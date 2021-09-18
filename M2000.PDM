@@ -1,0 +1,1612 @@
+[Root]
+Most Recent Package=mysetup2016
+
+
+[Package|final4|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final4
+
+[Package|final4|Configure DAO ISAMs]
+Applicable=Yes
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|final4|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|final4|Files Found]
+
+[Package|final4|Files Released]
+
+[Package|final4|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+
+[Package|final4|Out-of-Date Dependency Information]
+
+[Package|final4|Files Added]
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\help2000.mdb=
+
+[Package|final4|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+
+[Package|final4|Files In Project]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=Yes
+C:\WINDOWS\system32\msvbvm60.dll=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=No
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=Yes
+C:\WINDOWS\system32\MSJET35.DLL=Yes
+C:\WINDOWS\system32\MSJTER35.DLL=Yes
+C:\WINDOWS\system32\MSJINT35.DLL=Yes
+C:\WINDOWS\system32\vbajet32.dll=Yes
+C:\WINDOWS\system32\expsrv.dll=Yes
+C:\WINDOWS\system32\MSRD2X35.DLL=Yes
+C:\WINDOWS\system32\MSREPL35.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=Yes
+C:\WINDOWS\system32\VB5DB.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=Yes
+
+[Package|final4|Configure Registry Files]
+Applicable=No
+
+[Package|final4|Configure Remote Servers]
+Applicable=No
+
+[Package|final4|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+
+[Package|final4|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+
+[Package|final4|Distribution]
+Type=single
+Size=
+Title=M2000v6
+
+[Package|final4|Package]
+PackageFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final4
+ProjectFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4
+ServerSideCab=
+File1=C:\Documents and Settings\Me\Τα έγγραφά μου\final4\setup.exe
+File2=C:\Documents and Settings\Me\Τα έγγραφά μου\final4\Setup.Lst
+File3=C:\Documents and Settings\Me\Τα έγγραφά μου\final4\M2000.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
+
+[Package|final4|IconGroups]
+Group0=M2000
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|final4|M2000]
+Icon1=M2000.exe
+Title1=M2000
+StartIn1=$(AppPath)
+Key1=Icon1
+
+
+[Package|final7|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+
+[Package|final7|Configure DAO ISAMs]
+Applicable=No
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|final7|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|final7|Files Found]
+
+[Package|final7|Files Released]
+
+[Package|final7|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=
+
+[Package|final7|Out-of-Date Dependency Information]
+
+[Package|final7|Files Added]
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\help2000.mdb=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=
+
+[Package|final7|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\idispatch.tlb=
+
+[Package|final7|Files In Project]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=Yes
+C:\WINDOWS\system32\msvbvm60.dll=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=Yes
+
+[Package|final7|Configure Registry Files]
+Applicable=No
+
+[Package|final7|Configure Remote Servers]
+Applicable=No
+
+[Package|final7|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=$(AppPath)
+
+[Package|final7|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=No
+
+[Package|final7|Distribution]
+Type=single
+Size=
+Title=M2000v6rev8
+
+[Package|final7|IconGroups]
+Group0=M2000
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|final7|M2000]
+Icon1=M2000.exe
+Title1=M2000
+StartIn1=$(AppPath)
+Key1=Icon1
+
+[Package|final7|Package]
+PackageFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+ProjectFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4
+ServerSideCab=
+File1=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\setup.exe
+File2=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\Setup.Lst
+File3=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\M2000.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
+
+[Package|fina9|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+
+[Package|fina9|Configure DAO ISAMs]
+Applicable=No
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|fina9|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|fina9|Files Found]
+
+[Package|fina9|Files Released]
+
+[Package|fina9|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=
+
+[Package|fina9|Out-of-Date Dependency Information]
+
+[Package|fina9|Files Added]
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\help2000.mdb=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\ca.crt=
+
+[Package|fina9|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\idispatch.tlb=
+
+[Package|fina9|Files In Project]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=Yes
+C:\WINDOWS\system32\msvbvm60.dll=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=Yes
+
+[Package|fina9|Configure Registry Files]
+Applicable=No
+
+[Package|fina9|Configure Remote Servers]
+Applicable=No
+
+[Package|fina9|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=$(AppPath)
+
+[Package|fina9|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=No
+
+[Package|fina9|Distribution]
+Type=single
+Size=
+Title=M2000v6rev9
+
+[Package|fina9|Package]
+PackageFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+ProjectFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4
+ServerSideCab=
+File1=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\setup.exe
+File2=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\Setup.Lst
+File3=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\M2000.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
+
+[Package|fina9|IconGroups]
+Group0=M2000
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|fina9|M2000]
+Icon1=M2000.exe
+Title1=M2000
+StartIn1=$(AppPath)
+Key1=Icon1
+
+[Package|fina10|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+
+[Package|fina10|Configure DAO ISAMs]
+Applicable=No
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|fina10|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|fina10|Files Found]
+
+[Package|fina10|Files Released]
+
+[Package|fina10|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=
+
+[Package|fina10|Out-of-Date Dependency Information]
+
+[Package|fina10|Files Added]
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\help2000.mdb=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\ca.crt=
+
+[Package|fina10|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\idispatch.tlb=
+
+[Package|fina10|Files In Project]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=Yes
+C:\WINDOWS\system32\msvbvm60.dll=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=Yes
+
+[Package|fina10|Configure Registry Files]
+Applicable=No
+
+[Package|fina10|Configure Remote Servers]
+Applicable=No
+
+[Package|fina10|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=$(AppPath)
+
+[Package|fina10|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=No
+
+[Package|fina10|Distribution]
+Type=single
+Size=
+Title=M2000v6reV10
+
+[Package|fina10|Package]
+PackageFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+ProjectFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4
+ServerSideCab=
+File1=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\setup.exe
+File2=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\Setup.Lst
+File3=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\M2000.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
+
+[Package|fina10|IconGroups]
+Group0=M2000
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|fina10|M2000]
+Icon1=M2000.exe
+Title1=M2000
+StartIn1=$(AppPath)
+Key1=Icon1
+
+[Package|fina11|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+
+[Package|fina11|Configure DAO ISAMs]
+Applicable=No
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|fina11|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|fina11|Files Found]
+
+[Package|fina11|Files Released]
+
+[Package|fina11|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=
+
+[Package|fina11|Out-of-Date Dependency Information]
+
+[Package|fina11|Files Added]
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\help2000.mdb=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\ca.crt=
+
+[Package|fina11|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\idispatch.tlb=
+
+[Package|fina11|Files In Project]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=Yes
+C:\WINDOWS\system32\msvbvm60.dll=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=Yes
+
+[Package|fina11|Configure Registry Files]
+Applicable=No
+
+[Package|fina11|Configure Remote Servers]
+Applicable=No
+
+[Package|fina11|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=$(AppPath)
+
+[Package|fina11|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=No
+
+[Package|fina11|Distribution]
+Type=single
+Size=
+Title=M2000v6reV11
+
+[Package|fina11|Package]
+PackageFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+ProjectFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4
+ServerSideCab=
+File1=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\setup.exe
+File2=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\Setup.Lst
+File3=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\M2000.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
+
+[Package|fina11|IconGroups]
+Group0=M2000
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|fina11|M2000]
+Icon1=M2000.exe
+Title1=M2000
+StartIn1=$(AppPath)
+Key1=Icon1
+
+[Package|final12|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+
+[Package|final12|Configure DAO ISAMs]
+Applicable=No
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|final12|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|final12|Files Found]
+
+[Package|final12|Files Released]
+
+[Package|final12|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=
+
+[Package|final12|Out-of-Date Dependency Information]
+
+[Package|final12|Files Added]
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\help2000.mdb=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\ca.crt=
+
+[Package|final12|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\idispatch.tlb=
+
+[Package|final12|Files In Project]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=Yes
+C:\WINDOWS\system32\msvbvm60.dll=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=Yes
+
+[Package|final12|Configure Registry Files]
+Applicable=No
+
+[Package|final12|Configure Remote Servers]
+Applicable=No
+
+[Package|final12|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=$(AppPath)
+
+[Package|final12|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=No
+
+[Package|final12|Distribution]
+Type=single
+Size=
+Title=M2000v7reV12
+
+[Package|final12|Package]
+PackageFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+ProjectFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4
+ServerSideCab=
+File1=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\setup.exe
+File2=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\Setup.Lst
+File3=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\M2000.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
+
+[Package|final12|IconGroups]
+Group0=M2000
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|final12|M2000]
+Icon1=M2000.exe
+Title1=M2000
+StartIn1=$(AppPath)
+Key1=Icon1
+
+[Package|final13|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+
+[Package|final13|Configure DAO ISAMs]
+Applicable=No
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|final13|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|final13|Files Found]
+
+[Package|final13|Files Released]
+
+[Package|final13|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=
+
+[Package|final13|Out-of-Date Dependency Information]
+
+[Package|final13|Files Added]
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\help2000.mdb=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\ca.crt=
+
+[Package|final13|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\idispatch.tlb=
+
+[Package|final13|Files In Project]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=Yes
+C:\WINDOWS\system32\msvbvm60.dll=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=Yes
+
+[Package|final13|Configure Registry Files]
+Applicable=No
+
+[Package|final13|Configure Remote Servers]
+Applicable=No
+
+[Package|final13|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=$(AppPath)
+
+[Package|final13|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=No
+
+[Package|final13|Distribution]
+Type=single
+Size=
+Title=M2000v7reV13
+
+[Package|final13|Package]
+PackageFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+ProjectFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4
+ServerSideCab=
+File1=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\setup.exe
+File2=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\Setup.Lst
+File3=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\M2000.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
+
+[Package|final13|IconGroups]
+Group0=M2000
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|final13|M2000]
+Icon1=M2000.exe
+Title1=M2000
+StartIn1=$(AppPath)
+Key1=Icon1
+
+[Package|final14|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+
+[Package|final14|Configure DAO ISAMs]
+Applicable=No
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|final14|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|final14|Files Found]
+
+[Package|final14|Files Released]
+
+[Package|final14|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=
+
+[Package|final14|Out-of-Date Dependency Information]
+
+[Package|final14|Files Added]
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\help2000.mdb=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\ca.crt=
+
+[Package|final14|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\idispatch.tlb=
+
+[Package|final14|Files In Project]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=Yes
+C:\WINDOWS\system32\msvbvm60.dll=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=Yes
+
+[Package|final14|Configure Registry Files]
+Applicable=No
+
+[Package|final14|Configure Remote Servers]
+Applicable=No
+
+[Package|final14|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=$(AppPath)
+
+[Package|final14|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=No
+
+[Package|final14|Distribution]
+Type=single
+Size=
+Title=M2000v7reV14
+
+[Package|final14|Package]
+PackageFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+ProjectFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4
+ServerSideCab=
+File1=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\setup.exe
+File2=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\Setup.Lst
+File3=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\M2000.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
+
+[Package|final14|IconGroups]
+Group0=M2000
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|final14|M2000]
+Icon1=M2000.exe
+Title1=M2000
+StartIn1=$(AppPath)
+Key1=Icon1
+
+[Package|final15|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+
+[Package|final15|Configure DAO ISAMs]
+Applicable=No
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|final15|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|final15|Files Found]
+
+[Package|final15|Files Released]
+
+[Package|final15|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=
+
+[Package|final15|Out-of-Date Dependency Information]
+
+[Package|final15|Files Added]
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\help2000.mdb=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\ca.crt=
+
+[Package|final15|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\idispatch.tlb=
+
+[Package|final15|Files In Project]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=Yes
+C:\WINDOWS\system32\msvbvm60.dll=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=Yes
+
+[Package|final15|Configure Registry Files]
+Applicable=No
+
+[Package|final15|Configure Remote Servers]
+Applicable=No
+
+[Package|final15|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=$(AppPath)
+
+[Package|final15|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=No
+
+[Package|final15|Distribution]
+Type=single
+Size=
+Title=M2000v7reV15
+
+[Package|final15|Package]
+PackageFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+ProjectFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4
+ServerSideCab=
+File1=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\setup.exe
+File2=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\Setup.Lst
+File3=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\M2000.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
+
+[Package|final15|IconGroups]
+Group0=M2000
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|final15|M2000]
+Icon1=M2000.exe
+Title1=M2000
+StartIn1=$(AppPath)
+Key1=Icon1
+
+[Package|final16|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+
+[Package|final16|Configure DAO ISAMs]
+Applicable=No
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|final16|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|final16|Files Found]
+
+[Package|final16|Files Released]
+
+[Package|final16|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=
+
+[Package|final16|Out-of-Date Dependency Information]
+
+[Package|final16|Files Added]
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\help2000.mdb=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\ca.crt=
+
+[Package|final16|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\idispatch.tlb=
+
+[Package|final16|Files In Project]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=Yes
+C:\WINDOWS\system32\msvbvm60.dll=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=Yes
+
+[Package|final16|Configure Registry Files]
+Applicable=No
+
+[Package|final16|Configure Remote Servers]
+Applicable=No
+
+[Package|final16|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=$(AppPath)
+
+[Package|final16|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=No
+
+[Package|final16|Distribution]
+Type=single
+Size=
+Title=M2000v7reV16
+
+[Package|final16|Package]
+PackageFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+ProjectFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4
+ServerSideCab=
+File1=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\setup.exe
+File2=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\Setup.Lst
+File3=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\M2000.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
+
+[Package|final16|IconGroups]
+Group0=M2000
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|final16|M2000]
+Icon1=M2000.exe
+Title1=M2000
+StartIn1=$(AppPath)
+Key1=Icon1
+
+
+[Package|final17|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+
+[Package|final17|Configure DAO ISAMs]
+Applicable=No
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|final17|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|final17|Files Found]
+
+[Package|final17|Files Released]
+
+[Package|final17|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=
+
+[Package|final17|Out-of-Date Dependency Information]
+
+[Package|final17|Files Added]
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\help2000.mdb=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\ca.crt=
+
+[Package|final17|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\idispatch.tlb=
+
+[Package|final17|Files In Project]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=Yes
+C:\WINDOWS\system32\msvbvm60.dll=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=Yes
+
+[Package|final17|Configure Registry Files]
+Applicable=No
+
+[Package|final17|Configure Remote Servers]
+Applicable=No
+
+[Package|final17|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=$(AppPath)
+
+[Package|final17|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=No
+
+[Package|final17|Distribution]
+Type=single
+Size=
+Title=M2000v7rev18
+
+[Package|final17|Package]
+PackageFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\final7
+ProjectFolder=C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4
+ServerSideCab=
+File1=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\setup.exe
+File2=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\Setup.Lst
+File3=C:\Documents and Settings\Me\Τα έγγραφά μου\final7\M2000.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
+
+[Package|final17|IconGroups]
+Group0=M2000 Programming Language
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|final17|M2000 Programming Language]
+Icon1=M2000.exe
+Title1=M2000 Environment
+StartIn1=$(AppPath)
+Key1=Icon1
+Icon2=ca.crt
+Title2=Install Certificate as Root
+StartIn2=$(AppPath)
+Key2=Icon3
+
+
+[Package|mypackage|Root]
+SubWizProgID=PDWizard.InetCABPkgSubWiz
+BuildFolder=C:\instal
+RA Server Support=Yes
+
+[Package|mypackage|Configure DAO ISAMs]
+Applicable=No
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|mypackage|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|mypackage|Files Found]
+help2000.mdb=C:\Users\moonbase\Documents\m2000v4\help2000.mdb
+AUTPRX32.DLL=C:\Users\moonbase\Documents\m2000v4\AUTPRX32.DLL
+AUTMGR32.EXE=C:\Users\moonbase\Documents\m2000v4\AUTMGR32.EXE
+RACMGR32.EXE=C:\Users\moonbase\Documents\m2000v4\RACMGR32.EXE
+ODKOB32.DLL=C:\Users\moonbase\Documents\m2000v4\ODKOB32.DLL
+RACREG32.DLL=C:\Users\moonbase\Documents\m2000v4\RACREG32.DLL
+
+[Package|mypackage|Files Released]
+
+[Package|mypackage|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=
+C:\Users\moonbase\Documents\m2000v4\Idispatch.tlb=
+C:\Windows\System32\ieframe.dll=
+
+[Package|mypackage|Out-of-Date Dependency Information]
+
+[Package|mypackage|Files Added]
+help2000.mdb=
+ca.crt=
+AutPrx32.dll=This file is needed for RA server support.
+AutMgr32.exe=This file is needed for RA server support.
+
+[Package|mypackage|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\idispatch.tlb=
+c:\windows\system32\ieframe.dll=
+c:\users\moonbase\documents\m2000v4\idispatch.tlb=
+
+[Package|mypackage|Files In Project]
+C:\WINDOWS\system32\msvbvm60.dll=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\Users\moonbase\Documents\m2000v4\m2000.exe=Yes
+C:\Windows\System32\ieframe.dll=No
+C:\Users\moonbase\Documents\m2000v4\Idispatch.tlb=No
+C:\Users\moonbase\Documents\m2000v4\help2000.mdb=Yes
+C:\Users\moonbase\Documents\m2000v4\ca.crt=Yes
+C:\Users\moonbase\Documents\m2000v4\AUTPRX32.DLL=Yes
+C:\Users\moonbase\Documents\m2000v4\AUTMGR32.EXE=Yes
+
+[Package|mypackage|Configure Registry Files]
+Applicable=No
+
+[Package|mypackage|Configure Remote Servers]
+Applicable=No
+
+[Package|mypackage|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=$(AppPath)
+
+[Package|mypackage|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=No
+
+[Package|mypackage|Distribution]
+Type=single
+Size=
+Title=M2000v7rev18
+
+[Package|mypackage|IconGroups]
+Group0=M2000 Programming Language
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|mypackage|M2000 Programming Language]
+Icon1=M2000.exe
+Title1=M2000 Environment
+StartIn1=$(AppPath)
+Key1=Icon1
+Icon2=ca.crt
+Title2=Install Certificate as Root
+StartIn2=$(AppPath)
+Key2=Icon3
+
+[Package|mypackage|ComponentInfo]
+m2000.exe=thiscab
+msvbvm60.dll=thiscab
+OLEAUT32.DLL=thiscab
+OLEPRO32.DLL=thiscab
+ASYCFILT.DLL=thiscab
+STDOLE2.TLB=thiscab
+COMCAT.DLL=thiscab
+help2000.mdb=thiscab
+ca.crt=thiscab
+AUTPRX32.DLL=thiscab
+AUTMGR32.EXE=thiscab
+
+[Package|mypackage|ObjectInfo]
+callback=true;true
+
+[Package|mypackage|Package]
+PackageFolder=C:\instal
+ProjectFolder=C:\Users\moonbase\Documents\m2000v4
+ServerSideCab=C:\instal\m2000.CAB
+File1=C:\instal\m2000.CAB
+File2=C:\instal\m2000.HTM
+Handler1=PDWizard.WebPostDplySubWiz
+Handler2=PDWizard.FolderDplySubWiz
+
+
+[Package|mysetup2016|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\instal
+RA Server Support=Yes
+
+[Package|mysetup2016|Configure DAO ISAMs]
+Applicable=No
+Xbase=No
+Excel=No
+Text=No
+Jet 2.x=No
+Lotus=No
+Paradox=No
+
+[Package|mysetup2016|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|mysetup2016|Files Found]
+help2000.mdb=C:\Users\moonbase\Documents\m2000v4\help2000.mdb
+AUTPRX32.DLL=C:\Users\moonbase\Documents\m2000v4\AUTPRX32.DLL
+AUTMGR32.EXE=C:\Users\moonbase\Documents\m2000v4\AUTMGR32.EXE
+RACMGR32.EXE=C:\Users\moonbase\Documents\m2000v4\RACMGR32.EXE
+ODKOB32.DLL=C:\Users\moonbase\Documents\m2000v4\ODKOB32.DLL
+RACREG32.DLL=C:\Users\moonbase\Documents\m2000v4\RACREG32.DLL
+ca.crt=C:\Users\moonbase\Documents\m2000v4\ca.crt
+
+[Package|mysetup2016|Files Released]
+
+[Package|mysetup2016|Missing Dependency Information]
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\IDispatch.tlb=
+C:\Users\moonbase\Documents\m2000v4\Idispatch.tlb=
+C:\Windows\System32\ieframe.dll=
+
+[Package|mysetup2016|Out-of-Date Dependency Information]
+C:\Windows\System32\MSCOMCTL.OCX=
+
+[Package|mysetup2016|Files Added]
+help2000.mdb=
+ca.crt=
+autprx32.dll=This file is needed for RA server support.
+autmgr32.exe=This file is needed for RA server support.
+RACMgr32.exe=This file is needed for RA server support.
+
+[Package|mysetup2016|Files Removed]
+c:\windows\winsxs\x86_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\gdiplus.dll=
+c:\documents and settings\me\τα έγγραφά μου\newm2000v4\idispatch.tlb=
+c:\windows\system32\ieframe.dll=
+c:\users\moonbase\documents\m2000v4\idispatch.tlb=
+c:\windows\system32\msvbvm60.dll=
+c:\program files\microsoft visual studio\vb98\wizards\pdwizard\redist\oleaut32.dll=
+c:\program files\microsoft visual studio\vb98\wizards\pdwizard\redist\olepro32.dll=
+c:\program files\microsoft visual studio\vb98\wizards\pdwizard\redist\asycfilt.dll=
+c:\program files\microsoft visual studio\vb98\wizards\pdwizard\redist\stdole2.tlb=
+c:\program files\microsoft visual studio\vb98\wizards\pdwizard\redist\comcat.dll=
+c:\windows\system32\mscomctl.ocx=
+
+[Package|mysetup2016|Files In Project]
+C:\WINDOWS\system32\msvbvm60.dll=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=No
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=No
+C:\Users\moonbase\Documents\m2000v4\m2000.exe=Yes
+C:\Windows\System32\ieframe.dll=No
+C:\Users\moonbase\Documents\m2000v4\Idispatch.tlb=No
+C:\Users\moonbase\Documents\m2000v4\help2000.mdb=Yes
+C:\Users\moonbase\Documents\m2000v4\ca.crt=Yes
+C:\Users\moonbase\Documents\m2000v4\AUTPRX32.DLL=Yes
+C:\Users\moonbase\Documents\m2000v4\AUTMGR32.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\Windows\System32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Users\moonbase\Documents\m2000v4\RACMGR32.EXE=Yes
+C:\Windows\System32\MSCOMCTL.OCX=No
+C:\Users\moonbase\Documents\m2000v4\RACREG32.DLL=Yes
+C:\Users\moonbase\Documents\m2000v4\ODKOB32.DLL=Yes
+
+[Package|mysetup2016|Configure Registry Files]
+Applicable=No
+
+[Package|mysetup2016|Configure Remote Servers]
+Applicable=No
+
+[Package|mysetup2016|Install Locations]
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=$(AppPath)
+C:\WINDOWS\system32\msvbvm60.dll=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\WinSxS\x86_Microsoft.Windows.GdiPlus_6595b64144ccf1df_1.0.2600.5512_x-ww_dfb54e0c\GdiPlus.dll=$(WinSysPath)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\system32\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\vbajet32.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\system32\VB5DB.DLL=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=$(AppPath)
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=$(AppPath)
+C:\Users\moonbase\Documents\m2000v4\m2000.exe=$(AppPath)
+C:\Users\moonbase\Documents\m2000v4\help2000.mdb=$(AppPath)
+C:\Users\moonbase\Documents\m2000v4\ca.crt=$(AppPath)
+C:\Users\moonbase\Documents\m2000v4\AUTPRX32.DLL=$(WinSysPath)
+C:\Users\moonbase\Documents\m2000v4\AUTMGR32.EXE=$(WinSysPath)
+C:\Users\moonbase\Documents\m2000v4\RACMGR32.EXE=$(WinSysPath)
+C:\Users\moonbase\Documents\m2000v4\RACREG32.DLL=$(WinSysPath)
+C:\Users\moonbase\Documents\m2000v4\ODKOB32.DLL=$(WinSysPath)
+
+[Package|mysetup2016|Configure Shared Files]
+Applicable=Yes
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\M2000.exe=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\help2000.mdb=No
+C:\Documents and Settings\Me\Τα έγγραφά μου\newM2000v4\ca.crt=No
+C:\Users\moonbase\Documents\m2000v4\m2000.exe=No
+C:\Users\moonbase\Documents\m2000v4\help2000.mdb=No
+C:\Users\moonbase\Documents\m2000v4\ca.crt=No
+
+[Package|mysetup2016|Distribution]
+Type=single
+Size=
+Title=M2000_v8.1_rev19
+
+[Package|mysetup2016|ComponentInfo]
+m2000.exe=thiscab
+msvbvm60.dll=thiscab
+OLEAUT32.DLL=thiscab
+OLEPRO32.DLL=thiscab
+ASYCFILT.DLL=thiscab
+STDOLE2.TLB=thiscab
+COMCAT.DLL=thiscab
+help2000.mdb=thiscab
+ca.crt=thiscab
+AUTPRX32.DLL=thiscab
+AUTMGR32.EXE=thiscab
+
+[Package|mysetup2016|ObjectInfo]
+callback=true;true
+
+[Package|mysetup2016|IconGroups]
+Group0=M2000 Programming Language
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|mysetup2016|M2000 Programming Language]
+Icon1=M2000.exe
+Title1=M2000 Environment
+StartIn1=$(AppPath)
+Key1=Icon1
+Icon2=ca.crt
+Title2=Install Certificate as Root
+StartIn2=$(AppPath)
+Key2=Icon3
+
+[Package|mysetup2016|Package]
+PackageFolder=C:\instal
+ProjectFolder=C:\Users\moonbase\Documents\m2000v4
+ServerSideCab=
+File1=C:\instal\setup.exe
+File2=C:\instal\Setup.Lst
+File3=C:\instal\m2000.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
