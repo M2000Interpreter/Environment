@@ -1,0 +1,238 @@
+// Generated .IDL file (by the OLE/COM Object Viewer)
+// 
+// typelib filename: IDispatch.tlb
+
+[
+  uuid(54BC8460-C769-11D2-8350-444553540004),
+  version(2.0),
+  helpstring("IDispatch Interface - Eduardo Morcillo - changed for M2000 Interperter")
+]
+library IDispatch
+{
+
+    // TLib :     // TLib : OLE Automation : {00020430-0000-0000-C000-000000000046}
+    importlib("stdole2.tlb");
+
+typedef struct {                
+long Data1;
+                
+short Data2;
+                
+short Data3;
+                
+unsigned char Data4[8];
+    } IID;
+    typedef struct {
+        [helpstring("Parameters")        
+]
+        long rgPointerToVariantArray;
+        [helpstring("Named parameters")        
+]
+        long rgPointerToDISPIDNamedArgs;
+        [helpstring("Parameter count")        
+]
+        long cArgs;
+        [helpstring("Named parameter count")        
+]
+        long cNamedArgs;
+    } DISPPARAMS;
+  
+    typedef struct {
+        [helpstring("Error number")        
+]
+        short wCode;
+                
+short wReserved;
+        [helpstring("Source")        
+]
+        long StrPtrSource;
+        [helpstring("Description")        
+]
+        long StrPtrDescription;
+        [helpstring("Help file")        
+]
+        long StrPtrHelpFile;
+        [helpstring("Help context")        
+]
+        long dwHelpContext;
+                
+long pvReserved;
+        [helpstring("HRESULT (__stdcall *pfnDeferredFillIn)(struct EXCEPINFO *);")        
+]
+        long pfnDeferredFillIn;
+                
+long scode;
+    } EXCEPINFO;
+
+    typedef [helpstring("InvokeFlags")]
+    enum {
+        DISPATCH_METHOD = 1,
+        DISPATCH_PROPERTYGET = 2,
+        DISPATCH_PROPERTYPUT = 4,
+        DISPATCH_PROPERTYPUTREF = 8
+    } InvokeFlags;
+
+    typedef [helpstring("IDispatch::Invoke HRESULTs")]
+    enum {
+        DISP_E_UNKNOWNINTERFACE = -2147352575,
+        DISP_E_MEMBERNOTFOUND = -2147352573,
+        DISP_E_PARAMNOTFOUND = -2147352572,
+        DISP_E_TYPEMISMATCH = -2147352571,
+        DISP_E_UNKNOWNNAME = -2147352570,
+        DISP_E_NONAMEDARGS = -2147352569,
+        DISP_E_BADVARTYPE = -2147352568,
+        DISP_E_EXCEPTION = -2147352567,
+        DISP_E_OVERFLOW = -2147352566,
+        DISP_E_BADINDEX = -2147352565,
+        DISP_E_UNKNOWNLCID = -2147352564,
+        DISP_E_ARRAYISLOCKED = -2147352563,
+        DISP_E_BADPARAMCOUNT = -2147352562,
+        DISP_E_PARAMNOTOPTIONAL = -2147352561,
+        DISP_E_BADCALLEE = -2147352560,
+        DISP_E_NOTACOLLECTION = -2147352559,
+        DISP_E_DIVBYZERO = -2147352558
+    } InvokeResults;
+
+    typedef [helpstring("Standard DISPIDs")]
+    enum {
+        DISPID_AUTOSIZE = -500,
+        DISPID_BACKCOLOR = -501,
+        DISPID_BACKSTYLE = -502,
+        DISPID_BORDERCOLOR = -503,
+        DISPID_BORDERSTYLE = -504,
+        DISPID_BORDERWIDTH = -505,
+        DISPID_DRAWMODE = -507,
+        DISPID_DRAWSTYLE = -508,
+        DISPID_DRAWWIDTH = -509,
+        DISPID_FILLCOLOR = -510,
+        DISPID_FILLSTYLE = -511,
+        DISPID_FONT = -512,
+        DISPID_FORECOLOR = -513,
+        DISPID_ENABLED = -514,
+        DISPID_HWND = -515,
+        DISPID_TABSTOP = -516,
+        DISPID_TEXT = -517,
+        DISPID_CAPTION = -518,
+        DISPID_BORDERVISIBLE = -519,
+        DISPID_APPEARANCE = -520,
+        DISPID_MOUSEPOINTER = -521,
+        DISPID_MOUSEICON = -522,
+        DISPID_PICTURE = -523,
+        DISPID_VALID = -524,
+        DISPID_READYSTATE = -525,
+        DISPID_LISTINDEX = -526,
+        DISPID_SELECTED = -527,
+        DISPID_LIST = -528,
+        DISPID_COLUMN = -529,
+        DISPID_LISTCOUNT = -531,
+        DISPID_MULTISELECT = -532,
+        DISPID_MAXLENGTH = -533,
+        DISPID_PASSWORDCHAR = -534,
+        DISPID_SCROLLBARS = -535,
+        DISPID_WORDWRAP = -536,
+        DISPID_MULTILINE = -537,
+        DISPID_NUMBEROFROWS = -538,
+        DISPID_NUMBEROFCOLUMNS = -539,
+        DISPID_DISPLAYSTYLE = -540,
+        DISPID_GROUPNAME = -541,
+        DISPID_IMEMODE = -542,
+        DISPID_ACCELERATOR = -543,
+        DISPID_ENTERKEYBEHAVIOR = -544,
+        DISPID_TABKEYBEHAVIOR = -545,
+        DISPID_SELTEXT = -546,
+        DISPID_SELSTART = -547,
+        DISPID_SELLENGTH = -548,
+        DISPID_REFRESH = -550,
+        DISPID_DOCLICK = -551,
+        DISPID_ABOUTBOX = -552,
+        DISPID_ADDITEM = -553,
+        DISPID_CLEAR = -554,
+        DISPID_REMOVEITEM = -555,
+        DISPID_CLICK = -600,
+        DISPID_DBLCLICK = -601,
+        DISPID_KEYDOWN = -602,
+        DISPID_KEYPRESS = -603,
+        DISPID_KEYUP = -604,
+        DISPID_MOUSEDOWN = -605,
+        DISPID_MOUSEMOVE = -606,
+        DISPID_MOUSEUP = -607,
+        DISPID_ERROREVENT = -608,
+        DISPID_READYSTATECHANGE = -609,
+        DISPID_CLICK_VALUE = -610,
+        DISPID_RIGHTTOLEFT = -611,
+        DISPID_TOPTOBOTTOM = -612,
+        DISPID_NAME = -800,
+        DISPID_DELETE = -801,
+        DISPID_OBJECT = -802,
+        DISPID_PARENT = -803
+    } STANDARD_DISPIDS;
+
+    typedef enum {
+        DISPID_AMBIENT_BACKCOLOR = -701,
+        DISPID_AMBIENT_DISPLAYNAME = -702,
+        DISPID_AMBIENT_FONT = -703,
+        DISPID_AMBIENT_FORECOLOR = -704,
+        DISPID_AMBIENT_LOCALEID = -705,
+        DISPID_AMBIENT_MESSAGEREFLECT = -706,
+        DISPID_AMBIENT_SCALEUNITS = -707,
+        DISPID_AMBIENT_TEXTALIGN = -708,
+        DISPID_AMBIENT_USERMODE = -709,
+        DISPID_AMBIENT_UIDEAD = -710,
+        DISPID_AMBIENT_SHOWGRABHANDLES = -711,
+        DISPID_AMBIENT_SHOWHATCHING = -712,
+        DISPID_AMBIENT_DISPLAYASDEFAULT = -713,
+        DISPID_AMBIENT_SUPPORTSMNEMONICS = -714,
+        DISPID_AMBIENT_AUTOCLIP = -715,
+        DISPID_AMBIENT_APPEARANCE = -716,
+        DISPID_AMBIENT_PALETTE = -726,
+        DISPID_AMBIENT_TRANSFERPRIORITY = -728,
+        DISPID_AMBIENT_RIGHTTOLEFT = -732,
+        DISPID_AMBIENT_TOPTOBOTTOM = -733
+    } AMBIENT_DISPIDS;
+
+    typedef enum {
+        DISPID_FONT_NAME = 0,
+        DISPID_FONT_SIZE = 2,
+        DISPID_FONT_BOLD = 3,
+        DISPID_FONT_ITALIC = 4,
+        DISPID_FONT_UNDER = 5,
+        DISPID_FONT_STRIKE = 6,
+        DISPID_FONT_WEIGHT = 7,
+        DISPID_FONT_CHARSET = 8,
+        DISPID_PICT_HANDLE = 0,
+        DISPID_PICT_HPAL = 2,
+        DISPID_PICT_TYPE = 3,
+        DISPID_PICT_WIDTH = 4,
+        DISPID_PICT_HEIGHT = 5,
+        DISPID_PICT_RENDER = 6
+    } OLEOBJECTS_DISPIDS;
+
+    interface IDispatchM2000;
+    [
+      odl,
+      uuid(00020400-0000-0000-C000-000000000046),
+      helpstring("IDispatch Interface")
+    ]
+    interface IDispatchM2000: IUnknown {
+        long _stdcall GetTypeInfoCount([out] long* pctinfo);
+        long _stdcall GetTypeInfo(
+                        [in] long iTInfo, 
+                        [in] long lcid, 
+                        [out] long* ppTInfo);
+        long _stdcall GetIDsOfNames(
+                        [in] IID* riid, 
+                        [in] long *rgszNames, 
+                        [in] long cNames,
+                        [in] long lcid, 
+                        [in, out] long *rgDispId);
+        long _stdcall Invoke(
+                        [in] long dispIdMember, 
+                        [in] IID* riid, 
+                        [in] long lcid, 
+                        [in] short wFlags, 
+                        [in, out] DISPPARAMS* pDispParams, 
+                        [out] VARIANT* pVarResult, 
+                        [out] EXCEPINFO* pExcepInfo, 
+                        [out] long* puArgErr);
+    };
+};

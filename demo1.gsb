@@ -1,0 +1,346 @@
+﻿MODULE GLOBAL A {Rem :  
+Thread.plan sequential
+\\ we can set Thread.plan before any thread created
+Rem :  Thread.plan concurrent
+\\ concurrent execute one by one statements
+\\ except those in { }
+\\ also from Revision 52 Part {} as variable works fine with it
+local counter1, counter2
+Title "3D Graphics", 0 ' 0  to hide console
+Set FAST !
+\\ by api
+Structure VecType {
+          x As Double
+          y As Double
+          z As Double
+}
+\\ Program
+Structure Variables {
+      vRot1 As VecType
+      vRot2 As VecType
+      vRot3 As VecType
+      vRot4 As VecType
+      vBase As VecType
+      vAxis As VecType
+}
+Buffer Clear Var As Variables
+\\ utility function
+VecAdr=Lambda Var (a$) -> {
+      =Var(0,a$)
+}
+VecOff=Lambda Var, VecType (a$, b$) -> {
+      =Var(0, a$, VecType(b$)!)
+}
+Class cLine {
+      X1, Y1, X2, Y2, color
+      Module Render {
+            ' read Number from stack
+            z=Round(Number,4)
+            z1=Round(Number, 4)
+            If z>=z1 Then {
+                  Move .X1, .Y1
+                  Width 3 {Draw to .X2, .Y2, .color}
+                  Circle Fill #aa33cc, z/40+200
+            } Else {
+                  Move .X2, .Y2
+                  Circle Fill #aa33cc, z/40+200
+                  Width 3 {Draw to .X1, .Y1, .color}
+            }
+      }
+Class:
+      Module cLine (.color){
+            If Match("NNNN") Then Read .X1, .Y1, .X2, .Y2
+      }     
+}
+
+\\ find address
+vBase=VecAdr("vBase")
+vBase.x=VecOff("vBase","x")
+vBase.y=VecOff("vBase","y")
+vBase.z=VecOff("vBase","z")
+vRot1=VecAdr("vRot1")
+vRot1.x=VecOff("vRot1","x")
+vRot1.y=VecOff("vRot1","y")
+vRot1.z=VecOff("vRot1","z")
+vRot2=VecAdr("vRot2")
+vRot2.x=VecOff("vRot2","x")
+vRot2.y=VecOff("vRot2","y")
+vRot2.z=VecOff("vRot2","z")
+vRot3=VecAdr("vRot3")
+vRot3.x=VecOff("vRot3","x")
+vRot3.y=VecOff("vRot3","y")
+vRot3.z=VecOff("vRot3","z")
+vRot4=VecAdr("vRot4")
+vRot4.x=VecOff("vRot4","x")
+vRot4.y=VecOff("vRot4","y")
+vRot4.z=VecOff("vRot4","z")
+vAxis=VecAdr("vAxis")
+
+Form 80,40
+Refresh 300
+Declare Alfa Form
+With Alfa, "Title", "Demo1"
+\\ a string to hold static background
+screen$=""
+disp=False
+Inventory Depth
+aLine=Each(Depth)
+once=False
+Thread {
+      part {
+                  Method Math, "RotVectMult", 4, vRot1, vAxis, vRot1, dAngle
+                  Push Eval(Var, vBase.y As double), Eval(Var, vBase.x As double)
+                  \\ x is in top, y is after x
+                  Over 2, 2 \\  copy two times from second, so double two top
+                  Push Eval(Var, vRot4.x As double)+Number : Over 1, 2 \\ copy 2 times top only
+                        Read Line1.X1, Line2.X1, Line3.X1
+                        Push Eval(Var, vRot4.y As double)+Number : Over 1, 2
+                        Read Line1.Y1, Line2.Y1, Line3.Y1
+                        Over 2, 4 \\ now original 2 values copied 4 times
+                        Line1.X2 = Eval(Var, vRot1.x As double)+Number
+                        Line1.Y2 = Eval(Var, vRot1.y As double)+Number
+                        Line2.X2 = Eval(Var, vRot2.x As double)+Number
+                        Line2.Y2 = Eval(Var, vRot2.y As double)+Number
+                        Line3.X2 = Eval(Var, vRot3.x As double)+Number
+                        Line3.Y2 = Eval(Var, vRot3.y As double)+Number
+                        DepthSort()
+                        counter1++
+      }  As once
+} As Compute
+Group All$ {
+Private:
+      Dim Base 1, A$(3)
+Public:
+      n=1
+      Set (.n) {
+            read .A$(.n)
+      }
+      Value {
+            =.A$(.n)
+      }
+}
+Layer Alfa {
+      Window 12, 10000, 8000;
+      Form 40, 20
+      Line1=cline(#0000FF, scale.x/2, scale.y/2, scale.x/2, scale.y/2-2220 )
+      Line2=cline(#FF0000, scale.x/2, scale.y/2, scale.x/2-2340, scale.y/2-60 )
+      Line3=cline(#00FF00, scale.x/2, scale.y/2, scale.x/2-780, scale.y/2-1200 )
+      All$(1)=Weak$(Line1.Render)
+      All$(2)=Weak$(Line2.Render)
+      All$(3)=Weak$(Line3.Render)
+      Declare Math Math
+      Method Math, "Vector", vBase,scale.x/2-1500, scale.y/2+1500, 1500 '  -1000
+      Method Math, "Vector", vRot1, Line1.X2, Line1.Y2, -1000
+      Method Math, "Vector", vRot2, Line2.X2, Line2.Y2, -1200
+      Method Math, "Vector", vRot3, Line3.X2, Line3.Y2, 1700
+      Method Math, "Vector", vRot4, Line1.X1, Line1.Y1, 0
+      Method Math,  "VecDiffMult", 4, vRot1, vBase, vRot1
+      Inventory Depth=Eval(Var, vRot1.z As double):=1, Eval(Var, vRot2.z As double):=2, Eval(Var, vRot3.z As double):=3
+      Sort Depth As number
+      Method Math, "Vector", vAxis, -.8, 1.6, .3
+      Method Math, "UnitVect", vAxis
+      Rad2Deg =Lambda pidivby180=pi/180 (RadAngle)->RadAngle / pidivby180
+      dAngle =5
+      Pen 0
+      Cls 7
+      Gradient 11, 13
+      Move 0,0
+      Cursor 0, Height-1
+      Cls 7, Height-1
+      Copy scale.x, scale.y to screen$
+      Cursor 0,Height
+      together=False
+      ok1=true
+      Thread {
+            ok1~
+      } as mm interval 1000/60
+      tm=0
+      Thread {
+            static internal=1
+            Refresh 0
+            Move 0,0
+            Copy 0,0 use screen$
+            Part {
+                  tm=timecount
+            } as ok1
+                  Print @(3,3); Round(tm,2)
+                  Cursor 0,height-1
+
+            Part {
+                       Part {
+                        aLine=Each(Depth)
+                        push  Eval(Var, vRot4.z As double) : Over 1, 2
+                        while aline {
+                                    All.n=eval(aLine)
+                                    Call All$, Val(eval$(Depth, aLine^))
+                        }
+                        counter2++
+                        } As disp
+                   Print Part $(5,Width/4), counter1, counter2,internal, $(7),Str$(Now , "hh:mm:ss" ) 
+                   Refresh ' execute together
+            }  As together
+            internal++
+            Profiler
+      } As PlayThis
+}
+\\ we set vatiables outside threads
+State=False
+blinking=False
+Thread {
+       If state Then disp~
+ } As blink
+Thread blink Hold
+ExitNow=False
+Function Alfa.Unload {
+      ExitNow=True
+      threads erase
+}
+Function Alfa.Click {
+                  State~
+                  If State Then {
+                         Thread compute Hold
+                         Thread blink interval 1000/4
+                         Thread blink Restart
+                         blinking=true
+                  } Else {
+                        disp=False
+                        If blinking Then Thread blink  Hold : blinking~
+                        Thread compute Restart
+                  }
+}
+Thread PlayThis interval 1000/60
+Thread compute interval 5
+Wait 200
+Method Alfa, "Show"
+\\ Change Task.Main with Every
+\\ Task.Main is a Thread
+\\ ExitNow needed If we have Every in place of Task.Main
+Task.Main 50 {
+\\      If counter1>1000 Then Threads Erase : Exit
+      If ExitNow Then Exit
+}
+Threads Erase
+Wait 100  \ some delay here
+Method Alfa, "CloseNow"
+Declare Alfa Nothing
+Declare Math Nothing
+Print counter1, counter2
+Sub DepthSort()
+             Inventory Queue Depth ' clear Depth, Then make keys As numbers
+             Append Depth, Eval(Var, vRot1.z As double):=1, Eval(Var, vRot2.z As double):=2, Eval(Var, vRot3.z As double):=3
+             Sort Depth As number
+End Sub
+}
+MODULE GLOBAL B {\\ by api
+Structure VecType {
+          x As Double
+          y As Double
+          z As Double
+}
+\\ Program
+Structure Variables {
+      vRot1 As VecType
+      vRot2 As VecType
+      vRot3 As VecType
+      vRot4 As VecType
+      vBase As VecType
+      vAxis As VecType
+}
+Buffer Clear Var As Variables
+\\ utility function
+VecAdr=Lambda Var (a$) -> {
+      =Var(0,a$)
+}
+VecOff=Lambda Var, VecType (a$, b$) -> {
+      =Var(0, a$, VecType(b$)!)
+}
+Class cLine {
+      X1, Y1, X2, Y2, color
+      Module Render {
+            ' read Number from stack
+            z=Round(Number,4)
+            z1=Round(Number, 4)
+            If z>=z1 Then {
+                  Move .X1, .Y1
+                  Width 3 {Draw to .X2, .Y2, .color}
+                  Circle Fill #aa33cc, z/40+200
+            } Else {
+                  Move .X2, .Y2
+                  Circle Fill #aa33cc, z/40+200
+                  Width 3 {Draw to .X1, .Y1, .color}
+            }
+      }
+Class:
+      Module cLine (.color){
+            If Match("NNNN") Then Read .X1, .Y1, .X2, .Y2
+      }     
+}
+
+\\ find address
+vBase=VecAdr("vBase")
+vBase.x=VecOff("vBase","x")
+vBase.y=VecOff("vBase","y")
+vBase.z=VecOff("vBase","z")
+vRot1=VecAdr("vRot1")
+vRot1.x=VecOff("vRot1","x")
+vRot1.y=VecOff("vRot1","y")
+vRot1.z=VecOff("vRot1","z")
+vRot2=VecAdr("vRot2")
+vRot2.x=VecOff("vRot2","x")
+vRot2.y=VecOff("vRot2","y")
+vRot2.z=VecOff("vRot2","z")
+vRot3=VecAdr("vRot3")
+vRot3.x=VecOff("vRot3","x")
+vRot3.y=VecOff("vRot3","y")
+vRot3.z=VecOff("vRot3","z")
+vRot4=VecAdr("vRot4")
+vRot4.x=VecOff("vRot4","x")
+vRot4.y=VecOff("vRot4","y")
+vRot4.z=VecOff("vRot4","z")
+vAxis=VecAdr("vAxis")
+Group All$ {
+Private:
+      Dim Base 1, A$(3)
+Public:
+      n=1
+      Set (.n) {
+            read .A$(.n)
+      }
+      Value {
+            =.A$(.n)
+      }
+}
+screen$=""
+disp=False
+Inventory Depth
+aLine=Each(Depth)
+once=False
+dangle=2
+counter1=1
+      Line1=cline(#0000FF, scale.x/2, scale.y/2, scale.x/2, scale.y/2-2220 )
+      Line2=cline(#FF0000, scale.x/2, scale.y/2, scale.x/2-2340, scale.y/2-60 )
+      Line3=cline(#00FF00, scale.x/2, scale.y/2, scale.x/2-780, scale.y/2-1200 )
+
+declare math math
+      Method Math, "Vector", vBase,scale.x/2-1500, scale.y/2+1500, 1500 '  -1000
+      Method Math, "Vector", vRot1, Line1.X2, Line1.Y2, -1000
+      Method Math, "Vector", vRot2, Line2.X2, Line2.Y2, -1200
+      Method Math, "Vector", vRot3, Line3.X2, Line3.Y2, 1700
+      Method Math, "Vector", vRot4, Line1.X1, Line1.Y1, 0
+      Method Math,  "VecDiffMult", 4, vRot1, vBase, vRot1
+
+Method Math, "RotVectMult", 4, vRot1, vAxis, vRot1, dAngle
+ counter1++
+
+Print counter1
+Print Eval(Var, vRot1.y As double)
+      All$(1)=Weak$(Line1.Render)
+      All$(2)=Weak$(Line2.Render)
+      All$(3)=Weak$(Line3.Render)
+For i=1 to 3 {
+      all.n=i
+      Print All$
+}
+}
+Smooth On
+A : END
