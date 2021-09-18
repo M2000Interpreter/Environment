@@ -1,0 +1,46 @@
+﻿MODULE A {function rec {
+      read bb
+      if bb<=0 then =0 : exit function
+      print bb
+      =rec(bb-1)
+      
+}
+
+a= rec(14500)
+}
+MODULE B {\\ script for making needed batch files for setting stack for m2000.exe
+\\ when we make the final exe
+curdir$=dir$
+\\ use editbin from masm32
+rem defaultpath$="C:\masm32\bin\"
+\\ or use the one from VC98
+defaultpath$="C:\Program Files\Microsoft Visual Studio\VC98\Bin\"
+if not exist(defaultpath$+"editbin.exe") then {
+      dir ? "c:", "Need Editbin.exe Folder - no spaces please"
+      defaultpath$=dir$
+      dir curdir$
+      if not exist(defaultpath$+"editbin.exe") then break
+}
+document dd$= {Echo off
+      Cls
+      Echo Set Stack Size for M2000 - press enter
+      }
+\\ = is append for document  - use clear dd$ to clear it.
+dd$ = shortdir$(defaultpath$) + {editbin /stack:102440960 m2000.exe}
+dir appdir$
+\\ without "for wide output" we place ascii text
+open "stack.bat" for output as i
+print #i, dd$
+close #i
+clear dd$
+dd$ ={Cls
+      Echo Execute stack.bat to set stack size for m2000, ver 8, rev 142+
+      }
+open "Info.bat" for output as i
+print #i,"Echo off"
+print #i, "cd "+quote$(appdir$)
+print #i, dd$
+close #i
+dos "cd "+quote$(appdir$) + " &&  Info.bat"
+set end  
+}
