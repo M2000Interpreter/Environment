@@ -1,7 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 22 active-X
-A fix for working on encrypted file gsb.
+Version 10 revision 23 active-X
+The Icon statement can load an ico from a Buffer 
+Procedure: From editor menu use "Load Resource" to insert a Binary structure to code, use a name as myIco when editor ask for it. A Binary structure has Base64 encoded bytes assigned to a Buffer (named myIco or any other). So Icon myIco replace M2000 icon to myIco in taskbar)
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
@@ -19,6 +20,10 @@ there is a new ca.crt - install ca.crt as root certificate (optional)
 
 http://georgekarras.blogspot.gr/
 
+ExportM2000 all files with executables:
+https://drive.google.com/drive/folders/1IbYgPtwaWpWC5pXLRqEaTaSoky37iK16
+
+only source without executables (something going wrong with GitHub)
 https://github.com/M2000Interpreter/Environment
 
 https://drive.google.com/open?id=0BwSrrDW66vvvdER4bzd0OENvWlU

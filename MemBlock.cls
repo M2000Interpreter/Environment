@@ -116,8 +116,8 @@ End Property
 Public Sub ClearError()
     ErrorMes = 0
 End Sub
-Public Property Get Status()
-    Status = ErrorMes
+Public Property Get status()
+    status = ErrorMes
 End Property
 Public Sub ResizeItems(NewSize As Long, Optional clearme As Long = 0)
 
@@ -165,24 +165,24 @@ Public Property Get WhatIsBasicItem() As Integer
 WhatIsBasicItem = BasicItem
 End Property
 
-Public Property Get GetBytePtr(offset As Variant) As Long
+Public Property Get GetBytePtr(Offset As Variant) As Long
 If ErrorMes = 0 And mItems > 0 Then
-    If offset < 0 Or offset >= mItems * ItemLen Then
+    If Offset < 0 Or Offset >= mItems * ItemLen Then
         ErrorMes = 4
     Else
-    GetBytePtr = signlong(uintnew(mPtr) + offset)
+    GetBytePtr = signlong(uintnew(mPtr) + Offset)
     End If
 Else
     GetBytePtr = 0  ' null
 End If
 End Property
-Public Property Get GetPtr(offset As Variant) As Long
+Public Property Get GetPtr(Offset As Variant) As Long
 If ErrorMes = 0 And mItems > 0 Then
-If offset < 0 Or offset >= mItems Then
+If Offset < 0 Or Offset >= mItems Then
     ' zero
     ErrorMes = 4
 Else
-    GetPtr = cUlng(uintnew(mPtr) + ItemLen * offset)
+    GetPtr = cUlng(uintnew(mPtr) + ItemLen * Offset)
     End If
 Else
     GetPtr = 0  ' null
@@ -268,19 +268,19 @@ NoRun = mExecBloc
 End Property
 
 Public Function PutStringAtOffset(addr As Variant, AnyString As String) As Variant
-Dim offset
-offset = uintnew(addr) - uintnew(mPtr)
+Dim Offset
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mItems > 0 Then
-    If offset < 0 Or offset + 3 >= mItems * ItemLen Then
+    If Offset < 0 Or Offset + 3 >= mItems * ItemLen Then
         ErrorMes = 4
     Else
         If Strings Is Nothing Then Set Strings = New LongHash
         With Strings
-        If .ExistKey(cUlng(offset + 1)) Then
+        If .ExistKey(cUlng(Offset + 1)) Then
            .ValueStr = AnyString
            PutStringAtOffset = .StrPointer
         Else
-        .ItemCreator2 cUlng(offset + 1), AnyString
+        .ItemCreator2 cUlng(Offset + 1), AnyString
         PutStringAtOffset = .StrPointer
         End If
         .Done = False
@@ -291,16 +291,16 @@ Else
 End If
 End Function
 Public Function GetStringFromOffset(addr As Variant, AnyString As String) As Variant
-Dim offset
-offset = uintnew(addr) - uintnew(mPtr)
+Dim Offset
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mItems > 0 Then
-    If offset < 0 Or offset + 3 >= mItems * ItemLen Then
+    If Offset < 0 Or Offset + 3 >= mItems * ItemLen Then
         ErrorMes = 4
         AnyString = "Crash"
     Else
         If Strings Is Nothing Then Set Strings = New LongHash
         With Strings
-        If .ExistKey(cUlng(offset + 1)) Then
+        If .ExistKey(cUlng(Offset + 1)) Then
            AnyString = .Value
            GetStringFromOffset = .StrPointer
         Else
@@ -318,10 +318,10 @@ End If
 
 End Function
 Public Function GetData(F As Long, addr, lengthInBytes As Long) As Boolean
-Dim offset, place
-offset = uintnew(addr) - uintnew(mPtr)
+Dim Offset, place
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mItems > 0 Then
-    If offset < 0 Or offset + lengthInBytes - 1 >= mItems * ItemLen Then
+    If Offset < 0 Or Offset + lengthInBytes - 1 >= mItems * ItemLen Then
         ErrorMes = 4
         GetData = False
     Else
@@ -386,10 +386,10 @@ End Function
 
 
 Public Function putData(F As Long, addr, lengthInBytes As Long) As Boolean
-Dim offset, place
-offset = uintnew(addr) - uintnew(mPtr)
+Dim Offset, place
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mItems > 0 Then
-    If offset < 0 Or offset + lengthInBytes - 1 >= mItems * ItemLen Then
+    If Offset < 0 Or Offset + lengthInBytes - 1 >= mItems * ItemLen Then
         ErrorMes = 4
         putData = False
     Else
@@ -436,6 +436,8 @@ mSubtype = 2
 ElseIf IsEmf Then
 SubType = 2
 End If
+ElseIf mSubtype = 300 Then
+GoTo there1
 End If
     If mSubtype <> 2 Or bitmap Then
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
@@ -445,6 +447,7 @@ End If
        Dim hEmf As Long
     On Error Resume Next
     Dim bb As MemBlock, hMem As Long
+there1:
     Set bb = Copy()
     bb.RemovePtr hMem
     Set bb = Nothing
@@ -472,6 +475,8 @@ Public Function GetStdPicture(Optional Width As Long = -1, Optional Height As Lo
     ElseIf IsEmf Then
     SubType = 2
     End If
+    ElseIf mSubtype = 300 Then
+    GoTo there1
     End If
     If mSubtype <> 2 Or bitmap Then
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
@@ -484,6 +489,7 @@ Public Function GetStdPicture(Optional Width As Long = -1, Optional Height As Lo
     
     hEmf = SetEnhMetaFileBits(SizeByte, ByVal GetBytePtr(0))
     If hEmf = 0 Then
+there1:
     Set GetStdPicture = Me.GetStdPicture1()
     Else
     Set GetStdPicture = gCreatePicture(hEmf, 4)
@@ -651,13 +657,13 @@ If mItems > 0 Then
 End If
 End Function
 Public Function Search(from As Long, what) As Long
-Dim limit As Long, b As Byte, i As Long, W As Byte
+Dim limit As Long, b As Byte, i As Long, w As Byte
 b = Abs(what) And &HFF
 limit = SizeByte - 1
 
 For i = from To limit
-    GetMem1 GetBytePtr(i), W
-    If b = W Then
+    GetMem1 GetBytePtr(i), w
+    If b = w Then
     Search = i + 1: Exit Function
     End If
 Next
@@ -814,10 +820,10 @@ If w2 <> -1 Then w2 = w2 / dv15
         aa.SaveDibToMeMBlock k
         
     End If
-    Dim handler As New mHandler
-    handler.t1 = 2
-    Set handler.objref = k
-    Set CreateFromPicture = handler
+    Dim Handler As New mHandler
+    Handler.t1 = 2
+    Set Handler.objref = k
+    Set CreateFromPicture = Handler
     
 End Function
 

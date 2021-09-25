@@ -21043,9 +21043,18 @@ On Error Resume Next
         End If
     ElseIf IsExp(basestack, rest$, p) Then
     If TypeOf basestack.lastobj Is mHandler Then
-            anyObj = GetObjFromHandler(basestack.lastobj, ok)
+            Set anyObj = GetObjFromHandler(basestack.lastobj, ok)
             If ok Then
+            Dim mm As MemBlock
+            If Typename(anyObj) = "MemBlock" Then
+                
+                Set mm = anyObj
+                mm.SubType = 300
+                Set aPic = mm.GetStdPicture()
+            Else
                 Set aPic = anyObj
+            End If
+            
                 MyIcon = True
             Else
             MyEr "No icon find", "Δεν βρήκα εικόνα"
