@@ -157,13 +157,21 @@ Set F = z
 Else
 Set F = z.Parent
 End If
+
 On Error Resume Next
 Dim thismonitor As Long
+If F.Visible Then
 thismonitor = MonitorFromWindow(F.hWnd, MONITOR_DEFAULTTONEAREST)
+
+Else
+FindFormSScreen = FindMonitorFromMouse()
+Exit Function
+End If
 Dim i As Long
 For i = 0 To UBound(ScrInfo())
 If thismonitor = ScrInfo(i).Handler Then FindFormSScreen = i:   Exit Function
 Next i
+FindFormSScreen = FindPrimary
 End Function
 Function FindMonitorFromPixel(x, y) As Long
 Dim x1 As Long, y1 As Long
@@ -184,8 +192,11 @@ x = tp.x
 y = tp.y
 Dim i As Long
 For i = 0 To UBound(ScrInfo())
-If ScrInfo(i).Handler = MonitorFromPoint(x, y, MONITOR_DEFAULTTONEAREST) Then FindMonitorFromMouse = i: Exit Function
+If ScrInfo(i).Handler = MonitorFromPoint(x, y, MONITOR_DEFAULTTONEAREST) Then
+FindMonitorFromMouse = i: Exit Function
+End If
 Next i
+FindMonitorFromMouse = FindPrimary
 End Function
 Sub MoveFormToOtherMonitor(F As Form)
 Dim k As Long, z As Long

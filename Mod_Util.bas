@@ -3239,7 +3239,8 @@ mPen = PenOne
 D.Font.bold = bstack.myBold
 D.Font.Italic = bstack.myitalic
 GetMonitorsNow
-Console = FindPrimary
+Console = FindFormSScreen(Form1)
+'' Console = FindPrimary
 With ScrInfo(Console)
 If SzOne < 4 Then SzOne = 4
     'Form1.Visible = False
@@ -8551,6 +8552,7 @@ Dim s$
         End If
     End If
     If FastSymbol(a$, ",") Then IsStrExp bstack, a$, AskDIB$
+    
     If FastSymbol(a$, ",") Then IsStrExp bstack, a$, AskStrInput$: AskInput = True
 
 olamazi
@@ -21068,6 +21070,7 @@ On Error Resume Next
     End If
     If Not UseMe Is Nothing Then
         PlaceIcon aPic
+        Set Form3.icon = aPic
         Else
         Set Form3.icon = aPic
     End If

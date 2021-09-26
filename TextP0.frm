@@ -716,11 +716,11 @@ End Sub
 
 Public Sub mscatsub()
 ''
-Dim l As Long, W As Long, s$, TempLcid As Long, OldLcid As Long
+Dim l As Long, w As Long, s$, TempLcid As Long, OldLcid As Long
 Dim el As Long, eW As Long, safety As Long, TT$
 
-W = TEXT1.mDoc.MarkParagraphID
-eW = W
+w = TEXT1.mDoc.MarkParagraphID
+eW = w
 TEXT1.SelStartSilent = TEXT1.SelStart  'MOVE CHARPOS TO SELSTART
 
 el = TEXT1.Charpos  ' charpos maybe is in the start or the end of block
@@ -732,33 +732,33 @@ If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 l = el + 1
 If EditTextWord Then
 Do
-If TEXT1.mDoc.FindWord(s$, True, W, l) Then
-TT$ = TEXT1.mDoc.TextParagraph(W)
+If TEXT1.mDoc.FindWord(s$, True, w, l) Then
+TT$ = TEXT1.mDoc.TextParagraph(w)
 Mid$(TT$, l, Len(s$)) = s$
-TEXT1.mDoc.ReWritePara W, TT$
-TEXT1.mDoc.WrapAgainBlock W, W
-TEXT1.mDoc.ColorThis (W)
+TEXT1.mDoc.ReWritePara w, TT$
+TEXT1.mDoc.WrapAgainBlock w, w
+TEXT1.mDoc.ColorThis (w)
 Else
-W = 1
+w = 1
 l = 0
 safety = safety + 1
 End If
-Loop Until (W = eW And l = el) Or safety = 2
+Loop Until (w = eW And l = el) Or safety = 2
 
 Else
 Do
-If TEXT1.mDoc.FindIdentifier(s$, True, W, l) Then
-TT$ = TEXT1.mDoc.TextParagraph(W)
+If TEXT1.mDoc.FindIdentifier(s$, True, w, l) Then
+TT$ = TEXT1.mDoc.TextParagraph(w)
 Mid$(TT$, l, Len(s$)) = s$
-TEXT1.mDoc.TextParagraph(W) = TT$
-TEXT1.mDoc.WrapAgainBlock W, W
-TEXT1.mDoc.ColorThis (W)
+TEXT1.mDoc.TextParagraph(w) = TT$
+TEXT1.mDoc.WrapAgainBlock w, w
+TEXT1.mDoc.ColorThis (w)
 Else
-W = 1
+w = 1
 l = 0
 safety = safety + 1
 End If
-Loop Until (W = eW And l = el) Or safety = 2
+Loop Until (w = eW And l = el) Or safety = 2
 
 End If
 TEXT1.mDoc.lcid = OldLcid
@@ -769,12 +769,12 @@ End Sub
 
 Public Sub rthissub(Optional anystr As Boolean = False)
 If TEXT1.mDoc.Busy Then Exit Sub
-Dim l As Long, W As Long, s$, TempLcid As Long, OldLcid As Long, noinp As Double
+Dim l As Long, w As Long, s$, TempLcid As Long, OldLcid As Long, noinp As Double
 Dim el As Long, eW As Long, safety As Long, TT$, w1 As Long, i1 As Long
 Dim neo$, mDoc10 As Document, addthat As Long, w2 As Long
 Dim prof1 As New clsProfiler
-W = TEXT1.mDoc.MarkParagraphID
-eW = W
+w = TEXT1.mDoc.MarkParagraphID
+eW = w
 TEXT1.SelStartSilent = TEXT1.SelStart  'MOVE CHARPOS TO SELSTART
 el = TEXT1.Charpos  ' charpos maybe is in the start or the end of block
 s$ = TEXT1.SelText
@@ -813,23 +813,23 @@ TEXT1.glistN.SuspDraw = True
 End If
 i1 = el
 l = i1 + addthat
-w1 = W
+w1 = w
 If EditTextWord Or anystr Then
 TEXT1.glistN.dropkey = True
 Dim ok1 As Boolean
 Do
 If anystr Then
-ok1 = TEXT1.mDoc.FindStrDown(s$, W, l)
+ok1 = TEXT1.mDoc.FindStrDown(s$, w, l)
 Else
-ok1 = TEXT1.mDoc.FindWord(s$, True, W, l)
+ok1 = TEXT1.mDoc.FindWord(s$, True, w, l)
 End If
 If ok1 Then
-If safety And W = w1 Then
-If w2 > 0 Then If w2 <> W Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
-w2 = W
+If safety And w = w1 Then
+If w2 > 0 Then If w2 <> w Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
+w2 = w
 If l = i1 Then
  TEXT1.SelLengthSilent = 0
-TEXT1.mDoc.MarkParagraphID = W
+TEXT1.mDoc.MarkParagraphID = w
  TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
  TEXT1.glistN.enabled = True
@@ -845,7 +845,7 @@ Else
 End If
 End If
 TEXT1.SelLengthSilent = 0
-TEXT1.mDoc.MarkParagraphID = W
+TEXT1.mDoc.MarkParagraphID = w
  TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
  TEXT1.glistN.enabled = True
@@ -857,7 +857,7 @@ TEXT1.GroupUndo
 '''l = l + Len(neo$)
 
 Else
-W = 1
+w = 1
 l = 0
 safety = safety + 1
 End If
@@ -869,15 +869,15 @@ Else
 ''If l > 0 Then l = l - 1
 TEXT1.glistN.dropkey = True
 Do
-If TEXT1.mDoc.FindIdentifier(s$, True, W, l) Then
+If TEXT1.mDoc.FindIdentifier(s$, True, w, l) Then
 'If w2 > 0 Then TEXT1.mDoc.ColorThis w2: TEXT1.WrapMarkedPara
-If w2 > 0 Then If w2 <> W Then TEXT1.mDoc.WrapAgainBlock w2, w2:    TEXT1.mDoc.ColorThis w2
-w2 = W
-If safety And W = w1 Then
+If w2 > 0 Then If w2 <> w Then TEXT1.mDoc.WrapAgainBlock w2, w2:    TEXT1.mDoc.ColorThis w2
+w2 = w
+If safety And w = w1 Then
 
 If l = i1 Then
  TEXT1.SelLengthSilent = 0
-TEXT1.mDoc.MarkParagraphID = W
+TEXT1.mDoc.MarkParagraphID = w
  TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
  TEXT1.glistN.enabled = True
@@ -893,7 +893,7 @@ Else
 End If
 End If
 TEXT1.SelLengthSilent = 0
-TEXT1.mDoc.MarkParagraphID = W
+TEXT1.mDoc.MarkParagraphID = w
  TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
  TEXT1.glistN.enabled = True
@@ -906,7 +906,7 @@ TEXT1.GroupUndo
 l = l + Len(neo$)
 
 Else
-W = 1
+w = 1
 l = 0
 safety = safety + 1
 End If
@@ -929,9 +929,9 @@ If s$ = vbNullString Or InStr(s$, Chr$(13)) > 0 Or InStr(s$, Chr$(10)) > 0 Then 
 SearchDown s$
 End Sub
 Sub SearchDown(s$, Optional anystr As Boolean = False)
-Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
+Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
 
-W = TEXT1.mDoc.MarkParagraphID   ' this is the not the order
+w = TEXT1.mDoc.MarkParagraphID   ' this is the not the order
 TEXT1.SelStartSilent = TEXT1.SelStart
 l = TEXT1.Charpos
 
@@ -940,15 +940,15 @@ TempLcid = FoundLocaleId(s$)
 If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
-  If Not TEXT1.mDoc.FindStrDown(s$, W, l) Then GoTo sdnOut
+  If Not TEXT1.mDoc.FindStrDown(s$, w, l) Then GoTo sdnOut
   Else
-    If Not TEXT1.mDoc.FindWord(s$, True, W, l) Then GoTo sdnOut
+    If Not TEXT1.mDoc.FindWord(s$, True, w, l) Then GoTo sdnOut
     End If
 Else
-    If Not TEXT1.mDoc.FindIdentifier(s$, True, W, l) Then GoTo sdnOut
+    If Not TEXT1.mDoc.FindIdentifier(s$, True, w, l) Then GoTo sdnOut
 End If
 TEXT1.SelLengthSilent = 0
-TEXT1.mDoc.MarkParagraphID = W
+TEXT1.mDoc.MarkParagraphID = w
 TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
@@ -965,8 +965,8 @@ If s$ = vbNullString Or InStr(s$, Chr$(13)) > 0 Or InStr(s$, Chr$(10)) > 0 Then 
 Searchup s$
 End Sub
 Sub Searchup(s$, Optional anystr As Boolean = False)
-Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
-W = TEXT1.mDoc.MarkParagraphID
+Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
+w = TEXT1.mDoc.MarkParagraphID
 TEXT1.SelStartSilent = TEXT1.SelStart - (TEXT1.SelLength > 1)
 l = TEXT1.Charpos + Len(s$)
 OldLcid = TEXT1.mDoc.lcid
@@ -974,15 +974,15 @@ TempLcid = FoundLocaleId(s$)
 If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
-   If Not TEXT1.mDoc.FindStrUp(s$, W, l) Then GoTo sdupOut
+   If Not TEXT1.mDoc.FindStrUp(s$, w, l) Then GoTo sdupOut
    Else
-       If Not TEXT1.mDoc.FindWord(s$, False, W, l) Then GoTo sdupOut
+       If Not TEXT1.mDoc.FindWord(s$, False, w, l) Then GoTo sdupOut
     End If
 Else
-    If Not TEXT1.mDoc.FindIdentifier(s$, False, W, l) Then GoTo sdupOut
+    If Not TEXT1.mDoc.FindIdentifier(s$, False, w, l) Then GoTo sdupOut
 End If
 TEXT1.SelLengthSilent = 0
-TEXT1.mDoc.MarkParagraphID = W
+TEXT1.mDoc.MarkParagraphID = w
 TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
@@ -1712,7 +1712,7 @@ FK$(13) = "”’√√—¡÷≈¡”"
 Else
 FK$(13) = "WRITER"
 End If
-Console = FindFormSScreen(Me)
+Console = FindMonitorFromMouse() '      FindFormSScreen(Me)
 
 Me.WindowState = 0
 If Me.WindowState = 0 Then
@@ -2550,10 +2550,10 @@ Private Sub view1_NewWindow2(ppDisp As Object, Cancel As Boolean)
 Static prev$
 Cancel = True
 If HTML Is Nothing Then Exit Sub
-If prev$ = HTML.activeElement.toString Then
+If prev$ = HTML.activeElement.ToString Then
 
 Else
-prev$ = HTML.activeElement.toString
+prev$ = HTML.activeElement.ToString
 view1.Navigate prev$
 Sleep 50
 End If
@@ -3496,12 +3496,12 @@ ask = NeoASK(bstack)
 
 End Function
 
-Sub mywait(bstack As basetask, PP As Double, Optional SLEEPSHORT As Boolean = False)
+Sub mywait(bstack As basetask, pp As Double, Optional SLEEPSHORT As Boolean = False)
 Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents1 Form1
-If PP = 0 Then Exit Sub
+If pp = 0 Then Exit Sub
 Else
 
 Err.Clear
@@ -3514,7 +3514,7 @@ End If
 End If
 End If
 
-PP = PP + CDbl(timeGetTime)
+pp = pp + CDbl(timeGetTime)
 
 Do
 
@@ -3537,7 +3537,7 @@ Exit Do
 End If
 End If
 End If
-Loop Until PP <= CDbl(timeGetTime) Or NOEXECUTION Or MOUT
+Loop Until pp <= CDbl(timeGetTime) Or NOEXECUTION Or MOUT
 
                        If exWnd <> 0 Then
                 MyTitle$ bstack

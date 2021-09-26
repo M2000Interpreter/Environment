@@ -1,8 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 23 active-X
-The Icon statement can load an ico from a Buffer 
-Procedure: From editor menu use "Load Resource" to insert a Binary structure to code, use a name as myIco when editor ask for it. A Binary structure has Base64 encoded bytes assigned to a Buffer (named myIco or any other). So Icon myIco replace M2000 icon to myIco in taskbar)
+Version 10 revision 24 active-X
+1.Msgbox (function Ask()) take the same icon as the icon in taskbar (if no picture provided).
+2.Two or more Screens: M2000 Environmemt open at the screen where the mouse pointer hover, just some milliseconds after the click on taskbar or start menu, or an icon at a desktop.
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

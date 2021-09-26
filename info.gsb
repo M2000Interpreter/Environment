@@ -32876,7 +32876,10 @@ wait 200
 if exist("lastmusic.dat") and not keypress(32) then
 	if filelen("lastmusic.dat")>0 then
 		k=buffer("lastmusic.dat")
-		dir eval$(k)
+		try ok {
+			dir eval$(k)
+		}
+		if not ok or error then dir ? "", "Folder for Mp3"
 	end if
 else
 	dir ? "", "Folder for Mp3"
