@@ -79,7 +79,7 @@ End Sub
 
 
 Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = vbKeyF12 Then
+If KeyCode = vbKeyF12 And ((Not mHelp) Or trace) Then
 showmodules
 End If
 End Sub

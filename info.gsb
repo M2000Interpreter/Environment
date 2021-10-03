@@ -33599,4 +33599,50 @@ method json, "assignpath", "properties.age.maximum", 80
 Report json.format$(4)
 Print json.format$(0)
 }
+MODULE MACHINECODE {\\ THIS RUN WITH OR WITHOUT DEP (Data Execution Prevention) ON FOR ALL PROGRAMS.
+\\ we make a buffer to use for DATA
+Buffer BinaryData as Long*10
+Return BinaryData, 1:=500
+Buffer code alfa as byte*1024
+\\ use https://defuse.ca/online-x86-assembler.htm
+\\ to find opcodes
+Pc=0
+\\ x86 Machine Code
+OpLong(0xb8, 5100) ' mov eax, 5100    ' 5100 to eax
+OpByteByte(0x83, 0xC0 ,5) ' add  eax,0x5   ' add 5 to eax
+OpByteLong(0x3,0x5, BinaryData(1)) 'add eax, [BinaryData(1)]  ' add eax 500 from second long on BinaryData
+OpLong(0xa3, BinaryData(0)) ' mov [BinaryData(0)], eax
+rem : OpByte(0x31, 0xC0) ' now eax=0  ' without this we get 5605 in M
+Ret() ' return
+\\ end of code
+Try Ok {
+      Execute Code alfa, 0
+}
+M=Uint(Error)
+Hex M
+Print M
+Print Error, ok
+Print Eval(BinaryData, 0) ' 5605
+
+Sub Ret()
+      Return alfa, pc:=0xC3
+      pc++
+End Sub
+Sub OpByteByte()
+      Return alfa, pc:=number, pc+1:=number, pc+2:=number
+      pc+=3
+End Sub
+Sub OpByte()
+      Return alfa, pc:=number, pc+1:=number
+      pc+=2
+End Sub
+Sub OpLong()
+      Return alfa, pc:=number, pc+1:=number as long
+      pc+=5
+End Sub
+Sub OpByteLong()
+      Return alfa, pc:=number, pc+1:=number, pc+2:=number as Long
+      pc+=6
+End Sub
+}
 UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}

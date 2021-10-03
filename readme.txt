@@ -1,8 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 24 active-X
-1.Msgbox (function Ask()) take the same icon as the icon in taskbar (if no picture provided).
-2.Two or more Screens: M2000 Environmemt open at the screen where the mouse pointer hover, just some milliseconds after the click on taskbar or start menu, or an icon at a desktop.
+Version 10 revision 25 active-X
+Help form now handles F12 properly.
 
 
 George Karras, Kallithea Attikis, Greece.
