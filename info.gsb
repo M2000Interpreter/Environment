@@ -15571,9 +15571,11 @@ Run ; Msg
 Print "You use Msg ";Counter;" times"
 }
 MODULE PONG {IF IsWine Else Smooth On
+ESCAPE OFF
+THREAD.PLAN SEQUENTIAL
 \\ Program SoloPong
 oldfont$=FontName$
-'Font "Tahoma"
+Font "VERDANA"
 Hard=2 \\ 3 for more
 Hide
 Mode 18, 8000,2400
@@ -15776,7 +15778,7 @@ Main.Task 100 {
                   Thread mp Restart
             }
       End Select
-      If finish Then Exit
+      If finish  OR keypress(27) Then Exit
 }
 Threads Erase
 If kr Else { Layer {Hide : Cls 5} : kr~ }
@@ -15788,6 +15790,7 @@ Cls 5
 Font oldfont$
 Form 60,30
 Show
+ESCAPE ON
 Keyboard "Info"+chr$(13)
 End
 Functions:
@@ -32312,7 +32315,7 @@ Else
 		 0 or 1, for 60 seconds per counting
 		2, for 30 seconds per counting
 		3, for 1 second per counting
-	By default the timer hide when rich 100 coutings
+	By default the timer hide when reach 100 coutings
 		using timer_counter we can read or write new value
 		the thread has to execute, so to add one to this value, to show this
 	Stop The Timer: 

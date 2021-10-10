@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 25 active-X
-Help form now handles F12 properly.
+Version 10 revision 25b active-X
+Some changes in info file
 
 
 George Karras, Kallithea Attikis, Greece.
