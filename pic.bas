@@ -199,7 +199,7 @@ Private Const GMEM_LOWER = GMEM_NOT_BANKED
 
 Public frame As Boolean
 Public PhotoBmp As Long
-Public W As Long
+Public w As Long
 Public BACKSPRITE As String
 Private Type MEMORYSTATUS
     dwLength As Long
@@ -486,13 +486,13 @@ cDib = False
 If Len(a) >= 12 Then
 ' read magicNo, witdh, height
 If Left$(a, 4) = "cDIB" Then
-Dim W As Long, H As Long
-W = val("&H" & Mid$(a, 5, 4))
+Dim w As Long, H As Long
+w = val("&H" & Mid$(a, 5, 4))
 H = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
+If Len(a) * 2 < ((w * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
 mdib.ClearUp
 
-If mdib.create(W, H) Then
+If mdib.create(w, H) Then
 If Len(a) * 2 < mdib.BytesPerScanLine * H + 24 Then Exit Function
 CopyMemory ByVal mdib.DIBSectionBitsPtr, ByVal StrPtr(a) + 24, mdib.BytesPerScanLine * H
 cDib = True
@@ -510,14 +510,14 @@ Else
 End If
 End Function
 Public Function SetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long, aColor As Long) As Double
-Dim W As Long, H As Long, bpl As Long, rgb(2) As Byte
-W = val("&H" & Mid$(ssdib, 5, 4))
+Dim w As Long, H As Long, bpl As Long, rgb(2) As Byte
+w = val("&H" & Mid$(ssdib, 5, 4))
 H = val("&H" & Mid$(ssdib, 9, 4))
-If Len(ssdib) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
-If W * H <> 0 Then
+If Len(ssdib) * 2 < ((w * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
+If w * H <> 0 Then
 bpl = (LenB(ssdib) - 24) \ H
-W = (W - x - 1) Mod W
-H = (y Mod H) * bpl + W * 3 + 24
+w = (w - x - 1) Mod w
+H = (y Mod H) * bpl + w * 3 + 24
 CopyMemory rgb(0), ByVal StrPtr(ssdib) + H, 3
 
 SetDIBPixel = -(rgb(2) * 256# * 256# + rgb(1) * 256# + rgb(0))
@@ -525,16 +525,16 @@ CopyMemory ByVal StrPtr(ssdib) + H, aColor, 3
 End If
 End Function
 Public Function GetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long) As Double
-Dim W As Long, H As Long, bpl As Long, rgb(2) As Byte
+Dim w As Long, H As Long, bpl As Long, rgb(2) As Byte
 'a = ssdib$
-W = val("&H" & Mid$(ssdib, 5, 4))
+w = val("&H" & Mid$(ssdib, 5, 4))
 H = val("&H" & Mid$(ssdib, 9, 4))
-If Len(ssdib) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
-If W * H <> 0 Then
+If Len(ssdib) * 2 < ((w * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
+If w * H <> 0 Then
 bpl = (LenB(ssdib) - 24) \ H   ' Len(ssdib$) 2 bytes per char
-W = (W - x - 1) Mod W
+w = (w - x - 1) Mod w
 
-H = (y Mod H) * bpl + W * 3 + 24
+H = (y Mod H) * bpl + w * 3 + 24
 
 
 CopyMemory rgb(0), ByVal StrPtr(ssdib) + H, 3
@@ -543,42 +543,42 @@ GetDIBPixel = -(rgb(2) * 256# * 256# + rgb(1) * 256# + rgb(0))
 End If
 End Function
 Public Function cDIBwidth1(a) As Long
-Dim W As Long, H As Long
+Dim w As Long, H As Long
 cDIBwidth1 = -1
 
-W = val("&H" & Mid$(a, 5, 4))
+w = val("&H" & Mid$(a, 5, 4))
 H = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
-cDIBwidth1 = W
+If Len(a) * 2 < ((w * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
+cDIBwidth1 = w
 End Function
 Public Function cDIBwidth(a) As Long
-Dim W As Long, H As Long
+Dim w As Long, H As Long
 cDIBwidth = -1
 If Len(a) >= 12 Then
 If Left$(a, 4) = "cDIB" Then
-W = val("&H" & Mid$(a, 5, 4))
+w = val("&H" & Mid$(a, 5, 4))
 H = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
-cDIBwidth = W
+If Len(a) * 2 < ((w * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
+cDIBwidth = w
 End If
 End If
 End Function
 Public Function cDIBheight1(a) As Long
-Dim W As Long, H As Long
+Dim w As Long, H As Long
 cDIBheight1 = -1
-W = val("&H" & Mid$(a, 5, 4))
+w = val("&H" & Mid$(a, 5, 4))
 H = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
+If Len(a) * 2 < ((w * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
 cDIBheight1 = H
 End Function
 Public Function cDIBheight(a) As Long
-Dim W As Long, H As Long
+Dim w As Long, H As Long
 cDIBheight = -1
 If Len(a) >= 12 Then
 If Left$(a, 4) = "cDIB" Then
-W = val("&H" & Mid$(a, 5, 4))
+w = val("&H" & Mid$(a, 5, 4))
 H = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
+If Len(a) * 2 < ((w * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
 cDIBheight = H
 End If
 End If
@@ -868,7 +868,7 @@ Dim tSA2 As SAFEARRAY2D
         CopyMemory ByVal VarPtrArray(bDib2), 0&, 4
  End Function
 
-Public Sub CanvasSize(cDibbuffer0 As cDIBSection, ByVal wcm As Double, ByVal hcm As Double, Optional ByVal rep As Boolean = False, Optional Max As Integer = 0, Optional yshift As Long = 0, Optional bcolor As Long = &HFFFFFF, Optional usepixel As Boolean = False, Optional ByVal Percent As Single = 85, Optional ByVal linewidth As Long = 4)
+Public Sub CanvasSize(cDibbuffer0 As cDIBSection, ByVal wcm As Double, ByVal hcm As Double, Optional ByVal rep As Boolean = False, Optional Max As Integer = 0, Optional yshift As Long = 0, Optional bColor As Long = &HFFFFFF, Optional usepixel As Boolean = False, Optional ByVal Percent As Single = 85, Optional ByVal linewidth As Long = 4)
 ' top left align only
 Dim piw As Long, pih As Long, stx As Long, sty As Long, stOffx As Long, stOffy As Long, stBorderX As Long, stBorderY As Long, strx As Long, stry As Long, i As Long, j As Long
 
@@ -881,7 +881,7 @@ piw = wcm
 pih = hcm
 End If
 If cDIBbuffer1.create(piw, pih) Then
-    cDIBbuffer1.Cls bcolor
+    cDIBbuffer1.Cls bColor
     cDIBbuffer1.GetDpiDIB cDibbuffer0
     
      stx = 0: sty = 0
@@ -2829,13 +2829,13 @@ Function GetCharSet(CodePage As Long)
     End If
 End Function
 Sub SwapString2Variant(ByRef s$, ByRef a As Variant)
-   Dim t As Long ' 4 Longs * 4 bytes each = 16 bytes
+   Static t As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory ByVal VarPtr(t), ByVal VarPtr(a) + 8, 4
    CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(s$), 4
    CopyMemory ByVal VarPtr(s$), ByVal VarPtr(t), 4
 End Sub
 Sub MoveStringToVariant(ByRef s$, ByRef a As Variant)
-   Dim t As Long ' 4 Longs * 4 bytes each = 16 bytes
+   Static t As Long ' 4 Longs * 4 bytes each = 16 bytes
    a = vbNullString
    CopyMemory ByVal VarPtr(t), ByVal VarPtr(a) + 8, 4
    CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(s$), 4
@@ -2872,17 +2872,17 @@ Dim t(0 To 3) As Long
    CopyMemory ByVal a, t(0), 2
 End Sub
 Sub VarByRefClean(ByVal a As Long)
-Dim z As Variant
+Static z As Variant
 CopyMemory ByVal a, z, 16
 End Sub
 Function VariantIsRef(ByVal a As Long) As Boolean
-Dim z As Integer
+Static z As Integer
    CopyMemory z, ByVal a, 4
    VariantIsRef = (z And &H4000) = &H4000
 End Function
 Sub SwapVariantRef(ByRef a As Variant, ByVal b As Long)
-    Dim z As Variant
-   Dim t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
+    Static z As Variant
+   Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory ByVal VarPtr(t(0)), ByVal b, 16
   ' t(0) = 17 ' t(0) Or &H4000
    
@@ -2890,26 +2890,26 @@ Sub SwapVariantRef(ByRef a As Variant, ByVal b As Long)
    CopyMemory ByVal b, ByVal VarPtr(z), 16
 End Sub
 Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
-   Dim t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
+   Static t(0 To 3) As Long  ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory t(0), ByVal VarPtr(a), 16
    CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
    CopyMemory ByVal VarPtr(b), t(0), 16
 End Sub
 Sub SwapVariant2(ByRef a As Variant, ByRef b As mArray, i As Long)
-   Dim t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
+   Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory t(0), ByVal VarPtr(a), 16
    CopyMemory ByVal VarPtr(a), ByVal b.itemPtr(i), 16
    CopyMemory ByVal b.itemPtr(i), t(0), 16
 End Sub
 Sub SwapVariant3(ByRef a As mArray, k As Long, ByRef b As mArray, i As Long)
-   Dim t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
+   Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory t(0), ByVal a.itemPtr(k), 16
    CopyMemory ByVal a.itemPtr(k), ByVal b.itemPtr(i), 16
    CopyMemory ByVal b.itemPtr(i), t(0), 16
 End Sub
 Sub EmptyVariantArrayItem(ByRef b As mArray, i As Long)
-Dim a As Variant
-   Dim t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
+Static a As Variant
+   Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory t(0), ByVal VarPtr(a), 16
    CopyMemory ByVal VarPtr(a), ByVal b.itemPtr(i), 16
    CopyMemory ByVal b.itemPtr(i), t(0), 16

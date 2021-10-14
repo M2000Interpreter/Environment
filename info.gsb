@@ -5423,11 +5423,11 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 30 for M2000 Interpreter version 10, revision 19 and above"
+	Report " A collection of modules for tests version 31 for M2000 Interpreter version 10, revision 26 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
-		Report 1, "George Karras 2020"
+		Report 1, "George Karras 2020-2021"
 	}
 }
 cls backcolor, row
@@ -22037,6 +22037,7 @@ MODULE URLNEW {Stack New {
       Data "telnet://192.0.2.16:80/",   "urn:oasis:names:specification:docbook:dtd:xml:4.1.2",  "ssh://alice@example.com"
       Data "https://bob:pass@example.com/place",   "http://example.com/?a=1&b=2+2&c=3&c=4&d=%65%6e%63%6F%64%65%64"
       data "ftp://username:password@hostname/"
+      data "https://georgekarras.blogspot.com"
       a=Array([])
 }
 function prechar$(a$, b$) {

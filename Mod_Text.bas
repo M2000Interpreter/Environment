@@ -13,7 +13,7 @@ Option Explicit
 
 Private timestamp As Long
 Global OsInfo As New clsOSInfo
-Global HaltLevel As Long
+Global HaltLevel As Long, errbag As ErrorBag
 Global startaddress As Long, stacksize As Long, findstack As Long
 Private Const mProp = "PropReference"
 Private Const mHdlr = "mHandler"
@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 25
+Global Const Revision = 26
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -14797,253 +14797,6 @@ End If
 End If
 End Function
 
-Function StaticNew(bstack As basetask, b$, w$, Lang As Long) As Boolean
-Dim p As Variant, ii As Long, ss$, usehandler As mHandler, H As Variant
-
-If bstack.StaticCollection Is Nothing Then
-
-Set bstack.StaticCollection = New FastCollection
-If Not bstack.IamThread Then
-    bstack.SetBacket "%_" + bstack.StaticInUse
-End If
-End If
-Do
-    Select Case IsLabel(bstack, b$, w$)
-    Case 1
-        If GetlocalVar(w$, ii) Then
-            MyEr "Variable exist as local", "« ÏÂÙ·‚ÎÁÙﬁ ı‹Ò˜ÂÈ ˘Ú ÙÔÈÍﬁ"
-            StaticNew = False
-            Exit Function
-        End If
-        If Not bstack.ExistVar(w$) Then
-            If FastSymbol(b$, "=") Then
-                    If Not IsExp(bstack, b$, p) Then SyntaxError: Exit Function
-                    Dim anything As Object
-                    Set anything = bstack.lastobj
-                    If CheckIsmArray(anything) Then
-                            Set usehandler = New mHandler
-                            With usehandler
-                            .t1 = 3
-                            Set .objref = anything
-                            End With
-                            Set p = usehandler
-                            Set H = usehandler
-                      bstack.SetVarobJvalue w$, H
-                      Set usehandler = Nothing
-                      Set H = Nothing
-                    ElseIf CheckLastHandler(anything) Then
-                        Set usehandler = anything
-                        If usehandler.t1 = 2 Then
-                            bstack.SetVarobJvalue w$, anything
-                        ElseIf usehandler.t1 = 1 Then
-                            bstack.SetVarobJvalue w$, anything
-                        ElseIf usehandler.t1 = 3 Then
-                            bstack.SetVarobJ w$, anything
-                        ElseIf usehandler.t1 = 4 Then
-                            Set p = usehandler
-                            bstack.SetVarobJvalue w$, p
-                        Else
-                            GoTo conthere
-                        End If
-                    ElseIf Not bstack.lastobj Is Nothing Then
-                        If TypeOf bstack.lastobj Is Group Then
-                            If bstack.lastobj.IamApointer Then
-                                If bstack.lastobj.link.IamFloatGroup Then
-                                    bstack.SetVarobJvalue w$, bstack.lastobj
-                                Else
-                                    GoTo aaaa1
-                                End If
-                            Else
-aaaa1:
-                            Set bstack.lastobj = Nothing
-                            MyEr "only for pointers for float groups", "Ï¸ÌÔ „È· ‰ÂﬂÍÙÂÚ ÛÂ ÏÁ ÛÙ·ÙÈÍ‹ ·ÌÙÈÍÂﬂÏÂÌ·"
-                            Exit Function
-                        End If
-                    End If
-                Else
-                    bstack.SetVar w$, p
-                End If
-                Set bstack.lastobj = Nothing
-            ElseIf IsLabelSymbolNew(b$, "Ÿ”", "AS", Lang) Then
-               If IsLabelSymbolNew(b$, "¡—…»Ãœ”", "DECIMAL", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                        If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                    p = CDec(p)
-                ElseIf IsLabelSymbolNew(b$, "ƒ…–Àœ”", "DOUBLE", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                        If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                    p = CDbl(p)
-                ElseIf IsLabelSymbolNew(b$, "¡–Àœ”", "SINGLE", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                        If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                    p = CSng(p)
-                ElseIf IsLabelSymbolNew(b$, "Àœ√… œ”", "BOOLEAN", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                        If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                    p = CBool(p)
-                ElseIf IsLabelSymbolNew(b$, "Ã¡ —’”", "LONG", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                        If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                    p = CLng(p)
-                ElseIf IsLabelSymbolNew(b$, "¡ ≈—¡…œ”", "INTEGER", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                        If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                    p = CInt(p)
-                ElseIf IsLabelSymbolNew(b$, "Àœ√…”‘… œ", "CURRENCY", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                        If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                    p = CCur(p)
-                ElseIf IsEnumAs(bstack, b$, p) Then
-                    bstack.SetVarobJ w$, p
-                    GoTo aaa1
-                Else
-                    MyEr "No type found", "‰ÂÌ ‚ÒﬁÍ· Ù˝Ô"
-                    Exit Function
-                End If
-                bstack.SetVar w$, p
-            ElseIf FastSymbol(b$, "->", , 2) Then
-                If GetPointer(bstack, b$) Then
-                    If bstack.lastpointer.IamFloatGroup Then
-                        bstack.SetVarobJvalue w$, bstack.lastpointer
-                    Else
-                        Set bstack.lastpointer = Nothing
-                        GoTo aaaa1
-                    End If
-                Else
-                    GoTo aaaa1
-                End If
-            Else
-               bstack.SetVar w$, p
-            End If
-            Set bstack.lastobj = Nothing
-        ElseIf FastSymbol(b$, "=") Then
-            ii = 1
-            ss$ = aheadstatus(b$, False, ii)
-            b$ = Mid$(b$, ii)
-        ElseIf Fast2VarNoTrim(b$, "Ÿ”", 2, "AS", 2, 3, ii) Then
-            ii = 1
-            ss$ = aheadstatus(b$, False, ii)
-            b$ = Mid$(b$, ii)
-        ElseIf FastSymbol(b$, "->", , 2) Then
-            ii = 1
-            ss$ = aheadstatus(b$, False, ii)
-            b$ = Mid$(b$, ii)
-        End If
-        StaticNew = True
-    Case 3
-        If Not bstack.ExistVar(w$) Then
-            If FastSymbol(b$, "=") Then If Not IsStrExp(bstack, b$, ss$) Then SyntaxError: Exit Function
-            bstack.SetVar w$, ss$
-        ElseIf FastSymbol(b$, "=") Then
-            ii = 1
-            ss$ = aheadstatus(b$, False, ii)
-            b$ = Mid$(b$, ii)
-        End If
-        StaticNew = True
-    Case 4
-        If Not bstack.ExistVar(w$) Then
-            If FastSymbol(b$, "=") Then
-            If Not IsExp(bstack, b$, p) Then SyntaxError: Exit Function
-            ElseIf IsLabelSymbolNew(b$, "Ÿ”", "AS", Lang) Then
-    
-               If IsLabelSymbolNew(b$, "¡—…»Ãœ”", "DECIMAL", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                    If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                    p = CDec(p)
-            ElseIf IsLabelSymbolNew(b$, "ƒ…–Àœ”", "DOUBLE", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                    If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                p = CDbl(p)
-            ElseIf IsLabelSymbolNew(b$, "¡–Àœ”", "SINGLE", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                    If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                p = CSng(p)
-            ElseIf IsLabelSymbolNew(b$, "Àœ√… œ”", "BOOLEAN", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                    If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                p = CBool(p)
-            ElseIf IsLabelSymbolNew(b$, "Ã¡ —’”", "LONG", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                    If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                p = CLng(p)
-            ElseIf IsLabelSymbolNew(b$, "¡ ≈—¡…œ”", "INTEGER", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                    If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-                p = CInt(p)
-            ElseIf IsLabelSymbolNew(b$, "Àœ√…”‘… œ", "CURRENCY", Lang, , , , False) Then
-                    If FastSymbol(b$, "=") Then
-                    If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-                    Else
-                        p = 0
-                    End If
-
-                p = CCur(p)
-            Else
-            MyEr "No type found", "‰ÂÌ ‚ÒﬁÍ· Ù˝Ô"
-            Exit Function
-            End If
-            
-            If Typename(p) <> "boolean" Then p = Int(p)
-            End If
-            bstack.SetVar w$, MyRound(p)
-        ElseIf FastSymbol(b$, "=") Then
-         ii = 1
-            ss$ = aheadstatus(b$, False, ii)
-        b$ = Mid$(b$, ii)
-        ElseIf Fast2VarNoTrim(b$, "Ÿ”", 2, "AS", 2, 3, ii) Then
-         ii = 1
-            ss$ = aheadstatus(b$, False, ii)
-        b$ = Mid$(b$, ii)
-    End If
-        StaticNew = True
-        
-    Case Else
-conthere:
-        MyErMacro b$, "No static for that type " + w$, "º˜È ÛÙ·ÙÈÍﬁ „È· ·ıÙ¸ ÙÔ Ù˝Ô " + w$
-        Exit Function
-    End Select
-aaa1:
- Loop Until Not FastSymbol(b$, ",")
-End Function
 Function ConstNew(bstack As basetask, b$, w$, makeallglobal As Boolean, Lang As Long) As Boolean
 Dim p As Variant, ii As Long, ss$, what As Long
     Dim cv As Constant
@@ -26718,7 +26471,21 @@ If l <> -1 Then
 x1 = Abs(IsLabel(bstack, rest$, s$))
 If x1 < 5 Then
 If Not FastSymbol(rest$, "(") Then
-ReadOneParameter vv, l, s$, myVar
+If Not ReadOneParameter(vv, l, s$, myVar) Then
+If MyIsObject(myVar) Then
+If myVar Is Err Then
+    Set errbag = New ErrorBag
+    errbag.CopyErr
+    Set myVar = errbag
+    Set errbag = Nothing
+    Err.Clear
+End If
+Else
+    MyEr s$, s$
+    GoTo there
+End If
+
+End If
 Else
 GoTo contindex
 End If
@@ -26728,18 +26495,52 @@ contindex:
   Err.Clear
         Set myVar = ReadOneIndexParameter(vv, l, s1$, sp, False)
                     If Err.Number Then
-                    Err.Clear
-                Set myVar = ReadOneIndexParameter(vv, l, s1$, sp, True)
-               
-                End If
+                        If MyIsObject(myVar) Then
+                            If myVar Is Err Then
+                                Set errbag = New ErrorBag
+                                errbag.CopyErr
+                                Set myVar = errbag
+                                Set errbag = Nothing
+                            End If
+                        End If
+                        Err.Clear
+                        Set myVar = ReadOneIndexParameter(vv, l, s1$, sp, True)
+                        If MyIsObject(myVar) Then
+                            If myVar Is Err Then
+                                Set errbag = New ErrorBag
+                                errbag.CopyErr
+                                Set myVar = errbag
+                                Set errbag = Nothing
+                            End If
+                        End If
+                        Err.Clear
+                    End If
                             ElseIf IsStrExp(bstack, rest$, ss$) Then
                             On Error Resume Next
                 Err.Clear
                 Set myVar = ReadOneIndexParameter(vv, l, s1$, ss$, False)
                 If Err.Number Then
+                   If MyIsObject(myVar) Then
+                            If myVar Is Err Then
+                                Set errbag = New ErrorBag
+                                errbag.CopyErr
+                                Set myVar = errbag
+                                Set errbag = Nothing
+                            End If
+                        End If
+                        
                 Err.Clear
                 Set myVar = ReadOneIndexParameter(vv, l, s1$, ss$, True)
-               
+                               If MyIsObject(myVar) Then
+                            If myVar Is Err Then
+                                Set errbag = New ErrorBag
+                                errbag.CopyErr
+                                Set myVar = errbag
+                                Set errbag = Nothing
+                            End If
+                        End If
+                        
+                Err.Clear
                 End If
                             End If
                             If Not FastSymbol(rest$, ")") Then GoTo there
@@ -27371,7 +27172,15 @@ End If
 er$ = vbNullString
 RETVAR = Empty
 ReadProp = ReadOneParameter(o, propIndex, er$, RETVAR)
-
+If MyIsObject(RETVAR) Then
+If RETVAR Is Err Then
+        Set errbag = New ErrorBag
+        errbag.CopyErr
+        Set RETVAR = errbag
+        Set errbag = Nothing
+        Err.Clear
+End If
+End If
 If er$ <> "" Then
 there:
 BadGetProp
@@ -27453,6 +27262,15 @@ Function ReadPropObj(o As Object, ByVal propIndex As Long, RETVAR As Variant) As
 Dim er$
 er$ = vbNullString
 ReadPropObj = ReadOneParameter(o, propIndex, er$, RETVAR)
+If MyIsObject(RETVAR) Then
+If RETVAR Is Err Then
+        Set errbag = New ErrorBag
+        errbag.CopyErr
+        Set RETVAR = errbag
+        Set errbag = Nothing
+        Err.Clear
+End If
+End If
 If er$ <> "" Then
 BadGetProp
 End If

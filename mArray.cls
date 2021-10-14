@@ -1678,19 +1678,19 @@ Dim M1 As Long, M2 As Long
    Piv = actualdata(M1)
    
            M1 = LB
-   Do While actualdata(M1) > Piv: M1 = M1 + 1: Loop
+   Do While actualdata(M1) < Piv: M1 = M1 + 1: Loop
     End If
   
   M2 = UB
   Do
-    Do While actualdata(M2) < Piv: M2 = M2 - 1: Loop
+    Do While actualdata(M2) > Piv: M2 = M2 - 1: Loop
     If M1 <= M2 Then
       If M1 <> M2 Then SwapVariant actualdata(M1), actualdata(M2)
       M1 = M1 + 1
       M2 = M2 - 1
     End If
     If M1 > M2 Then Exit Do
-    Do While actualdata(M1) > Piv: M1 = M1 + 1: Loop
+    Do While actualdata(M1) < Piv: M1 = M1 + 1: Loop
   Loop
   If LB < M2 Then QuickSortItemsWithSameKey LB, M2
   If M1 < UB Then QuickSortItemsWithSameKey M1, UB
@@ -1711,19 +1711,19 @@ Dim M1 As Long, M2 As Long
    Piv = actualdata(M1)
    
            M1 = LB
-   Do While actualdata(M1) < Piv: M1 = M1 + 1: Loop
+   Do While actualdata(M1) > Piv: M1 = M1 + 1: Loop
   End If
   
   M2 = UB
   Do
-    Do While actualdata(M2) > Piv: M2 = M2 - 1: Loop
+    Do While actualdata(M2) < Piv: M2 = M2 - 1: Loop
     If M1 <= M2 Then
       If M1 <> M2 Then SwapVariant actualdata(M1), actualdata(M2)
       M1 = M1 + 1
       M2 = M2 - 1
     End If
     If M1 > M2 Then Exit Do
-    Do While actualdata(M1) < Piv: M1 = M1 + 1: Loop
+    Do While actualdata(M1) > Piv: M1 = M1 + 1: Loop
   Loop
   If LB < M2 Then QuickSortItemsRevWithSameKey LB, M2
   If M1 < UB Then QuickSortItemsRevWithSameKey M1, UB
@@ -1896,8 +1896,6 @@ Dim M1 As Long, M2 As Long
     
     M1 = LB
     Do While Compare10(M1) = 1: M1 = M1 + 1: Loop
-
-
   
   M2 = UB
   Do

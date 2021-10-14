@@ -16,17 +16,30 @@ Private m As Object, f As Form1
 Public Sub doit()
 Attribute doit.VB_UserMemId = 0
 Dim test
+Dim link$
+
+If Dir(App.path + "\" + App.ExeName + ".gsb") <> "" Then
+link$ = "{dir " + Chr$(34) + App.path + Chr$(34) + " : load " & App.ExeName & "}"
+End If
+
 Set f = New Form1
 f.Move VirtualScreenWidth() + 2000, VirtualScreenHeight() + 2000
-'f.Show
-
 
 On Error Resume Next
-'With New cFIE
-'.FEATURE_BROWSER_EMULATION = .InstalledVersion
-'End With
+
+If link$ <> "" Then
+    Set m = NewObjectFromActivexDll(App.path + "\m2000.dll", "callback")
+    If Err Then
+    Err.Clear
+    Set m = NewObjectFromActivexDll(App.path + "\lib.bin", "callback")
+    End If
+Else
 Set m = CreateObject("M2000.callback")
-'Dim m As New M2000.callback
+    If Err Then
+        Err.Clear
+        Set m = NewObjectFromActivexDll(App.path + "\m2000.dll", "callback")
+    End If
+End If
 If Err Then
     MsgBox "Install M2000.dll first", vbCritical
     Unload f
@@ -40,6 +53,7 @@ m.run "start"
 m.StackMax -12345
 a$ = commandW
 If Trim$(a$) = "-h" Or Trim$(a$) = "/?" Then frmAbout.Show 1: ExitNow = True: Exit Sub
+If a$ = "" And link$ <> "" Then a$ = link$
 If m.Status = 0 Then
 m.Cli a$, ">"
 End If
@@ -55,10 +69,10 @@ m.StackMax -12345
 a$ = commandW
 
 If Trim$(a$) = "-h" Or Trim$(a$) = "/?" Then frmAbout.Show 1: ExitNow = True: Exit Sub
+If a$ = "" And link$ <> "" Then a$ = link$
 If m.Status = 0 Then
 Set f.mm = Me
 Set f.m = m
-'f.Timer1.Interval = 50
 
 Sleep 100
 m.AsyncCli a$, ">"

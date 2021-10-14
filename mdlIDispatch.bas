@@ -494,7 +494,10 @@ Public Function ReadOneParameter(pobjTarget As Object, dispid As Long, ERrR$, Va
        On Error Resume Next
         lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
 If Err > 0 Then
-ERrR$ = Err.Description
+If MyIsObject(VarRet) Then
+    If VarRet Is Err Then Exit Function
+End If
+If ERrR$ = "" Then ERrR$ = Err.Description
 Exit Function
 Else
         If lngRet <> 0 Then
@@ -581,6 +584,9 @@ Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR
         On Error Resume Next
         lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
 If Err > 0 Then
+If MyIsObject(VarRet) Then
+    If VarRet Is Err Then Exit Function
+End If
 ERrR$ = Err.Description
 Exit Function
 Else
