@@ -33649,4 +33649,25 @@ Sub OpByteLong()
       pc+=6
 End Sub
 }
+MODULE DOWNANY {FileFromDrive$="http://drive.google.com/uc?export=download&id="
+//Const ERROR_SUCCESS = 0x0&
+Const BINDF_GETNEWESTVERSION = 0x10&
+//Const INTERNET_FLAG_RELOAD = 0x80000000&
+//Const FILE_ATTRIBUTE_TEMPORARY = 0x100&
+Print "Download M2000paper.pdf"
+if internet then
+	If exist("M2000paper.pdf") then Try {dos "del "+quote$(dir$+"M2000paper.pdf");} : Wait 200
+	Declare URLDownloadToFile lib "urlmon.URLDownloadToFileW" {long pCaller, szUrl$, sxFilename$, long dwReserved, long callback}
+	dir user
+	if URLDownloadToFile(0,FileFromDrive$+"1pHBjLVeaGkyMhyyfvXyvh42cJ3njY7wa", dir$+"M2000paper.pdf",BINDF_GETNEWESTVERSION,0)==0 then
+		Print "Ok"
+	Else
+		Print "Try Again"
+	end if
+else
+	Print "Not Internet, Try Again"
+end if
+
+
+}
 UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}

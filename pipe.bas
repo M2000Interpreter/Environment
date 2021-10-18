@@ -223,7 +223,7 @@ Private Const DISP_E_TYPEMISMATCH = &H80020005
 Private Const E_INVALIDARG = &H80070057
 Private Const E_OUTOFMEMORY = &H8007000E
 Private Declare Function VariantTimeToSystemTime Lib "OleAut32.dll" ( _
-    ByVal vtime As Date, _
+    ByVal vTime As Date, _
     ByRef lpSystemTime As SYSTEMTIME _
 ) As Long
 Private Declare Function GetTimeZoneInformation Lib "kernel32.dll" (lpTimeZoneInformation As TIME_ZONE_INFORMATION) As Long
@@ -363,10 +363,10 @@ Public Function PathMakeDirs(ByVal Pathd As String) As Boolean
       PathMakeDirs = 0 <> CreateDirectory(StrPtr(Pathd), 0&)
    End Function
  
-Function PurifyPath(Spath$) As String
+Function PurifyPath(sPath$) As String
 Dim a$(), i
-If Spath$ = vbNullString Then Exit Function
-a$() = Split(Spath, "\")
+If sPath$ = vbNullString Then Exit Function
+a$() = Split(sPath, "\")
 If isdir(a$(LBound(a$()))) Then i = i + 1
 For i = LBound(a$()) + i To UBound(a$())
 a$(i) = PurifyName(a$(i))
@@ -617,14 +617,14 @@ On Error GoTo inc1
 Dim what As Long
 Dim st&, pa&, po&
 st& = 1
-Dim word$(), it As Long, max As Long, Line$, ok As Boolean, Min As Long
+Dim word$(), it As Long, Max As Long, Line$, ok As Boolean, Min As Long
 simple$ = simple$ + "|"
 word$() = Split(simple$, "|")
 
 
-max = UBound(word$()) - 1
-If max > 0 Then
-For st& = 0 To max
+Max = UBound(word$()) - 1
+If Max > 0 Then
+For st& = 0 To Max
 If word$(st&) = vbNullString Then
 MyEr "Need to give a string of type ""word1|word2....""", "Χρειάζεται να δώσεις ένα αλφαριθμητικό ""λεξη|άλληλέξη..."""
 Exit Function
@@ -637,8 +637,8 @@ Included = ExtractName(afile$, True)
 Else
     Sleep 1
     Set a = New Document
-    
-    a.lcid = cLid
+    a.MaxParaLength = 1000
+    a.lcid = Clid
     a.ReadUnicodeOrANSI afile$, , what
     
     If InStr(simple$, vbCr) > 0 Then
@@ -655,10 +655,10 @@ again:
     
     If st& > 0 Then
     
-     If max > 0 Then
+     If Max > 0 Then
      po& = po& + Len(word$(0))
      Line$ = a.TextParagraph(a.ParagraphFromOrder(pa&))
-     For it = 1 To max
+     For it = 1 To Max
      ok = InStr(po&, Line$, word$(it), vbTextCompare) > 0
      If Not ok Then Exit For
      Next it
@@ -780,16 +780,16 @@ finish:
     If Not ok Then
     iPad = 0
     
-    Dim offset As Long
-        Do While lChar3 + offset <= ubnd
-        Select Case bIn(lChar3 + offset)
+    Dim Offset As Long
+        Do While lChar3 + Offset <= ubnd
+        Select Case bIn(lChar3 + Offset)
             Case 10, 13, 32
-            If iPad > 0 Then offset = 0: Exit Do
-            offset = offset + 1
+            If iPad > 0 Then Offset = 0: Exit Do
+            Offset = Offset + 1
             
             Case 61
             iPad = iPad + 1
-            offset = offset + 1
+            Offset = Offset + 1
             Case Else
              If lChar2 = 0 Then GoTo error1
                 
@@ -802,7 +802,7 @@ finish:
                 End If
               End If
             
-             offset = 0
+             Offset = 0
             
             Exit Do
          

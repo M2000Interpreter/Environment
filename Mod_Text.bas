@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 26
+Global Const Revision = 27
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -12885,7 +12885,7 @@ fstr33: '"UNION.DATA$(", "ÅÍÙÓÇ.ÓÅÉÑÁÓ$("
         w3 = w3 - &H10000
         s$ = ChrW(UINT(w3 \ &H400& + &HD800&)) + ChrW(UINT((w3 And &H3FF&) + &HDC00&))
         Else
-    s$ = ChrW$(cUint(p))
+    s$ = ChrW$(UINT(p))
     End If
   Else
   s = ChrW(0)
@@ -13852,7 +13852,7 @@ fstr61: '"CHRCODE$(", "×ÁÑÊÙÄ$("
         w3 = w3 - &H10000
         R$ = ChrW(UINT(w3 \ &H400& + &HD800&)) + ChrW(UINT((w3 And &H3FF&) + &HDC00&))
         Else
-    R$ = ChrW$(cUint(p))
+    R$ = ChrW$(UINT(p))
     End If
     If Not FastSymbol(a$, ")") Then IsStr1 = False: Exit Function
     IsStr1 = True
@@ -15373,7 +15373,7 @@ notask:
                 HaltLevel = HaltLevel + 1
                 
                 crNew bstack, players(GetCode(bstack.Owner))
-                Form1.MyPrompt "", username & " (exit)>", bstack
+                Form1.MyPrompt "", UserName & " (exit)>", bstack
                 HaltLevel = HaltLevel - 1
                 Set bstack = bs
                 If ExTarget Then
@@ -43443,7 +43443,7 @@ Else
         w3 = w3 - &H10000
         s$ = ChrW(UINT(w3 \ &H400& + &HD800&)) + ChrW(UINT((w3 And &H3FF&) + &HDC00&))
         Else
-    s$ = ChrW$(cUint(p))
+    s$ = ChrW$(UINT(p))
     End If
   
  If Form1.gList1.Visible Then
@@ -47567,7 +47567,7 @@ Private Function IsSeek(bstack As basetask, a$, R As Variant, SG As Variant) As 
 End Function
 Private Function IsUint(bstack As basetask, a$, R As Variant, SG As Variant) As Boolean
 If IsExp(bstack, a$, R, , True) Then
- If VarPtr(R) = vbInteger Then
+ If VarType(R) = vbInteger Then
      On Error Resume Next
     
         R = SG * UINT(R)
@@ -49884,17 +49884,21 @@ Private Function IsChrCode(bstack As basetask, a$, R As Variant, SG As Variant) 
 Dim s$, w As Long
    If IsStrExp(bstack, a$, s$) Then
     If s$ = vbNullString Then
-        R = -1
+        R = CInt(-1)
     Else
         w = AscW(s$)
         If w > -10241 And w < -9984 Then
             If Len(s$) > 1 Then
-            R = SG * (&H10000 + (UINT(w) - &HD800&) * &H400 + UINT(AscW(Mid$(s$, 2, 1))) - &HDC00&)
+            R = CCur(SG * (&H10000 + (UINT(w) - &HD800&) * &H400 + UINT(AscW(Mid$(s$, 2, 1))) - &HDC00&))
             Else
-            R = SG * w
+             R = CInt(w)
+                On Error Resume Next
+                If SG < 0 Then R = -R
             End If
         Else
-        R = SG * w
+        R = CInt(w)
+        On Error Resume Next
+        If SG < 0 Then R = -R
         End If
         
     End If

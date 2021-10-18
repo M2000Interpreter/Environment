@@ -64,21 +64,21 @@ Public Function CreateZipBuffer() As mHandler
     LockControl = False
     mLastCancel = False
 End Function
-Public Function AddFromMemory(FileBuf() As Byte, Optional Name As String, Optional Comment As String, Optional Password As String, Optional EncrStrength As Long, Optional Level As Long = -1) As Boolean
-    AddFromMemory = Zip.AddFile(CVar(FileBuf), Name, Comment, Password, EncrStrength, Level)
+Public Function AddFromMemory(FileBuf() As Byte, Optional Name As String, Optional Comment As String, Optional Password As String, Optional EncrStrength As Long, Optional level As Long = -1) As Boolean
+    AddFromMemory = Zip.AddFile(CVar(FileBuf), Name, Comment, Password, EncrStrength, level)
 End Function
-Public Function AddFile(FileStr As String, Optional Name As String, Optional Comment As String, Optional Password As String, Optional EncrStrength As Long, Optional Level As Long = -1) As Boolean
-    AddFile = Zip.AddFile(CVar(FileStr), Name, Comment, Password, EncrStrength, Level)
+Public Function AddFile(FileStr As String, Optional Name As String, Optional Comment As String, Optional Password As String, Optional EncrStrength As Long, Optional level As Long = -1) As Boolean
+    AddFile = Zip.AddFile(CVar(FileStr), Name, Comment, Password, EncrStrength, level)
 End Function
-Function AddFileFromFolder(sFolderAndMask As String, _
+Public Function AddFileFromFolder(sFolderAndMask As String, _
             Optional Recursive As Boolean, _
             Optional TargetFolder As String, _
             Optional IncludeEmptyFolders As Boolean, _
             Optional Password As String, _
             Optional EncrStrength As Long, _
-            Optional Level As Long = -1) As Boolean
+            Optional level As Long = -1) As Boolean
     'Zip.AddFile
-    AddFileFromFolder = Zip.AddFromFolder(sFolderAndMask, Recursive, TargetFolder, IncludeEmptyFolders, Password, EncrStrength, Level)
+    AddFileFromFolder = Zip.AddFromFolder(sFolderAndMask, Recursive, TargetFolder, IncludeEmptyFolders, Password, EncrStrength, level)
 End Function
 Public Property Get FileInfo(FileNum) As Object
 Dim Handler As New mHandler, touple As New mArray
@@ -144,7 +144,7 @@ Private Sub Class_Terminate()
 Set Zip = Nothing
 End Sub
 
-Private Sub Zip_BeforeCompress(ByVal FileIdx As Long, Level As Long, SkipFile As Boolean, mCancel As Boolean)
+Private Sub Zip_BeforeCompress(ByVal FileIdx As Long, level As Long, SkipFile As Boolean, mCancel As Boolean)
     RaiseEvent Cancel(mCancel)
 End Sub
 

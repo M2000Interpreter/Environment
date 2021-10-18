@@ -19,13 +19,14 @@ Option Explicit
 '   With AnObject,"IsServer" as IsServer
 '   Declare AnObject Nothing
 ' OSInfo class by Alex Dragokas
-' ver 1.7
+' ver 1.13
 '
 
 'Tips:
 
 ' Versions:
 
+' 10.0* | Windows 11 (builds 22000+)
 ' 10.0* | Windows Server 2016
 ' 10.0* | Windows 10 (builds 9885+, Insider Preview)
 ' 6.4*  | Windows 10 Technical Preview (builds 9879-)
@@ -49,7 +50,8 @@ Option Explicit
 
 ' Last Service Packs:
 
-' 10     | SP0, ReleaseId=1703+, Build=16176+ (Creators Update)
+' 11     | SP0, ReleaseId=2009+, Build=22000+ (Sun Valley)
+' 10     | SP0, ReleaseId=2009+, Build=19043+ (Vibranium)
 ' 8.1    | SP0, Update 1+, Build=9600
 ' 8      | SP0, Build=9200
 ' 7      | SP1, Build=7601
@@ -62,11 +64,20 @@ Option Explicit
 ' 98     | Build=2222 A
 ' 95     | Build=950
 
+' Build versions:
+
+' https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions
+' https://www.techpowerup.com/forums/threads/windows-os-builds-list.167382/
+' https://docs.microsoft.com/en-Us/windows-server/get-started/windows-server-release-info
+
 Private Enum ePlatformID
     Win32S = 0
     Win32Windows = 1
     Win32NT = 2
     WinCE = 3
+    UNIX = 4
+    Xbox = 5
+    MacOSX = 6
 End Enum
 
 Private Type RTL_OSVERSIONINFOEXW
@@ -83,6 +94,20 @@ Private Type RTL_OSVERSIONINFOEXW
     wReserved As Byte
 End Type
 
+'Private Type OSVERSIONINFOEXW
+'    dwOSVersionInfoSize As Long
+'    dwMajorVersion As Long
+'    dwMinorVersion As Long
+'    dwBuildNumber As Long
+'    dwPlatformId As Long
+'    szCSDVersion(127) As Integer
+'    wServicePackMajor As Integer
+'    wServicePackMinor As Integer
+'    wSuiteMask As Integer
+'    wProductType As Byte
+'    wReserved As Byte
+'End Type
+
 Private Type SID_IDENTIFIER_AUTHORITY
     Value(0 To 5) As Byte
 End Type
@@ -97,34 +122,45 @@ Private Type TOKEN_GROUPS
     Groups(20) As SID_AND_ATTRIBUTES
 End Type
 
-Private Type TOKEN_PRIVILEGES
-    PrivilegeCount  As Long
-    LuidLowPart     As Long
-    LuidHighPart    As Long
-    Attributes      As Long
+'Private Type TOKEN_PRIVILEGES
+'    PrivilegeCount  As Long
+'    LuidLowPart     As Long
+'    LuidHighPart    As Long
+'    Attributes      As Long
+'End Type
+
+Private Type OBJECT_ATTRIBUTES
+    Length                   As Long
+    RootDirectory            As Long
+    ObjectName               As Long
+    Attributes               As Long
+    SecurityDescriptor       As Long
+    SecurityQualityOfService As Long
+End Type
+
+Private Type UNICODE_STRING
+    Length                          As Integer
+    MaximumLength                   As Integer
+    Buffer                          As Long
 End Type
 Private Declare Function OpenProcess Lib "kernel32" _
   (ByVal dwDesiredAccess As Long, _
    ByVal bInheritHandle As Long, _
    ByVal dwProcessId As Long) As Long
    
-Private Declare Function WaitForSingleObject Lib "kernel32" _
-  (ByVal hHandle As Long, _
-   ByVal dwMilliseconds As Long) As Long
-
-Private Declare Function GetLocaleInfo Lib "kernel32.dll" Alias "GetLocaleInfoW" (ByVal lcid As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+Private Declare Function GetLocaleInfo Lib "kernel32.dll" Alias "GetLocaleInfoW" (ByVal lcid As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
 Private Declare Function GetUserDefaultUILanguage Lib "kernel32.dll" () As Long
 Private Declare Function GetSystemDefaultUILanguage Lib "kernel32.dll" () As Long
 Private Declare Function GetSystemDefaultLCID Lib "kernel32.dll" () As Long
-'Private Declare Function GetUserDefaultLCID Lib "kernel32.dll" () As Long
+Private Declare Function GetUserDefaultLCID Lib "kernel32.dll" () As Long
 Private Declare Function IsWow64Process Lib "kernel32.dll" (ByVal hProc As Long, bWow64Process As Long) As Long
-'Private Declare Function GetVersionEx Lib "kernel32.dll" Alias "GetVersionExW" (lpVersionInformation As OSVERSIONINFOEX) As Long
-Private Declare Function RtlGetVersion Lib "NTDLL.DLL" (lpVersionInformation As RTL_OSVERSIONINFOEXW) As Long
+Private Declare Function GetVersionEx Lib "kernel32.dll" Alias "GetVersionExW" (lpVersionInformation As RTL_OSVERSIONINFOEXW) As Long 'OSVERSIONINFOEXW
+Private Declare Function RtlGetVersion Lib "ntdll.dll" (lpVersionInformation As RTL_OSVERSIONINFOEXW) As Long
 Private Declare Function GetSystemMetrics Lib "user32.dll" (ByVal nIndex As Long) As Long
 Private Declare Function GetProductInfo Lib "kernel32.dll" (ByVal dwOSMajorVersion As Long, ByVal dwOSMinorVersion As Long, ByVal dwSpMajorVersion As Long, ByVal dwSpMinorVersion As Long, pdwReturnedProductType As Long) As Long
 'Private Declare Function CheckTokenMembership Lib "advapi32.dll" (ByVal TokenHandle As Long, ByVal SidToCheck As Long, IsMember As Long) As Long
-Private Declare Function OpenProcessToken Lib "advapi32.dll" (ByVal ProcessHandle As Long, ByVal DesiredAccess As Long, TokenHandle As Long) As Long
-Private Declare Function GetTokenInformation Lib "advapi32.dll" (ByVal TokenHandle As Long, ByVal TokenInformationClass As Long, TokenInformation As Any, ByVal TokenInformationLength As Long, ReturnLength As Long) As Long
+Private Declare Function OpenProcessToken Lib "Advapi32.dll" (ByVal ProcessHandle As Long, ByVal DesiredAccess As Long, TokenHandle As Long) As Long
+Private Declare Function GetTokenInformation Lib "Advapi32.dll" (ByVal TokenHandle As Long, ByVal TokenInformationClass As Long, TokenInformation As Any, ByVal TokenInformationLength As Long, ReturnLength As Long) As Long
 'Private Declare Function OpenThreadToken Lib "advapi32.dll" (ByVal ThreadHandle As Long, ByVal DesiredAccess As Long, ByVal OpenAsSelf As Long, TokenHandle As Long) As Long
 'Private Declare Function GetCurrentThread Lib "kernel32.dll" () As Long
 Private Declare Function GetCurrentProcess Lib "kernel32.dll" () As Long
@@ -132,30 +168,38 @@ Private Declare Sub CopyMemory Lib "kernel32.dll" Alias "RtlMoveMemory" (dest As
 Private Declare Function GetMem4 Lib "msvbvm60.dll" (Src As Any, Dst As Any) As Long
 Private Declare Function CloseHandle Lib "kernel32.dll" (ByVal hObject As Long) As Long
 Private Declare Function LocalFree Lib "kernel32.dll" (ByVal hMem As Long) As Long
-Private Declare Sub FreeSid Lib "advapi32.dll" (ByVal pSid As Long)
-Private Declare Function AllocateAndInitializeSid Lib "advapi32.dll" (pIdentifierAuthority As Any, ByVal nSubAuthorityCount As Byte, ByVal nSubAuthority0 As Long, ByVal nSubAuthority1 As Long, ByVal nSubAuthority2 As Long, ByVal nSubAuthority3 As Long, ByVal nSubAuthority4 As Long, ByVal nSubAuthority5 As Long, ByVal nSubAuthority6 As Long, ByVal nSubAuthority7 As Long, lpPSid As Long) As Long
-Private Declare Function IsValidSid Lib "advapi32.dll" (ByVal pSid As Long) As Long
-Private Declare Function GetSidSubAuthority Lib "advapi32.dll" (ByVal pSid As Long, ByVal nSubAuthority As Long) As Long
-Private Declare Function GetSidSubAuthorityCount Lib "advapi32.dll" (ByVal pSid As Long) As Long
-Private Declare Function EqualSid Lib "advapi32.dll" (pSid1 As Any, pSid2 As Any) As Long
-Private Declare Function RegOpenKeyEx Lib "advapi32.dll" Alias "RegOpenKeyExW" (ByVal hKey As Long, ByVal lpSubKey As Long, ByVal ulOptions As Long, ByVal samDesired As Long, phkResult As Long) As Long
-Private Declare Function RegCloseKey Lib "advapi32.dll" (ByVal hKey As Long) As Long
-Private Declare Function RegQueryValueExStr Lib "advapi32.dll" Alias "RegQueryValueExW" (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, lpType As Long, ByVal szData As Long, lpcbData As Long) As Long
-Private Declare Function RegQueryValueExLong Lib "advapi32.dll" Alias "RegQueryValueExW" (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, lpType As Long, szData As Long, lpcbData As Long) As Long
-Private Declare Function RegQueryValueEx Lib "advapi32.dll" Alias "RegQueryValueExW" (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, lpType As Long, ByVal lpData As Any, lpcbData As Long) As Long
+Private Declare Sub FreeSid Lib "Advapi32.dll" (ByVal pSid As Long)
+Private Declare Function AllocateAndInitializeSid Lib "Advapi32.dll" (pIdentifierAuthority As Any, ByVal nSubAuthorityCount As Byte, ByVal nSubAuthority0 As Long, ByVal nSubAuthority1 As Long, ByVal nSubAuthority2 As Long, ByVal nSubAuthority3 As Long, ByVal nSubAuthority4 As Long, ByVal nSubAuthority5 As Long, ByVal nSubAuthority6 As Long, ByVal nSubAuthority7 As Long, lpPSid As Long) As Long
+Private Declare Function IsValidSid Lib "Advapi32.dll" (ByVal pSid As Long) As Long
+Private Declare Function GetSidSubAuthority Lib "Advapi32.dll" (ByVal pSid As Long, ByVal nSubAuthority As Long) As Long
+Private Declare Function GetSidSubAuthorityCount Lib "Advapi32.dll" (ByVal pSid As Long) As Long
+Private Declare Function EqualSid Lib "Advapi32.dll" (pSid1 As Any, pSid2 As Any) As Long
+Private Declare Function RegOpenKeyEx Lib "Advapi32.dll" Alias "RegOpenKeyExW" (ByVal hKey As Long, ByVal lpSubKey As Long, ByVal ulOptions As Long, ByVal samDesired As Long, phkResult As Long) As Long
+Private Declare Function RegCloseKey Lib "Advapi32.dll" (ByVal hKey As Long) As Long
+Private Declare Function RegQueryValueExStr Lib "Advapi32.dll" Alias "RegQueryValueExW" (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, lpType As Long, ByVal szData As Long, lpcbData As Long) As Long
+Private Declare Function RegQueryValueExLong Lib "Advapi32.dll" Alias "RegQueryValueExW" (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, lpType As Long, szData As Long, lpcbData As Long) As Long
+Private Declare Function RegQueryValueEx Lib "Advapi32.dll" Alias "RegQueryValueExW" (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, lpType As Long, ByVal lpData As Any, lpcbData As Long) As Long
 Private Declare Function LoadLibrary Lib "kernel32.dll" Alias "LoadLibraryW" (ByVal lpFileName As Long) As Long
 Private Declare Function FreeLibrary Lib "kernel32.dll" (ByVal hLibModule As Long) As Long
 Private Declare Function GetProcAddress Lib "kernel32.dll" (ByVal hModule As Long, ByVal lpProcName As String) As Long
 Private Declare Function lstrlenW Lib "kernel32.dll" (ByVal lpString As Long) As Long
 Private Declare Function lstrcpyW Lib "kernel32.dll" (ByVal lpStrDest As Long, ByVal lpStrSrc As Long) As Long
-Private Declare Function ConvertSidToStringSid Lib "advapi32.dll" Alias "ConvertSidToStringSidW" (ByVal pSid As Long, StringSid As Long) As Long
+Private Declare Function ConvertSidToStringSid Lib "Advapi32.dll" Alias "ConvertSidToStringSidW" (ByVal pSid As Long, StringSid As Long) As Long
 Private Declare Function GetModuleHandle Lib "kernel32.dll" Alias "GetModuleHandleW" (ByVal lpModuleName As Long) As Long
-Private Declare Sub RtlGetNtVersionNumbers Lib "NTDLL.DLL" (Major As Long, Minor As Long, Build As Long)
-Private Declare Function LookupPrivilegeValue Lib "advapi32.dll" Alias "LookupPrivilegeValueW" (ByVal lpSystemName As Long, ByVal lpName As Long, lpLuid As Long) As Long
-Private Declare Function AdjustTokenPrivileges Lib "advapi32.dll" (ByVal TokenHandle As Long, ByVal DisableAllPrivileges As Long, NewState As TOKEN_PRIVILEGES, ByVal BufferLength As Long, ByVal PreviousState As Long, ByVal ReturnLength As Long) As Long
-Private Declare Function OpenThreadToken Lib "advapi32.dll" (ByVal ThreadHandle As Long, ByVal DesiredAccess As Long, ByVal OpenAsSelf As Long, TokenHandle As Long) As Long
+Private Declare Sub RtlGetNtVersionNumbers Lib "ntdll.dll" (Major As Long, Minor As Long, Build As Long)
+'Private Declare Function LookupPrivilegeValue Lib "Advapi32.dll" Alias "LookupPrivilegeValueW" (ByVal lpSystemName As Long, ByVal lpName As Long, lpLuid As Long) As Long
+'Private Declare Function AdjustTokenPrivileges Lib "Advapi32.dll" (ByVal TokenHandle As Long, ByVal DisableAllPrivileges As Long, NewState As TOKEN_PRIVILEGES, ByVal BufferLength As Long, ByVal PreviousState As Long, ByVal ReturnLength As Long) As Long
+Private Declare Function OpenThreadToken Lib "Advapi32.dll" (ByVal ThreadHandle As Long, ByVal DesiredAccess As Long, ByVal OpenAsSelf As Long, TokenHandle As Long) As Long
 Private Declare Function GetCurrentThread Lib "kernel32.dll" () As Long
+Private Declare Function NtOpenSymbolicLinkObject Lib "ntdll.dll" (LinkHandle As Long, ByVal DesiredAccess As Long, ObjectAttributes As OBJECT_ATTRIBUTES) As Long
+'Private Declare Function NtOpenDirectoryObject Lib "ntdll.dll" (DirectoryHandle As Long, ByVal DesiredAccess As Long, ObjectAttributes As OBJECT_ATTRIBUTES) As Long
+Private Declare Function NtClose Lib "ntdll.dll" (ByVal Handle As Long) As Long
+'Private Declare Function IsOS Lib "Shlwapi.dll" Alias "#437" (ByVal dwOS As Long) As Long
+Private Declare Function GetUserName Lib "Advapi32.dll" Alias "GetUserNameW" (ByVal lpBuffer As Long, nSize As Long) As Long
+Private Declare Function GetComputerName Lib "kernel32.dll" Alias "GetComputerNameW" (ByVal lpBuffer As Long, nSize As Long) As Long
+Private Declare Function lstrlen Lib "kernel32.dll" Alias "lstrlenW" (ByVal lpString As Long) As Long
 
+Private Const MAX_PATH                  As Long = 260&
 Private Const SM_SERVERR2               As Long = 89&
 Private Const SM_MEDIACENTER            As Long = 87&
 Private Const SM_STARTER                As Long = 88&
@@ -178,18 +222,23 @@ Private Const VER_SUITE_WH_SERVER       As Long = &H8000&
 Private Const VER_NT_WORKSTATION        As Long = 1&
 Private Const VER_NT_DOMAIN_CONTROLLER  As Long = 2&
 Private Const VER_NT_SERVER             As Long = 3&
-Private Const LOCALE_SYSTEM_DEFAULT     As Long = &H800&
-Private Const LOCALE_USER_DEFAULT       As Long = &H400&
+'Private Const LOCALE_SYSTEM_DEFAULT     As Long = &H800&
+'Private Const LOCALE_USER_DEFAULT       As Long = &H400&
 Private Const LOCALE_SENGLANGUAGE       As Long = &H1001&
 Private Const HKEY_LOCAL_MACHINE        As Long = &H80000002
 Private Const KEY_WOW64_64KEY           As Long = &H100&
+Private Const DIRECTORY_QUERY           As Long = 1&
 
+Private Const STATUS_SUCCESS            As Long = 0&
 Private Const ERROR_SUCCESS             As Long = 0&
 Private Const TOKEN_QUERY               As Long = &H8&
-Private Const ERROR_NO_TOKEN            As Long = 1008&
+'Private Const ERROR_NO_TOKEN            As Long = 1008&
 Private Const TokenElevation            As Long = 20&
-Private Const TOKEN_ADJUST_PRIVILEGES   As Long = &H20
-Private Const SE_PRIVILEGE_ENABLED      As Long = 2&
+'Private Const TOKEN_ADJUST_PRIVILEGES   As Long = &H20
+'Private Const SE_PRIVILEGE_ENABLED      As Long = 2&
+'Private Const STATUS_ACCESS_DENIED      As Long = &HC0000022
+Private Const STATUS_OBJECT_NAME_NOT_FOUND As Long = &HC0000034
+
 
 Dim osi As RTL_OSVERSIONINFOEXW
 
@@ -205,6 +254,8 @@ Dim IsSafeBoot_             As Boolean
 Dim IsElevated_             As Boolean
 Dim IntegrityLevel_         As String
 Dim UserType_               As String
+Dim UserName_               As String
+Dim ComputerName_               As String
 Dim IsWindowsXPOrGreater_   As Boolean
 Dim IsWindowsVistaOrGreater_ As Boolean
 Dim IsWindows7OrGreater_    As Boolean
@@ -230,6 +281,7 @@ Dim SID_CurrentProcess_     As String
 Dim SafeBootMode_           As String
 Dim Platform_               As String 'Win9x / WinNT
 Dim ReleaseId_              As Long
+Dim DisplayVersion_         As String
 Dim IsServer_               As Boolean
 Dim IsDomainController_     As Boolean
 Dim inIDE                   As Boolean
@@ -237,6 +289,10 @@ Dim IsWin64_                As Boolean
 Dim SecureBoot_             As Boolean
 Dim PlatformID_             As Long
 Dim IsLocalSystemContext_   As Boolean
+Dim IsAdminGroup_           As Boolean
+Dim IsSystemCaseSensitive_  As Boolean
+Dim IsEmbedded_             As Boolean
+Dim LCID_UserDefault_       As Long
 
 
 Private Sub Class_Initialize()
@@ -244,8 +300,8 @@ Private Sub Class_Initialize()
     
     Dim dec             As Single
     Dim ProductType     As Long
-    Dim lRet            As Long
-    Dim Pos             As Long
+    Dim lret            As Long
+    Dim pos             As Long
     Dim tmp             As String
     Dim hLib            As Long
     Dim dwMajor         As Long
@@ -266,8 +322,13 @@ Private Sub Class_Initialize()
     LangNonUnicodeName_ = GetLangNameByCultureCode(LangNonUnicodeCode_)
     LangNonUnicodeNameFull_ = GetLangNameFullByCultureCode(LangNonUnicodeCode_)
     
+    LCID_UserDefault_ = GetUserDefaultLCID()
+    
     osi.dwOSVersionInfoSize = Len(osi)
-    RtlGetVersion osi
+    
+    If (STATUS_SUCCESS <> RtlGetVersion(osi)) Then
+        GetVersionEx osi
+    End If
     
     If inIDE Then
         'query correct OS version without manifest
@@ -280,8 +341,8 @@ Private Sub Class_Initialize()
         Set colOS = oWMI.ExecQuery("Select * from Win32_OperatingSystem")
         
         For Each oOS In colOS
-            Pos = InStr(oOS.Version, ".")
-            If Pos = 0 Then
+            pos = InStr(oOS.Version, ".")
+            If pos = 0 Then
                 osi.dwMajorVersion = CLng(oOS.Version)
                 osi.dwMinorVersion = 0
                 osi.dwBuildNumber = 0
@@ -307,9 +368,9 @@ Private Sub Class_Initialize()
     
     IsWin64_ = (Bitness_ = "x64")
     
-    lRet = GetSystemMetrics(SM_CLEANBOOT)
-    IsSafeBoot_ = (lRet > 0)
-    Select Case lRet
+    lret = GetSystemMetrics(SM_CLEANBOOT)
+    IsSafeBoot_ = (lret > 0)
+    Select Case lret
         Case 1
             SafeBootMode_ = "Safe mode"
         Case 2
@@ -349,7 +410,17 @@ Private Sub Class_Initialize()
     IsWindows8Point1OrGreater_ = (MajorMinor_ >= 6.3)
     IsWindows10OrGreater_ = (MajorMinor_ >= 6.4)
     
+    If MajorMinor_ >= 10 Then
+        'Get ReleaseId for Windows 10
+        tmp = RegRead_REG_SZ("SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId")
+        If IsNumeric(tmp) Then ReleaseId_ = CLng(tmp)
+    End If
+    
+    DisplayVersion_ = RegRead_REG_SZ("SOFTWARE\Microsoft\Windows NT\CurrentVersion", "DisplayVersion")
+    
+    'OS Version List:
     'https://msdn.microsoft.com/en-us/library/windows/desktop/ms724833(v=vs.85).aspx
+    'https://docs.microsoft.com/en-Us/windows-server/get-started/windows-server-release-info
     
     PlatformID_ = osi.dwPlatformId
     
@@ -387,10 +458,24 @@ Private Sub Class_Initialize()
         
         Select Case MajorMinor_
         Case 10
+            Dim bIsWin11Core As Boolean
+            bIsWin11Core = (0 <> GetProcAddress(GetModuleHandle(StrPtr("kernel32.dll")), "GetTempPath2W"))
+            
             If osi.wProductType = VER_NT_WORKSTATION Then
-                OSName_ = "Windows 10"
+                
+                If osi.dwBuildNumber >= 22000 And bIsWin11Core Then
+                    OSName_ = "Windows 11"
+                Else
+                    OSName_ = "Windows 10"
+                End If
             Else
-                OSName_ = "Windows Server 2016"
+                If ReleaseId_ >= 2009 And bIsWin11Core Then
+                    OSName_ = "Windows Server 2022"
+                ElseIf ReleaseId_ >= 1803 Then
+                    OSName_ = "Windows Server 2019"
+                Else
+                    OSName_ = "Windows Server 2016"
+                End If
             End If
         Case 6.4
             OSName_ = "Windows 10"
@@ -490,21 +575,18 @@ Private Sub Class_Initialize()
     ElseIf osi.dwPlatformId = WinCE Then
         OSName_ = "Windows CE"
         Platform_ = "WinCE"
+    ElseIf osi.dwPlatformId = UNIX Then
+        OSName_ = "Unix"
+        Platform_ = "Unix"
     End If
     
-    If OSName_ = vbNullString Then
+    If Len(OSName_) = 0 Then
         OSName_ = "Windows Unknown" & "(ver: " & MajorMinor_ & ". PT: " & osi.wProductType & ". Build: " & osi.dwBuildNumber & ")" & " Registry's data: " & _
             RegRead_REG_SZ("SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName")
     End If
     
-    If MajorMinor_ >= 10 Then
-        'Get ReleaseId for Windows 10
-        tmp = RegRead_REG_SZ("SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId")
-        If IsNumeric(tmp) Then ReleaseId_ = CLng(tmp)
-    End If
-    
     'Редакция
-    If Edition_ = vbNullString Then
+    If Len(Edition_) = 0 Then
         If MajorMinor_ >= 6 Then
             If GetProductInfo(osi.dwMajorVersion, osi.dwMinorVersion, osi.wServicePackMajor, osi.wServicePackMinor, ProductType) Then
                 Edition_ = GetProductName(ProductType)
@@ -526,7 +608,10 @@ Private Sub Class_Initialize()
     IntegrityLevel_ = GetIntegrityLevel()
     
     UserType_ = GetUserType()
-
+    UserName_ = GetUserName_()
+    ComputerName_ = GetComputerName_()
+    IsAdminGroup_ = (UserType_ = "Administrators")
+    
     GetCodePageInfo
     
     ' wSuiteMask
@@ -562,13 +647,60 @@ Private Sub Class_Initialize()
     
     SecureBoot_ = SecureBootState()
     
+    'http://www.nicklowe.org/2012/02/understanding-case-sensitivity-in-windows-obcaseinsensitive-file_case_sensitive_search/
+    Dim hDir    As Long
+    Dim OA      As OBJECT_ATTRIBUTES
+    Dim UniStr  As UNICODE_STRING
+    
+    If Me.MajorMinor <= 5 Then  'Win2000-
+        IsSystemCaseSensitive_ = True
+    Else
+        With UniStr
+            .Length = LenB("\SYSTEMROOT")
+            .MaximumLength = .Length
+            .Buffer = StrPtr("\SYSTEMROOT")
+        End With
+    
+        With OA
+            .Length = LenB(OA)
+            .ObjectName = VarPtr(UniStr)
+            .Attributes = 0
+        End With
+        
+        lret = NtOpenSymbolicLinkObject(hDir, DIRECTORY_QUERY, OA)
+        
+        If hDir <> 0 Then NtClose hDir
+        
+        If lret = STATUS_OBJECT_NAME_NOT_FOUND Then
+            IsSystemCaseSensitive_ = True
+        End If
+    End If
+    
+    'For some reason, doesn't return correct result (at least, for Windows 8.1 Embedded Industry Pro)
+    '
+    'Const OS_EMBEDDED As Long = 13&
+    'Dim iHasFeature As Long
+    'iHasFeature = IsOS(OS_EMBEDDED)
+    
+    Dim sEditionID$, sProductName$
+    sEditionID = RegRead_REG_SZ("SOFTWARE\Microsoft\Windows NT\CurrentVersion", "EditionID")
+    sProductName = RegRead_REG_SZ("SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName")
+    
+    IsEmbedded_ = (osi.wSuiteMask And VER_SUITE_EMBEDDEDNT) Or _
+        (InStr(1, sEditionID, "Embedded", 1) <> 0) Or _
+        (InStr(1, sProductName, "Embedded", 1) <> 0)
+    
+    If InStr(1, Edition_, "Unknown", 1) <> 0 Then Edition_ = Edition_ & " (" & sEditionID & ")"
+    If IsEmbedded_ Then Edition_ = Edition_ & " (Embedded)"
+    
     Exit Sub
 ErrorHandler:
     ErrorMsg Err, "clsOSver.Class_Initialize"
     Resume Next
 End Sub
 
-Sub GetCodePageInfo()
+
+Private Sub GetCodePageInfo()
     On Error GoTo ErrorHandler
 
     CodepageOEM_ = RegRead_REG_SZ("SYSTEM\CurrentControlSet\Control\Nls\CodePage", "OEMCP")
@@ -588,7 +720,7 @@ ErrorHandler:
     ErrorMsg Err, "clsOSver.GetCodePageInfo"
 End Sub
 
-Function GetLangNameFullByCultureCode(lcid As Long) As String
+Private Function GetLangNameFullByCultureCode(lcid As Long) As String
     Dim buf As String
     Dim lr  As Long
     buf = String$(1000, vbNullChar)
@@ -598,7 +730,7 @@ Function GetLangNameFullByCultureCode(lcid As Long) As String
     End If
 End Function
 
-Function RegRead_REG_SZ(strKey As String, strParam As String) As String
+Private Function RegRead_REG_SZ(strKey As String, strParam As String) As String
     On Error GoTo ErrorHandler
     
     Const KEY_QUERY_VALUE       As Long = &H1&
@@ -626,7 +758,7 @@ ErrorHandler:
     If hKey <> 0 Then RegCloseKey hKey
 End Function
 
-Function RegRead_REG_DWORD(strKey As String, strParam As String) As Long
+Private Function RegRead_REG_DWORD(strKey As String, strParam As String) As Long
     On Error GoTo ErrorHandler
     
     Const KEY_QUERY_VALUE       As Long = &H1&
@@ -653,14 +785,15 @@ ErrorHandler:
     If hKey <> 0 Then RegCloseKey hKey
 End Function
 
-Function IsProcessElevated(Optional hProcess As Long) As Boolean
+Public Function IsProcessElevated(Optional hProcess As Long) As Boolean
     On Error GoTo ErrorHandler
     
     Dim hToken           As Long
     Dim dwLengthNeeded   As Long
     Dim dwIsElevated     As Long
     
-     If osi.dwMajorVersion < 6 Then IsProcessElevated = (GetUserType() = "Administrator"): Exit Function
+    ' < Win Vista. Устанавливаем true, если пользователь состоит в группе "Администраторы"
+    If osi.dwMajorVersion < 6 Then IsProcessElevated = (GetUserType() = "Administrators"): Exit Function
 
     If hProcess = 0 Then hProcess = GetCurrentProcess()
     
@@ -679,7 +812,7 @@ ErrorHandler:
     If hToken Then CloseHandle hToken: hToken = 0
 End Function
 
-Public Function GetUserType(Optional hProcess As Long) As String
+Private Function GetUserType() As String
     On Error GoTo ErrorHandler
 
     Const TOKEN_QUERY                   As Long = &H8&
@@ -705,19 +838,18 @@ Public Function GetUserType(Optional hProcess As Long) As String
     GetUserType = "Unknown"
     tpSidAuth.Value(5) = SECURITY_NT_AUTHORITY
     
-    ' в идеале, сначала нужно проверять токен, полученный от потока
-    ' If Not OpenThreadToken(GetCurrentThread(), TOKEN_QUERY, True, hProcessToken) Then
-    ' ограничимся токеном процесса, т.к. пока не планируем более 1 потока
-    
-    If hProcess = 0 Then hProcess = GetCurrentProcess()
-    If 0 = OpenProcessToken(hProcess, TOKEN_QUERY, hProcessToken) Then Exit Function
+    ' Obtain current process token
+    If Not OpenThreadToken(GetCurrentThread(), TOKEN_QUERY, True, hProcessToken) Then
+        Call OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, hProcessToken)
+    End If
     
     If hProcessToken Then
-
+        
         ' Определяем требуемый размер буфера
         GetTokenInformation hProcessToken, ByVal TokenGroups, 0&, 0&, BufferSize
         
         If BufferSize Then
+            Dim InfoBuffer() As Long
             ReDim InfoBuffer((BufferSize \ 4) - 1) As Long  ' Переводим размер byte -> Long
             
             ' Получаем информацию о SID-ах групп, ассоциированных с этим токеном
@@ -739,26 +871,26 @@ Public Function GetUserType(Optional hProcess As Long) As String
                         If IsValidSid(tpTokens.Groups(i).SID) Then
                             ' Проверяем на соответствие
                             If EqualSid(ByVal tpTokens.Groups(i).SID, ByVal psidAdmin) Then
-                                GetUserType = "Administrator":  Exit For
+                                GetUserType = "Administrators":  Exit For
                             ElseIf EqualSid(ByVal tpTokens.Groups(i).SID, ByVal psidPower) Then
-                                GetUserType = "Power User":     Exit For
+                                GetUserType = "Power Users":     Exit For
                             ElseIf EqualSid(ByVal tpTokens.Groups(i).SID, ByVal psidUser) Then
-                                GetUserType = "Limited User":   Exit For
+                                GetUserType = "Limited Users":   Exit For
                             ElseIf EqualSid(ByVal tpTokens.Groups(i).SID, ByVal psidGuest) Then
-                                GetUserType = "Guest":          Exit For
+                                GetUserType = "Guests":          Exit For
                             End If
                         End If
                     Next
                 End If
-                If psidAdmin Then FreeSid psidAdmin
-                If psidPower Then FreeSid psidPower
-                If psidUser Then FreeSid psidUser
-                If psidGuest Then FreeSid psidGuest
+                If psidAdmin Then FreeSid psidAdmin: psidAdmin = 0
+                If psidPower Then FreeSid psidPower: psidPower = 0
+                If psidUser Then FreeSid psidUser: psidUser = 0
+                If psidGuest Then FreeSid psidGuest: psidGuest = 0
             End If
         End If
         CloseHandle hProcessToken: hProcessToken = 0
     End If
-        
+    
     Exit Function
 ErrorHandler:
     ErrorMsg Err, "clsOSver.GetUserType"
@@ -769,12 +901,12 @@ ErrorHandler:
     If psidGuest Then FreeSid psidGuest
 End Function
 
-Function GetCurrentProcessSID(Optional hProcess As Long = 0) As String
+Private Function GetCurrentProcessSID() As String
     On Error GoTo ErrorHandler
 
     Const TokenUser As Long = 1&
         
-    Dim hProcessToken As Long, tkUser As SID_AND_ATTRIBUTES, dwSize As Long, sSID As String, psSID As Long
+    Dim hProcess As Long, hProcessToken As Long, tkUser As SID_AND_ATTRIBUTES, dwSize As Long, sSID As String, psSID As Long
 
     If hProcess = 0 Then hProcess = GetCurrentProcess()
     If 0 = OpenProcessToken(hProcess, TOKEN_QUERY, hProcessToken) Then Exit Function
@@ -785,7 +917,7 @@ Function GetCurrentProcessSID(Optional hProcess As Long = 0) As String
         GetTokenInformation hProcessToken, ByVal TokenUser, 0&, 0&, dwSize
         
         If dwSize Then
-            
+            Dim InfoBuffer() As Long
             ReDim InfoBuffer((dwSize \ 4) - 1) As Long
             
             ' Получаем информацию о SID-ах групп, ассоциированных с этим токеном
@@ -817,7 +949,7 @@ ErrorHandler:
     ErrorMsg Err, "clsOSver.GetCurrentProcessSID"
 End Function
 
-Function GetIntegrityLevel(Optional hProcess As Long) As String
+Private Function GetIntegrityLevel(Optional hProcess As Long) As String
     'https://msdn.microsoft.com/en-us/library/bb625963.aspx
     'https://msdn.microsoft.com/en-us/library/bb625966.aspx
     On Error GoTo ErrorHandler
@@ -912,204 +1044,147 @@ ErrorHandler:
     If hToken Then CloseHandle hToken: hToken = 0
 End Function
 
-Function GetProductName(ProductType As Long) As String
+'https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-mde2/d92ead8f-faf3-47a8-a341-1921dc2c463b
+'https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getproductinfo
+Private Function GetProductName(ProductType As Long) As String
     On Error GoTo ErrorHandler
     
     Dim ProductName As String
     
     Select Case ProductType
-    Case &H6&
-        ProductName = "Business"
-    Case &H10&
-        ProductName = "Business N"
-    Case &H12&
-        ProductName = "HPC Edition"
-    Case &H40&
-        ProductName = "Server Hyper Core V"
-    Case &H65&
-        ProductName = "Home" '"Windows 8 Core"
-    Case &H62&
-        ProductName = "Home N" ' "Windows 8 N"
-    Case &H63&
-        ProductName = "Home China" ' "Windows 8 China"
-    Case &H64&
-        ProductName = "Home Single Language" ' "Windows 8 Single Language"
-    Case &H50&
-        ProductName = "Server Datacenter (evaluation installation)"
-    Case &H8&
-        ProductName = "Server Datacenter (full installation)"
-    Case &HC&
-        ProductName = "Server Datacenter (core installation)"
-    Case &H27&
-        ProductName = "Server Datacenter without Hyper-V (core installation)"
-    Case &H25&
-        ProductName = "Server Datacenter without Hyper-V (full installation)"
-    Case &H79
-        ProductName = "Education"
-    Case &H7A
-        ProductName = "Education N"
-    Case &H4&
-        ProductName = "Enterprise"
-    Case &H46&
-        ProductName = "Enterprise E"
-    Case &H48&
-        ProductName = "Enterprise Evaluation" '"Server Enterprise (EI)"
-    Case &H1B&
-        ProductName = "Enterprise N"
-    Case &H54&
-        ProductName = "Enterprise N Evaluation"
-    Case &H7D&
-        ProductName = "Enterprise 2015 LTSB"
-    Case &H81&
-        ProductName = "Enterprise 2015 LTSB Evaluation"
-    Case &H7E&
-        ProductName = "Enterprise 2015 LTSB N"
-    Case &H82&
-        ProductName = "Enterprise 2015 LTSB N Evaluation"
-    Case &HA&
-        ProductName = "Server Enterprise (full installation)"
-    Case &HE&
-        ProductName = "Server Enterprise (core installation)"
-    Case &H29&
-        ProductName = "Server Enterprise without Hyper-V (core installation)"
-    Case &HF&
-        ProductName = "Server Enterprise for Itanium-based Systems"
-    Case &H26&
-        ProductName = "Server Enterprise without Hyper-V (full installation)"
-    Case &H3B&
-        ProductName = "Windows Essential Server Solution Management"
-    Case &H3C&
-        ProductName = "Windows Essential Server Solution Additional"
-    Case &H3D&
-        ProductName = "Windows Essential Server Solution Management SVC"
-    Case &H3E&
-        ProductName = "Windows Essential Server Solution Additional SVC"
-    Case &H2&
-        ProductName = "Home Basic"
-    Case &H43&
-        ProductName = "Not supported"
-    Case &H5&
-        ProductName = "Home Basic N"
-    Case &H3&
-        ProductName = "Home Premium"
-    Case &H44&
-        ProductName = "Not supported"
-    Case &H1A&
-        ProductName = "Home Premium N"
-    Case &H22&
-        ProductName = "Windows Home Server 2011"
-    Case &H13&
-        ProductName = "Windows Storage Server 2008 R2 Essentials"
-    Case &H2A&
-        ProductName = "Microsoft Hyper-V Server"
-    Case &H7B&
-        ProductName = "IoT Core"
-    Case &H83&
-        ProductName = "IoT Core Commercial"
-    Case &H1E&
-        ProductName = "Windows Essential Business Server Management Server"
-    Case &H20&
-        ProductName = "Windows Essential Business Server Messaging Server"
-    Case &H1F&
-        ProductName = "Windows Essential Business Server Security Server"
-    Case &H68&
-        ProductName = "Mobile"
-    Case &H85&
-        ProductName = "Mobile Enterprise"
-    Case &H4C&
-        ProductName = "Windows MultiPoint Server Standard (full installation)"
-    Case &H4D&
-        ProductName = "Windows MultiPoint Server Premium (full installation)"
-    Case &H30&
-        ProductName = "Pro"
-    Case &H45&
-        ProductName = "Not supported"
-    Case &H31&
-        ProductName = "Pro N"
-    Case &H67&
-        ProductName = "Professional with Media Center"
-    Case &H36&
-        ProductName = "Server For SB Solutions EM"
-    Case &H33&
-        ProductName = "Server For SB Solutions"
-    Case &H37&
-        ProductName = "Server For SB Solutions EM"
-    Case &H18&
-        ProductName = "Windows Server 2008 for Windows Essential Server Solutions"
-    Case &H23&
-        ProductName = "Windows Server 2008 without Hyper-V for Windows Essential Server Solutions"
-    Case &H21&
-        ProductName = "Server Foundation"
-    Case &H32&
-        ProductName = "Windows Small Business Server 2011 Essentials"
-    Case &H9&
-        ProductName = "Windows Small Business Server"
-    Case &H19&
-        ProductName = "Small Business Server Premium"
-    Case &H3F&
-        ProductName = "Small Business Server Premium (core installation)"
-    Case &H38&
-        ProductName = "Windows MultiPoint Server"
-    Case &H4F&
-        ProductName = "Server Standard (evaluation installation)"
-    Case &H7&
-        ProductName = "Server Standard"
-    Case &HD&
-        ProductName = "Server Standard (core installation)"
-    Case &H24&
-        ProductName = "Server Standard without Hyper-V"
-    Case &H28&
-        ProductName = "Server Standard without Hyper-V (core installation)"
-    Case &H34&
-        ProductName = "Server Solutions Premium"
-    Case &H35&
-        ProductName = "Server Solutions Premium (core installation)"
-    Case &HB&
-        ProductName = "Starter"
-    Case &H42&
-        ProductName = "Not supported"
-    Case &H2F&
-        ProductName = "Starter N"
-    Case &H17&
-        ProductName = "Storage Server Enterprise"
-    Case &H2E&
-        ProductName = "Storage Server Enterprise (core installation)"
-    Case &H14&
-        ProductName = "Storage Server Express"
-    Case &H2B&
-        ProductName = "Storage Server Express (core installation)"
-    Case &H60&
-        ProductName = "Storage Server Standard (evaluation installation)"
-    Case &H15&
-        ProductName = "Storage Server Standard"
-    Case &H2C&
-        ProductName = "Storage Server Standard (core installation)"
-    Case &H5F&
-        ProductName = "Storage Server Workgroup (evaluation installation)"
-    Case &H16&
-        ProductName = "Storage Server Workgroup"
-    Case &H2D&
-        ProductName = "Storage Server Workgroup (core installation)"
-    Case &H0&
-        ProductName = "An unknown product"
-    Case &H1&
-        ProductName = "Ultimate"
-    Case &H47&
-        ProductName = "Not supported"
-    Case &H1C&
-        ProductName = "Ultimate N"
-    Case &H11&
-        ProductName = "Web Server (full installation)"
-    Case &H1D&
-        ProductName = "Web Server (core installation)"
-    Case &H4A&
-        ProductName = "Consumer Preview"
-    Case 0
-        ProductName = "An unknown product"
+    Case &H1&:        ProductName = "Ultimate"
+    Case &H2&:        ProductName = "Home Basic"
+    Case &H3&:        ProductName = "Home Premium"
+    Case &H4&:        ProductName = "Enterprise"
+    Case &H5&:        ProductName = "Home Basic N"
+    Case &H6&:        ProductName = "Business"
+    Case &H7&:        ProductName = "Server Standard"
+    Case &H8&:        ProductName = "Server Datacenter"
+    Case &H9&:        ProductName = "Small Business Server"
+    Case &HA&:        ProductName = "Server Enterprise"
+    Case &HB&:        ProductName = "Starter"
+    Case &HC&:        ProductName = "Server Datacenter Core"
+    Case &HD&:        ProductName = "Server Standard Core"
+    Case &HE&:        ProductName = "Server Enterprise Core"
+    Case &HF&:        ProductName = "Server Enterprise for Itanium-based Systems"
+    Case &H10&:        ProductName = "Business N"
+    Case &H11&:        ProductName = "Web Server"
+    Case &H12&:        ProductName = "Cluster Server" 'HPC Edition?
+    Case &H13&:        ProductName = "Home Server" 'Storage Server 2008 R2 Essentials?
+    Case &H14&:        ProductName = "Storage Server Express"
+    Case &H15&:        ProductName = "Storage Server Standard"
+    Case &H16&:        ProductName = "Storage Server Workgroup"
+    Case &H17&:        ProductName = "Storage Server Enterprise"
+    Case &H18&:        ProductName = "Server for Small Business" 'Server 2008 for Windows Essential Server Solutions?
+    Case &H19&:        ProductName = "Small Business Server Premium"
+    Case &H1A&:        ProductName = "Home Premium N"
+    Case &H1B&:        ProductName = "Enterprise N"
+    Case &H1C&:        ProductName = "Ultimate N"
+    Case &H1D&:        ProductName = "Web Server Core"
+    Case &H1E&:        ProductName = "Medium Business Server Management 'Essential Business Server Management Server?"
+    Case &H1F&:        ProductName = "Medium Business Server Security" 'Essential Business Server Security Server
+    Case &H20&:        ProductName = "Medium Business Server Messaging" 'Essential Business Server Messaging Server
+    Case &H21&:        ProductName = "Server Foundation"
+    Case &H22&:        ProductName = "Home Premium Server" 'Home Server 2011?
+    Case &H23&:        ProductName = "Server for Small Business without Hyper-V" 'Server 2008 without Hyper-V for Windows Essential Server Solutions?
+    Case &H24&:        ProductName = "Server Standard without Hyper-V"
+    Case &H25&:        ProductName = "Server Datacenter without Hyper-V"
+    Case &H26&:        ProductName = "Server Enterprise without Hyper-V"
+    Case &H27&:        ProductName = "Server Datacenter without Hyper-V Core"
+    Case &H28&:        ProductName = "Server Standard without Hyper-V Core"
+    Case &H29&:        ProductName = "Server Enterprise without Hyper-V Core"
+    Case &H2A&:        ProductName = "Microsoft Hyper-V Server"
+    Case &H2B&:        ProductName = "Storage Server Express Core"
+    Case &H2C&:        ProductName = "Storage Server Standard Core"
+    Case &H2D&:        ProductName = "Storage Server Workgroup Core"
+    Case &H2E&:        ProductName = "Storage Server Enterprise Core"
+    Case &H2F&:        ProductName = "Starter N"
+    Case &H30&:        ProductName = "Pro"
+    Case &H31&:        ProductName = "Pro N"
+    Case &H32&:        ProductName = "Small Business Solution Server" 'Small Business Server 2011 Essentials?
+    Case &H33&:        ProductName = "Small Business Solution Server"
+    Case &H34&:        ProductName = "Server Solutions Standard" 'Server Solutions Premium
+    Case &H35&:        ProductName = "Server Solutions Standard Core" 'Server Solutions Premium Core
+    Case &H36&:        ProductName = "Server For Small Business Solutions EM"
+    Case &H37&:        ProductName = "Server For Small Business Solutions EM"
+    Case &H38&:        ProductName = "Solution Embedded Server" ' MultiPoint Server?
+    Case &H39&:        ProductName = "Solution Embedded Server Core"
+    Case &H3B&:        ProductName = "Essential Server Solution Management"
+    Case &H3C&:        ProductName = "Essential Server Solution Additional"
+    Case &H3D&:        ProductName = "Essential Server Solution Management SVC"
+    Case &H3E&:        ProductName = "Essential Server Solution Additional SVC"
+    Case &H3F&:        ProductName = "Small Business Server Premium Core"
+    Case &H40&:        ProductName = "Cluster Server V" 'Server Hyper Core V?
+    Case &H41&:        ProductName = "Embedded"
+    Case &H42&:        ProductName = "Starter Enterprise"
+    Case &H43&:        ProductName = "Home Basic Enterprise"
+    Case &H44&:        ProductName = "Home Premium Enterprise"
+    Case &H45&:        ProductName = "Pro Enterprise"
+    Case &H46&:        ProductName = "Enterprise E"
+    Case &H47&:        ProductName = "Ultimate Enterprise"
+    Case &H48&:        ProductName = "Enterprise Evaluation" '"Server Enterprise (EI)"
+    Case &H4A&:        ProductName = "Consumer Preview"
+    Case &H4C&:        ProductName = "MultiPoint Server Standard"
+    Case &H4D&:        ProductName = "MultiPoint Server Premium"
+    Case &H4F&:        ProductName = "Server Standard Evaluation"
+    Case &H50&:        ProductName = "Server Datacenter Evaluation"
+    Case &H54&:        ProductName = "Enterprise N Evaluation"
+    Case &H55&:        ProductName = "Embedded Automotive"
+    Case &H56&:        ProductName = "Embedded Industry A"
+    Case &H57&:        ProductName = "Thin PC"
+    Case &H58&:        ProductName = "Embedded A"
+    Case &H59&:        ProductName = "Embedded Industry" 'Industry Pro?
+    Case &H5A&:        ProductName = "Embedded E"
+    Case &H5B&:        ProductName = "Embedded Industry E"
+    Case &H5C&:        ProductName = "Embedded Industry A E"
+    Case &H5F&:        ProductName = "Storage Server Workgroup Evaluation"
+    Case &H60&:        ProductName = "Storage Server Standard Evaluation"
+    Case &H61&:        ProductName = "Core ARM"
+    Case &H62&:        ProductName = "Home N" ' "Windows 8 N" ' Core N
+    Case &H63&:        ProductName = "Home China" ' "Windows 8 China" 'Core Country Specific
+    Case &H64&:        ProductName = "Home Single Language" ' "Windows 8 Single Language"
+    Case &H65&:        ProductName = "Home" '"Windows 8 Core"
+    Case &H67&:        ProductName = "Professional with Media Center"
+    Case &H68&:        ProductName = "Mobile Core"
+    Case &H69&:        ProductName = "Embedded Industry Eval"
+    Case &H6A&:        ProductName = "Embedded Industry Eval E"
+    Case &H6B&:        ProductName = "Embedded Eval"
+    Case &H6C&:        ProductName = "Embedded Eval E"
+    Case &H6D&:        ProductName = "Nano Server"
+    Case &H6E&:        ProductName = "Cloud Storage Server"
+    Case &H6F&:        ProductName = "Core Connected"
+    Case &H70&:        ProductName = "Professional Student"
+    Case &H71&:        ProductName = "Core Connected N"
+    Case &H72&:        ProductName = "Professional Student N"
+    Case &H73&:        ProductName = "Core Connected Single Language"
+    Case &H74&:        ProductName = "Core Connected China"
+    Case &H75&:        ProductName = "Connected Car"
+    Case &H76&:        ProductName = "Industry Handheld"
+    Case &H77&:        ProductName = "PPI Pro"
+    Case &H78&:        ProductName = "Server ARM64"
+    Case &H79&:        ProductName = "Education"
+    Case &H7A&:        ProductName = "Education N"
+    Case &H7B&:        ProductName = "IoT Core"
+    Case &H7C&:        ProductName = "Cloud Host Infrastructure Server"
+    Case &H7D&:        ProductName = "Enterprise LTSB" 'Enterprise 2015 LTSB?
+    Case &H7E&:        ProductName = "Enterprise LTSB N" 'Enterprise 2015 LTSB N?
+    Case &H7F&:        ProductName = "Pro LTSB"
+    Case &H80&:        ProductName = "Pro LTSB N"
+    Case &H81&:        ProductName = "Enterprise LTSB Evaluation" 'Enterprise 2015 LTSB Evaluation?
+    Case &H82&:        ProductName = "Enterprise LTSB N Evaluation" 'Enterprise 2015 LTSB N Evaluation?
+    Case &H83&:        ProductName = "IoT Core Commercial"
+    Case &H85&:        ProductName = "Mobile Enterprise"
+    Case &H87&:        ProductName = "Holographic"
+    Case &H88&:        ProductName = "Holographic Business"
+    Case &H91&:        ProductName = "Server Datacenter (Semi-Annual Channel Core)"
+    Case &H92&:        ProductName = "Server Standard (Semi-Annual Channel Core)"
+    Case &HA1&:        ProductName = "Pro for Workstations"
+    Case &HA2&:        ProductName = "Pro for Workstations N"
+    Case &H0&:         ProductName = "An unknown product"
     Case Else
         ProductName = "Unknown Edition (0x" & Hex$(ProductType) & ")"
     End Select
-
+    
     GetProductName = ProductName
     Exit Function
 ErrorHandler:
@@ -1117,7 +1192,8 @@ ErrorHandler:
 End Function
 
 
-Function GetLangNameByCultureCode(CultureCode As Long) As String
+
+Private Function GetLangNameByCultureCode(CultureCode As Long) As String
     Dim Lang$
     Select Case CultureCode
         Case &H419&
@@ -1402,7 +1478,7 @@ Function GetLangNameByCultureCode(CultureCode As Long) As String
     GetLangNameByCultureCode = Lang
 End Function
 
-Function IsWow64() As Boolean   ' Разрядность ОС
+Public Function IsWow64() As Boolean   ' Разрядность ОС
     Dim hModule As Long, procAddr As Long, lIsWin64 As Long
     Static isinit As Boolean, Result As Boolean
     
@@ -1425,10 +1501,31 @@ End Function
 
 Private Function SecureBootState() As Boolean
     Dim lState As Long
+    '// TODO:
+    'improvement - https://www.cyberforum.ru/win-api/thread2046367.html#post10789948
+    '++
     If MajorMinor_ >= 6.2 Then ' Win8+
         lState = RegRead_REG_DWORD("SYSTEM\CurrentControlSet\Control\SecureBoot\State", "UEFISecureBootEnabled")
         If lState = 1 Then SecureBootState = True
     End If
+End Function
+
+Private Function GetUserName_() As String
+    Dim sUsername$
+    sUsername = String$(MAX_PATH, vbNullChar)
+    If 0 <> GetUserName(StrPtr(sUsername), MAX_PATH) Then
+        sUsername = Left$(sUsername, lstrlen(StrPtr(sUsername)))
+    End If
+    GetUserName_ = sUsername
+End Function
+
+Private Function GetComputerName_() As String
+    Dim sComputerName$
+    sComputerName = String$(MAX_PATH, vbNullChar)
+    If 0 <> GetComputerName(StrPtr(sComputerName), MAX_PATH) Then
+        sComputerName = Left$(sComputerName, lstrlen(StrPtr(sComputerName)))
+    End If
+    GetComputerName_ = sComputerName
 End Function
 
 Public Property Get Bitness() As String
@@ -1487,6 +1584,14 @@ Public Property Get UserType() As String
     UserType = UserType_
 End Property
 
+Public Property Get UserName() As String
+    UserName = UserName_
+End Property
+
+Public Property Get ComputerName() As String
+    ComputerName = ComputerName_
+End Property
+
 Public Property Get IsSafeBoot() As Boolean
     IsSafeBoot = IsSafeBoot_
 End Property
@@ -1531,6 +1636,14 @@ Public Property Get IsWindowsXPOrGreater() As Boolean
     IsWindowsXPOrGreater = IsWindowsXPOrGreater_
 End Property
 
+Public Property Get IsWindowsXP_SP3OrGreater() As Boolean
+    Select Case MajorMinor_
+    Case Is > 5.1: IsWindowsXP_SP3OrGreater = True
+    Case Is < 5.1: IsWindowsXP_SP3OrGreater = False
+    Case Else: If SPver_ = 3 Then IsWindowsXP_SP3OrGreater = True
+    End Select
+End Property
+
 Public Property Get IsWindowsVistaOrGreater() As Boolean
     IsWindowsVistaOrGreater = IsWindowsVistaOrGreater_
 End Property
@@ -1560,8 +1673,6 @@ Public Property Get CodepageOEM_File() As String
 End Property
 
 Public Property Get CodepageANSI() As String
-    CodepageANSI = ""
-    Exit Property
     CodepageANSI = CodepageANSI_
 End Property
 
@@ -1593,6 +1704,10 @@ Public Property Get ReleaseId() As Long
     ReleaseId = ReleaseId_
 End Property
 
+Public Property Get DisplayVersion() As String 'such as 21H1
+    DisplayVersion = DisplayVersion_
+End Property
+
 Public Property Get IsServer() As Boolean
     IsServer = IsServer_
 End Property
@@ -1603,6 +1718,10 @@ End Property
 
 Public Property Get IsWin64() As Boolean
     IsWin64 = IsWin64_
+End Property
+
+Public Property Get IsWin32() As Boolean
+    IsWin32 = Not IsWin64_
 End Property
 
 Public Property Get PlatformID() As Long
@@ -1617,11 +1736,27 @@ Public Property Get IsLocalSystemContext() As Boolean
     IsLocalSystemContext = IsLocalSystemContext_
 End Property
 
+Public Property Get IsAdminGroup() As Boolean
+    IsAdminGroup = IsAdminGroup_
+End Property
+
+Public Property Get IsSystemCaseSensitive() As Boolean
+    IsSystemCaseSensitive = IsSystemCaseSensitive_
+End Property
+
+Public Property Get IsEmbedded() As Boolean
+    IsEmbedded = IsEmbedded_
+End Property
+
+Public Property Get LCID_UserDefault() As Long
+    LCID_UserDefault = LCID_UserDefault_
+End Property
+
 '###############################
 '        Error handler
 '###############################
 
-Friend Function ErrorMsg(ByVal ErrObj As ErrObject, ParamArray CodeModule())
+Private Function ErrorMsg(ByVal ErrObj As ErrObject, ParamArray CodeModule())
     'some error handler wrapper
     Dim Other$, i&
     For i = 1 To UBound(CodeModule)
@@ -1629,6 +1764,7 @@ Friend Function ErrorMsg(ByVal ErrObj As ErrObject, ParamArray CodeModule())
     Next
     Debug.Print " - " & Now() & " # " & ErrObj.Number & " (" & Err.Description & "), (" & Err.LastDllError & "), " & Other
 End Function
+
 
 Function IsRunning(hProcess As Long) As Long
 Dim hProc As Long

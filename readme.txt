@@ -1,29 +1,58 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 26 active-X
-1. Correction in #Sort() clause for tuple
-2. new m2000.exe:
-   if a m2000.gsb exist in same directory then m2000.dll (or lib.bin as alternate name) loaded (without using windows registry) and the m2000.gsb executed.
-   We can change m2000.exe name to something else like myApp.exe, then we can change name to m2000.dll as lib.bin and the auto file as myApp.gsb
-   If we use console then we have to include a Show statement to open console
-   If we want myApp.gsb to saved encrypted we can save App from console:
-	*Change to user directory: c:\users\USERNAME\appdata\roaming\m2000\
-		Save myApp @, {Dir User: ModuleA : End}
-        *Start in AppDir$ (application directory)
-		Save myApp @, {ModuleA : End}
-    For Application MyApp minimum files to export:
-		MyApp.exe  (M2000.exe rename to MyApp.exe)
-		MyApp.gsb  (use one of the above variation of save statement)
-		lib.bin (M2000.dll rename to lib.bin)
-		(if an old M2000 installation exist, the new one used)
-    For M2000 standard environment minimum files, without dll registration:
-		M2000.exe
-		help2000utf8.dat
-		M2000.dll
-		Optional: M2000.gsb (empty file or with a SHOW statement)
-		(if an old M2000 installation exist, then that old dll used)
-		(AppDir$ show the directory of m2000.dll)
-		(Use an empty M2000.gsb in same directory to select the local m2000.dll)
+Version 10 revision 27 active-X
+1. A Fix for search string on files using statement file "gsb", "thatstring|otherstring"
+
+2. Fix Uint() function to work with Integers (16bit -1%, 32bit -1&). I=-15065%: Print Uint(I), Uint(I*1&) ' 50471   4294952231
+
+3. chrcode() now return Integer (16bit) or Currency.
+Print chrcode("성")  ' -16079
+Print chrcode$(-16079) ' 성
+i=chrcode("성")
+Print uint(i), uint(-16079%) ' 49457 49457
+Print chrcode$(49457) ' 성
+' surrogate 𐐷 (4 bytes in UTF-16)
+C=chrcode(chrcode$(0x10437))
+Print type$(C), c ' Currency 66615
+Print chrcode$(66615)  ' 𐐷
+
+4. Updated clsOsInfo class (Information object from m2000) to v1.13, by Dragokas, member of vbforums.com, https://www.vbforums.com/showthread.php?846709-OS-Version-information-class&p=5540187#post5540187
+New for clsOsInfo 1.13:
+Added detection of:
+ - Windows 11
+ - Windows Server 2019
+ - Windows Server 2022
+New properties added:
+ - IsWin32
+ - DisplayVersion 'e.g. 21H1
+ - IsWindowsXP_SP3OrGreater
+ - UserName
+ - ComputerName
+ - IsAdminGroup
+ - IsSystemCaseSensitive
+ - IsEmbedded
+ - LCID_UserDefault
+ - IsWow64 -> made public.
+
+Example (also there are some readonly variables which alread use the clsOsInfo class)
+Module TestOsInfo {
+	declare osinfo information
+	with osinfo, "IsWin32" as Win32
+	method osInfo, "IsWow64" as Wow64
+	print "IsWin32:";Win32
+	print "IsWow64:";Wow64, " OsBit", osbit
+	with osinfo, "DisplayVersion" as dv$
+	print "DisplayVersion:";dv$
+	with osinfo, "ComputerName" as cn$
+	print "ComputerName:";cn$
+	print "M2000 read only variable Computer$:";Computer$
+	declare osinfo nothing
+}
+TestOsInfo
+
+6. Update info.gsb
+New program DownLoadAny:
+Download using URLDownloadToFile from lib urlmon
 
 
 George Karras, Kallithea Attikis, Greece.

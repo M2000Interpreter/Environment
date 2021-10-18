@@ -27,6 +27,7 @@ Private Declare Function MultiByteToWideChar& Lib "kernel32" (ByVal CodePage&, B
 Private Declare Function CloseHandle Lib "kernel32" (ByVal hObject As Long) As Long
 Private Declare Function CreateFile Lib "kernel32" Alias "CreateFileW" (ByVal lpFileName As Long, ByVal dwDesiredAccess As Long, ByVal dwShareMode As Long, lpSecurityAttributes As Any, ByVal dwCreationDisposition As Long, ByVal dwFlagsAndAttributes As Long, ByVal hTemplateFile As Long) As Long
 Public Final$
+Public MaxParaLength As Long
 'Dim mPosId As Long
 'Dim mCurrentParagraph As Long
 ' each paragraph has a number
@@ -2208,7 +2209,7 @@ End Function
 Public Function SaveUnicodeOrAnsi(ByVal FileName As String, Optional mode2save As Long = 0, Optional Append As Boolean = False) As Boolean
 ' using doc as extension you can read it from word...with automatic conversion to unicode
 ' OVERWRITE ALWAYS
-Dim W As Long, a() As Byte, F$, i As Long, bb As Byte, yesswap As Boolean, lf$
+Dim w As Long, a() As Byte, F$, i As Long, bb As Byte, yesswap As Boolean, lf$
 Const Utf8CodePage As Long = 65001
 On Error GoTo t12345
 '' 0 vbcrlf, 1 vblf, 2 vbcr
@@ -2223,11 +2224,11 @@ If Not Append Then
 End If
 F$ = GetDosPath(FileName)
 If Err.Number > 0 Or F$ = vbNullString Then Exit Function
-W = FreeFile
-Open F$ For Binary As W
+w = FreeFile
+Open F$ For Binary As w
 ' mode2save
 ' 0 is utf-le
-If Append Then Seek #W, LOF(W) + 1
+If Append Then Seek #w, LOF(w) + 1
 mode2save = mode2save Mod 10
 Dim maxmw As Long, iPos As Long
  Dim bbBuf() As Byte, iLen As Long
@@ -2236,17 +2237,17 @@ Dim maxmw As Long, iPos As Long
 
 If Abs(mode2save) = 7 Or mode2save = 0 Then
  a() = ChrW(&HFEFF)
-If Not Append And mode2save >= 0 Then Put #W, , a()
+If Not Append And mode2save >= 0 Then Put #w, , a()
 
 ElseIf mode2save = 1 Then
 a() = ChrW(&HFFFE) ' big endian...need swap
-If Not Append And mode2save > 0 Then Put #W, , a()
+If Not Append And mode2save > 0 Then Put #w, , a()
 yesswap = True
 ElseIf Abs(mode2save) = 2 Then  'utf8
 If mode2save > 0 And Not Append Then
-        Put #W, , CByte(&HEF)
-        Put #W, , CByte(&HBB)
-        Put #W, , CByte(&HBF)
+        Put #w, , CByte(&HEF)
+        Put #w, , CByte(&HBB)
+        Put #w, , CByte(&HBF)
         End If
      ''   Put #W, , Utf16toUtf8(buf)
             iPos = DocParaNext(0)
@@ -2260,12 +2261,12 @@ If mode2save > 0 And Not Append Then
             If iLen > 0 Then
             ReDim bbBuf(0 To iLen - 1)
             iLen = WideCharToMultiByte(Utf8CodePage, 0, VarPtr(a(0)), CLng(UBound(a) - LBound(a) + 1) \ 2, VarPtr(bbBuf(0)), iLen, 0, 0)
-            Put #W, , bbBuf()
+            Put #w, , bbBuf()
             End If
         Wend
      End If
      
-        Close W
+        Close w
     SaveUnicodeOrAnsi = True
         Exit Function
 ElseIf Abs(mode2save) = 3 Then ' ascii
@@ -2274,9 +2275,9 @@ ElseIf Abs(mode2save) = 3 Then ' ascii
 If mlcid < 4 Then mlcid = Module1.Clid
             While iPos <> 0
             
-                Put #W, , Convert2Ansi(textString(lf$, iPos, maxmw), mlcid)
+                Put #w, , Convert2Ansi(textString(lf$, iPos, maxmw), mlcid)
             Wend
-            Close W
+            Close w
             SaveUnicodeOrAnsi = True
             Exit Function
 End If
@@ -2290,17 +2291,17 @@ a() = textArray(lf$, iPos, maxmw)
 For i = 0 To UBound(a()) - 1 Step 2
 bb = a(i): a(i) = a(i + 1): a(i + 1) = bb
 Next i
-Put #W, , a()
+Put #w, , a()
 Wend
 Else
 
 
 While iPos <> 0
 a() = textArray(lf$, iPos, maxmw)
-Put #W, , a()
+Put #w, , a()
 Wend
 End If
-Close W
+Close w
 SaveUnicodeOrAnsi = True
 t12345:
 End Function
@@ -2766,23 +2767,23 @@ ExportWords = a()
 End If
 End Function
 Sub ExportWords2ObjectAddItem(ThisObject1 As Object, Optional usenumbers As Boolean = True)
-Dim a() As String, i As Long, ThisObject As mStiva
-Set ThisObject = ThisObject1
+Dim a() As String, i As Long, THISOBJECT As mStiva
+Set THISOBJECT = ThisObject1
 If unique = 0 Then
 a() = Split(mWordMap(textDoc))
 QuickSortString a(), LBound(a()), UBound(a())
 For i = LBound(a()) To UBound(a())
-ThisObject.additem a(i)
+THISOBJECT.additem a(i)
 Next i
 Exit Sub
 Else
 If usenumbers Then
 For i = 1 To unique
-ThisObject.additem MakeString(Pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
+THISOBJECT.additem MakeString(Pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
 Next i
 Else
 For i = 1 To unique
-ThisObject.additem MakeString(Pos(i), slen(i))
+THISOBJECT.additem MakeString(Pos(i), slen(i))
 Next i
 
 End If
@@ -2889,7 +2890,7 @@ Do While Not (thislof < SeekBuf)
     tmp = a(0): a(0) = a(1): a(1) = tmp
     s1 = a()
     End If
-    
+    If MaxParaLength > 0 Then If Len(getUniStringlINE) > MaxParaLength Then GoTo a12
     If s1 <> vbCr And s1 <> vbLf Then
         getUniStringlINE = getUniStringlINE + s1
      
