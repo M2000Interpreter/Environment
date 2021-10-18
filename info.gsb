@@ -33570,7 +33570,14 @@ beautify=-4
 Report 3, doc$
 Print status$
 }
-MODULE JSON1 {declare Json JsonObject
+MODULE JSON1 {function KeyList (json) {
+	flush
+	with json, "index" as json.index, "count" as json.count ,"KeyToStringPos" as keyName$()
+	if json.count=0 then =(,): exit
+	for i=0 to json.count-1:data keyname$(i):next
+	=array([])
+}
+declare Json JsonObject
 json$={
 {
     "description":"A person",
@@ -33602,6 +33609,14 @@ Print json.path("properties.age.maximum")
 method json, "assignpath", "properties.age.maximum", 80
 Report json.format$(4)
 Print json.format$(0)
+
+list1=Keylist(json.path("properties"))
+Print format$("Found {0} properties:", len(list1))
+nl$={
+}+"	- "
+Print #-2,  "	- "+list1#sort()#str$(nl$)
+
+
 }
 MODULE MACHINECODE {\\ THIS RUN WITH OR WITHOUT DEP (Data Execution Prevention) ON FOR ALL PROGRAMS.
 \\ we make a buffer to use for DATA

@@ -42,7 +42,7 @@ GOOD = item
 End Function
 Private Sub ExpandKey(Key As String)
 Dim i As Long, b As Long, k As Long, c As Long, cx1 As Long, c2 As Long, c1 As Long
-
+Dim pad$
 Randomize
 b = Len(Key)
 Key = String$(Len(Key), " ") + Key
@@ -51,8 +51,6 @@ k = Int(8 * Rnd)
 c = AscW(Mid$(Key, b + i \ 2 + 1, 1))
 c1 = UINT(c And &HF00) + &H4000
 c2 = UINT(c And &HF000) \ 8 + &H4000
-
-
 c = c And &HFF
 Mid$(Key, i, 2) = ChrW(c1 + 128 + k + (c And &HF) * 8) + ChrW(c2 + 128 + k + (c And &HF0) / 2)
 Next i
@@ -84,8 +82,10 @@ For i = 1 To Len(Key) - 1 Step 2
 Mid$(Key, i \ 2 + 1, 1) = Chr((Asc(Mid$(Key, i, 1)) And &H78) \ 8 + (Asc(Mid$(Key, i + 1, 1)) And &H78) * 2)
 Next i
 End If
-
-Key = Mid$(Key, 1, Len(Key) \ 2)
+If LenB(Key) > Len(Key) * 2 Then
+MidB$(Key, Len(Key) + 1, 1) = MidB$(Key, LenB(Key), 1)
+End If
+Key = MidB$(Key, 1, LenB(Key) \ 2 + LenB(Key) Mod 2)
 ReduceKey = noANSI
 End Function
 Private Function ReduceKey1(Key As String) As Boolean
@@ -109,12 +109,12 @@ Next i
  ExpandKey item
 Bad = item
 End Function
-Public Function decryptline(ByVal data As String, ByVal MasterKey As String, ByRef start As Long) As String
-decryptline = GOOD(start, MasterKey, data)
+Public Function decryptline(ByVal Data As String, ByVal MasterKey As String, ByRef Start As Long) As String
+decryptline = GOOD(Start, MasterKey, Data)
 End Function
 
-Public Function encryptline(ByVal data As String, ByVal MasterKey As String, ByRef start As Long) As String
-encryptline = Bad(start, MasterKey, data)
+Public Function encryptline(ByVal Data As String, ByVal MasterKey As String, ByRef Start As Long) As String
+encryptline = Bad(Start, MasterKey, Data)
 End Function
 Public Function must(sss$) As String
 must = decryptline(sss$, "MISTAKE TRY AGAIN", (Len(sss$) / 2) Mod 33)

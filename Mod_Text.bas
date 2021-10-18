@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 27
+Global Const Revision = 28
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -14596,72 +14596,72 @@ End If
 End Function
 '
 Function Fast2NoSpace(a$, c$, cl As Long, D$, dl As Long, ahead&) As Boolean
-Dim i As Long, Pad$, j As Long
+Dim i As Long, pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
-Pad$ = myUcase(Left$(a$, ahead&))
-If c$ = Left$(Pad$, cl) Then
+pad$ = myUcase(Left$(a$, ahead&))
+If c$ = Left$(pad$, cl) Then
 a$ = Mid$(a$, MyTrimLi(a$, cl + 1))
 Fast2NoSpace = True
 Exit Function
 End If
-If D$ = Left$(Pad$, dl) Then
+If D$ = Left$(pad$, dl) Then
 a$ = Mid$(a$, MyTrimLi(a$, dl + 1))
 Fast2NoSpace = True
 End If
 End Function
 Function Fast3NoSpaceCheck(Pos As Long, a$, c$, cl As Long, D$, dl As Long, e$, el As Long, ahead&) As Boolean
-Dim i As Long, Pad$, j As Long
+Dim i As Long, pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
-Pad$ = myUcase(Mid$(a$, Pos, ahead&))
-If c$ = Left$(Pad$, cl) Then
+pad$ = myUcase(Mid$(a$, Pos, ahead&))
+If c$ = Left$(pad$, cl) Then
     Pos = Pos + cl
     Fast3NoSpaceCheck = True
 Exit Function
 End If
-If D$ = Left$(Pad$, dl) Then
+If D$ = Left$(pad$, dl) Then
 Pos = Pos + dl
 Fast3NoSpaceCheck = True
 Exit Function
 End If
-If e$ = Left$(Pad$, el) Then
+If e$ = Left$(pad$, el) Then
 Pos = Pos + el
 Fast3NoSpaceCheck = True
 End If
 
 End Function
 Function Fast3NoSpace(a$, c$, cl As Long, D$, dl As Long, e$, el As Long, ahead&) As Boolean
-Dim i As Long, Pad$, j As Long
+Dim i As Long, pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
-Pad$ = myUcase(Left$(a$, ahead&))
-If c$ = Left$(Pad$, cl) Then
+pad$ = myUcase(Left$(a$, ahead&))
+If c$ = Left$(pad$, cl) Then
 a$ = Mid$(a$, MyTrimLi(a$, cl + 1))
 Fast3NoSpace = True
 Exit Function
 End If
-If D$ = Left$(Pad$, dl) Then
+If D$ = Left$(pad$, dl) Then
 a$ = Mid$(a$, MyTrimLi(a$, dl + 1))
 Fast3NoSpace = True
 Exit Function
 End If
-If e$ = Left$(Pad$, el) Then
+If e$ = Left$(pad$, el) Then
 a$ = Mid$(a$, MyTrimLi(a$, el + 1))
 Fast3NoSpace = True
 End If
 
 End Function
 Function Fast3Label(a$, c$, cl As Long, D$, dl As Long, e$, el As Long, ahead&) As Boolean
-Dim i As Long, Pad$, j As Long
+Dim i As Long, pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
 i = MyTrimL(a$)
 If i > j Then Exit Function
-Pad$ = myUcase(Mid$(a$, i, ahead&)) + " "
+pad$ = myUcase(Mid$(a$, i, ahead&)) + " "
 If j - i >= cl - 1 Then
-If InStr(c$, Left$(Pad$, cl)) > 0 Then
-If Mid$(Pad$, cl + 1, 1) Like "[0-9+.\( @-]" Then
+If InStr(c$, Left$(pad$, cl)) > 0 Then
+If Mid$(pad$, cl + 1, 1) Like "[0-9+.\( @-]" Then
 a$ = Mid$(a$, MyTrimLi(a$, i + cl))
 Fast3Label = True
 End If
@@ -14669,8 +14669,8 @@ Exit Function
 End If
 End If
 If j - i >= dl - 1 Then
-If InStr(D$, Left$(Pad$, dl)) > 0 Then
-If Mid$(Pad$, dl + 1, 1) Like "[0-9+.\( @-]" Then
+If InStr(D$, Left$(pad$, dl)) > 0 Then
+If Mid$(pad$, dl + 1, 1) Like "[0-9+.\( @-]" Then
 a$ = Mid$(a$, MyTrimLi(a$, i + dl))
 Fast3Label = True
 End If
@@ -14678,8 +14678,8 @@ Exit Function
 End If
 End If
 If j - i >= el - 1 Then
-If InStr(e$, Left$(Pad$, el)) > 0 Then
-If Mid$(Pad$, el + 1, 1) Like "[0-9+.\( @-]" Then
+If InStr(e$, Left$(pad$, el)) > 0 Then
+If Mid$(pad$, el + 1, 1) Like "[0-9+.\( @-]" Then
 a$ = Mid$(a$, MyTrimLi(a$, i + el))
 Fast3Label = True
 End If
@@ -14688,15 +14688,15 @@ End If
 End Function
 Function Fast2VarNoTrim(a$, c$, cl As Long, D$, dl As Long, ahead&, Pos As Long) As Boolean
 ' need space
-Dim i As Long, Pad$, j As Long
+Dim i As Long, pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
 i = MyTrimL(a$)
 If i > j Then Exit Function
-Pad$ = myUcase(Mid$(a$, i, ahead&)) + " "
+pad$ = myUcase(Mid$(a$, i, ahead&)) + " "
 If j - i >= cl - 1 Then
-If InStr(c$, Left$(Pad$, cl)) > 0 Then
-If Mid$(Pad$, cl + 1, 1) = " " Then
+If InStr(c$, Left$(pad$, cl)) > 0 Then
+If Mid$(pad$, cl + 1, 1) = " " Then
 Mid$(a$, i) = space$(cl)
 Pos = 1
 Fast2VarNoTrim = True
@@ -14706,8 +14706,8 @@ End If
 End If
 If dl = 0 Then Exit Function
 If j - i >= dl - 1 Then
-If InStr(D$, Left$(Pad$, dl)) > 0 Then
-If Mid$(Pad$, dl + 1, 1) = " " Then
+If InStr(D$, Left$(pad$, dl)) > 0 Then
+If Mid$(pad$, dl + 1, 1) = " " Then
 Mid$(a$, i) = space$(dl)
 Pos = 2
 Fast2VarNoTrim = True
@@ -14717,15 +14717,15 @@ End If
 End Function
 Function Fast2Varl(a$, c$, cl As Long, D$, dl As Long, ahead&, ByVal F As Long) As Boolean
 ' use F if dl>0
-Dim i As Long, Pad$, j As Long
+Dim i As Long, pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
 i = MyTrimL(a$)
 If i > j Then a$ = vbNullString: Exit Function
-Pad$ = myUcase(Mid$(a$, i, ahead&))
+pad$ = myUcase(Mid$(a$, i, ahead&))
 If F = 2 Then GoTo there
 If j - i >= cl - 1 Then
-If Left$(Pad$, cl) = c$ Then
+If Left$(pad$, cl) = c$ Then
 a$ = Mid$(a$, MyTrimLi(a$, i + cl))
 Fast2Varl = True
 Exit Function
@@ -14734,7 +14734,7 @@ End If
 If dl = 0 Or F = 1 Then Exit Function
 there:
 If j - i >= dl - 1 Then
-If Left$(Pad$, dl) = D$ Then
+If Left$(pad$, dl) = D$ Then
 a$ = Mid$(a$, MyTrimLi(a$, i + dl))
 Fast2Varl = True
 End If
@@ -14742,15 +14742,15 @@ End If
 End Function
 Function Fast2VarSpace(a$, c$, cl As Long, D$, dl As Long, ahead&) As Boolean
 ' need always space
-Dim i As Long, Pad$, j As Long
+Dim i As Long, pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
 i = MyTrimL(a$)
 If i > j Then a$ = vbNullString: Exit Function
-Pad$ = myUcase(Mid$(a$, i, ahead&))
+pad$ = myUcase(Mid$(a$, i, ahead&))
 If j - i >= cl - 1 Then
-If Left$(Pad$, cl) = c$ Then
-If Mid$(Pad$, cl + 1, 1) = " " Then
+If Left$(pad$, cl) = c$ Then
+If Mid$(pad$, cl + 1, 1) = " " Then
 a$ = Mid$(a$, MyTrimLi(a$, i + cl))
 Fast2VarSpace = True
 Exit Function
@@ -14759,8 +14759,8 @@ End If
 End If
 If dl = 0 Then Exit Function
 If j - i >= dl - 1 Then
-If Left$(Pad$, dl) = D$ Then
-If Mid$(Pad$, dl + 1, 1) = " " Then
+If Left$(pad$, dl) = D$ Then
+If Mid$(pad$, dl + 1, 1) = " " Then
 a$ = Mid$(a$, MyTrimLi(a$, i + dl))
 Fast2VarSpace = True
 End If
@@ -14768,14 +14768,14 @@ End If
 End If
 End Function
 Function Fast3Varl(a$, c$, cl As Long, D$, dl As Long, e$, el As Long, ahead&) As Boolean
-Dim i As Long, Pad$, j As Long
+Dim i As Long, pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
 i = MyTrimL(a$)
 If i > j Then a$ = vbNullString: Exit Function
-Pad$ = myUcase(Mid$(a$, i, ahead&))
+pad$ = myUcase(Mid$(a$, i, ahead&))
 If j - i >= cl - 1 Then
-If Left$(Pad$, cl) = c$ Then
+If Left$(pad$, cl) = c$ Then
 a$ = Mid$(a$, MyTrimLi(a$, i + cl))
 Fast3Varl = True
 Exit Function
@@ -14783,14 +14783,14 @@ End If
 End If
 If dl = 0 Then Exit Function
 If j - i >= dl - 1 Then
-If Left$(Pad$, dl) = D$ Then
+If Left$(pad$, dl) = D$ Then
 a$ = Mid$(a$, MyTrimLi(a$, i + dl))
 Fast3Varl = True
 End If
 End If
 If el = 0 Then Exit Function
 If j - i >= el - 1 Then
-If Left$(Pad$, el) = e$ Then
+If Left$(pad$, el) = e$ Then
 a$ = Mid$(a$, MyTrimLi(a$, i + el))
 Fast3Varl = True
 End If

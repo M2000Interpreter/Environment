@@ -58,9 +58,17 @@ Public Function CreateZipBuffer() As mHandler
     End If
     LockControl = True
    
-    Dim ret As Boolean, bufmem() As Byte
-    
-    ret = Zip.CompressArchive(bufmem, , , vbTrue)
+    Dim ret As Boolean, p() As Byte
+    Dim mem As New MemBlock, Handler As New mHandler
+
+    ret = Zip.CompressArchive(p, , , vbTrue)
+    If ret Then
+        mem.Construct 1, UBound(p) + 1
+        CopyMemory ByVal mem.GetPtr(0), p(0), UBound(p) + 1
+        Handler.t1 = 2
+        Set Handler.objref = mem
+        Set CreateZipBuffer = Handler
+    End If
     LockControl = False
     mLastCancel = False
 End Function

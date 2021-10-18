@@ -50,7 +50,7 @@ Module TestOsInfo {
 }
 TestOsInfo
 
-6. Update info.gsb
+5. Update info.gsb
 New program DownLoadAny:
 Download using URLDownloadToFile from lib urlmon
 

@@ -544,7 +544,7 @@ TaskMaster.rest
 
     Dim ft As FILETIME
     Dim lBusy As Long
-    Dim lRet As Long
+    Dim lret As Long
     Dim dblDelay As Double
     Dim dblDelayLow As Double
     Dim dblUnits As Double
@@ -559,7 +559,7 @@ TaskMaster.rest
     Else
         ft.dwLowDateTime = -1
         ft.dwHighDateTime = -1
-        lRet = SetWaitableTimer(hTimer, ft, 0, 0, 0, 0)
+        lret = SetWaitableTimer(hTimer, ft, 0, 0, 0, 0)
     End If
     
     ' Convert the Units to nanoseconds.
@@ -584,7 +584,7 @@ TaskMaster.rest
     End If
     
     ft.dwLowDateTime = CLng(dblDelayLow)
-    lRet = SetWaitableTimer(hTimer, ft, 0, 0, 0, False)
+    lret = SetWaitableTimer(hTimer, ft, 0, 0, 0, False)
    With Prefresh(GetCode(bstack.Owner))
     Do
         ' QS_ALLINPUT means that MsgWaitForMultipleObjects will
@@ -633,7 +633,7 @@ If IsWine Then
 End If
     Dim ft As FILETIME
     Dim lBusy As Long
-    Dim lRet As Long
+    Dim lret As Long
     Dim dblDelay As Double
     Dim dblDelayLow As Double
     Dim dblUnits As Double
@@ -649,7 +649,7 @@ End If
     Else
         ft.dwLowDateTime = -1
         ft.dwHighDateTime = -1
-        lRet = SetWaitableTimer(hTimer, ft, 0, 0, 0, 0)
+        lret = SetWaitableTimer(hTimer, ft, 0, 0, 0, 0)
     End If
     
     ' Convert the Units to nanoseconds.
@@ -670,7 +670,7 @@ End If
     End If
     
     ft.dwLowDateTime = CLng(dblDelayLow)
-    lRet = SetWaitableTimer(hTimer, ft, 0, 0, 0, False)
+    lret = SetWaitableTimer(hTimer, ft, 0, 0, 0, False)
     Dim handlepopup As Boolean, lastpopup As Long
     Do
          lBusy = MsgWaitForMultipleObjects(1, hTimer, False, _
