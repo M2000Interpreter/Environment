@@ -239,16 +239,16 @@ lastfactor = 1
 LastWidth = -1
 
 Set textbox1 = New myTextBox
-Set textbox1.Container = gList3
+Set textbox1.Container = glist3
 textbox1.MaxCharLength = 100
 If AskInput Then
-gList3.Visible = True
+glist3.Visible = True
 textbox1 = AskStrInput$
 textbox1.locked = False
 textbox1.enabled = True
 
 Else
-gList3.Visible = False  ' new from revision 17 (version 7)
+glist3.Visible = False  ' new from revision 17 (version 7)
 End If
 gList1.NoCaretShow = True
 gList1.VerticalCenterText = True
@@ -256,8 +256,9 @@ gList1.LeftMarginPixels = 8
 gList1.enabled = True
 Set ListPad = New Document
 ListPad = AskText$
+If AskDIB$ = vbNullString And AskDIBicon$ <> "" Then AskDIB$ = AskDIBicon$
 If AskDIB$ = vbNullString Then
-Set LoadPictureMine = Form3.icon
+    Set LoadPictureMine = Form3.icon
 Else
     If Left$(AskDIB$, 4) = "cDIB" And Len(AskDIB$) > 12 Then
                 Set photo = New cDIBSection
@@ -320,7 +321,7 @@ Else
 move AskLastX, AskLastY
 End If
 If AskInput Then
-gList3.TabIndex = 1
+glist3.TabIndex = 1
 End If
 End Sub
 
@@ -357,7 +358,7 @@ myCancel.Shutdown
 
 gList1.Shutdown
 gList2.Shutdown
-gList3.Shutdown
+glist3.Shutdown
 command1(0).Shutdown
 command1(1).Shutdown
 novisible = False
@@ -521,7 +522,7 @@ gList1.move borderleft * 2 + itemwidth3, bordertop * 5, itemwidth3 * 2 + borderl
 End If
 End If
 If AskInput Then
-gList3.move borderleft * 2 + itemwidth3, bordertop * 15, itemwidth3 * 2 + borderleft, bordertop * 3
+glist3.move borderleft * 2 + itemwidth3, bordertop * 15, itemwidth3 * 2 + borderleft, bordertop * 3
 
 End If
 If AskCancel$ <> "" Then
@@ -553,7 +554,7 @@ End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
 gList2.FontSize = 14.25 * factor * dv15 / 15
 gList1.FontSize = 13.5 * factor * dv15 / 15
-gList3.FontSize = 13.5 * factor * dv15 / 15
+glist3.FontSize = 13.5 * factor * dv15 / 15
 
 
 factor = gList2.FontSize / 14.25 / dv15 * 15

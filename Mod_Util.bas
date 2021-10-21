@@ -1463,6 +1463,9 @@ Err.Clear
                            Else
                               Set LoadMyPicture = LoadPictureGDIPlus(s1$)
                             End If
+                           ElseIf useback Then
+                                Set LoadMyPicture = LoadPictureGDIPlus(s1$, , , bColor)
+                                If Err.Number > 0 Then Err.Clear
                            End If
                            If Err.Number > 0 Then
                            Err.Clear
@@ -21034,7 +21037,7 @@ End Function
 Function MyIcon(basestack As basetask, rest$) As Boolean
 Dim s$, aPic As StdPicture, p, anyObj As Object, ok As Boolean
 On Error Resume Next
-
+    Dim aa As New cDIBSection
     If IsStrExp(basestack, rest$, s$) Then
         If CFname$(s$) <> "" Then
         
@@ -21042,8 +21045,15 @@ On Error Resume Next
         Set aPic = LoadPicture(GetDosPath(s$))
         If aPic Is Nothing Then Exit Function
              ok = True
+             If FileLen(GetDosPath(s$)) > 4000 Then
+                 aa.CreateFromPicture LoadMyPicture(GetDosPath(s$), True, &H3B3B3B)
+                AskDIBicon$ = DIBtoSTR(aa)
+                Else
+                AskDIBicon$ = ""
+                End If
         End If
     ElseIf IsExp(basestack, rest$, p) Then
+    
     If TypeOf basestack.lastobj Is mHandler Then
             Set anyObj = GetObjFromHandler(basestack.lastobj, ok)
             If ok Then
@@ -21051,12 +21061,20 @@ On Error Resume Next
             If Typename(anyObj) = "MemBlock" Then
                 
                 Set mm = anyObj
+                mm.SubType = 30
+                aa.CreateFromPicture mm.GetStdPicture(, , &H3B3B3B)
+                ' aa.CreateFromPicture mm.GetStdPicture1(, , &H3B3B3B)  ' smooth
+                AskDIBicon$ = DIBtoSTR(aa)
                 mm.SubType = 300
                 Set aPic = mm.GetStdPicture()
+                
+                
+
             Else
+                AskDIBicon$ = ""
                 Set aPic = anyObj
             End If
-            
+                
                 MyIcon = True
             Else
             MyEr "No icon find", "Δεν βρήκα εικόνα"
@@ -21075,6 +21093,9 @@ On Error Resume Next
         Set Form3.icon = aPic
     End If
     Set Form1.icon = aPic
+
+    Set basestack.lastobj = Nothing
+    Set basestack.lastpointer = Nothing
     MyIcon = ok
 End Function
 Private Function GetObjFromHandler(vv As Object, ok As Boolean) As Object
@@ -25440,20 +25461,20 @@ Dim ss$
                     DropLeft "\M2000_USER\", ss$
                     
 If ss$ = vbNullString Then
-Originalusername = username
+Originalusername = UserName
 Else
 ss$ = Right$(userfiles, Len(ss$))
 Originalusername = GetStrUntil("\", ss$)
 End If
 End Function
-Public Function username()
+Public Function UserName()
 Dim a$, b$, c$
 a$ = GetSpecialfolder(0)
 While a$ <> ""
 c$ = b$
 b$ = GetStrUntil("\", a$)
 Wend
-username = c$
+UserName = c$
 End Function
 Function IsDimension(bstack As basetask, a$, R As Variant, SG As Variant) As Boolean
 Dim s$, pppp As mArray, w1 As Long, p As Variant, anything As Object, pp As Variant, usehandler As mHandler

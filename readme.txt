@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 28 active-X
-Fix Show$() and Hide$() crypto functions for odd number of bytes.
+Version 10 revision 29 active-X
+ICON statement update (better for m2000 msgbox -> function Ask()).
 
 
 George Karras, Kallithea Attikis, Greece.

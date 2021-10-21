@@ -436,6 +436,10 @@ mSubtype = 2
 ElseIf IsEmf Then
 SubType = 2
 End If
+ElseIf mSubtype = 30 Then
+      '  CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
+      '  Set GetStdPicture1 = LoadImageFromBuffer2(a(), Width, Height, backcolor)
+      '   CopyMemory ByVal VarPtrArray(a), 0&, 4
 ElseIf mSubtype = 300 Then
 GoTo there1
 End If
@@ -491,6 +495,7 @@ Public Function GetStdPicture(Optional Width As Long = -1, Optional Height As Lo
     If hEmf = 0 Then
 there1:
     Set GetStdPicture = Me.GetStdPicture1()
+
     Else
     Set GetStdPicture = gCreatePicture(hEmf, 4)
     End If

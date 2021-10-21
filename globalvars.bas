@@ -1,7 +1,7 @@
 Attribute VB_Name = "globalvars"
 ' This is for selectors..
 Public AskTitle$, AskText$, AskCancel$, AskOk$, AskDIB$, ASKINUSE As Boolean
-Public AskInput As Boolean, AskResponse$, AskStrInput$
+Public AskInput As Boolean, AskResponse$, AskStrInput$, AskDIBicon$
 Public UseAskForMultipleEntry As Boolean
 Public BreakMe As Boolean
 Public CancelDialog As Boolean

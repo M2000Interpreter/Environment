@@ -71,7 +71,7 @@ End Type
 
 Private Type wmfPlaceableFileHeader
     Key         As Long
-    hMF         As Integer
+    hmf         As Integer
     BoundingBox As PWMFRect16
     Inch        As Integer
     reserved    As Long
@@ -92,7 +92,7 @@ Const CF_DIB = 8
 
 
 Private Declare Function SetEnhMetaFileBits Lib "gdi32" (ByVal cbBuffer As Long, lpData As Any) As Long
-Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hMF As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
+Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
 Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As Long
 
 
@@ -248,7 +248,7 @@ Private Declare Function CreateStreamOnHGlobal Lib "ole32.dll" _
     (ByVal hGlobal As Any, ByVal fDeleteOnRelease As Long, _
     ByRef ppstm As Any) As Long
     ' ----==== GDI+ Enums ====----
-Private Enum Status 'GDI+ Status
+Private Enum status 'GDI+ Status
     ok = 0
     GenericError = 1
     InvalidParameter = 2
@@ -273,10 +273,10 @@ Private Enum Status 'GDI+ Status
     ProfileNotFound = 21
 End Enum
 Private Declare Function GdipLoadImageFromStream Lib "gdiplus" _
-    (ByVal Stream As Any, ByRef Image As Long) As Status
+    (ByVal Stream As Any, ByRef Image As Long) As status
 Private Declare Function GdipCreateHBITMAPFromBitmap Lib "gdiplus" _
     (ByVal bitmap As Long, ByRef hbmReturn As Long, _
-    ByVal Background As Long) As Status
+    ByVal Background As Long) As status
 ' GDI and GDI+ constants
 Private Const PLANES = 14            '  Number of planes
 Private Const BITSPIXEL = 12         '  Number of bits per pixel
@@ -1040,7 +1040,7 @@ Public Function LoadImageFromBuffer2(ResData() As Byte, Optional Width As Long =
                   If Width = -1 Or Height = -1 Then
                    ' GetImageDimension img, Width, Height
                      GdipGetImageWidth Img, Width
-                GdipGetImageHeight Img, Height
+                     GdipGetImageHeight Img, Height
                 
                 End If
                  ' Initialise the hDC
@@ -1048,7 +1048,7 @@ Public Function LoadImageFromBuffer2(ResData() As Byte, Optional Width As Long =
 
                 ' Resize the picture
                 gdipResize Img, Hdc, Width, Height
-                
+                GdipDisposeImage Img
     
     ' Get the bitmap back
     GetBitmap Hdc, hBitmap
@@ -1056,7 +1056,7 @@ Public Function LoadImageFromBuffer2(ResData() As Byte, Optional Width As Long =
     ' Create the picture
     Set LoadImageFromBuffer2 = gCreatePicture(hBitmap)
             
-             GdipDisposeImage Img
+             'GdipDisposeImage Img
             
         End If
     End If
@@ -1421,7 +1421,7 @@ er$ = "GDI+: " & Err.Number & ". " & Err.Description
     Resume PROC_EXIT
 
 End Function
-Private Function GdiErrorString(ByVal lError As Status) As String
+Private Function GdiErrorString(ByVal lError As status) As String
     Dim s As String
     
     Select Case lError
@@ -1450,10 +1450,10 @@ Private Function GdiErrorString(ByVal lError As Status) As String
     
     GdiErrorString = s
 End Function
-Private Function GdiPlusExec(ByVal lReturn As Status) As Status
-    Dim lCurErr As Status
-    If lReturn = Status.ok Then
-        lCurErr = Status.ok
+Private Function GdiPlusExec(ByVal lReturn As status) As status
+    Dim lCurErr As status
+    If lReturn = status.ok Then
+        lCurErr = status.ok
     Else
         lCurErr = lReturn
         Dim er$
