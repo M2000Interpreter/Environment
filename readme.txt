@@ -1,7 +1,10 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 29 active-X
-ICON statement update (better for m2000 msgbox -> function Ask()).
+Version 10 revision 30 active-X
+Fix for interpreter for handling these:
+a=(("a","b","c")#Str$(", "), ("a","b","c")#Rev()#Str$(", "))
+Print a#str$(", ")
+Also hash commands (need a tuple or array before) now works with functions which return tuple or array.
 
 
 George Karras, Kallithea Attikis, Greece.
