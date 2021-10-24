@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 31
+Global Const Revision = 32
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -30802,11 +30802,20 @@ Loop
 If flag = False Then
 If Len(what$) > 0 Then
 If level2 = 0 Then
+    If Lang = 0 Then
+    what$ = myUcase(what$)
+        If what$ = "ะมอิม" Then
+        Pos = Pos - Len(what$)
+            flag = True
+            Exit Sub
+        End If
+    Else
     what$ = UCase(what$)
     If what$ = "ALWAYS" Then
         Pos = Pos - Len(what$)
         flag = True
         Exit Sub
+    End If
     End If
 End If
 End If

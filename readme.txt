@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 31 active-X
-Continue fixes as in rev 30.
+Version 10 revision 32 active-X
+Fix the Greek Version of Repeat Always
 
 
 George Karras, Kallithea Attikis, Greece.
