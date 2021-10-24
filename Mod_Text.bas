@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 30
+Global Const Revision = 31
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7130,8 +7130,15 @@ Else
     nbstack.SetV
     If GoFunc(nbstack, s1$, a$, p) Then
         If lookOne(a$, "#") Then
+        If nbstack.lastobj Is Nothing Then
+        NotArray
+        IsNumberNew = False
+        End If
         Set nbstack.lastobj = Nothing
-        If Typename(bstack.lastobj) = mgroup Then
+        If TypeOf bstack.lastobj Is mHandler Then
+                FastSymbol a$, "#"
+                GoTo comehere
+        ElseIf TypeOf bstack.lastobj Is Group Then
         Mid$(a$, 1, 1) = "."
          Set pppp = New mArray
         pppp.Arr = False
@@ -7469,7 +7476,7 @@ cont100203030:
                                 Set nbstack = Nothing ' ???
 comehere:
                                 If Not bstack.lastobj Is Nothing Then
-                                    If Typename(bstack.lastobj) = mHdlr Then
+                                    If TypeOf bstack.lastobj Is mHandler Then
                                         Set usehandler = bstack.lastobj
                                         Set bstack.lastobj = Nothing
                                         IsNumberNew = Matrix(bstack, a$, usehandler, R)
@@ -7976,9 +7983,26 @@ againsub:
             If w1 Then
                 bstack.addlen = 0
                 IsNumberNew = True
-                If Not flatobject Then Set bstack.lastobj = bstack.FuncObj
+               ' If Not flatobject Then Set bstack.lastobj = bstack.FuncObj
                 Set bstack.lastobj = bstack.FuncObj
                 R = bstack.FuncValue * SG
+                If Not bstack.lastobj Is Nothing Then
+                        If TypeOf bstack.lastobj Is mHandler Then
+                            If FastSymbol(a$, "#") Then
+                                GoTo comehere
+                            End If
+                        ElseIf TypeOf bstack.lastobj Is Group Then
+                            Mid$(a$, 1, 1) = "."
+                            Set pppp = New mArray
+                            pppp.Arr = False
+                            Set pppp.GroupRef = bstack.lastobj
+                            w2 = -2
+                            GoTo contgroup3
+                        Else
+                            Mid$(a$, 1, 1) = Chr$(1)
+                            GoTo comehere
+                        End If
+                End If
             End If
             If trace Then TestShowBypass = gr
         ElseIf bstack.IamChild Then

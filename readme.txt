@@ -1,10 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 30 active-X
-Fix for interpreter for handling these:
-a=(("a","b","c")#Str$(", "), ("a","b","c")#Rev()#Str$(", "))
-Print a#str$(", ")
-Also hash commands (need a tuple or array before) now works with functions which return tuple or array.
+Version 10 revision 31 active-X
+Continue fixes as in rev 30.
 
 
 George Karras, Kallithea Attikis, Greece.
