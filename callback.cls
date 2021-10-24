@@ -210,18 +210,55 @@ While Left$(cLine, 1) = Chr(34) And Right$(cLine, 1) = Chr(34) And Len(cLine) > 
 cLine = Mid$(cLine, 2, Len(cLine) - 2)
 Wend
 If ExtractType(cLine) <> "gsb" Then cLine = vbNullString
+If Left$(cLine, 1) Like "[+-]" Then
+Dim ss$
+para$ = ""
+While Left$(cLine, 1) Like "[+-]"
+ss$ = Split(cLine, " ")(0)
+cLine = LTrim$(Mid$(cLine, Len(ss$) + 1))
+para$ = para$ + ss$ + " "
+Wend
+ss$ = Trim$(para$)
+para$ = ""
+End If
 If cLine <> "" Then
 para$ = ExtractPath(cLine) + ExtractName(cLine)
 para$ = Trim$(Mid$(cLine, Len(para$) + 1))
 's$ = cLine + " " + s$
 cLine = Left$(cLine, Len(cLine$) - Len(para$))
+If ss$ = "" And para$ = "" Then
+s$ = LTrim(s$)
+If Left$(s$, 1) Like "[+-]" Then
+While Left$(s$, 1) Like "[+-]"
+ss$ = Split(s$, " ")(0)
+s$ = LTrim$(Mid$(s$, Len(ss$) + 1))
+para$ = para$ + ss$ + " "
+Wend
+ss$ = Trim$(para$)
+para$ = ""
+If ExtractType(s$) = "gsb" Then
+If ExtractType(cLine) = "gsb" Then
+' replace file
+cLine = ExtractPath(s$) + ExtractName(s$)
+End If
+Else
+s$ = ""
+End If
+End If
+
+End If
+
 ElseIf s$ <> "" Then
 para$ = Trim$(s$)
 End If
 
-
-
+If ss$ <> "" Then
+Switches ss$, True
+ElseIf para$ = "" And s$ <> "" Then
+Switches s$, True
+Else
 Switches para$, True
+End If
 If Trim$(para$) <> "" And Not Left$(para$, 1) Like "[+-]" Then interpret Basestack1, para$
 If Not INK$ = Chr(27) Then
 Form1.MyPrompt cLine, Prompt$

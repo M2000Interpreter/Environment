@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 32 active-X
-Fix the Greek Version of Repeat Always
+Version 10 revision 33 active-X
+Better handle a link to m2000.exe using switches in Windows 10
 
 
 George Karras, Kallithea Attikis, Greece.
