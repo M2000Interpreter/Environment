@@ -33888,8 +33888,8 @@ MODULE REV34VER10 {module testA {
 }
 module testB {
 	function FunctionReturnGroup() {
-		local Z=random(1, 500)
-		local group a {
+		Z=random(1, 500)
+		group a {
 			Property GroupMember {value}=Z
 			Function Name {
 				GROUP alfa {
@@ -33914,8 +33914,8 @@ module testB {
 }
 module testC {
 	function FunctionReturnGroup() {
-		local Z=random(1, 500)
-		local group a {
+		Z=random(1, 500)
+		group a {
 			Property GroupMember {value}=Z
 			Function Name {
 				GROUP alfa {
