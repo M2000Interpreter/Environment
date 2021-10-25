@@ -146,9 +146,9 @@ End Type
 Private Declare Function OpenProcess Lib "kernel32" _
   (ByVal dwDesiredAccess As Long, _
    ByVal bInheritHandle As Long, _
-   ByVal dwProcessId As Long) As Long
+   ByVal dwProcessID As Long) As Long
    
-Private Declare Function GetLocaleInfo Lib "kernel32.dll" Alias "GetLocaleInfoW" (ByVal lcid As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+Private Declare Function GetLocaleInfo Lib "kernel32.dll" Alias "GetLocaleInfoW" (ByVal lcid As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
 Private Declare Function GetUserDefaultUILanguage Lib "kernel32.dll" () As Long
 Private Declare Function GetSystemDefaultUILanguage Lib "kernel32.dll" () As Long
 Private Declare Function GetSystemDefaultLCID Lib "kernel32.dll" () As Long
@@ -159,8 +159,8 @@ Private Declare Function RtlGetVersion Lib "ntdll.dll" (lpVersionInformation As 
 Private Declare Function GetSystemMetrics Lib "user32.dll" (ByVal nIndex As Long) As Long
 Private Declare Function GetProductInfo Lib "kernel32.dll" (ByVal dwOSMajorVersion As Long, ByVal dwOSMinorVersion As Long, ByVal dwSpMajorVersion As Long, ByVal dwSpMinorVersion As Long, pdwReturnedProductType As Long) As Long
 'Private Declare Function CheckTokenMembership Lib "advapi32.dll" (ByVal TokenHandle As Long, ByVal SidToCheck As Long, IsMember As Long) As Long
-Private Declare Function OpenProcessToken Lib "Advapi32.dll" (ByVal ProcessHandle As Long, ByVal DesiredAccess As Long, TokenHandle As Long) As Long
-Private Declare Function GetTokenInformation Lib "Advapi32.dll" (ByVal TokenHandle As Long, ByVal TokenInformationClass As Long, TokenInformation As Any, ByVal TokenInformationLength As Long, ReturnLength As Long) As Long
+Private Declare Function OpenProcessToken Lib "advapi32.dll" (ByVal ProcessHandle As Long, ByVal DesiredAccess As Long, TokenHandle As Long) As Long
+Private Declare Function GetTokenInformation Lib "advapi32.dll" (ByVal TokenHandle As Long, ByVal TokenInformationClass As Long, TokenInformation As Any, ByVal TokenInformationLength As Long, ReturnLength As Long) As Long
 'Private Declare Function OpenThreadToken Lib "advapi32.dll" (ByVal ThreadHandle As Long, ByVal DesiredAccess As Long, ByVal OpenAsSelf As Long, TokenHandle As Long) As Long
 'Private Declare Function GetCurrentThread Lib "kernel32.dll" () As Long
 Private Declare Function GetCurrentProcess Lib "kernel32.dll" () As Long
@@ -168,34 +168,34 @@ Private Declare Sub CopyMemory Lib "kernel32.dll" Alias "RtlMoveMemory" (dest As
 Private Declare Function GetMem4 Lib "msvbvm60.dll" (Src As Any, Dst As Any) As Long
 Private Declare Function CloseHandle Lib "kernel32.dll" (ByVal hObject As Long) As Long
 Private Declare Function LocalFree Lib "kernel32.dll" (ByVal hMem As Long) As Long
-Private Declare Sub FreeSid Lib "Advapi32.dll" (ByVal pSid As Long)
-Private Declare Function AllocateAndInitializeSid Lib "Advapi32.dll" (pIdentifierAuthority As Any, ByVal nSubAuthorityCount As Byte, ByVal nSubAuthority0 As Long, ByVal nSubAuthority1 As Long, ByVal nSubAuthority2 As Long, ByVal nSubAuthority3 As Long, ByVal nSubAuthority4 As Long, ByVal nSubAuthority5 As Long, ByVal nSubAuthority6 As Long, ByVal nSubAuthority7 As Long, lpPSid As Long) As Long
-Private Declare Function IsValidSid Lib "Advapi32.dll" (ByVal pSid As Long) As Long
-Private Declare Function GetSidSubAuthority Lib "Advapi32.dll" (ByVal pSid As Long, ByVal nSubAuthority As Long) As Long
-Private Declare Function GetSidSubAuthorityCount Lib "Advapi32.dll" (ByVal pSid As Long) As Long
-Private Declare Function EqualSid Lib "Advapi32.dll" (pSid1 As Any, pSid2 As Any) As Long
-Private Declare Function RegOpenKeyEx Lib "Advapi32.dll" Alias "RegOpenKeyExW" (ByVal hKey As Long, ByVal lpSubKey As Long, ByVal ulOptions As Long, ByVal samDesired As Long, phkResult As Long) As Long
-Private Declare Function RegCloseKey Lib "Advapi32.dll" (ByVal hKey As Long) As Long
-Private Declare Function RegQueryValueExStr Lib "Advapi32.dll" Alias "RegQueryValueExW" (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, lpType As Long, ByVal szData As Long, lpcbData As Long) As Long
-Private Declare Function RegQueryValueExLong Lib "Advapi32.dll" Alias "RegQueryValueExW" (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, lpType As Long, szData As Long, lpcbData As Long) As Long
-Private Declare Function RegQueryValueEx Lib "Advapi32.dll" Alias "RegQueryValueExW" (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, lpType As Long, ByVal lpData As Any, lpcbData As Long) As Long
+Private Declare Sub FreeSid Lib "advapi32.dll" (ByVal pSid As Long)
+Private Declare Function AllocateAndInitializeSid Lib "advapi32.dll" (pIdentifierAuthority As Any, ByVal nSubAuthorityCount As Byte, ByVal nSubAuthority0 As Long, ByVal nSubAuthority1 As Long, ByVal nSubAuthority2 As Long, ByVal nSubAuthority3 As Long, ByVal nSubAuthority4 As Long, ByVal nSubAuthority5 As Long, ByVal nSubAuthority6 As Long, ByVal nSubAuthority7 As Long, lpPSid As Long) As Long
+Private Declare Function IsValidSid Lib "advapi32.dll" (ByVal pSid As Long) As Long
+Private Declare Function GetSidSubAuthority Lib "advapi32.dll" (ByVal pSid As Long, ByVal nSubAuthority As Long) As Long
+Private Declare Function GetSidSubAuthorityCount Lib "advapi32.dll" (ByVal pSid As Long) As Long
+Private Declare Function EqualSid Lib "advapi32.dll" (pSid1 As Any, pSid2 As Any) As Long
+Private Declare Function RegOpenKeyEx Lib "advapi32.dll" Alias "RegOpenKeyExW" (ByVal hKey As Long, ByVal lpSubKey As Long, ByVal ulOptions As Long, ByVal samDesired As Long, phkResult As Long) As Long
+Private Declare Function RegCloseKey Lib "advapi32.dll" (ByVal hKey As Long) As Long
+Private Declare Function RegQueryValueExStr Lib "advapi32.dll" Alias "RegQueryValueExW" (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, lpType As Long, ByVal szData As Long, lpcbData As Long) As Long
+Private Declare Function RegQueryValueExLong Lib "advapi32.dll" Alias "RegQueryValueExW" (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, lpType As Long, szData As Long, lpcbData As Long) As Long
+Private Declare Function RegQueryValueEx Lib "advapi32.dll" Alias "RegQueryValueExW" (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, lpType As Long, ByVal lpData As Any, lpcbData As Long) As Long
 Private Declare Function LoadLibrary Lib "kernel32.dll" Alias "LoadLibraryW" (ByVal lpFileName As Long) As Long
 Private Declare Function FreeLibrary Lib "kernel32.dll" (ByVal hLibModule As Long) As Long
 Private Declare Function GetProcAddress Lib "kernel32.dll" (ByVal hModule As Long, ByVal lpProcName As String) As Long
 Private Declare Function lstrlenW Lib "kernel32.dll" (ByVal lpString As Long) As Long
 Private Declare Function lstrcpyW Lib "kernel32.dll" (ByVal lpStrDest As Long, ByVal lpStrSrc As Long) As Long
-Private Declare Function ConvertSidToStringSid Lib "Advapi32.dll" Alias "ConvertSidToStringSidW" (ByVal pSid As Long, StringSid As Long) As Long
+Private Declare Function ConvertSidToStringSid Lib "advapi32.dll" Alias "ConvertSidToStringSidW" (ByVal pSid As Long, StringSid As Long) As Long
 Private Declare Function GetModuleHandle Lib "kernel32.dll" Alias "GetModuleHandleW" (ByVal lpModuleName As Long) As Long
 Private Declare Sub RtlGetNtVersionNumbers Lib "ntdll.dll" (Major As Long, Minor As Long, Build As Long)
 'Private Declare Function LookupPrivilegeValue Lib "Advapi32.dll" Alias "LookupPrivilegeValueW" (ByVal lpSystemName As Long, ByVal lpName As Long, lpLuid As Long) As Long
 'Private Declare Function AdjustTokenPrivileges Lib "Advapi32.dll" (ByVal TokenHandle As Long, ByVal DisableAllPrivileges As Long, NewState As TOKEN_PRIVILEGES, ByVal BufferLength As Long, ByVal PreviousState As Long, ByVal ReturnLength As Long) As Long
-Private Declare Function OpenThreadToken Lib "Advapi32.dll" (ByVal ThreadHandle As Long, ByVal DesiredAccess As Long, ByVal OpenAsSelf As Long, TokenHandle As Long) As Long
+Private Declare Function OpenThreadToken Lib "advapi32.dll" (ByVal ThreadHandle As Long, ByVal DesiredAccess As Long, ByVal OpenAsSelf As Long, TokenHandle As Long) As Long
 Private Declare Function GetCurrentThread Lib "kernel32.dll" () As Long
 Private Declare Function NtOpenSymbolicLinkObject Lib "ntdll.dll" (LinkHandle As Long, ByVal DesiredAccess As Long, ObjectAttributes As OBJECT_ATTRIBUTES) As Long
 'Private Declare Function NtOpenDirectoryObject Lib "ntdll.dll" (DirectoryHandle As Long, ByVal DesiredAccess As Long, ObjectAttributes As OBJECT_ATTRIBUTES) As Long
 Private Declare Function NtClose Lib "ntdll.dll" (ByVal Handle As Long) As Long
 'Private Declare Function IsOS Lib "Shlwapi.dll" Alias "#437" (ByVal dwOS As Long) As Long
-Private Declare Function GetUserName Lib "Advapi32.dll" Alias "GetUserNameW" (ByVal lpBuffer As Long, nSize As Long) As Long
+Private Declare Function GetUserName Lib "advapi32.dll" Alias "GetUserNameW" (ByVal lpBuffer As Long, nSize As Long) As Long
 Private Declare Function GetComputerName Lib "kernel32.dll" Alias "GetComputerNameW" (ByVal lpBuffer As Long, nSize As Long) As Long
 Private Declare Function lstrlen Lib "kernel32.dll" Alias "lstrlenW" (ByVal lpString As Long) As Long
 
@@ -301,7 +301,7 @@ Private Sub Class_Initialize()
     Dim dec             As Single
     Dim ProductType     As Long
     Dim lret            As Long
-    Dim pos             As Long
+    Dim Pos             As Long
     Dim tmp             As String
     Dim hLib            As Long
     Dim dwMajor         As Long
@@ -341,8 +341,8 @@ Private Sub Class_Initialize()
         Set colOS = oWMI.ExecQuery("Select * from Win32_OperatingSystem")
         
         For Each oOS In colOS
-            pos = InStr(oOS.Version, ".")
-            If pos = 0 Then
+            Pos = InStr(oOS.Version, ".")
+            If Pos = 0 Then
                 osi.dwMajorVersion = CLng(oOS.Version)
                 osi.dwMinorVersion = 0
                 osi.dwBuildNumber = 0
@@ -738,15 +738,15 @@ Private Function RegRead_REG_SZ(strKey As String, strParam As String) As String
     Dim buf As String
     Dim hKey As Long
     Dim ordType As Long
-    Dim cData As Long
+    Dim cdata As Long
 
     RegOpenKeyEx HKEY_LOCAL_MACHINE, StrPtr(strKey), 0&, KEY_QUERY_VALUE Or (IsWin64_ And KEY_WOW64_64KEY), hKey
     If hKey = 0 Then Exit Function
     
-    RegQueryValueExLong hKey, StrPtr(strParam), 0&, ordType, 0&, cData
-    If cData > 1 Then
-        buf = String$(cData - 1&, vbNullChar)
-        RegQueryValueExStr hKey, StrPtr(strParam), 0&, ordType, StrPtr(buf), cData
+    RegQueryValueExLong hKey, StrPtr(strParam), 0&, ordType, 0&, cdata
+    If cdata > 1 Then
+        buf = String$(cdata - 1&, vbNullChar)
+        RegQueryValueExStr hKey, StrPtr(strParam), 0&, ordType, StrPtr(buf), cdata
     End If
     buf = Left$(buf, lstrlenW(StrPtr(buf)))
     
@@ -766,14 +766,14 @@ Private Function RegRead_REG_DWORD(strKey As String, strParam As String) As Long
     Dim lData As Long
     Dim hKey As Long
     Dim ordType As Long
-    Dim cData As Long
+    Dim cdata As Long
 
     RegOpenKeyEx HKEY_LOCAL_MACHINE, StrPtr(strKey), 0&, KEY_QUERY_VALUE Or (IsWin64_ And KEY_WOW64_64KEY), hKey
     If hKey = 0 Then Exit Function
     
-    RegQueryValueExLong hKey, StrPtr(strParam), 0&, ordType, 0&, cData
-    If cData = 4 Then
-        If ERROR_SUCCESS = RegQueryValueEx(hKey, StrPtr(strParam), 0&, ordType, VarPtr(lData), cData) Then
+    RegQueryValueExLong hKey, StrPtr(strParam), 0&, ordType, 0&, cdata
+    If cdata = 4 Then
+        If ERROR_SUCCESS = RegQueryValueEx(hKey, StrPtr(strParam), 0&, ordType, VarPtr(lData), cdata) Then
             RegRead_REG_DWORD = lData
         End If
     End If
@@ -901,7 +901,7 @@ ErrorHandler:
     If psidGuest Then FreeSid psidGuest
 End Function
 
-Private Function GetCurrentProcessSID() As String
+Public Function GetCurrentProcessSID() As String
     On Error GoTo ErrorHandler
 
     Const TokenUser As Long = 1&
@@ -1758,11 +1758,11 @@ End Property
 
 Private Function ErrorMsg(ByVal ErrObj As ErrObject, ParamArray CodeModule())
     'some error handler wrapper
-    Dim Other$, i&
+    Dim other$, i&
     For i = 1 To UBound(CodeModule)
-        Other = Other & CodeModule(i) & " "
+        other = other & CodeModule(i) & " "
     Next
-    Debug.Print " - " & Now() & " # " & ErrObj.Number & " (" & Err.Description & "), (" & Err.LastDllError & "), " & Other
+    Debug.Print " - " & Now() & " # " & ErrObj.Number & " (" & Err.Description & "), (" & Err.LastDllError & "), " & other
 End Function
 
 

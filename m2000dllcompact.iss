@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "M2000 Environment"
-#define MyAppVersion "10 Revision 32 compact"
+#define MyAppVersion "10 Revision 34 compact"
 #define MyAppPublisher "George Karras"
 #define MyAppURL "http://georgekarras.blogspot.gr/"
 #define MyAppExeName "m2000.exe"

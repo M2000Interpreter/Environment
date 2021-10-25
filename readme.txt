@@ -1,8 +1,13 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 33 active-X
-Better handle a link to m2000.exe using switches in Windows 10
-
+Version 10 revision 34 active-X
+1. Some fixes for using => immediate on a group as a result from a function
+eg. Print FunctionReturnGroup()=>GroupMember
+see module rev34ver10 in info file
+2. New modules in info.gsb file
+FUNNY, RECSOUND, REV34VER10
+3. DD6 module in info file fixed.
+4. Most modules in info checked again.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

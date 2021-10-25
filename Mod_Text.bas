@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 33
+Global Const Revision = 34
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7120,6 +7120,7 @@ contAr1:
                 
             
 Else
+    
     Set nbstack = New basetask
     Set nbstack.Parent = bstack
     If bstack.IamThread Then Set nbstack.Process = bstack.Process
@@ -7129,26 +7130,42 @@ Else
     nbstack.tpointer = sbf(v1&).tpointer
     nbstack.SetV
     If GoFunc(nbstack, s1$, a$, p) Then
-        If lookOne(a$, "#") Then
-        If nbstack.lastobj Is Nothing Then
-        NotArray
-        IsNumberNew = False
-        End If
-        Set nbstack.lastobj = Nothing
-        If TypeOf bstack.lastobj Is mHandler Then
+        ' Lookone(a$,"#")
+        If Left$(a$, 1) = "#" Then
+            If nbstack.lastobj Is Nothing Then
+            NotArray
+            IsNumberNew = False
+            End If
+            Set anything = nbstack.lastobj
+            Set bstack.lastobj = anything
+            If TypeOf bstack.lastobj Is mHandler Then
                 FastSymbol a$, "#"
+                Set nbstack = Nothing
+                Set bstack.lastobj = anything
                 GoTo comehere
-        ElseIf TypeOf bstack.lastobj Is Group Then
-        Mid$(a$, 1, 1) = "."
-         Set pppp = New mArray
-        pppp.Arr = False
-        Set pppp.GroupRef = bstack.lastobj
-        w2 = -2
-        GoTo contgroup3
+            ElseIf TypeOf bstack.lastobj Is Group Then
+                Set userGroup = anything
+                Set nbstack = Nothing
+                Set bstack.lastobj = anything
+                If Not (userGroup.HasValue And Not userGroup.HasParameters) Then
+                Mid$(a$, 1, 1) = "."
+            End If
+again1001:
+            Set pppp = New mArray
+            pppp.Arr = False
+            Set pppp.GroupRef = bstack.lastobj
+            w2 = -2
+            Set nbstack = Nothing
+            Set bstack.lastobj = Nothing
+            GoTo contgroup3
         Else
-        Mid$(a$, 1, 1) = Chr$(1)
-        GoTo comehere
+            Mid$(a$, 1, 1) = Chr$(1)
+            GoTo comehere
         End If
+        ElseIf Left$(a$, 2) = "=>" Then
+            Mid$(a$, 1, 2) = Chr$(7) + "."
+            GoTo again1001
+
         ElseIf InStr(v$, "%") > 0 Then
             If SG = 1 Then
                 R = MyRound(p)
@@ -7485,6 +7502,9 @@ comehere:
                                         GoTo cont100203030
                                         
                                         End If
+                                        ElseIf Not usehandler Is bstack.lastobj And Not bstack.lastobj Is Nothing Then
+                                        Set bstack.lastobj = usehandler
+                                        Set usehandler = Nothing
                                         End If
                                         If MyIsObject(R) Then R = 0#
                                         If SG < 0 Then R = -R
@@ -7992,12 +8012,19 @@ againsub:
                                 GoTo comehere
                             End If
                         ElseIf TypeOf bstack.lastobj Is Group Then
-                            Mid$(a$, 1, 1) = "."
-                            Set pppp = New mArray
-                            pppp.Arr = False
-                            Set pppp.GroupRef = bstack.lastobj
-                            w2 = -2
-                            GoTo contgroup3
+                            Set userGroup = bstack.lastobj
+                            If Left$(a$, 2) = "=>" Then
+                                Mid$(a$, 1, 2) = Chr$(7) + "."
+                                If trace Then TestShowBypass = gr
+                                GoTo again1001
+                            ElseIf Left$(a$, 1) = "#" Then
+                                If Not (userGroup.HasValue And Not userGroup.HasParameters) Then
+                                    Mid$(a$, 1, 1) = "."
+                                End If
+                                If trace Then TestShowBypass = gr
+                                GoTo again1001
+                            End If
+                            
                         Else
                             Mid$(a$, 1, 1) = Chr$(1)
                             GoTo comehere
@@ -10535,7 +10562,7 @@ againpointer:
 Set bstackstr.lastobj = Nothing
 
     
-w2 = Len(a$)
+ w2 = Len(a$)
 Dim n$
 If Len(a$) < 129 Then
 w1& = IsLabelBig(bstackstr, a$, q$, par, q2$, , , usebackup, , gr)
@@ -10740,11 +10767,11 @@ GoTo checkpointer
 Case 5
             ' check again
 rvalObjectstring:
-    If Left$(aheadstatus(q$ + Split(a$, Chr$(13))(0), False), 1) = "S" Then
+    If Left$(aheadstatus(q$ + CopyUntilEndOfLine(a$), False), 1) = "S" Then
         
         If neoGetArray(bstackstr, q$, pppp) Then
 enterthis:
-            If NeoGetArrayItem(pppp, bstackstr, q$, w, a$, , , True) Then
+            If NeoGetArrayItem(pppp, bstackstr, q$, w, a$, , , True, True) Then
                
                 If Not pppp.Arr And FastSymbol(a$, ")") Then
                 ' need an object
@@ -10988,10 +11015,19 @@ Final:
                 p = vbNullString
                 Set pp = bstackstr.lastobj
                 Set bstackstr.lastobj = Nothing
-            IsStr1 = Matrix(bstackstr, a$, pp, p)
-            SwapString2Variant R$, p
-
-            Exit Function
+                IsStr1 = Matrix(bstackstr, a$, pp, p)
+                SwapString2Variant R$, p
+    
+                Exit Function
+            ElseIf Left$(a$, 2) = "=>" Then
+                    If TypeOf bstackstr.lastobj Is Group Then
+                    Set pppp = BoxGroupVar(bstackstr.lastobj)
+                    Set nbstack = Nothing
+                    Set bstackstr.lastobj = Nothing
+                    w = 0
+                    Mid$(a$, 1, 2) = "." + ChrW(3)
+                    GoTo groupstrvalue
+                    End If
             End If
             End If
         Else
@@ -23141,7 +23177,11 @@ Function SetNextLineCLR(c$) As Long
 SetNextLineCLR = InStr(c$, vbCrLf)
 If SetNextLineCLR > 0 Then Mid$(c$, 1, SetNextLineCLR + 1) = space(SetNextLineCLR + 1): SetNextLineCLR = SetNextLineCLR + 1
 End Function
-
+Function CopyUntilEndOfLine(a$) As String
+Dim i As Long
+i = InStr(a$, vbCrLf)
+If i = 0 Then CopyUntilEndOfLine = a$ Else CopyUntilEndOfLine = Left$(a$, i - 1)
+End Function
 Sub SetNextLineNL(c$)
 Dim i
 i = InStr(c$, vbCrLf)
@@ -23450,22 +23490,22 @@ CheckThis:
             Set usehandler = pp.item(Offset)
             If usehandler.t1 = 3 Then
                 If Typename(usehandler.objref) = myArray Then
-                Set pp = usehandler.objref
+                    Set pp = usehandler.objref
+                Else
+                    Exit Function
+                End If
+                Set usehandler = Nothing
             Else
-                Exit Function
+                Set pp = New mArray
+                pp.Arr = False
+                Set pp.GroupRef = usehandler
             End If
-            Set usehandler = Nothing
-        Else
-            Set pp = New mArray
-            pp.Arr = False
-            Set pp.GroupRef = p
+            p = vbEmpty
+            NeoGetArrayItem = pp.Arr
+            GoTo again123
+        ElseIf Typename(pp.item(Offset)) = mgroup Then
+            NeoGetArrayItem = True
         End If
-        p = vbEmpty
-        NeoGetArrayItem = pp.Arr
-        GoTo again123
-    ElseIf Typename(pp.item(Offset)) = mgroup Then
-        NeoGetArrayItem = True
-    End If
 End If
 End Function
 
@@ -29774,7 +29814,11 @@ again22:
       Pos = Pos + 1
 
         If Not BlockParam2(a$, Pos) Then Exit Do
-        If Mid$(a$, Pos + 1, 1) = "#" Then
+        If Mid$(a$, Pos + 1, 2) = "=>" Then
+        part$ = ""
+        Pos = Pos + 3
+        GoTo conthere
+        ElseIf Mid$(a$, Pos + 1, 1) = "#" Then
         'b$ = vbNullString
         part$ = ""
         Pos = Pos + 2
@@ -30178,7 +30222,11 @@ again22:
       Pos = Pos + 1
 
         If Not BlockParam2(a$, Pos) Then Exit Do
-        If Mid$(a$, Pos + 1, 1) = "#" Then
+        If Mid$(a$, Pos + 1, 2) = "=>" Then
+        'part$ = ""
+        Pos = Pos + 3
+        GoTo conthere
+        ElseIf Mid$(a$, Pos + 1, 1) = "#" Then
         'b$ = vbNullString
         'part$ = "N"
         Pos = Pos + 2
