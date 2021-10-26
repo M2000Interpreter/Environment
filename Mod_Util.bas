@@ -26377,3 +26377,12 @@ there1:
 
 End Function
 
+Function GrabFrame() As String
+Dim p As New cDIBSection
+
+p.CreateFromPicture hDCToPicture(GetDC(0), AVI.Left / DXP, AVI.top / DYP, AVI.Width / DXP, AVI.Height / DYP - 1)
+If p.Height > 0 Then
+
+GrabFrame = DIBtoSTR(p)
+End If
+End Function

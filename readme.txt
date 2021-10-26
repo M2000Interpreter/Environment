@@ -1,13 +1,33 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 34 active-X
-1. Some fixes for using => immediate on a group as a result from a function
-eg. Print FunctionReturnGroup()=>GroupMember
-see module rev34ver10 in info file
-2. New modules in info.gsb file
-FUNNY, RECSOUND, REV34VER10
-3. DD6 module in info file fixed.
-4. Most modules in info checked again.
+Version 10 revision 35 active-X
+1. Fix const lambda to be used in a call by pass by reference
+	const b=lambda k=1 -> {
+		=k
+		k++
+	}
+	module dosomething (&k) {
+		Print k()
+	}
+	for k=1 to 10
+		dosomething &b
+	next
+2. Final lambda in groups now can be used in a call when the group passed by reference.
+	group M {
+		final b=lambda k=1 -> {
+			=k
+			k++
+		}
+	}
+	module dosomething (&k, &z) {
+		Print k.b()  ' k.b() is the same as z()
+		Print z()
+	}
+	for k=1 to 5
+		dosomething &M, &M.b
+	next
+
+3.Update Demo1 in Info
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

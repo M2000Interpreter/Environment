@@ -5423,7 +5423,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 32 for M2000 Interpreter version 10, revision 34 and above"
+	Report " A collection of modules for tests version 33 for M2000 Interpreter version 10, revision 34 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -6487,7 +6487,8 @@ Layer Alfa {
       Move 0,0
       Cursor 0, Height-1
       Cls 7, Height-1
-      Copy scale.x, scale.y to screen$
+      hold
+      //Copy scale.x, scale.y to screen$
       Cursor 0,Height
       together=False
       ok1=true
@@ -6497,14 +6498,15 @@ Layer Alfa {
       tm=0
       Thread {
             static internal=1
-            Move 0,0
-            Copy 0,0 use screen$
+            'Move 0,0
+            'Copy 0,0 use screen$
+            release
             Part {
                   tm=timecount
             } as ok1
-            Print @(3,3); format$("{0:2:-5}",tm)
+            Print @(3,3); format$("{0:2:-7}",tm)
                   Cursor 0,height-1
-
+                   Print Part $(5,Width/4), counter1, counter2,internal, $(7),Str$(Now , "hh:mm:ss" ) 
             Part {
                        Part {
                         aLine=Each(Depth)
@@ -6515,8 +6517,9 @@ Layer Alfa {
                         }
                         counter2++
                         } As disp
-                   Print Part $(5,Width/4), counter1, counter2,internal, $(7),Str$(Now , "hh:mm:ss" ) 
-                  Refresh 5000' execute together
+                        wait 5
+                        Refresh 5000' execute together
+
             }  As together
             internal++
             Profiler
@@ -33861,6 +33864,7 @@ Print "record saved"
 soundrec end
 }
 MODULE REV34VER10 {module testA {
+	Print @FunctionReturnGroup()=>GroupMember
 	Print @FunctionReturnGroup()=>Name()=>v$()="Ok"
 	Print @FunctionReturnGroup()=>Name()=>val()=1234
 	Print @FunctionReturnGroup()=>Name()=>prop=500
@@ -33906,6 +33910,7 @@ module testB {
 		}
 		=a
 	}
+	Print FunctionReturnGroup()=>GroupMember
 	Print FunctionReturnGroup()=>Name()=>v$()="Ok"
 	Print FunctionReturnGroup()=>Name()=>val()=1234
 	Print FunctionReturnGroup()=>Name()=>prop=500
@@ -33932,6 +33937,7 @@ module testC {
 		}
 		=a
 	}
+	Print FunctionReturnGroup()=>GroupMember
 	KK=FunctionReturnGroup()
 	for kk {
 		 Print .Name()=>v$()="Ok"
@@ -33950,6 +33956,7 @@ module testC {
 	}
 }
 module testD {
+	Print @FunctionReturnGroup()=>GroupMember
 	KK=@FunctionReturnGroup()
 	for kk {
 		 Print .Name()=>v$()="Ok"

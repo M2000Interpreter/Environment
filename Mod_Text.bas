@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 34
+Global Const Revision = 35
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -10464,15 +10464,7 @@ End If
 If Not IsStrExp Then Set basestack.lastobj = Nothing
 rr$ = ac$
  End Function
-Function GrabFrame() As String
-Dim p As New cDIBSection
 
-p.CreateFromPicture hDCToPicture(GetDC(0), AVI.Left / DXP, AVI.top / DYP, AVI.Width / DXP, AVI.Height / DYP - 1)
-If p.Height > 0 Then
-
-GrabFrame = DIBtoSTR(p)
-End If
-End Function
 Function ReadVarDouble(bstack As basetask, what$) As Variant
 Dim vvv As Variant
 bstack.ReadVar what$, vvv
@@ -20871,7 +20863,7 @@ End Sub
 Function LinkGroup(bstack As basetask, ByVal Name$, inpq As Variant, Optional usefinal As Boolean = False) As Boolean
 Dim i As Long, Vlist As Boolean, FList, F$, aa$, v As Long
 Dim s() As String, ThisGroup As Group, q As Group, ss$, it As Long, ohere$, itGroup As Group
-Dim UnhidePrivate As Boolean
+Dim UnhidePrivate As Boolean, c As Constant
 
 If Typename(inpq) <> mgroup Then Exit Function
 Set q = inpq
@@ -20900,109 +20892,109 @@ FList = q.FuncList
 ohere$ = here$
 here$ = Left$(Name$, Len(Name$) - 1)
 For i = 1 To q.soros.Total
-aa$ = q.soros.StackItem(i)
-v = Split(aa$)(1)
-Vlist = True
-Select Case Typename(var(v))
-Case mgroup
-Set ThisGroup = var(v)
-With ThisGroup
-    ss$ = Split(aa$)(0)
-    
-    
-    If Left$(ss$, 1) = "*" Then
-        ss$ = Mid$(ss$, 2)
-        If UnhidePrivate And AscW(ss$) = -65 Then
-        ss$ = Mid$(ss$, 2)
-        End If
-        If .IamApointer Then
-        
-       varhash.ItemCreator Name$ + ss$, v, True
-       Else
-       it = globalvar(ss$, it)
-       MakeitObject2 var(it)
-       LinkGroup bstack, ss$, var(v)
-       Set itGroup = var(it)
-        itGroup.edittag = .edittag
-        itGroup.FuncList = .FuncList
-        itGroup.GroupName = ss$ + "."
-        Set itGroup.Sorosref = .soros.Copy
-        itGroup.HasValue = .HasValue
-        itGroup.HasSet = .HasSet
-        itGroup.HasStrValue = .HasStrValue
-        itGroup.HasParameters = .HasParameters
-        itGroup.HasParametersSet = .HasParametersSet
-        itGroup.HasRemove = .HasRemove
-        Set itGroup.Events = .Events
-        
-        itGroup.highpriorityoper = .highpriorityoper
-        itGroup.HasUnary = .HasUnary
-        
-        itGroup.Patch = Name$ + ss$
-        If .HasStrValue Then
-              varhash.ItemCreator Name$ + ss$ + "$", it, True
-        End If
-        Set itGroup.mytypes = .mytypes
-        End If
-        
-       
-    Else
-    it = globalvar(ss$, it)
-        MakeitObject2 var(it)
-        Set itGroup = var(it)
-        If .IamApointer Then
-            If .link.IamFloatGroup Then
-               Set itGroup.LinkRef = .link
-                itGroup.IamApointer = True
-                itGroup.isref = True
-            Else
-           
-            
-                itGroup.edittag = .link.edittag
-                itGroup.FuncList = .link.FuncList
-                itGroup.GroupName = ss$ + "."
-                Set itGroup.Sorosref = .link.soros.Copy
-                itGroup.HasValue = .link.HasValue
-                itGroup.HasSet = .link.HasSet
-                itGroup.HasStrValue = .link.HasStrValue
-                itGroup.HasParameters = .link.HasParameters
-                itGroup.HasParametersSet = .link.HasParametersSet
-                itGroup.HasRemove = .link.HasRemove
-                Set itGroup.Events = .link.Events
-            
-                itGroup.highpriorityoper = .link.highpriorityoper
-                itGroup.HasUnary = .link.HasUnary
-                itGroup.Patch = here$ + "." + ss$
-                If .link.HasStrValue Then
-                    varhash.ItemCreator Name$ + ss$ + "$", it, True
+    aa$ = q.soros.StackItem(i)
+    v = Split(aa$)(1)
+    Vlist = True
+    If MyIsObject(var(v)) Then
+        Select Case Typename(var(v))
+        Case mgroup
+            Set ThisGroup = var(v)
+            With ThisGroup
+                ss$ = Split(aa$)(0)
+                If Left$(ss$, 1) = "*" Then
+                    ss$ = Mid$(ss$, 2)
+                    If UnhidePrivate And AscW(ss$) = -65 Then
+                        ss$ = Mid$(ss$, 2)
+                    End If
+                    If .IamApointer Then
+                        varhash.ItemCreator Name$ + ss$, v, True
+                    Else
+                        it = globalvar(ss$, it)
+                        MakeitObject2 var(it)
+                        LinkGroup bstack, ss$, var(v)
+                        Set itGroup = var(it)
+                        itGroup.edittag = .edittag
+                        itGroup.FuncList = .FuncList
+                        itGroup.GroupName = ss$ + "."
+                        Set itGroup.Sorosref = .soros.Copy
+                        itGroup.HasValue = .HasValue
+                        itGroup.HasSet = .HasSet
+                        itGroup.HasStrValue = .HasStrValue
+                        itGroup.HasParameters = .HasParameters
+                        itGroup.HasParametersSet = .HasParametersSet
+                        itGroup.HasRemove = .HasRemove
+                        Set itGroup.Events = .Events
+                        itGroup.highpriorityoper = .highpriorityoper
+                        itGroup.HasUnary = .HasUnary
+                        
+                        itGroup.Patch = Name$ + ss$
+                        If .HasStrValue Then
+                              varhash.ItemCreator Name$ + ss$ + "$", it, True
+                        End If
+                        Set itGroup.mytypes = .mytypes
+                    End If
+                Else
+                    it = globalvar(ss$, it)
+                    MakeitObject2 var(it)
+                    Set itGroup = var(it)
+                    If .IamApointer Then
+                        If .link.IamFloatGroup Then
+                           Set itGroup.LinkRef = .link
+                            itGroup.IamApointer = True
+                            itGroup.isref = True
+                        Else
+                            itGroup.edittag = .link.edittag
+                            itGroup.FuncList = .link.FuncList
+                            itGroup.GroupName = ss$ + "."
+                            Set itGroup.Sorosref = .link.soros.Copy
+                            itGroup.HasValue = .link.HasValue
+                            itGroup.HasSet = .link.HasSet
+                            itGroup.HasStrValue = .link.HasStrValue
+                            itGroup.HasParameters = .link.HasParameters
+                            itGroup.HasParametersSet = .link.HasParametersSet
+                            itGroup.HasRemove = .link.HasRemove
+                            Set itGroup.Events = .link.Events
+                            itGroup.highpriorityoper = .link.highpriorityoper
+                            itGroup.HasUnary = .link.HasUnary
+                            itGroup.Patch = here$ + "." + ss$
+                            If .link.HasStrValue Then
+                                varhash.ItemCreator Name$ + ss$ + "$", it, True
+                            End If
+                            Set itGroup.mytypes = .link.mytypes
+                        End If
+                    Else
+                        If UnhidePrivate And AscW(ss$) = -65 Then
+                            ss$ = Mid$(ss$, 2)
+                        End If
+                        varhash.ItemCreator Name$ + ss$, v, True, , True
+                    End If
                 End If
-                Set itGroup.mytypes = .link.mytypes
+            End With
+        Case "lambda"
+islambda:
+            ss$ = Split(aa$)(0)
+            If UnhidePrivate And AscW(ss$) = -65 Then
+            ss$ = Mid$(ss$, 2)
             End If
-            
-       Else
+            varhash.ItemCreator Name$ + ss$, v, True
+            GlobalSub Name$ + ss$ + "()", "", Name$, , v
+        Case "Constant"
+            If var(v).flag Then
+                GoTo islambda
+            Else
+                GoTo cont123
+            End If
+        Case Else
+            GoTo cont123
+        End Select
+    Else
+cont123:
+        ss$ = Split(aa$)(0)
+        varhash.ItemCreator Name$ + ss$, v, True, , True
         If UnhidePrivate And AscW(ss$) = -65 Then
-        ss$ = Mid$(ss$, 2)
+            varhash.ItemCreator Name$ + Mid$(ss$, 2), v, True, , True
         End If
-       varhash.ItemCreator Name$ + ss$, v, True, , True
-       End If
     End If
-End With
-Case "lambda"
-ss$ = Split(aa$)(0)
-        If UnhidePrivate And AscW(ss$) = -65 Then
-        ss$ = Mid$(ss$, 2)
-        End If
-    varhash.ItemCreator Name$ + ss$, v, True
-
-         GlobalSub Name$ + ss$ + "()", "", Name$, , v
-Case Else
-ss$ = Split(aa$)(0)
-    varhash.ItemCreator Name$ + ss$, v, True, , True
-    If UnhidePrivate And AscW(ss$) = -65 Then
-    varhash.ItemCreator Name$ + Mid$(ss$, 2), v, True, , True
-    End If
-End Select
-
 Next
 
 
@@ -37686,12 +37678,17 @@ checkconstant:
     
                 globalvar what$, i, True
                 If Typename(var(i)) = "lambda" Then
+islambda:
+                
                     If ohere$ = vbNullString Then
                         GlobalSub what$ + "()", "", , , i
                     Else
                         GlobalSub ohere$ & "." & bstack.GroupName & what$ + "()", "", , , i
                     End If
+                ElseIf Typename(var(i)) = "Constant" Then
+                    If var(i).flag Then GoTo islambda
                 End If
+                
             End If
         Else
             it = globalvar(what$, it)
