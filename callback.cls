@@ -469,7 +469,7 @@ stacksize = 900000
 End Sub
 
 Private Sub Class_Terminate()
-Dim i As Long
+Dim Zero As basket, i As Long, zerocounter As Counters
 StopTimer
 If objref Is Nothing Then Exit Sub
 Set objref.Owner = Nothing
@@ -478,6 +478,10 @@ Set objref = Nothing
 globalstack.Flush
 TerminateM2000
 terminatefinal
+For i = -2 To 1000
+    players(i) = Zero
+    Prefresh(i) = zerocounter
+Next i
 If Forms.count > 0 Then
 For i = Forms.count - 1 To 0
 Set Forms(i).icon = LoadPicture("")

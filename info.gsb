@@ -6517,8 +6517,10 @@ Layer Alfa {
                         }
                         counter2++
                         } As disp
-                        wait 5
-                        Refresh 5000' execute together
+                        if not OpenInfo then
+                            wait 5
+                            Refresh 5000' execute together
+                        end if
 
             }  As together
             internal++
@@ -6562,7 +6564,8 @@ Method Alfa, "Show"
 \\ Task.Main is a Thread
 \\ ExitNow needed If we have Every in place of Task.Main
 Task.Main 50 {
-      if OpenInfo then showinfo()
+      if not together  then if OpenInfo then showinfo()
+
       If ExitNow Then Exit
 }
 Threads Erase
@@ -6577,14 +6580,12 @@ Smooth off
 Set Fast   ' return to normal
 sub showinfo()
       OpenInfo=false
-      after 100 {
-		Info$={
-			This is an example
-			of  using MATH object
-			(included in M2000 Interpreter)
-			}
-		AskRet=Ask(info$,"About Demo1","","")	
-	}
+	Info$={
+		This is an example
+		of  using MATH object
+		(included in M2000 Interpreter)
+		}
+	AskRet=Ask(info$,"About Demo1","","")	
 end sub
 }
 MODULE UPDATE {// if you can't run update, means that you get an error and the name of the module erased from the list where the we place a statement replacer
@@ -31788,7 +31789,6 @@ finale=false
 Spot$=""
 Image Hand  (#333333) to Spot$, 50
 Hide
-
 Back 12 {
 Cls 5,0
 // Refresh 5000
@@ -31861,7 +31861,7 @@ Semaphore=False
 Thread {
 		Part {
 			cursor 0,0
-			Print Over $(5,10), Names$(Col(TopPlayer)), @WhoisThere(), Px(TopPlayer), Py(TopPlayer), $("0.00"), R(TopPlayer), S(TopPlayer)
+			Print Over $(5,10), Names$(Col(TopPlayer)), @WhoisThere2(), Px(TopPlayer), Py(TopPlayer), $("0.00"), R(TopPlayer), S(TopPlayer)
 			Print  Under
 	} as Semaphore
 } as Informe interval 1000/25
@@ -31885,7 +31885,7 @@ every 1000/25{
 	else.if mouse= 1 then
 		Part {
 		HideAllIcon()
-		Which=@WhoisThere() 
+		Which=@WhoisThere2() 
 		if Which>0 and Which<3  then
 			TopPlayer=PlayersOrder(which)
 			Player Which over 3
@@ -31980,6 +31980,18 @@ Layer 3 {
 }
 Player 1 show
 End Sub
+Function WhoisThere2()
+	local i
+	for i=3 to 1
+	layer i {
+		move mouse.x, mouse.y
+		if point=0x7FFFFFFF then exit
+		if point=#333333 then exit
+		local hit=i
+	}
+	if valid(hit) then = i : exit for
+	next i
+End Function
 Function WhoisThere()
 	local m=Binary.AND(Collide(4,10), 7)
 	if m=0 then exit function

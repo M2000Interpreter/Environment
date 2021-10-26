@@ -112,6 +112,8 @@ Private Declare Function SelectObject Lib "gdi32" (ByVal Hdc As Long, ByVal hObj
 Private Declare Function CreateSolidBrush Lib "gdi32" (ByVal crColor As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Private Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) As Long
+Private Declare Function GetWindowRgn Lib "user32.dll" (ByVal hwnd As Long, ByVal hRgn As Long) As Long
+
 ' GDI+ functions
 Public Enum GP_MetafileType
     GP_MT_Invalid = 0
@@ -177,50 +179,52 @@ End Type
 
 Private Declare Function GdipGetMetafileHeaderFromMetafile Lib "gdiplus" (ByVal hMetafile As Long, ByRef dstHeader As GP_MetafileHeader) As Long
 
+Private Declare Function GdipCreateRegionHrgn Lib "gdiplus.dll" (ByVal hRgn As Long, Region As Long) As Long
+Private Declare Function GdipDeleteRegion Lib "gdiplus.dll" (ByVal Region As Long) As Long
 Private Declare Function GdipGetImageType Lib "gdiplus" (ByVal Image As Long, ImageType As Long) As Long
 Private Declare Function GdipDrawImage Lib "gdiplus" (ByVal graphics As Long, ByVal Image As Long, ByVal x As Single, ByVal y As Single) As Long
-Private Declare Function GdipCreateFromHWND Lib "gdiplus" (ByVal hWnd As Long, graphics As Long) As Long
-Private Declare Function GdipSetSmoothingMode Lib "GdiPlus.dll" (ByVal mGraphics As Long, ByVal mSmoothingMode As Long) As Long
+Private Declare Function GdipCreateFromHWND Lib "gdiplus" (ByVal hwnd As Long, graphics As Long) As Long
+Private Declare Function GdipSetSmoothingMode Lib "gdiplus.dll" (ByVal mGraphics As Long, ByVal mSmoothingMode As Long) As Long
 Private Declare Function GdipTranslateWorldTransform Lib "gdiplus" (ByVal graphics As Long, ByVal dX As Single, ByVal dY As Single, ByVal order As Long) As Long
 Private Declare Function GdipDisposeImageAttributes Lib "gdiplus" (ByVal imgAttr As Long) As Long
 Private Declare Function GdipCreateImageAttributes Lib "gdiplus" (ByRef imgAttr As Long) As Long
 Private Declare Function GdipSetImageAttributesColorMatrix Lib "gdiplus" (ByVal imgAttr As Long, ByVal clrAdjust As Long, ByVal clrAdjustEnabled As Long, ByRef clrMatrix As Any, ByRef grayMatrix As Any, ByVal clrMatrixFlags As Long) As Long
-Private Declare Function GdipSetImageAttributesColorKeys Lib "GdiPlus.dll" (ByVal mImageattr As Long, ByVal mType As Long, ByVal mEnableFlag As Long, ByVal mColorLow As Long, ByVal mColorHigh As Long) As Long
-Private Declare Function GdipSetPixelOffsetMode Lib "GdiPlus.dll" (ByVal graphics As Long, ByVal PixelOffsetMode As Long) As Long
-Private Declare Function GdipRotateWorldTransform Lib "GdiPlus.dll" (ByVal graphics As Long, ByVal angle As Single, ByVal order As Long) As Long
-Private Declare Function GdipLoadImageFromFile Lib "GdiPlus.dll" (ByVal FileName As Long, GpImage As Long) As Long
-Private Declare Function GdiplusStartup Lib "GdiPlus.dll" (Token As Long, gdipInput As GdiplusStartupInput, GdiplusStartupOutput As Long) As Long
-Private Declare Function GdipCreateFromHDC Lib "GdiPlus.dll" (ByVal Hdc As Long, GpGraphics As Long) As Long
-Private Declare Function GdipSetInterpolationMode Lib "GdiPlus.dll" (ByVal graphics As Long, ByVal InterMode As Long) As Long
-Private Declare Function GdipDrawImageRectI Lib "GdiPlus.dll" (ByVal graphics As Long, ByVal Img As Long, ByVal x As Long, ByVal y As Long, ByVal Width As Long, ByVal Height As Long) As Long
+Private Declare Function GdipSetImageAttributesColorKeys Lib "gdiplus.dll" (ByVal mImageattr As Long, ByVal mType As Long, ByVal mEnableFlag As Long, ByVal mColorLow As Long, ByVal mColorHigh As Long) As Long
+Private Declare Function GdipSetPixelOffsetMode Lib "gdiplus.dll" (ByVal graphics As Long, ByVal PixelOffsetMode As Long) As Long
+Private Declare Function GdipRotateWorldTransform Lib "gdiplus.dll" (ByVal graphics As Long, ByVal angle As Single, ByVal order As Long) As Long
+Private Declare Function GdipLoadImageFromFile Lib "gdiplus.dll" (ByVal FileName As Long, GpImage As Long) As Long
+Private Declare Function GdiplusStartup Lib "gdiplus.dll" (Token As Long, gdipInput As GdiplusStartupInput, GdiplusStartupOutput As Long) As Long
+Private Declare Function GdipCreateFromHDC Lib "gdiplus.dll" (ByVal Hdc As Long, GpGraphics As Long) As Long
+Private Declare Function GdipSetInterpolationMode Lib "gdiplus.dll" (ByVal graphics As Long, ByVal InterMode As Long) As Long
+Private Declare Function GdipDrawImageRectI Lib "gdiplus.dll" (ByVal graphics As Long, ByVal Img As Long, ByVal x As Long, ByVal y As Long, ByVal Width As Long, ByVal Height As Long) As Long
 
 Private Declare Function GdipConvertToEmfPlus Lib "gdiplus" (ByVal hGraphics As Long, ByVal srcMetafile As Long, ByRef conversionSuccess As Long, ByVal typeOfEMF As Long, ByVal ptrToMetafileDescription As Long, ByRef dstMetafilePtr As Long) As Long
 
 Private Declare Function GdipGetHemfFromMetafile Lib "gdiplus" (ByVal metafile As Long, hEmf As Long) As Long
 
-Private Declare Function GdipDrawImageRectRectI Lib "GdiPlus.dll" (ByVal graphics As Long, ByVal Img As Long, ByVal dstX As Long, ByVal dstY As Long, ByVal dstWidth As Long, ByVal dstHeight As Long, ByVal srcX As Long, ByVal srcY As Long, ByVal srcWidth As Long, ByVal srcHeight As Long, ByVal srcUnit As Long, Optional ByVal imageAttributes As Long = 0, Optional ByVal Callback As Long = 0, Optional ByVal callbackData As Long = 0) As Long
-Private Declare Function GdipDeleteGraphics Lib "GdiPlus.dll" (ByVal graphics As Long) As Long
-Private Declare Function GdipDisposeImage Lib "GdiPlus.dll" (ByVal Image As Long) As Long
-Private Declare Function GdipCreateBitmapFromHBITMAP Lib "GdiPlus.dll" (ByVal hbmp As Long, ByVal hPal As Long, GpBitmap As Long) As Long
-Private Declare Function GdipGetImageWidth Lib "GdiPlus.dll" (ByVal Image As Long, Width As Long) As Long
-Private Declare Function GdipGetImageHeight Lib "GdiPlus.dll" (ByVal Image As Long, Height As Long) As Long
-Private Declare Function GdipCreateMetafileFromWmf Lib "GdiPlus.dll" (ByVal hWmf As Long, ByVal deleteWmf As Long, WmfHeader As wmfPlaceableFileHeader, metafile As Long) As Long
-Private Declare Function GdipCreateMetafileFromEmf Lib "GdiPlus.dll" (ByVal hEmf As Long, ByVal deleteEmf As Long, metafile As Long) As Long
+Private Declare Function GdipDrawImageRectRectI Lib "gdiplus.dll" (ByVal graphics As Long, ByVal Img As Long, ByVal dstX As Long, ByVal dstY As Long, ByVal dstWidth As Long, ByVal dstHeight As Long, ByVal srcX As Long, ByVal srcY As Long, ByVal srcWidth As Long, ByVal srcHeight As Long, ByVal srcUnit As Long, Optional ByVal imageAttributes As Long = 0, Optional ByVal Callback As Long = 0, Optional ByVal callbackData As Long = 0) As Long
+Private Declare Function GdipDeleteGraphics Lib "gdiplus.dll" (ByVal graphics As Long) As Long
+Private Declare Function GdipDisposeImage Lib "gdiplus.dll" (ByVal Image As Long) As Long
+Private Declare Function GdipCreateBitmapFromHBITMAP Lib "gdiplus.dll" (ByVal hbmp As Long, ByVal hPal As Long, GpBitmap As Long) As Long
+Private Declare Function GdipGetImageWidth Lib "gdiplus.dll" (ByVal Image As Long, Width As Long) As Long
+Private Declare Function GdipGetImageHeight Lib "gdiplus.dll" (ByVal Image As Long, Height As Long) As Long
+Private Declare Function GdipCreateMetafileFromWmf Lib "gdiplus.dll" (ByVal hWmf As Long, ByVal deleteWmf As Long, WmfHeader As wmfPlaceableFileHeader, metafile As Long) As Long
+Private Declare Function GdipCreateMetafileFromEmf Lib "gdiplus.dll" (ByVal hEmf As Long, ByVal deleteEmf As Long, metafile As Long) As Long
 
-Private Declare Function GdipCreateBitmapFromHICON Lib "GdiPlus.dll" (ByVal hIcon As Long, GpBitmap As Long) As Long
-Private Declare Sub GdiplusShutdown Lib "GdiPlus.dll" (ByVal Token As Long)
+Private Declare Function GdipCreateBitmapFromHICON Lib "gdiplus.dll" (ByVal hIcon As Long, GpBitmap As Long) As Long
+Private Declare Sub GdiplusShutdown Lib "gdiplus.dll" (ByVal Token As Long)
 Private Declare Function GdipDrawLineI Lib "gdiplus" (ByVal graphics As Long, ByVal pen As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
-Private Declare Function GdipCreateSolidFill Lib "GdiPlus.dll" (ByVal mColor As Long, ByRef mBrush As Long) As Long
-Private Declare Function GdipDeleteBrush Lib "GdiPlus.dll" (ByVal mBrush As Long) As Long
-Private Declare Function GdipDeletePen Lib "GdiPlus.dll" (ByVal mPen As Long) As Long
-Private Declare Function GdipCreatePen1 Lib "GdiPlus.dll" (ByVal mColor As Long, ByVal mWidth As Single, ByVal mUnit As Long, ByRef mPen As Long) As Long
-Private Declare Function GdipSetPenEndCap Lib "GdiPlus.dll" (ByVal mPen As Long, ByVal mCap As Long) As Long
-Private Declare Function GdipSetPenStartCap Lib "GdiPlus.dll" (ByVal mPen As Long, ByVal mCap As Long) As Long
+Private Declare Function GdipCreateSolidFill Lib "gdiplus.dll" (ByVal mColor As Long, ByRef mBrush As Long) As Long
+Private Declare Function GdipDeleteBrush Lib "gdiplus.dll" (ByVal mBrush As Long) As Long
+Private Declare Function GdipDeletePen Lib "gdiplus.dll" (ByVal mPen As Long) As Long
+Private Declare Function GdipCreatePen1 Lib "gdiplus.dll" (ByVal mColor As Long, ByVal mWidth As Single, ByVal mUnit As Long, ByRef mPen As Long) As Long
+Private Declare Function GdipSetPenEndCap Lib "gdiplus.dll" (ByVal mPen As Long, ByVal mCap As Long) As Long
+Private Declare Function GdipSetPenStartCap Lib "gdiplus.dll" (ByVal mPen As Long, ByVal mCap As Long) As Long
 Private Declare Function GdipDrawLinesI Lib "gdiplus" (ByVal graphics As Long, ByVal pen As Long, ByRef pPoints As Any, ByVal count As Long) As Long
 Private Declare Function GdipSetPenLineJoin Lib "gdiplus" (ByVal pen As Long, ByVal lnJoin As Long) As Long
 Private Declare Function GdipFillPolygon2I Lib "gdiplus" (ByVal graphics As Long, ByVal brush As Long, Points As Any, ByVal count As Long) As Long
-Private Declare Function GdipCreateHatchBrush Lib "GdiPlus.dll" (ByVal mHatchStyle As Long, ByVal mForecol As Long, ByVal mBackcol As Long, ByRef mBrush As Long) As Long
-Private Declare Function GdipSetPenDashStyle Lib "GdiPlus.dll" (ByVal mPen As Long, ByVal mDashStyle As Long) As Long
+Private Declare Function GdipCreateHatchBrush Lib "gdiplus.dll" (ByVal mHatchStyle As Long, ByVal mForecol As Long, ByVal mBackcol As Long, ByRef mBrush As Long) As Long
+Private Declare Function GdipSetPenDashStyle Lib "gdiplus.dll" (ByVal mPen As Long, ByVal mDashStyle As Long) As Long
 Private Declare Function GdipDrawCurveI Lib "gdiplus" (ByVal graphics As Long, ByVal mPen As Long, Points As Any, ByVal count As Long) As Long
 Private Declare Function GdipDrawCurve2I Lib "gdiplus" (ByVal graphics As Long, ByVal mPen As Long, Points As Any, ByVal count As Long, ByVal tension As Single) As Long
 Private Declare Function GdipFillClosedCurveI Lib "gdiplus" (ByVal graphics As Long, ByVal brush As Long, Points As Any, ByVal count As Long) As Long
@@ -228,6 +232,7 @@ Private Declare Function GdipFillClosedCurve2I Lib "gdiplus" (ByVal graphics As 
 Private Declare Function GdipDrawBeziersI Lib "gdiplus" (ByVal graphics As Long, ByVal pen As Long, Points As Any, ByVal count As Long) As Long
 Private Declare Function GdipCreatePath Lib "gdiplus" (ByVal brushmode As Long, Path As Long) As Long
 Private Declare Function GdipAddPathBeziersI Lib "gdiplus" (ByVal Path As Long, Points As Any, ByVal count As Long) As Long
+Private Declare Function GdipFillRegion Lib "gdiplus" (ByVal graphics As Long, ByVal brush As Long, ByVal Region As Long) As Long
 Private Declare Function GdipFillPath Lib "gdiplus" (ByVal graphics As Long, ByVal brush As Long, ByVal Path As Long) As Long
 Private Declare Function GdipDrawPath Lib "gdiplus" (ByVal graphics As Long, ByVal mPen As Long, ByVal Path As Long) As Long
 Private Declare Function GdipDeletePath Lib "gdiplus" (ByVal Path As Long) As Long
@@ -240,7 +245,7 @@ Private Declare Function GdipFlush Lib "gdiplus" (ByVal graphics As Long, ByVal 
 Private Declare Function GdipResetPageTransform Lib "gdiplus" (ByVal graphics As Long) As Long
 Private Declare Function GdipSetSolidFillColor Lib "gdiplus" (ByVal brush As Long, ByVal argb As Long) As Long
 Private Declare Function GdipGetSolidFillColor Lib "gdiplus" (ByVal brush As Long, argb As Long) As Long
-Private Declare Function GdipCreateLineBrushI Lib "GdiPlus.dll" (point1 As Any, point2 As Any, ByVal color1 As Long, ByVal color2 As Long, ByVal WrapMode As Long, hBrush As Long) As Long
+Private Declare Function GdipCreateLineBrushI Lib "gdiplus.dll" (point1 As Any, point2 As Any, ByVal color1 As Long, ByVal color2 As Long, ByVal WrapMode As Long, hBrush As Long) As Long
 
 Private Declare Function GdipSetLineColors Lib "gdiplus" (ByVal brush As Long, ByVal color1 As Long, ByVal color2 As Long) As Long
 Private Declare Function GdipGetLineColors Lib "gdiplus" (ByVal brush As Long, lColors As Long) As Long
@@ -1575,4 +1580,29 @@ GdipCreateLineBrushI point(UseVertical), point(1), color2, color1, 1, hBrush
 GdipFillPolygon2I graphics, hBrush, point(0), 5
 GdipDeleteBrush hBrush
 GdipDeleteGraphics graphics
+End Sub
+Sub GdiPlusGradientRegion(whois As Long, x1 As Long, y1 As Long, x2 As Long, y2 As Long, ByVal color1 As Long, ByVal color2 As Long, Optional UseVertical As Long)
+Dim point(4) As POINTAPI, graphics As Long, hBrush As Long, hRegion As Long, myRgn As Long
+myRgn = CreateRectRgn(0&, 0&, 0&, 0&)
+If GetWindowRgn(Form1.dSprite(whois).hwnd, myRgn) <> 0 Then
+point(0).x = x1
+point(0).y = y1
+point(1).x = x2
+point(1).y = y1
+point(2).x = x2
+point(2).y = y2
+point(3).x = x1
+point(3).y = y2
+point(4).x = x1
+point(4).y = y2
+UseVertical = Abs(UseVertical <> 0) * 2
+GdipCreateFromHDC Form1.dSprite(whois).Hdc, graphics
+GdipCreateRegionHrgn myRgn, hRegion
+GdipCreateLineBrushI point(UseVertical), point(1), color2, color1, 1, hBrush
+GdipFillRegion graphics, hBrush, hRegion
+GdipDeleteBrush hBrush
+GdipDeleteRegion hRegion
+GdipDeleteGraphics graphics
+End If
+'DeleteObject myRgn
 End Sub

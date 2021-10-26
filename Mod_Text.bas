@@ -50,7 +50,7 @@ Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (By
 Private Declare Function CallWindowProc _
  Lib "user32.dll" Alias "CallWindowProcW" ( _
  ByVal lpPrevWndFunc As Long, _
- ByVal hWnd As Long, _
+ ByVal hwnd As Long, _
  ByVal Msg As Long, _
  ByVal wParam As Long, _
  ByVal lParam As Long) As Long
@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 35
+Global Const Revision = 36
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -227,11 +227,11 @@ Public trace As Boolean, tracecounter As Long, bypasstrace As Boolean
 Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 
 Public Declare Function SetTimer Lib "user32" _
-       (ByVal hWnd As Long, ByVal nIDEvent As Long, _
+       (ByVal hwnd As Long, ByVal nIDEvent As Long, _
         ByVal uElapse As Long, ByVal lpTimerFunc As Long) As Long
 
 Public Declare Sub KillTimer Lib "user32" _
-       (ByVal hWnd As Long, ByVal nIDEvent As Long)
+       (ByVal hwnd As Long, ByVal nIDEvent As Long)
 'Public Type tagInitCommonControlsEx
  ' lngSize As Long
   ' lngICC As Long
@@ -4741,11 +4741,11 @@ Exit Function
 num88: ' "охомг","SHOW"
     If Not Screen.ActiveForm Is Nothing Then
     If bstack.Owner Is Form1.DIS Then
-    R = SG * (Form1.hWnd = Screen.ActiveForm.hWnd And bstack.Owner.Visible)
+    R = SG * (Form1.hwnd = Screen.ActiveForm.hwnd And bstack.Owner.Visible)
     ElseIf Typename(bstack.Owner) = "PictureBox" Then
     R = SG * bstack.Owner.Visible
     Else
-    R = SG * bstack.Owner.hWnd = Screen.ActiveForm.hWnd
+    R = SG * bstack.Owner.hwnd = Screen.ActiveForm.hwnd
     End If
     Else
     R = False
@@ -5160,7 +5160,12 @@ num57: ' "POINT", "сглеио"
     Else
     IsNumberNew = True
     With players(GetCode(bstack.Owner))
-       R = SG * -(GetPixel(bstack.Owner.Hdc, .XGRAPH \ dv15, .YGRAPH \ dv15) And &HFFFFFF)
+    w1 = GetPixel(bstack.Owner.Hdc, .XGRAPH \ dv15, .YGRAPH \ dv15)
+        If w1 = -1 Then
+            R = SG * &H7FFFFFFF
+        Else
+            R = SG * -(w1 And &HFFFFFF)
+        End If
     End With
     End If
     Exit Function
@@ -15475,7 +15480,7 @@ contTarg:
 ContScan:
                 ClearJoyAll
                 PollJoypadk
-                If GetForegroundWindow <> Form1.hWnd Or Not Targets Then
+                If GetForegroundWindow <> Form1.hwnd Or Not Targets Then
                     If IsExp(bstack, b$, p, , True) Then
                     End If
                     MyDoEvents0 di
@@ -15512,7 +15517,7 @@ ContScan:
                         If IsExp(bstack, b$, p, , True) Then
                         sX = Timer + p
                         x1 = Form1.lockme
-                        If x1 Then UnHook Form1.hWnd
+                        If x1 Then UnHook Form1.hwnd
                             Form1.lockme = False
                             Do
                                 y1 = BLOCKkey
@@ -15529,7 +15534,7 @@ ContScan:
                                 End If
                             Loop Until NoAction Or Timer > sX Or myexit(bstack) Or bstack.IamThread
                             Form1.lockme = x1
-                            If x1 And GetForegroundWindow = Form1.hWnd Then Form1.hookme Form1.TEXT1.glistN
+                            If x1 And GetForegroundWindow = Form1.hwnd Then Form1.hookme Form1.TEXT1.glistN
                         Else
                         Do
                             MyDoEvents0 Form1
@@ -45255,7 +45260,7 @@ Set var(i) = myMsgBox
 basestack.soros.PushVal 16
 basestack.soros.PushStr MesTitle$
 basestack.soros.PushStr "Fatal Error"
-basestack.soros.PushVal Form1.hWnd
+basestack.soros.PushVal Form1.hwnd
 CallByObject basestack, i, False
 Set var(i) = Nothing
 NERR = True
@@ -46923,12 +46928,12 @@ CheckThis = 2
 End Function
 Function myHwnd(bstack As basetask) As Double
 If Typename(bstack.Owner) = "GuiM2000" Then
-myHwnd = bstack.Owner.hWnd
+myHwnd = bstack.Owner.hwnd
 Else
 If ttl Then
-myHwnd = Form3.hWnd
+myHwnd = Form3.hwnd
 Else
-myHwnd = bstack.Owner.hWnd
+myHwnd = bstack.Owner.hwnd
 End If
 End If
 End Function

@@ -1,33 +1,13 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 35 active-X
-1. Fix const lambda to be used in a call by pass by reference
-	const b=lambda k=1 -> {
-		=k
-		k++
-	}
-	module dosomething (&k) {
-		Print k()
-	}
-	for k=1 to 10
-		dosomething &b
-	next
-2. Final lambda in groups now can be used in a call when the group passed by reference.
-	group M {
-		final b=lambda k=1 -> {
-			=k
-			k++
-		}
-	}
-	module dosomething (&k, &z) {
-		Print k.b()  ' k.b() is the same as z()
-		Print z()
-	}
-	for k=1 to 5
-		dosomething &M, &M.b
-	next
+Version 10 revision 36 active-X
+1)A broken statement:
+1. Fix the STOP statement. Now M1 module in info works fine.
 
-3.Update Demo1 in Info
+2-4)Improvements:
+2. Point now return 0x7FFFFFFF when we get color out of layer.
+3. Gradient statement to Player layers preserve colour in non displayed pixels (transparent by a region on the window). So We can test if mouse pointer on a sprite layer return 0x7FFFFFFF (out) or the transparent color which we use at Player statement.
+4. Module Sprites in info now has the new definitions (2 & 3) to handle better the displayed sprites using mouse.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

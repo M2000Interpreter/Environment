@@ -1662,6 +1662,7 @@ With Form1.dSprite(PobjNum)
 .Width = photo.Width * DXP * SZ
 .Picture = photo.Picture(SZ)
 
+
 players(PobjNum).x = .Width / 2
 players(PobjNum).y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, 0)
@@ -1681,12 +1682,13 @@ On Error Resume Next
 .Font.Size = SZ
 
 End With
-DeleteObject myRgn
+'''DeleteObject myRgn  ' from windows...
 
 GetNewSpriteObj = PobjNum
 With players(PobjNum)
 .MAXXGRAPH = .x * 2
 .MAXYGRAPH = .y * 2
+.hRgn = True
 End With
 SetText Form1.dSprite(PobjNum)
 End If
@@ -1980,11 +1982,12 @@ PobjNum = PobjNum + 1
 End Sub
 Sub ClrSprites()
 On Error Resume Next
-Dim i As Long
+Dim i As Long, Zero As basket, zerocounter As Counters
 If PobjNum > 0 Then
 For i = PobjNum To 1 Step -1
-players(i).x = 0: players(i).y = 0
-PobjNum = i
+        players(i) = Zero
+        Prefresh(i) = zerocounter
+        PobjNum = i
 If Form1.dSprite.count > PobjNum Then Unload Form1.dSprite(PobjNum)
 Next i
 PobjNum = 0

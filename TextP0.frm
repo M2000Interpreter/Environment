@@ -2016,12 +2016,6 @@ finale:
 ExTarget = True
 elevatestatus = 0
 nExit:
-Dim Zero As basket, i As Long, zerocounter As Counters
-For i = -2 To 100
-    players(i) = Zero
-    Prefresh(i) = zerocounter
-Next i
-
 If Not thisbs Is Nothing Then
     Set Basestack1 = oldbs
 End If
