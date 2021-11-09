@@ -56,13 +56,13 @@ If Not glistN Is Nothing Then glistN.Shutdown
 Set Callback = Nothing
 Set glistN = Nothing
 End Sub
-Public Sub move(x, y, Optional W, Optional H)
-If IsMissing(W) Then
+Public Sub move(x, y, Optional w, Optional h)
+If IsMissing(w) Then
 glistN.MoveTwips CLng(x), CLng(y), 0, 0
-ElseIf IsMissing(H) Then
-glistN.MoveTwips CLng(x), CLng(y), CLng(W), 0
+ElseIf IsMissing(h) Then
+glistN.MoveTwips CLng(x), CLng(y), CLng(w), 0
 Else
-glistN.MoveTwips CLng(x), CLng(y), CLng(W), CLng(H)
+glistN.MoveTwips CLng(x), CLng(y), CLng(w), CLng(h)
 End If
 End Sub
 
@@ -204,6 +204,8 @@ ff.bold = .CtrlFontBold
 End With
 
 With glistN
+.NoEscapeKey = True
+.bypassfirstClick = True
 .SingleLineSlide = True
 .NoPanLeft = True
 .NoPanRight = False
@@ -641,4 +643,6 @@ Public Sub SetBarStyle(bColor As Long, Optional bHatch As Long, Optional BHatchC
     glistN.BarHatch = bHatch
     glistN.BarHatchColor = BHatchColor
 End Sub
-
+Private Sub glistN_SyncKeyboardUnicode(a As String)
+Callback.SpreadKey a
+End Sub

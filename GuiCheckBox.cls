@@ -27,11 +27,11 @@ Dim Callback As GuiM2000
 Public Property Get GetCallBack() As Form
 Set GetCallBack = Callback
 End Property
-Public Property Get index() As Long
-index = mIndex
+Public Property Get Index() As Long
+Index = mIndex
 End Property
 
-Public Property Let index(ByVal RHS As Long)
+Public Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Private Sub glistN_CtrlPlusF1()
@@ -41,7 +41,7 @@ Private Sub glistN_CtrlPlusF1()
       Callback.Callback mesCtrlName + ".About()"
       End If
 End Sub
-Public Sub Construct(there As Form, name$)
+Public Sub Construct(there As Form, Name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
@@ -50,10 +50,10 @@ Public Sub Construct(there As Form, name$)
  there.AddGuiControl Me
  glistN.Dynamic
  there.Controls(ctrlName).TabStop = True
- mesCtrlName = name$
+ mesCtrlName = Name$
 End Sub
 
-Public Sub ConstructArray(there As Form, name$, i As Long)
+Public Sub ConstructArray(there As Form, Name$, i As Long)
  Set Callback = there
  On Error Resume Next
 
@@ -68,7 +68,7 @@ Public Sub ConstructArray(there As Form, name$, i As Long)
  there.AddGuiControl Me
  glistN.Dynamic
  there.Controls(ctrlName).TabStop = True
- mesCtrlName = name$
+ mesCtrlName = Name$
 End Sub
 Public Property Get enabled() As Long
 enabled = glistN.enabled
@@ -78,13 +78,13 @@ Public Property Let enabled(ByVal RHS As Long)
 If glistN Is Nothing Then Exit Property
 glistN.enabled = RHS
 End Property
-Public Sub Move(X, Y, Optional w, Optional h)
+Public Sub move(x, y, Optional w, Optional h)
 If IsMissing(w) Then
-glistN.MoveTwips CLng(X), CLng(Y), 0, 0
+glistN.MoveTwips CLng(x), CLng(y), 0, 0
 ElseIf IsMissing(h) Then
-glistN.MoveTwips CLng(X), CLng(Y), CLng(w), 0
+glistN.MoveTwips CLng(x), CLng(y), CLng(w), 0
 Else
-glistN.MoveTwips CLng(X), CLng(Y), CLng(w), CLng(h)
+glistN.MoveTwips CLng(x), CLng(y), CLng(w), CLng(h)
 End If
 End Sub
 Public Sub deconstruct()
@@ -95,13 +95,15 @@ End Sub
 Public Sub SetUp()
 Dim ff As New StdFont
 With Callback
-ff.name = .CtrlFontName
+ff.Name = .CtrlFontName
 ff.charset = Form1.DIS.Font.charset
 ff.Size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 End With
 With glistN
-glistN.clear
+.Clear
+.NoEscapeKey = True
+.bypassfirstClick = True
 .additem "  " + mCaptext
 .NoCaretShow = True
 .NoPanRight = False
@@ -110,7 +112,7 @@ glistN.clear
 .MenuItem 1, True, False, mValue
 .ListIndex = 0
 Set .Font = ff
-.ForeColor = Callback.Controls(1).ForeColor
+.forecolor = Callback.Controls(1).forecolor
 .dcolor = Callback.Controls(1).dcolor
 .LeftMarginPixels = .HeightPixels
 .ShowMe
@@ -196,7 +198,7 @@ Public Sub FontAttr(ThisFontName, Optional ThisMode = -1, Optional ThisBold = Tr
 Dim aa As New StdFont
 If ThisFontName <> "" Then
 
-aa.name = ThisFontName
+aa.Name = ThisFontName
 
 If ThisMode > 7 Then aa.Size = ThisMode Else aa = 7
 aa.bold = ThisBold
@@ -207,7 +209,7 @@ Private Sub glistN_OnResize()
 glistN.LeftMarginPixels = glistN.HeightPixels
 End Sub
 
-Private Sub glistN_PanLeftRight(Direction As Boolean)
+Private Sub glistN_PanLeftRight(direction As Boolean)
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Click(" + Str(mIndex) + "," + Str(checked) + ")"
    Else
@@ -238,7 +240,7 @@ End Property
 Public Property Let ShowAlways(ByVal vNewValue As Variant)
 mStayOpen = CBool(vNewValue)
 If mStayOpen Then
-glistN.ForeColor = rgb(0, 0, 0)
+glistN.forecolor = rgb(0, 0, 0)
 glistN.backcolor = rgb(255, 255, 255)
 End If
 End Property
@@ -262,4 +264,15 @@ Public Property Let icon(RHS)
 glistN.icon = RHS
 
 End Property
+
+Private Sub glistN_SyncKeyboardUnicode(a As String)
+Callback.SpreadKey a
+End Sub
+Private Sub glistN_Fkey(a As Integer)
+If a > 1000 Then
+Callback.SendFKEY a - 1000
+Else
+Callback.SendFKEY a
+End If
+End Sub
 

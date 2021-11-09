@@ -15331,14 +15331,15 @@ MODULE ERATO {Module EratosthenesSieve (x) {
       If x>200000 Then Exit
       Dim i(x+1)
       k=2
-      k2=x div 2
+      k2=sqrt(x)
       While k<=k2 {
             m=k+k
             While m<=x {
                   i(m)=1
                   m+=k
             }
-            k++
+            {k++: if i(k)then loop
+            }
       }
       For i=2 to x {
       If i(i)=0 Then Print i,
@@ -15346,6 +15347,7 @@ MODULE ERATO {Module EratosthenesSieve (x) {
       Print
 }
 EratosthenesSieve 1000
+
 }
 MODULE BUB {Module Bubble {
       function bubblesort {
@@ -32010,7 +32012,8 @@ Sub  RotateValues(&a(), N)
 	a(Z)=V
 End Sub
 }
-MODULE CODEPAGES {Charset 0
+MODULE CODEPAGES {MM=LOCALE
+Charset 0
 FONT "Tahoma"
 m$=fontname$
 Form ! 80, 40
@@ -32031,6 +32034,8 @@ Gosub 200
 wait 100
 While  (inkey(10)=-1 and mouse=0) {wait 10}
 cls
+LOCALE MM
+keyboard "info"+chr$(13)
 end
 100 Bold 0
 	m=tab

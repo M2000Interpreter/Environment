@@ -100,14 +100,14 @@ End With
  mesCtrlName = Name$
 End Sub
 
-Public Sub move(x, y, Optional w, Optional H)
+Public Sub move(x, y, Optional w, Optional h)
 With Textbox
 If IsMissing(w) Then
 .glistN.MoveTwips CLng(x), CLng(y), 0, 0
-ElseIf IsMissing(H) Then
+ElseIf IsMissing(h) Then
 .glistN.MoveTwips CLng(x), CLng(y), CLng(w), 0
 Else
-.glistN.MoveTwips CLng(x), CLng(y), CLng(w), CLng(H)
+.glistN.MoveTwips CLng(x), CLng(y), CLng(w), CLng(h)
 End If
 Pad.move Pad.Left, Pad.top, .glistN.widthtwips, .glistN.HeightTwips * 5
 End With
@@ -347,6 +347,10 @@ On Error Resume Next
 Textbox.SetFocus
 'If Iam Then
 ShowMenu
+End Sub
+
+Private Sub Textbox_Fkey(a As Integer)
+Callback.SendFKEY a
 End Sub
 
 Private Sub textbox_KeyDown(KeyCode As Integer, shift As Integer)
@@ -687,6 +691,10 @@ F = -1
 End If
 End Sub
 
+Private Sub Textbox_SyncKeyboardUnicode(a As String)
+Callback.SpreadKey a
+End Sub
+
 Private Sub TextBox_ValidString(ThatString As String, setpos As Long)
 Dim l As Boolean
 If Not AutoComplete Then Exit Sub
@@ -863,10 +871,11 @@ ff1.bold = .CtrlFontBold
 
 End With
 Set Textbox.glistN.Font = ff1
+Textbox.glistN.NoEscapeKey = True
+Textbox.glistN.bypassfirstClick = True
 Textbox.FadePartColor = &H777777
 Textbox.Retired
 With glistN
-
 .SingleLineSlide = True
 .NoPanLeft = True
 .NoPanRight = False
@@ -992,6 +1001,9 @@ mMenuStyle = vNewValue
 If mMenuStyle Then
 glistN.BorderStyle = 1
 Textbox.vartext = vbNullString
+Textbox.glistN.bypassfirstClick = False
+Else
+Textbox.glistN.bypassfirstClick = True
 End If
 End Property
 
@@ -1097,3 +1109,11 @@ On Error Resume Next
 glistN.addpixels = CLng(vNewValue / dv15)
 If Err.Number > 0 Then Exit Property
 End Property
+Private Sub glistN_Fkey(a As Integer)
+If a > 1000 Then
+Callback.SendFKEY a - 1000
+Else
+Callback.SendFKEY a
+End If
+End Sub
+

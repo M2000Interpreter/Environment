@@ -2270,12 +2270,15 @@ End If
 End If
 KeyCode = 0
 Case vbKeyF4
+
 If TEXT1.SelText <> "" Then mscatsub Else TEXT1.dothis
+
 KeyCode = 0
 Case vbKeyF5
 If TEXT1.SelText <> "" Then rthissub shift Mod 2 = 1
 KeyCode = 0
 Case vbKeyF6  ' Set/Show/Reset Para1
+
 MarkSoftButton para1, PosPara1
 KeyCode = 0
 Case vbKeyF7  'Set/Show/Reset Para2

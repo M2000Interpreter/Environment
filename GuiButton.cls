@@ -45,13 +45,13 @@ Public Sub ConstructArray(there As Form, Name$, i As Long)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Public Sub Move(X, Y, Optional w, Optional h)
+Public Sub move(x, y, Optional w, Optional h)
 If IsMissing(w) Then
-glistN.MoveTwips CLng(X), CLng(Y), 0, 0
+glistN.MoveTwips CLng(x), CLng(y), 0, 0
 ElseIf IsMissing(h) Then
-glistN.MoveTwips CLng(X), CLng(Y), CLng(w), 0
+glistN.MoveTwips CLng(x), CLng(y), CLng(w), 0
 Else
-glistN.MoveTwips CLng(X), CLng(Y), CLng(w), CLng(h)
+glistN.MoveTwips CLng(x), CLng(y), CLng(w), CLng(h)
 End If
 End Sub
 Public Sub deconstruct()
@@ -60,7 +60,7 @@ Set Callback = Nothing
   Set glistN = Nothing
 End Sub
 Public Sub SetUp()
-white = Callback.Controls(1).ForeColor
+white = Callback.Controls(1).forecolor
 black = 0
 dimm1 = rgb(100, 200, 160)
 dimm2 = rgb(200, 120, 60)
@@ -73,6 +73,8 @@ ff.bold = .CtrlFontBold
 End With
 
 With glistN
+.NoEscapeKey = True
+.bypassfirstClick = True
 .NoCaretShow = True
 .NoPanRight = False
 .restrictLines = 1
@@ -81,8 +83,8 @@ With glistN
 .Text = mCaptext
 .backcolor = rgb(200, 120, 60)
 Set .Font = ff
-.ForeColor = Callback.Controls(1).ForeColor
-shadowcol = -.ForeColor
+.forecolor = Callback.Controls(1).forecolor
+shadowcol = -.forecolor
 .dcolor = Callback.Controls(1).dcolor
 
 .enabled = True
@@ -169,7 +171,7 @@ Private Sub glistN_CtrlPlusF1()
       End If
 End Sub
 
-Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
+Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 glistN.ShowMe
 End Sub
 
@@ -250,14 +252,14 @@ glistN.WrapText = RHS <> 0
 End Property
 Sub ColorsReset()
 white = rgb(255, 255, 255)
-glistN.ForeColor = rgb(255, 255, 255)
+glistN.forecolor = rgb(255, 255, 255)
 dimm1 = rgb(100, 200, 160)
 dimm2 = rgb(200, 120, 60)
 End Sub
 Sub Colors(white1, Optional dimm21, Optional dimm11)
 On Error Resume Next
 If Not glistN Is Nothing Then
-glistN.ForeColor = mycolor(white1)
+glistN.forecolor = mycolor(white1)
 If Not IsMissing(dimm21) Then
 dimm2 = dimm21
 If Not IsMissing(dimm11) Then dimm1 = dimm11
@@ -337,10 +339,10 @@ Public Property Get Blink()
 Blink = glistN.BlinkTime
 End Property
 Sub Transparent()
-Dim X  As Long, Y As Long
+Dim x  As Long, y As Long
 glistN.BackStyle = 1
-glistN.GetLeftTop X, Y
-glistN.RepaintFromOut Callback.Image, X, Y
+glistN.GetLeftTop x, y
+glistN.RepaintFromOut Callback.Image, x, y
 glistN.ShowMe
 Callback.RefreshList = Callback.RefreshList + 1
 End Sub
@@ -379,4 +381,15 @@ Public Property Let icon(RHS)
 glistN.icon = RHS
 
 End Property
+
+Private Sub glistN_SyncKeyboardUnicode(a As String)
+Callback.SpreadKey a
+End Sub
+Private Sub glistN_Fkey(a As Integer)
+If a > 1000 Then
+Callback.SendFKEY a - 1000
+Else
+Callback.SendFKEY a
+End If
+End Sub
 

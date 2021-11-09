@@ -21,19 +21,21 @@ Event KeyDown(KeyCode As Integer, shift As Integer)
 Event LostFocus()
 Event GotFocus()
 Event KeyPress(KeyAscii As Integer)
-Event MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
+Event MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 Event SpinnerValue(ThisValue As Long)
 Event DeployMenu()
 Event CtrlPlusF1()
+Event SyncKeyboardUnicode(a As String)
+Event Fkey(a As Integer)
 Private mprompt As String
 Private mkind As String, mPartColor As Long
 Public SkipProcAtExitFocus As Boolean
-Private Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
-Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalLock Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalReAlloc Lib "KERNEL32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
-Private Declare Function GlobalSize Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalUnlock Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
+Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalReAlloc Lib "kernel32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
+Private Declare Function GlobalSize Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
 Private Const GMEM_DDESHARE = &H2000&
 Private Const GMEM_DISCARDABLE = &H100&
 Private Const GMEM_DISCARDED = &H4000&
@@ -51,7 +53,7 @@ Private Const GMEM_VALID_FLAGS = &H7F72&
 Private Const GMEM_ZEROINIT = &H40&
 Private Const GPTR = (GMEM_FIXED Or GMEM_ZEROINIT)
 Private Const GMEM_LOWER = GMEM_NOT_BANKED
-Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 Private Declare Function GetClipboardData Lib "user32" _
     (ByVal wFormat As Long) As Long
@@ -219,13 +221,13 @@ If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse
 RaiseEvent GotFocus
 If enabled Then
 glistN.FadeLastLinePart = mPartColor
-glistN.ForeColor = rgb(0, 0, 0)
+glistN.forecolor = rgb(0, 0, 0)
 glistN.backcolor = rgb(255, 255, 255)
 glistN.NoCaretShow = False:
 glistN.PanPos = 0
 Else
 glistN.FadeLastLinePart = 0
-glistN.ForeColor = rgb(255, 255, 255)
+glistN.forecolor = rgb(255, 255, 255)
 glistN.backcolor = rgb(100, 200, 160)
 glistN.NoCaretShow = True
 End If
@@ -236,7 +238,7 @@ End Sub
 Public Sub Retired()
 glistN.FadeLastLinePart = 0
 If Not mStayOpen Then
-glistN.ForeColor = rgb(255, 255, 255)
+glistN.forecolor = rgb(255, 255, 255)
 glistN.backcolor = rgb(200, 120, 60)
 End If
 glistN.NoCaretShow = True: glistN.PanPos = 0: glistN.ShowMe
@@ -253,7 +255,7 @@ Exit Sub
 End If
 If Not SkipProcAtExitFocus Then
 glistN.FadeLastLinePart = 0
-glistN.ForeColor = rgb(255, 255, 255)
+glistN.forecolor = rgb(255, 255, 255)
 glistN.backcolor = rgb(200, 120, 60)
 glistN.NoCaretShow = True: glistN.PanPos = 0: glistN.ShowMe
 Else
@@ -301,8 +303,8 @@ On Error Resume Next
 glistN.SetFocus
 End Sub
 
-Private Sub glistN_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
-RaiseEvent MouseMove(Button, shift, X, Y)
+Private Sub glistN_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+RaiseEvent MouseMove(Button, shift, x, y)
 End Sub
 
 
@@ -430,6 +432,17 @@ Dim hMem As Long, lSize As Long, lPtr As Long
     End If
 End Function
 
+Private Sub glistN_SyncKeyboardUnicode(a As String)
+RaiseEvent SyncKeyboardUnicode(a)
+End Sub
+Private Sub glistN_Fkey(a As Integer)
+If a > 1000 Then
+RaiseEvent Fkey(a - 1000)
+Else
+RaiseEvent Fkey(a)
+End If
+End Sub
+
 Private Sub glistN_UnregisterGlist()
 If Not glistN.Spinner Then glistN.NoWheel = True
 On Error Resume Next
@@ -441,7 +454,7 @@ End Sub
 Public Property Let ShowAlways(ByVal vNewValue As Variant)
 mStayOpen = CBool(vNewValue)
 If mStayOpen Then
-glistN.ForeColor = rgb(0, 0, 0)
+glistN.forecolor = rgb(0, 0, 0)
 glistN.FadeLastLinePart = mPartColor
 glistN.backcolor = rgb(255, 255, 255)
 End If

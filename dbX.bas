@@ -1923,7 +1923,7 @@ End If
    Select Case rec.fields(i&).Type
 Case 1, 2, 3, 4, 5, 6
 
-    If IsNull(rec.fields(i&)) Then
+    If myIsNull(rec.fields(i&)) Then
         bstackstr.soros.PushUndefine
     Else
     stat = rec.fields(i&).status
@@ -1934,7 +1934,7 @@ Case 1, 2, 3, 4, 5, 6
         End If
     End If
 Case 7
-If IsNull(rec.fields(i&)) Then
+If myIsNull(rec.fields(i&)) Then
     
      bstackstr.soros.PushStr ""
  Else
@@ -1944,7 +1944,7 @@ If IsNull(rec.fields(i&)) Then
 
 
 Case 130, 8, 203, 202
-If IsNull(rec.fields(i&)) Then
+If myIsNull(rec.fields(i&)) Then
     
      bstackstr.soros.PushStr ""
  Else

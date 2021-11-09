@@ -82,7 +82,7 @@ End Enum
 Private Type UcsParsedUrl
     Protocol        As String
     Host            As String
-    Port            As Long
+    port            As Long
     Path            As String
     User            As String
     Pass            As String
@@ -93,7 +93,7 @@ End Type
 '=========================================================================
 
 Private Sub PrintError(sFunction As String)
-    Debug.Print "Critical error: " & Err.Description & " [" & MODULE_NAME & "." & sFunction & "]"
+    ' debug.print "Critical error: " & Err.Description & " [" & MODULE_NAME & "." & sFunction & "]"
 End Sub
 
 '=========================================================================
@@ -147,16 +147,16 @@ Public Sub DownloadFile(url As String, LocalFileName As String)
     m_dblBytesRead = 0
     m_baRecvBuffer = vbNullString
     Set m_oSocket = New cAsyncSocket
-    If Not m_oSocket.Create(SocketType:=ucsSckStream) Then
+    If Not m_oSocket.create(SocketType:=ucsSckStream) Then
         On Error GoTo 0
         Err.Raise vbObjectError, , m_oSocket.GetErrorDescription(m_oSocket.LastError)
     End If
-    If Not m_oSocket.Connect(m_uRemote.Host, m_uRemote.Port) Then
+    If Not m_oSocket.Connect(m_uRemote.Host, m_uRemote.port) Then
         On Error GoTo 0
         Err.Raise vbObjectError, , m_oSocket.GetErrorDescription(m_oSocket.LastError)
     End If
-    Debug.Print "Start:", m_uRemote.Host
-    RaiseEvent Start(m_uRemote.Host, m_uRemote.Port)
+    ' debug.print "Start:", m_uRemote.Host
+    RaiseEvent Start(m_uRemote.Host, m_uRemote.port)
     Exit Sub
 EH:
     PrintError FUNC_NAME
@@ -210,11 +210,11 @@ Private Function pvRecvHeaders(baBuffer() As Byte) As Boolean
             End If
             m_uRemote = uRedirect
             m_oSocket.Close_
-            If Not m_oSocket.Create(SocketType:=ucsSckStream) Then
+            If Not m_oSocket.create(SocketType:=ucsSckStream) Then
                 pvSetError m_oSocket.LastError
                 GoTo QH
             End If
-            If Not m_oSocket.Connect(m_uRemote.Host, m_uRemote.Port) Then
+            If Not m_oSocket.Connect(m_uRemote.Host, m_uRemote.port) Then
                 pvSetError m_oSocket.LastError
                 GoTo QH
             End If
@@ -253,7 +253,7 @@ Private Function pvRecvBody(baBuffer() As Byte, Optional ByVal Flush As Boolean)
         WriteStream baBuffer()
        
         'If Not (m_wait_close And m_reading = 1) Then
-        Debug.Print "DownloadProgress", m_sLocalFileName, m_dblBytesRead
+        ' debug.print "DownloadProgress", m_sLocalFileName, m_dblBytesRead
     
         RaiseEvent DownloadProgress(m_dblBytesRead, m_dblContentLength)
        ' End If
@@ -302,17 +302,17 @@ Private Function pvParseUrl(sUrl As String, uParsed As UcsParsedUrl) As Boolean
     .Pass = GetUrlParts(sUrl, URL_PART_PASSWORD)
     .Path = GetUrlPath(sUrl)
      If Len(.Path) = 0 Then .Path = "/"
-    .Port = CLng("0" + GetUrlParts(sUrl, URL_PART_PORT))
+    .port = CLng("0" + GetUrlParts(sUrl, URL_PART_PORT))
     .Protocol = GetUrlParts(sUrl, URL_PART_SCHEME)
     .User = GetUrlParts(sUrl, URL_PART_USERNAME)
-    If .Port = 0 Then
+    If .port = 0 Then
         Select Case LCase$(uParsed.Protocol)
         Case "https"
-            uParsed.Port = 443
+            uParsed.port = 443
         Case "socks5"
-            uParsed.Port = 1080
+            uParsed.port = 1080
         Case Else
-            uParsed.Port = 80
+            uParsed.port = 80
         End Select
     End If
     pvParseUrl = True
@@ -367,7 +367,7 @@ Private Sub m_oSocket_OnReceive()
 
     If m_eState = ucsWaitBody Then
         If m_reading > 0 Then
-            Debug.Print "reading in progess....", m_sLocalFileName, FileLen(GetDosPath(m_sLocalFileName)), m_reading
+            ' debug.print "reading in progess....", m_sLocalFileName, FileLen(GetDosPath(m_sLocalFileName)), m_reading
             m_reading = m_reading + 1
             Exit Sub
         End If
@@ -386,13 +386,13 @@ again:
             If UBound(baBuffer) > 0 Then
 again2:
             If pvRecvBody(baBuffer) Then
-            Debug.Print "reading now....", m_sLocalFileName, FileLen(GetDosPath(m_sLocalFileName)), m_reading, m_wait_close
+            ' debug.print "reading now....", m_sLocalFileName, FileLen(GetDosPath(m_sLocalFileName)), m_reading, m_wait_close
             Else
              RaiseEvent DownloadError(m_oSocket.LastError, m_oSocket.GetErrorDescription(m_oSocket.LastError))
             CancelDownload
             End If
             Else
-            Debug.Print "missing data", m_sLocalFileName
+            ' debug.print "missing data", m_sLocalFileName
             If Not m_wait_close Then If m_oSocket.ReceiveArray(baBuffer) Then If UBound(baBuffer) > 0 Then GoTo again2
             'Exit Sub
         End If
@@ -416,7 +416,7 @@ Private Sub m_oSocket_OnClose()
     Const FUNC_NAME     As String = "m_oSocket_OnClose"
     'Dim baBuffer()      As Byte
     If m_reading Then
-        Debug.Print "here////////////////////////", m_sLocalFileName
+        ' debug.print "here////////////////////////", m_sLocalFileName
         
         m_wait_close = True
         Exit Sub
@@ -440,7 +440,7 @@ End Sub
 
 Private Sub m_oSocket_OnError(ByVal ErrorCode As Long, ByVal EventMask As UcsAsyncSocketEventMaskEnum)
     Const FUNC_NAME     As String = "m_oSocket_OnError"
-    Debug.Print ErrorCode, m_sLocalFileName
+    ' debug.print ErrorCode, m_sLocalFileName
     On Error GoTo EH
     pvSetError ErrorCode
     Exit Sub

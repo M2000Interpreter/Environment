@@ -190,6 +190,8 @@ ff.bold = .CtrlFontBold
 End With
 
 With glistN
+.NoEscapeKey = True
+.bypassfirstClick = True
 .enabled = True
 Info = vbNullString
 If .listcount = 0 Then Text = vbNullString
@@ -242,6 +244,14 @@ Else
     glistN.NoCaretShow = False
     glistN.ShowMe2
     Deal = 0
+End If
+End Sub
+
+Private Sub glistN_Fkey(a As Integer)
+If a > 1000 Then
+Callback.SendFKEY a - 1000
+Else
+Callback.SendFKEY a
 End If
 End Sub
 
@@ -1204,6 +1214,10 @@ Dim hMem As Long, lSize As Long, lPtr As Long
     End If
 End Function
 
+Private Sub glistN_SyncKeyboardUnicode(a As String)
+Callback.SpreadKey a
+End Sub
+
 Private Sub glistN_UnregisterGlist()
 If Not glistN.Spinner Then glistN.NoWheel = True
 If glistN.TabStopSoft Then Callback.LastActive = ctrlName
@@ -1213,13 +1227,13 @@ If Err.Number > 0 Then glistN.NoWheel = True
 
 End Sub
 
-Public Sub move(x, y, Optional W, Optional H)
-If IsMissing(W) Then
+Public Sub move(x, y, Optional w, Optional h)
+If IsMissing(w) Then
 glistN.MoveTwips CLng(x), CLng(y), 0, 0
-ElseIf IsMissing(H) Then
-glistN.MoveTwips CLng(x), CLng(y), CLng(W), 0
+ElseIf IsMissing(h) Then
+glistN.MoveTwips CLng(x), CLng(y), CLng(w), 0
 Else
-glistN.MoveTwips CLng(x), CLng(y), CLng(W), CLng(H)
+glistN.MoveTwips CLng(x), CLng(y), CLng(w), CLng(h)
 End If
 End Sub
 Public Sub deconstruct()
@@ -1331,12 +1345,12 @@ Public Property Get drop()
 drop = glistN.DropEnabled
 End Property
 Private Sub glistN_AddSelStart(val As Long, shift As Integer)
-Dim W As Long, a$, l As Long, b$
+Dim w As Long, a$, l As Long, b$
 If glistN.SelStart > 0 Then
 a$ = Mid$(vartext, glistN.SelStart)
 
     If Len(a$) > 0 Then
-        W = AscW(a$)
+        w = AscW(a$)
         If (shift And 2) = 2 Then
             l = Len(a$)
             val = 1
@@ -1361,7 +1375,7 @@ a$ = Mid$(vartext, glistN.SelStart)
                     val = val - 1
                 End If
             End If
-        ElseIf W > -10241 And W < -9984 Then
+        ElseIf w > -10241 And w < -9984 Then
             val = 2
         End If
     End If
@@ -1369,11 +1383,11 @@ End If
 End Sub
 
 Private Sub glistN_SubSelStart(val As Long, shift As Integer)
-Dim W As Long, a$, l As Long, b$
+Dim w As Long, a$, l As Long, b$
 If glistN.SelStart < 2 Then Exit Sub
 a$ = Mid$(vartext, glistN.SelStart - 1, 1)
 If Len(a$) > 0 Then
-W = AscW(a$)
+w = AscW(a$)
         If (shift And 2) = 2 Then
             a$ = Mid$(vartext, 1, glistN.SelStart - 1)
             l = Len(a$)
@@ -1401,7 +1415,7 @@ W = AscW(a$)
                 l = l - 1
             End If
             val = val - l
-        ElseIf W > -9215 And W < -8960 Then
+        ElseIf w > -9215 And w < -8960 Then
             val = 2
         End If
 

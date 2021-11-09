@@ -548,3 +548,4 @@ Next i
 DecodeEscape = utf8decode(StrConv(Join(a(), ""), vbFromUnicode))
 
 End Function
+

@@ -243,9 +243,9 @@ Private Sub pvSetParamArray(ByVal Ptr As Long, aParams() As Variant)
 
         ' get the variant's type
         CpyMem iVarType, ByVal lVarPtr + (lIdx * 16&), 2&
-
+Debug.Print iVarType, "pvSetParam", lIdx
         If (iVarType And VT_BYREF) = VT_BYREF Then
-
+        
             ' ByRef Parameter
 
             ' get the pointer
@@ -306,6 +306,30 @@ Private Sub pvSetParamArray(ByVal Ptr As Long, aParams() As Variant)
     Next
 
 End Sub
+
+Private Function pvGetParamArray2(ByVal Ptr As Long, numArg As Long, isRefAr() As Long) As Variant()
+    Dim tDPAR           As DISPPARAMS
+    Dim lIdx            As Long
+    Dim lVarPtr         As Long
+    Dim aParams()       As Variant
+    CpyMem tDPAR, ByVal Ptr, Len(tDPAR)
+    lVarPtr = tDPAR.rgPointerToVariantArray
+    
+    If tDPAR.cArgs = 0 Then Exit Function
+    numArg = tDPAR.cArgs
+    Dim isRef As Boolean, isStrVal As Boolean, Pad$
+    ReDim aParams(1 To tDPAR.cArgs)
+    ReDim isRefAr(1 To tDPAR.cArgs) As Long
+    For lIdx = 1 To tDPAR.cArgs
+        Process VarPtr(aParams(lIdx)), lVarPtr + ((tDPAR.cArgs - lIdx) * 16&), isRefAr(lIdx), isStrVal, Pad$
+        If isStrVal Then
+            aParams(lIdx) = Pad$
+            Pad$ = vbNullString
+            isStrVal = False
+        End If
+     Next
+    pvGetParamArray2 = aParams
+End Function
 
 ' by Edanmo
 Private Function pvGetParamArray(ByVal Ptr As Long, numArg As Long) As Variant()
@@ -413,7 +437,7 @@ finalize:
         End If
 End Function
 
-Public Sub fireevent(ByVal dispid As Long, ByVal params As Long)
+Public Sub fireeventOLD(ByVal dispid As Long, ByVal params As Long)
 ' change to fire events, when also othet events are fired.
 'Static once As Boolean
 'If once Then Exit Sub
@@ -445,6 +469,35 @@ If exclude.ExistKey(dispid) Then Exit Sub
 
     pvSetParamArray params, vParams
     'once = False
+End Sub
+Public Sub fireevent(ByVal dispid As Long, ByVal params As Long)
+' change to fire events, when also othet events are fired.
+    Static once As Boolean
+    If once Then Exit Sub
+    If exclude.ExistKey(dispid) Then Exit Sub
+    once = True
+    Dim strEvent    As String
+    Dim vParams()   As Variant
+    Dim NumVar As Long, what$, delme As Boolean
+    ' get the name of the event
+    If inUse.ExistKey(dispid) Then
+        strEvent = inUse.Value
+        what$ = inUse.Info
+    Else
+        strEvent = GetMemberName(oTarget, dispid, iid_event, what$)
+        inUse.AddKey dispid, strEvent, what$
+    End If
+ 
+    Dim refc() As Long
+    vParams = pvGetParamArray2(params, NumVar, refc)
+    On Error Resume Next
+   
+    If Not CallEventFromCOM1(Me, strEvent, what$, NumVar, vParams, refc, delme, ItemIndex) Then
+       MyEr "Problem With Event: " + strEvent, "Πρόβλημα με το γεγονός: " + strEvent
+    End If
+    If delme Then exclude.AddKey dispid, ""
+    pvSetParamArray2 params, vParams, refc
+    once = False
 End Sub
 
 Public Sub Detach()
@@ -531,3 +584,115 @@ End Sub
 Public Function Attached() As Boolean
     Attached = blnAttached
 End Function
+Sub Process(VarProc As Long, a As Long, Ptr1 As Long, usestring As Boolean, stval$)
+    Dim t(0 To 8) As Integer, Zero, Ptr As Long, ItsVariantRef As Boolean
+    CpyMem ByVal VarPtr(t(0)), ByVal a, 16
+again:
+    CpyMem Ptr, ByVal VarPtr(t(4)), 4
+
+    If (t(0) And &H4000) > 0 Then
+        Ptr1 = Ptr
+        t(0) = CInt(CLng(t(0)) And &HBFFF&)
+        If t(0) <> 14 And t(0) <> 12 Then
+            t(1) = 0: t(2) = 0: t(3) = 0
+            Select Case t(0)
+            Case vbDouble, vbCurrency, vbDate
+                CpyMem ByVal VarPtr(t(4)), ByVal Ptr, 8
+            Case vbBoolean, vbInteger
+                CpyMem ByVal VarPtr(t(4)), ByVal Ptr, 2
+            Case vbByte
+                CpyMem ByVal VarPtr(t(4)), ByVal Ptr, 1
+            Case vbString
+                
+                CpyMem ByVal VarPtr(t(4)), ByVal Ptr, 4
+                
+            Case vbEmpty, vbNull
+            ' do nothing
+            Case Else
+                CpyMem ByVal VarPtr(t(4)), ByVal Ptr, 4
+            End Select
+        ElseIf t(0) = 12 Then
+            CpyMem ByVal VarPtr(t(0)), ByVal Ptr, 16
+            ItsVariantRef = True
+            If (t(0) And &H4000 > 0) Then GoTo again
+        Else
+            CpyMem ByVal VarPtr(t(1)), ByVal Ptr + 2, 14
+        End If
+    ElseIf t(0) = 12 Then
+        Ptr1 = Ptr
+        CpyMem ByVal VarPtr(t(0)), ByVal Ptr, 16
+    Else
+        If Not ItsVariantRef Then
+            Ptr1 = 0
+            If t(0) = 8 Then
+            usestring = True
+                If Ptr <> 0 Then
+                    
+                    stval$ = GetBStrFromBstrPtr(Ptr)
+                Else
+                    stval$ = vbNullString
+                End If
+                Exit Sub
+            Else
+            CpyMem ByVal a, VarPtr(Zero), 16
+            End If
+        Else
+            Ptr1 = -Ptr1
+            CpyMem ByVal a, VarPtr(Zero), 16
+        End If
+    End If
+    CpyMem ByVal VarProc, ByVal VarPtr(t(0)), 16
+    
+End Sub
+
+Private Sub pvSetParamArray2(ByVal Ptr As Long, aParams() As Variant, ref() As Long)
+    Dim tDPAR       As DISPPARAMS
+    Dim iVarType    As Long
+    Dim lIdx        As Long
+    Dim lPtr        As Long
+    Dim lVarPtr     As Long
+    Dim IP          As Long
+    Dim Zero
+    CpyMem tDPAR, ByVal Ptr, Len(tDPAR)
+    lVarPtr = tDPAR.rgPointerToVariantArray
+
+    For lIdx = 0 To tDPAR.cArgs - 1
+            IP = tDPAR.cArgs - lIdx
+            CpyMem iVarType, ByVal VarPtr(aParams(IP)), 2&
+            CpyMem lPtr, ByVal lVarPtr + (lIdx * 16&) + 8&, 4&
+            iVarType = iVarType And &HBFFF&
+            If ref(IP) Then
+            lPtr = ref(IP)
+            If iVarType = 12 Or lPtr < 0 Then
+                If lPtr < 0 Then
+                    CpyMem ByVal -lPtr, ByVal VarPtr(aParams(IP)), 16
+                Else
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)), 16
+                End If
+            ElseIf iVarType = 14 Then
+                CpyMem ByVal lPtr + 2, ByVal VarPtr(aParams(IP)) + 2, 14
+            Else
+                Select Case iVarType
+                Case vbDouble, vbCurrency, vbDate
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)) + 8, 8
+                Case vbBoolean, vbInteger
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)) + 8, 2
+                Case vbByte
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)) + 8, 1
+                Case vbEmpty, vbNull
+                Case Else
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)) + 8, 4
+                End Select
+            End If
+            If lPtr >= 0 Then
+            iVarType = iVarType + &H4000
+                   
+            CpyMem ByVal lVarPtr + (lIdx * 16&), VarPtr(iVarType), 2
+            End If
+            CpyMem aParams(IP), Zero, 16
+
+            End If
+    Next
+End Sub
+
+

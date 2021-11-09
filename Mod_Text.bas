@@ -50,7 +50,7 @@ Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (By
 Private Declare Function CallWindowProc _
  Lib "user32.dll" Alias "CallWindowProcW" ( _
  ByVal lpPrevWndFunc As Long, _
- ByVal hwnd As Long, _
+ ByVal hWnd As Long, _
  ByVal Msg As Long, _
  ByVal wParam As Long, _
  ByVal lParam As Long) As Long
@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 36
+Global Const Revision = 37
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -227,11 +227,11 @@ Public trace As Boolean, tracecounter As Long, bypasstrace As Boolean
 Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 
 Public Declare Function SetTimer Lib "user32" _
-       (ByVal hwnd As Long, ByVal nIDEvent As Long, _
+       (ByVal hWnd As Long, ByVal nIDEvent As Long, _
         ByVal uElapse As Long, ByVal lpTimerFunc As Long) As Long
 
 Public Declare Sub KillTimer Lib "user32" _
-       (ByVal hwnd As Long, ByVal nIDEvent As Long)
+       (ByVal hWnd As Long, ByVal nIDEvent As Long)
 'Public Type tagInitCommonControlsEx
  ' lngSize As Long
   ' lngICC As Long
@@ -2371,12 +2371,7 @@ MKEY$ = vbNullString
 RandomizeIt rndbase, 0
 ClearCatalog
 SetLibHdls
-LCID_DEF = LCID_def1()
-If OsInfo.LangNonUnicodeCode <> LCID_DEF Then
-    Beep
-    Sleep 10
-    Beep
-End If
+LCID_DEF = LCID_def1() Mod &H10000
 DefCodePage = GetCodePage(OsInfo.LangNonUnicodeCode)
 UserCodePage = DefCodePage
 UseTabInForm1Text1 = True
@@ -4741,11 +4736,11 @@ Exit Function
 num88: ' "ÏÈÏÍÇ","SHOW"
     If Not Screen.ActiveForm Is Nothing Then
     If bstack.Owner Is Form1.DIS Then
-    R = SG * (Form1.hwnd = Screen.ActiveForm.hwnd And bstack.Owner.Visible)
+    R = SG * (Form1.hWnd = Screen.ActiveForm.hWnd And bstack.Owner.Visible)
     ElseIf Typename(bstack.Owner) = "PictureBox" Then
     R = SG * bstack.Owner.Visible
     Else
-    R = SG * bstack.Owner.hwnd = Screen.ActiveForm.hwnd
+    R = SG * bstack.Owner.hWnd = Screen.ActiveForm.hWnd
     End If
     Else
     R = False
@@ -11434,7 +11429,7 @@ there12001:
                         On Error GoTo 0
                     End If
                 Else
-                If IsNull(var(w)) Then
+                If myIsNull(var(w)) Then
                 VarNull
                 IsStr1 = False
                       Exit Function
@@ -13823,17 +13818,17 @@ fstr60: '"STR$(", "ÃÑÁÖÇ$("
                 If Err.Number = 6 Then Overflow
                 Err.Clear
                 If Not NoUseDec Then
-                    If OverideDec Then
+                    If mNoUseDec Then
                         R$ = Replace$(R$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
                         R$ = Replace$(R$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
                         R$ = Replace$(R$, Chr(2), NowDec$)
                         R$ = Replace$(R$, Chr(3), NowThou$)
                         
-                    ElseIf InStr(R$, NowDec$) > 0 Then
-                        R$ = Replace$(R$, NowDec$, Chr(2))
-                        R$ = Replace$(R$, NowThou$, ",")
+                    ElseIf GetDeflocaleString(LOCALE_SDECIMAL) = "," Then
+                        R$ = Replace$(R$, ",", Chr(2))
+                        R$ = Replace$(R$, ".", ",")
                         R$ = Replace$(R$, Chr(2), ".")
-        
+
                 End If
                     End If
 contstrhere:
@@ -15480,7 +15475,7 @@ contTarg:
 ContScan:
                 ClearJoyAll
                 PollJoypadk
-                If GetForegroundWindow <> Form1.hwnd Or Not Targets Then
+                If GetForegroundWindow <> Form1.hWnd Or Not Targets Then
                     If IsExp(bstack, b$, p, , True) Then
                     End If
                     MyDoEvents0 di
@@ -15517,7 +15512,7 @@ ContScan:
                         If IsExp(bstack, b$, p, , True) Then
                         sX = Timer + p
                         x1 = Form1.lockme
-                        If x1 Then UnHook Form1.hwnd
+                        If x1 Then UnHook Form1.hWnd
                             Form1.lockme = False
                             Do
                                 y1 = BLOCKkey
@@ -15534,7 +15529,7 @@ ContScan:
                                 End If
                             Loop Until NoAction Or Timer > sX Or myexit(bstack) Or bstack.IamThread
                             Form1.lockme = x1
-                            If x1 And GetForegroundWindow = Form1.hwnd Then Form1.hookme Form1.TEXT1.glistN
+                            If x1 And GetForegroundWindow = Form1.hWnd Then Form1.hookme Form1.TEXT1.glistN
                         Else
                         Do
                             MyDoEvents0 Form1
@@ -20946,7 +20941,7 @@ For i = 1 To q.soros.Total
                         If .link.IamFloatGroup Then
                            Set itGroup.LinkRef = .link
                             itGroup.IamApointer = True
-                            itGroup.isref = True
+                            itGroup.isRef = True
                         Else
                             itGroup.edittag = .link.edittag
                             itGroup.FuncList = .link.FuncList
@@ -26917,11 +26912,6 @@ Set oo = Nothing
 Set pppp = Nothing
 Set vv = Nothing
 End Sub
-''ProcProperty bstack, var(i), sS$, rest$,  LANG
-' METHOD A,"Multiply" (12,12) [AS RESULT]   (or Result$)  if [As] isn't there so
-' METHOD A "Multiply" (12,12)  AS RESULT  without
-' METHOD A "Multiply", &alfa,&beta$   'passing by reference
-''ProcMethod bstack, var(i), sS$, rest$,  LANG
 Sub ProcMethod(bstack As basetask, v(), vIndex As Long, FN$, rest$, language As Long, ok As Boolean)
 Dim var1() As Variant, s$, R As Double, l As Long, newref As Long, glob As Boolean, newvar As Boolean
 Dim vv As Object, Result As Variant, retobject As Object, usehandler As mHandler
@@ -33130,6 +33120,7 @@ Dim p As Variant, s$
 End Sub
 
 Function searchsub(ByVal where As Long, w$, Final As Long, site As Long) As Boolean
+Static aCopy As New Document
 Dim ww$()
 ww$() = Split(w$)
 If where = 0 Then
@@ -33191,7 +33182,7 @@ Else
 End If
 
 Dim len1 As Long, there1 As Long, a$
-Dim aCopy As Document, there As Long, Curs As Long, Curs2 As Long
+Dim there As Long, Curs As Long, Curs2 As Long
 Dim a1 As Long, b As Long, c As Long, D As Long
 Dim ss$, Dump$
 If where > 0 Then
@@ -33205,6 +33196,7 @@ If len1 = 1 Then
 If ww$(0) = "S" Then
 Set aCopy = New Document
 With aCopy
+.EmptyDoc
 .textDocFast = a$
 .lcid = 1032
 ww$(1) = ww$(1) + ":"
@@ -33232,9 +33224,10 @@ End If
 Exit Function
 End If
 
-Set aCopy = New Document
+'Set aCopy = New Document
 
 With aCopy
+.EmptyDoc
 .textDocFast = a$
 .lcid = 1032
 there = 0
@@ -37702,7 +37695,7 @@ islambda:
             If var(i).link.IamFloatGroup Then
                Set var(it).LinkRef = var(i).link
                 var(it).IamApointer = True
-                var(it).isref = True
+                var(it).isRef = True
             Else
             With var(i).link
             
@@ -41482,27 +41475,6 @@ jumpheretoo:
 End Function
 
 
-Function ProcChooseOrgan(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim F As Long, i As Long, s$
-If Form4Loaded Then
-If Form4.Visible Then
-Form4.Visible = False
-    If Form1.TEXT1.Visible Then
-        Form1.TEXT1.SetFocus
-    Else
-        Form1.SetFocus
-    End If
-End If
-End If
-Form1.List1.Clear
-F = 0
-For i = 1 To 127
-s$ = ORGAN(i)
-Form1.List1.additemFast s$
-'If TextWidth(bstack.Owner, s$) > f Then f = TextWidth(bstack.Owner, s$)
-Next i
-ProcChooseOrgan = MyMenu(1, bstack, rest$, Lang)
-End Function
 Function ProcView(bstack As basetask, rest$, Lang As Long) As Boolean
 If bstack.toprinter Then oxiforPrinter: Exit Function
 If Left$(Typename(bstack.Owner), 3) = "Gui" Then oxiforforms: Exit Function
@@ -41841,16 +41813,16 @@ ProcThreadPlan = True
 End Function
 
 Function ProcSound(bstack As basetask, rest$) As Boolean
-Dim s$, ss, H As mHandler, m As MemBlock
+Dim s$, ss, h As mHandler, m As MemBlock
 If IsStrExp(bstack, rest$, s$) Then
 PlaySoundNew s$
 ProcSound = True
 ElseIf IsExp(bstack, rest$, ss) Then
 If Not bstack.lastobj Is Nothing Then
 If TypeOf bstack.lastobj Is mHandler Then
-    Set H = bstack.lastobj
-    If H.t1 = 2 Then
-        Set m = H.objref
+    Set h = bstack.lastobj
+    If h.t1 = 2 Then
+        Set m = h.objref
         PlaySoundNew2 m.GetPtr(0)
         ProcSound = True
     Else
@@ -45260,7 +45232,7 @@ Set var(i) = myMsgBox
 basestack.soros.PushVal 16
 basestack.soros.PushStr MesTitle$
 basestack.soros.PushStr "Fatal Error"
-basestack.soros.PushVal Form1.hwnd
+basestack.soros.PushVal Form1.hWnd
 CallByObject basestack, i, False
 Set var(i) = Nothing
 NERR = True
@@ -45831,13 +45803,13 @@ Dim p
                 End If
                 End If
                 If FastSymbol(rest$, ",") Then
-                Dim w, H
+                Dim w, h
                 If IsExp(basestack, rest$, w, , True) Then
                     If Not FastSymbol(rest$, ",") Then
                         mb.SentToClipBoard CLng(w), , , True, True
                         MyClipboard = True
-                    ElseIf IsExp(basestack, rest$, H, , True) Then
-                        mb.SentToClipBoard CLng(w), CLng(H), , True, True
+                    ElseIf IsExp(basestack, rest$, h, , True) Then
+                        mb.SentToClipBoard CLng(w), CLng(h), , True, True
                         MyClipboard = True
                     Else
                         MissParam rest$
@@ -46032,12 +46004,12 @@ Set bb.objref = aa
  bb.t1 = 3
 Set GetAnewEvent = bb
 End Function
-Public Function CallEventFromCOM(evCom As ComShinkEvent, aString$, what$, NumVar As Long, vrs(), exclude As Boolean, ItemIndex As Long) As Boolean
+Public Function CallEventFromCOM1(evCom As ComShinkEvent, aString$, what$, NumVar As Long, vrs(), ref() As Long, exclude As Boolean, ItemIndex As Long) As Boolean
 Dim tr As Boolean, extr As Boolean, olescok As Boolean
 Dim F$, F1$, klm As Long, ohelp As Object
 'olescok = escok
 'escok = False
-CallEventFromCOM = True
+CallEventFromCOM1 = True
 F1$ = evCom.modulename$
 F$ = UCase(F1$ + "_" + aString$ + "()") ' No greek
 If Not subHash.Find(F$, klm) Then exclude = True: Exit Function
@@ -46068,7 +46040,8 @@ Set bstack.Sorosref = bb
                 bb.DataVal CVar(ItemIndex)
             End If
             For k = 1 To NumVar
-            If VariantIsRef(VarPtr(vrs(k))) Then
+            'If VariantIsRef(VarPtr(vrs(k))) Then
+            If ref(k) Then
             Select Case VarType(vrs(k))
             Case vbString
             globalvarGroup "EV" + CStr(i + k) + "$", vrs(k)
@@ -46103,7 +46076,7 @@ Set bstack.Sorosref = bb
             Next k
             '''bb.DataObj evCom
             '' last is the second name, the class name??
-            bb.DataStr what$
+            bb.DataStr (what$)
      
             bb.DataObj MakeitObjectGeneric(evCom.VarIndex)
   
@@ -46123,20 +46096,21 @@ Set bstack.Sorosref = bb
             End If
                   here$ = vbNullString
                   If NumVar > 0 Then
-       For k = LBound(vrs()) To UBound(vrs()) - 1
+       For k = LBound(vrs()) To UBound(vrs()) - 1 + LBound(vrs())
+       If ref(k) Then
        Select Case VarType(vrs(k))
        Case vbString
-            GetlocalVar "EV" + CStr(i + k) + "$", j
-            vrs(k) = var(j)
+            varhash.Find2 "EV" + CStr(i + k) + "$", j, True
+           vrs(k) = var(j)
+
        Case Is >= vbArray
-            GetlocalVar "EV" + CStr(i + k) + "(", j
+            varhash.Find2 "EV" + CStr(i + k) + "(", j, True
             RetComArray var(j), vrs(k)
-       
         Case Else
-            GetlocalVar "EV" + CStr(i + k), j
+            varhash.Find2 "EV" + CStr(i + k), j, True
              vrs(k) = var(j)
             End Select
-           
+           End If
             Next k
             End If
             PopStage bstack
@@ -46928,12 +46902,12 @@ CheckThis = 2
 End Function
 Function myHwnd(bstack As basetask) As Double
 If Typename(bstack.Owner) = "GuiM2000" Then
-myHwnd = bstack.Owner.hwnd
+myHwnd = bstack.Owner.hWnd
 Else
 If ttl Then
-myHwnd = Form3.hwnd
+myHwnd = Form3.hWnd
 Else
-myHwnd = bstack.Owner.hwnd
+myHwnd = bstack.Owner.hWnd
 End If
 End If
 End Function
@@ -48872,7 +48846,7 @@ Dim s$, ex$, dd As Long, pp As Variant, Lang As Long
     If FastSymbol(a$, ",") Then
       If IsStrExp(bstack, a$, ex$) Then
       If Len(ex$) <> 1 Then
-      dd = AscW(NowDec$)
+      If Len(ex$) = 0 Then dd = 46 Else dd = AscW(NowDec$)
       Else
           dd = AscW(ex$)
           End If
@@ -52227,7 +52201,20 @@ MakeArray bstack, w$, 5, b$, pppp, NewStat, VarStat
 
         sss = Len(b$): ExecuteVar = 4: Exit Function
 End If
+aheadstatusSkipParam b$, i
+i = i + 1
+If MaybeIsSymbol3lot(b$, b12345, i) Or i > Len(b$) Then
+    If Mid$(b$, i, 2) = ":=" Then GoTo arr1111
+    If GetSub(w$ + ")", i) Then
+        Exit Function
+    Else
+        bstack.tmpstr = ss$
+        ExecuteVar = 2  ' GoTo autogosub
+        Exit Function
+    End If
 
+End If
+arr1111:
 If neoGetArray(bstack, w$, pppp, , , , True) Then
 againarray:
 If pppp Is Nothing Then
@@ -52621,7 +52608,8 @@ If Exec1 = 0 Then ExecuteVar = 8: Exit Function
     ExecuteVar = 7: Exit Function
     
     End If
-ElseIf Not FastSymbol(b$, "=", True) Then
+ElseIf Not FastSymbol(b$, "=") Then
+MissingSymbol "="
 sss = 0
 ExecuteVar = 3: Exit Function
 
@@ -54506,8 +54494,10 @@ On Error Resume Next
     s$ = "0" + s$
     ElseIf Left$(s$, 2) = "-." Then s$ = "-0" + Mid$(s$, 2)
  End If
- 
- If OverideDec Then s$ = Replace$(s$, ".", NowDec$)
+ If NoUseDec Then
+
+ s$ = Replace$(s$, ".", NowDec$)
+ End If
  End If
 End If
 contboolean2:
@@ -54526,19 +54516,15 @@ contboolean2:
         Else
         s$ = Format$(p, .FTXT)
         If Not NoUseDec Then
-            If OverideDec Then
+            If mNoUseDec Then
                 s$ = Replace$(s$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
                 s$ = Replace$(s$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
                 s$ = Replace$(s$, Chr(2), NowDec$)
                 s$ = Replace$(s$, Chr(3), NowThou$)
-                
-            ElseIf InStr(s$, NowDec$) > 0 And InStr(.FTXT, ".") > 0 Then
-                ElseIf InStr(s$, NowDec$) > 0 Then
-                s$ = Replace$(s$, NowDec$, Chr(2))
-                s$ = Replace$(s$, NowThou$, Chr(3))
+            ElseIf GetDeflocaleString(LOCALE_SDECIMAL) = "," Then
+                s$ = Replace$(s$, ",", Chr(2))
+                s$ = Replace$(s$, ".", ",")
                 s$ = Replace$(s$, Chr(2), ".")
-                s$ = Replace$(s$, Chr(3), ",")
-            
             End If
             End If
         End If
@@ -54863,19 +54849,17 @@ End If
                         If .FTXT <> "" Then
                                        s$ = Format$(p, .FTXT)
             If Not NoUseDec Then
-               If OverideDec Then
+               If mNoUseDec Then
                 s$ = Replace$(s$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
                 s$ = Replace$(s$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
                 s$ = Replace$(s$, Chr(2), NowDec$)
                 s$ = Replace$(s$, Chr(3), NowThou$)
-                
-            ElseIf InStr(s$, NowDec$) > 0 And InStr(.FTXT, ".") > 0 Then
-                s$ = Replace$(s$, NowDec$, Chr(2))
-                s$ = Replace$(s$, NowThou$, Chr(3))
+                ElseIf GetDeflocaleString(LOCALE_SDECIMAL) = "," Then
+                s$ = Replace$(s$, ",", Chr(2))
+                s$ = Replace$(s$, ".", ",")
                 s$ = Replace$(s$, Chr(2), ".")
-                s$ = Replace$(s$, Chr(3), ",")
-            
-            End If
+          
+                End If
             End If
                                
                                 If .FTEXT > 4 And Not work Then Scr.currentX = Scr.currentX + (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2
@@ -54896,8 +54880,8 @@ End If
                                       If Left$(s$, 1) = "." Then
                                         s$ = "0" + s$
                                         ElseIf Left$(s$, 2) = "-." Then s$ = "-0" + Mid$(s$, 2)
-                                        End If
-                                     If OverideDec Then s$ = Replace$(s$, ".", NowDec$)
+                                   End If
+                                     If mNoUseDec Then s$ = Replace$(s$, ".", NowDec$)
                                     End If
                                 End If
 
@@ -54928,24 +54912,22 @@ End If
                                                 s$ = "0" + s$
                                                 ElseIf Left$(s$, 2) = "-." Then s$ = "-0" + Mid$(s$, 2)
                                                 End If
-                                            If OverideDec Then s$ = Replace$(s$, ".", NowDec$)
+                                            If mNoUseDec Then s$ = Replace$(s$, ".", NowDec$)
                                         End If
                                     PlainBaSket Scr, prive, s$
                                 End If
                         Else
                       s$ = Format$(p, .FTXT)
             If Not NoUseDec Then
-                If OverideDec Then
+                If mNoUseDec Then
                     s$ = Replace$(s$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
                     s$ = Replace$(s$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
                     s$ = Replace$(s$, Chr(2), NowDec$)
                     s$ = Replace$(s$, Chr(3), NowThou$)
-                ElseIf InStr(s$, NowDec$) > 0 And InStr(.FTXT, ".") > 0 Then
-                    s$ = Replace$(s$, NowDec$, Chr(2))
-                    s$ = Replace$(s$, NowThou$, Chr(3))
-                    s$ = Replace$(s$, Chr(2), ".")
-                    s$ = Replace$(s$, Chr(3), ",")
-                
+                ElseIf GetDeflocaleString(LOCALE_SDECIMAL) = "," Then
+                s$ = Replace$(s$, ",", Chr(2))
+                s$ = Replace$(s$, ".", ",")
+                s$ = Replace$(s$, Chr(2), ".")
                 End If
             End If
       

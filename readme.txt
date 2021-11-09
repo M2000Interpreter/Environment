@@ -1,13 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 36 active-X
-1)A broken statement:
-1. Fix the STOP statement. Now M1 module in info works fine.
+Version 10 revision 37 active-X
+A lot of work. Examples will be posted in m2000 blog.
 
-2-4)Improvements:
-2. Point now return 0x7FFFFFFF when we get color out of layer.
-3. Gradient statement to Player layers preserve colour in non displayed pixels (transparent by a region on the window). So We can test if mouse pointer on a sprite layer return 0x7FFFFFFF (out) or the transparent color which we use at Player statement.
-4. Module Sprites in info now has the new definitions (2 & 3) to handle better the displayed sprites using mouse.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

@@ -1,18 +1,11 @@
 Attribute VB_Name = "modObjectExtender"
 Option Explicit
-
+Public btASM As Long
 ' modObjectExtender
 '
 ' event support for Late-Bound objects
 ' low level COM Projekt - by [rm_code] 2005
 Private Declare Function ObjSetAddRef Lib "msvbvm60.dll" Alias "__vbaObjSetAddref" (ByRef objDest As Object, ByVal pObject As Long) As Long
-Private Declare Sub VariantCopy Lib "OleAut32.dll" (pvargDest As Long, pvargSrc As Long)
-'Public Type GUID
-'    data1       As Long
-'    data2       As Integer
-'    data3       As Integer
-'    data4(7)    As Byte
-'End Type
 
 Public Type EventSink
     pVTable     As Long     ' VTable pointer
@@ -35,7 +28,6 @@ Private Const PAGE_EXECUTE_READWRITE = &H40
 Private Declare Function CallWindowProcA Lib "user32" ( _
     ByVal adr As Long, ByVal p1 As Long, ByVal p2 As Long, _
     ByVal p3 As Long, ByVal p4 As Long) As Long
-
 Public Declare Function VariantCopyIndPtr Lib "oleaut32" Alias "VariantCopyInd" ( _
     ByVal pvargDest As Long, ByVal pvargSrc As Long) As Long
 
@@ -191,6 +183,7 @@ Private Function ObjExt_Release(this As EventSink) As Long
 
     ' if reference count is 0, free the object
     If this.cRef = 0 Then GlobalFree this.hMem
+    'If this.cRef = 0 Then CoTaskMemFree this.hMem
 End Function
 
 ' IDispatch::GetTypeInfoCount
@@ -240,9 +233,9 @@ Public Function CreateEventSink(IID As GUID, objext As ComShinkEvent) As Object
         .pClass = ObjPtr(objext)
         .pVTable = VarPtr(ObjExt_vtbl(0))
     End With
-
     ' allocate some memory for our object
     sink.hMem = GlobalAlloc(GPTR, Len(sink))
+    'sink.hMem = CoTaskMemAlloc(Len(sink))
     If sink.hMem = 0 Then Exit Function
     CpyMem ByVal sink.hMem, sink, Len(sink)
 
@@ -256,11 +249,7 @@ End Function
 
 ' Pointer->Object
 Public Function ResolveObjPtr(ByVal Ptr As Long) As IUnknown
-    'Dim oUnk As IUnknown
 ObjSetAddRef ResolveObjPtr, Ptr
-    'CpyMem oUnk, Ptr, 4&
-    'Set ResolveObjPtr = oUnk
-    'CpyMem oUnk, 0&, 4&
 End Function
 ' ObjSetAddRef ObjectFromPtr, Ptr
 
@@ -273,9 +262,10 @@ Public Function CallPointer(ByVal fnc As Long, ParamArray params()) As Long
 Static once As Boolean
 If once Then Exit Function
 once = True
-Dim btASM As Long
 
+If btASM = 0 Then
  btASM = VirtualAlloc(ByVal 0&, MAXCODE, MEM_COMMIT, PAGE_EXECUTE_READWRITE)
+ End If
  If btASM = 0 Then
  MyEr "DEP or memory problem", "Πρόβλημα με την μνήμη"
  CallPointer = -1
@@ -318,12 +308,16 @@ Dim btASM As Long
                                   0, 0, 0, 0)
             
              VirtualUnlock btASM, MAXCODE
-        VirtualFree btASM, MAXCODE, MEM_DECOMMIT
-        VirtualFree btASM, 0, MEM_RELEASE
+
 
     once = False
 End Function
-
+Public Sub ReleaseMem()
+If btASM <> 0 Then
+        VirtualFree btASM, MAXCODE, MEM_DECOMMIT
+        VirtualFree btASM, 0, MEM_RELEASE
+End If
+End Sub
 Private Sub AddPush(pASM As Long, lng As Long)
     AddByte pASM, &H68
     AddLong pASM, lng

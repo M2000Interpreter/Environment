@@ -42,6 +42,9 @@ Private Declare Function ProgIDFromCLSID Lib "ole32.dll" ( _
 Private Declare Function StringFromCLSID Lib "ole32.dll" ( _
                          ByRef Clsid As GUID, _
                          lpszProgID As Long) As Long
+Public Declare Function CoTaskMemAlloc Lib "ole32.dll" _
+                            (ByVal hMem As Long) As Long
+
 Public Declare Sub CoTaskMemFree Lib "ole32.dll" _
                             (ByVal hMem As Long)
 Private Declare Function CLSIDFromString Lib "ole32.dll" ( _

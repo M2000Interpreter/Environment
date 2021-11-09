@@ -488,6 +488,7 @@ Set Forms(i).icon = LoadPicture("")
 Unload Forms(i)
 Next i
 End If
+ReleaseMem
 l_complete = False
 End Sub
 Public Sub StopTimer()

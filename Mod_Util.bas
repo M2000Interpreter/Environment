@@ -2,13 +2,13 @@ Attribute VB_Name = "Module2"
 Option Explicit
 Const CSIDL_TEMPLATES = &H15&
 Const MAX_PATH = 260
-Private Type SHITEMID
-    cb As Long
-    abID As Byte
-End Type
-Private Type ITEMIDLIST
-    mkid As SHITEMID
-End Type
+''Private Type SHITEMID
+''    cb As Long
+''    abID As Byte
+''End Type
+''Private Type ITEMIDLIST
+''    mkid As SHITEMID
+''End Type
 Public doslast As Double
 Dim FontList As FastCollection
 Public Trush() As VarItem
@@ -21,9 +21,9 @@ Private Const doc = "Document"
 Public Check2SaveModules As Boolean
 Dim ObjectCatalog As FastCollection, loadcatalog As New FastCollection
 Public tracecode As String, lasttracecode As Long
-Private Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteW" (ByVal hwnd As Long, ByVal lpszOp As Long, ByVal lpszFile As Long, ByVal lpszParams As Long, ByVal LpszDir As String, ByVal FsShowCmd As Long) As Long
-Private Declare Function SHGetSpecialFolderLocation Lib "shell32.dll" (ByVal hWndOwner As Long, ByVal nFolder As Long, pidl As ITEMIDLIST) As Long
-Private Declare Function SHGetPathFromIDList Lib "shell32.dll" Alias "SHGetPathFromIDListA" (ByVal pidl As Long, ByVal pszPath As String) As Long
+Private Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteW" (ByVal hWnd As Long, ByVal lpszOp As Long, ByVal lpszFile As Long, ByVal lpszParams As Long, ByVal LpszDir As String, ByVal FsShowCmd As Long) As Long
+Private Declare Function SHGetSpecialFolderLocation Lib "shell32.dll" (ByVal hWndOwner As Long, ByVal nFolder As Long, pidl As Long) As Long
+Private Declare Function SHGetPathFromIDList Lib "shell32.dll" Alias "SHGetPathFromIDListW" (ByVal pidl As Long, ByVal lpszPath As Long) As Long
 Private Declare Function FindExecutable Lib "shell32.dll" Alias "FindExecutableW" (ByVal lpFile As Long, ByVal lpDirectory As Long, ByVal lpResult As Long) As Long
 Private Declare Function GetForegroundWindow Lib "user32" () As Long
 Private Declare Function SelectClipRgn Lib "gdi32" (ByVal Hdc As Long, ByVal hRgn As Long) As Long
@@ -169,11 +169,11 @@ Private Const DT_VCENTER As Long = &H4&
 Private Const DT_WORDBREAK As Long = &H10&
 Private Const DT_WORD_ELLIPSIS As Long = &H40000
 Public Declare Function DestroyCaret Lib "user32" () As Long
-Public Declare Function CreateCaret Lib "user32" (ByVal hwnd As Long, ByVal hBitmap As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Public Declare Function ShowCaret Lib "user32" (ByVal hwnd As Long) As Long
+Public Declare Function CreateCaret Lib "user32" (ByVal hWnd As Long, ByVal hBitmap As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Public Declare Function ShowCaret Lib "user32" (ByVal hWnd As Long) As Long
 Public Declare Function GetFocus Lib "user32" () As Long
 Public Declare Function SetCaretPos Lib "user32" (ByVal x As Long, ByVal y As Long) As Long
-Public Declare Function HideCaret Lib "user32" (ByVal hwnd As Long) As Long
+Public Declare Function HideCaret Lib "user32" (ByVal hWnd As Long) As Long
 Const dv = 0.877551020408163
 Public QUERYLIST As String
 Public LASTQUERYLIST As Long
@@ -196,7 +196,7 @@ Public Release As Boolean
 Private Declare Function SetBkMode Lib "gdi32" (ByVal Hdc As Long, ByVal nBkMode As Long) As Long
 Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 Declare Function RoundRect Lib "gdi32" (ByVal Hdc As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal Y3 As Long) As Long
-Declare Function UpdateWindow Lib "user32" (ByVal hwnd As Long) As Long
+Declare Function UpdateWindow Lib "user32" (ByVal hWnd As Long) As Long
 Declare Function ScrollDC Lib "user32" (ByVal Hdc As Long, ByVal dX As Long, ByVal dY As Long, lprcScroll As RECT, lprcClip As RECT, ByVal hrgnUpdate As Long, lprcUpdate As RECT) As Long
 Public LastErName As String
 Public LastErNameGR As String
@@ -210,7 +210,7 @@ Type POINTAPI
 End Type
 Private Declare Function GetTextExtentPoint32 Lib "gdi32" Alias "GetTextExtentPoint32W" (ByVal Hdc As Long, ByVal lpsz As Long, ByVal cbString As Long, lpSize As POINTAPI) As Long
 
-Declare Function GetDC Lib "user32" (ByVal hwnd As Long) As Long
+Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Declare Function PaintDesktop Lib "user32" (ByVal Hdc As Long) As Long
 Declare Function SelectClipPath Lib "gdi32" (ByVal Hdc As Long, ByVal iMode As Long) As Long
   Public Const RGN_AND = 1
@@ -251,7 +251,7 @@ Global Const HWND_TOPMOST = -1
 Global Const HWND_NOTOPMOST = -2
 Global Const SWP_NOACTIVATE = &H10
 Global Const SWP_SHOWWINDOW = &H40
-Declare Sub SetWindowPos Lib "user32" (ByVal hwnd As Long, ByVal hWndInsertAfter As Long, ByVal x As Long, ByVal y As Long, ByVal cX As Long, ByVal cY As Long, ByVal wFlags As Long)
+Declare Sub SetWindowPos Lib "user32" (ByVal hWnd As Long, ByVal hWndInsertAfter As Long, ByVal x As Long, ByVal y As Long, ByVal cX As Long, ByVal cY As Long, ByVal wFlags As Long)
 Declare Function ExtFloodFill Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long, ByVal wFillType As Long) As Long
 Public Const FLOODFILLSURFACE = 1
 Public Const FLOODFILLBORDER = 0
@@ -269,7 +269,7 @@ Public nomore As Boolean
 Private Declare Function CallWindowProc _
  Lib "user32.dll" Alias "CallWindowProcW" ( _
  ByVal lpPrevWndFunc As Long, _
- ByVal hwnd As Long, _
+ ByVal hWnd As Long, _
  ByVal Msg As Long, _
  ByVal wParam As Long, _
  ByVal lParam As Long) As Long
@@ -333,7 +333,7 @@ End Type
 Private Declare Function CreateRoundRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal Y3 As Long) As Long
 
 Private Declare Function PathToRegion Lib "gdi32" (ByVal Hdc As Long) As Long
-Private Declare Function SetWindowRgn Lib "user32" (ByVal hwnd As Long, ByVal hRgn As Long, ByVal bRedraw As Boolean) As Long
+Private Declare Function SetWindowRgn Lib "user32" (ByVal hWnd As Long, ByVal hRgn As Long, ByVal bRedraw As Boolean) As Long
 Private Declare Function CreateFontIndirect Lib "gdi32" Alias "CreateFontIndirectA" (lpLogFont As LOGFONT) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal Hdc As Long, ByVal hObject As Long) As Long
 
@@ -356,7 +356,7 @@ Const DFC_POPUPMENU = 5            'Only Win98/2000 !!
 Const DFCS_BUTTON3STATE = &H10
 Const DC_GRADIENT = &H20          'Only Win98/2000 !!
 
-Private Declare Function DrawCaption Lib "user32" (ByVal hwnd As Long, ByVal Hdc As Long, pcRect As RECT, ByVal un As Long) As Long
+Private Declare Function DrawCaption Lib "user32" (ByVal hWnd As Long, ByVal Hdc As Long, pcRect As RECT, ByVal un As Long) As Long
 Private Declare Function DrawEdge Lib "user32" (ByVal Hdc As Long, qrc As RECT, ByVal edge As Long, ByVal grfFlags As Long) As Long
 Private Declare Function DrawFocusRect Lib "user32" (ByVal Hdc As Long, lpRect As RECT) As Long
 Private Declare Function DrawFrameControl Lib "user32" (ByVal Hdc As Long, lpRect As RECT, ByVal un1 As Long, ByVal un2 As Long) As Long
@@ -660,7 +660,7 @@ End Function
 Public Function KeyPressedLong(ByVal VirtKeyCode As Long) As Long
 On Error GoTo KEXIT
 If Not Screen.ActiveForm Is Nothing Then
-If GetForegroundWindow = Screen.ActiveForm.hwnd Then
+If GetForegroundWindow = Screen.ActiveForm.hWnd Then
 KeyPressedLong = GetAsyncKeyState(VirtKeyCode)
 End If
 End If
@@ -669,7 +669,7 @@ End Function
 Public Function KeyPressed2(ByVal VirtKeyCode As Long, ByVal VirtKeyCode2 As Long) As Boolean
 On Error GoTo KEXIT
 If Not Screen.ActiveForm Is Nothing Then
-If GetForegroundWindow = Screen.ActiveForm.hwnd Then
+If GetForegroundWindow = Screen.ActiveForm.hWnd Then
 KeyPressed2 = CBool((GetAsyncKeyState(VirtKeyCode) And &H8000&) = &H8000&) And CBool((GetAsyncKeyState(VirtKeyCode2) And &H8000&) = &H8000&)
 End If
 End If
@@ -678,7 +678,7 @@ End Function
 Public Function KeyPressed(ByVal VirtKeyCode As Long) As Boolean
 On Error GoTo KEXIT
 If Not Screen.ActiveForm Is Nothing Then
-If GetForegroundWindow = Screen.ActiveForm.hwnd Then
+If GetForegroundWindow = Screen.ActiveForm.hWnd Then
 KeyPressed = CBool((GetAsyncKeyState(VirtKeyCode) And &H8000&) = &H8000&)
 End If
 End If
@@ -687,7 +687,7 @@ End Function
 Public Function mouse2() As Long
 On Error GoTo MEXIT
 If Not Screen.ActiveForm Is Nothing Then
-If GetForegroundWindow = Screen.ActiveForm.hwnd Then
+If GetForegroundWindow = Screen.ActiveForm.hWnd Then
 
 mouse2 = (UINT(GetAsyncKeyState((1))) And &HFF) + (UINT(GetAsyncKeyState((2))) And &HFF) * 2 + (UINT(GetAsyncKeyState((4))) And &HFF) * 4
 End If
@@ -697,7 +697,7 @@ End Function
 Public Function mouse() As Long
 On Error GoTo MEXIT
 If Not Screen.ActiveForm Is Nothing Then
-If GetForegroundWindow = Screen.ActiveForm.hwnd Then
+If GetForegroundWindow = Screen.ActiveForm.hWnd Then
 ''If Screen.ActiveForm Is Form1 Then If Form1.lockme Then Exit Function
 
 mouse = -1 * CBool((GetAsyncKeyState(1) And &H8000&) = &H8000&) - 2 * CBool((GetAsyncKeyState(2) And &H8000&) = &H8000&) - 4 * CBool((GetAsyncKeyState(4) And &H8000&) = &H8000&)
@@ -712,7 +712,7 @@ On Error GoTo MOUSEX
 Dim tp As POINTAPI
 MOUSEX = x
 If Not Screen.ActiveForm Is Nothing Then
-If GetForegroundWindow = Screen.ActiveForm.hwnd Then
+If GetForegroundWindow = Screen.ActiveForm.hWnd Then
    GetCursorPos tp
    x = tp.x * dv15 - Offset
   MOUSEX = x
@@ -726,7 +726,7 @@ On Error GoTo MOUSEY
 Dim tp As POINTAPI
 MOUSEY = y
 If Not Screen.ActiveForm Is Nothing Then
-If GetForegroundWindow = Screen.ActiveForm.hwnd Then
+If GetForegroundWindow = Screen.ActiveForm.hWnd Then
    GetCursorPos tp
    y = tp.y * dv15 - Offset
    MOUSEY = y
@@ -886,7 +886,7 @@ If Int(25 * factor) > 2 Then
 m.ScaleMode = vbPixels
 
 hRgn = CreateRoundRectRgn(0, 0, m.ScaleX(x1, 1, 3), m.ScaleY(y1, 1, 3), 25 * factor, 25 * factor)
-SetWindowRgn m.hwnd, hRgn, t
+SetWindowRgn m.hWnd, hRgn, t
 DeleteObject hRgn
 m.ScaleMode = vbTwips
 
@@ -909,7 +909,7 @@ Select Case way
 Case 0
 DrawEdge m.Hdc, R, CLng(par) Mod 256, CLng(par) \ 256
 Case 1
-DrawCaption m.hwnd, m.Hdc, R, CLng(par)
+DrawCaption m.hWnd, m.Hdc, R, CLng(par)
 Case 2
 DrawEdge m.Hdc, R, CLng(par), BF_RECT
 Case 3
@@ -944,7 +944,7 @@ Select Case way
 Case 0
 DrawEdge m.Hdc, R, CLng(par) Mod 256, CLng(par) \ 256
 Case 1
-DrawCaption m.hwnd, m.Hdc, R, CLng(par)
+DrawCaption m.hWnd, m.Hdc, R, CLng(par)
 Case 2
 DrawEdge m.Hdc, R, CLng(par), BF_RECT
 Case 3
@@ -1036,7 +1036,7 @@ End Sub
 Public Sub LCTCnew(dqq As Object, mb As basket, y As Long, x As Long)
 DestroyCaret
 With mb
-CreateCaret dqq.hwnd, 0, dqq.ScaleX(.Xt, 1, 3), dqq.ScaleY((.Yt - .uMineLineSpace * 2) * 0.2, 1, 3)
+CreateCaret dqq.hWnd, 0, dqq.ScaleX(.Xt, 1, 3), dqq.ScaleY((.Yt - .uMineLineSpace * 2) * 0.2, 1, 3)
 SetCaretPos dqq.ScaleX(x * .Xt, 1, 3), dqq.ScaleY((y + 0.8) * .Yt, 1, 3)
 End With
 End Sub
@@ -1048,21 +1048,21 @@ If t& = -1 Or Not Form1.ActiveControl Is dqq Then
         Else
         If Form1.ActiveControl Is Nothing Then
         Else
-            CreateCaret Form1.ActiveControl.hwnd, 0, -1, 0
+            CreateCaret Form1.ActiveControl.hWnd, 0, -1, 0
             End If
-            CreateCaret dqq.hwnd, 0, -1, 0
+            CreateCaret dqq.hWnd, 0, -1, 0
         End If
         Exit Sub
 End If
 
 If t& = 1 Then
        ' CreateCaret dqq.hWnd, 0, dqq.ScaleX(.Xt, 1, 3), dqq.ScaleY((.Yt - .uMineLineSpace * 2), 1, 3)
-       CreateCaret dqq.hwnd, 0, dqq.ScaleX(.Xt, 1, 3), dqq.ScaleY(.Yt - .uMineLineSpace * 2, 1, 3)
+       CreateCaret dqq.hWnd, 0, dqq.ScaleX(.Xt, 1, 3), dqq.ScaleY(.Yt - .uMineLineSpace * 2, 1, 3)
         SetCaretPos dqq.ScaleX(.curpos * .Xt, 1, 3), dqq.ScaleY(.currow * .Yt + .uMineLineSpace, 1, 3)
         On Error Resume Next
         If Not extreme Then If INK$ = vbNullString Then dqq.Refresh
 Else
-    CreateCaret dqq.hwnd, 0, dqq.ScaleX(.Xt, 1, 3), .Yt \ DYP \ 6 + 1
+    CreateCaret dqq.hWnd, 0, dqq.ScaleX(.Xt, 1, 3), .Yt \ DYP \ 6 + 1
         
             SetCaretPos dqq.ScaleX(.curpos * .Xt, 1, 3), dqq.ScaleY((.currow + 1) * .Yt - .uMineLineSpace, 1, 3) - .Yt \ DYP \ 6 - 1
         On Error Resume Next
@@ -2907,33 +2907,33 @@ SetTextBasketBack dq, mybasket
                       nomoveLCTC dq, mybasket, y&, c& + x&, ins&
                       iamactive = False
            Else
-                If Not (GetForegroundWindow = Screen.ActiveForm.hwnd And Screen.ActiveForm.Name = "Form1") Then
+                If Not (GetForegroundWindow = Screen.ActiveForm.hWnd And Screen.ActiveForm.Name = "Form1") Then
                  
                       DestroyCaret
                       nomoveLCTC dq, mybasket, y&, c& + x&, ins&
                       iamactive = False
              Else
-                         If ShowCaret(dq.hwnd) = 0 Then
-                                   HideCaret dq.hwnd
+                         If ShowCaret(dq.hWnd) = 0 Then
+                                   HideCaret dq.hWnd
                                    .currow = y&
                                    .curpos = c& + x&
                                    LCTCB dq, mybasket, ins&
-                                   ShowCaret dq.hwnd
+                                   ShowCaret dq.hWnd
                          End If
                 End If
                 End If
      Else
   If Not Screen.ActiveForm Is Nothing Then
-            If GetForegroundWindow = Screen.ActiveForm.hwnd And Screen.ActiveForm.Name = "Form1" Then
+            If GetForegroundWindow = Screen.ActiveForm.hWnd And Screen.ActiveForm.Name = "Form1" Then
            
                           nomoveLCTC dq, mybasket, y&, c& + x&, ins&
                              iamactive = True
-                              If ShowCaret(dq.hwnd) = 0 And Screen.ActiveForm.Name = "Form1" Then
-                                   HideCaret dq.hwnd
+                              If ShowCaret(dq.hWnd) = 0 And Screen.ActiveForm.Name = "Form1" Then
+                                   HideCaret dq.hWnd
                                    .currow = y&
                                    .curpos = c& + x&
                                    LCTCB dq, mybasket, ins&
-                                   ShowCaret dq.hwnd
+                                   ShowCaret dq.hWnd
                          End If
                          End If
             End If
@@ -3530,7 +3530,7 @@ With Form1.TEXT1
 
 ProcTask2 bstack
 .glistN.UseTab = True
-Hook Form1.hwnd, Nothing '.glistN
+Hook Form1.hWnd, Nothing '.glistN
 .AutoNumber = Not Form1.EditTextWord
 
 .UsedAsTextBox = False
@@ -3678,7 +3678,7 @@ Set Form1.TEXT1.mDoc = New Document
 Form1.TEXT1.glistN.UseTab = UseTabInForm1Text1
 Form1.TEXT1.glistN.BackStyle = 0
 Set Form1.Point2Me = Nothing
-UnHook Form1.hwnd
+UnHook Form1.hWnd
 Form1.KeyPreview = True
 
 INK$ = vbNullString
@@ -3712,7 +3712,7 @@ If D.Visible Then D.SetFocus
 With Form1.TEXT1
 
 ProcTask2 bstack
-Hook Form1.hwnd, Nothing
+Hook Form1.hWnd, Nothing
 '.Filename = VbNullString
 .AutoNumber = Not Form1.EditTextWord
 
@@ -3945,7 +3945,7 @@ End If
 Form1.KeyPreview = True
 If maxchar > 0 Then Form1.TEXT1.glistN.DragEnabled = ot
 
-UnHook Form1.hwnd
+UnHook Form1.hWnd
 INK$ = vbNullString
 Form1.TEXT1.glistN.UseTab = False
 escok = oldesc
@@ -4719,7 +4719,7 @@ End If
 If dq.Visible = False Then dq.Visible = True
 If exWnd = 0 Then Form1.KeyPreview = True
 QRY = True
-If GetForegroundWindow = Form1.hwnd Then
+If GetForegroundWindow = Form1.hWnd Then
 If exWnd = 0 Then dq.SetFocus
 End If
 
@@ -4770,7 +4770,7 @@ LCTbasketCur dq, prive                       ' here
  End If
  End If
  End If
-If Not QRY Then HideCaret dq.hwnd:   Exit Do
+If Not QRY Then HideCaret dq.hWnd:   Exit Do
 
  BLOCKkey = False
  If USELIST Then
@@ -4840,7 +4840,7 @@ LCTbasket dq, prive, .currow, .curpos
   
    End If
       If iamactive Then
- If ShowCaret(dq.hwnd) = 0 Then
+ If ShowCaret(dq.hWnd) = 0 Then
  
    LCTCB dq, prive, 0
   End If
@@ -4850,11 +4850,11 @@ MyDoEvents1 Form1, , True
 End If
 
  If Screen.ActiveForm Is Nothing Then
- iamactive = False:  If ShowCaret(dq.hwnd) <> 0 Then HideCaret dq.hwnd
+ iamactive = False:  If ShowCaret(dq.hWnd) <> 0 Then HideCaret dq.hWnd
 Else
  
-    If Not GetForegroundWindow = Screen.ActiveForm.hwnd Then
-    iamactive = False:  If ShowCaret(dq.hwnd) <> 0 Then HideCaret dq.hwnd
+    If Not GetForegroundWindow = Screen.ActiveForm.hWnd Then
+    iamactive = False:  If ShowCaret(dq.hWnd) <> 0 Then HideCaret dq.hWnd
   
     End If
     End If
@@ -4878,7 +4878,7 @@ Else
 If Screen.ActiveForm.Name <> "Form1" Then
 iamactive = False
 Else
-iamactive = GetForegroundWindow = Screen.ActiveForm.hwnd
+iamactive = GetForegroundWindow = Screen.ActiveForm.hWnd
 End If
 End If
 If Fkey > 0 Then
@@ -5004,7 +5004,7 @@ cont12345:
                     fr1 = 1
                     If (s$ = vbNullString And a$ = "-") Or IsNumberQuery(s$ + a$, fr1, p, fr2) Then
                             If fr2 - 1 = RealLen(s$) + 1 Or (s$ = vbNullString And a$ = "-") Then
-   If ShowCaret(dq.hwnd) <> 0 Then DestroyCaret
+   If ShowCaret(dq.hWnd) <> 0 Then DestroyCaret
                 If a$ = "." Then
                 If Not NoUseDec Then
                     If OverideDec Then
@@ -5027,7 +5027,7 @@ GdiFlush
                     
                     End If
             Else
-            If ShowCaret(dq.hwnd) <> 0 Then DestroyCaret
+            If ShowCaret(dq.hWnd) <> 0 Then DestroyCaret
                    If safe$ <> "" Then
         a$ = safe$: safe$ = vbNullString
 End If
@@ -5287,10 +5287,10 @@ End Function
 
 
 
-Sub ICOPY(d1 As Object, x1 As Long, y1 As Long, w As Long, H As Long)
+Sub ICOPY(d1 As Object, x1 As Long, y1 As Long, w As Long, h As Long)
 Dim sV As Long
 With players(GetCode(d1))
-sV = BitBlt(d1.Hdc, CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleY(y1, 1, 3)), CLng(d1.ScaleX(w, 1, 3)), CLng(d1.ScaleY(H, 1, 3)), d1.Hdc, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleY(.YGRAPH, 1, 3)), SRCCOPY)
+sV = BitBlt(d1.Hdc, CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleY(y1, 1, 3)), CLng(d1.ScaleX(w, 1, 3)), CLng(d1.ScaleY(h, 1, 3)), d1.Hdc, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleY(.YGRAPH, 1, 3)), SRCCOPY)
 'sv = UpdateWindow(d1.hwnd)
 End With
 End Sub
@@ -5986,6 +5986,7 @@ If s$ <> "" Then
                 cc.Value = CLng(True)
                 mNoUseDec = True
                 CheckDec
+                OverideDec = False
             ElseIf D$ = "REC" Then
                 cc.ValueKey = "FUNCDEEP"  ' RESET
                 cc.ValueType = REG_DWORD
@@ -6849,7 +6850,7 @@ If Not Screen.ActiveForm Is Nothing Then
      If x.Name = "Form1" Or x.Name = "GuiM2000" Or x.Name = "Form2" Or x.Name = "Form4" Then
          If x.Visible And x.enabled Then
              If catchit Then x.SetFocus: Exit Sub
-             If x.hwnd = GetForegroundWindow Then
+             If x.hWnd = GetForegroundWindow Then
              catchit = True
              End If
          End If
@@ -6971,7 +6972,7 @@ Public Sub unknownid(b$, w$)
 MyErMacro b$, "unknown identifier " & w$, "’γνωστο αναγνωριστικό " & w$
 End Sub
 Public Sub VarNull()
-MyEr "Vatiable is Null", "Η μεταβλητή έχει την καμία τιμή - Null"
+MyEr "Variable is Null", "Η μεταβλητή έχει την καμία τιμή - Null"
 End Sub
 
 Public Sub NoRename()
@@ -7373,6 +7374,9 @@ Public Sub GroupCantSetValue()
 End Sub
 Public Sub PropCantChange()
 MyEr "Property can't change", "Η ιδιότητα δεν μπορεί να αλλάξει"
+End Sub
+Public Sub MissingSymbol(c$)
+MyEr "missing " & c$, "λείπει " & c$
 End Sub
 Public Sub NeedAGroupFromExpression()
 MyEr "Need a group from expression", "Χρειάζομαι μια ομάδα από την έκφραση"
@@ -8702,7 +8706,6 @@ End Function
 
 Function FastSymbol(a$, c$, Optional mis As Boolean = False, Optional cl As Long = 1) As Boolean
 Dim i As Long, j As Long
-'If Len(c$) <> cl Then Stop  ; only for check
 j = Len(a$)
 If j = 0 Then Exit Function
 i = MyTrimL(a$)
@@ -8712,9 +8715,7 @@ If mis Then MyEr "missing " & c$, "λείπει " & c$
 Exit Function
 End If
 If c$ = Mid$(a$, i, cl) Then
-'If InStr(c$, Mid$(a$, i, cl)) > 0 Then
 a$ = Mid$(a$, MyTrimLi(a$, i + cl))
-'Mid$(a$, i, cl) = Space$(cl)
 FastSymbol = True
 ElseIf mis Then
 MyEr "missing " & c$, "λείπει " & c$
@@ -10808,13 +10809,36 @@ CheckDec
 cdecimaldot$ = GetDeflocaleString(LOCALE_SDECIMAL)
 End Sub
 Public Sub CheckDec()
+If mNoUseDec Then
 OverideDec = False
-NowDec$ = GetDeflocaleString(LOCALE_SDECIMAL)
-NowThou$ = GetDeflocaleString(LOCALE_STHOUSAND)
-If NowDec$ = "." Then
-NoUseDec = False
+    NowDec$ = GetDeflocaleString(LOCALE_SDECIMAL)
+    If GetlocaleString(LOCALE_SDECIMAL) <> NowDec$ Then
+        NoUseDec = False
+        OverideDec = True
+        NowDec$ = GetlocaleString(LOCALE_SDECIMAL)
+        NowThou$ = GetlocaleString(LOCALE_STHOUSAND)
+    Else
+        NoUseDec = True
+        NowDec$ = GetlocaleString(LOCALE_SDECIMAL)
+        NowThou$ = GetlocaleString(LOCALE_STHOUSAND)
+    End If
 Else
-NoUseDec = mNoUseDec
+    NowDec$ = GetlocaleString(LOCALE_SDECIMAL)
+    NowThou$ = GetlocaleString(LOCALE_STHOUSAND)
+     NoUseDec = False
+    If GetDeflocaleString(LOCALE_SDECIMAL) = "." Then
+        If NowDec$ = "." Then
+            OverideDec = False
+            NoUseDec = True
+        Else
+        OverideDec = True
+        NoUseDec = False
+        End If
+    ElseIf NowDec$ = "." Then
+        OverideDec = True
+    Else
+        OverideDec = False
+    End If
 End If
 End Sub
 Function ProcEnumGroup(bstack As basetask, rest$, Optional glob As Boolean = False) As Boolean
@@ -16689,13 +16713,13 @@ Set Scr = bstack.Owner
 prive = GetCode(Scr)
 Dim p As Variant, i As Long, s$, pn&, x As Double, y As Double, it As Long, F As Long, pa$
 Dim x1 As Long, y1 As Long, frm$, par As Boolean, ohere$, ss$, w$, sX As Double, sY As Double, modname$
-Dim pppp As mArray, hlp$, H&, all$, myobject As Object, usehandler As mHandler, usegroup As Group
+Dim pppp As mArray, hlp$, h&, all$, myobject As Object, usehandler As mHandler, usegroup As Group
 Dim w1 As Long, w2 As Long, w3 As Long, dum As Boolean, virtualtop As Long
 pn& = 0
 virtualtop = varhash.count - 1
 'GoTo ByPass  '********************************
 For pn& = virtualtop To 0 Step -1
-varhash.ReadVar pn&, s$, H&
+varhash.ReadVar pn&, s$, h&
 If InStr(s$, ChrW(&H1FFF)) = 0 And InStr(s$, ChrW(&HFFBF)) = 0 Then Exit For
 virtualtop = virtualtop - 1
 Next pn&
@@ -16704,7 +16728,7 @@ pn& = 0
 Dim a() As String
 With players(prive)
 Do While pn& < varhash.count
-varhash.ReadVar pn&, s$, H&
+varhash.ReadVar pn&, s$, h&
 If SecureNames Then
 a() = Split(s$, "].")
 If UBound(a()) = 1 Then
@@ -16714,7 +16738,7 @@ End If
 End If
 's$ = Replace(s$, ChrW(&HFFBF), "")
 's$ = Replace(s$, ChrW(&H1FFF), "")
-If H& = -1 Then
+If h& = -1 Then
 Else
 'If InStr(s$, ChrW(&HFFBF)) > 0 And False Then   '*******************
 If InStr(s$, ChrW(&HFFBF)) > 0 Then
@@ -16724,8 +16748,8 @@ ElseIf InStr(s$, ChrW(&H1FFF)) > 0 Then '******************
 ' DO NOTHING
 GoTo LOOPNEXT
 ElseIf Right$(s$, 1) = "(" Then
-    If MyIsObject(var(H&)) Then
-        Set myobject = var(H&)
+    If MyIsObject(var(h&)) Then
+        Set myobject = var(h&)
         If Not CheckIsmArray(myobject) Then
         If Not myobject Is Nothing Then
         If TypeOf myobject Is mArray Then
@@ -16864,40 +16888,40 @@ Wend
     GoTo LOOPNEXT
  ElseIf Right$(s$, 1) = "$" Or Right$(s$, 3) = "$()" Then  ' WHY "$()"
     ' h& = Val(Mid$(VarName$, pn&))
-        If Typename(var(H&)) = doc Then
-            If var(H&).IsEmpty Then
+        If Typename(var(h&)) = doc Then
+            If var(h&).IsEmpty Then
                 hlp$ = " [Empty Document]"
             Else
-                hlp$ = " [Document " + CStr(var(H&).SizeCRLF) & " chars]"
+                hlp$ = " [Document " + CStr(var(h&).SizeCRLF) & " chars]"
             End If
-        ElseIf Typename(var(H&)) = "PropReference" Then
+        ElseIf Typename(var(h&)) = "PropReference" Then
         hlp$ = " [Object Property]"
         Else
-        If MyIsObject(var(H&)) Then
-        If TypeOf var(H&) Is lambda Then
+        If MyIsObject(var(h&)) Then
+        If TypeOf var(h&) Is lambda Then
             hlp$ = "[lambda$]"
             Else
             
-            If TypeOf var(H&) Is Constant Then
-            If var(H&).flag Then
-            hlp$ = "[" + Typename(var(H&).Value) + "$]"
+            If TypeOf var(h&) Is Constant Then
+            If var(h&).flag Then
+            hlp$ = "[" + Typename(var(h&).Value) + "$]"
             Else
-                 If Len(CStr(var(H&))) > 3 * .mx Then
-                    hlp$ = " = [" + Left$(CStr(var(H&)), 4) & "...]"
+                 If Len(CStr(var(h&))) > 3 * .mx Then
+                    hlp$ = " = [" + Left$(CStr(var(h&)), 4) & "...]"
                 Else
-                    hlp$ = " = [" + CStr(var(H&)) + "]"
+                    hlp$ = " = [" + CStr(var(h&)) + "]"
                 End If
             End If
             Else
-            hlp$ = "[" + Typename(var(H&)) + "]"
+            hlp$ = "[" + Typename(var(h&)) + "]"
             End If
             End If
         Else
         
-            If Len(var(H&)) > 3 * .mx Then
-                hlp$ = " = " & Chr(34) + Left$(CStr(var(H&)), 4) & "..." & Chr(34)
+            If Len(var(h&)) > 3 * .mx Then
+                hlp$ = " = " & Chr(34) + Left$(CStr(var(h&)), 4) & "..." & Chr(34)
             Else
-                hlp$ = " = " & Chr(34) + CStr(var(H&)) + Chr(34)
+                hlp$ = " = " & Chr(34) + CStr(var(h&)) + Chr(34)
             End If
             
         End If
@@ -16906,11 +16930,11 @@ Wend
     
 Else
 
-If MyIsObject(var(H&)) Then
-If var(H&) Is Nothing Then
+If MyIsObject(var(h&)) Then
+If var(h&) Is Nothing Then
 s$ = s$ + "*[Nothing]"
-ElseIf TypeOf var(H&) Is mHandler Then
-Set usehandler = var(H&)
+ElseIf TypeOf var(h&) Is mHandler Then
+Set usehandler = var(h&)
 Select Case usehandler.t1
 Case 1
 If usehandler.ReadOnly Then
@@ -16943,37 +16967,37 @@ End If
 End Select
 Set usehandler = Nothing
 Else
-    If TypeOf var(H&) Is Constant Then
+    If TypeOf var(h&) Is Constant Then
         On Error Resume Next
-        s$ = s$ & " = [" & LTrim$(Str(var(H&))) + "]"
+        s$ = s$ & " = [" & LTrim$(Str(var(h&))) + "]"
         If Err Then
-            s$ = s$ & " = [" & var(H&) + "]"
+            s$ = s$ & " = [" & var(h&) + "]"
             Err.Clear
         End If
     Else
-        If TypeOf var(H&) Is Group Then
-            Set usegroup = var(H&)
+        If TypeOf var(h&) Is Group Then
+            Set usegroup = var(h&)
             If usegroup.IamApointer Then
                 s$ = s$ & "*[Group]"
             Else
                 s$ = s$ & "[Group]"
             End If
             Set usegroup = Nothing
-        ElseIf TypeOf var(H&) Is PropReference Then
+        ElseIf TypeOf var(h&) Is PropReference Then
             s$ = s$ & " [Object Property]"
         Else
-            s$ = s$ & "[" & Typename(var(H&)) & "]"
+            s$ = s$ & "[" & Typename(var(h&)) & "]"
         End If
     End If
 End If
 Else
 On Error Resume Next
-s$ = s$ & " = " & LTrim$(Str(var(H&)))
+s$ = s$ & " = " & LTrim$(Str(var(h&)))
 If Err Then
-s$ = s$ & " = " & Chr(34) & var(H&) & Chr(34)
+s$ = s$ & " = " & Chr(34) & var(h&) & Chr(34)
 Err.Clear
 End If
-Select Case VarType(var(H&))
+Select Case VarType(var(h&))
         Case vbLong
         s$ = s$ & "&"
         Case vbDecimal
@@ -17044,7 +17068,7 @@ If Left$(mList.KeyToString, 2) <> "%_" Then
 If IsNumeric(mList.Value) Then
 s$ = s$ + mList.KeyToString + " = " + LTrim$(Str$(mList.Value))
 Else
-If Len(var(H&)) > 3 * .mx Then
+If Len(var(h&)) > 3 * .mx Then
  s$ = s$ + mList.KeyToString + " = " & Chr(34) + Left$(mList.Value, 4) & "..." & Chr(34)
  Else
 s$ = s$ + mList.KeyToString + " = " & Chr(34) + mList.Value + Chr(34)
@@ -17898,7 +17922,7 @@ Dim VR As Long
     End If
 End Function
 Function ExpandGui(bstack As basetask, what$, rest$, ifier As Boolean, Lang As Long, oName As String)
-Dim pppp As mArray, aVar As Variant, H$
+Dim pppp As mArray, aVar As Variant, h$
  Dim i As Long
 '' add new GuiItems but not visible
 what$ = Left$(what$, Len(what$) - 1)
@@ -17921,12 +17945,12 @@ what$ = Left$(what$, Len(what$) - 1)
         Set aaa = aVar
         With pppp.item(0)
         Set aaa.EventObj = .EventObj
-        H$ = .modulename
+        h$ = .modulename
         End With
         
         With aaa
         .MyName = what$
-        .modulename = H$
+        .modulename = h$
         .TempTitle = what$ + "(" + LTrim$(Str$(i)) + ")"
         .Index = i
         End With
@@ -18929,6 +18953,15 @@ ElseIf IsLabelSymbolNew(rest$, "ΠΛΗΡΟΦΟΡΙΕΣ", "INFORMATION", Lang) Then
     DeclareGUI = False
     End If
     Set var(i) = OsInfo
+ElseIf IsLabelSymbolNew(rest$, "ΒΟΗΘΟΣ", "SHINK", Lang) Then
+    
+    Y3 = True
+    If ar > 0 Then
+    MyEr "not for array", "όχι για πίνακα"
+    DeclareGUI = False
+    End If
+    Set var(i) = New ShinkEvent
+
 ElseIf IsLabelSymbolNew(rest$, "ΣΥΜΠΙΕΣΤΗΣ", "COMPRESSOR", Lang) Then
     If ar = 0 Then
         Set var(i) = New ZipTool
@@ -20521,18 +20554,18 @@ End Sub
 
 
 
-Sub scrMove00(Scr As Object, Optional ByVal w As Variant, Optional ByVal H As Variant)
+Sub scrMove00(Scr As Object, Optional ByVal w As Variant, Optional ByVal h As Variant)
 If TypeOf Scr Is Form Then
-If IsMissing(w) And IsMissing(H) Then
+If IsMissing(w) And IsMissing(h) Then
 Scr.move ScrInfo(Console).Left, ScrInfo(Console).top
 Else
-Scr.move ScrInfo(Console).Left, ScrInfo(Console).top, w, H
+Scr.move ScrInfo(Console).Left, ScrInfo(Console).top, w, h
 End If
 Else
- If IsMissing(w) And IsMissing(H) Then
+ If IsMissing(w) And IsMissing(h) Then
 Scr.move 0, 0
 Else
-Scr.move 0, 0, w, H
+Scr.move 0, 0, w, h
 End If
 End If
 End Sub
@@ -20664,12 +20697,10 @@ End If
 End If
 If i <> 0 Then addpath = False
 If InStr(ss$, "?") > 0 Or InStr(ss$, "*") > 0 Then
-aDir.Pattern = ss$
-frm$ = mylcasefILE$(aDir.Dir2$(mcd, "", False))
-'frm$ = mylcasefILE$(Dir(mcd + mylcasefILE(sS$)))
+    aDir.Pattern = ss$
+    frm$ = mylcasefILE$(aDir.Dir2$(mcd, "", False))
 Else
-frm$ = mylcasefILE$(aDir.Dir2$(mcd, ss$, False))
-'frm$ = mylcasefILE$(Dir(mcd & "*." & sS$))
+    frm$ = mylcasefILE$(aDir.Dir2$(mcd, ss$, False))
 End If
 
 If i = False Then
@@ -21213,13 +21244,13 @@ EXE$ = pp$ + EXE$
 If param <> "" Then
 'MyShell = Shell(Trim$(PP$ & EXE$ & " " & ww$ + " " + param), way)
 If Form1.Visible And way = vbNormalFocus Then
-MyShell = ShellExecute(Form1.hwnd, 0, StrPtr(EXE$), StrPtr(param), StrPtr(pp$), way)
+MyShell = ShellExecute(Form1.hWnd, 0, StrPtr(EXE$), StrPtr(param), StrPtr(pp$), way)
 Else
 MyShell = ShellExecute(0, 0, StrPtr(EXE$), StrPtr(param), StrPtr(pp$), way)
 End If
 Else
 If Form1.Visible And way = vbNormalFocus Then
-MyShell = ShellExecute(Form1.hwnd, 0, StrPtr(EXE$), 0, StrPtr(pp$), way)
+MyShell = ShellExecute(Form1.hWnd, 0, StrPtr(EXE$), 0, StrPtr(pp$), way)
 Else
 MyShell = ShellExecute(0, 0, StrPtr(EXE$), 0, StrPtr(pp$), way)
 End If
@@ -21243,7 +21274,7 @@ Case "@@@"
 'MyShell = Shell(RTrim$("explorer " & ww$), way)
 EXE$ = "explorer"
 If Form1.Visible Then
-MyShell = ShellExecute(Form1.hwnd, 0, StrPtr(EXE$), StrPtr(ww$), 0, way)
+MyShell = ShellExecute(Form1.hWnd, 0, StrPtr(EXE$), StrPtr(ww$), 0, way)
 Else
 MyShell = ShellExecute(0, 0, StrPtr(EXE$), StrPtr(ww$), 0, way)
 End If
@@ -21683,7 +21714,7 @@ Function MyScan(basestack As basetask, rest$) As Boolean
 Dim p As Variant, y As Double, s$
 ClearJoyAll
 PollJoypadk
-If GetForegroundWindow <> Form1.hwnd Or Not Targets Then
+If GetForegroundWindow <> Form1.hWnd Or Not Targets Then
 If IsExp(basestack, rest$, p, , True) Then
 
 End If
@@ -21869,7 +21900,7 @@ Public Function AddBackslash(s As String) As String
 
 End Function
 Function ProcCreateEmf(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim w, H  ' these are twips - need to convert to .01 mm
+Dim w, h  ' these are twips - need to convert to .01 mm
 Dim F As Boolean, p As Variant, Col As Long, it As Long, ss$, x As Double, par As Boolean, prive As Long
 Dim nd&, once As Boolean
 ProcCreateEmf = True
@@ -21877,7 +21908,7 @@ prive = GetCode(bstack.Owner)
 ' skip for now
 If IsExp(bstack, rest$, w, , True) Then
     If FastSymbol(rest$, ",") Then
-           If Not IsExp(bstack, rest$, H, , True) Then MissNumExpr
+           If Not IsExp(bstack, rest$, h, , True) Then MissNumExpr
     Else
     
     End If
@@ -22319,9 +22350,17 @@ On Error Resume Next
 Clid = 1032
 UserCodePage = 1253
 DefBooleanString = ";Αληθές;Ψευδές"
-NoUseDec = False
+If Not mNoUseDec Then
+NoUseDec = Mid$(CStr(1.2), 2, 1) = "."
+OverideDec = Not NoUseDec
+NowDec$ = "."
+NowThou$ = ","
+Else
+NoUseDec = Mid$(CStr(1.2), 2, 1) = ","
+OverideDec = Not NoUseDec
 NowDec$ = ","
 NowThou$ = "."
+End If
 With Form1
    bstack.myCharSet = 161
 If bstack.tolayer > 0 Then
@@ -22349,10 +22388,13 @@ Sub LATIN(bstack As basetask)
 On Error Resume Next
 Clid = 1033
 UserCodePage = 1252
-UserCodePage = 1253
-NoUseDec = False
+
+NoUseDec = Mid$(CStr(1.2), 2, 1) = "."
+OverideDec = Not NoUseDec
 NowDec$ = "."
 NowThou$ = ","
+
+
 With Form1
 bstack.myCharSet = 0
 If bstack.tolayer > 0 Then
@@ -23780,17 +23822,21 @@ End With
 End Function
 Public Function GetSpecialfolder(CSIDL As Long) As String
     Dim R As Long
-    Dim IDL As ITEMIDLIST, NoError As Long, Path$
+    Dim IDL As Long, NoError As Long, Path$
     'Get the special folder
     R = SHGetSpecialFolderLocation(100, CSIDL, IDL)
     If R = NoError Then
         'Create a buffer
-        Path$ = space$(512)
+        If IDL Then
+        Path$ = space$(1024)
+        
         'Get the path from the IDList
-        R = SHGetPathFromIDList(ByVal IDL.mkid.cb, ByVal Path$)
+        R = SHGetPathFromIDList(IDL, StrPtr(Path$))
         'Remove the unnecessary chr$(0)'s
-        GetSpecialfolder = mylcasefILE(Left$(Path, InStr(Path, Chr$(0)) - 1))
+        GetSpecialfolder = mylcasefILE(Left$(Path, InStr(Path, vbNullChar) - 1))
+        Call CoTaskMemFree(IDL)
         Exit Function
+        End If
     End If
     GetSpecialfolder = vbNullString
 End Function
@@ -25716,10 +25762,22 @@ Locale:
     Else
     DefBooleanString = ";\T\r\u\e;\F\a\l\s\e"
     End If
-    OverideDec = True
-    NoUseDec = False
-    NowDec$ = GetlocaleString(LOCALE_SDECIMAL)
-    NowThou$ = GetlocaleString(LOCALE_STHOUSAND)
+    OverideDec = False
+    NowDec$ = GetDeflocaleString(LOCALE_SDECIMAL)
+    If GetlocaleString(LOCALE_SDECIMAL) <> NowDec$ Then
+        NoUseDec = False
+        OverideDec = True
+        NowDec$ = GetlocaleString(LOCALE_SDECIMAL)
+        NowThou$ = GetlocaleString(LOCALE_STHOUSAND)
+    Else
+        NoUseDec = True
+        NowDec$ = GetlocaleString(LOCALE_SDECIMAL)
+        NowThou$ = GetlocaleString(LOCALE_STHOUSAND)
+    End If
+    
+    
+    
+
     p = GetCodePage(CLng(p))
     GoTo CHR222
     ElseIf IsStrExp(basestack, rest$, s$) Then
@@ -26045,7 +26103,7 @@ End If
 End Function
 
 Function StaticNew(bstack As basetask, b$, w$, Lang As Long) As Boolean
-Dim p As Variant, ii As Long, ss$, usehandler As mHandler, H As Variant
+Dim p As Variant, ii As Long, ss$, usehandler As mHandler, h As Variant
 
 If bstack.StaticCollection Is Nothing Then
 
@@ -26074,10 +26132,10 @@ Do
                             Set .objref = anything
                             End With
                             Set p = usehandler
-                            Set H = usehandler
-                      bstack.SetVarobJvalue w$, H
+                            Set h = usehandler
+                      bstack.SetVarobJvalue w$, h
                       Set usehandler = Nothing
-                      Set H = Nothing
+                      Set h = Nothing
                     ElseIf CheckLastHandler(anything) Then
                         Set usehandler = anything
                         If usehandler.t1 = 2 Then
@@ -26397,3 +26455,148 @@ If p.Height > 0 Then
 GrabFrame = DIBtoSTR(p)
 End If
 End Function
+Function ProcChooseOrgan(bstack As basetask, rest$, Lang As Long) As Boolean
+Dim F As Long, i As Long, s$
+If Form4Loaded Then
+If Form4.Visible Then
+Form4.Visible = False
+    If Form1.TEXT1.Visible Then
+        Form1.TEXT1.SetFocus
+    Else
+        Form1.SetFocus
+    End If
+End If
+End If
+Form1.List1.Clear
+F = 0
+For i = 1 To 127
+s$ = ORGAN(i)
+Form1.List1.additemFast s$
+'If TextWidth(bstack.Owner, s$) > f Then f = TextWidth(bstack.Owner, s$)
+Next i
+ProcChooseOrgan = MyMenu(1, bstack, rest$, Lang)
+End Function
+Public Function CallEventFromCOM(evCom As ComShinkEvent, aString$, what$, NumVar As Long, vrs(), exclude As Boolean, ItemIndex As Long) As Boolean
+Dim tr As Boolean, extr As Boolean, olescok As Boolean
+Dim F$, F1$, klm As Long, ohelp As Object
+'olescok = escok
+'escok = False
+CallEventFromCOM = True
+F1$ = evCom.modulename$
+F$ = UCase(F1$ + "_" + aString$ + "()") ' No greek
+If Not subHash.Find(F$, klm) Then exclude = True: Exit Function
+extr = extreme
+extreme = True
+tr = trace
+trace = False
+Dim n$, bb As mStiva, oldbstack As mStiva, nowtotal As Long
+Dim bstack As basetask
+Set bstack = New basetask
+Set bstack.Owner = Form1.DIS
+Set bstack.StaticCollection = EventStaticCollection
+bstack.IamAnEvent = True
+Dim i As Long
+i = evCom.VarIndex
+F1$ = evCom.modulename$
+Set oldbstack = bstack.soros
+Dim j As Long, k As Long, s1$, s2$
+Dim ohere$
+ohere$ = here$
+here$ = vbNullString
+
+If evCom.Attached Then
+Set bb = New mStiva
+Set bstack.Sorosref = bb
+            PushStage bstack, False
+            If ItemIndex > -1 Then
+                bb.DataVal CVar(ItemIndex)
+            End If
+            For k = 1 To NumVar
+            If VariantIsRef(VarPtr(vrs(k))) Then
+            Select Case VarType(vrs(k))
+            Case vbString
+            globalvarGroup "EV" + CStr(i + k) + "$", vrs(k)
+            bb.DataStr "EV" + CStr(i + k) + "$"
+            Case Is >= vbArray
+            ' make it normal
+            globalvarGroup "EV" + CStr(i + k) + "(", RetM2000array(vrs(k))
+            bb.DataStr "EV" + CStr(i + k)
+            Case Else
+            globalvarGroup "EV" + CStr(i + k), vrs(k)
+            bb.DataStr "EV" + CStr(i + k)
+            End Select
+            Else
+            Select Case VarType(vrs(k))
+            Case vbString
+            bb.DataStr CStr(vrs(k))
+            Case Is >= vbArray
+            ' make it normal
+                Set ohelp = RetM2000array(vrs(k))
+                bb.DataObj ohelp
+                Set ohelp = Nothing
+            Case Else
+                If MyIsObject(vrs(k)) Then
+                    Set ohelp = vrs(k)
+                    bb.DataObj ohelp
+                    Set ohelp = Nothing
+                Else
+                    bb.DataVal vrs(k)
+                End If
+            End Select
+            End If
+            Next k
+            '''bb.DataObj evCom
+            '' last is the second name, the class name??
+            bb.DataStr what$
+     
+            bb.DataObj MakeitObjectGeneric(evCom.VarIndex)
+  
+            'f$ = aString$
+            
+           '' WE ARE GOING TO OUR MODULE
+           
+            here$ = evCom.modulenameonly
+
+            If FastCallModule(bstack, klm) <> 1 Then
+            
+            
+            
+                PopStage bstack
+                bb.Flush
+                GoTo conthere
+            End If
+                  here$ = vbNullString
+                  If NumVar > 0 Then
+       For k = LBound(vrs()) To UBound(vrs()) - 1
+       Select Case VarType(vrs(k))
+       Case vbString
+            GetlocalVar "EV" + CStr(i + k) + "$", j
+            vrs(k) = var(j)
+       Case Is >= vbArray
+            GetlocalVar "EV" + CStr(i + k) + "(", j
+            RetComArray var(j), vrs(k)
+       
+        Case Else
+            GetlocalVar "EV" + CStr(i + k), j
+             vrs(k) = var(j)
+            End Select
+           
+            Next k
+            End If
+            PopStage bstack
+
+            bb.Flush
+
+End If
+
+conthere:
+Set bstack.Sorosref = oldbstack
+here$ = ohere$
+Set oldbstack = Nothing
+Set bb = Nothing
+extreme = extr
+trace = tr
+
+'escok = olescok
+End Function
+

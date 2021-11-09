@@ -953,6 +953,8 @@ Else
                 SELECTEDITEM = -1
                 secreset = False
                  RaiseEvent Selected2(-2)
+            ElseIf Not LeaveonChoose Then
+            RaiseEvent SyncKeyboardUnicode(Chr$(27))
              End If
         Else
             If myEnabled Then
@@ -1009,6 +1011,7 @@ Else
 
 Exit Sub
            End If
+           RaiseEvent SyncKeyboardUnicode(kk$)
            RaiseEvent RemoveOne(kk$)
            
          If KeyAscii = 44 And Len(kk$) = 2 Then
@@ -1636,7 +1639,7 @@ shift = 0
 RaiseEvent CtrlPlusF1
 Exit Sub
 ElseIf KeyCode >= vbKeyF1 And KeyCode <= vbKeyF12 Then
-    k = (KeyCode - vbKeyF1 + 1) + 12 * (shift And 1)
+    k = ((KeyCode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
     RaiseEvent Fkey(k)
     If k = 0 Then KeyCode = 0: shift = 0
 ElseIf KeyCode = 16 And shift <> 0 Then

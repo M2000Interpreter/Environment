@@ -139,7 +139,7 @@ passhere:
                
                 For lngLoop = 0 To items - 1 + fixnamearg
                 If Not MyIsNumericPointer(pArgs(lngLoop)) Then
-                If IsNull(pArgs(lngLoop)) Then
+                If myIsNull(pArgs(lngLoop)) Then
                 SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop)
                 ElseIf TypeOf pArgs(lngLoop) Is mArray Then
                     If Typename(pArgs(lngLoop).refArray) = "Long" Then

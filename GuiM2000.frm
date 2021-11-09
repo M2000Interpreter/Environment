@@ -422,7 +422,16 @@ Else
     Callback mMyName$ + ".Click()"
 End If
 End Sub
-
+Friend Sub SpreadKey(strKey As String)
+Dim VR(1)
+VR(0) = strKey
+If mIndex > -1 Then
+    CallbackNow mMyName$ + ".KeyPreview(" + CStr(Index) + ")", VR()
+Else
+    CallbackNow mMyName$ + ".KeyPreview()", VR()
+End If
+strKey = VR(0)
+End Sub
 Private Sub Form_Activate()
 On Error Resume Next
 
@@ -674,7 +683,6 @@ End Sub
 
 
 Private Sub gList2_BlinkNow(Face As Boolean)
-
 If mTimes > 0 Then
     mTimes = mTimes - 1
     If mTimes = 0 Then
@@ -1484,9 +1492,22 @@ End Property
 Public Property Get CtrlFontBold()
     CtrlFontBold = CtrlFont.bold
 End Property
+Friend Sub SendFKEY(a As Integer)
 
+ If mIndex >= 0 Then
+      Callback mMyName$ + ".Fkey(" + Str(mIndex) + "," + Str(a) + ")"
+   Else
+      Callback mMyName$ + ".Fkey(" + Str(a) + ")"
+      End If
+End Sub
 
-
+Private Sub gList2_Fkey(a As Integer)
+If a > 1000 Then
+SendFKEY a - 1000
+Else
+SendFKEY a
+End If
+End Sub
 
 Private Sub gList2_KeyDown(KeyCode As Integer, shift As Integer)
 If moveMe Then
@@ -1668,6 +1689,10 @@ Set LastGlist = this
 End Sub
 
 
+Private Sub gList2_SyncKeyboardUnicode(a As String)
+SpreadKey a
+End Sub
+
 Private Sub glistN_CheckLostFocus()
 On Error Resume Next
 If Not moveMe Then
@@ -1693,6 +1718,14 @@ glistN.ListindexPrivateUse = item
 glistN.ShowMe2
 lastitem = item
 'glistN.ListindexPrivateUse = -1
+End If
+End Sub
+
+Private Sub glistN_Fkey(a As Integer)
+If a > 1000 Then
+SendFKEY a - 1000
+Else
+SendFKEY a
 End If
 End Sub
 

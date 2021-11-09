@@ -1583,7 +1583,7 @@ Dim l1 As Long, c1 As Long
 If KeyCode = 18 Then
 Exit Sub
 End If
-If KeyCode = vbKeyF10 And shift <> 0 Then
+If KeyCode = vbKeyF10 And (shift And 7) = 1 Then
 KeyCode = 0
 If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
@@ -7789,15 +7789,15 @@ End If
 aheadstatus = b$
 End Function
 
-Public Sub move(x, y, Optional w, Optional H)
+Public Sub move(x, y, Optional w, Optional h)
 If IsMissing(w) Then
 glistN.MoveTwips CLng(x), CLng(y), 0, 0
-ElseIf IsMissing(H) Then
+ElseIf IsMissing(h) Then
 
 glistN.MoveTwips CLng(x), CLng(y), CLng(w), 0
 RelocateMarkedText
 Else
-glistN.MoveTwips CLng(x), CLng(y), CLng(w), CLng(H)
+glistN.MoveTwips CLng(x), CLng(y), CLng(w), CLng(h)
 RelocateMarkedText
 End If
 
@@ -7862,8 +7862,9 @@ enabled = b
   
 End Sub
 Private Sub PressKey_A(KeyCode As Integer, shift As Integer)
-Static ctrl As Boolean, noentrance As Boolean, where As Long, noinp As Double
+Static ctrl As Boolean, alt As Boolean, noentrance As Boolean, where As Long, noinp As Double
 Dim aa$, a$, JJ As Long, ii As Long
+If alt = True Then shift = shift Or 4: alt = False
 If noentrance Then
 KeyCode = 0
 Exit Sub
@@ -7893,8 +7894,11 @@ nochange = False
 
 Case vbKeyControl
 ctrl = True
+alt = (shift And 4) = 4
 KeyCode = 0
 Case vbKeyF1
+If shift > 0 Then If (shift And 2) <> 2 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+
 If (shift And 2) = 2 Then
 If SelText <> "" Then
 helpmeSub
@@ -7914,6 +7918,8 @@ End If
 
 KeyCode = 0
 Case vbKeyF2
+If (shift And 4) = 4 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+
 If shift <> 0 Then
 LastSearchType = 2 - Abs(shift Mod 2 = 1)
 If SelText <> "" Then s$ = SelText
@@ -7942,6 +7948,7 @@ If LastSearchType > 0 Then
 End If
 KeyCode = 0
 Case vbKeyF3
+If (shift And 4) = 4 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
     If shift <> 0 Then
         If s$ = vbNullString And SelText <> "" Then s$ = SelText
         If pagio$ = "GREEK" Then
@@ -7967,22 +7974,28 @@ Case vbKeyF3
         End If
     End If
 Case vbKeyF4
+If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If SelText <> "" Then mscatsub Else dothis
 KeyCode = 0
 Case vbKeyF5
+If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If SelText <> "" Then rthissub shift
 KeyCode = 0
 Case vbKeyF6  ' Set/Show/Reset Para1
+If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton para1, PosPara1
 KeyCode = 0
 Case vbKeyF7  'Set/Show/Reset Para2
+If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para2, PosPara2
 KeyCode = 0
 Case vbKeyF8  'Set/Show/Reset Para2
+If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para3, PosPara3
 KeyCode = 0
 
 Case vbKeyF9  ' Count Words
+If (shift And 7) > 1 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If shift <> 0 Then
 NoCenterLineEdit = Not NoCenterLineEdit
 If UserCodePage = 1253 Then
@@ -8011,14 +8024,17 @@ End If
 End If
 KeyCode = 0
 Case vbKeyF10
+If (shift And 7) > 1 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 showparagraph = Not showparagraph
 mDoc.WrapAgain
 Render
 End If
-KeyCode = 0
 ManualInform
+KeyCode = 0
 Case vbKeyF11
+If (shift And 7) = 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 fState = fState + 1
 SetME
 WrapAll
@@ -8032,6 +8048,7 @@ Case vbKeyTab
 If UseTab And Not BlockStartPos <> BlockEndPos And (TabControl = 0 Or MyTrimLNoTab(Mid$(CurrentParagraph, 1, Charpos)) < Charpos) Then
     shift = shift And &H1
     ctrl = False
+    alt = False
     JJ = SelStart
     If shift = 0 Then
     If showparagraph Then
@@ -8209,7 +8226,7 @@ shift = 0
 End If
 
 Case Else
-
+alt = False
 ctrl = False
 End Select
 noentrance = False
@@ -9952,5 +9969,14 @@ Public Sub SetBarStyle(bColor As Long, Optional bHatch As Long, Optional BHatchC
     glistN.BarHatch = bHatch
     glistN.BarHatchColor = mycolor(BHatchColor)
 End Sub
-
+Private Sub glistN_SyncKeyboardUnicode(a As String)
+Callback.SpreadKey a
+End Sub
+Private Sub glistN_Fkey(a As Integer)
+If a > 1000 Then
+Callback.SendFKEY a - 1000
+Else
+If UsedAsTextBox Or NumberOnly Or NumberIntOnly Then Callback.SendFKEY a
+End If
+End Sub
 

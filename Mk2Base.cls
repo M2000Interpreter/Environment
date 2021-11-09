@@ -42,8 +42,8 @@ Private Type GUID
     d003 As Long
     d004 As Long
 End Type
-Private Declare Function lstrlenW Lib "KERNEL32" (ByVal lpString As Long) As Long
-Private Declare Sub RtlMoveMemory Lib "KERNEL32" (Dst As Any, Src As Any, ByVal BLen As Long)
+Private Declare Function lstrlenW Lib "kernel32" (ByVal lpString As Long) As Long
+Private Declare Sub RtlMoveMemory Lib "kernel32" (Dst As Any, Src As Any, ByVal BLen As Long)
 Private Declare Function CLSIDFromString Lib "ole32.dll" ( _
                          ByVal lpszCLSID As Long, _
                          ByRef Clsid As GUID) As Long
@@ -207,7 +207,7 @@ If BaseTable.Find(Tablename) Then
     Loop
     ' prepare record accumulator
     For i = 0 To fieldlist.count - 1
-    fieldlist.index = i
+    fieldlist.Index = i
     fieldlist.Done = True
     If fieldlist.sValue = -1 Then
    '' Set ma = fieldlist.ValueObj
@@ -221,7 +221,7 @@ If BaseTable.Find(Tablename) Then
 
     j = 0
     For i = 0 To fieldlist.count - 1
-    fieldlist.index = i
+    fieldlist.Index = i
     fieldlist.Done = True
     If fieldlist.sValue = -1 Then pppp1.item(j) = i: j = j + 1
     Next i
@@ -248,7 +248,7 @@ End Sub
 Friend Function AddIndexes_(ParamList As mStiva2) As Boolean
 Dim Tablename, fieldname, pppp As mArray, fieldlist As FastCollection, fl As String
 Dim indexField As FastCollection, i As Long, fieldindex As Long, IndexList As FastCollection
-Dim originalname As String, vv, ordertype As Long, temp As mArray
+Dim originalname As String, vv, ordertype As Long, Temp As mArray
 Dim ord()
 If ParamList.count > 0 Then Tablename = ParamList.PopVal
 If Tablename = vbNullString Then Exit Function
@@ -272,8 +272,8 @@ If BaseTable.Find(Tablename) Then
             MyEr "field deleted, can't be used", "το πεδίο έχει διαγραφεί, δεν μπορεί να χρησιμοποιηθεί"
             Exit Function
         End If
-        Set temp = fieldlist.ValueObj
-        If temp.item(1) = 12 Then
+        Set Temp = fieldlist.ValueObj
+        If Temp.item(1) = 12 Then
             MyEr "Memo field can't be used for key", "το πεδίο τύπου ΥΠΟΜΝΗΜΑ δεν μπορεί να χρησιμοποιηθεί για κλειδί"
             Exit Function
         End If
@@ -300,8 +300,8 @@ If BaseTable.Find(Tablename) Then
         ordertype = ParamList.PopVal
         fl = myUcase(originalname, True)
         If fieldlist.ExistKey(fl) Then
-            Set temp = fieldlist.ValueObj
-            If temp.item(1) < 10 Then
+            Set Temp = fieldlist.ValueObj
+            If Temp.item(1) < 10 Then
                 If ordertype < 2 Then
                 ordertype = (ordertype And 3) + 2
                 Else
@@ -313,7 +313,7 @@ If BaseTable.Find(Tablename) Then
             If ordertype < 0 Then ordertype = 0
             If ordertype > 3 Then ordertype = 3
             indexField.AddKey fl, originalname + " " + LTrim(Str$(ordertype))
-            indexField.sValue = fieldlist.index
+            indexField.sValue = fieldlist.Index
             ord(i) = ordertype
             i = i + 1
         End If
@@ -404,12 +404,12 @@ End If
 If pppp.item(21) = 0 Then Exit Sub
 RecordList.Done = True
 For i& = 0 To RecordList.count - 1
-    RecordList.index = i&
+    RecordList.Index = i&
     If RecordList.sValue = 0 Then
     Set acc = RecordList.ValueObj
     allkey$ = vbNullString
     For j& = 0 To indexField.count - 1
-        indexField.index = j&
+        indexField.Index = j&
         indexField.Done = True
         If Len(allkey$) = 0 Then
         allkey$ = indexField.Normalize(acc.item(indexField.sValue))
