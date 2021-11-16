@@ -2,6 +2,19 @@ Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
 Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Any)
+Public Const KEYEVENTF_EXTENDEDKEY = &H1
+Public Const KEYEVENTF_KEYUP = &H2
+Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
+Private Declare Function MapVirtualKey Lib "user32" Alias "MapVirtualKeyA" (ByVal wCode As Long, ByVal wMapType As Long) As Long
+Private Declare Function GetKeyState Lib "user32" (ByVal nVirtKey As Long) As Long
+Const VK_CAPITAL = &H14
+Private Type KeyboardBytes
+     kbByte(0 To 255) As Byte
+End Type
+
+Private Declare Function GetKeyboardState Lib "user32" (kbArray As KeyboardBytes) As Long
+ 
+Dim kbArray As KeyboardBytes
 Public fonttest As PictureBox
 Private Declare Function GetTextMetrics Lib "gdi32" _
 Alias "GetTextMetricsA" (ByVal Hdc As Long, _
@@ -44,6 +57,7 @@ Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVa
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
 Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As Long
+
 Public MediaPlayer1 As New MovieModule
 Public MediaBack1 As New MovieModule
 Public form5iamloaded As Boolean
@@ -299,6 +313,20 @@ Private Declare Function TranslateCharsetInfo Lib "gdi32" ( _
 ) As Long
 Public reopen4 As Boolean, reopen2 As Boolean
 Public HelpFile As New Document, UseMDBHELP As Boolean, Form4Loaded As Boolean
+
+Public Const HKL_PREV = 0
+Public Const HKL_NEXT = 1
+
+Public Const KLF_ACTIVATE = &H1
+Public Const KLF_SUBSTITUTE_OK = &H2
+Public Const KLF_UNLOADPREVIOUS = &H4
+Public Const KLF_REORDER = &H8
+
+''' Size of KeyboardLayoutName (number of characters), including nul terminator
+Public Const KL_NAMELENGTH = 9
+
+Declare Function LoadKeyboardLayout Lib "user32" Alias "LoadKeyboardLayoutA" (ByVal pwszKLID As String, ByVal Flags As Long) As Long
+
 Public Sub PlaceIcon(a As StdPicture)
 On Error Resume Next
 If UseMe Is Nothing Then Exit Sub
@@ -309,32 +337,64 @@ Dim m As Callback, F As Form
 On Error Resume Next
 Set F = Screen.ActiveForm
 If UseMe Is Nothing Then Exit Sub
-If Not UseMe.IamVisible Then
-If Len(a$) = 0 Then a$ = "M2000"
-Form1.CaptionW = a$
+    If Not UseMe.IamVisible Then
+        If Len(a$) = 0 Then a$ = "M2000" Else Set F = Nothing
+        Form1.CaptionW = a$
+        If UseMe.IhaveExtForm Then
+        UseMe.SetExtCaption a$
+        Else
+        
+            Form3.Timer1.Interval = 30
+            Form3.Timer1.enabled = True
+            Form3.CaptionWsilent = a$
+            Form3.CaptionW = a$
+            Form1.CaptionW = vbNullString
+            Form3.WindowState = 0
+        End If
 Else
-If a$ = vbNullString Then
-UseMe.SetExtCaption a$
-Else
-UseMe.SetExtCaption a$
-Form1.CaptionW = vbNullString
-End If
+    If a$ = vbNullString Then
+        If UseMe.IhaveExtForm Then UseMe.SetExtCaption a$
+        Form1.CaptionW = vbNullString
+        Form1.Visible = False
+    Else
+        If UseMe.IhaveExtForm Then
+            UseMe.SetExtCaption a$
+        End If
+        Form1.CaptionW = a$
+       
+        
+        If F Is Form1 Then
+            If Form1.Visible Then
+            Form1.SetFocus
+            Else
+            If UseMe.WindowState > 0 Then
+                
+                Form1.Visible = True
+                Form1.SetFocus
+            End If
+            End If
+         End If
+       Set F = Nothing
+       
+    End If
+    ttl = False
 End If
 ttl = False
+Exit Sub
 If Not F Is Nothing Then
-If F Is Form1 Then
-If Form1.Visible Then
-Form1.SetFocus
-ElseIf Form1.TrueVisible Then
-If Not UseMe Is Nothing Then
-If UseMe.IhaveExtForm Then
-UseMe.ExtWindowState = 1
-End If
-End If
-End If
-Else
-If F.Visible Then F.SetFocus
-End If
+    If F Is Form1 Then
+        If Form1.Visible Then
+            Form1.SetFocus
+         ElseIf Not UseMe Is Nothing Then
+            If Form1.TrueVisible Then
+                If UseMe.IhaveExtForm Then
+                    UseMe.ExtWindowState = 1
+                End If
+            End If
+        End If
+    Else
+        If F.Visible Then F.SetFocus
+    End If
 End If
 Err.Clear
 End Sub
@@ -1988,7 +2048,7 @@ For i = PobjNum To 1 Step -1
         players(i) = Zero
         Prefresh(i) = zerocounter
         PobjNum = i
-If Form1.dSprite.count > PobjNum Then Unload Form1.dSprite(PobjNum)
+If Form1.dSprite.Count > PobjNum Then Unload Form1.dSprite(PobjNum)
 Next i
 PobjNum = 0
 
@@ -2875,9 +2935,7 @@ Dim p As Integer
 GetMem2 VarPtr(VarNull), p
 myIsNull = p = 1
 End Function
-Sub VarCopyRef(ByVal a As Long, ByRef b As Variant)
 
-End Sub
 ' VarByRef VarPtr(var2(items)), var(i)
 Sub VarByRef(ByVal a As Long, ByRef b As Variant)
 Dim t(0 To 3) As Long
@@ -2885,6 +2943,12 @@ Dim t(0 To 3) As Long
    t(0) = t(0) Or &H4000
    t(2) = VarPtr(b) + 8
    CopyMemory ByVal a, t(0), 16
+End Sub
+Sub ArrByRef(ByVal b As Long)
+Dim t(1) As Long
+   CopyMemory t(0), ByVal VarPtr(b), 4
+   t(0) = t(0) Or &H4000
+   CopyMemory ByVal VarPtr(b), t(0), 4
 End Sub
 Sub VarByRefDecimal(ByVal a As Long, ByRef b As Variant)
 Dim t(0 To 3) As Long
@@ -4711,25 +4775,40 @@ Debug.Print IsNull(alfa), myIsNull(alfa)
 NullVariant alfa
 Debug.Print IsNull(alfa), myIsNull(alfa)
 End Sub
-Sub testvar()
-Dim s$, alfa(), where As Long
-s$ = "malakas"
-ReDim alfa(5)
-alfa(3) = "good"
-Debug.Print s$, alfa(3)
-'SwapString2Variant s$, alfa(3)
-SwapString2VariantPointer s$, VarPtr(alfa(3))
-Debug.Print s$, alfa(3)
-where = VarPtr(alfa(3))
+Sub SendAKey(ByVal keycode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
+Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long
+Const key_release As Byte = 2
+' see locale$(94)
+LoadKeyboardLayout "00000408", KLF_ACTIVATE
+If keycode > 500 Then extended = 1: keycode = keycode - 500
+If Not extended Then
+If keycode > 64 And keycode < 91 Then
+    If Not CapsLockOn() Then shift = Not shift
+End If
+End If
+Map = MapVirtualKey(keycode, 0)
+smap = MapVirtualKey(&H10, 0)
+cmap = MapVirtualKey(&H11, 0)
+amap = MapVirtualKey(&H12, 0)
 
-SwapString2VariantPointer s$, where
-Debug.Print s$, alfa(3)
+
+keycode = keycode Mod 255
+' press key
+If shift Then keybd_event &H10, smap, 0, 0
+If ctrl Then keybd_event &H11, cmap, 0, 0
+If alt Then keybd_event &H12, amap, 0, 0
+keybd_event keycode, Map, extended, 0
+
+' release key
+keybd_event keycode, Map, KEYEVENTF_KEYUP + extended, 0
+If shift Then keybd_event &H10, smap, KEYEVENTF_KEYUP, 0
+If ctrl Then keybd_event &H11, cmap, KEYEVENTF_KEYUP, 0
+If alt Then keybd_event &H12, amap, KEYEVENTF_KEYUP, 0
 End Sub
-Sub testvari()
-Dim aa, bb
-aa = "1234"
-bb = "6789"
-Debug.Print aa, bb
-SwapStringVariant aa, bb
-Debug.Print aa, bb
+Public Function CapsLockOn() As Boolean
+    GetKeyboardState kbArray
+    CapsLockOn = (kbArray.kbByte(VK_CAPITAL) And 1) = 1
+End Function
+
+Sub testvar()
 End Sub

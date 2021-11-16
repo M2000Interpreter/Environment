@@ -195,7 +195,7 @@ Attribute VB_Exposed = False
 Option Explicit
 Public WithEvents testpad As TextViewer
 Attribute testpad.VB_VarHelpID = -1
-Public WithEvents Compute As myTextBox
+Public WithEvents Compute As myTextBox, previewKey As Boolean
 Attribute Compute.VB_VarHelpID = -1
 Private Label(0 To 2) As New myTextBox
 Dim run_in_basestack1 As Boolean
@@ -242,10 +242,10 @@ Public Sub ComputeNow()
 stackshow MyBaseTask
 End Sub
 
-Private Sub compute_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub compute_KeyDown(keycode As Integer, shift As Integer)
 Dim excode As Long
-If KeyCode = 13 Then
-KeyCode = 0
+If keycode = 13 Then
+keycode = 0
     If Compute.Prompt = "? " Then
         gList3(2).backcolor = &H3B3B3B
         TestShowCode = False
@@ -264,7 +264,7 @@ KeyCode = 0
         End If
         
     End If
-ElseIf KeyCode = 8 Then
+ElseIf keycode = 8 Then
 If Compute = vbNullString Then
     If Compute.Prompt <> ">" Then
         Compute.Prompt = ">"
@@ -282,7 +282,7 @@ If Compute = vbNullString Then
         End If
     End If
     Compute.vartext = vbNullString
-KeyCode = 0
+keycode = 0
 Exit Sub
 End If
 End If
@@ -308,11 +308,11 @@ stolemodalid = 0
 End If
 End Sub
 
-Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = 27 Then
-KeyCode = 0
+Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
+If keycode = 27 Then
+keycode = 0
 Unload Me
-ElseIf KeyCode = 13 Then
+ElseIf keycode = 13 Then
 If Not EXECUTED Then
 If Not STq Then
 STbyST = True
@@ -349,7 +349,7 @@ gList1.AutoPanPos = True
 Set testpad = New TextViewer
 gList1.NoWheel = True
 Set testpad.Container = gList1
-testpad.FileName = vbNullString
+testpad.Filename = vbNullString
 testpad.glistN.DropEnabled = False
 testpad.glistN.DragEnabled = False
 testpad.glistN.LeftMarginPixels = 8

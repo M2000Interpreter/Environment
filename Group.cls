@@ -35,7 +35,7 @@ Public highpriorityoper As String
 Public HasUnary As Boolean
 Public IamApointer As Boolean, lasthere$
 Public original As Long
-Public isref As Boolean ' One time use
+Public isRef As Boolean ' One time use
 Public LastOpen As String
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
@@ -277,9 +277,6 @@ End Sub
 Public Sub PokeItem(cursor As Long, item)
 ' used in the float mode
 'Debug.Print Typename$(item)
-If Typename$(item) = "String" Then
-'If item = vbNullString Then Stop
-End If
 If IsObject(item) Then
 
 Set bank.item(cursor) = item

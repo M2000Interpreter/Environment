@@ -1772,3 +1772,27 @@ hProc = OpenProcess(&H800, True, hProcess)
 IsRunning = hProc <> 0
 If hProc Then CloseHandle hProc
 End Function
+Public Sub SendScanCode(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean)
+' send only scancodes if a<500 or a-500 for a>500 with extend option. F4 is 615 (500+115)
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
+Else
+a = UCase(a)
+Select Case a
+Case "F1" To "F9"
+a = 611 + val(Mid(a, 2))
+Case Else
+a = AscW(a)
+If a > 254 Then a = 0
+End Select
+End If
+If a = 0 Then Exit Sub
+SendAKey CByte(a), shift, ctrl, alt
+End Sub
+Property Get CapsLock() As Boolean
+    CapsLock = CapsLockOn()
+End Property
+
+

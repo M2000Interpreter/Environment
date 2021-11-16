@@ -28,10 +28,11 @@ With glistN
 .VerticalCenterText = True
 .Text = mCaptext
 .backcolor = rgb(200, 120, 60)
-
+'.bypassfirstClick = True
 ''.FontSize = 12
 .enabled = True
 .ShowMe
+'.PrepareClick
 End With
 End Property
 
@@ -47,6 +48,7 @@ End Sub
 Private Sub glistN_CheckGotFocus()
 glistN.backcolor = rgb(100, 200, 160)
 glistN.ShowMe
+glistN.PrepareClick
 End Sub
 
 Private Sub glistN_CheckLostFocus()
@@ -54,21 +56,30 @@ If Me.enabled Then
 glistN.backcolor = rgb(200, 120, 60)
 glistN.PanPos = 0
 glistN.ShowMe
+glistN.DblClick
 End If
 End Sub
 
-Private Sub glistN_PanLeftRight(Direction As Boolean)
-    If (Not mCallback Is Nothing) Then mCallback.Press index
+Private Sub glistN_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+If Button <> 0 Then glistN.PrepareClick
+End Sub
+
+Private Sub glistN_PanLeftRight(direction As Boolean)
+    If (Not mCallback Is Nothing) Then mCallback.Press Index
 End Sub
 
 Private Sub glistN_RegisterGlist(this As gList)
 this.NoWheel = True
 End Sub
-
+Private Sub glistN_Selected(item As Long)
+'If item >= 0 Then
+ '   If (Not mCallback Is Nothing) Then mCallback.Press Index
+ '   End If
+End Sub
 Private Sub glistN_Selected2(item As Long)
-If item >= 0 Then
-    If (Not mCallback Is Nothing) Then mCallback.Press index
-    End If
+'If item >= 0 Then
+    If (Not mCallback Is Nothing) Then mCallback.Press Index
+ '   End If
 End Sub
 Property Set Callback(ByRef newObj As InterPress)
     Set mCallback = newObj
@@ -93,11 +104,11 @@ Public Property Get Caption() As String
 Caption = mCaptext
 End Property
 
-Public Property Get index() As Long
-index = mIndex
+Public Property Get Index() As Long
+Index = mIndex
 End Property
 
-Public Property Let index(ByVal RHS As Long)
+Public Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Get enabled() As Long

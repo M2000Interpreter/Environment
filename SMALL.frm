@@ -31,21 +31,21 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
-Private Enum BOOL
-    FALSE 
-    TRUE 
-End Enum
-#If False Then
-    Dim FALSE , TRUE 
-#End If
+'Private Enum BOOL
+'    FALSE 
+'    TRUE 
+'End Enum
+'#If False Then
+'    Dim FALSE , TRUE 
+'#End If
 Public hideme As Boolean
 Private foundform5 As Boolean
 
 
-Private Declare Function GetModuleHandleW Lib "KERNEL32" (ByVal lpModuleName As Long) As Long
+Private Declare Function GetModuleHandleW Lib "kernel32" (ByVal lpModuleName As Long) As Long
 
 
-Private Declare Function GetProcAddress Lib "KERNEL32" (ByVal hModule As Long, ByVal lpProcName As String) As Long
+Private Declare Function GetProcAddress Lib "kernel32" (ByVal hModule As Long, ByVal lpProcName As String) As Long
 
 
 Private Declare Function GetWindowLongA Lib "user32" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
@@ -71,7 +71,8 @@ Private Declare Function SysAllocStringLen Lib "oleaut32" (ByVal OleStr As Long,
 Private Const WM_GETTEXT = &HD
 Private Const WM_GETTEXTLENGTH = &HE
 Private Const WM_SETTEXT = &HC
-
+Private once As Boolean
+Private once2 As Boolean
 Public Property Get CaptionW() As String
     If m_Caption = "M2000" Then
         CaptionW = vbNullString
@@ -209,13 +210,13 @@ End If
 End Sub
 
 Private Sub Form_Resize()
-Static once As BOOL
+
 If Timer1.enabled Then Exit Sub
-If once Then Exit Sub
-once = TRUE 
+If once2 Then Exit Sub
+once2 = True
 If Not lastform Is Nothing Then
 If lastform.WindowState = 1 Then
-lastform.WindowState = 0: Me.skiptimer = True: Me.WindowState = 0: once = False: Exit Sub
+lastform.WindowState = 0: Me.skiptimer = True: Me.WindowState = 0: once2 = False: Exit Sub
 End If
 End If
 
@@ -227,14 +228,14 @@ End If
     If Form4Loaded Then If Form4.Visible Then Form4.Visible = False: reopen4 = True
     If Form2.Visible Then If trace Then Form2.Visible = False: reopen2 = True
      Timer1_Timer
-     once = False
+     once2 = False
     Exit Sub
     
  ElseIf Forms.count > 4 Then
  If Not lastform Is Nothing Then
  Timer1.enabled = True
      ElseIf Not (CaptionW <> "" And WindowState = 0) Then
-     If Not Form1.TrueVisible Then once = False: Exit Sub
+     If Not Form1.TrueVisible Then once2 = False: Exit Sub
     End If
      ElseIf WindowState = 0 Then
      
@@ -246,7 +247,7 @@ Timer1.Interval = 30
 Else
  Timer1.enabled = Timer1.Interval < 10000
  End If
- once = False
+ once2 = False
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
@@ -255,7 +256,6 @@ End Sub
 
 Private Sub Timer1_Timer()
 ' On Error Resume Next
-Static once As Boolean
 If once Then Exit Sub
 once = True
 Dim F As Form, F1 As GuiM2000, i As Long, thismodal As Double, f2 As GuiM2000

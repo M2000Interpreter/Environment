@@ -4757,6 +4757,7 @@ Flush \\ Empty the stack
 CurDir$=Dir$
 Title$="M2000 Pad"
 Title "", 0   ' hide the console - 0
+
 \\ Gui Elements
 oldlinespace=linespace
 linespace 60
@@ -4812,10 +4813,10 @@ HelpEnabled=false
 With Pad, "NoWrap", True, "SetM2000", True, "SelLength" as SelLength, "HighlightParagraph", True
 
 \\ Set labels for menu's headers. and thecolor for check mark/ disable items,  in menus which we have those
-With File1,"label","File"
-With Edit1,"label","Edit",  "Mark", Color(255,100,0)
-With Run1,"label","Run",  "Mark", Color(255,100,0)
-With Help1,"label","Help",  "Mark", Color(255,100,0), "Id" as Id$()
+With File1,"label","File", "Hover", true
+With Edit1,"label","Edit",  "Mark", Color(255,100,0),  "Hover", true
+With Run1,"label","Run",  "Mark", Color(255,100,0),  "Hover", true
+With Help1,"label","Help",  "Mark", Color(255,100,0), "Id" as Id$(), "Hover", true
 
 \\ set a property variable to read/write text to pad, also we can use Tab
 With Pad, "Text" as Pad.Text$, "NoColor", False, "ShowAlways", True, "UseTab", True, "tabwidth", 6
@@ -4839,7 +4840,7 @@ Layer NotePad {Cls #FFA000}
 
 \\ Now we make the menu. We set 4000 twips for each dropdown list (height calculated automatic)
 With File1,"MenuStyle", True, "MenuWidth", 4000 
-With Edit1,"MenuStyle", True, "MenuWidth", 4000 
+With Edit1,"MenuStyle", True, "MenuWidth", 4800 
 With Run1,"MenuStyle", True, "MenuWidth", 4000 
 With Help1,"MenuStyle", True, "MenuWidth", 4000 
 
@@ -4854,47 +4855,49 @@ With Help1,"MenuStyle", True, "MenuWidth", 4000
 For This {
 	const mi$="MenuItem"  \\ is a temporary variable only for For This Block
 	const mr$="MenuRadio"
-	Method File1, mi$,"Open",True
-	Method File1, mi$,"Save",True
+	Method File1, mi$,"Open",true, acc:="O", ctrl:=true
+	Method File1, mi$,"Save",true, acc:="S", ctrl:=true
 	Method File1, mi$,""    \\  only  a line here
-	Method File1, mi$,"Close",True
-	Method File1, mi$,"Quit",True
+	Method File1, mi$,"Close",true, acc:="C", alt:=true
+	Method File1, mi$,"Quit",true, acc:="Q", alt:=true
 
 	
 	With File1, "MenuGroup","This"
 	
-	Method Edit1, mi$,"Cut",True
-	Method Edit1, mi$,"Copy",True
-	Method Edit1, mi$,"Paste",True
+	Method Edit1, mi$,"Cut",true, acc:="X", ctrl:=true
+	Method Edit1, mi$,"Copy",true, acc:="C", ctrl:=true
+	Method Edit1, mi$,"Paste",true, acc:="V", ctrl:=true
 	Method Edit1, mi$,""
-	Method Edit1, mi$,"Less Indent",True
-	Method Edit1, mi$,"More Indent",True
+	Method Edit1, mi$,"Less Indent",true, acc:=9, ctrl:=true, shift:=true, legend:="TAB"
+	Method Edit1, mi$,"More Indent",true, acc:=9, ctrl:=true, legend:="TAB"
 	Method Edit1, mi$,""
-	Method Edit1, mr$,"Tabs for Indent",True,True
-	Method Edit1, mr$,"Spaces for Indent",True,false
+	Method Edit1, mr$,"Tabs for Indent",true,true , acc:="T", alt:=true
+	Method Edit1, mr$,"Spaces for Indent",true,false, acc:="S", alt:=true
 	Method Edit1, mi$,""
-	Method Edit1, mi$,"Show Hidden Characters", True, True
-	Method Edit1, mi$,"Free Style Edit Shift+F9", True, True
+	Method Edit1, mi$,"Show Hidden Characters", true, true, acc:="F10"
+	Method Edit1, mi$,"Free Style Edit", true, true, acc:="F9", shift:=True
 	
 
 	
 	With Edit1, "MenuGroup","This"
 
-	Method Run1, mi$,"Debug",True
+	Method Run1, mi$,"Debug",true, acc:="F5", alt:=true
 	Method Run1, mi$,""
-	Method Run1, mi$,"Test Slow",True
-	Method Run1, mi$,"Test Normal", True
+	Method Run1, mi$,"Test Slow",true, acc:="F8", alt:=true
+	Method Run1, mi$,"Test Normal", true, acc:="F6", alt:=true
 	Method Run1, mi$,""
-	Method Run1, mi$,"Settings"
+	Method Run1, mi$,"Settings", acc:="U", ctrl:=true
+	Method Run1, mi$,"Default Folder", acc:="D", ctrl:=true
+	Method Run1, mi$,"Folder Documents",  acc:="D", alt:=true
 
 	With Run1, "MenuGroup","This"
-	Method Help1, mi$,"About",True,,,,"ABOUT"
+	Method Help1, mi$,"About",true, id:="ABOUT" ,  acc:="A", alt:=true
 	Method Help1, mi$,""
-	Method Help1, mi$,"Find Topic",True,,,,"FIND"
-	Method Help1, mi$,"Open Topic",HelpShow,,,,"OPEN"
+	Method Help1, mi$,"Find Topic",true ,ID:="FIND", acc:="F", alt:=true
+	Method Help1, mi$,"Open Topic",HelpShow ,ID:="OPEN", acc:="O", shift:=true, alt:=true
 	Method Help1, mi$,""
-	Method Help1, mi$,"Close Help",HelpShow,,,,"CLOSE"
-	
+	Method Help1, mi$,"Close Help",HelpShow ,ID:="CLOSE", acc:="C", ctrl:=true, shift:=true
+
 
 	With Help1, "MenuGroup","This"
 }
@@ -5032,7 +5035,7 @@ Function Notepad.Resize {
 			local third=free/3
 			free=free-third-twipsX*3
 			Method Pad,"move", twipsX*3, tHeight1,  NP.Width-twipsX*6, free
-			Method HelpPad,"move", twipsX*2, tHeight1+free+twipsX*3,  NP.Width-twipsX*5,third
+			Method HelpPad,"move", twipsX*3, tHeight1+free+twipsX*3,  NP.Width-twipsX*6,third
 			helpshow=true
 		Else
 			helpshow=false
@@ -5409,9 +5412,9 @@ window 8, window
 Form 80, 66
 BackGround {cls 11 :height.pixels=scale.y  div twipsY : width.pixels=scale.x div twipsX }
 if height.pixels=1024 or height.pixels/width.pixels>0.70 then
-      Form  80,66
+      Form  80,68
 else
-     Form !  120,80    // we use ! to add more space for TV-MONITORS - Remove it then press Esc and then F1 to save it
+     Form !  120 ,68    // we use ! to add more space for TV-MONITORS - Remove it then press Esc and then F1 to save it
   end if
 backcolor=5   'point
 oldpen=14  ' pen
@@ -5932,7 +5935,7 @@ Layer Simple {
 }
 \\ now put a ListBox
 Declare Listbox1 Listbox Form Simple
-Method Listbox1, "move", 1000,1000,6000,4000
+Method Listbox1, "move", 1000,1000,6000,4200
 //Method Listbox1, "SetBarStyle", 11
 Method Listbox1, "SetBarStyle", color(50, 100,  200), 3
 \\ and fill with some data
@@ -17435,10 +17438,10 @@ Declare File1 Combobox Form NotePad
 Declare Edit1 Combobox Form NotePad
 Declare Run1 Combobox Form NotePad
 Declare Help1 Combobox Form NotePad
-With File1,"label","File", "listtext" As list$, "list" As list$() '
-With Edit1,"label","Edit",  "Mark", Color(255,100,0)
-With Run1,"label","Run",  "Mark", Color(255,100,0)
-With Help1,"label","Help",  "Mark", Color(255,100,0)
+With File1,"label","File", "listtext" As list$, "list" As list$(), "Hover", true
+With Edit1,"label","Edit",  "Mark", Color(255,100,0), "Hover", True
+With Run1,"label","Run",  "Mark", Color(255,100,0), "Hover", True
+With Help1,"label","Help",  "Mark", Color(255,100,0), "Hover", True
 
 With NotePad, "Title" As Caption$, "Visible" As Visible, "TitleHeight" As tHeight, "Sizable", True
 With NotePad, "UseIcon", True, "UseReverse", True
@@ -19376,7 +19379,7 @@ Font "Arial"
 menu fill 1,11,0
 menu frame
 DB.Provider ""  \\ reset
-Window 12,0
+Window 12, window
 Bold 1 : Form 70, 32
 OldDir$=Dir$  \\ keep direcory
 Dir AppDir$  \\ Use helpfile from application's Dir
@@ -20855,7 +20858,7 @@ Bold 1
 PEN 14
 CLS,0
 If Version<10 then Error "No proper M2000 version (must be >=9.9)"
-If Version=10 and revision<34 then Error "No proper M2000 revision for version 10"
+If Version=10 and revision<38 then Error "No proper M2000 revision for version 10"
 Set Fast
 Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 dir user
@@ -22517,7 +22520,9 @@ Cursor 22, r
 Report 1, "ברוכים הבאים الجامعات والكليات" , 5
 Print
 }
-MODULE SIMPLETXT {Όρισε Φόρμα1 Φόρμα
+MODULE SIMPLETXT {Παλιό.Τοπικό=Τοπικό
+Τοπικό 1032
+Όρισε Φόρμα1 Φόρμα
 Όρισε Κειμ1 Κείμενο Φόρμα Φόρμα1
 Όρισε Κειμ2 Κείμενο Φόρμα Φόρμα1
 Όρισε Κειμ3 Κείμενο Φόρμα Φόρμα1
@@ -22580,8 +22585,11 @@ MODULE SIMPLETXT {Όρισε Φόρμα1 Φόρμα
 Μέθοδος Φόρμα1, "Show",1
 Όρισε Κειμ1 Τίποτα
 Όρισε Φόρμα1 Τίποτα
+Τοπικό Παλιό.Τοπικό
 }
-MODULE SIMPLETXTEN {Declare Form1 Form
+MODULE SIMPLETXTEN {OLDLOCALE=LOCALE
+LOCALE 1033
+Declare Form1 Form
 Declare text1 editbox Form Form1
 Declare text2 editbox Form Form1
 Declare text3 editbox Form Form1
@@ -22647,6 +22655,7 @@ Layer Form1 {
 Method Form1, "Show",1
 Declare text1 Nothing
 Declare Form1 Nothing
+LOCALE OLDLOCALE
 }
 MODULE CONV2 {Module Checkit {
 	k$=lambda$ (m, b as integer=16) -> {
@@ -23004,7 +23013,7 @@ MODULE WIND4 {Clear
 \\ An old example, new revision.
 Thread.plan sequential
 Global Caption$="M2000 THREAD-INPUT-HANDLE WINDOW"
-Title caption$
+Title "WAIT", 0
 puticon=false
 If module(ico) Then
 ico 0
@@ -23024,7 +23033,8 @@ module global mayexit {
 }
 window.size=random(7,9)
 Hide  \\ prepare Window
-Window 10,0  \\ center full size 10pt letters
+
+Window 10, window  \\ center full size 10pt letters, to current monitor
 global abX=scale.x/2, abY=scale.y/2,  cur$, prev$
 About ! "Wind4 Module", abX, abY, {
 	This is the help file
@@ -23096,12 +23106,12 @@ If pos>0 Then print
 Let messrow=row   \\ we can use Let instead of messrow<=row+1
 Scroll Split  row+1
 Pen 0
-Refresh 40
 threads erase
 Thread {
 	scan 0.01 : thread this interval 10  \\ repait interval
 	Layer {Cursor 0,messrow : Print  Over  : Print Part ~(0),"waiting..." , kk }
-} as LL : Thread LL interval 10
+} as LL
+After 1000 { Thread LL interval 10}
 Scroll Split 1
 Thread  {   \\ this thread used for moving the Window
 	Layer {
@@ -23122,6 +23132,9 @@ Thread moveme hold  \\ not started yet
 Thread moveme interval 100  \\ we set an interval
 MayStart<=True
 
+title caption$, 1
+show
+Refresh 40
 
 \\ main thread here
 Main.Task 10 {
@@ -25737,7 +25750,12 @@ Feed$=Dec$(1.34)
 
 Declare CheckBox1 CheckBox Form Form1
 Method CheckBox1 "Move", 3000, 4000, 8000, 900
-With CheckBox1,"Caption", "Check This Please", "Checked" as CheckGet, "CheckReset" as CheckPut
+With CheckBox1,"Caption", "Check alt+SPACE, ctrl+*", "Checked" as CheckGet, "CheckReset" as CheckPut
+// opcodes: 0 just set focus, 1 set focus and press it, 2 press it
+Method CheckBox1, "AccKey", "*", ctrl:=true, opcode:=1
+Method CheckBox1, "AccKey", " ", alt:=true, opcode:= 32*2
+
+Method Form1, "AccKey", "Q", alt:=true, opcode:= 100615*2
 CheckPut=True
 
 
@@ -25782,7 +25800,7 @@ With Text1, "VarText" as VarText$
 Thread {
       Static work  // we use it for trash bin
       if alone then continue
-           if not empty then work=ask(letter$,"Four Controls in M2000") : Flush // stack is empty now
+           if not empty then work=ask(letter$,"Four Controls in M2000","*ThankYou","") : Flush // stack is empty now
 
 } as worker interval 100
 Function Text1.Click {
@@ -25806,6 +25824,7 @@ Function Form1.Click {
       Doc$="This is a value "+Feed$+{
       }
       Doc$="The CheckBox is "+Str$(CheckGet,{;"Checked";"No Checked";})+{
+      Press Alt+Q to send Ctrl+F4
       }
       Thread worker Execute Data Doc$
       Clear Doc$
@@ -26513,6 +26532,8 @@ CheckThis
 MODULE LED {\\ if you have two monitors:
 \\ Window mode, 1     \\ mode is a read only variable return the size of current font
 // Window mode, 2    // selecet monitor 2
+cls, 0
+window 6, window
 
 Module Led_Clock{
 	Escape Off
@@ -26572,8 +26593,10 @@ Module Led_Clock{
 	desktop 255
 	pen 14
 	refresh 50
+	mode 16
 	wait 1000
 	Escape On
+
 	sub LED(XX, S())
 		move XX+N*1.2, YY+NN
 		\\ LED  - UPPER
@@ -34015,5 +34038,57 @@ testA
 testB
 testC
 testD
+}
+MODULE REGISTRY {declare CR WINDOWS.REGISTRY
+const    HKEY_CLASSES_ROOT = 0x80000000&
+const   HKEY_CURRENT_USER = 0x80000001&
+const    HKEY_LOCAL_MACHINE = 0x80000002&
+const    HKEY_USERS = 0x80000003&
+Enum ERegistryValueTypes {
+    REG_NONE = 0&					'No value type
+    REG_SZ =1&						'Unicode nul terminated string
+    REG_EXPAND_SZ = 2&				'Unicode nul terminated string w/environment var
+    REG_BINARY = 3& 					'Free form binary
+    REG_DWORD = 4&					'32-bit number
+    REG_DWORD_LITTLE_ENDIAN = 4&		'32-bit number (same as REG_DWORD)
+    REG_DWORD_BIG_ENDIAN = 5&			'32-bit number
+    REG_LINK = 6&					'Symbolic Link (unicode)
+    REG_MULTI_SZ = 7&					'Multiple Unicode strings
+    REG_RESOURCE_LIST = 8&				'Resource list in the resource map
+    REG_FULL_RESOURCE_DESCRIPTOR = 9&	'Resource list in the hardware description
+    REG_RESOURCE_REQUIREMENTS_LIST = 10&
+}
+// looking for the default font in M2000
+// from console SETTINGS open the dialog for default values.
+with CR, "ClassKey",  HKEY_CURRENT_USER 
+with CR, "SectionKey", "Software\m2000v5\"
+with CR, "ValueType",REG_SZ , "ValueKey", "FONT", "KeyExists" as CR.Exist, "Value" as Cr.Ret$
+If  CR.Exist then Print Cr.Ret$
+
+with CR, "ClassKey",  HKEY_LOCAL_MACHINE
+with CR, "SectionKey", "SYSTEM\ControlSet001\Control\Keyboard Layout\DosKeybCodes"
+with CR, "ValueType", REG_SZ, "ValueKey" as valueName$, "KeyExists" as cr.exist, "Value" as cr.ret$
+dim a$()
+Long many=0  ' or many=0&
+Method CR, "EnumerateValues", &a$(), &many as ok
+document export$
+for i=0 to many-1
+	with CR, "SectionKey", "SYSTEM\ControlSet001\Control\Keyboard Layouts\"+a$(i)
+	valueName$="Layout Text"
+	export$=a$(i)+" "+If$(cr.exist->cr.ret$,"not exist")+{
+	}
+	REM Print a$(i), cr.ret$
+next
+if  height-row<11  then
+cls, -11
+else
+cls, -height+row
+end if
+Print "Keyboard Codes (press space bar)"
+cls, -height+row
+Report export$
+Print {Keyboard load "00000408"   ' load greek keyboard}
+Scroll Split 0
+declare CR nothing  ' optional, CR erased at the exit of this module
 }
 UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}

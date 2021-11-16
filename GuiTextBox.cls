@@ -20,7 +20,7 @@ Private mprompt As String
 Private Col() As Long, lastdata As String, thispara As Long
 Private mark1 As Long, mark2 As Long
 Private mkind As String, mPartColor As Long
-Public SkipProcAtExitFocus As Boolean
+Public SkipProcAtExitFocus As Boolean, MoveOnEnter As Boolean
 Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
 Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
@@ -70,10 +70,10 @@ Private Declare Function SelectClipRgn Lib "gdi32" (ByVal Hdc As Long, ByVal hRg
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal Hdc As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
 Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
-Public Property Get GetCallBack() As Form
+Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
 End Property
-Public Sub Construct(there As Form, Name$)
+Friend Sub Construct(there As GuiM2000, Name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
@@ -84,7 +84,7 @@ Public Sub Construct(there As Form, Name$)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Public Sub ConstructArray(there As Form, Name$, i As Long)
+Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  Set Callback = there
  On Error Resume Next
  ctrlName = GetTag$
@@ -188,7 +188,7 @@ ff.charset = Form1.DIS.Font.charset
 ff.Size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 End With
-
+MoveOnEnter = True
 With glistN
 .NoEscapeKey = True
 .bypassfirstClick = True
@@ -245,6 +245,10 @@ Else
     glistN.ShowMe2
     Deal = 0
 End If
+End Sub
+
+Private Sub glistN_EnterOnly()
+''
 End Sub
 
 Private Sub glistN_Fkey(a As Integer)
@@ -335,7 +339,7 @@ End Property
 
 
 Private Sub glistN_CheckGotFocus()
-
+Callback.RealHover = ctrlName
 If Not locked Then
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 ' RaiseEvent GotFocus
@@ -405,6 +409,17 @@ Text = Text
 End Sub
 
 Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
+If MoveOnEnter Then
+If KeyCode = 13 Then
+If shift = 1 Then
+glistN.Goback
+Else
+glistN.GoON
+End If
+Exit Sub
+KeyCode = 0
+End If
+End If
 Dim VR(2)
 VR(0) = KeyCode
 VR(1) = shift
@@ -1062,7 +1077,7 @@ End Sub
 
 
 
-Private Sub glistN_Selected(item As Long)
+Private Sub glistN_selected(item As Long)
 If item >= 0 Then
    '' If (Not mCallback Is Nothing) Then mCallback.Press Index
    If mIndex >= 0 Then
@@ -1214,7 +1229,7 @@ Dim hMem As Long, lSize As Long, lPtr As Long
     End If
 End Function
 
-Private Sub glistN_SyncKeyboardUnicode(a As String)
+Private Sub glistN_PreviewKeyboardUnicode(ByVal a As String)
 Callback.SpreadKey a
 End Sub
 
@@ -1257,7 +1272,7 @@ Public Property Get Index() As Long
 Index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Long)
+Friend Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Let ShowAlways(ByVal vNewValue As Variant)
@@ -1425,5 +1440,29 @@ Public Sub SetBarStyle(bColor As Long, Optional bHatch As Long, Optional BHatchC
     glistN.BarColor = mycolor(bColor)
     glistN.BarHatch = bHatch
     glistN.BarHatchColor = BHatchColor
+End Sub
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
+Else
+a = UCase(a)
+Select Case a
+Case "F1" To "F9"
+a = 611 + val(Mid(a, 2))
+Case Else
+a = AscW(a)
+If a > 126 Then a = 0
+End Select
+End If
+If Opcode < 0 Then Opcode = 0
+If a = 0 Then Exit Sub
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc a, ctrlName, Opcode
+End Sub
+Private Sub gListN_AccKey(m As Long)
+Callback.AccProces m
 End Sub
 

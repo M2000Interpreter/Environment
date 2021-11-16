@@ -125,30 +125,52 @@ End If
 Else
          ReDim myptr(0 To fixnamearg)
             myptr(0) = StrPtr(pstrProcName)
-            For lngLoop = 1 To fixnamearg
-            myptr(lngLoop) = StrPtr(pargs2(lngLoop))
+            For lngLoop = fixnamearg To 1 Step -1
+            myptr(fixnamearg - lngLoop + 1) = StrPtr(pargs2(lngLoop))
             Next lngLoop
                 ReDim varDISPID(0 To fixnamearg)
             lngRet = IDsp.GetIDsOfNames(riid, myptr(0), fixnamearg + 1, Clid, varDISPID(0))
- dispid = varDISPID(0)
+            dispid = varDISPID(0)
+            
 End If
     If lngRet = 0 Then
 passhere:
         If items > 0 Or fixnamearg > 0 Then
                 ReDim varArr(0 To items - 1 + fixnamearg)
-               
+                ReDim varARR2(0 To items - 1 + fixnamearg)
                 For lngLoop = 0 To items - 1 + fixnamearg
+
+                
                 If Not MyIsNumericPointer(pArgs(lngLoop)) Then
                 If myIsNull(pArgs(lngLoop)) Then
                 SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop)
                 ElseIf TypeOf pArgs(lngLoop) Is mArray Then
-                    If Typename(pArgs(lngLoop).refArray) = "Long" Then
-                    Set mmm = pArgs(lngLoop)
-                    mmm.ExportArrayNow
+                Set mmm = pArgs(lngLoop)
+                    If mmm.StrArray Then
+                    'SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop).refArray
+                    If VarType(mmm.refArray) = vbString Then
+                    varARR2(fixnamearg + items - 1 - lngLoop) = mmm.ExportStrArray()
+                    VarByRef VarPtr(varArr(fixnamearg + items - 1 - lngLoop)), varARR2(fixnamearg + items - 1 - lngLoop)
+                    Else
+                    varArr(fixnamearg + items - 1 - lngLoop) = mmm.ExportStrArray()
                     End If
+'
+                    ElseIf Typename(mmm.refArray) = "Long" Then
+                    If mmm.IsByValue Then
+                        varArr(fixnamearg + items - 1 - lngLoop) = mmm.ExportArrayCopy()
+                    Else
+                    mmm.ExportArrayNow
+                    
                     SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop).refArray
+                    End If
+                    Else
+                    SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop).refArray
+                    End If
+                    
                 ElseIf TypeOf pArgs(lngLoop) Is MemBlock Then
                     varArr(fixnamearg + items - 1 - lngLoop) = pArgs(lngLoop).ExportToByte
+                ElseIf VarType(pArgs(lngLoop)) = 8200 Then
+                    varArr(fixnamearg + items - 1 - lngLoop) = pArgs(lngLoop)
                 Else
                     SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop)
                 End If
@@ -165,17 +187,14 @@ passhere:
                 ReDim varDISPID(0 To 0)
                  varDISPID(0) = DISPID_PROPERTYPUT
                    .cNamedArgs = 1
+                  .rgPointerToDISPIDNamedArgs = VarPtr(varDISPID(0))
                  Else
                   .cNamedArgs = fixnamearg
 
-      For lngLoop = 0 To fixnamearg - 1
-      varDISPID(lngLoop) = varDISPID(fixnamearg - lngLoop)
-                    
-                Next
-
-                   
+      
+                  .rgPointerToDISPIDNamedArgs = VarPtr(varDISPID(1))
                 End If
-                .rgPointerToDISPIDNamedArgs = VarPtr(varDISPID(0))
+                
                 
                 Else
                 .cNamedArgs = 0
@@ -371,6 +390,10 @@ conthere:
             CallByName pobjTarget, pstrProcName, VbMethod, varArr(8), varArr(7), varArr(6), varArr(5), varArr(4), varArr(3), varArr(2), varArr(1), varArr(0)
         Case 10
             CallByName pobjTarget, pstrProcName, VbMethod, varArr(9), varArr(8), varArr(7), varArr(6), varArr(5), varArr(4), varArr(3), varArr(2), varArr(1), varArr(0)
+        Case 11
+            CallByName pobjTarget, pstrProcName, VbMethod, varArr(10), varArr(9), varArr(8), varArr(7), varArr(6), varArr(5), varArr(4), varArr(3), varArr(2), varArr(1), varArr(0)
+        Case 12
+            CallByName pobjTarget, pstrProcName, VbMethod, varArr(11), varArr(10), varArr(9), varArr(8), varArr(7), varArr(6), varArr(5), varArr(4), varArr(3), varArr(2), varArr(1), varArr(0)
         Case Else
             Err.Raise -2147352567
         End Select
@@ -396,6 +419,12 @@ End If
                             VarByRefClean VarPtr(varArr(where))
                             Set mmm = pArgs(lngLoop)
                             mmm.FixArray
+                            Set mmm = Nothing
+                        ElseIf VarType(varArr(where)) = 8200 Then
+                            VarByRefClean VarPtr(varArr(where))
+                            Set mmm = pArgs(lngLoop)
+                            mmm.FeedFromSrings varARR2(where)
+                            
                             Set mmm = Nothing
                         Else
                             VarByRefCleanRef VarPtr(varArr(where))

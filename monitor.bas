@@ -226,21 +226,46 @@ Dim nowX As Long, nowY As Long
 k = FindMonitorFromPixel(F.Left, F.top)
 z = FindMonitorFromMouse
 If k = z Then
-If flag Then
-Dim tp As POINTAPI
-GetCursorPos tp
-nowX = tp.x * dv15
-nowY = tp.y * dv15
-flag = False
+    If flag Then
+        Dim tp As POINTAPI
+        GetCursorPos tp
+        nowX = tp.x * dv15
+        nowY = tp.y * dv15
+        flag = False
+    Else
+        flag = False
+        If F.Name <> "GuiM2000" Then
+        nowX = (ScrInfo(k).Width - F.Width) / 2 + ScrInfo(k).Left
+        nowY = (ScrInfo(k).Height - F.Height) / 2 + ScrInfo(k).top
+        Else
+        If ScrInfo(z).Left = F.Left And F.Left > 0 And Not F.SkipAutoPos Then
+        nowX = F.Left + (Forms.count - 4) * 450 Mod 4500
+        nowY = F.top + (Forms.count - 4) * 450 Mod 4500
+        ElseIf ScrInfo(z).top = F.top And F.top > 0 And Not F.SkipAutoPos Then
+        nowX = F.Left + (Forms.count - 4) * 450 Mod 4500
+        nowY = F.top + (Forms.count - 4) * 450 Mod 4500
+        Else
+        nowX = F.Left
+        nowY = F.top
+        End If
+        End If
+    End If
 Else
-flag = False
-nowX = F.Left - ScrInfo(k).Left + ScrInfo(z).Left
-nowY = F.top - ScrInfo(k).top + ScrInfo(z).top
-'Exit Sub
-End If
-Else
-nowX = F.Left - ScrInfo(k).Left + ScrInfo(z).Left
-nowY = F.top - ScrInfo(k).top + ScrInfo(z).top
+    If F.Name <> "GuiM2000" Then
+        nowX = (ScrInfo(z).Width - F.Width) / 2 + ScrInfo(z).Left
+        nowY = (ScrInfo(z).Height - F.Height) / 2 + ScrInfo(z).top
+    Else
+        If ScrInfo(z).Left <> F.Left And F.Left > 0 And Not F.SkipAutoPos Then
+            nowX = ScrInfo(z).Left + (Forms.count - 4) * 450 Mod 4500
+            nowY = ScrInfo(z).top + (Forms.count - 4) * 450 Mod 4500
+        ElseIf ScrInfo(z).top <> F.top And F.top > 0 And Not F.SkipAutoPos Then
+            nowX = ScrInfo(z).Left + (Forms.count - 4) * 450 Mod 4500
+            nowY = ScrInfo(z).top + (Forms.count - 4) * 450 Mod 4500
+        Else
+        nowX = F.Left
+        nowY = F.top
+        End If
+    End If
 End If
 
 If nowX > ScrInfo(z).Left + ScrInfo(z).Width Then

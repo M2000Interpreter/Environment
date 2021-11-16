@@ -138,6 +138,7 @@ Dim scrTwips As Long
 Dim bordertop As Long, borderleft As Long
 Dim allwidth As Long, itemWidth As Long
 Private LastActive As Object
+Public previewKey As Boolean
 Private Sub Form_Activate()
 
      On Error Resume Next
@@ -173,16 +174,16 @@ scrTwips = Screen.TwipsPerPixelX
 setupxy = 20
 gList1.enabled = True
 gList2.enabled = True
-glist3.enabled = True
-glist3.LeaveonChoose = True
-glist3.VerticalCenterText = True
-glist3.restrictLines = 1
-glist3.PanPos = 0
+gList3.enabled = True
+gList3.LeaveonChoose = True
+gList3.VerticalCenterText = True
+gList3.restrictLines = 1
+gList3.PanPos = 0
 gList2.CapColor = rgb(255, 160, 0)
 gList2.HeadLine = vbNullString
 gList2.FloatList = True
 gList2.MoveParent = True
-glist3.NoPanRight = False
+gList3.NoPanRight = False
 gList1.NoCaretShow = True
 gList1.NoPanLeft = False
 gList1.StickBar = True
@@ -266,7 +267,7 @@ End If
 End With
   
 Set TEXT1 = New myTextBox
-Set TEXT1.Container = glist3
+Set TEXT1.Container = gList3
  lastfactor = ScaleDialogFix(SizeDialog)
 If ExpandWidth Then
 If LastWidth = 0 Then LastWidth = -1
@@ -285,7 +286,7 @@ gList2.SoftEnterFocus
 If selectorLastX = -1 And selectorLastY = -1 Then
 
 Else
-Move selectorLastX, selectorLastY
+move selectorLastX, selectorLastY
 End If
 Dim i As Integer
 
@@ -293,9 +294,9 @@ For i = 0 To Screen.FontCount - 1
 If Screen.Fonts(i) = ReturnFontName Then
 TEXT1 = Screen.Fonts(i)
 TEXT1.locked = False
-glist3.Font.charset = ReturnCharset
-glist3.Font.bold = ReturnBold
-glist3.Font.Italic = ReturnItalic
+gList3.Font.charset = ReturnCharset
+gList3.Font.bold = ReturnBold
+gList3.Font.Italic = ReturnItalic
 gList1.ListindexPrivateUse = i
 Exit For
 End If
@@ -306,8 +307,8 @@ gList4.enabled = True
 gList2.TabStop = False
 gList1.ShowMe
 TEXT1.locked = False
-glist3.ListIndex = 0
-glist3.SoftEnterFocus
+gList3.ListIndex = 0
+gList3.SoftEnterFocus
 End Sub
 
 
@@ -442,8 +443,8 @@ If gList1.ListIndex = -1 Then gList1.ListIndex = gList1.ScrollFrom
 End Sub
 
 
-Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = vbKeyEscape Then
+Private Sub gList1_KeyDown(keycode As Integer, shift As Integer)
+If keycode = vbKeyEscape Then
  CancelDialog = True
 Unload Me
 End If
@@ -452,20 +453,20 @@ End Sub
 
 
 Private Sub gList1_ScrollSelected(item As Long, y As Long)
-glist3.Font.name = Screen.Fonts(item - 1)
-glist3.Font.Italic = gList4.ListSelected(2)
-glist3.FontSize = 11.25 * lastfactor
-glist3.FontBold = gList4.ListSelected(1)
-glist3.Font.charset = Trim$(gList4.list(6))
+gList3.Font.Name = Screen.Fonts(item - 1)
+gList3.Font.Italic = gList4.ListSelected(2)
+gList3.FontSize = 11.25 * lastfactor
+gList3.FontBold = gList4.ListSelected(1)
+gList3.Font.charset = Trim$(gList4.list(6))
 TEXT1 = Screen.Fonts(item - 1)
 End Sub
 
 Private Sub gList1_selected(item As Long)
-glist3.Font.name = Screen.Fonts(item - 1)
-glist3.Font.Italic = gList4.ListSelected(2)
-glist3.FontSize = 11.25 * lastfactor
-glist3.FontBold = gList4.ListSelected(1)
-glist3.Font.charset = Trim$(gList4.list(6))
+gList3.Font.Name = Screen.Fonts(item - 1)
+gList3.Font.Italic = gList4.ListSelected(2)
+gList3.FontSize = 11.25 * lastfactor
+gList3.FontBold = gList4.ListSelected(1)
+gList3.Font.charset = Trim$(gList4.list(6))
 TEXT1 = Screen.Fonts(item - 1)
 End Sub
 
@@ -480,7 +481,7 @@ End Sub
 Private Sub gList1_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Dim a As RECT, b As RECT
 Dim oldforecolor As Long
-oldforecolor = gList1.ForeColor
+oldforecolor = gList1.forecolor
 If item = -1 Then
 'FillThere thisHDC, thisrect, gList1.CapColor
 'FillThereMyVersion2 thisHDC, thisrect, &HF0F0F0
@@ -493,18 +494,18 @@ a.top = a.top + 2
 If gList1.ListIndex = item Then
 b.Left = 0
 FillBack thisHDC, b, 0
-gList1.ForeColor = &HFFFFFF
+gList1.forecolor = &HFFFFFF
 Else
 FillBack thisHDC, b, gList1.backcolor
 
 End If
 
 PrintItem thisHDC, Screen.Fonts(item), a
-gList1.ForeColor = ForeColor
+gList1.forecolor = forecolor
 End If
 End Sub
- Private Sub PrintItem(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_VCENTER)
-    DrawText mHdc, StrPtr(c), -1, r, way
+ Private Sub PrintItem(mHdc As Long, c As String, R As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_VCENTER)
+    DrawText mHdc, StrPtr(c), -1, R, way
     End Sub
 Private Sub gList2_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 If item = -1 Then
@@ -518,28 +519,34 @@ Private Sub gList2_MouseUp(x As Single, y As Single)
             On Error Resume Next
             If Not LastActive Is Nothing Then
             If LastActive.enabled Then
-            If LastActive.Visible Then LastActive.SetFocus
+            If LastActive.Visible Then
+               If Not gList2.DoubleClickArea(x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor) Then
+                LastActive.SetFocus
+                Else
+                    Unload Me
+                End If
+            End If
             End If
             End If
 End Sub
 
 Private Sub glist3_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
-If glist3.EditFlag Then Exit Sub
-    If glist3.list(0) = vbNullString Then
-    glist3.backcolor = &H808080
-    glist3.ShowMe2
+If gList3.EditFlag Then Exit Sub
+    If gList3.list(0) = vbNullString Then
+    gList3.backcolor = &H808080
+    gList3.ShowMe2
     Exit Sub
     End If
  
 If Button = 1 Then
-  glist3.LeftMarginPixels = glist3.WidthPixels - glist3.UserControlTextWidth(glist3.list(0)) / Screen.TwipsPerPixelX
-       glist3.backcolor = rgb(0, 160, 0)
-    glist3.ShowMe2
+  gList3.LeftMarginPixels = gList3.WidthPixels - gList3.UserControlTextWidth(gList3.list(0)) / Screen.TwipsPerPixelX
+       gList3.backcolor = rgb(0, 160, 0)
+    gList3.ShowMe2
 Else
 
-    glist3.LeftMarginPixels = lastfactor * 5
-  glist3.backcolor = &H808080
-   glist3.ShowMe2
+    gList3.LeftMarginPixels = lastfactor * 5
+  gList3.backcolor = &H808080
+   gList3.ShowMe2
 
 
 End If
@@ -551,14 +558,14 @@ End Sub
 
 Private Sub glist3_LostFocus()
 'If gList1.listindex > -1 Then Text1 = gList1.List(gList1.listindex)
-glist3.backcolor = &H808080
-glist3.ShowMe2
+gList3.backcolor = &H808080
+gList3.ShowMe2
 End Sub
 
-Private Sub glist3_PanLeftRight(Direction As Boolean)
+Private Sub glist3_PanLeftRight(direction As Boolean)
 
 If TEXT1 = vbNullString Then Exit Sub
-If Direction Then
+If direction Then
 ReturnBold = gList4.ListSelected(1)
 ReturnItalic = gList4.ListSelected(2)
 ReturnSize = val(Trim$(gList4.list(4)))
@@ -570,18 +577,18 @@ End Sub
 
 Private Sub gList3_Selected2(item As Long)
 If item = -2 Then
-If glist3.PanPos <> 0 Then
+If gList3.PanPos <> 0 Then
 glist3_PanLeftRight (True)
 Exit Sub
 End If
 
- glist3.LeftMarginPixels = lastfactor * 5
-glist3.backcolor = &H808080
-glist3.ForeColor = &HE0E0E0
-glist3.EditFlag = False
-glist3.NoCaretShow = True
+ gList3.LeftMarginPixels = lastfactor * 5
+gList3.backcolor = &H808080
+gList3.forecolor = &HE0E0E0
+gList3.EditFlag = False
+gList3.NoCaretShow = True
 End If
-glist3.ShowMe2
+gList3.ShowMe2
 End Sub
 
 
@@ -655,10 +662,10 @@ End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
 lastfactor = factor
 gList1.addpixels = 10 * factor
-glist3.FontSize = 11.25 * factor * dv15 / 15
+gList3.FontSize = 11.25 * factor * dv15 / 15
 setupxy = 20 * factor
 gList1.LeftMarginPixels = 5 * factor
- glist3.LeftMarginPixels = factor * 5
+ gList3.LeftMarginPixels = factor * 5
 
 
 bordertop = 10 * scrTwips * factor
@@ -684,11 +691,11 @@ gList2.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 
 allheight = bordertop + heightTop + bordertop + heightSelector + bordertop + HeightMenu + bordertop + HeightBottom + bordertop
 
-Move Left, top, allwidth, allheight
-gList2.Move borderleft, bordertop, itemWidth, heightTop
-gList1.Move borderleft, 2 * bordertop + heightTop, itemWidth, heightSelector
-gList4.Move borderleft, 3 * bordertop + heightTop + heightSelector, itemWidth, HeightMenu
-glist3.Move borderleft, allheight - HeightBottom - bordertop, itemWidth, HeightBottom
+move Left, top, allwidth, allheight
+gList2.move borderleft, bordertop, itemWidth, heightTop
+gList1.move borderleft, 2 * bordertop + heightTop, itemWidth, heightSelector
+gList4.move borderleft, 3 * bordertop + heightTop + heightSelector, itemWidth, HeightMenu
+gList3.move borderleft, allheight - HeightBottom - bordertop, itemWidth, HeightBottom
 
 
 End Sub
@@ -730,18 +737,18 @@ End Sub
 Private Sub gList4_MenuChecked(item As Long)
 If item = 2 Then
 If gList4.ListSelected(1) Then
-glist3.Font.bold = True
+gList3.Font.bold = True
 Else
-glist3.Font.bold = False
+gList3.Font.bold = False
 End If
 ElseIf item = 3 Then
 If gList4.ListSelected(2) Then
-glist3.Font.Italic = True
+gList3.Font.Italic = True
 Else
-glist3.Font.Italic = False
+gList3.Font.Italic = False
 End If
 End If
-glist3.ShowMe2
+gList3.ShowMe2
 End Sub
 
 
@@ -758,7 +765,7 @@ End If
  gList4.EditFlag = False
  gList4.NoCaretShow = True
  End If
-glist3.Font.charset = Trim$(gList4.list(6))
+gList3.Font.charset = Trim$(gList4.list(6))
 
 End Sub
 Private Sub gList4_Selected2(item As Long)
@@ -790,39 +797,39 @@ Private Sub gList4_softSelected(item As Long)
 gList4_selected item
 End Sub
 
-Private Sub glist3_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub glist3_KeyDown(keycode As Integer, shift As Integer)
 
-If Not glist3.EditFlag Then
+If Not gList3.EditFlag Then
 
 
 gList1.ShowMe2
-glist3.SelStart = 1
-     glist3.LeftMarginPixels = lastfactor * 5
-  glist3.backcolor = &H808080
+gList3.SelStart = 1
+     gList3.LeftMarginPixels = lastfactor * 5
+  gList3.backcolor = &H808080
   
-glist3.EditFlag = True
-glist3.NoCaretShow = False
-glist3.backcolor = &H0
-glist3.ForeColor = &HFFFFFF
-glist3.ShowMe2
-ElseIf KeyCode = vbKeyReturn Then
+gList3.EditFlag = True
+gList3.NoCaretShow = False
+gList3.backcolor = &H0
+gList3.forecolor = &HFFFFFF
+gList3.ShowMe2
+ElseIf keycode = vbKeyReturn Then
 
 DestroyCaret
 If TEXT1 <> "" Then
-glist3.EditFlag = False
-glist3.enabled = False
+gList3.EditFlag = False
+gList3.enabled = False
 
 glist3_PanLeftRight True
-KeyCode = 0
+keycode = 0
 End If
 End If
 
 End Sub
-Private Sub gList4_SpecialColor(rgbcolor As Long)
+Private Sub gList4_SpecialColor(RGBcolor As Long)
 If gList4.EditFlag Then
 
 ElseIf gList4.NoCaretShow Then
-rgbcolor = rgb(255, 200, 125)
+RGBcolor = rgb(255, 200, 125)
 End If
 End Sub
 Private Sub gList4_ScrollSelected(item As Long, y As Long)

@@ -432,7 +432,7 @@ Public textbox3 As myTextBox
 Public combo2 As dropdownlist
 ' new combo box
 Public combo3 As dropdownlist
-Public textbox4 As myTextBox
+Public textbox4 As myTextBox, previewKey As Boolean
 ''
 Public WithEvents tbPaper As myTextBox
 Attribute tbPaper.VB_VarHelpID = -1
@@ -582,7 +582,7 @@ Else
         LastWidth = Width
       gList2.HeadlineHeight = gList2.HeightPixels
         gList2.PrepareToShow
-      gList3.PrepareToShow
+      glist3.PrepareToShow
       gList5.PrepareToShow
       DIS.PrepareToShow
         ly = ly * lastfactor / factor
@@ -619,7 +619,7 @@ gList2.move borderleft, bordertop, itemWidth, bordertop * 3
 gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
 gList2.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 gList1.move borderleft, bordertop * 6, itemWidth, bordertop * 3
-gList3.move borderleft + itemWidth * 2 / 5, bordertop * 9, itemWidth * 3 / 5, bordertop * 18
+glist3.move borderleft + itemWidth * 2 / 5, bordertop * 9, itemWidth * 3 / 5, bordertop * 18
 gList9.move borderleft, bordertop * 10, itemWidth * 2 / 5 - borderleft, bordertop * 3
 gList10.move borderleft + itemWidth * 2 / 5, bordertop * 10, itemWidth * 3 / 5, bordertop * 3
 'gList4.Move borderleft, bordertop * 14, itemwidth2, bordertop * 3
@@ -657,7 +657,7 @@ gList2.FontSize = 14.25 * factor * dv15 / 15
 factor = gList2.FontSize / 14.25 / dv15 * 15
 gList1.FontSize = 11.25 * factor * dv15 / 15
 factor = gList1.FontSize / 11.25 / dv15 * 15
-gList3.FontSize = gList1.FontSize
+glist3.FontSize = gList1.FontSize
 gList4.FontSize = gList1.FontSize
 gList5.FontSize = gList1.FontSize
 gList6.FontSize = gList1.FontSize
@@ -869,7 +869,7 @@ DIS.NoCaretShow = True
 DIS.LeftMarginPixels = 10
   
 ' Combobox1 SetUp
-gList3.restrictLines = 6
+glist3.restrictLines = 6
 Set textbox2 = New myTextBox
 Set textbox2.Container = gList1
 
@@ -878,7 +878,7 @@ combo1.UseOnlyTheList = True
 
 
 Set combo1.Textbox = textbox2
-Set combo1.Container = gList3
+Set combo1.Container = glist3
 combo1.locked = False
 combo1.AutoComplete = True
 combo1.Textbox.ShowAlways = True
@@ -940,7 +940,7 @@ Dim aa As New Document, bb As New FastCollection
        If ex Then Exit For
     Next i
     aa.SortDoc 1, 1, aa.DocLines
-gList3.Text = aa.textDoc
+glist3.Text = aa.textDoc
  gList11.enabled = True
 gList11.BackStyle = 1
 gList11.FontSize = 10.25

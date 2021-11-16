@@ -194,7 +194,9 @@ With Prefresh(GetCode(bstack.Owner))
                     
                      If some.Visible Then
                     If TypeOf some Is GuiM2000 Then
-                    If some.RefreshList > 0 Then some.RefreshALL Else some.Refresh
+                        
+                        If some.RefreshList > 0 Then some.RefreshALL Else some.Refresh
+                        
                     Else
                     some.Refresh
                     End If

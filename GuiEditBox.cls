@@ -190,10 +190,10 @@ Private LastListIndex As Long
 
 
 
-Public Property Get GetCallBack() As Form
+Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
 End Property
-Public Sub Construct(there As Form, Name$)
+Friend Sub Construct(there As GuiM2000, Name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
@@ -204,7 +204,7 @@ Public Sub Construct(there As Form, Name$)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Public Sub ConstructArray(there As Form, Name$, i As Long)
+Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  Set Callback = there
  On Error Resume Next
  ctrlName = GetTag$
@@ -258,7 +258,7 @@ WordCharRight = " ,[]"
 NoMark = False
 mNoColor = True
 mNoColor1 = True
-FileName = vbNullString
+Filename = vbNullString
 glistN.DragEnabled = False
 .backcolor = rgb(200, 120, 60)
 Set .Font = ff
@@ -273,6 +273,7 @@ EditDoc = True
 nowrap = False
 enabled = True
 SetME
+ShowAlways = True
 mDoc.ForEditBox = True
 End Sub
 Sub Show()
@@ -374,8 +375,8 @@ End Function
 Public Sub HorSrcoll(widthtwips As Long)
 glistN.PanPos = widthtwips
 End Sub
-Public Property Get FileName() As String
-FileName = myfilename
+Public Property Get Filename() As String
+Filename = myfilename
 End Property
 Sub NewTitle(RHS As String, addpixelstoo As Long, Optional factor As Single = 1)
 Title = RHS
@@ -408,7 +409,7 @@ glistN.PrepareToShow 10
 all = mDoc.DocLines
 glistN.CalcAndShowBar
 End Sub
-Public Property Let FileName(ByVal RHS As String)
+Public Property Let Filename(ByVal RHS As String)
 myfilename = RHS
 onelineheight = 0
 Dim thisdoc As New Document, header As New Document
@@ -726,6 +727,7 @@ End If
 
 End Sub
 Private Sub glistN_CheckGotFocus()
+Callback.RealHover = ctrlName
 If Not locked Then
 glistN.HideCaretOnexit = False
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
@@ -1834,6 +1836,7 @@ End If
 End If
 conthere:
 If NoMark And EditDoc = False Then glistN.ShowMe2: Exit Sub
+If KeyCode = 0 And shift = 0 Then Exit Sub
 If KeyCode <> 0 Or shift <> 0 Then PressKey_A KeyCode, shift
 
 
@@ -2407,7 +2410,7 @@ Dim what$, ThatPara As Long
    mDoc.MarkParagraphID = ThatPara
 End Sub
 
-Private Sub glistN_Selected(item As Long)
+Private Sub glistN_selected(item As Long)
   If undomode = 1 And undotext <> "" Then PushUndo
 If mEditDoc <> glistN.EditFlag Then EditDoc = EditDoc
 Dim what$, ThatPara As Long
@@ -7834,7 +7837,7 @@ Public Property Get Index() As Long
 Index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Long)
+Friend Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 
@@ -7900,6 +7903,7 @@ Case vbKeyF1
 If shift > 0 Then If (shift And 2) <> 2 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 
 If (shift And 2) = 2 Then
+shift = 0
 If SelText <> "" Then
 helpmeSub
 Else
@@ -7922,6 +7926,7 @@ If (shift And 4) = 4 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 
 If shift <> 0 Then
 LastSearchType = 2 - Abs(shift Mod 2 = 1)
+shift = 0
 If SelText <> "" Then s$ = SelText
 If pagio$ = "GREEK" Then
 s$ = InputBoxN("Αναζήτησε προς την αρχή " & IIf(LastSearchType = 1, "(και σε μέρος λέξης):" & vbCrLf & " Ctrl+F2 για λέξεις μόνο", ":" & vbCrLf & " Ctrl+F2 και για μέρη λέξεων"), "Συγγραφή Κειμένου", s$, noinp)
@@ -7950,6 +7955,7 @@ KeyCode = 0
 Case vbKeyF3
 If (shift And 4) = 4 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
     If shift <> 0 Then
+    shift = 0
         If s$ = vbNullString And SelText <> "" Then s$ = SelText
         If pagio$ = "GREEK" Then
             s$ = InputBoxN("Αναζήτησε προς το τέλος " & IIf(LastSearchType = 1, "(και σε μέρος λέξης):" & vbCrLf & " Ctrl+F3 για λέξεις μόνο", ":" & vbCrLf & " Ctrl+F3 και για μέρη λέξεων"), "Συγγραφή Κειμένου", s$, noinp)
@@ -7976,27 +7982,32 @@ If (shift And 4) = 4 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 Case vbKeyF4
 If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If SelText <> "" Then mscatsub Else dothis
+shift = 0
 KeyCode = 0
 Case vbKeyF5
 If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If SelText <> "" Then rthissub shift
 KeyCode = 0
+shift = 0
 Case vbKeyF6  ' Set/Show/Reset Para1
 If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton para1, PosPara1
 KeyCode = 0
+shift = 0
 Case vbKeyF7  'Set/Show/Reset Para2
 If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para2, PosPara2
 KeyCode = 0
+shift = 0
 Case vbKeyF8  'Set/Show/Reset Para2
 If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para3, PosPara3
 KeyCode = 0
-
+shift = 0
 Case vbKeyF9  ' Count Words
-If (shift And 7) > 1 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
-If shift <> 0 Then
+'If (shift And 7) > 1 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) = 1 Then
+shift = 0
 NoCenterLineEdit = Not NoCenterLineEdit
 If UserCodePage = 1253 Then
 If NoCenterLineEdit Then
@@ -8011,6 +8022,7 @@ Else
 ReplaceTitle = "Center line edit mode"
 End If
 End If
+
 Else
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 If glistN.lines > 1 Then
@@ -8104,6 +8116,7 @@ conttab:
     
         a$ = vbCrLf + SelText & "*"
         If shift <> 0 Then
+        shift = 0
         a$ = Replace(a$, vbCrLf + String(TabControl + (Len(CurrentParagraph) - Len(LTrim(CurrentParagraph))) Mod TabControl, ChrW(160)), vbCrLf)
             a$ = Replace(a$, vbCrLf + space$(TabControl + (Len(CurrentParagraph) - Len(LTrim(CurrentParagraph))) Mod TabControl), vbCrLf)
             InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
@@ -8121,7 +8134,7 @@ conttab:
     Else
     If shift <> 0 Then
     
-      
+      shift = 0
         If MyTrimL2(Mid$(CurrentParagraph, 1, TabControl)) = 0 Then
     
                 SelStartSilent = ii
@@ -8176,6 +8189,7 @@ End If
 If SelText <> "" Then
     a$ = vbCrLf + SelText & "*"
     If shift <> 0 Then
+    shift = 0
     a$ = Replace(a$, vbCrLf + ChrW(9), vbCrLf)
        ' a$ = Replace(a$, vbCrLf + String(1 + (Len(CurrentParagraph) - Len(LTrim(CurrentParagraph))), ChrW(9)), vbCrLf)
         InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
@@ -8193,7 +8207,7 @@ If SelText <> "" Then
 
 Else
 If shift <> 0 Then
-
+shift = 0
     If Mid$(CurrentParagraph, 1, 1) = ChrW(9) Or Mid$(CurrentParagraph, 1, 1) = ChrW(9) Then
 
             SelStartSilent = ii
@@ -8381,6 +8395,7 @@ s$ = Trim$(SelText)
 SelStartSilent = SelStart
 el = Charpos  ' charpos maybe is in the start or the end of block
 If shift Mod 2 = 1 Then
+shift = 0
 anystr = True
 If pagio$ = "GREEK" Then
 neo$ = InputBoxN("Αλλαγή Χαρακτήρων", "Διορθωτής Κειμένου", s$, noinp)
@@ -9969,7 +9984,7 @@ Public Sub SetBarStyle(bColor As Long, Optional bHatch As Long, Optional BHatchC
     glistN.BarHatch = bHatch
     glistN.BarHatchColor = mycolor(BHatchColor)
 End Sub
-Private Sub glistN_SyncKeyboardUnicode(a As String)
+Private Sub glistN_PreviewKeyboardUnicode(ByVal a As String)
 Callback.SpreadKey a
 End Sub
 Private Sub glistN_Fkey(a As Integer)
@@ -9978,5 +9993,30 @@ Callback.SendFKEY a - 1000
 Else
 If UsedAsTextBox Or NumberOnly Or NumberIntOnly Then Callback.SendFKEY a
 End If
+End Sub
+
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
+Else
+a = UCase(a)
+Select Case a
+Case "F1" To "F9"
+a = 611 + val(Mid(a, 2))
+Case Else
+a = AscW(a)
+If a > 126 Then a = 0
+End Select
+End If
+If Opcode < 0 Then Opcode = 0
+If a = 0 Then Exit Sub
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc a, ctrlName, Opcode
+End Sub
+Private Sub gListN_AccKey(m As Long)
+Callback.AccProces m
 End Sub
 

@@ -108,7 +108,7 @@ Attribute VB_Exposed = False
 Option Explicit
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private noChangeColorGlist3 As Boolean
-Public WithEvents mySelector As FileSelector
+Public WithEvents mySelector As FileSelector, previewKey As Boolean
 Attribute mySelector.VB_VarHelpID = -1
 Private Declare Function DestroyCaret Lib "user32" () As Long
 Dim height1 As Long, width1 As Long
@@ -176,10 +176,10 @@ scrTwips = Screen.TwipsPerPixelX
 ' clear data...
 setupxy = 20
 Set mySelector = New FileSelector
-gList3.LeaveonChoose = True
-gList3.VerticalCenterText = True
-gList3.restrictLines = 1
-gList3.PanPos = 0
+glist3.LeaveonChoose = True
+glist3.VerticalCenterText = True
+glist3.restrictLines = 1
+glist3.PanPos = 0
 firstpath = False
 nopreview = False
 oldLeftMarginPixels = 0
@@ -188,11 +188,11 @@ gList2.HeadLine = vbNullString
 
 gList2.FloatList = True
 gList2.MoveParent = True
-gList3.NoPanRight = False
+glist3.NoPanRight = False
 gList1.NoPanLeft = False
 
 Set TEXT1 = New myTextBox
-Set TEXT1.Container = gList3
+Set TEXT1.Container = glist3
 
 nopreview = True
 'fHeight = gList1.Height
@@ -325,7 +325,7 @@ UserFileName = vbNullString
 If ReturnFile <> "" Then
 UserFileName = .Mydir.ExtractName(ReturnFile)
 .selectedFile = .Mydir.ExtractName(ReturnFile)
-gList3.ShowMe
+glist3.ShowMe
 .FilePath = ExtractPath(ReturnFile, True)
 If .TEXT1 <> .Mydir.ExtractName(ReturnFile) Then .TEXT1 = .Mydir.ExtractName(ReturnFile)
 ReturnFile = vbNullString
@@ -350,8 +350,8 @@ move selectorLastX, selectorLastY
 End If
 'If TEXT1 <> "" Then
 TEXT1.locked = False
-gList3.ListIndex = 0
-gList3.SoftEnterFocus
+glist3.ListIndex = 0
+glist3.SoftEnterFocus
 If gList1.Value <> gList1.ListIndex Then
 gList1.Spinner = True
 gList1.Value = gList1.ListIndex
@@ -714,7 +714,14 @@ Private Sub gList2_MouseUp(x As Single, y As Single)
             If mySelector.myDir2 Is Nothing Then Exit Sub
             If Not LastActive Is Nothing Then
             If LastActive.enabled Then
-            If LastActive.Visible Then LastActive.SetFocus
+            If LastActive.Visible Then
+                If Not gList2.DoubleClickArea(x, y, setupxy / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1) Then
+                LastActive.SetFocus
+                Else
+                 mySelector.AbordAll
+                      Unload Me
+                End If
+            End If
             End If
             End If
 End Sub
@@ -731,30 +738,30 @@ Private Sub gList2_Selected2(item As Long)
 End Sub
 
 Private Sub glist3_CheckGotFocus()
-Set LastActive = gList3
-       gList3.backcolor = rgb(0, 160, 0)
-    gList3.ShowMe2
+Set LastActive = glist3
+       glist3.backcolor = rgb(0, 160, 0)
+    glist3.ShowMe2
     noChangeColorGlist3 = True
 End Sub
 
 
 Private Sub glist3_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
-If gList3.EditFlag Then Exit Sub
-    If gList3.list(0) = vbNullString Then
-    gList3.backcolor = &H808080
-    gList3.ShowMe2
+If glist3.EditFlag Then Exit Sub
+    If glist3.list(0) = vbNullString Then
+    glist3.backcolor = &H808080
+    glist3.ShowMe2
     Exit Sub
     End If
  
 If Button = 1 Then
-  gList3.LeftMarginPixels = gList3.WidthPixels - gList3.UserControlTextWidth(gList3.list(0)) / Screen.TwipsPerPixelX
-       gList3.backcolor = rgb(0, 160, 0)
-    gList3.ShowMe2
+  glist3.LeftMarginPixels = glist3.WidthPixels - glist3.UserControlTextWidth(glist3.list(0)) / Screen.TwipsPerPixelX
+       glist3.backcolor = rgb(0, 160, 0)
+    glist3.ShowMe2
 Else
 
-    gList3.LeftMarginPixels = 8
- If Not noChangeColorGlist3 Then gList3.backcolor = &H808080
-   gList3.ShowMe2
+    glist3.LeftMarginPixels = 8
+ If Not noChangeColorGlist3 Then glist3.backcolor = &H808080
+   glist3.ShowMe2
 
 
 End If
@@ -766,43 +773,43 @@ End Sub
 
 Private Sub glist3_KeyDown(KeyCode As Integer, shift As Integer)
 If Not mySelector.Mydir.isReadOnly(mySelector.Mydir.Path) Then
-If Not gList3.EditFlag Then
+If Not glist3.EditFlag Then
 
 If NewFolder Then
 
 If Not (gList1.ListIndex = -1) Then
 gList1.ListIndex = -1
 gList1.ShowMe2
-gList3.Clear
-gList3.SelStart = 1
+glist3.Clear
+glist3.SelStart = 1
 TEXT1 = "NewFolder"
 End If
-    gList3.LeftMarginPixels = 8
-  gList3.backcolor = &H808080
+    glist3.LeftMarginPixels = 8
+  glist3.backcolor = &H808080
   
-gList3.EditFlag = True
-gList3.NoCaretShow = False
-gList3.backcolor = &H0
-gList3.forecolor = &HFFFFFF
+glist3.EditFlag = True
+glist3.NoCaretShow = False
+glist3.backcolor = &H0
+glist3.forecolor = &HFFFFFF
 ElseIf Not FileExist Then
 If Not (gList1.ListIndex = -1) Then
 gList1.ListIndex = -1
 gList1.ShowMe2
-gList3.Clear
-gList3.SelStart = 1
+glist3.Clear
+glist3.SelStart = 1
 If UserFileName <> "" Then
 TEXT1 = UserFileName
 Else
 TEXT1 = "NewFile"
 End If
 End If
-    gList3.LeftMarginPixels = 8
-  gList3.backcolor = &H808080
+    glist3.LeftMarginPixels = 8
+  glist3.backcolor = &H808080
   
-gList3.EditFlag = True
-gList3.NoCaretShow = False
-gList3.backcolor = &H0
-gList3.forecolor = &HFFFFFF
+glist3.EditFlag = True
+glist3.NoCaretShow = False
+glist3.backcolor = &H0
+glist3.forecolor = &HFFFFFF
 Else
 If KeyCode = vbKeyReturn Then
 GoTo here
@@ -812,15 +819,15 @@ KeyCode = 0
 gList1.SetFocus
 End If
 End If
-gList3.ShowMe2
+glist3.ShowMe2
 KeyCode = 0
 
 ElseIf KeyCode = vbKeyReturn Then
 here:
 DestroyCaret
 If TEXT1 <> "" Then
-gList3.EditFlag = False
-gList3.enabled = False
+glist3.EditFlag = False
+glist3.enabled = False
 glist3_PanLeftRight True
 End If
 KeyCode = 0
@@ -833,8 +840,8 @@ End Sub
 
 Private Sub glist3_LostFocus()
  noChangeColorGlist3 = False
-gList3.backcolor = &H808080
-gList3.ShowMe2
+glist3.backcolor = &H808080
+glist3.ShowMe2
 End Sub
 
 Private Sub glist3_PanLeftRight(direction As Boolean)
@@ -866,7 +873,7 @@ TEXT1 = mySelector.Mydir.CleanName(TEXT1.Text)
     End If
     Else
 
-        ReturnFile = mySelector.GetPath + gList3.list(0)
+        ReturnFile = mySelector.GetPath + glist3.list(0)
         
     End If
 
@@ -884,16 +891,16 @@ End Sub
 
 Private Sub gList3_Selected2(item As Long)
 If item = -2 Then
-If gList3.PanPos <> 0 Then
+If glist3.PanPos <> 0 Then
 glist3_PanLeftRight (True)
 Exit Sub
 End If
 
-gList3.LeftMarginPixels = 8
-gList3.backcolor = &H808080
-gList3.forecolor = &HE0E0E0
-gList3.EditFlag = False
-gList3.NoCaretShow = True
+glist3.LeftMarginPixels = 8
+glist3.backcolor = &H808080
+glist3.forecolor = &HE0E0E0
+glist3.EditFlag = False
+glist3.NoCaretShow = True
 
 
 ElseIf Not mySelector.Mydir.isReadOnly(mySelector.Mydir.Path) Then
@@ -903,13 +910,13 @@ gList1.ListIndex = -1
 gList1.ShowMe2
 TEXT1 = "NewFolder"
 End If
-    gList3.LeftMarginPixels = 8
-  gList3.backcolor = &H808080
+    glist3.LeftMarginPixels = 8
+  glist3.backcolor = &H808080
   
-gList3.EditFlag = True
-gList3.NoCaretShow = False
-gList3.backcolor = &H0
-gList3.forecolor = &HFFFFFF
+glist3.EditFlag = True
+glist3.NoCaretShow = False
+glist3.backcolor = &H0
+glist3.forecolor = &HFFFFFF
 ElseIf Not FileExist Then
 If Not (gList1.ListIndex = -1) Then
 gList1.ListIndex = -1
@@ -920,22 +927,22 @@ Else
 TEXT1 = "NewFile"
 End If
 End If
-    gList3.LeftMarginPixels = 8
-  gList3.backcolor = &H808080
+    glist3.LeftMarginPixels = 8
+  glist3.backcolor = &H808080
   
-gList3.EditFlag = True
-gList3.NoCaretShow = False
-gList3.backcolor = &H0
-gList3.forecolor = &HFFFFFF
+glist3.EditFlag = True
+glist3.NoCaretShow = False
+glist3.backcolor = &H0
+glist3.forecolor = &HFFFFFF
 End If
 End If
-gList3.ShowMe2
+glist3.ShowMe2
 End Sub
 
 
 
-Private Sub mySelector_DoubleClick(file As String)
-ReturnFile = file
+Private Sub mySelector_DoubleClick(File As String)
+ReturnFile = File
 mySelector.AbordAll
 Unload Me
 End Sub
@@ -970,7 +977,7 @@ End If
 Image1.Height = aImage.Height
 Image1.Width = aImage.Width
 End Property
-Private Sub mySelector_TraceFile(file As String)
+Private Sub mySelector_TraceFile(File As String)
 Dim aPic As StdPicture, s$
 If Not DialogPreview Then
 TEXT1 = mySelector.Mydir.list(mySelector.glistN.ListIndex)
@@ -987,12 +994,12 @@ Set LoadApicture = LoadPicture("")
 On Error Resume Next
 Err.Clear
 'If FileLen(file) > 1500000 Then Image1.refresh
-    s$ = CFname(file)
+    s$ = CFname(File)
     Set aPic = LoadMyPicture(GetDosPath(s$), True, gList2.backcolor)
      MyEr "", ""
      If Not aPic Is Nothing Then
         Set aImage = aPic
-        If file = vbNullString Or Err.Number > 0 Then Exit Sub
+        If File = vbNullString Or Err.Number > 0 Then Exit Sub
         ihave = True
         Line (0, 0)-(Scalewidth - dv15, Scaleheight - dv15), Me.backcolor, BF
 
@@ -1072,7 +1079,7 @@ multifileselection = False
 ExpandWidth = False
 For i = LBound(a()) To UBound(a())
 j = 0
-Do While gList1.Id(j) <> a(i)
+Do While gList1.id(j) <> a(i)
 j = j + 1
 If j >= gList1.listcount Then Exit Do
 Loop
@@ -1120,7 +1127,7 @@ Sub GetSettings()
 Dim s As String, i As Long
 For i = 0 To gList1.listcount - 1
 If gList1.ListSelected(i) = True Then
-If s = vbNullString Then s = gList1.Id(i) Else s = s & "," & gList1.Id(i)
+If s = vbNullString Then s = gList1.id(i) Else s = s & "," & gList1.id(i)
 End If
 Next i
 Settings = s
@@ -1136,7 +1143,7 @@ Sub ScaleDialog(ByVal factor As Single, PreviewFile As Boolean, Optional NewWidt
 On Error Resume Next
 lastfactor = factor
 gList1.addpixels = 10 * factor
-gList3.FontSize = 11.25 * factor * dv15 / 15
+glist3.FontSize = 11.25 * factor * dv15 / 15
 mySelector.PreserveNpixelsHeaderRight = 20 * factor
 setupxy = 20 * factor
 oldLeftMarginPixels = 30 * factor
@@ -1190,7 +1197,7 @@ End If
 move Left, top, allwidth, allheight
 gList2.move borderleft, bordertop, itemWidth, heightTop
 gList1.move borderleft, 2 * bordertop + heightTop, itemWidth, heightSelector
-gList3.move borderleft, allheight - HeightBottom - bordertop, itemWidth, HeightBottom
+glist3.move borderleft, allheight - HeightBottom - bordertop, itemWidth, HeightBottom
 
 If iwidth = 0 Then iwidth = itemWidth
 If iheight = 0 Then iheight = HeightPreview

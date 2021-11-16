@@ -75,7 +75,7 @@ End Type
 ' no second sort allowed per array
 Private sortmult As Long, sortoff As Long, upart As Long, part As Long, Col(), Piv, piv1()
 Public Index As Long, Final As Boolean, refgroup As Object, grouperror As Boolean
-Public refArray As Variant
+Public refArray As Variant, StrArray As Boolean, IsByValue As Boolean
 Public Sub Compute0(p As Variant, ss$)
 If Final Then CantAssignValue: Exit Sub
 Dim v As Long, sp As Variant
@@ -354,37 +354,167 @@ Arr = False
 End Sub
 Friend Sub ExportArrayNow()
 CopyVariantArray refArray, actualdata()
+IsByValue = False
+End Sub
+Friend Function ExportArrayCopy() As Variant()
+ExportArrayCopy = actualdata
+End Function
+
+Friend Sub ExportStringArrayNow()
+StrArray = True
+End Sub
+
+Friend Function ExportStrArray() As String()
+
+Dim i As Long
+Dim n As Byte, s$, m_base As Long, R1 As Long, where As Long
+
+ReDim strAr(maxitems) As String
+For i = 0 To maxitems - 1
+GetMem1 VarPtr(actualdata(i)), n
+If n = 8 Then
+strAr(i) = actualdata(i)
+Else
+End If
+Next i
+ExportStrArray = strAr
+End Function
+Private Function makeonedim(items As Long) As Variant()
+ReDim makeonedim(0 To items - 1)
+End Function
+
+Friend Sub FeedFromSrings(Carrier As Variant)
+Dim a() As String, i As Long
+a() = Carrier
+Carrier = Array()
+Dim zz As Variant, rCount As Long, dimActual As Long, dummy As Long, tst As Long
+Dim ii As Long
+CopyMemory ByVal VarPtr(refArray), zz, 16
+On Error GoTo TT
+rCount = UBound(a()) - LBound(a) + 1
+dimActual = 1
+TT:
+If dimActual = 0 Then
+If dnum = 0 Then Exit Sub
+Class_Terminate
+Class_Initialize
+Exit Sub
+End If
+StartResize
+If dnum >= dimActual Then
+PushDim rCount, limBase(dimActual - 1)
+Else
+PushDim rCount
+End If
+Dim sum As Long
+sum = rCount
+again:
+dummy = dimActual
+On Error GoTo ok1
+tst = UBound(a(), dimActual + 1)
+rCount = UBound(a(), dimActual + 1) - LBound(a, dimActual + 1) + 1
+dimActual = dimActual + 1
+sum = sum * rCount
+ok1:
+If dimActual <> dummy Then
+If dnum >= dimActual Then
+PushDim rCount, limBase(dimActual - 1)
+Else
+PushDim rCount
+End If
+GoTo again
+End If
+If dimActual <> 1 Then
+MyEr "wrong array dimensions", "λάθος διαστάσεις πίνακα"
+Else
+actualdata() = makeonedim(sum)
+ii = LBound(a)
+For i = LBound(actualdata, 1) To UBound(actualdata, 1)
+actualdata(i) = a(ii)
+ii = ii + 1
+Next i
+PushEnd
+End If
 End Sub
 Friend Sub FixArray()
-Dim zz As Variant
+Dim zz As Variant, rCount As Long, dimActual As Long, dummy As Long, tst As Long
+Dim hlp()
 CopyMemory ByVal VarPtr(refArray), zz, 16
-Dim z As Long, i As Long
-If count <> UBound(actualdata()) - LBound(actualdata) + 1 Then
-i = count
-maxitems1 = UBound(actualdata()) - LBound(actualdata)
-maxitems = maxitems1 + 1
-z = 1
-If dnum > 1 Then
+If IsByValue Then Exit Sub
+If StrArray Then
 
-  z = i \ limit(dnum - 1)
-
-   If maxitems Mod z <> 0 Then
-  maxitems = maxitems + z - maxitems Mod z
-  maxitems1 = maxitems - 1
-  ReDim Preserve actualdata(maxitems1)
-  End If
-  limit(dnum - 1) = maxitems \ z
 Else
-limit(0) = maxitems
+On Error GoTo TT
+rCount = UBound(actualdata, 1) - LBound(actualdata, 1) + 1
+dimActual = 1
+TT:
+If dimActual = 0 Then
+If dnum = 0 Then Exit Sub
+Class_Terminate
+Class_Initialize
+Exit Sub
 End If
+StartResize
+If dnum >= dimActual Then
+PushDim rCount, limBase(dimActual - 1)
+Else
+PushDim rCount
+End If
+Dim sum As Long
+sum = rCount
+again:
+dummy = dimActual
+On Error GoTo ok1
+tst = UBound(actualdata(), dimActual + 1)
+rCount = UBound(actualdata(), dimActual + 1) - LBound(actualdata, dimActual + 1) + 1
+dimActual = dimActual + 1
+sum = sum * rCount
+ok1:
+If dimActual <> dummy Then
+If dnum >= dimActual Then
+PushDim rCount, limBase(dimActual - 1)
+Else
+PushDim rCount
+End If
+GoTo again
+End If
+If oldmaxitems <> sum Then
+hlp() = actualdata()
+actualdata() = makeonedim(sum)
+CopySerialize hlp
+End If
+
+PushEnd
+'Dim z As Long, i As Long
+'If count <> rCount Then
+'i = count
+'maxitems1 = UBound(actualdata()) - LBound(actualdata)
+'maxitems = maxitems1 + 1
+'z = 1
+'If dnum > 1 Then
+
+  'z = i \ limit(dnum - 1)
+
+'   If maxitems Mod z <> 0 Then
+'  maxitems = maxitems + z - maxitems Mod z
+'  maxitems1 = maxitems - 1
+'  ReDim Preserve actualdata(maxitems1)
+'  End If
+'  limit(dnum - 1) = maxitems \ z
+'Else
+'If maxitems > 0 Then dnum = 1
+' dtable(0) = 1
+'limit(0) = maxitems
+'End If
 End If
 '
+
 End Sub
 Friend Sub LoadTuple(ar As Variant)
 Dim z As Long, i As Long
 actualdata = ar
-If count <> UBound(actualdata()) - LBound(actualdata) + 1 Then
-i = count
+If Count <> UBound(actualdata()) - LBound(actualdata) + 1 Then
+i = Count
 maxitems1 = UBound(actualdata()) - LBound(actualdata)
 maxitems = maxitems1 + 1
 z = 1
@@ -399,14 +529,15 @@ If dnum > 1 Then
   ReDim Preserve actualdata(maxitems1)
   End If
   limit(dnum - 1) = maxitems \ z
+
 Else
 dnum = 1
+dtable(0) = 1
 limit(0) = maxitems
 End If
 End If
 '
 End Sub
-
 Friend Sub CopySerialize(mmm() As Variant)
 ' may we get an exception here
 Dim m_base As Long, first12 As Long
@@ -455,7 +586,7 @@ End Sub
 Public Sub Car(m As Object)
 Dim k As New mArray, usehandler As mHandler
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
-If count > 0 Then
+If Count > 0 Then
     k.PushDim 1
     k.PushEnd
     k.SerialItem actualdata(0), 0, 1
@@ -503,7 +634,7 @@ Public Sub Cdr(m As Object)
 Dim k As New mArray
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 If dnum > 0 Then
-k.StartResize: k.PushDim Me.count - 1: k.PushEnd
+k.StartResize: k.PushDim Me.Count - 1: k.PushEnd
 Else
 k.Arr = True
 Set k.GroupRef = Me.GroupRef
@@ -560,14 +691,14 @@ End Sub
 
 Public Sub AppendArray(k As mArray)
 'append this to k
-If k.count = 0 Then
+If k.Count = 0 Then
 Me.CopyArray k
 Exit Sub
 End If
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 Dim fromhere As Long
 fromhere = k.UpperMonoLimit + 1
-k.SerialItem v, Me.count + k.count, 10
+k.SerialItem v, Me.Count + k.Count, 10
 k.myarrbase = myarrbase
 k.RevOrder = RevOrder
 If Right$(k.arrname, 2) = "%(" Then
@@ -907,11 +1038,11 @@ End Sub
 Public Function UpperMonoLimit()
 UpperMonoLimit = maxitems1
 End Function
-Public Property Get count()
+Public Property Get Count()
 If dnum = 0 Then
-count = 0
+Count = 0
 Else
-count = maxitems1 + 1 ' sa
+Count = maxitems1 + 1 ' sa
 End If
 End Property
 Public Property Let arrname(aName As String)
@@ -1130,9 +1261,10 @@ Friend Sub SwapItem(curitem As Long, thisvariant)
 SwapVariant actualdata(curitem), thisvariant
 End Sub
 Friend Function IsStringItem(curitem As Long) As Variant
-Dim usehandler As mHandler
+Dim usehandler As mHandler, n As Byte
 If Arr Then
-IsStringItem = Typename(actualdata(curitem)) = "String"
+GetMem1 VarPtr(actualdata(curitem)), n
+IsStringItem = n = 8
 ElseIf curitem < 0 And curitem <> -2 Then
 On Error Resume Next
 Set usehandler = GroupRef
@@ -1143,7 +1275,7 @@ If usehandler.objref.Done Then
     If usehandler.objref.IsObj Then
         
     Else
-        IsStringItem = Typename(usehandler.objref.Value) = "String"
+        IsStringItem = usehandler.objref.IsString
     End If
 End If
 End If
@@ -1381,9 +1513,7 @@ If curitem <> -2 Then
 Set usehandler = GroupRef
 If usehandler.t1 <> 1 Then Err.Raise 1010, , "Need an Inventory Object"
 If usehandler.objref.Done Then
-    If usehandler.objref.IsObj Then
-        
-    Else
+    If usehandler.objref.IsString Then
         usehandler.objref.Value = item
     End If
 End If
@@ -1399,7 +1529,7 @@ End If
 Else
 CantAssignValue
 End If
-ElseIf Not IsObject(actualdata(curitem)) Then
+ElseIf Not IsObject(actualdata(curitem)) Then  ' why not myisobject ???
 MoveStringToVariant item, actualdata(curitem)
 Else
 If TypeOf actualdata(curitem) Is PropReference Then
@@ -1731,9 +1861,9 @@ End Sub
 Public Sub SortTuple(Optional Low As Long = -1, Optional high As Long = -1)
 Dim i As Long, n As Byte
 If dnum < 1 Then Exit Sub
-If count > 0 Then
-If high = -1 Then high = count - 1
-If high > count - 1 Then high = count - 1
+If Count > 0 Then
+If high = -1 Then high = Count - 1
+If high > Count - 1 Then high = Count - 1
 If Low = -1 Then Low = 0
 If Low >= high Then Exit Sub
 
@@ -1748,9 +1878,9 @@ End Sub
 Public Sub SortDesTuple(Optional Low As Long = -1, Optional high As Long = -1)
 Dim i As Long, n As Byte
 If dnum < 1 Then Exit Sub
-If count > 0 Then
-If high = -1 Then high = count - 1
-If high > count - 1 Then high = count - 1
+If Count > 0 Then
+If high = -1 Then high = Count - 1
+If high > Count - 1 Then high = Count - 1
 If Low = -1 Then Low = 0
 If Low >= high Then Exit Sub
 
@@ -1941,7 +2071,7 @@ If UBound(Col()) < 1 Then
 
 ReDim Col(4)
 Col(0) = 0
-Col(1) = count \ sortmult - 1
+Col(1) = Count \ sortmult - 1
 Col(2) = 0
 Col(3) = 0
 ElseIf UBound(Col()) < 3 Then
@@ -1956,9 +2086,9 @@ For i = LBound(col0) To UBound(col0)
 Col(i) = CLng(col0(i))
 Next i
 there1:
-If Col(1) = -1 Then Col(1) = count \ sortmult - 1
+If Col(1) = -1 Then Col(1) = Count \ sortmult - 1
 
-If Col(1) > count \ sortmult - 1 Then Col(1) = count \ sortmult - 1
+If Col(1) > Count \ sortmult - 1 Then Col(1) = Count \ sortmult - 1
 If Col(0) < 0 Then Col(0) = 0
 If Col(0) >= Col(1) Then Exit Sub
 

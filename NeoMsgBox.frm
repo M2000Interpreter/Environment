@@ -138,7 +138,7 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements InterPress
 Public textbox1 As myTextBox
-Public WithEvents ListPad As Document
+Public WithEvents ListPad As Document, previewKey As Boolean
 Attribute ListPad.VB_VarHelpID = -1
 Private Type myImage
     Image As StdPicture
@@ -322,6 +322,7 @@ move AskLastX, AskLastY
 End If
 If AskInput Then
 glist3.TabIndex = 1
+Set LastActive = glist3
 End If
 End Sub
 
@@ -380,7 +381,6 @@ cListCount = all
 End Sub
 
 
-
 Private Sub gList2_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 If item = -1 Then
 FillThere thisHDC, thisrect, gList2.CapColor
@@ -391,7 +391,7 @@ End Sub
 
 Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
-                       AskCancel$ = vbNullString
+            AskCancel$ = vbNullString
             ASKINUSE = False
 End If
 End Sub
@@ -657,12 +657,17 @@ End If
 End Sub
 
 Private Sub gList2_MouseUp(x As Single, y As Single)
-If command1(yo).Visible Then command1(yo).SetFocus
-
+If command1(yo).Visible Then
+    If Not gList2.DoubleClickArea(x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor) Then
+    command1(yo).SetFocus
+    Else
+     AskCancel$ = vbNullString
+            ASKINUSE = False
+    End If
+End If
 End Sub
 
 Private Sub gList3_Selected2(item As Long)
-
  command1(0).SetFocus
 End Sub
 

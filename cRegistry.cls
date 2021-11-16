@@ -24,11 +24,33 @@ Option Explicit
 '
 ' Updated 29 April 1998 for VB5.
 '   * Fixed GPF in EnumerateValues
-'   * Added support for all registry types, not just string
+'   * Added support for all registry types, not just strings
 '   * Put all declares in local class
 '   * Added VB5 Enums
 '   * Added CreateKey and DeleteKey methods
+'
+' Updated 2 January 1999
+'   * The CreateExeAssociation method failed to set up the
+'     association correctly if the optional document icon
+'     was not provided.
+'   * Added new parameters to CreateExeAssociation to set up
+'     other standard handlers: Print, Add, New
+'   * Provided the CreateAdditionalEXEAssociations method
+'     to allow non-standard menu items to be added (for example,
+'     right click on a .VBP file.  VB installs Run and Make
+'     menu items).
+'
+' Updated 8 February 2000
+'   * Ensure CreateExeAssociation and related items sets up the
+'     registry keys in the
+'           HKEY_LOCAL_MACHINE\SOFTWARE\Classes
+'     branch as well as the HKEY_CLASSES_ROOT branch.
+'
+' ---------------------------------------------------------------------------
+' vbAccelerator - free, advanced source code for VB programmers.
+'     http://vbaccelerator.com
 ' =========================================================
+
 Private mTemp As Boolean
 'Registry Specific Access Rights
 Private Const KEY_QUERY_VALUE = &H1
@@ -72,85 +94,83 @@ Private Type FILETIME
 End Type
 
 'Registry Function Prototypes
-Private Declare Function RegOpenKeyEx Lib "advapi32" Alias "RegOpenKeyExW" _
-  (ByVal hKey As Long, ByVal lpSubKey As Long, ByVal ulOptions As Long, _
+Private Declare Function RegOpenKeyEx Lib "advapi32" Alias "RegOpenKeyExA" _
+  (ByVal hKey As Long, ByVal lpSubKey As String, ByVal ulOptions As Long, _
   ByVal samDesired As Long, phkResult As Long) As Long
 
-Private Declare Function RegSetValueExStr Lib "advapi32" Alias "RegSetValueExW" _
-  (ByVal hKey As Long, ByVal lpValueName As Long, ByVal reserved As Long, _
-   ByVal dwType As Long, ByVal szData As Long, ByVal cbData As Long) As Long
-Private Declare Function RegSetValueExLong Lib "advapi32" Alias "RegSetValueExW" _
-  (ByVal hKey As Long, ByVal lpValueName As Long, ByVal reserved As Long, _
+Private Declare Function RegSetValueExStr Lib "advapi32" Alias "RegSetValueExA" _
+  (ByVal hKey As Long, ByVal lpValueName As String, ByVal Reserved As Long, _
+   ByVal dwType As Long, ByVal szData As String, ByVal cbData As Long) As Long
+Private Declare Function RegSetValueExLong Lib "advapi32" Alias "RegSetValueExA" _
+  (ByVal hKey As Long, ByVal lpValueName As String, ByVal Reserved As Long, _
    ByVal dwType As Long, szData As Long, ByVal cbData As Long) As Long
-Private Declare Function RegSetValueExByte Lib "advapi32" Alias "RegSetValueExW" _
-  (ByVal hKey As Long, ByVal lpValueName As Long, ByVal reserved As Long, _
+Private Declare Function RegSetValueExByte Lib "advapi32" Alias "RegSetValueExA" _
+  (ByVal hKey As Long, ByVal lpValueName As String, ByVal Reserved As Long, _
    ByVal dwType As Long, szData As Byte, ByVal cbData As Long) As Long
 
 Private Declare Function RegCloseKey Lib "advapi32" (ByVal hKey As Long) As Long
 
-Private Declare Function RegQueryValueExStr Lib "advapi32" Alias "RegQueryValueExW" _
-  (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, _
-   ByRef lpType As Long, ByVal szData As Long, ByRef lpcbData As Long) As Long
-Private Declare Function RegQueryValueExLong Lib "advapi32" Alias "RegQueryValueExW" _
-  (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, _
+Private Declare Function RegQueryValueExStr Lib "advapi32" Alias "RegQueryValueExA" _
+  (ByVal hKey As Long, ByVal lpValueName As String, ByVal lpReserved As Long, _
+   ByRef lpType As Long, ByVal szData As String, ByRef lpcbData As Long) As Long
+Private Declare Function RegQueryValueExLong Lib "advapi32" Alias "RegQueryValueExA" _
+  (ByVal hKey As Long, ByVal lpValueName As String, ByVal lpReserved As Long, _
    ByRef lpType As Long, szData As Long, ByRef lpcbData As Long) As Long
-Private Declare Function RegQueryValueExByte Lib "advapi32" Alias "RegQueryValueExW" _
-  (ByVal hKey As Long, ByVal lpValueName As Long, ByVal lpReserved As Long, _
+Private Declare Function RegQueryValueExByte Lib "advapi32" Alias "RegQueryValueExA" _
+  (ByVal hKey As Long, ByVal lpValueName As String, ByVal lpReserved As Long, _
    ByRef lpType As Long, szData As Byte, ByRef lpcbData As Long) As Long
    
-Private Declare Function RegCreateKeyEx Lib "advapi32" Alias "RegCreateKeyExW" _
-  (ByVal hKey As Long, ByVal lpSubKey As Long, ByVal reserved As Long, _
-   ByVal lpClass As Long, ByVal dwOptions As Long, ByVal samDesired As Long, _
+Private Declare Function RegCreateKeyEx Lib "advapi32" Alias "RegCreateKeyExA" _
+  (ByVal hKey As Long, ByVal lpSubKey As String, ByVal Reserved As Long, _
+   ByVal lpClass As String, ByVal dwOptions As Long, ByVal samDesired As Long, _
    lpSecurityAttributes As SECURITY_ATTRIBUTES, phkResult As Long, _
    lpdwDisposition As Long) As Long
 
-Private Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExW" _
-  (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpName As Long, _
-  ByVal lpcbName As Long, ByVal lpReserved As Long, ByVal lpClass As Long, _
+Private Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExA" _
+  (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpName As String, _
+   lpcbName As Long, ByVal lpReserved As Long, ByVal lpClass As String, _
    lpcbClass As Long, lpftLastWriteTime As FILETIME) As Long
 
-Private Declare Function RegEnumKey Lib "advapi32.dll" Alias "RegEnumKeyW" ( _
-    ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpName As Long, _
+Private Declare Function RegEnumKey Lib "advapi32.dll" Alias "RegEnumKeyA" ( _
+    ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpName As String, _
     ByVal cbName As Long) As Long
 
-Private Declare Function RegEnumValue Lib "advapi32.dll" Alias "RegEnumValueW" _
-  (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpValueName As Long, _
-   ByVal lpcbValueName As Long, ByVal lpReserved As Long, ByVal lpType As Long, _
+Private Declare Function RegEnumValue Lib "advapi32.dll" Alias "RegEnumValueA" _
+  (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpValueName As String, _
+   lpcbValueName As Long, ByVal lpReserved As Long, ByVal lpType As Long, _
    ByVal lpData As Long, ByVal lpcbData As Long) As Long
    
-Private Declare Function RegEnumValueLong Lib "advapi32.dll" Alias "RegEnumValueW" _
-  (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpValueName As Long, _
-  ByVal lpcbValueName As Long, ByVal lpReserved As Long, lpType As Long, _
+Private Declare Function RegEnumValueLong Lib "advapi32.dll" Alias "RegEnumValueA" _
+  (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpValueName As String, _
+   lpcbValueName As Long, ByVal lpReserved As Long, lpType As Long, _
    lpData As Long, lpcbData As Long) As Long
-Private Declare Function RegEnumValueStr Lib "advapi32.dll" Alias "RegEnumValueW" _
-  (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpValueName As Long, _
-  ByVal lpcbValueName As Long, ByVal lpReserved As Long, lpType As Long, _
-   ByVal lpData As Long, lpcbData As Long) As Long
-Private Declare Function RegEnumValueByte Lib "advapi32.dll" Alias "RegEnumValueW" _
-  (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpValueName As Long, _
-   ByVal lpcbValueName As Long, ByVal lpReserved As Long, lpType As Long, _
+Private Declare Function RegEnumValueStr Lib "advapi32.dll" Alias "RegEnumValueA" _
+  (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpValueName As String, _
+   lpcbValueName As Long, ByVal lpReserved As Long, lpType As Long, _
+   ByVal lpData As String, lpcbData As Long) As Long
+Private Declare Function RegEnumValueByte Lib "advapi32.dll" Alias "RegEnumValueA" _
+  (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpValueName As String, _
+   lpcbValueName As Long, ByVal lpReserved As Long, lpType As Long, _
    lpData As Byte, lpcbData As Long) As Long
 
-Private Declare Function RegQueryInfoKey Lib "advapi32.dll" Alias "RegQueryInfoKeyW" _
-   (ByVal hKey As Long, ByVal lpClass As Long, _
+Private Declare Function RegQueryInfoKey Lib "advapi32.dll" Alias "RegQueryInfoKeyA" _
+   (ByVal hKey As Long, ByVal lpClass As String, _
    lpcbClass As Long, ByVal lpReserved As Long, lpcSubKeys As Long, _
    lpcbMaxSubKeyLen As Long, lpcbMaxClassLen As Long, lpcValues As Long, _
    lpcbMaxValueNameLen As Long, lpcbMaxValueLen As Long, lpcbSecurityDescriptor As Long, _
    lpftLastWriteTime As Any) As Long
 
-Private Declare Function RegDeleteKey Lib "advapi32.dll" Alias "RegDeleteKeyW" _
-  (ByVal hKey As Long, ByVal lpSubKey As Long) As Long
+Private Declare Function RegDeleteKey Lib "advapi32.dll" Alias "RegDeleteKeyA" _
+  (ByVal hKey As Long, ByVal lpSubKey As String) As Long
 
-Private Declare Function RegDeleteValue Lib "advapi32.dll" Alias "RegDeleteValueW" _
-  (ByVal hKey As Long, ByVal lpValueName As Long) As Long
+Private Declare Function RegDeleteValue Lib "advapi32.dll" Alias "RegDeleteValueA" _
+  (ByVal hKey As Long, ByVal lpValueName As String) As Long
 
 ' Other declares:
-Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-Private Declare Function ExpandEnvironmentStrings _
-   Lib "KERNEL32" Alias "ExpandEnvironmentStringsW" _
-   (ByVal lpSrc As Long, ByVal lpDst As Long, _
-   ByVal nsize As Long) As Long
+Private Declare Function ExpandEnvironmentStrings Lib "kernel32" Alias "ExpandEnvironmentStringsA" (ByVal lpSrc As String, ByVal lpDst As String, ByVal nSize As Long) As Long
+
 
 Public Enum ERegistryClassConstants
     HKEY_CLASSES_ROOT = &H80000000
@@ -163,7 +183,7 @@ Public Enum ERegistryValueTypes
 'Predefined Value Types
     REG_NONE = (0)                         'No value type
     REG_SZ = (1)                           'Unicode nul terminated string
-    REG_EXPAND_SZ = (2)                    'Unicode nul terminated string w/environment var
+    REG_EXPAND_SZ = (2)                    'Unicode nul terminated string w/enviornment var
     REG_BINARY = (3)                       'Free form binary
     REG_DWORD = (4)                        '32-bit number
     REG_DWORD_LITTLE_ENDIAN = (4)          '32-bit number (same as REG_DWORD)
@@ -189,7 +209,7 @@ Public Property Get KeyExists() As Boolean
     '                m_sSectionKey _
     '            )
 Dim hKey As Long
-    If RegOpenKeyEx(m_hClassKey, StrPtr(m_sSectionKey), 0, 1, hKey) = ERROR_SUCCESS Then
+    If RegOpenKeyEx(m_hClassKey, m_sSectionKey, 0, 1, hKey) = ERROR_SUCCESS Then
         KeyExists = True
         RegCloseKey hKey
     Else
@@ -202,9 +222,9 @@ Dim tSA As SECURITY_ATTRIBUTES
 Dim hKey As Long
 Dim lCreate As Long
 Dim e As Long
-Dim nulla$
+
     'Open or Create the key
-    e = RegCreateKeyEx(m_hClassKey, StrPtr(m_sSectionKey), 0, StrPtr(nulla$), REG_OPTION_NON_VOLATILE, _
+    e = RegCreateKeyEx(m_hClassKey, m_sSectionKey, 0, "", REG_OPTION_NON_VOLATILE, _
                  KEY_ALL_ACCESS, tSA, hKey, lCreate)
     If e Then
         Err.Raise 26001, App.EXENAME & ".cRegistry", "Failed to create registry Key: '" & m_sSectionKey
@@ -216,7 +236,7 @@ Dim nulla$
 End Function
 Public Function DeleteKey() As Boolean
 Dim e As Long
-    e = RegDeleteKey(m_hClassKey, StrPtr(m_sSectionKey))
+    e = RegDeleteKey(m_hClassKey, m_sSectionKey)
     If e Then
         Err.Raise 26001, App.EXENAME & ".cRegistry", "Failed to delete registry Key: '" & m_hClassKey & "',Section: '" & m_sSectionKey
     Else
@@ -228,11 +248,11 @@ Public Function DeleteValue() As Boolean
 Dim e As Long
 Dim hKey As Long
 
-    e = RegOpenKeyEx(m_hClassKey, StrPtr(m_sSectionKey), 0, KEY_ALL_ACCESS, hKey)
+    e = RegOpenKeyEx(m_hClassKey, m_sSectionKey, 0, KEY_ALL_ACCESS, hKey)
     If e Then
         Err.Raise 26001, App.EXENAME & ".cRegistry", "Failed to open key '" & m_hClassKey & "',Section: '" & m_sSectionKey & "' for delete access"
     Else
-        e = RegDeleteValue(hKey, StrPtr(m_sValueKey))
+        e = RegDeleteValue(hKey, m_sValueKey)
         If e Then
             Err.Raise 26001, App.EXENAME & ".cRegistry", "Failed to delete registry Key: '" & m_hClassKey & "',Section: '" & m_sSectionKey & "',Key: '" & m_sValueKey
         Else
@@ -246,11 +266,10 @@ Dim vValue As Variant
 Dim cData As Long, sData As String, ordType As Long, e As Long
 Dim hKey As Long
 
-    e = RegOpenKeyEx(m_hClassKey, StrPtr(m_sSectionKey), 0, KEY_QUERY_VALUE, hKey)
-    'ApiRaiseIf e
+    e = RegOpenKeyEx(m_hClassKey, m_sSectionKey, 0, KEY_QUERY_VALUE, hKey)
+    'ApiRaiseIf?e
 
-    e = RegQueryValueExLong(hKey, StrPtr(m_sValueKey), 0&, ordType, 0&, cData)
-    
+    e = RegQueryValueExLong(hKey, m_sValueKey, 0&, ordType, 0&, cData)
     If e And e <> ERROR_MORE_DATA Then
         Value = m_vDefault
         Exit Property
@@ -260,35 +279,33 @@ Dim hKey As Long
     Select Case ordType
     Case REG_DWORD, REG_DWORD_LITTLE_ENDIAN
         Dim iData As Long
-        e = RegQueryValueExLong(hKey, StrPtr(m_sValueKey), 0&, _
+        e = RegQueryValueExLong(hKey, m_sValueKey, 0&, _
                                ordType, iData, cData)
         vValue = CLng(iData)
         
     Case REG_DWORD_BIG_ENDIAN  ' Unlikely, but you never know
         Dim dwData As Long
-        e = RegQueryValueExLong(hKey, StrPtr(m_sValueKey), 0&, _
+        e = RegQueryValueExLong(hKey, m_sValueKey, 0&, _
                                ordType, dwData, cData)
         vValue = SwapEndian(dwData)
         
     Case REG_SZ, REG_MULTI_SZ ' Same thing to Visual Basic
-        
-        sData = String$(cData / 2 - 1, 0)
-        e = RegQueryValueExStr(hKey, StrPtr(m_sValueKey), 0&, _
-                               ordType, StrPtr(sData), cData)
-        vValue = StripTerminator(sData)
+        sData = String$(cData - 1, 0)
+        e = RegQueryValueExStr(hKey, m_sValueKey, 0&, _
+                               ordType, sData, cData)
+        vValue = sData
         
     Case REG_EXPAND_SZ
-        sData = String$(cData / 2 - 1, 0)
-        e = RegQueryValueExStr(hKey, StrPtr(m_sValueKey), 0&, _
-                               ordType, StrPtr(sData), cData)
-                               
-        vValue = ExpandEnvStr(StripTerminator(sData))
+        sData = String$(cData - 1, 0)
+        e = RegQueryValueExStr(hKey, m_sValueKey, 0&, _
+                               ordType, sData, cData)
+        vValue = ExpandEnvStr(sData)
         
     ' Catch REG_BINARY and anything else
     Case Else
         Dim abData() As Byte
         ReDim abData(cData)
-        e = RegQueryValueExByte(hKey, StrPtr(m_sValueKey), 0&, _
+        e = RegQueryValueExByte(hKey, m_sValueKey, 0&, _
                                 ordType, abData(0), cData)
         vValue = abData
         
@@ -306,9 +323,9 @@ Dim hKey As Long
 Dim e As Long
 Dim lCreate As Long
 Dim tSA As SECURITY_ATTRIBUTES
-Dim nulla$
+
     'Open or Create the key
-    e = RegCreateKeyEx(m_hClassKey, StrPtr(m_sSectionKey), 0, StrPtr(nulla$), REG_OPTION_NON_VOLATILE, _
+    e = RegCreateKeyEx(m_hClassKey, m_sSectionKey, 0, "", REG_OPTION_NON_VOLATILE, _
                  KEY_ALL_ACCESS, tSA, hKey, lCreate)
     
     If e Then
@@ -322,7 +339,7 @@ Dim nulla$
                 ab = vValue
                 ordType = REG_BINARY
                 c = UBound(ab) - LBound(ab) - 1
-                e = RegSetValueExByte(hKey, StrPtr(m_sValueKey), 0&, ordType, ab(0), c)
+                e = RegSetValueExByte(hKey, m_sValueKey, 0&, ordType, ab(0), c)
             Else
                 Err.Raise 26001
             End If
@@ -331,7 +348,7 @@ Dim nulla$
                 Dim i As Long
                 i = vValue
                 ordType = REG_DWORD
-                e = RegSetValueExLong(hKey, StrPtr(m_sValueKey), 0&, ordType, i, 4)
+                e = RegSetValueExLong(hKey, m_sValueKey, 0&, ordType, i, 4)
             End If
         Case REG_SZ, REG_EXPAND_SZ
             Dim s As String, iPos As Long
@@ -342,8 +359,8 @@ Dim nulla$
             If iPos Then
                 If InStr(iPos + 2, s, "%") Then ordType = REG_EXPAND_SZ
             End If
-            c = 2 * Len(s) '+ 1
-            e = RegSetValueExStr(hKey, StrPtr(m_sValueKey), 0&, ordType, StrPtr(s), c)
+            c = Len(s) + 1
+            e = RegSetValueExStr(hKey, m_sValueKey, 0&, ordType, s, c)
             
         ' User should convert to a compatible type before calling
         Case Else
@@ -354,8 +371,7 @@ Dim nulla$
         If Not e Then
             m_vValue = vValue
         Else
-        Err.clear
-        '            Err.Raise vbObjectError + 1048 + 26001, App.EXEName & ".cRegistry", "Failed to set registry value Key: '" & m_hClassKey & "',Section: '" & m_sSectionKey & "',Key: '" & m_sValueKey & "' to value: '" & m_vValue & "'"
+            Err.Raise vbObjectError + 1048 + 26001, App.EXENAME & ".cRegistry", "Failed to set registry value Key: '" & m_hClassKey & "',Section: '" & m_sSectionKey & "',Key: '" & m_sValueKey & "' to value: '" & m_vValue & "'"
         End If
         
         'Close the key
@@ -384,7 +400,7 @@ Dim ft As Currency
    Erase sKeyNames()
     
    lIndex = 0
-   lResult = RegOpenKeyEx(m_hClassKey, StrPtr(m_sSectionKey), 0, KEY_QUERY_VALUE, hKey)
+   lResult = RegOpenKeyEx(m_hClassKey, m_sSectionKey, 0, KEY_QUERY_VALUE, hKey)
    If (lResult = ERROR_SUCCESS) Then
       ' Log "OpenedKey:" & m_hClassKey & "," & m_sSectionKey
       lResult = RegQueryInfoKey(hKey, "", cJunk, 0, _
@@ -394,13 +410,13 @@ Dim ft As Currency
    
            'Set buffer space
            lNameSize = cNameMax + 1
-           sName = String$(lNameSize / 2 - 1, 0)
+           sName = String$(lNameSize, 0)
            If (lNameSize = 0) Then lNameSize = 1
            
            ' Log "Requesting Next Value"
          
            'Get value name:
-           lResult = RegEnumValue(hKey, lIndex, StrPtr(sName), lNameSize, _
+           lResult = RegEnumValue(hKey, lIndex, sName, lNameSize, _
                                   0&, 0&, 0&, 0&)
            ' Log "RegEnumValue returned:" & lResult
            If (lResult = ERROR_SUCCESS) Then
@@ -409,7 +425,7 @@ Dim ft As Currency
                 ' value and type here, I found it always (ultimately) resulted in
                 ' a GPF, on Win95 and NT.  Why?  Can anyone help?
        
-               sName = StripTerminator(sName)
+               sName = Left$(sName, lNameSize)
                ' Log "Enumerated value:" & sName
                  
                iKeyCount = iKeyCount + 1
@@ -456,20 +472,19 @@ On Error GoTo EnumerateSectionsError
 '
    lIndex = 0
 
-   lResult = RegOpenKeyEx(m_hClassKey, StrPtr(m_sSectionKey), 0, KEY_ENUMERATE_SUB_KEYS, hKey)
+   lResult = RegOpenKeyEx(m_hClassKey, m_sSectionKey, 0, KEY_ENUMERATE_SUB_KEYS, hKey)
    Do While lResult = ERROR_SUCCESS
        'Set buffer space
-       szBuffer = String$(1000, 0)
+       szBuffer = String$(255, 0)
        lBuffSize = Len(szBuffer)
       
       'Get next value
-       lResult = RegEnumKey(hKey, lIndex, StrPtr(szBuffer), lBuffSize)
+       lResult = RegEnumKey(hKey, lIndex, szBuffer, lBuffSize)
                              
        If (lResult = ERROR_SUCCESS) Then
            iSectCount = iSectCount + 1
            ReDim Preserve sSect(1 To iSectCount) As String
            iPos = InStr(szBuffer, Chr$(0))
-           
            If (iPos > 0) Then
               sSect(iSectCount) = Left(szBuffer, iPos - 1)
            Else
@@ -489,63 +504,128 @@ EnumerateSectionsError:
    If (hKey <> 0) Then
       RegCloseKey hKey
    End If
-   'Err.Raise vbObjectError + 1048 + 26002, App.EXENAME & ".cRegistry", Err.Description
+   Err.Raise vbObjectError + 1048 + 26002, App.EXENAME & ".cRegistry", Err.Description
    Exit Function
 End Function
+Private Sub pSetClassValue(ByVal sValue As String)
+Dim sSection As String
+   ClassKey = HKEY_CLASSES_ROOT
+   Value = sValue
+   sSection = SectionKey
+   ClassKey = HKEY_LOCAL_MACHINE
+   SectionKey = "SOFTWARE\Classes\" & sSection
+   Value = sValue
+   SectionKey = sSection
+End Sub
 Public Sub CreateEXEAssociation( _
         ByVal sExePath As String, _
         ByVal sClassName As String, _
         ByVal sClassDescription As String, _
         ByVal sAssociation As String, _
+        Optional ByVal sOpenMenuText As String = "&Open", _
+        Optional ByVal bSupportPrint As Boolean = False, _
+        Optional ByVal sPrintMenuText As String = "&Print", _
+        Optional ByVal bSupportNew As Boolean = False, _
+        Optional ByVal sNewMenuText As String = "&New", _
+        Optional ByVal bSupportInstall As Boolean = False, _
+        Optional ByVal sInstallMenuText As String = "", _
         Optional ByVal lDefaultIconIndex As Long = -1 _
     )
-    Dim bn(0 To 5) As Byte
-    ClassKey = HKEY_CLASSES_ROOT
-    SectionKey = "." & sAssociation
-    ValueKey = vbNullString
-    ValueType = REG_SZ
-    Value = sClassName
-      If OperatingSystem > System_Windows_Vista Then
+   ' Check if path is wrapped in quotes:
+   sExePath = Trim$(sExePath)
+   If (Left$(sExePath, 1) <> """") Then
+      sExePath = """" & sExePath
+   End If
+   If (Right$(sExePath, 1) <> """") Then
+      sExePath = sExePath & """"
+   End If
     
-    sClassName = "\Applications\M2000"
-    End If
-    SectionKey = sClassName
-    ValueKey = vbNullString
-    ValueType = REG_SZ
-    Value = sClassDescription
-
-    SectionKey = sClassName
-    ValueKey = "EditFlags"
-    ValueType = REG_BINARY
-    bn(0) = 0
-    Value = bn()
-
-    SectionKey = sClassName & "\shell"
-    ValueKey = vbNullString
-    ValueType = REG_SZ
-    Value = vbNullString
+    ' Create the .File to Class association:
+   SectionKey = "." & sAssociation
+   ValueType = REG_SZ
+   ValueKey = ""
+   pSetClassValue sClassName
+   
+   ' Create the Class shell open command:
+   SectionKey = sClassName
+   pSetClassValue sClassDescription
+   
+   SectionKey = sClassName & "\shell\open"
+   If (sOpenMenuText = "") Then sOpenMenuText = "&Open"
+   ValueKey = ""
+   pSetClassValue sOpenMenuText
+   SectionKey = sClassName & "\shell\open\command"
+   ValueKey = ""
+   pSetClassValue sExePath & " ""%1"""
+   
+   If (bSupportPrint) Then
+      SectionKey = sClassName & "\shell\print"
+      If (sPrintMenuText = "") Then sPrintMenuText = "&Print"
+      ValueKey = ""
+      pSetClassValue sPrintMenuText
+      SectionKey = sClassName & "\shell\print\command"
+      ValueKey = ""
+      pSetClassValue sExePath & " /p ""%1"""
+   End If
+   
+   If (bSupportInstall) Then
+      If (sInstallMenuText = "") Then
+         sInstallMenuText = "&Install " & sAssociation
+      End If
+      SectionKey = sClassName & "\shell\add"
+      ValueKey = ""
+      pSetClassValue sInstallMenuText
+      SectionKey = sClassName & "\shell\add\command"
+      ValueKey = ""
+      pSetClassValue sExePath & " /a ""%1"""
+   End If
+   
+   If (bSupportNew) Then
+      SectionKey = sClassName & "\shell\new"
+      ValueKey = ""
+      If (sNewMenuText = "") Then sNewMenuText = "&New"
+      pSetClassValue sNewMenuText
+      SectionKey = sClassName & "\shell\new\command"
+      ValueKey = ""
+      pSetClassValue sExePath & " /n ""%1"""
+   End If
+   
+   If lDefaultIconIndex > -1 Then
+      SectionKey = sClassName & "\DefaultIcon"
+      ValueKey = ""
+      pSetClassValue sExePath & "," & CStr(lDefaultIconIndex)
+   End If
     
-    SectionKey = sClassName & "\shell\open"
-    ValueKey = vbNullString
-    ValueType = REG_SZ
-    Value = vbNullString
-
-    ValueKey = "EditFlags"
-    ValueType = REG_BINARY
-    bn(0) = 1
-    Value = bn()
-    
-    SectionKey = sClassName & "\shell\open\command"
-    ValueKey = vbNullString
-    ValueType = REG_EXPAND_SZ
-    Value = Chr(34) + sExePath + Chr(34) & " " & Chr(34) & "&1" & Chr(34)
-    If lDefaultIconIndex > -1 Then
-        SectionKey = sClassName & "\DefaultIcon"
-        ValueKey = vbNullString
-        Value = sExePath & "," & CStr(lDefaultIconIndex)
-
-    End If
-
+End Sub
+Public Sub CreateAdditionalEXEAssociations( _
+      ByVal sClassName As String, _
+      ParamArray vItems() As Variant _
+   )
+Dim iItems As Long
+Dim iItem As Long
+   
+   On Error Resume Next
+   iItems = UBound(vItems) + 1
+   If (iItems Mod 3) <> 0 Or (Err.Number <> 0) Then
+      Err.Raise vbObjectError + 1048 + 26004, App.EXENAME & ".cRegistry", "Invalid parameter list passed to CreateAdditionalEXEAssociations - expected Name/Text/Command"
+   Else
+      ' Check if it exists:
+      SectionKey = sClassName
+      If Not (KeyExists) Then
+         Err.Raise vbObjectError + 1048 + 26005, App.EXENAME & ".cRegistry", "Error - attempt to create additional associations before class defined."
+      Else
+         For iItem = 0 To iItems - 1 Step 3
+            ValueType = REG_SZ
+            SectionKey = sClassName & "\shell\" & vItems(iItem)
+            ValueKey = ""
+            pSetClassValue vItems(iItem + 1)
+            SectionKey = sClassName & "\shell\" & vItems(iItem) & "\command"
+            ValueKey = ""
+            pSetClassValue vItems(iItem + 2)
+         Next iItem
+      End If
+   End If
+   
 End Sub
 Public Property Get ValueType() As ERegistryValueTypes
     ValueType = m_eValueType
@@ -591,26 +671,17 @@ Private Function SwapEndian(ByVal dw As Long) As Long
     CopyMemory ByVal VarPtr(SwapEndian) + 1, ByVal VarPtr(dw) + 2, 1
     CopyMemory SwapEndian, ByVal VarPtr(dw) + 3, 1
 End Function
-Private Function ExpandEnvStr(strInput) As String
-Dim Result As Long
-Dim strOutput As String
-strOutput = space$(1000)
-Result = ExpandEnvironmentStrings(StrPtr(strInput), StrPtr(strOutput), Result)
-strOutput = space$(Result)
-Result = ExpandEnvironmentStrings(StrPtr(strInput), StrPtr(strOutput), Result)
-ExpandEnvStr = StripTerminator(strOutput)
+Private Function ExpandEnvStr(sData As String) As String
+    Dim c As Long, s As String
+    ' Get the length
+    s = "" ' Needed to get around Windows 95 limitation
+    c = ExpandEnvironmentStrings(sData, s, c)
+    ' Expand the string
+    s = String$(c - 1, 0)
+    c = ExpandEnvironmentStrings(sData, s, c)
+    ExpandEnvStr = s
 End Function
-Function StripTerminator(ByVal strString As String) As String
-    Dim intZeroPos As Long
-
-    intZeroPos = InStr(strString, Chr$(0))
-    If intZeroPos > 0 Then
-        StripTerminator = Left$(strString, intZeroPos - 1)
-    Else
-        StripTerminator = strString
-    End If
-End Function
-
-Public Property Let temp(ByVal vNewValue As Variant)
+Public Property Let Temp(ByVal vNewValue As Variant)
 mTemp = CBool(vNewValue)
 End Property
+

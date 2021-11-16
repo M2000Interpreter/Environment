@@ -111,6 +111,11 @@ End If
 If Cancel < 1 Then
 If Not MayQuit Then Cancel = -1: Exit Sub
 Dim F As Form, i As Long, F1 As GuiM2000, nook As Long
+
+NERR = True: NOEXECUTION = True
+ExTarget = True: INK$ = Chr(27): UKEY$ = Chr$(27)
+If Cancel = -100 Then Exit Sub
+
 For i = Forms.count - 1 To 0 Step -1
 Set F = Forms(i)
 If TypeOf F Is GuiM2000 Then
@@ -166,6 +171,7 @@ Set ExtForm = Nothing
 Finished = True
 End Sub
 Public Sub AsyncCli(LoadFileAndSwitches$, Optional Prompt$ = ">")
+Sleep 100
 par1$ = LoadFileAndSwitches$
 par2$ = Prompt$
 Set UseMe = Me
@@ -179,6 +185,7 @@ End Sub
 Friend Sub CliRun()
 Dim LoadFileAndSwitches$, Prompt$
 LoadFileAndSwitches$ = par1$
+par1$ = ""
 Prompt$ = par2$
 Dim ohere$, s$
 If findstack = 0 Then ClaimStack
@@ -439,19 +446,25 @@ Public Sub Show()
 On Error Resume Next
 If UseMe Is Nothing Then Exit Sub
 Form1.CaptionW = vbNullString
-If ExtForm.WindowState = 0 Then ExtForm.Visible = True
+If ExtForm Is Nothing Then Exit Sub
+'If ExtForm.WindowState = 1 Then
+'ExtForm.Visible = True
+'End If
+ExtForm.CaptionW = lasttitle
+
 End Sub
 
 Public Sub Hide()
 On Error Resume Next
 If UseMe Is Nothing Then Exit Sub
-
 ExtForm.Hide
 End Sub
 Public Function IamVisible() As Boolean
 On Error Resume Next
 If UseMe Is Nothing Then Exit Function
-If Not IhaveExtForm Then IamVisible = Form1.Visible: Exit Function
+If Not IhaveExtForm Then
+IamVisible = Form1.TrueVisible: Exit Function
+End If
 IamVisible = ExtForm.Visible
 If Err.Number > 0 Then
 Set ExtForm = Nothing

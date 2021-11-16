@@ -66,6 +66,7 @@ Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Public Stable As Long
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private lastfind As String
 Private lasttype As Integer
@@ -420,6 +421,17 @@ ElseIf Not IsObject(PriveSpace(Index).iValue) Then
     End If
 End If
 End Property
+Public Function IsString() As Boolean
+Dim n As Byte
+Done = False
+If Index = -1 Then
+Else
+    Done = True
+     GetMem1 VarPtr(PriveSpace(Index).iValue), n
+     If n = 10 Then n = PriveSpace(Index).KeyType
+End If
+IsString = n = 8
+End Function
 Private Function MyVal() As Variant
 On Error Resume Next
 MyVal = PriveSpace(Index).Key

@@ -23,15 +23,20 @@ Public ctrlName As String
 Private mesCtrlName As String
 Dim mIndex As Long, mStayOpen As Boolean
 Dim Callback As GuiM2000
+Public SkipFirstClick As Boolean
 '' for every GuiSomething
-Public Property Get GetCallBack() As Form
+Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
 End Property
+Private Sub OneClick()
+On Error Resume Next
+If SkipFirstClick Then glistN.PrepareClick
+End Sub
 Public Property Get Index() As Long
 Index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Long)
+Friend Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Private Sub glistN_CtrlPlusF1()
@@ -41,7 +46,7 @@ Private Sub glistN_CtrlPlusF1()
       Callback.Callback mesCtrlName + ".About()"
       End If
 End Sub
-Public Sub Construct(there As Form, Name$)
+Friend Sub Construct(there As GuiM2000, Name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
@@ -53,7 +58,7 @@ Public Sub Construct(there As Form, Name$)
  mesCtrlName = Name$
 End Sub
 
-Public Sub ConstructArray(there As Form, Name$, i As Long)
+Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  Set Callback = there
  On Error Resume Next
 
@@ -100,8 +105,12 @@ ff.charset = Form1.DIS.Font.charset
 ff.Size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 End With
+SkipFirstClick = True
 With glistN
 .Clear
+.Arrows2Tab = True
+.NoArrowDown = True
+.NoArrowUp = True
 .NoEscapeKey = True
 .bypassfirstClick = True
 .additem "  " + mCaptext
@@ -147,7 +156,9 @@ Set glistN = Nothing
 End Sub
 
 Private Sub glistN_CheckGotFocus()
+Callback.RealHover = ctrlName
 check1focus = True
+'OneClick
 End Sub
 
 Private Sub gListN_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
@@ -168,6 +179,7 @@ End Sub
 Private Sub glistN_CheckLostFocus()
 check1focus = False
 glistN.ShowMe
+glistN.DblClick
 End Sub
 Private Sub glistN_MenuChecked(item As Long)
 ' always item is 1  so 1-1..0 (base 0)
@@ -178,7 +190,9 @@ If item >= 0 Then
    Else
       Callback.Callback mesCtrlName + ".Changed(" + Str(glistN.ListSelected(0)) + ")"
       End If
+    
 End If
+
 End Sub
 Public Property Get checked() As Boolean
 If Not glistN Is Nothing Then
@@ -223,6 +237,7 @@ Private Sub glistN_Selected2(item As Long)
    Else
       Callback.Callback mesCtrlName + ".Click(" + Str(checked) + ")"
       End If
+      OneClick
 End Sub
 Public Property Get top() As Variant
 top = Callback.Controls(ctrlName).top
@@ -255,6 +270,11 @@ Public Property Let Default(RHS)
 On Error Resume Next
 If CBool(RHS) Then Callback.Default = ctrlName
 End Property
+
+Private Sub glistN_softSelected(item As Long)
+OneClick
+End Sub
+
 Private Sub glistN_UnregisterGlist()
 On Error Resume Next
 If glistN.TabStopSoft Then Callback.LastActive = ctrlName
@@ -265,7 +285,7 @@ glistN.icon = RHS
 
 End Property
 
-Private Sub glistN_SyncKeyboardUnicode(a As String)
+Private Sub glistN_PreviewKeyboardUnicode(ByVal a As String)
 Callback.SpreadKey a
 End Sub
 Private Sub glistN_Fkey(a As Integer)
@@ -275,4 +295,26 @@ Else
 Callback.SendFKEY a
 End If
 End Sub
-
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
+Else
+a = UCase(a)
+Select Case a
+Case "F1" To "F9"
+a = 611 + val(Mid(a, 2))
+Case Else
+a = AscW(a)
+If a > 126 Then a = 0
+End Select
+End If
+If Opcode < 0 Then Opcode = 0
+If a = 0 Then Exit Sub
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc a, ctrlName, Opcode
+End Sub
+Private Sub gListN_AccKey(m As Long)
+Callback.AccProces m
+End Sub

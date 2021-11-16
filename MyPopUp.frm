@@ -60,7 +60,7 @@ Dim Lx As Long, ly As Long, dr As Boolean
 Dim bordertop As Long, borderleft As Long, lastshift As Integer
 Dim allheight As Long, allwidth As Long, itemWidth As Long
 Private myobject As Object
-Public LASTActiveForm As Form
+Public LASTActiveForm As Form, previewKey As Boolean
 Dim ttl$(1 To 2)
 
 Public Sub Up(Optional x As Variant, Optional y As Variant)

@@ -55,7 +55,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
-Public WithEvents label1 As TextViewer
+Public WithEvents label1 As TextViewer, previewKey As Boolean
 Attribute label1.VB_VarHelpID = -1
 Private l As Long
 Private t As Long
@@ -78,8 +78,8 @@ End Sub
 
 
 
-Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = vbKeyF12 And ((Not mHelp) Or trace) Then
+Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
+If keycode = vbKeyF12 And ((Not mHelp) Or trace) Then
 showmodules
 End If
 End Sub
@@ -108,7 +108,7 @@ gList1.LeftMarginPixels = 4
 Set label1 = New TextViewer
 Set label1.Container = gList1
 label1.NoCenterLineEdit = True
-label1.FileName = vbNullString
+label1.Filename = vbNullString
 label1.glistN.NoMoveDrag = True
 label1.glistN.DropEnabled = False
 label1.glistN.DragEnabled = Not abt
@@ -317,7 +317,7 @@ End Sub
 Private Sub glist1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 If item = -1 Then
 If gList1.DoubleClickCheck(Button, item, x, y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor, -1) Then
-HelpLastWidth = -1
+            HelpLastWidth = -1
             Unload Me
 End If
 Else
@@ -334,19 +334,19 @@ gList1.EditFlag = False
 End If
 End Sub
 
-Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub gList1_KeyDown(keycode As Integer, shift As Integer)
 If shift <> 0 Then
 If label1.SelectionColor = rgb(255, 64, 128) Then label1.SelectionColor = 0
 label1.NoMark = False
 label1.EditDoc = True
 End If
-Select Case KeyCode
+Select Case keycode
 Case vbKeyDelete, vbKeyBack, vbKeyReturn, vbKeySpace
 
 gList1.EditFlag = False
 If mHelp Or abt Then
-MKEY$ = MKEY$ & ChrW$(KeyCode)
-KeyCode = 0
+MKEY$ = MKEY$ & ChrW$(keycode)
+keycode = 0
 End If
 End Select
 If mHelp Or abt Then shift = 0
@@ -367,6 +367,13 @@ flagmarkout = True
 If mHelp Then
 shift = 0
 End If
+End Sub
+
+Private Sub gList1_MouseUp(x As Single, y As Single)
+If gList1.DoubleClickArea(x, y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor) Then
+            HelpLastWidth = -1
+            Unload Me
+            End If
 End Sub
 
 Private Sub gList1_selected2(item As Long)
@@ -470,7 +477,7 @@ factor = gList1.FontSize / 14.25 / dv15 * 15
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
-Dim H As Long, i As Long
+Dim h As Long, i As Long
 Helplastfactor = factor
 setupxy = 20 * factor
 bordertop = 10 * dv15 * factor

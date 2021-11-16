@@ -245,10 +245,11 @@ Event MenuChecked(item As Long)
 Event PromptLine(ThatLine As Long)
 Event PanLeftRight(direction As Boolean)
 Event GetBackPicture(pic As Object)
-Event KeyDown(KeyCode As Integer, shift As Integer)
-Event KeyDownAfter(KeyCode As Integer, shift As Integer)
+Event KeyDown(keycode As Integer, shift As Integer)
+Event KeyDownAfter(keycode As Integer, shift As Integer)
 Event SyncKeyboard(item As Integer)
 Event SyncKeyboardUnicode(a$)
+Event PreviewKeyboardUnicode(ByVal a$)
 Event Find(Key As String, where As Long, skip As Boolean)
 Event ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Event ExposeListcount(cListCount As Long)
@@ -258,6 +259,7 @@ Event SpinnerValue(ThatValue As Long)
 Event RegisterGlist(this As gList)
 Event UnregisterGlist()
 Event DeployMenu()
+Event CascadeSelect(item As Long) ' 1 based
 Event BlinkNow(Face As Boolean)
 Event CtrlPlusF1()
 Event EnterOnly()
@@ -275,6 +277,7 @@ Event SetExpandSS(val As Long)
 Event ExpandSelStart(val As Long)
 Event Fkey(a As Integer)
 Event CaretDeal(Deal As Long)
+Event AccKey(m As Long)
 Private state As Boolean
 Private secreset As Boolean
 Private scrollme As Long
@@ -305,6 +308,7 @@ Dim valuepoint As Long, minimumWidth As Long
 Dim mValue As Long, mmax As Long, mmin As Long, mLargeChange As Long  ' min 1
 Dim mSmallChange As Long  ' min 1
 Dim mVertical As Boolean
+
 Dim OurDraw As Boolean, GetOpenValue As Long
 Dim lastX As Single, LastY As Single
 
@@ -353,10 +357,11 @@ Public WordCharRight As String
 Public WordCharRightButIncluded As String
 Public WordCharLeftButIncluded As String
 Public DropEnabled As Boolean
-Public DragEnabled As Boolean
+Public DragEnabled As Boolean, NoArrowUp As Boolean, NoArrowDown As Boolean, Arrows2Tab As Boolean
 Public NoHeaderBackground As Boolean
 Private Declare Function GetLocaleInfo Lib "kernel32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
 Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
+Private Declare Function MapVirtualKey Lib "user32" Alias "MapVirtualKeyA" (ByVal wCode As Long, ByVal wMapType As Long) As Long
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
 Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hWnd As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
@@ -374,8 +379,10 @@ End Type
     Time As Long
     pt As POINTAPI
 End Type
-Dim doubleclick As Long
-Dim mLx As Long, mLy As Long
+Private timestamp As Double, timestamp1 As Double
+Private doubleclick As Long, preservedoubleclick As Long
+Private dbLx As Long, dbly As Long
+Private PX As Long, PY As Long
 Public SkipForm As Boolean
 Public dropkey As Boolean
 Public MenuGroup As String
@@ -521,20 +528,20 @@ End Property
 Public Property Let Text(ByVal new_text As String)
 Clear True
 If new_text <> "" Then
-If Right$(new_text, 2) <> vbCrLf And new_text <> "" Then
-new_text = new_text + vbCrLf
-End If
-Dim mpos As Long, b$
-Do
-b$ = GetStrUntilB(mpos, vbCrLf, new_text)
-additemFast b$  ' and blank lines
-Loop Until mpos > Len(new_text) Or mpos = 0
+    If Right$(new_text, 2) <> vbCrLf And new_text <> "" Then
+        new_text = new_text + vbCrLf
+    End If
+    Dim mpos As Long, b$
+    Do
+    b$ = GetStrUntilB(mpos, vbCrLf, new_text)
+    additemFast b$  ' and blank lines
+    Loop Until mpos > Len(new_text) Or mpos = 0
 End If
 If UserControl.Ambient.UserMode = False Then
-Repaint
-SELECTEDITEM = 0
-CalcAndShowBar
-ShowMe
+    Repaint
+    SELECTEDITEM = 0
+    CalcAndShowBar
+    ShowMe
 End If
 
 PropertyChanged "Text"
@@ -583,8 +590,6 @@ Mid$(Text, thiscur, l) = Pad$
 thiscur = thiscur + l
 Next i
 Text = Left$(Text, thiscur - 1)
-
-
 
 RaiseEvent PureListOff
 End Property
@@ -884,11 +889,11 @@ Timer1.Interval = 40
 Timer1.enabled = True
 End Sub
 
-Public Sub LargeBar1KeyDown(KeyCode As Integer, shift As Integer)
+Public Sub LargeBar1KeyDown(keycode As Integer, shift As Integer)
 Timer1.enabled = False
 If ListIndex < 0 Then
 Else
-PressKey KeyCode, shift
+PressKey keycode, shift
 End If
 End Sub
 
@@ -930,11 +935,22 @@ If Not NoWheel Then RaiseEvent RegisterGlist(Me)
 End Sub
 
 Private Sub UserControl_KeyPress(KeyAscii As Integer)
+
 If BypassKey Then KeyAscii = 0: Exit Sub
 If dropkey Then KeyAscii = 0: Exit Sub
 Dim bb As Boolean, kk$, pair$, b1 As Boolean
 If ListIndex < 0 Then
 If KeyAscii = 13 Then RaiseEvent EnterOnly
+If ParentPreview Then
+    If UKEY$ <> "" Then
+                        kk$ = UKEY$
+                        UKEY$ = vbNullString
+                        Else
+                        kk$ = GetKeY(KeyAscii)
+              End If
+        kk$ = GetKeY(KeyAscii)
+        RaiseEvent PreviewKeyboardUnicode(kk$)
+End If
 Else
     If Not state Then
        
@@ -946,6 +962,7 @@ Else
                 secreset = False
                 RaiseEvent Selected2(SELECTEDITEM - 1)
             End If
+            If ParentPreview Then RaiseEvent PreviewKeyboardUnicode(Chr$(13))
         ElseIf KeyAscii = 27 Then  ' can be used if not enabled...to quit
         
             KeyAscii = 0
@@ -954,7 +971,7 @@ Else
                 secreset = False
                  RaiseEvent Selected2(-2)
             ElseIf Not LeaveonChoose Then
-            RaiseEvent SyncKeyboardUnicode(Chr$(27))
+            RaiseEvent PreviewKeyboardUnicode(Chr$(27))
              End If
         Else
             If myEnabled Then
@@ -967,6 +984,8 @@ Else
                             KeyAscii = 0
                         Else
                             RaiseEvent KeyDown(KeyAscii, lastshift)
+                             If Not KeyAscii = 0 Then GetKeY2 KeyAscii, lastshift
+ 
                         End If
                         If KeyAscii = 0 Then Exit Sub
                     End If
@@ -982,13 +1001,13 @@ Else
                 End If
                     If EditFlag And ((KeyAscii > 32 And KeyAscii <> 127) Or (KeyAscii = 9 And UseTab)) Then
                     If UKEY$ <> "" Then
-                    kk$ = UKEY$
-                    UKEY$ = vbNullString
+                        kk$ = UKEY$
+                        UKEY$ = vbNullString
                     Else
-          kk$ = GetKeY(KeyAscii)
-          End If
-          
-  RaiseEvent getpair(kk$, pair$)
+                        kk$ = GetKeY(KeyAscii)
+                    End If
+            If ParentPreview Then RaiseEvent PreviewKeyboardUnicode(kk$)
+            RaiseEvent getpair(kk$, pair$)
             If Len(kk$) = 0 Then Exit Sub
              
             If SelStart = 0 Then mSelstart = 1
@@ -1005,13 +1024,8 @@ Else
             End If
            End If
            If AscW(kk$) = 13 Then
-            
-
-
-
-Exit Sub
+                        Exit Sub
            End If
-           RaiseEvent SyncKeyboardUnicode(kk$)
            RaiseEvent RemoveOne(kk$)
            
          If KeyAscii = 44 And Len(kk$) = 2 Then
@@ -1033,7 +1047,7 @@ Exit Sub
             End If
 
 
-RaiseEvent SetExpandSS(mSelstart)
+            RaiseEvent SetExpandSS(mSelstart)
         
            '
             Else
@@ -1043,8 +1057,12 @@ RaiseEvent SetExpandSS(mSelstart)
                     Else
           kk$ = GetKeY(KeyAscii)
           End If
+          If ParentPreview Then RaiseEvent PreviewKeyboardUnicode(kk$)
           RaiseEvent SyncKeyboardUnicode(kk$)
+          
             End If
+        Else
+        If ParentPreview Then RaiseEvent PreviewKeyboardUnicode(Chr$(KeyAscii))
          End If
          End If
          End If
@@ -1070,7 +1088,7 @@ Else
 
     If listcount > 0 Or MultiLineEditBox Then
     If OverrideShow And Not HandleOverride Then
-       ShowMe
+    ShowMe
     Else
       ShowMe2
     End If
@@ -1207,8 +1225,6 @@ WordCharLeft = " ,."
 WordCharRight = " ,."
 BarColor = &H63DFFE  '&HC3C3C3
 Shape1.hatchType = 1
-mLx = -1000
-mLy = -1000
 End Sub
 Property Let TabWidthChar(RHS As Long)
     tParam.iTabLength = Abs(RHS)
@@ -1243,346 +1259,373 @@ If ListIndex < topitem Then topitem = ListIndex
       PrepareToShow 5
     End If
 End Sub
-Public Sub PressKey(KeyCode As Integer, shift As Integer, Optional NoEvents As Boolean = False)
-
-If shift <> 0 And KeyCode = 16 Then Exit Sub
+Public Sub PressKey(keycode As Integer, shift As Integer, Optional NoEvents As Boolean = False)
+Dim lcnt As Long, osel As Long, lsep As Long
+If shift <> 0 And keycode = 16 Then Exit Sub
 
 Timer1.enabled = False
 If BlinkON Then BlinkTimer.enabled = True
 'Timer1.Interval = 1000
 Dim LastListIndex As Long, bb As Boolean, val As Long
 LastListIndex = ListIndex
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
-If (KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown) And (shift And 2) = 2 Then
-    If MarkNext = 0 Then RaiseEvent KeyDown(KeyCode, shift)
-    If KeyCode = 0 Then Exit Sub
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
+If (keycode = vbKeyPageUp Or keycode = vbKeyPageDown) And (shift And 2) = 2 Then
+    If MarkNext = 0 Then
+    RaiseEvent KeyDown(keycode, shift)
+    If keycode <> 0 Then GetKeY2 keycode, shift
+    End If
+    If keycode = 0 Then Exit Sub
 End If
-If MarkNext = 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+If MarkNext = 0 Then RaiseEvent KeyDownAfter(keycode, shift)
 End If
 
-If KeyCode = 93 Then
+If keycode = 93 Then
 ' you have to clear myButton, here keycode
-RaiseEvent OutPopUp(nowX, nowY, KeyCode)
+RaiseEvent OutPopUp(nowX, nowY, keycode)
 End If
-Select Case KeyCode
+Select Case keycode
 Case vbKeyHome
 If EditFlag Then
-RaiseEvent DelExpandSS
-If mSelstart = 1 Then
-mSelstart = Len(list(ListIndex)) - Len(NLtrim(list(ListIndex))) + 1
+    RaiseEvent DelExpandSS
+    If mSelstart = 1 Then
+        mSelstart = Len(list(ListIndex)) - Len(NLtrim(list(ListIndex))) + 1
+    Else
+        mSelstart = 1
+    End If
 Else
-mSelstart = 1
-End If
-Else
-ShowThis 1
-       Do While Not (Not ListSep(ListIndex) Or ListIndex = listcount - 1)
-    ShowThis SELECTEDITEM + 1
-    Loop
-    If ListSep(ListIndex) Then ListIndex = LastListIndex
-    RaiseEvent ChangeSelStart(SelStart)
-    If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
+       SELECTEDITEM = 1
+       lcnt = listcount
+       osel = SELECTEDITEM
+       secreset = False
+       lsep = ListSep(ListIndex)
+       Do While Not (Not lsep Or ListIndex >= lcnt - 1)
+            secreset = False
+            SELECTEDITEM = osel + 1
+            osel = SELECTEDITEM
+            lsep = ListSep(ListIndex)
+        Loop
+        If ListSep(ListIndex) Then ListIndex = LastListIndex Else ShowThis SELECTEDITEM
+        RaiseEvent ChangeSelStart(SelStart)
+        If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
 End If
 Case vbKeyEnd
 If EditFlag Then
-mSelstart = Len(list(ListIndex)) + 1
-RaiseEvent SetExpandSS(mSelstart)
+    mSelstart = Len(list(ListIndex)) + 1
+    RaiseEvent SetExpandSS(mSelstart)
 Else
-    ShowThis listcount
+    SELECTEDITEM = listcount + 1
+    osel = SELECTEDITEM
+    secreset = False
     Do While Not (Not ListSep(ListIndex) Or ListIndex = 0)
-        ShowThis SELECTEDITEM - 1
+        secreset = False
+        SELECTEDITEM = osel - 1
+        osel = SELECTEDITEM
     Loop
-    If ListSep(ListIndex) Then ListIndex = LastListIndex
+    secreset = False
+    If ListSep(ListIndex) Then ListIndex = LastListIndex Else ShowThis SELECTEDITEM
     RaiseEvent SetExpandSS(mSelstart)
     RaiseEvent ChangeSelStart(SelStart)
     If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
 End If
 Case vbKeyPageUp
     If shift = 0 Then RaiseEvent MarkDestroyAny
-        If (shift And 2) = 2 Then
-            ShowThis 1
-            If EditFlag Then
-                RaiseEvent DelExpandSS
-                If mSelstart = 1 Then
-                    mSelstart = Len(list(ListIndex)) - Len(NLtrim(list(ListIndex))) + 1
-                    Else
-                    mSelstart = 1
-               End If
-            End If
-        ElseIf SELECTEDITEM - lines < 0 Then
-       If SELECTEDITEM - 1 > 0 Then
-       ShowThis SELECTEDITEM - 1
-       Else
-       PrepareToShow 5
-           If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
-           
-       shift = 0: KeyCode = 0: Exit Sub
-       End If
+    If (shift And 2) = 2 Then
+        ShowThis 1
+        If EditFlag Then
+            RaiseEvent DelExpandSS
+            If mSelstart = 1 Then
+                mSelstart = Len(list(ListIndex)) - Len(NLtrim(list(ListIndex))) + 1
+            Else
+                mSelstart = 1
+           End If
+        End If
+    ElseIf SELECTEDITEM - lines < 0 Then
+        If SELECTEDITEM - 1 > 0 Then
+            ShowThis SELECTEDITEM - 1
+        Else
+            PrepareToShow 5
+            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+            shift = 0: keycode = 0: Exit Sub
+        End If
     Else
-    
         If topitem < SELECTEDITEM - (lines + 1) \ 2 Then
             If topitem = 0 Then
-                ShowThis SELECTEDITEM - 1
+                SELECTEDITEM = SELECTEDITEM - 1
             Else
-                ShowThis topitem
+                SELECTEDITEM = topitem
             End If
         Else
-            ShowThis SELECTEDITEM - (lines + 1) \ 2 - 1
+            SELECTEDITEM = SELECTEDITEM - (lines + 1) \ 2 - 1
         End If
     End If
-    While ListSep(ListIndex) And Not ListIndex = 0
-        ShowThis SELECTEDITEM - 1
+    osel = SELECTEDITEM
+    secreset = False
+    While ListSep(osel) And Not osel = 0
+        secreset = False
+        osel = osel - 1
     Wend
-    If ListSep(ListIndex) Then ListIndex = LastListIndex
+    secreset = False
+    If ListSep(osel - 1) Then
+        ListIndex = LastListIndex
+    Else
+        SELECTEDITEM = osel + 1
+        ShowThis osel
+    End If
     RaiseEvent ChangeSelStart(SelStart)
     If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-         If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
-
-     shift = 0: KeyCode = 0: Exit Sub
+    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+    shift = 0: keycode = 0: Exit Sub
 Case vbKeyUp
-If Spinner Then Exit Sub
+    If Spinner Then Exit Sub
     If SELECTEDITEM > 1 Then
-    Do
-       'ListindexPrivateUse = SELECTEDITEM - 2
-       ShowThis SELECTEDITEM - 1
-    Loop Until Not ListSep(ListIndex) Or ListIndex = 0
-  
-   
-    End If
-    If Not MultiLineEditBox Then If ListSep(ListIndex) Then ListIndex = LastListIndex
-     RaiseEvent ExpandSelStart((mSelstart))
-     RaiseEvent ChangeSelStart((mSelstart))
-'     If MultiLineEditBox Then FindRealCursor ListIndex
-    If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-       If shift <> 0 Then
-   If ListIndex < topitem Then topitem = ListIndex
-   
-    PrepareToShow 5
-    If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
-    Else
-      RaiseEvent MarkDestroyAny
-    MarkNext = 0
-    If NoFreeMoveUpDown Then
-    If ListIndex < topitem Then topitem = ListIndex Else topitem = topitem - 1
-    If ListIndex - topitem > lines Then topitem = ListIndex - lines
-    If topitem < 0 Then topitem = 0
-       ShowMe2
-    Else
-    KeyCode = 0
-If ListIndex < topitem Then topitem = ListIndex
-      PrepareToShow 5
-    End If
-        Exit Sub
-        
-    
-    End If
-      shift = 0: KeyCode = 0: Exit Sub
-    
-Case vbKeyDown
-If Spinner Then Exit Sub
-    If SELECTEDITEM < listcount Then
-    Do
-        'ListindexPrivateUse = SELECTEDITEM
-        ShowThis SELECTEDITEM + 1
-    Loop Until Not ListSep(ListIndex) Or ListIndex = listcount - 1
-   
-    End If
-    If Not MultiLineEditBox Then If ListSep(ListIndex) Then ListIndex = LastListIndex
-    
-  RaiseEvent ExpandSelStart((mSelstart))
-    'SelStartEventAlways = SelStart
-    RaiseEvent ChangeSelStart((mSelstart))
-    
-   ' If MultiLineEditBox Then FindRealCursor ListIndex
-    If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-    If shift <> 0 Then
-    
-    If ListIndex - topitem > lines Then topitem = ListIndex - lines
-    
-    PrepareToShow 5
-  If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
-    Else
-    RaiseEvent MarkDestroyAny
-    MarkNext = 0
-        If NoFreeMoveUpDown Then
-        If topitem + lines + 2 > listcount Then
-       If ListIndex - topitem > lines Then topitem = ListIndex - lines
+        osel = SELECTEDITEM
+        Do
+            osel = osel - 1
+            secreset = False
+            SELECTEDITEM = osel
+        Loop Until Not ListSep(ListIndex) Or ListIndex = 0
+        secreset = False
+        If Not MultiLineEditBox Then
+            If ListSep(ListIndex) Then ListIndex = LastListIndex Else ShowThis osel
         Else
-        topitem = topitem + 1
+            ShowThis osel
         End If
-         ShowMe2
     Else
-    KeyCode = 0
-    If ListIndex - topitem > lines Then topitem = ListIndex - lines
-    PrepareToShow 5
+        If Not MultiLineEditBox Then If ListSep(ListIndex) Then ListIndex = LastListIndex
     End If
-    Exit Sub
+    RaiseEvent ExpandSelStart((mSelstart))
+    RaiseEvent ChangeSelStart((mSelstart))
+    If Not NoEvents Then If SELECTEDITEM > 0 Then If Not NoArrowUp Then RaiseEvent selected(SELECTEDITEM)
+    If shift <> 0 Then
+        If ListIndex < topitem Then topitem = ListIndex
+        PrepareToShow 5
+        If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+    Else
+        RaiseEvent MarkDestroyAny
+        MarkNext = 0
+        If NoFreeMoveUpDown Then
+            If ListIndex < topitem Then topitem = ListIndex Else topitem = topitem - 1
+            If ListIndex - topitem > lines Then topitem = ListIndex - lines
+            If topitem < 0 Then topitem = 0
+            ShowMe2
+        Else
+            keycode = 0
+            If ListIndex < topitem Then topitem = ListIndex
+            PrepareToShow 5
+        End If
+        Exit Sub
     End If
-  
-     KeyCode = 0: Exit Sub
-Case vbKeyPageDown
-If shift = 0 Then RaiseEvent MarkDestroyAny
-    If (shift And 2) = 2 Then
-            ShowThis listcount
-            If EditFlag Then
-                mSelstart = Len(list(ListIndex)) + 1
-                RaiseEvent SetExpandSS(mSelstart)
+    shift = 0: keycode = 0: Exit Sub
+Case vbKeyDown
+    If Spinner Then Exit Sub
+    lcnt = listcount
+    If SELECTEDITEM < lcnt Then
+        osel = SELECTEDITEM
+        Do
+            osel = osel + 1
+            secreset = False
+            SELECTEDITEM = osel
+        Loop Until Not ListSep(ListIndex) Or ListIndex = lcnt - 1
+        secreset = False
+        If Not MultiLineEditBox Then
+            If ListSep(ListIndex) Then ListIndex = LastListIndex Else ShowThis osel
+        Else
+            ShowThis osel
+        End If
+    Else
+        If Not MultiLineEditBox Then If ListSep(ListIndex) Then ListIndex = LastListIndex
+    End If
+    RaiseEvent ExpandSelStart((mSelstart))
+    RaiseEvent ChangeSelStart((mSelstart))
+    If Not NoEvents Then If SELECTEDITEM > 0 Then If Not NoArrowDown Then RaiseEvent selected(SELECTEDITEM)
+    If shift <> 0 Then
+        If ListIndex - topitem > lines Then topitem = ListIndex - lines
+        PrepareToShow 5
+        If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+    Else
+        RaiseEvent MarkDestroyAny
+        MarkNext = 0
+        If NoFreeMoveUpDown Then
+            If topitem + lines + 2 > listcount Then
+                If ListIndex - topitem > lines Then topitem = ListIndex - lines
+            Else
+                topitem = topitem + 1
             End If
-            
-        ElseIf SELECTEDITEM + (lines + 1) \ 2 >= listcount Then
-     If listcount > SELECTEDITEM Then
-    ShowThis SELECTEDITEM + 1
-    Else
-     PrepareToShow 5
-        If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
-    shift = 0: KeyCode = 0: Exit Sub
+            ShowMe2
+        Else
+            keycode = 0
+            If ListIndex - topitem > lines Then topitem = ListIndex - lines
+            PrepareToShow 5
+        End If
+        Exit Sub
     End If
+     keycode = 0: Exit Sub
+Case vbKeyPageDown
+    lcnt = listcount
+    If shift = 0 Then RaiseEvent MarkDestroyAny
+    If (shift And 2) = 2 Then
+        ShowThis lcnt
+        If EditFlag Then
+            mSelstart = Len(list(ListIndex)) + 1
+            RaiseEvent SetExpandSS(mSelstart)
+        End If
+    ElseIf SELECTEDITEM + (lines + 1) \ 2 >= lcnt Then
+        If listcount > SELECTEDITEM Then
+            ShowThis SELECTEDITEM + 1
+        Else
+            PrepareToShow 5
+            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+            shift = 0: keycode = 0: Exit Sub
+        End If
     ElseIf (SELECTEDITEM - topitem) <= (lines + 1) \ 2 Then
-    If topitem + (lines + 1) + 1 <= listcount Then
-    ShowThis topitem + (lines + 1) + 1
+        If topitem + (lines + 1) + 1 <= lcnt Then
+            SELECTEDITEM = topitem + (lines + 1) + 1
+        Else
+            SELECTEDITEM = SELECTEDITEM + 1
+        End If
     Else
-    ShowThis SELECTEDITEM + 1
+        SELECTEDITEM = SELECTEDITEM + (lines + 1) \ 2 + 1
     End If
-    Else
-    ShowThis SELECTEDITEM + (lines + 1) \ 2 + 1
-    End If
-    While ListSep(ListIndex) And Not ListIndex = listcount - 1
-    ShowThis SELECTEDITEM + 1
+    osel = SELECTEDITEM
+    secreset = False
+    While ListSep(osel) And Not ((osel = lcnt - 1) Or (osel < 1))
+        secreset = False
+        osel = osel + 1
     Wend
-    If ListSep(ListIndex) Then ListIndex = LastListIndex
+    secreset = False
+    If ListSep(osel) Then
+        ListIndex = LastListIndex
+    Else
+        SELECTEDITEM = osel
+        ShowThis osel
+    End If
     RaiseEvent ChangeSelStart(SelStart)
     If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
-     shift = 0: KeyCode = 0: Exit Sub
+    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+    shift = 0: keycode = 0: Exit Sub
 Case vbKeySpace
-
-If SELECTEDITEM > 0 Then
-If EditFlag Then
-If mSelstart = 0 Then mSelstart = 1
- If maxchar = 0 Or (maxchar > Len(list(SELECTEDITEM - 1)) Or MultiLineEditBox) Then
- bb = enabled
- enabled = False
-     RaiseEvent PushUndoIfMarked
-     RaiseEvent MarkDelete(False)
- enabled = bb
-'RaiseEvent SetExpandSS(mSelstart + 1)
-            SelStartEventAlways = SelStart
-            RaiseEvent DelExpandSS
- RaiseEvent PureListOn
- If shift = 5 Then
- list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) & ChrW(&H2007) & Mid$(list(SELECTEDITEM - 1), SelStart)
- RaiseEvent RemoveOne(ChrW(&H2007))
- ElseIf shift = 3 Then
- list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) & ChrW(&HA0) & Mid$(list(SELECTEDITEM - 1), SelStart)
- RaiseEvent RemoveOne(ChrW(&HA0))
- 
- Else
-  list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) & " " & Mid$(list(SELECTEDITEM - 1), SelStart)
- RaiseEvent RemoveOne(" ")
- End If
- RaiseEvent PureListOff
-SelStartEventAlways = SelStart + 1
-RaiseEvent SetExpandSS(mSelstart)
-KeyCode = 0
-PrepareToShow 10
-End If
-Exit Sub
-Else
-
-If (MultiSelect Or ListMenu(SELECTEDITEM - 1)) Then
-If ListRadio(SELECTEDITEM - 1) And ListSelected(SELECTEDITEM - 1) Then
-' do nothing
-Else
-ListSelected(SELECTEDITEM - 1) = Not ListSelected(SELECTEDITEM - 1)
-' from 1 to listcount
-If MultiSelect Then
-   If ListSelected(SELECTEDITEM - 1) Then
-    RaiseEvent SelectedMultiAdd(SELECTEDITEM)
+    If SELECTEDITEM > 0 Then
+        If EditFlag Then
+        If mSelstart = 0 Then mSelstart = 1
+        If maxchar = 0 Or (maxchar > Len(list(SELECTEDITEM - 1)) Or MultiLineEditBox) Then
+        bb = enabled
+        enabled = False
+        RaiseEvent PushUndoIfMarked
+        RaiseEvent MarkDelete(False)
+        enabled = bb
+        SelStartEventAlways = SelStart
+        RaiseEvent DelExpandSS
+        RaiseEvent PureListOn
+        If shift = 5 Then
+            list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) & ChrW(&H2007) & Mid$(list(SELECTEDITEM - 1), SelStart)
+            RaiseEvent RemoveOne(ChrW(&H2007))
+        ElseIf shift = 3 Then
+            list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) & ChrW(&HA0) & Mid$(list(SELECTEDITEM - 1), SelStart)
+            RaiseEvent RemoveOne(ChrW(&HA0))
+        Else
+            list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) & " " & Mid$(list(SELECTEDITEM - 1), SelStart)
+            RaiseEvent RemoveOne(" ")
+        End If
+            RaiseEvent PureListOff
+            SelStartEventAlways = SelStart + 1
+            RaiseEvent SetExpandSS(mSelstart)
+            keycode = 0
+            PrepareToShow 10
+        End If
+        Exit Sub
     Else
-    RaiseEvent SelectedMultiSub(SELECTEDITEM)
+        If (MultiSelect Or ListMenu(SELECTEDITEM - 1)) Then
+            If ListRadio(SELECTEDITEM - 1) And ListSelected(SELECTEDITEM - 1) Then
+                ' do nothing
+            Else
+                ListSelected(SELECTEDITEM - 1) = Not ListSelected(SELECTEDITEM - 1)
+                ' from 1 to listcount
+                If MultiSelect Then
+                    If ListSelected(SELECTEDITEM - 1) Then
+                        RaiseEvent SelectedMultiAdd(SELECTEDITEM)
+                    Else
+                        RaiseEvent SelectedMultiSub(SELECTEDITEM)
+                    End If
+                Else
+                    RaiseEvent MenuChecked(SELECTEDITEM)
+                End If
+            End If
+        End If
     End If
-Else
-RaiseEvent MenuChecked(SELECTEDITEM)
-End If
-End If
-End If
-End If
 End If
 Case vbKeyLeft
 RaiseEvent DelExpandSS
 If EditFlag Then
-val = 1
-RaiseEvent SubSelStart(val, shift)
-If MultiLineEditBox Then
-If SelStart > val Then
-mSelstart = SelStart - val
-If shift = 0 Then RaiseEvent SetExpandSS(mSelstart)
-RaiseEvent MayRefresh(bb)
-If bb Then ShowMe2
-ElseIf ListIndex > 0 Then
-ShowThis SELECTEDITEM - 1
-mSelstart = Len(list(ListIndex)) + 1
-If shift = 0 Then RaiseEvent SetExpandSS(mSelstart)
-If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-
-End If
-ElseIf SelStart > val Then
-mSelstart = SelStart - val
-If shift = 0 Then RaiseEvent SetExpandSS(mSelstart)
-End If
+    val = 1
+    RaiseEvent SubSelStart(val, shift)
+    If MultiLineEditBox Then
+        If SelStart > val Then
+            mSelstart = SelStart - val
+            If shift = 0 Then RaiseEvent SetExpandSS(mSelstart)
+            RaiseEvent MayRefresh(bb)
+            If bb Then ShowMe2
+        ElseIf ListIndex > 0 Then
+            ShowThis SELECTEDITEM - 1
+            mSelstart = Len(list(ListIndex)) + 1
+            If shift = 0 Then RaiseEvent SetExpandSS(mSelstart)
+            If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
+        End If
+    ElseIf SelStart > val Then
+        mSelstart = SelStart - val
+        If shift = 0 Then RaiseEvent SetExpandSS(mSelstart)
+    End If
+Else
+    If Not NoEvents Then If SELECTEDITEM > 0 Then If Not Arrows2Tab Then RaiseEvent selected(SELECTEDITEM)
 End If
 Case vbKeyRight
 If EditFlag Then
-val = 1
-RaiseEvent AddSelStart(val, shift)
-If MultiLineEditBox Then
-If SelStart <= Len(list(SELECTEDITEM - 1)) - val + 1 Then
-
-mSelstart = SelStart + val
-If shift = 0 Then RaiseEvent SetExpandSS(mSelstart)
-RaiseEvent MayRefresh(bb)
-If bb Then ShowMe2
-ElseIf ListIndex < listcount - 1 Then
-ListindexPrivateUse = ListIndex + 1
-mSelstart = 1
-If shift = 0 Then RaiseEvent SetExpandSS(mSelstart)
-If (SELECTEDITEM - topitem) > lines + 1 Then topitem = topitem + 1
-If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-
-
-End If
+    val = 1
+    RaiseEvent AddSelStart(val, shift)
+    If MultiLineEditBox Then
+        If SelStart <= Len(list(SELECTEDITEM - 1)) - val + 1 Then
+            mSelstart = SelStart + val
+            If shift = 0 Then RaiseEvent SetExpandSS(mSelstart)
+            RaiseEvent MayRefresh(bb)
+            If bb Then ShowMe2
+        ElseIf ListIndex < listcount - 1 Then
+            ListindexPrivateUse = ListIndex + 1
+            mSelstart = 1
+            If shift = 0 Then RaiseEvent SetExpandSS(mSelstart)
+            If (SELECTEDITEM - topitem) > lines + 1 Then topitem = topitem + 1
+            If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
+        End If
+    Else
+        If SelStart <= Len(list(SELECTEDITEM - 1)) - val + 1 Then
+            mSelstart = SelStart + val
+            If shift = 0 Then RaiseEvent SetExpandSS(mSelstart)
+        End If
+    End If
 Else
-If SelStart <= Len(list(SELECTEDITEM - 1)) - val + 1 Then
-mSelstart = SelStart + val
-If shift = 0 Then RaiseEvent SetExpandSS(mSelstart)
-End If
-End If
+    If Not NoEvents Then If SELECTEDITEM > 0 Then If Not Arrows2Tab Then RaiseEvent selected(SELECTEDITEM)
 End If
 Case vbKeyDelete
 If EditFlag Then
-   If mSelstart = 0 Then mSelstart = 1
+    If mSelstart = 0 Then mSelstart = 1
     If SelStart > Len(list(SELECTEDITEM - 1)) Then
-      mSelstart = Len(list(SELECTEDITEM - 1)) + 1
-    If listcount > SELECTEDITEM Then
-    If Not NoEvents Then
-    
-    RaiseEvent LineDown
-    RaiseEvent addone(vbCr)
-    End If
-    End If
+        mSelstart = Len(list(SELECTEDITEM - 1)) + 1
+        If listcount > SELECTEDITEM Then
+            If Not NoEvents Then
+                RaiseEvent LineDown
+                RaiseEvent addone(vbCr)
+            End If
+        End If
     Else
-     RaiseEvent PureListOn
-     val = 1
-    RaiseEvent AddSelStart(val, shift)
-     RaiseEvent addone(Mid$(list(SELECTEDITEM - 1), SelStart, val))
-    list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) + Mid$(list(SELECTEDITEM - 1), SelStart + val)
-    RaiseEvent SetExpandSS(mSelstart)
-    RaiseEvent PureListOff
-    ShowMe2
+        RaiseEvent PureListOn
+        val = 1
+        RaiseEvent AddSelStart(val, shift)
+        RaiseEvent addone(Mid$(list(SELECTEDITEM - 1), SelStart, val))
+        list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) + Mid$(list(SELECTEDITEM - 1), SelStart + val)
+        RaiseEvent SetExpandSS(mSelstart)
+        RaiseEvent PureListOff
+        ShowMe2
     End If
 End If
-
 Case vbKeyBack
-
 If EditFlag Then
     If SelStart > 1 Then
         val = 1
@@ -1590,7 +1633,6 @@ If EditFlag Then
         RaiseEvent SubSelStart(val, shift)
         SelStart = SelStart - val  ' make it a delete because we want selstart to take place before list() take value     RaiseEvent PureListOn
         RaiseEvent addone(Mid$(list(SELECTEDITEM - 1), SelStart, val))
-
         list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) + Mid$(list(SELECTEDITEM - 1), SelStart + val)
         RaiseEvent SetExpandSS(mSelstart)
         RaiseEvent PureListOff
@@ -1603,52 +1645,58 @@ If EditFlag Then
 End If
 Case vbKeyReturn
 If MultiLineEditBox Then
-RaiseEvent SplitLine
-RaiseEvent SetExpandSS(mSelstart)
-RaiseEvent RemoveOne(vbCrLf)
+    RaiseEvent SplitLine
+    RaiseEvent SetExpandSS(mSelstart)
+    RaiseEvent RemoveOne(vbCrLf)
 Else
-RaiseEvent EnterOnly
+    RaiseEvent EnterOnly
 End If
 End Select
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
-If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
+If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
 End If
 
 If MultiLineEditBox Then
-SelStartEventAlways = SelStart
-If shift Or Not (KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown) Then Me.PrepareToShow 5
+    SelStartEventAlways = SelStart
+    If shift Or Not (keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown) Then Me.PrepareToShow 5
 Else
-KeyCode = 0
-SelStartEventAlways = SelStart
-Me.PrepareToShow 5
+    keycode = 0
+    SelStartEventAlways = SelStart
+    Me.PrepareToShow 5
 End If
-KeyCode = 0
+keycode = 0
 End Sub
 
-Private Sub UserControl_KeyUp(KeyCode As Integer, shift As Integer)
-If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
+Private Function AccKey()
+
+End Function
+Private Sub UserControl_KeyUp(keycode As Integer, shift As Integer)
+
+
+If BypassKey Then keycode = 0: shift = 0: Exit Sub
 Dim i As Long, k As Integer
 
 lastshift = shift
 
-If KeyCode = 18 Then
+
+If keycode = 18 Then
 RaiseEvent Maybelanguage
-ElseIf KeyCode = 112 And (shift And 2) = 2 Then
-KeyCode = 0
+ElseIf keycode = 112 And (shift And 2) = 2 Then
+keycode = 0
 shift = 0
 RaiseEvent CtrlPlusF1
 Exit Sub
-ElseIf KeyCode >= vbKeyF1 And KeyCode <= vbKeyF12 Then
-    k = ((KeyCode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
+ElseIf keycode >= vbKeyF1 And keycode <= vbKeyF12 Then
+    k = ((keycode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
     RaiseEvent Fkey(k)
-    If k = 0 Then KeyCode = 0: shift = 0
-ElseIf KeyCode = 16 And shift <> 0 Then
+    If k = 0 Then keycode = 0: shift = 0
+ElseIf keycode = 16 And shift <> 0 Then
 RaiseEvent Maybelanguage
-ElseIf KeyCode = vbKeyV Then
+ElseIf keycode = vbKeyV Then
 Exit Sub
 Else
-If KeyCode = 27 And NoEscapeKey Then
-KeyCode = 0
+If keycode = 27 And NoEscapeKey Then
+keycode = 0
 Else
 RaiseEvent RefreshOnly
 End If
@@ -1687,7 +1735,6 @@ End If
  Else
 UKEY$ = vbNullString
  End If
- 
 End Sub
 
 Private Sub UserControl_LostFocus()
@@ -1776,7 +1823,7 @@ End Sub
 
 Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 If dropkey Then Exit Sub
-Static PX As Long, PY As Long
+Dim osel As Long
 If missMouseClick Then Exit Sub
 If Abs(PX - x) <= 60 And Abs(PY - y) <= 60 Then Exit Sub
 PX = x
@@ -1786,33 +1833,28 @@ RaiseEvent MouseMove(Button, shift, x, y)
 If myt = 0 Or Not myEnabled Then Exit Sub
 If (Button And 2) = 2 Then Exit Sub
 Dim tListcount As Long
-
 tListcount = listcount
-Static timestamp As Double
 
 If timestamp = 0 Or (timestamp - Timer) > 1 Then timestamp = Timer
-
 If (timestamp + 0.02) > Timer And shift = 0 Then Exit Sub
 timestamp = Timer
-
 If Not FreeMouse Then Exit Sub
 If Button = 0 Then If Not nopointerchange Then If mousepointer < 2 Then mousepointer = 1
 If (x > Width - barwidth) And tListcount > lines + 1 And Not BarVisible Then
-Hidebar = True: BarVisible = m_showbar Or AutoHide Or MultiLineEditBox
-
+    Hidebar = True: BarVisible = m_showbar Or AutoHide Or MultiLineEditBox
 ElseIf (x < Width - barwidth) And Button = 0 And BarVisible And (StickBar Or AutoHide) Then
-Hidebar = False
-BarVisible = False
+    Hidebar = False
+    BarVisible = False
 End If
 If OurDraw Then
-barMouseMove Button, shift, x, y
-Exit Sub
+    barMouseMove Button, shift, x, y
+    Exit Sub
 End If
 cX = x
 Timer3.enabled = False
 Dim YYT As Long, oldbutton As Integer
 If mHeadlineHeightTwips = 0 Then
-YYT = y \ myt
+    YYT = y \ myt
 Else
     If y < mHeadlineHeightTwips Then
         If y < 0 Then
@@ -1827,186 +1869,148 @@ End If
 oldbutton = Button
 If (Button And 3) > 0 And useFloatList And FloatList Then FloatListMe useFloatList, x, y: Button = 0 Else If Not nopointerchange Then If mousepointer > 1 Then mousepointer = 1
 If mHeadline <> "" Then
-If YYT = 0 Then ' we move in mHeadline
-' -1 is mHeadline
-
-If (Button And 3) > 0 And FloatList And Not useFloatList Then FloatListMe useFloatList, x, y: Button = 0
-RaiseEvent ExposeItemMouseMove(Button, -1, CLng(x / scrTwips), CLng(y / scrTwips))
-Else
-RaiseEvent ExposeItemMouseMove(Button, topitem + YYT - 1, CLng(x / scrTwips), CLng(y - (YYT - 1) * myt) / scrTwips)
-End If
-Else
-RaiseEvent ExposeItemMouseMove(Button, topitem + YYT, CLng(x / scrTwips), CLng(y - YYT * myt) / scrTwips)
-End If
-If oldbutton <> Button Then Exit Sub
-YYT = YYT + (mHeadline <> "")
-If (Button And 3) = 0 Then
-
-If YYT >= 0 And YYT <= lines Then
-If topitem + YYT < tListcount Then
-secreset = False
-End If
-End If
-ElseIf dr Then
-
-     If MultiLineEditBox And (Button = 1) And secreset Then
-            If MarkNext > 3 Then
-       
-                ElseIf MarkNext = 0 Then
-                MarkNext = 1
-                RaiseEvent markin
-                End If
-     End If
-If (SELECTEDITEM <> (topitem + YYT + 1)) And SELECTEDITEM >= 0 And Button <> 0 Then secreset = False
-' special for M2000  (StickBar And x > Width / 2)
-If shift = 0 And ((Not scrollme > 0) And (x > Width / 2) Or Not SingleLineSlide) And StickBar And MarkNext = 0 And tListcount > lines + 1 Then
-If Abs(LastY - y) < scrTwips * 2 Then LastY = y: Exit Sub
-Hidebar = True
-CalcAndShowBar1
-   If LastY < y Then
-      y = scrTwips * 2
-      Else
-      y = Scaleheight - scrTwips
-      End If
-     
-           
-            If Abs(lastX - x) < scrTwips * 4 Or Not MultiLineEditBox Then
-             lastX = x
-            LastY = y
-            
-            If Vertical Then
- 
-            GetOpenValue = valuepoint - y + mHeadlineHeightTwips
-    
-            Else
-          '  GetOpenValue = valuepoint - x ' NO USED HERE
-            End If
-       
-
-         
-            If processXY(lastX, LastY, True) Then
-            FreeMouse = False
-            End If
-            Timer3.enabled = False
-            Exit Sub
-            Else
-          
-            If YYT >= 0 And YYT <= lines Then shift = 1: GoTo there1
-            End If
-            
-End If
-If mHeadline <> "" And y < mHeadlineHeightTwips Then
-' we sent twips not pixels
-' move...me..??
-
-ElseIf (y - mHeadlineHeightTwips) < myt / 2 And (topitem + YYT > 0) Then
-'scroll up
-
-
-drc = True
- Timer2.enabled = True
- 
-ElseIf y > Scaleheight - myt \ 2 And (tListcount <> 1) Then
-
-drc = False
- Timer2.enabled = True
-ElseIf YYT >= 0 And YYT <= lines Then
-there1:
-
-                If MultiLineEditBox And (Button = 1) Then
-                If MarkNext = 1 Then
-                shift = 1
-
-                RaiseEvent MarkOut
-                ElseIf shift = 0 And MarkNext = 2 Then
-                MarkNext = 0  ' so markNext=2 we have a complete marked text
-                RaiseEvent MarkDestroy
-                End If
-                End If
-If Timer2.enabled Then
- Timer2.enabled = False
- 
-End If
-If topitem + YYT < tListcount Then
-
-If (cX > Scalewidth / 4 And cX < Scalewidth * 3 / 4) And scrollme = 0 Then x = ly
-
-        If Not SELECTEDITEM = topitem + YYT + 1 Then
-            
-            SELECTEDITEM = topitem + YYT + 1
-            
-             If Not BlockItemcount Then
-             REALCUR SELECTEDITEM - 1, cX - scrollme, dummy, mSelstart
-      
-              mSelstart = mSelstart + 1
-              'RaiseEvent SetExpandSS(mSelstart)
-                RaiseEvent ChangeSelStart(mSelstart)
-            End If
- If MultiLineEditBox And (Button = 1) Then
-                If shift = 1 And MarkNext = 0 Then
-                MarkNext = 1
-                RaiseEvent markin
-                ElseIf shift = 1 And MarkNext = 1 Then
-                
-                RaiseEvent MarkOut
-                End If
-     End If
-      
-            If StickBar Or AutoHide Then DOT3
-            
-            If x - ly > 0 And Not NoPanRight Then
-            scrollme = (x - ly)
-            ElseIf x - ly < 0 And Not NoPanLeft Then
-             scrollme = (x - ly)
-            Else
-            If Not EditFlag Then scrollme = 0
-            End If
-         'Timer1.Enabled = True
-         If Not EditFlag Then If scrollme > 0 Then scrollme = 0
-          '
-           
-        ElseIf cY <> YYT Then
-            cY = YYT
-            Timer3.enabled = True
+    If YYT = 0 Then ' we move in mHeadline
+    ' -1 is mHeadline
+        If (Button And 3) > 0 And FloatList And Not useFloatList Then FloatListMe useFloatList, x, y: Button = 0
+            RaiseEvent ExposeItemMouseMove(Button, -1, CLng(x / scrTwips), CLng(y / scrTwips))
         Else
-        If Not Timer1.enabled Then
-         If Not BlockItemcount Then
-
-             REALCUR SELECTEDITEM - 1, cX - scrollme, dummy, mSelstart
-              mSelstart = mSelstart + 1
-         '  RaiseEvent SetExpandSS(mSelstart)
-           RaiseEvent ChangeSelStart(mSelstart)
-
-             End If
-              If MultiLineEditBox And (Button = 1) Then
-                  If shift = 1 And MarkNext = 0 Then
-                      MarkNext = 1
-                      RaiseEvent markin
-                            ElseIf shift = 1 And MarkNext = 1 Then
-                                RaiseEvent MarkOut
-                End If
-                End If
-               If x - ly > 0 And Not NoPanRight Then
-            scrollme = (x - ly)
-            ElseIf x - ly < 0 And Not NoPanLeft Then
-             scrollme = (x - ly)
-            Else
-          If Not EditFlag Then scrollme = 0
-            End If
-            
-            If MarkNext = 4 Then
-            RaiseEvent MarkDestroyAny
-            End If
-            Timer1.Interval = 20
-            
-            Timer1.enabled = True
-            End If
-            Timer3.enabled = False
-            
+            RaiseEvent ExposeItemMouseMove(Button, topitem + YYT - 1, CLng(x / scrTwips), CLng(y - (YYT - 1) * myt) / scrTwips)
         End If
-
-End If
-End If
+    Else
+        RaiseEvent ExposeItemMouseMove(Button, topitem + YYT, CLng(x / scrTwips), CLng(y - YYT * myt) / scrTwips)
+    End If
+    If oldbutton <> Button Then Exit Sub
+    YYT = YYT + (mHeadline <> "")
+    If (Button And 3) = 0 Then
+        If YYT >= 0 And YYT <= lines Then
+            If topitem + YYT < tListcount Then
+                secreset = False
+            End If
+        End If
+    ElseIf dr Then
+        If MultiLineEditBox And (Button = 1) And secreset Then
+            If MarkNext > 3 Then
+            ElseIf MarkNext = 0 Then
+                MarkNext = 1
+                RaiseEvent markin
+            End If
+        End If
+        If (SELECTEDITEM <> (topitem + YYT + 1)) And SELECTEDITEM >= 0 And Button <> 0 Then secreset = False
+        ' special for M2000  (StickBar And x > Width / 2)
+        If shift = 0 And ((Not scrollme > 0) And (x > Width / 2) Or Not SingleLineSlide) And StickBar And MarkNext = 0 And tListcount > lines + 1 Then
+            If Abs(LastY - y) < scrTwips * 2 Then LastY = y: Exit Sub
+            Hidebar = True
+            CalcAndShowBar1
+            If LastY < y Then
+                y = scrTwips * 2
+            Else
+                y = Scaleheight - scrTwips
+            End If
+            If Abs(lastX - x) < scrTwips * 4 Or Not MultiLineEditBox Then
+                lastX = x
+                LastY = y
+                If Vertical Then
+                    GetOpenValue = valuepoint - y + mHeadlineHeightTwips
+                Else
+              '  GetOpenValue = valuepoint - x ' NO USED HERE
+                End If
+                If processXY(lastX, LastY, True) Then
+                    FreeMouse = False
+                End If
+                Timer3.enabled = False
+                Exit Sub
+            Else
+                If YYT >= 0 And YYT <= lines Then shift = 1: GoTo there1
+            End If
+        End If
+        If mHeadline <> "" And y < mHeadlineHeightTwips Then
+        ' we sent twips not pixels
+        ' move...me..??
+        
+        ElseIf (y - mHeadlineHeightTwips) < myt / 2 And (topitem + YYT > 0) Then
+        'scroll up
+            drc = True
+            Timer2.enabled = True
+        ElseIf y > Scaleheight - myt \ 2 And (tListcount <> 1) Then
+            drc = False
+            Timer2.enabled = True
+        ElseIf YYT >= 0 And YYT <= lines Then
+there1:
+            If MultiLineEditBox And (Button = 1) Then
+                If MarkNext = 1 Then
+                    shift = 1
+                    RaiseEvent MarkOut
+                ElseIf shift = 0 And MarkNext = 2 Then
+                    MarkNext = 0  ' so markNext=2 we have a complete marked text
+                    RaiseEvent MarkDestroy
+                End If
+            End If
+            If Timer2.enabled Then
+                Timer2.enabled = False
+            End If
+            If topitem + YYT < tListcount Then
+                If (cX > Scalewidth / 4 And cX < Scalewidth * 3 / 4) And scrollme = 0 Then x = ly
+                If Not SELECTEDITEM = topitem + YYT + 1 Then
+                    osel = SELECTEDITEM
+                    SELECTEDITEM = topitem + YYT + 1
+                    If Not BlockItemcount Then
+                        REALCUR SELECTEDITEM - 1, cX - scrollme, dummy, mSelstart
+                        mSelstart = mSelstart + 1
+                        RaiseEvent ChangeSelStart(mSelstart)
+                    End If
+                    If MultiLineEditBox And (Button = 1) Then
+                        If shift = 1 And MarkNext = 0 Then
+                            MarkNext = 1
+                            RaiseEvent markin
+                        ElseIf shift = 1 And MarkNext = 1 Then
+                            RaiseEvent MarkOut
+                        End If
+                    End If
+                    If StickBar Or AutoHide Then DOT3
+                        If x - ly > 0 And Not NoPanRight Then
+                            scrollme = (x - ly)
+                        ElseIf x - ly < 0 And Not NoPanLeft Then
+                            scrollme = (x - ly)
+                        Else
+                            If Not EditFlag Then scrollme = 0
+                        End If
+                        If Not EditFlag Then If scrollme > 0 Then scrollme = 0
+                ElseIf cY <> YYT Then
+                    cY = YYT
+                    Timer3.enabled = True
+                Else
+                    If Not Timer1.enabled Then
+                        If Not BlockItemcount Then
+                            REALCUR SELECTEDITEM - 1, cX - scrollme, dummy, mSelstart
+                            mSelstart = mSelstart + 1
+                            RaiseEvent ChangeSelStart(mSelstart)
+                        End If
+                        If MultiLineEditBox And (Button = 1) Then
+                        If shift = 1 And MarkNext = 0 Then
+                            MarkNext = 1
+                            RaiseEvent markin
+                        ElseIf shift = 1 And MarkNext = 1 Then
+                            RaiseEvent MarkOut
+                        End If
+                    End If
+                    If x - ly > 0 And Not NoPanRight Then
+                        scrollme = (x - ly)
+                    ElseIf x - ly < 0 And Not NoPanLeft Then
+                        scrollme = (x - ly)
+                    Else
+                        If Not EditFlag Then scrollme = 0
+                    End If
+                    
+                    If MarkNext = 4 Then
+                        RaiseEvent MarkDestroyAny
+                    End If
+                    Timer1.Interval = 20
+                    Timer1.enabled = True
+                End If
+                Timer3.enabled = False
+            End If
+        End If
+    End If
 End If
 
 End Sub
@@ -2025,10 +2029,9 @@ Public Sub CheckMark()
 End Sub
 
 Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
-
 If dropkey Then Exit Sub
 If missMouseClick Then missMouseClick = False: Exit Sub
-If Button = 1 Then mLx = CLng(x / scrTwips): mLy = CLng(y / scrTwips): RaiseEvent MouseUp(x / scrTwips, y / scrTwips)
+If Button = 1 Then RaiseEvent MouseUp(x / scrTwips, y / scrTwips)
 If (Button And 2) = 2 Then
 x = nowX
 y = nowY
@@ -2104,25 +2107,21 @@ If topitem + YYT < listcount Then
 
 If (Button And 3) > 0 And myEnabled Then
 
-
+    
     If secreset Then
         ' this is a double click
         secreset = False
          If Not ListSep(topitem + YYT) Then
-         If MarkNext = 0 And (EditFlag Or MultiLineEditBox) Then
-         If MultiLineEditBox And Not EditFlag Then
-         REALCUR SELECTEDITEM - 1, cX - scrollme, dummy, mSelstart
-         mSelstart = mSelstart + 1
-         End If
-      MarkWord
-      
-      Else
-
-      RaiseEvent Selected2(SELECTEDITEM - 1)
-      Exit Sub
+            If MarkNext = 0 And (EditFlag Or MultiLineEditBox) Then
+                If MultiLineEditBox And Not EditFlag Then
+                    REALCUR SELECTEDITEM - 1, cX - scrollme, dummy, mSelstart
+                    mSelstart = mSelstart + 1
                 End If
-        
-        
+                MarkWord
+            Else
+                RaiseEvent Selected2(SELECTEDITEM - 1)
+                Exit Sub
+            End If
         End If
         
     Else
@@ -2139,29 +2138,28 @@ If (Button And 3) > 0 And myEnabled Then
             End If
             RaiseEvent selected(SELECTEDITEM)  ' broadcast
          End If
-    '     If Shift = 0 Then CheckMark
-
-         If SELECTEDITEM = topitem + YYT + 1 Then
-                        If MultiSelect Or ListMenu(SELECTEDITEM - 1) Then
-                            If (x / scrTwips > 0) And (x / scrTwips < LeftMarginPixels) Then
-                                If ListRadio(SELECTEDITEM - 1) And ListSelected(SELECTEDITEM - 1) Then
-                                ' do nothing
-                                Else
-                                ListSelected(SELECTEDITEM - 1) = Not ListSelected(SELECTEDITEM - 1)
-                                If MultiSelect Then
+            If SELECTEDITEM = topitem + YYT + 1 Then
+                If MultiSelect Or ListMenu(SELECTEDITEM - 1) Then
+                    If (x / scrTwips > 0) And (x / scrTwips < LeftMarginPixels) Then
+                        If ListRadio(SELECTEDITEM - 1) And ListSelected(SELECTEDITEM - 1) Then
+                        ' do nothing
+                        Else
+                            ListSelected(SELECTEDITEM - 1) = Not ListSelected(SELECTEDITEM - 1)
+                            If MultiSelect Then
                                 If ListSelected(SELECTEDITEM - 1) Then
-                                RaiseEvent SelectedMultiAdd(SELECTEDITEM)
+                                    RaiseEvent SelectedMultiAdd(SELECTEDITEM)
                                 Else
-                                RaiseEvent SelectedMultiSub(SELECTEDITEM)
+                                    RaiseEvent SelectedMultiSub(SELECTEDITEM)
                                 End If
-                                Else
+                            Else
                                 RaiseEvent MenuChecked(SELECTEDITEM)
-                                End If
-                                End If
                             End If
-                            
                         End If
-
+                            If Not enabled Then Exit Sub
+                            PrepareToShow 5
+                            Exit Sub
+                        End If
+                    End If
 End If
 
 End If
@@ -2833,7 +2831,7 @@ End If
 End Function
 Public Sub ShowThis(ByVal item As Long, Optional noselect As Boolean)
 On Error GoTo skipthis
-
+If item <= 0 Then item = 1
 If Extender.Parent Is Nothing Then Exit Sub
 
 If listcount <= lines + 1 Then
@@ -2927,7 +2925,10 @@ Public Sub ClearClick()
 SELECTEDITEM = -1
 secreset = False
 End Sub
-
+Public Sub PrepareClick()
+'bypassfirstClick = False
+secreset = True
+End Sub
 Public Function DblClick() As Boolean
 DblClick = secreset
 secreset = False
@@ -3746,20 +3747,22 @@ Else
 End If
 End Function
 Function design() As Boolean
-If listcount = 0 Then
-   '      barvisible = False
-
-Cls
+On Error GoTo there
 If UserControl.Ambient.UserMode = False Then
+Cls
 currentX = scrTwips
 currentY = scrTwips
 Print UserControl.Ambient.DisplayName
-
 currentX = 0
 currentY = 0
-End If
 design = True
+Else
+'Cls
 End If
+Exit Function
+there:
+'If listcount = 0 Then Cls
+
 End Function
 Private Sub LargeBar1_Scroll()
 If Not state Then
@@ -4178,51 +4181,71 @@ Public Property Let Percent(ByVal RHS As Single)
 mpercent = RHS
 PropertyChanged "Percent"
 End Property
-Private Sub UserControl_KeyDown(KeyCode As Integer, shift As Integer)
-If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
+Friend Sub Goback()
+    ChooseNextLeft Me, Me.Parent, True
+End Sub
+Friend Sub GoON()
+    ChooseNextRight Me, Me.Parent, True
+End Sub
+Private Sub UserControl_KeyDown(keycode As Integer, shift As Integer)
+If BypassKey Then keycode = 0: shift = 0: Exit Sub
 lastshift = shift
-If KeyCode = 27 And NoEscapeKey Then
-KeyCode = 0
+
+If keycode = 27 And NoEscapeKey Then
+keycode = 0
 Exit Sub
 End If
-If KeyCode = vbKeyTab And Not mEditFlag Then
-If shift = 2 Then
-        choosenext
-    KeyCode = 0
-    Exit Sub
+If Arrows2Tab And Not mEditFlag Then
+    If keycode = vbKeyLeft Or (keycode = vbKeyUp And Arrows2Tab) Then
+        ChooseNextLeft Me, Me.Parent
+        keycode = 0
+        Exit Sub
+    ElseIf keycode = vbKeyRight Or (keycode = vbKeyDown And Arrows2Tab) Then
+        ChooseNextRight Me, Me.Parent
+        keycode = 0
+        Exit Sub
     End If
-ElseIf KeyCode = vbKeyF4 Then
+End If
+If keycode = vbKeyTab And Not mEditFlag Then
+    If shift = 1 Then
+        choosenext
+        keycode = 0
+        Exit Sub
+    End If
+ElseIf keycode = vbKeyF4 Then
 If shift = 4 Then
 On Error Resume Next
 If Parent.Name = "GuiM2000" Or Parent.Name = "Form2" Or Parent.Name = "Form4" Then
 With UserControl.Parent
 .ByeBye
 End With
-KeyCode = 0
+keycode = 0
 Exit Sub
 End If
 End If
 End If
-If dropkey Then shift = 0: KeyCode = 0: Exit Sub
+If dropkey Then shift = 0: keycode = 0: Exit Sub
 Dim i&
 If shift = 4 Then
-If KeyCode = 18 Then
+If keycode = 18 Then
 If mynum$ = vbNullString Then mynum$ = "0"
-KeyCode = 0
+keycode = 0
 Exit Sub
+Else
+If keycode <> 0 Then GetKeY2 keycode, shift
 End If
-Select Case KeyCode
+Select Case keycode
 Case vbKeyAdd, vbKeyInsert
 mynum$ = "&h"
 Case vbKey0 To vbKey9
-mynum$ = mynum$ + Chr$(KeyCode - vbKey0 + 48)
+mynum$ = mynum$ + Chr$(keycode - vbKey0 + 48)
 LastNumX = True
 Case vbKeyNumpad0 To vbKeyNumpad9
 LastNumX = False
-mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 48)
+mynum$ = mynum$ + Chr$(keycode - vbKeyNumpad0 + 48)
 Case vbKeyA To vbKeyF
 If Left$(mynum$, 1) = "&" Then
-mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 65)
+mynum$ = mynum$ + Chr$(keycode - vbKeyNumpad0 + 65)
 LastNumX = True
 Else
 mynum$ = vbNullString
@@ -4234,18 +4257,18 @@ Exit Sub
 End If
 
 mynum$ = vbNullString
-If shift <> 0 And KeyCode = 0 Then Exit Sub
+If shift <> 0 And keycode = 0 Then Exit Sub
 
-RaiseEvent KeyDown(KeyCode, shift)
-
-If (KeyCode = 0) Or Not (enabled Or state) Then Exit Sub
+RaiseEvent KeyDown(keycode, shift)
+If keycode <> 0 Then GetKeY2 keycode, shift
+If (keycode = 0) Or Not (enabled Or state) Then Exit Sub
 If SELECTEDITEM < 0 Then
 SELECTEDITEM = topitem + 1: ShowMe2
-If Not EditFlag Then: KeyCode = 0
+If Not EditFlag Then: keycode = 0
 End If
-LargeBar1KeyDown KeyCode, shift
+LargeBar1KeyDown keycode, shift
 If EnabledBar Then
-Select Case KeyCode
+Select Case keycode
 Case vbKeyLeft, vbKeyUp
 If Spinner Then
 If Not NoBarClick Then
@@ -4278,6 +4301,7 @@ Case vbKeyPageDown
 Value = Value + largechange
 End Select
 End If
+
 i = GetLastKeyPressed
  If i <> -1 And i <> 94 Then
   If i = 13 Then
@@ -4286,6 +4310,7 @@ i = GetLastKeyPressed
  UKEY$ = ChrW(i)
  End If
  End If
+ 
 End Sub
 Public Property Get Vertical() As Boolean
 Vertical = mVertical
@@ -5273,6 +5298,7 @@ End Property
 
 Function GetKeY(ascii As Integer) As String
     Dim Buffer As String, ret As Long
+
     Buffer = String$(514, 0)
     Dim R&
       R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
@@ -5284,7 +5310,18 @@ Function GetKeY(ascii As Integer) As String
         GetKeY = ChrW$(AscW(StrConv(ChrW$(ascii Mod 256), 64, 1033)))
     End If
 End Function
+Sub GetKeY2(ascii As Integer, shift As Integer)
+Dim acc As Long
+acc = MapVirtualKey(ascii, 2)
+If ascii > 0 And acc = 0 Then acc = ascii + 500
+If acc = 0 Then Exit Sub
+If (shift And 1) = 1 Then acc = acc + 1000
+If (shift And 2) = 2 Then acc = acc + 10000
+If (shift And 4) = 4 Then acc = acc + 100000
 
+RaiseEvent AccKey(acc)
+If acc = 0 Then ascii = 0: shift = 0
+End Sub
 Public Function LineTopOffsetPixels()
 Dim nr As RECT, a$
 a$ = "fg"
@@ -5331,35 +5368,39 @@ If BarHatch <> -1 Then FrameRect UserControl.Hdc, th, br2
   DeleteObject br2
 End If
 End Sub
-
+Function DoubleClickArea(ByVal x As Long, ByVal y As Long, ByVal Xorigin As Long, ByVal Yorigin As Long, setupxy As Long) As Boolean
+   If Abs(x - Xorigin) < setupxy And Abs(y - Yorigin) < setupxy Then
+        preservedoubleclick = doubleclick
+    Else
+        preservedoubleclick = 0
+   End If
+   DoubleClickArea = Not preservedoubleclick = 0
+End Function
 Function DoubleClickCheck(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long, ByVal Xorigin As Long, ByVal Yorigin As Long, setupxy As Long, itemline As Long) As Boolean
 ' doubleclick
-Static Lx As Long, ly As Long
 If item = itemline Then
    If Abs(x - Xorigin) < setupxy And Abs(y - Yorigin) < setupxy Then
-     If Not nopointerchange Then mousepointer = 1
-      
-      FloatList = False
-            If Button = 1 Then
-                  
-            
-                doubleclick = doubleclick + 1
-                          Lx = mLx
-                          ly = mLy
-                        
-                 If Lx <> -1000 And ly <> -1000 Then
-                        doubleclick = doubleclick + 1
-                            If doubleclick > 1 Then DoubleClickCheck = True: Exit Function
-    End If
-                            Button = 0
-                       
-    End If
+        If Not nopointerchange Then mousepointer = 1
+        FloatList = False
+        If Button = 1 Then
+            doubleclick = doubleclick + 1 + preservedoubleclick
+            preservedoubleclick = 0
+            If doubleclick = 1 Then
+                timestamp1 = Timer
+            ElseIf doubleclick > 1 Then
+                If (timestamp1 + 1.5) < Timer Then
+                    doubleclick = 1
+                    timestamp1 = Timer
+                Else
+                    timestamp1 = Timer + 100
+                    DoubleClickCheck = True: Exit Function
+                End If
+            End If
+            Button = 0
+        End If
     Else
-
-        mLx = -1000
-      mLy = -1000
         doubleclick = 0
-       FloatList = True
+        FloatList = True
     End If
 End If
 End Function
@@ -5396,7 +5437,13 @@ DeleteObject hRgn
 End If
 End Sub
 Public Sub ShowMenu()
+    'dropkey = True
     RaiseEvent DeployMenu
+
+   
+End Sub
+Public Sub CascadeSelect(ByVal item As Long)
+RaiseEvent CascadeSelect(item)
 End Sub
 Public Property Let BlinkTime(t As Variant)
 BlinkON = True <> 0
@@ -5515,3 +5562,7 @@ Dim what As Long
         End If
     End If
 End Sub
+Private Property Get ParentPreview() As Boolean
+On Error Resume Next
+If UserControl.Parent.previewKey Then ParentPreview = True
+End Property

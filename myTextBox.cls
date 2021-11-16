@@ -24,12 +24,15 @@ Event KeyPress(KeyAscii As Integer)
 Event MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 Event SpinnerValue(ThisValue As Long)
 Event DeployMenu()
+Event CascadeSelect(item As Long)  ' 1 based
 Event CtrlPlusF1()
 Event SyncKeyboardUnicode(a As String)
+Event PreviewKeyboardUnicode(a As String)
 Event Fkey(a As Integer)
+Event AccKey(m As Long)
 Private mprompt As String
 Private mkind As String, mPartColor As Long
-Public SkipProcAtExitFocus As Boolean
+Public SkipProcAtExitFocus As Boolean, SkipFirstClick As Boolean
 Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
 Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
@@ -152,7 +155,9 @@ glistN.PromptLineIdent = Len(RHS)
 Text = RHS
 End Property
 
-
+Private Sub glistN_CascadeSelect(item As Long)
+RaiseEvent CascadeSelect(item)
+End Sub
 
 Private Sub glistN_CtrlPlusF1()
 RaiseEvent CtrlPlusF1
@@ -162,7 +167,7 @@ Private Sub glistN_DeployMenu()
 '
 RaiseEvent DeployMenu
 End Sub
-
+'
 
 Private Sub glistN_RegisterGlist(this As gList)
 If Not glistN.Spinner Then this.NoWheel = True
@@ -306,7 +311,18 @@ End Sub
 Private Sub glistN_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 RaiseEvent MouseMove(Button, shift, x, y)
 End Sub
+Friend Sub OneClick()
+On Error Resume Next
+If SkipFirstClick Then glistN.PrepareClick
+End Sub
 
+Private Sub glistN_Selected2(item As Long)
+RaiseEvent DeployMenu
+End Sub
+
+Private Sub glistN_softSelected(item As Long)
+OneClick
+End Sub
 
 Private Sub glistN_SyncKeyboard(item As Integer)
 RaiseEvent KeyPress(item)
@@ -431,7 +447,9 @@ Dim hMem As Long, lSize As Long, lPtr As Long
 
     End If
 End Function
-
+Private Sub glistN_PreviewKeyboardUnicode(ByVal a As String)
+RaiseEvent PreviewKeyboardUnicode(a)
+End Sub
 Private Sub glistN_SyncKeyboardUnicode(a As String)
 RaiseEvent SyncKeyboardUnicode(a)
 End Sub
@@ -493,4 +511,7 @@ val = 2
 
 End If
 End If
+End Sub
+Private Sub gListN_AccKey(m As Long)
+RaiseEvent AccKey(m)
 End Sub

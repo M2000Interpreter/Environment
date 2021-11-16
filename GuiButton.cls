@@ -20,10 +20,16 @@ Private mesCtrlName As String, mlocked As Boolean, mTimes
 Dim mIndex As Long
 Dim Callback As GuiM2000
 Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, shadowcol As Long
-Public Property Get GetCallBack() As Form
+Public SkipFirstClick As Boolean
+
+Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
 End Property
-Public Sub Construct(there As Form, Name$)
+Private Sub OneClick()
+On Error Resume Next
+If SkipFirstClick Then glistN.PrepareClick
+End Sub
+Friend Sub Construct(there As GuiM2000, Name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
@@ -34,7 +40,7 @@ Public Sub Construct(there As Form, Name$)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Public Sub ConstructArray(there As Form, Name$, i As Long)
+Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  Set Callback = there
  On Error Resume Next
  ctrlName = GetTag$
@@ -59,7 +65,7 @@ Shutdown
 Set Callback = Nothing
   Set glistN = Nothing
 End Sub
-Public Sub SetUp()
+Friend Sub SetUp()
 white = Callback.Controls(1).forecolor
 black = 0
 dimm1 = rgb(100, 200, 160)
@@ -71,8 +77,11 @@ ff.charset = Form1.DIS.Font.charset
 ff.Size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 End With
-
+SkipFirstClick = True
 With glistN
+.Arrows2Tab = True
+.NoArrowDown = True
+.NoArrowUp = True
 .NoEscapeKey = True
 .bypassfirstClick = True
 .NoCaretShow = True
@@ -88,6 +97,7 @@ shadowcol = -.forecolor
 .dcolor = Callback.Controls(1).dcolor
 
 .enabled = True
+.ListindexPrivateUse = 0
 .ShowMe
 End With
 End Sub
@@ -100,6 +110,8 @@ End Sub
 Private Sub Class_Terminate()
 Set glistN = Nothing
 End Sub
+
+
 
 Private Sub glistN_BlinkNow(Face As Boolean)
 On Error GoTo ex1
@@ -123,6 +135,7 @@ ex1:
 End Sub
 
 Private Sub glistN_CheckGotFocus()
+Callback.RealHover = ctrlName
 If mlocked Then
 On Error Resume Next
 'Callback.Controls(ctrlName).TabStop = False
@@ -142,6 +155,7 @@ If glistN.BackStyle = 1 Then
 End If
 glistN.backcolor = mycolor(dimm1)
 glistN.ShowMe
+'OneClick
 End If
 End Sub
 
@@ -159,8 +173,8 @@ End If
 If Not mlocked Then glistN.backcolor = mycolor(dimm2)
 glistN.PanPos = 0
 glistN.ShowMe
-
 End If
+glistN.DblClick
 End Sub
 
 Private Sub glistN_CtrlPlusF1()
@@ -191,8 +205,14 @@ Private Sub glistN_RegisterGlist(this As gList)
 this.NoWheel = True
 End Sub
 
-Private Sub glistN_Selected(item As Long)
-If mlocked Then
+Private Sub glistN_selected(item As Long)
+If Not SkipFirstClick Then
+ If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".ClickOnce(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".ClickOnce()"
+      End If
+Else
  If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Click(" + Str(mIndex) + ")"
    Else
@@ -208,6 +228,7 @@ If item >= 0 Then
    Else
       Callback.Callback mesCtrlName + ".Click()"
       End If
+      OneClick
     End If
 End Sub
 '
@@ -232,7 +253,7 @@ Public Property Get Index() As Long
 Index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Long)
+Friend Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Get enabled() As Long
@@ -373,6 +394,10 @@ On Error Resume Next
 If CBool(RHS) Then Callback.Default = ctrlName
 End Property
 
+Private Sub glistN_softSelected(item As Long)
+OneClick
+End Sub
+
 Private Sub glistN_UnregisterGlist()
 On Error Resume Next
 If glistN.TabStopSoft Then Callback.LastActive = ctrlName
@@ -382,7 +407,7 @@ glistN.icon = RHS
 
 End Property
 
-Private Sub glistN_SyncKeyboardUnicode(a As String)
+Private Sub glistN_PreviewKeyboardUnicode(ByVal a As String)
 Callback.SpreadKey a
 End Sub
 Private Sub glistN_Fkey(a As Integer)
@@ -392,4 +417,27 @@ Else
 Callback.SendFKEY a
 End If
 End Sub
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
+Else
+a = UCase(a)
+Select Case a
+Case "F1" To "F9"
+a = 611 + val(Mid(a, 2))
+Case Else
+a = AscW(a)
+If a > 126 Then a = 0
+End Select
+End If
+If Opcode < 0 Then Opcode = 0
+If a = 0 Then Exit Sub
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc a, ctrlName, Opcode
+End Sub
+Private Sub gListN_AccKey(m As Long)
+Callback.AccProces m
+End Sub

@@ -25,10 +25,11 @@ Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, trans As Boolean
 Private mHideCaret As Boolean, mTitle As String
 Private lastshift As Boolean, lastitem As Long
 Public maychange As Boolean
-Public Property Get GetCallBack() As Form
+Public SkipFirstClick As Boolean
+Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
 End Property
-Public Sub Construct(there As Form, Name$)
+Friend Sub Construct(there As GuiM2000, Name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
@@ -39,7 +40,7 @@ Public Sub Construct(there As Form, Name$)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Public Sub ConstructArray(there As Form, Name$, i As Long)
+Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  Set Callback = there
  On Error Resume Next
  ctrlName = GetTag$
@@ -94,11 +95,12 @@ Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, By
 
 If item = -1 Then
 ElseIf maychange And Not Button = 2 Then
+
 If lastitem = item Then Exit Sub
 glistN.mousepointer = 1
 If glistN.ListSep(item) Then Exit Sub
 
-
+If Button = 0 Then OneClick
 glistN.ListindexPrivateUse = item
 glistN.ShowMe2
 lastitem = item
@@ -143,6 +145,7 @@ Private Sub glistN_CtrlPlusF1()
       End If
 End Sub
 Private Sub glistN_CheckGotFocus()
+Callback.RealHover = ctrlName
 If Not locked Then
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 If Not trans Then
@@ -158,6 +161,7 @@ If Not trans Then
     End If
 End If
 glistN.ShowMe
+OneClick
 End If
 
 End Sub
@@ -183,7 +187,7 @@ End If
 glistN.PanPos = 0: glistN.PrepareToShow
 End If
 End If
-
+glistN.DblClick
 End Sub
 Public Sub SetFocus()
 On Error Resume Next
@@ -202,7 +206,7 @@ ff.charset = Form1.DIS.Font.charset
 ff.Size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 End With
-
+SkipFirstClick = True
 With glistN
 .NoEscapeKey = True
 .bypassfirstClick = True
@@ -221,6 +225,7 @@ Set .Font = ff
 .enabled = True
 .StickBar = True
 enabled = True
+ShowAlways = True
 .ShowMe
 End With
 End Sub
@@ -239,7 +244,7 @@ Public Property Get Index() As Long
 Index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Long)
+Friend Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Get locked() As Boolean
@@ -289,6 +294,7 @@ If mIndex >= 0 Then
    Else
       Callback.Callback mesCtrlName + ".PopUp(" + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
       End If
+      OneClick
 Exit Sub
 End If
 End Sub
@@ -299,6 +305,7 @@ Private Sub glistN_PanLeftRight(direction As Boolean)
    Else
       Callback.Callback mesCtrlName + ".DblClick(" + Str(glistN.ListIndex) + "," + Str(direction) + ")"
       End If
+       ' OneClick
 End Sub
 
 Private Sub glistN_ReadListItem(item As Long, content As String)
@@ -342,11 +349,13 @@ End Sub
 
 Private Sub glistN_ScrollMove(item As Long)
 '
+
    If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Move(" + Str(mIndex) + "," + Str(item) + ")"
    Else
       Callback.Callback mesCtrlName + ".Move(" + Str(item) + ")"
       End If
+      glistN.DblClick
 End Sub
 
 Private Sub glistN_ScrollSelected(item As Long, y As Long)
@@ -355,9 +364,10 @@ Private Sub glistN_ScrollSelected(item As Long, y As Long)
    Else
       Callback.Callback mesCtrlName + ".Scroll(" + Str(item) + ")"
       End If
+     ' OneClick
 End Sub
 
-Private Sub glistN_Selected(item As Long)
+Private Sub glistN_selected(item As Long)
 '
 If glistN.PanPos <> 0 Then glistN.PanPos = 0
    If mIndex >= 0 Then
@@ -365,15 +375,16 @@ If glistN.PanPos <> 0 Then glistN.PanPos = 0
    Else
       Callback.Callback mesCtrlName + ".Click(" + Str(item) + ")"
       End If
+        'OneClick
 End Sub
 
 Private Sub glistN_Selected2(item As Long)
-'
    If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".DblClick(" + Str(mIndex) + "," + Str(item) + "," + Str(lastshift) + ")"
    Else
       Callback.Callback mesCtrlName + ".DblClick(" + Str(item) + "," + Str(lastshift) + ")"
       End If
+      OneClick
 End Sub
 
 Private Sub gListN_SpecialColor(RGBcolor As Long)
@@ -482,7 +493,11 @@ End Property
 Public Property Let Text(ByVal vNewValue As Variant)
 On Error Resume Next
 If glistN Is Nothing Then Exit Property
+'If CStr(vNewValue) = vbNullString Then
+'glistN.Text = " "
+'Else
 glistN.Text = CStr(vNewValue)
+'End If
 End Property
 Public Sub Sort(Optional SkipChar As Long = 1)
 If glistN.listcount < 2 Then Exit Sub
@@ -643,6 +658,35 @@ Public Sub SetBarStyle(bColor As Long, Optional bHatch As Long, Optional BHatchC
     glistN.BarHatch = bHatch
     glistN.BarHatchColor = BHatchColor
 End Sub
-Private Sub glistN_SyncKeyboardUnicode(a As String)
+Private Sub glistN_PreviewKeyboardUnicode(ByVal a As String)
 Callback.SpreadKey a
 End Sub
+Private Sub OneClick()
+On Error Resume Next
+If SkipFirstClick Then glistN.PrepareClick
+End Sub
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
+Else
+a = UCase(a)
+Select Case a
+Case "F1" To "F9"
+a = 611 + val(Mid(a, 2))
+Case Else
+a = AscW(a)
+If a > 126 Then a = 0
+End Select
+End If
+If Opcode < 0 Then Opcode = 0
+If a = 0 Then Exit Sub
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc a, ctrlName, Opcode
+End Sub
+Private Sub gListN_AccKey(m As Long)
+Callback.AccProces m
+End Sub
+

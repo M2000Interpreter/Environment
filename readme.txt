@@ -1,6 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 37 active-X
+Version 10 revision 38 active-X
 A lot of work. Examples will be posted in m2000 blog.
 
 

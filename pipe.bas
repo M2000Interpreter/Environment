@@ -1014,7 +1014,9 @@ Dim Cancel As Integer
 Static once
 If once Then Exit Sub
 once = True
+On Error Resume Next
 UseMe.StopTimer
+If Err Then once = False: Exit Sub
 If InitOk = 0 Then
 myToken = InitGDIPlus()
 InitOk = 1

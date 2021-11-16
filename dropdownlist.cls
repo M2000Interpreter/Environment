@@ -47,7 +47,8 @@ Textbox.Prompt = a$ + " " + ChrW$(&H25BC) & " "
 Textbox.glistN.ShowMe
 End Property
 
-Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
+
+Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 If item = -1 Then
 
 Else
@@ -102,8 +103,8 @@ Textbox.SetFocus
 End If
 End Sub
 
-Private Sub glistN_PanLeftRight(Direction As Boolean)
-If Direction = True Then
+Private Sub glistN_PanLeftRight(direction As Boolean)
+If direction = True Then
 Text = glistN.list(glistN.ListIndex)
 End If
 End Sub
@@ -114,6 +115,7 @@ On Error Resume Next
 Set LastGlist = Nothing
 If Err.Number > 0 Then glistN.NoWheel = True
 End Sub
+
 
 Private Sub textbox_KeyDown(KeyCode As Integer, shift As Integer)
 Dim b$
@@ -195,7 +197,7 @@ End If
 End Sub
 
 
-Private Sub textbox_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub textbox_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 If Textbox.glistN.DblClick Then
 Iam = False
 

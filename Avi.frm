@@ -32,6 +32,7 @@ Dim doubleclick As Long
 Dim ERNUM As Long
 Private mInterval As Long
 Private intTimes As Long
+Public previewKey As Boolean
 
 Private Sub Form_Activate()
 
@@ -66,8 +67,8 @@ Private Sub Form_Click()
 If MediaPlayer1.isMoviePlaying Then GETLOST
 End Sub
 
-Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
-KeyCode = 0
+Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
+keycode = 0
 If Form1.Visible Then
 If Form1.TEXT1.Visible Then
 Form1.TEXT1.SetFocus
@@ -90,7 +91,7 @@ GETLOST
 getout = True
 Else
 MediaPlayer1.hideMovie
-MediaPlayer1.FileName = avifile
+MediaPlayer1.Filename = avifile
 Timer1.enabled = False
 Interval = MediaPlayer1.Length
 
