@@ -1,7 +1,7 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Any)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Any)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
 Public Const KEYEVENTF_KEYUP = &H2
 Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
@@ -17,7 +17,7 @@ Private Declare Function GetKeyboardState Lib "user32" (kbArray As KeyboardBytes
 Dim kbArray As KeyboardBytes
 Public fonttest As PictureBox
 Private Declare Function GetTextMetrics Lib "gdi32" _
-Alias "GetTextMetricsA" (ByVal Hdc As Long, _
+Alias "GetTextMetricsA" (ByVal hDC As Long, _
 lpMetrics As TEXTMETRIC) As Long
 Private Type TEXTMETRIC
 tmHeight As Long
@@ -52,7 +52,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -105,7 +105,7 @@ Public Type tagSize
     cX As Long
     cY As Long
 End Type
-Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal Hdc As Long, lpAspectRatio As tagSize) As Long
+Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hDC As Long, lpAspectRatio As tagSize) As Long
 Declare Function CreateRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Declare Function CombineRgn Lib "gdi32" (ByVal hDestRgn As Long, ByVal hSrcRgn1 As Long, ByVal hSrcRgn2 As Long, ByVal nCombineMode As Long) As Long
 Public Declare Function SetWindowRgn Lib "user32" (ByVal hWnd As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
@@ -149,20 +149,20 @@ Type bitmap
         bmBitsPixel As Integer
         bmBits As Long
 End Type
-Declare Function StretchBlt Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
-Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal Hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Declare Function CreateCompatibleDC Lib "gdi32" (ByVal Hdc As Long) As Long
-Declare Function SelectObject Lib "gdi32" (ByVal Hdc As Long, ByVal hObject As Long) As Long
-Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) As Long
+Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hDC As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
+Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
+Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
 Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 'Declare Function GetObject Lib "gdi32" Alias "GetObjectA" (ByVal hObject As Long, ByVal nCount As Long, lpObject As Any) As Long
-Declare Function GetPixel Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long) As Long
-Declare Function SetPixel Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal Hdc As Long, ByVal nIndex As Long) As Long
+Declare Function GetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long) As Long
+Declare Function SetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function GetDesktopWindow Lib "user32" () As Long
-Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal Hdc As Long) As Long
+Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long) As Long
 Private Const BITSPIXEL = 12         '  Number of bits per pixel
 Private Declare Function RegisterClipboardFormat Lib "user32" Alias _
    "RegisterClipboardFormatA" (ByVal lpString As String) As Long
@@ -325,8 +325,9 @@ Public Const KLF_REORDER = &H8
 ''' Size of KeyboardLayoutName (number of characters), including nul terminator
 Public Const KL_NAMELENGTH = 9
 
-Declare Function LoadKeyboardLayout Lib "user32" Alias "LoadKeyboardLayoutA" (ByVal pwszKLID As String, ByVal Flags As Long) As Long
-
+Declare Function LoadKeyboardLayout Lib "user32" Alias "LoadKeyboardLayoutA" (ByVal pwszKLID As String, ByVal flags As Long) As Long
+Declare Function UnloadKeyboardLayout Lib "user32" (ByVal HKL As Long) As Long
+Declare Function ActivateKeyboardLayout Lib "user32" (ByVal HKL As Long, ByVal flags As Long) As Long
 Public Sub PlaceIcon(a As StdPicture)
 On Error Resume Next
 If UseMe Is Nothing Then Exit Sub
@@ -1182,9 +1183,9 @@ If cDibbuffer0.create(myw, myh) Then
 On Error GoTo there
         With bstack.Owner
          If bstack.toprinter Then
-         cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+         cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
          Else
-        cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
             End If
             BACKSPRITE = DIBtoSTR(cDibbuffer0)
         End With
@@ -1265,9 +1266,9 @@ On Error GoTo there
    
 With bstack.Owner
     If bstack.toprinter Then
-        cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
     Else
-        cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
     End If
     If Not nogetback Then BACKSPRITE = DIBtoSTR(cDibbuffer0)
 End With
@@ -1465,9 +1466,9 @@ cDibbuffer0.Cls bckColor
 Else
         With bstack.Owner
         If bstack.toprinter Then
-        cDibbuffer0.LoadPictureBlt .Hdc, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
+        cDibbuffer0.LoadPictureBlt .hDC, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
         Else
-                      cDibbuffer0.LoadPictureBlt .Hdc, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
+                      cDibbuffer0.LoadPictureBlt .hDC, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
            End If
         End With
         End If
@@ -1591,15 +1592,15 @@ Sub Conv24(cDibbuffer0 As Object)
  Dim cDIBbuffer1 As Object
  Set cDIBbuffer1 = New cDIBSection
 Call cDIBbuffer1.create(cDibbuffer0.Width, cDibbuffer0.Height)
-cDIBbuffer1.LoadPictureBlt cDibbuffer0.Hdc
+cDIBbuffer1.LoadPictureBlt cDibbuffer0.hDC
 Set cDibbuffer0 = cDIBbuffer1
 Set cDIBbuffer1 = Nothing
 End Sub
-Public Function CmpHeight_pixels(s As Single) As Single
-CmpHeight_pixels = s * 20# / DYP
+Public Function CmpHeight_pixels(S As Single) As Single
+CmpHeight_pixels = S * 20# / DYP
 End Function
-Public Function CmpHeight(s As Single) As Single
-CmpHeight = s * 20#
+Public Function CmpHeight(S As Single) As Single
+CmpHeight = S * 20#
 End Function
 Public Function FindSpriteByTag(sp As Long) As Long
 Dim i As Long
@@ -1672,21 +1673,21 @@ Public Function ScaleRegion(hRgn As Long, Size As Single) As Long
     End If
      DeleteObject hRgn
 End Function
-Function GetNewSpriteObj(Priority As Long, s$, tr As Long, rr As Long, Optional ByVal SZ As Single = 1, Optional ByVal rot As Single = 0, Optional bb$ = vbNullString) As Long
+Function GetNewSpriteObj(Priority As Long, S$, tr As Long, rr As Long, Optional ByVal SZ As Single = 1, Optional ByVal rot As Single = 0, Optional bb$ = vbNullString) As Long
 Dim photo As Object, myRgn As Long, oldobj As Long
 Dim photo2 As Object
  oldobj = FindSpriteByTag(Priority)
  If oldobj Then
 ' this priority...is used
 ' so change only image
-SpriteGetOtherImage oldobj, s$, tr, rr, SZ, rot, bb$
+SpriteGetOtherImage oldobj, S$, tr, rr, SZ, rot, bb$
 GetNewSpriteObj = oldobj
 
 Exit Function
 Else
       Set photo = New cDIBSection
         Set photo2 = New cDIBSection
-           If cDib(s$, photo) Then
+           If cDib(S$, photo) Then
  
  If rr >= 0 Then
 
@@ -1969,10 +1970,10 @@ If k = 0 Then Exit Sub  ' there is no such a player
     
 
 End Sub
-Private Sub SpriteGetOtherImage(s As Long, b$, tran As Long, rrr As Long, SZ As Single, rot As Single, Optional bb$ = vbNullString) ' before take from priority the original sprite
+Private Sub SpriteGetOtherImage(S As Long, b$, tran As Long, rrr As Long, SZ As Single, rot As Single, Optional bb$ = vbNullString) ' before take from priority the original sprite
 Dim photo As Object, myRgn As Long
 Dim photo2 As Object
-If s < 1 Or s > PobjNum Then Exit Sub
+If S < 1 Or S > PobjNum Then Exit Sub
 
       Set photo = New cDIBSection
        Set photo2 = New cDIBSection
@@ -2014,25 +2015,25 @@ myRgn = RotateRegion(myRgn, (rot), photo.Width * SZ, photo.Height * SZ, SZ)
 Dim oldtag As Long
 
 
-With Form1.dSprite(s)
+With Form1.dSprite(S)
 .Height = photo.Height * DYP * SZ
 .Width = photo.Width * DXP * SZ
 .Picture = photo.Picture(SZ)
-.Left = .Left + players(s).x - .Width / 2
-players(s).x = .Width / 2
-.top = .top + players(s).y - .Height / 2
-players(s).y = .Height / 2
+.Left = .Left + players(S).x - .Width / 2
+players(S).x = .Width / 2
+.top = .top + players(S).y - .Height / 2
+players(S).y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, True)
 ''''''''''''''''''''''''UpdateWindow .hwnd
  DeleteObject myRgn
 
 End With
-With players(s)
+With players(S)
 
 .MAXXGRAPH = .x * 2
 .MAXYGRAPH = .y * 2
 End With
-SetText Form1.dSprite(s)
+SetText Form1.dSprite(S)
 End If
 End Sub
 
@@ -2897,24 +2898,24 @@ Sub SwapStringVariant(ByRef b As Variant, ByRef a As Variant)
    CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(b) + 8, 4
    CopyMemory ByVal VarPtr(b) + 8, ByVal VarPtr(t), 4
 End Sub
-Sub SwapString2Variant(ByRef s$, ByRef a As Variant)
+Sub SwapString2Variant(ByRef S$, ByRef a As Variant)
    Static t As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory ByVal VarPtr(t), ByVal VarPtr(a) + 8, 4
-   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(s$), 4
-   CopyMemory ByVal VarPtr(s$), ByVal VarPtr(t), 4
+   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(S$), 4
+   CopyMemory ByVal VarPtr(S$), ByVal VarPtr(t), 4
 End Sub
-Sub SwapString2VariantPointer(ByRef s$, ByVal a As Long)
+Sub SwapString2VariantPointer(ByRef S$, ByVal a As Long)
    Static t As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory ByVal VarPtr(t), ByVal a + 8, 4
-   CopyMemory ByVal a + 8, ByVal VarPtr(s$), 4
-   CopyMemory ByVal VarPtr(s$), ByVal VarPtr(t), 4
+   CopyMemory ByVal a + 8, ByVal VarPtr(S$), 4
+   CopyMemory ByVal VarPtr(S$), ByVal VarPtr(t), 4
 End Sub
-Sub MoveStringToVariant(ByRef s$, ByRef a As Variant)
+Sub MoveStringToVariant(ByRef S$, ByRef a As Variant)
    Static t As Long ' 4 Longs * 4 bytes each = 16 bytes
    a = vbNullString
    CopyMemory ByVal VarPtr(t), ByVal VarPtr(a) + 8, 4
-   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(s$), 4
-   CopyMemory ByVal VarPtr(s$), ByVal VarPtr(t), 4
+   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(S$), 4
+   CopyMemory ByVal VarPtr(S$), ByVal VarPtr(t), 4
 End Sub
 
 
@@ -3006,7 +3007,7 @@ Sub SwapVariant3(ByRef a As mArray, k As Long, ByRef b As mArray, i As Long)
    CopyMemory ByVal b.itemPtr(i), t(0), 16
 End Sub
 Sub EmptyVariantArrayItem(ByRef b As mArray, i As Long)
-Static a As Variant
+   Dim a As Variant
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory t(0), ByVal VarPtr(a), 16
    CopyMemory ByVal VarPtr(a), ByVal b.itemPtr(i), 16
@@ -3181,7 +3182,7 @@ Case "TO", "TODAY", "TONE", "TOP", "TRIM$(", "TRUE", "TRY", "TUNE", "TWIPSX"
 Case "TWIPSY", "TYPE", "TYPE$(", "UCASE$(", "UINT(", "UNARY", "UNDER", "UNICODE", "UNION.DATA$(", "UNIQUE", "UNTIL"
 Case "UP", "UPDATABLE", "UPDATE", "USE", "USER", "USERS", "USER.NAME$", "USGN("
 Case "VAL(", "VAL$(", "VALID(", "VALUE", "VALUE(", "VALUE$", "VERSION", "VIEW", "VOID", "VOLUME"
-Case "WAIT", "WCHAR", "WEAK", "WEAK$(", "WHILE", "WIDE", "WIDTH", "WIN", "WINDOW"
+Case "WAIT", "WCHAR", "WEAK", "WEAK$(", "WHILE", "WHEN", "WIDE", "WIDTH", "WIN", "WINDOW"
 Case "WITH", "WITHEVENTS", "WORDS", "WRITABLE(", "WRITE", "WRITER", "X.TWIPS", "XOR", "Y.TWIPS", "адеиас", "апеияо", "апой.ая$(", "апой.де$("
 Case "адеиасе", "ахя(", "ай(", "айеяаио.дуадийо(", "айеяаио", "айеяаиос", "акт", "акгхес", "акгхгс", "аккацг", "аккацг$("
 Case "аккане", "аккиыс", "аккиыс.ам", "ам", "ам(", "амап(", "амап$(", "ам$(", "ама", "амафгтгсг", "амахеыягсг", "амайтгсг", "амакоцио"
@@ -3220,8 +3221,8 @@ Case "лецако.сеияас$(", "лецако.сеияас(", "лецецомота", "лецехос", "лецехос.сыяо
 Case "лекыдиа", "леяос", "леяос(", "леяос$(", "лес$(", "лета", "летахесг", "летахесг(", "левяи", "лгдемийос", "лгйос", "лгйос(", "лгйос.елж("
 Case "лий(", "лий$(", "лийяо(", "лийяо.сеияас$(", "лийяо.сеияас(", "лийяос.йатакоцос$(", "лмглг", "ломадиаио", "ломадиаиос", "ломадийо", "лояжг$(", "лоусийг", "лоусийг.летягтгс", "лпип"
 Case "лпяоста(", "маи", "меа", "мео", "меои", "меос", "мгла", "мглата", "мглата$"
-Case "нейима", "одгциа", "одгцос$(", "охомг", "охомес", "олака", "ойм$(", "олада", "олада(", "олада$(", "олада.сумоко(", "омола", "омола.аявеиоу$(", "ояифомтиа"
-Case "омола.аявеиоу.ломо$(", "омола.тлглатос$", "омола.вягстг$", "ояио.амадяолгс", "ояисе", "ояож(", "оуяа", "ови", "паифеижымг", "паийтгс", "паийтгс(", "паине", "пай(", "пай$(", "памта"
+Case "нейима", "одгциа", "одгцос$(", "охомг", "охомес", "олака", "ойм$(", "олада", "олада(", "олада$(", "олада.сумоко(", "омола", "омола.аявеиоу$("
+Case "омола.аявеиоу.ломо$(", "омола.тлглатос$", "омола.вягстг$", "ояифомтиа", "ояио.амадяолгс", "ояисе", "ояож(", "осо", "оуяа", "ови", "паифеижымг", "паийтгс", "паийтгс(", "паине", "пай(", "пай$(", "памта"
 Case "памы", "памылисо(", "паяацяажос$(", "паяацяажос(", "паяал(", "паяал$(", "паяахесг$(", "паяахуяо", "паяалетяои$", "паяе", "паяейаяе$"
 Case "паяелбокг", "патглемо(", "павос", "педиа", "педио", "педио$(", "пеф$(", "пема", "пеяи"
 Case "пеяи$", "пеяихыяио", "пета", "пи", "пимайас", "пимайас$(", "пимайас(", "пимайес", "писы("
@@ -3565,11 +3566,11 @@ Public Function ScrY() As Long
 ScrY = GetSystemMetrics(SM_CYSCREEN) * dv15
 End Function
 
-Public Function MyTrimL3Len(s$) As Long
+Public Function MyTrimL3Len(S$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimL3Len = 0: Exit Function
-  p2 = StrPtr(s): l = l - 1
+  l = Len(S): If l = 0 Then MyTrimL3Len = 0: Exit Function
+  p2 = StrPtr(S): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
   GetMem2 i, p1
@@ -3582,11 +3583,11 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   Next i
  MyTrimL3Len = (i - p2) \ 2
 End Function
-Public Function MyTrimL2(s$) As Long
+Public Function MyTrimL2(S$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimL2 = 1: Exit Function
-  p2 = StrPtr(s): l = l - 1
+  l = Len(S): If l = 0 Then MyTrimL2 = 1: Exit Function
+  p2 = StrPtr(S): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
   GetMem2 i, p1
@@ -3600,11 +3601,11 @@ Dim p2 As Long, p1 As Integer, p4 As Long
  MyTrimL2 = l + 2
 End Function
 
-Public Function MyTrimR(s$) As Long
+Public Function MyTrimR(S$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimR = 1: Exit Function
-  p2 = StrPtr(s): l = l - 1
+  l = Len(S): If l = 0 Then MyTrimR = 1: Exit Function
+  p2 = StrPtr(S): l = l - 1
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
   GetMem2 i, p1
@@ -3619,11 +3620,11 @@ Dim p2 As Long, p1 As Integer, p4 As Long
 End Function
 
 
-Public Function MyTrimL2NoTab(s$) As Long
+Public Function MyTrimL2NoTab(S$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
-  p2 = StrPtr(s): l = l - 1
+  l = Len(S): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
+  p2 = StrPtr(S): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
   GetMem2 i, p1
@@ -3637,14 +3638,14 @@ Dim p2 As Long, p1 As Integer, p4 As Long
  MyTrimL2NoTab = 0
 End Function
 
-Public Function MyTrimRfrom(s$, st As Long, ByVal en As Long) As Long
+Public Function MyTrimRfrom(S$, st As Long, ByVal en As Long) As Long
 Dim i&
 Dim p2 As Long, p1 As Integer, p4 As Long
-  If st > Len(s$) Then MyTrimRfrom = en: Exit Function
-  If en > Len(s$) Then MyTrimRfrom = en: Exit Function
+  If st > Len(S$) Then MyTrimRfrom = en: Exit Function
+  If en > Len(S$) Then MyTrimRfrom = en: Exit Function
   If en <= st Then MyTrimRfrom = en: Exit Function
   If st < 1 Then MyTrimRfrom = en: Exit Function
-  p2 = StrPtr(s) + (st - 1) * 2: en = en - 1
+  p2 = StrPtr(S) + (st - 1) * 2: en = en - 1
   p4 = p2 + (en - st) * 2
   For i = p4 To p2 Step -2
   GetMem2 i, p1
@@ -3658,12 +3659,12 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   Next i
  MyTrimRfrom = st
 End Function
-Public Function MyTrimCR(s$) As String
+Public Function MyTrimCR(S$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(s): If l = 0 Then Exit Function
+l = Len(S): If l = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
+  p2 = StrPtr(S): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
@@ -3685,16 +3686,16 @@ l = Len(s): If l = 0 Then Exit Function
   End Select
   Next i
   p2 = i
-  If p2 > p4 Then MyTrimCR = vbNullString Else MyTrimCR = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+  If p2 > p4 Then MyTrimCR = vbNullString Else MyTrimCR = Mid$(S$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
  
 End Function
 
-Public Function MyTrim(s$) As String
+Public Function MyTrim(S$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(s): If l = 0 Then Exit Function
+l = Len(S): If l = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
+  p2 = StrPtr(S): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
@@ -3716,15 +3717,15 @@ l = Len(s): If l = 0 Then Exit Function
   End Select
   Next i
   p2 = i
-  If p2 > p4 Then MyTrim = vbNullString Else MyTrim = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+  If p2 > p4 Then MyTrim = vbNullString Else MyTrim = Mid$(S$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
  
 End Function
-Public Function MyTrimLW(s$) As String
+Public Function MyTrimLW(S$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(s): If l = 0 Then Exit Function
+l = Len(S): If l = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
+  p2 = StrPtr(S): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
@@ -3737,15 +3738,15 @@ l = Len(s): If l = 0 Then Exit Function
   End Select
   Next i
   p2 = i
-  If p2 > p4 Then MyTrimLW = vbNullString Else MyTrimLW = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+  If p2 > p4 Then MyTrimLW = vbNullString Else MyTrimLW = Mid$(S$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
  
 End Function
-Public Function MyTrimRW(s$) As String
+Public Function MyTrimRW(S$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(s): If l = 0 Then Exit Function
+l = Len(S): If l = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
+  p2 = StrPtr(S): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
@@ -3757,16 +3758,16 @@ l = Len(s): If l = 0 Then Exit Function
   End Select
   Next i
   p4 = i
-   If p2 > p4 Then MyTrimRW = vbNullString Else MyTrimRW = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+   If p2 > p4 Then MyTrimRW = vbNullString Else MyTrimRW = Mid$(S$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
  
 End Function
 
-Public Function MyTrimRB(s$) As String
+Public Function MyTrimRB(S$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = LenB(s): If l = 0 Then Exit Function
+l = LenB(S): If l = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
+  p2 = StrPtr(S): l = l - 1
   p22 = p2
   p4 = p2 + l
   For i = p4 To p2 Step -1
@@ -3778,15 +3779,15 @@ l = LenB(s): If l = 0 Then Exit Function
   End Select
   Next i
   p4 = i
-  If p2 > p4 Then MyTrimRB = vbNullString Else MyTrimRB = MidB$(s$, (p2 - p22) + 1, (p4 - p2) + 1)
+  If p2 > p4 Then MyTrimRB = vbNullString Else MyTrimRB = MidB$(S$, (p2 - p22) + 1, (p4 - p2) + 1)
  
 End Function
-Public Function MyTrimLB(s$) As String
+Public Function MyTrimLB(S$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = LenB(s): If l = 0 Then Exit Function
+l = LenB(S): If l = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
+  p2 = StrPtr(S): l = l - 1
   p22 = p2
   p4 = p2 + l
   For i = p2 To p4 Step 1
@@ -3799,15 +3800,15 @@ l = LenB(s): If l = 0 Then Exit Function
   End Select
     Next i
     p2 = i
-  If p2 > p4 Then MyTrimLB = vbNullString Else MyTrimLB = MidB$(s$, (p2 - p22) + 1, (p4 - p2) + 1)
+  If p2 > p4 Then MyTrimLB = vbNullString Else MyTrimLB = MidB$(S$, (p2 - p22) + 1, (p4 - p2) + 1)
  
 End Function
-Public Function MyTrimB(s$) As String
+Public Function MyTrimB(S$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = LenB(s): If l = 0 Then Exit Function
+l = LenB(S): If l = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
+  p2 = StrPtr(S): l = l - 1
   p22 = p2
   p4 = p2 + l
   For i = p4 To p2 Step -1
@@ -3830,7 +3831,7 @@ l = LenB(s): If l = 0 Then Exit Function
   End Select
   Next i
   p2 = i
-  If p2 > p4 Then MyTrimB = vbNullString Else MyTrimB = MidB$(s$, (p2 - p22) + 1, (p4 - p2) + 1)
+  If p2 > p4 Then MyTrimB = vbNullString Else MyTrimB = MidB$(S$, (p2 - p22) + 1, (p4 - p2) + 1)
  
 End Function
 Function IsLabelAnew(where$, a$, R$, Lang As Long) As Long
@@ -4696,7 +4697,7 @@ If Err.Number > 0 Then aSize = 12: fonttest.Font.Size = aSize
 End Sub
 Public Function InternalLeadingSpace() As Long
 On Error Resume Next
-    GetTextMetrics fonttest.Hdc, tm
+    GetTextMetrics fonttest.hDC, tm
   With tm
 InternalLeadingSpace = (.tmInternalLeading = 0) Or Not (.tmInternalLeading > 0)
 End With
@@ -4704,7 +4705,7 @@ End Function
 Public Function AverCharSpace(ddd As Object, Optional breakchar) As Long
 On Error Resume Next
 Dim tmm As TEXTMETRIC
-    GetTextMetrics ddd.Hdc, tmm
+    GetTextMetrics ddd.hDC, tmm
   With tmm
 AverCharSpace = .tmAveCharWidth
 breakchar = .tmBreakChar
@@ -4776,10 +4777,8 @@ NullVariant alfa
 Debug.Print IsNull(alfa), myIsNull(alfa)
 End Sub
 Sub SendAKey(ByVal keycode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
-Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long
+Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long, Old As Long
 Const key_release As Byte = 2
-' see locale$(94)
-LoadKeyboardLayout "00000408", KLF_ACTIVATE
 If keycode > 500 Then extended = 1: keycode = keycode - 500
 If Not extended Then
 If keycode > 64 And keycode < 91 Then
@@ -4804,11 +4803,26 @@ keybd_event keycode, Map, KEYEVENTF_KEYUP + extended, 0
 If shift Then keybd_event &H10, smap, KEYEVENTF_KEYUP, 0
 If ctrl Then keybd_event &H11, cmap, KEYEVENTF_KEYUP, 0
 If alt Then keybd_event &H12, amap, KEYEVENTF_KEYUP, 0
+
 End Sub
 Public Function CapsLockOn() As Boolean
     GetKeyboardState kbArray
     CapsLockOn = (kbArray.kbByte(VK_CAPITAL) And 1) = 1
 End Function
-
-Sub testvar()
+Public Sub ChangeTo408()
+    Dim Old
+    Old = ActivateKeyboardLayout((408), &H100&)
+    If Old = 0 Then
+    LoadKeyboardLayout "00000408", KLF_ACTIVATE
+    End If
 End Sub
+Public Sub ChangeTo409()
+    Dim Old
+    Old = ActivateKeyboardLayout((409), &H100&)
+    If Old = 0 Then
+    LoadKeyboardLayout "00000409", KLF_ACTIVATE
+    End If
+End Sub
+Public Function Keyboards(what) As String
+   Keyboards = GetlocaleString2(94&, what)
+End Function

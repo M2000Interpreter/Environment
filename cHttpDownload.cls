@@ -31,7 +31,7 @@ Private Const MODULE_NAME As String = "cHttpDownload"
 '=========================================================================
 ' Events
 '=========================================================================
-Event Start(ByVal remobtehost$, ByVal remoteport As Long)
+Event Start(ByVal remotehost$, ByVal remoteport As Long)
 Event DownloadProgress(ByVal BytesRead As Double, ByVal BytesTotal As Double)
 Event DownloadError(ByVal Number As Long, ByVal Description As String)
 Event DownloadComplete(ByVal LocalFileName As String)
@@ -82,7 +82,7 @@ End Enum
 Private Type UcsParsedUrl
     Protocol        As String
     Host            As String
-    port            As Long
+    Port            As Long
     Path            As String
     User            As String
     Pass            As String
@@ -151,12 +151,12 @@ Public Sub DownloadFile(url As String, LocalFileName As String)
         On Error GoTo 0
         Err.Raise vbObjectError, , m_oSocket.GetErrorDescription(m_oSocket.LastError)
     End If
-    If Not m_oSocket.Connect(m_uRemote.Host, m_uRemote.port) Then
+    If Not m_oSocket.Connect(m_uRemote.Host, m_uRemote.Port) Then
         On Error GoTo 0
         Err.Raise vbObjectError, , m_oSocket.GetErrorDescription(m_oSocket.LastError)
     End If
     ' debug.print "Start:", m_uRemote.Host
-    RaiseEvent Start(m_uRemote.Host, m_uRemote.port)
+    RaiseEvent Start(m_uRemote.Host, m_uRemote.Port)
     Exit Sub
 EH:
     PrintError FUNC_NAME
@@ -214,7 +214,7 @@ Private Function pvRecvHeaders(baBuffer() As Byte) As Boolean
                 pvSetError m_oSocket.LastError
                 GoTo QH
             End If
-            If Not m_oSocket.Connect(m_uRemote.Host, m_uRemote.port) Then
+            If Not m_oSocket.Connect(m_uRemote.Host, m_uRemote.Port) Then
                 pvSetError m_oSocket.LastError
                 GoTo QH
             End If
@@ -302,17 +302,17 @@ Private Function pvParseUrl(sUrl As String, uParsed As UcsParsedUrl) As Boolean
     .Pass = GetUrlParts(sUrl, URL_PART_PASSWORD)
     .Path = GetUrlPath(sUrl)
      If Len(.Path) = 0 Then .Path = "/"
-    .port = CLng("0" + GetUrlParts(sUrl, URL_PART_PORT))
+    .Port = CLng("0" + GetUrlParts(sUrl, URL_PART_PORT))
     .Protocol = GetUrlParts(sUrl, URL_PART_SCHEME)
     .User = GetUrlParts(sUrl, URL_PART_USERNAME)
-    If .port = 0 Then
+    If .Port = 0 Then
         Select Case LCase$(uParsed.Protocol)
         Case "https"
-            uParsed.port = 443
+            uParsed.Port = 443
         Case "socks5"
-            uParsed.port = 1080
+            uParsed.Port = 1080
         Case Else
-            uParsed.port = 80
+            uParsed.Port = 80
         End Select
     End If
     pvParseUrl = True

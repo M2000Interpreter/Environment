@@ -1,8 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 38 active-X
-A lot of work. Examples will be posted in m2000 blog.
-
+Version 10 revision 39 active-X
+New flow control Do When or Repeat When
+This is opposite to Do Until or Repeat Until
+Some bug fixes and a new HttpRequest object for Https/Http Requests.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

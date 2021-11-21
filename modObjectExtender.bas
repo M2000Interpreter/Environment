@@ -9,7 +9,7 @@ Private Declare Function ObjSetAddRef Lib "msvbvm60.dll" Alias "__vbaObjSetAddre
 
 Public Type EventSink
     pVTable     As Long     ' VTable pointer
-    pClass      As Long     ' ComShinkEvent pointer
+    pClass      As Long     ' ComShinkEvent pointer | mServer Pointer
     cRef        As Long     ' reference counter
     IID         As GUID     ' interface IID
     hMem        As Long     ' memory address
@@ -216,11 +216,11 @@ Private Function ObjExt_Invoke(this As EventSink, _
 
     ' get the object extender class
     ' which owns this event sink
-    Dim objext  As ComShinkEvent
-    Set objext = ResolveObjPtr(this.pClass)
-
+        Dim objext  As ComShinkEvent
+        Set objext = ResolveObjPtr(this.pClass)
+        objext.fireevent dispIdMember, pDispParams
     ' forward the event
-    objext.fireevent dispIdMember, pDispParams
+    
 End Function
 
 Public Function CreateEventSink(IID As GUID, objext As ComShinkEvent) As Object
@@ -242,7 +242,6 @@ Public Function CreateEventSink(IID As GUID, objext As ComShinkEvent) As Object
     ' return the object
     CpyMem CreateEventSink, sink.hMem, 4&
 End Function
-
 Private Function addr(p As Long) As Long
     addr = p
 End Function
@@ -337,3 +336,49 @@ Private Sub AddByte(pASM As Long, bt As Byte)
     CpyMem ByVal pASM, bt, 1
     pASM = pASM + 1
 End Sub
+Private Function CallCdecl( _
+    ByVal lpfn As Long, _
+    ParamArray Args() As Variant _
+) As Long
+
+    Dim btASM(&HEC00& - 1)  As Byte
+    Dim pASM                As Long
+    Dim btArgSize           As Byte
+    Dim i                   As Integer
+
+    pASM = VarPtr(btASM(0))
+
+    If UBound(Args) = 0 Then
+        If IsArray(Args(0)) Then
+            For i = UBound(Args(0)) To 0 Step -1
+                AddPush pASM, CLng(Args(0)(i))    ' PUSH dword
+                btArgSize = btArgSize + 4
+            Next
+        Else
+            For i = UBound(Args) To 0 Step -1
+                AddPush pASM, CLng(Args(i))       ' PUSH dword
+                btArgSize = btArgSize + 4
+            Next
+        End If
+    Else
+        For i = UBound(Args) To 0 Step -1
+            AddPush pASM, CLng(Args(i))           ' PUSH dword
+            btArgSize = btArgSize + 4
+        Next
+    End If
+
+    AddByte pASM, &HB8
+    AddLong pASM, lpfn
+    AddByte pASM, &HFF
+    AddByte pASM, &HD0
+    AddByte pASM, &H83
+    AddByte pASM, &HC4
+    AddByte pASM, btArgSize
+    AddByte pASM, &HC2
+    AddByte pASM, &H10
+    AddByte pASM, &H0
+
+    CallCdecl = CallWindowProcA(VarPtr(btASM(0)), _
+                               0, 0, 0, 0)
+End Function
+

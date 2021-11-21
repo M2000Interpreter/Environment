@@ -71,9 +71,9 @@ Attribute VB_Exposed = False
 Option Explicit
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private Declare Function DestroyCaret Lib "user32" () As Long
-Private Declare Function DrawIconEx Lib "user32" (ByVal Hdc As Long, ByVal xLeft As Long, ByVal yTop As Long, ByVal hIcon As Long, ByVal cxWidth As Long, ByVal cyWidth As Long, ByVal istepIfAniCur As Long, ByVal hbrFlickerFreeDraw As Long, ByVal diFlags As Long) As Long
+Private Declare Function DrawIconEx Lib "user32" (ByVal hDC As Long, ByVal xLeft As Long, ByVal yTop As Long, ByVal hIcon As Long, ByVal cxWidth As Long, ByVal cyWidth As Long, ByVal istepIfAniCur As Long, ByVal hbrFlickerFreeDraw As Long, ByVal diFlags As Long) As Long
 Private Declare Function DrawState Lib "user32" Alias "DrawStateA" _
-        (ByVal Hdc As Long, _
+        (ByVal hDC As Long, _
         ByVal hBrush As Long, _
         ByVal lpDrawStateProc As Long, _
         ByVal lParam As Long, _
@@ -92,7 +92,7 @@ Private Declare Function SetWindowTextW Lib "user32" (ByVal hWnd As Long, ByVal 
     Private Const GWL_WNDPROC = -4
     Private m_Caption As String
 Dim setupxy As Single
-Dim Lx As Single, ly As Single, dr As Boolean
+Dim Lx As Single, lY As Single, dr As Boolean
 Dim scrTwips As Long
 Dim bordertop As Long, borderleft As Long
 Dim allwidth As Long, itemWidth As Long
@@ -426,7 +426,7 @@ Private Sub Form_Click()
 On Error Resume Next
 If gList2.Visible Then gList2.SetFocus
 If mIndex > -1 Then
-    Callback mMyName$ + ".Click(" + CStr(Index) + ")"
+    Callback mMyName$ + ".Click(" + CStr(index) + ")"
 Else
     Callback mMyName$ + ".Click()"
 End If
@@ -435,7 +435,7 @@ Friend Sub SpreadKey(strKey As String)
 Dim VR(1)
 VR(0) = strKey
 If mIndex > -1 Then
-    CallbackNow mMyName$ + ".KeyPreview(" + CStr(Index) + ")", VR()
+    CallbackNow mMyName$ + ".KeyPreview(" + CStr(index) + ")", VR()
 Else
     CallbackNow mMyName$ + ".KeyPreview()", VR()
 End If
@@ -462,10 +462,10 @@ ResizeMark.Width = MarkSize * dv15
 ResizeMark.Height = MarkSize * dv15
 ResizeMark.Left = Width - MarkSize * dv15
 ResizeMark.top = Height - MarkSize * dv15
-Dim xx As Long
-xx = GetPixel(Me.Hdc, Width - MarkSize * dv15, Height - MarkSize * dv15)
-If xx <> -1 Then
-ResizeMark.backcolor = xx
+Dim XX As Long
+XX = GetPixel(Me.hDC, Width - MarkSize * dv15, Height - MarkSize * dv15)
+If XX <> -1 Then
+ResizeMark.backcolor = XX
 End If
 ResizeMark.Visible = Sizable
 If Sizable Then ResizeMark.ZOrder 0
@@ -566,7 +566,7 @@ End Sub
 Private Sub Form_LostFocus()
 If Not IamPopUp Then mHover = ""
 If mIndex > -1 Then
-    Callback mMyName$ + ".LostFocus(" + CStr(Index) + ")"
+    Callback mMyName$ + ".LostFocus(" + CStr(index) + ")"
 Else
     Callback mMyName$ + ".LostFocus()"
 End If
@@ -606,7 +606,7 @@ If Button > 0 And Targets Then
             Case Else
             
             If mIndex > -1 Then
-                Callback mMyName$ + ".Target" + "(" + CStr(Index) + "," + Str(sel& + prive * 10000) + ")"
+                Callback mMyName$ + ".Target" + "(" + CStr(index) + "," + Str(sel& + prive * 10000) + ")"
             Else
                 Callback mMyName$ + ".Target" + "(" + Str(sel& + prive * 10000) + ")"
             End If
@@ -624,7 +624,7 @@ End If
 
 
 If mIndex > -1 Then
-    Callback mMyName$ + ".MouseDown(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+    Callback mMyName$ + ".MouseDown(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 Else
     Callback mMyName$ + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 End If
@@ -640,7 +640,7 @@ If Not Relax Then
 Relax = True
 
 If mIndex > -1 Then
-Callback mMyName$ + ".MouseMove(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback mMyName$ + ".MouseMove(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 Else
 Callback mMyName$ + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 End If
@@ -655,7 +655,7 @@ If Not Relax Then
 Relax = True
 
 If mIndex > -1 Then
-Callback mMyName$ + ".MouseUp(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback mMyName$ + ".MouseUp(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 Else
 Callback mMyName$ + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 End If
@@ -683,6 +683,7 @@ ElseIf mModalid <> 0 And Visible Then
 Else
 mModalIdPrev = 0
 Quit = Not byPassCallback
+If Quit And Visible Then Visible = False
 End If
 End Sub
 
@@ -690,7 +691,7 @@ Private Sub Form_Resize()
 If Me.WindowState <> 0 Then WindowState = 0: Exit Sub
 gList2.MoveTwips 0, 0, Me.Width, gList2.HeightTwips
 ResizeMark.move Width - ResizeMark.Width, Height - ResizeMark.Height
-ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
 End Sub
 
 
@@ -707,20 +708,20 @@ If mTimes > 0 Then
     gList2.BlinkON = False: gList2.CapColor = mBarColor
     If Stored Then RestoreBlibkStatus
     Else
-        state Face
+        State Face
     End If
 Else
-    state Face
+    State Face
 End If
 gList2.ShowMe
 If Stored Then Exit Sub
   If mIndex >= 0 Then
-   Callback mMyName$ + ".Blink(" + Str(Index) + "," + Str(Face) + ")"
+   Callback mMyName$ + ".Blink(" + Str(index) + "," + Str(Face) + ")"
    Else
       Callback mMyName$ + ".Blink(" + Str(Face) + ")"
       End If
 End Sub
-Public Sub state(Face As Boolean)
+Public Sub State(Face As Boolean)
     If Face Then
         gList2.CapColor = rgb(255, 160, 0)
     Else
@@ -756,7 +757,7 @@ Stored = False
 End Sub
 Private Sub gList2_CtrlPlusF1()
     If mIndex > -1 Then
-        Callback mMyName$ + ".About(" + CStr(Index) + ")"
+        Callback mMyName$ + ".About(" + CStr(index) + ")"
     Else
         Callback mMyName$ + ".About()"
     End If
@@ -764,7 +765,7 @@ End Sub
 
 Private Sub gList2_EnterOnly()
     If mIndex > -1 Then
-        Callback mMyName$ + ".Enter(" + CStr(Index) + ")"
+        Callback mMyName$ + ".Enter(" + CStr(index) + ")"
     Else
         Callback mMyName$ + ".Enter()"
     End If
@@ -821,7 +822,7 @@ If gList2.SingleClickCheck(Button, item, x, y, setupxy * (1 + 2 * infopos) / 2, 
             OpenInfo
         Else
             If mIndex > -1 Then
-                Callback mMyName$ + ".Info(" + CStr(Index) + "," + CStr(x) + "," + CStr(y) + ")"
+                Callback mMyName$ + ".Info(" + CStr(index) + "," + CStr(x) + "," + CStr(y) + ")"
             Else
                 Callback mMyName$ + ".Info(" + CStr(x) + "," + CStr(y) + ")"
             End If
@@ -885,22 +886,22 @@ If mSizable And mShowMaximize Then
             End With
         End If
         If mIndex > -1 Then
-           Callback mMyName$ + ".Resize(" + CStr(Index) + ")"
+           Callback mMyName$ + ".Resize(" + CStr(index) + ")"
         Else
            Callback mMyName$ + ".Resize()"
         End If
-        ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+        ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
         If IhaveLastPos Then
                 
                 If mIndex > -1 Then
-                    Callback mMyName$ + ".Maximized(" + CStr(Index) + ")"
+                    Callback mMyName$ + ".Maximized(" + CStr(index) + ")"
                 Else
                     Callback mMyName$ + ".Maximized()"
                 End If
                 MenuSet 2
         Else
                 If mIndex > -1 Then
-                    Callback mMyName$ + ".Restored(" + CStr(Index) + ")"
+                    Callback mMyName$ + ".Restored(" + CStr(index) + ")"
                 Else
                     Callback mMyName$ + ".Restored()"
                 End If
@@ -927,7 +928,7 @@ If gList2.SingleClickCheck(Button, item, x, y, gList2.WidthPixels - setupxy * (1
             OpenInfo
         Else
             If mIndex > -1 Then
-                Callback mMyName$ + ".Info(" + CStr(Index) + "," + CStr(x) + "," + CStr(y) + ")"
+                Callback mMyName$ + ".Info(" + CStr(index) + "," + CStr(x) + "," + CStr(y) + ")"
             Else
                 Callback mMyName$ + ".Info(" + CStr(x) + "," + CStr(y) + ")"
             End If
@@ -982,21 +983,21 @@ If mSizable And mShowMaximize Then
             
         End If
         If mIndex > -1 Then
-           Callback mMyName$ + ".Resize(" + CStr(Index) + ")"
+           Callback mMyName$ + ".Resize(" + CStr(index) + ")"
         Else
            Callback mMyName$ + ".Resize()"
         End If
-        ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+        ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
         If IhaveLastPos Then
                 If mIndex > -1 Then
-                    Callback mMyName$ + ".Maximized(" + CStr(Index) + ")"
+                    Callback mMyName$ + ".Maximized(" + CStr(index) + ")"
                 Else
                     Callback mMyName$ + ".Maximized()"
                 End If
                 MenuSet 2
         Else
                 If mIndex > -1 Then
-                    Callback mMyName$ + ".Restored(" + CStr(Index) + ")"
+                    Callback mMyName$ + ".Restored(" + CStr(index) + ")"
                 Else
                     Callback mMyName$ + ".Restrored()"
                 End If
@@ -1118,11 +1119,14 @@ For Each w In GuiControls
 Next w
 End If
 If ttl Then If Not MyForm3 Is Nothing Then Unload MyForm3
+VisibleOldState = False
 If Not safeform Is Nothing Then
 If safeform.ExistKey(hWnd) Then safeform.ValueStr = "skip"
 End If
+
 If TaskMaster Is Nothing Then Exit Sub
 TaskMaster.CheckThreadsForThisObject Me
+
 End Sub
 Private Sub FillBack(thathDC As Long, there As RECT, bgcolor As Long)
 Dim my_brush As Long
@@ -1412,11 +1416,11 @@ Else
 End If
 CaptionW = gList2.HeadLine
 End Property
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Friend Property Let Index(ByVal RHS As Long)
+Friend Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Sub CloseNow()
@@ -1439,9 +1443,9 @@ Set w = Nothing
 Unload Me
     End If
 End Sub
-Public Function Control(Index) As Object
+Public Function Control(index) As Object
 On Error Resume Next
-Set Control = Controls(Index)
+Set Control = Controls(index)
 If Err > 0 Then Set Control = Me
 End Function
 Public Sub Opacity(mAlpha, Optional mlColor = 0, Optional mTRMODE = 0)
@@ -1452,7 +1456,7 @@ If Not Sizable Then
 If MY_BACK Is Nothing Then Set MY_BACK = New cDIBSection
 MY_BACK.ClearUp
 If MY_BACK.create(Width / DXP, Height / DYP) Then
-MY_BACK.LoadPictureBlt Hdc
+MY_BACK.LoadPictureBlt hDC
 If MY_BACK.bitsPerPixel <> 24 Then Conv24 MY_BACK
 End If
 End If
@@ -1460,7 +1464,7 @@ End Sub
 Public Sub Release()
 If Not Sizable Then
 If MY_BACK Is Nothing Then Exit Sub
-MY_BACK.PaintPicture Hdc
+MY_BACK.PaintPicture hDC
 End If
 End Sub
 
@@ -1528,14 +1532,14 @@ SendFKEY a
 End If
 End Sub
 
-Private Sub gList2_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = 115 And shift = 4 Then
+Private Sub gList2_KeyDown(keycode As Integer, shift As Integer)
+If keycode = 115 And shift = 4 Then
 ByeBye
 Exit Sub
 End If
 If moveMe Then
 If shift = 0 Then
-Select Case KeyCode
+Select Case keycode
 Case vbKeyLeft
 movemeX = movemeX - 10 * dv15
 Case vbKeyRight
@@ -1556,9 +1560,9 @@ Case Else
         End If
     Exit Sub
 End Select
-KeyCode = 0
+keycode = 0
 Else
-Select Case KeyCode
+Select Case keycode
 Case vbKeyLeft
 movemeX = movemeX - dv15
 Case vbKeyRight
@@ -1568,7 +1572,7 @@ movemeY = movemeY - dv15
 Case vbKeyDown
 movemeY = movemeY + dv15
 End Select
-KeyCode = 0
+keycode = 0
 End If
 If Not sizeMe Then
 gList2.FloatListMe True, movemeX, movemeY
@@ -1581,7 +1585,7 @@ If VirtualScreenWidth < movemeX Then movemeX = VirtualScreenWidth
 
                 move Me.Left, Me.top, movemeX, movemeY
                 If mIndex > -1 Then
-                    Callback mMyName$ + ".Resize(" + CStr(Index) + ")"
+                    Callback mMyName$ + ".Resize(" + CStr(index) + ")"
                 Else
                     Callback mMyName$ + ".Resize()"
                 End If
@@ -1589,21 +1593,21 @@ If VirtualScreenWidth < movemeX Then movemeX = VirtualScreenWidth
                 
 
 End If
-KeyCode = 0
+keycode = 0
 Exit Sub
 Else
 
 Dim VR(2)
-VR(0) = KeyCode
+VR(0) = keycode
 VR(1) = shift
 If mIndex > -1 Then
-    CallbackNow mMyName$ + ".KeyDown(" + CStr(Index) + ")", VR()
+    CallbackNow mMyName$ + ".KeyDown(" + CStr(index) + ")", VR()
 Else
     CallbackNow mMyName$ + ".KeyDown()", VR()
 End If
 shift = VR(1)
-KeyCode = VR(0)
-If KeyCode = 40 Then
+keycode = VR(0)
+If keycode = 40 Then
 If NoEventInfo Then
 If Not Pad.Visible Then OpenInfo
 End If
@@ -1769,14 +1773,14 @@ SendFKEY a
 End If
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyRight Then
+Private Sub glistN_KeyDown(keycode As Integer, shift As Integer)
+If keycode = vbKeyLeft Or keycode = vbKeyRight Then
 
-KeyCode = 0
+keycode = 0
 
 Pad.Visible = False
-ElseIf KeyCode = 9 Then
-KeyCode = 0
+ElseIf keycode = 9 Then
+keycode = 0
 Pad.Visible = False
 End If
 End Sub
@@ -1798,7 +1802,7 @@ If Sizable And Not dr Then
     dr = Button = 1
     ResizeMark.mousepointer = vbSizeNWSE
     Lx = x
-    ly = y
+    lY = y
     If dr Then Exit Sub
     
     End If
@@ -1814,20 +1818,20 @@ If Not Relax Then
     If Button = 0 Then If dr Then Me.mousepointer = 0: dr = False: Relax = False: Exit Sub
     Relax = True
     If dr Then
-         If y < (Height - 150) Or y >= Height Then addy = (y - ly) Else addy = dv15 * 5
+         If y < (Height - 150) Or y >= Height Then addy = (y - lY) Else addy = dv15 * 5
          If x < (Width - 150) Or x >= Width Then addX = (x - Lx) Else addX = dv15 * 5
          If Width + addX >= 1800 And Width + addX < VirtualScreenWidth() Then
              If Height + addy >= 1800 And Height + addy < VirtualScreenHeight() Then
                 Lx = x
-                ly = y
+                lY = y
                 move Left, top, Width + addX, Height + addy
                 IhaveLastPos = False
                 If mIndex > -1 Then
-                    Callback mMyName$ + ".Resize(" + CStr(Index) + ")"
+                    Callback mMyName$ + ".Resize(" + CStr(index) + ")"
                 Else
                     Callback mMyName$ + ".Resize()"
                 End If
-                ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+                ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
             End If
         End If
         Relax = False
@@ -1838,7 +1842,7 @@ If Not Relax Then
                     dr = Button = 1
                     ResizeMark.mousepointer = vbSizeNWSE
                     Lx = x
-                    ly = y
+                    lY = y
                     If dr Then Relax = False: Exit Sub
                 Else
                     ResizeMark.mousepointer = 0
@@ -1876,11 +1880,11 @@ If vNewValue \ dv15 > 1 Then
 End If
 End Property
 
-Public Property Get header() As Variant
-header = gList2.Visible
+Public Property Get Header() As Variant
+Header = gList2.Visible
 End Property
 
-Public Property Let header(ByVal vNewValue As Variant)
+Public Property Let Header(ByVal vNewValue As Variant)
 gList2.Visible = vNewValue
 End Property
 
@@ -1958,17 +1962,17 @@ Case 2
 Case 3
     If Maximize(True) Then
             If mIndex > -1 Then
-           Callback mMyName$ + ".Resize(" + CStr(Index) + ")"
+           Callback mMyName$ + ".Resize(" + CStr(index) + ")"
         Else
            Callback mMyName$ + ".Resize()"
         End If
-        ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+        ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
     MenuSet 2
     End If
 Case 4
     If Maximize(False) Then
             If mIndex > -1 Then
-           Callback mMyName$ + ".Resize(" + CStr(Index) + ")"
+           Callback mMyName$ + ".Resize(" + CStr(index) + ")"
         Else
            Callback mMyName$ + ".Resize()"
         End If
@@ -2034,7 +2038,7 @@ Case 2
 Case 3
     If Maximize(True) Then
             If mIndex > -1 Then
-           Callback mMyName$ + ".Resize(" + CStr(Index) + ")"
+           Callback mMyName$ + ".Resize(" + CStr(index) + ")"
         Else
            Callback mMyName$ + ".Resize()"
         End If
@@ -2043,7 +2047,7 @@ Case 3
 Case 4
     If Maximize(False) Then
             If mIndex > -1 Then
-           Callback mMyName$ + ".Resize(" + CStr(Index) + ")"
+           Callback mMyName$ + ".Resize(" + CStr(index) + ")"
         Else
            Callback mMyName$ + ".Resize()"
         End If

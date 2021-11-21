@@ -185,15 +185,15 @@ IndexNew = True
 mIndex = 0
 OptVariant mIndex
 End Sub
-Public Property Get Index() As Variant
-Index = mIndex
+Public Property Get index() As Variant
+index = mIndex
 End Property
 Public Sub ArrayIndex(ParamArray RHS())
 'IndexNew = True
     mIndex = RHS
 End Sub
 
-Public Property Let Index(ByVal RHS As Variant)
+Public Property Let index(ByVal RHS As Variant)
 IndexNew = True
 mIndex = RHS
 End Property
@@ -202,7 +202,7 @@ If idx Is Nothing Then Exit Sub
 IndexNew = True
 UseIndex = True
 If IndexList Is Nothing Then
-    If idx.count = 1 Then
+    If idx.Count = 1 Then
        idx.Dump 0, mIndex
     Else
     idx.GetArr mIndex

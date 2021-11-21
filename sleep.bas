@@ -533,7 +533,7 @@ Loop Until a > b.MARKTWO
 End Sub
 Public Sub SleepWaitEdit(bstack As basetask, lNumberOf10ThmiliSeconds As Long)
 On Error Resume Next
-If Forms.count < 3 Then
+If Forms.Count < 3 Then
 Sleep 1
  DoEvents
 Exit Sub
@@ -618,7 +618,7 @@ End Sub
         
 Public Sub SleepWaitEdit2(lNumberOf10ThmiliSeconds As Long)
 On Error Resume Next
-If Forms.count < 3 Then
+If Forms.Count < 3 Then
 Sleep 1
 DoEvents
 Exit Sub
@@ -684,7 +684,7 @@ End If
 
                         If Not handlepopup Then
                             If Screen.ActiveForm.PopUpMenuVal Then
-                            lastpopup = Screen.ActiveForm.Hdc
+                            lastpopup = Screen.ActiveForm.hDC
                             handlepopup = True
                             End If
                        ElseIf GetForegroundWindow <> Screen.ActiveForm.hWnd Then
@@ -708,7 +708,7 @@ Sub SetVisibleByHDC(whatHDC As Long, setit As Long)
 Dim k As Form
 On Error Resume Next
 For Each k In Forms
-    If k.Hdc = whatHDC Then k.Visible = setit
+    If k.hDC = whatHDC Then k.Visible = setit
 Next k
 
 End Sub

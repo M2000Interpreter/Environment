@@ -122,7 +122,7 @@ Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not
 Private Const DWL_ANYTHREAD& = 0&
 Const LOCALE_ILANGUAGE = 1&
 Private OldPar As Long, dragCharpos As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private Type DRAWTEXTPARAMS
      cbSize As Long
      iTabLength As Long
@@ -133,9 +133,9 @@ End Type
 Dim tParam As DRAWTEXTPARAMS
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
 Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT) As Long
-Private Declare Function SelectClipRgn Lib "gdi32" (ByVal Hdc As Long, ByVal hRgn As Long) As Long
+Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal Hdc As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
+Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hDC As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
 Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 
 'nTabPositions  here we use 1
@@ -255,8 +255,8 @@ End Function
 Public Sub HorSrcoll(widthtwips As Long)
 glistN.PanPos = widthtwips
 End Sub
-Public Property Get FileName() As String
-FileName = myfilename
+Public Property Get Filename() As String
+Filename = myfilename
 End Property
 Sub NewTitle(RHS As String, addpixelstoo As Long, Optional factor As Single = 1)
 Title = RHS
@@ -291,12 +291,12 @@ glistN.PrepareToShow 10
 all = mDoc.DocLines
 glistN.CalcAndShowBar
 End Sub
-Public Property Let FileName(ByVal RHS As String)
+Public Property Let Filename(ByVal RHS As String)
 myfilename = RHS
 onelineheight = 0
-Dim thisdoc As New Document, header As New Document
+Dim thisdoc As New Document, Header As New Document
 Set mDoc = thisdoc
-Set mDoc1 = header
+Set mDoc1 = Header
 Dim i As Long
 glistN.NoCaretShow = True
 ClearRedo
@@ -567,11 +567,11 @@ End If
 End Sub
 
 Private Sub glistN_Fkey(a As Integer)
-Dim s$
+Dim S$
 If Me.UsedAsTextBox Then
 If FK$(a) <> "" Then
-    s$ = FK$(a)
-    interpret Basestack1, s$
+    S$ = FK$(a)
+    interpret Basestack1, S$
 Fkey = 0
 End If
 a = 0
@@ -1053,11 +1053,11 @@ End Sub
 
 
 
-Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = vbKeyTab Then
+Private Sub glistN_KeyDown(keycode As Integer, shift As Integer)
+If keycode = vbKeyTab Then
 If shift = 2 Then choosenext
         
-    KeyCode = 0
+    keycode = 0
     Exit Sub
     
 
@@ -1065,11 +1065,11 @@ End If
 
 Dim selstart2 As Long, b As Boolean, Pad$, cc As Long
 Dim l1 As Long, c1 As Long
-If KeyCode = 18 Then
+If keycode = 18 Then
 Exit Sub
 End If
-If KeyCode = 16 And shift <> 0 Then
-KeyCode = 0
+If keycode = 16 And shift <> 0 Then
+keycode = 0
 If glistN.SelStart = 0 Then
 RaiseEvent inform(glistN.ListIndex + 1, 1)
 Else
@@ -1077,17 +1077,17 @@ RaiseEvent inform(glistN.ListIndex + 1, glistN.SelStart)
 End If
 Exit Sub
 End If
-If NoMark Then KeyCode = 0: Exit Sub
+If NoMark Then keycode = 0: Exit Sub
 
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
-ElseIf KeyCode = vbKeyX And (shift And 3) = 2 Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
+ElseIf keycode = vbKeyX And (shift And 3) = 2 Then
 MarkCut
 Show
-KeyCode = 0
-ElseIf KeyCode = vbKeyC And (shift And 3) = 2 Then
+keycode = 0
+ElseIf keycode = vbKeyC And (shift And 3) = 2 Then
 MarkCopy
-KeyCode = 0
-ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
+keycode = 0
+ElseIf keycode = vbKeyV And (shift And 3) = 2 Then
 Pad$ = GetTextData(13)
 If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
 If ParaSelStart = 2 And glistN.list(glistN.ListIndex) = vbNullString Then
@@ -1104,13 +1104,13 @@ End If
 SelText = Pad$
 RemoveUndo SelText
 
-KeyCode = 0
+keycode = 0
 'mDoc.WrapAgainColorBlock mDoc.MarkParagraphID, mDoc.MarkParagraphID
-ElseIf KeyCode = vbKeyA And (shift And 3) = 2 Then
+ElseIf keycode = vbKeyA And (shift And 3) = 2 Then
 glistN.MarkNext = 0
 glistN.MarkALL
-KeyCode = 0
-ElseIf KeyCode = vbKeyY And (shift And 3) = 2 Then
+keycode = 0
+ElseIf keycode = vbKeyY And (shift And 3) = 2 Then
 ' Redo
 profundo.MARKONE
 againY:
@@ -1190,8 +1190,8 @@ End If
 If undoprev Then GoTo againY
 End If
 
-KeyCode = 0
-ElseIf KeyCode = vbKeyZ And (shift And 3) = 2 Then
+keycode = 0
+ElseIf keycode = vbKeyZ And (shift And 3) = 2 Then
 ' 2nd version of undo system
 ' undopos now is selstart
 profundo.MARKONE
@@ -1265,36 +1265,36 @@ undomode = 0
 End If
 If undoprev Then GoTo againZ
 
-KeyCode = 0
-ElseIf KeyCode = vbKeyA And (shift And 3) = 3 Then
+keycode = 0
+ElseIf keycode = vbKeyA And (shift And 3) = 3 Then
 glistN.MarkNext = 0
 BlockEndPara = mDoc.MarkParagraphID
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 glistN.ShowPan
-KeyCode = 0
+keycode = 0
 
-ElseIf KeyCode = vbKeyDelete Then
+ElseIf keycode = vbKeyDelete Then
 If HaveMarkedText Then
 ClearRedo
 PushUndo
 glistN_MarkDelete False
 
-KeyCode = 0
+keycode = 0
 End If
-ElseIf KeyCode = vbKeyBack Then
+ElseIf keycode = vbKeyBack Then
 If HaveMarkedText Then
 ClearRedo
 PushUndo
 glistN_MarkDelete False
 
-KeyCode = 0
+keycode = 0
 End If
 End If
 
 End Sub
 
-Private Sub glistN_KeyDownAfter(KeyCode As Integer, shift As Integer)
+Private Sub glistN_KeyDownAfter(keycode As Integer, shift As Integer)
 If NoMark Then Exit Sub
 If HaveMarkedText Then
 If shift = 0 Then
@@ -1304,20 +1304,20 @@ BlockStartPos = BlockEndPos
 glistN.RefreshNow
 ElseIf (shift And 1) = 1 Then
 
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
 glistN_MarkOut
 End If
 
 End If
 ElseIf (shift And 1) = 1 And glistN.MarkNext = 0 Then
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
 
 glistN.MarkNext = 1
 glistN_MarkIn
 
 End If
 ElseIf (shift And 1) = 1 And glistN.MarkNext > 0 Then
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
 glistN.MarkNext = 2
 glistN_MarkOut
 End If
@@ -1837,7 +1837,7 @@ Dim what$, ThatPara As Long
    mDoc.MarkParagraphID = ThatPara
 End Sub
 
-Private Sub glistN_Selected(item As Long)
+Private Sub glistN_selected(item As Long)
        If undomode = 1 And undotext <> "" Then PushUndo
     
        
@@ -4316,7 +4316,7 @@ End Function
 Public Function AutoIntNewLine() As Boolean
 ' if autonumber
 Dim a$, newid As Long 'mDoc.MarkParagraphID
-Dim b$, c$, D$, e$, skip As Boolean, tr$, maxw As Long, ns As String, och As Long
+Dim b$, c$, D$, e$, skip As Boolean, tr$, maxw As Long, Ns As String, och As Long
 
 showparagraphWork = False
 
@@ -4359,8 +4359,8 @@ there:
         glistN_MarkDelete False
         undoprev = True
         End If
-        ns = NLtrim(CurrentParagraph)
-        a$ = Myleft$(CurrentParagraph, Len(CurrentParagraph) - Len(ns))
+        Ns = NLtrim(CurrentParagraph)
+        a$ = Myleft$(CurrentParagraph, Len(CurrentParagraph) - Len(Ns))
  If Len(a$) > Charpos - 1 Then
 SelStartSilent = SelStart - Charpos + Len(a$) + 1
 Else
@@ -5203,18 +5203,18 @@ End Select
 Next i
 
 End Sub
-Function blockStringAhead(s$, pos1 As Long) As Long
+Function blockStringAhead(S$, pos1 As Long) As Long
 Dim i As Long, j As Long, c As Long
-c = Len(s$)
+c = Len(S$)
 i = pos1
 If i > c Then blockStringAhead = False: Exit Function
 Do
 
-Select Case AscW(Mid$(s$, i, 1))
+Select Case AscW(Mid$(S$, i, 1))
 Case 34
 Do While i < c
 i = i + 1
-If AscW(Mid$(s$, i, 1)) = 34 Then Exit Do
+If AscW(Mid$(S$, i, 1)) = 34 Then Exit Do
 Loop
 Case 123
 j = j - 1
@@ -5254,11 +5254,11 @@ End Function
 Private Function Myleft$(a As String, Pos As Long)
 If Pos < 1 Then Myleft$ = vbNullString Else Myleft$ = Mid$(a, 1, Pos)
 End Function
-Private Function MyTrimRNoCr(s$) As Long
+Private Function MyTrimRNoCr(S$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimRNoCr = 1: Exit Function
-  p2 = StrPtr(s): l = l - 1
+  l = Len(S): If l = 0 Then MyTrimRNoCr = 1: Exit Function
+  p2 = StrPtr(S): l = l - 1
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
   GetMem2 i, p1
@@ -5271,11 +5271,11 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   Next i
  MyTrimRNoCr = l + 2
 End Function
-Private Function MyTrimL2NoTab(s$) As Long
+Private Function MyTrimL2NoTab(S$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
-  p2 = StrPtr(s): l = l - 1
+  l = Len(S): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
+  p2 = StrPtr(S): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
   GetMem2 i, p1

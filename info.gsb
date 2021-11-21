@@ -5317,7 +5317,7 @@ Save1:
 Save2:
 		cont=True
 		If Pad.Text$<>BackUp$ Then {
-			If ask("Save Changes?",Title$)=1 Then Goto Save1
+			If ask("Save Changes?",Title$,"*SAVE", "CANCEL")=1 Then Goto Save1
 		}
 		Clear BackUp$
 		Pad.Text$=""
@@ -34090,5 +34090,216 @@ Report export$
 Print {Keyboard load "00000408"   ' load greek keyboard}
 Scroll Split 0
 declare CR nothing  ' optional, CR erased at the exit of this module
+}
+MODULE HOOKEVENT {REM { This is an old program from March 2016;
+
+Using a Hook Event in a form we can get messages before sending them. There are some messages which bypass this system, like the one to close the form, or for validating input in textboxes. These messages need to get answer (if we implement them).
+
+We send mesages to thread's stack so we can delay the execution. Also we can observe messages. We use Part { } as Variable, to bypass code if another Part which use the same Variable executed the same time. The Part structure automatic change the value of control Variable.
+
+Look  lazy$(&CallBack()) at the line
+
+	Event Hello New lazy$(&CallBack())
+	
+We place a new function in Event Hello, which is a list of functions. But the new function passed from a Lazy$() function which make it like a code in the module. So the code on this function has the same lexical Scope as the module.
+
+We can use any function as code in "parent" module, if we call using Call Local. Version 10 has also static functions which are in same scope as the module, but these functions can't be passed by reference. Acctually a &CallBack() is a string containing the code of the function in a block. Check this:
+	
+	? function("{read x:=x**2}",2)=4
+	
+The window manager exclude some messages from execution, if there is no service function, using a black list. The black list erased each time a user form get focus (from a previous lost focus, including the first time we showing the form), and build the list quickly again.
+
+Experiment:
+Change NoEventHook to true and try tp stop the clock on the top window, pressing the button messagebox on the lower form, if you are like you can see an event happen before the main.task threadswitch task to oher threads.
+
+So when the event raised in the main.task thread may stop the clock refresh in the form's caption. This is a little chance to happen, but happens. We can include the message box in an After 100 { code here}, which is a thread for one execution only after 100 ms. 
+}
+// by default the Sequential part used
+// so Sequential means that a thread has to finish, for changing thread. A thread start at interval bounds, but finish when actually can.
+// so Concurrent means that the threads changed in each statement, if there are threads which has to run in parallel. Code in blocks trait are one statement.
+// Events from Gui or other objects (which we can Declare them WithEvents), have to find idle time to actually start to run, and in refreshing. Main Task give the idle time.
+
+REM:
+	Thread.Plan Sequential
+REM:	Thread.Plan Concurrent
+
+
+NoEventHook=false
+
+Title "M2000-Demo"   \\  , 0     \\ use ,0 to minimize
+\\ M2000  - Form and Button and TextBox (limited to 50 chars)
+If Not NoEventHook Then
+	Declare Form1 Form Event Hello
+else
+	Event Hello {
+	}
+	Declare Form1 Form
+end if
+Declare Form1Button1(2) Button Form Form1
+Declare Form1Text1(2) TextBox Form Form1
+
+
+Method Form1,"move", 2000,7000,10500,3000
+Method Form1Text1(0),"move", 500,900,4500,500
+Method Form1Text1(1),"move", 5500,900,4500,500
+With Form1Text1(0), "Text","Όλα Καλά"
+Method Form1Button1(0),"move", 500,2000,4500,500
+Method Form1Button1(1),"move", 5500,2000,4500,500
+With Form1Button1(0), "Caption","MessageBox"
+
+
+If Not NoEventHook Then
+	Declare Form2 Form Event Hello
+else
+	Declare Form2 Form
+end if
+Declare Form2Button2 Button Form Form2
+Method Form2,"move", 0,0,8000,3000
+Method Form2Button2,"move", 1000,2000,6000,500
+
+Again=True
+
+\\ using Call Local we Call code in function but in This name space
+
+Function Form1Text1.Click {
+      Read Who
+      Print "Form1Text1 ";Who
+}
+Function Form1Text1.Keydown {
+\\ This is used without use of soft callback function
+\\ because we have to return immediate
+\\ we can alter keys here!
+Read New index
+Read New &keycode, &Shft, &obj
+      If keycode=13 Then {
+
+            With Form1Text1(index),  "Text" As Form1Text1$
+
+            Print Form1Text1$
+            Form1Text1$=""
+      }
+}
+Function Form1Text1.ValidString {
+\\ This is used without use of soft callback function
+     Read New index
+     Read New &A$, &B
+  A$=Ucase$(A$)
+}
+Function Form1Button1.Click {
+     \\ This is a message box
+     \\ This use the soft callback (or async)
+     Read index
+     If index=0 Then
+           Rem :
+           Print ask("ok","This is an example for M2000 Gui")
+           // hide previous line / unhide the next line
+           Rem : After 300 {Print ask("ok","This is an example for M2000 Gui")}
+           
+     Else
+        With Form1Text1(0),  "Text",""
+        Cls
+     End if
+}
+Function Form2Button2.Click {
+            If Again Then With Form2, "Title", "Press Again"
+            Again~
+} 
+Let busy1=0, busy2=0
+Thread {
+      If Not Empty Then
+            Part {
+                Try { Call Local Letter$}
+           } As busy1
+      end if
+} As ExecuteThis1 Interval 50
+
+Thread {
+      If Not Empty Then
+            Part {
+                Try { Call Local Letter$}
+           } As busy2
+      end if
+} As ExecuteThis2 Interval 50
+
+
+Function Callback {
+    \\ This function used If we don't have references to gui objects
+    \\ and we can use threads for async service
+    Read msg$, &frm
+    For This {
+            With frm, "Title" As Caption$
+            {
+                  Part {
+                        Print msg$, Caption$
+                         \\ Data command send to bottom, Push send to top
+                        Thread ExecuteThis1 Execute Data msg$
+                        msg$=""
+                  } As busy1
+                  Part {
+                        Print msg$, Caption$
+                        Thread ExecuteThis2 Execute Data msg$
+                        msg$=""
+                  } As busy2
+                  \\ using copy we can push back the mesage again
+                  \\ New messages are coming
+                  If msg$<>""  Then loop \\ just mark block for looping once
+                  Refresh
+            }
+      }
+}
+Event Hello New lazy$(&CallBack())
+
+With Form1, "Title" As Form1.Caption$, "Visible" As Form1.Visible
+With Form2, "Title" As Form2.Caption$, "Visible" As Form2.Visible, "top", 3000, "left", 3000
+
+REM {
+	// WE CAN CONTROL THE UNLOAD EVENT
+	Function Form1.Unload {
+		Read New &Cancel
+		Cancel=Form1.visible
+		Form1.visible=False
+	
+	}
+	Function Form2.Unload {
+		Read New &Cancel
+		Cancel=Form2.visible
+		Form2.visible=False	
+	}
+}
+
+
+With Form2Button2, "Caption","Press This Please"
+Form1.Caption$="Hello There"
+Form2.Caption$="Hello There 2"
+
+Method Form1,"Show"
+Method Form2,"Show"
+Refresh
+cc=0
+With Form1Text1(1), "Text" As counter$
+Thread {
+      cc++
+      If form1.visible Then counter$=Format$("{0}", cc)
+} As counter Interval 100
+Main.Task 50 {
+      If Again Then If form2.visible Then form2.caption$="Hello There 2 ["+str$(now,"hh:mm:ss")+"]"
+  
+      If form1.visible Or form2.visible Else Exit
+      Print "WAIT........"
+      Refresh
+}
+Threads Erase
+Try {
+	Thread.Plan Sequential
+}
+\\ we can dereference these here
+Dim Form1Button2(), Form1Text1()
+Declare Form2Button2 Nothing
+Declare Form1 Nothing
+Declare Form2 Nothing
+\\ change title and show the console
+Title "Back Again"
+Show  \\ get focus back
+Threads Erase
 }
 UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}
