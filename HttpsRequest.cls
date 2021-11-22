@@ -43,6 +43,7 @@ Event Cancel(ByRef CancelMe)
 Event DownloadError(ByVal Number As Long, ByVal Description As String)
 Event Complete()
 
+
 Private Sub m_oSocket_OnReceive()
     Const FUNC_NAME     As String = "HttpsRequest"
     Const HDR_CONTENT_LENGTH As String = "content-length:"

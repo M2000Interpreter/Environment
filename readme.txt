@@ -1,7 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 40 active-X
-A small bug fix
+Version 10 revision 41 active-X
+1. Fix descending sort for lists when keys have numbers - part or all- (was like ascending by a mistake)
+2. Fix return type boolean for static Functions.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

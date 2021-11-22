@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 40
+Global Const Revision = 41
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -8005,7 +8005,8 @@ againsub:
                 IsNumberNew = True
                ' If Not flatobject Then Set bstack.lastobj = bstack.FuncObj
                 Set bstack.lastobj = bstack.FuncObj
-                R = bstack.FuncValue * SG
+                R = bstack.FuncValue
+                If SG = -1 Then R = -R
                 If Not bstack.lastobj Is Nothing Then
                         If TypeOf bstack.lastobj Is mHandler Then
                             If FastSymbol(a$, "#") Then
