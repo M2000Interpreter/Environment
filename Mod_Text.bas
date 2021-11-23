@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 41
+Global Const Revision = 42
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -687,7 +687,7 @@ Public Sub PopStage(basestack As basetask)
             numid.poptop
             funid.poptop
             strfunid.poptop
-            funid.poptop
+            strid.poptop
         ElseIf .LookTopVal = -2 Then
         basestack.SubLevel = basestack.SubLevel - 1
         .drop 5
@@ -2232,7 +2232,7 @@ subHash.ReduceHash snames, sbf()
 numid.poptop
 funid.poptop
 strfunid.poptop
-funid.poptop
+strid.poptop
 
 End Function
 
@@ -4848,7 +4848,7 @@ If bstack.toprinter Then
     End If
     Else
     If .uMineLineSpace > .MineLineSpace Then
-        R = SG * .SZ / 2
+        R = SG * .UseDouble
     Else
          R = SG * .SZ
     End If
@@ -5236,7 +5236,7 @@ num68: ' "TAB", "”‘«À«"
     Exit Function
 num69: ' "HEIGHT", "’ÿœ”"
     IsNumberNew = True
-    R = SG * players(GetCode(bstack.Owner)).My
+    R = SG * players(GetCode(bstack.Owner)).my
     
     Exit Function
 num70: ' "POS", "»≈”«"
@@ -14661,13 +14661,25 @@ j = Len(a$)
 If j = 0 Then Exit Function
 Pad$ = myUcase(Left$(a$, ahead&))
 If c$ = Left$(Pad$, cl) Then
-a$ = Mid$(a$, MyTrimLi(a$, cl + 1))
+j = MyTrimLi(a$, cl + 1)
+check:
+If Len(Mid$(a$, j, 1)) > 0 Then
+Select Case AscW(Mid$(a$, j, 1))
+Case 36, 37, 40, 46, 48 To 57, 95, Is < 0, Is > 64
+Fast2NoSpace = False
+Case Else
+a$ = Mid$(a$, j)
 Fast2NoSpace = True
+End Select
+Else
+a$ = Mid$(a$, j)
+Fast2NoSpace = True
+End If
 Exit Function
 End If
 If D$ = Left$(Pad$, dl) Then
-a$ = Mid$(a$, MyTrimLi(a$, dl + 1))
-Fast2NoSpace = True
+j = MyTrimLi(a$, dl + 1)
+GoTo check
 End If
 End Function
 Function Fast3NoSpaceCheck(Pos As Long, a$, c$, cl As Long, D$, dl As Long, e$, el As Long, ahead&) As Boolean
@@ -19474,7 +19486,7 @@ there1234:
                         numid.poptopGlobal
                         funid.poptopGlobal
                         strfunid.poptopGlobal
-                        funid.poptopGlobal
+                        strid.poptopGlobal
                     End If
                 End If
             End If
@@ -20015,6 +20027,9 @@ Identifier = ProcPrinter(basestack, rest$)
 Exit Function
 Case "MOTION", " …Õ«”«"
 Identifier = ProcMotion(basestack, rest$, Lang)
+Exit Function
+Case "ASSERT", "¡Œ…Ÿ”«"
+ProcAssert basestack, rest$
 Exit Function
 Case "PAGE", "”≈À…ƒ¡" 'ok
 ProcPage basestack, rest$, Lang
@@ -23235,7 +23250,7 @@ prive.Xt = .Xt
 prive.Yt = .Yt
 prive.uMineLineSpace = .sUAddTwipsTop
 prive.mx = 100
-prive.My = 100
+prive.my = 100
 prive.SZ = .SZ
 End With
 dd.FontSize = prive.SZ
@@ -29689,6 +29704,7 @@ crNew bstack, players(GetCode(Scr))
 MyDoEvents1 Scr
 Set Scr = Nothing
 End Sub
+
 Function ProcPage(basestack As basetask, rest$, Lang As Long) As Boolean
 ProcPage = True
 Dim Scr As Object, x As Double, skip As Boolean
@@ -32358,7 +32374,7 @@ If Left$(s$, 1) = "S" Then
             If o < 1 Then o = 0
             If o > Len(frm$) Then o = Len(frm$) + 1
             With players(GetCode(basestack.Owner))
-            ScreenEdit basestack, frm$, 0, .mysplit, .mx - 1, .My - 1, o, x1
+            ScreenEdit basestack, frm$, 0, .mysplit, .mx - 1, .my - 1, o, x1
             End With
             Form1.ResetMarks
             If frm$ <> "" And Abs(x1) >= 0 And Not CancelEDIT Then
@@ -32446,7 +32462,7 @@ jump1:
         
         With players(GetCode(basestack.Owner))
             prev$ = sbf(x1).sb
-            ScreenEdit basestack, prev$, 0, .mysplit, .mx - 1, .My - 1, sbf(x1).sbc, , , , True
+            ScreenEdit basestack, prev$, 0, .mysplit, .mx - 1, .my - 1, sbf(x1).sbc, , , , True
             End With
             If prev$ <> sbf(x1).sb Then
             Set sbf(x1).subs = Nothing
@@ -32470,7 +32486,7 @@ jump1:
            MakeMyTitle s$, Lang
            Form1.TEXT1.glistN.UseTab = UseTabInForm1Text1
            With players(GetCode(basestack.Owner))
-            ScreenEdit basestack, frm$, 0, .mysplit, .mx - 1, .My - 1, i ', , , , Len(frm$) = 0
+            ScreenEdit basestack, frm$, 0, .mysplit, .mx - 1, .my - 1, i ', , , , Len(frm$) = 0
             End With
             If frm$ <> "" Then
             MakeThisSub basestack, s$
@@ -32497,7 +32513,7 @@ jump1:
         Form1.TEXT1.Title = "Command List "
         End If
         With players(GetCode(basestack.Owner))
-        ScreenEdit basestack, frm$, 0, .mysplit, .mx - 1, .My - 1
+        ScreenEdit basestack, frm$, 0, .mysplit, .mx - 1, .my - 1
         End With
         Form1.ShadowMarks = False
         QUERYLIST = vbCr + Replace$(frm$, vbCrLf, vbCr)
@@ -32710,12 +32726,12 @@ thh1:
                 numid.poptopGlobal
                 funid.poptopGlobal
                 strfunid.poptopGlobal
-                funid.poptopGlobal
+                strid.poptopGlobal
             Else
                 numid.poptop
                 funid.poptop
                 strfunid.poptop
-                funid.poptop
+                strid.poptop
             End If
         End With
         Set bs = Nothing
@@ -42163,7 +42179,7 @@ conteditdoc2:
                                     Form1.TabControl = 8 + 2 * dum
                                       OldValue = Form1.nobypasscheck
                                   Form1.nobypasscheck = False
-                                  ScreenEditDOC bstack, var(i), 0, .mysplit, .mx - 1, .My - 1, x1, dum, Col
+                                  ScreenEditDOC bstack, var(i), 0, .mysplit, .mx - 1, .my - 1, x1, dum, Col
                                   Form1.nobypasscheck = OldValue
                                     var(i).LastSelStart = x1
                                     var(i).ColorEvent = False
@@ -42190,7 +42206,7 @@ conteditdoc2:
                                     Form1.TabControl = 8 + 2 * dum
                                     OldValue = Form1.nobypasscheck
                                   Form1.nobypasscheck = False
-                                  ScreenEditDOC bstack, pppp.item(i), 0, .mysplit, .mx - 1, .My - 1, x1, dum, Col
+                                  ScreenEditDOC bstack, pppp.item(i), 0, .mysplit, .mx - 1, .my - 1, x1, dum, Col
                                   Form1.nobypasscheck = OldValue
                                     pppp.item(i).LastSelStart = x1
                                      pppp.item(i).ColorEvent = False
@@ -42230,8 +42246,8 @@ If IsLabelSymbolNew(rest$, " ¡‘Ÿ", "DOWN", Lang) Then
 ElseIf IsLabelSymbolNew(rest$, "◊Ÿ—…”Ã¡", "SPLIT", Lang) Then
 If IsExp(bstack, rest$, p) Then
 With players(prive)
-    If p < 0 Then p = .My + p
-    If p >= 0 And p < .My Then .mysplit = p
+    If p < 0 Then p = .my + p
+    If p >= 0 And p < .my Then .mysplit = p
 End With
 Else
 ProcSrcoll = False
@@ -42994,8 +43010,8 @@ If x1 < 0 Then
             If F < 4 Then F = 4  ' 4 chars minimum
             If F > .mx Then F = .mx  ' .mx maximum
             If F + x1 > .mx Then x1 = .mx - F - 1
-            If it > .My \ 2 Then it = .My \ 2
-            If CLng(.My - y1) < it Then  ' need space above
+            If it > .my \ 2 Then it = .my \ 2
+            If CLng(.my - y1) < it Then  ' need space above
                  y1 = .currow - it
             End If
 
@@ -47445,7 +47461,7 @@ If IsExp(bstack, a$, R) Then
             If FastSymbol(a$, ",") Then
 stack99981:
                 Set usestiva = anything
-                If IsExp(bstack, a$, p, , True) Then
+                If IsExp(bstack, a$, p) Then
                     If p <> 0 Then
                         Set anything = usestiva.CopyMe2(CLng(Fix(p)))
                     Else
@@ -53995,8 +54011,8 @@ Do
                 
                 If FastSymbol(rest$, ",") Then
                 If IsExp(basestack, rest$, p, , True) Then
-                If CLng(Fix(p)) >= .My Then
-                If par Then .currow = .My - 1
+                If CLng(Fix(p)) >= .my Then
+                If par Then .currow = .my - 1
                 Else
                 If par Then .currow = CLng(Fix(p))
                 End If
@@ -54506,7 +54522,7 @@ contboolean2:
     '                    ensure that we are align in .Column  (.Column is based zero...)
     skiplast = False
             If Not TypeOf Scr Is MetaDc Then
-               If .currow >= .My And Not TypeOf Scr Is MetaDc Then
+               If .currow >= .my And Not TypeOf Scr Is MetaDc Then
                If Not w4 Then crNew basestack, prive: skiplast = True
                End If
                 End If
@@ -54563,7 +54579,7 @@ contboolean2:
               If .lastprint Then
                 If Not TypeOf Scr Is MetaDc Then
                  If .curpos = 0 Then
-                 If .currow >= .My And Not TypeOf Scr Is MetaDc Then
+                 If .currow >= .my And Not TypeOf Scr Is MetaDc Then
                  crNew basestack, prive
                  Else
                  LCTbasketCur Scr, prive
@@ -54589,7 +54605,7 @@ contboolean2:
                         
                             If .curpos = 0 Then
                             
-                                If .currow >= .My And Not TypeOf Scr Is MetaDc Then
+                                If .currow >= .my And Not TypeOf Scr Is MetaDc Then
                                 crNew basestack, prive
                              
                               
@@ -54612,7 +54628,7 @@ contboolean2:
                         End If
                         If .lastprint Then
                             If .curpos = 0 Then
-                                If .currow >= .My And Not TypeOf Scr Is MetaDc Then
+                                If .currow >= .my And Not TypeOf Scr Is MetaDc Then
                                 crNew basestack, prive
                                 Else
                                 LCTbasketCur Scr, prive
@@ -54640,7 +54656,7 @@ contboolean2:
                                                                If .lastprint Then
      
                  If .curpos = 0 Then
-                 If .currow >= .My And Not TypeOf Scr Is MetaDc Then
+                 If .currow >= .my And Not TypeOf Scr Is MetaDc Then
                  crNew basestack, prive
                  Else
                  LCTbasketCur Scr, prive
@@ -54680,7 +54696,7 @@ End If
         If .Column > 0 Then
                              x1 = .curpos: y1 = .currow
                 skiplast = False
-                                If .currow >= .My And Not w4 And Not TypeOf Scr Is MetaDc Then
+                                If .currow >= .my And Not w4 And Not TypeOf Scr Is MetaDc Then
                                 crNew basestack, prive
                                 skiplast = True
                                 End If
@@ -55023,7 +55039,7 @@ If w4 <> 0 And par Then
                  End If
                  If Not skiplast Then crNew basestack, prive
                  End If
-        ElseIf (.currow >= .My And Not TypeOf Scr Is MetaDc) Or (w3 < 0 And pn& = 0) Then
+        ElseIf (.currow >= .my And Not TypeOf Scr Is MetaDc) Or (w3 < 0 And pn& = 0) Then
 JUMPHERE:
               crNew basestack, prive
               LCTbasketCur Scr, prive
@@ -56500,7 +56516,7 @@ Set obj = oldobj
 End Function
 
 
-Sub ClearState()
+Sub ClearState1()
 Basestack1.IamAnEvent = False
 abt = False
 Set comhash = New sbHash

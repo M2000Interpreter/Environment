@@ -325,9 +325,9 @@ Public Const KLF_REORDER = &H8
 ''' Size of KeyboardLayoutName (number of characters), including nul terminator
 Public Const KL_NAMELENGTH = 9
 
-Declare Function LoadKeyboardLayout Lib "user32" Alias "LoadKeyboardLayoutA" (ByVal pwszKLID As String, ByVal flags As Long) As Long
+Declare Function LoadKeyboardLayout Lib "user32" Alias "LoadKeyboardLayoutA" (ByVal pwszKLID As String, ByVal Flags As Long) As Long
 Declare Function UnloadKeyboardLayout Lib "user32" (ByVal HKL As Long) As Long
-Declare Function ActivateKeyboardLayout Lib "user32" (ByVal HKL As Long, ByVal flags As Long) As Long
+Declare Function ActivateKeyboardLayout Lib "user32" (ByVal HKL As Long, ByVal Flags As Long) As Long
 Public Sub PlaceIcon(a As StdPicture)
 On Error Resume Next
 If UseMe Is Nothing Then Exit Sub
@@ -1596,11 +1596,11 @@ cDIBbuffer1.LoadPictureBlt cDibbuffer0.hDC
 Set cDibbuffer0 = cDIBbuffer1
 Set cDIBbuffer1 = Nothing
 End Sub
-Public Function CmpHeight_pixels(S As Single) As Single
-CmpHeight_pixels = S * 20# / DYP
+Public Function CmpHeight_pixels(s As Single) As Single
+CmpHeight_pixels = s * 20# / DYP
 End Function
-Public Function CmpHeight(S As Single) As Single
-CmpHeight = S * 20#
+Public Function CmpHeight(s As Single) As Single
+CmpHeight = s * 20#
 End Function
 Public Function FindSpriteByTag(sp As Long) As Long
 Dim i As Long
@@ -1673,21 +1673,21 @@ Public Function ScaleRegion(hRgn As Long, Size As Single) As Long
     End If
      DeleteObject hRgn
 End Function
-Function GetNewSpriteObj(Priority As Long, S$, tr As Long, rr As Long, Optional ByVal SZ As Single = 1, Optional ByVal rot As Single = 0, Optional bb$ = vbNullString) As Long
+Function GetNewSpriteObj(Priority As Long, s$, tr As Long, rr As Long, Optional ByVal SZ As Single = 1, Optional ByVal rot As Single = 0, Optional bb$ = vbNullString) As Long
 Dim photo As Object, myRgn As Long, oldobj As Long
 Dim photo2 As Object
  oldobj = FindSpriteByTag(Priority)
  If oldobj Then
 ' this priority...is used
 ' so change only image
-SpriteGetOtherImage oldobj, S$, tr, rr, SZ, rot, bb$
+SpriteGetOtherImage oldobj, s$, tr, rr, SZ, rot, bb$
 GetNewSpriteObj = oldobj
 
 Exit Function
 Else
       Set photo = New cDIBSection
         Set photo2 = New cDIBSection
-           If cDib(S$, photo) Then
+           If cDib(s$, photo) Then
  
  If rr >= 0 Then
 
@@ -1970,10 +1970,10 @@ If k = 0 Then Exit Sub  ' there is no such a player
     
 
 End Sub
-Private Sub SpriteGetOtherImage(S As Long, b$, tran As Long, rrr As Long, SZ As Single, rot As Single, Optional bb$ = vbNullString) ' before take from priority the original sprite
+Private Sub SpriteGetOtherImage(s As Long, b$, tran As Long, rrr As Long, SZ As Single, rot As Single, Optional bb$ = vbNullString) ' before take from priority the original sprite
 Dim photo As Object, myRgn As Long
 Dim photo2 As Object
-If S < 1 Or S > PobjNum Then Exit Sub
+If s < 1 Or s > PobjNum Then Exit Sub
 
       Set photo = New cDIBSection
        Set photo2 = New cDIBSection
@@ -2015,25 +2015,25 @@ myRgn = RotateRegion(myRgn, (rot), photo.Width * SZ, photo.Height * SZ, SZ)
 Dim oldtag As Long
 
 
-With Form1.dSprite(S)
+With Form1.dSprite(s)
 .Height = photo.Height * DYP * SZ
 .Width = photo.Width * DXP * SZ
 .Picture = photo.Picture(SZ)
-.Left = .Left + players(S).x - .Width / 2
-players(S).x = .Width / 2
-.top = .top + players(S).y - .Height / 2
-players(S).y = .Height / 2
+.Left = .Left + players(s).x - .Width / 2
+players(s).x = .Width / 2
+.top = .top + players(s).y - .Height / 2
+players(s).y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, True)
 ''''''''''''''''''''''''UpdateWindow .hwnd
  DeleteObject myRgn
 
 End With
-With players(S)
+With players(s)
 
 .MAXXGRAPH = .x * 2
 .MAXYGRAPH = .y * 2
 End With
-SetText Form1.dSprite(S)
+SetText Form1.dSprite(s)
 End If
 End Sub
 
@@ -2898,24 +2898,24 @@ Sub SwapStringVariant(ByRef b As Variant, ByRef a As Variant)
    CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(b) + 8, 4
    CopyMemory ByVal VarPtr(b) + 8, ByVal VarPtr(t), 4
 End Sub
-Sub SwapString2Variant(ByRef S$, ByRef a As Variant)
+Sub SwapString2Variant(ByRef s$, ByRef a As Variant)
    Static t As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory ByVal VarPtr(t), ByVal VarPtr(a) + 8, 4
-   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(S$), 4
-   CopyMemory ByVal VarPtr(S$), ByVal VarPtr(t), 4
+   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(s$), 4
+   CopyMemory ByVal VarPtr(s$), ByVal VarPtr(t), 4
 End Sub
-Sub SwapString2VariantPointer(ByRef S$, ByVal a As Long)
+Sub SwapString2VariantPointer(ByRef s$, ByVal a As Long)
    Static t As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory ByVal VarPtr(t), ByVal a + 8, 4
-   CopyMemory ByVal a + 8, ByVal VarPtr(S$), 4
-   CopyMemory ByVal VarPtr(S$), ByVal VarPtr(t), 4
+   CopyMemory ByVal a + 8, ByVal VarPtr(s$), 4
+   CopyMemory ByVal VarPtr(s$), ByVal VarPtr(t), 4
 End Sub
-Sub MoveStringToVariant(ByRef S$, ByRef a As Variant)
+Sub MoveStringToVariant(ByRef s$, ByRef a As Variant)
    Static t As Long ' 4 Longs * 4 bytes each = 16 bytes
    a = vbNullString
    CopyMemory ByVal VarPtr(t), ByVal VarPtr(a) + 8, 4
-   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(S$), 4
-   CopyMemory ByVal VarPtr(S$), ByVal VarPtr(t), 4
+   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(s$), 4
+   CopyMemory ByVal VarPtr(s$), ByVal VarPtr(t), 4
 End Sub
 
 
@@ -3125,7 +3125,7 @@ a$ = myUcase(a$, True)
 Select Case a$
 Case "@(", "$(", "~(", "?", "->", "[]"
 Case "ABOUT", "ABOUT$", "ABS(", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
-Case "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ATN("
+Case "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
 Case "BACK", "BACKGROUND", "BACKWARD(", "BANK(", "BASE", "BEEP", "BINARY", "BINARY.ADD(", "BINARY.AND(", "BINARY.NEG(", "BINARY.NOT("
 Case "BINARY.OR(", "BINARY.ROTATE(", "BINARY.SHIFT(", "BINARY.XOR(", "BITMAPS", "BMP$(", "BOLD"
 Case "BOOLEAN", "BORDER", "BREAK", "BROWSER", "BROWSER$", "BUFFER", "BUFFER(", "BYTE", "CALL", "CASE", "CASCADE", "CAT", "CAR("
@@ -3183,7 +3183,7 @@ Case "TWIPSY", "TYPE", "TYPE$(", "UCASE$(", "UINT(", "UNARY", "UNDER", "UNICODE"
 Case "UP", "UPDATABLE", "UPDATE", "USE", "USER", "USERS", "USER.NAME$", "USGN("
 Case "VAL(", "VAL$(", "VALID(", "VALUE", "VALUE(", "VALUE$", "VERSION", "VIEW", "VOID", "VOLUME"
 Case "WAIT", "WCHAR", "WEAK", "WEAK$(", "WHILE", "WHEN", "WIDE", "WIDTH", "WIN", "WINDOW"
-Case "WITH", "WITHEVENTS", "WORDS", "WRITABLE(", "WRITE", "WRITER", "X.TWIPS", "XOR", "Y.TWIPS", "адеиас", "апеияо", "апой.ая$(", "апой.де$("
+Case "WITH", "WITHEVENTS", "WORDS", "WRITABLE(", "WRITE", "WRITER", "X.TWIPS", "XOR", "Y.TWIPS", "адеиас", "аниысг", "апеияо", "апой.ая$(", "апой.де$("
 Case "адеиасе", "ахя(", "ай(", "айеяаио.дуадийо(", "айеяаио", "айеяаиос", "акт", "акгхес", "акгхгс", "аккацг", "аккацг$("
 Case "аккане", "аккиыс", "аккиыс.ам", "ам", "ам(", "амап(", "амап$(", "ам$(", "ама", "амафгтгсг", "амахеыягсг", "амайтгсг", "амакоцио"
 Case "амакоцио$", "амакусг.охомгс", "амакусг.у", "амакусг.ь", "амакусг.в", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье"
@@ -3566,11 +3566,11 @@ Public Function ScrY() As Long
 ScrY = GetSystemMetrics(SM_CYSCREEN) * dv15
 End Function
 
-Public Function MyTrimL3Len(S$) As Long
+Public Function MyTrimL3Len(s$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(S): If l = 0 Then MyTrimL3Len = 0: Exit Function
-  p2 = StrPtr(S): l = l - 1
+  l = Len(s): If l = 0 Then MyTrimL3Len = 0: Exit Function
+  p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
   GetMem2 i, p1
@@ -3583,11 +3583,11 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   Next i
  MyTrimL3Len = (i - p2) \ 2
 End Function
-Public Function MyTrimL2(S$) As Long
+Public Function MyTrimL2(s$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(S): If l = 0 Then MyTrimL2 = 1: Exit Function
-  p2 = StrPtr(S): l = l - 1
+  l = Len(s): If l = 0 Then MyTrimL2 = 1: Exit Function
+  p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
   GetMem2 i, p1
@@ -3601,11 +3601,11 @@ Dim p2 As Long, p1 As Integer, p4 As Long
  MyTrimL2 = l + 2
 End Function
 
-Public Function MyTrimR(S$) As Long
+Public Function MyTrimR(s$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(S): If l = 0 Then MyTrimR = 1: Exit Function
-  p2 = StrPtr(S): l = l - 1
+  l = Len(s): If l = 0 Then MyTrimR = 1: Exit Function
+  p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
   GetMem2 i, p1
@@ -3620,11 +3620,11 @@ Dim p2 As Long, p1 As Integer, p4 As Long
 End Function
 
 
-Public Function MyTrimL2NoTab(S$) As Long
+Public Function MyTrimL2NoTab(s$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(S): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
-  p2 = StrPtr(S): l = l - 1
+  l = Len(s): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
+  p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
   GetMem2 i, p1
@@ -3638,14 +3638,14 @@ Dim p2 As Long, p1 As Integer, p4 As Long
  MyTrimL2NoTab = 0
 End Function
 
-Public Function MyTrimRfrom(S$, st As Long, ByVal en As Long) As Long
+Public Function MyTrimRfrom(s$, st As Long, ByVal en As Long) As Long
 Dim i&
 Dim p2 As Long, p1 As Integer, p4 As Long
-  If st > Len(S$) Then MyTrimRfrom = en: Exit Function
-  If en > Len(S$) Then MyTrimRfrom = en: Exit Function
+  If st > Len(s$) Then MyTrimRfrom = en: Exit Function
+  If en > Len(s$) Then MyTrimRfrom = en: Exit Function
   If en <= st Then MyTrimRfrom = en: Exit Function
   If st < 1 Then MyTrimRfrom = en: Exit Function
-  p2 = StrPtr(S) + (st - 1) * 2: en = en - 1
+  p2 = StrPtr(s) + (st - 1) * 2: en = en - 1
   p4 = p2 + (en - st) * 2
   For i = p4 To p2 Step -2
   GetMem2 i, p1
@@ -3659,12 +3659,12 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   Next i
  MyTrimRfrom = st
 End Function
-Public Function MyTrimCR(S$) As String
+Public Function MyTrimCR(s$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(S): If l = 0 Then Exit Function
+l = Len(s): If l = 0 Then Exit Function
 
-  p2 = StrPtr(S): l = l - 1
+  p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
@@ -3686,16 +3686,16 @@ l = Len(S): If l = 0 Then Exit Function
   End Select
   Next i
   p2 = i
-  If p2 > p4 Then MyTrimCR = vbNullString Else MyTrimCR = Mid$(S$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+  If p2 > p4 Then MyTrimCR = vbNullString Else MyTrimCR = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
  
 End Function
 
-Public Function MyTrim(S$) As String
+Public Function MyTrim(s$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(S): If l = 0 Then Exit Function
+l = Len(s): If l = 0 Then Exit Function
 
-  p2 = StrPtr(S): l = l - 1
+  p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
@@ -3717,15 +3717,15 @@ l = Len(S): If l = 0 Then Exit Function
   End Select
   Next i
   p2 = i
-  If p2 > p4 Then MyTrim = vbNullString Else MyTrim = Mid$(S$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+  If p2 > p4 Then MyTrim = vbNullString Else MyTrim = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
  
 End Function
-Public Function MyTrimLW(S$) As String
+Public Function MyTrimLW(s$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(S): If l = 0 Then Exit Function
+l = Len(s): If l = 0 Then Exit Function
 
-  p2 = StrPtr(S): l = l - 1
+  p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
@@ -3738,15 +3738,15 @@ l = Len(S): If l = 0 Then Exit Function
   End Select
   Next i
   p2 = i
-  If p2 > p4 Then MyTrimLW = vbNullString Else MyTrimLW = Mid$(S$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+  If p2 > p4 Then MyTrimLW = vbNullString Else MyTrimLW = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
  
 End Function
-Public Function MyTrimRW(S$) As String
+Public Function MyTrimRW(s$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(S): If l = 0 Then Exit Function
+l = Len(s): If l = 0 Then Exit Function
 
-  p2 = StrPtr(S): l = l - 1
+  p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
@@ -3758,16 +3758,16 @@ l = Len(S): If l = 0 Then Exit Function
   End Select
   Next i
   p4 = i
-   If p2 > p4 Then MyTrimRW = vbNullString Else MyTrimRW = Mid$(S$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+   If p2 > p4 Then MyTrimRW = vbNullString Else MyTrimRW = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
  
 End Function
 
-Public Function MyTrimRB(S$) As String
+Public Function MyTrimRB(s$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = LenB(S): If l = 0 Then Exit Function
+l = LenB(s): If l = 0 Then Exit Function
 
-  p2 = StrPtr(S): l = l - 1
+  p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l
   For i = p4 To p2 Step -1
@@ -3779,15 +3779,15 @@ l = LenB(S): If l = 0 Then Exit Function
   End Select
   Next i
   p4 = i
-  If p2 > p4 Then MyTrimRB = vbNullString Else MyTrimRB = MidB$(S$, (p2 - p22) + 1, (p4 - p2) + 1)
+  If p2 > p4 Then MyTrimRB = vbNullString Else MyTrimRB = MidB$(s$, (p2 - p22) + 1, (p4 - p2) + 1)
  
 End Function
-Public Function MyTrimLB(S$) As String
+Public Function MyTrimLB(s$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = LenB(S): If l = 0 Then Exit Function
+l = LenB(s): If l = 0 Then Exit Function
 
-  p2 = StrPtr(S): l = l - 1
+  p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l
   For i = p2 To p4 Step 1
@@ -3800,15 +3800,15 @@ l = LenB(S): If l = 0 Then Exit Function
   End Select
     Next i
     p2 = i
-  If p2 > p4 Then MyTrimLB = vbNullString Else MyTrimLB = MidB$(S$, (p2 - p22) + 1, (p4 - p2) + 1)
+  If p2 > p4 Then MyTrimLB = vbNullString Else MyTrimLB = MidB$(s$, (p2 - p22) + 1, (p4 - p2) + 1)
  
 End Function
-Public Function MyTrimB(S$) As String
+Public Function MyTrimB(s$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = LenB(S): If l = 0 Then Exit Function
+l = LenB(s): If l = 0 Then Exit Function
 
-  p2 = StrPtr(S): l = l - 1
+  p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l
   For i = p4 To p2 Step -1
@@ -3831,7 +3831,7 @@ l = LenB(S): If l = 0 Then Exit Function
   End Select
   Next i
   p2 = i
-  If p2 > p4 Then MyTrimB = vbNullString Else MyTrimB = MidB$(S$, (p2 - p22) + 1, (p4 - p2) + 1)
+  If p2 > p4 Then MyTrimB = vbNullString Else MyTrimB = MidB$(s$, (p2 - p22) + 1, (p4 - p2) + 1)
  
 End Function
 Function IsLabelAnew(where$, a$, R$, Lang As Long) As Long
@@ -4392,19 +4392,19 @@ End Function
 
 Public Function allcommands(aHash As sbHash) As Boolean
 Dim mycommands(), i As Long
-mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "BACK", "BACKGROUND", "BASE", "BEEP", "BINARY", "BITMAPS", "BOLD", "BREAK", "BROWSER", "BUFFER", "CALL", "CASE", "CAT", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLOSE", "CLS", "CODEPAGE", "COLOR", "COMMIT", "COMPRESS", "CONST", "CONTINUE", "COPY", "CURSOR", "CURVE", "DATA", "DB.PROVIDER", "DB.USER" _
+mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "ASSERT", "BACK", "BACKGROUND", "BASE", "BEEP", "BINARY", "BITMAPS", "BOLD", "BREAK", "BROWSER", "BUFFER", "CALL", "CASE", "CAT", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLOSE", "CLS", "CODEPAGE", "COLOR", "COMMIT", "COMPRESS", "CONST", "CONTINUE", "COPY", "CURSOR", "CURVE", "DATA", "DB.PROVIDER", "DB.USER" _
 , "DECLARE", "DEF", "DELETE", "DESKTOP", "DIM", "DIR", "DIV", "DO", "DOCUMENT", "DOS", "DOUBLE", "DRAW", "DRAWING", "DRAWINGS", "DROP", "DURATION", "EDIT", "EDIT.DOC", "ELSE", "ELSE.IF", "EMPTY", "END", "ENUM", "ENUMERATION", "ERASE", "ERROR", "ESCAPE", "EVENT", "EVERY", "EXECUTE", "EXIT", "EXPORT", "FAST", "FIELD", "FILES", "FILL", "FIND", "FKEY", "FLOODFILL", "FLUSH", "FONT", "FOR", "FORM", "FORMLABEL", "FRAME", "FUNCTION", "GET", "GLOBAL" _
 , "GOSUB", "GOTO", "GRADIENT", "GREEK", "GROUP", "HALT", "HEIGHT", "HELP", "HEX", "HIDE", "HOLD", "HTML", "ICON", "IF", "IMAGE", "INLINE", "INPUT", "INSERT", "INVENTORY", "ITALIC", "JOYPAD", "KEYBOARD", "LATIN", "LAYER", "LEGEND", "LET", "LINE", "LINESPACE", "LINK", "LIST", "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LONG", "LOOP", "MAIN.TASK", "MARK", "MEDIA", "MENU", "MERGE.DOC", "METHOD", "MODE", "MODULE" _
 , "MODULES", "MONITOR", "MOTION", "MOTION.W", "MOUSE.ICON", "MOVE", "MOVIE", "MOVIES", "MUSIC", "NAME", "NEW", "NEXT", "NORMAL", "ON", "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPTIMIZATION", "ORDER", "OVER", "OVERWRITE", "PAGE", "PART", "PATH", "PEN", "PIPE", "PLAY", "PLAYER", "PLAYER(", "POLYGON", "PRINT", "PRINTER", "PRINTING", "PROFILER", "PROPERTIES", "PROTOTYPE", "PSET", "PUSH", "PUT", "READ", "RECURSION.LIMIT" _
 , "REFER", "REFRESH", "RELEASE", "REM", "REMOVE", "REPEAT", "REPORT", "RESTART", "RETRIEVE", "RETURN", "SAVE", "SAVE.AS", "SAVE.DOC", "SCAN", "SCORE", "SCREEN.PIXELS", "SCRIPT", "SCROLL", "SEARCH", "SEEK", "SELECT", "SET", "SETTINGS", "SHIFT", "SHIFTBACK", "SHOW", "SLOW", "SMOOTH", "SORT", "SOUND", "SOUNDREC", "SOUNDS", "SPEECH", "SPLIT", "SPRITE", "STACK", "START", "STATIC", "STEP", "STOCK", "STOP", "STRUCTURE" _
 , "SUB", "SUBDIR", "SUPERCLASS", "SWAP", "SWEEP", "SWITCHES", "TAB", "TABLE", "TARGET", "TARGETS", "TASK.MAIN", "TEST", "TEXT", "THEN", "THREAD", "THREAD.PLAN", "THREADS", "TITLE", "TONE", "TRY", "TUNE", "UPDATE", "USE", "USER", "VERSION", "VIEW", "VOLUME", "WAIT", "WHILE", "WIDTH", "WIN", "WINDOW", "WITH", "WORDS", "WRITE", "WRITER", "адеиасе", "акт", "аккацг", "аккане", "аккиыс", "аккиыс.ам", "ам", "амафгтгсг" _
-, "амахеыягсг", "амайтгсг", "амакоцио", "амакусг.охомгс", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье", "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "апая", "апаяихлгсг", "апедысе", "апо", "апохгйеусг.ыс", "апойопг", "аяца", "аявеиа", "аявеио", "аявг", "аукос", "ауноуса", "ажаияесг", "ажгсе", "баке", "басг", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг" _
+, "амахеыягсг", "амайтгсг", "амакоцио", "амакусг.охомгс", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье", "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "аниысг", "апая", "апаяихлгсг", "апедысе", "апо", "апохгйеусг.ыс", "апойопг", "аяца", "аявеиа", "аявеио", "аявг", "аукос", "ауноуса", "ажаияесг", "ажгсе", "баке", "басг", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг" _
 , "бгла", "богхеиа", "цецомос", "целисе", "цемийес", "цемийг", "цемийо", "циа", "цяаллатосеияа", "цяаллг", "цяаье", "цягцояа", "деийтг.лояжг", "деине", "дейаен", "дес", "диабасе", "диацяажг", "диайопг", "диайоптес", "диалесоу", "диаяхяысг", "диаяйеиа", "диастиво", "диажамеиа", "диажамо", "диажуцг", "диайопг", "диейоье", "диояхысе", "дипка", "дипкос", "дойилг", "долг", "дяолеас", "дуадийо", "дысе", "еццяажо", "еийома", "еийомес", "еийомидио" _
 , "еисацыцг", "ейдосг", "ейтекесг", "ейтупысг", "ейтупытгс", "екецвос", "еккгмийа", "емхесг", "емтасг", "емы", "емысе", "енацыцг", "енодос", "епамакабе", "епамекабе", "епекене", "епекене.амтийеилемо", "епекене.цяаллатосеияа", "епекене.ояцамо", "епекене.вяыла", "епицяажг", "епийаияо", "епикене", "епикене.амтийеилемо", "епикене.цяаллатосеияа", "епикене.ояцамо", "епикене.вяыла", "епикоцес", "епикоцг", "епикоцгс" _
 , "епипедо", "епистяожг", "епижамеиа", "еполемо", "етийета.жоялас", "еуяесг", "глеяолгмиа", "гвоцяажгсг", "гвои", "гвос", "хесе", "хесг", "идиотгтес", "исвмг", "ивмос", "йахаяг", "йахаяо", "йахе", "йакесе", "йалпукг", "йаме", "йамомийа", "йат", "йатакоцои", "йатакоцос", "йатастасг", "йатавыягсг", "йеилемо", "йемг", "йимгсг", "йимгсг.п", "йкасг", "йкеиди", "йкеисе", "йомсока", "йяата", "йяатгсе", "йяуье" _
 , "йуйкийа", "йуйкос", "йукисг", "йуяио.еяцо", "кабг", "кахос", "катимийа", "кенеис", "киста", "коцос", "лайяус", "ле", "леходос", "лекыдиа", "леяос", "лета", "летахесг", "лоусийг", "лпип", "мео", "мгла", "мглата", "нейима", "охомг", "олада", "олака", "омола", "ояио.амадяолгс", "ояисе", "паийтгс", "паине", "памы", "паяахуяо", "паяе", "паяелбокг", "павос", "педио", "пема", "пеяи" _
-, "пеяихыяио", "пета", "пимайас", "пимайес", "пкациа", "пкаисио", "пкгйтяокоцио", "покуцымо", "пяос", "пяосхесе.еццяажо", "пяосхгйг", "пяытотупо", "пяовеияо", "яоутима", "яухлисеис", "с", "саяысе", "сбгсе", "сеияа", "секида", "семаяио", "сгл", "сглади", "сглеио", "стахеяг", "стахеяес", "статийг", "статийес", "стг", "стгм", "сто", "стой", "стовои", "стовос", "суццяажеас", "суццяажг", "суцвымеусе.еццяажо", "сулпиесг" _
-, "сулпкгяысг", "сумаятгсг", "сумевисе", "сумхгла", "сус", "сустгла", "сведио", "сведиа", "сведио.мглатым", "сыяос", "сысе", "сысе.еццяажо", "таимиа", "таимиес", "танг", "танимолгсг", "текос", "титкос", "тлгла", "тлглата", "томос", "топийа", "топийес", "топийг", "топийо", "тоте", "тупос", "тупысе", "упеяйкасг", "упойатакоцос", "упокоцистг", "жаядиа", "жеяе", "жеяеписы", "жомто", "жояла", "жоятос", "жоятысе" _
+, "пеяихыяио", "пета", "пимайас", "пимайес", "пкациа", "пкаисио", "пкгйтяокоцио", "покуцымо", "пяос", "пяосхесе.еццяажо", "пяосхгйг", "пяытотупо", "пяовеияо", "яоутима", "яухлисеис", "с", "саяысе", "сбгсе", "сеияа", "секида", "семаяио", "сгл", "сглади", "стахеяг", "стахеяес", "статийг", "статийес", "стг", "стгм", "сто", "стой", "стовои", "стовос", "суццяажеас", "суццяажг", "суцвымеусе.еццяажо", "сулпиесг" _
+, "сумаятгсг", "сумевисе", "сус", "сустгла", "сведио", "сведиа", "сведио.мглатым", "сыяос", "сысе", "сысе.еццяажо", "таимиа", "таимиес", "танг", "танимолгсг", "текос", "титкос", "тлгла", "тлглата", "томос", "топийа", "топийес", "топийг", "топийо", "тоте", "тупос", "тупысе", "упеяйкасг", "упойатакоцос", "жаядиа", "жеяе", "жеяеписы", "жомто", "жояла", "жоятысе" _
 , "жоятысе.еццяажо", "жымг", "ваяайтгяес", "ваяане", "вягсг", "вягстг", "вягстгс", "вяыла", "вяылатисе", "?")
 For i = 0 To UBound(mycommands())
 
@@ -4593,6 +4593,8 @@ Case "DESKTOP", "епижамеиа"
 aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDesktop)
 Case "вяылатисе", "PSET"
 aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPset)
+Case "ASSERT", "аниысг"
+aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoAssert)
 Case "IF", "ам"
     aHash.ItemCreator2 CStr(mycommands(i)), 0, 1
 Case "ELSE", "аккиыс"
@@ -4777,7 +4779,7 @@ NullVariant alfa
 Debug.Print IsNull(alfa), myIsNull(alfa)
 End Sub
 Sub SendAKey(ByVal keycode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
-Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long, Old As Long
+Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long, old As Long
 Const key_release As Byte = 2
 If keycode > 500 Then extended = 1: keycode = keycode - 500
 If Not extended Then
@@ -4810,16 +4812,16 @@ Public Function CapsLockOn() As Boolean
     CapsLockOn = (kbArray.kbByte(VK_CAPITAL) And 1) = 1
 End Function
 Public Sub ChangeTo408()
-    Dim Old
-    Old = ActivateKeyboardLayout((408), &H100&)
-    If Old = 0 Then
+    Dim old
+    old = ActivateKeyboardLayout((408), &H100&)
+    If old = 0 Then
     LoadKeyboardLayout "00000408", KLF_ACTIVATE
     End If
 End Sub
 Public Sub ChangeTo409()
-    Dim Old
-    Old = ActivateKeyboardLayout((409), &H100&)
-    If Old = 0 Then
+    Dim old
+    old = ActivateKeyboardLayout((409), &H100&)
+    If old = 0 Then
     LoadKeyboardLayout "00000409", KLF_ACTIVATE
     End If
 End Sub

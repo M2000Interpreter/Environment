@@ -2584,7 +2584,9 @@ If Not acclist Is Nothing Then
                 alt = Abs(((todo \ 100000) Mod 10) <> 0) * 4
                 
                 todo = todo Mod 1000
-                SendAKey todo, shift, ctrl, alt
+                Dim a As gList
+                Set a = Controls(acclist.Value)
+                a.TakeKey CInt(todo), shift + ctrl + alt
             End If
             m = 0
             Exit Sub

@@ -1,8 +1,10 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 41 active-X
-1. Fix descending sort for lists when keys have numbers - part or all- (was like ascending by a mistake)
-2. Fix return type boolean for static Functions.
+Version 10 revision 42 active-X
+1. Fix an error in Stack()
+2. Assert statement look help Assert in M2000 console.
+3. Fix key redirection from user form on accelaration key.
+       (look FirstWindow module in info)
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

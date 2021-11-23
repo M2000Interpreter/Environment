@@ -5400,7 +5400,8 @@ If Module(Info) Then
 	keyboard "INFOBasic"+chr$(13)
 end if
 }
-MODULE INFOBASIC {Set Edit !4   ' 4 chars fpr tabs in edit
+MODULE INFOBASIC {if fontname$<>"Verdana" then font "Verdana"
+Set Edit !4   ' 4 chars fpr tabs in edit
 \\
 \\ Press Esc to exit this editor - look the context drop down menu too (ctrl+F10 also open context dropdown menu)
 \\
@@ -19366,8 +19367,7 @@ Save.Doc doc$,FL$, 2
 wait 200
 Win Quote$(Dir$+FL$)
 }
-MODULE CHANGEHELP {
-if not exist(appdir$+"HELP2000.mdb") then {
+MODULE CHANGEHELP {if not exist(appdir$+"HELP2000.mdb") then {
       Report {You have to place in appdir$ the HELP2000.mdb
             Also you may install Access2007 runtime
             After edit the help file, use Swicth "+mdb" to use mdb file for help
@@ -19380,6 +19380,7 @@ menu fill 1,11,0
 menu frame
 DB.Provider ""  \\ reset
 Window 12, window
+refresh
 Bold 1 : Form 70, 32
 OldDir$=Dir$  \\ keep direcory
 Dir AppDir$  \\ Use helpfile from application's Dir
@@ -34301,5 +34302,69 @@ Declare Form2 Nothing
 Title "Back Again"
 Show  \\ get focus back
 Threads Erase
+}
+MODULE NEWASSERT {mode 22
+Double
+Pen 11 {
+	Report 2, {Assert Statement
+	}
+}
+Normal
+Pen 15 {
+	Print " ";
+	Report {Assert statement check a list of conditions. All condtitions evaluated. Errors in expressions accumulated. If error(s) or false result from condition(s) found, then an error raised.
+	
+	Escape Off   (Esc key disabled for execution stop), make Asserts to ignore the list of coditions.
+	
+	For this test we have three condition to check.
+	The second condition has an error, n variable didn't exit.
+	
+	We use Stop statement to change values, and to insert a new variable n at the execution point. So accept Stop in the following message box, and follow the help messages, typing the displayed statements.
+	Press a key now
+	}, width-2
+}
+Push Key$: Drop
+Report {Start execution....................
+}
+Escape off
+Assert x=10, n=5
+Escape on
+x=10
+REM n=5
+b$="beta"
+While not @checkit() 
+	List !
+	Stop
+End While
+
+Print "Done"
+Print "Press F3"
+
+Function checkit()
+	local ok, resp$
+	Try ok {
+		Assert x=10 , n=5 , b$="alfa"
+	}
+	if not ok then
+	Report "Error "+Error$
+	if not valid(n) then
+		rep$={type: n=10
+		}
+	else.if n<>5 then
+		rep$={type: n=5
+		}
+	else
+		rep$=""
+	end if
+	if not b$="alfa" then
+		rep$+={type: b$="alfa"
+		}
+	end if
+	Report rep$+{type: exit
+		}
+	end if
+	=ok
+end function
+
 }
 UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}
