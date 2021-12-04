@@ -243,6 +243,7 @@ Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
 Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hWnd As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
 Const WM_KEYFIRST = &H100
+Const WM_CHAR = &H102
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
     x As Long
@@ -311,7 +312,7 @@ Public Function GetLastKeyPressed() As Long
 Dim Message As Msg
     If mynum$ <> "" Then
         GetLastKeyPressed = -1
-    ElseIf PeekMessageW(Message, 0, WM_KEYFIRST, WM_KEYLAST, 0) Then
+    ElseIf PeekMessageW(Message, 0, WM_CHAR, WM_KEYLAST, 0) Then
         GetLastKeyPressed = Message.wParam
     Else
         GetLastKeyPressed = -1
@@ -360,6 +361,7 @@ End If
 End Sub
 
 Private Sub Form_Activate()
+If HOOKTEST <> 0 Then UnHook HOOKTEST
 If ASKINUSE Then
 'Me.ZOrder 1
 Else
@@ -1546,7 +1548,7 @@ ThereIsAPrinter = IsPrinter
 If ThereIsAPrinter Then
 
 pname = Printer.DeviceName
-Port = Printer.Port
+port = Printer.port
 
 End If
 
@@ -2659,7 +2661,7 @@ On Error Resume Next
 'tf2$ = THISFILE
 needset = False
 Dim MSD As String
-MSD = App.Path
+MSD = App.path
 AddDirSep MSD
 'View1.TabStop = True
 
@@ -2715,7 +2717,7 @@ Sleep 5
 Loop Until view1.Visible Or MOUT
 
 If Not MOUT Then
-view1.setfoucs
+'view1.setfoucs
 Me.KeyPreview = False
 End If
 
@@ -3130,10 +3132,10 @@ End Sub
 Function GetKeY(ascii As Integer) As String
     Dim Buffer As String, ret As Long
     Buffer = String$(514, 0)
-    Dim R&, k&
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
-      R = CLng(val("&H" & Right(Hex(R), 4)))
-    ret = GetLocaleInfo(R, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
+    Dim r&, k&
+      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
+      r = CLng(val("&H" & Right(Hex(r), 4)))
+    ret = GetLocaleInfo(r, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
     If ret > 0 Then
         GetKeY = ChrW$(AscW(StrConv(ChrW$(ascii Mod 256), 64, CLng(val("&h" + Left$(Buffer, ret - 1))))))
     Else
@@ -3141,11 +3143,11 @@ Function GetKeY(ascii As Integer) As String
     End If
 End Function
 Public Function GetLCIDFromKeyboard() As Long
-    Dim Buffer As String, ret&, R&
+    Dim Buffer As String, ret&, r&
     Buffer = String$(514, 0)
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
-      R = val("&H" & Right(Hex(R), 4))
-        ret = GetLocaleInfo(R, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
+      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
+      r = val("&H" & Right(Hex(r), 4))
+        ret = GetLocaleInfo(r, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
     GetLCIDFromKeyboard = CLng(val("&h" + Left$(Buffer, ret - 1)))
 End Function
 Sub MarkSoftButton(para As Long, pospara As Long)
@@ -3298,6 +3300,53 @@ End Select
 TEXT1.mDoc.ColorEvent = Not TEXT1.NoColor
 
 End Sub
+Private Sub mywait11(bstack As basetask, PP As Double)
+Dim p As Boolean, e As Boolean
+On Error Resume Next
+If bstack.Process Is Nothing Then
+''If extreme Then MyDoEvents
+If PP = 0 Then Exit Sub
+Else
+
+Err.Clear
+p = bstack.Process.Done
+If Err.Number = 0 Then
+e = True
+If p <> 0 Then
+Exit Sub
+End If
+End If
+End If
+PP = PP + CDbl(timeGetTime)
+
+Do
+
+
+If TaskMaster.Processing And Not bstack.TaskMain Then
+        If Not bstack.toprinter Then bstack.Owner.Refresh
+        'If TaskMaster.tickdrop > 0 Then TaskMaster.tickdrop
+        TaskMaster.TimerTick  'Now
+       ' SleepWait 1
+       MyDoEvents
+       
+Else
+        ' SleepWait 1
+        MyDoEvents
+        End If
+If e Then
+p = bstack.Process.Done
+If Err.Number = 0 Then
+If p <> 0 Then
+Exit Do
+End If
+End If
+End If
+Loop Until PP <= CDbl(timeGetTime) Or NOEXECUTION
+
+                       If exWnd <> 0 Then
+                MyTitle$ bstack
+                End If
+End Sub
 
 Public Function NeoASK(bstack As basetask) As Double
 If ASKINUSE Then Exit Function
@@ -3368,7 +3417,10 @@ If IsWine Then
     Sleep 1
     safety = uintnew(timeGetTime) + 30
     While Not NeoMsgBox.Visible And safety < uintnew(timeGetTime)
-        MyDoEvents
+        'MyDoEvents
+        'mywait Basestack1, 1, True
+        mywait11 Basestack1, 5
+        Sleep 1
     Wend
     
     If NeoMsgBox.Visible = False Then
@@ -3407,7 +3459,7 @@ oldcodeid = Modalid
                     Next x
                      Set x = Nothing
 If INFOONLY Then
-NeoMsgBox.command1(0).SetFocus
+NeoMsgBox.command1.SetFocus
 End If
 Modalid = mycode
 
@@ -3416,9 +3468,11 @@ If TaskMaster Is Nothing Then
       Sleep 1
       Else
     
-      If Not TaskMaster.Processing And TaskMaster.QueueCount = 0 Then
-        DoEvents
+      If TaskMaster.QueueCount > 0 Then
+            mywait11 Basestack1, 5
+            Sleep 1
       Else
+      
        TaskMaster.TimerTickNow
        TaskMaster.StopProcess
        

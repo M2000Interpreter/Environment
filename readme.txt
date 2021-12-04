@@ -1,10 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 42 active-X
-1. Fix an error in Stack()
-2. Assert statement look help Assert in M2000 console.
-3. Fix key redirection from user form on accelaration key.
-       (look FirstWindow module in info)
+Version 10 revision 43 active-X
+A lot of work
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

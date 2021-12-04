@@ -105,9 +105,10 @@ poulos:
 End Sub
 
 
-Private Sub TaskInterface_Tick()
+Private Function TaskInterface_Tick() As Boolean
  Dim midimsg As Long
 If mute Or m_duration <= uintnew(CDbl(timeGetTime)) Then
+TaskInterface_Tick = True
 If mNote > 0 Then
  midimsg = &H80 + (mNote * &H100) + Channel
  midiOutShortMsg hmidi, midimsg
@@ -142,7 +143,7 @@ If mNote > 0 Then
 
 End If
 'Form1.OwnEvet = jobnameID
-End Sub
+End Function
 
 
 

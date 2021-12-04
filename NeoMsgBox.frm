@@ -41,7 +41,6 @@ Begin VB.Form NeoMsgBox
    End
    Begin M2000.gList command1 
       Height          =   525
-      Index           =   0
       Left            =   4590
       TabIndex        =   1
       Top             =   4245
@@ -62,33 +61,10 @@ Begin VB.Form NeoMsgBox
       ShowBar         =   0   'False
       ForeColor       =   16777215
    End
-   Begin M2000.gList command1 
-      Height          =   525
-      Index           =   1
-      Left            =   705
-      TabIndex        =   2
-      Top             =   4305
-      Width           =   3330
-      _ExtentX        =   5874
-      _ExtentY        =   926
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   14.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ShowBar         =   0   'False
-      ForeColor       =   16777215
-   End
    Begin M2000.gList gList1 
       Height          =   1995
-      Left            =   3375
-      TabIndex        =   3
+      Left            =   3360
+      TabIndex        =   4
       Top             =   960
       Width           =   4755
       _ExtentX        =   8387
@@ -111,7 +87,7 @@ Begin VB.Form NeoMsgBox
    Begin M2000.gList gList3 
       Height          =   315
       Left            =   3135
-      TabIndex        =   4
+      TabIndex        =   3
       Top             =   3600
       Width           =   4590
       _ExtentX        =   8096
@@ -128,6 +104,28 @@ Begin VB.Form NeoMsgBox
          Strikethrough   =   0   'False
       EndProperty
       ShowBar         =   0   'False
+   End
+   Begin M2000.gList command2 
+      Height          =   525
+      Left            =   480
+      TabIndex        =   2
+      Top             =   4200
+      Width           =   3225
+      _ExtentX        =   5689
+      _ExtentY        =   926
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   14.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      ForeColor       =   16777215
    End
 End
 Attribute VB_Name = "NeoMsgBox"
@@ -153,7 +151,7 @@ Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpD
 Private Declare Function DestroyCaret Lib "user32" () As Long
 Dim iTop As Long, iLeft As Long, iwidth As Long, iheight As Long
 Dim setupxy As Single
-Dim Lx As Long, ly As Long, dr As Boolean, drmove As Boolean
+Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
 Dim a$
 Dim bordertop As Long, borderleft As Long
@@ -164,32 +162,46 @@ Dim myCancel As myButton
 Dim all As Long
 Dim novisible As Boolean
 Private mModalid As Variant
-Dim LastActive As gList, yo As Integer
+Dim LastActive As String, yo As Integer
 
 '
 Property Get NeverShow() As Boolean
 NeverShow = Not novisible
 End Property
 
-Private Sub command1_GotFocus(Index As Integer)
-yo = Index
+Private Sub command1_GotFocus()
+yo = 0
 End Sub
-
-Private Sub command1_KeyDown(Index As Integer, KeyCode As Integer, shift As Integer)
-If KeyCode = 39 Or KeyCode = 40 Then
-KeyCode = 0
-If Index > 0 Then
-If command1(Index - 1).Visible Then command1(Index - 1).SetFocus: Set LastActive = command1(Index - 1)
+Private Sub command2_GotFocus()
+yo = 1
+End Sub
+Private Sub command1_KeyDown(keycode As Integer, shift As Integer)
+If keycode = 39 Or keycode = 40 Then
+    keycode = 0
+ElseIf keycode = 37 Or keycode = 38 Then
+    keycode = 0
+    If command1.Visible Then command2.SetFocus: LastActive = command2.Name
 End If
-ElseIf KeyCode = 37 Or KeyCode = 38 Then
-If Index < 1 Then
-KeyCode = 0
-If command1(Index + 1).Visible Then command1(Index + 1).SetFocus: Set LastActive = command1(Index + 1)
-End If
-End If
-If KeyCode = vbKeyPause And Not BreakMe Then
+If keycode = vbKeyPause And Not BreakMe Then
 ASKINUSE = False
-ElseIf KeyCode = vbKeyEscape Then
+ElseIf keycode = vbKeyEscape Then
+                AskCancel$ = vbNullString
+            ASKINUSE = False
+
+End If
+End Sub
+Private Sub command2_KeyDown(keycode As Integer, shift As Integer)
+If keycode = 39 Or keycode = 40 Then
+keycode = 0
+
+If command1.Visible Then command1.SetFocus: LastActive = command1.Name
+
+ElseIf keycode = 37 Or keycode = 38 Then
+    keycode = 0
+End If
+If keycode = vbKeyPause And Not BreakMe Then
+ASKINUSE = False
+ElseIf keycode = vbKeyEscape Then
                 AskCancel$ = vbNullString
             ASKINUSE = False
 
@@ -197,14 +209,13 @@ End If
 End Sub
 
 Private Sub Form_Activate()
-If LastActive Is Nothing Then Exit Sub
-LastActive.SetFocus
-Set LastActive = Nothing
+If HOOKTEST <> 0 Then UnHook HOOKTEST
+If LastActive = "" Then Exit Sub
+Controls(LastActive).SetFocus
+LastActive = ""
 End Sub
 
 Private Sub Form_Deactivate()
-'Set LastGlist = Nothing
-Set LastActive = Nothing
   If ASKINUSE And Not Form2.Visible Then
     If Visible Then
     Me.SetFocus
@@ -212,8 +223,8 @@ Set LastActive = Nothing
     End If
 End Sub
 
-Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = vbKeyPause And Not BreakMe Then
+Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
+If keycode = vbKeyPause And Not BreakMe Then
 ASKINUSE = False
 End If
 End Sub
@@ -224,13 +235,13 @@ Dim photo As cDIBSection, aPic As StdPicture
 novisible = True
 ''Set LastGlist = Nothing
 
-If AskCancel$ = vbNullString Then command1(1).Visible = False
+If AskCancel$ = vbNullString Then command2.Visible = False
 gList2.enabled = True
 
-command1(0).enabled = True
-command1(1).enabled = True
-command1(0).TabIndex = 2
-command1(1).TabIndex = 1
+command1.enabled = True
+command2.enabled = True
+command1.TabIndex = 2
+command2.TabIndex = 1
 gList2.TabIndex = 3
 
 height1 = 2775 * DYP / 15
@@ -239,16 +250,16 @@ lastfactor = 1
 LastWidth = -1
 
 Set textbox1 = New myTextBox
-Set textbox1.Container = glist3
+Set textbox1.Container = gList3
 textbox1.MaxCharLength = 100
 If AskInput Then
-glist3.Visible = True
+gList3.Visible = True
 textbox1 = AskStrInput$
 textbox1.locked = False
 textbox1.enabled = True
 
 Else
-glist3.Visible = False  ' new from revision 17 (version 7)
+gList3.Visible = False  ' new from revision 17 (version 7)
 End If
 gList1.NoCaretShow = True
 gList1.VerticalCenterText = True
@@ -291,20 +302,20 @@ gList2.HeadLine = AskTitle$
 gList2.HeadlineHeight = gList2.HeightPixels
 gList2.SoftEnterFocus
 Set myOk = New myButton
-Set myOk.Container = command1(0)
+Set myOk.Container = command1
 
   Set myOk.Callback = Me
-  myOk.Index = 1
+  myOk.index = 1
   If Left$(AskOk$, 1) = "*" Then
-  Set LastActive = command1(0)
+  LastActive = command1.Name
   AskOk$ = Mid$(AskOk$, 2)
   End If
   myOk.Caption = AskOk$
 myOk.enabled = True
 Set myCancel = New myButton
-Set myCancel.Container = command1(1)
+Set myCancel.Container = command2
   If Left$(AskCancel$, 1) = "*" Then
-  Set LastActive = command1(1)
+  LastActive = command2.Name
   AskCancel$ = Mid$(AskCancel$, 2)
   End If
 myCancel.Caption = AskCancel$
@@ -321,8 +332,8 @@ Else
 move AskLastX, AskLastY
 End If
 If AskInput Then
-glist3.TabIndex = 1
-Set LastActive = glist3
+gList3.TabIndex = 1
+LastActive = gList3.Name
 End If
 End Sub
 
@@ -337,7 +348,7 @@ If Button = 1 Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
-    ly = y
+    lY = y
     End If
     
     Else
@@ -345,7 +356,7 @@ If Button = 1 Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
-    ly = y
+    lY = y
     End If
     End If
 
@@ -359,9 +370,9 @@ myCancel.Shutdown
 
 gList1.Shutdown
 gList2.Shutdown
-glist3.Shutdown
-command1(0).Shutdown
-command1(1).Shutdown
+gList3.Shutdown
+command1.Shutdown
+command2.Shutdown
 novisible = False
 End Sub
 
@@ -410,11 +421,11 @@ If dr Then
 
 If bordertop < 150 Then
 
-        If y < (Height - 150) Or y > Height Then addy = (y - ly)
+        If y < (Height - 150) Or y > Height Then addy = (y - lY)
      If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
-    If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
+    If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
         If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
@@ -467,11 +478,11 @@ Else
         gList1.PrepareToShow
           ListPad.WrapAgain
         all = ListPad.DocLines
-        ly = ly * lastfactor / factor
+        lY = lY * lastfactor / factor
         End If
         Else
         Lx = x
-        ly = y
+        lY = y
    
 End If
 once = False
@@ -522,14 +533,14 @@ gList1.move borderleft * 2 + itemwidth3, bordertop * 5, itemwidth3 * 2 + borderl
 End If
 End If
 If AskInput Then
-glist3.move borderleft * 2 + itemwidth3, bordertop * 15, itemwidth3 * 2 + borderleft, bordertop * 3
+gList3.move borderleft * 2 + itemwidth3, bordertop * 15, itemwidth3 * 2 + borderleft, bordertop * 3
 
 End If
 If AskCancel$ <> "" Then
-command1(1).move borderleft, bordertop * 19, itemwidth2, bordertop * 3
-command1(0).move borderleft + itemwidth2 + borderleft, bordertop * 19, itemwidth2, bordertop * 3
+command2.move borderleft, bordertop * 19, itemwidth2, bordertop * 3
+command1.move borderleft + itemwidth2 + borderleft, bordertop * 19, itemwidth2, bordertop * 3
 Else
-command1(0).move borderleft, bordertop * 19, itemWidth, bordertop * 3
+command1.move borderleft, bordertop * 19, itemWidth, bordertop * 3
 End If
 If iwidth = 0 Then iwidth = itemwidth3
 If iheight = 0 Then iheight = bordertop * 12
@@ -554,13 +565,13 @@ End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
 gList2.FontSize = 14.25 * factor * dv15 / 15
 gList1.FontSize = 13.5 * factor * dv15 / 15
-glist3.FontSize = 13.5 * factor * dv15 / 15
+gList3.FontSize = 13.5 * factor * dv15 / 15
 
 
 factor = gList2.FontSize / 14.25 / dv15 * 15
-command1(0).FontSize = 11.75 * factor
+command1.FontSize = 11.75 * factor
 factor = gList1.FontSize / 11.75 / dv15 * 15
-command1(1).FontSize = command1(0).FontSize
+command2.FontSize = command1.FontSize
 ScaleDialogFix = factor
 End Function
 
@@ -648,8 +659,8 @@ End Sub
 
 
 
-Private Sub gList2_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = vbKeyEscape Then
+Private Sub gList2_KeyDown(keycode As Integer, shift As Integer)
+If keycode = vbKeyEscape Then
                 AskCancel$ = vbNullString
             ASKINUSE = False
 
@@ -657,22 +668,34 @@ End If
 End Sub
 
 Private Sub gList2_MouseUp(x As Single, y As Single)
-If command1(yo).Visible Then
+If yo = 0 Then
+If command1.Visible Then
     If Not gList2.DoubleClickArea(x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor) Then
-    command1(yo).SetFocus
+    command1.SetFocus
     Else
      AskCancel$ = vbNullString
             ASKINUSE = False
     End If
 End If
+
+Else
+If command2.Visible Then
+    If Not gList2.DoubleClickArea(x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor) Then
+        command2.SetFocus
+    Else
+        AskCancel$ = vbNullString
+        ASKINUSE = False
+    End If
+End If
+End If
 End Sub
 
 Private Sub gList3_Selected2(item As Long)
- command1(0).SetFocus
+ command1.SetFocus
 End Sub
 
-Private Sub InterPress_Press(Index As Long)
-If Index = 0 Then
+Private Sub InterPress_Press(index As Long)
+If index = 0 Then
 AskResponse$ = AskCancel$
 AskCancel$ = vbNullString
 Else

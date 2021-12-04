@@ -48,7 +48,7 @@ Public BackMove As Boolean
 Public LastSelStart As Long
 Public ListLoadedType As Long
 Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
 Private words$, unique As Long
 Private p3 As Long
@@ -166,14 +166,14 @@ Public Sub ResetColor(ParaNum)
 On Error Resume Next
 ReDim para(ParaNum).colordata(2)
 End Sub
-Public Sub ColorThis(mNum As Long, Optional count As Long = 0, Optional LookDown As Boolean = True)
+Public Sub ColorThis(mNum As Long, Optional Count As Long = 0, Optional LookDown As Boolean = True)
 If ForEditBox Then
-    ColorThis3 mNum, count, LookDown
+    ColorThis3 mNum, Count, LookDown
 Else
-    ColorThis2 mNum, count, LookDown
+    ColorThis2 mNum, Count, LookDown
 End If
 End Sub
-Private Sub ColorThis3(mNum As Long, Optional count As Long = 0, Optional LookDown As Boolean = True)
+Private Sub ColorThis3(mNum As Long, Optional Count As Long = 0, Optional LookDown As Boolean = True)
 Dim docback As Long, lookthis As Long, Data$, oldstart As Long, lenfinal As Long, closed As Long, lastnum As Long
 lenfinal = Len(Final$)
 If lenfinal = 0 Then Final$ = ";": lenfinal = 1
@@ -212,7 +212,7 @@ again55:
             End If
             If Final$ = "}" Then
                         closed = -1
-                       count = countbrakcet(Data$, closed, count)
+                       Count = countbrakcet(Data$, closed, Count)
                        End If
             If lookthis = 15 Then
                     
@@ -240,7 +240,7 @@ again2:
                         Data$ = TextParagraph(lookthis)
                         If Final$ = "}" Then
                         closed = -1
-                        count = countbrakcet(Data$, closed, count)
+                        Count = countbrakcet(Data$, closed, Count)
                         If closed > -1 Then
                         
 
@@ -278,7 +278,7 @@ again2:
                                         Do While lookthis > 0
                                             If para(lookthis).startfrom <> para(docback).startfrom Then GoTo finish
                                             para(lookthis).startfrom = 0
-                                            ColorThis1 lookthis, count
+                                            ColorThis1 lookthis, Count
                                         Loop
                                         mNum = lookthis
                                         GoTo finish
@@ -316,7 +316,7 @@ conthere:
         lookthis = 0: GoTo again
         End If
         If Final = "}" Then
-        If para(docback).startfrom > 0 Then mNum = para(docback).startfrom: count = 0
+        If para(docback).startfrom > 0 Then mNum = para(docback).startfrom: Count = 0
         lookthis = 0: GoTo again
         End If
          GoTo again2
@@ -327,18 +327,18 @@ If mNum = 0 Then Exit Sub
     mNum = DocParaNext(mNum)
 End Sub
 
-Private Sub ColorThis2(mNum As Long, Optional count As Long = 0, Optional LookDown As Boolean = True)
+Private Sub ColorThis2(mNum As Long, Optional Count As Long = 0, Optional LookDown As Boolean = True)
 Dim mNum1 As Long, laststart As Long
 If mNum = 0 Then Exit Sub
-If count = 0 Then laststart = para(mNum).startfrom
+If Count = 0 Then laststart = para(mNum).startfrom
 If ColorEvent Then
 mNum1 = mNum
-ColorThis1 mNum, count, True
+ColorThis1 mNum, Count, True
 
 If Not mNum1 = mNum And mNum <> 0 Then
 
 If laststart <> para(mNum).startfrom Or para(mNum1).colordata(UBound(para(mNum1).colordata) - 1) <> 15 Then
-If count = 0 And laststart <> 0 Then
+If Count = 0 And laststart <> 0 Then
 
 laststart = para(mNum1).startfrom
 mNum1 = DocParaNext(mNum1)
@@ -362,7 +362,7 @@ End If
 mNum = DocParaNext(mNum)
 
 End Sub
-Private Sub ColorThis1(mNum As Long, count As Long, Optional ByPass As Boolean = False)
+Private Sub ColorThis1(mNum As Long, Count As Long, Optional ByPass As Boolean = False)
 Dim lookthis As Long, Data$, mNum1 As Long
 If para(mNum).startfrom <> 0 Then
 
@@ -396,7 +396,7 @@ Loop
 mNum = mNum1
 End If
 
-count = -1
+Count = -1
 Else
 
 If lookthis = 0 And (Switchon Or ByPass) Then
@@ -408,7 +408,7 @@ Do While mNum1 <> 0
     mNum1 = DocParaNext(mNum1)
     
 Loop
-count = -1
+Count = -1
 End If
 
 
@@ -418,7 +418,7 @@ Else
 
 Data$ = TextParagraph(mNum)
 RaiseEvent ColorDataEvent(mNum, Data$, lookthis)
-count = 0
+Count = 0
 End If
 End Sub
  
@@ -962,7 +962,7 @@ If Typename(thiscur) = "Empty" Then
 
 Else
 If InStr(textHtmlDoc, vbTab) > 0 Then
-    textHtmlDoc = "<pre>" + Left$(textHtmlDoc, thiscur - 1) + vbCrLf + "</pre>"
+    textHtmlDoc = "<pre >" + Left$(textHtmlDoc, thiscur - 1) + vbCrLf + "</pre>"
 Else
     textHtmlDoc = Left$(textHtmlDoc, thiscur - 1) + vbCrLf
 End If
@@ -2189,16 +2189,16 @@ Dim PathLength As Long
         GetDosPath = Left$(s, PathLength)
 
 End Function
-Private Function NeoUnicodeFile(FileName$) As Boolean
+Private Function NeoUnicodeFile(Filename$) As Boolean
 Dim hFile
 Dim F$
 Const FILE_ATTRIBUTE_NORMAL = &H80
 Const GENERIC_WRITE = &H40000000
-If Left$(FileName$, 2) <> "\\" Then
+If Left$(Filename$, 2) <> "\\" Then
 
-F$ = "\\?\" + FileName$
+F$ = "\\?\" + Filename$
 Else
-F$ = FileName$
+F$ = Filename$
 End If
 On Error Resume Next
 hFile = CreateFile(StrPtr(F$), GENERIC_WRITE, ByVal 0, ByVal 0, 2, FILE_ATTRIBUTE_NORMAL, ByVal 0)
@@ -2206,7 +2206,7 @@ hFile = CreateFile(StrPtr(F$), GENERIC_WRITE, ByVal 0, ByVal 0, 2, FILE_ATTRIBUT
 CloseHandle hFile
 NeoUnicodeFile = (GetDosPath(F$) <> "")
 End Function
-Public Function SaveUnicodeOrAnsi(ByVal FileName As String, Optional mode2save As Long = 0, Optional Append As Boolean = False) As Boolean
+Public Function SaveUnicodeOrAnsi(ByVal Filename As String, Optional mode2save As Long = 0, Optional Append As Boolean = False) As Boolean
 ' using doc as extension you can read it from word...with automatic conversion to unicode
 ' OVERWRITE ALWAYS
 Dim w As Long, a() As Byte, F$, i As Long, bb As Byte, yesswap As Boolean, lf$
@@ -2220,9 +2220,9 @@ If Abs(mode2save \ 10) > 0 Then
 End If
 mode2save = mode2save Mod 10
 If Not Append Then
-    If Not NeoUnicodeFile(FileName) Then Exit Function
+    If Not NeoUnicodeFile(Filename) Then Exit Function
 End If
-F$ = GetDosPath(FileName)
+F$ = GetDosPath(Filename)
 If Err.Number > 0 Or F$ = vbNullString Then Exit Function
 w = FreeFile
 Open F$ For Binary As w
@@ -2424,7 +2424,7 @@ Public Function ContainsUTF16(ByRef Source() As Byte) As Long
     End If
     End If
 End Function
-Public Sub ReadUnicodeOrANSI(FileName As String, Optional Merge As Boolean = False, Optional feedback As Long, Optional insert2index As Boolean = False)
+Public Sub ReadUnicodeOrANSI(Filename As String, Optional Merge As Boolean = False, Optional feedback As Long, Optional insert2index As Boolean = False)
 Busy = True
 Dim i&, FNr&, BLen&, WChars&, bom As Integer, BTmp As Byte, b() As Byte, lbt As Long
 Dim mLof As Long, ok, nobom As Long
@@ -2432,14 +2432,14 @@ nobom = 1
 ' code from Schmidt, member of vbforums
 ' this code changed for Document Class
 ' Change to read line by line, so no two copies needed
-If FileName = vbNullString Then Exit Sub
+If Filename = vbNullString Then Exit Sub
 If Not Merge Then EmptyDoc
 ReDim Buffer(1 To 1) As Byte
 bufOffset = 0
 bufsize = 0
 SeekBuf = 1
 On Error GoTo ErrHandler
-  BLen = FileLen(GetDosPath(FileName))
+  BLen = FileLen(GetDosPath(Filename))
     If BLen = 0 Then
   If DocLines = 0 Then
   textDoc = vbNullString
@@ -2448,7 +2448,7 @@ On Error GoTo ErrHandler
   End If
   
   FNr = FreeFile
-  Open GetDosPath(FileName) For Binary Access Read As FNr
+  Open GetDosPath(Filename) For Binary Access Read As FNr
   Get FNr, , bom
     Select Case bom
       Case &HFEFF, &HFFFE 'one of the two possible 16 Bit BOMs

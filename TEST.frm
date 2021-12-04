@@ -201,7 +201,7 @@ Private Label(0 To 2) As New myTextBox
 Dim run_in_basestack1 As Boolean
 Dim MyBaseTask As New basetask
 Dim setupxy As Single
-Dim Lx As Long, ly As Long, dr As Boolean, drmove As Boolean
+Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
 Dim a$
 Dim bordertop As Long, borderleft As Long
@@ -247,7 +247,7 @@ Dim excode As Long
 If keycode = 13 Then
 keycode = 0
     If Compute.Prompt = "? " Then
-        gList3(2).backcolor = &H3B3B3B
+        glist3(2).backcolor = &H3B3B3B
         TestShowCode = False
         stackshow MyBaseTask
     Else
@@ -291,6 +291,7 @@ End Sub
 
 Private Sub Form_Activate()
 '
+If HOOKTEST <> 0 Then UnHook HOOKTEST
 trace = True
 If stolemodalid = 0 Then
 If Modalid <> 0 Then
@@ -344,11 +345,11 @@ gList2.FloatLimitTop = VirtualScreenHeight() - players(0).Yt * 2
 gList2.FloatLimitLeft = VirtualScreenWidth() - players(0).Xt * 2
 gList2.MoveParent = True
 'gList2.enabled = True
-gList1.DragEnabled = False
-gList1.AutoPanPos = True
+glist1.DragEnabled = False
+glist1.AutoPanPos = True
 Set testpad = New TextViewer
-gList1.NoWheel = True
-Set testpad.Container = gList1
+glist1.NoWheel = True
+Set testpad.Container = glist1
 testpad.Filename = vbNullString
 testpad.glistN.DropEnabled = False
 testpad.glistN.DragEnabled = False
@@ -364,9 +365,9 @@ Compute.MaxCharLength = 500 ' as a limit
 Compute.locked = False
 Compute.enabled = True
 Compute.Retired
-Set Label(0).Container = gList3(0)
-Set Label(1).Container = gList3(1)
-Set Label(2).Container = gList3(2)
+Set Label(0).Container = glist3(0)
+Set Label(1).Container = glist3(1)
+Set Label(2).Container = glist3(2)
 If pagio$ = "GREEK" Then
 gList2.HeadLine = "Έλεγχος"
 Compute.Prompt = "? "
@@ -455,14 +456,14 @@ End Sub
 
 
 Private Sub gList1_CheckGotFocus()
-gList1.backcolor = &H606060
-gList1.ShowMe2
+glist1.backcolor = &H606060
+glist1.ShowMe2
 End Sub
 
 Private Sub gList1_CheckLostFocus()
 
-gList1.backcolor = &H3B3B3B
-gList1.ShowMe2
+glist1.backcolor = &H3B3B3B
+glist1.ShowMe2
 End Sub
 
 
@@ -504,16 +505,16 @@ If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor,
 End If
 End Sub
 
-Public Property Let Label1prompt(ByVal Index As Long, ByVal RHS As String)
-Label(Index).Prompt = RHS
+Public Property Let Label1prompt(ByVal index As Long, ByVal RHS As String)
+Label(index).Prompt = RHS
 End Property
 
-Public Property Get label1(ByVal Index As Long) As String
-label1 = Label(Index)
+Public Property Get label1(ByVal index As Long) As String
+label1 = Label(index)
 End Property
 
-Public Property Let label1(ByVal Index As Long, ByVal RHS As String)
-Label(Index) = RHS
+Public Property Let label1(ByVal index As Long, ByVal RHS As String)
+Label(index) = RHS
 End Property
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
 Dim a As RECT, b As Long
@@ -567,15 +568,15 @@ End Sub
 
 
 
-Private Sub glist3_CheckGotFocus(Index As Integer)
+Private Sub glist3_CheckGotFocus(index As Integer)
 Dim s$, z$
 gList4.SetFocus
-If Index < 2 Then
+If index < 2 Then
 abt = False
 
 vH_title$ = vbNullString
-s$ = Label(Index)
-If Index = 1 Then
+s$ = Label(index)
+If index = 1 Then
    
         Dim i As Long
         If MyBaseTask.ExistVar2(s$) Then
@@ -639,7 +640,7 @@ sHelp s$, MyBaseTask.Process.CodeData, vH_x, vH_y
 vHelp
 End If
 Else
-If Index = 0 Then
+If index = 0 Then
 i = MyBaseTask.OriginalCode
 JUMPHERE:
 Dim aa As Long, aaa As String
@@ -674,13 +675,13 @@ Case "?", "!", " ", ".", ":", Is >= "A", Chr$(10), """"
 End Select
 End If
 End If
-ElseIf Index = 2 Then
+ElseIf index = 2 Then
 TestShowCode = Not TestShowCode
 If TestShowCode Then
-gList3(2).backcolor = &H606060
+glist3(2).backcolor = &H606060
 Label(2) = Label(2)
 Else
-gList3(2).backcolor = &H3B3B3B
+glist3(2).backcolor = &H3B3B3B
 Label(2) = Label(2)
 testpad.SetRowColumn 1, 1
 End If
@@ -787,7 +788,7 @@ If Button = 1 Then
     tracecounter = 100
     mousepointer = vbSizeNWSE
     Lx = x
-    ly = y
+    lY = y
     End If
     
     Else
@@ -796,7 +797,7 @@ If Button = 1 Then
     tracecounter = 100
     mousepointer = vbSizeNWSE
     Lx = x
-    ly = y
+    lY = y
     End If
     End If
 
@@ -817,11 +818,11 @@ If dr Then
 
 If bordertop < 150 Then
 
-        If y < (Height - 150) Or y > Height Then addy = (y - ly)
+        If y < (Height - 150) Or y > Height Then addy = (y - lY)
      If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
-    If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
+    If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
         If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
@@ -862,13 +863,13 @@ Else
         LastWidth = Width
       gList2.HeadlineHeight = gList2.HeightPixels
         gList2.PrepareToShow
-        gList1.PrepareToShow
+        glist1.PrepareToShow
         'testpad.Render
-        ly = ly * lastfactor / factor
+        lY = lY * lastfactor / factor
         End If
         Else
         Lx = x
-        ly = y
+        lY = y
    
 End If
 once = False
@@ -897,23 +898,23 @@ FontTransparent = False  ' clear background  or false to write over
 gList2.move borderleft, bordertop, itemWidth, bordertop * 3
 gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
 gList2.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
-gList3(0).move borderleft, bordertop * 5, itemwidth2, bordertop * 4
-gList3(1).move borderleft, bordertop * 9, itemwidth2, bordertop * 4
-gList3(2).move borderleft, bordertop * 13, itemwidth2, bordertop * 4
+glist3(0).move borderleft, bordertop * 5, itemwidth2, bordertop * 4
+glist3(1).move borderleft, bordertop * 9, itemwidth2, bordertop * 4
+glist3(2).move borderleft, bordertop * 13, itemwidth2, bordertop * 4
 gList4.move borderleft * 2 + itemwidth2, bordertop * 5, itemwidth3, bordertop * 12
-gList1.move borderleft, bordertop * 18, itemWidth, bordertop * 12
+glist1.move borderleft, bordertop * 18, itemWidth, bordertop * 12
 gList0.move borderleft, bordertop * 31, itemWidth, bordertop * 3
 End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
 gList2.FontSize = 14.25 * factor * dv15 / 15
 factor = gList2.FontSize / 14.25 / dv15 * 15
-gList1.FontSize = 11.25 * factor * dv15 / 15
+glist1.FontSize = 11.25 * factor * dv15 / 15
 gList4.FontSize = 12 * factor * dv15 / 15
-factor = gList1.FontSize / 11.25 / dv15 * 15
-gList3(0).FontSize = gList1.FontSize
-gList3(1).FontSize = gList1.FontSize
-gList3(2).FontSize = gList1.FontSize
-gList0.FontSize = gList1.FontSize
+factor = glist1.FontSize / 11.25 / dv15 * 15
+glist3(0).FontSize = glist1.FontSize
+glist3(1).FontSize = glist1.FontSize
+glist3(2).FontSize = glist1.FontSize
+gList0.FontSize = glist1.FontSize
 ScaleDialogFix = factor
 End Function
 

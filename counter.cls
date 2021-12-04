@@ -133,22 +133,23 @@ Private Function BytesToStr(ab() As Byte) As String
     BytesToStr = ab() 'StrConv(ab, vbUnicode)
     
 End Function
-Private Sub TaskInterface_Tick()
+Private Function TaskInterface_Tick() As Boolean
 
  Dim x As Integer, mycnt As Long
 Dim lpBuffer(2048) As Byte
 On Error GoTo there
 If m_duration <= uintnew(CDbl(timeGetTime)) Then
+    TaskInterface_Tick = True
    m_duration = uintnew(CDbl(timeGetTime)) + mYspace
    If hPipe <> 0 Then
   ' mybuf$ = String$(2001, Chr(0))
    If ConnectNamedPipe(hPipe, ByVal 0) = 0 Then
     If GetLastError = ERROR_PIPE_LISTENING Then
 
-    Exit Sub
+    Exit Function
     End If
    Else
-   Exit Sub
+   Exit Function
    End If
     Erase lpBuffer()
   res = ReadFile(hPipe, lpBuffer(0), 2043, mycnt, ByVal 0&)
@@ -170,10 +171,10 @@ If m_duration <= uintnew(CDbl(timeGetTime)) Then
 ' ByVal stringbuffer, 10, numread, 0
    End If
    End If
-   Exit Sub
+   Exit Function
 there:
     myBase.Done = True
-End Sub
+End Function
 
 
 

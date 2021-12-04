@@ -56,7 +56,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Private gokeyboard As Boolean, lastitem As Long, part1 As String, lastgoodnum As Long
 Private height1, width1
-Dim Lx As Long, ly As Long, dr As Boolean
+Dim Lx As Long, lY As Long, dr As Boolean
 Dim bordertop As Long, borderleft As Long, lastshift As Integer
 Dim allheight As Long, allwidth As Long, itemWidth As Long
 Private myobject As Object
@@ -303,6 +303,10 @@ Public Sub UNhookMe()
 ' nothing
 End Sub
 
+Private Sub Form_Activate()
+If HOOKTEST <> 0 Then UnHook HOOKTEST
+End Sub
+
 Private Sub Form_Load()
 Set LASTActiveForm = Screen.ActiveForm
 End Sub
@@ -318,7 +322,7 @@ If Button = 1 Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
-    ly = y
+    lY = y
     End If
     
     Else
@@ -326,7 +330,7 @@ If Button = 1 Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
-    ly = y
+    lY = y
     End If
     End If
 
@@ -347,11 +351,11 @@ If dr Then
 
 If bordertop < 150 Then
 
-        If y < (Height - 150) Or y > Height Then addy = (y - ly)
+        If y < (Height - 150) Or y > Height Then addy = (y - lY)
      If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
-    If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
+    If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
         If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
@@ -395,11 +399,11 @@ Else
 
 
 ''gList1.PrepareToShow
-        ly = ly * Pouplastfactor / factor
+        lY = lY * Pouplastfactor / factor
         End If
         Else
         Lx = x
-        ly = y
+        lY = y
    
 End If
 once = False
@@ -460,13 +464,13 @@ lastitem = item
 End If
 End Sub
 
-Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub gList1_KeyDown(keycode As Integer, shift As Integer)
 gokeyboard = True
-If KeyCode = vbKeyEscape Then Unload Me: Exit Sub
+If keycode = vbKeyEscape Then Unload Me: Exit Sub
 
 If gList1.ListIndex = -1 Then gList1.ListindexPrivateUse = lastitem
 
-If ((KeyCode >= vbKey0 And KeyCode <= vbKey9) Or (KeyCode >= vbKeyNumpad0 And KeyCode <= vbKeyNumpad9)) And gList1.EditFlag = False And gList1.ListIndex = 0 Then
+If ((keycode >= vbKey0 And keycode <= vbKey9) Or (keycode >= vbKeyNumpad0 And keycode <= vbKeyNumpad9)) And gList1.EditFlag = False And gList1.ListIndex = 0 Then
                         lastitem = 0
                     gList1.PromptLineIdent = Len(part1)
                     gList1.list(0) = vbNullString
@@ -474,10 +478,10 @@ If ((KeyCode >= vbKey0 And KeyCode <= vbKey9) Or (KeyCode >= vbKeyNumpad0 And Ke
                     gList1.EditFlag = True
 
 ElseIf gList1.ListIndex = 0 And gList1.EditFlag = True Then
-        If KeyCode = vbKeyDown Or KeyCode = vbKeyReturn And gList1.EditFlag = True Then
+        If keycode = vbKeyDown Or keycode = vbKeyReturn And gList1.EditFlag = True Then
         gList1.EditFlag = False
         lastitem = 0
-        KeyCode = 0
+        keycode = 0
         DoCommand 1
         gList1.ListindexPrivateUse = 0
         gList1.ShowMe2

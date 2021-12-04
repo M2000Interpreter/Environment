@@ -171,18 +171,53 @@ If p >= 0 And p < UBound(q()) Then
      
               '
 While FastSymbol(rest$, ",")
+x = Empty
 If IsLabelSymbolNew(rest$, "жяасг", "TEXT", Lang) Then
 If IsStrExp(bstack, rest$, w$) Then q(p).Tag = w$
 ElseIf IsLabelSymbolNew(rest$, "пема", "PEN", Lang) Then
-If IsExp(bstack, rest$, x) Then q(p).pen = x
+If IsExp(bstack, rest$, x, , True) Then q(p).pen = x
 ElseIf IsLabelSymbolNew(rest$, "жомто", "BACK", Lang) Then
-If IsExp(bstack, rest$, x) Then q(p).back = x
+If IsExp(bstack, rest$, x, , True) Then q(p).back = x
 ElseIf IsLabelSymbolNew(rest$, "пкаисио", "BORDER", Lang) Then
-If IsExp(bstack, rest$, x) Then q(p).fore = x
+If IsExp(bstack, rest$, x, , True) Then q(p).fore = x
 ElseIf IsLabelSymbolNew(rest$, "одгциа", "COMMAND", Lang) Then
 If IsStrExp(bstack, rest$, w$) Then q(p).Comm = w$
+ElseIf IsLabelSymbolNew(rest$, "тилг", "VALUE", Lang) Then
+If IsExp(bstack, rest$, x, , True) Then q(p).topval = Int(x * 100)
+ElseIf IsLabelSymbolNew(rest$, "басг", "BASE", Lang) Then
+If IsExp(bstack, rest$, x, , True) Then q(p).botval = Int(x * 100):
+ElseIf IsLabelSymbolNew(rest$, "вяыла", "COLOR", Lang) Then
+If IsExp(bstack, rest$, x, , True) Then q(p).barC = x
+ElseIf IsLabelSymbolNew(rest$, "лецехос", "SIZE", Lang) Then
+If IsExp(bstack, rest$, x, , True) Then
+If x > 100 Then x = 100
+If x < -100 Then x = -100
+q(p).imagesize = Int(x)
 End If
-
+' "йахетг", "PORTRAIT"
+ElseIf IsLabelSymbolNew(rest$, "йахетг", "PORTRAIT", Lang) Then
+    If IsExp(bstack, rest$, x, , True) Then q(p).Vertical = Int(x) <> 0
+ElseIf IsLabelSymbolNew(rest$, "еийома", "IMAGE", Lang) Then
+If IsExp(bstack, rest$, x) Then
+    If bstack.lastobj Is Nothing Then
+    Set q(p).drawimage = Nothing
+    ElseIf TypeOf bstack.lastobj Is mHandler Then
+        Dim usehandler As mHandler
+        Set usehandler = bstack.lastobj
+        Set bstack.lastobj = Nothing
+        If usehandler.t1 = 2 Then
+        Set q(p).drawimage = usehandler.objref
+        Else
+        GoTo err123
+        End If
+     
+    Else
+err123:
+        WrongObject
+        Exit Sub
+    End If
+    End If
+End If
 Wend
 RTarget bstack, q(p)
 End If
@@ -2623,7 +2658,7 @@ Public Sub SendScanCode(a, Optional shift As Boolean, Optional ctrl As Boolean, 
 If MyIsNumeric(a) Then
 a = CLng(a)
 If a < 0 Then Exit Sub
-If a > 499 Then Exit Sub
+If a > 754 Then Exit Sub
 Else
 a = UCase(a)
 Select Case a
@@ -2635,7 +2670,7 @@ If a > 254 Then a = 0
 End Select
 End If
 If a = 0 Then Exit Sub
-SendAKey CByte(a), shift, ctrl, alt
+SendAKey a, shift, ctrl, alt
 End Sub
 Property Get CapsLock() As Boolean
     CapsLock = CapsLockOn()

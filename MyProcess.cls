@@ -136,10 +136,10 @@ End Sub
 
 
 
-Private Sub TaskInterface_Tick()
+Private Function TaskInterface_Tick() As Boolean
 On Error Resume Next
- Dim X As Long, mycnt As Long, ohere$, look As Boolean, ok As Boolean
- Static offset As Double
+ Dim x As Long, mycnt As Long, ohere$, look As Boolean, ok As Boolean
+ Static Offset As Double
  Dim NowProcess As basetask
  Set NowProcess = myProcess
 
@@ -153,20 +153,22 @@ End If
  If myDone Then GoTo there
  ok = m_duration <= uintnew(CDbl(timeGetTime))
  If ok Or mStep Then
+ 
             If ok Then m_duration = uintnew(CDbl(timeGetTime)) + mYspace
 
             If mybuf$ = vbNullString Then
-            If Not ok Then mStep = False: Exit Sub
+            If Not ok Then mStep = False: Exit Function
             mybuf$ = mycode: NowProcess.IFCTRL = 0: NowProcess.jump = False: NowProcess.UseofIf = 0
             End If
+            TaskInterface_Tick = True
             ohere$ = here$
             here$ = myHere$
-            X = 1
+            x = 1
             look = True
             
 Set NowProcess.Owner = myOwner
 If Interrupted Then SetTextBasketBack myOwner, players(GetCode(myOwner)): mStep = True
- Call executeblock(X, NowProcess, mybuf$, False, look, Interrupted, True)
+ Call executeblock(x, NowProcess, mybuf$, False, look, Interrupted, True)
   If Not (NowProcess Is Nothing) Then Set myOwner = NowProcess.Owner
         If Len(mybuf$) < 3 Then
             mybuf$ = vbNullString
@@ -176,14 +178,14 @@ If Interrupted Then SetTextBasketBack myOwner, players(GetCode(myOwner)): mStep 
       
     If Not look Then GoTo conthere
      End If
-       If LastErNum <> 0 Or X = 0 Then
+       If LastErNum <> 0 Or x = 0 Then
        mStep = False
        myDone = True
        End If
-        If X = 3 Then X = 1: look = False
-        If ProcessEnd Then Exit Sub
+        If x = 3 Then x = 1: look = False
+        If ProcessEnd Then Exit Function
         
-        If (X = 1 Or (X = 2 And mybuf$ = vbNullString)) And look = True Then
+        If (x = 1 Or (x = 2 And mybuf$ = vbNullString)) And look = True Then
         
             If NowProcess.Parent.exist(myid, "_multi") Then
                 mStep = False
@@ -203,7 +205,7 @@ If Interrupted Then SetTextBasketBack myOwner, players(GetCode(myOwner)): mStep 
 conthere:
 If NOEXECUTION Then GoTo there
                 here$ = ohere$
-        If X = 0 Then
+        If x = 0 Then
         myDone = True
         
         End If
@@ -215,7 +217,7 @@ If MOUT Then GoTo there
    End If
     If myDone Then GoTo there
     
-   Exit Sub
+   Exit Function
 there:
 On Error GoTo 0
 
@@ -223,7 +225,7 @@ On Error GoTo 0
 
    TaskInterface_Dispose tmThisTask
    
-End Sub
+End Function
 Public Property Get TaskInterface_CodeData() As String
 TaskInterface_CodeData = mycode
 End Property

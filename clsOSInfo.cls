@@ -341,13 +341,13 @@ Private Sub Class_Initialize()
         Set colOS = oWMI.ExecQuery("Select * from Win32_OperatingSystem")
         
         For Each oOS In colOS
-            Pos = InStr(oOS.Version, ".")
+            Pos = InStr(oOS.version, ".")
             If Pos = 0 Then
-                osi.dwMajorVersion = CLng(oOS.Version)
+                osi.dwMajorVersion = CLng(oOS.version)
                 osi.dwMinorVersion = 0
                 osi.dwBuildNumber = 0
             Else
-                Ver = Split(oOS.Version, ".")
+                Ver = Split(oOS.version, ".")
                 If UBound(Ver) = 1 Then
                     osi.dwMajorVersion = CLng(Ver(0))
                     osi.dwMinorVersion = CLng(Ver(1))
@@ -1777,7 +1777,7 @@ Public Sub SendScanCode(a, Optional shift As Boolean, Optional ctrl As Boolean, 
 If MyIsNumeric(a) Then
 a = CLng(a)
 If a < 0 Then Exit Sub
-If a > 499 Then Exit Sub
+If a > 754 Then Exit Sub
 Else
 a = UCase(a)
 Select Case a
@@ -1789,7 +1789,7 @@ If a > 254 Then a = 0
 End Select
 End If
 If a = 0 Then Exit Sub
-SendAKey CByte(a), shift, ctrl, alt
+SendAKey a, shift, ctrl, alt
 End Sub
 Property Get CapsLock() As Boolean
     CapsLock = CapsLockOn()

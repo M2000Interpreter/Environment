@@ -32,6 +32,7 @@ Public UnloadForm1 As Boolean, a$
 Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 Public dv15 As Long
 Public ExitNow As Boolean
+Dim cfie As New cfie
 
 Public Function commandW() As String
 Static mm$
@@ -54,6 +55,9 @@ End Function
 Sub Main()
 dv15 = 1440 / DpiScrX
 DisableProcessWindowsGhosting
+If cfie.ReadFeature(cfie.ExeName, cfie.InstalledVersion * 1000) = Empty Then
+Debug.Print cfie.InstalledVersion
+End If
 Dim mm As New RunM2000
 Dim o As Object
 Set o = mm

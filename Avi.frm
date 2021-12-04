@@ -35,7 +35,7 @@ Private intTimes As Long
 Public previewKey As Boolean
 
 Private Sub Form_Activate()
-
+If HOOKTEST <> 0 Then UnHook HOOKTEST
 CLICK_COUNT = CLICK_COUNT + 1
 If getout Then Exit Sub
 If CLICK_COUNT < 2 Then

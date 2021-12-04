@@ -4240,6 +4240,7 @@ Module CheckIt {
       Rem : Wait 3000   ' we can use just a wait loop, or the main.task loop
       \\ main.task exit if all threads erased
       Main.Task 30 {
+      rem refresh  ' use refresh to show something
       }
 \\ when module exit all threads from this module get a signal to stop.
 \\ we can use Threads Erase to erase all threads.
@@ -5681,7 +5682,7 @@ Sub Press()
 	Print @(0,Height);
 	Thread {
 		Pen col {
-		Print Over $(3), "Press space bar or mouse key" 
+		Print Over $(3), "Press space bar or mouse key":Refresh
 		}
 		swap col, col2
 	} as threadid interval 250
@@ -11584,7 +11585,7 @@ Print "Treatment group "
 Print 85, 88, 75, 66, 25, 29, 83, 39, 97
 Print "Control group"
 Print 68, 41, 10, 49, 16, 65, 32, 92, 28, 98
-Print "Please wait about 4.5 minutes  - Use ctrl-C to exit any time"
+Print "Please wait about 1.5 to 4.5 minutes  - Use ctrl-C to exit any time"
 Refresh
 Module Checkit {
       Global data(), treat=0
@@ -12194,7 +12195,7 @@ MODULE HTTP {Module CheckIt  {
       }  as TimeOut interval 300   ' change thread interval to give more time to collect
       \\ In main thread we can check ReadyState and Mouse button
       Task.Main 100 {
-            Report 2, Str$(ReadyState)
+            Report 2, Str$(ReadyState): refresh
             If ReadyState=4 then exit
             if k>20 then exit   ' 20*100= 2 sec
             if mouse then exit ' exit if mouse click
@@ -15708,6 +15709,7 @@ Thread {
       Player 2,xd1+kp,y
       'Player 4, xm,ym     
       Player 4, xm,ym Use a$,1,0, xm mod 360 size (2*xk-Abs(xm-xk))/xk
+      REFRESH 5000
       xm+=tx       
       ym+=tm
       } As mp Interval 10
@@ -15791,7 +15793,8 @@ Main.Task 100 {
       Case " "
             {  If Not kr Then Layer {Hide }: kr~
                   Thread mp Hold
-                  Mouse.icon Show 
+                  Mouse.icon Show
+                  refresh 20
                   If Ask("Stop this game","SoloPong","Yes","No")=1 Then { 
                   Layer {Cls 5}
                         finish=True
@@ -15803,7 +15806,8 @@ Main.Task 100 {
 }
 Threads Erase
 If kr Else { Layer {Hide : Cls 5} : kr~ }
-Mouse.icon Show 
+Mouse.icon Show
+REFRESH  20
 If Ask("New Game","SoloPong","Yes","No")=1 Then Goto Again
 Player 0
 Cls 5
@@ -22692,7 +22696,7 @@ thread {
 } as countdown interval 100
 
 Main.Task 25 {
-	Print m, "inside main task"
+	Print m, "inside main task": Refresh
 	if keypress(1) then exit
 }
 Threads ' just report
@@ -22845,6 +22849,7 @@ Main.Task 1000/4 {
 		Print #-2,Page$
 		Doc$=Page$
 		Clear Page$
+		refresh
 	}
 	if critical>40 or keypress(1) then exit
 }
@@ -23109,7 +23114,7 @@ Scroll Split  row+1
 Pen 0
 threads erase
 Thread {
-	scan 0.01 : thread this interval 10  \\ repait interval
+	scan 0.01 : thread this interval 10 
 	Layer {Cursor 0,messrow : Print  Over  : Print Part ~(0),"waiting..." , kk }
 } as LL
 After 1000 { Thread LL interval 10}
@@ -26008,7 +26013,7 @@ MODULE ΓΡΑΦΙΚΟ {θεσε γρηγορα !
             ανανεωση 2000
             αν πατημένο(1)  τοτε εξοδος
             ζ+=ζβ
-            αν κκ τότε{ αν ζ>4*πι τότε κκ=ψευδής} αλλιώς άδειασε
+            αν κκ τότε{ αν ζ>4*πι τότε κκ=ψευδής:άδειασε} αλλιώς άδειασε
             ζ1+=ζβ1*2
       }
 }
@@ -27333,8 +27338,7 @@ Do
         until not zz
     else.if lcase$(line$)="exit" then
     	line$=""
-    else
-     
+    else    
        push line$
        module privatename
        Try  {
@@ -27343,8 +27347,8 @@ Do
        module back$       
         er$=error$       
 	if er$<>"" then echo(er$)
-
     end if
+    wait 1
 Until line$=""
 Print len(line$)
 wait 1000
@@ -34366,5 +34370,89 @@ Function checkit()
 	=ok
 end function
 
+}
+MODULE ΑΘΡΟΙΣΜΑ {\\ ετοιμασία οθόνης
+Οθόνη 5 : Φορμα 80,50 : Πένα 14
+\\ ετοιμασία πίνακα
+μεγ=10
+μεγ1=μεγ-1
+Πίνακας Α(μεγ)
+'Α(0) = 1, 1, 1, 3, 3, 3, 4, 5, 1, 2
+Α(0) =1, 3, 4, 6, 5, 4,12, 13, 7,8
+\\ μεταβλητές
+
+Τοπικές σκοπός=25, συνολο, μισό=μεγ Δια 2
+\\Ετοιμασία Εξαγωγής
+Κάνε φόρμα4$(Χ)=Δεξι$("    "+Γραφή$(Χ,"##0"),4)
+αα=Α()
+Έγγραφο Α$={Αποτελέσματα:
+Σύνολο: }+αα#γραφη$(",")+{
+Σκοπός:}+γραφη$(Σκοπός)+{
+}
+\\ κύρια επανάληψη
+Για κ=0 Έως μεγ1 {
+      Αν α(κ)<σκοπός Τότε {
+            Για τόσα=1 Έως μεγ1 { \\ δοκίμασε με τόσα=2
+                        πάρε_ένα(κ, σκοπός, τόσα)
+                 }
+       }
+}
+Διόρθωσε Α$ \\ ανοίγει τον διορθωτή Για να συμπληρώσουμε κάτι
+Πρόχειρο Α$ \\ εξαγωγή στο πρόχειρο
+Σώσε.Έγγραφο Α$, "Αποτελέσματα.txt"
+Αναφορά Α$ \\ στην οθόνη
+\\ εδώ τερματίζει ο διερμηνευτής.
+Ρουτίνα πάρε_ένα(χ, ν, άσε_τόσα)
+      Τοπικές κ=1, σουμα, κκ, μμ, προχ$
+      \\ αναβαθμίζουμε σε Έγγραφο την τοπική
+      Έγγραφο προχ$=""
+      μμ=χ
+      Σωρός Νέος {
+            \\ ανοίγουμε ένα σωρό τιμών
+            \\ βάζουμε τιμές με την βάλε και τις δαβάζουμε με την Διάβασε
+            \\ καθαρίζει στο πέρας του μπλοκ    
+            Ενώ ν>0 {
+                        χ=(μεγ+χ ) Υπολ μεγ
+                        Αν Α(χ)<=ν Τότε ν-=Α(χ) : σουμα+=Α(χ) : Βαλε Α(χ )
+                        Αν κ+άσε_τόσα >μεγ1 Τότε άσε_τόσα=1
+                        κ+=άσε_τόσα
+                        Αν κ>μεγ1 Τότε Έξοδος
+                        χ=μμ+κ
+            }
+            Αν σούμα=σκοπός Τότε {
+                  Αν όχι κενό Τότε ταξινόμηση(1,Μέγεθος.Σωρού)
+                  Προχ$="."
+                  Ενώ όχι κενό {
+                        Διάβασε κκ
+                        Αν Εγγράφου.Μήκος(Προχ$)>1 Τότε Προχ$ = ","
+                        Προχ$ = φόρμα4$(κκ)
+                  }
+                  Προχ$ = {
+                  }
+                  Εύρεση Α$, Προχ$
+                  Αν Αριθμός=0 Τότε {
+                        συνολο++
+                        Α$ =Γραφή$(σύνολο, "000")+Προχ$
+                  }
+            }  
+      }
+Τέλος Ρουτίνας
+Ρουτίνα ταξινόμηση(αρχικό, τελικό)
+      Τοπικές πράγμα, ι=αρχικό, όριο=τελικό+1
+      Αν όριο >2 Τότε Φέρε (όριο+ι) Δια 2
+      Διάβασε πράγμα
+      όριο--
+      Ενώ ι<όριο {
+            Αν πράγμα<ΤιμήΣωρού(ι) Τότε {
+                  όριο--
+                  Αν ι>1 Τότε Φέρε ι
+                  ΦέρεΠίσω όριο
+            }  Αλλιώς ι++
+      }
+      Αν ι>όριο Τότε ι=όριο
+      Βάλε πράγμα : ΦέρεΠίσω ι
+      Αν ι>αρχικό Τότε ταξινόμηση(αρχικό,ι-1)
+      Αν τελικό>ι Τότε ταξινόμηση(ι,τελικό)
+Τέλος Ρουτίνας
 }
 UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}

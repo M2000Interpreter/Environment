@@ -9,7 +9,7 @@ Private Declare Function ObjSetAddRef Lib "msvbvm60.dll" Alias "__vbaObjSetAddre
 
 Public Type EventSink
     pVTable     As Long     ' VTable pointer
-    pClass      As Long     ' ComShinkEvent pointer | mServer Pointer
+    pClass      As Long     ' ComShinkEvent pointer
     cRef        As Long     ' reference counter
     IID         As GUID     ' interface IID
     hMem        As Long     ' memory address

@@ -334,12 +334,12 @@ If UseMe Is Nothing Then Exit Sub
 UseMe.GetIcon a
 End Sub
 Public Sub PlaceCaption(ByVal a$)
-Dim m As Callback, F As Form
+Dim m As Callback, f As Form
 On Error Resume Next
-Set F = Screen.ActiveForm
+Set f = Screen.ActiveForm
 If UseMe Is Nothing Then Exit Sub
     If Not UseMe.IamVisible Then
-        If Len(a$) = 0 Then a$ = "M2000" Else Set F = Nothing
+        If Len(a$) = 0 Then a$ = "M2000" Else Set f = Nothing
         Form1.CaptionW = a$
         If UseMe.IhaveExtForm Then
         UseMe.SetExtCaption a$
@@ -364,7 +364,7 @@ Else
         Form1.CaptionW = a$
        
         
-        If F Is Form1 Then
+        If f Is Form1 Then
             If Form1.Visible Then
             Form1.SetFocus
             Else
@@ -375,15 +375,15 @@ Else
             End If
             End If
          End If
-       Set F = Nothing
+       Set f = Nothing
        
     End If
     ttl = False
 End If
 ttl = False
 Exit Sub
-If Not F Is Nothing Then
-    If F Is Form1 Then
+If Not f Is Nothing Then
+    If f Is Form1 Then
         If Form1.Visible Then
             Form1.SetFocus
          ElseIf Not UseMe Is Nothing Then
@@ -394,7 +394,7 @@ If Not F Is Nothing Then
             End If
         End If
     Else
-        If F.Visible Then F.SetFocus
+        If f.Visible Then f.SetFocus
     End If
 End If
 Err.Clear
@@ -702,7 +702,7 @@ If cDibbuffer0.hDIb = 0 Then Exit Function
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim a As Single, b As Single, k As Single, R As Single
+Dim a As Single, b As Single, k As Single, r As Single
 Dim BR As Byte, BG As Byte, bbb As Byte ', ba$
 Dim BR1 As Byte, BG1 As Byte, bbb1 As Byte, ppBa As Long
 BR1 = 255 * ((100 - Alpha) / 100#)
@@ -721,8 +721,8 @@ GetMem1 ppBa + 2, BR
 Dim pw As Long, ph As Long
     piw = cDibbuffer0.Width
     pih = cDibbuffer0.Height
-    R = Atn(CSng(piw) / CSng(pih)) + Pi / 2#
-     k = Fix(Abs((piw / Cos(R) / 2) * zoomfactor) + 0.5)
+    r = Atn(CSng(piw) / CSng(pih)) + Pi / 2#
+     k = Fix(Abs((piw / Cos(r) / 2) * zoomfactor) + 0.5)
 
 Dim cDIBbuffer1 As Object
  Dim olddpix As Long, olddpiy As Long
@@ -775,8 +775,8 @@ On Error Resume Next
     ph1 = ph
     pws = pw
     phs = ph
-    R = Atn(CSng(myw) / CSng(myh))
-    k = -myw / (2# * Sin(R))
+    r = Atn(CSng(myw) / CSng(myh))
+    k = -myw / (2# * Sin(r))
     
 
        x_step2 = CLng(Fix(Cos(angle! + Pi / 2) * pw))
@@ -784,8 +784,8 @@ On Error Resume Next
 
     x_step = CLng(Fix(Cos(angle!) * pw))
     y_step = CLng(Fix(Sin(angle!) * ph))
-  image_x = CLng(Fix(pw / 2 - Fix(k * Sin(angle! - R)))) * pw
-   image_y = CLng(Fix(ph / 2 + Fix(k * Cos(angle! - R)))) * ph
+  image_x = CLng(Fix(pw / 2 - Fix(k * Sin(angle! - r)))) * pw
+   image_y = CLng(Fix(ph / 2 + Fix(k * Cos(angle! - r)))) * ph
 Dim pw1out As Long, ph1out As Long, pwOut As Long, phOut As Long, much As Single
 ''Dim cw1 As Long, ch1 As Long, outf As Single, fadex As Long, fadey As Long, outf1 As Single, outf2 As Single
 pw1 = pw1 - 1
@@ -997,7 +997,7 @@ If cDibbuffer0.hDIb = 0 Then Exit Sub
 If zoomfactor <= 0.01! Then zoomfactor = 0.01!
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
 
-Dim k As Single, R As Single
+Dim k As Single, r As Single
 Dim BR As Byte, BG As Byte, bbb As Byte, ppBa As Long
 ppBa = VarPtr(bckColor)
 GetMem1 ppBa, bbb
@@ -1005,8 +1005,8 @@ GetMem1 ppBa + 1, BG
 GetMem1 ppBa + 2, BR
     piw = cDibbuffer0.Width
     pih = cDibbuffer0.Height
-    R = Atn(piw / pih) + Pi / 2!
-    k = Abs((piw / Cos(R) / 2!) * zoomfactor)
+    r = Atn(piw / pih) + Pi / 2!
+    k = Abs((piw / Cos(r) / 2!) * zoomfactor)
  Dim cDIBbuffer1 As Object
  Set cDIBbuffer1 = New cDIBSection
  If piw <= 1 Then piw = 2
@@ -1069,8 +1069,8 @@ On Error Resume Next
     pw = cDIBbuffer1.Width
     ph = cDIBbuffer1.Height
 
-    R = Atn(CSng(myw) / CSng(myh))
-    k = -CSng(myw) / (2! * Sin(R))
+    r = Atn(CSng(myw) / CSng(myh))
+    k = -CSng(myw) / (2! * Sin(r))
   
     Dim pw1 As Long, ph1 As Long
     Const pidicv2 = 1.570795!
@@ -1081,8 +1081,8 @@ On Error Resume Next
    
          pws = pw1 * zoomfactor
     phs = ph1 * zoomfactor
-  image_x = ((pws - zoomfactor - b) / 2 - (k * Sin(angle! - R))) * pw
-   image_y = ((phs - zoomfactor - b) / 2 + (k * Cos(angle! - R))) * ph
+  image_x = ((pws - zoomfactor - b) / 2 - (k * Sin(angle! - r))) * pw
+   image_y = ((phs - zoomfactor - b) / 2 + (k * Cos(angle! - r))) * ph
    image_x = image_x - MyMod(image_x, CSng(dv15))
    image_y = image_y - MyMod(image_y, CSng(dv15))
    
@@ -1193,8 +1193,8 @@ End If
 there:
 End Function
 
-Private Function MyMod(R1 As Single, po As Single) As Single
-MyMod = R1 - Fix(R1 / po) * po
+Private Function MyMod(r1 As Single, po As Single) As Single
+MyMod = r1 - Fix(r1 / po) * po
 End Function
 '
 Public Function RotateDib(bstack As basetask, cDibbuffer0 As cDIBSection, Optional ByVal angle! = 0, Optional ByVal zoomfactor As Single = 100, _
@@ -1243,7 +1243,7 @@ End If
 
 
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim k As Single, R As Single, ppBa As Long
+Dim k As Single, r As Single, ppBa As Long
 Dim BR As Byte, BG As Byte, bbb As Byte, ba$
 Dim BR1 As Byte, BG1 As Byte, bbb1 As Byte
 ppBa = VarPtr(bckColor)
@@ -1317,16 +1317,16 @@ Dim tSA2 As SAFEARRAY2D
      pws = pw * zoomfactor
     phs = ph * zoomfactor
     
-    R = Atn(CSng(myw) / CSng(myh))
-    k = -CSng(myw) / (2! * Sin(R))
+    r = Atn(CSng(myw) / CSng(myh))
+    k = -CSng(myw) / (2! * Sin(r))
     
     x_step = Cos(angle!) * pw
     y_step = Sin(angle!) * ph
 
     x_step2 = Cos(angle! + pidicv2) * pw
     y_step2 = Sin(angle! + pidicv2) * ph
-  image_x = ((pws - b) / 2 - (k * Sin(angle! - R))) * pw
-   image_y = ((phs - b) / 2 + (k * Cos(angle! - R))) * ph
+  image_x = ((pws - b) / 2 - (k * Sin(angle! - r))) * pw
+   image_y = ((phs - b) / 2 + (k * Cos(angle! - r))) * ph
       image_x = image_x - MyMod(image_x, CSng(dv15))
    image_y = image_y - MyMod(image_y, CSng(dv15))
   pws = pws + 1
@@ -1440,7 +1440,7 @@ angle! = -MyMod(angle!, 360!) * 1.745329E-02!
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100!
 Dim myw As Single, myh As Single, piw As Long, pih As Long, pix As Long, piy As Long
-Dim k As Single, R As Single
+Dim k As Single, r As Single
 Const pidicv2 = 1.570795!
 'If zoomfactor = 1 And angle! = 0 Then Exit Function
     piw = cDibbuffer0.Width
@@ -1512,8 +1512,8 @@ Dim tSA2 As SAFEARRAY2D
     Dim pw As Long, ph As Long
      pw = piw
     ph = pih
-    R = Atn(CSng(myw) / CSng(myh))
-    k = -myw / (2! * Sin(R))
+    r = Atn(CSng(myw) / CSng(myh))
+    k = -myw / (2! * Sin(r))
   
     Dim pw1 As Long, ph1 As Long
     
@@ -1524,8 +1524,8 @@ Dim tSA2 As SAFEARRAY2D
    
          pws = pw1 * zoomfactor
     phs = ph1 * zoomfactor
-  image_x = ((pws - zoomfactor - b) / 2 - (k * Sin(angle! - R))) * pw
-   image_y = ((phs - zoomfactor - b) / 2 + (k * Cos(angle! - R))) * ph
+  image_x = ((pws - zoomfactor - b) / 2 - (k * Sin(angle! - r))) * pw
+   image_y = ((phs - zoomfactor - b) / 2 + (k * Cos(angle! - r))) * ph
    image_x = image_x - MyMod(image_x, CSng(dv15))
    image_y = image_y - MyMod(image_y, CSng(dv15))
    x_step2 = Cos(angle! + pidicv2) * pw
@@ -1618,12 +1618,12 @@ Call SetWindowRgn(.hWnd, (0), False)
 End With
 End Sub
 Public Function RotateRegion(hRgn As Long, angle As Single, ByVal piw As Long, ByVal pih As Long, ByVal Size As Single) As Long
-Dim k As Single, R As Single, aa As Single
+Dim k As Single, r As Single, aa As Single
 aa = (CLng(angle! * 100) Mod 36000) / 100
 
 angle! = -angle * 1.74532925199433E-02
-   R = Atn(piw / CSng(pih)) + Pi / 2!
-    k = piw / Cos(R)
+   r = Atn(piw / CSng(pih)) + Pi / 2!
+    k = piw / Cos(r)
     Dim myw As Long, myh As Long
  myw = Round((Abs(piw * Cos(angle!)) + Abs(pih * Sin(angle!))) * Size, 0)
 myh = Round((Abs(piw * Sin(angle!)) + Abs(pih * Cos(angle!))) * Size, 0)
@@ -1638,8 +1638,8 @@ hRgn = ScaleRegion(hRgn, Size)
     uXF.eM22 = Cos(angle!)
 k = Abs(k)
 
-uXF.eDx = Round(k * Cos(angle! - R) / 2! + k / 2!, 0)
-uXF.eDy = Round(k * Sin(angle! - R) / 2! + k / 2!, 0)
+uXF.eDx = Round(k * Cos(angle! - r) / 2! + k / 2!, 0)
+uXF.eDy = Round(k * Sin(angle! - r) / 2! + k / 2!, 0)
 
 
     rSize = GetRegionData(hRgn, rSize, ByVal 0&)
@@ -3185,7 +3185,7 @@ Case "VAL(", "VAL$(", "VALID(", "VALUE", "VALUE(", "VALUE$", "VERSION", "VIEW", 
 Case "WAIT", "WCHAR", "WEAK", "WEAK$(", "WHILE", "WHEN", "WIDE", "WIDTH", "WIN", "WINDOW"
 Case "WITH", "WITHEVENTS", "WORDS", "WRITABLE(", "WRITE", "WRITER", "X.TWIPS", "XOR", "Y.TWIPS", "адеиас", "аниысг", "апеияо", "апой.ая$(", "апой.де$("
 Case "адеиасе", "ахя(", "ай(", "айеяаио.дуадийо(", "айеяаио", "айеяаиос", "акт", "акгхес", "акгхгс", "аккацг", "аккацг$("
-Case "аккане", "аккиыс", "аккиыс.ам", "ам", "ам(", "амап(", "амап$(", "ам$(", "ама", "амафгтгсг", "амахеыягсг", "амайтгсг", "амакоцио"
+Case "аккане", "аккиыс", "аккиыс.ам", "ам", "ам(", "амап(", "амап$(", "ам$(", "амт(", "ама", "амафгтгсг", "амахеыягсг", "амайтгсг", "амакоцио"
 Case "амакоцио$", "амакусг.охомгс", "амакусг.у", "амакусг.ь", "амакусг.в", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье"
 Case "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "амтийеилемо(", "амы", "аниа", "аниа(", "аниа$", "аниа(", "апая", "апаяихлгсг", "апедысе"
 Case "апко", "апкос", "апо", "апохгйеусг.ыс", "апой$(", "апойопг", "апойкеистийа", "апок(", "аяца", "аяихло", "аяихлос", "аяихлос.паяацяажоу("
@@ -3248,7 +3248,7 @@ Case Else
 ismine = False
 End Select
 End Function
-Private Function IsNumberQuery(a$, fr As Long, R As Variant, lr As Long, skipdecimals As Boolean) As Boolean
+Private Function IsNumberQuery(a$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
 Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$, rr As Double
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberQuery = False: Exit Function
@@ -3351,7 +3351,7 @@ Else
     If Err.Number > 0 Then
          lr = 0
     Else
-        R = rr
+        r = rr
        lr = sng - fr + 2
        IsNumberQuery = True
     End If
@@ -3363,9 +3363,9 @@ End Function
 
 
 Static Function ValidNum(a$, Final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
-Dim R As Long
-Dim R1 As Long
-R1 = 1
+Dim r As Long
+Dim r1 As Long
+r1 = 1
           If Not NoUseDec Then
                                 If OverideDec Then
                                     a$ = Replace(a$, NowDec$, ".")
@@ -3376,44 +3376,44 @@ R1 = 1
               
 Dim v As Double, b$
 If Final Then
-R1 = IsNumberOnly(a$, R1, v, R, cutdecimals)
+r1 = IsNumberOnly(a$, r1, v, r, cutdecimals)
 
-R1 = (R1 And Len(a$) <= R) Or (a$ = vbNullString)
-If R1 Then
+r1 = (r1 And Len(a$) <= r) Or (a$ = vbNullString)
+If r1 Then
 Select Case checktype
 Case vbLong
 On Error Resume Next
     v = CLng(v)
-    If Err.Number > 0 Then Err.Clear: R1 = False
+    If Err.Number > 0 Then Err.Clear: r1 = False
 
 Case vbSingle
 On Error Resume Next
      v = CSng(v)
-    If Err.Number > 0 Then Err.Clear: R1 = False
+    If Err.Number > 0 Then Err.Clear: r1 = False
 Case vbDecimal
 On Error Resume Next
     v = CDec(v)
-    If Err.Number > 0 Then Err.Clear: R1 = False
+    If Err.Number > 0 Then Err.Clear: r1 = False
 Case vbCurrency
 On Error Resume Next
     v = CCur(v)
-    If Err.Number > 0 Then Err.Clear: R1 = False
+    If Err.Number > 0 Then Err.Clear: r1 = False
 End Select
 
 
 End If
 Else
 If (a$ = "-") Or a$ = vbNullString Then
-R1 = True
+r1 = True
 Else
- R1 = IsNumberQuery(a$, R1, v, R, cutdecimals)
+ r1 = IsNumberQuery(a$, r1, v, r, cutdecimals)
     If a$ <> "" Then
-         If R < 2 Then
-                R1 = Not (R <= Len(a$))
+         If r < 2 Then
+                r1 = Not (r <= Len(a$))
                 a$ = vbNullString
         Else
-                R1 = R1 And Not R <= Len(a$)
-                a$ = Mid$(a$, 1, R - 1)
+                r1 = r1 And Not r <= Len(a$)
+                a$ = Mid$(a$, 1, r - 1)
         End If
  End If
  End If
@@ -3425,25 +3425,25 @@ Else
                             Else
                                 a$ = Replace(a$, ".", QueryDecString)
                             End If
-ValidNum = R1
+ValidNum = r1
 End Function
-Function ValidNumberOnly(a$, R As Variant, skipdec As Boolean) As Boolean
-R = R - R
-ValidNumberOnly = IsNumberOnly(a$, (1), R, (0), skipdec)
+Function ValidNumberOnly(a$, r As Variant, skipdec As Boolean) As Boolean
+r = r - r
+ValidNumberOnly = IsNumberOnly(a$, (1), r, (0), skipdec)
 End Function
-Function ValidNumberOnlyClean(a$, R As Variant, skipdec As Boolean) As Long
+Function ValidNumberOnlyClean(a$, r As Variant, skipdec As Boolean) As Long
 On Error Resume Next
-R = R - R
+r = r - r
 Dim fr As Long, lr As Long
 fr = 1
-If IsNumberOnly(a$, fr, R, lr, skipdec) Then
+If IsNumberOnly(a$, fr, r, lr, skipdec) Then
 ValidNumberOnlyClean = lr
 Else
 ValidNumberOnlyClean = -1
 End If
 
 End Function
-Private Function IsNumberOnly(a$, fr As Long, R As Variant, lr As Long, skipdecimals As Boolean) As Boolean
+Private Function IsNumberOnly(a$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
 Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberOnly = False: Exit Function
@@ -3538,15 +3538,15 @@ Else
             On Error Resume Next
             If Len(DE$) > 0 Then
                 Mid$(DE$, 1, 1) = cdecimaldot$
-                R = CDec(ig$ & DE$)
+                r = CDec(ig$ & DE$)
             Else
-                R = CDec(ig$)
+                r = CDec(ig$)
             End If
             If Err.Number = 6 Then
-                R = CDbl(ig$ & DE$)
+                r = CDbl(ig$ & DE$)
             End If
          Else
-            R = val(ig$ & DE$ & ex$)
+            r = val(ig$ & DE$ & ex$)
              If Err.Number > 0 Then
              Err.Clear
              IsNumberOnly = False
@@ -3834,11 +3834,11 @@ l = LenB(s): If l = 0 Then Exit Function
   If p2 > p4 Then MyTrimB = vbNullString Else MyTrimB = MidB$(s$, (p2 - p22) + 1, (p4 - p2) + 1)
  
 End Function
-Function IsLabelAnew(where$, a$, R$, Lang As Long) As Long
+Function IsLabelAnew(where$, a$, r$, Lang As Long) As Long
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, gr As Boolean
-R$ = vbNullString
+r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
 Dim i&, l As Long, p3 As Integer
 Dim p2 As Long, p1 As Integer, p4 As Long
@@ -3893,16 +3893,16 @@ p2 = StrPtr(a$): l = l - 1
   If p1 < 256 Then
   Select Case p1
         Case 64  '"@"
-            If i < p4 And R$ <> "" Then
+            If i < p4 And r$ <> "" Then
                 GetMem2 i + 2, p1
-                where$ = R$
-                R$ = vbNullString
+                where$ = r$
+                r$ = vbNullString
             Else
               IsLabelAnew = 0: a$ = Mid$(a$, (i - p2) \ 2): Exit Function
             End If
         Case 63 '"?"
-        If R$ = vbNullString Then
-            R$ = "?"
+        If r$ = vbNullString Then
+            r$ = "?"
             i = i + 4
         Else
             i = i + 2
@@ -3916,7 +3916,7 @@ p2 = StrPtr(a$): l = l - 1
         Case 46 '"."
             If one Then
                 Exit For
-            ElseIf R$ <> "" And i < p4 Then
+            ElseIf r$ <> "" And i < p4 Then
                 GetMem2 i + 2, p1
                 If ChrW(p1) = "." Or ChrW(p1) = " " Then
                 If ChrW(p1) = "." And i + 2 < p4 Then
@@ -3928,11 +3928,11 @@ p2 = StrPtr(a$): l = l - 1
                 End If
             End If
                 GetMem2 i, p1
-                R$ = R$ & ChrW(p1)
+                r$ = r$ & ChrW(p1)
                 rr& = 1
             End If
       Case 38 ' "&"
-            If R$ = vbNullString Then
+            If r$ = vbNullString Then
             rr& = 2
             'a$ = Mid$(a$, 2)
             End If
@@ -3944,8 +3944,8 @@ p2 = StrPtr(a$): l = l - 1
               If one Then
 
             Exit For
-            ElseIf R$ <> "" Then
-            R$ = R$ & ChrW(p1)
+            ElseIf r$ <> "" Then
+            r$ = r$ & ChrW(p1)
             '' A$ = Mid$(A$, 2)
             rr& = 1 'is an identifier or floating point variable
             Else
@@ -3955,35 +3955,35 @@ p2 = StrPtr(a$): l = l - 1
             If one Then
             Exit For
             Else
-            R$ = R$ & ChrW(p1)
+            r$ = r$ & ChrW(p1)
             rr& = 1 'is an identifier or floating point variable
             End If
         Case 36 ' "$"
             If one Then Exit For
-            If R$ <> "" Then
+            If r$ <> "" Then
             one = True
             rr& = 3 ' is string variable
-            R$ = R$ & ChrW(p1)
+            r$ = r$ & ChrW(p1)
             Else
             Exit For
             End If
         Case 37 ' "%"
             If one Then Exit For
-            If R$ <> "" Then
+            If r$ <> "" Then
             one = True
             rr& = 4 ' is long variable
-            R$ = R$ & ChrW(p1)
+            r$ = r$ & ChrW(p1)
             Else
             Exit For
             End If
             
         Case 40 ' "("
-            If R$ <> "" Then
+            If r$ <> "" Then
             If i + 4 <= p4 Then
                 GetMem2 i + 2, p1
                 GetMem2 i + 2, p3
                 If ChrW(p1) + ChrW(p3) = ")@" Then
-                    R$ = R$ & "()."
+                    r$ = r$ & "()."
                     i = i + 4
                 Else
                     GoTo i1233
@@ -4001,7 +4001,7 @@ i1233:
                                        Exit For
                                        End Select
                      GetMem2 i, p1
-                                        R$ = R$ & ChrW(p1)
+                                        r$ = r$ & ChrW(p1)
                                         i = i + 2
                                       ' A$ = Mid$(A$, 2)
                                    Exit For
@@ -4020,7 +4020,7 @@ i1233:
               Exit For
               Else
               gr = True
-              R$ = R$ & ChrW(p1)
+              r$ = r$ & ChrW(p1)
               rr& = 1 'is an identifier or floating point variable
               End If
     End If
@@ -4028,19 +4028,19 @@ i1233:
 
     Next i
   If i > p4 Then a$ = vbNullString Else If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
-       R$ = myUcase(R$, gr)
+       r$ = myUcase(r$, gr)
        Lang = 1 + CLng(gr)
 
     IsLabelAnew = rr&
 
 
 End Function
-Public Function IsLabelDotSub(where$, a$, rrr$, R$, Lang As Long, Optional p1 As Integer = 0) As Long
+Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional p1 As Integer = 0) As Long
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, firstdot$, gr As Boolean
 rrr$ = vbNullString
-R$ = vbNullString
+r$ = vbNullString
 Dim i&, l As Long, p3 As Integer
 Dim p2 As Long, p4 As Long  '', excludesp As Long
   l = Len(a$): If l = 0 Then IsLabelDotSub = 0: Lang = 1: Exit Function
@@ -4105,32 +4105,32 @@ p2 = StrPtr(a$): l = l - 1
                 GetMem2 i + 2, p1
                 Select Case p1
                 Case 61, 40
-                If Len(R$) > 1 Then R$ = Left$(R$, Len(R$) - 1)
+                If Len(r$) > 1 Then r$ = Left$(r$, Len(r$) - 1)
 
                 End Select
                 End If
      Case 64  '"@"
-            If i < p4 And R$ <> "" Then
+            If i < p4 And r$ <> "" Then
             GetMem2 i + 2, p1
             If ChrW(p1) <> "(" Then
-              where$ = myUcase(R$, gr)
-            R$ = vbNullString
+              where$ = myUcase(r$, gr)
+            r$ = vbNullString
             rrr$ = vbNullString
             Else
               IsLabelDotSub = 0: a$ = firstdot$ + Mid$(a$, (i - p2) \ 2): Exit Function
             End If
             Else
-            If LenB(R$) = 0 And i < p4 Then
-            R$ = R$ + "@"
+            If LenB(r$) = 0 And i < p4 Then
+            r$ = r$ + "@"
 
             Else
               IsLabelDotSub = 0: a$ = vbNullString: Exit Function
               End If
             End If
     Case 63 '"?"
-        If R$ = vbNullString And firstdot$ = vbNullString Then
+        If r$ = vbNullString And firstdot$ = vbNullString Then
         rrr$ = "?"
-        R$ = rrr$
+        r$ = rrr$
         i = i + 4
         a$ = Mid$(a$, (i - p2) \ 2)
         IsLabelDotSub = 1
@@ -4143,9 +4143,9 @@ p2 = StrPtr(a$): l = l - 1
         IsLabelDotSub = 1
         Lang = 1 + CLng(gr)
         If Lang = 1 Then
-        rrr$ = UCase(R$)
+        rrr$ = UCase(r$)
         Else
-        rrr$ = myUcase(R$)
+        rrr$ = myUcase(r$)
         End If
     
         a$ = Mid$(a$, (i + 2 - p2) \ 2)
@@ -4158,7 +4158,7 @@ p2 = StrPtr(a$): l = l - 1
     Case 46 '"."
             If one Then
             Exit For
-            ElseIf R$ <> "" And i < p4 Then
+            ElseIf r$ <> "" And i < p4 Then
             GetMem2 i + 2, p1
             If ChrW(p1) = "." Or ChrW(p1) = " " Then
             If ChrW(p1) = "." And i + 2 < p4 Then
@@ -4171,7 +4171,7 @@ p2 = StrPtr(a$): l = l - 1
             End If
             End If
             GetMem2 i, p1
-            R$ = R$ & ChrW(p1)
+            r$ = r$ & ChrW(p1)
             rr& = 1
             Else
             firstdot$ = firstdot$ + "."
@@ -4182,8 +4182,8 @@ p2 = StrPtr(a$): l = l - 1
            If one Then
 
             Exit For
-            ElseIf R$ <> "" Then
-            R$ = R$ & ChrW(p1)
+            ElseIf r$ <> "" Then
+            r$ = r$ & ChrW(p1)
             rr& = 1 'is an identifier or floating point variable
             Else
             Exit For
@@ -4192,34 +4192,34 @@ p2 = StrPtr(a$): l = l - 1
             If one Then
             Exit For
             Else
-            R$ = R$ & ChrW(p1)
+            r$ = r$ & ChrW(p1)
             rr& = 1 'is an identifier or floating point variable
             End If
         Case 36 ' "$"
             If one Then Exit For
-            If R$ <> "" Then
+            If r$ <> "" Then
             one = True
             rr& = 3 ' is string variable
-            R$ = R$ & ChrW(p1)
+            r$ = r$ & ChrW(p1)
             Else
             Exit For
             End If
         Case 37 ' "%"
             If one Then Exit For
-            If R$ <> "" Then
+            If r$ <> "" Then
             one = True
             rr& = 4 ' is long variable
-            R$ = R$ & ChrW(p1)
+            r$ = r$ & ChrW(p1)
             Else
             Exit For
             End If
     Case 40 '"("
-            If R$ <> "" Then
+            If r$ <> "" Then
             If i + 4 <= p4 Then
                 GetMem2 i + 2, p1
                 GetMem2 i + 2, p3
                 If ChrW(p1) + ChrW(p3) = ")@" Then
-                    R$ = R$ & "()."
+                    r$ = r$ & "()."
                     i = i + 4
                 Else
                     GoTo i123
@@ -4238,7 +4238,7 @@ i123:
                                        End Select
                      GetMem2 i, p1
                                         
-                                        R$ = R$ & ChrW(p1)
+                                        r$ = r$ & ChrW(p1)
                                     
                                         i = i + 2
                                    Exit For
@@ -4256,7 +4256,7 @@ i123:
               Exit For
               Else
               gr = True
-              R$ = R$ & ChrW(p1)
+              r$ = r$ & ChrW(p1)
               rr& = 1 'is an identifier or floating point variable
               End If
     End If
@@ -4266,7 +4266,7 @@ i123:
   Else
   If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
   End If
-       rrr$ = firstdot$ + myUcase(R$, gr)
+       rrr$ = firstdot$ + myUcase(r$, gr)
        Lang = 1 + CLng(gr)
     IsLabelDotSub = rr&
    'a$ = LTrim$(a$)
@@ -4782,11 +4782,12 @@ Sub SendAKey(ByVal keycode As Integer, ByVal shift As Boolean, ByVal ctrl As Boo
 Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long, old As Long
 Const key_release As Byte = 2
 If keycode > 500 Then extended = 1: keycode = keycode - 500
-If Not extended Then
+If extended = 0 Then
 If keycode > 64 And keycode < 91 Then
     If Not CapsLockOn() Then shift = Not shift
 End If
 End If
+
 Map = MapVirtualKey(keycode, 0)
 smap = MapVirtualKey(&H10, 0)
 cmap = MapVirtualKey(&H11, 0)

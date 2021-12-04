@@ -41,13 +41,13 @@ End Property
 
 Public Property Get Priority() As PriorityLevel
 End Property
-Public Property Let Id(ByVal Value As Long)
+Public Property Let id(ByVal Value As Long)
 End Property
-Public Property Get Id() As Long
+Public Property Get id() As Long
 End Property
-Public Property Let busy(ByVal Value As Boolean)
+Public Property Let Busy(ByVal Value As Boolean)
 End Property
-Public Property Get busy() As Boolean
+Public Property Get Busy() As Boolean
 End Property
 Public Property Get Interval() As Double
 End Property
@@ -68,6 +68,7 @@ Public Property Get Process() As basetask
 End Property
 Public Property Set Process(Value As basetask)
 End Property
-Public Sub Tick()
-End Sub
+Public Function Tick() As Boolean
+
+End Function
 

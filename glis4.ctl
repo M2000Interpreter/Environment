@@ -74,7 +74,7 @@ Dim waitforparent As Boolean
 Dim havefocus As Boolean, UKEY$
 Dim dummy As Long
 Dim nopointerchange As Boolean
-Dim NowLocale As Long, PrevLocale As Long, ChangeLanguage As Boolean
+Dim PrevLocale As Long
 Private Type Myshape
     Visible As Boolean
     hatchType As Long
@@ -367,6 +367,7 @@ Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
 Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hWnd As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
 Const WM_KEYFIRST = &H100
+Const WM_CHAR = &H102
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
     x As Long
@@ -433,7 +434,7 @@ Public Function GetLastKeyPressed() As Long
 Dim Message As Msg
 If mynum$ <> "" Then
 GetLastKeyPressed = -1
-ElseIf PeekMessageW(Message, 0, WM_KEYFIRST, WM_KEYLAST, 0) Then
+ElseIf PeekMessageW(Message, 0, WM_CHAR, WM_KEYLAST, 0) Then
         GetLastKeyPressed = Message.wParam
     Else
         GetLastKeyPressed = -1
@@ -1668,9 +1669,6 @@ End If
 keycode = 0
 End Sub
 
-Private Function AccKey()
-
-End Function
 Private Sub UserControl_KeyUp(keycode As Integer, shift As Integer)
 If PrevLocale <> GetLocale Then RaiseEvent Maybelanguage
 If BypassKey Then keycode = 0: shift = 0: Exit Sub
@@ -2118,12 +2116,45 @@ If (Button And 3) > 0 And myEnabled Then
                 End If
                 MarkWord
             Else
+                
+        Timer1.enabled = False
+        If (((SELECTEDITEM <> (topitem + YYT + 1)) And Not secreset) Or EditFlag) And Not ListSep(topitem + YYT) Then
+             SELECTEDITEM = topitem + YYT + 1 ' we have a new selected item
+             ' compute selstart always
+            If Not BlockItemcount Then
+                REALCUR SELECTEDITEM - 1, cX - scrollme, dummy, mSelstart
+                mSelstart = mSelstart + 1
+                RaiseEvent SetExpandSS(mSelstart)
+                RaiseEvent ChangeSelStart(mSelstart)
+                
+            End If
+            RaiseEvent selected(SELECTEDITEM)  ' broadcast
+         End If
+            If SELECTEDITEM = topitem + YYT + 1 Then
+                If MultiSelect Or ListMenu(SELECTEDITEM - 1) Then
+                        If ListRadio(SELECTEDITEM - 1) And ListSelected(SELECTEDITEM - 1) Then
+                        ' do nothing
+                        ElseIf ListRadio(SELECTEDITEM - 1) Then
+                            ListSelected(SELECTEDITEM - 1) = Not ListSelected(SELECTEDITEM - 1)
+                            If MultiSelect Then
+                                If ListSelected(SELECTEDITEM - 1) Then
+                                    RaiseEvent SelectedMultiAdd(SELECTEDITEM)
+                                Else
+                                    RaiseEvent SelectedMultiSub(SELECTEDITEM)
+                                End If
+                            Else
+                                RaiseEvent MenuChecked(SELECTEDITEM)
+                            End If
+                        End If
+                        End If
+                    End If
                 RaiseEvent Selected2(SELECTEDITEM - 1)
-                Exit Sub
+                
             End If
         End If
         
     Else
+
         Timer1.enabled = False
         If (((SELECTEDITEM <> (topitem + YYT + 1)) And Not secreset) Or EditFlag) And Not ListSep(topitem + YYT) Then
              SELECTEDITEM = topitem + YYT + 1 ' we have a new selected item
@@ -3821,81 +3852,81 @@ End If
 UserControlTextHeightPixels = overrideTextHeight / scrTwips
 
 End Function
-Private Sub PrintLineControlSingle(mHdc As Long, ByVal c As String, R As RECT)
+Private Sub PrintLineControlSingle(mHdc As Long, ByVal c As String, r As RECT)
 ' this is our basic print routine
 Dim that As Long, cc As String, fg As Long
 If CenterText Then that = DT_CENTER
 If VerticalCenterText Then that = that Or DT_VCENTER
 If WrapText Then
 c = c + space(4)  ' 4 additional characters for DT_MODIFYSTRING
-DrawTextEx mHdc, StrPtr(c), -1, R, DT_WORDBREAK Or DT_NOPREFIX Or DT_MODIFYSTRING Or DT_PATH_ELLIPSIS Or that, VarPtr(tParam)
+DrawTextEx mHdc, StrPtr(c), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or DT_MODIFYSTRING Or DT_PATH_ELLIPSIS Or that, VarPtr(tParam)
 Else
 If LastLinePart <> "" Then
     If FadeLastLinePart > 0 Then
     cc = c + LastLinePart
     fg = Me.forecolor
     Me.forecolor = FadeLastLinePart
-   DrawText mHdc, StrPtr(cc), -1, R, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS
+   DrawText mHdc, StrPtr(cc), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS
    Me.forecolor = fg
-   DrawTextEx mHdc, StrPtr(c), -1, R, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
+   DrawTextEx mHdc, StrPtr(c), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
     
     Else
     cc = c + LastLinePart
-   DrawTextEx mHdc, StrPtr(cc), -1, R, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
+   DrawTextEx mHdc, StrPtr(cc), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
    End If
 Else
 
-    DrawTextEx mHdc, StrPtr(c), -1, R, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
     End If
     End If
     
     End Sub
-Private Sub PrintLineControlHeader(mHdc As Long, c As String, R As RECT, Optional that As Long = 0)
+Private Sub PrintLineControlHeader(mHdc As Long, c As String, r As RECT, Optional that As Long = 0)
 ' this is our basic print routine
-DrawTextEx mHdc, StrPtr(c), -1, R, DT_WORDBREAK Or DT_NOPREFIX Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+DrawTextEx mHdc, StrPtr(c), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 
     
     End Sub
-  Private Sub CalcRectHeader(mHdc As Long, c As String, R As RECT, Optional that As Long = 0)
-R.top = 0
-R.Left = 0
-If R.Right = 0 Then R.Right = UserControl.Width / scrTwips
-DrawTextEx mHdc, StrPtr(c), -1, R, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP Or that, VarPtr(tParam)
+  Private Sub CalcRectHeader(mHdc As Long, c As String, r As RECT, Optional that As Long = 0)
+r.top = 0
+r.Left = 0
+If r.Right = 0 Then r.Right = UserControl.Width / scrTwips
+DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP Or that, VarPtr(tParam)
 End Sub
-Private Sub PrintLineControl(mHdc As Long, c As String, R As RECT)
-    DrawTextEx mHdc, StrPtr(c), -1, R, DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS, VarPtr(tParam)
+Private Sub PrintLineControl(mHdc As Long, c As String, r As RECT)
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS, VarPtr(tParam)
 
 End Sub
 Private Sub PrintLinePixels(dd As Object, c As String)
-Dim R As RECT    ' print to a picturebox as label
-R.Right = dd.Scalewidth
-R.Bottom = dd.Scaleheight
-DrawTextEx dd.hDC, StrPtr(c), -1, R, DT_NOPREFIX Or DT_WORDBREAK Or DT_EXPANDTABS, VarPtr(tParam)
+Dim r As RECT    ' print to a picturebox as label
+r.Right = dd.Scalewidth
+r.Bottom = dd.Scaleheight
+DrawTextEx dd.hDC, StrPtr(c), -1, r, DT_NOPREFIX Or DT_WORDBREAK Or DT_EXPANDTABS, VarPtr(tParam)
 End Sub
-Private Sub CalcRect(mHdc As Long, c As String, R As RECT)
-R.top = 0
-R.Left = 0
+Private Sub CalcRect(mHdc As Long, c As String, r As RECT)
+r.top = 0
+r.Left = 0
 Dim that As Long
 If CenterText Then that = DT_CENTER
 If VerticalCenterText Then that = that Or DT_VCENTER
 If WrapText Then
-    If R.Right = 0 Then R.Right = UserControl.Width / scrTwips
-    DrawTextEx mHdc, StrPtr(c), -1, R, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    If r.Right = 0 Then r.Right = UserControl.Width / scrTwips
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 Else
-    DrawTextEx mHdc, StrPtr(c), -1, R, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 End If
 
 End Sub
-Private Sub CalcRect1(mHdc As Long, c As String, R As RECT)
-R.top = 0
-R.Left = 0
+Private Sub CalcRect1(mHdc As Long, c As String, r As RECT)
+r.top = 0
+r.Left = 0
 
 If WrapText Then
-If R.Right = 0 Then R.Right = UserControl.Width / scrTwips - LeftMarginPixels
+If r.Right = 0 Then r.Right = UserControl.Width / scrTwips - LeftMarginPixels
 
-DrawTextEx mHdc, StrPtr(c), -1, R, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 Else
-    DrawTextEx mHdc, StrPtr(c), -1, R, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
     End If
 
 End Sub
@@ -5304,9 +5335,9 @@ Public Property Set mouseicon(RHS)
 Set UserControl.mouseicon = RHS
 End Property
 Function GetLocale() As Long
-    Dim R&
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
-      GetLocale = val("&H" & Right(Hex(R), 4))
+    Dim r&
+      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
+      GetLocale = val("&H" & Right(Hex(r), 4))
    
     
 End Function
@@ -5314,10 +5345,10 @@ Function GetKeY(ascii As Integer) As String
     Dim Buffer As String, ret As Long
 
     Buffer = String$(514, 0)
-    Dim R&
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
-      R = val("&H" & Right(Hex(R), 4))
-    ret = GetLocaleInfo(R, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
+    Dim r&
+      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
+      r = val("&H" & Right(Hex(r), 4))
+    ret = GetLocaleInfo(r, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
     If ret > 0 Then
         GetKeY = ChrW$(AscW(StrConv(ChrW$(ascii Mod 256), 64, CLng(val("&h" + Left$(Buffer, ret - 1))))))
     Else

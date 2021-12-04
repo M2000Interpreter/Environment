@@ -291,14 +291,14 @@ End Function
 Public Function GetTimeZoneInfo() As String
 
 Dim TZI As TIME_ZONE_INFORMATION ' receives information on the time zone
-Dim retval As Long ' return value
+Dim RetVal As Long ' return value
 Dim c As Long ' counter variable needed to display time zone name
 
-    retval = GetTimeZoneInformation(TZI) ' read information on the computer's selected time zone
+    RetVal = GetTimeZoneInformation(TZI) ' read information on the computer's selected time zone
      If zones.ExistKey(Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")) Then
      ' do nothing. now zone$ has set the index field to standard name.
      End If
-    If retval = 2 Then
+    If RetVal = 2 Then
     GetTimeZoneInfo = Replace(StrConv(TZI.DaylightName, vbFromUnicode), Chr(0), "")
     Else
     GetTimeZoneInfo = Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")
@@ -463,20 +463,20 @@ End If
 RenameFile2 = 0 <> CopyFile(StrPtr(F$), StrPtr(fd$), 1)
 KillFile F$
 End Function
-Public Function CanKillFile(FileName$) As Boolean
-FixPath FileName$
+Public Function CanKillFile(Filename$) As Boolean
+FixPath Filename$
 If Not IsSupervisor Then
-    If Left$(FileName$, 1) = "." Then
+    If Left$(Filename$, 1) = "." Then
         CanKillFile = True
     Else
       If strTemp <> "" Then
-            If Not mylcasefILE(strTemp) = mylcasefILE(Left$(FileName$, Len(strTemp))) Then
-            CanKillFile = mylcasefILE(userfiles) = mylcasefILE(Left$(FileName$, Len(userfiles)))
+            If Not mylcasefILE(strTemp) = mylcasefILE(Left$(Filename$, Len(strTemp))) Then
+            CanKillFile = mylcasefILE(userfiles) = mylcasefILE(Left$(Filename$, Len(userfiles)))
             Else
             CanKillFile = True
             End If
         Else
-            CanKillFile = mylcasefILE(userfiles) = mylcasefILE(Left$(FileName$, Len(userfiles)))
+            CanKillFile = mylcasefILE(userfiles) = mylcasefILE(Left$(Filename$, Len(userfiles)))
         End If
     End If
 Else
@@ -501,15 +501,15 @@ End If
 MakeACopy = 0 <> CopyFile(StrPtr(F$), StrPtr(fd$), 0)
 End Function
 
-Public Function NeoUnicodeFile(FileName$) As Boolean
+Public Function NeoUnicodeFile(Filename$) As Boolean
 Dim hFile, counter
 Dim F$, F1$
 Sleep 10
-If Not CanKillFile(FileName$) Then Exit Function
-If Left$(FileName$, 2) <> "\\" Then
-F$ = "\\?\" + FileName$
+If Not CanKillFile(Filename$) Then Exit Function
+If Left$(Filename$, 2) <> "\\" Then
+F$ = "\\?\" + Filename$
 Else
-F$ = FileName$
+F$ = Filename$
 End If
 On Error Resume Next
 F1$ = Dir(F$)  '' THIS IS THEWORKAROUND FOR THE PROBLEMATIC CREATIFILE (I GOT SOME HANGS)
@@ -1023,6 +1023,7 @@ InitOk = 1
 End If
 backhere:
 UseMe.CliRun
+ClearState1
 If UseMe Is Nothing Then Exit Sub
 
 UseMe.Shutdown Cancel

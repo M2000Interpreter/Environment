@@ -108,31 +108,28 @@ Private Declare Function DestroyCaret Lib "user32" () As Long
 Public TEXT1 As myTextBox
 Attribute TEXT1.VB_VarHelpID = -1
 Dim setupxy As Single
-Dim Lx As Long, ly As Long, dr As Boolean
+Dim Lx As Long, lY As Long, dr As Boolean
 Dim scrTwips As Long
 Dim bordertop As Long, borderleft As Long
 Dim allwidth As Long, itemWidth As Long
 Dim colrotate As Long
-Private LastActive As Object
-Public previewKey As Boolean
+Private LastActive As String
+Public previewKey As Boolean, ByeBye As Boolean
 Private Sub Form_Activate()
-
-     On Error Resume Next
-             If LastActive Is Nothing Then Set LastActive = gList1
-              If Typename(ActiveControl) = "gList" Then
-                If LastActive Is ActiveControl Then
-                Hook hWnd, ActiveControl
-                Else
-                Hook hWnd, Nothing
-                End If
-                Else
-               
-                Hook hWnd, Nothing
-                End If
-            If LastActive.enabled Then
-            If LastActive.Visible Then If Not ActiveControl Is LastActive Then LastActive.SetFocus
-         End If
-
+    If ByeBye Then Exit Sub
+    On Error Resume Next
+    If LastActive = vbNullString Then LastActive = gList1.Name
+    If HOOKTEST <> 0 Then UnHook HOOKTEST
+        If Typename(ActiveControl) = "gList" Then
+            Hook hWnd, ActiveControl
+        Else
+            Hook hWnd, Nothing
+        End If
+        If LastActive <> "" Then
+            If Controls(LastActive).enabled Then
+            If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
+        End If
+    End If
 End Sub
 Private Sub Form_Deactivate()
 UnHook hWnd
@@ -211,7 +208,7 @@ If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
 dr = True
 mousepointer = vbSizeNWSE
 Lx = x
-ly = y
+lY = y
 End If
 
 Else
@@ -219,7 +216,7 @@ If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < W
 dr = True
 mousepointer = vbSizeNWSE
 Lx = x
-ly = y
+lY = y
 End If
 
 End If
@@ -237,7 +234,7 @@ If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mo
 End If
 
 If dr Then
-    If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
+    If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
     If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     
    If Not ExpandWidth Then addX = 0
@@ -277,13 +274,13 @@ If dr Then
         gList2.PrepareToShow
       
       
-        ly = ly * lastfactor / factor
+        lY = lY * lastfactor / factor
     
         'End If
         End If
         Else
         Lx = x
-        ly = y
+        lY = y
    
 End If
 once = False
@@ -294,29 +291,29 @@ If dr Then Me.mousepointer = 0
 dr = False
 End Sub
 
-Private Sub Form_Terminate()
-Set LastActive = Nothing
-End Sub
-
 Private Sub Form_Unload(Cancel As Integer)
 UNhookMe
 DestroyCaret
 selectorLastX = Left
 selectorLastY = top
 Sleep 200
+ByeBye = False
 loadfileiamloaded = False
+
 End Sub
 
 
 
 
 Private Sub gList1_GotFocus()
+On Error Resume Next
 If gList1.ListIndex = -1 Then gList1.ListIndex = gList1.ScrollFrom
 End Sub
 
 
 Private Sub gList1_HeaderSelected(Button As Integer)
 ' rotate b g r
+On Error Resume Next
 Select Case colrotate
 Case 0
 colrotate = 1
@@ -333,26 +330,18 @@ End Select
 TEXT1 = Mid$(TEXT1 + TEXT1, 3, 6)
 gList1.ShowThis UNPACKLNG(TEXT1) + 1
 End Sub
-
 Private Sub gList1_KeyDown(keycode As Integer, shift As Integer)
 If keycode = vbKeyEscape Then
-
+ByeBye = True
 Unload Me
 ElseIf keycode = vbKeyRight Then
-    If colrotate > 1 Then
-    colrotate = 0
-    Else
-    colrotate = colrotate + 1
-    End If
-
     gList1_HeaderSelected 0
- keycode = 0
+    gList1_HeaderSelected 0
+    keycode = 0
 ElseIf keycode = vbKeyLeft Then
-    
     gList1_HeaderSelected 0
 keycode = 0
 End If
-
 End Sub
 
 
@@ -376,11 +365,12 @@ Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, By
 If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
                 gList1.enabled = False  '??
                     gList3.enabled = False
+                    ByeBye = True
             Unload Me
 End If
 End Sub
- Private Sub PrintItem(mHdc As Long, c As String, R As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_CENTER Or DT_VCENTER)
-    DrawText mHdc, StrPtr(c), -1, R, way
+ Private Sub PrintItem(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_CENTER Or DT_VCENTER)
+    DrawText mHdc, StrPtr(c), -1, r, way
     End Sub
 
 Private Sub gList1_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
@@ -403,7 +393,9 @@ v$ = Right$(PACKLNG(item), 6)
 realitem = UNPACKLNG(Mid$(v$ & v$, 3, 6))
 End Select
 FillBack thisHDC, a, realitem
+On Error Resume Next
 gList1.forecolor = &HFFFFFF - realitem
+
 a.top = a.top + 2
 PrintItem thisHDC, Right$("00000" & Hex$(item), 6), a
 End If
@@ -425,14 +417,16 @@ End Sub
 
 Private Sub gList2_MouseUp(x As Single, y As Single)
             On Error Resume Next
-            If Not LastActive Is Nothing Then
-            If LastActive.enabled Then
-                If LastActive.Visible Then
+            If LastActive <> "" Then
+            If Controls(LastActive).enabled Then
+                If Controls(LastActive).Visible Then
                    If Not gList2.DoubleClickArea(x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor) Then
-                    LastActive.SetFocus
+                    Controls(LastActive).SetFocus
                     Else
                         gList1.enabled = False  '??
                         gList3.enabled = False
+                        ByeBye = True
+                        UnHook hWnd
                         Unload Me
                     End If
                 End If
@@ -526,7 +520,7 @@ If direction Then
     Case 2
     ReturnColor = UNPACKLNG(Mid$(TEXT1 + TEXT1, 3, 6))
     End Select
-
+ByeBye = True
 Unload Me
 End If
 End Sub
@@ -670,17 +664,20 @@ Set LastGlist = this
 If Err.Number > 0 Then this.NoWheel = True
 End Sub
 Public Sub hookme(this As gList)
+Set LastGlist = Nothing
+If ByeBye = True Then Exit Sub
 If this Is gList1 Then Set LastGlist = this Else Set LastGlist = Nothing
 End Sub
 Private Sub gList2_RefreshDesktop()
 If Form1.Visible Then Form1.Refresh: If Form1.DIS.Visible Then Form1.DIS.Refresh
 End Sub
 Private Sub gList1_CheckGotFocus()
-Set LastActive = gList1
+If ByeBye Then Exit Sub
+LastActive = gList1.Name
 End Sub
 Private Sub gList1_UnregisterGlist()
 On Error Resume Next
-If gList1.TabStopSoft Then Set LastActive = gList1
+If Not ByeBye Then If gList1.TabStopSoft Then LastActive = gList1.Name
 Set LastGlist = Nothing
-If Err.Number > 0 Then gList1.NoWheel = True
+If Err.Number > 0 Then If Not ByeBye Then gList1.NoWheel = True
 End Sub

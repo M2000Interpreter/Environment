@@ -128,8 +128,9 @@ Private Sub TaskInterface_Parameters(ParamArray Values() As Variant)
 End Sub
 
 
-Private Sub TaskInterface_Tick()
+Private Function TaskInterface_Tick() As Boolean
+    TaskInterface_Tick = True
   myDone = True
-End Sub
+End Function
 
 

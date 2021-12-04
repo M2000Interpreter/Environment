@@ -47,9 +47,9 @@ Exit Sub
 
 Dim i As Long
 rest
-       If myMasterList.count > 0 Then
-       For i = 1 To myMasterList.count
-       If myMasterList(i).Id < 100 Then
+       If myMasterList.Count > 0 Then
+       For i = 1 To myMasterList.Count
+       If myMasterList(i).id < 100 Then
  PlayMusic = True
 GoTo thh11
        End If
@@ -57,9 +57,9 @@ GoTo thh11
        Next i
         
         End If
-       If myRunningList.count > 0 Then
-       For i = 1 To myRunningList.count
-       If myRunningList(i).Id < 100 Then
+       If myRunningList.Count > 0 Then
+       For i = 1 To myRunningList.Count
+       If myRunningList(i).id < 100 Then
         PlayMusic = True
  GoTo thh11
      '  End
@@ -73,7 +73,7 @@ thh11:
  
 End Property
 Public Property Get QueueCount() As Long
-  QueueCount = myRunningList.count + myMasterList.count
+  QueueCount = myRunningList.Count + myMasterList.Count
 End Property
 
 
@@ -94,9 +94,9 @@ End Property
 Public Function ThrowOne(thisid As Long) As Boolean
 Dim i As Long
 rest
-       If myMasterList.count > 0 Then
-       For i = 1 To myMasterList.count
-       If myMasterList(i).Id = thisid Then
+       If myMasterList.Count > 0 Then
+       For i = 1 To myMasterList.Count
+       If myMasterList(i).id = thisid Then
        myMasterList.Remove i
        ThrowOne = True
 GoTo thh
@@ -105,9 +105,9 @@ GoTo thh
        Next i
         
         End If
-       If myRunningList.count > 0 Then
-       For i = 1 To myRunningList.count
-       If myRunningList(i).Id = thisid Then
+       If myRunningList.Count > 0 Then
+       For i = 1 To myRunningList.Count
+       If myRunningList(i).id = thisid Then
        
        myRunningList(i).Done = True
        myRunningList.Remove i
@@ -120,9 +120,9 @@ GoTo thh
         
         End If
         ' SECONDTIME
-               If myMasterList.count > 0 Then
-       For i = 1 To myMasterList.count
-       If myMasterList(i).Id = thisid Then
+               If myMasterList.Count > 0 Then
+       For i = 1 To myMasterList.Count
+       If myMasterList(i).id = thisid Then
        myMasterList.Remove i
        ThrowOne = True
 GoTo thh
@@ -131,9 +131,9 @@ GoTo thh
        Next i
         
         End If
-       If myRunningList.count > 0 Then
-       For i = 1 To myRunningList.count
-       If myRunningList(i).Id = thisid Then
+       If myRunningList.Count > 0 Then
+       For i = 1 To myRunningList.Count
+       If myRunningList(i).id = thisid Then
        myRunningList(i).Done = True
        myRunningList.Remove i
        ThrowOne = True
@@ -155,9 +155,9 @@ Private Function Remove(thisid As Long) As Boolean
 Dim i As Long
 rest
 
-       If myRunningList.count > 0 Then
-       For i = 1 To myRunningList.count
-       If myRunningList(i).Id = thisid Then
+       If myRunningList.Count > 0 Then
+       For i = 1 To myRunningList.Count
+       If myRunningList(i).id = thisid Then
        myRunningList.Remove i
        Remove = True
        RestEnd
@@ -177,16 +177,16 @@ Public Sub AddTask(ByRef NewTask As TaskInterface, Optional Priority As Priority
   ' Add to list
  
   If Priority = tmHigh Then
-    If myMasterList.count > 0 Then
+    If myMasterList.Count > 0 Then
     
     myMasterList.Add NewTask, , 1
     Else
     myMasterList.Add NewTask
     End If
   Else
-        If myMasterList.count > 0 Then
+        If myMasterList.Count > 0 Then
     
-    myMasterList.Add NewTask, , , myMasterList.count
+    myMasterList.Add NewTask, , , myMasterList.Count
     Else
     myMasterList.Add NewTask
     End If
@@ -199,9 +199,9 @@ End Sub
 Private Property Get getone(thisid As Long) As TaskInterface
 Dim i As Long
 rest
-       If myMasterList.count > 0 Then
-       For i = 1 To myMasterList.count
-       If myMasterList(i).Id = thisid Then
+       If myMasterList.Count > 0 Then
+       For i = 1 To myMasterList.Count
+       If myMasterList(i).id = thisid Then
       Set getone = myMasterList(i)
 GoTo thh
        End If
@@ -209,9 +209,9 @@ GoTo thh
        Next i
         
         End If
-       If myRunningList.count > 0 Then
-       For i = 1 To myRunningList.count
-       If myRunningList(i).Id = thisid Then
+       If myRunningList.Count > 0 Then
+       For i = 1 To myRunningList.Count
+       If myRunningList(i).id = thisid Then
         Set getone = myRunningList(i)
  GoTo thh
       
@@ -231,12 +231,12 @@ ok = False
 If Not (task Is Nothing) Then
         Select Case code
         Case 0 ' hold
-            task.busy = True
+            task.Busy = True
         Case 1
             task.Dispose tmAllTasks
             ThrowOne Mes
         Case 2 ' Restart
-            task.busy = False
+            task.Busy = False
         Case 3
         task.Interval = param
         Case 4
@@ -287,7 +287,7 @@ Set b.Sorosref = bstack.soros
 'End If
 Set b.StaticCollection = bstack.StaticCollection
 b.OriginalCode = bstack.OriginalCode
-b.OriginalName = bstack.OriginalName
+b.originalname = bstack.originalname
 
 Set GetNewBaseTask = b
 End Function
@@ -297,11 +297,11 @@ End Function
 Public Sub Dispose()
   On Error Resume Next
         StopTimer
-        Do While myMasterList.count > 0
+        Do While myMasterList.Count > 0
           myMasterList(1).Dispose tmAllTasks
           myMasterList.Remove 1
         Loop
-            Do While myRunningList.count > 0
+            Do While myRunningList.Count > 0
         
           myRunningList(1).Dispose tmAllTasks
           myRunningList.Remove 1
@@ -310,71 +310,61 @@ Public Sub Dispose()
 End Sub
 
 Public Sub TimerTick()
-tickTimer = tickTimer + 1
-If tickdrop > 0 Then Exit Sub ' tickdrop = myMasterList.Count: Exit Sub
-Dim this As TaskInterface
-  If myMasterList.count = 0 Then Exit Sub
-  
-  Do
-  
-  Set this = myMasterList(1)
-  myMasterList.Remove 1
-
-  
- If OnlyMusic Then
- If this.Id > 100 Then
- AddTask this
- Exit Sub
- End If
- ElseIf holdtasks Then
- AddTask this, this.Priority
- Exit Sub
- End If
-  myRunningList.Add this
-  Loop While this.Id < 0 And myMasterList.count <> 0
-  If this.Id < 0 Then Exit Sub
-  
-  If Not this.busy And Not this.Done Then
-
-  this.Tick
-  End If
-  If Remove(this.Id) Then
-  If this.Done Then
-
-    this.Dispose tmThisTask
+    tickTimer = tickTimer + 1
+    If tickdrop > 0 Then Exit Sub
+    Dim this As TaskInterface, many As Long, dosomething As Boolean
+    If myMasterList.Count = 0 Then Exit Sub
+    many = myMasterList.Count
+again:
+    Do
+        Set this = myMasterList(1)
+        myMasterList.Remove 1
+        If OnlyMusic Then
+            If this.id > 100 Then
+                AddTask this
+                Exit Sub
+            End If
+        ElseIf holdtasks Then
+            AddTask this, this.Priority
+            Exit Sub
+        End If
+        myRunningList.Add this
+        many = many - 1
+    Loop While this.id < 0 And myMasterList.Count <> 0
+    If this.id < 0 Then Exit Sub
+    dosomething = False
+    If Not this.Busy And Not this.Done Then
+      dosomething = this.Tick
+    End If
+    If Remove(this.id) Then
+      If this.Done Then
+          this.Dispose tmThisTask
+      Else
+          If Not NOEXECUTION Then
+              AddTask this, this.Priority
+              If many > 0 And Not dosomething Then GoTo again
+          Else
+              this.Dispose tmThisTask
+          End If
+    End If
   Else
-If Not NOEXECUTION Then
-AddTask this, this.Priority
-Else
-this.Dispose tmThisTask
-End If
-    
-  End If
-  Else
-    If this.Done Then
-
-  Else
-
-''  AddTask this, this.Priority
-    
-  End If
     this.Dispose tmThisTask
   End If
 
-  If myTimerIsRunning = False Or QueueCount = 0 Then
-    StopTimer
-
-       ElseIf QueueCount = 1 And taskmainonly Then
-    Sleep 50
-  End If
-
-  If LastErNum <> 0 Then Dispose
+    If myTimerIsRunning = False Or QueueCount = 0 Then
+        StopTimer
+    ElseIf QueueCount = 1 And taskmainonly Then
+        Sleep 50
+    ElseIf Not dosomething Then
+        Sleep 5
+    End If
+    If LastErNum <> 0 Then Dispose
 End Sub
 Public Sub TimerTickOne()
 If tickdrop > 0 Then Exit Sub 'tickdrop = myMasterList.Count: Exit Sub
 tickdrop = 1000
 Dim this As TaskInterface
-  If myMasterList.count = 0 Then tickdrop = 0: Exit Sub
+  If myMasterList.Count = 0 Then tickdrop = 0: Exit Sub
   
   Do
   
@@ -383,7 +373,7 @@ Dim this As TaskInterface
 
   
  If OnlyMusic Then
- If this.Id > 100 Then
+ If this.id > 100 Then
  AddTask this
  tickdrop = 0
  Exit Sub
@@ -394,14 +384,14 @@ Dim this As TaskInterface
  Exit Sub
  End If
   myRunningList.Add this
-  Loop While this.Id < 0 And myMasterList.count <> 0
-  If this.Id < 0 Then tickdrop = 0: Exit Sub
+  Loop While this.id < 0 And myMasterList.Count <> 0
+  If this.id < 0 Then tickdrop = 0: Exit Sub
   
-  If Not this.busy And Not this.Done Then
+  If Not this.Busy And Not this.Done Then
 
   this.Tick
   End If
-  If Remove(this.Id) Then
+  If Remove(this.id) Then
   If this.Done Then
 
     this.Dispose tmThisTask
@@ -437,14 +427,14 @@ Public Sub TimerTickNow()
 tickTimer = tickTimer + 1
 Dim this As TaskInterface
 If myTimerHandle = 0 Then Exit Sub
-  If myMasterList.count = 0 Then Exit Sub
+  If myMasterList.Count = 0 Then Exit Sub
   
   Do
   
   Set this = myMasterList(1)
   myMasterList.Remove 1
  If OnlyMusic Then
- If this.Id > 100 Then
+ If this.id > 100 Then
  AddTask this
  Exit Sub
  End If
@@ -453,14 +443,14 @@ If myTimerHandle = 0 Then Exit Sub
  Exit Sub
  End If
   myRunningList.Add this
-  Loop While this.Id < 0 And myMasterList.count <> 0
-  If this.Id < 0 Then Exit Sub
+  Loop While this.id < 0 And myMasterList.Count <> 0
+  If this.id < 0 Then Exit Sub
   
-  If Not this.busy And Not this.Done Then
+  If Not this.Busy And Not this.Done Then
 
   this.Tick
   End If
-  If Remove(this.Id) Then
+  If Remove(this.id) Then
   If this.Done Then
 
     this.Dispose tmThisTask
@@ -569,13 +559,13 @@ tickdrop = 0
 End Sub
 Public Sub CheckThreadsForThisObject(obj As Object)
 Dim this As TaskInterface, i As Long
-If myRunningList.count + myMasterList.count = 0 Then Exit Sub
+If myRunningList.Count + myMasterList.Count = 0 Then Exit Sub
 StopTimer
-For i = 0 To myRunningList.count - 1
+For i = 0 To myRunningList.Count - 1
 Set this = myRunningList(i + 1)
 If this.Owner Is obj Then this.Dispose tmAllTasks
 Next i
-For i = 0 To myMasterList.count - 1
+For i = 0 To myMasterList.Count - 1
 Set this = myMasterList(i + 1)
 If this.Owner Is obj Then this.Dispose tmAllTasks
 Next i

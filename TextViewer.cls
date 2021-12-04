@@ -567,11 +567,11 @@ End If
 End Sub
 
 Private Sub glistN_Fkey(a As Integer)
-Dim S$
+Dim s$
 If Me.UsedAsTextBox Then
 If FK$(a) <> "" Then
-    S$ = FK$(a)
-    interpret Basestack1, S$
+    s$ = FK$(a)
+    interpret Basestack1, s$
 Fkey = 0
 End If
 a = 0
@@ -3770,6 +3770,7 @@ mDoc.MarkParagraphID = ThatPara
 End Property
 Public Property Let Text2(RHS As String)
 Dim oldenabled As Boolean
+LastListIndex = 0
 If Me.HaveMarkedText Then
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
@@ -4157,7 +4158,6 @@ sel1 = SelLength
 Dim a As Long, b As Long, c As Long, D As Long
 findit = RHS
 mDoc.FindPos 1, 0, findit, a, b, c, D
-
 SetRowColumn a, b, sel1 <> 0
 If sel1 <> 0 Then SelLength = sel1: LastSelStart = sel1
 End Property
@@ -5203,18 +5203,18 @@ End Select
 Next i
 
 End Sub
-Function blockStringAhead(S$, pos1 As Long) As Long
+Function blockStringAhead(s$, pos1 As Long) As Long
 Dim i As Long, j As Long, c As Long
-c = Len(S$)
+c = Len(s$)
 i = pos1
 If i > c Then blockStringAhead = False: Exit Function
 Do
 
-Select Case AscW(Mid$(S$, i, 1))
+Select Case AscW(Mid$(s$, i, 1))
 Case 34
 Do While i < c
 i = i + 1
-If AscW(Mid$(S$, i, 1)) = 34 Then Exit Do
+If AscW(Mid$(s$, i, 1)) = 34 Then Exit Do
 Loop
 Case 123
 j = j - 1
@@ -5254,11 +5254,11 @@ End Function
 Private Function Myleft$(a As String, Pos As Long)
 If Pos < 1 Then Myleft$ = vbNullString Else Myleft$ = Mid$(a, 1, Pos)
 End Function
-Private Function MyTrimRNoCr(S$) As Long
+Private Function MyTrimRNoCr(s$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(S): If l = 0 Then MyTrimRNoCr = 1: Exit Function
-  p2 = StrPtr(S): l = l - 1
+  l = Len(s): If l = 0 Then MyTrimRNoCr = 1: Exit Function
+  p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
   GetMem2 i, p1
@@ -5271,11 +5271,11 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   Next i
  MyTrimRNoCr = l + 2
 End Function
-Private Function MyTrimL2NoTab(S$) As Long
+Private Function MyTrimL2NoTab(s$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(S): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
-  p2 = StrPtr(S): l = l - 1
+  l = Len(s): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
+  p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
   GetMem2 i, p1

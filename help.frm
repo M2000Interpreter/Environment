@@ -67,10 +67,14 @@ Private jump As Boolean
  Dim scrTwips As Long
 
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
-Dim Lx As Long, ly As Long, dr As Boolean, drmove As Boolean
+Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long
 Dim UAddPixelsTop As Long, flagmarkout As Boolean
+
+Private Sub Form_Activate()
+If HOOKTEST <> 0 Then UnHook HOOKTEST
+End Sub
 
 Private Sub Form_Deactivate()
 jump = False
@@ -89,7 +93,7 @@ Private Sub Form_KeyPress(KeyAscii As Integer)
 On Error GoTo there1
 
 If Form1.Visible Then
-If Not gList1.EditFlag Then
+If Not glist1.EditFlag Then
 Form1.SetFocus
 INK$ = StrConv(ChrW$(KeyAscii Mod 256), 64, Form1.GetLCIDFromKeyboard)
 End If
@@ -103,10 +107,10 @@ Form4Loaded = True
 Set LastGlist2 = Nothing
 setupxy = 20 * Helplastfactor
 scrTwips = Screen.TwipsPerPixelX
-gList1.CapColor = rgb(255, 160, 0)
-gList1.LeftMarginPixels = 4
+glist1.CapColor = rgb(255, 160, 0)
+glist1.LeftMarginPixels = 4
 Set label1 = New TextViewer
-Set label1.Container = gList1
+Set label1.Container = glist1
 label1.NoCenterLineEdit = True
 label1.Filename = vbNullString
 label1.glistN.NoMoveDrag = True
@@ -159,7 +163,7 @@ End If
 End Sub
 Public Sub moveMe()
 ScaleDialog Helplastfactor, HelpLastWidth
-Hook2 hWnd, gList1
+Hook2 hWnd, glist1
 label1.glistN.SoftEnterFocus
 If IsWine Then
 If Not Screen.ActiveForm Is Nothing Then
@@ -181,7 +185,7 @@ If Button = 1 Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
-    ly = y
+    lY = y
     End If
     
     Else
@@ -189,7 +193,7 @@ If Button = 1 Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
-    ly = y
+    lY = y
     End If
     End If
 
@@ -211,11 +215,11 @@ If dr Then
 
 If bordertop < 150 Then
 
-        If y < (Height - 150) Or y > Height Then addy = (y - ly)
+        If y < (Height - 150) Or y > Height Then addy = (y - lY)
      If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
-    If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
+    If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
         If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
@@ -259,11 +263,11 @@ Else
 
 
 ''gList1.PrepareToShow
-        ly = ly * Helplastfactor / factor
+        lY = lY * Helplastfactor / factor
         End If
         Else
         Lx = x
-        ly = y
+        lY = y
    
 End If
 once = False
@@ -316,19 +320,19 @@ End Sub
 
 Private Sub glist1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 If item = -1 Then
-If gList1.DoubleClickCheck(Button, item, x, y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor, -1) Then
+If glist1.DoubleClickCheck(Button, item, x, y, glist1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor, -1) Then
             HelpLastWidth = -1
             Unload Me
 End If
 Else
-gList1.mousepointer = 1
+glist1.mousepointer = 1
 End If
 End Sub
 
 
 Private Sub glist1_getpair(a As String, b As String)
 If mHelp Or abt Then
-gList1.EditFlag = False
+glist1.EditFlag = False
     MKEY$ = MKEY$ & a
     a = vbNullString
 End If
@@ -343,7 +347,7 @@ End If
 Select Case keycode
 Case vbKeyDelete, vbKeyBack, vbKeyReturn, vbKeySpace
 
-gList1.EditFlag = False
+glist1.EditFlag = False
 If mHelp Or abt Then
 MKEY$ = MKEY$ & ChrW$(keycode)
 keycode = 0
@@ -370,7 +374,7 @@ End If
 End Sub
 
 Private Sub gList1_MouseUp(x As Single, y As Single)
-If gList1.DoubleClickArea(x, y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor) Then
+If glist1.DoubleClickArea(x, y, glist1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor) Then
             HelpLastWidth = -1
             Unload Me
             End If
@@ -441,13 +445,13 @@ a.Left = a.Right - b
 a.Right = a.Right - setupxy + b
 a.top = b
 a.Bottom = setupxy - b
-FillThere thathDC, VarPtr(a), gList1.dcolor
+FillThere thathDC, VarPtr(a), glist1.dcolor
 b = 5
 a.Left = a.Left - 3
 a.Right = a.Right + 3
 a.top = b
 a.Bottom = setupxy - b
-FillThere thathDC, VarPtr(a), gList1.CapColor
+FillThere thathDC, VarPtr(a), glist1.CapColor
 
 
 End Sub
@@ -472,8 +476,8 @@ FillThereMyVersion thisHDC, thisrect, &HF0F0F0
 End If
 End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
-gList1.FontSize = 14.25 * factor * dv15 / 15
-factor = gList1.FontSize / 14.25 / dv15 * 15
+glist1.FontSize = 14.25 * factor * dv15 / 15
+factor = glist1.FontSize / 14.25 / dv15 * 15
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
@@ -500,13 +504,13 @@ End If
 myform Me, Left * kk, top * kk, allwidth, allheight, True, factor
 
   
-gList1.addpixels = 4 * factor
+glist1.addpixels = 4 * factor
 label1.move borderleft, bordertop, itemWidth, allheight - bordertop * 2
 
 label1.NewTitle vH_title$, (4 + UAddPixelsTop) * factor
 label1.Render
-gList1.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
-gList1.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
+glist1.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
+glist1.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 
 
 End Sub

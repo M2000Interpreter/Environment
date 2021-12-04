@@ -128,39 +128,29 @@ Dim nopreview As Boolean
 Dim oldLeftMarginPixels As Long
 Dim firstpath As Long
 Dim setupxy As Single
-Dim Lx As Long, ly As Long, dr As Boolean
+Dim Lx As Long, lY As Long, dr As Boolean
 Dim scrTwips As Long
 Dim bordertop As Long, borderleft As Long
 Dim allwidth As Long, itemWidth As Long
 Dim dirlistindex As Long
 Dim dirlisttop As Long
   Dim ihave As Boolean
-Private LastActive As Object
+Private LastActive As String
 
 Private Sub Form_Activate()
-
-     On Error Resume Next
-             If LastActive Is Nothing Then Set LastActive = gList1
-              If Typename(ActiveControl) = "gList" Then
-                If LastActive Is ActiveControl Then
-                Hook hWnd, ActiveControl
-                Else
-                Hook hWnd, Nothing
-                End If
-                Else
-               
-                Hook hWnd, Nothing
-                End If
-
-        
-        
-     
-        
-  
-            If LastActive.enabled Then
-            If LastActive.Visible Then If Not ActiveControl Is LastActive Then LastActive.SetFocus
-         End If
-
+    On Error Resume Next
+    If LastActive = vbNullString Then LastActive = gList1.Name
+    If HOOKTEST <> 0 Then UnHook HOOKTEST
+        If Typename(ActiveControl) = "gList" Then
+            Hook hWnd, ActiveControl
+        Else
+            Hook hWnd, Nothing
+        End If
+        If LastActive <> "" Then
+            If Controls(LastActive).enabled Then
+            If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
+        End If
+    End If
 End Sub
 
 Private Sub Form_Deactivate()
@@ -379,7 +369,7 @@ If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
 dr = True
 mousepointer = vbSizeNWSE
 Lx = x
-ly = y
+lY = y
 End If
 
 Else
@@ -387,7 +377,7 @@ If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < W
 dr = True
 mousepointer = vbSizeNWSE
 Lx = x
-ly = y
+lY = y
 End If
 
 End If
@@ -404,7 +394,7 @@ If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mo
  If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else mousepointer = 0
 End If
 If dr Then
-    If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
+    If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
     If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     
    If Not ExpandWidth Then addX = 0
@@ -453,13 +443,13 @@ If dr Then
         gList1.PrepareToShow
        
       
-        ly = ly * lastfactor / factor
+        lY = lY * lastfactor / factor
     
         'End If
         End If
         Else
         Lx = x
-        ly = y
+        lY = y
    
 End If
 once = False
@@ -468,10 +458,6 @@ End Sub
 Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
 If dr Then Me.mousepointer = 0
 dr = False
-End Sub
-
-Private Sub Form_Terminate()
-Set LastActive = Nothing
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
@@ -509,7 +495,6 @@ Image1.Width = 0
 selectorLastX = Left
 selectorLastY = top
 Sleep 200
-Set LastActive = Nothing
 loadfileiamloaded = False
 End Sub
 Private Sub MakeFolder(ByVal a$)
@@ -520,7 +505,7 @@ Sleep 1
 End Sub
 
 Private Sub gList1_CheckGotFocus()
-Set LastActive = gList1
+LastActive = gList1.Name
 End Sub
 
 Private Sub gList1_CtrlPlusF1()
@@ -599,8 +584,8 @@ gList1.ShowMe2
 End If
 End Sub
 
-Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = vbKeyEscape Then
+Private Sub gList1_KeyDown(keycode As Integer, shift As Integer)
+If keycode = vbKeyEscape Then
 mySelector.AbordAll
 CancelDialog = True
 Unload Me
@@ -652,34 +637,34 @@ Private Sub gList1_SyncKeyboardUnicode(a As String)
 Dim oldf As Long
     
     
-Static F As Long
-oldf = F
-F = gList1.ListIndex
-F = mySelector.myDir2.FindItemStartWidth(ShearchList, True, F + 1)
-If F < 0 Then
-F = mySelector.myDir2.FindItemStartWidth(ShearchList, True, F + 1)
+Static f As Long
+oldf = f
+f = gList1.ListIndex
+f = mySelector.myDir2.FindItemStartWidth(ShearchList, True, f + 1)
+If f < 0 Then
+f = mySelector.myDir2.FindItemStartWidth(ShearchList, True, f + 1)
 End If
-If F >= 0 Then
-gList1.ScrollTo F - gList1.lines / 2, F + 1
+If f >= 0 Then
+gList1.ScrollTo f - gList1.lines / 2, f + 1
  ''RaiseEvent PickOther(gList1.ListValue)
 Else
-F = oldf
+f = oldf
 ShearchList = Mid$(ShearchList, 1, Len(ShearchList) - 1)
-If Len(ShearchList) = 0 Then F = -1: Exit Sub
-F = mySelector.myDir2.FindItemStartWidth(ShearchList, True, F + 1)
-If F >= 0 Then
-gList1.ScrollTo F - gList1.lines / 2, F + 1
+If Len(ShearchList) = 0 Then f = -1: Exit Sub
+f = mySelector.myDir2.FindItemStartWidth(ShearchList, True, f + 1)
+If f >= 0 Then
+gList1.ScrollTo f - gList1.lines / 2, f + 1
  ''RaiseEvent PickOther(gList1.ListValue)
 Else
 
-F = -1
+f = -1
 End If
 End If
 End Sub
 
 Private Sub gList1_UnregisterGlist()
 On Error Resume Next
-If gList1.TabStopSoft Then Set LastActive = gList1
+If gList1.TabStopSoft Then LastActive = gList1.Name
 Set LastGlist = Nothing
 If Err.Number > 0 Then gList1.NoWheel = True
 End Sub
@@ -712,11 +697,11 @@ End Sub
 
 Private Sub gList2_MouseUp(x As Single, y As Single)
             If mySelector.myDir2 Is Nothing Then Exit Sub
-            If Not LastActive Is Nothing Then
-            If LastActive.enabled Then
-            If LastActive.Visible Then
+            If LastActive <> "" Then
+            If Controls(LastActive).enabled Then
+            If Controls(LastActive).Visible Then
                 If Not gList2.DoubleClickArea(x, y, setupxy / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1) Then
-                LastActive.SetFocus
+                Controls(LastActive).SetFocus
                 Else
                  mySelector.AbordAll
                       Unload Me
@@ -728,17 +713,17 @@ End Sub
 
 Private Sub gList2_Selected2(item As Long)
  On Error Resume Next
-        If LastActive Is Nothing Then
-        Set LastActive = gList1
+        If LastActive = "" Then
+            LastActive = gList1.Name
         Else
-            If LastActive.enabled Then
-            If LastActive.Visible Then LastActive.SetFocus
+            If Controls(LastActive).enabled Then
+                If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
             End If
         End If
 End Sub
 
 Private Sub glist3_CheckGotFocus()
-Set LastActive = glist3
+LastActive = glist3.Name
        glist3.backcolor = rgb(0, 160, 0)
     glist3.ShowMe2
     noChangeColorGlist3 = True
@@ -771,7 +756,7 @@ End Sub
 
 
 
-Private Sub glist3_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub glist3_KeyDown(keycode As Integer, shift As Integer)
 If Not mySelector.Mydir.isReadOnly(mySelector.Mydir.Path) Then
 If Not glist3.EditFlag Then
 
@@ -811,18 +796,18 @@ glist3.NoCaretShow = False
 glist3.backcolor = &H0
 glist3.forecolor = &HFFFFFF
 Else
-If KeyCode = vbKeyReturn Then
+If keycode = vbKeyReturn Then
 GoTo here
-ElseIf KeyCode = vbKeyUp Or vbKeyDown Then
+ElseIf keycode = vbKeyUp Or vbKeyDown Then
 DestroyCaret
-KeyCode = 0
+keycode = 0
 gList1.SetFocus
 End If
 End If
 glist3.ShowMe2
-KeyCode = 0
+keycode = 0
 
-ElseIf KeyCode = vbKeyReturn Then
+ElseIf keycode = vbKeyReturn Then
 here:
 DestroyCaret
 If TEXT1 <> "" Then
@@ -830,7 +815,7 @@ glist3.EditFlag = False
 glist3.enabled = False
 glist3_PanLeftRight True
 End If
-KeyCode = 0
+keycode = 0
 
 End If
 

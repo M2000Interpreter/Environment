@@ -548,4 +548,29 @@ Next i
 DecodeEscape = utf8decode(StrConv(Join(a(), ""), vbFromUnicode))
 
 End Function
-
+Sub ClearState1()
+If Not NOEDIT Then
+NOEDIT = True
+Else
+If QRY Then QRY = False
+End If
+Sleep 300
+Set Basestack1 = Nothing
+abt = False
+Set comhash = New sbHash
+Set numid = New idHash
+Set funid = New idHash
+Set strid = New idHash
+Set strfunid = New idHash
+NERR = False
+TaskMaster.Dispose
+CloseAllConnections
+CleanupLibHandles
+' restore DB.Provider for User
+JetPrefixUser = JetPrefixHelp
+JetPostfixUser = JetPostfixHelp
+' SET ARRAY BASE TO ZERO
+ArrBase = 0
+ReDim sbf(0), var(0)
+Set globalstack = Nothing
+End Sub

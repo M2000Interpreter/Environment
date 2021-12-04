@@ -30,46 +30,60 @@ Public Function Decode64toMemBloc(ByVal a$, ok As Boolean, Optional forcode As B
     a$ = Decode64(a$, ok)
     If ok Then
         BLen = LenB(a$)
-        mem.Construct 1, BLen, , forcode
+        mem.construct 1, BLen, , forcode
         CopyBytes BLen, mem.GetPtr(0), StrPtr(a$)
         Set Decode64toMemBloc = mem
     End If
     
 End Function
-Public Function File2newMemblock(FileName As String, R, P) As Object
+Public Function File2newMemblock(Filename As String, r, p) As Object
     Dim mem As New MemBlock, BLen As Long, i As Long
-    R = -1#
-    FileName = CFname(FileName)
-    If FileName <> "" Then
+    r = -1#
+    Filename = CFname(Filename)
+    If Filename <> "" Then
      
      
-    BLen = FileLen(GetDosPath(FileName))
+    BLen = FileLen(GetDosPath(Filename))
     If BLen Then
-    mem.Construct 1, BLen, , CBool(P)
+    mem.construct 1, BLen, , CBool(p)
     i = FreeFile
     On Error Resume Next
 
-    Open GetDosPath(FileName) For Binary Access Read As i
+    Open GetDosPath(Filename) For Binary Access Read As i
 
     If Err.Number > 0 Then MyEr Err.Description, Err.Description: Close i: Exit Function
     If mem.GetData(i, mem.GetPtr(0), BLen) Then
-    R = 0#
+    r = 0#
     Set File2newMemblock = mem
+    If Not mem.IsWmf Then
+    If Not mem.IsEmf Then
+    If Not mem.IsBmp Then
+    If Not mem.IsIco Then
+    If Not mem.IsGif Then
+    If Not mem.IsJpg Then
+    If Not mem.IsPng Then
+    End If
+    End If
+    End If
+    End If
+    End If
+    End If
+    End If
     End If
     Close i
     End If
     End If
 End Function
 
-Public Function SaveStr2MemBlock(a, R) As Object
+Public Function SaveStr2MemBlock(a, r) As Object
 Dim aa As New cDIBSection
-R = -1#
+r = -1#
 If cDib(a, aa) Then
     aa.GetDpi 96, 96
     If Not aa.SaveDibToMeMBlock(SaveStr2MemBlock) Then
     MyEr "Can't save to buffer", "Δεν μπορώ να σώσω στη διάρθρωση"
     Else
-    R = 0#
+    r = 0#
     End If
 End If
 End Function
@@ -94,11 +108,11 @@ j.SaveFile sFile
 End With
    End Function
 
-Public Sub CheckOrientation(a As cDIBSection, F As String)
+Public Sub CheckOrientation(a As cDIBSection, f As String)
 
-          If LCase(ExtractType(F, (0))) = "jpg" Then
+          If LCase(ExtractType(f, (0))) = "jpg" Then
            Dim qw As New ExifRead
-             qw.Load F
+             qw.Load f
  
             Select Case qw.Tag(Orientation)
                   Case 3
