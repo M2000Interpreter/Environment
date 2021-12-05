@@ -791,8 +791,11 @@ Public Property Get Font() As Font
     Set Font = m_font
 End Property
 
+Function CloneFont(Font As IFont) As StdFont
+  Font.Clone CloneFont
+End Function
 Public Property Set Font(New_Font As Font)
-    Set m_font = New_Font
+    Set m_font = CloneFont(New_Font)
     Set UserControl.Font = m_font
     GetTextMetrics UserControl.hDC, tm
     If restrictLines > 0 Then

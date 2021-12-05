@@ -65,29 +65,29 @@ Private mHeader As ENHMETAHEADER
 Private Declare Function CreateHatchBrush Lib "gdi32" (ByVal nIndex As Long, ByVal crColor As Long) As Long
 Private Declare Function CreatePen Lib "gdi32.dll" (ByVal fnPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
 Private Declare Function CreateEnhMetaFile Lib "gdi32" Alias "CreateEnhMetaFileW" (ByVal hDCRef As Long, ByVal lpFileName As Long, ByVal lpRect As Long, ByVal lpDescription As Long) As Long
-Private Declare Function CloseEnhMetaFile Lib "gdi32" (ByVal Hdc As Long) As Long
+Private Declare Function CloseEnhMetaFile Lib "gdi32" (ByVal hDC As Long) As Long
 Private Declare Function OleCreatePictureIndirect Lib "olepro32.dll" (lpPictDesc As PICTDESC, riid As Any, ByVal fPictureOwnsHandle As Long, IPic As IPicture) As Long
 Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As Long
 Private Declare Function DeleteMetaFile Lib "gdi32" (ByVal hmf As Long) As Long
-Private Declare Function SetBkColor Lib "gdi32" (ByVal Hdc As Long, ByVal crColor As Long) As Long
-Private Declare Function LineTo Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long) As Long
-Private Declare Function MoveToEx Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, lpPoint As Any) As Long
-Private Declare Function Rectangle Lib "gdi32.dll" (ByVal Hdc As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
+Private Declare Function SetBkColor Lib "gdi32" (ByVal hDC As Long, ByVal crColor As Long) As Long
+Private Declare Function LineTo Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long) As Long
+Private Declare Function MoveToEx Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, lpPoint As Any) As Long
+Private Declare Function Rectangle Lib "gdi32.dll" (ByVal hDC As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Private Declare Function GetStockObject Lib "gdi32.dll" (ByVal nIndex As Long) As Long
-Private Declare Function PlayEnhMetaFile Lib "gdi32" (ByVal Hdc As Long, ByVal hEmf As Long, lpRect As Any) As Long
-Private Declare Function SetGraphicsMode Lib "gdi32" (ByVal Hdc As Long, ByVal iMode As Long) As Long
-Private Declare Function GetGraphicsMode Lib "gdi32" (ByVal Hdc As Long) As Long
-Private Declare Function SetMapMode Lib "gdi32" (ByVal Hdc As Long, ByVal nMapMode As Long) As Long
-Private Declare Function GetMapMode Lib "gdi32" (ByVal Hdc As Long) As Long
+Private Declare Function PlayEnhMetaFile Lib "gdi32" (ByVal hDC As Long, ByVal hEmf As Long, lpRect As Any) As Long
+Private Declare Function SetGraphicsMode Lib "gdi32" (ByVal hDC As Long, ByVal iMode As Long) As Long
+Private Declare Function GetGraphicsMode Lib "gdi32" (ByVal hDC As Long) As Long
+Private Declare Function SetMapMode Lib "gdi32" (ByVal hDC As Long, ByVal nMapMode As Long) As Long
+Private Declare Function GetMapMode Lib "gdi32" (ByVal hDC As Long) As Long
 Private Declare Function SetWinMetaFileBits Lib "gdi32" (ByVal cbBuffer As Long, lpbBuffer As Byte, ByVal hDCRef As Long, lpmfp As Any) As Long
 Private Declare Function GetMetaFileBitsEx Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nSize As Long, lpData As Byte) As Long
 
 
-Private Declare Function SetROP2 Lib "gdi32" (ByVal Hdc As Long, ByVal nDrawMode As Long) As Long
+Private Declare Function SetROP2 Lib "gdi32" (ByVal hDC As Long, ByVal nDrawMode As Long) As Long
 
 
 
@@ -101,7 +101,7 @@ End Type
 Dim pm As POINTAPI
 
 Dim boundrect As RECT
-Private Declare Function FillRect Lib "user32" (ByVal Hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Private Declare Function FillRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Private Type PICTDESC
     Size                As Long
     Type                As Long
@@ -136,10 +136,10 @@ Private Type XFORM
         eDy As Single
 End Type
 
- Private Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) _
+ Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) _
           As Long
-Private Declare Function GetWorldTransform Lib "gdi32" (ByVal Hdc As Long, lpXform As XFORM) As Long
-Private Declare Function SetWorldTransform Lib "gdi32" (ByVal Hdc As Long, lpXform As XFORM) As Long
+Private Declare Function GetWorldTransform Lib "gdi32" (ByVal hDC As Long, lpXform As XFORM) As Long
+Private Declare Function SetWorldTransform Lib "gdi32" (ByVal hDC As Long, lpXform As XFORM) As Long
 
 Private Const GM_ADVANCED = 2
 Private Const GM_COMPATIBLE = 1
@@ -151,12 +151,12 @@ Public Property Get Name() As String
     Name = "Emf"
 End Property
 
-Public Property Get Hdc() As Long
-    Hdc = m_hDC
+Public Property Get hDC() As Long
+    hDC = m_hDC
 End Property
 
-Public Property Get Status() As Boolean
-    Status = m_Status
+Public Property Get status() As Boolean
+    status = m_Status
 End Property
 Public Property Get mouseicon() As StdPicture
     Set mouseicon = moufa
@@ -164,8 +164,8 @@ End Property
 Public Property Let mouseicon(RHS As StdPicture)
     Set moufa = RHS
 End Property
-Private Function MyMod(R1, po) As Variant
-MyMod = R1 - Fix(R1 / po) * po
+Private Function MyMod(r1, po) As Variant
+MyMod = r1 - Fix(r1 / po) * po
 End Function
 Public Sub create(pen As Long, fakeWidth As Long, fakeHeight As Long)
     Static onetime As Boolean
@@ -212,7 +212,7 @@ Public Sub create(pen As Long, fakeWidth As Long, fakeHeight As Long)
 End Sub
 Public Function getEmfObj() As Object
 Dim aPic As MemBlock
-Dim bytes As Long, retval As Long
+Dim bytes As Long, RetVal As Long
 Dim emfP As StdPicture
 Set emfP = Me.getEmf
 If emfP Is Nothing Then Exit Function
@@ -225,8 +225,8 @@ If bytes Then
 End If
 Set getEmfObj = aPic
 End Function
-Private Sub CleanUp()
-Dim retval As Long
+Private Sub Cleanup()
+Dim RetVal As Long
     If m_hFntOld <> 0 Then SelectObject m_hDC, m_hFntOld
     If hOldPen <> 0 Then SelectObject m_hDC, hOldPen: DeleteObject m_hpen
     If m_brushOld Then SelectObject m_hDC, m_brushOld: DeleteObject m_brush
@@ -235,7 +235,7 @@ End Sub
 Public Function getEmf() As StdPicture
 
 If m_Status Then
-    CleanUp
+    Cleanup
     Set getEmf = pvMetaToPicture
     m_Status = False
 End If
@@ -261,7 +261,7 @@ Private Function pvMetaToPicture() As IPicture
 End Function
 Public Property Get Picture() As StdPicture
 If m_Status Then
-    CleanUp
+    Cleanup
      Set Picture = pvMetaToPicture
     m_Status = False
 End If
@@ -347,7 +347,7 @@ End Property
 Private Sub Class_Terminate()
     If m_Status Then
         If m_hDC <> 0 Then
-             CleanUp
+             Cleanup
              DeleteDC m_hDC
         End If
     End If
@@ -432,10 +432,12 @@ fillstyle = m_fillstyle
 End Property
 Private Sub MakeBrush()
 Const NULL_BRUSH = 5
+Const DC_PEN = 19
 Dim ret As Long
 If m_fillstyle > 1 Then
     If m_brushOld Then SelectObject m_hDC, m_brushOld
     If m_brush Then DeleteObject m_brush
+ 
     Select Case m_fillstyle
     Case 6
         ret = 4
@@ -449,6 +451,7 @@ If m_fillstyle > 1 Then
         ret = 1
     Case 2
         ret = 0
+
     End Select
     m_brush = CreateHatchBrush(ret, m_fillcolor)
     m_brushOld = SelectObject(m_hDC, m_brush)
@@ -460,7 +463,9 @@ ElseIf m_fillstyle = 1 Then
 Else
     If m_brushOld Then SelectObject m_hDC, m_brushOld
     If m_brush Then DeleteObject m_brush
-    m_brush = CreateSolidBrush(m_fillcolor)
+   ' m_brush = GetStockObject(DC_PEN)
+   m_brush = CreateSolidBrush(m_fillcolor)
+    
     m_brushOld = SelectObject(m_hDC, m_brush)
 End If
 End Sub
@@ -476,11 +481,11 @@ End Property
 
 Public Property Let DrawWidth(ByVal RHS As Long)
 m_DrawWidth = RHS
-Dim retval As Long
+Dim RetVal As Long
 If m_Status Then
 If m_hDC Then
-If hOldPen <> 0 Then retval = SelectObject(m_hDC, hOldPen)
-If m_hpen <> 0 Then retval = DeleteObject(m_hpen)
+If hOldPen <> 0 Then RetVal = SelectObject(m_hDC, hOldPen)
+If m_hpen <> 0 Then RetVal = DeleteObject(m_hpen)
 m_hpen = CreatePen(m_DrawStyle, m_DrawWidth, m_pen)
 hOldPen = SelectObject(m_hDC, m_hpen)
 End If
@@ -757,11 +762,11 @@ SetGraphicsMode m_hDC, GM_COMPATIBLE
     DeleteMetaFile pHandle
 End Sub
 Private Function buildXForm(ByVal x0 As Long, ByVal y0 As Long, ByVal q As Single, piw As Long, pih As Long) As XFORM
-    Dim R As Single, k As Single
+    Dim r As Single, k As Single
     q = -(CLng(q * 100) Mod 36000) * 1.74532925199433E-04
 
-        R = Atn(piw / CSng(pih)) + Pi / 2!
-        k = piw / Cos(R) / 2
+        r = Atn(piw / CSng(pih)) + Pi / 2!
+        k = piw / Cos(r) / 2
         buildXForm.eM11 = Round(Cos(q), 4)
         buildXForm.eM12 = Round(Sin(q), 4)
         buildXForm.eM21 = Round(-Sin(q), 4)
@@ -830,11 +835,11 @@ If m_Status Then
 End If
 
 End Property
-Private Function getEmfFromWmf(Wmf As StdPicture, W As Long, H As Long) As Long
+Private Function getEmfFromWmf(Wmf As StdPicture, w As Long, h As Long) As Long
  Dim zz As METAFILEPICT
  Dim bb As wmfPlaceableFileHeader
-  zz.xExt = W '* dv15
- zz.yExt = H '* dv15
+  zz.xExt = w '* dv15
+ zz.yExt = h '* dv15
  
  Dim bytes As Long
 Dim Buffer() As Byte
@@ -848,5 +853,5 @@ Exit Function
 End If
     On Error Resume Next
     zz.mm = 1
-    getEmfFromWmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.Hdc, zz)
+    getEmfFromWmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.hDC, zz)
 End Function

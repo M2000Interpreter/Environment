@@ -6271,22 +6271,22 @@ Public Function ContainsUTF8(ByRef Source() As Byte) As Boolean
     
 
 End Function
-Function ReadUnicodeOrANSI(Filename As String, Optional ByVal EnsureWinLFs As Boolean, Optional feedback As Long) As String
+Function ReadUnicodeOrANSI(FileName As String, Optional ByVal EnsureWinLFs As Boolean, Optional feedback As Long) As String
 Dim i&, FNr&, BLen&, WChars&, bom As Integer, BTmp As Byte, b() As Byte
 Dim mLof As Long, nobom As Long
 nobom = 1
 ' code from Schmidt, member of vbforums
-If Filename = vbNullString Then Exit Function
+If FileName = vbNullString Then Exit Function
 On Error Resume Next
-If GetDosPath(Filename) = vbNullString Then MissFile: Exit Function
+If GetDosPath(FileName) = vbNullString Then MissFile: Exit Function
  On Error GoTo ErrHandler
-  BLen = FileLen(GetDosPath(Filename))
+  BLen = FileLen(GetDosPath(FileName))
 '  If Err.Number = 53 Then missfile: Exit Function
  
   If BLen = 0 Then Exit Function
   
   FNr = FreeFile
-  Open GetDosPath(Filename) For Binary Access Read As FNr
+  Open GetDosPath(FileName) For Binary Access Read As FNr
       Get FNr, , bom
     Select Case bom
       Case &HFEFF, &HFFFE 'one of the two possible 16 Bit BOMs
@@ -6392,17 +6392,17 @@ Err.Raise Err.Number, Err.Source & ".ReadUnicodeOrANSI", Err.Description
 End If
 End Function
 
-Public Function SaveUnicode(ByVal Filename As String, ByVal buf As String, mode2save As Long, Optional Append As Boolean = False) As Boolean
+Public Function SaveUnicode(ByVal FileName As String, ByVal buf As String, mode2save As Long, Optional Append As Boolean = False) As Boolean
 ' using doc as extension you can read it from word...with automatic conversion to unicode
 ' OVERWRITE ALWAYS
 Dim w As Long, a() As Byte, f$, i As Long, bb As Byte, yesswap As Boolean
 On Error GoTo t12345
 If Not Append Then
-If Not NeoUnicodeFile(Filename) Then Exit Function
+If Not NeoUnicodeFile(FileName) Then Exit Function
 Else
-If Not CanKillFile(Filename$) Then Exit Function
+If Not CanKillFile(FileName$) Then Exit Function
 End If
-f$ = GetDosPath(Filename)
+f$ = GetDosPath(FileName)
 If Err.Number > 0 Or f$ = vbNullString Then Exit Function
 w = FreeFile
 MyDoEvents
@@ -8939,14 +8939,14 @@ Dim p2 As Long, p1 As Integer, p4 As Long
 End Function
 
 
-Function IsLabelSymbolNewExp(a$, gre$, Eng$, code As Long, usethis$) As Boolean
+Function IsLabelSymbolNewExp(a$, gre$, Eng$, Code As Long, usethis$) As Boolean
 ' code 2  gre or eng, set new value to code 1 or 0
 ' 0 for gre
 ' 1 for eng
 ' return true if we have label
 If Len(usethis$) = 0 Then
 Dim what As Boolean
-Select Case code
+Select Case Code
 Case 0
 IsLabelSymbolNewExp = IsLabelSymbol3(1032, a$, gre$, usethis$, False, False, False, True)
 Case 1
@@ -8954,16 +8954,16 @@ IsLabelSymbolNewExp = IsLabelSymbol3(1033, a$, Eng$, usethis$, False, False, Fal
 Case 2
 what = IsLabelSymbol3(1032, a$, gre$, usethis$, False, False, False, True)
 If what Then
-code = 0
+Code = 0
 IsLabelSymbolNewExp = what
 Exit Function
 End If
 what = IsLabelSymbol3(1033, a$, Eng$, usethis$, False, False, False, True)
-If what Then code = 1
+If what Then Code = 1
 IsLabelSymbolNewExp = what
 End Select
 Else
-Select Case code
+Select Case Code
 Case 0, 2
 IsLabelSymbolNewExp = gre$ = usethis$
 Case 1
@@ -10361,10 +10361,10 @@ If BLen = 0 Then Exit Function
 End Function
 
 Public Function ideographs(c$) As Boolean
-Dim code As Long
+Dim Code As Long
 If c$ = vbNullString Then Exit Function
-code = AscW(c$)  '
-ideographs = (code And &H7FFF) >= &H4E00 Or (-code > 24578) Or (code >= &H3400& And code <= &HEDBF&) Or (code >= -1792 And code <= -1281)
+Code = AscW(c$)  '
+ideographs = (Code And &H7FFF) >= &H4E00 Or (-Code > 24578) Or (Code >= &H3400& And Code <= &HEDBF&) Or (Code >= -1792 And Code <= -1281)
 End Function
 Public Function nounder32(c$) As Boolean
 nounder32 = AscW(c$) > 31 Or AscW(c$) < 0
@@ -10752,11 +10752,11 @@ End Function
 
 Public Function GetDeflocaleString(ByVal this As Long) As String
 On Error GoTo 1234
-    Dim Buffer As String, ret&, r&
+    Dim Buffer As String, Ret&, r&
     Buffer = String$(514, 0)
       
-        ret = GetLocaleInfoW(0, this, StrPtr(Buffer), Len(Buffer))
-    GetDeflocaleString = Left$(Buffer, ret - 1)
+        Ret = GetLocaleInfoW(0, this, StrPtr(Buffer), Len(Buffer))
+    GetDeflocaleString = Left$(Buffer, Ret - 1)
     
 1234:
     
@@ -10806,8 +10806,10 @@ With prive
 x& = .curpos
 y& = .currow
 xl& = xl& + x&
-half = yl& Mod 2 + 1
+
+
 yl& = yl& + y& - 1
+half = 1 - (yl& - y + 1) Mod 2
 With BoxTarget
 .SZ = prive.SZ
 .Comm = COM$
@@ -15449,7 +15451,7 @@ End If
             basestask.OriginalCode = -v
             basestask.FuncRec = subHash.LastKnown
 
-            frm$ = myl.code$
+            frm$ = myl.Code$
 PrepareLambda = True
 Exit Function
 1234
@@ -15781,7 +15783,7 @@ Public Function TraceThis(bstack As basetask, di As Object, b$, w$, SBB$) As Boo
             WaitShow = 0
             If bstack.OriginalCode < 0 Then
             lasttracecode = -bstack.OriginalCode
-                SBB$ = GetNextLine((var(-bstack.OriginalCode).code$))
+                SBB$ = GetNextLine((var(-bstack.OriginalCode).Code$))
             Else
             lasttracecode = bstack.OriginalCode
                 SBB$ = GetNextLine((sbf(Abs(bstack.OriginalCode)).sb))
@@ -15797,7 +15799,7 @@ Public Function TraceThis(bstack As basetask, di As Object, b$, w$, SBB$) As Boo
             Else
                 If bstack.OriginalCode <> 0 Then
                     If bstack.OriginalCode < 0 Then
-                        TestShowSub = var(-bstack.OriginalCode).code$
+                        TestShowSub = var(-bstack.OriginalCode).Code$
                     Else
                         TestShowSub = sbf(Abs(bstack.OriginalCode)).sb
                     End If
@@ -18268,13 +18270,14 @@ Dim pppp As mArray
 Dim ii As Long, ev As ComShinkEvent
 MyDeclare = True
 ML = -1
-    If Not groupok Then y1 = IsLabelSymbolNew(rest$, "цемийо", "GLOBAL", Lang)
+    If Not groupok Then y1 = IsLabelSymbolNewExp(rest$, "цемийо", "GLOBAL", Lang, ss$)
 If Not y1 Then
 
-    If Not groupok Then y1 = IsLabelSymbolNew(rest$, "топийо", "LOCAL", Lang)
-    If y1 Then y1 = y1 * -100
+    If Not groupok Then y1 = IsLabelSymbolNewExp(rest$, "топийо", "LOCAL", Lang, ss$)
+    If y1 Then y1 = y1 * -100: ss$ = vbNullString
 End If
-If Not groupok Then Y3 = IsLabelSymbolNew(rest$, "лецецомота", "WITHEVENTS", Lang)
+If Not groupok Then Y3 = IsLabelSymbolNewExp(rest$, "лецецомота", "WITHEVENTS", Lang, ss$)
+ss$ = vbNullString
 x1 = Abs(innerIsLabel(bstack, rest$, what$, , True, True))
 If Not groupok Then
 w$ = myUcase(what$, True)
@@ -22011,8 +22014,8 @@ Else
 End If
 ProcFKey = True
 End Function
-Function placeme$(gre$, Eng$, code As Long)
-If code = 1 Then placeme$ = Eng$ Else placeme$ = gre$
+Function placeme$(gre$, Eng$, Code As Long)
+If Code = 1 Then placeme$ = Eng$ Else placeme$ = gre$
 End Function
 Function MyScan(basestack As basetask, rest$) As Boolean
 Dim p As Variant, y As Double, s$
@@ -22725,47 +22728,47 @@ End With
 End Sub
 
 Private Function GetLCIDFromKeyboard() As Long
-    Dim Buffer As String, ret&, r&
+    Dim Buffer As String, Ret&, r&
     Buffer = String$(514, 0)
       r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
       r = val("&H" & Right(Hex(r), 4))
-        ret = GetLocaleInfoW(r, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
-    GetLCIDFromKeyboard = CLng(val("&h" + Left$(Buffer, ret - 1)))
+        Ret = GetLocaleInfoW(r, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
+    GetLCIDFromKeyboard = CLng(val("&h" + Left$(Buffer, Ret - 1)))
 End Function
 Public Function GetLCIDFromKeyboardLanguage() As String
-    Dim Buffer As String, ret&, r&
+    Dim Buffer As String, Ret&, r&
     Buffer = String$(514, 0)
       r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
       r = val("&H" & Right(Hex(r), 4))
       'LOCALE_SENGLANGUAGE&
       If UserCodePage = DefCodePage Then ''
-      ret = GetLocaleInfoW(r, LOCALE_SENGLANGUAGE&, StrPtr(Buffer), Len(Buffer))
+      Ret = GetLocaleInfoW(r, LOCALE_SENGLANGUAGE&, StrPtr(Buffer), Len(Buffer))
       Else
-        ret = GetLocaleInfoW(r, LOCALE_SLANGUAGE&, StrPtr(Buffer), Len(Buffer))
+        Ret = GetLocaleInfoW(r, LOCALE_SLANGUAGE&, StrPtr(Buffer), Len(Buffer))
         End If
-     If shortlang Then If ret > 3 Then ret = 4
+     If shortlang Then If Ret > 3 Then Ret = 4
      On Error Resume Next
-    GetLCIDFromKeyboardLanguage = Left$(Buffer, ret - 1)
+    GetLCIDFromKeyboardLanguage = Left$(Buffer, Ret - 1)
 
 End Function
 Public Function GetlocaleString(ByVal this As Long) As String
 On Error GoTo 1234
-    Dim Buffer As String, ret&, r&
+    Dim Buffer As String, Ret&, r&
     Buffer = String$(514, 0)
-    ret = GetLocaleInfoW(Clid, this, StrPtr(Buffer), Len(Buffer))
+    Ret = GetLocaleInfoW(Clid, this, StrPtr(Buffer), Len(Buffer))
         
-    GetlocaleString = Left$(Buffer, ret - 1)
+    GetlocaleString = Left$(Buffer, Ret - 1)
     
 1234:
     
 End Function
 Public Function GetlocaleString2(ByVal this As Long, ByVal McLid As Long) As String
 On Error GoTo 1234
-    Dim Buffer As String, ret&, r&
+    Dim Buffer As String, Ret&, r&
     Buffer = String$(514, 0)
       
-        ret = GetLocaleInfoW(McLid, this, StrPtr(Buffer), Len(Buffer))
-    GetlocaleString2 = Left$(Buffer, ret - 1)
+        Ret = GetLocaleInfoW(McLid, this, StrPtr(Buffer), Len(Buffer))
+    GetlocaleString2 = Left$(Buffer, Ret - 1)
     
 1234:
     
@@ -24431,7 +24434,7 @@ Dim LRec As RecordMci
         Set LRec = sRec
         If Not LRec.HaveMic Then GoTo noMic
         LRec.Rec_Initialize
-        If IsStrExp(basestack, rest$, s$) Then LRec.Filename = s$
+        If IsStrExp(basestack, rest$, s$) Then LRec.FileName = s$
         If FastSymbol(rest$, ",") Then
             If IsExp(basestack, rest$, p, , True) Then
                 If IsLabelSymbolLatin(rest$, "STEREO") Then
@@ -27093,35 +27096,36 @@ Set GuiForm = bstack.Owner
 GuiForm.RenderTarget bstack, rest$, Lang, p
 Else
 If p >= 0 And p < UBound(q()) Then
-     
+Dim ss$
 While FastSymbol(rest$, ",")
+ss$ = vbNullString
 x = Empty
-If IsLabelSymbolNew(rest$, "жяасг", "TEXT", Lang) Then
+If IsLabelSymbolNewExp(rest$, "жяасг", "TEXT", Lang, ss$) Then
 If IsStrExp(bstack, rest$, w$) Then q(p).Tag = w$
-ElseIf IsLabelSymbolNew(rest$, "пема", "PEN", Lang) Then
+ElseIf IsLabelSymbolNewExp(rest$, "пема", "PEN", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then q(p).pen = x
-ElseIf IsLabelSymbolNew(rest$, "жомто", "BACK", Lang) Then
+ElseIf IsLabelSymbolNewExp(rest$, "жомто", "BACK", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then q(p).back = x
-ElseIf IsLabelSymbolNew(rest$, "пкаисио", "BORDER", Lang) Then
+ElseIf IsLabelSymbolNewExp(rest$, "пкаисио", "BORDER", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then q(p).fore = x
-ElseIf IsLabelSymbolNew(rest$, "одгциа", "COMMAND", Lang) Then
+ElseIf IsLabelSymbolNewExp(rest$, "одгциа", "COMMAND", Lang, ss$) Then
 If IsStrExp(bstack, rest$, w$) Then q(p).Comm = w$
-ElseIf IsLabelSymbolNew(rest$, "тилг", "VALUE", Lang) Then
+ElseIf IsLabelSymbolNewExp(rest$, "тилг", "VALUE", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then q(p).topval = Int(x * 100)
-ElseIf IsLabelSymbolNew(rest$, "басг", "BASE", Lang) Then
+ElseIf IsLabelSymbolNewExp(rest$, "басг", "BASE", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then q(p).botval = Int(x * 100):
-ElseIf IsLabelSymbolNew(rest$, "вяыла", "COLOR", Lang) Then
+ElseIf IsLabelSymbolNewExp(rest$, "вяыла", "COLOR", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then q(p).barC = x
-ElseIf IsLabelSymbolNew(rest$, "лецехос", "SIZE", Lang) Then
+ElseIf IsLabelSymbolNewExp(rest$, "лецехос", "SIZE", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then
 If x > 100 Then x = 100
 If x < -100 Then x = -100
 q(p).imagesize = Int(x)
 End If
 ' "йахетг", "PORTRAIT"
-ElseIf IsLabelSymbolNew(rest$, "йахетг", "PORTRAIT", Lang) Then
+ElseIf IsLabelSymbolNewExp(rest$, "йахетг", "PORTRAIT", Lang, ss$) Then
     If IsExp(bstack, rest$, x, , True) Then q(p).Vertical = Int(x) <> 0
-ElseIf IsLabelSymbolNew(rest$, "еийома", "IMAGE", Lang) Then
+ElseIf IsLabelSymbolNewExp(rest$, "еийома", "IMAGE", Lang, ss$) Then
 If IsExp(bstack, rest$, x) Then
     If bstack.lastobj Is Nothing Then
     Set q(p).drawimage = Nothing
@@ -27170,4 +27174,59 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   End Select
   Next i
 End Function
+Function MyError(basestack As basetask, rest$, Lang As Long) As Boolean
+Dim p As Variant, x1 As Long, s$, ss$, what$
+Dim myMsgBox As New stdCallFunction, i As Long
+x1 = LastErNum
+If IsExp(basestack, rest$, p, , True) Then
+If p = 0 Then
+myMsgBox.CallThis "user32.MessageBoxW", "long alfa, lptext$, lpcaption$, long type", 1
+basestack.soros.PushVal 16
+basestack.soros.PushStr MesTitle$
+basestack.soros.PushStr "Fatal Error"
+basestack.soros.PushVal Form1.hWnd
+Module1.CallByObject basestack, False, myMsgBox
+NERR = True
+MyError = False
+Exit Function
+ElseIf p = -1 Then
+NERR = False
+MyError = False
+Exit Function
+Else
+If p = -2 Then
+ ISSTRINGA rest$, s$
+ ISSTRINGA rest$, ss$
+MyEr s, ss$
+If basestack.IamThread Then
+On Error Resume Next
+basestack.Parent.ThrowThreads
+NERR = False
+MyError = False
+Exit Function
+End If
+MyError = False
+Exit Function
+
+Else
+MyEr "ERROR " & Trim$(Str$(p)), "кахос " & Trim$(Str$(p))
+LastErNum = p
+End If
+End If
+ElseIf IsStrExp(basestack, rest$, s$) Then
+MyEr what$ & " " & s$, what$ & " " & s$
+Else
+LastErNum = 0 ': LastErNum1 = 0
+LastErNameGR = vbNullString
+LastErName = vbNullString
+
+MyError = True
+Exit Function
+End If
+
+MyError = False
+
+End Function
+
+
 

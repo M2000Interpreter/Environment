@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 43
+Global Const Revision = 44
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -147,7 +147,7 @@ Public DXP As Long
 Public DYP As Long
 Public SLOW As Boolean
 Public pname As String
-Public port As String
+Public Port As String
 Global elevatestatus As Long
 Global elevatestatus2 As Long
 Public Fkey As Long
@@ -13601,7 +13601,7 @@ lit16: '    Case "MODULE$", "‘Ã«Ã¡$"
                     Exit Function
 
 lit17: '    Case "PRINTERNAME$", "≈ ‘’–Ÿ‘«”$"  ' ‰ÂÌ ·ﬂÊÂÈ Ò¸ÎÔ È· Á ¸ÒÙ·
-                    r$ = pname & " (" & port & ")"
+                    r$ = pname & " (" & Port & ")"
                     IsStr1 = True
                     Exit Function
 lit18: '    Case "PROPERTIES$", "…ƒ…œ‘«‘≈”$"
@@ -13659,7 +13659,7 @@ lit25: '    Case "SPRITE$", "ƒ…¡÷¡Õ≈…¡$"
                 IsStr1 = True
                 Exit Function
 lit26: '    Case "APPDIR$", "≈÷¡—Ãœ√«. ¡‘$"
-                r$ = GetLongName(App.path)
+                r$ = GetLongName(App.Path)
                 If Right(r$, 1) <> "\" Then r$ = r$ + "\"
                 IsStr1 = True
                 Exit Function
@@ -26661,9 +26661,11 @@ End Sub
 
 Sub CreateitObject(var As Variant, THISOBJECT As String, Optional ByVal cc As Variant)
 Dim aa As Object
+Dim nVal As String
 If IsMissing(cc) Then
 If Left$(THISOBJECT, 1) = "{" Then
-    THISOBJECT = strProgIDfromSrting(THISOBJECT)
+    nVal = strProgIDfromSrting(THISOBJECT)
+    If Len(nVal) > 0 Then THISOBJECT = nVal
 End If
 On Error Resume Next
 Set aa = CreateObject(THISOBJECT)
@@ -28683,13 +28685,11 @@ a$ = sStr
 End If
 CleanStr = a$
 End Function
-Private Sub CallByObject(bstack As basetask, i As Long, ret As Boolean)
-Dim that As stdCallFunction, Up As Long, getparam As Boolean, PP As Long
+Sub CallByObject(bstack As basetask, ret As Boolean, that As stdCallFunction)
+Dim Up As Long, getparam As Boolean, PP As Long
 Dim k As Long, p As Variant, Final(0 To 63) As Variant
 Dim x1 As Long, what$, curtype As Long, s$, link$, rtype As Variant
 Dim thisref(0 To 63) As Long
-
-Set that = var(i)
 
 If that.ReadType(that.Count - 1) = -100 Then
 Up = that.Count - 1
@@ -28697,7 +28697,6 @@ getparam = True
 Else
 Up = that.Count
 End If
-
 For k = 1 To Up
        
         If that.IsByRef(k - 1) Then
@@ -28791,10 +28790,18 @@ rtype = vbLong
 Else
 rtype = that.RetType
 End If
-If that.CallType = 0 Then
-x1 = stdCallW(that.LIB, that.func, rtype, Final(), Up)
+If that.CallAddr = 0 Then
+If Left$(that.func, 1) = "#" Then
+that.CallAddr = GetFuncPtrOrd(that.LIB, that.func)
 Else
-x1 = cdeclCallW(that.LIB, that.func, rtype, Final(), Up)
+that.CallAddr = GetFuncPtr(that.LIB, that.func)
+End If
+End If
+If that.CallAddr = 0 Then Exit Sub
+If that.CallType = 0 Then
+x1 = Fast_stdCallW(that.CallAddr, rtype, Final(), Up)
+Else
+x1 = Fast_cdeclCallW(that.CallAddr, rtype, Final(), Up)
 End If
 If ret Then
 If that.RetType = 0 Then
@@ -29004,7 +29011,7 @@ End If
 Set oo = Nothing
 Else
 If vv Is var(vIndex) Then
-var(newref).construct vIndex, l, indirect    ' this is the link vindex is an index to var()
+var(newref).Construct vIndex, l, indirect    ' this is the link vindex is an index to var()
 Else
 var(newref).ConstructObj vv, l
 End If
@@ -29045,7 +29052,7 @@ End If
 myVar.ConstructObj oo, l
 Set oo = Nothing
 Else
-myVar.construct vIndex, l   ' this is the link vindex is an index to var()
+myVar.Construct vIndex, l   ' this is the link vindex is an index to var()
 End If
 Set myVar = Nothing
 End With
@@ -29076,7 +29083,7 @@ End If
 myVar.ConstructObj oo, l
 Set oo = Nothing
 Else
-myVar.construct vIndex, l   ' this is the link vindex is an index to var()
+myVar.Construct vIndex, l   ' this is the link vindex is an index to var()
 End If
 
 myVar.UseIndex = True
@@ -31691,7 +31698,7 @@ Set Scr = basestack.Owner
 If IsLabelSymbolNew(rest$, "Õ¡…", "ON", Lang) And pname <> "" And Not basestack.toprinter Then
                             basestack.toprinter = True
                             For Each xp In Printers
-                            If xp.DeviceName = pname And xp.port = port Then Set Printer = xp
+                            If xp.DeviceName = pname And xp.Port = Port Then Set Printer = xp
                             Next xp
                             getfirstpage
 
@@ -35346,7 +35353,7 @@ End Sub
 Sub NeoCall(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 Dim basestack As basetask, i As Long, p As Variant, par As Boolean, f As Long, op As Object, op1 As Object
 Dim flag As Boolean, it As Long, what$, s$, x1 As Long, ss$, bs As basetask, vvl As Variant, x As Double
-Dim c As Constant, myl As lambda, a As Group
+Dim c As Constant, myl As lambda, a As Group, usethis As stdCallFunction
 Set basestack = ObjFromPtr(basestackLP)
 If Fast2VarNoTrim(rest$, "‘≈À≈”‘«", 7, "OPERATOR", 8, 9, f) Then
     If ISSTRINGA(rest$, s$) Then
@@ -35392,70 +35399,77 @@ End If
     resp = True
     If FastSymbol(rest$, "!") Then basestack.nokillvars = True
     par = False: f = 0
-    If IsLabelSymbolNew(rest$, " ≈Õ«", "VOID", Lang) Then par = True
-    If IsLabelSymbolNew(rest$, "≈ŒŸ‘≈—… «", "EXTERN", Lang) Then
+    ss$ = vbNullString
+    
+    If IsLabelSymbolNewExp(rest$, " ≈Õ«", "VOID", Lang, ss$) Then par = True
+    If IsLabelSymbolNewExp(rest$, "≈ŒŸ‘≈—… «", "EXTERN", Lang, ss$) Then
         basestack.nokillvars = False
         If IsExp(basestack, rest$, p) Then
             i = CLng(p)
             If i >= 0 Or i <= p Then
-                If Typename(var(i)) = "Constant" Then
-                    Set c = var(i)
-                    If Not c.flag Then
-                        InternalError
-                        resp = False
-                        Exit Sub
-                    End If
-                    Set myl = c.Value
-                End If
-                If Typename(var(i)) = "stdCallFunction" Then
+                If Not MyIsObject(var(i)) Then
+                InternalError
+                ElseIf TypeOf var(i) Is stdCallFunction Then
+                    Set usethis = var(i)
                     On Error Resume Next
                     Err.Clear
-                    CallByObject basestack, i, Not par
+                    CallByObject basestack, Not par, usethis
                     Set basestack = Nothing
                     If Err.Number <> 0 Then
                         MyEr Err.Description, Err.Description
                     End If
                     Exit Sub
-                ElseIf Typename(var(i)) = "lambda" Or Not myl Is Nothing Then
-                    ' call lamda
-                    If myl Is Nothing Then Set myl = var(i)
-                    PushStage basestack, False
-                    flag = False
-                    it = 1
-                    rest$ = vbNullString
-                    myl.Name = here$
-                    myl.CopyToVar basestack, here$ = vbNullString, var()
-                    basestack.OriginalCode = -i
-                    basestack.FuncRec = subHash.LastKnown
-                    ss$ = myl.code$
-                    Call executeblock(it, basestack, ss$, False, flag, , True)
-                    myl.CopyFromVar basestack, var()
-                    If it = 0 Then
-                        Set basestack.lastobj = Nothing
-                        Set basestack.FuncObj = Nothing
-                        basestack.ThrowThreads
-                        MyErMacro rest$, Chr(0) + "Problem in lambda", Chr(0) + "–Ò¸‚ÎÁÏ· ÛÙÁ Î‹Ï‰·"
-                        FK$(13) = "EDIT " + sbf(var(i).OriginalCode).goodname + ", " + CStr(-var(i).lastlen - Len(ss$) + 1)
-                        myl.lastlen = Len(ss$)
+                Else
+                    If TypeOf var(i) Is Constant Then
+                        Set c = var(i)
+                        If Not c.flag Then
+                            InternalError
+                            resp = False
+                            Exit Sub
+                        End If
+                        Set myl = c.Value
+                    End If
+                    If (TypeOf var(i) Is lambda) Or Not myl Is Nothing Then
+                        ' call lamda
+                        If myl Is Nothing Then Set myl = var(i)
+                        PushStage basestack, False
+                        flag = False
+                        it = 1
+                        rest$ = vbNullString
+                        myl.Name = here$
+                        myl.CopyToVar basestack, here$ = vbNullString, var()
+                        basestack.OriginalCode = -i
+                        basestack.FuncRec = subHash.LastKnown
+                        ss$ = myl.code$
+                        Call executeblock(it, basestack, ss$, False, flag, , True)
+                        myl.CopyFromVar basestack, var()
+                        If it = 0 Then
+                            Set basestack.lastobj = Nothing
+                            Set basestack.FuncObj = Nothing
+                            basestack.ThrowThreads
+                            MyErMacro rest$, Chr(0) + "Problem in lambda", Chr(0) + "–Ò¸‚ÎÁÏ· ÛÙÁ Î‹Ï‰·"
+                            FK$(13) = "EDIT " + sbf(var(i).OriginalCode).goodname + ", " + CStr(-var(i).lastlen - Len(ss$) + 1)
+                            myl.lastlen = Len(ss$)
+                            PopStage basestack
+                            Set basestack = Nothing
+                            resp = False
+                            Exit Sub
+                        End If
+                        If c Is Nothing Then Set var(i) = myl ' not allow change when running
                         PopStage basestack
                         Set basestack = Nothing
-                        resp = False
                         Exit Sub
+                    Else
+                        InternalError
+                        ' INVALID FUNCTION HANDLE
                     End If
-                    If c Is Nothing Then Set var(i) = myl ' not allow change when running
-                    PopStage basestack
-                    Set basestack = Nothing
-                    Exit Sub
-                Else
-                    InternalError
-                    ' INVALID FUNCTION HANDLE
                 End If
             Else
                 ' INVALID FUNCTION HANDLE
                 InternalError
             End If
         End If
-    ElseIf IsLabelSymbolNew(rest$, "√≈√œÕœ”", "EVENT", Lang) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "√≈√œÕœ”", "EVENT", Lang, ss$) Then
         i = Abs(IsLabel(basestack, rest$, what$))
         If i = 1 Then
             If Not GetVar(basestack, basestack.GroupName & what$, i) Then
@@ -41535,9 +41549,9 @@ comehere:
                     End If
                     Else
                         If itissingle Then
-                            useBuffer.construct PP, CLng(p), par, Runnable, vbSingle
+                            useBuffer.Construct PP, CLng(p), par, Runnable, vbSingle
                         Else
-                            useBuffer.construct PP, CLng(p), par, Runnable
+                            useBuffer.Construct PP, CLng(p), par, Runnable
                         End If
                         End If
                         End If
@@ -41550,9 +41564,9 @@ comehere:
                     Else
                     If useBuffer.status = 0 Then
                         If itissingle Then
-                            useBuffer.construct PP, 1, par, Runnable, vbSingle
+                            useBuffer.Construct PP, 1, par, Runnable, vbSingle
                         Else
-                            useBuffer.construct PP, 1, par, Runnable
+                            useBuffer.Construct PP, 1, par, Runnable
                         End If
                         End If
                     End If
@@ -45015,64 +45029,6 @@ exitlink:
 Set basestack.Sorosref = myobject
 Set myobject = Nothing
 End Function
-
-Function MyError(basestack As basetask, rest$, Lang As Long) As Boolean
-Dim p As Variant, x1 As Long, s$, ss$, what$
-Dim myMsgBox As New stdCallFunction, i As Long
-x1 = LastErNum
-If IsExp(basestack, rest$, p, , True) Then
-If p = 0 Then
-myMsgBox.CallThis "user32.MessageBoxW", "long alfa, lptext$, lpcaption$, long type", 1
-i = AllocVar()
-Set var(i) = myMsgBox
-basestack.soros.PushVal 16
-basestack.soros.PushStr MesTitle$
-basestack.soros.PushStr "Fatal Error"
-basestack.soros.PushVal Form1.hWnd
-CallByObject basestack, i, False
-Set var(i) = Nothing
-NERR = True
-MyError = False
-Exit Function
-ElseIf p = -1 Then
-NERR = False
-MyError = False
-Exit Function
-Else
-If p = -2 Then
- ISSTRINGA rest$, s$
- ISSTRINGA rest$, ss$
-MyEr s, ss$
-If basestack.IamThread Then
-On Error Resume Next
-basestack.Parent.ThrowThreads
-NERR = False
-MyError = False
-Exit Function
-End If
-MyError = False
-Exit Function
-
-Else
-MyEr "ERROR " & Trim$(Str$(p)), "À¡»œ” " & Trim$(Str$(p))
-LastErNum = p
-End If
-End If
-ElseIf IsStrExp(basestack, rest$, s$) Then
-MyEr what$ & " " & s$, what$ & " " & s$
-Else
-LastErNum = 0 ': LastErNum1 = 0
-LastErNameGR = vbNullString
-LastErName = vbNullString
-
-MyError = True
-Exit Function
-End If
-
-MyError = False
-
-End Function
-
 
 Function MyDim(basestack As basetask, rest$, Lang As Long, Optional dNew As Boolean) As Boolean
 Dim par As Boolean, pppp As mArray, it As Long, k As Long, usehandler As mHandler

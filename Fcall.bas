@@ -2,15 +2,15 @@ Attribute VB_Name = "Fcall"
 ' This is a module from Olaf Schmidt changed for M2000 needs
 Option Explicit
 Private Declare Function DispCallFunc Lib "oleaut32" (ByVal pvInstance As Long, ByVal offsetinVft As Long, ByVal callconv As Long, ByVal retTYP As Integer, ByVal paCNT As Long, ByRef paTypes As Integer, ByRef paValues As Long, ByRef RETVAR As Variant) As Long
-Private Declare Function GetProcByName Lib "KERNEL32" Alias "GetProcAddress" (ByVal hModule As Long, ByVal lpProcName As String) As Long
-Private Declare Function GetProcByOrdinal Lib "KERNEL32" Alias "GetProcAddress" (ByVal hModule As Long, ByVal nOrdinal As Long) As Long
-Private Declare Function LoadLibrary Lib "KERNEL32" Alias "LoadLibraryW" (ByVal lpLibFileName As Long) As Long
-Private Declare Function FreeLibrary Lib "KERNEL32" (ByVal hLibModule As Long) As Long
-Private Declare Function lstrlenA Lib "KERNEL32" (ByVal lpString As Long) As Long
-Private Declare Function lstrlenW Lib "KERNEL32" (ByVal lpString As Long) As Long
-Private Declare Sub RtlMoveMemory Lib "KERNEL32" (Dst As Any, Src As Any, ByVal BLen As Long)
+Private Declare Function GetProcByName Lib "kernel32" Alias "GetProcAddress" (ByVal hModule As Long, ByVal lpProcName As String) As Long
+Private Declare Function GetProcByOrdinal Lib "kernel32" Alias "GetProcAddress" (ByVal hModule As Long, ByVal nOrdinal As Long) As Long
+Private Declare Function LoadLibrary Lib "kernel32" Alias "LoadLibraryW" (ByVal lpLibFileName As Long) As Long
+Private Declare Function FreeLibrary Lib "kernel32" (ByVal hLibModule As Long) As Long
+Private Declare Function lstrlenA Lib "kernel32" (ByVal lpString As Long) As Long
+Private Declare Function lstrlenW Lib "kernel32" (ByVal lpString As Long) As Long
+Private Declare Sub RtlMoveMemory Lib "kernel32" (Dst As Any, Src As Any, ByVal BLen As Long)
 Private Declare Function SysStringLen Lib "oleaut32" (ByVal bstr As Long) As Long
-Declare Function GetLastError Lib "KERNEL32" () As Long
+Declare Function GetLastError Lib "kernel32" () As Long
 Private Enum CALLINGCONVENTION_ENUM
   cc_fastcall
   CC_CDECL
@@ -57,7 +57,30 @@ Dim v(), HRes As Long, i As Long
  stdCallW = vbEmpty
  End If
 End Function
+Public Function Fast_stdCallW(ByVal addr As Long, ByVal RetType As Variant, p() As Variant, j As Long)
+Dim v(), HRes As Long, i As Long
+ 
+  v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
+  For i = 0 To j - 1 ''UBound(V)
+    If VarType(p(i)) = vbString Then
+    v(i) = CLng(StrPtr(p(i)))
+    VPtr(i) = VarPtr(v(i))
+    VType(i) = vbString
+    Else
+    VType(i) = VarType(v(i))
+    VPtr(i) = VarPtr(v(i))
+    End If
+    
+  Next i
 
+  HRes = DispCallFunc(0, addr, CC_STDCALL, CInt(RetType), j, VType(0), VPtr(0), Fast_stdCallW)
+
+  If HRes Then Err.Raise HRes
+' p() = v()
+ If Typename(Fast_stdCallW) = "Null" Then
+ Fast_stdCallW = vbEmpty
+ End If
+End Function
 
 Public Function cdeclCallW(sDll As String, sFunc As String, ByVal RetType As Variant, p() As Variant, j As Long)
 Dim i As Long, pFunc As Long, v(), HRes As Long
@@ -78,6 +101,25 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
   cdeclCallW = vbEmpty
   End If
 End Function
+
+Public Function Fast_cdeclCallW(ByVal addr, ByVal RetType As Variant, p() As Variant, j As Long)
+Dim i As Long, pFunc As Long, v(), HRes As Long
+ 
+  v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
+  For i = 0 To j - 1
+    If VarType(p(i)) = vbString Then v(i) = StrPtr(p(i))
+    VType(i) = VarType(v(i))
+    VPtr(i) = VarPtr(v(i))
+  Next i
+
+  HRes = DispCallFunc(0, addr, CC_CDECL, CInt(RetType), j, VType(0), VPtr(0), Fast_cdeclCallW)
+
+  If HRes Then Err.Raise HRes
+  If Typename(Fast_cdeclCallW) = "Null" Then
+  Fast_cdeclCallW = vbEmpty
+  End If
+End Function
+
 
 Public Function stdCallA(sDll As String, sFunc As String, ByVal RetType As Variant, ParamArray p() As Variant)
 Dim i As Long, pFunc As Long, v(), HRes As Long

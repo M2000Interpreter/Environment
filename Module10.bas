@@ -40,6 +40,155 @@ Private Declare Function UrlCanonicalizeApi Lib "shlwapi" Alias "UrlCanonicalize
     ByVal pszCanonicalized As Long, _
     pcchCanonicalized As Long, _
     ByVal dwFlags As Long) As Long
+Const MOVEFILE_REPLACE_EXISTING = &H1
+Const FILE_ATTRIBUTE_TEMPORARY = &H100
+Const FILE_BEGIN = 0
+Const FILE_SHARE_READ = &H1
+Const FILE_SHARE_WRITE = &H2
+Const CREATE_NEW = 1
+Const OPEN_EXISTING = 3
+Const OPEN_ALLWAYS = 4
+Const GENERIC_READ = &H80000000
+Const GENERIC_WRITE = &H40000000
+
+Public Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
+
+Private Declare Function WriteFile Lib "kernel32" (ByVal hFile As Long, lpBuffer As Any, ByVal nNumberOfBytesToWrite As Long, lpNumberOfBytesWritten As Long, ByVal lpOverlapped As Any) As Long
+Private Declare Function ReadFile Lib "kernel32" (ByVal hFile As Long, lpBuffer As Any, ByVal nNumberOfBytesToRead As Long, lpNumberOfBytesRead As Long, ByVal lpOverlapped As Any) As Long
+Private Declare Function CreateFile Lib "kernel32" Alias "CreateFileA" (ByVal lpFileName As String, ByVal dwDesiredAccess As Long, ByVal dwShareMode As Long, ByVal lpSecurityAttributes As Any, ByVal dwCreationDisposition As Long, ByVal dwFlagsAndAttributes As Long, ByVal hTemplateFile As Long) As Long
+Private Declare Function CloseHandle Lib "kernel32" (ByVal hObject As Long) As Long
+Private Declare Function SetFilePointer Lib "kernel32" (ByVal hFile As Long, ByVal lDistanceToMove As Long, lpDistanceToMoveHigh As Long, ByVal dwMoveMethod As Long) As Long
+Private Declare Function GetFileSize Lib "kernel32" (ByVal hFile As Long, lpFileSizeHigh As Long) As Long
+Private Declare Function SetEndOfFile Lib "kernel32" (ByVal hFile As Long) As Long
+Private InUseHandlers As New FastCollection
+Private FreeUseHandlers As New FastCollection
+Public Function BigFileHandler(RHS) As Long
+Static MaxNum As Long
+Dim where As Long
+If FreeUseHandlers.Count = 0 Then
+    MaxNum = MaxNum + 1
+    InUseHandlers.AddKey MaxNum, RHS
+    BigFileHandler = MaxNum
+Else
+    FreeUseHandlers.ToEnd
+    where = CLng(FreeUseHandlers.KeyToNumber)
+    FreeUseHandlers.RemoveWithNoFind
+    FreeUseHandlers.Done = False
+    InUseHandlers.AddKey where, RHS
+    BigFileHandler = where
+End If
+End Function
+Public Function ReadFileHandler(h&) As Long
+If InUseHandlers.Find(CVar(h&)) Then
+    InUseHandlers.RemoveWithNoFind
+    FreeUseHandlers.AddKey CVar(h&)
+Else
+    MyEr "No such file handler", "Δεν υπάρχει τέτοιο χειριστής αρχείου"
+End If
+End Function
+Public Sub ReleaseHandler(h&)
+If InUseHandlers.Find(CVar(h&)) Then
+    InUseHandlers.RemoveWithNoFind
+    FreeUseHandlers.AddKey CVar(h&)
+End If
+End Sub
+Public Sub CloseAllHandlers()
+Dim h&
+On Error Resume Next
+Do While InUseHandlers.Count > 0
+    InUseHandlers.ToEnd
+    h& = CLng(InUseHandlers.Value)
+    InUseHandlers.RemoveWithNoFind
+    API_CloseFile h&
+Loop
+End Sub
+Public Sub API_OpenFile(ByVal Filename As String, ByRef FileNumber As Long, ByRef FileSize As Currency)
+Dim FileH As Long
+Dim ret As Long
+On Error Resume Next
+FileH = CreateFile(Filename, GENERIC_READ Or GENERIC_WRITE, FILE_SHARE_READ Or FILE_SHARE_WRITE, 0&, OPEN_ALLWAYS, 0, 0)
+If Err.Number > 0 Then
+    Err.Clear
+    FileNumber = -1
+Else
+    FileNumber = FileH
+    ret = SetFilePointer(FileH, 0, 0, FILE_BEGIN)
+    API_FileSize FileH, FileSize
+End If
+On Error GoTo 0
+End Sub
+
+Public Sub API_FileSize(ByVal FileNumber As Long, ByRef FileSize As Currency)
+    Dim FileSizeL As Long
+    Dim FileSizeH As Long
+    FileSizeH = 0
+    FileSizeL = GetFileSize(FileNumber, FileSizeH)
+    Long2Size FileSizeL, FileSizeH, FileSize
+End Sub
+
+Public Sub API_ReadFile(ByVal FileNumber As Long, ByVal Position As Currency, ByRef BlockSize As Long, ByRef Data() As Byte)
+Dim PosL As Long
+Dim PosH As Long
+Dim SizeRead As Long
+Dim ret As Long
+Size2Long Position, PosL, PosH
+ret = SetFilePointer(FileNumber, PosL, PosH, FILE_BEGIN)
+ret = ReadFile(FileNumber, Data(0), BlockSize, SizeRead, 0&)
+BlockSize = SizeRead
+End Sub
+
+Public Sub API_CloseFile(ByVal FileNumber As Long)
+Dim ret As Long
+ret = CloseHandle(FileNumber)
+End Sub
+
+Public Sub API_WriteFile(ByVal FileNumber As Long, ByVal Position As Currency, ByRef BlockSize As Long, ByRef Data() As Byte)
+Dim PosL As Long
+Dim PosH As Long
+Dim SizeWrit As Long
+Dim ret As Long
+Size2Long Position - 1, PosL, PosH
+ret = SetFilePointer(FileNumber, PosL, PosH, FILE_BEGIN)
+ret = WriteFile(FileNumber, Data(0), BlockSize, SizeWrit, 0&)
+BlockSize = SizeWrit
+End Sub
+
+Private Sub Size2Long(ByVal FileSize As Currency, ByRef LongLow As Long, ByRef LongHigh As Long)
+'&HFFFFFFFF unsigned = 4294967295
+'Dim Cutoff As Currency
+'Cutoff = 2147483647
+'Cutoff = Cutoff + 2147483647
+'Cutoff = Cutoff + 1 ' now we hold the value of 4294967295 and not -1
+LongHigh = 0
+Do Until FileSize < 4294967295@
+    LongHigh = LongHigh + 1
+    FileSize = FileSize - 4294967295@
+Loop
+If FileSize > 2147483647@ Then
+    LongLow = -CLng(4294967295@ - (FileSize - 1))
+Else
+    LongLow = CLng(FileSize)
+End If
+End Sub
+
+Private Sub Long2Size(ByVal LongLow As Long, ByVal LongHigh As Long, ByRef FileSize As Currency)
+'&HFFFFFFFF unsigned = 4294967295
+'Dim Cutoff As Currency
+'Cutoff = 2147483647
+'Cutoff = Cutoff + 2147483647
+'Cutoff = Cutoff + 1 ' now we hold the value of 4294967295 and not -1
+
+FileSize = 4294967295@ * LongHigh
+If LongLow < 0 Then
+    FileSize = FileSize + (4294967295@ + (LongLow + 1))
+Else
+    FileSize = FileSize + LongLow
+End If
+End Sub
+
+
+
+
 Public Function ApiCanonicalize(ByVal url As String, Optional dwFlags As Long = 0) As String
     url = Left$(url, INTERNET_MAX_URL_LENGTH)
    Dim dwSize As Long, res As String
@@ -574,3 +723,4 @@ ArrBase = 0
 ReDim sbf(0), var(0)
 Set globalstack = Nothing
 End Sub
+
