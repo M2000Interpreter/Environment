@@ -13,9 +13,9 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 Public Event MayQuit(Yes)
-Public Event BreakLine(Data$, datanext$)
+Public Event BreakLine(data$, datanext$)
 Public Event Lastline()
-Public Event ColorDataEvent(thispara As Long, Data$, feedback As Long)
+Public Event ColorDataEvent(thispara As Long, data$, feedback As Long)
 Private lastlinelastchar As Long
 Private lastcolordatacur As Long
 Private Declare Function GetShortPathName Lib "kernel32" Alias _
@@ -48,13 +48,13 @@ Public BackMove As Boolean
 Public LastSelStart As Long
 Public ListLoadedType As Long
 Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
 Private words$, unique As Long
 Private p3 As Long
 Dim mlcid As Long
 Dim sortmlcid As Long
-Private Pos() As Long, slen() As Long, hit() As Long
+Private pos() As Long, slen() As Long, hit() As Long
 Dim Buffer() As Byte, bufOffset As Long, bufsize As Long, SeekBuf As Long
 Public Busy As Boolean
 Private mSortstyle As VbCompareMethod
@@ -125,7 +125,7 @@ Else
 InvalidPara = para(ParaNum).lines = 0
 End If
 End Function
-Sub WritePara(ParaNum As Long, ByVal Data$)
+Sub WritePara(ParaNum As Long, ByVal data$)
     Dim NeoData$, neolines As Long, thatmax As Long, lookthis As Long
     Do
     neolines = para(ParaNum).lines + 1
@@ -146,12 +146,12 @@ Sub WritePara(ParaNum As Long, ByVal Data$)
     
    End If
     
-    RaiseEvent BreakLine(Data$, NeoData$)  ' no method inside this class
-    If NeoData$ = vbNullString Then NeoData$ = Data$: Data$ = vbNullString
+    RaiseEvent BreakLine(data$, NeoData$)  ' no method inside this class
+    If NeoData$ = vbNullString Then NeoData$ = data$: data$ = vbNullString
     para(ParaNum).content(neolines) = NeoData$
     para(ParaNum).lines = neolines
     NeoData$ = vbNullString
-    Loop Until Data$ = vbNullString
+    Loop Until data$ = vbNullString
 End Sub
 Sub WriteParaOneline(ParaNum As Long, ByVal NeoData$)
     
@@ -174,12 +174,12 @@ Else
 End If
 End Sub
 Private Sub ColorThis3(mNum As Long, Optional Count As Long = 0, Optional LookDown As Boolean = True)
-Dim docback As Long, lookthis As Long, Data$, oldstart As Long, lenfinal As Long, closed As Long, lastnum As Long
+Dim docback As Long, lookthis As Long, data$, oldstart As Long, lenfinal As Long, closed As Long, lastnum As Long
 lenfinal = Len(Final$)
 If lenfinal = 0 Then Final$ = ";": lenfinal = 1
     If mNum = 0 Then Exit Sub
-    Data$ = TextParagraph(mNum)
-    If Trim$(Data$) = vbNullString And Switchon Then
+    data$ = TextParagraph(mNum)
+    If Trim$(data$) = vbNullString And Switchon Then
         lookthis = DocParaBack(mNum)
         If lookthis > 0 Then
                     If para(lookthis).startfrom > 0 And UBound(para(lookthis).colordata()) = 2 Then
@@ -198,10 +198,10 @@ If lenfinal = 0 Then Final$ = ";": lenfinal = 1
             docback = mNum
 again:
             oldstart = para(mNum).startfrom
-            Data$ = TextParagraph(mNum)
+            data$ = TextParagraph(mNum)
             
 again55:
-            RaiseEvent ColorDataEvent(mNum, Data$, lookthis)
+            RaiseEvent ColorDataEvent(mNum, data$, lookthis)
             If UBound(para(mNum).colordata()) = 0 Then
                   ReDim para(mNum).colordata(1)
                             para(mNum).colordata(0) = 14
@@ -212,7 +212,7 @@ again55:
             End If
             If Final$ = "}" Then
                         closed = -1
-                       Count = countbrakcet(Data$, closed, Count)
+                       Count = countbrakcet(data$, closed, Count)
                        End If
             If lookthis = 15 Then
                     
@@ -237,16 +237,16 @@ again55:
 again2:
             lookthis = DocParaNext(mNum)
             Do While lookthis > 0
-                        Data$ = TextParagraph(lookthis)
+                        data$ = TextParagraph(lookthis)
                         If Final$ = "}" Then
                         closed = -1
-                        Count = countbrakcet(Data$, closed, Count)
+                        Count = countbrakcet(data$, closed, Count)
                         If closed > -1 Then
                         
 
                                        
 
-                                        If closed < Len(Data$) Then
+                                        If closed < Len(data$) Then
                                            oldstart = mNum
                                          ReDim para(lookthis).colordata(1)
                                         para(lookthis).colordata(0) = 15
@@ -266,12 +266,12 @@ again2:
                         Else
                         GoTo conthere
                         End If
-                        ElseIf Left$(Trim$(Data$), lenfinal) = Final$ Or Right$(RTrim(Data$), lenfinal) = Final$ Then
+                        ElseIf Left$(Trim$(data$), lenfinal) = Final$ Or Right$(RTrim(data$), lenfinal) = Final$ Then
                                         ReDim para(lookthis).colordata(4)
                                         para(lookthis).colordata(0) = 15
                                         para(lookthis).colordata(1) = 1
                                         para(lookthis).colordata(2) = 14
-                                        para(lookthis).colordata(3) = rinstr(Data$, Final$) + lenfinal
+                                        para(lookthis).colordata(3) = rinstr(data$, Final$) + lenfinal
                                         para(lookthis).startfrom = para(docback).startfrom
                                         mNum = lookthis
                                         lookthis = DocParaNext(mNum)
@@ -284,13 +284,13 @@ again2:
                                         GoTo finish
                     Else
 conthere:
-                    If Data$ <> "" Then
+                    If data$ <> "" Then
                             ReDim para(lookthis).colordata(3)
                             para(lookthis).colordata(0) = 15
                             para(lookthis).colordata(1) = 1
                             
                                para(lookthis).colordata(2) = 15
-                            para(lookthis).colordata(3) = Len(Data$) + 1
+                            para(lookthis).colordata(3) = Len(data$) + 1
                             Else
                             ReDim para(lookthis).colordata(1)
                             para(lookthis).colordata(0) = 15
@@ -363,15 +363,15 @@ mNum = DocParaNext(mNum)
 
 End Sub
 Private Sub ColorThis1(mNum As Long, Count As Long, Optional ByPass As Boolean = False)
-Dim lookthis As Long, Data$, mNum1 As Long
+Dim lookthis As Long, data$, mNum1 As Long
 If para(mNum).startfrom <> 0 Then
 
     mNum1 = para(mNum).startfrom
     
     mNum = mNum1
-Data$ = TextParagraph(mNum1)
+data$ = TextParagraph(mNum1)
 
-RaiseEvent ColorDataEvent(mNum1, Data$, lookthis)
+RaiseEvent ColorDataEvent(mNum1, data$, lookthis)
 If mNum1 = mNum Then
 If lookthis = 0 Then
 If para(mNum).startfrom = 0 Then
@@ -416,8 +416,8 @@ End If
 
 Else
 
-Data$ = TextParagraph(mNum)
-RaiseEvent ColorDataEvent(mNum, Data$, lookthis)
+data$ = TextParagraph(mNum)
+RaiseEvent ColorDataEvent(mNum, data$, lookthis)
 Count = 0
 End If
 End Sub
@@ -426,7 +426,7 @@ End Sub
 Sub PlaceColorData(ParaNum As Long, thatcolordata() As Long)
     para(ParaNum).colordata = thatcolordata()
 End Sub
-Sub ReWritePara(ParaNum As Long, ByVal Data$, Optional skipcolor As Boolean = False)
+Sub ReWritePara(ParaNum As Long, ByVal data$, Optional skipcolor As Boolean = False)
     Dim NeoData$, neolines As Long, thatmax As Long, lookthis As Long
     If ParaNum = 0 Then Exit Sub
     para(ParaNum).lines = 0  ' clear
@@ -442,17 +442,17 @@ Sub ReWritePara(ParaNum As Long, ByVal Data$, Optional skipcolor As Boolean = Fa
     thatmax = thatmax * 2
     ReDim Preserve para(ParaNum).content(1 To thatmax)
     End If
-    RaiseEvent BreakLine(Data$, NeoData$)  ' no method inside this class
-    If NeoData$ = vbNullString Then NeoData$ = Data$: Data$ = vbNullString
-    If Len(NeoData$) > 1000 And LenB(Data$) = 0 Then
-    Data$ = Mid$(NeoData$, 1001)
+    RaiseEvent BreakLine(data$, NeoData$)  ' no method inside this class
+    If NeoData$ = vbNullString Then NeoData$ = data$: data$ = vbNullString
+    If Len(NeoData$) > 1000 And LenB(data$) = 0 Then
+    data$ = Mid$(NeoData$, 1001)
     NeoData$ = Left$(NeoData$, 1000)
     End If
     
     para(ParaNum).content(neolines) = NeoData$
     para(ParaNum).lines = neolines
     NeoData$ = vbNullString
-    Loop Until Data$ = vbNullString
+    Loop Until data$ = vbNullString
     If ColorEvent And Not skipcolor Then
      ColorThis (ParaNum)
     End If
@@ -1402,10 +1402,9 @@ End Property
 Property Get startfrom(ParaNum As Long) As Long
 startfrom = para(ParaNum).startfrom
 End Property
-Property Let Paracolordata(ParaNum As Long, Col() As Long)
-If ParaNum <> 0 Then para(ParaNum).colordata() = Col()
+Property Let Paracolordata(ParaNum As Long, col() As Long)
+If ParaNum <> 0 Then para(ParaNum).colordata() = col()
 End Property
-
 Property Get Paracolordata(ParaNum As Long) As Long()
 ' it is valid
 On Error Resume Next
@@ -1598,11 +1597,11 @@ order = 1
 
     
 End Function
-Property Let TextParagraphOrder(ByVal order As Long, Data$)
+Property Let TextParagraphOrder(ByVal order As Long, data$)
     Dim mycur As Long
     If order = -1 Then
         mycur = DocParaBack(0)
-        ReWritePara mycur, Data$
+        ReWritePara mycur, data$
         Exit Property
     ElseIf order = 0 Then
         order = 1
@@ -1611,7 +1610,7 @@ Property Let TextParagraphOrder(ByVal order As Long, Data$)
     Do While mycur > 0
         order = order - 1
         If order = 0 Then
-            ReWritePara mycur, Data$
+            ReWritePara mycur, data$
             Exit Property
         End If
         mycur = DocParaNext(mycur)
@@ -1628,12 +1627,12 @@ Property Get TextParagraphKey(ByVal ParaNum As Long) As String
     TextParagraphKey = Mid$(Join(para(ParaNum).content, ""), mKeystart)
 End Property
 
-Property Let TextParagraph(ByVal ParaNum As Long, Data$)
+Property Let TextParagraph(ByVal ParaNum As Long, data$)
     If ParaNum = 0 Then Exit Property
     para(ParaNum).lines = 1   ' clear' also can be a flag to show that this is deleted
     ReDim para(ParaNum).content(1 To 1)
     ReDim para(ParaNum).colordata(1)   ' erase old color  --
-    para(ParaNum).content(1) = Data$
+    para(ParaNum).content(1) = data$
 End Property
 
 Property Get TextParagraphLen(ByVal ParaNum As Long) As Long
@@ -2592,8 +2591,8 @@ End Function
 Private Function mWordMap(s$) As String
 Dim i&, l As Long
 Static p2 As Long, p1 As Integer, p3 As Long, p4 As Long
-Dim ss$, Pos As Long
-Pos = -2
+Dim ss$, pos As Long
+pos = -2
   l = Len(s): If l = 0 Then mWordMap = " ": Exit Function
 
   p2 = StrPtr(s$): l = l - 1
@@ -2603,28 +2602,28 @@ Pos = -2
   GetMem2 i, p1
   Select Case p1
     Case 65 To 90, 97 To 122, Is > 127
-    If i - p4 = 2 Then p2 = i: Pos = Pos + 2
+    If i - p4 = 2 Then p2 = i: pos = pos + 2
     Case 39
     If i - p4 = 2 Then p4 = i
     Case Else
     If i - p4 > 2 Then
-            CopyMemory ByVal p3 + Pos, ByVal p2, i - p2
-            Pos = Pos + i - p2
-            PutMem2 p3 + Pos, 32   ' place a space...
+            CopyMemory ByVal p3 + pos, ByVal p2, i - p2
+            pos = pos + i - p2
+            PutMem2 p3 + pos, 32   ' place a space...
             
     End If
     p4 = i
   End Select
   Next i
   If i - p4 > 2 Then
-        CopyMemory ByVal p3 + Pos, ByVal p2, i - p2
-        Pos = Pos + i - p2
+        CopyMemory ByVal p3 + pos, ByVal p2, i - p2
+        pos = pos + i - p2
   End If
-  Pos = Pos / 2
-  If Pos <= 0 Then
+  pos = pos / 2
+  If pos <= 0 Then
   mWordMap = " "
   Else
-  mWordMap = Left$(s$, Pos)
+  mWordMap = Left$(s$, pos)
   End If
 
 End Function
@@ -2674,14 +2673,14 @@ If l = 1 Then
 CountWords2 = -(Trim(a$) <> "")
 top = CountWords2
 If top > 0 Then
-ReDim Pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
-Pos(1) = StrPtr(a$)
+ReDim pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
+pos(1) = StrPtr(a$)
 slen(1) = 1
 End If
 Else
 Dim p5 As Long
 p5 = 512 '' L \ 32 + 1
-ReDim Pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
+ReDim pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
 Dim i As Long, k As Long
 Dim p2 As Long, p4 As Long, p6 As Long, bb As Integer
 p2 = StrPtr(a$)
@@ -2708,7 +2707,7 @@ there1:
                 md = (mtop - mda + 1) \ 2
                 p6 = mda + md
                 Do While md > 0
-                    Select Case CompareString(uLCID, NORM_IGNORECASE, p2, k, Pos(p6), slen(p6))
+                    Select Case CompareString(uLCID, NORM_IGNORECASE, p2, k, pos(p6), slen(p6))
                         Case 1
                             mtop = mtop - md
                             md = (mtop - mda + 1) \ 2
@@ -2724,18 +2723,18 @@ there1:
                 If md = 0 Then
                 If top = p5 Then
                 p5 = p5 * 2
-                ReDim Preserve Pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
+                ReDim Preserve pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
                 End If
                     top = top + 1
                     
                     If mda = top - 1 Then
-                        Pos(top) = p2
+                        pos(top) = p2
                         slen(top) = k
                     Else
-                        CopyMemory ByVal VarPtr(Pos(1)) + mda * 4 + 4, ByVal VarPtr(Pos(1)) + mda * 4, (top - mda - 1) * 4
+                        CopyMemory ByVal VarPtr(pos(1)) + mda * 4 + 4, ByVal VarPtr(pos(1)) + mda * 4, (top - mda - 1) * 4
                         CopyMemory ByVal VarPtr(slen(1)) + mda * 4 + 4, ByVal VarPtr(slen(1)) + mda * 4, (top - mda - 1) * 4
                         CopyMemory ByVal VarPtr(hit(1)) + mda * 4 + 4, ByVal VarPtr(hit(1)) + mda * 4, (top - mda - 1) * 4
-                        Pos(mda + 1) = p2
+                        pos(mda + 1) = p2
                         slen(mda + 1) = k
                         hit(mda + 1) = 0
                     End If
@@ -2761,7 +2760,7 @@ Else
 ReDim a(1 To unique)
 Dim i As Long
 For i = 1 To unique
-a(i) = MakeString(Pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
+a(i) = MakeString(pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
 Next i
 ExportWords = a()
 End If
@@ -2779,11 +2778,11 @@ Exit Sub
 Else
 If usenumbers Then
 For i = 1 To unique
-THISOBJECT.additem MakeString(Pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
+THISOBJECT.additem MakeString(pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
 Next i
 Else
 For i = 1 To unique
-THISOBJECT.additem MakeString(Pos(i), slen(i))
+THISOBJECT.additem MakeString(pos(i), slen(i))
 Next i
 
 End If
@@ -2793,7 +2792,7 @@ End Sub
 Public Sub ResetWords()
 words$ = vbNullString
 p3 = 0
-ReDim Pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
+ReDim pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
 unique = 0
 End Sub
 Public Sub QuickSortString(Arr() As String, ByVal LB As Long, ByVal UB As Long)
@@ -3025,13 +3024,13 @@ End If
 GetMem2 VarPtr(Buffer(location - bufOffset)), b
 SeekBuf = location + 2
 End Sub
-Function InstrTextCompareAnyLocale(position As Long, from$, this$, Optional uLCID As Long = 1033) As Long
+Function InstrTextCompareAnyLocale(Position As Long, from$, this$, Optional uLCID As Long = 1033) As Long
 Dim NORM_IGNORECASE As Long
 If Not NoIgnoreCase Then NORM_IGNORECASE = &H1
 Dim p1 As Long, p2 As Long, l1 As Long, l2 As Long, cu As Long
-l1 = (Len(from$) - Len(this$)) * 2 - (position - 1) * 2
+l1 = (Len(from$) - Len(this$)) * 2 - (Position - 1) * 2
 If l1 < 0 Then Exit Function
-p1 = StrPtr(from$) + (position - 1) * 2
+p1 = StrPtr(from$) + (Position - 1) * 2
 p2 = StrPtr(this$)
 l2 = Len(this$)
 For cu = p1 To p1 + l1 Step 2
@@ -3041,13 +3040,13 @@ Exit Function
 End If
 Next cu
 End Function
-Function InstrRevTextCompareAnyLocale(from$, this$, Optional position As Long = -1, Optional uLCID As Long = 1033) As Long
+Function InstrRevTextCompareAnyLocale(from$, this$, Optional Position As Long = -1, Optional uLCID As Long = 1033) As Long
 Dim NORM_IGNORECASE As Long
 If Not NoIgnoreCase Then NORM_IGNORECASE = &H1
 Dim p1 As Long, p2 As Long, l1 As Long, l2 As Long, cu As Long
-If Len(from$) < position Then position = -1
-If position > 0 Then
-l1 = (Len(from$) - Len(this$)) * 2 - (Len(from$) - position) * 2
+If Len(from$) < Position Then Position = -1
+If Position > 0 Then
+l1 = (Len(from$) - Len(this$)) * 2 - (Len(from$) - Position) * 2
 Else
 l1 = (Len(from$) - Len(this$)) * 2
 End If

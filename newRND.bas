@@ -9,9 +9,9 @@ Public Type rndvars
      blnInit As Boolean
 End Type
 Public Sub RandomizeIt(m As rndvars, NeoNumber As Long)
-    Dim d As Double
+    Dim D As Double
     If NeoNumber = 0 Then m.blnInit = False
-    d = RndM(m, NeoNumber)
+    D = RndM(m, NeoNumber)
 End Sub
 Public Function RndM(m As rndvars, Optional ByVal Number As Long) As Double
 ' Static lngX As Long, lngY As Long, lngZ As Long, blnInit As Boolean

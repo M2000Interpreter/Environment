@@ -722,5 +722,5 @@ JetPostfixUser = JetPostfixHelp
 ArrBase = 0
 ReDim sbf(0), var(0)
 Set globalstack = Nothing
-End Sub
 
+End Sub

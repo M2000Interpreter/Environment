@@ -246,8 +246,8 @@ Event MenuChecked(item As Long)
 Event PromptLine(ThatLine As Long)
 Event PanLeftRight(direction As Boolean)
 Event GetBackPicture(pic As Object)
-Event KeyDown(keycode As Integer, shift As Integer)
-Event KeyDownAfter(keycode As Integer, shift As Integer)
+Event KeyDown(KeyCode As Integer, shift As Integer)
+Event KeyDownAfter(KeyCode As Integer, shift As Integer)
 Event SyncKeyboard(item As Integer)
 Event SyncKeyboardUnicode(a$)
 Event PreviewKeyboardUnicode(ByVal a$)
@@ -791,11 +791,11 @@ Public Property Get Font() As Font
     Set Font = m_font
 End Property
 
-Function CloneFont(Font As IFont) As StdFont
+Public Function CloneFont(Font As IFont) As StdFont
   Font.Clone CloneFont
 End Function
 Public Property Set Font(New_Font As Font)
-    Set m_font = CloneFont(New_Font)
+    Set m_font = New_Font
     Set UserControl.Font = m_font
     GetTextMetrics UserControl.hDC, tm
     If restrictLines > 0 Then
@@ -894,11 +894,11 @@ Timer1.Interval = 40
 Timer1.enabled = True
 End Sub
 
-Public Sub LargeBar1KeyDown(keycode As Integer, shift As Integer)
+Public Sub LargeBar1KeyDown(KeyCode As Integer, shift As Integer)
 Timer1.enabled = False
 If ListIndex < 0 Then
 Else
-PressKey keycode, shift
+PressKey KeyCode, shift
 End If
 End Sub
 
@@ -1264,31 +1264,31 @@ If ListIndex < topitem Then topitem = ListIndex
       PrepareToShow 5
     End If
 End Sub
-Public Sub PressKey(keycode As Integer, shift As Integer, Optional NoEvents As Boolean = False)
+Public Sub PressKey(KeyCode As Integer, shift As Integer, Optional NoEvents As Boolean = False)
 Dim lcnt As Long, osel As Long, lsep As Long
-If shift <> 0 And keycode = 16 Then Exit Sub
+If shift <> 0 And KeyCode = 16 Then Exit Sub
 
 Timer1.enabled = False
 If BlinkON Then BlinkTimer.enabled = True
 'Timer1.Interval = 1000
 Dim LastListIndex As Long, bb As Boolean, val As Long
 LastListIndex = ListIndex
-If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
-If (keycode = vbKeyPageUp Or keycode = vbKeyPageDown) And (shift And 2) = 2 Then
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If (KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown) And (shift And 2) = 2 Then
     If MarkNext = 0 Then
-    RaiseEvent KeyDown(keycode, shift)
-    If keycode <> 0 Then GetKeY2 keycode, shift
+    RaiseEvent KeyDown(KeyCode, shift)
+    If KeyCode <> 0 Then GetKeY2 KeyCode, shift
     End If
-    If keycode = 0 Then Exit Sub
+    If KeyCode = 0 Then Exit Sub
 End If
-If MarkNext = 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+If MarkNext = 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
 End If
 
-If keycode = 93 Then
+If KeyCode = 93 Then
 ' you have to clear myButton, here keycode
-RaiseEvent OutPopUp(nowX, nowY, keycode)
+RaiseEvent OutPopUp(nowX, nowY, KeyCode)
 End If
-Select Case keycode
+Select Case KeyCode
 Case vbKeyHome
 If EditFlag Then
     RaiseEvent DelExpandSS
@@ -1349,8 +1349,8 @@ Case vbKeyPageUp
             ShowThis SELECTEDITEM - 1
         Else
             PrepareToShow 5
-            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
-            shift = 0: keycode = 0: Exit Sub
+            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+            shift = 0: KeyCode = 0: Exit Sub
         End If
     Else
         If topitem < SELECTEDITEM - (lines + 1) \ 2 Then
@@ -1378,8 +1378,8 @@ Case vbKeyPageUp
     End If
     RaiseEvent ChangeSelStart(SelStart)
     If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
-    shift = 0: keycode = 0: Exit Sub
+    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+    shift = 0: KeyCode = 0: Exit Sub
 Case vbKeyUp
     If Spinner Then Exit Sub
     If SELECTEDITEM > 1 Then
@@ -1404,7 +1404,7 @@ Case vbKeyUp
     If shift <> 0 Then
         If ListIndex < topitem Then topitem = ListIndex
         PrepareToShow 5
-        If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+        If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
     Else
         RaiseEvent MarkDestroyAny
         MarkNext = 0
@@ -1414,13 +1414,13 @@ Case vbKeyUp
             If topitem < 0 Then topitem = 0
             ShowMe2
         Else
-            keycode = 0
+            KeyCode = 0
             If ListIndex < topitem Then topitem = ListIndex
             PrepareToShow 5
         End If
         Exit Sub
     End If
-    shift = 0: keycode = 0: Exit Sub
+    shift = 0: KeyCode = 0: Exit Sub
 Case vbKeyDown
     If Spinner Then Exit Sub
     lcnt = listcount
@@ -1446,7 +1446,7 @@ Case vbKeyDown
     If shift <> 0 Then
         If ListIndex - topitem > lines Then topitem = ListIndex - lines
         PrepareToShow 5
-        If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+        If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
     Else
         RaiseEvent MarkDestroyAny
         MarkNext = 0
@@ -1458,13 +1458,13 @@ Case vbKeyDown
             End If
             ShowMe2
         Else
-            keycode = 0
+            KeyCode = 0
             If ListIndex - topitem > lines Then topitem = ListIndex - lines
             PrepareToShow 5
         End If
         Exit Sub
     End If
-     keycode = 0: Exit Sub
+     KeyCode = 0: Exit Sub
 Case vbKeyPageDown
     lcnt = listcount
     If shift = 0 Then RaiseEvent MarkDestroyAny
@@ -1479,8 +1479,8 @@ Case vbKeyPageDown
             ShowThis SELECTEDITEM + 1
         Else
             PrepareToShow 5
-            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
-            shift = 0: keycode = 0: Exit Sub
+            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+            shift = 0: KeyCode = 0: Exit Sub
         End If
     ElseIf (SELECTEDITEM - topitem) <= (lines + 1) \ 2 Then
         If topitem + (lines + 1) + 1 <= lcnt Then
@@ -1506,8 +1506,8 @@ Case vbKeyPageDown
     End If
     RaiseEvent ChangeSelStart(SelStart)
     If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
-    shift = 0: keycode = 0: Exit Sub
+    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+    shift = 0: KeyCode = 0: Exit Sub
 Case vbKeySpace
     If SELECTEDITEM > 0 Then
         If EditFlag Then
@@ -1534,7 +1534,7 @@ Case vbKeySpace
             RaiseEvent PureListOff
             SelStartEventAlways = SelStart + 1
             RaiseEvent SetExpandSS(mSelstart)
-            keycode = 0
+            KeyCode = 0
             PrepareToShow 10
         End If
         Exit Sub
@@ -1657,46 +1657,46 @@ Else
     RaiseEvent EnterOnly
 End If
 End Select
-If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
-If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
 End If
 
 If MultiLineEditBox Then
     SelStartEventAlways = SelStart
-    If shift Or Not (keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown) Then Me.PrepareToShow 5
+    If shift Or Not (KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown) Then Me.PrepareToShow 5
 Else
-    keycode = 0
+    KeyCode = 0
     SelStartEventAlways = SelStart
     Me.PrepareToShow 5
 End If
-keycode = 0
+KeyCode = 0
 End Sub
 
-Private Sub UserControl_KeyUp(keycode As Integer, shift As Integer)
+Private Sub UserControl_KeyUp(KeyCode As Integer, shift As Integer)
 If PrevLocale <> GetLocale Then RaiseEvent Maybelanguage
-If BypassKey Then keycode = 0: shift = 0: Exit Sub
+If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
 Dim i As Long, k As Integer
 
 lastshift = shift
 
-If keycode = 18 Then
+If KeyCode = 18 Then
 'RaiseEvent Maybelanguage
-ElseIf keycode = 112 And (shift And 2) = 2 Then
-keycode = 0
+ElseIf KeyCode = 112 And (shift And 2) = 2 Then
+KeyCode = 0
 shift = 0
 RaiseEvent CtrlPlusF1
 Exit Sub
-ElseIf keycode >= vbKeyF1 And keycode <= vbKeyF12 Then
-    k = ((keycode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
+ElseIf KeyCode >= vbKeyF1 And KeyCode <= vbKeyF12 Then
+    k = ((KeyCode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
     RaiseEvent Fkey(k)
-    If k = 0 Then keycode = 0: shift = 0
-ElseIf keycode = 16 And shift <> 0 Then
+    If k = 0 Then KeyCode = 0: shift = 0
+ElseIf KeyCode = 16 And shift <> 0 Then
   '  RaiseEvent Maybelanguage
-ElseIf keycode = vbKeyV Then
+ElseIf KeyCode = vbKeyV Then
 Exit Sub
 Else
-If keycode = 27 And NoEscapeKey Then
-keycode = 0
+If KeyCode = 27 And NoEscapeKey Then
+KeyCode = 0
 Else
 RaiseEvent RefreshOnly
 End If
@@ -1748,6 +1748,7 @@ End Sub
 
 Private Sub UserControl_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
 ' cut area
+On Error GoTo there
 If dropkey Then Exit Sub
 If missMouseClick Then Exit Sub
 nowX = x
@@ -1819,9 +1820,11 @@ End If
                   
             RaiseEvent MarkDestroyAny
             End If
+there:
 End Sub
 
 Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+On Error GoTo there
 If dropkey Then Exit Sub
 Dim osel As Long
 If missMouseClick Then Exit Sub
@@ -2012,7 +2015,7 @@ there1:
         End If
     End If
 End If
-
+there:
 End Sub
 
 Public Sub CheckMark()
@@ -2029,6 +2032,7 @@ Public Sub CheckMark()
 End Sub
 
 Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+On Error GoTo there
 If dropkey Then Exit Sub
 If missMouseClick Then missMouseClick = False: Exit Sub
 If Button = 1 Then RaiseEvent MouseUp(x / scrTwips, y / scrTwips)
@@ -2200,7 +2204,6 @@ If secreset = False Then If shift = 0 Then CheckMark
 If Not enabled Then Exit Sub
 secreset = True
 PrepareToShow 5
-'ShowMe2
  If Button = 2 Then
 RaiseEvent OutPopUp(x, y, Button)
 
@@ -2211,6 +2214,7 @@ End If
 
 End If
 End If
+there:
 End Sub
 
 
@@ -3068,7 +3072,8 @@ Timer1.enabled = True
 
 End Sub
 Public Sub ShowMe(Optional visibleme As Boolean = False, Optional headeronly As Boolean)
- Dim REALX As Long, RealX2 As Long, myt1, oldtopitem As Long
+Dim REALX As Long, RealX2 As Long, myt1, oldtopitem As Long
+On Error GoTo there
  If SuspDraw Then Exit Sub
 If visibleme Then
  barwidth = UserControlTextWidth("W")
@@ -3365,8 +3370,10 @@ End If
     LastVScroll = Value
 RepaintScrollBar
 RaiseEvent ScrollMove(topitem)
+there:
 End Sub
 Public Sub ShowMe2()
+On Error GoTo there
 If SuspDraw Then Exit Sub
 Dim YYT As Long, nr As RECT, j As Long, i As Long, skipme As Boolean, fg As Long, hnr As RECT, nfg As Long, nfg1 As Long
  Dim REALX As Long, RealX2 As Long, myt1
@@ -3606,6 +3613,7 @@ currentY = 0
 currentX = 0
 End If
 RepaintScrollBar
+there:
 End Sub
 
 Property Get lines() As Long
@@ -3665,7 +3673,7 @@ On Error GoTo th1
 
 If Extender.Parent Is Nothing Then Exit Sub
 
-If Extender.Parent.Picture.Handle <> 0 And BackStyle = 1 Then
+If Extender.Parent.Picture.handle <> 0 And BackStyle = 1 Then
 
 If Me.BorderStyle = 1 Then
 currentY = 0
@@ -3683,7 +3691,7 @@ ElseIf BackStyle = 1 Then
 Dim mmo As PictureBox
 RaiseEvent GetBackPicture(mmo)
 If Not mmo Is Nothing Then
-If mmo.Picture.Handle <> 0 Then
+If mmo.Picture.handle <> 0 Then
     UserControl.PaintPicture mmo.Picture, 0, 0, , , Extender.Left, Extender.top
     If Me.BorderStyle = 1 Then
     currentY = 0
@@ -3714,7 +3722,7 @@ If Extender.Parent Is Nothing Then Exit Sub
 
 If BackStyle = 1 Then
     If Not SkipForm Then
-        If UserControl.Parent.Picture.Handle <> 0 Then
+        If UserControl.Parent.Picture.handle <> 0 Then
             If Me.BorderStyle = 1 Then
                     currentY = 0
                     currentX = 0
@@ -3741,7 +3749,7 @@ If BackStyle = 1 Then
         Dim mmo As Object, isfrm As Boolean
         RaiseEvent GetBackPicture(mmo)
         If Not mmo Is Nothing Then
-            If mmo.Image.Handle <> 0 Then
+            If mmo.Image.handle <> 0 Then
                 UserControl.PaintPicture mmo.Image, 0, 0, , , Extender.Left - mmo.Left, Extender.top - mmo.top
                 If Me.BorderStyle = 1 Then
                 currentY = 0
@@ -3855,81 +3863,81 @@ End If
 UserControlTextHeightPixels = overrideTextHeight / scrTwips
 
 End Function
-Private Sub PrintLineControlSingle(mHdc As Long, ByVal c As String, r As RECT)
+Private Sub PrintLineControlSingle(mHdc As Long, ByVal c As String, R As RECT)
 ' this is our basic print routine
 Dim that As Long, cc As String, fg As Long
 If CenterText Then that = DT_CENTER
 If VerticalCenterText Then that = that Or DT_VCENTER
 If WrapText Then
 c = c + space(4)  ' 4 additional characters for DT_MODIFYSTRING
-DrawTextEx mHdc, StrPtr(c), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or DT_MODIFYSTRING Or DT_PATH_ELLIPSIS Or that, VarPtr(tParam)
+DrawTextEx mHdc, StrPtr(c), -1, R, DT_WORDBREAK Or DT_NOPREFIX Or DT_MODIFYSTRING Or DT_PATH_ELLIPSIS Or that, VarPtr(tParam)
 Else
 If LastLinePart <> "" Then
     If FadeLastLinePart > 0 Then
     cc = c + LastLinePart
     fg = Me.forecolor
     Me.forecolor = FadeLastLinePart
-   DrawText mHdc, StrPtr(cc), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS
+   DrawText mHdc, StrPtr(cc), -1, R, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS
    Me.forecolor = fg
-   DrawTextEx mHdc, StrPtr(c), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
+   DrawTextEx mHdc, StrPtr(c), -1, R, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
     
     Else
     cc = c + LastLinePart
-   DrawTextEx mHdc, StrPtr(cc), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
+   DrawTextEx mHdc, StrPtr(cc), -1, R, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
    End If
 Else
 
-    DrawTextEx mHdc, StrPtr(c), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, R, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
     End If
     End If
     
     End Sub
-Private Sub PrintLineControlHeader(mHdc As Long, c As String, r As RECT, Optional that As Long = 0)
+Private Sub PrintLineControlHeader(mHdc As Long, c As String, R As RECT, Optional that As Long = 0)
 ' this is our basic print routine
-DrawTextEx mHdc, StrPtr(c), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+DrawTextEx mHdc, StrPtr(c), -1, R, DT_WORDBREAK Or DT_NOPREFIX Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 
     
     End Sub
-  Private Sub CalcRectHeader(mHdc As Long, c As String, r As RECT, Optional that As Long = 0)
-r.top = 0
-r.Left = 0
-If r.Right = 0 Then r.Right = UserControl.Width / scrTwips
-DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP Or that, VarPtr(tParam)
+  Private Sub CalcRectHeader(mHdc As Long, c As String, R As RECT, Optional that As Long = 0)
+R.top = 0
+R.Left = 0
+If R.Right = 0 Then R.Right = UserControl.Width / scrTwips
+DrawTextEx mHdc, StrPtr(c), -1, R, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP Or that, VarPtr(tParam)
 End Sub
-Private Sub PrintLineControl(mHdc As Long, c As String, r As RECT)
-    DrawTextEx mHdc, StrPtr(c), -1, r, DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS, VarPtr(tParam)
+Private Sub PrintLineControl(mHdc As Long, c As String, R As RECT)
+    DrawTextEx mHdc, StrPtr(c), -1, R, DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS, VarPtr(tParam)
 
 End Sub
 Private Sub PrintLinePixels(dd As Object, c As String)
-Dim r As RECT    ' print to a picturebox as label
-r.Right = dd.Scalewidth
-r.Bottom = dd.Scaleheight
-DrawTextEx dd.hDC, StrPtr(c), -1, r, DT_NOPREFIX Or DT_WORDBREAK Or DT_EXPANDTABS, VarPtr(tParam)
+Dim R As RECT    ' print to a picturebox as label
+R.Right = dd.Scalewidth
+R.Bottom = dd.Scaleheight
+DrawTextEx dd.hDC, StrPtr(c), -1, R, DT_NOPREFIX Or DT_WORDBREAK Or DT_EXPANDTABS, VarPtr(tParam)
 End Sub
-Private Sub CalcRect(mHdc As Long, c As String, r As RECT)
-r.top = 0
-r.Left = 0
+Private Sub CalcRect(mHdc As Long, c As String, R As RECT)
+R.top = 0
+R.Left = 0
 Dim that As Long
 If CenterText Then that = DT_CENTER
 If VerticalCenterText Then that = that Or DT_VCENTER
 If WrapText Then
-    If r.Right = 0 Then r.Right = UserControl.Width / scrTwips
-    DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    If R.Right = 0 Then R.Right = UserControl.Width / scrTwips
+    DrawTextEx mHdc, StrPtr(c), -1, R, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 Else
-    DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, R, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 End If
 
 End Sub
-Private Sub CalcRect1(mHdc As Long, c As String, r As RECT)
-r.top = 0
-r.Left = 0
+Private Sub CalcRect1(mHdc As Long, c As String, R As RECT)
+R.top = 0
+R.Left = 0
 
 If WrapText Then
-If r.Right = 0 Then r.Right = UserControl.Width / scrTwips - LeftMarginPixels
+If R.Right = 0 Then R.Right = UserControl.Width / scrTwips - LeftMarginPixels
 
-DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+DrawTextEx mHdc, StrPtr(c), -1, R, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 Else
-    DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, R, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
     End If
 
 End Sub
@@ -3953,7 +3961,7 @@ End Function
 Public Sub RepaintFromOut(parentpic As StdPicture, Myleft As Long, mytop As Long)
 On Error GoTo th1
 
-If parentpic.Handle <> 0 Then
+If parentpic.handle <> 0 Then
 UserControl.PaintPicture parentpic, 0, 0, , , Myleft, mytop
 Else
 th1:
@@ -4220,74 +4228,74 @@ End Sub
 Friend Sub GoON()
     ChooseNextRight Me, Me.Parent, True
 End Sub
-Friend Sub TakeKey(keycode As Integer, shift As Integer)
-    UserControl_KeyDown keycode, shift
-If keycode <> 0 Then
-    UserControl_KeyUp keycode, shift
+Friend Sub TakeKey(KeyCode As Integer, shift As Integer)
+    UserControl_KeyDown KeyCode, shift
+If KeyCode <> 0 Then
+    UserControl_KeyUp KeyCode, shift
 End If
 
 End Sub
 
-Private Sub UserControl_KeyDown(keycode As Integer, shift As Integer)
+Private Sub UserControl_KeyDown(KeyCode As Integer, shift As Integer)
 PrevLocale = GetLocale()
-If BypassKey Then keycode = 0: shift = 0: Exit Sub
+If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
 lastshift = shift
 
-If keycode = 27 And NoEscapeKey Then
-keycode = 0
+If KeyCode = 27 And NoEscapeKey Then
+KeyCode = 0
 Exit Sub
 End If
 If Arrows2Tab And Not mEditFlag Then
-    If keycode = vbKeyLeft Or (keycode = vbKeyUp And Arrows2Tab) Then
+    If KeyCode = vbKeyLeft Or (KeyCode = vbKeyUp And Arrows2Tab) Then
         ChooseNextLeft Me, Me.Parent
-        keycode = 0
+        KeyCode = 0
         Exit Sub
-    ElseIf keycode = vbKeyRight Or (keycode = vbKeyDown And Arrows2Tab) Then
+    ElseIf KeyCode = vbKeyRight Or (KeyCode = vbKeyDown And Arrows2Tab) Then
         ChooseNextRight Me, Me.Parent
-        keycode = 0
+        KeyCode = 0
         Exit Sub
     End If
 End If
-If keycode = vbKeyTab And Not mEditFlag Then
+If KeyCode = vbKeyTab And Not mEditFlag Then
     If shift = 1 Then
         choosenext
-        keycode = 0
+        KeyCode = 0
         Exit Sub
     End If
-ElseIf keycode = vbKeyF4 Then
+ElseIf KeyCode = vbKeyF4 Then
 If shift = 4 Then
 On Error Resume Next
 If Parent.Name = "GuiM2000" Or Parent.Name = "Form2" Or Parent.Name = "Form4" Then
 With UserControl.Parent
 .ByeBye
 End With
-keycode = 0
+KeyCode = 0
 Exit Sub
 End If
 End If
 End If
-If dropkey Then shift = 0: keycode = 0: Exit Sub
+If dropkey Then shift = 0: KeyCode = 0: Exit Sub
 Dim i&
 If shift = 4 Then
-If keycode = 18 Then
+If KeyCode = 18 Then
 If mynum$ = vbNullString Then mynum$ = "0"
-keycode = 0
+KeyCode = 0
 Exit Sub
 Else
-If keycode <> 0 Then GetKeY2 keycode, shift
+If KeyCode <> 0 Then GetKeY2 KeyCode, shift
 End If
-Select Case keycode
+Select Case KeyCode
 Case vbKeyAdd, vbKeyInsert
 mynum$ = "&h"
 Case vbKey0 To vbKey9
-mynum$ = mynum$ + Chr$(keycode - vbKey0 + 48)
+mynum$ = mynum$ + Chr$(KeyCode - vbKey0 + 48)
 LastNumX = True
 Case vbKeyNumpad0 To vbKeyNumpad9
 LastNumX = False
-mynum$ = mynum$ + Chr$(keycode - vbKeyNumpad0 + 48)
+mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 48)
 Case vbKeyA To vbKeyF
 If Left$(mynum$, 1) = "&" Then
-mynum$ = mynum$ + Chr$(keycode - vbKeyNumpad0 + 65)
+mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 65)
 LastNumX = True
 Else
 mynum$ = vbNullString
@@ -4299,18 +4307,18 @@ Exit Sub
 End If
 
 mynum$ = vbNullString
-If shift <> 0 And keycode = 0 Then Exit Sub
+If shift <> 0 And KeyCode = 0 Then Exit Sub
 
-RaiseEvent KeyDown(keycode, shift)
-If keycode <> 0 Then GetKeY2 keycode, shift
-If (keycode = 0) Or Not (enabled Or State) Then Exit Sub
+RaiseEvent KeyDown(KeyCode, shift)
+If KeyCode <> 0 Then GetKeY2 KeyCode, shift
+If (KeyCode = 0) Or Not (enabled Or State) Then Exit Sub
 If SELECTEDITEM < 0 Then
 SELECTEDITEM = topitem + 1: ShowMe2
-If Not EditFlag Then: keycode = 0
+If Not EditFlag Then: KeyCode = 0
 End If
-LargeBar1KeyDown keycode, shift
+LargeBar1KeyDown KeyCode, shift
 If EnabledBar Then
-Select Case keycode
+Select Case KeyCode
 Case vbKeyLeft, vbKeyUp
 If Spinner Then
 If Not NoBarClick Then
@@ -5338,9 +5346,9 @@ Public Property Set mouseicon(RHS)
 Set UserControl.mouseicon = RHS
 End Property
 Function GetLocale() As Long
-    Dim r&
-      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
-      GetLocale = val("&H" & Right(Hex(r), 4))
+    Dim R&
+      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
+      GetLocale = val("&H" & Right(Hex(R), 4))
    
     
 End Function
@@ -5348,10 +5356,10 @@ Function GetKeY(ascii As Integer) As String
     Dim Buffer As String, ret As Long
 
     Buffer = String$(514, 0)
-    Dim r&
-      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
-      r = val("&H" & Right(Hex(r), 4))
-    ret = GetLocaleInfo(r, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
+    Dim R&
+      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
+      R = val("&H" & Right(Hex(R), 4))
+    ret = GetLocaleInfo(R, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
     If ret > 0 Then
         GetKeY = ChrW$(AscW(StrConv(ChrW$(ascii Mod 256), 64, CLng(val("&h" + Left$(Buffer, ret - 1))))))
     Else

@@ -217,7 +217,6 @@ With glistN
 .VerticalCenterText = True
 .Text = mListText
 .backcolor = dimm2
-
 Set .Font = ff
 .forecolor = white
 .dcolor = Callback.Controls(1).dcolor
@@ -225,7 +224,6 @@ Set .Font = ff
 .enabled = True
 .StickBar = True
 enabled = True
-ShowAlways = True
 .ShowMe
 End With
 End Sub
@@ -240,11 +238,11 @@ aa.bold = ThisBold
 Set glistN.Font = aa
 End If
 End Sub
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Friend Property Let Index(ByVal RHS As Long)
+Friend Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Get locked() As Boolean
@@ -436,20 +434,20 @@ glistN.CalcAndShowBar
 If glistN.Visible Then glistN.ShowMe2
 End Sub
 
-Public Property Get list(Index) As Variant
+Public Property Get list(index) As Variant
 On Error Resume Next
-list = glistN.list(CLng(Index))
+list = glistN.list(CLng(index))
 End Property
 
-Public Property Let list(Index, ByVal vNewValue As Variant)
+Public Property Let list(index, ByVal vNewValue As Variant)
 On Error Resume Next
-glistN.list(CLng(Index)) = CStr(vNewValue)
+glistN.list(CLng(index)) = CStr(vNewValue)
 glistN.PrepareToShow
 End Property
 Sub Add(content$)
 glistN.additem content$
 End Sub
-Sub AddFast(Index As Long, content$)
+Sub AddFast(index As Long, content$)
 glistN.additemFast content$
 End Sub
 Sub Insert(content$)
@@ -460,8 +458,8 @@ glistN.Clear
 If glistN.Visible Then glistN.ShowMe2
 End Sub
 
-Sub Delete(Index As Long)
-glistN.Removeitem Index
+Sub Delete(index As Long)
+glistN.Removeitem index
 End Sub
 
 Public Property Get ListIndex() As Variant
@@ -482,8 +480,8 @@ End Property
 Public Property Get listcount() As Variant
 listcount = glistN.listcount
 End Property
-Public Sub ShowThis(Index As Long, Optional noselect)
-glistN.ShowThis Index, CBool(noselect)
+Public Sub ShowThis(index As Long, Optional noselect)
+glistN.ShowThis index, CBool(noselect)
 End Sub
 
 Public Property Get Text() As Variant

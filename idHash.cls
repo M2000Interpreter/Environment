@@ -24,7 +24,7 @@ Private PriveSpace() As item
 Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private lastfind As String
 Private Hash() As Long
 Public index As Long
@@ -153,8 +153,8 @@ Private Function Malloc() As Long
         toplim = toplim + 1
         Malloc = toplim
 End Function
-Property Get count()
-count = toplim + 1
+Property Get Count()
+Count = toplim + 1
 End Property
 Property Get LastKnown() As String
 LastKnown = lastfind
@@ -219,7 +219,7 @@ End With
 
 End Sub
 Property Get Percent()
-Percent = count / hashlen
+Percent = Count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
@@ -245,8 +245,8 @@ HashFuncStored = lastHashFunc0 Mod hashlen
 End Function
 
 Public Sub pushtopGlobal()
-clean.PushVal CVar(limitGlobal)
-clean.PushVal CVar(toplim + 1)
+clean.PushLong limitGlobal
+clean.PushLong toplim + 1
 limitGlobal = toplim + 1
 End Sub
 Public Sub poptopGlobal()
@@ -256,7 +256,7 @@ limitGlobal = CLng(clean.PopVal)
 End Sub
 
 Public Sub pushtop()
-clean.PushVal CVar(toplim + 1)
+clean.PushLong toplim + 1
 End Sub
 Public Sub poptop()
  ReduceHash CLng(clean.PopVal)

@@ -209,6 +209,7 @@ End If
 End Sub
 
 Private Sub Form_Activate()
+On Error Resume Next
 If HOOKTEST <> 0 Then UnHook HOOKTEST
 If LastActive = "" Then Exit Sub
 Controls(LastActive).SetFocus
@@ -580,7 +581,7 @@ On Error Resume Next
 Dim sc As Double
 Set Image1.Image = Nothing
 Image1.Width = 0
-If aImage.Handle <> 0 Then
+If aImage.handle <> 0 Then
 Set Image1.Image = aImage
 If (aImage.Width / iwidth) < (aImage.Height / iheight) Then
 sc = aImage.Height / iheight
@@ -601,7 +602,7 @@ On Error Resume Next
 Dim sc As Double
 Set Image1.Image = Nothing
 Image1.Width = 0
-If aImage.Handle <> 0 Then
+If aImage.handle <> 0 Then
 Set Image1.Image = aImage
 Image1.Height = aImage.Height
 Image1.Width = aImage.Width
@@ -712,8 +713,8 @@ If item >= 0 Then
 content = ListPad.TextLine(item + 1)
 End If
 End Sub
-Private Sub ListPad_BreakLine(Data As String, datanext As String)
-    gList1.BreakLine Data, datanext
+Private Sub ListPad_BreakLine(data As String, datanext As String)
+    gList1.BreakLine data, datanext
 End Sub
 
 

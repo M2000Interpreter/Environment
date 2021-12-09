@@ -233,6 +233,9 @@ Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 Private EncbTrans(63) As Byte, EnclPowers8(255) As Long, EnclPowers16(255) As Long
 Dim lPowers18(63) As Long, bTrans(255) As Byte, lPowers6(63) As Long, lPowers12(63) As Long
+
+
+
 Public Function DateFromString(ByVal sDateIn As String, ByVal lcid As Long) As Date
 
     Dim hResult As Long
@@ -416,7 +419,7 @@ End If
 End If
 End Sub
 Public Function RenameFile(ByVal sSourceFile As String, ByVal sDesFile As String) As Boolean
-Dim F$, fd$
+Dim f$, fd$
 If Not CanKillFile(sSourceFile) Then Exit Function
 If ExtractType(sSourceFile) = vbNullString Then sSourceFile = sSourceFile + ".gsb"
 If ExtractType(sDesFile) = vbNullString Then
@@ -434,49 +437,49 @@ Else
 sDesFile = ExtractPath(sSourceFile) + ExtractName(sDesFile, True)
 End If
 If Left$(sSourceFile, 2) <> "\\" Then
-F$ = "\\?\" + sSourceFile
+f$ = "\\?\" + sSourceFile
 Else
-F$ = sSourceFile
+f$ = sSourceFile
 End If
 If Left$(sDesFile, 2) <> "\\" Then
 fd$ = "\\?\" + sDesFile
 Else
 fd$ = sDesFile
 End If
-RenameFile = 0 <> MoveFile(StrPtr(F$), StrPtr(fd$))
+RenameFile = 0 <> MoveFile(StrPtr(f$), StrPtr(fd$))
 
 End Function
 
 Public Function RenameFile2(ByVal sSourceFile As String, ByVal sDesFile As String) As Boolean
-Dim F$, fd$
+Dim f$, fd$
 sDesFile = ExtractPath(sSourceFile) + ExtractName(sDesFile, True)
 If Left$(sSourceFile, 2) <> "\\" Then
-F$ = "\\?\" + sSourceFile
+f$ = "\\?\" + sSourceFile
 Else
-F$ = sSourceFile
+f$ = sSourceFile
 End If
 If Left$(sDesFile, 2) <> "\\" Then
 fd$ = "\\?\" + sDesFile
 Else
 fd$ = sDesFile
 End If
-RenameFile2 = 0 <> CopyFile(StrPtr(F$), StrPtr(fd$), 1)
-KillFile F$
+RenameFile2 = 0 <> CopyFile(StrPtr(f$), StrPtr(fd$), 1)
+KillFile f$
 End Function
-Public Function CanKillFile(Filename$) As Boolean
-FixPath Filename$
+Public Function CanKillFile(FileName$) As Boolean
+FixPath FileName$
 If Not IsSupervisor Then
-    If Left$(Filename$, 1) = "." Then
+    If Left$(FileName$, 1) = "." Then
         CanKillFile = True
     Else
       If strTemp <> "" Then
-            If Not mylcasefILE(strTemp) = mylcasefILE(Left$(Filename$, Len(strTemp))) Then
-            CanKillFile = mylcasefILE(userfiles) = mylcasefILE(Left$(Filename$, Len(userfiles)))
+            If Not mylcasefILE(strTemp) = mylcasefILE(Left$(FileName$, Len(strTemp))) Then
+            CanKillFile = mylcasefILE(userfiles) = mylcasefILE(Left$(FileName$, Len(userfiles)))
             Else
             CanKillFile = True
             End If
         Else
-            CanKillFile = mylcasefILE(userfiles) = mylcasefILE(Left$(Filename$, Len(userfiles)))
+            CanKillFile = mylcasefILE(userfiles) = mylcasefILE(Left$(FileName$, Len(userfiles)))
         End If
     End If
 Else
@@ -486,11 +489,11 @@ End If
 End Function
 Public Function MakeACopy(ByVal sSourceFile As String, ByVal sDesFile As String) As Boolean
 If Not CanKillFile(sSourceFile) Then Exit Function
-Dim F$, fd$
+Dim f$, fd$
 If Left$(sSourceFile, 2) <> "\\" Then
-F$ = "\\?\" + sSourceFile
+f$ = "\\?\" + sSourceFile
 Else
-F$ = sSourceFile
+f$ = sSourceFile
 End If
 If Left$(sDesFile, 2) <> "\\" Then
 fd$ = "\\?\" + sDesFile
@@ -498,29 +501,29 @@ Else
 fd$ = sDesFile
 End If
 
-MakeACopy = 0 <> CopyFile(StrPtr(F$), StrPtr(fd$), 0)
+MakeACopy = 0 <> CopyFile(StrPtr(f$), StrPtr(fd$), 0)
 End Function
 
-Public Function NeoUnicodeFile(Filename$) As Boolean
+Public Function NeoUnicodeFile(FileName$) As Boolean
 Dim hFile, counter
-Dim F$, F1$
+Dim f$, F1$
 Sleep 10
-If Not CanKillFile(Filename$) Then Exit Function
-If Left$(Filename$, 2) <> "\\" Then
-F$ = "\\?\" + Filename$
+If Not CanKillFile(FileName$) Then Exit Function
+If Left$(FileName$, 2) <> "\\" Then
+f$ = "\\?\" + FileName$
 Else
-F$ = Filename$
+f$ = FileName$
 End If
 On Error Resume Next
-F1$ = Dir(F$)  '' THIS IS THEWORKAROUND FOR THE PROBLEMATIC CREATIFILE (I GOT SOME HANGS)
+F1$ = Dir(f$)  '' THIS IS THEWORKAROUND FOR THE PROBLEMATIC CREATIFILE (I GOT SOME HANGS)
 
-hFile = CreateFile(StrPtr(F$), GENERIC_WRITE, ByVal 0, ByVal 0, 2, FILE_ATTRIBUTE_NORMAL, ByVal 0)
+hFile = CreateFile(StrPtr(f$), GENERIC_WRITE, ByVal 0, ByVal 0, 2, FILE_ATTRIBUTE_NORMAL, ByVal 0)
 FlushFileBuffers hFile
 Sleep 10
 
 CloseHandle hFile
 
-NeoUnicodeFile = (CFname(GetDosPath(F$)) <> "")
+NeoUnicodeFile = (CFname(GetDosPath(f$)) <> "")
 
 Sleep 10
 
@@ -547,18 +550,18 @@ Dim PathLength As Long
 
 End Function
 
-Sub PlaySoundNew(F As String)
+Sub PlaySoundNew(f As String)
 
-If F = vbNullString Then
+If f = vbNullString Then
 PlaySound 0&, 0&, SND_PURGE
 Else
-If ExtractType(F) = vbNullString Then F = F & ".WAV"
-F = CFname(F)
-PlaySound StrPtr(F), ByVal 0&, SND_FILENAME Or SND_ASYNC
+If ExtractType(f) = vbNullString Then f = f & ".WAV"
+f = CFname(f)
+PlaySound StrPtr(f), ByVal 0&, SND_FILENAME Or SND_ASYNC
 End If
 End Sub  ' SND_MEMORY
-Sub PlaySoundNew2(F As Long)
-PlaySound (F), ByVal 0&, SND_MEMORY Or SND_ASYNC
+Sub PlaySoundNew2(f As Long)
+PlaySound (f), ByVal 0&, SND_MEMORY Or SND_ASYNC
 End Sub
 
        
@@ -922,16 +925,16 @@ Public Function Encode64(sString As String, Optional compact As Boolean = False,
 End Function
 
 '
-Public Function FileToEncode64(F$, leftmargin As Long) As String
+Public Function FileToEncode64(f$, leftmargin As Long) As String
 Dim i As Long, fl As Long
 
-fl = FileLen(GetDosPath(F$))
+fl = FileLen(GetDosPath(f$))
 If fl = 0 Then Exit Function
     i = FreeFile
-    Open GetDosPath(F$) For Binary Access Read As i
+    Open GetDosPath(f$) For Binary Access Read As i
     Dim bOut() As Byte, bIn() As Byte
     Dim lChar As Long, lTrip As Long, iPad As Integer, lLen As Long, lTemp As Long, lPos As Long, lOutSize As Long
-    iPad = (3 - FileLen(GetDosPath(F$)) Mod 3) Mod 3                          'See if the length is divisible by 3
+    iPad = (3 - FileLen(GetDosPath(f$)) Mod 3) Mod 3                          'See if the length is divisible by 3
     ReDim bIn(0 To fl - 1)
     Get #i, , bIn()
     Close i

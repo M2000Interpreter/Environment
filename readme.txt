@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 44 active-X
-A fault on targets when the height is 1 row, when we choose middle position for caption, removed.
+Version 10 revision 45 active-X
+Some improvements on interpreter for static functions.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

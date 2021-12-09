@@ -6339,10 +6339,10 @@ While k {
 }
 MODULE DEMO1 {set Fast !
 Smooth on
-Rem :
- Thread.plan sequential : ComputeInterval=20: Rate=60
+Rem :Thread.plan sequential :ComputeInterval=30: Rate=60:TM=100
 \\ we can set Thread.plan before any thread created
-Rem : Thread.plan concurrent : ComputeInterval=30 :Rate=120
+Rem :
+Thread.plan concurrent : ComputeInterval=30:Rate=60:TM=100
 \\ concurrent execute one by one statements
 \\ except those in { }
 \\ also from Revision 52 Part {} as variable works fine with it
@@ -6435,102 +6435,98 @@ Inventory Depth
 aLine=Each(Depth)
 once=False
 Function DepthSort() {
-                   Inventory Queue Depth ' clear Depth, Then make keys As numbers
-                   Append Depth, Eval(Var, vRot1.z As double):=1, Eval(Var, vRot2.z As double):=2, Eval(Var, vRot3.z As double):=3
-                   Sort Depth As number
+	Inventory Queue Depth ' clear Depth, Then make keys As numbers
+	Append Depth, Eval(Var, vRot1.z As double):=1, Eval(Var, vRot2.z As double):=2, Eval(Var, vRot3.z As double):=3
+	Sort Depth As number
 }
 Thread {
-      part {
-                  Method Math, "RotVectMult", 4, vRot1, vAxis, vRot1, dAngle
-                  Push Eval(Var, vBase.y As double), Eval(Var, vBase.x As double)
-                  \\ x is in top, y is after x
-                  Over 2, 2 \\  copy two times from second, so double two top
-                  Push Eval(Var, vRot4.x As double)+Number : Over 1, 2 \\ copy 2 times top only
-                        Read Line1.X1, Line2.X1, Line3.X1
-                        Push Eval(Var, vRot4.y As double)+Number : Over 1, 2
-                        Read Line1.Y1, Line2.Y1, Line3.Y1
-                        Over 2, 4 \\ now original 2 values copied 4 times
-                        Line1.X2 = Eval(Var, vRot1.x As double)+Number
-                        Line1.Y2 = Eval(Var, vRot1.y As double)+Number
-                        Line2.X2 = Eval(Var, vRot2.x As double)+Number
-                        Line2.Y2 = Eval(Var, vRot2.y As double)+Number
-                        Line3.X2 = Eval(Var, vRot3.x As double)+Number
-                        Line3.Y2 = Eval(Var, vRot3.y As double)+Number
-                        call local depthsort()
-                        counter1++
-                        if random(20)>1 then exit
-                        Method Math, "Vector", vAxis,.4 -.8*rnd, 1.6, .2-.3*rnd
-                        Method Math, "UnitVect", vAxis
-      }  As once
+	part {
+		Method Math, "RotVectMult", 4, vRot1, vAxis, vRot1, dAngle
+		Push Eval(Var, vBase.y As double), Eval(Var, vBase.x As double)
+		\\ x is in top, y is after x
+		Over 2, 2 \\  copy two times from second, so double two top
+		Push Eval(Var, vRot4.x As double)+Number : Over 1, 2 \\ copy 2 times top only
+			Read Line1.X1, Line2.X1, Line3.X1
+			Push Eval(Var, vRot4.y As double)+Number : Over 1, 2
+			Read Line1.Y1, Line2.Y1, Line3.Y1
+			Over 2, 4 \\ now original 2 values copied 4 times
+			Line1.X2 = Eval(Var, vRot1.x As double)+Number
+			Line1.Y2 = Eval(Var, vRot1.y As double)+Number
+			Line2.X2 = Eval(Var, vRot2.x As double)+Number
+			Line2.Y2 = Eval(Var, vRot2.y As double)+Number
+			Line3.X2 = Eval(Var, vRot3.x As double)+Number
+			Line3.Y2 = Eval(Var, vRot3.y As double)+Number
+			call local depthsort()
+			counter1++
+			if random(20)>1 then exit
+			Method Math, "Vector", vAxis,.4 -.8*rnd, 1.6, .2-.3*rnd
+			Method Math, "UnitVect", vAxis
+	}  As once
 } As Compute
 dim All(1 to 3)
 Layer Alfa {
-      Window 12, 10000, 8000;
-      Form 40, 20
-      Line1=cline(#0000FF, scale.x/2, scale.y/2, scale.x/2, scale.y/2-2220 )
-      Line2=cline(#FF0000, scale.x/2, scale.y/2, scale.x/2-2340, scale.y/2-60 )
-      Line3=cline(#00FF00, scale.x/2, scale.y/2, scale.x/2-780, scale.y/2-1200 )
-      All(1)->Line1
-      All(2)->line2
-      All(3)->line3
-      Declare Math Math
-      Method Math, "Vector", vBase,scale.x/2-1500, scale.y/2+1500, 1500 '  -1000
-      Method Math, "Vector", vRot1, Line1.X2, Line1.Y2, -1000
-      Method Math, "Vector", vRot2, Line2.X2, Line2.Y2, -1200
-      Method Math, "Vector", vRot3, Line3.X2, Line3.Y2, 1700
-      Method Math, "Vector", vRot4, Line1.X1, Line1.Y1, 0
-      Method Math,  "VecDiffMult", 4, vRot1, vBase, vRot1
-      Inventory Depth=Eval(Var, vRot1.z As double):=1, Eval(Var, vRot2.z As double):=2, Eval(Var, vRot3.z As double):=3
-      Sort Depth As number
-      Method Math, "Vector", vAxis, -.8, 1.6, .3
-      Method Math, "UnitVect", vAxis
-      Rad2Deg =Lambda pidivby180=pi/180 (RadAngle)->RadAngle / pidivby180
-      dAngle =5
-      Pen 0
-      Cls 7
-      Gradient 11, 13
-      Move 0,0
-      Cursor 0, Height-1
-      Cls 7, Height-1
-      hold
-      //Copy scale.x, scale.y to screen$
-      Cursor 0,Height
-      together=False
-      ok1=true
-      Thread {
-            ok1~
-      } as mm interval 1000/50
-      tm=0
-      Thread {
-            static internal=1
-            'Move 0,0
-            'Copy 0,0 use screen$
-            release
-            Part {
-                  tm=timecount
-            } as ok1
-            Print @(3,3); format$("{0:2:-7}",tm)
-                  Cursor 0,height-1
-                   Print Part $(5,Width/4), counter1, counter2,internal, $(7),Str$(Now , "hh:mm:ss" ) 
-            Part {
-                       Part {
-                        aLine=Each(Depth)
-                        push  Eval(Var, vRot4.z As double) : Over 1, 2
-                        while aline {
-                                    pp=all(eval(aLine))
-                                    pp=>render  Val(eval$(Depth, aLine^))
-                        }
-                        counter2++
-                        } As disp
-                        if not OpenInfo then
-                            wait 5
-                            Refresh 5000' execute together
-                        end if
-
-            }  As together
-            internal++
-            Profiler
-      } As PlayThis
+	Window 12, 10000, 8000;
+	Form 40, 20
+	Line1=cline(#0000FF, scale.x/2, scale.y/2, scale.x/2, scale.y/2-2220 )
+	Line2=cline(#FF0000, scale.x/2, scale.y/2, scale.x/2-2340, scale.y/2-60 )
+	Line3=cline(#00FF00, scale.x/2, scale.y/2, scale.x/2-780, scale.y/2-1200 )
+	All(1)->Line1
+	All(2)->line2
+	All(3)->line3
+	Declare Math Math
+	Method Math, "Vector", vBase,scale.x/2-1500, scale.y/2+1500, 1500 '  -1000
+	Method Math, "Vector", vRot1, Line1.X2, Line1.Y2, -1000
+	Method Math, "Vector", vRot2, Line2.X2, Line2.Y2, -1200
+	Method Math, "Vector", vRot3, Line3.X2, Line3.Y2, 1700
+	Method Math, "Vector", vRot4, Line1.X1, Line1.Y1, 0
+	Method Math,  "VecDiffMult", 4, vRot1, vBase, vRot1
+	Inventory Depth=Eval(Var, vRot1.z As double):=1, Eval(Var, vRot2.z As double):=2, Eval(Var, vRot3.z As double):=3
+	Sort Depth As number
+	Method Math, "Vector", vAxis, -.8, 1.6, .3
+	Method Math, "UnitVect", vAxis
+	Rad2Deg =Lambda pidivby180=pi/180 (RadAngle)->RadAngle / pidivby180
+	dAngle =5
+	Pen 0
+	Cls 7
+	Gradient 11, 13
+	Move 0,0
+	Cursor 0, Height-1
+	Cls 7, Height-1
+	hold
+	//Copy scale.x, scale.y to screen$
+	Cursor 0,Height
+	together=False
+	ok1=true
+	Thread {
+		{ok1~: if ok1 then tm=timecount
+		}
+	} as mm interval 1000/50
+	tm=0
+	Thread {
+		static internal=1
+		'Move 0,0
+		'Copy 0,0 use screen$
+		{
+			release
+			Print @(3,3); format$("{0:2:-7}",tm)
+			Cursor 0,height-1
+			Print Part $(5,Width/4), counter1, counter2,internal, $(7),Str$(Now , "hh:mm:ss" )
+		}
+		Part {
+			Part {
+				aLine=Each(Depth)
+				push  Eval(Var, vRot4.z As double) : Over 1, 2
+				while aline {
+					pp=all(eval(aLine))
+					pp=>render  Val(eval$(Depth, aLine^))
+				}
+				counter2++
+			} As disp
+			if not OpenInfo then Refresh 5000
+		} As together
+		internal++
+		Profiler
+	} As PlayThis
 }
 \\ we set variables outside threads
 State=False
@@ -6568,9 +6564,8 @@ Method Alfa, "Show"
 \\ Change Task.Main with Every
 \\ Task.Main is a Thread
 \\ ExitNow needed If we have Every in place of Task.Main
-Task.Main 50 {
+Task.Main TM {
       if not together  then if OpenInfo then showinfo()
-
       If ExitNow Then Exit
 }
 Threads Erase
@@ -6584,7 +6579,8 @@ Title "Demo Complete"
 Smooth off
 Set Fast   ' return to normal
 sub showinfo()
-      OpenInfo=false
+	OpenInfo=false
+	refresh 10
 	Info$={
 		This is an example
 		of  using MATH object

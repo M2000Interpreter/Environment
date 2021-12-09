@@ -20,8 +20,9 @@ Dim mCallType As Long
 Dim t() As Long
 Dim paramnum As Long
 Public FreeHere As Boolean
+Public CallAddr As Long
 
-Public Sub CallThis(ByVal vNewValue As String, paramList As String, lang As Long)
+Public Sub CallThis(ByVal vNewValue As String, ParamList As String, Lang As Long)
 Dim l As Long, check$, m As Long
 l = InStr(vNewValue, ".")
 If l <> 0 Then
@@ -31,7 +32,7 @@ Else
 mLib = vNewValue
 mFunction = vbNullString ' what about that??
 End If
-mConctruct = paramList
+mConctruct = ParamList
 If InStr(vNewValue, ".dll") > 0 Then
 mLib = mLib + ".dll"
 End If
@@ -40,22 +41,22 @@ mFunction = Mid$(mFunction, 5)
 ElseIf LCase(mFunction) Like "dll*" Then
 mFunction = Mid$(mFunction, 4)
 End If
-Do While paramList <> ""
+Do While ParamList <> ""
 
- If IsLabelSymbolNew(paramList, "Ã¡ —’”", "LONG", lang) Then
- If FastSymbol(paramList, "&") Then l = 16 Else l = 0
- If IsPureLabel(paramList, check$) = 1 Then
+ If IsLabelSymbolNew(ParamList, "Ã¡ —’”", "LONG", Lang) Then
+ If FastSymbol(ParamList, "&") Then l = 16 Else l = 0
+ If IsPureLabel(ParamList, check$) = 1 Then
  'OK
  m = 2
  Else
- paramList = "error"
+ ParamList = "error"
  Exit Sub
  End If
  Else
-  If FastSymbol(paramList, "&") Then l = 16 Else l = 0
- m = IsPureLabel(paramList, check$)
+  If FastSymbol(ParamList, "&") Then l = 16 Else l = 0
+ m = IsPureLabel(ParamList, check$)
  If m = 0 Then
- If FastSymbol(paramList, "...", , 3) Then
+ If FastSymbol(ParamList, "...", , 3) Then
  PushType -100  ' Paramarray
  Exit Do
  End If
@@ -63,13 +64,13 @@ Do While paramList <> ""
  End If
 PushType m + l   'above 16 is byref
 If IsArrayItem(paramnum) Then
-If Not FastSymbol(paramList, ")") Then Exit Do
+If Not FastSymbol(ParamList, ")") Then Exit Do
 End If
-If Not FastSymbol(paramList, ",") Then Exit Do
+If Not FastSymbol(ParamList, ",") Then Exit Do
 If check$ = vbNullString Then Exit Do
 If paramnum = 63 Then Exit Do
 Loop
-paramList = Trim$(paramList)   ' if we have somethig then that is an error
+ParamList = Trim$(ParamList)   ' if we have somethig then that is an error
 End Sub
 Public Property Get LIB() As String
 LIB = mLib

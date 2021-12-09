@@ -15,10 +15,10 @@ Option Explicit
 ' a stack only for strings for group objects
 Private mstack As New Collection
 Public Property Get Total() As Long
-Total = mstack.count
+Total = mstack.Count
 End Property
-Public Property Get count() As Long
-count = mstack.count
+Public Property Get Count() As Long
+Count = mstack.Count
 End Property
 Function Copy() As mStiva2
 Dim i As Long
@@ -28,33 +28,40 @@ Copy.PushVariant mstack.item(i)
 Next i
 End Function
 Public Property Get LookTopVal() As Variant
-If mstack.count > 0 Then
+If mstack.Count > 0 Then
 LookTopVal = mstack.item(1)
 End If
 End Property
 Public Property Get LookSecondVal() As Variant
-If mstack.count > 1 Then
+If mstack.Count > 1 Then
 LookSecondVal = mstack.item(2)
 End If
 End Property
 Public Property Get PopVal() As Variant
-If mstack.count > 0 Then
+If mstack.Count > 0 Then
 PopVal = mstack.item(1)
    mstack.Remove 1
 End If
 End Property
 Public Sub PushVal(a As Variant)
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add a
 Else
 mstack.Add a, , 1
 End If
 End Sub
 Public Sub PushVariant(a As Variant)
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add a
 Else
 mstack.Add a, , 1
+End If
+End Sub
+Public Sub PushLong(a As Long)
+If mstack.Count = 0 Then
+mstack.Add CVar(a)
+Else
+mstack.Add CVar(a), , 1
 End If
 End Sub
 Public Sub MakeTopItem(where As Long)
@@ -64,7 +71,7 @@ On Error Resume Next
 If where > 1 Then
 a = mstack.item(where)
 mstack.Remove where
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add a
 Else
 mstack.Add a, , 1
@@ -73,19 +80,19 @@ End If
 End Sub
 Public Sub Flush()
 Dim num As Long
-For num = 1 To mstack.count
+For num = 1 To mstack.Count
    mstack.Remove 1
 Next num
 End Sub
 Public Sub PushStr(ByRef a As String)
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add CVar(a)
 Else
 mstack.Add CVar(a), , 1
 End If
 End Sub
 Public Property Get StackItem2(where As Long, maxvalue As Long) As Variant
-If where > mstack.count Then
+If where > mstack.Count Then
 StackItem2 = maxvalue + 1
 Else
 StackItem2 = mstack.item(where)
@@ -103,27 +110,27 @@ End Property
 Public Sub DataObj(RHS As Object)
 Dim aa
 Set aa = RHS
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
-mstack.Add aa, , , mstack.count
+mstack.Add aa, , , mstack.Count
 End If
 End Sub
 Public Sub DataVal(a As Variant)
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add a
 Else
-mstack.Add a, , , mstack.count
+mstack.Add a, , , mstack.Count
 End If
 End Sub
 Public Sub DataStr(ByRef a As String)
 Dim v As Variant
 v = vbNullString
 SwapString2Variant a, v
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add v
 Else
-mstack.Add v, , , mstack.count
+mstack.Add v, , , mstack.Count
 End If
 End Sub
 Sub GetStackPick(where, ByRef v As Variant)
@@ -141,10 +148,10 @@ Dim i As Long, aa As Variant
 If a.Total > 0 Then
 Do
 aa = a.StackPick(1)
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
-mstack.Add aa, , , mstack.count    'push so first of a is first on mstack
+mstack.Add aa, , , mstack.Count    'push so first of a is first on mstack
 End If
 Loop Until a.Total < 1
 End If
@@ -153,14 +160,14 @@ Public Sub DataStrUn(a As String)
 Dim aa As Variant, i As Long, b As String
 b = Split(a)(0)
 aa = a
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
 For i = 1 To Total
 If Split(mstack.item(i))(0) = b Then
 
 mstack.Remove i
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add aa
 ElseIf i = 1 Then
 mstack.Add aa, , 1
@@ -170,13 +177,13 @@ End If
 Exit Sub
 End If
 Next i
-mstack.Add aa, , , mstack.count
+mstack.Add aa, , , mstack.Count
 End If
 End Sub
 Public Sub drop(ByVal items As Long)
 Dim num As Long
 On Error Resume Next
-If mstack.count < items Then: Set mstack = New Collection: Exit Sub
+If mstack.Count < items Then: Set mstack = New Collection: Exit Sub
 For num = 1 To items
     mstack.Remove 1
 Next num
