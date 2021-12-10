@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 45
+Global Const Revision = 46
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5003,7 +5003,7 @@ TimeZones zones
 Set TaskMaster = New TaskMaster
 TaskMaster.Interval = 5
 beeperBEAT = 300
-MediaPlayer1.Filename = vbNullString
+MediaPlayer1.filename = vbNullString
 defFontname = "Verdana"
 my_system = OperatingPlatform
 vol = 50
@@ -8617,14 +8617,14 @@ If IsStrExp(bstack, a$, s1$) Then
 If s1$ = vbNullString Then
 R = 0
 
-               IsNumberNew = FastSymbol(a$, ")", True)
+IsNumberNew = FastSymbol(a$, ")", True)
 Else
 If ExtractPath(s1$) = vbNullString Then
-                If CFname(s1$) <> "" Then
-                    s1$ = CFname(s1$)
-                ElseIf mylcasefILE(s1$) = ExtractName(s1$, True) Then
-                    s1$ = mcd + s1$
-                End If
+    If CFname(s1$) <> "" Then
+        s1$ = CFname(s1$)
+    ElseIf mylcasefILE(s1$) = ExtractName(s1$, True) Then
+        s1$ = mcd + s1$
+    End If
 End If
        R = SG * FileLen(GetDosPath(s1$))
                
@@ -32354,22 +32354,21 @@ If Left$(s$, 1) = "S" Then
             End With
             Form1.ResetMarks
             If frm$ <> "" And Abs(x1) >= 0 And Not CancelEDIT Then
-            If par Then
-                            i = FreeFile
-                                            If Not WeCanWrite(s$) Then Set Scr = Nothing: Exit Function
-                            On Error Resume Next
-                            
-                            Open GetDosPath(s$) For Output As i
-                                            If Err.Number > 0 Then
-                                Err.Clear
-                                 MyEr "Bad filename", "À‹ËÔÚ ÛÙÔ ¸ÌÔÏ· ·Ò˜ÂﬂÔı"
-                                Set Scr = Nothing
-                                Exit Function
-                                End If
-                            Print #i, frm$;
-                            Close i
-                Else
-                par = SaveUnicode(s$, frm$, x1)
+                If par Then
+                    i = FreeFile
+                        If Not WeCanWrite(s$) Then Set Scr = Nothing: Exit Function
+                        On Error Resume Next
+                        Open GetDosPath(s$) For Output As i
+                        If Err.Number > 0 Then
+                            Err.Clear
+                            MyEr "Bad filename", "À‹ËÔÚ ÛÙÔ ¸ÌÔÏ· ·Ò˜ÂﬂÔı"
+                            Set Scr = Nothing
+                            Exit Function
+                        End If
+                        Print #i, frm$;
+                        Close i
+                    Else
+                    par = SaveUnicode(s$, frm$, x1)
                 End If
                 
             End If
@@ -34584,7 +34583,7 @@ If IsLabelSymbolNew(rest$, "Ãœ’”… «", "MUSIC", Lang) Then
             End If
             If s$ <> "" Then
                 MediaBack1.closeMovie
-                MediaBack1.Filename = s$
+                MediaBack1.filename = s$
                 MediaBack1.openMovie
                 MediaBack1.playMovie
             End If
@@ -40536,7 +40535,7 @@ Do
                                 getAnsiRealComma f, s$
                         End If
                 Else
-                           prive = GetCode(bstack.Owner)
+                prive = GetCode(bstack.Owner)
                 If players(prive).lastprint Then
                 LCTbasket bstack.Owner, players(prive), players(prive).currow, players(prive).curpos
                 players(prive).lastprint = False
@@ -41896,6 +41895,7 @@ End Function
 
 Function ProcOpen(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim s$, what$, it As Long, p As Variant, x1 As Long, i As Long, skip As Boolean, excl As Boolean
+Dim id$
 If IsStrExp(bstack, rest$, s$) Then
     If s$ <> "" Then
         FixPath s$
@@ -41905,16 +41905,20 @@ If IsStrExp(bstack, rest$, s$) Then
     End If
     If IsLabelSymbolNew(rest$, "√…¡", "FOR", Lang, True) Then
         If skip Then
-            If Not IsLabelSymbolNew(rest$, "≈’—…¡", "WIDE", Lang) Then
-                IsLabelSymbolNew rest$, "≈’—≈…¡", "WCHAR", Lang
+            id$ = vbNullString
+            If Not IsLabelSymbolNewExp(rest$, "≈’—…¡", "WIDE", Lang, id$) Then
+                IsLabelSymbolNewExp rest$, "≈’—≈…¡", "WCHAR", Lang, id$
             End If
         Else
             i = FreeFile
-            uni(i) = IsLabelSymbolNew(rest$, "≈’—…¡", "WIDE", Lang)
+            id$ = vbNullString
+            uni(i) = IsLabelSymbolNewExp(rest$, "≈’—…¡", "WIDE", Lang, id$)
             'SPELLING CORRECTION FOR GREEK WORD..
-            If Not uni(i) Then uni(i) = IsLabelSymbolNew(rest$, "≈’—≈…¡", "WCHAR", Lang)
+            If Not uni(i) Then uni(i) = IsLabelSymbolNewExp(rest$, "≈’—≈…¡", "WCHAR", Lang, id$)
+            If uni(i) Then id$ = vbNullString
             End If
-        If IsLabelSymbolNew(rest$, "≈…”¡√Ÿ√«", "INPUT", Lang) Then
+            
+        If IsLabelSymbolNewExp(rest$, "≈…”¡√Ÿ√«", "INPUT", Lang, id$) Then
             excl = IsLabelSymbolNew(rest$, "¡–œ À≈…”‘… ¡", "EXCLUSIVE", Lang)
             If skip Then BadFilename: Exit Function
             If IsLabelSymbolNew(rest$, "Ÿ”", "AS", Lang, True) Then
@@ -41942,7 +41946,7 @@ If IsStrExp(bstack, rest$, s$) Then
                         End If
                 End If
                 End If
-        ElseIf IsLabelSymbolNew(rest$, "”’Ã–À«—Ÿ”«", "APPEND", Lang) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "”’Ã–À«—Ÿ”«", "APPEND", Lang, id$) Then
             excl = IsLabelSymbolNew(rest$, "¡–œ À≈…”‘… ¡", "EXCLUSIVE", Lang)
             If Not skip Then If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
             If IsLabelSymbolNew(rest$, "Ÿ”", "AS", Lang, True) Then
@@ -41975,7 +41979,7 @@ If IsStrExp(bstack, rest$, s$) Then
             Else
                 Exit Function
             End If
-        ElseIf IsLabelSymbolNew(rest$, "≈Œ¡√Ÿ√«", "OUTPUT", Lang) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "≈Œ¡√Ÿ√«", "OUTPUT", Lang, id$) Then
             excl = IsLabelSymbolNew(rest$, "¡–œ À≈…”‘… ¡", "EXCLUSIVE", Lang)
             If Not skip Then If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
             If IsLabelSymbolNew(rest$, "Ÿ”", "AS", Lang, True) Then
@@ -42006,7 +42010,7 @@ If IsStrExp(bstack, rest$, s$) Then
             Else
                 Exit Function
             End If
-        ElseIf IsLabelSymbolNew(rest$, "–≈ƒ…¡", "RANDOM", Lang) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "–≈ƒ…¡", "RANDOM", Lang, id$) Then
             excl = IsLabelSymbolNew(rest$, "¡–œ À≈…”‘… ¡", "EXCLUSIVE", Lang)
             If skip Then BadFilename: Exit Function
             If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
@@ -54308,7 +54312,6 @@ End If
             putUniString f, vbCrLf
             Else
             putANSIString f, vbCrLf
-            'Print #f,
             End If
         End If
     End If

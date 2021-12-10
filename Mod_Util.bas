@@ -2835,6 +2835,7 @@ If AddTwipsTop < 0 Then
      dq.FontSize = mSz
      Do While oldTH * 2 < dq.TextHeight("A")
      mSz = mSz - 0.25
+     If mSz < 1 Then mSz = 1: Exit Do
      dq.FontSize = mSz
      Loop
      End If
@@ -9017,7 +9018,7 @@ End If
 
 End If
 End Function
-Function MakeEmf(bstack As basetask, b$, Lang As Long, Data$, Optional ww = 0, Optional hh = 0) As Boolean
+Function MakeEmf(bstack As basetask, b$, Lang As Long, data$, Optional ww = 0, Optional hh = 0) As Boolean
 Dim w$, x1 As Long, label1$, usehandler As mHandler, par As Boolean, pppp As mArray, p As Variant, it&, x2&
 x2 = Len(b$)
 If IsLabelSymbolNew(b$, "ΩΣ", "AS", Lang) Then
@@ -9037,12 +9038,12 @@ contvar1:
             Set usehandler = New mHandler
                 usehandler.t1 = 2
 
-                Set usehandler.objref = ExecuteEmfBlock(bstack, Data$, it, ww, hh)
+                Set usehandler.objref = ExecuteEmfBlock(bstack, data$, it, ww, hh)
 
 
                     Set var(x1) = usehandler
                     MakeEmf = it <> 0
-                    If it = 0 Then b$ = Data$ + space$(x2&)
+                    If it = 0 Then b$ = data$ + space$(x2&)
                 Exit Function
             ElseIf x1 = 5 Then
                 If GetVar(bstack, label1$, x1) Then
@@ -9050,10 +9051,10 @@ contvar1:
                         Set usehandler = New mHandler
                         usehandler.t1 = 2
 
-                        Set usehandler.objref = ExecuteEmfBlock(bstack, Data$, it, ww, hh)
+                        Set usehandler.objref = ExecuteEmfBlock(bstack, data$, it, ww, hh)
                         Set pppp.item(x1) = usehandler
                         MakeEmf = it <> 0
-                        If it = 0 Then b$ = Data$ + space$(x2&) + b$
+                        If it = 0 Then b$ = data$ + space$(x2&) + b$
                     End If
                     Exit Function
             
@@ -9070,11 +9071,11 @@ contvar1:
                 Set usehandler = New mHandler
                 usehandler.t1 = 2
         
-                Set usehandler.objref = ExecuteEmfBlock(bstack, Data$, it, ww, hh)
+                Set usehandler.objref = ExecuteEmfBlock(bstack, data$, it, ww, hh)
           
                     Set var(x1) = usehandler
                     MakeEmf = it <> 0
-                    If it = 0 Then b$ = Data$ + space$(x2&) + b$
+                    If it = 0 Then b$ = data$ + space$(x2&) + b$
             
                 Exit Function
             Else
@@ -9086,11 +9087,11 @@ contvar1:
                     If GetArrayReference(bstack, w$, label1$, var(x1), pppp, x1) Then
                         Set usehandler = New mHandler
                         usehandler.t1 = 2
-                        Set usehandler.objref = ExecuteEmfBlock(bstack, Data$, it, ww, hh)
+                        Set usehandler.objref = ExecuteEmfBlock(bstack, data$, it, ww, hh)
                        
                         Set pppp.item(x1) = usehandler
                         MakeEmf = it <> 0
-                        If it = 0 Then b$ = Data$ + space$(x2&) + b$
+                        If it = 0 Then b$ = data$ + space$(x2&) + b$
                     End If
                     Exit Function
             
@@ -9105,7 +9106,7 @@ contvar1:
 End Function
 
 
-Function GetRes(bstack As basetask, b$, Lang As Long, Data$) As Boolean
+Function GetRes(bstack As basetask, b$, Lang As Long, data$) As Boolean
 Dim w$, x1 As Long, label1$, usehandler As mHandler, par As Boolean, pppp As mArray, p As Variant
 If IsLabelSymbolNew(b$, "ΩΣ", "AS", Lang) Then
             w$ = Funcweak(bstack, b$, x1, label1$)
@@ -9125,13 +9126,13 @@ contvar1:
                 usehandler.t1 = 2
         If FastSymbol(b$, ",") Then
         If IsExp(bstack, b$, p, , True) Then
-         Set usehandler.objref = Decode64toMemBloc(Data$, par, CBool(p))
+         Set usehandler.objref = Decode64toMemBloc(data$, par, CBool(p))
         Else
         GetRes = True
-        MissParam Data$: Exit Function
+        MissParam data$: Exit Function
         End If
         Else
-                Set usehandler.objref = Decode64toMemBloc(Data$, par)
+                Set usehandler.objref = Decode64toMemBloc(data$, par)
                 End If
                 If par Then
                     Set var(x1) = usehandler
@@ -9143,7 +9144,7 @@ contvar1:
                 Exit Function
             ElseIf x1 = 3 Then
                 x1 = globalvar(label1$, vbNullString)
-                var(x1) = Decode64(Data$, par)
+                var(x1) = Decode64(data$, par)
                 If Not par Then GoTo Err1
                 GetRes = True
                 Exit Function
@@ -9155,13 +9156,13 @@ contvar1:
                         If Not par Then GoTo Err1
                         If FastSymbol(b$, ",") Then
         If IsExp(bstack, b$, p, , True) Then
-         Set usehandler.objref = Decode64toMemBloc(Data$, par, CBool(p))
+         Set usehandler.objref = Decode64toMemBloc(data$, par, CBool(p))
         Else
         GetRes = True
-        MissParam Data$: Exit Function
+        MissParam data$: Exit Function
         End If
         Else
-                        Set usehandler.objref = Decode64toMemBloc(Data$, par)
+                        Set usehandler.objref = Decode64toMemBloc(data$, par)
                         End If
                     
                         Set pppp.item(x1) = usehandler
@@ -9178,7 +9179,7 @@ contvar1:
 contstr1:
                 If GetVar(bstack, label1$, x1) Then
                     If GetArrayReference(bstack, b$, label1$, var(x1), pppp, x1) Then
-                        pppp.item(x1) = Decode64(Data$, par)
+                        pppp.item(x1) = Decode64(data$, par)
                         If Not par Then GoTo Err1
                         GetRes = True
                     End If
@@ -9196,7 +9197,7 @@ contstr1:
             Set usehandler = New mHandler
                 usehandler.t1 = 2
         
-                Set usehandler.objref = Decode64toMemBloc(Data$, par)
+                Set usehandler.objref = Decode64toMemBloc(data$, par)
                 If par Then
                     Set var(x1) = usehandler
                     GetRes = True
@@ -9212,7 +9213,7 @@ Err1:
                 ElseIf x1 = 3 Then
                 
                 If GetVar(bstack, label1$, x1) Then
-                var(x1) = Decode64(Data$, par)
+                var(x1) = Decode64(data$, par)
                 If Not par Then GoTo Err1
                 GetRes = True
                 Exit Function
@@ -9223,7 +9224,7 @@ Err1:
                     If GetArrayReference(bstack, w$, label1$, var(x1), pppp, x1) Then
                         Set usehandler = New mHandler
                         usehandler.t1 = 2
-                        Set usehandler.objref = Decode64toMemBloc(Data$, par)
+                        Set usehandler.objref = Decode64toMemBloc(data$, par)
                         If Not par Then GoTo Err1
                         Set pppp.item(x1) = usehandler
                         GetRes = True
@@ -9239,7 +9240,7 @@ Err1:
                                If GetVar(bstack, label1$, x1) Then
                             DropLeft "(", w$
                     If GetArrayReference(bstack, w$, label1$, var(x1), pppp, x1) Then
-                        pppp.item(x1) = Decode64(Data$, par)
+                        pppp.item(x1) = Decode64(data$, par)
                         If Not par Then GoTo Err1
                         GetRes = True
                     End If
@@ -10990,7 +10991,7 @@ End If
 End Sub
 Function ProcEnumGroup(bstack As basetask, rest$, Optional glob As Boolean = False) As Boolean
 
-    Dim s$, w1$, v As Long, enumvalue As Long, myenum As Enumeration, mh As mHandler, v1 As Long
+    Dim s$, w1$, v As Long, enumvalue As Long, myenum As Enumeration, mh As mHandler, V1 As Long
     Dim gr As Boolean
     enumvalue = 0
     If FastPureLabel(rest$, w1$, , , , , , gr) = 1 Then
@@ -11029,15 +11030,15 @@ Function ProcEnumGroup(bstack As basetask, rest$, Optional glob As Boolean = Fal
             mh.ReadOnly = True
             mh.index_cursor = enumvalue
             mh.index_start = myenum.Count - 1
-             v1 = globalvar(bstack.GroupName + myUcase(w1$, gr), v1, , glob)
-             Set var(v1) = mh
+             V1 = globalvar(bstack.GroupName + myUcase(w1$, gr), V1, , glob)
+             Set var(V1) = mh
             ProcEnumGroup = True
         Else
             Exit Do
         End If
         If FastSymbol(s$, ",") Then ProcEnumGroup = False
         Loop
-        If v1 > v Then Set var(v) = var(v1) Else MyEr "Empty Enumeration", "Άδεια Απαρίθμηση": Exit Function
+        If V1 > v Then Set var(v) = var(V1) Else MyEr "Empty Enumeration", "Άδεια Απαρίθμηση": Exit Function
         ProcEnumGroup = FastSymbol(rest$, "}", True)
     Else
         MissingEnumBlock
@@ -11048,7 +11049,7 @@ Function ProcEnumGroup(bstack As basetask, rest$, Optional glob As Boolean = Fal
 End Function
 Function ProcEnum(bstack As basetask, rest$, Optional glob As Boolean = False) As Boolean
 
-    Dim s$, w1$, v As Long, enumvalue As Variant, myenum As Enumeration, mh As mHandler, v1 As Long, i As Long
+    Dim s$, w1$, v As Long, enumvalue As Variant, myenum As Enumeration, mh As mHandler, V1 As Long, i As Long
     Dim gr As Boolean
     enumvalue = 0#
     If FastPureLabel(rest$, w1$, , , , , , gr) = 1 Then
@@ -11098,15 +11099,15 @@ Function ProcEnum(bstack As basetask, rest$, Optional glob As Boolean = False) A
             mh.index_cursor = enumvalue
             mh.index_start = myenum.Count - 1
             
-             v1 = globalvar(w1$, v1, , glob)
-             Set var(v1) = mh
+             V1 = globalvar(w1$, V1, , glob)
+             Set var(V1) = mh
             ProcEnum = True
         Else
             Exit Do
         End If
         If FastSymbol(s$, ",") Then ProcEnum = False
         Loop
-        If v1 > v Then Set var(v) = var(v1) Else MyEr "Empty Enumeration", "Άδεια Απαρίθμηση": Exit Function
+        If V1 > v Then Set var(v) = var(V1) Else MyEr "Empty Enumeration", "Άδεια Απαρίθμηση": Exit Function
         ProcEnum = FastSymbol(rest$, "}", True)
     Else
         MissingEnumBlock

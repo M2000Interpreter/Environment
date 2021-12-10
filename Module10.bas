@@ -40,11 +40,13 @@ Private Declare Function UrlCanonicalizeApi Lib "shlwapi" Alias "UrlCanonicalize
     ByVal pszCanonicalized As Long, _
     pcchCanonicalized As Long, _
     ByVal dwFlags As Long) As Long
+Const NO_ERROR = 0&
 Const MOVEFILE_REPLACE_EXISTING = &H1
 Const FILE_ATTRIBUTE_TEMPORARY = &H100
 Const FILE_BEGIN = 0
 Const FILE_SHARE_READ = &H1
 Const FILE_SHARE_WRITE = &H2
+Const FILE_READ_ATTRIBUTES As Long = &H80&
 Const CREATE_NEW = 1
 Const OPEN_EXISTING = 3
 Const OPEN_ALLWAYS = 4
@@ -55,11 +57,12 @@ Public Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination 
 
 Private Declare Function WriteFile Lib "kernel32" (ByVal hFile As Long, lpBuffer As Any, ByVal nNumberOfBytesToWrite As Long, lpNumberOfBytesWritten As Long, ByVal lpOverlapped As Any) As Long
 Private Declare Function ReadFile Lib "kernel32" (ByVal hFile As Long, lpBuffer As Any, ByVal nNumberOfBytesToRead As Long, lpNumberOfBytesRead As Long, ByVal lpOverlapped As Any) As Long
-Private Declare Function CreateFile Lib "kernel32" Alias "CreateFileA" (ByVal lpFileName As String, ByVal dwDesiredAccess As Long, ByVal dwShareMode As Long, ByVal lpSecurityAttributes As Any, ByVal dwCreationDisposition As Long, ByVal dwFlagsAndAttributes As Long, ByVal hTemplateFile As Long) As Long
+Private Declare Function CreateFile Lib "kernel32" Alias "CreateFileW" (ByVal lpFileName As Long, ByVal dwDesiredAccess As Long, ByVal dwShareMode As Long, lpSecurityAttributes As Any, ByVal dwCreationDisposition As Long, ByVal dwFlagsAndAttributes As Long, ByVal hTemplateFile As Long) As Long
 Private Declare Function CloseHandle Lib "kernel32" (ByVal hObject As Long) As Long
 Private Declare Function SetFilePointer Lib "kernel32" (ByVal hFile As Long, ByVal lDistanceToMove As Long, lpDistanceToMoveHigh As Long, ByVal dwMoveMethod As Long) As Long
 Private Declare Function GetFileSize Lib "kernel32" (ByVal hFile As Long, lpFileSizeHigh As Long) As Long
 Private Declare Function SetEndOfFile Lib "kernel32" (ByVal hFile As Long) As Long
+Private Declare Function GetLastError Lib "kernel32" () As Long
 Private InUseHandlers As New FastCollection
 Private FreeUseHandlers As New FastCollection
 Public Function BigFileHandler(RHS) As Long
@@ -78,14 +81,15 @@ Else
     BigFileHandler = where
 End If
 End Function
-Public Function ReadFileHandler(h&) As Long
+'internal use
+Public Function ReadFileHandler(h&) As Variant
 If InUseHandlers.Find(CVar(h&)) Then
-    InUseHandlers.RemoveWithNoFind
-    FreeUseHandlers.AddKey CVar(h&)
+    ReadFileHandler = InUseHandlers.Value
 Else
     MyEr "No such file handler", "Δεν υπάρχει τέτοιο χειριστής αρχείου"
 End If
 End Function
+' internal use  You have to close file first
 Public Sub ReleaseHandler(h&)
 If InUseHandlers.Find(CVar(h&)) Then
     InUseHandlers.RemoveWithNoFind
@@ -99,18 +103,41 @@ Do While InUseHandlers.Count > 0
     InUseHandlers.ToEnd
     h& = CLng(InUseHandlers.Value)
     InUseHandlers.RemoveWithNoFind
+    FreeUseHandlers.AddKey CVar(h&)
     API_CloseFile h&
 Loop
 End Sub
-Public Sub API_OpenFile(ByVal Filename As String, ByRef FileNumber As Long, ByRef FileSize As Currency)
+Function myFileLen(filename As String) As Currency
 Dim FileH As Long
-Dim ret As Long
+Dim ret As Long, ok As Long
 On Error Resume Next
-FileH = CreateFile(Filename, GENERIC_READ Or GENERIC_WRITE, FILE_SHARE_READ Or FILE_SHARE_WRITE, 0&, OPEN_ALLWAYS, 0, 0)
+FileH = CreateFile(StrPtr(filename), _
+                FILE_READ_ATTRIBUTES, _
+                FILE_SHARE_READ Or FILE_SHARE_WRITE, _
+                ByVal 0&, OPEN_EXISTING, 0&, 0&)
+
+If Err.Number > 0 Then
+    Err.Clear
+there:
+    MyEr "Can't read the file length", "Δεν μπορώ να διαβάσω το μήκος του αρχείου"
+    myFileLen = -1#
+Else
+    ok = API_FileSize(FileH, myFileLen)
+    API_CloseFile FileH
+    If ok Then GoTo there  ' no zero means error
+End If
+On Error GoTo 0
+End Function
+Public Sub API_OpenFile(ByVal filename As String, ByRef FileNumber As Long, ByRef FileSize As Currency)
+Dim FileH As Long
+Dim ret As Long, ok As Long
+On Error Resume Next
+FileH = CreateFile(filename, GENERIC_READ Or GENERIC_WRITE, FILE_SHARE_READ Or FILE_SHARE_WRITE, 0&, OPEN_ALLWAYS, 0, 0)
 If Err.Number > 0 Then
     Err.Clear
     FileNumber = -1
 Else
+there:
     FileNumber = FileH
     ret = SetFilePointer(FileH, 0, 0, FILE_BEGIN)
     API_FileSize FileH, FileSize
@@ -118,22 +145,28 @@ End If
 On Error GoTo 0
 End Sub
 
-Public Sub API_FileSize(ByVal FileNumber As Long, ByRef FileSize As Currency)
+Function API_FileSize(ByVal FileNumber As Long, ByRef FileSize As Currency) As Long
     Dim FileSizeL As Long
-    Dim FileSizeH As Long
+    Dim FileSizeH As Long, ok As Long
     FileSizeH = 0
     FileSizeL = GetFileSize(FileNumber, FileSizeH)
+    If FileSizeL = -1& Then
+        ok = GetLastError
+        If ok Then API_FileSize = ok: Exit Function
+    End If
+    
     Long2Size FileSizeL, FileSizeH, FileSize
-End Sub
+    API_FileSize = 0
+End Function
 
-Public Sub API_ReadFile(ByVal FileNumber As Long, ByVal Position As Currency, ByRef BlockSize As Long, ByRef Data() As Byte)
+Public Sub API_ReadFile(ByVal FileNumber As Long, ByVal Position As Currency, ByRef BlockSize As Long, ByRef data() As Byte)
 Dim PosL As Long
 Dim PosH As Long
 Dim SizeRead As Long
 Dim ret As Long
 Size2Long Position, PosL, PosH
 ret = SetFilePointer(FileNumber, PosL, PosH, FILE_BEGIN)
-ret = ReadFile(FileNumber, Data(0), BlockSize, SizeRead, 0&)
+ret = ReadFile(FileNumber, data(0), BlockSize, SizeRead, 0&)
 BlockSize = SizeRead
 End Sub
 
@@ -142,14 +175,14 @@ Dim ret As Long
 ret = CloseHandle(FileNumber)
 End Sub
 
-Public Sub API_WriteFile(ByVal FileNumber As Long, ByVal Position As Currency, ByRef BlockSize As Long, ByRef Data() As Byte)
+Public Sub API_WriteFile(ByVal FileNumber As Long, ByVal Position As Currency, ByRef BlockSize As Long, ByRef data() As Byte)
 Dim PosL As Long
 Dim PosH As Long
 Dim SizeWrit As Long
 Dim ret As Long
 Size2Long Position - 1, PosL, PosH
 ret = SetFilePointer(FileNumber, PosL, PosH, FILE_BEGIN)
-ret = WriteFile(FileNumber, Data(0), BlockSize, SizeWrit, 0&)
+ret = WriteFile(FileNumber, data(0), BlockSize, SizeWrit, 0&)
 BlockSize = SizeWrit
 End Sub
 

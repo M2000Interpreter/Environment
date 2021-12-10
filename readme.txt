@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 45 active-X
-Some improvements on interpreter for static functions.
+Version 10 revision 46 active-X
+Correction for Ver10 example (in info file), now work perfect.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
