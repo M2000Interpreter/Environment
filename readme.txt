@@ -1,7 +1,11 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 46 active-X
-Correction for Ver10 example (in info file), now work perfect.
+Version 10 revision 47 active-X
+1. UPGRADE the file functions/statements, to handle over 2GB files:
+OPEN, CLOSE, LINE INPUT, INPUT, PRINT, WRITE, SEEK, PUT, GET
+SEEK(), RECORDS(), EOF()  Now the file pointer is Currency.
+2. Correction for WRITEWITH example (in info file), now work perfect. (found in the file support upgrade phase)
+3. Some minor fixes.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

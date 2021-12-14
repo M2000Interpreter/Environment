@@ -26815,7 +26815,7 @@ MODULE ARDUINO {module SerialRead {
 }
 SerialRead
 }
-MODULE GCC {Document Export$={
+MODULE GCC {Prototype {
 Module Global A {\\ empty the stack
 \\ clear values
 If not valid(mypath$) then Keyboard "All"+chr$(13) :exit
@@ -27061,7 +27061,6 @@ If add2(alfa(0), Max%) else {
       m=Timecount
       Print eval(alfa,Max%-1), m
 }
-
 Dim a(Max%)
 Profiler
 b=100+2
@@ -27073,7 +27072,6 @@ m1=TimeCount
 Print a(Max%-1), m1
 If m<2 then m=1
 Print format$("C is by far the fastest language {0}% from M2000", m1/m*100)
-
 Print Over $(6), "Test 20 Random Items"
 Print Under
 Equ$=string$("0",log(max%)+1)
@@ -27086,7 +27084,6 @@ If max%<100 then {
 for i=0 to max%-1: Append pack, i:=i: next i
             L=Lambda pack -> {
                   If len(pack)=0 then error "empty"
-
                   k=random(1, len(pack))-1
                   \\ return value (key as value, when no value exist) using k as index
                    =pack(k!)
@@ -27100,8 +27097,7 @@ for i=0 to max%-1: Append pack, i:=i: next i
                     next i
                     test
                     a$=key$
-                    }
-                 
+                    }                
             }
 } else {
 \\ use an empty pack, store used
@@ -27145,7 +27141,8 @@ halt
 Print "done"
 }
 ALL : End ' statement to execute when script loaded
-}
+} as Export$
+Document Export$
 Save.Doc Export$, "dlltst.gsb"
 If Exist("dlltst.gsb") then
 	If ask("File saved, press run to execute it","Use gcc to make and import a dll", "*Run", "Not Now")=1 then

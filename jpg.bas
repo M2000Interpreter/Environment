@@ -30,30 +30,30 @@ Public Function Decode64toMemBloc(ByVal a$, ok As Boolean, Optional forcode As B
     a$ = Decode64(a$, ok)
     If ok Then
         BLen = LenB(a$)
-        mem.construct 1, BLen, , forcode
+        mem.Construct 1, BLen, , forcode
         CopyBytes BLen, mem.GetPtr(0), StrPtr(a$)
         Set Decode64toMemBloc = mem
     End If
     
 End Function
-Public Function File2newMemblock(Filename As String, r, p) As Object
+Public Function File2newMemblock(Filename As String, R, p) As Object
     Dim mem As New MemBlock, BLen As Long, i As Long
-    r = -1#
+    R = -1#
     Filename = CFname(Filename)
     If Filename <> "" Then
      
      
     BLen = FileLen(GetDosPath(Filename))
     If BLen Then
-    mem.construct 1, BLen, , CBool(p)
+    mem.Construct 1, BLen, , CBool(p)
     i = FreeFile
     On Error Resume Next
 
     Open GetDosPath(Filename) For Binary Access Read As i
 
     If Err.Number > 0 Then MyEr Err.Description, Err.Description: Close i: Exit Function
-    If mem.GetData(i, mem.GetPtr(0), BLen) Then
-    r = 0#
+    If mem.GetData1(i, mem.GetPtr(0), BLen) Then
+    R = 0#
     Set File2newMemblock = mem
     If Not mem.IsWmf Then
     If Not mem.IsEmf Then
@@ -75,15 +75,15 @@ Public Function File2newMemblock(Filename As String, r, p) As Object
     End If
 End Function
 
-Public Function SaveStr2MemBlock(a, r) As Object
+Public Function SaveStr2MemBlock(a, R) As Object
 Dim aa As New cDIBSection
-r = -1#
+R = -1#
 If cDib(a, aa) Then
     aa.GetDpi 96, 96
     If Not aa.SaveDibToMeMBlock(SaveStr2MemBlock) Then
     MyEr "Can't save to buffer", "Δεν μπορώ να σώσω στη διάρθρωση"
     Else
-    r = 0#
+    R = 0#
     End If
 End If
 End Function

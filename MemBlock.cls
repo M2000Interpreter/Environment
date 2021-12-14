@@ -67,7 +67,7 @@ Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nSize As Long, lpD
 Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
  Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
@@ -85,7 +85,7 @@ Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As L
 
 
 Const CF_ENHMETAFILE = 14
-Sub construct(ByteLen As Long, Optional Times As Long = 1, Optional clearme As Long = 0, Optional executable As Boolean = False, Optional thatbasicitem As Integer)
+Sub Construct(ByteLen As Long, Optional Times As Long = 1, Optional clearme As Long = 0, Optional executable As Boolean = False, Optional thatbasicitem As Integer)
 
 If mItems <> 0 Then ErrorMes = 1: Exit Sub
 If Times < 1 Then ErrorMes = 2: Exit Sub
@@ -317,13 +317,13 @@ Else
 End If
 
 End Function
-Public Function GetData(f As Long, addr, lengthInBytes As Long) As Boolean
+Public Function GetData1(f As Long, addr, lengthInBytes As Long) As Boolean
 Dim Offset, place
 Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mItems > 0 Then
     If Offset < 0 Or Offset + lengthInBytes - 1 >= mItems * ItemLen Then
         ErrorMes = 4
-        GetData = False
+        GetData1 = False
     Else
     On Error GoTo there
     Dim a1 As SAFEARRAY1D, a() As Byte
@@ -339,7 +339,7 @@ If ErrorMes = 0 And mItems > 0 Then
         place = 1
         Get #f, , a()
         CopyMemory ByVal VarPtrArray(a), 0&, 4
-        GetData = True
+        GetData1 = True
   End If
     
 Else
@@ -347,6 +347,34 @@ there:
         If place = 1 Then
                 CopyMemory ByVal VarPtrArray(a), 0&, 4
         End If
+        GetData1 = False
+End If
+        
+End Function
+Public Function GetData(f As Long, ByVal addr, lengthInBytes As Long) As Boolean
+Dim Offset, place, range
+range = uintnew(addr) - uintnew1(GetPtr(0))
+If range < 0 Or range >= mItems * ItemLen Then
+        ErrorMes = 4
+        GetData = False
+        Exit Function
+End If
+Offset = uintnew(addr) - uintnew(mPtr)
+If ErrorMes = 0 And mItems > 0 Then
+    If Offset < 0 Or Offset + lengthInBytes - 1 >= (mItems * ItemLen - range) Then
+        ErrorMes = 4
+        GetData = False
+    Else
+        On Error GoTo there
+        Dim FH As Long
+        FH = Module10.ReadFileHandler(CLng(f))
+        If FH = 0 Then Exit Function
+        Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(addr)
+        GetData = True
+        Exit Function
+  End If
+Else
+there:
         GetData = False
 End If
         
@@ -386,7 +414,13 @@ End Function
 
 
 Public Function putData(f As Long, addr, lengthInBytes As Long) As Boolean
-Dim Offset, place
+Dim Offset, place, range
+range = uintnew(addr) - uintnew1(GetPtr(0))
+If range < 0 Or range >= mItems * ItemLen Then
+        ErrorMes = 4
+        putData = False
+        Exit Function
+End If
 Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mItems > 0 Then
     If Offset < 0 Or Offset + lengthInBytes - 1 >= mItems * ItemLen Then
@@ -403,11 +437,12 @@ If ErrorMes = 0 And mItems > 0 Then
         .pvData = addr
     End With
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-
         place = 1
         On Error Resume Next
-        Put #f, , a()
-        If Err.Number > 0 Then Close f: Exit Function
+        Dim FH As Long
+        FH = Module10.ReadFileHandler(CLng(f))
+        Module10.FileWriteBytes FH, a()
+        If Err.Number > 0 Then Exit Function
         CopyMemory ByVal VarPtrArray(a), 0&, 4
         putData = True
   End If
@@ -624,7 +659,7 @@ Dim a1 As SAFEARRAY1D, a() As Byte, Token As Long
     
     CopyMemory ByVal VarPtrArray(a), 0&, 4
 End Sub
-Function Copy(Optional r As Long = 0, Optional p As Long = 0) As Object
+Function Copy(Optional R As Long = 0, Optional p As Long = 0) As Object
 Dim aCopy As New MemBlock, BLen As Long, hMem As Long
 If mItems > 0 Then
     If mExecBloc Then
@@ -633,26 +668,26 @@ If mItems > 0 Then
         BLen = mBytes
     End If
     mItems = BLen \ ItemLen
-    If r <> 0 Then
-        If r >= 0 And r < mItems Then
+    If R <> 0 Then
+        If R >= 0 And R < mItems Then
             If p >= 1 Then
-                aCopy.construct ItemLen, CLng(p), , r = 0 And Not mExecBloc
+                aCopy.Construct ItemLen, CLng(p), , R = 0 And Not mExecBloc
                 If mItems > p Then
                     p = mItems
                 End If
-                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), ItemLen * p
+                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(R), ItemLen * p
             Else
            
-                aCopy.construct ItemLen, 1&, , Not mExecBloc
+                aCopy.Construct ItemLen, 1&, , Not mExecBloc
                 
-                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), ItemLen
+                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(R), ItemLen
             End If
         Else
-            aCopy.construct ItemLen, 1&, , Not mExecBloc
-            CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), ItemLen
+            aCopy.Construct ItemLen, 1&, , Not mExecBloc
+            CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(R), ItemLen
         End If
     Else
-    aCopy.construct ItemLen, mItems, , Not mExecBloc
+    aCopy.Construct ItemLen, mItems, , Not mExecBloc
     hMem = GlobalLock(aCopy.GetPtr(0))
     
     CopyMemory ByVal hMem, ByVal mPtr, BLen

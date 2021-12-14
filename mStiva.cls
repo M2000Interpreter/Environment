@@ -16,7 +16,7 @@ Private mstack As New Collection
 Private mMany As Long
 Dim BeginFrom As Long
 ' interface for iteration
-Public Index As Long
+Public index As Long
 ' new idea to not include a VarItem
 ' we place three items, the slot, the type (or subtype), the data.
 ' so each item is a multiple of three
@@ -230,10 +230,13 @@ End Property
 
 Public Property Get StackItemType(where As Long) As String
 Dim aa As VarItem
-On Error Resume Next
+On Error GoTo mess
 
 Set aa = mstack.item(where)
 StackItemType = aa.Typename
+Exit Property
+mess:
+MyEr "offset out of limits", "Δείκτης εκτός ορίων"
 End Property
 Public Property Get StackItemTypeObjectType(where As Long) As String
 Dim aa As VarItem, bb As Object, mh As mHandler
@@ -854,8 +857,8 @@ Next i
 End Function
 Property Get Value() As Variant
 Dim aa As VarItem
-If Index >= 0 And Index < mMany Then
-    Set aa = mstack.item(Index + 1)
+If index >= 0 And index < mMany Then
+    Set aa = mstack.item(index + 1)
     If aa.slot = 1 Then
         Set Value = aa.mItem
     Else
@@ -865,8 +868,8 @@ End If
 End Property
 Function IsObj() As Boolean
 Dim aa As VarItem
-If Index >= 0 And Index < mMany Then
-    Set aa = mstack.item(Index + 1)
+If index >= 0 And index < mMany Then
+    Set aa = mstack.item(index + 1)
     If aa.slot = 1 Then
         IsObj = True
     End If
@@ -874,8 +877,8 @@ End If
 End Function
 Function IsEnum(p As Variant) As Boolean
 Dim aa As VarItem, usehandler As mHandler
-If Index >= 0 And Index < mMany Then
-    Set aa = mstack.item(Index + 1)
+If index >= 0 And index < mMany Then
+    Set aa = mstack.item(index + 1)
     If aa.slot = 1 Then
     If Typename(aa.mItem) = "mHandler" Then
         Set usehandler = aa.mItem

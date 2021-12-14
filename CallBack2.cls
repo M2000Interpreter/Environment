@@ -51,14 +51,14 @@ mName$ = myUcase(mName$)
 reghash.AddKey mName$, mType$
 End Sub
 Public Sub CallGlobal(modulename$, ParamArray a())
-If Status <> 0 Then Exit Sub
+If status <> 0 Then Exit Sub
 Dim ohere$
 ohere$ = here$
-Dim i As Long, mS As New mStiva, ar As mArray, j As Long
+Dim i As Long, ms As New mStiva, ar As mArray, j As Long
 Dim manydim As Long, maxitems As Long, probe As Long, v() As Variant, probelow As Long
 Dim oldsoros As mStiva
 Set oldsoros = objref.soros
-Set objref.Sorosref = mS
+Set objref.Sorosref = ms
 For i = 0 To UBound(a())
 Select Case VarType(a(i))
 Case Is >= vbArray
@@ -84,22 +84,22 @@ Next j
 ar.PushEnd
 'ar.RevOrder = True
 ar.CopySerialize v()
-mS.DataObj ar
+ms.DataObj ar
 Set ar = Nothing
 Erase v()
 Else
-mS.DataValLong 0
+ms.DataValLong 0
 End If
 Case vbEmpty
-mS.DataValLong 0
+ms.DataValLong 0
 Case vbVariant, vbString
-mS.DataStr CStr(a(i))
+ms.DataStr CStr(a(i))
 Case Else
-mS.DataVal CDbl(a(i))
+ms.DataVal CDbl(a(i))
 End Select
 Next i
 PushStage objref, 0
-Set mS = Nothing
+Set ms = Nothing
 here$ = vbNullString
 If subHash.ExistKey(myUcase(modulename$, True)) Then
     probe = interpret(objref, modulename$)
@@ -156,7 +156,7 @@ End If
 End Function
 Public Sub CallModule(modulename$, ParamArray a())
 Static once As Boolean, where As Long, what, full$
-If Status <> 0 Then Exit Sub
+If status <> 0 Then Exit Sub
 If Not GetSubFullName2(myUcase(modulename$, True), full$, where) Then
     what = False
     
@@ -189,7 +189,7 @@ ohere$ = here$
 here$ = full$
 
 
-Dim i As Long, mS As New mStiva, ar As mArray, j As Long
+Dim i As Long, ms As New mStiva, ar As mArray, j As Long
 Dim manydim As Long, maxitems As Long, probe As Long, v() As Variant, probelow As Long
 Dim IhaveSignature As Boolean, sign$, sign2$, dummy$, look As Long
 If reghash.Find(myUcase(modulename$, True)) Then
@@ -200,7 +200,7 @@ End If
 ' no byrefernece yet
 Dim oldsoros As mStiva
 Set oldsoros = objref.soros
-Set objref.Sorosref = mS
+Set objref.Sorosref = ms
 
 
 For i = 0 To UBound(a())
@@ -237,33 +237,33 @@ look = IsLabelOnly(sign$, dummy$)
 look = globalvarGroup("b" + CStr(var2used) + "." + dummy$, True) ' perhaps this is a fault, why is true??
 ElseIf look > 4 Then
 FastSymbol sign, ")", True
-mS.DataObj ar
+ms.DataObj ar
 Else
 SyntaxError
 GoTo there
 End If
 Else
-mS.DataObj ar
+ms.DataObj ar
 End If
 Set ar = Nothing
 Erase v()
 Else
-mS.DataValLong 0
+ms.DataValLong 0
 End If
 
 
 Case vbEmpty
-mS.DataValLong 0
+ms.DataValLong 0
 Case vbVariant, vbString
-mS.DataStr CStr(a(i))
+ms.DataStr CStr(a(i))
 Case Else
 
-mS.DataVal CDbl(a(i))
+ms.DataVal CDbl(a(i))
 
 End Select
 Next i
 PushStage objref, 0
-objref.soros.MergeTop mS
+objref.soros.MergeTop ms
 
 probe = FastCallModule(objref, where)
 
@@ -304,7 +304,7 @@ End Sub
 
 Public Sub ExecuteStatement(ByVal code$)
 Dim what$, Pos As Long, func As Boolean, param$, drop$
-If Status <> 0 Then Exit Sub
+If status <> 0 Then Exit Sub
 If IsLabelOnly(code$, what$) > 4 Then
     func = True
 ElseIf what$ = vbNullString Then
@@ -362,7 +362,7 @@ Call Run(code$, False)
 End Sub
 Public Function Run(ByVal code$, Optional clean As Boolean = True) As Boolean
 Dim ohere$, stay As Variant
-If Status <> 0 Then Exit Function
+If status <> 0 Then Exit Function
 If elevatestatus2 Then Exit Function
 elevatestatus2 = 1
 If clean Then PushStage objref, 0
@@ -446,11 +446,11 @@ End Property
 Property Get ErrorEn() As String
 ErrorEn = LastErName
 End Property
-Property Get Status() As Long
+Property Get status() As Long
 If elevatestatus2 Then
-Status = -elevatestatus2
+status = -elevatestatus2
 Else
-Status = LastErNum
+status = LastErNum
 End If
 End Property
 Public Sub Reset()
@@ -493,3 +493,17 @@ Set objref.Owner = Nothing
 Set objref.Sorosref = Nothing
 Set objref = Nothing
 End Sub
+' This is a way to create a fhandler outside M2000 and pass it to
+' M2000 system, creating a M2000 File Handler.
+' The M2000 File Handler now can be used from Print, Write, Input, Seek, Seek(), Get, Put, Close
+' The exclusive or not is upon creation of the original file handler
+' By Default we use open for Input (fway=1), so adjust it accordingly
+' The fstep say 1 (means one character, this can change to something else only for Field type,fway=4)
+' The unic=1 means we use UTF16LE (One Word width, 2 bytes)
+' Use unic=0 for ANSI (is bound to Locale number)
+
+Public Function FileHandler(Fhandler, Optional fway = 1, Optional Fstep = 1, Optional uinc = 1) As Variant
+FileHandler = BigFileHandler(CLng(Fhandler), CLng(fway), CLng(Fstep), CLng(uinc))
+End Function
+
+
