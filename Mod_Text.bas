@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 47
+Global Const Revision = 48
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -23792,6 +23792,7 @@ Function neoGetArray(bstack As basetask, ByVal nm$, ga As mArray, Optional searc
 Dim k As Long, myobject As Object
 Dim n$, hidden As Boolean
 nm$ = myUcase(nm$)
+If Len(nm$) = 0 Then SyntaxError: Exit Function
 If useglobalname Or here$ = vbNullString Then
 n$ = bstack.GroupName + nm$
 ElseIf Left$(nm$, 5) = "ΑΥΤΟ." Or Left$(nm$, 5) = "THIS." Then
@@ -23957,6 +23958,7 @@ Else
             Else
             n$ = Mid$(n$, 1, Len(n$) - 1)
             End If
+
 ' check group or handler
 
         If varhash.Find3(n$, k, feedback) Then
@@ -40117,74 +40119,68 @@ Function MyReport(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim p As Variant, prive As Long, x As Double, y As Double, y1 As Long, x1 As Long, it As Long
 Dim s$, i As Long, pa$, sX As Double
 MyReport = False
-
 prive = GetCode(bstack.Owner)
 If FastSymbol(rest$, "!") Then
-If IsExp(bstack, rest$, p, , True) Then
-ReportTabWidth = Abs(p)
-players(prive).ReportTab = ReportTabWidth
-MyReport = True
-End If
-Exit Function
+    If IsExp(bstack, rest$, p, , True) Then
+        ReportTabWidth = Abs(p)
+        players(prive).ReportTab = ReportTabWidth
+        MyReport = True
+    End If
+    Exit Function
 End If
 If IsExp(bstack, rest$, p) Then
-If Not FastSymbol(rest$, ",") Then MissPar:: Exit Function
+    If Not FastSymbol(rest$, ",") Then MissPar:: Exit Function
 Else
-p = 0
+    p = 0
 End If
 If IsStrExp(bstack, rest$, s$) Then
- x = bstack.Owner.Width
-If FastSymbol(rest$, ",") Then
-If Not IsExp(bstack, rest$, x) Then: Exit Function
-With players(prive)
-If x <= .mx Then
-x = x * .Xt - 2 * dv15
-bstack.Owner.currentX = bstack.Owner.currentX + dv15
-End If
-End With
-End If
-
-If FastSymbol(rest$, ",") Then
-If Not IsExp(bstack, rest$, y) Then: Exit Function
-y1 = y - 1
-If IsLabelSymbolNew(rest$, "ΓΡΑΜΜΗ", "LINE", Lang) Then
-        If Not IsExp(bstack, rest$, sX) Then: Exit Function
-        x1 = sX - 1
-If IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
-          wwPlain bstack, players(prive), s$, CLng(x), y1, , , CLng(p), x1, , , True
-  bstack.tmpstr = "@READ " + Left$(rest$, 1)
-  BackPort rest$
-  If Not executeblock(i, bstack, rest$, True, False, , True) Then
-' error ??
-  End If
-  Else
-        wwPlain bstack, players(prive), s$, CLng(x), y1, , , CLng(p), x1
-      End If
+    x = bstack.Owner.Width
+    If lookOne(rest$, ";") Then SyntaxError: Exit Function
+    If FastSymbol(rest$, ",") Then
+        If Not IsExp(bstack, rest$, x) Then: Exit Function
+        With players(prive)
+            If x <= .mx Then
+                x = x * .Xt - 2 * dv15
+                bstack.Owner.currentX = bstack.Owner.currentX + dv15
+            End If
+        End With
+    End If
+    If FastSymbol(rest$, ",") Then
+        If Not IsExp(bstack, rest$, y) Then: Exit Function
+        y1 = y - 1
+        If IsLabelSymbolNew(rest$, "ΓΡΑΜΜΗ", "LINE", Lang) Then
+            If Not IsExp(bstack, rest$, sX) Then Exit Function
+            x1 = sX - 1
+            If IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
+                wwPlain bstack, players(prive), s$, CLng(x), y1, , , CLng(p), x1, , , True
+                bstack.tmpstr = "@READ " + Left$(rest$, 1)
+                BackPort rest$
+                If Not executeblock(i, bstack, rest$, True, False, , True) Then
+                ' error ??
+                End If
+            Else
+                wwPlain bstack, players(prive), s$, CLng(x), y1, , , CLng(p), x1
+            End If
+        Else
+            If IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
+                wwPlain bstack, players(prive), s$, CLng(x), y1, , , CLng(p), , it, , True
+                bstack.tmpstr = "@READ " + Left$(rest$, 1)
+                BackPort rest$
+                If Not executeblock(i, bstack, rest$, True, False, , True) Then
+                ' error ?
+                End If
+            Else
+                wwPlain bstack, players(prive), s$, CLng(x), y1, , , CLng(p), , it
+            End If
+        End If
+        players(prive).LastReportLines = CDbl(it)
+    Else
+        wwPlain bstack, players(prive), s$, CLng(x), 100000, True, , CLng(p), , it
+        players(prive).LastReportLines = -1
+    End If
+    MyReport = True
 Else
-If IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
-  wwPlain bstack, players(prive), s$, CLng(x), y1, , , CLng(p), , it, , True
-  bstack.tmpstr = "@READ " + Left$(rest$, 1)
-  BackPort rest$
-  If Not executeblock(i, bstack, rest$, True, False, , True) Then
- ' error ?
-  End If
-  
-Else
-  wwPlain bstack, players(prive), s$, CLng(x), y1, , , CLng(p), , it
-  End If
- End If
-players(prive).LastReportLines = CDbl(it)
-  
-Else
-
- wwPlain bstack, players(prive), s$, CLng(x), 100000, True, , CLng(p), , it
-   players(prive).LastReportLines = -1
-End If
-
-MyReport = True
-Else
-If LastErNum <> 0 Then LastErNum = 0:: Exit Function      'ifier=true
-
+    If LastErNum <> 0 Then LastErNum = 0: Exit Function      'ifier=true
 End If
 
 End Function
@@ -45190,6 +45186,7 @@ usethisbase = ArrBase
             rest$ = Mid$(rest$, 129 - Len(rest1$))
         End If
     End If
+    If it = 0 Then MissArrayName: Exit Function
     If basestack.priveflag Then
     w$ = ChrW(&HFFBF) + w$
     End If
@@ -45221,7 +45218,7 @@ ArrBase = usethisbase
             rest$ = Mid$(rest$, 129 - Len(rest1$))
         End If
     End If
-
+    If it = 0 Then MissArrayName: Exit Function
     If basestack.priveflag Then
     w$ = ChrW(&HFFBF) + w$
     ElseIf Len(basestack.UseGroupname) > 0 Then
@@ -45241,7 +45238,7 @@ ArrBase = usethisbase
     ''*********************
     If neoGetArray(basestack, w$, pppp, True) And Not par Then
     If Not pppp.Arr Then
-    MyEr "Name conflict with Inventory object", "Υπάρχει τέτοιο όνομα σε χρήση σε Κατάσταση"
+    conflictname
     
     Set pppp = Nothing: GoTo ex1
     End If
@@ -45363,7 +45360,7 @@ ArrBase = usethisbase
                                         Set pppp.item(i) = basestack.lastobj
                                                     Else
                                                         Set basestack.lastobj = Nothing
-                                                        MyEr "object not supported", "Το αντικείμενο δεν υποστηρίζεται"
+                                                        badsupport
                                                         MyDim = False
                                                         GoTo ex1
                                                         Exit For
@@ -45500,7 +45497,7 @@ ArrBase = usethisbase
                                     pppp.item(i) = ss$
                             Else
                                                      Set basestack.lastobj = Nothing
-                                                        MyEr "object not supported", "Το αντικείμενο δεν υποστηρίζεται"
+                                                        badsupport
                                                         MyDim = False
                                                         GoTo ex1
                                                         Exit For
@@ -45524,7 +45521,7 @@ ArrBase = usethisbase
      End If
     End Select
     If it = 0 Then
-      MyEr "Array dimensions missing ", "Ο πίνακας δεν έχει διαστάσεις "
+      BadDim
 
     rest$ = basestack.GroupName & w$ & rest$
     MyDim = False
@@ -55918,7 +55915,7 @@ Dim p As Variant, x As Variant, i As Long, f As Long, s$, ss$
                                         Set pppp.item(i) = basestack.lastobj
                                                     Else
                                                         Set basestack.lastobj = Nothing
-                                                        MyEr "object not supported", "Το αντικείμενο δεν υποστηρίζεται"
+                                                        badsupport
                                                         GoTo ex1
                                                         Exit For
                                                      End If
@@ -56007,25 +56004,24 @@ Dim p As Variant, x As Variant, i As Long, f As Long, s$, ss$
                         For i = 0 To pppp.UpperMonoLimit
                         If IsStrExp(basestack, (s$), ss$) Then
                             If Typename(basestack.lastobj) = mgroup Then
-                                    Set pppp.GroupRef = Nothing
-                                    pppp.IHaveClass = False
-                                    Set pppp.item(i) = basestack.lastobj
+                                Set pppp.GroupRef = Nothing
+                                pppp.IHaveClass = False
+                                Set pppp.item(i) = basestack.lastobj
                             ElseIf Typename(basestack.lastobj) = "lambda" Then
-                                    Set pppp.item(i) = basestack.lastobj
+                                Set pppp.item(i) = basestack.lastobj
                             ElseIf Typename(basestack.lastobj) = mHdlr Then
-                                        Set pppp.item(i) = basestack.lastobj
-                                        ElseIf Typename(basestack.lastobj) = "mStiva" Then
-                                        Set pppp.item(i) = basestack.lastobj
-                                        ElseIf Typename(basestack.lastobj) = myArray Then
-                                        Set pppp.item(i) = basestack.lastobj
-                                    
+                                Set pppp.item(i) = basestack.lastobj
+                            ElseIf Typename(basestack.lastobj) = "mStiva" Then
+                                Set pppp.item(i) = basestack.lastobj
+                            ElseIf Typename(basestack.lastobj) = myArray Then
+                                Set pppp.item(i) = basestack.lastobj
                             ElseIf basestack.lastobj Is Nothing Then
-                                    pppp.item(i) = ss$
+                                pppp.item(i) = ss$
                             Else
-                                                     Set basestack.lastobj = Nothing
-                                                        MyEr "object not supported", "Το αντικείμενο δεν υποστηρίζεται"
-                                                        GoTo ex1
-                                                        Exit For
+                                Set basestack.lastobj = Nothing
+                                badsupport
+                                GoTo ex1
+                                Exit For
                             End If
                         Else
                             Set basestack.lastobj = Nothing
@@ -56044,7 +56040,7 @@ Dim p As Variant, x As Variant, i As Long, f As Long, s$, ss$
     End If
     End Select
     If o = 0 Then
-      MyEr "Array dimensions missing ", "Ο πίνακας δεν έχει διαστάσεις "
+      BadDim
     rest$ = basestack.GroupName & frm$ & rest$
     End If
 ex1:

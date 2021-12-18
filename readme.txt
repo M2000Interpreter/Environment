@@ -1,11 +1,12 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 47 active-X
-1. UPGRADE the file functions/statements, to handle over 2GB files:
-OPEN, CLOSE, LINE INPUT, INPUT, PRINT, WRITE, SEEK, PUT, GET
-SEEK(), RECORDS(), EOF()  Now the file pointer is Currency.
-2. Correction for WRITEWITH example (in info file), now work perfect. (found in the file support upgrade phase)
-3. Some minor fixes.
+Version 10 revision 48 active-X
+Two additions in Interpreter, for errors and one fix in savr file dialog form.
+1. Remove check for read only folder in Save.As statement (which prevents the new filename entry).
+2. Add check for the known "Dim 12, 1" error (was fatal error, but now return error message)
+3. Add check for a ";" after a string expression in Report statement (shows Syntax Error)
+
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

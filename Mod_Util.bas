@@ -7133,7 +7133,15 @@ End Sub
 Public Sub MissType()
 MyEr "Wrong data type", "Άλλος τύπος μεταβλητής"
 End Sub
-
+Public Sub badsupport()
+MyEr "object not supported", "Το αντικείμενο δεν υποστηρίζεται"
+End Sub
+Public Sub conflictname()
+MyEr "Name conflict with Inventory object", "Υπάρχει τέτοιο όνομα σε χρήση σε Κατάσταση"
+End Sub
+Public Sub MissArrayName()
+MyEr "Missing array name", "Λείπει όνομα πίνακα"
+End Sub
 Public Sub BadPath()
 MyEr "Bad Path name", "Λάθος στο όνομα φακέλου (τόπο)"
 End Sub
@@ -7340,6 +7348,15 @@ MyEr "missing group type expression", "λείπει έκφραση τύπου ομάδας"
 End Sub
 Public Sub BadGroupHandle()  ' this is for identifier or execute part
 MyEr "group isn't variable", "η ομάδα δεν είναι μεταβλητή"
+End Sub
+Public Sub BadEvents()
+MyEr "Can't handle events here", "Δεν μπορώ να χειριστώ γεγονότα"
+End Sub
+Public Sub BadDim()
+MyEr "Array dimensions missing", "Ο πίνακας δεν έχει διαστάσεις"
+End Sub
+Public Sub ArrayNameExist()
+MyEr "Array exist", "Υπάρχει ήδη αυτός ο πίνακας"
 End Sub
 Public Sub MissingDocRef()  ' this is for identifier or execute part
 MyEr "invalid document pointer", "μη έγκυρος δείκτης εγγράφου"
@@ -18216,9 +18233,8 @@ Dim pppp As mArray
 Dim ii As Long, ev As ComShinkEvent
 MyDeclare = True
 ML = -1
-    If Not groupok Then y1 = IsLabelSymbolNewExp(rest$, "ΓΕΝΙΚΟ", "GLOBAL", Lang, ss$)
+If Not groupok Then y1 = IsLabelSymbolNewExp(rest$, "ΓΕΝΙΚΟ", "GLOBAL", Lang, ss$)
 If Not y1 Then
-
     If Not groupok Then y1 = IsLabelSymbolNewExp(rest$, "ΤΟΠΙΚΟ", "LOCAL", Lang, ss$)
     If y1 Then y1 = y1 * -100: ss$ = vbNullString
 End If
@@ -18226,149 +18242,134 @@ If Not groupok Then Y3 = IsLabelSymbolNewExp(rest$, "ΜΕΓΕΓΟΝΟΤΑ", "WITHEVENTS", 
 ss$ = vbNullString
 x1 = Abs(innerIsLabel(bstack, rest$, what$, , True, True))
 If Not groupok Then
-w$ = myUcase(what$, True)
+    w$ = myUcase(what$, True)
 Else
-w$ = bstack.GroupName + myUcase(what$, True)
+    w$ = bstack.GroupName + myUcase(what$, True)
 End If
 gohere:
-    If x1 = 1 Or x1 = 3 Then
-        If x1 = 1 Then
-            If GetVar(bstack, w$, i) And y1 = 0 Then
-            
+If x1 = 1 Or x1 = 3 Then
+    If x1 = 1 Then
+        If GetVar(bstack, w$, i) And y1 = 0 Then
             If Y3 Then
-            If TypeOf var(i) Is GuiM2000 Then
-                    MyEr "Can't define com events here", "Δεν μπορώ να χειριστώ γεγονότα COM εδώ"
-                            MyDeclare = False
-            Exit Function
-            End If
-                        If GetShink(ev, i, w$) Then
-                            If Not GetVar(bstack, ChrW(&HFFBF) + "_" + w$, ii) Then
-                            
-                            ii = globalvarGroup(ChrW(&HFFBF) + "_" + w$, s$, , y1 = True)
-                            End If
-                            
-                            
-                            Set var(ii) = ev
-                                        
-                            Else
-                            MyEr "Can't handle events here", "Δεν μπορώ να χειριστώ γεγονότα"
-                            MyDeclare = False
-                         End If
-                        Exit Function
+                If TypeOf var(i) Is GuiM2000 Then
+                    BadEvents
+                    MyDeclare = False
+                    Exit Function
+                End If
+                If GetShink(ev, i, w$) Then
+                    If Not GetVar(bstack, ChrW(&HFFBF) + "_" + w$, ii) Then
+                        ii = globalvarGroup(ChrW(&HFFBF) + "_" + w$, s$, , y1 = True)
+                    End If
+                    Set var(ii) = ev
+                Else
+                    BadEvents
+                    MyDeclare = False
+                End If
+                Exit Function
             End If
             ss$ = vbNullString
-
-               If IsLabelSymbolNewExp(rest$, "ΤΙΠΟΤΑ", "NOTHING", Lang, ss$) Then
-                   If ML >= 0 Then
+            If IsLabelSymbolNewExp(rest$, "ΤΙΠΟΤΑ", "NOTHING", Lang, ss$) Then
+                If ML >= 0 Then
 goNothing:
-              If neoGetArray(bstack, w$, pppp) Then
-              ' no check for real array Why ?
-              
-              For i = 0 To pppp.UpperMonoLimit
-                If MyIsObject(pppp.item(i)) Then
-                    If Typename$(pppp.item(i)) = "GuiM2000" Then
-                    Set declobj = pppp.item(i)
-                    Unload declobj
+                    If neoGetArray(bstack, w$, pppp) Then
+                        ' no check for real array Why ?
+                        For i = 0 To pppp.UpperMonoLimit
+                            If MyIsObject(pppp.item(i)) Then
+                                If Typename$(pppp.item(i)) = "GuiM2000" Then
+                                    Set declobj = pppp.item(i)
+                                    Unload declobj
+                                End If
+                                Set pppp.item(i) = Nothing  ' special use
+                            Else
+                                pppp.item(i) = Empty
+                            End If
+                        Next i
+                    Else
+                        MyDeclare = False
+                        Exit Function
                     End If
-                 Set pppp.item(i) = Nothing  ' special use
-                Else
-                pppp.item(i) = Empty
-                End If
-              Next i
-              Else
-              MyDeclare = False
-                Exit Function
-              End If
-                   
-                   ElseIf Not MyIsObject(var(i)) Then
-                        If groupok Then
+                ElseIf Not MyIsObject(var(i)) Then
+                    If groupok Then
                         Set var(i) = Nothing
-                        
-                        Else
-                        
+                    Else
                         BadObjectDecl
                         MyDeclare = False
-                        End If
-                   Else
-                   If var(i) Is Nothing Then Exit Function
-                      If TypeOf var(i) Is GuiM2000 Then
-                      var(i).CloseNow
-                      Unload var(i)
-                      Else
-                      If GetVar(bstack, ChrW(&HFFBF) + "_" + w$, ii) Then
-                        Set var(ii) = Nothing
-                      End If
-                      End If
-                       Set var(i) = Nothing
-                   End If
-                   Exit Function
-               
-               ElseIf IsLabelSymbolNewExp(rest$, "ΝΕΟ", "NEW", Lang, ss$) Then
-               Set var(i) = Nothing
-               GoTo THEREnew
-               ElseIf IsLabelSymbolNewExp(rest$, "ΝΕΑ", "NEW", Lang, ss$) Then
-               Set var(i) = Nothing
-               GoTo THEREnew
-               Else
-                  BadObjectDecl
-                    MyDeclare = False
-                  Exit Function
-               End If
-                     
-            End If
-   
-         End If
-         ss$ = vbNullString
-         If IsLabelSymbolNewExp(rest$, "ΒΑΣΗ", "BASE", Lang, ss$) Then
-            If Not IsStrExp(bstack, rest$, pa$) Then
-                BadObjectDecl
-                MyDeclare = False
-                Exit Function
-            End If
-            If GetVar(bstack, w$, i) Then
-                BadObjectDecl
-                MyDeclare = False
-                Exit Function
-             End If
-            If Not getone2(pa$, p) Then
-                Set p = New Mk2Base
-                PushOne pa$, p
-            End If
-            globalvar bstack.GroupName & w$, p, y1 = True
-            MyDeclare = True
-            Exit Function
-         ElseIf IsLabelSymbolNewExp(rest$, "ΑΠΟ", "LIB", Lang, ss$) Then
-            If y1 = 100 Then y1 = 0
-                par = Fast2Label(rest$, "C", 1, "", 0, 1)
-                If IsStrExp(bstack, rest$, pa$) Then
-                    If Not IsStrExp(bstack, rest$, ss$) Then ss$ = vbNullString
-                    Do
-                        If FastSymbol(ss$, vbCrLf, , 2) Then
-                            s$ = vbNullString
-                        Else
-                            s$ = GetNextLine(ss$)
-                            If Not MaybeIsSymbol(s$, "'\/") Then Exit Do
-                        End If
-                    Loop
-                    ss$ = s$ + CleanStr(ss$, vbCrLf)
-                s$ = vbNullString
-                i = AllocVar()
-                Set declobj = New stdCallFunction
-                If IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
-                If Not IsExp(bstack, rest$, p) Then
-                BadObjectDecl
-                MyDeclare = False
-                Set declobj = Nothing
-                Exit Function
+                    End If
                 Else
-            declobj.RetType = CLng(p)
+                    If var(i) Is Nothing Then Exit Function
+                    If TypeOf var(i) Is GuiM2000 Then
+                        var(i).CloseNow
+                        Unload var(i)
+                    Else
+                        If GetVar(bstack, ChrW(&HFFBF) + "_" + w$, ii) Then
+                            Set var(ii) = Nothing
+                        End If
+                    End If
+                    Set var(i) = Nothing
                 End If
+                Exit Function
+            ElseIf IsLabelSymbolNewExp(rest$, "ΝΕΟ", "NEW", Lang, ss$) Then
+               Set var(i) = Nothing
+               GoTo THEREnew
+            ElseIf IsLabelSymbolNewExp(rest$, "ΝΕΑ", "NEW", Lang, ss$) Then
+               Set var(i) = Nothing
+               GoTo THEREnew
+            Else
+                BadObjectDecl
+                MyDeclare = False
+                Exit Function
+            End If
+        End If
+    End If
+    ss$ = vbNullString
+    If IsLabelSymbolNewExp(rest$, "ΒΑΣΗ", "BASE", Lang, ss$) Then
+        If Not IsStrExp(bstack, rest$, pa$) Then
+            BadObjectDecl
+            MyDeclare = False
+            Exit Function
+        End If
+        If GetVar(bstack, w$, i) Then
+            BadObjectDecl
+            MyDeclare = False
+            Exit Function
+        End If
+        If Not getone2(pa$, p) Then
+            Set p = New Mk2Base
+            PushOne pa$, p
+        End If
+        globalvar bstack.GroupName & w$, p, y1 = True
+        MyDeclare = True
+        Exit Function
+    ElseIf IsLabelSymbolNewExp(rest$, "ΑΠΟ", "LIB", Lang, ss$) Then
+        If y1 = 100 Then y1 = 0
+        par = Fast2Label(rest$, "C", 1, "", 0, 1)
+        If IsStrExp(bstack, rest$, pa$) Then
+            If Not IsStrExp(bstack, rest$, ss$) Then ss$ = vbNullString
+            Do
+                If FastSymbol(ss$, vbCrLf, , 2) Then
+                    s$ = vbNullString
+                Else
+                    s$ = GetNextLine(ss$)
+                    If Not MaybeIsSymbol(s$, "'\/") Then Exit Do
                 End If
-                declobj.CallThis pa$, ss$, Lang
-                If par Then declobj.CallType = 1
-            
+            Loop
+            ss$ = s$ + CleanStr(ss$, vbCrLf)
+            s$ = vbNullString
+            i = AllocVar()
+            Set declobj = New stdCallFunction
+            If IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
+                If Not IsExp(bstack, rest$, p) Then
+                    BadObjectDecl
+                    MyDeclare = False
+                    Set declobj = Nothing
+                    Exit Function
+                Else
+                    declobj.RetType = CLng(p)
+                End If
+            End If
+            declobj.CallThis pa$, ss$, Lang
+            If par Then declobj.CallType = 1
                 Set var(i) = declobj
-                
                 s$ = w$
                 If x1 = 3 Then
                     If here$ = vbNullString Or y1 Then
@@ -18383,248 +18384,210 @@ goNothing:
                         GlobalSub here$ & "." & bstack.GroupName & s$ + "()", "CALL EXTERN " & Str(i) & " : = NUMBER"
                     End If
                 End If
-               Set declobj = Nothing
+                Set declobj = Nothing
                 Exit Function
             Else
                 BadObjectDecl
-                 MyDeclare = False
-                 Set declobj = Nothing
+                MyDeclare = False
+                Set declobj = Nothing
                 Exit Function
             End If
         ElseIf IsLabelSymbolNewExp(rest$, "ΜΕ", "USE", Lang, ss$) Then
-                If Y3 <> 0 Then
+            If Y3 <> 0 Then
                 SyntaxError
                 Exit Function
-                End If
-
-
-                    x1 = Abs(IsLabel(bstack, rest$, pa$))
-                    IsSymbol3 rest$, ","
-                    If x1 = 1 Then
-                            If GetVar(bstack, pa$, x1) Then
-                                    If MyIsObject(var(x1)) Then
-                                                i = globalvar(w$, s$, , y1 = True)
-                                                If IsStrExp(bstack, rest$, ss$) Then
-                                                Set var(i) = MakeObjectFromString(var(x1), ss$)
-                                         
-                                                
-                                                
-                                                
-                                                End If
-                                    End If
-                            End If
-                    Else
-                    MissPar
-                    MyDeclare = False
+            End If
+            x1 = Abs(IsLabel(bstack, rest$, pa$))
+            IsSymbol3 rest$, ","
+            If x1 = 1 Then
+                If GetVar(bstack, pa$, x1) Then
+                    If MyIsObject(var(x1)) Then
+                        i = globalvar(w$, s$, , y1 = True)
+                        If IsStrExp(bstack, rest$, ss$) Then
+                        Set var(i) = MakeObjectFromString(var(x1), ss$)
                     End If
-                    Exit Function
-        End If
-        If ML >= 0 Then
-         If neoGetArray(bstack, w$, pppp, True) Then
-         MyEr "Array exist", "Υπάρχει ήδη αυτός ο πίνακας"
-                MyDeclare = False
-                Exit Function
-         Else
-         x1 = -1
-         GlobalArr bstack, w$ + "(", LTrim$(Str(ML)) + ")", i, x1, , , CBool(y1)
-          If DeclareGUI(bstack, what$, rest$, MyDeclare, Lang, (i), ML, w$, y1, Y3, x1) Then
-            If Y3 And y1 = 0 Then
-            ii = -1
-            GlobalArr bstack, ChrW(&HFFBF) + "_" + w$ + "(", LTrim$(Str(ML)) + ")", i, ii, , , CBool(y1)
-              If Not GetShinkArr(x1, ii, w$, 0, i) Then
-              MyEr "Events for this type of object", "Δεν υπάρχουν γεγονότα για αυτό το αντικείμενο"
-              MyDeclare = False
-              Else
-                    var(x1).comevents = True
                 End If
             End If
-
-        
-        
-        Exit Function
-        End If
-        End If
         Else
-        i = globalvar(w$, s$, , y1 = True)
+            MissPar
+            MyDeclare = False
         End If
+        Exit Function
+    End If
+    If ML >= 0 Then
+         If neoGetArray(bstack, w$, pppp, True) Then
+            ArrayNameExist
+            MyDeclare = False
+            Exit Function
+         Else
+            x1 = -1
+            GlobalArr bstack, w$ + "(", LTrim$(Str(ML)) + ")", i, x1, , , CBool(y1)
+            If DeclareGUI(bstack, what$, rest$, MyDeclare, Lang, (i), ML, w$, y1, Y3, x1) Then
+                If Y3 And y1 = 0 Then
+                    ii = -1
+                    GlobalArr bstack, ChrW(&HFFBF) + "_" + w$ + "(", LTrim$(Str(ML)) + ")", i, ii, , , CBool(y1)
+                    If Not GetShinkArr(x1, ii, w$, 0, i) Then
+                        BadEvents
+                        MyDeclare = False
+                    Else
+                        var(x1).comevents = True
+                    End If
+                End If
+                Exit Function
+            End If
+        End If
+    Else
+        i = globalvar(w$, s$, , y1 = True)
+    End If
 THEREnew:
 MyDeclare = False
-        Y4 = IsLabelSymbolNew(rest$, "ΠΑΡΕ", "GET", Lang)
-        If Y4 And MaybeIsSymbol(rest$, ",") Then
-            FastSymbol rest$, ","
+    Y4 = IsLabelSymbolNew(rest$, "ΠΑΡΕ", "GET", Lang)
+    If Y4 And MaybeIsSymbol(rest$, ",") Then
+        FastSymbol rest$, ","
+        If IsStrExp(bstack, rest$, pa$) Then
+            GetitObject var(i), , CVar(pa$)
+        End If
+        GoTo jump1
+    ElseIf IsStrExp(bstack, rest$, s$) Then
+        If FastSymbol(rest$, ",") Then
             If IsStrExp(bstack, rest$, pa$) Then
-                GetitObject var(i), , CVar(pa$)
-            End If
-            GoTo jump1
-        ElseIf IsStrExp(bstack, rest$, s$) Then
-            If FastSymbol(rest$, ",") Then
-                If IsStrExp(bstack, rest$, pa$) Then
-                    If Y4 Then
-                        On Error Resume Next
-                        GetitObject var(i), CVar(s$), CVar(pa$)
-                        If Err.Number > 0 Then Exit Function
-                    ElseIf FastSymbol(rest$, ",") Then
-                        If IsStrExp(bstack, rest$, w$) Then
-                            Err.Clear
-                            On Error Resume Next
-                            If w$ = vbNullString Then
-                                Licenses.Add s$
-                            Else
-                                Licenses.Add s$, w$
-                            End If
-                            If Err.Number > 0 And Err.Number <> 732 Then
-                                MissLicense
-                                Err.Clear
-                            Else
-                                Err.Clear
-                                CreateitObject var(i), s$, CVar(pa$)
-                                If Err.Number > 0 Then
-                                    Err.Clear
-                                    MissLicense
-                                End If
-                            End If
-                            Licenses.Remove s$
-                        Else
-                            MissStringExpr
-                        End If
-                    Else
+                If Y4 Then
+                    On Error Resume Next
+                    GetitObject var(i), CVar(s$), CVar(pa$)
+                    If Err.Number > 0 Then Exit Function
+                ElseIf FastSymbol(rest$, ",") Then
+                    If IsStrExp(bstack, rest$, w$) Then
                         Err.Clear
                         On Error Resume Next
-                        CreateitObject var(i), s$, CVar(pa$)
-
-                        If Err.Number > 0 Then
-                            Err.Clear
-                            MissLicense
+                        If w$ = vbNullString Then
+                            Licenses.Add s$
+                        Else
+                            Licenses.Add s$, w$
                         End If
+                        If Err.Number > 0 And Err.Number <> 732 Then
+                            MissLicense
+                            Err.Clear
+                        Else
+                            Err.Clear
+                            CreateitObject var(i), s$, CVar(pa$)
+                            If Err.Number > 0 Then
+                                Err.Clear
+                                MissLicense
+                            End If
+                        End If
+                        Licenses.Remove s$
+                    Else
+                        MissStringExpr
                     End If
-                    
-                    
                 Else
-                 If FastSymbol(rest$, ",") Then
-                 If IsStrExp(bstack, rest$, pa$) Then
                     Err.Clear
+                    On Error Resume Next
+                    CreateitObject var(i), s$, CVar(pa$)
+                    If Err.Number > 0 Then
+                        Err.Clear
+                        MissLicense
+                    End If
+                End If
+            Else
+                If FastSymbol(rest$, ",") Then
+                    If IsStrExp(bstack, rest$, pa$) Then
+                        Err.Clear
                         On Error Resume Next
                         If pa$ = vbNullString Then
-                        Licenses.Add s$
+                            Licenses.Add s$
                         Else
-                 Licenses.Add s$, pa$
-                 End If
-                     If Err.Number > 0 And Err.Number <> 732 Then
-                        MissLicense
-                        Err.Clear
+                            Licenses.Add s$, pa$
+                        End If
+                        If Err.Number > 0 And Err.Number <> 732 Then
+                            MissLicense
+                            Err.Clear
                         Else
-                        Err.Clear
-                 CreateitObject var(i), s$
-                 If Err.Number > 0 Then
-                        Err.Clear
-                        MissLicense
+                            Err.Clear
+                            CreateitObject var(i), s$
+                            If Err.Number > 0 Then
+                                Err.Clear
+                                MissLicense
+                            End If
                         End If
-                        End If
-                 Licenses.Remove s$
-                 Else
-                    MissStringExpr
-                 End If
+                        Licenses.Remove s$
+                    Else
+                        MissStringExpr
+                    End If
                 Else
                     MissStringExpr
                     End If
                 End If
             Else
-               Err.Clear
-                        On Error Resume Next
-                        If Y4 Then
-                            GetitObject var(i), CVar(s$)
-                        Else
-                            CreateitObject var(i), s$
-                        End If
+                Err.Clear
+                On Error Resume Next
+                If Y4 Then
+                    GetitObject var(i), CVar(s$)
+                Else
+                    CreateitObject var(i), s$
+                End If
 jump1:
-                 If Err.Number > 0 Then
-                        Err.Clear
-                        MissLicense
-                        ElseIf Y3 <> 0 Then
-                        
-                         
-                         If GetShink(ev, i, w$) Then
-                         ' private
-                         ' no need for a name, we do not address it in any way.
-                         ' ev knows how to call handler
-                            If Not GetVar(bstack, ChrW(&HFFBF) + "_" + w$, ii) Then
-                            
-                            ii = globalvarGroup(ChrW(&HFFBF) + "_" + w$, s$, , y1 = True)
-                            End If
-                            
-                            
-                            Set var(ii) = ev
-
-                         Else
-                         MyEr "Can't handle events here", "Δεν μπορώ να χειριστώ γεγονότα"
-                            MyDeclare = False
-            
-                         End If
-                         
-                        End If
+                If Err.Number > 0 Then
+                    Err.Clear
+                    MissLicense
+                ElseIf Y3 <> 0 Then
+                    If GetShink(ev, i, w$) Then
+                       ' private
+                       ' no need for a name, we do not address it in any way.
+                       ' ev knows how to call handler
+                       If Not GetVar(bstack, ChrW(&HFFBF) + "_" + w$, ii) Then
+                           ii = globalvarGroup(ChrW(&HFFBF) + "_" + w$, s$, , y1 = True)
+                       End If
+                       Set var(ii) = ev
+                    Else
+                       BadEvents
+                       MyDeclare = False
+                    End If
+                End If
             End If
         ElseIf DeclareGUI(bstack, what$, rest$, MyDeclare, Lang, i, , , , Y3) Then
-        If Y3 Then
+            If Y3 Then
                 If GetShink(ev, i, w$) Then
                     If Not GetVar(bstack, ChrW(&HFFBF) + "_" + w$, ii) Then
-                    
-                    ii = globalvarGroup(ChrW(&HFFBF) + "_" + w$, s$, , y1 = True)
+                        ii = globalvarGroup(ChrW(&HFFBF) + "_" + w$, s$, , y1 = True)
                     End If
                     Set var(ii) = ev
                 End If
-        
-        
-        
         End If
-         
-        End If
-           Err.Clear
-                        On Error Resume Next
-            
-        If Not MyIsObject(var(i)) Then
-        If groupok Then
-        
-        Set var(i) = Nothing
-        'OptVariant var(i)
-        Else
-        BadObjectDecl
-        End If
-        End If
-       
-    ElseIf x1 = 5 Then
-If FastSymbol(rest$, ")") Then
- 'w$ = Left$(w$, Len(w$) - 1)
-'w$ = w$ + ")"
- If IsLabelSymbolNewExp(rest$, "ΤΙΠΟΤΑ", "NOTHING", Lang, ss$) Then GoTo goNothing
- If IsLabelSymbolNewExp(rest$, "ΠΑΝΩ", "OVER", Lang, ss$) Then
-    ExpandGui bstack, what$, rest$, MyDeclare, Lang, w$
-
-Else
-
- 
- BadObjectDecl
- End If
-ElseIf IsExp(bstack, rest$, p) Then
-ML = CLng(p)
-If FastSymbol(rest$, ")") Then
-x1 = 1
- w$ = Left$(w$, Len(w$) - 1)
-   GoTo gohere
-Else
-BadObjectDecl
-End If
-Else
-BadObjectDecl
-End If
-    Else
-    
-    BadObjectDecl
-    
     End If
-     MyDeclare = True
-     Set declobj = Nothing
-    
-
+    Err.Clear
+    On Error Resume Next
+    If Not MyIsObject(var(i)) Then
+        If groupok Then
+            Set var(i) = Nothing
+        Else
+            BadObjectDecl
+        End If
+    End If
+ElseIf x1 = 5 Then
+    If FastSymbol(rest$, ")") Then
+        If IsLabelSymbolNewExp(rest$, "ΤΙΠΟΤΑ", "NOTHING", Lang, ss$) Then GoTo goNothing
+        If IsLabelSymbolNewExp(rest$, "ΠΑΝΩ", "OVER", Lang, ss$) Then
+            ExpandGui bstack, what$, rest$, MyDeclare, Lang, w$
+        Else
+            BadObjectDecl
+        End If
+    ElseIf IsExp(bstack, rest$, p) Then
+        ML = CLng(p)
+        If FastSymbol(rest$, ")") Then
+            x1 = 1
+            w$ = Left$(w$, Len(w$) - 1)
+            GoTo gohere
+        Else
+            BadObjectDecl
+        End If
+    Else
+        BadObjectDecl
+    End If
+Else
+    BadObjectDecl
+End If
+MyDeclare = True
+Set declobj = Nothing
 End Function
 
 Private Function GetShinkArr(v As Long, where As Long, objname$, from As Long, count As Long) As Boolean
@@ -26604,40 +26567,34 @@ conthere:
 aaa1:
  Loop Until Not FastSymbol(b$, ",")
 End Function
-
 Function MyDocument(basestack As basetask, rest$, Lang As Long, Optional alocal As Boolean) As Boolean
 Dim ss$, s$, what$, x1 As Long, i As Long, it As Long, pppp As mArray
 MyDocument = True
 ss$ = vbNullString
 Do
     x1 = Abs(IsLabel(basestack, rest$, what$))
-        If basestack.priveflag Then what$ = ChrW(&HFFBF) + what$
+    If basestack.priveflag Then what$ = ChrW(&HFFBF) + what$
     If x1 = 3 Or x1 = 6 Then
         If x1 = 3 Then
-        
-                
-                
             If Not FastSymbol(rest$, "<") Then  ' get local var first
-            If alocal Then
-            i = globalvar(basestack.GroupName & what$, s$)  ' MAKE ONE  '
-             GoTo makeitnow
-            ElseIf GetlocalVar(basestack.GroupName & what$, i) Then
-            GoTo there0
+                If alocal Then
+                    i = globalvar(basestack.GroupName & what$, s$)  ' MAKE ONE  '
+                    GoTo makeitnow
+                ElseIf GetlocalVar(basestack.GroupName & what$, i) Then
+                    GoTo there0
+                ElseIf GetVar(basestack, basestack.GroupName & what$, i) Then
+                    GoTo there0
+                Else
+                    i = globalvar(basestack.GroupName & what$, s$)  ' MAKE ONE  '
+                    GoTo makeitnow
+                End If
             ElseIf GetVar(basestack, basestack.GroupName & what$, i) Then
-            GoTo there0
-            Else
-            i = globalvar(basestack.GroupName & what$, s$)  ' MAKE ONE  '
-             GoTo makeitnow
-            End If
-            ElseIf GetVar(basestack, basestack.GroupName & what$, i) Then
-            
 there0:
                 s$ = var(i)
                 MakeitObject var(i)
                 CheckVar var(i), s$
                 GoTo there1
             Else
-        
                 i = globalvar(basestack.GroupName & what$, s$) ' MAKE ONE
                 If i <> 0 Then
 makeitnow:
@@ -26650,13 +26607,10 @@ there1:
                             MissStringExpr
                             MyDocument = False
                         End If
-                    Else
-                    ' DO NOTHING
                     End If
                 End If
             End If
         Else
-            ' ARRAYf
             If neoGetArray(basestack, what$, pppp, here$ <> "") Then   ' basestack.GroupName &
                 If Not NeoGetArrayItem(pppp, basestack, what$, it, rest$) Then MyDocument = False: Exit Function
                 x1 = 0
@@ -26669,36 +26623,33 @@ there1:
                             CheckVar pppp.item(it), s$
                         Else
                             MissStringExpr
-                        MyDocument = False
+                            MyDocument = False
                         End If
                     End If
                 Else
-                If FastSymbol(rest$, "=") Then
-                    If IsStrExp(basestack, rest$, s$) Then
-                        CheckVar pppp.item(it), s$
+                    If FastSymbol(rest$, "=") Then
+                        If IsStrExp(basestack, rest$, s$) Then
+                            CheckVar pppp.item(it), s$
+                        Else
+                            MissStringExpr
+                            MyDocument = False
+                        End If
                     Else
-                        MissStringExpr
-                        MyDocument = False
+                        Exit Do
                     End If
-                Else
-                    Exit Do
-                   End If
                 End If
                 MyDocument = True
             Else
-            MyErMacro rest$, "array has no dimension", "ο πίνακας δεν έχει οριστεί"
-             MyDocument = False
-             Exit Function
+                MyErMacro rest$, "array has no dimension", "ο πίνακας δεν έχει οριστεί"
+                MyDocument = False
+                Exit Function
             End If
-          
-            End If
+        End If
     Else
-    SyntaxError
-    MyDocument = False
-    
+        SyntaxError
+        MyDocument = False
     End If
-    Loop Until Not FastSymbol(rest$, ",")
-
+Loop Until Not FastSymbol(rest$, ",")
 End Function
 
 Function GrabFrame() As String
