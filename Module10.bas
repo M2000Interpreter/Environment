@@ -14,7 +14,7 @@ End Type
 Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (Arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
 Private Declare Function SafeArrayGetDim Lib "OleAut32.dll" (ByVal Ptr As Long) As Long
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
 Private Const E_POINTER As Long = &H80004003
 Private Const S_OK As Long = 0
 Private Const INTERNET_MAX_URL_LENGTH As Long = 2083
@@ -132,20 +132,20 @@ End Sub
 ' in any case
 ' 0 is error.
 ' non 0 is the filehandler from M2000 (not the real handler)
-Function MyOpenFile(ByVal F$, ftype As MyOpenFileType, fexc As MyOpenFileExclusive, fstp As Long, unif As Long) As Long
-If Left$(F$, 2) <> "\\" Then
-F$ = "\\?\" + F$
+Function MyOpenFile(ByVal f$, ftype As MyOpenFileType, fexc As MyOpenFileExclusive, fstp As Long, unif As Long) As Long
+If Left$(f$, 2) <> "\\" Then
+f$ = "\\?\" + f$
 End If
 Dim FileH As Long
 FileError = 511
 On Error GoTo there:
 Select Case ftype
 Case ForInput
-    FileH = CreateFile(StrPtr(F$), GENERIC_READ, (FILE_SHARE_READ Or FILE_SHARE_WRITE) * fexc, ByVal 0&, OPEN_EXISTING, 0&, 0&)
+    FileH = CreateFile(StrPtr(f$), GENERIC_READ, (FILE_SHARE_READ Or FILE_SHARE_WRITE) * fexc, ByVal 0&, OPEN_EXISTING, 0&, 0&)
 Case ForOutput
-    FileH = CreateFile(StrPtr(F$), GENERIC_WRITE, (FILE_SHARE_READ Or FILE_SHARE_WRITE) * fexc, ByVal 0&, CREATE_ALWAYS, 0&, 0&)
+    FileH = CreateFile(StrPtr(f$), GENERIC_WRITE, (FILE_SHARE_READ Or FILE_SHARE_WRITE) * fexc, ByVal 0&, CREATE_ALWAYS, 0&, 0&)
 Case Else
-    FileH = CreateFile(StrPtr(F$), GENERIC_READ Or GENERIC_WRITE, (FILE_SHARE_READ Or FILE_SHARE_WRITE) * fexc, ByVal 0&, OPEN_EXISTING, 0&, 0&)
+    FileH = CreateFile(StrPtr(f$), GENERIC_READ Or GENERIC_WRITE, (FILE_SHARE_READ Or FILE_SHARE_WRITE) * fexc, ByVal 0&, OPEN_EXISTING, 0&, 0&)
 End Select
 If FileH = INVALID_HANDLE_VALUE Then
 FileError = GetLastError()
@@ -281,7 +281,7 @@ End Property
 Public Function BigFileHandler(FH As Long, ftype As Long, fst As Long, unif As Long) As Long
 Static MaxNum As Long
 Dim where As Long
-If FreeUseHandlers.count = 0 Then
+If FreeUseHandlers.Count = 0 Then
     MaxNum = MaxNum + 1
     InUseHandlers.AddKey CVar(MaxNum), Array(FH, ftype, fst, unif)
     InUseHandlers.sValue = FH
@@ -322,7 +322,7 @@ End Sub
 Public Sub CloseAllHandlers()
 Dim h&
 On Error Resume Next
-Do While InUseHandlers.count > 0
+Do While InUseHandlers.Count > 0
     InUseHandlers.ToEnd
     h& = CLng(InUseHandlers.sValue)
     API_CloseFile h&
@@ -331,14 +331,14 @@ Do While InUseHandlers.count > 0
     FreeUseHandlers.AddKey CVar(h&)
 Loop
 End Sub
-Function myFileLen(ByVal Filename As String) As Currency
-If Left$(Filename, 2) <> "\\" Then
-Filename = "\\?\" + Filename
+Function myFileLen(ByVal FileName As String) As Currency
+If Left$(FileName, 2) <> "\\" Then
+FileName = "\\?\" + FileName
 End If
 Dim FileH As Long
 Dim ret As Long, ok As Long
 On Error Resume Next
-FileH = CreateFile(StrPtr(Filename), _
+FileH = CreateFile(StrPtr(FileName), _
                 FILE_READ_ATTRIBUTES, _
                  0, _
                 ByVal 0&, OPEN_EXISTING, 0&, 0&)
@@ -355,11 +355,11 @@ Else
 End If
 On Error GoTo 0
 End Function
-Public Sub API_OpenFile(ByVal Filename As String, ByRef FileNumber As Long, ByRef FileSize As Currency, SetPointerTo As Long)
+Public Sub API_OpenFile(ByVal FileName As String, ByRef FileNumber As Long, ByRef FileSize As Currency, SetPointerTo As Long)
 Dim FileH As Long
 Dim ret As Long, ok As Long
 On Error Resume Next
-FileH = CreateFile(StrPtr(Filename), GENERIC_READ Or GENERIC_WRITE, FILE_SHARE_READ Or FILE_SHARE_WRITE, 0&, OPEN_ALLWAYS, 0, 0)
+FileH = CreateFile(StrPtr(FileName), GENERIC_READ Or GENERIC_WRITE, FILE_SHARE_READ Or FILE_SHARE_WRITE, 0&, OPEN_ALLWAYS, 0, 0)
 If Err.Number > 0 Then
     Err.Clear
     FileNumber = -1
@@ -386,13 +386,13 @@ Function API_FileSize(ByVal FileNumber As Long, ByRef FileSize As Currency) As L
     API_FileSize = 0
 End Function
 
-Public Sub API_ReadFile(ByVal FileNumber As Long, ByRef BlockSize As Long, ByRef data() As Byte)
+Public Sub API_ReadFile(ByVal FileNumber As Long, ByRef BlockSize As Long, ByRef Data() As Byte)
 Dim PosL As Long
 Dim PosH As Long
 Dim SizeRead As Long
 Dim ret As Long
 ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
-ret = ReadFile(FileNumber, data(0), BlockSize, SizeRead, 0&)
+ret = ReadFile(FileNumber, Data(0), BlockSize, SizeRead, 0&)
 BlockSize = SizeRead
 End Sub
 Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal addr As Long)
@@ -410,13 +410,13 @@ FlushFileBuffers FileNumber
 ret = CloseHandle(FileNumber)
 End Sub
 
-Public Function API_WriteFile(ByVal FileNumber As Long, ByRef BlockSize As Long, ByRef data() As Byte) As Boolean
+Public Function API_WriteFile(ByVal FileNumber As Long, ByRef BlockSize As Long, ByRef Data() As Byte) As Boolean
 Dim PosL As Long
 Dim PosH As Long
 Dim SizeWrit As Long
 Dim ret As Long
 ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
-ret = WriteFile(FileNumber, data(0), BlockSize, SizeWrit, 0&)
+ret = WriteFile(FileNumber, Data(0), BlockSize, SizeWrit, 0&)
 API_WriteFile = (BlockSize = SizeWrit)
 End Function
 
@@ -433,7 +433,6 @@ Private Sub Long2Size(ByVal LongLow As Long, ByVal LongHigh As Long, ByRef FileS
     PutMem4 VarPtr(FileSize) + 4, LongHigh
     FileSize = FileSize * 10000@
 End Sub
-
 
 
 

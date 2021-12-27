@@ -754,7 +754,7 @@ Public Sub Unsignlongnegative(a$)
     MyErMacro a$, "Unsigned long can't be negative", "Ο ακέραιος χωρίς προσημο δεν μπορεί να είναι αρνητικός"
 End Sub
 Public Sub Unsignlongfailed(a$)
-MyErMacro a$, "Unsigned long to sign failed", "Η μετατροπή ακέραιου χωρίς πρόσημο σε ακέραιο με πρόσημο, απέτυχε"
+MyErMacro a$, "Unsigned long to sign failedend", "Η μετατροπή ακέραιου χωρίς πρόσημο σε ακέραιο με πρόσημο, απέτυχε"
 End Sub
 Public Sub NoProperObject()
 MyEr "This object not supported", "Αυτό το αντικείμενο δεν υποστηρίζεται"
@@ -1583,101 +1583,101 @@ Public Sub PrintLineControlSingle(mHdc As Long, c As String, R As RECT)
     DrawTextEx mHdc, StrPtr(c), -1, R, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
     End Sub
 '
-Public Sub MyPrintNew(ddd As Object, UAddTwipsTop, s$, Optional cr As Boolean = False, Optional fake As Boolean = False)
+Public Sub MyPrintNew(DDD As Object, UAddTwipsTop, s$, Optional cr As Boolean = False, Optional fake As Boolean = False)
 
 Dim nr As RECT, nl As Long, mytop As Long
-mytop = ddd.currentY
+mytop = DDD.currentY
 If s$ = vbNullString Then
 nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
-CalcRect ddd.hDC, " ", nr
-nr.Left = ddd.currentX / dv15
+CalcRect DDD.hDC, " ", nr
+nr.Left = DDD.currentX / dv15
 nr.Right = nr.Right + nr.Left
-nr.top = ddd.currentY / dv15
+nr.top = DDD.currentY / dv15
 nr.Bottom = nr.top + nr.Bottom
 nl = (nr.Bottom + 1) * dv15
 If cr Then
-ddd.currentY = (nr.Bottom + 1) * dv15 + UAddTwipsTop ''2
-ddd.currentX = 0
+DDD.currentY = (nr.Bottom + 1) * dv15 + UAddTwipsTop ''2
+DDD.currentX = 0
 Else
-ddd.currentX = nr.Right * dv15
+DDD.currentX = nr.Right * dv15
 End If
 Else
 nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
-CalcRect ddd.hDC, s$, nr
-nr.Left = ddd.currentX / dv15
+CalcRect DDD.hDC, s$, nr
+nr.Left = DDD.currentX / dv15
 nr.Right = nr.Right + nr.Left
-nr.top = ddd.currentY / dv15
+nr.top = DDD.currentY / dv15
 nr.Bottom = nr.top + nr.Bottom
 nl = (nr.Bottom + 1) * dv15
 If Not fake Then
-If nr.Left * dv15 < ddd.Width Then PrintLineControlSingle ddd.hDC, s$, nr
+If nr.Left * dv15 < DDD.Width Then PrintLineControlSingle DDD.hDC, s$, nr
 End If
 If cr Then
-ddd.currentY = nl + UAddTwipsTop ''* 2
-ddd.currentX = 0
+DDD.currentY = nl + UAddTwipsTop ''* 2
+DDD.currentX = 0
 Else
-ddd.currentY = mytop
-ddd.currentX = nr.Right * dv15
+DDD.currentY = mytop
+DDD.currentX = nr.Right * dv15
 End If
 End If
 
 End Sub
-Public Sub MyPrint(ddd As Object, s$)
+Public Sub MyPrint(DDD As Object, s$)
 Dim nr As RECT, nl As Long
 If s$ = vbNullString Then
     nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
-    CalcRect ddd.hDC, " ", nr
-    nr.Left = ddd.currentX / dv15
+    CalcRect DDD.hDC, " ", nr
+    nr.Left = DDD.currentX / dv15
     nr.Right = nr.Right + nr.Left
-    nr.top = ddd.currentY / dv15
+    nr.top = DDD.currentY / dv15
     nr.Bottom = nr.top + nr.Bottom
     nl = (nr.Bottom + 1) * dv15
-    ddd.currentY = (nr.Bottom + 1) * dv15
-    ddd.currentX = 0
+    DDD.currentY = (nr.Bottom + 1) * dv15
+    DDD.currentX = 0
 Else
 nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
-CalcRect ddd.hDC, s$, nr
-nr.Left = ddd.currentX / dv15
+CalcRect DDD.hDC, s$, nr
+nr.Left = DDD.currentX / dv15
 nr.Right = nr.Right + nr.Left
-nr.top = ddd.currentY / dv15
+nr.top = DDD.currentY / dv15
 nr.Bottom = nr.top + nr.Bottom
 nl = (nr.Bottom + 1) * dv15
-If nr.Left * dv15 <= ddd.Width Then PrintLineControlSingle ddd.hDC, s$, nr
-ddd.currentY = nl
-ddd.currentX = 0
+If nr.Left * dv15 <= DDD.Width Then PrintLineControlSingle DDD.hDC, s$, nr
+DDD.currentY = nl
+DDD.currentX = 0
 End If
 End Sub
 
-Public Function TextWidth(ddd As Object, a$) As Long
+Public Function TextWidth(DDD As Object, a$) As Long
 Dim nr As RECT
-CalcRect ddd.hDC, a$, nr
+CalcRect DDD.hDC, a$, nr
 TextWidth = nr.Right * dv15
 End Function
-Public Function TextWidth2(ddd As Object, a$) As Long
+Public Function TextWidth2(DDD As Object, a$) As Long
 Dim nr As RECT
-CalcRectNoSingle ddd.hDC, a$, nr
+CalcRectNoSingle DDD.hDC, a$, nr
 TextWidth2 = nr.Right * dv15
 
 End Function
-Public Function TextWidthPixels(ddd As Object, a$) As Long
+Public Function TextWidthPixels(DDD As Object, a$) As Long
 Dim nr As RECT
-CalcRect ddd.hDC, a$, nr
+CalcRect DDD.hDC, a$, nr
 TextWidthPixels = nr.Right
 End Function
-Private Function TextHeight(ddd As Object, a$) As Long
+Private Function TextHeight(DDD As Object, a$) As Long
 Dim nr As RECT
-CalcRect ddd.hDC, a$, nr
+CalcRect DDD.hDC, a$, nr
 
 TextHeight = nr.Bottom * dv15
 End Function
-Private Function TextHeight2(ddd As Object, a$) As Long
+Private Function TextHeight2(DDD As Object, a$) As Long
 Dim nr As RECT
-CalcRectNoSingle ddd.hDC, a$, nr
+CalcRectNoSingle DDD.hDC, a$, nr
 
 TextHeight2 = nr.Bottom * dv15
 End Function
 
-Public Sub PlainBaSket(ddd As Object, mybasket As basket, ByVal what As String, Optional ONELINE As Boolean = False, Optional nocr As Boolean = False, Optional plusone As Long = 2, Optional clearline As Boolean = False, Optional processcr As Boolean = False, Optional semicolon As Boolean = False)
+Public Sub PlainBaSket(DDD As Object, mybasket As basket, ByVal what As String, Optional ONELINE As Boolean = False, Optional nocr As Boolean = False, Optional plusone As Long = 2, Optional clearline As Boolean = False, Optional processcr As Boolean = False, Optional semicolon As Boolean = False)
 
 Dim PX As Long, PY As Long, R As Long, p$, c$, LEAVEME As Boolean, nr As RECT, nr2 As RECT, w As Integer
 Dim p2 As Long, mUAddPixelsTop As Long
@@ -1702,7 +1702,7 @@ With mybasket
     PX = .curpos
     PY = .currow
     If PY = .my And .double Then
-        If ddd Is Form1.PrinterDocument1 Then
+        If DDD Is Form1.PrinterDocument1 Then
             getnextpage
             With nr
                 .top = PY * pixY + mUAddPixelsTop
@@ -1711,7 +1711,7 @@ With mybasket
             PY = 0
             .currow = 0
         Else
-            ScrollUpNew ddd, mybasket
+            ScrollUpNew DDD, mybasket
         End If
         PY = .currow
     End If
@@ -1736,21 +1736,21 @@ With mybasket
     Dim ii As Long, mark1 As Long, mr As Long, ML As Long
     
     Do While (lenw& - R) >= .mx - PX And (.mx - PX) > 0
-     If ddd.FontTransparent = False Then
+     If DDD.FontTransparent = False Then
         With nr2
             .Left = PX * pixX
             .Right = mybasket.mx * pixX + 1
             .top = rTop
             .Bottom = rBottom
         End With
-         FillBack ddd.hDC, nr2, .Paper
+         FillBack DDD.hDC, nr2, .Paper
          End If
-        ddd.currentX = PX * .Xt
-        ddd.currentY = PY * .Yt + .uMineLineSpace
+        DDD.currentX = PX * .Xt
+        DDD.currentY = PY * .Yt + .uMineLineSpace
         R1 = .mx - PX - 1 + R
 
-        If ddd.currentX = 0 And clearline Then
-            If Not TypeOf ddd Is MetaDc Then ddd.Line (0&, PY * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
+        If DDD.currentX = 0 And clearline Then
+            If Not TypeOf DDD Is MetaDc Then DDD.Line (0&, PY * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
         End If
         
         Do
@@ -1770,7 +1770,7 @@ With mybasket
                 For ii = R + 2 To Len(what$)
                     If Not A2(ii) > 2 Then If (A2(ii) And 2) <> 2 And (a1(ii) And 7) = 0 Then Exit For
                    If (RealLen(Mid$(what$, mark1, ii - mark1 + 2)) + .curpos) > .mx Then
-                   If TextWidth(ddd, Mid$(what$, mark1, ii - mark1 + 2)) \ .Xt > (.mx - .curpos - 1) Then
+                   If TextWidth(DDD, Mid$(what$, mark1, ii - mark1 + 2)) \ .Xt > (.mx - .curpos - 1) Then
                    c$ = Mid$(what$, mark1, ii - mark1 + 1)
                 
                 LL(ff) = Mid$(what$, mark1 + Len(c$) + 1)
@@ -1791,12 +1791,12 @@ With mybasket
                 R = R + Len(c$): If ii > mark1 Then R = R - 1
                 mark1 = nr.Right
                 nr.Right = (PX + Len(what$)) * pixX + 1
-                DrawText ddd.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_NOPREFIX + DT_NOCLIP
-                mark1 = TextWidth(ddd, c$)
+                DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_NOPREFIX + DT_NOCLIP
+                mark1 = TextWidth(DDD, c$)
                 mark1 = mark1 \ .Xt - (mark1 Mod .Xt > 0)
                 nr.Right = nr.Left + mark1 * pixX + 1
                 realR& = realR + mark1
-                ddd.currentX = nr.Right * DXP
+                DDD.currentX = nr.Right * DXP
                 If processcr Then
                 
                 .curpos = 0
@@ -1814,10 +1814,10 @@ checkcombine:
                          Loop Until (a1(R + 1) And 7) = 0
                      End If
                  End If
-                 DrawText ddd.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
+                 DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
             Else
                 If c$ = Chr$(7) Then
-                    If Not ddd Is Form1.PrinterDocument1 Then Beep
+                    If Not DDD Is Form1.PrinterDocument1 Then Beep
                     R = R + 1: realR = realR - 1:
                     GoTo cont0
                 End If
@@ -1833,7 +1833,7 @@ checkcombine:
                         If Mid$(WHAT1$, R + 2, 1) = ChrW(10) Then R = R + 1
                         .curpos = 0
                         If PY + 1 >= .my Then
-                            If ddd Is Form1.PrinterDocument1 Then
+                            If DDD Is Form1.PrinterDocument1 Then
                                 getnextpage
                                 With nr
                                     .top = PY * pixY + mUAddPixelsTop
@@ -1842,7 +1842,7 @@ checkcombine:
                                 PY = 0
                                 .currow = 0
                             Else
-                                ScrollUpNew ddd, mybasket
+                                ScrollUpNew DDD, mybasket
                             End If
                         Else
                             .currow = PY + 1
@@ -1865,9 +1865,9 @@ checkcombine:
                         End If
                     ElseIf c$ = ChrW(10) Then
                         .curpos = 0
-                        If Not TypeOf ddd Is MetaDc Then
+                        If Not TypeOf DDD Is MetaDc Then
                         If PY + 1 = .my Then
-                            If ddd Is Form1.PrinterDocument1 Then
+                            If DDD Is Form1.PrinterDocument1 Then
                                 getnextpage
                                 With nr
                                     .top = PY * pixY + mUAddPixelsTop
@@ -1876,7 +1876,7 @@ checkcombine:
                                 PY = 0
                                 .currow = 0
                             Else
-                                ScrollUpNew ddd, mybasket
+                                ScrollUpNew DDD, mybasket
                             End If
                         Else
                             .currow = PY + 1
@@ -1897,7 +1897,7 @@ checkcombine:
                 .Right = .Left + pixX
             End With
 cont0:
-            ddd.currentX = (PX + realR) * .Xt
+            DDD.currentX = (PX + realR) * .Xt
             realR = realR + 1
             If R >= lenw& Then
                 R = lenw& + 1
@@ -1916,8 +1916,8 @@ cont0:
         GoTo skipthis
         End If
         End If
-        If Not TypeOf ddd Is MetaDc Then
-        If ddd Is Form1.PrinterDocument1 Then
+        If Not TypeOf DDD Is MetaDc Then
+        If DDD Is Form1.PrinterDocument1 Then
                 getnextpage
                 With nr
                     .top = PY * pixY + mUAddPixelsTop
@@ -1926,7 +1926,7 @@ cont0:
                 PY = 0
                 .currow = 0
             Else
-                ScrollUpNew ddd, mybasket
+                ScrollUpNew DDD, mybasket
             End If
             PY = PY - 1
         End If
@@ -1955,21 +1955,21 @@ skipthis:
         End With
         GoTo jumpexit
     End If
-    If ddd.FontTransparent = False Then
+    If DDD.FontTransparent = False Then
         With nr2
             .Left = PX * pixX
             .Right = (PX + Len(what$)) * pixX + 1
             .top = rTop
             .Bottom = rBottom
         End With
-        FillBack ddd.hDC, nr2, mybasket.Paper
+        FillBack DDD.hDC, nr2, mybasket.Paper
     End If
     realR& = 0
     If Len(what$) > R Then
-        ddd.currentX = PX * .Xt
-        ddd.currentY = PY * .Yt + .uMineLineSpace
-        If ddd.currentX = 0 And clearline Then
-            If Not TypeOf ddd Is MetaDc Then ddd.Line (0&, PY * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
+        DDD.currentX = PX * .Xt
+        DDD.currentY = PY * .Yt + .uMineLineSpace
+        If DDD.currentX = 0 And clearline Then
+            If Not TypeOf DDD Is MetaDc Then DDD.Line (0&, PY * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
         End If
         R1 = Len(what$) - 1
         For R = R To R1
@@ -1990,12 +1990,12 @@ skipthis:
                 c$ = Mid$(what$, mark1, ii - mark1 + 1)
                 R = R + Len(c$)
                 If ii > mark1 Then R = R - 1
-                mark1 = TextWidth(ddd, c$) \ DXP
+                mark1 = TextWidth(DDD, c$) \ DXP
                 nr.Right = nr.Left + mark1 + 1
-                DrawTextEx ddd.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_NOPREFIX + DT_NOCLIP, 0
+                DrawTextEx DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_NOPREFIX + DT_NOCLIP, 0
                 .curpos = nr.Right \ pixX
                 realR& = realR + mark1 \ pixX - (mark1 Mod pixX > 0) * 1
-                ddd.currentX = .curpos * .Xt
+                DDD.currentX = .curpos * .Xt
                 If Not processcr Then GoTo contNew
                 
                 GoTo again
@@ -2012,11 +2012,11 @@ checkcombine1:
                         Loop Until (a1(R + 1) And 7) = 0
                     End If
                 End If
-                ddd.currentX = ddd.currentX + .Xt
+                DDD.currentX = DDD.currentX + .Xt
             Else
 CHECK1:
                 If c$ = Chr$(7) Then
-                    If Not ddd Is Form1.PrinterDocument1 Then Beep
+                    If Not DDD Is Form1.PrinterDocument1 Then Beep
                     GoTo cont1
                 End If
                 If processcr Then
@@ -2031,12 +2031,12 @@ CHECK1:
                         If Mid$(WHAT1$, R + 2, 1) = ChrW(10) Then R = R + 1
                         .curpos = 0
                         PX = 0
-                        ddd.currentX = 0
+                        DDD.currentX = 0
                         realR& = 0
                         c$ = ""
-                        If Not TypeOf ddd Is MetaDc Then
+                        If Not TypeOf DDD Is MetaDc Then
                             If PY + 1 = .my Then
-                                If ddd Is Form1.PrinterDocument1 Then
+                                If DDD Is Form1.PrinterDocument1 Then
                                     getnextpage
                                     With nr
                                         .top = PY * pixY + mUAddPixelsTop
@@ -2045,7 +2045,7 @@ CHECK1:
                                     PY = 0
                                     .currow = 0
                                 Else
-                                    ScrollUpNew ddd, mybasket
+                                    ScrollUpNew DDD, mybasket
                                 End If
                             Else
                                 .currow = PY + 1
@@ -2071,9 +2071,9 @@ CHECK1:
                         End If
                     ElseIf c$ = ChrW(10) Then
                         .curpos = 0
-                        If Not TypeOf ddd Is MetaDc Then
+                        If Not TypeOf DDD Is MetaDc Then
                         If PY + 1 >= .my Then
-                            If ddd Is Form1.PrinterDocument1 Then
+                            If DDD Is Form1.PrinterDocument1 Then
                                 getnextpage
                                 With nr
                                     .top = PY * pixY + mUAddPixelsTop
@@ -2082,7 +2082,7 @@ CHECK1:
                                 PY = 0
                                 .currow = 0
                             Else
-                                ScrollUpNew ddd, mybasket
+                                ScrollUpNew DDD, mybasket
                             End If
                         Else
                             .currow = PY + 1
@@ -2098,7 +2098,7 @@ CHECK1:
                     End If
                 End If
             End If
-            DrawText ddd.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
+            DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
             realR& = realR + 1
 contNew:
             With nr
@@ -2139,28 +2139,28 @@ End Sub
 
 
 Public Function nTextY(basestack As basetask, ByVal what As String, ByVal Font As String, ByVal Size As Single, Optional ByVal degree As Double = 0#, Optional ByVal ExtraWidth As Long = 0)
-Dim ddd As Object
-Set ddd = basestack.Owner
+Dim DDD As Object
+Set DDD = basestack.Owner
 Dim PX As Long, PY As Long, OLDFONT As String, OLDSIZE As String, DE#
 Dim f As LOGFONT, hPrevFont As Long, hFont As Long, fline$
 Dim BFONT As String
 Dim prive As Long
-prive = GetCode(ddd)
+prive = GetCode(DDD)
 ExtraWidth = ExtraWidth \ dv15
 If ExtraWidth <> 0 Then
-SetTextCharacterExtra ddd.hDC, ExtraWidth
+SetTextCharacterExtra DDD.hDC, ExtraWidth
 End If
 On Error Resume Next
 With players(prive)
-BFONT = ddd.Font.Name
+BFONT = DDD.Font.Name
 If Font <> "" Then
-If Size = 0 Then Size = ddd.FontSize
+If Size = 0 Then Size = DDD.FontSize
 StoreFont Font, Size, .charset
-ddd.Font.charset = 0
-ddd.FontSize = 9
-ddd.FontName = .FontName
-ddd.Font.charset = .charset
-ddd.FontSize = Size
+DDD.Font.charset = 0
+DDD.FontSize = 9
+DDD.FontName = .FontName
+DDD.Font.charset = .charset
+DDD.FontSize = Size
 Else
 Font = .FontName
 End If
@@ -2175,7 +2175,7 @@ f.lfWeight = Abs(.bold) * 800
   f.lfHeight = (Size * -20) / DYP
 
   hFont = CreateFontIndirect(f)
-  hPrevFont = SelectObject(ddd.hDC, hFont)
+  hPrevFont = SelectObject(DDD.hDC, hFont)
  what$ = Replace$(what, vbCrLf, vbCr) + vbCr
 Dim textmetrics As POINTAPI, Max, maxx As Long, sumy As Long
 Do While what$ <> ""
@@ -2191,46 +2191,46 @@ textmetrics.x = 0
 textmetrics.y = 0
     If Len(fline$) = 0 Then
         fline$ = " "
-        GetTextExtentPoint32 ddd.hDC, StrPtr(fline$), Len(fline$), textmetrics
+        GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
         textmetrics.x = 0
     Else
-        GetTextExtentPoint32 ddd.hDC, StrPtr(fline$), Len(fline$), textmetrics
+        GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
     End If
 sumy = sumy + textmetrics.y
 If maxx < textmetrics.x Then maxx = textmetrics.x
 Loop
 nTextY = Int(Abs(maxx * dv15 * Sin(degree)) + Abs(sumy * dv15 * Cos(degree)))
-  hFont = SelectObject(ddd.hDC, hPrevFont)
+  hFont = SelectObject(DDD.hDC, hPrevFont)
   DeleteObject hFont
-If ExtraWidth <> 0 Then SetTextCharacterExtra ddd.hDC, 0
+If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.hDC, 0
 End With
-PlaceBasket ddd, players(prive)
+PlaceBasket DDD, players(prive)
 
 
 End Function
 Public Function nText(basestack As basetask, ByVal what As String, ByVal Font As String, ByVal Size As Single, Optional ByVal degree As Double = 0#, Optional ByVal ExtraWidth As Long = 0)
-Dim ddd As Object
-Set ddd = basestack.Owner
+Dim DDD As Object
+Set DDD = basestack.Owner
 Dim PX As Long, PY As Long, OLDFONT As String, OLDSIZE As String, DE#
 Dim f As LOGFONT, hPrevFont As Long, hFont As Long, fline$
 Dim BFONT As String
 Dim prive As Long
-prive = GetCode(ddd)
+prive = GetCode(DDD)
 On Error Resume Next
 With players(prive)
 ExtraWidth = ExtraWidth \ dv15
 If ExtraWidth <> 0 Then
-SetTextCharacterExtra ddd.hDC, ExtraWidth
+SetTextCharacterExtra DDD.hDC, ExtraWidth
 End If
-BFONT = ddd.Font.Name
+BFONT = DDD.Font.Name
 If Font <> "" Then
-If Size = 0 Then Size = ddd.FontSize
+If Size = 0 Then Size = DDD.FontSize
 StoreFont Font, Size, .charset
-ddd.Font.charset = 0
-ddd.FontSize = 9
-ddd.FontName = .FontName
-ddd.Font.charset = .charset
-ddd.FontSize = Size
+DDD.Font.charset = 0
+DDD.FontSize = 9
+DDD.FontName = .FontName
+DDD.Font.charset = .charset
+DDD.FontSize = Size
 Else
 Font = .FontName
 End If
@@ -2247,7 +2247,7 @@ f.lfWeight = Abs(.bold) * 800
   f.lfHeight = (Size * -20) / DYP
 
   hFont = CreateFontIndirect(f)
-  hPrevFont = SelectObject(ddd.hDC, hFont)
+  hPrevFont = SelectObject(DDD.hDC, hFont)
   what$ = Replace$(what, vbCrLf, vbCr) + vbCr
 Dim textmetrics As POINTAPI, Max, maxx As Long, sumy As Long
 Do While what$ <> ""
@@ -2263,10 +2263,10 @@ textmetrics.x = 0
 textmetrics.y = 0
     If Len(fline$) = 0 Then
         fline$ = " "
-        GetTextExtentPoint32 ddd.hDC, StrPtr(fline$), Len(fline$), textmetrics
+        GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
         textmetrics.x = 0
     Else
-        GetTextExtentPoint32 ddd.hDC, StrPtr(fline$), Len(fline$), textmetrics
+        GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
     End If
 sumy = sumy + textmetrics.y
 If maxx < textmetrics.x Then maxx = textmetrics.x
@@ -2274,12 +2274,12 @@ Loop
 
 nText = Int(Abs(maxx * dv15 * Cos(degree)) + Abs(sumy * dv15 * Sin(degree)))
 
-  hFont = SelectObject(ddd.hDC, hPrevFont)
+  hFont = SelectObject(DDD.hDC, hPrevFont)
   DeleteObject hFont
-If ExtraWidth <> 0 Then SetTextCharacterExtra ddd.hDC, 0
+If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.hDC, 0
 
 End With
-PlaceBasket ddd, players(prive)
+PlaceBasket DDD, players(prive)
 
 
 End Function
@@ -2453,12 +2453,12 @@ Else
 End If
 End Sub
 
-Public Sub wPlain(ddd As Object, mb As basket, ByVal what As String, ByVal wi&, ByVal Hi&, Optional nocr As Boolean = False)
+Public Sub wPlain(DDD As Object, mb As basket, ByVal what As String, ByVal wi&, ByVal Hi&, Optional nocr As Boolean = False)
 Dim PX As Long, PY As Long, ttt As Long, ruller&
 Dim buf$, b$, npy As Long ', npx As long
 
 With mb
-PlaceBasket ddd, mb
+PlaceBasket DDD, mb
 tParam.iTabLength = .ReportTab
 If what = vbNullString Then Exit Sub
 PX = .curpos
@@ -2473,24 +2473,24 @@ For ttt = 1 To Len(what)
    ' If nounder32(b$) Then
    
    If Not (b$ = vbCr Or b$ = vbLf) Then
-    If TextWidth(ddd, buf$ & b$) <= (wi& * .Xt) Then
+    If TextWidth(DDD, buf$ & b$) <= (wi& * .Xt) Then
     buf$ = buf$ & b$
     End If
     ElseIf b$ = vbCr Then
     
     If nocr Then Exit For
-    MyPrintNew ddd, mb.uMineLineSpace, buf$, Not nocr
+    MyPrintNew DDD, mb.uMineLineSpace, buf$, Not nocr
     
     
     buf$ = vbNullString
     Hi& = Hi& - 1
     npy = npy + 1
-    LCTbasket ddd, mb, npy, PX
+    LCTbasket DDD, mb, npy, PX
     End If
     If Hi& < 0 Then Exit For
 Next ttt
-If Hi& >= 0 And buf$ <> "" Then MyPrintNew ddd, mb.uMineLineSpace, buf$, Not nocr
-If Not nocr Then LCTbasket ddd, mb, PY, PX
+If Hi& >= 0 And buf$ <> "" Then MyPrintNew DDD, mb.uMineLineSpace, buf$, Not nocr
+If Not nocr Then LCTbasket DDD, mb, PY, PX
 End With
 End Sub
 Public Sub FeedFont2Stack(basestack As basetask, ok As Boolean)
@@ -2508,16 +2508,16 @@ End If
 basestack.soros.MergeTop ms
 End Sub
 Public Sub nPlain(basestack As basetask, ByVal what As String, ByVal Font As String, ByVal Size As Single, Optional ByVal degree As Double = 0#, Optional ByVal JUSTIFY As Long = 0, Optional ByVal qual As Boolean = True, Optional ByVal ExtraWidth As Long = 0)
-Dim ddd As Object
-Set ddd = basestack.Owner
+Dim DDD As Object
+Set DDD = basestack.Owner
 Dim PX As Long, PY As Long, OLDFONT As String, OLDSIZE As Long, DEGR As Double
 Dim f As LOGFONT, hPrevFont As Long, hFont As Long, fline$, TT As Long
 Dim BFONT As String
 
 On Error Resume Next
-BFONT = ddd.Font.Name
+BFONT = DDD.Font.Name
 If ExtraWidth <> 0 Then
-SetTextCharacterExtra ddd.hDC, ExtraWidth
+SetTextCharacterExtra DDD.hDC, ExtraWidth
 End If
 Dim icx As Long, icy As Long, x As Long, y As Long, icH As Long
 
@@ -2535,9 +2535,9 @@ DEGR = (degree) * 180# / Pi
   End If
   f.lfHeight = (Size * -20) / DYP
   hFont = CreateFontIndirect(f)
-  hPrevFont = SelectObject(ddd.hDC, hFont)
-  icH = TextHeight(ddd, "fq")
-  hFont = SelectObject(ddd.hDC, hPrevFont)
+  hPrevFont = SelectObject(DDD.hDC, hFont)
+  icH = TextHeight(DDD, "fq")
+  hFont = SelectObject(DDD.hDC, hPrevFont)
   DeleteObject hFont
   f.lfItalic = Abs(basestack.myitalic)
   f.lfWeight = Abs(basestack.myBold) * 800
@@ -2554,13 +2554,13 @@ DEGR = (degree) * 180# / Pi
 
   
     hFont = CreateFontIndirect(f)
-  hPrevFont = SelectObject(ddd.hDC, hFont)
+  hPrevFont = SelectObject(DDD.hDC, hFont)
 
 TT = ExtraWidth \ 2
 icy = CLng(Cos(degree) * icH)
 icx = CLng(Sin(degree) * icH)
 
-With players(GetCode(ddd))
+With players(GetCode(DDD))
 If JUSTIFY < 0 Then
 JUSTIFY = Abs(JUSTIFY) - 1
 If JUSTIFY = 0 Then
@@ -2595,27 +2595,27 @@ fline$ = GetStrUntil(vbCr, what$)
 End If
 textmetrics.x = 0
 textmetrics.y = 0
-GetTextExtentPoint32 ddd.hDC, StrPtr(fline$), Len(fline$), textmetrics
+GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
 x = x + icx
 y = y + icy
 If JUSTIFY = 1 Then
-    ddd.currentX = x - Int((textmetrics.x * Cos(degree) + textmetrics.y * Sin(degree)) * dv15)
-    ddd.currentY = y + Int((textmetrics.x * Sin(degree) - textmetrics.y * Cos(degree)) * dv15)
+    DDD.currentX = x - Int((textmetrics.x * Cos(degree) + textmetrics.y * Sin(degree)) * dv15)
+    DDD.currentY = y + Int((textmetrics.x * Sin(degree) - textmetrics.y * Cos(degree)) * dv15)
 ElseIf JUSTIFY = 2 Then
 'If tt <> 0 Then textmetrics.X = textmetrics.X - tt * 1.5
 
-     ddd.currentX = x - Int((textmetrics.x * Cos(degree) + textmetrics.y * Sin(degree)) * dv15) \ 2
-    ddd.currentY = y + Int((textmetrics.x * Sin(degree) - textmetrics.y * Cos(degree)) * dv15) \ 2
+     DDD.currentX = x - Int((textmetrics.x * Cos(degree) + textmetrics.y * Sin(degree)) * dv15) \ 2
+    DDD.currentY = y + Int((textmetrics.x * Sin(degree) - textmetrics.y * Cos(degree)) * dv15) \ 2
 Else
 
-    ddd.currentX = x
-    ddd.currentY = y
+    DDD.currentX = x
+    DDD.currentY = y
 End If
-MyPrint ddd, fline$
+MyPrint DDD, fline$
 Loop
-  hFont = SelectObject(ddd.hDC, hPrevFont)
+  hFont = SelectObject(DDD.hDC, hPrevFont)
   DeleteObject hFont
-If ExtraWidth <> 0 Then SetTextCharacterExtra ddd.hDC, 0
+If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.hDC, 0
 End Sub
 
 Public Sub nForm(bstack As basetask, TheSize As Single, nW As Long, nH As Long, myLineSpace As Long)
@@ -5395,24 +5395,23 @@ If Not Form4.Visible Then Form4.Show , Form1: bypassshow = True
 
 If bypassshow Then
 
+    If (ScrInfo(monitor).Height - vH_y * Helplastfactor + ScrInfo(monitor).top) < 0 Then
+        Helplastfactor = (ScrInfo(monitor).Height + ScrInfo(monitor).top) / vH_y
+    End If
 
-If (ScrInfo(monitor).Height - vH_y * Helplastfactor + ScrInfo(monitor).top) < 0 Then
-Helplastfactor = (ScrInfo(monitor).Height + ScrInfo(monitor).top) / vH_y
-End If
+    If (ScrInfo(monitor).Width - vH_x * Helplastfactor + ScrInfo(monitor).Left) < 0 Then
+         Helplastfactor = (ScrInfo(monitor).Left + ScrInfo(monitor).Width) / vH_x
+    End If
+    If VirtualScreenWidth * 0.8 < vH_x * Helplastfactor Then
+        Helplastfactor = VirtualScreenWidth * 0.8 / vH_x
+    End If
 
-If (ScrInfo(monitor).Width - vH_x * Helplastfactor + ScrInfo(monitor).Left) < 0 Then
- Helplastfactor = (ScrInfo(monitor).Left + ScrInfo(monitor).Width) / vH_x
-End If
-If VirtualScreenWidth * 0.8 < vH_x * Helplastfactor Then
-Helplastfactor = VirtualScreenWidth * 0.8 / vH_x
-End If
-
-myform Form4, ScrInfo(monitor).Width - vH_x * Helplastfactor + ScrInfo(monitor).Left, ScrInfo(monitor).Height - vH_y * Helplastfactor + ScrInfo(monitor).top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
+    myform Form4, ScrInfo(monitor).Width - vH_x * Helplastfactor + ScrInfo(monitor).Left, ScrInfo(monitor).Height - vH_y * Helplastfactor + ScrInfo(monitor).top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
 Else
 If Screen.Width <= Form4.Left - ScrInfo(monitor).Left Then
-myform Form4, Screen.Width - vH_x * Helplastfactor + ScrInfo(monitor).Left, Form4.top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
+    myform Form4, Screen.Width - vH_x * Helplastfactor + ScrInfo(monitor).Left, Form4.top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
 Else
-myform Form4, Form4.Left, Form4.top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
+    myform Form4, Form4.Left, Form4.top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
 End If
 End If
 Form4.moveMe
@@ -7355,6 +7354,9 @@ End Sub
 Public Sub BadDim()
 MyEr "Array dimensions missing", "Ο πίνακας δεν έχει διαστάσεις"
 End Sub
+Public Sub badread()
+MyEr "can't read value", "δεν μπορώ να διαβάσω τιμή"
+End Sub
 Public Sub ArrayNameExist()
 MyEr "Array exist", "Υπάρχει ήδη αυτός ο πίνακας"
 End Sub
@@ -7451,8 +7453,11 @@ Public Sub MissIF()
     MyEr "No IF for END IF", "δεν βρήκα ΑΝ για την ΤΕΛΟΣ ΑΝ"
 End Sub
 
+Public Sub badSubNotFound()
+MyEr "sub not found", "δεν βρέθηκε η ρουτίνα"
+End Sub
 Public Sub BadCommand()
- MyEr "Command for supervisor rights", "Εντολή μόνο για επόπτη"
+MyEr "Command for supervisor rights", "Εντολή μόνο για επόπτη"
 End Sub
 Public Sub NoClauseInThread()
 MyEr "can't find ERASE or HOLD or RESTART or INTERVAL clause", "Δεν μπορώ να βρω όρο όπως το ΣΒΗΣΕ ή το ΚΡΑΤΑ ή το ΞΕΚΙΝΑ ή το ΚΑΘΕ"
@@ -11258,7 +11263,8 @@ With players(prive)
         MyPset = True
     End If
 End With
-MyDoEvents1 Scr
+MyRefresh bstack
+'MyDoEvents1 Scr
 Set Scr = Nothing
 End Function
 Function Matrix(bstack As basetask, a$, Arr As Variant, res As Variant) As Boolean
@@ -15412,19 +15418,6 @@ End If
 there1:
 bstack.LoadOnly = False
 End Function
-Public Sub PushErrStage(basestack As basetask)
-        With basestack.RetStack
-                        .PushVal subHash.count
-                        .PushVal varhash.count
-                        .PushVal sb2used
-                        .PushVal basestack.SubLevel
-                        .PushVal var2used
-
-                        .PushVal -4
-                         basestack.ErrVars = var2used
-        End With
-       
-End Sub
 Function PrepareLambda(basestask As basetask, myl As lambda, ByVal v As Long, frm$, c As Constant) As Boolean
 On Error GoTo 1234
 If Typename(var(v)) = "Constant" Then
@@ -16669,7 +16662,7 @@ End If
 Else
 .enabled = False
 End If
-
+Form2.gList1.ShowMe
 End With
 
 once = False
@@ -19747,7 +19740,8 @@ End If
 End If
 Scr.fillstyle = vbSolid
 End With
-MyDoEvents1 Scr
+MyRefresh bstack
+'MyDoEvents1 Scr
 
 
 End Function
@@ -21623,7 +21617,8 @@ Set Scr = basestack.Owner
 If Scr.Name = "DIS" Or Scr.Name = "dSprite" Then
 Scr.Visible = False
 End If
-MyDoEvents1 Scr
+MyRefresh basestack
+'MyDoEvents1 Scr
 Set Scr = Nothing
 End Sub
 
@@ -27185,4 +27180,152 @@ End Function
 Function myLof2FH(FH As Long) As Currency
     If FH = 0 Then Exit Function
     Module10.API_FileSize FH, myLof2FH
+End Function
+Sub Str1nControls(ByRef R$)
+On Error Resume Next
+    If Screen.ActiveForm Is Nothing Then
+    R$ = vbNullString
+    Else
+    Select Case Screen.ActiveForm.Name
+    Case "View1"
+      R$ = "BROWSER"
+    Case "TweakForm"
+      R$ = "SETTINGS"
+    Case "AVI"
+    R$ = "AVI"
+    Case "Form1"
+      R$ = "MAIN"
+    Case "Form4"
+    R$ = "HELP"
+    Case Else
+     GetGuiM2000 R$
+    End Select
+    End If
+                
+End Sub
+Sub Str1nControlsGR(ByRef R$)
+    On Error Resume Next
+    If Screen.ActiveForm Is Nothing Then
+    R$ = vbNullString
+    Else
+    Select Case Screen.ActiveForm.Name
+    Case "AVI"
+    R$ = "ΤΑΙΝΙΑ"
+    Case "Form1"
+    R$ = "ΚΥΡΙΟ"
+    Case "Form4"
+    R$ = "ΒΟΗΘΕΙΑ"
+    Case Else
+    GetGuiM2000 R$
+    End Select
+    End If
+End Sub
+Function IsEof(bstack As basetask, a$, R As Variant, SG As Variant) As Boolean
+Dim VR, myFileLen As Currency, FH As Long
+    IsSymbol3 a$, "#"  ' drop it
+    If IsExp(bstack, a$, R, , True) Then
+        VR = Int(R)
+        If Fstep(VR) = 0 Then
+            wrongfilenumber a$
+        Else
+            FH = Module10.ReadFileHandler(CLng(VR))
+            API_FileSize FH, myFileLen
+            R = myFileLen < CCur(Module10.FileSeek(VR))
+            If SG < 0 Then R = CVar(CLng(0 - R))
+            IsEof = FastSymbol(a$, ")", True)
+        End If
+    Else
+        MissParam a$
+    End If
+End Function
+Function IsSeek(bstack As basetask, a$, R As Variant, SG As Variant) As Boolean
+    Dim VR
+    IsSymbol3 a$, "#"  ' drop it
+    If IsExp(bstack, a$, R, , True) Then
+        R = Int(R)
+        If Fstep(R) = 0 Then
+            wrongfilenumber a$
+        ElseIf Fstep(R) <> 1 Then
+            MyErMacro a$, "not valid file TYPE", "λάθος ΤΥΠΟΣ αρχείου"
+        Else
+            R = SG * FileSeek(R)
+            IsSeek = FastSymbol(a$, ")", True)
+        End If
+    Else
+         MissParam a$
+    End If
+End Function
+
+Public Function Validator(bstack As basetask, a$, v$, R, SG) As Boolean
+    Dim v1&, w1&, s$, VR&, n$, p
+    If FastSymbol(a$, "@") Then
+        If IsLabel(bstack, a$, s$) Then
+            Validator = True
+            If Right$(s$, 1) = "(" Then FastSymbol a$, ")"
+            If GetVar(bstack, s$, VR) Then
+                R = SG * True
+                w1 = Abs(Asc(v$) < 128)
+                If IsLabelSymbolNew(a$, "ΩΣ", "AS", w1) Then
+                    If IsLabel(bstack, a$, s$) Then
+                        If Right$(s$, 1) = "(" Then FastSymbol a$, ")"
+                        If GetVar(bstack, s$, v1&) Then
+                            R = SG * CheckTwo(VR, v1&)
+                        Else
+                            R = 0
+                        End If
+                    Else
+                        MissVarName
+                        Validator = False
+                    End If
+                End If
+            End If
+        End If
+        Validator = FastSymbol(a$, ")")
+    Else
+            Validator = True
+            Dim OLD1$, OLD2$
+            OLD1$ = LastErName
+            OLD2$ = LastErNameGR
+            MyEr "", ""
+            w1 = 1
+            s$ = aheadstatus(a$, True, w1) & "   "  ' version 6.5(11)
+            n$ = Left$(a$, w1 - 1)
+            If w1 > 1 Then Mid$(a$, 1, w1 - 1) = space$(w1 - 1)
+            If Left$(s$, 1) = "S" And Not Left$(s$, 3) = "SoN" Then
+                If IsStrExp(bstack, n$, s$) Then
+                    a$ = Mid$(a$, w1)
+                    R = SG * (FastSymbol(a$, ")") And NLtrim$(n$) = vbNullString)
+                ElseIf LastErNum <> 0 Then
+                    GoTo JUMPHERE
+                Else  ' for MyErMacro
+                    R = 1
+                    If Len(a$) + w1 > Len(n$) Then R = 0
+                    R = R * SG * FastSymbol(a$, ")", True)
+                End If
+    
+            ElseIf IsExp(bstack, n$, p) Then
+                a$ = Mid$(a$, w1)
+                R = SG * (FastSymbol(a$, ")") And NLtrim$(n$) = vbNullString)
+            ElseIf LastErNum = 0 Then ' ' for MyErMacro
+                R = 1
+                If Len(a$) + w1 > Len(n$) Then R = 0
+                R = R * SG * FastSymbol(a$, ")", True)
+            Else
+JUMPHERE:
+            LastErNum = 0
+            LastErNum1 = 0
+            LastErNameGR = vbNullString
+            LastErName = vbNullString
+            a$ = Mid$(a$, w1)
+            Validator = FastSymbol(a$, ")")
+            R = 0
+        End If
+        If "" <> LastErName Then R = 0
+        If "" <> LastErNameGR Then R = 0
+        LastErNameGR = vbNullString
+        LastErName = vbNullString
+        LastErNum = 0
+        LastErNum1 = 0
+        End If
+        Set bstack.lastobj = Nothing
 End Function

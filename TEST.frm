@@ -247,7 +247,7 @@ Dim excode As Long
 If keycode = 13 Then
 keycode = 0
     If Compute.Prompt = "? " Then
-        glist3(2).backcolor = &H3B3B3B
+        gList3(2).backcolor = &H3B3B3B
         TestShowCode = False
         stackshow MyBaseTask
     Else
@@ -345,12 +345,12 @@ gList2.FloatLimitTop = VirtualScreenHeight() - players(0).Yt * 2
 gList2.FloatLimitLeft = VirtualScreenWidth() - players(0).Xt * 2
 gList2.MoveParent = True
 'gList2.enabled = True
-glist1.DragEnabled = False
-glist1.AutoPanPos = True
+gList1.DragEnabled = False
+gList1.AutoPanPos = True
 Set testpad = New TextViewer
-glist1.NoWheel = True
-Set testpad.Container = glist1
-testpad.Filename = vbNullString
+gList1.NoWheel = True
+Set testpad.Container = gList1
+testpad.FileName = vbNullString
 testpad.glistN.DropEnabled = False
 testpad.glistN.DragEnabled = False
 testpad.glistN.LeftMarginPixels = 8
@@ -365,9 +365,9 @@ Compute.MaxCharLength = 500 ' as a limit
 Compute.locked = False
 Compute.enabled = True
 Compute.Retired
-Set Label(0).Container = glist3(0)
-Set Label(1).Container = glist3(1)
-Set Label(2).Container = glist3(2)
+Set Label(0).Container = gList3(0)
+Set Label(1).Container = gList3(1)
+Set Label(2).Container = gList3(2)
 If pagio$ = "GREEK" Then
 gList2.HeadLine = "Έλεγχος"
 Compute.Prompt = "? "
@@ -456,14 +456,14 @@ End Sub
 
 
 Private Sub gList1_CheckGotFocus()
-glist1.backcolor = &H606060
-glist1.ShowMe2
+gList1.backcolor = &H606060
+gList1.ShowMe2
 End Sub
 
 Private Sub gList1_CheckLostFocus()
 
-glist1.backcolor = &H3B3B3B
-glist1.ShowMe2
+gList1.backcolor = &H3B3B3B
+gList1.ShowMe2
 End Sub
 
 
@@ -478,7 +478,7 @@ abt = False
 sHelp gList2.HeadLine, testpad.Text, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 
 If TestShowCode Then
-vHelp True
+If Not Form4.Visible Then vHelp True
 Form4.label1.SelStartSilent = testpad.SelStart
 Form4.label1.SelLengthSilent = 0
 Form4.label1.SelectionColor = rgb(255, 64, 128)
@@ -678,10 +678,10 @@ End If
 ElseIf index = 2 Then
 TestShowCode = Not TestShowCode
 If TestShowCode Then
-glist3(2).backcolor = &H606060
+gList3(2).backcolor = &H606060
 Label(2) = Label(2)
 Else
-glist3(2).backcolor = &H3B3B3B
+gList3(2).backcolor = &H3B3B3B
 Label(2) = Label(2)
 testpad.SetRowColumn 1, 1
 End If
@@ -863,7 +863,7 @@ Else
         LastWidth = Width
       gList2.HeadlineHeight = gList2.HeightPixels
         gList2.PrepareToShow
-        glist1.PrepareToShow
+        gList1.PrepareToShow
         'testpad.Render
         lY = lY * lastfactor / factor
         End If
@@ -898,23 +898,23 @@ FontTransparent = False  ' clear background  or false to write over
 gList2.move borderleft, bordertop, itemWidth, bordertop * 3
 gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
 gList2.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
-glist3(0).move borderleft, bordertop * 5, itemwidth2, bordertop * 4
-glist3(1).move borderleft, bordertop * 9, itemwidth2, bordertop * 4
-glist3(2).move borderleft, bordertop * 13, itemwidth2, bordertop * 4
+gList3(0).move borderleft, bordertop * 5, itemwidth2, bordertop * 4
+gList3(1).move borderleft, bordertop * 9, itemwidth2, bordertop * 4
+gList3(2).move borderleft, bordertop * 13, itemwidth2, bordertop * 4
 gList4.move borderleft * 2 + itemwidth2, bordertop * 5, itemwidth3, bordertop * 12
-glist1.move borderleft, bordertop * 18, itemWidth, bordertop * 12
+gList1.move borderleft, bordertop * 18, itemWidth, bordertop * 12
 gList0.move borderleft, bordertop * 31, itemWidth, bordertop * 3
 End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
 gList2.FontSize = 14.25 * factor * dv15 / 15
 factor = gList2.FontSize / 14.25 / dv15 * 15
-glist1.FontSize = 11.25 * factor * dv15 / 15
+gList1.FontSize = 11.25 * factor * dv15 / 15
 gList4.FontSize = 12 * factor * dv15 / 15
-factor = glist1.FontSize / 11.25 / dv15 * 15
-glist3(0).FontSize = glist1.FontSize
-glist3(1).FontSize = glist1.FontSize
-glist3(2).FontSize = glist1.FontSize
-gList0.FontSize = glist1.FontSize
+factor = gList1.FontSize / 11.25 / dv15 * 15
+gList3(0).FontSize = gList1.FontSize
+gList3(1).FontSize = gList1.FontSize
+gList3(2).FontSize = gList1.FontSize
+gList0.FontSize = gList1.FontSize
 ScaleDialogFix = factor
 End Function
 

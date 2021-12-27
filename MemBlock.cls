@@ -30,7 +30,7 @@ Private Type METAFILEPICT
 End Type
 Private Type PWMFRect16
     Left   As Integer
-    top    As Integer
+    Top    As Integer
     Right  As Integer
     Bottom As Integer
 End Type
@@ -456,8 +456,8 @@ there:
 End If
         
 End Function
-Friend Function GetStdPicture1(Optional Width As Long = -1, Optional Height As Long = -1, Optional ByVal backcolor As Long = vbWhite, Optional RetainRatio As Boolean = False, Optional bitmap As Boolean = False, Optional magia1 As Boolean = False) As IPicture
-   Dim a1 As SAFEARRAY1D, a() As Byte, Token As Long
+Friend Function GetStdPicture1(Optional Width As Long = -1, Optional Height As Long = -1, Optional ByVal BackColor As Long = vbWhite, Optional RetainRatio As Boolean = False, Optional bitmap As Boolean = False, Optional magia1 As Boolean = False) As IPicture
+   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
      With a1
         .cbElements = 1
         .cDims = 1
@@ -480,7 +480,7 @@ GoTo there1
 End If
     If mSubtype <> 2 Or bitmap Then
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-        Set GetStdPicture1 = LoadImageFromBuffer3(a(), Width, Height, backcolor, magia1)
+        Set GetStdPicture1 = LoadImageFromBuffer3(a(), Width, Height, BackColor, magia1)
          CopyMemory ByVal VarPtrArray(a), 0&, 4
     Else
        Dim hEmf As Long
@@ -499,8 +499,8 @@ there1:
    
  
 End Function
-Public Function GetStdPicture(Optional Width As Long = -1, Optional Height As Long = -1, Optional ByVal backcolor As Long = vbWhite, Optional FlipOrRotate As Long = 0, Optional bitmap As Boolean = False) As IPicture
-   Dim a1 As SAFEARRAY1D, a() As Byte, Token As Long
+Public Function GetStdPicture(Optional Width As Long = -1, Optional Height As Long = -1, Optional ByVal BackColor As Long = vbWhite, Optional FlipOrRotate As Long = 0, Optional bitmap As Boolean = False) As IPicture
+   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
      With a1
         .cbElements = 1
         .cDims = 1
@@ -519,7 +519,7 @@ Public Function GetStdPicture(Optional Width As Long = -1, Optional Height As Lo
     End If
     If mSubtype <> 2 Or bitmap Then
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-        Set GetStdPicture = LoadImageFromBuffer2(a(), Width, Height, backcolor, FlipOrRotate)
+        Set GetStdPicture = LoadImageFromBuffer2(a(), Width, Height, BackColor, FlipOrRotate)
          CopyMemory ByVal VarPtrArray(a), 0&, 4
     Else
        Dim hEmf As Long
@@ -540,8 +540,8 @@ there1:
    
  
 End Function
-Public Function DrawEmfToHdc(Scr As Object, x As Long, y As Long, angle!, Width As Long, Height As Long) As Boolean
-   Dim a1 As SAFEARRAY1D, a() As Byte, Token As Long
+Public Function DrawEmfToHdc(Scr As Object, X As Long, Y As Long, angle!, Width As Long, Height As Long) As Boolean
+   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
    If mSubtype = 0 Then
         If IsEmf Then
         mSubtype = 2
@@ -557,13 +557,13 @@ Public Function DrawEmfToHdc(Scr As Object, x As Long, y As Long, angle!, Width 
         .pvData = Me.GetPtr(0)
     End With
     CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-    DrawEmfToHdc = DrawEmfFromBuffer(Scr, a(), x, y, angle!, Width, Height)
+    DrawEmfToHdc = DrawEmfFromBuffer(Scr, a(), X, Y, angle!, Width, Height)
     
     CopyMemory ByVal VarPtrArray(a), 0&, 4
  
 End Function
-Public Function DrawSpriteToHdc(bstack As basetask, sprt As Boolean, angle!, zoomfactor!, blend!, Optional backcolor As Long = -1) As Boolean
-   Dim a1 As SAFEARRAY1D, a() As Byte, Token As Long
+Public Function DrawSpriteToHdc(bstack As basetask, sprt As Boolean, angle!, zoomfactor!, blend!, Optional BackColor As Long = -1) As Boolean
+   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
    If mSubtype = 0 Then
         If IsEmf Then
         mSubtype = 2
@@ -579,13 +579,13 @@ Public Function DrawSpriteToHdc(bstack As basetask, sprt As Boolean, angle!, zoo
         .pvData = Me.GetPtr(0)
     End With
     CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-    DrawSpriteToHdc = DrawSpriteFromBuffer(bstack, a(), Not sprt, angle!, zoomfactor!, blend!, backcolor, mSubtype = 2)
+    DrawSpriteToHdc = DrawSpriteFromBuffer(bstack, a(), Not sprt, angle!, zoomfactor!, blend!, BackColor, mSubtype = 2)
     
     CopyMemory ByVal VarPtrArray(a), 0&, 4
  
 End Function
-Public Function DrawImageToHdc(where As Object, Optional x As Long = 0&, Optional y As Long = 0&, Optional Width As Long = -1, Optional Height As Long = -1) As Boolean
-   Dim a1 As SAFEARRAY1D, a() As Byte, Token As Long
+Public Function DrawImageToHdc(where As Object, Optional X As Long = 0&, Optional Y As Long = 0&, Optional Width As Long = -1, Optional Height As Long = -1) As Boolean
+   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
      With a1
         .cbElements = 1
         .cDims = 1
@@ -594,13 +594,13 @@ Public Function DrawImageToHdc(where As Object, Optional x As Long = 0&, Optiona
         .pvData = Me.GetPtr(0)
     End With
    CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-   DrawImageToHdc = DrawImageFromBuffer(a(), where.hDC, x, y, (Width), (Height))
+   DrawImageToHdc = DrawImageFromBuffer(a(), where.hdc, X, Y, (Width), (Height))
    CopyMemory ByVal VarPtrArray(a), 0&, 4
  
 End Function
 Public Function ReadImageSizeX(SizeX As Variant) As Boolean
 If Width <> -1 Then SizeX = Width: ReadImageSizeX = True: Exit Function
-   Dim a1 As SAFEARRAY1D, a() As Byte, Token As Long
+   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
      With a1
         .cbElements = 1
         .cDims = 1
@@ -623,7 +623,7 @@ If Width <> -1 Then SizeX = Width: ReadImageSizeX = True: Exit Function
 End Function
 Public Function ReadImageSizeY(SizeY As Variant) As Boolean
 If Height <> -1 Then SizeY = Height: ReadImageSizeY = True: Exit Function
-   Dim a1 As SAFEARRAY1D, a() As Byte, Token As Long
+   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
      With a1
         .cbElements = 1
         .cDims = 1
@@ -643,7 +643,7 @@ If Height <> -1 Then SizeY = Height: ReadImageSizeY = True: Exit Function
     CopyMemory ByVal VarPtrArray(a), 0&, 4
 End Function
 Public Sub ResetImageSize()
-Dim a1 As SAFEARRAY1D, a() As Byte, Token As Long
+Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
      With a1
         .cbElements = 1
         .cDims = 1
@@ -697,13 +697,13 @@ If mItems > 0 Then
 End If
 End Function
 Public Function Search(from As Long, what) As Long
-Dim limit As Long, b As Byte, i As Long, w As Byte
-b = Abs(what) And &HFF
+Dim limit As Long, B As Byte, i As Long, w As Byte
+B = Abs(what) And &HFF
 limit = SizeByte - 1
 
 For i = from To limit
     GetMem1 GetBytePtr(i), w
-    If b = w Then
+    If B = w Then
     Search = i + 1: Exit Function
     End If
 Next
@@ -717,7 +717,7 @@ End Property
 Public Property Let SubType(ByVal RHS As Variant)
 mSubtype = RHS
 End Property
-Public Sub SentToClipBoard(Optional pWidth As Long = -1, Optional ByVal pHeight As Long = -1, Optional backcolor As Long = vbWhite, Optional lockratio As Boolean = False, Optional toBitmap As Boolean = False)
+Public Sub SentToClipBoard(Optional pWidth As Long = -1, Optional ByVal pHeight As Long = -1, Optional BackColor As Long = vbWhite, Optional lockratio As Boolean = False, Optional toBitmap As Boolean = False)
     Dim hBitmap As Long
     Dim mm As StdPicture, hEmf As Long
     On Error Resume Next
@@ -730,7 +730,7 @@ Public Sub SentToClipBoard(Optional pWidth As Long = -1, Optional ByVal pHeight 
         lockratio = True
     End If
 
-    Set mm = GetStdPicture1(pWidth, pHeight, backcolor, lockratio, toBitmap)
+    Set mm = GetStdPicture1(pWidth, pHeight, BackColor, lockratio, toBitmap)
 
     If Err.Number > 0 Or (mm Is Nothing) Then
         MyEr "Not a proper picture to send it to clipboard", "Δεν είναι μια σωστή εικόνα για να τη στείλω στο πρόχειρο"
@@ -855,7 +855,7 @@ Exit Function
 End If
     On Error Resume Next
     zz.mm = 1
-    getEmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.hDC, zz)
+    getEmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.hdc, zz)
 End Function
 
 Public Sub SentWmfToClipBoard()
@@ -876,11 +876,20 @@ Public Sub SentWmfToClipBoard()
     End If
 
 End Sub
-Friend Function CreateFromPicture(backcolor As Long, w1 As Long, w2 As Long, rot As Long) As mHandler
+Friend Function CreateFromPicture(BackColor As Long, w1 As Long, w2 As Long, rot As Long) As mHandler
 Dim aa As New cDIBSection
 If w1 <> -1 Then w1 = w1 / dv15
 If w2 <> -1 Then w2 = w2 / dv15
-    aa.CreateFromPicture GetStdPicture(w1, w2, mycolor(backcolor), rot)
+   
+    
+    Dim sp As StdPicture
+    Set sp = GetStdPicture(w1, w2, mycolor(BackColor), rot)
+    If sp.Type = 4 Then
+    aa.emfSizeFactor = 1
+    aa.CreateFromPicture sp, mycolor(BackColor), w1, w2
+    Else
+    aa.CreateFromPicture sp
+    End If
     Dim k As Object
     Set k = New MemBlock
     aa.SaveDibToMeMBlock k

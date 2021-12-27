@@ -66,6 +66,7 @@ Public lastobj As Object
 Public FuncObj As Object
 Public FuncRec As String
 Public FuncValue As Variant
+Public ErrorOriginal As Long
 Public LastValue As Variant
 Public LastState As Boolean
 Public LastEnum As Variant
@@ -95,11 +96,11 @@ End Sub
 
 Public Sub SetV()
 Vars = var2used  ' these are globals
-Vname = varhash.Count
+Vname = varhash.count
 End Sub
 Public Sub SetV2()
 Vars = var2used + ByName
-Vname = varhash.Count + ByName
+Vname = varhash.count + ByName
 End Sub
 Public Sub CopyStrip(bst As basetask)
 With bst
@@ -279,7 +280,7 @@ If Not StaticCollection.Find(Name$) Then Exit Function
             Set mm = Nothing
         ElseIf usehandler.t1 = 4 Then
                 If ss$ = "++" Then
-                        If usehandler.index_start < usehandler.objref.Count - 1 Then
+                        If usehandler.index_start < usehandler.objref.count - 1 Then
                             usehandler.index_start = usehandler.index_start + 1
                             usehandler.objref.index = usehandler.index_start
                             usehandler.index_cursor = usehandler.objref.Value
@@ -507,9 +508,23 @@ Public Sub ReadStaticCol(ByVal Name$, var As Variant)
         If .Find(Name$) Then
             If .IsObj Then
                     Set var = .ValueObj
-                    
-            
-            Else
+              Else
+                   Set var = Nothing
+            End If
+        End If
+    End With
+End Sub
+Public Sub ReadStaticCol2(Name$, var As Variant)
+    Dim i As Long, vv As Variant
+    If StaticCollection Is Nothing Then
+    Set var = Nothing
+    Exit Sub
+    End If
+    With StaticCollection
+        If .Find(Name$) Then
+            If .IsObj Then
+                    Set var = .ValueObj
+              Else
                    Set var = Nothing
             End If
         End If
@@ -833,7 +848,7 @@ Public Function ThreadsStr(Optional ByVal Lang As Long = 0)
 Dim aa As mThreadref, a$
 If threadsnames Is Nothing Then Exit Function
 
-If threadsnames.Count > 0 Then
+If threadsnames.count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
 ' For Each aa In threadsnames
@@ -866,7 +881,7 @@ Public Function ThreadsNumber() As Long
 '' use threadsnames
 Dim aa As mThreadref, kk
 If threadsnames Is Nothing Then ThreadsNumber = kk: Exit Function
-If threadsnames.Count > 0 Then
+If threadsnames.count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
 Set aa = threadsnames.ValueObj
@@ -883,7 +898,7 @@ Dim aa As mThreadref, Tid As Long
 Dim thatProcess As TaskInterface
 Dim thatBasetask As basetask
 cont:
-If threadsnames.Count > 0 Then
+If threadsnames.count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
 Set aa = threadsnames.ValueObj
@@ -918,7 +933,7 @@ If parentSoros.LookNull Then
 ElseIf parentSoros.PopType = ">" Then
     parentSoros.drop 1
     IsOptionalForArray = check
-ElseIf parentSoros.Count = 0 Then
+ElseIf parentSoros.count = 0 Then
   IsOptionalForArray = check
 End If
 End Function
@@ -928,7 +943,7 @@ If parentSoros.LookNull Then
 ElseIf parentSoros.PopType = ">" Then
     parentSoros.drop 1
     IsOptional = True
-ElseIf parentSoros.Count = 0 Then
+ElseIf parentSoros.count = 0 Then
   IsOptional = True
 End If
 End Function
@@ -987,16 +1002,42 @@ Set R = parentSoros.PopObj
 IsInStackObject = True
 End If
 End Function
+Public Function RetStackLookTopVal()
+If RetSoros Is Nothing Then Exit Function
+RetStackLookTopVal = RetSoros.LookTopVal
+End Function
 Public Function IsInRetStackNumberLong(R As Long) As Boolean
 If RetSoros Is Nothing Then Exit Function
+If RetSoros.IsDecimal Then Exit Function
+
 Dim v As Variant
 v = RetSoros.LookTopVal
+
 If MyIsNumeric(v) Then
 IsInRetStackNumberLong = True
+
 R = CLng(v)
 RetSoros.drop 1
 End If
 End Function
+Public Sub PushSecondThird(a As Long, b As Long)
+    RetStack.PushSecondThird a, b
+End Sub
+Public Function isPop3Long(a As Long, b As Long) As Long
+    isPop3Long = RetStack.isPop3Long(a, b)
+End Function
+Public Function Pop3Long(a As Long, b As Long) As Long
+    Pop3Long = RetStack.Pop3Long(a, b)
+End Function
+Public Function IsDecimal() As Boolean
+    IsDecimal = RetStack.IsDecimal
+End Function
+Public Sub RetStackDrop(a As Long)
+    RetStack.drop a
+End Sub
+Public Sub Flush()
+If Not RetStack Is Nothing Then RetStack.Flush
+End Sub
 Public Function IsInRetStackNumber(R As Variant) As Boolean
 If RetSoros Is Nothing Then Exit Function
 Dim v As Variant

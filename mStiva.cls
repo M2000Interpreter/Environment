@@ -252,6 +252,9 @@ If TypeOf bb Is mHandler Then
 Set mh = bb
 Set bb = mh.objref
 CheckDeepAny bb
+If Not TypeOf bb Is mHandler Then
+StackItemTypeObjectType = "*[" + Typename(mh.objref) + "]"
+Else
 Set mh = bb
 If mh.t1 = 3 Or mh.t1 = 0 Then
 StackItemTypeObjectType = "*[" + Typename(mh.objref) + "]"
@@ -261,6 +264,7 @@ ElseIf mh.t1 = 2 Then
 StackItemTypeObjectType = "*[Buffer]"
 ElseIf mh.t1 = 4 Then
 StackItemTypeObjectType = "*[Enum]"
+End If
 End If
 Else
 StackItemTypeObjectType = Typename(bb)

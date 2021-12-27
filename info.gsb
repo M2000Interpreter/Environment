@@ -1448,7 +1448,7 @@ t=(1,0,1)
 Print c#pos(t) ' 1  means 2nd position
 Print c#pos(3->t) ' 6  means 7th position
 }
-MODULE R1 {Report {Recerse a string holding the right chaacters in order (not reversed)
+MODULE R1 {Report {Reverse a string holding the right chaacters in order (not reversed)
 Using StrRev$() we get error in third exanple
 }
 Function DispRev$(a$) {
@@ -9067,7 +9067,7 @@ MODULE KB {Function CallMe {
       Gradient 5,5
       Cursor 0,0
       Double
-      Report 2, "Keyboard 005"   
+      Report 2, "Keyboard 006 - Fast Response"   
       Normal
       Report 2,{Menu
       1-Exit  3-Xylophone 4-Piano 5-Saxophone  8-Show Keys/Notes 9-Rythm Yes 0-Rythm No
@@ -9111,6 +9111,7 @@ MODULE KB {Function CallMe {
       refresh 5000
       Scroll Split  Height/2+1
       Cursor 0, Height/2+1
+      Global Refr=True
       Module ClKey {
             Read a$, press, sel
             If press Then {
@@ -9118,10 +9119,12 @@ MODULE KB {Function CallMe {
             Next()
             voi(sel)=f
             Print a$, f
+            Refr<=true
             Score f, dur, a$+vol$ : kb$<=kb$+a$+"-": Play f, org
             } else {
                   kb$<=Replace$(a$+"-","", kb$)
                   If voi(sel)>0 Then {
+                  Refr<=true
                    Play voi(sel), 0 
                    use(voi(sel))~
                    voi(sel)=0
@@ -9161,13 +9164,13 @@ MODULE KB {Function CallMe {
       Threads
       Thread L Interval 6000
       Main.Task 10 {
-            Display(mm, kk, mm2, kk1)
-            Refresh 1000
+            If Refr Then refresh 1000 : Display(mm, kk, mm2, kk1): Refr<=false
+            Refresh 10: wait 1
             If KeyPress(asc("1")) Then Exit
             If KeyPress(asc("3")) Then org<=14 : dur<=100 
             If KeyPress(asc("4")) Then org<=5 : dur<=300
             If KeyPress(asc("5")) Then org<=65 : dur<=5000
-            If KeyPress(asc("8")) Then n=1-n
+            If KeyPress(asc("8")) Then n=1-n : refr<=true
             If KeyPress(asc("9")) Then Thread L Restart
             If KeyPress(asc("0")) Then Thread L Hold
             If KeyPress(32) Then { vol$ <= "V127"  } else vol$ <=if$(dur=300->"V100", "V110")
@@ -10223,7 +10226,7 @@ MODULE COMPILER {Module CompilerExample {
 	Refresh
 	Print "Lexical Analyzer" : Refresh
 	lexical_analyzer
-	Print "Syntaxl Analyzer" : Refresh
+	Print "Syntax Analyzer" : Refresh
 	syntax_analyzer
 	Print "Code Generator" : Refresh
 	CodeGenerator
@@ -13731,8 +13734,13 @@ MODULE INTERACTION {Module CheckIt {
       Method buttonRND, "move", 4000,3000,2000,600
       With form1, "Title", "Rosetta Code: GUI component interaction"
       With textbox1,"vartext" as textbox1.value$, "Prompt", "Value:", "ShowAlways", true
-      With buttonInc,"Caption","Increment"
-      With buttonRND,"Caption","Random"
+      
+      With buttonInc,"Caption","Increment [+]"
+      Method buttonInc, "AccKey", "+", opcode:=1
+      
+      With buttonRND,"Caption","Random [^R]"
+      Method buttonRND, "AccKey", "R", ctrl:=true, opcode:=1
+      
       textbox1.value$="0"
       Function Local1(new Feed$) {
             \\ this Function can be used from other Integer 

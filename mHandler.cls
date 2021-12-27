@@ -73,11 +73,11 @@ If IsObject(index_cursor) Then Set mObjRef = index_cursor: index_cursor = vbEmpt
     index_End = 0
 End If
 End Sub
-Friend Function CreateFromPicture(b As Long, w1 As Long, w2 As Long, w3 As Long) As Object
+Friend Function CreateFromPicture(B As Long, w1 As Long, w2 As Long, w3 As Long) As Object
 If t1 = 2 Then
 Dim mm As MemBlock
 Set mm = mObjRef
-Set CreateFromPicture = mm.CreateFromPicture(b, w1, w2, w3)
+Set CreateFromPicture = mm.CreateFromPicture(B, w1, w2, w3)
 End If
 End Function
 
