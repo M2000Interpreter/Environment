@@ -1,9 +1,9 @@
-* text=auto encoding=ISO-8859-7
-*.frm eol=crlf
-*.bas eol=crlf
-*.cls eol=crlf
-*.ctl eol=crlf
-*.vbp eol=crlf
-*.vbw eol=crlf
-*.bas=auto encoding=ISO-8859-7
+*.frm eol=crlf diff=win1252
+*.bas eol=crlf diff=win1252
+*.cls eol=crlf diff=win1252
+*.ctl eol=crlf diff=win1252
+*.vbp eol=crlf diff=win1252
+*.vbw eol=crlf diff=win1252
+*.bas  eol=crlf diff=win1252
+
 
