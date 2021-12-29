@@ -1,9 +1,9 @@
-*.frm eol=crlf diff=win1252 working-tree-encoding=windows-1252
-*.bas eol=crlf diff=win1252 working-tree-encoding=windows-1252
-*.cls eol=crlf diff=win1252 working-tree-encoding=windows-1252
-*.ctl eol=crlf diff=win1252 working-tree-encoding=windows-1252
-*.vbp eol=crlf diff=win1252 working-tree-encoding=windows-1252
+*.frm eol=crlf diff=win1252 working-tree-encoding=windows-1253
+*.bas eol=crlf diff=win1252 working-tree-encoding=windows-1253
+*.cls eol=crlf diff=win1252 working-tree-encoding=windows-1253
+*.ctl eol=crlf diff=win1252 working-tree-encoding=windows-1253
+*.vbp eol=crlf diff=win1252 working-tree-encoding=windows-1253
 *.vbw eol=crlf
-*.bas  eol=crlf diff=win1252 working-tree-encoding=windows-1252
+*.bas  eol=crlf diff=win1252 working-tree-encoding=windows-1253
 
 
