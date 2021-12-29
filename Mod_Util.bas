@@ -511,7 +511,7 @@ contarr0:
                                         GoTo contarr0
             
                                         Else
-                                                MyEr "Use STACKTYPE$() ", " Χρησιμοποίησε την ΣΩΡΟΥΤΥΠΟΣ$()"
+                                                MyEr "Use STACKTYPE$() ", " Γ—Γ±Γ§Γ³Γ©Γ¬Γ―Γ°Γ―ΓΓ§Γ³Γ¥ Γ΄Γ§Γ­ Γ“Γ™Γ‘ΓΓ•Γ”Γ•ΓΓΓ“$()"
                                                 CheckItemType = False
                                                 Exit Function
                                         End If
@@ -640,10 +640,10 @@ contarr1:
 End Function
 
 Sub NoValidCodePage()
-    MyEr "Invalid code page", "ανύπαρκτη κωδικοσελίδα"
+    MyEr "Invalid code page", "Γ΅Γ­Γ½Γ°Γ΅Γ±ΓªΓ΄Γ§ ΓªΓΉΓ¤Γ©ΓªΓ―Γ³Γ¥Γ«ΓΓ¤Γ΅"
 End Sub
 Sub NoValidLocale()
-    MyEr "Invalid Locale ID", "ανύπαρκτος κωδικός τοπικού"
+    MyEr "Invalid Locale ID", "Γ΅Γ­Γ½Γ°Γ΅Γ±ΓªΓ΄Γ―Γ² ΓªΓΉΓ¤Γ©ΓªΓΌΓ² Γ΄Γ―Γ°Γ©ΓªΓ―Γ½"
 End Sub
 Public Function Utf16toUtf8(s As String) As Byte()
     ' code from vbforum
@@ -735,29 +735,29 @@ End If
 MOUSEY:
 End Function
 Public Sub OnlyInAGroup()
-    MyEr "Only in a group", "Μόνο σε μια ομάδα"
+    MyEr "Only in a group", "ΓΓΌΓ­Γ― Γ³Γ¥ Γ¬Γ©Γ΅ Γ―Γ¬ΓΓ¤Γ΅"
 End Sub
 Public Sub WrongOperator()
-MyEr "Wrong operator", "λάθος τελεστής"
+MyEr "Wrong operator", "Γ«ΓΓ¨Γ―Γ² Γ΄Γ¥Γ«Γ¥Γ³Γ΄ΓΓ²"
 End Sub
 Public Sub NoOperatorForThatObject(ss$)
 If ss$ = "g" Then ss$ = "<="
-    MyEr "Object not support operator " + ss$, "Το αντικείμενο δεν υποστηρίζει το τελεστή " + ss$
+    MyEr "Object not support operator " + ss$, "Γ”Γ― Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ¤Γ¥Γ­ ΓµΓ°Γ―Γ³Γ΄Γ§Γ±ΓΓ¦Γ¥Γ© Γ΄Γ― Γ΄Γ¥Γ«Γ¥Γ³Γ΄Γ " + ss$
 End Sub
 Public Sub NoStackObjectFound(a$)
-    MyErMacro a$, "Not stack object found", "Δεν βρήκα αντικείμενο σωρού"
+    MyErMacro a$, "Not stack object found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ³ΓΉΓ±Γ―Γ½"
 End Sub
 Public Sub NoStackObjectToMerge()
-    MyEr "Not stack object to merge", "Δεν βρήκα αντικείμενο σωρού να ενώσω"
+    MyEr "Not stack object to merge", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ³ΓΉΓ±Γ―Γ½ Γ­Γ΅ Γ¥Γ­ΓΎΓ³ΓΉ"
 End Sub
 Public Sub Unsignlongnegative(a$)
-    MyErMacro a$, "Unsigned long can't be negative", "Ο ακέραιος χωρίς προσημο δεν μπορεί να είναι αρνητικός"
+    MyErMacro a$, "Unsigned long can't be negative", "Γ Γ΅ΓªΓΓ±Γ΅Γ©Γ―Γ² Γ·ΓΉΓ±ΓΓ² Γ°Γ±Γ―Γ³Γ§Γ¬Γ― Γ¤Γ¥Γ­ Γ¬Γ°Γ―Γ±Γ¥Γ Γ­Γ΅ Γ¥ΓΓ­Γ΅Γ© Γ΅Γ±Γ­Γ§Γ΄Γ©ΓªΓΌΓ²"
 End Sub
 Public Sub Unsignlongfailed(a$)
-MyErMacro a$, "Unsigned long to sign failedend", "Η μετατροπή ακέραιου χωρίς πρόσημο σε ακέραιο με πρόσημο, απέτυχε"
+MyErMacro a$, "Unsigned long to sign failedend", "Γ‡ Γ¬Γ¥Γ΄Γ΅Γ΄Γ±Γ―Γ°Γ Γ΅ΓªΓΓ±Γ΅Γ©Γ―Γµ Γ·ΓΉΓ±ΓΓ² Γ°Γ±ΓΌΓ³Γ§Γ¬Γ― Γ³Γ¥ Γ΅ΓªΓΓ±Γ΅Γ©Γ― Γ¬Γ¥ Γ°Γ±ΓΌΓ³Γ§Γ¬Γ―, Γ΅Γ°ΓΓ΄ΓµΓ·Γ¥"
 End Sub
 Public Sub NoProperObject()
-MyEr "This object not supported", "Αυτό το αντικείμενο δεν υποστηρίζεται"
+MyEr "This object not supported", "ΓΓµΓ΄ΓΌ Γ΄Γ― Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ¤Γ¥Γ­ ΓµΓ°Γ―Γ³Γ΄Γ§Γ±ΓΓ¦Γ¥Γ΄Γ΅Γ©"
 End Sub
 
 Public Sub MyEr(er$, ergr$)
@@ -793,39 +793,39 @@ Dim i As Long
 i = rinstr(v$, "." + ChrW(8191))
 If i > 0 Then
     i = rinstr(v$, ".")
-    MyErMacro a$, "Unknown Variable " & Mid$(v$, i), "Άγνωστη μεταβλητή " & Mid$(v$, i)
+    MyErMacro a$, "Unknown Variable " & Mid$(v$, i), "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ " & Mid$(v$, i)
 Else
     i = rinstr(v$, "].")
     If i > 0 Then
-        MyErMacro a$, "Unknown Variable " & Mid$(v$, i + 2), "Άγνωστη μεταβλητή " & Mid$(v$, i + 2)
+        MyErMacro a$, "Unknown Variable " & Mid$(v$, i + 2), "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ " & Mid$(v$, i + 2)
     Else
         i = rinstr(v$, ChrW(8191))
     If i > 0 Then
         i = InStr(i + 1, v$, ".")
         If i > 0 Then
-            MyErMacro a$, "Unknown Variable " & Mid$(v$, i + 1), "Άγνωστη μεταβλητή " & Mid$(v$, i + 1)
+            MyErMacro a$, "Unknown Variable " & Mid$(v$, i + 1), "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ " & Mid$(v$, i + 1)
         Else
-            MyErMacro a$, "Unknown Variable", "Άγνωστη μεταβλητή"
+            MyErMacro a$, "Unknown Variable", "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ"
         End If
     Else
-        MyErMacro a$, "Unknown Variable " & v$, "Άγνωστη μεταβλητή " & v$
+        MyErMacro a$, "Unknown Variable " & v$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ " & v$
     End If
     End If
 End If
 
 End Sub
 Sub UnknownProperty1(a$, v$)
-MyErMacro a$, "Unknown Property " & v$, "Άγνωστη ιδιότητα " & v$
+MyErMacro a$, "Unknown Property " & v$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ©Γ¤Γ©ΓΌΓ΄Γ§Γ΄Γ΅ " & v$
 End Sub
 Sub UnknownMethod1(a$, v$)
- MyErMacro a$, "unknown method/array  " & v$, "Άγνωστη μέθοδος/πίνακας " & v$
+ MyErMacro a$, "unknown method/array  " & v$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ¬ΓΓ¨Γ―Γ¤Γ―Γ²/Γ°ΓΓ­Γ΅ΓªΓ΅Γ² " & v$
 End Sub
 Sub UnknownFunction1(a$, v$)
- MyErMacro a$, "unknown function/array " & v$, "Άγνωστη συνάρτηση/πίνακας " & v$
+ MyErMacro a$, "unknown function/array " & v$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ³ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§/Γ°ΓΓ­Γ΅ΓªΓ΅Γ² " & v$
 End Sub
 
 Sub InternalError()
- MyEr "Internal Error", "Εσωτερικό Πρόβλημα"
+ MyEr "Internal Error", "Γ…Γ³ΓΉΓ΄Γ¥Γ±Γ©ΓªΓΌ ΓΓ±ΓΌΓΆΓ«Γ§Γ¬Γ΅"
 End Sub
 Public Function LoadFont(ByVal FntFileName As String) As Boolean
     Dim FntRC As Long
@@ -864,7 +864,7 @@ End Function
 Public Sub RemoveAllFonts()
 Dim i As Long, FntFileName As String, Inc As Integer, rc As Long
 If FontList Is Nothing Then Exit Sub
-For i = 0 To FontList.count - 1
+For i = 0 To FontList.Count - 1
     FontList.index = i
     FntFileName = FontList.KeyToString
     Inc = 0
@@ -1385,7 +1385,7 @@ Sub spriteGDI(bstack As basetask, rst As String)
 Dim NoUseBack As Boolean, usehandler As mHandler
 If bstack.lastobj Is Nothing Then
 Err1:
-    MyEr "Expecting a memory Buffer", "Περίμενα διάρθρωση μνήμης"
+    MyEr "Expecting a memory Buffer", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ¤Γ©ΓΓ±Γ¨Γ±ΓΉΓ³Γ§ Γ¬Γ­ΓΓ¬Γ§Γ²"
     Exit Sub
 End If
 If Not TypeOf bstack.lastobj Is mHandler Then GoTo Err1
@@ -2927,7 +2927,7 @@ cLast& = Len(a$)
 If cLast& + x& >= .mx Then
 MyDoEvents
 If dq.Font.charset = 161 Then
-b$ = InputBoxN("Εισαγωγή Τιμής Πεδίου", MesTitle$, a$, noinp)
+b$ = InputBoxN("Γ…Γ©Γ³Γ΅Γ£ΓΉΓ£Γ Γ”Γ©Γ¬ΓΓ² ΓΓ¥Γ¤ΓΓ―Γµ", MesTitle$, a$, noinp)
 Else
 b$ = InputBoxN("Input Field Value", MesTitle$, a$, noinp)
 End If
@@ -3389,7 +3389,7 @@ If SzOne < 36 And D.Height / SzOne > 250 Then SetDouble D: BAR = BAR + 1
 If SzOne < 83 Then
 
 If bstack.myCharSet = 161 Then
-b$ = "ΠΕΡΙΒΑΛΛΟΝ "
+b$ = "ΓΓ…Γ‘Γ‰Γ‚ΓΓ‹Γ‹ΓΓ "
 Else
 b$ = "ENVIRONMENT "
 End If
@@ -3421,13 +3421,13 @@ SetNormal D
         rs = vbNullString
             If bstack.myCharSet = 161 Then
             If Revision = 0 Then
-            wwPlain2 bstack, players(DisForm), "Έκδοση Διερμηνευτή: " & CStr(VerMajor) & "." & CStr(VerMinor), D.Width, 0, True
+            wwPlain2 bstack, players(DisForm), "ΒΈΓªΓ¤Γ―Γ³Γ§ Γ„Γ©Γ¥Γ±Γ¬Γ§Γ­Γ¥ΓµΓ΄Γ: " & CStr(VerMajor) & "." & CStr(VerMinor), D.Width, 0, True
             Else
-                    wwPlain2 bstack, players(DisForm), "Έκδοση Διερμηνευτή: " & CStr(VerMajor) & "." & Left$(CStr(VerMinor), 1) & " (" & CStr(Revision) & ")", D.Width, 0, True
+                    wwPlain2 bstack, players(DisForm), "ΒΈΓªΓ¤Γ―Γ³Γ§ Γ„Γ©Γ¥Γ±Γ¬Γ§Γ­Γ¥ΓµΓ΄Γ: " & CStr(VerMajor) & "." & Left$(CStr(VerMinor), 1) & " (" & CStr(Revision) & ")", D.Width, 0, True
                 End If
-                   wwPlain2 bstack, players(DisForm), "Λειτουργικό Σύστημα: " & os & osbit, D.Width, 0, True
+                   wwPlain2 bstack, players(DisForm), "Γ‹Γ¥Γ©Γ΄Γ―ΓµΓ±Γ£Γ©ΓªΓΌ Γ“Γ½Γ³Γ΄Γ§Γ¬Γ΅: " & os & osbit, D.Width, 0, True
             
-                      wwPlain2 bstack, players(DisForm), "Όνομα Χρήστη: " & Tcase(Originalusername), D.Width, 0, True
+                      wwPlain2 bstack, players(DisForm), "ΒΌΓ­Γ―Γ¬Γ΅ Γ—Γ±ΓΓ³Γ΄Γ§: " & Tcase(Originalusername), D.Width, 0, True
                 
             Else
              If Revision = 0 Then
@@ -4098,7 +4098,7 @@ checkit:
     If Not Lang Then
         b$ = sbname$ + "Problem in string in paragraph " + CStr(countlines)
     Else
-        b$ = sbname$ + "Πρόβλημα με το αλφαριθμητικό στη παράγραφο " + CStr(countlines)
+        b$ = sbname$ + "ΓΓ±ΓΌΓΆΓ«Γ§Γ¬Γ΅ Γ¬Γ¥ Γ΄Γ― Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ Γ³Γ΄Γ§ Γ°Γ΅Γ±ΓΓ£Γ±Γ΅Γ¶Γ― " + CStr(countlines)
     End If
     resp& = ask(b$, True)
 If resp& <> 4 Then
@@ -4199,11 +4199,11 @@ Case 13
 Case 125
 If openpar <> 0 And j > 0 Then
 pareprob:
-If paren.count > 0 Then countlines = paren.PopVal
+If paren.Count > 0 Then countlines = paren.PopVal
 If Not Lang Then
         b$ = sbname$ + "Problem in parenthesis in paragraph" + Str$(countlines)
     Else
-        b$ = sbname$ + "Πρόβλημα με τις παρενθέσεις στη παράγραφο" + Str$(countlines)
+        b$ = sbname$ + "ΓΓ±ΓΌΓΆΓ«Γ§Γ¬Γ΅ Γ¬Γ¥ Γ΄Γ©Γ² Γ°Γ΅Γ±Γ¥Γ­Γ¨ΓΓ³Γ¥Γ©Γ² Γ³Γ΄Γ§ Γ°Γ΅Γ±ΓΓ£Γ±Γ΅Γ¶Γ―" + Str$(countlines)
     End If
     resp& = ask(b$, True)
 If resp& <> 4 Then
@@ -4238,14 +4238,14 @@ ElseIf j < 0 Then
     If Not Lang Then
         b$ = sbname$ + "Problem in blocks - look } are less " + CStr(Abs(j))
     Else
-        b$ = sbname$ + "Πρόβλημα με τα τμήματα - δες τα } είναι λιγότερα " + CStr(Abs(j))
+        b$ = sbname$ + "ΓΓ±ΓΌΓΆΓ«Γ§Γ¬Γ΅ Γ¬Γ¥ Γ΄Γ΅ Γ΄Γ¬ΓΓ¬Γ΅Γ΄Γ΅ - Γ¤Γ¥Γ² Γ΄Γ΅ } Γ¥ΓΓ­Γ΅Γ© Γ«Γ©Γ£ΓΌΓ΄Γ¥Γ±Γ΅ " + CStr(Abs(j))
     End If
 resp& = ask(b$, True)
 Else
 If Not Lang Then
 b$ = sbname$ + "Problem in blocks - look { are less " + CStr(j)
 Else
-b$ = sbname$ + "Πρόβλημα με τα τμήματα - δες τα { είναι λιγότερα " + CStr(j)
+b$ = sbname$ + "ΓΓ±ΓΌΓΆΓ«Γ§Γ¬Γ΅ Γ¬Γ¥ Γ΄Γ΅ Γ΄Γ¬ΓΓ¬Γ΅Γ΄Γ΅ - Γ¤Γ¥Γ² Γ΄Γ΅ { Γ¥ΓΓ­Γ΅Γ© Γ«Γ©Γ£ΓΌΓ΄Γ¥Γ±Γ΅ " + CStr(j)
 End If
 resp& = ask(b$, True)
 End If
@@ -4701,7 +4701,7 @@ If MKEY$ <> "" Then
     MKEY$ = vbNullString
 End If
 If INK$ <> "" Then
-' ειδική περίπτωση αν έχουμε 0 στο πρώτο Byte, έχουμε ειδικό κ
+' Γ¥Γ©Γ¤Γ©ΓªΓ Γ°Γ¥Γ±ΓΓ°Γ΄ΓΉΓ³Γ§ Γ΅Γ­ ΓΓ·Γ―ΓµΓ¬Γ¥ 0 Γ³Γ΄Γ― Γ°Γ±ΓΎΓ΄Γ― Byte, ΓΓ·Γ―ΓµΓ¬Γ¥ Γ¥Γ©Γ¤Γ©ΓªΓΌ Γª
         w = AscW(INK$)
     If w = 0 Then
         INKEY$ = Left$(INK$, 2)
@@ -4710,14 +4710,14 @@ If INK$ <> "" Then
     INKEY$ = Left$(INK$, 2)
     INK$ = Mid$(INK$, 3)
     Else
-    ' αλλιώς σηκώνουμε ένα χαρακτήρα με ότι έχει ακόμα
+    ' Γ΅Γ«Γ«Γ©ΓΎΓ² Γ³Γ§ΓªΓΎΓ­Γ―ΓµΓ¬Γ¥ ΓΓ­Γ΅ Γ·Γ΅Γ±Γ΅ΓªΓ΄ΓΓ±Γ΅ Γ¬Γ¥ ΓΌΓ΄Γ© ΓΓ·Γ¥Γ© Γ΅ΓªΓΌΓ¬Γ΅
     INKEY$ = PopOne(INK$)
     
    
         
     End If
 Else
-    'Αν δεν έχουμε τίποτα...δεν κάνουμε τίποτα...γυρίζουμε το τίποτα!
+    'ΓΓ­ Γ¤Γ¥Γ­ ΓΓ·Γ―ΓµΓ¬Γ¥ Γ΄ΓΓ°Γ―Γ΄Γ΅...Γ¤Γ¥Γ­ ΓªΓΓ­Γ―ΓµΓ¬Γ¥ Γ΄ΓΓ°Γ―Γ΄Γ΅...Γ£ΓµΓ±ΓΓ¦Γ―ΓµΓ¬Γ¥ Γ΄Γ― Γ΄ΓΓ°Γ―Γ΄Γ΅!
     INKEY$ = vbNullString
 End If
 
@@ -5666,21 +5666,21 @@ Next i
  If ok Then
 a$ = a$ & Chr(0)
 ' Here are greek letters for proper case conversion
-a$ = Replace(a$, "σ" & Chr(0), "ς")
+a$ = Replace(a$, "Γ³" & Chr(0), "Γ²")
 a$ = Replace(a$, Chr(0), "")
-a$ = Replace(a$, "σ ", "ς ")
-a$ = Replace(a$, "σ$", "ς$")
-a$ = Replace(a$, "σ&", "ς&")
-a$ = Replace(a$, "σ.", "ς.")
-a$ = Replace(a$, "σ(", "ς(")
-a$ = Replace(a$, "σ_", "ς_")
-a$ = Replace(a$, "σ/", "ς/")
-a$ = Replace(a$, "σ\", "ς\")
-a$ = Replace(a$, "σ-", "ς-")
-a$ = Replace(a$, "σ+", "ς+")
-a$ = Replace(a$, "σ*", "ς*")
-a$ = Replace(a$, "σ" & vbCr, "ς" & vbCr)
-a$ = Replace(a$, "σ" & vbLf, "ς" & vbLf)
+a$ = Replace(a$, "Γ³ ", "Γ² ")
+a$ = Replace(a$, "Γ³$", "Γ²$")
+a$ = Replace(a$, "Γ³&", "Γ²&")
+a$ = Replace(a$, "Γ³.", "Γ².")
+a$ = Replace(a$, "Γ³(", "Γ²(")
+a$ = Replace(a$, "Γ³_", "Γ²_")
+a$ = Replace(a$, "Γ³/", "Γ²/")
+a$ = Replace(a$, "Γ³\", "Γ²\")
+a$ = Replace(a$, "Γ³-", "Γ²-")
+a$ = Replace(a$, "Γ³+", "Γ²+")
+a$ = Replace(a$, "Γ³*", "Γ²*")
+a$ = Replace(a$, "Γ³" & vbCr, "Γ²" & vbCr)
+a$ = Replace(a$, "Γ³" & vbLf, "Γ²" & vbLf)
 End If
 myLcase = a$
 End Function
@@ -5701,21 +5701,21 @@ Next i
  If ok Then
 a$ = a$ & Chr(0)
 ' Here are greek letters for proper case conversion
-a$ = Replace(a$, "σ" & Chr(0), "ς")
+a$ = Replace(a$, "Γ³" & Chr(0), "Γ²")
 a$ = Replace(a$, Chr(0), "")
-a$ = Replace(a$, "σ ", "ς ")
-a$ = Replace(a$, "σ$", "ς$")
-a$ = Replace(a$, "σ&", "ς&")
-a$ = Replace(a$, "σ.", "ς.")
-a$ = Replace(a$, "σ(", "ς(")
-a$ = Replace(a$, "σ_", "ς_")
-a$ = Replace(a$, "σ/", "ς/")
-a$ = Replace(a$, "σ\", "ς\")
-a$ = Replace(a$, "σ-", "ς-")
-a$ = Replace(a$, "σ+", "ς+")
-a$ = Replace(a$, "σ*", "ς*")
-a$ = Replace(a$, "σ" & vbCr, "ς" & vbCr)
-a$ = Replace(a$, "σ" & vbLf, "ς" & vbLf)
+a$ = Replace(a$, "Γ³ ", "Γ² ")
+a$ = Replace(a$, "Γ³$", "Γ²$")
+a$ = Replace(a$, "Γ³&", "Γ²&")
+a$ = Replace(a$, "Γ³.", "Γ².")
+a$ = Replace(a$, "Γ³(", "Γ²(")
+a$ = Replace(a$, "Γ³_", "Γ²_")
+a$ = Replace(a$, "Γ³/", "Γ²/")
+a$ = Replace(a$, "Γ³\", "Γ²\")
+a$ = Replace(a$, "Γ³-", "Γ²-")
+a$ = Replace(a$, "Γ³+", "Γ²+")
+a$ = Replace(a$, "Γ³*", "Γ²*")
+a$ = Replace(a$, "Γ³" & vbCr, "Γ²" & vbCr)
+a$ = Replace(a$, "Γ³" & vbLf, "Γ²" & vbLf)
 End If
 
 End Sub
@@ -6087,31 +6087,31 @@ End Sub
     
     
 Sub myesc(b$)
-MyErMacro b$, "Escape", "Διακοπή εκτέλεσης"
+MyErMacro b$, "Escape", "Γ„Γ©Γ΅ΓªΓ―Γ°Γ Γ¥ΓªΓ΄ΓΓ«Γ¥Γ³Γ§Γ²"
 End Sub
 Sub wrongsizeOrposition(a$)
-    MyErMacro a$, "Wrong Size-Position for reading buffer", "Λάθος Μέγεθος-θέση, για διάβασμα Διάρθρωσης"
+    MyErMacro a$, "Wrong Size-Position for reading buffer", "Γ‹ΓΓ¨Γ―Γ² ΓΓΓ£Γ¥Γ¨Γ―Γ²-Γ¨ΓΓ³Γ§, Γ£Γ©Γ΅ Γ¤Γ©ΓΓΆΓ΅Γ³Γ¬Γ΅ Γ„Γ©ΓΓ±Γ¨Γ±ΓΉΓ³Γ§Γ²"
 End Sub
 Sub wrongweakref(a$)
-MyErMacro a$, "Wrong weak reference", "λάθος ισχνής αναφοράς"
+MyErMacro a$, "Wrong weak reference", "Γ«ΓΓ¨Γ―Γ² Γ©Γ³Γ·Γ­ΓΓ² Γ΅Γ­Γ΅Γ¶Γ―Γ±ΓΓ²"
 End Sub
 Sub negsqrt(a$)
-MyErMacro a$, "negative number for root", "αρνητικός σε ρίζα"
+MyErMacro a$, "negative number for root", "Γ΅Γ±Γ­Γ§Γ΄Γ©ΓªΓΌΓ² Γ³Γ¥ Γ±ΓΓ¦Γ΅"
 End Sub
 Sub expecteddecimal(a$)
-MyErMacro a$, "Expected decimal separator char", "Περίμενα χαρακτήρα διαχωρισμού δεκαδικών"
+MyErMacro a$, "Expected decimal separator char", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ·Γ΅Γ±Γ΅ΓªΓ΄ΓΓ±Γ΅ Γ¤Γ©Γ΅Γ·ΓΉΓ±Γ©Γ³Γ¬Γ―Γ½ Γ¤Γ¥ΓªΓ΅Γ¤Γ©ΓªΓΎΓ­"
 End Sub
 Sub wrongexprinstring(a$)
-MyErMacro a$, "Wrong expression in string", "λάθος μαθηματική έκφραση στο αλφαριθμητικό"
+MyErMacro a$, "Wrong expression in string", "Γ«ΓΓ¨Γ―Γ² Γ¬Γ΅Γ¨Γ§Γ¬Γ΅Γ΄Γ©ΓªΓ ΓΓªΓ¶Γ±Γ΅Γ³Γ§ Γ³Γ΄Γ― Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ"
 End Sub
 Sub unknownoffset(a$, s$)
-MyErMacro a$, "Unknown Offset " & s$, "Άγνωστη Μετάθεση " & s$
+MyErMacro a$, "Unknown Offset " & s$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ ΓΓ¥Γ΄ΓΓ¨Γ¥Γ³Γ§ " & s$
 End Sub
 Sub wronguseofenum(a$)
-MyErMacro a$, "Wrong use of enumerator", "λάθος χρήση απαριθμητή"
+MyErMacro a$, "Wrong use of enumerator", "Γ«ΓΓ¨Γ―Γ² Γ·Γ±ΓΓ³Γ§ Γ΅Γ°Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ"
 End Sub
 Sub nosuchfile()
-MyEr "No such file", "Δεν υπάρχει τέτοιο αρχείο"
+MyEr "No such file", "Γ„Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ© Γ΄ΓΓ΄Γ―Γ©Γ― Γ΅Γ±Γ·Γ¥ΓΓ―"
 End Sub
 
 Public Sub MyDoEvents()
@@ -6490,7 +6490,7 @@ Do While Not FileEOFFH(FH)
 Exit Do
 End If
     If Len(s) > 65535 Then
-        MyEr "too big line for line input", "πολύ μεγάλη εισαγωγή γραμμής"
+        MyEr "too big line for line input", "Γ°Γ―Γ«Γ½ Γ¬Γ¥Γ£ΓΓ«Γ§ Γ¥Γ©Γ³Γ΅Γ£ΓΉΓ£Γ Γ£Γ±Γ΅Γ¬Γ¬ΓΓ²"
         Exit Function
     End If
 Loop
@@ -6522,7 +6522,7 @@ Do While Not FileEOFFH(FH)
         Exit Do
     End If
     If LenB(s) > 65535 Then
-        MyEr "too big line for line input", "πολύ μεγάλη εισαγωγή γραμμής"
+        MyEr "too big line for line input", "Γ°Γ―Γ«Γ½ Γ¬Γ¥Γ£ΓΓ«Γ§ Γ¥Γ©Γ³Γ΅Γ£ΓΉΓ£Γ Γ£Γ±Γ΅Γ¬Γ¬ΓΓ²"
         Exit Sub
     End If
 Loop
@@ -6588,7 +6588,7 @@ there:
     End If
 nn1:
     If Len(s) > 65535 Then
-            MyEr "too big line for line input", "πολύ μεγάλη εισαγωγή γραμμής"
+            MyEr "too big line for line input", "Γ°Γ―Γ«Γ½ Γ¬Γ¥Γ£ΓΓ«Γ§ Γ¥Γ©Γ³Γ΅Γ£ΓΉΓ£Γ Γ£Γ±Γ΅Γ¬Γ¬ΓΓ²"
             Exit Sub
         End If
     Loop
@@ -6658,7 +6658,7 @@ there:
     End If
 nn1:
         If LenB(s) > 65535 Then
-            MyEr "too big line for line input", "πολύ μεγάλη εισαγωγή γραμμής"
+            MyEr "too big line for line input", "Γ°Γ―Γ«Γ½ Γ¬Γ¥Γ£ΓΓ«Γ§ Γ¥Γ©Γ³Γ΅Γ£ΓΉΓ£Γ Γ£Γ±Γ΅Γ¬Γ¬ΓΓ²"
             Exit Sub
         End If
 Loop
@@ -6686,7 +6686,7 @@ Do While Not FileEOFFH(FH)
         Exit Do
     End If
     If Len(s) > 65535 Then
-        MyEr "too big line for line input", "πολύ μεγάλη εισαγωγή γραμμής"
+        MyEr "too big line for line input", "Γ°Γ―Γ«Γ½ Γ¬Γ¥Γ£ΓΓ«Γ§ Γ¥Γ©Γ³Γ΅Γ£ΓΉΓ£Γ Γ£Γ±Γ΅Γ¬Γ¬ΓΓ²"
         Exit Sub
     End If
 Loop
@@ -6718,7 +6718,7 @@ Do While Not FileEOFFH(FH)  'LOF(f) < Seek(f)
         Exit Do
     End If
         If LenB(s) > 65535 Then
-            MyEr "too big line for line input", "πολύ μεγάλη εισαγωγή γραμμής"
+            MyEr "too big line for line input", "Γ°Γ―Γ«Γ½ Γ¬Γ¥Γ£ΓΓ«Γ§ Γ¥Γ©Γ³Γ΅Γ£ΓΉΓ£Γ Γ£Γ±Γ΅Γ¬Γ¬ΓΓ²"
             Exit Sub
         End If
 Loop
@@ -7043,166 +7043,166 @@ Public Function IfierVal()
 If LastErNum <> 0 Then LastErNum = 0: IfierVal = True
 End Function
 Public Sub OutOfLimit()
-  MyEr "Out of limit", "Εκτός ορίου"
+  MyEr "Out of limit", "Γ…ΓªΓ΄ΓΌΓ² Γ―Γ±ΓΓ―Γµ"
 End Sub
 Public Sub stackproblem()
-MyEr "Problem in return stack", "Πρόβλημα στον σωρό επιστροφής"
+MyEr "Problem in return stack", "ΓΓ±ΓΌΓΆΓ«Γ§Γ¬Γ΅ Γ³Γ΄Γ―Γ­ Γ³ΓΉΓ±ΓΌ Γ¥Γ°Γ©Γ³Γ΄Γ±Γ―Γ¶ΓΓ²"
 End Sub
 Public Sub PlaceAcommaBefore()
-MyEr "Place a comma before", "Βάλε ένα κόμμα πριν"
+MyEr "Place a comma before", "Γ‚ΓΓ«Γ¥ ΓΓ­Γ΅ ΓªΓΌΓ¬Γ¬Γ΅ Γ°Γ±Γ©Γ­"
 End Sub
 Public Sub unknownid(b$, w$)
-MyErMacro b$, "unknown identifier " & w$, "Άγνωστο αναγνωριστικό " & w$
+MyErMacro b$, "unknown identifier " & w$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ― Γ΅Γ­Γ΅Γ£Γ­ΓΉΓ±Γ©Γ³Γ΄Γ©ΓªΓΌ " & w$
 End Sub
 Public Sub VarNull()
-MyEr "Variable is Null", "Η μεταβλητή έχει την καμία τιμή - Null"
+MyEr "Variable is Null", "Γ‡ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ ΓΓ·Γ¥Γ© Γ΄Γ§Γ­ ΓªΓ΅Γ¬ΓΓ΅ Γ΄Γ©Γ¬Γ - Null"
 End Sub
 
 Public Sub NoRename()
-    MyEr "Nothing renamed", "Δεν έγινε μετονομασία"
+    MyEr "Nothing renamed", "Γ„Γ¥Γ­ ΓΓ£Γ©Γ­Γ¥ Γ¬Γ¥Γ΄Γ―Γ­Γ―Γ¬Γ΅Γ³ΓΓ΅"
 End Sub
 Public Sub MissCdib()
-  MyEr "Missing IMAGE", "Λείπει εικόνα"
+  MyEr "Missing IMAGE", "Γ‹Γ¥ΓΓ°Γ¥Γ© Γ¥Γ©ΓªΓΌΓ­Γ΅"
 End Sub
 Public Sub MissFile()
- MyEr "File not found", "Δεν βρέθηκε το αρχείο"
+ MyEr "File not found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓ¨Γ§ΓªΓ¥ Γ΄Γ― Γ΅Γ±Γ·Γ¥ΓΓ―"
 End Sub
 Public Sub BadObjectDecl()
-  MyEr "Bad object declaration - use Clear Command for Gui Elements", "Λάθος όρισμα αντικειμένου - χρησιμοποίησε Καθαρό για να καθαρίσεις τυχόν στοιχεία του γραφικού περιβάλλοντος"
+  MyEr "Bad object declaration - use Clear Command for Gui Elements", "Γ‹ΓΓ¨Γ―Γ² ΓΌΓ±Γ©Γ³Γ¬Γ΅ Γ΅Γ­Γ΄Γ©ΓªΓ¥Γ©Γ¬ΓΓ­Γ―Γµ - Γ·Γ±Γ§Γ³Γ©Γ¬Γ―Γ°Γ―ΓΓ§Γ³Γ¥ ΓΓ΅Γ¨Γ΅Γ±ΓΌ Γ£Γ©Γ΅ Γ­Γ΅ ΓªΓ΅Γ¨Γ΅Γ±ΓΓ³Γ¥Γ©Γ² Γ΄ΓµΓ·ΓΌΓ­ Γ³Γ΄Γ―Γ©Γ·Γ¥ΓΓ΅ Γ΄Γ―Γµ Γ£Γ±Γ΅Γ¶Γ©ΓªΓ―Γ½ Γ°Γ¥Γ±Γ©ΓΆΓΓ«Γ«Γ―Γ­Γ΄Γ―Γ²"
 End Sub
 Public Sub NoEnumerator()
-  MyEr " - No enumerator found for this object", " - Δεν βρήκα δρομέα συλλογής για αυτό το αντικείμενο"
+  MyEr " - No enumerator found for this object", " - Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ¤Γ±Γ―Γ¬ΓΓ΅ Γ³ΓµΓ«Γ«Γ―Γ£ΓΓ² Γ£Γ©Γ΅ Γ΅ΓµΓ΄ΓΌ Γ΄Γ― Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ―"
 End Sub
 Public Sub AssigntoNothing()
-  MyEr "Bad object declaration - use Declare command", "Λάθος όρισμα αντικειμένου - χρησιμοποίησε την Όρισε"
+  MyEr "Bad object declaration - use Declare command", "Γ‹ΓΓ¨Γ―Γ² ΓΌΓ±Γ©Γ³Γ¬Γ΅ Γ΅Γ­Γ΄Γ©ΓªΓ¥Γ©Γ¬ΓΓ­Γ―Γµ - Γ·Γ±Γ§Γ³Γ©Γ¬Γ―Γ°Γ―ΓΓ§Γ³Γ¥ Γ΄Γ§Γ­ ΒΌΓ±Γ©Γ³Γ¥"
 End Sub
 Public Sub Overflow()
- MyEr "Overflow", "υπερχείλιση"
+ MyEr "Overflow", "ΓµΓ°Γ¥Γ±Γ·Γ¥ΓΓ«Γ©Γ³Γ§"
 End Sub
 Public Sub MissCdibStr()
-  MyEr "Missing IMAGE in string", "Λείπει εικόνα στο αλφαριθμητικό"
+  MyEr "Missing IMAGE in string", "Γ‹Γ¥ΓΓ°Γ¥Γ© Γ¥Γ©ΓªΓΌΓ­Γ΅ Γ³Γ΄Γ― Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ"
 End Sub
 Public Sub MissStackStr()
-  MyEr "Missing string value from stack", "Λείπει αλφαριθμητικό από το σωρό"
+  MyEr "Missing string value from stack", "Γ‹Γ¥ΓΓ°Γ¥Γ© Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ Γ΅Γ°ΓΌ Γ΄Γ― Γ³ΓΉΓ±ΓΌ"
 End Sub
 Public Sub WrongFileHandler()
-MyEr "Wrong File Handler", "Λάθος Χειριστής Αρχείου"
+MyEr "Wrong File Handler", "Γ‹ΓΓ¨Γ―Γ² Γ—Γ¥Γ©Γ±Γ©Γ³Γ΄ΓΓ² ΓΓ±Γ·Γ¥ΓΓ―Γµ"
 End Sub
 
 Public Sub MissStackItem()
- MyEr "Missing item from stack", "Λείπει κάτι από το σωρό"
+ MyEr "Missing item from stack", "Γ‹Γ¥ΓΓ°Γ¥Γ© ΓªΓΓ΄Γ© Γ΅Γ°ΓΌ Γ΄Γ― Γ³ΓΉΓ±ΓΌ"
 End Sub
 Public Sub MissStackNumber()
- MyEr "Missing number value from stack", "Λείπει αριθμός από το σωρό"
+ MyEr "Missing number value from stack", "Γ‹Γ¥ΓΓ°Γ¥Γ© Γ΅Γ±Γ©Γ¨Γ¬ΓΌΓ² Γ΅Γ°ΓΌ Γ΄Γ― Γ³ΓΉΓ±ΓΌ"
 End Sub
 Public Sub MissMic()
-MyEr "No mic found", "Δεν βρήκα είσοδο ηχογράφησης"
+MyEr "No mic found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ¥ΓΓ³Γ―Γ¤Γ― Γ§Γ·Γ―Γ£Γ±ΓΓ¶Γ§Γ³Γ§Γ²"
 End Sub
 Public Sub missNumber()
-MyEr "Only number allowed", "Μόνο αριθμός επιτρέπεται"
+MyEr "Only number allowed", "ΓΓΌΓ­Γ― Γ΅Γ±Γ©Γ¨Γ¬ΓΌΓ² Γ¥Γ°Γ©Γ΄Γ±ΓΓ°Γ¥Γ΄Γ΅Γ©"
 End Sub
 Public Sub MissNumExpr()
-MyEr "Missing number expression", "Λείπει αριθμητική παράσταση"
+MyEr "Missing number expression", "Γ‹Γ¥ΓΓ°Γ¥Γ© Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓ Γ°Γ΅Γ±ΓΓ³Γ΄Γ΅Γ³Γ§"
 End Sub
 Public Sub MissLicense()
-MyEr "Missing License", "Λείπει Άδεια"
+MyEr "Missing License", "Γ‹Γ¥ΓΓ°Γ¥Γ© ΒΆΓ¤Γ¥Γ©Γ΅"
 End Sub
 Public Sub MissStringExpr()
-MyEr "Missing string expression", "Λείπει αλφαριθμητική παράσταση"
+MyEr "Missing string expression", "Γ‹Γ¥ΓΓ°Γ¥Γ© Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓ Γ°Γ΅Γ±ΓΓ³Γ΄Γ΅Γ³Γ§"
 End Sub
 Public Sub MissString()
-MyEr "Missing string", "Λείπει αλφαριθμητικό"
+MyEr "Missing string", "Γ‹Γ¥ΓΓ°Γ¥Γ© Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ"
 End Sub
 Public Sub MissStringNumber()
-MyEr "Missing string or number", "Λείπει αλφαριθμητικό ή αριθμός"
+MyEr "Missing string or number", "Γ‹Γ¥ΓΓ°Γ¥Γ© Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ Γ Γ΅Γ±Γ©Γ¨Γ¬ΓΌΓ²"
 End Sub
 
 Public Sub NoCreateFile()
-    MyEr "Can't create file", "Δεν μπορώ να φτιάξω αρχείο"
+    MyEr "Can't create file", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¶Γ΄Γ©ΓΓ®ΓΉ Γ΅Γ±Γ·Γ¥ΓΓ―"
 End Sub
 Public Sub BadFilename()
-MyEr "Bad filename", "Λάθος στο όνομα αρχείου"
+MyEr "Bad filename", "Γ‹ΓΓ¨Γ―Γ² Γ³Γ΄Γ― ΓΌΓ­Γ―Γ¬Γ΅ Γ΅Γ±Γ·Γ¥ΓΓ―Γµ"
 End Sub
 Public Sub ReadOnly()
-MyEr "Read Only", "Μόνο για ανάγνωση"
+MyEr "Read Only", "ΓΓΌΓ­Γ― Γ£Γ©Γ΅ Γ΅Γ­ΓΓ£Γ­ΓΉΓ³Γ§"
 End Sub
 Public Sub MissDir()
-MyEr "Missing directory name", "Λείπει όνομα φακέλου"
+MyEr "Missing directory name", "Γ‹Γ¥ΓΓ°Γ¥Γ© ΓΌΓ­Γ―Γ¬Γ΅ Γ¶Γ΅ΓªΓΓ«Γ―Γµ"
 End Sub
 Public Sub MissType()
-MyEr "Wrong data type", "Άλλος τύπος μεταβλητής"
+MyEr "Wrong data type", "ΒΆΓ«Γ«Γ―Γ² Γ΄Γ½Γ°Γ―Γ² Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄ΓΓ²"
 End Sub
 Public Sub badsupport()
-MyEr "object not supported", "Το αντικείμενο δεν υποστηρίζεται"
+MyEr "object not supported", "Γ”Γ― Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ¤Γ¥Γ­ ΓµΓ°Γ―Γ³Γ΄Γ§Γ±ΓΓ¦Γ¥Γ΄Γ΅Γ©"
 End Sub
 Public Sub conflictname()
-MyEr "Name conflict with Inventory object", "Υπάρχει τέτοιο όνομα σε χρήση σε Κατάσταση"
+MyEr "Name conflict with Inventory object", "Γ•Γ°ΓΓ±Γ·Γ¥Γ© Γ΄ΓΓ΄Γ―Γ©Γ― ΓΌΓ­Γ―Γ¬Γ΅ Γ³Γ¥ Γ·Γ±ΓΓ³Γ§ Γ³Γ¥ ΓΓ΅Γ΄ΓΓ³Γ΄Γ΅Γ³Γ§"
 End Sub
 Public Sub MissArrayName()
-MyEr "Missing array name", "Λείπει όνομα πίνακα"
+MyEr "Missing array name", "Γ‹Γ¥ΓΓ°Γ¥Γ© ΓΌΓ­Γ―Γ¬Γ΅ Γ°ΓΓ­Γ΅ΓªΓ΅"
 End Sub
 Public Sub BadPath()
-MyEr "Bad Path name", "Λάθος στο όνομα φακέλου (τόπο)"
+MyEr "Bad Path name", "Γ‹ΓΓ¨Γ―Γ² Γ³Γ΄Γ― ΓΌΓ­Γ―Γ¬Γ΅ Γ¶Γ΅ΓªΓΓ«Γ―Γµ (Γ΄ΓΌΓ°Γ―)"
 End Sub
 Public Sub BadReBound()
-MyEr "Can't commit a reference here", "Δεν μπορώ να αναθέσω εδώ μια αναφορά"
+MyEr "Can't commit a reference here", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ΅Γ­Γ΅Γ¨ΓΓ³ΓΉ Γ¥Γ¤ΓΎ Γ¬Γ©Γ΅ Γ΅Γ­Γ΅Γ¶Γ―Γ±Γ"
 End Sub
 Public Sub oxiforPrinter()
-MyEr "Not allowed this command for printer", "Δεν επιτρέπεται αυτή η εντολή για τον εκτυπωτή"
+MyEr "Not allowed this command for printer", "Γ„Γ¥Γ­ Γ¥Γ°Γ©Γ΄Γ±ΓΓ°Γ¥Γ΄Γ΅Γ© Γ΅ΓµΓ΄Γ Γ§ Γ¥Γ­Γ΄Γ―Γ«Γ Γ£Γ©Γ΅ Γ΄Γ―Γ­ Γ¥ΓªΓ΄ΓµΓ°ΓΉΓ΄Γ"
 End Sub
 Public Sub ResourceLimit()
-MyEr "No more Graphic Resource for forms - 100 Max", "Δεν έχω άλλο χώρο για γραφικά σε φόρμες - 100 Μεγιστο"
+MyEr "No more Graphic Resource for forms - 100 Max", "Γ„Γ¥Γ­ ΓΓ·ΓΉ ΓΓ«Γ«Γ― Γ·ΓΎΓ±Γ― Γ£Γ©Γ΅ Γ£Γ±Γ΅Γ¶Γ©ΓªΓ Γ³Γ¥ Γ¶ΓΌΓ±Γ¬Γ¥Γ² - 100 ΓΓ¥Γ£Γ©Γ³Γ΄Γ―"
 End Sub
 Public Sub oxiforforms()
-MyEr "Not allowed this command for forms", "Δεν επιτρέπεται αυτή η εντολή για φόρμες"
+MyEr "Not allowed this command for forms", "Γ„Γ¥Γ­ Γ¥Γ°Γ©Γ΄Γ±ΓΓ°Γ¥Γ΄Γ΅Γ© Γ΅ΓµΓ΄Γ Γ§ Γ¥Γ­Γ΄Γ―Γ«Γ Γ£Γ©Γ΅ Γ¶ΓΌΓ±Γ¬Γ¥Γ²"
 End Sub
 Public Sub oxiforMetaFiles()
-MyEr "Not allowed this command for drawings", "Δεν επιτρέπεται αυτή η εντολή για σχέδια"
+MyEr "Not allowed this command for drawings", "Γ„Γ¥Γ­ Γ¥Γ°Γ©Γ΄Γ±ΓΓ°Γ¥Γ΄Γ΅Γ© Γ΅ΓµΓ΄Γ Γ§ Γ¥Γ­Γ΄Γ―Γ«Γ Γ£Γ©Γ΅ Γ³Γ·ΓΓ¤Γ©Γ΅"
 End Sub
 Public Sub SyntaxError()
 If LastErName = vbNullString Then
-MyEr "Syntax Error", "Συντακτικό Λάθος"
+MyEr "Syntax Error", "Γ“ΓµΓ­Γ΄Γ΅ΓªΓ΄Γ©ΓªΓΌ Γ‹ΓΓ¨Γ―Γ²"
 Else
 If LastErNum = 0 Then LastErNum = -1 ' general
 LastErNum1 = LastErNum
 End If
 End Sub
 Public Sub MissingnumVar()
-MyEr "missing numeric variable", "λείπει αριθμητική μεταβλητή"
+MyEr "missing numeric variable", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ"
 End Sub
 Public Sub BadGraphic()
-MyEr "Can't operate graphic", "δεν μπορώ να χειριστώ το γραφικό"
+MyEr "Can't operate graphic", "Γ¤Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ·Γ¥Γ©Γ±Γ©Γ³Γ΄ΓΎ Γ΄Γ― Γ£Γ±Γ΅Γ¶Γ©ΓªΓΌ"
 End Sub
 Public Sub SelectorInUse()
-MyEr "File/Folder Selector in Use", "Η φόρμα επιλογής αρχείων/φακέλων είναι σε χρήση"
+MyEr "File/Folder Selector in Use", "Γ‡ Γ¶ΓΌΓ±Γ¬Γ΅ Γ¥Γ°Γ©Γ«Γ―Γ£ΓΓ² Γ΅Γ±Γ·Γ¥ΓΓΉΓ­/Γ¶Γ΅ΓªΓΓ«ΓΉΓ­ Γ¥ΓΓ­Γ΅Γ© Γ³Γ¥ Γ·Γ±ΓΓ³Γ§"
 End Sub
 Public Sub MissingDoc()  ' this is for identifier or execute part
-MyEr "missing document type variable", "λείπει μεταβλητή τύπου εγγράφου"
+MyEr "missing document type variable", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ Γ΄Γ½Γ°Γ―Γµ Γ¥Γ£Γ£Γ±ΓΓ¶Γ―Γµ"
 End Sub
 Public Sub MissingDocOrArrayOrInventory()  ' this is for identifier or execute part
-MyEr "missing document or Array or Inventory type ", "λείπει τύπος έγγραφο ή πίνακα ή κατάσταση"
+MyEr "missing document or Array or Inventory type ", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ΄Γ½Γ°Γ―Γ² ΓΓ£Γ£Γ±Γ΅Γ¶Γ― Γ Γ°ΓΓ­Γ΅ΓªΓ΅ Γ ΓªΓ΅Γ΄ΓΓ³Γ΄Γ΅Γ³Γ§"
 End Sub
 Public Sub UpperArrayLimit()
-MyEr "Reach array upper limit", "Έφθασα στο άνω όριο του πίνακα"
+MyEr "Reach array upper limit", "ΒΈΓ¶Γ¨Γ΅Γ³Γ΅ Γ³Γ΄Γ― ΓΓ­ΓΉ ΓΌΓ±Γ©Γ― Γ΄Γ―Γµ Γ°ΓΓ­Γ΅ΓªΓ΅"
 End Sub
 
 Public Sub MissingArrayOrInventory()  ' this is for identifier or execute part
-MyEr "missing Array or Inventory type ", "λείπει τύπος πίνακα ή κατάσταση"
+MyEr "missing Array or Inventory type ", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ΄Γ½Γ°Γ―Γ² Γ°ΓΓ­Γ΅ΓªΓ΅ Γ ΓªΓ΅Γ΄ΓΓ³Γ΄Γ΅Γ³Γ§"
 End Sub
 Public Sub MissingLabel()
-MyEr "Missing label/Number line", "Λείπει Ετικέτα/Αριθμός γραμμής"
+MyEr "Missing label/Number line", "Γ‹Γ¥ΓΓ°Γ¥Γ© Γ…Γ΄Γ©ΓªΓΓ΄Γ΅/ΓΓ±Γ©Γ¨Γ¬ΓΌΓ² Γ£Γ±Γ΅Γ¬Γ¬ΓΓ²"
 End Sub
 Public Sub MissFuncParammeterdOCVar(ar$)
-MyEr "Not a Document variable " + ar$, "Δεν είναι μεταβλητή τύπου εγγράφου " + ar$
+MyEr "Not a Document variable " + ar$, "Γ„Γ¥Γ­ Γ¥ΓΓ­Γ΅Γ© Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ Γ΄Γ½Γ°Γ―Γµ Γ¥Γ£Γ£Γ±ΓΓ¶Γ―Γµ " + ar$
 End Sub
 Public Sub MissingBlock()  ' this is for identifier or execute part
-MyEr "missing block {} or string expression", "λείπει κώδικας σε {} η αλφαριθμητική έκφραση"
+MyEr "missing block {} or string expression", "Γ«Γ¥ΓΓ°Γ¥Γ© ΓªΓΎΓ¤Γ©ΓªΓ΅Γ² Γ³Γ¥ {} Γ§ Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓ ΓΓªΓ¶Γ±Γ΅Γ³Γ§"
 End Sub
 Public Sub MissingBlockCode()
-MyEr "missing block {}", "λείπει κώδικας σε μπλοκ {}"
+MyEr "missing block {}", "Γ«Γ¥ΓΓ°Γ¥Γ© ΓªΓΎΓ¤Γ©ΓªΓ΅Γ² Γ³Γ¥ Γ¬Γ°Γ«Γ―Γª {}"
 End Sub
 Public Sub OnlyOneLineAllowed()
-MyEr "Use block {} in starting line only", "Χρησιμοποίησε μπλοκ {} στην αρχική γραμμή"
+MyEr "Use block {} in starting line only", "Γ—Γ±Γ§Γ³Γ©Γ¬Γ―Γ°Γ―ΓΓ§Γ³Γ¥ Γ¬Γ°Γ«Γ―Γª {} Γ³Γ΄Γ§Γ­ Γ΅Γ±Γ·Γ©ΓªΓ Γ£Γ±Γ΅Γ¬Γ¬Γ"
 End Sub
 Public Function CheckBlock(once As Boolean) As Long
                                     If once Then
@@ -7213,356 +7213,356 @@ Public Function CheckBlock(once As Boolean) As Long
 End Function
 
 Public Sub MissingEnumBlock()
-MyEr "missing block {} for enumeration constants", "λείπει μπλοκ {} για σταθερές απαρίθμησης "
+MyEr "missing block {} for enumeration constants", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ¬Γ°Γ«Γ―Γª {} Γ£Γ©Γ΅ Γ³Γ΄Γ΅Γ¨Γ¥Γ±ΓΓ² Γ΅Γ°Γ΅Γ±ΓΓ¨Γ¬Γ§Γ³Γ§Γ² "
 End Sub
 Public Sub MissingCodeBlock()
-MyEr "missing block {}", "λείπει μπλοκ κώδικα σε {}"
+MyEr "missing block {}", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ¬Γ°Γ«Γ―Γª ΓªΓΎΓ¤Γ©ΓªΓ΅ Γ³Γ¥ {}"
 End Sub
 Public Sub MissingArray(Optional w$)
 If w$ = "" Then
-MyEr "No array found", "Δεν βρήκα πίνακα"
+MyEr "No array found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ°ΓΓ­Γ΅ΓªΓ΅"
 Else
-MyEr "Can't find array " & w$ & ")", "Δεν βρίσκω πίνακα " & w$ & ")"
+MyEr "Can't find array " & w$ & ")", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓ³ΓªΓΉ Γ°ΓΓ­Γ΅ΓªΓ΅ " & w$ & ")"
 End If
 End Sub
 Public Sub ErrNum()
-MyEr "Error in number", "Λάθος στον αριθμό"
+MyEr "Error in number", "Γ‹ΓΓ¨Γ―Γ² Γ³Γ΄Γ―Γ­ Γ΅Γ±Γ©Γ¨Γ¬ΓΌ"
 End Sub
 Public Sub CantAssignValue()
-MyEr "Can't assign value to constant", "Δεν μπορώ να βάλω τιμή σε σταθερά"
+MyEr "Can't assign value to constant", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ ΓΆΓΓ«ΓΉ Γ΄Γ©Γ¬Γ Γ³Γ¥ Γ³Γ΄Γ΅Γ¨Γ¥Γ±Γ"
 End Sub
 Public Sub ExpectedEnumType()
- MyEr "Expected Enumaration Type", "Περίμενα τύπο απαρίθμησης"
+ MyEr "Expected Enumaration Type", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ΄Γ½Γ°Γ― Γ΅Γ°Γ΅Γ±ΓΓ¨Γ¬Γ§Γ³Γ§Γ²"
 End Sub
 
 Public Sub ExpectedVariable()
- MyEr "Expected variable", "Περίμενα μεταβλητή"
+ MyEr "Expected variable", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ"
 End Sub
 Public Sub Expected(w1$, w2$)
- MyEr "Expected object type " + w1$, "Περίμενα αντικείμενο τύπου " + w2$
+ MyEr "Expected object type " + w1$, "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ΄Γ½Γ°Γ―Γµ " + w2$
 End Sub
 Public Sub ExpectedCaseorElseorEnd2()
-MyEr "Expected Case or Else or End Select", "Περίμενα Με ή Αλλιώς ή Τέλος Επιλογής"
+MyEr "Expected Case or Else or End Select", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ ΓΓ¥ Γ ΓΓ«Γ«Γ©ΓΎΓ² Γ Γ”ΓΓ«Γ―Γ² Γ…Γ°Γ©Γ«Γ―Γ£ΓΓ²"
 End Sub
 Public Sub ExpectedCaseorElseorEnd()
- MyEr "Expected Case or Else or End Select, for two or more commands use {}", "Περίμενα Με ή Αλλιώς ή Τέλος Επιλογής, για δυο ή περισσότερες εντολές χρησιμοποίησε { }"
+ MyEr "Expected Case or Else or End Select, for two or more commands use {}", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ ΓΓ¥ Γ ΓΓ«Γ«Γ©ΓΎΓ² Γ Γ”ΓΓ«Γ―Γ² Γ…Γ°Γ©Γ«Γ―Γ£ΓΓ², Γ£Γ©Γ΅ Γ¤ΓµΓ― Γ Γ°Γ¥Γ±Γ©Γ³Γ³ΓΌΓ΄Γ¥Γ±Γ¥Γ² Γ¥Γ­Γ΄Γ―Γ«ΓΓ² Γ·Γ±Γ§Γ³Γ©Γ¬Γ―Γ°Γ―ΓΓ§Γ³Γ¥ { }"
 End Sub
 Public Sub ExpectedCommentsOnly()
- MyEr "Expected comments (using ' or \) or new line", "Περίμενα σημειώσεις (με ' ή \) ή αλλαγή γραμής"
+ MyEr "Expected comments (using ' or \) or new line", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ³Γ§Γ¬Γ¥Γ©ΓΎΓ³Γ¥Γ©Γ² (Γ¬Γ¥ ' Γ \) Γ Γ΅Γ«Γ«Γ΅Γ£Γ Γ£Γ±Γ΅Γ¬ΓΓ²"
 End Sub
 
 Public Sub ExpectedEndSelect()
- MyEr "Expected Εnd Select", "Περίμενα Τέλος Επιλογής"
+ MyEr "Expected Γ…nd Select", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ”ΓΓ«Γ―Γ² Γ…Γ°Γ©Γ«Γ―Γ£ΓΓ²"
 End Sub
 Public Sub ExpectedEndSelect2()
- MyEr "Expected Εnd Select, for two or more commands use {}", "Περίμενα Τέλος Επιλογής, για δυο ή περισσότερες εντολές χρησιμοποίησε { }"
+ MyEr "Expected Γ…nd Select, for two or more commands use {}", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ”ΓΓ«Γ―Γ² Γ…Γ°Γ©Γ«Γ―Γ£ΓΓ², Γ£Γ©Γ΅ Γ¤ΓµΓ― Γ Γ°Γ¥Γ±Γ©Γ³Γ³ΓΌΓ΄Γ¥Γ±Γ¥Γ² Γ¥Γ­Γ΄Γ―Γ«ΓΓ² Γ·Γ±Γ§Γ³Γ©Γ¬Γ―Γ°Γ―ΓΓ§Γ³Γ¥ { }"
 End Sub
 Public Sub LocalAndGlobal()
-MyEr "Global and local together;", "Γενική και τοπική μαζί!"
+MyEr "Global and local together;", "ΓƒΓ¥Γ­Γ©ΓªΓ ΓªΓ΅Γ© Γ΄Γ―Γ°Γ©ΓªΓ Γ¬Γ΅Γ¦Γ!"
 End Sub
 Public Sub UnknownProperty(w$)
-MyEr "Unknown Property " & w$, "Άγνωστη ιδιότητα " & w$
+MyEr "Unknown Property " & w$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ©Γ¤Γ©ΓΌΓ΄Γ§Γ΄Γ΅ " & w$
 End Sub
 Public Sub UnknownVariable(v$)
 Dim i As Long
 i = rinstr(v$, "." + ChrW(8191))
 If i > 0 Then
     i = rinstr(v$, ".")
-    MyEr "Unknown Variable " & Mid$(v$, i), "Άγνωστη μεταβλητή " & Mid$(v$, i)
+    MyEr "Unknown Variable " & Mid$(v$, i), "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ " & Mid$(v$, i)
 Else
     i = rinstr(v$, "].")
     If i > 0 Then
-        MyEr "Unknown Variable " & Mid$(v$, i + 2), "Άγνωστη μεταβλητή " & Mid$(v$, i + 2)
+        MyEr "Unknown Variable " & Mid$(v$, i + 2), "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ " & Mid$(v$, i + 2)
     Else
         i = rinstr(v$, ChrW(8191))
     If i > 0 Then
         i = InStr(i + 1, v$, ".")
         If i > 0 Then
-            MyEr "Unknown Variable " & Mid$(v$, i + 1), "Άγνωστη μεταβλητή " & Mid$(v$, i + 1)
+            MyEr "Unknown Variable " & Mid$(v$, i + 1), "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ " & Mid$(v$, i + 1)
         Else
-            MyEr "Unknown Variable", "Άγνωστη μεταβλητή"
+            MyEr "Unknown Variable", "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ"
         End If
     Else
-        MyEr "Unknown Variable " & v$, "Άγνωστη μεταβλητή " & v$
+        MyEr "Unknown Variable " & v$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ " & v$
     End If
     End If
 End If
 End Sub
 Sub indexout(a$)
-MyErMacro a$, "Index out of limits", "Δείκτης εκτός ορίων"
+MyErMacro a$, "Index out of limits", "Γ„Γ¥ΓΓªΓ΄Γ§Γ² Γ¥ΓªΓ΄ΓΌΓ² Γ―Γ±ΓΓΉΓ­"
 End Sub
 
 Sub wrongfilenumber(a$)
- MyErMacro a$, "not valid file number", "λάθος αριθμός αρχείου"
+ MyErMacro a$, "not valid file number", "Γ«ΓΓ¨Γ―Γ² Γ΅Γ±Γ©Γ¨Γ¬ΓΌΓ² Γ΅Γ±Γ·Γ¥ΓΓ―Γµ"
 End Sub
 Public Sub WrongArgument(a$)
-MyErMacro a$, Err.Description, "Λάθος όρισμα"
+MyErMacro a$, Err.Description, "Γ‹ΓΓ¨Γ―Γ² ΓΌΓ±Γ©Γ³Γ¬Γ΅"
 End Sub
 Public Sub UnKnownWeak(w$)
- MyEr "Unknown Weak " & w$, "Άγνωστη ισχνή " & w$
+ MyEr "Unknown Weak " & w$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ©Γ³Γ·Γ­Γ " & w$
 End Sub
 Public Sub InternalEror()
-MyEr "Internal error", "Εσωτερικό λάθος"
+MyEr "Internal error", "Γ…Γ³ΓΉΓ΄Γ¥Γ±Γ©ΓªΓΌ Γ«ΓΓ¨Γ―Γ²"
 End Sub
 Sub NegativeIindex(a$)
-MyErMacro a$, "negative index", "αρνητικός δείκτη"
+MyErMacro a$, "negative index", "Γ΅Γ±Γ­Γ§Γ΄Γ©ΓªΓΌΓ² Γ¤Γ¥ΓΓªΓ΄Γ§"
 End Sub
 Sub joypader(a$, R)
-MyErMacro a$, "Joypad number " & CStr(R) & " isn't ready", "Το νούμερο Λαβής " & CStr(R) & " δεν είναι έτοιμο"
+MyErMacro a$, "Joypad number " & CStr(R) & " isn't ready", "Γ”Γ― Γ­Γ―Γ½Γ¬Γ¥Γ±Γ― Γ‹Γ΅ΓΆΓΓ² " & CStr(R) & " Γ¤Γ¥Γ­ Γ¥ΓΓ­Γ΅Γ© ΓΓ΄Γ―Γ©Γ¬Γ―"
 End Sub
 Sub noImage(a$)
-MyErMacro a$, "Νο image in string", "Δεν υπάρχει εικόνα στο αλφαριθμητικό"
+MyErMacro a$, "ΓΓ― image in string", "Γ„Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ© Γ¥Γ©ΓªΓΌΓ­Γ΅ Γ³Γ΄Γ― Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ"
 End Sub
 Sub noImageInBuffer(a$)
-MyErMacro a$, "No Image in Buffer", "Δεν έχει εικόνα η Διάρθρωση"
+MyErMacro a$, "No Image in Buffer", "Γ„Γ¥Γ­ ΓΓ·Γ¥Γ© Γ¥Γ©ΓªΓΌΓ­Γ΅ Γ§ Γ„Γ©ΓΓ±Γ¨Γ±ΓΉΓ³Γ§"
 End Sub
 
 Sub WrongJoypadNumber(a$)
-MyErMacro a$, "Joypad number 0 to 15", "Αριθμός Λαβής από 0 έως 15"
+MyErMacro a$, "Joypad number 0 to 15", "ΓΓ±Γ©Γ¨Γ¬ΓΌΓ² Γ‹Γ΅ΓΆΓΓ² Γ΅Γ°ΓΌ 0 ΓΓΉΓ² 15"
 End Sub
 Sub CantFindArray(a$, s$)
-MyErMacro a$, "Can't find array " & s$, "Δεν βρίσκω πίνακα " & s$
+MyErMacro a$, "Can't find array " & s$, "Γ„Γ¥Γ­ ΓΆΓ±ΓΓ³ΓªΓΉ Γ°ΓΓ­Γ΅ΓªΓ΅ " & s$
 End Sub
 Sub CantReadDimension(a$, s$)
- MyErMacro a$, "Can't read dimension index from array " & s$, "Δεν μπορώ να διαβάσω τον δείκτη διάστασης του πίνακα " & s$
+ MyErMacro a$, "Can't read dimension index from array " & s$, "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¤Γ©Γ΅ΓΆΓΓ³ΓΉ Γ΄Γ―Γ­ Γ¤Γ¥ΓΓªΓ΄Γ§ Γ¤Γ©ΓΓ³Γ΄Γ΅Γ³Γ§Γ² Γ΄Γ―Γµ Γ°ΓΓ­Γ΅ΓªΓ΅ " & s$
 
 End Sub
 Sub cantreadlib(a$)
-MyErMacro a$, "Can't Read TypeLib", "Δεν μπορώ να διαβάσω τους τύπους των παραμέτρων"
+MyErMacro a$, "Can't Read TypeLib", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¤Γ©Γ΅ΓΆΓΓ³ΓΉ Γ΄Γ―ΓµΓ² Γ΄Γ½Γ°Γ―ΓµΓ² Γ΄ΓΉΓ­ Γ°Γ΅Γ±Γ΅Γ¬ΓΓ΄Γ±ΓΉΓ­"
 End Sub
 Public Sub NotForArray()
-MyEr "not for array items", "όχι για στοιχεία πίνακα"
+MyEr "not for array items", "ΓΌΓ·Γ© Γ£Γ©Γ΅ Γ³Γ΄Γ―Γ©Γ·Γ¥ΓΓ΅ Γ°ΓΓ­Γ΅ΓªΓ΅"
 End Sub
 Public Sub NotArray()  ' this is for identifier or execute part
-MyEr "Expected Array", "Περίμενα πίνακα"
+MyEr "Expected Array", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ°ΓΓ­Γ΅ΓªΓ΅"
 End Sub
 Public Sub NotExistArray()  ' this is for identifier or execute part
-MyEr "Array not exist", "Δεν υπάρχει τέτοιος πίνακας"
+MyEr "Array not exist", "Γ„Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ© Γ΄ΓΓ΄Γ―Γ©Γ―Γ² Γ°ΓΓ­Γ΅ΓªΓ΅Γ²"
 End Sub
 Public Sub MissingGroup()  ' this is for identifier or execute part
-MyEr "missing group type variable", "λείπει μεταβλητή τύπου ομάδας"
+MyEr "missing group type variable", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ Γ΄Γ½Γ°Γ―Γµ Γ―Γ¬ΓΓ¤Γ΅Γ²"
 End Sub
 Public Sub MissingGroupExp()  ' this is for identifier or execute part
-MyEr "missing group type expression", "λείπει έκφραση τύπου ομάδας"
+MyEr "missing group type expression", "Γ«Γ¥ΓΓ°Γ¥Γ© ΓΓªΓ¶Γ±Γ΅Γ³Γ§ Γ΄Γ½Γ°Γ―Γµ Γ―Γ¬ΓΓ¤Γ΅Γ²"
 End Sub
 Public Sub BadGroupHandle()  ' this is for identifier or execute part
-MyEr "group isn't variable", "η ομάδα δεν είναι μεταβλητή"
+MyEr "group isn't variable", "Γ§ Γ―Γ¬ΓΓ¤Γ΅ Γ¤Γ¥Γ­ Γ¥ΓΓ­Γ΅Γ© Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ"
 End Sub
 Public Sub BadEvents()
-MyEr "Can't handle events here", "Δεν μπορώ να χειριστώ γεγονότα"
+MyEr "Can't handle events here", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ·Γ¥Γ©Γ±Γ©Γ³Γ΄ΓΎ Γ£Γ¥Γ£Γ―Γ­ΓΌΓ΄Γ΅"
 End Sub
 Public Sub BadDim()
-MyEr "Array dimensions missing", "Ο πίνακας δεν έχει διαστάσεις"
+MyEr "Array dimensions missing", "Γ Γ°ΓΓ­Γ΅ΓªΓ΅Γ² Γ¤Γ¥Γ­ ΓΓ·Γ¥Γ© Γ¤Γ©Γ΅Γ³Γ΄ΓΓ³Γ¥Γ©Γ²"
 End Sub
 Public Sub badread()
-MyEr "can't read value", "δεν μπορώ να διαβάσω τιμή"
+MyEr "can't read value", "Γ¤Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¤Γ©Γ΅ΓΆΓΓ³ΓΉ Γ΄Γ©Γ¬Γ"
 End Sub
 Public Sub ArrayNameExist()
-MyEr "Array exist", "Υπάρχει ήδη αυτός ο πίνακας"
+MyEr "Array exist", "Γ•Γ°ΓΓ±Γ·Γ¥Γ© ΓΓ¤Γ§ Γ΅ΓµΓ΄ΓΌΓ² Γ― Γ°ΓΓ­Γ΅ΓªΓ΅Γ²"
 End Sub
 Public Sub MissingDocRef()  ' this is for identifier or execute part
-MyEr "invalid document pointer", "μη έγκυρος δείκτης εγγράφου"
+MyEr "invalid document pointer", "Γ¬Γ§ ΓΓ£ΓªΓµΓ±Γ―Γ² Γ¤Γ¥ΓΓªΓ΄Γ§Γ² Γ¥Γ£Γ£Γ±ΓΓ¶Γ―Γµ"
 End Sub
 Public Sub MissingObjReturn()
-MyEr "Missing Object", "Δεν βρήκα αντικείμενο"
+MyEr "Missing Object", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ―"
 End Sub
 Public Sub NoNewLambda()
-    MyEr "No New statement for lambda", "Όχι δήλωση νέου για λαμδα"
+    MyEr "No New statement for lambda", "ΒΌΓ·Γ© Γ¤ΓΓ«ΓΉΓ³Γ§ Γ­ΓΓ―Γµ Γ£Γ©Γ΅ Γ«Γ΅Γ¬Γ¤Γ΅"
 End Sub
 Public Sub ExpectedObj(nn$)
-MyEr "Expected object type " + nn$, "Περίμενα αντικείμενο τύπου " + nn$
+MyEr "Expected object type " + nn$, "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ΄Γ½Γ°Γ―Γµ " + nn$
 End Sub
 Public Sub MisOperatror(ss$)
-MyEr "Group not support operator " + ss$, "Η ομάδα δεν υποστηρίζει το τελεστή " + ss$
+MyEr "Group not support operator " + ss$, "Γ‡ Γ―Γ¬ΓΓ¤Γ΅ Γ¤Γ¥Γ­ ΓµΓ°Γ―Γ³Γ΄Γ§Γ±ΓΓ¦Γ¥Γ© Γ΄Γ― Γ΄Γ¥Γ«Γ¥Γ³Γ΄Γ " + ss$
 End Sub
 Public Sub CantReadFileTimeStap(a$)
-MyErMacro a$, "Can't Read File TimeStamp", "Δεν μπορώ να διαβάσω την Χρονοσήμανση του αρχείου"
+MyErMacro a$, "Can't Read File TimeStamp", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¤Γ©Γ΅ΓΆΓΓ³ΓΉ Γ΄Γ§Γ­ Γ—Γ±Γ―Γ­Γ―Γ³ΓΓ¬Γ΅Γ­Γ³Γ§ Γ΄Γ―Γµ Γ΅Γ±Γ·Γ¥ΓΓ―Γµ"
 End Sub
 
 Public Sub ExpectedObjInline(nn$)
-MyErMacro nn$, "Expected Object", "Περίμενα αντικείμενο"
+MyErMacro nn$, "Expected Object", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ―"
 End Sub
 Public Sub MissingObj()
-MyEr "missing object type variable", "λείπει μεταβλητή τύπου αντικειμένου"
+MyEr "missing object type variable", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ Γ΄Γ½Γ°Γ―Γµ Γ΅Γ­Γ΄Γ©ΓªΓ¥Γ©Γ¬ΓΓ­Γ―Γµ"
 End Sub
 Public Sub BadGetProp()
-MyEr "Can't Get Property", "Δεν μπορώ να διαβάσω αυτή την ιδιότητα"
+MyEr "Can't Get Property", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¤Γ©Γ΅ΓΆΓΓ³ΓΉ Γ΅ΓµΓ΄Γ Γ΄Γ§Γ­ Γ©Γ¤Γ©ΓΌΓ΄Γ§Γ΄Γ΅"
 End Sub
 Public Sub BadLetProp()
-MyEr "Can't Let Property", "Δεν μπορώ να γράψω αυτή την ιδιότητα"
+MyEr "Can't Let Property", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ£Γ±ΓΓΈΓΉ Γ΅ΓµΓ΄Γ Γ΄Γ§Γ­ Γ©Γ¤Γ©ΓΌΓ΄Γ§Γ΄Γ΅"
 End Sub
 Public Sub NoNumberAssign()
-MyEr "Can't assign number to object", "Δεν μπορώ να δώσω αριθμό στο αντικείμενο"
+MyEr "Can't assign number to object", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¤ΓΎΓ³ΓΉ Γ΅Γ±Γ©Γ¨Γ¬ΓΌ Γ³Γ΄Γ― Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ―"
 End Sub
 Public Sub NoAssignThere()
-MyEr "Use Return Object to change items", "Χρησιμοποίησε την Επιστροφή αντικείμενο για να επιστρέψεις τιμές"
+MyEr "Use Return Object to change items", "Γ—Γ±Γ§Γ³Γ©Γ¬Γ―Γ°Γ―ΓΓ§Γ³Γ¥ Γ΄Γ§Γ­ Γ…Γ°Γ©Γ³Γ΄Γ±Γ―Γ¶Γ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ£Γ©Γ΅ Γ­Γ΅ Γ¥Γ°Γ©Γ³Γ΄Γ±ΓΓΈΓ¥Γ©Γ² Γ΄Γ©Γ¬ΓΓ²"
 End Sub
 Public Sub NoObjectpAssignTolong()
-MyEr "Can't assign object to long", "Δεν μπορώ να δώσω αντικείμενο στον μακρυ"
+MyEr "Can't assign object to long", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¤ΓΎΓ³ΓΉ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ³Γ΄Γ―Γ­ Γ¬Γ΅ΓªΓ±Γµ"
 End Sub
 Public Sub NoObjectpAssignToInteger()
-MyEr "Can't assign object to Integer", "Δεν μπορώ να δώσω αντικείμενο στον ακέραιο"
+MyEr "Can't assign object to Integer", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¤ΓΎΓ³ΓΉ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ³Γ΄Γ―Γ­ Γ΅ΓªΓΓ±Γ΅Γ©Γ―"
 End Sub
 Public Sub NoObjectAssign()
-MyEr "Can't assign object", "Δεν μπορώ να δώσω αντικείμενο"
+MyEr "Can't assign object", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¤ΓΎΓ³ΓΉ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ―"
 End Sub
 Public Sub NoNewStatFor(w1$, w2$)
-MyEr "No New statement for " + w1$, "Όχι δήλωση νέου για " + w2$
+MyEr "No New statement for " + w1$, "ΒΌΓ·Γ© Γ¤ΓΓ«ΓΉΓ³Γ§ Γ­ΓΓ―Γµ Γ£Γ©Γ΅ " + w2$
 End Sub
 Public Sub NoThatOperator(ss$)
-    MyEr ss$ + " operator not allowed in group definition", " Ο τελεστής " + ss$ + " δεν επιτρεπεται σε ορισμό ομάδας"
+    MyEr ss$ + " operator not allowed in group definition", " Γ Γ΄Γ¥Γ«Γ¥Γ³Γ΄ΓΓ² " + ss$ + " Γ¤Γ¥Γ­ Γ¥Γ°Γ©Γ΄Γ±Γ¥Γ°Γ¥Γ΄Γ΅Γ© Γ³Γ¥ Γ―Γ±Γ©Γ³Γ¬ΓΌ Γ―Γ¬ΓΓ¤Γ΅Γ²"
 End Sub
 Public Sub MissingObjRef()
-MyEr "invalid object pointer", "μη έγκυρος δείκτης αντικειμένου"
+MyEr "invalid object pointer", "Γ¬Γ§ ΓΓ£ΓªΓµΓ±Γ―Γ² Γ¤Γ¥ΓΓªΓ΄Γ§Γ² Γ΅Γ­Γ΄Γ©ΓªΓ¥Γ©Γ¬ΓΓ­Γ―Γµ"
 End Sub
 Public Sub MissingStrVar()  ' this is for identifier or execute part
-MyEr "missing string variable", "λείπει αλφαριθμητική μεταβλητή"
+MyEr "missing string variable", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ"
 End Sub
 Public Sub NoSwap(nameOfvar$)
-MyEr "Can't swap ", "Δεν μπορώ να αλλάξω τιμές "
+MyEr "Can't swap ", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ΅Γ«Γ«ΓΓ®ΓΉ Γ΄Γ©Γ¬ΓΓ² "
 End Sub
 Public Sub Nosuchvariable(nameOfvar$)
-MyEr "No such variable " + nameOfvar$, "δεν υπάρχει τέτοια μεταβλητή " + nameOfvar$
+MyEr "No such variable " + nameOfvar$, "Γ¤Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ© Γ΄ΓΓ΄Γ―Γ©Γ΅ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ " + nameOfvar$
 End Sub
 Public Sub NoValueForVar(w$)
 If LastErNum = 0 Then
-MyEr "No value for variable " & w$, "Χωρίς τιμή η μεταβλητή " & w$
+MyEr "No value for variable " & w$, "Γ—ΓΉΓ±ΓΓ² Γ΄Γ©Γ¬Γ Γ§ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ " & w$
 End If
 End Sub
 Public Sub NoReference()
-   MyEr "No reference exist", "Δεν υπάρχει αναφορά"
+   MyEr "No reference exist", "Γ„Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ© Γ΅Γ­Γ΅Γ¶Γ―Γ±Γ"
 End Sub
 Public Sub NoCommandOrBlock()
-MyEr "Expected in Select Case a Block or a Command", "Περίμενα στην Επίλεξε Με μια εντολή ή ένα μπλοκ εντολών)"
+MyEr "Expected in Select Case a Block or a Command", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ³Γ΄Γ§Γ­ Γ…Γ°ΓΓ«Γ¥Γ®Γ¥ ΓΓ¥ Γ¬Γ©Γ΅ Γ¥Γ­Γ΄Γ―Γ«Γ Γ ΓΓ­Γ΅ Γ¬Γ°Γ«Γ―Γª Γ¥Γ­Γ΄Γ―Γ«ΓΎΓ­)"
 End Sub
 
 Public Sub NoSecReF()
-MyEr "No reference allowed - use new variable", "Δεν δέχεται αναφορά - χρησιμοποίησε νέα μεταβλητή"
+MyEr "No reference allowed - use new variable", "Γ„Γ¥Γ­ Γ¤ΓΓ·Γ¥Γ΄Γ΅Γ© Γ΅Γ­Γ΅Γ¶Γ―Γ±Γ - Γ·Γ±Γ§Γ³Γ©Γ¬Γ―Γ°Γ―ΓΓ§Γ³Γ¥ Γ­ΓΓ΅ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ"
 End Sub
 Public Sub MissSymbolMyEr(wht$)   ' not the macro one
-MyEr "missing " & wht$, "λείπει " & wht$
+MyEr "missing " & wht$, "Γ«Γ¥ΓΓ°Γ¥Γ© " & wht$
 End Sub
 Public Sub MissTHENELSE()
-    MyEr "missing THEN or ELSE", "δεν βρήκα ΤΟΤΕ ή ΑΛΛΙΩΣ"
+    MyEr "missing THEN or ELSE", "Γ¤Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ”ΓΓ”Γ… Γ ΓΓ‹Γ‹Γ‰Γ™Γ“"
 End Sub
 
 Public Sub MissENDIF()
-    MyEr "missing END IF", "δεν βρήκα ΤΕΛΟΣ ΑΝ"
+    MyEr "missing END IF", "Γ¤Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ”Γ…Γ‹ΓΓ“ ΓΓ"
 End Sub
 Public Sub MissIF()
-    MyEr "No IF for END IF", "δεν βρήκα ΑΝ για την ΤΕΛΟΣ ΑΝ"
+    MyEr "No IF for END IF", "Γ¤Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ ΓΓ Γ£Γ©Γ΅ Γ΄Γ§Γ­ Γ”Γ…Γ‹ΓΓ“ ΓΓ"
 End Sub
 
 Public Sub badSubNotFound()
-MyEr "sub not found", "δεν βρέθηκε η ρουτίνα"
+MyEr "sub not found", "Γ¤Γ¥Γ­ ΓΆΓ±ΓΓ¨Γ§ΓªΓ¥ Γ§ Γ±Γ―ΓµΓ΄ΓΓ­Γ΅"
 End Sub
 Public Sub BadCommand()
-MyEr "Command for supervisor rights", "Εντολή μόνο για επόπτη"
+MyEr "Command for supervisor rights", "Γ…Γ­Γ΄Γ―Γ«Γ Γ¬ΓΌΓ­Γ― Γ£Γ©Γ΅ Γ¥Γ°ΓΌΓ°Γ΄Γ§"
 End Sub
 Public Sub NoClauseInThread()
-MyEr "can't find ERASE or HOLD or RESTART or INTERVAL clause", "Δεν μπορώ να βρω όρο όπως το ΣΒΗΣΕ ή το ΚΡΑΤΑ ή το ΞΕΚΙΝΑ ή το ΚΑΘΕ"
+MyEr "can't find ERASE or HOLD or RESTART or INTERVAL clause", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ ΓΆΓ±ΓΉ ΓΌΓ±Γ― ΓΌΓ°ΓΉΓ² Γ΄Γ― Γ“Γ‚Γ‡Γ“Γ… Γ Γ΄Γ― ΓΓ‘ΓΓ”Γ Γ Γ΄Γ― ΓΓ…ΓΓ‰ΓΓ Γ Γ΄Γ― ΓΓΓΓ…"
 End Sub
 Public Sub NoThisInThread()
-MyEr "Clause This can't used outside a thread", "Ο όρος ΑΥΤΟ δεν μπορεί να χρησιμοποιηθεί έξω από ένα νήμα"
+MyEr "Clause This can't used outside a thread", "Γ ΓΌΓ±Γ―Γ² ΓΓ•Γ”Γ Γ¤Γ¥Γ­ Γ¬Γ°Γ―Γ±Γ¥Γ Γ­Γ΅ Γ·Γ±Γ§Γ³Γ©Γ¬Γ―Γ°Γ―Γ©Γ§Γ¨Γ¥Γ ΓΓ®ΓΉ Γ΅Γ°ΓΌ ΓΓ­Γ΅ Γ­ΓΓ¬Γ΅"
 End Sub
 Public Sub MisInterval()
-MyEr "Expected number for interval, miliseconds", "Περίμενα αριθμό για ορισμό τακτικού διαστήματος εκκίνησης νήματος (χρόνο σε χιλιοστά δευτερολέπτου)"
+MyEr "Expected number for interval, miliseconds", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ΅Γ±Γ©Γ¨Γ¬ΓΌ Γ£Γ©Γ΅ Γ―Γ±Γ©Γ³Γ¬ΓΌ Γ΄Γ΅ΓªΓ΄Γ©ΓªΓ―Γ½ Γ¤Γ©Γ΅Γ³Γ΄ΓΓ¬Γ΅Γ΄Γ―Γ² Γ¥ΓªΓªΓΓ­Γ§Γ³Γ§Γ² Γ­ΓΓ¬Γ΅Γ΄Γ―Γ² (Γ·Γ±ΓΌΓ­Γ― Γ³Γ¥ Γ·Γ©Γ«Γ©Γ―Γ³Γ΄Γ Γ¤Γ¥ΓµΓ΄Γ¥Γ±Γ―Γ«ΓΓ°Γ΄Γ―Γµ)"
 End Sub
 Public Sub MisEndFunc()
-MyEr "Expected End Function", "Περίμενα Τέλος Συνάρτησης"
+MyEr "Expected End Function", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ”ΓΓ«Γ―Γ² Γ“ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§Γ²"
 End Sub
 Public Sub MisEndSub()
-MyEr "Expected End Sub", "Περίμενα Τέλος Ρουτίνας"
+MyEr "Expected End Sub", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ”ΓΓ«Γ―Γ² Γ‘Γ―ΓµΓ΄ΓΓ­Γ΅Γ²"
 End Sub
 Public Sub NoRef2()
-MyEr "No with reference in left side of assignment", "Όχι με αναφορά στην εκχώρηση τιμής"
+MyEr "No with reference in left side of assignment", "ΒΌΓ·Γ© Γ¬Γ¥ Γ΅Γ­Γ΅Γ¶Γ―Γ±Γ Γ³Γ΄Γ§Γ­ Γ¥ΓªΓ·ΓΎΓ±Γ§Γ³Γ§ Γ΄Γ©Γ¬ΓΓ²"
 End Sub
 Public Sub WrongObject()
-MyEr "Wrong object type", "λάθος τύπος αντικειμένου"
+MyEr "Wrong object type", "Γ«ΓΓ¨Γ―Γ² Γ΄Γ½Γ°Γ―Γ² Γ΅Γ­Γ΄Γ©ΓªΓ¥Γ©Γ¬ΓΓ­Γ―Γµ"
 End Sub
 Public Sub NullObject()
-MyEr "object type is Nothing", "O τύπος αντικειμένου είναι Τίποτα"
+MyEr "object type is Nothing", "O Γ΄Γ½Γ°Γ―Γ² Γ΅Γ­Γ΄Γ©ΓªΓ¥Γ©Γ¬ΓΓ­Γ―Γµ Γ¥ΓΓ­Γ΅Γ© Γ”ΓΓ°Γ―Γ΄Γ΅"
 End Sub
 Public Sub WrongType()
-MyEr "Wrong type", "λάθος τύπος"
+MyEr "Wrong type", "Γ«ΓΓ¨Γ―Γ² Γ΄Γ½Γ°Γ―Γ²"
 End Sub
 Public Sub GroupWrongUse()
-MyEr "Something wrong with group", "Κάτι πάει στραβά με την ομάδα"
+MyEr "Something wrong with group", "ΓΓΓ΄Γ© Γ°ΓΓ¥Γ© Γ³Γ΄Γ±Γ΅ΓΆΓ Γ¬Γ¥ Γ΄Γ§Γ­ Γ―Γ¬ΓΓ¤Γ΅"
 End Sub
 Public Sub GroupCantSetValue()
-    MyEr "Group can't set value", "Η ομάδα δεν μπορεί να θέσει τιμή"
+    MyEr "Group can't set value", "Γ‡ Γ―Γ¬ΓΓ¤Γ΅ Γ¤Γ¥Γ­ Γ¬Γ°Γ―Γ±Γ¥Γ Γ­Γ΅ Γ¨ΓΓ³Γ¥Γ© Γ΄Γ©Γ¬Γ"
 End Sub
 Public Sub PropCantChange()
-MyEr "Property can't change", "Η ιδιότητα δεν μπορεί να αλλάξει"
+MyEr "Property can't change", "Γ‡ Γ©Γ¤Γ©ΓΌΓ΄Γ§Γ΄Γ΅ Γ¤Γ¥Γ­ Γ¬Γ°Γ―Γ±Γ¥Γ Γ­Γ΅ Γ΅Γ«Γ«ΓΓ®Γ¥Γ©"
 End Sub
 Public Sub MissingSymbol(c$)
-MyEr "missing " & c$, "λείπει " & c$
+MyEr "missing " & c$, "Γ«Γ¥ΓΓ°Γ¥Γ© " & c$
 End Sub
 Public Sub NeedAGroupFromExpression()
-MyEr "Need a group from expression", "Χρειάζομαι μια ομάδα από την έκφραση"
+MyEr "Need a group from expression", "Γ—Γ±Γ¥Γ©ΓΓ¦Γ―Γ¬Γ΅Γ© Γ¬Γ©Γ΅ Γ―Γ¬ΓΓ¤Γ΅ Γ΅Γ°ΓΌ Γ΄Γ§Γ­ ΓΓªΓ¶Γ±Γ΅Γ³Γ§"
 End Sub
 Public Sub NeedAGroupInRightExpression()
-MyEr "Need a group from right expression", "Χρειάζομαι μια ομάδα από την δεξιά έκφραση"
+MyEr "Need a group from right expression", "Γ—Γ±Γ¥Γ©ΓΓ¦Γ―Γ¬Γ΅Γ© Γ¬Γ©Γ΅ Γ―Γ¬ΓΓ¤Γ΅ Γ΅Γ°ΓΌ Γ΄Γ§Γ­ Γ¤Γ¥Γ®Γ©Γ ΓΓªΓ¶Γ±Γ΅Γ³Γ§"
 End Sub
 Public Sub NotAfter(a$)
-MyErMacro a$, "not an expression after not operator", "δεν υπάρχει παράσταση δεξιά τού τελεστή όχι"
+MyErMacro a$, "not an expression after not operator", "Γ¤Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ© Γ°Γ΅Γ±ΓΓ³Γ΄Γ΅Γ³Γ§ Γ¤Γ¥Γ®Γ©Γ Γ΄Γ―Γ½ Γ΄Γ¥Γ«Γ¥Γ³Γ΄Γ ΓΌΓ·Γ©"
 End Sub
 Public Sub EmptyArray()
-MyEr "Empty Array", "Άδειος Πίνακας"
+MyEr "Empty Array", "ΒΆΓ¤Γ¥Γ©Γ―Γ² ΓΓΓ­Γ΅ΓªΓ΅Γ²"
 End Sub
 Public Sub EmptyStack(a$)
- MyErMacro a$, "Stack is empty", "O σωρός είναι άδειος"
+ MyErMacro a$, "Stack is empty", "O Γ³ΓΉΓ±ΓΌΓ² Γ¥ΓΓ­Γ΅Γ© ΓΓ¤Γ¥Γ©Γ―Γ²"
 End Sub
 Public Sub StackTopNotArray(a$)
- MyErMacro a$, "Stack top isn't array", "Η κορυφή του σωρού δεν είναι πίνακας"
+ MyErMacro a$, "Stack top isn't array", "Γ‡ ΓªΓ―Γ±ΓµΓ¶Γ Γ΄Γ―Γµ Γ³ΓΉΓ±Γ―Γ½ Γ¤Γ¥Γ­ Γ¥ΓΓ­Γ΅Γ© Γ°ΓΓ­Γ΅ΓªΓ΅Γ²"
 End Sub
 
 Public Sub StackTopNotGroup(a$)
-MyErMacro a$, "Stack top isn't group", "Η κορυφή του σωρού δεν είναι ομάδα"
+MyErMacro a$, "Stack top isn't group", "Γ‡ ΓªΓ―Γ±ΓµΓ¶Γ Γ΄Γ―Γµ Γ³ΓΉΓ±Γ―Γ½ Γ¤Γ¥Γ­ Γ¥ΓΓ­Γ΅Γ© Γ―Γ¬ΓΓ¤Γ΅"
 End Sub
 Public Sub StackTopNotNumber(a$)
-MyErMacro a$, "Stack top isn't number", "Η κορυφή του σωρού δεν είναι αριθμός"
+MyErMacro a$, "Stack top isn't number", "Γ‡ ΓªΓ―Γ±ΓµΓ¶Γ Γ΄Γ―Γµ Γ³ΓΉΓ±Γ―Γ½ Γ¤Γ¥Γ­ Γ¥ΓΓ­Γ΅Γ© Γ΅Γ±Γ©Γ¨Γ¬ΓΌΓ²"
 End Sub
 Public Sub NeedAnArray1()
 NeedAnArray1
 End Sub
 Public Sub NeedAnArray(a$)
-MyErMacro a$, "Need an Array", "Χρειάζομαι ένα πίνακα"
+MyErMacro a$, "Need an Array", "Γ—Γ±Γ¥Γ©ΓΓ¦Γ―Γ¬Γ΅Γ© ΓΓ­Γ΅ Γ°ΓΓ­Γ΅ΓªΓ΅"
 End Sub
 Public Sub noref()
-MyEr "No with reference (&)", "Όχι με αναφορά (&)"
+MyEr "No with reference (&)", "ΒΌΓ·Γ© Γ¬Γ¥ Γ΅Γ­Γ΅Γ¶Γ―Γ±Γ (&)"
 End Sub
 Public Sub NoMoreDeep(deep As Variant)
-MyEr "No more" + Str(deep) + " levels gosub allowed", "Δεν επιτρέπονται πάνω από" + Str(deep) + " επίπεδα για εντολή ΔΙΑΜΕΣΟΥ"
+MyEr "No more" + Str(deep) + " levels gosub allowed", "Γ„Γ¥Γ­ Γ¥Γ°Γ©Γ΄Γ±ΓΓ°Γ―Γ­Γ΄Γ΅Γ© Γ°ΓΓ­ΓΉ Γ΅Γ°ΓΌ" + Str(deep) + " Γ¥Γ°ΓΓ°Γ¥Γ¤Γ΅ Γ£Γ©Γ΅ Γ¥Γ­Γ΄Γ―Γ«Γ Γ„Γ‰ΓΓΓ…Γ“ΓΓ•"
 End Sub
 Public Sub CantFind(w$)
-MyEr "Can't find " + w$ + " or type name", "Δεν μπορώ να βρω το " + w$ + " ή όνομα τύπου"
+MyEr "Can't find " + w$ + " or type name", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ ΓΆΓ±ΓΉ Γ΄Γ― " + w$ + " Γ ΓΌΓ­Γ―Γ¬Γ΅ Γ΄Γ½Γ°Γ―Γµ"
 End Sub
 Public Sub OverflowLong(Optional b As Boolean = False)
 If b Then
-MyEr "OverFlow Integer", "Yπερχείλιση ακεραίου"
+MyEr "OverFlow Integer", "YΓ°Γ¥Γ±Γ·Γ¥ΓΓ«Γ©Γ³Γ§ Γ΅ΓªΓ¥Γ±Γ΅ΓΓ―Γµ"
 Else
-MyEr "OverFlow Long", "Yπερχείλιση μακρύ"
+MyEr "OverFlow Long", "YΓ°Γ¥Γ±Γ·Γ¥ΓΓ«Γ©Γ³Γ§ Γ¬Γ΅ΓªΓ±Γ½"
 End If
 End Sub
 Public Sub BadUseofReturn()
-MyEr "Wrong Use of Return", "Κακή χρήση της επιστροφής"
+MyEr "Wrong Use of Return", "ΓΓ΅ΓªΓ Γ·Γ±ΓΓ³Γ§ Γ΄Γ§Γ² Γ¥Γ°Γ©Γ³Γ΄Γ±Γ―Γ¶ΓΓ²"
 End Sub
 Public Sub DevZero()
-    MyEr "division by zero", "διαίρεση με το μηδέν"
+    MyEr "division by zero", "Γ¤Γ©Γ΅ΓΓ±Γ¥Γ³Γ§ Γ¬Γ¥ Γ΄Γ― Γ¬Γ§Γ¤ΓΓ­"
 End Sub
 Public Sub DevZeroMacro(aa$)
-    MyErMacro aa$, "division by zero", "διαίρεση με το μηδέν"
+    MyErMacro aa$, "division by zero", "Γ¤Γ©Γ΅ΓΓ±Γ¥Γ³Γ§ Γ¬Γ¥ Γ΄Γ― Γ¬Γ§Γ¤ΓΓ­"
 End Sub
 Public Sub ErrInExponet(a$)
-MyErMacro a$, "Error in exponet", "Λάθος στον εκθέτη"
+MyErMacro a$, "Error in exponet", "Γ‹ΓΓ¨Γ―Γ² Γ³Γ΄Γ―Γ­ Γ¥ΓªΓ¨ΓΓ΄Γ§"
 End Sub
 
 Public Sub LambdaOnly(a$)
-MyErMacro a$, "Only in lambda function", "Μόνο σε λάμδα συνάρτηση"
+MyErMacro a$, "Only in lambda function", "ΓΓΌΓ­Γ― Γ³Γ¥ Γ«ΓΓ¬Γ¤Γ΅ Γ³ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§"
 End Sub
 Public Sub FilePathNotForUser()
-MyEr "Filepath is not valid for user", "Ο τόπος του αρχείου δεν είναι έγκυρος για τον χρήστη"
+MyEr "Filepath is not valid for user", "Γ Γ΄ΓΌΓ°Γ―Γ² Γ΄Γ―Γµ Γ΅Γ±Γ·Γ¥ΓΓ―Γµ Γ¤Γ¥Γ­ Γ¥ΓΓ­Γ΅Γ© ΓΓ£ΓªΓµΓ±Γ―Γ² Γ£Γ©Γ΅ Γ΄Γ―Γ­ Γ·Γ±ΓΓ³Γ΄Γ§"
 End Sub
 
 ' used to isnumber
@@ -7583,48 +7583,48 @@ MyEr en$, gr$
 End If
 End Sub
 Public Sub ZeroParam(ar$)   ' we use MyErMacro in isNumber and isString
-MyErMacro ar$, "Empty parameter", "Μηδενική παράμετρος"
+MyErMacro ar$, "Empty parameter", "ΓΓ§Γ¤Γ¥Γ­Γ©ΓªΓ Γ°Γ΅Γ±ΓΓ¬Γ¥Γ΄Γ±Γ―Γ²"
 End Sub
 Public Sub MissPar()
-MyEr "missing parameter", "λείπει παράμετρος"
+MyEr "missing parameter", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ°Γ΅Γ±ΓΓ¬Γ¥Γ΄Γ±Γ―Γ²"
 End Sub
 Public Sub MissModuleName()
-MyEr "Missing module name", "Λείπει όνομα τμήματος"
+MyEr "Missing module name", "Γ‹Γ¥ΓΓ°Γ¥Γ© ΓΌΓ­Γ―Γ¬Γ΅ Γ΄Γ¬ΓΓ¬Γ΅Γ΄Γ―Γ²"
 End Sub
 Public Sub nonext()
-MyEr "NEXT without FOR", "ΕΠΟΜΕΝΟ χωρίς ΓΙΑ"
+MyEr "NEXT without FOR", "Γ…ΓΓΓΓ…ΓΓ Γ·ΓΉΓ±ΓΓ² ΓƒΓ‰Γ"
 End Sub
 Public Sub MissWhile()
-MyEr "Missing the End While", "Έχασα το Τέλος Ενώ"
+MyEr "Missing the End While", "ΒΈΓ·Γ΅Γ³Γ΅ Γ΄Γ― Γ”ΓΓ«Γ―Γ² Γ…Γ­ΓΎ"
 End Sub
 
 Public Sub MissUntil()
-MyEr "Missing the Until or Always", "Έχασα το Μέχρι ή το Πάντα"
+MyEr "Missing the Until or Always", "ΒΈΓ·Γ΅Γ³Γ΅ Γ΄Γ― ΓΓΓ·Γ±Γ© Γ Γ΄Γ― ΓΓΓ­Γ΄Γ΅"
 End Sub
 
 Public Sub MissNext()
-MyEr "Missing the right NEXT", "Έχασα το σωστό ΕΠΟΜΕΝΟ"
+MyEr "Missing the right NEXT", "ΒΈΓ·Γ΅Γ³Γ΅ Γ΄Γ― Γ³ΓΉΓ³Γ΄ΓΌ Γ…ΓΓΓΓ…ΓΓ"
 End Sub
 Public Sub MissVarName()
-MyEr "Missing variable name", "Λείπει όνομα μεταβλητής"
+MyEr "Missing variable name", "Γ‹Γ¥ΓΓ°Γ¥Γ© ΓΌΓ­Γ―Γ¬Γ΅ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄ΓΓ²"
 End Sub
 Public Sub MissParamref(ar$)
-MyErMacro ar$, "missing by reference parameter", "λείπει με αναφορά παράμετρος"
+MyErMacro ar$, "missing by reference parameter", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ¬Γ¥ Γ΅Γ­Γ΅Γ¶Γ―Γ±Γ Γ°Γ΅Γ±ΓΓ¬Γ¥Γ΄Γ±Γ―Γ²"
 End Sub
 Public Sub MissParam(ar$)
-MyErMacro ar$, "missing parameter", "λείπει παράμετρος"
+MyErMacro ar$, "missing parameter", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ°Γ΅Γ±ΓΓ¬Γ¥Γ΄Γ±Γ―Γ²"
 End Sub
 Public Sub MissFuncParameterStringVar()
-MyEr "Not a string variable", "Δεν είναι αλφαριθμητική μεταβλητή"
+MyEr "Not a string variable", "Γ„Γ¥Γ­ Γ¥ΓΓ­Γ΅Γ© Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ"
 End Sub
 Public Sub MissFuncParameterStringVarMacro(ar$)
-MyErMacro ar$, "Not a string variable", "Δεν είναι αλφαριθμητική μεταβλητή"
+MyErMacro ar$, "Not a string variable", "Γ„Γ¥Γ­ Γ¥ΓΓ­Γ΅Γ© Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ"
 End Sub
 Public Sub NoSuchFolder()
-MyEr "No such folder", "Δεν υπάρχει τέτοιος φάκελος"
+MyEr "No such folder", "Γ„Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ© Γ΄ΓΓ΄Γ―Γ©Γ―Γ² Γ¶ΓΓªΓ¥Γ«Γ―Γ²"
 End Sub
 Public Sub MissSymbol(wht$)
-MyEr "missing " & wht$, "λείπει " & wht$
+MyEr "missing " & wht$, "Γ«Γ¥ΓΓ°Γ¥Γ© " & wht$
 End Sub
 Public Sub ClearSpace(nm$)
 Dim i As Long
@@ -8233,36 +8233,36 @@ Sub monitor(bstack As basetask, prive As basket, Lang As Long)
     Dim primarymonitor As Long
     primarymonitor = FindPrimary
     If Lang = 0 Then
-        wwPlain2 bstack, prive, "Εξ ορισμού κωδικοσελίδα: " & GetACP, bstack.Owner.Width, 1000, True
-        wwPlain2 bstack, prive, "Φάκελος εφαρμογής", bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "Γ…Γ® Γ―Γ±Γ©Γ³Γ¬Γ―Γ½ ΓªΓΉΓ¤Γ©ΓªΓ―Γ³Γ¥Γ«ΓΓ¤Γ΅: " & GetACP, bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "Γ–ΓΓªΓ¥Γ«Γ―Γ² Γ¥Γ¶Γ΅Γ±Γ¬Γ―Γ£ΓΓ²", bstack.Owner.Width, 1000, True
         wwPlain2 bstack, prive, PathFromApp("m2000"), bstack.Owner.Width, 1000, True
-        wwPlain2 bstack, prive, "Καταχώρηση gsb", bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "ΓΓ΅Γ΄Γ΅Γ·ΓΎΓ±Γ§Γ³Γ§ gsb", bstack.Owner.Width, 1000, True
         wwPlain2 bstack, prive, myRegister("gsb"), bstack.Owner.Width, 1000, True
-        wwPlain2 bstack, prive, "Φάκελος προσωρινών αρχείων", bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "Γ–ΓΓªΓ¥Γ«Γ―Γ² Γ°Γ±Γ―Γ³ΓΉΓ±Γ©Γ­ΓΎΓ­ Γ΅Γ±Γ·Γ¥ΓΓΉΓ­", bstack.Owner.Width, 1000, True
         wwPlain2 bstack, prive, LONGNAME(strTemp), bstack.Owner.Width, 1000, True
-        wwPlain2 bstack, prive, "Τρέχον φάκελος", bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "Γ”Γ±ΓΓ·Γ―Γ­ Γ¶ΓΓªΓ¥Γ«Γ―Γ²", bstack.Owner.Width, 1000, True
         wwPlain2 bstack, prive, mcd, bstack.Owner.Width, 1000, True
         If m_bInIDE Then
-        wwPlain2 bstack, prive, "Όριο Αναδρομής για Συναρτήσεις " + CStr(stacksize \ 3700), bstack.Owner.Width, 1000, True
-        wwPlain2 bstack, prive, "Όριο Αναδρομής Συναρτήσεων/Τμημάτων με την Κάλεσε " + CStr(stacksize \ 1900), bstack.Owner.Width, 1000, True
-        wwPlain2 bstack, prive, "Όριο κλήσεων για Τμήματα " + CStr(stacksize \ 1288), bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "ΒΌΓ±Γ©Γ― ΓΓ­Γ΅Γ¤Γ±Γ―Γ¬ΓΓ² Γ£Γ©Γ΅ Γ“ΓµΓ­Γ΅Γ±Γ΄ΓΓ³Γ¥Γ©Γ² " + CStr(stacksize \ 3700), bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "ΒΌΓ±Γ©Γ― ΓΓ­Γ΅Γ¤Γ±Γ―Γ¬ΓΓ² Γ“ΓµΓ­Γ΅Γ±Γ΄ΓΓ³Γ¥ΓΉΓ­/Γ”Γ¬Γ§Γ¬ΓΓ΄ΓΉΓ­ Γ¬Γ¥ Γ΄Γ§Γ­ ΓΓΓ«Γ¥Γ³Γ¥ " + CStr(stacksize \ 1900), bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "ΒΌΓ±Γ©Γ― ΓªΓ«ΓΓ³Γ¥ΓΉΓ­ Γ£Γ©Γ΅ Γ”Γ¬ΓΓ¬Γ΅Γ΄Γ΅ " + CStr(stacksize \ 1288), bstack.Owner.Width, 1000, True
         Else
-        wwPlain2 bstack, prive, "Όριο Αναδρομής για Συναρτήσεις " + CStr(stacksize \ 9017), bstack.Owner.Width, 1000, True
-        wwPlain2 bstack, prive, "Όριο Αναδρομής Συναρτήσεων/Τμημάτων με την Κάλεσε " + CStr(stacksize \ 4524), bstack.Owner.Width, 1000, True
-        wwPlain2 bstack, prive, "Όριο κλήσεων για Τμήματα  " + CStr(stacksize \ 3759), bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "ΒΌΓ±Γ©Γ― ΓΓ­Γ΅Γ¤Γ±Γ―Γ¬ΓΓ² Γ£Γ©Γ΅ Γ“ΓµΓ­Γ΅Γ±Γ΄ΓΓ³Γ¥Γ©Γ² " + CStr(stacksize \ 9017), bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "ΒΌΓ±Γ©Γ― ΓΓ­Γ΅Γ¤Γ±Γ―Γ¬ΓΓ² Γ“ΓµΓ­Γ΅Γ±Γ΄ΓΓ³Γ¥ΓΉΓ­/Γ”Γ¬Γ§Γ¬ΓΓ΄ΓΉΓ­ Γ¬Γ¥ Γ΄Γ§Γ­ ΓΓΓ«Γ¥Γ³Γ¥ " + CStr(stacksize \ 4524), bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "ΒΌΓ±Γ©Γ― ΓªΓ«ΓΓ³Γ¥ΓΉΓ­ Γ£Γ©Γ΅ Γ”Γ¬ΓΓ¬Γ΅Γ΄Γ΅  " + CStr(stacksize \ 3759), bstack.Owner.Width, 1000, True
         End If
-        If OverideDec Then wwPlain2 bstack, prive, "Αλλαγή Τοπικού " + CStr(Clid), bstack.Owner.Width, 1000, True
+        If OverideDec Then wwPlain2 bstack, prive, "ΓΓ«Γ«Γ΅Γ£Γ Γ”Γ―Γ°Γ©ΓªΓ―Γ½ " + CStr(Clid), bstack.Owner.Width, 1000, True
         If UseIntDiv Then ss$ = "+DIV" Else ss$ = "-DIV"
         If priorityOr Then ss$ = ss$ + " +PRI" Else ss$ = ss$ + " -PRI"
         If Not mNoUseDec Then ss$ = ss$ + " -DEC" Else ss$ = ss$ + " +DEC"
-        If mNoUseDec <> NoUseDec Then ss$ = ss$ + "(παράκαμψη)"
+        If mNoUseDec <> NoUseDec Then ss$ = ss$ + "(Γ°Γ΅Γ±ΓΓªΓ΅Γ¬ΓΈΓ§)"
 GoSub part2
-        wwPlain2 bstack, prive, "Διακόπτες " + ss$, bstack.Owner.Width, 1000, True
-        wwPlain2 bstack, prive, "Περί διακοπτών: χρησιμοποίησε την εντολή Βοήθεια Διακόπτες", bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "Γ„Γ©Γ΅ΓªΓΌΓ°Γ΄Γ¥Γ² " + ss$, bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "ΓΓ¥Γ±Γ Γ¤Γ©Γ΅ΓªΓ―Γ°Γ΄ΓΎΓ­: Γ·Γ±Γ§Γ³Γ©Γ¬Γ―Γ°Γ―ΓΓ§Γ³Γ¥ Γ΄Γ§Γ­ Γ¥Γ­Γ΄Γ―Γ«Γ Γ‚Γ―ΓΓ¨Γ¥Γ©Γ΅ Γ„Γ©Γ΅ΓªΓΌΓ°Γ΄Γ¥Γ²", bstack.Owner.Width, 1000, True
         
-        wwPlain2 bstack, prive, "Οθόνες:" + Str$(DisplayMonitorCount()) + "  η βασική :" + Str$(primarymonitor + 1) + " Εντολή: Παράθυρο Τύπος," + Str$(primarymonitor), bstack.Owner.Width, 1000, True
-        wwPlain2 bstack, prive, "Αυτή η φόρμα είναι στην οθόνη:" + Str$(FindFormSScreen(di) + 1), bstack.Owner.Width, 1000, True
-        wwPlain2 bstack, prive, "Η κονσόλα είναι στην οθόνη:" + Str$(Console + 1), bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "ΓΓ¨ΓΌΓ­Γ¥Γ²:" + Str$(DisplayMonitorCount()) + "  Γ§ ΓΆΓ΅Γ³Γ©ΓªΓ :" + Str$(primarymonitor + 1) + " Γ…Γ­Γ΄Γ―Γ«Γ: ΓΓ΅Γ±ΓΓ¨ΓµΓ±Γ― Γ”Γ½Γ°Γ―Γ²," + Str$(primarymonitor), bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "ΓΓµΓ΄Γ Γ§ Γ¶ΓΌΓ±Γ¬Γ΅ Γ¥ΓΓ­Γ΅Γ© Γ³Γ΄Γ§Γ­ Γ―Γ¨ΓΌΓ­Γ§:" + Str$(FindFormSScreen(di) + 1), bstack.Owner.Width, 1000, True
+        wwPlain2 bstack, prive, "Γ‡ ΓªΓ―Γ­Γ³ΓΌΓ«Γ΅ Γ¥ΓΓ­Γ΅Γ© Γ³Γ΄Γ§Γ­ Γ―Γ¨ΓΌΓ­Γ§:" + Str$(Console + 1), bstack.Owner.Width, 1000, True
 
     Else
         wwPlain2 bstack, prive, "Default Code Page:" & GetACP, bstack.Owner.Width, 1000, True
@@ -8394,7 +8394,7 @@ getrow ObjFromPtr(basestackLP), rest$, , , Lang
 resp = True
 End Sub
 Sub NeoExecute(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
-If IsLabelSymbolNew(rest$, "ΚΩΔΙΚΑ", "CODE", Lang) Then
+If IsLabelSymbolNew(rest$, "ΓΓ™Γ„Γ‰ΓΓ", "CODE", Lang) Then
  resp = ExecCode(ObjFromPtr(basestackLP), rest$)
  Else
 CommExecAndTimeOut ObjFromPtr(basestackLP), rest$
@@ -8850,14 +8850,14 @@ If j = 0 Then Exit Function
 i = MyTrimL(a$)
 If i > j Then Exit Function  ' this is not good
 If j - i < cl - 1 Then
-If mis Then MyEr "missing " & c$, "λείπει " & c$
+If mis Then MyEr "missing " & c$, "Γ«Γ¥ΓΓ°Γ¥Γ© " & c$
 Exit Function
 End If
 If c$ = Mid$(a$, i, cl) Then
 a$ = Mid$(a$, MyTrimLi(a$, i + cl))
 FastSymbol = True
 ElseIf mis Then
-MyEr "missing " & c$, "λείπει " & c$
+MyEr "missing " & c$, "Γ«Γ¥ΓΓ°Γ¥Γ© " & c$
 End If
 End Function
 Function FastSymbol1(s$, c$) As Boolean
@@ -8987,7 +8987,7 @@ IsLabelSymbol = IsLabelSYMB33(test$, what$, Pass)
 If Len(what$) <> Len(c$) Then IsLabelSymbol = False
 If Not IsLabelSymbol Then
      If mis Then
-                 MyEr "missing " & c$, "λείπει " & c$
+                 MyEr "missing " & c$, "Γ«Γ¥ΓΓ°Γ¥Γ© " & c$
               End If
 Exit Function
 End If
@@ -9001,7 +9001,7 @@ End If
   
              Else
              If mis Then
-                 MyEr "missing " & c$, "λείπει " & c$
+                 MyEr "missing " & c$, "Γ«Γ¥ΓΓ°Γ¥Γ© " & c$
               End If
             IsLabelSymbol = False
             End If
@@ -9011,14 +9011,14 @@ End Function
 Function MakeEmf(bstack As basetask, b$, Lang As Long, Data$, Optional ww = 0, Optional hh = 0) As Boolean
 Dim w$, x1 As Long, label1$, usehandler As mHandler, par As Boolean, pppp As mArray, p As Variant, it&, x2&
 x2 = Len(b$)
-If IsLabelSymbolNew(b$, "ΩΣ", "AS", Lang) Then
+If IsLabelSymbolNew(b$, "Γ™Γ“", "AS", Lang) Then
             w$ = Funcweak(bstack, b$, x1, label1$)
             If LastErNum1 = -1 And x1 < 5 Then Exit Function
             If LenB(w$) = 0 Then
             If Len(bstack.UseGroupname) > 0 Then
                 If Len(label1$) > Len(bstack.UseGroupname) Then
                     If bstack.UseGroupname = Left$(label1$, Len(bstack.UseGroupname)) Then
-                        MyEr "No such member in this group", "Δεν υπάρχει τέτοιο μέλος σε αυτή την ομάδα"
+                        MyEr "No such member in this group", "Γ„Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ© Γ΄ΓΓ΄Γ―Γ©Γ― Γ¬ΓΓ«Γ―Γ² Γ³Γ¥ Γ΅ΓµΓ΄Γ Γ΄Γ§Γ­ Γ―Γ¬ΓΓ¤Γ΅"
                         Exit Function
                     End If
                 End If
@@ -9050,7 +9050,7 @@ contvar1:
             
                 Else
                     MyEr "", ""
-                    MyEr "Array not defined", "Ο πίνακας δεν έχει οριστεί"
+                    MyEr "Array not defined", "Γ Γ°ΓΓ­Γ΅ΓªΓ΅Γ² Γ¤Γ¥Γ­ ΓΓ·Γ¥Γ© Γ―Γ±Γ©Γ³Γ΄Γ¥Γ"
                     Exit Function
                 End If
             End If
@@ -9087,7 +9087,7 @@ contvar1:
             
                 Else
                     MyEr "", ""
-                    MyEr "Array not defined", "Ο πίνακας δεν έχει οριστεί"
+                    MyEr "Array not defined", "Γ Γ°ΓΓ­Γ΅ΓªΓ΅Γ² Γ¤Γ¥Γ­ ΓΓ·Γ¥Γ© Γ―Γ±Γ©Γ³Γ΄Γ¥Γ"
                     Exit Function
                 End If
             End If
@@ -9098,14 +9098,14 @@ End Function
 
 Function GetRes(bstack As basetask, b$, Lang As Long, Data$) As Boolean
 Dim w$, x1 As Long, label1$, usehandler As mHandler, par As Boolean, pppp As mArray, p As Variant
-If IsLabelSymbolNew(b$, "ΩΣ", "AS", Lang) Then
+If IsLabelSymbolNew(b$, "Γ™Γ“", "AS", Lang) Then
             w$ = Funcweak(bstack, b$, x1, label1$)
             If LastErNum1 = -1 And x1 < 5 Then Exit Function
             If LenB(w$) = 0 Then
             If Len(bstack.UseGroupname) > 0 Then
                 If Len(label1$) > Len(bstack.UseGroupname) Then
                     If bstack.UseGroupname = Left$(label1$, Len(bstack.UseGroupname)) Then
-                        MyEr "No such member in this group", "Δεν υπάρχει τέτοιο μέλος σε αυτή την ομάδα"
+                        MyEr "No such member in this group", "Γ„Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ© Γ΄ΓΓ΄Γ―Γ©Γ― Γ¬ΓΓ«Γ―Γ² Γ³Γ¥ Γ΅ΓµΓ΄Γ Γ΄Γ§Γ­ Γ―Γ¬ΓΓ¤Γ΅"
                         Exit Function
                     End If
                 End If
@@ -9162,7 +9162,7 @@ contvar1:
             
                 Else
                     MyEr "", ""
-                    MyEr "Array not defined", "Ο πίνακας δεν έχει οριστεί"
+                    MyEr "Array not defined", "Γ Γ°ΓΓ­Γ΅ΓªΓ΅Γ² Γ¤Γ¥Γ­ ΓΓ·Γ¥Γ© Γ―Γ±Γ©Γ³Γ΄Γ¥Γ"
                     Exit Function
                 End If
             ElseIf x1 = 6 Then
@@ -9176,7 +9176,7 @@ contstr1:
                     Exit Function
                 Else
                     MyEr "", ""
-                    MyEr "Array not defined", "Ο πίνακας δεν έχει οριστεί"
+                    MyEr "Array not defined", "Γ Γ°ΓΓ­Γ΅ΓªΓ΅Γ² Γ¤Γ¥Γ­ ΓΓ·Γ¥Γ© Γ―Γ±Γ©Γ³Γ΄Γ¥Γ"
                     Exit Function
                 End If
             End If
@@ -9194,7 +9194,7 @@ contstr1:
             
                 Else
 Err1:
-                    MyEr "Can't decode this resource", "Δεν μπορών να αποκωδικοποιήσω αυτό το πόρο"
+                    MyEr "Can't decode this resource", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎΓ­ Γ­Γ΅ Γ΅Γ°Γ―ΓªΓΉΓ¤Γ©ΓªΓ―Γ°Γ―Γ©ΓΓ³ΓΉ Γ΅ΓµΓ΄ΓΌ Γ΄Γ― Γ°ΓΌΓ±Γ―"
                 End If
                 Exit Function
             Else
@@ -9223,7 +9223,7 @@ Err1:
             
                 Else
                     MyEr "", ""
-                    MyEr "Array not defined", "Ο πίνακας δεν έχει οριστεί"
+                    MyEr "Array not defined", "Γ Γ°ΓΓ­Γ΅ΓªΓ΅Γ² Γ¤Γ¥Γ­ ΓΓ·Γ¥Γ© Γ―Γ±Γ©Γ³Γ΄Γ¥Γ"
                     Exit Function
                 End If
                             ElseIf x1 = 6 Then
@@ -9237,7 +9237,7 @@ Err1:
                     Exit Function
                 Else
                     MyEr "", ""
-                    MyEr "Array not defined", "Ο πίνακας δεν έχει οριστεί"
+                    MyEr "Array not defined", "Γ Γ°ΓΓ­Γ΅ΓªΓ΅Γ² Γ¤Γ¥Γ­ ΓΓ·Γ¥Γ© Γ―Γ±Γ©Γ³Γ΄Γ¥Γ"
                     Exit Function
                 End If
             End If
@@ -9404,7 +9404,7 @@ Dim p As Variant
                     If IsExp(bstack, a$, p, , True) Then
                          If p > 31 Or p < -31 Then
                          
-                         MyErMacro a$, "Shift from -31 to 31", "Ολίσθηση από -31 ως 31"
+                         MyErMacro a$, "Shift from -31 to 31", "ΓΓ«ΓΓ³Γ¨Γ§Γ³Γ§ Γ΅Γ°ΓΌ -31 ΓΉΓ² 31"
                          IsBinaryShift = False: Exit Function
                          Else
                                If p > 0 Then
@@ -9442,7 +9442,7 @@ Dim p As Variant
                  If IsExp(bstack, a$, p, , True) Then
                         If p > 31 Or p < -31 Then
                             
-                              MyErMacro a$, "Rotation from -31 to 31", "Περιστοφή από -31 ως 31"
+                              MyErMacro a$, "Rotation from -31 to 31", "ΓΓ¥Γ±Γ©Γ³Γ΄Γ―Γ¶Γ Γ΅Γ°ΓΌ -31 ΓΉΓ² 31"
                              IsBinaryRotate = False: Exit Function
                         Else
                              If p > 0 Then
@@ -9517,7 +9517,7 @@ If IsExp(bstack, a$, R, , True) Then
      
      If R = Int(R) Then
         If R Mod 90 = 0 And R Mod 180 <> 0 Then
-        MyErMacro a$, "Wrong Tan Parameter", "Λάθος παράμετρος εφαπτομένης"
+        MyErMacro a$, "Wrong Tan Parameter", "Γ‹ΓΓ¨Γ―Γ² Γ°Γ΅Γ±ΓΓ¬Γ¥Γ΄Γ±Γ―Γ² Γ¥Γ¶Γ΅Γ°Γ΄Γ―Γ¬ΓΓ­Γ§Γ²"
         IsTan = False: Exit Function
         End If
         End If
@@ -9549,7 +9549,7 @@ End Function
 Function IsLn(bstack As basetask, a$, R As Variant, SG As Variant) As Boolean
   If IsExp(bstack, a$, R, , True) Then
     If R <= 0 Then
-       MyErMacro a$, "Only > zero parameter", "Μόνο >0 παράμετρος"
+       MyErMacro a$, "Only > zero parameter", "ΓΓΌΓ­Γ― >0 Γ°Γ΅Γ±ΓΓ¬Γ¥Γ΄Γ±Γ―Γ²"
         IsLn = False: Exit Function
     Else
     R = SG * Log(R)
@@ -9566,7 +9566,7 @@ End Function
 Function IsLog(bstack As basetask, a$, R As Variant, SG As Variant) As Boolean
 If IsExp(bstack, a$, R, , True) Then
         If R <= 0 Then
-       MyErMacro a$, "Only > zero parameter", "Μόνο >0 παράμετρος"
+       MyErMacro a$, "Only > zero parameter", "ΓΓΌΓ­Γ― >0 Γ°Γ΅Γ±ΓΓ¬Γ¥Γ΄Γ±Γ―Γ²"
         IsLog = False: Exit Function
     Else
     R = SG * Log(R) / 2.30258509299405
@@ -9745,7 +9745,7 @@ Else
         Else
         DE$ = DE$ & Mid$(a$, sng, 1)
         End If
-        Case "E", "e", "Ε", "ε" ' ************check it
+        Case "E", "e", "Γ…", "Γ¥" ' ************check it
              If ex$ = vbNullString Then
                sg1 = True
         ex$ = "E"
@@ -9818,9 +9818,9 @@ sng = fr - 1
     Exit Do
     End Select
     Loop
-If LCase(Mid$(a$, sng, 2)) Like "0[xχ]" Then
+If LCase(Mid$(a$, sng, 2)) Like "0[xΓ·]" Then
     If foundsign Then
-    MyEr "no sign for hex values", "όχι πρόσημο για δεκαεξαδικούς"
+    MyEr "no sign for hex values", "ΓΌΓ·Γ© Γ°Γ±ΓΌΓ³Γ§Γ¬Γ― Γ£Γ©Γ΅ Γ¤Γ¥ΓªΓ΅Γ¥Γ®Γ΅Γ¤Γ©ΓªΓ―Γ½Γ²"
     IsNumberOnly = False
     GoTo er111
     End If
@@ -9835,7 +9835,7 @@ If LCase(Mid$(a$, sng, 2)) Like "0[xχ]" Then
     sng = sng + 1
     SG = 1 ' no sign
     If LenB(DE$) = 0 Then
-    MyEr "ivalid hex values", "λάθος όρισμα για δεκαεξαδικό"
+    MyEr "ivalid hex values", "Γ«ΓΓ¨Γ―Γ² ΓΌΓ±Γ©Γ³Γ¬Γ΅ Γ£Γ©Γ΅ Γ¤Γ¥ΓªΓ΅Γ¥Γ®Γ΅Γ¤Γ©ΓªΓΌ"
     IsNumberOnly = False
     GoTo er111
     End If
@@ -9908,7 +9908,7 @@ Else
         Else
         DE$ = DE$ & Mid$(a$, sng, 1)
         End If
-        Case "E", "e", "Ε", "ε"  ' ************check it
+        Case "E", "e", "Γ…", "Γ¥"  ' ************check it
             If ex$ = vbNullString Then
                sg1 = True
                 ex$ = "E"
@@ -10044,11 +10044,11 @@ If a1 > Len(a$) Then a1 = Len(a$) + 1
     If IsNumberOnly(a$, 1, D, a1, noendtypes, exceptspecial) Then
         a$ = Mid$(a$, a1)
         IsNumberD2 = True
-    ElseIf MaybeIsSymbol(a$, "ΑαΨψTtFf") Then
-        If Fast3Varl(a$, "ΑΛΗΘΕΣ", 6, "ΑΛΗΘΗΣ", 6, "TRUE", 4, 6) Then
+    ElseIf MaybeIsSymbol(a$, "ΓΓ΅ΓΓΈTtFf") Then
+        If Fast3Varl(a$, "ΓΓ‹Γ‡ΓΓ…Γ“", 6, "ΓΓ‹Γ‡ΓΓ‡Γ“", 6, "TRUE", 4, 6) Then
             D = True
             IsNumberD2 = True
-        ElseIf Fast3Varl(a$, "ΨΕΥΔΕΣ", 6, "ΨΕΥΔΗΣ", 6, "FALSE", 5, 6) Then
+        ElseIf Fast3Varl(a$, "ΓΓ…Γ•Γ„Γ…Γ“", 6, "ΓΓ…Γ•Γ„Γ‡Γ“", 6, "FALSE", 5, 6) Then
             D = False
             IsNumberD2 = True
         Else
@@ -10079,10 +10079,10 @@ Next a1
 If a1 > Len(a$) Then a1 = Len(a$) + 1
 If IsNumberOnly(a$, fr, D, a1) Then
 IsNumberD3 = True
-ElseIf Fast3NoSpaceCheck(fr, a$, "ΑΛΗΘΕΣ", 6, "ΑΛΗΘΗΣ", 6, "TRUE", 4, 6) Then
+ElseIf Fast3NoSpaceCheck(fr, a$, "ΓΓ‹Γ‡ΓΓ…Γ“", 6, "ΓΓ‹Γ‡ΓΓ‡Γ“", 6, "TRUE", 4, 6) Then
 D = True
 IsNumberD3 = True
-ElseIf Fast3NoSpaceCheck(fr, a$, "ΨΕΥΔΕΣ", 6, "ΨΕΥΔΗΣ", 6, "FALSE", 5, 6) Then
+ElseIf Fast3NoSpaceCheck(fr, a$, "ΓΓ…Γ•Γ„Γ…Γ“", 6, "ΓΓ…Γ•Γ„Γ‡Γ“", 6, "FALSE", 5, 6) Then
 D = False
 IsNumberD3 = True
 Else
@@ -10145,7 +10145,7 @@ Else
 
     ig$ = "0"
     DE$ = mydec$
-    ElseIf LCase(Mid$(a$, sng&, 2)) Like "0[xχ]" Then
+    ElseIf LCase(Mid$(a$, sng&, 2)) Like "0[xΓ·]" Then
     ig$ = "0"
     DE$ = "0x"
   sng& = sng& + 1
@@ -10195,7 +10195,7 @@ Else
         Exit Do
         End If
         End If
-        Case "Ε", "ε"
+        Case "Γ…", "Γ¥"
  If ex$ = vbNullString Then
           sg1 = True
         ex$ = "E"
@@ -10324,7 +10324,7 @@ Else
                                   R = val(ig$ & DE$)
                              End If
                          End If
-                       MyEr "Error in exponet", "Λάθος στον εκθέτη"
+                       MyEr "Error in exponet", "Γ‹ΓΓ¨Γ―Γ² Γ³Γ΄Γ―Γ­ Γ¥ΓªΓ¨ΓΓ΄Γ§"
                        IsNumberCheck = False
                        Exit Function
                      End If
@@ -10651,7 +10651,7 @@ again1:
                   End If
                   pd$ = LTrim$(Str(p))
                   
-                  If InStr(pd$, "E") > 0 Or InStr(pd$, "e") > 0 Then '' we can change e to greek ε
+                  If InStr(pd$, "E") > 0 Or InStr(pd$, "e") > 0 Then '' we can change e to greek Γ¥
                   pd$ = Format$(p, "0." + String$(p1, "0") + "E+####")
                        If Not NoUseDec Then
                                If OverideDec Then
@@ -10991,7 +10991,7 @@ Function ProcEnumGroup(bstack As basetask, rest$, Optional glob As Boolean = Fal
         
         myenum.EnumName = w1$
         Else
-        MyEr "No proper name for enumeration", "μη κανονικό όνομα για απαρίθμηση"
+        MyEr "No proper name for enumeration", "Γ¬Γ§ ΓªΓ΅Γ­Γ―Γ­Γ©ΓªΓΌ ΓΌΓ­Γ―Γ¬Γ΅ Γ£Γ©Γ΅ Γ΅Γ°Γ΅Γ±ΓΓ¨Γ¬Γ§Γ³Γ§"
         Exit Function
     End If
     If FastSymbol(rest$, "{") Then
@@ -11006,7 +11006,7 @@ Function ProcEnumGroup(bstack As basetask, rest$, Optional glob As Boolean = Fal
             If FastSymbol(s$, "=") Then
             If IsExp(bstack, s$, enumvalue) Then
                 If Not bstack.lastobj Is Nothing Then
-                    MyEr "No Object allowed as enumeration value", "Δεν επιτρέπεται αντικείμενο για τιμή απαριθμητή"
+                    MyEr "No Object allowed as enumeration value", "Γ„Γ¥Γ­ Γ¥Γ°Γ©Γ΄Γ±ΓΓ°Γ¥Γ΄Γ΅Γ© Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ£Γ©Γ΅ Γ΄Γ©Γ¬Γ Γ΅Γ°Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ"
                     Exit Function
                     End If
                 End If
@@ -11019,7 +11019,7 @@ Function ProcEnumGroup(bstack As basetask, rest$, Optional glob As Boolean = Fal
             mh.t1 = 4
             mh.ReadOnly = True
             mh.index_cursor = enumvalue
-            mh.index_start = myenum.count - 1
+            mh.index_start = myenum.Count - 1
              v1 = globalvar(bstack.GroupName + myUcase(w1$, gr), v1, , glob)
              Set var(v1) = mh
             ProcEnumGroup = True
@@ -11028,7 +11028,7 @@ Function ProcEnumGroup(bstack As basetask, rest$, Optional glob As Boolean = Fal
         End If
         If FastSymbol(s$, ",") Then ProcEnumGroup = False
         Loop
-        If v1 > v Then Set var(v) = var(v1) Else MyEr "Empty Enumeration", "Άδεια Απαρίθμηση": Exit Function
+        If v1 > v Then Set var(v) = var(v1) Else MyEr "Empty Enumeration", "ΒΆΓ¤Γ¥Γ©Γ΅ ΓΓ°Γ΅Γ±ΓΓ¨Γ¬Γ§Γ³Γ§": Exit Function
         ProcEnumGroup = FastSymbol(rest$, "}", True)
     Else
         MissingEnumBlock
@@ -11049,7 +11049,7 @@ Function ProcEnum(bstack As basetask, rest$, Optional glob As Boolean = False) A
         
         myenum.EnumName = w1$
         Else
-        MyEr "No proper name for enumeration", "μη κανονικό όνομα για απαρίθμηση"
+        MyEr "No proper name for enumeration", "Γ¬Γ§ ΓªΓ΅Γ­Γ―Γ­Γ©ΓªΓΌ ΓΌΓ­Γ―Γ¬Γ΅ Γ£Γ©Γ΅ Γ΅Γ°Γ΅Γ±ΓΓ¨Γ¬Γ§Γ³Γ§"
         Exit Function
     End If
     If FastSymbol(rest$, "{") Then
@@ -11067,11 +11067,11 @@ Function ProcEnum(bstack As basetask, rest$, Optional glob As Boolean = False) A
             If FastSymbol(s$, "=") Then
             If IsExp(bstack, s$, enumvalue) Then
                 If Not bstack.lastobj Is Nothing Then
-                    MyEr "No Object allowed as enumeration value", "Δεν επιτρέπεται αντικείμενο για τιμή απαριθμητή"
+                    MyEr "No Object allowed as enumeration value", "Γ„Γ¥Γ­ Γ¥Γ°Γ©Γ΄Γ±ΓΓ°Γ¥Γ΄Γ΅Γ© Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ£Γ©Γ΅ Γ΄Γ©Γ¬Γ Γ΅Γ°Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ"
                     Exit Function
                    End If
             Else
-                    MyEr "No String allowed as enumeration value", "Δεν επιτρέπεται αλφαριθμητικό για τιμή απαριθμητή"
+                    MyEr "No String allowed as enumeration value", "Γ„Γ¥Γ­ Γ¥Γ°Γ©Γ΄Γ±ΓΓ°Γ¥Γ΄Γ΅Γ© Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ Γ£Γ©Γ΅ Γ΄Γ©Γ¬Γ Γ΅Γ°Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ"
                     Exit Function
             Exit Function
                 End If
@@ -11087,7 +11087,7 @@ Function ProcEnum(bstack As basetask, rest$, Optional glob As Boolean = False) A
             mh.t1 = 4
             mh.ReadOnly = True
             mh.index_cursor = enumvalue
-            mh.index_start = myenum.count - 1
+            mh.index_start = myenum.Count - 1
             
              v1 = globalvar(w1$, v1, , glob)
              Set var(v1) = mh
@@ -11097,7 +11097,7 @@ Function ProcEnum(bstack As basetask, rest$, Optional glob As Boolean = False) A
         End If
         If FastSymbol(s$, ",") Then ProcEnum = False
         Loop
-        If v1 > v Then Set var(v) = var(v1) Else MyEr "Empty Enumeration", "Άδεια Απαρίθμηση": Exit Function
+        If v1 > v Then Set var(v) = var(v1) Else MyEr "Empty Enumeration", "ΒΆΓ¤Γ¥Γ©Γ΅ ΓΓ°Γ΅Γ±ΓΓ¨Γ¬Γ§Γ³Γ§": Exit Function
         ProcEnum = FastSymbol(rest$, "}", True)
     Else
         MissingEnumBlock
@@ -11293,20 +11293,20 @@ If Left$(Pad$, 1) = Chr$(1) Then LSet Pad$ = Mid$(Pad$, 2): cut = cut - 1
 Do
 multi = False
 Select Case Left$(Pad$, cut - 1)
-Case "SUM", "ΑΘΡ"
+Case "SUM", "ΓΓΓ‘"
 res = 0
-For w3 = 0 To pppp.count - 1
+For w3 = 0 To pppp.Count - 1
 If pppp.MyIsNumeric(pppp.item(w3)) Then res = res + pppp.item(w3)
 Next w3
-Case "MIN", "ΜΙΚ"
+Case "MIN", "ΓΓ‰Γ"
 res = 0
 w4 = -1
-If pppp.count > 0 Then
-For w3 = 0 To pppp.count - 1
+If pppp.Count > 0 Then
+For w3 = 0 To pppp.Count - 1
 If pppp.MyIsNumeric(w3) Then res = pppp.itemnumeric(w3): w4 = w3: Exit For
 Next w3
 
-For w3 = w3 To pppp.count - 1
+For w3 = w3 To pppp.Count - 1
 If pppp.MyIsNumeric(pppp.item(w3)) Then If pppp.item(w3) < res Then res = pppp.item(w3): w4 = w3
 Next w3
 End If
@@ -11317,15 +11317,15 @@ If Not FastSymbol(a$, ")") Then
     Matrix = True
     Exit Function
 End If
-Case "MIN$", "ΜΙΚ$"
+Case "MIN$", "ΓΓ‰Γ$"
 res = vbNullString
 w4 = -1
-If pppp.count > 0 Then
-For w3 = 0 To pppp.count - 1
+If pppp.Count > 0 Then
+For w3 = 0 To pppp.Count - 1
 If pppp.IsStringItem(w3) Then res = pppp.item(w3): w4 = w3: Exit For
 Next w3
 
-For w3 = w3 To pppp.count - 1
+For w3 = w3 To pppp.Count - 1
 If pppp.IsStringItem(w3) Then If pppp.item(w3) < res Then res = pppp.item(w3): w4 = w3
 Next w3
 End If
@@ -11337,15 +11337,15 @@ Else
     Exit Function
 End If
 
-Case "MAX$", "ΜΕΓ$"
+Case "MAX$", "ΓΓ…Γƒ$"
 res = vbNullString
 w4 = -1
-If pppp.count > 0 Then
-For w3 = 0 To pppp.count - 1
+If pppp.Count > 0 Then
+For w3 = 0 To pppp.Count - 1
 If pppp.IsStringItem(w3) Then res = pppp.item(w3): w4 = w3: Exit For
 Next w3
 
-For w3 = w3 To pppp.count - 1
+For w3 = w3 To pppp.Count - 1
 If pppp.IsStringItem(w3) Then If pppp.item(w3) > res Then res = pppp.item(w3): w4 = w3
 Next w3
 End If
@@ -11356,15 +11356,15 @@ Else
     Matrix = True
     Exit Function
 End If
-Case "MAX", "ΜΕΓ"
+Case "MAX", "ΓΓ…Γƒ"
 res = 0
 w4 = -1
-If pppp.count > 0 Then
-For w3 = 0 To pppp.count - 1
+If pppp.Count > 0 Then
+For w3 = 0 To pppp.Count - 1
 If pppp.MyIsNumeric(pppp.item(w3)) Then res = pppp.itemnumeric(w3): w4 = w3: Exit For
 Next w3
 
-For w3 = w3 To pppp.count - 1
+For w3 = w3 To pppp.Count - 1
 If pppp.MyIsNumeric(pppp.item(w3)) Then If pppp.item(w3) > res Then res = pppp.item(w3): w4 = w3
 Next w3
 End If
@@ -11377,14 +11377,14 @@ Else
     Matrix = True
     Exit Function
 End If
-Case "EVAL", "EVAL$", "ΕΚΦΡ", "ΕΚΦΡ$"
+Case "EVAL", "EVAL$", "Γ…ΓΓ–Γ‘", "Γ…ΓΓ–Γ‘$"
 If IsExp(bstack, a$, p, , True) Then
     w2 = CLng(p)
 Else
     w2 = 0
 End If
-If w2 < 0 Or w2 >= pppp.count Then
-MyEr "offset out of limits", "Δείκτης εκτός ορίων"
+If w2 < 0 Or w2 >= pppp.Count Then
+MyEr "offset out of limits", "Γ„Γ¥ΓΓªΓ΄Γ§Γ² Γ¥ΓªΓ΄ΓΌΓ² Γ―Γ±ΓΓΉΓ­"
 Matrix = False
 Exit Function
 Else
@@ -11402,7 +11402,7 @@ lookagain:
                         If FastSymbol(a$, ",") Then
                             If IsExp(bstack, a$, p, , True) Then
                                 w4 = CLng(Int(p))
-                                If w4 < 0 Or w4 >= .objref.count Then
+                                If w4 < 0 Or w4 >= .objref.Count Then
                                     indexout a$
                                     Exit Function
                                 End If
@@ -11446,7 +11446,7 @@ lookagain:
                     If FastSymbol(a$, ",") Then
                             If IsExp(bstack, a$, p, , True) Then
                                 w4 = CLng(Int(p))
-                                If w4 < 0 Or w4 >= .objref.count Then
+                                If w4 < 0 Or w4 >= .objref.Count Then
                                     indexout a$
                                     Exit Function
                                 End If
@@ -11490,7 +11490,7 @@ lookagain:
                 ElseIf usehandler.t1 = 1 And FastSymbol(a$, ",") Then
                     If IsExp(bstack, a$, p, , True) Then
                             w4 = CLng(Int(p))
-                            If w4 < 0 Or w4 >= .objref.count Then
+                            If w4 < 0 Or w4 >= .objref.Count Then
                             indexout a$
                             Exit Function
                             End If
@@ -11639,14 +11639,14 @@ Else
 
 End If
 
-Case "VAL", "ΤΙΜΗ", "VAL$", "ΤΙΜΗ$"
+Case "VAL", "Γ”Γ‰ΓΓ‡", "VAL$", "Γ”Γ‰ΓΓ‡$"
 If IsExp(bstack, a$, p, , True) Then
     w2 = CLng(p)
 Else
     w2 = 0
 End If
-If w2 < 0 Or w2 >= pppp.count Then
-MyEr "offset out of limits", "Δείκτης εκτός ορίων"
+If w2 < 0 Or w2 >= pppp.Count Then
+MyEr "offset out of limits", "Γ„Γ¥ΓΓªΓ΄Γ§Γ² Γ¥ΓªΓ΄ΓΌΓ² Γ―Γ±ΓΓΉΓ­"
 Matrix = False
 Exit Function
 Else
@@ -11665,7 +11665,7 @@ If .t1 = 3 Then
     ElseIf .t1 = 1 And FastSymbol(a$, ",") Then
         If IsExp(bstack, a$, p, , True) Then
                 w4 = CLng(Int(p))
-                If w4 < 0 Or w4 >= .objref.count Then
+                If w4 < 0 Or w4 >= .objref.Count Then
                 indexout a$
                 Exit Function
                 End If
@@ -11715,10 +11715,10 @@ Else
         End If
     End If
 End If
-Case "SLICE", "ΜΕΡΟΣ"
+Case "SLICE", "ΓΓ…Γ‘ΓΓ“"
 If IsExp(bstack, a$, p, , True) Then
-If p < 0 Or p >= pppp.count Then
-    MyEr "start offset out of limits", "Δείκτης αρχής εκτός ορίων"
+If p < 0 Or p >= pppp.Count Then
+    MyEr "start offset out of limits", "Γ„Γ¥ΓΓªΓ΄Γ§Γ² Γ΅Γ±Γ·ΓΓ² Γ¥ΓªΓ΄ΓΌΓ² Γ―Γ±ΓΓΉΓ­"
     Matrix = False
     Exit Function
 End If
@@ -11727,16 +11727,16 @@ p = 0
 End If
 If FastSymbol(a$, ",") Then
 If IsExp(bstack, a$, R, , True) Then
-    If R >= pppp.count Or R < p Then
-    MyEr "end offset out of limits", "Δείκτης τέλους εκτός ορίων"
+    If R >= pppp.Count Or R < p Then
+    MyEr "end offset out of limits", "Γ„Γ¥ΓΓªΓ΄Γ§Γ² Γ΄ΓΓ«Γ―ΓµΓ² Γ¥ΓªΓ΄ΓΌΓ² Γ―Γ±ΓΓΉΓ­"
     Matrix = False
     Exit Function
     End If
 Else
-R = pppp.count - 1
+R = pppp.Count - 1
 End If
 Else
-R = pppp.count - 1
+R = pppp.Count - 1
 End If
 If original > 0 Then
 pppp.CopyArraySliceFast pppp1, CLng(p), CLng(R)
@@ -11752,7 +11752,7 @@ Set usehandler = New mHandler
 usehandler.t1 = 3
 Set usehandler.objref = pppp
 Set bstack.lastobj = usehandler
-Case "SORT", "ΤΑΞΙΝΟΜΗΣΗ"
+Case "SORT", "Γ”ΓΓΓ‰ΓΓΓΓ‡Γ“Γ‡"
 w2 = 0
 w3 = -1
 w4 = -1
@@ -11790,7 +11790,7 @@ Set usehandler = New mHandler
 usehandler.t1 = 3
 Set usehandler.objref = pppp
 Set bstack.lastobj = usehandler
-Case "STR$", "ΓΡΑΦΗ$"
+Case "STR$", "ΓƒΓ‘ΓΓ–Γ‡$"
 If Not IsStrExp(bstack, a$, Pad$) Then Pad$ = " "
 If FastSymbol(a$, ",") Then
     If Not IsStrExp(bstack, a$, s$) Then
@@ -11798,8 +11798,8 @@ If FastSymbol(a$, ",") Then
     End If
 End If
 res = ""
-If pppp.count > 0 Then
-For w3 = 0 To pppp.count - 2
+If pppp.Count > 0 Then
+For w3 = 0 To pppp.Count - 2
 If pppp.IsStringItem(w3) Then
     If Len(s$) > 0 Then
         res = res + """" + StringToEscapeStr(pppp.item(w3)) + """" + Pad$
@@ -11828,7 +11828,7 @@ If Len(s$) > 0 Then
     End If
 End If
 End If
-Case "FOLD", "ΠΑΚ", "FOLD$", "ΠΑΚ$"
+Case "FOLD", "ΓΓΓ", "FOLD$", "ΓΓΓ$"
 If IsExp(bstack, a$, p) Then
     If Not bstack.lastobj Is Nothing Then
         Set anything = bstack.lastobj
@@ -11847,16 +11847,16 @@ If IsExp(bstack, a$, p) Then
         Set bstack.lastobj = Nothing
         CallLambdaArrayFold bstack, pppp, anything, res
     Else
-        MyEr "missing a lambda function", "λείπει μια λάμδα συνάρτηση"
+        MyEr "missing a lambda function", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ¬Γ©Γ΅ Γ«ΓΓ¬Γ¤Γ΅ Γ³ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§"
         Matrix = False
         Exit Function
     End If
 Else
-    MyEr "missing a lambda function", "λείπει μια λάμδα συνάρτηση"
+    MyEr "missing a lambda function", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ¬Γ©Γ΅ Γ«ΓΓ¬Γ¤Γ΅ Γ³ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§"
     Matrix = False
     Exit Function
 End If
-Case "REV", "ΑΝΑΠ"
+Case "REV", "ΓΓΓΓ"
 Set pppp1 = New mArray
 If original > 0 Then
     pppp.CopyArrayRevFast pppp1
@@ -11874,14 +11874,14 @@ usehandler.t1 = 3
 Set usehandler.objref = pppp
 Set bstack.lastobj = usehandler
 
-Case "MAP", "ΑΝΤ"
+Case "MAP", "ΓΓΓ”"
 againmap:
 If IsExp(bstack, a$, p) Then
     If Not bstack.lastobj Is Nothing Then
     CallLambdaArrayMap bstack, pppp, bstack.lastobj
     If FastSymbol(a$, ",") Then GoTo againmap
     Else
-    MyEr "missing a lambda function", "λείπει μια λάμδα συνάρτηση"
+    MyEr "missing a lambda function", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ¬Γ©Γ΅ Γ«ΓΓ¬Γ¤Γ΅ Γ³ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§"
     Matrix = False
     Exit Function
 End If
@@ -11893,13 +11893,13 @@ original = original + 1
 End If
 res = 0
 If FastSymbol(a$, ",") Then
-    If pppp.count = 0 Then
+    If pppp.Count = 0 Then
         If IsExp(bstack, a$, p, , True) Then
              res = p: retresonly = True
         ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
             res = Pad$: retresonly = True
         Else
-           MyEr "No value", "Χωρίς τιμή"
+           MyEr "No value", "Γ—ΓΉΓ±ΓΓ² Γ΄Γ©Γ¬Γ"
             Matrix = False
             Exit Function
         End If
@@ -11918,13 +11918,13 @@ Set bstack.lastobj = usehandler
 End If
 multi = True
 
-Case "FILTER", "ΦΙΛΤΡΟ"
+Case "FILTER", "Γ–Γ‰Γ‹Γ”Γ‘Γ"
 again:
 If IsExp(bstack, a$, p) Then
     If Not bstack.lastobj Is Nothing Then
     CallLambdaArray bstack, pppp, bstack.lastobj
     Else
-    MyEr "missing a lambda function", "λείπει μια λάμδα συνάρτηση"
+    MyEr "missing a lambda function", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ¬Γ©Γ΅ Γ«ΓΓ¬Γ¤Γ΅ Γ³ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§"
     Matrix = False
     Exit Function
 End If
@@ -11936,7 +11936,7 @@ original = original + 1
 End If
 res = 0
 If FastSymbol(a$, ",") Then
-    If pppp.count = 0 Then
+    If pppp.Count = 0 Then
         If IsExp(bstack, a$, p) Then
             If Not bstack.lastobj Is Nothing Then
             If TypeOf bstack.lastobj Is mHandler Then
@@ -11954,7 +11954,7 @@ If FastSymbol(a$, ",") Then
         ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
             res = Pad$: retresonly = True
         Else
-           MyEr "No value", "Χωρίς τιμή"
+           MyEr "No value", "Γ—ΓΉΓ±ΓΓ² Γ΄Γ©Γ¬Γ"
             Matrix = False
             Exit Function
         End If
@@ -11972,13 +11972,13 @@ Set usehandler.objref = pppp
 Set bstack.lastobj = usehandler
 End If
 multi = True
-Case "NOTHAVE", "ΔΕΝΕΧΕΙ"
+Case "NOTHAVE", "Γ„Γ…ΓΓ…Γ—Γ…Γ‰"
 bhas = 2
 GoTo jpos
-Case "HAVE", "ΕΧΕΙ"
+Case "HAVE", "Γ…Γ—Γ…Γ‰"
 bhas = 1
 GoTo jpos
-Case "POS", "ΘΕΣΗ"
+Case "POS", "ΓΓ…Γ“Γ‡"
 jpos:
     res = -1
     cur = 0
@@ -12005,10 +12005,10 @@ dothis:
                     Set pppp1 = usehandler.objref
             
                     sn() = pppp1.GetCopy()
-                    If pppp1.count > 0 Then
-                        ReDim Preserve sn(0 To pppp1.count - 1)
+                    If pppp1.Count > 0 Then
+                        ReDim Preserve sn(0 To pppp1.Count - 1)
                     End If
-                    cur = pppp1.count - 1
+                    cur = pppp1.Count - 1
                     w3 = p
                 End If
             ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
@@ -12027,11 +12027,11 @@ dothis:
             End If
         End If
         
-        If pppp.count > 0 Then
+        If pppp.Count > 0 Then
             res = -1
             If Not pppp1 Is Nothing Then
-                While res = -1 And cur >= 0 And w3 < pppp.count - cur - 1
-                    For w3 = w3 To pppp.count - cur - 1
+                While res = -1 And cur >= 0 And w3 < pppp.Count - cur - 1
+                    For w3 = w3 To pppp.Count - cur - 1
                         If pppp.MyIsObject(pppp.item(w3)) Then
                              If pppp.MyIsObject(sn(0)) Then GoTo inside
                         Else
@@ -12041,7 +12041,7 @@ inside:
                                 res = w3
                                 w4 = w3 + 1
                                 For w2 = 1 To cur
-                                    If w4 < pppp.count Then
+                                    If w4 < pppp.Count Then
                                         If pppp.MyIsObject(pppp.item(w4)) Then
                                             If Not pppp.MyIsObject(sn(w2)) Then
                                                 res = -1
@@ -12064,7 +12064,7 @@ inside:
                     Next w3
                 Wend
             Else
-                For w3 = p To pppp.count - 1
+                For w3 = p To pppp.Count - 1
                     If pppp.MyIsNumeric(pppp.item(w3)) Then
                         If pppp.item(w3) = R Then
                         res = w3: Exit For
@@ -12085,7 +12085,7 @@ inside:
                     If IsExp(bstack, a$, sn(cur), , True) Then
                         If res > -1 Then
                             w3 = w3 + 1
-                            If w3 < pppp.count Then
+                            If w3 < pppp.Count Then
                                 If pppp.MyIsNumeric(pppp.item(w3)) Then
                                     If pppp.item(w3) <> sn(cur) Then w2 = -1
                                 ElseIf pppp.ItemType(w3) = "mHandler" Then
@@ -12107,14 +12107,14 @@ inside:
                 If w2 = -1 Then
                     w3 = res + 1
                     res = -1
-                    While res = -1 And cur > 0 And w3 < pppp.count - cur - 1
-                        For w3 = w3 To pppp.count - cur - 1
+                    While res = -1 And cur > 0 And w3 < pppp.Count - cur - 1
+                        For w3 = w3 To pppp.Count - cur - 1
                             If pppp.MyIsNumeric(pppp.item(w3)) Then
                                 If pppp.item(w3) = sn(0) Then
                                     res = w3
                                     w4 = w3 + 1
                                     For w2 = 1 To cur
-                                        If w4 < pppp.count Then
+                                        If w4 < pppp.Count Then
                                             If pppp.MyIsNumeric(pppp.itemnumeric(w4)) Then
                                                 If pppp.item(w4) <> sn(w2) Then res = -1: Exit For
                                             ElseIf pppp.ItemType(w4) = "mHandler" Then
@@ -12143,9 +12143,9 @@ inside:
 there:
         ReDim st(0 To 4) As String
         st(0) = Pad$
-        If pppp.count > 0 Then
+        If pppp.Count > 0 Then
             res = -1
-            For w3 = p To pppp.count - 1
+            For w3 = p To pppp.Count - 1
                 If pppp.IsStringItem(w3) Then
                     If pppp.item(w3) = st(0) Then res = w3: Exit For
                 End If
@@ -12157,7 +12157,7 @@ there:
                 If IsStrExp(bstack, a$, st(cur)) Then
                     If res > -1 Then
                         w3 = w3 + 1
-                        If w3 < pppp.count Then
+                        If w3 < pppp.Count Then
                             If pppp.IsStringItem(w3) Then
                                 If pppp.item(w3) <> st(cur) Then w2 = -1
                             Else
@@ -12174,14 +12174,14 @@ there:
             If w2 = -1 Then
                 w3 = res + 1
                 res = -1
-                While res = -1 And cur > 0 And w3 < pppp.count - cur - 1
-                    For w3 = w3 To pppp.count - cur - 1
+                While res = -1 And cur > 0 And w3 < pppp.Count - cur - 1
+                    For w3 = w3 To pppp.Count - cur - 1
                         If pppp.IsStringItem(w3) Then
                             If pppp.item(w3) = st(0) Then
                                 res = w3
                                 w4 = w3 + 1
                                 For w2 = 1 To cur
-                                    If w4 < pppp.count Then
+                                    If w4 < pppp.Count Then
                                         If pppp.IsStringItem(w4) Then
                                             If pppp.item(w4) <> st(w2) Then res = -1: Exit For
                                         Else
@@ -12213,7 +12213,7 @@ Matrix = FastSymbol(a$, ")")
 If Not multi Then Exit Do
 If Matrix = False Then Exit Do
 If Not IsOperator(a$, "#") Then Exit Do
-If pppp.count = 0 Then
+If pppp.Count = 0 Then
         Do
         w2 = 1
         aheadstatus a$, , w2
@@ -12292,11 +12292,11 @@ w1 = globalvarGroup("A_" + CStr(w2), 0#)
     nbstack.OriginalCode = 0
     nbstack.UseGroupname = vbNullString
 Dim aa As Object, oldsoros As mStiva, tempsoros As New mStiva, finalpppp As New mArray
-finalpppp.StartResize: finalpppp.PushDim pppp.count: finalpppp.PushEnd
+finalpppp.StartResize: finalpppp.PushDim pppp.Count: finalpppp.PushEnd
 Set oldsoros = bstack.soros
 Set bstack.Sorosref = tempsoros
 Dim R, what As Long, where As Long
-For w1 = 0 To pppp.count - 1
+For w1 = 0 To pppp.Count - 1
  
   If pppp.IsStringItem(w1) Then
     tempsoros.PushStrVariant pppp.item(w1)
@@ -12347,11 +12347,11 @@ w1 = globalvarGroup("A_" + CStr(w2), 0#)
     nbstack.OriginalCode = 0
     nbstack.UseGroupname = vbNullString
 Dim aa As Object, oldsoros As mStiva, tempsoros As New mStiva, finalpppp As New mArray
-finalpppp.StartResize: finalpppp.PushDim pppp.count: finalpppp.PushEnd
+finalpppp.StartResize: finalpppp.PushDim pppp.Count: finalpppp.PushEnd
 Set oldsoros = bstack.soros
 Set bstack.Sorosref = tempsoros
 Dim R, what As Long, where As Long
-For w1 = 0 To pppp.count - 1
+For w1 = 0 To pppp.Count - 1
  
   If pppp.IsStringItem(w1) Then
     tempsoros.PushStrVariant pppp.item(w1)
@@ -12361,7 +12361,7 @@ For w1 = 0 To pppp.count - 1
       tempsoros.PushVal pppp.item(w1)
   End If
   If Not GoFunc(nbstack, "A_" + CStr(Abs(w2)) + "()", vbNullString, R, w2, , , True) Then Exit For
-  If tempsoros.count > 0 Then
+  If tempsoros.Count > 0 Then
   If tempsoros.StackItemTypeIsObject(1) Then
   Set finalpppp.item(w1) = tempsoros.PopObj
   Else
@@ -12407,7 +12407,7 @@ Else
 tempsoros.PushStrVariant res
 End If
 
-For w1 = 0 To pppp.count - 1
+For w1 = 0 To pppp.Count - 1
 
   If pppp.IsStringItem(w1) Then
     tempsoros.PushStrVariant pppp.item(w1)
@@ -12419,7 +12419,7 @@ For w1 = 0 To pppp.count - 1
   If Not GoFunc(nbstack, "A_" + CStr(Abs(w2)) + "()", vbNullString, R, w2, , , True) Then Exit For
   
 Next w1
-  If tempsoros.count > 0 Then
+  If tempsoros.Count > 0 Then
   If tempsoros.StackItemTypeIsObject(1) Then
         Set bstack.lastobj = tempsoros.PopObj
         res = 0
@@ -12437,7 +12437,7 @@ Set aa = bstack.lastobj
 Set bstack.lastobj = Nothing
 Set bb = aa.objref
 If bb.StructLen > 0 Then
-MyEr "Structure members are ReadOnly", "Τα μέλη της δομής είναι μόνο για ανάγνωση"
+MyEr "Structure members are ReadOnly", "Γ”Γ΅ Γ¬ΓΓ«Γ§ Γ΄Γ§Γ² Γ¤Γ―Γ¬ΓΓ² Γ¥ΓΓ­Γ΅Γ© Γ¬ΓΌΓ­Γ― Γ£Γ©Γ΅ Γ΅Γ­ΓΓ£Γ­ΓΉΓ³Γ§"
 Exit Function
 End If
 If bb.Done And FastSymbol(rest$, ":=", , 2) Then
@@ -12469,7 +12469,7 @@ If bb.Done And FastSymbol(rest$, ":=", , 2) Then
                 bb.Value = s$
             End If
         Else
-                MyEr "No Data found", "Δεν βρέθηκαν στοιχεία"
+                MyEr "No Data found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓ¨Γ§ΓªΓ΅Γ­ Γ³Γ΄Γ―Γ©Γ·Γ¥ΓΓ΅"
                 ChangeValues = False
         End If
         GoTo there
@@ -12479,7 +12479,7 @@ ElseIf lookOne(rest$, ",") Then
         ChangeValues = True
         ah = aheadstatus(rest$, False) + " "
         If InStr(ah, "l") Then
-                MyEr "Found logical expression", "Βρήκα λογική έκφραση"
+                MyEr "Found logical expression", "Γ‚Γ±ΓΓªΓ΅ Γ«Γ―Γ£Γ©ΓªΓ ΓΓªΓ¶Γ±Γ΅Γ³Γ§"
                 ChangeValues = False
         Else
                 If Left$(ah, 1) = "N" Then
@@ -12489,12 +12489,12 @@ ElseIf lookOne(rest$, ",") Then
                     End If
                         If VarType(p) = vbBoolean Then p = CLng(p)
                     If Not bstack.lastobj Is Nothing Then
-                        MyEr "No Object Allowed for Key", "Δεν επιτρέπεται αντικείμενο για κλειδί"
+                        MyEr "No Object Allowed for Key", "Γ„Γ¥Γ­ Γ¥Γ°Γ©Γ΄Γ±ΓΓ°Γ¥Γ΄Γ΅Γ© Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ£Γ©Γ΅ ΓªΓ«Γ¥Γ©Γ¤Γ"
                         ChangeValues = False
                         GoTo there
                     End If
                     If Not bb.Find(p) Then
-                         MyEr "No Key found", "Δεν βρέθηκε κλειδί"
+                         MyEr "No Key found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓ¨Γ§ΓªΓ¥ ΓªΓ«Γ¥Γ©Γ¤Γ"
                         ChangeValues = False
                         GoTo there
                     End If
@@ -12505,17 +12505,17 @@ ElseIf lookOne(rest$, ",") Then
                         GoTo there
                     End If
                     If Not bstack.lastobj Is Nothing Then
-                        MyEr "No Object Allowed for Key", "Δεν επιτρέπεται αντικείμενο για κλειδί"
+                        MyEr "No Object Allowed for Key", "Γ„Γ¥Γ­ Γ¥Γ°Γ©Γ΄Γ±ΓΓ°Γ¥Γ΄Γ΅Γ© Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ£Γ©Γ΅ ΓªΓ«Γ¥Γ©Γ¤Γ"
                         ChangeValues = False
                         GoTo there
                     End If
                     If Not bb.Find(s$) Then
-                          MyEr "No Key found", "Δεν βρέθηκε κλειδί"
+                          MyEr "No Key found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓ¨Γ§ΓªΓ¥ ΓªΓ«Γ¥Γ©Γ¤Γ"
                         ChangeValues = False
                         GoTo there
                     End If
                 Else
-                        MyEr "No Key found", "Δεν βρέθηκε κλειδί"
+                        MyEr "No Key found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓ¨Γ§ΓªΓ¥ ΓªΓ«Γ¥Γ©Γ¤Γ"
                         ChangeValues = False
                         GoTo there
                 
@@ -12551,7 +12551,7 @@ lastindex = bb.index
                             bb.Value = s$
                         End If
                 Else
-                        MyEr "No Data found", "Δεν βρέθηκαν στοιχεία"
+                        MyEr "No Data found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓ¨Γ§ΓªΓ΅Γ­ Γ³Γ΄Γ―Γ©Γ·Γ¥ΓΓ΅"
                         ChangeValues = False
                 End If
                 End If
@@ -12605,11 +12605,11 @@ If CheckIsmArray(anything) Then
         Exit Function
     End If
     On Error GoTo 0
-    If w < 0 Then w = pppp.count - w + bs
-    If w > (pppp.count + bs) Then GoTo outlimit
+    If w < 0 Then w = pppp.Count - w + bs
+    If w > (pppp.Count + bs) Then GoTo outlimit
     If w < 0 Then
 outlimit:
-    MyEr "Index out of limits", "Ο δείκτης είναι εκτός ορίων"
+    MyEr "Index out of limits", "Γ Γ¤Γ¥ΓΓªΓ΄Γ§Γ² Γ¥ΓΓ­Γ΅Γ© Γ¥ΓªΓ΄ΓΌΓ² Γ―Γ±ΓΓΉΓ­"
     Exit Function
     End If
     
@@ -12642,7 +12642,7 @@ outlimit:
                     pppp.item(w) = s$
                 End If
             Else
-                    MyEr "No Data found", "Δεν βρέθηκαν στοιχεία"
+                    MyEr "No Data found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓ¨Γ§ΓªΓ΅Γ­ Γ³Γ΄Γ―Γ©Γ·Γ¥ΓΓ΅"
                     ChangeValuesArray = False
             End If
     End If
@@ -12664,8 +12664,8 @@ If CheckStackObj(bstack, anything) Then
         Exit Function
     End If
     On Error GoTo 0
-    If w < 0 Then w = stiva.count - w + 1
-    If w > stiva.count Then GoTo outlimit
+    If w < 0 Then w = stiva.Count - w + 1
+    If w > stiva.Count Then GoTo outlimit
     If w < 0 Then GoTo outlimit
    
     If FastSymbol(rest$, ":=", , 2) Then
@@ -12709,7 +12709,7 @@ If CheckStackObj(bstack, anything) Then
                     stiva.MakeTopItemBack w
                 End If
             Else
-                    MyEr "No Data found", "Δεν βρέθηκαν στοιχεία"
+                    MyEr "No Data found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓ¨Γ§ΓªΓ΅Γ­ Γ³Γ΄Γ―Γ©Γ·Γ¥ΓΓ΅"
                     ChangeValuesArray = False
             End If
     End If
@@ -12836,7 +12836,7 @@ notglobal = TypeOf bstack.Owner Is GuiM2000
              v = globalvar(w$, 0#, , VarStat, temphere$)
          Else
              If var(v) >= 330000 And Not notglobal Then
-                MyEr "wrong target handler", "λάθος χειριστής στόχου"
+                MyEr "wrong target handler", "Γ«ΓΓ¨Γ―Γ² Γ·Γ¥Γ©Γ±Γ©Γ³Γ΄ΓΓ² Γ³Γ΄ΓΌΓ·Γ―Γµ"
                 MyExec = 0
                 Exit Sub
              End If
@@ -12911,7 +12911,7 @@ SyntaxError
 Exit Function
 End If
 ML = 0
-If UCase(ss$) = "PIPE" Or UCase(ss$) = "ΑΥΛΟΥ" Then
+If UCase(ss$) = "PIPE" Or UCase(ss$) = "ΓΓ•Γ‹ΓΓ•" Then
 ML = 1
 End If
 
@@ -12951,7 +12951,7 @@ If ML <> 1 Then
     End If
 End If
 
-If Not IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
+If Not IsLabelSymbolNew(rest$, "Γ“Γ”Γ", "TO", Lang) Then
 
 w$ = "S" & CStr(Int(Rnd(12) * 100000))
 
@@ -12978,16 +12978,16 @@ Case 6
    
      If neoGetArray(basestack, ss$, pppp) Then
             If Not NeoGetArrayItem(pppp, basestack, ss$, it, rest$) Then
-        MyEr "Not such index for array", "Περίμενα σωστούς δείκτες για πίνακα"
+        MyEr "Not such index for array", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ³ΓΉΓ³Γ΄Γ―Γ½Γ² Γ¤Γ¥ΓΓªΓ΄Γ¥Γ² Γ£Γ©Γ΅ Γ°ΓΓ­Γ΅ΓªΓ΅"
         
         Exit Function
         End If
      Else
-     MyEr "Not such array, need to DIM fisrt", "Περίμενα πίνακα, πρέπει να ορίσεις έναν"
+     MyEr "Not such array, need to DIM fisrt", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ°ΓΓ­Γ΅ΓªΓ΅, Γ°Γ±ΓΓ°Γ¥Γ© Γ­Γ΅ Γ―Γ±ΓΓ³Γ¥Γ©Γ² ΓΓ­Γ΅Γ­"
 : Exit Function
      End If
     
-    w$ = "A" & CopyArrayItems(basestack, ss$) + Str(it) ''''''''''εδω για τον νεο πίνακα πρέπει να δώσω το mArray???
+    w$ = "A" & CopyArrayItems(basestack, ss$) + Str(it) ''''''''''Γ¥Γ¤ΓΉ Γ£Γ©Γ΅ Γ΄Γ―Γ­ Γ­Γ¥Γ― Γ°ΓΓ­Γ΅ΓªΓ΅ Γ°Γ±ΓΓ°Γ¥Γ© Γ­Γ΅ Γ¤ΓΎΓ³ΓΉ Γ΄Γ― mArray???
     s$ = frm$
     frm$ = pppp.item(it)
     If pppp.ItemType(it) = doc Then
@@ -13003,7 +13003,7 @@ Case 6
    If Left$(w$, 1) <> "S" Then
 
 p = GetTaskId + 10000 ' starts from 10000
-If Not IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
+If Not IsLabelSymbolNew(rest$, "Γ™Γ“", "AS", Lang) Then
 's$ = validpipename(ss$)
 
 If frm$ <> "" Then
@@ -13027,7 +13027,7 @@ p = val(what$)
 s$ = frm$
 If Left$(w$, 1) = "V" Then var(val(Mid$(w$, 2))) = validpipename(frm$)
 Else
-MyEr "No number found (5 digits)", "Δεν βρήκα αριθμό (5 ψηφία)"
+MyEr "No number found (5 digits)", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ΅Γ±Γ©Γ¨Γ¬ΓΌ (5 ΓΈΓ§Γ¶ΓΓ΅)"
 Exit Function
 End If
 Case 1
@@ -13041,18 +13041,18 @@ Case 5, 7
    
      If neoGetArray(basestack, what, pppp) Then
         If Not NeoGetArrayItem(pppp, basestack, ss$, it, rest$) Then
-        MyEr "Not such index for array", "Περίμενα σωστούς δείκτες για πίνακα"
+        MyEr "Not such index for array", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ³ΓΉΓ³Γ΄Γ―Γ½Γ² Γ¤Γ¥ΓΓªΓ΄Γ¥Γ² Γ£Γ©Γ΅ Γ°ΓΓ­Γ΅ΓªΓ΅"
       
         Exit Function
         End If
      Else
-     MyEr "Not such array, need to DIM fisrt", "Περίμενα πίνακα, πρέπει να ορίσεις έναν"
+     MyEr "Not such array, need to DIM fisrt", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ°ΓΓ­Γ΅ΓªΓ΅, Γ°Γ±ΓΓ°Γ¥Γ© Γ­Γ΅ Γ―Γ±ΓΓ³Γ¥Γ©Γ² ΓΓ­Γ΅Γ­"
      
       Exit Function
      End If
      If pppp.item(it) < 10000 Then pppp.item(it) = p Else p = pppp.item(it)
     Case Else
-    MyEr "Wrong parameter", "Λάθος παράμετρος"
+    MyEr "Wrong parameter", "Γ‹ΓΓ¨Γ―Γ² Γ°Γ΅Γ±ΓΓ¬Γ¥Γ΄Γ±Γ―Γ²"
      Exit Function
    End Select
    End If
@@ -13087,7 +13087,7 @@ End If
 i = FreeFile
 On Error Resume Next
  If Not NeoUnicodeFile(strTemp + ss$) Then
- MyEr "can't save " + strTemp + ss$, "δεν μπορώ να σώσω " + strTemp + ss$
+ MyEr "can't save " + strTemp + ss$, "Γ¤Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ³ΓΎΓ³ΓΉ " + strTemp + ss$
 what$ = vbNullString
  Exit Function
 End If
@@ -13140,7 +13140,7 @@ If TypeOf aa.objref Is FastCollection Then
 Dim bb As FastCollection
 Set bb = aa.objref
 If bb.StructLen > 0 Then
-MyEr "Structure members are ReadOnly", "Τα μέλη της δομής είναι μόνο για ανάγνωση"
+MyEr "Structure members are ReadOnly", "Γ”Γ΅ Γ¬ΓΓ«Γ§ Γ΄Γ§Γ² Γ¤Γ―Γ¬ΓΓ² Γ¥ΓΓ­Γ΅Γ© Γ¬ΓΌΓ­Γ― Γ£Γ©Γ΅ Γ΅Γ­ΓΓ£Γ­ΓΉΓ³Γ§"
 Exit Function
 End If
 
@@ -13151,7 +13151,7 @@ AddInventory = True
 ah = aheadstatus(rest$, False) + " "
 If InStr(ah, "l") Then
 If ret2logical Then ret2logical = False: Exit Function
-MyEr "No logical expression", "Όχι λογική έκφραση"
+MyEr "No logical expression", "ΒΌΓ·Γ© Γ«Γ―Γ£Γ©ΓªΓ ΓΓªΓ¶Γ±Γ΅Γ³Γ§"
 AddInventory = False
 Else
 If Left$(ah, 1) = "N" Then
@@ -13168,13 +13168,13 @@ If Left$(ah, 1) = "N" Then
         GoTo noenum
         End If
         End If
-        MyEr "No Object Allowed for Key", "Δεν επιτρέπεται αντικείμενο για κλειδί"
+        MyEr "No Object Allowed for Key", "Γ„Γ¥Γ­ Γ¥Γ°Γ©Γ΄Γ±ΓΓ°Γ¥Γ΄Γ΅Γ© Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ£Γ©Γ΅ ΓªΓ«Γ¥Γ©Γ¤Γ"
         AddInventory = False
         GoTo there
     End If
 noenum:
     If bb.ExistKey0(p) Then
-        MyEr "Key exist, must be unique", "Το κλειδί υπάρχει, πρέπει να είναι μοναδικό"
+        MyEr "Key exist, must be unique", "Γ”Γ― ΓªΓ«Γ¥Γ©Γ¤Γ ΓµΓ°ΓΓ±Γ·Γ¥Γ©, Γ°Γ±ΓΓ°Γ¥Γ© Γ­Γ΅ Γ¥ΓΓ­Γ΅Γ© Γ¬Γ―Γ­Γ΅Γ¤Γ©ΓªΓΌ"
         AddInventory = False
         GoTo there
     End If
@@ -13185,19 +13185,19 @@ ElseIf Left$(ah, 1) = "S" Then
         GoTo there
     End If
     If Not bstack.lastobj Is Nothing Then
-        MyEr "No Object Allowed for Key", "Δεν επιτρέπεται αντικείμενο για κλειδί"
+        MyEr "No Object Allowed for Key", "Γ„Γ¥Γ­ Γ¥Γ°Γ©Γ΄Γ±ΓΓ°Γ¥Γ΄Γ΅Γ© Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ£Γ©Γ΅ ΓªΓ«Γ¥Γ©Γ¤Γ"
         AddInventory = False
         GoTo there
     End If
     If bb.ExistKey0(s$) Then
-        MyEr "Key exist, must be unique", "Το κλειδί υπάρχει, πρέπει να είναι μοναδικό"
+        MyEr "Key exist, must be unique", "Γ”Γ― ΓªΓ«Γ¥Γ©Γ¤Γ ΓµΓ°ΓΓ±Γ·Γ¥Γ©, Γ°Γ±ΓΓ°Γ¥Γ© Γ­Γ΅ Γ¥ΓΓ­Γ΅Γ© Γ¬Γ―Γ­Γ΅Γ¤Γ©ΓªΓΌ"
         AddInventory = False
         GoTo there
     End If
     bb.AddKey s$
 
 Else
-        MyEr "No Key found", "Δεν βρέθηκε κλειδί"
+        MyEr "No Key found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓ¨Γ§ΓªΓ¥ ΓªΓ«Γ¥Γ©Γ¤Γ"
         AddInventory = False
         GoTo there
 
@@ -13255,7 +13255,7 @@ ElseIf Left$(ah, 1) = "S" Then
     End If
 
 Else
-        MyEr "No Data found", "Δεν βρέθηκαν στοιχεία"
+        MyEr "No Data found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓ¨Γ§ΓªΓ΅Γ­ Γ³Γ΄Γ―Γ©Γ·Γ¥ΓΓ΅"
         AddInventory = False
         GoTo there
 
@@ -13275,7 +13275,7 @@ Exit Function
 ElseIf TypeOf aa.objref Is mArray Then
 While IsSymbol(rest$, ",")
 If Not IsExp(bstack, rest$, p) Then
-    MyEr "Expected Array", "Περίμενα Πίνακα"
+    MyEr "Expected Array", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ ΓΓΓ­Γ΅ΓªΓ΅"
     Set aa = Nothing
     Set bstack.lastobj = Nothing
     Exit Function
@@ -13287,7 +13287,7 @@ If CheckIsmArray(myobject) Then
 Set pppp = myobject
 pppp.AppendArray aa.objref
 Else
-    MyEr "Expected Array", "Περίμενα Πίνακα"
+    MyEr "Expected Array", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ ΓΓΓ­Γ΅ΓªΓ΅"
     Set aa = Nothing
     Set bstack.lastobj = Nothing
     Exit Function
@@ -13299,13 +13299,13 @@ Exit Function
 End If
 End If
 End If
-MyEr "Wrong type of object (not Inventory or pointer to Array)", "Λάθος τύπος αντικειμένου (όχι Κατάσταση ή δείκτης σε Πίνακα)"
+MyEr "Wrong type of object (not Inventory or pointer to Array)", "Γ‹ΓΓ¨Γ―Γ² Γ΄Γ½Γ°Γ―Γ² Γ΅Γ­Γ΄Γ©ΓªΓ¥Γ©Γ¬ΓΓ­Γ―Γµ (ΓΌΓ·Γ© ΓΓ΅Γ΄ΓΓ³Γ΄Γ΅Γ³Γ§ Γ Γ¤Γ¥ΓΓªΓ΄Γ§Γ² Γ³Γ¥ ΓΓΓ­Γ΅ΓªΓ΅)"
 Set aa = Nothing
 End If
 Set bstack.lastobj = Nothing
 End Function
 Sub OnlyForInventory()
-MyEr "Only for Inventory object", "Μόνο για αντικείμενο Κατάσταση"
+MyEr "Only for Inventory object", "ΓΓΌΓ­Γ― Γ£Γ©Γ΅ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― ΓΓ΅Γ΄ΓΓ³Γ΄Γ΅Γ³Γ§"
 End Sub
 Function NewInventory(bstack As basetask, rest$, R, Queue As Boolean) As Boolean
             Dim serr As Boolean, usehandler As mHandler
@@ -13601,7 +13601,7 @@ Function interpret(bstack As basetask, b$, Optional ByPass As Boolean) As Boolea
 Dim di As Object, myobject As Object, i As Long, x1 As Long, ok As Boolean, sp As Variant
 Dim usehandler As mHandler, usehandler2 As mHandler
 Set di = bstack.Owner
-Dim prive As basket
+Dim prive As basket, cb As CodeBlock
 'b$ = Trim$(b$)
 Dim w$, ww#, LLL As Long, sss As Long, v As Long, p As Variant, ss$, sw$, ohere$
 Dim pppp As mArray, i1 As Long, Lang As Long
@@ -13617,8 +13617,14 @@ Do While Len(b$) <> LLL
 If LastErNum <> 0 Then Exit Do
 LLL = Len(b$)
 
-
-If FastSymbol(b$, "{") Then
+If FastSymbol(b$, ".") Then
+' run in codeblock
+            Set cb = New CodeBlock
+            cb.Construct b$
+            cb.ExportStr bstack
+            cb.codeline (0)
+            
+ElseIf FastSymbol(b$, "{") Then
 If Not interpret(bstack, block(b$)) Then interpret = False: here$ = ohere$: GoTo there1
 If FastSymbol(b$, "}") Then
 sss = Len(b$)
@@ -13660,7 +13666,7 @@ End If
   If trace And (bstack.Process Is Nothing) And Not bypasstrace Then
   If bstack.IamLambda Then
   If pagio$ = "GREEK" Then
-  Form2.label1(0) = "ΛΑΜΔΑ()"
+  Form2.label1(0) = "Γ‹ΓΓΓ„Γ()"
   Else
   Form2.label1(0) = "LAMBDA()"
   End If
@@ -13866,7 +13872,7 @@ checkobject:
                         End If
                         GoTo loopcontinue1
                     Else
-                        MyEr "Expected String expression", "Περίμενα έκφραση Αλφαριθμητική"
+                        MyEr "Expected String expression", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ ΓΓªΓ¶Γ±Γ΅Γ³Γ§ ΓΓ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓ"
                         Exit Function
                     End If
                 ElseIf var(v) Is Nothing Then
@@ -13949,13 +13955,13 @@ noexpression:
             ' exist and take something else
             If IsExp(bstack, b$, p) Then
                 If bstack.lastobj Is Nothing Then
-                    Expected "lambda", "λάμδα"
+                    Expected "lambda", "Γ«ΓΓ¬Γ¤Γ΅"
                 ElseIf TypeOf bstack.lastobj Is lambda Then
                     Set var(v) = bstack.lastobj
                     Set bstack.lastobj = Nothing
                     GoTo loopcontinue1
                 Else
-                    Expected "lambda", "λάμδα"
+                    Expected "lambda", "Γ«ΓΓ¬Γ¤Γ΅"
                 End If
                 interpret = False
                 GoTo there1
@@ -14201,7 +14207,7 @@ somethingelse:
                              interpret = False
                                 GoTo there1
                         ElseIf ss$ = "++" Then
-                        If usehandler.index_start < usehandler.objref.count - 1 Then
+                        If usehandler.index_start < usehandler.objref.Count - 1 Then
                             usehandler.index_start = usehandler.index_start + 1
                             usehandler.objref.index = usehandler.index_start
                             usehandler.index_cursor = usehandler.objref.Value
@@ -14221,7 +14227,7 @@ somethingelse:
                         End If
                         End If
                     Else
-                    MyEr "Object not support operator " + ss$, "Το αντικείμενο δεν υποστηρίζει το τελεστή " + ss$
+                    MyEr "Object not support operator " + ss$, "Γ”Γ― Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ¤Γ¥Γ­ ΓµΓ°Γ―Γ³Γ΄Γ§Γ±ΓΓ¦Γ¥Γ© Γ΄Γ― Γ΄Γ¥Γ«Γ¥Γ³Γ΄Γ " + ss$
                     interpret = False
                     GoTo there1
                     End If
@@ -14298,7 +14304,7 @@ PROCESSCOMMAND:
         Dim x2 As Long, y2 As Long, SBR$, nd&
         If Trim$(w$) <> "" Then
             Select Case w$
-                Case "CALL", "ΚΑΛΕΣΕ"
+                Case "CALL", "ΓΓΓ‹Γ…Γ“Γ…"
                     ' CHECK FOR NUMBER...
                     If bstack.NoRun Then
                         bstack.callx1 = 0
@@ -14314,23 +14320,23 @@ PROCESSCOMMAND:
                         End If
                     End If
                 Case " ", ChrW(160), vbTab
-                Case "SLOW", "ΑΡΓΑ"
+                Case "SLOW", "ΓΓ‘ΓƒΓ"
                     extreme = False
                     SLOW = True
                     interpret = True
                     here$ = ohere$
                     GoTo there1
-                Case "FAST", "ΓΡΗΓΟΡΑ"
+                Case "FAST", "ΓƒΓ‘Γ‡ΓƒΓΓ‘Γ"
                     If FastSymbol(b$, "!") Then extreme = True Else extreme = False
                     SLOW = False
                     interpret = True
                     here$ = ohere$
                     GoTo there1
-                Case "GLOBAL", "ΓΕΝΙΚΟ", "ΓΕΝΙΚΗ", "ΓΕΝΙΚΕΣ", "LOCAL", "ΤΟΠΙΚΑ", "ΤΟΠΙΚΗ", "ΤΟΠΙΚΕΣ"
+                Case "GLOBAL", "ΓƒΓ…ΓΓ‰ΓΓ", "ΓƒΓ…ΓΓ‰ΓΓ‡", "ΓƒΓ…ΓΓ‰ΓΓ…Γ“", "LOCAL", "Γ”ΓΓΓ‰ΓΓ", "Γ”ΓΓΓ‰ΓΓ‡", "Γ”ΓΓΓ‰ΓΓ…Γ“"
                     b$ = w$ + " " + b$
                     interpret = Execute(bstack, b$, True) = 1
                     GoTo there1
-                Case "USER", "ΧΡΗΣΤΗΣ"
+                Case "USER", "Γ—Γ‘Γ‡Γ“Γ”Γ‡Γ“"
                     ss$ = PurifyPath(GetStrUntil("\", Trim$(GetNextLine(b$) + "\")))
                     If ss$ <> "" Then
                         dset
@@ -14353,7 +14359,7 @@ PROCESSCOMMAND:
                     End If
                     interpret = True
                     GoTo there1
-                Case "TARGET", "ΣΤΟΧΟΣ"
+                Case "TARGET", "Γ“Γ”ΓΓ—ΓΓ“"
                     If Abs(IsLabel(bstack, b$, w$)) = 1 Then
                         If Not GetVar(bstack, w$, v) Then
                             v = globalvar(w$, 0#, , True)
@@ -14400,11 +14406,11 @@ err123456:
                         interpret = False
                         here$ = ohere$:             GoTo there1
                     End If
-                Case "ΔΙΑΚΟΠΤΕΣ", "SWITCHES"
+                Case "Γ„Γ‰ΓΓΓΓΓ”Γ…Γ“", "SWITCHES"
                     If IsStrExp(bstack, b$, ss$) Then
                     Switches ss$, bstack.IamChild Or bstack.IamAnEvent  ' NON LOCAL FROM cli OR using SET SWITCHES
                 End If
-                Case "MONITOR", "ΕΛΕΓΧΟΣ"
+                Case "MONITOR", "Γ…Γ‹Γ…ΓƒΓ—ΓΓ“"
                     If IsSupervisor Then
                     prive = players(GetCode(di))
                     
@@ -14413,7 +14419,7 @@ err123456:
                     Else
                     BadCommand
                     End If
-                Case "ΣΕΝΑΡΙΟ", "SCRIPT"
+                Case "Γ“Γ…ΓΓΓ‘Γ‰Γ", "SCRIPT"
                 If IsLabelOnly(b$, ss$) Then
                  If GetSub(myUcase(ss$, True), nd&) Then
                            b$ = vbCrLf + sbf(nd&).sb & b$
@@ -14428,7 +14434,7 @@ err123456:
                 ElseIf IsStrExp(bstack, b$, w$) Then
                            b$ = vbCrLf + w$ + b$
                    End If
-Case "RETURN", "ΕΠΙΣΤΡΟΦΗ"
+Case "RETURN", "Γ…ΓΓ‰Γ“Γ”Γ‘ΓΓ–Γ‡"
     LastErNum = 0
        If IsExp(bstack, b$, p) Then
                 If bstack.lastobj Is Nothing Then
@@ -14450,7 +14456,7 @@ Case "RETURN", "ΕΠΙΣΤΡΟΦΗ"
   BadUseofReturn
        interpret = False
        GoTo there1
-            Case "CONTINUE", "ΣΥΝΕΧΙΣΕ"
+            Case "CONTINUE", "Γ“Γ•ΓΓ…Γ—Γ‰Γ“Γ…"
             If HaltLevel > 0 Then
                      If NORUN1 Then NORUN1 = False: interpret = True: b$ = vbNullString: GoTo there1   ' send environment....to hell
                     If bstack.IamChild Or bstack.IamAnEvent Then NERR = True: NOEXECUTION = True
@@ -14458,13 +14464,13 @@ Case "RETURN", "ΕΠΙΣΤΡΟΦΗ"
             Else
             GoTo contnoproper
             End If
-            Case "CONST", "ΣΤΑΘΕΡΗ", "ΣΤΑΘΕΡΕΣ"
+            Case "CONST", "Γ“Γ”ΓΓΓ…Γ‘Γ‡", "Γ“Γ”ΓΓΓ…Γ‘Γ…Γ“"
             ConstNew bstack, b$, w$, True, Lang
                     If LastErNum = -1 Then
                     interpret = False
                     GoTo there1
                     End If
-                Case "ΤΕΛΟΣ", "END"
+                Case "Γ”Γ…Γ‹ΓΓ“", "END"
                     
                     If NORUN1 Then NORUN1 = False: interpret = True: b$ = vbNullString: GoTo there1   ' send environment....to hell
                     If bstack.IamChild Or bstack.IamAnEvent Then
@@ -14500,7 +14506,7 @@ Case "RETURN", "ΕΠΙΣΤΡΟΦΗ"
                               ElseIf Not ProcModuleEntry(bstack, "", 0, b$, Lang) Then
                                     If MOUT And b$ = vbNullString Then
                                     Else
-                                        MyErMacro b$, "unknown identifier " & w$, "Άγνωστο αναγνωριστικό " & w$
+                                        MyErMacro b$, "unknown identifier " & w$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ― Γ΅Γ­Γ΅Γ£Γ­ΓΉΓ±Γ©Γ³Γ΄Γ©ΓªΓΌ " & w$
                                     End If
                                 End If
                                 bstack.RemoveOptionals
@@ -14512,7 +14518,7 @@ Case "RETURN", "ΕΠΙΣΤΡΟΦΗ"
                           
                           Else
 contnoproper:
-                            MyEr "No proper command for command line interpreter", "Δεν είναι η κατάλληλη εντολή για τον διερμηνευτή γραμμής"
+                            MyEr "No proper command for command line interpreter", "Γ„Γ¥Γ­ Γ¥ΓΓ­Γ΅Γ© Γ§ ΓªΓ΅Γ΄ΓΓ«Γ«Γ§Γ«Γ§ Γ¥Γ­Γ΄Γ―Γ«Γ Γ£Γ©Γ΅ Γ΄Γ―Γ­ Γ¤Γ©Γ¥Γ±Γ¬Γ§Γ­Γ¥ΓµΓ΄Γ Γ£Γ±Γ΅Γ¬Γ¬ΓΓ²"
                             interpret = False
                           
                             here$ = ohere$: GoTo there1
@@ -14557,7 +14563,7 @@ contnoproper:
                               ElseIf Not ProcModuleEntry(bstack, "", 0, b$, Lang) Then
                                 If MOUT And b$ = vbNullString Then
                                 Else
-                                    MyErMacro b$, "unknown identifier " & w$, "Άγνωστο αναγνωριστικό " & w$
+                                    MyErMacro b$, "unknown identifier " & w$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ― Γ΅Γ­Γ΅Γ£Γ­ΓΉΓ±Γ©Γ³Γ΄Γ©ΓªΓΌ " & w$
                                 End If
                             
                             
@@ -14584,9 +14590,9 @@ contnoproper:
         If Abs(IsLabel(bstack, (w$), w$)) Then
         
          If FindNameForGroup(bstack, w$) Then
- MyEr "Unknown Property " & w$, "Άγνωστη ιδιότητα " & w$
+ MyEr "Unknown Property " & w$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ©Γ¤Γ©ΓΌΓ΄Γ§Γ΄Γ΅ " & w$
  Else
-MyEr "Unknown Variable " & w$, "Άγνωστη μεταβλητή " & w$
+MyEr "Unknown Variable " & w$, "ΒΆΓ£Γ­ΓΉΓ³Γ΄Γ§ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ " & w$
 End If
 b$ = w$ & " " & b$
         
@@ -15162,7 +15168,7 @@ contarr1:
         pppp.ItemStr(v) = pppp.item(v) + ss$
     Else
 st1222:
-        MyEr "Need a string", "Χρειάζομαι ένα αλφαριθμητικό"
+        MyEr "Need a string", "Γ—Γ±Γ¥Γ©ΓΓ¦Γ―Γ¬Γ΅Γ© ΓΓ­Γ΅ Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ"
         interpret = False: here$ = ohere$: GoTo there1
     End If
     Else
@@ -16159,10 +16165,10 @@ End Function
 
 Sub ClearLoadedForms()
 Dim i As Long, j As Long, Start As Long
-j = Forms.count
+j = Forms.Count
 Debug.Print ""
 While j > 0
-For i = Start To Forms.count - 1
+For i = Start To Forms.Count - 1
 If TypeOf Forms(i) Is GuiM2000 Then Unload Forms(i): Start = i: Exit For
 Next i
 j = j - 1
@@ -16326,7 +16332,7 @@ Dim pppp As mArray
 
 
 IdPara = True
-If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
+If IsLabelSymbolNew(rest$, "Γ“Γ”Γ", "TO", Lang) Then
         If Not IsExp(basestack, rest$, y) Then
             MissNumExpr
             IdPara = False
@@ -16339,7 +16345,7 @@ If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
                     If IsExp(basestack, rest$, x) Then
                         x = Int(x)
                         If x < 1 Then
-                        MyErMacro rest$, "the index base must be >=1", "η βάση δείκτη πρέπει να είναι >=1"
+                        MyErMacro rest$, "the index base must be >=1", "Γ§ ΓΆΓΓ³Γ§ Γ¤Γ¥ΓΓªΓ΄Γ§ Γ°Γ±ΓΓ°Γ¥Γ© Γ­Γ΅ Γ¥ΓΓ­Γ΅Γ© >=1"
                         
                         Exit Function
                         End If
@@ -16349,7 +16355,7 @@ If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
                      If IsExp(basestack, rest$, z) Then
                          z = Int(z)
                          If z < 1 Then
-                         MyErMacro rest$, "the lenght base must be >=1", "το μήκος πρέπει να είναι >=1"
+                         MyErMacro rest$, "the lenght base must be >=1", "Γ΄Γ― Γ¬ΓΓªΓ―Γ² Γ°Γ±ΓΓ°Γ¥Γ© Γ­Γ΅ Γ¥ΓΓ­Γ΅Γ© >=1"
                          
                          Exit Function
                          End If
@@ -16469,7 +16475,7 @@ If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
  ElseIf IsExp(basestack, rest$, x) Then
     x = Int(x)
     If x < 1 Then
-    MyErMacro rest$, "the index base must be >=1", "η βάση δείκτη πρέπει να είναι >=1"
+    MyErMacro rest$, "the index base must be >=1", "Γ§ ΓΆΓΓ³Γ§ Γ¤Γ¥ΓΓªΓ΄Γ§ Γ°Γ±ΓΓ°Γ¥Γ© Γ­Γ΅ Γ¥ΓΓ­Γ΅Γ© >=1"
     ' not needed to change idpara must be true because macro embed an ERROR command
     Exit Function
     End If
@@ -16481,7 +16487,7 @@ If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
         End If
         y = Int(y)
         If y < 0 Then
-            MyErMacro rest$, "number to delete chars must positive or zero", "ο αριθμός για να διαγράψω πρέπει να είναι θετικός ή μηδέν"
+            MyErMacro rest$, "number to delete chars must positive or zero", "Γ― Γ΅Γ±Γ©Γ¨Γ¬ΓΌΓ² Γ£Γ©Γ΅ Γ­Γ΅ Γ¤Γ©Γ΅Γ£Γ±ΓΓΈΓΉ Γ°Γ±ΓΓ°Γ¥Γ© Γ­Γ΅ Γ¥ΓΓ­Γ΅Γ© Γ¨Γ¥Γ΄Γ©ΓªΓΌΓ² Γ Γ¬Γ§Γ¤ΓΓ­"
             Exit Function
         End If
     Else
@@ -16757,19 +16763,19 @@ End If
 stackshowonly = False
 If al$ <> "" Then al$ = al$ & vbCrLf
     If pagio$ = "GREEK" Then
-    al$ = al$ & "Σωρός "
+    al$ = al$ & "Γ“ΓΉΓ±ΓΌΓ² "
     Else
     al$ = al$ & "Stack "
     End If
 If stack.Total = 0 Then
     If pagio$ = "GREEK" Then
-    al$ = al$ & "Αδειος"
+    al$ = al$ & "ΓΓ¤Γ¥Γ©Γ―Γ²"
     Else
     al$ = al$ & "Empty"
     End If
 Else
     If pagio$ = "GREEK" Then
-    al$ = al$ & "Κορυφή "
+    al$ = al$ & "ΓΓ―Γ±ΓµΓ¶Γ "
     Else
     al$ = al$ & "Top "
     End If
@@ -16794,7 +16800,7 @@ R$ = stack.StackItem(i)
    If pagio$ = "LATIN" Then
     al$ = al$ & "[Optional] "
     Else
-    al$ = al$ & "[Προαιρετικό] "
+    al$ = al$ & "[ΓΓ±Γ―Γ΅Γ©Γ±Γ¥Γ΄Γ©ΓªΓΌ] "
     End If
 ElseIf stack.StackItemType(i) = "*" Then
 
@@ -16843,7 +16849,7 @@ Dim x1 As Long, y1 As Long, frm$, par As Boolean, ohere$, ss$, w$, sX As Double,
 Dim pppp As mArray, hlp$, h&, all$, myobject As Object, usehandler As mHandler, usegroup As Group
 Dim w1 As Long, w2 As Long, w3 As Long, dum As Boolean, virtualtop As Long
 pn& = 0
-virtualtop = varhash.count - 1
+virtualtop = varhash.Count - 1
 'GoTo ByPass  '********************************
 For pn& = virtualtop To 0 Step -1
     varhash.ReadVar pn&, s$, h&
@@ -16854,7 +16860,7 @@ ByPass:
 pn& = 0
 Dim a() As String
 With players(prive)
-    Do While pn& < varhash.count
+    Do While pn& < varhash.Count
         varhash.ReadVar pn&, s$, h&
         If SecureNames Then
             a() = Split(s$, "].")
@@ -17135,7 +17141,7 @@ s$ = vbNullString
 If Not bstack.StaticCollection Is Nothing Then
 Dim st1 As Long, mList As FastCollection
 Set mList = bstack.StaticCollection
-For st1 = 1 To mList.count
+For st1 = 1 To mList.Count
 mList.index = st1 - 1
 If Left$(mList.KeyToString, 2) <> "%_" Then
     If s$ <> "" Then s$ = s$ + ", "
@@ -17181,7 +17187,7 @@ If Lang = 1 Then
 
 s$ = " Static Variables: " + s$
 Else
-s$ = " Στατικές Μεταβλητές: " + s$
+s$ = " Γ“Γ΄Γ΅Γ΄Γ©ΓªΓΓ² ΓΓ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄ΓΓ²: " + s$
 End If
 If tofile >= 0 Then
  putUniString tofile, vbCrLf
@@ -17344,7 +17350,7 @@ Dim p As Variant, mm As MemBlock, w2 As Long, usehandler As mHandler
             If p < 0 Or p >= mm.SizeByte Then
                 Set basestack.lastobj = Nothing
                 Set mm = Nothing
-                MyEr "Offset out of buffer", "Διεύθυνση εκτός διάρθρωσης"
+                MyEr "Offset out of buffer", "Γ„Γ©Γ¥Γ½Γ¨ΓµΓ­Γ³Γ§ Γ¥ΓªΓ΄ΓΌΓ² Γ¤Γ©ΓΓ±Γ¨Γ±ΓΉΓ³Γ§Γ²"
                 Exit Function
             End If
 
@@ -17354,7 +17360,7 @@ Dim p As Variant, mm As MemBlock, w2 As Long, usehandler As mHandler
             Set basestack.lastobj = Nothing
             Dim what As Long
             what = CallWindowProc(w2, 0&, 0&, 0&, 0&)
-            If what <> 0 Then MyEr "Error " & what, "Λάθος " & what
+            If what <> 0 Then MyEr "Error " & what, "Γ‹ΓΓ¨Γ―Γ² " & what
                 ReleaseExecution w2, mm.SizeByte
                 ExecCode = what = 0
                 Set mm = Nothing
@@ -17404,8 +17410,8 @@ End Sub
 Function ProcSave(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim pa$, w$, s$, Col As Long, prg$, x1 As Long, par As Boolean, i As Long, noUse As Long, lcl As Boolean
 Dim askme As Boolean, k As Long, m As Long
-If lckfrm <> 0 Then MyEr "Save is locked", "Η αποθήκευση είναι κλειδωμένη": rest$ = vbNullString: Exit Function
-lcl = IsLabelSymbolNew(rest$, "ΤΟΠΙΚΑ", "LOCAL", Lang) Or basestack.IamChild Or basestack.IamAnEvent
+If lckfrm <> 0 Then MyEr "Save is locked", "Γ‡ Γ΅Γ°Γ―Γ¨ΓΓªΓ¥ΓµΓ³Γ§ Γ¥ΓΓ­Γ΅Γ© ΓªΓ«Γ¥Γ©Γ¤ΓΉΓ¬ΓΓ­Γ§": rest$ = vbNullString: Exit Function
+lcl = IsLabelSymbolNew(rest$, "Γ”ΓΓΓ‰ΓΓ", "LOCAL", Lang) Or basestack.IamChild Or basestack.IamAnEvent
 x1 = Abs(IsLabelFileName(basestack, rest, pa$, , s$))
 
 If x1 <> 1 Then
@@ -17415,9 +17421,9 @@ pa$ = s$: s$ = vbNullString
 End If
 
 If x1 <> 0 Then
-        If subHash.count = 0 Or pa$ = vbNullString Then MyEr "Nothing to save", "Δεν υπάρχει κάτι να σώσω":              Exit Function
+        If subHash.Count = 0 Or pa$ = vbNullString Then MyEr "Nothing to save", "Γ„Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ© ΓªΓΓ΄Γ© Γ­Γ΅ Γ³ΓΎΓ³ΓΉ":              Exit Function
         If ExtractType(pa$) = "gsb1" Then
-            MyEr "Recovery Mode (file is a gsb1 type): use another name or set type to gsb", "Κατάσταση Ανάκτησης (o τύπος αρχείου είναι gsb1): χρησιμοποίησε άλλο όνομα χωρίς τύπο, ή τύπο gsb"
+            MyEr "Recovery Mode (file is a gsb1 type): use another name or set type to gsb", "ΓΓ΅Γ΄ΓΓ³Γ΄Γ΅Γ³Γ§ ΓΓ­ΓΓªΓ΄Γ§Γ³Γ§Γ² (o Γ΄Γ½Γ°Γ―Γ² Γ΅Γ±Γ·Γ¥ΓΓ―Γµ Γ¥ΓΓ­Γ΅Γ© gsb1): Γ·Γ±Γ§Γ³Γ©Γ¬Γ―Γ°Γ―ΓΓ§Γ³Γ¥ ΓΓ«Γ«Γ― ΓΌΓ­Γ―Γ¬Γ΅ Γ·ΓΉΓ±ΓΓ² Γ΄Γ½Γ°Γ―, Γ Γ΄Γ½Γ°Γ― gsb"
             Exit Function
         End If
 
@@ -17430,7 +17436,7 @@ If x1 <> 0 Then
         If Not WeCanWrite(pa$) Then Exit Function
         
       
-           For i = subHash.count - 1 To 0 Step -1
+           For i = subHash.Count - 1 To 0 Step -1
        subHash.ReadVar i, s$, Col
        If Not Len(sbf(Col).sbgroup) > 0 Then
        
@@ -17459,18 +17465,18 @@ If x1 <> 0 Then
                                 End If
                                 End If
                         Else
-                                If Not blockCheck(sbf(Col).sb, DialogLang, noUse, "Συνάρτηση " & s$ + "()" + vbCrLf) Then Exit Function
+                                If Not blockCheck(sbf(Col).sb, DialogLang, noUse, "Γ“ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§ " & s$ + "()" + vbCrLf) Then Exit Function
                                 If sbf(Col).IamAClass Then
                                 k = InStr(sbf(Col).sb, vbCrLf)
                                 m = rinstr(sbf(Col).sb, vbCrLf + vbCrLf)
                                 k = InStr(k + 1, sbf(Col).sb, "{")
-                                prg$ = "ΚΛΑΣΗ " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, k + 3, m - k - 3) + vbCrLf + prg$
+                                prg$ = "ΓΓ‹ΓΓ“Γ‡ " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, k + 3, m - k - 3) + vbCrLf + prg$
                                 Else
                                 prg$ = s$ & " {" & sbf(Col).sb & "}" & vbCrLf + prg$
                                 If lcl Then
-                                    prg$ = "ΣΥΝΑΡΤΗΣΗ " + prg$
+                                    prg$ = "Γ“Γ•ΓΓΓ‘Γ”Γ‡Γ“Γ‡ " + prg$
                                 Else
-                                    prg$ = "ΣΥΝΑΡΤΗΣΗ ΓΕΝΙΚΗ " + prg$
+                                    prg$ = "Γ“Γ•ΓΓΓ‘Γ”Γ‡Γ“Γ‡ ΓƒΓ…ΓΓ‰ΓΓ‡ " + prg$
                                 End If
                                 End If
                         End If
@@ -17486,12 +17492,12 @@ If x1 <> 0 Then
                                     prg$ = "MODULE GLOBAL " + prg$
                                 End If
                         Else
-                                If Not blockCheck(sbf(Col).sb, DialogLang, noUse, "Τμήμα " & s$ + vbCrLf) Then Exit Function
+                                If Not blockCheck(sbf(Col).sb, DialogLang, noUse, "Γ”Γ¬ΓΓ¬Γ΅ " & s$ + vbCrLf) Then Exit Function
                                 prg$ = s$ & " {" & sbf(Col).sb & "}" & vbCrLf + prg$
                                 If lcl Then
-                                    prg$ = "ΤΜΗΜΑ " + prg$
+                                    prg$ = "Γ”ΓΓ‡ΓΓ " + prg$
                                 Else
-                                    prg$ = "ΤΜΗΜΑ ΓΕΝΙΚΟ " + prg$
+                                    prg$ = "Γ”ΓΓ‡ΓΓ ΓƒΓ…ΓΓ‰ΓΓ " + prg$
                                 End If
                         End If
                 End If
@@ -17555,14 +17561,14 @@ nogood:
                             KillFile pa$ + "1"
                         End If
                         RenameFile2 ExtractPath(pa$) & ExtractNameOnly(pa$, True) + ".bck1", ExtractPath(pa$) & ExtractNameOnly(pa$, True) + ".gsb"
-                        MyEr "File not saved -1005", "Δεν σώθηκε το αρχείο -1005"
+                        MyEr "File not saved -1005", "Γ„Γ¥Γ­ Γ³ΓΎΓ¨Γ§ΓªΓ¥ Γ΄Γ― Γ΅Γ±Γ·Γ¥ΓΓ― -1005"
                         ProcSave = True
                         Exit Function
                         Else
                         Check2SaveModules = False
                         End If
                 Else
-                        If MsgBoxN("Αλλαγή " + ExtractNameOnly(pa$, True), vbOKCancel, MesTitle$) <> vbOK Then
+                        If MsgBoxN("ΓΓ«Γ«Γ΅Γ£Γ " + ExtractNameOnly(pa$, True), vbOKCancel, MesTitle$) <> vbOK Then
                         GoTo nogood
                         Else
                         Check2SaveModules = False
@@ -17588,7 +17594,7 @@ nogood:
         End If
  ProcSave = True
 Else
-MyEr "A name please or use Ctrl+A to perform SAVE COMMAND$  (the last loading)", "Ένα όνομα παρακαλώ, ή πάτα το ctrl+Α για να αποθηκεύσεις με το όνομα του προγράμματος που φορτώθηκε τελευταία"
+MyEr "A name please or use Ctrl+A to perform SAVE COMMAND$  (the last loading)", "ΒΈΓ­Γ΅ ΓΌΓ­Γ―Γ¬Γ΅ Γ°Γ΅Γ±Γ΅ΓªΓ΅Γ«ΓΎ, Γ Γ°ΓΓ΄Γ΅ Γ΄Γ― ctrl+Γ Γ£Γ©Γ΅ Γ­Γ΅ Γ΅Γ°Γ―Γ¨Γ§ΓªΓ¥Γ½Γ³Γ¥Γ©Γ² Γ¬Γ¥ Γ΄Γ― ΓΌΓ­Γ―Γ¬Γ΅ Γ΄Γ―Γµ Γ°Γ±Γ―Γ£Γ±ΓΓ¬Γ¬Γ΅Γ΄Γ―Γ² Γ°Γ―Γµ Γ¶Γ―Γ±Γ΄ΓΎΓ¨Γ§ΓªΓ¥ Γ΄Γ¥Γ«Γ¥ΓµΓ΄Γ΅ΓΓ΅"
 End If
 
 End Function
@@ -17741,7 +17747,7 @@ Do
         LastErNum = 0
     End If
 Loop While FastSymbol(Mes$, ",")
-If Len(fin$) > 0 Then MyEr "Assert :" + fin$, "Αξίωση:" + fin$
+If Len(fin$) > 0 Then MyEr "Assert :" + fin$, "ΓΓ®ΓΓΉΓ³Γ§:" + fin$
 ProcAssert = Not (haveerrors Or LastErNum)
 End If
 rest$ = Mid$(rest$, Pos)
@@ -17750,7 +17756,7 @@ Function ProcAbout(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim par As Boolean, s$, ss$, x As Double, y As Double, i As Long
 Dim kk As New Document
 Dim UAddPixelsTop As Long  ' just not used
-If IsLabelSymbolNewExp(rest$, "ΔΕΙΞΕ", "SHOW", Lang, ss$) Then
+If IsLabelSymbolNewExp(rest$, "Γ„Γ…Γ‰ΓΓ…", "SHOW", Lang, ss$) Then
 If lastAboutHTitle <> "" Then abt = True: vH_title$ = vbNullString
 If IsStrExp(basestack, rest$, ss$) Then
     feedback$ = ss$
@@ -17799,7 +17805,7 @@ End If
 End If
 End If
 '*******
-ElseIf IsLabelSymbolNew(rest$, "ΚΑΛΕΣΕ", "CALL", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓΓ‹Γ…Γ“Γ…", "CALL", Lang) Then
 mHelp = True
 abt = True
 If IsStrExp(basestack, rest$, ss$) Then
@@ -17812,7 +17818,7 @@ If IsStrExp(basestack, rest$, s$) Then
 mHelp = True
 If s$ = vbNullString Then
 If Lang = 0 Then
-lastAboutHTitle = "Βοήθεια Εφαρμογής"
+lastAboutHTitle = "Γ‚Γ―ΓΓ¨Γ¥Γ©Γ΅ Γ…Γ¶Γ΅Γ±Γ¬Γ―Γ£ΓΓ²"
 LastAboutText = vbNullString
 Else
 lastAboutHTitle = "Application Help"
@@ -17945,7 +17951,7 @@ End Function
 Function ProcRemove(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim ss$
 ProcRemove = True
-If IsLabelSymbolNew(rest$, "ΑΔΕΙΑΣ", "LICENSE", Lang) Then
+If IsLabelSymbolNew(rest$, "ΓΓ„Γ…Γ‰ΓΓ“", "LICENSE", Lang) Then
 If IsStrExp(basestack, rest$, ss$) Then
 Licenses.Remove ss$
 Else
@@ -17955,15 +17961,15 @@ Else
 If IsStrExp(basestack, rest$, ss$) Then
 RemoveDll ss$
 ElseIf sb2used <= basestack.OriginalCode And basestack.OriginalCode <> 0 Then
-MyEr "Can't Remove Last Module/Function", "Δεν μπορώ να διαγράψω το τελευταίο τμήμα/συνάρτηση"
+MyEr "Can't Remove Last Module/Function", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¤Γ©Γ΅Γ£Γ±ΓΓΈΓΉ Γ΄Γ― Γ΄Γ¥Γ«Γ¥ΓµΓ΄Γ΅ΓΓ― Γ΄Γ¬ΓΓ¬Γ΅/Γ³ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§"
 ProcRemove = False
 Else
 If basestack.IamChild Or basestack.IamAnEvent Or basestack.IamThread Or HaltLevel > 0 Then Exit Function
 If sb2used > 0 Then
-If MsgBoxN(IIf(pagio$ <> "GREEK", "Remove last module/function", "Να διαγράψω το τελευταίο τμήμα") & vbCrLf & sbf(subHash.count).goodname, 1) = 1 Then
+If MsgBoxN(IIf(pagio$ <> "GREEK", "Remove last module/function", "ΓΓ΅ Γ¤Γ©Γ΅Γ£Γ±ΓΓΈΓΉ Γ΄Γ― Γ΄Γ¥Γ«Γ¥ΓµΓ΄Γ΅ΓΓ― Γ΄Γ¬ΓΓ¬Γ΅") & vbCrLf & sbf(subHash.Count).goodname, 1) = 1 Then
 
 
-If subHash.count > 0 Then subHash.ReduceHash subHash.count - 1, sbf()
+If subHash.Count > 0 Then subHash.ReduceHash subHash.Count - 1, sbf()
     If UBound(sbf()) / 2 > sb2used And UBound(sbf()) > 19 Then
        ReDim Preserve sbf(UBound(sbf()) / 2 + 1) As modfun
          
@@ -17983,13 +17989,13 @@ End Function
 Function BreakMes() As String
 If Check2SaveModules Then
 If pagio$ = "GREEK" Then
-BreakMes = "Διακοπή και Επανεκκίνηση" & vbCrLf & "Προσοχή υπάρχουν μη αποθηκευμένες αλλαγές που θα χαθούν"
+BreakMes = "Γ„Γ©Γ΅ΓªΓ―Γ°Γ ΓªΓ΅Γ© Γ…Γ°Γ΅Γ­Γ¥ΓªΓªΓΓ­Γ§Γ³Γ§" & vbCrLf & "ΓΓ±Γ―Γ³Γ―Γ·Γ ΓµΓ°ΓΓ±Γ·Γ―ΓµΓ­ Γ¬Γ§ Γ΅Γ°Γ―Γ¨Γ§ΓªΓ¥ΓµΓ¬ΓΓ­Γ¥Γ² Γ΅Γ«Γ«Γ΅Γ£ΓΓ² Γ°Γ―Γµ Γ¨Γ΅ Γ·Γ΅Γ¨Γ―Γ½Γ­"
 Else
 BreakMes = "Break Key - Hard Reset" & vbCrLf & "Warning, changes lost"
 End If
 Else
 If pagio$ = "GREEK" Then
-BreakMes = "Διακοπή και Επανεκκίνηση"
+BreakMes = "Γ„Γ©Γ΅ΓªΓ―Γ°Γ ΓªΓ΅Γ© Γ…Γ°Γ΅Γ­Γ¥ΓªΓªΓΓ­Γ§Γ³Γ§"
 Else
 BreakMes = "Break Key - Hard Reset"
 End If
@@ -17997,7 +18003,7 @@ End If
 End Function
 Function Check2Save() As Boolean
 If Check2SaveModules Then
-Check2Save = MsgBoxN(IIf(pagio$ = "GREEK", "Προσοχή υπάρχουν μη αποθηκευμένες αλλαγές που θα χαθούν", "Warning, changes lost"), 1, IIf(pagio$ = "GREEK", "Τερματισμός Διερμηνευτή", "Quit Interpreter")) <> 1
+Check2Save = MsgBoxN(IIf(pagio$ = "GREEK", "ΓΓ±Γ―Γ³Γ―Γ·Γ ΓµΓ°ΓΓ±Γ·Γ―ΓµΓ­ Γ¬Γ§ Γ΅Γ°Γ―Γ¨Γ§ΓªΓ¥ΓµΓ¬ΓΓ­Γ¥Γ² Γ΅Γ«Γ«Γ΅Γ£ΓΓ² Γ°Γ―Γµ Γ¨Γ΅ Γ·Γ΅Γ¨Γ―Γ½Γ­", "Warning, changes lost"), 1, IIf(pagio$ = "GREEK", "Γ”Γ¥Γ±Γ¬Γ΅Γ΄Γ©Γ³Γ¬ΓΌΓ² Γ„Γ©Γ¥Γ±Γ¬Γ§Γ­Γ¥ΓµΓ΄Γ", "Quit Interpreter")) <> 1
 Else
 Check2Save = False
 End If
@@ -18066,7 +18072,7 @@ what$ = Left$(what$, Len(what$) - 1)
  If neoGetArray(bstack, oName$, pppp, here$ <> "") Then
  
  If Not (pppp.IHaveGui Or pppp.comevents) Then
- MyEr "Only for Gui controls or Com objects with events", "Μόνο για στοιχεία διεπαφής ή για αντικείμενα COM με γεγονότα"
+ MyEr "Only for Gui controls or Com objects with events", "ΓΓΌΓ­Γ― Γ£Γ©Γ΅ Γ³Γ΄Γ―Γ©Γ·Γ¥ΓΓ΅ Γ¤Γ©Γ¥Γ°Γ΅Γ¶ΓΓ² Γ Γ£Γ©Γ΅ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ΅ COM Γ¬Γ¥ Γ£Γ¥Γ£Γ―Γ­ΓΌΓ΄Γ΅"
  ifier = False: Exit Function
   End If
  i = pppp.UpperMonoLimit + 1
@@ -18186,21 +18192,21 @@ what$ = Left$(what$, Len(what$) - 1)
         End With
     Case "Socket"
     Set aVar = New Socket
-    Set pppp.item(pppp.count - 1) = aVar
+    Set pppp.item(pppp.Count - 1) = aVar
     Case "SerialPort"
     Set aVar = New SerialPort
-    Set pppp.item(pppp.count - 1) = aVar
+    Set pppp.item(pppp.Count - 1) = aVar
     Case "ShellPipe"
     Set aVar = New ShellPipe
-    Set pppp.item(pppp.count - 1) = aVar
+    Set pppp.item(pppp.Count - 1) = aVar
     Case "cHttpDownload"
     Set aVar = New cHttpDownload
-    Set pppp.item(pppp.count - 1) = aVar
+    Set pppp.item(pppp.Count - 1) = aVar
     Case "CallBack2"
         Dim Aaaa As CallBack2
-        Set Aaaa = pppp.item(pppp.count - 1)
+        Set Aaaa = pppp.item(pppp.Count - 1)
         Set aVar = Aaaa.CopyOfMe
-        Set pppp.item(pppp.count - 1) = aVar
+        Set pppp.item(pppp.Count - 1) = aVar
     Case Else
     ' any other com object
     
@@ -18210,7 +18216,7 @@ what$ = Left$(what$, Len(what$) - 1)
     If neoGetArray(bstack, ChrW(&HFFBF) + "_" + what$ + "(", pppp1, True) Then
      i = pppp1.UpperMonoLimit + 1
     pppp1.SerialItem 0, i + 2, 9
-    GetShinkArr2 pppp, pppp1, what$, (pppp1.count - 1), (pppp1.count)
+    GetShinkArr2 pppp, pppp1, what$, (pppp1.Count - 1), (pppp1.Count)
     End If
     End If
 ifier = True
@@ -18226,12 +18232,12 @@ Dim pppp As mArray
 Dim ii As Long, ev As ComShinkEvent
 MyDeclare = True
 ML = -1
-If Not groupok Then y1 = IsLabelSymbolNewExp(rest$, "ΓΕΝΙΚΟ", "GLOBAL", Lang, ss$)
+If Not groupok Then y1 = IsLabelSymbolNewExp(rest$, "ΓƒΓ…ΓΓ‰ΓΓ", "GLOBAL", Lang, ss$)
 If Not y1 Then
-    If Not groupok Then y1 = IsLabelSymbolNewExp(rest$, "ΤΟΠΙΚΟ", "LOCAL", Lang, ss$)
+    If Not groupok Then y1 = IsLabelSymbolNewExp(rest$, "Γ”ΓΓΓ‰ΓΓ", "LOCAL", Lang, ss$)
     If y1 Then y1 = y1 * -100: ss$ = vbNullString
 End If
-If Not groupok Then Y3 = IsLabelSymbolNewExp(rest$, "ΜΕΓΕΓΟΝΟΤΑ", "WITHEVENTS", Lang, ss$)
+If Not groupok Then Y3 = IsLabelSymbolNewExp(rest$, "ΓΓ…ΓƒΓ…ΓƒΓΓΓΓ”Γ", "WITHEVENTS", Lang, ss$)
 ss$ = vbNullString
 x1 = Abs(innerIsLabel(bstack, rest$, what$, , True, True))
 If Not groupok Then
@@ -18261,7 +18267,7 @@ If x1 = 1 Or x1 = 3 Then
                 Exit Function
             End If
             ss$ = vbNullString
-            If IsLabelSymbolNewExp(rest$, "ΤΙΠΟΤΑ", "NOTHING", Lang, ss$) Then
+            If IsLabelSymbolNewExp(rest$, "Γ”Γ‰ΓΓΓ”Γ", "NOTHING", Lang, ss$) Then
                 If ML >= 0 Then
 goNothing:
                     If neoGetArray(bstack, w$, pppp) Then
@@ -18301,10 +18307,10 @@ goNothing:
                     Set var(i) = Nothing
                 End If
                 Exit Function
-            ElseIf IsLabelSymbolNewExp(rest$, "ΝΕΟ", "NEW", Lang, ss$) Then
+            ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ…Γ", "NEW", Lang, ss$) Then
                Set var(i) = Nothing
                GoTo THEREnew
-            ElseIf IsLabelSymbolNewExp(rest$, "ΝΕΑ", "NEW", Lang, ss$) Then
+            ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ…Γ", "NEW", Lang, ss$) Then
                Set var(i) = Nothing
                GoTo THEREnew
             Else
@@ -18315,7 +18321,7 @@ goNothing:
         End If
     End If
     ss$ = vbNullString
-    If IsLabelSymbolNewExp(rest$, "ΒΑΣΗ", "BASE", Lang, ss$) Then
+    If IsLabelSymbolNewExp(rest$, "Γ‚ΓΓ“Γ‡", "BASE", Lang, ss$) Then
         If Not IsStrExp(bstack, rest$, pa$) Then
             BadObjectDecl
             MyDeclare = False
@@ -18333,7 +18339,7 @@ goNothing:
         globalvar bstack.GroupName & w$, p, y1 = True
         MyDeclare = True
         Exit Function
-    ElseIf IsLabelSymbolNewExp(rest$, "ΑΠΟ", "LIB", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "ΓΓΓ", "LIB", Lang, ss$) Then
         If y1 = 100 Then y1 = 0
         par = Fast2Label(rest$, "C", 1, "", 0, 1)
         If IsStrExp(bstack, rest$, pa$) Then
@@ -18350,7 +18356,7 @@ goNothing:
             s$ = vbNullString
             i = AllocVar()
             Set declobj = New stdCallFunction
-            If IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
+            If IsLabelSymbolNew(rest$, "Γ™Γ“", "AS", Lang) Then
                 If Not IsExp(bstack, rest$, p) Then
                     BadObjectDecl
                     MyDeclare = False
@@ -18385,7 +18391,7 @@ goNothing:
                 Set declobj = Nothing
                 Exit Function
             End If
-        ElseIf IsLabelSymbolNewExp(rest$, "ΜΕ", "USE", Lang, ss$) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ…", "USE", Lang, ss$) Then
             If Y3 <> 0 Then
                 SyntaxError
                 Exit Function
@@ -18434,7 +18440,7 @@ goNothing:
     End If
 THEREnew:
 MyDeclare = False
-    Y4 = IsLabelSymbolNew(rest$, "ΠΑΡΕ", "GET", Lang)
+    Y4 = IsLabelSymbolNew(rest$, "ΓΓΓ‘Γ…", "GET", Lang)
     If Y4 And MaybeIsSymbol(rest$, ",") Then
         FastSymbol rest$, ","
         If IsStrExp(bstack, rest$, pa$) Then
@@ -18558,8 +18564,8 @@ jump1:
     End If
 ElseIf x1 = 5 Then
     If FastSymbol(rest$, ")") Then
-        If IsLabelSymbolNewExp(rest$, "ΤΙΠΟΤΑ", "NOTHING", Lang, ss$) Then GoTo goNothing
-        If IsLabelSymbolNewExp(rest$, "ΠΑΝΩ", "OVER", Lang, ss$) Then
+        If IsLabelSymbolNewExp(rest$, "Γ”Γ‰ΓΓΓ”Γ", "NOTHING", Lang, ss$) Then GoTo goNothing
+        If IsLabelSymbolNewExp(rest$, "ΓΓΓΓ™", "OVER", Lang, ss$) Then
             ExpandGui bstack, what$, rest$, MyDeclare, Lang, w$
         Else
             BadObjectDecl
@@ -18583,12 +18589,12 @@ MyDeclare = True
 Set declobj = Nothing
 End Function
 
-Private Function GetShinkArr(v As Long, where As Long, objname$, from As Long, count As Long) As Boolean
+Private Function GetShinkArr(v As Long, where As Long, objname$, from As Long, Count As Long) As Boolean
 Dim aa As Object, ok As Boolean, i As Long, pppp As mArray, pppp1 As mArray, ev As ComShinkEvent
 Set pppp = var(v)
 Set pppp1 = var(where)
 ok = True
-For i = from To count + from - 1
+For i = from To Count + from - 1
     Set ev = New ComShinkEvent
     
     Set aa = pppp.item(i)
@@ -18609,13 +18615,13 @@ For i = from To count + from - 1
    Next i
    GetShinkArr = ok
 End Function
-Private Function GetShinkArr2(pppp As mArray, pppp1 As mArray, objname$, from As Long, count As Long) As Boolean
+Private Function GetShinkArr2(pppp As mArray, pppp1 As mArray, objname$, from As Long, Count As Long) As Boolean
 Dim aa As Object, ok As Boolean, i As Long, ev As ComShinkEvent
 ok = True
 Set ev = pppp1.item(0)
 Dim v As Long
 v = ev.VarIndex
-For i = from To count - 1
+For i = from To Count - 1
     Set ev = New ComShinkEvent
     
     Set aa = pppp.item(i)
@@ -18664,9 +18670,9 @@ Dim pppp As mArray, mmmm As mEvent
 ' for these events no use of noHere property because no copyevent/upgrade happens
 '         see .upgrade in UnFloatGroupReWriteVars and UnFloatGroup
 
- If IsLabelSymbolNew(rest$, "ΦΟΡΜΑ", "FORM", Lang) Then
+ If IsLabelSymbolNew(rest$, "Γ–ΓΓ‘ΓΓ", "FORM", Lang) Then
     Y3 = False ' no withevents in declare
-    If IsLabelSymbolNew(rest$, "ΓΕΓΟΝΟΣ", "EVENT", Lang) Then
+    If IsLabelSymbolNew(rest$, "ΓƒΓ…ΓƒΓΓΓΓ“", "EVENT", Lang) Then
         x1 = Abs(IsLabel(bstack, rest$, w$))
         If x1 <> 1 Then
                 BadObjectDecl
@@ -18710,7 +18716,7 @@ Dim pppp As mArray, mmmm As mEvent
                 Set alfa.EventObj = mmmm
                 With mmmm
                     .BypassInit 10
-                    .VarIndex = i * 1000 + varhash.count
+                    .VarIndex = i * 1000 + varhash.Count
                     .enabled = True
                     .ParamBlock "Read msg$, &obj", 2
                     .GenItemCreator LTrim$(Str(i * 456)), "{ Module " + here$ + vbCrLf + "try { Call local " + here$ + "." + bstack.GroupName + what$ + "() } }" + here$ + "." + bstack.GroupName
@@ -18731,7 +18737,7 @@ contEvArray:
                     If y1 = 0 Then
                         With mmmm
                             .BypassInit 10
-                            .VarIndex = i * 1000 + varhash.count
+                            .VarIndex = i * 1000 + varhash.Count
                             .enabled = True
                             .ParamBlock "Read Index, msg$, &obj", 3
                             .GenItemCreator LTrim$(Str(i * 3456)), "{ Module " + here$ + vbCrLf + "try { call local " + here$ + "." + bstack.GroupName + what$ + "() } }" + here$ + "." + bstack.GroupName
@@ -18759,9 +18765,9 @@ contEvArray:
                 Set mmmm = Nothing
             End If
         End If
- ElseIf IsLabelSymbolNew(rest$, "ΠΛΗΚΤΡΟ", "BUTTON", Lang) Then
+ ElseIf IsLabelSymbolNew(rest$, "ΓΓ‹Γ‡ΓΓ”Γ‘Γ", "BUTTON", Lang) Then
      Y3 = False ' no withevents in declare
-    If IsLabelSymbolNew(rest$, "ΦΟΡΜΑ", "FORM", Lang) Then
+    If IsLabelSymbolNew(rest$, "Γ–ΓΓ‘ΓΓ", "FORM", Lang) Then
         If Not IsExp(bstack, rest$, p) Then
             BadObjectDecl
         Else
@@ -18804,9 +18810,9 @@ contEvArray:
             End If
         End If
     End If
-ElseIf IsLabelSymbolNew(rest$, "ΕΙΣΑΓΩΓΗ", "TEXTBOX", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ…Γ‰Γ“ΓΓƒΓ™ΓƒΓ‡", "TEXTBOX", Lang) Then
     Y3 = False ' no withevents in declare
-    If IsLabelSymbolNew(rest$, "ΦΟΡΜΑ", "FORM", Lang) Then
+    If IsLabelSymbolNew(rest$, "Γ–ΓΓ‘ΓΓ", "FORM", Lang) Then
         If Not IsExp(bstack, rest$, p) Then
             BadObjectDecl
         Else
@@ -18849,9 +18855,9 @@ ElseIf IsLabelSymbolNew(rest$, "ΕΙΣΑΓΩΓΗ", "TEXTBOX", Lang) Then
             End If
         End If
     End If
-ElseIf IsLabelSymbolNew(rest$, "ΕΠΙΛΟΓΗ", "CHECKBOX", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ…ΓΓ‰Γ‹ΓΓƒΓ‡", "CHECKBOX", Lang) Then
     Y3 = False ' no withevents in declare
-     If IsLabelSymbolNew(rest$, "ΦΟΡΜΑ", "FORM", Lang) Then
+     If IsLabelSymbolNew(rest$, "Γ–ΓΓ‘ΓΓ", "FORM", Lang) Then
         If Not IsExp(bstack, rest$, p) Then
             BadObjectDecl
         Else
@@ -18894,9 +18900,9 @@ ElseIf IsLabelSymbolNew(rest$, "ΕΠΙΛΟΓΗ", "CHECKBOX", Lang) Then
             End If
         End If
     End If
-ElseIf IsLabelSymbolNew(rest$, "ΚΕΙΜΕΝΟ", "EDITBOX", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓ…Γ‰ΓΓ…ΓΓ", "EDITBOX", Lang) Then
     Y3 = False ' no withevents in declare
-    If IsLabelSymbolNew(rest$, "ΦΟΡΜΑ", "FORM", Lang) Then
+    If IsLabelSymbolNew(rest$, "Γ–ΓΓ‘ΓΓ", "FORM", Lang) Then
         If Not IsExp(bstack, rest$, p) Then
             BadObjectDecl
         Else
@@ -18949,9 +18955,9 @@ ElseIf IsLabelSymbolNew(rest$, "ΚΕΙΜΕΝΟ", "EDITBOX", Lang) Then
             End If
         End If
     End If
-ElseIf IsLabelSymbolNew(rest$, "ΛΙΣΤΑ", "LISTBOX", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ‹Γ‰Γ“Γ”Γ", "LISTBOX", Lang) Then
     Y3 = False ' no withevents in declare
-    If IsLabelSymbolNew(rest$, "ΦΟΡΜΑ", "FORM", Lang) Then
+    If IsLabelSymbolNew(rest$, "Γ–ΓΓ‘ΓΓ", "FORM", Lang) Then
         If Not IsExp(bstack, rest$, p) Then
             BadObjectDecl
         Else
@@ -19004,9 +19010,9 @@ ElseIf IsLabelSymbolNew(rest$, "ΛΙΣΤΑ", "LISTBOX", Lang) Then
             End If
         End If
     End If
-ElseIf IsLabelSymbolNew(rest$, "ΛΙΣΤΑ.ΕΙΣΑΓΩΓΗΣ", "COMBOBOX", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ‹Γ‰Γ“Γ”Γ.Γ…Γ‰Γ“ΓΓƒΓ™ΓƒΓ‡Γ“", "COMBOBOX", Lang) Then
     Y3 = False ' no withevents in declare
-    If IsLabelSymbolNew(rest$, "ΦΟΡΜΑ", "FORM", Lang) Then
+    If IsLabelSymbolNew(rest$, "Γ–ΓΓ‘ΓΓ", "FORM", Lang) Then
         If Not IsExp(bstack, rest$, p) Then
             BadObjectDecl
         Else
@@ -19047,32 +19053,32 @@ ElseIf IsLabelSymbolNew(rest$, "ΛΙΣΤΑ.ΕΙΣΑΓΩΓΗΣ", "COMBOBOX", Lang) Then
             End If
         End If
     End If
-ElseIf IsLabelSymbolNew(rest$, "ΠΛΗΡΟΦΟΡΙΕΣ", "INFORMATION", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓ‹Γ‡Γ‘ΓΓ–ΓΓ‘Γ‰Γ…Γ“", "INFORMATION", Lang) Then
     
     Y3 = False ' no withevents in declare
     If ar > 0 Then
-    MyEr "not for array", "όχι για πίνακα"
+    MyEr "not for array", "ΓΌΓ·Γ© Γ£Γ©Γ΅ Γ°ΓΓ­Γ΅ΓªΓ΅"
     DeclareGUI = False
     End If
     Set var(i) = OsInfo
-ElseIf IsLabelSymbolNew(rest$, "ΜΗΤΡΩΟ.ΣΥΣΤΗΜΑΤΟΣ", "WINDOWS.REGISTRY", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓ‡Γ”Γ‘Γ™Γ.Γ“Γ•Γ“Γ”Γ‡ΓΓΓ”ΓΓ“", "WINDOWS.REGISTRY", Lang) Then
     
     Y3 = False ' no withevents in declare
     If ar > 0 Then
-    MyEr "not for array", "όχι για πίνακα"
+    MyEr "not for array", "ΓΌΓ·Γ© Γ£Γ©Γ΅ Γ°ΓΓ­Γ΅ΓªΓ΅"
     DeclareGUI = False
     End If
     Set var(i) = New cRegistry
-ElseIf IsLabelSymbolNew(rest$, "ΠΗΓΗ_ΓΕΓΟΝΟΤΟΣ", "SINK_EVENT", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓ‡ΓƒΓ‡_ΓƒΓ…ΓƒΓΓΓΓ”ΓΓ“", "SINK_EVENT", Lang) Then
     
     Y3 = True
     If ar > 0 Then
-    MyEr "not for array", "όχι για πίνακα"
+    MyEr "not for array", "ΓΌΓ·Γ© Γ£Γ©Γ΅ Γ°ΓΓ­Γ΅ΓªΓ΅"
     DeclareGUI = False
     End If
     Set var(i) = New SinkEvent
 
-ElseIf IsLabelSymbolNew(rest$, "ΣΥΜΠΙΕΣΤΗΣ", "COMPRESSOR", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ“Γ•ΓΓΓ‰Γ…Γ“Γ”Γ‡Γ“", "COMPRESSOR", Lang) Then
     If ar = 0 Then
         Set var(i) = New ZipTool
     Else
@@ -19083,10 +19089,10 @@ ElseIf IsLabelSymbolNew(rest$, "ΣΥΜΠΙΕΣΤΗΣ", "COMPRESSOR", Lang) Then
         Next i
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΜΑΘΗΜΑΤΙΚΑ", "MATH", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓΓΓ‡ΓΓΓ”Γ‰ΓΓ", "MATH", Lang) Then
     Y3 = False ' no withevents in declare
     Set var(i) = New Math
-ElseIf IsLabelSymbolNew(rest$, "ΣΤΑΘΜΟΣ", "SOCKET", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ“Γ”ΓΓΓΓΓ“", "SOCKET", Lang) Then
     If ar = 0 Then
         Set var(i) = New Socket
     Else
@@ -19097,7 +19103,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΣΤΑΘΜΟΣ", "SOCKET", Lang) Then
         Next i
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΑΥΛΟΣ", "SHELLPIPE", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓ•Γ‹ΓΓ“", "SHELLPIPE", Lang) Then
     If ar = 0 Then
         Set var(i) = New ShellPipe
     Else
@@ -19108,7 +19114,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΑΥΛΟΣ", "SHELLPIPE", Lang) Then
         Next i
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΣΕΙΡΙΑΚΗ", "SERIALPORT", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ“Γ…Γ‰Γ‘Γ‰ΓΓΓ‡", "SERIALPORT", Lang) Then
     If ar = 0 Then
         Set var(i) = New SerialPort
     Else
@@ -19119,7 +19125,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΣΕΙΡΙΑΚΗ", "SERIALPORT", Lang) Then
         Next i
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΚΑΤΕΒΑΣΜΑ", "DOWNLOAD", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓΓ”Γ…Γ‚ΓΓ“ΓΓ", "DOWNLOAD", Lang) Then
     If ar = 0 Then
         Set var(i) = New cHttpDownload
     Else
@@ -19130,7 +19136,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΚΑΤΕΒΑΣΜΑ", "DOWNLOAD", Lang) Then
         Next i
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΑΙΤΗΜΑ_ΣΥΝΔΕΣΗΣ", "HTTPREQUEST", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓ‰Γ”Γ‡ΓΓ_Γ“Γ•ΓΓ„Γ…Γ“Γ‡Γ“", "HTTPREQUEST", Lang) Then
     If ar = 0 Then
         Set var(i) = New clsHttpsRequest
     Else
@@ -19141,7 +19147,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΑΙΤΗΜΑ_ΣΥΝΔΕΣΗΣ", "HTTPREQUEST", Lang) Then
         Next i
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΠΕΛΑΤΗΣ", "CLIENT", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓ…Γ‹ΓΓ”Γ‡Γ“", "CLIENT", Lang) Then
     Y3 = False ' no withevents in declare
     If ar = 0 Then
         Set var(i) = New cTlsClient
@@ -19153,7 +19159,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΠΕΛΑΤΗΣ", "CLIENT", Lang) Then
         Next i
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΣΥΛΛΟΓΗ", "COLLECTION", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ“Γ•Γ‹Γ‹ΓΓƒΓ‡", "COLLECTION", Lang) Then
     Y3 = False ' no withevents in declare
     If ar = 0 Then
         Set var(i) = New Collection
@@ -19165,7 +19171,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΣΥΛΛΟΓΗ", "COLLECTION", Lang) Then
         Next i
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΣΤΟΙΧΕΙΑXML", "XMLDATA", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ“Γ”ΓΓ‰Γ—Γ…Γ‰ΓXML", "XMLDATA", Lang) Then
     Y3 = False ' no withevents in declare
     If ar = 0 Then
         Set var(i) = xmlMonoNew
@@ -19178,7 +19184,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΣΤΟΙΧΕΙΑXML", "XMLDATA", Lang) Then
         Next i
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΠΙΝΑΚΑΣJSON", "JSONARRAY", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓ‰ΓΓΓΓΓ“JSON", "JSONARRAY", Lang) Then
     Y3 = False
     If ar = 0 Then
         Set var(i) = New JsonArray
@@ -19191,7 +19197,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΠΙΝΑΚΑΣJSON", "JSONARRAY", Lang) Then
         Next i
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΛΙΣΤΑJSON", "JSONOBJECT", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ‹Γ‰Γ“Γ”ΓJSON", "JSONOBJECT", Lang) Then
     Y3 = False
     If ar = 0 Then
         Set var(i) = New JsonObject
@@ -19204,7 +19210,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΛΙΣΤΑJSON", "JSONOBJECT", Lang) Then
         Next i
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΜΟΝΑΔΙΚΟ", "MUTEX", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓΓΓΓ„Γ‰ΓΓ", "MUTEX", Lang) Then
     Y3 = False ' no withevents in declare
     If ar = 0 Then
         Set var(i) = New Mutex
@@ -19216,8 +19222,8 @@ ElseIf IsLabelSymbolNew(rest$, "ΜΟΝΑΔΙΚΟ", "MUTEX", Lang) Then
         Next i
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΕΦΑΡΜΟΓΗ", "APPLICATION", Lang) Then
-    If IsLabelSymbolNew(rest$, "ΦΟΡΜΑ", "FORM", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ…Γ–ΓΓ‘ΓΓΓƒΓ‡", "APPLICATION", Lang) Then
+    If IsLabelSymbolNew(rest$, "Γ–ΓΓ‘ΓΓ", "FORM", Lang) Then
         Set var(i) = Form1
     Else
         If ar = 0 Then
@@ -19237,7 +19243,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΕΦΑΡΜΟΓΗ", "APPLICATION", Lang) Then
         End If
     End If
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "ΤΜΗΜΑ", "MODULE", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ”ΓΓ‡ΓΓ", "MODULE", Lang) Then
     If ar = 0 Then
             Set mm = New CallBack2
             mm.NoPublic bstack, here$
@@ -19253,7 +19259,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΤΜΗΜΑ", "MODULE", Lang) Then
             Set mm = Nothing
         Next i
     End If
-ElseIf IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ™Γ“", "AS", Lang) Then
     If IsStrExp(bstack, rest$, s$) Then GoTo ccc
 ElseIf IsStrExp(bstack, rest$, s$) Then
 ccc:
@@ -19422,7 +19428,7 @@ Do
                             RetStack.MergeBottomCopyArray usehandler.objref
                         Else
                             mydata2 = False
-                            MyEr "Expected Stack Object or Array after !", "Περίμενα αντικείμενο Σωρό ή πίνακα μετά το !"
+                            MyEr "Expected Stack Object or Array after !", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ“ΓΉΓ±ΓΌ Γ Γ°ΓΓ­Γ΅ΓªΓ΅ Γ¬Γ¥Γ΄Γ Γ΄Γ― !"
                             Set bstack.lastobj = Nothing
                             Exit Function
                         End If
@@ -19662,7 +19668,7 @@ Dim Scr As Object
 Set Scr = bstack.Owner
 ProcCurve = True
 With players(GetCode(Scr))
-If IsLabelSymbolNew(rest$, "ΓΩΝΙΑ", "ANGLE", Lang) Then par = True
+If IsLabelSymbolNew(rest$, "ΓƒΓ™ΓΓ‰Γ", "ANGLE", Lang) Then par = True
 f = 32
 ReDim PLG(f)
 x1 = 1
@@ -19750,9 +19756,9 @@ Dim i As Long, s$, sX As Double, sY As Double, pppp As mArray
 Dim x1 As Long, y1 As Long, p As Variant, ML As Long, desc As Boolean, numb As Boolean, useclid As Boolean
 ProcSort = False
 Dim mm As mArray, uHandler As mHandler
-desc = IsLabelSymbolNew(rest$, "ΦΘΙΝΟΥΣΑ", "DESCENDING", Lang)
+desc = IsLabelSymbolNew(rest$, "Γ–ΓΓ‰ΓΓΓ•Γ“Γ", "DESCENDING", Lang)
 If Not desc Then
-    useclid = IsLabelSymbolNew(rest$, "ΑΥΞΟΥΣΑ", "ASCENDING", Lang)
+    useclid = IsLabelSymbolNew(rest$, "ΓΓ•ΓΓΓ•Γ“Γ", "ASCENDING", Lang)
 Else
     useclid = True
 End If
@@ -19767,11 +19773,11 @@ usehandler:
                         Exit Function
                         End If
                             If uHandler.t1 = 1 Then
-                                If IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
-                                    numb = IsLabelSymbolNew(rest$, "ΑΡΙΘΜΟΣ", "NUMBER", Lang, , , , False)
+                                If IsLabelSymbolNew(rest$, "Γ™Γ“", "AS", Lang) Then
+                                    numb = IsLabelSymbolNew(rest$, "ΓΓ‘Γ‰ΓΓΓΓ“", "NUMBER", Lang, , , , False)
                                     If Not numb Then
-                                    If Not IsLabelSymbolNew(rest$, "ΚΕΙΜΕΝΟ", "TEXT", Lang, , , , False) Then
-                                    MyEr "Expected Text or Number", "Περίμενα Κείμενο ή Αριθμός"
+                                    If Not IsLabelSymbolNew(rest$, "ΓΓ…Γ‰ΓΓ…ΓΓ", "TEXT", Lang, , , , False) Then
+                                    MyEr "Expected Text or Number", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ ΓΓ¥ΓΓ¬Γ¥Γ­Γ― Γ ΓΓ±Γ©Γ¨Γ¬ΓΌΓ²"
                                     ProcSort = False
                                     Exit Function
                                     End If
@@ -19931,10 +19937,10 @@ useArray:
                                 End If
                             ProcSort = True
                             Else
-                            MyEr "Expected Inventory", "Περίμενα Κατάσταση"
+                            MyEr "Expected Inventory", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ ΓΓ΅Γ΄ΓΓ³Γ΄Γ΅Γ³Γ§"
                             End If
                 Else
-                   MyEr "Expected Inventory", "Περίμενα Κατάσταση"
+                   MyEr "Expected Inventory", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ ΓΓ΅Γ΄ΓΓ³Γ΄Γ΅Γ³Γ§"
                 End If
             Else
                    MissFuncParameterStringVar
@@ -20086,7 +20092,7 @@ Do
                             soros.MergeBottomCopyArray usehandler.objref
                         Else
                             GetData = False
-                            MyEr "Expected Stack Object or Array after !", "Περίμενα αντικείμενο Σωρό ή πίνακα μετά το !"
+                            MyEr "Expected Stack Object or Array after !", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― Γ“ΓΉΓ±ΓΌ Γ Γ°ΓΓ­Γ΅ΓªΓ΅ Γ¬Γ¥Γ΄Γ Γ΄Γ― !"
                             Set bstack.lastobj = Nothing
                             Exit Function
                         End If
@@ -20151,7 +20157,7 @@ If x1 = 1 Or x1 = 3 Then
 
                       ProcProperty bstack, var(), i, ss$, rest$, Lang
                       If Err.Number > 0 Then
-                      MyEr "Property " + ss$ + " problem", "Πρόβλημα με ιδιότητα " + ss$
+                      MyEr "Property " + ss$ + " problem", "ΓΓ±ΓΌΓΆΓ«Γ§Γ¬Γ΅ Γ¬Γ¥ Γ©Γ¤Γ©ΓΌΓ΄Γ§Γ΄Γ΅ " + ss$
                       Err.Clear
                       MyWith = False
                     Exit Do
@@ -20191,7 +20197,7 @@ ElseIf x1 = 5 Or x1 = 6 Then
                   Exit Do
                   End If
                   If Err.Number > 0 Then
-                      MyEr "Property " + ss$ + " problem", "Πρόβλημα με ιδιότητα " + ss$
+                      MyEr "Property " + ss$ + " problem", "ΓΓ±ΓΌΓΆΓ«Γ§Γ¬Γ΅ Γ¬Γ¥ Γ©Γ¤Γ©ΓΌΓ΄Γ§Γ΄Γ΅ " + ss$
                       Err.Clear
                       MyWith = False
                     Exit Do
@@ -20218,7 +20224,7 @@ End Function
 
 Function MyWrite(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim p As Variant, s$, it As Long, par As Boolean, i As Long, skip As Boolean
-If IsLabelSymbolNew(rest$, "ΜΕ", "WITH", Lang) Then
+If IsLabelSymbolNew(rest$, "ΓΓ…", "WITH", Lang) Then
     If IsStrExp(basestack, rest$, s$) Then
         csvsep$ = Left$(s$, 1)
         If FastSymbol(rest$, ",") Then If IsStrExp(basestack, rest$, s$) Then csvDec$ = Left$(s$, 1): MyWrite = True
@@ -20230,7 +20236,7 @@ If IsLabelSymbolNew(rest$, "ΜΕ", "WITH", Lang) Then
 End If
 MyWrite = True
 If csvsep$ = vbNullString Then csvsep$ = ","
-If IsLabelSymbolNew(rest$, "ΔΕΚΑΕΞ", "HEX", Lang) Then it = 1
+If IsLabelSymbolNew(rest$, "Γ„Γ…ΓΓΓ…Γ", "HEX", Lang) Then it = 1
 If FastSymbol(rest$, "#") Then
 
     MyWrite = False
@@ -20244,7 +20250,7 @@ If FastSymbol(rest$, "#") Then
     prive = players(GetCode(Scr))
     Else
     i = CLng(p)
-    If Fkind(i) = FnoUse Or Fkind(i) = Finput Or Fkind(i) = Frandom Then MyEr "Wrong File Handler", "Λάθος Χειριστής Αρχείου": MyWrite = False: Exit Function
+    If Fkind(i) = FnoUse Or Fkind(i) = Finput Or Fkind(i) = Frandom Then MyEr "Wrong File Handler", "Γ‹ΓΓ¨Γ―Γ² Γ—Γ¥Γ©Γ±Γ©Γ³Γ΄ΓΓ² ΓΓ±Γ·Γ¥ΓΓ―Γµ": MyWrite = False: Exit Function
     End If
         
         par = False
@@ -20368,7 +20374,7 @@ a$ = NLtrim$(a$)
             IsPureLabel = 0
             Exit Function
             End If
-        Case 65 To 90, 913 To 937, 902, 904, 906, 908, 905, 911, 910, 962 '"A" To "Z", "Α" To "Ω", "Ά", "Έ", "Ί", "Ό", "Ή", "Ώ", "Ύ", "ς"
+        Case 65 To 90, 913 To 937, 902, 904, 906, 908, 905, 911, 910, 962 '"A" To "Z", "Γ" To "Γ™", "ΒΆ", "ΒΈ", "ΒΊ", "ΒΌ", "ΒΉ", "ΒΏ", "ΒΎ", "Γ²"
             If one Then
             Exit Do
             Else
@@ -20740,7 +20746,7 @@ Loop
 If Lang Then
 ss$ = "Sounds: " & ss$
 Else
-ss$ = "Ήχοι: " & ss$
+ss$ = "ΒΉΓ·Γ―Γ©: " & ss$
 End If
 Set mDir = Nothing
 RepPlain bstack, bstack.Owner, ss$
@@ -20781,7 +20787,7 @@ If i = False Then
         If par Then
             pa$ = "Folders " & ss$ & ": "
         Else
-            pa$ = "Κατάλογοι " & ss$ & ": "
+            pa$ = "ΓΓ΅Γ΄ΓΓ«Γ―Γ£Γ―Γ© " & ss$ & ": "
         End If
     End If
 End If
@@ -20839,7 +20845,7 @@ Case 2
 addext = True
 addpath = True
 Case Else
-MyEr "Not defined yet", "δεν έχει οριστεί ακόμα"
+MyEr "Not defined yet", "Γ¤Γ¥Γ­ ΓΓ·Γ¥Γ© Γ―Γ±Γ©Γ³Γ΄Γ¥Γ Γ΅ΓªΓΌΓ¬Γ΅"
 ProcFiles = False
 Exit Function
 End Select
@@ -20864,10 +20870,10 @@ If i = False Then
             End If
         Else
             If stac1 <> "" Then
-            pa$ = "Αρχεία " & Replace(ss$, "|", ", ") & " με κείμενο " & Chr(34) + stac1 + Chr(34) & " :  "
+            pa$ = "ΓΓ±Γ·Γ¥ΓΓ΅ " & Replace(ss$, "|", ", ") & " Γ¬Γ¥ ΓªΓ¥ΓΓ¬Γ¥Γ­Γ― " & Chr(34) + stac1 + Chr(34) & " :  "
             
             Else
-            pa$ = "Αρχεία " & Replace(ss$, "|", ", ") & ": "
+            pa$ = "ΓΓ±Γ·Γ¥ΓΓ΅ " & Replace(ss$, "|", ", ") & ": "
             End If
         End If
     End If
@@ -21020,7 +21026,7 @@ If Lang Then
 
 pa$ = "In Memory: " & pa$ & vbCrLf & "        Use REMOVE to remove the right most, EDIT module_name to edit"
 Else
-pa$ = "Στη Μνήμη: " & pa$ & vbCrLf & "        Με τη ΔΙΑΓΡΑΦΗ θα σβήσεις το τελευταίο, με ΣΥΓΓΡΑΦΗ ή Σ όνομα_τμήματος θα γράψεις"
+pa$ = "Γ“Γ΄Γ§ ΓΓ­ΓΓ¬Γ§: " & pa$ & vbCrLf & "        ΓΓ¥ Γ΄Γ§ Γ„Γ‰ΓΓƒΓ‘ΓΓ–Γ‡ Γ¨Γ΅ Γ³ΓΆΓΓ³Γ¥Γ©Γ² Γ΄Γ― Γ΄Γ¥Γ«Γ¥ΓµΓ΄Γ΅ΓΓ―, Γ¬Γ¥ Γ“Γ•ΓƒΓƒΓ‘ΓΓ–Γ‡ Γ Γ“ ΓΌΓ­Γ―Γ¬Γ΅_Γ΄Γ¬ΓΓ¬Γ΅Γ΄Γ―Γ² Γ¨Γ΅ Γ£Γ±ΓΓΈΓ¥Γ©Γ²"
 End If
 End If
 If here$ = vbNullString Then If showlocal Then GoTo ponly
@@ -21039,7 +21045,7 @@ If pa$ <> "" Then pa$ = pa$ & vbCrLf
 If Lang Then
 pa$ = pa$ & "On Disk: "
 Else
-pa$ = pa$ & "Στον Δίσκο: "
+pa$ = pa$ & "Γ“Γ΄Γ―Γ­ Γ„ΓΓ³ΓªΓ―: "
 End If
 End If
 ss$ = vbNullString
@@ -21058,8 +21064,8 @@ If Lang Then
 pa$ = pa$ & vbCrLf + Replace$("        Use LOAD 'module_name' to load, EDIT 'module_name.gsb' to edit on disk", "'", Chr(34))
 If IsSupervisor Then pa$ = pa$ & ", WIN DIR$ for folders tasks"
 Else
-pa$ = pa$ & vbCrLf + Replace$("        Με ΦΟΡΤΩΣΕ ονομα_τμηματος φορτώνεις στη μνήμη, με Σ ή ΣΥΓΓΡΑΦΗ 'ονομα_τμηματος.gsb' διορθώνεις στο δίσκο", "'", Chr(34))
-If IsSupervisor Then pa$ = pa$ & ", με ΣΥΣΤΗΜΑ ΚΑΤ$ ανοίγεις τον κατάλογο με τα αρχεία για εργασίες"
+pa$ = pa$ & vbCrLf + Replace$("        ΓΓ¥ Γ–ΓΓ‘Γ”Γ™Γ“Γ… Γ―Γ­Γ―Γ¬Γ΅_Γ΄Γ¬Γ§Γ¬Γ΅Γ΄Γ―Γ² Γ¶Γ―Γ±Γ΄ΓΎΓ­Γ¥Γ©Γ² Γ³Γ΄Γ§ Γ¬Γ­ΓΓ¬Γ§, Γ¬Γ¥ Γ“ Γ Γ“Γ•ΓƒΓƒΓ‘ΓΓ–Γ‡ 'Γ―Γ­Γ―Γ¬Γ΅_Γ΄Γ¬Γ§Γ¬Γ΅Γ΄Γ―Γ².gsb' Γ¤Γ©Γ―Γ±Γ¨ΓΎΓ­Γ¥Γ©Γ² Γ³Γ΄Γ― Γ¤ΓΓ³ΓªΓ―", "'", Chr(34))
+If IsSupervisor Then pa$ = pa$ & ", Γ¬Γ¥ Γ“Γ•Γ“Γ”Γ‡ΓΓ ΓΓΓ”$ Γ΅Γ­Γ―ΓΓ£Γ¥Γ©Γ² Γ΄Γ―Γ­ ΓªΓ΅Γ΄ΓΓ«Γ―Γ£Γ― Γ¬Γ¥ Γ΄Γ΅ Γ΅Γ±Γ·Γ¥ΓΓ΅ Γ£Γ©Γ΅ Γ¥Γ±Γ£Γ΅Γ³ΓΓ¥Γ²"
 End If
 End If
 End If
@@ -21127,7 +21133,7 @@ On Error Resume Next
                 
                 MyIcon = True
             Else
-            MyEr "No icon find", "Δεν βρήκα εικόνα"
+            MyEr "No icon find", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ¥Γ©ΓªΓΌΓ­Γ΅"
                 Exit Function
             End If
         Else
@@ -21155,7 +21161,7 @@ If TypeOf vv Is mHandler Then
     If mh.indirect >= 0 Then
     vIndex = mh.indirect
     If var2used < mh.indirect Then
-    MyEr "weak reference out of scope", "η αναφορά είναι εκτός σκοπού"
+    MyEr "weak reference out of scope", "Γ§ Γ΅Γ­Γ΅Γ¶Γ―Γ±Γ Γ¥ΓΓ­Γ΅Γ© Γ¥ΓªΓ΄ΓΌΓ² Γ³ΓªΓ―Γ°Γ―Γ½"
     ok = False
     Exit Function
     End If
@@ -21824,7 +21830,7 @@ Loop
 If Lang Then
 ss$ = "Drawings: " & ss$
 Else
-ss$ = "Σχέδια: " & ss$
+ss$ = "Γ“Γ·ΓΓ¤Γ©Γ΅: " & ss$
 End If
 Set mDir = Nothing
 RepPlain bstack, bstack.Owner, ss$
@@ -21850,7 +21856,7 @@ Set mDir = Nothing
 If Lang Then
 ss$ = "Movies: " & ss$
 Else
-ss$ = "Ταινίες: " & ss$
+ss$ = "Γ”Γ΅Γ©Γ­ΓΓ¥Γ²: " & ss$
 End If
 RepPlain bstack, bstack.Owner, ss$
 End Function
@@ -21874,14 +21880,14 @@ Loop
 If Lang Then
 ss$ = "Bitmaps: " & ss$
 Else
-ss$ = "Εικόνες: " & ss$
+ss$ = "Γ…Γ©ΓªΓΌΓ­Γ¥Γ²: " & ss$
 End If
 Set mDir = Nothing
 RepPlain bstack, bstack.Owner, ss$
 End Function
 Function ProcFKey(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim i As Long, p As Variant, s$, prive
-If IsLabelSymbolNew(rest$, "ΚΑΘΑΡΟ", "CLEAR", Lang) Then
+If IsLabelSymbolNew(rest$, "ΓΓΓΓΓ‘Γ", "CLEAR", Lang) Then
     For i = 1 To 24: FK$(i) = vbNullString: Next i
 ElseIf IsExp(bstack, rest$, p) Then
 
@@ -21909,7 +21915,7 @@ Else
     s$ = vbNullString: prive = GetCode(bstack.Owner)
     For i = 1 To 24
         If FK$(i) <> "" Then
-            s$ = s$ + placeme$("ΚΛΕΙΔΙ", "FKEY", Lang) + Right$(" " & Str$(i), 3) & " [" & FK$(i) & "]" ' FKEY
+            s$ = s$ + placeme$("ΓΓ‹Γ…Γ‰Γ„Γ‰", "FKEY", Lang) + Right$(" " & Str$(i), 3) & " [" & FK$(i) & "]" ' FKEY
             If i > 12 Then s$ = s$ + " SHIFT + F" & CStr(i - 12) Else s$ = s$ + " F" & CStr(i)
             s$ = s$ + vbCrLf
         End If
@@ -21998,7 +22004,7 @@ End If
 End If
 If Abs(IsLabel(basestack, rest$, s$)) > 0 Then
     vH_title$ = vbNullString
-    aa = AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128
+    aa = AscW(s$ + Mid$(" Γ“", Abs(pagio$ = "GREEK") + 1)) < 128
     If Len(s1$) > 0 Then s$ = s1$ + s$
     fHelp basestack, s$, aa
 ElseIf Not ISSTRINGA(rest$, s$) Then
@@ -22151,7 +22157,7 @@ If FastSymbol(rest$, "{") Then
             ProcCreateEmf = False
             Exit Function
         End If
-        If Not IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then Exit Function
+        If Not IsLabelSymbolNew(rest$, "Γ™Γ“", "AS", Lang) Then Exit Function
 
 End Function
 Function ProcPath(bstack As basetask, rest$, Lang As Long) As Boolean
@@ -22159,7 +22165,7 @@ Dim f As Boolean, p As Variant, Col As Long, it As Long, ss$, x As Double, par A
 Dim OldGDILines As Boolean, Region As Boolean, oldpathcolor As Long, oldpathfillstyle As Integer, nd&, once As Boolean
 ProcPath = True
 prive = GetCode(bstack.Owner)
-f = IsLabelSymbolNew(rest$, "ΠΑΝΩ", "OVER", Lang)
+f = IsLabelSymbolNew(rest$, "ΓΓΓΓ™", "OVER", Lang)
 If FastSymbol(rest$, "!") Then par = True
 
 If IsExp(bstack, rest$, p, , True) Then
@@ -22495,21 +22501,21 @@ Dim di As Object
 Set di = bstack.Owner
 If GREEK Then
 Dim bb$
-bb$ = "   ΕΛΛΗΝΙΚΑ ή ΛΑΤΙΝΙΚΑ για επιλογή κωδικοσελίδας για το τύπο εμφάνισης βοήθειας " & vbCrLf
-bb$ = bb$ & "   Με Esc τερματίζει η εκτέλεση τμημάτων  " & vbCrLf
-bb$ = bb$ & "   ctrl + f1 ανοίγει την βοήθεια, γράφοντας και επιλέγοντας βρίσκει" & vbCrLf
-bb$ = bb$ & "   ctrl + c Τερματίζει την εκτέλεση και καθαρίζει" & vbCrLf
-bb$ = bb$ & "   ctrl + οποιοδήποτε πλήκτρο ανοίγει τη βηματική εκτέλεση" & vbCrLf
-bb$ = bb$ & "   pause/break κάνει ψυχρή εκκίνηση / δες ΒΟΗΘΕΙΑ ΑΡΧΗ" & vbCrLf
-bb$ = bb$ & "   Σ ονομαΤμηματος ανοίγει τον διορθωτή για να γράψουμε πρόγραμμα" & vbCrLf
-bb$ = bb$ & "   Σ ονομαΣυνάρτησης( ανοίγει τον διορθωτή για να γράψουμε συνάρτηση" & vbCrLf
-bb$ = bb$ & "   Σ ονομαΣυνάρτησης$( ανοίγει τον διορθωτή για να γράψουμε συνάρτηση$" & vbCrLf
-bb$ = bb$ & "   Τμηματα  [μας δείχνει τα τμήματα στη μνήμη και το δίσκο]" & vbCrLf
-bb$ = bb$ & "   ΒΟΗΘΕΙΑ κατι (μας δίνει βοήθεια σε ξεχωριστό παράθυρο)" & vbCrLf
-bb$ = bb$ & "   ? ή ΤΥΠΩΣΕ τυπώνει" & vbCrLf
-bb$ = bb$ & "   δώσε την εντολή ΡΥΘΜΙΣΕΙΣ η ctrl+U για να αλλάξει την εξ ορισμού γραμματοσειρά και τα χρώματα" & vbCrLf
-bb$ = bb$ & "   δώσε την εντολή ΕΛΕΓΧΟΣ για να δεις στοιχεία του διερμηνευτή" & vbCrLf
-bb$ = bb$ & "   δώσε την εντολή ΤΕΛΟΣ για να τερματίσεις τον διερμηνευτή" & vbCrLf
+bb$ = "   Γ…Γ‹Γ‹Γ‡ΓΓ‰ΓΓ Γ Γ‹ΓΓ”Γ‰ΓΓ‰ΓΓ Γ£Γ©Γ΅ Γ¥Γ°Γ©Γ«Γ―Γ£Γ ΓªΓΉΓ¤Γ©ΓªΓ―Γ³Γ¥Γ«ΓΓ¤Γ΅Γ² Γ£Γ©Γ΅ Γ΄Γ― Γ΄Γ½Γ°Γ― Γ¥Γ¬Γ¶ΓΓ­Γ©Γ³Γ§Γ² ΓΆΓ―ΓΓ¨Γ¥Γ©Γ΅Γ² " & vbCrLf
+bb$ = bb$ & "   ΓΓ¥ Esc Γ΄Γ¥Γ±Γ¬Γ΅Γ΄ΓΓ¦Γ¥Γ© Γ§ Γ¥ΓªΓ΄ΓΓ«Γ¥Γ³Γ§ Γ΄Γ¬Γ§Γ¬ΓΓ΄ΓΉΓ­  " & vbCrLf
+bb$ = bb$ & "   ctrl + f1 Γ΅Γ­Γ―ΓΓ£Γ¥Γ© Γ΄Γ§Γ­ ΓΆΓ―ΓΓ¨Γ¥Γ©Γ΅, Γ£Γ±ΓΓ¶Γ―Γ­Γ΄Γ΅Γ² ΓªΓ΅Γ© Γ¥Γ°Γ©Γ«ΓΓ£Γ―Γ­Γ΄Γ΅Γ² ΓΆΓ±ΓΓ³ΓªΓ¥Γ©" & vbCrLf
+bb$ = bb$ & "   ctrl + c Γ”Γ¥Γ±Γ¬Γ΅Γ΄ΓΓ¦Γ¥Γ© Γ΄Γ§Γ­ Γ¥ΓªΓ΄ΓΓ«Γ¥Γ³Γ§ ΓªΓ΅Γ© ΓªΓ΅Γ¨Γ΅Γ±ΓΓ¦Γ¥Γ©" & vbCrLf
+bb$ = bb$ & "   ctrl + Γ―Γ°Γ―Γ©Γ―Γ¤ΓΓ°Γ―Γ΄Γ¥ Γ°Γ«ΓΓªΓ΄Γ±Γ― Γ΅Γ­Γ―ΓΓ£Γ¥Γ© Γ΄Γ§ ΓΆΓ§Γ¬Γ΅Γ΄Γ©ΓªΓ Γ¥ΓªΓ΄ΓΓ«Γ¥Γ³Γ§" & vbCrLf
+bb$ = bb$ & "   pause/break ΓªΓΓ­Γ¥Γ© ΓΈΓµΓ·Γ±Γ Γ¥ΓªΓªΓΓ­Γ§Γ³Γ§ / Γ¤Γ¥Γ² Γ‚ΓΓ‡ΓΓ…Γ‰Γ ΓΓ‘Γ—Γ‡" & vbCrLf
+bb$ = bb$ & "   Γ“ Γ―Γ­Γ―Γ¬Γ΅Γ”Γ¬Γ§Γ¬Γ΅Γ΄Γ―Γ² Γ΅Γ­Γ―ΓΓ£Γ¥Γ© Γ΄Γ―Γ­ Γ¤Γ©Γ―Γ±Γ¨ΓΉΓ΄Γ Γ£Γ©Γ΅ Γ­Γ΅ Γ£Γ±ΓΓΈΓ―ΓµΓ¬Γ¥ Γ°Γ±ΓΌΓ£Γ±Γ΅Γ¬Γ¬Γ΅" & vbCrLf
+bb$ = bb$ & "   Γ“ Γ―Γ­Γ―Γ¬Γ΅Γ“ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§Γ²( Γ΅Γ­Γ―ΓΓ£Γ¥Γ© Γ΄Γ―Γ­ Γ¤Γ©Γ―Γ±Γ¨ΓΉΓ΄Γ Γ£Γ©Γ΅ Γ­Γ΅ Γ£Γ±ΓΓΈΓ―ΓµΓ¬Γ¥ Γ³ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§" & vbCrLf
+bb$ = bb$ & "   Γ“ Γ―Γ­Γ―Γ¬Γ΅Γ“ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§Γ²$( Γ΅Γ­Γ―ΓΓ£Γ¥Γ© Γ΄Γ―Γ­ Γ¤Γ©Γ―Γ±Γ¨ΓΉΓ΄Γ Γ£Γ©Γ΅ Γ­Γ΅ Γ£Γ±ΓΓΈΓ―ΓµΓ¬Γ¥ Γ³ΓµΓ­ΓΓ±Γ΄Γ§Γ³Γ§$" & vbCrLf
+bb$ = bb$ & "   Γ”Γ¬Γ§Γ¬Γ΅Γ΄Γ΅  [Γ¬Γ΅Γ² Γ¤Γ¥ΓΓ·Γ­Γ¥Γ© Γ΄Γ΅ Γ΄Γ¬ΓΓ¬Γ΅Γ΄Γ΅ Γ³Γ΄Γ§ Γ¬Γ­ΓΓ¬Γ§ ΓªΓ΅Γ© Γ΄Γ― Γ¤ΓΓ³ΓªΓ―]" & vbCrLf
+bb$ = bb$ & "   Γ‚ΓΓ‡ΓΓ…Γ‰Γ ΓªΓ΅Γ΄Γ© (Γ¬Γ΅Γ² Γ¤ΓΓ­Γ¥Γ© ΓΆΓ―ΓΓ¨Γ¥Γ©Γ΅ Γ³Γ¥ Γ®Γ¥Γ·ΓΉΓ±Γ©Γ³Γ΄ΓΌ Γ°Γ΅Γ±ΓΓ¨ΓµΓ±Γ―)" & vbCrLf
+bb$ = bb$ & "   ? Γ Γ”Γ•ΓΓ™Γ“Γ… Γ΄ΓµΓ°ΓΎΓ­Γ¥Γ©" & vbCrLf
+bb$ = bb$ & "   Γ¤ΓΎΓ³Γ¥ Γ΄Γ§Γ­ Γ¥Γ­Γ΄Γ―Γ«Γ Γ‘Γ•ΓΓΓ‰Γ“Γ…Γ‰Γ“ Γ§ ctrl+U Γ£Γ©Γ΅ Γ­Γ΅ Γ΅Γ«Γ«ΓΓ®Γ¥Γ© Γ΄Γ§Γ­ Γ¥Γ® Γ―Γ±Γ©Γ³Γ¬Γ―Γ½ Γ£Γ±Γ΅Γ¬Γ¬Γ΅Γ΄Γ―Γ³Γ¥Γ©Γ±Γ ΓªΓ΅Γ© Γ΄Γ΅ Γ·Γ±ΓΎΓ¬Γ΅Γ΄Γ΅" & vbCrLf
+bb$ = bb$ & "   Γ¤ΓΎΓ³Γ¥ Γ΄Γ§Γ­ Γ¥Γ­Γ΄Γ―Γ«Γ Γ…Γ‹Γ…ΓƒΓ—ΓΓ“ Γ£Γ©Γ΅ Γ­Γ΅ Γ¤Γ¥Γ©Γ² Γ³Γ΄Γ―Γ©Γ·Γ¥ΓΓ΅ Γ΄Γ―Γµ Γ¤Γ©Γ¥Γ±Γ¬Γ§Γ­Γ¥ΓµΓ΄Γ" & vbCrLf
+bb$ = bb$ & "   Γ¤ΓΎΓ³Γ¥ Γ΄Γ§Γ­ Γ¥Γ­Γ΄Γ―Γ«Γ Γ”Γ…Γ‹ΓΓ“ Γ£Γ©Γ΅ Γ­Γ΅ Γ΄Γ¥Γ±Γ¬Γ΅Γ΄ΓΓ³Γ¥Γ©Γ² Γ΄Γ―Γ­ Γ¤Γ©Γ¥Γ±Γ¬Γ§Γ­Γ¥ΓµΓ΄Γ" & vbCrLf
 Else
 bb$ = "   GREEK or LATIN for choose the codepage for errors display" & vbCrLf
 bb$ = bb$ & "   with LATIN all error messages are in ENGLISH language  " & vbCrLf
@@ -22561,7 +22567,7 @@ On Error Resume Next
 LoadKeyboardLayout "00000408", KLF_ACTIVATE
 Clid = 1032
 UserCodePage = 1253
-DefBooleanString = ";Αληθές;Ψευδές"
+DefBooleanString = ";ΓΓ«Γ§Γ¨ΓΓ²;ΓΓ¥ΓµΓ¤ΓΓ²"
 If Not mNoUseDec Then
 NoUseDec = Mid$(CStr(1.2), 2, 1) = "."
 OverideDec = Not NoUseDec
@@ -22588,7 +22594,7 @@ If bstack.tolayer > 0 Then
 End With
 pagio$ = "GREEK"
 Clid = 1032
-DefBooleanString = ";Αληθές;Ψευδές"
+DefBooleanString = ";ΓΓ«Γ§Γ¨ΓΓ²;ΓΓ¥ΓµΓ¤ΓΓ²"
 DialogSetupLang 0
 With players(GetCode(bstack.Owner))
 .charset = 161
@@ -22843,7 +22849,7 @@ ProcFind = True
         ss$ = GetNextLine(frm$)
         SetNextLine frm$
     If frm$ <> "" Then
-        MyEr "Search string with line breaks", "Αλφαριθμητικό αναζήτησης με αλλαγές γραμμών"
+        MyEr "Search string with line breaks", "ΓΓ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ Γ΅Γ­Γ΅Γ¦ΓΓ΄Γ§Γ³Γ§Γ² Γ¬Γ¥ Γ΅Γ«Γ«Γ΅Γ£ΓΓ² Γ£Γ±Γ΅Γ¬Γ¬ΓΎΓ­"
         Exit Function
     End If
     Else
@@ -22923,7 +22929,7 @@ If entrypoint = 1 Then dum = True  ' means documend append to file
 pass2:
                  If FastPureLabel(rest$, w$, , True) = 1 Then
 
-                    If Not check2(w$, "ΩΣ", "AS") Then SyntaxError: Exit Function
+                    If Not check2(w$, "Γ™Γ“", "AS") Then SyntaxError: Exit Function
                     
                     If Not Abs(IsLabel(basestack, rest$, w$)) = 3 Then MissingStrVar: Exit Function
                      If y1 = 3 Then
@@ -22961,7 +22967,7 @@ sdmess:
     ss$ = GetNextLine(w$)
     SetNextLine w$
     If w$ <> "" Then
-    MyEr "filename with line breaks", "όνομα αρχείου με αλλαγές γραμμών"
+    MyEr "filename with line breaks", "ΓΌΓ­Γ―Γ¬Γ΅ Γ΅Γ±Γ·Γ¥ΓΓ―Γµ Γ¬Γ¥ Γ΅Γ«Γ«Γ΅Γ£ΓΓ² Γ£Γ±Γ΅Γ¬Γ¬ΓΎΓ­"
     Exit Function
     End If
     ' check valid name
@@ -23007,7 +23013,7 @@ sdmess:
                     x1 = 3
                     End If
                      If Not var(i).SaveUnicodeOrAnsi(ss$, x1, dum) Then
-                       MyEr "can't save " + ss$, "δεν μπορώ να σώσω " + ss$
+                       MyEr "can't save " + ss$, "Γ¤Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ³ΓΎΓ³ΓΉ " + ss$
                       End If
                       Else
                       FilePathNotForUser
@@ -23036,7 +23042,7 @@ sdmess:
                     x1 = 3
                     End If
                      If Not pppp.item(i).SaveUnicodeOrAnsi(ss$, x1, dum) Then
-                       MyEr "can't save " + ss$, "δεν μπορώ να σώσω " + ss$
+                       MyEr "can't save " + ss$, "Γ¤Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ³ΓΎΓ³ΓΉ " + ss$
                        Exit Function
                       End If
                       Else
@@ -23164,11 +23170,11 @@ If Left$(Typename(bstack.Owner), 3) = "Gui" Then oxiforforms: Exit Function
 ProcField = True
  prive = GetCode(bstack.Owner)
   With players(prive)
-        If IsLabelSymbolNew(rest$, "ΝΕΟ", "NEW", Lang) Then
+        If IsLabelSymbolNew(rest$, "ΓΓ…Γ", "NEW", Lang) Then
             If IsExp(bstack, rest$, p) Then Result = p Else Result = 0
             Exit Function
         End If
-        If IsLabelSymbolNew(rest$, "ΣΥΝΘΗΜΑ", "PASSWORD", Lang) Then i = True
+        If IsLabelSymbolNew(rest$, "Γ“Γ•ΓΓΓ‡ΓΓ", "PASSWORD", Lang) Then i = True
     
         If Not IsExp(bstack, rest$, x) Then x = .curpos
         If Not FastSymbol(rest$, ",") Then Exit Function
@@ -23177,7 +23183,7 @@ ProcField = True
         If Not IsExp(bstack, rest$, p) Then Exit Function
         p = MyRound(p)
         End If
-        If Not IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then Exit Function
+        If Not IsLabelSymbolNew(rest$, "Γ™Γ“", "AS", Lang) Then Exit Function
         Select Case Abs(IsLabel(bstack, rest$, what$))
         Case 3
             par = False
@@ -23220,7 +23226,7 @@ End Function
 Function ProcList(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim p As Variant, again$, Clsid() As GUID, LNames() As String, clsNumber As Long, i As Long, probe$, what$
 Dim usemodule As Boolean, where As Long, page$
-If IsLabelSymbolNew(rest$, "ΧΡΗΣΤΩΝ", "USERS", Lang) Then
+If IsLabelSymbolNew(rest$, "Γ—Γ‘Γ‡Γ“Γ”Γ™Γ", "USERS", Lang) Then
 ProcUsers basestack
 ProcList = True
 Exit Function
@@ -23229,21 +23235,21 @@ End If
 If FastSymbol(rest$, "!") Then
 mylist basestack, -2, Lang   ' proportional
 ElseIf IsLabelSymbolNew(rest$, "COM", "COM", Lang) Then
-If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
+If IsLabelSymbolNew(rest$, "Γ“Γ”Γ", "TO", Lang) Then
 If here$ <> "" Then
-    MyEr "Only in command line interpreter", "Μόνο στον μεταφραστή γραμμής"
+    MyEr "Only in command line interpreter", "ΓΓΌΓ­Γ― Γ³Γ΄Γ―Γ­ Γ¬Γ¥Γ΄Γ΅Γ¶Γ±Γ΅Γ³Γ΄Γ Γ£Γ±Γ΅Γ¬Γ¬ΓΓ²"
     Exit Function
 End If
 
 If FastPureLabel(rest$, what$, , True) = 0 Then
-    MyEr "Expect a module name", "Περίμενα ένα όνομα τμήματος"
+    MyEr "Expect a module name", "ΓΓ¥Γ±ΓΓ¬Γ¥Γ­Γ΅ ΓΓ­Γ΅ ΓΌΓ­Γ―Γ¬Γ΅ Γ΄Γ¬ΓΓ¬Γ΅Γ΄Γ―Γ²"
     Exit Function
 End If
 If Not subHash.Find(what$, where) Then
 If Lang = 1 Then
 where = ModuleSubAsap(what$, "\\ End for Automatic list" + vbCrLf)
 Else
-where = ModuleSubAsap(what$, "\\ Τέλος Αυτόματης λίσταq" + vbCrLf)
+where = ModuleSubAsap(what$, "\\ Γ”ΓΓ«Γ―Γ² ΓΓµΓ΄ΓΌΓ¬Γ΅Γ΄Γ§Γ² Γ«ΓΓ³Γ΄Γ΅q" + vbCrLf)
 End If
 End If
 usemodule = True
@@ -23252,7 +23258,7 @@ End If
 
 '' list com
 '' List com to abcModule
-If ObjectCatalog.count <> 0 Then again$ = "!"
+If ObjectCatalog.Count <> 0 Then again$ = "!"
 ' use Choose.object + to make it again
 If ProcChooseObj(basestack, again$, Lang) Then
 ' list1 is a glist control
@@ -23271,7 +23277,7 @@ If Form1.List1.ListIndex = -1 Then ProcList = True: Exit Function
             If Lang = 1 Then
                 page$ = page$ + "Declare "
             Else
-                page$ = page$ + "Όρισε "
+                page$ = page$ + "ΒΌΓ±Γ©Γ³Γ¥ "
             End If
             page$ = page$ + LNames(i) + " " + Chr$(34) + GetGUIDstr(Clsid(i)) + Chr$(34) + vbCrLf
         Else
@@ -23315,9 +23321,9 @@ Err.Clear
 End Function
 Function ProcLoad(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim x1 As Long, s$, w$, ss$, par As Boolean, vvl As Variant, Key$, par1 As Boolean, NoRun As Boolean
-par1 = Not IsLabelSymbolNew(rest$, "ΝΕΟ", "NEW", Lang)
-If par1 Then par1 = Not IsLabelSymbolNew(rest$, "ΝΕΑ", "NEW", Lang)  ' PLURAL FOR GREEK
-NoRun = IsLabelSymbolNew(rest$, "ΤΜΗΜΑΤΑ", "MODULES", Lang)
+par1 = Not IsLabelSymbolNew(rest$, "ΓΓ…Γ", "NEW", Lang)
+If par1 Then par1 = Not IsLabelSymbolNew(rest$, "ΓΓ…Γ", "NEW", Lang)  ' PLURAL FOR GREEK
+NoRun = IsLabelSymbolNew(rest$, "Γ”ΓΓ‡ΓΓΓ”Γ", "MODULES", Lang)
 ProcLoad = True
 With basestack
 If Not .IamChild And Not .IamAnEvent And Not .IamThread And Not .IamLambda Then
@@ -23327,7 +23333,7 @@ If Check2Save Then
 End If
 
 If sb2used > 0 And Not NoRun Then
-If MsgBoxN(IIf(pagio$ <> "GREEK", "There are modules/functions loaded, load anyway", "Υπάρχουν φορτωμένα τμήματα/συναρτήσεις, να φορτώσω όπως και να έχει"), 1) <> 1 Then
+If MsgBoxN(IIf(pagio$ <> "GREEK", "There are modules/functions loaded, load anyway", "Γ•Γ°ΓΓ±Γ·Γ―ΓµΓ­ Γ¶Γ―Γ±Γ΄ΓΉΓ¬ΓΓ­Γ΅ Γ΄Γ¬ΓΓ¬Γ΅Γ΄Γ΅/Γ³ΓµΓ­Γ΅Γ±Γ΄ΓΓ³Γ¥Γ©Γ², Γ­Γ΅ Γ¶Γ―Γ±Γ΄ΓΎΓ³ΓΉ ΓΌΓ°ΓΉΓ² ΓªΓ΅Γ© Γ­Γ΅ ΓΓ·Γ¥Γ©"), 1) <> 1 Then
 
 rest$ = vbNullString
 Exit Function
@@ -23462,7 +23468,7 @@ Loop
 
 If ss$ <> "" Then
 If par Then GoTo skipme
-If (AscW(ss$) > 127 And myUcase(Left$(ss$, 5)) <> "ΚΛΑΣΗ" And myUcase(Left$(ss$, 5)) <> "ΤΜΗΜΑ" And myUcase(Left$(ss$, 9)) <> "ΣΥΝΑΡΤΗΣΗ") Or (((AscW(ss$) And &H4000) = &H4000)) Then
+If (AscW(ss$) > 127 And myUcase(Left$(ss$, 5)) <> "ΓΓ‹ΓΓ“Γ‡" And myUcase(Left$(ss$, 5)) <> "Γ”ΓΓ‡ΓΓ" And myUcase(Left$(ss$, 9)) <> "Γ“Γ•ΓΓΓ‘Γ”Γ‡Γ“Γ‡") Or (((AscW(ss$) And &H4000) = &H4000)) Then
     ss$ = mycoder.must(ss$)
     If NORUN1 Then
         Clipboard.Clear
@@ -23531,9 +23537,9 @@ NumberId numid, funid
 StringId strid, strfunid
 NoOptimum = False
 If Lang = 0 Then
-sHelp "Μ2000 [ΒΟΗΘΕΙΑ]", "Γράψε ΤΕΛΟΣ για να βγεις από το πρόγραμμα" & vbCrLf & "Δες τα ΟΛΑ (κάνε κλικ στο ΟΛΑ)" & vbCrLf & "George Karras 2018", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
+sHelp "Γ2000 [Γ‚ΓΓ‡ΓΓ…Γ‰Γ]", "ΓƒΓ±ΓΓΈΓ¥ Γ”Γ…Γ‹ΓΓ“ Γ£Γ©Γ΅ Γ­Γ΅ ΓΆΓ£Γ¥Γ©Γ² Γ΅Γ°ΓΌ Γ΄Γ― Γ°Γ±ΓΌΓ£Γ±Γ΅Γ¬Γ¬Γ΅" & vbCrLf & "Γ„Γ¥Γ² Γ΄Γ΅ ΓΓ‹Γ (ΓªΓΓ­Γ¥ ΓªΓ«Γ©Γª Γ³Γ΄Γ― ΓΓ‹Γ)" & vbCrLf & "George Karras 2018", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
 Else
-sHelp "Μ2000 [HELP]", "Write END for exit from this program" & vbCrLf & "See ALL commands  (click on ALL)" & vbCrLf & "George Karras 2018", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
+sHelp "Γ2000 [HELP]", "Write END for exit from this program" & vbCrLf & "See ALL commands  (click on ALL)" & vbCrLf & "George Karras 2018", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
 End If
 NERR = False
 lckfrm = 0
@@ -23584,7 +23590,7 @@ End If
  Form1.List1.Clear
     If lookOne(rest$, "!") Then
             ObjectCatalog.Done = True
-            For i = 0 To ObjectCatalog.count - 1
+            For i = 0 To ObjectCatalog.Count - 1
                 ObjectCatalog.index = i
                 Form1.List1.additemFast ObjectCatalog.KeyToString
                 
@@ -23643,7 +23649,7 @@ End If
             Next iSect
             ObjectCatalog.Sort
             ObjectCatalog.Done = True
-            For i = 0 To ObjectCatalog.count - 1
+            For i = 0 To ObjectCatalog.Count - 1
                 ObjectCatalog.index = i
                 Form1.List1.additemFast ObjectCatalog.KeyToString
                 
@@ -23695,7 +23701,7 @@ Function ProcDesktop(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim work1 As Boolean, oldleft As Long, oldtop As Long
 Dim photo As cDIBSection, s$, p As Variant, x As Double, aPic As StdPicture
 olamazi
-If IsLabelSymbolNew(rest$, "ΕΙΚΟΝΑ", "IMAGE", Lang) Then
+If IsLabelSymbolNew(rest$, "Γ…Γ‰ΓΓΓΓ", "IMAGE", Lang) Then
 If IsStrExp(bstack, rest$, s$) Then
 ' FILL WIDTH  IMAGE
  If Left$(s$, 4) = "cDIB" And Len(s$) > 12 Then
@@ -23751,14 +23757,14 @@ If IsStrExp(bstack, rest$, s$) Then
         End If
  Set photo = Nothing
 End If
-ElseIf IsLabelSymbolNew(rest$, "ΚΡΥΨΕ", "HIDE", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓ‘Γ•ΓΓ…", "HIDE", Lang) Then
 If Not form5iamloaded Then
 '
 End If
 Form5.backcolor = &H0 ' ALWAYS BLACK
 Form5.Cls
 SetTrans Form5, CByte(255), mycolor(0), True
-ElseIf IsLabelSymbolNew(rest$, "ΚΑΘΑΡΗ", "CLEAR", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓΓΓΓ‘Γ‡", "CLEAR", Lang) Then
 If form5iamloaded Then
 Form5.RestoreSizePos
 Form5.backcolor = &H0 ' ALWAYS BLACK
@@ -23807,7 +23813,7 @@ ProcDesktop = True
 End Function
 Function ProcFont(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim prive As Long, x1 As Long, s$
-If IsLabelSymbolNew(rest$, "ΦΟΡΤΩΣΕ", "LOAD", Lang) Then
+If IsLabelSymbolNew(rest$, "Γ–ΓΓ‘Γ”Γ™Γ“Γ…", "LOAD", Lang) Then
 Do
 If IsStrExp(bstack, rest$, s$) Then
     s$ = CFname$(s$)
@@ -23820,7 +23826,7 @@ Else
     Exit Function
 End If
 Loop Until Not FastSymbol(rest$, ",")
-ElseIf IsLabelSymbolNew(rest$, "ΔΙΑΓΡΑΦΗ", "REMOVE", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ„Γ‰ΓΓƒΓ‘ΓΓ–Γ‡", "REMOVE", Lang) Then
 Do
 If IsStrExp(bstack, rest$, s$) Then
     s$ = CFname$(s$)
@@ -23977,7 +23983,7 @@ If IsExp(bstack, rest$, p) Then
     ElseIf IsExp(bstack, rest$, sX) Then
     Beeper sX, p
     Else
-    MyEr "wrong parameter", "λάθος παράμετρος"
+    MyEr "wrong parameter", "Γ«ΓΓ¨Γ―Γ² Γ°Γ΅Γ±ΓΓ¬Γ¥Γ΄Γ±Γ―Γ²"
     Exit Function
     End If
 Else
@@ -24171,7 +24177,7 @@ End Function
 Function MyLineInput(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim f As Long, p As Variant, what$, it As Long, s$, i As Long, prive As Long, frm$
 Dim pppp As mArray
-If IsLabelSymbolNew(rest$, "ΕΙΣΑΓΩΓΗΣ", "INPUT", Lang) Then
+If IsLabelSymbolNew(rest$, "Γ…Γ‰Γ“ΓΓƒΓ™ΓƒΓ‡Γ“", "INPUT", Lang) Then
 If FastSymbol(rest$, "#") Then
 
     If Not IsExp(bstack, rest$, p) Then Exit Function
@@ -24181,7 +24187,7 @@ If FastSymbol(rest$, "#") Then
     Case 3
     MyLineInput = True
     If uni(f) Then
-    If Not getUniStringlINE(f, s$) Then MyLineInput = False: MyEr "Can't input, not UTF16LE", "Δεν μπορώ να εισάγω, όχι UTF16LE": Exit Function
+    If Not getUniStringlINE(f, s$) Then MyLineInput = False: MyEr "Can't input, not UTF16LE", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¥Γ©Γ³ΓΓ£ΓΉ, ΓΌΓ·Γ© UTF16LE": Exit Function
     Else
     getAnsiStringlINE f, s$
     End If
@@ -24199,7 +24205,7 @@ If FastSymbol(rest$, "#") Then
     End If
     MyLineInput = True
     If uni(f) Then
-    If Not getUniStringlINE(f, s$) Then MyLineInput = False: MyEr "Can't input, not UTF16LE", "Δεν μπορώ να εισάγω, όχι UTF16LE": Exit Function
+    If Not getUniStringlINE(f, s$) Then MyLineInput = False: MyEr "Can't input, not UTF16LE", "Γ„Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ¥Γ©Γ³ΓΓ£ΓΉ, ΓΌΓ·Γ© UTF16LE": Exit Function
     Else
     getAnsiStringlINE f, s$
     End If
@@ -24233,7 +24239,7 @@ Case 6
 If neoGetArray(bstack, what$, pppp) Then
                        If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then Exit Function
                 Else
-                 MyEr "No such array", "Δεν υπάρχει τέτοιος πίνακας"
+                 MyEr "No such array", "Γ„Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ© Γ΄ΓΓ΄Γ―Γ©Γ―Γ² Γ°ΓΓ­Γ΅ΓªΓ΅Γ²"
                        Exit Function
                 End If
                            prive = GetCode(bstack.Owner)
@@ -24289,7 +24295,7 @@ there01:
                 Err.Clear
                 CheckVarLong var(i), CLng(Int(p))
                 If Err > 0 Then
-                If Err.Number = 6 Then MyEr "overflowlong Long", "Υπερχείλιση  μακρύ"
+                If Err.Number = 6 Then MyEr "overflowlong Long", "Γ•Γ°Γ¥Γ±Γ·Γ¥ΓΓ«Γ©Γ³Γ§  Γ¬Γ΅ΓªΓ±Γ½"
                 Err.Clear
                 MyLong = False
                 Exit Function
@@ -24308,7 +24314,7 @@ there12:
                             Err.Clear
                             CheckVarLong var(i), CLng(Int(p))
                             If Err > 0 Then
-                            If Err.Number = 6 Then MyEr "overflowlong Long", "Υπερχείλιση  μακρύ"
+                            If Err.Number = 6 Then MyEr "overflowlong Long", "Γ•Γ°Γ¥Γ±Γ·Γ¥ΓΓ«Γ©Γ³Γ§  Γ¬Γ΅ΓªΓ±Γ½"
                             Err.Clear
                             MyLong = False
                             Exit Function
@@ -24333,7 +24339,7 @@ Dim s$, p As Variant, ss$, x As Double, y As Double
 Dim LRec As RecordMci
     
     
-    If IsLabelSymbolNew(rest$, "ΝΕΑ", "NEW", Lang) Then
+    If IsLabelSymbolNew(rest$, "ΓΓ…Γ", "NEW", Lang) Then
         Set sRec = New RecordMci
         Set LRec = sRec
         If Not LRec.HaveMic Then GoTo noMic
@@ -24365,16 +24371,16 @@ Dim LRec As RecordMci
         Set LRec = sRec
     ss$ = vbNullString
     
-    If IsLabelSymbolNewExp(rest$, "ΕΙΣΑΓΩΓΗ", "INSERT", Lang, ss$) Then
+    If IsLabelSymbolNewExp(rest$, "Γ…Γ‰Γ“ΓΓƒΓ™ΓƒΓ‡", "INSERT", Lang, ss$) Then
         LRec.Capture True
-    ElseIf IsLabelSymbolNewExp(rest$, "ΑΛΛΑΓΗ", "OVERWRITE", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ‹Γ‹ΓΓƒΓ‡", "OVERWRITE", Lang, ss$) Then
         LRec.ReCapture
-    ElseIf IsLabelSymbolNewExp(rest$, "ΑΠΟΚΟΠΗ", "DELETE", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "ΓΓΓΓΓΓΓ‡", "DELETE", Lang, ss$) Then
             If IsExp(basestack, rest$, x, , True) Then
             Else
                 x = 0
             End If
-            If IsLabelSymbolNew(rest$, "ΕΩΣ", "TO", Lang) Then
+            If IsLabelSymbolNew(rest$, "Γ…Γ™Γ“", "TO", Lang) Then
                 If Not IsExp(basestack, rest$, y, , True) Then
                     y = LRec.getLengthInMS
                 End If
@@ -24382,7 +24388,7 @@ Dim LRec As RecordMci
                 y = LRec.getLengthInMS
             End If
             LRec.CutRecordMs CDbl(x), CDbl(y)
-    ElseIf IsLabelSymbolNewExp(rest$, "ΕΝΤΑΣΗ", "VOLUME", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "Γ…ΓΓ”ΓΓ“Γ‡", "VOLUME", Lang, ss$) Then
                 If IsExp(basestack, rest$, x, , True) Then
                     If x < 0 Then x = 0
                     If x > 100 Then x = 100
@@ -24390,11 +24396,11 @@ Dim LRec As RecordMci
                 Else
                     LRec.setVolume 50&
                 End If
-    ElseIf IsLabelSymbolNewExp(rest$, "ΔΙΑΚΟΠΗ", "STOP", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "Γ„Γ‰ΓΓΓΓΓ‡", "STOP", Lang, ss$) Then
         LRec.recStop
-    ElseIf IsLabelSymbolNewExp(rest$, "ΔΟΚΙΜΗ", "TEST", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "Γ„ΓΓΓ‰ΓΓ‡", "TEST", Lang, ss$) Then
         LRec.recPlay
-    ElseIf IsLabelSymbolNewExp(rest$, "ΘΕΣΗ", "POS", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ…Γ“Γ‡", "POS", Lang, ss$) Then
         If LRec.isRecPlaying Then
             If IsExp(basestack, rest$, x, , True) Then
             LRec.recPlayFromMs x
@@ -24409,19 +24415,19 @@ Dim LRec As RecordMci
             LRec.oneMCI "seek capture to 0"
             End If
         End If
-    ElseIf IsLabelSymbolNewExp(rest$, "ΣΩΣΕ", "SAVE", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "Γ“Γ™Γ“Γ…", "SAVE", Lang, ss$) Then
         If IsStrExp(basestack, rest$, s$) Then
             LRec.SaveAs s$
         Else
             LRec.Save
         End If
-    ElseIf IsLabelSymbolNewExp(rest$, "ΚΛΕΙΣΕ", "END", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ‹Γ…Γ‰Γ“Γ…", "END", Lang, ss$) Then
         Set sRec = Nothing
         Set LRec = Nothing
     End If
     Else
         
-        MyEr "You don't have new recording", "Δεν έχεις ετοιμάσει νέα ηχογράφηση"
+        MyEr "You don't have new recording", "Γ„Γ¥Γ­ ΓΓ·Γ¥Γ©Γ² Γ¥Γ΄Γ―Γ©Γ¬ΓΓ³Γ¥Γ© Γ­ΓΓ΅ Γ§Γ·Γ―Γ£Γ±ΓΓ¶Γ§Γ³Γ§"
     End If
   ProcSoundRec = True
   Exit Function
@@ -24455,7 +24461,7 @@ Dim s$, ss$, x As Double, y As Double
 Set Scr = basestack.Owner
 On Error Resume Next
 ProcMedia = True
-If IsLabelSymbolNew(rest$, "ΦΟΡΤΩΣΕ", "LOAD", Lang) Then
+If IsLabelSymbolNew(rest$, "Γ–ΓΓ‘Γ”Γ™Γ“Γ…", "LOAD", Lang) Then
             If AVIUP Then
                   AVI.GETLOST
                   MyDoEvents
@@ -24497,7 +24503,7 @@ If IsLabelSymbolNew(rest$, "ΦΟΡΤΩΣΕ", "LOAD", Lang) Then
             
     ElseIf AVIUP Then
     ss$ = vbNullString
-        If IsLabelSymbolNewExp(rest$, "ΔΕΙΞΕ", "SHOW", Lang, ss$) Then
+        If IsLabelSymbolNewExp(rest$, "Γ„Γ…Γ‰ΓΓ…", "SHOW", Lang, ss$) Then
             'If Not AVIRUN Then MediaPlayer1.playMovie: MediaPlayer1.pauseMovie
             
             
@@ -24528,17 +24534,17 @@ If IsLabelSymbolNew(rest$, "ΦΟΡΤΩΣΕ", "LOAD", Lang) Then
                 ProcMedia = True
                 Exit Function
        End If
-        ElseIf IsLabelSymbolNewExp(rest$, "ΚΡΥΨΕ", "HIDE", Lang, ss$) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ‘Γ•ΓΓ…", "HIDE", Lang, ss$) Then
                 AVI.Hide
                 Set Scr = Nothing
                 ProcMedia = True
                 Exit Function
-        ElseIf IsLabelSymbolNewExp(rest$, "ΚΡΑΤΗΣΕ", "PAUSE", Lang, ss$) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ‘ΓΓ”Γ‡Γ“Γ…", "PAUSE", Lang, ss$) Then
                 If MediaPlayer1.isMoviePlaying Then MediaPlayer1.pauseMovie
                 Set Scr = Nothing
                 ProcMedia = True
                 Exit Function
-        ElseIf IsLabelSymbolNewExp(rest$, "ΠΑΙΞΕ", "PLAY", Lang, ss$) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "ΓΓΓ‰ΓΓ…", "PLAY", Lang, ss$) Then
         
                 If Not AVIRUN Then
                 AVI.Interval = MediaPlayer1.getLengthInMS - MediaPlayer1.getPositionInMS
@@ -24549,7 +24555,7 @@ If IsLabelSymbolNew(rest$, "ΦΟΡΤΩΣΕ", "LOAD", Lang) Then
                 Set Scr = Nothing
                 ProcMedia = True
                 Exit Function
-        ElseIf IsLabelSymbolNewExp(rest$, "ΞΕΚΙΝΑ", "RESTART", Lang, ss$) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ…ΓΓ‰ΓΓ", "RESTART", Lang, ss$) Then
                     If Not MediaPlayer1.isMoviePlaying Then
                     
                          MediaPlayer1.playMovie
@@ -24562,7 +24568,7 @@ If IsLabelSymbolNew(rest$, "ΦΟΡΤΩΣΕ", "LOAD", Lang) Then
                     Set Scr = Nothing
                     ProcMedia = True
                     Exit Function
-        ElseIf IsLabelSymbolNewExp(rest$, "ΣΤΟ", "TO", Lang, ss$) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "Γ“Γ”Γ", "TO", Lang, ss$) Then
                     If IsExp(basestack, rest$, x) Then
                         If MediaPlayer1.getLengthInMS > 0 Then MediaPlayer1.setPositionTo x
                         
@@ -24572,7 +24578,7 @@ If IsLabelSymbolNew(rest$, "ΦΟΡΤΩΣΕ", "LOAD", Lang) Then
                     Exit Function
 
         End If
-    ElseIf IsLabelSymbolNewExp(rest$, "ΚΡΥΨΕ", "HIDE", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ‘Γ•ΓΓ…", "HIDE", Lang, ss$) Then
     
     End If
     ss$ = vbNullString
@@ -24752,7 +24758,7 @@ Function ProcImage(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim photo As cDIBSection, pppp As mArray, s$, x1 As Long, y1 As Long, w$, it As Long, p As Variant, part As Boolean, border As Long, titl$
 Dim aPic As StdPicture, s1$, usecolorback As Boolean, ihavepic As Boolean, mem As MemBlock, cback As Long, usehandler As mHandler
 ProcImage = True
-part = IsLabelSymbolNew(rest$, "ΠΛΑΙΣΙΟ", "FRAME", Lang)
+part = IsLabelSymbolNew(rest$, "ΓΓ‹ΓΓ‰Γ“Γ‰Γ", "FRAME", Lang)
 If IsStrExp(bstack, rest$, s$) Then
     ihavepic = Left$(s$, 4) = "cDIB" And Len(s$) > 12
     GoTo cont1
@@ -24786,7 +24792,7 @@ ElseIf IsExp(bstack, rest$, p) Then
     Set usehandler = Nothing
     Set bstack.lastobj = Nothing
 errNoImage:
-    MyEr "No Image found", "Δεν βρήκα εικόνα"
+    MyEr "No Image found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ¥Γ©ΓªΓΌΓ­Γ΅"
     Exit Function
 cont1:
     x1 = 0
@@ -24830,7 +24836,7 @@ cont1:
         Else
            ThumbImage bstack.Owner, x1, y1, s$, border, dv15, titl$
         End If
-    ElseIf IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
+    ElseIf IsLabelSymbolNew(rest$, "Γ“Γ”Γ", "TO", Lang) Then
         If CFname(s$) <> "" Or ihavepic Or Not aPic Is Nothing Then
             Select Case Abs(IsLabel(bstack, rest$, w$))
             Case 3
@@ -24873,7 +24879,7 @@ cont1:
                     ElseIf Not cDib(s$, photo) Then
                         Set photo = Nothing
                         ProcImage = False
-                        MyEr "No Image Found", "Δεν βρήκε εικόνα"
+                        MyEr "No Image Found", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ¥ Γ¥Γ©ΓªΓΌΓ­Γ΅"
                         Exit Function
                     End If
                     x1 = photo.Width
@@ -24915,12 +24921,12 @@ cont1:
                 End If
                 Exit Function
             Case 6
-    ' ΑΠΟ ΠΙΝΑΚΑ
+    ' ΓΓΓ ΓΓ‰ΓΓΓΓ
                 Dim W5 As Long
                 If neoGetArray(bstack, w$, pppp) Then
                     If Not NeoGetArrayItem(pppp, bstack, w$, W5, rest$) Then ProcImage = False: MissNumExpr: Exit Function
                     If MyIsObject(pppp.item(W5)) Then
-                        MyEr "can't copy image to " + pppp.ItemType(W5), "δεν μπορώ να αντιγράψω εικόνα σε " + pppp.ItemType(W5)
+                        MyEr "can't copy image to " + pppp.ItemType(W5), "Γ¤Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ΅Γ­Γ΄Γ©Γ£Γ±ΓΓΈΓΉ Γ¥Γ©ΓªΓΌΓ­Γ΅ Γ³Γ¥ " + pppp.ItemType(W5)
                         ProcImage = False
                         Exit Function
                     End If
@@ -24963,7 +24969,7 @@ cont1:
                     If photo.Width > 0 Then
                         Set photo = photo.Resample(y1, x1)
                         If MyIsObject(pppp.item(W5)) Then
-                            MyEr "can't copy image to " + pppp.ItemType(W5), "δεν μπορώ να αντιγράψω εικόνα σε " + pppp.ItemType(W5)
+                            MyEr "can't copy image to " + pppp.ItemType(W5), "Γ¤Γ¥Γ­ Γ¬Γ°Γ―Γ±ΓΎ Γ­Γ΅ Γ΅Γ­Γ΄Γ©Γ£Γ±ΓΓΈΓΉ Γ¥Γ©ΓªΓΌΓ­Γ΅ Γ³Γ¥ " + pppp.ItemType(W5)
                             ProcImage = False
                         Else
                             pppp.item(W5) = DIBtoSTR(photo)
@@ -24976,16 +24982,16 @@ cont1:
                 End If
             End Select
         Else
-            MyEr "missing file, or image in string or in buffer", "λείπει αρχείο ή εικόνα σε αλφαριθμητικό ή σε διάρθρωση μνήμης"
+            MyEr "missing file, or image in string or in buffer", "Γ«Γ¥ΓΓ°Γ¥Γ© Γ΅Γ±Γ·Γ¥ΓΓ― Γ Γ¥Γ©ΓªΓΌΓ­Γ΅ Γ³Γ¥ Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ Γ Γ³Γ¥ Γ¤Γ©ΓΓ±Γ¨Γ±ΓΉΓ³Γ§ Γ¬Γ­ΓΓ¬Γ§Γ²"
             ProcImage = False
             Exit Function
         End If
-    ElseIf IsLabelSymbolNew(rest$, "ΕΞΑΓΩΓΗ", "EXPORT", Lang) Then
+    ElseIf IsLabelSymbolNew(rest$, "Γ…ΓΓΓƒΓ™ΓƒΓ‡", "EXPORT", Lang) Then
         If IsStrExp(bstack, rest$, w$) Then
             If Not CanKillFile(w$) Then FilePathNotForUser:  Exit Function
             Set photo = New cDIBSection
             If Not (ihavepic Or Not aPic Is Nothing) Then
-                 MyEr "No found Image in String or Buffer", "Δεν βρήκα εικόνα σε αλφαριθμητικό ή σε διάρθρωση μνήμης"
+                 MyEr "No found Image in String or Buffer", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ¥Γ©ΓªΓΌΓ­Γ΅ Γ³Γ¥ Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ Γ Γ³Γ¥ Γ¤Γ©ΓΓ±Γ¨Γ±ΓΉΓ³Γ§ Γ¬Γ­ΓΓ¬Γ§Γ²"
                  ProcImage = False
                  Exit Function
             ElseIf aPic Is Nothing Then
@@ -25005,7 +25011,7 @@ cont4:
                         photo.SaveDib ExtractPath(w$) + ExtractNameOnly(w$, True) & ".bmp"
                     End If
                 Else
-                 MyEr "No Proper Image in String", "Δεν βρήκα κατάλληλη εικόνα σε αλφαριθμητικό"
+                 MyEr "No Proper Image in String", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ ΓªΓ΅Γ΄ΓΓ«Γ«Γ§Γ«Γ§ Γ¥Γ©ΓªΓΌΓ­Γ΅ Γ³Γ¥ Γ΅Γ«Γ¶Γ΅Γ±Γ©Γ¨Γ¬Γ§Γ΄Γ©ΓªΓΌ"
                  ProcImage = False
                  Exit Function
                 End If
@@ -25024,7 +25030,7 @@ cont4:
             Set photo = Nothing
             Exit Function
         Else
-             ProcImage = False: MyEr "Missing Filename", "Δεν βρήκα όνομα αρχείου": Exit Function
+             ProcImage = False: MyEr "Missing Filename", "Γ„Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ ΓΌΓ­Γ―Γ¬Γ΅ Γ΅Γ±Γ·Γ¥ΓΓ―Γµ": Exit Function
         End If
 ElseIf mem Is Nothing Then
     If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then x1 = p
@@ -25087,7 +25093,7 @@ If MaybeIsSymbol(rest$, ",") Then GoTo renderthere
         If x1 > -1 Then x1 = d1.ScaleX(x1, 1, 3)
         If y1 > -1 Then y1 = d1.ScaleY(y1, 1, 3)
         With players(GetCode(d1))
-            'If FastSymbol(rest$, ",") Then MyEr "Not for bitmap", "όχι για εικόνα σημείων": ProcImage = False: Exit Function
+            'If FastSymbol(rest$, ",") Then MyEr "Not for bitmap", "ΓΌΓ·Γ© Γ£Γ©Γ΅ Γ¥Γ©ΓªΓΌΓ­Γ΅ Γ³Γ§Γ¬Γ¥ΓΓΉΓ­": ProcImage = False: Exit Function
             
             mem.DrawImageToHdc d1, .XGRAPH \ dv15, .YGRAPH \ dv15, x1, y1
         End With
@@ -25132,7 +25138,7 @@ If IsExp(bstack, rest$, p) Then
                 End If
             End If
         End If
-        If IsLabelSymbolNew(rest$, "ΜΕ", "USE", Lang) Then ' no need for coma
+        If IsLabelSymbolNew(rest$, "ΓΓ…", "USE", Lang) Then ' no need for coma
             Select Case Abs(IsLabel(bstack, rest$, what$))
             Case 3
                 If GetVar(bstack, what$, i) Then s$ = var(i)
@@ -25198,7 +25204,7 @@ mis:
                     
                     End If
                     
-                   If IsLabelSymbolNew(rest$, "ΜΕΓΕΘΟΣ", "SIZE", Lang) Then
+                   If IsLabelSymbolNew(rest$, "ΓΓ…ΓƒΓ…ΓΓΓ“", "SIZE", Lang) Then
               If Not IsExp(bstack, rest$, sY) Then ProcPlayer = False: MissNumExpr: Exit Function
               Else
               sY = 1
@@ -25218,7 +25224,7 @@ mis:
         
         End If
         Else ' without x, y
-            If IsLabelSymbolNew(rest$, "ΜΕ", "USE", Lang) Then
+            If IsLabelSymbolNew(rest$, "ΓΓ…", "USE", Lang) Then
         Select Case Abs(IsLabel(bstack, rest$, what$))
         Case 3
             If GetVar(bstack, what$, i) Then s$ = var(i)
@@ -25267,7 +25273,7 @@ mis:
             Else
     
             End If
-            If IsLabelSymbolNew(rest$, "ΜΕΓΕΘΟΣ", "SIZE", Lang) Then          ' SIZE WITHOUT COMMA
+            If IsLabelSymbolNew(rest$, "ΓΓ…ΓƒΓ…ΓΓΓ“", "SIZE", Lang) Then          ' SIZE WITHOUT COMMA
                 If Not IsExp(bstack, rest$, sY) Then ProcPlayer = False: MissNumExpr: Exit Function
             Else
                 sY = 1
@@ -25276,25 +25282,25 @@ mis:
             it = GetNewSpriteObj(orig, s$, Col, CLng(sX), CSng(sY), CSng(sxy), frm$)
             ' no USE no X, Y or X,Y USE ..
             ' only command
-        ElseIf IsLabelSymbolNew(rest$, "ΔΕΙΞΕ", "SHOW", Lang) Then     ' SHOW
+        ElseIf IsLabelSymbolNew(rest$, "Γ„Γ…Γ‰ΓΓ…", "SHOW", Lang) Then     ' SHOW
             SrpiteHideShow orig, (True)
-        ElseIf IsLabelSymbolNew(rest$, "ΚΡΥΨΕ", "HIDE", Lang) Then        ' HIDE
+        ElseIf IsLabelSymbolNew(rest$, "ΓΓ‘Γ•ΓΓ…", "HIDE", Lang) Then        ' HIDE
             SrpiteHideShow orig, (False)
-        ElseIf IsLabelSymbolNew(rest$, "ΠΑΝΩ", "OVER", Lang) Then      ' ΠΑΝΩ
+        ElseIf IsLabelSymbolNew(rest$, "ΓΓΓΓ™", "OVER", Lang) Then      ' ΓΓΓΓ™
             If IsExp(bstack, rest$, x) Then
                 If orig <> x Then SpriteControlOver orig, CLng(x)
                 
             Else
                 ProcPlayer = False
             End If
-        ElseIf IsLabelSymbolNew(rest$, "ΥΠΟ", "UNDER", Lang) Then
+        ElseIf IsLabelSymbolNew(rest$, "Γ•ΓΓ", "UNDER", Lang) Then
             If IsExp(bstack, rest$, x) Then
                 If orig <> x Then SpriteControlUnder orig, CLng(x)
                 
             Else
                 ProcPlayer = False
             End If
-        ElseIf IsLabelSymbolNew(rest$, "ΑΛΛΑΞΕ", "SWAP", Lang) Then       ' SWAP
+        ElseIf IsLabelSymbolNew(rest$, "ΓΓ‹Γ‹ΓΓΓ…", "SWAP", Lang) Then       ' SWAP
             If IsExp(bstack, rest$, x) Then
                 If orig <> x Then SpriteControl orig, CLng(x)
                 
@@ -25811,7 +25817,7 @@ If entrypoint = 1 Then dum = True
     ss$ = GetNextLine(frm$)
     SetNextLine frm$
     If frm$ <> "" Then
-    MyEr "filename with line breaks", "όνομα αρχείου με αλλαγές γραμμών"
+    MyEr "filename with line breaks", "ΓΌΓ­Γ―Γ¬Γ΅ Γ΅Γ±Γ·Γ¥ΓΓ―Γµ Γ¬Γ¥ Γ΅Γ«Γ«Γ΅Γ£ΓΓ² Γ£Γ±Γ΅Γ¬Γ¬ΓΎΓ­"
     
     End If
     ' check valid name
@@ -25889,7 +25895,7 @@ prive = GetCode(basestack.Owner)
             If Lang = 1 Then
             PlainBaSket basestack.Owner, players(prive), "NO RECURSION LIMIT FOR SUBRUTINES"
             Else
-            PlainBaSket basestack.Owner, players(prive), "ΧΩΡΙΣ ΟΡΙΟ ΑΝΑΔΡΟΜΗΣ ΣΤΙΣ ΡΟΥΤΙΝΕΣ"
+            PlainBaSket basestack.Owner, players(prive), "Γ—Γ™Γ‘Γ‰Γ“ ΓΓ‘Γ‰Γ ΓΓΓΓ„Γ‘ΓΓΓ‡Γ“ Γ“Γ”Γ‰Γ“ Γ‘ΓΓ•Γ”Γ‰ΓΓ…Γ“"
             End If
             
     Else
@@ -25902,12 +25908,12 @@ prive = GetCode(basestack.Owner)
         PlainBaSket basestack.Owner, players(prive), "RECURSION LIMIT FOR FUNCTIONS " + CStr(stacksize \ 9832 - 1)
         End If
     Else
-        PlainBaSket basestack.Owner, players(prive), "ΟΡΙΟ ΑΝΑΔΡΟΜΗΣ ΣΤΙΣ ΡΟΥΤΙΝΕΣ " + CStr(deep)
+        PlainBaSket basestack.Owner, players(prive), "ΓΓ‘Γ‰Γ ΓΓΓΓ„Γ‘ΓΓΓ‡Γ“ Γ“Γ”Γ‰Γ“ Γ‘ΓΓ•Γ”Γ‰ΓΓ…Γ“ " + CStr(deep)
          crNew basestack, players(prive)
           If m_bInIDE Then
-          PlainBaSket basestack.Owner, players(prive), "ΟΡΙΟ ΑΝΑΔΡΟΜΗΣ ΣΤΙΣ ΣΥΝΑΡΤΗΣΕΙΣ " + CStr(stacksize \ 2948 - 1)
+          PlainBaSket basestack.Owner, players(prive), "ΓΓ‘Γ‰Γ ΓΓΓΓ„Γ‘ΓΓΓ‡Γ“ Γ“Γ”Γ‰Γ“ Γ“Γ•ΓΓΓ‘Γ”Γ‡Γ“Γ…Γ‰Γ“ " + CStr(stacksize \ 2948 - 1)
           Else
-        PlainBaSket basestack.Owner, players(prive), "ΟΡΙΟ ΑΝΑΔΡΟΜΗΣ ΣΤΙΣ ΣΥΝΑΡΤΗΣΕΙΣ " + CStr(stacksize \ 9832 - 1)
+        PlainBaSket basestack.Owner, players(prive), "ΓΓ‘Γ‰Γ ΓΓΓΓ„Γ‘ΓΓΓ‡Γ“ Γ“Γ”Γ‰Γ“ Γ“Γ•ΓΓΓ‘Γ”Γ‡Γ“Γ…Γ‰Γ“ " + CStr(stacksize \ 9832 - 1)
         End If
     End If
     End If
@@ -25971,7 +25977,7 @@ Locale:
                     End If
     
     If Clid = 1032 Then
-    DefBooleanString = ";Αληθές;Ψευδές"
+    DefBooleanString = ";ΓΓ«Γ§Γ¨ΓΓ²;ΓΓ¥ΓµΓ¤ΓΓ²"
     Else
     DefBooleanString = ";\T\r\u\e;\F\a\l\s\e"
     End If
@@ -26062,7 +26068,7 @@ Dim p As Variant
         If IsExp(basestack, rest$, p, , True) Then
         If Not StartJoypadk(MyRound(p)) Then
         ' ERROR
-        MyEr "Joypad " & CStr(p) & " not exist", "η λαβή " & CStr(p) & " δεν υπάρχει"
+        MyEr "Joypad " & CStr(p) & " not exist", "Γ§ Γ«Γ΅ΓΆΓ " & CStr(p) & " Γ¤Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ©"
         
         Exit Function
         End If
@@ -26070,13 +26076,13 @@ Dim p As Variant
         
          If IsExp(basestack, rest$, p, , True) Then
         If Not StartJoypadk(MyRound(p)) Then
-        MyEr "Joypad " & CStr(p) & " not exist", "η λαβή " & CStr(p) & " δεν υπάρχει"
+        MyEr "Joypad " & CStr(p) & " not exist", "Γ§ Γ«Γ΅ΓΆΓ " & CStr(p) & " Γ¤Γ¥Γ­ ΓµΓ°ΓΓ±Γ·Γ¥Γ©"
         
         Exit Function
 
         End If
         Else
-        MyEr "Joypad Number?", "Αριθμός Λαβής?"
+        MyEr "Joypad Number?", "ΓΓ±Γ©Γ¨Γ¬ΓΌΓ² Γ‹Γ΅ΓΆΓΓ²?"
         
         Exit Function
 
@@ -26108,7 +26114,7 @@ If IsExp(bstack, rest$, p) Then
         beeperBEAT = CLng(p)
         PlayTune (s$)
     Else
-        MyEr "wrong parameter", "λάθος παράμετρος"
+        MyEr "wrong parameter", "Γ«ΓΓ¨Γ―Γ² Γ°Γ΅Γ±ΓΓ¬Γ¥Γ΄Γ±Γ―Γ²"
         Exit Function
     End If
 ElseIf IsStrExp(bstack, rest$, s$) Then
@@ -26125,7 +26131,7 @@ x1 = Abs(IsLabelFileName(bstack, rest$, s$, , w$))
 
 If x1 = 1 Then
 s$ = w$
- If Not IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then ProcName = False: Exit Function
+ If Not IsLabelSymbolNew(rest$, "Γ™Γ“", "AS", Lang) Then ProcName = False: Exit Function
 
  y1 = Abs(IsLabelFileName(bstack, rest$, ss$, , w$))
 
@@ -26145,7 +26151,7 @@ Else
 rest$ = s$ + rest$
 End If
 If IsStrExp(bstack, rest$, s$) Then
- If Not IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then ProcName = False: Exit Function
+ If Not IsLabelSymbolNew(rest$, "Γ™Γ“", "AS", Lang) Then ProcName = False: Exit Function
 If IsStrExp(bstack, rest$, ss$) Then
 On Error Resume Next
 If Not RenameFile(s$, ss$) Then NoRename
@@ -26329,7 +26335,7 @@ Do
     Select Case IsLabel(bstack, b$, w$)
     Case 1
         If GetlocalVar(w$, ii) Then
-            MyEr "Variable exist as local", "Η μεταβλητή υπάρχει ως τοπική"
+            MyEr "Variable exist as local", "Γ‡ Γ¬Γ¥Γ΄Γ΅ΓΆΓ«Γ§Γ΄Γ ΓµΓ°ΓΓ±Γ·Γ¥Γ© ΓΉΓ² Γ΄Γ―Γ°Γ©ΓªΓ"
             StaticNew = False
             Exit Function
         End If
@@ -26374,7 +26380,7 @@ Do
                             Else
 aaaa1:
                             Set bstack.lastobj = Nothing
-                            MyEr "only for pointers for float groups", "μόνο για δείκτες σε μη στατικά αντικείμενα"
+                            MyEr "only for pointers for float groups", "Γ¬ΓΌΓ­Γ― Γ£Γ©Γ΅ Γ¤Γ¥ΓΓªΓ΄Γ¥Γ² Γ³Γ¥ Γ¬Γ§ Γ³Γ΄Γ΅Γ΄Γ©ΓªΓ Γ΅Γ­Γ΄Γ©ΓªΓ¥ΓΓ¬Γ¥Γ­Γ΅"
                             Exit Function
                         End If
                     End If
@@ -26382,50 +26388,50 @@ aaaa1:
                     bstack.SetVar w$, p
                 End If
                 Set bstack.lastobj = Nothing
-            ElseIf IsLabelSymbolNew(b$, "ΩΣ", "AS", Lang) Then
-               If IsLabelSymbolNew(b$, "ΑΡΙΘΜΟΣ", "DECIMAL", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "Γ™Γ“", "AS", Lang) Then
+               If IsLabelSymbolNew(b$, "ΓΓ‘Γ‰ΓΓΓΓ“", "DECIMAL", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                         If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                     p = CDec(p)
-                ElseIf IsLabelSymbolNew(b$, "ΔΙΠΛΟΣ", "DOUBLE", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(b$, "Γ„Γ‰ΓΓ‹ΓΓ“", "DOUBLE", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                         If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                     p = CDbl(p)
-                ElseIf IsLabelSymbolNew(b$, "ΑΠΛΟΣ", "SINGLE", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(b$, "ΓΓΓ‹ΓΓ“", "SINGLE", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                         If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                     p = CSng(p)
-                ElseIf IsLabelSymbolNew(b$, "ΛΟΓΙΚΟΣ", "BOOLEAN", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(b$, "Γ‹ΓΓƒΓ‰ΓΓΓ“", "BOOLEAN", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                         If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                     p = CBool(p)
-                ElseIf IsLabelSymbolNew(b$, "ΜΑΚΡΥΣ", "LONG", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(b$, "ΓΓΓΓ‘Γ•Γ“", "LONG", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                         If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                     p = CLng(p)
-                ElseIf IsLabelSymbolNew(b$, "ΑΚΕΡΑΙΟΣ", "INTEGER", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(b$, "ΓΓΓ…Γ‘ΓΓ‰ΓΓ“", "INTEGER", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                         If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                     p = CInt(p)
-                ElseIf IsLabelSymbolNew(b$, "ΛΟΓΙΣΤΙΚΟ", "CURRENCY", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(b$, "Γ‹ΓΓƒΓ‰Γ“Γ”Γ‰ΓΓ", "CURRENCY", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                         If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
@@ -26436,7 +26442,7 @@ aaaa1:
                     bstack.SetVarobJ w$, p
                     GoTo aaa1
                 Else
-                    MyEr "No type found", "δεν βρήκα τύπο"
+                    MyEr "No type found", "Γ¤Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ΄Γ½Γ°Γ―"
                     Exit Function
                 End If
                 bstack.SetVar w$, p
@@ -26459,7 +26465,7 @@ aaaa1:
             ii = 1
             ss$ = aheadstatus(b$, False, ii)
             b$ = Mid$(b$, ii)
-        ElseIf Fast2VarNoTrim(b$, "ΩΣ", 2, "AS", 2, 3, ii) Then
+        ElseIf Fast2VarNoTrim(b$, "Γ™Γ“", 2, "AS", 2, 3, ii) Then
             ii = 1
             ss$ = aheadstatus(b$, False, ii)
             b$ = Mid$(b$, ii)
@@ -26483,51 +26489,51 @@ aaaa1:
         If Not bstack.ExistVar(w$) Then
             If FastSymbol(b$, "=") Then
             If Not IsExp(bstack, b$, p) Then SyntaxError: Exit Function
-            ElseIf IsLabelSymbolNew(b$, "ΩΣ", "AS", Lang) Then
+            ElseIf IsLabelSymbolNew(b$, "Γ™Γ“", "AS", Lang) Then
     
-               If IsLabelSymbolNew(b$, "ΑΡΙΘΜΟΣ", "DECIMAL", Lang, , , , False) Then
+               If IsLabelSymbolNew(b$, "ΓΓ‘Γ‰ΓΓΓΓ“", "DECIMAL", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                     p = CDec(p)
-            ElseIf IsLabelSymbolNew(b$, "ΔΙΠΛΟΣ", "DOUBLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "Γ„Γ‰ΓΓ‹ΓΓ“", "DOUBLE", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CDbl(p)
-            ElseIf IsLabelSymbolNew(b$, "ΑΠΛΟΣ", "SINGLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "ΓΓΓ‹ΓΓ“", "SINGLE", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CSng(p)
-            ElseIf IsLabelSymbolNew(b$, "ΛΟΓΙΚΟΣ", "BOOLEAN", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "Γ‹ΓΓƒΓ‰ΓΓΓ“", "BOOLEAN", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CBool(p)
-            ElseIf IsLabelSymbolNew(b$, "ΜΑΚΡΥΣ", "LONG", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "ΓΓΓΓ‘Γ•Γ“", "LONG", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CLng(p)
-            ElseIf IsLabelSymbolNew(b$, "ΑΚΕΡΑΙΟΣ", "INTEGER", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "ΓΓΓ…Γ‘ΓΓ‰ΓΓ“", "INTEGER", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CInt(p)
-            ElseIf IsLabelSymbolNew(b$, "ΛΟΓΙΣΤΙΚΟ", "CURRENCY", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "Γ‹ΓΓƒΓ‰Γ“Γ”Γ‰ΓΓ", "CURRENCY", Lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
@@ -26536,7 +26542,7 @@ aaaa1:
 
                 p = CCur(p)
             Else
-            MyEr "No type found", "δεν βρήκα τύπο"
+            MyEr "No type found", "Γ¤Γ¥Γ­ ΓΆΓ±ΓΓªΓ΅ Γ΄Γ½Γ°Γ―"
             Exit Function
             End If
             
@@ -26547,7 +26553,7 @@ aaaa1:
          ii = 1
             ss$ = aheadstatus(b$, False, ii)
         b$ = Mid$(b$, ii)
-        ElseIf Fast2VarNoTrim(b$, "ΩΣ", 2, "AS", 2, 3, ii) Then
+        ElseIf Fast2VarNoTrim(b$, "Γ™Γ“", 2, "AS", 2, 3, ii) Then
          ii = 1
             ss$ = aheadstatus(b$, False, ii)
         b$ = Mid$(b$, ii)
@@ -26556,7 +26562,7 @@ aaaa1:
         
     Case Else
 conthere:
-        MyErMacro b$, "No static for that type " + w$, "Όχι στατική για αυτό το τύπο " + w$
+        MyErMacro b$, "No static for that type " + w$, "ΒΌΓ·Γ© Γ³Γ΄Γ΅Γ΄Γ©ΓªΓ Γ£Γ©Γ΅ Γ΅ΓµΓ΄ΓΌ Γ΄Γ― Γ΄Γ½Γ°Γ― " + w$
         Exit Function
     End Select
 aaa1:
@@ -26635,7 +26641,7 @@ there1:
                 End If
                 MyDocument = True
             Else
-                MyErMacro rest$, "array has no dimension", "ο πίνακας δεν έχει οριστεί"
+                MyErMacro rest$, "array has no dimension", "Γ― Γ°ΓΓ­Γ΅ΓªΓ΅Γ² Γ¤Γ¥Γ­ ΓΓ·Γ¥Γ© Γ―Γ±Γ©Γ³Γ΄Γ¥Γ"
                 MyDocument = False
                 Exit Function
             End If
@@ -26837,7 +26843,7 @@ Function ProcKeyboard(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim par As Boolean, s$, p As Variant, w3 As Long, g As gList
 Dim alt, shift, ctrl, again As Boolean
 On Error Resume Next
-If IsLabelSymbolNew(rest$, "ΦΟΡΤΩΣΕ", "LOAD", Lang) Then
+If IsLabelSymbolNew(rest$, "Γ–ΓΓ‘Γ”Γ™Γ“Γ…", "LOAD", Lang) Then
 If IsStrExp(basestack, rest$, s$) Then
     Set basestack.lastobj = Nothing
     If LoadKeyboardLayout(s$, KLF_ACTIVATE) <> 0 Then
@@ -26850,7 +26856,7 @@ Else
     LoadKeyboardLayout "00000409", KLF_ACTIVATE
     End If
 End If
-ElseIf IsLabelSymbolNew(rest$, "ΠΕΤΑ", "REMOVE", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ΓΓ…Γ”Γ", "REMOVE", Lang) Then
 If IsStrExp(basestack, rest$, s$) Then
     Set basestack.lastobj = Nothing
     If s$ = "00000408" Or s$ = "00000409" Then
@@ -26860,7 +26866,7 @@ If IsStrExp(basestack, rest$, s$) Then
     End If
     End If
 End If
-ElseIf IsLabelSymbolNew(rest$, "ΔΩΣΕ", "PUT", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "Γ„Γ™Γ“Γ…", "PUT", Lang) Then
     If IsStrExp(basestack, rest$, s$) Then
         If s$ <> vbNullString Then
         
@@ -26873,7 +26879,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΔΩΣΕ", "PUT", Lang) Then
             p = p + 500
         Else
 err123:
-            MyEr "Code out of range", "Κωδικός εκτός εμβέλειας"
+            MyEr "Code out of range", "ΓΓΉΓ¤Γ©ΓªΓΌΓ² Γ¥ΓªΓ΄ΓΌΓ² Γ¥Γ¬ΓΆΓΓ«Γ¥Γ©Γ΅Γ²"
             Exit Function
         End If
     ElseIf IsExp(basestack, rest$, p, , True) Then
@@ -26992,32 +26998,32 @@ Dim ss$
 While FastSymbol(rest$, ",")
 ss$ = vbNullString
 x = Empty
-If IsLabelSymbolNewExp(rest$, "ΦΡΑΣΗ", "TEXT", Lang, ss$) Then
+If IsLabelSymbolNewExp(rest$, "Γ–Γ‘ΓΓ“Γ‡", "TEXT", Lang, ss$) Then
 If IsStrExp(bstack, rest$, w$) Then q(p).Tag = w$
-ElseIf IsLabelSymbolNewExp(rest$, "ΠΕΝΑ", "PEN", Lang, ss$) Then
+ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ…ΓΓ", "PEN", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then q(p).pen = x
-ElseIf IsLabelSymbolNewExp(rest$, "ΦΟΝΤΟ", "BACK", Lang, ss$) Then
+ElseIf IsLabelSymbolNewExp(rest$, "Γ–ΓΓΓ”Γ", "BACK", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then q(p).back = x
-ElseIf IsLabelSymbolNewExp(rest$, "ΠΛΑΙΣΙΟ", "BORDER", Lang, ss$) Then
+ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ‹ΓΓ‰Γ“Γ‰Γ", "BORDER", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then q(p).fore = x
-ElseIf IsLabelSymbolNewExp(rest$, "ΟΔΗΓΙΑ", "COMMAND", Lang, ss$) Then
+ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ„Γ‡ΓƒΓ‰Γ", "COMMAND", Lang, ss$) Then
 If IsStrExp(bstack, rest$, w$) Then q(p).Comm = w$
-ElseIf IsLabelSymbolNewExp(rest$, "ΤΙΜΗ", "VALUE", Lang, ss$) Then
+ElseIf IsLabelSymbolNewExp(rest$, "Γ”Γ‰ΓΓ‡", "VALUE", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then q(p).topval = Int(x * 100)
-ElseIf IsLabelSymbolNewExp(rest$, "ΒΑΣΗ", "BASE", Lang, ss$) Then
+ElseIf IsLabelSymbolNewExp(rest$, "Γ‚ΓΓ“Γ‡", "BASE", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then q(p).botval = Int(x * 100):
-ElseIf IsLabelSymbolNewExp(rest$, "ΧΡΩΜΑ", "COLOR", Lang, ss$) Then
+ElseIf IsLabelSymbolNewExp(rest$, "Γ—Γ‘Γ™ΓΓ", "COLOR", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then q(p).barC = x
-ElseIf IsLabelSymbolNewExp(rest$, "ΜΕΓΕΘΟΣ", "SIZE", Lang, ss$) Then
+ElseIf IsLabelSymbolNewExp(rest$, "ΓΓ…ΓƒΓ…ΓΓΓ“", "SIZE", Lang, ss$) Then
 If IsExp(bstack, rest$, x, , True) Then
 If x > 100 Then x = 100
 If x < -100 Then x = -100
 q(p).imagesize = Int(x)
 End If
-' "ΚΑΘΕΤΗ", "PORTRAIT"
-ElseIf IsLabelSymbolNewExp(rest$, "ΚΑΘΕΤΗ", "PORTRAIT", Lang, ss$) Then
+' "ΓΓΓΓ…Γ”Γ‡", "PORTRAIT"
+ElseIf IsLabelSymbolNewExp(rest$, "ΓΓΓΓ…Γ”Γ‡", "PORTRAIT", Lang, ss$) Then
     If IsExp(bstack, rest$, x, , True) Then q(p).Vertical = Int(x) <> 0
-ElseIf IsLabelSymbolNewExp(rest$, "ΕΙΚΟΝΑ", "IMAGE", Lang, ss$) Then
+ElseIf IsLabelSymbolNewExp(rest$, "Γ…Γ‰ΓΓΓΓ", "IMAGE", Lang, ss$) Then
 If IsExp(bstack, rest$, x) Then
     If bstack.lastobj Is Nothing Then
     Set q(p).drawimage = Nothing
@@ -27101,7 +27107,7 @@ MyError = False
 Exit Function
 
 Else
-MyEr "ERROR " & Trim$(Str$(p)), "ΛΑΘΟΣ " & Trim$(Str$(p))
+MyEr "ERROR " & Trim$(Str$(p)), "Γ‹ΓΓΓΓ“ " & Trim$(Str$(p))
 LastErNum = p
 End If
 End If
@@ -27210,11 +27216,11 @@ Sub Str1nControlsGR(ByRef R$)
     Else
     Select Case Screen.ActiveForm.Name
     Case "AVI"
-    R$ = "ΤΑΙΝΙΑ"
+    R$ = "Γ”ΓΓ‰ΓΓ‰Γ"
     Case "Form1"
-    R$ = "ΚΥΡΙΟ"
+    R$ = "ΓΓ•Γ‘Γ‰Γ"
     Case "Form4"
-    R$ = "ΒΟΗΘΕΙΑ"
+    R$ = "Γ‚ΓΓ‡ΓΓ…Γ‰Γ"
     Case Else
     GetGuiM2000 R$
     End Select
@@ -27246,7 +27252,7 @@ Function IsSeek(bstack As basetask, a$, R As Variant, SG As Variant) As Boolean
         If Fstep(R) = 0 Then
             wrongfilenumber a$
         ElseIf Fstep(R) <> 1 Then
-            MyErMacro a$, "not valid file TYPE", "λάθος ΤΥΠΟΣ αρχείου"
+            MyErMacro a$, "not valid file TYPE", "Γ«ΓΓ¨Γ―Γ² Γ”Γ•ΓΓΓ“ Γ΅Γ±Γ·Γ¥ΓΓ―Γµ"
         Else
             R = SG * FileSeek(R)
             IsSeek = FastSymbol(a$, ")", True)
@@ -27265,7 +27271,7 @@ Public Function Validator(bstack As basetask, a$, v$, R, SG) As Boolean
             If GetVar(bstack, s$, VR) Then
                 R = SG * True
                 w1 = Abs(Asc(v$) < 128)
-                If IsLabelSymbolNew(a$, "ΩΣ", "AS", w1) Then
+                If IsLabelSymbolNew(a$, "Γ™Γ“", "AS", w1) Then
                     If IsLabel(bstack, a$, s$) Then
                         If Right$(s$, 1) = "(" Then FastSymbol a$, ")"
                         If GetVar(bstack, s$, v1&) Then
