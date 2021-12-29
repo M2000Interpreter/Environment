@@ -1,7 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 50 active-X
-Fix on a break in revision 49, for GOTO inside subroutines
+Version 10 revision 51 active-X
+Fix a bug (from 48 revision), when interpreter decide to call a subroutine without using Gosub statement. The problem was in Echelon example in Info file, in a line A(r,c)/=div1 (because / used for remark, but /= isn't a remark). So instead performing division for array element, decide to call the A(), and that is an error.
+
 
 
 George Karras, Kallithea Attikis, Greece.

@@ -26,6 +26,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 Option Explicit
 Public getout As Boolean
 Dim doubleclick As Long
@@ -91,7 +92,7 @@ GETLOST
 getout = True
 Else
 MediaPlayer1.hideMovie
-MediaPlayer1.Filename = avifile
+MediaPlayer1.FileName = avifile
 Timer1.enabled = False
 Interval = MediaPlayer1.Length
 
