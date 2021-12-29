@@ -864,7 +864,7 @@ End Function
 Public Sub RemoveAllFonts()
 Dim i As Long, FntFileName As String, Inc As Integer, rc As Long
 If FontList Is Nothing Then Exit Sub
-For i = 0 To FontList.count - 1
+For i = 0 To FontList.Count - 1
     FontList.index = i
     FntFileName = FontList.KeyToString
     Inc = 0
@@ -4199,7 +4199,7 @@ Case 13
 Case 125
 If openpar <> 0 And j > 0 Then
 pareprob:
-If paren.count > 0 Then countlines = paren.PopVal
+If paren.Count > 0 Then countlines = paren.PopVal
 If Not Lang Then
         b$ = sbname$ + "Problem in parenthesis in paragraph" + Str$(countlines)
     Else
@@ -11019,7 +11019,7 @@ Function ProcEnumGroup(bstack As basetask, rest$, Optional glob As Boolean = Fal
             mh.t1 = 4
             mh.ReadOnly = True
             mh.index_cursor = enumvalue
-            mh.index_start = myenum.count - 1
+            mh.index_start = myenum.Count - 1
              v1 = globalvar(bstack.GroupName + myUcase(w1$, gr), v1, , glob)
              Set var(v1) = mh
             ProcEnumGroup = True
@@ -11087,7 +11087,7 @@ Function ProcEnum(bstack As basetask, rest$, Optional glob As Boolean = False) A
             mh.t1 = 4
             mh.ReadOnly = True
             mh.index_cursor = enumvalue
-            mh.index_start = myenum.count - 1
+            mh.index_start = myenum.Count - 1
             
              v1 = globalvar(w1$, v1, , glob)
              Set var(v1) = mh
@@ -11295,18 +11295,18 @@ multi = False
 Select Case Left$(Pad$, cut - 1)
 Case "SUM", "ΑΘΡ"
 res = 0
-For w3 = 0 To pppp.count - 1
+For w3 = 0 To pppp.Count - 1
 If pppp.MyIsNumeric(pppp.item(w3)) Then res = res + pppp.item(w3)
 Next w3
 Case "MIN", "ΜΙΚ"
 res = 0
 w4 = -1
-If pppp.count > 0 Then
-For w3 = 0 To pppp.count - 1
+If pppp.Count > 0 Then
+For w3 = 0 To pppp.Count - 1
 If pppp.MyIsNumeric(w3) Then res = pppp.itemnumeric(w3): w4 = w3: Exit For
 Next w3
 
-For w3 = w3 To pppp.count - 1
+For w3 = w3 To pppp.Count - 1
 If pppp.MyIsNumeric(pppp.item(w3)) Then If pppp.item(w3) < res Then res = pppp.item(w3): w4 = w3
 Next w3
 End If
@@ -11320,12 +11320,12 @@ End If
 Case "MIN$", "ΜΙΚ$"
 res = vbNullString
 w4 = -1
-If pppp.count > 0 Then
-For w3 = 0 To pppp.count - 1
+If pppp.Count > 0 Then
+For w3 = 0 To pppp.Count - 1
 If pppp.IsStringItem(w3) Then res = pppp.item(w3): w4 = w3: Exit For
 Next w3
 
-For w3 = w3 To pppp.count - 1
+For w3 = w3 To pppp.Count - 1
 If pppp.IsStringItem(w3) Then If pppp.item(w3) < res Then res = pppp.item(w3): w4 = w3
 Next w3
 End If
@@ -11340,12 +11340,12 @@ End If
 Case "MAX$", "ΜΕΓ$"
 res = vbNullString
 w4 = -1
-If pppp.count > 0 Then
-For w3 = 0 To pppp.count - 1
+If pppp.Count > 0 Then
+For w3 = 0 To pppp.Count - 1
 If pppp.IsStringItem(w3) Then res = pppp.item(w3): w4 = w3: Exit For
 Next w3
 
-For w3 = w3 To pppp.count - 1
+For w3 = w3 To pppp.Count - 1
 If pppp.IsStringItem(w3) Then If pppp.item(w3) > res Then res = pppp.item(w3): w4 = w3
 Next w3
 End If
@@ -11359,12 +11359,12 @@ End If
 Case "MAX", "ΜΕΓ"
 res = 0
 w4 = -1
-If pppp.count > 0 Then
-For w3 = 0 To pppp.count - 1
+If pppp.Count > 0 Then
+For w3 = 0 To pppp.Count - 1
 If pppp.MyIsNumeric(pppp.item(w3)) Then res = pppp.itemnumeric(w3): w4 = w3: Exit For
 Next w3
 
-For w3 = w3 To pppp.count - 1
+For w3 = w3 To pppp.Count - 1
 If pppp.MyIsNumeric(pppp.item(w3)) Then If pppp.item(w3) > res Then res = pppp.item(w3): w4 = w3
 Next w3
 End If
@@ -11383,7 +11383,7 @@ If IsExp(bstack, a$, p, , True) Then
 Else
     w2 = 0
 End If
-If w2 < 0 Or w2 >= pppp.count Then
+If w2 < 0 Or w2 >= pppp.Count Then
 MyEr "offset out of limits", "Δείκτης εκτός ορίων"
 Matrix = False
 Exit Function
@@ -11402,7 +11402,7 @@ lookagain:
                         If FastSymbol(a$, ",") Then
                             If IsExp(bstack, a$, p, , True) Then
                                 w4 = CLng(Int(p))
-                                If w4 < 0 Or w4 >= .objref.count Then
+                                If w4 < 0 Or w4 >= .objref.Count Then
                                     indexout a$
                                     Exit Function
                                 End If
@@ -11446,7 +11446,7 @@ lookagain:
                     If FastSymbol(a$, ",") Then
                             If IsExp(bstack, a$, p, , True) Then
                                 w4 = CLng(Int(p))
-                                If w4 < 0 Or w4 >= .objref.count Then
+                                If w4 < 0 Or w4 >= .objref.Count Then
                                     indexout a$
                                     Exit Function
                                 End If
@@ -11490,7 +11490,7 @@ lookagain:
                 ElseIf usehandler.t1 = 1 And FastSymbol(a$, ",") Then
                     If IsExp(bstack, a$, p, , True) Then
                             w4 = CLng(Int(p))
-                            If w4 < 0 Or w4 >= .objref.count Then
+                            If w4 < 0 Or w4 >= .objref.Count Then
                             indexout a$
                             Exit Function
                             End If
@@ -11645,7 +11645,7 @@ If IsExp(bstack, a$, p, , True) Then
 Else
     w2 = 0
 End If
-If w2 < 0 Or w2 >= pppp.count Then
+If w2 < 0 Or w2 >= pppp.Count Then
 MyEr "offset out of limits", "Δείκτης εκτός ορίων"
 Matrix = False
 Exit Function
@@ -11665,7 +11665,7 @@ If .t1 = 3 Then
     ElseIf .t1 = 1 And FastSymbol(a$, ",") Then
         If IsExp(bstack, a$, p, , True) Then
                 w4 = CLng(Int(p))
-                If w4 < 0 Or w4 >= .objref.count Then
+                If w4 < 0 Or w4 >= .objref.Count Then
                 indexout a$
                 Exit Function
                 End If
@@ -11717,7 +11717,7 @@ Else
 End If
 Case "SLICE", "ΜΕΡΟΣ"
 If IsExp(bstack, a$, p, , True) Then
-If p < 0 Or p >= pppp.count Then
+If p < 0 Or p >= pppp.Count Then
     MyEr "start offset out of limits", "Δείκτης αρχής εκτός ορίων"
     Matrix = False
     Exit Function
@@ -11727,16 +11727,16 @@ p = 0
 End If
 If FastSymbol(a$, ",") Then
 If IsExp(bstack, a$, R, , True) Then
-    If R >= pppp.count Or R < p Then
+    If R >= pppp.Count Or R < p Then
     MyEr "end offset out of limits", "Δείκτης τέλους εκτός ορίων"
     Matrix = False
     Exit Function
     End If
 Else
-R = pppp.count - 1
+R = pppp.Count - 1
 End If
 Else
-R = pppp.count - 1
+R = pppp.Count - 1
 End If
 If original > 0 Then
 pppp.CopyArraySliceFast pppp1, CLng(p), CLng(R)
@@ -11798,8 +11798,8 @@ If FastSymbol(a$, ",") Then
     End If
 End If
 res = ""
-If pppp.count > 0 Then
-For w3 = 0 To pppp.count - 2
+If pppp.Count > 0 Then
+For w3 = 0 To pppp.Count - 2
 If pppp.IsStringItem(w3) Then
     If Len(s$) > 0 Then
         res = res + """" + StringToEscapeStr(pppp.item(w3)) + """" + Pad$
@@ -11893,7 +11893,7 @@ original = original + 1
 End If
 res = 0
 If FastSymbol(a$, ",") Then
-    If pppp.count = 0 Then
+    If pppp.Count = 0 Then
         If IsExp(bstack, a$, p, , True) Then
              res = p: retresonly = True
         ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
@@ -11936,7 +11936,7 @@ original = original + 1
 End If
 res = 0
 If FastSymbol(a$, ",") Then
-    If pppp.count = 0 Then
+    If pppp.Count = 0 Then
         If IsExp(bstack, a$, p) Then
             If Not bstack.lastobj Is Nothing Then
             If TypeOf bstack.lastobj Is mHandler Then
@@ -12005,10 +12005,10 @@ dothis:
                     Set pppp1 = usehandler.objref
             
                     sn() = pppp1.GetCopy()
-                    If pppp1.count > 0 Then
-                        ReDim Preserve sn(0 To pppp1.count - 1)
+                    If pppp1.Count > 0 Then
+                        ReDim Preserve sn(0 To pppp1.Count - 1)
                     End If
-                    cur = pppp1.count - 1
+                    cur = pppp1.Count - 1
                     w3 = p
                 End If
             ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
@@ -12027,11 +12027,11 @@ dothis:
             End If
         End If
         
-        If pppp.count > 0 Then
+        If pppp.Count > 0 Then
             res = -1
             If Not pppp1 Is Nothing Then
-                While res = -1 And cur >= 0 And w3 < pppp.count - cur - 1
-                    For w3 = w3 To pppp.count - cur - 1
+                While res = -1 And cur >= 0 And w3 < pppp.Count - cur - 1
+                    For w3 = w3 To pppp.Count - cur - 1
                         If pppp.MyIsObject(pppp.item(w3)) Then
                              If pppp.MyIsObject(sn(0)) Then GoTo inside
                         Else
@@ -12041,7 +12041,7 @@ inside:
                                 res = w3
                                 w4 = w3 + 1
                                 For w2 = 1 To cur
-                                    If w4 < pppp.count Then
+                                    If w4 < pppp.Count Then
                                         If pppp.MyIsObject(pppp.item(w4)) Then
                                             If Not pppp.MyIsObject(sn(w2)) Then
                                                 res = -1
@@ -12064,7 +12064,7 @@ inside:
                     Next w3
                 Wend
             Else
-                For w3 = p To pppp.count - 1
+                For w3 = p To pppp.Count - 1
                     If pppp.MyIsNumeric(pppp.item(w3)) Then
                         If pppp.item(w3) = R Then
                         res = w3: Exit For
@@ -12085,7 +12085,7 @@ inside:
                     If IsExp(bstack, a$, sn(cur), , True) Then
                         If res > -1 Then
                             w3 = w3 + 1
-                            If w3 < pppp.count Then
+                            If w3 < pppp.Count Then
                                 If pppp.MyIsNumeric(pppp.item(w3)) Then
                                     If pppp.item(w3) <> sn(cur) Then w2 = -1
                                 ElseIf pppp.ItemType(w3) = "mHandler" Then
@@ -12107,14 +12107,14 @@ inside:
                 If w2 = -1 Then
                     w3 = res + 1
                     res = -1
-                    While res = -1 And cur > 0 And w3 < pppp.count - cur - 1
-                        For w3 = w3 To pppp.count - cur - 1
+                    While res = -1 And cur > 0 And w3 < pppp.Count - cur - 1
+                        For w3 = w3 To pppp.Count - cur - 1
                             If pppp.MyIsNumeric(pppp.item(w3)) Then
                                 If pppp.item(w3) = sn(0) Then
                                     res = w3
                                     w4 = w3 + 1
                                     For w2 = 1 To cur
-                                        If w4 < pppp.count Then
+                                        If w4 < pppp.Count Then
                                             If pppp.MyIsNumeric(pppp.itemnumeric(w4)) Then
                                                 If pppp.item(w4) <> sn(w2) Then res = -1: Exit For
                                             ElseIf pppp.ItemType(w4) = "mHandler" Then
@@ -12143,9 +12143,9 @@ inside:
 there:
         ReDim st(0 To 4) As String
         st(0) = Pad$
-        If pppp.count > 0 Then
+        If pppp.Count > 0 Then
             res = -1
-            For w3 = p To pppp.count - 1
+            For w3 = p To pppp.Count - 1
                 If pppp.IsStringItem(w3) Then
                     If pppp.item(w3) = st(0) Then res = w3: Exit For
                 End If
@@ -12157,7 +12157,7 @@ there:
                 If IsStrExp(bstack, a$, st(cur)) Then
                     If res > -1 Then
                         w3 = w3 + 1
-                        If w3 < pppp.count Then
+                        If w3 < pppp.Count Then
                             If pppp.IsStringItem(w3) Then
                                 If pppp.item(w3) <> st(cur) Then w2 = -1
                             Else
@@ -12174,14 +12174,14 @@ there:
             If w2 = -1 Then
                 w3 = res + 1
                 res = -1
-                While res = -1 And cur > 0 And w3 < pppp.count - cur - 1
-                    For w3 = w3 To pppp.count - cur - 1
+                While res = -1 And cur > 0 And w3 < pppp.Count - cur - 1
+                    For w3 = w3 To pppp.Count - cur - 1
                         If pppp.IsStringItem(w3) Then
                             If pppp.item(w3) = st(0) Then
                                 res = w3
                                 w4 = w3 + 1
                                 For w2 = 1 To cur
-                                    If w4 < pppp.count Then
+                                    If w4 < pppp.Count Then
                                         If pppp.IsStringItem(w4) Then
                                             If pppp.item(w4) <> st(w2) Then res = -1: Exit For
                                         Else
@@ -12213,7 +12213,7 @@ Matrix = FastSymbol(a$, ")")
 If Not multi Then Exit Do
 If Matrix = False Then Exit Do
 If Not IsOperator(a$, "#") Then Exit Do
-If pppp.count = 0 Then
+If pppp.Count = 0 Then
         Do
         w2 = 1
         aheadstatus a$, , w2
@@ -12292,11 +12292,11 @@ w1 = globalvarGroup("A_" + CStr(w2), 0#)
     nbstack.OriginalCode = 0
     nbstack.UseGroupname = vbNullString
 Dim aa As Object, oldsoros As mStiva, tempsoros As New mStiva, finalpppp As New mArray
-finalpppp.StartResize: finalpppp.PushDim pppp.count: finalpppp.PushEnd
+finalpppp.StartResize: finalpppp.PushDim pppp.Count: finalpppp.PushEnd
 Set oldsoros = bstack.soros
 Set bstack.Sorosref = tempsoros
 Dim R, what As Long, where As Long
-For w1 = 0 To pppp.count - 1
+For w1 = 0 To pppp.Count - 1
  
   If pppp.IsStringItem(w1) Then
     tempsoros.PushStrVariant pppp.item(w1)
@@ -12347,11 +12347,11 @@ w1 = globalvarGroup("A_" + CStr(w2), 0#)
     nbstack.OriginalCode = 0
     nbstack.UseGroupname = vbNullString
 Dim aa As Object, oldsoros As mStiva, tempsoros As New mStiva, finalpppp As New mArray
-finalpppp.StartResize: finalpppp.PushDim pppp.count: finalpppp.PushEnd
+finalpppp.StartResize: finalpppp.PushDim pppp.Count: finalpppp.PushEnd
 Set oldsoros = bstack.soros
 Set bstack.Sorosref = tempsoros
 Dim R, what As Long, where As Long
-For w1 = 0 To pppp.count - 1
+For w1 = 0 To pppp.Count - 1
  
   If pppp.IsStringItem(w1) Then
     tempsoros.PushStrVariant pppp.item(w1)
@@ -12361,7 +12361,7 @@ For w1 = 0 To pppp.count - 1
       tempsoros.PushVal pppp.item(w1)
   End If
   If Not GoFunc(nbstack, "A_" + CStr(Abs(w2)) + "()", vbNullString, R, w2, , , True) Then Exit For
-  If tempsoros.count > 0 Then
+  If tempsoros.Count > 0 Then
   If tempsoros.StackItemTypeIsObject(1) Then
   Set finalpppp.item(w1) = tempsoros.PopObj
   Else
@@ -12407,7 +12407,7 @@ Else
 tempsoros.PushStrVariant res
 End If
 
-For w1 = 0 To pppp.count - 1
+For w1 = 0 To pppp.Count - 1
 
   If pppp.IsStringItem(w1) Then
     tempsoros.PushStrVariant pppp.item(w1)
@@ -12419,7 +12419,7 @@ For w1 = 0 To pppp.count - 1
   If Not GoFunc(nbstack, "A_" + CStr(Abs(w2)) + "()", vbNullString, R, w2, , , True) Then Exit For
   
 Next w1
-  If tempsoros.count > 0 Then
+  If tempsoros.Count > 0 Then
   If tempsoros.StackItemTypeIsObject(1) Then
         Set bstack.lastobj = tempsoros.PopObj
         res = 0
@@ -12605,8 +12605,8 @@ If CheckIsmArray(anything) Then
         Exit Function
     End If
     On Error GoTo 0
-    If w < 0 Then w = pppp.count - w + bs
-    If w > (pppp.count + bs) Then GoTo outlimit
+    If w < 0 Then w = pppp.Count - w + bs
+    If w > (pppp.Count + bs) Then GoTo outlimit
     If w < 0 Then
 outlimit:
     MyEr "Index out of limits", "Ο δείκτης είναι εκτός ορίων"
@@ -12664,8 +12664,8 @@ If CheckStackObj(bstack, anything) Then
         Exit Function
     End If
     On Error GoTo 0
-    If w < 0 Then w = stiva.count - w + 1
-    If w > stiva.count Then GoTo outlimit
+    If w < 0 Then w = stiva.Count - w + 1
+    If w > stiva.Count Then GoTo outlimit
     If w < 0 Then GoTo outlimit
    
     If FastSymbol(rest$, ":=", , 2) Then
@@ -13601,7 +13601,7 @@ Function interpret(bstack As basetask, b$, Optional ByPass As Boolean) As Boolea
 Dim di As Object, myobject As Object, i As Long, x1 As Long, ok As Boolean, sp As Variant
 Dim usehandler As mHandler, usehandler2 As mHandler
 Set di = bstack.Owner
-Dim prive As basket
+Dim prive As basket, cb As CodeBlock
 'b$ = Trim$(b$)
 Dim w$, ww#, LLL As Long, sss As Long, v As Long, p As Variant, ss$, sw$, ohere$
 Dim pppp As mArray, i1 As Long, Lang As Long
@@ -13617,8 +13617,14 @@ Do While Len(b$) <> LLL
 If LastErNum <> 0 Then Exit Do
 LLL = Len(b$)
 
-
-If FastSymbol(b$, "{") Then
+If FastSymbol(b$, ".") Then
+' run in codeblock
+            Set cb = New CodeBlock
+            cb.Construct b$
+            cb.ExportStr bstack
+            cb.codeline (0)
+            
+ElseIf FastSymbol(b$, "{") Then
 If Not interpret(bstack, block(b$)) Then interpret = False: here$ = ohere$: GoTo there1
 If FastSymbol(b$, "}") Then
 sss = Len(b$)
@@ -14201,7 +14207,7 @@ somethingelse:
                              interpret = False
                                 GoTo there1
                         ElseIf ss$ = "++" Then
-                        If usehandler.index_start < usehandler.objref.count - 1 Then
+                        If usehandler.index_start < usehandler.objref.Count - 1 Then
                             usehandler.index_start = usehandler.index_start + 1
                             usehandler.objref.index = usehandler.index_start
                             usehandler.index_cursor = usehandler.objref.Value
@@ -16159,10 +16165,10 @@ End Function
 
 Sub ClearLoadedForms()
 Dim i As Long, j As Long, Start As Long
-j = Forms.count
+j = Forms.Count
 Debug.Print ""
 While j > 0
-For i = Start To Forms.count - 1
+For i = Start To Forms.Count - 1
 If TypeOf Forms(i) Is GuiM2000 Then Unload Forms(i): Start = i: Exit For
 Next i
 j = j - 1
@@ -16843,7 +16849,7 @@ Dim x1 As Long, y1 As Long, frm$, par As Boolean, ohere$, ss$, w$, sX As Double,
 Dim pppp As mArray, hlp$, h&, all$, myobject As Object, usehandler As mHandler, usegroup As Group
 Dim w1 As Long, w2 As Long, w3 As Long, dum As Boolean, virtualtop As Long
 pn& = 0
-virtualtop = varhash.count - 1
+virtualtop = varhash.Count - 1
 'GoTo ByPass  '********************************
 For pn& = virtualtop To 0 Step -1
     varhash.ReadVar pn&, s$, h&
@@ -16854,7 +16860,7 @@ ByPass:
 pn& = 0
 Dim a() As String
 With players(prive)
-    Do While pn& < varhash.count
+    Do While pn& < varhash.Count
         varhash.ReadVar pn&, s$, h&
         If SecureNames Then
             a() = Split(s$, "].")
@@ -17135,7 +17141,7 @@ s$ = vbNullString
 If Not bstack.StaticCollection Is Nothing Then
 Dim st1 As Long, mList As FastCollection
 Set mList = bstack.StaticCollection
-For st1 = 1 To mList.count
+For st1 = 1 To mList.Count
 mList.index = st1 - 1
 If Left$(mList.KeyToString, 2) <> "%_" Then
     If s$ <> "" Then s$ = s$ + ", "
@@ -17415,7 +17421,7 @@ pa$ = s$: s$ = vbNullString
 End If
 
 If x1 <> 0 Then
-        If subHash.count = 0 Or pa$ = vbNullString Then MyEr "Nothing to save", "Δεν υπάρχει κάτι να σώσω":              Exit Function
+        If subHash.Count = 0 Or pa$ = vbNullString Then MyEr "Nothing to save", "Δεν υπάρχει κάτι να σώσω":              Exit Function
         If ExtractType(pa$) = "gsb1" Then
             MyEr "Recovery Mode (file is a gsb1 type): use another name or set type to gsb", "Κατάσταση Ανάκτησης (o τύπος αρχείου είναι gsb1): χρησιμοποίησε άλλο όνομα χωρίς τύπο, ή τύπο gsb"
             Exit Function
@@ -17430,7 +17436,7 @@ If x1 <> 0 Then
         If Not WeCanWrite(pa$) Then Exit Function
         
       
-           For i = subHash.count - 1 To 0 Step -1
+           For i = subHash.Count - 1 To 0 Step -1
        subHash.ReadVar i, s$, Col
        If Not Len(sbf(Col).sbgroup) > 0 Then
        
@@ -17960,10 +17966,10 @@ ProcRemove = False
 Else
 If basestack.IamChild Or basestack.IamAnEvent Or basestack.IamThread Or HaltLevel > 0 Then Exit Function
 If sb2used > 0 Then
-If MsgBoxN(IIf(pagio$ <> "GREEK", "Remove last module/function", "Να διαγράψω το τελευταίο τμήμα") & vbCrLf & sbf(subHash.count).goodname, 1) = 1 Then
+If MsgBoxN(IIf(pagio$ <> "GREEK", "Remove last module/function", "Να διαγράψω το τελευταίο τμήμα") & vbCrLf & sbf(subHash.Count).goodname, 1) = 1 Then
 
 
-If subHash.count > 0 Then subHash.ReduceHash subHash.count - 1, sbf()
+If subHash.Count > 0 Then subHash.ReduceHash subHash.Count - 1, sbf()
     If UBound(sbf()) / 2 > sb2used And UBound(sbf()) > 19 Then
        ReDim Preserve sbf(UBound(sbf()) / 2 + 1) As modfun
          
@@ -18186,21 +18192,21 @@ what$ = Left$(what$, Len(what$) - 1)
         End With
     Case "Socket"
     Set aVar = New Socket
-    Set pppp.item(pppp.count - 1) = aVar
+    Set pppp.item(pppp.Count - 1) = aVar
     Case "SerialPort"
     Set aVar = New SerialPort
-    Set pppp.item(pppp.count - 1) = aVar
+    Set pppp.item(pppp.Count - 1) = aVar
     Case "ShellPipe"
     Set aVar = New ShellPipe
-    Set pppp.item(pppp.count - 1) = aVar
+    Set pppp.item(pppp.Count - 1) = aVar
     Case "cHttpDownload"
     Set aVar = New cHttpDownload
-    Set pppp.item(pppp.count - 1) = aVar
+    Set pppp.item(pppp.Count - 1) = aVar
     Case "CallBack2"
         Dim Aaaa As CallBack2
-        Set Aaaa = pppp.item(pppp.count - 1)
+        Set Aaaa = pppp.item(pppp.Count - 1)
         Set aVar = Aaaa.CopyOfMe
-        Set pppp.item(pppp.count - 1) = aVar
+        Set pppp.item(pppp.Count - 1) = aVar
     Case Else
     ' any other com object
     
@@ -18210,7 +18216,7 @@ what$ = Left$(what$, Len(what$) - 1)
     If neoGetArray(bstack, ChrW(&HFFBF) + "_" + what$ + "(", pppp1, True) Then
      i = pppp1.UpperMonoLimit + 1
     pppp1.SerialItem 0, i + 2, 9
-    GetShinkArr2 pppp, pppp1, what$, (pppp1.count - 1), (pppp1.count)
+    GetShinkArr2 pppp, pppp1, what$, (pppp1.Count - 1), (pppp1.Count)
     End If
     End If
 ifier = True
@@ -18583,12 +18589,12 @@ MyDeclare = True
 Set declobj = Nothing
 End Function
 
-Private Function GetShinkArr(v As Long, where As Long, objname$, from As Long, count As Long) As Boolean
+Private Function GetShinkArr(v As Long, where As Long, objname$, from As Long, Count As Long) As Boolean
 Dim aa As Object, ok As Boolean, i As Long, pppp As mArray, pppp1 As mArray, ev As ComShinkEvent
 Set pppp = var(v)
 Set pppp1 = var(where)
 ok = True
-For i = from To count + from - 1
+For i = from To Count + from - 1
     Set ev = New ComShinkEvent
     
     Set aa = pppp.item(i)
@@ -18609,13 +18615,13 @@ For i = from To count + from - 1
    Next i
    GetShinkArr = ok
 End Function
-Private Function GetShinkArr2(pppp As mArray, pppp1 As mArray, objname$, from As Long, count As Long) As Boolean
+Private Function GetShinkArr2(pppp As mArray, pppp1 As mArray, objname$, from As Long, Count As Long) As Boolean
 Dim aa As Object, ok As Boolean, i As Long, ev As ComShinkEvent
 ok = True
 Set ev = pppp1.item(0)
 Dim v As Long
 v = ev.VarIndex
-For i = from To count - 1
+For i = from To Count - 1
     Set ev = New ComShinkEvent
     
     Set aa = pppp.item(i)
@@ -18710,7 +18716,7 @@ Dim pppp As mArray, mmmm As mEvent
                 Set alfa.EventObj = mmmm
                 With mmmm
                     .BypassInit 10
-                    .VarIndex = i * 1000 + varhash.count
+                    .VarIndex = i * 1000 + varhash.Count
                     .enabled = True
                     .ParamBlock "Read msg$, &obj", 2
                     .GenItemCreator LTrim$(Str(i * 456)), "{ Module " + here$ + vbCrLf + "try { Call local " + here$ + "." + bstack.GroupName + what$ + "() } }" + here$ + "." + bstack.GroupName
@@ -18731,7 +18737,7 @@ contEvArray:
                     If y1 = 0 Then
                         With mmmm
                             .BypassInit 10
-                            .VarIndex = i * 1000 + varhash.count
+                            .VarIndex = i * 1000 + varhash.Count
                             .enabled = True
                             .ParamBlock "Read Index, msg$, &obj", 3
                             .GenItemCreator LTrim$(Str(i * 3456)), "{ Module " + here$ + vbCrLf + "try { call local " + here$ + "." + bstack.GroupName + what$ + "() } }" + here$ + "." + bstack.GroupName
@@ -23252,7 +23258,7 @@ End If
 
 '' list com
 '' List com to abcModule
-If ObjectCatalog.count <> 0 Then again$ = "!"
+If ObjectCatalog.Count <> 0 Then again$ = "!"
 ' use Choose.object + to make it again
 If ProcChooseObj(basestack, again$, Lang) Then
 ' list1 is a glist control
@@ -23584,7 +23590,7 @@ End If
  Form1.List1.Clear
     If lookOne(rest$, "!") Then
             ObjectCatalog.Done = True
-            For i = 0 To ObjectCatalog.count - 1
+            For i = 0 To ObjectCatalog.Count - 1
                 ObjectCatalog.index = i
                 Form1.List1.additemFast ObjectCatalog.KeyToString
                 
@@ -23643,7 +23649,7 @@ End If
             Next iSect
             ObjectCatalog.Sort
             ObjectCatalog.Done = True
-            For i = 0 To ObjectCatalog.count - 1
+            For i = 0 To ObjectCatalog.Count - 1
                 ObjectCatalog.index = i
                 Form1.List1.additemFast ObjectCatalog.KeyToString
                 

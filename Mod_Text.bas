@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 49
+Global Const Revision = 50
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3187,7 +3187,7 @@ Public Sub PushStage(basestack As basetask, dummy As Boolean)
                         .PushLong -2&
                         
                 Else
-                        .Push2long varhash.count, subHash.count
+                        .Push2long varhash.Count, subHash.Count
                         .Push2long var2used, sb2used
                         .PushLong -1&
                         numid.pushtop
@@ -3223,7 +3223,7 @@ Public Sub PopStage(basestack As basetask)
 End Sub
 Public Sub PushErrStage(basestack As basetask)
         With basestack.RetStack
-            .Push2long varhash.count, subHash.count
+            .Push2long varhash.Count, subHash.Count
             .Push2long basestack.SubLevel, sb2used
             .PushVal var2used
             .PushVal -4  ' from 6 to 4 entries
@@ -3581,8 +3581,8 @@ Dim kolpo As Boolean, bb$, once As Boolean, subsfc As FastCollection
 Dim Lang As Long, ok As Boolean, rv As Variant
 Dim small$, sbi As Long
 bstack.SetSkip
-Vars = var2used: Vname = varhash.count
-subs = sb2used: snames = subHash.count
+Vars = var2used: Vname = varhash.Count
+subs = sb2used: snames = subHash.Count
 numid.pushtop
 funid.pushtop
 strfunid.pushtop
@@ -4517,7 +4517,7 @@ jumpbad:
                                             bstack.addlen = nd&
                                             Exit Do
                                         Else
-                                            bb$ = Mid$(var(-S3).code$, i)
+                                            GoTo AGAINGOTOLAMBDA
                                         End If
                                     Else
                                         If i = 0 Or i > Len(sbf(S3).sb) Then
@@ -4526,9 +4526,10 @@ jumpbad:
                                             bstack.addlen = nd&
                                             Exit Do
                                         End If
-                                        bb$ = Mid$(sbf(S3).sb, i)
+                                        GoTo AGAINGOTO
                                     End If
                                 End If
+                               
                                 GoTo subsentry10
                             Else
                                 If S3 = 0 Then
@@ -4551,7 +4552,19 @@ checkother:
                                         Exit Do
                                     End If
                                     subsfc.ItemCreator2 bb$, i, S3
-                                    bb$ = Mid$(var(-S3).code$, i)
+AGAINGOTOLAMBDA:
+                                    If bstack.SubLevel > 0 Then
+                                                If Len(var(-S3).code$) - i > sbi Then
+                                                    bb$ = Mid$(var(-S3).code$, i, Len(var(-S3).code$) - i - sbi)
+                                                Else
+                                                    bb$ = Mid$(var(-S3).code$, i)
+                                                    sbi = 0
+                                                End If
+                                            Else
+                                                bb$ = Mid$(var(-S3).code$, i)
+                                                sbi = 0
+                                            End If
+                    
                                 Else
                                     i = PosLabel(bb$, sbf(S3).sb)
                                     If i = 0 Or i > Len(sbf(S3).sb) Then
@@ -4561,7 +4574,18 @@ checkother:
                                         Exit Do
                                     End If
                                     subsfc.ItemCreator2 bb$, i, S3
-                                    bb$ = Mid$(sbf(S3).sb, i)
+AGAINGOTO:
+                                    If bstack.SubLevel > 0 Then
+                                                If Len(sbf(S3).sb) - i > sbi Then
+                                                    bb$ = Mid$(sbf(S3).sb, i, Len(sbf(S3).sb) - i - sbi)
+                                                Else
+                                                    bb$ = Mid$(sbf(S3).sb, i)
+                                                    sbi = 0
+                                                End If
+                                            Else
+                                                bb$ = Mid$(sbf(S3).sb, i)
+                                                sbi = 0
+                                            End If
                                 End If
                                 
                                 GoTo subsentry10
@@ -7163,7 +7187,6 @@ conthere:
 
 End Function
 
-'
 Function IsNumberNew(bstack As basetask, a$, R As Variant, SG As Variant, flatobject) As Boolean
 Dim VR As Long, v$, v1&, w1 As Long, w2 As Long, p As Variant, s1$, dd As Long, dn As Long, w3 As Long
 Dim pp As Variant, pppp As mArray, nbstack As basetask, usehandler As mHandler, usebackup As Boolean
@@ -10105,7 +10128,7 @@ syntax1:
                                     Set pppp = usehandler.objref
                                     Set usehandler = Nothing
                                     w2 = CLng(p)
-                                    If pppp.count > w2 And w2 >= 0 Then
+                                    If pppp.Count > w2 And w2 >= 0 Then
                                         pppp.index = w2
                                         If MyIsObject(pppp.Value) Then
                                             FastSymbol a$, ")"
@@ -10142,9 +10165,9 @@ syntax1:
                         End If
                         With usehandler.objref
                             p = MyRound(p)
-                            If Abs(p) < .count Then
+                            If Abs(p) < .Count Then
                                 If p < 0 Then
-                                    .index = .count + MyRound(p)
+                                    .index = .Count + MyRound(p)
                                 Else
                                     .index = MyRound(p)
                                 End If
@@ -10478,7 +10501,7 @@ againsub:
             bstack.FuncValue = R
             Set bstack.FuncObj = Nothing
             dn = bstack.addlen
-            bstack.RetStack.Push3long Len(a$), 0, Len(a$) - Len(n$)
+            bstack.RetStack.PushVal CDec(0)
             
             If trace Then
             s1$ = TestShowSub: sg1 = TestShowBypass
@@ -10495,12 +10518,12 @@ againsub:
             w1 = w1 + Len(n$)
             TestShowBypass = True
             dd = 1
-            executeblock dd, bstack, n$, False, False, , True
+            executeblock dd, bstack, n$, False, True, , True
             SwapStrings s1$, TestShowSub: TestShowBypass = sg1
             Else
              w1 = w1 + Len(n$)
             dd = 1
-            executeblock dd, bstack, n$, False, False, , True
+            executeblock dd, bstack, n$, False, True, , True
             End If
             bstack.RetStackDrop 1
             bstack.addlen = dn
@@ -14052,9 +14075,9 @@ fstr2: '"EVAL$(", "≈ ÷—$(", "≈ ÷—¡”«$("
                 If FastSymbol(a$, ",") Then
                     If IsExp(bstackstr, a$, p, , True) Then
                         p = MyRound(p)
-                        If Abs(p) < .objref.count Then
+                        If Abs(p) < .objref.Count Then
                             If p < 0 Then
-                            .objref.index = .objref.count + MyRound(p)
+                            .objref.index = .objref.Count + MyRound(p)
                             Else
                             .objref.index = MyRound(p)
                             End If
@@ -15126,7 +15149,7 @@ check999100:
                     
                     End If
                     Else
-                        Set bstackstr.lastobj = anything.ExportArray(anything.count)
+                        Set bstackstr.lastobj = anything.ExportArray(anything.Count)
                         
                     End If
                     Set anything = Nothing
@@ -16737,9 +16760,9 @@ contrightstrpar:
             If IsExp(bstackstr, a$, p, , True) Then
                 If VarType(p) = vbBoolean Then p = CLng(p)
                 If FastSymbol(a$, "!") Then
-                    If Abs(p) < .count Then
+                    If Abs(p) < .Count Then
                         If p < 0 Then
-                            .index = .count + MyRound(p)
+                            .index = .Count + MyRound(p)
                         Else
                             .index = MyRound(p)
                         End If
@@ -18152,17 +18175,17 @@ contLoop:
             Case "BREAK", "ƒ…≈ œÿ≈"
 contBreak:
             restartmodule = False
-            If bstack.SubLevel > 0 Then
-                    WaitShow = 0
-                     PopStagePartContinue2 bstack, bstack.RetStackTotal
-                    once = False
-                    b$ = Chr$(0)
-                    If bstack.RetStackTotal = 0 Then Execute = 1 Else Execute = 2
-            Else
+            'If bstack.SubLevel > 0 Then
+            '        WaitShow = 0
+            '         PopStagePartContinue2 bstack, bstack.RetStackTotal
+            '        once = False
+            '        b$ = Chr$(0)
+            '        If bstack.RetStackTotal = 0 Then Execute = 1 Else Execute = 2
+            'Else
                 b$ = "BREAK"
                 once = True
                 Execute = 2
-                End If
+             '   End If
                 
                 Exit Function
             Case "CONTINUE", "”’Õ≈◊…”≈"
@@ -21537,7 +21560,7 @@ mystack.UseGroupname = basestack.UseGroupname
 mystack.Look2Parent = True
 mystack.strg = strg
 mystack.fHere = here$
-Vname = varhash.count
+Vname = varhash.Count
 Vars = var2used
 If usesamestack Then
     Set mystack.Sorosref = basestack.soros
@@ -21618,14 +21641,14 @@ Else
 End If
 
 If here$ <> ohere$ Or mystack.IamChild Or basestack.IamAnEvent Then
-    subs = sb2used: snames = subHash.count
+    subs = sb2used: snames = subHash.Count
     If Not mystack.CallLocalLast Then
         With mystack
-            .commnum = comhash.count
-            .strfunnum = strfunid.count
-            .numfunnum = funid.count
-            .strnum = strid.count
-            .numnum = numid.count
+            .commnum = comhash.Count
+            .strfunnum = strfunid.Count
+            .numfunnum = funid.Count
+            .strnum = strid.Count
+            .numnum = numid.Count
         End With
     End If
     i = 1: FK$(13) = vbNullString
@@ -21827,6 +21850,7 @@ therebad:
                                             GoTo thh
                                         Else
                                             bb$ = Mid$(ec$, i)
+                                            sbi = 0 ' ???? CHECK THIS
                                         End If
                                     Else
                                         S3 = subsfc.sValue
@@ -21836,7 +21860,18 @@ therebad:
                                                 '  bstack.addlen = nd&
                                                 GoTo thh
                                             Else
-                                                bb$ = Mid$(var(-S3).code$, i)
+AGAINGOTOLAMBDA:
+                                                If mystack.SubLevel > 0 Then
+                                                    If Len(var(-S3).code$) - i > sbi Then
+                                                        bb$ = Mid$(var(-S3).code$, i, Len(var(-S3).code$) - i - sbi)
+                                                    Else
+                                                        bb$ = Mid$(var(-S3).code$, i)
+                                                        sbi = 0
+                                                    End If
+                                                Else
+                                                    bb$ = Mid$(var(-S3).code$, i)
+                                                    sbi = 0
+                                                End If
                                             End If
                                         Else
                                             If i = 0 Or i > Len(sbf(S3).sb) Then
@@ -21844,7 +21879,18 @@ therebad:
                                                 '  bstack.addlen = nd&
                                                 GoTo thh
                                             End If
-                                            bb$ = Mid$(sbf(S3).sb, i)
+AGAINGOTO:
+                                            If mystack.SubLevel > 0 Then
+                                                If Len(sbf(S3).sb) - i > sbi Then
+                                                    bb$ = Mid$(sbf(S3).sb, i, Len(sbf(S3).sb) - i - sbi)
+                                                Else
+                                                    bb$ = Mid$(sbf(S3).sb, i)
+                                                    sbi = 0
+                                                End If
+                                            Else
+                                                bb$ = Mid$(sbf(S3).sb, i)
+                                                sbi = 0
+                                            End If
                                         End If
                                     End If
                                     GoTo subsentry10
@@ -21856,6 +21902,7 @@ therebad:
                                         Else
                                             subsfc.ItemCreator2 bb$, i, 0
                                             bb$ = Mid$(ec$, i)
+                                            sbi = 0
                                             GoTo subsentry10
                                         End If
                                     End If
@@ -21868,7 +21915,7 @@ checkother:
                                         GoTo thh
                                     End If
                                     subsfc.ItemCreator2 bb$, i, S3
-                                    bb$ = Mid$(var(-S3).code$, i)
+                                    GoTo AGAINGOTOLAMBDA
                                 Else
                                     i = PosLabel(bb$, sbf(S3).sb)
                                     If i = 0 Or i > Len(sbf(S3).sb) Then
@@ -21877,7 +21924,8 @@ checkother:
                                         GoTo thh
                                     End If
                                     subsfc.ItemCreator2 bb$, i, S3
-                                    bb$ = Mid$(sbf(S3).sb, i)
+                                    GoTo AGAINGOTO
+                                    
                                 End If
                                 
                                 GoTo subsentry10
@@ -22000,11 +22048,11 @@ there1234:
             here$ = ohere$
             If Not mystack.CallLocalLast Then
                 With mystack
-                    If .commnum <> comhash.count Then comhash.ReduceHash .commnum, sbf()
-                    If .numfunnum <> funid.count Then funid.ReduceHash .numfunnum
-                    If .strfunnum <> strfunid.count Then strfunid.ReduceHash .strfunnum
-                    If .numnum <> numid.count Then numid.ReduceHash .numnum
-                    If .strnum <> strid.count Then strid.ReduceHash .strnum
+                    If .commnum <> comhash.Count Then comhash.ReduceHash .commnum, sbf()
+                    If .numfunnum <> funid.Count Then funid.ReduceHash .numfunnum
+                    If .strfunnum <> strfunid.Count Then strfunid.ReduceHash .strfunnum
+                    If .numnum <> numid.Count Then numid.ReduceHash .numnum
+                    If .strnum <> strid.Count Then strid.ReduceHash .strnum
                 End With
                 If nokillvars Then
                     If sbf(x1).sbc Then
@@ -22049,11 +22097,11 @@ emptyfunc:
             here$ = ohere$
             If Not mystack.CallLocalLast Then
                 With mystack
-                    If .commnum <> comhash.count Then comhash.ReduceHash .commnum, sbf()
-                    If .numfunnum <> funid.count Then funid.ReduceHash .numfunnum
-                    If .strfunnum <> strfunid.count Then strfunid.ReduceHash .strfunnum
-                    If .numnum <> numid.count Then numid.ReduceHash .numnum
-                    If .strnum <> strid.count Then strid.ReduceHash .strnum
+                    If .commnum <> comhash.Count Then comhash.ReduceHash .commnum, sbf()
+                    If .numfunnum <> funid.Count Then funid.ReduceHash .numfunnum
+                    If .strfunnum <> strfunid.Count Then strfunid.ReduceHash .strfunnum
+                    If .numnum <> numid.Count Then numid.ReduceHash .numnum
+                    If .strnum <> strid.Count Then strid.ReduceHash .strnum
                 End With
             End If
             If Not nokillvars Then
@@ -25994,9 +26042,9 @@ If Not pp.Arr Then
                 With usehandler.objref
                     If Not FastSymbol(rst$, "!") Then ppp$ = CStr(p): GoTo contlabel1
                     p = MyRound(p)
-                    If Abs(p) < .count Then
+                    If Abs(p) < .Count Then
                         If p < 0 Then
-                            .index = .count + Int(p)
+                            .index = .Count + Int(p)
                         Else
                             .index = Int(p)
                         End If
@@ -26670,12 +26718,12 @@ Set usehandler1 = anything
 Set usehandler.objref = usehandler1.objref
 End If
 With usehandler.objref
-    If st < 0 Then st = .count + st Else st = st - 1
-    If en < 0 Then en = .count + en Else en = en - 1
+    If st < 0 Then st = .Count + st Else st = st - 1
+    If en < 0 Then en = .Count + en Else en = en - 1
     If st < 0 Then st = 0: en = -2 '0
     If en < 0 Then en = -1 '0
-    If st >= .count Then en = -1: st = .count - 1
-    If en >= .count Then en = -1 ' .count - 1
+    If st >= .Count Then en = -1: st = .Count - 1
+    If en >= .Count Then en = -1 ' .count - 1
     
 End With
 With usehandler
@@ -26922,7 +26970,7 @@ Dim f$
 Dim pppp As mArray
 ThisGroup.IamCleared = False
 bstack.CopyStrip stripstack1
-OvarnameLen = varhash.count + 1 ' new way
+OvarnameLen = varhash.Count + 1 ' new way
 If Len(here$) > 0 Then
  ThisGroup.Patch = here$ + "." + ohere$
 Else
@@ -27894,7 +27942,7 @@ If Final Then
                                             bstack.priveflag = prv
                                              ExecuteGroupStruct = Abs(ExecuteGroupStruct(bstack, bstack.GroupName & w$, y1, ss$, 0, Lang, glob, alocal))
                                             bstack.priveflag = False
-                                                OvarnameLen = varhash.count + 1 'Len(VarName$) + 1   'we record ...
+                                                OvarnameLen = varhash.Count + 1 'Len(VarName$) + 1   'we record ...
                                           
                                             
                                              bstack.GroupName = frm$
@@ -27921,7 +27969,7 @@ contvvv:
                                         If Not Abs(ExecuteGroupStruct(bstack, bstack.GroupName & w$, y1, s$, addlen, Lang, glob, alocal)) = 0 Then
                                             ExecuteGroupStruct = FastSymbol(rest$, "}")
                                         End If
-                                            OvarnameLen = varhash.count + 1  'we record ...
+                                            OvarnameLen = varhash.Count + 1  'we record ...
                                   
                                          bstack.GroupName = frm$
                                          If Typename(var(y1)) <> mgroup Then Set var(y1) = New Group
@@ -28240,7 +28288,7 @@ Case 1
                     End If
                     
 conthere0001:
-                    OvarnameLen = varhash.count + 1
+                    OvarnameLen = varhash.Count + 1
                 ElseIf TypeOf stripstack1.lastobj Is Group Then
                             If Final Then
                             NoObjectAssign
@@ -28269,7 +28317,7 @@ againgroup:
                                 Exit Function
                             End If
                            ' LogGroup bstack, vvv, ohere$, OvarnameLen, lcl, NoRec, uni
-                            OvarnameLen = varhash.count + 1  'we record ...
+                            OvarnameLen = varhash.Count + 1  'we record ...
                         Else
                           If Typename(var(v)) = "Double" Then
                           Set var(v) = myobject
@@ -28290,7 +28338,7 @@ againgroup:
                           End If
                          
                    
-                          OvarnameLen = varhash.count + 1  'we record ...
+                          OvarnameLen = varhash.Count + 1  'we record ...
                          ' LogGroup bstack, vvv, ohere$, OvarnameLen, lcl, NoRec, uni
                             Set stripstack1.lastobj = Nothing
                             Set stripstack1 = New basetask
@@ -28495,7 +28543,7 @@ contstr1:
                                                 GlobalSub here$ & "." & w$ + "()", "", here$ + "." + bstack.GroupName, , v
                                             End If
 
-                                             OvarnameLen = varhash.count + 1
+                                             OvarnameLen = varhash.Count + 1
                                              ElseIf TypeOf stripstack1.lastobj Is Group Then
                                              ' here
 
@@ -28517,7 +28565,7 @@ againgroupstr:
                         End If
                         
                   
-                        OvarnameLen = varhash.count + 1  'we record ...
+                        OvarnameLen = varhash.Count + 1  'we record ...
                                 Set stripstack1.lastobj = Nothing
                                 Set stripstack1 = New basetask
                                 bstack.CopyStrip stripstack1
@@ -28794,11 +28842,11 @@ Dim k As Long, p As Variant, Final(0 To 63) As Variant
 Dim x1 As Long, what$, curtype As Long, s$, link$, rtype As Variant
 Dim thisref(0 To 63) As Long
 
-If that.ReadType(that.count - 1) = -100 Then
-Up = that.count - 1
+If that.ReadType(that.Count - 1) = -100 Then
+Up = that.Count - 1
 getparam = True
 Else
-Up = that.count
+Up = that.Count
 End If
 For k = 1 To Up
        
@@ -28919,7 +28967,7 @@ Else
 
 Exit Sub
 End If
-For k = 1 To that.count
+For k = 1 To that.Count
 If that.IsByRef(k - 1) Then
 ' RESTORE VALUES...
     If that.ReadType(k - 1) < 5 Then
@@ -31179,9 +31227,9 @@ Dim s() As String
         Else
         w$ = UCase(ohere$ & ".")
         End If
-            If OvarnameLen <= varhash.count Then
+            If OvarnameLen <= varhash.Count Then
                     
-            For i = OvarnameLen To varhash.count  ' or not
+            For i = OvarnameLen To varhash.Count  ' or not
             
                  varhash.ReadVar i - 1, ss$, dropit
                  
@@ -31236,7 +31284,7 @@ Dim s() As String
 
 End With
 bye:
-OvarnameLen = varhash.count + 1 'Len(VarName$) + 1   'we record ...AGAIN
+OvarnameLen = varhash.Count + 1 'Len(VarName$) + 1   'we record ...AGAIN
 
 End Sub
 Function FindNameForGroup(bstack As basetask, w$) As Boolean
@@ -32510,11 +32558,11 @@ With bs
     .ErrVars = .Vars
     basestack.ByName = 0
     .ByName = 0
-    .commnum = comhash.count
-    .strfunnum = strfunid.count
-    .numfunnum = funid.count
-    .strnum = strid.count
-    .numnum = numid.count
+    .commnum = comhash.Count
+    .strfunnum = strfunid.Count
+    .numfunnum = funid.Count
+    .strnum = strid.Count
+    .numnum = numid.Count
     If sbf(x1).sbc Then
         numid.pushtopGlobal
         funid.pushtopGlobal
@@ -32526,7 +32574,7 @@ With bs
         strfunid.pushtop
         funid.pushtop
     End If
-    subs = sb2used: snames = subHash.count
+    subs = sb2used: snames = subHash.Count
     .UseGroupname = sbf(x1).sbgroup
     .tpointer = sbf(x1).tpointer
     .OriginalCode = x1
@@ -32678,10 +32726,10 @@ thh1:
             If UBound(sbf()) <> subHash.MaxSpace Then
                     ReDim Preserve sbf(subHash.MaxSpace) As modfun
             End If
-            If .commnum <> comhash.count Then comhash.ReduceHash .commnum, sbf()
-            If .numfunnum <> funid.count Then funid.ReduceHash .numfunnum
-            If .strfunnum <> strfunid.count Then strfunid.ReduceHash .strfunnum
-            If .strnum <> strid.count Then strid.ReduceHash .strnum
+            If .commnum <> comhash.Count Then comhash.ReduceHash .commnum, sbf()
+            If .numfunnum <> funid.Count Then funid.ReduceHash .numfunnum
+            If .strfunnum <> strfunid.Count Then strfunid.ReduceHash .strfunnum
+            If .strnum <> strid.Count Then strid.ReduceHash .strnum
             If sbf(x1).sbc Then
                 numid.poptopGlobal
                 funid.poptopGlobal
@@ -32800,10 +32848,12 @@ therebad:
                 If sbf(S3).subs.ExistKey(bb$) Then
                     If IsNumeric(sbf(S3).subs.Value) Then
                         i = sbf(S3).subs.Value
+                        x1 = S3
                     Else
                         i = val(Split(sbf(S3).subs.Value)(0))
                         x1 = val(Split(sbf(S3).subs.Value)(1))
                     End If
+                   
                 Else
                     If InStr(bb$, vbCr) > 0 Then
                         i = rinstr(sbf(S3).sb, bb$)
@@ -32812,14 +32862,27 @@ therebad:
                         i = PosLabel(bb$, sbf(S3).sb)
                     End If
                     sbf(S3).subs.AddKey bb$, i
+                    x1 = S3
                 End If
                 If trace Then
                     bs.addlen = 0
                     TestShowBypass = True
                     TestShowSub = sbf(S3).sb
                 End If
-
-                
+                If bs.SubLevel > 0 Then
+                    If x1 = S3 Then
+                        If Len(sbf(S3).sb) - i > sbi Then
+                            bb$ = Mid$(sbf(S3).sb, i, Len(sbf(S3).sb) - i - sbi)
+                            GoTo againmod
+                        Else
+                            sbi = 0
+                        End If
+                    Else
+                        sbi = 0
+                    End If
+                Else
+                    sbi = 0
+                End If
             End If
         Else
             If Not loopthis Then GoTo thh1
@@ -33676,14 +33739,14 @@ subsub02:
                                                             Exec = 2
                                                             Exit Do
                                                         End If
-                                                        bb$ = Mid$(var(-S3).code$, i)
+                                                        GoTo AGAINGOTOLAMBDA
                                                     Else
                                                         If i = 0 Or i > Len(sbf(S3).sb) Then
                                                             b$ = bb$
                                                             Exec = 2
                                                             Exit Do
                                                         End If
-                                                        bb$ = Mid$(sbf(S3).sb, i)
+                                                        GoTo AGAINGOTO
                                                     End If
                                                     
                                                 End If
@@ -33710,8 +33773,14 @@ checkother:
                                                         Exec = 2
                                                         Exit Do
                                                     End If
+AGAINGOTOLAMBDA:
                                                     subs.ItemCreator2 bb$, i, S3
+                                                    If Len(var(-S3).code$) - i > sbi Then
+                                                    bb$ = Mid$(var(-S3).code$, i, Len(var(-S3).code$) - i - sbi)
+                                                    Else
                                                     bb$ = Mid$(var(-S3).code$, i)
+                                                    sbi = 0
+                                                    End If
                                                 ElseIf S3 > 0 Then
                                                     i = PosLabel(bb$, sbf(S3).sb)
                                                     If i = 0 Or i > Len(sbf(S3).sb) Then
@@ -33720,7 +33789,13 @@ checkother:
                                                         Exit Do
                                                     End If
                                                     subs.ItemCreator2 bb$, i, S3
+AGAINGOTO:
+                                                    If Len(sbf(S3).sb) - i > sbi Then
+                                                    bb$ = Mid$(sbf(S3).sb, i, Len(sbf(S3).sb) - i - sbi)
+                                                    Else
                                                     bb$ = Mid$(sbf(S3).sb, i)
+                                                    sbi = 0
+                                                    End If
                                                 Else ' cascade to upper level
                                                     b$ = bb$
                                                     Exec = 2
@@ -34301,7 +34376,7 @@ againhere:
             
 End Function
 Public Function SubsExist() As Boolean
-SubsExist = subHash.count > 0
+SubsExist = subHash.Count > 0
 End Function
 Sub TraceStore(b As basetask, v As Long, c$, o&)
      v = b.addlen
@@ -34843,7 +34918,7 @@ Set oldbstack = bstack.soros
 Dim ohere$
 ohere$ = here$
 If a Is Nothing Then Exit Function
-For j = 0 To a.count - 1
+For j = 0 To a.Count - 1
 here$ = "EV" + CStr(i) + "." + CStr(j)
 If a.enabled Then
 a.ReadVar j, n$, f$
@@ -34906,7 +34981,7 @@ Set oldbstack = bstack.soros
 Dim j As Long, s1$, klm As Long
 Dim ohere$
 ohere$ = here$
-For j = 0 To a.count - 1
+For j = 0 To a.Count - 1
 here$ = "EV" + CStr(i) + "." + CStr(j)
 If a.enabled Then
 a.ReadVar j, n$, f$
@@ -42747,10 +42822,10 @@ Set usehandler = basestack.lastobj
         Else
             FastSymbol rest$, ","  ' optional
             If IsExp(basestack, rest$, x) Then
-                tmp.drop tmp.count - x + 1
+                tmp.drop tmp.Count - x + 1
                 ProcDrop = True
             Else
-                tmp.drop tmp.count
+                tmp.drop tmp.Count
                 ProcDrop = True
             End If
         End If
@@ -42803,7 +42878,7 @@ Exit Function
         If y < 0 Then
         y = Abs(y)
         x = x - 1
-        If CLng(x + y) > basestack.soros.count Then y = basestack.soros.count - x
+        If CLng(x + y) > basestack.soros.Count Then y = basestack.soros.Count - x
         For i = x + 1 To x + y
         
          basestack.soros.MakeTopItem CLng(i)
@@ -42811,7 +42886,7 @@ Exit Function
         Next i
         Else
            'y = y - 1
-If CLng(x + y - 1) > basestack.soros.count Then y = basestack.soros.count - x + 1
+If CLng(x + y - 1) > basestack.soros.Count Then y = basestack.soros.Count - x + 1
 
         For i = y To 1 Step -1
         
@@ -42850,7 +42925,7 @@ Exit Function
         If y < 0 Then
         y = Abs(Int(y))
         x = x - 1
-          If CLng(x + y) > basestack.soros.count Then y = basestack.soros.count - x
+          If CLng(x + y) > basestack.soros.Count Then y = basestack.soros.Count - x
         For i = y To 2 Step -1
         
          basestack.soros.MakeTopItemBack CLng(i + x)
@@ -42859,7 +42934,7 @@ Exit Function
         If x > 0 Then basestack.soros.MakeTopItemBack CLng(i + x)
         Else
         y = Int(y)
-        If CLng(x + y - 1) > basestack.soros.count Then y = basestack.soros.count - x + 1
+        If CLng(x + y - 1) > basestack.soros.Count Then y = basestack.soros.Count - x + 1
 
         For i = 1 To y
         basestack.soros.MakeTopItemBack CLng(x + y - 1)
@@ -43604,7 +43679,7 @@ If EventObj Is Nothing Then Exit Sub
 Dim i As Long, j As Long, part$
 If here$ <> "" Then where$ = here$ + "." + where$
 With EventObj
-    For i = 0 To .count - 1
+    For i = 0 To .Count - 1
     .index = i
     .Done = True
     If .Value = vbNullString Then
@@ -44293,7 +44368,7 @@ Function ProcClass(basestack As basetask, rest$, Lang As Long, super As Boolean)
 Dim i As Long, ss$, y1 As Long, what$, w$, ohere$, w2$, subs As Long, snames As Long, s$, pre$
 Dim k As Long, m As Long, once As Boolean, Skipfirsttype As Boolean, wt$
 If super Then
-    subs = sb2used: snames = subHash.count:
+    subs = sb2used: snames = subHash.Count:
     Dim R As Variant
     Dim SuperGroup As Object
     
@@ -46554,7 +46629,7 @@ Sub FeedArray(pppp As mArray, v As Long, fromthis As Object, Optional convert As
 Dim mm As mStiva, myobject As Object, p As Variant, usehandler As mHandler
 Set mm = fromthis
 Do While Not mm.IsEmpty
-If v >= pppp.count Then Exit Do
+If v >= pppp.Count Then Exit Do
 If mm.PopType = ">" Then
 mm.drop 1
 pppp.item(v) = CLng(0)
@@ -46770,7 +46845,7 @@ timestamp = timeGetTime + 1000
 End If
 If Abs(timestamp - timeGetTime) < 1000 Then Exit Sub
 timestamp = timeGetTime + 1000
-If Forms.count > 5 Then Exit Sub
+If Forms.Count > 5 Then Exit Sub
 If Busy Then Exit Sub
 If Not bstack.IamAnEvent Then
 If bstack.TaskMain Then Exit Sub
@@ -46970,7 +47045,7 @@ checkIterator:
                     Set bstack.lastobj = ms.ExportArray(CLng(MyRound(p)))
                     End If
                     Else
-                        Set bstack.lastobj = ms.ExportArray(ms.count)
+                        Set bstack.lastobj = ms.ExportArray(ms.Count)
                         
                     End If
                     Set ms = Nothing
@@ -47419,7 +47494,7 @@ len1234:
                             If .objref.StructLen > 0 Then
                                 R = SG * .objref.StructLen
                             Else
-                                R = SG * .objref.count
+                                R = SG * .objref.Count
                             End If
                             IsLen = FastSymbol(a$, ")", True)
                         Exit Function
@@ -47433,9 +47508,9 @@ len1234:
                         If CheckDeepAny(anything) Then
                             If Typename(anything) = mHdlr Then
                                 Set usehandler = anything
-                                R = SG * usehandler.objref.count
+                                R = SG * usehandler.objref.Count
                             Else
-                                R = SG * anything.count
+                                R = SG * anything.Count
                             End If
                         Else
                             R = 0
@@ -47457,7 +47532,7 @@ len1234:
                 End If
             End With
         ElseIf Typename(bstack.lastobj) = myArray Then
-                R = SG * bstack.lastobj.count
+                R = SG * bstack.lastobj.Count
                 IsLen = FastSymbol(a$, ")", True)
                 Set bstack.lastobj = Nothing
                 Exit Function
@@ -47491,7 +47566,7 @@ Dim p As Variant, s$, usehandler As mHandler
     With usehandler
     If .indirect < 0 Then
     If TypeOf .objref Is FastCollection Then
-        R = SG * .objref.count
+        R = SG * .objref.Count
         Set bstack.lastobj = Nothing
         IsLenDisp = FastSymbol(a$, ")", True)
         Exit Function
@@ -48033,7 +48108,7 @@ handlehandlers:
                         If FastSymbol(a$, ",") Then
                         If IsExp(bstack, a$, pp, , True) Then
                             w3 = CLng(Int(pp))
-                            If w3 < 0 Or w3 >= .objref.count Then
+                            If w3 < 0 Or w3 >= .objref.Count Then
                             indexout a$
                             Exit Function
                             End If
@@ -50853,7 +50928,7 @@ NotArray1:
                                     ReadOnly
                                     Exec1 = 0: ExecuteVar = 8: Exit Function
                             ElseIf ss$ = "++" Then
-                                If usehandler.index_start < usehandler.objref.count - 1 Then
+                                If usehandler.index_start < usehandler.objref.Count - 1 Then
                                     usehandler.index_start = usehandler.index_start + 1
                                     usehandler.objref.index = usehandler.index_start
                                     usehandler.index_cursor = usehandler.objref.Value
@@ -51056,7 +51131,7 @@ assignpointer:
                     If MyIsObject(var(v)) Then
                     If var(v).IamApointer Then
                     Set var(v) = bstack.lastpointer
-                    ElseIf var(v).soros.count > 0 Or var(v).FuncList <> vbNullString Then
+                    ElseIf var(v).soros.Count > 0 Or var(v).FuncList <> vbNullString Then
                     MyEr "Can't assign pointer to named group", "ƒÂÌ ÏÔÒ˛ Ì· ‚‹Î˘ ‰ÂﬂÍÙÁ ÛÂ Â˛ÌıÏÁ ÔÏ‹‰·"
                     Set bstack.lastpointer = Nothing
                         Set bstack.lastobj = Nothing  '???
@@ -52665,7 +52740,7 @@ Else
     If Not IsStrExp(bstack, b$, ss$) Then Exec1 = 0: ExecuteVar = 8: Exit Function
     If Not MyIsObject(pppp.item(v)) Then
     If pppp.Arr Then
-    If pppp.count = 0 Then
+    If pppp.Count = 0 Then
 
     pppp.GroupRef.Value = ss$
     ElseIf bstack.lastobj Is Nothing Then
@@ -53739,7 +53814,7 @@ takeone:
     '' for arrays only
     If countDir >= 0 Then
     
-    If counter = myobject.count Or (counter > Counterend And Counterend > -1) Or countDir = 0 Then
+    If counter = myobject.Count Or (counter > Counterend And Counterend > -1) Or countDir = 0 Then
         Set myobject = Nothing
               SwapStrings rest$, bck$
             '  rest$ = bck$

@@ -13,12 +13,13 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 ' each basetask link to a codeblock and use own cursor
 Option Explicit
-Private WithEvents LL As Lexar
+Private WithEvents LL As Lexar, myabort As Boolean
 Attribute LL.VB_VarHelpID = -1
 Public CodeDoc As String
 Private Type ast
     codepos As Long  ' in document CodeDoc
-    codetype As Integer
+    codetype As Byte
+    codemore As Byte
     codehelp As Integer
     codevar As Long
 End Type
@@ -28,7 +29,7 @@ Private varcost() As Variant
 Private vcost As Long
 Private mb As Long
 Private LastCode As Long, LastVar As Long
-Const strline = ":==<=<>=>+=-=/=*=()^++--*#&/!=~,[]{}%@\;.?" + """"""
+Const strline = ":==<=<>=>+=-=/=*=*()^++--*#&/!=~,[]{}%@\;.?<=>**|" + """"""
 Private ms As mStiva2, docvar As Document
 Private Identifiers As FastCollection
 Private mycode$, SkipCode As Boolean, CurLine As Long
@@ -77,7 +78,8 @@ End Property
 
 Property Get Comma(there As Long) As Boolean
 With code(there)
-    If .codetype = 8 Then If .codevar = -34 Then there = there + 1: Comma = True
+    If .codetype = 8 Then If .codevar = -34 Then there = there + 1: Comma = True: Exit Function
+   ' If .codetype = 14 Then If .codevar = -34 Then there = there + 1: Comma = True
 End With
 End Property
 Property Get Semi(there As Long) As Boolean
@@ -116,7 +118,11 @@ With code(there)
                     ' nothing
                 Case Is < 1
                 Case Else
+                  '  If a$ = "<=>" Then
+                   ' MaybeIsSymbolAny = True
+                   ' Else
                     MaybeIsSymbolAny = InStr(a$, Mid$(strline, j, 1)) > 0
+                   ' End If
                 End Select
     End If
 End With
@@ -593,6 +599,11 @@ If LastVar >= vcost Then
     ReDim Preserve varcost(vcost) As Variant
 End If
 End Sub
+
+Private Sub LL_abort(ok As Boolean)
+ok = myabort
+End Sub
+
 Private Sub LL_addone(n As Long, t As Long)
 If t = 3 Or SkipCode Then Exit Sub
 Dim p As Long, v As String
@@ -632,7 +643,6 @@ With code(LastCode)
    If ms.LookTopVal = "}" Then
     ms.drop 1
     p = CLng(ms.PopVal)
-
     code(p).codevar = LastCode + 1
     .codevar = p + 1
     End If
@@ -644,12 +654,39 @@ Case Else
     LastCode = LastCode - 1
     Exit Sub
    End If
+   
    End If
 
  Do While t = 0 And LastCode > 0
    If code(LastCode - 1).codetype = 9 Or code(LastCode - 1).codetype = 0 Then
     LastCode = LastCode - 1
     Else
+again:
+    If IsThen(CStr(ms.LookTopVal)) Then
+    If ms.LookSecondVal + 1 < LastCode Then
+        If code(CLng(ms.LookSecondVal)).codemore > 0 Then
+                ms.drop 1
+                p = CLng(ms.PopVal)
+                code(p).codehelp = CInt(LastCode - p + 1)
+                GoTo again
+        End If
+        
+    Else
+        code(CLng(ms.LookSecondVal)).codemore = 0
+    End If
+   ElseIf iselse(CStr(ms.LookTopVal)) Then
+           If ms.LookSecondVal + 1 < LastCode Then
+        If code(CLng(ms.LookSecondVal)).codemore > 0 Then
+                    ms.drop 1
+                    p = CLng(ms.PopVal)
+                    code(p).codehelp = CInt(LastCode - p + 1)
+                    GoTo again
+        End If
+        
+    Else
+        code(CLng(ms.LookSecondVal)).codemore = 0
+    End If
+   End If
     Exit Do
    End If
    Loop
@@ -744,14 +781,36 @@ If Right$(v, 1) = "(" Then
     ms.PushVal CVar(LastCode)
     ms.PushStr ")"
 End If
-If .codetype = 11 Then
-   If UseCase Then v = myUcase(v, True)
+If .codetype = 171 Then
+    If UseCase Then v = myUcase(v, True)
+    
     If IsIf(v) Then
         If isEnd(CStr(ms.LookTopVal)) Then
-        ms.drop 2
-        If isEnd(CStr(ms.LookTopVal)) Then
-        ms.drop 2
-        End If
+            If Not GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
+                SyntaxError
+                myabort = True
+                Exit Sub
+            End If
+            ms.drop 2
+            If iselse(CStr(ms.LookTopVal)) Then
+                If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
+                    ms.drop 1
+                    z = CLng(ms.PopVal)
+                    code(z).codehelp = CInt(LastCode - z + 1)
+                End If
+            ElseIf IsThen(CStr(ms.LookTopVal)) Then
+                If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
+                    ms.drop 1
+                    z = CLng(ms.PopVal)
+                    code(z).codehelp = CInt(LastCode - z + 1)
+                End If
+            ElseIf IsElseIf(CStr(ms.LookTopVal)) Then
+                If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
+                    ms.drop 1
+                    z = CLng(ms.PopVal)
+                    code(z).codehelp = CInt(LastCode - z + 1)
+                End If
+            End If
         Else
         ms.PushVal CVar(LastCode)
         ms.PushStr v
@@ -760,20 +819,109 @@ If .codetype = 11 Then
         ms.PushVal CVar(LastCode)
         ms.PushStr v
     ElseIf IsThen(v) Then
-    .codetype = 9
-    ElseIf IsElse(v) Then
-    .codetype = 9
+        If IsIf(CStr(ms.LookTopVal)) Then
+            If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
+                ms.drop 2
+                ms.PushVal CVar(LastCode)
+                ms.PushStr v
+                .codetype = 10
+                .codemore = 1
+            Else
+                GoTo syer
+            End If
+        ElseIf IsElseIf(ms.LookTopVal) Then
+            If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
+                ms.drop 1
+                z = CLng(ms.PopVal)
+                code(z).codehelp = CInt(LastCode - z)   ' NOT +1
+                ms.PushVal CVar(LastCode)
+                ms.PushStr v
+                .codetype = 10
+                .codemore = 1
+            Else
+syer:
+                SyntaxError
+                myabort = True
+            End If
+        Else
+            GoTo syer
+        End If
+    ElseIf IsElseIf(v) Then
+        If IsThen(CStr(ms.LookTopVal)) Then
+iselse:
+            If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
+                ms.drop 1
+                z = CLng(ms.PopVal)
+                code(z).codehelp = CInt(LastCode - z)   ' NOT +1
+                ms.PushVal CVar(LastCode)
+                 ms.PushStr v
+                 .codetype = 10
+                 .codemore = 1
+            Else
+            SyntaxError
+                myabort = True
+            End If
+        ElseIf iselse(CStr(ms.LookTopVal)) Then
+        If code(CLng(ms.LookSecondVal)).codemore <> 1 Then
+        MyEr "No Else.If after last Else", "Όχι Αλλιώς.Αν μετά το τελευταίο Αλλιώς"
+        myabort = True
+        Else
+        GoTo iselse
+        End If
+        End If
+    ElseIf iselse(v) Then
+        If IsIf(CStr(ms.LookTopVal)) Then
+            If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
+                ms.drop 1
+                z = CLng(ms.PopVal)
+                code(z).codehelp = CInt(LastCode - z)   ' NOT +1
+                ms.PushVal CVar(LastCode)
+                ms.PushStr v
+                .codetype = 10
+                .codemore = 2
+            Else
+                GoTo syer
+            End If
+        ElseIf IsThen(CStr(ms.LookTopVal)) Then
+            If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
+                ms.drop 1
+                z = CLng(ms.PopVal)
+                code(z).codehelp = CInt(LastCode - z + 1)
+                ms.PushVal CVar(LastCode)
+                ms.PushStr v
+                .codetype = 10
+                .codemore = 2
+            Else
+                GoTo syer
+            End If
+        ElseIf IsElseIf(CStr(ms.LookTopVal)) Then
+            If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
+                ms.drop 1
+                z = CLng(ms.PopVal)
+                code(z).codehelp = CInt(LastCode - z)   ' NOT +1
+                ms.PushVal CVar(LastCode)
+                ms.PushStr v
+                .codetype = 10
+                .codemore = 1
+            Else
+                GoTo syer
+            End If
+        Else
+            MyEr "No If for ELSE", "Δεν υπάρχει Αν για το Αλλιώς"
+            myabort = True
+'            GoTo syer
+        End If
     End If
 Else
     If UseCase Then
-    v = myUcase(v, True)
-    If code(LastCode).codetype = 171 Then
-    If v = "REM" Or v = "ΣΗΜ" Then
-    LastCode = LastCode - 1
-    SkipCode = True
-    Exit Sub
-    End If
-    End If
+        v = myUcase(v, True)
+        If code(LastCode).codetype = 171 Then
+            If v = "REM" Or v = "ΣΗΜ" Then
+                LastCode = LastCode - 1
+                SkipCode = True
+                Exit Sub
+            End If
+        End If
     End If
 End If
 
@@ -797,7 +945,8 @@ Case 24, 19, 18, 17, 14, 9, 8, 5
     ElseIf .codetype = 19 Then
     If ms.Count > 0 Then
         If ms.LookTopVal <> ")" Then
-        Debug.Print "ERROR"
+        MyEr "expected )", "περίμενα )"
+        myabort = True
         Else
         ms.drop 1
         z = CLng(ms.PopVal)
@@ -889,6 +1038,18 @@ Dim bstack As basetask
 Set bstack = b
 Dim i As Long, j As Long, numbers As Long, strconst As Long
 Set docvar = New Document
+If myabort Then
+If LastCode > 0 Then
+If pagio = "GREEK" Then
+Add LastErNameGR & " στη θέση χαρακτήρα " & code(LastCode).codepos
+Else
+Add LastErName & " at char pos " & code(LastCode).codepos
+End If
+MyEr "", ""
+RepPlain bstack, bstack.Owner, (docvar.textDoc)
+End If
+Exit Sub
+End If
 For i = 0 To LastCode
     With code(i)
     
@@ -898,27 +1059,24 @@ For i = 0 To LastCode
         If .codevar < -1 Then
         Add " :" + vbCrLf
         Else
-        Add " Identifier: " + Identifiers.KeyToString3(.codevar) + RetStr(.codehelp, i) + vbCrLf
+        Add " Identifier: " + Identifiers.KeyToString3(.codevar) + RetStr(.codehelp, i) & " id (" & .codevar & ")" & vbCrLf
         End If
     Case 21
         Add " TUPLE (" + RetStr(.codehelp, i) + vbCrLf
     Case 10, 11, 112, 111, Is > 160
-   
-    If Identifiers.Count < .codevar Then
-                        Add " Syntax Error:" + vbCrLf
-                        Add " " + codeline(i) + vbCrLf
-                        GoTo ex12
-    Else
-     If .codevar = -1 Then
-     
-     Add " Syntax Error:" + vbCrLf
-     Add " " + codeline(i) + vbCrLf
-     GoTo ex12
-     Else
-        Add " Identifier: " + Identifiers.KeyToString3(.codevar) + RetStr(.codehelp, i) + vbCrLf
+        If Identifiers.Count < .codevar Then
+            Add " Syntax Error:" + vbCrLf
+            Add " " + codeline(i) + vbCrLf
+            GoTo ex12
+        Else
+            If .codevar = -1 Then
+                Add " Syntax Error:" + vbCrLf
+                Add " " + codeline(i) + vbCrLf
+                GoTo ex12
+            Else
+                Add " Identifier: " + Identifiers.KeyToString3(.codevar) + RetStr(.codehelp, i) & " id (" & .codevar & ")" & vbCrLf
+            End If
         End If
-        End If
-    
     Case 140
         Add " START BRACKET (end bracket:" + Str$(.codevar) + ")" + vbCrLf
     Case 141
@@ -931,13 +1089,13 @@ For i = 0 To LastCode
                 j = -.codevar - 2
                 Select Case j
                 Case Is > 200
-                    Add " " + Mid$(strline, j - 200, 3) + vbCrLf
+                    Add " " + Mid$(strline, j - 200, 3) & " symbol id (" & j & ")" & vbCrLf
                 Case Is > 100
-                    Add " " + Mid$(strline, j - 100, 2) + vbCrLf
+                    Add " " + Mid$(strline, j - 100, 2) & " symbol id (" & j & ")" & vbCrLf
                     
                 Case Else
                 'If Mid$(strline, j, 1) = ")" And .codetype <> 19 Then Stop
-                    Add " " + Mid$(strline, j, 1) + RetStr(.codehelp, i) + vbCrLf
+                    Add " " + Mid$(strline, j, 1) + RetStr(.codehelp, i) & " symbol id (" & j & ")" & vbCrLf
                 End Select
             Case -2
                 Add " " + """""" + vbCrLf
@@ -945,18 +1103,18 @@ For i = 0 To LastCode
 
                     'add " " + Replace(Replace(CStr(varcost(.codevar)), vbCrLf, "\n"), vbTab, "\t") + vbCrLf
                 If .codetype = 16 Then
-                    Add " {" + CStr(varcost(.codevar)) + "}" + RetStr(.codehelp, i) + vbCrLf
+                    Add " {" + CStr(varcost(.codevar)) + "}" + RetStr(.codehelp, i) & " strliteral (" & .codevar & ")" & vbCrLf
                 
                         strconst = strconst + 1
                 ElseIf .codetype = 15 Then
-                    Add " " + """" + CStr(varcost(.codevar)) + """" + RetStr(.codehelp, i) + vbCrLf
+                    Add " " + """" + CStr(varcost(.codevar)) + """" + RetStr(.codehelp, i) & " strliteral (" & .codevar & ")" & vbCrLf
                         strconst = strconst + 1
                 ElseIf .codetype = 14 Then
                     Add " >>>>>>>>>>>>>>>>>>>  " + CStr(varcost(.codevar)) + RetStr(.codehelp, i) + vbCrLf
                         
                 Else
                     On Error Resume Next
-                    Add " " + CStr(varcost(.codevar)) + " " + Typename$(varcost(.codevar)) + vbCrLf
+                    Add " " + CStr(varcost(.codevar)) + " " + Typename$(varcost(.codevar)) & " numliteral (" & .codevar & ")" & vbCrLf
                     If Err.Number > 0 Then
                         Add " Syntax Error:" + vbCrLf
                         Add " " + codeline(i) + vbCrLf
@@ -979,9 +1137,20 @@ Add "Labels :" + Str$(LastVar - numbers - strconst + 1) + vbCrLf
 End If
 ex12:
 ' unhide next two lines to get results to clipboard
+If ms.Total > 0 Then
+Set docvar = New Document
+i = CLng(ms.LookSecondVal)
+If pagio = "GREEK" Then
+Add "Δεν έκλεισε σωστά στη θέση χαρακτήρα " & code(i).codepos
+Else
+Add "Not Properly closed at char pos " & code(i).codepos
+End If
+Else
 Clipboard.Clear
 SetTextData CF_UNICODETEXT, (docvar.textDoc)      'set as unicode text
+End If
 RepPlain bstack, bstack.Owner, (docvar.textDoc)
+
         'For i = 0 To LastVar
         'RepPlain bstack, bstack.Owner, (varcost(i))
         'Next i
@@ -989,21 +1158,18 @@ Set docvar = Nothing
 End Sub
 
 Private Function IsIf(v As String) As Boolean
-Exit Function
     If v = "IF" Or v = "AN" Then IsIf = True
 End Function
-Private Function IsElse(v As String) As Boolean
-    If v = "ELSE" Or v = "ΑΛΛΙΩΣ" Then IsElse = True
+Private Function iselse(v As String) As Boolean
+    If v = "ELSE" Or v = "ΑΛΛΙΩΣ" Then iselse = True
 End Function
 Private Function IsElseIf(v As String) As Boolean
-Exit Function
     If v = "ELSE.IF" Or v = "ΑΛΛΙΩΣ.ΑΝ" Then IsElseIf = True
 End Function
 Private Function IsThen(v As String) As Boolean
-    If v = "THEN" Or v = "ΤΟΤΕ" Then IsThen = True
+   If v = "THEN" Or v = "ΤΟΤΕ" Then IsThen = True
 End Function
 Function isEnd(a$) As Boolean
-Exit Function
 a$ = myUcase(a$, True)
 Select Case a$
 Case "END", "ΤΕΛΟΣ"
