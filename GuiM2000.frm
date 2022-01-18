@@ -71,9 +71,9 @@ Attribute VB_Exposed = False
 Option Explicit
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private Declare Function DestroyCaret Lib "user32" () As Long
-Private Declare Function DrawIconEx Lib "user32" (ByVal hDC As Long, ByVal xLeft As Long, ByVal yTop As Long, ByVal hIcon As Long, ByVal cxWidth As Long, ByVal cyWidth As Long, ByVal istepIfAniCur As Long, ByVal hbrFlickerFreeDraw As Long, ByVal diFlags As Long) As Long
+Private Declare Function DrawIconEx Lib "user32" (ByVal Hdc As Long, ByVal xLeft As Long, ByVal yTop As Long, ByVal hIcon As Long, ByVal cxWidth As Long, ByVal cyWidth As Long, ByVal istepIfAniCur As Long, ByVal hbrFlickerFreeDraw As Long, ByVal diFlags As Long) As Long
 Private Declare Function DrawState Lib "user32" Alias "DrawStateA" _
-        (ByVal hDC As Long, _
+        (ByVal Hdc As Long, _
         ByVal hBrush As Long, _
         ByVal lpDrawStateProc As Long, _
         ByVal lParam As Long, _
@@ -498,7 +498,7 @@ ResizeMark.Height = MarkSize * dv15
 ResizeMark.Left = Width - MarkSize * dv15
 ResizeMark.top = Height - MarkSize * dv15
 Dim XX As Long
-XX = GetPixel(Me.hDC, Width - MarkSize * dv15, Height - MarkSize * dv15)
+XX = GetPixel(Me.Hdc, Width - MarkSize * dv15, Height - MarkSize * dv15)
 If XX <> -1 Then
 ResizeMark.backcolor = XX
 End If
@@ -726,7 +726,7 @@ Private Sub Form_Resize()
 If Me.WindowState <> 0 Then WindowState = 0: Exit Sub
 gList2.MoveTwips 0, 0, Me.Width, gList2.HeightTwips
 ResizeMark.move Width - ResizeMark.Width, Height - ResizeMark.Height
-ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
+ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
 End Sub
 
 
@@ -925,7 +925,7 @@ If mSizable And mShowMaximize Then
         Else
            Callback mMyName$ + ".Resize()"
         End If
-        ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
+        ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
         If IhaveLastPos Then
                 
                 If mIndex > -1 Then
@@ -1022,7 +1022,7 @@ If mSizable And mShowMaximize Then
         Else
            Callback mMyName$ + ".Resize()"
         End If
-        ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
+        ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
         If IhaveLastPos Then
                 If mIndex > -1 Then
                     Callback mMyName$ + ".Maximized(" + CStr(index) + ")"
@@ -1491,7 +1491,7 @@ If Not Sizable Then
 If MY_BACK Is Nothing Then Set MY_BACK = New cDIBSection
 MY_BACK.ClearUp
 If MY_BACK.create(Width / DXP, Height / DYP) Then
-MY_BACK.LoadPictureBlt hDC
+MY_BACK.LoadPictureBlt Hdc
 If MY_BACK.bitsPerPixel <> 24 Then Conv24 MY_BACK
 End If
 End If
@@ -1499,7 +1499,7 @@ End Sub
 Public Sub Release()
 If Not Sizable Then
 If MY_BACK Is Nothing Then Exit Sub
-MY_BACK.PaintPicture hDC
+MY_BACK.PaintPicture Hdc
 End If
 End Sub
 
@@ -1703,7 +1703,7 @@ Dim var1() As Variant, retobject As Object, that As Object, hmonitor As Long
 ReDim var1(0 To 1)
 Dim var2() As String
 ReDim var2(0 To 0)
-hmonitor = FindFormSScreen(Me)
+hmonitor = FindMonitorFromPixel(x, y) ' FindFormSScreen(Me)
 x = x + Left
 y = y + top
 Set that = vv
@@ -1718,7 +1718,7 @@ Else
 that.move ScrInfo(hmonitor).Width - that.Width + ScrInfo(hmonitor).Left, y + ScrInfo(hmonitor).top
 End If
 ElseIf y + that.Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
-that.move x, ScrInfo(hmonitor).Height - Height + ScrInfo(hmonitor).top
+that.move x, ScrInfo(hmonitor).Height - Height '+ ScrInfo(hmonitor).top
 Else
 that.move x, y
 End If
@@ -1734,9 +1734,12 @@ MyDoEvents
 End Sub
 Public Sub PopUpPos(vv As Variant, ByVal x As Variant, ByVal y As Variant, ByVal y1 As Variant)
 Dim that As Object, hmonitor As Long
+
 x = x + Left
 y = y + top + y1
-hmonitor = FindFormSScreen(Me)
+'hmonitor = FindFormSScreen(Me)
+hmonitor = FindMonitorFromPixel(x, y)
+
 Set that = vv
 If Me Is that Then Exit Sub
 If that.Visible Then
@@ -1744,12 +1747,12 @@ If Not that.enabled Then Exit Sub
 End If
 If x + that.Width > ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left Then
 If y + that.Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
-that.move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - that.Width, y - that.Height - y1 + ScrInfo(hmonitor).top
+that.move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - that.Width, y - that.Height - y1 ' + ScrInfo(hmonitor).top
 Else
-that.move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - that.Width, y + ScrInfo(hmonitor).top
+that.move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - that.Width, y '+ ScrInfo(hmonitor).top
 End If
 ElseIf y + that.Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
-that.move x, y - that.Height - y1 + ScrInfo(hmonitor).top
+that.move x, y - that.Height - y1
 Else
 that.move x, y
 End If
@@ -1866,7 +1869,7 @@ If Not Relax Then
                 Else
                     Callback mMyName$ + ".Resize()"
                 End If
-                ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
+                ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
             End If
         End If
         Relax = False
@@ -2001,7 +2004,7 @@ Case 3
         Else
            Callback mMyName$ + ".Resize()"
         End If
-        ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
+        ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
     MenuSet 2
     End If
 Case 4

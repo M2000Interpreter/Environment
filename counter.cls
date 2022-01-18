@@ -24,9 +24,9 @@ Implements TaskInterface
 Dim jobnameID As Long
 ' load code or just use it as a counter
 ' load code first time
-Dim m_duration As Double
-Dim mYspace As Double
-    Dim myholdtime As Double
+Dim m_duration As Currency
+Dim mYspace As Currency
+    Dim myholdtime As Currency
 Dim mycode As String
 Dim MyMode As Long
 Dim mybusy As Boolean
@@ -53,12 +53,12 @@ res = DisconnectNamedPipe(hPipe)
 End If
 End Sub
 
-Private Property Let TaskInterface_interval(ByVal RHS As Double)
+Private Property Let TaskInterface_interval(ByVal RHS As Currency)
 mYspace = RHS
-m_duration = uintnew(CDbl(timeGetTime)) + mYspace
+m_duration = uintnew(CCur(timeGetTime)) + mYspace
 End Property
 
-Private Property Get TaskInterface_interval() As Double
+Private Property Get TaskInterface_interval() As Currency
 '
 TaskInterface_interval = mYspace
 End Property
@@ -87,14 +87,14 @@ On Error GoTo poulos
     
     On Error Resume Next
    jobnameID = CLng(Values(0)) ' this is the hanlde
-   mYspace = CDbl(Values(1)) '
- '  m_duration = uintnew(CDbl(timeGetTime)) '+ mYspace
+   mYspace = CCur(Values(1)) '
+ '  m_duration = uintnew(Ccur(timeGetTime)) '+ mYspace
   pipename = "\\.\pipe\" & Values(2) + ChrW$(0)
 'pipename = validpipename(CStr(Values(2)))
-   myholdtime = CDbl(Values(3))
+   myholdtime = CCur(Values(3))
 
    
-    m_duration = uintnew(CDbl(timeGetTime)) + myholdtime
+    m_duration = uintnew(CCur(timeGetTime)) + myholdtime
    mytarget$ = Values(4)
    ' AND A VARIABLE....TO PLACE DATA
    Dim openMode, pipeMode As Long
@@ -138,9 +138,9 @@ Private Function TaskInterface_Tick() As Boolean
  Dim x As Integer, mycnt As Long
 Dim lpBuffer(2048) As Byte
 On Error GoTo there
-If m_duration <= uintnew(CDbl(timeGetTime)) Then
+If m_duration <= uintnew(CCur(timeGetTime)) Then
     TaskInterface_Tick = True
-   m_duration = uintnew(CDbl(timeGetTime)) + mYspace
+   m_duration = uintnew(CCur(timeGetTime)) + mYspace
    If hPipe <> 0 Then
   ' mybuf$ = String$(2001, Chr(0))
    If ConnectNamedPipe(hPipe, ByVal 0) = 0 Then

@@ -167,7 +167,7 @@ Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, capchroma As Lon
 Dim Quit
 Private OldPar As Long, dragCharpos As Long
 ' new
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private Type DRAWTEXTPARAMS
      cbSize As Long
      iTabLength As Long
@@ -8873,19 +8873,16 @@ End With
 Retired
 
 End Sub
-Sub Colors(white1, Optional black1, Optional dimm11, Optional dimm21, Optional dimm33)
-
+Sub Colors(white1, Optional black1, Optional dimm11, Optional dimm21, Optional dimm33, Optional dimm34)
+If Not glistN Is Nothing Then
 white = mycolor(white1)
-If Not IsMissing(black1) Then
-black = mycolor(black1)
-If Not IsMissing(dimm11) Then
-dimm1 = dimm11
-If Not IsMissing(dimm21) Then dimm2 = dimm21
-End If
-End If
-If Not IsMissing(dimm33) Then glistN.CapColor = CLng(dimm33)
-
+If Not IsMissing(black1) Then black = mycolor(black1)
+If Not IsMissing(dimm11) Then dimm1 = mycolor(dimm11)
+If Not IsMissing(dimm21) Then dimm2 = mycolor(dimm21)
+If Not IsMissing(dimm34) Then glistN.dcolor = CLng(mycolor(dimm34))
+If Not IsMissing(dimm33) Then glistN.CapColor = CLng(mycolor(dimm33))
 Retired
+End If
 End Sub
 Public Sub Retired()
 If mStayOpen Then

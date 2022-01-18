@@ -19,7 +19,7 @@ Private Channel As Long
 Private volume As Long
 Private lNote As Integer
 Private mNote As Integer
-Private m_duration As Long
+Private m_duration As Currency
 Dim jobnameID As Long
 Dim metronome As Long
 Dim mybusy As Boolean
@@ -53,12 +53,12 @@ Private Property Get TaskInterface_ID() As Long
 TaskInterface_ID = Channel + 1
 End Property
 
-Private Property Let TaskInterface_interval(ByVal RHS As Double)
-m_duration = CLng(RHS)
+Private Property Let TaskInterface_interval(ByVal RHS As Currency)
+m_duration = RHS
 End Property
 
-Private Property Get TaskInterface_interval() As Double
-TaskInterface_interval = CDbl(m_duration)
+Private Property Get TaskInterface_interval() As Currency
+TaskInterface_interval = m_duration
 End Property
 
 ' IMPLEMENTED PROPERTIES
@@ -88,7 +88,7 @@ On Error GoTo poulos
    instrum = CLng(Values(1))
 Channel = jobnameID - 1
 volume = 127
-    m_duration = 0 'MasterTimer + 1600
+    m_duration = 0@ 'MasterTimer + 1600
     
     If Err.Number > 0 Then
       On Error GoTo 0
@@ -107,7 +107,7 @@ End Sub
 
 Private Function TaskInterface_Tick() As Boolean
  Dim midimsg As Long
-If mute Or m_duration <= uintnew(CDbl(timeGetTime)) Then
+If mute Or m_duration <= uintnew(CCur(timeGetTime)) Then
 TaskInterface_Tick = True
 If mNote > 0 Then
  midimsg = &H80 + (mNote * &H100) + Channel
@@ -128,7 +128,7 @@ If mNote > 0 Then
     
     If BE < 1 Then BE = 1
     If BE > 6 Then BE = 6
-        m_duration = uintnew(CDbl(timeGetTime)) + BEATS(Channel) / 2 ^ (BE - 1)
+        m_duration = uintnew(CCur(timeGetTime)) + CCur(BEATS(Channel) / 2# ^ (BE - 1))
    If mNote <> -1 Then
     mNote = GetNote(octava, lNote \ 2)
       midimsg = &H90 + (mNote * &H100) + (volume * &H10000) + Channel

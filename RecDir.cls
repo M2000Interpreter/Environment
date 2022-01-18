@@ -51,7 +51,7 @@ Private Declare Function FindClose Lib "kernel32.dll" (ByVal hFindFile As Long) 
 
 Dim myfile$(), myLevel() As Integer
 Public Event DirFinished()
-Public Event feedback(FileName$) ' dir or filenames...
+Public Event feedback(Filename$) ' dir or filenames...
 Dim Filetypes2find As String  ' input  "jpg|bmp"  or ""
 Dim mrec As Boolean
 Public abort As Boolean
@@ -127,7 +127,7 @@ Public Function GetLongName(strTest As String) As String
    GetLongName = sLongPath
  
 End Function
-  Function TotalDiskSpace(DriveLetter As String) As Double
+  Function TotalDiskSpace(DriveLetter As String) As Currency
 ' Returns the total storage capacity for a drive
 On Error GoTo 100
 Dim Dletter As String, x As Long
@@ -146,7 +146,7 @@ Dim Dletter As String, x As Long
         Exit Function
     End If
     TotalDiskSpace = _
-    Int(CDbl(SectorsPerCluster * BytesPerSector) * TotalClusters / 1024 / 1024)
+    Int(CCur(uintnew(SectorsPerCluster) * uintnew(BytesPerSector)) * uintnew(TotalClusters) / 1024@ / 1024@)
     Exit Function
 100
     MsgBox "error at totaldiskspace"
@@ -172,7 +172,7 @@ Function NumberofDrives() As Integer
     Exit Function
 End Function
 
-Function DriveName(Index As Integer) As String
+Function DriveName(index As Integer) As String
     Dim i As Integer
     Dim Buffer As String
     Buffer = String$(260, 0)
@@ -188,7 +188,7 @@ Function DriveName(Index As Integer) As String
           TheDrive = TheDrive & Mid$(Buffer, i, 1)
         If Asc(Mid$(Buffer, i, 1)) = 0 Then 'null separates drives
             DriveCount = DriveCount + 1
-            If DriveCount = Index Then
+            If DriveCount = index Then
                 DriveName = UCase(Left(TheDrive, 1))
                 Exit Function
             End If
@@ -198,25 +198,24 @@ Function DriveName(Index As Integer) As String
 End Function
     
 
-Function FreeDiskSpace(DriveLetter As String) As Double
+Function FreeDiskSpace(DriveLetter As String) As Currency
 ' Returns the number of free bytes for a drive
 On Error GoTo 400
-Dim Dletter As String, x As Double
+Dim Dletter As String, x As Currency
     Dim SectorsPerCluster As Long
     Dim BytesPerSector As Long
     Dim NumberofFreeClusters As Long
     Dim TotalClusters As Long
 
     Dletter = Left(DriveLetter, 1) & ":\"
-    x = GetDiskFreeSpace(Dletter, SectorsPerCluster, _
-      BytesPerSector, NumberofFreeClusters, TotalClusters)
+    x = uintnew(GetDiskFreeSpace(Dletter, SectorsPerCluster, _
+      BytesPerSector, NumberofFreeClusters, TotalClusters))
     
     If x = 0 Then 'Error occurred
-        FreeDiskSpace = -99 'Assign an arbitrary error value
+        FreeDiskSpace = -99@ 'Assign an arbitrary error value
         Exit Function
     End If
-    FreeDiskSpace = _
-      SectorsPerCluster * BytesPerSector * NumberofFreeClusters
+    FreeDiskSpace = uintnew(SectorsPerCluster) * uintnew(BytesPerSector) * uintnew(NumberofFreeClusters)
       Exit Function
 400
       MsgBox "error at freediskspace"
@@ -291,16 +290,16 @@ ReDim myfile$(100)
 ReDim myLevel(100) As Integer
 InUseItems = 0
 End Sub
-Public Property Get list(Index As Long) As String
-If Index < 0 Then
+Public Property Get list(index As Long) As String
+If index < 0 Then
 list = vbNullString
 Else
 If Not onetime Then onetime = True: once
-list = myfile$(Index)
+list = myfile$(index)
 End If
 End Property
-Public Property Let list(Index As Long, RHS As String)
-myfile$(Index) = RHS
+Public Property Let list(index As Long, RHS As String)
+myfile$(index) = RHS
 End Property
 
 Private Function CheckFile(ByVal expan$) As Boolean
@@ -372,7 +371,7 @@ Else
 End If
 RaiseEvent DirFinished
 End Function
-Public Function FileAttr(a$, Attr As Long) As Boolean
+Public Function FileAttr(a$, attr As Long) As Boolean
 Dim wfd As WIN32_FIND_DATA
 On Error GoTo there1
 Dim fhandle As Long
@@ -380,7 +379,7 @@ Dim fhandle As Long
 fhandle = FindFirstFile(StrPtr(a$), wfd)
 
 If (fhandle > 0) Then
-Attr = wfd.dwFileAttributes
+attr = wfd.dwFileAttributes
 lastTimeStamp = FileTimeToDate(wfd.ftLastWriteTime)
 FileAttr = True
 FindClose fhandle
@@ -394,13 +393,13 @@ End If
 fhandle = FindFirstFile(StrPtr(b$), wfd)
 
 If (fhandle > 0) Then
-Attr = wfd.dwFileAttributes
+attr = wfd.dwFileAttributes
 lastTimeStamp = FileTimeToDate(wfd.ftLastWriteTime)
 FileAttr = True
 FindClose fhandle
 Else
 If GetLongName(a$) <> "" Then
-Attr = CLng(GetAttr(a$))
+attr = CLng(GetAttr(a$))
 lastTimeStamp = 0
 FileAttr = True
 End If
@@ -721,21 +720,21 @@ b$ = NLtrim$(a$)
 End If
 End If
 End Function
-Private Function PointPos(F$) As Long
+Private Function PointPos(f$) As Long
 Dim er As Long, er2 As Long
-While IsSymbol3(F$, """")
-F$ = GetStrUntil(Chr(34), F$)
+While IsSymbol3(f$, """")
+f$ = GetStrUntil(Chr(34), f$)
 Wend
 Dim i As Long, j As Long, oj As Long
-If F$ = vbNullString Then
+If f$ = vbNullString Then
 PointPos = 1
 Else
 er = 3
 er2 = 3
-For i = 1 To Len(F$)
+For i = 1 To Len(f$)
 er = er + 1
 er2 = er2 + 1
-Select Case Mid$(F$, i, 1)
+Select Case Mid$(f$, i, 1)
 Case "."
 oj = j: j = i
 Case "\", "/", ":", Is = """"
@@ -759,27 +758,27 @@ End Select
 Next i
 If j = 0 Then
 If oj = 0 Then
-j = Len(F$) + 1
+j = Len(f$) + 1
 Else
 j = oj
 End If
 End If
-While Mid$(F$, j, i) = " "
+While Mid$(f$, j, i) = " "
 j = j - 1
 Wend
 PointPos = j
 End If
 End Function
-Public Function ExtractType(F$, Optional JJ As Long = 0) As String
+Public Function ExtractType(f$, Optional JJ As Long = 0) As String
 Dim i As Long, j As Long, D$
-If IsSymbol3(F$, """") Then F$ = GetStrUntil(Chr(34), F$)
-If F$ = vbNullString Then ExtractType = vbNullString: Exit Function
+If IsSymbol3(f$, """") Then f$ = GetStrUntil(Chr(34), f$)
+If f$ = vbNullString Then ExtractType = vbNullString: Exit Function
 If JJ > 0 Then
 j = JJ
 Else
-j = PointPos(F$)
+j = PointPos(f$)
 End If
-D$ = F$ & " "
+D$ = f$ & " "
 If j < Len(D$) Then
 For i = j To Len(D$)
 Select Case Mid$(D$, i, 1)
@@ -797,24 +796,24 @@ Else
 ExtractType = vbNullString
 End If
 End Function
-Public Function ExtractPath(F$, Optional IsAfile As Boolean = True) As String
-If F$ = ".." Then ExtractPath = F$: Exit Function
+Public Function ExtractPath(f$, Optional IsAfile As Boolean = True) As String
+If f$ = ".." Then ExtractPath = f$: Exit Function
 Dim i As Long, j As Long
-j = PointPos(F$)
-If Mid$(F$, j, 1) = "." Then
+j = PointPos(f$)
+If Mid$(f$, j, 1) = "." Then
 '
 Else
-j = Len(F$)
+j = Len(f$)
 End If
 For i = j To 1 Step -1
-Select Case Mid$(F$, i, 1)
+Select Case Mid$(f$, i, 1)
 Case Is < " ", "\", "/", ":"
 Exit For
 End Select
 Next i
 If Not IsAfile Then
     For i = i - 1 To 1 Step -1
-    Select Case Mid$(F$, i, 1)
+    Select Case Mid$(f$, i, 1)
     Case Is < " ", "\", "/", ":"
     Exit For
     End Select
@@ -823,45 +822,45 @@ End If
 If i = 0 Then
 ExtractPath = vbNullString
 Else
-ExtractPath = Mid$(F$, 1, i)
+ExtractPath = Mid$(f$, 1, i)
 End If
 End Function
-Public Function ExtractName(F$) As String
+Public Function ExtractName(f$) As String
 Dim i As Long, j As Long, k$
-If F$ = vbNullString Then Exit Function
+If f$ = vbNullString Then Exit Function
 'j = PointPos(F$)
 
 'If Mid$(F$, j, 1) = "." Then
 'k$ = ExtractType(F$, j)
 'Else
-j = Len(F$)
+j = Len(f$)
 'End If
 For i = j To 1 Step -1
-Select Case Mid$(F$, i, 1)
+Select Case Mid$(f$, i, 1)
 Case Is < " ", "\", "/", ":"
 Exit For
 End Select
 Next i
 If k$ = vbNullString Then
-If Mid$(F$, i + j - i, 1) = "." Then
-ExtractName = Mid$(F$, i + 1, j - i - 1)
+If Mid$(f$, i + j - i, 1) = "." Then
+ExtractName = Mid$(f$, i + 1, j - i - 1)
 Else
-ExtractName = Mid$(F$, i + 1, j - i)
+ExtractName = Mid$(f$, i + 1, j - i)
 
 End If
 Else
-ExtractName = Mid$(F$, i + 1, j - i) + k$
+ExtractName = Mid$(f$, i + 1, j - i) + k$
 End If
 
 End Function
-Public Function isReadOnly(ByVal F$) As Boolean
+Public Function isReadOnly(ByVal f$) As Boolean
 Dim v&
 
 Err.Clear
 On Error Resume Next
-If Right$(F$, 1) = "\" Then F$ = Mid$(F$, 1, Len(F$) - 1)
-If F$ <> "" Then
-If FileAttr(F$, v&) Then isReadOnly = (v& And 1) > 0 Else isReadOnly = True
+If Right$(f$, 1) = "\" Then f$ = Mid$(f$, 1, Len(f$) - 1)
+If f$ <> "" Then
+If FileAttr(f$, v&) Then isReadOnly = (v& And 1) > 0 Else isReadOnly = True
 
 Else
 isReadOnly = True
@@ -871,12 +870,12 @@ End Function
 Private Function isdirP(wfd As WIN32_FIND_DATA) As Boolean
 isdirP = (wfd.dwFileAttributes And 16) > 0
 End Function
-Public Function isdir(F$) As Boolean
+Public Function isdir(f$) As Boolean
 Dim v&
 Err.Clear
-If F$ = vbNullString Then Exit Function
+If f$ = vbNullString Then Exit Function
 On Error Resume Next
-If FileAttr(F$, v&) Then
+If FileAttr(f$, v&) Then
 isdir = (v& And 16) > 0
 End If
 End Function

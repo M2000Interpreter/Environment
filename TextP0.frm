@@ -1518,7 +1518,7 @@ Set TEXT1.Container = gList1
 With TEXT1.glistN
 .DragEnabled = False ' only drop - we can change this from popup menu
 .enabled = False
-TEXT1.FileName = vbNullString
+TEXT1.Filename = vbNullString
 .addpixels = 0
 TEXT1.showparagraph = False
 
@@ -3317,7 +3317,7 @@ Exit Sub
 End If
 End If
 End If
-pp = pp + CDbl(timeGetTime)
+pp = pp + CCur(timeGetTime)
 
 Do
 
@@ -3341,7 +3341,7 @@ Exit Do
 End If
 End If
 End If
-Loop Until pp <= CDbl(timeGetTime) Or NOEXECUTION
+Loop Until pp <= CCur(timeGetTime) Or NOEXECUTION
 
                        If exWnd <> 0 Then
                 MyTitle$ bstack
@@ -3568,7 +3568,7 @@ End If
 End If
 End If
 
-pp = pp + CDbl(timeGetTime)
+pp = pp + CCur(timeGetTime)
 
 Do
 
@@ -3591,7 +3591,7 @@ Exit Do
 End If
 End If
 End If
-Loop Until pp <= CDbl(timeGetTime) Or NOEXECUTION Or MOUT
+Loop Until pp <= CCur(timeGetTime) Or NOEXECUTION Or MOUT
 
                        If exWnd <> 0 Then
                 MyTitle$ bstack

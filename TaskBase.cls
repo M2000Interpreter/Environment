@@ -21,7 +21,7 @@ Private myPriority As PriorityLevel
 Private myDone As Boolean
 Private myid As Long
 Private mybusy As Boolean
-Private myInterval As Double
+Private myInterval As Currency
 Private myProcess As basetask
 
 Private Sub Class_Initialize()
@@ -76,11 +76,11 @@ Private Property Get TaskInterface_ID() As Long
 TaskInterface_ID = myid
 End Property
 
-Private Property Let TaskInterface_interval(ByVal RHS As Double)
+Private Property Let TaskInterface_interval(ByVal RHS As Currency)
 myInterval = RHS
 End Property
 
-Private Property Get TaskInterface_interval() As Double
+Private Property Get TaskInterface_interval() As Currency
 TaskInterface_interval = myInterval
 End Property
 

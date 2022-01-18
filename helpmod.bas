@@ -68,7 +68,7 @@ Private Declare Function GetLogicalDriveStrings Lib "kernel32" _
  lpSectorsPerCluster As Long, lpBytesPerSector As Long, _
  lpNumberOfFreeClusters As Long, lpTtoalNumberOfClusters As Long) _
  As Long
- Function FreeDiskSpace(DriveLetter As String) As Double
+ Function FreeDiskSpace(DriveLetter As String) As Currency
 ' Returns the number of free bytes for a drive
 
     Dim SectorsPerCluster As Long
@@ -81,11 +81,10 @@ Private Declare Function GetLogicalDriveStrings Lib "kernel32" _
       BytesPerSector, NumberofFreeClusters, TotalClusters)
     
     If x = 0 Then 'Error occurred
-        FreeDiskSpace = -99 'Assign an arbitrary error value
+        FreeDiskSpace = -99@ 'Assign an arbitrary error value
         Exit Function
     End If
-    FreeDiskSpace = _
-      CDbl(SectorsPerCluster) * CDbl(BytesPerSector) * CDbl(NumberofFreeClusters) / (1024# * 1024#) * 0.975  '0.025% for the sysrem
+    FreeDiskSpace = uintnew(SectorsPerCluster) * uintnew(BytesPerSector) * uintnew(NumberofFreeClusters) / (1024@ * 1024@) * 0.975  '0.025% for the sysrem
 End Function
     Function strMachineName() As String
 

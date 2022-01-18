@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 10
 Global Const VerMinor = 0
-Global Const Revision = 51
+Global Const Revision = 52
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5030,7 +5030,7 @@ priorityOr = False  '  TRUE OR FALSE AND FALSE GIVE -1 BECAUSE OR AND XOR PROCES
 '' WITH priorityOr = FALSE WE HAVE FLAT SYSTEM.........TRUE OR FALSE AND FALSE GIVE 0
 OperatingSystem
  dv20 = 24.5
-Randomize CDbl(timeGetTime)
+Randomize uintnew(CCur(timeGetTime))
 JetPrefixUser = JetPrefixHelp
 JetPostfixUser = JetPostfixHelp
 JetPostfix = JetPostfixHelp
@@ -5090,7 +5090,7 @@ TimeZones zones
 Set TaskMaster = New TaskMaster
 TaskMaster.Interval = 5
 beeperBEAT = 300
-MediaPlayer1.FileName = vbNullString
+MediaPlayer1.Filename = vbNullString
 defFontname = "Verdana"
 my_system = OperatingPlatform
 vol = 50
@@ -26207,9 +26207,9 @@ Static once As Boolean
 If once Then Exit Sub
   If Not TaskMaster Is Nothing Then
 
-    If Abs(MasterTimer - CDbl(timeGetTime)) > 50 Then
+    If Abs(MasterTimer - uintnew(CCur(timeGetTime))) > 50 Then
         If Not extreme Then once = True: DoEvents: once = False
-        MasterTimer = CDbl(timeGetTime)
+        MasterTimer = uintnew(CCur(timeGetTime))
     End If
    ' Form1.Caption = MasterTimer
     TaskMaster.TimerTick
@@ -26516,7 +26516,7 @@ End If
 End If
 End If
 
-pp = pp + CDbl(timeGetTime)
+pp = pp + CCur(timeGetTime)
 If TaskMaster Is Nothing Then Set TaskMaster = New TaskMaster
 Do
 
@@ -26543,7 +26543,7 @@ Exit Do
 End If
 End If
 End If
-Loop Until pp <= CDbl(timeGetTime) Or NOEXECUTION
+Loop Until pp <= CCur(timeGetTime) Or NOEXECUTION
 
                        If exWnd <> 0 Then
                 MyTitle$ bstack
@@ -34404,7 +34404,7 @@ If IsLabelSymbolNew(rest$, "лоусийг", "MUSIC", Lang) Then
             End If
             If s$ <> "" Then
                 MediaBack1.closeMovie
-                MediaBack1.FileName = s$
+                MediaBack1.Filename = s$
                 MediaBack1.openMovie
                 MediaBack1.playMovie
             End If

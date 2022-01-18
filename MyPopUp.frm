@@ -62,8 +62,8 @@ Dim allheight As Long, allwidth As Long, itemWidth As Long
 Private myobject As Object
 Public LASTActiveForm As Form, previewKey As Boolean
 Dim ttl$(1 To 2)
-
 Public Sub Up(Optional x As Variant, Optional y As Variant)
+Dim hmonitor As Long
 If IsMissing(x) Then
 x = CSng(MOUSEX())
 y = CSng(MOUSEY())
@@ -71,14 +71,15 @@ Else
 x = x + Form1.Left
 y = y + Form1.top
 End If
-If x + Width > VirtualScreenWidth() Then
-If y + Height > VirtualScreenHeight() Then
-move VirtualScreenWidth() - Width, VirtualScreenHeight() - Height
+hmonitor = FindMonitorFromPixel(x, y)
+If x + Width > ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left Then
+If y + Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
+move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - Width, y - Height
 Else
-move VirtualScreenWidth() - Width, y
+move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - Width, y
 End If
-ElseIf y + Height > VirtualScreenHeight() Then
-move x, VirtualScreenHeight() - Height
+ElseIf y + Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
+move x, y - Height
 Else
 move x, y
 End If
@@ -86,6 +87,7 @@ Show
 MyDoEvents
 End Sub
 Public Sub UpGui(that As Object, x As Variant, y As Variant, thistitle$)
+Dim hmonitor As Long
 If thistitle$ <> "" Then
 gList1.HeadLine = vbNullString
 gList1.HeadLine = thistitle$
@@ -96,16 +98,15 @@ gList1.HeadlineHeight = 0
 End If
 x = x + that.Left
 y = y + that.top
-
-
-If x + Width > VirtualScreenWidth() Then
-If y + Height > VirtualScreenHeight() Then
-move VirtualScreenWidth() - Width, VirtualScreenHeight() - Height
+hmonitor = FindMonitorFromPixel(x, y)
+If x + Width > ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left Then
+If y + Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
+move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - Width, y - Height
 Else
-move VirtualScreenWidth() - Width, y
+move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - Width, y
 End If
-ElseIf y + Height > VirtualScreenHeight() Then
-move x, VirtualScreenHeight() - Height
+ElseIf y + Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
+move x, y - Height
 Else
 move x, y
 End If

@@ -249,11 +249,11 @@ Public Property Get Caption() As String
 Caption = mCaptext
 End Property
 
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Friend Property Let Index(ByVal RHS As Long)
+Friend Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Get enabled() As Long
@@ -277,15 +277,18 @@ glistN.forecolor = rgb(255, 255, 255)
 dimm1 = rgb(100, 200, 160)
 dimm2 = rgb(200, 120, 60)
 End Sub
-Sub Colors(white1, Optional dimm21, Optional dimm11)
+Sub Colors(white1, Optional dimm21, Optional dimm11, Optional dimm33)
 On Error Resume Next
 If Not glistN Is Nothing Then
 glistN.forecolor = mycolor(white1)
-If Not IsMissing(dimm21) Then
-dimm2 = dimm21
-If Not IsMissing(dimm11) Then dimm1 = dimm11
+If Not IsMissing(dimm21) Then dimm2 = mycolor(dimm21)
+
+If Not IsMissing(dimm11) Then dimm1 = mycolor(dimm11)
+
+If Not IsMissing(dimm33) Then glistN.CapColor = CLng(mycolor(dimm33))
 End If
-End If
+
+
 'Retired
 End Sub
 Public Sub Shutdown()

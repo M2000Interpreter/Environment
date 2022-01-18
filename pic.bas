@@ -1,5 +1,9 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
+Private Type abcd
+    x As Long
+    com() As String
+End Type
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
 Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Any)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
@@ -325,9 +329,9 @@ Public Const KLF_REORDER = &H8
 ''' Size of KeyboardLayoutName (number of characters), including nul terminator
 Public Const KL_NAMELENGTH = 9
 
-Declare Function LoadKeyboardLayout Lib "user32" Alias "LoadKeyboardLayoutA" (ByVal pwszKLID As String, ByVal Flags As Long) As Long
+Declare Function LoadKeyboardLayout Lib "user32" Alias "LoadKeyboardLayoutA" (ByVal pwszKLID As String, ByVal flags As Long) As Long
 Declare Function UnloadKeyboardLayout Lib "user32" (ByVal HKL As Long) As Long
-Declare Function ActivateKeyboardLayout Lib "user32" (ByVal HKL As Long, ByVal Flags As Long) As Long
+Declare Function ActivateKeyboardLayout Lib "user32" (ByVal HKL As Long, ByVal flags As Long) As Long
 Public Sub PlaceIcon(a As StdPicture)
 On Error Resume Next
 If UseMe Is Nothing Then Exit Sub
@@ -2049,7 +2053,7 @@ For i = PobjNum To 1 Step -1
         players(i) = Zero
         Prefresh(i) = zerocounter
         PobjNum = i
-If Form1.dSprite.count > PobjNum Then Unload Form1.dSprite(PobjNum)
+If Form1.dSprite.Count > PobjNum Then Unload Form1.dSprite(PobjNum)
 Next i
 PobjNum = 0
 
@@ -4829,3 +4833,12 @@ End Sub
 Public Function Keyboards(what) As String
    Keyboards = GetlocaleString2(94&, what)
 End Function
+Public Sub testthis()
+Dim a As abcd, b As abcd
+ReDim a.com(0 To 3)
+a.com(1) = "ok"
+b = a
+a.com(1) = "ok11"
+Debug.Print b.com(1)
+End Sub
+

@@ -49,9 +49,9 @@ Public Property Let Busy(ByVal Value As Boolean)
 End Property
 Public Property Get Busy() As Boolean
 End Property
-Public Property Get Interval() As Double
+Public Property Get Interval() As Currency
 End Property
-Public Property Let Interval(ByVal Value As Double)
+Public Property Let Interval(ByVal Value As Currency)
 End Property
 Public Property Get CodeData() As String
 End Property

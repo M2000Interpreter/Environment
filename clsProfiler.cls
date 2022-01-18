@@ -12,11 +12,11 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
-Private MARK1 As Currency
-Private Declare Function QueryPerformanceCounter Lib "KERNEL32" _
+Private mark1 As Currency
+Private Declare Function QueryPerformanceCounter Lib "kernel32" _
    (lpPerformanceCount As Currency) _
    As Boolean
-Private Declare Function QueryPerformanceFrequency Lib "KERNEL32" _
+Private Declare Function QueryPerformanceFrequency Lib "kernel32" _
    (lpPerformanceCount As Currency) _
    As Boolean
 Private CountsPerSecond As Currency
@@ -24,13 +24,13 @@ Private CountsPerSecond As Currency
 Public Sub MARKONE()
 Dim CTR As Currency
 QueryPerformanceCounter CTR
-MARK1 = CTR
+mark1 = CTR
 End Sub
 Public Function MARKTWO() As Double
-Dim MARK2 As Currency
-If QueryPerformanceCounter(MARK2) Then
+Dim mark2 As Currency
+If QueryPerformanceCounter(mark2) Then
 If CountsPerSecond = 0 Then QueryPerformanceFrequency CountsPerSecond
-MARKTWO = ((MARK2 - MARK1) / CountsPerSecond) * 1000
+MARKTWO = ((mark2 - mark1) / CountsPerSecond) * 1000
 End If
 End Function
 Public Property Get getAPIOverhead() As Currency

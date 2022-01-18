@@ -17,7 +17,7 @@ Option Explicit
 Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Event ValidString(ThatString As String, setpos As Long)
-Event KeyDown(KeyCode As Integer, shift As Integer)
+Event KeyDown(keycode As Integer, shift As Integer)
 Event LostFocus()
 Event GotFocus()
 Event KeyPress(KeyAscii As Integer)
@@ -275,11 +275,11 @@ Private Sub glistN_HeaderSelected(Button As Integer)
 Text = Text
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
-RaiseEvent KeyDown(KeyCode, shift)
-If KeyCode = vbKeyUp Then
-ElseIf KeyCode = vbKeyDown Then
-ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
+Private Sub glistN_KeyDown(keycode As Integer, shift As Integer)
+RaiseEvent KeyDown(keycode, shift)
+If keycode = vbKeyUp Then
+ElseIf keycode = vbKeyDown Then
+ElseIf keycode = vbKeyV And (shift And 3) = 2 Then
 If Not enabled Then Exit Sub
 Pad$ = GetTextData(13)
 If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
@@ -359,14 +359,12 @@ Public Property Get Value() As Long
 If glistN.Spinner Then
 Value = glistN.ValueSilent
 End If
-
 End Property
 
 Public Property Let Value(ByVal RHS As Long)
 If glistN.Spinner Then
 glistN.ValueSilent = RHS
 End If
-
 End Property
 
 Public Sub Dereference()

@@ -66,10 +66,12 @@ Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long
 Dim tParam As DRAWTEXTPARAMS
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
 Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT) As Long
-Private Declare Function SelectClipRgn Lib "gdi32" (ByVal Hdc As Long, ByVal hRgn As Long) As Long
+Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal Hdc As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
+Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hDC As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
 Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
+Public NumberOnly As Boolean
+Public NumberIntOnly As Boolean
 Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
 End Property
@@ -140,9 +142,7 @@ End If
 glistN.ShowMe2
 End Property
 Public Property Get Info() As String
-
 Info = glistN.HeadLine
-
 End Property
 
 Public Property Let Info(ByVal RHS As String)
@@ -247,9 +247,6 @@ Else
 End If
 End Sub
 
-Private Sub glistN_EnterOnly()
-''
-End Sub
 
 Private Sub glistN_Fkey(a As Integer)
 If a > 1000 Then
@@ -283,6 +280,15 @@ Private Sub glistN_ChangeListItem(item As Long, content As String)
 Dim this As String, thispos As Long, VR(2)
 thispos = glistN.SelStart - Len(mprompt)
 this = Mid$(content, 1 + Len(mprompt))
+If NumberOnly Then
+    If NLtrim$(this) = vbNullString Then
+    
+    ElseIf Not ValidNum(this, False, NumberIntOnly) Then
+        this = Mid$(glistN.list(item), 1 + Len(mprompt))
+    End If
+End If
+
+If Len(this) < thispos Then thispos = Len(this) + 1
 '' RaiseEvent ValidString(this, thispos)
 VR(0) = this
 VR(1) = thispos
@@ -312,7 +318,7 @@ If thisselstart <= Len(mprompt) Then thisselstart = Len(mprompt) + 1
 'glistN.ShowPan
 With glistN
 .ShowPan
-.ExternalCursor .SelStart, .list(.ListIndex), .forecolor
+.ExternalCursor thisselstart, .list(.ListIndex), .forecolor
 End With
 End Sub
 
@@ -408,30 +414,30 @@ Private Sub glistN_HeaderSelected(Button As Integer)
 Text = Text
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub glistN_KeyDown(keycode As Integer, shift As Integer)
 If MoveOnEnter Then
-If KeyCode = 13 Then
+If keycode = 13 Then
 If shift = 1 Then
 glistN.Goback
 Else
 glistN.GoON
 End If
 Exit Sub
-KeyCode = 0
+keycode = 0
 End If
 End If
 Dim VR(2)
-VR(0) = KeyCode
+VR(0) = keycode
 VR(1) = shift
    If mIndex >= 0 Then
    Callback.CallbackNow mesCtrlName + ".KeyDown(" + Str(mIndex) + ")", VR()
    Else
       Callback.CallbackNow mesCtrlName + ".KeyDown()", VR()
       End If
-KeyCode = VR(0)
+keycode = VR(0)
 shift = VR(1)
-If KeyCode = vbKeyF10 And shift <> 0 Then
-KeyCode = 0
+If keycode = vbKeyF10 And shift <> 0 Then
+keycode = 0
 If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
    Else
@@ -439,9 +445,9 @@ If mIndex >= 0 Then
       End If
 Exit Sub
 End If
-If KeyCode = vbKeyUp Then
-ElseIf KeyCode = vbKeyDown Then
-ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
+If keycode = vbKeyUp Then
+ElseIf keycode = vbKeyDown Then
+ElseIf keycode = vbKeyV And (shift And 3) = 2 Then
 If Not enabled Then Exit Sub
 Pad$ = GetTextData(13)
 If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
@@ -478,7 +484,7 @@ glistN.SetFocus
 End Sub
 
 Private Sub glistN_RTL(thisHDC As Long, item As Long, where As Long, mark10 As Long, mark20 As Long, Offset As Long)
-Offset = RealX1(thisHDC, where, vartext, where, mark10)
+Offset = RealX1(thisHDC, where, Text, where, mark10)
 
 End Sub
 Function RealX1(mHdc As Long, ByVal ExtSelStart As Long, ByVal that$, Optional nValue As Long = 0, Optional found As Long = 0) As Long
@@ -1137,21 +1143,50 @@ glistN.Vertical = True
 End Sub
 
 
-Public Property Get Value() As Long
+Public Property Get Value()
+On Error Resume Next
+Value = 0&
 If glistN.Spinner Then
-Value = glistN.ValueSilent
+Value = CVar(glistN.ValueSilent)
+ElseIf NumberOnly Then
+    If NLtrim$(vartext) = vbNullString Then
+        If Not NumberIntOnly Then
+            Value = CDbl(0)
+        Else
+            Value = CDec(0)
+        End If
+    ElseIf Not NumberIntOnly Then
+        If NowDec$ <> "." Then
+            Value = CDbl(val(Replace$(vartext, NowDec$, ".")))
+        Else
+            Value = CDbl(val(vartext))
+        End If
+    Else
+        Value = CDec(val(vartext))
+    End If
+Else
+    Value = vartext
 End If
 
 End Property
 
-Public Property Let Value(ByVal RHS As Long)
+Public Property Let Value(ByVal RHS)
 If glistN.Spinner Then
-glistN.ValueSilent = RHS
+On Error Resume Next
+glistN.ValueSilent = CLng(RHS)
+ElseIf NumberOnly Then
+    If IsNumeric(RHS) Then
+        vartext = Replace$(LTrim(Str$(RHS)), NowDec$, ".")
+    Else
+        vartext = Replace$(RHS, NowDec$, ".")
+    End If
+ElseIf IsNumeric(RHS) Then
+    vartext = Replace$(LTrim(Str$(RHS)), NowDec$, ".")
+Else
+    vartext = RHS
 End If
 
 End Property
-
-
 
 Public Property Get MaxCharLength() As Long
 MaxCharLength = glistN.maxchar
@@ -1268,11 +1303,11 @@ aa.bold = ThisBold
 Set glistN.Font = aa
 End If
 End Sub
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Friend Property Let Index(ByVal RHS As Long)
+Friend Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Let ShowAlways(ByVal vNewValue As Variant)
@@ -1321,8 +1356,8 @@ white = mycolor(white1)
 If Not IsMissing(black1) Then
 black = mycolor(black1)
 If Not IsMissing(dimm11) Then
-dimm1 = dimm11
-If Not IsMissing(dimm21) Then dimm2 = dimm21
+dimm1 = mycolor(dimm11)
+If Not IsMissing(dimm21) Then dimm2 = mycolor(dimm21)
 End If
 End If
 If enabled Then
@@ -1345,7 +1380,6 @@ End Property
 
 Public Property Let icon(RHS)
 glistN.icon = RHS
-
 End Property
 Public Property Let Drag(RHS)
 glistN.DragEnabled = RHS

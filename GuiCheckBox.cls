@@ -24,6 +24,8 @@ Private mesCtrlName As String
 Dim mIndex As Long, mStayOpen As Boolean
 Dim Callback As GuiM2000
 Public SkipFirstClick As Boolean
+Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, shadowcol As Long
+
 '' for every GuiSomething
 Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
@@ -32,11 +34,11 @@ Private Sub OneClick()
 On Error Resume Next
 If SkipFirstClick Then glistN.PrepareClick
 End Sub
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Friend Property Let Index(ByVal RHS As Long)
+Friend Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Private Sub glistN_CtrlPlusF1()
@@ -98,6 +100,10 @@ Set Callback = Nothing
   Set glistN = Nothing
 End Sub
 Public Sub SetUp()
+white = Callback.Controls(1).forecolor
+black = 0
+dimm1 = rgb(100, 200, 160)
+dimm2 = rgb(200, 120, 60)
 Dim ff As New StdFont
 With Callback
 ff.Name = .CtrlFontName
@@ -317,4 +323,22 @@ Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
 Private Sub gListN_AccKey(m As Long)
 Callback.AccProces m
+End Sub
+Sub Colors(white1, Optional dimm21, Optional dimm11, Optional dimm33)
+On Error Resume Next
+If Not glistN Is Nothing Then
+glistN.forecolor = mycolor(white1)
+If Not IsMissing(dimm21) Then dimm2 = mycolor(dimm21)
+
+If Not IsMissing(dimm11) Then dimm1 = mycolor(dimm11)
+
+If Not IsMissing(dimm33) Then glistN.CapColor = CLng(mycolor(dimm33))
+End If
+'Retired
+End Sub
+Sub ColorsReset()
+white = rgb(255, 255, 255)
+glistN.forecolor = rgb(255, 255, 255)
+dimm1 = rgb(100, 200, 160)
+dimm2 = rgb(200, 120, 60)
 End Sub

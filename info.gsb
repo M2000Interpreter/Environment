@@ -24610,7 +24610,7 @@ MODULE FORMTARGET {\\ FROM 9.9 REVISION 29
 \\ SCANNING HAPPEN AT THE MOUSE DOWN EVENT. SO TARGETS GET A CLICK ONLY
 \\ BUTTONS GET DOUBLE CLICK, OR SHIFT CAPTION LEFT, OR ENTER, BUT NOT A SIMPLE CLICK
 
-
+Title "ok11", 0
 
 Declare form1 Form
 m=false
@@ -24630,15 +24630,23 @@ Function form1.MouseDown {
 Function form1.Target {
 	\\ normal events executed to console
 	\\ so we have to use Layer to redirect to Form1 layer
-	Print "target:", number, A
-	Refresh
-	Layer Form1 {
+	read new code
+	local x,y, x1, y1
+Layer Form1 {
+	(x,y)=(mouse.x, mouse.y)
+	while mouse=1
+		change code, back 7
+		(x1,y1)=(mouse.x, mouse.y)
+		if x1<>x or y1<>y then change code, back 2: break
+		refresh
+	end while
 		Target A, m
 		if m then
 			change A, back 2
 		else
 			change A, back 0
 		end if
+		 change code, back 2
 	}
 	m~
 }
@@ -24650,13 +24658,14 @@ Layer form1 {
 	cursor 4, 4
 	\\ we use immediate execution, in this module
 	\\ so we call zz as this module (call local pass current scope to zz)
-	target A, "call local zz", 10, 3, 2,15, 105, "press me"
+	target A, "call local zz", 10, 2, 2,15, 105, "press me"
 	cursor 4, 8
 	\\ 115 means 5 center, 10 use target event, 100 proportional font rendering
-	target B,"z", 10, 3, 5,15, 115, "press me too"
+	target B,"?", 10, 2, 5,15, 115, "press me too"
 }
 Method form1,"show",1
 Declare form1 nothing
+Title "ok11", 1
 }
 MODULE MULTIASSIGN {Dim B(10)=0
 (A,B$,B(1))=(100, "Yes", 4)

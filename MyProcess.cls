@@ -29,7 +29,7 @@ Private MyMode As Long
 Private mybusy As Boolean
 Public hPipe As Long  ' τι δουλειά έχει εδώ;;
 Private pipename As String  '= "\\.\pipe\bigtest"
-Private myholdtime As Double
+Private myholdtime As Currency
 Private myBUFvar As String, res As Long
 Private Declare Function timeGetTime Lib "winmm.dll" () As Long
 Private myProcess As basetask  ' myprocess.process.id is the handler
@@ -81,18 +81,18 @@ myProcess.ThrowOne myid
     Set myProcessPureParent = Nothing
 End Sub
 
-Private Property Let TaskInterface_interval(ByVal RHS As Double)
+Private Property Let TaskInterface_interval(ByVal RHS As Currency)
 mYspace = RHS
 m_duration = 0
 mStep = False
 If mYspace = 0 Then
 
 Else
-m_duration = uintnew(CDbl(timeGetTime)) + mYspace
+m_duration = uintnew(CCur(timeGetTime)) + mYspace
 End If
 End Property
 
-Private Property Get TaskInterface_interval() As Double
+Private Property Get TaskInterface_interval() As Currency
 '
 
 TaskInterface_interval = mYspace
@@ -115,10 +115,10 @@ On Error GoTo poulos
     
     On Error Resume Next
     myid = CLng(Values(0))  ' this is the hanlde
-   mYspace = CDbl(Values(1)) '
+   mYspace = CCur(Values(1)) '
    mycode = CStr(Values(2))
-   myholdtime = CDbl(Values(3)) ' για το after μονο
-    m_duration = uintnew(CDbl(timeGetTime)) + myholdtime
+   myholdtime = CCur(Values(3)) ' για το after μονο
+    m_duration = uintnew(CCur(timeGetTime)) + myholdtime
    myHere$ = CStr(Values(4))  ' change from 5 to 4
    mNostretch = CBool(Values(5))
     If Err.Number > 0 Then
@@ -139,7 +139,6 @@ End Sub
 Private Function TaskInterface_Tick() As Boolean
 On Error Resume Next
  Dim x As Long, mycnt As Long, ohere$, look As Boolean, ok As Boolean
- Static Offset As Double
  Dim NowProcess As basetask
  Set NowProcess = myProcess
 
@@ -151,10 +150,10 @@ myDone = True
 End If
          
  If myDone Then GoTo there
- ok = m_duration <= uintnew(CDbl(timeGetTime))
+ ok = m_duration <= uintnew(CCur(timeGetTime))
  If ok Or mStep Then
  
-            If ok Then m_duration = uintnew(CDbl(timeGetTime)) + mYspace
+            If ok Then m_duration = uintnew(CCur(timeGetTime)) + mYspace
 
             If mybuf$ = vbNullString Then
             If Not ok Then mStep = False: Exit Function

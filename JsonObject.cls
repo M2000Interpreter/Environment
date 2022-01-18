@@ -34,7 +34,7 @@ Dim toplim As Long
 Private lastkey As String
 Private Hash() As Long
 Public Done As Boolean
-Public Index As Long
+Public index As Long
 Private ParentIndex As Long
 Private entrance As Long
 Private curdot$
@@ -53,7 +53,7 @@ Private Sub Class_Initialize()
     curdot$ = GetDeflocaleString(14)
 End Sub
 Private Sub AddKey(RHS, Optional aValue As Variant)
-    Index = -1
+    index = -1
     lastkey = Normalize(RHS)
     If Len(lastkey) = 0 Then RHS = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = RHS
     Done = False
@@ -76,26 +76,26 @@ If toplim < 0 Then Exit Sub
 top1 = toplim
 If Done Then
        If ParentIndex > -1 Then
-            PriveSpace(ParentIndex).Pleft = PriveSpace(Index).Pleft
+            PriveSpace(ParentIndex).Pleft = PriveSpace(index).Pleft
 
         Else
         
-        Hash(PriveSpace(Index).lastpos) = PriveSpace(Index).Pleft
+        Hash(PriveSpace(index).lastpos) = PriveSpace(index).Pleft
 
         End If
-        If top1 = Index Then
+        If top1 = index Then
             PriveSpace(top1) = new_item
         Else
             SwapVariant vvv, PriveSpace(top1).iValue
-            PriveSpace(Index).iValue = -1
-            PriveSpace(Index) = PriveSpace(top1)
+            PriveSpace(index).iValue = -1
+            PriveSpace(index) = PriveSpace(top1)
             PriveSpace(top1) = new_item
-            SwapVariant vvv, PriveSpace(Index).iValue
+            SwapVariant vvv, PriveSpace(index).iValue
         End If
-        k = Hash(PriveSpace(Index).lastpos) - 1
+        k = Hash(PriveSpace(index).lastpos) - 1
         If k = top1 Then
             ' we have to give the new position to Hash()
-            Hash(PriveSpace(Index).lastpos) = Index + 1
+            Hash(PriveSpace(index).lastpos) = index + 1
         Else
             Do While k >= 0 And k <> top1 And k <> k1
                    k1 = k
@@ -104,7 +104,7 @@ If Done Then
             If k = k1 Then
                ReHash
             ElseIf k = top1 Then
-               PriveSpace(k1).Pleft = Index + 1
+               PriveSpace(k1).Pleft = index + 1
             End If
         End If
   
@@ -146,27 +146,27 @@ End Sub
 
 Property Let Value(RHS As Variant)
 Done = False
-If Index = -1 Then
+If index = -1 Then
     ItemCreator lastkey, RHS
 Else
-    PriveSpace(Index).iValue = RHS
+    PriveSpace(index).iValue = RHS
 End If
 Done = True
 End Property
 Property Set ValueObj(RHS As Variant)
 Done = False
-If Index = -1 Then
+If index = -1 Then
     ItemCreator lastkey, RHS
 Else
-    Set PriveSpace(Index).iValue = RHS
+    Set PriveSpace(index).iValue = RHS
 End If
 Done = True
 End Property
 
 Property Get Value() As Variant
 Done = False
-If Not Index = -1 Then
-    With PriveSpace(Index)
+If Not index = -1 Then
+    With PriveSpace(index)
         If Not IsObject(.iValue) Then
             Done = True
                 Value = .iValue
@@ -179,8 +179,8 @@ End Property
 
 Property Get ValueObj() As Variant
 Done = False
-If Not Index = -1 Then
-    With PriveSpace(Index)
+If Not index = -1 Then
+    With PriveSpace(index)
         If IsObject(.iValue) Then
             Set ValueObj = .iValue
             Done = True
@@ -261,17 +261,17 @@ Private Function Malloc() As Long
     toplim = toplim + 1
     Malloc = toplim
 End Function
-Property Get count()
-    count = toplim + 1
+Property Get Count()
+    Count = toplim + 1
 End Property
 
 Property Get IsEmpty()
     IsEmpty = toplim = -1
 End Property
 Function IsObj() As Boolean
-If Index = -1 Then
+If index = -1 Then
 Else
-IsObj = IsObject(PriveSpace(Index).iValue)
+IsObj = IsObject(PriveSpace(index).iValue)
 End If
 End Function
 
@@ -284,7 +284,7 @@ k = Hash(HashFunc(Key)) - 1
 k1 = -2
 If k >= 0 Then
     Do
-        If PriveSpace(k).Key = Key Then ExistKey = True: Index = k: Exit Function
+        If PriveSpace(k).Key = Key Then ExistKey = True: index = k: Exit Function
         k1 = k
         k = PriveSpace(k).Pleft - 1
         
@@ -294,7 +294,7 @@ If k >= 0 Then
         k = Hash(HashFunc(Key)) - 1
         If k >= 0 Then
         Do
-            If PriveSpace(k).Key = Key Then ExistKey = True: Index = k: Exit Function
+            If PriveSpace(k).Key = Key Then ExistKey = True: index = k: Exit Function
             k1 = k
             k = PriveSpace(k).Pleft - 1
         Loop Until k < 0 Or k = k1
@@ -347,11 +347,11 @@ End With
 
 place HashFunc1(kk), a
 
-Index = a
+index = a
 Done = True
 End Sub
 Property Get Percent()
-Percent = 100 * count / hashlen
+Percent = 100 * Count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
@@ -380,52 +380,52 @@ End Sub
 
 
 Public Property Get KeyToString() As String
-If Index > -1 Then
+If index > -1 Then
 
-    KeyToString = PriveSpace(Index).Key
+    KeyToString = PriveSpace(index).Key
 End If
 End Property
 Public Sub ToStart()
-Index = 0
-Done = count > 0
+index = 0
+Done = Count > 0
 End Sub
 Public Sub ToEnd()
-Index = count - 1
-Done = count > 0
+index = Count - 1
+Done = Count > 0
 End Sub
 
 Public Sub NextIndex()
     Done = False
-    If Index = -1 Then
+    If index = -1 Then
  
     Else
-        If Index < toplim Then Done = True: Index = Index + 1
+        If index < toplim Then Done = True: index = index + 1
     End If
 
 End Sub
 Public Function ToNextIndex()
 Done = False
-    If Index = -1 Then
+    If index = -1 Then
  
     Else
-        If Index < toplim Then Done = True: Index = Index + 1
+        If index < toplim Then Done = True: index = index + 1
     End If
     ToNextIndex = Done
 End Function
 Public Sub PrevIndex()
     Done = False
-    If Index = -1 Then
+    If index = -1 Then
     
     Else
-        If Index > 0 Then Done = True: Index = Index - 1
+        If index > 0 Then Done = True: index = index - 1
     End If
 
 End Sub
 Public Function ToPrevIndex()
     Done = False
-    If Index = -1 Then
+    If index = -1 Then
     Else
-        If Index > 0 Then Done = True: Index = Index - 1
+        If index > 0 Then Done = True: index = index - 1
     End If
     ToPrevIndex = Done
 End Function
@@ -532,54 +532,54 @@ Function anObject(Key As String, RHS) As JsonObject
     m.Assign Key, RHS
     Set anObject = m
 End Function
-Function anArray(Index As Long, RHS) As JsonArray
+Function anArray(index As Long, RHS) As JsonArray
     Dim m As New JsonArray
     If IsObject(RHS) Then
-        Set m.ValueObj(Index) = RHS
+        Set m.ValueObj(index) = RHS
     Else
-        m.Value(Index) = RHS
+        m.Value(index) = RHS
     End If
     Set anArray = m
     
 End Function
 Property Get ValueIsNull(Key As String) As Boolean
     If ExistKey(Key) Then
-        ValueIsNull = VarType(PriveSpace(Index).iValue) = vbEmpty
+        ValueIsNull = VarType(PriveSpace(index).iValue) = vbEmpty
     Else
         ValueIsNull = True
     End If
 End Property
 Property Get ValueIsObj(Key As String) As Boolean
     If ExistKey(Key) Then
-        If IsObject(PriveSpace(Index).iValue) Then
-            ValueIsObj = TypeOf PriveSpace(Index).iValue Is JsonObject
+        If IsObject(PriveSpace(index).iValue) Then
+            ValueIsObj = TypeOf PriveSpace(index).iValue Is JsonObject
         End If
     End If
 End Property
 Property Get ValueIsArray(Key As String) As Boolean
     If ExistKey(Key) Then
-        If IsObject(PriveSpace(Index).iValue) Then
-            ValueIsArray = TypeOf PriveSpace(Index).iValue Is JsonArray
+        If IsObject(PriveSpace(index).iValue) Then
+            ValueIsArray = TypeOf PriveSpace(index).iValue Is JsonArray
         End If
     End If
 End Property
 Property Get ValueIsBoolean(Key As String) As Boolean
     If ExistKey(Key) Then
-        ValueIsBoolean = VarType(PriveSpace(Index).iValue) = vbBoolean
+        ValueIsBoolean = VarType(PriveSpace(index).iValue) = vbBoolean
     End If
 End Property
 Function ValType(Key As String) As Long
 If Not IsEmpty Then
     If ExistKey(Key) Then
-        If Not VarType(PriveSpace(Index).iValue) = vbEmpty Then
-            If IsObject(PriveSpace(Index).iValue) Then
-                If TypeOf PriveSpace(Index).iValue Is JsonArray Then
+        If Not VarType(PriveSpace(index).iValue) = vbEmpty Then
+            If IsObject(PriveSpace(index).iValue) Then
+                If TypeOf PriveSpace(index).iValue Is JsonArray Then
                     ValType = 4
                 Else
                     ValType = 5
                 End If
             Else
-                Select Case VarType(PriveSpace(Index).iValue)
+                Select Case VarType(PriveSpace(index).iValue)
                 Case 0, 1, 10
                 Case vbString
                     ValType = 1
@@ -596,15 +596,15 @@ If Not IsEmpty Then
 End If
 End Function
 Private Function ValType2() As Long
-If Not VarType(PriveSpace(Index).iValue) = vbEmpty Then
-    If IsObject(PriveSpace(Index).iValue) Then
-        If TypeOf PriveSpace(Index).iValue Is JsonArray Then
+If Not VarType(PriveSpace(index).iValue) = vbEmpty Then
+    If IsObject(PriveSpace(index).iValue) Then
+        If TypeOf PriveSpace(index).iValue Is JsonArray Then
             ValType2 = 4
         Else
             ValType2 = 5
         End If
     Else
-        Select Case VarType(PriveSpace(Index).iValue)
+        Select Case VarType(PriveSpace(index).iValue)
         Case 1, 10
         Case vbString
             ValType2 = 1
@@ -622,9 +622,9 @@ End Function
 Sub Assign(Key As String, RHS)
     If ExistKey(Key) Then
         If IsObject(RHS) Then
-            Set PriveSpace(Index).iValue = RHS
+            Set PriveSpace(index).iValue = RHS
         Else
-            PriveSpace(Index).iValue = RHS
+            PriveSpace(index).iValue = RHS
         End If
     Else
         AddKey Key, RHS
@@ -645,7 +645,7 @@ If TypeOf m Is JsonArray Then
     If n = s Then
         ma.Assign w, RHS
     ElseIf Left$(part$(n), 1) = " " Then
-            If ma.count <= w Or Not ma.ValType(w) > 3 Then
+            If ma.Count <= w Or Not ma.ValType(w) > 3 Then
                     If Left$(part$(n + 1), 1) = " " Then
                         ma.Assign w, New JsonArray
                     Else
@@ -714,19 +714,19 @@ Select Case w
 Case 0
     ToString = "null"
 Case 1
-    ToString = """" + StringToEscapeStr(PriveSpace(Index).iValue) + """"
+    ToString = """" + StringToEscapeStr(PriveSpace(index).iValue) + """"
 Case 2
-    If PriveSpace(Index).iValue Then ToString = "true" Else ToString = "false"
+    If PriveSpace(index).iValue Then ToString = "true" Else ToString = "false"
 Case 3
-    ToString = Replace("" & PriveSpace(Index).iValue, curdot$, dot)
+    ToString = Replace("" & PriveSpace(index).iValue, curdot$, dot)
 Case 4
-    Set ja = PriveSpace(Index).iValue
+    Set ja = PriveSpace(index).iValue
     ToString = ja.Json
 Case 5
-    Set jo = PriveSpace(Index).iValue
+    Set jo = PriveSpace(index).iValue
     ToString = jo.Json
 Case 33
-    ToString = Replace("" & PriveSpace(Index).iValue, curdot$, dot)
+    ToString = Replace("" & PriveSpace(index).iValue, curdot$, dot)
 End Select
 End Function
 Private Function ToString2(n As Long, ww As Long)
@@ -736,28 +736,28 @@ Select Case w
 Case 0
     ToString2 = "null"
 Case 1
-    ToString2 = """" + StringToEscapeStr(PriveSpace(Index).iValue) + """"
+    ToString2 = """" + StringToEscapeStr(PriveSpace(index).iValue) + """"
 Case 2
-    If PriveSpace(Index).iValue Then ToString2 = "true" Else ToString2 = "false"
+    If PriveSpace(index).iValue Then ToString2 = "true" Else ToString2 = "false"
 Case 3
-    ToString2 = Trim$(Str$(PriveSpace(Index).iValue))
+    ToString2 = Trim$(Str$(PriveSpace(index).iValue))
 Case 4
-    Set ja = PriveSpace(Index).iValue
+    Set ja = PriveSpace(index).iValue
     ToString2 = ja.Json(n, ww)
 Case 5
-    Set jo = PriveSpace(Index).iValue
+    Set jo = PriveSpace(index).iValue
     ToString2 = jo.Json(n, ww)
 Case 33
-    ToString2 = Replace("" & PriveSpace(Index).iValue, curdot$, ".")
+    ToString2 = Replace("" & PriveSpace(index).iValue, curdot$, ".")
 End Select
 End Function
 Property Get Json(Optional sp As Long = 0, Optional w As Long = -1) As String
     Dim hlp$, acc$, nl$
     sp = Abs(sp)
     If sp Then nl$ = vbCrLf + space$(sp): hlp$ = space$(sp): If w = -1 Then w = sp
-    For Index = 0 To count - 1
-        acc$ = acc$ + hlp$ + nl$ + """" + StringToEscapeStr(PriveSpace(Index).Key) + """" + " : " + ToString2(sp - w * (sp > 0), w)
-        If Index = 0 Then
+    For index = 0 To Count - 1
+        acc$ = acc$ + hlp$ + nl$ + """" + StringToEscapeStr(PriveSpace(index).Key) + """" + " : " + ToString2(sp - w * (sp > 0), w)
+        If index = 0 Then
             If sp Then
                 hlp$ = ","
             Else
@@ -772,7 +772,7 @@ Property Get Json(Optional sp As Long = 0, Optional w As Long = -1) As String
     Else
     Json = "{" + acc$ + vbCrLf + space(sp - w) + "}"
     End If
-    Index = -1
+    index = -1
 End Property
 Property Get item(Key As String)
 Attribute item.VB_UserMemId = 0
@@ -780,11 +780,11 @@ If ExistKey(Key) Then
     Select Case ValType2()
     Case 0
     Case 4, 5
-        Set item = PriveSpace(Index).iValue
+        Set item = PriveSpace(index).iValue
     Case 33
-        item = val("" & PriveSpace(Index).iValue)
+        item = val("" & PriveSpace(index).iValue)
     Case Else
-        item = PriveSpace(Index).iValue
+        item = PriveSpace(index).iValue
     End Select
 End If
 End Property
@@ -883,49 +883,49 @@ End If
 Split2 = s
 End Function
 Function Parser(a$) As Object
-Dim i As Long, jumpstring As Long, ch As String, level As Long, v
+Dim i As Long, jumpstring As Long, ch As String, Level As Long, v
 Dim b() As Byte
 ReDim b(0)
 Dim ma As JsonArray, mo As JsonObject
 Dim markin As Long
 Dim p()
 ReDim p(100), mm(100)
-level = -1
+Level = -1
 For i = 1 To Len(a$)
 ch = Mid$(a$, i, 1)
 If ch = "{" Then
-    level = level + 1
-    If level > UBound(p) Then ReDim Preserve p(level * 2): ReDim Preserve mm(level * 2)
-    p(level) = ""
-    Set mm(level) = New JsonObject
-    Set mo = mm(level)
+    Level = Level + 1
+    If Level > UBound(p) Then ReDim Preserve p(Level * 2): ReDim Preserve mm(Level * 2)
+    p(Level) = ""
+    Set mm(Level) = New JsonObject
+    Set mo = mm(Level)
 ElseIf ch = "}" Then
-    If ma Is mm(level) Then Exit Function
-    level = level - 1
-    If level < 0 Then Set Parser = mo: Exit Function
-    If TypeOf mm(level) Is JsonArray Then
-    Set ma = mm(level)
-        ma.Assign 0 + p(level), mm(level + 1)
+    If ma Is mm(Level) Then Exit Function
+    Level = Level - 1
+    If Level < 0 Then Set Parser = mo: Exit Function
+    If TypeOf mm(Level) Is JsonArray Then
+    Set ma = mm(Level)
+        ma.Assign 0 + p(Level), mm(Level + 1)
     Else
-        Set mo = mm(level)
-        mo.Assign "" + p(level), mm(level + 1)
+        Set mo = mm(Level)
+        mo.Assign "" + p(Level), mm(Level + 1)
     End If
 ElseIf ch = "[" Then
-    level = level + 1
-    If level > UBound(p) Then ReDim Preserve p(level * 2): ReDim Preserve mm(level * 2)
-    p(level) = 0
-    Set mm(level) = New JsonArray
-    Set ma = mm(level)
+    Level = Level + 1
+    If Level > UBound(p) Then ReDim Preserve p(Level * 2): ReDim Preserve mm(Level * 2)
+    p(Level) = 0
+    Set mm(Level) = New JsonArray
+    Set ma = mm(Level)
 ElseIf ch = "]" Then
-    If mo Is mm(level) Then Exit Function
-    level = level - 1
-    If level < 0 Then Set Parser = ma:  Exit Function
-    If TypeOf mm(level) Is JsonArray Then
-    Set ma = mm(level)
-        ma.Assign 0 + p(level), mm(level + 1)
+    If mo Is mm(Level) Then Exit Function
+    Level = Level - 1
+    If Level < 0 Then Set Parser = ma:  Exit Function
+    If TypeOf mm(Level) Is JsonArray Then
+    Set ma = mm(Level)
+        ma.Assign 0 + p(Level), mm(Level + 1)
     Else
-        Set mo = mm(level)
-        mo.Assign "" + p(level), mm(level + 1)
+        Set mo = mm(Level)
+        mo.Assign "" + p(Level), mm(Level + 1)
     End If
 ElseIf ch = """" Then
     markin = i + 1
@@ -937,31 +937,31 @@ ElseIf ch = """" Then
         ch = Mid$(a$, i, 1)
     Wend
     If ch = """" Then
-        If ma Is mm(level) Then
-            ma.Assign 0 + p(level), ma.EscapeStrToString(Mid$(a$, markin, i - markin))
-        ElseIf p(level) = "" Then
-            p(level) = mo.EscapeStrToString(Mid$(a$, markin, i - markin))
-            If p(level) = "" Then Exit Function
+        If ma Is mm(Level) Then
+            ma.Assign 0 + p(Level), ma.EscapeStrToString(Mid$(a$, markin, i - markin))
+        ElseIf p(Level) = "" Then
+            p(Level) = mo.EscapeStrToString(Mid$(a$, markin, i - markin))
+            If p(Level) = "" Then Exit Function
             While i < Len(a$) And ch <> ":"
                 i = i + 1
                 ch = Mid$(a$, i, 1)
             Wend
             If ch <> ":" Then Exit Function
         Else
-            mo.Assign "" + p(level), mo.EscapeStrToString(Mid$(a$, markin, i - markin))
+            mo.Assign "" + p(Level), mo.EscapeStrToString(Mid$(a$, markin, i - markin))
         End If
     Else
         Exit Function
     End If
 ElseIf ch = "," Then
-    If ma Is mm(level) Then p(level) = p(level) + 1 Else p(level) = ""
+    If ma Is mm(Level) Then p(Level) = p(Level) + 1 Else p(Level) = ""
 ElseIf ch = "t" Then
     If Mid$(a$, i, 4) = "true" Then
         i = i + 3
-        If ma Is mm(level) Then
-            ma.Assign 0 + p(level), True
+        If ma Is mm(Level) Then
+            ma.Assign 0 + p(Level), True
         Else
-            mo.Assign "" + p(level), True
+            mo.Assign "" + p(Level), True
         End If
     Else
         Exit Function
@@ -969,10 +969,10 @@ ElseIf ch = "t" Then
 ElseIf ch = "f" Then
     If Mid$(a$, i, 5) = "false" Then
         i = i + 4
-        If ma Is mm(level) Then
-            ma.Assign 0 + p(level), False
+        If ma Is mm(Level) Then
+            ma.Assign 0 + p(Level), False
         Else
-            mo.Assign "" + p(level), False
+            mo.Assign "" + p(Level), False
         End If
     Else
         Exit Function
@@ -980,10 +980,10 @@ ElseIf ch = "f" Then
 ElseIf ch = "n" Then
     If Mid$(a$, i, 4) = "null" Then
         i = i + 3
-        If ma Is mm(level) Then
-            ma.Assign 0 + p(level), ma.NullValue
+        If ma Is mm(Level) Then
+            ma.Assign 0 + p(Level), ma.NullValue
         Else
-            mo.Assign "" + p(level), mo.NullValue
+            mo.Assign "" + p(Level), mo.NullValue
         End If
     Else
         Exit Function
@@ -1003,29 +1003,29 @@ ElseIf ch Like "[+-0123456789.]" Then
     Loop
     If i > Len(a$) Then Exit Function
     ch$ = Mid$(a$, markin, i - markin + 1)
-    If ma Is mm(level) Then
+    If ma Is mm(Level) Then
         If Len(ch) > 28 Then
             If InStr(ch$, ".") > 0 Then Mid$(ch$, InStr(ch$, ".")) = curdot$
             b() = ch
             v = b()
-            ma.Assign 0 + p(level), v
+            ma.Assign 0 + p(Level), v
         ElseIf InStr(1, ch, "e", vbTextCompare) = 0 And Len(ch) > 14 Then
         If InStr(ch$, ".") > 0 Then Mid$(ch$, InStr(ch$, ".")) = curdot$
-            ma.Assign 0 + p(level), CDec(ch)
+            ma.Assign 0 + p(Level), CDec(ch)
         Else
-            ma.Assign 0 + p(level), val(ch)
+            ma.Assign 0 + p(Level), val(ch)
         End If
     Else
         If Len(ch) > 28 Then
             If InStr(ch$, ".") > 0 Then Mid$(ch$, InStr(ch$, ".")) = curdot$
             b() = ch
             v = b()
-            mo.Assign "" + p(level), v
+            mo.Assign "" + p(Level), v
         ElseIf InStr(1, ch, "e", vbTextCompare) = 0 And Len(ch) > 14 Then
             If InStr(ch$, ".") > 0 Then Mid$(ch$, InStr(ch$, ".")) = curdot$
-            mo.Assign "" + p(level), CDec(ch)
+            mo.Assign "" + p(Level), CDec(ch)
         Else
-            mo.Assign "" + p(level), val(ch)
+            mo.Assign "" + p(Level), val(ch)
         End If
     End If
 End If
