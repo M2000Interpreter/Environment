@@ -185,8 +185,8 @@ glistN.ShowMe2
 lastitem = item
 End If
 End Sub
- Private Sub PrintItem(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_RIGHT Or DT_VCENTER)
-    DrawText mHdc, StrPtr(c), -1, r, way
+ Private Sub PrintItem(mHdc As Long, c As String, R As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_RIGHT Or DT_VCENTER)
+    DrawText mHdc, StrPtr(c), -1, R, way
     End Sub
 Private Sub gListN_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Dim a As RECT, ofg As Long
@@ -1362,4 +1362,26 @@ End Property
 
 Public Property Let WrapText(ByVal RHS As Long)
 glistN.WrapText = RHS <> 0
+End Property
+Property Let Visible(ByVal RHS As Boolean)
+    If Not Textbox Is Nothing Then
+        If Not Textbox.glistN Is Nothing Then
+            If RHS = False Then
+                If Pad.Visible Then
+                    Iam = False
+                    glistN.BypassLeaveonChoose = True
+                    Textbox.SetFocus
+                    Pad.Visible = False
+                End If
+            End If
+            Textbox.glistN.Visible = RHS
+        End If
+    End If
+End Property
+Property Get Visible() As Boolean
+    If Not Textbox Is Nothing Then
+        If Not Textbox.glistN Is Nothing Then
+        Visible = Textbox.glistN.Visible
+        End If
+    End If
 End Property

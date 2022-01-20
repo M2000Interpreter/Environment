@@ -1,8 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 52 active-X
-A major upgrade for ListBox control, with multicolumn support. Some tweaks on GUI system done. This isn't the final upgrade. So wait for the final for some days.
-
+Version 10 revision 53 active-X
+Update glis4 control, for Listbox, Editbox, Combobox. Now we can edit RTL text.
+Fix multicolumn ListBox (additional Subs).
+Fix a bug which prevents running the M2000_Editor_Information module. Was a bug in Call method on a non child module.
 
 
 George Karras, Kallithea Attikis, Greece.

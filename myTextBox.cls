@@ -16,6 +16,7 @@ Option Explicit
 ' don't forget to set default property to vartext (changed from text)
 Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
+Private mark1 As Long, mark2 As Long
 Event ValidString(ThatString As String, setpos As Long)
 Event KeyDown(keycode As Integer, shift As Integer)
 Event LostFocus()
@@ -33,6 +34,8 @@ Event AccKey(m As Long)
 Private mprompt As String
 Private mkind As String, mPartColor As Long
 Public SkipProcAtExitFocus As Boolean, SkipFirstClick As Boolean
+Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
+
 Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
 Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
@@ -197,6 +200,7 @@ End Sub
 
 Private Sub glistN_ChangeSelStart(thisselstart As Long)
 If thisselstart <= Len(mprompt) Then thisselstart = Len(mprompt) + 1
+glistN.ShowMe2
 End Sub
 
 Public Property Get ThisKind() As String
@@ -513,3 +517,608 @@ End Sub
 Private Sub gListN_AccKey(m As Long)
 RaiseEvent AccKey(m)
 End Sub
+Private Sub glistN_GetRealX1(mHdc As Long, ByVal ExtSelStart As Long, ByVal that As String, retvalue As Long, ok As Boolean)
+retvalue = RealX1(mHdc, ExtSelStart, that)
+ok = True
+End Sub
+Private Sub glistN_RTL(thisHDC As Long, item As Long, where As Long, mark10 As Long, mark20 As Long, Offset As Long)
+Offset = RealX1(thisHDC, where, Text, where, mark10)
+End Sub
+Function RealX1(mHdc As Long, ByVal ExtSelStart As Long, ByVal that$, Optional nValue As Long = 0, Optional found As Long = 0) As Long
+If ExtSelStart <= 0 Then ExtSelStart = 1
+Dim ww$(), Col() As Long, items&, i, c As String
+Dim rleftacc As Long, original As Long, rx1 As Long, direction As Long
+Dim OldValue As Long, orx1 As Long, j As Long, nrtl As Boolean
+If Len(that$) = 0 Then
+    nValue = 1: Exit Function
+End If
+
+original = ExtSelStart
+
+ReDim ww$(0)
+ww$(0) = that$
+
+
+Dim M1 As Long, M2 As Long
+Dim dummy As RECT, R As RECT, tabw As Long, Offset As Long, hRgn As Long, estX As Long
+tabw = tParam.iTabLength * glistN.AveCharWith
+glistN.UserControlTextMetricsPixels that$, R.Right, R.Bottom
+dummy = R
+dummy.top = glistN.HeadlineHeightTwips + 1
+dummy.Bottom = dummy.top + R.Bottom
+R = dummy
+Offset = 0
+estX = 0
+'hRgn = CreateRectRgnIndirect(dummy)
+'SelectClipRgn mHdc, hRgn
+If found > 0 Then
+rx1 = LowWord(GetTabbedTextExtent(mHdc, StrPtr(that$), Len(that$), 1, tabw))
+If rx1 < found Then
+
+c = Right$(that$, 1)
+
+nValue = 1
+RTL3 c, nValue, mark1, mark2, nrtl, M1, M2
+If mark1 <> 0 And mark2 <> 0 Then
+nValue = Len(that$)
+RTL3 that$, nValue, mark1, mark2, nrtl, M1, M2
+nValue = mark1
+GoTo finish
+Else
+nValue = Len(ww(i))
+RTL3 ww(i), nValue, mark1, mark2, nrtl, M1, M2
+If mark1 <> 0 And mark2 <> 0 And nValue >= mark2 Then
+If nValue <= mark2 + 1 Then
+nValue = mark1
+GoTo finish
+Else
+nValue = nValue + 1
+ExtSelStart = nValue
+End If
+Else
+nValue = Len(that$) + 1
+GoTo finish
+End If
+
+End If
+End If
+End If
+For i = 0 To items&
+    c = ww$(i)
+    R.Left = Offset
+    rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+    If Len(c) >= ExtSelStart - estX Or (found > 0 And rleftacc > found) Then
+            If Not Len(c) >= ExtSelStart - estX Then
+            ExtSelStart = Len(c) + estX
+            End If
+
+        nValue = ExtSelStart - estX
+
+        RTL3 c, nValue, mark1, mark2, nrtl, M1, M2
+        If nrtl Then
+            If M2 - M1 > 0 Then Mid$(c, M1, M2 - M1 + 1) = StrReverse(Mid$(c, M1, M2 - M1 + 1))
+        End If
+        If mark1 = 0 Or mark2 = 0 Then
+        If nValue > 1 Then
+            j = nValue - 1
+            RTL3 c, j, mark1, mark2, nrtl, M1, M2
+            If mark1 <> 0 And mark2 <> 0 And j >= mark1 And j <= mark2 Then
+            If i = items& Then
+            If found > 0 Then
+                rx1 = Offset
+                If mark1 > 1 Then
+                    Offset = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), mark1 - 1, 1, tabw, 0))
+                End If
+                c = Mid$(ww(i), mark1, mark2 - mark1 + 1)
+                If nrtl Then
+                    M1 = M1 - mark1 + 1
+                    M2 = M2 - mark1 + 1
+                    If M2 - M1 > 0 Then Mid$(c, M1, M2 - M1 + 1) = StrReverse(Mid$(c, M1, M2 - M1 + 1))
+                End If
+                If found > Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c$), 1, tabw, 0)) Then
+                        nValue = mark1 + estX
+                        Exit For
+                    Else
+                        Offset = rx1
+                        c = ww$(i)
+                    End If
+                nValue = j + estX
+                End If
+             GoTo here1
+
+            Else
+            nValue = mark2 - 1 + estX 'j - (nValue > mark2)
+            If nValue <= 0 Then nValue = 1
+            If mark1 > 1 Then
+            
+            rx1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), mark2, 1, tabw, 0))
+            If found > 0 Then
+            If rx1 <= found Then
+            nValue = mark1 + estX
+            RealX1 = rx1
+            Exit For
+            End If
+
+            End If
+            RealX1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), mark1 - 1, 1, tabw, 0))
+            
+            End If
+            Exit For
+            
+            End If
+            End If
+        End If
+        ElseIf mark1 <> 0 And mark2 <> 0 And nValue = mark2 + 1 Then
+        If found > 0 Then
+         rx1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), mark2, 1, tabw, 0))
+        If found > rx1 Then
+         nValue = mark1 + estX
+            RealX1 = rx1
+        Exit For
+        End If
+        nValue = mark2
+        End If
+        GoTo here1
+       
+        End If
+
+        If mark1 <> 0 And mark2 <> 0 And nValue >= mark1 And nValue <= mark2 Then
+here1:
+            If mark1 > 1 Then
+                
+                Offset = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), mark1 - 1, 1, tabw, 0))
+            End If
+            If mark1 = nValue And found > 0 Then
+
+            If Offset > found Then
+            j = mark1 - 2
+            If j >= 1 Then
+            Do While found < R.Left + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), j, 1, tabw, 0))
+            j = j - 1
+            If j = 0 Then j = 1: Exit Do
+            Loop
+            Else
+                            
+                GoTo nortl
+            End If
+            RTL3 c, j, mark1, mark2, nrtl, M1, M2
+            If mark1 <> 0 And mark2 <> 0 Then
+            nValue = mark2 - (j - mark1) + estX
+            Else
+            nValue = j + 1 + estX
+            End If
+
+            RealX1 = Offset
+            Exit For
+            End If
+            End If
+            c = Mid$(ww(i), mark1, mark2 - mark1 + 1)
+            If nrtl Then
+                M1 = M1 - mark1 + 1
+                M2 = M2 - mark1 + 1
+                If M2 - M1 > 0 Then Mid$(c, M1, M2 - M1 + 1) = StrReverse(Mid$(c, M1, M2 - M1 + 1))
+            End If
+           
+            If nValue = mark2 + 1 Then
+            If found > 0 Then
+            For j = mark2 - mark1 + 1 To 1 Step -1
+            If found > Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), j, 1, tabw, 0)) Then
+            
+            If j > 1 Then
+            If LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), j, 1, tabw, 0)) > LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), j - 1, 1, tabw, 0)) < 0 Then
+            
+                        nValue = mark2 - (j) + estX
+
+            Offset = found
+            Exit For
+            End If
+            End If
+
+            nValue = mark2 - (j - 1) + estX
+
+            Offset = found
+            Exit For
+
+            End If
+            Next j
+            If j = 0 Then
+            nValue = mark1 - 1 + estX - 1
+            If nValue <= 0 Then nValue = 1
+            End If
+            Else
+            nValue = mark1 - 1 + estX - 1
+            If nValue <= 0 Then nValue = 1
+            End If
+            
+          
+             RealX1 = Offset
+         
+            Exit For
+            ElseIf found > 0 And mark1 = nValue Then
+            If found > Offset Then
+             nValue = mark2
+             
+            GoTo conthere
+            Else
+            nValue = mark2 + 1 + estX
+            RealX1 = Offset
+            End If
+            
+            
+            Else
+conthere:
+            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+             If nValue > mark1 Then
+                rx1 = rleftacc - 1 - LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), nValue - mark1, 1, tabw, 0))
+            Else
+                rx1 = rleftacc - 1
+            End If
+            End If
+        If found > 0 Then
+         rx1 = rx1 + 1
+            If found < rx1 Then
+                original = nValue
+                For j = nValue To mark2
+
+                rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), j - mark1 + 1, 1, tabw, 0))
+
+                    
+                    original = original + 1
+                    If found >= rx1 Then Exit For
+                Next j
+                
+                j = original
+                If nrtl Then
+                nValue = M2 - ((j + 1 - mark1) - M1) + mark1 + estX
+ 
+                
+                
+                Else
+                
+                
+                If j > mark2 Then
+      
+                  nValue = mark2 + 1 + estX
+                  If nValue = 0 Then nValue = 1
+                      
+                          RealX1 = rx1
+                          Exit For
+                  Else
+                  
+                          nValue = j
+                          RTL3 c, nValue, mark1, mark2, nrtl, M1, M2
+                          If nrtl And j >= M1 And j <= M2 Then
+                          nValue = nValue + 2 + estX
+                          Else
+                          nValue = j + estX
+                          End If
+            
+                  
+                  End If
+              
+                
+                    RealX1 = rx1 + 1
+        End If
+                Else
+                  original = nValue
+                  For j = nValue - 1 To mark1 + 1 Step -1
+                
+                      rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), j - mark1, 1, tabw, 0))
+                      If found <= rx1 Then Exit For
+                      original = j
+                      
+                  Next j
+                    j = original
+                If nrtl Then
+                nValue = M2 - ((j + 1 - mark1) - M1) + mark1 + estX
+              Else
+                    
+                    If j < mark1 Then
+                       j = mark1
+                    End If
+                 
+                 
+                 
+                    If nrtl And j - mark1 >= M1 And j - mark1 <= M2 Then
+                    nValue = nValue + estX
+                    Else
+                    nValue = j + estX
+                    End If
+     End If
+
+                    RealX1 = rx1
+
+            End If
+            
+          If found = 0 Then
+                If Mid$(that$, nValue, 1) = " " Then
+         c = Mid$(that$, nValue + 1, 1)
+         If Len(c) > 0 Then
+         RTL3 c, (1), mark1, mark2, nrtl, M1, M2
+         If mark1 = 0 Or mark2 = 0 Then
+         nValue = nValue + 1
+         'If nvalue1 < 1 Then nvalue1 = 1
+         End If
+         End If
+         End If
+         End If
+      Exit For
+     End If
+            
+            If found = 0 And nrtl Then
+            'nValue = ExtSelStart
+            Else
+            nValue = mark2 - (nValue - mark1) + (nValue <> mark2) + estX - 1
+            End If
+            
+If nValue = mark1 And items& = 1 Then
+rx1 = 0
+           
+            
+            End If
+            If nValue = 0 Then nValue = mark2
+       
+            
+            
+            RealX1 = rx1
+            
+        Else ' NO RTL
+nortl:
+            c = Myleft$(c, ExtSelStart - estX - 1)
+            rx1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+            If found > 0 Then
+                If found < rx1 Then
+                    nValue = ExtSelStart - 1
+                    If nValue - estX - 1 < 1 Then
+                        RealX1 = Offset
+                    Else
+                        c = Myleft$(c, nValue - estX - 1)
+                        j = Len(c)
+                        RTL3 c, j, mark1, mark2, nrtl, M1, M2      ' found=0
+                        If mark1 <> 0 And mark2 <> 0 Then
+                        If j <= mark2 And j >= mark1 Then
+                        nValue = mark2 - (j - mark1) + estX
+                        Else
+                        'nValue = nValue + estX - 1
+                        End If
+                        Else
+                       ' nValue = Len(c) + estX
+                        End If
+                        rx1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+                    End If
+                    RealX1 = rx1
+                    Exit For
+                Else
+                    RealX1 = rx1
+                    
+                    nValue = original
+                End If
+            Else
+                RealX1 = rx1
+                nValue = ExtSelStart
+            End If
+            
+            Exit For
+        End If
+  
+         RealX1 = rx1
+       ' nValue = ExtSelStart
+        
+        Exit For
+    ElseIf i = items& Then
+        nValue = ExtSelStart - estX
+        RTL3 c, nValue, mark1, mark2, nrtl, M1, M2
+        If mark1 <> 0 And mark2 <> 0 Then
+            If mark2 = Len(c) Then
+                c = Myleft$(ww(i), mark1 - 1)
+                If Len(c) = 0 Then
+                    rleftacc = Offset
+                ElseIf nrtl And M2 = mark2 Then
+                rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+                  c = ww(i)
+                  
+               If M2 - M1 > 0 Then c = Mid$(c, M1, M2 - M1 + 1)
+                 rleftacc = rleftacc + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+                nValue = M1 - 1
+            Else
+                 rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+                End If
+            ElseIf found > 0 Then
+            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), nValue, 1, tabw, 0))
+        If rleftacc < found Then
+        nValue = original
+
+        End If
+                RealX1 = found
+        GoTo finish
+            End If
+        End If
+    End If
+    Offset = rleftacc
+    estX = estX + Len(ww(i))
+Next i
+
+
+If i = items& + 1 Then
+    RealX1 = Offset
+    nValue = estX
+End If
+finish:
+'SelectClipRgn mHdc, &H0
+'DeleteObject hRgn
+End Function
+
+Private Sub RTL3(what As String, where As Long, mark10 As Long, mark20 As Long, numhandle As Boolean, M1 As Long, M2 As Long)
+numhandle = False
+M1 = 0
+M2 = 0
+mark10 = 0
+mark20 = 0
+Dim A2() As Integer, R As Long, ii As Long
+Dim wr$
+Dim mcharpos As Long
+If Len(what) = 0 Then Exit Sub
+
+If where = -1 Then mcharpos = Len(what) Else mcharpos = where - 1
+If mcharpos > Len(what) Then Exit Sub
+ReDim A2(Len(what) + 10)
+
+
+If GetStringTypeExW(&HB, 2, StrPtr(what), Len(what), A2(0)) = 0 Then Exit Sub
+For ii = mcharpos To 0 Step -1
+    If ii < Len(what) Then
+    If A2(ii) = 9 Then
+   If mark10 > 0 Then Exit For
+    Exit Sub
+    End If
+    If A2(ii) = 2 Then
+    mark10 = ii + 1
+    End If
+    If mark10 > 0 And A2(ii) = 1 Then
+    Exit For
+    End If
+    End If
+Next ii
+
+If mark10 = 0 Then Exit Sub
+For ii = mark10 - 1 To Len(what) - 1
+
+    If A2(ii) = 1 Then
+    Exit For
+    End If
+    If ii >= 0 Then
+        If A2(ii) = 7 Then
+            For R = ii + 1 To Len(what) - 1
+                If A2(R) = 1 Then Exit For
+                If A2(R) = 9 Then
+                Exit For
+                End If
+                If A2(R) <> 7 And A2(R) < 11 Then
+                    If (A2(R) And 2) = 2 Then
+                        ii = R
+                        R = -1
+                        Exit For
+                    End If
+                   If mark20 > mcharpos Then: R = 0: Exit For
+                End If
+            Next R
+            If R = 0 Then
+                Exit For
+            ElseIf R <> -1 Then
+                ii = R - 1
+            End If
+        End If
+        If (A2(ii) And 2) = 2 And A2(ii) < 11 And A2(ii) <> 10 Then
+            mark20 = ii + 1
+            If mark20 > 0 And A2(ii) = 1 Then
+            Exit For
+            End If
+        End If
+    End If
+    If A2(ii) = 9 Then
+    If mark20 > 0 Then mark20 = ii
+    Exit For
+    End If
+Next ii
+
+'If mark10 > 0 And mark20 > 0 Then
+there11:
+If mcharpos > 0 Then
+If A2(mcharpos) = 3 And A2(mcharpos - 1) <> 3 Then
+M1 = mcharpos
+M2 = mcharpos
+Else
+M1 = mcharpos - 1
+M2 = mcharpos - 1
+End If
+Else
+Exit Sub
+
+End If
+Dim findme As Long
+
+
+If A2(M1) <> 3 Then Exit Sub
+' find language
+For findme = mcharpos To mark1 Step -1
+If A2(findme) = 2 Then Exit For
+Next findme
+findme = AscW(Mid$(what, findme + 1, 1))
+If findme >= &H600& And findme <= &H6FF& Then
+' arabic language
+                    Do While M1 > 0
+                        If (A2(M1 - 1) > 3 And A2(M1) < 11) And (A2(M1) > 3 And A2(M1) < 10) Then
+
+                        ElseIf A2(M1 - 1) = 4 Then
+                        If M1 > 1 Then
+                        If A2(M1 - 2) >= 10 Then
+                        M1 = M1 - 1
+                        Exit Do
+                        End If
+                        End If
+                        Else
+                        If Not (A2(M1) = 3 Or A2(M1) = 7) Then Exit Do
+                       
+                    End If
+                        M1 = M1 - 1
+                    Loop
+                    Do While M2 < mark2
+                    If (A2(M2 + 1) > 3 And A2(M2) < 11) And (A2(M2) > 3 And A2(M2) < 10) Then
+
+                        Else
+                    If Not (A2(M2) = 3 Or A2(M2) = 7) Then Exit Do
+                    
+                    End If
+                        M2 = M2 + 1
+                    Loop
+Else
+
+Do While M1 > 0
+    If (A2(M1 - 1) > 3 And A2(M1) < 10) Or A2(M1) = 4 Then
+ If A2(M1 - 1) = 4 Then
+ If M1 > 1 Then
+ If A2(M1 - 2) = 11 Then
+ M1 = M1 - 1: Exit Do
+ End If
+ End If
+ ElseIf A2(M1) = 1 Then
+Exit Do
+End If
+    Else
+    If Not (A2(M1) = 3 Or A2(M1) = 7) Then Exit Do
+   
+End If
+    M1 = M1 - 1
+Loop
+Do While M2 < mark2
+
+If A2(M2) > 3 And A2(M2) < 10 Then
+If A2(M2) = 4 Then
+If A2(M2 + 1) <> 3 Then
+Exit Do
+End If
+End If
+    Else
+If Not (A2(M2) = 3 Or A2(M2) = 7) Then Exit Do
+
+End If
+    M2 = M2 + 1
+Loop
+End If
+M1 = M1 + 2
+
+numhandle = True
+If mcharpos = M2 Then
+where = M1 - (M1 = 1)
+
+Else
+where = M2 - (mcharpos - M1)
+
+End If
+
+
+End Sub
+Private Function Myleft$(a As String, Pos As Long)
+If Pos < 1 Then Myleft$ = vbNullString Else Myleft$ = Mid$(a, 1, Pos)
+End Function
+

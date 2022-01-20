@@ -17,7 +17,6 @@ Option Explicit
 Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Private mprompt As String
-Private Col() As Long, lastdata As String, thispara As Long
 Private mark1 As Long, mark2 As Long
 Private mkind As String, mPartColor As Long
 Public SkipProcAtExitFocus As Boolean, MoveOnEnter As Boolean
@@ -65,10 +64,6 @@ Dim Callback As GuiM2000
 Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long
 Dim tParam As DRAWTEXTPARAMS
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
-Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT) As Long
-Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
-Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hDC As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
 Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 Public NumberOnly As Boolean
 Public NumberIntOnly As Boolean
@@ -256,6 +251,11 @@ Callback.SendFKEY a
 End If
 End Sub
 
+Private Sub glistN_GetRealX1(mHdc As Long, ByVal ExtSelStart As Long, ByVal that As String, retvalue As Long, ok As Boolean)
+retvalue = RealX1(mHdc, ExtSelStart, that)
+ok = True
+End Sub
+
 Private Sub glistN_OutPopUp(x As Single, y As Single, myButton As Integer)
 If myButton And &H2 = 2 Then
 If mIndex >= 0 Then
@@ -317,8 +317,9 @@ Private Sub glistN_ChangeSelStart(thisselstart As Long)
 If thisselstart <= Len(mprompt) Then thisselstart = Len(mprompt) + 1
 'glistN.ShowPan
 With glistN
-.ShowPan
-.ExternalCursor thisselstart, .list(.ListIndex), .forecolor
+'.ShowPan
+.ShowMe2
+'.ExternalCursor thisselstart, .list(.ListIndex), .forecolor
 End With
 End Sub
 
@@ -470,13 +471,15 @@ End Property
 Public Property Let SelStart(ByVal RHS As Long)
 glistN.SelStart = RHS
 End Property
-
-Public Property Get Visible() As Boolean
-Visible = glistN.Visible
+Property Let Visible(ByVal RHS As Boolean)
+    If Not glistN Is Nothing Then
+        glistN.Visible = RHS
+    End If
 End Property
-
-Public Property Let Visible(ByVal RHS As Boolean)
-glistN.Visible = RHS
+Property Get Visible() As Boolean
+    If Not glistN Is Nothing Then
+        Visible = glistN.Visible
+    End If
 End Property
 Public Sub SetFocus()
 On Error Resume Next
@@ -485,7 +488,6 @@ End Sub
 
 Private Sub glistN_RTL(thisHDC As Long, item As Long, where As Long, mark10 As Long, mark20 As Long, Offset As Long)
 Offset = RealX1(thisHDC, where, Text, where, mark10)
-
 End Sub
 Function RealX1(mHdc As Long, ByVal ExtSelStart As Long, ByVal that$, Optional nValue As Long = 0, Optional found As Long = 0) As Long
 If ExtSelStart <= 0 Then ExtSelStart = 1
@@ -507,12 +509,13 @@ Dim dummy As RECT, R As RECT, tabw As Long, Offset As Long, hRgn As Long, estX A
 tabw = tParam.iTabLength * glistN.AveCharWith
 glistN.UserControlTextMetricsPixels that$, R.Right, R.Bottom
 dummy = R
-dummy.top = R.Bottom + 1
+dummy.top = glistN.HeadlineHeightTwips + 1
 dummy.Bottom = dummy.top + R.Bottom
+R = dummy
 Offset = 0
 estX = 0
-hRgn = CreateRectRgnIndirect(dummy)
-SelectClipRgn mHdc, hRgn
+'hRgn = CreateRectRgnIndirect(dummy)
+'SelectClipRgn mHdc, hRgn
 If found > 0 Then
 rx1 = LowWord(GetTabbedTextExtent(mHdc, StrPtr(that$), Len(that$), 1, tabw))
 If rx1 < found Then
@@ -906,8 +909,8 @@ If i = items& + 1 Then
     nValue = estX
 End If
 finish:
-SelectClipRgn mHdc, &H0
-DeleteObject hRgn
+'SelectClipRgn mHdc, &H0
+'DeleteObject hRgn
 End Function
 
 Private Sub RTL3(what As String, where As Long, mark10 As Long, mark20 As Long, numhandle As Boolean, M1 As Long, M2 As Long)

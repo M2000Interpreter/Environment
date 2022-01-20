@@ -13,9 +13,9 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 Public Event MayQuit(Yes)
-Public Event BreakLine(data$, datanext$)
+Public Event BreakLine(Data$, datanext$)
 Public Event Lastline()
-Public Event ColorDataEvent(thispara As Long, data$, feedback As Long)
+Public Event ColorDataEvent(thispara As Long, Data$, feedback As Long)
 Private lastlinelastchar As Long
 Private lastcolordatacur As Long
 Private Declare Function GetShortPathName Lib "kernel32" Alias _
@@ -48,13 +48,13 @@ Public BackMove As Boolean
 Public LastSelStart As Long
 Public ListLoadedType As Long
 Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
 Private words$, unique As Long
 Private p3 As Long
 Dim mlcid As Long
 Dim sortmlcid As Long
-Private pos() As Long, slen() As Long, hit() As Long
+Private Pos() As Long, slen() As Long, hit() As Long
 Dim Buffer() As Byte, bufOffset As Long, bufsize As Long, SeekBuf As Long
 Public Busy As Boolean
 Private mSortstyle As VbCompareMethod
@@ -125,7 +125,7 @@ Else
 InvalidPara = para(ParaNum).lines = 0
 End If
 End Function
-Sub WritePara(ParaNum As Long, ByVal data$)
+Sub WritePara(ParaNum As Long, ByVal Data$)
     Dim NeoData$, neolines As Long, thatmax As Long, lookthis As Long
     Do
     neolines = para(ParaNum).lines + 1
@@ -146,12 +146,12 @@ Sub WritePara(ParaNum As Long, ByVal data$)
     
    End If
     
-    RaiseEvent BreakLine(data$, NeoData$)  ' no method inside this class
-    If NeoData$ = vbNullString Then NeoData$ = data$: data$ = vbNullString
+    RaiseEvent BreakLine(Data$, NeoData$)  ' no method inside this class
+    If NeoData$ = vbNullString Then NeoData$ = Data$: Data$ = vbNullString
     para(ParaNum).content(neolines) = NeoData$
     para(ParaNum).lines = neolines
     NeoData$ = vbNullString
-    Loop Until data$ = vbNullString
+    Loop Until Data$ = vbNullString
 End Sub
 Sub WriteParaOneline(ParaNum As Long, ByVal NeoData$)
     
@@ -174,12 +174,12 @@ Else
 End If
 End Sub
 Private Sub ColorThis3(mNum As Long, Optional Count As Long = 0, Optional LookDown As Boolean = True)
-Dim docback As Long, lookthis As Long, data$, oldstart As Long, lenfinal As Long, closed As Long, lastnum As Long
+Dim docback As Long, lookthis As Long, Data$, oldstart As Long, lenfinal As Long, closed As Long, lastnum As Long
 lenfinal = Len(Final$)
 If lenfinal = 0 Then Final$ = ";": lenfinal = 1
     If mNum = 0 Then Exit Sub
-    data$ = TextParagraph(mNum)
-    If Trim$(data$) = vbNullString And Switchon Then
+    Data$ = TextParagraph(mNum)
+    If Trim$(Data$) = vbNullString And Switchon Then
         lookthis = DocParaBack(mNum)
         If lookthis > 0 Then
                     If para(lookthis).startfrom > 0 And UBound(para(lookthis).colordata()) = 2 Then
@@ -198,10 +198,10 @@ If lenfinal = 0 Then Final$ = ";": lenfinal = 1
             docback = mNum
 again:
             oldstart = para(mNum).startfrom
-            data$ = TextParagraph(mNum)
+            Data$ = TextParagraph(mNum)
             
 again55:
-            RaiseEvent ColorDataEvent(mNum, data$, lookthis)
+            RaiseEvent ColorDataEvent(mNum, Data$, lookthis)
             If UBound(para(mNum).colordata()) = 0 Then
                   ReDim para(mNum).colordata(1)
                             para(mNum).colordata(0) = 14
@@ -212,7 +212,7 @@ again55:
             End If
             If Final$ = "}" Then
                         closed = -1
-                       Count = countbrakcet(data$, closed, Count)
+                       Count = countbrakcet(Data$, closed, Count)
                        End If
             If lookthis = 15 Then
                     
@@ -237,16 +237,16 @@ again55:
 again2:
             lookthis = DocParaNext(mNum)
             Do While lookthis > 0
-                        data$ = TextParagraph(lookthis)
+                        Data$ = TextParagraph(lookthis)
                         If Final$ = "}" Then
                         closed = -1
-                        Count = countbrakcet(data$, closed, Count)
+                        Count = countbrakcet(Data$, closed, Count)
                         If closed > -1 Then
                         
 
                                        
 
-                                        If closed < Len(data$) Then
+                                        If closed < Len(Data$) Then
                                            oldstart = mNum
                                          ReDim para(lookthis).colordata(1)
                                         para(lookthis).colordata(0) = 15
@@ -266,12 +266,12 @@ again2:
                         Else
                         GoTo conthere
                         End If
-                        ElseIf Left$(Trim$(data$), lenfinal) = Final$ Or Right$(RTrim(data$), lenfinal) = Final$ Then
+                        ElseIf Left$(Trim$(Data$), lenfinal) = Final$ Or Right$(RTrim(Data$), lenfinal) = Final$ Then
                                         ReDim para(lookthis).colordata(4)
                                         para(lookthis).colordata(0) = 15
                                         para(lookthis).colordata(1) = 1
                                         para(lookthis).colordata(2) = 14
-                                        para(lookthis).colordata(3) = rinstr(data$, Final$) + lenfinal
+                                        para(lookthis).colordata(3) = rinstr(Data$, Final$) + lenfinal
                                         para(lookthis).startfrom = para(docback).startfrom
                                         mNum = lookthis
                                         lookthis = DocParaNext(mNum)
@@ -284,13 +284,13 @@ again2:
                                         GoTo finish
                     Else
 conthere:
-                    If data$ <> "" Then
+                    If Data$ <> "" Then
                             ReDim para(lookthis).colordata(3)
                             para(lookthis).colordata(0) = 15
                             para(lookthis).colordata(1) = 1
                             
                                para(lookthis).colordata(2) = 15
-                            para(lookthis).colordata(3) = Len(data$) + 1
+                            para(lookthis).colordata(3) = Len(Data$) + 1
                             Else
                             ReDim para(lookthis).colordata(1)
                             para(lookthis).colordata(0) = 15
@@ -363,15 +363,15 @@ mNum = DocParaNext(mNum)
 
 End Sub
 Private Sub ColorThis1(mNum As Long, Count As Long, Optional ByPass As Boolean = False)
-Dim lookthis As Long, data$, mNum1 As Long
+Dim lookthis As Long, Data$, mNum1 As Long
 If para(mNum).startfrom <> 0 Then
 
     mNum1 = para(mNum).startfrom
     
     mNum = mNum1
-data$ = TextParagraph(mNum1)
+Data$ = TextParagraph(mNum1)
 
-RaiseEvent ColorDataEvent(mNum1, data$, lookthis)
+RaiseEvent ColorDataEvent(mNum1, Data$, lookthis)
 If mNum1 = mNum Then
 If lookthis = 0 Then
 If para(mNum).startfrom = 0 Then
@@ -416,8 +416,8 @@ End If
 
 Else
 
-data$ = TextParagraph(mNum)
-RaiseEvent ColorDataEvent(mNum, data$, lookthis)
+Data$ = TextParagraph(mNum)
+RaiseEvent ColorDataEvent(mNum, Data$, lookthis)
 Count = 0
 End If
 End Sub
@@ -426,7 +426,7 @@ End Sub
 Sub PlaceColorData(ParaNum As Long, thatcolordata() As Long)
     para(ParaNum).colordata = thatcolordata()
 End Sub
-Sub ReWritePara(ParaNum As Long, ByVal data$, Optional skipcolor As Boolean = False)
+Sub ReWritePara(ParaNum As Long, ByVal Data$, Optional skipcolor As Boolean = False)
     Dim NeoData$, neolines As Long, thatmax As Long, lookthis As Long
     If ParaNum = 0 Then Exit Sub
     para(ParaNum).lines = 0  ' clear
@@ -442,17 +442,17 @@ Sub ReWritePara(ParaNum As Long, ByVal data$, Optional skipcolor As Boolean = Fa
     thatmax = thatmax * 2
     ReDim Preserve para(ParaNum).content(1 To thatmax)
     End If
-    RaiseEvent BreakLine(data$, NeoData$)  ' no method inside this class
-    If NeoData$ = vbNullString Then NeoData$ = data$: data$ = vbNullString
-    If Len(NeoData$) > 1000 And LenB(data$) = 0 Then
-    data$ = Mid$(NeoData$, 1001)
+    RaiseEvent BreakLine(Data$, NeoData$)  ' no method inside this class
+    If NeoData$ = vbNullString Then NeoData$ = Data$: Data$ = vbNullString
+    If Len(NeoData$) > 1000 And LenB(Data$) = 0 Then
+    Data$ = Mid$(NeoData$, 1001)
     NeoData$ = Left$(NeoData$, 1000)
     End If
     
     para(ParaNum).content(neolines) = NeoData$
     para(ParaNum).lines = neolines
     NeoData$ = vbNullString
-    Loop Until data$ = vbNullString
+    Loop Until Data$ = vbNullString
     If ColorEvent And Not skipcolor Then
      ColorThis (ParaNum)
     End If
@@ -962,7 +962,8 @@ If Typename(thiscur) = "Empty" Then
 
 Else
 If InStr(textHtmlDoc, vbTab) > 0 Then
-    textHtmlDoc = "<pre >" + Left$(textHtmlDoc, thiscur - 1) + vbCrLf + "</pre>"
+' For blogger word wrap enabler
+    textHtmlDoc = "<pre style=" + Chr$(34) + "white-space: pre-wrap;" + Chr$(34) + ">" + Left$(textHtmlDoc, thiscur - 1) + vbCrLf + "</pre>"
 Else
     textHtmlDoc = Left$(textHtmlDoc, thiscur - 1) + vbCrLf
 End If
@@ -1402,8 +1403,8 @@ End Property
 Property Get startfrom(ParaNum As Long) As Long
 startfrom = para(ParaNum).startfrom
 End Property
-Property Let Paracolordata(ParaNum As Long, col() As Long)
-If ParaNum <> 0 Then para(ParaNum).colordata() = col()
+Property Let Paracolordata(ParaNum As Long, Col() As Long)
+If ParaNum <> 0 Then para(ParaNum).colordata() = Col()
 End Property
 Property Get Paracolordata(ParaNum As Long) As Long()
 ' it is valid
@@ -1597,11 +1598,11 @@ order = 1
 
     
 End Function
-Property Let TextParagraphOrder(ByVal order As Long, data$)
+Property Let TextParagraphOrder(ByVal order As Long, Data$)
     Dim mycur As Long
     If order = -1 Then
         mycur = DocParaBack(0)
-        ReWritePara mycur, data$
+        ReWritePara mycur, Data$
         Exit Property
     ElseIf order = 0 Then
         order = 1
@@ -1610,7 +1611,7 @@ Property Let TextParagraphOrder(ByVal order As Long, data$)
     Do While mycur > 0
         order = order - 1
         If order = 0 Then
-            ReWritePara mycur, data$
+            ReWritePara mycur, Data$
             Exit Property
         End If
         mycur = DocParaNext(mycur)
@@ -1627,12 +1628,12 @@ Property Get TextParagraphKey(ByVal ParaNum As Long) As String
     TextParagraphKey = Mid$(Join(para(ParaNum).content, ""), mKeystart)
 End Property
 
-Property Let TextParagraph(ByVal ParaNum As Long, data$)
+Property Let TextParagraph(ByVal ParaNum As Long, Data$)
     If ParaNum = 0 Then Exit Property
     para(ParaNum).lines = 1   ' clear' also can be a flag to show that this is deleted
     ReDim para(ParaNum).content(1 To 1)
     ReDim para(ParaNum).colordata(1)   ' erase old color  --
-    para(ParaNum).content(1) = data$
+    para(ParaNum).content(1) = Data$
 End Property
 
 Property Get TextParagraphLen(ByVal ParaNum As Long) As Long
@@ -2188,27 +2189,27 @@ Dim PathLength As Long
         GetDosPath = Left$(s, PathLength)
 
 End Function
-Private Function NeoUnicodeFile(Filename$) As Boolean
+Private Function NeoUnicodeFile(FileName$) As Boolean
 Dim hFile
-Dim F$
+Dim f$
 Const FILE_ATTRIBUTE_NORMAL = &H80
 Const GENERIC_WRITE = &H40000000
-If Left$(Filename$, 2) <> "\\" Then
+If Left$(FileName$, 2) <> "\\" Then
 
-F$ = "\\?\" + Filename$
+f$ = "\\?\" + FileName$
 Else
-F$ = Filename$
+f$ = FileName$
 End If
 On Error Resume Next
-hFile = CreateFile(StrPtr(F$), GENERIC_WRITE, ByVal 0, ByVal 0, 2, FILE_ATTRIBUTE_NORMAL, ByVal 0)
+hFile = CreateFile(StrPtr(f$), GENERIC_WRITE, ByVal 0, ByVal 0, 2, FILE_ATTRIBUTE_NORMAL, ByVal 0)
 ''Sleep 1
 CloseHandle hFile
-NeoUnicodeFile = (GetDosPath(F$) <> "")
+NeoUnicodeFile = (GetDosPath(f$) <> "")
 End Function
-Public Function SaveUnicodeOrAnsi(ByVal Filename As String, Optional mode2save As Long = 0, Optional Append As Boolean = False) As Boolean
+Public Function SaveUnicodeOrAnsi(ByVal FileName As String, Optional mode2save As Long = 0, Optional Append As Boolean = False) As Boolean
 ' using doc as extension you can read it from word...with automatic conversion to unicode
 ' OVERWRITE ALWAYS
-Dim w As Long, a() As Byte, F$, i As Long, bb As Byte, yesswap As Boolean, lf$
+Dim w As Long, a() As Byte, f$, i As Long, bb As Byte, yesswap As Boolean, lf$
 Const Utf8CodePage As Long = 65001
 On Error GoTo t12345
 '' 0 vbcrlf, 1 vblf, 2 vbcr
@@ -2219,12 +2220,12 @@ If Abs(mode2save \ 10) > 0 Then
 End If
 mode2save = mode2save Mod 10
 If Not Append Then
-    If Not NeoUnicodeFile(Filename) Then Exit Function
+    If Not NeoUnicodeFile(FileName) Then Exit Function
 End If
-F$ = GetDosPath(Filename)
-If Err.Number > 0 Or F$ = vbNullString Then Exit Function
+f$ = GetDosPath(FileName)
+If Err.Number > 0 Or f$ = vbNullString Then Exit Function
 w = FreeFile
-Open F$ For Binary As w
+Open f$ For Binary As w
 ' mode2save
 ' 0 is utf-le
 If Append Then Seek #w, LOF(w) + 1
@@ -2423,7 +2424,7 @@ Public Function ContainsUTF16(ByRef Source() As Byte) As Long
     End If
     End If
 End Function
-Public Sub ReadUnicodeOrANSI(Filename As String, Optional Merge As Boolean = False, Optional feedback As Long, Optional insert2index As Boolean = False)
+Public Sub ReadUnicodeOrANSI(FileName As String, Optional Merge As Boolean = False, Optional feedback As Long, Optional insert2index As Boolean = False)
 Busy = True
 Dim i&, FNr&, BLen&, WChars&, bom As Integer, BTmp As Byte, b() As Byte, lbt As Long
 Dim mLof As Long, ok, nobom As Long
@@ -2431,14 +2432,14 @@ nobom = 1
 ' code from Schmidt, member of vbforums
 ' this code changed for Document Class
 ' Change to read line by line, so no two copies needed
-If Filename = vbNullString Then Exit Sub
+If FileName = vbNullString Then Exit Sub
 If Not Merge Then EmptyDoc
 ReDim Buffer(1 To 1) As Byte
 bufOffset = 0
 bufsize = 0
 SeekBuf = 1
 On Error GoTo ErrHandler
-  BLen = FileLen(GetDosPath(Filename))
+  BLen = FileLen(GetDosPath(FileName))
     If BLen = 0 Then
   If DocLines = 0 Then
   textDoc = vbNullString
@@ -2447,7 +2448,7 @@ On Error GoTo ErrHandler
   End If
   
   FNr = FreeFile
-  Open GetDosPath(Filename) For Binary Access Read As FNr
+  Open GetDosPath(FileName) For Binary Access Read As FNr
   Get FNr, , bom
     Select Case bom
       Case &HFEFF, &HFFFE 'one of the two possible 16 Bit BOMs
@@ -2591,8 +2592,8 @@ End Function
 Private Function mWordMap(s$) As String
 Dim i&, l As Long
 Static p2 As Long, p1 As Integer, p3 As Long, p4 As Long
-Dim ss$, pos As Long
-pos = -2
+Dim ss$, Pos As Long
+Pos = -2
   l = Len(s): If l = 0 Then mWordMap = " ": Exit Function
 
   p2 = StrPtr(s$): l = l - 1
@@ -2602,28 +2603,28 @@ pos = -2
   GetMem2 i, p1
   Select Case p1
     Case 65 To 90, 97 To 122, Is > 127
-    If i - p4 = 2 Then p2 = i: pos = pos + 2
+    If i - p4 = 2 Then p2 = i: Pos = Pos + 2
     Case 39
     If i - p4 = 2 Then p4 = i
     Case Else
     If i - p4 > 2 Then
-            CopyMemory ByVal p3 + pos, ByVal p2, i - p2
-            pos = pos + i - p2
-            PutMem2 p3 + pos, 32   ' place a space...
+            CopyMemory ByVal p3 + Pos, ByVal p2, i - p2
+            Pos = Pos + i - p2
+            PutMem2 p3 + Pos, 32   ' place a space...
             
     End If
     p4 = i
   End Select
   Next i
   If i - p4 > 2 Then
-        CopyMemory ByVal p3 + pos, ByVal p2, i - p2
-        pos = pos + i - p2
+        CopyMemory ByVal p3 + Pos, ByVal p2, i - p2
+        Pos = Pos + i - p2
   End If
-  pos = pos / 2
-  If pos <= 0 Then
+  Pos = Pos / 2
+  If Pos <= 0 Then
   mWordMap = " "
   Else
-  mWordMap = Left$(s$, pos)
+  mWordMap = Left$(s$, Pos)
   End If
 
 End Function
@@ -2673,14 +2674,14 @@ If l = 1 Then
 CountWords2 = -(Trim(a$) <> "")
 top = CountWords2
 If top > 0 Then
-ReDim pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
-pos(1) = StrPtr(a$)
+ReDim Pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
+Pos(1) = StrPtr(a$)
 slen(1) = 1
 End If
 Else
 Dim p5 As Long
 p5 = 512 '' L \ 32 + 1
-ReDim pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
+ReDim Pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
 Dim i As Long, k As Long
 Dim p2 As Long, p4 As Long, p6 As Long, bb As Integer
 p2 = StrPtr(a$)
@@ -2707,7 +2708,7 @@ there1:
                 md = (mtop - mda + 1) \ 2
                 p6 = mda + md
                 Do While md > 0
-                    Select Case CompareString(uLCID, NORM_IGNORECASE, p2, k, pos(p6), slen(p6))
+                    Select Case CompareString(uLCID, NORM_IGNORECASE, p2, k, Pos(p6), slen(p6))
                         Case 1
                             mtop = mtop - md
                             md = (mtop - mda + 1) \ 2
@@ -2723,18 +2724,18 @@ there1:
                 If md = 0 Then
                 If top = p5 Then
                 p5 = p5 * 2
-                ReDim Preserve pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
+                ReDim Preserve Pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
                 End If
                     top = top + 1
                     
                     If mda = top - 1 Then
-                        pos(top) = p2
+                        Pos(top) = p2
                         slen(top) = k
                     Else
-                        CopyMemory ByVal VarPtr(pos(1)) + mda * 4 + 4, ByVal VarPtr(pos(1)) + mda * 4, (top - mda - 1) * 4
+                        CopyMemory ByVal VarPtr(Pos(1)) + mda * 4 + 4, ByVal VarPtr(Pos(1)) + mda * 4, (top - mda - 1) * 4
                         CopyMemory ByVal VarPtr(slen(1)) + mda * 4 + 4, ByVal VarPtr(slen(1)) + mda * 4, (top - mda - 1) * 4
                         CopyMemory ByVal VarPtr(hit(1)) + mda * 4 + 4, ByVal VarPtr(hit(1)) + mda * 4, (top - mda - 1) * 4
-                        pos(mda + 1) = p2
+                        Pos(mda + 1) = p2
                         slen(mda + 1) = k
                         hit(mda + 1) = 0
                     End If
@@ -2760,7 +2761,7 @@ Else
 ReDim a(1 To unique)
 Dim i As Long
 For i = 1 To unique
-a(i) = MakeString(pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
+a(i) = MakeString(Pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
 Next i
 ExportWords = a()
 End If
@@ -2778,11 +2779,11 @@ Exit Sub
 Else
 If usenumbers Then
 For i = 1 To unique
-THISOBJECT.additem MakeString(pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
+THISOBJECT.additem MakeString(Pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
 Next i
 Else
 For i = 1 To unique
-THISOBJECT.additem MakeString(pos(i), slen(i))
+THISOBJECT.additem MakeString(Pos(i), slen(i))
 Next i
 
 End If
@@ -2792,7 +2793,7 @@ End Sub
 Public Sub ResetWords()
 words$ = vbNullString
 p3 = 0
-ReDim pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
+ReDim Pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
 unique = 0
 End Sub
 Public Sub QuickSortString(Arr() As String, ByVal LB As Long, ByVal UB As Long)
@@ -2844,12 +2845,12 @@ Dim Piv As String, tmp As String '<- adjust types here, when switching to someth
   If LB < M2 Then QuickSortString Arr, LB, M2
   If M1 < UB Then QuickSortString Arr, M1, UB
 End Sub
-Private Function getAnsiStringlINE(F As Long, thislof As Long, Optional linebreaktype As Long) As String
+Private Function getAnsiStringlINE(f As Long, thislof As Long, Optional linebreaktype As Long) As String
 Dim a() As Byte, s1 As String, ss As Long, lbreak As Byte, check As Byte
 Dim se As Long, st1 As Long
 On Error GoTo a11
 Do While Not (thislof < SeekBuf)
-    GetByte F, SeekBuf, check
+    GetByte f, SeekBuf, check
     If check <> 10 And check <> 13 Then
 
                   getAnsiStringlINE = getAnsiStringlINE + ChrW(AscW(StrConv(ChrW(check), vbUnicode, mlcid)))
@@ -2860,9 +2861,9 @@ Do While Not (thislof < SeekBuf)
         If Not (thislof < SeekBuf) Then
             ss = SeekBuf
             lbreak = check
-            GetByte F, SeekBuf, check
+            GetByte f, SeekBuf, check
             If check <> 10 And check <> 13 Or lbreak = check Then
-                NewSeek F, ss  ' restore it
+                NewSeek f, ss  ' restore it
             If check = 10 Then linebreaktype = 10 Else linebreaktype = 20
             End If
             
@@ -2875,14 +2876,14 @@ a11:
 On Error GoTo 0
 SeekBuf = thislof + 1
 End Function
-Private Function getUniStringlINE(F As Long, thislof As Long, Optional LEndian As Boolean = True, Optional linebreaktype As Long) As String
+Private Function getUniStringlINE(f As Long, thislof As Long, Optional LEndian As Boolean = True, Optional linebreaktype As Long) As String
 Dim a() As Byte, s1 As String, ss As Long, lbreak As String, tmp As Byte
 a = " "
 Dim p As Integer
 On Error GoTo a12
 Do While Not (thislof < SeekBuf)
     ''Get #f, , a()
-    GetWord F, SeekBuf, p
+    GetWord f, SeekBuf, p
     s1 = ChrW(p)
     If Not LEndian Then
     a() = s1
@@ -2898,7 +2899,7 @@ Do While Not (thislof < SeekBuf)
         If Not (thislof < SeekBuf) Then
             ss = SeekBuf
             lbreak = s1
-                GetWord F, SeekBuf, p
+                GetWord f, SeekBuf, p
                 s1 = ChrW(p)
                 If Not LEndian Then
                 a() = s1
@@ -2906,7 +2907,7 @@ Do While Not (thislof < SeekBuf)
                 s1 = a()
                 End If
             If s1 <> vbCr And s1 <> vbLf Or lbreak = s1 Then
-                  NewSeek F, ss
+                  NewSeek f, ss
             If s1 = vbLf Then linebreaktype = 10 Else linebreaktype = 20
             End If
         End If
@@ -2918,7 +2919,7 @@ a12:
 On Error GoTo 0
 SeekBuf = thislof + 1
 End Function
-Private Function getUniStringLineUtF8(F As Long, thislof As Long, Optional linebreaktype As Long) As String
+Private Function getUniStringLineUtF8(f As Long, thislof As Long, Optional linebreaktype As Long) As String
 
 Dim ss As Long, lbreak As Byte, check As Byte
 Dim st As Long, WChars&
@@ -2928,7 +2929,7 @@ On Error GoTo a13
 Do While Not (thislof < SeekBuf)
 tryagain:
     If thislof < SeekBuf Then Exit Do
-    GetByte F, SeekBuf, check
+    GetByte f, SeekBuf, check
 
     If (check And &H80) <> 0 Then
         st = st + 1
@@ -2944,13 +2945,13 @@ tryagain:
         If Not (thislof < SeekBuf) Then
             ss = SeekBuf
             lbreak = check
-              GetByte F, SeekBuf, check
+              GetByte f, SeekBuf, check
             If (check And &H80) <> 0 Then GoTo notryother
             
             If (check <> 10) And (check <> 13) Or (lbreak = check) Then
 notryother:
 
-                NewSeek F, ss  ' restore it
+                NewSeek f, ss  ' restore it
                 If check = 10 Then linebreaktype = 10 Else linebreaktype = 20
      
             End If
@@ -2978,48 +2979,48 @@ ReDim para(1 To docmax)
 ReDim DocParaBack(0 To docmax)
 ReDim DocParaNext(0 To docmax)
 End Sub
-Sub FillBuffer(F As Long)
+Sub FillBuffer(f As Long)
 Dim c As Long
 If bufsize = 0 Then
-bufsize = LOF(F) Mod 327680
-If bufsize = 0 Then bufsize = LOF(F)
+bufsize = LOF(f) Mod 327680
+If bufsize = 0 Then bufsize = LOF(f)
 End If
-c = LOF(F) - SeekBuf + 1
+c = LOF(f) - SeekBuf + 1
 If UBound(Buffer()) > 1 Then bufOffset = bufOffset + UBound(Buffer())
 If c > 327680 Then
         ReDim Buffer(1 To 327680) As Byte
-        Get F, , Buffer
+        Get f, , Buffer
 ElseIf c > 0 Then
         ReDim Buffer(1 To c) As Byte
-        Get F, , Buffer
+        Get f, , Buffer
 End If
 End Sub
-Sub NewSeek(F As Long, ByVal location As Long)
+Sub NewSeek(f As Long, ByVal location As Long)
 If bufsize = 0 Then
-bufsize = LOF(F) Mod 327680
-If bufsize = 0 Then bufsize = LOF(F) Else bufsize = 327680
+bufsize = LOF(f) Mod 327680
+If bufsize = 0 Then bufsize = LOF(f) Else bufsize = 327680
 GoTo fillmeplease
 End If
 If location - bufOffset > 0 And location <= bufsize + bufOffset Then
 Else
 fillmeplease:
-Seek #F, (location \ bufsize) * bufsize + 1
-FillBuffer F
+Seek #f, (location \ bufsize) * bufsize + 1
+FillBuffer f
 End If
 SeekBuf = location
 End Sub
-Sub GetByte(F As Long, ByVal location As Long, b As Byte)
+Sub GetByte(f As Long, ByVal location As Long, b As Byte)
 If location > UBound(Buffer) + bufOffset Then
-Seek #F, (location \ bufsize) * bufsize + 1
-FillBuffer F
+Seek #f, (location \ bufsize) * bufsize + 1
+FillBuffer f
 End If
 b = Buffer(location - bufOffset)
 SeekBuf = location + 1
 End Sub
-Sub GetWord(F As Long, ByVal location As Long, b As Integer)
+Sub GetWord(f As Long, ByVal location As Long, b As Integer)
 If location > UBound(Buffer) + bufOffset Then
-Seek #F, (location \ bufsize) * bufsize + 1
-FillBuffer F
+Seek #f, (location \ bufsize) * bufsize + 1
+FillBuffer f
 End If
 GetMem2 VarPtr(Buffer(location - bufOffset)), b
 SeekBuf = location + 2

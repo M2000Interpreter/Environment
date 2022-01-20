@@ -342,3 +342,13 @@ glistN.forecolor = rgb(255, 255, 255)
 dimm1 = rgb(100, 200, 160)
 dimm2 = rgb(200, 120, 60)
 End Sub
+Property Let Visible(ByVal RHS As Boolean)
+    If Not glistN Is Nothing Then
+        glistN.Visible = RHS
+    End If
+End Property
+Property Get Visible() As Boolean
+    If Not glistN Is Nothing Then
+        Visible = glistN.Visible
+    End If
+End Property
