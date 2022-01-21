@@ -1,5 +1,7 @@
 Attribute VB_Name = "Module9"
 Option Explicit
+Global MinMonitorLeft As Long
+Global MinMonitorTop As Long
 Private Declare Function EnumDisplayMonitors Lib "user32" (ByVal Hdc As Long, lprcClip As Any, ByVal lpfnEnum As Long, dwData As Any) As Long
 Public Declare Function MonitorFromPoint Lib "user32" (ByVal x As Long, ByVal y As Long, ByVal dwFlags As Long) As Long
 Private Declare Function MonitorFromWindow Lib "user32" (ByVal hWnd As Long, ByVal dwFlags As Long) As Long
@@ -70,27 +72,35 @@ Public Property Get AllMonitorsSame() As Long
 End Property
 Public Sub GetMonitorsNow()
   Dim n As Long
+  MinMonitorLeft = &H7FFFFFFF
+  MinMonitorTop = &H7FFFFFFF
     EnumDisplayMonitors 0, ByVal 0&, AddressOf MonitorEnumProc, n
     Console = FindMonitorFromMouse
 End Sub
-Function EnumMonitors(F As Form) As Long
+Public Sub GetMonitorsAgain()
+  Dim n As Long
+  MinMonitorLeft = &H7FFFFFFF
+  MinMonitorTop = &H7FFFFFFF
+    EnumDisplayMonitors 0, ByVal 0&, AddressOf MonitorEnumProc, n
+End Sub
+Function EnumMonitors(f As Form) As Long
     Dim n As Long
     EnumDisplayMonitors 0, ByVal 0&, AddressOf MonitorEnumProc, n
-    With F
+    With f
         .move .Left, .top, (rcVS.Right - rcVS.Left) * 2 + .Width - .Scalewidth, (rcVS.Bottom - rcVS.top) * 2 + .Height - .Scaleheight
     End With
-    F.Scale (rcVS.Left, rcVS.top)-(rcVS.Right, rcVS.Bottom)
-    F.Caption = n & " Monitor" & IIf(n > 1, "s", vbNullString)
-    F.lblMonitors(0).Appearance = 0 'Flat
-    F.lblMonitors(0).BorderStyle = 1 'FixedSingle
+    f.Scale (rcVS.Left, rcVS.top)-(rcVS.Right, rcVS.Bottom)
+    f.Caption = n & " Monitor" & IIf(n > 1, "s", vbNullString)
+    f.lblMonitors(0).Appearance = 0 'Flat
+    f.lblMonitors(0).BorderStyle = 1 'FixedSingle
     For n = 0 To n - 1
         If n Then
-            Load F.lblMonitors(n)
-            F.lblMonitors(n).Visible = True
+            Load f.lblMonitors(n)
+            f.lblMonitors(n).Visible = True
         End If
         With rcMonitors(n)
-            F.lblMonitors(n).move .Left, .top, .Right - .Left, .Bottom - .top
-            F.lblMonitors(n).Caption = "Monitor " & n + 1 & vbLf & _
+            f.lblMonitors(n).move .Left, .top, .Right - .Left, .Bottom - .top
+            f.lblMonitors(n).Caption = "Monitor " & n + 1 & vbLf & _
                 .Right - .Left & " x " & .Bottom - .top & vbLf & _
                 "(" & .Left & ", " & .top & ")-(" & .Right & ", " & .Bottom & ")"
         End With
@@ -111,8 +121,10 @@ Private Function MonitorEnumProc(ByVal hmonitor As Long, ByVal hdcMonitor As Lon
         
    ' Else
     .Left = mi.rcMonitor.Left * dv15
-    
+    If .Left < MinMonitorLeft Then MinMonitorLeft = .Left
+  
     .top = mi.rcMonitor.top * dv15
+    If .top < MinMonitorTop Then MinMonitorTop = .top
     'End If
     
     .Height = (mi.rcMonitor.Bottom - mi.rcMonitor.top) * dv15
@@ -141,27 +153,27 @@ If ScrInfo(i).primary Then FindPrimary = i: Exit Function
 Next i
 End Function
 Function FindFormSScreenCorner(z As Object) As Long
-Dim F As Form
+Dim f As Form
 If TypeOf z Is Form Then
-Set F = z
+Set f = z
 Else
-Set F = z.Parent
+Set f = z.Parent
 End If
-FindFormSScreenCorner = FindMonitorFromPixel(F.Left, F.top)
+FindFormSScreenCorner = FindMonitorFromPixel(f.Left, f.top)
 
 End Function
 Function FindFormSScreen(z As Object)
-Dim F As Form
+Dim f As Form
 If TypeOf z Is Form Then
-Set F = z
+Set f = z
 Else
-Set F = z.Parent
+Set f = z.Parent
 End If
 
 On Error Resume Next
 Dim thismonitor As Long
-If F.Visible Then
-thismonitor = MonitorFromWindow(F.hWnd, MONITOR_DEFAULTTONEAREST)
+If f.Visible Then
+thismonitor = MonitorFromWindow(f.hWnd, MONITOR_DEFAULTTONEAREST)
 
 Else
 FindFormSScreen = FindMonitorFromMouse()
@@ -198,32 +210,32 @@ End If
 Next i
 FindMonitorFromMouse = FindPrimary
 End Function
-Sub MoveFormToOtherMonitor(F As Form)
+Sub MoveFormToOtherMonitor(f As Form)
 Dim k As Long, z As Long
 'k = FindMonitorFromPixel(F.Left, F.Top)
 z = FindMonitorFromMouse
 'If k <> Z Then
 ' center to z
-If F.Width > ScrInfo(z).Width Then
-    If F.Height > ScrInfo(z).Height Then
-        F.move ScrInfo(z).Left, ScrInfo(z).top
+If f.Width > ScrInfo(z).Width Then
+    If f.Height > ScrInfo(z).Height Then
+        f.move ScrInfo(z).Left, ScrInfo(z).top
     Else
-        F.move ScrInfo(z).Left, ScrInfo(z).top + (ScrInfo(z).Height - F.Height) / 2
+        f.move ScrInfo(z).Left, ScrInfo(z).top + (ScrInfo(z).Height - f.Height) / 2
     End If
     
-ElseIf F.Height > ScrInfo(z).Height Then
-    F.move ScrInfo(z).Left + (ScrInfo(z).Width - F.Width) / 2, ScrInfo(z).top
+ElseIf f.Height > ScrInfo(z).Height Then
+    f.move ScrInfo(z).Left + (ScrInfo(z).Width - f.Width) / 2, ScrInfo(z).top
 Else
  ' F.Move ScrInfo(Z).Left + (ScrInfo(Z).width - F.width) / 2, ScrInfo(Z).Top + (ScrInfo(Z).Height - F.Height) / 2
 
 End If
 'End If
 End Sub
-Sub MoveFormToOtherMonitorOnly(F As Form, Optional flag As Boolean)
+Sub MoveFormToOtherMonitorOnly(f As Form, Optional flag As Boolean)
 Dim k As Long, z As Long
 If DisplayMonitorCount = 1 Then Exit Sub
 Dim nowX As Long, nowY As Long
-k = FindMonitorFromPixel(F.Left, F.top)
+k = FindMonitorFromPixel(f.Left, f.top)
 z = FindMonitorFromMouse
 If k = z Then
     If flag Then
@@ -234,36 +246,36 @@ If k = z Then
         flag = False
     Else
         flag = False
-        If F.Name <> "GuiM2000" Then
-        nowX = (ScrInfo(k).Width - F.Width) / 2 + ScrInfo(k).Left
-        nowY = (ScrInfo(k).Height - F.Height) / 2 + ScrInfo(k).top
+        If f.Name <> "GuiM2000" Then
+        nowX = (ScrInfo(k).Width - f.Width) / 2 + ScrInfo(k).Left
+        nowY = (ScrInfo(k).Height - f.Height) / 2 + ScrInfo(k).top
         Else
-        If ScrInfo(z).Left = F.Left And F.Left > 0 And Not F.SkipAutoPos Then
-        nowX = F.Left + (Forms.count - 4) * 450 Mod 4500
-        nowY = F.top + (Forms.count - 4) * 450 Mod 4500
-        ElseIf ScrInfo(z).top = F.top And F.top > 0 And Not F.SkipAutoPos Then
-        nowX = F.Left + (Forms.count - 4) * 450 Mod 4500
-        nowY = F.top + (Forms.count - 4) * 450 Mod 4500
+        If ScrInfo(z).Left = f.Left And f.Left > 0 And Not f.SkipAutoPos Then
+        nowX = f.Left + (Forms.Count - 4) * 450 Mod 4500
+        nowY = f.top + (Forms.Count - 4) * 450 Mod 4500
+        ElseIf ScrInfo(z).top = f.top And f.top > 0 And Not f.SkipAutoPos Then
+        nowX = f.Left + (Forms.Count - 4) * 450 Mod 4500
+        nowY = f.top + (Forms.Count - 4) * 450 Mod 4500
         Else
-        nowX = F.Left
-        nowY = F.top
+        nowX = f.Left
+        nowY = f.top
         End If
         End If
     End If
 Else
-    If F.Name <> "GuiM2000" Then
-        nowX = (ScrInfo(z).Width - F.Width) / 2 + ScrInfo(z).Left
-        nowY = (ScrInfo(z).Height - F.Height) / 2 + ScrInfo(z).top
+    If f.Name <> "GuiM2000" Then
+        nowX = (ScrInfo(z).Width - f.Width) / 2 + ScrInfo(z).Left
+        nowY = (ScrInfo(z).Height - f.Height) / 2 + ScrInfo(z).top
     Else
-        If ScrInfo(z).Left <> F.Left And F.Left > 0 And Not F.SkipAutoPos Then
-            nowX = ScrInfo(z).Left + (Forms.count - 4) * 450 Mod 4500
-            nowY = ScrInfo(z).top + (Forms.count - 4) * 450 Mod 4500
-        ElseIf ScrInfo(z).top <> F.top And F.top > 0 And Not F.SkipAutoPos Then
-            nowX = ScrInfo(z).Left + (Forms.count - 4) * 450 Mod 4500
-            nowY = ScrInfo(z).top + (Forms.count - 4) * 450 Mod 4500
+        If ScrInfo(z).Left <> f.Left And f.Left > 0 And Not f.SkipAutoPos Then
+            nowX = ScrInfo(z).Left + (Forms.Count - 4) * 450 Mod 4500
+            nowY = ScrInfo(z).top + (Forms.Count - 4) * 450 Mod 4500
+        ElseIf ScrInfo(z).top <> f.top And f.top > 0 And Not f.SkipAutoPos Then
+            nowX = ScrInfo(z).Left + (Forms.Count - 4) * 450 Mod 4500
+            nowY = ScrInfo(z).top + (Forms.Count - 4) * 450 Mod 4500
         Else
-        nowX = F.Left
-        nowY = F.top
+        nowX = f.Left
+        nowY = f.top
         End If
     End If
 End If
@@ -271,9 +283,9 @@ End If
 If nowX > ScrInfo(z).Left + ScrInfo(z).Width Then
     nowX = ScrInfo(z).Left + ScrInfo(z).Width * 2 / 3
 End If
-If nowX + F.Width > ScrInfo(z).Left + ScrInfo(z).Width Then
-    If F.Width < ScrInfo(z).Width Then
-    nowX = ScrInfo(z).Left + ScrInfo(z).Width - F.Width
+If nowX + f.Width > ScrInfo(z).Left + ScrInfo(z).Width Then
+    If f.Width < ScrInfo(z).Width Then
+    nowX = ScrInfo(z).Left + ScrInfo(z).Width - f.Width
     Else
     nowX = ScrInfo(z).Left
     End If
@@ -281,46 +293,46 @@ End If
 If nowY > ScrInfo(z).top + ScrInfo(z).Height Then
     nowY = ScrInfo(z).top + ScrInfo(z).Height * 2 / 3
 End If
-If nowY + F.Height > ScrInfo(z).top + ScrInfo(z).Height Then
-    If F.Height < ScrInfo(z).Height Then
-    nowY = ScrInfo(z).top + ScrInfo(z).Height - F.Height
+If nowY + f.Height > ScrInfo(z).top + ScrInfo(z).Height Then
+    If f.Height < ScrInfo(z).Height Then
+    nowY = ScrInfo(z).top + ScrInfo(z).Height - f.Height
     Else
     nowY = ScrInfo(z).top
     End If
 End If
 
-If F.Width > ScrInfo(z).Width Then
-    If F.Height > ScrInfo(z).Height Then
+If f.Width > ScrInfo(z).Width Then
+    If f.Height > ScrInfo(z).Height Then
         nowX = ScrInfo(z).Left
         nowY = ScrInfo(z).top
     Else
         nowX = ScrInfo(z).Left
-        nowY = ScrInfo(z).top + (ScrInfo(z).Height - F.Height) / 2
+        nowY = ScrInfo(z).top + (ScrInfo(z).Height - f.Height) / 2
     End If
     
-ElseIf F.Height > ScrInfo(z).Height Then
-    nowX = ScrInfo(z).Left + (ScrInfo(z).Width - F.Width) / 2
+ElseIf f.Height > ScrInfo(z).Height Then
+    nowX = ScrInfo(z).Left + (ScrInfo(z).Width - f.Width) / 2
     nowY = ScrInfo(z).top
 ElseIf flag Then
-    nowX = ScrInfo(z).Left + (ScrInfo(z).Width - F.Width) / 2
-    nowY = ScrInfo(z).top + (ScrInfo(z).Height - F.Height) / 2
+    nowX = ScrInfo(z).Left + (ScrInfo(z).Width - f.Width) / 2
+    nowY = ScrInfo(z).top + (ScrInfo(z).Height - f.Height) / 2
 End If
-F.move nowX, nowY
+f.move nowX, nowY
 End Sub
-Sub MoveFormToOtherMonitorCenter(F As Form)
+Sub MoveFormToOtherMonitorCenter(f As Form)
 Dim k As Long, z As Long
 z = FindMonitorFromMouse
-If F.Width > ScrInfo(z).Width Then
-    If F.Height > ScrInfo(z).Height Then
-        F.move ScrInfo(z).Left, ScrInfo(z).top
+If f.Width > ScrInfo(z).Width Then
+    If f.Height > ScrInfo(z).Height Then
+        f.move ScrInfo(z).Left, ScrInfo(z).top
     Else
-        F.move ScrInfo(z).Left, ScrInfo(z).top + (ScrInfo(z).Height - F.Height) / 2
+        f.move ScrInfo(z).Left, ScrInfo(z).top + (ScrInfo(z).Height - f.Height) / 2
     End If
     
-ElseIf F.Height > ScrInfo(z).Height Then
-    F.move ScrInfo(z).Left + (ScrInfo(z).Width - F.Width) / 2, ScrInfo(z).top
+ElseIf f.Height > ScrInfo(z).Height Then
+    f.move ScrInfo(z).Left + (ScrInfo(z).Width - f.Width) / 2, ScrInfo(z).top
 Else
- F.move ScrInfo(z).Left + (ScrInfo(z).Width - F.Width) / 2, ScrInfo(z).top + (ScrInfo(z).Height - F.Height) / 2
+ f.move ScrInfo(z).Left + (ScrInfo(z).Width - f.Width) / 2, ScrInfo(z).top + (ScrInfo(z).Height - f.Height) / 2
 
 End If
 End Sub

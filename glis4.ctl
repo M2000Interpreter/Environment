@@ -3158,6 +3158,7 @@ there:
 End Property
 Public Sub FloatListMe(State As Boolean, x As Single, y As Single)
 Static preX As Single, preY As Single
+Dim dummy As Long
 On Error GoTo there
 If Extender.Parent Is Nothing Then Exit Sub
 If Not State Then
@@ -3166,17 +3167,18 @@ preY = y
 State = True
 mousepointer = 0
 doubleclick = 0
+GetMonitorsAgain
 Else
 If Extender.Visible Then
 
 mousepointer = 5
 RaiseEvent NeedDoEvents
 If MoveParent Then
-If (Extender.Parent.top + (y - preY) < 0) Then preY = y + Extender.Parent.top
-If (Extender.Parent.Left + (x - preX) < 0) Then preX = x + Extender.Parent.Left
-If ((Extender.Parent.top + y - preY) > FloatLimitTop) And FloatLimitTop > 0 Then preY = Extender.Parent.top + y - FloatLimitTop
+If (Extender.Parent.top + (y - preY) < MinMonitorTop) Then preY = y + Extender.Parent.top - MinMonitorTop
+If (Extender.Parent.Left + (x - preX) < MinMonitorLeft) Then preX = x + Extender.Parent.Left - MinMonitorLeft
+If ((Extender.Parent.top + y - preY) > FloatLimitTop) And FloatLimitTop > ((Extender.Parent.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > MinMonitorTop Then preY = Extender.Parent.top + y - FloatLimitTop
 
-If ((Extender.Parent.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > 0 Then preX = Extender.Parent.Left + x - FloatLimitLeft
+If ((Extender.Parent.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > MinMonitorLeft Then preX = Extender.Parent.Left + x - FloatLimitLeft
 Extender.Parent.move Extender.Parent.Left + (x - preX), Extender.Parent.top + (y - preY)
 RaiseEvent RefreshDesktop
 Else

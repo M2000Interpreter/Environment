@@ -1,9 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 53 active-X
-Update glis4 control, for Listbox, Editbox, Combobox. Now we can edit RTL text.
-Fix multicolumn ListBox (additional Subs).
-Fix a bug which prevents running the M2000_Editor_Information module. Was a bug in Call method on a non child module.
+Version 10 revision 54 active-X
+Multi monitor support, fix logic to support negative coordinates in Windows 10.
 
 
 George Karras, Kallithea Attikis, Greece.
