@@ -71,9 +71,9 @@ Attribute VB_Exposed = False
 Option Explicit
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private Declare Function DestroyCaret Lib "user32" () As Long
-Private Declare Function DrawIconEx Lib "user32" (ByVal Hdc As Long, ByVal xLeft As Long, ByVal yTop As Long, ByVal hIcon As Long, ByVal cxWidth As Long, ByVal cyWidth As Long, ByVal istepIfAniCur As Long, ByVal hbrFlickerFreeDraw As Long, ByVal diFlags As Long) As Long
+Private Declare Function DrawIconEx Lib "user32" (ByVal hDC As Long, ByVal xLeft As Long, ByVal yTop As Long, ByVal hIcon As Long, ByVal cxWidth As Long, ByVal cyWidth As Long, ByVal istepIfAniCur As Long, ByVal hbrFlickerFreeDraw As Long, ByVal diFlags As Long) As Long
 Private Declare Function DrawState Lib "user32" Alias "DrawStateA" _
-        (ByVal Hdc As Long, _
+        (ByVal hDC As Long, _
         ByVal hBrush As Long, _
         ByVal lpDrawStateProc As Long, _
         ByVal lParam As Long, _
@@ -498,7 +498,7 @@ ResizeMark.Height = MarkSize * dv15
 ResizeMark.Left = Width - MarkSize * dv15
 ResizeMark.top = Height - MarkSize * dv15
 Dim XX As Long
-XX = GetPixel(Me.Hdc, Width - MarkSize * dv15, Height - MarkSize * dv15)
+XX = GetPixel(Me.hDC, Width - MarkSize * dv15, Height - MarkSize * dv15)
 If XX <> -1 Then
 ResizeMark.backcolor = XX
 End If
@@ -726,7 +726,7 @@ Private Sub Form_Resize()
 If Me.WindowState <> 0 Then WindowState = 0: Exit Sub
 gList2.MoveTwips 0, 0, Me.Width, gList2.HeightTwips
 ResizeMark.move Width - ResizeMark.Width, Height - ResizeMark.Height
-ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
 End Sub
 
 
@@ -925,7 +925,7 @@ If mSizable And mShowMaximize Then
         Else
            Callback mMyName$ + ".Resize()"
         End If
-        ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+        ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
         If IhaveLastPos Then
                 
                 If mIndex > -1 Then
@@ -1022,7 +1022,7 @@ If mSizable And mShowMaximize Then
         Else
            Callback mMyName$ + ".Resize()"
         End If
-        ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+        ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
         If IhaveLastPos Then
                 If mIndex > -1 Then
                     Callback mMyName$ + ".Maximized(" + CStr(index) + ")"
@@ -1135,6 +1135,7 @@ End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
 UNhookMe
+Dim clearbasket As basket
 Quit = True
 Set myEvent = Nothing
 If Not glistN Is Nothing Then glistN.Shutdown
@@ -1142,8 +1143,7 @@ Set glistN = Nothing
 If Not Pad Is Nothing Then Unload Pad
 Set Pad = Nothing
 If prive <> 0 Then
-players(prive).used = False
-players(prive).MAXXGRAPH = 0
+players(prive) = clearbasket
 prive = 0
 
 End If
@@ -1491,7 +1491,7 @@ If Not Sizable Then
 If MY_BACK Is Nothing Then Set MY_BACK = New cDIBSection
 MY_BACK.ClearUp
 If MY_BACK.create(Width / DXP, Height / DYP) Then
-MY_BACK.LoadPictureBlt Hdc
+MY_BACK.LoadPictureBlt hDC
 If MY_BACK.bitsPerPixel <> 24 Then Conv24 MY_BACK
 End If
 End If
@@ -1499,7 +1499,7 @@ End Sub
 Public Sub Release()
 If Not Sizable Then
 If MY_BACK Is Nothing Then Exit Sub
-MY_BACK.PaintPicture Hdc
+MY_BACK.PaintPicture hDC
 End If
 End Sub
 
@@ -1568,6 +1568,7 @@ End If
 End Sub
 
 Private Sub gList2_KeyDown(keycode As Integer, shift As Integer)
+Static once As Boolean
 If keycode = 115 And shift = 4 Then
 ByeBye
 Exit Sub
@@ -1612,7 +1613,8 @@ End If
 If Not sizeMe Then
 gList2.FloatListMe True, movemeX, movemeY
 gList2.FloatListMe False, movemeX, movemeY
-Else
+ElseIf Not once Then  ' stop reentrance
+once = True
 If movemeY < 3000 Then movemeY = 3000
 If movemeX < 3000 Then movemeX = 3000
 If VirtualScreenHeight < movemeY Then movemeY = VirtualScreenHeight
@@ -1626,7 +1628,7 @@ If VirtualScreenWidth < movemeX Then movemeX = VirtualScreenWidth
                 End If
                 Form_Resize
                 
-
+once = False
 End If
 keycode = 0
 Exit Sub
@@ -1869,7 +1871,7 @@ If Not Relax Then
                 Else
                     Callback mMyName$ + ".Resize()"
                 End If
-                ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+                ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
             End If
         End If
         Relax = False
@@ -2004,7 +2006,7 @@ Case 3
         Else
            Callback mMyName$ + ".Resize()"
         End If
-        ResizeMark.backcolor = GetPixel(Me.Hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+        ResizeMark.backcolor = GetPixel(Me.hDC, Width \ dv15 - 1, Height \ dv15 - 1)
     MenuSet 2
     End If
 Case 4
@@ -2589,10 +2591,10 @@ End Property
 Friend Property Let modulename(ByVal RHS As String)
 PRmodulename$ = RHS
 End Property
-Friend Sub RegisterAcc(m, ControlName$, Optional Opcode As Long = 0)
+Friend Sub RegisterAcc(m, controlname$, Optional Opcode As Long = 0)
 If acclist Is Nothing Then Set acclist = New FastCollection
 If acclist.ExistKey(m) Then acclist.RemoveWithNoFind
-acclist.AddKey m, ControlName$
+acclist.AddKey m, controlname$
 acclist.sValue = Opcode
 End Sub
 Friend Sub AccProces(m As Long)

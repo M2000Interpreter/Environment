@@ -111,8 +111,8 @@ End Type
 Private s$
 Private m_fontname As String
 Private m_fontsize As Single
-Private m_currentX As Long
-Private m_currenty As Long
+Private m_currentX As Single
+Private m_currenty As Single
 Private m_PageStyle As Long
 Private m_transparent As Long
 Private m_fonttransparent As Long
@@ -164,8 +164,8 @@ End Property
 Public Property Let mouseicon(RHS As StdPicture)
     Set moufa = RHS
 End Property
-Private Function MyMod(r1, po) As Variant
-MyMod = r1 - Fix(r1 / po) * po
+Private Function MyMod(R1, po) As Variant
+MyMod = R1 - Fix(R1 / po) * po
 End Function
 Public Sub create(pen As Long, fakeWidth As Long, fakeHeight As Long)
     Static onetime As Boolean
@@ -217,10 +217,10 @@ Dim emfP As StdPicture
 Set emfP = Me.getEmf
 If emfP Is Nothing Then Exit Function
 Set aPic = New MemBlock
-bytes = GetEnhMetaFileBits(emfP.handle, bytes, ByVal 0)
+bytes = GetEnhMetaFileBits(emfP.Handle, bytes, ByVal 0)
 If bytes Then
     aPic.Construct 1, bytes
-    Call GetEnhMetaFileBits(emfP.handle, bytes, ByVal aPic.GetBytePtr(0))
+    Call GetEnhMetaFileBits(emfP.Handle, bytes, ByVal aPic.GetBytePtr(0))
     aPic.SubType = 2 ' emf
 End If
 Set getEmfObj = aPic
@@ -357,19 +357,19 @@ Private Sub Class_Terminate()
     
 End Sub
 
-Public Property Get currentX() As Long
+Public Property Get currentX() As Single
     currentX = m_currentX
 End Property
 
-Public Property Let currentX(ByVal RHS As Long)
-m_currentX = RHS
+Public Property Let currentX(ByVal RHS As Single)
+    m_currentX = RHS
 End Property
 
-Public Property Get currentY() As Long
+Public Property Get currentY() As Single
     currentY = m_currenty
 End Property
 
-Public Property Let currentY(ByVal RHS As Long)
+Public Property Let currentY(ByVal RHS As Single)
 m_currenty = RHS
 End Property
 Public Property Get prive() As Long
@@ -662,7 +662,7 @@ Public Sub PlayEmfInside(picthis As StdPicture, x As Long, y As Long, Optional W
     SetWorldTransform m_hDC, myXForm
       kkx.Right = kkx.Right * 1.00166666666667
   kkx.Bottom = kkx.Bottom * 1.00333333333333
-    PlayEnhMetaFile m_hDC, picthis.handle, kkx
+    PlayEnhMetaFile m_hDC, picthis.Handle, kkx
     End If
     
     SetWorldTransform m_hDC, gOldWorld
@@ -738,7 +738,7 @@ Private Sub PlayEmfInsideSimple(picthis As StdPicture, x As Long, y As Long, Opt
    kkx.Right = kkx.Right * 1.00166666666667
   kkx.Bottom = kkx.Bottom * 1.00333333333333
     SetGraphicsMode m_hDC, GM_ADVANCED
-    PlayEnhMetaFile m_hDC, picthis.handle, kkx
+    PlayEnhMetaFile m_hDC, picthis.Handle, kkx
 SetGraphicsMode m_hDC, GM_COMPATIBLE
     
     
@@ -844,10 +844,10 @@ Private Function getEmfFromWmf(Wmf As StdPicture, w As Long, h As Long) As Long
  
  Dim bytes As Long
 Dim Buffer() As Byte
-   bytes = GetMetaFileBitsEx(Wmf.handle, bytes, ByVal 0&)
+   bytes = GetMetaFileBitsEx(Wmf.Handle, bytes, ByVal 0&)
  If bytes Then
 ReDim Buffer(1 To bytes) As Byte
-Call GetMetaFileBitsEx(Wmf.handle, bytes, Buffer(1))
+Call GetMetaFileBitsEx(Wmf.Handle, bytes, Buffer(1))
 Else
 
 Exit Function

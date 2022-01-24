@@ -171,6 +171,20 @@ If mIndex >= 0 Then
       End If
 End Sub
 
+Private Sub glistN_PrepareContainer()
+'
+Dim VR(1)
+    VR(0) = True
+    If mIndex >= 0 Then
+        Callback.CallbackNow mesCtrlName + ".Container(" + Str(mIndex) + ")", VR()
+    Else
+        Callback.CallbackNow mesCtrlName + ".Container()", VR()
+    End If
+    If CBool(VR(0)) Then
+        Callback.Controls(ctrlName).Container.Refresh
+    End If
+End Sub
+
 Private Sub glistN_ReadColumnItem(item As Long, Col As Long, content As String)
 If Not mEnabled Then Exit Sub
 Dim VR(1)
@@ -425,9 +439,7 @@ content = VR(0)
 End Sub
 
 Private Sub glistN_RefreshDesktop()
-
 If Callback.Visible Then Callback.Refresh
-
 End Sub
 
 Private Sub glistN_RemoveOne(that As String)
@@ -899,7 +911,7 @@ Title = mTitle
 End Property
 Public Property Let TitleHeight(ByVal vNewValue As Variant)
 mfactor = Abs(CSng(vNewValue))
-If mfactor < 1 Then mfactor = 1
+If mfactor < 0.1 Then mfactor = 0.1
 If mTitle <> "" Then
 Dim onelineheight As Long
 glistN.HeadLine = mTitle
@@ -1640,3 +1652,49 @@ End Sub
 Private Function Myleft$(a As String, Pos As Long)
 If Pos < 1 Then Myleft$ = vbNullString Else Myleft$ = Mid$(a, 1, Pos)
 End Function
+Sub UseMove()
+    If glistN Is Nothing Then Exit Sub
+    glistN.FloatList = True
+    glistN.NoHorMove = False
+    glistN.NoVerMove = False
+End Sub
+Sub UseÍïMove()
+    If glistN Is Nothing Then Exit Sub
+    glistN.FloatList = False
+    glistN.NoHorMove = False
+    glistN.NoVerMove = False
+End Sub
+Sub UseHorMove()
+    If glistN Is Nothing Then Exit Sub
+    glistN.FloatList = True
+    glistN.NoHorMove = False
+    glistN.NoVerMove = True
+End Sub
+Sub UseVerMove()
+    If glistN Is Nothing Then Exit Sub
+    glistN.FloatList = True
+    glistN.NoHorMove = True
+    glistN.NoVerMove = False
+End Sub
+
+Private Sub glistN_ValidMove(x As Single, y As Single)
+Dim VR(2)
+VR(0) = x
+VR(1) = y
+   If mIndex >= 0 Then
+   Callback.CallbackNow mesCtrlName + ".ValidMove(" + Str(mIndex) + "," + Str(mIndex) + ")", VR()
+   Else
+      Callback.CallbackNow mesCtrlName + ".ValidMove()", VR()
+      End If
+x = VR(0)
+y = VR(1)
+End Sub
+Property Let MoveParent(ByVal RHS As Boolean)
+If Not glistN Is Nothing Then glistN.MoveParent = RHS
+End Property
+Property Get MoveParent() As Boolean
+    If Not glistN Is Nothing Then
+        MoveParent = glistN.MoveParent
+    End If
+End Property
+

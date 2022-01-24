@@ -93,7 +93,7 @@ Private Sub Form_KeyPress(KeyAscii As Integer)
 On Error GoTo there1
 
 If Form1.Visible Then
-If Not glist1.EditFlag Then
+If Not gList1.EditFlag Then
 Form1.SetFocus
 INK$ = StrConv(ChrW$(KeyAscii Mod 256), 64, Form1.GetLCIDFromKeyboard)
 End If
@@ -107,12 +107,12 @@ Form4Loaded = True
 Set LastGlist2 = Nothing
 setupxy = 20 * Helplastfactor
 scrTwips = Screen.TwipsPerPixelX
-glist1.CapColor = rgb(255, 160, 0)
-glist1.LeftMarginPixels = 4
+gList1.CapColor = rgb(255, 160, 0)
+gList1.LeftMarginPixels = 4
 Set label1 = New TextViewer
-Set label1.Container = glist1
+Set label1.Container = gList1
 label1.NoCenterLineEdit = True
-label1.Filename = vbNullString
+label1.FileName = vbNullString
 label1.glistN.NoMoveDrag = True
 label1.glistN.DropEnabled = False
 label1.glistN.DragEnabled = Not abt
@@ -163,7 +163,7 @@ End If
 End Sub
 Public Sub moveMe()
 ScaleDialog Helplastfactor, HelpLastWidth
-Hook2 hWnd, glist1
+Hook2 hWnd, gList1
 label1.glistN.SoftEnterFocus
 If IsWine Then
 If Not Screen.ActiveForm Is Nothing Then
@@ -320,19 +320,19 @@ End Sub
 
 Private Sub glist1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 If item = -1 Then
-If glist1.DoubleClickCheck(Button, item, x, y, glist1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor, -1) Then
+If gList1.DoubleClickCheck(Button, item, x, y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor, -1) Then
             HelpLastWidth = -1
             Unload Me
 End If
 Else
-glist1.mousepointer = 1
+gList1.mousepointer = 1
 End If
 End Sub
 
 
 Private Sub glist1_getpair(a As String, b As String)
 If mHelp Or abt Then
-glist1.EditFlag = False
+gList1.EditFlag = False
     MKEY$ = MKEY$ & a
     a = vbNullString
 End If
@@ -347,7 +347,7 @@ End If
 Select Case keycode
 Case vbKeyDelete, vbKeyBack, vbKeyReturn, vbKeySpace
 
-glist1.EditFlag = False
+gList1.EditFlag = False
 If mHelp Or abt Then
 MKEY$ = MKEY$ & ChrW$(keycode)
 keycode = 0
@@ -374,7 +374,7 @@ End If
 End Sub
 
 Private Sub gList1_MouseUp(x As Single, y As Single)
-If glist1.DoubleClickArea(x, y, glist1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor) Then
+If gList1.DoubleClickArea(x, y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor) Then
             HelpLastWidth = -1
             Unload Me
             End If
@@ -445,13 +445,13 @@ a.Left = a.Right - b
 a.Right = a.Right - setupxy + b
 a.top = b
 a.Bottom = setupxy - b
-FillThere thathDC, VarPtr(a), glist1.dcolor
+FillThere thathDC, VarPtr(a), gList1.dcolor
 b = 5
 a.Left = a.Left - 3
 a.Right = a.Right + 3
 a.top = b
 a.Bottom = setupxy - b
-FillThere thathDC, VarPtr(a), glist1.CapColor
+FillThere thathDC, VarPtr(a), gList1.CapColor
 
 
 End Sub
@@ -476,8 +476,8 @@ FillThereMyVersion thisHDC, thisrect, &HF0F0F0
 End If
 End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
-glist1.FontSize = 14.25 * factor * dv15 / 15
-factor = glist1.FontSize / 14.25 / dv15 * 15
+gList1.FontSize = 14.25 * factor * dv15 / 15
+factor = gList1.FontSize / 14.25 / dv15 * 15
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
@@ -496,7 +496,7 @@ allwidth = NewWidth  ''vH_x * factor
 allheight = vH_y * factor
 itemWidth = allwidth - 2 * borderleft
 Dim kk As Long
-If Left < 0 Or top < 0 Then
+If Left < MinMonitorLeft Or top < MinMonitorTop Then
 kk = 0
 Else
 kk = 1
@@ -504,13 +504,13 @@ End If
 myform Me, Left * kk, top * kk, allwidth, allheight, True, factor
 
   
-glist1.addpixels = 4 * factor
+gList1.addpixels = 4 * factor
 label1.move borderleft, bordertop, itemWidth, allheight - bordertop * 2
 
 label1.NewTitle vH_title$, (4 + UAddPixelsTop) * factor
 label1.Render
-glist1.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
-glist1.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
+gList1.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
+gList1.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 
 
 End Sub

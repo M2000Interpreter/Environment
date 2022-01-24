@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 54 active-X
-Multi monitor support, fix logic to support negative coordinates in Windows 10.
-
+Version 10 revision 55 active-X
+New GuiImage control. Can hold other controls.
+Som fixes from previous revisions.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

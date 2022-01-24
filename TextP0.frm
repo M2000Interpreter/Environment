@@ -1518,7 +1518,7 @@ Set TEXT1.Container = gList1
 With TEXT1.glistN
 .DragEnabled = False ' only drop - we can change this from popup menu
 .enabled = False
-TEXT1.Filename = vbNullString
+TEXT1.FileName = vbNullString
 .addpixels = 0
 TEXT1.showparagraph = False
 
@@ -2520,7 +2520,7 @@ End If
 End Sub
 
 
-Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, url As Variant, Flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
+Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, url As Variant, flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
 If look1 Then
 look1 = False:  lookfirst = False
 

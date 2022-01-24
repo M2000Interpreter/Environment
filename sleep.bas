@@ -229,207 +229,177 @@ End Sub
 
 Public Sub MyDoEvents0new(some As Object)
    On Error GoTo procbliah3
-
-
-        With Prefresh(GetCode(some))
-            If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
-            
-                If .RRCOUNTER = 0 Then
-                    .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
-                    If byPassCallback Then Exit Sub
-                    If some.Visible Then some.Refresh
-                  
-                   
- 
-                    If Not TaskMaster Is Nothing Then
-                            TaskMaster.StopProcess
-                             DoEvents
-                             TaskMaster.StartProcess
-                    Else
-                        DoEvents
-                    End If
-           End If
-           End With
-   Exit Sub
+With Prefresh(GetCode(some))
+    If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+        If .RRCOUNTER = 0 Then
+            .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
+            If byPassCallback Then Exit Sub
+            If some.Visible Then some.Refresh
+            If Not TaskMaster Is Nothing Then
+                TaskMaster.StopProcess
+                DoEvents
+                TaskMaster.StartProcess
+            Else
+                DoEvents
+            End If
+   End If
+End With
+Exit Sub
    
 procbliah3:
 DoEvents
 End Sub
 
 Public Sub MyDoEvents0(some As Object)
-   On Error GoTo procbliah3
-With Prefresh(GetCode(some))
-
-
-            If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
-            
-                If .RRCOUNTER = 0 Then
-                    .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
-                    If byPassCallback Then Exit Sub
-                    If some.Visible Then
-                    If TypeOf some Is GuiM2000 Then
+    On Error GoTo procbliah3
+    With Prefresh(GetCode(some))
+        If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+        If .RRCOUNTER = 0 Then
+            .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
+            If byPassCallback Then Exit Sub
+            If some.Visible Then
+                If TypeOf some Is GuiM2000 Then
                     If some.RefreshList > 0 Then some.RefreshALL Else some.Refresh
-                    Else
+                Else
                     some.Refresh
-                    End If
-                    End If
-                  
-                   End If
- 
-                    If Not TaskMaster Is Nothing Then
-                            TaskMaster.StopProcess
-                             DoEvents
-                             TaskMaster.StartProcess
-                    Else
-                        DoEvents
-                    End If
-End With
-   Exit Sub
+                End If
+            End If
+        End If
+        If Not TaskMaster Is Nothing Then
+            TaskMaster.StopProcess
+            DoEvents
+            TaskMaster.StartProcess
+        Else
+            DoEvents
+        End If
+    End With
+    Exit Sub
 procbliah3:
-DoEvents
+    DoEvents
 End Sub
 
 Public Sub MyDoEvents1(some As Object, Optional DOeVONLY As Boolean = False, Optional ResetK1 As Boolean)
 Static once As Boolean
-If some Is Nothing Then
-If TaskMaster Is Nothing Then
-If DOeVONLY Then
-            DoEvents
+    If some Is Nothing Then
+        If TaskMaster Is Nothing Then
+            If DOeVONLY Then
+                DoEvents
             Else
-    If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
-            If REFRESHRATE <> 25 And ResetK1 Then RRCOUNTER = 0
-            If RRCOUNTER = 0 Then
-            If ResetK1 Then REFRESHRATE = 25
-            k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
-            End If
-            End If
-Else
-    TaskMaster.rest
-    If DOeVONLY Then
-     If Not once Then
-        once = True
-        TaskMaster.TimerTickNow
-        TaskMaster.StopProcess
-         DoEvents
-         TaskMaster.StartProcess
-         once = False
-         Else
-        TaskMaster.TimerTickNow
-         TaskMaster.StopProcess
-         DoEvents
+                If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+                    If REFRESHRATE <> 25 And ResetK1 Then RRCOUNTER = 0
+                        If RRCOUNTER = 0 Then
+                            If ResetK1 Then REFRESHRATE = 25
+                            k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+                        End If
+                    End If
+                Else
+                    TaskMaster.rest
+                    If DOeVONLY Then
+                        If Not once Then
+                            once = True
+                            TaskMaster.TimerTickNow
+                            TaskMaster.StopProcess
+                            DoEvents
+                            TaskMaster.StartProcess
+                            once = False
+                        Else
+                            TaskMaster.TimerTickNow
+                            TaskMaster.StopProcess
+                            DoEvents
+                        End If
+                    Else
+                        If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+                        If REFRESHRATE <> 25 And ResetK1 Then RRCOUNTER = 0
+                        If RRCOUNTER = 0 Then
+                            If ResetK1 Then REFRESHRATE = 25
+                            k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+                            TaskMaster.Dispose
+                            If Not once Then
+                                once = True
+                                TaskMaster.TimerTickNow
+                                TaskMaster.StopProcess
+                                DoEvents
+                                TaskMaster.StartProcess
+                                once = False
+                            Else
+                                TaskMaster.TimerTickNow
+                                TaskMaster.StopProcess
+                                DoEvents
+                            End If
+                        End If
+                    End If
+                    TaskMaster.RestEnd
+                End If
+            Exit Sub
         End If
-    Else
-    
-    If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
-    
-            
-            If REFRESHRATE <> 25 And ResetK1 Then RRCOUNTER = 0
-            If RRCOUNTER = 0 Then
-            If ResetK1 Then REFRESHRATE = 25
-            k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
-            TaskMaster.Dispose
-         If Not once Then
-        once = True
-        TaskMaster.TimerTickNow
-        TaskMaster.StopProcess
-         DoEvents
-         TaskMaster.StartProcess
-         once = False
-         Else
-        TaskMaster.TimerTickNow
-         TaskMaster.StopProcess
-         DoEvents
-        End If
-                  
-                  End If
-        End If
-
-TaskMaster.RestEnd
-End If
-
-
-
-Exit Sub
-End If
-
-On Error Resume Next
-If some Is Nothing Then Set some = Form1
-With Prefresh(GetCode(some))
-If TaskMaster Is Nothing Then
-If DOeVONLY Then
-            DoEvents
+        On Error Resume Next
+        If some Is Nothing Then Set some = Form1
+        With Prefresh(GetCode(some))
+        If TaskMaster Is Nothing Then
+            If DOeVONLY Then
+                DoEvents
             Else
-    
-    If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
-            
-            If REFRESHRATE <> 25 And ResetK1 Then .RRCOUNTER = 0
-            If .RRCOUNTER = 0 Then
-            If ResetK1 Then REFRESHRATE = 25
-            .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
-            If byPassCallback Then Exit Sub
-            If some.Visible Then
-            If TypeOf some Is GuiM2000 Then
-                    If some.RefreshList > 0 Then some.RefreshALL Else some.Refresh
-                    Else
-                    some.Refresh
+                If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+                If REFRESHRATE <> 25 And ResetK1 Then .RRCOUNTER = 0
+                If .RRCOUNTER = 0 Then
+                    If ResetK1 Then REFRESHRATE = 25
+                    .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
+                    If byPassCallback Then Exit Sub
+                    If some.Visible Then
+                        If TypeOf some Is GuiM2000 Then
+                            If some.RefreshList > 0 Then some.RefreshALL Else some.Refresh
+                        Else
+                            some.Refresh
+                        End If
                     End If
+                End If
             End If
-            End If
-            End If
-Else
-
-
-    TaskMaster.rest
-    If DOeVONLY Then
-     If Not once Then
-        once = True
-        TaskMaster.TimerTickNow
-        TaskMaster.StopProcess
-         DoEvents
-         TaskMaster.StartProcess
-         once = False
-         Else
-        TaskMaster.TimerTickNow
-         TaskMaster.StopProcess
-         DoEvents
-        End If
-    Else
-      If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
-      
-            If REFRESHRATE <> 25 And ResetK1 Then .RRCOUNTER = 0
-            If .RRCOUNTER = 0 Then
-            If ResetK1 Then REFRESHRATE = 25
-            .k1 = uintnew(timeGetTime) + REFRESHRATE: .RRCOUNTER = 1
-         If byPassCallback Then Exit Sub
-         If some.Visible Then
-         If TypeOf some Is GuiM2000 Then
-                    If some.RefreshList > 0 Then some.RefreshALL Else some.Refresh
-                    Else
-                    some.Refresh
+        Else
+            TaskMaster.rest
+            If DOeVONLY Then
+                If Not once Then
+                    once = True
+                    TaskMaster.TimerTickNow
+                    TaskMaster.StopProcess
+                    DoEvents
+                    TaskMaster.StartProcess
+                    once = False
+                Else
+                    TaskMaster.TimerTickNow
+                    TaskMaster.StopProcess
+                    DoEvents
+                End If
+            Else
+                If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+                If REFRESHRATE <> 25 And ResetK1 Then .RRCOUNTER = 0
+                If .RRCOUNTER = 0 Then
+                    If ResetK1 Then REFRESHRATE = 25
+                    .k1 = uintnew(timeGetTime) + REFRESHRATE: .RRCOUNTER = 1
+                    If byPassCallback Then Exit Sub
+                    If some.Visible Then
+                        If TypeOf some Is GuiM2000 Then
+                            If some.RefreshList > 0 Then some.RefreshALL Else some.Refresh
+                        Else
+                            some.Refresh
+                        End If
                     End If
-         End If
-        
-         
-         
-         If Not once Then
-        once = True
-        TaskMaster.TimerTickNow
-        TaskMaster.StopProcess
-         DoEvents
-         TaskMaster.StartProcess
-         once = False
-         Else
-        TaskMaster.TimerTickNow
-         TaskMaster.StopProcess
-         DoEvents
+                    If Not once Then
+                        once = True
+                        TaskMaster.TimerTickNow
+                        TaskMaster.StopProcess
+                        DoEvents
+                        TaskMaster.StartProcess
+                        once = False
+                    Else
+                        TaskMaster.TimerTickNow
+                        TaskMaster.StopProcess
+                        DoEvents
+                    End If
+                End If
+            End If
+            TaskMaster.RestEnd
         End If
-                  
-                  End If
-        End If
-
-TaskMaster.RestEnd
-End If
-End With
+    End With
 End Sub
 
 Public Sub MyDoEvents2(Optional obj As Object)

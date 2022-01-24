@@ -86,7 +86,7 @@ End Type
 
 Private mynum$, dragslow As Long, lastshift As Integer, HandleOverride As Boolean
 Public BypassKey As Boolean, AdjustColumns As Boolean
-Public BlinkON As Boolean
+Public BlinkON As Boolean, prive As Long
 Private mBlinkTime As Long, AdjustColumn As Integer, AdjustColumnSum As Long
 Public UseTab As Boolean
 Public InternalCursor As Boolean, SkipChars As Long
@@ -213,6 +213,7 @@ Event SelectedMultiAdd(item As Long)
 Event SelectedMultiSub(item As Long)
 Event Selected2(item As Long)
 Event softSelected(item As Long)
+Event ValidMove(x As Single, y As Single)
 Event Maybelanguage()
 Event MouseUp(x As Single, y As Single)
 Event SpecialColor(RGBcolor As Long)
@@ -230,6 +231,7 @@ Event DropOk(ok As Boolean)
 Event DropFront(ok As Boolean)
 Event ScrollMove(item As Long)
 Event RefreshDesktop()
+Event PrepareContainer()
 Event NeedDoEvents()
 Event OutPopUp(x As Single, y As Single, myButton As Integer)
 Event SplitLine()
@@ -352,6 +354,7 @@ Public FloatList As Boolean
 Public MoveParent As Boolean
 Public BlockItemcount As Boolean
 Private useFloatList As Boolean
+Public NoVerMove As Boolean, NoHorMove As Boolean
 Public HeadLineHeightMinimum As Long
 Private mPreserveNpixelsHeaderRight As Long
 Public AutoPanPos As Boolean   ' used if we have no EditFlag
@@ -1214,6 +1217,14 @@ If BlinkON Then
         RaiseEvent BlinkNow(FaceBlink)
         ShowPan
     End If
+ElseIf useFloatList And FloatList Then
+    Timer1.enabled = False
+    If TypeOf Extender.Container Is GuiM2000 Then
+        RaiseEvent RefreshDesktop
+    Else
+        RaiseEvent PrepareContainer
+    End If
+    
 Else
     Timer1.enabled = False
     Timer1.Interval = 30
@@ -2131,7 +2142,7 @@ Dim YYT As Long, oldbutton As Integer
 On Error GoTo there
 If dropkey Then Exit Sub
 If missMouseClick Then Exit Sub
-If mousepointer = vbSizeWE And (Button And 3) > 0 Then
+If mousepointer = vbSizeWE And (Button And 3) > 0 And Not useFloatList Then
     If x < UserControl.Width - scrTwips Then
         If (shift And 3) = 1 Or (Button And 2) = 2 Then
             YYT = mParts(AdjustColumn)
@@ -2162,7 +2173,7 @@ Exit Sub
 End If
 nowX = x
 nowY = y
-If (Button And 2) = 2 And Not mousepointer = vbSizeWE Then Exit Sub
+If (Button And 2) = 2 And (Not (mousepointer = vbSizeWE And Not useFloatList)) Then Exit Sub
 If myt = 0 Then Exit Sub
 FreeMouse = True
 
@@ -2243,7 +2254,7 @@ PY = y
 
 RaiseEvent MouseMove(Button, shift, x, y)
 If myt = 0 Or Not myEnabled Then Exit Sub
-If (Button And 2) = 2 And Not mousepointer = vbSizeWE Then Exit Sub
+If (Button And 2) = 2 And (Not (mousepointer = vbSizeWE And Not useFloatList)) Then Exit Sub
 
 tListcount = listcount
 
@@ -2253,7 +2264,7 @@ timestamp = Timer
 If Not FreeMouse Then Exit Sub
 If Button = 0 Then
     If Not nopointerchange Then
-        If mTabs > 1 And AdjustColumns Then  ' And mousepointer <> vbSizeWE
+        If mTabs > 1 And AdjustColumns And Not useFloatList Then
             osel = CLng(x)
             For k = 1 To mTabs
                 sum = sum + mParts(k)
@@ -2269,7 +2280,7 @@ If Button = 0 Then
                 sum = sum - mParts(k)
                 End If
             Next k
-            If mousepointer < 2 Or mousepointer = vbSizeWE Then mousepointer = 1
+            If mousepointer < 2 Or (mousepointer = vbSizeWE And Not useFloatList) Then mousepointer = 1
 ok_i_found:
             osel = 0
         Else
@@ -2277,7 +2288,7 @@ ok_i_found:
         End If
     End If
 End If
-If mousepointer = vbSizeWE And (Button And 3) > 0 Then
+If mousepointer = vbSizeWE And (Button And 3) > 0 And Not useFloatList Then
     If x < UserControl.Width - scrTwips Then
             If (shift And 3) = 1 Or (Button And 2) = 2 Then
             YYT = mParts(AdjustColumn)
@@ -2335,7 +2346,7 @@ If (Button And 3) > 0 And useFloatList And FloatList Then
         FloatListMe useFloatList, x, y: Button = 0
     Else
         If Not nopointerchange Then
-            If mousepointer > 1 And Not mousepointer = vbSizeWE Then mousepointer = 1
+            If mousepointer > 1 And Not (mousepointer = vbSizeWE And Not useFloatList) Then mousepointer = 1
         End If
 End If
     If mHeadline <> "" Then
@@ -2343,14 +2354,14 @@ End If
             ' -1 is mHeadline
             If (Button And 3) > 0 And FloatList And Not useFloatList Then FloatListMe useFloatList, x, y: Button = 0
             RaiseEvent ExposeItemMouseMove(Button, -1, CLng(x / scrTwips), CLng(y / scrTwips))
-        ElseIf Not mousepointer = vbSizeWE Then
+        ElseIf Not (mousepointer = vbSizeWE And Not useFloatList) Then
             If YYT <= TopRows Then
                 RaiseEvent ExposeItemMouseMove(Button, YYT - 1, CLng(x / scrTwips), CLng(y - (YYT - 1) * myt) / scrTwips)
             Else
                 RaiseEvent ExposeItemMouseMove(Button, topitem - TopRows + YYT - 1, CLng(x / scrTwips), CLng(y - (YYT - 1) * myt) / scrTwips)
             End If
         End If
-    ElseIf Not mousepointer = vbSizeWE Then
+    ElseIf Not (mousepointer = vbSizeWE And Not useFloatList) Then
         If YYT < TopRows Then
             RaiseEvent ExposeItemMouseMove(Button, YYT, CLng(x / scrTwips), CLng(y - YYT * myt) / scrTwips)
         Else
@@ -2523,7 +2534,7 @@ Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, x As Single
 On Error GoTo there
 If dropkey Then Exit Sub
 If missMouseClick Then missMouseClick = False: Exit Sub
-If mousepointer = vbSizeWE Then
+If mousepointer = vbSizeWE And Not useFloatList Then
     mousepointer = 1
     Exit Sub
 End If
@@ -2532,7 +2543,17 @@ If (Button And 2) = 2 Then
 x = nowX
 y = nowY
 End If
-useFloatList = False
+If useFloatList Then
+    Timer1.enabled = False
+    If MoveParent Then
+        If TypeOf Extender.Container Is GuiM2000 Then
+            RaiseEvent RefreshDesktop
+        Else
+            RaiseEvent PrepareContainer
+        End If
+    End If
+    useFloatList = False
+End If
 If myt = 0 Then Exit Sub
 Timer1bar.Interval = 100
 Timer1bar.enabled = False
@@ -3158,7 +3179,7 @@ there:
 End Property
 Public Sub FloatListMe(State As Boolean, x As Single, y As Single)
 Static preX As Single, preY As Single
-Dim dummy As Long
+Dim dummy As Long, vx As Single, vy As Single
 On Error GoTo there
 If Extender.Parent Is Nothing Then Exit Sub
 If Not State Then
@@ -3169,18 +3190,45 @@ mousepointer = 0
 doubleclick = 0
 GetMonitorsAgain
 Else
+If NoVerMove Then preY = y
+If NoHorMove Then preX = x
 If Extender.Visible Then
-
-mousepointer = 5
+If NoVerMove Then
+    mousepointer = 9
+ElseIf NoHorMove Then
+    mousepointer = 7
+Else
+    mousepointer = 5
+End If
 RaiseEvent NeedDoEvents
 If MoveParent Then
-If (Extender.Parent.top + (y - preY) < MinMonitorTop) Then preY = y + Extender.Parent.top - MinMonitorTop
-If (Extender.Parent.Left + (x - preX) < MinMonitorLeft) Then preX = x + Extender.Parent.Left - MinMonitorLeft
-If ((Extender.Parent.top + y - preY) > FloatLimitTop) And FloatLimitTop > ((Extender.Parent.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > MinMonitorTop Then preY = Extender.Parent.top + y - FloatLimitTop
-
-If ((Extender.Parent.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > MinMonitorLeft Then preX = Extender.Parent.Left + x - FloatLimitLeft
-Extender.Parent.move Extender.Parent.Left + (x - preX), Extender.Parent.top + (y - preY)
-RaiseEvent RefreshDesktop
+    If TypeOf Extender.Container Is GuiM2000 Then
+        If (Extender.Container.top + (y - preY) < MinMonitorTop) Then preY = y + Extender.Container.top - MinMonitorTop
+        If (Extender.Container.Left + (x - preX) < MinMonitorLeft) Then preX = x + Extender.Container.Left - MinMonitorLeft
+        If ((Extender.Container.top + y - preY) > FloatLimitTop) And FloatLimitTop > ((Extender.Parent.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > MinMonitorTop Then preY = Extender.Parent.top + y - FloatLimitTop
+        If ((Extender.Container.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > MinMonitorLeft Then preX = Extender.Parent.Left + x - FloatLimitLeft
+        Else
+            If ((Extender.Container.top + y - preY) > FloatLimitTop) And FloatLimitTop > ((Extender.Container.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > 0 Then preY = Extender.Parent.top + y - FloatLimitTop
+            If ((Extender.Container.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > 0 Then preX = Extender.Container.Left + x - FloatLimitLeft
+            If (Extender.Container.top + (y - preY) < 0) Then preY = y + Extender.Container.top
+            If (Extender.Container.Left + (x - preX) < 0) Then preX = x + Extender.Container.Left
+    End If
+        
+        
+        
+    
+        vx = Extender.Container.Left + (x - preX)
+        vy = Extender.Container.top + (y - preY)
+        RaiseEvent ValidMove(vx, vy)
+        Extender.Container.move vx, vy
+        Timer1.enabled = False
+        Timer1.Interval = 2
+        Timer1.enabled = True
+        'If TypeOf Extender.Container Is GuiM2000 Then
+        '    RaiseEvent RefreshDesktop
+        'Else
+        '    RaiseEvent PrepareContainer
+        'End If
 Else
 Extender.ZOrder
 If (Extender.top + (y - preY) < 0) Then preY = y + Extender.top
@@ -3188,8 +3236,11 @@ If (Extender.Left + (x - preX) < 0) Then preX = x + Extender.Left
 If ((Extender.top + y - preY) > FloatLimitTop) And FloatLimitTop > 0 Then preY = Extender.top + y - FloatLimitTop
 
 If ((Extender.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > 0 Then preX = Extender.Left + x - FloatLimitLeft
-
-Extender.move Extender.Left + (x - preX), Extender.top + (y - preY)
+    vx = Extender.Left + (x - preX)
+    vy = Extender.top + (y - preY)
+    RaiseEvent ValidMove(vx, vy)
+    
+    Extender.move vx, vy
 End If
 End If
 If Me.BackStyle = 1 Then ShowMe2
@@ -3279,6 +3330,8 @@ Prop$ = UCase(Prop$)
 If itemcount = 0 Or BlockItemcount Then Exit Sub
 If IsMissing(item) Then
       Select Case Prop$
+            Case "EDIT"
+                 mEditFlag = CBool(RHS)
             Case "CENTERTEXT"
                 CenterText = CBool(RHS)
             Case "RIGHTTEXT"
@@ -3315,7 +3368,12 @@ Prop$ = UCase(Prop$)
 If thiscolumn < 1 Or thiscolumn > mTabs Then thiscolumn = 1
 If itemcount = 0 Or BlockItemcount Then
     RaiseEvent ReadColumnPropNum(item, thiscolumn, Prop$, that)
-    PropAtColumnNum = that
+    If VarType(that) = vbEmpty Then
+        GoTo alfa
+    Else
+        PropAtColumnNum = that
+    End If
+    
     Exit Property
 End If
 If item < 0 Then Exit Property
@@ -3329,8 +3387,11 @@ Else
     that = .content.ItemPath("P." & thiscolumn & ".[" & Prop$ & "]")
     If VarType(that) = vbEmpty Then
         that = .content.ItemPath("P.0.[" & Prop$ & "]")
+alfa:
         If VarType(that) = 0 Then
             Select Case Prop$
+            Case "EDIT"
+                that = mEditFlag
             Case "CENTERTEXT"
                 that = CenterText
             Case "RIGHTTEXT"
@@ -3357,7 +3418,11 @@ Prop$ = UCase(Prop$)
 If thiscolumn < 1 Or thiscolumn > mTabs Then thiscolumn = 1
 If itemcount = 0 Or BlockItemcount Then
     RaiseEvent ReadColumnProp(item, thiscolumn, Prop$, that$)
-    PropAtColumn = that$
+    If that$ = "" Then
+        GoTo alfa
+    Else
+        PropAtColumn = that$
+    End If
     Exit Property
 End If
 If item < 0 Then Exit Property
@@ -3371,8 +3436,11 @@ Else
     rep = .content.ItemPath("P." & thiscolumn & ".[" & Prop$ & "]")
     If VarType(rep) = vbEmpty Then
         rep = .content.ItemPath("P.0.[" & Prop$ & "]")
+alfa:
         If VarType(rep) = 0 Then
             Select Case Prop$
+            Case "EDIT"
+                rep = mEditFlag
             Case "CENTERTEXT"
                 rep = CenterText
             Case "RIGHTTEXT"
@@ -3944,7 +4012,7 @@ Timer1.enabled = True
 End Sub
 Public Sub ShowMe(Optional visibleme As Boolean = False, Optional headeronly As Boolean)
 Dim REALX As Long, RealX2 As Long, myt1, oldtopitem As Long, s1 As String
-Dim mcenter As Boolean, mwraptext As Boolean, mVcenter As Boolean
+Dim mcenter As Boolean, mwraptext As Boolean, mVcenter As Boolean, mEditFlag1 As Boolean
 On Error GoTo there
 If SuspDraw Then Exit Sub
 If visibleme Then
@@ -3959,6 +4027,7 @@ End If
 Dim i As Long, j As Long, g$, nr As RECT, fg As Long, hnr As RECT, skipme As Boolean, nfg As Long, tmprows As Long
 If MultiSelect And LeftMarginPixels < mytPixels Then LeftMarginPixels = mytPixels
 If Not headeronly Then Repaint
+mEditFlag1 = mEditFlag
 currentY = 0
 nr.top = 0
 nr.Left = 0
@@ -4129,14 +4198,14 @@ If listcount > 0 Then
                     For k = 1 To mTabs
                     
                      If mParts(k) > 0 Then
-                        
+                        mEditFlag1 = CBool(PropAtColumnNum(i, k, "Edit"))
                         mcenter = CBool(PropAtColumnNum(i, k, "CenterText"))
                         mwraptext = CBool(PropAtColumnNum(i, k, "WrapText"))
                         mVcenter = CBool(PropAtColumnNum(i, k, "VerticalCenterText"))
                         If (NarrowSelect And mCurTab = k) Or Not NarrowSelect Then
                             nfg = fg
                             If nfg <> fg Then Me.forecolor = nfg
-                            If mEditFlag Then
+                            If mEditFlag1 Then
                                 If nfg = fg Then Me.forecolor = fg
                             ElseIf nfg = fg Then
                                 If Me.backcolor = 0 Then
@@ -4162,7 +4231,7 @@ If listcount > 0 Then
                                 PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
                             Else
                                 hnr = nr
-                                If EditFlag And k = mCurTab Then hnr.Bottom = nr.top + mytPixels + 1
+                                If mEditFlag1 And k = mCurTab Then hnr.Bottom = nr.top + mytPixels + 1
                                 PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(i, k), hnr, mwraptext, mcenter, mVcenter
                             End If
                         End If
@@ -4175,7 +4244,7 @@ If listcount > 0 Then
                     Next k
                 Else
                     If nfg <> fg Then Me.forecolor = nfg
-                    If mEditFlag Then
+                    If mEditFlag1 Then
                         If nfg = fg Then Me.forecolor = fg
                     ElseIf nfg = fg Then
                         If Me.backcolor = 0 Then
@@ -4276,13 +4345,14 @@ If listcount > 0 Then
                 If mTabs > 1 Then
                     For k = 1 To mTabs
                      If mParts(k) > 0 Then
+                        mEditFlag1 = CBool(PropAtColumnNum(i, k, "Edit"))
                         mcenter = CBool(PropAtColumnNum(i, k, "CenterText"))
                         mwraptext = CBool(PropAtColumnNum(i, k, "WrapText"))
-                            mVcenter = CBool(PropAtColumnNum(i, k, "VerticalCenterText"))
+                        mVcenter = CBool(PropAtColumnNum(i, k, "VerticalCenterText"))
                         If (NarrowSelect And mCurTab = k) Or Not NarrowSelect Then
                             nfg = fg
                             If nfg <> fg Then Me.forecolor = nfg
-                            If mEditFlag Then
+                            If mEditFlag1 Then
                                 If nfg = fg Then Me.forecolor = fg
                             ElseIf nfg = fg Then
                                 If Me.backcolor = 0 Then
@@ -4307,7 +4377,7 @@ If listcount > 0 Then
                                 PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
                             Else
                                 hnr = nr
-                                If EditFlag And k = mCurTab Then hnr.Bottom = nr.top + mytPixels + 1
+                                If mEditFlag1 And k = mCurTab Then hnr.Bottom = nr.top + mytPixels + 1
                                 PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(i, k), hnr, mwraptext, mcenter, mVcenter
                             End If
                         End If
@@ -4320,7 +4390,7 @@ If listcount > 0 Then
                     Next k
                 Else
                     If nfg <> fg Then Me.forecolor = nfg
-                    If mEditFlag Then
+                    If mEditFlag1 Then
                         If nfg = fg Then Me.forecolor = fg
                     ElseIf nfg = fg Then
                         If Me.backcolor = 0 Then
@@ -4354,7 +4424,7 @@ If listcount > 0 Then
                             If mParts(k) > 0 Then
                                 mcenter = CBool(PropAtColumnNum(i, k, "CenterText"))
                                 mwraptext = CBool(PropAtColumnNum(i, k, "WrapText"))
-                            mVcenter = CBool(PropAtColumnNum(i, k, "VerticalCenterText"))
+                                mVcenter = CBool(PropAtColumnNum(i, k, "VerticalCenterText"))
                                 nr.Right = nr.Left + mParts(k)
                                 nr.Bottom = nr.Bottom + 1
                                 hRgn = CreateRectRgnIndirect(nr)
@@ -4403,21 +4473,21 @@ If listcount > 0 Then
         Do While ListJoin(ii + 1)
             ii = ii + 1
         Loop
-        If Not NoCaretShow And Not EditFlag And i <> ii Then
+        mEditFlag1 = CBool(PropAtColumnNum(i, mCurTab, "Edit"))
+        If Not NoCaretShow And Not mEditFlag1 And i <> ii Then
             If ii - topitem - 1 <= lines + onemore And (ii > topitem Or ii <= TopRows) And Not ListSep(ii - 1) Then
-            
                 i = ii - i
                 GoTo there1
             End If
         End If
         i = ii - i
         If SELECTEDITEM - topitem - 1 <= lines + onemore And (SELECTEDITEM > topitem Or SELECTEDITEM <= TopRows) And Not ListSep(SELECTEDITEM - 1) Then
-        
+            mEditFlag1 = CBool(PropAtColumnNum(SELECTEDITEM - 1, mCurTab, "Edit"))
             mcenter = CBool(PropAtColumnNum(SELECTEDITEM - 1, mCurTab, "CenterText"))
             mwraptext = CBool(PropAtColumnNum(SELECTEDITEM - 1, mCurTab, "WrapText"))
             mVcenter = CBool(PropAtColumnNum(SELECTEDITEM - 1, mCurTab, "VerticalCenterText"))
             If Not NoCaretShow Then
-                If EditFlag Then
+                If mEditFlag1 Then
                     If SelStart = 0 Then SelStart = 1
                     DrawStyle = vbSolid
                     RaiseEvent PureListOff
@@ -4546,7 +4616,7 @@ On Error GoTo there
 If SuspDraw Then Exit Sub
 Dim nr As RECT, j As Long, i As Long, skipme As Boolean, fg As Long, hnr As RECT, nfg As Long, nfg1 As Long
 Dim REALX As Long, RealX2 As Long, myt1, s1 As String
-Dim mcenter As Boolean, mwraptext As Boolean, mVcenter As Boolean
+Dim mcenter As Boolean, mwraptext As Boolean, mVcenter As Boolean, mEditFlag1 As Boolean
 barwidth = UserControlTextWidth("W")
 If listcount = 0 And HeadLine = vbNullString Then
     Repaint
@@ -4655,6 +4725,7 @@ Else
                     For k = 1 To mCurTab - 1
                         nr.Left = nr.Left + mParts(k)
                     Next k
+                    mEditFlag1 = CBool(PropAtColumnNum(i, mCurTab, "EDIT"))
                     mcenter = CBool(PropAtColumnNum(i, mCurTab, "CenterText"))
                     mwraptext = CBool(PropAtColumnNum(i, mCurTab, "WrapText"))
                     mVcenter = CBool(PropAtColumnNum(i, mCurTab, "VerticalCenterText"))
@@ -4668,14 +4739,14 @@ Else
                     SelectClipRgn UserControl.Hdc, hRgn
                     RaiseEvent ExposeRectCol(i, k, VarPtr(nr), UserControl.Hdc, skipme)
                     If Not skipme Then
-                        If mwraptext And Not EditFlag Then
+                        If mwraptext And Not mEditFlag1 Then
                             hnr = nr
                             s1 = listAtColumn(i, k)
                             LineAddTopOffsetPixels s1, hnr
                             PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
                         Else
                             hnr = nr
-                            If EditFlag Then hnr.Bottom = nr.top + mytPixels + 1
+                            If mEditFlag1 Then hnr.Bottom = nr.top + mytPixels + 1
                             PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(i, k), hnr, False, mcenter, mVcenter
                         End If
                     End If
@@ -4693,7 +4764,7 @@ Else
                                 nfg = fg
                                 If nfg1 <> nfg Then nfg = nfg1
                                 If nfg <> fg Then Me.forecolor = nfg
-                                If mEditFlag Then
+                                If mEditFlag1 Then
                                     If nfg = fg Then Me.forecolor = fg
                                 ElseIf nfg = fg Then
                                     If Me.backcolor = 0 Then
@@ -4733,6 +4804,8 @@ Else
                         End If
                     Next k
                 Else
+                    nfg = nfg1
+                    If nfg <> fg Then Me.forecolor = nfg
                     If (MultiSelect Or ListMenu(i)) And itemcount > 0 Then
                         MyMark UserControl.Hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, i, True
                     End If
@@ -4756,9 +4829,10 @@ Else
                     If ListSep(i) Then
                         forecolor = dcolor
                     Else
+                        nfg = nfg1
                         If nfg = fg Then forecolor = fg
                         If SELECTEDITEM - 1 = i And nfg <> fg Then
-                            Me.forecolor = nfg  'uintnew(&HFFFFFF) - uintnew(nfg)
+                            Me.forecolor = nfg
                         End If
                     End If
                     If mTabs > 1 Then
@@ -4767,6 +4841,7 @@ Else
                         currentX = scrollme
                         For k = 1 To mTabs
                             If mParts(k) > 0 Then
+                            mEditFlag1 = CBool(PropAtColumnNum(i, mCurTab, "EDIT"))
                             mcenter = CBool(PropAtColumnNum(i, k, "CenterText"))
                             mwraptext = CBool(PropAtColumnNum(i, k, "WrapText"))
                             mVcenter = CBool(PropAtColumnNum(i, k, "VerticalCenterText"))
@@ -4847,6 +4922,7 @@ Else
                         nr.Left = nr.Left + mParts(k)
                     Next k
                     k = mCurTab
+                    mEditFlag1 = CBool(PropAtColumnNum(i, mCurTab, "EDIT"))
                     mcenter = CBool(PropAtColumnNum(i, mCurTab, "CenterText"))
                     mwraptext = CBool(PropAtColumnNum(i, mCurTab, "WrapText"))
                     mVcenter = CBool(PropAtColumnNum(i, mCurTab, "VerticalCenterText"))
@@ -4860,15 +4936,14 @@ Else
                     SelectClipRgn UserControl.Hdc, hRgn
                     RaiseEvent ExposeRectCol(i, k, VarPtr(nr), UserControl.Hdc, skipme)
                     If Not skipme Then
-                        If mwraptext And Not EditFlag Then
+                        If mwraptext And Not mEditFlag1 Then
                             hnr = nr
                             s1 = listAtColumn(i, k)
                             LineAddTopOffsetPixels s1, hnr
                             PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
                         Else
                             hnr = nr
-                            If EditFlag Then hnr.Bottom = nr.top + mytPixels + 1
-                            'PrintLineControlSingleNoWrap UserControl.Hdc, listAtColumn(i, k), hnr
+                            If mEditFlag1 Then hnr.Bottom = nr.top + mytPixels + 1
                             PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(i, k), hnr, False, mcenter, mVcenter
                         End If
                     End If
@@ -4879,6 +4954,7 @@ Else
                     nr.Left = sum
                     For k = 1 To mTabs
                         If mParts(k) > 0 Then
+                            mEditFlag1 = CBool(PropAtColumnNum(i, mCurTab, "EDIT"))
                             mcenter = CBool(PropAtColumnNum(i, k, "CenterText"))
                             mwraptext = CBool(PropAtColumnNum(i, k, "WrapText"))
                             mVcenter = CBool(PropAtColumnNum(i, k, "VerticalCenterText"))
@@ -4886,7 +4962,7 @@ Else
                                 nfg = fg
                                 If nfg1 <> nfg Then nfg = nfg1
                                 If nfg <> fg Then Me.forecolor = nfg
-                                If mEditFlag Then
+                                If mEditFlag1 Then
                                     If nfg = fg Then Me.forecolor = fg
                                 ElseIf nfg = fg Then
                                     If Me.backcolor = 0 Then
@@ -4928,6 +5004,10 @@ Else
                         End If
                     Next k
                 Else
+                nfg = nfg1
+                If nfg <> fg Then Me.forecolor = nfg
+                
+                
                 If (MultiSelect Or ListMenu(i)) And itemcount > 0 Then
                     MyMark UserControl.Hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, i, True
                 End If
@@ -4951,9 +5031,10 @@ Else
                     If ListSep(i) Then
                         forecolor = dcolor
                     Else
+                        nfg = nfg1
                         If nfg = fg Then forecolor = fg
                         If SELECTEDITEM - 1 = i And nfg <> fg Then
-                            Me.forecolor = nfg  'uintnew(&HFFFFFF) - uintnew(nfg)
+                            Me.forecolor = nfg
                         End If
                     End If
                     If mTabs > 1 Then
@@ -5019,7 +5100,8 @@ Else
         Do While ListJoin(ii + 1)
             ii = ii + 1
         Loop
-        If Not NoCaretShow And Not EditFlag And i <> ii Then
+        mEditFlag1 = CBool(PropAtColumnNum(i, mCurTab, "EDIT"))
+        If Not NoCaretShow And Not mEditFlag1 And i <> ii Then
             If ii - topitem - 1 <= lines + onemore And (ii > topitem - 1 Or ii <= TopRows) And Not ListSep(ii - 1) Then
                 If i < topitem And ii >= topitem Then
                 
@@ -5035,12 +5117,12 @@ Else
         i = ii - i
         ii = 0
         If SELECTEDITEM - topitem - 1 <= lines + onemore And (SELECTEDITEM > topitem Or SELECTEDITEM <= TopRows) And Not ListSep(SELECTEDITEM - 1) Then
-        
+        mEditFlag1 = CBool(PropAtColumnNum(SELECTEDITEM - 1, mCurTab, "EDIT"))
         mcenter = CBool(PropAtColumnNum(SELECTEDITEM - 1, mCurTab, "CenterText"))
         mwraptext = CBool(PropAtColumnNum(SELECTEDITEM - 1, mCurTab, "WrapText"))
         mVcenter = CBool(PropAtColumnNum(SELECTEDITEM - 1, mCurTab, "VerticalCenterText"))
         If Not NoCaretShow Then
-             If EditFlag Then
+             If mEditFlag1 Then
                 If SelStart = 0 Then SelStart = 1
                 DrawStyle = vbSolid
                 RaiseEvent PureListOff
@@ -5089,16 +5171,16 @@ Else
                                     ShowMyCaretInTwips RealX2, (SELECTEDITEM + TopRows - topitem - 1 + tmprows) * myt + mHeadlineHeightTwips
                                 End If
                             Else
-                                ShowMyCaretInTwips RealX2, (SELECTEDITEM + TopRows - topitem - 1 + tmprows) * myt + mHeadlineHeightTwips * myt
+                                ShowMyCaretInTwips RealX2, (SELECTEDITEM + TopRows - topitem - 1 + tmprows) * myt + mHeadlineHeightTwips
                                 End If
                         End If
                     End If
                     If mTabs = 1 Then
-                        If mEditFlag Or Not NoScroll Then
+                        If mEditFlag1 Or Not NoScroll Then
                             If RealX2 > Width * 0.8 * dragslow Then scrollme = scrollme - Width * 0.2 * dragslow: PrepareToShow 5
                         End If
                         If RealX2 - Width * 0.2 * dragslow < 0 Then
-                            If mEditFlag Or Not NoScroll Then
+                            If mEditFlag1 Or Not NoScroll Then
                                 scrollme = scrollme + Width * 0.2 * dragslow
                                 If Not mcenter Then
                                     If scrollme > 0 Then scrollme = 0 Else PrepareToShow 5
@@ -5109,13 +5191,13 @@ Else
                         End If
                     Else
                 
-                        If mEditFlag Or Not NoScroll Then
+                        If mEditFlag1 Or Not NoScroll Then
                             If RealX2 > (mParts(mCurTab) * scrTwips * 0.8 + TwipsCurTab) * dragslow Then
                                 scrollme = scrollme - mParts(mCurTab) * scrTwips * 0.2 * dragslow: PrepareToShow 5
                             End If
                         End If
                         If RealX2 - (mParts(mCurTab) * scrTwips * 0.2 + TwipsCurTab) * dragslow < 0 Then
-                            If mEditFlag Or Not NoScroll Then
+                            If mEditFlag1 Or Not NoScroll Then
                                 If Not mcenter Then
                                     scrollme = scrollme + mParts(mCurTab) * scrTwips * 0.2 * dragslow
                                     If scrollme > 0 Then scrollme = 0 Else PrepareToShow 5
@@ -5286,7 +5368,7 @@ UserControl.Cls
 End If
 End Sub
 Public Sub Repaint()
-Dim hnr As RECT, br As Long
+Dim hnr As RECT, br As Long, pp As Object
 If restrictLines > 0 Then
 myt = (UserControl.Scaleheight - mHeadlineHeightTwips) \ restrictLines
 Else
@@ -5302,9 +5384,18 @@ If Extender.Parent Is Nothing Then Exit Sub
 If BackStyle = 1 Then
     
     If Not SkipForm Then
-        If UserControl.Parent.Picture.Handle <> 0 Then
+        On Error Resume Next
+        If Not UserControl.Extender.Container Is UserControl.Parent Then
+            Set pp = UserControl.Extender.Container
+        End If
+        Err.Clear
+        If pp Is Nothing Then
+            Set pp = UserControl.Parent
+        End If
+        On Error GoTo th1
+        If pp.Picture.Handle <> 0 Then
             If Me.BorderStyle = 1 Then
-                UserControl.PaintPicture UserControl.Parent.Picture, scrTwips, scrTwips, Width - 2 * scrTwips, Height - 2 * scrTwips, Extender.Left, Extender.top, Width - 2 * scrTwips, Height - 2 * scrTwips
+                UserControl.PaintPicture pp.Picture, scrTwips, scrTwips, Width - 2 * scrTwips, Height - 2 * scrTwips, Extender.Left, Extender.top, Width - 2 * scrTwips, Height - 2 * scrTwips
                 hnr.Left = 0
                 hnr.Right = Me.WidthPixels
                 hnr.top = 0
@@ -5313,11 +5404,11 @@ If BackStyle = 1 Then
                 FrameRect UserControl.Hdc, hnr, br
                 DeleteObject br
             Else
-                UserControl.PaintPicture UserControl.Parent.Picture, 0, 0, , , Extender.Left, Extender.top
+                UserControl.PaintPicture pp.Picture, 0, 0, , , Extender.Left, Extender.top
             End If
         Else
             If Me.BorderStyle = 1 Then
-                UserControl.PaintPicture UserControl.Parent.Image, 0, 0, Width - scrTwips, Height - scrTwips, Extender.Left, Extender.top, Width - scrTwips, Height - scrTwips
+                UserControl.PaintPicture pp.Image, 0, 0, Width - scrTwips, Height - scrTwips, Extender.Left, Extender.top, Width - scrTwips, Height - scrTwips
                 hnr.Left = 0
                 hnr.Right = Me.WidthPixels
                 hnr.top = 0
@@ -5327,7 +5418,7 @@ If BackStyle = 1 Then
                 DeleteObject br
                 
             Else
-                UserControl.PaintPicture UserControl.Parent.Image, 0, 0, , , Extender.Left, Extender.top
+                UserControl.PaintPicture pp.Image, 0, 0, , , Extender.Left, Extender.top
             End If
         End If
     Else
@@ -7181,13 +7272,14 @@ If item = itemline Then
     End If
 End If
 End Function
-
 Public Property Get Parent() As Variant
 On Error GoTo there
 If UserControl.Parent Is Nothing Then Exit Property
 Set Parent = UserControl.Parent
 there:
 End Property
+
+
 Public Sub Curve(Optional t As Boolean = False, Optional factor As Single = 1)
 Dim hRgn As Long
 If Int(25 * factor) > 2 Then
@@ -7550,3 +7642,5 @@ For i = 1 To mCurTab - 1
 Next i
 TwipsCurTab = where * scrTwips
 End Sub
+
+
