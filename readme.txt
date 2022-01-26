@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 55 active-X
-New GuiImage control. Can hold other controls.
-Som fixes from previous revisions.
+Version 10 revision 56 active-X
+New Events for ListBox to work as Spliter Control.
+Some fixes from previous revisions.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

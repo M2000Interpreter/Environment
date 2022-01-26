@@ -4768,12 +4768,18 @@ linespace 60
 Declare NotePad Form
 Declare Pad EditBox Form NotePad
 Declare HelpPad EditBox Form NotePad
+Declare Handle1 Listbox Form NotePad
 Declare File1 Combobox Form NotePad
 Declare Edit1 Combobox Form NotePad
 Declare Run1 Combobox Form NotePad
 Declare Help1 Combobox Form NotePad
 Declare Inform1 Button Form NotePad
 linespace oldlinespace
+With Handle1, "Visible" as handle1.visible, "locked" as handle1.locked, "headeronly", true, "tabstop", false, "TitleBackColor" as mcol, "top" as handle1.top
+Method Handle1, "UseVerMove"
+mcol=#FFA000
+handle1.locked=true
+handle1.visible=false
 \\ we can display an icon (the M2000 by default)
 \\ Normal the icon is in the rright side, the control icon for close is in the left side. Here we do the oposite
 \\ Also we get the Quit property. Is a property which a Document read when do a busy work of loading to quit it.
@@ -5014,13 +5020,16 @@ Function NotePad.Unload(New &Ok) {
 	End If
 }
 \\ we can change this in code if we change the font of title (because a new TitleHeight  prodced), or if we remove the header (make it invinsible)
-def onetime=true
+def onetime=true, third, free
+third=1000
+With NotePad, "Width" as NP.Width, "Height" as NP.Height, "TitleHeight" as tHeight
 Function Notepad.Resize {
 	Local FromHelp=false
 	if match("N") then Read FromHelp
 	Layer NotePad { Cls Color(255, 160, 0) ,0}
-	With NotePad, "Width" as NP.Width, "Height" as NP.Height, "TitleHeight" as tHeight
-	tHeight1=theight*2
+	
+	local tHeight1=theight*2
+	Local free=NP.Height-tHeight1-twipsX*3
 	if onetime then
 		Method File1,"move", twipsX*3, tHeight,  twipsX*80, tHeight
 		Method Edit1,"move", twipsX*3+twipsX*80, tHeight,  twipsX*80, tHeight
@@ -5032,21 +5041,32 @@ Function Notepad.Resize {
 	local oldhelpshow=helpshow
 	If NP.height>1800 Then {
 		If helpview Then
-			local free=NP.Height-tHeight1-twipsX*3
-			local third=free/3
-			free=free-third-twipsX*3
-			Method Pad,"move", twipsX*3, tHeight1,  NP.Width-twipsX*6, free
-			Method HelpPad,"move", twipsX*3, tHeight1+free+twipsX*3,  NP.Width-twipsX*6,third
+			if oldhelpshow else
+				Method Handle1, "move",twipsX*3, tHeight1+free-free/3-twipsX*3,  NP.Width-twipsX*6,twipsY*3
+			end if
+			if handle1.locked then handle1.locked=false
+			local third=handle1.top-tHeight1
+			if third<twipsX*10 then third=twipsX*10
+			if free<third then
+			third=free/3
+			end if
+			Method Pad,"move", twipsX*3, tHeight1,  NP.Width-twipsX*6, third
+			third+=tHeight1
+			Method Handle1, "move",twipsX*3, third,  NP.Width-twipsX*6,twipsX*3
+			Method HelpPad,"move", twipsX*3, third+twipsX*3,  NP.Width-twipsX*6,free-third-twipsY*3+tHeight1		
+			handle1.visible=true
 			helpshow=true
 		Else
 			helpshow=false
+			handle1.visible=false
 			Method Pad,"move", twipsX*3, tHeight1,  NP.Width-twipsX*6, NP.Height-tHeight1-twipsY*3
 		End If
 		With Pad, "NoWrap" as NoWrap
 		If  Not NoWrap or not FromHelp Then
 			Method Pad,"Resize"
 		Else
-			if helpshow then if not oldhelpshow then Method Pad,"Resize"
+			//if helpshow then if not oldhelpshow then
+			Method Pad,"Resize"
 		End If
 		Method HelpPad, "resize"
 	}
@@ -5370,6 +5390,17 @@ Function Help1.DblClick {
 		Method  HelpPad, "EditTextView", false : HelpView=false: Call Local Notepad.Resize(true)
 	End Select
 	
+}
+Function Handle1.ValidMove {
+	Drop
+	Read New &Y
+	mcol=7
+	if y<tHeight+1000 then y=tHeight+1000 : exit
+	if y>NP.Height-tHeight then y=NP.Height-tHeight
+}
+Function Handle1.MouseUp {
+	Call Local Notepad.Resize()
+	mcol=#FFA000
 }
 Function HelpPad.Word() {
 	Call Local FindWord(letter$, false)
@@ -20867,7 +20898,7 @@ Bold 1
 PEN 14
 CLS,0
 If Version<10 then Error "No proper M2000 version (must be >=9.9)"
-If Version=10 and revision<38 then Error "No proper M2000 revision for version 10"
+If Version=10 and revision<56 then Error "No proper M2000 revision for version 10"
 Set Fast
 Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 dir user
@@ -34520,8 +34551,8 @@ Module CheckIt {
       }
 }
 Report {PhoneBooth Simulation using Mutex class
-Bob, Jhon and Tom need to call using PhoneBoot.
-Also sometimes you decide to change suspend the service, for cleaning mostly. This can be done using space bar.
+Bob, Jhon and Tom need to call using PhoneBooth.
+Also sometimes you decide to suspend the service, for cleaning mostly. This can be done using space bar.
 }
 Cls ,Row+1
 CheckIt
