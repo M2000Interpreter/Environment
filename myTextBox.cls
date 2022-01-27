@@ -131,15 +131,15 @@ glistN.ShowMe
 locked = True
 End Property
 
-Public Property Get top() As Long
-top = glistN.TopTwips
+Public Property Get Top() As Long
+Top = glistN.TopTwips
 End Property
-Public Property Let top(RHS As Long)
+Public Property Let Top(RHS As Long)
 glistN.TopTwips = RHS
 End Property
 Public Property Set Container(glistNN As gList)
 Set glistN = glistNN
-glistNN.enabled = True
+glistNN.Enabled = True
 Info = vbNullString
 If glistNN.listcount = 0 Then Text = vbNullString
 glistN.NoCaretShow = True
@@ -185,7 +185,7 @@ End Sub
 
 
 Private Sub glistN_ChangeListItem(item As Long, content As String)
-If Not enabled Then Exit Sub
+If Not Enabled Then Exit Sub
 Dim this As String, thispos As Long
 thispos = glistN.SelStart - Len(mprompt)
 this = Mid$(content, 1 + Len(mprompt))
@@ -213,11 +213,11 @@ glistN.LastLinePart = " " & RHS
 End Property
 
 
-Public Property Get enabled() As Boolean
-enabled = glistN.EditFlag
+Public Property Get Enabled() As Boolean
+Enabled = glistN.EditFlag
 End Property
 
-Public Property Let enabled(ByVal RHS As Boolean)
+Public Property Let Enabled(ByVal RHS As Boolean)
 glistN.EditFlag = RHS
 glistN.NoCaretShow = Not RHS
 End Property
@@ -228,16 +228,16 @@ Private Sub glistN_CheckGotFocus()
 If Not locked Then
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 RaiseEvent GotFocus
-If enabled Then
+If Enabled Then
 glistN.FadeLastLinePart = mPartColor
 glistN.forecolor = rgb(0, 0, 0)
-glistN.backcolor = rgb(255, 255, 255)
+glistN.BackColor = rgb(255, 255, 255)
 glistN.NoCaretShow = False:
 glistN.PanPos = 0
 Else
 glistN.FadeLastLinePart = 0
 glistN.forecolor = rgb(255, 255, 255)
-glistN.backcolor = rgb(100, 200, 160)
+glistN.BackColor = rgb(100, 200, 160)
 glistN.NoCaretShow = True
 End If
 glistN.ShowMe
@@ -248,7 +248,7 @@ Public Sub Retired()
 glistN.FadeLastLinePart = 0
 If Not mStayOpen Then
 glistN.forecolor = rgb(255, 255, 255)
-glistN.backcolor = rgb(200, 120, 60)
+glistN.BackColor = rgb(200, 120, 60)
 End If
 glistN.NoCaretShow = True: glistN.PanPos = 0: glistN.ShowMe
 End Sub
@@ -265,7 +265,7 @@ End If
 If Not SkipProcAtExitFocus Then
 glistN.FadeLastLinePart = 0
 glistN.forecolor = rgb(255, 255, 255)
-glistN.backcolor = rgb(200, 120, 60)
+glistN.BackColor = rgb(200, 120, 60)
 glistN.NoCaretShow = True: glistN.PanPos = 0: glistN.ShowMe
 Else
 '
@@ -284,7 +284,7 @@ RaiseEvent KeyDown(keycode, shift)
 If keycode = vbKeyUp Then
 ElseIf keycode = vbKeyDown Then
 ElseIf keycode = vbKeyV And (shift And 3) = 2 Then
-If Not enabled Then Exit Sub
+If Not Enabled Then Exit Sub
 Pad$ = GetTextData(13)
 If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
 If Pad$ <> "" Then vartext = Pad$
@@ -335,11 +335,11 @@ Private Sub glistN_SpinnerValue(ThatValue As Long)
 RaiseEvent SpinnerValue(ThatValue)
 End Sub
 Public Property Get locked() As Boolean
-locked = Not glistN.enabled
+locked = Not glistN.Enabled
 End Property
 
 Public Property Let locked(ByVal RHS As Boolean)
-glistN.enabled = Not RHS
+glistN.Enabled = Not RHS
 End Property
 Public Sub Spinner(ShowBar As Boolean, MinValue As Long, maxvalue As Long, LargeValue As Long)
 If Not ShowBar Then
@@ -347,11 +347,11 @@ glistN.Spinner = False
 glistN.ShowBar = False
 glistN.EnabledBar = False
 Else
-glistN.enabled = False
+glistN.Enabled = False
 glistN.restrictLines = 1
 glistN.Spinner = True
 glistN.SetSpin MinValue, maxvalue, LargeValue
-glistN.enabled = True
+glistN.Enabled = True
 glistN.EnabledBar = True
 glistN.ShowBar = True
 
@@ -476,7 +476,7 @@ mStayOpen = CBool(vNewValue)
 If mStayOpen Then
 glistN.forecolor = rgb(0, 0, 0)
 glistN.FadeLastLinePart = mPartColor
-glistN.backcolor = rgb(255, 255, 255)
+glistN.BackColor = rgb(255, 255, 255)
 End If
 End Property
 
@@ -494,7 +494,7 @@ If glistN.SelStart > 0 Then
 a$ = Mid$(vartext, glistN.SelStart, 1)
 If Len(a$) > 0 Then
 w = AscW(a$)
-If w > -10241 And w < -9984 Then
+If w > -10241 And w < -9216 Then
 val = 2
 End If
 End If
@@ -507,7 +507,7 @@ If glistN.SelStart < 2 Then Exit Sub
 a$ = Mid$(vartext, glistN.SelStart - 1, 1)
 If Len(a$) > 0 Then
 w = AscW(a$)
-If w > -9215 And w < -8960 Then
+If w > -9217 And w < -8192 Then
 
 val = 2
 
@@ -544,8 +544,8 @@ Dim dummy As RECT, R As RECT, tabw As Long, Offset As Long, hRgn As Long, estX A
 tabw = tParam.iTabLength * glistN.AveCharWith
 glistN.UserControlTextMetricsPixels that$, R.Right, R.Bottom
 dummy = R
-dummy.top = glistN.HeadlineHeightTwips + 1
-dummy.Bottom = dummy.top + R.Bottom
+dummy.Top = glistN.HeadlineHeightTwips + 1
+dummy.Bottom = dummy.Top + R.Bottom
 R = dummy
 Offset = 0
 estX = 0
@@ -586,7 +586,7 @@ End If
 For i = 0 To items&
     c = ww$(i)
     R.Left = Offset
-    rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+    rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), Len(c), 1, tabw, 0))
     If Len(c) >= ExtSelStart - estX Or (found > 0 And rleftacc > found) Then
             If Not Len(c) >= ExtSelStart - estX Then
             ExtSelStart = Len(c) + estX
@@ -607,7 +607,7 @@ For i = 0 To items&
             If found > 0 Then
                 rx1 = Offset
                 If mark1 > 1 Then
-                    Offset = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), mark1 - 1, 1, tabw, 0))
+                    Offset = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), mark1 - 1, 1, tabw, 0))
                 End If
                 c = Mid$(ww(i), mark1, mark2 - mark1 + 1)
                 If nrtl Then
@@ -615,7 +615,7 @@ For i = 0 To items&
                     M2 = M2 - mark1 + 1
                     If M2 - M1 > 0 Then Mid$(c, M1, M2 - M1 + 1) = StrReverse(Mid$(c, M1, M2 - M1 + 1))
                 End If
-                If found > Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c$), 1, tabw, 0)) Then
+                If found > Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), Len(c$), 1, tabw, 0)) Then
                         nValue = mark1 + estX
                         Exit For
                     Else
@@ -631,7 +631,7 @@ For i = 0 To items&
             If nValue <= 0 Then nValue = 1
             If mark1 > 1 Then
             
-            rx1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), mark2, 1, tabw, 0))
+            rx1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), mark2, 1, tabw, 0))
             If found > 0 Then
             If rx1 <= found Then
             nValue = mark1 + estX
@@ -640,7 +640,7 @@ For i = 0 To items&
             End If
 
             End If
-            RealX1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), mark1 - 1, 1, tabw, 0))
+            RealX1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), mark1 - 1, 1, tabw, 0))
             
             End If
             Exit For
@@ -650,7 +650,7 @@ For i = 0 To items&
         End If
         ElseIf mark1 <> 0 And mark2 <> 0 And nValue = mark2 + 1 Then
         If found > 0 Then
-         rx1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), mark2, 1, tabw, 0))
+         rx1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), mark2, 1, tabw, 0))
         If found > rx1 Then
          nValue = mark1 + estX
             RealX1 = rx1
@@ -666,14 +666,14 @@ For i = 0 To items&
 here1:
             If mark1 > 1 Then
                 
-                Offset = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), mark1 - 1, 1, tabw, 0))
+                Offset = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), mark1 - 1, 1, tabw, 0))
             End If
             If mark1 = nValue And found > 0 Then
 
             If Offset > found Then
             j = mark1 - 2
             If j >= 1 Then
-            Do While found < R.Left + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), j, 1, tabw, 0))
+            Do While found < R.Left + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), j, 1, tabw, 0))
             j = j - 1
             If j = 0 Then j = 1: Exit Do
             Loop
@@ -702,10 +702,10 @@ here1:
             If nValue = mark2 + 1 Then
             If found > 0 Then
             For j = mark2 - mark1 + 1 To 1 Step -1
-            If found > Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), j, 1, tabw, 0)) Then
+            If found > Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), j, 1, tabw, 0)) Then
             
             If j > 1 Then
-            If LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), j, 1, tabw, 0)) > LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), j - 1, 1, tabw, 0)) < 0 Then
+            If LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), j, 1, tabw, 0)) > LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), j - 1, 1, tabw, 0)) < 0 Then
             
                         nValue = mark2 - (j) + estX
 
@@ -747,9 +747,9 @@ here1:
             
             Else
 conthere:
-            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), Len(c), 1, tabw, 0))
              If nValue > mark1 Then
-                rx1 = rleftacc - 1 - LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), nValue - mark1, 1, tabw, 0))
+                rx1 = rleftacc - 1 - LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), nValue - mark1, 1, tabw, 0))
             Else
                 rx1 = rleftacc - 1
             End If
@@ -760,7 +760,7 @@ conthere:
                 original = nValue
                 For j = nValue To mark2
 
-                rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), j - mark1 + 1, 1, tabw, 0))
+                rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), j - mark1 + 1, 1, tabw, 0))
 
                     
                     original = original + 1
@@ -803,7 +803,7 @@ conthere:
                   original = nValue
                   For j = nValue - 1 To mark1 + 1 Step -1
                 
-                      rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), j - mark1, 1, tabw, 0))
+                      rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), j - mark1, 1, tabw, 0))
                       If found <= rx1 Then Exit For
                       original = j
                       
@@ -865,7 +865,7 @@ rx1 = 0
         Else ' NO RTL
 nortl:
             c = Myleft$(c, ExtSelStart - estX - 1)
-            rx1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+            rx1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), Len(c), 1, tabw, 0))
             If found > 0 Then
                 If found < rx1 Then
                     nValue = ExtSelStart - 1
@@ -884,7 +884,7 @@ nortl:
                         Else
                        ' nValue = Len(c) + estX
                         End If
-                        rx1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+                        rx1 = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), Len(c), 1, tabw, 0))
                     End If
                     RealX1 = rx1
                     Exit For
@@ -914,17 +914,17 @@ nortl:
                 If Len(c) = 0 Then
                     rleftacc = Offset
                 ElseIf nrtl And M2 = mark2 Then
-                rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+                rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), Len(c), 1, tabw, 0))
                   c = ww(i)
                   
                If M2 - M1 > 0 Then c = Mid$(c, M1, M2 - M1 + 1)
-                 rleftacc = rleftacc + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+                 rleftacc = rleftacc + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), Len(c), 1, tabw, 0))
                 nValue = M1 - 1
             Else
-                 rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, 0))
+                 rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), Len(c), 1, tabw, 0))
                 End If
             ElseIf found > 0 Then
-            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), nValue, 1, tabw, 0))
+            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, R.Left, R.Top, StrPtr(c), nValue, 1, tabw, 0))
         If rleftacc < found Then
         nValue = original
 

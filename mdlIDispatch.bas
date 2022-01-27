@@ -60,16 +60,16 @@ End If
 If lngRet = 0 Then FindDISPID = dispid
 End Function
 Public Sub ShutEnabledGuiM2000(Optional all As Boolean = False)
-Dim x As Form, bb As Boolean
+Dim X As Form, bb As Boolean
 
 Do
-For Each x In Forms
+For Each X In Forms
 bb = True
-If TypeOf x Is GuiM2000 Then
-    If x.enabled Then bb = False: x.CloseNow: bb = False: Exit For
+If TypeOf X Is GuiM2000 Then
+    If X.enabled Then bb = False: X.CloseNow: bb = False: Exit For
     
 End If
-Next x
+Next X
 
 Loop Until bb Or Not all
 
@@ -239,12 +239,13 @@ JUMPHERE:
                Set mm = Nothing
                 'CallByName pobjTarget, "MyHide", VbMethod
             ElseIf UCase(pstrProcName) = "SHOW" Then
-
-                If pobjTarget.Quit Then MyEr "Form unloaded, use declare again using declare A new Form", "η φόρμα δεν έχει φορτωθεί, χρησιμοποίησε την Όρισε Α Νεα Φορμα": Exit Function
-                CallByName pobjTarget, "ShowTaskBar", VbMethod
-                CallByName pobjTarget, "ShowmeALl", VbMethod
+                Set mm = pobjTarget
+                If mm.Quit Then MyEr "Form unloaded, use declare again using declare A new Form", "η φόρμα δεν έχει φορτωθεί, χρησιμοποίησε την Όρισε Α Νεα Φορμα": Exit Function
+                mm.ShowTaskBar
+                mm.ShowmeALL
                 If items = 0 Then
-                    CallByName pobjTarget, pstrProcName, VbMethod, 0, GiveForm()
+                    'CallByName pobjTarget, pstrProcName, VbMethod, 0, GiveForm()
+                    mm.Show 0, GiveForm()
                     Set myform = pobjTarget
                     MoveFormToOtherMonitorOnly myform
                ElseIf items = 2 Then
@@ -271,30 +272,28 @@ conthere:
                    oldmoldid = Modalid
                    mycodeid = Rnd * 1000000
                    pobjTarget.Modal = mycodeid
-                   Dim x As Form, z As Form, zz As Form
+                   Dim X As Form, z As Form, zz As Form
                    Set zz = Screen.ActiveForm
                    If zz.Name = "Form3" Then
                    Set zz = zz.lastform
                    End If
                    If Not pobjTarget.IamPopUp Then
-                        For Each x In Forms
-                            If x.Visible And x.Name = "GuiM2000" Then
-                                If Not x Is pobjTarget Then
-                                    If x.Enablecontrol Then
-                                        x.Modal = mycodeid
-                                        x.Enablecontrol = False
+                        For Each X In Forms
+                            If X.Visible And X.Name = "GuiM2000" Then
+                                If Not X Is pobjTarget Then
+                                    If X.Enablecontrol Then
+                                        X.Modal = mycodeid
+                                        X.Enablecontrol = False
                                     End If
                                 End If
                             End If
-                        Next x
+                        Next X
                     End If
                     If pobjTarget.NeverShow Then
                     Modalid = mycodeid
-                    'If Not pobjTarget.IamPopUp Then
-                    ' change this
-                    'pobjTarget.Title = pobjTarget.Title
+
                     pobjTarget.ShowTaskBar
-                    'End If
+
                     If items = 2 Then
                     CallByName pobjTarget, pstrProcName, VbMethod, 0, varArr(1)
                     Else
@@ -344,12 +343,12 @@ conthere:
                     Modalid = mycodeid
                 End If
                 Set z = Nothing
-                For Each x In Forms
-                    If x.Visible And x.Name = "GuiM2000" Then
-                        x.TestModal mycodeid
-                        If x.Enablecontrol Then Set z = x
+                For Each X In Forms
+                    If X.Visible And X.Name = "GuiM2000" Then
+                        X.TestModal mycodeid
+                        If X.Enablecontrol Then Set z = X
                     End If
-                Next x
+                Next X
                 If Not zz Is Nothing Then Set z = zz
                 If Typename(z) = "GuiM2000" Then
                 If z.Modal = Modalid Then

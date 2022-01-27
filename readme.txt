@@ -1,8 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 10 revision 56 active-X
-New Events for ListBox to work as Spliter Control.
-Some fixes from previous revisions.
+Version 11 active-X
+More Events for Gui Controls.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

@@ -310,15 +310,14 @@ End Function
 
 Public Function GetLastKeyPressed() As Long
 Dim Message As Msg
-    If mynum$ <> "" Then
-        GetLastKeyPressed = -1
-    ElseIf PeekMessageW(Message, 0, WM_CHAR, WM_KEYLAST, 0) Then
-        GetLastKeyPressed = Message.wParam
-    Else
-        GetLastKeyPressed = -1
-    
-    End If
-    Exit Function
+If mynum$ <> "" Then
+    GetLastKeyPressed = -1
+ElseIf PeekMessageW(Message, 0, WM_CHAR, WM_KEYLAST, 0) Then
+    GetLastKeyPressed = Message.wParam
+Else
+    GetLastKeyPressed = -1
+
+End If
 End Function
 
 Private Sub DIS_LostFocus()
@@ -421,7 +420,7 @@ i = GetLastKeyPressed
 End If
 
  If i <> -1 And i <> 94 Then
-UKEY$ = ChrW(i)
+    UKEY$ = ChrW(i)
  Else
  If i <> -1 Then UKEY$ = vbNullString
  End If
@@ -471,7 +470,7 @@ End Sub
 Private Sub gList1_ChangeSelStart(thisselstart As Long)
 Dim i As Long
 
-If gList1.enabled Then
+If gList1.Enabled Then
 With TEXT1
 i = .SelLength
 .Form1mn1Enabled = i > 0
@@ -493,7 +492,7 @@ End Sub
 Private Sub gList1_HeaderSelected(Button As Integer)
 Dim i As Long
 
-If Not gList1.enabled Then Exit Sub
+If Not gList1.Enabled Then Exit Sub
 With TEXT1
 If .UsedAsTextBox Then Exit Sub
 i = .SelLength
@@ -545,7 +544,7 @@ End Sub
 Private Sub gList1_OutPopUp(x As Single, y As Single, myButton As Integer)
 Dim i As Long
 
-If Not gList1.enabled Then Exit Sub
+If Not gList1.Enabled Then Exit Sub
 With TEXT1
 If .UsedAsTextBox Then Exit Sub
 i = .SelLength
@@ -559,7 +558,7 @@ i = .SelLength
 End With
 UNhookMe
 MyPopUp.feedlabels TEXT1, EditTextWord
-MyPopUp.Up x + gList1.Left, y + gList1.top
+MyPopUp.Up x + gList1.Left, y + gList1.Top
 myButton = 0
 End Sub
 
@@ -817,7 +816,7 @@ i1 = el
 l = i1 + addthat
 w1 = w
 If EditTextWord Or anystr Then
-TEXT1.glistN.dropkey = True
+TEXT1.glistN.DropKey = True
 Dim ok1 As Boolean
 Do
 If anystr Then
@@ -832,9 +831,9 @@ w2 = w
 If l = i1 Then
  TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = w
- TEXT1.glistN.enabled = False
+ TEXT1.glistN.Enabled = False
 TEXT1.ParaSelStart = l
- TEXT1.glistN.enabled = True
+ TEXT1.glistN.Enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
 TEXT1.SelText = neo$
@@ -848,9 +847,9 @@ End If
 End If
 TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = w
- TEXT1.glistN.enabled = False
+ TEXT1.glistN.Enabled = False
 TEXT1.ParaSelStart = l
- TEXT1.glistN.enabled = True
+ TEXT1.glistN.Enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
 TEXT1.SelText = neo$
@@ -865,11 +864,11 @@ safety = safety + 1
 End If
 If prof1.MARKTWO > 1000 Then ProcTask2 Basestack1: prof1.MARKONE
 Loop Until safety = 2 Or KeyPressed(16)
-TEXT1.glistN.dropkey = False
+TEXT1.glistN.DropKey = False
 
 Else
 ''If l > 0 Then l = l - 1
-TEXT1.glistN.dropkey = True
+TEXT1.glistN.DropKey = True
 Do
 If TEXT1.mDoc.FindIdentifier(s$, True, w, l) Then
 'If w2 > 0 Then TEXT1.mDoc.ColorThis w2: TEXT1.WrapMarkedPara
@@ -880,9 +879,9 @@ If safety And w = w1 Then
 If l = i1 Then
  TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = w
- TEXT1.glistN.enabled = False
+ TEXT1.glistN.Enabled = False
 TEXT1.ParaSelStart = l
- TEXT1.glistN.enabled = True
+ TEXT1.glistN.Enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
 TEXT1.SelText = neo$
@@ -896,9 +895,9 @@ End If
 End If
 TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = w
- TEXT1.glistN.enabled = False
+ TEXT1.glistN.Enabled = False
 TEXT1.ParaSelStart = l
- TEXT1.glistN.enabled = True
+ TEXT1.glistN.Enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
 
@@ -914,7 +913,7 @@ safety = safety + 1
 End If
 If prof1.MARKTWO > 1000 Then ProcTask2 Basestack1: prof1.MARKONE
 Loop Until safety = 2 Or KeyPressed(16)
-TEXT1.glistN.dropkey = False
+TEXT1.glistN.DropKey = False
 End If
 TEXT1.mDoc.lcid = OldLcid
 If w2 > 0 Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
@@ -951,9 +950,9 @@ Else
 End If
 TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = w
-TEXT1.glistN.enabled = False
+TEXT1.glistN.Enabled = False
 TEXT1.ParaSelStart = l
-TEXT1.glistN.enabled = True
+TEXT1.glistN.Enabled = True
 TEXT1.SelLength = Len(s$)
 sdnOut:
 TEXT1.mDoc.lcid = OldLcid
@@ -985,9 +984,9 @@ Else
 End If
 TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = w
-TEXT1.glistN.enabled = False
+TEXT1.glistN.Enabled = False
 TEXT1.ParaSelStart = l
-TEXT1.glistN.enabled = True
+TEXT1.glistN.Enabled = True
 TEXT1.SelLength = Len(s$)
 sdupOut:
 TEXT1.mDoc.lcid = OldLcid
@@ -1413,7 +1412,7 @@ Form2.Show , Form1
  
 Form2.label1(1) = "..."
 Form2.label1(2) = "..."
-    Form2.gList3(2).backcolor = &H3B3B3B
+    Form2.gList3(2).BackColor = &H3B3B3B
     TestShowCode = False
      TestShowSub = vbNullString
  TestShowStart = 0
@@ -1441,12 +1440,11 @@ Private Sub Form_KeyPress(KeyAscii As Integer)
 If KeyAscii = 9 And view1.Visible Then view1.SetFocus: KeyAscii = 0: Exit Sub
 If clickMe2 = -2 And clickMe <> -1 Then clickMe2 = clickMe
 If clickMe2 <> -1 And Not List1.LeaveonChoose Then KeyAscii = 0: Exit Sub
-
 If Right$(INK$, 1) = Chr$(6) And KeyAscii = 9 Then
 
 Else
 If mynum$ <> "" Then
-If mynum$ <> "" Then Exit Sub
+    Exit Sub
 End If
 If UKEY$ <> "" Then
 INK$ = INK$ & UKEY$
@@ -1517,7 +1515,7 @@ Set TEXT1 = New TextViewer
 Set TEXT1.Container = gList1
 With TEXT1.glistN
 .DragEnabled = False ' only drop - we can change this from popup menu
-.enabled = False
+.Enabled = False
 TEXT1.FileName = vbNullString
 .addpixels = 0
 TEXT1.showparagraph = False
@@ -1688,7 +1686,7 @@ End Sub
 Sub something()
 Set Basestack1.Owner = DIS
 Set DisStack.Owner = DIS
-PrinterDocument1.backcolor = QBColor(15)
+PrinterDocument1.BackColor = QBColor(15)
 NOEXECUTION = False
 Basestack1.toprinter = False
 MOUT = False
@@ -1790,7 +1788,7 @@ MyDoEvents
    PrepareLabel Basestack1
     Form2.label1(1) = "..."
     Form2.label1(2) = "..."
-    Form2.gList3(2).backcolor = &H3B3B3B
+    Form2.gList3(2).BackColor = &H3B3B3B
     TestShowCode = False
     TestShowSub = vbNullString
     TestShowStart = 0
@@ -2101,9 +2099,9 @@ keycode = 0
  
         TEXT1.SelLengthSilent = 0
         TEXT1.mDoc.MarkParagraphID = TEXT1.mDoc.ParagraphFromOrder(gothere)
-        TEXT1.glistN.enabled = False
+        TEXT1.glistN.Enabled = False
         TEXT1.ParaSelStart = gocolumn
-        TEXT1.glistN.enabled = True
+        TEXT1.glistN.Enabled = True
         TEXT1.ManualInform
  
  Exit Sub
@@ -2365,7 +2363,7 @@ If Len(TEXT1.CurrentParagraph) + 1 < TEXT1.Charpos Then
 TEXT1.SelStartSilent = TEXT1.CharPosStart - TEXT1.Charpos + 1
 End If
 If TEXT1.HaveMarkedText Then TEXT1.SelStartSilent = TEXT1.SelStart
-    gList1.enabled = False
+    gList1.Enabled = False
     JJ = TEXT1.SelStart
     where = JJ
     ii = 1 + TEXT1.SelStart - TEXT1.ParaSelStart
@@ -2471,7 +2469,7 @@ If TEXT1.HaveMarkedText Then TEXT1.SelStartSilent = TEXT1.SelStart
         End If
     End If
 End If
-gList1.enabled = True
+gList1.Enabled = True
 TEXT1.ReColorBlock
 TEXT1.glistN.Noflashingcaret = False
 TEXT1.Render
@@ -2520,7 +2518,7 @@ End If
 End Sub
 
 
-Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, url As Variant, flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
+Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, url As Variant, Flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
 If look1 Then
 look1 = False:  lookfirst = False
 
@@ -2685,7 +2683,7 @@ If IsWine Then
 With view1
 On Error Resume Next
     .Visible = True
-    .top = IEY
+    .Top = IEY
     .Left = IEX
     .Width = IESizeX
     .Height = IESizeY
@@ -3174,9 +3172,9 @@ Else ' goto that paragraph
     If Not TEXT1.mDoc.InvalidPara(para) Then
         TEXT1.SelLengthSilent = 0
         TEXT1.mDoc.MarkParagraphID = para
-        TEXT1.glistN.enabled = False
+        TEXT1.glistN.Enabled = False
         TEXT1.ParaSelStart = pospara
-        TEXT1.glistN.enabled = True
+        TEXT1.glistN.Enabled = True
         TEXT1.ManualInform
     Else
         para = 0
@@ -3280,7 +3278,7 @@ End If
 BreakMe = False
 End Function
 Public Sub SetText1()
-If (600 - hueconv(TEXT1.backcolor)) Mod 360 > 30 And lightconv(TEXT1.backcolor) >= 128 Then TEXT1.ColorSet = 1 Else TEXT1.ColorSet = 0
+If (600 - hueconv(TEXT1.BackColor)) Mod 360 > 30 And lightconv(TEXT1.BackColor) >= 128 Then TEXT1.ColorSet = 1 Else TEXT1.ColorSet = 0
 Select Case fState
 Case 0
 shortlang = False
@@ -3494,26 +3492,29 @@ recover:
 On Error GoTo recover2
 BLOCKkey = False
 AskTitle$ = vbNullString
-Dim z As Form
- Set z = Nothing
+Dim z As Form, XX As GuiM2000
+Set z = Nothing
+For Each x In Forms
+    If x.Visible And x.Name = "GuiM2000" Then
+        Set XX = x
+        If Not XX.Enablecontrol Then XX.TestModal mycode
+        If XX.Enablecontrol Then Set z = XX
+        Set XX = Nothing
+    End If
+Next x
+Set x = Nothing
+If Not zz Is Nothing Then Set z = zz
 
-           For Each x In Forms
-            If x.Visible And x.Name = "GuiM2000" Then
-            If Not x.Enablecontrol Then x.TestModal mycode
-          If x.Enablecontrol Then Set z = x
-            End If
-            Next x
-             Set x = Nothing
-          If Not zz Is Nothing Then Set z = zz
-          
-          If Typename(z) = "GuiM2000" Then
-            z.ShowmeALL
-            z.SetFocus
-            Set z = Nothing
-            ElseIf Not z Is Nothing Then
-            If z.Visible Then z.SetFocus
-          End If
-          Modalid = oldcodeid
+If Typename(z) = "GuiM2000" Then
+    Set XX = z
+    XX.ShowmeALL
+    XX.SetFocus
+    Set z = Nothing
+    Set XX = Nothing
+ElseIf Not z Is Nothing Then
+    If z.Visible Then z.SetFocus
+End If
+Modalid = oldcodeid
           
 If INFOONLY Then
 NeoASK = 1

@@ -178,9 +178,9 @@ End Type
 Dim tParam As DRAWTEXTPARAMS
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
 Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT) As Long
-Private Declare Function SelectClipRgn Lib "gdi32" (ByVal Hdc As Long, ByVal hRgn As Long) As Long
+Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hdc As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal Hdc As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
+Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hdc As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
 Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 Private tmpshow As Boolean
 Private WordOnly As Boolean
@@ -260,7 +260,7 @@ mNoColor = True
 mNoColor1 = True
 FileName = vbNullString
 glistN.DragEnabled = False
-.backcolor = rgb(200, 120, 60)
+.BackColor = rgb(200, 120, 60)
 Set .Font = ff
 .forecolor = white
 .dcolor = Callback.Controls(1).dcolor
@@ -271,7 +271,7 @@ TextPixelOffset = Int(glistN.TextHeightOffset)
 capchroma = glistN.CapColor
 EditDoc = True
 nowrap = False
-enabled = True
+Enabled = True
 SetME
 ShowAlways = True
 mDoc.ForEditBox = True
@@ -559,7 +559,7 @@ End If
 
 End Sub
 Public Sub AddUndo(that As String)
-If Not enabled Then Exit Sub
+If Not Enabled Then Exit Sub
 ClearRedo
 If that = vbCrLf Then
 PushUndo
@@ -602,7 +602,7 @@ undomode = 0
 End If
 End Sub
 Public Sub ManualInform()
-If Not glistN.enabled Then Exit Sub
+If Not glistN.Enabled Then Exit Sub
 If glistN.SelStart = 0 Then
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Inform(" + Str(mIndex) + "," + Str(glistN.ListIndex + 1) + ", 1)"
@@ -667,7 +667,7 @@ If Charpos < 2 Or NumberOnly Or NumberIntOnly Then Exit Sub
                 l = l - 1
             End If
             val = val - l
-        ElseIf w > -9215 And w < -8960 Then
+        ElseIf w > -9217 And w < -8192 Then
             val = 2
         End If
     ElseIf Charpos > 0 Then
@@ -717,7 +717,7 @@ If Charpos > 0 Then
                     val = val - 1
                 End If
             End If
-        ElseIf w > -10241 And w < -9984 Then
+        ElseIf w > -10241 And w < -9216 Then
             val = 2
         End If
     End If
@@ -732,18 +732,18 @@ If Not locked Then
 glistN.HideCaretOnexit = False
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 
-If enabled Then
+If Enabled Then
 glistN.NoCaretShow = NoMark
 
 mNoColor = mNoColor1
 glistN.forecolor = black
-glistN.backcolor = white
+glistN.BackColor = white
 
 Else
 mNoColor = True
 glistN.NoCaretShow = NoMark
 glistN.forecolor = white
-glistN.backcolor = dimm1
+glistN.BackColor = dimm1
 End If
 If Not NoCenterLineEdit Then
 glistN.ShowMe
@@ -779,7 +779,7 @@ glistN.HideCaretOnexit = True
 glistN.forecolor = white
 If glistN.BackStyle <> 1 Then
 
-glistN.backcolor = dimm2
+glistN.BackColor = dimm2
 End If
 
 glistN.PanPos = 0: glistN.PrepareToShow
@@ -799,9 +799,9 @@ Private Sub glistN_CorrectCursorAfterDrag()
     If Not mDoc.InvalidPara(OldPar) Then
         SelLengthSilent = 0
         mDoc.MarkParagraphID = OldPar
-        glistN.enabled = False
+        glistN.Enabled = False
         ParaSelStart = dragCharpos
-        glistN.enabled = True
+        glistN.Enabled = True
         ManualInform
         OldPar = 0
     End If
@@ -845,9 +845,9 @@ If Not mDoc.InvalidPara(OldPar) Then
         a = True
         SelLengthSilent = 0
         mDoc.MarkParagraphID = OldPar
-        glistN.enabled = False
+        glistN.Enabled = False
         ParaSelStart = dragCharpos
-        glistN.enabled = True
+        glistN.Enabled = True
         ManualInform
         OldPar = 0
     End If
@@ -861,7 +861,7 @@ a = True
 End If
 End Sub
 Private Sub glistN_Maybelanguage()
-If Not glistN.enabled Then Exit Sub
+If Not glistN.Enabled Then Exit Sub
 If glistN.SelStart = 0 Then
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Inform(" + Str(mIndex) + "," + Str(glistN.ListIndex + 1) + ", 1)"
@@ -918,7 +918,7 @@ End Sub
 
 Private Sub glistN_RemoveOne(that As String)
 ' push undo removeone
-If Not enabled Then Exit Sub
+If Not Enabled Then Exit Sub
 
 ClearRedo
 If that = vbCrLf Then
@@ -1030,7 +1030,7 @@ If glistN.ListIndex < 0 Then Exit Sub
 Dim what$, ThatPara As Long, pastchars As Long, oldpanpos As Long
 pastchars = mDoc.TextParagraphLine2(glistN.ListIndex + 1, what$, ThatPara, False)
 Charpos = pastchars + glistN.SelStart
-If Not glistN.enabled Then Exit Sub
+If Not glistN.Enabled Then Exit Sub
 oldpanpos = glistN.PanPos
 tmpshow = True
 If glistN.SelStart = 0 Then
@@ -1534,9 +1534,9 @@ aaa:
 glistN.ScrollToSilent glistN.ScrollFrom
 
 If Not mNoCenterLineEdit Then
-If glistN.enabled Then glistN.ShowPan
+If glistN.Enabled Then glistN.ShowPan
 Else
-If glistN.enabled Then glistN.ShowMe2
+If glistN.Enabled Then glistN.ShowMe2
 End If
 'expandCharPos = glistN.SelStart
 mDoc.Busy = False
@@ -1679,8 +1679,8 @@ undotext = Redotext
 undomode = Redomode
 If undomode = 2 Then undopos = Redopos - 2
 undoprev = Redoprev
-b = enabled
-enabled = False
+b = Enabled
+Enabled = False
 SelLength = 0
 If Redomode = 3 Then
 SelStart = Redopos - 2
@@ -1726,7 +1726,7 @@ glistN_SplitLine
 
 End If
 
-enabled = b
+Enabled = b
 If Not undoprev Then
 glistN.ShowPan
 ManualInform
@@ -1758,8 +1758,8 @@ Redoprev = undoprev
 
 ' MOVE TO PARAGRAPH...AND CHARPOS
 
-b = enabled
-enabled = False
+b = Enabled
+Enabled = False
 
    SelLength = 0
    SelStart = undopos
@@ -1794,7 +1794,7 @@ ElseIf undomode = 2 Then
 Else
         InsertText = undotext
 End If
-enabled = b
+Enabled = b
 If Not undoprev Then
 glistN.ShowPan
 ManualInform
@@ -5928,7 +5928,7 @@ Public Property Let EditDoc(ByVal RHS As Boolean)
 mEditDoc = RHS
 If Not RHS Then glistN.MarkNext = 0
 glistN.EditFlag = RHS
-If glistN.enabled Then
+If glistN.Enabled Then
 glistN.ShowMe2
 End If
 End Property
@@ -5975,17 +5975,17 @@ glistN.NoScroll = Not mNoWrap
 End If
 End Property
 
-Public Property Get enabled() As Boolean
-enabled = glistN.enabled
+Public Property Get Enabled() As Boolean
+Enabled = glistN.Enabled
 End Property
 
-Public Property Let enabled(ByVal RHS As Boolean)
+Public Property Let Enabled(ByVal RHS As Boolean)
 'glistN.HideCaretOnexit = Not rhs
 If Not RHS Then
 glistN.Noflashingcaret = False
 Show
 End If
-glistN.enabled = RHS
+glistN.Enabled = RHS
 End Property
 Sub SetFocus()
 If glistN.Visible Then glistN.SetFocus
@@ -6023,7 +6023,7 @@ End If
 Else
 glistN.SelStartEventAlways = Column
 End If
-If glistN.enabled Then
+If glistN.Enabled Then
 If Not noShow Then glistN.ShowMe2
 End If
 End Sub
@@ -6051,8 +6051,8 @@ BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 glistN.MarkNext = 0
 End If
-oldenabled = glistN.enabled
-glistN.enabled = False
+oldenabled = glistN.Enabled
+glistN.Enabled = False
 glistN.PanPos = 0
 glistN.ScrollToSilent 0
 Set mDoc = New Document
@@ -6084,7 +6084,7 @@ all = mDoc.DocLines
  glistN.SelStart = 0
 ClearRedo
 ClearUndo
-glistN.enabled = oldenabled
+glistN.Enabled = oldenabled
 Dim what$, ThatPara As Long, pastchars
    pastchars = mDoc.TextParagraphLine(1, what$, ThatPara)
 mDoc.MarkParagraphID = ThatPara
@@ -6164,7 +6164,7 @@ If RHS <= 0 Then
     BlockStartPara = BlockEndPara
     BlockStartPos = BlockEndPos
     glistN.MarkNext = 0
-If glistN.enabled Then glistN.ShowPan
+If glistN.Enabled Then glistN.ShowPan
 Else
 glistN.MarkNext = 1
    BlockStartCursor = glistN.SelStart
@@ -6185,7 +6185,7 @@ BlockEndline = BlockEndline - 1 ' base 0
     BlockBottomline = BlockEndline
 If RHS <> 0 Then
 glistN.MarkNext = 2
-If glistN.enabled Then glistN.ShowPan
+If glistN.Enabled Then glistN.ShowPan
 End If
 End If
 End Property
@@ -6216,15 +6216,15 @@ End Property
 Public Property Set Font(New_Font As Font)
     Set glistN.Font = New_Font
 End Property
-Public Property Let backcolor(ByVal RHS As OLE_COLOR)
+Public Property Let BackColor(ByVal RHS As OLE_COLOR)
 
     
-glistN.backcolor = RHS
+glistN.BackColor = RHS
   
     
 End Property
-Public Property Get backcolor() As OLE_COLOR
-    backcolor = glistN.backcolor
+Public Property Get BackColor() As OLE_COLOR
+    BackColor = glistN.BackColor
 End Property
 Public Property Get forecolor() As OLE_COLOR
     forecolor = glistN.forecolor
@@ -6364,8 +6364,8 @@ glistN.MarkNext = 0
 undomode = 5 ' like 1
 RemoveUndo (RHS)
 undomode = 4 ' like 0
-b = enabled
-If b Then enabled = False
+b = Enabled
+If b Then Enabled = False
 Dim k As Long, l As Long
 If Right$(RHS, 1) = vbCr Then RHS = RHS + vbLf
 If RHS <> "" Then
@@ -6375,7 +6375,7 @@ mDoc.InsertDoc mDoc.MarkParagraphID, Charpos, RHS
 all = mDoc.DocLines
 
 End If
-If b <> enabled Then enabled = b
+If b <> Enabled Then Enabled = b
 End Property
 Private Property Let InsertText2(ByVal RHS As String)
 glistN_MarkDelete True
@@ -6629,14 +6629,14 @@ maxw = MyTrimRNoCr(Myleft$(CurrentParagraph, Charpos - 1))
 If Charpos > maxw Then
 och = Charpos - maxw - 1
 If och > 0 Then
-skip = enabled
-enabled = False
+skip = Enabled
+Enabled = False
 
 SelStartSilent2 = SelStart - och
 SelLengthSilent = och
 InsertTextNoRender = ""
 undoprev = True
-enabled = skip
+Enabled = skip
 End If
 End If
 End If
@@ -6684,7 +6684,7 @@ End If
 Dim a$
 tc = TabControl
 
-glistN.enabled = False
+glistN.Enabled = False
     a$ = Myleft(CurrentParagraph, Charpos)
 
     If MyTrimL2NoTab(a$) <> 1 And tc = 0 And MyTrimL(a$) > 1 Then
@@ -6724,7 +6724,7 @@ glistN.enabled = False
     End If
     SelStartSilent = j + Len(idnt$) + 3 + ww
     End If
-glistN.enabled = True
+glistN.Enabled = True
 Render
 End Sub
 Function GetLCIDFromKeyboard() As Long
@@ -7836,11 +7836,11 @@ End If
 End Sub
 
 Public Property Get locked() As Boolean
-locked = Not glistN.enabled
+locked = Not glistN.Enabled
 End Property
 
 Public Property Let locked(ByVal RHS As Boolean)
-glistN.enabled = Not RHS
+glistN.Enabled = Not RHS
 End Property
 Public Property Get index() As Long
 index = mIndex
@@ -7868,9 +7868,9 @@ LineHeight = glistN.HeightTwips / glistN.lines
 End Property
 Public Sub PressKey(keycode As Integer, shift As Integer)
 Dim b As Boolean
-  b = enabled
+  b = Enabled
     PressKey_A keycode, shift
-enabled = b
+Enabled = b
   
 End Sub
 Private Sub PressKey_A(keycode As Integer, shift As Integer)
@@ -8103,7 +8103,7 @@ conttab:
     If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
     nochange = True
     shift = shift And &H1
-    glistN.enabled = False
+    glistN.Enabled = False
     
     If HaveMarkedText Then SelStartSilent = SelStart
     JJ = SelStart
@@ -8165,7 +8165,7 @@ conttab:
             SelStartSilent = where + TabControl
         End If
     End If
-    glistN.enabled = True
+    glistN.Enabled = True
         ReColorBlock
     Render
     nochange = False
@@ -8177,7 +8177,7 @@ conttab1:
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 nochange = True
 shift = shift And &H1
-glistN.enabled = False
+glistN.Enabled = False
 
 If HaveMarkedText Then SelStartSilent = SelStart
 JJ = SelStart
@@ -8238,7 +8238,7 @@ shift = 0
         SelStartSilent = where + 1
     End If
 End If
-glistN.enabled = True
+glistN.Enabled = True
     ReColorBlock
 Render
 nochange = False
@@ -8278,9 +8278,9 @@ Else
 End If
 SelLengthSilent = 0
 mDoc.MarkParagraphID = w
-glistN.enabled = False
+glistN.Enabled = False
 ParaSelStart = l
-glistN.enabled = True
+glistN.Enabled = True
 SelLength = Len(s$)
 sdnOut:
 mDoc.lcid = OldLcid
@@ -8308,9 +8308,9 @@ Else
 End If
 SelLengthSilent = 0
 mDoc.MarkParagraphID = w
-glistN.enabled = False
+glistN.Enabled = False
 ParaSelStart = l
-glistN.enabled = True
+glistN.Enabled = True
 SelLength = Len(s$)
 sdupOut:
 mDoc.lcid = OldLcid
@@ -8455,7 +8455,7 @@ i1 = el
 l = i1 + addthat
 w1 = w
 If EditTextWord Or WordOnly Then
-glistN.dropkey = True
+glistN.DropKey = True
 Do
 
 If anystr Then
@@ -8471,9 +8471,9 @@ If safety And w = w1 Then
 If l = i1 Then
  SelLengthSilent = 0
 mDoc.MarkParagraphID = w
-glistN.enabled = False
+glistN.Enabled = False
 ParaSelStart = l
-glistN.enabled = True
+glistN.Enabled = True
 SelLength = Len(s$)
 AddUndo ""
 SelText = neo$
@@ -8487,9 +8487,9 @@ End If
 End If
 SelLengthSilent = 0
 mDoc.MarkParagraphID = w
-glistN.enabled = False
+glistN.Enabled = False
 ParaSelStart = l
-glistN.enabled = True
+glistN.Enabled = True
 SelLength = Len(s$)
 AddUndo ""
 SelText = neo$
@@ -8505,11 +8505,11 @@ safety = safety + 1
 End If
 If prof1.MARKTWO > 1000 Then ProcTask2 Basestack1: prof1.MARKTWO
 Loop Until safety = 2 Or KeyPressed(16)
-glistN.dropkey = False
+glistN.DropKey = False
 
 Else
 
-glistN.dropkey = True
+glistN.DropKey = True
 Do
 If mDoc.FindIdentifier(s$, True, w, l) Then
 If w2 > 0 Then If w2 <> w Then mDoc.WrapAgainBlock w2, w2:  mDoc.ColorThis w2
@@ -8518,9 +8518,9 @@ If safety And w = w1 Then
 If l = i1 Then
  SelLengthSilent = 0
 mDoc.MarkParagraphID = w
-glistN.enabled = False
+glistN.Enabled = False
 ParaSelStart = l
-glistN.enabled = True
+glistN.Enabled = True
 SelLength = Len(s$)
 AddUndo ""
 SelText = neo$
@@ -8534,9 +8534,9 @@ End If
 End If
 SelLengthSilent = 0
 mDoc.MarkParagraphID = w
-glistN.enabled = False
+glistN.Enabled = False
 ParaSelStart = l
-glistN.enabled = True
+glistN.Enabled = True
 SelLength = Len(s$)
 AddUndo ""
 SelText = neo$
@@ -8551,7 +8551,7 @@ safety = safety + 1
 End If
 If prof1.MARKTWO > 1000 Then ProcTask2 Basestack1: prof1.MARKTWO
 Loop Until safety = 2 Or KeyPressed(16)
-glistN.dropkey = False
+glistN.DropKey = False
 End If
 mDoc.lcid = OldLcid
 If w2 > 0 Then mDoc.WrapAgainBlock w2, w2:   mDoc.ColorThis w2
@@ -8583,9 +8583,9 @@ Else ' goto that paragraph
     If Not mDoc.InvalidPara(para) Then
         SelLengthSilent = 0
         mDoc.MarkParagraphID = para
-        glistN.enabled = False
+        glistN.Enabled = False
         ParaSelStart = pospara
-        glistN.enabled = True
+        glistN.Enabled = True
         ManualInform
     Else
         para = 0
@@ -8776,7 +8776,7 @@ Public Property Let ShowAlways(ByVal vNewValue As Variant)
 mStayOpen = CBool(vNewValue)
 If mStayOpen Then
 glistN.forecolor = black 'rgb(0, 0, 0)
-glistN.backcolor = white ' rgb(255, 255, 255)
+glistN.BackColor = white ' rgb(255, 255, 255)
 End If
 End Property
 
@@ -8839,7 +8839,7 @@ End Sub
 Sub EditTextView(ByVal OnOff As Boolean)
 mStayOpen = True
 glistN.forecolor = black 'rgb(0, 0, 0)
-glistN.backcolor = white ' rgb(255, 255, 255)
+glistN.BackColor = white ' rgb(255, 255, 255)
 NoMark = Not OnOff
 mEditDoc = OnOff
 If Not OnOff Then glistN.MarkNext = 0 Else glistN.MarkNext = 2
@@ -8858,7 +8858,7 @@ Sub TransparentOff()
 On Error Resume Next
 If Not glistN Is Nothing Then
 glistN.BackStyle = 0
-glistN.backcolor = mycolor(dimm2)
+glistN.BackColor = mycolor(dimm2)
 glistN.PanPos = 0
 glistN.ShowMe
 Callback.RefreshList = Callback.RefreshList - 1
@@ -8891,11 +8891,11 @@ End Sub
 Public Sub Retired()
 If mStayOpen Then
 glistN.forecolor = black
-glistN.backcolor = white
+glistN.BackColor = white
 glistN.NoCaretShow = False
 Else
 glistN.forecolor = white
-glistN.backcolor = dimm2
+glistN.BackColor = dimm2
 glistN.NoCaretShow = True
 End If
  glistN.PanPos = 0: glistN.ShowMe

@@ -90,13 +90,13 @@ With glistN
 .CenterText = True
 .VerticalCenterText = True
 .Text = mCaptext
-.backcolor = rgb(200, 120, 60)
+.BackColor = rgb(200, 120, 60)
 Set .Font = ff
 .forecolor = Callback.Controls(1).forecolor
 shadowcol = -.forecolor
 .dcolor = Callback.Controls(1).dcolor
 
-.enabled = True
+.Enabled = True
 .ListindexPrivateUse = 0
 .ShowMe
 End With
@@ -124,9 +124,9 @@ On Error GoTo ex1
     End If
     
     If Not glistN.BlinkON Then
-      If Not glistN.backcolor = mycolor(dimm1) Then
+      If Not glistN.BackColor = mycolor(dimm1) Then
         If Not glistN.BackStyle = 0 Then
-            glistN.backcolor = mycolor(dimm1)
+            glistN.BackColor = mycolor(dimm1)
             glistN.ShowMe
         End If
         End If
@@ -145,7 +145,7 @@ End If
 Callback.Controls(Callback.LastActive).SetFocus
 Exit Sub
 End If
-If Me.enabled Then
+If Me.Enabled Then
 If glistN.BackStyle = 1 Then
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".GotFocus(" + Str(mIndex) + ")"
@@ -153,7 +153,7 @@ If glistN.BackStyle = 1 Then
       Callback.Callback mesCtrlName + ".GotFocus()"
       End If
 End If
-glistN.backcolor = mycolor(dimm1)
+glistN.BackColor = mycolor(dimm1)
 glistN.ShowMe
 'OneClick
 End If
@@ -161,7 +161,7 @@ End Sub
 
 Private Sub glistN_CheckLostFocus()
 
-If Me.enabled Then
+If Me.Enabled Then
 Callback.LastActive = ctrlName
 If glistN.BackStyle = 1 Then
   If mIndex >= 0 Then
@@ -170,7 +170,7 @@ If glistN.BackStyle = 1 Then
       Callback.Callback mesCtrlName + ".LostFocus()"
       End If
 End If
-If Not mlocked Then glistN.backcolor = mycolor(dimm2)
+If Not mlocked Then glistN.BackColor = mycolor(dimm2)
 glistN.PanPos = 0
 glistN.ShowMe
 End If
@@ -188,7 +188,6 @@ End Sub
 Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 glistN.ShowMe
 End Sub
-
 
 Private Sub glistN_PanLeftRight(direction As Boolean)
 
@@ -256,13 +255,13 @@ End Property
 Friend Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
-Public Property Get enabled() As Long
-enabled = glistN.enabled
+Public Property Get Enabled() As Long
+Enabled = glistN.Enabled
 End Property
 
-Public Property Let enabled(ByVal RHS As Long)
+Public Property Let Enabled(ByVal RHS As Long)
 If glistN Is Nothing Then Exit Property
-glistN.enabled = RHS
+glistN.Enabled = RHS
 End Property
 Public Property Get WrapText() As Long
 WrapText = glistN.WrapText
@@ -295,7 +294,7 @@ Public Sub Shutdown()
 On Error Resume Next
 If Not glistN Is Nothing Then
 glistN.Shutdown
-glistN.enabled = False
+glistN.Enabled = False
 End If
 End Sub
 Public Sub FontAttr(ThisFontName, Optional ThisMode = -1, Optional ThisBold = True)
@@ -312,12 +311,12 @@ End Sub
 Public Sub Curve(RHS As Single)
 glistN.Curve False, RHS
 End Sub
-Public Property Get top() As Variant
+Public Property Get Top() As Variant
 'top = Callback.Controls(ctrlName).top
-top = glistN.TopTwips
+Top = glistN.TopTwips
 End Property
-Public Property Let top(ByVal RHS As Variant)
-Callback.Controls(ctrlName).top = RHS
+Public Property Let Top(ByVal RHS As Variant)
+Callback.Controls(ctrlName).Top = RHS
 End Property
 Public Property Get Left() As Variant
 Left = Callback.Controls(ctrlName).Left
@@ -337,9 +336,9 @@ End Property
 
 Public Property Let locked(ByVal vNewValue As Variant)
 mlocked = vNewValue
-glistN.dropkey = mlocked
+glistN.DropKey = mlocked
 glistN.TabStop = Not mlocked
-glistN.backcolor = mycolor(dimm2)
+glistN.BackColor = mycolor(dimm2)
 glistN.PanPos = 0
 glistN.ShowMe
 End Property
@@ -374,7 +373,7 @@ Sub TransparentOff()
 On Error Resume Next
 If Not glistN Is Nothing Then
 glistN.BackStyle = 0
-glistN.backcolor = mycolor(dimm2)
+glistN.BackColor = mycolor(dimm2)
 glistN.PanPos = 0
 glistN.ShowMe
 Callback.RefreshList = Callback.RefreshList - 1

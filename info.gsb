@@ -4816,8 +4816,9 @@ With HelpPad, "visible" as helpshow, "ShowAlways", True, "Text" as HelpText$, "e
 With HelpPad, "NoCenterLineEdit", True, "SetM2000", True, "EditDoc" as HelpEdit ' predifined for word picking
 \\ we want HelpPad not shown from beginning, so we disable it
 HelpEnabled=false
-
-With Pad, "NoWrap", True, "SetM2000", True, "SelLength" as SelLength, "HighlightParagraph", True
+With Pad, "NoWrap" as NoWrap
+NoWrap=True
+With Pad,  "SetM2000", True, "SelLength" as SelLength, "HighlightParagraph", True
 
 \\ Set labels for menu's headers. and thecolor for check mark/ disable items,  in menus which we have those
 With File1,"label","File", "Hover", true
@@ -4883,7 +4884,7 @@ For This {
 	Method Edit1, mi$,""
 	Method Edit1, mi$,"Show Hidden Characters", true, true, acc:="F10"
 	Method Edit1, mi$,"Free Style Edit", true, true, acc:="F9", shift:=True
-	
+	Method Edit1, mi$,"Wrap Text", true, true, acc:="F1"
 
 	
 	With Edit1, "MenuGroup","This"
@@ -4913,7 +4914,7 @@ For This {
 \\ always Def make local variables. We can set a type before for all non typed names after
 \\ or we can use as type and give a first value (not an expression here).
 \\ by defailt false is the va;ue for boolean type, so the =false not needed
-Def boolean LoadState=false,  old_status=false, lastword$
+Def boolean LoadState=false,  old_status=false, lastword$, old_wrap=true
 
  \\ We need some properties with inexes, so we make these as arrays 
  \\ They look as arrays but they are objects (PropReference)
@@ -4952,13 +4953,12 @@ if doc.par(aLL$)=0 then
 	}
 Else
 	Function GetHelp$(&word$, findit) {
-		Local Nword$=ucase$(word$)
-		
+		Local Nword$=ucase$(word$)	
 		select case Nword$
 		case "ΓΕΝΙΚΑ"
-		Nword$="ΟΛΑ"
+			Nword$="ΟΛΑ"
 		case "GENERAL"
-		Nword$="ALL"
+			Nword$="ALL"
 		End Select
 		if findit then
 			find aLL$, "\"+Nword$, where
@@ -4968,7 +4968,7 @@ Else
 		Read Where1
 		if Where1>0 then
 			Read  There : drop
-			Ret$=mid$( Paragraph$(aLL$, There), 2)
+			Ret$=mid$(Paragraph$(aLL$, There), 2)
 			Word$=leftpart$(Ret$,"!")
 			lbl=Val(Rightpart$(Ret$,"!"))
 			info=Val(Rightpart$(Ret$,"-"))
@@ -4987,7 +4987,7 @@ End If
 Function FindWord() {
 	read new word$, find=false
 	Local hlp$=GetHelp$(&Word$, find)
-	If len(hlp$) Else Exit
+	If len(hlp$) else exit
 	lastword$=word$
 	HelpText$=word$+nl$+hlp$
 	If not helpview Then helpview=true : helpenabled=true
@@ -5020,24 +5020,22 @@ Function NotePad.Unload(New &Ok) {
 	End If
 }
 \\ we can change this in code if we change the font of title (because a new TitleHeight  prodced), or if we remove the header (make it invinsible)
-def onetime=true, third, free
+def third, free
 third=1000
 With NotePad, "Width" as NP.Width, "Height" as NP.Height, "TitleHeight" as tHeight
+Method File1,"move", twipsX*3, tHeight,  twipsX*80, tHeight
+Method Edit1,"move", twipsX*3+twipsX*80, tHeight,  twipsX*80, tHeight
+Method Run1,"move",  twipsX*3+twipsX*160, tHeight,  twipsX*80, tHeight
+Method Help1,"move", twipsX*3+twipsX*240, tHeight,  twipsX*80, tHeight
+Method Inform1,"move", twipsX*3+twipsX*320, tHeight,  twipsX*160, tHeight
+
+
 Function Notepad.Resize {
 	Local FromHelp=false
 	if match("N") then Read FromHelp
 	Layer NotePad { Cls Color(255, 160, 0) ,0}
-	
 	local tHeight1=theight*2
 	Local free=NP.Height-tHeight1-twipsX*3
-	if onetime then
-		Method File1,"move", twipsX*3, tHeight,  twipsX*80, tHeight
-		Method Edit1,"move", twipsX*3+twipsX*80, tHeight,  twipsX*80, tHeight
-		Method Run1,"move",  twipsX*3+twipsX*160, tHeight,  twipsX*80, tHeight
-		Method Help1,"move", twipsX*3+twipsX*240, tHeight,  twipsX*80, tHeight
-		Method Inform1,"move", twipsX*3+twipsX*320, tHeight,  twipsX*160, tHeight
-		onetime=false
-	End if
 	local oldhelpshow=helpshow
 	If NP.height>1800 Then {
 		If helpview Then
@@ -5047,35 +5045,27 @@ Function Notepad.Resize {
 			if handle1.locked then handle1.locked=false
 			local third=handle1.top-tHeight1
 			if third<twipsX*10 then third=twipsX*10
-			if free<third then
-			third=free/3
-			end if
+			if free<third then third=free/3
 			Method Pad,"move", twipsX*3, tHeight1,  NP.Width-twipsX*6, third
 			third+=tHeight1
 			Method Handle1, "move",twipsX*3, third,  NP.Width-twipsX*6,twipsX*3
 			Method HelpPad,"move", twipsX*3, third+twipsX*3,  NP.Width-twipsX*6,free-third-twipsY*3+tHeight1		
 			handle1.visible=true
 			helpshow=true
+			Method HelpPad, "resize"
 		Else
 			helpshow=false
 			handle1.visible=false
 			Method Pad,"move", twipsX*3, tHeight1,  NP.Width-twipsX*6, NP.Height-tHeight1-twipsY*3
 		End If
-		With Pad, "NoWrap" as NoWrap
-		If  Not NoWrap or not FromHelp Then
-			Method Pad,"Resize"
-		Else
-			//if helpshow then if not oldhelpshow then
-			Method Pad,"Resize"
-		End If
-		Method HelpPad, "resize"
+		Method Pad,"Resize"
 	}
 }
 
 ms$={Find Topic
 Use ALL to get a list of all topics}
-Function HelpPad.click1 {
-	Method  HelpPad, "EditTextView", false
+Function HelpPad.click() {
+	Method  HelpPad, "EditTextView", false:
 	what$=lastword$
 	If ask(ms$,,,,, what$)=1 Then Read New what$ :Call Local FindWord(what$, true)
 }
@@ -5121,9 +5111,12 @@ Function Pad.Inform {
 	Read New L, P
 	If old_status<>par_status Then
 	With Inform1, "Caption",If$(par_status->"Hidden", "No Hidden")
-	old_status=par_status
+		old_status=par_status
+	else.if old_wrap <> NoWrap then
+		With Inform1, "Caption",If$(NoWrap-> "No Wrap", "Wrap Text")
+		old_wrap=NoWrap
 	Else
-	With Inform1, "Caption", format$("{0}-{1}", L,P)
+		With Inform1, "Caption", format$("{0}-{1}", L,P)
 	End If
 	\\ set focus to Pad - refresh if not scheduled
 	Method Pad,"Show"
@@ -5145,13 +5138,20 @@ Function ChangeHidden {
 	Method Pad,"PressKey", 121, 0   ' 121=vbkeyF10
 	old_status=par_status
 	With Inform1, "Caption",If$(Edit1.Selected(10)->"Hidden", "No Hidden")
-	Method Pad,"Show"      
+	Method Pad,"Show"
 }
 Function ChangeStyle {
 	Edit1.Selected(11)=not style_status
 	Method Pad,"PressKey", 120, 1
 	\\ no need to refresh, the effect is internal, and we see the cursor
 	\\ to leave the center line if free style used, not only in top or bottom page
+}
+Function ChangeWrap {
+	old_wrap~
+	Edit1.Selected(12)=not old_wrap
+	NoWrap=old_wrap
+	With Inform1, "Caption",If$(NoWrap-> "No Wrap", "Wrap Text")
+'	Method Pad,"Show"
 }
 
 \\ Befor Edit1 opened
@@ -5162,6 +5162,8 @@ Function Edit1.OpenMenu {
 	Edit1.Enabled(1)=X
 	Edit1.Selected(10)= par_Status
 	Edit1.Selected(11)= style_status
+	Edit1.Selected(12)=Not NoWrap
+	
 }
 \\ We can check in checkboxes and radiobutton withou closing the menu
 \\ if we click on checks - (not on names)
@@ -5177,6 +5179,8 @@ Function Edit1.MenuChecked {
 		Call Local ChangeHidden()
 	Else.If RadioIndex=11 Then
 		Call Local ChangeStyle()
+	Else.If RadioIndex=12 Then
+		Call Local ChangeWrap()
 	Else
 		With Inform1, "Caption","??"
 		Method Pad,"Show"	
@@ -5208,6 +5212,8 @@ Function Edit1.DblClick {
 		Call Local ChangeHidden()
 	Case 11
 		Call Local ChangeStyle()
+	Case 12
+		Call Local ChangeWrap()		
 	End Select
 }
 
@@ -5383,11 +5389,11 @@ Function Help1.DblClick {
 		A=Ask(info$,Title$,"","")
 	}
 	Case "FIND"
-		Call Local HelpPad.click1()
+		Call Local HelpPad.click()
 	Case "OPEN"
 		Method  HelpPad, "EditTextView", True: Call Local Notepad.Resize(true)
 	Case "CLOSE"
-		Method  HelpPad, "EditTextView", false : HelpView=false: Call Local Notepad.Resize(true)
+		Method  HelpPad, "EditTextView", false : HelpView=false: handle1.visible=false: Call Local Notepad.Resize(true)
 	End Select
 	
 }
@@ -13836,14 +13842,17 @@ Function Global Local1(new Feed$) {
 Module CheckIt {
       Declare form1 form
       Declare textbox1 textbox form form1
-      Declare buttonInc Button form form1
-      Declare buttonDec Button form form1
+      Declare frame1 Image form form1      
+      Declare buttonInc Button form form1 Image frame1
+      Declare buttonDec Button form form1 Image frame1
       Method textbox1, "move", 2000,2000,4000,600
-      Method buttonInc, "move", 2000,3000,2000,600
-      Method buttonDec, "move", 4000,3000,2000,600
+      Method frame1,  "move", 2000, 3000,4000,600
+      Method buttonInc, "move", 0,0,2000,600
+      Method buttonDec, "move", 2000,0,2000,600
       With textbox1,"vartext" as textbox1.value$, "Prompt", "Value:" ', "ShowAlways", True
       With buttonInc,"Caption","Increment" 
       With buttonDec,"Caption","Decrement","Locked", True
+      with frame1, "visible" as frame1.visible, "tabstop", false
       textbox1.value$="0"
       oldval1=True
       oldval2=False
@@ -13879,6 +13888,9 @@ Module CheckIt {
                 if  not finishEnter then Call Local TextBox1.Disable()
                 textbox1.value$=str$(val(textbox1.value$)-1, "")     
                 if val(textbox1.value$)=0 then Call Local TextBox1.Enable()
+      }
+      function form1.click {
+          frame1.visible=not frame1.visible
       }
       Call Local controlIncDec(textBox1.Value$)
       Method form1, "show", 1
@@ -34562,5 +34574,113 @@ Report{
 While not inkey$="" : wait 10: End While
 Push key$: Drop
 Cls,0
+}
+MODULE VER11 {declare form1 form
+declare image1 Image form form1
+METHOD image1,"MOVE", 1000,1000, 6000, 3300
+With image1,"KeyEvent", true, "Enabled" as enabled, "tabstop", true, "showcaret" as caret, "default", true
+enabled=true
+caret=true
+layer image1 {
+	form 20, 10
+	CLS 4,0 : PEN 15
+	DOUBLE
+	REPORT 2, "Example"
+	NORMAL
+	CLS  #336633, 2
+	REFRESH 10
+}
+function form1.click {
+	enabled= not enabled
+	if enabled then method image1, "GetFocus"
+}
+bufall=stack
+buf$=""
+function getline$() {
+	if stack.size=0 then exit
+	shift 1,-stack.size
+	exp$=""
+	while not empty
+	exp$+=letter$
+	end while
+	=exp$
+}
+function image1.lostfocus {
+	layer image1 {
+		cursor 0, row:print over $(0), getline$(buf$, ! stack(bufall))
+	}
+}
+function image1.gotfocus {
+	layer image1 {
+		cursor 0, row:print over  $(0),  buf$;
+	}
+}
+function image1.keydown {
+	read new &k, &s
+	if s<>2 then exit
+	if k=86  then
+		local clip$=clipboard$
+		if clip$<>"" then keyboard clip$ : call local image1.keypress()
+		k=0:s=0
+	else.if k=67 then
+		local clip$=getline$(buf$, ! stack(bufall))
+		if clip$<>"" then clipboard clip$
+		k=0:s=0
+	end if
+}
+Def CheckSurrogateLead(w as integer)=uint(w)>0xD7FF and uint(w)<0xDC00
+// HERE WE USE THE TAIL WHEN WE DELETE CHARS (SO WE CAN DELETE DOUBLE WORD CHARACTERS)
+Def CheckSurrogateTrail(w as integer)=uint(w)>0xDBFF and uint(w)<0xE000
+buf1$=""
+function image1.keypress {
+	if not caret then caret=true
+	layer image1 {
+		LOCAL a$, onemore as boolean
+		a$=KEY$
+		DO
+			if a$=chr$(8) then
+				onemore=false
+				if len(buf$)>0 then
+					local w=chrcode(right$(buf$,1))
+					do
+						onemore=false
+						if CheckSurrogateTrail(w) then onemore=true
+						buf$=left$(buf$, len(buf$)-1)
+					until not onemore or len(buf$)=0
+					end if
+				if len(buf$)=0 and len(bufall)>0 then
+					stack bufall {read buf$}
+					if onemore then
+						buf$=left$(buf$, len(buf$)-1)
+					end if
+					cursor 0, row:print over $(0),buf$;
+				else		
+					if pos>0 then cursor 0, row:print over $(0),buf$;
+				end if
+			else.if len.disp(a$)=0  and chrcode(a$)>32 or chrcode(a$)<0 then
+				// THIS IS FOR COMBINING_DIACRITICAL_MARKS LIKE CHRCODE$(0x301)
+				// COMBINING ACUTE ACCENT
+				// hold Alt press + 3 0 1 release Alt
+				buf$+=a$
+				cursor 0, row:print over  $(0),  buf$;
+			else.iF a$=CHR$(13) then
+				buf$=getline$(buf$, !bufall)
+				layer {print buf$:refresh}
+				cursor 0, row:print over $(0),buf$
+				print: buf$=""
+			else.if a$>=" " then
+				if len.disp(buf$)=width-1 then
+					stack bufall {push buf$}:buf$="": cursor 0, row:print over
+				end if
+				print a$; : buf$+=a$
+			end if
+			a$=KEY$
+		UNTIL a$=""
+		refresh
+	}
+}
+METHOD form1 "SHOW", 1
+
+declare form1 NOTHING
 }
 UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}

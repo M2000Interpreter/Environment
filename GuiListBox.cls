@@ -283,16 +283,16 @@ Callback.RealHover = ctrlName
 If Not locked Then
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 If Not trans Then
-    If enabled Then
+    If Enabled Then
         glistN.forecolor = black
-        glistN.backcolor = white
+        glistN.BackColor = white
         glistN.NoCaretShow = False
         If Not glistN.EditFlag Then
             glistN.PanPos = 0
         End If
     Else
         glistN.forecolor = white
-        glistN.backcolor = dimm1
+        glistN.BackColor = dimm1
         glistN.NoCaretShow = True
     End If
 End If
@@ -307,7 +307,7 @@ Public Sub Retired()
 If Not trans Then
 glistN.EditFlag = False
 glistN.forecolor = white
-glistN.backcolor = dimm2
+glistN.BackColor = dimm2
 glistN.NoCaretShow = True: glistN.PanPos = 0: glistN.ShowMe
 End If
 End Sub
@@ -328,7 +328,7 @@ End If
 If Not trans Then
 If glistN.BackStyle <> 1 Then
 glistN.forecolor = white
-glistN.backcolor = dimm2
+glistN.BackColor = dimm2
 End If
 glistN.PanPos = 0
 glistN.PrepareToShow
@@ -366,14 +366,14 @@ With glistN
 .Vertical = True
 .VerticalCenterText = True
 .Text = mListText
-.backcolor = dimm2
+.BackColor = dimm2
 Set .Font = ff
 .forecolor = white
 .dcolor = Callback.Controls(1).dcolor
 .NoCaretShow = False
-.enabled = True
+.Enabled = True
 .StickBar = True
-enabled = True
+Enabled = True
 .ShowMe
 End With
 End Sub
@@ -396,11 +396,11 @@ Friend Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Get locked() As Boolean
-locked = Not glistN.enabled
+locked = Not glistN.Enabled
 End Property
 
 Public Property Let locked(ByVal RHS As Boolean)
-glistN.enabled = Not RHS
+glistN.Enabled = Not RHS
 End Property
 
 Private Sub glistN_ExposeListcount(cListCount As Long)
@@ -603,11 +603,11 @@ Public Property Let ListText(ByVal vNewValue As Variant)
 mListText = vNewValue
 
 End Property
-Public Property Get enabled() As Boolean
-enabled = mEnabled
+Public Property Get Enabled() As Boolean
+Enabled = mEnabled
 End Property
 
-Public Property Let enabled(ByVal RHS As Boolean)
+Public Property Let Enabled(ByVal RHS As Boolean)
 mEnabled = RHS
 End Property
 
@@ -800,8 +800,8 @@ Public Sub Sort(Optional SkipChar As Long = 1, Optional SortType, Optional Colum
     glistN.SkipChars = SkipChar
     If IsMissing(Columns) Then Columns = 1
     Dim oEnabled As Boolean
-    oEnabled = glistN.enabled
-    glistN.enabled = False
+    oEnabled = glistN.Enabled
+    glistN.Enabled = False
     If Not glistN.JoinLinesCount > 0 Then
         glistN.QuickSortExtended CLng(Columns), CLng(LowLim), CLng(HighLim)
     Else
@@ -822,7 +822,7 @@ Public Sub Sort(Optional SkipChar As Long = 1, Optional SortType, Optional Colum
             glistN.Expand CLng(LowLim), CLng(HighLim), many
         End If
     End If
-    glistN.enabled = oEnabled
+    glistN.Enabled = oEnabled
     If oEnabled Then glistN.ListIndex = glistN.ListIndex: glistN.PrepareToShow 2
     
 End Sub
@@ -925,7 +925,7 @@ Public Property Let ShowAlways(ByVal vNewValue As Variant)
 mStayOpen = CBool(vNewValue)
 If mStayOpen Then
 glistN.forecolor = black ' rgb(0, 0, 0)
-glistN.backcolor = white ' rgb(255, 255, 255)
+glistN.BackColor = white ' rgb(255, 255, 255)
 End If
 End Property
 Public Property Get Find(ByVal FindThis$) As Variant
@@ -1791,3 +1791,96 @@ Property Let TitleBackColor(ByVal RHS As Long)
         End If
     End If
 End Property
+Private Sub glistN_AddSelStart(val As Long, shift As Integer)
+Dim w As Long, a$, l As Long, b$
+Const sp1 = ",+-*/=<>^!.&[]{}()^;""" + "'!"
+Dim sp As String: sp = " " + ChrW(9) + ChrW(160)
+Dim sp2 As String: sp2 = sp1 + sp
+If glistN.SelStart > 0 Then
+If Columns > 1 Then
+a$ = Mid$(listAtColumn(ListIndex, Column), glistN.SelStart)
+Else
+a$ = Mid$(list(ListIndex), glistN.SelStart)
+End If
+    If Len(a$) > 0 Then
+        w = AscW(a$)
+        If (shift And 2) = 2 Then
+            l = Len(a$)
+            val = 1
+            If l < 2 Then Exit Sub
+                b$ = Mid$(a$, val, 1)
+                If InStr(sp1, b$) = 0 Then
+                Do While val < l And InStr(sp, b$) > 0
+                    val = val + 1
+                    b$ = Mid$(a$, val, 1)
+                Loop
+                If InStr(sp1, b$) = 0 Then
+                    If val = 1 Then
+                        Do While val < l And InStr(sp2, b$) = 0
+                            val = val + 1
+                            b$ = Mid$(a$, val, 1)
+                        Loop
+                        If InStr(sp2, b$) > 0 Then val = val - 1
+                    Else
+                        If val < l Then val = val - 1
+                    End If
+                Else
+                    val = val - 1
+                End If
+            End If
+        ElseIf w > -10241 And w < -9216 Then
+            val = 2
+        End If
+    End If
+End If
+End Sub
+
+Private Sub glistN_SubSelStart(val As Long, shift As Integer)
+Dim w As Long, a$, l As Long, b$
+Const sp1 = ",+-*/=<>^!.&[]{}()^;""" + "'!"
+Dim sp As String: sp = " " + ChrW(9) + ChrW(160)
+Dim sp2 As String: sp2 = sp1 + sp
+Dim vartext As String
+If glistN.SelStart < 2 Then Exit Sub
+If Columns > 1 Then
+vartext = listAtColumn(ListIndex, Column)
+Else
+vartext = list(ListIndex)
+End If
+a$ = Mid$(vartext, glistN.SelStart - 1, 1)
+If Len(a$) > 0 Then
+w = AscW(a$)
+        If (shift And 2) = 2 Then
+            a$ = Mid$(vartext, 1, glistN.SelStart - 1)
+            l = Len(a$)
+            val = l
+            If val = 1 Then Exit Sub
+            b$ = Mid$(a$, l, 1)
+            If InStr(sp1, b$) = 0 Then
+                Do While l > 1 And InStr(sp, b$) > 0
+                    l = l - 1
+                    b$ = Mid$(a$, l, 1)
+                Loop
+                If InStr(sp1, b$) = 0 Then
+                    If l = val Then
+                        Do While l > 1 And InStr(sp2, b$) = 0
+                            l = l - 1
+                            b$ = Mid$(a$, l, 1)
+                        Loop
+                        If l = 1 And Not InStr(sp2, b$) > 0 Then l = l - 1
+                        
+                    Else
+                     If InStr(sp2, b$) > 0 Then l = l - 1
+                    End If
+                End If
+            Else
+                l = l - 1
+            End If
+            val = val - l
+        ElseIf w > -9217 And w < -8192 Then
+            val = 2
+        End If
+
+End If
+End Sub
+
