@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 11 active-X
-More Events for Gui Controls.
+Version 11 Revision 1 active-X
+Restore form's move to a negative coordinates montior.(as in 10 revision 55).
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

@@ -130,7 +130,7 @@ Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpD
 Private Declare Function DestroyCaret Lib "user32" () As Long
 Private Declare Function CreateCaret Lib "user32" (ByVal hWnd As Long, ByVal hBitmap As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
 Private Declare Function ShowCaret Lib "user32" (ByVal hWnd As Long) As Long
-Private Declare Function SetCaretPos Lib "user32" (ByVal x As Long, ByVal y As Long) As Long
+Private Declare Function SetCaretPos Lib "user32" (ByVal X As Long, ByVal Y As Long) As Long
 Private Declare Function HideCaret Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hdc As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
 Private Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal hdc As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
@@ -214,9 +214,9 @@ Event SelectedMultiAdd(item As Long)
 Event SelectedMultiSub(item As Long)
 Event Selected2(item As Long)
 Event softSelected(item As Long)
-Event ValidMove(x As Single, y As Single)
+Event ValidMove(X As Single, Y As Single)
 Event Maybelanguage()
-Event MouseUp(x As Single, y As Single)
+Event MouseUp(X As Single, Y As Single)
 Event SpecialColor(RGBcolor As Long)
 Event RemoveOne(that As String)
 Event PushMark2Undo(that As String)
@@ -234,7 +234,7 @@ Event ScrollMove(item As Long)
 Event RefreshDesktop()
 Event PrepareContainer()
 Event NeedDoEvents()
-Event OutPopUp(x As Single, y As Single, myButton As Integer)
+Event OutPopUp(X As Single, Y As Single, myButton As Integer)
 Event SplitLine()
 Event LineUp()
 Event LineDown()
@@ -255,7 +255,7 @@ Event ReadListItem(item As Long, content As String)
 Event ChangeListItem(item As Long, content As String)
 Event HeaderSelected(Button As Integer)
 Event BlockCaret(item As Long, blockme As Boolean, skipme As Boolean)
-Event ScrollSelected(item As Long, y As Long)
+Event ScrollSelected(item As Long, Y As Long)
 Event MenuChecked(item As Long)
 Event PromptLine(ThatLine As Long)
 Event PanLeftRight(direction As Boolean)
@@ -269,9 +269,9 @@ Event Find(Key As String, where As Long, skip As Boolean)
 Event ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Event ExposeRectCol(ByVal item As Long, ByVal Col As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Event ExposeListcount(cListCount As Long)
-Event ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Event ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 Event GetRealX1(mHdc As Long, ByVal ExtSelStart As Long, ByVal that$, retvalue As Long, ok As Boolean)
-Event MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Event MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 Event SpinnerValue(ThatValue As Long)
 Event RegisterGlist(this As gList)
 Event UnregisterGlist()
@@ -393,8 +393,8 @@ Const WM_KEYFIRST = &H100
 Const WM_CHAR = &H102
 Const WM_KEYLAST = &H108
 Private Type POINTAPI
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
 End Type
 Private Type Msg
     hWnd As Long
@@ -2154,23 +2154,23 @@ If myEnabled Then SoftExitFocus
 havefocus = False
 End Sub
 
-Private Sub UserControl_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub UserControl_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 ' cut area
 Dim YYT As Long, oldbutton As Integer
 On Error GoTo there
 If FloatList And UseHeaderOnly Then
         missMouseClick = False
-        FloatListMe useFloatList, x, y
+        FloatListMe useFloatList, X, Y
         Exit Sub
 End If
 If DropKey Then Exit Sub
 
 If missMouseClick Then Exit Sub
 If mousepointer = vbSizeWE And (Button And 3) > 0 And Not useFloatList And Not UseHeaderOnly Then
-    If x < UserControl.Width - scrTwips Then
+    If X < UserControl.Width - scrTwips Then
         If (shift And 3) = 1 Or (Button And 2) = 2 Then
             YYT = mParts(AdjustColumn)
-            mParts(AdjustColumn) = CLng(x - scrTwips) \ scrTwips - AdjustColumnSum
+            mParts(AdjustColumn) = CLng(X - scrTwips) \ scrTwips - AdjustColumnSum
             If mTabs > AdjustColumn Then
                 If mParts(AdjustColumn + 1) + (YYT - mParts(AdjustColumn)) > 0 Then
                     mParts(AdjustColumn + 1) = mParts(AdjustColumn + 1) + (YYT - mParts(AdjustColumn))
@@ -2181,7 +2181,7 @@ If mousepointer = vbSizeWE And (Button And 3) > 0 And Not useFloatList And Not U
             YYT = 0
         Else
         
-        mParts(AdjustColumn) = (CLng(x - scrTwips) \ scrTwips - AdjustColumnSum)
+        mParts(AdjustColumn) = (CLng(X - scrTwips) \ scrTwips - AdjustColumnSum)
         End If
         TwipsCurTab = 0
         Dim k As Integer
@@ -2195,23 +2195,23 @@ If mousepointer = vbSizeWE And (Button And 3) > 0 And Not useFloatList And Not U
     PrepareToShow 2
 Exit Sub
 End If
-nowX = x
-nowY = y
+nowX = X
+nowY = Y
 If (Button And 2) = 2 And (Not (mousepointer = vbSizeWE And Not useFloatList And Not UseHeaderOnly)) Then Exit Sub
 If myt = 0 Then Exit Sub
 FreeMouse = True
 
 If mHeadlineHeightTwips = 0 Then
-YYT = y \ myt
+YYT = Y \ myt
 Else
-    If y < mHeadlineHeightTwips Then
-        If y < 0 Then
+    If Y < mHeadlineHeightTwips Then
+        If Y < 0 Then
         YYT = -1
         Else
         YYT = 0
         End If
     Else
-    YYT = (y - mHeadlineHeightTwips) \ myt + 1
+    YYT = (Y - mHeadlineHeightTwips) \ myt + 1
     End If
 End If
 If YYT < 0 Then YYT = 0
@@ -2223,29 +2223,29 @@ If mHeadline <> "" And Timer2.Enabled = False Then
     If YYT = 0 Then ' we move in mHeadline
         ' -1 is mHeadline
         ' headline listen clicks if  list is disabled...
-        RaiseEvent ExposeItemMouseMove(Button, -1, CLng(x / scrTwips), CLng(y / scrTwips))
-        If (x < Width - mPreserveNpixelsHeaderRight) Or (mPreserveNpixelsHeaderRight = 0) Then RaiseEvent HeaderSelected(Button)
+        RaiseEvent ExposeItemMouseMove(Button, -1, CLng(X / scrTwips), CLng(Y / scrTwips))
+        If (X < Width - mPreserveNpixelsHeaderRight) Or (mPreserveNpixelsHeaderRight = 0) Then RaiseEvent HeaderSelected(Button)
         If oldbutton <> Button Then
         Button = 0
         Exit Sub
         End If
     ElseIf myEnabled Then
        If Not Shape1.Visible Then
-        RaiseEvent ExposeItemMouseMove(Button, topitem - TopRows + YYT - 1, CLng(x / scrTwips), CLng(y - (YYT - 1) * myt - mHeadlineHeightTwips) / scrTwips)
+        RaiseEvent ExposeItemMouseMove(Button, topitem - TopRows + YYT - 1, CLng(X / scrTwips), CLng(Y - (YYT - 1) * myt - mHeadlineHeightTwips) / scrTwips)
         End If
     End If
 ElseIf myEnabled Then
-    RaiseEvent ExposeItemMouseMove(Button, topitem - TopRows + YYT, CLng(x / scrTwips), CLng((y - YYT * myt) / scrTwips))
+    RaiseEvent ExposeItemMouseMove(Button, topitem - TopRows + YYT, CLng(X / scrTwips), CLng((Y - YYT * myt) / scrTwips))
 End If
 If oldbutton <> Button Then Exit Sub
 End If
 YYT = YYT + (mHeadline <> "")
-lastX = x
-LastY = y
+lastX = X
+LastY = Y
 
-If (x > Width - barwidth) And BarVisible And EnabledBar And Button = 1 Then
+If (X > Width - barwidth) And BarVisible And EnabledBar And Button = 1 Then
 If Vertical Then
-GetOpenValue = valuepoint - y + mHeadlineHeightTwips
+GetOpenValue = valuepoint - Y + mHeadlineHeightTwips
 Else
 'GetOpenValue = valuepoint - x ' NOT USED HERE
 End If
@@ -2254,11 +2254,11 @@ FreeMouse = False
 End If
 Timer3.Enabled = False
 Else
-cX = x
-If Not dr Then lY = x
+cX = X
+If Not dr Then lY = X
 dr = True
 
-If cY = y \ myt Then Timer3.Enabled = False: cY = y \ myt
+If cY = Y \ myt Then Timer3.Enabled = False: cY = Y \ myt
 End If
 If MarkNext = 4 Then
     RaiseEvent MarkDestroyAny
@@ -2266,21 +2266,21 @@ End If
 there:
 End Sub
 
-Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 On Error GoTo there
 If FloatList And UseHeaderOnly And Button <> 0 Then
         missMouseClick = False
-        FloatListMe useFloatList, x, y
+        FloatListMe useFloatList, X, Y
         Exit Sub
 End If
 If DropKey Then Exit Sub
 Dim osel As Long, tListcount As Long, YYT As Long, oldbutton As Integer, k As Integer, sum As Long
 If missMouseClick Then Exit Sub
-If Abs(PX - x) <= 60 And Abs(PY - y) <= 60 Then Exit Sub
-PX = x
-PY = y
+If Abs(PX - X) <= 60 And Abs(PY - Y) <= 60 Then Exit Sub
+PX = X
+PY = Y
 
-RaiseEvent MouseMove(Button, shift, x, y)
+RaiseEvent MouseMove(Button, shift, X, Y)
 If myt = 0 Or Not myEnabled Then Exit Sub
 If (Button And 2) = 2 And (Not (mousepointer = vbSizeWE And Not useFloatList)) Then Exit Sub
 
@@ -2293,7 +2293,7 @@ If Not FreeMouse Then Exit Sub
 If Button = 0 Then
     If Not nopointerchange Then
         If mTabs > 1 And AdjustColumns And Not useFloatList Then
-            osel = CLng(x)
+            osel = CLng(X)
             For k = 1 To mTabs
                 sum = sum + mParts(k)
             Next k
@@ -2317,10 +2317,10 @@ ok_i_found:
     End If
 End If
 If mousepointer = vbSizeWE And (Button And 3) > 0 And Not useFloatList And Not UseHeaderOnly Then
-    If x < UserControl.Width - scrTwips Then
+    If X < UserControl.Width - scrTwips Then
             If (shift And 3) = 1 Or (Button And 2) = 2 Then
             YYT = mParts(AdjustColumn)
-            mParts(AdjustColumn) = CLng(x - scrTwips) \ scrTwips - AdjustColumnSum
+            mParts(AdjustColumn) = CLng(X - scrTwips) \ scrTwips - AdjustColumnSum
             If mTabs > AdjustColumn Then
                 If mParts(AdjustColumn + 1) + (YYT - mParts(AdjustColumn)) > 0 Then
                     mParts(AdjustColumn + 1) = mParts(AdjustColumn + 1) + (YYT - mParts(AdjustColumn))
@@ -2330,7 +2330,7 @@ If mousepointer = vbSizeWE And (Button And 3) > 0 And Not useFloatList And Not U
             End If
             YYT = 0
             Else
-        mParts(AdjustColumn) = (CLng(x - scrTwips) \ scrTwips - AdjustColumnSum)
+        mParts(AdjustColumn) = (CLng(X - scrTwips) \ scrTwips - AdjustColumnSum)
         End If
         TwipsCurTab = 0
         For k = 1 To mCurTab - 1
@@ -2344,34 +2344,34 @@ If mousepointer = vbSizeWE And (Button And 3) > 0 And Not useFloatList And Not U
 Exit Sub
 End If
 
-If (x > Width - barwidth) And tListcount > lines + 1 And Not BarVisible Then
+If (X > Width - barwidth) And tListcount > lines + 1 And Not BarVisible Then
     Hidebar = True: BarVisible = m_showbar Or AutoHide Or MultiLineEditBox
-ElseIf (x < Width - barwidth) And Button = 0 And BarVisible And (StickBar Or AutoHide) Then
+ElseIf (X < Width - barwidth) And Button = 0 And BarVisible And (StickBar Or AutoHide) Then
     Hidebar = False
     BarVisible = False
 End If
 If OurDraw Then
-    barMouseMove Button, shift, x, y
+    barMouseMove Button, shift, X, Y
     Exit Sub
 End If
-cX = x
+cX = X
 Timer3.Enabled = False
 If mHeadlineHeightTwips = 0 Then
-    YYT = y \ myt
+    YYT = Y \ myt
 Else
-    If y < mHeadlineHeightTwips Then
-        If y < 0 Then
+    If Y < mHeadlineHeightTwips Then
+        If Y < 0 Then
         YYT = -1
         Else
         YYT = 0
         End If
     Else
-    YYT = (y - mHeadlineHeightTwips) \ myt + 1
+    YYT = (Y - mHeadlineHeightTwips) \ myt + 1
     End If
 End If
 oldbutton = Button
 If (Button And 3) > 0 And useFloatList And FloatList Then
-        FloatListMe useFloatList, x, y: Button = 0
+        FloatListMe useFloatList, X, Y: Button = 0
     Else
         If Not nopointerchange Then
             If mousepointer > 1 And Not (mousepointer = vbSizeWE And Not useFloatList) And Not UseHeaderOnly Then mousepointer = 1
@@ -2380,20 +2380,20 @@ End If
     If mHeadline <> "" Then
         If YYT = 0 Then ' we move in mHeadline
             ' -1 is mHeadline
-            If (Button And 3) > 0 And FloatList And Not useFloatList Then FloatListMe useFloatList, x, y: Button = 0
-            RaiseEvent ExposeItemMouseMove(Button, -1, CLng(x / scrTwips), CLng(y / scrTwips))
+            If (Button And 3) > 0 And FloatList And Not useFloatList Then FloatListMe useFloatList, X, Y: Button = 0
+            RaiseEvent ExposeItemMouseMove(Button, -1, CLng(X / scrTwips), CLng(Y / scrTwips))
         ElseIf Not (mousepointer = vbSizeWE And Not useFloatList) Then
             If YYT <= TopRows Then
-                RaiseEvent ExposeItemMouseMove(Button, YYT - 1, CLng(x / scrTwips), CLng(y - (YYT - 1) * myt) / scrTwips)
+                RaiseEvent ExposeItemMouseMove(Button, YYT - 1, CLng(X / scrTwips), CLng(Y - (YYT - 1) * myt) / scrTwips)
             Else
-                RaiseEvent ExposeItemMouseMove(Button, topitem - TopRows + YYT - 1, CLng(x / scrTwips), CLng(y - (YYT - 1) * myt) / scrTwips)
+                RaiseEvent ExposeItemMouseMove(Button, topitem - TopRows + YYT - 1, CLng(X / scrTwips), CLng(Y - (YYT - 1) * myt) / scrTwips)
             End If
         End If
     ElseIf Not (mousepointer = vbSizeWE And Not useFloatList) Then
         If YYT < TopRows Then
-            RaiseEvent ExposeItemMouseMove(Button, YYT, CLng(x / scrTwips), CLng(y - YYT * myt) / scrTwips)
+            RaiseEvent ExposeItemMouseMove(Button, YYT, CLng(X / scrTwips), CLng(Y - YYT * myt) / scrTwips)
         Else
-            RaiseEvent ExposeItemMouseMove(Button, topitem - TopRows + YYT, CLng(x / scrTwips), CLng(y - YYT * myt) / scrTwips)
+            RaiseEvent ExposeItemMouseMove(Button, topitem - TopRows + YYT, CLng(X / scrTwips), CLng(Y - YYT * myt) / scrTwips)
         End If
     End If
     If oldbutton <> Button Then Exit Sub
@@ -2414,20 +2414,20 @@ End If
         End If
         If (SELECTEDITEM <> (topitem + YYT + 1)) And SELECTEDITEM >= 0 And Button <> 0 Then secreset = False
         ' special for M2000  (StickBar And x > Width / 2)
-        If shift = 0 And ((Not scrollme > 0) And (x > Width / 2 Or (mTabs > 1 And (x - TwipsCurTab) > mParts(mCurTab) * scrTwips \ 2)) Or Not SingleLineSlide) And StickBar And MarkNext = 0 And tListcount > lines + 1 Then
-            If Abs(LastY - y) < scrTwips * 2 Then LastY = y: Exit Sub
+        If shift = 0 And ((Not scrollme > 0) And (X > Width / 2 Or (mTabs > 1 And (X - TwipsCurTab) > mParts(mCurTab) * scrTwips \ 2)) Or Not SingleLineSlide) And StickBar And MarkNext = 0 And tListcount > lines + 1 Then
+            If Abs(LastY - Y) < scrTwips * 2 Then LastY = Y: Exit Sub
             Hidebar = True
             CalcAndShowBar1
-            If LastY < y Then
-                y = scrTwips * 2
+            If LastY < Y Then
+                Y = scrTwips * 2
             Else
-                y = Scaleheight - scrTwips
+                Y = Scaleheight - scrTwips
             End If
-            If Abs(lastX - x) < scrTwips * 4 Or Not MultiLineEditBox Then
-                lastX = x
-                LastY = y
+            If Abs(lastX - X) < scrTwips * 4 Or Not MultiLineEditBox Then
+                lastX = X
+                LastY = Y
                 If Vertical Then
-                    GetOpenValue = valuepoint - y + mHeadlineHeightTwips
+                    GetOpenValue = valuepoint - Y + mHeadlineHeightTwips
                 Else
               '  GetOpenValue = valuepoint - x ' NO USED HERE
                 End If
@@ -2440,15 +2440,15 @@ End If
                 If YYT >= 0 And YYT <= lines Then shift = 1: GoTo there1
             End If
         End If
-        If mHeadline <> "" And y < mHeadlineHeightTwips Then
+        If mHeadline <> "" And Y < mHeadlineHeightTwips Then
         ' we sent twips not pixels
         ' move...me..??
         
-        ElseIf (y - mHeadlineHeightTwips) < myt / 2 And (topitem + YYT > 0) Then
+        ElseIf (Y - mHeadlineHeightTwips) < myt / 2 And (topitem + YYT > 0) Then
         'scroll up
             drc = True
             Timer2.Enabled = True
-        ElseIf y > Scaleheight - myt \ 2 And (tListcount <> 1) Then
+        ElseIf Y > Scaleheight - myt \ 2 And (tListcount <> 1) Then
             drc = False
             Timer2.Enabled = True
         ElseIf YYT >= 0 And YYT <= lines + TopRows Then
@@ -2466,7 +2466,7 @@ there1:
                 Timer2.Enabled = False
             End If
             If topitem + YYT - TopRows < tListcount Then
-                If (cX > Scalewidth / 4 And cX < Scalewidth * 3 / 4) And scrollme = 0 Then x = lY
+                If (cX > Scalewidth / 4 And cX < Scalewidth * 3 / 4) And scrollme = 0 Then X = lY
                 If Not SELECTEDITEM = topitem - TopRows + YYT + 1 And Not (YYT < TopRows And SELECTEDITEM = YYT + 1) Then
                     osel = SELECTEDITEM
                     SELECTEDITEM = topitem + YYT + 1
@@ -2496,10 +2496,10 @@ there1:
                         End If
                     End If
                     If StickBar Or AutoHide Then DOT3
-                        If x - lY > 0 And Not NoPanRight Then
-                            scrollme = (x - lY)
-                        ElseIf x - lY < 0 And Not NoPanLeft Then
-                            scrollme = (x - lY)
+                        If X - lY > 0 And Not NoPanRight Then
+                            scrollme = (X - lY)
+                        ElseIf X - lY < 0 And Not NoPanLeft Then
+                            scrollme = (X - lY)
                         Else
                             If Not EditFlagSpecial Then scrollme = 0
                         End If
@@ -2523,10 +2523,10 @@ there1:
                             RaiseEvent MarkOut
                         End If
                     End If
-                    If x - lY > 0 And Not NoPanRight Then
-                        scrollme = (x - lY)
-                    ElseIf x - lY < 0 And Not NoPanLeft Then
-                        scrollme = (x - lY)
+                    If X - lY > 0 And Not NoPanRight Then
+                        scrollme = (X - lY)
+                    ElseIf X - lY < 0 And Not NoPanLeft Then
+                        scrollme = (X - lY)
                     Else
                         If Not EditFlagSpecial Then scrollme = 0
                     End If
@@ -2558,7 +2558,7 @@ Public Sub CheckMark()
       End If
 End Sub
 
-Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 On Error GoTo there
 If DropKey Then Exit Sub
 If missMouseClick Then missMouseClick = False: Exit Sub
@@ -2566,10 +2566,10 @@ If mousepointer = vbSizeWE And Not useFloatList And Not UseHeaderOnly Then
     mousepointer = 1
     Exit Sub
 End If
-If Button = 1 Or UseHeaderOnly Then RaiseEvent MouseUp(x / scrTwips, y / scrTwips)
+If Button = 1 Or UseHeaderOnly Then RaiseEvent MouseUp(X / scrTwips, Y / scrTwips)
 If (Button And 2) = 2 Then
-x = nowX
-y = nowY
+X = nowX
+Y = nowY
 End If
 If useFloatList Then
     Timer1.Enabled = False
@@ -2593,17 +2593,17 @@ Timer2.Enabled = False
 If Not (FreeMouse Or Not myEnabled) Then Exit Sub
 
 With UserControl
- If (x < 0 Or y < 0 Or x > .Width Or y > .Height) And (LeaveonChoose And Not BypassLeaveonChoose) Then
+ If (X < 0 Or Y < 0 Or X > .Width Or Y > .Height) And (LeaveonChoose And Not BypassLeaveonChoose) Then
 If Hidebar Then Hidebar = False: Redraw Hidebar Or m_showbar
  SELECTEDITEM = -1
  RaiseEvent Selected2(-2)
  Exit Sub
  End If
 End With
-cX = x
+cX = X
 If Hidebar Then Hidebar = False: Redraw Hidebar Or m_showbar
 If Timer3.Enabled Then
-cY = y: DOT3
+cY = Y: DOT3
 End If
 Timer3.Enabled = False
 If Timer2.Enabled Then
@@ -2627,16 +2627,16 @@ Dim YYT As Long
                 End If
 jump1:
 If mHeadlineHeightTwips = 0 Then
-YYT = y \ myt
+YYT = Y \ myt
 Else
-    If y < mHeadlineHeightTwips Then
-        If y < 0 Then
+    If Y < mHeadlineHeightTwips Then
+        If Y < 0 Then
         YYT = -1
         Else
         YYT = 0
         End If
     Else
-    YYT = (y - mHeadlineHeightTwips) \ myt + 1
+    YYT = (Y - mHeadlineHeightTwips) \ myt + 1
     End If
 End If
 
@@ -2762,7 +2762,7 @@ If (Button And 3) > 0 And myEnabled Then
               topitem = SELECTEDITEM - 1
              End If
                 If MultiSelect Or ListMenu(SELECTEDITEM - 1) Then
-                    If (x / scrTwips > 0) And (x / scrTwips < LeftMarginPixels) Then
+                    If (X / scrTwips > 0) And (X / scrTwips < LeftMarginPixels) Then
                         If ListRadio(SELECTEDITEM - 1) And ListSelected(SELECTEDITEM - 1) Then
                         ' do nothing
                         Else
@@ -2790,7 +2790,7 @@ If Not Enabled Then Exit Sub
 secreset = True
 PrepareToShow 5
  If Button = 2 Then
-RaiseEvent OutPopUp(x, y, Button)
+RaiseEvent OutPopUp(X, Y, Button)
 
 End If
 ''
@@ -2826,7 +2826,7 @@ Timer2.Enabled = False
 If marvel Then RaiseEvent CorrectCursorAfterDrag
 End Sub
 
-Private Sub UserControl_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub UserControl_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim something$, ok As Boolean
 If DropKey Then Exit Sub
  
@@ -2903,7 +2903,7 @@ End If
 
 End Sub
 
-Private Sub UserControl_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, State As Integer)
+Private Sub UserControl_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, State As Integer)
 On Error Resume Next
 If DropKey Then Exit Sub
 If Not DropEnabled Then Effect = 0: Exit Sub
@@ -2921,15 +2921,15 @@ If Not TaskMaster Is Nothing Then
 tListcount = listcount
  If State = vbOver Then
  
-If mHeadline <> "" And y < mHeadlineHeightTwips Then
+If mHeadline <> "" And Y < mHeadlineHeightTwips Then
 ' we sent twips not pixels
 ' move...me..??
 
-ElseIf (y - mHeadlineHeightTwips) < myt / 2 And (topitem + YYT > 0) Then
+ElseIf (Y - mHeadlineHeightTwips) < myt / 2 And (topitem + YYT > 0) Then
                 drc = True
                 Timer2.Enabled = True
         
-        ElseIf y > Scaleheight - myt \ 2 And (tListcount <> 1) Then
+        ElseIf Y > Scaleheight - myt \ 2 And (tListcount <> 1) Then
                 drc = False
                 Timer2.Enabled = True
         Else
@@ -2938,7 +2938,7 @@ ElseIf (y - mHeadlineHeightTwips) < myt / 2 And (topitem + YYT > 0) Then
              
                 If Not Timer1.Enabled Then
                 If Not havefocus Then RaiseEvent DragOverCursor(dragfocus)
-                HideCaretOnexit = False: MovePos x, y
+                HideCaretOnexit = False: MovePos X, Y
                 If CBool(shift And 1) Then chooseshow
                 
                 End If
@@ -2970,7 +2970,7 @@ If Not ok Then
         Effect = vbDropEffectNone
         HideCaretOnexit = True
         If caretCreated Then caretCreated = False: DestroyCaret
-        MovePos x, y
+        MovePos X, Y
         If CBool(shift And 1) Then chooseshow
     End If
 ElseIf State = vbEnter Then
@@ -2979,7 +2979,7 @@ If Not marvel Then RaiseEvent DragOverNow(ok)
 If Not ok Then
     If Not Timer1.Enabled Then
         HideCaretOnexit = False
-        MovePos x, y
+        MovePos X, Y
         If CBool(shift And 1) Then chooseshow
     Else
         dragfocus = False
@@ -3030,26 +3030,26 @@ aa = this$ & ChrW$(0)
 Data.SetData aa(), vbCFText
 AllowedEffects = vbDropEffectCopy + vbDropEffectMove
 End Sub
-Public Sub MovePos(ByVal x As Single, ByVal y As Single)
+Public Sub MovePos(ByVal X As Single, ByVal Y As Single)
 
 Dim dummy As Long, YYT As Long, M_CURSOR As Long
 dragslow = 0.02
 If mHeadlineHeightTwips = 0 Then
-YYT = y \ myt + 1
+YYT = Y \ myt + 1
 Else
-    If y < mHeadlineHeightTwips Then
-        If y < 0 Then
+    If Y < mHeadlineHeightTwips Then
+        If Y < 0 Then
         Exit Sub
         Else
         YYT = 1
         End If
     Else
-    YYT = (y - mHeadlineHeightTwips) \ myt + 1
+    YYT = (Y - mHeadlineHeightTwips) \ myt + 1
     End If
 End If
 YYT = YYT - 1
 If topitem + YYT < listcount Then
-REALCUR topitem + YYT, x - scrollme, dummy, M_CURSOR
+REALCUR topitem + YYT, X - scrollme, dummy, M_CURSOR
 ListindexPrivateUse = topitem + YYT
 If ListIndex = -1 Then
         If itemcount = 0 Then
@@ -3204,21 +3204,21 @@ SELECTEDITEM = 0
 End If
 there:
 End Property
-Public Sub FloatListMe(State As Boolean, x As Single, y As Single)
+Public Sub FloatListMe(State As Boolean, X As Single, Y As Single)
 Static preX As Single, preY As Single
 Dim dummy As Long, vx As Single, vy As Single
 On Error GoTo there
 If Extender.Parent Is Nothing Then Exit Sub
 If Not State Then
-preX = x
-preY = y
+preX = X
+preY = Y
 State = True
 mousepointer = 0
 doubleclick = 0
 GetMonitorsAgain
 Else
-If NoVerMove Then preY = y
-If NoHorMove Then preX = x
+If NoVerMove Then preY = Y
+If NoHorMove Then preX = X
 If Extender.Visible Then
 If NoVerMove Then
     mousepointer = 9
@@ -3229,23 +3229,23 @@ Else
 End If
 RaiseEvent NeedDoEvents
 If MoveParent Then
-    If TypeOf Extender.Container Is GuiM2000 Then
-        If (Extender.Container.Top + (y - preY) < MinMonitorTop) Then preY = y + Extender.Container.Top - MinMonitorTop
-        If (Extender.Container.Left + (x - preX) < MinMonitorLeft) Then preX = x + Extender.Container.Left - MinMonitorLeft
-        If ((Extender.Container.Top + y - preY) > FloatLimitTop) And FloatLimitTop > ((Extender.Parent.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > MinMonitorTop Then preY = Extender.Parent.Top + y - FloatLimitTop
-        If ((Extender.Container.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > MinMonitorLeft Then preX = Extender.Parent.Left + x - FloatLimitLeft
+    If Not TypeOf Extender.Container Is VB.PictureBox Then
+        If (Extender.Container.Top + (Y - preY) < MinMonitorTop) Then preY = Y + Extender.Container.Top - MinMonitorTop
+        If (Extender.Container.Left + (X - preX) < MinMonitorLeft) Then preX = X + Extender.Container.Left - MinMonitorLeft
+        If ((Extender.Container.Top + Y - preY) > FloatLimitTop) And FloatLimitTop > ((Extender.Parent.Left + X - preX) > FloatLimitLeft) And FloatLimitLeft > MinMonitorTop Then preY = Extender.Parent.Top + Y - FloatLimitTop
+        If ((Extender.Container.Left + X - preX) > FloatLimitLeft) And FloatLimitLeft > MinMonitorLeft Then preX = Extender.Parent.Left + X - FloatLimitLeft
         Else
-            If ((Extender.Container.Top + y - preY) > FloatLimitTop) And FloatLimitTop > ((Extender.Container.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > 0 Then preY = Extender.Parent.Top + y - FloatLimitTop
-            If ((Extender.Container.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > 0 Then preX = Extender.Container.Left + x - FloatLimitLeft
-            If (Extender.Container.Top + (y - preY) < 0) Then preY = y + Extender.Container.Top
-            If (Extender.Container.Left + (x - preX) < 0) Then preX = x + Extender.Container.Left
+            If ((Extender.Container.Top + Y - preY) > FloatLimitTop) And FloatLimitTop > ((Extender.Container.Left + X - preX) > FloatLimitLeft) And FloatLimitLeft > 0 Then preY = Extender.Parent.Top + Y - FloatLimitTop
+            If ((Extender.Container.Left + X - preX) > FloatLimitLeft) And FloatLimitLeft > 0 Then preX = Extender.Container.Left + X - FloatLimitLeft
+            If (Extender.Container.Top + (Y - preY) < 0) Then preY = Y + Extender.Container.Top
+            If (Extender.Container.Left + (X - preX) < 0) Then preX = X + Extender.Container.Left
     End If
         
         
         
     
-        vx = Extender.Container.Left + (x - preX)
-        vy = Extender.Container.Top + (y - preY)
+        vx = Extender.Container.Left + (X - preX)
+        vy = Extender.Container.Top + (Y - preY)
         RaiseEvent ValidMove(vx, vy)
         Extender.Container.move vx, vy
         Timer1.Enabled = False
@@ -3258,13 +3258,13 @@ If MoveParent Then
         'End If
 Else
 Extender.ZOrder
-If (Extender.Top + (y - preY) < 0) Then preY = y + Extender.Top
-If (Extender.Left + (x - preX) < 0) Then preX = x + Extender.Left
-If ((Extender.Top + y - preY) > FloatLimitTop) And FloatLimitTop > 0 Then preY = Extender.Top + y - FloatLimitTop
+If (Extender.Top + (Y - preY) < 0) Then preY = Y + Extender.Top
+If (Extender.Left + (X - preX) < 0) Then preX = X + Extender.Left
+If ((Extender.Top + Y - preY) > FloatLimitTop) And FloatLimitTop > 0 Then preY = Extender.Top + Y - FloatLimitTop
 
-If ((Extender.Left + x - preX) > FloatLimitLeft) And FloatLimitLeft > 0 Then preX = Extender.Left + x - FloatLimitLeft
-    vx = Extender.Left + (x - preX)
-    vy = Extender.Top + (y - preY)
+If ((Extender.Left + X - preX) > FloatLimitLeft) And FloatLimitLeft > 0 Then preX = Extender.Left + X - FloatLimitLeft
+    vx = Extender.Left + (X - preX)
+    vy = Extender.Top + (Y - preY)
     RaiseEvent ValidMove(vx, vy)
     
     Extender.move vx, vy
@@ -6143,14 +6143,14 @@ End Property
 Public Property Let jumptothemousemode(ByVal RHS As Boolean)
 mjumptothemousemode = RHS
 End Property
-Private Function processXY(ByVal x As Single, ByVal y As Single, Optional rep As Boolean = True) As Boolean
+Private Function processXY(ByVal X As Single, ByVal Y As Single, Optional rep As Boolean = True) As Boolean
 If NoBarClick Or UseHeaderOnly Then Exit Function
 Timer1bar.Enabled = False
 Dim checknewvalue As Long, newheight As Long
 With UserControl
 If mHeadline <> "" Then
 newheight = .Height - mHeadlineHeightTwips
-y = y - mHeadlineHeightTwips
+Y = Y - mHeadlineHeightTwips
 Else
 newheight = .Height
 End If
@@ -6159,34 +6159,34 @@ If minimumWidth < 60 Then minimumWidth = 60  ' 4 x scrtwips
 ' value must have real max ...minimum MAX-60
 If Vertical Then
 ' here minimumwidth is minimumheight
-If y >= valuepoint - scrTwips And y <= minimumWidth + valuepoint - scrTwips Then
+If Y >= valuepoint - scrTwips And Y <= minimumWidth + valuepoint - scrTwips Then
 ' is our scroll bar
 OurDraw = Not rep
 
-ElseIf y > newheight * Percent And y < newheight * (1 - Percent) Then
+ElseIf Y > newheight * Percent And Y < newheight * (1 - Percent) Then
 '  we are inside so take a largechange
 processXY = True
 
-        If y < valuepoint Then
+        If Y < valuepoint Then
          ' jump to mouse position at page (or fakepage )
                     If mjumptothemousemode Then
-                     y = (y \ minimumWidth + 1) * minimumWidth - minimumWidth
+                     Y = (Y \ minimumWidth + 1) * minimumWidth - minimumWidth
                      Else
-                    y = valuepoint - minimumWidth
+                    Y = valuepoint - minimumWidth
                     End If
         Else
          ' jump to mouse position at page (or fakepage )
                 If mjumptothemousemode Then
-                y = (y \ minimumWidth - 1) * minimumWidth + minimumWidth
+                Y = (Y \ minimumWidth - 1) * minimumWidth + minimumWidth
                 Else
-                y = valuepoint + minimumWidth
+                Y = valuepoint + minimumWidth
                 End If
         End If
-            If y < newheight * Percent Then y = newheight * Percent
-            If y > Round(newheight * (1 - Percent)) - minimumWidth + newheight * Percent Then
-            y = newheight * (1 - Percent) - minimumWidth
+            If Y < newheight * Percent Then Y = newheight * Percent
+            If Y > Round(newheight * (1 - Percent)) - minimumWidth + newheight * Percent Then
+            Y = newheight * (1 - Percent) - minimumWidth
             End If
-            checknewvalue = Round((y - newheight * Percent) * (Max - Min) / ((newheight * (1 - Percent) - minimumWidth) - newheight * Percent)) + Min
+            checknewvalue = Round((Y - newheight * Percent) * (Max - Min) / ((newheight * (1 - Percent) - minimumWidth) - newheight * Percent)) + Min
             If checknewvalue = Value And mjumptothemousemode Then
                  ' do nothing
                 
@@ -6196,7 +6196,7 @@ processXY = True
                 If Timer1bar.Interval > 10 Then Timer1bar.Interval = Timer1bar.Interval - 5 ' autorepeat
                 Timer1bar.Enabled = True
             End If
-ElseIf y >= newheight * (1 - Percent) And y <= newheight Then ' is right button
+ElseIf Y >= newheight * (1 - Percent) And Y <= newheight Then ' is right button
 processXY = True
 checknewvalue = Value + mSmallChange
 If checknewvalue = Value Then
@@ -6207,7 +6207,7 @@ If Timer1bar.Interval > 10 Then Timer1bar.Interval = Timer1bar.Interval - 5  '
 Timer1bar.Enabled = True
 End If
 
-ElseIf y < newheight * Percent - scrTwips Then
+ElseIf Y < newheight * Percent - scrTwips Then
 processXY = True
 checknewvalue = Value - mSmallChange
 ' is  left button
@@ -6222,31 +6222,31 @@ End If
 End If
 
 ElseIf Not Timer1bar.Enabled Then
-If x >= valuepoint - scrTwips And x <= minimumWidth + valuepoint - scrTwips Then
+If X >= valuepoint - scrTwips And X <= minimumWidth + valuepoint - scrTwips Then
 ' is our scroll bar
 OurDraw = Not rep
 
-ElseIf x > .Width * Percent And x < .Width * (1 - Percent) Then
+ElseIf X > .Width * Percent And X < .Width * (1 - Percent) Then
 processXY = True
 '  we are inside so take a largechange
-        If x < valuepoint Then
+        If X < valuepoint Then
                 If mjumptothemousemode Then
-                  x = (x \ minimumWidth + 1) * minimumWidth - minimumWidth
+                  X = (X \ minimumWidth + 1) * minimumWidth - minimumWidth
                 Else
-                x = valuepoint - minimumWidth
+                X = valuepoint - minimumWidth
                 End If
         Else
                 If mjumptothemousemode Then
-                x = (x \ minimumWidth - 1) * minimumWidth + minimumWidth
+                X = (X \ minimumWidth - 1) * minimumWidth + minimumWidth
                 Else
-                x = valuepoint + minimumWidth
+                X = valuepoint + minimumWidth
                 End If
         End If
-            If x < .Width * Percent Then x = .Width * Percent
-            If x > Round(.Width * (1 - Percent)) - minimumWidth + .Width * Percent Then
-            x = .Width * (1 - Percent) - minimumWidth
+            If X < .Width * Percent Then X = .Width * Percent
+            If X > Round(.Width * (1 - Percent)) - minimumWidth + .Width * Percent Then
+            X = .Width * (1 - Percent) - minimumWidth
             End If
-            checknewvalue = Round((x - .Width * Percent) * (Max - Min) / ((.Width * (1 - Percent) - minimumWidth) - .Width * Percent)) + Min
+            checknewvalue = Round((X - .Width * Percent) * (Max - Min) / ((.Width * (1 - Percent) - minimumWidth) - .Width * Percent)) + Min
             If checknewvalue = Value And mjumptothemousemode Then
             ' do nothing
             Else
@@ -6254,7 +6254,7 @@ processXY = True
             If Timer1bar.Interval > 10 Then Timer1bar.Interval = Timer1bar.Interval - 5  ' autorepeat
             Timer1bar.Enabled = True
             End If
-ElseIf x >= .Width * (1 - Percent) And x <= .Width Then
+ElseIf X >= .Width * (1 - Percent) And X <= .Width Then
 processXY = True
 checknewvalue = Value + mSmallChange
 If checknewvalue = Value Then
@@ -6265,7 +6265,7 @@ If Timer1bar.Interval > 10 Then Timer1bar.Interval = Timer1bar.Interval - 5 ' au
 Timer1bar.Enabled = True
 End If
 ' is right button
-ElseIf x < .Width * Percent - scrTwips Then
+ElseIf X < .Width * Percent - scrTwips Then
 processXY = True
 checknewvalue = Value - mSmallChange
 If checknewvalue = Value Then
@@ -6281,7 +6281,7 @@ End If
 End If
 End With
 End Function
-Private Sub barMouseMove(Button As Integer, shift As Integer, x As Single, ByVal y As Single)
+Private Sub barMouseMove(Button As Integer, shift As Integer, X As Single, ByVal Y As Single)
 If Not EnabledBar Then Exit Sub
 Dim ForValidValue As Long, newheight As Long
 If OurDraw Then
@@ -6296,12 +6296,12 @@ With UserControl
 If Vertical Then
 
 If mHeadline <> "" Then
-y = y - mHeadlineHeightTwips
+Y = Y - mHeadlineHeightTwips
 newheight = .Height - mHeadlineHeightTwips
 Else
 newheight = .Height
 End If
-        ForValidValue = y + GetOpenValue 'ForValidValue + valuepoint
+        ForValidValue = Y + GetOpenValue 'ForValidValue + valuepoint
         If ForValidValue < newheight * Percent Then
         ForValidValue = newheight * Percent
         Value = Min
@@ -6317,7 +6317,7 @@ End If
 
 Else
 
-         ForValidValue = x + GetOpenValue
+         ForValidValue = X + GetOpenValue
         If ForValidValue < .Width * Percent Then
         ForValidValue = .Width * Percent
         Value = Min
@@ -6396,14 +6396,14 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 
-Private Sub MyMark(thathDC As Long, Radius As Long, x As Long, y As Long, item As Long, Optional Reverse As Boolean = False) ' circle
+Private Sub MyMark(thathDC As Long, Radius As Long, X As Long, Y As Long, item As Long, Optional Reverse As Boolean = False) ' circle
 '
 Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long
 Dim th As RECT
-th.Left = x - Radius
-th.Top = y - Radius
-th.Right = x + Radius
-th.Bottom = y + Radius
+th.Left = X - Radius
+th.Top = Y - Radius
+th.Right = X + Radius
+th.Bottom = Y + Radius
 Dim old_brush As Long, old_pen As Long, my_brush As Long
 
     If Not ListChecked(item) Then
@@ -6421,10 +6421,10 @@ Dim old_brush As Long, old_pen As Long, my_brush As Long
         If Radius < 4 Then Radius = 4
         End If
              
-        th.Left = x - Radius
-        th.Top = y - Radius
-        th.Right = x + Radius
-        th.Bottom = y + Radius
+        th.Left = X - Radius
+        th.Top = Y - Radius
+        th.Right = X + Radius
+        th.Bottom = Y + Radius
 
         
 
@@ -6747,15 +6747,15 @@ SELECTEDITEM = 0
 End If
 End Property
 Public Sub ListindexPrivateUseFirstFree(ByVal item As Long)
-Dim x As Long
+Dim X As Long
 If item < listcount Then
 Do While ListJoin(item) And item > 0
     item = item - 1
 Loop
 SkipReadEditflag = False
-For x = item To listcount - 1
-If (mList(x).Flags And (fline + joinpRevline)) = 0 Then SELECTEDITEM = x + 1: Exit For
-Next x
+For X = item To listcount - 1
+If (mList(X).Flags And (fline + joinpRevline)) = 0 Then SELECTEDITEM = X + 1: Exit For
+Next X
 If item = listcount Then SELECTEDITEM = 0
 Else
 SELECTEDITEM = 0
@@ -7253,18 +7253,18 @@ If BarHatch <> -1 Then FrameRect UserControl.hdc, th, br2
   DeleteObject br2
 End If
 End Sub
-Function DoubleClickArea(ByVal x As Long, ByVal y As Long, ByVal Xorigin As Long, ByVal Yorigin As Long, setupxy As Long) As Boolean
-   If Abs(x - Xorigin) < setupxy And Abs(y - Yorigin) < setupxy Then
+Function DoubleClickArea(ByVal X As Long, ByVal Y As Long, ByVal Xorigin As Long, ByVal Yorigin As Long, setupxy As Long) As Boolean
+   If Abs(X - Xorigin) < setupxy And Abs(Y - Yorigin) < setupxy Then
         preservedoubleclick = doubleclick
     Else
         preservedoubleclick = 0
    End If
    DoubleClickArea = Not preservedoubleclick = 0
 End Function
-Function DoubleClickCheck(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long, ByVal Xorigin As Long, ByVal Yorigin As Long, setupxy As Long, itemline As Long) As Boolean
+Function DoubleClickCheck(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long, ByVal Xorigin As Long, ByVal Yorigin As Long, setupxy As Long, itemline As Long) As Boolean
 ' doubleclick
 If item = itemline Then
-   If Abs(x - Xorigin) < setupxy And Abs(y - Yorigin) < setupxy Then
+   If Abs(X - Xorigin) < setupxy And Abs(Y - Yorigin) < setupxy Then
         If Not nopointerchange Then mousepointer = 1
         FloatList = False
         If Button = 1 Then
@@ -7289,9 +7289,9 @@ If item = itemline Then
     End If
 End If
 End Function
-Function SingleClickCheck(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long, ByVal Xorigin As Long, ByVal Yorigin As Long, setupxy As Long, itemline As Long) As Boolean
+Function SingleClickCheck(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long, ByVal Xorigin As Long, ByVal Yorigin As Long, setupxy As Long, itemline As Long) As Boolean
 If item = itemline Then
-   If Abs(x - Xorigin) < setupxy And Abs(y - Yorigin) < setupxy Then
+   If Abs(X - Xorigin) < setupxy And Abs(Y - Yorigin) < setupxy Then
       If Not nopointerchange Then mousepointer = 1
         FloatList = False
             If Button = 1 Then
