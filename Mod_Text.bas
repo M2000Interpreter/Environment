@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 11
 Global Const VerMinor = 0
-Global Const Revision = 1
+Global Const Revision = 2
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -31366,7 +31366,7 @@ Else
                     End With
                     For i = 1 To PobjNum
                     
-                    With players(val(Form1.dSprite(i).Tag))
+                    With players(val("0" & Form1.dSprite(i).Tag))
                         If Form1.dSprite(i).mouseicon = Form1.Picture2.mouseicon And Not .HideIcon Then
                         Form1.dSprite(i).mousepointer = .LastIcon
                        Set Form1.dSprite(i).mouseicon = .LastIconPic
@@ -34595,7 +34595,7 @@ Dim u As Long
         If dq.Name = "dSprite" Then
             GetCode = dq.index
         Else
-            GetCode = CLng(dq.Tag)
+            GetCode = CLng("0" & dq.Tag)
         End If
     End If
 End Function
@@ -41385,7 +41385,7 @@ If Left$(Typename(bstack.Owner), 3) = "Gui" Then oxiforforms: Exit Function
 If TypeOf bstack.Owner Is MetaDc Then oxiforMetaFiles: Exit Function
 If TypeOf bstack.Owner Is VB.PictureBox Then
 On Error GoTo ttt
-If CLng(bstack.Owner.Tag) > 33 Then
+If CLng("0" & bstack.Owner.Tag) > 33 Then
 oxiforImages: Exit Function
 End If
 End If

@@ -17,6 +17,8 @@ Private root
 Public status As String
 Public beautify As Long
 Public skip As Boolean
+' this is false by default
+Public NumericCharacterEntities As Boolean
 Private ProcessBag As Collection
 Private achild As Long, thelast As Boolean
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
@@ -63,6 +65,9 @@ Private Function unpackattrib(t1 As Variant) As String
     t$ = Replace$(t$, "&qt;", ">")
     t$ = Mid$(Replace$(t$, "amp;", "&"), 2)
     unpackattrib = Left$(t$, Len(t$) - 1)
+        If NumericCharacterEntities Then
+        convertNumericEntities unpackattrib
+    End If
 End Function
 
 Private Function unpacktext(t1 As Variant) As String
@@ -73,7 +78,27 @@ Private Function unpacktext(t1 As Variant) As String
     t$ = Replace$(t$, "&lt;", "<")
     t$ = Replace$(t$, "&qt;", ">")
     unpacktext = Replace$(t$, "amp;", "&")
+    If NumericCharacterEntities Then
+        convertNumericEntities unpacktext
+    End If
 End Function
+Private Sub convertNumericEntities(a$)
+Dim B() As String, i As Long, j As Long
+B = Split(a$, "&#")
+If UBound(B) <= 0 Then Exit Sub
+For i = 1 To UBound(B)
+j = InStr(B(i), ";")
+Select Case Left$(B(i), 1)
+Case "x"
+If j - 2 > 0 Then
+    B(i) = ChrW(val("&h" + Mid$(B(i), 2, j - 2))) + Mid$(B(i), j + 1)
+    End If
+Case Else
+    B(i) = ChrW(val(Left$(B(i), j - 1))) + Mid$(B(i), j + 1)
+End Select
+Next
+a$ = Join(B, "")
+End Sub
 Sub PlaceCdata()
 ' <![CDATA["'<>&]]>  ' no escaped
 End Sub
@@ -163,6 +188,7 @@ ElseIf (node(3) And &H1) Then
     Set val = root(2)
     Dim p As XmlMonoInternal, c As Collection
     Set p = New XmlMonoInternal
+    p.NumericCharacterEntities = NumericCharacterEntities
     p.insertnode node
     If val Is Nothing Then
         Set c = New Collection
@@ -293,6 +319,7 @@ Else
     MyEr "No childs for this node, only attributes", "όχι παιδιά για αυτόν τον κόμβο, μόνο ιδιότητες"
 End If
 Set ScanForTag = New XmlMonoInternal
+ScanForTag.NumericCharacterEntities = NumericCharacterEntities
 End Function
 Property Get textFromChildDeep(Tag$) As String
 Dim tmp As XmlMonoInternal
@@ -345,6 +372,7 @@ Else
     MyEr "No childs for this node, only attributes", "όχι παιδιά για αυτόν τον κόμβο, μόνο ιδιότητες"
 End If
 Set child = New XmlMonoInternal
+child.NumericCharacterEntities = NumericCharacterEntities
 End Function
 Friend Function deep(Tag$, child As XmlMonoInternal, guard As Long) As Boolean
    Dim val, c As Collection, aXml As XmlMonoInternal
@@ -676,16 +704,16 @@ Else
     ProcessInstruction = ProcessBag.item(i)
 End If
 End Property
-Private Sub MyEr1(a$, b$)
+Private Sub MyEr1(a$, B$)
     status = a$
    
    ' Err.Raise 5000, , a$
 End Sub
-Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
+Sub SwapVariant(ByRef a As Variant, ByRef B As Variant)
    Dim t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory t(0), ByVal VarPtr(a), 16
-   CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
-   CopyMemory ByVal VarPtr(b), t(0), 16
+   CopyMemory ByVal VarPtr(a), ByVal VarPtr(B), 16
+   CopyMemory ByVal VarPtr(B), t(0), 16
 End Sub
 Private Function Advance2Lt(t$, pc As Long, st As Long) As Boolean
 Do While Mid$(t$, pc, 1) <> "<"
@@ -989,11 +1017,13 @@ newentry:
                                                 
                                                 Dim child As XmlMonoInternal
                                                 Set child = New XmlMonoInternal
+                                                child.NumericCharacterEntities = NumericCharacterEntities
                                                 child.createfromtext t$, pc, st
                                                 If child.HasNode Then AppendChildObj child
                                                 While AdvanceAnySpaceorLT(t$, pc, st)
                                                     If Mid$(t$, pc + 1, 1) = "/" Then pc = pc + 1: GoTo here
                                                     Set child = New XmlMonoInternal
+                                                    child.NumericCharacterEntities = NumericCharacterEntities
                                                     child.createfromtext t$, pc, st
                                                     If child.HasNode Then AppendChildObj child
                                                 Wend
@@ -1089,3 +1119,15 @@ End Sub
 Sub RemoveProcess()
     Set ProcessBag = Nothing
 End Sub
+Friend Sub SetNumericCharacterEntities(RHS)
+    Dim m As XmlMonoInternal
+    NumericCharacterEntities = CBool(RHS)
+    If Not Me.HasNode Then Exit Sub
+    Set m = FirstChild
+    While Not m Is Nothing
+        m.SetNumericCharacterEntities RHS
+        Set m = Nextchild
+    Wend
+    Set m = FirstChild
+End Sub
+

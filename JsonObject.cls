@@ -68,6 +68,43 @@ Private Sub AddKey(RHS, Optional aValue As Variant)
         Value = aValue
     End If
 End Sub
+Sub DeleteKey(RHS)
+    If Find(RHS) Then
+        RemoveOne
+    End If
+End Sub
+Friend Function Find(RHS) As Boolean
+Dim k As Long, Key As String, k1 As Long
+Key = Normalize(RHS)
+If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
+ParentIndex = -1
+Done = False
+k = Hash(HashFunc(Key)) - 1
+k1 = -2
+If k >= 0 Then
+Do
+    If PriveSpace(k).Key = Key Then Find = True: index = k: Done = True: Exit Function
+     ParentIndex = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k1 = k
+If k1 = k Then
+ReHash
+k = Hash(HashFunc(Key)) - 1
+k1 = -2
+ParentIndex = -1
+If k >= 0 Then
+Do
+    If PriveSpace(k).Key = Key Then Find = True: index = k: Done = True: Exit Function
+     ParentIndex = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k = k1
+End If
+End If
+End If
+
+End Function
 
 Friend Sub RemoveOne()
 Dim new_item As item

@@ -20909,8 +20909,8 @@ Font "Verdana"
 Bold 1
 PEN 14
 CLS,0
-If Version<10 then Error "No proper M2000 version (must be >=9.9)"
-If Version=10 and revision<56 then Error "No proper M2000 revision for version 10"
+If Version<11 then Error "No proper M2000 version (must be >=11)"
+If Version=11 and revision<2 then Error "No proper M2000 revision for version 11"
 Set Fast
 Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 dir user
@@ -33720,7 +33720,7 @@ Print json$("description")
 Print json$("type")
 Print json.path$("properties.name.type")
 Print json.path$("properties|age|type", "|")  ' define different seperator
-Print json.path("properties.age.maximum")
+Print json.path("properties/.age.maximum")
 method json, "assignpath", "properties.age.maximum", 80
 Report json.format$(4)
 Print json.format$(0)
@@ -33730,8 +33730,11 @@ Print format$("Found {0} properties:", len(list1))
 nl$={
 }+"	- "
 Print #-2,  "	- "+list1#sort()#str$(nl$)
-
-
+// New in revision 2 version 11 deletekey
+Report json.format$(0)
+//Method json, "deletekey", "type"
+Method json, "deletekey", "properties"
+Report json.format$(0)
 }
 MODULE MACHINECODE {\\ THIS RUN WITH OR WITHOUT DEP (Data Execution Prevention) ON FOR ALL PROGRAMS.
 \\ we make a buffer to use for DATA
@@ -34682,5 +34685,172 @@ function image1.keypress {
 METHOD form1 "SHOW", 1
 
 declare form1 NOTHING
+}
+MODULE XML3 {// New method NumericCharactersEntities
+// use this to convert numeric entitites when you read ATTR OR TEXT
+// BUT NOT USED WHEN WE WRITE BACK.
+// See the &#x00C9; as É (201 or 0xC9)
+pen 14 : Cls 5,0 :Print $(4),
+declare databank xmldata
+method databank, "NumericCharactersEntities", true
+with databank, "xml" as doc$, "beautify" as beautify, "status" as status$
+doc$={<?xml?>
+<Students>
+	<Student Name="April" Gender="F" DateOfBirth="1989-01-02" />
+	<Student Name="Bob" Gender="M"  DateOfBirth="1990-03-04" />
+	<Student Name="Chad" Gender="M"  DateOfBirth="1991-05-06" />
+	<Student Name="Dave" Gender="M"  DateOfBirth="1992-07-08">
+		<Pet Type="dog" Name="Rover" />
+	</Student>
+	<Student DateOfBirth="1993-09-10" Gender="F" Name="&#x00C9;mily" />
+</Students>
+}
+beautify=-4
+Report 3, doc$
+With Databank, "Attr" as Attr$()
+Print status$=""
+Method databank, "GetListByTag", "Student", -1 as Result
+Print type$(Result), len(Result)
+c=1
+If len(Result)>0 then
+	Stack Result {
+		Read fieldsNo : With fieldsNo, "Attr" as fieldsno.tag$()
+	}
+	Stack Result {
+		Print c, " "+fieldsno.tag$("Name")
+		c++
+		if empty else LOOP  // Loop raise a flag for this block, which interpreter read at the end of block, and then cleat it
+		Read fieldsNo
+	}
+end if
+// If you change value, this value not saved with escaped numeric character edities
+// only the xml special characters escaped:
+//	quot	"
+//	amp	&
+//	apos	'
+//	lt	<
+//	gt	>
+rem 1:
+fieldsno.tag$("Name")=@conv$("Émily")
+beautify=-4
+Report 3, doc$
+declare databank Nothing
+
+Function Conv$(a$)
+	if len(a$)=0 then exit function
+	local b$, c$, k
+	for i=1 to len(a$)
+		c$=mid$(a$, i,1)
+		k=uint(chrcode(c$))
+	Rem 2:if k>127 then b$+="&#"+str$(k,"")+";" else b$+=c$   // this place decimal value
+		if k>127 then b$+="&#x"+hex$(k,2)+";" else b$+=c$ // this place hexadecimal value
+	next
+	=b$
+End Function
+}
+MODULE OBSERVER {Class Subject {
+Private:
+      registry=list
+Public:
+      Module registerObserver (observer as *Observer) {
+            \\ this type of pointer is a reference one
+            \\ ->(this) is a hard pointer, but ->this is a weak reference
+            observer=>subject->this
+            append .registry, observer=>name$:=observer
+      }
+      Module notify(name$){
+             Print "Incoming Event from ";name$
+      }
+      Module Observe {
+            m=each(.registry)
+            While m {
+                  n=eval(m)
+                  n=>dosomething
+rem                  Print n=>name$
+            }
+            Print "Observe"
+            Wait 20
+            If inkey$<>" " Then Loop
+      }
+}
+Class AnyClick {
+      Function readit {
+            Error "Abstract"
+      }
+}
+Class KeyClick As AnyClick {
+      num=0
+      Function Final readit {
+            If keypress(.num) Then
+                  =True
+            End If
+      }
+      Remove {
+            Print "Deleted KeyClick ";.num
+      }
+class:
+      Module KeyClick (.num) {
+      }
+}
+Class MouseClick as AnyClick {
+      num=0
+      Function Final readit {
+            If Binary.And(mouse, .num)=.num Then
+                  =True
+            End If
+      }
+      Remove {
+            Print "Deleted MouseClick ";.num
+      }
+class:
+      Module MouseClick (.num) {
+      }
+}
+Class Observer {
+      subject=Pointer(), name$
+      click=list, func$
+      Remove {
+            .click<=list
+            Print "Deleted ";.name$
+      }
+      Module dosomething {
+            m=each(.click)
+            While m
+                  k=eval(m)
+                  If k=>readit() Then
+                        .subject=>notify .name$
+                        Print "Raise from ";.name$
+                        call .func$
+                        break
+                  End If
+            End While
+      }
+class:
+      Module Observer(.name$, .func$, aClick as *AnyClick) {
+            Append .click, len(.click):=aClick
+            While not empty
+                  Read aClick
+                  If not aClick is type AnyClick Then Error "not proper type"
+                  Append .click, len(.click):=aClick
+            End While
+      }
+}
+Function Button1 {
+      Print "Button 1"
+}
+Function Button2 {
+      Print "Button 2"
+}
+Function Middle {
+      Print "Middle"
+}
+CallBack1$=Lazy$(&Button1())
+CallBack2$=Lazy$(&Button2())
+CallBack3$=Lazy$(&Middle())
+M=Subject()
+M.registerObserver Pointer(Observer("Button1", CallBack1$, Pointer(KeyClick(Asc("A"))), Pointer(MouseClick(1))))
+M.registerObserver Pointer(Observer("Button2", CallBack2$, Pointer(MouseClick(2))))
+M.registerObserver Pointer(Observer("Middle", CallBack3$, Pointer(MouseClick(4))))
+M.observe
 }
 UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}

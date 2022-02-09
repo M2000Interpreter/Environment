@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 1 active-X
-Restore form's move to a negative coordinates montior.(as in 10 revision 55).
+Version 11 Revision 2 active-X
+Added DeleteKey for JsonObject. Also some bugs removed.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
