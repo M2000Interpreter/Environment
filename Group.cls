@@ -84,7 +84,7 @@ If mytypes Is RHS Then
     Exit Function
 End If
 'If mytypes.count <> extypes.count Then Exit Function
-If mytypes.count * extypes.count = 0 Then Exit Function
+If mytypes.Count * extypes.Count = 0 Then Exit Function
 For Each k In extypes
     If TypeGroupNow(k) Then MatchTypes = True: Exit Function
 Next
@@ -100,8 +100,8 @@ Public Sub ResetEvents()
 If eventlist Is Nothing Then Exit Sub
 Dim i As Long
 With eventlist
-For i = 0 To .count - 1
-    .Index = i
+For i = 0 To .Count - 1
+    .index = i
     .Done = True
     .Value = vbNullString
     .sValue = 0
@@ -115,8 +115,8 @@ If eventlist Is Nothing Then Exit Sub
 Dim eventlist2 As New FastCollection
 Dim i As Long
 With eventlist
-For i = 0 To .count - 1
-    .Index = i
+For i = 0 To .Count - 1
+    .index = i
     .Done = True
     eventlist2.AddKey .KeyToString, ""
 Next i
@@ -399,7 +399,6 @@ Set OwnSoros = New mStiva2
 End Sub
 
 Private Sub Class_Terminate()
-Dim myobject As Object
 Dim iLastErNum As Long, iLastErNum1 As Long
 Set eventlist = Nothing
 If IamApointer Then
@@ -419,22 +418,17 @@ If IamApointer Then
                     End If
                 End If
             End If
-        
         End If
     End If
 ElseIf FloatGroup And Not ToDelete And HasRemove Then
-                  
-                        iLastErNum = LastErNum
-                        iLastErNum1 = LastErNum1
-                        LastErNum = 0
-                        LastErNum1 = 0
-                        ProcessOperRemove Me
-                        LastErNum = iLastErNum
-                        LastErNum1 = iLastErNum1
+    iLastErNum = LastErNum
+    iLastErNum1 = LastErNum1
+    LastErNum = 0
+    LastErNum1 = 0
+    ProcessOperRemove Me
+    LastErNum = iLastErNum
+    LastErNum1 = iLastErNum1
 End If
-'Set bank = Nothing
-'Set SuperClassList = Nothing
-'Set LinkToGroup = Nothing
 End Sub
 
 Public Property Get edittag() As String
@@ -478,7 +472,6 @@ Public Property Get refcount1() As Long
 Dim m As Long
 m = GetRefCount(Me)
 If m > 3 Then refcount1 = m - 3 Else refcount1 = 0
-
 End Property
 Private Function GetRefCount(ByRef vvv) As Long
     If Not IsObject(vvv) Then Exit Function

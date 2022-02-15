@@ -34580,18 +34580,34 @@ Cls,0
 }
 MODULE VER11 {declare form1 form
 declare image1 Image form form1
-METHOD image1,"MOVE", 1000,1000, 6000, 3300
+declare text1 TextBox form form1
+Method Form1, "AccKey", "Q", alt:=true, opcode:= 100615*2
+// METHOD Form1,"move", 1000,1000, 8000, 6000
+With Form1, "Height", 6000, "Width", 8000
+METHOD image1,"move", 1000,1000, 6000, 3300
+METHOD Text1,"move", 1000, 5000
 With image1,"KeyEvent", true, "Enabled" as enabled, "tabstop", true, "showcaret" as caret, "default", true
+With Text1, "ShowAlways", true, "text" as text1.text$, "MoveOnEnter", false
+Method Image1, "AccKey", "D", alt:=true, opcode:= 1
+Method Text1, "AccKey", "T", alt:=true, opcode:= 0
 enabled=true
 caret=true
 layer image1 {
 	form 20, 10
+	motion 1000,1000
 	CLS 4,0 : PEN 15
 	DOUBLE
 	REPORT 2, "Example"
 	NORMAL
 	CLS  #336633, 2
 	REFRESH 10
+}
+function text1.enter {
+	keyboard text1.text$ + chr$(13)
+	text1.text$=""
+	call local image1.gotfocus()
+	call local image1.keypress()
+	call local image1.lostfocus()
 }
 function form1.click {
 	enabled= not enabled
@@ -34636,7 +34652,7 @@ Def CheckSurrogateLead(w as integer)=uint(w)>0xD7FF and uint(w)<0xDC00
 Def CheckSurrogateTrail(w as integer)=uint(w)>0xDBFF and uint(w)<0xE000
 buf1$=""
 function image1.keypress {
-	if not caret then caret=true
+       if not caret then caret=true
 	layer image1 {
 		LOCAL a$, onemore as boolean
 		a$=KEY$
@@ -34682,6 +34698,14 @@ function image1.keypress {
 		refresh
 	}
 }
+Keyboard {This is for
+** Image Control **
+Check:
+Alt + D
+Alt + T
+Alt + Q to quit
+}
+call local image1.keypress()
 METHOD form1 "SHOW", 1
 
 declare form1 NOTHING

@@ -34,8 +34,8 @@ Const WM_KEYFIRST = &H100
 Const WM_CHAR = &H102
 Const WM_KEYLAST = &H108
 Private Type POINTAPI
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
 End Type
 Private Type Msg
     hWnd As Long
@@ -56,7 +56,7 @@ Friend Sub Construct(there As GuiM2000, Name$)
  On Error Resume Next
  ctrlName = GetTag$
  Set pbox = there.Controls.Add("vb.picturebox", ctrlName)
- there.AddGuiControl Me
+ there.AddGuiControl Me, CVar(ctrlName)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
@@ -66,7 +66,7 @@ Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  ctrlName = GetTag$
  Set pbox = there.Controls.Add("vb.picturebox", ctrlName)
  mIndex = i
- there.AddGuiControl Me
+ there.AddGuiControl Me, CVar(ctrlName)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
@@ -103,13 +103,13 @@ Public Sub deconstruct()
 Set Callback = Nothing
 Set pbox = Nothing
 End Sub
-Public Sub move(x, y, Optional w, Optional h)
+Public Sub move(X, Y, Optional w, Optional h)
 If IsMissing(w) Then
-pbox.move CLng(x), CLng(y), 0, 0
+pbox.move CLng(X), CLng(Y), 0, 0
 ElseIf IsMissing(h) Then
-pbox.move CLng(x), CLng(y), CLng(w), 0
+pbox.move CLng(X), CLng(Y), CLng(w), 0
 Else
-pbox.move CLng(x), CLng(y), CLng(w), CLng(h)
+pbox.move CLng(X), CLng(Y), CLng(w), CLng(h)
 End If
 End Sub
 
@@ -132,7 +132,7 @@ End Property
 
 Public Property Let prive(ByVal RHS As Long)
     If Not pbox Is Nothing Then
-        pbox.Tag = RHS
+        pbox.tag = RHS
         players(RHS).controlname = myUcase(Callback.modulename + "." + mesCtrlName, True)
        
     End If
@@ -140,7 +140,7 @@ Public Property Let prive(ByVal RHS As Long)
 End Property
 Public Property Get prive() As Long
     If Not pbox Is Nothing Then
-        pbox.Tag = mprive
+        pbox.tag = mprive
     End If
     prive = mprive
 End Property
@@ -172,19 +172,22 @@ Private Sub pbox_Click()
 End Sub
 
 Private Sub pbox_GotFocus()
-INK$ = preserveINK$
-If BypassKey Then Exit Sub
     If mIndex >= 0 Then
         Callback.Callback mesCtrlName + ".GotFocus(" + Str(mIndex) + ")"
     Else
         Callback.Callback mesCtrlName + ".GotFocus()"
     End If
+If BypassKey Then Exit Sub
+INK$ = preserveINK$
 ShowCaret = ShowCaret
 If ShowCaret Then Module2.ShowCaret pbox.hWnd
 End Sub
 
 Private Sub pbox_KeyDown(keycode As Integer, shift As Integer)
-If BypassKey Then keycode = 0: shift = 0: Exit Sub
+If BypassKey Then
+GetKeY2 keycode, shift
+keycode = 0: shift = 0: Exit Sub
+End If
 lastshift = shift
 Dim VR(2)
 VR(0) = keycode
@@ -389,8 +392,7 @@ End Sub
 
 
 Private Sub pbox_LostFocus()
-preserveINK$ = INK$
-INK$ = ""
+
 If ShowCaret Then DestroyCaret
 If pbox.TabStop And Enabled And Visible Then
     Callback.LastActive = ctrlName
@@ -400,9 +402,12 @@ End If
     Else
         Callback.Callback mesCtrlName + ".LostFocus()"
     End If
+If BypassKey Then INK$ = "": Exit Sub
+preserveINK$ = INK$
+INK$ = ""
 End Sub
 
-Private Sub pbox_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub pbox_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim bstack As basetask, oldhere$
 If Not Enabled Then Exit Sub
 If Not Relax Then
@@ -410,7 +415,7 @@ Relax = True
 Dim sel&
 
 If Button > 0 And Targets Then
-    sel& = ScanTarget(q(), CLng(x), CLng(y), prive)
+    sel& = ScanTarget(q(), CLng(X), CLng(Y), prive)
     If sel& >= 0 Then
         If Button = 1 Then
             Select Case q(sel&).id Mod 100
@@ -444,33 +449,33 @@ End If
 
 
 If mIndex > -1 Then
-    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 Else
-    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 End If
 Relax = False
 End If
 End Sub
-Private Sub pbox_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub pbox_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Not Enabled Then Exit Sub
 If Not Relax Then
 Relax = True
 If mIndex > -1 Then
-Callback.Callback mesCtrlName + ".MouseUp(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback.Callback mesCtrlName + ".MouseUp(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 Else
-Callback.Callback mesCtrlName + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback.Callback mesCtrlName + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 End If
 Relax = False
 End If
 End Sub
-Private Sub pbox_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub pbox_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Not Enabled Then Exit Sub
 If Not Relax Then
 Relax = True
 If mIndex > -1 Then
-Callback.Callback mesCtrlName + ".MouseMove(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback.Callback mesCtrlName + ".MouseMove(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 Else
-Callback.Callback mesCtrlName + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback.Callback mesCtrlName + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 End If
 Relax = False
 End If
@@ -513,7 +518,7 @@ Public Sub DisAllTargets()
 DisableTargets q(), prive
 End Sub
 Friend Sub RenderTarget(bstack As basetask, rest$, Lang As Long, tHandle As Variant)
-Dim p, w$, x
+Dim p, w$, X
 If tHandle \ 10000 <> prive Then
 MyEr "target not for this image", "Ô ÛÙ¸˜ÔÚ ‰ÂÌ ÂﬂÌ·È „È· ·ıÙﬁ ÙÁÌ ÂÈÍ¸Ì·"
 Exit Sub
@@ -523,34 +528,34 @@ If p >= 0 And p < UBound(q()) Then
      
               '
 While FastSymbol(rest$, ",")
-x = Empty
+X = Empty
 If IsLabelSymbolNew(rest$, "÷—¡”«", "TEXT", Lang) Then
-If IsStrExp(bstack, rest$, w$) Then q(p).Tag = w$
+If IsStrExp(bstack, rest$, w$) Then q(p).tag = w$
 ElseIf IsLabelSymbolNew(rest$, "–≈Õ¡", "PEN", Lang) Then
-If IsExp(bstack, rest$, x, , True) Then q(p).pen = x
+If IsExp(bstack, rest$, X, , True) Then q(p).pen = X
 ElseIf IsLabelSymbolNew(rest$, "÷œÕ‘œ", "BACK", Lang) Then
-If IsExp(bstack, rest$, x, , True) Then q(p).back = x
+If IsExp(bstack, rest$, X, , True) Then q(p).back = X
 ElseIf IsLabelSymbolNew(rest$, "–À¡…”…œ", "BORDER", Lang) Then
-If IsExp(bstack, rest$, x, , True) Then q(p).fore = x
+If IsExp(bstack, rest$, X, , True) Then q(p).fore = X
 ElseIf IsLabelSymbolNew(rest$, "œƒ«√…¡", "COMMAND", Lang) Then
 If IsStrExp(bstack, rest$, w$) Then q(p).Comm = w$
 ElseIf IsLabelSymbolNew(rest$, "‘…Ã«", "VALUE", Lang) Then
-If IsExp(bstack, rest$, x, , True) Then q(p).topval = Int(x * 100)
+If IsExp(bstack, rest$, X, , True) Then q(p).topval = Int(X * 100)
 ElseIf IsLabelSymbolNew(rest$, "¬¡”«", "BASE", Lang) Then
-If IsExp(bstack, rest$, x, , True) Then q(p).botval = Int(x * 100):
+If IsExp(bstack, rest$, X, , True) Then q(p).botval = Int(X * 100):
 ElseIf IsLabelSymbolNew(rest$, "◊—ŸÃ¡", "COLOR", Lang) Then
-If IsExp(bstack, rest$, x, , True) Then q(p).barC = x
+If IsExp(bstack, rest$, X, , True) Then q(p).barC = X
 ElseIf IsLabelSymbolNew(rest$, "Ã≈√≈»œ”", "SIZE", Lang) Then
-If IsExp(bstack, rest$, x, , True) Then
-If x > 100 Then x = 100
-If x < -100 Then x = -100
-q(p).imagesize = Int(x)
+If IsExp(bstack, rest$, X, , True) Then
+If X > 100 Then X = 100
+If X < -100 Then X = -100
+q(p).imagesize = Int(X)
 End If
 ' " ¡»≈‘«", "PORTRAIT"
 ElseIf IsLabelSymbolNew(rest$, " ¡»≈‘«", "PORTRAIT", Lang) Then
-    If IsExp(bstack, rest$, x, , True) Then q(p).Vertical = Int(x) <> 0
+    If IsExp(bstack, rest$, X, , True) Then q(p).Vertical = Int(X) <> 0
 ElseIf IsLabelSymbolNew(rest$, "≈… œÕ¡", "IMAGE", Lang) Then
-If IsExp(bstack, rest$, x) Then
+If IsExp(bstack, rest$, X) Then
     If bstack.lastobj Is Nothing Then
     Set q(p).drawimage = Nothing
     ElseIf TypeOf bstack.lastobj Is mHandler Then
@@ -720,4 +725,30 @@ On Error Resume Next
 DestroyCaret
 Callback.Controls(ctrlName).SetFocus
 
+End Sub
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
+Else
+a = UCase(a)
+Select Case a
+Case "F1" To "F9"
+a = 611 + val(Mid(a, 2))
+Case Else
+a = AscW(a)
+If a > 126 Then a = 0
+End Select
+End If
+If Opcode < 0 Then Opcode = 0
+If a = 0 Then Exit Sub
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc a, ctrlName, Opcode
+End Sub
+Friend Sub TakeKey(keycode As Integer, shift As Integer)
+    pbox_KeyDown keycode, shift
+If keycode <> 0 Then
+    pbox_KeyUp keycode, shift
+End If
 End Sub

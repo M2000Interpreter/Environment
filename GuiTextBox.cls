@@ -256,12 +256,12 @@ retvalue = RealX1(mHdc, ExtSelStart, that)
 ok = True
 End Sub
 
-Private Sub glistN_OutPopUp(x As Single, y As Single, myButton As Integer)
+Private Sub glistN_OutPopUp(X As Single, Y As Single, myButton As Integer)
 If myButton And &H2 = 2 Then
 If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(Y + Callback.Controls(ctrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
    Else
-      Callback.Callback mesCtrlName + ".PopUp(" + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(Y + Callback.Controls(ctrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
       End If
       End If
 End Sub
@@ -1107,19 +1107,12 @@ If item >= 0 Then
       End If
 End If
 End Sub
-
-
-Private Sub glistN_SyncKeyboard(item As Integer)
-' RaiseEvent KeyPress(item)
-End Sub
 Private Sub glistN_SpinnerValue(ThatValue As Long)
-''' RaiseEvent SpinnerValue(ThatValue)
    If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".SpinnerValue(" + Str(mIndex) + "," + LTrim$(Str(ThatValue)) + ")"
    Else
       Callback.Callback mesCtrlName + ".SpinnerValue(" + LTrim$(Str(ThatValue)) + ")"
       End If
-     '' vartext = str(ThatValue)
 End Sub
 Public Property Get locked() As Boolean
 locked = Not glistN.Enabled
@@ -1281,13 +1274,13 @@ If Err.Number > 0 Then glistN.NoWheel = True
 
 End Sub
 
-Public Sub move(x, y, Optional w, Optional h)
+Public Sub move(X, Y, Optional w, Optional h)
 If IsMissing(w) Then
-glistN.MoveTwips CLng(x), CLng(y), 0, 0
+glistN.MoveTwips CLng(X), CLng(Y), 0, 0
 ElseIf IsMissing(h) Then
-glistN.MoveTwips CLng(x), CLng(y), CLng(w), 0
+glistN.MoveTwips CLng(X), CLng(Y), CLng(w), 0
 Else
-glistN.MoveTwips CLng(x), CLng(y), CLng(w), CLng(h)
+glistN.MoveTwips CLng(X), CLng(Y), CLng(w), CLng(h)
 End If
 End Sub
 Public Sub deconstruct()
@@ -1330,12 +1323,12 @@ On Error Resume Next
 If CBool(RHS) Then Callback.Default = ctrlName
 End Property
 Sub Transparent()
-Dim x  As Long, y As Long
+Dim X  As Long, Y As Long
 glistN.FadeLastLinePart = mPartColor
 glistN.forecolor = black
 glistN.BackStyle = 1
-glistN.GetLeftTop x, y
-glistN.RepaintFromOut Callback.Image, x, y
+glistN.GetLeftTop X, Y
+glistN.RepaintFromOut Callback.Image, X, Y
 Callback.RefreshList = Callback.RefreshList + 1
 End Sub
 Sub TransparentOff()
@@ -1398,7 +1391,7 @@ Public Property Get drop()
 drop = glistN.DropEnabled
 End Property
 Private Sub glistN_AddSelStart(val As Long, shift As Integer)
-Dim w As Long, a$, l As Long, b$
+Dim w As Long, a$, l As Long, B$
 If glistN.SelStart > 0 Then
 a$ = Mid$(vartext, glistN.SelStart)
 
@@ -1408,19 +1401,19 @@ a$ = Mid$(vartext, glistN.SelStart)
             l = Len(a$)
             val = 1
             If l < 2 Then Exit Sub
-                b$ = Mid$(a$, val, 1)
-                If InStr(sp1, b$) = 0 Then
-                Do While val < l And InStr(sp, b$) > 0
+                B$ = Mid$(a$, val, 1)
+                If InStr(sp1, B$) = 0 Then
+                Do While val < l And InStr(sp, B$) > 0
                     val = val + 1
-                    b$ = Mid$(a$, val, 1)
+                    B$ = Mid$(a$, val, 1)
                 Loop
-                If InStr(sp1, b$) = 0 Then
+                If InStr(sp1, B$) = 0 Then
                     If val = 1 Then
-                        Do While val < l And InStr(sp2, b$) = 0
+                        Do While val < l And InStr(sp2, B$) = 0
                             val = val + 1
-                            b$ = Mid$(a$, val, 1)
+                            B$ = Mid$(a$, val, 1)
                         Loop
-                        If InStr(sp2, b$) > 0 Then val = val - 1
+                        If InStr(sp2, B$) > 0 Then val = val - 1
                     Else
                         If val < l Then val = val - 1
                     End If
@@ -1436,7 +1429,7 @@ End If
 End Sub
 
 Private Sub glistN_SubSelStart(val As Long, shift As Integer)
-Dim w As Long, a$, l As Long, b$
+Dim w As Long, a$, l As Long, B$
 If glistN.SelStart < 2 Then Exit Sub
 a$ = Mid$(vartext, glistN.SelStart - 1, 1)
 If Len(a$) > 0 Then
@@ -1446,22 +1439,22 @@ w = AscW(a$)
             l = Len(a$)
             val = l
             If val = 1 Then Exit Sub
-            b$ = Mid$(a$, l, 1)
-            If InStr(sp1, b$) = 0 Then
-                Do While l > 1 And InStr(sp, b$) > 0
+            B$ = Mid$(a$, l, 1)
+            If InStr(sp1, B$) = 0 Then
+                Do While l > 1 And InStr(sp, B$) > 0
                     l = l - 1
-                    b$ = Mid$(a$, l, 1)
+                    B$ = Mid$(a$, l, 1)
                 Loop
-                If InStr(sp1, b$) = 0 Then
+                If InStr(sp1, B$) = 0 Then
                     If l = val Then
-                        Do While l > 1 And InStr(sp2, b$) = 0
+                        Do While l > 1 And InStr(sp2, B$) = 0
                             l = l - 1
-                            b$ = Mid$(a$, l, 1)
+                            B$ = Mid$(a$, l, 1)
                         Loop
-                        If l = 1 And Not InStr(sp2, b$) > 0 Then l = l - 1
+                        If l = 1 And Not InStr(sp2, B$) > 0 Then l = l - 1
                         
                     Else
-                     If InStr(sp2, b$) > 0 Then l = l - 1
+                     If InStr(sp2, B$) > 0 Then l = l - 1
                     End If
                 End If
             Else

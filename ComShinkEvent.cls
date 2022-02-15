@@ -224,6 +224,7 @@ Public modulenameonly$
 Public VarIndex As Long, ItemIndex As Long
 ' by Edanmo
 Private exclude As New LongHash, inUse As New LongHash
+Public StaticCollection As FastCollection
 Private Sub pvSetParamArray(ByVal Ptr As Long, aParams() As Variant)
     Dim tDPAR       As DISPPARAMS
     Dim SafeArray   As SAFEARRAY_1D

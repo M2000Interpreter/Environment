@@ -66,7 +66,7 @@ Do
 For Each X In Forms
 bb = True
 If TypeOf X Is GuiM2000 Then
-    If X.enabled Then bb = False: X.CloseNow: bb = False: Exit For
+    If X.Enabled Then bb = False: X.CloseNow: bb = False: Exit For
     
 End If
 Next X
@@ -351,14 +351,15 @@ conthere:
                 Next X
                 If Not zz Is Nothing Then Set z = zz
                 If Typename(z) = "GuiM2000" Then
-                If z.Modal = Modalid Then
+                    Set mm = z
+                    If mm.Modal = Modalid Then
                 
-                Else
-                    z.ShowmeALL
-                   If z.Visible Then z.SetFocus
+                    Else
+                        mm.ShowmeALL
+                        If mm.Visible Then mm.SetFocus
                     End If
                     Set z = Nothing
-                    
+                    Set mm = Nothing
                 ElseIf Not z Is Nothing Then
                     If z.Visible Then z.SetFocus
                 End If

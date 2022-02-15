@@ -19,12 +19,12 @@ Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Dim StartPoint As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private mParamBlock As String, mParams As Long
 Private Hash() As Long
 Public excludeme As Object
 Public NoHere$
-Public exclude As LongHash
+Public exclude As LongHash, StaticCollection As FastCollection
 Public Function Extern(ParamArray a()) As Long
 Attribute Extern.VB_UserMemId = 0
 ' default function
@@ -37,8 +37,8 @@ End If
 ohere$ = here$
 Dim i As Long, ar As mArray, j As Long
 Dim manydim As Long, maxitems As Long, probe As Long, v() As Variant, probelow As Long
-Dim mS As mStiva
-Set mS = objref.soros
+Dim ms As mStiva
+Set ms = objref.soros
 For i = 0 To UBound(a())
 Select Case VarType(a(i))
 Case Is >= vbArray
@@ -64,24 +64,24 @@ Next j
 ar.PushEnd
 'ar.RevOrder = True
 ar.CopySerialize v()
-mS.DataObj ar
+ms.DataObj ar
 Set ar = Nothing
 Erase v()
 Else
-mS.DataValLong 0
+ms.DataValLong 0
 End If
 Case vbEmpty
-mS.DataValLong 0
+ms.DataValLong 0
 Case vbVariant, vbString
-mS.DataStr CStr(a(i))
+ms.DataStr CStr(a(i))
 Case Else
-mS.DataVal CDbl(a(i))
+ms.DataVal CDbl(a(i))
 End Select
 Next i
-objref.soros.MergeTop mS
+objref.soros.MergeTop ms
 here$ = vbNullString
 Call CallEvent(objref, "", 1, VarIndex)
-Set mS = Nothing
+Set ms = Nothing
 here$ = ohere$
 End Function
 
@@ -96,11 +96,11 @@ Public Sub ParamBlock(RHS As String, many As Long)
 mParamBlock = RHS
 mParams = many
 End Sub
-Public Property Get enabled() As Boolean
-enabled = mEnabled
+Public Property Get Enabled() As Boolean
+Enabled = mEnabled
 End Property
 
-Public Property Let enabled(ByVal RHS As Boolean)
+Public Property Let Enabled(ByVal RHS As Boolean)
 mEnabled = RHS
 End Property
 Private Sub Class_Initialize()
@@ -290,14 +290,14 @@ End Sub
 Property Get Percent()
 Percent = count / hashlen
 End Property
-Private Sub place(ByVal b, ByVal a)
+Private Sub place(ByVal B, ByVal a)
     Dim k As Long
-    k = Hash(b)
-    If Not Hash(b) = a + 1 Then
-         Hash(b) = a + 1
+    k = Hash(B)
+    If Not Hash(B) = a + 1 Then
+         Hash(B) = a + 1
          PriveSpace(a).Pleft = k
     End If
-    PriveSpace(a).lastpos = b
+    PriveSpace(a).lastpos = B
 End Sub
 
 Private Function HashFunc2(where As Long)
@@ -313,12 +313,12 @@ Public Sub Upgrade(usethis$)
 Dim i As Long, a$
 For i = 0 To toplim
 a$ = PriveSpace(i).ndx
-Dim b$
+Dim B$
 If a$ <> "" Then
-b$ = Left$(a$, rinstr(a$, "}", 0))
-a$ = Mid$(a$, Len(b$) + 1)
-If b$ <> "" And NoHere = a$ Then
-PriveSpace(i).ndx = b$ + usethis$
+B$ = Left$(a$, rinstr(a$, "}", 0))
+a$ = Mid$(a$, Len(B$) + 1)
+If B$ <> "" And NoHere = a$ Then
+PriveSpace(i).ndx = B$ + usethis$
 End If
 End If
 Next i
