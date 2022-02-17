@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 11
 Global Const VerMinor = 0
-Global Const Revision = 3
+Global Const Revision = 4
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -31630,9 +31630,11 @@ End If
 End Function
 Function procMotionW(bstack As basetask, rest$) As Boolean
 Dim X As Double, Y As Double, myform As GuiM2000, where As Long
+Dim Scr As Object
 If TypeOf bstack.Owner Is GuiM2000 Then
 procMotionW = True
 Set myform = bstack.Owner
+myform1:
 where = FindFormSScreen(myform)
   If Not IsExp(bstack, rest$, X) Then X = myform.Left
     If FastSymbol(rest$, ",") Then
@@ -31649,7 +31651,19 @@ where = FindFormSScreen(myform)
     End If
     
 myform.move X, Y
-
+ElseIf val("0" + bstack.Owner.Tag) > 32 Then
+Set Scr = bstack.Owner.Parent
+If Scr Is Nothing Then Exit Function
+While Not TypeOf Scr Is GuiM2000
+Set Scr = Scr.Parent
+If Scr Is Nothing Then Exit Function
+Wend
+procMotionW = True
+Set myform = Scr
+GoTo myform1
+ElseIf TypeOf bstack.Owner Is MetaDc Then
+oxiforMetaFiles
+Exit Function
 Else
 'If Not Form1.Visible Then Exit Function
 procMotionW = True
@@ -31741,7 +31755,11 @@ X = 0
 If FastSymbol(rest$, ",") Then
     If Not IsStrExp(basestack, rest$, s$) Then
     If TypeOf Scr Is GuiM2000 Then
-    s$ = Scr.Controls(1).FontName
+        If Len(prive.FontName) > 0 Then
+            s$ = prive.FontName
+        Else
+            s$ = Scr.Controls(1).FontName
+        End If
     Else
     s$ = prive.FontName
     End If
@@ -31749,7 +31767,11 @@ If FastSymbol(rest$, ",") Then
     If FastSymbol(rest$, ",") Then
         If Not IsExp(basestack, rest$, X) Then
          If TypeOf Scr Is GuiM2000 Then
-         X = Scr.Controls(1).FontSize
+                 If Len(prive.FontName) > 0 Then
+                    X = prive.SZ
+                 Else
+                    X = Scr.Controls(1).FontSize
+                End If
          Else
             X = prive.SZ
         End If
@@ -41932,35 +41954,6 @@ Else
     MissStringExpr
 End If
 End Function
-Function ProcTargets(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim GuiForm As GuiM2000
-If TypeOf bstack.Owner Is GuiM2000 Then Set GuiForm = bstack.Owner
-If Lang = 1 Then
-    If IsLabelSymbolLatin(rest$, "NEW") Then
-        If Not GuiForm Is Nothing Then
-            GuiForm.ClearTargets
-        Else
-            If Targets Then
-                Targets = False
-            End If
-            ReDim q(0) As target
-        End If
-    End If
-Else
-    If IsLabelSymbol(rest$, "меои") Then
-        If Not GuiForm Is Nothing Then
-            GuiForm.ClearTargets
-        Else
-            If Targets Then
-                Targets = False
-            End If
-            ReDim q(0) As target
-        End If
-    End If
-End If
-ProcTargets = True
-End Function
-
 Function ProcItalic(bstack As basetask, rest$) As Boolean
 Dim p As Variant
 If IsExp(bstack, rest$, p) Then

@@ -1,9 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 3 active-X
-1. Added Accelaretor Keys for Image Control
-2. Static Variables for Events from COM objects and Forms on Event service functions
-3. Removing a bug on s=>method when s was a global name, when static variables used.
+Version 11 Revision 4 active-X
+Fix logic for Trargets on Image control.
 
 
 George Karras, Kallithea Attikis, Greece.

@@ -92,12 +92,28 @@ ColorDialog.Show
 Else
 ColorDialog.Show , Thisform
 End If
+Dim Scr As Object, v1 As Long
+Set Scr = bstack.Owner
+If TypeOf Scr Is GuiM2000 Then
+    Scr.UNhookMe
+ElseIf val("0" + bstack.Owner.Tag) > 32 Then
+    Set Scr = bstack.Owner.Parent
+    If Scr Is Nothing Then Exit Function
+    While Not TypeOf Scr Is GuiM2000
+        Set Scr = Scr.Parent
+        If Scr Is Nothing Then Exit Function
+    Wend
+    Scr.UNhookMe
+ElseIf Not Screen.ActiveForm Is Nothing Then
+    Screen.ActiveForm.UNhookMe
+End If
+
 If Not Screen.ActiveForm Is Nothing Then
 If Not Screen.ActiveForm Is ColorDialog Then
 ColorDialog.Show , Screen.ActiveForm
 End If
 End If
-MoveFormToOtherMonitorOnly ColorDialog, bstack.Owner.Name = "GuiM2000"
+MoveFormToOtherMonitorOnly ColorDialog, Scr.Name = "GuiM2000"
 CancelDialog = False
 If Not ColorDialog.Visible Then
     ColorDialog.Visible = True
@@ -117,6 +133,21 @@ Public Function OpenFont(bstack As basetask, Thisform As Object) As Boolean
 If inUse Then OpenFont = False: Exit Function
 inUse = True
 ExpandWidth = True
+Dim Scr As Object, v1 As Long
+Set Scr = bstack.Owner
+If TypeOf Scr Is GuiM2000 Then
+    Scr.UNhookMe
+ElseIf val("0" + bstack.Owner.Tag) > 32 Then
+    Set Scr = bstack.Owner.Parent
+    If Scr Is Nothing Then Exit Function
+    While Not TypeOf Scr Is GuiM2000
+        Set Scr = Scr.Parent
+        If Scr Is Nothing Then Exit Function
+    Wend
+    Scr.UNhookMe
+ElseIf Not Screen.ActiveForm Is Nothing Then
+    Screen.ActiveForm.UNhookMe
+End If
 
 If Thisform Is Nothing Then
 FontDialog.Show
@@ -128,7 +159,7 @@ If Not Screen.ActiveForm Is FontDialog Then
 FontDialog.Show , Screen.ActiveForm
 End If
 End If
-MoveFormToOtherMonitorOnly FontDialog, bstack.Owner.Name = "GuiM2000"
+MoveFormToOtherMonitorOnly FontDialog, Scr.Name = "GuiM2000"
 CancelDialog = False
 If Not FontDialog.Visible Then
     FontDialog.Visible = True
@@ -175,6 +206,21 @@ If InStr(Settings, ",expand") = 0 Then
 Settings = Settings & ",expand"
 End If
 End If
+Dim Scr As Object, v1 As Long
+Set Scr = bstack.Owner
+If TypeOf Scr Is GuiM2000 Then
+    Scr.UNhookMe
+ElseIf val("0" + bstack.Owner.Tag) > 32 Then
+    Set Scr = bstack.Owner.Parent
+    If Scr Is Nothing Then Exit Function
+    While Not TypeOf Scr Is GuiM2000
+        Set Scr = Scr.Parent
+        If Scr Is Nothing Then Exit Function
+    Wend
+    Scr.UNhookMe
+ElseIf Not Screen.ActiveForm Is Nothing Then
+    Screen.ActiveForm.UNhookMe
+End If
 
 If Thisform Is Nothing Then
 LoadFile.Show
@@ -186,7 +232,7 @@ If Not Screen.ActiveForm Is LoadFile Then
 LoadFile.Show , Screen.ActiveForm
 End If
 End If
-MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.Name = "GuiM2000"
+MoveFormToOtherMonitorOnly LoadFile, Scr.Name = "GuiM2000"
 CancelDialog = False
 If Not LoadFile.Visible Then
     LoadFile.Visible = True
@@ -204,7 +250,7 @@ inUse = False
 End Function
 Public Function OpenDialog(bstack As basetask, Thisform As Object, TopDir As String, lastname As String, thattitle As String, TypeList As String, OpenNew As Boolean, MULTFILES As Boolean) As Boolean
 If inUse Then OpenDialog = False: Exit Function
-Dim foundmulti As Boolean
+Dim foundmulti As Boolean, Scr As Object, v1 As Long
 inUse = True
 ' do something with multifiles..
 ReturnFile = lastname
@@ -243,12 +289,20 @@ Else
 foundmulti = True
 End If
 End If
-If TypeOf bstack.Owner Is GuiM2000 Then
-    bstack.Owner.UNhookMe
+Set Scr = bstack.Owner
+If TypeOf Scr Is GuiM2000 Then
+    Scr.UNhookMe
+ElseIf val("0" + bstack.Owner.Tag) > 32 Then
+    Set Scr = bstack.Owner.Parent
+    If Scr Is Nothing Then Exit Function
+    While Not TypeOf Scr Is GuiM2000
+        Set Scr = Scr.Parent
+        If Scr Is Nothing Then Exit Function
+    Wend
+    Scr.UNhookMe
 ElseIf Not Screen.ActiveForm Is Nothing Then
     Screen.ActiveForm.UNhookMe
 End If
-
 If Thisform Is Nothing Then
 LoadFile.Show
 Else
@@ -259,7 +313,7 @@ If Not Screen.ActiveForm Is LoadFile Then
 LoadFile.Show , Screen.ActiveForm
 End If
 End If
-MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.Name = "GuiM2000"
+MoveFormToOtherMonitorOnly LoadFile, Scr.Name = "GuiM2000"
 CancelDialog = False
 If Not LoadFile.Visible Then
     LoadFile.Visible = True
@@ -281,6 +335,7 @@ inUse = False
 ' read files
 End Function
 Public Function SaveAsDialog(bstack As basetask, Thisform As Object, lastname As String, TopDir As String, thattitle As String, TypeList As String) As Boolean
+Dim Scr As Object
 If inUse Then SaveAsDialog = False: Exit Function
 inUse = True
 DialogPreview = False
@@ -314,6 +369,22 @@ If InStr(Settings, ",expand") = 0 Then
 Settings = Settings & ",expand"
 End If
 End If
+Set Scr = bstack.Owner
+If TypeOf Scr Is GuiM2000 Then
+    Scr.UNhookMe
+ElseIf val("0" + bstack.Owner.Tag) > 32 Then
+    Set Scr = bstack.Owner.Parent
+    If Scr Is Nothing Then Exit Function
+    While Not TypeOf Scr Is GuiM2000
+        Set Scr = Scr.Parent
+        If Scr Is Nothing Then Exit Function
+    Wend
+    Scr.UNhookMe
+ElseIf Not Screen.ActiveForm Is Nothing Then
+    Screen.ActiveForm.UNhookMe
+End If
+
+
 
 If Thisform Is Nothing Then
 LoadFile.Show
@@ -325,7 +396,7 @@ If Not Screen.ActiveForm Is LoadFile Then
 LoadFile.Show , Screen.ActiveForm
 End If
 End If
-MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.Name = "GuiM2000"
+MoveFormToOtherMonitorOnly LoadFile, Scr.Name = "GuiM2000"
  CancelDialog = False
  If Not LoadFile.Visible Then
     LoadFile.Visible = True
@@ -387,6 +458,21 @@ ReturnFile = vbNullString
 Else
 TopFolder = TopDir
 End If
+Dim Scr As Object, v1 As Long
+Set Scr = bstack.Owner
+If TypeOf Scr Is GuiM2000 Then
+    Scr.UNhookMe
+ElseIf val("0" + bstack.Owner.Tag) > 32 Then
+    Set Scr = bstack.Owner.Parent
+    If Scr Is Nothing Then Exit Function
+    While Not TypeOf Scr Is GuiM2000
+        Set Scr = Scr.Parent
+        If Scr Is Nothing Then Exit Function
+    Wend
+    Scr.UNhookMe
+ElseIf Not Screen.ActiveForm Is Nothing Then
+    Screen.ActiveForm.UNhookMe
+End If
 
 If Thisform Is Nothing Then
 LoadFile.Show
@@ -398,7 +484,7 @@ If Not Screen.ActiveForm Is LoadFile Then
 LoadFile.Show , Screen.ActiveForm
 End If
 End If
-MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.Name = "GuiM2000"
+MoveFormToOtherMonitorOnly LoadFile, Scr.Name = "GuiM2000"
 CancelDialog = False
 If Not LoadFile.Visible Then
     LoadFile.Visible = True

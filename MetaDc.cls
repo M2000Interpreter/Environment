@@ -14,7 +14,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Private Type RECT
         Left As Long
-        top As Long
+        Top As Long
         Right As Long
         Bottom As Long
 End Type
@@ -22,7 +22,6 @@ Private Type SIZEL
 cX As Long
 cY As Long
 End Type
-
 Private Type ENHMETAHEADER  ' 88
 iType As Long
 nSize As Long
@@ -48,7 +47,7 @@ Private Type METAFILEPICT
 End Type
 Private Type PWMFRect16
     Left   As Integer
-    top    As Integer
+    Top    As Integer
     Right  As Integer
     Bottom As Integer
 End Type
@@ -65,29 +64,29 @@ Private mHeader As ENHMETAHEADER
 Private Declare Function CreateHatchBrush Lib "gdi32" (ByVal nIndex As Long, ByVal crColor As Long) As Long
 Private Declare Function CreatePen Lib "gdi32.dll" (ByVal fnPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
 Private Declare Function CreateEnhMetaFile Lib "gdi32" Alias "CreateEnhMetaFileW" (ByVal hDCRef As Long, ByVal lpFileName As Long, ByVal lpRect As Long, ByVal lpDescription As Long) As Long
-Private Declare Function CloseEnhMetaFile Lib "gdi32" (ByVal hDC As Long) As Long
+Private Declare Function CloseEnhMetaFile Lib "gdi32" (ByVal hdc As Long) As Long
 Private Declare Function OleCreatePictureIndirect Lib "olepro32.dll" (lpPictDesc As PICTDESC, riid As Any, ByVal fPictureOwnsHandle As Long, IPic As IPicture) As Long
 Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As Long
 Private Declare Function DeleteMetaFile Lib "gdi32" (ByVal hmf As Long) As Long
-Private Declare Function SetBkColor Lib "gdi32" (ByVal hDC As Long, ByVal crColor As Long) As Long
-Private Declare Function LineTo Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long) As Long
-Private Declare Function MoveToEx Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, lpPoint As Any) As Long
-Private Declare Function Rectangle Lib "gdi32.dll" (ByVal hDC As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
+Private Declare Function SetBkColor Lib "gdi32" (ByVal hdc As Long, ByVal crColor As Long) As Long
+Private Declare Function LineTo Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long) As Long
+Private Declare Function MoveToEx Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long, lpPoint As Any) As Long
+Private Declare Function Rectangle Lib "gdi32.dll" (ByVal hdc As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Private Declare Function GetStockObject Lib "gdi32.dll" (ByVal nIndex As Long) As Long
-Private Declare Function PlayEnhMetaFile Lib "gdi32" (ByVal hDC As Long, ByVal hEmf As Long, lpRect As Any) As Long
-Private Declare Function SetGraphicsMode Lib "gdi32" (ByVal hDC As Long, ByVal iMode As Long) As Long
-Private Declare Function GetGraphicsMode Lib "gdi32" (ByVal hDC As Long) As Long
-Private Declare Function SetMapMode Lib "gdi32" (ByVal hDC As Long, ByVal nMapMode As Long) As Long
-Private Declare Function GetMapMode Lib "gdi32" (ByVal hDC As Long) As Long
+Private Declare Function PlayEnhMetaFile Lib "gdi32" (ByVal hdc As Long, ByVal hEmf As Long, lpRect As Any) As Long
+Private Declare Function SetGraphicsMode Lib "gdi32" (ByVal hdc As Long, ByVal iMode As Long) As Long
+Private Declare Function GetGraphicsMode Lib "gdi32" (ByVal hdc As Long) As Long
+Private Declare Function SetMapMode Lib "gdi32" (ByVal hdc As Long, ByVal nMapMode As Long) As Long
+Private Declare Function GetMapMode Lib "gdi32" (ByVal hdc As Long) As Long
 Private Declare Function SetWinMetaFileBits Lib "gdi32" (ByVal cbBuffer As Long, lpbBuffer As Byte, ByVal hDCRef As Long, lpmfp As Any) As Long
 Private Declare Function GetMetaFileBitsEx Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nSize As Long, lpData As Byte) As Long
 
 
-Private Declare Function SetROP2 Lib "gdi32" (ByVal hDC As Long, ByVal nDrawMode As Long) As Long
+Private Declare Function SetROP2 Lib "gdi32" (ByVal hdc As Long, ByVal nDrawMode As Long) As Long
 
 
 
@@ -95,13 +94,13 @@ Private Const MM_TEXT = 1
 Private Const MM_LOENGLISH = 4
 
  Private Type POINTAPI
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
 End Type
 Dim pm As POINTAPI
 
 Dim boundrect As RECT
-Private Declare Function FillRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Private Declare Function FillRect Lib "user32" (ByVal hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Private Type PICTDESC
     Size                As Long
     Type                As Long
@@ -136,10 +135,10 @@ Private Type XFORM
         eDy As Single
 End Type
 
- Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) _
+ Private Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) _
           As Long
-Private Declare Function GetWorldTransform Lib "gdi32" (ByVal hDC As Long, lpXform As XFORM) As Long
-Private Declare Function SetWorldTransform Lib "gdi32" (ByVal hDC As Long, lpXform As XFORM) As Long
+Private Declare Function GetWorldTransform Lib "gdi32" (ByVal hdc As Long, lpXform As XFORM) As Long
+Private Declare Function SetWorldTransform Lib "gdi32" (ByVal hdc As Long, lpXform As XFORM) As Long
 
 Private Const GM_ADVANCED = 2
 Private Const GM_COMPATIBLE = 1
@@ -151,8 +150,8 @@ Public Property Get Name() As String
     Name = "Emf"
 End Property
 
-Public Property Get hDC() As Long
-    hDC = m_hDC
+Public Property Get hdc() As Long
+    hdc = m_hDC
 End Property
 
 Public Property Get status() As Boolean
@@ -181,7 +180,7 @@ Public Sub create(pen As Long, fakeWidth As Long, fakeHeight As Long)
     m_width = (m_width \ dv15) * dv15
     m_height = (m_height \ dv15) * dv15
     boundrect.Left = 0
-    boundrect.top = 0
+    boundrect.Top = 0
     boundrect.Right = (m_width - dv15) * (2540 / 1440)
     boundrect.Bottom = (m_height - dv15) * (2540 / 1440)
     fakeWidth = boundrect.Right * 1440 / 2540
@@ -283,11 +282,11 @@ End Property
 Public Property Let mousepointer(ByVal RHS As Integer)
     m_mousepointer = RHS
 End Property
-Public Property Get backcolor() As Long
-backcolor = m_backcolor
+Public Property Get BackColor() As Long
+BackColor = m_backcolor
 End Property
 
-Public Property Let backcolor(RHS As Long)
+Public Property Let BackColor(RHS As Long)
     m_backcolor = RHS
 End Property
 
@@ -380,11 +379,11 @@ Public Property Let prive(ByVal RHS As Long)
 m_prive = RHS
 End Property
 
-Public Property Get top() As Long
-top = m_top
+Public Property Get Top() As Long
+Top = m_top
 End Property
 
-Public Property Let top(ByVal RHS As Long)
+Public Property Let Top(ByVal RHS As Long)
 m_top = RHS
 End Property
 
@@ -565,7 +564,7 @@ Call SetBkMode(m_hDC, 0)
 If FillBack Then
 linepen = CreateSolidBrush(RGBcolor)
 rp.Left = x1 \ dv15
-rp.top = y1 \ dv15
+rp.Top = y1 \ dv15
 rp.Right = Int(x2 / dv15 + 0.5)
 rp.Bottom = Int(y2 / dv15 + 0.5) + 1
 FillRect m_hDC, rp, linepen
@@ -574,7 +573,7 @@ If DrawBlock Then GoTo cont123
 ElseIf DrawBlock Then
 'linepen = CreateSolidBrush(RGBcolor)
 rp.Left = x1 \ dv15
-rp.top = y1 \ dv15
+rp.Top = y1 \ dv15
 rp.Right = Int(x2 / dv15 + 0.5)
 rp.Bottom = Int(y2 / dv15 + 0.5) + 1
 cont123:
@@ -585,14 +584,14 @@ oldpen = SelectObject(m_hDC, linepen)
 'nowold = SelectObject(m_hDC, hollow)
 'Rectangle m_hDC, rp.Left, rp.top, rp.Right - 1, rp.Bottom - 1
 'SelectObject m_hDC, nowold
-MoveToEx m_hDC, rp.Left, rp.top, ByVal 0
-LineTo m_hDC, rp.Right, rp.top
+MoveToEx m_hDC, rp.Left, rp.Top, ByVal 0
+LineTo m_hDC, rp.Right, rp.Top
 'MoveToEx m_hDC, x1 \ dv15, y1 \ dv15, ByVal 0
 LineTo m_hDC, rp.Right, rp.Bottom
 'MoveToEx m_hDC, x1 \ dv15, y1 \ dv15, ByVal 0
 LineTo m_hDC, rp.Left, rp.Bottom
 'MoveToEx m_hDC, x1 \ dv15, y1 \ dv15, ByVal 0
-LineTo m_hDC, rp.Left, rp.top
+LineTo m_hDC, rp.Left, rp.Top
 
 
 
@@ -621,7 +620,7 @@ Public Property Let FontTransparent(ByVal RHS As Boolean)
 ' do nothing
 m_fonttransparent = RHS
 End Property
-Public Sub PlayEmfInside(picthis As StdPicture, x As Long, y As Long, Optional Width As Long = -1, Optional Height As Long = -1, Optional rot As Single, Optional Xs As Long, Optional Ys As Long)
+Public Sub PlayEmfInside(picthis As StdPicture, X As Long, Y As Long, Optional Width As Long = -1, Optional Height As Long = -1, Optional rot As Single, Optional Xs As Long, Optional Ys As Long)
     Dim kkx As RECT, oMap As Long
     Dim myXForm As XFORM
     
@@ -652,9 +651,9 @@ Public Sub PlayEmfInside(picthis As StdPicture, x As Long, y As Long, Optional W
     Dim kkx1 As Long, kky1 As Long
     kkx1 = Round((Width) / dv15)
     kky1 = Round((Height) / dv15)
-    myXForm = buildXForm(x, y, rot, kkx1, kky1)
+    myXForm = buildXForm(X, Y, rot, kkx1, kky1)
     kkx.Left = Xs - kkx1 / 2
-    kkx.top = Ys - kky1 / 2
+    kkx.Top = Ys - kky1 / 2
     kkx.Right = Xs + kkx1 / 2
     kkx.Bottom = Ys + kky1 / 2
     
@@ -673,7 +672,7 @@ Public Sub PlayEmfInside(picthis As StdPicture, x As Long, y As Long, Optional W
     
     
 End Sub
-Public Sub PlayWmfInside(picthis As StdPicture, x As Long, y As Long, Optional Width As Long = -1, Optional Height As Long = -1, Optional rot As Single, Optional Xs As Long, Optional Ys As Long)
+Public Sub PlayWmfInside(picthis As StdPicture, X As Long, Y As Long, Optional Width As Long = -1, Optional Height As Long = -1, Optional rot As Single, Optional Xs As Long, Optional Ys As Long)
   Dim pHandle As Long
     
     Dim kkx As RECT, oMap As Long
@@ -706,9 +705,9 @@ Public Sub PlayWmfInside(picthis As StdPicture, x As Long, y As Long, Optional W
     Dim kkx1 As Long, kky1 As Long
     kkx1 = Round((Width) / dv15)
     kky1 = Round((Height) / dv15)
-    myXForm = buildXForm(x, y, rot, kkx1, kky1)
+    myXForm = buildXForm(X, Y, rot, kkx1, kky1)
     kkx.Left = Xs - kkx1 / 2
-    kkx.top = Ys - kky1 / 2
+    kkx.Top = Ys - kky1 / 2
     kkx.Right = Xs + kkx1 / 2
     kkx.Bottom = Ys + kky1 / 2
     
@@ -727,14 +726,14 @@ Public Sub PlayWmfInside(picthis As StdPicture, x As Long, y As Long, Optional W
     
     DeleteMetaFile pHandle
 End Sub
-Private Sub PlayEmfInsideSimple(picthis As StdPicture, x As Long, y As Long, Optional Width As Long = -1, Optional Height As Long = -1)
+Private Sub PlayEmfInsideSimple(picthis As StdPicture, X As Long, Y As Long, Optional Width As Long = -1, Optional Height As Long = -1)
     Dim kkx As RECT
 
       
-    kkx.Left = x
-    kkx.top = y
-    kkx.Right = Width + x
-    kkx.Bottom = Height + y
+    kkx.Left = X
+    kkx.Top = Y
+    kkx.Right = Width + X
+    kkx.Bottom = Height + Y
    kkx.Right = kkx.Right * 1.00166666666667
   kkx.Bottom = kkx.Bottom * 1.00333333333333
     SetGraphicsMode m_hDC, GM_ADVANCED
@@ -743,17 +742,17 @@ SetGraphicsMode m_hDC, GM_COMPATIBLE
     
     
 End Sub
-Private Sub PlayWmfInsideSimple(picthis As StdPicture, x As Long, y As Long, Optional Width As Long = -1, Optional Height As Long = -1)
+Private Sub PlayWmfInsideSimple(picthis As StdPicture, X As Long, Y As Long, Optional Width As Long = -1, Optional Height As Long = -1)
 
     Dim pHandle As Long
      pHandle = getEmfFromWmf(picthis, Width * dv15, Height * dv15)
     Dim kkx As RECT
 
       
-    kkx.Left = x
-    kkx.top = y
-    kkx.Right = Width + x
-    kkx.Bottom = Height + y
+    kkx.Left = X
+    kkx.Top = Y
+    kkx.Right = Width + X
+    kkx.Bottom = Height + Y
    kkx.Right = kkx.Right * 1.00166666666667
   kkx.Bottom = kkx.Bottom * 1.00333333333333
     SetGraphicsMode m_hDC, GM_ADVANCED
@@ -854,5 +853,13 @@ Exit Function
 End If
     On Error Resume Next
     zz.mm = 1
-    getEmfFromWmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.hDC, zz)
+    getEmfFromWmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.hdc, zz)
 End Function
+
+Public Property Get Tag() As Variant
+Tag = "0"
+End Property
+
+Public Property Let Tag(ByVal RHS As Variant)
+' nothing
+End Property

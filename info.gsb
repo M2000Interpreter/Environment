@@ -24653,7 +24653,7 @@ MODULE FORMTARGET {\\ FROM 9.9 REVISION 29
 \\ SCANNING HAPPEN AT THE MOUSE DOWN EVENT. SO TARGETS GET A CLICK ONLY
 \\ BUTTONS GET DOUBLE CLICK, OR SHIFT CAPTION LEFT, OR ENTER, BUT NOT A SIMPLE CLICK
 
-Title "ok11", 0
+REM Title "ok11", 0
 
 Declare form1 Form
 m=false
@@ -24675,14 +24675,14 @@ Function form1.Target {
 	\\ so we have to use Layer to redirect to Form1 layer
 	read new code
 	local x,y, x1, y1
-Layer Form1 {
-	(x,y)=(mouse.x, mouse.y)
-	while mouse=1
-		change code, back 7
-		(x1,y1)=(mouse.x, mouse.y)
-		if x1<>x or y1<>y then change code, back 2: break
-		refresh
-	end while
+	Layer Form1 {
+		(x,y)=(mouse.x, mouse.y)
+		while mouse=1
+			change code, back 7
+			(x1,y1)=(mouse.x, mouse.y)
+			if x1<>x or y1<>y then change code, back 2: break
+			refresh
+		end while
 		Target A, m
 		if m then
 			change A, back 2
@@ -34876,5 +34876,100 @@ M.registerObserver Pointer(Observer("Button1", CallBack1$, Pointer(KeyClick(Asc(
 M.registerObserver Pointer(Observer("Button2", CallBack2$, Pointer(MouseClick(2))))
 M.registerObserver Pointer(Observer("Middle", CallBack3$, Pointer(MouseClick(4))))
 M.observe
+}
+MODULE FORMTARGET2 {// Now targets are in Image control (see also FormTarget module)
+declare Form1 form
+declare Image1 image form Form1
+Method Form1, "move", 1000, 1000, 10000, 8000
+Method Image1, "move", 1000, 1000, 6000, 4000
+With Form1, "Title" as Form1.Title$
+With Image1, "Visible" as Visible, "Locked" as Locked, "Enabled" as Enabled
+Form1.Title$="Click on Form1"
+Enabled=true
+Layer Form1 {
+	Gradient 1, 5
+		move 0,0
+	draw to  scale.x/2, scale.y/2
+	circle 1500
+	move 0,0
+}
+m=false
+Module zz {
+	Form1.Title$="You Click on Top Target"
+	Layer {
+		print "ok", timecount
+		refresh
+	}
+	change A, text "ok"
+}
+Function form1.MouseDown {
+	Form1.Title$="You Click on Form1"
+	Stack
+	refresh
+}
+Function Image1.MouseDown {
+	Form1.Title$="You Click on Image1"
+	Stack
+	refresh
+}
+Function Image1.Target {
+	Print "target:", number, A
+	Refresh
+	Form1.Title$="You Click on Bottom Target"
+	Layer Image1 {
+	Target A, m
+	if m then
+		change A, back 2
+	else
+		change A, back 0
+	end if
+}
+m~
+}
+Layer Image1 {
+	window 16, 8000, 6000;
+	form 32, 20
+	cls #333333, 0
+	cursor 4, 4
+	target A, "call local zz", 10, 2, 2,15, 105, "press me"
+	cursor 4, 8
+	target B,"z", 10, 2, 5,15, 115, "press me too"
+}
+k=true
+function form1.click {
+	if locked then locked=false
+	k~
+	if k then
+		method Image1, "CopyBack"
+		layer image1{
+			change a, border 15
+			change b, border 15		
+		}
+	end if
+	visible=k
+}
+Thread {
+	layer Form1 {
+//		Refresh 1000
+		move random(3000), random(3000)
+		draw random(8000), random(8000), random(11,15)
+		method Image1, "CopyBack"
+		layer image1{
+			change a, border 15
+			change b, border 15		
+		}
+		method form1, "RefreshAll"
+//		refresh
+	}
+	Layer {
+		print timecount
+		refresh
+	}
+} as AA interval 100
+locked=true
+k=false
+method Form1, "show", 1
+Threads Erase
+declare Form1 nothing
 }
 UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}
