@@ -174,7 +174,7 @@ If p >= 0 And p < UBound(q()) Then
 While FastSymbol(rest$, ",")
 X = Empty
 If IsLabelSymbolNew(rest$, "ÖÑÁÓÇ", "TEXT", Lang) Then
-If IsStrExp(bstack, rest$, w$) Then q(p).tag = w$
+If IsStrExp(bstack, rest$, w$) Then q(p).Tag = w$
 ElseIf IsLabelSymbolNew(rest$, "ÐÅÍÁ", "PEN", Lang) Then
 If IsExp(bstack, rest$, X, , True) Then q(p).pen = X
 ElseIf IsLabelSymbolNew(rest$, "ÖÏÍÔÏ", "BACK", Lang) Then
@@ -383,7 +383,7 @@ End Property
 Friend Property Get EventObj() As Object
 Set EventObj = myEvent
 End Property
-Friend Sub Callback(B$)
+Friend Sub Callback(b$)
 If Quit Then Exit Sub
 If myEvent Is Nothing Then
 Set EventObj = New mEvent
@@ -391,23 +391,23 @@ End If
 If ByPassEvent Then
     If myEvent.excludeme.IamBusy Then Exit Sub
     Dim Mark$
-    Mark$ = Split(B$, "(")(0)
+    Mark$ = Split(b$, "(")(0)
     If myEvent.excludeme.ExistKey3(Mark$) Then Exit Sub
     If Not TaskMaster Is Nothing Then TaskMaster.tickdrop = 0
     
     If Visible Then
        myEvent.excludeme.AddKey2 Mark$
-    If CallEventFromGuiOne(Me, myEvent, B$) Then
+    If CallEventFromGuiOne(Me, myEvent, b$) Then
        If Not Quit Then myEvent.excludeme.Remove Mark$
     End If
     Else
-        CallEventFromGuiOne Me, myEvent, B$
+        CallEventFromGuiOne Me, myEvent, b$
     End If
 Else
-    CallEventFromGui Me, myEvent, B$
+    CallEventFromGui Me, myEvent, b$
 End If
 End Sub
-Friend Sub CallbackNow(B$, VR())
+Friend Sub CallbackNow(b$, VR())
 If Quit Then Exit Sub
 If myEvent Is Nothing Then
 Set EventObj = New mEvent
@@ -415,10 +415,10 @@ End If
 
 If myEvent.excludeme.IamBusy Then Exit Sub
 Dim Mark$
-Mark$ = Split(B$, "(")(0)
+Mark$ = Split(b$, "(")(0)
 If myEvent.excludeme.ExistKey3(Mark$) Then Exit Sub
 If Visible Then myEvent.excludeme.AddKey2 Mark$
-If CallEventFromGuiNow(Me, myEvent, B$, VR()) Then myEvent.excludeme.Remove Mark$
+If CallEventFromGuiNow(Me, myEvent, b$, VR()) Then myEvent.excludeme.Remove Mark$
 
 End Sub
 
@@ -507,6 +507,12 @@ ResizeMark.Top = Height - MarkSize * dv15
 Dim XX As Long
 XX = GetPixel(Me.hdc, Width - MarkSize * dv15, Height - MarkSize * dv15)
 If XX <> -1 Then
+        If XX >= 0 Then
+            ResizeMark.BackColor = XX
+        Else
+            ResizeMark.BackColor = Me.BackColor
+        End If
+
 ResizeMark.BackColor = XX
 End If
 ResizeMark.Visible = Sizable
@@ -732,7 +738,13 @@ Private Sub Form_Resize()
 If Me.WindowState <> 0 Then WindowState = 0: Exit Sub
 gList2.MoveTwips 0, 0, Me.Width, gList2.HeightTwips
 ResizeMark.move Width - ResizeMark.Width, Height - ResizeMark.Height
-ResizeMark.BackColor = GetPixel(Me.hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+Dim v As Long
+v = GetPixel(Me.hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+If v < 0 Then
+ResizeMark.BackColor = Me.BackColor
+Else
+ResizeMark.BackColor = v
+End If
 End Sub
 
 
@@ -854,6 +866,7 @@ End Sub
 
 Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 On Error Resume Next ' for set focus
+Dim v As Long
 If Button <> 1 Then Exit Sub
 ByPassColor = True
 If UseReverse Then
@@ -931,7 +944,12 @@ If mSizable And mShowMaximize Then
         Else
            Callback mMyName$ + ".Resize()"
         End If
-        ResizeMark.BackColor = GetPixel(Me.hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+        v = GetPixel(Me.hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+        If v >= 0 Then
+            ResizeMark.BackColor = v
+        Else
+            ResizeMark.BackColor = Me.BackColor
+        End If
         If IhaveLastPos Then
                 
                 If mIndex > -1 Then
@@ -1028,7 +1046,12 @@ If mSizable And mShowMaximize Then
         Else
            Callback mMyName$ + ".Resize()"
         End If
-        ResizeMark.BackColor = GetPixel(Me.hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+        v = GetPixel(Me.hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+        If v >= 0 Then
+            ResizeMark.BackColor = v
+        Else
+            ResizeMark.BackColor = Me.BackColor
+        End If
         If IhaveLastPos Then
                 If mIndex > -1 Then
                     Callback mMyName$ + ".Maximized(" + CStr(index) + ")"
@@ -1182,167 +1205,167 @@ CopyFromLParamToRect a, thatRect
 FillBack thathDC, a, thatbgcolor
 End Sub
 Private Sub FillThereMyVersionTrans(thathDC As Long, thatRect As Long, thatbgcolor As Long, Reverse As Boolean)
-Dim a As RECT, B As Long, aline As RECT
-B = 2 * lastfactor
-If B < 2 Then B = 2
-If setupxy - B < 0 Then B = setupxy \ 4 + 1
+Dim a As RECT, b As Long, aline As RECT
+b = 2 * lastfactor
+If b < 2 Then b = 2
+If setupxy - b < 0 Then b = setupxy \ 4 + 1
 CopyFromLParamToRect a, thatRect
 If Reverse Then
-    a.Left = a.Right - setupxy + B
-    a.Right = a.Right - B
+    a.Left = a.Right - setupxy + b
+    a.Right = a.Right - b
 Else
-    a.Left = B
-    a.Right = setupxy - B
+    a.Left = b
+    a.Right = setupxy - b
 End If
-a.Top = B
-a.Bottom = setupxy - B
-If B < 1 Then B = 1 Else B = B * 2 - 1
+a.Top = b
+a.Bottom = setupxy - b
+If b < 1 Then b = 1 Else b = b * 2 - 1
 aline = a
-aline.Left = a.Right - B
+aline.Left = a.Right - b
 FillThere thathDC, VarPtr(aline), mIconColor
 aline = a
-aline.Right = a.Left + B
+aline.Right = a.Left + b
 FillThere thathDC, VarPtr(aline), mIconColor
 
 aline = a
-aline.Bottom = a.Top + B
+aline.Bottom = a.Top + b
 FillThere thathDC, VarPtr(aline), mIconColor
 aline = a
-aline.Top = a.Bottom - B
+aline.Top = a.Bottom - b
 FillThere thathDC, VarPtr(aline), mIconColor
 End Sub
 Private Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long, Reverse As Boolean)
-Dim a As RECT, B As Long
-B = 2 * lastfactor
-If B < 2 Then B = 2
-If setupxy - B < 0 Then B = setupxy \ 4 + 1
+Dim a As RECT, b As Long
+b = 2 * lastfactor
+If b < 2 Then b = 2
+If setupxy - b < 0 Then b = setupxy \ 4 + 1
 CopyFromLParamToRect a, thatRect
 If Reverse Then
-    a.Left = a.Right - setupxy + B
-    a.Right = a.Right - B
+    a.Left = a.Right - setupxy + b
+    a.Right = a.Right - b
 Else
-    a.Left = B
-    a.Right = setupxy - B
+    a.Left = b
+    a.Right = setupxy - b
 End If
-a.Top = B
-a.Bottom = setupxy - B
+a.Top = b
+a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), mIconColor
 CopyFromLParamToRect a, thatRect
-B = 5 * lastfactor
+b = 5 * lastfactor
 If Reverse Then
-    a.Left = a.Right - setupxy + B
-    a.Right = a.Right - B
+    a.Left = a.Right - setupxy + b
+    a.Right = a.Right - b
 Else
-    a.Left = B
-    a.Right = setupxy - B
+    a.Left = b
+    a.Right = setupxy - b
 End If
-a.Top = B
-a.Bottom = setupxy - B
+a.Top = b
+a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), thatbgcolor
 End Sub
 Private Sub FillThereMyVersion2(thathDC As Long, thatRect As Long, butPos As Long, Reverse As Boolean)
-Dim a As RECT, B As Long, c As Long
-B = 2 * lastfactor
-If B < 2 Then B = 2
-If setupxy - B < 0 Then B = setupxy \ 4 + 1
+Dim a As RECT, b As Long, c As Long
+b = 2 * lastfactor
+If b < 2 Then b = 2
+If setupxy - b < 0 Then b = setupxy \ 4 + 1
 c = setupxy * (butPos)
 CopyFromLParamToRect a, thatRect
 If Reverse Then
-    a.Left = a.Right - (c + setupxy * 2) + B
-    a.Right = a.Right - B - c - setupxy
+    a.Left = a.Right - (c + setupxy * 2) + b
+    a.Right = a.Right - b - c - setupxy
 
 Else
-    a.Left = B + c + setupxy
-    a.Right = setupxy - 2 * B + a.Left
+    a.Left = b + c + setupxy
+    a.Right = setupxy - 2 * b + a.Left
 End If
-a.Bottom = setupxy - B
-B = 5 * lastfactor
+a.Bottom = setupxy - b
+b = 5 * lastfactor
 
 If 5 * lastfactor < 1 Then
 a.Top = a.Bottom - 1
 Else
-a.Top = setupxy - B
+a.Top = setupxy - b
 End If
 FillThere thathDC, VarPtr(a), mIconColor
 End Sub
 Private Sub FillThereMyVersion3Trans(thathDC As Long, thatRect As Long, thatbgcolor As Long, butPos As Long, Reverse As Boolean)
-Dim a As RECT, B As Long, c As Long
-B = 2 * lastfactor
-If B < 2 Then B = 2
-If setupxy - B < 0 Then B = setupxy \ 4 + 1
+Dim a As RECT, b As Long, c As Long
+b = 2 * lastfactor
+If b < 2 Then b = 2
+If setupxy - b < 0 Then b = setupxy \ 4 + 1
 c = setupxy * butPos
 CopyFromLParamToRect a, thatRect
 If Reverse Then
-    a.Left = a.Right - (c + setupxy * 2) + B
-    a.Right = a.Right - B - c - setupxy
+    a.Left = a.Right - (c + setupxy * 2) + b
+    a.Right = a.Right - b - c - setupxy
 Else
-    a.Left = B + c + setupxy
-    a.Right = setupxy - 2 * B + a.Left
+    a.Left = b + c + setupxy
+    a.Right = setupxy - 2 * b + a.Left
 End If
-a.Top = 3 * B
-a.Bottom = setupxy - B
+a.Top = 3 * b
+a.Bottom = setupxy - b
 Dim aline As RECT
-If B < 2 Then B = 2 Else B = B * 2 - 1
+If b < 2 Then b = 2 Else b = b * 2 - 1
 aline = a
-aline.Left = a.Right - B
+aline.Left = a.Right - b
 FillThere thathDC, VarPtr(aline), mIconColor
 aline = a
-aline.Right = a.Left + B
+aline.Right = a.Left + b
 FillThere thathDC, VarPtr(aline), mIconColor
 
 aline = a
-aline.Bottom = a.Top + B
+aline.Bottom = a.Top + b
 FillThere thathDC, VarPtr(aline), mIconColor
 aline = a
-aline.Bottom = a.Bottom - B * 2
-aline.Top = a.Bottom - B
+aline.Bottom = a.Bottom - b * 2
+aline.Top = a.Bottom - b
 FillThere thathDC, VarPtr(aline), mIconColor
 End Sub
 Private Sub FillThereMyVersion3(thathDC As Long, thatRect As Long, thatbgcolor As Long, butPos As Long, Reverse As Boolean)
-Dim a As RECT, B As Long, c As Long
-B = 2 * lastfactor
-If B < 2 Then B = 2
-If setupxy - B < 0 Then B = setupxy \ 4 + 1
+Dim a As RECT, b As Long, c As Long
+b = 2 * lastfactor
+If b < 2 Then b = 2
+If setupxy - b < 0 Then b = setupxy \ 4 + 1
 c = setupxy * butPos
 CopyFromLParamToRect a, thatRect
 If Reverse Then
-    a.Left = a.Right - (c + setupxy * 2) + B
-    a.Right = a.Right - B - c - setupxy
+    a.Left = a.Right - (c + setupxy * 2) + b
+    a.Right = a.Right - b - c - setupxy
 Else
-    a.Left = B + c + setupxy
-    a.Right = setupxy - 2 * B + a.Left
+    a.Left = b + c + setupxy
+    a.Right = setupxy - 2 * b + a.Left
 End If
-a.Top = 3 * B
-a.Bottom = setupxy - B
+a.Top = 3 * b
+a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), mIconColor
 CopyFromLParamToRect a, thatRect
-B = 5 * lastfactor
-If B < 2 Then B = 2
+b = 5 * lastfactor
+If b < 2 Then b = 2
 If Reverse Then
-    a.Left = a.Right - (c + setupxy * 2) + B
-    a.Right = a.Right - B - c - setupxy
+    a.Left = a.Right - (c + setupxy * 2) + b
+    a.Right = a.Right - b - c - setupxy
 
 Else
-    a.Left = B + c + setupxy
-    a.Right = setupxy - 2 * B + a.Left
+    a.Left = b + c + setupxy
+    a.Right = setupxy - 2 * b + a.Left
 End If
 
 
-a.Top = 4 * B
-a.Bottom = setupxy - B
+a.Top = 4 * b
+a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), thatbgcolor
-a.Bottom = a.Top - B
-B = 2 * lastfactor
-If B < 2 Then B = 2
-a.Bottom = a.Bottom - B - B / 2
+a.Bottom = a.Top - b
+b = 2 * lastfactor
+If b < 2 Then b = 2
+a.Bottom = a.Bottom - b - b / 2
 
-a.Top = 4 * B + B / 2
+a.Top = 4 * b + b / 2
 FillThere thathDC, VarPtr(a), thatbgcolor
 
 
 End Sub
 Private Sub FillThereMyVersion4(thathDC As Long, thatRect As Long, butPos As Long, Reverse As Boolean)
-Dim a As RECT, B As Long, c As Long
+Dim a As RECT, b As Long, c As Long
 Dim color1 As Long
 color1 = mIconColor
 If Not moveMe And Not ByPassColor Then
@@ -1352,33 +1375,33 @@ If mIconColor = 16777215 Then color1 = 32768 Else color1 = 16777215
 End If
 End If
 End If
-B = 2 * lastfactor
-If B < 2 Then B = 2
-If setupxy - B < 0 Then B = setupxy \ 4 + 1
+b = 2 * lastfactor
+If b < 2 Then b = 2
+If setupxy - b < 0 Then b = setupxy \ 4 + 1
 CopyFromLParamToRect a, thatRect
 If Reverse Then
 c = setupxy * (butPos - 1)
-a.Left = B + c + setupxy
-a.Right = setupxy - 2 * B + a.Left
+a.Left = b + c + setupxy
+a.Right = setupxy - 2 * b + a.Left
 Else
 c = setupxy * butPos
-a.Left = a.Right - (c + setupxy) + B
- a.Right = a.Right - B - c
+a.Left = a.Right - (c + setupxy) + b
+ a.Right = a.Right - b - c
 End If
-a.Bottom = setupxy - B
-B = 5 * lastfactor
+a.Bottom = setupxy - b
+b = 5 * lastfactor
 
 If 5 * lastfactor < 1 Then
 a.Top = a.Bottom - 1
 Else
-a.Top = setupxy - B
+a.Top = setupxy - b
 End If
 FillThere thathDC, VarPtr(a), color1
-a.Top = a.Top - B
-a.Bottom = a.Bottom - B
+a.Top = a.Top - b
+a.Bottom = a.Bottom - b
 FillThere thathDC, VarPtr(a), color1
-a.Top = a.Top - B
-a.Bottom = a.Bottom - B
+a.Top = a.Top - b
+a.Bottom = a.Bottom - b
 FillThere thathDC, VarPtr(a), color1
 
 End Sub
@@ -1863,7 +1886,7 @@ End If
 End Sub
 
 Private Sub ResizeMark_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
-Dim addy As Single, addX As Single
+Dim addy As Single, addX As Single, v As Long
 If Not Relax Then
     X = X + ResizeMark.Left
     Y = Y + ResizeMark.Top
@@ -1883,7 +1906,13 @@ If Not Relax Then
                 Else
                     Callback mMyName$ + ".Resize()"
                 End If
-                ResizeMark.BackColor = GetPixel(Me.hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+                v = GetPixel(Me.hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+                If v >= 0 Then
+                    ResizeMark.BackColor = v
+                Else
+                    ResizeMark.BackColor = Me.BackColor
+                End If
+                
             End If
         End If
         Relax = False
@@ -1981,7 +2010,7 @@ Friend Sub MinimizeON()
            End If
 End Sub
 Private Sub glistN_PanLeftRight(direction As Boolean)
-Dim item As Long
+Dim item As Long, v As Long
 On Error Resume Next
 If direction = True Then
 item = glistN.ListIndex
@@ -2018,7 +2047,12 @@ Case 3
         Else
            Callback mMyName$ + ".Resize()"
         End If
-        ResizeMark.BackColor = GetPixel(Me.hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+        v = GetPixel(Me.hdc, Width \ dv15 - 1, Height \ dv15 - 1)
+        If v >= 0 Then
+            ResizeMark.BackColor = v
+        Else
+            ResizeMark.BackColor = Me.BackColor
+        End If
     MenuSet 2
     End If
 Case 4

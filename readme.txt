@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 4 active-X
-Fix logic for Trargets on Image control.
+Version 11 Revision 5 active-X
+A Fix on Resize event on User Form (to avoid an error with ResizeMark backcolor property)
 
 
 George Karras, Kallithea Attikis, Greece.
