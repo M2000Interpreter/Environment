@@ -22,7 +22,7 @@ Event KeyDown(keycode As Integer, shift As Integer)
 Event LostFocus()
 Event GotFocus()
 Event KeyPress(KeyAscii As Integer)
-Event MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Event MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 Event SpinnerValue(ThisValue As Long)
 Event DeployMenu()
 Event CascadeSelect(item As Long)  ' 1 based
@@ -209,7 +209,7 @@ End Property
 
 Public Property Let ThisKind(ByVal RHS As String)
 mkind = RHS
-glistN.LastLinePart = " " & RHS
+glistN.LastLinePart = " " + RHS
 End Property
 
 
@@ -312,8 +312,8 @@ On Error Resume Next
 glistN.SetFocus
 End Sub
 
-Private Sub glistN_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-RaiseEvent MouseMove(Button, shift, x, y)
+Private Sub glistN_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
+RaiseEvent MouseMove(Button, shift, X, Y)
 End Sub
 Friend Sub OneClick()
 On Error Resume Next

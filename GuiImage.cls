@@ -132,7 +132,7 @@ End Property
 
 Public Property Let prive(ByVal RHS As Long)
     If Not pbox Is Nothing Then
-        pbox.tag = RHS
+        pbox.Tag = RHS
         players(RHS).controlname = myUcase(Callback.modulename + "." + mesCtrlName, True)
        
     End If
@@ -140,7 +140,7 @@ Public Property Let prive(ByVal RHS As Long)
 End Property
 Public Property Get prive() As Long
     If Not pbox Is Nothing Then
-        pbox.tag = mprive
+        pbox.Tag = mprive
     End If
     prive = mprive
 End Property
@@ -504,14 +504,14 @@ VR(1) = Height
         Callback.CallbackNow mesCtrlName + ".Resize()", VR()
     End If
     If VR(0) <> Width Or VR(1) <> Height Then
-        pbox.move pbox.Left, pbox.Top, VR(0), VR(1)
+        pbox.move pbox.Left, pbox.top, VR(0), VR(1)
     End If
 once = False
 End If
 End Sub
 Public Sub CopyBack()
 If pbox Is Nothing Then Exit Sub
-pbox.PaintPicture pbox.Parent.Image, 0, 0, , , pbox.Left, pbox.Top
+pbox.PaintPicture pbox.Parent.Image, 0, 0, , , pbox.Left, pbox.top
 End Sub
 
 Public Sub DisAllTargets()
@@ -530,7 +530,7 @@ If p >= 0 And p < UBound(q()) Then
 While FastSymbol(rest$, ",")
 X = Empty
 If IsLabelSymbolNew(rest$, "ÖÑÁÓÇ", "TEXT", Lang) Then
-If IsStrExp(bstack, rest$, w$) Then q(p).tag = w$
+If IsStrExp(bstack, rest$, w$) Then q(p).Tag = w$
 ElseIf IsLabelSymbolNew(rest$, "ÐÅÍÁ", "PEN", Lang) Then
 If IsExp(bstack, rest$, X, , True) Then q(p).pen = X
 ElseIf IsLabelSymbolNew(rest$, "ÖÏÍÔÏ", "BACK", Lang) Then
@@ -633,7 +633,7 @@ End Function
 Function GetLocale() As Long
     Dim R&
       R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
-      GetLocale = val("&H" & Right(Hex(R), 4))
+      GetLocale = val("&H" + Right(Hex(R), 4))
 End Function
 Function GetKeY(ascii As Integer) As String
     Dim Buffer As String, ret As Long
@@ -641,7 +641,7 @@ Function GetKeY(ascii As Integer) As String
     Buffer = String$(514, 0)
     Dim R&
       R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
-      R = val("&H" & Right(Hex(R), 4))
+      R = val("&H" + Right(Hex(R), 4))
     ret = GetLocaleInfo(R, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
     If ret > 0 Then
         GetKeY = ChrW$(AscW(StrConv(ChrW$(ascii Mod 256), 64, CLng(val("&h" + Left$(Buffer, ret - 1))))))

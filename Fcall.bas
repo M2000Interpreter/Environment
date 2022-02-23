@@ -185,7 +185,7 @@ Dim hLib As Long
     End If
   'End If
   GetFuncPtr = GetProcByName(hLib, sFunc)
-  If GetFuncPtr = 0 Then MyEr "EntryPoint not found: " & sFunc & " in: " & sLib, "EntryPoint not found: " & sFunc & " στο: " & sLib
+  If GetFuncPtr = 0 Then MyEr "EntryPoint not found: " + sFunc + " in: " + sLib, "EntryPoint not found: " + sFunc + " στο: " + sLib
 End Function
 Public Sub RemoveDll(ByVal sLib As String)
 Dim v As Long, s As String
@@ -219,7 +219,7 @@ lfunc = val(Mid$(sFunc, 2))
     End If
    ' End If
   GetFuncPtrOrd = GetProcByOrdinal(hLib, lfunc)
-  If GetFuncPtrOrd = 0 Then MyEr "EntryPoint not found: " & sFunc & " in: " & sLib, "EntryPoint not found: " & sFunc & " στο: " & sLib
+  If GetFuncPtrOrd = 0 Then MyEr "EntryPoint not found: " + sFunc + " in: " + sLib, "EntryPoint not found: " + sFunc + " στο: " + sLib
 End Function
 Public Function GetBStrFromBstrPtr(lpSrc As Long) As String
 Dim slen As Long

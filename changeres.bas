@@ -40,9 +40,9 @@ dmDisplayFrequency As Long
 End Type
 Private Declare Function EnumDisplaySettings Lib "user32" Alias "EnumDisplaySettingsA" (ByVal lpszDeviceName As Long, ByVal iModeNum As Long, lpDevMode As Any) As Boolean
 Private Declare Function ChangeDisplaySettings Lib "user32" Alias "ChangeDisplaySettingsA" (lpDevMode As Any, ByVal dwFlags As Long) As Long
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal nIndex As Long) As Long
 Private Declare Function CreateDC Lib "gdi32" Alias "CreateDCA" (ByVal lpDriverName As String, ByVal lpDeviceName As String, ByVal lpOutput As String, ByVal lpInitData As Any) As Long
-Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
+Private Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) As Long
 Private oldx As Long, oldy As Long
 Private Const MAX_PATH As Long = 260
 Private Const MAX_PATH_UNICODE As Long = 260 * 2 - 1
@@ -147,7 +147,7 @@ If HOOKTEST <> 0 Then
 'Debug.Print "Can't hook now..exit"
 Exit Sub
 End If
-'debug.Print "New Hook @" + CStr(hWnd)
+'debug.Print "New Hook @" & (hWnd)
 HOOKTEST = hWnd
 If m_bInIDE Then Exit Sub
 
@@ -171,7 +171,7 @@ If HOOKTEST <> hWnd Then
 Exit Sub
 End If
 HOOKTEST = 0
-'Debug.Print "Delete Hook @" + CStr(hWnd)
+'Debug.Print "Delete Hook @" & (hWnd)
 If m_bInIDE Then Exit Sub
     If defWndProc > 0 Then
     
@@ -339,7 +339,7 @@ If ExistFileT Then FindClose fhandle: timestamp = uintnew(wfd.ftLastAccessTime.d
 Exit Function
 there2:
 End Function
-Public Sub ChangeScreenRes(x As Long, y As Long)
+Public Sub ChangeScreenRes(X As Long, Y As Long)
 ' this is a modified version that i found in internet
 Static once As Boolean
 
@@ -356,8 +356,8 @@ nDc = CreateDC("DISPLAY", vbNullString, vbNullString, ByVal 0&)
 BITS = GetDeviceCaps(nDc, BITSPIXEL)
 erg = EnumDisplaySettings(0&, 0&, DevM)
 DevM.dmFields = DM_PELSWIDTH Or DM_PELSHEIGHT Or DM_BITSPERPEL
-DevM.dmPelsWidth = x
-DevM.dmPelsHeight = y
+DevM.dmPelsWidth = X
+DevM.dmPelsHeight = Y
 DevM.dmBitsPerPel = BITS
 erg = ChangeDisplaySettings(DevM, CDS_TEST)
 DeleteDC nDc

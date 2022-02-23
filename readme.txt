@@ -1,8 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 5 active-X
-A Fix on Resize event on User Form (to avoid an error with ResizeMark backcolor property)
-
+Version 11 Revision 6 active-X
+A Lot of work, see blog for more information
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

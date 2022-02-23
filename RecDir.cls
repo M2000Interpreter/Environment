@@ -51,7 +51,7 @@ Private Declare Function FindClose Lib "kernel32.dll" (ByVal hFindFile As Long) 
 
 Dim myfile$(), myLevel() As Integer
 Public Event DirFinished()
-Public Event feedback(Filename$) ' dir or filenames...
+Public Event feedback(FileName$) ' dir or filenames...
 Dim Filetypes2find As String  ' input  "jpg|bmp"  or ""
 Dim mrec As Boolean
 Public abort As Boolean
@@ -130,7 +130,7 @@ End Function
   Function TotalDiskSpace(DriveLetter As String) As Currency
 ' Returns the total storage capacity for a drive
 On Error GoTo 100
-Dim Dletter As String, x As Long
+Dim Dletter As String, X As Long
 
     Dim SectorsPerCluster As Long
     Dim BytesPerSector As Long
@@ -138,10 +138,10 @@ Dim Dletter As String, x As Long
     Dim TotalClusters As Long
 
     Dletter = Left(DriveLetter, 1) & ":\"
-    x = GetDiskFreeSpace(Dletter, SectorsPerCluster, _
+    X = GetDiskFreeSpace(Dletter, SectorsPerCluster, _
       BytesPerSector, NumberofFreeClusters, TotalClusters)
     
-    If x = 0 Then 'Error occurred
+    If X = 0 Then 'Error occurred
         TotalDiskSpace = -99 'Assign an arbitrary error value
         Exit Function
     End If
@@ -201,17 +201,17 @@ End Function
 Function FreeDiskSpace(DriveLetter As String) As Currency
 ' Returns the number of free bytes for a drive
 On Error GoTo 400
-Dim Dletter As String, x As Currency
+Dim Dletter As String, X As Currency
     Dim SectorsPerCluster As Long
     Dim BytesPerSector As Long
     Dim NumberofFreeClusters As Long
     Dim TotalClusters As Long
 
     Dletter = Left(DriveLetter, 1) & ":\"
-    x = uintnew(GetDiskFreeSpace(Dletter, SectorsPerCluster, _
+    X = uintnew(GetDiskFreeSpace(Dletter, SectorsPerCluster, _
       BytesPerSector, NumberofFreeClusters, TotalClusters))
     
-    If x = 0 Then 'Error occurred
+    If X = 0 Then 'Error occurred
         FreeDiskSpace = -99@ 'Assign an arbitrary error value
         Exit Function
     End If
@@ -307,7 +307,7 @@ Dim ee As Integer
 If Filetypes2find = "||" Then
 CheckFile = True
 Else
-CheckFile = InStr(Filetypes2find, "|" & UCase(Mid$(expan$, InStrRev(expan$, ".") + 1)) & "|") > 0
+CheckFile = InStr(Filetypes2find, "|" + UCase(Mid$(expan$, InStrRev(expan$, ".") + 1)) + "|") > 0
 End If
 End Function
 
@@ -324,18 +324,14 @@ ClearList
 
 ndx = 0
 For i = 1 To NumberofDrives
- 'Me.additem DriveName(i) & ":\" & CStr(TotalDiskSpace(DriveName(i)))
- AddAFile Chr$(2) + DriveName(i) & ":", 1 + Abs(TotalDiskSpace(DriveName(i)) < 0) 'use level as not enabled
+ AddAFile Chr$(2) + DriveName(i) + ":", 1 + Abs(TotalDiskSpace(DriveName(i)) < 0) 'use level as not enabled
 Next i
 If listcount > 0 Then Dir2 = list(0)
 RaiseEvent DirFinished
 Exit Function
 End If
-'If Right$(ff, 1) <> "\" Then ff = ff & "\"
-'' filetype$ input  "jpg|bmp"  or ""
-
 End If
-Filetypes2find = "|" & UCase(FileType$) & "|"
+Filetypes2find = "|" + UCase(FileType$) + "|"
 mrec = Recursive
 Dim s As String
 
@@ -458,20 +454,20 @@ thatmax = 20
 thatmaxtoo = 20
 ReDim mf$(1 To thatmax)
 ReDim fold$(1 To thatmaxtoo)
-If (Right$("\" & folder, 2) = "\." Or Right$("\" & folder, 3) = "\..") Then Exit Function
+If (Right$("\" & folder, 2) = "\." Or Right$("\" + folder, 3) = "\..") Then Exit Function
 '  The paths need to have the correct unicode lookpath prefix "\\?\" for local HDs or "\\?\UNC" for network shares.
 If Pattern <> "" Then
 If Left$(folder, 2) = "\\" Then
 fhandle = FindFirstFile(StrPtr(folder & "\" & Pattern), wfd)
 Else
-fhandle = FindFirstFile(StrPtr("\\?\" & folder & "\" & Pattern), wfd)
+fhandle = FindFirstFile(StrPtr("\\?\" + folder + "\" & Pattern), wfd)
 End If
 
 Else
 If Left$(folder, 2) = "\\" Then
-fhandle = FindFirstFile(StrPtr(folder & "\*.*"), wfd)
+fhandle = FindFirstFile(StrPtr(folder + "\*.*"), wfd)
 Else
-fhandle = FindFirstFile(StrPtr("\\?\" & folder & "\*.*"), wfd)
+fhandle = FindFirstFile(StrPtr("\\?\" + folder + "\*.*"), wfd)
 End If
 End If
 ' if fhandle = -1 then we have a failure but this isn't the end of search
@@ -515,7 +511,7 @@ If fff Mod 30 = 29 Then mywait Basestack1, 1
          Case 1
          mf$(maxf) = lookpath
          Case 2
-         mf$(maxf) = LCase(ExtractType(lookpath)) & "#" & lookpath
+         mf$(maxf) = LCase$(ExtractType(lookpath)) + "#" + lookpath
          Case Else
          ' maybe here filedatatime can be converted to a unicode reader
          ' I am sure that this isn't ok...for unicode
@@ -534,7 +530,7 @@ Wend
 FindClose fhandle
 ' #1
 ' maybe we can hide that with a switch
- If Level = 1 And folder <> "" And ((LCase(folder & "\") <> LCase(TopFolder)) Or (TopFolder = "\")) Then AddAFile "...", Level: addthis = addthis + 1  '  may we needaswitch here to exclude that
+ If Level = 1 And folder <> "" And ((LCase$(folder + "\") <> LCase$(TopFolder)) Or (TopFolder = "\")) Then AddAFile "...", Level: addthis = addthis + 1  '  may we needaswitch here to exclude that
 If foldersonly Or foldersincluded Then
      ' #2
     If fff > 1 Then
@@ -568,7 +564,7 @@ If maxf > 0 Then
     Next k
     End Select
   
-  If Level < 3 Then RaiseEvent feedback(folder & " (" & CStr(maxf) & ") files")
+  If Level < 3 Then RaiseEvent feedback(folder & " (" & (maxf) & ") files")
 End If
 If Not mrec Then
 If foldersonly Or foldersincluded Then

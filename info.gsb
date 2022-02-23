@@ -11748,7 +11748,8 @@ Function alfa {
  
 Print alfa(1,2,3,4)=2.5
 }
-MODULE MAZE2 {Module Maze2 {
+MODULE MAZE2 {back {cls 0}
+Module Maze2 {
       \\ depth-first search
       While Inkey$<>"" {}  ' drop keys
       Const View as boolean=True
@@ -34875,7 +34876,14 @@ M=Subject()
 M.registerObserver Pointer(Observer("Button1", CallBack1$, Pointer(KeyClick(Asc("A"))), Pointer(MouseClick(1))))
 M.registerObserver Pointer(Observer("Button2", CallBack2$, Pointer(MouseClick(2))))
 M.registerObserver Pointer(Observer("Middle", CallBack3$, Pointer(MouseClick(4))))
+Escape Off
+cls
+Print "Press space to exit"
+cls ,row
 M.observe
+Clear
+Escape On
+Print "Press F3"
 }
 MODULE FORMTARGET2 {// Now targets are in Image control (see also FormTarget module)
 declare Form1 form

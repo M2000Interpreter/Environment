@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 ' lambda functions in M2000
 ' in running state copy nonlocal variables to current list
-Public name$
+Public Name$
 Public code$
 Private Type Vars
     Value As Variant
@@ -42,7 +42,7 @@ For i = 0 To used - 1
                         If glb Then
                         GlobalSub nm$ + "()", "", , , myVar(where).there
                     Else
-                        GlobalSub here$ & "." & bstack.GroupName & nm$ + "()", "", , , myVar(where).there
+                        GlobalSub here$ + "." + bstack.GroupName + nm$ + "()", "", , , myVar(where).there
                 End If
     Set v(myVar(where).there) = myVar(where).Value
     ElseIf Typename(myVar(where).Value) = "Group" Then
@@ -73,7 +73,7 @@ For i = 0 To used - 1
                         If glb Then
                         GlobalSub nm$ + "()", "", , , there
                     Else
-                        GlobalSub here$ & "." & bstack.GroupName & nm$ + "()", "", , , there
+                        GlobalSub here$ + "." + bstack.GroupName + nm$ + "()", "", , , there
                 End If
           ElseIf Typename(myVar(where).Value) = "Group" Then
           If myVar(where).Value.IamApointer Then

@@ -83,21 +83,21 @@ Private Function unpacktext(t1 As Variant) As String
     End If
 End Function
 Private Sub convertNumericEntities(a$)
-Dim B() As String, i As Long, j As Long
-B = Split(a$, "&#")
-If UBound(B) <= 0 Then Exit Sub
-For i = 1 To UBound(B)
-j = InStr(B(i), ";")
-Select Case Left$(B(i), 1)
+Dim b() As String, i As Long, j As Long
+b = Split(a$, "&#")
+If UBound(b) <= 0 Then Exit Sub
+For i = 1 To UBound(b)
+j = InStr(b(i), ";")
+Select Case Left$(b(i), 1)
 Case "x"
 If j - 2 > 0 Then
-    B(i) = ChrW(val("&h" + Mid$(B(i), 2, j - 2))) + Mid$(B(i), j + 1)
+    b(i) = ChrW(val("&h" + Mid$(b(i), 2, j - 2))) + Mid$(b(i), j + 1)
     End If
 Case Else
-    B(i) = ChrW(val(Left$(B(i), j - 1))) + Mid$(B(i), j + 1)
+    b(i) = ChrW(val(Left$(b(i), j - 1))) + Mid$(b(i), j + 1)
 End Select
 Next
-a$ = Join(B, "")
+a$ = Join(b, "")
 End Sub
 Sub PlaceCdata()
 ' <![CDATA["'<>&]]>  ' no escaped
@@ -704,16 +704,16 @@ Else
     ProcessInstruction = ProcessBag.item(i)
 End If
 End Property
-Private Sub MyEr1(a$, B$)
+Private Sub MyEr1(a$, b$)
     status = a$
    
    ' Err.Raise 5000, , a$
 End Sub
-Sub SwapVariant(ByRef a As Variant, ByRef B As Variant)
+Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
    Dim t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory t(0), ByVal VarPtr(a), 16
-   CopyMemory ByVal VarPtr(a), ByVal VarPtr(B), 16
-   CopyMemory ByVal VarPtr(B), t(0), 16
+   CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
+   CopyMemory ByVal VarPtr(b), t(0), 16
 End Sub
 Private Function Advance2Lt(t$, pc As Long, st As Long) As Boolean
 Do While Mid$(t$, pc, 1) <> "<"

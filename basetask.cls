@@ -156,7 +156,7 @@ Public Sub SetVarobJ(ByVal Name$, var As Variant)
     Set StaticCollection.ValueObj = var
     End If
 End Sub
-Public Sub ClearBasket()
+Public Sub clearBasket()
 
     Dim oldname$, Name$
     Name$ = "%_" + StaticInUse
@@ -185,7 +185,7 @@ Public Sub SetBacket(ByVal Name$)
         
     End If
     Set var = StaticCollection
-    If Me.IamThread Or Me.IamAnEvent Then Exit Sub
+    If Me.IamThread Then Exit Sub
     If Parent Is Nothing Then
     
     Else
@@ -855,12 +855,12 @@ While threadsnames.Done
 Set aa = threadsnames.ValueObj
 If Left$(aa.varname, 1) = "_" Then
 If Lang = 0 Then
-a$ = a$ & "есытеяийо мгла "
+a$ = a$ + "есытеяийо мгла "
 Else
-a$ = a$ & "INTERNAL THREAD "
+a$ = a$ + "INTERNAL THREAD "
 End If
 Else
-a$ = a$ & aa.varname + Str$(aa.id) & " "
+a$ = a$ + aa.varname + Str$(aa.id) + " "
 End If
 threadsnames.NextIndex
 Wend

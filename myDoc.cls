@@ -166,14 +166,14 @@ Public Sub ResetColor(ParaNum)
 On Error Resume Next
 ReDim para(ParaNum).colordata(2)
 End Sub
-Public Sub ColorThis(mNum As Long, Optional Count As Long = 0, Optional LookDown As Boolean = True)
+Public Sub ColorThis(mNum As Long, Optional count As Long = 0, Optional LookDown As Boolean = True)
 If ForEditBox Then
-    ColorThis3 mNum, Count, LookDown
+    ColorThis3 mNum, count, LookDown
 Else
-    ColorThis2 mNum, Count, LookDown
+    ColorThis2 mNum, count, LookDown
 End If
 End Sub
-Private Sub ColorThis3(mNum As Long, Optional Count As Long = 0, Optional LookDown As Boolean = True)
+Private Sub ColorThis3(mNum As Long, Optional count As Long = 0, Optional LookDown As Boolean = True)
 Dim docback As Long, lookthis As Long, Data$, oldstart As Long, lenfinal As Long, closed As Long, lastnum As Long
 lenfinal = Len(Final$)
 If lenfinal = 0 Then Final$ = ";": lenfinal = 1
@@ -212,7 +212,7 @@ again55:
             End If
             If Final$ = "}" Then
                         closed = -1
-                       Count = countbrakcet(Data$, closed, Count)
+                       count = countbrakcet(Data$, closed, count)
                        End If
             If lookthis = 15 Then
                     
@@ -240,7 +240,7 @@ again2:
                         Data$ = TextParagraph(lookthis)
                         If Final$ = "}" Then
                         closed = -1
-                        Count = countbrakcet(Data$, closed, Count)
+                        count = countbrakcet(Data$, closed, count)
                         If closed > -1 Then
                         
 
@@ -278,7 +278,7 @@ again2:
                                         Do While lookthis > 0
                                             If para(lookthis).startfrom <> para(docback).startfrom Then GoTo finish
                                             para(lookthis).startfrom = 0
-                                            ColorThis1 lookthis, Count
+                                            ColorThis1 lookthis, count
                                         Loop
                                         mNum = lookthis
                                         GoTo finish
@@ -316,7 +316,7 @@ conthere:
         lookthis = 0: GoTo again
         End If
         If Final = "}" Then
-        If para(docback).startfrom > 0 Then mNum = para(docback).startfrom: Count = 0
+        If para(docback).startfrom > 0 Then mNum = para(docback).startfrom: count = 0
         lookthis = 0: GoTo again
         End If
          GoTo again2
@@ -327,18 +327,18 @@ If mNum = 0 Then Exit Sub
     mNum = DocParaNext(mNum)
 End Sub
 
-Private Sub ColorThis2(mNum As Long, Optional Count As Long = 0, Optional LookDown As Boolean = True)
+Private Sub ColorThis2(mNum As Long, Optional count As Long = 0, Optional LookDown As Boolean = True)
 Dim mNum1 As Long, laststart As Long
 If mNum = 0 Then Exit Sub
-If Count = 0 Then laststart = para(mNum).startfrom
+If count = 0 Then laststart = para(mNum).startfrom
 If ColorEvent Then
 mNum1 = mNum
-ColorThis1 mNum, Count, True
+ColorThis1 mNum, count, True
 
 If Not mNum1 = mNum And mNum <> 0 Then
 
 If laststart <> para(mNum).startfrom Or para(mNum1).colordata(UBound(para(mNum1).colordata) - 1) <> 15 Then
-If Count = 0 And laststart <> 0 Then
+If count = 0 And laststart <> 0 Then
 
 laststart = para(mNum1).startfrom
 mNum1 = DocParaNext(mNum1)
@@ -362,7 +362,7 @@ End If
 mNum = DocParaNext(mNum)
 
 End Sub
-Private Sub ColorThis1(mNum As Long, Count As Long, Optional ByPass As Boolean = False)
+Private Sub ColorThis1(mNum As Long, count As Long, Optional ByPass As Boolean = False)
 Dim lookthis As Long, Data$, mNum1 As Long
 If para(mNum).startfrom <> 0 Then
 
@@ -396,7 +396,7 @@ Loop
 mNum = mNum1
 End If
 
-Count = -1
+count = -1
 Else
 
 If lookthis = 0 And (Switchon Or ByPass) Then
@@ -408,7 +408,7 @@ Do While mNum1 <> 0
     mNum1 = DocParaNext(mNum1)
     
 Loop
-Count = -1
+count = -1
 End If
 
 
@@ -418,7 +418,7 @@ Else
 
 Data$ = TextParagraph(mNum)
 RaiseEvent ColorDataEvent(mNum, Data$, lookthis)
-Count = 0
+count = 0
 End If
 End Sub
  
@@ -1070,8 +1070,8 @@ Dim i As Long, k As Long, j As Long, ii As Long
        
         ElseIf fromPos > Len(b$) Then
            
-           ReWritePara ParaNum, b$ & t_text, True
-            fromPos = Len(b$ & t_text) + 1
+           ReWritePara ParaNum, b$ + t_text, True
+            fromPos = Len(b$ + t_text) + 1
             
             b$ = vbNullString
         Else
@@ -2648,7 +2648,7 @@ Else
 Exit Do
 End If
 Loop
-If addtimes Then TextParagraph(mycur) = TextParagraph(mycur) & " - " & CStr(many)
+If addtimes Then TextParagraph(mycur) = TextParagraph(mycur) & " - " & (many)
 mycur = nextCur
 Loop
 Busy = False
@@ -2761,7 +2761,7 @@ Else
 ReDim a(1 To unique)
 Dim i As Long
 For i = 1 To unique
-a(i) = MakeString(Pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
+a(i) = MakeString(Pos(i), slen(i)) & " (" & (hit(i) + 1) & ")"
 Next i
 ExportWords = a()
 End If
@@ -2779,7 +2779,7 @@ Exit Sub
 Else
 If usenumbers Then
 For i = 1 To unique
-THISOBJECT.additem MakeString(Pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
+THISOBJECT.additem MakeString(Pos(i), slen(i)) & " (" & (hit(i) + 1) & ")"
 Next i
 Else
 For i = 1 To unique

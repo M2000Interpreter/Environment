@@ -452,37 +452,37 @@ Public Function MoveFile(pOldPath As String, pNewPath As String)
     MoveFileW StrPtr(pOldPath), StrPtr(pNewPath)
     
 End Function
-Public Function isdir(F$) As Boolean
+Public Function isdir(f$) As Boolean
 On Error Resume Next
 Dim mm As New recDir
 Dim lookfirst As Boolean
 Dim Pad$
-If F$ = vbNullString Then Exit Function
-If F$ = "." Then F$ = mcd
-If InStr(F$, "\..") > 0 Or F$ = ".." Or Left$(F$, 3) = "..\" Then
-If Right$(F$, 1) <> "\" Then
-Pad$ = ExtractPath(F$ & "\", True, True)
+If f$ = vbNullString Then Exit Function
+If f$ = "." Then f$ = mcd
+If InStr(f$, "\..") > 0 Or f$ = ".." Or Left$(f$, 3) = "..\" Then
+If Right$(f$, 1) <> "\" Then
+Pad$ = ExtractPath(f$ + "\", True, True)
 Else
-Pad$ = ExtractPath(F$, True, True)
+Pad$ = ExtractPath(f$, True, True)
 End If
 If Pad$ = vbNullString Then
-If Right$(F$, 1) <> "\" Then
-Pad$ = ExtractPath(mcd + F$ & "\", True)
+If Right$(f$, 1) <> "\" Then
+Pad$ = ExtractPath(mcd + f$ + "\", True)
 Else
-Pad$ = ExtractPath(mcd + F$, True)
+Pad$ = ExtractPath(mcd + f$, True)
 End If
 End If
 lookfirst = mm.isdir(Pad$)
-If lookfirst Then F$ = Pad$
+If lookfirst Then f$ = Pad$
 Else
-F$ = mylcasefILE(F$)
-lookfirst = mm.isdir(F$)
+f$ = mylcasefILE(f$)
+lookfirst = mm.isdir(f$)
 If Not lookfirst Then
 
-Pad$ = mcd + F$
+Pad$ = mcd + f$
 
 lookfirst = mm.isdir(Pad$)
-If lookfirst Then F$ = Pad$
+If lookfirst Then f$ = Pad$
 
 End If
 End If
@@ -516,11 +516,11 @@ b$ = GetName(GetStrUntil(" ", c$))
 If Right$(b$, 1) = "(" Then b$ = b$ + ")"
 If gp$ <> "" Then gp$ = b$ + ", " + gp$ Else gp$ = b$
 Wend
-If vH_title$ <> "" Then b$ = "<| " & vH_title$ & vbCrLf & vbCrLf Else b$ = vbNullString
+If vH_title$ <> "" Then b$ = "<| " + vH_title$ + vbCrLf + vbCrLf Else b$ = vbNullString
 If Eng Then
-        sHelp "User Modules/Functions [F12]", b$ & gp$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+        sHelp "User Modules/Functions [F12]", b$ + gp$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 Else
-        sHelp "Τμήματα/Συναρτήσεις Χρήστη [F12]", b$ & gp$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+        sHelp "Τμήματα/Συναρτήσεις Χρήστη [F12]", b$ + gp$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 End If
 vHelp Not Form4.Visible
 Exit Sub
@@ -530,12 +530,12 @@ ElseIf GetlocalSubExtra(D$, i) Or D$ = here$ Then
 conthere:
 If D$ = here$ Then i = bstack.OriginalCode
 If vH_title$ <> "" Then
-b$ = "<| " & vH_title$ & vbCrLf & vbCrLf
+b$ = "<| " + vH_title$ + vbCrLf + vbCrLf
 Else
 If Eng Then
-b$ = "<| " & "User Modules/Functions [F12]" & vbCrLf & vbCrLf
+b$ = "<| User Modules/Functions [F12]" + vbCrLf + vbCrLf
 Else
-b$ = "<| " & "Τμήματα/Συναρτήσεις Χρήστη [F12]" & vbCrLf & vbCrLf
+b$ = "<| Τμήματα/Συναρτήσεις Χρήστη [F12]" + vbCrLf + vbCrLf
 End If
 End If
 If Right$(D$, 1) = ")" Then
@@ -553,7 +553,7 @@ Dim ss$
     Else
      ss$ = SBcode(i)
      End If
-        sHelp D$, c$ + "  " & b$ & ss$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+        sHelp D$, c$ + "  " + b$ + ss$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
     
         vHelp Not Form4.Visible
 Exit Sub
@@ -576,26 +576,26 @@ D$ = doriginal$
 If Right$(D$, 2) = "()" Then D$ = Left$(D$, Len(D$) - 1)
 If Left$(D$, 1) = "#" Then
 If AscW(Mid$(D$, 2, 1) + " ") < 128 Then
-SQL$ = "SELECT * FROM [COMMANDS] WHERE ENGLISH >= '" & UCase(D$) & "'"
+SQL$ = "SELECT * FROM [COMMANDS] WHERE ENGLISH >= '" + UCase(D$) + "'"
 Else
-SQL$ = "SELECT * FROM [COMMANDS] WHERE DESCRIPTION >= '" & myUcase(D$, True) & "'"
+SQL$ = "SELECT * FROM [COMMANDS] WHERE DESCRIPTION >= '" + myUcase(D$, True) + "'"
 End If
 Else
 If AscW(D$ + " ") < 128 Then
-SQL$ = "SELECT * FROM [COMMANDS] WHERE ENGLISH >= '" & UCase(D$) & "'"
+SQL$ = "SELECT * FROM [COMMANDS] WHERE ENGLISH >= '" + UCase(D$) + "'"
 Else
-SQL$ = "SELECT * FROM [COMMANDS] WHERE DESCRIPTION >= '" & myUcase(D$, True) & "'"
+SQL$ = "SELECT * FROM [COMMANDS] WHERE DESCRIPTION >= '" + myUcase(D$, True) + "'"
 End If
 End If
-b$ = mylcasefILE(CD & "help2000")
-getrow bstack, p$ & b$ & p$ & c$ & p$ & SQL$ & p$ & ",1," & p$ & p$ & c$ & p$ & p$, False, , , True
-SQL$ = p$ & b$ & p$ & c$ & p$ & "GROUP" & p$
+b$ = mylcasefILE(CD + "help2000")
+getrow bstack, p$ + b$ + p$ + c$ + p$ + SQL$ + p$ + ",1," + p$ + p$ + c$ + p$ + p$, False, , , True
+SQL$ = p$ + b$ + p$ + c$ + p$ + "GROUP" + p$
 If bstack.IsNumber(R) Then
 If bstack.IsString(gp$) Then
 If bstack.IsString(b$) Then
 If bstack.IsString(p$) Then
 If bstack.IsNumber(R) Then
-getrow bstack, SQL$ & "," & CStr(1) & "," & Chr(34) & "GROUPNUM" & Chr(34) & "," & Str$(R), False, , , True
+getrow bstack, SQL$ + "," + CStr(1) + "," + Chr(34) + "GROUPNUM" + Chr(34) + "," + Str$(R), False, , , True
 If bstack.IsNumber(R) Then
 If bstack.IsNumber(R) Then
 If bstack.IsString(c$) Then
@@ -616,18 +616,18 @@ checkit:
         bb = InStr(b$, "__<ENG>__")
         If bb > 0 Then
             If Eng Then
-            c$ = "List [" & NLtrim$(Mid$(c$, InStr(c$, ",") + 1)) & "]"
+            c$ = "List [" + NLtrim$(Mid$(c$, InStr(c$, ",") + 1)) + "]"
                 b$ = Mid$(b$, bb + 11)
             Else
-            c$ = "Λίστα [" & Mid$(c$, 1, InStr(c$, ",") - 1) & "]"
+            c$ = "Λίστα [" + Mid$(c$, 1, InStr(c$, ",") - 1) + "]"
                 b$ = Left$(b$, bb - 1)
             End If
             Else
-             c$ = "Λίστα [" & Mid$(c$, 1, InStr(c$, ",") - 1) & "], List [" & NLtrim$(Mid$(c$, InStr(c$, ",") + 1)) & "]"
+             c$ = "Λίστα [" + Mid$(c$, 1, InStr(c$, ",") - 1) + "], List [" + NLtrim$(Mid$(c$, InStr(c$, ",") + 1)) + "]"
         End If
-        If vH_title$ <> "" Then b$ = "<| " & vH_title$ & vbCrLf & vbCrLf & b$ Else b$ = vbCrLf & b$
+        If vH_title$ <> "" Then b$ = "<| " + vH_title$ + vbCrLf + vbCrLf + b$ Else b$ = vbCrLf + b$
         
-        sHelp gp$, sec$ + c$ & "  " & b$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+        sHelp gp$, sec$ + c$ + "  " + b$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
     
         vHelp Not Form4.Visible
       End If
@@ -691,16 +691,16 @@ End If
         End If
        
         If Eng Then
-        c$ = "List [" & NLtrim$(Mid$(c$, InStr(c$, ",") + 1)) & "]"
+        c$ = "List [" + NLtrim$(Mid$(c$, InStr(c$, ",") + 1)) + "]"
             
         Else
-        c$ = "Λίστα [" & Mid$(c$, 1, InStr(c$, ",") - 1) & "]"
+        c$ = "Λίστα [" + Mid$(c$, 1, InStr(c$, ",") - 1) + "]"
             
         End If
           
-        If vH_title$ <> "" Then b$ = "<| " & vH_title$ & vbCrLf & vbCrLf & b$ Else b$ = vbCrLf & b$
+        If vH_title$ <> "" Then b$ = "<| " + vH_title$ + vbCrLf + vbCrLf + b$ Else b$ = vbCrLf + b$
         
-        sHelp gp$, sec$ + c$ & "  " & b$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+        sHelp gp$, sec$ + c$ + "  " + b$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
     
         vHelp Not Form4.Visible
 
@@ -877,7 +877,7 @@ End If
  On Error Resume Next
  If Left$(base, 1) = "(" Or JetPostfix = ";" Then Exit Function ' we can't create in ODBC
 If ExtractPath(base) = vbNullString Then base = mylcasefILE(mcd + base)
-If ExtractType(base) = vbNullString Then base = base & ".mdb"
+If ExtractType(base) = vbNullString Then base = base + ".mdb"
 
 If CFname((base)) <> "" Then
  If Not CanKillFile(base) Then FilePathNotForUser: Exit Function
@@ -893,7 +893,7 @@ Exit Function
 End If
 End If
 
-CreateObject("ADOX.Catalog").create (JetPrefix & base & JetPostfix & othersettings)   'create a new, empty *.mdb-File
+CreateObject("ADOX.Catalog").create (JetPrefix + base + JetPostfix + othersettings)   'create a new, empty *.mdb-File
 NewBase = True
 End If
 End Function
@@ -922,7 +922,7 @@ If FastSymbol(R$, ",") Then
     
     Set fieldlist = pppp.item(1)
     For i = 0 To fieldlist.count - 1
-        fieldlist.Index = i
+        fieldlist.index = i
         fieldlist.Done = True
         If fieldlist.sValue = -1 Then
             fields = fields + 1
@@ -940,7 +940,7 @@ If FastSymbol(R$, ",") Then
     If indexField.count > 0 Then
     stac1.DataVal indexField.count
     For j = 0 To pppp.item(3).count - 1
-    indexField.Index = j
+    indexField.index = j
     indexField.Done = True
     
    
@@ -954,7 +954,7 @@ stac1.PushVal indexField.count
 stac1.PushVal fields
 Else
 For i = 0 To tables.count - 1
-tables.Index = i
+tables.index = i
 tables.Done = True
 If tables.sValue = 0 Then
 Set pppp = tables.ValueObj
@@ -999,7 +999,7 @@ End If
         'skip this
         Else
             If ExtractPath(base) = vbNullString Then base = mylcasefILE(mcd + base)
-            If ExtractType(base) = vbNullString Then base = base & ".mdb"
+            If ExtractType(base) = vbNullString Then base = base + ".mdb"
             If Not CanKillFile(base) Then FilePathNotForUser: Exit Function
         End If
     If True Then
@@ -1010,50 +1010,50 @@ End If
                 srl = DriveSerial(Left$(base, 3))
                 If srl = 0 And Not GetDosPath(base) = vbNullString Then
                     If Lang = 0 Then
-                        If Not ask("Βάλε το CD/Δισκέτα με το αρχείο " & ExtractName(base, True)) = vbCancel Then Exit Function
+                        If Not ask("Βάλε το CD/Δισκέτα με το αρχείο " + ExtractName(base, True)) = vbCancel Then Exit Function
                     Else
-                        If Not ask("Put CD/Disk with file " & ExtractName(base, True)) = vbCancel Then Exit Function
+                        If Not ask("Put CD/Disk with file " + ExtractName(base, True)) = vbCancel Then Exit Function
                     End If
                 End If
                 If myBase = vbNullString Then
                     If Left$(base, 1) = "(" Or JetPostfix = ";" Then
-                        myBase.open JetPrefix & JetPostfix
+                        myBase.open JetPrefix + JetPostfix
                         If Err.Number Then
                         MyEr Err.Description, Err.Description
                         Exit Function
                         End If
                     Else
-                        myBase.open JetPrefix & GetDosPath(base) & ";Mode=Share Deny Write" & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF      'open the Connection
+                        myBase.open JetPrefix + GetDosPath(base) + ";Mode=Share Deny Write" + JetPostfix + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF      'open the Connection
                     End If
                 End If
                 If Err.Number > 0 Then
                     Do While srl <> DriveSerial(Left$(base, 3))
                         If Lang = 0 Then
-                            If ask("Βάλε το CD/Δισκέτα με αριθμό σειράς " & CStr(srl) & " στον οδηγό " & Left$(base, 1)) = vbCancel Then Exit Do
+                            If ask("Βάλε το CD/Δισκέτα με αριθμό σειράς " + CStr(srl) + " στον οδηγό " + Left$(base, 1)) = vbCancel Then Exit Do
                         Else
-                            If ask("Put CD/Disk with serial number " & CStr(srl) & " in drive " & Left$(base, 1)) = vbCancel Then Exit Do
+                            If ask("Put CD/Disk with serial number " + CStr(srl) + " in drive " + Left$(base, 1)) = vbCancel Then Exit Do
                         End If
                     Loop
                     If srl = DriveSerial(Left$(base, 3)) Then
                         Err.Clear
-                        If myBase = vbNullString Then myBase.open JetPrefix & GetDosPath(base) & ";Mode=Share Deny Write" & JetPostfix & "User Id=" & DBUser & ";Password=" & DBSecurityOFF       'open the Connection
+                        If myBase = vbNullString Then myBase.open JetPrefix + GetDosPath(base) + ";Mode=Share Deny Write" + JetPostfix + "User Id=" + DBUser + ";Password=" + DBSecurityOFF       'open the Connection
                     End If
                 End If
             Else
                 If myBase = vbNullString Then
                 ' check if we have ODBC
                     If Left$(base, 1) = "(" Or JetPostfix = ";" Then
-                        myBase.open JetPrefix & JetPostfix
+                        myBase.open JetPrefix + JetPostfix
                         If Err.Number Then
                             MyEr Err.Description, Err.Description
                             Exit Function
                         End If
                     Else
                         Err.Clear
-                        myBase.open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                        myBase.open JetPrefix + GetDosPath(base) + JetPostfix + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
                         If Err.Number = -2147467259 Then
                            Err.Clear
-                           myBase.open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                           myBase.open JetPrefixOld + GetDosPath(base) + JetPostfixOld + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
                            If Err.Number = 0 Then
                                JetPrefix = JetPrefixOld
                                JetPostfix = JetPostfixOld
@@ -1112,7 +1112,7 @@ End If
                                         End If
          ElseIf Tablename = TBL.Name Then
          cnt = 1
-                     rs.open "Select * From [" & TBL.Name & "] ;", myBase, 3, 4 'adOpenStatic, adLockBatchOptimistic
+                     rs.open "Select * From [" + TBL.Name + "] ;", myBase, 3, 4 'adOpenStatic, adLockBatchOptimistic
                                          stac1.Flush
                                         stac1.DataVal CDbl(rs.fields.count)
                                         If TBL.indexes.count > 0 Then
@@ -1217,7 +1217,7 @@ End If
 g102:
 End Function
 
-Public Function append_table(bstackstr As basetask, base As String, R$, ED As Boolean, Optional Lang As Long = -1) As Boolean
+Public Function append_table(bstackstr As basetask, base As String, R$, ed As Boolean, Optional Lang As Long = -1) As Boolean
 Dim table$, i&, par$, ok As Boolean, TT, t As Double, j&, vv, p_acc As mArray, acc As mArray
 Dim gindex As Long
 Dim mb As Mk2Base, tables As FastCollection, pppp As mArray, Temp As mArray, fieldlist As FastCollection
@@ -1255,9 +1255,9 @@ Set indexField = pppp.item(3)
 Set fieldlist = pppp.item(4)
 If indexField.count > 0 Then
     If gindex > fieldlist.count + 1 Then gindex = fieldlist.count + 1
-    fieldlist.Index = gindex - 1
+    fieldlist.index = gindex - 1
     fieldlist.Done = True
-    tables.Index = fieldlist.Value
+    tables.index = fieldlist.Value
     tables.Done = True
     fieldlist.Done = False
     Set p_acc = tables.ValueObj
@@ -1266,7 +1266,7 @@ If indexField.count > 0 Then
     tables.Done = False
 Else
     If gindex > tables.count + 1 Then gindex = tables.count + 1
-    tables.Index = gindex - 1
+    tables.index = gindex - 1
     tables.Done = True
     Set p_acc = tables.ValueObj
     p_acc.CopyArray acc
@@ -1281,20 +1281,20 @@ i& = 0
 Set fieldlist = pppp.item(1)
 Do
 TT = 0
-fieldlist.Index = p_acc.item(i&)
+fieldlist.index = p_acc.item(i&)
 fieldlist.Done = True
 Set Temp = fieldlist.ValueObj
 
 If FastSymbol(R$, ",") Then
 If i& = 0 And Temp.item(4) Then
-    If Not ED Then
+    If Not ed Then
         acc.item(p_acc.item(i&)) = Temp.item(5)
         Temp.item(5) = Temp.item(5) + 1
     End If
 End If
 ElseIf IsStrExp(bstackstr, R$, par$) Then
     If i& = 0 And Temp.item(4) Then
-        If Not ED Then
+        If Not ed Then
             acc.item(p_acc.item(i&)) = Temp.item(4)
             Temp.item(4) = Temp.item(4) + 1
         End If
@@ -1306,7 +1306,7 @@ ElseIf IsStrExp(bstackstr, R$, par$) Then
     If Not FastSymbol(R$, ",") Then Exit Do
 ElseIf IsExp(bstackstr, R$, TT) Then
     If i& = 0 And Temp.item(4) Then
-        If Not ED Then
+        If Not ed Then
             acc.item(p_acc.item(i&)) = Temp.item(4)
             Temp.item(4) = Temp.item(4) + 1
         End If
@@ -1323,7 +1323,7 @@ Set indexField = pppp.item(3)
 Set fieldlist = pppp.item(4)
 If indexField.count > 0 Then
 For j& = 0 To indexField.count - 1
-    indexField.Index = j&
+    indexField.index = j&
     indexField.Done = True
     If Len(allkey$) = 0 Then
     allkey$ = indexField.Normalize(acc.item(indexField.sValue))
@@ -1337,14 +1337,14 @@ If Len(prevkey$) > 0 Then
             MyEr "index key not unique", "Το κλειδί δεν είναι μοναδικό"
             Exit Function
         End If
-        fieldlist.Index = gindex - 1
+        fieldlist.index = gindex - 1
         fieldlist.Done = True
-        tables.Index = fieldlist.Value
+        tables.index = fieldlist.Value
         ' I have to add logic here for calculating the final bytes for file
         ' so if the previous is less than the current, we can save to same plase
         ' else we have to delete this and make a new entry
         Set tables.ValueObj = acc
-        fieldlist.AddKey allkey$, tables.Index
+        fieldlist.AddKey allkey$, tables.index
         fieldlist.Remove prevkey$
         If pppp.item(5) = 2 Then
             fieldlist.SortDes
@@ -1353,9 +1353,9 @@ If Len(prevkey$) > 0 Then
         End If
     
     Else
-        fieldlist.Index = gindex - 1
+        fieldlist.index = gindex - 1
         fieldlist.Done = True
-        tables.Index = fieldlist.Value
+        tables.index = fieldlist.Value
         tables.Done = True
         fieldlist.Done = False
         Set tables.ValueObj = acc
@@ -1377,7 +1377,7 @@ Else
 End If
 End If
 If gindex > 0 Then
-    tables.Index = gindex - 1
+    tables.index = gindex - 1
     tables.Done = True
     Set tables.ValueObj = acc
 Else
@@ -1412,7 +1412,7 @@ If Left$(base, 1) = "(" Or JetPostfix = ";" Then
 'skip this
 Else
     If ExtractPath(base) = vbNullString Then base = mylcasefILE(mcd + base)
-    If ExtractType(base) = vbNullString Then base = base & ".mdb"
+    If ExtractType(base) = vbNullString Then base = base + ".mdb"
     If Not CanKillFile(base) Then FilePathNotForUser: Exit Function
 End If
           On Error Resume Next
@@ -1427,17 +1427,17 @@ End If
                     Exit Function
                 Else
                 If Left$(base, 1) = "(" Or JetPostfix = ";" Then
-                    myBase.open JetPrefix & JetPostfix
+                    myBase.open JetPrefix + JetPostfix
                     If Err.Number Then
                         MyEr Err.Description, Err.Description
                         Exit Function
                     End If
                 Else
                         Err.Clear
-                        myBase.open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                        myBase.open JetPrefix + GetDosPath(base) + JetPostfix + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
                         If Err.Number = -2147467259 Then
                            Err.Clear
-                           myBase.open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                           myBase.open JetPrefixOld + GetDosPath(base) + JetPostfixOld + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
                            If Err.Number = 0 Then
                                JetPrefix = JetPrefixOld
                                JetPostfix = JetPostfixOld
@@ -1471,20 +1471,20 @@ RemoveOneConn base
  Err.Clear
 rec.open id$, myBase, 3, 4
 If Err.Number Then
-MyEr Err.Description & " " & id$, Err.Description & " " & id$
+MyEr Err.Description + " " + id$, Err.Description + " " + id$
 Exit Function
 End If
 End If
    
    
-If ED Then
+If ed Then
 If gindex > 0 Then
 Err.Clear
     rec.MoveLast
     rec.MoveFirst
     rec.absoluteposition = gindex '  - 1
     If Err.Number <> 0 Then
-    MyEr "Wrong index for table " & table$, "Λάθος δείκτης για αρχείο " & table$
+    MyEr "Wrong index for table " + table$, "Λάθος δείκτης για αρχείο " + table$
     End If
 ElseIf rec.EOF Then
     MyEr "Record not found", "Η Εγγραφή δεν βρέθηκε"
@@ -1500,7 +1500,7 @@ rec.AddNew
 End If
 i& = 0
 While FastSymbol(R$, ",")
-If ED Then
+If ed Then
     While FastSymbol(R$, ",")
     i& = i& + 1
     Wend
@@ -1517,7 +1517,7 @@ Wend
 Err.Clear
 rec.UpdateBatch  ' update be an updatebatch
 If Err.Number > 0 Then
-MyEr "Can't append " & Err.Description, "Αδυναμία προσθήκης:" & Err.Description
+MyEr "Can't append " + Err.Description, "Αδυναμία προσθήκης:" + Err.Description
 append_table = False
 Else
 append_table = True
@@ -1589,16 +1589,16 @@ If IsStrExp(bstackstr, R$, base) Then
                     Set fieldlist = pppp.item(1)
                     If fieldlist.ExistKey(myUcase(first$, True)) Then
                         If fieldlist.sValue <> -1 Then GoTo aError
-                        i& = fieldlist.Index
+                        i& = fieldlist.index
                         ii = 0
                         topi = tables.count
                         many = 0
                         If IndexList.count > 0 Then
                         topi = IndexList.count
                         While ii < topi
-                            IndexList.Index = ii
+                            IndexList.index = ii
                             IndexList.Done = True
-                            tables.Index = IndexList.Value
+                            tables.index = IndexList.Value
                             tables.Done = True
                             If tables.sValue = 0 Then
                                 Set Temp = tables.ValueObj
@@ -1621,7 +1621,7 @@ If IsStrExp(bstackstr, R$, base) Then
                         Wend
                         Else
                         While ii < topi
-                            tables.Index = ii
+                            tables.index = ii
                             tables.Done = True
                             If tables.sValue = 0 Then
                                 Set Temp = tables.ValueObj
@@ -1665,9 +1665,9 @@ aError:
                 topi = IndexList.count
                 
                 While from > 0 And ii < topi
-                    IndexList.Index = ii
+                    IndexList.index = ii
                     IndexList.Done = True
-                    tables.Index = IndexList.Value
+                    tables.index = IndexList.Value
                     tables.Done = True
                     If tables.sValue = 0 Then
                         from = from - 1
@@ -1683,7 +1683,7 @@ aError:
             
             While from > 0 And ii < topi
             
-                tables.Index = ii
+                tables.index = ii
                 tables.Done = True
                 If tables.sValue = 0 Then
                     from = from - 1
@@ -1722,16 +1722,16 @@ If IsStrExp(bstackstr, R$, first$) Then
 If FastSymbol(R$, ",") Then
 If Search$ = vbNullString Then
     If IsStrExp(bstackstr, R$, Search$) Then
-    Search$ = " " & Search$ & " "
+    Search$ = " " + Search$ + " "
         If FastSymbol(R$, ",") Then
                 If IsExp(bstackstr, R$, p) Then
-                Second$ = Search$ & Str$(p)
+                Second$ = Search$ + Str$(p)
                 ok = True
             ElseIf IsStrExp(bstackstr, R$, Second$) Then
             If InStr(Second$, "'") > 0 Then
-                Second$ = Search$ & Chr(34) & Second$ & Chr(34)
+                Second$ = Search$ + Chr(34) + Second$ + Chr(34)
             Else
-                Second$ = Search$ & "'" & Second$ & "'"
+                Second$ = Search$ + "'" + Second$ + "'"
                 End If
                 ok = True
             End If
@@ -1740,13 +1740,13 @@ If Search$ = vbNullString Then
         End If
     Else
      If IsExp(bstackstr, R$, p) Then
-            Second$ = Search$ & Str$(p)
+            Second$ = Search$ + Str$(p)
             ok = True
             ElseIf IsStrExp(bstackstr, R$, Second$) Then
                       If InStr(Second$, "'") > 0 Then
-                Second$ = Search$ & Chr(34) & Second$ & Chr(34)
+                Second$ = Search$ + Chr(34) + Second$ + Chr(34)
             Else
-                Second$ = Search$ & "'" & Second$ & "'"
+                Second$ = Search$ + "'" + Second$ + "'"
                 End If
             ok = True
         End If
@@ -1773,7 +1773,7 @@ If Left$(base, 1) = "(" Or JetPostfix = ";" Then
 
 Else
 If ExtractPath(base) = vbNullString Then base = mylcasefILE(mcd + base)
-If ExtractType(base) = vbNullString Then base = base & ".mdb"
+If ExtractType(base) = vbNullString Then base = base + ".mdb"
 If Not IamHelpFile Then If Not CanKillFile(base) Then FilePathNotForUser: Exit Sub
 End If
 
@@ -1789,7 +1789,7 @@ Else
 id$ = "SELECT * FROM [" + table$ + "]"
   End If
    Else
-id$ = "SELECT * FROM [" & table$ & "] WHERE [" & first$ & "] " & Second$
+id$ = "SELECT * FROM [" + table$ + "] WHERE [" + first$ + "] " + Second$
  End If
 
    If Not getone(base, myBase) Then
@@ -1801,47 +1801,47 @@ id$ = "SELECT * FROM [" & table$ & "] WHERE [" & first$ & "] " & Second$
         srl = DriveSerial(Left$(base, 3))
         If srl = 0 And Not GetDosPath(base) = vbNullString Then
                 If Lang = 0 Then
-                    If Not ask("Βάλε το CD/Δισκέτα με το αρχείο " & ExtractName(base, True)) = vbCancel Then Exit Sub
+                    If Not ask("Βάλε το CD/Δισκέτα με το αρχείο " + ExtractName(base, True)) = vbCancel Then Exit Sub
                 Else
-                    If Not ask("Put CD/Disk with file " & ExtractName(base, True)) = vbCancel Then Exit Sub
+                    If Not ask("Put CD/Disk with file " + ExtractName(base, True)) = vbCancel Then Exit Sub
                 End If
          End If
 
  
  '  If mybase = VbNullString Then ' mybase.Mode = adShareDenyWrite
-   If myBase = vbNullString Then myBase.open JetPrefix & GetDosPath(base) & ";Mode=Share Deny Write" & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+   If myBase = vbNullString Then myBase.open JetPrefix + GetDosPath(base) + ";Mode=Share Deny Write" + JetPostfix + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
 
             If Err.Number > 0 Then
             
             Do While srl <> DriveSerial(Left$(base, 3))
                 If Lang = 0 Then
-                If ask("Βάλε το CD/Δισκέτα με αριθμό σειράς " & CStr(srl) & " στον οδηγό " & Left$(base, 1)) = vbCancel Then Exit Do
+                If ask("Βάλε το CD/Δισκέτα με αριθμό σειράς " + CStr(srl) + " στον οδηγό " + Left$(base, 1)) = vbCancel Then Exit Do
                 Else
-                If ask("Put CD/Disk with serial number " & CStr(srl) & " in drive " & Left$(base, 1)) = vbCancel Then Exit Do
+                If ask("Put CD/Disk with serial number " + CStr(srl) + " in drive " + Left$(base, 1)) = vbCancel Then Exit Do
                 End If
             Loop
             If srl = DriveSerial(Left$(base, 3)) Then
             Err.Clear
-        If myBase = vbNullString Then myBase.open JetPrefix & GetDosPath(base) & ";Mode=Share Deny Write" & JetPostfix & "User Id=" & DBUser & ";Password=" & DBSecurityOFF      'open the Connection
+        If myBase = vbNullString Then myBase.open JetPrefix + GetDosPath(base) + ";Mode=Share Deny Write" + JetPostfix + "User Id=" + DBUser + ";Password=" + DBSecurityOFF      'open the Connection
         
             End If
         
         End If
     Else
-'     myBase.Open JetPrefix & """" & GetDosPath(BASE) & """" & ";Jet OLEDB:Database Password=100101;User Id=" & DBUser  & ";Password=" & DBUserPassword & ";" &  DBSecurityOFF  'open the Connection
+'     myBase.Open JetPrefix + """" + GetDosPath(BASE) + """" + ";Jet OLEDB:Database Password=100101;User Id=" + DBUser  + ";Password=" + DBUserPassword + ";" +  DBSecurityOFF  'open the Connection
  If myBase = vbNullString Then
  If Left$(base, 1) = "(" Or JetPostfix = ";" Then
- myBase.open JetPrefix & JetPostfix
+ myBase.open JetPrefix + JetPostfix
  If Err.Number Then
  MyEr Err.Description, Err.Description
  Exit Sub
  End If
  Else
         Err.Clear
-        myBase.open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+        myBase.open JetPrefix + GetDosPath(base) + JetPostfix + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
         If Err.Number = -2147467259 Then
            Err.Clear
-           myBase.open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+           myBase.open JetPrefixOld + GetDosPath(base) + JetPostfixOld + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
            If Err.Number = 0 Then
                JetPrefix = JetPrefixOld
                JetPostfix = JetPostfixOld
@@ -1850,7 +1850,7 @@ id$ = "SELECT * FROM [" & table$ & "] WHERE [" & first$ & "] " & Second$
            End If
         ElseIf Err.Number <> 0 Then
         
-            MyEr "Read row, open base: " & Err.Description, "Διάβασμα γραμμής, άνοιγμα βάσης: " & Err.Description
+            MyEr "Read row, open base: " + Err.Description, "Διάβασμα γραμμής, άνοιγμα βάσης: " + Err.Description
             Err.Clear
             Exit Sub
         End If
@@ -1882,7 +1882,7 @@ RemoveOneConn base
  Err.Clear
 rec.open id$, myBase, 3, 4
 If Err.Number Then
-MyEr Err.Description & " " & id$, Err.Description & " " & id$
+MyEr Err.Description + " " + id$, Err.Description + " " + id$
 Exit Sub
 End If
 End If
@@ -1891,7 +1891,7 @@ End If
 
    
   If rec.EOF Then
-   ' stack$(BASESTACK) = " 0" & stack$(BASESTACK)
+   ' stack$(BASESTACK) = " 0" + stack$(BASESTACK)
    bstackstr.soros.PushVal CDbl(0)
    rec.Close
   myBase.Close
@@ -1960,7 +1960,6 @@ contNext:
    Next i&
    End If
    
-   'stack$(BaseSTACK) = " " & Trim$(Str$(II)) + stack$(BaseSTACK)
    bstackstr.soros.PushVal CDbl(ii)
 
 
@@ -1968,12 +1967,12 @@ Exit Sub
 g10:
 If ERL Then
 If Lang = 0 Then
-If ask("Το ερώτημα SQL δεν μπορεί να ολοκληρωθεί" & vbCrLf & table$, True) = vbRetry Then GoTo g05
+If ask("Το ερώτημα SQL δεν μπορεί να ολοκληρωθεί" + vbCrLf + table$, True) = vbRetry Then GoTo g05
 Else
-If ask("SQL can't complete" & vbCrLf & table$) = vbRetry Then GoTo g05
+If ask("SQL can't complete" + vbCrLf + table$) = vbRetry Then GoTo g05
 End If
 Err.Clear
-MyErMacro R$, "Can't read a database table :" & table$, "Δεν μπορώ να διαβάσω πίνακα :" & table$
+MyErMacro R$, "Can't read a database table :" + table$, "Δεν μπορώ να διαβάσω πίνακα :" + table$
 End If
 On Error Resume Next
 
@@ -2020,7 +2019,7 @@ If Left$(base, 1) = "(" Or JetPostfix = ";" Then
 'skip this
 Else
     If ExtractPath(base) = vbNullString Then base = mylcasefILE(mcd + base)
-    If ExtractType(base) = vbNullString Then base = base & ".mdb"
+    If ExtractType(base) = vbNullString Then base = base + ".mdb"
     If Not CanKillFile(base) Then FilePathNotForUser: Exit Sub
 End If
 Dim id$
@@ -2040,43 +2039,43 @@ End If
     If srl = 0 And Not GetDosPath(base) = vbNullString Then
     
        If Lang = 0 Then
-    If Not ask("Βάλε το CD/Δισκέτα με το αρχείο " & ExtractName(base, True)) = vbCancel Then Exit Sub
+    If Not ask("Βάλε το CD/Δισκέτα με το αρχείο " + ExtractName(base, True)) = vbCancel Then Exit Sub
     Else
-      If Not ask("Put CD/Disk with file " & ExtractName(base, True)) = vbCancel Then Exit Sub
+      If Not ask("Put CD/Disk with file " + ExtractName(base, True)) = vbCancel Then Exit Sub
     End If
      End If
 
-     myBase.open JetPrefix & GetDosPath(base) & ";Mode=Share Deny Write" & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF    'open the Connection
+     myBase.open JetPrefix + GetDosPath(base) + ";Mode=Share Deny Write" + JetPostfix + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF    'open the Connection
 
                If Err.Number > 0 Then
         
             Do While srl <> DriveSerial(Left$(base, 3))
             If Lang = 0 Then
-            If ask("Βάλε το CD/Δισκέτα με αριθμό σειράς " & CStr(srl) & " στον οδηγό " & Left$(base, 1)) = vbCancel Then Exit Do
+            If ask("Βάλε το CD/Δισκέτα με αριθμό σειράς " + CStr(srl) + " στον οδηγό " + Left$(base, 1)) = vbCancel Then Exit Do
             Else
-            If ask("Put CD/Disk with serial number " & CStr(srl) & " in drive " & Left$(base, 1)) = vbCancel Then Exit Do
+            If ask("Put CD/Disk with serial number " + CStr(srl) + " in drive " + Left$(base, 1)) = vbCancel Then Exit Do
             End If
             Loop
             If srl = DriveSerial(Left$(base, 3)) Then
             Err.Clear
-   myBase.open JetPrefix & GetDosPath(base) & ";Mode=Share Deny Write" & JetPostfix & "User Id=" & DBUser & ";Password=" & DBSecurityOFF   'open the Connection
+   myBase.open JetPrefix + GetDosPath(base) + ";Mode=Share Deny Write" + JetPostfix + "User Id=" + DBUser + ";Password=" + DBSecurityOFF   'open the Connection
                 
             End If
         
         End If
    Else
     If Left$(base, 1) = "(" Or JetPostfix = ";" Then
- myBase.open JetPrefix & JetPostfix
+ myBase.open JetPrefix + JetPostfix
  If Err.Number Then
  MyEr Err.Description, Err.Descnullription
  Exit Sub
  End If
  Else
         Err.Clear
-        myBase.open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+        myBase.open JetPrefix + GetDosPath(base) + JetPostfix + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
         If Err.Number = -2147467259 Then
            Err.Clear
-           myBase.open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+           myBase.open JetPrefixOld + GetDosPath(base) + JetPostfixOld + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
            If Err.Number = 0 Then
                JetPrefix = JetPrefixOld
                JetPostfix = JetPostfixOld
@@ -2104,7 +2103,7 @@ RemoveOneConn base
  Err.Clear
 rec.open id$, myBase, 3, 4
 If Err.Number Then
-MyEr Err.Description & " " & id$, Err.Description & " " & id$
+MyEr Err.Description + " " + id$, Err.Description + " " + id$
 Exit Sub
 End If
 End If
@@ -2113,7 +2112,7 @@ End If
  ' DBEngine.Idle dbRefreshCache
 
   If rec.EOF Then
-   ''''''''''''''''' stack$(BASESTACK) = " 0" & stack$(BASESTACK)
+   ''''''''''''''''' stack$(BASESTACK) = " 0" + stack$(BASESTACK)
 bstackstr.soros.PushVal CDbl(0)
   Exit Sub
  
@@ -2131,7 +2130,7 @@ If from >= 0 Then
 End If
 If many + from - 1 > ii Then many = ii - from + 1
 bstackstr.soros.PushVal CDbl(ii)
-''''''''''''''''' stack$(BASESTACK) = " " & Trim$(Str$(II)) + stack$(BASESTACK)
+''''''''''''''''' stack$(BASESTACK) = " " + Trim$(Str$(II)) + stack$(BASESTACK)
 
     For i& = 1 To many
     bv.additemFast CStr(rec.fields(0))   ' USING gList
@@ -2170,7 +2169,7 @@ If Left$(base, 1) = "(" Or JetPostfix = ";" Then
 'skip this
 Else
     If ExtractPath(base) = vbNullString Then base = mylcasefILE(mcd + base)
-    If ExtractType(base) = vbNullString Then base = base & ".mdb"
+    If ExtractType(base) = vbNullString Then base = base + ".mdb"
     If Not CanKillFile(base) Then FilePathNotForUser: Exit Sub
 End If
 
@@ -2187,17 +2186,17 @@ If Not getone(base, myBase) Then
         Exit Sub
     Else
         If Left$(base, 1) = "(" Or JetPostfix = ";" Then
-            myBase.open JetPrefix & JetPostfix
+            myBase.open JetPrefix + JetPostfix
             If Err.Number Then
             MyEr Err.Description, Err.Description
             Exit Sub
             End If
         Else
             Err.Clear
-            myBase.open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+            myBase.open JetPrefix + GetDosPath(base) + JetPostfix + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
             If Err.Number = -2147467259 Then
                Err.Clear
-               myBase.open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+               myBase.open JetPrefixOld + GetDosPath(base) + JetPostfixOld + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
                If Err.Number = 0 Then
                    JetPrefix = JetPrefixOld
                    JetPostfix = JetPostfixOld
@@ -2320,7 +2319,7 @@ If Left$(base, 1) = "(" Or JetPostfix = ";" Then
 'skip this
 Else
     If ExtractPath(base) = vbNullString Then base = mylcasefILE(mcd + base)
-    If ExtractType(base) = vbNullString Then base = base & ".mdb"
+    If ExtractType(base) = vbNullString Then base = base + ".mdb"
     If Not CanKillFile(base) Then FilePathNotForUser: Exit Function
 End If
     
@@ -2336,17 +2335,17 @@ End If
                     Exit Function
                 Else
                     If Left$(base, 1) = "(" Or JetPostfix = ";" Then
-                        myBase.open JetPrefix & JetPostfix
+                        myBase.open JetPrefix + JetPostfix
                         If Err.Number Then
                         MyEr Err.Description, Err.Description
                         Exit Function
                         End If
                     Else
                         Err.Clear
-                        myBase.open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                        myBase.open JetPrefix + GetDosPath(base) + JetPostfix + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
                         If Err.Number = -2147467259 Then
                            Err.Clear
-                           myBase.open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                           myBase.open JetPrefixOld + GetDosPath(base) + JetPostfixOld + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
                            If Err.Number = 0 Then
                                JetPrefix = JetPrefixOld
                                JetPostfix = JetPostfixOld
@@ -2382,7 +2381,7 @@ RemoveOneConn base
             
 
 If Err.Number Then
-MyEr Err.Description & " " & Tablename, Err.Description & " " & Tablename
+MyEr Err.Description + " " + Tablename, Err.Description + " " + Tablename
 Exit Function
 End If
 End If
@@ -2535,7 +2534,7 @@ If Left$(base, 1) = "(" Or JetPostfix = ";" Then
 'skip this
 Else
     If ExtractPath(base) = vbNullString Then base = mylcasefILE(mcd + base)
-    If ExtractType(base) = vbNullString Then base = base & ".mdb"
+    If ExtractType(base) = vbNullString Then base = base + ".mdb"
     If Not CanKillFile(base) Then FilePathNotForUser: Exit Function
 End If
     Dim okndx As Boolean, okntable As Boolean, one_ok As Boolean
@@ -2552,17 +2551,17 @@ End If
                     Exit Function
                 Else
                 If Left$(base, 1) = "(" Or JetPostfix = ";" Then
-                    myBase.open JetPrefix & JetPostfix
+                    myBase.open JetPrefix + JetPostfix
                     If Err.Number Then
                     MyEr Err.Description, Err.Description
                     Exit Function
                     End If
                 Else
                     Err.Clear
-                    myBase.open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                    myBase.open JetPrefix + GetDosPath(base) + JetPostfix + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
                     If Err.Number = -2147467259 Then
                        Err.Clear
-                       myBase.open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                       myBase.open JetPrefixOld + GetDosPath(base) + JetPostfixOld + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
                        If Err.Number = 0 Then
                            JetPrefix = JetPrefixOld
                            JetPostfix = JetPostfixOld
@@ -2593,7 +2592,7 @@ RemoveOneConn base
  Err.Clear
  Set cat.ActiveConnection = myBase
 If Err.Number Then
-MyEr Err.Description & " " & mtable, Err.Description & " " & mtable
+MyEr Err.Description + " " + mtable, Err.Description + " " + mtable
 Exit Function
 End If
 End If
@@ -2719,14 +2718,14 @@ End If
 realtype$ = mylcasefILE(Trim$(ExtractType(base)))
 If realtype$ <> "" Then
     base = ExtractPath(base, True) + ExtractNameOnly(base, True)
-    If BASE2 = vbNullString Then BASE2 = strTemp & LTrim$(Str(Timer)) & "_0." + realtype$ Else BASE2 = ExtractPath(BASE2) + LTrim$(Str(Timer)) + "_0." + realtype$
+    If BASE2 = vbNullString Then BASE2 = strTemp + LTrim$(Str(Timer)) + "_0." + realtype$ Else BASE2 = ExtractPath(BASE2) + LTrim$(Str(Timer)) + "_0." + realtype$
     Set conn = CreateObject("JRO.JetEngine")
-    base = base & "." + realtype$
+    base = base + "." + realtype$
 
-   conn.CompactDatabase JetPrefix & base & JetPostfixUser, _
-                                GetStrUntil(";", "" + JetPrefix) & _
-                                GetStrUntil(":", "" + JetPostfix) & ":Engine Type=5;" & _
-                                "Data Source=" & BASE2 & JetPostfixUser
+   conn.CompactDatabase JetPrefix + base + JetPostfixUser, _
+                                GetStrUntil(";", "" + JetPrefix) + _
+                                GetStrUntil(":", "" + JetPostfix) + ":Engine Type=5;" + _
+                                "Data Source=" + BASE2 + JetPostfixUser
                                 
 
     
@@ -2756,7 +2755,7 @@ If realtype$ <> "" Then
       
       
  
-      MyErMacro R$, "Can't compact databese " & ExtractName(base, True) & "." & " use a back up", "Πρόβλημα με την βάση " & ExtractName(base, True) & ".mdb χρησιμοποίησε ένα σωσμένο αρχείο"
+      MyErMacro R$, "Can't compact databese " + ExtractName(base, True) + "." + " use a back up", "Πρόβλημα με την βάση " + ExtractName(base, True) + ".mdb χρησιμοποίησε ένα σωσμένο αρχείο"
       End If
       Err.Clear
     End If
@@ -2826,9 +2825,9 @@ If IsStrExp(bstackstr, R$, Second$) Then
 ok = True
 
            If InStr(Second$, "'") > 0 Then
-                Second$ = Chr(34) & Second$ & Chr(34)
+                Second$ = Chr(34) + Second$ + Chr(34)
             Else
-                Second$ = "'" & Second$ & "'"
+                Second$ = "'" + Second$ + "'"
                 End If
 ElseIf IsExp(bstackstr, R$, p) Then
 ok = True
@@ -2857,7 +2856,7 @@ If Left$(base, 1) = "(" Or JetPostfix = ";" Then
 'skip this we can 't killfile the base for odbc
 Else
     If ExtractPath(base) = vbNullString Then base = mylcasefILE(mcd + base)
-    If ExtractType(base) = vbNullString Then base = base & ".mdb"
+    If ExtractType(base) = vbNullString Then base = base + ".mdb"
     If Not CanKillFile(base) Then FilePathNotForUser: DELfields = False: Exit Function
     If CheckMine(base) Then KillFile base: DELfields = True: Exit Function
     
@@ -2873,7 +2872,7 @@ If Left$(base, 1) = "(" Or JetPostfix = ";" Then
 'skip this
 Else
     If ExtractPath(base) = vbNullString Then base = mylcasefILE(mcd + base)
-    If ExtractType(base) = vbNullString Then base = base & ".mdb"
+    If ExtractType(base) = vbNullString Then base = base + ".mdb"
     If Not CanKillFile(base) Then FilePathNotForUser: DELfields = False: Exit Function
 End If
 
@@ -2888,17 +2887,17 @@ Dim myBase
                     Exit Function
                 Else
                     If Left$(base, 1) = "(" Or JetPostfix = ";" Then
-                        myBase.open JetPrefix & JetPostfix
+                        myBase.open JetPrefix + JetPostfix
                         If Err.Number Then
                         MyEr Err.Description, Err.Description
                         DELfields = False: Exit Function
                         End If
                     Else
                         Err.Clear
-                        myBase.open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                        myBase.open JetPrefix + GetDosPath(base) + JetPostfix + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
                         If Err.Number = -2147467259 Then
                            Err.Clear
-                           myBase.open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                           myBase.open JetPrefixOld + GetDosPath(base) + JetPostfixOld + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF     'open the Connection
                            If Err.Number = 0 Then
                                JetPrefix = JetPrefixOld
                                JetPostfix = JetPostfixOld
@@ -2923,9 +2922,9 @@ Dim rec
    Exit Function
    Else
    myBase.errors.Clear
-   myBase.Execute "DELETE * FROM [" & table$ & "] WHERE " & first$ & " = " & Second$
+   myBase.Execute "DELETE * FROM [" + table$ + "] WHERE " + first$ + " = " + Second$
    If myBase.errors.count > 0 Then
-   MyEr "Can't delete " & table$, "Δεν μπορώ να διαγράψω"
+   MyEr "Can't delete " + table$, "Δεν μπορώ να διαγράψω"
    Else
     DELfields = True
    End If
@@ -2942,10 +2941,10 @@ Dim Cnn1
  Set Cnn1 = CreateObject("ADODB.Connection")
 
  On Error Resume Next
- Cnn1.open JetPrefix & DBFileName & ";Jet OLEDB:Database Password=;User Id=" & DBUser & ";Password=" & DBUserPassword & ";"  ' &  DBSecurityOFF 'open the Connection
+ Cnn1.open JetPrefix + DBFileName + ";Jet OLEDB:Database Password=;User Id=" + DBUser + ";Password=" + DBUserPassword + ";"  ' +  DBSecurityOFF 'open the Connection
  If Err Then
  Err.Clear
- Cnn1.open JetPrefix & DBFileName & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF    'open the Connection
+ Cnn1.open JetPrefix + DBFileName + JetPostfix + "User Id=" + DBUser + ";Password=" + DBUserPassword + ";" + DBSecurityOFF    'open the Connection
  If Err Then
  Else
  CheckMine = True
@@ -2970,7 +2969,7 @@ Dim i As Long
 Err.Clear
 For i = conCollection.count - 1 To 0 Step -1
 On Error Resume Next
-conCollection.Index = i
+conCollection.index = i
 If conCollection.IsObj Then
 If TypeOf conCollection.ValueObj Is Mk2Base Then
 ' do nothing just throw
@@ -2982,11 +2981,11 @@ With conCollection.ValueObj
 bb = .ConnectionString <> ""
 If Err.Number = 0 Then
 If .mode > 0 Then
-If .state = 1 Then
+If .State = 1 Then
    .Close
-ElseIf .state = 2 Then
+ElseIf .State = 2 Then
     .Close
-ElseIf .state > 2 Then
+ElseIf .State > 2 Then
 Call .Cancel
 .Close
 End If
@@ -3435,9 +3434,9 @@ Else
           ElseIf UCase(s$) = "ODBC" Or UCase(s$) = "PATH" Then
                 If FastSymbol(rest$, ",") Then
                  If IsStrExp(bstack, rest$, ss$) Then
-                 JetPrefixUser = pa$ & ";Password=" & ss$
+                 JetPrefixUser = pa$ + ";Password=" + ss$
                  Else
-                 JetPrefixUser = pa$ & ";Password="
+                 JetPrefixUser = pa$ + ";Password="
                  End If
                 Else
                 JetPrefixUser = pa$
@@ -3448,9 +3447,9 @@ Else
              If FastSymbol(rest$, ",") Then
                 If IsStrExp(bstack, rest$, ss$) Then
                    If ss$ = vbNullString Then
-                       JetPostfixUser = ";" & s$ & ":Database Password=100101;"
+                       JetPostfixUser = ";" + s$ + ":Database Password=100101;"
                    Else
-                       JetPostfixUser = ";" & s$ & ":Database Password=" & ss$ & ";"
+                       JetPostfixUser = ";" + s$ + ":Database Password=" + ss$ + ";"
                    
                    End If
                     
@@ -3458,7 +3457,7 @@ Else
                     ProcDBprovider = False
                 End If
              Else
-                JetPostfixUser = ";" & s$ & ":Database Password=100101;"
+                JetPostfixUser = ";" + s$ + ":Database Password=100101;"
              End If
           End If
         Else

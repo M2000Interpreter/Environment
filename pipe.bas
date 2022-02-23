@@ -377,7 +377,7 @@ Next i
 If LBound(a()) = UBound(a()) Then
 PurifyPath = a$(UBound(a$()))
 Else
-PurifyPath = ExtractPath(Join(a$, "\") & "\", False)
+PurifyPath = ExtractPath(Join(a$, "\") + "\", False)
 End If
 End Function
 Public Function PurifyName(sStr As String) As String
@@ -555,7 +555,7 @@ Sub PlaySoundNew(f As String)
 If f = vbNullString Then
 PlaySound 0&, 0&, SND_PURGE
 Else
-If ExtractType(f) = vbNullString Then f = f & ".WAV"
+If ExtractType(f) = vbNullString Then f = f + ".WAV"
 f = CFname(f)
 PlaySound StrPtr(f), ByVal 0&, SND_FILENAME Or SND_ASYNC
 End If
@@ -608,7 +608,7 @@ Dim b$
 a$ = myUcase(a$)
 b$ = Left$(a$, InStr(1, a$, "\pipe\", vbTextCompare))
 If b$ = vbNullString Then
-validpipename = "\\" & strMachineName & "\pipe\" & a$
+validpipename = "\\" + strMachineName + "\pipe\" + a$
 Else
 validpipename = a$
 End If

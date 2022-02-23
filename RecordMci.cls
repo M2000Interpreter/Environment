@@ -23,7 +23,7 @@ Private Type WAVEINCAPS
 End Type
 Private Declare Function mciGetErrorString Lib "winmm.dll" Alias "mciGetErrorStringA" (ByVal dwError As Long, ByVal lpstrBuffer As String, ByVal uLength As Long) As Long 'Get the error message of the mcidevice if any
 Private Declare Function mciSendString Lib "winmm.dll" Alias "mciSendStringA" (ByVal lpstrCommand As String, ByVal lpstrReturnString As String, ByVal uReturnLength As Long, ByVal hwndCallback As Long) As Long 'Send command strings to the mci device
-Private Declare Function mciSendString2 Lib "winmm.dll" Alias "mciSendStringA" (ByVal lpstrCommand As String, ByVal Id As Long, ByVal something1 As Long, ByVal hwndCallback As Long) As Long
+Private Declare Function mciSendString2 Lib "winmm.dll" Alias "mciSendStringA" (ByVal lpstrCommand As String, ByVal id As Long, ByVal something1 As Long, ByVal hwndCallback As Long) As Long
 
 Private Declare Function waveInGetNumDevs Lib "winmm.dll" () As Long
 Private Declare Function waveInGetID Lib "winmm.dll" ( _
@@ -33,7 +33,7 @@ Private Declare Function waveInGetDevCaps Lib "winmm.dll" _
                          Alias "waveInGetDevCapsW" ( _
                          ByVal uDeviceID As Long, _
                          ByRef lpCaps As WAVEINCAPS, _
-                         ByVal uSize As Long) As Long
+                         ByVal USize As Long) As Long
 Private Declare Function lstrcpyn Lib "kernel32" _
                          Alias "lstrcpynW" ( _
                          ByRef lpString1 As Any, _
@@ -97,7 +97,7 @@ Public Sub QualityRadio()
   
 End Sub
 Public Sub QualityAny(qrec As Double)
- Error = mciSendString2("set mycapture samplespersec " & CStr(CLng(qrec)) & " BYTESPERSEC " & CStr(CLng(qrec) * NeedByteFactor), 0&, 0, 0)
+ Error = mciSendString2("set mycapture samplespersec " & (CLng(qrec)) & " BYTESPERSEC " & (CLng(qrec) * NeedByteFactor), 0&, 0, 0)
 End Sub
 Public Sub Mono()
 Error = mciSendString2("set mycapture channels 1", 0&, 0, 0)
@@ -128,7 +128,7 @@ Error = mciSendString2("record mycapture overwrite", 0, 0, 0)
 End Sub
 Sub CutRecordMs(recStart As Double, recEnd As Double)
 Error = mciSendString2("set mycapture time format ms", 0, 0, 0)
-Error = mciSendString2("delete mycapture from " & CStr(recStart) & " to " & CStr(recEnd), 0&, 0, 0)
+Error = mciSendString2("delete mycapture from " & (recStart) & " to " & (recEnd), 0&, 0, 0)
 
 End Sub
 Public Function getPositionInMS() As Long

@@ -361,7 +361,7 @@ Private Function getRGB(bckColor As Variant) As Long
 Dim br As Byte, bg As Byte, bbb As Byte, ba$
 If VarType(bckColor) <> vbString Then ba$ = Hex$(bckColor) Else ba$ = bckColor
 ba$ = Right$("00000" & ba$, 6)
-getRGB = val("&h" & Mid$(ba$, 1, 2)) * 256 * 256 + val("&h" & Mid$(ba$, 3, 2)) * 256 + val("&h" & Mid$(ba$, 5, 2))
+getRGB = val("&h" + Mid$(ba$, 1, 2) + Mid$(ba$, 3, 2) + Mid$(ba$, 5, 2) + "&")
 End Function
 Private Function getRGBquad(rgb As RGBQUAD) As Long
 getRGBquad = cUlng(rgb.rgbRed + rgb.rgbGreen * 256@ + rgb.rgbBlue * 256 * 256@)
@@ -503,7 +503,7 @@ Dim lHDC As Long
 Dim lhBmpOld As Long
 Dim hObj As Long
 Dim lFmt As Long
-Dim B() As Byte
+Dim b() As Byte
 Dim tbi As BITMAPINFO
 Dim lPtr As Long
 Dim hDibCopy As Long
@@ -694,13 +694,13 @@ Friend Function create32( _
 End Function
 Public Property Get BytesPerScanLine() As Long
     ' Scans must align on dword boundaries:
-    Dim a As Long, B As Long
+    Dim a As Long, b As Long
 
     a = m_tBI.bmiHeader.biWidth * m_tBI.bmiHeader.biBitCount
-    B = a Mod 32
-    If B > 0 Then B = 32 - B
+    b = a Mod 32
+    If b > 0 Then b = 32 - b
     
-    BytesPerScanLine = (a + B) \ 8
+    BytesPerScanLine = (a + b) \ 8
     
    
 End Property
@@ -1031,9 +1031,9 @@ Dim cDib As New cDIBSection
     Set Resample = cDib
 End Function
 
-Private Sub swaplong(a As Long, B As Long)
+Private Sub swaplong(a As Long, b As Long)
 Dim c As Long
-c = a: a = B: B = c
+c = a: a = b: b = c
 End Sub
 
 Public Sub ThumbnailPaint(DestPic As Object, Optional ByVal zf As Single = -1, Optional ByVal FitToPic As Boolean = True, Optional CROP As Boolean = False, Optional over As Boolean = False, Optional ByVal fr As Long = 0, Optional ByVal offsetX As Long = 0, Optional ByVal offsetY As Long, Optional ByVal border As Long = 0, Optional ByVal rtxy As Double = 1#)
@@ -2138,7 +2138,7 @@ canmake:
  WhiteBits
  Me.FontSize = 128
  If autosize = 0 Then Exit Function
- Text "big....size " & CStr(3 * Int(picthis.Width / autosize) * Int(picthis.Height / autosize) / 1024# / 1024#) & " Mbyte", 0, 0
+ Text "big....size " & (3 * Int(picthis.Width / autosize) * Int(picthis.Height / autosize) / 1024# / 1024#) & " Mbyte", 0, 0
 
 End Function
 
@@ -2196,7 +2196,7 @@ Else
 If Not vso Is Nothing Then
 If vso.Visible = False Then
 vso.Visible = True
-vso.enabled = False: vso.Value = 0: vso.enabled = True
+vso.Enabled = False: vso.Value = 0: vso.Enabled = True
 End If
 vso.Visible = True
 VredX = redX
@@ -2215,7 +2215,7 @@ Else
 If Not hso Is Nothing Then
 If hso.Visible = False Then
 hso.Visible = True
-hso.enabled = False: hso.Value = 0: hso.enabled = True
+hso.Enabled = False: hso.Value = 0: hso.Enabled = True
 End If
 hso.Visible = True
 VredY = redY
@@ -2257,7 +2257,7 @@ If Not vso Is Nothing Then vso.Visible = False: redX = 0
 Else
 If Not vso Is Nothing Then
 If vso.Visible = False Then
-vso.Visible = True: vso.enabled = False: vso.Value = 0: vso.enabled = True
+vso.Visible = True: vso.Enabled = False: vso.Value = 0: vso.Enabled = True
 End If
 vso.Visible = True: redX = vso.Width
 End If
@@ -2297,7 +2297,7 @@ End If
 Else
 If Not vso Is Nothing Then
 If vso.Visible = False Then
-vso.Visible = True: vso.enabled = False: vso.Value = 0: vso.enabled = True
+vso.Visible = True: vso.Enabled = False: vso.Value = 0: vso.Enabled = True
 End If
 vso.Visible = True
 VredX = redX
@@ -2314,7 +2314,7 @@ End If
 Else
 If Not hso Is Nothing Then
 If hso.Visible = False Then
-hso.Visible = True: hso.enabled = False: hso.Value = 0: hso.enabled = True
+hso.Visible = True: hso.Enabled = False: hso.Value = 0: hso.Enabled = True
 End If
 hso.Visible = True
 VredY = redY

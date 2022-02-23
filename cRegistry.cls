@@ -99,13 +99,13 @@ Private Declare Function RegOpenKeyEx Lib "advapi32" Alias "RegOpenKeyExA" _
   ByVal samDesired As Long, phkResult As Long) As Long
 
 Private Declare Function RegSetValueExStr Lib "advapi32" Alias "RegSetValueExA" _
-  (ByVal hKey As Long, ByVal lpValueName As String, ByVal Reserved As Long, _
+  (ByVal hKey As Long, ByVal lpValueName As String, ByVal reserved As Long, _
    ByVal dwType As Long, ByVal szData As String, ByVal cbData As Long) As Long
 Private Declare Function RegSetValueExLong Lib "advapi32" Alias "RegSetValueExA" _
-  (ByVal hKey As Long, ByVal lpValueName As String, ByVal Reserved As Long, _
+  (ByVal hKey As Long, ByVal lpValueName As String, ByVal reserved As Long, _
    ByVal dwType As Long, szData As Long, ByVal cbData As Long) As Long
 Private Declare Function RegSetValueExByte Lib "advapi32" Alias "RegSetValueExA" _
-  (ByVal hKey As Long, ByVal lpValueName As String, ByVal Reserved As Long, _
+  (ByVal hKey As Long, ByVal lpValueName As String, ByVal reserved As Long, _
    ByVal dwType As Long, szData As Byte, ByVal cbData As Long) As Long
 
 Private Declare Function RegCloseKey Lib "advapi32" (ByVal hKey As Long) As Long
@@ -121,7 +121,7 @@ Private Declare Function RegQueryValueExByte Lib "advapi32" Alias "RegQueryValue
    ByRef lpType As Long, szData As Byte, ByRef lpcbData As Long) As Long
    
 Private Declare Function RegCreateKeyEx Lib "advapi32" Alias "RegCreateKeyExA" _
-  (ByVal hKey As Long, ByVal lpSubKey As String, ByVal Reserved As Long, _
+  (ByVal hKey As Long, ByVal lpSubKey As String, ByVal reserved As Long, _
    ByVal lpClass As String, ByVal dwOptions As Long, ByVal samDesired As Long, _
    lpSecurityAttributes As SECURITY_ATTRIBUTES, phkResult As Long, _
    lpdwDisposition As Long) As Long
@@ -263,13 +263,13 @@ Dim hKey As Long
 End Function
 Public Property Get Value() As Variant
 Dim vValue As Variant
-Dim cData As Long, sData As String, ordType As Long, e As Long
+Dim cdata As Long, sData As String, ordType As Long, e As Long
 Dim hKey As Long
 
     e = RegOpenKeyEx(m_hClassKey, m_sSectionKey, 0, KEY_QUERY_VALUE, hKey)
     'ApiRaiseIf?e
 
-    e = RegQueryValueExLong(hKey, m_sValueKey, 0&, ordType, 0&, cData)
+    e = RegQueryValueExLong(hKey, m_sValueKey, 0&, ordType, 0&, cdata)
     If e And e <> ERROR_MORE_DATA Then
         Value = m_vDefault
         Exit Property
@@ -280,33 +280,33 @@ Dim hKey As Long
     Case REG_DWORD, REG_DWORD_LITTLE_ENDIAN
         Dim iData As Long
         e = RegQueryValueExLong(hKey, m_sValueKey, 0&, _
-                               ordType, iData, cData)
+                               ordType, iData, cdata)
         vValue = CLng(iData)
         
     Case REG_DWORD_BIG_ENDIAN  ' Unlikely, but you never know
         Dim dwData As Long
         e = RegQueryValueExLong(hKey, m_sValueKey, 0&, _
-                               ordType, dwData, cData)
+                               ordType, dwData, cdata)
         vValue = SwapEndian(dwData)
         
     Case REG_SZ, REG_MULTI_SZ ' Same thing to Visual Basic
-        sData = String$(cData - 1, 0)
+        sData = String$(cdata - 1, 0)
         e = RegQueryValueExStr(hKey, m_sValueKey, 0&, _
-                               ordType, sData, cData)
+                               ordType, sData, cdata)
         vValue = sData
         
     Case REG_EXPAND_SZ
-        sData = String$(cData - 1, 0)
+        sData = String$(cdata - 1, 0)
         e = RegQueryValueExStr(hKey, m_sValueKey, 0&, _
-                               ordType, sData, cData)
+                               ordType, sData, cdata)
         vValue = ExpandEnvStr(sData)
         
     ' Catch REG_BINARY and anything else
     Case Else
         Dim abData() As Byte
-        ReDim abData(cData)
+        ReDim abData(cdata)
         e = RegQueryValueExByte(hKey, m_sValueKey, 0&, _
-                                ordType, abData(0), cData)
+                                ordType, abData(0), cdata)
         vValue = abData
         
     End Select

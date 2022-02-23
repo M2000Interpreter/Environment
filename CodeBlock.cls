@@ -943,7 +943,7 @@ Case 24, 19, 18, 17, 14, 9, 8, 5
     ms.PushVal CVar(LastCode)
     ms.PushStr ")"
     ElseIf .codetype = 19 Then
-    If ms.Count > 0 Then
+    If ms.count > 0 Then
         If ms.LookTopVal <> ")" Then
         MyEr "expected )", "περίμενα )"
         myabort = True
@@ -1029,8 +1029,8 @@ docvar.InsertDoc docvar.LastParagraph, docvar.TextParagraphLen(docvar.LastParagr
 End If
 
 End Sub
-Function RetStr(x As Integer, base As Long) As String
-If x > 0 Then RetStr = " skip to" + Str$(x + base)
+Function RetStr(X As Integer, base As Long) As String
+If X > 0 Then RetStr = " skip to" + Str$(X + base)
 End Function
 Sub ExportStr(b As Object)
 
@@ -1064,7 +1064,7 @@ For i = 0 To LastCode
     Case 21
         Add " TUPLE (" + RetStr(.codehelp, i) + vbCrLf
     Case 10, 11, 112, 111, Is > 160
-        If Identifiers.Count < .codevar Then
+        If Identifiers.count < .codevar Then
             Add " Syntax Error:" + vbCrLf
             Add " " + codeline(i) + vbCrLf
             GoTo ex12
@@ -1078,9 +1078,9 @@ For i = 0 To LastCode
             End If
         End If
     Case 140
-        Add " START BRACKET (end bracket:" + Str$(.codevar) + ")" + vbCrLf
+        Add " START BRACKET (end bracket: " & (.codevar) & ")" & vbCrLf
     Case 141
-        Add " END BRACKET (start  bracket:" + Str$(.codevar) + ")" + vbCrLf
+        Add " END BRACKET (start  bracket: " & (.codevar) & ")" & vbCrLf
     Case 20
     Add " Label " + varcost(.codevar) + vbCrLf
     Case Else
@@ -1103,20 +1103,20 @@ For i = 0 To LastCode
 
                     'add " " + Replace(Replace(CStr(varcost(.codevar)), vbCrLf, "\n"), vbTab, "\t") + vbCrLf
                 If .codetype = 16 Then
-                    Add " {" + CStr(varcost(.codevar)) + "}" + RetStr(.codehelp, i) & " strliteral (" & .codevar & ")" & vbCrLf
+                    Add " {" & (varcost(.codevar)) & "}" + RetStr(.codehelp, i) & " strliteral (" & .codevar & ")" & vbCrLf
                 
                         strconst = strconst + 1
                 ElseIf .codetype = 15 Then
-                    Add " " + """" + CStr(varcost(.codevar)) + """" + RetStr(.codehelp, i) & " strliteral (" & .codevar & ")" & vbCrLf
+                    Add " " + """" & (varcost(.codevar)) & """" & RetStr(.codehelp, i) & " strliteral (" & .codevar & ")" & vbCrLf
                         strconst = strconst + 1
                 ElseIf .codetype = 14 Then
-                    Add " >>>>>>>>>>>>>>>>>>>  " + CStr(varcost(.codevar)) + RetStr(.codehelp, i) + vbCrLf
+                    Add " >>>>>>>>>>>>>>>>>>>  " & (varcost(.codevar)) + RetStr(.codehelp, i) + vbCrLf
                         
                 Else
                     On Error Resume Next
-                    Add " " + CStr(varcost(.codevar)) + " " + Typename$(varcost(.codevar)) & " numliteral (" & .codevar & ")" & vbCrLf
+                    Add " " & (varcost(.codevar)) & " " & Typename$(varcost(.codevar)) & " numliteral (" & .codevar & ")" & vbCrLf
                     If Err.Number > 0 Then
-                        Add " Syntax Error:" + vbCrLf
+                        Add " Syntax Error:" & vbCrLf
                         Add " " + codeline(i) + vbCrLf
                         GoTo ex12
                     End If
@@ -1131,7 +1131,7 @@ For i = 0 To LastCode
 Next i
 Add "Number Literals:" + Str$(numbers) + vbCrLf
 Add "String Literals:" + Str$(strconst) + vbCrLf
-Add "Identifiers:" + Str$(Identifiers.Count) + vbCrLf
+Add "Identifiers:" + Str$(Identifiers.count) + vbCrLf
 If LastVar - numbers - strconst + 1 > 0 Then
 Add "Labels :" + Str$(LastVar - numbers - strconst + 1) + vbCrLf
 End If

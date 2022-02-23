@@ -615,19 +615,19 @@ Private Sub Class_Initialize()
     GetCodePageInfo
     
     ' wSuiteMask
-    If osi.wSuiteMask And VER_SUITE_BACKOFFICE Then SuiteMask_ = SuiteMask_ & " + " & "BackOffice"
-    If osi.wSuiteMask And VER_SUITE_BLADE Then SuiteMask_ = SuiteMask_ & " + " & "Blade"
-    If osi.wSuiteMask And VER_SUITE_COMPUTE_SERVER Then SuiteMask_ = SuiteMask_ & " + " & "Compute Server"
-    If osi.wSuiteMask And VER_SUITE_DATACENTER Then SuiteMask_ = SuiteMask_ & " + " & "DataCenter"
-    If osi.wSuiteMask And VER_SUITE_ENTERPRISE Then SuiteMask_ = SuiteMask_ & " + " & "Enterprise"
-    If osi.wSuiteMask And VER_SUITE_EMBEDDEDNT Then SuiteMask_ = SuiteMask_ & " + " & "EmbeddedNT"
-    If osi.wSuiteMask And VER_SUITE_PERSONAL Then SuiteMask_ = SuiteMask_ & " + " & "Personal"
-    If osi.wSuiteMask And VER_SUITE_SINGLEUSERTS Then SuiteMask_ = SuiteMask_ & " + " & "SingleUserTS"
-    If osi.wSuiteMask And VER_SUITE_SMALLBUSINESS Then SuiteMask_ = SuiteMask_ & " + " & "SmallBusiness"
-    If osi.wSuiteMask And VER_SUITE_SMALLBUSINESS_RESTRICTED Then SuiteMask_ = SuiteMask_ & " + " & "SmallBusiness Restricted"
-    If osi.wSuiteMask And VER_SUITE_STORAGE_SERVER Then SuiteMask_ = SuiteMask_ & " + " & "Storage Server"
-    If osi.wSuiteMask And VER_SUITE_TERMINAL Then SuiteMask_ = SuiteMask_ & " + " & "Terminal"
-    If osi.wSuiteMask And VER_SUITE_WH_SERVER Then SuiteMask_ = SuiteMask_ & " + " & "WH Server"
+    If osi.wSuiteMask And VER_SUITE_BACKOFFICE Then SuiteMask_ = SuiteMask_ & " + BackOffice"
+    If osi.wSuiteMask And VER_SUITE_BLADE Then SuiteMask_ = SuiteMask_ & " + Blade"
+    If osi.wSuiteMask And VER_SUITE_COMPUTE_SERVER Then SuiteMask_ = SuiteMask_ & " + Compute Server"
+    If osi.wSuiteMask And VER_SUITE_DATACENTER Then SuiteMask_ = SuiteMask_ & " + DataCenter"
+    If osi.wSuiteMask And VER_SUITE_ENTERPRISE Then SuiteMask_ = SuiteMask_ & " + Enterprise"
+    If osi.wSuiteMask And VER_SUITE_EMBEDDEDNT Then SuiteMask_ = SuiteMask_ & " + EmbeddedNT"
+    If osi.wSuiteMask And VER_SUITE_PERSONAL Then SuiteMask_ = SuiteMask_ & " + Personal"
+    If osi.wSuiteMask And VER_SUITE_SINGLEUSERTS Then SuiteMask_ = SuiteMask_ & " + SingleUserTS"
+    If osi.wSuiteMask And VER_SUITE_SMALLBUSINESS Then SuiteMask_ = SuiteMask_ & " + SmallBusiness"
+    If osi.wSuiteMask And VER_SUITE_SMALLBUSINESS_RESTRICTED Then SuiteMask_ = SuiteMask_ & " + SmallBusiness Restricted"
+    If osi.wSuiteMask And VER_SUITE_STORAGE_SERVER Then SuiteMask_ = SuiteMask_ & " + Storage Server"
+    If osi.wSuiteMask And VER_SUITE_TERMINAL Then SuiteMask_ = SuiteMask_ & " + Terminal"
+    If osi.wSuiteMask And VER_SUITE_WH_SERVER Then SuiteMask_ = SuiteMask_ & " + WH Server"
     
     If 0 <> Len(SuiteMask_) Then SuiteMask_ = Mid$(SuiteMask_, 4)
     

@@ -43,12 +43,12 @@ Public Property Get ListText()
 ListText = glistN.ListValue
 End Property
 Public Property Let Label(a$)
-Textbox.Prompt = a$ + " " + ChrW$(&H25BC) & " "
+Textbox.Prompt = a$ + " " + ChrW$(&H25BC) + " "
 Textbox.glistN.ShowMe
 End Property
 
 
-Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 If item = -1 Then
 
 Else
@@ -93,9 +93,9 @@ End If
 Iam = True
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub glistN_KeyDown(keycode As Integer, shift As Integer)
 
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyRight Then
+If keycode = vbKeyLeft Or keycode = vbKeyRight Then
 
 Iam = True
 glistN.BypassLeaveonChoose = True
@@ -117,12 +117,12 @@ If Err.Number > 0 Then glistN.NoWheel = True
 End Sub
 
 
-Private Sub textbox_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub textbox_KeyDown(keycode As Integer, shift As Integer)
 Dim b$
 Iam = False
-If KeyCode = vbKeyDown Or KeyCode = vbKeyReturn Then
+If keycode = vbKeyDown Or keycode = vbKeyReturn Then
 If glistN.Visible Then glistN.enabled = True: Textbox.SkipProcAtExitFocus = True: glistN.SetFocus: Exit Sub
-    KeyCode = 0
+    keycode = 0
     glistN.Visible = True
     glistN.ZOrder
     Textbox.SkipProcAtExitFocus = True
@@ -143,10 +143,10 @@ If glistN.Visible Then glistN.enabled = True: Textbox.SkipProcAtExitFocus = True
     End If
 End If
 
-ElseIf KeyCode = vbKeyTab Then
+ElseIf keycode = vbKeyTab Then
 Textbox.SkipProcAtExitFocus = False
 glistN.Visible = False
-ElseIf AutoComplete And KeyCode = vbKeyRight And Textbox.SelStart >= Len(Textbox.Text) Then
+ElseIf AutoComplete And keycode = vbKeyRight And Textbox.SelStart >= Len(Textbox.Text) Then
 b$ = Left$(Textbox.glistN.LastLinePart, 1)
 If b$ <> "" Then Textbox.glistN.LastLinePart = Mid$(Textbox.glistN.LastLinePart, 2)
 Textbox.Text = Textbox.Text + b$
@@ -197,7 +197,7 @@ End If
 End Sub
 
 
-Private Sub textbox_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub textbox_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Textbox.glistN.DblClick Then
 Iam = False
 
@@ -234,33 +234,33 @@ Iam = False
 End If
 End Sub
 Private Sub glistN_SyncKeyboardUnicode(a As String)
-Static F As Long
-F = glistN.FindItemStartWidth(a, Not NoCaseSensitive, F + 1)
-If F >= 0 Then
-glistN.ScrollTo F - glistN.lines / 2, F + 1
+Static f As Long
+f = glistN.FindItemStartWidth(a, Not NoCaseSensitive, f + 1)
+If f >= 0 Then
+glistN.ScrollTo f - glistN.lines / 2, f + 1
  RaiseEvent PickOther(glistN.ListValue)
 Else
-F = -1
+f = -1
 End If
 End Sub
 
 Private Sub TextBox_ValidString(ThatString As String, setpos As Long)
 Dim l As Boolean
 If Not AutoComplete Then Exit Sub
-Dim F As Long
+Dim f As Long
 Iam = True
 If ThatString = vbNullString And Textbox.glistN.LastLinePart <> "" Then
-F = glistN.FindItemStartWidth(Textbox.glistN.LastLinePart, Not NoCaseSensitive, 0)
+f = glistN.FindItemStartWidth(Textbox.glistN.LastLinePart, Not NoCaseSensitive, 0)
 
 Else
-F = glistN.FindItemStartWidth(ThatString, Not NoCaseSensitive, 0)
+f = glistN.FindItemStartWidth(ThatString, Not NoCaseSensitive, 0)
 End If
-If F >= 0 Then
-If Not NoCaseSensitive Then ThatString = Left$(glistN.list(F), Len(ThatString))
-Textbox.glistN.LastLinePart = Mid$(glistN.list(F), Len(ThatString) + 1)
-RaiseEvent AutoCompleteDone(glistN.list(F))
+If f >= 0 Then
+If Not NoCaseSensitive Then ThatString = Left$(glistN.list(f), Len(ThatString))
+Textbox.glistN.LastLinePart = Mid$(glistN.list(f), Len(ThatString) + 1)
+RaiseEvent AutoCompleteDone(glistN.list(f))
 glistN.enabled = False
-glistN.ScrollTo F - glistN.lines / 2, F + 1
+glistN.ScrollTo f - glistN.lines / 2, f + 1
 glistN.enabled = True
 glistN.ShowMe
 

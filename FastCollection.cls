@@ -1528,7 +1528,7 @@ sng = fr - 1
     Loop
 n$ = Mid$(a$, sng)
 
-If val("0" & Mid$(a$, sng, 1)) = 0 And Left(Mid$(a$, sng, 1), sng) <> "0" And Left(Mid$(a$, sng, 1), sng) <> "." Then
+If val("0" + Mid$(a$, sng, 1)) = 0 And Left(Mid$(a$, sng, 1), sng) <> "0" And Left(Mid$(a$, sng, 1), sng) <> "." Then
 IsNumberOnly = False
 
 Else
@@ -1543,7 +1543,7 @@ Else
         
         Select Case Mid$(a$, sng, 1)
         Case "0" To "9"
-        ig$ = ig$ & Mid$(a$, sng, 1)
+        ig$ = ig$ + Mid$(a$, sng, 1)
         Case "."
         DE$ = "."
         Exit Do
@@ -1565,9 +1565,9 @@ Else
         End If
         Case "0" To "9"
         If sg1 Then
-        ex$ = ex$ & Mid$(a$, sng, 1)
+        ex$ = ex$ + Mid$(a$, sng, 1)
         Else
-        DE$ = DE$ & Mid$(a$, sng, 1)
+        DE$ = DE$ + Mid$(a$, sng, 1)
         End If
         Case "E", "e", "Å", "å"
                If ex$ = vbNullString Then
@@ -1581,7 +1581,7 @@ Else
         
         Case "+", "-"
         If sg1 And Len(ex$) = 1 Then
-         ex$ = ex$ & Mid$(a$, sng, 1)
+         ex$ = ex$ + Mid$(a$, sng, 1)
         Else
         Exit Do
         End If
@@ -1598,20 +1598,20 @@ Else
         IsNumberOnly = False
         lr = 1
     Else
-        If SG < 0 Then ig$ = "-" & ig$
+        If SG < 0 Then ig$ = "-" + ig$
         If Len(ig$ + DE$) > 13 And LenB(ex$) = 0 Then
             On Error Resume Next
             If Len(DE$) > 0 Then
                 Mid$(DE$, 1, 1) = cdecimaldot$
-                R = CDec(ig$ & DE$)
+                R = CDec(ig$ + DE$)
             Else
                 R = CDec(ig$)
             End If
             If Err.Number = 6 Then
-                R = CDbl(ig$ & DE$)
+                R = CDbl(ig$ + DE$)
             End If
          Else
-            R = val(ig$ & DE$ & ex$)
+            R = val(ig$ + DE$ + ex$)
              If Err.Number > 0 Then
              Err.Clear
              IsNumberOnly = False

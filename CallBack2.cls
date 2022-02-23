@@ -234,7 +234,7 @@ If IhaveSignature Then
 look = IsLabelOnly(sign$, dummy$)
 If look = 2 Then ' byref
 look = IsLabelOnly(sign$, dummy$)
-look = globalvarGroup("b" + CStr(var2used) + "." + dummy$, True) ' perhaps this is a fault, why is true??
+look = globalvarGroup("b" & (var2used) & "." & dummy$, True) ' perhaps this is a fault, why is true??
 ElseIf look > 4 Then
 FastSymbol sign, ")", True
 ms.DataObj ar

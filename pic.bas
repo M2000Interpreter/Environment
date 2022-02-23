@@ -537,10 +537,7 @@ Function check_mem() As Long
     'retrieve the memory status
     GlobalMemoryStatus MemStat
     check_mem = MemStat.dwAvailPhys \ 1024 \ 1024
-    ' dwAvailPhys
-    ' dwAvailVirtual
-    'MsgBox "You have" & Str$(MemStat.dwTotalPhys / 1024) & " Kb total memory and" & Str$(MemStat.dwAvailPageFile / 1024) & " Kb available PageFile memory."
-End Function
+ End Function
 '
 '
 ' Implemantation of string bitmaps
@@ -677,7 +674,7 @@ Public Function DIBtoSTR(mdib As cDIBSection) As String
 Dim a As String
 If mdib.Width > 0 Then
 a = String$(mdib.BytesPerScanLine * mdib.Height \ 2 + 12, Chr(0))
-Mid$(a, 1, 12) = "cDIB" & Right$("0000" & Hex$(mdib.Width), 4) + Right$("0000" & Hex$(mdib.Height), 4)
+Mid$(a, 1, 12) = "cDIB" + Right$("0000" + Hex$(mdib.Width), 4) + Right$("0000" + Hex$(mdib.Height), 4)
 CopyMemory ByVal StrPtr(a) + 24, ByVal mdib.DIBSectionBitsPtr, mdib.BytesPerScanLine * mdib.Height
 DIBtoSTR = a
 End If
@@ -2053,7 +2050,7 @@ For i = PobjNum To 1 Step -1
         players(i) = Zero
         Prefresh(i) = zerocounter
         PobjNum = i
-If Form1.dSprite.Count > PobjNum Then Unload Form1.dSprite(PobjNum)
+If Form1.dSprite.count > PobjNum Then Unload Form1.dSprite(PobjNum)
 Next i
 PobjNum = 0
 
@@ -2418,11 +2415,11 @@ Public Function HTML(sText As String, _
    Optional sContextStart As String = "<HTML><BODY>", _
    Optional sContextEnd As String = "</BODY></HTML>") As Byte()
    Dim m_sDescription As String
-    m_sDescription = "Version:1.0" & vbCrLf & _
-                  "StartHTML:aaaaaaaaaa" & vbCrLf & _
-                  "EndHTML:bbbbbbbbbb" & vbCrLf & _
-                  "StartFragment:cccccccccc" & vbCrLf & _
-                  "EndFragment:dddddddddd" & vbCrLf
+    m_sDescription = "Version:1.0" + vbCrLf + _
+                  "StartHTML:aaaaaaaaaa" + vbCrLf + _
+                  "EndHTML:bbbbbbbbbb" + vbCrLf + _
+                  "StartFragment:cccccccccc" + vbCrLf + _
+                  "EndFragment:dddddddddd" + vbCrLf
     Dim a() As Byte, b() As Byte, c() As Byte
    '' sText = "<FONT FACE=Arial SIZE=1 COLOR=BLUE>" + sText + "</FONT>"
    
