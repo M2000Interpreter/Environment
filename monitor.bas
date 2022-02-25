@@ -3,14 +3,14 @@ Option Explicit
 Global MinMonitorLeft As Long
 Global MinMonitorTop As Long
 Private Declare Function EnumDisplayMonitors Lib "user32" (ByVal Hdc As Long, lprcClip As Any, ByVal lpfnEnum As Long, dwData As Any) As Long
-Public Declare Function MonitorFromPoint Lib "user32" (ByVal x As Long, ByVal y As Long, ByVal dwFlags As Long) As Long
+Public Declare Function MonitorFromPoint Lib "user32" (ByVal X As Long, ByVal Y As Long, ByVal dwFlags As Long) As Long
 Private Declare Function MonitorFromWindow Lib "user32" (ByVal hWnd As Long, ByVal dwFlags As Long) As Long
 
 Private Declare Function GetMonitorInfo Lib "user32" Alias "GetMonitorInfoA" (ByVal hmonitor As Long, ByRef lpmi As MONITORINFO) As Long
 Private Declare Function GetWindowRect Lib "user32" (ByVal hWnd As Long, lpRect As RECT) As Long
 Private Declare Function UnionRect Lib "user32" (lprcDst As RECT, lprcSrc1 As RECT, lprcSrc2 As RECT) As Long
-Private Declare Function OffsetRect Lib "user32" (lpRect As RECT, ByVal x As Long, ByVal y As Long) As Long
-Private Declare Function MoveWindow Lib "user32" (ByVal hWnd As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal bRepaint As Long) As Long
+Private Declare Function OffsetRect Lib "user32" (lpRect As RECT, ByVal X As Long, ByVal Y As Long) As Long
+Private Declare Function MoveWindow Lib "user32" (ByVal hWnd As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal bRepaint As Long) As Long
 'Private Type RECT
  '   Left As Long
   '  Top As Long
@@ -101,7 +101,7 @@ Function EnumMonitors(f As Form) As Long
         With rcMonitors(n)
             f.lblMonitors(n).move .Left, .top, .Right - .Left, .Bottom - .top
             f.lblMonitors(n).Caption = "Monitor " & n + 1 & vbLf & _
-                .Right - .Left & " x " & .Bottom - .top & vbLf & _
+                .Right - .Left & " x " & (.Bottom - .top) & vbLf & _
                 "(" & .Left & ", " & .top & ")-(" & .Right & ", " & .Bottom & ")"
         End With
     Next
@@ -185,10 +185,10 @@ If thismonitor = ScrInfo(i).Handler Then FindFormSScreen = i:   Exit Function
 Next i
 FindFormSScreen = FindPrimary
 End Function
-Function FindMonitorFromPixel(x, y) As Long
+Function FindMonitorFromPixel(X, Y) As Long
 Dim x1 As Long, y1 As Long
-x1 = x \ dv15
-y1 = y \ dv15
+x1 = X \ dv15
+y1 = Y \ dv15
 Dim i As Long
 For i = 0 To UBound(ScrInfo())
 If ScrInfo(i).Handler = MonitorFromPoint(x1, y1, MONITOR_DEFAULTTONEAREST) Then FindMonitorFromPixel = i: Exit Function
@@ -198,13 +198,13 @@ End Function
 Function FindMonitorFromMouse()
 '
    ' - offset
-Dim x As Long, y As Long, tp As POINTAPI
+Dim X As Long, Y As Long, tp As POINTAPI
 GetCursorPos tp
-x = tp.x
-y = tp.y
+X = tp.X
+Y = tp.Y
 Dim i As Long
 For i = 0 To UBound(ScrInfo())
-If ScrInfo(i).Handler = MonitorFromPoint(x, y, MONITOR_DEFAULTTONEAREST) Then
+If ScrInfo(i).Handler = MonitorFromPoint(X, Y, MONITOR_DEFAULTTONEAREST) Then
 FindMonitorFromMouse = i: Exit Function
 End If
 Next i
@@ -241,8 +241,8 @@ If k = z Then
     If flag Then
         Dim tp As POINTAPI
         GetCursorPos tp
-        nowX = tp.x * dv15
-        nowY = tp.y * dv15
+        nowX = tp.X * dv15
+        nowY = tp.Y * dv15
         flag = False
     Else
         flag = False
@@ -251,11 +251,11 @@ If k = z Then
         nowY = (ScrInfo(k).Height - f.Height) / 2 + ScrInfo(k).top
         Else
         If ScrInfo(z).Left = f.Left And f.Left > 0 And Not f.SkipAutoPos Then
-        nowX = f.Left + (Forms.Count - 4) * 450 Mod 4500
-        nowY = f.top + (Forms.Count - 4) * 450 Mod 4500
+        nowX = f.Left + (Forms.count - 4) * 450 Mod 4500
+        nowY = f.top + (Forms.count - 4) * 450 Mod 4500
         ElseIf ScrInfo(z).top = f.top And f.top > 0 And Not f.SkipAutoPos Then
-        nowX = f.Left + (Forms.Count - 4) * 450 Mod 4500
-        nowY = f.top + (Forms.Count - 4) * 450 Mod 4500
+        nowX = f.Left + (Forms.count - 4) * 450 Mod 4500
+        nowY = f.top + (Forms.count - 4) * 450 Mod 4500
         Else
         nowX = f.Left
         nowY = f.top
@@ -268,11 +268,11 @@ Else
         nowY = (ScrInfo(z).Height - f.Height) / 2 + ScrInfo(z).top
     Else
         If ScrInfo(z).Left <> f.Left And f.Left > 0 And Not f.SkipAutoPos Then
-            nowX = ScrInfo(z).Left + (Forms.Count - 4) * 450 Mod 4500
-            nowY = ScrInfo(z).top + (Forms.Count - 4) * 450 Mod 4500
+            nowX = ScrInfo(z).Left + (Forms.count - 4) * 450 Mod 4500
+            nowY = ScrInfo(z).top + (Forms.count - 4) * 450 Mod 4500
         ElseIf ScrInfo(z).top <> f.top And f.top > 0 And Not f.SkipAutoPos Then
-            nowX = ScrInfo(z).Left + (Forms.Count - 4) * 450 Mod 4500
-            nowY = ScrInfo(z).top + (Forms.Count - 4) * 450 Mod 4500
+            nowX = ScrInfo(z).Left + (Forms.count - 4) * 450 Mod 4500
+            nowY = ScrInfo(z).top + (Forms.count - 4) * 450 Mod 4500
         Else
         nowX = f.Left
         nowY = f.top

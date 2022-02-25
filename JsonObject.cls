@@ -298,8 +298,8 @@ Private Function Malloc() As Long
     toplim = toplim + 1
     Malloc = toplim
 End Function
-Property Get Count()
-    Count = toplim + 1
+Property Get count()
+    count = toplim + 1
 End Property
 
 Property Get IsEmpty()
@@ -388,7 +388,7 @@ index = a
 Done = True
 End Sub
 Property Get Percent()
-Percent = 100 * Count / hashlen
+Percent = 100 * count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
@@ -424,11 +424,11 @@ End If
 End Property
 Public Sub ToStart()
 index = 0
-Done = Count > 0
+Done = count > 0
 End Sub
 Public Sub ToEnd()
-index = Count - 1
-Done = Count > 0
+index = count - 1
+Done = count > 0
 End Sub
 
 Public Sub NextIndex()
@@ -682,7 +682,7 @@ If TypeOf m Is JsonArray Then
     If n = s Then
         ma.Assign w, RHS
     ElseIf Left$(part$(n), 1) = " " Then
-            If ma.Count <= w Or Not ma.ValType(w) > 3 Then
+            If ma.count <= w Or Not ma.ValType(w) > 3 Then
                     If Left$(part$(n + 1), 1) = " " Then
                         ma.Assign w, New JsonArray
                     Else
@@ -755,7 +755,7 @@ Case 1
 Case 2
     If PriveSpace(index).iValue Then ToString = "true" Else ToString = "false"
 Case 3
-    ToString = Replace("" & PriveSpace(index).iValue, curdot$, dot)
+    ToString = Replace(PriveSpace(index).iValue, curdot$, dot)
 Case 4
     Set ja = PriveSpace(index).iValue
     ToString = ja.Json
@@ -763,7 +763,7 @@ Case 5
     Set jo = PriveSpace(index).iValue
     ToString = jo.Json
 Case 33
-    ToString = Replace("" & PriveSpace(index).iValue, curdot$, dot)
+    ToString = Replace(PriveSpace(index).iValue, curdot$, dot)
 End Select
 End Function
 Private Function ToString2(n As Long, ww As Long)
@@ -785,14 +785,14 @@ Case 5
     Set jo = PriveSpace(index).iValue
     ToString2 = jo.Json(n, ww)
 Case 33
-    ToString2 = Replace("" & PriveSpace(index).iValue, curdot$, ".")
+    ToString2 = Replace(PriveSpace(index).iValue, curdot$, ".")
 End Select
 End Function
 Property Get Json(Optional sp As Long = 0, Optional w As Long = -1) As String
     Dim hlp$, acc$, nl$
     sp = Abs(sp)
     If sp Then nl$ = vbCrLf + space$(sp): hlp$ = space$(sp): If w = -1 Then w = sp
-    For index = 0 To Count - 1
+    For index = 0 To count - 1
         acc$ = acc$ + hlp$ + nl$ + """" + StringToEscapeStr(PriveSpace(index).Key) + """" + " : " + ToString2(sp - w * (sp > 0), w)
         If index = 0 Then
             If sp Then
@@ -819,7 +819,21 @@ If ExistKey(Key) Then
     Case 4, 5
         Set item = PriveSpace(index).iValue
     Case 33
-        item = val("" & PriveSpace(index).iValue)
+Dim s As String
+    s = PriveSpace(index).iValue
+    If InStr(s, curdot$) > 0 Then
+        s = Replace(PriveSpace(index).iValue, curdot$, ".")
+    End If
+    If InStr(s, ".") > 25 Then
+        item = val(s)
+    Else
+        On Error Resume Next
+        item = CDec(Replace(s, ".", curdot$))
+        If Err Then
+            Err.Clear
+            item = val(s)
+        End If
+    End If
     Case Else
         item = PriveSpace(index).iValue
     End Select
@@ -1082,14 +1096,14 @@ End Property
 Function BigNumber(ByVal ch As String) As Variant
 Dim b() As Byte
    If Len(ch) > 28 Then
-            If InStr(ch$, ".") > 0 Then Mid$(ch$, InStr(ch$, ".")) = curdot$
+            If InStr(ch$, ".") > 0 And curdot$ <> "." Then Mid$(ch$, InStr(ch$, ".")) = curdot$
             b() = ch
             BigNumber = b()
         ElseIf InStr(1, ch, "e", vbTextCompare) = 0 And Len(ch) > 14 Then
-            If InStr(ch$, ".") > 0 Then Mid$(ch$, InStr(ch$, ".")) = curdot$
+            If InStr(ch$, ".") > 0 And curdot$ <> "." Then Mid$(ch$, InStr(ch$, ".")) = curdot$
             BigNumber = CDec(ch)
         Else
-            If InStr(ch$, curdot$) > 0 Then Mid$(ch$, InStr(ch$, curdot$)) = "."
+            If curdot$ <> "." Then If InStr(ch$, curdot$) > 0 Then Mid$(ch$, InStr(ch$, curdot$)) = "."
             BigNumber = val(ch)
         End If
 End Function

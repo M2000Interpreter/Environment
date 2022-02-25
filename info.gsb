@@ -5465,7 +5465,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 33 for M2000 Interpreter version 10, revision 34 and above"
+	Report " A collection of modules for tests version 34 for M2000 Interpreter version 11, revision 7 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -5489,8 +5489,8 @@ Pen 15 {
 }
 title("List")
 Report {
-	You can see the global variables, If any exist, defined in console  (write A=10 then press F3 )
-	Use statement Clear to clear all variables (including static variables if any)
+	You can see the global variables, If any exist, defined in console  (write A=10, press enter then press F3 )
+	Use statement Clear to clear all variables (including static variables if any). If a module not run as expected use CLEAR before run the module.
 	}
 Pen 11 {List}
 title("Stack")
@@ -13204,6 +13204,7 @@ Module checkit {
       Save.Doc a$, "checkthis.txt", 0  ' 0 for UTF-16LE
       Flush
       Open "checkthis.txt" For Wide Input as #F
+      Seek #f, 3
       While not Eof(#f) {
             Data Seek(#f)
             Line Input #F, b$
@@ -20911,7 +20912,7 @@ Bold 1
 PEN 14
 CLS,0
 If Version<11 then Error "No proper M2000 version (must be >=11)"
-If Version=11 and revision<2 then Error "No proper M2000 revision for version 11"
+If Version=11 and revision<7 then Error "No proper M2000 revision for version 11 (need revision >=7)"
 Set Fast
 Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 dir user
@@ -22326,7 +22327,7 @@ MODULE BASIC {
 000 GOSUB 200
 010 
 020 REM 
-030 FORM 80,48
+030 FORM ! 80,48
 040 CONST MAX=64%   ' % for Integer
 050 DEF INTEGER A1, I  :  DEF Z$
 060 DIM P(MAX)
@@ -33721,7 +33722,7 @@ Print json$("description")
 Print json$("type")
 Print json.path$("properties.name.type")
 Print json.path$("properties|age|type", "|")  ' define different seperator
-Print json.path("properties/.age.maximum")
+Print json.path("properties.age.maximum")
 method json, "assignpath", "properties.age.maximum", 80
 Report json.format$(4)
 Print json.format$(0)
@@ -34979,5 +34980,49 @@ k=false
 method Form1, "show", 1
 Threads Erase
 declare Form1 nothing
+}
+MODULE REV7VER11 {Global a(100)
+Class Alfa {
+	dim a(3)=19
+	Group z {
+		Dim a(100)=21
+	}
+	Module Redim {
+		Dim .a(2), .z.a(3)
+	}
+	Module Redim.a (N) {
+		Dim .a(N)	
+	}
+}
+M=Alfa()
+Global N=Alfa()
+? ">>>>>>>>>>>>>>"
+list
+M.Redim
+N.Redim
+? ">>>>>>>>>>>>>>"
+List
+? ">>>>>>>>>>>>>>"
+Dim M.a(8)
+List
+Global K->Alfa()
+? ">>>>>>>>>>>>>>"
+List
+For K {
+	Print Len(.a()), Len(.z.a())
+	.Redim
+	Print Len(.a()), Len(.z.a())
+}
+For K {
+	Print Len(.a()), Len(.z.a())
+	.Redim.a 20
+	dim .z.a(10)
+}
+For K {
+	Print Len(.a()), Len(.z.a())
+}
+Print M.a(0)=19, M.z.a(0)=21
+Print N.a(0)=19, N.z.a(0)=21
+Print k=>a(0)=19, K=>z.a(0)=21
 }
 UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}

@@ -326,7 +326,7 @@ Public Function stepFrames(Value As Long)
     'Ex. If the m"+str(myID)+" was on frame 20. And if you stepped
     '10 frames the m"+str(myID)+" would skip ahead 10 frames and
     'would be on frame 30.
-    Error = mciSendString("step m" + LTrim$(Str(myid)) + " by " + Value, 0, 0, 0)
+    Error = mciSendString("step m" + LTrim$(Str(myid)) + " by " & Value, 0, 0, 0)
 End Function
 Public Function restoreSizeDefault()
     'This function will restore the m"+str(myID)+" to its original
@@ -748,7 +748,7 @@ Public Function setVolume(Value As Long)
      'Raise or lower the volume for both channels
     '1000 max - 0 min
 
-    ' Error = mciSendString("setaudio volume to " + Value, 0, 0, 0)
+    ' Error = mciSendString("setaudio volume to " & Value, 0, 0, 0)
  Error = mciSendString("setaudio m" + LTrim$(Str(myid)) + " volume to " + Str(Value), 0, 0, 0)
  
 End Function
@@ -825,14 +825,14 @@ Public Function setSpeed(Value As Long)
     'Set the current playing spped of the m"+str(myID)+"
     '0 = as fast as possible without losing frames
     'Values 1 - 2000 - 2000 being fastest
-    Error = mciSendString("set m" + LTrim$(Str(myid)) + " speed " + Value, 0, 0, 0)
+    Error = mciSendString("set m" + LTrim$(Str(myid)) + " speed " & Value, 0, 0, 0)
 End Function
 Public Function setLeftVolume(Value As Long)
     'Set the value of the left volume
-    Error = mciSendString("setaudio m" + LTrim$(Str(myid)) + " left volume to " + Value, 0, 0, 0)
+    Error = mciSendString("setaudio m" + LTrim$(Str(myid)) + " left volume to " & Value, 0, 0, 0)
 End Function
 Public Function setRightVolume(Value As Long)
-    Error = mciSendString("setaudio m" + LTrim$(Str(myid)) + " right volume to " + Value, 0, 0, 0)
+    Error = mciSendString("setaudio m" + LTrim$(Str(myid)) + " right volume to " & Value, 0, 0, 0)
 End Function
 Sub Timeout(duration)
     'Pauses for a specified amount of milliseconds

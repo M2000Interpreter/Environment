@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 6 active-X
-A Lot of work, see blog for more information
+Version 11 Revision 7 active-X
+Fix for arrays. See rev7ver11 module in new info.gsb
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

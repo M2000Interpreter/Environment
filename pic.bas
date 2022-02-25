@@ -5,7 +5,7 @@ Private Type abcd
     COM() As String
 End Type
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Any)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Any)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
 Public Const KEYEVENTF_KEYUP = &H2
 Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
@@ -21,7 +21,7 @@ Private Declare Function GetKeyboardState Lib "user32" (kbArray As KeyboardBytes
 Dim kbArray As KeyboardBytes
 Public fonttest As PictureBox
 Private Declare Function GetTextMetrics Lib "gdi32" _
-Alias "GetTextMetricsA" (ByVal hdc As Long, _
+Alias "GetTextMetricsA" (ByVal Hdc As Long, _
 lpMetrics As TEXTMETRIC) As Long
 Private Type TEXTMETRIC
 tmHeight As Long
@@ -56,7 +56,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -109,7 +109,7 @@ Public Type tagSize
     cX As Long
     cY As Long
 End Type
-Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hdc As Long, lpAspectRatio As tagSize) As Long
+Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal Hdc As Long, lpAspectRatio As tagSize) As Long
 Declare Function CreateRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Declare Function CombineRgn Lib "gdi32" (ByVal hDestRgn As Long, ByVal hSrcRgn1 As Long, ByVal hSrcRgn2 As Long, ByVal nCombineMode As Long) As Long
 Public Declare Function SetWindowRgn Lib "user32" (ByVal hWnd As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
@@ -153,20 +153,20 @@ Type bitmap
         bmBitsPixel As Integer
         bmBits As Long
 End Type
-Declare Function StretchBlt Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
-Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hdc As Long) As Long
-Declare Function SelectObject Lib "gdi32" (ByVal hdc As Long, ByVal hObject As Long) As Long
-Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) As Long
+Declare Function StretchBlt Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal Hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Declare Function CreateCompatibleDC Lib "gdi32" (ByVal Hdc As Long) As Long
+Declare Function SelectObject Lib "gdi32" (ByVal Hdc As Long, ByVal hObject As Long) As Long
+Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) As Long
 Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 'Declare Function GetObject Lib "gdi32" Alias "GetObjectA" (ByVal hObject As Long, ByVal nCount As Long, lpObject As Any) As Long
-Declare Function GetPixel Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long) As Long
-Declare Function SetPixel Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal crColor As Long) As Long
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal nIndex As Long) As Long
+Declare Function GetPixel Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long) As Long
+Declare Function SetPixel Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal crColor As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal Hdc As Long, ByVal nIndex As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function GetDesktopWindow Lib "user32" () As Long
-Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hdc As Long) As Long
+Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal Hdc As Long) As Long
 Private Const BITSPIXEL = 12         '  Number of bits per pixel
 Private Declare Function RegisterClipboardFormat Lib "user32" Alias _
    "RegisterClipboardFormatA" (ByVal lpString As String) As Long
@@ -276,7 +276,7 @@ Public Type JOYINFOEX
     dwReserved2 As Long
 End Type
 Public Type MYJOYSTATtype
-Enabled As Boolean
+enabled As Boolean
 lngButton As Long
 joyPaD As direction
 AnalogX As Long
@@ -350,7 +350,7 @@ If UseMe Is Nothing Then Exit Sub
         Else
         
             Form3.Timer1.Interval = 30
-            Form3.Timer1.Enabled = True
+            Form3.Timer1.enabled = True
             Form3.CaptionWsilent = a$
             Form3.CaptionW = a$
             Form1.CaptionW = vbNullString
@@ -405,14 +405,14 @@ Err.Clear
 End Sub
 Public Function StartJoypadk(Optional ByVal jn As Long = 0) As Boolean
     If joyGetDevCapsA(jn, MYJOYCAPS, 404) <> 0 Then 'Get Joypadk info
-    MYJOYSTAT(jn).Enabled = False
+    MYJOYSTAT(jn).enabled = False
         StartJoypadk = False
     Else
         MYJOYEX.dwSize = 64
         MYJOYEX.dwFlags = 255
         Call joyGetPosEx(jn, MYJOYEX)
         MYJOYSTAT(jn).Wait2Read = False
-         MYJOYSTAT(jn).Enabled = True
+         MYJOYSTAT(jn).enabled = True
         StartJoypadk = True
     End If
 End Function
@@ -427,7 +427,7 @@ Public Sub FlushJoyAll()
 
 Dim jn As Long
 For jn = 0 To 15
-MYJOYSTAT(jn).Enabled = False
+MYJOYSTAT(jn).enabled = False
 Next jn
 End Sub
 
@@ -436,7 +436,7 @@ Public Sub PollJoypadk()
     Dim jn As Long, wh As Long
     ' Get the Joypadk information
     For jn = 0 To 15
-    If MYJOYSTAT(jn).Enabled Then
+    If MYJOYSTAT(jn).enabled Then
     If Not MYJOYSTAT(jn).Wait2Read Then
       MYJOYEX.dwSize = 64
     MYJOYEX.dwFlags = 255
@@ -1184,9 +1184,9 @@ If cDibbuffer0.create(myw, myh) Then
 On Error GoTo there
         With bstack.Owner
          If bstack.toprinter Then
-         cDibbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+         cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
          Else
-        cDibbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
             End If
             BACKSPRITE = DIBtoSTR(cDibbuffer0)
         End With
@@ -1267,9 +1267,9 @@ On Error GoTo there
    
 With bstack.Owner
     If bstack.toprinter Then
-        cDibbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
     Else
-        cDibbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
     End If
     If Not nogetback Then BACKSPRITE = DIBtoSTR(cDibbuffer0)
 End With
@@ -1467,9 +1467,9 @@ cDibbuffer0.Cls bckColor
 Else
         With bstack.Owner
         If bstack.toprinter Then
-        cDibbuffer0.LoadPictureBlt .hdc, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
+        cDibbuffer0.LoadPictureBlt .Hdc, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
         Else
-                      cDibbuffer0.LoadPictureBlt .hdc, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
+                      cDibbuffer0.LoadPictureBlt .Hdc, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
            End If
         End With
         End If
@@ -1593,7 +1593,7 @@ Sub Conv24(cDibbuffer0 As Object)
  Dim cDIBbuffer1 As Object
  Set cDIBbuffer1 = New cDIBSection
 Call cDIBbuffer1.create(cDibbuffer0.Width, cDibbuffer0.Height)
-cDIBbuffer1.LoadPictureBlt cDibbuffer0.hdc
+cDIBbuffer1.LoadPictureBlt cDibbuffer0.Hdc
 Set cDibbuffer0 = cDIBbuffer1
 Set cDIBbuffer1 = Nothing
 End Sub
@@ -3538,7 +3538,7 @@ Else
         If Len(ig$ + DE$) > 13 And LenB(ex$) = 0 Then
             On Error Resume Next
             If Len(DE$) > 0 Then
-                Mid$(DE$, 1, 1) = cdecimaldot$
+                Mid$(DE$, 1, 1) = DefaultDec$
                 R = CDec(ig$ & DE$)
             Else
                 R = CDec(ig$)
@@ -4700,7 +4700,7 @@ If Err.Number > 0 Then aSize = 12: fonttest.Font.Size = aSize
 End Sub
 Public Function InternalLeadingSpace() As Long
 On Error Resume Next
-    GetTextMetrics fonttest.hdc, tm
+    GetTextMetrics fonttest.Hdc, tm
   With tm
 InternalLeadingSpace = (.tmInternalLeading = 0) Or Not (.tmInternalLeading > 0)
 End With
@@ -4708,7 +4708,7 @@ End Function
 Public Function AverCharSpace(DDD As Object, Optional breakchar) As Long
 On Error Resume Next
 Dim tmm As TEXTMETRIC
-    GetTextMetrics DDD.hdc, tmm
+    GetTextMetrics DDD.Hdc, tmm
   With tmm
 AverCharSpace = .tmAveCharWidth
 breakchar = .tmBreakChar

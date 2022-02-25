@@ -18,7 +18,7 @@ Option Explicit
 ' zero$ has chr$(1)
 Const Zero$ = ""
 Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
-Public NowDec$
+Const NowDec$ = ","
 ' No same key. --- this is changed
 Private AllowSameKey As Boolean
 ' We can remove a key - if AllowSameKey=false
@@ -66,8 +66,8 @@ Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Public Stable As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Private lastfind As String
 Private lasttype As Integer
 Private lastkey As String
@@ -91,7 +91,6 @@ Private Sub Class_Initialize()
     hashlen = MaxSpace * 2 + 3
     toplim = -1
     mSortstyle = vbTextCompare
-    NowDec$ = DefaultDec$
 End Sub
 Public Sub ResetGui()
     MaxSpace = 50
@@ -637,8 +636,8 @@ Private Function Malloc() As Long
     toplim = toplim + 1
     Malloc = toplim
 End Function
-Property Get Count()
-    Count = toplim + 1
+Property Get count()
+    count = toplim + 1
 End Property
 Public Property Let UcaseKeys(RHS)
 If toplim = -1 Then
@@ -916,7 +915,7 @@ place HashFunc1(kk), a
 index = -1
 End Sub
 Property Get Percent()
-Percent = 100 * Count / hashlen
+Percent = 100 * count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
@@ -988,11 +987,11 @@ End If
 End Property
 Public Sub ToStart()
 index = 0
-Done = Count > 0
+Done = count > 0
 End Sub
 Public Sub ToEnd()
-index = Count - 1
-Done = Count > 0
+index = count - 1
+Done = count > 0
 End Sub
 
 Public Sub NextIndex()
@@ -1484,9 +1483,9 @@ Public Property Get KeyToString3(there As Long) As String
 
 End Property
 
-Private Function IsNumberD2(a$, D As Variant) As Boolean
+Private Function IsNumberD2(a$, d As Variant) As Boolean
 ' for inline stacitems
-If VarType(D) = vbEmpty Then D = 0#
+If VarType(d) = vbEmpty Then d = 0#
 Dim a1 As Long
 If a$ <> "" Then
 For a1 = 1 To Len(a$) + 1
@@ -1499,7 +1498,7 @@ Exit For
 End Select
 Next a1
 If a1 > Len(a$) Then a1 = Len(a$) + 1
-    If IsNumberOnly(a$, 1, D, a1) Then
+    If IsNumberOnly(a$, 1, d, a1) Then
         a$ = Mid$(a$, a1)
         IsNumberD2 = True
     Else
@@ -1602,7 +1601,7 @@ Else
         If Len(ig$ + DE$) > 13 And LenB(ex$) = 0 Then
             On Error Resume Next
             If Len(DE$) > 0 Then
-                Mid$(DE$, 1, 1) = cdecimaldot$
+                Mid$(DE$, 1, 1) = DefaultDec$
                 R = CDec(ig$ + DE$)
             Else
                 R = CDec(ig$)
