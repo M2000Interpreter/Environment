@@ -142,7 +142,7 @@ Private Type myImage
     Image As StdPicture
     Height As Long
     Width As Long
-    top As Long
+    Top As Long
     Left As Long
 End Type
 Dim Image1 As myImage
@@ -176,11 +176,12 @@ Private Sub command2_GotFocus()
 yo = 1
 End Sub
 Private Sub command1_KeyDown(keycode As Integer, shift As Integer)
+
 If keycode = 39 Or keycode = 40 Then
     keycode = 0
 ElseIf keycode = 37 Or keycode = 38 Then
     keycode = 0
-    If command1.Visible Then command2.SetFocus: LastActive = command2.Name
+    If command2.Visible Then command2.SetFocus: LastActive = command2.Name
 End If
 If keycode = vbKeyPause And Not BreakMe Then
 ASKINUSE = False
@@ -283,7 +284,7 @@ Else
                Set photo = Nothing
        Else
                If CFname(AskDIB$) <> "" Then
-                  Set aPic = LoadMyPicture(GetDosPath(CFname(AskDIB$)), True, gList2.backcolor)
+                  Set aPic = LoadMyPicture(GetDosPath(CFname(AskDIB$)), True, gList2.BackColor)
                     If aPic Is Nothing Then Exit Sub
                
                    Set LoadPictureMine = aPic
@@ -383,7 +384,7 @@ Set myCancel = Nothing
 AskDIB$ = vbNullString
 AskOk$ = vbNullString
 AskLastX = Left
-AskLastY = top
+AskLastY = Top
 ''Sleep 200
 ASKINUSE = False
 End Sub
@@ -509,7 +510,7 @@ allheight = height1 * factor
 itemWidth = allwidth - 2 * borderleft
 itemwidth3 = (itemWidth - 2 * borderleft) / 3
 itemwidth2 = (itemWidth - borderleft) / 2
-move Left, top, allwidth, allheight
+move Left, Top, allwidth, allheight
 FontTransparent = False  ' clear background  or false to write over
 gList2.move borderleft, bordertop, itemWidth, bordertop * 3
 gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
@@ -553,7 +554,7 @@ iLeft = borderleft
 iTop = 5 * bordertop
 iwidth = itemwidth3
 iheight = bordertop * 12
- Line (0, 0)-(Scalewidth - dv15, Scaleheight - dv15), Me.backcolor, BF
+ Line (0, 0)-(Scalewidth - dv15, Scaleheight - dv15), Me.BackColor, BF
 If (curIwidth / iwidth) < (curIheight / iheight) Then
 sc = curIheight / iheight
 ImageMove Image1, iLeft + (iwidth - curIwidth / sc) / 2, iTop, curIwidth / sc, iheight
@@ -581,7 +582,7 @@ On Error Resume Next
 Dim sc As Double
 Set Image1.Image = Nothing
 Image1.Width = 0
-If aImage.handle <> 0 Then
+If aImage.Handle <> 0 Then
 Set Image1.Image = aImage
 If (aImage.Width / iwidth) < (aImage.Height / iheight) Then
 sc = aImage.Height / iheight
@@ -602,7 +603,7 @@ On Error Resume Next
 Dim sc As Double
 Set Image1.Image = Nothing
 Image1.Width = 0
-If aImage.handle <> 0 Then
+If aImage.Handle <> 0 Then
 Set Image1.Image = aImage
 Image1.Height = aImage.Height
 Image1.Width = aImage.Width
@@ -614,13 +615,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -647,7 +648,7 @@ If IsWine Then
     PaintPicture a.Image, neoTop, NeoLeft, NeoWidth, NeoHeight
 Else
     Dim aa As New cDIBSection
-    aa.backcolor = backcolor
+    aa.BackColor = BackColor
     aa.CreateFromPicture a.Image
     aa.ResetBitmapTypeToBITMAP
     PaintPicture aa.Picture, neoTop, NeoLeft, NeoWidth, NeoHeight
@@ -713,8 +714,8 @@ If item >= 0 Then
 content = ListPad.TextLine(item + 1)
 End If
 End Sub
-Private Sub ListPad_BreakLine(data As String, datanext As String)
-    gList1.BreakLine data, datanext
+Private Sub ListPad_BreakLine(Data As String, datanext As String)
+    gList1.BreakLine Data, datanext
 End Sub
 
 
