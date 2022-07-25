@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 8 active-X
-GUI: Fix a bug in msgbox with one button when we use arrows (was a fatal error).
+Version 11 Revision 9 active-X
+Fix a bug in format$().
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
