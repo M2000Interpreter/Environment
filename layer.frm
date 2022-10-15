@@ -5,7 +5,7 @@ Begin VB.Form Form5
    BorderStyle     =   0  'None
    Caption         =   "Form5"
    ClientHeight    =   3090
-   ClientLeft      =   0
+   ClientLeft      =   -30000
    ClientTop       =   0
    ClientWidth     =   4680
    FillStyle       =   0  'Solid
@@ -23,7 +23,6 @@ Begin VB.Form Form5
    ScaleHeight     =   3090
    ScaleWidth      =   4680
    ShowInTaskbar   =   0   'False
-   StartUpPosition =   3  'Windows Default
 End
 Attribute VB_Name = "Form5"
 Attribute VB_GlobalNameSpace = False
@@ -119,7 +118,7 @@ INK$ = INK$ & GetKeY(KeyAscii)
 End Sub
 Public Sub RestoreSizePos()
 ' calling from form1
-Me.move Form1.Left, Form1.top, Form1.Width, Form1.Height
+Me.move Form1.Left, Form1.Top, Form1.Width, Form1.Height
 End Sub
 Public Sub RestorePos()
 ' calling from form1

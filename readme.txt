@@ -1,7 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 9 active-X
-Fix a bug in format$().
+Version 11 Revision 10 active-X
+New variant for function Image() now generate QRCODE (emf file).
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

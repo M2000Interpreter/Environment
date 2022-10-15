@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 11
 Global Const VerMinor = 0
-Global Const Revision = 9
+Global Const Revision = 10
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -4939,11 +4939,6 @@ While ISSTRINGA(kill2$, R$)
 KillFile strTemp + R$
 Wend
 End Sub
-'' this is from Trick (VbForums)
-Sub Proto1(ByVal addr As Long, basestack As basetask, rest$, Lang As Long, resp As Boolean)
-End Sub
-
-
 Public Sub NeoSubMain()
 ' need to read registry form sub main
 On Error Resume Next
@@ -9189,10 +9184,17 @@ IsNumberNew = False
                 R = 0#
                 Exit Function
             End If
-        Else
-                noImage a$
+        Else  ' QRcode
+                GetQrCode bstack, a$, s$
+                If Not bstack.lastobj Is Nothing Then
+                    If TypeOf bstack.lastobj Is mHandler Then
+                        IsNumberNew = FastSymbol(a$, ")", True)
+                        R = 0#
+                        Exit Function
+                    End If
+                End If
         End If
-            
+        noImage a$
             
     ElseIf IsExp(bstack, a$, s$) Then
       
@@ -9201,7 +9203,9 @@ IsNumberNew = False
               Set usehandler = bstack.lastobj
               Set bstack.lastobj = Nothing
               If usehandler.t1 = 2 Then
-              
+              If usehandler.objref.IsEmf Or usehandler.objref.IsWmf Then
+                ' WRONG BUFFER
+              Else
                   If usehandler.objref.ReadImageSizeX(R) Then
                   
                   
@@ -9260,6 +9264,7 @@ IsNumberNew = False
                         p = &HFFFFFF
                     End If
                     Set bstack.lastobj = usehandler.CreateFromPicture(dd, w1, w2, w3)
+                    End If
                           Set usehandler = Nothing
                           IsNumberNew = FastSymbol(a$, ")", True)
                       Exit Function
@@ -25961,7 +25966,7 @@ If id& < 100 Then
     If (id& Mod 10) > 0 Then
     LCTbasket dd, prive, y&, x&
     dd.FontTransparent = True
-    dd.forecolor = mycolor(prive.mypen)
+    dd.ForeColor = mycolor(prive.mypen)
        PlainBaSket dd, prive, Tag$, True, True
     End If
     End If
@@ -25993,7 +25998,7 @@ Else
     If half = 1 Then
     dd.currentY = dd.currentY + prive.Yt \ 2 '+ mybasket.uMineLineSpace \ 2
     End If
-    dd.forecolor = mycolor(prive.mypen)
+    dd.ForeColor = mycolor(prive.mypen)
     
     If Not D Is dd Then
     Set DDD.Owner = dd
@@ -31702,12 +31707,12 @@ If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
 If IsWine Then
 If x = ScrInfo(Console).Left And y = ScrInfo(Console).Top Then
 Form1.move x, y
-If form5iamloaded Then Form5.RestorePos
+'If form5iamloaded Then Form5.RestorePos
 Sleep 10
 End If
 End If
 Form1.move x, y
-If form5iamloaded Then Form5.RestorePos
+'If form5iamloaded Then Form5.RestorePos
 Console = FindFormSScreen(Form1)
     If FastSymbol(rest$, ";") Then
     x = ((ScrInfo(Console).Width - 1) - Form1.Width) / 2 + ScrInfo(Console).Left
@@ -34474,7 +34479,7 @@ DDD.FontName = .FontName
 DDD.Font.charset = .charset
 DDD.FontSize = .SZ
 End If
-DDD.forecolor = .mypen
+DDD.ForeColor = .mypen
 End With
 End Sub
 Function GetCode(dq As Object) As Long
@@ -36405,7 +36410,7 @@ Col = mycolor(p)
 End If
 If Not FastSymbol(rest$, ",") Then SyntaxError: ProcPoly = False: Exit Function
 If IsLabelSymbolNew(rest$, "ΓΩΝΙΑ", "ANGLE", Lang) Then par = True
-Scr.fillstyle = vbSolid
+Scr.FillStyle = vbSolid
 Scr.fillcolor = Col
 F = 32
 ReDim PLG(F)
@@ -36479,7 +36484,7 @@ If .pathfillstyle = 1 And .IamEmf Then mGDILines = False
 If mGDILines Then
 pencol = .mypen
 
-    If .pathgdi > 0 Then Col = .pathcolor: bstyle = .pathfillstyle Else bstyle = Scr.fillstyle
+    If .pathgdi > 0 Then Col = .pathcolor: bstyle = .pathfillstyle Else bstyle = Scr.FillStyle
     M2000Pen trans, Col
  If trans < 255 And bstyle = 5 Then M2000Pen trans, pencol Else M2000Pen 255, pencol
     DrawPolygonGdi Scr.Hdc, pencol, Col, bstyle, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 1)
@@ -36490,7 +36495,7 @@ If Polygon(Scr.Hdc, PLG(0), x1) = 0 Then
     ProcPoly = True: BadGraphic: Set Scr = Nothing: Exit Function
 End If
 End If
-Scr.fillstyle = vbSolid
+Scr.FillStyle = vbSolid
 End With
 MyRefresh bstack
 'MyDoEvents1 Scr
@@ -36510,7 +36515,7 @@ PLG(2).x = x1
 PLG(2).y = y1
 PLG(3).x = x
 PLG(3).y = y1
-Scr.fillstyle = vbSolid
+Scr.FillStyle = vbSolid
 Scr.fillcolor = 0
 Polygon Scr.Hdc, PLG(0), 4
 End Sub
@@ -36563,7 +36568,7 @@ Else
 End If
 
 If par Then
-    Scr.fillstyle = vbSolid
+    Scr.FillStyle = vbSolid
     Scr.fillcolor = mycolor(x)
     If sX = sY Then sY = PI2
     If sX = sY Or Abs(sX - sY) + 0.0001 > PI2 Then
@@ -36644,9 +36649,9 @@ If par Then
                 End If
             End If
         End If
-        Scr.fillstyle = 1
+        Scr.FillStyle = 1
     Else
-        Scr.fillstyle = 1
+        Scr.FillStyle = 1
         If mGDILines Then
             If Not par Then M2000Pen trans, Col Else M2000Pen 255, Col
             If .pathgdi > 0 Then
@@ -42472,7 +42477,7 @@ jump:
     y1 = y1 + .YGRAPH
     'mm.Line2 .XGRAPH, .YGRAPH, x1, y1, mycolor(Col), True
     
-    mm.fillstyle = vbSolid
+    mm.FillStyle = vbSolid
     mm.fillcolor = mycolor(Col)
     DrawFrameForEmf Scr, .XGRAPH, .YGRAPH, x1, y1
   .XGRAPH = x1
@@ -42605,7 +42610,7 @@ End If
                    LEVCOLMENU = 2
                            If FastSymbol(rest$, ",") Then
                                 If IsExp(bstack, rest$, p) Then
-                                   Form1.List1.forecolor = mycolor(p)
+                                   Form1.List1.ForeColor = mycolor(p)
                                    LEVCOLMENU = 3
                                    Else
                                    MissNumExpr
@@ -45355,24 +45360,7 @@ Loop Until Not FastSymbol(rest$, ",")
 End If
 
 End Function
-Function MyVol(basestack As basetask, rest$) As Boolean
-Dim p As Variant
-If IsExp(basestack, rest$, p, , True) Then
-    vol = CLng(MyMod(Abs(p), 101))
-    If FastSymbol(rest$, ",") Then
-         If IsExp(basestack, rest$, p, , True) Then
-            p = CLng(p)
-      MediaPlayer1.SetMasterVolume vol, CLng(p)
-  Else
-      MissParam rest$
-      
- End If
-Else
- MediaPlayer1.SetMasterVolume vol
-End If
-End If
-MyVol = True
-End Function
+
 Function MyClipboard(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim s$, photo As cDIBSection, R As Variant
 Dim Width As Long, Height As Long
@@ -46352,8 +46340,8 @@ End Function
 
 Function ProcessIf(flag As Variant, bstack As basetask, rest$, R As Variant) As Boolean
 
-Dim mode As Boolean, usehandler As mHandler
-mode = flag < 1
+Dim Mode As Boolean, usehandler As mHandler
+Mode = flag < 1
 If bstack.lastobj Is Nothing Then
 flag = Int(Abs(flag > 0) * (flag - 1) - (flag <= 0) * (flag + 1) + 1)
 Else
@@ -46375,7 +46363,7 @@ ProcessIf = True
 Do
     If flag = nowpos Then
         If MaybeIsSymbol(rest$, ",)") Then
-            If mode Then
+            If Mode Then
             R = flag = 1
             Else
             R = 0
@@ -46398,14 +46386,14 @@ Do
     End If
     If Not FastSymbol(rest$, ",") Then Exit Do
     nowpos = nowpos + 1
-    If mode Then If nowpos > 2 Then MyEr "To many expressions", "Πολλές εκφράσεις"
+    If Mode Then If nowpos > 2 Then MyEr "To many expressions", "Πολλές εκφράσεις"
 Loop
 If nowpos = 1 Then MyEr "Need two expressions", "Χρειάζομαι δυο εκφράσεις"
 If Not FastSymbol(rest$, ")") Then ProcessIf = False
 End Function
 Function ProcessIfStr(ByVal flag As Double, bstack As basetask, rest$, ss As String) As Boolean
-Dim mode As Boolean
-mode = flag < 1
+Dim Mode As Boolean
+Mode = flag < 1
 flag = Int(Abs(flag > 0) * (flag - 1) - (flag <= 0) * (flag + 1) + 1)
 'Set bstack.lastobj = Nothing
 Dim nowpos As Double, w1 As Long, s$
@@ -46434,7 +46422,7 @@ Do
     End If
     If Not FastSymbol(rest$, ",") Then Exit Do
     nowpos = nowpos + 1
-    If mode Then If nowpos > 2 Then MyEr "To many expressions", "Πολλές εκφράσεις"
+    If Mode Then If nowpos > 2 Then MyEr "To many expressions", "Πολλές εκφράσεις"
 Loop
 If nowpos = 1 Then MyEr "Need two xpressions", "Χρειάζομαι δυο εκφράσεις"
 If Not FastSymbol(rest$, ")") Then ProcessIfStr = False

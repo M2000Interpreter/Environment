@@ -1,11 +1,11 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Type abcd
-    X As Long
+    x As Long
     COM() As String
 End Type
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Any)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Any)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
 Public Const KEYEVENTF_KEYUP = &H2
 Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
@@ -56,7 +56,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -153,16 +153,16 @@ Type bitmap
         bmBitsPixel As Integer
         bmBits As Long
 End Type
-Declare Function StretchBlt Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Declare Function StretchBlt Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
 Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal Hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
 Declare Function CreateCompatibleDC Lib "gdi32" (ByVal Hdc As Long) As Long
 Declare Function SelectObject Lib "gdi32" (ByVal Hdc As Long, ByVal hObject As Long) As Long
 Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) As Long
 Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
+Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 'Declare Function GetObject Lib "gdi32" Alias "GetObjectA" (ByVal hObject As Long, ByVal nCount As Long, lpObject As Any) As Long
-Declare Function GetPixel Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long) As Long
-Declare Function SetPixel Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal crColor As Long) As Long
+Declare Function GetPixel Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long) As Long
+Declare Function SetPixel Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
 Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal Hdc As Long, ByVal nIndex As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function GetDesktopWindow Lib "user32" () As Long
@@ -338,12 +338,12 @@ If UseMe Is Nothing Then Exit Sub
 UseMe.GetIcon a
 End Sub
 Public Sub PlaceCaption(ByVal a$)
-Dim m As Callback, f As Form
+Dim m As Callback, F As Form
 On Error Resume Next
-Set f = Screen.ActiveForm
+Set F = Screen.ActiveForm
 If UseMe Is Nothing Then Exit Sub
     If Not UseMe.IamVisible Then
-        If Len(a$) = 0 Then a$ = "M2000" Else Set f = Nothing
+        If Len(a$) = 0 Then a$ = "M2000" Else Set F = Nothing
         Form1.CaptionW = a$
         If UseMe.IhaveExtForm Then
         UseMe.SetExtCaption a$
@@ -368,7 +368,7 @@ Else
         Form1.CaptionW = a$
        
         
-        If f Is Form1 Then
+        If F Is Form1 Then
             If Form1.Visible Then
             Form1.SetFocus
             Else
@@ -379,15 +379,15 @@ Else
             End If
             End If
          End If
-       Set f = Nothing
+       Set F = Nothing
        
     End If
     ttl = False
 End If
 ttl = False
 Exit Sub
-If Not f Is Nothing Then
-    If f Is Form1 Then
+If Not F Is Nothing Then
+    If F Is Form1 Then
         If Form1.Visible Then
             Form1.SetFocus
          ElseIf Not UseMe Is Nothing Then
@@ -398,7 +398,7 @@ If Not f Is Nothing Then
             End If
         End If
     Else
-        If f.Visible Then f.SetFocus
+        If F.Visible Then F.SetFocus
     End If
 End If
 Err.Clear
@@ -571,22 +571,22 @@ Else
     Set CDib2Pic = emptypic
 End If
 End Function
-Public Function SetDIBPixel(ssdib As Variant, ByVal X As Long, ByVal Y As Long, aColor As Long) As Double
+Public Function SetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long, aColor As Long) As Double
 Dim w As Long, h As Long, bpl As Long, rgb(2) As Byte
 w = val("&H" & Mid$(ssdib, 5, 4))
 h = val("&H" & Mid$(ssdib, 9, 4))
 If Len(ssdib) * 2 < ((w * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 If w * h <> 0 Then
 bpl = (LenB(ssdib) - 24) \ h
-w = (w - X - 1) Mod w
-h = (Y Mod h) * bpl + w * 3 + 24
+w = (w - x - 1) Mod w
+h = (y Mod h) * bpl + w * 3 + 24
 CopyMemory rgb(0), ByVal StrPtr(ssdib) + h, 3
 
 SetDIBPixel = -(rgb(2) * 256# * 256# + rgb(1) * 256# + rgb(0))
 CopyMemory ByVal StrPtr(ssdib) + h, aColor, 3
 End If
 End Function
-Public Function GetDIBPixel(ssdib As Variant, ByVal X As Long, ByVal Y As Long) As Double
+Public Function GetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long) As Double
 Dim w As Long, h As Long, bpl As Long, rgb(2) As Byte
 'a = ssdib$
 w = val("&H" & Mid$(ssdib, 5, 4))
@@ -594,9 +594,9 @@ h = val("&H" & Mid$(ssdib, 9, 4))
 If Len(ssdib) * 2 < ((w * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 If w * h <> 0 Then
 bpl = (LenB(ssdib) - 24) \ h   ' Len(ssdib$) 2 bytes per char
-w = (w - X - 1) Mod w
+w = (w - x - 1) Mod w
 
-h = (Y Mod h) * bpl + w * 3 + 24
+h = (y Mod h) * bpl + w * 3 + 24
 
 
 CopyMemory rgb(0), ByVal StrPtr(ssdib) + h, 3
@@ -741,7 +741,7 @@ cDibbuffer0.Cls bckColor
 
 there:
 Dim bDib2() As Byte, bDib1() As Byte
-Dim X As Long, Y As Long
+Dim x As Long, y As Long
 Dim lc As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
@@ -861,7 +861,7 @@ End Function
 
 Public Function Merge3Dib(backdib As cDIBSection, maskdib As cDIBSection, frontdib As cDIBSection, Optional Reverse As Boolean = False)
 
-Dim X As Long, Y As Long
+Dim x As Long, y As Long
 
 Dim xmax As Long, yMax As Long
     yMax = backdib.Height - 1
@@ -907,21 +907,21 @@ Dim tSA2 As SAFEARRAY2D
         '-----------------------------------------------
         If Reverse Then
         
-    For X = 0 To (xmax * 3) Step 3
-        For Y = yMax To 0 Step -1
-            bDib(X, Y) = (CLng(bDib(X, Y)) * bDib1(X, Y) + CLng(bDib2(X, Y)) * (255 - bDib1(X, Y))) \ 256
-            bDib(X + 1, Y) = (CLng(bDib(X + 1, Y)) * bDib1(X + 1, Y) + CLng(bDib2(X + 1, Y)) * (255 - bDib1(X + 1, Y))) \ 256
-            bDib(X + 2, Y) = (CLng(bDib(X + 2, Y)) * bDib1(X + 2, Y) + CLng(bDib2(X + 2, Y)) * (255 - bDib1(X + 2, Y))) \ 256
-        Next Y
-        Next X
+    For x = 0 To (xmax * 3) Step 3
+        For y = yMax To 0 Step -1
+            bDib(x, y) = (CLng(bDib(x, y)) * bDib1(x, y) + CLng(bDib2(x, y)) * (255 - bDib1(x, y))) \ 256
+            bDib(x + 1, y) = (CLng(bDib(x + 1, y)) * bDib1(x + 1, y) + CLng(bDib2(x + 1, y)) * (255 - bDib1(x + 1, y))) \ 256
+            bDib(x + 2, y) = (CLng(bDib(x + 2, y)) * bDib1(x + 2, y) + CLng(bDib2(x + 2, y)) * (255 - bDib1(x + 2, y))) \ 256
+        Next y
+        Next x
         Else
-     For X = 0 To (xmax * 3) Step 3
-        For Y = yMax To 0 Step -1
-            bDib(X, Y) = (CLng(bDib2(X, Y)) * bDib1(X, Y) + CLng(bDib(X, Y)) * (255 - bDib1(X, Y))) \ 256
-            bDib(X + 1, Y) = (CLng(bDib2(X + 1, Y)) * bDib1(X + 1, Y) + CLng(bDib(X + 1, Y)) * (255 - bDib1(X + 1, Y))) \ 256
-            bDib(X + 2, Y) = (CLng(bDib2(X + 2, Y)) * bDib1(X + 2, Y) + CLng(bDib(X + 2, Y)) * (255 - bDib1(X + 2, Y))) \ 256
-        Next Y
-        Next X
+     For x = 0 To (xmax * 3) Step 3
+        For y = yMax To 0 Step -1
+            bDib(x, y) = (CLng(bDib2(x, y)) * bDib1(x, y) + CLng(bDib(x, y)) * (255 - bDib1(x, y))) \ 256
+            bDib(x + 1, y) = (CLng(bDib2(x + 1, y)) * bDib1(x + 1, y) + CLng(bDib(x + 1, y)) * (255 - bDib1(x + 1, y))) \ 256
+            bDib(x + 2, y) = (CLng(bDib2(x + 2, y)) * bDib1(x + 2, y) + CLng(bDib(x + 2, y)) * (255 - bDib1(x + 2, y))) \ 256
+        Next y
+        Next x
         End If
 
    '-----------------------------------------------
@@ -1725,8 +1725,8 @@ With Form1.dSprite(PobjNum)
 .Picture = photo.Picture(SZ)
 
 
-players(PobjNum).X = .Width / 2
-players(PobjNum).Y = .Height / 2
+players(PobjNum).x = .Width / 2
+players(PobjNum).y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, 0)
 
 .Tag = Priority
@@ -1748,8 +1748,8 @@ End With
 
 GetNewSpriteObj = PobjNum
 With players(PobjNum)
-.MAXXGRAPH = .X * 2
-.MAXYGRAPH = .Y * 2
+.MAXXGRAPH = .x * 2
+.MAXYGRAPH = .y * 2
 .hRgn = True
 End With
 SetText Form1.dSprite(PobjNum)
@@ -1868,13 +1868,13 @@ If k < 1 Or k > PobjNum Then Exit Function
  PosSpriteY = Form1.dSprite(k).Top
 End Function
 
-Sub PosSprite(aPrior As Long, ByVal X As Long, ByVal Y As Long) ' ' before take from priority the original sprite
+Sub PosSprite(aPrior As Long, ByVal x As Long, ByVal y As Long) ' ' before take from priority the original sprite
 Dim k As Long
 k = FindSpriteByTag(aPrior)
 If k < 1 Or k > PobjNum Then Exit Sub
  
 
-Form1.dSprite(k).move X, Y
+Form1.dSprite(k).move x, y
 
 End Sub
 Sub SrpiteHideShow(ByVal aPrior As Long, ByVal wh As Boolean) ' this is a priority
@@ -2020,10 +2020,10 @@ With Form1.dSprite(s)
 .Height = photo.Height * DYP * SZ
 .Width = photo.Width * DXP * SZ
 .Picture = photo.Picture(SZ)
-.Left = .Left + players(s).X - .Width / 2
-players(s).X = .Width / 2
-.Top = .Top + players(s).Y - .Height / 2
-players(s).Y = .Height / 2
+.Left = .Left + players(s).x - .Width / 2
+players(s).x = .Width / 2
+.Top = .Top + players(s).y - .Height / 2
+players(s).y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, True)
 ''''''''''''''''''''''''UpdateWindow .hwnd
  DeleteObject myRgn
@@ -2031,8 +2031,8 @@ Call SetWindowRgn(.hWnd, myRgn, True)
 End With
 With players(s)
 
-.MAXXGRAPH = .X * 2
-.MAXYGRAPH = .Y * 2
+.MAXXGRAPH = .x * 2
+.MAXYGRAPH = .y * 2
 End With
 SetText Form1.dSprite(s)
 End If
@@ -4839,3 +4839,44 @@ a.COM(1) = "ok11"
 Debug.Print b.COM(1)
 End Sub
 
+Sub GetQrCode(basestack As basetask, a$, ab$)
+Dim ErrLevel As Long, x As Variant, QRcolor As Long
+On Error Resume Next
+If FastSymbol(a$, ",") Then
+    If IsExp(basestack, a$, x, , True) Then
+        QRcolor = mycolor(x)
+    End If
+Else
+    GoTo step2
+End If
+
+If FastSymbol(a$, ",") Then
+    If IsExp(basestack, a$, x, , True) Then
+        If x = 1 Then
+            ErrLevel = 1
+        ElseIf x = 2 Then
+            ErrLevel = 2
+        ElseIf x = 3 Then
+            ErrLevel = 3
+        End If
+    End If
+End If
+step2:
+Set basestack.lastobj = Nothing
+Dim aPic As MemBlock, usehandler As mHandler
+Dim bytes As Long
+Dim emfP As StdPicture
+Set emfP = QRCodegenBarcode(ab$, QRcolor, , ErrLevel)
+If emfP Is Nothing Then Exit Sub
+Set aPic = New MemBlock
+bytes = GetEnhMetaFileBits(emfP.Handle, bytes, ByVal 0)
+If bytes Then
+    aPic.Construct 1, bytes
+    Call GetEnhMetaFileBits(emfP.Handle, bytes, ByVal aPic.GetBytePtr(0))
+    aPic.SubType = 2 ' emf
+    Set usehandler = New mHandler
+    usehandler.t1 = 2
+    Set usehandler.objref = aPic
+    Set basestack.lastobj = usehandler
+End If
+End Sub

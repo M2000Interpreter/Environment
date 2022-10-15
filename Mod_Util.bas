@@ -25,7 +25,7 @@ Private Declare Function SHGetSpecialFolderLocation Lib "shell32.dll" (ByVal hWn
 Private Declare Function SHGetPathFromIDList Lib "shell32.dll" Alias "SHGetPathFromIDListW" (ByVal pidl As Long, ByVal lpszPath As Long) As Long
 Private Declare Function FindExecutable Lib "shell32.dll" Alias "FindExecutableW" (ByVal lpFile As Long, ByVal lpDirectory As Long, ByVal lpResult As Long) As Long
 Private Declare Function GetForegroundWindow Lib "user32" () As Long
-Private Declare Function SelectClipRgn Lib "gdi32" (ByVal Hdc As Long, ByVal hRgn As Long) As Long
+Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function MessageBeep Lib "user32" (ByVal wType As Long) As Long
 Public Declare Function GetLocaleInfoW Lib "kernel32" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
 Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
@@ -115,14 +115,14 @@ Private Const LOCALE_USER_DEFAULT As Long = &H800
 Private Const C3_DIACRITIC As Long = &H2
 Private Const CT_CTYPE3 As Byte = &H4
 Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
-Private Declare Function SetTextCharacterExtra Lib "gdi32" (ByVal Hdc As Long, ByVal nCharExtra As Long) As Long
+Private Declare Function SetTextCharacterExtra Lib "gdi32" (ByVal hDC As Long, ByVal nCharExtra As Long) As Long
 Private Declare Function WideCharToMultiByte Lib "kernel32" (ByVal CodePage As Long, ByVal dwFlags As Long, ByVal lpWideCharStr As Long, ByVal cchWideChar As Long, ByVal lpMultiByteStr As Long, ByVal cchMultiByte As Long, ByVal lpDefaultChar As Long, ByVal lpUsedDefaultChar As Long) As Long
 Private Declare Function GdiFlush Lib "gdi32" () As Long
 Public iamactive As Boolean
 Declare Function MultiByteToWideChar& Lib "kernel32" (ByVal CodePage&, ByVal dwFlags&, MultiBytes As Any, ByVal cBytes&, ByVal pWideChars&, ByVal cWideChars&)
-Private Declare Function FillRect Lib "user32" (ByVal Hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Private Declare Function FillRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Private Declare Function CreateSolidBrush Lib "gdi32" (ByVal crColor As Long) As Long
-Private Declare Function GetClipRgn Lib "gdi32" (ByVal Hdc As Long, _
+Private Declare Function GetClipRgn Lib "gdi32" (ByVal hDC As Long, _
          hRgn As Long) As Long
 Declare Function CreateRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
@@ -187,11 +187,11 @@ Public vH_y As Long
 Public ttl As Boolean
 Public Const SRCCOPY = &HCC0020
 Public Release As Boolean
-Private Declare Function SetBkMode Lib "gdi32" (ByVal Hdc As Long, ByVal nBkMode As Long) As Long
+Private Declare Function SetBkMode Lib "gdi32" (ByVal hDC As Long, ByVal nBkMode As Long) As Long
 Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
-Declare Function RoundRect Lib "gdi32" (ByVal Hdc As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal Y3 As Long) As Long
+Declare Function RoundRect Lib "gdi32" (ByVal hDC As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal Y3 As Long) As Long
 Declare Function UpdateWindow Lib "user32" (ByVal hWnd As Long) As Long
-Declare Function ScrollDC Lib "user32" (ByVal Hdc As Long, ByVal dX As Long, ByVal dY As Long, lprcScroll As RECT, lprcClip As RECT, ByVal hrgnUpdate As Long, lprcUpdate As RECT) As Long
+Declare Function ScrollDC Lib "user32" (ByVal hDC As Long, ByVal dX As Long, ByVal dY As Long, lprcScroll As RECT, lprcClip As RECT, ByVal hrgnUpdate As Long, lprcUpdate As RECT) As Long
 Public LastErName As String
 Public LastErNameGR As String
 Public LastErNum As Long
@@ -202,11 +202,11 @@ Type POINTAPI
         x As Long
         y As Long
 End Type
-Private Declare Function GetTextExtentPoint32 Lib "gdi32" Alias "GetTextExtentPoint32W" (ByVal Hdc As Long, ByVal lpsz As Long, ByVal cbString As Long, lpSize As POINTAPI) As Long
+Private Declare Function GetTextExtentPoint32 Lib "gdi32" Alias "GetTextExtentPoint32W" (ByVal hDC As Long, ByVal lpsz As Long, ByVal cbString As Long, lpSize As POINTAPI) As Long
 
 Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
-Declare Function PaintDesktop Lib "user32" (ByVal Hdc As Long) As Long
-Declare Function SelectClipPath Lib "gdi32" (ByVal Hdc As Long, ByVal iMode As Long) As Long
+Declare Function PaintDesktop Lib "user32" (ByVal hDC As Long) As Long
+Declare Function SelectClipPath Lib "gdi32" (ByVal hDC As Long, ByVal iMode As Long) As Long
   Public Const RGN_AND = 1
     Public Const RGN_COPY = 5
     Public Const RGN_DIFF = 4
@@ -214,14 +214,14 @@ Declare Function SelectClipPath Lib "gdi32" (ByVal Hdc As Long, ByVal iMode As L
     Public Const RGN_MIN = RGN_AND
     Public Const RGN_OR = 2
     Public Const RGN_XOR = 3
-Declare Function StrokePath Lib "gdi32" (ByVal Hdc As Long) As Long
-Declare Function Polygon Lib "gdi32" (ByVal Hdc As Long, lpPoint As POINTAPI, ByVal nCount As Long) As Long
-Declare Function PolyBezier Lib "gdi32.dll" (ByVal Hdc As Long, lppt As POINTAPI, ByVal cPoints As Long) As Long
-Declare Function PolyBezierTo Lib "gdi32.dll" (ByVal Hdc As Long, lppt As POINTAPI, ByVal cCount As Long) As Long
-Declare Function BeginPath Lib "gdi32" (ByVal Hdc As Long) As Long
-Declare Function EndPath Lib "gdi32" (ByVal Hdc As Long) As Long
-Declare Function FillPath Lib "gdi32" (ByVal Hdc As Long) As Long
-Declare Function StrokeAndFillPath Lib "gdi32" (ByVal Hdc As Long) As Long
+Declare Function StrokePath Lib "gdi32" (ByVal hDC As Long) As Long
+Declare Function Polygon Lib "gdi32" (ByVal hDC As Long, lpPoint As POINTAPI, ByVal nCount As Long) As Long
+Declare Function PolyBezier Lib "gdi32.dll" (ByVal hDC As Long, lppt As POINTAPI, ByVal cPoints As Long) As Long
+Declare Function PolyBezierTo Lib "gdi32.dll" (ByVal hDC As Long, lppt As POINTAPI, ByVal cCount As Long) As Long
+Declare Function BeginPath Lib "gdi32" (ByVal hDC As Long) As Long
+Declare Function EndPath Lib "gdi32" (ByVal hDC As Long) As Long
+Declare Function FillPath Lib "gdi32" (ByVal hDC As Long) As Long
+Declare Function StrokeAndFillPath Lib "gdi32" (ByVal hDC As Long) As Long
 
 Public PLG() As POINTAPI
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
@@ -246,7 +246,7 @@ Global Const HWND_NOTOPMOST = -2
 Global Const SWP_NOACTIVATE = &H10
 Global Const SWP_SHOWWINDOW = &H40
 Declare Sub SetWindowPos Lib "user32" (ByVal hWnd As Long, ByVal hWndInsertAfter As Long, ByVal x As Long, ByVal y As Long, ByVal cX As Long, ByVal cY As Long, ByVal wFlags As Long)
-Declare Function ExtFloodFill Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long, ByVal wFillType As Long) As Long
+Declare Function ExtFloodFill Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long, ByVal wFillType As Long) As Long
 Public Const FLOODFILLSURFACE = 1
 Public Const FLOODFILLBORDER = 0
 
@@ -290,7 +290,7 @@ Public Type target
     ' THIS IS POINTS AT CHARACTER RESOLUTION
     SZ As Single
     ' SO WE NEED SZ
-    Lx As Long
+    lX As Long
     lY As Long
     tx As Long
     ty As Long
@@ -332,10 +332,10 @@ Private Type LOGFONT
 End Type
 Private Declare Function CreateRoundRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal Y3 As Long) As Long
 
-Private Declare Function PathToRegion Lib "gdi32" (ByVal Hdc As Long) As Long
+Private Declare Function PathToRegion Lib "gdi32" (ByVal hDC As Long) As Long
 Private Declare Function SetWindowRgn Lib "user32" (ByVal hWnd As Long, ByVal hRgn As Long, ByVal bRedraw As Boolean) As Long
 Private Declare Function CreateFontIndirect Lib "gdi32" Alias "CreateFontIndirectA" (lpLogFont As LOGFONT) As Long
-Private Declare Function SelectObject Lib "gdi32" (ByVal Hdc As Long, ByVal hObject As Long) As Long
+Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 
 ' OCTOBER 2000
 Public dstyle As Long
@@ -356,12 +356,12 @@ Const DFC_POPUPMENU = 5            'Only Win98/2000 !!
 Const DFCS_BUTTON3STATE = &H10
 Const DC_GRADIENT = &H20          'Only Win98/2000 !!
 
-Private Declare Function DrawCaption Lib "user32" (ByVal hWnd As Long, ByVal Hdc As Long, pcRect As RECT, ByVal un As Long) As Long
-Private Declare Function DrawEdge Lib "user32" (ByVal Hdc As Long, qrc As RECT, ByVal edge As Long, ByVal grfFlags As Long) As Long
-Private Declare Function DrawFocusRect Lib "user32" (ByVal Hdc As Long, lpRect As RECT) As Long
-Private Declare Function DrawFrameControl Lib "user32" (ByVal Hdc As Long, lpRect As RECT, ByVal un1 As Long, ByVal un2 As Long) As Long
-Private Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal Hdc As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
-Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal Hdc As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
+Private Declare Function DrawCaption Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long, pcRect As RECT, ByVal un As Long) As Long
+Private Declare Function DrawEdge Lib "user32" (ByVal hDC As Long, qrc As RECT, ByVal edge As Long, ByVal grfFlags As Long) As Long
+Private Declare Function DrawFocusRect Lib "user32" (ByVal hDC As Long, lpRect As RECT) As Long
+Private Declare Function DrawFrameControl Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal un1 As Long, ByVal un2 As Long) As Long
+Private Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal hDC As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
+Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hDC As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
 Private Declare Function SetRect Lib "user32" (lpRect As RECT, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Private Declare Function OffsetRect Lib "user32" (lpRect As RECT, ByVal x As Long, ByVal y As Long) As Long
 ''API declarations
@@ -387,11 +387,11 @@ Public Const TA_LEFT = 0
 Public Const TA_RIGHT = 2
 Public Const TA_CENTER = 6
 Public Const TA_RTLREADING = &H100&
-Public Declare Function SetTextJustification Lib "gdi32" (ByVal Hdc As Long, ByVal nBreakExtra As Long, ByVal nBreakCount As Long) As Long
-Public Declare Function SetTextAlign Lib "gdi32" (ByVal Hdc As Long, ByVal wFlags As Long) As Long
-Public Declare Function TabbedTextOut Lib "user32" Alias "TabbedTextOutW" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal lpString As Long, ByVal nCount As Long, ByVal nTabPositions As Long, ByRef lpnTabStopPositions As Long, ByVal nTabOrigin As Long) As Long
-Public Declare Function TextOut Lib "gdi32" Alias "TextOutW" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal lpString As Long, ByVal nCount As Long) As Long
-Public Declare Function GetTabbedTextExtent Lib "user32" Alias "GetTabbedTextExtentW" (ByVal Hdc As Long, ByVal lpString As Long, ByVal nCount As Long, ByVal nTabPositions As Long, lpnTabStopPositions As Long) As Long
+Public Declare Function SetTextJustification Lib "gdi32" (ByVal hDC As Long, ByVal nBreakExtra As Long, ByVal nBreakCount As Long) As Long
+Public Declare Function SetTextAlign Lib "gdi32" (ByVal hDC As Long, ByVal wFlags As Long) As Long
+Public Declare Function TabbedTextOut Lib "user32" Alias "TabbedTextOutW" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal lpString As Long, ByVal nCount As Long, ByVal nTabPositions As Long, ByRef lpnTabStopPositions As Long, ByVal nTabOrigin As Long) As Long
+Public Declare Function TextOut Lib "gdi32" Alias "TextOutW" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal lpString As Long, ByVal nCount As Long) As Long
+Public Declare Function GetTabbedTextExtent Lib "user32" Alias "GetTabbedTextExtentW" (ByVal hDC As Long, ByVal lpString As Long, ByVal nCount As Long, ByVal nTabPositions As Long, lpnTabStopPositions As Long) As Long
 Function CheckItemType(bstackstr As basetask, v As Variant, a$, R$, Optional ByVal wasarr As Boolean = False, Optional UseCase As Boolean) As Boolean
 Dim usehandler As mHandler, fastcol As FastCollection, pppp As mArray, w1 As Long, p As Variant, s$
 UseCase = False
@@ -910,20 +910,20 @@ If y1 >= .my Then y1 = m.ScaleY(m.Scaleheight, 1, 3) Else y1 = m.ScaleY(y1 * .Yt
 SetRect R, x + zoom, y + zoom, x1 - zoom, y1 - zoom
 Select Case way
 Case 0
-DrawEdge m.Hdc, R, CLng(par) Mod 256, CLng(par) \ 256
+DrawEdge m.hDC, R, CLng(par) Mod 256, CLng(par) \ 256
 Case 1
-DrawCaption m.hWnd, m.Hdc, R, CLng(par)
+DrawCaption m.hWnd, m.hDC, R, CLng(par)
 Case 2
-DrawEdge m.Hdc, R, CLng(par), BF_RECT
+DrawEdge m.hDC, R, CLng(par), BF_RECT
 Case 3
-DrawFocusRect m.Hdc, R
+DrawFocusRect m.hDC, R
 Case 4
-DrawFrameControl m.Hdc, R, DFC_BUTTON, DFCS_BUTTON3STATE
+DrawFrameControl m.hDC, R, DFC_BUTTON, DFCS_BUTTON3STATE
 Case 5
 b$ = Replace(CStr(par), ChrW(&HFFFFF8FB), ChrW(&H2007))
-DrawText m.Hdc, StrPtr(b$), Len(CStr(par)), R, DT_CENTER + DT_NOCLIP
+DrawText m.hDC, StrPtr(b$), Len(CStr(par)), R, DT_CENTER + DT_NOCLIP
 Case 6
-DrawFrameControl m.Hdc, R, CLng(par) Mod 256, CLng(par) \ 256
+DrawFrameControl m.hDC, R, CLng(par) Mod 256, CLng(par) \ 256
 Case Else
 k1 = 0
 MyDoEvents1 Form1
@@ -945,20 +945,20 @@ y = m.ScaleY(.YGRAPH, 1, 3)
 SetRect R, x + zoom, y + zoom, x1 - zoom, y1 - zoom
 Select Case way
 Case 0
-DrawEdge m.Hdc, R, CLng(par) Mod 256, CLng(par) \ 256
+DrawEdge m.hDC, R, CLng(par) Mod 256, CLng(par) \ 256
 Case 1
-DrawCaption m.hWnd, m.Hdc, R, CLng(par)
+DrawCaption m.hWnd, m.hDC, R, CLng(par)
 Case 2
-DrawEdge m.Hdc, R, CLng(par), BF_RECT
+DrawEdge m.hDC, R, CLng(par), BF_RECT
 Case 3
-DrawFocusRect m.Hdc, R
+DrawFocusRect m.hDC, R
 Case 4
-DrawFrameControl m.Hdc, R, DFC_BUTTON, DFCS_BUTTON3STATE
+DrawFrameControl m.hDC, R, DFC_BUTTON, DFCS_BUTTON3STATE
 Case 5
 b$ = Replace(CStr(par), ChrW(&HFFFFF8FB), ChrW(&H2007))
-DrawText m.Hdc, StrPtr(b$), Len(CStr(par)), R, DT_CENTER + DT_NOCLIP
+DrawText m.hDC, StrPtr(b$), Len(CStr(par)), R, DT_CENTER + DT_NOCLIP
 Case 6
-DrawFrameControl m.Hdc, R, CLng(par) Mod 256, CLng(par) \ 256
+DrawFrameControl m.hDC, R, CLng(par) Mod 256, CLng(par) \ 256
 Case Else
 k1 = 0
 MyDoEvents1 Form1
@@ -969,11 +969,11 @@ End Sub
 
 
 Public Sub TextColor(D As Object, tc As Long)
-D.forecolor = tc And &HFFFFFF
+D.ForeColor = tc And &HFFFFFF
 End Sub
 Public Sub TextColorB(D As Object, mb As basket, tc As Long)
-D.forecolor = tc And &HFFFFFF
-mb.mypen = D.forecolor
+D.ForeColor = tc And &HFFFFFF
+mb.mypen = D.ForeColor
 End Sub
 
 Public Sub LCTNo(DqQQ As Object, ByVal y As Long, ByVal x As Long)
@@ -1139,9 +1139,9 @@ End If
 dqq.fillcolor = mycolor(c)
 dqq.fillstyle = vbFSSolid
 If v Then
-ExtFloodFill dqq.Hdc, dqq.ScaleX(x1, 1, 3), dqq.ScaleY(y1, 1, 3), dqq.point(dqq.ScaleX(x1, 1, 3), dqq.ScaleY(y1, 1, 3)), FLOODFILLSURFACE
+ExtFloodFill dqq.hDC, dqq.ScaleX(x1, 1, 3), dqq.ScaleY(y1, 1, 3), dqq.point(dqq.ScaleX(x1, 1, 3), dqq.ScaleY(y1, 1, 3)), FLOODFILLSURFACE
 Else
-ExtFloodFill dqq.Hdc, dqq.ScaleX(x1, 1, 3), dqq.ScaleY(y1, 1, 3), mycolor(.mypen), FLOODFILLBORDER
+ExtFloodFill dqq.hDC, dqq.ScaleX(x1, 1, 3), dqq.ScaleY(y1, 1, 3), mycolor(.mypen), FLOODFILLBORDER
 End If
 If Not .IamEmf Then
 dqq.ScaleMode = osm
@@ -1360,7 +1360,7 @@ Else
         Pcw = raster.Width \ 2
         Pch = raster.Height \ 2
         With players(GetCode(d1))
-        raster.PaintPicture d1.Hdc, Int(d1.ScaleX(.XGRAPH, 1, 3) - Pcw), Int(d1.ScaleX(.YGRAPH, 1, 3) - Pch)
+        raster.PaintPicture d1.hDC, Int(d1.ScaleX(.XGRAPH, 1, 3) - Pcw), Int(d1.ScaleX(.YGRAPH, 1, 3) - Pch)
         End With
     GoTo cont1
 End If
@@ -1370,7 +1370,7 @@ RotateDib bstack, raster, rot, sp, i, NoUseBack, (blend), amask$
 Pcw = raster.Width \ 2
 Pch = raster.Height \ 2
 With players(GetCode(d1))
-raster.PaintPicture d1.Hdc, Int(d1.ScaleX(.XGRAPH, 1, 3) - Pcw), Int(d1.ScaleX(.YGRAPH, 1, 3) - Pch)
+raster.PaintPicture d1.hDC, Int(d1.ScaleX(.XGRAPH, 1, 3) - Pcw), Int(d1.ScaleX(.YGRAPH, 1, 3) - Pch)
 End With
 cont1:
 If Not bstack.toprinter Then
@@ -1465,11 +1465,11 @@ If Left$(F, 4) = "cDIB" And Len(F) > 12 Then
 Dim ph As New cDIBSection
 If cDib(F, ph) Then
 If x1 = 0 Then
-ph.PaintPicture d1.Hdc, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleX(.YGRAPH, 1, 3))
+ph.PaintPicture d1.hDC, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleX(.YGRAPH, 1, 3))
 Exit Sub
 Else
 If y1 = 0 Then y1 = Abs(ph.Height * x1 / ph.Width)
-ph.StretchPictureH d1.Hdc, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleX(.YGRAPH, 1, 3)), CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleX(y1, 1, 3))
+ph.StretchPictureH d1.hDC, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleX(.YGRAPH, 1, 3)), CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleX(y1, 1, 3))
 Exit Sub
 End If
 End If
@@ -1563,7 +1563,7 @@ End Function
 
 Public Function MyTextWidth(D As Object, a$) As Long
 Dim nr As RECT
-CalcRect D.Hdc, a$, nr
+CalcRect D.hDC, a$, nr
 'MyTextWidth = nr.Right * d.ScaleX(1, 3, 1)
 MyTextWidth = nr.Right * DXP
 End Function
@@ -1592,7 +1592,7 @@ Dim nr As RECT, nl As Long, mytop As Long
 mytop = DDD.currentY
 If s$ = vbNullString Then
 nr.Left = 0: nr.Right = 0: nr.Top = 0: nr.Bottom = 0
-CalcRect DDD.Hdc, " ", nr
+CalcRect DDD.hDC, " ", nr
 nr.Left = DDD.currentX / dv15
 nr.Right = nr.Right + nr.Left
 nr.Top = DDD.currentY / dv15
@@ -1606,14 +1606,14 @@ DDD.currentX = nr.Right * dv15
 End If
 Else
 nr.Left = 0: nr.Right = 0: nr.Top = 0: nr.Bottom = 0
-CalcRect DDD.Hdc, s$, nr
+CalcRect DDD.hDC, s$, nr
 nr.Left = DDD.currentX / dv15
 nr.Right = nr.Right + nr.Left
 nr.Top = DDD.currentY / dv15
 nr.Bottom = nr.Top + nr.Bottom
 nl = (nr.Bottom + 1) * dv15
 If Not fake Then
-If nr.Left * dv15 < DDD.Width Then PrintLineControlSingle DDD.Hdc, s$, nr
+If nr.Left * dv15 < DDD.Width Then PrintLineControlSingle DDD.hDC, s$, nr
 End If
 If cr Then
 DDD.currentY = nl + UAddTwipsTop ''* 2
@@ -1629,7 +1629,7 @@ Public Sub MyPrint(DDD As Object, s$)
 Dim nr As RECT, nl As Long
 If s$ = vbNullString Then
     nr.Left = 0: nr.Right = 0: nr.Top = 0: nr.Bottom = 0
-    CalcRect DDD.Hdc, " ", nr
+    CalcRect DDD.hDC, " ", nr
     nr.Left = DDD.currentX / dv15
     nr.Right = nr.Right + nr.Left
     nr.Top = DDD.currentY / dv15
@@ -1639,13 +1639,13 @@ If s$ = vbNullString Then
     DDD.currentX = 0
 Else
 nr.Left = 0: nr.Right = 0: nr.Top = 0: nr.Bottom = 0
-CalcRect DDD.Hdc, s$, nr
+CalcRect DDD.hDC, s$, nr
 nr.Left = DDD.currentX / dv15
 nr.Right = nr.Right + nr.Left
 nr.Top = DDD.currentY / dv15
 nr.Bottom = nr.Top + nr.Bottom
 nl = (nr.Bottom + 1) * dv15
-If nr.Left * dv15 <= DDD.Width Then PrintLineControlSingle DDD.Hdc, s$, nr
+If nr.Left * dv15 <= DDD.Width Then PrintLineControlSingle DDD.hDC, s$, nr
 DDD.currentY = nl
 DDD.currentX = 0
 End If
@@ -1653,29 +1653,29 @@ End Sub
 
 Public Function TextWidth(DDD As Object, a$) As Long
 Dim nr As RECT
-CalcRect DDD.Hdc, a$, nr
+CalcRect DDD.hDC, a$, nr
 TextWidth = nr.Right * dv15
 End Function
 Public Function TextWidth2(DDD As Object, a$) As Long
 Dim nr As RECT
-CalcRectNoSingle DDD.Hdc, a$, nr
+CalcRectNoSingle DDD.hDC, a$, nr
 TextWidth2 = nr.Right * dv15
 
 End Function
 Public Function TextWidthPixels(DDD As Object, a$) As Long
 Dim nr As RECT
-CalcRect DDD.Hdc, a$, nr
+CalcRect DDD.hDC, a$, nr
 TextWidthPixels = nr.Right
 End Function
 Private Function TextHeight(DDD As Object, a$) As Long
 Dim nr As RECT
-CalcRect DDD.Hdc, a$, nr
+CalcRect DDD.hDC, a$, nr
 
 TextHeight = nr.Bottom * dv15
 End Function
 Private Function TextHeight2(DDD As Object, a$) As Long
 Dim nr As RECT
-CalcRectNoSingle DDD.Hdc, a$, nr
+CalcRectNoSingle DDD.hDC, a$, nr
 
 TextHeight2 = nr.Bottom * dv15
 End Function
@@ -1746,7 +1746,7 @@ With mybasket
             .Top = rTop
             .Bottom = rBottom
         End With
-         FillBack DDD.Hdc, nr2, .Paper
+         FillBack DDD.hDC, nr2, .Paper
          End If
         DDD.currentX = PX * .Xt
         DDD.currentY = PY * .Yt + .uMineLineSpace
@@ -1794,7 +1794,7 @@ With mybasket
                 R = R + Len(c$): If ii > mark1 Then R = R - 1
                 mark1 = nr.Right
                 nr.Right = (PX + Len(what$)) * pixX + 1
-                DrawText DDD.Hdc, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_NOPREFIX + DT_NOCLIP
+                DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_NOPREFIX + DT_NOCLIP
                 mark1 = TextWidth(DDD, c$)
                 mark1 = mark1 \ .Xt - (mark1 Mod .Xt > 0)
                 nr.Right = nr.Left + mark1 * pixX + 1
@@ -1817,7 +1817,7 @@ checkcombine:
                          Loop Until (a1(R + 1) And 7) = 0
                      End If
                  End If
-                 DrawText DDD.Hdc, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
+                 DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
             Else
                 If c$ = Chr$(7) Then
                     If Not DDD Is Form1.PrinterDocument1 Then Beep
@@ -1965,7 +1965,7 @@ skipthis:
             .Top = rTop
             .Bottom = rBottom
         End With
-        FillBack DDD.Hdc, nr2, mybasket.Paper
+        FillBack DDD.hDC, nr2, mybasket.Paper
     End If
     realR& = 0
     If Len(what$) > R Then
@@ -1995,7 +1995,7 @@ skipthis:
                 If ii > mark1 Then R = R - 1
                 mark1 = TextWidth(DDD, c$) \ DXP
                 nr.Right = nr.Left + mark1 + 1
-                DrawTextEx DDD.Hdc, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_NOPREFIX + DT_NOCLIP, 0
+                DrawTextEx DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_NOPREFIX + DT_NOCLIP, 0
                 .curpos = nr.Right \ pixX
                 realR& = realR + mark1 \ pixX - (mark1 Mod pixX > 0) * 1
                 DDD.currentX = .curpos * .Xt
@@ -2101,7 +2101,7 @@ CHECK1:
                     End If
                 End If
             End If
-            DrawText DDD.Hdc, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
+            DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
             realR& = realR + 1
 contNew:
             With nr
@@ -2151,7 +2151,7 @@ Dim prive As Long
 prive = GetCode(DDD)
 ExtraWidth = ExtraWidth \ dv15
 If ExtraWidth <> 0 Then
-SetTextCharacterExtra DDD.Hdc, ExtraWidth
+SetTextCharacterExtra DDD.hDC, ExtraWidth
 End If
 On Error Resume Next
 With players(prive)
@@ -2178,7 +2178,7 @@ F.lfWeight = Abs(.bold) * 800
   F.lfHeight = (Size * -20) / DYP
 
   hFont = CreateFontIndirect(F)
-  hPrevFont = SelectObject(DDD.Hdc, hFont)
+  hPrevFont = SelectObject(DDD.hDC, hFont)
  what$ = Replace$(what, vbCrLf, vbCr) + vbCr
 Dim textmetrics As POINTAPI, Max, maxx As Long, sumy As Long
 Do While what$ <> ""
@@ -2194,18 +2194,18 @@ textmetrics.x = 0
 textmetrics.y = 0
     If Len(fline$) = 0 Then
         fline$ = " "
-        GetTextExtentPoint32 DDD.Hdc, StrPtr(fline$), Len(fline$), textmetrics
+        GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
         textmetrics.x = 0
     Else
-        GetTextExtentPoint32 DDD.Hdc, StrPtr(fline$), Len(fline$), textmetrics
+        GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
     End If
 sumy = sumy + textmetrics.y
 If maxx < textmetrics.x Then maxx = textmetrics.x
 Loop
 nTextY = Int(Abs(maxx * dv15 * Sin(degree)) + Abs(sumy * dv15 * Cos(degree)))
-  hFont = SelectObject(DDD.Hdc, hPrevFont)
+  hFont = SelectObject(DDD.hDC, hPrevFont)
   DeleteObject hFont
-If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.Hdc, 0
+If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.hDC, 0
 End With
 PlaceBasket DDD, players(prive)
 
@@ -2223,7 +2223,7 @@ On Error Resume Next
 With players(prive)
 ExtraWidth = ExtraWidth \ dv15
 If ExtraWidth <> 0 Then
-SetTextCharacterExtra DDD.Hdc, ExtraWidth
+SetTextCharacterExtra DDD.hDC, ExtraWidth
 End If
 BFONT = DDD.Font.Name
 If Font <> "" Then
@@ -2250,7 +2250,7 @@ F.lfWeight = Abs(.bold) * 800
   F.lfHeight = (Size * -20) / DYP
 
   hFont = CreateFontIndirect(F)
-  hPrevFont = SelectObject(DDD.Hdc, hFont)
+  hPrevFont = SelectObject(DDD.hDC, hFont)
   what$ = Replace$(what, vbCrLf, vbCr) + vbCr
 Dim textmetrics As POINTAPI, Max, maxx As Long, sumy As Long
 Do While what$ <> ""
@@ -2266,10 +2266,10 @@ textmetrics.x = 0
 textmetrics.y = 0
     If Len(fline$) = 0 Then
         fline$ = " "
-        GetTextExtentPoint32 DDD.Hdc, StrPtr(fline$), Len(fline$), textmetrics
+        GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
         textmetrics.x = 0
     Else
-        GetTextExtentPoint32 DDD.Hdc, StrPtr(fline$), Len(fline$), textmetrics
+        GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
     End If
 sumy = sumy + textmetrics.y
 If maxx < textmetrics.x Then maxx = textmetrics.x
@@ -2277,9 +2277,9 @@ Loop
 
 nText = Int(Abs(maxx * dv15 * Cos(degree)) + Abs(sumy * dv15 * Sin(degree)))
 
-  hFont = SelectObject(DDD.Hdc, hPrevFont)
+  hFont = SelectObject(DDD.hDC, hPrevFont)
   DeleteObject hFont
-If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.Hdc, 0
+If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.hDC, 0
 
 End With
 PlaceBasket DDD, players(prive)
@@ -2520,7 +2520,7 @@ Dim BFONT As String
 On Error Resume Next
 BFONT = DDD.Font.Name
 If ExtraWidth <> 0 Then
-SetTextCharacterExtra DDD.Hdc, ExtraWidth
+SetTextCharacterExtra DDD.hDC, ExtraWidth
 End If
 Dim icx As Long, icy As Long, x As Long, y As Long, icH As Long
 
@@ -2538,9 +2538,9 @@ DEGR = (degree) * 180# / Pi
   End If
   F.lfHeight = (Size * -20) / DYP
   hFont = CreateFontIndirect(F)
-  hPrevFont = SelectObject(DDD.Hdc, hFont)
+  hPrevFont = SelectObject(DDD.hDC, hFont)
   icH = TextHeight(DDD, "fq")
-  hFont = SelectObject(DDD.Hdc, hPrevFont)
+  hFont = SelectObject(DDD.hDC, hPrevFont)
   DeleteObject hFont
   F.lfItalic = Abs(basestack.myitalic)
   F.lfWeight = Abs(basestack.myBold) * 800
@@ -2557,7 +2557,7 @@ DEGR = (degree) * 180# / Pi
 
   
     hFont = CreateFontIndirect(F)
-  hPrevFont = SelectObject(DDD.Hdc, hFont)
+  hPrevFont = SelectObject(DDD.hDC, hFont)
 
 TT = ExtraWidth \ 2
 icy = CLng(Cos(degree) * icH)
@@ -2598,7 +2598,7 @@ fline$ = GetStrUntil(vbCr, what$)
 End If
 textmetrics.x = 0
 textmetrics.y = 0
-GetTextExtentPoint32 DDD.Hdc, StrPtr(fline$), Len(fline$), textmetrics
+GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
 x = x + icx
 y = y + icy
 If JUSTIFY = 1 Then
@@ -2616,9 +2616,9 @@ Else
 End If
 MyPrint DDD, fline$
 Loop
-  hFont = SelectObject(DDD.Hdc, hPrevFont)
+  hFont = SelectObject(DDD.hDC, hPrevFont)
   DeleteObject hFont
-If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.Hdc, 0
+If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.hDC, 0
 End Sub
 
 Public Sub nForm(bstack As basetask, TheSize As Single, nW As Long, nH As Long, myLineSpace As Long)
@@ -2702,11 +2702,11 @@ ar.Bottom = D.Height / dv15
 ar.Right = D.Width / dv15
 ar.Top = .mysplit * .Yt / dv15
 p = .Yt / dv15
-R = BitBlt(D.Hdc, CLng(ar.Left), CLng(ar.Top), CLng(ar.Right), CLng(ar.Bottom - p), D.Hdc, CLng(ar.Left), CLng(ar.Top + p), SRCCOPY)
+R = BitBlt(D.hDC, CLng(ar.Left), CLng(ar.Top), CLng(ar.Right), CLng(ar.Bottom - p), D.hDC, CLng(ar.Left), CLng(ar.Top + p), SRCCOPY)
 
  
   ar.Top = ar.Bottom - p
-FillBack D.Hdc, ar, .Paper
+FillBack D.hDC, ar, .Paper
 .curpos = 0
 .currow = .my - 1
 End With
@@ -2722,7 +2722,7 @@ ar.Bottom = D.ScaleY(D.Height, 1, 3)
 ar.Right = D.ScaleX(D.Width, 1, 3)
 ar.Top = D.ScaleY(.mysplit * .Yt, 1, 3)
 p = D.ScaleY(.Yt, 1, 3)
-R = BitBlt(D.Hdc, CLng(ar.Left), CLng(ar.Top + p), CLng(ar.Right), CLng(ar.Bottom - p), D.Hdc, CLng(ar.Left), CLng(ar.Top), SRCCOPY)
+R = BitBlt(D.hDC, CLng(ar.Left), CLng(ar.Top + p), CLng(ar.Right), CLng(ar.Bottom - p), D.hDC, CLng(ar.Left), CLng(ar.Top), SRCCOPY)
 D.Line (0, .mysplit * .Yt)-(D.Scalewidth, .mysplit * .Yt + .Yt), .Paper, BF
 .currow = .mysplit
 .curpos = 0
@@ -2888,7 +2888,7 @@ dq.FontName = .FontName
 dq.Font.charset = .charset
 dq.FontSize = .SZ
 End If
-dq.forecolor = .mypen And &HFFFFFF
+dq.ForeColor = .mypen And &HFFFFFF
 
 If Not dq.BackColor = .Paper Then
    dq.BackColor = .Paper
@@ -3384,8 +3384,8 @@ If Not IsSupervisor Then
     LastErNum = 0
     If ss$ <> "" Then
      skipthat = interpret(bstack, ss$)
-     If mycolor(PenOne) <> D.forecolor Then
-     PenOne = -D.forecolor
+     If mycolor(PenOne) <> D.ForeColor Then
+     PenOne = -D.ForeColor
      End If
     End If
 End If
@@ -3397,7 +3397,7 @@ b$ = "пеяибакком "
 Else
 b$ = "ENVIRONMENT "
 End If
-D.forecolor = mycolor(PenOne)
+D.ForeColor = mycolor(PenOne)
 LCTbasket D, players(DisForm), 0, 0
 wwPlain2 bstack, players(DisForm), b$ + "M2000", D.Width, 0, 0 '',True
 ICO = TextWidth(D, b$ + "M2000") + 100
@@ -3614,7 +3614,7 @@ Hook Form1.hWnd, Nothing '.glistN
 .UsedAsTextBox = False
 .glistN.LeftMarginPixels = 10
 .glistN.maxchar = 0
-If D.forecolor = tcol Then
+If D.ForeColor = tcol Then
 Set Form1.Point2Me = D
 If D.Name = "Form1" Then
 .glistN.SkipForm = False
@@ -3624,7 +3624,7 @@ End If
 Form1.TEXT1.glistN.BackStyle = 1
 End If
 Dim scope As Long
-scope = ChooseByHue(D.forecolor, rgb(16, 12, 8), rgb(253, 245, 232))
+scope = ChooseByHue(D.ForeColor, rgb(16, 12, 8), rgb(253, 245, 232))
 If D.BackColor = ChooseByHue(scope, D.BackColor, rgb(128, 128, 128)) Then
 If lightconv(scope) > 192 Then
 scope = lightconv(scope) - 128
@@ -3649,7 +3649,7 @@ End If
 
 .BackColor = tcol
 
-.forecolor = D.forecolor
+.ForeColor = D.ForeColor
 Form1.SetText1
 .glistN.overrideTextHeight = prive.overrideTextHeight '         fonttest.TextHeight("fj")
 .Font.Name = D.Font.Name
@@ -3668,7 +3668,7 @@ Else
 Form1.TEXT1.move x& * .Xt + D.Left, y& * .Yt + D.Top, (x1& - x&) * .Xt + .Xt, (y1& - y&) * .Yt + .Yt
 End If
 End With
-If D.forecolor = tcol Then
+If D.ForeColor = tcol Then
 If D.Name = "Form1" Then
 Form1.TEXT1.glistN.RepaintFromOut D.Image, D.Left, D.Top
 Else
@@ -3850,7 +3850,7 @@ Else
 End If
 
 Dim scope As Long
-scope = ChooseByHue(D.forecolor, rgb(16, 12, 8), rgb(253, 245, 232))
+scope = ChooseByHue(D.ForeColor, rgb(16, 12, 8), rgb(253, 245, 232))
 If D.BackColor = ChooseByHue(scope, D.BackColor, rgb(128, 128, 128)) Then
 If lightconv(scope) > 192 Then
 scope = lightconv(scope) - 128
@@ -3875,7 +3875,7 @@ End If
 '.glistN.AddPixels = 0
 .glistN.ZOrder 0
 .BackColor = D.BackColor
-.forecolor = D.forecolor
+.ForeColor = D.ForeColor
 .Font.Name = D.Font.Name
 Form1.SetText1
 .glistN.overrideTextHeight = prive.overrideTextHeight '   fonttest.TextHeight("fj")
@@ -4275,8 +4275,8 @@ Form1.Font.Strikethrough = False
 .Font.Name = D.Font.Name
 Form1.Font.charset = D.Font.charset
 .Font.Size = D.Font.Size
-If LEVCOLMENU < 2 Then .BackColor = D.forecolor
-If LEVCOLMENU < 3 Then .forecolor = D.BackColor
+If LEVCOLMENU < 2 Then .BackColor = D.ForeColor
+If LEVCOLMENU < 3 Then .ForeColor = D.BackColor
 .Font.bold = D.Font.bold
 .Font.Italic = D.Font.Italic
 .addpixels = 2 * prive.uMineLineSpace / dv15
@@ -5147,7 +5147,7 @@ Loop
  
 If Not QRY Then s$ = vbNullString
 dq.FontTransparent = True
-SetBkMode dq.Hdc, 1
+SetBkMode dq.hDC, 1
 QRY = False
 
 Call mouse
@@ -5367,7 +5367,7 @@ End Function
 Sub ICOPY(d1 As Object, x1 As Long, y1 As Long, w As Long, h As Long)
 Dim sV As Long
 With players(GetCode(d1))
-sV = BitBlt(d1.Hdc, CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleY(y1, 1, 3)), CLng(d1.ScaleX(w, 1, 3)), CLng(d1.ScaleY(h, 1, 3)), d1.Hdc, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleY(.YGRAPH, 1, 3)), SRCCOPY)
+sV = BitBlt(d1.hDC, CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleY(y1, 1, 3)), CLng(d1.ScaleX(w, 1, 3)), CLng(d1.ScaleY(h, 1, 3)), d1.hDC, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleY(.YGRAPH, 1, 3)), SRCCOPY)
 'sv = UpdateWindow(d1.hwnd)
 End With
 End Sub
@@ -10851,7 +10851,7 @@ With BoxTarget
 .Comm = COM$
 .id = id&
 .Tag = Tag$
-.Lx = x&
+.lX = x&
 .lY = y&
 .tx = xl& - 1
 .ty = yl&
@@ -10904,7 +10904,7 @@ If id& < 100 Then
     D.currentY = D.currentY + prive.Yt \ 2
     End If
     PlainBaSket D, prive, Tag$, True, True
-    LCTbasket D, prive, BoxTarget.lY, BoxTarget.Lx
+    LCTbasket D, prive, BoxTarget.lY, BoxTarget.lX
     End If
     End If
 Else
@@ -10936,7 +10936,7 @@ Else
     D.currentY = D.currentY + prive.Yt \ 2
     End If
     wwPlain2 DSTACK, prive, Tag$, xl& - x&, 10000, , True, F, , , True
-    LCTbasket D, prive, BoxTarget.lY, BoxTarget.Lx
+    LCTbasket D, prive, BoxTarget.lY, BoxTarget.lX
     End If
 End If
     
@@ -13658,7 +13658,7 @@ Dim pppp As mArray, i1 As Long, Lang As Long
 Dim R1 As Long, r2 As Long
 ' uink$ = VbNullString
 di.FontTransparent = True
-SetBkMode di.Hdc, 1
+SetBkMode di.hDC, 1
 ohere$ = here$
 If Not ByPass Then here$ = vbNullString
 bstack.LoadOnly = ByPass
@@ -19887,12 +19887,12 @@ If mGDILines Then
         PLG(x1 + 2) = PLG(0)
         PLG(x1 + 3) = PLG(0)
         PLG(x1 + 4) = PLG(0)
-        DrawBezierGdi Scr.Hdc, pencol, Col, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 4)
+        DrawBezierGdi Scr.hDC, pencol, Col, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 4)
     Else
-        DrawBezierGdi Scr.Hdc, pencol, 0, 1, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 1)
+        DrawBezierGdi Scr.hDC, pencol, 0, 1, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 1)
     End If
 Else
-If PolyBezier(Scr.Hdc, PLG(0), x1 + 1) = 0 Then
+If PolyBezier(Scr.hDC, PLG(0), x1 + 1) = 0 Then
 BadGraphic
  Exit Function
 End If
@@ -21728,7 +21728,7 @@ For i = -2 To 1000
     players(i) = Zero
     Prefresh(i) = zerocounter
 Next i
-Scr.forecolor = mycolor(11)
+Scr.ForeColor = mycolor(11)
 basestack.myBold = False
 basestack.myitalic = False
 pa = 0
@@ -22234,7 +22234,7 @@ End If
 If basestack.toprinter Then
 If oprinter.Height > 0 Then
 oprinter.Cls CLng(mycolor(.Paper))
-oprinter.PaintPicture Form1.PrinterDocument1.Hdc
+oprinter.PaintPicture Form1.PrinterDocument1.hDC
 .curpos = 0
 .currow = .mysplit
 .lastprint = False
@@ -22376,7 +22376,7 @@ If IsExp(bstack, rest$, p, , True) Then
                 players(prive).pathcolor = mycolor(Col)
                 players(prive).pathfillstyle = Int(x) Mod 8
                 
-                BeginPath bstack.Owner.Hdc
+                BeginPath bstack.Owner.hDC
               '  If (par Or F) And GDILines Then OldGDILines = True: players(prive).NoGDI = True
                 If (par Or Region) Then players(prive).NoGDI = True: If GDILines Then OldGDILines = True
                 Call executeblock(it, bstack, ss$, False, once, , True)
@@ -22391,7 +22391,7 @@ If IsExp(bstack, rest$, p, , True) Then
                 End If
                         
                 ' what for 2 and 3 values
-                EndPath bstack.Owner.Hdc
+                EndPath bstack.Owner.hDC
         
                 bstack.Owner.fillstyle = Int(x) Mod 8
                 bstack.Owner.fillcolor = mycolor(Col)
@@ -22399,12 +22399,12 @@ If IsExp(bstack, rest$, p, , True) Then
                 If par Then bstack.Owner.DrawMode = 7
                 If F Then  ' from 8 rev 83
                       If bstack.Owner.fillstyle = 1 Then
-                           StrokeAndFillPath bstack.Owner.Hdc
+                           StrokeAndFillPath bstack.Owner.hDC
                         Else
-                            FillPath bstack.Owner.Hdc
+                            FillPath bstack.Owner.hDC
                           End If
                 Else
-                     StrokeAndFillPath bstack.Owner.Hdc         ' stroke and fill path
+                     StrokeAndFillPath bstack.Owner.hDC         ' stroke and fill path
                 End If
                 If par Then bstack.Owner.DrawMode = 13
                 bstack.Owner.fillstyle = vbFSTransparent
@@ -22443,7 +22443,7 @@ If IsExp(bstack, rest$, p, , True) Then
 contthere:
               If FastSymbol(rest$, ";") Then
  
-                  SelectClipRgn bstack.Owner.Hdc, 0&
+                  SelectClipRgn bstack.Owner.hDC, 0&
               End If
               bstack.addlen = nd&
               Exit Function
@@ -22458,12 +22458,12 @@ contthere2:
                 
                 players(prive).pathcolor = mycolor(Col)
                 players(prive).pathfillstyle = Int(x) Mod 8
-                BeginPath bstack.Owner.Hdc
+                BeginPath bstack.Owner.hDC
                 'If (par Or region) And GDILines Then OldGDILines = True: players(prive).NoGDI = True
                 If (par Or Region) Then players(prive).NoGDI = True: If GDILines Then OldGDILines = True
                 Call executeblock(it, bstack, ss$, False, once, , , True)
                 
-                EndPath bstack.Owner.Hdc
+                EndPath bstack.Owner.hDC
                 players(prive).pathgdi = players(prive).pathgdi - 1
                 If players(prive).pathgdi > 0 Then
                     players(prive).pathcolor = oldpathcolor
@@ -22475,15 +22475,15 @@ contthere2:
                 If Region Then            ' path { block of commands };
                     
                     If F Then
-                        SelectClipPath bstack.Owner.Hdc, 2
+                        SelectClipPath bstack.Owner.hDC, 2
                     Else
-                        SelectClipPath bstack.Owner.Hdc, RGN_COPY  ' make a clip path
+                        SelectClipPath bstack.Owner.hDC, RGN_COPY  ' make a clip path
                     End If
                 
                     
                 Else
                     If par Then bstack.Owner.DrawMode = 7
-                    StrokePath bstack.Owner.Hdc               ' stroke path
+                    StrokePath bstack.Owner.hDC               ' stroke path
                     If par Then bstack.Owner.DrawMode = 13
                 End If
                  bstack.Owner.fillstyle = vbFSTransparent
@@ -24191,7 +24191,7 @@ Else
 If .hRgn Then
 GdiPlusGradientRegion whois, 0, 0, bstack.Owner.Scalewidth / dv15 + 1, bstack.Owner.Scaleheight / dv15 + 1, GDIP_ARGB1(trans, x), GDIP_ARGB1(trans, y), 1
 Else
-GdiPlusGradient bstack.Owner.Hdc, 0, 0, bstack.Owner.Scalewidth / dv15 + 1, bstack.Owner.Scaleheight / dv15 + 1, GDIP_ARGB1(trans, x), GDIP_ARGB1(trans, y), 1
+GdiPlusGradient bstack.Owner.hDC, 0, 0, bstack.Owner.Scalewidth / dv15 + 1, bstack.Owner.Scaleheight / dv15 + 1, GDIP_ARGB1(trans, x), GDIP_ARGB1(trans, y), 1
 End If
 End If
 
@@ -24205,9 +24205,9 @@ If useold Then
 TwoColorsGradient bstack.Owner, -CLng(p <> 0), GDIP_ARGB1(trans, x), GDIP_ARGB1(trans, y)
 Else
 If p = 0 Then
-GdiPlusGradient bstack.Owner.Hdc, 0, 0, bstack.Owner.Scalewidth / dv15 + 1, bstack.Owner.Scaleheight / dv15 + 1, GDIP_ARGB1(trans, y), GDIP_ARGB1(trans, x), 0&
+GdiPlusGradient bstack.Owner.hDC, 0, 0, bstack.Owner.Scalewidth / dv15 + 1, bstack.Owner.Scaleheight / dv15 + 1, GDIP_ARGB1(trans, y), GDIP_ARGB1(trans, x), 0&
 Else
-GdiPlusGradient bstack.Owner.Hdc, 0, 0, bstack.Owner.Scalewidth / dv15 + 1, bstack.Owner.Scaleheight / dv15 + 1, GDIP_ARGB1(trans, x), GDIP_ARGB1(trans, y), 1&
+GdiPlusGradient bstack.Owner.hDC, 0, 0, bstack.Owner.Scalewidth / dv15 + 1, bstack.Owner.Scaleheight / dv15 + 1, GDIP_ARGB1(trans, x), GDIP_ARGB1(trans, y), 1&
 End If
 End If
 
@@ -24632,7 +24632,7 @@ With j(i&)
 If .Enable And .layer = myl Then
 XX& = x \ .Xt
 YY& = y \ .Yt
-If .Lx <= XX& And .tx >= XX& And .lY <= YY& And .ty >= YY& Then
+If .lX <= XX& And .tx >= XX& And .lY <= YY& And .ty >= YY& Then
 ScanTarget = i&
 Exit For
 End If
@@ -27761,5 +27761,22 @@ End If
 
 End Function
 
-
+Function MyVol(basestack As basetask, rest$) As Boolean
+Dim p As Variant
+If IsExp(basestack, rest$, p, , True) Then
+    vol = CLng(MyMod(Abs(p), 101))
+    If FastSymbol(rest$, ",") Then
+         If IsExp(basestack, rest$, p, , True) Then
+            p = CLng(p)
+      MediaPlayer1.SetMasterVolume vol, CLng(p)
+  Else
+      MissParam rest$
+      
+ End If
+Else
+ MediaPlayer1.SetMasterVolume vol
+End If
+End If
+MyVol = True
+End Function
 

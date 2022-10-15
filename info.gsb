@@ -5465,7 +5465,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 34 for M2000 Interpreter version 11, revision 7 and above"
+	Report " A collection of modules for tests version 36 for M2000 Interpreter version 11, revision 9 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -16885,6 +16885,7 @@ MODULE CLOCK {Αν Έγκυρο(ok) Αλλιως Πληκτρολόγιο "Clock
 Οθόνη 5,0
 Πενα 14
 Περιθώριο {Πένα 14}
+Επιφάνεια Κρυψε
 Επιφάνεια 220, 5
 \\ ανοίγει με ctrl+f1
 Περί ! "Μ2000 Ρολόι 12 ωρών - M2000 Clock 12 hours", κλιμαξ.χ*5/7, κλιμαξ.υ*2/3,{
@@ -34641,7 +34642,7 @@ function image1.keydown {
 	if s<>2 then exit
 	if k=86  then
 		local clip$=clipboard$
-		if clip$<>"" then keyboard clip$ : call local image1.keypress()
+		if clip$<>"" then keyboard clip$
 		k=0:s=0
 	else.if k=67 then
 		local clip$=getline$(buf$, ! stack(bufall))
@@ -35024,5 +35025,115 @@ For K {
 Print M.a(0)=19, M.z.a(0)=21
 Print N.a(0)=19, N.z.a(0)=21
 Print k=>a(0)=19, K=>z.a(0)=21
+}
+MODULE CRC {Module CheckApi {
+      Declare CRC32 LIB c "ntdll.RtlComputeCrc32" {Long Zero, a$, long s}
+      a$=Str$("The quick brown fox jumps over the lazy dog")
+      // a len of 3.5 is 7 bytes. Len is a double which return number of words
+      // so a 0.5 word is a byte
+      // because we get a long (singed) we convert it to unsigned 32 bit (using same bits)
+      Hex Uint(CRC32(sint(0x0),a$,len(a$)*2))
+}
+CheckApi
+Module CheckApi {
+      Declare CRC32 LIB "ntdll.RtlComputeCrc32" {Long Zero, a$, long s}
+      a$=Str$("The quick brown fox")
+      b$=Str$(" jumps over the lazy dog")
+      Hex Uint(CRC32(CRC32(0,a$,len(a$)*2),b$,len(b$)*2))
+}
+CheckApi
+Module CheckIt {
+
+	Function PrepareTable {
+		Dim Base 0, table(256)
+		For i = 0 To 255
+			k = i
+			For j = 0 To 7
+				If binary.and(k,1)=1 Then
+					k =binary.Xor(binary.shift(k, -1) ,  0xEDB88320)
+				Else
+					k=binary.shift(k, -1)
+				End If
+			Next
+			table(i) = k
+		Next
+		=table()
+	}
+	crc32= lambda  ' we can break the lambda definition in parts
+		crct()=PrepareTable() ' this is a closure
+		(crc, buf$)  ' this is the input paremeter
+		-> { ' this is the function body of lambda
+			if len(buf$) Else exit
+			// we make a buffer of bytes and place string there
+			// Eval(buf, 0) read the first byte as unsigned number (0 to 255)
+			// buf and buf$ can coexist, they are different variables
+			buffer buf as byte*len(buf$)*2
+			return buf, 0:=buf$
+			crc =0xFFFFFFFF-crc
+			For i = 0 To Len(buf) -1
+				crc = binary.xor(binary.shift(crc, -8), crct(binary.xor(binary.and(crc, 0xff), Eval(buf, i))))
+			Next
+			=0xFFFFFFFF-crc
+		}
+	// str$() convert Utf16LE to ANSI 8bit
+	// Hex is like Print but conver unsigned numbers to hex
+	Hex crc32(0@, Str$("The quick brown fox jumps over the lazy dog")) ' return 0x414fa339
+	Hex crc32(crc32(0@, str$("The quick brown fox")), str$(" jumps over the lazy dog")) ' return 0x414fa339
+}
+CheckIt
+}
+MODULE VBCOLLECTION {Module GetC {
+      declare c collection
+      def decimal aDecimal=3000032131231231312312
+      Document doc$
+      Print type$(c)
+      \\ we get an inventory list of all methods/properties of a com Object
+      m=param(c)
+      IF LEN(m)>1 THEN {
+      For i=0 to len(m)-1
+            \\  use index, not key so i! is index
+            Doc$=m$(i!)+{
+            }  ' we use this block for new line
+      Next i
+      }
+      Report Doc$
+      Clipboard Doc$
+      \\ so now we have to use it, using Methid to call Add
+      Method c, "Add", 100, "Hello"
+      Method c, "Add", 2000, "There"
+      \\ add a decimal number
+ 
+      Method c, "Add", aDecimal, "Zero"
+      Method c, "count" as count
+      Print count =3  ' we have three members
+      Method C, "_NewEnum" as Item
+      Method c, "Item", "Zero" as ZeroItem  ' we get the decimal number
+      Print ZeroItem
+      Print type$(Item)="Nothing"  ' we have numbers
+      k=0
+      While Item {
+            k++
+            print k, eval(item)
+      }
+      c.item=lambda c (akey$) ->{
+            try ok {
+                  method c, "item", akey$ as ret
+            }
+            If type$(Ret)="Empty" Then Error "Key not used"
+            =ret
+      }
+      Print c.item("Hello")
+      Try {
+            val=c.item("Hello12")
+      }
+      Print Error$
+      Push c
+      \\ normaly we can use this line
+      \\ but if we omit this, Interpreter do this for us
+      Declare c Nothing
+}
+GetC
+Read a
+Print type$(a)="Collection"
 }
 UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}
