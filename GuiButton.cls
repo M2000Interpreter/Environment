@@ -21,7 +21,7 @@ Dim mIndex As Long
 Dim Callback As GuiM2000
 Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, shadowcol As Long
 Public SkipFirstClick As Boolean
-
+Public AllwaysDoubleClick As Boolean
 Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
 End Property
@@ -66,7 +66,7 @@ Set Callback = Nothing
   Set glistN = Nothing
 End Sub
 Friend Sub SetUp()
-white = Callback.Controls(1).forecolor
+white = Callback.Controls(1).ForeColor
 black = 0
 dimm1 = rgb(100, 200, 160)
 dimm2 = rgb(200, 120, 60)
@@ -92,11 +92,11 @@ With glistN
 .Text = mCaptext
 .BackColor = rgb(200, 120, 60)
 Set .Font = ff
-.forecolor = Callback.Controls(1).forecolor
-shadowcol = -.forecolor
+.ForeColor = Callback.Controls(1).ForeColor
+shadowcol = -.ForeColor
 .dcolor = Callback.Controls(1).dcolor
 
-.Enabled = True
+.enabled = True
 .ListindexPrivateUse = 0
 .ShowMe
 End With
@@ -145,7 +145,7 @@ End If
 Callback.Controls(Callback.LastActive).SetFocus
 Exit Sub
 End If
-If Me.Enabled Then
+If Me.enabled Then
 If glistN.BackStyle = 1 Then
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".GotFocus(" + Str(mIndex) + ")"
@@ -155,13 +155,13 @@ If glistN.BackStyle = 1 Then
 End If
 glistN.BackColor = mycolor(dimm1)
 glistN.ShowMe
-'OneClick
+If Not AllwaysDoubleClick Then glistN.PrepareClick
 End If
 End Sub
 
 Private Sub glistN_CheckLostFocus()
 
-If Me.Enabled Then
+If Me.enabled Then
 Callback.LastActive = ctrlName
 If glistN.BackStyle = 1 Then
   If mIndex >= 0 Then
@@ -255,13 +255,13 @@ End Property
 Friend Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
-Public Property Get Enabled() As Long
-Enabled = glistN.Enabled
+Public Property Get enabled() As Long
+enabled = glistN.enabled
 End Property
 
-Public Property Let Enabled(ByVal RHS As Long)
+Public Property Let enabled(ByVal RHS As Long)
 If glistN Is Nothing Then Exit Property
-glistN.Enabled = RHS
+glistN.enabled = RHS
 End Property
 Public Property Get WrapText() As Long
 WrapText = glistN.WrapText
@@ -272,14 +272,14 @@ glistN.WrapText = RHS <> 0
 End Property
 Sub ColorsReset()
 white = rgb(255, 255, 255)
-glistN.forecolor = rgb(255, 255, 255)
+glistN.ForeColor = rgb(255, 255, 255)
 dimm1 = rgb(100, 200, 160)
 dimm2 = rgb(200, 120, 60)
 End Sub
 Sub Colors(white1, Optional dimm21, Optional dimm11, Optional dimm33)
 On Error Resume Next
 If Not glistN Is Nothing Then
-glistN.forecolor = mycolor(white1)
+glistN.ForeColor = mycolor(white1)
 If Not IsMissing(dimm21) Then dimm2 = mycolor(dimm21)
 
 If Not IsMissing(dimm11) Then dimm1 = mycolor(dimm11)
@@ -294,7 +294,7 @@ Public Sub Shutdown()
 On Error Resume Next
 If Not glistN Is Nothing Then
 glistN.Shutdown
-glistN.Enabled = False
+glistN.enabled = False
 End If
 End Sub
 Public Sub FontAttr(ThisFontName, Optional ThisMode = -1, Optional ThisBold = True)

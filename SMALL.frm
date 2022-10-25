@@ -38,6 +38,7 @@ Option Explicit
 '#If False Then
 '    Dim FALSE , TRUE 
 '#End If
+Private Declare Function GetDesktopWindow Lib "user32" () As Long
 Public hideme As Boolean
 Private foundform5 As Boolean
 
@@ -101,17 +102,44 @@ If LenB(NewValue) = 0 Then NewValue = "M2000"
     m_Caption = NewValue
 DefWindowProcW Me.hWnd, WM_SETTEXT, 0, ByVal StrPtr(NewValue)
 End Property
-Private Sub Form_DblClick()
+
+Private Sub Form_Activate()
 On Error Resume Next
 If lastform Is Nothing Then Exit Sub
-If WindowState = 0 Then lastform.SetFocus
+If TypeOf lastform Is GuiM2000 Then
+If lastform.enabled = False Then Exit Sub
+If WindowState = 0 Then
+If Not lastform.Minimized Then
+If Not GetDesktopWindow = lastform.hWnd Then lastform.ZOrder 0
+End If
+End If
+End If
+End Sub
+
+Private Sub Form_DblClick()
+'On Error Resume Next
+'If lastform Is Nothing Then Exit Sub
+'If WindowState = 0 Then lastform.SetFocus
+On Error Resume Next
+If lastform Is Nothing Then Exit Sub
+If TypeOf lastform Is GuiM2000 Then
+'If WindowState = 0 Then If Not lastform.Minimized Then lastform.ZOrder 0
+Exit Sub
+End If
+If WindowState = 0 Then lastform.ZOrder 0
 
 End Sub
 
-Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub Form_GotFocus()
+On Error Resume Next
+If lastform Is Nothing Then Exit Sub
+If lastform.enabled = False Then Beep: Exit Sub
+End Sub
+
+Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
 If QRY Or GFQRY Then
 If Form1.Visible Then Form1.SetFocus
-ElseIf KeyCode = 27 And ASKINUSE Then
+ElseIf keycode = 27 And (ASKINUSE Or loadfileiamloaded) Then
 
     NOEXECUTION = True
 Else
@@ -143,11 +171,11 @@ Dim nook As Long, uselastform As Boolean
 Timer1.enabled = False
 If UnloadMode = (vbFormControlMenu Or byPassCallback) And lastform Is Nothing Then
 
-Dim F As Form, i As Long, F1 As GuiM2000
+Dim f As Form, i As Long, F1 As GuiM2000
 For i = Forms.count - 1 To 0 Step -1
-Set F = Forms(i)
-If TypeOf F Is GuiM2000 Then
-    Set F1 = F
+Set f = Forms(i)
+If TypeOf f Is GuiM2000 Then
+    Set F1 = f
     
     If Modalid <> 0 Then
         If F1.Modal = Modalid Then
@@ -175,9 +203,11 @@ End If
 
 If nook Then Cancel = True: Exit Sub
 Next i
-Set F = Nothing
+Set f = Nothing
 
 If Not lastform Is Nothing Then
+
+If lastform.Modal <> 0 Then If lastform.Modal <> Modalid Then Cancel = True: Exit Sub
 Exit Sub
 End If
 
@@ -199,7 +229,9 @@ End If
 Else
 
 If lastform Is Nothing Then ttl = False: Exit Sub
+
 If UnloadMode = vbFormControlMenu Then
+If lastform.Modal <> 0 And (ASKINUSE Or loadfileiamloaded) Then Beep: Cancel = True: Exit Sub
 Set F1 = lastform
 F1.ByeBye
 Cancel = True
@@ -214,13 +246,22 @@ Private Sub Form_Resize()
 If Timer1.enabled Then Exit Sub
 If once2 Then Exit Sub
 once2 = True
+hideme = (Me.WindowState = 1)
 If Not lastform Is Nothing Then
+If lastform.Modal <> 0 Then If lastform.Modal = Modalid And (ASKINUSE Or loadfileiamloaded) Then Beep: once2 = False: Exit Sub
 If lastform.WindowState = 1 Then
 lastform.WindowState = 0: Me.skiptimer = True: Me.WindowState = 0: once2 = False: Exit Sub
+ElseIf Not hideme And lastform.Modal = 0 Then
+lastform.TrueVisible = True
+
+ElseIf (ASKINUSE Or loadfileiamloaded) Then
+Beep
+once2 = False: Exit Sub
+
 End If
 End If
 
- hideme = (Me.WindowState = 1)
+ 'hideme = (Me.WindowState = 1)
 
   If hideme Then
     reopen2 = False
@@ -258,7 +299,7 @@ Private Sub Timer1_Timer()
 ' On Error Resume Next
 If once Then Exit Sub
 once = True
-Dim F As Form, F1 As GuiM2000, i As Long, thismodal As Double, f2 As GuiM2000
+Dim f As Form, F1 As GuiM2000, i As Long, thismodal As Double, f2 As GuiM2000
 If skiptimer Then
 skiptimer = False
 Timer1.enabled = False
@@ -283,11 +324,13 @@ starthere:
                     If TypeOf Forms(i) Is GuiM2000 Then
                         Set F1 = Forms(i)
                         If Not f2 Is F1 Then
-                            F1.Visible = F1.VisibleOldState Or F1.Visible
-                            F1.VisibleOldState = False
-                            F1.MinimizeOff
-                            If F1.Visible Then
-                                
+                           ' F1.Visible = F1.VisibleOldState Or F1.Visible
+                           ' F1.VisibleOldState = False
+                           ' F1.MinimizeOff
+                            'If F1.Visible Then
+                             If F1.TrueVisible Then
+                                F1.VisibleOldState = True
+                                F1.MinimizeOff
                                 If Form1.Visible Then
                                     F1.Show , Form1
                                 Else
@@ -298,14 +341,17 @@ starthere:
                     End If
                 Next i
                 Set F1 = f2
-                F1.Visible = F1.VisibleOldState Or F1.Visible
-                F1.VisibleOldState = False
-                If F1.Visible Then
-                    F1.MinimizeOff
+               ' F1.Visible = F1.VisibleOldState Or F1.Visible
+               ' F1.VisibleOldState = False
+                If F1.TrueVisible Then
+                    F1.VisibleOldState = True
+                    If F1.Minimized Then
+                    'F1.MinimizeOff
                     If Form1.Visible Then
                         F1.Show , Form1
                     Else
                         F1.Show
+                    End If
                     End If
                 End If
                 Set F1 = Nothing
@@ -328,8 +374,7 @@ starthere:
                 Exit Sub
             End If
         Else
-            F1.Visible = F1.VisibleOldState Or F1.Visible
-            F1.VisibleOldState = False
+            F1.Visible = F1.TrueVisible
             If F1.Visible Then
                 If Form1.Visible Then
                     F1.Show , Form1
@@ -341,8 +386,9 @@ starthere:
     End If
 Else
         Set F1 = lastform
-        F1.VisibleOldState = F1.Visible
-        F1.Visible = False
+        'F1.VisibleOldState = F1.Visible
+        'F1.Visible = False
+        If Not F1.Minimized Then
         If F1.Modal <> 0 Then
         thismodal = F1.Modal
         For i = Forms.count - 1 To 0 Step -1
@@ -357,6 +403,9 @@ Else
                 End If
             End If
         Next i
+        Else
+            F1.Visible = False
+        End If
         Set F1 = Nothing
         End If
 End If
@@ -406,14 +455,14 @@ Sleep 1
 If Form1.Visible Then Form1.SetFocus:  Form1.KeyPreview = True
 
 If Form1.Visible Then Sleep 2
- Set F = Nothing
+ Set f = Nothing
  Else
   Form1.Visible = Form1.TrueVisible
  Form1.Visible = False
 
-    For Each F In Forms
-       If Typename$(F) = "GuiM2000" Then
-    Set F1 = F
+    For Each f In Forms
+       If Typename$(f) = "GuiM2000" Then
+    Set F1 = f
         If F1.NeverShow Then
     If F1 Is lastform Then
         F1.Visible = F1.VisibleOldState Or F1.Visible
@@ -444,9 +493,9 @@ Form1.Visible = False
 'Form1.Hide
 If Form5.Visible Then Form5.Visible = False: foundform5 = True
 End If
- For Each F In Forms
-        If TypeOf F Is GuiM2000 Then
-            Set F1 = F
+ For Each f In Forms
+        If TypeOf f Is GuiM2000 Then
+            Set F1 = f
             If F1.TrueVisible Then
                 F1.VisibleOldState = True
                 F1.Visible = False

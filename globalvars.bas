@@ -1,5 +1,6 @@
 Attribute VB_Name = "globalvars"
 ' This is for selectors..
+Option Explicit
 Public AskTitle$, AskText$, AskCancel$, AskOk$, AskDIB$, ASKINUSE As Boolean
 Public AskInput As Boolean, AskResponse$, AskStrInput$, AskDIBicon$
 Public UseAskForMultipleEntry As Boolean
@@ -81,18 +82,30 @@ End Sub
 Public Function IsSelectorInUse() As Boolean
 IsSelectorInUse = inUse
 End Function
-Public Function OpenColor(bstack As basetask, Thisform As Object, thiscolor As Long) As Boolean
+Public Function OpenColor(bstack As basetask, thiscolor As Long) As Boolean
 If inUse Then OpenColor = False: Exit Function
 inUse = True
+Dim thisform As Object
+If Not Screen.ActiveForm Is Nothing Then
+If TypeOf Screen.ActiveForm Is GuiM2000 Then
+    Set thisform = Screen.ActiveForm
+ElseIf Screen.ActiveForm Is MyPopUp Then
+    Set thisform = MyPopUp.LASTActiveForm
+    MyPopUp.Hide
+Else
+    Set thisform = Screen.ActiveForm
+End If
+
+End If
 ExpandWidth = True
 ReturnColor = thiscolor
 
-If Thisform Is Nothing Then
+If thisform Is Nothing Then
 ColorDialog.Show
 Else
-ColorDialog.Show , Thisform
+ColorDialog.Show , thisform
 End If
-Dim Scr As Object, v1 As Long
+Dim Scr As Object
 Set Scr = bstack.Owner
 If TypeOf Scr Is GuiM2000 Then
     Scr.UNhookMe
@@ -120,20 +133,37 @@ If Not ColorDialog.Visible Then
     MyDoEvents
     End If
 WaitDialog bstack
-If Not Thisform Is Nothing Then
-          ' If Typename(Thisform) = "GuiM2000" Then Thisform.ShowmeALL
-          If Thisform.Visible Then Thisform.SetFocus
+If Not thisform Is Nothing Then
+        If thisform.Visible Then
+            If Typename(thisform) = "GuiM2000" Then
+                thisform.Enablecontrol = True
+                'Thisform.ShowmeALL
+            End If
+            thisform.SetFocus
+        End If
 End If
 OpenColor = Not CancelDialog
 thiscolor = ReturnColor
 ExpandWidth = False
 inUse = False
 End Function
-Public Function OpenFont(bstack As basetask, Thisform As Object) As Boolean
+Public Function OpenFont(bstack As basetask) As Boolean
 If inUse Then OpenFont = False: Exit Function
 inUse = True
+Dim thisform As Object
+If Not Screen.ActiveForm Is Nothing Then
+If TypeOf Screen.ActiveForm Is GuiM2000 Then
+    Set thisform = Screen.ActiveForm
+ElseIf Screen.ActiveForm Is MyPopUp Then
+    Set thisform = MyPopUp.LASTActiveForm
+    MyPopUp.Hide
+Else
+    Set thisform = Screen.ActiveForm
+End If
+
+End If
 ExpandWidth = True
-Dim Scr As Object, v1 As Long
+Dim Scr As Object
 Set Scr = bstack.Owner
 If TypeOf Scr Is GuiM2000 Then
     Scr.UNhookMe
@@ -149,10 +179,10 @@ ElseIf Not Screen.ActiveForm Is Nothing Then
     Screen.ActiveForm.UNhookMe
 End If
 
-If Thisform Is Nothing Then
+If thisform Is Nothing Then
 FontDialog.Show
 Else
-FontDialog.Show , Thisform
+FontDialog.Show , thisform
 End If
 If Not Screen.ActiveForm Is Nothing Then
 If Not Screen.ActiveForm Is FontDialog Then
@@ -166,17 +196,34 @@ If Not FontDialog.Visible Then
     MyDoEvents
     End If
 WaitDialog bstack
-If Not Thisform Is Nothing Then
-          ' If Typename(Thisform) = "GuiM2000" Then Thisform.ShowmeALL
-          If Thisform.Visible Then Thisform.SetFocus
+If Not thisform Is Nothing Then
+        If thisform.Visible Then
+            If Typename(thisform) = "GuiM2000" Then
+                thisform.Enablecontrol = True
+                'Thisform.ShowmeALL
+            End If
+            thisform.SetFocus
+        End If
 End If
 If ReturnFontName <> "" Then OpenFont = Not CancelDialog
 ExpandWidth = False
 inUse = False
 End Function
-Public Function OpenImage(bstack As basetask, Thisform As Object, TopDir As String, lastname As String, thattitle As String, TypeList As String) As Boolean
+Public Function OpenImage(bstack As basetask, TopDir As String, lastname As String, thattitle As String, TypeList As String) As Boolean
 If inUse Then OpenImage = False: Exit Function
 inUse = True
+Dim thisform As Object
+If Not Screen.ActiveForm Is Nothing Then
+If TypeOf Screen.ActiveForm Is GuiM2000 Then
+    Set thisform = Screen.ActiveForm
+ElseIf Screen.ActiveForm Is MyPopUp Then
+    Set thisform = MyPopUp.LASTActiveForm
+    MyPopUp.Hide
+Else
+    Set thisform = Screen.ActiveForm
+End If
+
+End If
 ' do something with multifiles..
 ReturnFile = lastname
 If ReturnFile <> "" Then If ExtractPath(lastname) = vbNullString Then ReturnFile = mcd + lastname
@@ -206,7 +253,7 @@ If InStr(Settings, ",expand") = 0 Then
 Settings = Settings & ",expand"
 End If
 End If
-Dim Scr As Object, v1 As Long
+Dim Scr As Object
 Set Scr = bstack.Owner
 If TypeOf Scr Is GuiM2000 Then
     Scr.UNhookMe
@@ -222,10 +269,10 @@ ElseIf Not Screen.ActiveForm Is Nothing Then
     Screen.ActiveForm.UNhookMe
 End If
 
-If Thisform Is Nothing Then
+If thisform Is Nothing Then
 LoadFile.Show
 Else
-LoadFile.Show , Thisform
+LoadFile.Show , thisform
 End If
 If Not Screen.ActiveForm Is Nothing Then
 If Not Screen.ActiveForm Is LoadFile Then
@@ -239,19 +286,36 @@ If Not LoadFile.Visible Then
     MyDoEvents
     End If
 WaitDialog bstack
-If Not Thisform Is Nothing Then
-          ' If Typename(Thisform) = "GuiM2000" Then Thisform.ShowmeALL
-          If Thisform.Visible Then Thisform.SetFocus
+If Not thisform Is Nothing Then
+        If thisform.Visible Then
+            If Typename(thisform) = "GuiM2000" Then
+                thisform.Enablecontrol = True
+                'Thisform.ShowmeALL
+            End If
+            thisform.SetFocus
+        End If
 End If
 If ReturnListOfFiles <> "" Or ReturnFile <> "" Then OpenImage = Not CancelDialog
 inUse = False
 
 ' read files
 End Function
-Public Function OpenDialog(bstack As basetask, Thisform As Object, TopDir As String, lastname As String, thattitle As String, TypeList As String, OpenNew As Boolean, MULTFILES As Boolean) As Boolean
+Public Function OpenDialog(bstack As basetask, TopDir As String, lastname As String, thattitle As String, TypeList As String, OpenNew As Boolean, MULTFILES As Boolean) As Boolean
 If inUse Then OpenDialog = False: Exit Function
-Dim foundmulti As Boolean, Scr As Object, v1 As Long
+Dim foundmulti As Boolean, Scr As Object
 inUse = True
+Dim thisform As Object
+If Not Screen.ActiveForm Is Nothing Then
+If TypeOf Screen.ActiveForm Is GuiM2000 Then
+    Set thisform = Screen.ActiveForm
+ElseIf Screen.ActiveForm Is MyPopUp Then
+    Set thisform = MyPopUp.LASTActiveForm
+    MyPopUp.Hide
+Else
+    Set thisform = Screen.ActiveForm
+End If
+
+End If
 ' do something with multifiles..
 ReturnFile = lastname
 If ReturnFile <> "" Then If ExtractPath(lastname) = vbNullString Then ReturnFile = mcd + lastname
@@ -303,10 +367,10 @@ ElseIf val("0" + bstack.Owner.Tag) > 32 Then
 ElseIf Not Screen.ActiveForm Is Nothing Then
     Screen.ActiveForm.UNhookMe
 End If
-If Thisform Is Nothing Then
+If thisform Is Nothing Then
 LoadFile.Show
 Else
-LoadFile.Show , Thisform
+LoadFile.Show , thisform
 End If
 If Not Screen.ActiveForm Is Nothing Then
 If Not Screen.ActiveForm Is LoadFile Then
@@ -321,12 +385,17 @@ If Not LoadFile.Visible Then
     End If
 'Hook3 LoadFile.hWnd, Nothing
 WaitDialog bstack
-If Not Thisform Is Nothing Then
-          ' If Typename(Thisform) = "GuiM2000" Then Thisform.ShowmeALL
-          If Thisform.Visible Then Thisform.SetFocus
+If Not thisform Is Nothing Then
+        If thisform.Visible Then
+            If Typename(thisform) = "GuiM2000" Then
+                thisform.Enablecontrol = True
+                'Thisform.ShowmeALL
+            End If
+            thisform.SetFocus
+        End If
 End If
 If ReturnListOfFiles <> "" Or ReturnFile <> "" Then OpenDialog = Not CancelDialog
-If MULTFILES And Not FOUNDMILTI Then
+If MULTFILES And Not foundmulti Then
 
 Settings = Replace(Settings, ",multi", "")
 
@@ -334,10 +403,22 @@ End If
 inUse = False
 ' read files
 End Function
-Public Function SaveAsDialog(bstack As basetask, Thisform As Object, lastname As String, TopDir As String, thattitle As String, TypeList As String) As Boolean
+Public Function SaveAsDialog(bstack As basetask, lastname As String, TopDir As String, thattitle As String, TypeList As String) As Boolean
 Dim Scr As Object
 If inUse Then SaveAsDialog = False: Exit Function
 inUse = True
+Dim thisform As Object
+If Not Screen.ActiveForm Is Nothing Then
+If TypeOf Screen.ActiveForm Is GuiM2000 Then
+    Set thisform = Screen.ActiveForm
+ElseIf Screen.ActiveForm Is MyPopUp Then
+    Set thisform = MyPopUp.LASTActiveForm
+    MyPopUp.Hide
+Else
+    Set thisform = Screen.ActiveForm
+End If
+
+End If
 DialogPreview = False
 FileExist = False
 NewFolder = False
@@ -386,10 +467,10 @@ End If
 
 
 
-If Thisform Is Nothing Then
+If thisform Is Nothing Then
 LoadFile.Show
 Else
-LoadFile.Show , Thisform
+LoadFile.Show , thisform
 End If
 If Not Screen.ActiveForm Is Nothing Then
 If Not Screen.ActiveForm Is LoadFile Then
@@ -403,15 +484,28 @@ MoveFormToOtherMonitorOnly LoadFile, Scr.Name = "GuiM2000"
     MyDoEvents
     End If
 WaitDialog bstack
-If Not Thisform Is Nothing Then
-          ' If Typename(Thisform) = "GuiM2000" Then Thisform.ShowmeALL
-          If Thisform.Visible Then Thisform.SetFocus
+If Not thisform Is Nothing Then
+        If thisform.Visible Then
+            If Typename(thisform) = "GuiM2000" Then
+                thisform.Enablecontrol = True
+                'Thisform.ShowmeALL
+            End If
+            thisform.SetFocus
+        End If
 End If
 If ReturnFile <> "" Then SaveAsDialog = Not CancelDialog
 inUse = False
 End Function
 Public Function GetFile(bstack As basetask, thistitle As String, thisfolder As String, onetype As String, Optional multifiles As Boolean = False) As String
-Dim thatform As Object, currentpos
+    If OpenDialog(bstack, thisfolder, "", thistitle, onetype, False, multifiles) Then
+        GetFile = ReturnFile
+    End If
+End Function
+
+Public Function FolderSelector(bstack As basetask, thatfolder As String, TopDir As String, thattitle As String, newflag As Boolean) As Boolean
+If inUse Then FolderSelector = False: Exit Function
+inUse = True
+Dim thatform As Object
 If Not Screen.ActiveForm Is Nothing Then
 If TypeOf Screen.ActiveForm Is GuiM2000 Then
     Set thatform = Screen.ActiveForm
@@ -421,17 +515,8 @@ ElseIf Screen.ActiveForm Is MyPopUp Then
 Else
     Set thatform = Screen.ActiveForm
 End If
-
 End If
-    If OpenDialog(bstack, thatform, thisfolder, "", thistitle, onetype, False, multifiles) Then
-    GetFile = ReturnFile
-    End If
 
-End Function
-
-Public Function FolderSelector(bstack As basetask, Thisform As Object, thatfolder As String, TopDir As String, thattitle As String, newflag As Boolean) As Boolean
-If inUse Then FolderSelector = False: Exit Function
-inUse = True
 DialogPreview = False
 ReturnFile = thatfolder
 SaveDialog = False
@@ -458,7 +543,7 @@ ReturnFile = vbNullString
 Else
 TopFolder = TopDir
 End If
-Dim Scr As Object, v1 As Long
+Dim Scr As Object
 Set Scr = bstack.Owner
 If TypeOf Scr Is GuiM2000 Then
     Scr.UNhookMe
@@ -474,10 +559,10 @@ ElseIf Not Screen.ActiveForm Is Nothing Then
     Screen.ActiveForm.UNhookMe
 End If
 
-If Thisform Is Nothing Then
+If thatform Is Nothing Then
 LoadFile.Show
 Else
-LoadFile.Show , Thisform
+LoadFile.Show , thatform
 End If
 If Not Screen.ActiveForm Is Nothing Then
 If Not Screen.ActiveForm Is LoadFile Then
@@ -491,9 +576,14 @@ If Not LoadFile.Visible Then
     MyDoEvents
     End If
 WaitDialog bstack
-If Not Thisform Is Nothing Then
-          ' If Typename(Thisform) = "GuiM2000" Then Thisform.ShowmeALL
-          If Thisform.Visible Then Thisform.SetFocus
+If Not thatform Is Nothing Then
+        If thatform.Visible Then
+            If Typename(thatform) = "GuiM2000" Then
+                thatform.Enablecontrol = True
+                'ThatForm.ShowmeALL
+            End If
+            thatform.SetFocus
+        End If
 End If
 If ReturnFile <> "" Then FolderSelector = Not CancelDialog
 inUse = False

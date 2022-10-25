@@ -28,7 +28,7 @@ HasNode = IsArray(root)
 End Function
 Private Function packtext(t1$) As Variant
     Dim t$
-    t$ = Replace$(t1$, "&", "amp;")
+    t$ = Replace$(t1$, "&", "&amp;")
     t$ = Replace$(t$, Chr(34), "&quot;")
     t$ = Replace$(t$, "'", "&apos;")
     t$ = Replace$(t$, "<", "&lt;")
@@ -38,7 +38,7 @@ Private Function packtext(t1$) As Variant
 End Function
 Private Function packattrib(t1$, usesingle As Boolean) As Variant
     Dim t$
-    t$ = Replace$(t1$, "&", "amp;")
+    t$ = Replace$(t1$, "&", "&amp;")
     If Not usesingle Then
         t$ = Replace$(t$, Chr(34), "&quot;")
     Else
@@ -63,7 +63,7 @@ Private Function unpackattrib(t1 As Variant) As String
     End If
     t$ = Replace$(t$, "&lt;", "<")
     t$ = Replace$(t$, "&qt;", ">")
-    t$ = Mid$(Replace$(t$, "amp;", "&"), 2)
+    t$ = Mid$(Replace$(t$, "&amp;", "&"), 2)
     unpackattrib = Left$(t$, Len(t$) - 1)
         If NumericCharacterEntities Then
         convertNumericEntities unpackattrib
@@ -77,7 +77,7 @@ Private Function unpacktext(t1 As Variant) As String
     t$ = Replace$(t$, "&apos;", "'")
     t$ = Replace$(t$, "&lt;", "<")
     t$ = Replace$(t$, "&qt;", ">")
-    unpacktext = Replace$(t$, "amp;", "&")
+    unpacktext = Replace$(t$, "&amp;", "&")
     If NumericCharacterEntities Then
         convertNumericEntities unpacktext
     End If
@@ -1121,12 +1121,16 @@ Sub RemoveProcess()
 End Sub
 Friend Sub SetNumericCharacterEntities(RHS)
     Dim m As XmlMonoInternal
+    ' lastchild
+    Dim mLast As XmlMonoInternal
     NumericCharacterEntities = CBool(RHS)
     If Not Me.HasNode Then Exit Sub
+    If Me.ChildCount = 0 Then Exit Sub
+    Set mLast = lastchild
     Set m = FirstChild
     While Not m Is Nothing
         m.SetNumericCharacterEntities RHS
-        Set m = Nextchild
+        If Not m Is mLast Then Set m = Nextchild Else Set m = Nothing
     Wend
     Set m = FirstChild
 End Sub

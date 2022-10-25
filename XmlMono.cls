@@ -25,8 +25,8 @@ End Sub
 Property Get status()
     status = oXml.status
 End Property
-Property Let beautify(B As Long)
-    oXml.beautify = B
+Property Let beautify(b As Long)
+    oXml.beautify = b
 End Property
 Property Get beautify() As Long
     beautify = oXml.beautify
@@ -235,3 +235,4 @@ End Sub
 Sub NumericCharactersEntities(RHS)
     oXml.SetNumericCharacterEntities RHS
 End Sub
+

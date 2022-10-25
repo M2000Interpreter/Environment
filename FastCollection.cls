@@ -66,8 +66,8 @@ Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Public Stable As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private lastfind As String
 Private lasttype As Integer
 Private lastkey As String
@@ -1483,9 +1483,9 @@ Public Property Get KeyToString3(there As Long) As String
 
 End Property
 
-Private Function IsNumberD2(a$, d As Variant) As Boolean
+Private Function IsNumberD2(a$, D As Variant) As Boolean
 ' for inline stacitems
-If VarType(d) = vbEmpty Then d = 0#
+If VarType(D) = vbEmpty Then D = 0#
 Dim a1 As Long
 If a$ <> "" Then
 For a1 = 1 To Len(a$) + 1
@@ -1498,7 +1498,7 @@ Exit For
 End Select
 Next a1
 If a1 > Len(a$) Then a1 = Len(a$) + 1
-    If IsNumberOnly(a$, 1, d, a1) Then
+    If IsNumberOnly(a$, 1, D, a1) Then
         a$ = Mid$(a$, a1)
         IsNumberD2 = True
     Else
@@ -1553,8 +1553,20 @@ Else
     Loop
     End If
     ' compute decimal part
-    If DE$ <> "" Then
+    If Len(DE$) = 0 Then
+    If Len(a$) > sng& Then
+    If InStr("EeÅå", Mid$(a$, sng&, 1)) > 0 Then
+    If InStr("1234567890+-", Mid$(a$, sng& + 1, 1)) > 0 Then
+       ' fr = fr + 1
+        DE$ = "."
+        
+        GoTo cont123
+    End If
+    End If
+    End If
+    Else
       sng = sng + 1
+cont123:
         Do While sng <= Len(a$)
        
         Select Case Mid$(a$, sng, 1)

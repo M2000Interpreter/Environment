@@ -1,6 +1,7 @@
 Attribute VB_Name = "Module8"
 'Author: Merri of vbforums.com
 'http://www.vbforums.com/showthread.php?t=499661
+Option Explicit
 Private Declare Function timeGetTime Lib "winmm.dll" () As Long
 Public Type rndvars
      lngX   As Long

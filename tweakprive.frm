@@ -452,7 +452,7 @@ Dim myCancel As myButton
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim Mysize As Single
 Dim setupxy As Single
-Dim Lx As Long, ly As Long, dr As Boolean, drmove As Boolean
+Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
 Dim a$
 Dim bordertop As Long, borderleft As Long
@@ -487,7 +487,7 @@ Hook hWnd, Nothing
 End Sub
 
 Private Sub Form_Load()
-DIS.enabled = True
+DIS.Enabled = True
 AutoRedraw = True
 Form_Load1
 'AS A LABEL ONLY
@@ -507,7 +507,7 @@ If Button = 1 Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
-    ly = y
+    lY = y
     End If
     
     Else
@@ -515,7 +515,7 @@ If Button = 1 Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
-    ly = y
+    lY = y
     End If
     End If
 
@@ -537,11 +537,11 @@ If dr Then
 
 If bordertop < 150 Then
 
-        If y < (Height - 150) Or y > Height Then addy = (y - ly)
+        If y < (Height - 150) Or y > Height Then addy = (y - lY)
      If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
-    If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
+    If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
         If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
@@ -582,14 +582,14 @@ Else
         LastWidth = Width
       gList2.HeadlineHeight = gList2.HeightPixels
         gList2.PrepareToShow
-      glist3.PrepareToShow
+      gList3.PrepareToShow
       gList5.PrepareToShow
       DIS.PrepareToShow
-        ly = ly * lastfactor / factor
+        lY = lY * lastfactor / factor
         End If
         Else
         Lx = x
-        ly = y
+        lY = y
    
 End If
 once = False
@@ -613,13 +613,13 @@ allheight = height1 * factor
 itemWidth = allwidth - 2 * borderleft
 itemwidth3 = (itemWidth - 2 * borderleft) / 3
 itemwidth2 = (itemWidth - borderleft) / 2
-move Left, top, allwidth, allheight
+move Left, Top, allwidth, allheight
 FontTransparent = False  ' clear background  or false to write over
 gList2.move borderleft, bordertop, itemWidth, bordertop * 3
 gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
 gList2.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 gList1.move borderleft, bordertop * 6, itemWidth, bordertop * 3
-glist3.move borderleft + itemWidth * 2 / 5, bordertop * 9, itemWidth * 3 / 5, bordertop * 18
+gList3.move borderleft + itemWidth * 2 / 5, bordertop * 9, itemWidth * 3 / 5, bordertop * 18
 gList9.move borderleft, bordertop * 10, itemWidth * 2 / 5 - borderleft, bordertop * 3
 gList10.move borderleft + itemWidth * 2 / 5, bordertop * 10, itemWidth * 3 / 5, bordertop * 3
 'gList4.Move borderleft, bordertop * 14, itemwidth2, bordertop * 3
@@ -657,7 +657,7 @@ gList2.FontSize = 14.25 * factor * dv15 / 15
 factor = gList2.FontSize / 14.25 / dv15 * 15
 gList1.FontSize = 11.25 * factor * dv15 / 15
 factor = gList1.FontSize / 11.25 / dv15 * 15
-glist3.FontSize = gList1.FontSize
+gList3.FontSize = gList1.FontSize
 gList4.FontSize = gList1.FontSize
 gList5.FontSize = gList1.FontSize
 gList6.FontSize = gList1.FontSize
@@ -772,16 +772,16 @@ End If
     cc.ValueKey = "PEN"
         cc.ValueType = REG_DWORD
         pen = cc.Value
-    tbPen.enabled = False
+    tbPen.Enabled = False
         tbPen = CStr(pen)
         tbPen.Value = CStr(pen)
-tbPen.enabled = True
+tbPen.Enabled = True
       DIS.forecolor = QBColor(tbPen)
     cc.ValueKey = "PAPER"
         cc.ValueType = REG_DWORD
         tbPaper = CStr(cc.Value)
         tbPaper.Value = cc.Value
-        DIS.backcolor = QBColor(cc.Value)
+        DIS.BackColor = QBColor(cc.Value)
         cc.ValueKey = "COMMAND"
         cc.ValueType = REG_SZ
 
@@ -869,7 +869,7 @@ DIS.NoCaretShow = True
 DIS.LeftMarginPixels = 10
   
 ' Combobox1 SetUp
-glist3.restrictLines = 6
+gList3.restrictLines = 6
 Set textbox2 = New myTextBox
 Set textbox2.Container = gList1
 
@@ -878,7 +878,7 @@ combo1.UseOnlyTheList = True
 
 
 Set combo1.Textbox = textbox2
-Set combo1.Container = glist3
+Set combo1.Container = gList3
 combo1.locked = False
 combo1.AutoComplete = True
 combo1.Textbox.ShowAlways = True
@@ -889,7 +889,7 @@ combo1.Label = "Font name"
 End If
 'Mode edit but exist in list
 textbox2.Retired
-textbox2.enabled = True:   combo1.UseOnlyTheList = True
+textbox2.Enabled = True:   combo1.UseOnlyTheList = True
 
 ' Combobox2 SetUp
 gList5.restrictLines = 2
@@ -898,7 +898,7 @@ Set textbox3.Container = gList4
 Set combo2 = New dropdownlist
 combo2.UseOnlyTheList = True
 
-textbox3.enabled = False
+textbox3.Enabled = False
 Set combo2.Textbox = textbox3
 Set combo2.Container = gList5
 combo2.locked = False
@@ -916,7 +916,7 @@ Set textbox4.Container = gList13
 Set combo3 = New dropdownlist
 combo3.UseOnlyTheList = True
 
-textbox4.enabled = False
+textbox4.Enabled = False
 Set combo3.Textbox = textbox4
 Set combo3.Container = gList14
 combo3.locked = False
@@ -940,8 +940,8 @@ Dim aa As New Document, bb As New FastCollection
        If ex Then Exit For
     Next i
     aa.SortDoc 1, 1, aa.DocLines
-glist3.Text = aa.textDoc
- gList11.enabled = True
+gList3.Text = aa.textDoc
+ gList11.Enabled = True
 gList11.BackStyle = 1
 gList11.FontSize = 10.25
 gList11.NoCaretShow = True
@@ -949,7 +949,7 @@ gList11.restrictLines = 6
 gList11.CenterText = True
 gList11.VerticalCenterText = True
 
-gList11.Text = "Warning: There is no " & vbCrLf & "warning about this " & vbCrLf & "software except that" & vbCrLf & "is given AS-IS" & vbCrLf & vbCrLf & "George Karras 1999-2020 ©"
+gList11.Text = "Warning: There is no " & vbCrLf & "warning about this " & vbCrLf & "software except that" & vbCrLf & "is given AS-IS" & vbCrLf & vbCrLf & "George Karras 1999-2022 ©"
 
 height1 = 6450 * DYP / 15
 width1 = 9900 * DXP / 15
@@ -960,7 +960,7 @@ Else
 LastWidth = -1
 End If
 FontName = "Arial"
-gList2.enabled = True
+gList2.Enabled = True
 gList2.CapColor = rgb(255, 160, 0)
 gList2.FloatList = True
 gList2.MoveParent = True
@@ -1010,7 +1010,7 @@ End If
 tbPaper.Spinner True, 0, 15, 1
 tbPaper.Value = 0
 tbPaper.Retired
-tbPaper.enabled = True
+tbPaper.Enabled = True
 
 Set tbPen = New myTextBox
 Set tbPen.Container = gList7
@@ -1022,7 +1022,7 @@ End If
 tbPen.Spinner True, 0, 15, 1
 tbPen.Value = 15
 tbPen.Retired
-tbPen.enabled = True
+tbPen.Enabled = True
 
 Set tbSize = New myTextBox
 Set tbSize.Container = gList8
@@ -1036,7 +1036,7 @@ tbSize.ThisKind = "pt"
 tbSize.Spinner True, 8, 48, 1
 tbSize.Value = 15
 tbSize.Retired
-tbSize.enabled = True
+tbSize.Enabled = True
 
 Set tbLineSpacing = New myTextBox
 Set tbLineSpacing.Container = gList12
@@ -1050,7 +1050,7 @@ tbLineSpacing.ThisKind = "twips"
 tbLineSpacing.Spinner True, 0, 60 * dv15, 2 * dv15
 tbLineSpacing.Value = 0
 tbLineSpacing.Retired
-tbLineSpacing.enabled = True
+tbLineSpacing.Enabled = True
 
 Set myCommand = New myButton
 Set myCommand.Container = command1(0)
@@ -1060,8 +1060,8 @@ Else
 myCommand.Caption = "OK"
 End If
   Set myCommand.Callback = Me
-  myCommand.Index = 1
-myCommand.enabled = True
+  myCommand.index = 1
+myCommand.Enabled = True
 Set myUnicode = New myButton
 Set myUnicode.Container = command1(1)
 If TweakLang = 0 Then
@@ -1070,17 +1070,17 @@ Else
 myUnicode.Caption = "Ansi Preview"
 End If
   Set myUnicode.Callback = Me
-myUnicode.enabled = True
+myUnicode.Enabled = True
 Set myCancel = New myButton
 Set myCancel.Container = command1(2)
-myCancel.Index = 2
+myCancel.index = 2
 If TweakLang = 0 Then
 myCancel.Caption = "¡ ’—œ"
 Else
 myCancel.Caption = "CANCEL"
 End If
   Set myCancel.Callback = Me
-myCancel.enabled = True
+myCancel.Enabled = True
 MyFill
  playall
  End Sub
@@ -1093,13 +1093,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -1174,7 +1174,7 @@ End Sub
 
 
 Private Sub gList4_ChangeListItem(item As Long, content As String)
-If gList11.enabled Then playall
+If gList11.Enabled Then playall
 End Sub
 Private Sub playall()
 
@@ -1219,12 +1219,12 @@ DIS.ShowMe2
 
 End Sub
 
-Private Sub InterPress_Press(Index As Long)
-If Index = 1 Then
+Private Sub InterPress_Press(index As Long)
+If index = 1 Then
 
 Command111_Click
 'Unload Me  'remove this line
-ElseIf Index = 2 Then
+ElseIf index = 2 Then
 ShutMe
 Else
 If myUnicode.Caption = "Unicode Preview" Then
@@ -1294,7 +1294,7 @@ End If
 tbPaper.Value = a
 a = tbPaper.Value  ' cut max or min
 tbPaper.Value = a
-DIS.backcolor = mycolor(a)
+DIS.BackColor = mycolor(a)
 DIS.ShowMe2
 'tbPaper.Info = "This is info box" + vbCrLf + "X = " + CStr(a)
 ThatString = CStr(a)

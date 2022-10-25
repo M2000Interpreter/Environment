@@ -327,7 +327,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub DIS_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, State As Integer)
+Private Sub DIS_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -349,7 +349,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub dSprite_OLEDragOver(index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, State As Integer)
+Private Sub dSprite_OLEDragOver(index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -434,7 +434,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub Form_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, State As Integer)
+Private Sub Form_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -470,7 +470,7 @@ End Sub
 Private Sub gList1_ChangeSelStart(thisselstart As Long)
 Dim i As Long
 
-If gList1.Enabled Then
+If gList1.enabled Then
 With TEXT1
 i = .SelLength
 .Form1mn1Enabled = i > 0
@@ -492,7 +492,7 @@ End Sub
 Private Sub gList1_HeaderSelected(Button As Integer)
 Dim i As Long
 
-If Not gList1.Enabled Then Exit Sub
+If Not gList1.enabled Then Exit Sub
 With TEXT1
 If .UsedAsTextBox Then Exit Sub
 i = .SelLength
@@ -544,7 +544,7 @@ End Sub
 Private Sub gList1_OutPopUp(x As Single, y As Single, myButton As Integer)
 Dim i As Long
 
-If Not gList1.Enabled Then Exit Sub
+If Not gList1.enabled Then Exit Sub
 With TEXT1
 If .UsedAsTextBox Then Exit Sub
 i = .SelLength
@@ -831,9 +831,9 @@ w2 = w
 If l = i1 Then
  TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = w
- TEXT1.glistN.Enabled = False
+ TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
- TEXT1.glistN.Enabled = True
+ TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
 TEXT1.SelText = neo$
@@ -847,9 +847,9 @@ End If
 End If
 TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = w
- TEXT1.glistN.Enabled = False
+ TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
- TEXT1.glistN.Enabled = True
+ TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
 TEXT1.SelText = neo$
@@ -879,9 +879,9 @@ If safety And w = w1 Then
 If l = i1 Then
  TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = w
- TEXT1.glistN.Enabled = False
+ TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
- TEXT1.glistN.Enabled = True
+ TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
 TEXT1.SelText = neo$
@@ -895,9 +895,9 @@ End If
 End If
 TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = w
- TEXT1.glistN.Enabled = False
+ TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
- TEXT1.glistN.Enabled = True
+ TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
 
@@ -950,9 +950,9 @@ Else
 End If
 TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = w
-TEXT1.glistN.Enabled = False
+TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
-TEXT1.glistN.Enabled = True
+TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdnOut:
 TEXT1.mDoc.lcid = OldLcid
@@ -984,9 +984,9 @@ Else
 End If
 TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = w
-TEXT1.glistN.Enabled = False
+TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
-TEXT1.glistN.Enabled = True
+TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdupOut:
 TEXT1.mDoc.lcid = OldLcid
@@ -1311,7 +1311,7 @@ End If
 End If
 End If
 Case vbKeyPause  '(this is the break key!!!!!'
-If Forms.Count > 5 Then keycode = 0: Exit Sub
+If Forms.count > 5 Then keycode = 0: Exit Sub
 If Not TaskMaster Is Nothing Then If TaskMaster.QueueCount > 0 Then keycode = 0: Exit Sub
 If QRY Or GFQRY Then
 If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
@@ -1515,7 +1515,7 @@ Set TEXT1 = New TextViewer
 Set TEXT1.Container = gList1
 With TEXT1.glistN
 .DragEnabled = False ' only drop - we can change this from popup menu
-.Enabled = False
+.enabled = False
 TEXT1.FileName = vbNullString
 .addpixels = 0
 TEXT1.showparagraph = False
@@ -1609,7 +1609,7 @@ Switches para$  ' ,TRUE CHECK THIS
   On Error Resume Next
   Dim i As Long
   
-      For i = 0 To Controls.Count - 1
+      For i = 0 To Controls.count - 1
      If Typename(Controls(i)) <> "Menu" Then Controls(i).TabStop = False
       Next i
 End Sub
@@ -2099,9 +2099,9 @@ keycode = 0
  
         TEXT1.SelLengthSilent = 0
         TEXT1.mDoc.MarkParagraphID = TEXT1.mDoc.ParagraphFromOrder(gothere)
-        TEXT1.glistN.Enabled = False
+        TEXT1.glistN.enabled = False
         TEXT1.ParaSelStart = gocolumn
-        TEXT1.glistN.Enabled = True
+        TEXT1.glistN.enabled = True
         TEXT1.ManualInform
  
  Exit Sub
@@ -2120,7 +2120,7 @@ If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
                 Form1.SetFocus
             End If
             End If
-            If Forms.Count > 5 Then keycode = 0: Exit Sub
+            If Forms.count > 5 Then keycode = 0: Exit Sub
             If Not TaskMaster Is Nothing Then If TaskMaster.QueueCount > 0 Then keycode = 0: Exit Sub
             If BreakMe Then noentrance = False: Exit Sub
             If ASKINUSE Then
@@ -2363,7 +2363,7 @@ If Len(TEXT1.CurrentParagraph) + 1 < TEXT1.Charpos Then
 TEXT1.SelStartSilent = TEXT1.CharPosStart - TEXT1.Charpos + 1
 End If
 If TEXT1.HaveMarkedText Then TEXT1.SelStartSilent = TEXT1.SelStart
-    gList1.Enabled = False
+    gList1.enabled = False
     JJ = TEXT1.SelStart
     where = JJ
     ii = 1 + TEXT1.SelStart - TEXT1.ParaSelStart
@@ -2469,7 +2469,7 @@ If TEXT1.HaveMarkedText Then TEXT1.SelStartSilent = TEXT1.SelStart
         End If
     End If
 End If
-gList1.Enabled = True
+gList1.enabled = True
 TEXT1.ReColorBlock
 TEXT1.glistN.Noflashingcaret = False
 TEXT1.Render
@@ -3172,9 +3172,9 @@ Else ' goto that paragraph
     If Not TEXT1.mDoc.InvalidPara(para) Then
         TEXT1.SelLengthSilent = 0
         TEXT1.mDoc.MarkParagraphID = para
-        TEXT1.glistN.Enabled = False
+        TEXT1.glistN.enabled = False
         TEXT1.ParaSelStart = pospara
-        TEXT1.glistN.Enabled = True
+        TEXT1.glistN.enabled = True
         TEXT1.ManualInform
     Else
         para = 0
@@ -3427,7 +3427,7 @@ If IsWine Then
         Exit Function
     End If
 Else
-If Forms.Count < 6 Then SleepWaitEdit bstack, 30
+If Forms.count < 6 Then SleepWaitEdit bstack, 30
 End If
 If AskInput Then
 NeoMsgBox.gList3.SetFocus
@@ -3447,13 +3447,13 @@ mycode = Rnd * 12312314
 oldcodeid = Modalid
 
  For Each x In Forms
-                            If x.Visible And x.Name = "GuiM2000" Then
-                     
-                           If x.Enablecontrol Then
-                               x.Modal = mycode
+                    If x.Name = "GuiM2000" Then
+                        
+                            If x.Enablecontrol Then
+                                If x.Modal = 0 Then x.Modal = mycode
                                 x.Enablecontrol = False
-                            End If
-                            End If
+                                End If
+                        End If
                     Next x
                      Set x = Nothing
 If INFOONLY Then
@@ -3495,20 +3495,26 @@ AskTitle$ = vbNullString
 Dim z As Form, XX As GuiM2000
 Set z = Nothing
 For Each x In Forms
-    If x.Visible And x.Name = "GuiM2000" Then
+    If x.Name = "GuiM2000" Then
         Set XX = x
-        If Not XX.Enablecontrol Then XX.TestModal mycode
+        If Not XX.Enablecontrol Then
+        XX.TestModal mycode
+        End If
         If XX.Enablecontrol Then Set z = XX
+        'End If
         Set XX = Nothing
     End If
 Next x
 Set x = Nothing
 If Not zz Is Nothing Then Set z = zz
-
+On Error Resume Next
 If Typename(z) = "GuiM2000" Then
     Set XX = z
+    XX.Enablecontrol = True
+    If XX.Visible Then
     XX.ShowmeALL
-    XX.SetFocus
+    If Not XX.Minimized Then XX.SetFocus
+    End If
     Set z = Nothing
     Set XX = Nothing
 ElseIf Not z Is Nothing Then

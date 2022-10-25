@@ -276,7 +276,7 @@ Public Type JOYINFOEX
     dwReserved2 As Long
 End Type
 Public Type MYJOYSTATtype
-enabled As Boolean
+Enabled As Boolean
 lngButton As Long
 joyPaD As direction
 AnalogX As Long
@@ -338,19 +338,19 @@ If UseMe Is Nothing Then Exit Sub
 UseMe.GetIcon a
 End Sub
 Public Sub PlaceCaption(ByVal a$)
-Dim m As Callback, F As Form
+Dim m As Callback, f As Form
 On Error Resume Next
-Set F = Screen.ActiveForm
+Set f = Screen.ActiveForm
 If UseMe Is Nothing Then Exit Sub
     If Not UseMe.IamVisible Then
-        If Len(a$) = 0 Then a$ = "M2000" Else Set F = Nothing
+        If Len(a$) = 0 Then a$ = "M2000" Else Set f = Nothing
         Form1.CaptionW = a$
         If UseMe.IhaveExtForm Then
         UseMe.SetExtCaption a$
         Else
         
             Form3.Timer1.Interval = 30
-            Form3.Timer1.enabled = True
+            Form3.Timer1.Enabled = True
             Form3.CaptionWsilent = a$
             Form3.CaptionW = a$
             Form1.CaptionW = vbNullString
@@ -368,7 +368,7 @@ Else
         Form1.CaptionW = a$
        
         
-        If F Is Form1 Then
+        If f Is Form1 Then
             If Form1.Visible Then
             Form1.SetFocus
             Else
@@ -379,15 +379,15 @@ Else
             End If
             End If
          End If
-       Set F = Nothing
+       Set f = Nothing
        
     End If
     ttl = False
 End If
 ttl = False
 Exit Sub
-If Not F Is Nothing Then
-    If F Is Form1 Then
+If Not f Is Nothing Then
+    If f Is Form1 Then
         If Form1.Visible Then
             Form1.SetFocus
          ElseIf Not UseMe Is Nothing Then
@@ -398,21 +398,21 @@ If Not F Is Nothing Then
             End If
         End If
     Else
-        If F.Visible Then F.SetFocus
+        If f.Visible Then f.SetFocus
     End If
 End If
 Err.Clear
 End Sub
 Public Function StartJoypadk(Optional ByVal jn As Long = 0) As Boolean
     If joyGetDevCapsA(jn, MYJOYCAPS, 404) <> 0 Then 'Get Joypadk info
-    MYJOYSTAT(jn).enabled = False
+    MYJOYSTAT(jn).Enabled = False
         StartJoypadk = False
     Else
         MYJOYEX.dwSize = 64
         MYJOYEX.dwFlags = 255
         Call joyGetPosEx(jn, MYJOYEX)
         MYJOYSTAT(jn).Wait2Read = False
-         MYJOYSTAT(jn).enabled = True
+         MYJOYSTAT(jn).Enabled = True
         StartJoypadk = True
     End If
 End Function
@@ -427,7 +427,7 @@ Public Sub FlushJoyAll()
 
 Dim jn As Long
 For jn = 0 To 15
-MYJOYSTAT(jn).enabled = False
+MYJOYSTAT(jn).Enabled = False
 Next jn
 End Sub
 
@@ -436,7 +436,7 @@ Public Sub PollJoypadk()
     Dim jn As Long, wh As Long
     ' Get the Joypadk information
     For jn = 0 To 15
-    If MYJOYSTAT(jn).enabled Then
+    If MYJOYSTAT(jn).Enabled Then
     If Not MYJOYSTAT(jn).Wait2Read Then
       MYJOYEX.dwSize = 64
     MYJOYEX.dwFlags = 255
@@ -3293,9 +3293,17 @@ Else
        sng = sng + 1
     Loop
     End If
-    ' compute decimal part
-    If DE$ <> "" Then
+    If Len(DE$) = 0 Then
+        If Len(a$) >= sng& Then
+            If InStr("EeÅå", Mid$(a$, sng&, 1)) > 0 Then
+            fr = fr + 1
+                DE$ = "."
+                GoTo cont1234
+            End If
+        End If
+    Else
       sng = sng + 1
+cont1234:
         Do While sng <= Len(a$)
        
         Select Case Mid$(a$, sng, 1)
@@ -3489,8 +3497,18 @@ Else
     Loop
     End If
     ' compute decimal part
-    If DE$ <> "" Then
+    If Len(DE$) = 0 And Not skipdecimals Then
+    If Len(a$) > sng& Then
+    If InStr("EeÅå", Mid$(a$, sng&, 1)) > 0 Then
+    If InStr("1234567890+-", Mid$(a$, sng& + 1, 1)) > 0 Then
+        DE$ = "."
+        GoTo cont123
+    End If
+    End If
+    End If
+    Else
       sng = sng + 1
+cont123:
         Do While sng <= Len(a$)
        
         Select Case Mid$(a$, sng, 1)
@@ -4766,7 +4784,7 @@ Function ProcWriter(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim prive As Long
 prive = GetCode(basestack.Owner)
 If Lang = 1 Then
-PlainBaSket basestack.Owner, players(prive), "George Karras (C), Kallithea Attikis, Greece 1999-2020"
+PlainBaSket basestack.Owner, players(prive), "George Karras (C), Kallithea Attikis, Greece 1999-2022"
 Else
 PlainBaSket basestack.Owner, players(prive), ListenUnicode(915, 953, 974, 961, 947, 959, 962, 32, 922, 945, 961, 961, 940, 962, 32, 40, 67, 41, 44, 32, 922, 945, 955, 955, 953, 952, 941, 945, 32, 913, 964, 964, 953, 954, 942, 962, 44, 32, 917, 955, 955, 940, 948, 945, 32, 49, 57, 57, 57, 45, 50, 48, 50, 48)
 End If

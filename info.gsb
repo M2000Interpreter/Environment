@@ -8532,111 +8532,6 @@ MODULE RE1 {Module Internal {
 }
 Internal
 }
-MODULE RO {Module RankLanguages {
-      Const Part1$="<a href="+""""+ "/wiki/Category", Part2$="member"
-      Const langHttp$="http://rosettacode.org/wiki/Category:Programming_Languages"
-      Const categoriesHttp$="http://www.rosettacode.org/mw/index.php?title=Special:Categories&limit=5000"
-      Def long m, i,j, tasks, counter, limit, T, t1
-      Def string LastLang$, job$
- 
-      Document final$, languages$, categories$
-      httpGet$=lambda$  (url$, timeout=1000)->{
-            Declare htmldoc "Msxml2.ServerXMLHTTP"
-            With htmldoc , "readyState" as ready
-            Report "Download:"+url$
-            Method htmldoc "open","get", url$, True
-            Method htmldoc "send"
-            Profiler
-            While Ready<>4 {
-                  Wait 20
-                  Print Over format$("Wait: {0:3} sec", timecount/1000)
-                  If timecount>timeout then Exit
-            }
-            If ready=4 Then  With  htmldoc, "responseText" as ready$ : =ready$
-            Declare htmldoc Nothing
-            print
-      }
- 
-      languages$=httpGet$(langHttp$, 30000)
-      If Doc.Len(languages$)=0 then  Error "File download failed (languages)"
- 
-      Inventory Lang
- 
-      m=Paragraph(languages$, 0) 
-      If Forward(languages$,m) then {
-            While m {
-                  job$=Paragraph$(languages$,(m))
-                  If Instr(job$, part1$) Else Continue
-                  i = Instr(job$, "</a>")
-                  If i Else Continue   ' same as If i=0 Then Continue
-                  j = i
-                   i=Rinstr(job$, ">", -i)
-                  If i Else Continue
-                  LastLang$=MID$(job$, i+1, j-i-1)
-                  if Instr(job$, "Category:"+lastlang$) then Append lang, lastlang$:=0  :  Print Over format$("Languages: {0}", len(lang))
-            }
-      }
-      Print
-      Document categories$=httpGet$(categoriesHttp$, 30000)
-      If Doc.Len(categories$)=0 then  Error "File download failed (categories)"
-      limit=Doc.Par(categories$)
-      If limit<Len(Lang) then Error "Invalid data"
-      Refresh
-      set slow
-      m=Paragraph(categories$, 0) 
-      counter=0
-      If Forward(categories$,m) then {
-            While m {
-                  job$=Paragraph$(categories$,(m))
-                  counter++
-                  Print Over format$("{0:2:-6}%", counter/limit*100)
-                  i=Instr(job$, part2$) 
-                  If  i Else Continue          
-                  i=Rinstr(job$, "(", -i)
-                  If  i Else Continue
-                  tasks=Val(Filter$(Mid$(job$, i+1),","))
-                  If tasks Else Continue
-                  i=Rinstr(job$, "<", -i)
-                  If i Else Continue
-                  j = i
-                  i=Rinstr(job$, ">", -i)
-                  If i Else Continue
-                  LastLang$=MID$(job$, i+1, j-i-1)
-                  If Exist(Lang, LastLang$) Then {
-                         Return Lang, LastLang$:=Lang(LastLang$)+tasks
-                  }
-            }
-      }
-      Print
-      \\ this type of iventory can get same keys
-      \\ also has stable sort
-      Report "Make Inventory list by Task"
-      Inventory queue ByTask
-      t1=Len(Lang)
-      T=Each(Lang)
-      While T {
-            Append ByTask, Eval(T):=Eval$(T!)
-            Print Over format$("Complete: {0} of {1}", T^+1, t1 )
-      }
-      Print
-      Report "Sort by task (stable sort, sort keys as numbers)"
-      Sort descending ByTask as number
-      Report "Make List"
-      T=Each(ByTask)
-      final$="Sample output on "+Date$(Today, 1033, "long date")+{:
- 
-      }
-      While T {
-            final$=format$("rank:{0::-4}. {1:-5} entries - {2}", T^+1, Eval$(T!), Eval$(T))+{
-            }
-      }
-      Report "Copy to Clipboard"
-      clipboard final$
-      \\ present to console with 3/4 fill lines then stop for space bar or mouse click to continue
-      Report final$     
-}
-RankLanguages
-}
 MODULE CE {a$="THIS IS MY TEXT TO ENCODE WITH CAESAR CIPHER"
 Function Cipher$(a$, N) {
       If Len(a$)=0 Then Exit
@@ -12221,7 +12116,7 @@ Print IbanCheck$("MK11 2222 3333 4444 555")
 }
 MODULE HTTP {Module CheckIt  {
       Declare  xml "Microsoft.XMLHTTP"
-      const testUrl$ = "http://www.rosettacode.org"
+      const testUrl$ = "https://news.google.com/"
       With  xml, "readyState" as ReadyState
       Method xml "Open", "Get", testUrl$, True  ' True means Async
       Method xml "send"
@@ -12243,7 +12138,7 @@ MODULE HTTP {Module CheckIt  {
             \\ break AA$ to lines
             Document BB$=AA$
             \\ using line breaks as CRLF
-            Print "Press space or mouse to change page"
+            Print "Press space or mouse to change page, or Esc to break report"
             Report BB$
       }
       Declare xml Nothing
@@ -20999,10 +20894,10 @@ Dim url$(4)
 for i=0 to len(d())-1
 	With d(i), "url" as url$(i)  \\ connect property url of d(i) to url$(i)
 next i
-Method d(0), "DownloadFile", "http://www.vbforums.com/showthread.php?818583-Binary-Code-Thunk-Experiment", dir$+"vbforums.html"
-Method d(2), "DownloadFile", "http://www.cs.virginia.edu/~evans/cs216/guides/x86.html", dir$+"x86.html"
-Method d(1), "DownloadFile","http://rosettacode.org/wiki/Rosetta_Code", dir$+"rossetacode.html"
-Method d(3), "DownloadFile","http://georgekarras.blogspot.gr", dir$+"m2000.html"
+Method d(0), "DownloadFile", "http://www.columbia.edu/~fdc/sample.html", dir$+"sample.html"
+Method d(2), "DownloadFile", "http://www.columbia.edu/~fdc/family/hallshill.html", dir$+"hallshill.html"
+Method d(1), "DownloadFile","http://www.columbia.edu/~fdc/family/frankfurt.html", dir$+"frankfurt.html"
+Method d(3), "DownloadFile","http://www.columbia.edu/~fdc/family/family.html", dir$+"family.html"
 cursor 0, m
 
 for i=0 to len(d())-1
@@ -21038,22 +20933,22 @@ wait 100
 cursor 0,2
 print over $(4),"live connections:";w
 cursor 0,m
-If exist("vbforums.html") then Print "vbforums.html - ";Filelen("vbforums.html")
-If exist("rossetacode.html") then Print "rossetacode.html - ";Filelen("rossetacode.html")
-If exist("x86.html") then Print "x86.html - ";Filelen("x86.html")
-If exist("m2000.html") then Print "m2000.html - ";Filelen("m2000.html")
+If exist("sample.html") then Print "sample.html - ";Filelen("sample.html")
+If exist("hallshill.html") then Print "hallshill.html - ";Filelen("hallshill.html")
+If exist("frankfurt.html") then Print "frankfurt.html - ";Filelen("frankfurt.html")
+If exist("family.html") then Print "family.html - ";Filelen("family.html")
 print "done"
 declare d() nothing
 declare form1 nothing
-if exist("m2000.html") then
-	if filelen("m2000.html")>0 then
+if exist("family.html") then
+	if filelen("family.html")>0 then
 		ok=false
-		if Ask("Open m2000.html in htmlEdtitor, as other process?")=1 then ok=true 
-		if Ask("Open m2000.html in console text editor?")=1 then
-			if ok then After 500 {openhtml "m2000.html"}: Mes()
-			Edit "m2000.html", 1
+		if Ask("Open family.html in htmlEdtitor, as other process?")=1 then ok=true 
+		if Ask("Open family.html in console text editor?")=1 then
+			if ok then After 500 {openhtml "family.html"}: Mes()
+			Edit "family.html", 1
 		else
-			if ok then After 50 {openhtml "m2000.html"}: Mes()
+			if ok then After 50 {openhtml "family.html"}: Mes()
 		end if
 		
 	end if
@@ -22979,6 +22874,7 @@ End
 MODULE CRAWL {Escape Off
 Hide
 Window 12, window
+oldwindow=window
 Back {
 Ybig=scale.Y
 Window 18,0, 2000;
@@ -23041,7 +22937,7 @@ End If
 set fast
 Cls 11
 }
-Window 12,0
+Window 12, oldwindow
 \\Show
 Escape On
 keyboard "info"+chr$(13)
@@ -31880,6 +31776,12 @@ Cls 5,0
 // Refresh 5000
 //Player 0
 Pen 14,255
+
+Dim a$(1 to 2)
+// Walrus=Buffer("walrus.png")
+Pen 14,255
+after 300 {
+
 Gradient 1,5
 Cursor 0, 1
 Report {
@@ -31891,10 +31793,10 @@ Report {
 Pen , 50
 Gradient 1,5 : Gradient 1,5
 Pen , 255
-Dim a$(1 to 2)
-// Walrus=Buffer("walrus.png")
 move scale.x*.8, scale.y*.8
 Image Walrus, scale.x,,0
+
+}
 FlipXImage=image(Walrus,#333333,,,4)
 image Walrus (#333333) to a$(1)
 image FlipXImage (#333333) to a$(2)
@@ -32259,21 +32161,27 @@ MODULE LIBEPIG {Τμήμα ΦέρεΑπόΔεξιά(Α, Β,  βήμα_ολίσθ
 	Τέλος Ενώ
 }
 Συνάρτηση Επιγραφή(Χρώμα_Επιγραφής) {
-	Τοπική Α
+	Τοπική Α, A1
 	Σχέδιο 8000, 2000 {
 		Πένα Χρώμα_Επιγραφής, 255
 		Αναφορά 2, "https://georgekarras.blogspot.com"
 		Δρομέας 0, 3
 		Αναφορά 2, "https://github.com/M2000Interpreter"
 	} ως Α
-	=Α
+	Σχέδιο 14000, 14000{
+		Θέση 6500,7000
+		Εικόνα Α, 12000,,0
+	} ως Α1
+	=Α1
 }
 Συνάρτηση Επιγραφή1(Χρώμα_Επιγραφής) {
 	Τοπική Α
 	Σχέδιο {
 		Πένα Χρώμα_Επιγραφής, 255
-		Φορμα 40, 22
-		Διάστιχο 240
+		
+		Φορμα 40, 28
+		Διάστιχο 120
+		Φορμα 40
 		Διπλά
 		Πλάγια
 		Αναφορά 2, "Προγραμματιστικά Υποδείγματα"
@@ -32298,11 +32206,10 @@ MODULE LIBEPIG {Τμήμα ΦέρεΑπόΔεξιά(Α, Β,  βήμα_ολίσθ
 		Τύπωσε @(0), "○  ";
 		Αναφορά 3, {Παράλληλος (Concurrent) Προγραμματισμός. (Νήματα σε έναν επεξεργαστή)}
 	} ως Α1
-	Σχέδιο 14000, 14000{
-		Θέση 7000,7000
-		Εικόνα Α1, 12000,,0
+	Σχέδιο 10000,10000{
+		Θέση 5000, 4500
+		Εικόνα Α1, 8000,,0
 	} ως Α
-		
 	=Α
 }
 Συνάρτηση Επιγραφή2(Χρώμα_Επιγραφής) {
@@ -32333,14 +32240,19 @@ MODULE LIBEPIG {Τμήμα ΦέρεΑπόΔεξιά(Α, Β,  βήμα_ολίσθ
 		}
 		
 	} ως Α1
-	Σχέδιο 6000, 4000{
-		θέση 3000,2000
-		Εικόνα Α1, 5800,,0
+	Σχέδιο 14000, 14000{
+		Θέση 6500,7000
+		Εικόνα Α1, 12000,,0
 	} ως Α
+	// Σχέδιο 6000, 4000{
+	//	θέση 3000,2000
+	//	Εικόνα Α1, 5800,,0
+	// } ως Α
 	=Α
 }
 }
-MODULE DEMOEPIG {Αναφορά {Οδηγίες
+MODULE DEMOEPIG {window 10, 18000, 14000;
+Αναφορά {Οδηγίες
 	Για να δοκιμάσεις την παρουσίαση (μέρος της από τη πραγμαιτκή που έγινε 18-10-2020 στο συνέδριο 12o CIE 2020), μπορείς να κάνεις τα εξής:
 		Με το διάστημα επιταχύνουμε την ολίσθηση, με το Esc την τερματίζουμε
 		Στην εφαρμογή sprites, υπάρχουν οδηγίες, με Esc την τερματίζουμε
@@ -32364,13 +32276,13 @@ MODULE DEMOEPIG {Αναφορά {Οδηγίες
 Φόντο 1, 5
 // οι επιγραφές είναι στη βιβλιοθήκη (στο τμήμα LibEpig)
 ΦέρεΑπόΚάτω Επιγραφή2(15),0, 60, 16, 2
-ΠερίμενεΚουμπί 100000
+ΠερίμενεΚουμπί 6000
 ΦέρεΑπόΔεξιά Επιγραφή2(15),Επιγραφή2(0), 60, 16, 2
-ΠερίμενεΚουμπί 100000
+ΠερίμενεΚουμπί 6000
 ΦέρεΑπόΚάτω Επιγραφή1(15),Επιγραφή1(#003366), 60, 8, 2
-ΠερίμενεΚουμπί 100000
+ΠερίμενεΚουμπί 6000
 ΦέρεΑπόΔεξιά Επιγραφή1(15),Επιγραφή1(0), 60, 8, 2
-ΠερίμενεΚουμπί 100000
+ΠερίμενεΚουμπί 6000
 Ανανέωση 5000
 Περιθώριο {Ανανέωση 5000}
 σβησε
@@ -34734,20 +34646,17 @@ doc$={<?xml?>
 }
 beautify=-4
 Report 3, doc$
-With Databank, "Attr" as Attr$()
+//With Databank, "Attr" as Attr$()
 Print status$=""
 Method databank, "GetListByTag", "Student", -1 as Result
 Print type$(Result), len(Result)
 c=1
 If len(Result)>0 then
 	Stack Result {
-		Read fieldsNo : With fieldsNo, "Attr" as fieldsno.tag$()
-	}
-	Stack Result {
+		Read fieldsNo : if c=1 then With fieldsNo, "Attr" as fieldsno.tag$()
 		Print c, " "+fieldsno.tag$("Name")
 		c++
 		if empty else LOOP  // Loop raise a flag for this block, which interpreter read at the end of block, and then cleat it
-		Read fieldsNo
 	}
 end if
 // If you change value, this value not saved with escaped numeric character edities
@@ -35135,5 +35044,47 @@ MODULE VBCOLLECTION {Module GetC {
 GetC
 Read a
 Print type$(a)="Collection"
+}
+MODULE XML4 {Module CheckIt {
+	Flush
+	Data "April", {Bubbly: I'm > Tam and <= Émily}
+	Data "Tam O'Shanter", {Burns: "When chapman billies leave the street ..."}
+	Data "Émily", {Short & shrift}
+	
+	declare xml xmlData
+	
+	// This put only <?xml?>
+	//    method xml, "PrepareNodeSimple", "xml" as ProcessInstructions
+	//    Putting these two lines we make this:  <?xml version="1.0" encoding="UTF16"?>
+	//    method xml, "PlaceAttributeToNode", ProcessInstructions, "version", "1.0"
+	//    method xml, "PlaceAttributeToNode", ProcessInstructions, "encoding", "UTF16" 
+	//  method xml, "PlaceProcessingInstructions", ProcessInstructions
+	
+	with xml, "xml" as doc$, "beautify" as beautify
+	
+	method xml, "PrepareNode", "CharacterRemarks" as Node
+	method xml, "InsertNode", Node
+	while not empty
+		read name$, text$
+		method xml, "PrepareNode", "Character", text$ as Node1
+		method xml, "PlaceAttributeToNode", Node1, "name", name$
+		method xml, "AppendChild", Node1
+	end while
+	beautify=-4
+	Report 3, doc$
+	beautify=-4
+	clipboard doc$
+	Method xml, "GetListByTag", "Character", -1 as Result
+	c=1
+	If len(Result)>0 then
+		Stack Result {
+			Read fieldsNo : if c=1 then With fieldsNo, "Attr" as fieldsno.tag$(), "text" as child1.text$
+			Print format$("{0:-4}|{1:20}|{2}", c, fieldsno.tag$("Name"), child1.text$)
+			c++
+			if empty else LOOP  // Loop raise a flag for this block, which interpreter read at the end of block, and then cleat it
+		}
+	end if
+}
+CheckIt
 }
 UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}
