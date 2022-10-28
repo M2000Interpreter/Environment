@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 11 active-X
-Some bugs removed.
+Version 11 Revision 12 active-X
+Fix the sint(uint(-123345),2) bug.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

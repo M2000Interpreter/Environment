@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 11
 Global Const VerMinor = 0
-Global Const Revision = 11
+Global Const Revision = 12
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -47186,21 +47186,28 @@ Set usehandler = bstack.lastobj
             Case 1
                 If .objref.ValidArea2(p, 1) Then
                 GetMem1 .objref.GetPtr(p), rB
-                R = SG * cUbyte(CDbl(rB))
+                R = CInt(cUbyte(rB))
+                If SG < 0 Then
+                    R = -R
+                End If
                 Else
                     GoTo err1256
                 End If
             Case 2
                 If .objref.ValidArea2(p, 2) Then
                 GetMem2 .objref.GetPtr(p), ri
-                R = SG * cUint(CDbl(UINT(CLng(ri))))
+                If SG < 0 Then
+                    R = -ri
+                Else
+                    R = ri
+                End If
                 Else
                     GoTo err1256
                 End If
             Case 8
                 If .objref.ValidArea2(p, 8) Then
                 GetMem8 .objref.GetPtr(p), rd
-                R = SG * rd
+                If SG < 0 Then R = -rd Else R = rd
                 Else
                     GoTo err1256
                 End If
@@ -47238,9 +47245,9 @@ conthere:
     Exit Function
     End If
     If p = 2 Then
-    R = SG * cUint(R)
+    R = SG * cUint(signlong(R))
     Else
-    R = SG * cUbyte(R)
+    R = SG * cUbyte(signlong(R))
     End If
     If Err.Number > 0 Then
     

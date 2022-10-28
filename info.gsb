@@ -1173,17 +1173,21 @@ m1=sint(mUnsigned)
 Print type$(m1)
 m2=binary.and(m1, 0xFF00FF00)
 Print type$(m2)
-k=0xFF00FF00
+k=0xFF01FF02
 Print type$(k)
+hex k
 k1=Binary.Shift(k,-8)
 Print type$(k1)
-k2=Binary.Rotate(k,-8)
+hex k, k1
+k2=Binary.Rotate(k,4)
 Print type$(k2)
+hex k, k2
 \\ binary.add() make the addition of two 32bit numbers and a Mod 2^32,
 \\ so always we cut the overflow bit
-\\ The type interal is Currency, not a long, but it used in this functions like it is a 32bit value
+\\ The type internal is Currency, not a long, but it used in this functions like it is a 32bit value
 k3=binary.add(0xFF123456,0xF1234567,0xFFFFFFFF)
 Print type$(k3)
+hex K3
 }
 MODULE URL {Report {See also DD7 module which decoding for URI use internal funations
 Here we see the decoding using M2000 code (slow)

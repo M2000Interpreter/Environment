@@ -10,15 +10,15 @@ Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
           lpszOutput As String
       End Type
             Private Declare Function StartDoc Lib "gdi32" Alias "StartDocA" _
-          (ByVal hDC As Long, lpdi As DOCINFO) As Long
+          (ByVal Hdc As Long, lpdi As DOCINFO) As Long
 
-      Private Declare Function StartPage Lib "gdi32" (ByVal hDC As Long) _
+      Private Declare Function StartPage Lib "gdi32" (ByVal Hdc As Long) _
           As Long
 
-      Private Declare Function EndDoc Lib "gdi32" (ByVal hDC As Long) _
+      Private Declare Function EndDoc Lib "gdi32" (ByVal Hdc As Long) _
           As Long
 
-      Private Declare Function EndPage Lib "gdi32" (ByVal hDC As Long) _
+      Private Declare Function EndPage Lib "gdi32" (ByVal Hdc As Long) _
           As Long
 Private mp_hdc As Long
 Public MyDM() As Byte
@@ -31,10 +31,10 @@ Private Const PHYSICALWIDTH As Long = 110
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
 
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal iCapabilitiy As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal Hdc As Long, ByVal iCapabilitiy As Long) As Long
 
       Private Declare Function ResetDC Lib "gdi32" Alias "ResetDCA" _
-          (ByVal hDC As Long, lpInitData As Any) As Long
+          (ByVal Hdc As Long, lpInitData As Any) As Long
 Private Declare Function CreateIC Lib "gdi32" Alias "CreateICA" _
           (ByVal lpDriverName As String, ByVal lpDeviceName As String, _
           ByVal lpOutput As String, lpInitData As Any) As Long
@@ -45,7 +45,7 @@ Private Declare Function CreateIC Lib "gdi32" Alias "CreateICA" _
       Private Declare Function CreateDC Lib "gdi32" Alias "CreateDCA" _
           (ByVal lpDriverName As String, ByVal lpDeviceName As String, _
           ByVal lpOutput As Long, lpInitData As Any) As Long
-      Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) _
+      Private Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) _
           As Long
       Private Const NULLPTR = 0&
       ' Constants for DEVMODE
@@ -173,7 +173,7 @@ End Sub
         ByteToString = StripNulls(TempStr)
       End Function
 
-      Function ShowProperties(F As Object, szPrinterName As String, adevmode() As Byte) As Boolean
+      Function ShowProperties(f As Object, szPrinterName As String, adevmode() As Byte) As Boolean
       Dim hPrinter As Long, i As Long
       Dim nSize As Long
 
@@ -199,8 +199,8 @@ End Sub
           End If
    
   End If
-         If Not F Is Nothing Then
-          nSize = DocumentProperties(F.hWnd, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_PROMPT Or DM_IN_BUFFER Or DM_OUT_BUFFER)  '
+         If Not f Is Nothing Then
+          nSize = DocumentProperties(f.hWnd, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_PROMPT Or DM_IN_BUFFER Or DM_OUT_BUFFER)  '
          Else
          nSize = DocumentProperties(0, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_IN_BUFFER Or DM_OUT_BUFFER)
         End If
@@ -247,7 +247,7 @@ lpy = GetDeviceCaps(mp_hdc, LOGPIXELSY)
           mp_hdc = 0
 End Sub
 
-Function PrinterCap(Cap As Long) As Long
+Function PrinterCap(cap As Long) As Long
         Dim p_hdc As Long
           Dim ret As Long
           Dim LastError As Long
@@ -257,7 +257,7 @@ Function PrinterCap(Cap As Long) As Long
         End If
           
           p_hdc = CreateIC(Printer.DriverName, Printer.DeviceName, 0, MyDM(1))
-PrinterCap = GetDeviceCaps(p_hdc, Cap)
+PrinterCap = GetDeviceCaps(p_hdc, cap)
 ret = DeleteDC(p_hdc)
 End Function
 Sub ChangeNowOrientationPortrait()
@@ -276,7 +276,7 @@ If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) < 1 Then
     Call CopyMemory(MyDM(1), pDevMode, Len(pDevMode))
 End If
 End Sub
-Function ChangeOrientation(F As Object, szPrinterName As String, adevmode() As Byte) As Boolean
+Function ChangeOrientation(f As Object, szPrinterName As String, adevmode() As Byte) As Boolean
       Dim hPrinter As Long, i As Long
       Dim nSize As Long
       Dim pDevMode As DEVMODE
@@ -301,8 +301,8 @@ Function ChangeOrientation(F As Object, szPrinterName As String, adevmode() As B
           End If
    
    End If
-         If Not F Is Nothing Then
-          nSize = DocumentProperties(F.hWnd, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_PROMPT Or DM_OUT_BUFFER Or DM_IN_BUFFER)
+         If Not f Is Nothing Then
+          nSize = DocumentProperties(f.hWnd, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_PROMPT Or DM_OUT_BUFFER Or DM_IN_BUFFER)
          Else
 
       
@@ -475,26 +475,18 @@ Function UINT(ByVal a As Long) As Long 'δίνει έναν integer σαν Unsigned integer 
  
  End Function
 Function cUbyte(ByVal a As Long) As Long
-Dim c As Long
-
-c = Abs(a) And &HFF&
-If c > 127 Then
-cUbyte = c - &H100
+If (a And &H80&) <> 0 Then
+    cUbyte = a Or &HFFFFFF80
 Else
-cUbyte = c
+    cUbyte = a And &H7F&
 End If
-
 End Function
 Function cUint(ByVal a As Long) As Long ' πέρνει έναν Unsigned integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
-Dim c As Long
-
-c = Abs(a) And &HFFFF&
-If c > 32767 Then
-cUint = CInt(c - &H10000)
+If (a And &H8000&) <> 0 Then
+    cUint = a Or &HFFFF8000
 Else
-cUint = CInt(c)
+    cUint = a And &H7FFF&
 End If
-
 End Function
 Function LowWord(a As Long) As Long
 LowWord = a
