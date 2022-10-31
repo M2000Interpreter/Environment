@@ -48,7 +48,7 @@ Public BackMove As Boolean
 Public LastSelStart As Long
 Public ListLoadedType As Long
 Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
 Private words$, unique As Long
 Private p3 As Long
@@ -2189,16 +2189,16 @@ Dim PathLength As Long
         GetDosPath = Left$(s, PathLength)
 
 End Function
-Private Function NeoUnicodeFile(FileName$) As Boolean
+Private Function NeoUnicodeFile(Filename$) As Boolean
 Dim hFile
 Dim f$
 Const FILE_ATTRIBUTE_NORMAL = &H80
 Const GENERIC_WRITE = &H40000000
-If Left$(FileName$, 2) <> "\\" Then
+If Left$(Filename$, 2) <> "\\" Then
 
-f$ = "\\?\" + FileName$
+f$ = "\\?\" + Filename$
 Else
-f$ = FileName$
+f$ = Filename$
 End If
 On Error Resume Next
 hFile = CreateFile(StrPtr(f$), GENERIC_WRITE, ByVal 0, ByVal 0, 2, FILE_ATTRIBUTE_NORMAL, ByVal 0)
@@ -2206,7 +2206,7 @@ hFile = CreateFile(StrPtr(f$), GENERIC_WRITE, ByVal 0, ByVal 0, 2, FILE_ATTRIBUT
 CloseHandle hFile
 NeoUnicodeFile = (GetDosPath(f$) <> "")
 End Function
-Public Function SaveUnicodeOrAnsi(ByVal FileName As String, Optional mode2save As Long = 0, Optional Append As Boolean = False) As Boolean
+Public Function SaveUnicodeOrAnsi(ByVal Filename As String, Optional mode2save As Long = 0, Optional Append As Boolean = False) As Boolean
 ' using doc as extension you can read it from word...with automatic conversion to unicode
 ' OVERWRITE ALWAYS
 Dim w As Long, a() As Byte, f$, i As Long, bb As Byte, yesswap As Boolean, lf$
@@ -2220,9 +2220,9 @@ If Abs(mode2save \ 10) > 0 Then
 End If
 mode2save = mode2save Mod 10
 If Not Append Then
-    If Not NeoUnicodeFile(FileName) Then Exit Function
+    If Not NeoUnicodeFile(Filename) Then Exit Function
 End If
-f$ = GetDosPath(FileName)
+f$ = GetDosPath(Filename)
 If Err.Number > 0 Or f$ = vbNullString Then Exit Function
 w = FreeFile
 Open f$ For Binary As w
@@ -2424,7 +2424,7 @@ Public Function ContainsUTF16(ByRef Source() As Byte) As Long
     End If
     End If
 End Function
-Public Sub ReadUnicodeOrANSI(FileName As String, Optional Merge As Boolean = False, Optional feedback As Long, Optional insert2index As Boolean = False)
+Public Sub ReadUnicodeOrANSI(Filename As String, Optional Merge As Boolean = False, Optional feedback As Long, Optional insert2index As Boolean = False)
 Busy = True
 Dim i&, FNr&, BLen&, WChars&, bom As Integer, BTmp As Byte, b() As Byte, lbt As Long
 Dim mLof As Long, ok, nobom As Long
@@ -2432,14 +2432,14 @@ nobom = 1
 ' code from Schmidt, member of vbforums
 ' this code changed for Document Class
 ' Change to read line by line, so no two copies needed
-If FileName = vbNullString Then Exit Sub
+If Filename = vbNullString Then Exit Sub
 If Not Merge Then EmptyDoc
 ReDim Buffer(1 To 1) As Byte
 bufOffset = 0
 bufsize = 0
 SeekBuf = 1
 On Error GoTo ErrHandler
-  BLen = FileLen(GetDosPath(FileName))
+  BLen = FileLen(GetDosPath(Filename))
     If BLen = 0 Then
   If DocLines = 0 Then
   textDoc = vbNullString
@@ -2448,7 +2448,7 @@ On Error GoTo ErrHandler
   End If
   
   FNr = FreeFile
-  Open GetDosPath(FileName) For Binary Access Read As FNr
+  Open GetDosPath(Filename) For Binary Access Read As FNr
   Get FNr, , bom
     Select Case bom
       Case &HFEFF, &HFFFE 'one of the two possible 16 Bit BOMs
@@ -2668,12 +2668,12 @@ End Function
 Private Function CountWords2(a$, uLCID As Long) As Long
 Dim l As Long, NORM_IGNORECASE As Long
 If Not NoIgnoreCase Then NORM_IGNORECASE = &H1001 Else NORM_IGNORECASE = &H1000
-Dim top As Long
+Dim Top As Long
 l = Len(a$)
 If l = 1 Then
 CountWords2 = -(Trim(a$) <> "")
-top = CountWords2
-If top > 0 Then
+Top = CountWords2
+If Top > 0 Then
 ReDim Pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
 Pos(1) = StrPtr(a$)
 slen(1) = 1
@@ -2692,7 +2692,7 @@ p4 = p2
 Do
          If p4 >= l Then
          If p4 <> p2 Then GoTo there1
-        CountWords2 = top: Exit Function
+        CountWords2 = Top: Exit Function
         End If
             GetMem2 p4, bb
             Select Case bb
@@ -2703,7 +2703,7 @@ Do
             If p4 <> p2 Then
 there1:
                 k = (p4 - p2) \ 2
-                mtop = top
+                mtop = Top
                 mda = 0
                 md = (mtop - mda + 1) \ 2
                 p6 = mda + md
@@ -2722,19 +2722,19 @@ there1:
                     p6 = mda + md
                 Loop
                 If md = 0 Then
-                If top = p5 Then
+                If Top = p5 Then
                 p5 = p5 * 2
                 ReDim Preserve Pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
                 End If
-                    top = top + 1
+                    Top = Top + 1
                     
-                    If mda = top - 1 Then
-                        Pos(top) = p2
-                        slen(top) = k
+                    If mda = Top - 1 Then
+                        Pos(Top) = p2
+                        slen(Top) = k
                     Else
-                        CopyMemory ByVal VarPtr(Pos(1)) + mda * 4 + 4, ByVal VarPtr(Pos(1)) + mda * 4, (top - mda - 1) * 4
-                        CopyMemory ByVal VarPtr(slen(1)) + mda * 4 + 4, ByVal VarPtr(slen(1)) + mda * 4, (top - mda - 1) * 4
-                        CopyMemory ByVal VarPtr(hit(1)) + mda * 4 + 4, ByVal VarPtr(hit(1)) + mda * 4, (top - mda - 1) * 4
+                        CopyMemory ByVal VarPtr(Pos(1)) + mda * 4 + 4, ByVal VarPtr(Pos(1)) + mda * 4, (Top - mda - 1) * 4
+                        CopyMemory ByVal VarPtr(slen(1)) + mda * 4 + 4, ByVal VarPtr(slen(1)) + mda * 4, (Top - mda - 1) * 4
+                        CopyMemory ByVal VarPtr(hit(1)) + mda * 4 + 4, ByVal VarPtr(hit(1)) + mda * 4, (Top - mda - 1) * 4
                         Pos(mda + 1) = p2
                         slen(mda + 1) = k
                         hit(mda + 1) = 0
@@ -2745,7 +2745,7 @@ there1:
             End Select
             p4 = p4 + 2
   Loop
-CountWords2 = top
+CountWords2 = Top
 End If
 End Function
 Private Function MakeString(copythat As Long, ByVal lSize As Long) As String

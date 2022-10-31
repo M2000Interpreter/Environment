@@ -4762,7 +4762,7 @@ Flush \\ Empty the stack
 CurDir$=Dir$
 Title$="M2000 Pad"
 Title "", 0   ' hide the console - 0
-
+def docFolder$
 \\ Gui Elements
 oldlinespace=linespace
 linespace 60
@@ -4900,7 +4900,7 @@ For This {
 	Method Run1, mi$,""
 	Method Run1, mi$,"Settings", acc:="U", ctrl:=true
 	Method Run1, mi$,"Default Folder", acc:="D", ctrl:=true
-	Method Run1, mi$,"Folder Documents",  acc:="D", alt:=true
+	Method Run1, mi$,"Documents Folder",  acc:="D", alt:=true
 
 	With Run1, "MenuGroup","This"
 	Method Help1, mi$,"About",true, id:="ABOUT" ,  acc:="A", alt:=true
@@ -5248,10 +5248,20 @@ Function Run1.DblClick {
 		} as TestFile$
 		Save.Doc TestFile$, "Test1235.gsb"
 		Win appdir$+"m2000.exe", dir$+"Test1235.gsb"
+	else.if Run1index=6 then
+		dir user
+		local n=ask("Directory:"+nl$+dir$, "Information","ok","")
+	else.if Run1index=7 then
+		local olddir$=dir$
+		if docFolder$<>"" then dir docFolder$
+	       dir ? "*","Documents Folder"
+	       docFolder$=dir$
+	       dir olddir$
 	else.If ask(if$(Run1index=0->"Module to run","Command(s) to execute"	+UseShow$),,,,,mod2run$)=1 Then
 		Read mod2run$
 		Clear TestFile$
 		TestFile$=If$(Run1index=2->"Set Slow"+nl$,"")
+		if docFolder$<>"" then TestFile$="Dir "+docFolder$+nl$
 		TestFile$="Module TestThis {"+Pad.Text$+nl$+"}"+nl$
 		TestFile$="Title "+quote$(LeftPart$(Caption$," -"))+nl$
 		TestFile$="Script TestThis :"+If$(Run1index=0->"Test ","")+mod2run$+": Push Key$: Drop: End"
@@ -5356,6 +5366,7 @@ Save2:
 			Dir CurDir$
 			Method NotePad, "CloseNow"
 		Else
+			//if docFolder$<>"" then dir docFolder$
 			FileName$=Dir$+"Untitled.gsb"
 			Caption$=TitleStr$(File.Name$(Filename$)) +" - M2000 Pad"
 			Method Pad, "Resize"
@@ -5469,7 +5480,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 36 for M2000 Interpreter version 11, revision 9 and above"
+	Report " A collection of modules for tests version 37 for M2000 Interpreter version 11, revision 9 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1

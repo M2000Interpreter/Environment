@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 11
 Global Const VerMinor = 0
-Global Const Revision = 12
+Global Const Revision = 13
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5374,6 +5374,9 @@ Do
                 rightoperator = False
                 Exit Function
             End If
+    ElseIf lookTwoSame(aa$, "/") Then
+          rightoperator = True
+         Exit Do
     ElseIf FastSymbol(aa$, "/") Then
             If logical(bstack, aa$, R) Then
                 MUL = 2
@@ -8034,7 +8037,24 @@ num79: ' "NUMBER", "ΑΡΙΘΜΟΣ", "ΤΙΜΗ"
     IsNumberNew = True
     Exit Function
     Else
-     
+    If bstack.soros.count > 0 Then
+    If bstack.soros.IsObj Then
+    If TypeOf bstack.soros.objref(1) Is mHandler Then
+    Set usehandler = bstack.soros.objref(1)
+    If usehandler.t1 = 4 Then
+        R = SG * usehandler.index_cursor * usehandler.sign
+        bstack.soros.drop 1
+        IsNumberNew = True
+        Exit Function
+    ElseIf usehandler.UseIterator Then
+        R = SG * usehandler.index_cursor
+        bstack.soros.drop 1
+        IsNumberNew = True
+        Exit Function
+    End If
+    End If
+    End If
+    End If
             StackTopNotNumber a$
   
     IsNumberNew = False
@@ -25942,7 +25962,7 @@ If Id& < 100 Then
     If (Id& Mod 10) > 0 Then
     LCTbasket dd, prive, y&, x&
     dd.FontTransparent = True
-    dd.forecolor = mycolor(prive.mypen)
+    dd.ForeColor = mycolor(prive.mypen)
        PlainBaSket dd, prive, Tag$, True, True
     End If
     End If
@@ -25974,7 +25994,7 @@ Else
     If half = 1 Then
     dd.currentY = dd.currentY + prive.Yt \ 2 '+ mybasket.uMineLineSpace \ 2
     End If
-    dd.forecolor = mycolor(prive.mypen)
+    dd.ForeColor = mycolor(prive.mypen)
     
     If Not D Is dd Then
     Set DDD.Owner = dd
@@ -34458,7 +34478,7 @@ DDD.FontName = .FontName
 DDD.Font.charset = .charset
 DDD.FontSize = .SZ
 End If
-DDD.forecolor = .mypen
+DDD.ForeColor = .mypen
 End With
 End Sub
 Function GetCode(dq As Object) As Long
@@ -36031,9 +36051,15 @@ Function StructPage(basestack As basetask, rest$, Lang As Long, ByVal Offset, By
 Dim what$, offset1 As Long, i As Long, s$, b$, p As Variant, w2 As Long, maxoffset As Long, probeoffset As Long, usehandler As mHandler
 Dim itissingle As Boolean
     b$ = NLtrim$(block(rest$))
-   If Not FastSymbol(rest$, "}") Then Exit Function
+    If Not FastSymbol(rest$, "}") Then Exit Function
+    If FastSymbol(b$, vbCrLf, , 2) Then
+        GoTo cont567
+    Else
+        GoTo again1
+    End If
 again:
     If FastSymbol(b$, vbCrLf, , 2) Then
+cont567:
     Do
         While FastSymbol(b$, vbCrLf, , 2)
         Wend
@@ -36054,8 +36080,9 @@ again1:
     probeoffset = 0
     If StructPage(basestack, b$, Lang, Offset, probeoffset, offsetlist, lasthead$) Then
         If probeoffset > maxoffset Then maxoffset = probeoffset
+        FastSymbol b$, ","
         ' leave offset as is
-    GoTo again
+    GoTo cont567
     Else
     Exit Function
     End If
@@ -36074,17 +36101,35 @@ again1:
         End If
 
         If StructPage(basestack, b$, Lang, Offset, probeoffset, offsetlist, lasthead$ + what$ + ".") Then
+            If FastSymbol(b$, "*") Then
+                p = 1&
+                If Not IsExp(basestack, b$, p) Then MissNumExpr: Exit Function
+                p = MyRound(p)
+                If p * (probeoffset - Offset) + Offset > &H1FFFFFFF Then ' half gigabyte for struct (is very big too)
+                    GoTo err111
+                ElseIf p <= 0 Then
+                    GoTo err222
+                End If
+                probeoffset = p * (probeoffset - Offset) + Offset
+            End If
+            
+            
             If probeoffset > maxoffset Then maxoffset = probeoffset
+
             ' leave offset as is
     
             offsetlist.AddKey myUcase(lasthead$ + what$, True), CVar(Offset)
             If offsetlist.Done Then
             offsetlist.sValue = probeoffset - Offset
+            If FastSymbol(b$, ";") Then
+            Offset = probeoffset
+            End If
             ' keytype not used for strucrures except for single values
             ' so Eval() can read single from 4 bytes
             If itissingle Then offsetlist.KeyTypeValue = CInt(vbSingle): itissingle = False
             End If
-        GoTo again
+            FastSymbol b$, ","
+        GoTo cont567
         Else
         Exit Function
         End If
@@ -36148,27 +36193,28 @@ comehere:
                                    End If
     
     Else
-    
-    offset1 = 2
-    End If
-    w2 = offset1  ' negative offset for strings
-    p = 1
-    If FastSymbol(b$, "*") Then
-    If Not IsExp(basestack, b$, p) Then
-           MissNumExpr
-        Exit Function
-    Else
-    p = MyRound(p)
-    If p * Abs(offset1) + Offset > &H1FFFFFFF Then  ' half gigabyte for struct (is very big too)
-        MyEr "Too big number for struct", "Μεγάλο νούμερο για δομή"
-        Exit Function
-    ElseIf p < 0 Then
-        MyEr "Too big number for struct", "Μεγάλο νούμερο για δομή"
-        Exit Function
-    Else
-        offset1 = offset1 * CLng(p)
-    End If
-    End If
+        offset1 = 2
+        End If
+        w2 = offset1  ' negative offset for strings
+        p = 1
+        If FastSymbol(b$, "*") Then
+            If Not IsExp(basestack, b$, p) Then
+                MissNumExpr
+            Exit Function
+        Else
+            p = MyRound(p)
+            If p * Abs(offset1) + Offset > &H1FFFFFFF Then  ' half gigabyte for struct (is very big too)
+err111:
+                MyEr "Too big size for struct", "Μεγάλο μέγεθος για δομή"
+                Exit Function
+            ElseIf p <= 0 Then
+err222:
+                MyEr "size is zero or less for struct", "Μεγάλο νούμερο για δομή"
+                Exit Function
+            Else
+                offset1 = offset1 * CLng(p)
+            End If
+        End If
     End If
     If offsetlist.ExistKey(lasthead$ + what$) Then
     MyEr "double name is same struct", "διπλή εισαγωγή ονόματος"
@@ -36181,16 +36227,25 @@ comehere:
     If offsetlist.Done Then offsetlist.sValue = w2
     If itissingle Then offsetlist.KeyTypeValue = CInt(vbSingle): itissingle = False
     Offset = Offset + Abs(offset1)
+    If FastSymbol(b$, ",") Then
+    If NocharsInLine(b$) Or b$ = vbNullString Then
+    GoTo cont147
+    End If
+    While FastSymbol(b$, vbCrLf, , 2)
+    Wend
+    Else
     SetNextLineNL b$
     Do
         While FastSymbol(b$, vbCrLf, , 2)
         Wend
     Loop Until Not NocharsInLine(b$) Or b$ = vbNullString
+    End If
+cont147:
     Loop Until Not Between(FastPureLabel(b$, what$), 1, 3, 2)
-        If maxoffset < Offset Then
-    offset2 = Offset
+    If maxoffset < Offset Then
+        offset2 = Offset
     Else
-    offset2 = maxoffset
+        offset2 = maxoffset
     End If
     StructPage = True
     GoTo again1
@@ -41474,6 +41529,7 @@ comehere:
                     useBuffer.ResizeItems CLng(p), par
                     End If
                     Else
+                    useBuffer.ClearError
                         If itissingle Then
                             useBuffer.Construct pp, CLng(p), par, Runnable, vbSingle
                         Else
@@ -41492,7 +41548,7 @@ comehere:
                         If itissingle Then
                             useBuffer.Construct pp, 1, par, Runnable, vbSingle
                         Else
-                            useBuffer.Construct pp, 1, par, Runnable
+                            useBuffer.Construct pp, 1, par, Runnable ', useBuffer.ItemSize
                         End If
                         End If
                     End If
@@ -42538,7 +42594,7 @@ End If
                    LEVCOLMENU = 2
                            If FastSymbol(rest$, ",") Then
                                 If IsExp(bstack, rest$, p) Then
-                                   Form1.List1.forecolor = mycolor(p)
+                                   Form1.List1.ForeColor = mycolor(p)
                                    LEVCOLMENU = 3
                                    Else
                                    MissNumExpr
@@ -49828,13 +49884,19 @@ If Left$(b$, 1) = "_" Then
             Exit Function
         End If
 ElseIf MaybeIsSymbol(b$, "/*-+=~^|<") Then
+        If Mid$(b$, i, 2) = "//" Then
+            If GetSub(w$, v) Then
+                ExecuteVar = 6 ' GoTo autogosub
+            Else
+                Exec1 = 0
+            End If
+            Exit Function
+        End If
         If Mid$(b$, i, 2) = "<=" Then
         ' LOOK GLOBAL
-        If GetVar(bstack, w$, v, True, , , , usetype, isglobal) Then
-       
-        w$ = varhash.lastkey
+            If GetVar(bstack, w$, v, True, , , , usetype, isglobal) Then
+            w$ = varhash.lastkey
             Mid$(b$, i, 2) = "  "
-            
             GoTo assignvalue
         ElseIf GetlocalVar(w$, v) Then
             If TypeOf var(v) Is Group Then

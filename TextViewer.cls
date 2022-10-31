@@ -861,7 +861,7 @@ If UsedAsTextBox Then
 b.Bottom = a.Bottom - 2
 End If
 Dim skipcolor As Boolean
-OldColor = glistN.forecolor
+OldColor = glistN.ForeColor
 If item < 0 Then  ' this is a headline
     FillBack thisHDC, b, glistN.CapColor
     mDoc1.TextParagraphLine2 1, what$, ThatPara, False
@@ -992,7 +992,7 @@ Else
             SetTextColor thisHDC, SelectionTextColor
         End If
     ElseIf Not skipcolor Then
-        SetTextColor thisHDC, glistN.forecolor
+        SetTextColor thisHDC, glistN.ForeColor
     End If
     If Final$ <> "" Or fbypass Then
         If Not fbypass Then
@@ -3957,13 +3957,13 @@ End Property
 Public Property Get BackColor() As OLE_COLOR
     BackColor = glistN.BackColor
 End Property
-Public Property Get forecolor() As OLE_COLOR
-    forecolor = glistN.forecolor
+Public Property Get ForeColor() As OLE_COLOR
+    ForeColor = glistN.ForeColor
 End Property
 
-Public Property Let forecolor(ByVal RHS As OLE_COLOR)
+Public Property Let ForeColor(ByVal RHS As OLE_COLOR)
 
-    glistN.forecolor = RHS
+    glistN.ForeColor = RHS
 
 End Property
 

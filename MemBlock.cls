@@ -86,8 +86,11 @@ Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As L
 
 Const CF_ENHMETAFILE = 14
 Sub Construct(ByteLen As Long, Optional Times As Long = 1, Optional clearme As Long = 0, Optional executable As Boolean = False, Optional thatbasicitem As Integer)
-
-If mItems <> 0 Then ErrorMes = 1: Exit Sub
+If mItems <> 0 Then
+If mItems <> Times Or mBytes <> ByteLen * Times Then
+    ErrorMes = 1: Exit Sub
+    End If
+End If
 If Times < 1 Then ErrorMes = 2: Exit Sub
 If ByteLen < 0 Then
 BasicItem = vbString
@@ -101,7 +104,21 @@ If ErrorMes <> 0 Then Exit Sub
 ItemLen = ByteLen
 mItems = Times
 mExecBloc = Not executable
-mPtr = Blockmalloc(ByteLen * Times, clearme, mExecBloc)
+If clearme Then
+    If mPtr <> 0 Then
+        If NoRun Then
+            If BlockSize(mPtr) > 0 Then
+                BlockFree mPtr
+            End If
+        Else
+                BlockFreeVirtual mPtr, mBytes
+        End If
+        mPtr = 0
+    End If
+End If
+If mPtr = 0 Then
+    mPtr = Blockmalloc(ByteLen * Times, clearme, mExecBloc)
+End If
 'If mExecBloc Then
 If mPtr <> 0 Then mBytes = ByteLen * Times
 End Sub
@@ -251,14 +268,14 @@ End Sub
 Private Sub Class_Terminate()
 Set structref = Nothing
 If mPtr <> 0 Then
-If NoRun Then
-If BlockSize(mPtr) > 0 Then
-    BlockFree mPtr
-End If
-Else
-        BlockFreeVirtual mPtr, mBytes
-        mBytes = 0
-End If
+    If NoRun Then
+        If BlockSize(mPtr) > 0 Then
+            BlockFree mPtr
+        End If
+    Else
+            BlockFreeVirtual mPtr, mBytes
+            mBytes = 0
+    End If
 End If
 mPtr = 0
 End Sub
@@ -540,7 +557,7 @@ there1:
    
  
 End Function
-Public Function DrawEmfToHdc(Scr As Object, X As Long, Y As Long, angle!, Width As Long, Height As Long) As Boolean
+Public Function DrawEmfToHdc(Scr As Object, x As Long, y As Long, angle!, Width As Long, Height As Long) As Boolean
    Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
    If mSubtype = 0 Then
         If IsEmf Then
@@ -557,7 +574,7 @@ Public Function DrawEmfToHdc(Scr As Object, X As Long, Y As Long, angle!, Width 
         .pvData = Me.GetPtr(0)
     End With
     CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-    DrawEmfToHdc = DrawEmfFromBuffer(Scr, a(), X, Y, angle!, Width, Height)
+    DrawEmfToHdc = DrawEmfFromBuffer(Scr, a(), x, y, angle!, Width, Height)
     
     CopyMemory ByVal VarPtrArray(a), 0&, 4
  
@@ -584,7 +601,7 @@ Public Function DrawSpriteToHdc(bstack As basetask, sprt As Boolean, angle!, zoo
     CopyMemory ByVal VarPtrArray(a), 0&, 4
  
 End Function
-Public Function DrawImageToHdc(where As Object, Optional X As Long = 0&, Optional Y As Long = 0&, Optional Width As Long = -1, Optional Height As Long = -1) As Boolean
+Public Function DrawImageToHdc(where As Object, Optional x As Long = 0&, Optional y As Long = 0&, Optional Width As Long = -1, Optional Height As Long = -1) As Boolean
    Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
      With a1
         .cbElements = 1
@@ -594,7 +611,7 @@ Public Function DrawImageToHdc(where As Object, Optional X As Long = 0&, Optiona
         .pvData = Me.GetPtr(0)
     End With
    CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-   DrawImageToHdc = DrawImageFromBuffer(a(), where.hdc, X, Y, (Width), (Height))
+   DrawImageToHdc = DrawImageFromBuffer(a(), where.Hdc, x, y, (Width), (Height))
    CopyMemory ByVal VarPtrArray(a), 0&, 4
  
 End Function
@@ -697,13 +714,13 @@ If mItems > 0 Then
 End If
 End Function
 Public Function Search(from As Long, what) As Long
-Dim limit As Long, B As Byte, i As Long, w As Byte
-B = Abs(what) And &HFF
+Dim limit As Long, b As Byte, i As Long, w As Byte
+b = Abs(what) And &HFF
 limit = SizeByte - 1
 
 For i = from To limit
     GetMem1 GetBytePtr(i), w
-    If B = w Then
+    If b = w Then
     Search = i + 1: Exit Function
     End If
 Next
@@ -855,7 +872,7 @@ Exit Function
 End If
     On Error Resume Next
     zz.mm = 1
-    getEmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.hdc, zz)
+    getEmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.Hdc, zz)
 End Function
 
 Public Sub SentWmfToClipBoard()

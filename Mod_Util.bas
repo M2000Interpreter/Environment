@@ -969,11 +969,11 @@ End Sub
 
 
 Public Sub TextColor(D As Object, tc As Long)
-D.forecolor = tc And &HFFFFFF
+D.ForeColor = tc And &HFFFFFF
 End Sub
 Public Sub TextColorB(D As Object, mb As basket, tc As Long)
-D.forecolor = tc And &HFFFFFF
-mb.mypen = D.forecolor
+D.ForeColor = tc And &HFFFFFF
+mb.mypen = D.ForeColor
 End Sub
 
 Public Sub LCTNo(DqQQ As Object, ByVal y As Long, ByVal x As Long)
@@ -2896,7 +2896,7 @@ dq.FontName = .FontName
 dq.Font.charset = .charset
 dq.FontSize = .SZ
 End If
-dq.forecolor = .mypen And &HFFFFFF
+dq.ForeColor = .mypen And &HFFFFFF
 
 If Not dq.BackColor = .Paper Then
    dq.BackColor = .Paper
@@ -3392,8 +3392,8 @@ If Not IsSupervisor Then
     LastErNum = 0
     If ss$ <> "" Then
      skipthat = interpret(bstack, ss$)
-     If mycolor(PenOne) <> D.forecolor Then
-     PenOne = -D.forecolor
+     If mycolor(PenOne) <> D.ForeColor Then
+     PenOne = -D.ForeColor
      End If
     End If
 End If
@@ -3405,7 +3405,7 @@ b$ = "ÐÅÑÉÂÁËËÏÍ "
 Else
 b$ = "ENVIRONMENT "
 End If
-D.forecolor = mycolor(PenOne)
+D.ForeColor = mycolor(PenOne)
 LCTbasket D, players(DisForm), 0, 0
 wwPlain2 bstack, players(DisForm), b$ + "M2000", D.Width, 0, 0 '',True
 ICO = TextWidth(D, b$ + "M2000") + 100
@@ -3622,7 +3622,7 @@ Hook Form1.hWnd, Nothing '.glistN
 .UsedAsTextBox = False
 .glistN.LeftMarginPixels = 10
 .glistN.maxchar = 0
-If D.forecolor = tcol Then
+If D.ForeColor = tcol Then
 Set Form1.Point2Me = D
 If D.Name = "Form1" Then
 .glistN.SkipForm = False
@@ -3632,7 +3632,7 @@ End If
 Form1.TEXT1.glistN.BackStyle = 1
 End If
 Dim scope As Long
-scope = ChooseByHue(D.forecolor, rgb(16, 12, 8), rgb(253, 245, 232))
+scope = ChooseByHue(D.ForeColor, rgb(16, 12, 8), rgb(253, 245, 232))
 If D.BackColor = ChooseByHue(scope, D.BackColor, rgb(128, 128, 128)) Then
 If lightconv(scope) > 192 Then
 scope = lightconv(scope) - 128
@@ -3657,7 +3657,7 @@ End If
 
 .BackColor = tcol
 
-.forecolor = D.forecolor
+.ForeColor = D.ForeColor
 Form1.SetText1
 .glistN.overrideTextHeight = prive.overrideTextHeight '         fonttest.TextHeight("fj")
 .Font.Name = D.Font.Name
@@ -3676,7 +3676,7 @@ Else
 Form1.TEXT1.move x& * .Xt + D.Left, y& * .Yt + D.Top, (x1& - x&) * .Xt + .Xt, (y1& - y&) * .Yt + .Yt
 End If
 End With
-If D.forecolor = tcol Then
+If D.ForeColor = tcol Then
 If D.Name = "Form1" Then
 Form1.TEXT1.glistN.RepaintFromOut D.Image, D.Left, D.Top
 Else
@@ -3858,7 +3858,7 @@ Else
 End If
 
 Dim scope As Long
-scope = ChooseByHue(D.forecolor, rgb(16, 12, 8), rgb(253, 245, 232))
+scope = ChooseByHue(D.ForeColor, rgb(16, 12, 8), rgb(253, 245, 232))
 If D.BackColor = ChooseByHue(scope, D.BackColor, rgb(128, 128, 128)) Then
 If lightconv(scope) > 192 Then
 scope = lightconv(scope) - 128
@@ -3883,7 +3883,7 @@ End If
 '.glistN.AddPixels = 0
 .glistN.ZOrder 0
 .BackColor = D.BackColor
-.forecolor = D.forecolor
+.ForeColor = D.ForeColor
 .Font.Name = D.Font.Name
 Form1.SetText1
 .glistN.overrideTextHeight = prive.overrideTextHeight '   fonttest.TextHeight("fj")
@@ -4283,8 +4283,8 @@ Form1.Font.Strikethrough = False
 .Font.Name = D.Font.Name
 Form1.Font.charset = D.Font.charset
 .Font.Size = D.Font.Size
-If LEVCOLMENU < 2 Then .BackColor = D.forecolor
-If LEVCOLMENU < 3 Then .forecolor = D.BackColor
+If LEVCOLMENU < 2 Then .BackColor = D.ForeColor
+If LEVCOLMENU < 3 Then .ForeColor = D.BackColor
 .Font.bold = D.Font.bold
 .Font.Italic = D.Font.Italic
 .addpixels = 2 * prive.uMineLineSpace / dv15
@@ -21778,7 +21778,7 @@ For i = -2 To 1000
     players(i) = Zero
     Prefresh(i) = zerocounter
 Next i
-Scr.forecolor = mycolor(11)
+Scr.ForeColor = mycolor(11)
 basestack.myBold = False
 basestack.myitalic = False
 pa = 0
@@ -26170,7 +26170,7 @@ CodePage:
         ' usercodepage for use compare.
         ' also change to form.
         On Error Resume Next
-        If Not IsValidCodePage(CLng(p)) Then
+        If IsValidCodePage(CLng(p)) = 0 Then
             NoValidCodePage
             ProcSalata = True
         Exit Function
@@ -27014,8 +27014,14 @@ makeitnow:
                      Set usehandler = var(i)
 Set offsetlist = usehandler.objref
 ' so now we have the inventory
+Dim mm As Long
+If Fast2Label(rest$, "APPEND", 6, "ÐÑÏÓÈÇÊÇ", 8, 8) Then
+    mm = offsetlist.StructLen
+End If
 If FastSymbol(rest$, "{") Then
-    If StructPage(basestack, rest$, Lang, 0, Offset, offsetlist, "") Then
+
+    
+    If StructPage(basestack, rest$, Lang, mm, Offset, offsetlist, "") Then
     If offsetlist Is Nothing Then Exit Function
     offsetlist.StructLen = Offset
     usehandler.ReadOnly = True
