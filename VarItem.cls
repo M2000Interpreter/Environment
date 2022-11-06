@@ -15,91 +15,87 @@ Option Explicit
 Public mItem As Variant
 Public slot As Byte
 Public mTypeName As Byte
-Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-
 Property Let Typename(ByRef RHS As String)
-mTypeName = Asc(RHS)
+    mTypeName = Asc(RHS)
 End Property
-
- Property Get Typename() As String
-Typename = Chr(mTypeName)
+Property Get Typename() As String
+    Typename = Chr(mTypeName)
 End Property
 Property Let ItemStrVar(ByRef RHS As Variant)
     slot = 4
     mItem = RHS
 End Property
 Property Let ItemStr(ByRef RHS As String)
-slot = 4
-MoveStringToVariant RHS, mItem
+    slot = 4
+    MoveStringToVariant RHS, mItem
 End Property
 Public Sub PopString(s$)
-If slot = 4 Then
-SwapString2Variant s$, mItem
-ElseIf slot = 5 Then
-s$ = mItem
-Else
-s$ = vbNullString
-End If
+    If slot = 4 Then
+        SwapString2Variant s$, mItem
+    ElseIf slot = 5 Then
+        s$ = mItem
+    Else
+        s$ = vbNullString
+    End If
 End Sub
- Property Get ItemStr() As String
-If slot > 3 Then ItemStr = mItem
+Property Get ItemStr() As String
+    If slot > 3 Then ItemStr = mItem
 End Property
- Property Let ItemDouble(ByVal RHS As Variant)
- slot = 2
-mItem = RHS
+Property Let ItemDouble(ByVal RHS As Variant)
+    slot = 2
+    mItem = RHS
 End Property
 
 Property Get ItemDouble() As Variant
-If slot = 2 Then ItemDouble = mItem
+    If slot = 2 Then ItemDouble = mItem
 End Property
- Property Let ItemVariant(RHS As Variant)
- slot = 2
-mItem = RHS
+Property Let ItemVariant(RHS As Variant)
+    slot = 2
+    mItem = RHS
 End Property
- Property Get ItemVariantOnly() As Variant
- ItemVariantOnly = mItem
+Property Get ItemVariantOnly() As Variant
+    ItemVariantOnly = mItem
 End Property
 
- Property Get ItemVariant() As Variant
- If slot = 2 Then ItemVariant = mItem
+Property Get ItemVariant() As Variant
+    If slot = 2 Then ItemVariant = mItem
 End Property
- Property Get ItemNoObject() As Variant
- If slot <> 1 Then ItemNoObject = mItem
+
+Property Get ItemNoObject() As Variant
+    If slot <> 1 Then ItemNoObject = mItem
 End Property
 Property Get NoValue() As Boolean
-If slot = 1 Then NoValue = mItem Is Nothing Else NoValue = slot = 0
+    If slot = 1 Then NoValue = mItem Is Nothing Else NoValue = slot = 0
 End Property
-
 Public Property Set ArrayRef(RHS As Object)
     slot = 9
     Set mItem = RHS
 End Property
 Public Property Get ArrayRef() As Object
-If slot = 9 Then Set ObjectRef = mItem
+    If slot = 9 Then Set ObjectRef = mItem
 End Property
 Public Property Set ObjectRef(RHS As Object)
     slot = 1
     Set mItem = RHS
 End Property
 Public Property Get ObjectRef() As Object
-If slot = 1 Then Set ObjectRef = mItem
+    If slot = 1 Then Set ObjectRef = mItem
 End Property
-
 Public Sub Recycle()
-Dim obj As IUnknown, GetRefCount As Long
-Set obj = Me
-CopyMemory GetRefCount, ByVal (ObjPtr(obj)) + 4, 4
-If GetRefCount > 4 Then Exit Sub
-On Error Resume Next
-mItem = vbEmpty
-slot = 0
-mTypeName = 0
-
-TrushCount = TrushCount + 1
-If TrushCount > UBound(Trush) Then
-    ReDim Preserve Trush(UBound(Trush) * 2)
-End If
-Set Trush(TrushCount) = Me
+    Dim obj As IUnknown, GetRefCount As Long
+    Set obj = Me
+    CopyMemory GetRefCount, ByVal (ObjPtr(obj)) + 4, 4
+    If GetRefCount > 4 Then Exit Sub
+    On Error Resume Next
+    mItem = vbEmpty
+    slot = 0
+    mTypeName = 0
+    TrushCount = TrushCount + 1
+    If TrushCount > UBound(Trush) Then
+        ReDim Preserve Trush(UBound(Trush) * 2)
+    End If
+    Set Trush(TrushCount) = Me
 End Sub
 

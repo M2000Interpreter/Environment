@@ -302,8 +302,16 @@ If btASM = 0 Then
 
     AddCall pASM, fnc                   ' CALL rel addr
     AddByte pASM, &HC3                  ' RET
+    Dim bt As Byte
+Dim ii As Long
 
-    CallPointer = CallWindowProcA(btASM, _
+'For ii = btASM To pASM - 1
+' CpyMem bt, ByVal ii, 1
+' Debug.Print Right$("00" + Hex$(bt), 2);
+' Next ii
+' Debug.Print
+ 
+  CallPointer = CallWindowProcA(btASM, _
                                   0, 0, 0, 0)
             
              VirtualUnlock btASM, MAXCODE

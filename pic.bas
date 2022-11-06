@@ -21,7 +21,7 @@ Private Declare Function GetKeyboardState Lib "user32" (kbArray As KeyboardBytes
 Dim kbArray As KeyboardBytes
 Public fonttest As PictureBox
 Private Declare Function GetTextMetrics Lib "gdi32" _
-Alias "GetTextMetricsA" (ByVal Hdc As Long, _
+Alias "GetTextMetricsA" (ByVal hDC As Long, _
 lpMetrics As TEXTMETRIC) As Long
 Private Type TEXTMETRIC
 tmHeight As Long
@@ -109,7 +109,7 @@ Public Type tagSize
     cX As Long
     cY As Long
 End Type
-Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal Hdc As Long, lpAspectRatio As tagSize) As Long
+Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hDC As Long, lpAspectRatio As tagSize) As Long
 Declare Function CreateRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Declare Function CombineRgn Lib "gdi32" (ByVal hDestRgn As Long, ByVal hSrcRgn1 As Long, ByVal hSrcRgn2 As Long, ByVal nCombineMode As Long) As Long
 Public Declare Function SetWindowRgn Lib "user32" (ByVal hWnd As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
@@ -153,20 +153,20 @@ Type bitmap
         bmBitsPixel As Integer
         bmBits As Long
 End Type
-Declare Function StretchBlt Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
-Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal Hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Declare Function CreateCompatibleDC Lib "gdi32" (ByVal Hdc As Long) As Long
-Declare Function SelectObject Lib "gdi32" (ByVal Hdc As Long, ByVal hObject As Long) As Long
-Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) As Long
+Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hDC As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
+Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
+Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
 Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 'Declare Function GetObject Lib "gdi32" Alias "GetObjectA" (ByVal hObject As Long, ByVal nCount As Long, lpObject As Any) As Long
-Declare Function GetPixel Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long) As Long
-Declare Function SetPixel Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal Hdc As Long, ByVal nIndex As Long) As Long
+Declare Function GetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long) As Long
+Declare Function SetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function GetDesktopWindow Lib "user32" () As Long
-Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal Hdc As Long) As Long
+Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long) As Long
 Private Const BITSPIXEL = 12         '  Number of bits per pixel
 Private Declare Function RegisterClipboardFormat Lib "user32" Alias _
    "RegisterClipboardFormatA" (ByVal lpString As String) As Long
@@ -1184,9 +1184,9 @@ If cDibbuffer0.create(myw, myh) Then
 On Error GoTo there
         With bstack.Owner
          If bstack.toprinter Then
-         cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+         cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
          Else
-        cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
             End If
             BACKSPRITE = DIBtoSTR(cDibbuffer0)
         End With
@@ -1194,8 +1194,8 @@ End If
 there:
 End Function
 
-Private Function MyMod(R1 As Single, po As Single) As Single
-MyMod = R1 - Fix(R1 / po) * po
+Private Function MyMod(r1 As Single, po As Single) As Single
+MyMod = r1 - Fix(r1 / po) * po
 End Function
 '
 Public Function RotateDib(bstack As basetask, cDibbuffer0 As cDIBSection, Optional ByVal angle! = 0, Optional ByVal zoomfactor As Single = 100, _
@@ -1267,9 +1267,9 @@ On Error GoTo there
    
 With bstack.Owner
     If bstack.toprinter Then
-        cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
     Else
-        cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
     End If
     If Not nogetback Then BACKSPRITE = DIBtoSTR(cDibbuffer0)
 End With
@@ -1467,9 +1467,9 @@ cDibbuffer0.Cls bckColor
 Else
         With bstack.Owner
         If bstack.toprinter Then
-        cDibbuffer0.LoadPictureBlt .Hdc, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
+        cDibbuffer0.LoadPictureBlt .hDC, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
         Else
-                      cDibbuffer0.LoadPictureBlt .Hdc, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
+                      cDibbuffer0.LoadPictureBlt .hDC, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
            End If
         End With
         End If
@@ -1593,7 +1593,7 @@ Sub Conv24(cDibbuffer0 As Object)
  Dim cDIBbuffer1 As Object
  Set cDIBbuffer1 = New cDIBSection
 Call cDIBbuffer1.create(cDibbuffer0.Width, cDibbuffer0.Height)
-cDIBbuffer1.LoadPictureBlt cDibbuffer0.Hdc
+cDIBbuffer1.LoadPictureBlt cDibbuffer0.hDC
 Set cDibbuffer0 = cDIBbuffer1
 Set cDIBbuffer1 = Nothing
 End Sub
@@ -3125,7 +3125,7 @@ ismine = True
 a$ = myUcase(a$, True)
 Select Case a$
 Case "@(", "$(", "~(", "?", "->", "[]"
-Case "ABOUT", "ABOUT$", "ABS(", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
+Case "ABOUT", "ABOUT$", "ABS(", "ADDRESSOF", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
 Case "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
 Case "BACK", "BACKGROUND", "BACKWARD(", "BANK(", "BASE", "BEEP", "BINARY", "BINARY.ADD(", "BINARY.AND(", "BINARY.NEG(", "BINARY.NOT("
 Case "BINARY.OR(", "BINARY.ROTATE(", "BINARY.SHIFT(", "BINARY.XOR(", "BITMAPS", "BMP$(", "BOLD"
@@ -3197,7 +3197,7 @@ Case "цемийес", "цемийг", "цемийо", "циа", "цомийо", "цяалла", "цяалла$", "цяалл
 Case "цяажг$(", "цяаье", "цягцояа", "цымиа", "дапед(", "деийтг.лояжг", "деийтгс", "деийтгс(", "деийтгс.йол", "деийтгс.ь", "деийтгс.у", "деийтгс.в"
 Case "деийтгса.ь", "деийтгса.у", "деийтгса.в", "деине", "дей(", "дейаен", "дейаен$(", "дем", "демевеи(", "дениос", "дени$(", "денилеяос$(", "дес", "дглосио"
 Case "диа", "диабасе", "диацяажг", "диадийтуо", "диадийтуо$", "диадовийо", "диайопг", "диайоптес", "диалесоу", "диаяхяысг", "диаяхяысг(", "диаяйеиа", "диастасг("
-Case "диастиво", "диажамеиа", "диажамеиа$", "диажамо", "диажуцг", "диайопг", "диейоье", "дийтуо$", "диояхысе"
+Case "диастиво", "диажамеиа", "диажамеиа$", "диажамо", "диажуцг", "диайопг", "диейоье", "диеухумсгапо", "дийтуо$", "диояхысе"
 Case "дипка", "дипко", "дипкос", "дойилг", "дойилг(", "долг", "дяолеас", "дуадийг.пеяистяожг(", "дуадийо", "дуадийо(", "дуадийо.айеяаио("
 Case "дуадийо.амти(", "дуадийо.амтистяожо(", "дуадийо.апо(", "дуадийо.г(", "дуадийо.йаи(", "дуадийо.окисхгсг(", "дуадийо.ови(", "дуадийо.пяосхесг(", "дуадийо.пяо(", "дуолиса(", "дысе"
 Case "еццяажес(", "еццяажо", "еццяажоу.кенеис(", "еццяажоу.лгйос(", "еццяажоу.ломадийес.кенеис(", "еццяажоу.пая(", "еццяаьило(", "ецйуяо(", "еий$("
@@ -3373,8 +3373,8 @@ End Function
 
 Static Function ValidNum(a$, Final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
 Dim R As Long
-Dim R1 As Long
-R1 = 1
+Dim r1 As Long
+r1 = 1
           If Not NoUseDec Then
                                 If OverideDec Then
                                     a$ = Replace(a$, NowDec$, ".")
@@ -3385,43 +3385,43 @@ R1 = 1
               
 Dim v As Double, b$
 If Final Then
-R1 = IsNumberOnly(a$, R1, v, R, cutdecimals)
+r1 = IsNumberOnly(a$, r1, v, R, cutdecimals)
 
-R1 = (R1 And Len(a$) <= R) Or (a$ = vbNullString)
-If R1 Then
+r1 = (r1 And Len(a$) <= R) Or (a$ = vbNullString)
+If r1 Then
 Select Case checktype
 Case vbLong
 On Error Resume Next
     v = CLng(v)
-    If Err.Number > 0 Then Err.Clear: R1 = False
+    If Err.Number > 0 Then Err.Clear: r1 = False
 
 Case vbSingle
 On Error Resume Next
      v = CSng(v)
-    If Err.Number > 0 Then Err.Clear: R1 = False
+    If Err.Number > 0 Then Err.Clear: r1 = False
 Case vbDecimal
 On Error Resume Next
     v = CDec(v)
-    If Err.Number > 0 Then Err.Clear: R1 = False
+    If Err.Number > 0 Then Err.Clear: r1 = False
 Case vbCurrency
 On Error Resume Next
     v = CCur(v)
-    If Err.Number > 0 Then Err.Clear: R1 = False
+    If Err.Number > 0 Then Err.Clear: r1 = False
 End Select
 
 
 End If
 Else
 If (a$ = "-") Or a$ = vbNullString Then
-R1 = True
+r1 = True
 Else
- R1 = IsNumberQuery(a$, R1, v, R, cutdecimals)
+ r1 = IsNumberQuery(a$, r1, v, R, cutdecimals)
     If a$ <> "" Then
          If R < 2 Then
-                R1 = Not (R <= Len(a$))
+                r1 = Not (R <= Len(a$))
                 a$ = vbNullString
         Else
-                R1 = R1 And Not R <= Len(a$)
+                r1 = r1 And Not R <= Len(a$)
                 a$ = Mid$(a$, 1, R - 1)
         End If
  End If
@@ -3434,7 +3434,7 @@ Else
                             Else
                                 a$ = Replace(a$, ".", QueryDecString)
                             End If
-ValidNum = R1
+ValidNum = r1
 End Function
 Function ValidNumberOnly(a$, R As Variant, skipdec As Boolean) As Boolean
 R = R - R
@@ -4369,7 +4369,7 @@ myid() = Array("THIS", 1, "ауто", 1, "RND", 2, "туваиос", 2, "PEN", 3, "пема", 3
 , "TICK", 73, "тий", 73, "TODAY", 74, "сглеяа", 74, "NOW", 75, "тыяа", 75, "MENU.VISIBLE", 76, "епикоцес.жамеяес", 76, "MENUITEMS", 77, "епикоцес", 77 _
 , "MENU", 78, "епикоцг", 78, "NUMBER", 79, "аяихлос", 79, "тилг", 79, "LAMBDA", 80, "калда", 81, "GROUP", 83, "олада", 83, "ARRAY", 84, "пимайас", 84, "[]", 85 _
 , "сыяос", 86, "STACK", 86, "ISWINE", 87, "SHOW", 88, "охомг", 88, "OSBIT", 89, "WINDOW", 90, "сусйеуг", 90, "MONITOR.STACK", 91, "екецвос.сыяоу", 91, "MONITOR.STACK.SIZE", 92, "екецвос.лецехос.сыяоу", 92, "?", 93, "диаяхяысг", 94, "BUFFER", 94, "йатастасг", 95, "INVENTORY", 95, "LIST", 96, "киста", 96, "QUEUE", 97, "оуяа", 97, "INFINITY", 82, "апеияо", 82, "еккгмийа", 98, "GREEK", 98 _
-, "INTERNET", 99, "диадийтуо", 99, "CLIPBOARD.IMAGE", 100, "пяовеияо.еийома", 100, "CLIPBOARD.DRAWING", 101, "пяовеияо.сведио", 101, "MONITORS", 102, "охомес", 102, "DOS", 103, "йомсока", 103, "SOUNDREC.LEVEL", 104, "гвоцяажгсгс.епипедо", 104)
+, "INTERNET", 99, "диадийтуо", 99, "CLIPBOARD.IMAGE", 100, "пяовеияо.еийома", 100, "CLIPBOARD.DRAWING", 101, "пяовеияо.сведио", 101, "MONITORS", 102, "охомес", 102, "DOS", 103, "йомсока", 103, "SOUNDREC.LEVEL", 104, "гвоцяажгсгс.епипедо", 104, "ADDRESSOF", 105, "диеухумсгапо", 105)
 If Not ahashbackup Is Nothing Then
 For i = 0 To UBound(myid()) Step 2
     ahashbackup.ItemCreator CStr(myid(i)), CLng(myid(i + 1))
@@ -4718,7 +4718,7 @@ If Err.Number > 0 Then aSize = 12: fonttest.Font.Size = aSize
 End Sub
 Public Function InternalLeadingSpace() As Long
 On Error Resume Next
-    GetTextMetrics fonttest.Hdc, tm
+    GetTextMetrics fonttest.hDC, tm
   With tm
 InternalLeadingSpace = (.tmInternalLeading = 0) Or Not (.tmInternalLeading > 0)
 End With
@@ -4726,7 +4726,7 @@ End Function
 Public Function AverCharSpace(DDD As Object, Optional breakchar) As Long
 On Error Resume Next
 Dim tmm As TEXTMETRIC
-    GetTextMetrics DDD.Hdc, tmm
+    GetTextMetrics DDD.hDC, tmm
   With tmm
 AverCharSpace = .tmAveCharWidth
 breakchar = .tmBreakChar
@@ -4792,10 +4792,10 @@ crNew basestack, players(prive)
 ProcWriter = True
 End Function
 Sub test123()
-Dim alfa
-Debug.Print IsNull(alfa), myIsNull(alfa)
-NullVariant alfa
-Debug.Print IsNull(alfa), myIsNull(alfa)
+Dim ALFA
+Debug.Print IsNull(ALFA), myIsNull(ALFA)
+NullVariant ALFA
+Debug.Print IsNull(ALFA), myIsNull(ALFA)
 End Sub
 Sub SendAKey(ByVal keycode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
 Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long, old As Long

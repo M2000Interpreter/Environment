@@ -32,7 +32,7 @@ Private Type PicBmp
     hPal As Long
     reserved As Long
 End Type
-Private Declare Function OleCreatePictureIndirect Lib "olepro32.dll" (PicDesc As PicBmp, RefIID As GUID, ByVal fPictureOwnsHandle As Long, IPic As IPicture) As Long
+Private Declare Function OleCreatePictureIndirect Lib "olepro32.dll" (PicDesc As PicBmp, RefIID As GUID, ByVal fPictureOwnsHandle As Long, ipic As IPicture) As Long
 Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal Hdc As Long) As Long
 Private Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal Hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal Hdc As Long, ByVal hObject As Long) As Long
@@ -41,7 +41,7 @@ Private Declare Function GetSystemPaletteEntries Lib "gdi32" (ByVal Hdc As Long,
 Private Declare Function CreatePalette Lib "gdi32" (lpLogPalette As LOGPALETTE) As Long
 Private Declare Function SelectPalette Lib "gdi32" (ByVal Hdc As Long, ByVal HPALETTE As Long, ByVal bForceBackground As Long) As Long
 Private Declare Function RealizePalette Lib "gdi32" (ByVal Hdc As Long) As Long
-Private Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
+Private Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 Private Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function OpenPrinter Lib "winspool.drv" Alias "OpenPrinterA" (ByVal pPrinterName As String, phPrinter As Long, pDefault As Any) As Long
@@ -86,12 +86,12 @@ Type PRINTER_DEFAULTS
 End Type
 ' New Win95 Page Setup dialogs are up to you
 Private Type POINTL
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
 End Type
 Private Type RECT
     Left As Long
-    top As Long
+    Top As Long
     Right As Long
     Bottom As Long
 End Type
@@ -148,12 +148,12 @@ Sub Pprop()
     
     If ThereIsAPrinter = False Then Exit Sub
         
-    Dim X As Printer
-For Each X In Printers
-If X.DeviceName = pname And X.Port = Port Then Exit For
-Next X
+    Dim x As Printer
+For Each x In Printers
+If x.DeviceName = pname And x.Port = Port Then Exit For
+Next x
 Dim gp As Long, Td As PRINTER_DEFAULTS
-Call OpenPrinter(X.DeviceName, gp, Td)
+Call OpenPrinter(x.DeviceName, gp, Td)
 If form5iamloaded Then
 Call PrinterProperties(Form5.hWnd, gp)
 Else
@@ -163,7 +163,7 @@ Call ResetPrinter(gp, Td)
 Call ClosePrinter(gp)
 End Sub
 Function CreateBitmapPicture(ByVal hbmp As Long, ByVal hPal As Long) As Picture
-    Dim R As Long, pic As PicBmp, IPic As IPicture, IID_IDispatch As GUID
+    Dim R As Long, pic As PicBmp, ipic As IPicture, IID_IDispatch As GUID
 
     'Fill GUID info
     With IID_IDispatch
@@ -181,10 +181,10 @@ Function CreateBitmapPicture(ByVal hbmp As Long, ByVal hPal As Long) As Picture
     End With
 
     'Create the picture
-    R = OleCreatePictureIndirect(pic, IID_IDispatch, 1, IPic)
+    R = OleCreatePictureIndirect(pic, IID_IDispatch, 1, ipic)
 
     'Return the new picture
-    Set CreateBitmapPicture = IPic
+    Set CreateBitmapPicture = ipic
 End Function
 Function hDCToPicture(ByVal hDCSrc As Long, ByVal LeftSrc As Long, ByVal TopSrc As Long, ByVal WidthSrc As Long, ByVal HeightSrc As Long) As Picture
     Dim hDCMemory As Long, hbmp As Long, hBmpPrev As Long, R As Long
@@ -935,6 +935,8 @@ Public Sub DisableMidi()
   End If
 End Sub
 
-
+Sub testExec()
+    CallPointer AddressOf ExtCall, 12345&
+End Sub
 
 

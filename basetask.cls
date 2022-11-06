@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 ' Basetask is a module task of M2000
 ' This is a utility soros for passing parammeters to functions
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Public LoadOnly As Boolean, NoRun As Boolean
 Public CheckUnReferenceGui As Long
 Public callx1 As Long, tpointer As Long
@@ -87,6 +87,7 @@ Public Prof As clsProfiler
 Public modfuncall As Boolean
 Public restpart$
 
+
 Public Sub SetSkip()
     SkipClear = SkipClear + 1
 End Sub
@@ -156,7 +157,7 @@ Public Sub SetVarobJ(ByVal Name$, var As Variant)
     Set StaticCollection.ValueObj = var
     End If
 End Sub
-Public Sub clearBasket()
+Public Sub clearbasket()
 
     Dim oldname$, Name$
     Name$ = "%_" + StaticInUse
@@ -800,8 +801,8 @@ Public Sub PushThread(Threadid As Long, threadvar As String)
 Dim aa As New mThreadref
 checkialive
 Set aa.thread = Nothing  ' no thread
-aa.id = Threadid
-aa.varname = threadvar
+aa.Id = Threadid
+aa.VarName = threadvar
 If Not threadsnames.Find(Threadid) Then threadsnames.AddKey Threadid
 Set threadsnames.ValueObj = aa
 
@@ -811,7 +812,7 @@ Public Function exist(Threadid As Long, ThreadName As String) As Boolean
 If threadsnames Is Nothing Then exist = False: Exit Function
 If threadsnames.Find(Threadid) Then
  With threadsnames.ValueObj
-    exist = .varname = ThreadName
+    exist = .VarName = ThreadName
 End With
 End If
 
@@ -853,14 +854,14 @@ threadsnames.ToStart
 While threadsnames.Done
 ' For Each aa In threadsnames
 Set aa = threadsnames.ValueObj
-If Left$(aa.varname, 1) = "_" Then
+If Left$(aa.VarName, 1) = "_" Then
 If Lang = 0 Then
 a$ = a$ + "есытеяийо мгла "
 Else
 a$ = a$ + "INTERNAL THREAD "
 End If
 Else
-a$ = a$ + aa.varname + Str$(aa.id) + " "
+a$ = a$ + aa.VarName + Str$(aa.Id) + " "
 End If
 threadsnames.NextIndex
 Wend
@@ -885,7 +886,7 @@ If threadsnames.count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
 Set aa = threadsnames.ValueObj
-If Left$(aa.varname, 5) <> "_multi" Then kk = kk + 1
+If Left$(aa.VarName, 5) <> "_multi" Then kk = kk + 1
 threadsnames.NextIndex
 Wend
 Set aa = Nothing
@@ -902,16 +903,16 @@ If threadsnames.count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
 Set aa = threadsnames.ValueObj
-If idexclude <> aa.id Then
+If idexclude <> aa.Id Then
 If Not TaskMaster Is Nothing Then
-        If TaskMaster.ThrowOne(aa.id) Then
-        ThrowOne aa.id
+        If TaskMaster.ThrowOne(aa.Id) Then
+        ThrowOne aa.Id
         ElseIf Not IamThread Then
         threadsnames.RemoveWithNoFind
         GoTo cont
         End If
 Else
-ThrowOne aa.id
+ThrowOne aa.Id
 End If
 End If
 threadsnames.NextIndex

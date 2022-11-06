@@ -164,15 +164,17 @@ Public Sub BlockFree(ByVal Ptr As Long)
         HeapFree GetProcessHeap(), 0, Ptr
 End Sub
 Public Sub SetUpForExecution(ByVal Ptr As Long, ByVal nBytes As Long)
+        Dim oldV As Long
         FlushInstructionCache GetCurrentProcess, Ptr, nBytes
-        VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READ, PAGE_READWRITE
+        VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READ, oldV ' PAGE_READWRITE
         VirtualLock Ptr, nBytes
 End Sub
 Public Sub ReleaseExecution(ByVal Ptr As Long, ByVal nBytes As Long)
+        Dim oldV As Long
        FlushInstructionCache GetCurrentProcess, Ptr, nBytes
         
         VirtualUnlock Ptr, nBytes
-         VirtualProtect Ptr, nBytes, PAGE_READWRITE, PAGE_EXECUTE_READ
+         VirtualProtect Ptr, nBytes, PAGE_READWRITE, oldV '  PAGE_EXECUTE_READ
 End Sub
 Public Sub BlockFreeVirtual(ByVal Ptr As Long, ByVal nBytes As Long)
       ' VirtualUnlock Ptr, nBytes
@@ -503,7 +505,7 @@ Loop Until a > b.MARKTWO
 End Sub
 Public Sub SleepWaitEdit(bstack As basetask, lNumberOf10ThmiliSeconds As Long)
 On Error Resume Next
-If Forms.Count < 3 Then
+If Forms.count < 3 Then
 Sleep 1
  DoEvents
 Exit Sub
@@ -588,7 +590,7 @@ End Sub
         
 Public Sub SleepWaitEdit2(lNumberOf10ThmiliSeconds As Long)
 On Error Resume Next
-If Forms.Count < 3 Then
+If Forms.count < 3 Then
 Sleep 1
 DoEvents
 Exit Sub

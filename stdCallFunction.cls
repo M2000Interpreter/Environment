@@ -21,7 +21,6 @@ Dim t() As Long
 Dim paramnum As Long
 Public FreeHere As Boolean
 Public CallAddr As Long
-
 Public Sub CallThis(ByVal vNewValue As String, ParamList As String, Lang As Long)
 Dim l As Long, check$, m As Long
 l = InStr(vNewValue, ".")
@@ -128,8 +127,8 @@ ReDim t(16) As Long
 paramnum = -1
 End Sub
 
-Public Property Get Count() As Long
-Count = paramnum + 1
+Public Property Get count() As Long
+count = paramnum + 1
 End Property
 
 Public Property Get RetType() As Long
@@ -155,3 +154,16 @@ RemoveDll mFunction
 End If
 End If
 End Sub
+Public Function GetAddress() As Long
+If Me.CallAddr = 0 Then
+If Left$(func, 1) = "#" Then
+    CallAddr = Fcall.GetFuncPtrOrd(LIB, func)
+Else
+    CallAddr = Fcall.GetFuncPtr(LIB, func)
+    
+End If
+End If
+
+    GetAddress = CallAddr
+
+End Function
