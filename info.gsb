@@ -5480,7 +5480,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 37 for M2000 Interpreter version 11, revision 9 and above"
+	Report " A collection of modules for tests version 38 for M2000 Interpreter version 11, revision 9 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -10116,68 +10116,264 @@ MODULE COMPILER {Module CompilerExample {
 		Always
 		Print "Press any key" : Push key$ : Drop
 		// Prepare VM
+		profiler
 		let pc=0, sp=len(stack_) div 4
 		do
 			b=func(eval(code_, pc))
 			pc++
 			call local b()
 		until exit_now
-		Print "done"
+		Print
+		Print "", round(Timecount/1000,2),"s"
 	}
-	Push {
-	{
-		/*
-		This is an integer ascii Mandelbrot generator
-		*/
-		left_edge= -420;
-		right_edge=300;
-		top_edge=300;
-		bottom_edge = -300;
-		x_step=7;
-		y_step=15;
- 
-		max_iter=200;
- 
-		y0 = top_edge;
-		while (y0 > bottom_edge) {
-			x0 = left_edge;
-			while (x0 < right_edge) {
-				y = 0;
-				x = 0;
-				the_char = ' ';
-				i = 0;
-				while (i < max_iter) {
-					x_x = (x * x) / 200;
-					y_y = (y * y) / 200;
-					if (x_x + y_y > 800 ) {
-						the_char = '0' + i;
-						if (i > 9) {
-							the_char = '@';
-						}
-						i = max_iter;
-					}
-					y = x * y / 100 + y0;
-					x = x_x - y_y + x0;
-					i = i + 1;
-				}
-				putc(the_char);
-				x0 = x0 + x_step;
+	Module Transpiler_to_M2000 (code$){
+		Print #-2,  "Virtual Assembly Code:"+{
+		}+code$
+		Print "Prepare M2000 Code"
+		Flush
+		prolog$={Global z
+			Module Halt {Error "stop"}
+			Module neg {push -number}
+			Module not {push number=0}
+			Module and {push sint(binary.and(uint(number), uint(number)))}
+			Module or {push sint(binary.or(uint(number), uint(number)))}
+			Module gt {push number<number}
+			Module lt {push number>number}
+			Module ge {push number<=number}
+			Module le {push number>=number}
+			Module ne {push number<>number}
+			Module eq {push number=number}
+			Module mul {push number*number}
+			Module div {shift 2 : push number div number}
+			Module mod {shift 2 : push number mod number}
+			Module sub {shift 2 : push number - number}
+			Module add {push number + number}
+			Module prtc {Print #-2, chrcode$(number);:Refresh}
+			Module prts {Print #-2, format$(var$(number));:Refresh}
+			Module prti {Print #-2, str$(number, 0);:Refresh}
 			}
-			putc('\n');
-			y0 = y0 - y_step;
+		Variable$=lambda$ (many, Name$, glob as boolean=false)->{
+			if many else exit
+			if glob then
+				="Global "+name$+"(0 to "+str$(many,0)+")"+{
+				}
+			else
+				="Dim Base 0, "+name$+"("+str$(many,0)+")"+{
+				}
+			end if
+		}
+		firstline$=leftpart$(code$,13)
+		code$=rightpart$(code$, 10)
+		firstline$=rightpart$(firstline$, ": ")
+		Vars=val(firstline$)
+		firstline$=rightpart$(firstline$, ": ")
+		Strings=val(firstline$)
+		document feedstrings$
+		if Strings Then
+		for i=0 to Strings-1
+			firstline$=Trim$(leftpart$(code$,13))
+			code$=rightpart$(code$, 10)
+			feedstrings$="var$("+str$(i,0)+") = "+firstline$+{
+			}
+		next
+		end if
+		stack new {
+			{
+				g$=leftpart$(code$, " (")
+				if g$="" or code$="" then
+					data code$ : code$="": exit
+				end if
+				data g$
+				code$=rightpart$(code$, 41)
+				loop
+			}
+			while not empty{
+				read g$
+				code$+=g$
+			}
+		}
+		code$=replace$("]", ")", code$)
+		code$=replace$("fetch [", "fetch(", code$)
+		code$=replace$("store [", "store(", code$)
+		code$=replace$("jmp ", "goto ", code$)
+		code$=replace$("jz", "if number else ", code$)
+		Subs$={
+			End
+			Sub store(x)
+				Read var(x)
+			End Sub
+			Sub fetch(x)
+				Push  var(x)
+			End Sub
+		}
+		document M2000Code$="Module Run {" +prolog$ + Variable$(Vars,"var")
+		M2000Code$=Variable$(Strings,"var$", true) +feedstrings$ + "Try {" + {
+		} + code$+"}"+Subs$+"}"
+		//clipboard M2000code$
+		//exit
+		Inline M2000Code$
+		Print "Press any key" : Push key$ : Drop
+		profiler
+		Run
+		Print
+		Print round(Timecount/1000,2),"s"
+	}
+	print "choose example",
+	menu "Mandelbrot", "primes","test case 4", "99 Bottles of Beer", "FizzBuzz", "fibonacci of 44 is 701408733", "12 factorial is 479001600"
+	if menu then print menu$(menu) else exit
+	select case menu
+	case 1
+		{
+			Push {
+			{
+				/*
+				This is an integer ascii Mandelbrot generator
+				*/
+				left_edge= -420;
+				right_edge=300;
+				top_edge=300;
+				bottom_edge = -300;
+				x_step=7;
+				y_step=15;
+				
+				max_iter=200;
+				
+				y0 = top_edge;
+				while (y0 > bottom_edge) {
+					x0 = left_edge;
+					while (x0 < right_edge) {
+						y = 0;
+						x = 0;
+						the_char = ' ';
+						i = 0;
+						while (i < max_iter) {
+							x_x = (x * x) / 200;
+							y_y = (y * y) / 200;
+							if (x_x + y_y > 800 ) {
+								the_char = '0' + i;
+								if (i > 9) {
+									the_char = '@';
+								}
+								i = max_iter;
+							}
+							y = x * y / 100 + y0;
+							x = x_x - y_y + x0;
+							i = i + 1;
+						}
+						putc(the_char);
+						x0 = x0 + x_step;
+					}
+					putc('\n');
+					y0 = y0 - y_step;
+				}
+			}
+			} 
+		}
+	case 2
+		{
+			push {
+			/*
+			Simple prime number generator
+			*/
+			count = 1;
+			n = 1;
+			limit = 100;
+			while (n < limit) {
+				k=3;
+				p=1;
+				n=n+2;
+				while ((k*k<=n) && (p)) {
+					p=n/k*k!=n;
+					k=k+2;
+				}
+				if (p) {
+					print(n, " is prime\n");
+					count = count + 1;
+				}
+			}
+			print("Total primes found: ", count, "\n");
+			} 
+		}
+	case 3
+	{
+		push {
+		/*** test printing, embedded \n and comments with lots of '*' ***/ print(42); print("\nHello World\nGood Bye\nok\n"); print("Print a slash n - \\n.\n");
 		}
 	}
-	} 
- 
-	Form ! 120, 60
+	case 4
+	{
+		push {
+		 /* 99 bottles */ bottles = 99; while (bottles > 0) {
+			print(bottles, " bottles of beer on the wall\n");
+			print(bottles, " bottles of beer\n");
+			print("Take one down, pass it around\n");
+			bottles = bottles - 1;
+			print(bottles, " bottles of beer on the wall\n\n");
+			}
+		}
+	}
+	case 5
+	{
+		push {
+		/* FizzBuzz */ i = 1; while (i <= 100) {
+
+			if (!(i % 15))
+				print("FizzBuzz");
+			else if (!(i % 3))
+				print("Fizz");
+			else if (!(i % 5))
+				print("Buzz");
+			else
+				print(i);
+				print("\n");
+				i = i + 1;
+			} 
+		}
+	}
+	case 6
+	{
+		push {
+			/* fibonacci of 44 is 701408733 */
+			
+			n = 44; i = 1; a = 0; b = 1; while (i < n) {
+			
+				w = a + b;
+				a = b;
+				b = w;
+				i = i + 1;
+			} print(w, "\n"); 
+		}
+	}
+	case 7
+	{
+		push {
+			/* 12 factorial is 479001600 */
+			
+			n = 12; result = 1; i = 1; while (i <= n) {
+			
+			result = result * i;
+			i = i + 1;
+			} print(result); 
+		}
+	}
+	end select
+	Form! 104, 60
 	Refresh
 	Print "Lexical Analyzer" : Refresh
 	lexical_analyzer
+	if not islet then exitr
 	Print "Syntax Analyzer" : Refresh
 	syntax_analyzer
+	if not islet then exit
 	Print "Code Generator" : Refresh
 	CodeGenerator
-	Virtual_Machine_Interpreter
+	if not islet then exit
+	if ask("Choose execution style", "Info", "Virtual Machine", "*M2000 Transpiler")=1 then
+		Virtual_Machine_Interpreter
+	else
+		Transpiler_to_M2000
+	end if
+	Print "done"
 	Set Fast 'restore speed setting
 }
 CompilerExample
@@ -12296,7 +12492,8 @@ CLS 15, 0
 FORM 132,68      
 CALENDAR 1966, 1032 ' GREEK
 GOSUB WAITKEY_OR_MOUSE
-FOR I=2020 TO 2026
+I=VAL(DATE$(TODAY,LOCALE, "yyyy"))
+FOR I=I TO I+5
 CALENDAR I, 1033  ' ENGLISH
 GOSUB WAITKEY_OR_MOUSE
 NEXT I
@@ -34293,7 +34490,7 @@ Title "Back Again"
 Show  \\ get focus back
 Threads Erase
 }
-MODULE NEWASSERT {mode 22
+MODULE ASSERT1 {mode 22
 Double
 Pen 11 {
 	Report 2, {Assert Statement
@@ -34383,10 +34580,13 @@ MODULE ΑΘΡΟΙΣΜΑ {\\ ετοιμασία οθόνης
                  }
        }
 }
+Τύπωσε "Πάτα Esc"
+cLS, 1
 Διόρθωσε Α$ \\ ανοίγει τον διορθωτή Για να συμπληρώσουμε κάτι
 Πρόχειρο Α$ \\ εξαγωγή στο πρόχειρο
 Σώσε.Έγγραφο Α$, "Αποτελέσματα.txt"
 Αναφορά Α$ \\ στην οθόνη
+Αν τμήμα(info) Τότε Τυπωσε "πάτα F3"
 \\ εδώ τερματίζει ο διερμηνευτής.
 Ρουτίνα πάρε_ένα(χ, ν, άσε_τόσα)
       Τοπικές κ=1, σουμα, κκ, μμ, προχ$
@@ -34596,7 +34796,7 @@ function image1.keypress {
 						if CheckSurrogateTrail(w) then onemore=true
 						buf$=left$(buf$, len(buf$)-1)
 					until not onemore or len(buf$)=0
-					end if
+				end if
 				if len(buf$)=0 and len(bufall)>0 then
 					stack bufall {read buf$}
 					if onemore then

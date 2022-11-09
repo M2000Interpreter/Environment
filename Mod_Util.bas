@@ -7483,9 +7483,7 @@ End Sub
 Public Sub NoSecReF()
 MyEr "No reference allowed - use new variable", "ƒÂÌ ‰›˜ÂÙ·È ·Ì·ˆÔÒ‹ - ˜ÒÁÛÈÏÔÔﬂÁÛÂ Ì›· ÏÂÙ·‚ÎÁÙﬁ"
 End Sub
-Public Sub MissSymbolMyEr(wht$)   ' not the macro one
-MyEr "missing " + wht$, "ÎÂﬂÂÈ " + wht$
-End Sub
+
 Public Sub MissTHENELSE()
     MyEr "missing THEN or ELSE", "‰ÂÌ ‚ÒﬁÍ· ‘œ‘≈ ﬁ ¡ÀÀ…Ÿ”"
 End Sub
@@ -7540,7 +7538,7 @@ Public Sub PropCantChange()
 MyEr "Property can't change", "« È‰È¸ÙÁÙ· ‰ÂÌ ÏÔÒÂﬂ Ì· ·ÎÎ‹ÓÂÈ"
 End Sub
 Public Sub MissingSymbol(c$)
-MyEr "missing " + c$, "ÎÂﬂÂÈ " + c$
+MissSymbol c$
 End Sub
 Public Sub NeedAGroupFromExpression()
 MyEr "Need a group from expression", "◊ÒÂÈ‹ÊÔÏ·È ÏÈ· ÔÏ‹‰· ·¸ ÙÁÌ ›ÍˆÒ·ÛÁ"
@@ -8896,14 +8894,14 @@ If j = 0 Then Exit Function
 i = MyTrimL(a$)
 If i > j Then Exit Function  ' this is not good
 If j - i < cl - 1 Then
-If mis Then MyEr "missing " + c$, "ÎÂﬂÂÈ " + c$
+If mis Then MissSymbol c$
 Exit Function
 End If
 If c$ = Mid$(a$, i, cl) Then
 a$ = Mid$(a$, MyTrimLi(a$, i + cl))
 FastSymbol = True
 ElseIf mis Then
-MyEr "missing " + c$, "ÎÂﬂÂÈ " + c$
+MissSymbol c$
 End If
 End Function
 Function FastSymbol1(s$, c$) As Boolean
@@ -8983,77 +8981,9 @@ Dim p2 As Long, p1 As Integer, p4 As Long
 End Function
 
 
-Function IsLabelSymbolNewExp(a$, gre$, Eng$, code As Long, usethis$) As Boolean
-' code 2  gre or eng, set new value to code 1 or 0
-' 0 for gre
-' 1 for eng
-' return true if we have label
-If Len(usethis$) = 0 Then
-Dim what As Boolean
-Select Case code
-Case 0
-IsLabelSymbolNewExp = IsLabelSymbol3(1032, a$, gre$, usethis$, False, False, False, True)
-Case 1
-IsLabelSymbolNewExp = IsLabelSymbol3(1033, a$, Eng$, usethis$, False, False, False, True)
-Case 2
-what = IsLabelSymbol3(1032, a$, gre$, usethis$, False, False, False, True)
-If what Then
-code = 0
-IsLabelSymbolNewExp = what
-Exit Function
-End If
-what = IsLabelSymbol3(1033, a$, Eng$, usethis$, False, False, False, True)
-If what Then code = 1
-IsLabelSymbolNewExp = what
-End Select
-Else
-Select Case code
-Case 0, 2
-IsLabelSymbolNewExp = gre$ = usethis$
-Case 1
-IsLabelSymbolNewExp = Eng$ = usethis$
-End Select
-If IsLabelSymbolNewExp Then a$ = Mid$(a$, MyTrimL(a$) + Len(usethis$))
-End If
-If IsLabelSymbolNewExp Then
-usethis$ = vbNullString
-End If
-End Function
 
 
-Function IsLabelSymbol(a$, c$, Optional mis As Boolean = False, Optional ByVal ByPass As Boolean = False, Optional checkonly As Boolean = False) As Boolean
-Dim test$, what$, Pass As Long
-If ByPass Then Exit Function
 
-  If a$ <> "" And c$ <> "" Then
-test$ = a$
-Pass = Len(c$)
-
-IsLabelSymbol = IsLabelSYMB33(test$, what$, Pass)
-If Len(what$) <> Len(c$) Then IsLabelSymbol = False
-If Not IsLabelSymbol Then
-     If mis Then
-                 MyEr "missing " + c$, "ÎÂﬂÂÈ " + c$
-              End If
-Exit Function
-End If
-
-        If myUcase(what$) = c$ Then
-        If checkonly Then
-     '   A$ = what$ & " " & TEST$
-        Else
-                    a$ = Mid$(test$, Pass)
-          End If
-  
-             Else
-             If mis Then
-                 MyEr "missing " + c$, "ÎÂﬂÂÈ " + c$
-              End If
-            IsLabelSymbol = False
-            End If
-
-End If
-End Function
 Function MakeEmf(bstack As basetask, b$, Lang As Long, Data$, Optional ww = 0, Optional hh = 0) As Boolean
 Dim w$, x1 As Long, label1$, usehandler As mHandler, par As Boolean, pppp As mArray, p As Variant, it&, x2&
 x2 = Len(b$)
@@ -13699,7 +13629,7 @@ If s.Total >= 3 Then
 If s.LookTopVal = -3 Then s.drop 3
 End If
 End Sub
-Function interpret(bstack As basetask, b$, Optional ByPass As Boolean) As Boolean
+Function interpret(bstack As basetask, b$, Optional bypass As Boolean) As Boolean
 Dim di As Object, myobject As Object, i As Long, x1 As Long, ok As Boolean, sp As Variant
 Dim usehandler As mHandler, usehandler2 As mHandler
 Set di = bstack.Owner
@@ -13712,8 +13642,8 @@ Dim r1 As Long, r2 As Long
 di.FontTransparent = True
 SetBkMode di.hDC, 1
 ohere$ = here$
-If Not ByPass Then here$ = vbNullString
-bstack.LoadOnly = ByPass
+If Not bypass Then here$ = vbNullString
+bstack.LoadOnly = bypass
 sss = Len(b$)
 Do While Len(b$) <> LLL
 If LastErNum <> 0 Then Exit Do
@@ -16436,7 +16366,7 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
                     If GetVar(basestack, what$, i) Then
                         If Typename(var(i)) = doc Then
                                 If Not FastSymbol(rest$, "=") Then
-                                    MissSymbolMyEr "="
+                                    MissSymbol "="
                                     IdPara = False
                                     Exit Function
                                 Else
@@ -16484,7 +16414,7 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
                         If Not NeoGetArrayItem(pppp, basestack, what$, it, rest$) Then IdPara = False: Exit Function
                         If pppp.ItemType(it) = doc Then
                                     If Not FastSymbol(rest$, "=") Then
-                                            MissSymbolMyEr "="
+                                            MissSymbol "="
                                             IdPara = False
                                             Exit Function
                                             Else
@@ -16563,7 +16493,7 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
         
                 If Typename(var(i)) = doc Then
                     If Not FastSymbol(rest$, "=") Then
-                    MissSymbolMyEr "="
+                    MissSymbol "="
                     IdPara = False
                     Exit Function
                     Else
@@ -16593,7 +16523,7 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
                 
                 Else
                     If Not FastSymbol(rest$, "=") Then
-                    MissSymbolMyEr "="
+                    MissSymbol "="
                     IdPara = False
                     Exit Function
                     Else
@@ -16919,7 +16849,7 @@ For pn& = virtualtop To 0 Step -1
     If InStr(s$, ChrW(&H1FFF)) = 0 And InStr(s$, ChrW(&HFFBF)) = 0 Then Exit For
     virtualtop = virtualtop - 1
 Next pn&
-ByPass:
+bypass:
 pn& = 0
 Dim a() As String
 With players(prive)
@@ -18824,7 +18754,7 @@ Dim pppp As mArray, mmmm As mEvent
                 alfa.MyName = what$
                 alfa.index = -1
                 alfa.modulename = here$
-                alfa.ByPass = bp
+                alfa.bypass = bp
                 alfa.TempTitle = what$
                 Set mmmm = Nothing
                 Set alfa = Nothing
@@ -18854,7 +18784,7 @@ contEvArray:
                             Set .EventObj = mmmm
                             .MyName = what$
                             .modulename = here$
-                            .ByPass = bp
+                            .bypass = bp
                             .TempTitle = what$ & "(" & (i) & ")"
                             .index = i
                         End With
@@ -19987,9 +19917,9 @@ usehandler:
                         End If
                             If uHandler.t1 = 1 Then
                                 If IsLabelSymbolNew(rest$, "Ÿ”", "AS", Lang) Then
-                                    numb = IsLabelSymbolNew(rest$, "¡—…»Ãœ”", "NUMBER", Lang, , , , False)
+                                    numb = IsLabelSymbolNew(rest$, "¡—…»Ãœ”", "NUMBER", Lang, , , False)
                                     If Not numb Then
-                                    If Not IsLabelSymbolNew(rest$, " ≈…Ã≈Õœ", "TEXT", Lang, , , , False) Then
+                                    If Not IsLabelSymbolNew(rest$, " ≈…Ã≈Õœ", "TEXT", Lang, , , False) Then
                                     MyEr "Expected Text or Number", "–ÂÒﬂÏÂÌ·  ÂﬂÏÂÌÔ ﬁ ¡ÒÈËÏ¸Ú"
                                     ProcSort = False
                                     Exit Function
@@ -26618,19 +26548,19 @@ aaaa1:
                 End If
                 Set bstack.lastobj = Nothing
             ElseIf IsLabelSymbolNew(b$, "Ÿ”", "AS", Lang) Then
-               If IsLabelSymbolNew(b$, "¡—…»Ãœ”", "DECIMAL", Lang, , , , False) Then
+               If IsLabelSymbolNew(b$, "¡—…»Ãœ”", "DECIMAL", Lang, , , False) Then
                     p = CDec(0)
-                ElseIf IsLabelSymbolNew(b$, "ƒ…–Àœ”", "DOUBLE", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(b$, "ƒ…–Àœ”", "DOUBLE", Lang, , , False) Then
                     p = 0#
-                ElseIf IsLabelSymbolNew(b$, "¡–Àœ”", "SINGLE", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(b$, "¡–Àœ”", "SINGLE", Lang, , , False) Then
                     p = 0!
-                ElseIf IsLabelSymbolNew(b$, "Àœ√… œ”", "BOOLEAN", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(b$, "Àœ√… œ”", "BOOLEAN", Lang, , , False) Then
                     p = False
-                ElseIf IsLabelSymbolNew(b$, "Ã¡ —’”", "LONG", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(b$, "Ã¡ —’”", "LONG", Lang, , , False) Then
                     p = 0&
-                ElseIf IsLabelSymbolNew(b$, "¡ ≈—¡…œ”", "INTEGER", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(b$, "¡ ≈—¡…œ”", "INTEGER", Lang, , , False) Then
                     p = 0
-                ElseIf IsLabelSymbolNew(b$, "Àœ√…”‘… œ", "CURRENCY", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(b$, "Àœ√…”‘… œ", "CURRENCY", Lang, , , False) Then
                     p = 0@
                 ElseIf IsEnumAs(bstack, b$, p) Then
                     bstack.SetVarobJ w$, p
@@ -26693,40 +26623,40 @@ aaaa1:
             If Not IsExp(bstack, b$, p) Then SyntaxError: Exit Function
             ElseIf IsLabelSymbolNew(b$, "Ÿ”", "AS", Lang) Then
     
-               If IsLabelSymbolNew(b$, "¡—…»Ãœ”", "DECIMAL", Lang, , , , False) Then
+               If IsLabelSymbolNew(b$, "¡—…»Ãœ”", "DECIMAL", Lang, , , False) Then
                     p = CDec(p)
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                     End If
                     p = Int(p)
-            ElseIf IsLabelSymbolNew(b$, "ƒ…–Àœ”", "DOUBLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "ƒ…–Àœ”", "DOUBLE", Lang, , , False) Then
                     p = 0#
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                     End If
                     p = Int(p)
-            ElseIf IsLabelSymbolNew(b$, "¡–Àœ”", "SINGLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "¡–Àœ”", "SINGLE", Lang, , , False) Then
                     p = 0!
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                     End If
                     p = Int(p)
-            ElseIf IsLabelSymbolNew(b$, "Àœ√… œ”", "BOOLEAN", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "Àœ√… œ”", "BOOLEAN", Lang, , , False) Then
                     p = False
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                     End If
-            ElseIf IsLabelSymbolNew(b$, "Ã¡ —’”", "LONG", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "Ã¡ —’”", "LONG", Lang, , , False) Then
                     p = 0&
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                     End If
-            ElseIf IsLabelSymbolNew(b$, "¡ ≈—¡…œ”", "INTEGER", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "¡ ≈—¡…œ”", "INTEGER", Lang, , , False) Then
                     p = 0
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                     End If
-            ElseIf IsLabelSymbolNew(b$, "Àœ√…”‘… œ", "CURRENCY", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "Àœ√…”‘… œ", "CURRENCY", Lang, , , False) Then
                     p = 0@
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
@@ -27647,9 +27577,9 @@ ProcPage = True
 Dim Scr As Object, x As Double, skip As Boolean
 Set Scr = basestack.Owner
 If basestack.toprinter Then getnextpage: skip = True
-If IsLabelSymbolNew(rest$, " ¡»≈‘«", "PORTRAIT", Lang, , , , False) Then
+If IsLabelSymbolNew(rest$, " ¡»≈‘«", "PORTRAIT", Lang, , , False) Then
     Portrait basestack
-ElseIf IsLabelSymbolNew(rest$, "œ—…∆œÕ‘…¡", "LANDSCAPE", Lang, , , , False) Then
+ElseIf IsLabelSymbolNew(rest$, "œ—…∆œÕ‘…¡", "LANDSCAPE", Lang, , , False) Then
     Landscape basestack
 ElseIf IsNumber(basestack, rest$, x) Then
     If x = 1 Then Portrait basestack Else Landscape basestack

@@ -4689,7 +4689,7 @@ Case "HALT", "акт"
 Case "STOP", "диайопг"
     aHash.ItemCreator2 CStr(mycommands(i)), 0, 41
 Case "DRAWING", "сведио"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 42 ' REMINDER: 42 LAST GOTO, IN EXECUTE()
+    aHash.ItemCreator2 CStr(mycommands(i)), 0, 42
 Case Else
     aHash.ItemCreator CStr(mycommands(i)), 0
 End Select
@@ -4792,10 +4792,10 @@ crNew basestack, players(prive)
 ProcWriter = True
 End Function
 Sub test123()
-Dim ALFA
-Debug.Print IsNull(ALFA), myIsNull(ALFA)
-NullVariant ALFA
-Debug.Print IsNull(ALFA), myIsNull(ALFA)
+Dim alfa
+Debug.Print IsNull(alfa), myIsNull(alfa)
+NullVariant alfa
+Debug.Print IsNull(alfa), myIsNull(alfa)
 End Sub
 Sub SendAKey(ByVal keycode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
 Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long, old As Long
@@ -4898,3 +4898,4 @@ If bytes Then
     Set basestack.lastobj = usehandler
 End If
 End Sub
+

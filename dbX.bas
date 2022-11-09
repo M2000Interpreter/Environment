@@ -848,7 +848,7 @@ ArrBase = 0
 NewBase = True
 Exit Function
 End If
-If IsLabelSymbolNew(R$, "топийг", "LOCAL", Lang, , , , False) Then
+If IsLabelSymbolNew(R$, "топийг", "LOCAL", Lang, , , False) Then
 '
 If Not IsStrExp(bstackstr, R$, base) Then
 MissStringExpr
@@ -1397,11 +1397,11 @@ End If
 End If
 If Not ok Then Exit Function
 If Lang <> -1 Then If IsLabelSymbolNew(R$, "сто", "TO", Lang) Then If IsExp(bstackstr, R$, t) Then gindex = CLng(t) Else SyntaxError
-Dim id$
+Dim Id$
   If InStr(UCase(Trim$(table$)) + " ", "SELECT") = 1 Then
-id$ = table$
+Id$ = table$
 Else
-id$ = "SELECT * FROM [" + table$ + "]"
+Id$ = "SELECT * FROM [" + table$ + "]"
 End If
 
 
@@ -1459,7 +1459,7 @@ End If
           
            Set rec = CreateObject("ADODB.Recordset")
             Err.Clear
-           rec.open id$, myBase, 3, 4 'adOpenStatic, adLockBatchOptimistic
+           rec.open Id$, myBase, 3, 4 'adOpenStatic, adLockBatchOptimistic
 
  If Err.Number <> 0 Then
 LL$ = myBase ' AS A STRING
@@ -1469,9 +1469,9 @@ RemoveOneConn base
  myBase.open = LL$
  PushOne base, myBase
  Err.Clear
-rec.open id$, myBase, 3, 4
+rec.open Id$, myBase, 3, 4
 If Err.Number Then
-MyEr Err.Description + " " + id$, Err.Description + " " + id$
+MyEr Err.Description + " " + Id$, Err.Description + " " + Id$
 Exit Function
 End If
 End If
@@ -1780,16 +1780,16 @@ End If
 g05:
 Err.Clear
    On Error Resume Next
-Dim id$
+Dim Id$
    
       If first$ = vbNullString Then
 If InStr(UCase(Trim$(table$)) + " ", "SELECT") = 1 Then
-id$ = table$
+Id$ = table$
 Else
-id$ = "SELECT * FROM [" + table$ + "]"
+Id$ = "SELECT * FROM [" + table$ + "]"
   End If
    Else
-id$ = "SELECT * FROM [" + table$ + "] WHERE [" + first$ + "] " + Second$
+Id$ = "SELECT * FROM [" + table$ + "] WHERE [" + first$ + "] " + Second$
  End If
 
    If Not getone(base, myBase) Then
@@ -1869,9 +1869,9 @@ id$ = "SELECT * FROM [" + table$ + "] WHERE [" + first$ + "] " + Second$
 Dim LL$
    Set rec = CreateObject("ADODB.Recordset")
  Err.Clear
- If myBase.mode = 0 Then myBase.open
+ If myBase.Mode = 0 Then myBase.open
  Err.Clear
-  rec.open id$, myBase, 3, 4
+  rec.open Id$, myBase, 3, 4
 If Err.Number <> 0 Then
 LL$ = myBase ' AS A STRING
 Set myBase = Nothing
@@ -1880,9 +1880,9 @@ RemoveOneConn base
  myBase.open = LL$
  PushOne base, myBase
  Err.Clear
-rec.open id$, myBase, 3, 4
+rec.open Id$, myBase, 3, 4
 If Err.Number Then
-MyEr Err.Description + " " + id$, Err.Description + " " + id$
+MyEr Err.Description + " " + Id$, Err.Description + " " + Id$
 Exit Sub
 End If
 End If
@@ -2022,11 +2022,11 @@ Else
     If ExtractType(base) = vbNullString Then base = base + ".mdb"
     If Not CanKillFile(base) Then FilePathNotForUser: Exit Sub
 End If
-Dim id$
+Dim Id$
   If InStr(UCase(Trim$(table$)) + " ", "SELECT") = 1 Then
-id$ = table$
+Id$ = table$
 Else
-id$ = "SELECT * FROM [" + table$ + "]"
+Id$ = "SELECT * FROM [" + table$ + "]"
 End If
 
      If Not getone(base, myBase) Then
@@ -2092,7 +2092,7 @@ On Error GoTo g101
  Dim LL$
    Set rec = CreateObject("ADODB.Recordset")
     Err.Clear
-     rec.open id$, myBase, 3, 4
+     rec.open Id$, myBase, 3, 4
       If Err.Number <> 0 Then
 LL$ = myBase ' AS A STRING
 Set myBase = Nothing
@@ -2101,9 +2101,9 @@ RemoveOneConn base
  myBase.open = LL$
  PushOne base, myBase
  Err.Clear
-rec.open id$, myBase, 3, 4
+rec.open Id$, myBase, 3, 4
 If Err.Number Then
-MyEr Err.Description + " " + id$, Err.Description + " " + id$
+MyEr Err.Description + " " + Id$, Err.Description + " " + Id$
 Exit Sub
 End If
 End If
@@ -2980,12 +2980,12 @@ Else
 With conCollection.ValueObj
 bb = .ConnectionString <> ""
 If Err.Number = 0 Then
-If .mode > 0 Then
-If .State = 1 Then
+If .Mode > 0 Then
+If .state = 1 Then
    .Close
-ElseIf .State = 2 Then
+ElseIf .state = 2 Then
     .Close
-ElseIf .State > 2 Then
+ElseIf .state > 2 Then
 Call .Cancel
 .Close
 End If
@@ -3024,7 +3024,7 @@ conthere:
         mb.Close_
     ElseIf vv.ConnectionString <> "" Then
     
-    If Err.Number = 0 And vv.mode <> 0 Then vv.Close
+    If Err.Number = 0 And vv.Mode <> 0 Then vv.Close
     Err.Clear
     End If
     conCollection.Remove conname
@@ -3274,7 +3274,7 @@ End If
 End If
 End Function
 Public Sub SQL()
-Dim a$, R$, k As Long, R1$, waittablename As Boolean
+Dim a$, R$, k As Long, r1$, waittablename As Boolean
 Dim closepar As Long, getonename As Boolean
 a$ = "SELECT * FROM [COMMANDS alfa] WHERE ENGLISH LIKE '" + "MODULE%" + "' AND GROUPNUM = 3"
 a$ = "SELECT [ENGLISH] FROM COMMANDS WHERE GROUPNUM =" + Str$(100) + " ORDER BY [ENGLISH]"
@@ -3309,19 +3309,19 @@ Debug.Print "Command:";
 waittablename = True
 Case "GROUP"
 getonename = False
-If IsLabelOnly(a$, R1$) Then
-R1$ = UCase(R1$)
-If Not R1$ = "BY" Then Debug.Print "Missing BY", a$: Exit Sub
-R$ = R$ + " " + R1$
+If IsLabelOnly(a$, r1$) Then
+r1$ = UCase(r1$)
+If Not r1$ = "BY" Then Debug.Print "Missing BY", a$: Exit Sub
+R$ = R$ + " " + r1$
 Debug.Print "Command:";
 waittablename = False
 End If
 Case "ORDER"
 getonename = False
-If IsLabelOnly(a$, R1$) Then
-R1$ = UCase(R1$)
-If Not R1$ = "BY" Then Debug.Print "Missing BY", a$: Exit Sub
-R$ = R$ + " " + R1$
+If IsLabelOnly(a$, r1$) Then
+r1$ = UCase(r1$)
+If Not r1$ = "BY" Then Debug.Print "Missing BY", a$: Exit Sub
+R$ = R$ + " " + r1$
 Debug.Print "Command:";
 waittablename = False
 End If
@@ -3379,24 +3379,24 @@ If Len(R$) > 0 Then Debug.Print "operator: "; R$: getonename = False
 If Digits(a$, R$, False) Then
     If Left$(a$, 1) = "." Then
         R$ = R$ + "."
-        If Digits(a$, R1$, True) Then
-            R$ = R$ + R1$
+        If Digits(a$, r1$, True) Then
+            R$ = R$ + r1$
             If InStr("eE", Left$(a$, 1)) > 0 Then
                 If InStr("-+", Mid$(a$, 2, 1)) > 0 Then
-                    R1$ = "E" + Mid$(a$, 2, 1)
-                    If Digits(Mid$(a$, 3), (R1$), True) Then
-                        R$ = R$ + R1$
+                    r1$ = "E" + Mid$(a$, 2, 1)
+                    If Digits(Mid$(a$, 3), (r1$), True) Then
+                        R$ = R$ + r1$
                         a$ = Mid$(a$, 3)
-                        Digits a$, R1$, True
-                        R$ = R$ + R1$
+                        Digits a$, r1$, True
+                        R$ = R$ + r1$
                     End If
                 Else
-                    R1$ = "E"
-                    If Digits(Mid$(a$, 2), (R1$), True) Then
-                        R$ = R$ + R1$
+                    r1$ = "E"
+                    If Digits(Mid$(a$, 2), (r1$), True) Then
+                        R$ = R$ + r1$
                         a$ = Mid$(a$, 2)
-                        Digits a$, R1$, True
-                        R$ = R$ + R1$
+                        Digits a$, r1$, True
+                        R$ = R$ + r1$
                     End If
                 End If
             End If

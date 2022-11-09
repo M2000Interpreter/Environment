@@ -1,7 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 15 active-X
-New addressOf for modules, look help addressOf for example
+Version 11 Revision 16 active-X
+Optimizations. Some work on info.bas (version 38):
+1. New version for Compiler module additon 6 more examples plus choise for M2000 transpiler,run faster than virtual machine)
+2. Assert renamed to Assert1.
 
 
 George Karras, Kallithea Attikis, Greece.
