@@ -14,7 +14,7 @@ Attribute VB_Exposed = True
 Option Explicit
 ' George's FastCollection
 ' Only Add, and Find.
-' Key as string may be a hex number (used for enumarates)
+' Key as string may be a hex number (used for enumerates)
 ' zero$ has chr$(1)
 Const Zero$ = ""
 Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long

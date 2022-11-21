@@ -31,7 +31,7 @@ Private Declare Function midiOutSetVolume Lib "winmm" (ByVal uDeviceID As Long, 
 Private Declare Function waveOutSetVolume Lib "winmm.dll" (ByVal uDeviceID As Long, ByVal dwVolume As Long) As Long
 Private Declare Function waveOutGetVolume Lib "winmm.dll" (ByVal uDeviceID As Long, dwVolume As Long) As Long
 
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 
 
 Private myid As Long
@@ -373,13 +373,13 @@ Public Function openMovieWindow(hWnd As Long, WindowStyle As String)
     'Decide which way you want the mci device to work below
     
     'use the command below to play divx movies. Must have the Divx codec installed
-   ' error = mciSendString("open " + LASTF + " type mpegvideo alias m"+str(myID)+" parent " + hWnd + " style " + WindowStyle + " ", 0, 0, 0)
+   ' error = mciSendString("open " + LASTF + " type mpegvideo alias m"+str(myID)+" parent " & hwnd & " style " + WindowStyle + " ", 0, 0, 0)
     
     'Let the mci device decide which driver to use
-      Error = mciSendString("open " + LASTF + " alias m" + LTrim$(Str(myid)) + " parent " + hWnd + " style " + WindowStyle + " ", 0, 0, 0)
+      Error = mciSendString("open " + LASTF + " alias m" + LTrim$(Str(myid)) + " parent " & hWnd & " style " + WindowStyle + " ", 0, 0, 0)
  
     If Error <> 0 Then
-    Error = mciSendString("open " + LASTF + " type mpegvideo alias m" + LTrim$(Str(myid)) + " parent " + hWnd + " style " + WindowStyle + " ", 0, 0, 0)
+    Error = mciSendString("open " + LASTF + " type mpegvideo alias m" + LTrim$(Str(myid)) + " parent " & hWnd & " style " + WindowStyle + " ", 0, 0, 0)
     
     
     End If
@@ -393,7 +393,7 @@ Public Function playMovie()
 
 
     'Play the m"+str(myID)+" after you open it
-    Error = mciSendString("play m" + LTrim$(Str(myid)) + "", 0, 0, 0)
+    Error = mciSendString("play m" + LTrim$(Str(myid)) + " ", 0, 0, 0)
 
 End Function
 
@@ -414,7 +414,7 @@ End Function
 Public Function stopMovie()
     'Stops the playing of the m"+str(myID)+"
 
-    Error = mciSendString("stop m" + LTrim$(Str(myid)) + "", 0, 0, 0)
+    Error = mciSendString("stop m" + LTrim$(Str(myid)) + " ", 0, 0, 0)
     
 End Function
 Public Function extractCurrentMovieSize(wLeft As Long, wTop As Long, wWidth As Long, wHeight As Long)
@@ -491,7 +491,7 @@ Public Function sizeLocateMovie(Left As Long, top As Long, Width As Long, Height
     'Change the size of the m"+str(myID)+" and the location of
     'the m"+str(myID)+" in Pixels
 ' 120 120 200 200 frame 0 0 200 200 source 0 0 200 200
-    Error = mciSendString("put m" + LTrim$(Str(myid)) + " window at " + Left + " " + top + " " + Width + " " + Height, 0, 0, 0)
+    Error = mciSendString("put m" + LTrim$(Str(myid)) + " window at " & Left & " " & top & " " & Width & " " & Height, 0, 0, 0)
 
 'error = mciSendString("put m"+str(myID)+" video 120 120 200 200 frame 0 0 200 200 source 0 0 200 200 ", 0, 0, 0)
 
@@ -595,7 +595,7 @@ End Function
 Public Function pauseMovie()
     'Pause the m"+str(myID)+"
     If AVIRUN Then
-    AVI.Timer1.enabled = False
+    AVI.Timer1.Enabled = False
     If (Me.getLengthInMS - Me.getPositionInMS) > 0 Then
     
     AVI.Interval = Me.getLengthInMS - Me.getPositionInMS
@@ -603,11 +603,11 @@ Public Function pauseMovie()
      AVI.Interval = 10000
     End If
     End If
-    Error = mciSendString("pause m" + LTrim$(Str(myid)) + "", 0, 0, 0)
+    Error = mciSendString("pause m" + LTrim$(Str(myid)) + " ", 0, 0, 0)
 End Function
 Public Function resumeMovie()
     'Resumes the m"+str(myID)+"
-    Error = mciSendString("resume m" + LTrim$(Str(myid)) + "", 0, 0, 0)
+    Error = mciSendString("resume m" + LTrim$(Str(myid)) + " ", 0, 0, 0)
 End Function
 Public Function getPositionInMS() As Long
     'Get the position of the m"+str(myID)+" in milliseconds
@@ -634,7 +634,7 @@ Public Function getStatus() As String
 End Function
 Public Function closeMovie()
     'Close the mci device
-   If opencounter > 0 Then Error = mciSendString("close m" + LTrim$(Str(myid)) + "", 0, 0, 0): opencounter = opencounter - 1
+   If opencounter > 0 Then Error = mciSendString("close m" + LTrim$(Str(myid)) + " ", 0, 0, 0): opencounter = opencounter - 1
 End Function
 Public Function getFormatPosition() As String
     'Get the position in a userfriendly time format
@@ -749,7 +749,7 @@ Public Function setVolume(Value As Long)
     '1000 max - 0 min
 
     ' Error = mciSendString("setaudio volume to " & Value, 0, 0, 0)
- Error = mciSendString("setaudio m" + LTrim$(Str(myid)) + " volume to " + Str(Value), 0, 0, 0)
+ Error = mciSendString("setaudio m" + LTrim$(Str(myid)) + " volume to " + Str(Value) + " ", 0, 0, 0)
  
 End Function
 Public Function setPositionTo(Second As Double)
@@ -763,7 +763,7 @@ Public Function setPositionTo(Second As Double)
     mciSendString "seek m" + LTrim$(Str(myid)) + " to " + Second, 0, 0, 0
     End If
      If AVIRUN Then
-    AVI.Timer1.enabled = False
+    AVI.Timer1.Enabled = False
     
      If (Me.getLengthInMS - Me.getPositionInMS) > 0 Then
     
@@ -779,9 +779,9 @@ Public Function restartMovie()
     'function to start playing from the beginning
     Error = mciSendString("seek m" + LTrim$(Str(myid)) + " to start", 0, 0, 0)
      If AVIRUN Then
-    AVI.Timer1.enabled = False
-    AVI.Timer1.enabled = Me.getLengthInMS
-      AVI.Timer1.enabled = True
+    AVI.Timer1.Enabled = False
+    AVI.Timer1.Enabled = Me.getLengthInMS
+      AVI.Timer1.Enabled = True
     End If
     playMovie
 End Function

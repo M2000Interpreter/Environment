@@ -187,16 +187,16 @@ Dim hLib As Long
   GetFuncPtr = GetProcByName(hLib, sFunc)
   If GetFuncPtr = 0 Then MyEr "EntryPoint not found: " + sFunc + " in: " + sLib, "EntryPoint not found: " + sFunc + " στο: " + sLib
 End Function
-Public Sub RemoveDll(ByVal sLib As String)
+Public Sub RemoveDll(ByVal sLib As String, Optional noErr As Boolean)
 Dim v As Long, s As String
 s = ExtractPath(sLib)
 If s = "" Then sLib = mcd + sLib
 If LibHdls.Find(sLib) Then
     If FreeLibrary(LibHdls.Value) <> 0 Then
-    LibHdls.RemoveWithNoFind
+        LibHdls.RemoveWithNoFind
     Else
     v = GetLastError()
-    MyEr "η βιβλιοθήκη δεν μπορεί να αφαιρεθεί, κωδικός λάθους:(" & v & ")", "dll not removes, error code:(" & v & ")"
+    If Not noErr Then MyEr "η βιβλιοθήκη δεν μπορεί να αφαιρεθεί, κωδικός λάθους:(" & v & ")", "dll not removes, error code:(" & v & ")"
     
     End If
 Else

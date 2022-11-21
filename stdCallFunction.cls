@@ -150,7 +150,7 @@ End Property
 Private Sub Class_Terminate()
 If FreeHere Then
 If mFunction <> "" Then
-RemoveDll mFunction
+RemoveDll mFunction, True
 End If
 End If
 End Sub

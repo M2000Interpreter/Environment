@@ -2777,7 +2777,7 @@ while inkey$<>"" : end while
 Set Fast!
 Pendulum
 Set Fast
-keyboard "Info"+chr$(13)
+if module(Infobasic) then keyboard "Infobasic", 13
 }
 MODULE LOGO {smooth off  ' can't use xor with GDI+, so we work with GDI32 (by default)
 Form 80, 50
@@ -5480,7 +5480,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 38 for M2000 Interpreter version 11, revision 9 and above"
+	Report " A collection of modules for tests version 39 for M2000 Interpreter version 11, revision 17 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -5554,6 +5554,7 @@ Fkey + Enter to see the Function Keys
 }
 \\title("M2000 Writer")
 \\Keyboard "Writer"+chr$(13)
+Refresh 50
 show
 End
 Sub title(a$)
@@ -5569,7 +5570,7 @@ End Sub
 MODULE SAVEME {Print "Wait..."
 Title "Info"
 dir user
-save info, {UseThis : InfoBasic :Fkey: Pen 15 {Print "Press F3 now"}}
+save info, {UseThis : InfoBasic : ShowKeys: Pen 15 {Print "Press F3 now"}}
 Print "Done"
 
 }
@@ -6649,14 +6650,14 @@ MODULE UPDATE {// if you can't run update, means that you get an error and the n
 beep
 Title "Info"
 dir appdir$
-save info, {UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}}
+save info, {UseThis : InfoBasic : ShowKeys : Pen 15 {Print "Press F3 now"}}
 if isnum then {
 	drop
 	open "info.bck" for output as #N
 	close #N
 }
 dir user
-save info, {UseThis : InfoBasic : Fkey: Pen 15 {Print "Press F3 now"}}
+save info, {UseThis : InfoBasic :  ShowKeys: Pen 15 {Print "Press F3 now"}}
 }
 MODULE BJ { Escape Off
  Flush  \\empty Stack, we use optional arguments in Modules
@@ -13797,29 +13798,43 @@ Checkit 1033, 1036
 Checkit 1033, 1032
 }
 MODULE ENV {Module CheckIt {
-      \\ using read only variablles
-      Print "Platform: ";Platform$
-      Print "Computer Os: "; Os$
-      Print "Type of OS: ";OsBit;" bit"
-      Print "Computer Name:";  Computer$
-      Print "User Name: "; User.Name$
-      \\ using WScript.Shell
-      Declare objShell "WScript.Shell"
-      With  objShell, "Environment" set env ("Process")
-      With env, "item" as Env$()
-      Print Env$("PATH")
-      Print Env$("HOMEPATH")
-      Declare objShell Nothing
-      \\ using internal Information object
-      Declare OsInfo INFORMATION
-      With OsInfo, "build" as build, "NtDllVersion" as NtDllVersion$
-      Method OsInfo, "GetCurrentProcessSID" as PID$
-      Method OsInfo, "IsProcessElevated" as isElevated
-      Print "Os build number: ";build
-      Print "Nr Dll version: ";NtDllVersion$
-      Print "ProcessSID: ";pid$
-      Print "Is Process Eleveted: ";isElevated
-      Declare OsInfo Nothing
+\\ using read only variablles
+	Print "Platform: ";Platform$
+	Print "Computer Os: "; Os$
+	Print "Type of OS: ";OsBit;" bit"
+	Print "Computer Name:";  Computer$
+	Print "User Name: "; User.Name$
+\\ using WScript.Shell
+	Declare objShell "WScript.Shell"
+	With  objShell, "Environment" set env ("Process")
+	With env, "item" as Env$()
+	rem {
+		Print  Part $(,4), "Path:",
+		Report 3, Env$("PATH")
+	}
+	Pen 12 {Print "Path: "; Env$("PATH")}
+	Cursor 0, row
+	Print "MOMEPATH: ";  Env$("HOMEPATH")
+	Declare objShell Nothing
+\\ using internal Information object
+	Declare OsInfo INFORMATION
+	With OsInfo, "build" as build, "NtDllVersion" as NtDllVersion$
+	Method OsInfo, "GetCurrentProcessSID" as PID$
+	Method OsInfo, "IsProcessElevated" as isElevated
+	Print "Os build number: ";build
+	Print "Nr Dll version: ";NtDllVersion$
+	Print "ProcessSID: ";pid$
+	Print "Is Process Eleveted: ";isElevated
+	Declare OsInfo Nothing
+\\ Network - Internet
+	Print "Your LAN address: ";Lan$
+	Print "Internet Connection: ";
+	If Internet  then
+		Print "ON"
+		Print "Your public IP address: ";Internet$
+	Else
+		Print "OFF"
+	end if
 }
 Checkit
 }
@@ -18042,7 +18057,7 @@ Declare Pad Nothing
 Declare NotePad Nothing 
 If Module(Info) Then
     Title "Info"
-    keyboard "INFOBasic"+chr$(13)
+    keyboard "INFOBasic", 13
 end if
 }
 MODULE ΓΛΩΣΣΑ {\\ notepad for educational school language ΓΛΩΣΣΑ
@@ -20997,7 +21012,7 @@ MODULE MAXITEM {Module TestThis {
 }
 TestThis
 }
-MODULE INFO {keyboard "UseThis : InfoBasic : Fkey"+chr$(13)
+MODULE INFO {keyboard "UseThis : InfoBasic: Showkeys", 13
 
 }
 MODULE CLOCK1 {''keyboard " clock %ok=1 : clear :  info "+chr$(13)
@@ -25996,7 +26011,7 @@ Function Form1.Click {
       }
       Doc$="This is a value "+Feed$+{
       }
-      Doc$="The CheckBox is "+Str$(CheckGet,{;"Checked";"No Checked";})+{
+      Doc$="The CheckBox is "+Str$(CheckGet,{;"Checked";"Not Checked";})+{
       Press Alt+Q to send Ctrl+F4
       }
       Thread worker Execute Data Doc$
@@ -26707,7 +26722,7 @@ MODULE LED {\\ if you have two monitors:
 // Window mode, 2    // selecet monitor 2
 cls, 0
 window 6, window
-
+desktop clear
 Module Led_Clock{
 	Escape Off
 	Smooth off
@@ -26731,6 +26746,7 @@ Module Led_Clock{
 	CLS BackColor, 0
 	Back {CLS BackColor,0}
 	desktop 255, BackColor
+	desktop hide
 	Forecolor=12
 	C=BackColor-Forecolor
 	pen BackColor
@@ -35302,4 +35318,275 @@ MODULE XML4 {Module CheckIt {
 }
 CheckIt
 }
-UseThis : InfoBasic : Fkey : Pen 15 {Print "Press F3 now"}
+MODULE BSEARCH {\\ binary search
+const N=10
+Dim A(0 to N-1)
+A(0):=1,2,3,4,5,6,8,9,10,11
+Print Len(A())=10
+Function BinarySearch(&A(), aValue) {
+	def long mid, lo, hi
+	def boolean ok=False
+	let lo=0, hi=Len(A())-1
+	While lo<=hi
+		mid=(lo+hi)/2
+		if A(mid)>aValue Then
+			hi=mid-1
+		Else.if A(mid)<aValue Then
+			lo=mid+1
+		Else
+			=mid
+			ok=True
+			exit
+		End if
+	End While
+	if not ok then =-lo-1
+}
+For i=0 to 12
+Rem	Print "Search for value:";i
+	where= BinarySearch(&A(), i)
+	if where>=0 then
+		Print "found i at index: ";where
+	else
+		where=-where-1
+		if where<len(A()) then
+			Print "Not found, we can insert it at index: ";where
+			Dim A(len(A())+1)   ' redim
+			stock A(where)	 keep len(A())-where-1, A(where+1)  'move items up
+			A(where)=i  ' insert value
+		Else
+			Print "Not found, we can append to array at index: ";where
+			Dim A(len(A())+1)   ' redim
+			A(where)=i  ' insert value
+		End If
+	end if
+next i
+Print Len(A())=13
+Print A()
+}
+MODULE SHOWKEYS {refresh 50
+n=mode
+x=scale.x*4/5
+y=scale.y*3/4
+declare form1 form
+Method form1, "NoTaskBar"
+With form1, "Title", "FKEY List"
+Method form1, "TransparentTitle"
+def long k
+after 10000 {
+	try {
+           Method form1, "CloseNow"
+	}
+}
+
+layer form1 {
+	window n,  x, y;
+	form 60, 28
+	gradient 4,7, 0
+	cls 0x333333, 2
+	pen 15
+	Report 2, "Press Alt+F4 or close form from square icon - double click - or press enter"
+	Print
+	fkey
+	method form1, "opacity", 240
+}
+function form1.enter {
+	Method form1, "CloseNow"
+}
+Function form1.click {
+	Method form1, "SendScanCode", "F4", alt:=true
+}
+Method form1, "show", 1
+threads erase
+declare form1 nothing
+
+}
+MODULE CARET {// Find and replace time for caret time out
+declare CR WINDOWS.REGISTRY
+const HKEY_CURRENT_USER = 0x80000001&
+const REG_DWORD = 4&					'32-bit number
+with CR, "ClassKey",  HKEY_CURRENT_USER 
+with CR, "SectionKey", "Control Panel\Desktop\"
+with CR, "ValueType", REG_DWORD , "ValueKey", "CaretTimeout"
+with CR,"KeyExists" as CaretTimeout.Exist, "Value" as CaretTimeout.value
+If CaretTimeout.Exist then Print  "Old Value: 0x"+Hex$(uint(CaretTimeout.value))+"&", CaretTimeout.value
+CaretTimeout.value=0xFFFFFFFF&
+If CaretTimeout.Exist then Print  "New Value: 0x"+ Hex$(uint(CaretTimeout.value))+"&", CaretTimeout.value
+}
+MODULE GRAPH2 {Font "Tahoma"
+Pen 14
+Window 12, 16000, 14000;
+Smooth on
+PrintBorderLine=lambda (No, Col)
+->{
+	x=row : cursor 0,row
+	for i=1 to No:Print Over ~(1,Col,Col): if i<No then Print
+	Next : cursor 0, x
+}
+DispAxis=lambda (M, Span)
+	->{
+		long z=twipsX*Span, z1=scale.x/z, zm=(z1 div 6)+1, zu=z1-zm-1
+		if zu<3 then Error "Span to small"
+		long du=zu*z+z div 2, i, zz=z div 2
+		zm*=z
+		long zy=TwipsY*Span,zv=M+(scale.Y-M)/2, zy1=M/zy, zd=zy div 4
+		move zm-z*1.5, zv
+		draw du+z*1.5, 0
+		move zm, zv+zd
+		draw 0, -M-zd
+		for i=-1 to zu
+			if i else continue
+			move zm+i*z, zv
+			draw 0, zd, 15
+		next i
+		for i=1 to zy1
+			move zm, zv-i*zy
+			draw -zz, 0, 15
+		next i
+		=(zm, zv, z, zy)
+	}
+evaluate_line=lambda (x1,y1,x2,y2)
+	->{
+		=lambda x1,y1,x2,y2 (x)
+		->{
+			dy=y2-y1: dx=x2-x1
+			=(dy*x+((dx*y1)-(dy*x1)))/dx
+		}
+	}
+//(Xax,Yax,Xs,Ys)=DispAxis(Scale.Y*4/5, 80)
+PointMaker=lambda (Xax,Yax,Xs,Ys, Ev_l)
+	->{
+		=lambda Xax,Yax,Xs,Ys, Ev_l (X, lbl$="", axis=false, plotme=true)
+		->{
+			Y=Ev_l(X):wX=Xax+X*Xs :wY= Yax-Y*Ys
+			if axis then
+				move Xax, wY
+				Width 1, 2 {
+					draw wX-Xax,0
+					draw 0, Yax-wY
+				}
+			end if
+			if plotme then Width 8 {Pset 14, wX, wY}	
+			if lbl$<>"" then
+				move wX, wY
+				Pen 15 {Legend format$("[{0},{1}]", round(X,2),round(Y,2))+lbl$, "Courier", Ys/72}
+			end if
+			=(wX, wY)
+		}
+	}
+
+///Program  Begin here\\\
+cls 0,0
+gradient 6, 0
+data1=DispAxis(Scale.Y*4/5, 80)  // draw axis and return data
+// !data1 as parameter push a copy of items as parameters
+set2=(2,1,8,8.5)
+Plot2=PointMaker(!data1, evaluate_line(-1,2,8,4))
+Plot3=PointMaker(!data1, evaluate_line(!set2))
+
+(a, b)=Plot2(-5,,,false)
+(a1, b1)=Plot2(14,,,false)
+Pen 11 {move a, b:draw to a1, b1}
+
+(a, b)=Plot3(-5,,,false)
+(a1, b1)=Plot3(14,,,false)
+Pen 10 {move a, b:draw to a1, b1}
+
+call Plot2(2, " "):Call Plot2(3," "):Call Plot2(5.6," ", true):Call Plot2(8," ")
+call Plot3(2, " "):Call Plot3(3," "):Call Plot3(5.6," "):Call Plot3(7.5," ", true)
+
+Call PrintBorderLine(2, #3388AA)
+OldI=Italic:Double: Italic 1: Report 6, "Graph2": Italic OldI: Normal
+
+// last line flashing text
+Cursor 0, Height-1
+L=2
+Every 1000/4{
+	Print Over  ~(L,2,2), $(6), "Press any key"
+	if inkey$<>"" then exit
+	L=3-L
+}
+
+if module(Infobasic) then keyboard "Infobasic", 13
+
+
+
+}
+MODULE MULTIPLESCREENS {again:
+// use of form !, using !,  make a form to leave more border (for TV which hide some pixels at screen border)
+form ! 80, 35
+cls 0,0
+back {cls 0,0}
+flush
+desktop 255,0
+print "All values are in twips"
+z=window
+for i=0 to monitors-1
+	window mode, i
+	Back {
+		data i, motion.XW, motion.YW, motion.X, motion.y, scale.x, scale.y, twipsX, twipsY
+	}
+	data i, motion.XW, motion.YW, motion.X, motion.y, scale.x, scale.y, twipsX, twipsY
+next i
+window mode, z
+form ! 80, 35
+for i=0 to (monitors-1)+2
+	read m, mxw, myw, mx, my, sx, sy, tx, ty
+	print m, mxw, myw, mx, my, sx, sy, tx, ty
+next i
+desktop 255
+print "console at monitor ";z
+long zz
+again2:
+input "Switch console to monitor:", zz
+if zz>=0 and zz<monitors then {
+	if zz<>z then {
+		window mode, zz
+		form ! 80, 35
+		goto again  // goto works inside { } so the if thenin muliple lines  need {}
+	}
+} else {
+	print "Value between 0 and "; monitors
+
+}
+input "Another try (no zero value):", zz
+if zz<>0 then goto again2
+print "done"
+}
+MODULE VPLAYER {def resp$
+movie // close any open video
+cls 0, 0
+back {cls 0,0}
+Print "Video Player 0.1"
+volume 30
+video$=path$(0xE)
+Print video$
+dir video$
+menu
+files + "avi|mp4"
+Menu !
+if menu>0 then
+	p$=menu$(menu)
+	Print p$
+	Print "Play:";
+	menu "yes", "no"
+	if menu=1 then Print menu$(menu) else Print "no"
+	if menu=1 then
+		movie p$
+		resp$=movie.error$
+		if resp$<>"" then
+			Report {You need video codecs, perhaps from:
+				https://www.mediaplayercodecpack.com/standard/
+				You get Opera and mcAfee web protection, but you can uninstall them.
+				}
+		else
+			//MOVIE 1000+motion.xW,1000+motion.yW 
+			report {Click on video to stop/hide it, or write Movie and press enter}
+			wait 3000
+		end if
+	end if
+end if
+dir user
+volume 50
+if resp$="" then if module(info) then info
+}
+UseThis : InfoBasic : ShowKeys : Pen 15 {Print "Press F3 now"}

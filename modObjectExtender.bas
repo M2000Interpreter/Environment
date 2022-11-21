@@ -344,7 +344,7 @@ Private Sub AddByte(pASM As Long, bt As Byte)
     CpyMem ByVal pASM, bt, 1
     pASM = pASM + 1
 End Sub
-Private Function CallCdecl( _
+Public Function CallCdecl( _
     ByVal lpfn As Long, _
     ParamArray Args() As Variant _
 ) As Long

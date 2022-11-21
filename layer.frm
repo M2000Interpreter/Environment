@@ -47,7 +47,10 @@ Private Sub Form_Load()
 Set LastGlist = Nothing
 form5iamloaded = True
 If Not s_complete Then
-Me.move -30000
+On Error Resume Next
+Me.move -100000
+If Err.Number > 0 Then Me.move -30000
+
 If Form1.Visible Then Form1.Hide
 
 End If

@@ -81,7 +81,8 @@ End If
 End Sub
 
 Private Sub Form_Load()
-Me.backcolor = Form1.DIS.backcolor
+Dim hmonitor As Long
+Me.BackColor = Form1.DIS.BackColor
 If getout Then Exit Sub
 CLICK_COUNT = 0
 Dim CD As String
@@ -93,36 +94,34 @@ getout = True
 Else
 MediaPlayer1.hideMovie
 MediaPlayer1.FileName = avifile
-Timer1.enabled = False
+Timer1.Enabled = False
 Interval = MediaPlayer1.Length
-
+hmonitor = FindMonitorFromPixel(Form1.Left, Form1.top)
 
 If MediaPlayer1.Error = 0 Then
 
 If UseAviSize And MediaPlayer1.Height > 2 Then
-If AviSizeX = 0 And AviSizeY = 0 Then
-If aviX = 0 And aviY = 0 Then
+    If AviSizeX = 0 And AviSizeY = 0 Then
+        If aviX = 0 And aviY = 0 Then
+            AviSizeX = (ScrInfo(Console).Width - 1) * 0.99
+            AviSizeY = (ScrInfo(Console).Height - 1) * 0.99
+        Else
+            AviSizeX = Me.Scalewidth
+            AviSizeY = Me.Scaleheight
+        End If
+    Else
+        If AviSizeX = 0 And AviSizeY <> 0 Then
+            AviSizeX = CLng(AviSizeY * MediaPlayer1.Width / CDbl(MediaPlayer1.Height))
+        End If
+        If AviSizeY = 0 Then
+            AviSizeY = CLng(AviSizeX * MediaPlayer1.Height / CDbl(MediaPlayer1.Width))
+        End If
+        If aviX = 0 And aviY = 0 Then
+            aviX = ((ScrInfo(Console).Width - 1) * 0.99 - AviSizeX) / 2 + ScrInfo(Console).Left
+            aviY = ((ScrInfo(Console).Height - 1) * 0.99 - AviSizeY) / 2 + ScrInfo(Console).top
+        End If
 
-AviSizeX = (ScrInfo(Console).Width - 1) * 0.99
-AviSizeY = (ScrInfo(Console).Height - 1) * 0.99
-Else
-AviSizeX = Me.Scalewidth
-AviSizeY = Me.Scaleheight
 End If
-Else
-If AviSizeX = 0 And AviSizeY <> 0 Then
-AviSizeX = CLng(AviSizeY * MediaPlayer1.Width / CDbl(MediaPlayer1.Height))
-End If
-If AviSizeY = 0 Then
-AviSizeY = CLng(AviSizeX * MediaPlayer1.Height / CDbl(MediaPlayer1.Width))
-End If
-If aviX = 0 And aviY = 0 Then
-
-aviX = ((ScrInfo(Console).Width - 1) * 0.99 - AviSizeX) / 2 + ScrInfo(Console).Left
-aviY = ((ScrInfo(Console).Height - 1) * 0.99 - AviSizeY) / 2 + ScrInfo(Console).top
-End If
-End If
-
 Me.move aviX, aviY, AviSizeX, AviSizeY
 MyDoEvents
 MediaPlayer1.openMovieWindow Me.hWnd, "child"
@@ -130,8 +129,10 @@ MediaPlayer1.openMovieWindow Me.hWnd, "child"
 MediaPlayer1.sizeLocateMovie 0, 0, ScaleX(AviSizeX, vbTwips, vbPixels), ScaleY(AviSizeY, vbTwips, vbPixels) + 1
 'Show
 ElseIf MediaPlayer1.Height > 2 Then
-Me.move Left, top, ScaleX(MediaPlayer1.Width, vbPixels, vbTwips), ScaleY(MediaPlayer1.Height, vbPixels, vbTwips) + 1
 
+
+
+Me.move 0, 0, ScaleX(MediaPlayer1.Width, vbPixels, vbTwips), ScaleY(MediaPlayer1.Height, vbPixels, vbTwips) + 1
 MediaPlayer1.openMovieWindow AVI.hWnd, "child"
 
 
@@ -152,12 +153,12 @@ Height = 0
 Else
 
 If Not UseAviXY Then
-Me.move ((ScrInfo(Console).Width - 1) - Width) / 2, ((ScrInfo(Console).Height - 1) - Height) / 2
+Me.move ((ScrInfo(Console).Width - 1) - Width) / 2 + ScrInfo(Console).Left, ((ScrInfo(Console).Height - 1) - Height) / 2 + ScrInfo(Console).top
 End If
 End If
 
 
-Timer1.enabled = False
+Timer1.Enabled = False
 
 
 
@@ -172,11 +173,11 @@ AVIUP = True
 End Sub
 
 Public Sub Avi2Up()
-Timer1.enabled = True
+Timer1.Enabled = True
 Me.ZOrder
 MediaPlayer1.playMovie
 
-Timer1.enabled = True
+Timer1.Enabled = True
 AVIRUN = True
 End Sub
 
@@ -192,7 +193,7 @@ End Sub
 
 Public Sub GETLOST()
 getout = True
-Timer1.enabled = False
+Timer1.Enabled = False
 Hide
 MediaPlayer1.hideMovie
 MediaPlayer1.stopMovie
