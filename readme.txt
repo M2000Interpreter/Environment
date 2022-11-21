@@ -1,9 +1,16 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 16 active-X
-Optimizations. Some work on info.bas (version 38):
-1. New version for Compiler module additon 6 more examples plus choise for M2000 transpiler,run faster than virtual machine)
-2. Assert renamed to Assert1.
+Version 11 Revision 17 active-X
+- Optimizations + Bug fixes
+  (from 16 was a bug, which prevents MATMUL example (from INFO) to execute)
+- Some work on info.bas (version 39):
+1. BSEARCH (binary search example)
+2. SHOWKEYS (functions keys displayed on a user form)
+3. CARET (adjust caret timeout - CHANGE WINDOWS REGISTRY WITHOUT USING ELEVATION)
+4. GRAPH2 (simple graph with axis and lines and points)
+5. MULTIPLESCREENS (Move console to any screen (monitor), and found some metrics about)
+6. VPLAYER (simple video player)
+
 
 
 George Karras, Kallithea Attikis, Greece.
