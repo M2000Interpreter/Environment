@@ -2859,7 +2859,7 @@ Sub drawframe0()
 End Sub
 }
 MODULE EN {if version< 9.9 Then 1000
-If revision<19 Then 1000
+if version= 9.9 AND REVISION<19 Then 1000
 \\ by default Dog=1, Cat=2
 \\ we can change it: Dog=0, Cat   ' so now Cat=1
 \\ we can change it: Dog=100, Cat=200
@@ -5480,7 +5480,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 39 for M2000 Interpreter version 11, revision 17 and above"
+	Report " A collection of modules for tests version 40 for M2000 Interpreter version 11, revision 17 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -12020,7 +12020,7 @@ MODULE MINESWEEPER {Module Minesweeper {
       Refresh 1000
       Def com$, com_label$
       Def x, b_row, b_col, where, top_where
-      Def rows=6, columns=8, swap_first%
+      Def rows=12, columns=8, swap_first%
       Def boolean skiptest, end_game, cheat
       Dim Board$(0 to rows+1, 0 to columns+1)="? "
       Def mines%, i%, j%, used%, acc%, n%, m%
@@ -12279,10 +12279,11 @@ MODULE MINESWEEPER {Module Minesweeper {
             }
       End Sub     
 }
-Minesweeper
-Report 2, "Press a Key"
-Push Key$ : Drop
-Keyboard "info"+chr$(13)   ' call the info module
+do
+	Minesweeper
+	Report 2, "Press Space Bar to plain again, or any other key to exit"
+when Key$=" "
+if module(infobasic) then Keyboard "infobasic", 13 
 }
 MODULE IBAN {\\ IBAN checker
 Function MakeIBANfun$ {

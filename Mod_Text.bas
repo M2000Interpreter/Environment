@@ -91,7 +91,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 11
 Global Const VerMinor = 0
-Global Const Revision = 17
+Global Const Revision = 18
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -51784,13 +51784,13 @@ i = i + 1
 If MaybeIsSymbol3lot(b$, b12345, i) Or i > Len(b$) Then
     If Mid$(b$, i, 2) = ":=" Then GoTo arr1111
     If Mid$(b$, i, 2) = "/=" Then GoTo arr1111
-    If GetSub(w$ + ")", i) Then
-        Exit Function
-    Else
+   ' If GetSub(w$ + ")", i) Then
+   '     Exit Function
+   ' Else
         bstack.tmpstr = ss$
         ExecuteVar = 2  ' GoTo autogosub
         Exit Function
-    End If
+    'End If
 
 End If
 arr1111:
@@ -52416,14 +52416,14 @@ End If
 Loop
 Else
 If LastErNum <> 0 Then Exec1 = 0: ExecuteVar = 8: Exit Function
-If GetSub(w$ + ")", i) Then
-Else
+'If GetSub(w$ + ")", i) Then
+'Else
 bstack.tmpstr = ss$
 'b$ = ss$ + b$
 ExecuteVar = 2  ' GoTo autogosub
 Exit Function
     
-End If
+'End If
 End If
 Exit Function
 Case6:

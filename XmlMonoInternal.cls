@@ -357,12 +357,12 @@ Else
 End If
 
 End Property
-Function ScanForTagDeep(Tag$, child As XmlMonoInternal) As Boolean
+Function ScanForTagDeep(Tag$, Child As XmlMonoInternal) As Boolean
 If Not IsArray(root) Then
     MyEr "I have't node", "Δεν έχω κόμβο"
 ElseIf (root(3) And 1) Then
     beautify = CLng(100000 * Rnd) + 1
-    If deep(Tag$, child, beautify) Then
+    If deep(Tag$, Child, beautify) Then
         beautify = 0
         ScanForTagDeep = True
         Exit Function
@@ -371,10 +371,10 @@ ElseIf (root(3) And 1) Then
 Else
     MyEr "No childs for this node, only attributes", "όχι παιδιά για αυτόν τον κόμβο, μόνο ιδιότητες"
 End If
-Set child = New XmlMonoInternal
-child.NumericCharacterEntities = NumericCharacterEntities
+Set Child = New XmlMonoInternal
+Child.NumericCharacterEntities = NumericCharacterEntities
 End Function
-Friend Function deep(Tag$, child As XmlMonoInternal, guard As Long) As Boolean
+Friend Function deep(Tag$, Child As XmlMonoInternal, guard As Long) As Boolean
    Dim val, c As Collection, aXml As XmlMonoInternal
     Set val = root(2)
     If val Is Nothing Then
@@ -385,12 +385,12 @@ Friend Function deep(Tag$, child As XmlMonoInternal, guard As Long) As Boolean
         For i = 1 To c.count
         Set aXml = c(i)
         If aXml.beautify = guard Then Exit Function ' safety
-        If aXml.Tag = Tag$ Then Set child = aXml: deep = True: Exit Function
+        If aXml.Tag = Tag$ Then Set Child = aXml: deep = True: Exit Function
                     Dim p
             p = aXml.node
             If (p(3) And 1) = 1 Then
         If aXml.ChildCount > 0 Then
-            If aXml.deep(Tag$, child, guard) Then deep = True: Exit Function
+            If aXml.deep(Tag$, Child, guard) Then deep = True: Exit Function
         End If
         End If
         Next i
@@ -543,11 +543,11 @@ Property Let cdata(t$)
         root(4) = "<![CDATA[" + t$ + "]]>"
     End If
 End Property
-Function EndOffChilds(child As XmlMonoInternal) As Boolean
+Function EndOffChilds(Child As XmlMonoInternal) As Boolean
 EndOffChilds = False
 If Not thelast Then
-    Set child = Nextchild
-    child.ResetChildPointer
+    Set Child = Nextchild
+    Child.ResetChildPointer
 Else
 EndOffChilds = True
 End If
@@ -582,10 +582,10 @@ End If
      '   MyEr "node not inserted yet", "δεν έχει εισαχθεί κόμβος"
     Else
         Dim i As Long, c As Collection, m(), p, j As Long, D As XmlMonoInternal, t$
-        Dim id$
+        Dim Id$
         
-        If beautify > 0 Then id$ = space(beautify)
-        Xml = id$
+        If beautify > 0 Then Id$ = space(beautify)
+        Xml = Id$
         If Not ProcessBag Is Nothing Then
         For i = 1 To ProcessBag.count
         p = ProcessBag(i)
@@ -594,7 +594,7 @@ End If
         Else
         Xml = Xml + "<?" + p(0) + AnyNodeAttr(p) + "?>"
         End If
-        If beautify Then Xml = Xml + vbCrLf + id$
+        If beautify Then Xml = Xml + vbCrLf + Id$
         Next i
         End If
         If (root(3) And 1) = 0 Then
@@ -619,7 +619,7 @@ End If
                     If guard Is Nothing Then Set root(2) = Nothing ' weave untik top
                     If Len(D.status) > 0 Then status = "<" + root(0) + " child='" + Trim$(Str$(i)) + "'>" + D.status + "</" + root(0) + ">": GoTo 1000
                     Next i
-                    Xml = Xml + id$
+                    Xml = Xml + Id$
             Else
                     Xml = Xml + root(4)
             End If
@@ -668,10 +668,10 @@ Function AttrExist(t$, Optional attr As String) As Boolean
         AttrExist = Err.Number = 0
     End If
 End Function
-Function AlterProcessAttr(id, t$, NewValue As String, Optional OldValue As String) As Boolean
-If ProcessBag.count < id Or id < 1 Then MyEr "index fault", "δείκτης εκτός ορίων": Exit Function
+Function AlterProcessAttr(Id, t$, NewValue As String, Optional OldValue As String) As Boolean
+If ProcessBag.count < Id Or Id < 1 Then MyEr "index fault", "δείκτης εκτός ορίων": Exit Function
 Dim node, i As Long, c As Collection
-node = ProcessBag.item(id)
+node = ProcessBag.item(Id)
 If Typename(node(1)) = "Nothing" Then
     i = InStrRev(node(5), ">")
     OldValue = Mid$(node(5), i - 1)
@@ -896,7 +896,6 @@ againtag:
         Next n1
         node(5) = val$
         PlaceProcessingInstructions node
-       ' If Mid$(t$, pc, 1) <> ">" Then pc = pc + 1
     End If
 End If
 End Sub
@@ -1015,17 +1014,17 @@ newentry:
                                                 End If
                                                 
                                                 
-                                                Dim child As XmlMonoInternal
-                                                Set child = New XmlMonoInternal
-                                                child.NumericCharacterEntities = NumericCharacterEntities
-                                                child.createfromtext t$, pc, st
-                                                If child.HasNode Then AppendChildObj child
+                                                Dim Child As XmlMonoInternal
+                                                Set Child = New XmlMonoInternal
+                                                Child.NumericCharacterEntities = NumericCharacterEntities
+                                                Child.createfromtext t$, pc, st
+                                                If Child.HasNode Then AppendChildObj Child
                                                 While AdvanceAnySpaceorLT(t$, pc, st)
                                                     If Mid$(t$, pc + 1, 1) = "/" Then pc = pc + 1: GoTo here
-                                                    Set child = New XmlMonoInternal
-                                                    child.NumericCharacterEntities = NumericCharacterEntities
-                                                    child.createfromtext t$, pc, st
-                                                    If child.HasNode Then AppendChildObj child
+                                                    Set Child = New XmlMonoInternal
+                                                    Child.NumericCharacterEntities = NumericCharacterEntities
+                                                    Child.createfromtext t$, pc, st
+                                                    If Child.HasNode Then AppendChildObj Child
                                                 Wend
                                             End If
 here:

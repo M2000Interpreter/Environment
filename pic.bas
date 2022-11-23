@@ -1,7 +1,7 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Type abcd
-    x As Long
+    X As Long
     COM() As String
 End Type
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
@@ -153,16 +153,16 @@ Type bitmap
         bmBitsPixel As Integer
         bmBits As Long
 End Type
-Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
 Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hDC As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
 Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
 Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
 Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
+Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 'Declare Function GetObject Lib "gdi32" Alias "GetObjectA" (ByVal hObject As Long, ByVal nCount As Long, lpObject As Any) As Long
-Declare Function GetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long) As Long
-Declare Function SetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
+Declare Function GetPixel Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long) As Long
+Declare Function SetPixel Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long, ByVal crColor As Long) As Long
 Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function GetDesktopWindow Lib "user32" () As Long
@@ -571,14 +571,14 @@ Else
     Set CDib2Pic = emptypic
 End If
 End Function
-Public Function SetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long, aColor As Long) As Double
+Public Function SetDIBPixel(ssdib As Variant, ByVal X As Long, ByVal y As Long, aColor As Long) As Double
 Dim w As Long, h As Long, bpl As Long, rgb(2) As Byte
 w = val("&H" & Mid$(ssdib, 5, 4))
 h = val("&H" & Mid$(ssdib, 9, 4))
 If Len(ssdib) * 2 < ((w * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 If w * h <> 0 Then
 bpl = (LenB(ssdib) - 24) \ h
-w = (w - x - 1) Mod w
+w = (w - X - 1) Mod w
 h = (y Mod h) * bpl + w * 3 + 24
 CopyMemory rgb(0), ByVal StrPtr(ssdib) + h, 3
 
@@ -586,7 +586,7 @@ SetDIBPixel = -(rgb(2) * 256# * 256# + rgb(1) * 256# + rgb(0))
 CopyMemory ByVal StrPtr(ssdib) + h, aColor, 3
 End If
 End Function
-Public Function GetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long) As Double
+Public Function GetDIBPixel(ssdib As Variant, ByVal X As Long, ByVal y As Long) As Double
 Dim w As Long, h As Long, bpl As Long, rgb(2) As Byte
 'a = ssdib$
 w = val("&H" & Mid$(ssdib, 5, 4))
@@ -594,7 +594,7 @@ h = val("&H" & Mid$(ssdib, 9, 4))
 If Len(ssdib) * 2 < ((w * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 If w * h <> 0 Then
 bpl = (LenB(ssdib) - 24) \ h   ' Len(ssdib$) 2 bytes per char
-w = (w - x - 1) Mod w
+w = (w - X - 1) Mod w
 
 h = (y Mod h) * bpl + w * 3 + 24
 
@@ -741,7 +741,7 @@ cDibbuffer0.Cls bckColor
 
 there:
 Dim bDib2() As Byte, bDib1() As Byte
-Dim x As Long, y As Long
+Dim X As Long, y As Long
 Dim lc As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
@@ -861,7 +861,7 @@ End Function
 
 Public Function Merge3Dib(backdib As cDIBSection, maskdib As cDIBSection, frontdib As cDIBSection, Optional Reverse As Boolean = False)
 
-Dim x As Long, y As Long
+Dim X As Long, y As Long
 
 Dim xmax As Long, yMax As Long
     yMax = backdib.Height - 1
@@ -907,21 +907,21 @@ Dim tSA2 As SAFEARRAY2D
         '-----------------------------------------------
         If Reverse Then
         
-    For x = 0 To (xmax * 3) Step 3
+    For X = 0 To (xmax * 3) Step 3
         For y = yMax To 0 Step -1
-            bDib(x, y) = (CLng(bDib(x, y)) * bDib1(x, y) + CLng(bDib2(x, y)) * (255 - bDib1(x, y))) \ 256
-            bDib(x + 1, y) = (CLng(bDib(x + 1, y)) * bDib1(x + 1, y) + CLng(bDib2(x + 1, y)) * (255 - bDib1(x + 1, y))) \ 256
-            bDib(x + 2, y) = (CLng(bDib(x + 2, y)) * bDib1(x + 2, y) + CLng(bDib2(x + 2, y)) * (255 - bDib1(x + 2, y))) \ 256
+            bDib(X, y) = (CLng(bDib(X, y)) * bDib1(X, y) + CLng(bDib2(X, y)) * (255 - bDib1(X, y))) \ 256
+            bDib(X + 1, y) = (CLng(bDib(X + 1, y)) * bDib1(X + 1, y) + CLng(bDib2(X + 1, y)) * (255 - bDib1(X + 1, y))) \ 256
+            bDib(X + 2, y) = (CLng(bDib(X + 2, y)) * bDib1(X + 2, y) + CLng(bDib2(X + 2, y)) * (255 - bDib1(X + 2, y))) \ 256
         Next y
-        Next x
+        Next X
         Else
-     For x = 0 To (xmax * 3) Step 3
+     For X = 0 To (xmax * 3) Step 3
         For y = yMax To 0 Step -1
-            bDib(x, y) = (CLng(bDib2(x, y)) * bDib1(x, y) + CLng(bDib(x, y)) * (255 - bDib1(x, y))) \ 256
-            bDib(x + 1, y) = (CLng(bDib2(x + 1, y)) * bDib1(x + 1, y) + CLng(bDib(x + 1, y)) * (255 - bDib1(x + 1, y))) \ 256
-            bDib(x + 2, y) = (CLng(bDib2(x + 2, y)) * bDib1(x + 2, y) + CLng(bDib(x + 2, y)) * (255 - bDib1(x + 2, y))) \ 256
+            bDib(X, y) = (CLng(bDib2(X, y)) * bDib1(X, y) + CLng(bDib(X, y)) * (255 - bDib1(X, y))) \ 256
+            bDib(X + 1, y) = (CLng(bDib2(X + 1, y)) * bDib1(X + 1, y) + CLng(bDib(X + 1, y)) * (255 - bDib1(X + 1, y))) \ 256
+            bDib(X + 2, y) = (CLng(bDib2(X + 2, y)) * bDib1(X + 2, y) + CLng(bDib(X + 2, y)) * (255 - bDib1(X + 2, y))) \ 256
         Next y
-        Next x
+        Next X
         End If
 
    '-----------------------------------------------
@@ -1725,7 +1725,7 @@ With Form1.dSprite(PobjNum)
 .Picture = photo.Picture(SZ)
 
 
-players(PobjNum).x = .Width / 2
+players(PobjNum).X = .Width / 2
 players(PobjNum).y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, 0)
 
@@ -1748,7 +1748,7 @@ End With
 
 GetNewSpriteObj = PobjNum
 With players(PobjNum)
-.MAXXGRAPH = .x * 2
+.MAXXGRAPH = .X * 2
 .MAXYGRAPH = .y * 2
 .hRgn = True
 End With
@@ -1773,15 +1773,15 @@ If k = 0 Then Exit Function
 With Form1.dSprite(k)
 it = val("0" & .Tag)
 x1 = .Left + .Width * (100 - Percent) / 200 - players(it).HotSpotX
-y1 = .Top + .Height * (100 - Percent) / 200 - players(it).HotSpotY
+y1 = .top + .Height * (100 - Percent) / 200 - players(it).HotSpotY
 x2 = .Left + .Width * (1 - (100 - Percent) / 200) - players(it).HotSpotX
-y2 = .Top + .Height * (1 - (100 - Percent) / 200) - players(it).HotSpotY
+y2 = .top + .Height * (1 - (100 - Percent) / 200) - players(it).HotSpotY
 End With
 For i = Priority - 1 To 1 Step -1
 k = FindSpriteByTag(i)
 If k <> 0 Then
     With Form1.dSprite(k)
-        If (x2 < .Left + .Width / 4) Or (x1 >= .Left + .Width * 3 / 4) Or (y2 <= .Top + .Height / 4) Or (y1 > .Top + .Height * 3 / 4) Then
+        If (x2 < .Left + .Width / 4) Or (x1 >= .Left + .Width * 3 / 4) Or (y2 <= .top + .Height / 4) Or (y1 > .top + .Height * 3 / 4) Then
         Else
         suma = suma + 2 ^ (i - 1)
         End If
@@ -1818,7 +1818,7 @@ Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, k As Long
 k = FindSpriteByTag(Priority)
 If k = 0 Then Exit Function
 x1 = Form1.dSprite(k).Left + Form1.dSprite(k).Width * (100 - Percent) / 200
-y1 = Form1.dSprite(k).Top + Form1.dSprite(k).Height * (100 - Percent) / 200
+y1 = Form1.dSprite(k).top + Form1.dSprite(k).Height * (100 - Percent) / 200
 x2 = x1 + Form1.dSprite(k).Width * (1 - 2 * (100 - Percent) / 200)
 y2 = y1 + Form1.dSprite(k).Height * (1 - 2 * (100 - Percent) / 200)
 If x2 < nx1 Or x1 >= nx2 Or y2 <= ny1 Or y1 > ny2 Then
@@ -1865,16 +1865,16 @@ Function PosSpriteY(aPrior As Long) As Long ' before take from priority the orig
 Dim k As Long
 k = FindSpriteByTag(aPrior)
 If k < 1 Or k > PobjNum Then Exit Function
- PosSpriteY = Form1.dSprite(k).Top
+ PosSpriteY = Form1.dSprite(k).top
 End Function
 
-Sub PosSprite(aPrior As Long, ByVal x As Long, ByVal y As Long) ' ' before take from priority the original sprite
+Sub PosSprite(aPrior As Long, ByVal X As Long, ByVal y As Long) ' ' before take from priority the original sprite
 Dim k As Long
 k = FindSpriteByTag(aPrior)
 If k < 1 Or k > PobjNum Then Exit Sub
  
 
-Form1.dSprite(k).move x, y
+Form1.dSprite(k).move X, y
 
 End Sub
 Sub SrpiteHideShow(ByVal aPrior As Long, ByVal wh As Boolean) ' this is a priority
@@ -2020,9 +2020,9 @@ With Form1.dSprite(s)
 .Height = photo.Height * DYP * SZ
 .Width = photo.Width * DXP * SZ
 .Picture = photo.Picture(SZ)
-.Left = .Left + players(s).x - .Width / 2
-players(s).x = .Width / 2
-.Top = .Top + players(s).y - .Height / 2
+.Left = .Left + players(s).X - .Width / 2
+players(s).X = .Width / 2
+.top = .top + players(s).y - .Height / 2
 players(s).y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, True)
 ''''''''''''''''''''''''UpdateWindow .hwnd
@@ -2031,7 +2031,7 @@ Call SetWindowRgn(.hWnd, myRgn, True)
 End With
 With players(s)
 
-.MAXXGRAPH = .x * 2
+.MAXXGRAPH = .X * 2
 .MAXYGRAPH = .y * 2
 End With
 SetText Form1.dSprite(s)
@@ -3029,14 +3029,14 @@ Private Function c_CreatePartialRegion(rgnRects() As RECT, ByVal lIndex As Long,
     ' cheat a little & use rectangles to store the header
     With rgnRects(lIndex - 2&) ' bytes 0-15
         .Left = 32                      ' length of region header in bytes
-        .Top = 1                        ' required cannot be anything else
+        .top = 1                        ' required cannot be anything else
         .Right = uIndex - lIndex + 1&   ' number of rectangles for the region
         .Bottom = .Right * 16&          ' byte size used by the rectangles;
     End With                            ' ^^ can be zero & Windows will calculate
     
     With rgnRects(lIndex - 1&) ' bytes 16-31 bounding rectangle identification
         .Left = leftOffset                  ' left
-        .Top = rgnRects(lIndex).Top         ' top
+        .top = rgnRects(lIndex).top         ' top
         .Right = leftOffset + cX            ' right
         .Bottom = rgnRects(uIndex).Bottom   ' bottom
     End With
@@ -3497,7 +3497,8 @@ Else
     Loop
     End If
     ' compute decimal part
-    If Len(DE$) = 0 And Not skipdecimals Then
+    If Len(DE$) = 0 Then
+    If Not skipdecimals Then
     If Len(a$) > sng& Then
     If InStr("EeÅå", Mid$(a$, sng&, 1)) > 0 Then
     If InStr("1234567890+-", Mid$(a$, sng& + 1, 1)) > 0 Then
@@ -3506,7 +3507,9 @@ Else
     End If
     End If
     End If
+    End If
     Else
+      
       sng = sng + 1
 cont123:
         Do While sng <= Len(a$)
@@ -4858,23 +4861,23 @@ Debug.Print b.COM(1)
 End Sub
 
 Sub GetQrCode(basestack As basetask, a$, ab$)
-Dim ErrLevel As Long, x As Variant, QRcolor As Long
+Dim ErrLevel As Long, X As Variant, QRcolor As Long
 On Error Resume Next
 If FastSymbol(a$, ",") Then
-    If IsExp(basestack, a$, x, , True) Then
-        QRcolor = mycolor(x)
+    If IsExp(basestack, a$, X, , True) Then
+        QRcolor = mycolor(X)
     End If
 Else
     GoTo step2
 End If
 
 If FastSymbol(a$, ",") Then
-    If IsExp(basestack, a$, x, , True) Then
-        If x = 1 Then
+    If IsExp(basestack, a$, X, , True) Then
+        If X = 1 Then
             ErrLevel = 1
-        ElseIf x = 2 Then
+        ElseIf X = 2 Then
             ErrLevel = 2
-        ElseIf x = 3 Then
+        ElseIf X = 3 Then
             ErrLevel = 3
         End If
     End If
