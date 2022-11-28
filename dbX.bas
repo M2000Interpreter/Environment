@@ -848,7 +848,7 @@ ArrBase = 0
 NewBase = True
 Exit Function
 End If
-If IsLabelSymbolNew(R$, "топийг", "LOCAL", Lang, , , False) Then
+If IsLabelSymbolNew(R$, "топийг", "LOCAL", Lang) Then
 '
 If Not IsStrExp(bstackstr, R$, base) Then
 MissStringExpr

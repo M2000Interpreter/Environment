@@ -77,21 +77,21 @@ Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Public Property Get enabled() As Long
-enabled = glistN.enabled
+Public Property Get Enabled() As Long
+Enabled = glistN.Enabled
 End Property
 
-Public Property Let enabled(ByVal RHS As Long)
+Public Property Let Enabled(ByVal RHS As Long)
 If glistN Is Nothing Then Exit Property
-glistN.enabled = RHS
+glistN.Enabled = RHS
 End Property
-Public Sub move(x, y, Optional w, Optional h)
+Public Sub move(X, y, Optional w, Optional h)
 If IsMissing(w) Then
-glistN.MoveTwips CLng(x), CLng(y), 0, 0
+glistN.MoveTwips CLng(X), CLng(y), 0, 0
 ElseIf IsMissing(h) Then
-glistN.MoveTwips CLng(x), CLng(y), CLng(w), 0
+glistN.MoveTwips CLng(X), CLng(y), CLng(w), 0
 Else
-glistN.MoveTwips CLng(x), CLng(y), CLng(w), CLng(h)
+glistN.MoveTwips CLng(X), CLng(y), CLng(w), CLng(h)
 End If
 End Sub
 Public Sub deconstruct()
@@ -100,7 +100,7 @@ Set Callback = Nothing
   Set glistN = Nothing
 End Sub
 Public Sub SetUp()
-white = Callback.Controls(1).forecolor
+white = Callback.Controls(1).ForeColor
 black = 0
 dimm1 = rgb(100, 200, 160)
 dimm2 = rgb(200, 120, 60)
@@ -127,11 +127,11 @@ With glistN
 .MenuItem 1, True, False, mValue
 .ListIndex = 0
 Set .Font = ff
-.forecolor = Callback.Controls(1).forecolor
+.ForeColor = Callback.Controls(1).ForeColor
 .dcolor = Callback.Controls(1).dcolor
 .LeftMarginPixels = .HeightPixels
 .ShowMe
-.enabled = True
+.Enabled = True
 End With
 End Sub
 Public Property Let Caption(myCap As String)
@@ -211,7 +211,7 @@ End Property
 Sub Shutdown()
 If Not glistN Is Nothing Then
 glistN.Shutdown
-glistN.enabled = False
+glistN.Enabled = False
 End If
 End Sub
 Public Sub FontAttr(ThisFontName, Optional ThisMode = -1, Optional ThisBold = True)
@@ -261,8 +261,8 @@ End Property
 Public Property Let ShowAlways(ByVal vNewValue As Variant)
 mStayOpen = CBool(vNewValue)
 If mStayOpen Then
-glistN.forecolor = rgb(0, 0, 0)
-glistN.backcolor = rgb(255, 255, 255)
+glistN.ForeColor = rgb(0, 0, 0)
+glistN.BackColor = rgb(255, 255, 255)
 End If
 End Property
 Sub GetFocus()
@@ -291,7 +291,7 @@ glistN.icon = RHS
 
 End Property
 
-Private Sub glistN_PreviewKeyboardUnicode(ByVal a As String)
+Private Sub glistN_PreviewKeyboardUnicode(a As String)
 Callback.SpreadKey a
 End Sub
 Private Sub glistN_Fkey(a As Integer)
@@ -301,7 +301,7 @@ Else
 Callback.SendFKEY a
 End If
 End Sub
-Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(a, Optional Shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 If MyIsNumeric(a) Then
 a = CLng(a)
 If a < 0 Then Exit Sub
@@ -318,7 +318,7 @@ End Select
 End If
 If Opcode < 0 Then Opcode = 0
 If a = 0 Then Exit Sub
-a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+a = a - 1000 * Shift - 10000 * ctrl - 100000 * alt
 Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
 Private Sub gListN_AccKey(m As Long)
@@ -327,7 +327,7 @@ End Sub
 Sub Colors(white1, Optional dimm21, Optional dimm11, Optional dimm33)
 On Error Resume Next
 If Not glistN Is Nothing Then
-glistN.forecolor = mycolor(white1)
+glistN.ForeColor = mycolor(white1)
 If Not IsMissing(dimm21) Then dimm2 = mycolor(dimm21)
 
 If Not IsMissing(dimm11) Then dimm1 = mycolor(dimm11)
@@ -338,7 +338,7 @@ End If
 End Sub
 Sub ColorsReset()
 white = rgb(255, 255, 255)
-glistN.forecolor = rgb(255, 255, 255)
+glistN.ForeColor = rgb(255, 255, 255)
 dimm1 = rgb(100, 200, 160)
 dimm2 = rgb(200, 120, 60)
 End Sub
@@ -352,3 +352,7 @@ Property Get Visible() As Boolean
         Visible = glistN.Visible
     End If
 End Property
+
+Private Sub glistN_WindowKey(VbKeyThis As Integer)
+Callback.ProcessWinKey VbKeyThis
+End Sub

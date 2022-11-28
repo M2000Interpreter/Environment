@@ -1,11 +1,11 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 18 active-X
-- Bug fixes: Val() statement now works fine, MINESWEEPER in info works fine too.
-- I found a piece of old code which removed, but prevent to call a sub when a function had same name, like function alfa() { } and Sub alfa() ... End Sub. The Gosub alfa() has no problem, but if we call alfa() without Gosub the current block terminate execution like executing exit statement, without any notice. So now this bug removed.
+Version 11 Revision 19 active-X
+1. A very rare bug founded and removed. This bug come from using operator for comparison for Groups (objects), when we use a pointer to group before the operator.
 
-- Also I found this: If we have a global array A() and we have a Dim A() in a module we change the global array, we don't make a local one. To prevent this we have to do this: Dim New A(), because we know it is a global array A(), or for a library (where some other place a global A() before execution of the module) is better to use Dim New (but if this line executed again before the end of module execution a new local array A() shadow the last local one, so it is better to use this only one time in a module's block (and then for redim we can use DIM A(), because local array has priority for picking). If a module read an array to A() and exist a global A() there is no problem because the read statement (which get the array from stack of values) never read to a global array, except we execute the READ in console's command line, or using SET READ where Set execute a line of code like it is a manual entered, from M2000 console. Those places have namespace empty. All other places have the namespace from module or function. For DIM this happen because a DIM define arrays, and can redifene arrays (works as REDIM PRESERVE for already defined arrays).
+2. New info examples: Priority, and Priority1 (for priority queues). Showkeys which open a user form now close using any key press (excluding special keys like arrows).
 
+3. New Functionality for User Forms: Using Windows key and up arrow or down arrow we can handle the maximize - restore to original size, for user forms which can change size. We must press the arrow key and quick press the window key, then press the appropriate arrow key again. The user forms in M2000 simulate the title bar, so this style normally didn't get the "maximize" command from windows, using Windows Key and arrows (there are many combinations, and yet I implement a fraction of it). Check it with info examples, press F8 to open mEditor, or run CS (c sharp editor) and htmlEditor.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

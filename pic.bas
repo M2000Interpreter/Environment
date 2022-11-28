@@ -4794,38 +4794,33 @@ End If
 crNew basestack, players(prive)
 ProcWriter = True
 End Function
-Sub test123()
-Dim alfa
-Debug.Print IsNull(alfa), myIsNull(alfa)
-NullVariant alfa
-Debug.Print IsNull(alfa), myIsNull(alfa)
-End Sub
-Sub SendAKey(ByVal keycode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
+
+Sub SendAKey(ByVal KeyCode As Integer, ByVal Shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
 Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long, old As Long
 Const key_release As Byte = 2
-If keycode > 500 Then extended = 1: keycode = keycode - 500
+If KeyCode > 500 Then extended = 1: KeyCode = KeyCode - 500
 If extended = 0 Then
-If keycode > 64 And keycode < 91 Then
-    If Not CapsLockOn() Then shift = Not shift
+If KeyCode > 64 And KeyCode < 91 Then
+    If Not CapsLockOn() Then Shift = Not Shift
 End If
 End If
 
-Map = MapVirtualKey(keycode, 0)
+Map = MapVirtualKey(KeyCode, 0)
 smap = MapVirtualKey(&H10, 0)
 cmap = MapVirtualKey(&H11, 0)
 amap = MapVirtualKey(&H12, 0)
 
 
-keycode = keycode Mod 255
+KeyCode = KeyCode Mod 255
 ' press key
-If shift Then keybd_event &H10, smap, 0, 0
+If Shift Then keybd_event &H10, smap, 0, 0
 If ctrl Then keybd_event &H11, cmap, 0, 0
 If alt Then keybd_event &H12, amap, 0, 0
-keybd_event keycode, Map, extended, 0
+keybd_event KeyCode, Map, extended, 0
 
 ' release key
-keybd_event keycode, Map, KEYEVENTF_KEYUP + extended, 0
-If shift Then keybd_event &H10, smap, KEYEVENTF_KEYUP, 0
+keybd_event KeyCode, Map, KEYEVENTF_KEYUP + extended, 0
+If Shift Then keybd_event &H10, smap, KEYEVENTF_KEYUP, 0
 If ctrl Then keybd_event &H11, cmap, KEYEVENTF_KEYUP, 0
 If alt Then keybd_event &H12, amap, KEYEVENTF_KEYUP, 0
 
@@ -4833,6 +4828,17 @@ End Sub
 Public Function CapsLockOn() As Boolean
     GetKeyboardState kbArray
     CapsLockOn = (kbArray.kbByte(VK_CAPITAL) And 1) = 1
+End Function
+Public Function WinKey() As Boolean
+    Const VK_RWIN As Long = &H5C
+    Const VK_LWIN As Long = &H5B
+ '   GetKeyboardState kbArray
+'    WinKey = ((kbArray.kbByte(VK_RWIN) And 1) = 1) Or ((kbArray.kbByte(VK_LWIN) And 1) = 1)
+    
+    WinKey = KeyPressedLong(VK_RWIN) Or KeyPressedLong(VK_LWIN)
+    
+    
+    
 End Function
 Public Sub ChangeTo408()
     Dim old
@@ -4851,14 +4857,6 @@ End Sub
 Public Function Keyboards(what) As String
    Keyboards = GetlocaleString2(94&, what)
 End Function
-Public Sub testthis()
-Dim a As abcd, b As abcd
-ReDim a.COM(0 To 3)
-a.COM(1) = "ok"
-b = a
-a.COM(1) = "ok11"
-Debug.Print b.COM(1)
-End Sub
 
 Sub GetQrCode(basestack As basetask, a$, ab$)
 Dim ErrLevel As Long, X As Variant, QRcolor As Long

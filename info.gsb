@@ -5480,7 +5480,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 40 for M2000 Interpreter version 11, revision 17 and above"
+	Report " A collection of modules for tests version 41 for M2000 Interpreter version 11, revision 17 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -35370,7 +35370,7 @@ x=scale.x*4/5
 y=scale.y*3/4
 declare form1 form
 Method form1, "NoTaskBar"
-With form1, "Title", "FKEY List"
+With form1, "Title", "FKEY List", "previewKey", true
 Method form1, "TransparentTitle"
 def long k
 after 10000 {
@@ -35385,12 +35385,12 @@ layer form1 {
 	gradient 4,7, 0
 	cls 0x333333, 2
 	pen 15
-	Report 2, "Press Alt+F4 or close form from square icon - double click - or press enter"
+	Report 2, "Press Alt+F4 or close form from square icon - double click - or press any key"
 	Print
 	fkey
 	method form1, "opacity", 240
 }
-function form1.enter {
+function form1.KeyPreview(New &k$) {
 	Method form1, "CloseNow"
 }
 Function form1.click {
@@ -35589,5 +35589,243 @@ end if
 dir user
 volume 50
 if resp$="" then if module(info) then info
+}
+MODULE PRIORITY {Module OrdrerQueue (filename$, emptysecndqueue as boolean)  {
+      // f=-2  or use empty filename for screen
+      open filename$ for output as #f
+      zz=list
+      pq=List      
+      flush
+      // subs can read from module's stack
+      println( "Add items to pq queue")
+      Data 4 ,"Feed cat",5 , "Make tea", 3, "Clear drains",1 , "Solve RC tasks"
+      AddItems(pq)
+      println("Add items to zz queue")
+      AddItems(zz, 2 , "Tax return", 1 ,"Solve RC tasks#2")
+      println( "Peek top from zz queue")
+      PeekTop(zz)  // Solve RC tasks#2
+      println( "Merge two priority lists")
+      merge(pq, zz, emptysecndqueue)
+      println("Peek top from pq queue")
+      PeekTop(pq)  // Solve RC tasks
+      println("Add items to pq queue")
+      AddItems(pq, 1 ,"Solve RC tasks#3")
+      println("Peek top from pq queue")
+      PeekTop(pq)  // Solve RC tasks
+      println("Pop one from pq until empty queue")
+      while len(pq)>0
+            PopOne(pq)
+      end while
+      println( "Pop one from zz until empty queue")
+      while len(zz)>0
+            PopOne(zz)
+      end while
+      close #f
+      sub AddItems(pq)
+            local s, z
+            while not empty
+                  read z
+                  if not exist(pq, z) then s=stack:append pq, z:=s else s=eval(pq)
+                  read what$: stack s {data what$}
+                  stack new {println( "add item",z,what$)}
+            end while
+            sort descending pq as number
+            Println()
+      end sub
+      sub merge(pq, qp, emptyqueue)           
+            local needsort=false
+            local kqp=each(qp, -1, 1), k$, t, p
+            while kqp
+                  t=eval(kqp)
+                  k$= eval$(kqp!)
+                  if not exist(pq, eval$(kqp!)) then
+                        p=stack
+                        append pq, val(eval$(kqp!)):=p
+                        needsort=true
+                  else
+                        p=eval(pq)                  
+                  end if
+                  stack p {
+                        if emptyqueue then
+                              data !t
+                              delete qp,eval$(kqp!)
+                        else
+                              data !stack(t)
+                        end if
+                  }
+            end while
+            if needsort then sort descending pq as number
+      end sub
+      sub PeekTop(pq)
+            Local k=len(pq)
+            if k=0 then exit sub
+            k=val(eval$(pq, k-1))
+            if exist(pq, k) then local s=eval(pq): println( k,stackitem$(s, 1))
+      End sub
+      Sub PopOne(pq)
+            Local k=len(pq)
+            if k<0 then exit sub
+            k=val(eval$(pq, k-1))
+            if exist(pq, k) then
+                  local s=eval(pq)
+                  println( k,stackitem$(s, 1))
+                  if len(s)=1 then
+                        delete pq, k
+                  else
+                        stack s {drop}
+                  end if
+            end if
+       end sub
+       Sub println()
+             if empty then print #f, "": exit sub
+             while not empty
+                  if islet then print #f, letter$;
+                  if empty else print #f, " ";
+                  if isnum then print #f,  number;
+                  if empty else print #f, " ";
+             end while
+             if f=-2 and  pos=0 then exit sub
+             print #f, ""
+       end sub
+}	
+pen 11 {Print "Priority Queue - Merging and removing items from second Queue"}
+OrdrerQueue "",  true
+Print "press a key": Push Key$: Drop
+Pen 11 {Print "Priority Queue - Merging without removing items from second Queue"}
+OrdrerQueue "",  false
+}
+MODULE PRIORITY1 {global countmany=0&
+class obj {
+private:
+      x, s$
+public:
+      operator ">" {
+            read k as *obj
+            push .x>k=>x
+      }
+      property toString$ {
+            value (sp=8) {
+                  link parent x, s$ to x, s$
+                  value$=format$("{0::-5}"+string$(" ", sp)+"{1:20}", x, s$)
+            }
+      }
+      function Copy {
+            countmany++
+            z=this
+            =pointer((z))
+      }
+      remove {
+            countmany--
+      }
+class:
+      module obj (.x, .s$) {countmany++}
+}
+// obj() return object as value (using a special pointer)
+function global g(priority, task$) {
+	// here we return an object using nonrmal pointer
+	// try to change -> to = to see the error
+	->obj(priority, task$)
+}
+Module PriorityQueueForGroups (emptysecndqueue as boolean) {
+      Flush  ' empty current stack
+      Data g(3, "Clear drains"),g(4 ,"Feed cat"), g( 5 , "Make tea")
+      Data g( 1 ,"Solve RC tasks")
+      ObjectCount()
+      pq=stack
+      zz=stack
+      while not empty
+            InsertPQ(pq) // top of stack is pq then objects follow
+      end while
+      Pen 15 {
+            data  g(2 , "Tax return"), g(1 ,"Solve RC tasks#2")
+            while not empty: InsertPq(zz): End While
+	            n1=each(zz,-1,1)
+	            Header()
+	            while n1
+	                  Print @Peek$(stackitem(n1))
+	            end while             
+      }
+      MergePq(pq, zz, emptysecndqueue)
+      InsertPq(pq, g(1 ,"Solve RC tasks#3"))
+      ObjectCount()
+      Print "Using Peek to Examine Priority Queue"
+      n1=each(pq,-1, 1)
+      Header()
+      while n1
+            Print @Peek$(stackitem(n1))
+      end while
+      ObjectCount()
+      Header()
+      while not @isEmpty(pq)
+            Print @Pop(pq)=>tostring$
+      end while
+      ObjectCount()
+      Header()
+      while not @isEmpty(zz)
+            Print @Pop(zz)=>tostring$
+      end while
+      ObjectCount()
+      // here are the subs/simple functions
+      // these are static parts of module
+      sub Header()
+            Print " Priority        Task"
+            Print "==========  ================"
+      end sub
+      sub ObjectCount()
+            Pen 10 {Print "There are ";countmany;" objects of type obj"}
+      end sub
+      sub MergePq(a, pq, emptyqueue)
+            local n1=each(pq, -1, 1), z=pointer()
+            while n1               
+                if emptyqueue then
+                    stack pq {
+                        shiftback len(pq)
+                        InsertPQ(a, Group)
+                    }
+                else
+                    z=stackitem(n1)
+                    InsertPQ(a, z=>copy())
+                end if
+            end while      
+      end sub
+      sub InsertPQ(a, n as *obj)
+            Print "Insert:";n=>tostring$(1)
+            if len(a)=0 then stack a {data n} : exit sub
+            if @comp(n, stackitem(a)) then stack a {push n} : exit sub
+            stack a {
+                  push n
+                  local t=2, pq=len(a), t1=0
+                  local m=pq
+                  while t<=pq
+                        t1=m
+                        m=(pq+t) div 2
+                        if m=0 then  m=t1 : exit 
+                        If @Comp(stackitem(m),n) then t=m+1:  continue
+                        pq=m-1
+                        m=pq
+                  end while
+                  if m>1 then shiftback m                  
+            }
+      end sub
+      function comp(a as *obj, pq as *obj)
+            =a>pq
+      end function
+      function Peek$(a as *obj)
+            =a=>toString$
+      end function
+      function IsEmpty(a)
+            =len(a)=0
+      end function
+      function Pop(a)
+            // Group make a copy (but here is a pointer of group)
+            stack a {shift stack.size
+            =Group}
+      end function
+}
+pen 11 {Print "Priority Queue - Merging and removing items from second Queue"}
+PriorityQueueForGroups true
+Print "press a key": Push Key$: Drop
+Pen 11 {Print "Priority Queue - Merging without removing items from second Queue"}
+PriorityQueueForGroups false
 }
 UseThis : InfoBasic : ShowKeys : Pen 15 {Print "Press F3 now"}

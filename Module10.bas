@@ -14,7 +14,7 @@ End Type
 Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (Arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
 Private Declare Function SafeArrayGetDim Lib "OleAut32.dll" (ByVal Ptr As Long) As Long
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
 Private Const E_POINTER As Long = &H80004003
 Private Const S_OK As Long = 0
 Private Const INTERNET_MAX_URL_LENGTH As Long = 2083
@@ -281,7 +281,7 @@ End Property
 Public Function BigFileHandler(FH As Long, ftype As Long, fst As Long, unif As Long) As Long
 Static MaxNum As Long
 Dim where As Long
-If FreeUseHandlers.Count = 0 Then
+If FreeUseHandlers.count = 0 Then
     MaxNum = MaxNum + 1
     InUseHandlers.AddKey CVar(MaxNum), Array(FH, ftype, fst, unif)
     InUseHandlers.sValue = FH
@@ -322,7 +322,7 @@ End Sub
 Public Sub CloseAllHandlers()
 Dim h&
 On Error Resume Next
-Do While InUseHandlers.Count > 0
+Do While InUseHandlers.count > 0
     InUseHandlers.ToEnd
     h& = CLng(InUseHandlers.sValue)
     API_CloseFile h&
@@ -971,8 +971,4 @@ ReDim sbf(0), var(0)
 Set globalstack = Nothing
 
 End Sub
-Sub test2345()
-Dim alfa() As Byte, b
-b = CStr(alfa())
-Debug.Print LenB(b), "123"
-End Sub
+
