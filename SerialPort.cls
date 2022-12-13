@@ -144,7 +144,7 @@ Private Declare Function ReadFile Lib "kernel32" (ByVal hFile As Long, lpBuffer 
 Private Declare Function WriteFile Lib "kernel32" (ByVal hFile As Long, lpBuffer As Any, _
          ByVal nNumberOfBytesToWrite As Long, lpNumberOfBytesWritten As Long, _
          ByVal lpOverlapped As Long) As Long
-Private h As Long, port$, BaudRate, mportnumber As Long
+Private h As Long, Port$, BaudRate, mportnumber As Long
 Private openserial As Boolean
 Private timeouts As COMMTIMEOUTS
 Dim BufferOut As MemBlock, bOutOffset As Long
@@ -160,14 +160,14 @@ Public Sub OpenPort(ByVal portnumber As Long, Optional ByVal rate As Long = 9600
     Dim rc As Long
     
     If portnumber >= 1 And portnumber <= 9 Then
-        port$ = "\\.\COM" + Trim$(Str$(portnumber))
+        Port$ = "\\.\COM" + Trim$(Str$(portnumber))
     ElseIf portnumber > 9 And portnumber <= 24 Then
-        port$ = "\\\\.\\COM" + Trim$(Str$(portnumber))
+        Port$ = "\\\\.\\COM" + Trim$(Str$(portnumber))
     Else
         Exit Sub
     End If
     
-    h = CreateFile(StrPtr(port$), GENERIC_READ + GENERIC_WRITE, ByVal 0, ByVal 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ByVal 0)
+    h = CreateFile(StrPtr(Port$), GENERIC_READ + GENERIC_WRITE, ByVal 0, ByVal 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ByVal 0)
 
     If h = -1 Then
         rc = Err.LastDllError
@@ -182,18 +182,18 @@ Public Sub OpenPort(ByVal portnumber As Long, Optional ByVal rate As Long = 9600
         Exit Sub
     End If
     openserial = True
-    Dim d As DCB 'The DCB structure and the SetCommState() function allow to set the baud rate and the byte size of the serial port.
-    rc = GetCommState(h, d)
-    d.ByteSize = 8
-    d.BaudRate = rate
-    d.fBitFields = F_BINARY Or Flags 'Windows does not support non-binary data transfers so the flag must always be set in the DCB structure.
+    Dim D As DCB 'The DCB structure and the SetCommState() function allow to set the baud rate and the byte size of the serial port.
+    rc = GetCommState(h, D)
+    D.ByteSize = 8
+    D.BaudRate = rate
+    D.fBitFields = F_BINARY Or Flags 'Windows does not support non-binary data transfers so the flag must always be set in the DCB structure.
     
     'Another example how to set some flags in the DCB.
     'd.fBitFields = F_BINARY Or F_PARITY Or F_RTS_CONTROL_ENABLE
     
-    d.StopBits = ONESTOPBIT
-    d.parity = NOPARITY
-    rc = SetCommState(h, d)
+    D.StopBits = ONESTOPBIT
+    D.parity = NOPARITY
+    rc = SetCommState(h, D)
     If rc = 0 Then
       Err1 Err.LastDllError, "SetCommState"
       GoTo close_and_exit

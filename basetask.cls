@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 ' Basetask is a module task of M2000
 ' This is a utility soros for passing parammeters to functions
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Public LoadOnly As Boolean, NoRun As Boolean
 Public CheckUnReferenceGui As Long
 Public callx1 As Long, tpointer As Long
@@ -97,11 +97,11 @@ End Sub
 
 Public Sub SetV()
 Vars = var2used  ' these are globals
-Vname = varhash.count
+Vname = varhash.Count
 End Sub
 Public Sub SetV2()
 Vars = var2used + ByName
-Vname = varhash.count + ByName
+Vname = varhash.Count + ByName
 End Sub
 Public Sub CopyStrip(bst As basetask)
 With bst
@@ -281,7 +281,7 @@ If Not StaticCollection.Find(Name$) Then Exit Function
             Set mm = Nothing
         ElseIf usehandler.t1 = 4 Then
                 If ss$ = "++" Then
-                        If usehandler.index_start < usehandler.objref.count - 1 Then
+                        If usehandler.index_start < usehandler.objref.Count - 1 Then
                             usehandler.index_start = usehandler.index_start + 1
                             usehandler.objref.index = usehandler.index_start
                             usehandler.index_cursor = usehandler.objref.Value
@@ -849,7 +849,7 @@ Public Function ThreadsStr(Optional ByVal Lang As Long = 0)
 Dim aa As mThreadref, a$
 If threadsnames Is Nothing Then Exit Function
 
-If threadsnames.count > 0 Then
+If threadsnames.Count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
 ' For Each aa In threadsnames
@@ -882,7 +882,7 @@ Public Function ThreadsNumber() As Long
 '' use threadsnames
 Dim aa As mThreadref, kk
 If threadsnames Is Nothing Then ThreadsNumber = kk: Exit Function
-If threadsnames.count > 0 Then
+If threadsnames.Count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
 Set aa = threadsnames.ValueObj
@@ -899,7 +899,7 @@ Dim aa As mThreadref, Tid As Long
 Dim thatProcess As TaskInterface
 Dim thatBasetask As basetask
 cont:
-If threadsnames.count > 0 Then
+If threadsnames.Count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
 Set aa = threadsnames.ValueObj
@@ -934,7 +934,7 @@ If parentSoros.LookNull Then
 ElseIf parentSoros.PopType = ">" Then
     parentSoros.drop 1
     IsOptionalForArray = check
-ElseIf parentSoros.count = 0 Then
+ElseIf parentSoros.Count = 0 Then
   IsOptionalForArray = check
 End If
 End Function
@@ -944,7 +944,7 @@ If parentSoros.LookNull Then
 ElseIf parentSoros.PopType = ">" Then
     parentSoros.drop 1
     IsOptional = True
-ElseIf parentSoros.count = 0 Then
+ElseIf parentSoros.Count = 0 Then
   IsOptional = True
 End If
 End Function

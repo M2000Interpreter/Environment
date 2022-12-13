@@ -18,7 +18,7 @@ Public Event addval(v As Variant)
 Public Event addstr(v As String, UseCase As Boolean)
 Public Event NewLine(ByVal i As Long)
 Public Event abort(ByRef ok As Boolean)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Dim WithEvents mDoc As Document
 Attribute mDoc.VB_VarHelpID = -1
 Private Col() As Long, lastdata As String, thispara As Long
@@ -584,9 +584,11 @@ JUMPHERE:
         Case "0" To "9", "."
             If part$ = "N" Then
             If Len(a$) < Pos Then
-            If Mid$(a$, Pos + 1, 1) Like "[&@#%~]" Then
-            Pos = Pos + 1
-            End If
+                If Mid$(a$, Pos + 1, 1) Like "[@#%~]" Then
+                    Pos = Pos + 1
+                ElseIf Mid$(a$, Pos + 1, 1) = "&" Then
+                    If Mid$(a$, Pos + 2, 1) = "&" Then Pos = Pos + 2 Else Pos = Pos + 1
+                End If
             End If
             ElseIf part$ = "S" Then
             

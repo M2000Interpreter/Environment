@@ -32,17 +32,17 @@ Private Type PicBmp
     hPal As Long
     reserved As Long
 End Type
-Private Declare Function OleCreatePictureIndirect Lib "olepro32.dll" (PicDesc As PicBmp, RefIID As GUID, ByVal fPictureOwnsHandle As Long, ipic As IPicture) As Long
-Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
-Private Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hDC As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal iCapabilitiy As Long) As Long
-Private Declare Function GetSystemPaletteEntries Lib "gdi32" (ByVal hDC As Long, ByVal wStartIndex As Long, ByVal wNumEntries As Long, lpPaletteEntries As PALETTEENTRY) As Long
+Private Declare Function OleCreatePictureIndirect Lib "olepro32.dll" (PicDesc As PicBmp, RefIID As GUID, ByVal fPictureOwnsHandle As Long, IPic As IPicture) As Long
+Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hdc As Long) As Long
+Private Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Private Declare Function SelectObject Lib "gdi32" (ByVal hdc As Long, ByVal hObject As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal iCapabilitiy As Long) As Long
+Private Declare Function GetSystemPaletteEntries Lib "gdi32" (ByVal hdc As Long, ByVal wStartIndex As Long, ByVal wNumEntries As Long, lpPaletteEntries As PALETTEENTRY) As Long
 Private Declare Function CreatePalette Lib "gdi32" (lpLogPalette As LOGPALETTE) As Long
-Private Declare Function SelectPalette Lib "gdi32" (ByVal hDC As Long, ByVal HPALETTE As Long, ByVal bForceBackground As Long) As Long
-Private Declare Function RealizePalette Lib "gdi32" (ByVal hDC As Long) As Long
-Private Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
-Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
+Private Declare Function SelectPalette Lib "gdi32" (ByVal hdc As Long, ByVal HPALETTE As Long, ByVal bForceBackground As Long) As Long
+Private Declare Function RealizePalette Lib "gdi32" (ByVal hdc As Long) As Long
+Private Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
+Private Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function OpenPrinter Lib "winspool.drv" Alias "OpenPrinterA" (ByVal pPrinterName As String, phPrinter As Long, pDefault As Any) As Long
 Private Declare Function ClosePrinter Lib "winspool.drv" (ByVal hPrinter As Long) As Long
@@ -87,7 +87,7 @@ End Type
 ' New Win95 Page Setup dialogs are up to you
 Private Type POINTL
     X As Long
-    y As Long
+    Y As Long
 End Type
 Private Type RECT
     Left As Long
@@ -163,7 +163,7 @@ Call ResetPrinter(gp, Td)
 Call ClosePrinter(gp)
 End Sub
 Function CreateBitmapPicture(ByVal hbmp As Long, ByVal hPal As Long) As Picture
-    Dim R As Long, pic As PicBmp, ipic As IPicture, IID_IDispatch As GUID
+    Dim R As Long, pic As PicBmp, IPic As IPicture, IID_IDispatch As GUID
 
     'Fill GUID info
     With IID_IDispatch
@@ -181,29 +181,29 @@ Function CreateBitmapPicture(ByVal hbmp As Long, ByVal hPal As Long) As Picture
     End With
 
     'Create the picture
-    R = OleCreatePictureIndirect(pic, IID_IDispatch, 1, ipic)
+    R = OleCreatePictureIndirect(pic, IID_IDispatch, 1, IPic)
 
     'Return the new picture
-    Set CreateBitmapPicture = ipic
+    Set CreateBitmapPicture = IPic
 End Function
-Function hDCToPicture(ByVal hDCSrc As Long, ByVal LeftSrc As Long, ByVal TopSrc As Long, ByVal WidthSrc As Long, ByVal HeightSrc As Long) As Picture
+Function hDCToPicture(ByVal hdcSrc As Long, ByVal LeftSrc As Long, ByVal TopSrc As Long, ByVal WidthSrc As Long, ByVal HeightSrc As Long) As Picture
     Dim hDCMemory As Long, hbmp As Long, hBmpPrev As Long, R As Long
     Dim hPal As Long, hPalPrev As Long, RasterCapsScrn As Long, HasPaletteScrn As Long
     Dim PaletteSizeScrn As Long, LogPal As LOGPALETTE
 
     'Create a compatible device context
-    hDCMemory = CreateCompatibleDC(hDCSrc)
+    hDCMemory = CreateCompatibleDC(hdcSrc)
     'Create a compatible bitmap
-    hbmp = CreateCompatibleBitmap(hDCSrc, WidthSrc, HeightSrc)
+    hbmp = CreateCompatibleBitmap(hdcSrc, WidthSrc, HeightSrc)
     'Select the compatible bitmap into our compatible device context
     hBmpPrev = SelectObject(hDCMemory, hbmp)
 
     'Raster capabilities?
-    RasterCapsScrn = GetDeviceCaps(hDCSrc, RASTERCAPS) ' Raster
+    RasterCapsScrn = GetDeviceCaps(hdcSrc, RASTERCAPS) ' Raster
     'Does our picture use a palette?
     HasPaletteScrn = RasterCapsScrn And RC_PALETTE ' Palette
     'What's the size of that palette?
-    PaletteSizeScrn = GetDeviceCaps(hDCSrc, SIZEPALETTE) ' Size of
+    PaletteSizeScrn = GetDeviceCaps(hdcSrc, SIZEPALETTE) ' Size of
 
     If HasPaletteScrn And (PaletteSizeScrn = 256) Then
         'Set the palette version
@@ -211,7 +211,7 @@ Function hDCToPicture(ByVal hDCSrc As Long, ByVal LeftSrc As Long, ByVal TopSrc 
         'Number of palette entries
         LogPal.palNumEntries = 256
         'Retrieve the system palette entries
-        R = GetSystemPaletteEntries(hDCSrc, 0, 256, LogPal.palPalEntry(0))
+        R = GetSystemPaletteEntries(hdcSrc, 0, 256, LogPal.palPalEntry(0))
         'Create the palette
         hPal = CreatePalette(LogPal)
         'Select the palette
@@ -221,7 +221,7 @@ Function hDCToPicture(ByVal hDCSrc As Long, ByVal LeftSrc As Long, ByVal TopSrc 
     End If
 
     'Copy the source image to our compatible device context
-    R = BitBlt(hDCMemory, 0, 0, WidthSrc, HeightSrc, hDCSrc, LeftSrc, TopSrc, vbSrcCopy)
+    R = BitBlt(hDCMemory, 0, 0, WidthSrc, HeightSrc, hdcSrc, LeftSrc, TopSrc, vbSrcCopy)
 
     'Restore the old bitmap
     hbmp = SelectObject(hDCMemory, hBmpPrev)
@@ -323,7 +323,7 @@ Dim o As Object
 If Typename(sapi) = "Nothing" Then Set sapi = CreateObject("sapi.spvoice")
 If Typename(sapi) = "Nothing" Then VoiceName = vbNullString: Exit Function
 D = Int(D)
-If sapi.getvoices().count >= D And D > 0 Then
+If sapi.getvoices().Count >= D And D > 0 Then
 For Each o In sapi.getvoices
 D = D - 1
 If D = 0 Then VoiceName = o.GetDescription: Exit For
@@ -334,8 +334,8 @@ Public Function NumVoices() As Long
 On Error Resume Next
 If Typename(sapi) = "Nothing" Then Set sapi = CreateObject("sapi.spvoice")
 If Typename(sapi) = "Nothing" Then NumVoices = -1: Exit Function
-If sapi.getvoices().count > 0 Then
-NumVoices = sapi.getvoices().count
+If sapi.getvoices().Count > 0 Then
+NumVoices = sapi.getvoices().Count
 End If
 End Function
 Public Sub SPEeCH(ByVal a$, Optional BOY As Boolean = False, Optional ByVal vNumber As Long = -1)
@@ -345,8 +345,8 @@ On Error Resume Next
 If vNumber = 0 Then vNumber = 1
 If Typename(sapi) = "Nothing" Then Set sapi = CreateObject("sapi.spvoice")
 If Typename(sapi) = "Nothing" Then Beep: Exit Sub
-If sapi.getvoices().count > 0 Then
-If sapi.getvoices().count < vNumber Or sapi.getvoices().count < 1 Then vNumber = 1
+If sapi.getvoices().Count > 0 Then
+If sapi.getvoices().Count < vNumber Or sapi.getvoices().Count < 1 Then vNumber = 1
  With sapi
          Set .Voice = .getvoices.item(vNumber - 1)
        If BOY Then
@@ -681,7 +681,7 @@ If Len(para(lastPara)) = 0 Then lastPara = lastPara - 1
 nextline:
         If NOEXECUTION Then Exit For
         
-        n = LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(para(i)), Len(para(i)), 1, tabw)) * DXP
+        n = LowWord(GetTabbedTextExtent(DDD.hdc, StrPtr(para(i)), Len(para(i)), 1, tabw)) * DXP
 '        n = MyTextWidth(ddd, para(i))
         If n > wi Then
             st = Len(para(i))
@@ -692,13 +692,13 @@ nextline:
                 w = AscW(Mid$(para(i), 1, st1))
                 If w > -10241 And w < -9216 Then
                     
-                    If wi >= LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(para(i)), st1 + 1, 1, tabw)) * DXP Then
+                    If wi >= LowWord(GetTabbedTextExtent(DDD.hdc, StrPtr(para(i)), st1 + 1, 1, tabw)) * DXP Then
                         st0 = st1
                     Else
                         st = st1
                     End If
                 Else
-                    If wi >= LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(para(i)), st1, 1, tabw)) * DXP Then
+                    If wi >= LowWord(GetTabbedTextExtent(DDD.hdc, StrPtr(para(i)), st1, 1, tabw)) * DXP Then
                         st0 = st1
                     Else
                         st = st1
@@ -740,36 +740,36 @@ nextline:
                  buf$ = RTrim(buf$)
                  lasttab = rinstr(buf$, vbTab)
                  If lasttab > 0 Then
-                 Extra = LowWord(TabbedTextOut(DDD.hDC, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), lasttab, 1, tabw, DDD.currentX \ DXP))
+                 Extra = LowWord(TabbedTextOut(DDD.hdc, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), lasttab, 1, tabw, DDD.currentX \ DXP))
                  buf$ = Mid$(buf$, lasttab + 1)
                  DDD.currentX = DDD.currentX + Extra * DXP
                               
                  End If
-                 olda = SetTextAlign(DDD.hDC, 0) 'TA_RTLREADING)
+                 olda = SetTextAlign(DDD.hdc, 0) 'TA_RTLREADING)
                  cuts = Len(buf$) - Len(Replace$(buf$, " ", ""))
                  
-                 Extra = wi \ DXP - INTD \ DXP - Extra - LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(buf$), Len(buf$), 1, tabw))
+                 Extra = wi \ DXP - INTD \ DXP - Extra - LowWord(GetTabbedTextExtent(DDD.hdc, StrPtr(buf$), Len(buf$), 1, tabw))
                  
-                 SetTextJustification DDD.hDC, Extra, cuts
+                 SetTextJustification DDD.hdc, Extra, cuts
                  
                 '
-                 TextOut DDD.hDC, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$)
+                 TextOut DDD.hdc, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$)
                  
-                 SetTextJustification DDD.hDC, 0, 0
-                 olda = SetTextAlign(DDD.hDC, olda)
+                 SetTextJustification DDD.hdc, 0, 0
+                 olda = SetTextAlign(DDD.hdc, olda)
                  Case 1
                  buf$ = RTrim(buf$)
-                 Extra = wi \ DXP - LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(buf$), Len(buf$), 1, tabw))
+                 Extra = wi \ DXP - LowWord(GetTabbedTextExtent(DDD.hdc, StrPtr(buf$), Len(buf$), 1, tabw))
                  
-                 Extra = LowWord(TabbedTextOut(DDD.hDC, DDD.currentX \ DXP + Extra, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$), 1, tabw, DDD.currentX \ DXP + Extra))
+                 Extra = LowWord(TabbedTextOut(DDD.hdc, DDD.currentX \ DXP + Extra, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$), 1, tabw, DDD.currentX \ DXP + Extra))
                  Case 2
                  buf$ = Trim(buf$)
-                 Extra = (wi \ DXP - LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(buf$), Len(buf$), 1, tabw))) \ 2
+                 Extra = (wi \ DXP - LowWord(GetTabbedTextExtent(DDD.hdc, StrPtr(buf$), Len(buf$), 1, tabw))) \ 2
                  
-                 Extra = LowWord(TabbedTextOut(DDD.hDC, DDD.currentX \ DXP + Extra, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$), 1, tabw, DDD.currentX \ DXP + Extra))
+                 Extra = LowWord(TabbedTextOut(DDD.hdc, DDD.currentX \ DXP + Extra, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$), 1, tabw, DDD.currentX \ DXP + Extra))
                  
                  Case Else
-                 Extra = LowWord(TabbedTextOut(DDD.hDC, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$), 1, tabw, DDD.currentX \ DXP))
+                 Extra = LowWord(TabbedTextOut(DDD.hdc, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$), 1, tabw, DDD.currentX \ DXP))
                  
                  End Select
 
@@ -817,15 +817,15 @@ last:
                 Select Case frmt
                 Case 1
                 buf$ = RTrim(buf$)
-                 Extra = wi \ DXP - LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(buf$), Len(buf$), 1, tabw))
+                 Extra = wi \ DXP - LowWord(GetTabbedTextExtent(DDD.hdc, StrPtr(buf$), Len(buf$), 1, tabw))
                  
-                 Extra = LowWord(TabbedTextOut(DDD.hDC, DDD.currentX \ DXP + Extra, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$), 1, tabw, DDD.currentX \ DXP + Extra))
+                 Extra = LowWord(TabbedTextOut(DDD.hdc, DDD.currentX \ DXP + Extra, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$), 1, tabw, DDD.currentX \ DXP + Extra))
                 
                 Case 2
                 buf$ = Trim(buf$)
-                Extra = (wi \ DXP - LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(buf$), Len(buf$), 1, tabw))) \ 2
+                Extra = (wi \ DXP - LowWord(GetTabbedTextExtent(DDD.hdc, StrPtr(buf$), Len(buf$), 1, tabw))) \ 2
                  
-                Extra = LowWord(TabbedTextOut(DDD.hDC, DDD.currentX \ DXP + Extra, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$), 1, tabw, DDD.currentX \ DXP + Extra))
+                Extra = LowWord(TabbedTextOut(DDD.hdc, DDD.currentX \ DXP + Extra, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$), 1, tabw, DDD.currentX \ DXP + Extra))
 
                 Case 3, 0
                 INTD = TextWidth(DDD, space$(MyTrimL3Len(buf$)))
@@ -835,7 +835,7 @@ last:
                 End If
                 buf$ = RTrim(buf$)
                 
-                Extra = LowWord(TabbedTextOut(DDD.hDC, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$), 1, tabw, DDD.currentX \ DXP))
+                Extra = LowWord(TabbedTextOut(DDD.hdc, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$), 1, tabw, DDD.currentX \ DXP))
                 
                 End Select
                 End If

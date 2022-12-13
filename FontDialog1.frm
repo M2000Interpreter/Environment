@@ -149,7 +149,7 @@ Private Sub Form_Activate()
             Hook hWnd, Nothing
         End If
         If LastActive <> "" Then
-            If Controls(LastActive).Enabled Then
+            If Controls(LastActive).enabled Then
             If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
         End If
     End If
@@ -162,9 +162,9 @@ loadfileiamloaded = True
 scrTwips = Screen.TwipsPerPixelX
 ' clear data...
 setupxy = 20
-gList1.Enabled = True
-gList2.Enabled = True
-gList3.Enabled = True
+gList1.enabled = True
+gList2.enabled = True
+gList3.enabled = True
 gList3.LeaveonChoose = True
 gList3.VerticalCenterText = True
 gList3.restrictLines = 1
@@ -293,7 +293,7 @@ End If
 Next i
 If ReturnSize >= 6 Then gList4.list(4) = "  " & (ReturnSize)
 gList4.list(6) = "  " & (ReturnCharset)
-gList4.Enabled = True
+gList4.enabled = True
 gList2.TabStop = False
 gList1.ShowMe
 TEXT1.locked = False
@@ -408,7 +408,7 @@ Private Sub Form_Unload(Cancel As Integer)
 UNhookMe
 DestroyCaret
 selectorLastX = Left
-selectorLastY = Top
+selectorLastY = top
 Sleep 200
 loadfileiamloaded = False
 End Sub
@@ -466,7 +466,7 @@ End Sub
 Private Sub gList1_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Dim a As RECT, b As RECT
 Dim oldforecolor As Long
-oldforecolor = gList1.forecolor
+oldforecolor = gList1.ForeColor
 If item = -1 Then
 'FillThere thisHDC, thisrect, gList1.CapColor
 'FillThereMyVersion2 thisHDC, thisrect, &HF0F0F0
@@ -475,18 +475,18 @@ Else
 skip = True
 CopyFromLParamToRect a, thisrect
 CopyFromLParamToRect b, thisrect
-a.Top = a.Top + 2
+a.top = a.top + 2
 If gList1.ListIndex = item Then
 b.Left = 0
 FillBack thisHDC, b, 0
-gList1.forecolor = &HFFFFFF
+gList1.ForeColor = &HFFFFFF
 Else
 FillBack thisHDC, b, gList1.BackColor
 
 End If
 
 PrintItem thisHDC, Screen.Fonts(item), a
-gList1.forecolor = forecolor
+gList1.ForeColor = ForeColor
 End If
 End Sub
  Private Sub PrintItem(mHdc As Long, c As String, R As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_VCENTER)
@@ -503,7 +503,7 @@ End Sub
 Private Sub gList2_MouseUp(X As Single, Y As Single)
             On Error Resume Next
             If LastActive <> "" Then
-            If Controls(LastActive).Enabled Then
+            If Controls(LastActive).enabled Then
             If Controls(LastActive).Visible Then
                If Not gList2.DoubleClickArea(X, Y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor) Then
                 Controls(LastActive).SetFocus
@@ -569,7 +569,7 @@ End If
 
  gList3.LeftMarginPixels = lastfactor * 5
 gList3.BackColor = &H808080
-gList3.forecolor = &HE0E0E0
+gList3.ForeColor = &HE0E0E0
 gList3.EditFlag = False
 gList3.NoCaretShow = True
 End If
@@ -593,10 +593,10 @@ b = CLng(Rnd * 3) + setupxy / 3
 
 CopyFromLParamToRect a, thatRect
 a.Left = a.Right - setupxy
-a.Top = b
+a.top = b
 a.Bottom = b + setupxy / 5
 FillThere thathDC, VarPtr(a), thatbgcolor
-a.Top = b + setupxy / 5 + setupxy / 10
+a.top = b + setupxy / 5 + setupxy / 10
 a.Bottom = b + setupxy \ 2
 FillThere thathDC, VarPtr(a), thatbgcolor
 
@@ -608,13 +608,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -676,7 +676,7 @@ gList2.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 
 allheight = bordertop + heightTop + bordertop + heightSelector + bordertop + HeightMenu + bordertop + HeightBottom + bordertop
 
-move Left, Top, allwidth, allheight
+move Left, top, allwidth, allheight
 gList2.move borderleft, bordertop, itemWidth, heightTop
 gList1.move borderleft, 2 * bordertop + heightTop, itemWidth, heightSelector
 gList4.move borderleft, 3 * bordertop + heightTop + heightSelector, itemWidth, HeightMenu
@@ -795,14 +795,14 @@ gList3.SelStart = 1
 gList3.EditFlag = True
 gList3.NoCaretShow = False
 gList3.BackColor = &H0
-gList3.forecolor = &HFFFFFF
+gList3.ForeColor = &HFFFFFF
 gList3.ShowMe2
 ElseIf keycode = vbKeyReturn Then
 
 DestroyCaret
 If TEXT1 <> "" Then
 gList3.EditFlag = False
-gList3.Enabled = False
+gList3.enabled = False
 
 glist3_PanLeftRight True
 keycode = 0

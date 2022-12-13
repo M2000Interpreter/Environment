@@ -72,8 +72,8 @@ Private Declare Function DispCallFunc Lib "oleaut32" ( _
                          ByVal cc As Integer, _
                          ByVal vtReturn As Integer, _
                          ByVal cActuals As Long, _
-                         ByRef prgvt As Any, _
-                         ByRef prgpvarg As Any, _
+                         ByRef prgVt As Any, _
+                         ByRef prgpVarg As Any, _
                          ByRef pvargResult As Variant) As Long
 Private Declare Function LoadTypeLibEx Lib "oleaut32" ( _
                          ByVal szFile As Long, _
@@ -212,7 +212,7 @@ End Enum
 
 Public Type fncinf
     Name                    As String
-    addr                    As Long
+    Addr                    As Long
     params                  As Integer
 End Type
 
@@ -229,7 +229,7 @@ Public Enum invokekind
     INVOKE_PROPERTY_PUTREF = &H8
 End Enum
 Public Const DISP_E_PARAMNOTFOUND = &H80020004
-Public Enum Varenum
+Public Enum VARENUM
     VT_EMPTY = 0&                   '
     VT_NULL = 1&                    ' 0
     VT_I2 = 2&                      ' signed 2 bytes integer
@@ -311,7 +311,7 @@ End Function
 
 ' // Get all co-classes described in type library.
 Public Function GetAllCoclasses( _
-                ByRef path As String, _
+                ByRef Path As String, _
                 ByRef listOfClsid() As GUID, _
                 ByRef listOfNames() As String, _
                 ByRef countCoClass As Long) As Boolean
@@ -324,7 +324,7 @@ Public Function GetAllCoclasses( _
     Dim pAttr   As Long
     Dim tKind   As Long
     
-    ret = LoadTypeLibEx(StrPtr(path), REGKIND_NONE, typeLib)
+    ret = LoadTypeLibEx(StrPtr(Path), REGKIND_NONE, typeLib)
     
     If ret Then
         Err.Raise ret
@@ -408,7 +408,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
         Dim ppFuncDesc As Long, fncdsc As FUNCDESC, cFuncs As Long
         Dim ppVarDesc As Long, vardsc As VARDESC
         Dim ParamDesc As TPARAMDESC, hlp As Long, pRefType As Long
-        Dim TypeDesc As TTYPEDESC, RetVal$
+        Dim TypeDesc As TTYPEDESC, retval$
         Dim ret As Long, pctinfo As Long, ppTInfo As Long, typeInf As IUnknown
         Dim pAttr   As Long
         Dim tKind   As Long
@@ -516,10 +516,10 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
                             End If
                                 acc = acc + 16
                            ttt$ = ""
-                           RetVal$ = ""
+                           retval$ = ""
                            If strNames(i) = "" Then strNames(i) = "Value"
                            If (ParamDesc.wParamFlags And PARAMFLAG_FRETVAL) = &H8 Then
-                               RetVal$ = " as " + stringifyTypeDesc(TypeDesc, typeInf)
+                               retval$ = " as " + stringifyTypeDesc(TypeDesc, typeInf)
                            Else
                                 If (ParamDesc.wParamFlags And PARAMFLAG_FIN) = &H1 Then ttt$ = "in "
                                 If (ParamDesc.wParamFlags And PARAMFLAG_FOUT) = &H2 Then ttt$ = ttt$ + "out "
@@ -539,7 +539,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
                        End If
                    End If
                    
-                If RetVal$ = "" Then
+                If retval$ = "" Then
                      If fncdsc.elemdesc.vt = 24 Then
                      mList.Value = strName
                      Else
@@ -548,7 +548,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
                      
                      End If
                 Else
-                     mList.Value = strName + RetVal$
+                     mList.Value = strName + retval$
             End If
             
             End If
@@ -739,20 +739,20 @@ End Function
                 
 ' // Create object by CLSID and path.
 Public Function CreateObjectEx( _
-                ByRef path As String, _
+                ByRef Path As String, _
                 ByRef Clsid As GUID) As IUnknown
                 
     Dim hLib    As Long
     Dim lpAddr  As Long
     Dim isLoad  As Boolean
     
-    hLib = GetModuleHandle(StrPtr(path))
+    hLib = GetModuleHandle(StrPtr(Path))
     
     If hLib = 0 Then
     
-        hLib = LoadLibrary(StrPtr(path))
+        hLib = LoadLibrary(StrPtr(Path))
         If hLib = 0 Then
-            Err.Raise 53, , Error(53) & " " & Chr$(34) & path & Chr$(34)
+            Err.Raise 53, , Error(53) & " " & Chr$(34) & Path & Chr$(34)
             Exit Function
         End If
         
@@ -764,7 +764,7 @@ Public Function CreateObjectEx( _
     
     If lpAddr = 0 Then
         If isLoad Then FreeLibrary hLib
-        Err.Raise 453, , "Can't find dll entry point DllGetClasesObject in " & Chr$(34) & path & Chr$(34)
+        Err.Raise 453, , "Can't find dll entry point DllGetClasesObject in " & Chr$(34) & Path & Chr$(34)
         Exit Function
     End If
 
@@ -804,7 +804,7 @@ End Function
 
 ' // Unload DLL if not used.
 Public Function UnloadLibrary( _
-                ByRef path As String) As Boolean
+                ByRef Path As String) As Boolean
                 
     Dim hLib    As Long
     Dim lpAddr  As Long
@@ -812,7 +812,7 @@ Public Function UnloadLibrary( _
     
     If Not isinit Then Exit Function
     
-    hLib = GetModuleHandle(StrPtr(path))
+    hLib = GetModuleHandle(StrPtr(Path))
     If hLib = 0 Then Exit Function
     
     lpAddr = GetProcAddress(hLib, "DllCanUnloadNow")
@@ -1206,6 +1206,8 @@ Private Function VarTypeName(nVarType As Long) As String
             VarTypeName = "Decimal"
         Case 17
             VarTypeName = "Byte"
+        Case 20
+            VarTypeName = "Long Long"
         Case 8192
             VarTypeName = "Array"
         Case Else
@@ -1304,7 +1306,7 @@ Public Function NewObjectFromActivexDll(ByVal pathToDll As String, _
                                         ByVal className As String) As IUnknown
     Set NewObjectFromActivexDll = CreateObjectEx2(pathToDll, pathToDll, className)
 End Function
-Public Function UnloadActivexDll(ByVal path As String) As Long
+Public Function UnloadActivexDll(ByVal Path As String) As Long
     Dim hLib    As Long
     Dim lpAddr  As Long
     Dim ret     As Long
@@ -1312,7 +1314,7 @@ Public Function UnloadActivexDll(ByVal path As String) As Long
     UnloadActivexDll = 1
     If isinit Then
         UnloadActivexDll = 2
-        hLib = GetModuleHandle(StrPtr(path))
+        hLib = GetModuleHandle(StrPtr(Path))
         If hLib <> 0 Then
             UnloadActivexDll = 3
             lpAddr = GetProcAddress(hLib, "DllCanUnloadNow")

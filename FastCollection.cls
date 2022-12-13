@@ -66,8 +66,8 @@ Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Public Stable As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Private lastfind As String
 Private lasttype As Integer
 Private lastkey As String
@@ -412,7 +412,7 @@ ElseIf Not IsObject(PriveSpace(index).iValue) Then
     Done = True
     Value = PriveSpace(index).iValue
     
-    If Typename(Value) = "Error" Then
+    If varTypename(Value) = "Error" Then
     
     Value = MyVal()
     If VarType(Value) = vbString Then Value = PriveSpace(index).Key
@@ -447,6 +447,8 @@ Case vbCurrency
 MyVal = CCur(Replace$(MyVal, ".", NowDec$))
 Case vbDecimal
 MyVal = CDec(Replace$(MyVal, ".", NowDec$))
+Case 20
+MyVal = cInt64(MyVal)
 Case Else
 MyVal = CDbl(Replace$(MyVal, ".", NowDec$))
 End Select
@@ -461,7 +463,15 @@ ElseIf Not IsObject(PriveSpace(index).iValue) Then
 ValueType = True
     Done = True
     val1 = PriveSpace(index).iValue
-    If Typename(val1) = "Error" Then
+    If CheckInt64(val1) Then
+           If ch = 2 Then
+            s = val1
+        Else
+            p = 0
+            On Error Resume Next
+            p = val1
+        End If
+    ElseIf Typename(val1) = "Error" Then
         If ch = 2 Then
             s = KeyToString
         Else
@@ -636,8 +646,8 @@ Private Function Malloc() As Long
     toplim = toplim + 1
     Malloc = toplim
 End Function
-Property Get count()
-    count = toplim + 1
+Property Get Count()
+    Count = toplim + 1
 End Property
 Public Property Let UcaseKeys(RHS)
 If toplim = -1 Then
@@ -661,7 +671,7 @@ Function IsEnum(p As Variant) As Boolean
 Dim usehandler As mHandler
 If index = -1 Then
 ElseIf IsObject(PriveSpace(index).iValue) Then
-If Typename(PriveSpace(index).iValue) = "mHandler" Then
+If varTypename(PriveSpace(index).iValue) = "mHandler" Then
     Set usehandler = PriveSpace(index).iValue
     IsEnum = usehandler.t1 = 4
     If IsEnum Then p = usehandler.index_cursor * usehandler.sign
@@ -915,12 +925,12 @@ place HashFunc1(kk), a
 index = -1
 End Sub
 Property Get Percent()
-Percent = 100 * count / hashlen
+Percent = 100 * Count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
     k = Hash(b)
-    If Not Hash(b) = a + 1 Then
+    If Not k = a + 1 Then
          Hash(b) = a + 1
          PriveSpace(a).Pleft = k
     End If
@@ -987,11 +997,11 @@ End If
 End Property
 Public Sub ToStart()
 index = 0
-Done = count > 0
+Done = Count > 0
 End Sub
 Public Sub ToEnd()
-index = count - 1
-Done = count > 0
+index = Count - 1
+Done = Count > 0
 End Sub
 
 Public Sub NextIndex()

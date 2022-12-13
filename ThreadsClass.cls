@@ -13,7 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
 Private mSortstyle As VbCompareMethod
-Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 Private Type item
     Key As Long
@@ -26,7 +26,7 @@ Private PriveSpace() As item
 Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Private lastfind As Long
 Private lastkey As Long
 Private Hash() As Long
@@ -210,7 +210,7 @@ ElseIf Not IsObject(PriveSpace(index).iValue) Then
     Done = True
     Value = PriveSpace(index).iValue
     
-    If Typename(Value) = "Error" Then
+    If VarTypeName(Value) = "Error" Then
     Value = KeyToString
     End If
 End If
@@ -280,8 +280,8 @@ Private Function Malloc() As Long
     toplim = toplim + 1
     Malloc = toplim
 End Function
-Property Get count()
-    count = toplim + 1
+Property Get Count()
+    Count = toplim + 1
 End Property
 
 Function IsObj() As Boolean
@@ -410,12 +410,12 @@ Done = True
 End Sub
 
 Property Get Percent()
-Percent = 100 * count / hashlen
+Percent = 100 * Count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
     k = Hash(b)
-    If Not Hash(b) = a + 1 Then
+    If Not k = a + 1 Then
          Hash(b) = a + 1
          PriveSpace(a).Pleft = k
     End If
@@ -441,11 +441,11 @@ Private Function UINT(ByVal a As Integer) As Long
  End If
  
  End Function
-Private Function MyModOld(r1 As Double, po) As Double
-MyModOld = r1 - Fix(r1 / po) * po
+Private Function MyModOld(R1 As Double, po) As Double
+MyModOld = R1 - Fix(R1 / po) * po
 End Function
-Private Function MyMod(r1, po) As Variant
-MyMod = r1 - Fix(r1 / po) * po
+Private Function MyMod(R1, po) As Variant
+MyMod = R1 - Fix(R1 / po) * po
 End Function
 Private Function uintnew(ByVal a As Currency) As Currency
 If a > 2147483647@ Then a = 2147483647@
@@ -492,11 +492,11 @@ End If
 End Property
 Public Sub ToStart()
 index = 0
-Done = count > 0
+Done = Count > 0
 End Sub
 Public Sub ToEnd()
-index = count - 1
-Done = count > 0
+index = Count - 1
+Done = Count > 0
 End Sub
 
 Public Sub NextIndex()

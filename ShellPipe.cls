@@ -68,16 +68,16 @@ Private Type SECURITY_ATTRIBUTES
     bInheritHandle As Long
 End Type
 
-Private Declare Function CloseHandle Lib "KERNEL32" _
+Private Declare Function CloseHandle Lib "kernel32" _
     (ByVal hObject As Long) As Long
 
-Private Declare Function CreatePipe Lib "KERNEL32" _
+Private Declare Function CreatePipe Lib "kernel32" _
     (ByRef phReadPipe As Long, _
      ByRef phWritePipe As Long, _
      ByRef lpPipeAttributes As Any, _
      ByVal nSize As Long) As Long
 
-Private Declare Function CreateProcessA Lib "KERNEL32" _
+Private Declare Function CreateProcessA Lib "kernel32" _
     (ByVal ApplicationName As String, _
      ByVal CommandLine As String, _
      ByVal lpProcessAttributes As Long, _
@@ -89,15 +89,15 @@ Private Declare Function CreateProcessA Lib "KERNEL32" _
      ByRef StartupInformation As STARTUPINFO, _
      ByRef ProcessInformation As PROCESSINFO) As Long
 
-Private Declare Function GenerateConsoleCtrlEvent Lib "KERNEL32" _
+Private Declare Function GenerateConsoleCtrlEvent Lib "kernel32" _
     (ByVal dwCtrlEvent As Long, _
      ByVal dwProcessGroupId As Long) As Long
 
-Private Declare Function GetExitCodeProcess Lib "KERNEL32" _
+Private Declare Function GetExitCodeProcess Lib "kernel32" _
     (ByVal hHandle As Long, _
      ByRef lpExitCode As Long) As Long
 
-Private Declare Function PeekNamedPipe Lib "KERNEL32" _
+Private Declare Function PeekNamedPipe Lib "kernel32" _
     (ByVal hNamedPipe As Long, _
      ByVal lpBuf As String, _
      ByVal nBufSize As Long, _
@@ -105,19 +105,19 @@ Private Declare Function PeekNamedPipe Lib "KERNEL32" _
      ByRef lpTotalBytesAvail As Long, _
      ByVal lpBytesLeftThisMessage As Long) As Long
 
-Private Declare Function ReadFile Lib "KERNEL32" _
+Private Declare Function ReadFile Lib "kernel32" _
     (ByVal hFile As Long, _
      ByVal lpBuf As String, _
      ByVal nNumberOfBytesToRead As Long, _
      ByRef lpNumberOfBytesRead As Long, _
      ByVal lpOverlapped As Any) As Long
 
-Private Declare Function SetHandleInformation Lib "KERNEL32" _
+Private Declare Function SetHandleInformation Lib "kernel32" _
     (ByVal hObject As Long, _
      ByVal dwMask As Long, _
      ByVal dwFlags As Long) As Long
 
-Private Declare Function TerminateProcess Lib "KERNEL32" _
+Private Declare Function TerminateProcess Lib "kernel32" _
     (ByVal hHandle As Long, _
      ByVal uExitCode As Long) As Long
 
@@ -125,11 +125,11 @@ Private Declare Function WaitForInputIdle Lib "user32" ( _
     ByVal hProcess As Long, _
     ByVal dwMilliseconds As Long) As Long
 
-Private Declare Function WaitForSingleObject Lib "KERNEL32" _
+Private Declare Function WaitForSingleObject Lib "kernel32" _
     (ByVal hHandle As Long, _
      ByVal dwMilliseconds As Long) As Long
 
-Private Declare Function WriteFile Lib "KERNEL32" _
+Private Declare Function WriteFile Lib "kernel32" _
     (ByVal hFile As Long, _
      ByVal lpBuf As String, _
      ByVal cToWrite As Long, _

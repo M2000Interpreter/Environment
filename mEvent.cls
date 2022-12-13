@@ -19,7 +19,7 @@ Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Dim StartPoint As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Private mParamBlock As String, mParams As Long
 Private Hash() As Long
 Public excludeme As Object
@@ -29,7 +29,7 @@ Public Function Extern(ParamArray a()) As Long
 Attribute Extern.VB_UserMemId = 0
 ' default function
 Dim ohere$, objref As New basetask
-If Forms.count >= 4 Then
+If Forms.Count >= 4 Then
     Set objref.Owner = Form1.DIS
 Else
 Exit Function
@@ -43,7 +43,8 @@ For i = 0 To UBound(a())
 Select Case VarType(a(i))
 Case Is >= vbArray
 ' only with error control
-If Typename(a(i)) = "Variant()" Then
+
+If varTypename(a(i)) = "Variant()" Then
 Set ar = New mArray
 v() = a(i)
 On Error Resume Next
@@ -96,11 +97,11 @@ Public Sub ParamBlock(RHS As String, many As Long)
 mParamBlock = RHS
 mParams = many
 End Sub
-Public Property Get Enabled() As Boolean
-Enabled = mEnabled
+Public Property Get enabled() As Boolean
+enabled = mEnabled
 End Property
 
-Public Property Let Enabled(ByVal RHS As Boolean)
+Public Property Let enabled(ByVal RHS As Boolean)
 mEnabled = RHS
 End Property
 Private Sub Class_Initialize()
@@ -217,8 +218,8 @@ End Function
 Property Get CurMaxSpace()
 CurMaxSpace = MaxSpace
 End Property
-Property Get count()
-count = toplim + 1
+Property Get Count()
+Count = toplim + 1
 End Property
 Friend Function Find(Key As String, func As String) As Boolean
 Dim k As Long
@@ -288,16 +289,16 @@ End With
 place HashFunc(Key), a
 End Sub
 Property Get Percent()
-Percent = count / hashlen
+Percent = Count / hashlen
 End Property
-Private Sub place(ByVal B, ByVal a)
+Private Sub place(ByVal b, ByVal a)
     Dim k As Long
-    k = Hash(B)
-    If Not Hash(B) = a + 1 Then
-         Hash(B) = a + 1
+    k = Hash(b)
+    If Not k = a + 1 Then
+         Hash(b) = a + 1
          PriveSpace(a).Pleft = k
     End If
-    PriveSpace(a).lastpos = B
+    PriveSpace(a).lastpos = b
 End Sub
 
 Private Function HashFunc2(where As Long)
@@ -313,12 +314,12 @@ Public Sub Upgrade(usethis$)
 Dim i As Long, a$
 For i = 0 To toplim
 a$ = PriveSpace(i).ndx
-Dim B$
+Dim b$
 If a$ <> "" Then
-B$ = Left$(a$, rinstr(a$, "}", 0))
-a$ = Mid$(a$, Len(B$) + 1)
-If B$ <> "" And NoHere = a$ Then
-PriveSpace(i).ndx = B$ + usethis$
+b$ = Left$(a$, rinstr(a$, "}", 0))
+a$ = Mid$(a$, Len(b$) + 1)
+If b$ <> "" And NoHere = a$ Then
+PriveSpace(i).ndx = b$ + usethis$
 End If
 End If
 Next i

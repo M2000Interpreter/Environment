@@ -294,14 +294,14 @@ End Function
 Public Function GetTimeZoneInfo() As String
 
 Dim TZI As TIME_ZONE_INFORMATION ' receives information on the time zone
-Dim RetVal As Long ' return value
+Dim retval As Long ' return value
 Dim c As Long ' counter variable needed to display time zone name
 
-    RetVal = GetTimeZoneInformation(TZI) ' read information on the computer's selected time zone
+    retval = GetTimeZoneInformation(TZI) ' read information on the computer's selected time zone
      If zones.ExistKey(Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")) Then
      ' do nothing. now zone$ has set the index field to standard name.
      End If
-    If RetVal = 2 Then
+    If retval = 2 Then
     GetTimeZoneInfo = Replace(StrConv(TZI.DaylightName, vbFromUnicode), Chr(0), "")
     Else
     GetTimeZoneInfo = Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")
@@ -783,16 +783,16 @@ finish:
     If Not ok Then
     iPad = 0
     
-    Dim Offset As Long
-        Do While lChar3 + Offset <= ubnd
-        Select Case bIn(lChar3 + Offset)
+    Dim offset As Long
+        Do While lChar3 + offset <= ubnd
+        Select Case bIn(lChar3 + offset)
             Case 10, 13, 32
-            If iPad > 0 Then Offset = 0: Exit Do
-            Offset = Offset + 1
+            If iPad > 0 Then offset = 0: Exit Do
+            offset = offset + 1
             
             Case 61
             iPad = iPad + 1
-            Offset = Offset + 1
+            offset = offset + 1
             Case Else
              If lChar2 = 0 Then GoTo error1
                 
@@ -805,7 +805,7 @@ finish:
                 End If
               End If
             
-             Offset = 0
+             offset = 0
             
             Exit Do
          
@@ -1027,9 +1027,8 @@ End If
 backhere:
 UseMe.CliRun
 ClearState1
-If UseMe Is Nothing Then Exit Sub
-
-UseMe.Shutdown Cancel
+If UseMe Is Nothing Then once = False: Exit Sub
+UseMe.ShutDown Cancel
 
 If Cancel Then GoTo backhere
 If Not UseMe.IhaveExtForm Then

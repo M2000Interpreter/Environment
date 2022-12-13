@@ -246,8 +246,8 @@ Const WM_KEYFIRST = &H100
 Const WM_CHAR = &H102
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
 End Type
  Private Type Msg
     hWnd As Long
@@ -327,7 +327,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub DIS_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
+Private Sub DIS_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -349,7 +349,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub dSprite_OLEDragOver(index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
+Private Sub dSprite_OLEDragOver(index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -434,7 +434,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub Form_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
+Private Sub Form_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -541,7 +541,7 @@ If KeyAscii = 9 Then KeyAscii = 0: Exit Sub
 If KeyAscii = 13 Then KeyAscii = 0: Exit Sub
 End Sub
 
-Private Sub gList1_OutPopUp(x As Single, y As Single, myButton As Integer)
+Private Sub gList1_OutPopUp(X As Single, Y As Single, myButton As Integer)
 Dim i As Long
 
 If Not gList1.enabled Then Exit Sub
@@ -558,7 +558,7 @@ i = .SelLength
 End With
 UNhookMe
 MyPopUp.feedlabels TEXT1, EditTextWord
-MyPopUp.Up x + gList1.Left, y + gList1.Top
+MyPopUp.Up X + gList1.Left, Y + gList1.top
 myButton = 0
 End Sub
 
@@ -645,7 +645,7 @@ End If
 End Select
 End Sub
 
-Private Sub List1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub List1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 If item = -1 Then
 
 Else
@@ -1019,7 +1019,7 @@ End If
 
 End Sub
 
-Private Sub DIS_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub DIS_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Not NoAction Then
 NoAction = True
 
@@ -1027,9 +1027,9 @@ If Button > 0 And Targets Then
 
 If Button = 1 Then
 Dim sel&
-    sel& = ScanTarget(q(), CLng(x), CLng(y), 0)
+    sel& = ScanTarget(q(), CLng(X), CLng(Y), 0)
     If sel& >= 0 Then
-        Select Case q(sel&).id Mod 100
+        Select Case q(sel&).Id Mod 100
         Case Is < 10
         If TaskMaster Is Nothing Then
         
@@ -1061,7 +1061,7 @@ End Sub
 
 
 
-Private Sub dSprite_MouseDown(index As Integer, Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub dSprite_MouseDown(index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim p As Long, u2 As Long
 If lockme Then Exit Sub
 If Not NoAction Then
@@ -1073,10 +1073,10 @@ With players(p)
 
         If Button > 0 And Targets Then
 
-        sel& = ScanTarget(q(), CLng(x), CLng(y), index)
+        sel& = ScanTarget(q(), CLng(X), CLng(Y), index)
             If sel& >= 0 Then
                 If Button = 1 Then
-                Select Case q(sel&).id Mod 100
+                Select Case q(sel&).Id Mod 100
                 Case Is < 10
                 If Not interpret(DisStack, "LAYER " & dSprite(index).Tag + " {" + vbCrLf + q(sel&).Comm + vbCrLf & "}") Then Beep
                 Case Else
@@ -1311,7 +1311,7 @@ End If
 End If
 End If
 Case vbKeyPause  '(this is the break key!!!!!'
-If Forms.count > 5 Then keycode = 0: Exit Sub
+If Forms.Count > 5 Then keycode = 0: Exit Sub
 If Not TaskMaster Is Nothing Then If TaskMaster.QueueCount > 0 Then keycode = 0: Exit Sub
 If QRY Or GFQRY Then
 If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
@@ -1609,7 +1609,7 @@ Switches para$  ' ,TRUE CHECK THIS
   On Error Resume Next
   Dim i As Long
   
-      For i = 0 To Controls.count - 1
+      For i = 0 To Controls.Count - 1
      If Typename(Controls(i)) <> "Menu" Then Controls(i).TabStop = False
       Next i
 End Sub
@@ -1617,20 +1617,20 @@ End Sub
 
 
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 If NoAction Then Exit Sub
 NoAction = True
 Dim sel&
 
 If Button > 0 And Targets Then
-sel& = ScanTarget(q(), CLng(x), CLng(y), -1)
+sel& = ScanTarget(q(), CLng(X), CLng(Y), -1)
 
 If sel& >= 0 Then
 
 If Button = 1 Then
 
 
-Select Case q(sel&).id Mod 100
+Select Case q(sel&).Id Mod 100
 Case Is < 10
 
 If Not interpret(MeStack, (q(sel&).Comm)) Then Beep
@@ -2120,7 +2120,7 @@ If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
                 Form1.SetFocus
             End If
             End If
-            If Forms.count > 5 Then keycode = 0: Exit Sub
+            If Forms.Count > 5 Then keycode = 0: Exit Sub
             If Not TaskMaster Is Nothing Then If TaskMaster.QueueCount > 0 Then keycode = 0: Exit Sub
             If BreakMe Then noentrance = False: Exit Sub
             If ASKINUSE Then
@@ -2683,7 +2683,7 @@ If IsWine Then
 With view1
 On Error Resume Next
     .Visible = True
-    .Top = IEY
+    .top = IEY
     .Left = IEX
     .Width = IESizeX
     .Height = IESizeY
@@ -2859,7 +2859,7 @@ MyFont = defFontname
                     SzOne = 14
              PenOne = 14
              PaperOne = 5
-             DIS.forecolor = mycolor(PenOne)
+             DIS.ForeColor = mycolor(PenOne)
              On Error Resume Next
              cc.Value = Form1.FontName
              cc.ValueKey = "NEWSECURENAMES"
@@ -2997,7 +2997,7 @@ End If
       
     If cc.Value = PenOne Then cc.Value = 15 - PenOne
    
-        DIS.forecolor = mycolor(PenOne)
+        DIS.ForeColor = mycolor(PenOne)
     cc.ValueKey = "PAPER"
         cc.ValueType = REG_DWORD
         PaperOne = cc.Value
@@ -3053,7 +3053,7 @@ End If
         Set cc = Nothing
         End If
            
-       DIS.forecolor = mycolor(PenOne) ' NOW PEN IS RGB VALUE
+       DIS.ForeColor = mycolor(PenOne) ' NOW PEN IS RGB VALUE
             Font.charset = basestack.myCharSet
     Font.bold = basestack.myBold
     DIS.Font.charset = basestack.myCharSet
@@ -3349,7 +3349,7 @@ End Sub
 Public Function NeoASK(bstack As basetask) As Double
 If ASKINUSE Then Exit Function
 On Error GoTo recover
-Dim safety As Long
+Dim safety As Long, XX As GuiM2000
 Dim oldesc As Boolean, zz As Form
     oldesc = escok
 'using AskTitle$, AskText$, AskCancel$, AskOk$, AskDIB$
@@ -3427,7 +3427,7 @@ If IsWine Then
         Exit Function
     End If
 Else
-If Forms.count < 6 Then SleepWaitEdit bstack, 30
+If Forms.Count < 6 Then SleepWaitEdit bstack, 30
 End If
 If AskInput Then
 NeoMsgBox.gList3.SetFocus
@@ -3442,20 +3442,20 @@ End If
     MyDoEvents
     End If
    
-    Dim mycode As Double, oldcodeid As Double, x As Form
-mycode = Rnd * 12312314
-oldcodeid = Modalid
-
- For Each x In Forms
-                    If x.Name = "GuiM2000" Then
-                        
-                            If x.Enablecontrol Then
-                                If x.Modal = 0 Then x.Modal = mycode
-                                x.Enablecontrol = False
-                                End If
-                        End If
-                    Next x
-                     Set x = Nothing
+    Dim mycode As Double, oldcodeid As Double, X As Form
+    mycode = Rnd * 12312314
+    oldcodeid = Modalid
+    For Each X In Forms
+        If X.Name = "GuiM2000" Then
+            Set XX = X
+            If XX.Enablecontrol Then
+                If XX.Modal = 0 Then XX.Modal = mycode
+                XX.Enablecontrol = False
+            End If
+        End If
+        Set XX = Nothing
+    Next X
+    Set X = Nothing
 If INFOONLY Then
 NeoMsgBox.command1.SetFocus
 End If
@@ -3492,11 +3492,11 @@ recover:
 On Error GoTo recover2
 BLOCKkey = False
 AskTitle$ = vbNullString
-Dim z As Form, XX As GuiM2000
+Dim z As Form
 Set z = Nothing
-For Each x In Forms
-    If x.Name = "GuiM2000" Then
-        Set XX = x
+For Each X In Forms
+    If X.Name = "GuiM2000" Then
+        Set XX = X
         If Not XX.Enablecontrol Then
         XX.TestModal mycode
         End If
@@ -3504,8 +3504,8 @@ For Each x In Forms
         'End If
         Set XX = Nothing
     End If
-Next x
-Set x = Nothing
+Next X
+Set X = Nothing
 If Not zz Is Nothing Then Set z = zz
 On Error Resume Next
 If Typename(z) = "GuiM2000" Then

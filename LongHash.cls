@@ -146,7 +146,7 @@ End Sub
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
     k = Hash(b)
-    If Not Hash(b) = a + 1 Then
+    If Not k = a + 1 Then
          Hash(b) = a + 1
          PriveSpace(a).Pleft = k
     End If

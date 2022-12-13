@@ -31,14 +31,14 @@ a.NoPublic objref, mineHere$
 Set CopyOfMe = a
 End Property
 Property Let ShowGui(RHS As Boolean)
-If Forms.count = 0 Then Exit Property
+If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
 If Form1.top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).top
 Else
 If Form1.WindowState = 0 Then
-If Not (QRY Or GFQRY Or Forms.count > 5) Then Form1.Visible = False
+If Not (QRY Or GFQRY Or Forms.Count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
@@ -438,7 +438,7 @@ here$ = ohere$
 If clean Then PopStage objref
 elevatestatus2 = 0
 Dim exityes
-If NERR Then NERR = False: Err.Raise 50500, , "Fatsl Error"
+If NERR Then NERR = False: Err.Raise 50500, , "Fatal Error"
 End Function
 Property Get ErrorGr() As String
 ErrorGr = LastErNameGR

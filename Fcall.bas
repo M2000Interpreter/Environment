@@ -23,7 +23,7 @@ Private Enum CALLINGCONVENTION_ENUM
   CC_MPWPASCAL
 End Enum
 
-Private LibHdls As New FastCollection, VType(0 To 63) As Integer, VPtr(0 To 63) As Long
+Private LibHdls As New FastCollection, vType(0 To 63) As Integer, vPtr(0 To 63) As Long
 Sub HandleStringInBuffer(a As MemBlock)
 
 End Sub
@@ -38,47 +38,47 @@ Dim v(), HRes As Long, i As Long
   For i = 0 To j - 1 ''UBound(V)
     If VarType(p(i)) = vbString Then
     v(i) = CLng(StrPtr(p(i)))
-    VPtr(i) = VarPtr(v(i))
-    VType(i) = vbString
+    vPtr(i) = VarPtr(v(i))
+    vType(i) = vbString
     Else
-    VType(i) = VarType(v(i))
-    VPtr(i) = VarPtr(v(i))
+    vType(i) = VarType(v(i))
+    vPtr(i) = VarPtr(v(i))
     End If
     
   Next i
   If Left$(sFunc, 1) = "#" Then
-  HRes = DispCallFunc(0, GetFuncPtrOrd(sDll, sFunc), CC_STDCALL, CInt(RetType), j, VType(0), VPtr(0), stdCallW)
+  HRes = DispCallFunc(0, GetFuncPtrOrd(sDll, sFunc), CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), stdCallW)
   Else
-  HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_STDCALL, CInt(RetType), j, VType(0), VPtr(0), stdCallW)
+  HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), stdCallW)
   End If
   If HRes Then Err.Raise HRes
 ' p() = v()
- If Typename(stdCallW) = "Null" Then
- stdCallW = vbEmpty
+ If VarType(stdCallW) = vbNull Then
+        stdCallW = vbEmpty
  End If
 End Function
-Public Function Fast_stdCallW(ByVal addr As Long, ByVal RetType As Variant, p() As Variant, j As Long)
+Public Function Fast_stdCallW(ByVal Addr As Long, ByVal RetType As Variant, p() As Variant, j As Long)
 Dim v(), HRes As Long, i As Long
  
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
   For i = 0 To j - 1 ''UBound(V)
     If VarType(p(i)) = vbString Then
     v(i) = CLng(StrPtr(p(i)))
-    VPtr(i) = VarPtr(v(i))
-    VType(i) = vbString
+    vPtr(i) = VarPtr(v(i))
+    vType(i) = vbString
     Else
-    VType(i) = VarType(v(i))
-    VPtr(i) = VarPtr(v(i))
+    vType(i) = VarType(v(i))
+    vPtr(i) = VarPtr(v(i))
     End If
     
   Next i
 
-  HRes = DispCallFunc(0, addr, CC_STDCALL, CInt(RetType), j, VType(0), VPtr(0), Fast_stdCallW)
+  HRes = DispCallFunc(0, Addr, CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), Fast_stdCallW)
 
   If HRes Then Err.Raise HRes
 ' p() = v()
- If Typename(Fast_stdCallW) = "Null" Then
- Fast_stdCallW = vbEmpty
+ If VarType(Fast_stdCallW) = vbNull Then
+    Fast_stdCallW = vbEmpty
  End If
 End Function
 
@@ -88,34 +88,34 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
   For i = 0 To j - 1
     If VarType(p(i)) = vbString Then v(i) = StrPtr(p(i))
-    VType(i) = VarType(v(i))
-    VPtr(i) = VarPtr(v(i))
+    vType(i) = VarType(v(i))
+    vPtr(i) = VarPtr(v(i))
   Next i
    If Left$(sFunc, 1) = "#" Then
-     HRes = DispCallFunc(0, GetFuncPtrOrd(sDll, sFunc), CC_CDECL, CInt(RetType), j, VType(0), VPtr(0), cdeclCallW)
+     HRes = DispCallFunc(0, GetFuncPtrOrd(sDll, sFunc), CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), cdeclCallW)
    Else
-  HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_CDECL, CInt(RetType), j, VType(0), VPtr(0), cdeclCallW)
+  HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), cdeclCallW)
   End If
   If HRes Then Err.Raise HRes
-  If Typename(cdeclCallW) = "Null" Then
-  cdeclCallW = vbEmpty
+  If VarType(cdeclCallW) = vbNull Then
+    cdeclCallW = vbEmpty
   End If
 End Function
 
-Public Function Fast_cdeclCallW(ByVal addr, ByVal RetType As Variant, p() As Variant, j As Long)
+Public Function Fast_cdeclCallW(ByVal Addr, ByVal RetType As Variant, p() As Variant, j As Long)
 Dim i As Long, pFunc As Long, v(), HRes As Long
  
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
   For i = 0 To j - 1
     If VarType(p(i)) = vbString Then v(i) = StrPtr(p(i))
-    VType(i) = VarType(v(i))
-    VPtr(i) = VarPtr(v(i))
+    vType(i) = VarType(v(i))
+    vPtr(i) = VarPtr(v(i))
   Next i
 
-  HRes = DispCallFunc(0, addr, CC_CDECL, CInt(RetType), j, VType(0), VPtr(0), Fast_cdeclCallW)
+  HRes = DispCallFunc(0, Addr, CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), Fast_cdeclCallW)
 
   If HRes Then Err.Raise HRes
-  If Typename(Fast_cdeclCallW) = "Null" Then
+  If VarType(Fast_cdeclCallW) = vbNull Then
   Fast_cdeclCallW = vbEmpty
   End If
 End Function
@@ -127,11 +127,11 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
   For i = 0 To UBound(v)
     If VarType(p(i)) = vbString Then p(i) = StrConv(p(i), vbFromUnicode): v(i) = StrPtr(p(i))
-    VType(i) = VarType(v(i))
-    VPtr(i) = VarPtr(v(i))
+    vType(i) = VarType(v(i))
+    vPtr(i) = VarPtr(v(i))
   Next i
   
-  HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_STDCALL, RetType, i, VType(0), VPtr(0), stdCallA)
+  HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_STDCALL, RetType, i, vType(0), vPtr(0), stdCallA)
   
   For i = 0 To UBound(p) 'back-conversion of the ANSI-String-Results
     If VarType(p(i)) = vbString Then p(i) = StrConv(p(i), vbUnicode)
@@ -145,11 +145,11 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
   For i = 0 To UBound(v)
     If VarType(p(i)) = vbString Then p(i) = StrConv(p(i), vbFromUnicode): v(i) = StrPtr(p(i))
-    VType(i) = VarType(v(i))
-    VPtr(i) = VarPtr(v(i))
+    vType(i) = VarType(v(i))
+    vPtr(i) = VarPtr(v(i))
   Next i
   
-  HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_CDECL, RetType, i, VType(0), VPtr(0), cdeclCallA)
+  HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_CDECL, RetType, i, vType(0), vPtr(0), cdeclCallA)
   
   For i = 0 To UBound(p) 'back-conversion of the ANSI-String-Results
     If VarType(p(i)) = vbString Then p(i) = StrConv(p(i), vbUnicode)
@@ -163,11 +163,11 @@ Dim i As Long, v(), HRes As Long
 
   v = p 'make a copy of the params, to prevent problems with VT_ByRef-Members in the ParamArray
   For i = 0 To UBound(v)
-    VType(i) = VarType(v(i))
-    VPtr(i) = VarPtr(v(i))
+    vType(i) = VarType(v(i))
+    vPtr(i) = VarPtr(v(i))
   Next i
   
-  HRes = DispCallFunc(pUnk, vtblIdx * 4, CC_STDCALL, vbLong, i, VType(0), VPtr(0), vtblCall)
+  HRes = DispCallFunc(pUnk, vtblIdx * 4, CC_STDCALL, vbLong, i, vType(0), vPtr(0), vtblCall)
   If HRes Then Err.Raise HRes
 End Function
 

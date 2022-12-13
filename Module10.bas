@@ -343,11 +343,11 @@ FileH = CreateFile(StrPtr(FileName), _
                  0, _
                 ByVal 0&, OPEN_EXISTING, 0&, 0&)
 
-If Err.Number > 0 Then
+If Err.Number > 0 Or FileH = -1 Then
     Err.Clear
 there:
     MyEr "Can't read the file length", "Δεν μπορώ να διαβάσω το μήκος του αρχείου"
-    myFileLen = -1#
+    myFileLen = -1@
 Else
     ok = API_FileSize(FileH, myFileLen)
     API_CloseFile FileH

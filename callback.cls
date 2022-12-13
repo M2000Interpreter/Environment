@@ -13,12 +13,14 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
 'class for call back
+Private Declare Function GetCurrentProcessId Lib "kernel32" () As Long
+
 Private objref As basetask
 Private mineHere$
 Private setstacklimit As Boolean
 Private par1$, par2$
 Public Event ErrorAtt(ByRef recover As Variant)
-Public Finished As Boolean
+Public Finished As Boolean, mylogfile$
 Private hTimer As Long, hTimer2
 Dim locked As Boolean
 Dim ExtForm As Object
@@ -63,9 +65,9 @@ lasttitle = a$
 ExtForm.CaptionW = a$
 End If
 End Sub
-Public Sub GetForm(F As Object)
+Public Sub GetForm(f As Object)
 
-Set ExtForm = F
+Set ExtForm = f
 'If F Is Nothing Then Exit Sub
 End Sub
 Public Sub StackMax(stack As Long)
@@ -97,7 +99,7 @@ par1$ = LoadFileAndSwitches$
 par2$ = Prompt$
 CliRun
 End Sub
-Public Sub Shutdown(Cancel As Integer)
+Public Sub ShutDown(Cancel As Integer)
 
 If ASKINUSE Or loadfileiamloaded Then
 NOEXECUTION = Cancel = 2
@@ -110,16 +112,16 @@ End If
 End If
 If Cancel < 1 Then
 If Not MayQuit Then Cancel = -1: Exit Sub
-Dim F As Form, i As Long, F1 As GuiM2000, nook As Long
+Dim f As Form, i As Long, F1 As GuiM2000, nook As Long
 
 NERR = True: NOEXECUTION = True
 ExTarget = True: INK$ = Chr(27): UKEY$ = Chr$(27)
 If Cancel = -100 Then Exit Sub
 
-For i = Forms.count - 1 To 0 Step -1
-Set F = Forms(i)
-If TypeOf F Is GuiM2000 Then
-    Set F1 = F
+For i = Forms.Count - 1 To 0 Step -1
+Set f = Forms(i)
+If TypeOf f Is GuiM2000 Then
+    Set F1 = f
     
     If Modalid <> 0 Then
         If F1.Modal = Modalid Then
@@ -141,7 +143,7 @@ If TypeOf F Is GuiM2000 Then
 End If
 If nook Then Cancel = True: Exit For
 Next i
-Set F = Nothing
+Set f = Nothing
 
 
 If Cancel Then Exit Sub
@@ -171,16 +173,27 @@ Set ExtForm = Nothing
 Finished = True
 End Sub
 Public Sub AsyncCli(LoadFileAndSwitches$, Optional Prompt$ = ">")
+Dim pid As Long
+If strTemp = vbNullString Then SetTmpPath
 Sleep 100
 par1$ = LoadFileAndSwitches$
 par2$ = Prompt$
 Set UseMe = Me
-hTimer = SetTimer(0&, 0&, 10, AddressOf RunMe)
+pid = GetCurrentProcessId()
+If strTemp = vbNullString Then strTemp = GetTempPathgg()
+Dim m As Long
+mylogfile$ = strTemp + LTrim$(Str$(pid)) + ".M2000"
+m = 1
+Open mylogfile$ For Output As #m
+Close #m
+tempList2delete = Sput(mylogfile$) + tempList2delete
+
+hTimer = SetTimer(0&, 0&, 2000, AddressOf RunMe)
 End Sub
 Public Sub AsyncShow()
 If hTimer2 Then Exit Sub
 Set UseMe = Me
-hTimer2 = SetTimer(0&, 0&, 10, AddressOf ShowForm1)
+hTimer2 = SetTimer(0&, 0&, 100, AddressOf ShowForm1)
 End Sub
 Friend Sub CliRun()
 Dim LoadFileAndSwitches$, Prompt$
@@ -278,20 +291,20 @@ DoEvents
 Sleep 5
 End If
 On Error Resume Next
-If Not ExtForm Is Nothing Then ExtForm.Shutdown
+If Not ExtForm Is Nothing Then ExtForm.ShutDown
 Dim i As Long
 For i = UBound(var()) To 0 Step -1: var(i) = 0&: Next i
 Finished = True
 End Sub
 Property Let ShowGui(RHS As Boolean)
-If Forms.count = 0 Then Exit Property
+If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
 If Form1.top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).top
 Else
 If Form1.WindowState = 0 Then
-If Not (Forms.count > 5) Then Form1.Visible = False
+If Not (Forms.Count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
@@ -495,8 +508,8 @@ For i = -2 To 1000
     players(i) = Zero
     Prefresh(i) = zerocounter
 Next i
-If Forms.count > 0 Then
-For i = Forms.count - 1 To 0
+If Forms.Count > 0 Then
+For i = Forms.Count - 1 To 0
 Set Forms(i).icon = LoadPicture("")
 Unload Forms(i)
 Next i
@@ -515,7 +528,7 @@ Public Sub StopTimer2()
   If hTimer2 <> 0 Then
   '' MasterTimer = 0
     KillTimer 0&, hTimer2
-    hTimer = 0
+    hTimer2 = 0
   End If
 End Sub
 Public Sub SetFocus()
@@ -586,7 +599,7 @@ Public Sub SendMess(a$)
     On Error Resume Next
         ExtForm.SendMessNow a$
         If Err Then
-        Me.Shutdown True
+        Me.ShutDown True
         
         End If
         

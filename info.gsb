@@ -184,18 +184,34 @@ for i=1 to 10
 next   
 clear
 }
-MODULE BB {Print "check mouse buttons"
+MODULE BB {if row<height-10 then cls, row else Cls,height-10
+Refresh 50
+Print "Click mouse buttons"
 Print "Press Esc to exit"
+scroll split row
 m=false
-Every 100 {
-if mouse.key then { m=true } else m=false
-print not m
+Escape off
+Profiler  // reset counter
+Try  {
+	Every 1000/25 {
+		if mouse.key then m=true else m=false
+		print not m, int(timecount) 
+		if keypress(27) then exit
+	}
 }
+scroll split 0  // no split screen
+if module(info) then Print "Press F3"
+Escape on
 }
-MODULE BB1 {Print "press mouse button"
+MODULE BB1 {if row<height-10 then cls, row else Cls,height-10
+Print "press mouse button"
+scroll split row
 a=mouse
-while not a {a=mouse: print a ,  not -a}
+profiler
+while not a {a=mouse: print a ,  not -a, int(timecount)}
 ? "ok"
+scroll split 0  // no split screen
+if module(info) then Print "Press F3"
 }
 MODULE D {\\ Identifiers in Greek language
 \\ see DR for the same program with statements in English language
@@ -844,6 +860,7 @@ Module Checkit {
 }
 Checkit
 Print a ' a exist always
+keyboard "Clear", 13
 }
 MODULE F1 {Report {
 	OOP part 1
@@ -1135,7 +1152,7 @@ checkit
 }
 MODULE F8 {Report {
 	Another example using advapi32.dll to declare three external functions
-	We use Constan identifiers at a global level.
+	We use Constant identifiers at a global level.
 	Also the Global scope end when this module exit
 }
 Declare Global CryptAcquireContext Lib "advapi32.CryptAcquireContextW" {Long &hProv, pszContainer$,pszProvider$, long dwProvType, long dwFlags}
@@ -1189,7 +1206,7 @@ k3=binary.add(0xFF123456,0xF1234567,0xFFFFFFFF)
 Print type$(k3)
 hex K3
 }
-MODULE URL {Report {See also DD7 module which decoding for URI use internal funations
+MODULE URL {Report {See also DD7 module which decoding for URI using internal functions
 Here we see the decoding using M2000 code (slow)
 }
 Module checkit {
@@ -1452,8 +1469,12 @@ t=(1,0,1)
 Print c#pos(t) ' 1  means 2nd position
 Print c#pos(3->t) ' 6  means 7th position
 }
-MODULE R1 {Report {Reverse a string holding the right chaacters in order (not reversed)
+MODULE R1 {Report {Reversing a string holding the right characters in order (not reversed)
 Using StrRev$() we get error in third exanple
+
+This happen because some characters displayed on top of others, so we have to keep the order.
+We use the len.Disp() to find these characters which must glue together.
+
 }
 Function DispRev$(a$) {
       i=1: j=Len(a$): if j=0 then ="": exit
@@ -1470,9 +1491,12 @@ Function DispRev$(a$) {
       } until i>len(a$)
        =z$
 }
-Print DispRev$("abcd")="dcba"
-Print DispRev$("")=""
-Print DispRev$("s⃝df̅")="f̅ds⃝", StrRev$("s⃝df")="f̅ds⃝"
+Print DispRev$("abcd")="dcba", StrRev$("abcd")="dcba"
+Print DispRev$("")="", StrRev$("")=""
+Report {This DispRev$("s⃝df̅")="f̅ds⃝" is true
+	This StrRev$("s⃝df̅")="f̅ds⃝" is false
+	}
+Print DispRev$("s⃝df̅")="f̅ds⃝", StrRev$("s⃝df̅")="f̅ds⃝"
 }
 MODULE W1 { Report {
         This is an evolutionary Algorithm, where is a target string, a fitness function which return a number of how many charachters are at the right position, but no information returned for which character is in wrong position.
@@ -2779,13 +2803,16 @@ Pendulum
 Set Fast
 if module(Infobasic) then keyboard "Infobasic", 13
 }
-MODULE LOGO {smooth off  ' can't use xor with GDI+, so we work with GDI32 (by default)
+MODULE LOGO {font "Verdana"
+smooth off  ' can't use xor with GDI+, so we work with GDI32 (by default)
+refresh 50
+BackGround {refresh 50}
 Form 80, 50
-BackGround {cls 11 :height.pixels=scale.y  div twipsY : width.pixels=scale.x div twipsX }
+BackGround {cls 0 :height.pixels=scale.y  div twipsY : width.pixels=scale.x div twipsX }
 if height.pixels=1024 or height.pixels/width.pixels>0.70 then
       Form  80,50
 else
-     Form !  120,60    // we use ! to add more space for TV-MONITORS - Remove it then press Esc and then F1 to save it
+     Form !  120,55    // we use ! to add more space for TV-MONITORS - Remove it then press Esc and then F1 to save it
   end if
 Refresh 10000
 Cls 5,0
@@ -2954,7 +2981,7 @@ else
 	If SF.count> 0 then Show_Folders(SubFolders)
 End If
 Win Dir$  ' open explorer in M2000 user directory
-Rem Win "explorer", "/select,"+dir$  ' open explorer with selected name the folder dir$
+Rem Win "explorer", "/select, "+dir$  ' open explorer with selected name the folder dir$
 declare fs nothing
 
 
@@ -3135,18 +3162,129 @@ MODULE GAME {Module Game2048 {
 }
 Game2048
 }
-MODULE FIX1 {Class fixme {
+MODULE FIX1 {Where=random(1, monitors)
+//mm=where=window
+mm=0
+Title "M2000", mm
+font "Courier New"
+if mm then Hide
+// window as variable return monitor where the console is.
+Window 8, Where
+if mm else wait 100
+back {gradient #0A0F0D, #0A0F0D}
+linespace 30
+// we use ! after Form to leave space for TV type monitors.
+// you can remove ! if you have monitors
+Form ! 80
+Cls #0A0F0D, 0
+Pen 15
+Push Bold
+Bold 0
+// we make a class a function, global, which return an object of type group with additional fixme type
+Class fixme {
       f=lambda->1
+      remove {
+          print "Object fixme destroyed"
+      }
 }
+// we make  a pointer to a fresh object created from fixme() function
 fix->fixme()
-next_fact=lambda fix (x)->{
+// we make a lambda function with one closure, the fix which is a copy of fix
+// but because fix is a pointer we just get a second pointer to object fixme
+next_fact=lambda fix (x as long long)->{
+     if x<=1&& then =1&& :exit
+     =x*fix=>f(x-1&&)
+}
+// now we pass the function next_fact (is first citizen) to fix=>f
+// we pass a copy. But this copy has a pointer to object pointed by fix (in the fix closure)
+// if we clear the memory using clear, the fix as pointer erased but the fix in lambda has a pointer,
+// and this pointer prevents the object for erasing.
+fix=>f=next_fact
+
+// we can make a copy (also we get a copy of fix, but is a pointer)
+m=next_fact
+
+// so now we call the next_fact()
+nf=next_fact(20)
+
+Print "Factorial 20 = "; nf, "Type:";Type$(nf)
+nf1=next_fact(21)
+
+Print "Factorial 21 = "; nf1, "Type:";Type$(nf1)
+
+
+Print "Redefine next_fact to use Decimal"
+next_fact=lambda fix (x as Decimal)->{
+     if x<=1@ then =1@ :exit
+     =x*fix=>f(x-1@)
+}
+fix=>f=next_fact
+nf2=next_fact(21)
+Print "Factorial 21 = "; nf2, "Type:";Type$(nf2)
+
+nf22=next_fact(27)
+Print "Factorial 27 = "; nf22, "Type:";Type$(nf22)
+
+nf3=next_fact(28)
+Print "Factorial 28 = "; nf3, "Type:";Type$(nf3)
+
+
+
+Print "Redefine next_fact to use Double by defaultl"
+next_fact=lambda fix (x as Double)->{
      if x<=1 then =1 :exit
      =x*fix=>f(x-1)
 }
 fix=>f=next_fact
-Print next_fact(5)
-m=next_fact
-Print m(5)
+
+nf4=next_fact(10)
+Print "Factorial 10 = "; nf4, "Type:";Type$(nf4)
+nf4=next_fact(17)
+Print "Factorial 17 = "; nf4, "Type:";Type$(nf4)
+nf4=next_fact(18)
+Print "Factorial 18 = "; nf4, "Type:";Type$(nf4)
+nf4=next_fact(20)
+Print "Factorial 20 = "; nf4, "Type:";Type$(nf4)
+
+Print "Redefine next_fact to use Currency"
+next_fact=lambda fix (x as Currency)->{
+     if x<=1# then =1# :exit
+     =x*fix=>f(x-1#)
+}
+fix=>f=next_fact
+nf5=next_fact(17)
+Print "Factorial 17 = "; nf5, "Type:";Type$(nf5)
+nf6=next_fact(18)
+Print "Factorial 18 = "; nf6, "Type:";Type$(nf6)
+
+fix=>f=m
+m1=m(20)
+Print "Using lambda m, Factorial 20 = "; m1, "Type:";Type$(m1)
+
+
+// Now we break the pointer to next_fact
+// Just replacing the function with a simple one
+// so now  next_fact and m, have breaking the cycle of references.
+fix=>f=lambda->1
+
+// without clear just write a Exit statement
+Rem Exit
+Print "Statement Clear - erase all module's variables"
+Clear
+Print "So now all variables destroyed"
+Try ok {
+	Print m(5)
+}
+// we get "internal error in function m()"
+// because
+Print "Error"+Error$
+Print "This is normal because the actual object not exist"
+if isnum then Bold number
+flush
+Pen 11 {print "Write Edit Fix1 to review the code"}
+if module(info) then print "Press F3 to return to main page"
+Title "M2000", 1
+Show
 }
 MODULE Y {op=Pen
 Pen 15
@@ -4558,8 +4696,8 @@ SET FAST !
 PEN #fff9aa
 // BLOCK ESCAPE KEY
 ESCAPE OFF
-//thread.plan sequential //WE CAN USE THREAD plan sequential also.
-THREAD.PLAN CONCURRENT
+thread.plan sequential //WE CAN USE THREAD plan sequential also.
+//THREAD.PLAN CONCURRENT
 ox=scale.x*1.4
 oy=scale.y*1.4
 REFRESH  500 
@@ -5450,25 +5588,37 @@ Declare Pad Nothing
 Declare NotePad Nothing 
 If Module(Info) Then
 	Title "Info"
-	keyboard "INFOBasic"+chr$(13)
 end if
 }
-MODULE INFOBASIC {if fontname$<>"Verdana" then font "Verdana"
+MODULE INFOBASIC {Italic 0
+Bold 1
+if fontname$<>"Verdana" then font "Verdana"
 Set Edit !4   ' 4 chars fpr tabs in edit
 \\
 \\ Press Esc to exit this editor - look the context drop down menu too (ctrl+F10 also open context dropdown menu)
 \\
 \\
 refresh 10000
-hide
+cls 0,0
 \\ window show again
-window 8, window 
-Form 80, 66
-BackGround {cls 11 :height.pixels=scale.y  div twipsY : width.pixels=scale.x div twipsX }
+window 6, window
+refresh 10000
+linespace 0
+wait 100
+'Form 80, 66
+BackGround {
+	cls 0,0
+	height.pixels=scale.y  div twipsY
+	width.pixels=scale.x div twipsX
+	sx=scale.x
+	sy=scale.y
+}
 if height.pixels=1024 or height.pixels/width.pixels>0.70 then
       Form  80,68
 else
-     Form !  120 ,68    // we use ! to add more space for TV-MONITORS - Remove it then press Esc and then F1 to save it
+	Window 12, sx*.95, sy*.92;
+	BackGround {cls,0 }
+       form 100, height+2;
   end if
 backcolor=5   'point
 oldpen=14  ' pen
@@ -5480,11 +5630,11 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 41 for M2000 Interpreter version 11, revision 17 and above"
+	Report " A collection of modules for tests version 43 for M2000 Interpreter version 11, revision 20 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
-		Report 1, "George Karras 2021-2022"
+		Report 1, "George Karras 2022-2023"
 	}
 }
 cls backcolor, row
@@ -5554,6 +5704,7 @@ Fkey + Enter to see the Function Keys
 }
 \\title("M2000 Writer")
 \\Keyboard "Writer"+chr$(13)
+back {refresh 50}
 Refresh 50
 show
 End
@@ -5575,6 +5726,8 @@ Print "Done"
 
 }
 MODULE M2000_EDITOR_INFORMATION {\\if width<>80 and height<>66 then window 10, window : form !80,66
+font "verdana"
+form ! 80, 66
 thread.plan sequential   ' can run as concurrent too
 linespace twipsY*2
 ' Mode as read only value return the height of layer form in pt. Using Mode we set to the same Mode but we cut extra space (use linespace also)
@@ -5593,7 +5746,7 @@ Pen 0 {
 	Report " Internal M2000 Editor"
 	Pen 5{
 		cursor 0, row-1
-		Report 1, "George Karras 2019"
+		Report 1, "George Karras 2022-2023"
 	}
 }
 cls backcolor, row
@@ -5863,6 +6016,7 @@ MODULE FORM44 {Module TryIt {
 	      }
 	}
 	'goto aaa
+	boolean mine=false
 	For i=0 to N-1 {
 	\\ Threads get current layer as starting layer
 	      Layer Form1(i) {
@@ -8288,55 +8442,57 @@ Set Fast
 MODULE BN {Dim Mod$(0 to 99), Mul(0 to 9,0 to 9)
 for j=0 to 9 : For i=0 to 9:Mod$(i+j*10)=str$(i mod 10,0): Mul(i,j)=i*j : Next i :Next j
 profiler
-a$="1231231231231231231231231231232132131213130989802139080120931920389"
+a$="9231231231231231231231231231232132131213130989802139080120931920389590859034898509385094850943850943850348083409850934809534809583458340958340985093458934850349"
 \\ a$ x n
 n1$="1234567767765675576765234324243122131213122113123120898031238910823"
-Print val(n1$)*val(a$)
+// try to swap these variables
+// swap a$, n1$
+print val(n1$)*val(a$)
 k=0
-acc=0
 a$=strrev$(a$)
 inventory num
 rev3$=""
 n1=len(n1$)
 while n1>0 
-n=val(mid$(n1$,n1,1))
-n1--
-rev2$=string$("0", k)
-rev1$=""
-k++
-
-if n>0 then
-      if not exist(num, n) then
-      digit=0&
-      For i=1 to len(a$)
-      digit+=n*val(mid$(a$,i,1))
-      rev1$+=str$(digit mod 10,0)
-      digit/=10&
-      Next i
-      if digit then rev1$+=str$(digit mod 10,0)
+    n=val(mid$(n1$,n1,1))
+    n1--
+    rev2$=string$("0", k)
+    rev1$=""
+    k++
+    
+    if n>0 then
+        if not exist(num, n) then
+            digit=0&
+            For i=1 to len(a$)
+                digit+=n*val(mid$(a$,i,1))
+                rev1$+=str$(digit mod 10,0)
+                digit/=10&
+            Next i
+            if digit then rev1$+=str$(digit mod 10,0)
             Append num, n:=rev1$
-      else
+        else
             rev1$=num$(n)
-      End if
-      rev2$+=rev1$
-      if len(rev3$)=0 then
+        End if
+        rev2$+=rev1$
+        if len(rev3$)=0 then
             swap rev2$, rev3$
-      else
+        else
             swap rev1$, rev3$
             rev3$=""
             if rev2$<rev1$ then swap rev1$, rev2$
             digit=0
             For i=1 to len(rev1$)
-            digit+=val(mid$(rev1$, i, 1))+val(mid$(rev2$, i, 1))
-            rev3$+=str$(digit mod 10,0)
-            digit/=10&
+                digit+=val(mid$(rev1$, i, 1))+val(mid$(rev2$, i, 1))
+                rev3$+=str$(digit mod 10,0)
+                digit/=10&
             next i
             if digit>0 then rev3$+=str$(digit mod 10,0)
-      end  if
-      End if
+        end  if
+    End if
 End While
-Print strrev$(rev3$)
+print strrev$(rev3$)
 print timecount
+print Len(Num)
 }
 MODULE DI {inline code libdiv
 op=Pen
@@ -8859,6 +9015,7 @@ define_module_b:
 Module b {
       Read a, n, &ar(), cir
       Dim ar(alfa,2)
+      const pi=3.14159~
       z=pi/2
       km=0
       x=pos.x
@@ -12491,7 +12648,14 @@ IF PRINT_IT THEN PRINTING ON ELSE REFRESH 1000
 FONT "COURIER NEW"
 PEN 0
 CLS 15, 0
-FORM 132,68      
+if module(fixmode) then
+fixmode 132,68
+else
+FORM 132,68
+end if
+mode=mode*.8
+
+
 CALENDAR 1966, 1032 ' GREEK
 GOSUB WAITKEY_OR_MOUSE
 I=VAL(DATE$(TODAY,LOCALE, "yyyy"))
@@ -13160,7 +13324,7 @@ MODULE LZW {Module FastM2000 {
       insert to 2,1  Doc$=""  ' remove first space
       
       Doc$={
-      }+"Compression ration:"+str$((len(encodeLZW$) div 2)/len(encodeLZW$)*100, " ##")+{%
+      }+"Compression ration:"+str$((len(encodeLZW$) div 2)/len(plaintext$)*100, " ##")+{%
       }
       Function decodeLZW$(i$) {
             Def c, i, l, o$, t$, w$
@@ -13713,9 +13877,11 @@ Report {
 	
 	10000& is Long 32bit
 	
-	10000@ is Decimal
+	10000&& is Long Long 64bit
 	
-	10000# is Currency
+	10000@ is Decimal 96bit  - has floating decimal point, without exponent value.
+	
+	10000# is Currency 64bit - fix 4 decimal places
 	
 	10000~ is Float
 	
@@ -13735,6 +13901,9 @@ Module Checkit {
       Print TimeCount
       Profiler
       sumtolimit 10000&
+      Print TimeCount
+      Profiler
+      sumtolimit 10000&&
       Print TimeCount
       Profiler
       sumtolimit 10000#
@@ -18194,7 +18363,7 @@ Method NotePad, "FontAttr", "Times", 28, True
 With NotePad, "UseIcon", True, "UseReverse", True
 Method Pad, "FontAttr", "COURIER NEW", 14, true
 identifiers$="<-|ΠΡΟΓΡΑΜΜΑ|ΜΕΤΑΒΛΗΤΕΣ|ΠΡΑΓΜΑΤΙΚΕΣ|ΑΚΕΡΑΙΕΣ|ΛΟΓΙΚΕΣ|ΧΑΡΑΚΤΗΡΕΣ|ΣΤΑΘΕΡΕΣ|ΑΡΧΗ|ΓΡΑΨΕ|ΔΙΑΒΑΣΕ|ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ|DIV|MOD|ΑΝ|ΤΟΤΕ|ΑΛΛΙΩΣ|ΑΛΛΙΩΣ_ΑΝ|ΤΕΛΟΣ_ΑΝ|ΓΙΑ|ΑΠΟ|ΜΕΧΡΙ|ΜΕ_ΒΗΜΑ|ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ|ΕΠΙΛΕΞΕ|ΠΕΡΙΠΤΩΣΗ|ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ|ΟΣΟ|ΕΠΑΝΑΛΑΒΕ|ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ|ΜΕΧΡΙΣ_ΟΤΟΥ|ΚΑΙ|Η|ΟΧΙ|ΑΛΗΘΗΣ|ΨΕΥΔΗΣ|ΚΑΛΕΣΕ|ΔΙΑΔΙΚΑΣΙΑ|ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ|Α_Μ(|Α_Τ(|Ε|ΕΦ(|ΗΜ(|ΛΟΓ(|ΣΥΝ(|Τ_Ρ(|ΣΥΝΑΡΤΗΣΗ|ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ|"
-With Pad, "NoWrap", True, "ColorCollection1", identifiers$, "LineComment1", "!", "OtherSymbols","@", "CommentSymbols", "[!][!]", "ComSymbolsWidth", 2, "WordCharRight", ": ,[]+()-*/)}≤≥≠"+chr$(9), "WordCharleft", " :,[]+*/)({≤≥≠"+chr$(9), "WordCharRightButIncluded", "("
+With Pad, "NoWrap", True, "ColorCollection1", identifiers$, "LineComment1", "!", "OtherSymbols","@", "CommentSymbols", "[!][!]", "ComSymbolsWidth", 2, "WordCharRight", ": ,[]+()-*/)}≤≥≠"+chr$(9), "WordCharleft", " :,[]+*/)({≤≥≠"+chr$(9), "WordCharRightButIncluded", "(","ExtraFront",""
 With Pad, "LineComment2",CHR$(0), "StringSep2","'", "AssignSym","<-", "SearchWords",False, "UseColon","","SplitExpr",",", "CommentLineLight", True
 With Pad, "Sellength" as Pad.SelLength, "EnablePairs", True, "BracketsForArrays", True
 With File1,"label","Αρχείο", "listtext" As list$, "list" As list$() '
@@ -21028,20 +21197,23 @@ Report{
 win appdir$+"m2000.exe", {load modules info.gsb: ok=1: clock: end}
 
 }
-MODULE USETHIS {hide
-window mode, window
-back {cls 11,0}
-Font "Verdana"
-Bold 1
-PEN 14
-CLS,0
-If Version<11 then Error "No proper M2000 version (must be >=11)"
-If Version=11 and revision<7 then Error "No proper M2000 revision for version 11 (need revision >=7)"
-Set Fast
-Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
-dir user
-Player 0  ' erase any layer
-
+MODULE USETHIS {try {
+	hide
+	linespace 0
+	window mode, window
+	back {gradient 5, 5}
+	Font "Verdana"
+	Bold 1
+	PEN 14
+	CLS,0
+	If Version<11 then Error "No proper M2000 version (must be >=11)"
+	If Version=11 and revision<20 then Error "No proper M2000 revision for version 11 (need revision >=20)"
+	Set Fast
+	Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
+	dir user
+	Player 0  ' erase any layer
+	back {gradient 11,11}
+}
 \\ Use form without ! for less border
 \\ Form ! 100,66
 
@@ -22341,12 +22513,13 @@ function form1.resize {
       layer form1 {
           if form1.width<max_x then form1.width=max_x
           if form1.height<4000 then form1.height=4000
-          move form1.Width, form1.Height  
-          cls
+          gradient  #202020, 1
           local oldi=italic
           italic 1
+          move form1.Width, form1.Height  
           Legend "Use Ctrl+F1 in textboxes","Courier",8,0,1
           italic oldi
+          refresh
     }
 }
 Call Local form1.resize()
@@ -23087,7 +23260,7 @@ End
 250 Every 1000/8 {
 260       T~
 270       Print Over $(6),~(If(T->7,15)),"PRESS LEFT MOUSE BUTTON"
-280       If keypress(1) then Exit
+280       If keypress(1) then while keypress(1) : wait 1: end while: Exit
 290 }
 300 Print Over
 310 Return
@@ -34750,15 +34923,22 @@ layer image1 {
 	REFRESH 10
 }
 function text1.enter {
-	keyboard text1.text$ + chr$(13)
+	keyboard text1.text$, 13     // same as keyboard text1.text$ + chr$(13)
 	text1.text$=""
 	call local image1.gotfocus()
 	call local image1.keypress()
 	call local image1.lostfocus()
 }
+function form1.enter {
+	call local form1.click()
+}
 function form1.click {
 	enabled= not enabled
-	if enabled then method image1, "GetFocus"
+	layer form1 {
+		cls  2+enabled, 0
+		refresh
+	}
+	if enabled then method image1, "GetFocus"  else caret=false
 }
 bufall=stack
 buf$=""
@@ -34777,6 +34957,7 @@ function image1.lostfocus {
 	}
 }
 function image1.gotfocus {
+	caret=enabled
 	layer image1 {
 		cursor 0, row:print over  $(0),  buf$;
 	}
@@ -34799,7 +34980,7 @@ Def CheckSurrogateLead(w as integer)=uint(w)>0xD7FF and uint(w)<0xDC00
 Def CheckSurrogateTrail(w as integer)=uint(w)>0xDBFF and uint(w)<0xE000
 buf1$=""
 function image1.keypress {
-       if not caret then caret=true
+       if enabled then if not caret then caret=true
 	layer image1 {
 		LOCAL a$, onemore as boolean
 		a$=KEY$
@@ -35365,6 +35546,7 @@ Print Len(A())=13
 Print A()
 }
 MODULE SHOWKEYS {refresh 50
+back {refresh 50}
 n=mode
 x=scale.x*4/5
 y=scale.y*3/4
@@ -35373,12 +35555,20 @@ Method form1, "NoTaskBar"
 With form1, "Title", "FKEY List", "previewKey", true
 Method form1, "TransparentTitle"
 def long k
-after 10000 {
-	try {
-           Method form1, "CloseNow"
-	}
-}
+def boolean Busy
 
+after 10000 {
+	busy=true
+	try {
+		every 100{
+		if not busy then exit
+		 M-=10 : if m<30 then exit  else method form1, "opacity", M
+		}
+       if busy then Method form1, "CloseNow"
+	}
+	busy=false
+}
+M=20
 layer form1 {
 	window n,  x, y;
 	form 60, 28
@@ -35388,14 +35578,22 @@ layer form1 {
 	Report 2, "Press Alt+F4 or close form from square icon - double click - or press any key"
 	Print
 	fkey
-	method form1, "opacity", 240
+	method form1, "opacity", M
 }
+busy=true
+thread {
+	 M+=10 : if m>=240 or not busy then busy=false: thread this erase  else method form1, "opacity", M
+} as fade1 interval 100
 function form1.KeyPreview(New &k$) {
-	Method form1, "CloseNow"
+	Method form1, "CloseNow" : busy=false
 }
 Function form1.click {
-	Method form1, "SendScanCode", "F4", alt:=true
+	Method form1, "SendScanCode", "F4", alt:=true:  busy=false
 }
+Function form1.Unload(&Notok) {
+	Notok=busy
+}
+
 Method form1, "show", 1
 threads erase
 declare form1 nothing
@@ -35827,5 +36025,717 @@ PriorityQueueForGroups true
 Print "press a key": Push Key$: Drop
 Pen 11 {Print "Priority Queue - Merging without removing items from second Queue"}
 PriorityQueueForGroups false
+}
+MODULE OVERFLOW {k=window
+Title "M2000", 0
+Font "Tahoma"
+Window 6, k
+hide
+back {
+	cls 0,0
+	sx=scale.x
+	sy=scale.y
+}
+// Window 12, sx*.7, sy*.9;    // for Courier New   ( ; center window)
+Window 12, sx*.9, sy*.9;
+Linespace 0
+
+Form 80
+
+Form ;  // expand border to monitor dimensions (actual the back layer)
+? $(,10);
+Title "M2000", 1
+cls #040A08,0
+Double
+print over $(6,width+1), ~(#0f0ff0,10,10), $(6,width), "Add one to maximum value" : print ' to change line - because print over hold the row...
+Normal
+
+try ok {
+	def decimal A
+	A=79228162514264337593543950335@+1@  // decimal literal
+}
+Print Error$
+try ok {
+	def currency AB
+	AB=922337203685477.5807@+1@  // decimal literal
+}
+Print Error$
+try ok {
+	def long long A0
+	A0=9223372036854775807@+1@  // decimal literal
+}
+Print Error$
+Try ok {
+	def long A1
+	A1=2147483647+1  // double literal
+}
+Print Error$
+Try ok {
+	def integer A2
+	A2=32767+1  // double literal
+}
+Print Error$
+Try ok {
+	def single S22
+	S22=3.402823E40	
+}
+Print Error$
+Print "Test double (1): ";
+Try ok {
+	def double D22
+	D22=1.79769313486231570E309
+}
+Print Error$
+Try ok {
+	def double D23
+	D23=1.79769313486231570E+308
+	Print D23
+	Print "         now we add one more to get double value"
+	D23+=D23
+	Print "But we get Infinity: "; D23 = infinity
+}
+Print Error$
+Double
+print over $(6,width+1), ~(#0f0ff0,10,10), $(6,width), "Subtract one to minimum value (excluding float and double)" : print ' to change line - because print over hold the row...
+Normal
+try ok {
+	def decimal AA
+	AA=-79228162514264337593543950335@-1@  // decimal literal
+}
+Print Error$
+try ok {
+	def currency A001
+	A001=-922337203685477.5808@-1@  // decimal literal
+}
+Print Error$
+try ok {
+	def long long A00
+	A00=-9223372036854775808@-1@  // decimal literal
+}
+Print Error$
+Try ok {
+	def long A11
+	A11=-2147483648-1  // double literal
+}
+Print Error$
+Try ok {
+	def integer A22
+	A22=-32768-1  // double literal
+}
+Print Error$
+c=-922337203685477.5808#
+? TYPE$(C)="Currency"
+d=-922337203685477.5808@
+? TYPE$(D)="Decimal"
+? C=D  ' true
+? -922337203685477.5808#=-922337203685477.5808@
+
+? over @(width-21),$(6, 18), ~(#00fff0,1,15), "Press Esc to exit edit"
+?
+Z=row
+// scroll split row
+cls 5, row
+Print "Use Arrows Up Down to get old commands"
+Print "Use Edit without parameters to open the list of previous commands"
+Print "Use Edit ! 4 to set 4 characters for TAB character, for editor"
+Scroll Split z
+refresh 50
+Keyboard "Edit overflow", 13
+
+}
+MODULE FIXMODE {// change mode for console, using current font
+// for Courier new use to=1
+Read W as long=40, H as long=32, tp as long=1
+W=Max.data(40, Min.data(W, 132))
+Window 6, window
+hide
+back {
+	cls 0,0
+	sx=scale.x
+	sy=scale.y
+}
+if tp=1 then
+	IF sy/twipsY>1024 then
+	Window 12, sx*.5, sy*.9;    // for Courier New   ( ; center window)
+	end if
+	Form W, H
+else.if tp=0 then
+	Window 4, sx*.9, sy*.9;
+	Linespace 45
+	Form W;
+else
+	Linespace 0
+	Window 4, sx*.9, sy*.9;
+	Form W, H
+end if
+Form ;  // expand border to monitor dimensions (actual the back layer)
+show
+// ? width, height
+}
+MODULE LITERAL {Print "Overflow Literals"
+Print "Type Decimal"
+try ok {
+	k=9879813279128379279183799123981237@
+}
+Print Error$
+Print "Type Currency"
+try ok {
+	k=98798132791283792.79183799123981237#
+}
+Print Error$
+Print "Type Long Long"
+try ok {
+	k=9879813279128379279183799123981237&&
+}
+Print Error$
+Print "Type Long"
+try ok {
+	k=9879813279128379279183799123981237&
+}
+Print Error$
+Print "Type Single"
+try ok {
+	k=3223402823243432423423324432434423423453453453453454354353534554534534~
+}
+Print Error$
+Print "Type Double"
+try ok {
+	k=1.89769313486231570E+308
+}
+Print Error$
+Print "Exponet Overflow"
+try ok {
+	k=1e300~
+}
+Print Error$
+}
+MODULE BUTTONSONFRAME {declare form1 form
+declare frame1 image form form1
+declare button1(3) button form form1 image frame1
+method form1 "move", ,, 120000, 14000
+method frame1 "move", 600,600, 10000, 12000
+for i=0 to 2
+method button1(i), "move", 1000, 1000+1000*i, 3000, 600
+next
+for i=3 to 5
+	declare button1() over
+	method button1(i), "move", 4600, 1000+1000*(i-3), 3000, 600
+next
+max=5
+function button1.click(index) {
+	print index
+	refresh
+}
+method form1, "show", 1
+declare form1 nothing
+}
+MODULE TURING {Module CheckIt {
+	print "Universal Turing Machine"
+	print "------------------------"
+	class Machine {
+	private:
+		Head=1, Symbols=(,), States=(,)
+		Initial_State$, Terminating_state$, Blank_Symbol$
+		BS=0, Rules=list, caption$
+		tp$="{0:4} {1} {2} {3:5} {4:4}"
+	public:
+		Module States {
+			.States<=array([])
+		}
+		Module Symbols {
+			.Symbols<=array([])
+		}
+		Module Reset (.Initial_State$, .Terminating_state$, .Blank_Symbol$) {
+			if len(.States)=0 then error "No States defined"
+			if len(.Symbols)=0 then error "No Symbols defined"
+			if .States#nothave(.Initial_State$) then error "Initial State Not Exist"
+			if .States#nothave(.Terminating_state$) then error "Terminating State Not Exist"
+			it=.Symbols#pos(.Blank_Symbol$) : if it=-1 then error "Blank symbol not exist"
+			.BS<=it
+			.Rules<=List
+		}
+		Module Init (.caption$) {
+			flush  // empty stack
+			print .caption$
+		}
+		Module AddRule (state$, read_symbol$, write_symbol$, action$, end_state$) {
+			
+			if .States#nothave(state$) then Error "State not exist"
+			if .symbols#nothave(read_symbol$) then Error "Read Symbol not exist"
+			if .symbols#nothave(write_symbol$) then Error "Read Symbol not exist"
+			if ("right","left","stay")#nothave(action$) then Error "Action not exist"
+			if .States#nothave(end_state$) then Error "End state not exist"
+			try ok {
+				tuple=(.symbols#pos(write_symbol$), action$, end_state$)
+				Append .rules, state$+"_"+read_symbol$:=tuple
+			}
+			if not ok then error "rule "+ state$+"_"+read_symbol$+" already exist "
+			Pen 11 {
+				Print format$(.tp$, state$, read_symbol$, write_symbol$, action$, end_state$)
+			}
+			if stack.size>=5 then loop
+		}
+		Module Tape {
+			s=[]
+			m=each(s)
+			while m
+				it= .Symbols#pos(stackitem$(m))
+				if it=-1 then error "Tape symbol not exist at position ";m^
+				data it
+			end while
+		}
+		Module Run (steps as long, display as boolean) {
+			if len(.rules)=0 then error "No rules found"
+			if .Initial_State$="" or .Terminating_state$="" or .Blank_Symbol$="" then
+				error "Reset the machine please"
+			end if
+			if empty then push .BS
+			curState$=.Initial_State$
+			cont=true
+			.head<=1
+			dim inst$() : link inst$() to inst()
+			while curState$<>.Terminating_state$
+				if display then pen 15 {showstack()}		
+				steps--
+				theRule$=curState$+"_"+.symbols#val$(stackitem(.head))
+				if not exist(.Rules, theRule$) then error "Undefined "+theRule$
+				inst$()=.Rules(theRule$)
+				shift .head : drop :push inst(0): shiftback .head
+				select case inst$(1)
+				case "right"
+					.head++ : if .head>stack.size then data .BS
+				case "left"
+					if .head<=1 then push .BS else .head--
+				else case
+					cont=false
+				end select
+				// change state
+				curState$=inst$(2)
+				// Show Stack
+				if steps=0  or not cont then exit
+			end while
+			if steps=0 then print over
+			Pen 12 {showstack()}
+			print "tape length: ";stack.size : flush
+			Refresh
+			sub showstack()
+				local d$=format$("{0:-5} {1::-5} ", curState$, .head) 
+				local i: for i=1 to min.data(stack.size, 60): d$+=.symbols#val$(stackitem(i)):Next
+				print d$
+			end sub
+		}
+	}
+	Turing1=Machine()
+	For Turing1 {
+		.init "Simple incrementer"
+		.States "q0", "qf"
+		.Symbols "B", "1"
+		.Reset "q0", "qf", "B"    // initial state, terminating state, blank symbol
+		.AddRule "q0", "1", "1", "right", "q0"
+		.AddRule "q0", "B", "1", "stay", "qf"
+		.tape  "1", "1", "1"
+		.Run 100, true
+	}
+	Turing2=Machine()
+	For Turing2 {
+		.init "Three-state busy beaver"
+		.States "a", "b", "c", "halt"
+		.Symbols "0", "1"
+		.Reset "a", "halt", "0"
+		.AddRule "a", "0", "1", "right", "b",	"a", "1", "1", "left", "c"
+		.AddRule "b", "0", "1", "left", "a",	"b", "1", "1", "right", "b"
+		.AddRule "c", "0", "1", "left", "b", 	"c", "1", "1", "stay", "halt"
+		.Run 1000, true
+	}
+	
+	For Turing1 {
+		.init "Sorter"
+		.States "A","B","C","D","E","X"
+		.Symbols "a","b","B","*"
+		.Reset "A", "X", "*"
+		.AddRule "A", "a", "a", "right", "A", 	"A", "b", "B", "right", "B"
+		.AddRule "A", "*", "*", "left", "E",  	"B", "a", "a", "right", "B"
+		.AddRule "B", "b", "b", "right", "B", 	"B", "*", "*", "left", "C"
+		.AddRule "C", "a", "b", "left", "D",  	"C", "b", "b", "left", "C"
+		.AddRule "C", "B", "b", "left", "E",  	"D", "a", "a", "left", "D"
+		.AddRule "D", "b", "b", "left", "D", 	"D", "B", "a", "right", "A"
+		.AddRule "E", "a", "a", "left", "E", 	 "E", "*", "*", "right", "X"
+		.tape "b", "a", "b","b","b","a","a"
+		.Run 100, false
+	}
+	Turing1.tape "b","b","b","a","b","a","b","a","a","a","b","b","a"
+	Turing1.Run 1000, false
+	
+	Turing3=Machine()
+	for Turing3 {
+		.init "5-state, 2-symbol probable Busy Beaver machine from Wikipedia"
+		.States "A","B","C","D", "E", "H"
+		.Symbols "0", "1"
+		.Reset "A", "H", "0"
+		.AddRule "A", "0", "1", "right", "B", 	"A", "1", "1", "left", "C"
+		.AddRule "B", "0", "1", "right", "C", 	"B", "1", "1", "right", "B"
+		.AddRule "C", "0", "1", "right", "D", 	"C", "1", "1", "left", "E"
+		.AddRule "D", "0", "1", "left", "A",	"D", "1", "1", "left", "D"
+		.AddRule "E", "0", "1", "stay", "H", 	"E", "1", "0", "left", "A"
+		profiler
+		.Run 470, false //000000, false
+		Print round(timecount/1000,2);"s"    // estimated 12.5 hours for 47000000 steps
+	}
+}
+CheckIt
+}
+MODULE PYT {def long long total, prim, maxPeri=100,p
+while maxPeri <= 100000&&
+    prim = 0&&
+    total = 0&&
+    Gosub newTri(3, 4, 5)
+    print format$("Up to {0}: {1} triples, {2} primitives", maxPeri, total, prim)
+    maxPeri*=10&&
+end while
+
+Sub newTri(s0, s1, s2)
+    p = s0 + s1 + s2
+    if p >= maxPeri then exit sub
+    prim++
+    total+= floor(maxPeri/p)
+    Gosub newTri( 1*s0-2*s1+2*s2,  2*s0-1*s1+2*s2,  2*s0-2*s1+3*s2)
+    Gosub newTri( 1*s0+2*s1+2*s2,  2*s0+1*s1+2*s2,  2*s0+2*s1+3*s2)
+    Gosub newTri(-1*s0+2*s1+2*s2, -2*s0+1*s1+2*s2, -2*s0+2*s1+3*s2)
+End sub
+}
+MODULE UCPIECHART {declare FORM1 form
+declare PIE type "M2000.UCPIECHART" form FORM1
+Method FORM1,"move", 1000, 1000, 14000, 12000
+Layer Form1 {Gradient 11, #7777aa}
+With Pie,"BackColorOpacity" as Opacity, "Title", "Pie Example"
+Method PIE,"move", 1000, 1000, 12000, 10000
+Method PIE,"additem", "Alfa1", 70, #ff0000
+Method PIE,"additem", "Alfa2", 20, #0000ff
+Method PIE,"additem", "Alfa3", 10, #00ff00
+function form1.click {
+	layer form1 {
+		Gradient random(7,14), #7777aa
+		refresh
+	}
+}
+// always by reference with external controls
+function PIE.MouseMove(&A, &B, &X, &Y) {
+	Print A, B, X, Y
+	Refresh
+}	
+function PIE.ItemClick(&W) {
+	Print "Item", W
+	Opacity=W*30
+	refresh
+}
+Method FORM1 "SHOW", 1
+
+declare FORM1 nothing
+}
+MODULE UCCHART {function newCollection {
+	declare list1 Collection
+	=list1
+}
+flush
+
+declare FORM1 form
+declare Chart type "M2000.ucChartArea" form FORM1
+Method FORM1,"move", 1000, 1000, 14000, 12000
+Layer Form1 {Gradient 11, #7777aa}
+With Chart,"BackColorOpacity", 0, "title", "Chart Example", "LinesCurve", true
+Method Chart,"move", 1000, 1000, 12000, 10000
+
+data  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"
+Value1=newCollection()
+while not empty
+	method Value1, "add", letter$
+end while
+Method Chart, "AddAxisItems", Value1
+Value1=newCollection()
+Data 2,5,7,-10, 5, 10
+while not empty
+	method Value1, "add", number
+end while
+Method Chart, "AddLineSeries", "2007", Value1, color(255,0,0)
+Data 8, 4, 45, -15, 9, 14
+Value1=newCollection()
+while not empty
+	method Value1, "add", number
+end while
+Method Chart, "AddLineSeries", "2008", Value1, color(0,0,255)
+Value1=newCollection()
+Data 14, 8, 16,4, 24, 3
+while not empty
+	method Value1, "add", number
+end while
+Method Chart, "AddLineSeries", "2009", Value1, color(0,255,0)
+function form1.click {
+	layer form1 {
+		Gradient random(7,14), #7777aa
+		refresh
+	}
+}
+function Chart.MouseMove(&A, &B, &X, &Y) {
+	Print A, B, X, Y
+	Refresh
+}	
+function Chart.Click() {
+	Print "Thank you"
+	refresh
+}
+METHOD FORM1 "SHOW", 1
+
+declare FORM1 NOTHING
+}
+MODULE NINEBUTTONS {Enum UcsNineButtonStateEnum {
+    ucsBstNormal = 0
+    ucsBstHover = 1
+    ucsBstPressed = 2
+    ucsBstHoverPressed = 3
+    ucsBstDisabled = 4
+    ucsBstFocused = 8
+}
+Enum UcsNineButtonTextFlagsEnum {
+    ucsBflHorLeft = 0
+    ucsBflHorCenter = 1
+    ucsBflHorRight = 2
+    ucsBflVertTop = 0
+    ucsBflVertCenter = 4
+    ucsBflVertBottom = 8
+    ucsBflCenter = binary.or(ucsBflHorCenter, ucsBflVertCenter)
+    ucsBflDirectionRightToLeft = 0x10&
+    ucsBflDirectionVertical = 0x20&
+    ucsBflNoFitBlackBox = 0x40&
+    ucsBflDisplayFormatControl = 0x200&
+    ucsBflNoFontFallback = 0x4000&
+    ucsBflMeasureTrailingSpaces = 0x8000&
+    ucsBflNoWrap = 0x10000&
+    ucsBflLineLimit = 0x20000&
+    ucsBflNoClip = 0x40000&
+}
+Enum UcsNineButtonStyleEnum {
+	ucsBtyNone =0
+	ucsBtyButtonDefault
+	ucsBtyButtonGreen
+	ucsBtyButtonRed
+	ucsBtyButtonTurnGreen
+	ucsBtyButtonTurnRed
+	ucsBtyFlatPrimary
+	ucsBtyFlatSecondary
+	ucsBtyFlatSuccess
+	ucsBtyFlatDanger
+	ucsBtyFlatWarning
+	ucsBtyFlatInfo
+	ucsBtyFlatLight
+	ucsBtyFlatDark
+	ucsBtyOutlinePrimary
+	ucsBtyOutlineSecondary
+	ucsBtyOutlineSuccess
+	ucsBtyOutlineDanger
+	ucsBtyOutlineWarning
+	ucsBtyOutlineInfo
+	ucsBtyOutlineLight
+	ucsBtyOutlineDark
+	ucsBtyCardDefault
+	ucsBtyCardPrimary
+	ucsBtyCardSuccess
+	ucsBtyCardOrange
+	ucsBtyCardDanger
+	ucsBtyCardWarning
+	ucsBtyCardPurple
+	ucsBtyCardFocus
+}
+declare FORM1 FORM
+declare Button(30) TYPE "M2000.CTXNINEBUTTON" FORM FORM1
+Method FORM1,"move", 1000, 1000, 14000, 12000
+z=Button(0)
+With z,"ButtonTextFlags" as ButtonTextFlags()
+for i=0 to 14
+	
+	Method Button(i), "move", 1000,1000+630*i, 4000, 600
+	With Button(i), "Style", i+1, "ManualFocus",true
+	z=Button(i)
+	ButtonTextFlags(ucsBstPressed)=2^random(1, 6)
+	Method Button(i+15), "move", 6000,1000+630*i, 4000, 600
+	With Button(i+15), "Style", i+16, "ButtonTextFlags", ucsBstFocused @ ucsBflHorRight
+Next i
+Layer Form1 {Gradient 11, #7777aa}
+function form1.click {
+	layer form1 {
+		Gradient random(7,14), #7777aa
+		refresh
+	}
+}
+function Button.click(index) {
+	Print "Click "; index
+	refresh
+}
+method FORM1 "SHOW", 1
+
+declare FORM1 nothing
+}
+MODULE SHAPEEX {Enum seShapeConstants {
+	seShapeRectangle = 0
+	seShapeSquare
+	seShapeOval
+	seShapeCircle
+	seShapeRoundedRectangle
+	seShapeRoundedSquare
+	seShapeTriangleEquilateral
+	seShapeTriangleIsosceles
+	seShapeTriangleScalene
+	seShapeTriangleRight
+	seShapeRhombus
+	seShapeKite
+	seShapeDiamond
+	seShapeTrapezoid
+	seShapeParalellogram
+	seShapeSemicircle
+	seShapeRegularPolygon
+	seShapeStar
+	seShapeJaggedStar
+	seShapeHeart
+	seShapeArrow
+	seShapeCrescent
+	seShapeDrop
+	seShapeEgg
+	seShapeLocation
+	seShapeSpeaker
+	seShapeCloud
+	seShapeTalk
+	seShapeShield
+	seShapePie = 29
+}
+
+Enum seBackStyleConstants {
+	seTransparent = 0
+	seOpaque
+}
+
+
+Enum seFillStyle2Constants {
+	seFSSolid   =0
+	seFSTransparent
+   
+}
+Enum BorderStyleConstants {
+	BSTransparent=0
+	BSSolid = 1
+	BSDash = 2
+	BSDot = 3
+	BSDashDot = 4
+	BSDashDotDo = 5
+	BSInsideSolid = 6
+}
+
+
+Enum seQualityConstants {
+   seQualityLow = 0
+   seQualityHigh
+}
+
+Enum SEStyle3DConstants {
+    seStyle3DNone = 0
+    seStyle3DLight = 1
+    seStyle3DShadow = 2
+    seStyle3DBoth = 3
+}
+
+Enum SEStyle3DEffectConstants {
+    seStyle3EffectAuto = 0
+    seStyle3EffectDiffuse = 1
+    seStyle3EffectGem = 2
+}
+
+Enum SEFlippedConstants {
+    seFlippedNo = 0
+    seFlippedHorizontally = 1
+    seFlippedVertically = 2
+    seFlippedBoth = 3
+}
+
+
+
+DIM X(28), Y(28)
+for i=0 to 27 step 4 : X(i)=1000:X(i+1)=4000:X(i+2)=7000:X(i+3)=10000:Next
+for i=0 to 3
+	 Y(i)=0:Y(i+4)=2000:Y(i+8)=4000: Y(i+12)=6000:Y(i+16)=8000:Y(i+20)=10000:Y(i+24)=12000 
+Next
+z=Y()
+z*=0.85
+z+=1200
+z=X()
+z+=1000
+DECLARE FORM1 FORM
+DECLARE Button(28) TYPE "M2000.ShapeEx" FORM FORM1
+Method FORM1,"move", 1000, 1000, 14000, 14000
+def rc()=color(random(255),random(255),random(255))
+for i=0 to 27
+	Method Button(i), "move",x(i),y(i), 900, 1200
+	With Button(i), "Style", i+1, "Clickable",true, "Shape", i, "Quality",seQualityHigh
+	With Button(i),  "Style3DEffect", seStyle3EffectDiffuse,"Style3D",seStyle3DBoth
+	With Button(i),"BorderColor", 15,  "BorderWidth", 4, "FillStyle", seFSSolid, "Fillcolor", rc()
+	With Button(i),"Shift", random(0,1)*30, "CurvingFactor", 5, "Vertices", 7, "BorderStyle", BSDot
+	Next i
+Layer Form1 {Gradient 11, #7777aa}
+function form1.click {
+	layer form1 {
+		Gradient random(7,14), #7777aa
+		refresh
+	}
+}
+function Button.click(index) {
+	with Button(index), "RotationDegrees" as A, "FillStyle" as B
+	A=A+5  // you can't use A++ because A is an object
+	B=1-B
+	Print "Click "; index
+	refresh
+}
+METHOD FORM1 "SHOW", 1
+
+DECLARE FORM1 NOTHING
+}
+MODULE RADIAL {declare form1 form
+declare Progress1 type "M2000.ucRadialProgress" form form1
+declare Progress2 type "M2000.ucRadialProgress" form form1
+Method form1,"move", 1000, 1000, 12000, 10000
+layer form1 {
+gradient #777777, #aaaaaa
+}
+Method Progress1, "move", 1000, 1000, 4000, 4000
+Method Progress2, "move", 6000, 5000, 4000, 4000
+
+Method Progress1, "ChangeDefaults", 48, #FFFFFF, 0.25, 0.8, #777777, "Times New Roman",#FFFFFF
+Method Progress2, "ChangeDefaults", 12, #777777, 0.15, 0.45, #979797
+With Progress1, "value" as value1
+With Progress2, "value" as value2
+
+function form1.mousemove(a,b,x,y) {
+	value1=min.data(100, max.data(0, 100*(10000-y)/10000))
+	value2=min.data(100, max.data(0, 100*x/12000))
+	print value1, value2
+	refresh  ' M2000 console refresh
+}
+
+Method form1 "SHOW", 1
+
+declare form1 nothing
+}
+MODULE REFARRAY {vblong=3
+vbString=8
+DECLARE arr "M2000.REFARRAY"
+with arr, "value" as arr(), "count" as arr.len, "ArrPtr" as Addr(), "ArrPtr" as Addr
+with arr, "value" as arr$()
+
+Method arr, "DefArrayAt", 0, vblong, 1000
+Method arr, "DefArrayAt", 1, vbString, 1000
+arr(0, 20)=30&
+arr$(1, 5)="Hello from M2000"
+? arr(0,20), arr$(1,5)
+? addr // first variant place
+// these two arrays have one type only
+// so 1001 long type values have 4*1001 bytes  (4 times more data from a variant type array)
+? addr(0)  // first item place in array in place 2
+? addr(1)  // first item place in array in place 1
 }
 UseThis : InfoBasic : ShowKeys : Pen 15 {Print "Press F3 now"}

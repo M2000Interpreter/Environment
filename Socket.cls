@@ -176,7 +176,7 @@ Private Sub connection_not_sync()
 MyEr "Connection isn't synchronus", "Η σύνδεση δεν είναι σύγχρονη"
 End Sub
 
-Public Function create( _
+Public Function Create( _
             Optional ByVal SocketPort As Variant, _
             Optional ByVal SocketType As Variant, _
             Optional ByVal EventMask As Variant, _
@@ -188,7 +188,7 @@ Public Function create( _
         If IsMissing(SocketAddress) Then iSocketAddress = vbNullString Else iSocketAddress = CVar(SocketAddress)
         If m_hSocket = 0 Then Set mySocket = New cAsyncSocket: m_hSocket = mySocket.SocketHandle
         SyncEnabled = False
-        create = mySocket.create(CLng(SocketPort), CLng(SocketType), CLng(EventMask), iSocketAddress)
+        Create = mySocket.Create(CLng(SocketPort), CLng(SocketType), CLng(EventMask), iSocketAddress)
         SocketAddress = iSocketAddress
 End Function
 Public Function GetPeerName(PeerAddress As Variant, PeerPort As Variant) As Variant
@@ -368,12 +368,12 @@ Public Function Send( _
     HostAddress = iHostAddress
     
 End Function
-Public Function Shutdown(Optional ByVal How) As Variant
+Public Function ShutDown(Optional ByVal How) As Variant
     Dim iHow As Long
     If m_hSocket = 0 Then socket_not_init: Exit Function
     If IsMissing(How) = 1 Then iHow = 1 Else iHow = How
     SyncEnabled = False
-    Shutdown = mySocket.Shutdown(iHow)
+    ShutDown = mySocket.ShutDown(iHow)
 End Function
 Public Function GetErrorDescription(ByVal ErrorCode) As Variant
         If m_hSocket = 0 Then socket_not_init: Exit Function
@@ -489,12 +489,12 @@ Public Function SyncReceiveText( _
     ErrorOk = False
     CloseOk = False
     SyncEnabled = True
-    Dim escnow As Long, part$, count As Long
+    Dim escnow As Long, part$, Count As Long
     If iTimeout > 0 Then
         Set tm = New clsProfiler
         tm.MARKONE
     End If
-    If NeedLen > 0 Then SyncReceiveText = space$(NeedLen): count = 1
+    If NeedLen > 0 Then SyncReceiveText = space$(NeedLen): Count = 1
 again:
         If Not ReceiveOk Then
          Do
@@ -507,10 +507,10 @@ again:
         If NeedLen > 0 Then
              part$ = mySocket.ReceiveText(iHostAddress, iHostPort, iCodePage)
              If Len(part$) > 0 Then
-                Mid$(SyncReceiveText, count, Len(part$)) = part$
-                count = count + Len(part$)
+                Mid$(SyncReceiveText, Count, Len(part$)) = part$
+                Count = Count + Len(part$)
              End If
-             If count <= NeedLen Then GoTo again
+             If Count <= NeedLen Then GoTo again
         Else
         SyncReceiveText = mySocket.ReceiveText(iHostAddress, iHostPort, iCodePage)
         End If

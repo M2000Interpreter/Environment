@@ -135,7 +135,7 @@ Private Type SAFEARRAY_1D
    Bounds(0 To 0)               As SAFEARRAYBOUND
 End Type
 
-Private Enum Varenum
+Private Enum VARENUM
     VT_EMPTY = 0
     VT_NULL = 1
     VT_I2 = 2
@@ -520,7 +520,7 @@ Public Function Attach(obj As Object) As Boolean
     Dim cReturned   As Long
     Dim hRet        As Long
     Dim iid_ICP     As GUID
-
+    Const E_NOTIMPL As Long = &H80004001
     ' already connected to an object?
     If blnAttached Then Detach
 
@@ -544,6 +544,10 @@ Public Function Attach(obj As Object) As Boolean
 
     ' get IEnumConnectionPoints
     hRet = CallPointer(oCPC.EnumConnectionPoints, pCPC, VarPtr(pECP))
+    If hRet = E_NOTIMPL Then
+    
+
+    End If
     If hRet Then Exit Function
 
     ' IEnumConnectionPoints VTable
@@ -585,9 +589,9 @@ End Sub
 Public Function Attached() As Boolean
     Attached = blnAttached
 End Function
-Sub Process(VarProc As Long, a As Long, Ptr1 As Long, usestring As Boolean, stval$)
+Sub Process(VarProc As Long, A As Long, Ptr1 As Long, usestring As Boolean, stval$)
     Dim t(0 To 8) As Integer, Zero, Ptr As Long, ItsVariantRef As Boolean
-    CpyMem ByVal VarPtr(t(0)), ByVal a, 16
+    CpyMem ByVal VarPtr(t(0)), ByVal A, 16
 again:
     CpyMem Ptr, ByVal VarPtr(t(4)), 4
 
@@ -635,11 +639,11 @@ again:
                 End If
                 Exit Sub
             Else
-            CpyMem ByVal a, VarPtr(Zero), 16
+            CpyMem ByVal A, VarPtr(Zero), 16
             End If
         Else
             Ptr1 = -Ptr1
-            CpyMem ByVal a, VarPtr(Zero), 16
+            CpyMem ByVal A, VarPtr(Zero), 16
         End If
     End If
     CpyMem ByVal VarProc, ByVal VarPtr(t(0)), 16

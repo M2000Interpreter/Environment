@@ -28,7 +28,7 @@ Dim toplim As Long
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private lastfind As String
 Private Hash() As Long
-Public Index As Long
+Public index As Long
 Private Sub Class_Initialize()
     MaxSpace = 10
     ReDim PriveSpace(MaxSpace) As item, Hash(MaxSpace * 2 + 3)
@@ -182,7 +182,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    num = PriveSpace(k).ndx: Find = True: lastfind = Key: Index = k: Exit Function
+    num = PriveSpace(k).ndx: Find = True: lastfind = Key: index = k: Exit Function
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0
@@ -201,7 +201,7 @@ Do
     With PriveSpace(k)
     If .Key = Key Then
     internal = .KeyType
-    num = .ndx: Find2 = True: lastfind = Key: Index = k: Exit Function
+    num = .ndx: Find2 = True: lastfind = Key: index = k: Exit Function
     End If
      k = .Pleft - 1
      End With
@@ -222,14 +222,14 @@ End If
 End Function
 
 
-Friend Sub ItemCreator(Key As String, num As Long, Optional isref As Boolean = False)
+Friend Sub ItemCreator(Key As String, num As Long, Optional isRef As Boolean = False)
 Dim a As Long
 a = Malloc()
 If Left$(Key, 1) = "." Then Stop
 place HashFunc(Key), a
 With PriveSpace(a)
     .ndx = num
-    If isref Then
+    If isRef Then
         .KeyType = 1
     Else
         .KeyType = 0
@@ -238,13 +238,13 @@ With PriveSpace(a)
     SwapStrings .Key, Key
 End With
 End Sub
-Friend Sub ItemCreatorNoSwap(Key As String, num As Long, Optional isref As Boolean = False)
+Friend Sub ItemCreatorNoSwap(Key As String, num As Long, Optional isRef As Boolean = False)
 Dim a As Long
 a = Malloc()
 place HashFunc(Key), a
 With PriveSpace(a)
     .ndx = num
-    If isref Then
+    If isRef Then
         .KeyType = 1
     Else
         .KeyType = 0
@@ -275,7 +275,7 @@ End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
     k = Hash(b)
-    If Not Hash(b) = a + 1 Then
+    If Not k = a + 1 Then
          Hash(b) = a + 1
          PriveSpace(a).Pleft = k
     End If

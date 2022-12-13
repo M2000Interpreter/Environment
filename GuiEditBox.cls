@@ -167,7 +167,7 @@ Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, capchroma As Lon
 Dim Quit
 Private OldPar As Long, dragCharpos As Long
 ' new
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Private Type DRAWTEXTPARAMS
      cbSize As Long
      iTabLength As Long
@@ -176,11 +176,11 @@ Private Type DRAWTEXTPARAMS
      uiLengthDrawn As Long
 End Type
 Dim tParam As DRAWTEXTPARAMS
-Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
+Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
 Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT) As Long
-Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
+Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hdc As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hDC As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
+Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hdc As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
 Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 Private tmpshow As Boolean
 Private WordOnly As Boolean
@@ -271,7 +271,7 @@ TextPixelOffset = Int(glistN.TextHeightOffset)
 capchroma = glistN.CapColor
 EditDoc = True
 nowrap = False
-Enabled = True
+enabled = True
 SetME
 ShowAlways = True
 mDoc.ForEditBox = True
@@ -559,7 +559,7 @@ End If
 
 End Sub
 Public Sub AddUndo(that As String)
-If Not Enabled Then Exit Sub
+If Not enabled Then Exit Sub
 ClearRedo
 If that = vbCrLf Then
 PushUndo
@@ -602,7 +602,7 @@ undomode = 0
 End If
 End Sub
 Public Sub ManualInform()
-If Not glistN.Enabled Then Exit Sub
+If Not glistN.enabled Then Exit Sub
 If glistN.SelStart = 0 Then
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Inform(" + Str(mIndex) + "," + Str(glistN.ListIndex + 1) + ", 1)"
@@ -624,10 +624,10 @@ undoprev = True
 End If
 End Sub
 
-Private Sub glistN_SubSelStart(val As Long, Shift As Integer)
+Private Sub glistN_SubSelStart(val As Long, shift As Integer)
 expandCharPos = 0
-Dim w As Long, a$, l As Long, b$
-If HaveMarkedText And Not (Shift And 1) = 1 Then
+Dim W As Long, a$, l As Long, b$
+If HaveMarkedText And Not (shift And 1) = 1 Then
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 glistN.MarkNext = 0
@@ -639,8 +639,8 @@ If Charpos < 2 Or NumberOnly Or NumberIntOnly Then Exit Sub
 
     a$ = Mid$(mDoc.TextParagraph(mDoc.MarkParagraphID), Charpos - 1)
     If Len(a$) > 0 Then
-        w = AscW(a$)
-        If (Shift And 2) = 2 And Charpos > 1 Then
+        W = AscW(a$)
+        If (shift And 2) = 2 And Charpos > 1 Then
             a$ = Mid$(mDoc.TextParagraph(mDoc.MarkParagraphID), 1, Charpos - 1)
             l = Len(a$)
             val = l
@@ -667,21 +667,21 @@ If Charpos < 2 Or NumberOnly Or NumberIntOnly Then Exit Sub
                 l = l - 1
             End If
             val = val - l
-        ElseIf w > -9217 And w < -8192 Then
+        ElseIf W > -9217 And W < -8192 Then
             val = 2
         End If
     ElseIf Charpos > 0 Then
-    w = Len(mDoc.TextParagraph(mDoc.MarkParagraphID))
-    If w < Charpos Then val = Charpos - w
+    W = Len(mDoc.TextParagraph(mDoc.MarkParagraphID))
+    If W < Charpos Then val = Charpos - W
     End If
     
 End Sub
 
-Private Sub glistN_AddSelStart(val As Long, Shift As Integer)
+Private Sub glistN_AddSelStart(val As Long, shift As Integer)
 expandCharPos = 0
 If NumberOnly Or NumberIntOnly Then Exit Sub
-Dim w As Long, a$, l As Long, b$
-If HaveMarkedText And Not (Shift And 1) = 1 Then
+Dim W As Long, a$, l As Long, b$
+If HaveMarkedText And Not (shift And 1) = 1 Then
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 glistN.MarkNext = 0
@@ -691,8 +691,8 @@ End If
 If Charpos > 0 Then
     a$ = Mid$(mDoc.TextParagraph(mDoc.MarkParagraphID), Charpos, 1)
     If Len(a$) > 0 Then
-        w = AscW(a$)
-        If (Shift And 2) = 2 Then
+        W = AscW(a$)
+        If (shift And 2) = 2 Then
             a$ = Mid$(mDoc.TextParagraph(mDoc.MarkParagraphID), Charpos)
             l = Len(a$)
             val = 1
@@ -717,7 +717,7 @@ If Charpos > 0 Then
                     val = val - 1
                 End If
             End If
-        ElseIf w > -10241 And w < -9216 Then
+        ElseIf W > -10241 And W < -9216 Then
             val = 2
         End If
     End If
@@ -732,7 +732,7 @@ If Not locked Then
 glistN.HideCaretOnexit = False
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 
-If Enabled Then
+If enabled Then
 glistN.NoCaretShow = NoMark
 
 mNoColor = mNoColor1
@@ -799,9 +799,9 @@ Private Sub glistN_CorrectCursorAfterDrag()
     If Not mDoc.InvalidPara(OldPar) Then
         SelLengthSilent = 0
         mDoc.MarkParagraphID = OldPar
-        glistN.Enabled = False
+        glistN.enabled = False
         ParaSelStart = dragCharpos
-        glistN.Enabled = True
+        glistN.enabled = True
         ManualInform
         OldPar = 0
     End If
@@ -845,9 +845,9 @@ If Not mDoc.InvalidPara(OldPar) Then
         a = True
         SelLengthSilent = 0
         mDoc.MarkParagraphID = OldPar
-        glistN.Enabled = False
+        glistN.enabled = False
         ParaSelStart = dragCharpos
-        glistN.Enabled = True
+        glistN.enabled = True
         ManualInform
         OldPar = 0
     End If
@@ -861,7 +861,7 @@ a = True
 End If
 End Sub
 Private Sub glistN_Maybelanguage()
-If Not glistN.Enabled Then Exit Sub
+If Not glistN.enabled Then Exit Sub
 If glistN.SelStart = 0 Then
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Inform(" + Str(mIndex) + "," + Str(glistN.ListIndex + 1) + ", 1)"
@@ -879,12 +879,12 @@ Render
 End Sub
 
 
-Private Sub glistN_OutPopUp(X As Single, y As Single, myButton As Integer)
+Private Sub glistN_OutPopUp(X As Single, Y As Single, myButton As Integer)
 '
 If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(Y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
    Else
-      Callback.Callback mesCtrlName + ".PopUp(" + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(Y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
       End If
 End Sub
 
@@ -918,7 +918,7 @@ End Sub
 
 Private Sub glistN_RemoveOne(that As String)
 ' push undo removeone
-If Not Enabled Then Exit Sub
+If Not enabled Then Exit Sub
 
 ClearRedo
 If that = vbCrLf Then
@@ -1030,7 +1030,7 @@ If glistN.ListIndex < 0 Then Exit Sub
 Dim what$, ThatPara As Long, pastchars As Long, oldpanpos As Long
 pastchars = mDoc.TextParagraphLine2(glistN.ListIndex + 1, what$, ThatPara, False)
 Charpos = pastchars + glistN.SelStart
-If Not glistN.Enabled Then Exit Sub
+If Not glistN.enabled Then Exit Sub
 oldpanpos = glistN.PanPos
 tmpshow = True
 If glistN.SelStart = 0 Then
@@ -1142,12 +1142,12 @@ End Sub
 Private Sub gListN_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Dim a As RECT, b As RECT, i As Long, tmp As Long
 Dim Final$, fbypass As Boolean
-Dim bb As RECT, cc As RECT
+Dim BB As RECT, cc As RECT
 Dim OldColor As Long
 Dim what$, ThatPara As Long
 CopyFromLParamToRect a, thisrect
 b = a
-bb = a
+BB = a
 cc = a
 cc.Left = 0
 If UsedAsTextBox Then
@@ -1268,10 +1268,10 @@ Else
         End If
     ElseIf HighLightParagraph Then
        If ThatPara = mDoc.MarkParagraphID Then
-        bb = cc
-        bb.top = b.top
-        bb.Bottom = b.Bottom
-        FillBack thisHDC, bb, HighLightColor
+        BB = cc
+        BB.top = b.top
+        BB.Bottom = b.Bottom
+        FillBack thisHDC, BB, HighLightColor
         End If
     End If
     If ThatPara = mDoc.MarkParagraphID Then
@@ -1313,13 +1313,13 @@ End Sub
 
 Private Sub gListN_ExposeRect2(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Dim a As RECT, b As RECT, i As Long, pastchars As Long, hRgn As Long, tmp As Long
-Dim bb As RECT, cc As RECT
+Dim BB As RECT, cc As RECT
 Dim Final$, fbypass As Boolean
 Dim OldColor As Long
 Dim what$, ThatPara As Long
 CopyFromLParamToRect a, thisrect
 b = a
-bb = a
+BB = a
 cc = a
 cc.Left = 0
 If UsedAsTextBox Then
@@ -1440,10 +1440,10 @@ Else
  ''  skipcolor = True
 ElseIf HighLightParagraph Then
    If ThatPara = mDoc.MarkParagraphID Then
-    bb = cc
-    bb.top = b.top
-    bb.Bottom = b.Bottom
-    FillBack thisHDC, bb, HighLightColor
+    BB = cc
+    BB.top = b.top
+    BB.Bottom = b.Bottom
+    FillBack thisHDC, BB, HighLightColor
     End If
 End If
     If ThatPara = mDoc.MarkParagraphID Then
@@ -1534,9 +1534,9 @@ aaa:
 glistN.ScrollToSilent glistN.ScrollFrom
 
 If Not mNoCenterLineEdit Then
-If glistN.Enabled Then glistN.ShowPan
+If glistN.enabled Then glistN.ShowPan
 Else
-If glistN.Enabled Then glistN.ShowMe2
+If glistN.enabled Then glistN.ShowMe2
 End If
 'expandCharPos = glistN.SelStart
 mDoc.Busy = False
@@ -1559,7 +1559,7 @@ ReplaceTitle = vbNullString
 End If
 End If
 End Sub
-Private Sub glistN_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub glistN_KeyDown(keycode As Integer, shift As Integer)
 If glistN.HeadLine <> "" Then
 If NoTitle Then
 glistN.HeadLine = vbNullString
@@ -1570,23 +1570,23 @@ ReplaceTitle = vbNullString
 End If
 End If
 Dim VR(2)
-VR(0) = KeyCode
-VR(1) = Shift
+VR(0) = keycode
+VR(1) = shift
 If mIndex > -1 Then
-    Callback.CallbackNow mesCtrlName + ".KeyDown(" + CStr(index) + ")", VR()
+    Callback.CallbackNow mesCtrlName + ".KeyDown(" + CStr(Index) + ")", VR()
 Else
     Callback.CallbackNow mesCtrlName + ".KeyDown()", VR()
 End If
-Shift = VR(1)
-KeyCode = VR(0)
+shift = VR(1)
+keycode = VR(0)
 
 Dim selstart2 As Long, b As Boolean, Pad$, cc As Long
 Dim l1 As Long, c1 As Long
-If KeyCode = 18 Then
+If keycode = 18 Then
 Exit Sub
 End If
-If KeyCode = vbKeyF10 And (Shift And 7) = 1 Then
-KeyCode = 0
+If keycode = vbKeyF10 And (shift And 7) = 1 Then
+keycode = 0
 If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
    Else
@@ -1594,8 +1594,8 @@ If mIndex >= 0 Then
       End If
 Exit Sub
 End If
-If KeyCode = 16 And Shift <> 0 Then
-KeyCode = 0
+If keycode = 16 And shift <> 0 Then
+keycode = 0
 If glistN.SelStart = 0 Then
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Inform(" + Str(mIndex) + "," + Str(glistN.ListIndex + 1) + ", 1)"
@@ -1611,20 +1611,20 @@ Else
 End If
 Exit Sub
 End If
-If NoMark And Not (KeyCode <> vbKeyDown Or KeyCode <> vbKeyUp Or KeyCode <> vbKeyPageUp Or KeyCode <> vbKeyPageDown) Then KeyCode = 0: Exit Sub
+If NoMark And Not (keycode <> vbKeyDown Or keycode <> vbKeyUp Or keycode <> vbKeyPageUp Or keycode <> vbKeyPageDown) Then keycode = 0: Exit Sub
 
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
 '
-If NoMark And KeyCode = vbKeyUp Then KeyCode = vbKeyPageUp
-If NoMark And KeyCode = vbKeyDown Then KeyCode = vbKeyPageDown
-ElseIf KeyCode = vbKeyX And (Shift And 3) = 2 Then
+If NoMark And keycode = vbKeyUp Then keycode = vbKeyPageUp
+If NoMark And keycode = vbKeyDown Then keycode = vbKeyPageDown
+ElseIf keycode = vbKeyX And (shift And 3) = 2 Then
 MarkCut
 Show
-KeyCode = 0
-ElseIf KeyCode = vbKeyC And (Shift And 3) = 2 Then
+keycode = 0
+ElseIf keycode = vbKeyC And (shift And 3) = 2 Then
 MarkCopy
-KeyCode = 0
-ElseIf KeyCode = vbKeyV And (Shift And 3) = 2 Then
+keycode = 0
+ElseIf keycode = vbKeyV And (shift And 3) = 2 Then
     Pad$ = GetTextData(13)
     If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
     If NumberOnly Or NumberIntOnly Then
@@ -1657,13 +1657,13 @@ ElseIf KeyCode = vbKeyV And (Shift And 3) = 2 Then
     End If
     SelText = Pad$
     RemoveUndo SelText
-    KeyCode = 0
+    keycode = 0
     ReColorBlock
-ElseIf KeyCode = vbKeyA And (Shift And 3) = 2 Then
+ElseIf keycode = vbKeyA And (shift And 3) = 2 Then
 glistN.MarkNext = 0
 glistN.MarkALL
-KeyCode = 0
-ElseIf KeyCode = vbKeyY And (Shift And 3) = 2 Then
+keycode = 0
+ElseIf keycode = vbKeyY And (shift And 3) = 2 Then
 ' Redo
 profundo.MARKONE
 againY:
@@ -1679,8 +1679,8 @@ undotext = Redotext
 undomode = Redomode
 If undomode = 2 Then undopos = Redopos - 2
 undoprev = Redoprev
-b = Enabled
-Enabled = False
+b = enabled
+enabled = False
 SelLength = 0
 If Redomode = 3 Then
 SelStart = Redopos - 2
@@ -1726,7 +1726,7 @@ glistN_SplitLine
 
 End If
 
-Enabled = b
+enabled = b
 If Not undoprev Then
 glistN.ShowPan
 ManualInform
@@ -1739,8 +1739,8 @@ Redomode = 0
 End If
 If undoprev Then GoTo againY
 End If
-KeyCode = 0
-ElseIf KeyCode = vbKeyZ And (Shift And 3) = 2 Then
+keycode = 0
+ElseIf keycode = vbKeyZ And (shift And 3) = 2 Then
 ' 2nd version of undo system
 ' undopos now is selstart
 profundo.MARKONE
@@ -1758,8 +1758,8 @@ Redoprev = undoprev
 
 ' MOVE TO PARAGRAPH...AND CHARPOS
 
-b = Enabled
-Enabled = False
+b = enabled
+enabled = False
 
    SelLength = 0
    SelStart = undopos
@@ -1794,7 +1794,7 @@ ElseIf undomode = 2 Then
 Else
         InsertText = undotext
 End If
-Enabled = b
+enabled = b
 If Not undoprev Then
 glistN.ShowPan
 ManualInform
@@ -1808,44 +1808,44 @@ undotext = vbNullString
 undomode = 0
 End If
 If undoprev Then GoTo againZ
-KeyCode = 0
-ElseIf KeyCode = vbKeyA And (Shift And 3) = 3 Then
+keycode = 0
+ElseIf keycode = vbKeyA And (shift And 3) = 3 Then
 glistN.MarkNext = 0
 BlockEndPara = mDoc.MarkParagraphID
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 glistN.ShowPan
-KeyCode = 0
+keycode = 0
 
-ElseIf KeyCode = vbKeyDelete Then
+ElseIf keycode = vbKeyDelete Then
 If HaveMarkedText Then
 ClearRedo
 PushUndo
 glistN_MarkDelete False
 
-KeyCode = 0
+keycode = 0
 End If
-ElseIf KeyCode = vbKeyBack Then
+ElseIf keycode = vbKeyBack Then
 If HaveMarkedText Then
 ClearRedo
 PushUndo
 glistN_MarkDelete False
 
-KeyCode = 0
+keycode = 0
 End If
 End If
 conthere:
 If NoMark And EditDoc = False Then glistN.ShowMe2: Exit Sub
-If KeyCode = 0 And Shift = 0 Then Exit Sub
-If KeyCode <> 0 Or Shift <> 0 Then PressKey_A KeyCode, Shift
+If keycode = 0 And shift = 0 Then Exit Sub
+If keycode <> 0 Or shift <> 0 Then PressKey_A keycode, shift
 
 
 End Sub
 
-Private Sub glistN_KeyDownAfter(KeyCode As Integer, Shift As Integer)
+Private Sub glistN_KeyDownAfter(keycode As Integer, shift As Integer)
 If NoMark Then Exit Sub
 If HaveMarkedText Then
-If Shift = 0 Then
+If shift = 0 Then
 glistN.MarkNext = 0
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
@@ -1856,19 +1856,19 @@ If mIndex >= 0 Then
       End If
 glistN.RefreshNow
 
-ElseIf (Shift And 1) = 1 Then
+ElseIf (shift And 1) = 1 Then
 
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
 glistN_MarkOut
 End If
 End If
-ElseIf (Shift And 1) = 1 And glistN.MarkNext = 0 Then
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+ElseIf (shift And 1) = 1 And glistN.MarkNext = 0 Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
 glistN.MarkNext = 1
 glistN_MarkIn
 End If
-ElseIf (Shift And 1) = 1 And glistN.MarkNext > 0 Then
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+ElseIf (shift And 1) = 1 And glistN.MarkNext > 0 Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
 glistN.MarkNext = 2
 glistN_MarkOut
 End If
@@ -2403,7 +2403,7 @@ End Sub
 
 'End Sub
 
-Private Sub glistN_ScrollSelected(item As Long, y As Long)
+Private Sub glistN_ScrollSelected(item As Long, Y As Long)
 If NoMark Then Exit Sub
 Dim what$, ThatPara As Long
    mDoc.TextParagraphLine item, what$, ThatPara
@@ -3674,20 +3674,52 @@ Exit Do
            If one Then
            
             Exit Do
+            ElseIf Extra& > 0 Then
+                
+                R$ = R$ & Myleft$(a$, 1)
+                a$ = Mid$(a$, 2)
+                
+                If Len(R$) > 18 Then rr& = 0: Exit Do
+                rr& = 1
+            If MaybeIsSymbolNoSpace(a$, "&", True) Then
+                If Len(R$) > 10 Then rr& = 0: Exit Do
+                R$ = R$ + "&": Exit Do
+            ElseIf MaybeIsSymbolNoSpace(a$, "%", True) Then
+                If Len(R$) > 6 Then rr& = 0: Exit Do
+                R$ = R$ + "%": Exit Do
+            End If
+                
             ElseIf R$ <> "" Then
             R$ = R$ & Myleft$(a$, 1)
             a$ = Mid$(a$, 2)
                rr& = 1 'is an identifier or floating point variable
             ElseIf Mid$(a$ + "__", 2, 2) Like "[ΧχXx][0-9A-Fa-f]" Then
-             R$ = R$ & Myleft$(a$, 3)
-            a$ = Mid$(a$, 4)
-               rr& = 1
-            Extra& = 9
+evryka:
+                R$ = R$ & Myleft$(a$, 3)
+                a$ = Mid$(a$, 4)
+                Extra& = 9
+                If Myleft$(a$, 1) = "%" Then
+                    a$ = Mid$(a$, 2)
+                    rr& = 1
+                    Exit Do
+                ElseIf Myleft$(a$, 1) = "&" Then
+                    rr& = 1
+                    a$ = Mid$(a$, 2)
+                    Exit Do
+                Else
+                    rr& = 1
+                End If
+            ElseIf Mid$(a$, 2, 1) = "%" Then
+                a$ = Mid$(a$, 3)
+                rr& = 100: Exit Do
+            ElseIf Mid$(a$, 2, 1) = "&" Then
+                a$ = Mid$(a$, 3)
+                rr& = 100: Exit Do
             Else
-            If dot& > 0 Then
-            a$ = "." + a$: dot& = 0
-            ElseIf Mid$(a$, 2, 1) = "." Then
-            a$ = Mid$(a$, 3)
+                If dot& > 0 Then
+                    a$ = "." + a$: dot& = 0
+                ElseIf Mid$(a$, 2, 1) = "." Then
+                    a$ = Mid$(a$, 3)
 checkexp:
               While MaybeIsSymbolNoSpace(a$, "1234567890", True)
               Wend
@@ -3742,13 +3774,20 @@ If Len(OpenTag) = 0 Then
             If one Then
             Exit Do
             Else
-  If Extra& > 0 Then
-  If Len(R$) = 10 Then Exit Do
-  If Not c$ Like "[0-9a-fA-F]" Then Exit Do
-  
-  End If
+                If Extra& > 0 Then
+                If Not c$ Like "[0-9a-fA-F]" Then Exit Do
+                If Len(R$) > 18 Then rr& = 0: a$ = Mid$(a$, 2): Exit Do
+                End If
+            
               R$ = R$ & Myleft$(a$, 1)
             a$ = Mid$(a$, 2)
+            If MaybeIsSymbolNoSpace(a$, "&", True) Then
+                If Len(R$) > 10 Then rr& = 0: Exit Do
+                R$ = R$ + "&": Exit Do
+            ElseIf MaybeIsSymbolNoSpace(a$, "%", True) Then
+                If Len(R$) > 6 Then rr& = 0: Exit Do
+                R$ = R$ + "%": Exit Do
+            End If
             rr& = 1
   
             End If
@@ -3773,6 +3812,17 @@ If Len(OpenTag) = 0 Then
             Else
             Exit Do
             End If
+        Case 38
+            If one Then Exit Do
+            If LCase$(Mid$(a$, 2, 1)) = "h" Then
+                If Mid$(a$ + "__", 3, 1) Like "[0-9A-Fa-f]" Then
+                    GoTo evryka
+                End If
+            End If
+            a$ = Mid$(a$, 2)
+            rr& = 100
+            Exit Do
+        
         Case 40 ' "("
             If R$ <> "" And Not ((Len(R$) = 1 And ExtraYes) Or WordOnly) Then
                 Select Case rr&
@@ -3862,24 +3912,21 @@ If j - i < cl - 1 Then Exit Function
 If InStr(c$, Mid$(a$, i, cl)) > 0 Then FastSymbolNoRemove = True
 End Function
 Function IsLabelOnly2000(a$, R$) As Long 'ok
-
 Dim rr&, one As Boolean, c$, dot&, Extra&, num As Boolean
 R$ = vbNullString
 If a$ = vbNullString Then IsLabelOnly2000 = 0: Exit Function
 a$ = NLtrim$(a$)
-    Do While Len(a$) > 0
-     c$ = Myleft$(a$, 1) 'ANYCHAR HERE
+Do While Len(a$) > 0
+    c$ = Myleft$(a$, 1) 'ANYCHAR HERE
     If AscW(c$) < 256 Then
         Select Case AscW(c$)
-                Case 35 ' "#"
-        If R$ <> "" Then
-        Exit Do
-        Else
-        
-        R$ = "#"
-           a$ = Mid$(a$, 2)
-          
-          rr& = 10
+        Case 35 ' "#"
+            If R$ <> "" Then
+                Exit Do
+            Else
+                R$ = "#"
+                a$ = Mid$(a$, 2)
+                rr& = 10
            End If
         Case 64  '"@"
            If R$ = vbNullString Then
@@ -3940,143 +3987,153 @@ a$ = NLtrim$(a$)
             End If
             Exit Function
         End If
-     Case 92, 94, 123 To 126, 160 '"\","^", "{" To "~"
-Exit Do
-        
-        Case 48 To 57, 95 '"0" To "9", "_"
-       
-           If one Then
-           
+    Case 92, 94, 123 To 126, 160 '"\","^", "{" To "~"
+        Exit Do
+    Case 48 To 57, 95 '"0" To "9", "_"
+        If one Then
             Exit Do
-            ElseIf R$ <> "" Then
+        ElseIf R$ <> "" Then
             R$ = R$ & Myleft$(a$, 1)
             a$ = Mid$(a$, 2)
             If Extra& > 0 Then
-            If Myleft$(a$, 1) = "%" Then
-            If Len(R$) > 6 Then rr& = 1: Exit Do
-            a$ = Mid$(a$, 2)
-            Extra& = Extra& + 10
-            rr& = 1: Exit Do
-            
-             ElseIf Myleft$(a$, 1) = "&" Then
-             Extra& = Extra& + 10
-            a$ = Mid$(a$, 2)
-            rr& = 1: Exit Do
+                If Myleft$(a$, 1) = "%" Then
+                    a$ = Mid$(a$, 2)
+                    If Len(R$) > 6 Then rr& = 0 Else rr& = 1: Extra& = Extra& + 10
+                    Exit Do
+                ElseIf Myleft$(a$, 2) = "&&" Then
+                    a$ = Mid$(a$, 3)
+                    If Len(R$) > 18 Then rr& = 0 Else rr& = 1: Extra& = Extra& + 10
+                    Exit Do
+                ElseIf Myleft$(a$, 1) = "&" Then
+                    a$ = Mid$(a$, 2)
+                    If Len(R$) > 10 Then rr& = 0 Else rr& = 1: Extra& = Extra& + 10
+                    Exit Do
+                ElseIf Myleft$(a$, 1) = "@" Then
+                    a$ = Mid$(a$, 2)
+                    If Len(R$) > 18 Then rr& = 0 Else rr& = 1
+                    Exit Do
+                End If
             End If
-            If Len(R$) = 10 Then rr& = 1: Exit Do
-            End If
-               rr& = 1 'is an identifier or floating point variable
-            ElseIf Mid$(a$ + "__", 2, 2) Like "[ΧχXx][0-9A-Fa-f]" Then
-             R$ = R$ & Myleft$(a$, 3)
+            If Len(R$) > 18 Then rr& = 0 Else rr& = 1
+        ElseIf Mid$(a$ + "__", 2, 2) Like "[ΧχXx][0-9A-Fa-f]" Then
+evryka:
+            R$ = Myleft$(a$, 3)
             a$ = Mid$(a$, 4)
-               rr& = 1
             Extra& = 9
             If Myleft$(a$, 1) = "%" Then
                 a$ = Mid$(a$, 2)
+                rr& = 1: Extra& = Extra& + 10
+                Exit Do
+            ElseIf Myleft$(a$, 2) = "&&" Then
                 Extra& = Extra& + 10
-                rr& = 1: Exit Do
-            
-             ElseIf Myleft$(a$, 1) = "&" Then
-                 Extra& = Extra& + 10
+                a$ = Mid$(a$, 3)
+                Exit Do
+            ElseIf Myleft$(a$, 1) = "&" Then
+                rr& = 1: Extra& = Extra& + 10
                 a$ = Mid$(a$, 2)
-                rr& = 1: Exit Do
-            End If
-            ElseIf AscW(Mid$(a$, 2, 1) + " ") = 38 Then
-            a$ = Mid$(a$, 3)
-            Extra& = 100
-            Exit Do
+                Exit Do
+            ElseIf Myleft$(a$, 1) = "@" Then
+                a$ = Mid$(a$, 2)
+                rr& = 1
+                Exit Do
             Else
-           
-          If dot& > 0 Then
-            a$ = "." + a$: dot& = 0
-            ElseIf Mid$(a$, 2, 1) = "." Then
+            rr& = 1
+            End If
+        ElseIf Mid$(a$, 2, 1) = "%" Then
             a$ = Mid$(a$, 3)
+            
+            rr& = 100: Exit Do
+        ElseIf Mid$(a$, 2, 1) = "&" Then
+           a$ = Mid$(a$, 3)
+            
+            MaybeIsSymbolNoSpace a$, "&", True
+            rr& = 100: Exit Do
+            
+            Exit Do
+        Else
+            If dot& > 0 Then
+                a$ = "." + a$: dot& = 0
+            ElseIf Mid$(a$, 2, 1) = "." Then
+                a$ = Mid$(a$, 3)
 checkexp:
-              While MaybeIsSymbolNoSpace(a$, "1234567890", True)
-              Wend
-
-              If MaybeIsSymbolNoSpace(a$, "EeΕε", True) Then
-                  MaybeIsSymbolNoSpace a$, "+-", True
-                  If MaybeIsSymbolNoSpace(a$, "+-", True) Then
-                  IsLabelOnly2000 = 1
-                  Exit Function
-                  End If
-                  MaybeIsSymbolNoSpace a$, "123456789", True
-                  While MaybeIsSymbolNoSpace(a$, "1234567890", True)
-                  Wend
-                  If MaybeIsSymbolNoSpace(a$, ".") Then
-                  IsLabelOnly2000 = 1
-                  a$ = vbNullString
-                  Exit Function
-                  End If
-              Else
-              While MaybeIsSymbolNoSpace(a$, "1234567890", True)
-              Wend
-              End If
-            If MaybeIsSymbolNoSpace(a$, ".") Then
-             
-              IsLabelOnly2000 = 1
-              Else
-              IsLabelOnly2000 = 100
-              End If
-              
-              Exit Function
+                While MaybeIsSymbolNoSpace(a$, "1234567890", True)
+                Wend
+                If MaybeIsSymbolNoSpace(a$, "EeΕε", True) Then
+                    MaybeIsSymbolNoSpace a$, "+-", True
+                    If MaybeIsSymbolNoSpace(a$, "+-", True) Then
+                        IsLabelOnly2000 = 1
+                        Exit Function
+                    End If
+                    MaybeIsSymbolNoSpace a$, "123456789", True
+                    While MaybeIsSymbolNoSpace(a$, "1234567890", True)
+                    Wend
+                    If MaybeIsSymbolNoSpace(a$, ".") Then
+                      IsLabelOnly2000 = 1
+                      a$ = vbNullString
+                      Exit Function
+                    End If
+                Else
+                    While MaybeIsSymbolNoSpace(a$, "1234567890", True)
+                    Wend
+                End If
+                If MaybeIsSymbolNoSpace(a$, ".") Then
+                    IsLabelOnly2000 = 1
+                Else
+                    IsLabelOnly2000 = 100
+                End If
+                Exit Function
             ElseIf MaybeIsSymbolNoSpace(a$, "1234567890", True) Then
-              While MaybeIsSymbolNoSpace(a$, "1234567890", True)
-              Wend
-                  If MaybeIsSymbolNoSpace(a$, ".", True) Then
-                                
+                While MaybeIsSymbolNoSpace(a$, "1234567890", True)
+                Wend
+                If MaybeIsSymbolNoSpace(a$, ".", True) Then
                     GoTo checkexp
-                    ElseIf MaybeIsSymbolNoSpace(a$, "EeΕε") Then
+                ElseIf MaybeIsSymbolNoSpace(a$, "EeΕε") Then
                     GoTo checkexp
-                  End If
-                  MaybeIsSymbolNoSpace a$, "&", True
+                End If
+                If MaybeIsSymbolNoSpace(a$, "&", True) Then
+                    MaybeIsSymbolNoSpace a$, "&", True
+                
+                    ElseIf MaybeIsSymbolNoSpace(a$, "%", True) Then
+                
+                    End If
                 IsLabelOnly2000 = 100
                 Exit Function
             End If
             Exit Do
-            End If
-Case Is < 0, Is > 64 ' >=A and negative
-
-            If one Then
+        End If
+    Case Is < 0, Is > 64 ' >=A and negative
+        If one Then
             Exit Do
+        Else
+            If Extra& > 0 Then
+                If Not c$ Like "[a-fA-F]" Then Exit Do
+                R$ = R$ & Myleft$(a$, 1)
+                a$ = Mid$(a$, 2)
+                If Myleft$(a$, 1) = "%" Then
+                    If Len(R$) > 6 Then rr& = 0 Else rr& = 1: Extra& = Extra& + 10
+                    a$ = Mid$(a$, 2)
+                    Exit Do
+                ElseIf Myleft$(a$, 2) = "&&" Then
+                   a$ = Mid$(a$, 3)
+                   If Len(R$) > 18 Then rr& = 0 Else rr& = 1: Extra& = Extra& + 10
+                   Exit Do
+                ElseIf Myleft$(a$, 1) = "&" Then
+                   a$ = Mid$(a$, 2)
+                   If Len(R$) > 10 Then rr& = 0 Else rr& = 1: Extra& = Extra& + 10
+                   Exit Do
+                ElseIf Myleft$(a$, 1) = "@" Then
+                    a$ = Mid$(a$, 2)
+                    If Len(R$) > 18 Then rr& = 0 Else rr& = 1
+                    Exit Do
+                End If
+                If Len(R$) > 18 Then rr& = 0
             Else
-  If Extra& > 0 Then
-        If Not c$ Like "[a-fA-F]" Then Exit Do
-        R$ = R$ & Myleft$(a$, 1)
-            a$ = Mid$(a$, 2)
-            
-            If Myleft$(a$, 1) = "%" Then
-                If Len(R$) > 6 Then rr& = 1: Exit Do
-                Extra& = Extra& + 10
-                a$ = Mid$(a$, 2)
-                rr& = 1: Exit Do
-            
-             ElseIf Myleft$(a$, 1) = "&" Then
-             Extra& = Extra& + 10
-                a$ = Mid$(a$, 2)
-                rr& = 1: Exit Do
+                 R$ = R$ & Myleft$(a$, 1)
+                 a$ = Mid$(a$, 2)
+                 rr& = 1 'is an identifier or floating point variable
             End If
-            If Len(R$) = 10 Then rr& = 1: Exit Do
-        
-        
-  Else
-            R$ = R$ & Myleft$(a$, 1)
-            a$ = Mid$(a$, 2)
-       
-            rr& = 1 'is an identifier or floating point variable
-  
-  
-  
-  End If
-              
-        
-  
-            End If
-      Case 38 ' "&"
-            If R$ = vbNullString Then rr& = 2:    a$ = Mid$(a$, 2)
-            Exit Do
-       Case 36 ' "$"
+        End If
+    Case 36 ' "$"
        If one Then Exit Do
             If R$ <> "" Then
             one = True
@@ -4086,7 +4143,7 @@ Case Is < 0, Is > 64 ' >=A and negative
             Else
             Exit Do
             End If
-        Case 37 ' "%"
+     Case 37 ' "%"
       If one Then
             If InStr(R$, "$.") Then
             rr& = 3          ' is string variable with string pointer
@@ -4109,8 +4166,17 @@ Case Is < 0, Is > 64 ' >=A and negative
             End If
             
             Else
-            Exit Do
+                Exit Do
             End If
+        Case 38 ' "&"
+        If one Then Exit Do
+        If LCase$(Mid$(a$, 2, 1)) = "h" Then
+        If Mid$(a$ + "__", 3, 1) Like "[0-9A-Fa-f]" Then
+            GoTo evryka
+        End If
+        End If
+        If R$ = vbNullString Then rr& = 10: a$ = Mid$(a$, 2): R$ = "&"
+        Exit Do
         Case 40 ' "("
             If R$ <> "" Then
                 If Mid$(a$, 2, 2) = ")@" Then
@@ -4163,10 +4229,23 @@ Case Is < 0, Is > 64 ' >=A and negative
         End If
         End If
     End If
-
-    IsLabelOnly2000 = rr& + Extra&
-   
+    
+    If R$ = "&" Then
+        IsLabelOnly2000 = 10
+    ElseIf rr& > 3 And rr& < 9 Then
+        IsLabelOnly2000 = rr& + Extra&
+    ElseIf CheckFree(Myleft$(a$, 1)) Then
+        IsLabelOnly2000 = rr& + Extra&
+    ElseIf rr& > 0 Then
+        If Myleft$(R$, 1) = "&" Then
+            a$ = Mid$(R$, 2) + a$: R$ = "&"
+            IsLabelOnly2000 = 10
+        Else
+            IsLabelOnly2000 = 1
+        End If
+    End If
 End Function
+
 
 Private Function MaybeIsSymbol(a$, c$, Optional tail$ = vbNullString, Optional Remove As Boolean = False) As Boolean
 Dim i As Long, ok As Boolean
@@ -5935,7 +6014,7 @@ Public Property Let EditDoc(ByVal RHS As Boolean)
 mEditDoc = RHS
 If Not RHS Then glistN.MarkNext = 0
 glistN.EditFlag = RHS
-If glistN.Enabled Then
+If glistN.enabled Then
 glistN.ShowMe2
 End If
 End Property
@@ -5982,17 +6061,17 @@ glistN.NoScroll = Not mNoWrap
 End If
 End Property
 
-Public Property Get Enabled() As Boolean
-Enabled = glistN.Enabled
+Public Property Get enabled() As Boolean
+enabled = glistN.enabled
 End Property
 
-Public Property Let Enabled(ByVal RHS As Boolean)
+Public Property Let enabled(ByVal RHS As Boolean)
 'glistN.HideCaretOnexit = Not rhs
 If Not RHS Then
 glistN.Noflashingcaret = False
 Show
 End If
-glistN.Enabled = RHS
+glistN.enabled = RHS
 End Property
 Sub SetFocus()
 If glistN.Visible Then glistN.SetFocus
@@ -6030,7 +6109,7 @@ End If
 Else
 glistN.SelStartEventAlways = Column
 End If
-If glistN.Enabled Then
+If glistN.enabled Then
 If Not noShow Then glistN.ShowMe2
 End If
 End Sub
@@ -6058,8 +6137,8 @@ BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 glistN.MarkNext = 0
 End If
-oldenabled = glistN.Enabled
-glistN.Enabled = False
+oldenabled = glistN.enabled
+glistN.enabled = False
 glistN.PanPos = 0
 glistN.ScrollToSilent 0
 Set mDoc = New Document
@@ -6091,7 +6170,7 @@ all = mDoc.DocLines
  glistN.SelStart = 0
 ClearRedo
 ClearUndo
-glistN.Enabled = oldenabled
+glistN.enabled = oldenabled
 Dim what$, ThatPara As Long, pastchars
    pastchars = mDoc.TextParagraphLine(1, what$, ThatPara)
 mDoc.MarkParagraphID = ThatPara
@@ -6171,7 +6250,7 @@ If RHS <= 0 Then
     BlockStartPara = BlockEndPara
     BlockStartPos = BlockEndPos
     glistN.MarkNext = 0
-If glistN.Enabled Then glistN.ShowPan
+If glistN.enabled Then glistN.ShowPan
 Else
 glistN.MarkNext = 1
    BlockStartCursor = glistN.SelStart
@@ -6192,7 +6271,7 @@ BlockEndline = BlockEndline - 1 ' base 0
     BlockBottomline = BlockEndline
 If RHS <> 0 Then
 glistN.MarkNext = 2
-If glistN.Enabled Then glistN.ShowPan
+If glistN.enabled Then glistN.ShowPan
 End If
 End If
 End Property
@@ -6371,8 +6450,8 @@ glistN.MarkNext = 0
 undomode = 5 ' like 1
 RemoveUndo (RHS)
 undomode = 4 ' like 0
-b = Enabled
-If b Then Enabled = False
+b = enabled
+If b Then enabled = False
 Dim k As Long, l As Long
 If Right$(RHS, 1) = vbCr Then RHS = RHS + vbLf
 If RHS <> "" Then
@@ -6382,7 +6461,7 @@ mDoc.InsertDoc mDoc.MarkParagraphID, Charpos, RHS
 all = mDoc.DocLines
 
 End If
-If b <> Enabled Then Enabled = b
+If b <> enabled Then enabled = b
 End Property
 Private Property Let InsertText2(ByVal RHS As String)
 glistN_MarkDelete True
@@ -6636,14 +6715,14 @@ maxw = MyTrimRNoCr(Myleft$(CurrentParagraph, Charpos - 1))
 If Charpos > maxw Then
 och = Charpos - maxw - 1
 If och > 0 Then
-skip = Enabled
-Enabled = False
+skip = enabled
+enabled = False
 
 SelStartSilent2 = SelStart - och
 SelLengthSilent = och
 InsertTextNoRender = ""
 undoprev = True
-Enabled = skip
+enabled = skip
 End If
 End If
 End If
@@ -6691,7 +6770,7 @@ End If
 Dim a$
 tc = TabControl
 
-glistN.Enabled = False
+glistN.enabled = False
     a$ = Myleft(CurrentParagraph, Charpos)
 
     If MyTrimL2NoTab(a$) <> 1 And tc = 0 And MyTrimL(a$) > 1 Then
@@ -6731,7 +6810,7 @@ glistN.Enabled = False
     End If
     SelStartSilent = j + Len(idnt$) + 3 + ww
     End If
-glistN.Enabled = True
+glistN.enabled = True
 Render
 End Sub
 Function GetLCIDFromKeyboard() As Long
@@ -7019,34 +7098,34 @@ End If
     End Sub
 
 
-Function SplitStringUsingArray(ByVal c$, bb() As Long, wc&, cuts() As Long) As String()
+Function SplitStringUsingArray(ByVal c$, BB() As Long, wc&, cuts() As Long) As String()
 Dim cc$()
-ReDim cc$((UBound(bb()) + 1) / 2)
-Dim st&, ste&, w&
+ReDim cc$((UBound(BB()) + 1) / 2)
+Dim st&, ste&, W&
 wc& = 0
-ste& = UBound(bb())
-For w& = 1 To ste& - 2 Step 2
+ste& = UBound(BB())
+For W& = 1 To ste& - 2 Step 2
 On Error Resume Next
-If bb(w& + 2) - bb(w&) < 1 Then
-cc$(wc&) = Mid$(c$, 1, bb(w&))
-cuts(wc&) = bb(w& + 2)
+If BB(W& + 2) - BB(W&) < 1 Then
+cc$(wc&) = Mid$(c$, 1, BB(W&))
+cuts(wc&) = BB(W& + 2)
 Else
 If wc& > 0 Then
-cc$(wc&) = cc$(wc& - 1) + Mid$(c$, bb(w&), bb(w& + 2) - bb(w&))
+cc$(wc&) = cc$(wc& - 1) + Mid$(c$, BB(W&), BB(W& + 2) - BB(W&))
 Else
-cc$(wc&) = Mid$(c$, bb(w&), bb(w& + 2) - bb(w&))
+cc$(wc&) = Mid$(c$, BB(W&), BB(W& + 2) - BB(W&))
 End If
 cuts(wc&) = Len(cc$(wc&))
 End If
-If bb(w& + 2) - bb(w&) = 0 Then
+If BB(W& + 2) - BB(W&) = 0 Then
 wc& = wc& - 1
 SplitStringUsingArray = cc$()
 Exit Function
 End If
 wc& = wc& + 1
-Next w&
-If bb(w&) > 0 Then
-If Trim$(Mid$(c$, bb(w&))) <> vbNullString Then
+Next W&
+If BB(W&) > 0 Then
+If Trim$(Mid$(c$, BB(W&))) <> vbNullString Then
 
 cc$(wc&) = c$ 'Mid$(c$,  bb(w&))
 cuts(wc&) = Len(c$)
@@ -7056,18 +7135,18 @@ End If
 End If
 SplitStringUsingArray = cc$()
 End Function
-Function SplitStringUsingArrayNoTab(c$, bb() As Long, wc&) As String()
+Function SplitStringUsingArrayNoTab(c$, BB() As Long, wc&) As String()
 Dim cc$()
-ReDim cc$((UBound(bb()) + 1) / 2)
-Dim st&, ste&, w&
+ReDim cc$((UBound(BB()) + 1) / 2)
+Dim st&, ste&, W&
 wc& = 0
-ste& = UBound(bb())
-For w& = 1 To ste& - 2 Step 2
+ste& = UBound(BB())
+For W& = 1 To ste& - 2 Step 2
 On Error Resume Next
-If bb(w& + 2) - bb(w&) < 1 Then
-cc$(wc&) = Mid$(c$, bb(w&))
+If BB(W& + 2) - BB(W&) < 1 Then
+cc$(wc&) = Mid$(c$, BB(W&))
 Else
-cc$(wc&) = Mid$(c$, bb(w&), bb(w& + 2) - bb(w&))
+cc$(wc&) = Mid$(c$, BB(W&), BB(W& + 2) - BB(W&))
 End If
 If cc$(wc&) = vbNullString Then
 wc& = wc& - 1
@@ -7075,9 +7154,9 @@ SplitStringUsingArrayNoTab = cc$()
 Exit Function
 End If
 wc& = wc& + 1
-Next w&
-If bb(w&) > 0 Then
-cc$(wc&) = Mid$(c$, bb(w&))
+Next W&
+If BB(W&) > 0 Then
+cc$(wc&) = Mid$(c$, BB(W&))
 End If
 If cc$(wc&) = vbNullString Then wc& = wc& - 1
 SplitStringUsingArrayNoTab = cc$()
@@ -7089,7 +7168,8 @@ If M2000code Then
 Select Case ColorSet
 Case 0
     If ch = 13 Then
-    M2000 = rgb(&HEE, &HEE, &H33)
+    'M2000 = rgb(&HEE, &HEE, &H33)
+    M2000 = rgb(&HC5, &HF7, &HF7)
     ElseIf ch = 12 Then
     M2000 = rgb(&HDD, &HAA, 0)
     Else
@@ -7200,14 +7280,14 @@ End Select
 
 End Function
 Private Function aheadstatus2000(a$, Optional srink As Boolean = True, Optional Pos As Long = 1) As String 'ok
-Dim b$, part$, w$, pos2 As Long, word$
+Dim b$, part$, W$, pos2 As Long, word$
 
 If a$ = vbNullString Then Exit Function
 If Pos = 0 Then Pos = 1
 Do While Pos <= Len(a$)
 
-    w$ = Mid$(a$, Pos, 1)
-    If part$ = vbNullString And w$ = "0" Then
+    W$ = Mid$(a$, Pos, 1)
+    If part$ = vbNullString And W$ = "0" Then
         If Pos + 2 <= Len(a$) Then
             If LCase(Mid$(a$, Pos, 2)) Like "0[xχ]" Then
             'hexadecimal literal number....
@@ -7216,9 +7296,12 @@ Do While Pos <= Len(a$)
                 If Not Mid$(a$, Pos, 1) Like "[0-9a-fA-F]" Then Exit Do
                 Pos = Pos + 1
                 Loop
+                If Mid$(a$, Pos, 1) = "&" Then
+                If Mid$(a$, Pos + 1, 1) = "&" Then Pos = Pos + 2 Else Pos = Pos + 1
+                End If
                 b$ = b$ & "N"
                 If Pos <= Len(a$) Then
-                    w$ = Mid$(a$, Pos, 1)
+                    W$ = Mid$(a$, Pos, 1)
                 Else
                     Exit Do
                 End If
@@ -7226,7 +7309,7 @@ Do While Pos <= Len(a$)
         End If
     End If
 
-    If w$ = Chr(34) Then
+    If W$ = Chr(34) Then
     
         If part$ <> "" Then
         b$ = b$ & part$
@@ -7239,7 +7322,7 @@ Do While Pos <= Len(a$)
    
         Pos = Pos + 1
         Loop
-    ElseIf w$ = "(" Then
+    ElseIf W$ = "(" Then
         If part$ <> "" Then
             ' after
             ElseIf Right$(b$, 1) = "a" Then
@@ -7255,7 +7338,7 @@ Do While Pos <= Len(a$)
        If Mid$(a$, Pos + 1, 1) <> "." Then b$ = b$ & part$
         part$ = vbNullString
         
-    ElseIf w$ = "{" Then
+    ElseIf W$ = "{" Then
 If word$ <> "" Then
   Select Case myUcase(word$, True)
   Case "THEN", "ELSE", "ΤΟΤΕ"
@@ -7292,7 +7375,7 @@ If word$ <> "" Then
 ''Exit Do
 
     Else
-        Select Case w$
+        Select Case W$
         Case ","  ' bye bye
         Exit Do
         Case "%"
@@ -7362,9 +7445,11 @@ JUMPHERE:
         Case "0" To "9", "."
             If part$ = "N" Then
             If Len(a$) < Pos Then
-            If Mid$(a$, Pos + 1, 1) Like "[&@#%~]" Then
-            Pos = Pos + 1
-            End If
+                If Mid$(a$, Pos + 1, 1) Like "[@#%~]" Then
+                    Pos = Pos + 1
+                ElseIf Mid$(a$, Pos + 1, 1) = "&" Then
+                    If Mid$(a$, Pos + 2, 1) = "&" Then Pos = Pos + 2 Else Pos = Pos + 1
+                End If
             End If
             ElseIf part$ = "S" Then
             
@@ -7382,7 +7467,7 @@ JUMPHERE:
         Case "e", "E", "ε", "Ε"
         If LenB(word$) = 0 Then part$ = "N"
         
-        word$ = word$ + w$
+        word$ = word$ + W$
            If part$ = "S" Then
             
             
@@ -7412,7 +7497,7 @@ JUMPHERE:
                         part$ = "o"
                         Pos = Pos + 1
                     End If
-                ElseIf w$ = ">" And Pos > 1 Then
+                ElseIf W$ = ">" And Pos > 1 Then
                     If Mid$(a$, Pos - 1, 2) = "->" Then ' "->"
                         If Right$(b$, 1) = "S" Then
                             b$ = b$ + part$
@@ -7431,33 +7516,33 @@ JUMPHERE:
             End If
 there1:
                 If b$ & part$ <> "" Then
-                w$ = Replace(b$ & part$, "a", "")
+                W$ = Replace(b$ & part$, "a", "")
             part$ = vbNullString
                If srink Then
                   Do
-                b$ = w$
-                w$ = Replace(b$, "NN", "N")
-                Loop While w$ <> b$
+                b$ = W$
+                W$ = Replace(b$, "NN", "N")
+                Loop While W$ <> b$
                          Do
-                        b$ = w$
-                          w$ = Replace(b$, "SlS", "N")
-                          Loop While w$ <> b$
+                        b$ = W$
+                          W$ = Replace(b$, "SlS", "N")
+                          Loop While W$ <> b$
                             Do
-                          b$ = w$
-                          w$ = Replace(b$, "NlN", "N")
-                          Loop While w$ <> b$
+                          b$ = W$
+                          W$ = Replace(b$, "NlN", "N")
+                          Loop While W$ <> b$
     
                 Do
-                b$ = w$
-                w$ = Replace(b$, "NoN", "N")
-                Loop While w$ <> b$
+                b$ = W$
+                W$ = Replace(b$, "NoN", "N")
+                Loop While W$ <> b$
                 
                 Do
-                b$ = w$
-                w$ = Replace(b$, "SoS", "S")
-                Loop While w$ <> b$
+                b$ = W$
+                W$ = Replace(b$, "SoS", "S")
+                Loop While W$ <> b$
                 Else
-              b$ = w$
+              b$ = W$
                End If
                
                 If Myleft$(b$, Len(b$) - 1) <> "l" Then part$ = "l"
@@ -7469,14 +7554,14 @@ there1:
         Exit Do
         Case Else
         If part$ = "N" Then
-        word$ = word$ + w$
+        word$ = word$ + W$
         ElseIf part$ = "S" Then
        
         Else
         
      b$ = b$ & part$
      part$ = "N"
-     word$ = word$ + w$
+     word$ = word$ + W$
             End If
         End Select
         End If
@@ -7485,29 +7570,29 @@ there1:
 conthere:
 Loop
 
-    w$ = Replace(b$ & part$, "a", "")
+    W$ = Replace(b$ & part$, "a", "")
     
-    b$ = w$
+    b$ = W$
 If srink Then
          Do
-  b$ = w$
+  b$ = W$
 
-    w$ = Replace(b$, "SlS", "N")
-    Loop While w$ <> b$
+    W$ = Replace(b$, "SlS", "N")
+    Loop While W$ <> b$
       Do
-    b$ = w$
-    w$ = Replace(b$, "NlN", "N")
-    Loop While w$ <> b$
+    b$ = W$
+    W$ = Replace(b$, "NlN", "N")
+    Loop While W$ <> b$
     
     Do
-    b$ = w$
-    w$ = Replace(b$, "NoN", "N")
-    Loop While w$ <> b$
+    b$ = W$
+    W$ = Replace(b$, "NoN", "N")
+    Loop While W$ <> b$
     
     Do
-    b$ = w$
-    w$ = Replace(b$, "SoS", "S")
-    Loop While w$ <> b$
+    b$ = W$
+    W$ = Replace(b$, "SoS", "S")
+    Loop While W$ <> b$
 End If
    
    
@@ -7520,13 +7605,13 @@ End If
 End Function
 
 Private Function aheadstatus(a$, Optional srink As Boolean = True, Optional Pos As Long = 1) As String 'ok
-Dim b$, part$, w$, pos2 As Long, word$
+Dim b$, part$, W$, pos2 As Long, word$
 
 If a$ = vbNullString Then Exit Function
 If Pos = 0 Then Pos = 1
 Do While Pos <= Len(a$)
-    w$ = Mid$(a$, Pos, 1)
-    If part$ = vbNullString And w$ = "0" Then
+    W$ = Mid$(a$, Pos, 1)
+    If part$ = vbNullString And W$ = "0" Then
         If Pos + 2 <= Len(a$) Then
             If LCase(Mid$(a$, Pos, 2)) Like "0[xχ]" Then
             'hexadecimal literal number....
@@ -7537,7 +7622,7 @@ Do While Pos <= Len(a$)
                 Loop
                 b$ = b$ & "N"
                 If Pos <= Len(a$) Then
-                    w$ = Mid$(a$, Pos, 1)
+                    W$ = Mid$(a$, Pos, 1)
                 Else
                     Exit Do
                 End If
@@ -7545,11 +7630,11 @@ Do While Pos <= Len(a$)
         End If
     End If
         
-        If w$ = StringSep Then
+        If W$ = StringSep Then
             If part$ <> "" Then
                 b$ = b$ & part$
                 part$ = vbNullString
-            ElseIf w$ = Myleft$(stringsep2, 1) Then
+            ElseIf W$ = Myleft$(stringsep2, 1) Then
                 If part$ <> "" Then
                 b$ = b$ & part$
                 End If
@@ -7585,7 +7670,7 @@ cont002:
                 Pos = Pos + 1
             Loop
             If Pos > Len(a$) Then Pos = Len(a$)
-        ElseIf w$ = Myleft$(stringsep2, 1) Then
+        ElseIf W$ = Myleft$(stringsep2, 1) Then
             If part$ <> "" Then
                 b$ = b$ & part$
             End If
@@ -7600,7 +7685,7 @@ cont002:
             If Pos > Len(a$) Then Pos = Len(a$)
            
         
-        ElseIf w$ = "(" Or w$ = "[" Then
+        ElseIf W$ = "(" Or W$ = "[" Then
         
         If part$ <> "" Then
             ' after
@@ -7612,7 +7697,7 @@ cont002:
               
         End If
       Pos = Pos + 1
-        If Not BlockParam4(a$, Pos, Asc(w$)) Then Pos = Len(a$) + 1: Exit Do
+        If Not BlockParam4(a$, Pos, Asc(W$)) Then Pos = Len(a$) + 1: Exit Do
        If Mid$(a$, Pos + 1, 1) <> "." Then
        b$ = b$ & part$
         Else
@@ -7621,7 +7706,7 @@ cont002:
         part$ = vbNullString
    Else
     If Len(OpenTag) = 0 Then
-        Select Case w$
+        Select Case W$
         Case mSplitExpr  ' bye bye
         Exit Do
         Case "%"
@@ -7694,7 +7779,7 @@ cont002:
         part$ = "S"
         End If
         Case "e", "E", "ε", "Ε"
-        word$ = word$ + w$
+        word$ = word$ + W$
            If part$ = "S" Then
             
             
@@ -7704,40 +7789,40 @@ cont002:
             'part$ = "N"
             End If
         Case "=", ">", "<", "~"
-         If b$ & part$ = "" And InStr(StartSymbols + Chr$(0), w$) > 0 Then
+         If b$ & part$ = "" And InStr(StartSymbols + Chr$(0), W$) > 0 Then
          Pos = Pos + 1
          b$ = "N"
          
          Exit Do
          End If
                 If b$ & part$ <> "" Then
-                w$ = Replace(b$ & part$, "a", "")
+                W$ = Replace(b$ & part$, "a", "")
             part$ = vbNullString
                If srink Then
                   Do
-                b$ = w$
-                w$ = Replace(b$, "NN", "N")
-                Loop While w$ <> b$
+                b$ = W$
+                W$ = Replace(b$, "NN", "N")
+                Loop While W$ <> b$
                          Do
-                        b$ = w$
-                          w$ = Replace(b$, "SlS", "N")
-                          Loop While w$ <> b$
+                        b$ = W$
+                          W$ = Replace(b$, "SlS", "N")
+                          Loop While W$ <> b$
                             Do
-                          b$ = w$
-                          w$ = Replace(b$, "NlN", "N")
-                          Loop While w$ <> b$
+                          b$ = W$
+                          W$ = Replace(b$, "NlN", "N")
+                          Loop While W$ <> b$
     
                 Do
-                b$ = w$
-                w$ = Replace(b$, "NoN", "N")
-                Loop While w$ <> b$
+                b$ = W$
+                W$ = Replace(b$, "NoN", "N")
+                Loop While W$ <> b$
                 
                 Do
-                b$ = w$
-                w$ = Replace(b$, "SoS", "S")
-                Loop While w$ <> b$
+                b$ = W$
+                W$ = Replace(b$, "SoS", "S")
+                Loop While W$ <> b$
                 Else
-              b$ = w$
+              b$ = W$
                End If
                If part$ <> "" Then
             b$ = b$ & part$
@@ -7763,14 +7848,14 @@ cont002:
         Case Else
     
          If part$ = "N" Then
-        word$ = word$ + w$
+        word$ = word$ + W$
         ElseIf part$ = "S" Then
        
         Else
         
      b$ = b$ & part$
      part$ = "N"
-     word$ = word$ + w$
+     word$ = word$ + W$
             End If
         End Select
         Else
@@ -7780,50 +7865,50 @@ cont002:
     Pos = Pos + 1
  Loop
 
-    w$ = Replace(b$ & part$, "a", "")
+    W$ = Replace(b$ & part$, "a", "")
     
-    b$ = w$
+    b$ = W$
 If srink Then
          Do
-  b$ = w$
+  b$ = W$
 
-    w$ = Replace(b$, "SlS", "N")
-    Loop While w$ <> b$
+    W$ = Replace(b$, "SlS", "N")
+    Loop While W$ <> b$
       Do
-    b$ = w$
-    w$ = Replace(b$, "NlN", "N")
-    Loop While w$ <> b$
+    b$ = W$
+    W$ = Replace(b$, "NlN", "N")
+    Loop While W$ <> b$
     
     Do
-    b$ = w$
-    w$ = Replace(b$, "NoN", "N")
-    Loop While w$ <> b$
+    b$ = W$
+    W$ = Replace(b$, "NoN", "N")
+    Loop While W$ <> b$
     
     Do
-    b$ = w$
-    w$ = Replace(b$, "SoS", "S")
-    Loop While w$ <> b$
+    b$ = W$
+    W$ = Replace(b$, "SoS", "S")
+    Loop While W$ <> b$
 End If
 aheadstatus = b$
 End Function
 
-Public Sub move(X, y, Optional w, Optional h)
+Public Sub move(X, Y, Optional W, Optional H)
 glistN.HideBarAsap
-If IsMissing(w) Then
-glistN.MoveTwips CLng(X), CLng(y), 0, 0
-ElseIf IsMissing(h) Then
+If IsMissing(W) Then
+glistN.MoveTwips CLng(X), CLng(Y), 0, 0
+ElseIf IsMissing(H) Then
 
-glistN.MoveTwips CLng(X), CLng(y), CLng(w), 0
+glistN.MoveTwips CLng(X), CLng(Y), CLng(W), 0
 RelocateMarkedText
 Else
-glistN.MoveTwips CLng(X), CLng(y), CLng(w), CLng(h)
+glistN.MoveTwips CLng(X), CLng(Y), CLng(W), CLng(H)
 RelocateMarkedText
 End If
 
 
 End Sub
 Public Sub deconstruct()
-If Not glistN Is Nothing Then glistN.Shutdown
+If Not glistN Is Nothing Then glistN.ShutDown
 Set Callback = Nothing
 Set glistN = Nothing
 Set mDoc = Nothing
@@ -7843,25 +7928,25 @@ End If
 End Sub
 
 Public Property Get locked() As Boolean
-locked = Not glistN.Enabled
+locked = Not glistN.enabled
 End Property
 
 Public Property Let locked(ByVal RHS As Boolean)
-glistN.Enabled = Not RHS
+glistN.enabled = Not RHS
 End Property
-Public Property Get index() As Long
-index = mIndex
+Public Property Get Index() As Long
+Index = mIndex
 End Property
 
-Friend Property Let index(ByVal RHS As Long)
+Friend Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 
-Public Property Get Linespace() As Variant
-Linespace = dv15 * (glistN.addpixels) / 2
+Public Property Get LineSpace() As Variant
+LineSpace = dv15 * (glistN.addpixels) / 2
 End Property
 
-Public Property Let Linespace(ByVal vNewValue As Variant)
+Public Property Let LineSpace(ByVal vNewValue As Variant)
     vNewValue = (vNewValue \ 30) * 60
 On Error Resume Next
 glistN.addpixels = CLng(vNewValue / dv15)
@@ -7873,38 +7958,38 @@ Public Property Get LineHeight() As Variant
 ''
 LineHeight = glistN.HeightTwips / glistN.lines
 End Property
-Public Sub PressKey(KeyCode As Integer, Shift As Integer)
+Public Sub PressKey(keycode As Integer, shift As Integer)
 Dim b As Boolean
-  b = Enabled
-    PressKey_A KeyCode, Shift
-Enabled = b
+  b = enabled
+    PressKey_A keycode, shift
+enabled = b
   
 End Sub
-Private Sub PressKey_A(KeyCode As Integer, Shift As Integer)
+Private Sub PressKey_A(keycode As Integer, shift As Integer)
 Static ctrl As Boolean, alt As Boolean, noentrance As Boolean, where As Long, noinp As Double
 Dim aa$, a$, JJ As Long, ii As Long
-If alt = True Then Shift = Shift Or 4: alt = False
+If alt = True Then shift = shift Or 4: alt = False
 If noentrance Then
-KeyCode = 0
+keycode = 0
 Exit Sub
 End If
 noentrance = True
-Select Case KeyCode
+Select Case keycode
 Case vbKeyReturn
 nochange = True
 If UsedAsTextBox Or NumberOnly Or NumberIntOnly Then
-KeyCode = 0
+keycode = 0
 If Not Callback Is Nothing Then
 With Callback.Control(1)
 .PressKey 13, 0
 End With
 End If
-ElseIf (Shift And 2) = 2 And AllowInsertBrackets Then
-KeyCode = 0
-Shift = 0
+ElseIf (shift And 2) = 2 And AllowInsertBrackets Then
+keycode = 0
+shift = 0
 insertbrackets
 ElseIf AutoIntNewLine Then
-KeyCode = 0
+keycode = 0
 Else
 
 End If
@@ -7913,13 +7998,13 @@ nochange = False
 
 Case vbKeyControl
 ctrl = True
-alt = (Shift And 4) = 4
-KeyCode = 0
+alt = (shift And 4) = 4
+keycode = 0
 Case vbKeyF1
-If Shift > 0 Then If (Shift And 2) <> 2 Then KeyCode = 0: Shift = 0: noentrance = False: Exit Sub
+If shift > 0 Then If (shift And 2) <> 2 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 
-If (Shift And 2) = 2 Then
-Shift = 0
+If (shift And 2) = 2 Then
+shift = 0
 If SelText <> "" Then
 helpmeSub
 Else
@@ -7936,13 +8021,13 @@ Render
 ManualInform
 End If
 
-KeyCode = 0
+keycode = 0
 Case vbKeyF2
-If (Shift And 4) = 4 Then KeyCode = 0: Shift = 0: noentrance = False: Exit Sub
+If (shift And 4) = 4 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 
-If Shift <> 0 Then
-LastSearchType = 2 - Abs(Shift Mod 2 = 1)
-Shift = 0
+If shift <> 0 Then
+LastSearchType = 2 - Abs(shift Mod 2 = 1)
+shift = 0
 If SelText <> "" Then s$ = SelText
 If pagio$ = "GREEK" Then
 s$ = InputBoxN("Αναζήτησε προς την αρχή " & IIf(LastSearchType = 1, "(και σε μέρος λέξης):" & vbCrLf & " Ctrl+F2 για λέξεις μόνο", ":" & vbCrLf & " Ctrl+F2 και για μέρη λέξεων"), "Συγγραφή Κειμένου", s$, noinp)
@@ -7952,13 +8037,13 @@ s$ = InputBoxN("Search to top " & IIf(LastSearchType = 1, "(inside words also):"
 End If
 If Not noinp = 1 Then
 noentrance = False
-KeyCode = 0
+keycode = 0
 Exit Sub
 End If
 End If
 If noinp = 1 Then
     If MyTrim(s$) <> "" Then Searchup s$, LastSearchType = 1 Else LastSearchType = 0
-    Shift = 0
+    shift = 0
 ElseIf SelText <> "" Or s$ <> "" Then
 If LastSearchType > 0 Then
     If SelText <> "" Then s$ = SelText
@@ -7967,11 +8052,11 @@ If LastSearchType > 0 Then
         supsub
     End If
 End If
-KeyCode = 0
+keycode = 0
 Case vbKeyF3
-If (Shift And 4) = 4 Then KeyCode = 0: Shift = 0: noentrance = False: Exit Sub
-    If Shift <> 0 Then
-    Shift = 0
+If (shift And 4) = 4 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
+    If shift <> 0 Then
+    shift = 0
         If s$ = vbNullString And SelText <> "" Then s$ = SelText
         If pagio$ = "GREEK" Then
             s$ = InputBoxN("Αναζήτησε προς το τέλος " & IIf(LastSearchType = 1, "(και σε μέρος λέξης):" & vbCrLf & " Ctrl+F3 για λέξεις μόνο", ":" & vbCrLf & " Ctrl+F3 και για μέρη λέξεων"), "Συγγραφή Κειμένου", s$, noinp)
@@ -7980,13 +8065,13 @@ If (Shift And 4) = 4 Then KeyCode = 0: Shift = 0: noentrance = False: Exit Sub
         End If
         If Not noinp = 1 Then
             noentrance = False
-            KeyCode = 0
+            keycode = 0
             Exit Sub
         End If
     End If
     If noinp = 1 Then
     If MyTrim(s$) <> "" Then SearchDown s$, LastSearchType = 1 Else LastSearchType = 0
-    Shift = 0
+    shift = 0
     ElseIf SelText <> "" Or s$ <> "" Then
         If LastSearchType > 0 Then
             If SelText <> "" Then s$ = SelText
@@ -7996,34 +8081,34 @@ If (Shift And 4) = 4 Then KeyCode = 0: Shift = 0: noentrance = False: Exit Sub
         End If
     End If
 Case vbKeyF4
-If (Shift And 7) > 0 Then KeyCode = 0: Shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 If SelText <> "" Then mscatsub Else dothis
-Shift = 0
-KeyCode = 0
+shift = 0
+keycode = 0
 Case vbKeyF5
-If (Shift And 7) > 0 Then KeyCode = 0: Shift = 0: noentrance = False: Exit Sub
-If SelText <> "" Then rthissub Shift
-KeyCode = 0
-Shift = 0
+If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
+If SelText <> "" Then rthissub shift
+keycode = 0
+shift = 0
 Case vbKeyF6  ' Set/Show/Reset Para1
-If (Shift And 7) > 0 Then KeyCode = 0: Shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton para1, PosPara1
-KeyCode = 0
-Shift = 0
+keycode = 0
+shift = 0
 Case vbKeyF7  'Set/Show/Reset Para2
-If (Shift And 7) > 0 Then KeyCode = 0: Shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para2, PosPara2
-KeyCode = 0
-Shift = 0
+keycode = 0
+shift = 0
 Case vbKeyF8  'Set/Show/Reset Para2
-If (Shift And 7) > 0 Then KeyCode = 0: Shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para3, PosPara3
-KeyCode = 0
-Shift = 0
+keycode = 0
+shift = 0
 Case vbKeyF9  ' Count Words
 'If (shift And 7) > 1 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
-If (Shift And 7) = 1 Then
-Shift = 0
+If (shift And 7) = 1 Then
+shift = 0
 NoCenterLineEdit = Not NoCenterLineEdit
 If UserCodePage = 1253 Then
 If NoCenterLineEdit Then
@@ -8050,9 +8135,9 @@ End If
 End If
 End If
 End If
-KeyCode = 0
+keycode = 0
 Case vbKeyF10
-If (Shift And 7) > 1 Then KeyCode = 0: Shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 1 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 showparagraph = Not showparagraph
@@ -8060,25 +8145,25 @@ mDoc.WrapAgain
 Render
 End If
 ManualInform
-KeyCode = 0
+keycode = 0
 Case vbKeyF11
-If (Shift And 7) = 0 Then KeyCode = 0: Shift = 0: noentrance = False: Exit Sub
+If (shift And 7) = 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 fState = fState + 1
 SetME
 WrapAll
 ManualInform
 glistN.ShowMe
-KeyCode = 0
+keycode = 0
 Case vbKeyPageUp
 Case vbKeyPageDown
 Case vbKeyTab
 
 If UseTab And Not BlockStartPos <> BlockEndPos And (TabControl = 0 Or MyTrimLNoTab(Mid$(CurrentParagraph, 1, Charpos)) < Charpos) Then
-    Shift = Shift And &H1
+    shift = shift And &H1
     ctrl = False
     alt = False
     JJ = SelStart
-    If Shift = 0 Then
+    If shift = 0 Then
     If showparagraph Then
     showparagraph = False
     'SelStartSilent = JJ
@@ -8094,23 +8179,23 @@ If UseTab And Not BlockStartPos <> BlockEndPos And (TabControl = 0 Or MyTrimLNoT
           SelStart = JJ + 1
         End If
        
-         KeyCode = 0
+         keycode = 0
     ElseIf NLtrim(Mid$(CurrentParagraph, Charpos, 1)) = vbNullString Then
         SelStart = SelStart + 1
-        KeyCode = 8
+        keycode = 8
     ElseIf NLtrim(Myleft$(CurrentParagraph, Charpos - 1)) = vbNullString Then
-        KeyCode = 8
+        keycode = 8
     End If
     'End If
    
-    Shift = 0
+    shift = 0
  
 ElseIf TabControl > 0 Then
 conttab:
     If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
     nochange = True
-    Shift = Shift And &H1
-    glistN.Enabled = False
+    shift = shift And &H1
+    glistN.enabled = False
     
     If HaveMarkedText Then SelStartSilent = SelStart
     JJ = SelStart
@@ -8131,8 +8216,8 @@ conttab:
     If SelText <> "" Then
     
         a$ = vbCrLf + SelText & "*"
-        If Shift <> 0 Then
-        Shift = 0
+        If shift <> 0 Then
+        shift = 0
         a$ = Replace(a$, vbCrLf + String(TabControl + (Len(CurrentParagraph) - Len(LTrim(CurrentParagraph))) Mod TabControl, ChrW(160)), vbCrLf)
             a$ = Replace(a$, vbCrLf + space$(TabControl + (Len(CurrentParagraph) - Len(LTrim(CurrentParagraph))) Mod TabControl), vbCrLf)
             InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
@@ -8148,9 +8233,9 @@ conttab:
         End If
         
     Else
-    If Shift <> 0 Then
+    If shift <> 0 Then
     
-      Shift = 0
+      shift = 0
         If MyTrimL2(Mid$(CurrentParagraph, 1, TabControl)) = 0 Then
     
                 SelStartSilent = ii
@@ -8172,19 +8257,19 @@ conttab:
             SelStartSilent = where + TabControl
         End If
     End If
-    glistN.Enabled = True
+    glistN.enabled = True
         ReColorBlock
     Render
     nochange = False
     End If
-    KeyCode = 0  ' new
-    Shift = 0 ' new
+    keycode = 0  ' new
+    shift = 0 ' new
 ElseIf BlockStartPos <> BlockEndPos And HaveMarkedText Then
 conttab1:
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 nochange = True
-Shift = Shift And &H1
-glistN.Enabled = False
+shift = shift And &H1
+glistN.enabled = False
 
 If HaveMarkedText Then SelStartSilent = SelStart
 JJ = SelStart
@@ -8204,8 +8289,8 @@ End If
 
 If SelText <> "" Then
     a$ = vbCrLf + SelText & "*"
-    If Shift <> 0 Then
-    Shift = 0
+    If shift <> 0 Then
+    shift = 0
     a$ = Replace(a$, vbCrLf + ChrW(9), vbCrLf)
        ' a$ = Replace(a$, vbCrLf + String(1 + (Len(CurrentParagraph) - Len(LTrim(CurrentParagraph))), ChrW(9)), vbCrLf)
         InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
@@ -8222,8 +8307,8 @@ If SelText <> "" Then
     
 
 Else
-If Shift <> 0 Then
-Shift = 0
+If shift <> 0 Then
+shift = 0
     If Mid$(CurrentParagraph, 1, 1) = ChrW(9) Or Mid$(CurrentParagraph, 1, 1) = ChrW(9) Then
 
             SelStartSilent = ii
@@ -8245,13 +8330,13 @@ Shift = 0
         SelStartSilent = where + 1
     End If
 End If
-glistN.Enabled = True
+glistN.enabled = True
     ReColorBlock
 Render
 nochange = False
 End If
-KeyCode = 0
-Shift = 0
+keycode = 0
+shift = 0
 
 End If
 
@@ -8262,8 +8347,8 @@ End Select
 noentrance = False
 End Sub
 Sub SearchDown(s$, Optional anystr As Boolean = False)
-Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
-w = mDoc.MarkParagraphID   ' this is the not the order
+Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
+W = mDoc.MarkParagraphID   ' this is the not the order
 SelStartSilent = SelStart
 l = Charpos
 
@@ -8272,29 +8357,29 @@ TempLcid = FoundLocaleId(s$)
 If TempLcid <> 0 Then mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
-  If Not mDoc.FindStrDown(s$, w, l) Then GoTo sdnOut
+  If Not mDoc.FindStrDown(s$, W, l) Then GoTo sdnOut
   Else
-    If Not mDoc.FindWord(s$, True, w, l) Then GoTo sdnOut
+    If Not mDoc.FindWord(s$, True, W, l) Then GoTo sdnOut
     End If
 Else
     If WordOnly Then
-    If Not mDoc.FindWord(s$, True, w, l) Then GoTo sdnOut
+    If Not mDoc.FindWord(s$, True, W, l) Then GoTo sdnOut
     Else
-    If Not mDoc.FindIdentifier(s$, True, w, l) Then GoTo sdnOut
+    If Not mDoc.FindIdentifier(s$, True, W, l) Then GoTo sdnOut
     End If
 End If
 SelLengthSilent = 0
-mDoc.MarkParagraphID = w
-glistN.Enabled = False
+mDoc.MarkParagraphID = W
+glistN.enabled = False
 ParaSelStart = l
-glistN.Enabled = True
+glistN.enabled = True
 SelLength = Len(s$)
 sdnOut:
 mDoc.lcid = OldLcid
 End Sub
 Sub Searchup(s$, Optional anystr As Boolean = False)
-Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
-w = mDoc.MarkParagraphID
+Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
+W = mDoc.MarkParagraphID
 SelStartSilent = SelStart - (SelLength > 1)
 l = Charpos + Len(s$)
 OldLcid = mDoc.lcid
@@ -8302,22 +8387,22 @@ TempLcid = FoundLocaleId(s$)
 If TempLcid <> 0 Then mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
-   If Not mDoc.FindStrUp(s$, w, l) Then GoTo sdupOut
+   If Not mDoc.FindStrUp(s$, W, l) Then GoTo sdupOut
    Else
-       If Not mDoc.FindWord(s$, False, w, l) Then GoTo sdupOut
+       If Not mDoc.FindWord(s$, False, W, l) Then GoTo sdupOut
     End If
 Else
     If WordOnly Then
-        If Not mDoc.FindWord(s$, False, w, l) Then GoTo sdupOut
+        If Not mDoc.FindWord(s$, False, W, l) Then GoTo sdupOut
     Else
-        If Not mDoc.FindIdentifier(s$, False, w, l) Then GoTo sdupOut
+        If Not mDoc.FindIdentifier(s$, False, W, l) Then GoTo sdupOut
     End If
 End If
 SelLengthSilent = 0
-mDoc.MarkParagraphID = w
-glistN.Enabled = False
+mDoc.MarkParagraphID = W
+glistN.enabled = False
 ParaSelStart = l
-glistN.Enabled = True
+glistN.enabled = True
 SelLength = Len(s$)
 sdupOut:
 mDoc.lcid = OldLcid
@@ -8345,11 +8430,11 @@ SearchDown s$
 End Sub
 Public Sub mscatsub()
 ''
-Dim l As Long, w As Long, s$, TempLcid As Long, OldLcid As Long
+Dim l As Long, W As Long, s$, TempLcid As Long, OldLcid As Long
 Dim el As Long, eW As Long, safety As Long, TT$
 
-w = mDoc.MarkParagraphID
-eW = w
+W = mDoc.MarkParagraphID
+eW = W
 SelStartSilent = SelStart  'MOVE CHARPOS TO SELSTART
 
 el = Charpos  ' charpos maybe is in the start or the end of block
@@ -8361,34 +8446,34 @@ If TempLcid <> 0 Then mDoc.lcid = TempLcid
 l = el + 1
 If EditTextWord Then
 Do
-If mDoc.FindWord(s$, True, w, l) Then
-TT$ = mDoc.TextParagraph(w)
+If mDoc.FindWord(s$, True, W, l) Then
+TT$ = mDoc.TextParagraph(W)
 Mid$(TT$, l, Len(s$)) = s$
-mDoc.ReWritePara w, TT$
-mDoc.WrapAgainBlock w, w
-mDoc.ColorThis (w)
+mDoc.ReWritePara W, TT$
+mDoc.WrapAgainBlock W, W
+mDoc.ColorThis (W)
 Else
-w = 1
+W = 1
 l = 0
 safety = safety + 1
 End If
-Loop Until (w = eW And l = el) Or safety = 2
+Loop Until (W = eW And l = el) Or safety = 2
 
 Else
 Do
-If mDoc.FindIdentifier(s$, True, w, l) Then
-TT$ = mDoc.TextParagraph(w)
+If mDoc.FindIdentifier(s$, True, W, l) Then
+TT$ = mDoc.TextParagraph(W)
 Mid$(TT$, l, Len(s$)) = s$
-mDoc.TextParagraph(w) = TT$
-mDoc.WrapAgainBlock w, w
-mDoc.ColorThis (w)
+mDoc.TextParagraph(W) = TT$
+mDoc.WrapAgainBlock W, W
+mDoc.ColorThis (W)
 
 Else
-w = 1
+W = 1
 l = 0
 safety = safety + 1
 End If
-Loop Until (w = eW And l = el) Or safety = 2
+Loop Until (W = eW And l = el) Or safety = 2
 
 End If
 mDoc.lcid = OldLcid
@@ -8396,22 +8481,22 @@ Render
 If glistN.Visible Then glistN.SetFocus
 End Sub
 
-Public Sub rthissub(Optional Shift As Integer)
-Dim l As Long, w As Long, s$, TempLcid As Long, OldLcid As Long
+Public Sub rthissub(Optional shift As Integer)
+Dim l As Long, W As Long, s$, TempLcid As Long, OldLcid As Long
 Dim el As Long, eW As Long, safety As Long, TT$, w1 As Long, i1 As Long, noinp As Double
 Dim neo$, mDoc10 As Document, addthat As Long, w2 As Long, ok1 As Boolean
 Dim anystr As Boolean
 Dim prof1 As New clsProfiler
-w = mDoc.MarkParagraphID
-eW = w
+W = mDoc.MarkParagraphID
+eW = W
 w2 = -1
 SelStartSilent = SelStart  'MOVE CHARPOS TO SELSTART
 el = Charpos  ' charpos maybe is in the start or the end of block
 s$ = Trim$(SelText)
 SelStartSilent = SelStart
 el = Charpos  ' charpos maybe is in the start or the end of block
-If Shift Mod 2 = 1 Then
-Shift = 0
+If shift Mod 2 = 1 Then
+shift = 0
 anystr = True
 If pagio$ = "GREEK" Then
 neo$ = InputBoxN("Αλλαγή Χαρακτήρων", "Διορθωτής Κειμένου", s$, noinp)
@@ -8460,27 +8545,27 @@ prof1.MARKONE
 glistN.SuspDraw = True
 i1 = el
 l = i1 + addthat
-w1 = w
+w1 = W
 If EditTextWord Or WordOnly Then
 glistN.DropKey = True
 Do
 
 If anystr Then
-ok1 = mDoc.FindStrDown(s$, w, l)
+ok1 = mDoc.FindStrDown(s$, W, l)
 Else
-ok1 = mDoc.FindWord(s$, True, w, l)
+ok1 = mDoc.FindWord(s$, True, W, l)
 End If
 If ok1 Then
-If w2 > 0 Then If w2 <> w Then mDoc.WrapAgainBlock w2, w2:  mDoc.ColorThis w2
-w2 = w
-If safety And w = w1 Then
+If w2 > 0 Then If w2 <> W Then mDoc.WrapAgainBlock w2, w2:  mDoc.ColorThis w2
+w2 = W
+If safety And W = w1 Then
 
 If l = i1 Then
  SelLengthSilent = 0
-mDoc.MarkParagraphID = w
-glistN.Enabled = False
+mDoc.MarkParagraphID = W
+glistN.enabled = False
 ParaSelStart = l
-glistN.Enabled = True
+glistN.enabled = True
 SelLength = Len(s$)
 AddUndo ""
 SelText = neo$
@@ -8493,10 +8578,10 @@ Else
 End If
 End If
 SelLengthSilent = 0
-mDoc.MarkParagraphID = w
-glistN.Enabled = False
+mDoc.MarkParagraphID = W
+glistN.enabled = False
 ParaSelStart = l
-glistN.Enabled = True
+glistN.enabled = True
 SelLength = Len(s$)
 AddUndo ""
 SelText = neo$
@@ -8506,7 +8591,7 @@ undoprev = True
 'l = l + Len(neo$)
 
 Else
-w = 1
+W = 1
 l = 0
 safety = safety + 1
 End If
@@ -8518,16 +8603,16 @@ Else
 
 glistN.DropKey = True
 Do
-If mDoc.FindIdentifier(s$, True, w, l) Then
-If w2 > 0 Then If w2 <> w Then mDoc.WrapAgainBlock w2, w2:  mDoc.ColorThis w2
-w2 = w
-If safety And w = w1 Then
+If mDoc.FindIdentifier(s$, True, W, l) Then
+If w2 > 0 Then If w2 <> W Then mDoc.WrapAgainBlock w2, w2:  mDoc.ColorThis w2
+w2 = W
+If safety And W = w1 Then
 If l = i1 Then
  SelLengthSilent = 0
-mDoc.MarkParagraphID = w
-glistN.Enabled = False
+mDoc.MarkParagraphID = W
+glistN.enabled = False
 ParaSelStart = l
-glistN.Enabled = True
+glistN.enabled = True
 SelLength = Len(s$)
 AddUndo ""
 SelText = neo$
@@ -8540,10 +8625,10 @@ Else
 End If
 End If
 SelLengthSilent = 0
-mDoc.MarkParagraphID = w
-glistN.Enabled = False
+mDoc.MarkParagraphID = W
+glistN.enabled = False
 ParaSelStart = l
-glistN.Enabled = True
+glistN.enabled = True
 SelLength = Len(s$)
 AddUndo ""
 SelText = neo$
@@ -8552,7 +8637,7 @@ undoprev = True
 l = l + Len(neo$)
 
 Else
-w = 1
+W = 1
 l = 0
 safety = safety + 1
 End If
@@ -8590,9 +8675,9 @@ Else ' goto that paragraph
     If Not mDoc.InvalidPara(para) Then
         SelLengthSilent = 0
         mDoc.MarkParagraphID = para
-        glistN.Enabled = False
+        glistN.enabled = False
         ParaSelStart = pospara
-        glistN.Enabled = True
+        glistN.enabled = True
         ManualInform
     Else
         para = 0
@@ -8665,7 +8750,7 @@ Public Property Let MultiLineComment2(ByVal vNewValue As Variant)
 mMultiLineComment2 = vNewValue
 mDoc.Final = vNewValue
 End Property
-Public Sub PopUpMenu(poptitle$, X As Variant, y As Variant)
+Public Sub PopUpMenu(poptitle$, X As Variant, Y As Variant)
 Dim oldModalId As Variant, i As Long
 ''If UsedAsTextBox Then Exit Sub
 i = SelLength
@@ -8682,7 +8767,7 @@ Modalid = Rnd * 113314324
 'UnHook Callback.hWnd
 UNhookMe
 MyPopUp.feedlabels Me, False
-MyPopUp.UpGui Callback, X, y, poptitle$
+MyPopUp.UpGui Callback, X, Y, poptitle$
 MyPopUp.Visible = True
 MyPopUp.ZOrder 0
 
@@ -8854,10 +8939,10 @@ glistN.EditFlag = OnOff
 glistN.NoCaretShow = NoMark
 End Sub
 Sub Transparent()
-Dim X  As Long, y As Long
+Dim X  As Long, Y As Long
 glistN.BackStyle = 1
-glistN.GetLeftTop X, y
-glistN.RepaintFromOut Callback.Image, X, y
+glistN.GetLeftTop X, Y
+glistN.RepaintFromOut Callback.Image, X, Y
 glistN.ShowMe
 Callback.RefreshList = Callback.RefreshList + 1
 End Sub
@@ -9156,10 +9241,10 @@ On Error Resume Next
 Set LastGlist = Nothing
 UnHook Callback.hWnd
 End Sub
-Function ISSTRINGb(bb$, R$) As Boolean
+Function ISSTRINGb(BB$, R$) As Boolean
 '
-Dim q$, w As Long, a$
-a$ = NLtrim$(bb$)
+Dim q$, W As Long, a$
+a$ = NLtrim$(BB$)
 R$ = vbNullString
 If a$ = vbNullString Then Exit Function
 Select Case Myleft$(a$, 1)
@@ -9170,23 +9255,23 @@ q$ = Right$(stringsep2, 1)
 End Select
 If q$ = vbNullString Or Len(a$) < 2 Then ISSTRINGb = False: Exit Function
 If q$ = Chr(34) Then
-    w = 1
+    W = 1
     Do
-    w = w + 1
-    w = InStr(w, a$, q$)
-    If w > 0 Then
-    If Mid$(a$, w - 1, 1) <> "\" Then Exit Do
-    ElseIf w = 0 Then
+    W = W + 1
+    W = InStr(W, a$, q$)
+    If W > 0 Then
+    If Mid$(a$, W - 1, 1) <> "\" Then Exit Do
+    ElseIf W = 0 Then
     Exit Do
     End If
     Loop
 
 Else
-w = InStr(2, a$, q$, vbBinaryCompare)
+W = InStr(2, a$, q$, vbBinaryCompare)
 End If
-If w = 0 Then ISSTRINGb = False: Exit Function
-R$ = Mid$(a$, 2, w - 2)
-bb$ = NLtrim$(Mid$(a$, w + 1))
+If W = 0 Then ISSTRINGb = False: Exit Function
+R$ = Mid$(a$, 2, W - 2)
+BB$ = NLtrim$(Mid$(a$, W + 1))
 
 ISSTRINGb = True
 
@@ -10030,7 +10115,7 @@ If UsedAsTextBox Or NumberOnly Or NumberIntOnly Then Callback.SendFKEY a
 End If
 End Sub
 
-Public Sub AccKey(a, Optional Shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
 If MyIsNumeric(a) Then
 a = CLng(a)
@@ -10048,7 +10133,7 @@ End Select
 End If
 If Opcode < 0 Then Opcode = 0
 If a = 0 Then Exit Sub
-a = a - 1000 * Shift - 10000 * ctrl - 100000 * alt
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
 Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
 Private Sub gListN_AccKey(m As Long)

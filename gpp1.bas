@@ -1,24 +1,24 @@
 Attribute VB_Name = "gpp1"
 Option Explicit
 Public pw As Long, ph As Long, psw As Long, psh As Long, pwox As Long, phoy As Long, mydpi As Long, prFactor As Single, szFactor As Single
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
-Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
       Private Type DOCINFO
           cbSize As Long
           lpszDocName As String
           lpszOutput As String
       End Type
             Private Declare Function StartDoc Lib "gdi32" Alias "StartDocA" _
-          (ByVal Hdc As Long, lpdi As DOCINFO) As Long
+          (ByVal hdc As Long, lpdi As DOCINFO) As Long
 
-      Private Declare Function StartPage Lib "gdi32" (ByVal Hdc As Long) _
+      Private Declare Function StartPage Lib "gdi32" (ByVal hdc As Long) _
           As Long
 
-      Private Declare Function EndDoc Lib "gdi32" (ByVal Hdc As Long) _
+      Private Declare Function EndDoc Lib "gdi32" (ByVal hdc As Long) _
           As Long
 
-      Private Declare Function EndPage Lib "gdi32" (ByVal Hdc As Long) _
+      Private Declare Function EndPage Lib "gdi32" (ByVal hdc As Long) _
           As Long
 Private mp_hdc As Long
 Public MyDM() As Byte
@@ -31,10 +31,10 @@ Private Const PHYSICALWIDTH As Long = 110
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
 
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal Hdc As Long, ByVal iCapabilitiy As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal iCapabilitiy As Long) As Long
 
       Private Declare Function ResetDC Lib "gdi32" Alias "ResetDCA" _
-          (ByVal Hdc As Long, lpInitData As Any) As Long
+          (ByVal hdc As Long, lpInitData As Any) As Long
 Private Declare Function CreateIC Lib "gdi32" Alias "CreateICA" _
           (ByVal lpDriverName As String, ByVal lpDeviceName As String, _
           ByVal lpOutput As String, lpInitData As Any) As Long
@@ -45,7 +45,7 @@ Private Declare Function CreateIC Lib "gdi32" Alias "CreateICA" _
       Private Declare Function CreateDC Lib "gdi32" Alias "CreateDCA" _
           (ByVal lpDriverName As String, ByVal lpDeviceName As String, _
           ByVal lpOutput As Long, lpInitData As Any) As Long
-      Private Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) _
+      Private Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) _
           As Long
       Private Const NULLPTR = 0&
       ' Constants for DEVMODE
@@ -345,44 +345,44 @@ Dim pDevMode As DEVMODE
          'Call CopyMemory(dm(1), pDevMode, Len(pDevMode))
 End Function
 Public Sub associate(EXT As String, FileType As String, _
-  ByVal Filename As String)
+  ByVal FileName As String)
 On Error Resume Next
-Filename = mylcasefILE(Filename)
+FileName = mylcasefILE(FileName)
 Dim b As Object
 Set b = CreateObject("wscript.shell")
 EXT = "." & Replace(UCase(EXT), ".", "")
-If Filename = vbNullString Then Exit Sub
-b.regwrite "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\" & ExtractNameOnly(Filename, True), Filename
+If FileName = vbNullString Then Exit Sub
+b.regwrite "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\" & ExtractNameOnly(FileName, True), FileName
 b.regwrite "HKCR\" & EXT & "\", FileType
 b.regwrite "HKCR\" & FileType & "\", EXT & " M2000 file"  'EXT & "_auto_file"
-b.regwrite "HKCR\" & FileType & "\DefaultIcon\", Filename & ",0"
-b.regwrite "HKCR\" & FileType & "\shell\open\command\", Filename & " ""%1"" "
-b.regwrite "HKLM\SOFTWARE\Classes\" & ExtractName(Filename) & "\", EXT & " M2000 file"
-b.regwrite "HKLM\SOFTWARE\Classes\" & ExtractName(Filename) & "\DefaultIcon\", Filename & ",0"
-b.regwrite "HKLM\SOFTWARE\Classes\" & ExtractName(Filename) & "\shell\open\command\", Filename & " ""%1"" "
-b.regwrite "HKCR\Applications\" & FileType & "\shell\open\command\", Filename & " ""&l"" "
+b.regwrite "HKCR\" & FileType & "\DefaultIcon\", FileName & ",0"
+b.regwrite "HKCR\" & FileType & "\shell\open\command\", FileName & " ""%1"" "
+b.regwrite "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\", EXT & " M2000 file"
+b.regwrite "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\DefaultIcon\", FileName & ",0"
+b.regwrite "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\shell\open\command\", FileName & " ""%1"" "
+b.regwrite "HKCR\Applications\" & FileType & "\shell\open\command\", FileName & " ""&l"" "
 b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\Application"
-b.regwrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\Application", Filename
+b.regwrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\Application", FileName
 b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\OpenWithList\"
-b.regwrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\OpenWithList\", Filename
+b.regwrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\OpenWithList\", FileName
 
 End Sub
 Public Sub deassociate(EXT As String, FileType As String, _
-  ByVal Filename As String)
+  ByVal FileName As String)
 On Error Resume Next
-Filename = mylcasefILE(Filename)
+FileName = mylcasefILE(FileName)
 Dim b As Object
 Set b = CreateObject("wscript.shell")
 EXT = "." & Replace$(EXT, ".", "")
-If Filename = vbNullString Then Exit Sub
-b.regdelete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\" & ExtractNameOnly(Filename, True)
+If FileName = vbNullString Then Exit Sub
+b.regdelete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\" & ExtractNameOnly(FileName, True)
 b.regdelete "HKCR\" & EXT & "\" ', FileType
 b.regdelete "HKCR\" & FileType & "\shell\open\command\" ', Filename & " ""&l"" "
 b.regdelete "HKCR\" & FileType & "\DefaultIcon\" ', Filename & ",0"
 b.regdelete "HKCR\" & FileType & "\" ', EXT * " file"
-b.regdelete "HKLM\SOFTWARE\Classes\" & ExtractName(Filename) & "\shell\open\command\" ', Filename & " ""&l"" "
-b.regdelete "HKLM\SOFTWARE\Classes\" & ExtractName(Filename) & "\DefaultIcon\" ', Filename & ",0"
-b.regdelete "HKLM\SOFTWARE\Classes\" & ExtractName(Filename) & "\" ', EXT * " file"
+b.regdelete "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\shell\open\command\" ', Filename & " ""&l"" "
+b.regdelete "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\DefaultIcon\" ', Filename & ",0"
+b.regdelete "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\" ', EXT * " file"
 b.regdelete "HKCR\Applications\" & FileType & "\shell\open\command\" ', Filename & " ""&l"" "
 b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\Application"
 b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\OpenWithList\"
@@ -420,6 +420,13 @@ Else
 uintnew1 = CCur(a)
 End If
 End Function
+Function SignInt64(v)
+If v >= limitlonglong Then v = v - maxlonglong
+    SignInt64 = cInt64(v)
+
+End Function
+
+
 Function uintnew0(ByVal a As Currency) As Double
 If a > 2147483647@ Then a = 2147483647@
 If a < -2147483648@ Then a = -2147483648@
@@ -535,35 +542,55 @@ PACKLNGUnsign$ = Right$("00000000" & Hex$(cUlng2(CDbl(-a))), 8)
 Else
 PACKLNGUnsign$ = Right$("00000000" & Hex$(cUlng2(CDbl(a))), 8)
 End If
-
 End Function
 Function PACKLNG$(ByVal a As Double) ' change to get negative values
 If a > 2147483647# Then a = 2147483647#
 If a < -2147483648# Then a = -2147483648#
 PACKLNG$ = Right$("00000000" & Hex$(CLng(a)), 8)
 End Function
-Function PACKLNG2$(ByVal a As Double)  ' with error return..for revision print, change for Write to file, to cutoff excess
+Function PACKLNG2$(z)  ' with error return..for revision print, change for Write to file, to cutoff excess
 ' this if only for print
-Dim internal As Long
-a = Int(a)
-If a > 4294967296# Then
-PACKLNG2$ = "???+"
-ElseIf a < 0 Then
-' error
-PACKLNG2$ = "???-"
-Else
-    If a > 2147483647# Then
-    internal = CLng(a - 4294967296#)
+On Error GoTo er10
+Dim internal As Long, a As Currency, high$
+If CheckInt64(z) Then
+    CopyMemory internal, ByVal VarPtr(z) + 12, 4
+    If internal <> 0 Then
+        If (internal And &HFFFF0000) = 0 Then
+            high$ = "0x" + Right$("0000" & Hex$(internal), 4)
+        Else
+            high$ = "0x" + Right$("00000000" & Hex$(internal), 8)
+        End If
+        CopyMemory internal, ByVal VarPtr(z) + 8, 4
+        PACKLNG2$ = high$ + Right$("00000000" & Hex$(internal), 8)
     Else
-    internal = CLng(a)
+        CopyMemory internal, ByVal VarPtr(z) + 8, 4
+        GoTo jump1
     End If
-
-If internal <= 65535# And internal >= 0# Then
-PACKLNG2$ = "0x" + Right$("0000" & Hex$(internal), 4)
 Else
-PACKLNG2$ = "0x" + Right$("00000000" & Hex$(internal), 8)
+    a = CCur(Int(z))
+    If a > 4294967296# Then
+        PACKLNG2$ = "???+"
+    ElseIf a < 0 Then
+        ' error
+        PACKLNG2$ = "???-"
+    Else
+        If a > 2147483647# Then
+            internal = CLng(a - 4294967296#)
+        Else
+            internal = CLng(a)
+        End If
+jump1:
+        If internal And &HFFFF0000 = 0 Then
+            PACKLNG2$ = "0x" + Right$("0000" & Hex$(internal), 4)
+        Else
+            PACKLNG2$ = "0x" + Right$("00000000" & Hex$(internal), 8)
+        End If
+    End If
 End If
-End If
+Exit Function
+er10:
+PACKLNG2$ = "????"
+
 Exit Function
 End Function
 Function UNPACKLNG(ByVal s$) As Long

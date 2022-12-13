@@ -56,37 +56,37 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Private gokeyboard As Boolean, lastitem As Long, part1 As String, lastgoodnum As Long
 Private height1, width1
-Dim Lx As Long, lY As Long, dr As Boolean
+Dim lX As Long, lY As Long, dr As Boolean
 Dim bordertop As Long, borderleft As Long, lastshift As Integer
 Dim allheight As Long, allwidth As Long, itemWidth As Long
 Private myobject As Object
 Public LASTActiveForm As Form, previewKey As Boolean
 Dim ttl$(1 To 2)
-Public Sub Up(Optional x As Variant, Optional y As Variant)
+Public Sub Up(Optional X As Variant, Optional Y As Variant)
 Dim hmonitor As Long
-If IsMissing(x) Then
-x = CSng(MOUSEX())
-y = CSng(MOUSEY())
+If IsMissing(X) Then
+X = CSng(MOUSEX())
+Y = CSng(MOUSEY())
 Else
-x = x + Form1.Left
-y = y + Form1.top
+X = X + Form1.Left
+Y = Y + Form1.top
 End If
-hmonitor = FindMonitorFromPixel(x, y)
-If x + Width > ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left Then
-If y + Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
-move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - Width, y - Height
+hmonitor = FindMonitorFromPixel(X, Y)
+If X + Width > ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left Then
+If Y + Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
+move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - Width, Y - Height
 Else
-move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - Width, y
+move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - Width, Y
 End If
-ElseIf y + Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
-move x, y - Height
+ElseIf Y + Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
+move X, Y - Height
 Else
-move x, y
+move X, Y
 End If
 Show
 MyDoEvents
 End Sub
-Public Sub UpGui(that As Object, x As Variant, y As Variant, thistitle$)
+Public Sub UpGui(that As Object, X As Variant, Y As Variant, thistitle$)
 Dim hmonitor As Long
 If thistitle$ <> "" Then
 gList1.HeadLine = vbNullString
@@ -96,19 +96,19 @@ Else
 gList1.HeadLine = vbNullString
 gList1.HeadlineHeight = 0
 End If
-x = x + that.Left
-y = y + that.top
-hmonitor = FindMonitorFromPixel(x, y)
-If x + Width > ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left Then
-If y + Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
-move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - Width, y - Height
+X = X + that.Left
+Y = Y + that.top
+hmonitor = FindMonitorFromPixel(X, Y)
+If X + Width > ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left Then
+If Y + Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
+move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - Width, Y - Height
 Else
-move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - Width, y
+move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - Width, Y
 End If
-ElseIf y + Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
-move x, y - Height
+ElseIf Y + Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
+move X, Y - Height
 Else
-move x, y
+move X, Y
 End If
 If thistilte$ <> "" Then
 
@@ -312,39 +312,39 @@ Private Sub Form_Load()
 Set LASTActiveForm = Screen.ActiveForm
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 
 If Button = 1 Then
     
     If Pouplastfactor = 0 Then Pouplastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
+    If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
     dr = True
     mousepointer = vbSizeNWSE
-    Lx = x
-    lY = y
+    lX = X
+    lY = Y
     End If
     
     Else
-    If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
+    If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then
     dr = True
     mousepointer = vbSizeNWSE
-    Lx = x
-    lY = y
+    lX = X
+    lY = Y
     End If
     End If
 
 End If
 End Sub
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
 End If
 If dr Then
 
@@ -352,12 +352,12 @@ If dr Then
 
 If bordertop < 150 Then
 
-        If y < (Height - 150) Or y > Height Then addy = (y - lY)
-     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
+        If Y < (Height - 150) Or Y > Height Then addy = (Y - lY)
+     If X < (Width - 150) Or X > Width Then addX = (X - lX)
      
 Else
-    If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
-        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
+    If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
+        If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
     End If
     
 
@@ -386,10 +386,10 @@ Else
         
         If Pouplastfactor <> factor Then ScaleDialog Pouplastfactor, Width
 
-        Lx = x
+        lX = X
         
         Else
-        Lx = x * Pouplastfactor / factor
+        lX = X * Pouplastfactor / factor
              ScaleDialog Pouplastfactor, (Width + addX) * Pouplastfactor / factor
          
    
@@ -403,14 +403,14 @@ Else
         lY = lY * Pouplastfactor / factor
         End If
         Else
-        Lx = x
-        lY = y
+        lX = X
+        lY = Y
    
 End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 
 If dr Then Me.mousepointer = 0
 dr = False
@@ -445,7 +445,7 @@ End Sub
 
 
 
-Private Sub glist1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub glist1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 ''If X * dv15 > Width / 2 Then
 
 If item = -1 Then
@@ -502,7 +502,7 @@ Private Sub gList1_LostFocus()
 Unload Me
 End Sub
 
-Private Sub gList1_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub gList1_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 
 gokeyboard = False
 gList1.PromptLineIdent = 0
@@ -514,7 +514,7 @@ Private Sub glist1_RegisterGlist(this As gList)
 this.NoWheel = True '
 End Sub
 
-Private Sub gList1_ScrollSelected(item As Long, y As Long)
+Private Sub gList1_ScrollSelected(item As Long, Y As Long)
 If gokeyboard Then Exit Sub
 
 gList1.EditFlag = False

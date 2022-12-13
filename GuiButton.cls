@@ -51,17 +51,17 @@ Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Public Sub move(X, y, Optional w, Optional h)
+Public Sub move(X, Y, Optional w, Optional h)
 If IsMissing(w) Then
-glistN.MoveTwips CLng(X), CLng(y), 0, 0
+glistN.MoveTwips CLng(X), CLng(Y), 0, 0
 ElseIf IsMissing(h) Then
-glistN.MoveTwips CLng(X), CLng(y), CLng(w), 0
+glistN.MoveTwips CLng(X), CLng(Y), CLng(w), 0
 Else
-glistN.MoveTwips CLng(X), CLng(y), CLng(w), CLng(h)
+glistN.MoveTwips CLng(X), CLng(Y), CLng(w), CLng(h)
 End If
 End Sub
 Public Sub deconstruct()
-Shutdown
+ShutDown
 Set Callback = Nothing
   Set glistN = Nothing
 End Sub
@@ -89,14 +89,14 @@ With glistN
 .restrictLines = 1
 .CenterText = True
 .VerticalCenterText = True
-.Text = mCaptext
+.text = mCaptext
 .BackColor = rgb(200, 120, 60)
 Set .Font = ff
 .ForeColor = Callback.Controls(1).ForeColor
 shadowcol = -.ForeColor
 .dcolor = Callback.Controls(1).dcolor
 
-.Enabled = True
+.enabled = True
 .ListindexPrivateUse = 0
 .ShowMe
 End With
@@ -145,7 +145,7 @@ End If
 Callback.Controls(Callback.LastActive).SetFocus
 Exit Sub
 End If
-If Me.Enabled Then
+If Me.enabled Then
 If glistN.BackStyle = 1 Then
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".GotFocus(" + Str(mIndex) + ")"
@@ -161,7 +161,7 @@ End Sub
 
 Private Sub glistN_CheckLostFocus()
 
-If Me.Enabled Then
+If Me.enabled Then
 Callback.LastActive = ctrlName
 If glistN.BackStyle = 1 Then
   If mIndex >= 0 Then
@@ -185,7 +185,7 @@ Private Sub glistN_CtrlPlusF1()
       End If
 End Sub
 
-Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
+Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 glistN.ShowMe
 End Sub
 
@@ -248,20 +248,20 @@ Public Property Get Caption() As String
 Caption = mCaptext
 End Property
 
-Public Property Get index() As Long
-index = mIndex
+Public Property Get Index() As Long
+Index = mIndex
 End Property
 
-Friend Property Let index(ByVal RHS As Long)
+Friend Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
-Public Property Get Enabled() As Long
-Enabled = glistN.Enabled
+Public Property Get enabled() As Long
+enabled = glistN.enabled
 End Property
 
-Public Property Let Enabled(ByVal RHS As Long)
+Public Property Let enabled(ByVal RHS As Long)
 If glistN Is Nothing Then Exit Property
-glistN.Enabled = RHS
+glistN.enabled = RHS
 End Property
 Public Property Get WrapText() As Long
 WrapText = glistN.WrapText
@@ -290,11 +290,11 @@ End If
 
 'Retired
 End Sub
-Public Sub Shutdown()
+Public Sub ShutDown()
 On Error Resume Next
 If Not glistN Is Nothing Then
-glistN.Shutdown
-glistN.Enabled = False
+glistN.ShutDown
+glistN.enabled = False
 End If
 End Sub
 Public Sub FontAttr(ThisFontName, Optional ThisMode = -1, Optional ThisBold = True)
@@ -311,12 +311,12 @@ End Sub
 Public Sub Curve(RHS As Single)
 glistN.Curve False, RHS
 End Sub
-Public Property Get top() As Variant
+Public Property Get Top() As Variant
 'top = Callback.Controls(ctrlName).top
-top = glistN.TopTwips
+Top = glistN.TopTwips
 End Property
-Public Property Let top(ByVal RHS As Variant)
-Callback.Controls(ctrlName).top = RHS
+Public Property Let Top(ByVal RHS As Variant)
+Callback.Controls(ctrlName).Top = RHS
 End Property
 Public Property Get Left() As Variant
 Left = Callback.Controls(ctrlName).Left
@@ -362,10 +362,10 @@ Public Property Get Blink()
 Blink = glistN.BlinkTime
 End Property
 Sub Transparent()
-Dim X  As Long, y As Long
+Dim X  As Long, Y As Long
 glistN.BackStyle = 1
-glistN.GetLeftTop X, y
-glistN.RepaintFromOut Callback.Image, X, y
+glistN.GetLeftTop X, Y
+glistN.RepaintFromOut Callback.Image, X, Y
 glistN.ShowMe
 Callback.RefreshList = Callback.RefreshList + 1
 End Sub
@@ -408,36 +408,36 @@ Public Property Let icon(RHS)
 glistN.icon = RHS
 End Property
 
-Private Sub glistN_PreviewKeyboardUnicode(a As String)
-Callback.SpreadKey a
+Private Sub glistN_PreviewKeyboardUnicode(A As String)
+Callback.SpreadKey A
 End Sub
-Private Sub glistN_Fkey(a As Integer)
-If a > 1000 Then
-Callback.SendFKEY a - 1000
+Private Sub glistN_Fkey(A As Integer)
+If A > 1000 Then
+Callback.SendFKEY A - 1000
 Else
-Callback.SendFKEY a
+Callback.SendFKEY A
 End If
 End Sub
-Public Sub AccKey(a, Optional Shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(A, Optional Shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
-If MyIsNumeric(a) Then
-a = CLng(a)
-If a < 0 Then Exit Sub
-If a > 499 Then Exit Sub
+If MyIsNumeric(A) Then
+A = CLng(A)
+If A < 0 Then Exit Sub
+If A > 499 Then Exit Sub
 Else
-a = UCase(a)
-Select Case a
+A = UCase(A)
+Select Case A
 Case "F1" To "F9"
-a = 611 + val(Mid(a, 2))
+A = 611 + val(Mid(A, 2))
 Case Else
-a = AscW(a)
-If a > 126 Then a = 0
+A = AscW(A)
+If A > 126 Then A = 0
 End Select
 End If
 If Opcode < 0 Then Opcode = 0
-If a = 0 Then Exit Sub
-a = a - 1000 * Shift - 10000 * ctrl - 100000 * alt
-Callback.RegisterAcc a, ctrlName, Opcode
+If A = 0 Then Exit Sub
+A = A - 1000 * Shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc A, ctrlName, Opcode
 End Sub
 Private Sub gListN_AccKey(m As Long)
 Callback.AccProces m

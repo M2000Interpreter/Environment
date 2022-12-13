@@ -29,7 +29,7 @@ Enum cbnCallTypes
 End Enum
 ' Maybe need this http://support2.microsoft.com/kb/2870467/
 'To update oleaut32
-Private Declare Sub VariantCopy Lib "OleAut32.dll" (ByRef pvargDest As Variant, ByRef pvargSrc As Variant)
+Private Declare Sub VariantCopy Lib "oleaut32.dll" (ByRef pvargDest As Variant, ByRef pvargSrc As Variant)
 Private KnownProp As FastCollection
 Private Init As Boolean
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
@@ -44,7 +44,7 @@ Public Function FindDISPID(pobjTarget As Object, ByVal pstrProcName As Variant) 
     FindDISPID = -1
     If pobjTarget Is Nothing Then Exit Function
 
-    Dim a$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
+    Dim A$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
     ReDim myptr(0 To 0)
     myptr(0) = StrPtr(pstrProcName)
     
@@ -60,18 +60,18 @@ End If
 If lngRet = 0 Then FindDISPID = dispid
 End Function
 Public Sub ShutEnabledGuiM2000(Optional all As Boolean = False)
-Dim x As Form, bb As Boolean
+Dim X As Form, BB As Boolean
 
 Do
-For Each x In Forms
-bb = True
-If TypeOf x Is GuiM2000 Then
-    If x.enabled Then bb = False: x.CloseNow: bb = False: Exit For
+For Each X In Forms
+BB = True
+If TypeOf X Is GuiM2000 Then
+    If X.enabled Then BB = False: X.CloseNow: BB = False: Exit For
     
 End If
-Next x
+Next X
 
-Loop Until bb Or Not all
+Loop Until BB Or Not all
 
 End Sub
 
@@ -108,19 +108,23 @@ Dim myptr() As Long
 Dim mm As GuiM2000
 Dim mmm As mArray
     ' Get IDispatch from object
+    If TypeOf pobjTarget Is ExtControl Then
+    Set pobjTarget = pobjTarget.Value
+    End If
     Set IDsp = pobjTarget
-
-    ' Get DISPIP from pstrProcName
     If fixnamearg = 0 Then
         ReDim varDISPID(0 To 0)
 If Not getone(Typename$(pobjTarget) & "." & pstrProcName, dispid) Then
             ReDim myptr(0 To 0)
             myptr(0) = StrPtr(pstrProcName)
-            lngRet = IDsp.GetIDsOfNames(riid, myptr(0), 1&, Clid, varDISPID(0))
             
+            lngRet = IDsp.GetIDsOfNames(riid, myptr(0), 1&, Clid, varDISPID(0))
+            'if varDISPID(0)=-2147414014
             If lngRet = 0 Then dispid = varDISPID(0): PushOne Typename$(pobjTarget) & "." & pstrProcName, dispid
             Else
+            
             lngRet = 0
+            
 End If
 Else
          ReDim myptr(0 To fixnamearg)
@@ -131,6 +135,10 @@ Else
                 ReDim varDISPID(0 To fixnamearg)
             lngRet = IDsp.GetIDsOfNames(riid, myptr(0), fixnamearg + 1, Clid, varDISPID(0))
             dispid = varDISPID(0)
+            If dispid = -2147414014 Then
+            Stop
+            
+            End If
             
 End If
     If lngRet = 0 Then
@@ -155,7 +163,7 @@ passhere:
                     varArr(fixnamearg + items - 1 - lngLoop) = mmm.ExportStrArray()
                     End If
 '
-                    ElseIf Typename(mmm.refArray) = "Long" Then
+                    ElseIf VarTypeName(mmm.refArray) = "Long" Then
                     If mmm.IsByValue Then
                         varArr(fixnamearg + items - 1 - lngLoop) = mmm.ExportArrayCopy()
                     Else
@@ -202,6 +210,9 @@ passhere:
               End If
                 End With
                 If lngRet = -1 Then GoTo JUMPHERE
+                If dispid = -2147414014 Then
+                GoTo jumpe1
+                End If
 Else
     With params
         .cArgs = 0
@@ -257,41 +268,60 @@ JUMPHERE:
                    
                     Set myform = pobjTarget
                     MoveFormToOtherMonitorOnly myform
-                    pobjTarget.Modal = 0
-                   ' pobjTarget.Modal = 0
+                    If TypeOf pobjTarget Is GuiM2000 Then
+                        Set mm = pobjTarget
+                        mm.Modal = 0
+                        Set mm = Nothing
+                    Else
+                        pobjTarget.Modal = 0
+                    End If
+                   
                     End If
                ElseIf varArr(0) = 0 Then
                     CallByName pobjTarget, pstrProcName, VbMethod, 0, GiveForm()
                     Set myform = pobjTarget
                     MoveFormToOtherMonitorOnly myform
-                    pobjTarget.Modal = 0
-                    pobjTarget.Modal = 0
+                    If TypeOf pobjTarget Is GuiM2000 Then
+                        Set mm = pobjTarget
+                        mm.Modal = 0
+                        Set mm = Nothing
+                    Else
+                        pobjTarget.Modal = 0
+                    End If
                Else
 conthere:
                    Dim oldmoldid As Double, mycodeid As Double
                    oldmoldid = Modalid
                    mycodeid = Rnd * 1000000
-                   pobjTarget.Modal = mycodeid
-                   Dim x As Form, z As Form, zz As Form
+                   If TypeOf pobjTarget Is GuiM2000 Then
+                        Set mm = pobjTarget
+                        mm.Modal = mycodeid
+                        Set mm = Nothing
+                    Else
+                        pobjTarget.Modal = mycodeid
+                   End If
+                   Dim X As Form, z As Form, zz As Form
                    Set zz = Screen.ActiveForm
                    If zz.Name = "Form3" Then
                    Set zz = zz.lastform
                    End If
                    If Not pobjTarget.IamPopUp Then
-                        For Each x In Forms
-                            If x.Name = "GuiM2000" Then
-                            If x.Modal = 0 Then
-                                If Not x Is pobjTarget Then
-                                If x.TrueVisible Then
-                                    If x.Enablecontrol Then
-                                        x.Modal = mycodeid
-                                        x.Enablecontrol = False
+                        For Each X In Forms
+                            If X.Name = "GuiM2000" Then
+                            Set mm = X
+                            If mm.Modal = 0 Then
+                                If Not X Is pobjTarget Then
+                                If mm.TrueVisible Then
+                                    If mm.Enablecontrol Then
+                                        mm.Modal = mycodeid
+                                        mm.Enablecontrol = False
                                     End If
                                     End If
                                 End If
                                 End If
                             End If
-                        Next x
+                            Set mm = Nothing
+                        Next X
                     End If
                     If pobjTarget.NeverShow Then
                     Modalid = mycodeid
@@ -330,7 +360,7 @@ conthere:
                                         If Screen.ActiveForm.PopUpMenuVal Or Screen.ActiveForm.IamPopUp Then
                                             handlepopup = True
                                         End If
-                                    ElseIf GetForegroundWindow <> Screen.ActiveForm.hWnd Then
+                                    ElseIf GetForegroundWindow <> Screen.ActiveForm.hwnd Then
                                         handlepopup = False
                                         If Screen.ActiveForm.PopUpMenuVal Or Screen.ActiveForm.IamPopUp Then
                                         If Screen.ActiveForm.Visible Then
@@ -350,14 +380,16 @@ conthere:
                     Modalid = mycodeid
                 End If
                 Set z = Nothing
-                For Each x In Forms
-                    If x.Name = "GuiM2000" Then
-                       ' If x.Modal = 0 Then
-                            x.TestModal mycodeid
-                            If x.Enablecontrol Then Set z = x
+                For Each X In Forms
+                    If X.Name = "GuiM2000" Then
+                        Set mm = X
+                        ' If x.Modal = 0 Then
+                        mm.TestModal mycodeid
+                        If mm.Enablecontrol Then Set z = X
+                        Set mm = Nothing
                         'End If
                     End If
-                Next x
+                Next X
                 If Not zz Is Nothing Then Set z = zz
                 If Typename(z) = "GuiM2000" Then
                     Set mm = z
@@ -378,7 +410,10 @@ conthere:
         CallByName pobjTarget, pstrProcName, VbMethod
     Else
         'CallByName pobjTarget, pstrProcName, VbMethod, varArr()
+jumpe1:
         Select Case items
+        Case 0
+        CallByName pobjTarget, pstrProcName, VbMethod
         Case 1
             CallByName pobjTarget, pstrProcName, VbMethod, varArr(0)
         Case 2
@@ -408,6 +443,9 @@ conthere:
         End Select
     End If
 Else
+If lngRet = -2147352573 Then
+GoTo jumpe1
+End If
     Err.Raise lngRet
 End If
 End If

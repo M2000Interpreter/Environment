@@ -1,11 +1,14 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 19 active-X
-1. A very rare bug founded and removed. This bug come from using operator for comparison for Groups (objects), when we use a pointer to group before the operator.
+Version 11 Revision 20 active-X
+1. Filelen() now return -1 and error when the file not exist.
+2. Update QRcode
+3. Added some UserControls from others. Now M2000 can load controls on user forms. We can make arrays of controls (and arrays of forms, which may have arrays of controls)
+4. Long Long type supported.
+5. Added HashList and RefArray, two intresting classes.
+ 
 
-2. New info examples: Priority, and Priority1 (for priority queues). Showkeys which open a user form now close using any key press (excluding special keys like arrows).
 
-3. New Functionality for User Forms: Using Windows key and up arrow or down arrow we can handle the maximize - restore to original size, for user forms which can change size. We must press the arrow key and quick press the window key, then press the appropriate arrow key again. The user forms in M2000 simulate the title bar, so this style normally didn't get the "maximize" command from windows, using Windows Key and arrows (there are many combinations, and yet I implement a fraction of it). Check it with info examples, press F8 to open mEditor, or run CS (c sharp editor) and htmlEditor.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
