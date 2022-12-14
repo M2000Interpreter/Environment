@@ -254,7 +254,7 @@ End Type
     Message As Long
     wParam As Long
     lParam As Long
-    Time As Long
+    time As Long
     pt As POINTAPI
 End Type
 Public Point2Me As Object
@@ -337,19 +337,19 @@ End If
         End If
 End Sub
 
-Private Sub dSprite_GotFocus(index As Integer)
+Private Sub dSprite_GotFocus(Index As Integer)
 If lockme Then TEXT1.SetFocus: Exit Sub
 
 End Sub
 
-Private Sub dSprite_LostFocus(index As Integer)
+Private Sub dSprite_LostFocus(Index As Integer)
 If iamactive Then
 iamactive = False
 DestroyCaret
 End If
 End Sub
 
-Private Sub dSprite_OLEDragOver(index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
+Private Sub dSprite_OLEDragOver(Index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -591,7 +591,7 @@ End Sub
 
 
 Private Sub List1_ListError(code As Long)
-Dim dummy As Long
+Dim Dummy As Long
 List1.ListIndex = -1
 List1.LeaveonChoose = False
 List1.Visible = False
@@ -599,7 +599,7 @@ If List1.Tag <> "" Then
 If QRY Or GFQRY Then
 Else
 
-dummy = interpret(Basestack1, List1.Tag)
+Dummy = interpret(Basestack1, List1.Tag)
 'Me.KeyPreview = True
 End If
 End If
@@ -649,7 +649,7 @@ Private Sub List1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByV
 If item = -1 Then
 
 Else
-List1.mousepointer = 1
+List1.MousePointer = 1
 If lastitem = item Then Exit Sub
 If List1.ListSep(item) Then Exit Sub
 List1.ListindexPrivateUse = item
@@ -671,12 +671,12 @@ End If
 End Sub
 
 Private Sub List1_PanLeftRight(direction As Boolean)
-Dim dummy As Boolean
+Dim Dummy As Boolean
 If List1.Tag <> "" Then
 If QRY Or GFQRY Then
 Else
 
-dummy = interpret(Basestack1, List1.Tag)
+Dummy = interpret(Basestack1, List1.Tag)
 'Me.KeyPreview = True
 End If
 Else
@@ -687,13 +687,13 @@ End If
 End Sub
 
 Private Sub List1_Selected2(item As Long)
-Dim dummy As Boolean
+Dim Dummy As Boolean
 
 If List1.Tag <> "" Then
 If QRY Or GFQRY Then
 Else
 
-dummy = interpret(Basestack1, List1.Tag)
+Dummy = interpret(Basestack1, List1.Tag)
 'Me.KeyPreview = True
 End If
 Else
@@ -717,11 +717,11 @@ End Sub
 
 Public Sub mscatsub()
 ''
-Dim l As Long, w As Long, s$, TempLcid As Long, OldLcid As Long
+Dim l As Long, W As Long, s$, TempLcid As Long, OldLcid As Long
 Dim el As Long, eW As Long, safety As Long, TT$
 
-w = TEXT1.mDoc.MarkParagraphID
-eW = w
+W = TEXT1.mDoc.MarkParagraphID
+eW = W
 TEXT1.SelStartSilent = TEXT1.SelStart  'MOVE CHARPOS TO SELSTART
 
 el = TEXT1.Charpos  ' charpos maybe is in the start or the end of block
@@ -733,33 +733,33 @@ If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 l = el + 1
 If EditTextWord Then
 Do
-If TEXT1.mDoc.FindWord(s$, True, w, l) Then
-TT$ = TEXT1.mDoc.TextParagraph(w)
+If TEXT1.mDoc.FindWord(s$, True, W, l) Then
+TT$ = TEXT1.mDoc.TextParagraph(W)
 Mid$(TT$, l, Len(s$)) = s$
-TEXT1.mDoc.ReWritePara w, TT$
-TEXT1.mDoc.WrapAgainBlock w, w
-TEXT1.mDoc.ColorThis (w)
+TEXT1.mDoc.ReWritePara W, TT$
+TEXT1.mDoc.WrapAgainBlock W, W
+TEXT1.mDoc.ColorThis (W)
 Else
-w = 1
+W = 1
 l = 0
 safety = safety + 1
 End If
-Loop Until (w = eW And l = el) Or safety = 2
+Loop Until (W = eW And l = el) Or safety = 2
 
 Else
 Do
-If TEXT1.mDoc.FindIdentifier(s$, True, w, l) Then
-TT$ = TEXT1.mDoc.TextParagraph(w)
+If TEXT1.mDoc.FindIdentifier(s$, True, W, l) Then
+TT$ = TEXT1.mDoc.TextParagraph(W)
 Mid$(TT$, l, Len(s$)) = s$
-TEXT1.mDoc.TextParagraph(w) = TT$
-TEXT1.mDoc.WrapAgainBlock w, w
-TEXT1.mDoc.ColorThis (w)
+TEXT1.mDoc.TextParagraph(W) = TT$
+TEXT1.mDoc.WrapAgainBlock W, W
+TEXT1.mDoc.ColorThis (W)
 Else
-w = 1
+W = 1
 l = 0
 safety = safety + 1
 End If
-Loop Until (w = eW And l = el) Or safety = 2
+Loop Until (W = eW And l = el) Or safety = 2
 
 End If
 TEXT1.mDoc.lcid = OldLcid
@@ -770,12 +770,12 @@ End Sub
 
 Public Sub rthissub(Optional anystr As Boolean = False)
 If TEXT1.mDoc.Busy Then Exit Sub
-Dim l As Long, w As Long, s$, TempLcid As Long, OldLcid As Long, noinp As Double
+Dim l As Long, W As Long, s$, TempLcid As Long, OldLcid As Long, noinp As Double
 Dim el As Long, eW As Long, safety As Long, TT$, w1 As Long, i1 As Long
 Dim neo$, mDoc10 As Document, addthat As Long, w2 As Long
 Dim prof1 As New clsProfiler
-w = TEXT1.mDoc.MarkParagraphID
-eW = w
+W = TEXT1.mDoc.MarkParagraphID
+eW = W
 TEXT1.SelStartSilent = TEXT1.SelStart  'MOVE CHARPOS TO SELSTART
 el = TEXT1.Charpos  ' charpos maybe is in the start or the end of block
 s$ = TEXT1.SelText
@@ -814,23 +814,23 @@ TEXT1.glistN.SuspDraw = True
 End If
 i1 = el
 l = i1 + addthat
-w1 = w
+w1 = W
 If EditTextWord Or anystr Then
 TEXT1.glistN.DropKey = True
 Dim ok1 As Boolean
 Do
 If anystr Then
-ok1 = TEXT1.mDoc.FindStrDown(s$, w, l)
+ok1 = TEXT1.mDoc.FindStrDown(s$, W, l)
 Else
-ok1 = TEXT1.mDoc.FindWord(s$, True, w, l)
+ok1 = TEXT1.mDoc.FindWord(s$, True, W, l)
 End If
 If ok1 Then
-If safety And w = w1 Then
-If w2 > 0 Then If w2 <> w Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
-w2 = w
+If safety And W = w1 Then
+If w2 > 0 Then If w2 <> W Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
+w2 = W
 If l = i1 Then
  TEXT1.SelLengthSilent = 0
-TEXT1.mDoc.MarkParagraphID = w
+TEXT1.mDoc.MarkParagraphID = W
  TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
  TEXT1.glistN.enabled = True
@@ -846,7 +846,7 @@ Else
 End If
 End If
 TEXT1.SelLengthSilent = 0
-TEXT1.mDoc.MarkParagraphID = w
+TEXT1.mDoc.MarkParagraphID = W
  TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
  TEXT1.glistN.enabled = True
@@ -858,7 +858,7 @@ TEXT1.GroupUndo
 '''l = l + Len(neo$)
 
 Else
-w = 1
+W = 1
 l = 0
 safety = safety + 1
 End If
@@ -870,15 +870,15 @@ Else
 ''If l > 0 Then l = l - 1
 TEXT1.glistN.DropKey = True
 Do
-If TEXT1.mDoc.FindIdentifier(s$, True, w, l) Then
+If TEXT1.mDoc.FindIdentifier(s$, True, W, l) Then
 'If w2 > 0 Then TEXT1.mDoc.ColorThis w2: TEXT1.WrapMarkedPara
-If w2 > 0 Then If w2 <> w Then TEXT1.mDoc.WrapAgainBlock w2, w2:    TEXT1.mDoc.ColorThis w2
-w2 = w
-If safety And w = w1 Then
+If w2 > 0 Then If w2 <> W Then TEXT1.mDoc.WrapAgainBlock w2, w2:    TEXT1.mDoc.ColorThis w2
+w2 = W
+If safety And W = w1 Then
 
 If l = i1 Then
  TEXT1.SelLengthSilent = 0
-TEXT1.mDoc.MarkParagraphID = w
+TEXT1.mDoc.MarkParagraphID = W
  TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
  TEXT1.glistN.enabled = True
@@ -894,7 +894,7 @@ Else
 End If
 End If
 TEXT1.SelLengthSilent = 0
-TEXT1.mDoc.MarkParagraphID = w
+TEXT1.mDoc.MarkParagraphID = W
  TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
  TEXT1.glistN.enabled = True
@@ -907,7 +907,7 @@ TEXT1.GroupUndo
 l = l + Len(neo$)
 
 Else
-w = 1
+W = 1
 l = 0
 safety = safety + 1
 End If
@@ -930,9 +930,9 @@ If s$ = vbNullString Or InStr(s$, Chr$(13)) > 0 Or InStr(s$, Chr$(10)) > 0 Then 
 SearchDown s$
 End Sub
 Sub SearchDown(s$, Optional anystr As Boolean = False)
-Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
+Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
 
-w = TEXT1.mDoc.MarkParagraphID   ' this is the not the order
+W = TEXT1.mDoc.MarkParagraphID   ' this is the not the order
 TEXT1.SelStartSilent = TEXT1.SelStart
 l = TEXT1.Charpos
 
@@ -941,15 +941,15 @@ TempLcid = FoundLocaleId(s$)
 If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
-  If Not TEXT1.mDoc.FindStrDown(s$, w, l) Then GoTo sdnOut
+  If Not TEXT1.mDoc.FindStrDown(s$, W, l) Then GoTo sdnOut
   Else
-    If Not TEXT1.mDoc.FindWord(s$, True, w, l) Then GoTo sdnOut
+    If Not TEXT1.mDoc.FindWord(s$, True, W, l) Then GoTo sdnOut
     End If
 Else
-    If Not TEXT1.mDoc.FindIdentifier(s$, True, w, l) Then GoTo sdnOut
+    If Not TEXT1.mDoc.FindIdentifier(s$, True, W, l) Then GoTo sdnOut
 End If
 TEXT1.SelLengthSilent = 0
-TEXT1.mDoc.MarkParagraphID = w
+TEXT1.mDoc.MarkParagraphID = W
 TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
@@ -966,8 +966,8 @@ If s$ = vbNullString Or InStr(s$, Chr$(13)) > 0 Or InStr(s$, Chr$(10)) > 0 Then 
 Searchup s$
 End Sub
 Sub Searchup(s$, Optional anystr As Boolean = False)
-Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
-w = TEXT1.mDoc.MarkParagraphID
+Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
+W = TEXT1.mDoc.MarkParagraphID
 TEXT1.SelStartSilent = TEXT1.SelStart - (TEXT1.SelLength > 1)
 l = TEXT1.Charpos + Len(s$)
 OldLcid = TEXT1.mDoc.lcid
@@ -975,15 +975,15 @@ TempLcid = FoundLocaleId(s$)
 If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
-   If Not TEXT1.mDoc.FindStrUp(s$, w, l) Then GoTo sdupOut
+   If Not TEXT1.mDoc.FindStrUp(s$, W, l) Then GoTo sdupOut
    Else
-       If Not TEXT1.mDoc.FindWord(s$, False, w, l) Then GoTo sdupOut
+       If Not TEXT1.mDoc.FindWord(s$, False, W, l) Then GoTo sdupOut
     End If
 Else
-    If Not TEXT1.mDoc.FindIdentifier(s$, False, w, l) Then GoTo sdupOut
+    If Not TEXT1.mDoc.FindIdentifier(s$, False, W, l) Then GoTo sdupOut
 End If
 TEXT1.SelLengthSilent = 0
-TEXT1.mDoc.MarkParagraphID = w
+TEXT1.mDoc.MarkParagraphID = W
 TEXT1.glistN.enabled = False
 TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
@@ -1061,24 +1061,24 @@ End Sub
 
 
 
-Private Sub dSprite_MouseDown(index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub dSprite_MouseDown(Index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim p As Long, u2 As Long
 If lockme Then Exit Sub
 If Not NoAction Then
 NoAction = True
 Dim sel&
-p = val("0" & dSprite(index).Tag)
+p = val("0" & dSprite(Index).Tag)
 With players(p)
     u2 = .uMineLineSpace * 2
 
         If Button > 0 And Targets Then
 
-        sel& = ScanTarget(q(), CLng(X), CLng(Y), index)
+        sel& = ScanTarget(q(), CLng(X), CLng(Y), Index)
             If sel& >= 0 Then
                 If Button = 1 Then
                 Select Case q(sel&).Id Mod 100
                 Case Is < 10
-                If Not interpret(DisStack, "LAYER " & dSprite(index).Tag + " {" + vbCrLf + q(sel&).Comm + vbCrLf & "}") Then Beep
+                If Not interpret(DisStack, "LAYER " & dSprite(Index).Tag + " {" + vbCrLf + q(sel&).Comm + vbCrLf & "}") Then Beep
                 Case Else
                 INK$ = q(sel&).Comm
                 End Select
@@ -1677,7 +1677,7 @@ Cancel = NoAction
 End Sub
 
 Private Sub iForm_Resize()
-DIS.move 0, 0, Scalewidth, Scaleheight
+DIS.move 0, 0, ScaleWidth, ScaleHeight
 End Sub
 Public Sub Up()
 UpdateWindow hWnd
@@ -1727,10 +1727,10 @@ Basestack1.myCharSet = 0
     TEXT1.Font.charset = Basestack1.myCharSet
     List1.Font.charset = Basestack1.myCharSet
 
-Basestack1.Owner.move 0, 0, Scalewidth, Scaleheight
+Basestack1.Owner.move 0, 0, ScaleWidth, ScaleHeight
 
 If NoAction Then Exit Sub
-Dim dummy As Boolean, i
+Dim Dummy As Boolean, i
 NOEXECUTION = False
 '
 myBreak Basestack1
@@ -1857,7 +1857,7 @@ NOEXECUTION = False
 MOUT = True
 End If
 
-    QUERY Basestack1, Prompt$, qq$, (mybasket.mx * 4), True
+    QUERY Basestack1, Prompt$, qq$, (mybasket.mX * 4), True
     If NOEXECUTION And MOUT Then
     If MKEY$ = "@Start" + Chr$(13) Then qq$ = "@start"
         NOEXECUTION = False
@@ -2054,28 +2054,28 @@ Else
 End Sub
     
 Private Sub List1_DblClick()
-Dim dummy As Boolean
+Dim Dummy As Boolean
 List1.Visible = False
 If List1.Tag <> "" Then
 If QRY Or GFQRY Then
 
 Else
 
-dummy = interpret(Basestack1, List1.Tag)
+Dummy = interpret(Basestack1, List1.Tag)
 'Me.KeyPreview = True
 End If
 End If
 End Sub
 
 Private Sub List1_KeyPress(KeyAscii As Integer)
-Dim dummy As Boolean
+Dim Dummy As Boolean
 If KeyAscii = 13 Then
 List1.Visible = False
 If List1.Tag <> "" Then
 If QRY Or GFQRY Then
 Else
 
-dummy = interpret(Basestack1, List1.Tag)
+Dummy = interpret(Basestack1, List1.Tag)
 'Me.KeyPreview = True
 End If
 End If
@@ -2108,7 +2108,7 @@ keycode = 0
  End If
  End If
  End If
- If TEXT1.UsedAsTextBox Then Result = 99
+ If TEXT1.UsedAsTextBox Then result = 99
 NOEDIT = True: noentrance = False: Exit Sub
 End If
 If keycode = vbKeyPause Then
@@ -2161,11 +2161,11 @@ End If
 If TEXT1.UsedAsTextBox Then
 Select Case keycode
 Case Is = vbKeyTab And (shift Mod 2 = 1), vbKeyUp
-Result = -1
+result = -1
 Case vbKeyReturn
-If Use13 Then Result = 13 Else Result = 1
+If Use13 Then result = 13 Else result = 1
 Case vbKeyTab, vbKeyDown
-Result = 1
+result = 1
 Case Else
 noentrance = False
 Exit Sub
@@ -2599,11 +2599,11 @@ exWnd = 0
 
 view1.Visible = False
 Sleep 1
-PREPARE bstack, t1
+Prepare bstack, t1
 Sleep 1
 If Form1.Visible Then Form1.Refresh
 End Sub
-Private Sub PREPARE(basestack As basetask, ByVal Nb As String)
+Private Sub Prepare(basestack As basetask, ByVal Nb As String)
 Dim g As Long, ic As Long
 Dim VP As String, vv As String, CM$, b As String
 If needset Then
@@ -2674,11 +2674,11 @@ look1 = False
 If IESizeX = 0 Or IESizeY < 100 Then
 IEX = 0
 IEY = 0
-IESizeX = Me.Scalewidth
-IESizeY = Me.Scaleheight
+IESizeX = Me.ScaleWidth
+IESizeY = Me.ScaleHeight
 End If
-If (IESizeX - IEX) > Me.Scalewidth Then IESizeX = Me.Scalewidth - IEX
-If (IESizeY - IEY) > Me.Scaleheight Then IESizeY = Me.Scaleheight - IEY
+If (IESizeX - IEX) > Me.ScaleWidth Then IESizeX = Me.ScaleWidth - IEX
+If (IESizeY - IEY) > Me.ScaleHeight Then IESizeY = Me.ScaleHeight - IEY
 If IsWine Then
 With view1
 On Error Resume Next
@@ -3073,8 +3073,8 @@ End If
 If OperatingSystem > System_Windows_7 Then
                 MouseShow True
                 ElseIf basestack.tolayer > 0 Or basestack.toback Then
-                 DIS.mousepointer = 1
-                          Set DIS.mouseicon = Nothing
+                 DIS.MousePointer = 1
+                          Set DIS.MouseIcon = Nothing
                                            
                End If
 End Sub

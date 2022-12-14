@@ -43,6 +43,7 @@ End If
 Do While ParamList <> ""
 
  If IsLabelSymbolNew(ParamList, "Ã¡ —’”", "LONG", Lang) Then
+ IsLabelSymbolNew ParamList, "Ã¡ —’”", "LONG", Lang
  If FastSymbol(ParamList, "&") Then l = 16 Else l = 0
  If IsPureLabel(ParamList, check$) = 1 Then
  'OK
@@ -127,8 +128,8 @@ ReDim t(16) As Long
 paramnum = -1
 End Sub
 
-Public Property Get count() As Long
-count = paramnum + 1
+Public Property Get Count() As Long
+Count = paramnum + 1
 End Property
 
 Public Property Get RetType() As Long

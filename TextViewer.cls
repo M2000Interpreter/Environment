@@ -1847,14 +1847,63 @@ EditDoc = EditDoc
 Dim what$, ThatPara As Long
    mDoc.TextParagraphLine2 item, what$, ThatPara, showparagraphWork And showparagraph
    mDoc.MarkParagraphID = ThatPara
+
+If glistN.DragEnabled Then Exit Sub
+If ClickInsideMarkedText Then
+    Dim m As Long, z As Long
+    If BlockStartLine = BlockEndline Then
+        z = InStr(2, SelText, ".")
+        If z > 1 Then
+            SelStartSilent = SelStart + z
+            SelLengthSilent = SelLength - z
+            FillBlock
+        ElseIf Right$(SelText, 1) = "(" Then
+            SelStartSilent = SelStart
+            SelLengthSilent = SelLength - 1
+            FillBlock
+        Else
+            m = SelLength
+            SelStartSilent = SelStart
+            SelLengthSilent = SelLength + 1
+            If m + 1 <> SelLength Then
+                SelLengthSilent = m
+                FillBlock
+            ElseIf Right$(SelText, 1) = "(" Then
+                SelStartSilent = LastSelStart
+                FillBlock
+            ElseIf Right$(SelText, 1) = "." Then
+               If BlockStartPos < BlockEndPos Then
+               m = BlockEndPos
+               Else
+               m = BlockStartPos
+               End If
+               z = mDoc.TextParagraphLen(ThatPara)
+                While InStr(glistN.WordCharLeft, Mid$(mDoc.TextParagraph(ThatPara), m, 1)) < 2 And m < z
+                    m = m + 1
+                Wend
+                If BlockStartPos < BlockEndPos Then
+                SelLengthSilent = m - BlockStartPos
+                Else
+                SelLengthSilent = m - BlockEndPos
+                End If
+                
+                FillBlock
+            Else
+                SelLengthSilent = SelLength - 1
+            End If
+        End If
+    End If
+End If
 End Sub
 Private Sub glistN_Selected2(item As Long)
 If undomode = 1 And undotext <> "" Then PushUndo
 If ClickInsideMarkedText Then
 ' start drag
+If glistN.DragEnabled Then
 glistN.MarkNext = 4
 
 glistN.DragNow
+End If
 End If
 End Sub
 Private Sub glistN_ShowExternalCursor()
@@ -1862,15 +1911,15 @@ glistN.PrepareToShow 5
 End Sub
 Private Sub glistN_SplitLine()
 '
-Dim b$, dummy As Long, a As Long
+Dim b$, Dummy As Long, a As Long
 
 If glistN.ListIndex >= 0 Then
     b$ = mDoc.TextParagraph(mDoc.MarkParagraphID)
 If Charpos = 1 And b$ <> "" Then
-    dummy = mDoc.InsertBeforeParagraph(mDoc.MarkParagraphID, "")
-        mDoc.ColorThis (dummy)
+    Dummy = mDoc.InsertBeforeParagraph(mDoc.MarkParagraphID, "")
+        mDoc.ColorThis (Dummy)
      all = mDoc.DocLines
-    mDoc.MarkParagraphID = dummy
+    mDoc.MarkParagraphID = Dummy
     SetRowColumn glistN.ListIndex + 2, 0
 
     
@@ -1890,23 +1939,23 @@ ElseIf ParaSelStart > Len(b$) Then
 
 Else  ' ANYWHERE
 
-dummy = ParaSelStart
+Dummy = ParaSelStart
 
     mDoc.ReWritePara mDoc.MarkParagraphID, Left$(b$, ParaSelStart - 1), True    ' write and format
     
-    dummy = mDoc.InsertAfterParagraph(mDoc.MarkParagraphID, Mid$(b$, dummy))
+    Dummy = mDoc.InsertAfterParagraph(mDoc.MarkParagraphID, Mid$(b$, Dummy))
 '    mDoc.startfrom(mDoc.MarkParagraphID) = 0
 If mDoc.startfrom(mDoc.MarkParagraphID) <> 0 Then
     mDoc.ColorThis (mDoc.MarkParagraphID)
-    If mDoc.startfrom(mDoc.MarkParagraphID) <> mDoc.startfrom(dummy) Then
-          mDoc.ColorThis (dummy)
+    If mDoc.startfrom(mDoc.MarkParagraphID) <> mDoc.startfrom(Dummy) Then
+          mDoc.ColorThis (Dummy)
     End If
 Else
     mDoc.ColorThis (mDoc.MarkParagraphID), , False
-    mDoc.ColorThis (dummy)
+    mDoc.ColorThis (Dummy)
 
 End If
- mDoc.MarkParagraphID = dummy
+ mDoc.MarkParagraphID = Dummy
     all = mDoc.DocLines
     ParaSelStart = 1
 
@@ -3351,7 +3400,7 @@ Do While Len(a$) > 0
                     Exit Do
                 End If
             End If
-            If Len(LTrim$(R$)) > 18 Then rr& = 0 Else rr& = 1
+            If Len(LTrim$(R$)) > 18 And Extra Then rr& = 0 Else rr& = 1
         ElseIf Mid$(a$ + "__", 2, 2) Like "[×÷Xx][0-9A-Fa-f]" Then
 evryka:
             R$ = Left$(a$, 3)
@@ -4346,11 +4395,11 @@ CurrentParagraph = mDoc.TextParagraph(mDoc.MarkParagraphID)
 'End If
 End Function
 Public Function NextParagraph() As String
-Dim dummy As Long
+Dim Dummy As Long
 If showparagraphWork And showparagraph Then
-NextParagraph = Replace(Replace(mDoc.NextTextParagraph(mDoc.MarkParagraphID, dummy), " ", ChrW$(&HB7)), ChrW$(&H2007), ChrW$(&H2423))
+NextParagraph = Replace(Replace(mDoc.NextTextParagraph(mDoc.MarkParagraphID, Dummy), " ", ChrW$(&HB7)), ChrW$(&H2007), ChrW$(&H2423))
 Else
-NextParagraph = mDoc.NextTextParagraph(mDoc.MarkParagraphID, dummy)
+NextParagraph = mDoc.NextTextParagraph(mDoc.MarkParagraphID, Dummy)
 End If
 End Function
 Public Function AutoIntNewLine() As Boolean
@@ -4519,12 +4568,12 @@ End Sub
 Private Sub PrintItem2X(mHdc As Long, ByVal c As String, R As RECT, area As RECT, Col() As Long, ver1 As Boolean)
 On Error Resume Next
 Dim cc As String, all As Long, offset As Long, addthis As Long, hRgn As Long
-Dim b As RECT, Origin As Long, tabw As Long, dummy As RECT
+Dim b As RECT, Origin As Long, tabw As Long, Dummy As RECT
 tabw = tParam.iTabLength * glistN.AveCharWith
 Origin = R.Left
-dummy = R
-dummy.top = R.Bottom + 10
-dummy.Bottom = dummy.top + R.Bottom - R.top
+Dummy = R
+Dummy.top = R.Bottom + 10
+Dummy.Bottom = Dummy.top + R.Bottom - R.top
 Dim ww$(), items&, i, rleft
 If UBound(Col()) < 1 Then
     b = area
@@ -4580,7 +4629,7 @@ ww$() = SplitStringUsingArrayNoTab(c, Col(), items&)
         b = R
 
         If b.Right <= area.Left Or b.Left >= area.Right Then
-        hRgn = CreateRectRgnIndirect(dummy)
+        hRgn = CreateRectRgnIndirect(Dummy)
         SelectClipRgn mHdc, hRgn
         offset = offset + LowWord(TabbedTextOut(mHdc, R.Left, R.top, StrPtr(c), Len(c), 1, tabw, Origin))
 
@@ -5451,15 +5500,15 @@ End If
 
 
 Dim M1 As Long, M2 As Long
-Dim dummy As RECT, R As RECT, tabw As Long, offset As Long, hRgn As Long, estX As Long
+Dim Dummy As RECT, R As RECT, tabw As Long, offset As Long, hRgn As Long, estX As Long
 tabw = tParam.iTabLength * glistN.AveCharWith
 glistN.UserControlTextMetricsPixels that$, R.Right, R.Bottom
-dummy = R
-dummy.top = R.Bottom - 1000
-dummy.Bottom = dummy.top + R.Bottom
+Dummy = R
+Dummy.top = R.Bottom - 1000
+Dummy.Bottom = Dummy.top + R.Bottom
 offset = 0
 estX = 0
-hRgn = CreateRectRgnIndirect(dummy)
+hRgn = CreateRectRgnIndirect(Dummy)
 SelectClipRgn mHdc, hRgn
 If found > 0 Then
 rx1 = LowWord(GetTabbedTextExtent(mHdc, StrPtr(that$), Len(that$), 1, tabw))

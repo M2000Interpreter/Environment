@@ -40,7 +40,7 @@ Private Declare Function IsBadCodePtr Lib "kernel32" (ByVal lpfn As Long) As Lon
 Declare Function ExpandEnvironmentStrings _
    Lib "kernel32" Alias "ExpandEnvironmentStringsW" _
    (ByVal lpSrc As Long, ByVal lpDst As Long, _
-   ByVal nSize As Long) As Long
+   ByVal nsize As Long) As Long
 Private Declare Function GetTempFileNameW Lib "kernel32" _
     (ByVal lpszPath As Long, ByVal lpPrefixString As Long, _
      ByVal wUnique As Long, ByVal lpTempFileName As Long) _
@@ -244,7 +244,7 @@ Global Const HWND_TOPMOST = -1
 Global Const HWND_NOTOPMOST = -2
 Global Const SWP_NOACTIVATE = &H10
 Global Const SWP_SHOWWINDOW = &H40
-Declare Sub SetWindowPos Lib "user32" (ByVal hWnd As Long, ByVal hWndInsertAfter As Long, ByVal X As Long, ByVal Y As Long, ByVal cX As Long, ByVal cY As Long, ByVal wFlags As Long)
+Declare Sub SetWindowPos Lib "user32" (ByVal hWnd As Long, ByVal hWndInsertAfter As Long, ByVal X As Long, ByVal Y As Long, ByVal cx As Long, ByVal cy As Long, ByVal wFlags As Long)
 Declare Function ExtFloodFill Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal crColor As Long, ByVal wFillType As Long) As Long
 Public Const FLOODFILLSURFACE = 1
 Public Const FLOODFILLBORDER = 0
@@ -289,7 +289,7 @@ Public Type target
     ' THIS IS POINTS AT CHARACTER RESOLUTION
     SZ As Single
     ' SO WE NEED SZ
-    lX As Long
+    Lx As Long
     lY As Long
     tx As Long
     ty As Long
@@ -1245,7 +1245,7 @@ On Error Resume Next
  If (Left$(f$, 4) = "cDIB" And Len(f$) > 12) Then
    Set dib = New cDIBSection
   If Not cDib(f$, dib) Then
-    dib.Create x1&, y1&
+    dib.create x1&, y1&
     dib.Cls d1.BackColor
   End If
       Set p = dib.Picture
@@ -1265,7 +1265,7 @@ On Error Resume Next
 
     Else
     Set dib = New cDIBSection
-    dib.Create x1&, y1&
+    dib.create x1&, y1&
     dib.Cls d1.BackColor
     Set p = dib.Picture
     Set dib = Nothing
@@ -1697,7 +1697,7 @@ Dim PX As Long, PY As Long, R As Long, p$, c$, LEAVEME As Boolean, nr As RECT, n
 Dim p2 As Long, mUAddPixelsTop As Long
 Dim pixX As Long, pixY As Long
 Dim rTop As Long, rBottom As Long
-Dim lenw&, realR&, realstop&, R1 As Long, WHAT1$, ff As Long, LL$(), must As Long
+Dim lenw&, realR&, realstop&, r1 As Long, WHAT1$, ff As Long, LL$(), must As Long
 If processcr Then
     If Len(what$) = 0 Then Exit Sub
     LL$() = Split(what, vbLf)
@@ -1761,7 +1761,7 @@ With mybasket
          End If
         DDD.currentX = PX * .Xt
         DDD.currentY = PY * .Yt + .uMineLineSpace
-        R1 = .mX - PX - 1 + R
+        r1 = .mX - PX - 1 + R
 
         If DDD.currentX = 0 And clearline Then
             If Not TypeOf DDD Is MetaDc Then DDD.Line (0&, PY * .Yt)-((.mX - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
@@ -1824,7 +1824,7 @@ checkcombine:
                             If Not nounder32(p$) Then Mid$(WHAT1$, R + 2, 1) = " ": Exit Do
                             c$ = c$ + p$
                             R = R + 1
-                            If R >= R1 Then Exit Do
+                            If R >= r1 Then Exit Do
                          Loop Until (a1(R + 1) And 7) = 0
                      End If
                  End If
@@ -1985,8 +1985,8 @@ skipthis:
         If DDD.currentX = 0 And clearline Then
             If Not TypeOf DDD Is MetaDc Then DDD.Line (0&, PY * .Yt)-((.mX - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
         End If
-        R1 = Len(what$) - 1
-        For R = R To R1
+        r1 = Len(what$) - 1
+        For R = R To r1
             c$ = Mid$(WHAT1$, R + 1, 1)
             W = AscW(c$)
             If W > -10241 And W < -9216 Then
@@ -2022,7 +2022,7 @@ checkcombine1:
                             If Not nounder32(p$) Then Mid$(WHAT1$, R + 2, 1) = " ": Exit Do
                             c$ = c$ + p$
                             R = R + 1
-                            If R >= R1 Then Exit Do
+                            If R >= r1 Then Exit Do
                         Loop Until (a1(R + 1) And 7) = 0
                     End If
                 End If
@@ -2152,7 +2152,7 @@ jumpexit:
 End Sub
 
 
-Public Function nTextY(basestack As basetask, ByVal what As String, ByVal Font As String, ByVal Size As Single, Optional ByVal degree As Double = 0#, Optional ByVal ExtraWidth As Long = 0)
+Public Function nTextY(basestack As basetask, ByVal what As String, ByVal Font As String, ByVal size As Single, Optional ByVal degree As Double = 0#, Optional ByVal ExtraWidth As Long = 0)
 Dim DDD As Object
 Set DDD = basestack.Owner
 Dim PX As Long, PY As Long, OLDFONT As String, OLDSIZE As String, DE#
@@ -2168,13 +2168,13 @@ On Error Resume Next
 With players(prive)
 BFONT = DDD.Font.Name
 If Font <> "" Then
-If Size = 0 Then Size = DDD.FontSize
-StoreFont Font, Size, .charset
+If size = 0 Then size = DDD.FontSize
+StoreFont Font, size, .charset
 DDD.Font.charset = 0
 DDD.FontSize = 9
 DDD.FontName = .FontName
 DDD.Font.charset = .charset
-DDD.FontSize = Size
+DDD.FontSize = size
 Else
 Font = .FontName
 End If
@@ -2186,7 +2186,7 @@ f.lfWeight = Abs(.bold) * 800
   f.lfFaceName = Left$(Font, 30) + Chr$(0)
   f.lfCharSet = .charset
   f.lfQuality = 3 ' PROOF_QUALITY
-  f.lfHeight = (Size * -20) / DYP
+  f.lfHeight = (size * -20) / DYP
 
   hFont = CreateFontIndirect(f)
   hPrevFont = SelectObject(DDD.hdc, hFont)
@@ -2222,7 +2222,7 @@ PlaceBasket DDD, players(prive)
 
 
 End Function
-Public Function nText(basestack As basetask, ByVal what As String, ByVal Font As String, ByVal Size As Single, Optional ByVal degree As Double = 0#, Optional ByVal ExtraWidth As Long = 0)
+Public Function nText(basestack As basetask, ByVal what As String, ByVal Font As String, ByVal size As Single, Optional ByVal degree As Double = 0#, Optional ByVal ExtraWidth As Long = 0)
 Dim DDD As Object
 Set DDD = basestack.Owner
 Dim PX As Long, PY As Long, OLDFONT As String, OLDSIZE As String, DE#
@@ -2238,13 +2238,13 @@ SetTextCharacterExtra DDD.hdc, ExtraWidth
 End If
 BFONT = DDD.Font.Name
 If Font <> "" Then
-If Size = 0 Then Size = DDD.FontSize
-StoreFont Font, Size, .charset
+If size = 0 Then size = DDD.FontSize
+StoreFont Font, size, .charset
 DDD.Font.charset = 0
 DDD.FontSize = 9
 DDD.FontName = .FontName
 DDD.Font.charset = .charset
-DDD.FontSize = Size
+DDD.FontSize = size
 Else
 Font = .FontName
 End If
@@ -2258,7 +2258,7 @@ f.lfWeight = Abs(.bold) * 800
   f.lfFaceName = Left$(Font, 30) + Chr$(0)
   f.lfCharSet = .charset
   f.lfQuality = 3 ' NONANTIALIASED_QUALITY
-  f.lfHeight = (Size * -20) / DYP
+  f.lfHeight = (size * -20) / DYP
 
   hFont = CreateFontIndirect(f)
   hPrevFont = SelectObject(DDD.hdc, hFont)
@@ -2521,7 +2521,7 @@ ms.PushVal CDbl(0)
 End If
 basestack.soros.MergeTop ms
 End Sub
-Public Sub nPlain(basestack As basetask, ByVal what As String, ByVal Font As String, ByVal Size As Single, Optional ByVal degree As Double = 0#, Optional ByVal JUSTIFY As Long = 0, Optional ByVal qual As Boolean = True, Optional ByVal ExtraWidth As Long = 0)
+Public Sub nPlain(basestack As basetask, ByVal what As String, ByVal Font As String, ByVal size As Single, Optional ByVal degree As Double = 0#, Optional ByVal JUSTIFY As Long = 0, Optional ByVal qual As Boolean = True, Optional ByVal ExtraWidth As Long = 0)
 Dim DDD As Object
 Set DDD = basestack.Owner
 Dim PX As Long, PY As Long, OLDFONT As String, OLDSIZE As Long, DEGR As Double
@@ -2547,7 +2547,7 @@ DEGR = (degree) * 180# / Pi
   Else
     f.lfQuality = NONANTIALIASED_QUALITY
   End If
-  f.lfHeight = (Size * -20) / DYP
+  f.lfHeight = (size * -20) / DYP
   hFont = CreateFontIndirect(f)
   hPrevFont = SelectObject(DDD.hdc, hFont)
   icH = TextHeight(DDD, "fq")
@@ -2563,7 +2563,7 @@ DEGR = (degree) * 180# / Pi
   Else
   f.lfQuality = NONANTIALIASED_QUALITY
   End If
-  f.lfHeight = (Size * -20) / DYP
+  f.lfHeight = (size * -20) / DYP
   
 
   
@@ -2754,7 +2754,7 @@ ResetColumns = True
 .SZ = dq.FontSize
 
 Else
-If Not (fonttest.FontName = .FontName And fonttest.Font.charset = dq.Font.charset And fonttest.Font.Size = .SZ) Then
+If Not (fonttest.FontName = .FontName And fonttest.Font.charset = dq.Font.charset And fonttest.Font.size = .SZ) Then
 fonttest.Font.charset = .charset
 If fonttest.Font.charset = .charset Then
 StoreFont .FontName, .SZ, .charset
@@ -2897,7 +2897,7 @@ Public Sub SetTextBasketBack(dq As Object, mb As basket)
 On Error Resume Next
 With mb
 .UseDouble = 0
-If Not (dq.FontName = .FontName And dq.Font.charset = .charset And dq.Font.Size = .SZ) Then
+If Not (dq.FontName = .FontName And dq.Font.charset = .charset And dq.Font.size = .SZ) Then
 
 StoreFont .FontName, .SZ, .charset
 dq.Font.charset = 0
@@ -3329,7 +3329,7 @@ basketcode = GetCode(D)
 
 Form1.IEUP ""
 Form1.KeyPreview = True
-Dim dummy As Boolean, rs As String, mPen As Long, ICO As Long, BAR As Long, bar2 As Long
+Dim Dummy As Boolean, rs As String, mPen As Long, ICO As Long, BAR As Long, bar2 As Long
 BAR = 1
 Form1.DIS.Visible = True
 GDILines = False  ' reset to normal ' use Smooth on to change this to true
@@ -3483,7 +3483,7 @@ End If
 If Not ASKINUSE Then Unload NeoMsgBox
 End If
 If Not skipthat Then
-    If Len(COM$) > 0 Then dummy = interpret(bstack, COM$)
+    If Len(COM$) > 0 Then Dummy = interpret(bstack, COM$)
 End If
 'cr bstack
 End Sub
@@ -3671,13 +3671,13 @@ End If
 Form1.SetText1
 .glistN.overrideTextHeight = prive.overrideTextHeight '         fonttest.TextHeight("fj")
 .Font.Name = D.Font.Name
-.Font.Size = D.Font.Size ' SZ 'Int(d.font.Size) Why
+.Font.size = D.Font.size ' SZ 'Int(d.font.Size) Why
 .Font.charset = D.Font.charset
 .Font.Italic = D.Font.Italic
 .Font.bold = D.Font.bold
 .Font.Name = D.Font.Name
 .Font.charset = D.Font.charset
-.Font.Size = prive.SZ
+.Font.size = prive.SZ
 With prive
 If bstack.toback Then
 
@@ -3861,8 +3861,8 @@ If Form1.EditTextWord Then
 .glistN.WordCharLeftButIncluded = vbNullString
 
 Else
-.glistN.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", "@", Chr$(9), "#", "%", "&")
-.glistN.WordCharRight = ConCat(":", "{", "}", "[", "]", ",", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", Chr$(9), "#")
+.glistN.WordCharLeft = ConCat(".", ":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", "@", Chr$(9), "#", "%", "&")
+.glistN.WordCharRight = ConCat(".", ":", "{", "}", "[", "]", ",", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", Chr$(9), "#")
 .glistN.WordCharRightButIncluded = "(" ' so aaa(sdd) give aaa( as word
 .glistN.WordCharLeftButIncluded = "#"
 End If
@@ -3897,7 +3897,7 @@ End If
 .Font.Name = D.Font.Name
 Form1.SetText1
 .glistN.overrideTextHeight = prive.overrideTextHeight '   fonttest.TextHeight("fj")
-.Font.Size = D.Font.Size ' SZ 'Int(d.font.Size) Why
+.Font.size = D.Font.size ' SZ 'Int(d.font.Size) Why
 .Font.charset = D.Font.charset
 .Font.Italic = D.Font.Italic
 .Font.bold = D.Font.bold
@@ -3905,7 +3905,7 @@ Form1.SetText1
 .Font.Name = D.Font.Name
 
 .Font.charset = D.Font.charset
-.Font.Size = prive.SZ 'Int(d.font.Size)
+.Font.size = prive.SZ 'Int(d.font.Size)
 If bstack.toback Then
 If maxchar > 0 Then
 
@@ -4316,10 +4316,10 @@ With Form1.List1
 .Font.Name = D.Font.Name
 Form1.Font.charset = D.Font.charset
 Form1.Font.Strikethrough = False
-.Font.Size = D.Font.Size
+.Font.size = D.Font.size
 .Font.Name = D.Font.Name
 Form1.Font.charset = D.Font.charset
-.Font.Size = D.Font.Size
+.Font.size = D.Font.size
 If LEVCOLMENU < 2 Then .BackColor = D.ForeColor
 If LEVCOLMENU < 3 Then .ForeColor = D.BackColor
 .Font.bold = D.Font.bold
@@ -4588,14 +4588,14 @@ Targets = ot
 mywait11 bstack, 5
 End Sub
 
-Public Sub FrameText(dd As Object, ByVal Size As Single, X As Long, Y As Long, cc As Long, Optional myCut As Boolean = False)
+Public Sub FrameText(dd As Object, ByVal size As Single, X As Long, Y As Long, cc As Long, Optional myCut As Boolean = False)
 Dim i As Long, mymul As Long
 
 If dd Is Form1.PrinterDocument1 Then
 ' check this please
 dd.Width = X
 dd.Height = Y
-Pr_Back dd, Size
+Pr_Back dd, size
 Exit Sub
 End If
 
@@ -4622,22 +4622,22 @@ dd.currentY = 0
 
 ''ClearScreenNew dd, mybasket, cc
 dd.currentY = 0
-dd.Font.Size = Size
-Size = dd.Font.Size
+dd.Font.size = size
+size = dd.Font.size
 
 ''Sleep 1  '' USED TO GIVE TIME TO LOAD FONT
-If fonttest.FontName = dd.Font.Name And dd.Font.Size = fonttest.Font.Size Then
+If fonttest.FontName = dd.Font.Name And dd.Font.size = fonttest.Font.size Then
 Else
-StoreFont dd.Font.Name, Size, dd.Font.charset
+StoreFont dd.Font.Name, size, dd.Font.charset
 End If
 .Yt = fonttest.TextHeight("fj")
 .Xt = fonttest.TextWidth("W")
 
 While TextHeight(fonttest, "fj") / (.Yt / 2 + dv15) < dv
-Size = Size + 0.2
-fonttest.Font.Size = Size
+size = size + 0.2
+fonttest.Font.size = size
 Wend
-dd.Font.Size = Size
+dd.Font.size = size
 .overrideTextHeight = fonttest.TextHeight("fj")
 .Yt = TextHeight(fonttest, "fj")
 .Xt = fonttest.TextWidth("W") + dv15
@@ -4695,7 +4695,7 @@ End If
 If .Column < 4 Then .Column = 4
 
 
-.SZ = Size
+.SZ = size
 
 If dd.Name = "Form1" Then
 ' no change
@@ -5243,17 +5243,17 @@ End With
 End Sub
 Sub Gradient(TheObject As Object, ByVal f&, ByVal t&, ByVal xx1&, ByVal xx2&, ByVal yy1&, ByVal yy2&, ByVal hor As Boolean, ByVal all As Boolean)
     Dim Redval&, Greenval&, Blueval&
-    Dim R1&, G1&, b1&, sr&, SG&, sb&
+    Dim r1&, G1&, b1&, sr&, SG&, sb&
     Dim obj As MetaDc
     f& = f& Mod &H1000000
     t& = t& Mod &H1000000
     Redval& = f& And &H10000FF
     Greenval& = (f& And &H100FF00) / &H100
     Blueval& = (f& And &HFF0000) / &H10000
-    R1& = t& And &H10000FF
+    r1& = t& And &H10000FF
     G1& = (t& And &H100FF00) / &H100
     b1& = (t& And &HFF0000) / &H10000
-    sr& = (R1& - Redval&) * 1000 / 127
+    sr& = (r1& - Redval&) * 1000 / 127
     SG& = (G1& - Greenval&) * 1000 / 127
     sb& = (b1& - Blueval&) * 1000 / 127
     Redval& = Redval& * 1000
@@ -10992,7 +10992,7 @@ With BoxTarget
 .Comm = COM$
 .Id = Id&
 .Tag = Tag$
-.lX = X&
+.Lx = X&
 .lY = Y&
 .tx = xl& - 1
 .ty = yl&
@@ -11045,7 +11045,7 @@ If Id& < 100 Then
     D.currentY = D.currentY + prive.Yt \ 2
     End If
     PlainBaSket D, prive, Tag$, True, True
-    LCTbasket D, prive, BoxTarget.lY, BoxTarget.lX
+    LCTbasket D, prive, BoxTarget.lY, BoxTarget.Lx
     End If
     End If
 Else
@@ -11077,15 +11077,15 @@ Else
     D.currentY = D.currentY + prive.Yt \ 2
     End If
     wwPlain2 DSTACK, prive, Tag$, xl& - X&, 10000, , True, f, , , True
-    LCTbasket D, prive, BoxTarget.lY, BoxTarget.lX
+    LCTbasket D, prive, BoxTarget.lY, BoxTarget.Lx
     End If
 End If
     
 End If
 End With
 End Function
-Private Function MyMod(R1, po) As Variant
-MyMod = R1 - Fix(R1 / po) * po
+Private Function MyMod(r1, po) As Variant
+MyMod = r1 - Fix(r1 / po) * po
 End Function
 Sub SetTmpPath()
      strTemp = mylcasefILE(GetTempPathgg)
@@ -11093,7 +11093,7 @@ End Sub
 Sub dset()
  If strTemp = vbNullString Then SetTmpPath
 ' for mcd
-Dim CD As String, dummy As Long, q$
+Dim CD As String, Dummy As Long, q$
 
 userfiles = GetSpecialfolder(CLng(26)) + "\M2000"
 AddDirSep userfiles
@@ -11354,7 +11354,7 @@ Exit Function
 
 End Function
 Private Function textPUT(bstack As basetask, ByVal ThisFile As String, THISBODY As String, c$, mode2save As Long) As Boolean
-Dim chk As String, b$, j As Long, PREPARE$, VR$, s$, v As Double, buf$, i As Long
+Dim chk As String, b$, j As Long, Prepare$, VR$, s$, v As Double, buf$, i As Long
 ThisFile = strTemp + ThisFile
 chk = GetDosPath(ThisFile)
 If chk <> "" And c$ = "new" Then KillFile GetDosPath(chk)
@@ -11362,11 +11362,11 @@ On Error GoTo HM
 textPUT = True
 Do
 j = InStr(THISBODY, "##")
-If j = 0 Then PREPARE$ = PREPARE$ + THISBODY: Exit Do
-If j > 1 Then PREPARE$ = PREPARE$ + Mid$(THISBODY, 1, InStr(THISBODY, "##") - 1)
+If j = 0 Then Prepare$ = Prepare$ + THISBODY: Exit Do
+If j > 1 Then Prepare$ = Prepare$ + Mid$(THISBODY, 1, InStr(THISBODY, "##") - 1)
 THISBODY = Mid$(THISBODY, j + 2)
 j = InStr(THISBODY, "##")
-If j = 0 Then PREPARE$ = PREPARE$ + THISBODY: Exit Do
+If j = 0 Then Prepare$ = Prepare$ + THISBODY: Exit Do
 If j > 1 Then VR$ = Mid$(THISBODY, 1, InStr(THISBODY, "##") - 1)
 THISBODY = Mid$(THISBODY, j + 2)
 '
@@ -11377,11 +11377,11 @@ buf$ = s$
 Else
 buf$ = VR$
 End If
-PREPARE$ = PREPARE$ + buf$
+Prepare$ = Prepare$ + buf$
 Loop
            If Not WeCanWrite(ThisFile) Then GoTo HM
 
-textPUT = SaveUnicode(ThisFile, PREPARE$, mode2save, Not (c$ = "new"))
+textPUT = SaveUnicode(ThisFile, Prepare$, mode2save, Not (c$ = "new"))
 Exit Function
 HM:
 textPUT = False
@@ -13487,12 +13487,12 @@ End Function
 Sub OnlyForInventory()
 MyEr "Only for Inventory object", "Μόνο για αντικείμενο Κατάσταση"
 End Sub
-Function NewInventory(bstack As basetask, rest$, R, Queue As Boolean) As Boolean
+Function NewInventory(bstack As basetask, rest$, R, queue As Boolean) As Boolean
             Dim serr As Boolean, usehandler As mHandler
             
-                    MakeitObjectInventory R, Queue
+                    MakeitObjectInventory R, queue
                     Set usehandler = R
-                    If Queue Then usehandler.objref.AllowAnyKey
+                    If queue Then usehandler.objref.AllowAnyKey
                     Set bstack.lastobj = usehandler
                     If FastSymbol(rest$, ":=", , 2) Then
                     If AddInventory(bstack, rest$, serr) Then
@@ -13781,11 +13781,11 @@ Function interpret(bstack As basetask, b$, Optional ByPass As Boolean) As Boolea
 Dim di As Object, myobject As Object, i As Long, x1 As Long, ok As Boolean, sp As Variant
 Dim usehandler As mHandler, usehandler2 As mHandler
 Set di = bstack.Owner
-Dim prive As basket, CB As CodeBlock
+Dim prive As basket, cb As CodeBlock
 'b$ = Trim$(b$)
 Dim W$, ww#, LLL As Long, sss As Long, v As Long, p As Variant, ss$, sw$, ohere$
 Dim pppp As mArray, i1 As Long, Lang As Long
-Dim R1 As Long, r2 As Long
+Dim r1 As Long, r2 As Long
 ' uink$ = VbNullString
 di.FontTransparent = True
 SetBkMode di.hdc, 1
@@ -13799,10 +13799,10 @@ LLL = Len(b$)
 
 If FastSymbol(b$, ".") Then
 ' run in codeblock
-            Set CB = New CodeBlock
-            CB.Construct b$
-            CB.ExportStr bstack
-            CB.codeline (0)
+            Set cb = New CodeBlock
+            cb.Construct b$
+            cb.ExportStr bstack
+            cb.codeline (0)
             
 ElseIf FastSymbol(b$, "{") Then
 If Not interpret(bstack, block(b$)) Then interpret = False: here$ = ohere$: GoTo there1
@@ -17562,7 +17562,7 @@ With players(GetCode(Scr))
     End If
     If .SZ < 4 Then .SZ = 4
         Err.Clear
-        Scr.Font.Size = .SZ
+        Scr.Font.size = .SZ
         If Err.Number > 0 Then
                 MyFont = "ARIAL"
                 Scr.Font.Name = MyFont
@@ -17785,7 +17785,7 @@ With bstack.Owner
     ReturnFontName = .Font.Name
     ReturnBold = .Font.bold
     ReturnItalic = .Font.Italic
-    ReturnSize = CSng(.Font.Size)
+    ReturnSize = CSng(.Font.size)
     ReturnCharset = .Font.charset
 End With
 FeedFont2Stack bstack, OpenFont(bstack)
@@ -17841,7 +17841,7 @@ If FastSymbol(rest$, ",") Then
 ElseIf FastSymbol(rest$, ";") Then
 prive = GetCode(bstack.Owner)
 .mysplit = 0
-Scr.Font.Size = .SZ
+Scr.Font.size = .SZ
        SetText Scr
         GetXYb Scr, players(prive), .curpos, .currow
 
@@ -17852,7 +17852,7 @@ Else
 '.SZ = .SZ * 3
 End If
 Err.Clear
-Scr.Font.Size = .SZ
+Scr.Font.size = .SZ
 If Err.Number > 0 Then
 
 MyFont = "ARIAL"
@@ -17861,7 +17861,7 @@ Scr.Font.charset = bstack.myCharSet
 Scr.Font.Name = MyFont
 Scr.Font.charset = bstack.myCharSet
 End If
-.SZ = Scr.Font.Size
+.SZ = Scr.Font.size
      .uMineLineSpace = .MineLineSpace
     
  FrameText Scr, .SZ, x1, y1, .Paper
@@ -22199,7 +22199,7 @@ On Error Resume Next
 ' DC FROM PRINTER
 'oprinter.EndPrint
 oprinter.ClearUp
-If oprinter.Create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
+If oprinter.create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
 Form1.PrinterDocument1.BackColor = QBColor(15)
 oprinter.WhiteBits
 oprinter.GetDpi mydpi, mydpi
@@ -22818,7 +22818,7 @@ Function GetWindowsDir() As String
     End If
 End Function
 Sub Portrait(bstack As basetask)
-Dim dummy As Object, try1 As Long
+Dim Dummy As Object, try1 As Long
 If UBound(MyDM) = 1 Then
 PrinterDim pw, ph, psw, psh, pwox, phoy
 End If
@@ -22838,7 +22838,7 @@ If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) > 1 Then
         SwapPrinterDim pw, ph, psw, psh, pwox, phoy
         GoTo contnow
     Else
-        ChangeOrientation dummy, Printer.DeviceName, MyDM()
+        ChangeOrientation Dummy, Printer.DeviceName, MyDM()
         SwapPrinterDim pw, ph, psw, psh, pwox, phoy
         Exit Sub
     End If
@@ -22851,7 +22851,7 @@ End If
 contnow:
 Dim thisprinter As New cDIBSection
 
-If thisprinter.Create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
+If thisprinter.create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
     thisprinter.ClearBits Form1.PrinterDocument1.BackColor
     
     thisprinter.GetDpi mydpi, mydpi
@@ -22886,7 +22886,7 @@ If bstack.toprinter Then
 End If
 End Sub
 Sub Landscape(bstack As basetask)
-Dim dummy As Object, try1 As Long
+Dim Dummy As Object, try1 As Long
 If UBound(MyDM) = 1 Then
 PrinterDim pw, ph, psw, psh, pwox, phoy
 End If
@@ -22905,7 +22905,7 @@ If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) < 1 Then
         SwapPrinterDim pw, ph, psw, psh, pwox, phoy
         GoTo contnow
     Else
-        ChangeOrientation dummy, Printer.DeviceName, MyDM()
+        ChangeOrientation Dummy, Printer.DeviceName, MyDM()
         SwapPrinterDim pw, ph, psw, psh, pwox, phoy
         Exit Sub
     End If
@@ -22918,7 +22918,7 @@ End If
 contnow:
 Dim thisprinter As New cDIBSection
 
-If thisprinter.Create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
+If thisprinter.create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
     thisprinter.ClearBits Form1.PrinterDocument1.BackColor
     thisprinter.GetDpi mydpi, mydpi
     thisprinter.needHDC
@@ -25032,7 +25032,7 @@ With j(i&)
 If .Enable And .layer = myl Then
 XX& = X \ .Xt
 YY& = Y \ .Yt
-If .lX <= XX& And .tx >= XX& And .lY <= YY& And .ty >= YY& Then
+If .Lx <= XX& And .tx >= XX& And .lY <= YY& And .ty >= YY& Then
 ScanTarget = i&
 Exit For
 End If

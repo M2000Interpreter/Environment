@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 21 active-X
-Some broken code fixed from Revision 21.
-Now M2000 threads works nice.
+Version 11 Revision 22 active-X
+Improved Editor.
+Long Long (64bit) can be pass from declared functions.
 
 
 George Karras, Kallithea Attikis, Greece.

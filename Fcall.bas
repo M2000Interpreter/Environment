@@ -31,7 +31,7 @@ Public Sub SetLibHdls()
     LibHdls.UcaseKeys = True
 End Sub
 
-Public Function stdCallW(sDll As String, sFunc As String, ByVal RetType As Variant, p() As Variant, j As Long)
+Public Function stdCallW(sDLL As String, sFunc As String, ByVal RetType As Variant, p() As Variant, j As Long)
 Dim v(), HRes As Long, i As Long
  
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
@@ -47,9 +47,9 @@ Dim v(), HRes As Long, i As Long
     
   Next i
   If Left$(sFunc, 1) = "#" Then
-  HRes = DispCallFunc(0, GetFuncPtrOrd(sDll, sFunc), CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), stdCallW)
+  HRes = DispCallFunc(0, GetFuncPtrOrd(sDLL, sFunc), CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), stdCallW)
   Else
-  HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), stdCallW)
+  HRes = DispCallFunc(0, GetFuncPtr(sDLL, sFunc), CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), stdCallW)
   End If
   If HRes Then Err.Raise HRes
 ' p() = v()
@@ -82,7 +82,7 @@ Dim v(), HRes As Long, i As Long
  End If
 End Function
 
-Public Function cdeclCallW(sDll As String, sFunc As String, ByVal RetType As Variant, p() As Variant, j As Long)
+Public Function cdeclCallW(sDLL As String, sFunc As String, ByVal RetType As Variant, p() As Variant, j As Long)
 Dim i As Long, pFunc As Long, v(), HRes As Long
  
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
@@ -92,9 +92,9 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
     vPtr(i) = VarPtr(v(i))
   Next i
    If Left$(sFunc, 1) = "#" Then
-     HRes = DispCallFunc(0, GetFuncPtrOrd(sDll, sFunc), CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), cdeclCallW)
+     HRes = DispCallFunc(0, GetFuncPtrOrd(sDLL, sFunc), CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), cdeclCallW)
    Else
-  HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), cdeclCallW)
+  HRes = DispCallFunc(0, GetFuncPtr(sDLL, sFunc), CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), cdeclCallW)
   End If
   If HRes Then Err.Raise HRes
   If VarType(cdeclCallW) = vbNull Then
@@ -121,7 +121,7 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
 End Function
 
 
-Public Function stdCallA(sDll As String, sFunc As String, ByVal RetType As Variant, ParamArray p() As Variant)
+Public Function stdCallA(sDLL As String, sFunc As String, ByVal RetType As Variant, ParamArray p() As Variant)
 Dim i As Long, pFunc As Long, v(), HRes As Long
  
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
@@ -131,7 +131,7 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
     vPtr(i) = VarPtr(v(i))
   Next i
   
-  HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_STDCALL, RetType, i, vType(0), vPtr(0), stdCallA)
+  HRes = DispCallFunc(0, GetFuncPtr(sDLL, sFunc), CC_STDCALL, RetType, i, vType(0), vPtr(0), stdCallA)
   
   For i = 0 To UBound(p) 'back-conversion of the ANSI-String-Results
     If VarType(p(i)) = vbString Then p(i) = StrConv(p(i), vbUnicode)
@@ -139,7 +139,7 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
   If HRes Then Err.Raise HRes
 End Function
 
-Public Function cdeclCallA(sDll As String, sFunc As String, ByVal RetType As VbVarType, ParamArray p() As Variant)
+Public Function cdeclCallA(sDLL As String, sFunc As String, ByVal RetType As VbVarType, ParamArray p() As Variant)
 Dim i As Long, pFunc As Long, v(), HRes As Long
  
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
@@ -149,7 +149,7 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
     vPtr(i) = VarPtr(v(i))
   Next i
   
-  HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_CDECL, RetType, i, vType(0), vPtr(0), cdeclCallA)
+  HRes = DispCallFunc(0, GetFuncPtr(sDLL, sFunc), CC_CDECL, RetType, i, vType(0), vPtr(0), cdeclCallA)
   
   For i = 0 To UBound(p) 'back-conversion of the ANSI-String-Results
     If VarType(p(i)) = vbString Then p(i) = StrConv(p(i), vbUnicode)
