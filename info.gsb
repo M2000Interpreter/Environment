@@ -5630,7 +5630,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 43 for M2000 Interpreter version 11, revision 20 and above"
+	Report " A collection of modules for tests version 44 for M2000 Interpreter version 11, revision 20 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -5902,7 +5902,8 @@ End Sub
 MODULE FORM44 {Module TryIt {
 	Rem : Set slow
 	Set fast
-	Thread.Plan  Concurrent  ' Sequential
+	// new for Concurrent, a value non zero cause maintask to not execute step by step
+	Thread.Plan  Concurrent 1  ' Sequential
 	Refresh 40
 	SMOOTH on
 	Cls,0
@@ -6129,7 +6130,7 @@ You can:
 push key$ : drop
 TryIt
 test !
-Keyboard "info"+chr$(13)
+Keyboard "infobasic"+chr$(13)
 }
 MODULE LIST33 {Declare Simple Form
 With Simple, "Title" As myTitle$
@@ -35575,7 +35576,7 @@ layer form1 {
 	gradient 4,7, 0
 	cls 0x333333, 2
 	pen 15
-	Report 2, "Press Alt+F4 or close form from square icon - double click - or press any key"
+	Report 2, "Press Alt+F4 or close this form from square icon - double click - or press any key - not functions keys now"
 	Print
 	fkey
 	method form1, "opacity", M
@@ -36737,5 +36738,16 @@ arr$(1, 5)="Hello from M2000"
 // so 1001 long type values have 4*1001 bytes  (4 times more data from a variant type array)
 ? addr(0)  // first item place in array in place 2
 ? addr(1)  // first item place in array in place 1
+}
+MODULE USEMENU {// https://rosettacode.org/wiki/Menu
+Module TestMenu {
+	Print "Make your choice: ";
+	Do
+	Menu "fee fie", "huff and puff", "mirror mirror", "tick tock"
+	when menu=0
+	Print Menu$(Menu)
+	Print "That was the ";If$(Menu->"1st","2nd","3rd","4th");" option, bravo;"
+}
+TestMenu
 }
 UseThis : InfoBasic : ShowKeys : Pen 15 {Print "Press F3 now"}

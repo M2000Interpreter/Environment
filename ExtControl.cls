@@ -63,23 +63,23 @@ Set another = Nothing
 End Sub
 
 Private Sub mycontrol_ObjectEvent(Info As EventInfo)
-Dim values(), m As Long
+Dim Values(), m As Long
 If Info.EventParameters.Count > 0 Then
-ReDim values(0 To Info.EventParameters.Count)
+ReDim Values(0 To Info.EventParameters.Count)
 Dim evinf As EventParameter
 m = 0
 For Each evinf In Info.EventParameters
-    values(m) = evinf.Value
+    Values(m) = evinf.Value
     m = m + 1
 Next evinf
 If mIndex <> -1 Then
-    Callback.CallbackNow myname$ + "." + Info.Name + "(" & mIndex & ")", values()
+    Callback.CallbackNow myname$ + "." + Info.Name + "(" & mIndex & ")", Values()
 Else
-    Callback.CallbackNow myname$ + "." + Info.Name + "()", values()
+    Callback.CallbackNow myname$ + "." + Info.Name + "()", Values()
 End If
 With Info.EventParameters
 For m = m - 1 To 0
-    .item(m).Value = values(m)
+    .item(m).Value = Values(m)
 Next m
 End With
 ElseIf mIndex <> -1 Then
