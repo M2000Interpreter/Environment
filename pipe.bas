@@ -1028,7 +1028,7 @@ backhere:
 UseMe.CliRun
 ClearState1
 If UseMe Is Nothing Then once = False: Exit Sub
-UseMe.ShutDown Cancel
+UseMe.Shutdown Cancel
 
 If Cancel Then GoTo backhere
 If Not UseMe.IhaveExtForm Then

@@ -40,6 +40,26 @@ If IhaveExtForm Then
 ExtForm.GetIcon PackData(a)
 End If
 End Sub
+Friend Function GetAppIcon() As StdPicture
+On Error Resume Next
+Dim k As StdPicture
+If IhaveExtForm Then
+GetAppIcon = UnPackData(ExtForm.GetAppIcon)
+End If
+End Function
+Private Function UnPackData(sData As String) As Object
+    Dim pbTemp  As PropertyBag
+    Dim arData()    As Byte
+    Let arData() = sData
+    
+    Set pbTemp = New PropertyBag
+    With pbTemp
+        Let .Contents = arData()
+        Set UnPackData = .ReadProperty("icon")
+    End With
+     
+    Set pbTemp = Nothing
+End Function
 Private Function PackData(obj As Object) As String
     Dim pbTemp  As PropertyBag
     Set pbTemp = New PropertyBag
@@ -68,6 +88,10 @@ End Sub
 Public Sub GetForm(f As Object)
 
 Set ExtForm = f
+On Error Resume Next
+If f Is Nothing Then Exit Sub
+Set Form3AppIcon = UnPackData(ExtForm.GetAppIcon())
+Err.Clear
 'If F Is Nothing Then Exit Sub
 End Sub
 Public Sub StackMax(stack As Long)
@@ -99,7 +123,7 @@ par1$ = LoadFileAndSwitches$
 par2$ = Prompt$
 CliRun
 End Sub
-Public Sub ShutDown(Cancel As Integer)
+Public Sub Shutdown(Cancel As Integer)
 
 If ASKINUSE Or loadfileiamloaded Then
 NOEXECUTION = Cancel = 2
@@ -125,7 +149,7 @@ If TypeOf f Is GuiM2000 Then
     
     If Modalid <> 0 Then
         If F1.Modal = Modalid Then
-            If F1.MyName$ <> "" Then
+            If F1.myname$ <> "" Then
                 
                     
                     F1.ByeBye2 nook
@@ -133,7 +157,7 @@ If TypeOf f Is GuiM2000 Then
             End If
         End If
     Else
-        If F1.MyName$ <> "" Then
+        If F1.myname$ <> "" Then
         
         
         F1.ByeBye2 nook
@@ -179,6 +203,11 @@ Sleep 100
 par1$ = LoadFileAndSwitches$
 par2$ = Prompt$
 Set UseMe = Me
+
+If Not Form3AppIcon Is Nothing Then
+    Set Form1.icon = Form3AppIcon
+    
+End If
 pid = GetCurrentProcessId()
 If strTemp = vbNullString Then strTemp = GetTempPathgg()
 Dim m As Long
@@ -291,7 +320,7 @@ DoEvents
 Sleep 5
 End If
 On Error Resume Next
-If Not ExtForm Is Nothing Then ExtForm.ShutDown
+If Not ExtForm Is Nothing Then ExtForm.Shutdown
 Dim i As Long
 For i = UBound(var()) To 0 Step -1: var(i) = 0&: Next i
 Finished = True
@@ -599,7 +628,7 @@ Public Sub SendMess(a$)
     On Error Resume Next
         ExtForm.SendMessNow a$
         If Err Then
-        Me.ShutDown True
+        Me.Shutdown True
         
         End If
         

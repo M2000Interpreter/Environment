@@ -93,7 +93,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 11
 Global Const VerMinor = 0
-Global Const Revision = 22
+Global Const Revision = 23
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3608,9 +3608,9 @@ End Sub
 
 
 Function SizeY(bstack As basetask, SG, a$, s$, s1$, R As Variant) As Boolean
-Dim r2 As Variant, R3 As Variant, r4 As Variant
+Dim r2 As Variant, R3 As Variant, R4 As Variant
     R3 = 0
-    r4 = 0
+    R4 = 0
     If IsStrExp(bstack, a$, s$) Then
     If Not FastSymbol(a$, ",") Then: MissParam a$: SizeY = False: Exit Function
     If Not IsStrExp(bstack, a$, s1$) Then: MissParam a$: SizeY = False: Exit Function
@@ -3621,14 +3621,14 @@ Dim r2 As Variant, R3 As Variant, r4 As Variant
              MissParam a$: SizeY = False: Exit Function
         End If
             If FastSymbol(a$, ",") Then
-                If Not IsExp(bstack, a$, r4, , True) Then
+                If Not IsExp(bstack, a$, R4, , True) Then
                     MissParam a$: SizeY = False: Exit Function
                 End If
-                r4 = Abs(Int(r4))
+                R4 = Abs(Int(R4))
             End If
         End If
     On Error Resume Next
-    R = nTextY(bstack, s$, s1$, CSng(r2), R3, r4)
+    R = nTextY(bstack, s$, s1$, CSng(r2), R3, R4)
     If Err.Number > 0 Then R = 0
     On Error GoTo 0
     If SG < 0 Then R = -R
@@ -3637,9 +3637,9 @@ Dim r2 As Variant, R3 As Variant, r4 As Variant
 End Function
 
 Function SizeX(bstack As basetask, SG, a$, s$, s1$, R As Variant) As Boolean
-Dim r2 As Variant, R3 As Variant, r4 As Variant
+Dim r2 As Variant, R3 As Variant, R4 As Variant
     R3 = 0
-    r4 = 0
+    R4 = 0
     If IsStrExp(bstack, a$, s$) Then
     If Not FastSymbol(a$, ",") Then SizeX = False: Exit Function
     If Not IsStrExp(bstack, a$, s1$) Then SizeX = False: Exit Function
@@ -3650,14 +3650,14 @@ Dim r2 As Variant, R3 As Variant, r4 As Variant
            MissParam a$: SizeX = False: Exit Function
         End If
             If FastSymbol(a$, ",") Then
-                If Not IsExp(bstack, a$, r4, , True) Then
+                If Not IsExp(bstack, a$, R4, , True) Then
                     MissParam a$: SizeX = False: Exit Function
                 End If
-                r4 = Abs(Int(r4))
+                R4 = Abs(Int(R4))
             End If
     End If
     On Error Resume Next
-    R = nText(bstack, s$, s1$, CSng(r2), R3, r4)
+    R = nText(bstack, s$, s1$, CSng(r2), R3, R4)
     If Err.Number > 0 Then R = 0
     On Error GoTo 0
     If SG < 0 Then R = -R
@@ -8006,7 +8006,7 @@ num57: ' "POINT", "ΣΗΜΕΙΟ"
     Else
     IsNumberNew = True
     With players(GetCode(bstack.Owner))
-    w1 = GetPixel(bstack.Owner.hdc, .XGRAPH \ dv15, .YGRAPH \ dv15)
+    w1 = GetPixel(bstack.Owner.hDC, .XGRAPH \ dv15, .YGRAPH \ dv15)
         If w1 = -1 Then
             R = &H7FFFFFFF
         Else
@@ -21576,12 +21576,9 @@ Case Else
     iscom = False
     End If
 VarOnly:
-    If linebyline Or onlyone Then
-        On ExecuteVar(Execute, 1, bstack, W$, b$, v, Lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers, forerror
-    Else
-        lbl = False
-        On ExecuteVar(Execute, 1, bstack, W$, b$, v, Lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, againExtra, exitfunc, forpointers, forfloatpointers, forerror
-    End If
+    
+    On ExecuteVar(Execute, 1, bstack, W$, b$, v, Lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers, forerror
+    
      
     If NoOptimum Then
     If GetSub(W$, v) Then
@@ -26268,7 +26265,7 @@ prive = players(GetCode(D))
 With tar
 Id& = .Id
 Tag$ = .Tag
-X& = .Lx
+X& = .lX
 Y& = .lY
 xl& = .tx + 1
 yl& = .ty
@@ -38726,7 +38723,7 @@ Case 3
     x1 = Scr.ScaleX(x1 + .XGRAPH, 1, 3) - Scr.ScaleX(.XGRAPH, 1, 3)
     y1 = Scr.ScaleX(y1 + .YGRAPH, 1, 3) - Scr.ScaleX(.YGRAPH, 1, 3)
     If photo.create(CLng(x1), CLng(y1)) Then
-    photo.LoadPictureBlt Scr.hdc, CLng(Scr.ScaleX(.XGRAPH, 1, 3)), CLng(Scr.ScaleX(.YGRAPH, 1, 3))
+    photo.LoadPictureBlt Scr.hDC, CLng(Scr.ScaleX(.XGRAPH, 1, 3)), CLng(Scr.ScaleX(.YGRAPH, 1, 3))
     
     If photo.bitsPerPixel <> 24 Then Conv24 photo
     
@@ -38755,7 +38752,7 @@ Case 6
     x1 = Scr.ScaleX(x1 + .XGRAPH, 1, 3) - Scr.ScaleX(.XGRAPH, 1, 3)
     y1 = Scr.ScaleX(y1 + .YGRAPH, 1, 3) - Scr.ScaleX(.YGRAPH, 1, 3)
     If photo.create(CLng(x1), CLng(y1)) Then
-            photo.LoadPictureBlt Scr.hdc, CLng(Scr.ScaleX(.XGRAPH, 1, 3)), CLng(Scr.ScaleX(.YGRAPH, 1, 3))
+            photo.LoadPictureBlt Scr.hDC, CLng(Scr.ScaleX(.XGRAPH, 1, 3)), CLng(Scr.ScaleX(.YGRAPH, 1, 3))
 
             If photo.bitsPerPixel <> 24 Then Conv24 photo
                 If MyIsObject(pppp.item(W6)) Then
@@ -38793,7 +38790,7 @@ y22 = 0!
  If Not (y22 = 0 And y2 = 100) Then
      RotateDib1 bstack, photo, y22, y2, Scr.BackColor
      End If
-      photo.PaintPicture Scr.hdc, CLng(Scr.ScaleX(x1, 1, 3)), CLng(Scr.ScaleX(y1, 1, 3))
+      photo.PaintPicture Scr.hDC, CLng(Scr.ScaleX(x1, 1, 3)), CLng(Scr.ScaleX(y1, 1, 3))
 
 End If
 Set photo = Nothing
@@ -38815,7 +38812,7 @@ y22 = 0!
 If Not (y22 = 0 And y2 = 100) Then
      RotateDib1 bstack, photo, y22, y2, , CLng(x1), CLng(y1)
        End If
-        photo.PaintPicture Scr.hdc, MyRound((Scr.ScaleX(x1, 1, 3)), 0), MyRound((Scr.ScaleX(y1, 1, 3)), 0) '', photo.Width * y2 \ 100, photo.Height * y2 \ 100
+        photo.PaintPicture Scr.hDC, MyRound((Scr.ScaleX(x1, 1, 3)), 0), MyRound((Scr.ScaleX(y1, 1, 3)), 0) '', photo.Width * y2 \ 100, photo.Height * y2 \ 100
      
  
 End If
@@ -40470,7 +40467,7 @@ End Function
 Function ProcRelease(basestack As basetask) As Boolean
 ' make this for each Guim2000 form also
 If basestack.Owner.Name = "DIS" Then
-    Form1.MY_BACK.PaintPicture Form1.DIS.hdc
+    Form1.MY_BACK.PaintPicture Form1.DIS.hDC
 ElseIf Typename(basestack.Owner) = "GuiM2000" Then
     Dim a As GuiM2000
     Set a = basestack.Owner
@@ -40478,11 +40475,11 @@ ElseIf Typename(basestack.Owner) = "GuiM2000" Then
         MyEr "Not for User forms with resize function", "Όχι για φόρμες χρήστη με δυνατότητα αλλαγής μεγέθους"
     Else
     
-        a.MY_BACK.PaintPicture a.hdc
+        a.MY_BACK.PaintPicture a.hDC
     End If
     Set a = Nothing
 ElseIf basestack.Owner Is Form1 Then
-Form1.Back_Back.PaintPicture Form1.hdc
+Form1.Back_Back.PaintPicture Form1.hDC
 ElseIf TypeOf basestack.Owner Is VB.PictureBox Then
     On Error GoTo there1
     Dim p As Long
@@ -40493,7 +40490,7 @@ ElseIf TypeOf basestack.Owner Is VB.PictureBox Then
             Set b = var(p)
             If Not b.MY_BACK Is Nothing Then
                 With b
-                    .MY_BACK.PaintPicture .pbox.hdc
+                    .MY_BACK.PaintPicture .pbox.hDC
                     Set b = Nothing
                 End With
             End If
@@ -40511,7 +40508,7 @@ Dim p As Long
 If basestack.Owner.Name = "DIS" Then
     Form1.MY_BACK.ClearUp
     If Form1.MY_BACK.create(Form1.DIS.Width / DXP, Form1.DIS.Height / DYP) Then
-        Form1.MY_BACK.LoadPictureBlt Form1.DIS.hdc
+        Form1.MY_BACK.LoadPictureBlt Form1.DIS.hDC
         If Form1.MY_BACK.bitsPerPixel <> 24 Then Conv24 Form1.MY_BACK
     End If
 ElseIf Typename(basestack.Owner) = "GuiM2000" Then
@@ -40524,7 +40521,7 @@ ElseIf Typename(basestack.Owner) = "GuiM2000" Then
             With a
             .MY_BACK.ClearUp
                 If .MY_BACK.create(.Width / DXP, .Height / DYP) Then
-                    .MY_BACK.LoadPictureBlt .hdc
+                    .MY_BACK.LoadPictureBlt .hDC
                     If .MY_BACK.bitsPerPixel <> 24 Then Conv24 .MY_BACK
                 End If
                 Set a = Nothing
@@ -40533,7 +40530,7 @@ ElseIf Typename(basestack.Owner) = "GuiM2000" Then
 ElseIf basestack.Owner Is Form1 Then
     Form1.Back_Back.ClearUp
     If Form1.Back_Back.create(Form1.Width / DXP, Form1.Height / DYP) Then
-        Form1.Back_Back.LoadPictureBlt Form1.hdc
+        Form1.Back_Back.LoadPictureBlt Form1.hDC
         If Form1.Back_Back.bitsPerPixel <> 24 Then Conv24 Form1.Back_Back
     End If
 ElseIf TypeOf basestack.Owner Is VB.PictureBox Then
@@ -40547,7 +40544,7 @@ If getvar2(basestack, players(p).ControlName, p, True) Then
     With b
     .MY_BACK.ClearUp
         If .MY_BACK.create(.pbox.Width / DXP, .pbox.Height / DYP) Then
-            .MY_BACK.LoadPictureBlt .pbox.hdc
+            .MY_BACK.LoadPictureBlt .pbox.hDC
             If .MY_BACK.bitsPerPixel <> 24 Then Conv24 .MY_BACK
         End If
         Set b = Nothing

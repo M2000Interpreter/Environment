@@ -111,6 +111,7 @@ Private Sub Form_GotFocus()
 ShowM2000
 End Sub
 
+
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
 If m Is Nothing Then Exit Sub
 On Error Resume Next
@@ -170,6 +171,10 @@ End Sub
 Public Sub GetIcon(a As String)
 Set Icon = UnPackData(a)
 End Sub
+Public Function GetAppIcon() As String
+    GetAppIcon = PackData(MyIcon)
+End Function
+
 Private Function UnPackData(sData As String) As Object
     Dim pbTemp  As PropertyBag
     Dim arData()    As Byte
@@ -181,5 +186,15 @@ Private Function UnPackData(sData As String) As Object
         Set UnPackData = .ReadProperty("icon")
     End With
      
+    Set pbTemp = Nothing
+End Function
+Private Function PackData(obj As Object) As String
+    Dim pbTemp  As PropertyBag
+    Set pbTemp = New PropertyBag
+    With pbTemp
+        Call .WriteProperty("icon", obj)
+        Let PackData = .Contents
+    End With
+    
     Set pbTemp = Nothing
 End Function

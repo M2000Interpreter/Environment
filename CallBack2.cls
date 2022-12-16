@@ -134,22 +134,22 @@ Set oldsoros = Nothing
 here$ = ohere$
 End Sub
 Private Function GetSubFullName2(nm$, fullname$, retnum As Long) As Boolean
-Dim dummy As Long
+Dim Dummy As Long
 If Len(here$) > 0 Then
     If Len(here$) > Len(nm$) Then
         If Mid$(here$, Len(here$) - Len(nm$)) = "." + nm$ Then
-            GetSubFullName2 = subHash.Find2(nm$, retnum, dummy)
+            GetSubFullName2 = subHash.Find2(nm$, retnum, Dummy)
           fullname = nm$: Exit Function
         End If
     End If
 End If
 
 If here$ <> "" Then
-     GetSubFullName2 = subHash.Find2(here$ & "." & nm$, retnum, dummy)
+     GetSubFullName2 = subHash.Find2(here$ & "." & nm$, retnum, Dummy)
   If GetSubFullName2 Then fullname$ = here$ & "." & nm$: Exit Function
 End If
 
-    GetSubFullName2 = subHash.Find2(nm$, retnum, dummy)
+    GetSubFullName2 = subHash.Find2(nm$, retnum, Dummy)
  If GetSubFullName2 Then fullname$ = nm$
 
 
@@ -191,7 +191,7 @@ here$ = full$
 
 Dim i As Long, ms As New mStiva, ar As mArray, j As Long
 Dim manydim As Long, maxitems As Long, probe As Long, v() As Variant, probelow As Long
-Dim IhaveSignature As Boolean, sign$, sign2$, dummy$, look As Long
+Dim IhaveSignature As Boolean, sign$, sign2$, Dummy$, look As Long
 If reghash.Find(myUcase(modulename$, True)) Then
 sign$ = reghash.Value
 sign2$ = sign$
@@ -231,10 +231,10 @@ ar.RevOrder = True
 ar.CopySerialize v()
 ''
 If IhaveSignature Then
-look = IsLabelOnly(sign$, dummy$)
+look = IsLabelOnly(sign$, Dummy$)
 If look = 2 Then ' byref
-look = IsLabelOnly(sign$, dummy$)
-look = globalvarGroup("b" & (var2used) & "." & dummy$, True) ' perhaps this is a fault, why is true??
+look = IsLabelOnly(sign$, Dummy$)
+look = globalvarGroup("b" & (var2used) & "." & Dummy$, True) ' perhaps this is a fault, why is true??
 ElseIf look > 4 Then
 FastSymbol sign, ")", True
 ms.DataObj ar
@@ -505,5 +505,14 @@ End Sub
 Public Function FileHandler(Fhandler, Optional fway = 1, Optional Fstep = 1, Optional uinc = 1) As Variant
 FileHandler = BigFileHandler(CLng(Fhandler), CLng(fway), CLng(Fstep), CLng(uinc))
 End Function
-
-
+Public Function CopyExe(NewName$, Optional useHelp) As Boolean
+    If UseMe Is Nothing Then
+    MyEr "You have to use the standard M2000.exe", "Πρέπει να χρησιμοποιήσεις το M2000.exe"
+    Exit Function
+    End If
+    If IsMissing(useHelp) Then
+        CopyExe = CopyM2000Exe(NewName$)
+    Else
+        CopyExe = CopyM2000Exe(NewName$, useHelp)
+    End If
+End Function

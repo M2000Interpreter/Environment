@@ -1541,7 +1541,6 @@ List1.BypassLeaveonChoose = False
 
 Set MeStack.Owner = Me
 
-
 ThereIsAPrinter = IsPrinter
 If ThereIsAPrinter Then
 

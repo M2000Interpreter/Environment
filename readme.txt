@@ -1,8 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 22 active-X
-Improved Editor.
-Long Long (64bit) can be pass from declared functions.
+Version 11 Revision 23 active-X
+Some bugs fixed.
 
 
 George Karras, Kallithea Attikis, Greece.

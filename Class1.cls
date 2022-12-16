@@ -21,7 +21,9 @@ Dim link$
 If Dir(App.path + "\" + App.ExeName + ".gsb") <> "" Then
 link$ = "{dir " + Chr$(34) + App.path + Chr$(34) + " : load " & App.ExeName & "}"
 End If
-
+'If Dir(App.path + "\M2000.gsb") <> "" Then
+'link$ = "{dir " + Chr$(34) + App.path + Chr$(34) + " : load M2000}"
+'End If
 Set f = New Form1
 f.Move VirtualScreenWidth() + 2000, VirtualScreenHeight() + 2000
 
@@ -31,10 +33,16 @@ If link$ <> "" Then
     Set m = NewObjectFromActivexDll(App.path + "\m2000.dll", "callback")
     If Err Then
     Err.Clear
+    
     Set m = NewObjectFromActivexDll(App.path + "\lib.bin", "callback")
+        If Err Then
+            Err.Clear
+            GoTo 1000
+        End If
     End If
 Else
-Set m = CreateObject("M2000.callback")
+1000
+    Set m = CreateObject("M2000.callback")
     If Err Then
         Err.Clear
         Set m = NewObjectFromActivexDll(App.path + "\m2000.dll", "callback")

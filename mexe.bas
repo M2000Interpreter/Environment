@@ -2,6 +2,10 @@ Attribute VB_Name = "Module1"
 Option Explicit
 ' M2000 starter
 ' We have to give some stack space
+Private Declare Function ExtractIconEx Lib "shell32.dll" _
+    Alias "ExtractIconExW" (ByVal lpszFile As Long, ByVal nIconIndex As Long, _
+    phiconLarge As Long, phiconSmall As Long, ByVal nIcons As Long) As Long
+
 Public Declare Function CoAllowSetForegroundWindow Lib "ole32.dll" (ByVal pUnk As Object, ByVal lpvReserved As Long) As Long
 
 Private Declare Function GetProcByName Lib "kernel32" Alias "GetProcAddress" (ByVal hModule As Long, ByVal lpProcName As String) As Long
@@ -33,7 +37,34 @@ Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 Public dv15 As Long
 Public ExitNow As Boolean
 Dim cfie As New cfie
+Private Type PictDesc
+    Size As Long
+    Type As Long
+    hHandle As Long
+    hPal As Long
+End Type
+Private Declare Function OleCreatePictureIndirect Lib "olepro32.dll" (lpPictDesc As PictDesc, riid As Any, ByVal fPictureOwnsHandle As Long, iPic As IPicture) As Long
+Public MyIcon As StdPicture
+Public Function HandleToStdPicture(ByVal hImage As Long, ByVal imgType As Long) As IPicture
 
+    ' function creates a stdPicture object from an image handle (bitmap or icon)
+    
+    Dim lpPictDesc As PictDesc, aGUID(0 To 3) As Long
+    With lpPictDesc
+        .Size = Len(lpPictDesc)
+        .Type = imgType
+        .hHandle = hImage
+        .hPal = 0
+    End With
+    ' IPicture GUID {7BF80980-BF32-101A-8BBB-00AA00300CAB}
+    aGUID(0) = &H7BF80980
+    aGUID(1) = &H101ABF32
+    aGUID(2) = &HAA00BB8B
+    aGUID(3) = &HAB0C3000
+    ' create stdPicture
+    Call OleCreatePictureIndirect(lpPictDesc, aGUID(0), True, HandleToStdPicture)
+    
+End Function
 Public Function commandW() As String
 Static mm$
 If mm$ <> "" Then commandW = mm$: Exit Function
@@ -53,11 +84,21 @@ Dim Ptr As Long: Ptr = GetCommandLineW
     If mm$ = "" And Command <> "" Then commandW = Command Else commandW = mm$
 End Function
 Sub Main()
+Dim mIcons As Long, there As String, iconHandler As Long
 dv15 = 1440 / DpiScrX
 DisableProcessWindowsGhosting
 If cfie.ReadFeature(cfie.ExeName, cfie.InstalledVersion * 1000) = Empty Then
 Debug.Print cfie.InstalledVersion
 End If
+there = App.path
+If Right$(there, 1) <> "\" Then
+there = there + "\" + App.ExeName + ".exe"
+Else
+there = there + App.ExeName + ".exe"
+End If
+mIcons = ExtractIconEx(StrPtr(there), -1, 0, 0, 0)
+Call ExtractIconEx(StrPtr(there), 0, iconHandler, 0, 1)
+Set MyIcon = HandleToStdPicture(iconHandler, vbPicTypeIcon)
 Dim mm As New RunM2000
 Dim o As Object
 Set o = mm

@@ -160,7 +160,13 @@ Private Sub Form_Load()
 Debug.Assert (InIDECheck = True)
 Timer1.Interval = 10000
 Timer1.enabled = False
-If Not byPassCallback Then Set Me.icon = Form1.icon
+If Not byPassCallback Then
+If Not Form3AppIcon Is Nothing Then
+    Set Me.icon = Form3AppIcon
+Else
+    Set Me.icon = Form1.icon
+End If
+End If
 End Sub
 
 
@@ -179,7 +185,7 @@ If TypeOf f Is GuiM2000 Then
     
     If Modalid <> 0 Then
         If F1.Modal = Modalid Then
-            If F1.MyName$ <> "" Then
+            If F1.myname$ <> "" Then
                 If lastform Is F1 Then
                     If Not F1.Enablecontrol Then Cancel = True: Exit Sub
                     F1.ByeBye2 nook: uselastform = True
@@ -189,7 +195,7 @@ If TypeOf f Is GuiM2000 Then
             End If
         End If
     Else
-        If F1.MyName$ <> "" Then
+        If F1.myname$ <> "" Then
         If lastform Is F1 Then
             If Not F1.Enablecontrol Then Cancel = True: Exit Sub
                 F1.ByeBye2 nook: uselastform = True
