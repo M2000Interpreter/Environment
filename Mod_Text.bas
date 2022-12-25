@@ -93,7 +93,7 @@ Public TestShowBypass As Boolean
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 11
 Global Const VerMinor = 0
-Global Const Revision = 23
+Global Const Revision = 24
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -121,7 +121,7 @@ Public LEVCOLMENU As Long
      
 
 Public taskid As Long, kill2$, para$
-Private Declare Function timeGetTime Lib "winmm.dll" () As Long
+Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
 Public sRec As Object
 Public defFontname As String
 Public pnum As Long
@@ -11086,12 +11086,7 @@ Body.code = block(rest$)
 End If
 If Trim$(Body.code) = vbNullString Then Exit Function
 k = Len(rest$)
-If Left$(rest$, 1) = "}" Then
-Mid$(rest$, 1, 1) = ":"
-Else
-Exit Function
-End If
-'If Not FastSymbol(rest$, "}") Then Exit Function
+If Not FastSymbol(rest$, "}") Then Exit Function
 Else
 GetLine:
 ' get one line only
@@ -17426,7 +17421,7 @@ End If
 End If
 End Function
 '
-Function Fast2NoSpace(a$, c$, cl As Long, D$, dl As Long, ahead&) As Boolean
+Function Fast2NoSpace(a$, c$, cl As Long, d$, dl As Long, ahead&) As Boolean
 Dim i As Long, Pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
@@ -17448,12 +17443,12 @@ Fast2NoSpace = True
 End If
 Exit Function
 End If
-If D$ = Left$(Pad$, dl) Then
+If d$ = Left$(Pad$, dl) Then
 j = MyTrimLi(a$, dl + 1)
 GoTo check
 End If
 End Function
-Function Fast3NoSpaceCheck(Pos As Long, a$, c$, cl As Long, D$, dl As Long, e$, el As Long, ahead&) As Boolean
+Function Fast3NoSpaceCheck(Pos As Long, a$, c$, cl As Long, d$, dl As Long, e$, el As Long, ahead&) As Boolean
 Dim i As Long, Pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
@@ -17463,7 +17458,7 @@ If c$ = Left$(Pad$, cl) Then
     Fast3NoSpaceCheck = True
 Exit Function
 End If
-If D$ = Left$(Pad$, dl) Then
+If d$ = Left$(Pad$, dl) Then
 Pos = Pos + dl
 Fast3NoSpaceCheck = True
 Exit Function
@@ -17474,7 +17469,7 @@ Fast3NoSpaceCheck = True
 End If
 
 End Function
-Function Fast3NoSpace(a$, c$, cl As Long, D$, dl As Long, e$, el As Long, ahead&) As Boolean
+Function Fast3NoSpace(a$, c$, cl As Long, d$, dl As Long, e$, el As Long, ahead&) As Boolean
 Dim i As Long, Pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
@@ -17484,7 +17479,7 @@ a$ = Mid$(a$, MyTrimLi(a$, cl + 1))
 Fast3NoSpace = True
 Exit Function
 End If
-If D$ = Left$(Pad$, dl) Then
+If d$ = Left$(Pad$, dl) Then
 a$ = Mid$(a$, MyTrimLi(a$, dl + 1))
 Fast3NoSpace = True
 Exit Function
@@ -17495,7 +17490,7 @@ Fast3NoSpace = True
 End If
 
 End Function
-Function Fast3Label(a$, c$, cl As Long, D$, dl As Long, e$, el As Long, ahead&) As Boolean
+Function Fast3Label(a$, c$, cl As Long, d$, dl As Long, e$, el As Long, ahead&) As Boolean
 Dim i As Long, Pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
@@ -17512,7 +17507,7 @@ Exit Function
 End If
 End If
 If j - i >= dl - 1 Then
-If InStr(D$, Left$(Pad$, dl)) > 0 Then
+If InStr(d$, Left$(Pad$, dl)) > 0 Then
 If Mid$(Pad$, dl + 1, 1) Like "[0-9+.\( @-]" Then
 a$ = Mid$(a$, MyTrimLi(a$, i + dl))
 Fast3Label = True
@@ -17529,7 +17524,7 @@ End If
 End If
 End If
 End Function
-Function Fast2VarNoTrim(a$, c$, cl As Long, D$, dl As Long, ahead&, Pos As Long) As Boolean
+Function Fast2VarNoTrim(a$, c$, cl As Long, d$, dl As Long, ahead&, Pos As Long) As Boolean
 ' need space
 Dim i As Long, Pad$, j As Long
 j = Len(a$)
@@ -17549,7 +17544,7 @@ End If
 End If
 If dl = 0 Then Exit Function
 If j - i >= dl - 1 Then
-If InStr(D$, Left$(Pad$, dl)) > 0 Then
+If InStr(d$, Left$(Pad$, dl)) > 0 Then
 If Mid$(Pad$, dl + 1, 1) = " " Then
 Mid$(a$, i) = space$(dl)
 Pos = 2
@@ -17558,7 +17553,7 @@ End If
 End If
 End If
 End Function
-Function Fast2Varl(a$, c$, cl As Long, D$, dl As Long, ahead&, ByVal f As Long) As Boolean
+Function Fast2Varl(a$, c$, cl As Long, d$, dl As Long, ahead&, ByVal f As Long) As Boolean
 ' use F if dl>0
 Dim i As Long, Pad$, j As Long
 j = Len(a$)
@@ -17572,7 +17567,7 @@ If Left$(Pad$, cl) = c$ Then
 i = i + cl
 If Len(a$) >= i Then
 Select Case AscW(Mid$(a$, i + 1, 1))
-Case Is < 36, 39, 41, 44, 47, 58, 92, 123, 125, 160
+Case Is < 36, 39, 41, 44, 47, 58, 61, 92, 123, 125, 160
 Case Else
 Exit Function
 End Select
@@ -17585,12 +17580,12 @@ End If
 If dl = 0 Or f = 1 Then Exit Function
 there:
 If j - i >= dl - 1 Then
-If Left$(Pad$, dl) = D$ Then
+If Left$(Pad$, dl) = d$ Then
 
 i = i + dl
 If Len(a$) >= i Then
 Select Case AscW(Mid$(a$, i + 1, 1))
-Case Is < 36, 39, 41, 44, 47, 58, 92, 123, 125, 160
+Case Is < 36, 39, 41, 44, 47, 58, 61, 92, 123, 125, 160
 Case Else
 Exit Function
 End Select
@@ -17602,7 +17597,7 @@ End If
 End If
 
 End Function
-Function Fast2VarSpace(a$, c$, cl As Long, D$, dl As Long, ahead&) As Boolean
+Function Fast2VarSpace(a$, c$, cl As Long, d$, dl As Long, ahead&) As Boolean
 ' need always space
 Dim i As Long, Pad$, j As Long
 j = Len(a$)
@@ -17621,7 +17616,7 @@ End If
 End If
 If dl = 0 Then Exit Function
 If j - i >= dl - 1 Then
-If Left$(Pad$, dl) = D$ Then
+If Left$(Pad$, dl) = d$ Then
 If Mid$(Pad$, dl + 1, 1) = " " Then
 a$ = Mid$(a$, MyTrimLi(a$, i + dl))
 Fast2VarSpace = True
@@ -17629,7 +17624,7 @@ End If
 End If
 End If
 End Function
-Function Fast3Varl(a$, c$, cl As Long, D$, dl As Long, e$, el As Long, ahead&) As Boolean
+Function Fast3Varl(a$, c$, cl As Long, d$, dl As Long, e$, el As Long, ahead&) As Boolean
 Dim i As Long, Pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
@@ -17645,7 +17640,7 @@ End If
 End If
 If dl = 0 Then Exit Function
 If j - i >= dl - 1 Then
-If Left$(Pad$, dl) = D$ Then
+If Left$(Pad$, dl) = d$ Then
 a$ = Mid$(a$, MyTrimLi(a$, i + dl))
 Fast3Varl = True
 End If
@@ -25497,7 +25492,7 @@ End If
 End Function
 
 
-Function logical(basestack As basetask, s$, D As Variant, Optional par As Long = 0, Optional flatobject As Boolean = False, Optional ByPass As Boolean = False, Optional SG As Integer = 1) As Boolean
+Function logical(basestack As basetask, s$, d As Variant, Optional par As Long = 0, Optional flatobject As Boolean = False, Optional ByPass As Boolean = False, Optional SG As Integer = 1) As Boolean
 Dim b$, s2$, S3$ ' , OSTAC$
 Dim ah As String
 again11:
@@ -25511,7 +25506,7 @@ End If
 If InStr(ah, "l") = 0 Then
 If InStr(ah, "N") > 0 Then
 If Len(ah) = 1 Then
-If Not IsNumber(basestack, s$, D, flatobject, SG) Then
+If Not IsNumber(basestack, s$, d, flatobject, SG) Then
     Set basestack.lastobj = Nothing
     If LastErNum1 < 0 Then Exit Function
 Else
@@ -25519,7 +25514,7 @@ SG = 1
     logical = True
 End If
 Else
-If Not IsNumber(basestack, s$, D, flatobject, SG) Then
+If Not IsNumber(basestack, s$, d, flatobject, SG) Then
     Set basestack.lastobj = Nothing
     If LastErNum1 < 0 Then Exit Function
 Else
@@ -25528,7 +25523,7 @@ End If
 End If
 Else
 If par > 0 Then
-If Not GetArr(basestack, s$, D, s2$, 0) Then
+If Not GetArr(basestack, s$, d, s2$, 0) Then
     Set basestack.lastobj = Nothing
 Else
     If Len(s$) > 0 Then
@@ -25567,7 +25562,7 @@ If FastSymbol(s$, "=") Then
     logical = False
     If IsStrExp(basestack, s$, s2$) Then
     logical = True
-    D = b$ = s2$
+    d = b$ = s2$
     Exit Function
     Else
     If LastErNum = -2 Then logical = True
@@ -25583,11 +25578,11 @@ ElseIf FastSymbol(s$, "<") Then
                 logical = True
                 Select Case b$
                 Case Is < s2$
-                    D = -1
+                    d = -1
                 Case Is = s2$
-                    D = 0
+                    d = 0
                 Case Else
-                    D = 1
+                    d = 1
                 End Select
                 Exit Function
             Else
@@ -25597,7 +25592,7 @@ ElseIf FastSymbol(s$, "<") Then
         Else
             If IsStrExp(basestack, s$, s2$) Then
                 logical = True
-                D = b$ <= s2$
+                d = b$ <= s2$
                 Exit Function
             Else
                 If LastErNum = -2 Then logical = True
@@ -25608,7 +25603,7 @@ ElseIf FastSymbol(s$, "<") Then
         Mid$(s$, 1, 1) = " "
         If IsStrExp(basestack, s$, s2$) Then
             logical = True
-            D = b$ <> s2$
+            d = b$ <> s2$
             Exit Function
         Else
             If LastErNum = -2 Then logical = True
@@ -25616,7 +25611,7 @@ ElseIf FastSymbol(s$, "<") Then
         End If
     ElseIf IsStrExp(basestack, s$, s2$) Then
     logical = True
-    D = b$ < s2$
+    d = b$ < s2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -25628,7 +25623,7 @@ ElseIf FastSymbol(s$, ">") Then
         Mid$(s$, 1, 1) = " "
         If IsStrExp(basestack, s$, s2$) Then
             logical = True
-            D = b$ >= s2$
+            d = b$ >= s2$
             Exit Function
         Else
             If LastErNum = -2 Then logical = True
@@ -25636,7 +25631,7 @@ ElseIf FastSymbol(s$, ">") Then
         End If
     ElseIf IsStrExp(basestack, s$, s2$) Then
     logical = True
-    D = b$ > s2$
+    d = b$ > s2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -25646,7 +25641,7 @@ ElseIf FastSymbol(s$, "~") Then
     logical = False
     If IsStrExp(basestack, s$, s2$) Then
     logical = True
-    D = b$ Like s2$
+    d = b$ Like s2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -25658,7 +25653,7 @@ If FastSymbol(s$, "=") Then
     logical = False
     If IsStrExp(basestack, s$, s2$) Then
     logical = True
-    D = CompareStr2(b$, s2$) = 0
+    d = CompareStr2(b$, s2$) = 0
     Exit Function
     Else
     If LastErNum = -2 Then logical = True
@@ -25672,7 +25667,7 @@ ElseIf FastSymbol(s$, "<") Then
             Mid$(s$, 2, 1) = " "
             If IsStrExp(basestack, s$, s2$) Then
                 logical = True
-                D = CompareStr2(b$, s2$)
+                d = CompareStr2(b$, s2$)
                 Exit Function
             Else
                 If LastErNum = -2 Then logical = True
@@ -25680,7 +25675,7 @@ ElseIf FastSymbol(s$, "<") Then
             End If
         ElseIf IsStrExp(basestack, s$, s2$) Then
             logical = True
-            D = CompareStr2(b$, s2$) < 1
+            d = CompareStr2(b$, s2$) < 1
             Exit Function
         Else
             If LastErNum = -2 Then logical = True
@@ -25690,7 +25685,7 @@ ElseIf FastSymbol(s$, "<") Then
         Mid$(s$, 1, 1) = " "
         If IsStrExp(basestack, s$, s2$) Then
             logical = True
-            D = CompareStr2(b$, s2$) <> 0
+            d = CompareStr2(b$, s2$) <> 0
             Exit Function
         Else
             If LastErNum = -2 Then logical = True
@@ -25698,7 +25693,7 @@ ElseIf FastSymbol(s$, "<") Then
         End If
     ElseIf IsStrExp(basestack, s$, s2$) Then
         logical = True
-        D = CompareStr2(b$, s2$) = -1
+        d = CompareStr2(b$, s2$) = -1
         Exit Function
     Else
         If LastErNum = -2 Then logical = True
@@ -25710,7 +25705,7 @@ ElseIf FastSymbol(s$, ">") Then
         Mid$(s$, 1, 1) = " "
         If IsStrExp(basestack, s$, s2$) Then
             logical = True
-            D = CompareStr2(b$, s2$) > -1
+            d = CompareStr2(b$, s2$) > -1
             Exit Function
         Else
             If LastErNum = -2 Then logical = True
@@ -25718,7 +25713,7 @@ ElseIf FastSymbol(s$, ">") Then
         End If
     ElseIf IsStrExp(basestack, s$, s2$) Then
         logical = True
-        D = CompareStr2(b$, s2$) = 1
+        d = CompareStr2(b$, s2$) = 1
         Exit Function
     Else
         If LastErNum = -2 Then logical = True
@@ -25728,7 +25723,7 @@ ElseIf FastSymbol(s$, "~") Then
     logical = False
     If IsStrExp(basestack, s$, s2$) Then
     logical = True
-    D = b$ Like s2$
+    d = b$ Like s2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -25742,7 +25737,7 @@ Else
 'If s$ <> s2$ Then Stop
 's$ = s2$
 cont145:
-If IsNumber(basestack, s$, D, flatobject, SG) Then
+If IsNumber(basestack, s$, d, flatobject, SG) Then
 logical = True
 End If
 End If
@@ -26257,11 +26252,11 @@ Sub RTarget(DDD As Object, tar As target)
 ' RENDER TARGET
 Dim xl&, yl&, b As Long, f As Long, Tag$, Id&
 Dim X&, Y&, ox&, oy&
-Dim prive As basket, D As Object
+Dim prive As basket, d As Object
 Dim c2&, v1&, v2&, vert&, mem As MemBlock
 Dim zoom As Single
-Set D = DDD.Owner
-prive = players(GetCode(D))
+Set d = DDD.Owner
+prive = players(GetCode(d))
 With tar
 Id& = .Id
 Tag$ = .Tag
@@ -26287,7 +26282,7 @@ Set dd = Form1
 ElseIf .layer > 0 And .layer < 33 Then
 Set dd = Form1.dSprite(.layer)
 Else
-Set dd = D
+Set dd = d
 End If
 
 prive.Xt = .Xt
@@ -26311,9 +26306,9 @@ Dim fx&, fy&
 If zoom < 0 Then
         If c2& <> &H81000000 Then
             If vert& = 0 Then
-                BoxColorNewBarHor D, prive, xl& - 1, yl&, c2&, v2&, v1&
+                BoxColorNewBarHor d, prive, xl& - 1, yl&, c2&, v2&, v1&
             Else
-                BoxColorNewBarVer D, prive, xl& - 1, yl&, c2&, v2&, v1&
+                BoxColorNewBarVer d, prive, xl& - 1, yl&, c2&, v2&, v1&
             End If
         End If
         c2& = &H81000000
@@ -26369,9 +26364,9 @@ End If
 End If
 If c2& <> &H81000000 Then
     If vert& = 0 Then
-        BoxColorNewBarHor D, prive, xl& - 1, yl&, c2&, v2&, v1&
+        BoxColorNewBarHor d, prive, xl& - 1, yl&, c2&, v2&, v1&
     Else
-        BoxColorNewBarVer D, prive, xl& - 1, yl&, c2&, v2&, v1&
+        BoxColorNewBarVer d, prive, xl& - 1, yl&, c2&, v2&, v1&
     End If
 End If
 If Id& < 100 Then
@@ -26433,10 +26428,10 @@ Else
     End If
     dd.ForeColor = mycolor(prive.mypen)
     
-    If Not D Is dd Then
+    If Not d Is dd Then
     Set DDD.Owner = dd
     wwPlain2 DDD, prive, Tag$, xl& - X&, 10000, , True, f, , , True
-    Set DDD.Owner = D
+    Set DDD.Owner = d
     Else
     wwPlain2 DDD, prive, Tag$, xl& - X&, 10000, , True, f, , , True
     End If
@@ -27287,11 +27282,11 @@ Set var = aa
 End Sub
 
 Function CheckVarGroup(basestack As basetask, var As Variant, s As String, Optional Final As Boolean = False) As Long
-Dim D As Document, c As Constant
+Dim d As Document, c As Constant
                 
 If VarTypeName(var) = doc Then
-Set D = var
-D.FasttextDoc = s
+Set d = var
+d.FasttextDoc = s
 
 ElseIf VarTypeName(var) = "lambda" Then
 If Not basestack.lastobj Is Nothing Then
@@ -31650,7 +31645,7 @@ End If
 
 Dim len1 As Long, there1 As Long, a$
 Dim there As Long, Curs As Long, Curs2 As Long
-Dim a1 As Long, b As Long, c As Long, D As Long
+Dim a1 As Long, b As Long, c As Long, d As Long
 Dim ss$, Dump$
 len1 = Len(ww$(0))
 If len1 = 1 Then
@@ -31670,7 +31665,7 @@ If len1 = 1 Then
             Do While .FindIdentifier(ww$(1), False, there, Curs)
                 If NLtrim$(Left$(.TextParagraph(there), Curs - 1)) = vbNullString Then
                     Final = -1
-                    .FindPos .FirstParagraphLine(there) + 2, 1, Final, a1, b, c, D
+                    .FindPos .FirstParagraphLine(there) + 2, 1, Final, a1, b, c, d
                     Final = Final + 1 ' because mid$ starts from 1
                     W$ = vbNullString
                     searchsub = True
@@ -31727,7 +31722,7 @@ paliedo:
                         Curs = 0
                     Else
                         Final = -1
-                        .FindPos .FirstParagraphLine(there1) + 2, 1, Final, a1, b, c, D
+                        .FindPos .FirstParagraphLine(there1) + 2, 1, Final, a1, b, c, d
                         Final = Final + 1 ' because mid$ starts from 1
                         W$ = BlockParam(Trim(Mid$(.TextParagraph(there), Curs2 + Len(ww(1)))))
                         searchsub = True
@@ -32834,7 +32829,7 @@ Dim j As VbVarType
 j = VarType(a)
 If j < vbSingle Or j = 20 Then MyRound = a: Exit Function
 Dim c As Variant
-Static n(1 To 28) As Single, D(1 To 28) As Double, cur(1 To 28) As Currency, dec(1 To 28) As Variant
+Static n(1 To 28) As Single, d(1 To 28) As Double, cur(1 To 28) As Currency, dec(1 To 28) As Variant
 Static SG(-1 To 1) As Single, sg4(-1 To 1) As Double, sg8(-1 To 1) As Currency
 On Error GoTo there
 If n(1) = 0 Then
@@ -32853,12 +32848,12 @@ If n(1) = 0 Then
         n(c) = CSng(10 ^ 5)
         n(10) = CSng(10 ^ 5)
     For c = 1& To 13&
-        D(c) = CDbl(10 ^ c)
+        d(c) = CDbl(10 ^ c)
     Next c
     For c = 14& To 27&
-        D(c) = CDbl(-1)
+        d(c) = CDbl(-1)
     Next c
-    D(c) = CDbl(10 ^ 13)
+    d(c) = CDbl(10 ^ 13)
     
     For c = 1& To 3&
         cur(c) = CCur(10 ^ c)
@@ -32887,8 +32882,8 @@ End If
         Case vbDouble
             c = sg4(Sgn(a))
  
-            If D(i) > 0 Then
-                MyRound = Fix(a * D(i) + c) / D(i)
+            If d(i) > 0 Then
+                MyRound = Fix(a * d(i) + c) / d(i)
             Else
                 MyRound = a
             End If
@@ -44207,10 +44202,14 @@ Private Sub checkbreak(bstack As basetask, b$, once As Boolean)
 Static Busy As Boolean
 If timestamp < 0 Then
 If lckfrm > 0 Then Exit Sub
-timestamp = timeGetTime + 1000
+'timestamp = ((timeGetTime And &HF80000) + &H80000) And &HF80000
+timestamp = timeGetTime And &H7800
+Exit Sub
 End If
-If Abs(timestamp - timeGetTime) < 1000 Then Exit Sub
-timestamp = timeGetTime + 1000
+If (timeGetTime And &H7800) = timestamp Then Exit Sub
+
+'timestamp = ((timeGetTime And &HF80000) + &H80000) And &HF80000
+timestamp = timeGetTime And &H7800
 If Forms.Count > 5 Then Exit Sub
 If Busy Then Exit Sub
 If Not bstack.IamAnEvent Then
@@ -44218,7 +44217,8 @@ If bstack.TaskMain Then Exit Sub
 If KeyPressed2(&H11, &H43) Then
 Busy = True
 Form1.EXECSTOP
-timestamp = timeGetTime + 1000
+'timestamp = ((timeGetTime And &HF80000) + &H80000) And &HF80000
+timestamp = timeGetTime And &H7800
 Busy = False
 Exit Sub
 ElseIf KeyPressedLong(&H13) = 0 Then
@@ -44245,9 +44245,11 @@ If Form1.mybreak1() Then
     
 End If
 ResetBreak
-timestamp = timeGetTime + 1000
+'timestamp = ((timeGetTime And &HF80000) + &H80000) And &HF80000
+timestamp = timeGetTime And &H7800
 Busy = False
 End Sub
+
 Public Sub ClearStr(a$)
 Dim i As Long, j As Long
                 While FastSymbol(a$, vbCrLf, , 2)

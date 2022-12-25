@@ -1,8 +1,10 @@
 M2000 Interpreter and Environment
 
-Version 11 Revision 23 active-X
-Some bugs fixed.
-
+Version 11 Revision 24 active-X
+Bugs removed:
+1- now conv2 in info run as expected
+2- change library for timeGetTime, now use the GetTickCount
+I found problems in Windows 10 (return of negative number unexpected). This problem cause an unhandled overflow.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

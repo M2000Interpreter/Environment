@@ -216,7 +216,7 @@ Public TrueVisible As Boolean, previewKey As Boolean
 Public WithEvents TEXT1 As TextViewer
 Attribute TEXT1.VB_VarHelpID = -1
 Public EditTextWord As Boolean
-Private Declare Function timeGetTime Lib "winmm.dll" () As Long
+Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
 ' by default EditTextWord is false, so we look for identifiers not words
 Private Pad$, s$
 Private Declare Function DefWindowProcW Lib "user32" (ByVal hWnd As Long, ByVal wMsg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long

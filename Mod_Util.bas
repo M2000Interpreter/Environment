@@ -136,7 +136,7 @@ Public Const LOCALE_STHOUSAND = &HF&
 Public Const LOCALE_SMONDECIMALSEP = &H16&
 Public Const LOCALE_SMONTHOUSANDSEP = &H17&
 Public Const LOCALE_SMONGROUPING = &H18&
-Private Declare Function timeGetTime Lib "winmm.dll" () As Long
+Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
 Private Const DT_BOTTOM As Long = &H8&
 Private Const DT_CALCRECT As Long = &H400&
 Private Const DT_CENTER As Long = &H1&
@@ -979,12 +979,12 @@ End Sub
 ' ***************
 
 
-Public Sub TextColor(D As Object, tc As Long)
-D.ForeColor = tc And &HFFFFFF
+Public Sub TextColor(d As Object, tc As Long)
+d.ForeColor = tc And &HFFFFFF
 End Sub
-Public Sub TextColorB(D As Object, mb As basket, tc As Long)
-D.ForeColor = tc And &HFFFFFF
-mb.mypen = D.ForeColor
+Public Sub TextColorB(d As Object, mb As basket, tc As Long)
+d.ForeColor = tc And &HFFFFFF
+mb.mypen = d.ForeColor
 End Sub
 
 Public Sub LCTNo(DqQQ As Object, ByVal Y As Long, ByVal X As Long)
@@ -1573,9 +1573,9 @@ conthere:
                           
 End Function
 
-Public Function MyTextWidth(D As Object, a$) As Long
+Public Function MyTextWidth(d As Object, a$) As Long
 Dim nr As RECT
-CalcRect D.hDC, a$, nr
+CalcRect d.hDC, a$, nr
 'MyTextWidth = nr.Right * d.ScaleX(1, 3, 1)
 MyTextWidth = nr.Right * DXP
 End Function
@@ -2641,19 +2641,19 @@ Public Sub nForm(bstack As basetask, TheSize As Single, nW As Long, nH As Long, 
 End Sub
 Sub crNew(bstack As basetask, mb As basket)
 
-Dim D As Object
-Set D = bstack.Owner
+Dim d As Object
+Set d = bstack.Owner
 With mb
 Dim PX As Long, PY As Long, R As Long
 PX = .curpos
 PY = .currow
 PX = 0
 PY = PY + 1
-If TypeOf D Is MetaDc Then
+If TypeOf d Is MetaDc Then
 
 ElseIf PY >= .mY Then
     If Not bstack.toprinter Then
-        ScrollUpNew D, mb
+        ScrollUpNew d, mb
         PY = .mY - 1
     Else
         PY = 0
@@ -2704,38 +2704,38 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 
-Public Sub ScrollUpNew(D As Object, mb As basket)
-If TypeOf D Is MetaDc Then Exit Sub
+Public Sub ScrollUpNew(d As Object, mb As basket)
+If TypeOf d Is MetaDc Then Exit Sub
 Dim ar As RECT, R As Long
 Dim p As Long
 With mb
 ar.Left = 0
-ar.Bottom = D.Height / dv15
-ar.Right = D.Width / dv15
+ar.Bottom = d.Height / dv15
+ar.Right = d.Width / dv15
 ar.top = .mysplit * .Yt / dv15
 p = .Yt / dv15
-R = BitBlt(D.hDC, CLng(ar.Left), CLng(ar.top), CLng(ar.Right), CLng(ar.Bottom - p), D.hDC, CLng(ar.Left), CLng(ar.top + p), SRCCOPY)
+R = BitBlt(d.hDC, CLng(ar.Left), CLng(ar.top), CLng(ar.Right), CLng(ar.Bottom - p), d.hDC, CLng(ar.Left), CLng(ar.top + p), SRCCOPY)
 
  
   ar.top = ar.Bottom - p
-FillBack D.hDC, ar, .Paper
+FillBack d.hDC, ar, .Paper
 .curpos = 0
 .currow = .mY - 1
 End With
 GdiFlush
 End Sub
-Public Sub ScrollDownNew(D As Object, mb As basket)
-If TypeOf D Is MetaDc Then Exit Sub
+Public Sub ScrollDownNew(d As Object, mb As basket)
+If TypeOf d Is MetaDc Then Exit Sub
 Dim ar As RECT, R As Long
 Dim p As Long
 With mb
 ar.Left = 0
-ar.Bottom = D.ScaleY(D.Height, 1, 3)
-ar.Right = D.ScaleX(D.Width, 1, 3)
-ar.top = D.ScaleY(.mysplit * .Yt, 1, 3)
-p = D.ScaleY(.Yt, 1, 3)
-R = BitBlt(D.hDC, CLng(ar.Left), CLng(ar.top + p), CLng(ar.Right), CLng(ar.Bottom - p), D.hDC, CLng(ar.Left), CLng(ar.top), SRCCOPY)
-D.Line (0, .mysplit * .Yt)-(D.ScaleWidth, .mysplit * .Yt + .Yt), .Paper, BF
+ar.Bottom = d.ScaleY(d.Height, 1, 3)
+ar.Right = d.ScaleX(d.Width, 1, 3)
+ar.top = d.ScaleY(.mysplit * .Yt, 1, 3)
+p = d.ScaleY(.Yt, 1, 3)
+R = BitBlt(d.hDC, CLng(ar.Left), CLng(ar.top + p), CLng(ar.Right), CLng(ar.Bottom - p), d.hDC, CLng(ar.Left), CLng(ar.top), SRCCOPY)
+d.Line (0, .mysplit * .Yt)-(d.ScaleWidth, .mysplit * .Yt + .Yt), .Paper, BF
 .currow = .mysplit
 .curpos = 0
 End With
@@ -3312,20 +3312,20 @@ Next i
 End Sub
 
 Sub original(bstack As basetask, COM$)
-Dim D As Object, b$
+Dim d As Object, b$
 
 If Len(COM$) > 0 Then QUERYLIST = vbNullString
 If Form1.Visible Then REFRESHRATE = 25: ResetPrefresh
 If bstack.toprinter Then
 bstack.toprinter = False
 Form1.PrinterDocument1.Cls
-Set D = bstack.Owner
+Set d = bstack.Owner
 Else
-Set D = bstack.Owner
+Set d = bstack.Owner
 End If
 On Error Resume Next
 Dim basketcode As Long
-basketcode = GetCode(D)
+basketcode = GetCode(d)
 
 
 Form1.IEUP ""
@@ -3334,11 +3334,11 @@ Dim Dummy As Boolean, rs As String, mPen As Long, ICO As Long, BAR As Long, bar2
 BAR = 1
 Form1.DIS.Visible = True
 GDILines = False  ' reset to normal ' use Smooth on to change this to true
-If COM$ <> "" Then D.Visible = False
+If COM$ <> "" Then d.Visible = False
 ClrSprites
 mPen = PenOne
-D.Font.bold = bstack.myBold
-D.Font.Italic = bstack.myitalic
+d.Font.bold = bstack.myBold
+d.Font.Italic = bstack.myitalic
 GetMonitorsNow
 Console = FindFormSScreen(Form1)
 '' Console = FindPrimary
@@ -3371,11 +3371,11 @@ If SzOne < 4 Then SzOne = 4
 NoBackFormFirstUse = False
 If players(-1).MAXXGRAPH <> 0 Then ClearScrNew Form1, players(-1), 0&
 Form1.DIS.Visible = True
-FrameText D, SzOne, (.Width + .Left - 1 - Form1.Left), (.Height + .top - 1 - Form1.top), PaperOne
+FrameText d, SzOne, (.Width + .Left - 1 - Form1.Left), (.Height + .top - 1 - Form1.top), PaperOne
 End With
 Form1.DIS.BackColor = mycolor(PaperOne)
 If lckfrm = 0 Then
-SetText D
+SetText d
 bstack.Owner.Font.charset = bstack.myCharSet
 StoreFont bstack.Owner.Font.Name, SzOne, bstack.myCharSet
  
@@ -3403,12 +3403,12 @@ If Not IsSupervisor Then
     LastErNum = 0
     If ss$ <> "" Then
      skipthat = interpret(bstack, ss$)
-     If mycolor(PenOne) <> D.ForeColor Then
-     PenOne = -D.ForeColor
+     If mycolor(PenOne) <> d.ForeColor Then
+     PenOne = -d.ForeColor
      End If
     End If
 End If
-If SzOne < 36 And D.Height / SzOne > 250 Then SetDouble D: BAR = BAR + 1
+If SzOne < 36 And d.Height / SzOne > 250 Then SetDouble d: BAR = BAR + 1
 If SzOne < 83 Then
 
 If bstack.myCharSet = 161 Then
@@ -3416,10 +3416,10 @@ b$ = "–≈—…¬¡ÀÀœÕ "
 Else
 b$ = "ENVIRONMENT "
 End If
-D.ForeColor = mycolor(PenOne)
-LCTbasket D, players(DisForm), 0, 0
-wwPlain2 bstack, players(DisForm), b$ + "M2000", D.Width, 0, 0 '',True
-ICO = TextWidth(D, b$ + "M2000") + 100
+d.ForeColor = mycolor(PenOne)
+LCTbasket d, players(DisForm), 0, 0
+wwPlain2 bstack, players(DisForm), b$ + "M2000", d.Width, 0, 0 '',True
+ICO = TextWidth(d, b$ + "M2000") + 100
 ' draw graphic'
 Dim iX As Long, iY As Long
 With players(DisForm)
@@ -3437,40 +3437,40 @@ End If
 End With
 
 ' ********
-SetNormal D
+SetNormal d
    Dim osbit As String
    If Is64bit Then osbit = " (64-bit)" Else osbit = " (32-bit)"
-        LCTbasket D, players(basketcode), BAR, 0
+        LCTbasket d, players(basketcode), BAR, 0
         rs = vbNullString
             If bstack.myCharSet = 161 Then
             If Revision = 0 Then
-            wwPlain2 bstack, players(DisForm), "∏Í‰ÔÛÁ ƒÈÂÒÏÁÌÂıÙﬁ: " + CStr(VerMajor) + "." + CStr(VerMinor), D.Width, 0, True
+            wwPlain2 bstack, players(DisForm), "∏Í‰ÔÛÁ ƒÈÂÒÏÁÌÂıÙﬁ: " + CStr(VerMajor) + "." + CStr(VerMinor), d.Width, 0, True
             Else
-                    wwPlain2 bstack, players(DisForm), "∏Í‰ÔÛÁ ƒÈÂÒÏÁÌÂıÙﬁ: " + CStr(VerMajor) + "." + Left$(CStr(VerMinor), 1) + " (" + CStr(Revision) + ")", D.Width, 0, True
+                    wwPlain2 bstack, players(DisForm), "∏Í‰ÔÛÁ ƒÈÂÒÏÁÌÂıÙﬁ: " + CStr(VerMajor) + "." + Left$(CStr(VerMinor), 1) + " (" + CStr(Revision) + ")", d.Width, 0, True
                 End If
-                   wwPlain2 bstack, players(DisForm), "ÀÂÈÙÔıÒ„ÈÍ¸ ”˝ÛÙÁÏ·: " + os + osbit, D.Width, 0, True
+                   wwPlain2 bstack, players(DisForm), "ÀÂÈÙÔıÒ„ÈÍ¸ ”˝ÛÙÁÏ·: " + os + osbit, d.Width, 0, True
             
-                      wwPlain2 bstack, players(DisForm), "ºÌÔÏ· ◊ÒﬁÛÙÁ: " + Tcase(Originalusername), D.Width, 0, True
+                      wwPlain2 bstack, players(DisForm), "ºÌÔÏ· ◊ÒﬁÛÙÁ: " + Tcase(Originalusername), d.Width, 0, True
                 
             Else
              If Revision = 0 Then
-              wwPlain2 bstack, players(DisForm), "Interpreter Version: " + CStr(VerMajor) + "." + CStr(VerMinor), D.Width, 0, True
+              wwPlain2 bstack, players(DisForm), "Interpreter Version: " + CStr(VerMajor) + "." + CStr(VerMinor), d.Width, 0, True
              Else
-                    wwPlain2 bstack, players(DisForm), "Interpreter Version: " + CStr(VerMajor) + "." + Left$(CStr(VerMinor), 1) + " rev. (" + CStr(Revision) + ")", D.Width, 0, True
+                    wwPlain2 bstack, players(DisForm), "Interpreter Version: " + CStr(VerMajor) + "." + Left$(CStr(VerMinor), 1) + " rev. (" + CStr(Revision) + ")", d.Width, 0, True
                  End If
               
-                      wwPlain2 bstack, players(DisForm), "Operating System: " + os + osbit, D.Width, 0, True
+                      wwPlain2 bstack, players(DisForm), "Operating System: " + os + osbit, d.Width, 0, True
                 
-                   wwPlain2 bstack, players(DisForm), "User Name: " + Tcase(Originalusername), D.Width, 0, True
+                   wwPlain2 bstack, players(DisForm), "User Name: " + Tcase(Originalusername), d.Width, 0, True
         
                  End If
                         '    cr bstack
-            GetXYb D, players(basketcode), bar2, BAR
+            GetXYb d, players(basketcode), bar2, BAR
              players(basketcode).curpos = bar2
             players(basketcode).currow = BAR
            BAR = BAR + 1
-            If BAR >= players(basketcode).mY Then ScrollUpNew D, players(basketcode)
-                    LCTbasket D, players(basketcode), BAR, 0
+            If BAR >= players(basketcode).mY Then ScrollUpNew d, players(basketcode)
+                    LCTbasket d, players(basketcode), BAR, 0
                     players(basketcode).curpos = 0
             players(basketcode).currow = BAR
     End If
@@ -3488,54 +3488,54 @@ If Not skipthat Then
 End If
 'cr bstack
 End Sub
-Sub ClearScr(D As Object, c1 As Long)
+Sub ClearScr(d As Object, c1 As Long)
 Dim aa As Long
-With players(GetCode(D))
+With players(GetCode(d))
 .Paper = c1
 .curpos = 0
 .currow = 0
 .lastprint = False
 End With
-If Not TypeOf D Is MetaDc Then
-D.Line (0, 0)-(D.ScaleWidth - dv15, D.ScaleHeight - dv15), c1, BF
+If Not TypeOf d Is MetaDc Then
+d.Line (0, 0)-(d.ScaleWidth - dv15, d.ScaleHeight - dv15), c1, BF
 End If
-D.currentX = 0
-D.currentY = 0
+d.currentX = 0
+d.currentY = 0
 
 End Sub
-Sub ClearScrNew(D As Object, mb As basket, c1 As Long)
+Sub ClearScrNew(d As Object, mb As basket, c1 As Long)
 Dim im As New StdPicture, spl As Long
-If TypeOf D Is MetaDc Then
-D.BackColor = c1
+If TypeOf d Is MetaDc Then
+d.BackColor = c1
 Exit Sub
 End If
 With mb
 spl = .mysplit * .Yt
-Set im = D.Image
+Set im = d.Image
 .Paper = c1
 
-If TypeOf D Is GuiM2000 Then
+If TypeOf d Is GuiM2000 Then
 If .mysplit = 0 Then
-    If Not D.BackColor = c1 Then D.BackColor = c1
-    D.Cls
+    If Not d.BackColor = c1 Then d.BackColor = c1
+    d.Cls
 Else
-    D.Line (0, spl)-(D.ScaleWidth - dv15, D.ScaleHeight - dv15), .Paper, BF
+    d.Line (0, spl)-(d.ScaleWidth - dv15, d.ScaleHeight - dv15), .Paper, BF
     End If
     .currow = .mysplit
-ElseIf D.Name = "Form1" Or mb.used Then
-D.Line (0, spl)-(D.ScaleWidth - dv15, D.ScaleHeight - dv15), .Paper, BF
+ElseIf d.Name = "Form1" Or mb.used Then
+d.Line (0, spl)-(d.ScaleWidth - dv15, d.ScaleHeight - dv15), .Paper, BF
 .curpos = 0
 .currow = .mysplit
 Else
-D.BackColor = c1
-If spl > 0 Then D.PaintPicture im, 0, 0, D.Width, spl, 0, 0, D.Width, spl, vbSrcCopy
+d.BackColor = c1
+If spl > 0 Then d.PaintPicture im, 0, 0, d.Width, spl, 0, 0, d.Width, spl, vbSrcCopy
 .curpos = 0
 .currow = .mysplit
 
 End If
 .lastprint = False
-D.currentX = 0
-D.currentY = 0
+d.currentX = 0
+d.currentY = 0
 End With
 End Sub
 Function iText(BB As basetask, ByVal v$, wi&, Hi&, aTitle$, n As Long, Optional NumberOnly As Boolean = False, Optional UseIntOnly As Boolean = False, Optional curset = -1&) As String
@@ -3594,10 +3594,10 @@ End With
 End Function
 Sub ScreenEditDOC(bstack As basetask, aaa As Variant, X&, Y&, x1&, y1&, Optional l As Long = 0, Optional usecol As Boolean = False, Optional Col As Long)
 On Error Resume Next
-Dim ot As Boolean, back As New Document, i As Long, D As Object
+Dim ot As Boolean, back As New Document, i As Long, d As Object
 Dim prive As basket
-Set D = bstack.Owner
-prive = players(GetCode(D))
+Set d = bstack.Owner
+prive = players(GetCode(d))
 With prive
 Dim oldesc As Boolean
 oldesc = escok
@@ -3610,15 +3610,15 @@ Next i
 End If
 i = back.LastSelStart
 Dim Aaaa As Document, tcol As Long, trans As Boolean
-If usecol Then tcol = mycolor(Col) Else tcol = D.BackColor
+If usecol Then tcol = mycolor(Col) Else tcol = d.BackColor
 If Not Form1.Visible Then newshow Basestack1
 
 'd.Enabled = False
-If Not bstack.toback Then D.TabStop = False
-If D Is Form1 Then
-D.lockme = True
+If Not bstack.toback Then d.TabStop = False
+If d Is Form1 Then
+d.lockme = True
 Else
-D.Parent.lockme = True
+d.Parent.lockme = True
 End If
 If y1& - Y& = 0 Then Y& = Y& - 1: If y1& < 0 Then Y& = Y& + 1: y1& = y1& + 1
 TextEditLineHeight = y1& - Y& + 1
@@ -3633,9 +3633,9 @@ Hook Form1.hWnd, Nothing '.glistN
 .UsedAsTextBox = False
 .glistN.LeftMarginPixels = 10
 .glistN.maxchar = 0
-If D.ForeColor = tcol Then
-Set Form1.Point2Me = D
-If D.Name = "Form1" Then
+If d.ForeColor = tcol Then
+Set Form1.Point2Me = d
+If d.Name = "Form1" Then
 .glistN.SkipForm = False
 Else
 .glistN.SkipForm = True
@@ -3643,8 +3643,8 @@ End If
 Form1.TEXT1.glistN.BackStyle = 1
 End If
 Dim scope As Long
-scope = ChooseByHue(D.ForeColor, rgb(16, 12, 8), rgb(253, 245, 232))
-If D.BackColor = ChooseByHue(scope, D.BackColor, rgb(128, 128, 128)) Then
+scope = ChooseByHue(d.ForeColor, rgb(16, 12, 8), rgb(253, 245, 232))
+If d.BackColor = ChooseByHue(scope, d.BackColor, rgb(128, 128, 128)) Then
 If lightconv(scope) > 192 Then
 scope = lightconv(scope) - 128
 .glistN.CapColor = rgb(128 + scope / 2, 128 + scope / 2, 128 + scope / 2)
@@ -3668,30 +3668,30 @@ End If
 
 .BackColor = tcol
 
-.ForeColor = D.ForeColor
+.ForeColor = d.ForeColor
 Form1.SetText1
 .glistN.overrideTextHeight = prive.overrideTextHeight '         fonttest.TextHeight("fj")
-.Font.Name = D.Font.Name
-.Font.size = D.Font.size ' SZ 'Int(d.font.Size) Why
-.Font.charset = D.Font.charset
-.Font.Italic = D.Font.Italic
-.Font.bold = D.Font.bold
-.Font.Name = D.Font.Name
-.Font.charset = D.Font.charset
+.Font.Name = d.Font.Name
+.Font.size = d.Font.size ' SZ 'Int(d.font.Size) Why
+.Font.charset = d.Font.charset
+.Font.Italic = d.Font.Italic
+.Font.bold = d.Font.bold
+.Font.Name = d.Font.Name
+.Font.charset = d.Font.charset
 .Font.size = prive.SZ
 With prive
 If bstack.toback Then
 
 Form1.TEXT1.move X& * .Xt, Y& * .Yt, (x1& - X&) * .Xt + .Xt, (y1& - Y&) * .Yt + .Yt
 Else
-Form1.TEXT1.move X& * .Xt + D.Left, Y& * .Yt + D.top, (x1& - X&) * .Xt + .Xt, (y1& - Y&) * .Yt + .Yt
+Form1.TEXT1.move X& * .Xt + d.Left, Y& * .Yt + d.top, (x1& - X&) * .Xt + .Xt, (y1& - Y&) * .Yt + .Yt
 End If
 End With
-If D.ForeColor = tcol Then
-If D.Name = "Form1" Then
-Form1.TEXT1.glistN.RepaintFromOut D.Image, D.Left, D.top
+If d.ForeColor = tcol Then
+If d.Name = "Form1" Then
+Form1.TEXT1.glistN.RepaintFromOut d.Image, d.Left, d.top
 Else
-Form1.TEXT1.glistN.RepaintFromOut D.Image, 0, 0
+Form1.TEXT1.glistN.RepaintFromOut d.Image, 0, 0
 End If
 
 End If
@@ -3760,10 +3760,10 @@ If Form1.TEXT1.Visible Then Form1.TEXT1.Visible = False
  l = Form1.TEXT1.LastSelStart
 
 
-If D Is Form1 Then
-D.lockme = False
+If d Is Form1 Then
+d.lockme = False
 Else
-D.Parent.lockme = False
+d.Parent.lockme = False
 End If
 If Not CancelEDIT Then
 
@@ -3780,32 +3780,32 @@ Form1.KeyPreview = True
 
 INK$ = vbNullString
 escok = oldesc
-Set D = Nothing
+Set d = Nothing
 End With
 End Sub
 Sub ScreenEdit(bstack As basetask, a$, X&, Y&, x1&, y1&, Optional l As Long = 0, Optional changelinefeeds As Long = 0, Optional maxchar As Long = 0, Optional ExcludeThisLeft As Long = 0, Optional internal As Boolean = False)
 On Error Resume Next
 ' allways a$ enter with crlf,but exit with crlf or cr or lf depents from changelinefeeds
-Dim oldesc As Boolean, D As Object
-Set D = bstack.Owner
+Dim oldesc As Boolean, d As Object
+Set d = bstack.Owner
 
 ''SetTextSZ d, Sz
 
 Dim prive As basket
-prive = players(GetCode(D))
+prive = players(GetCode(d))
 oldesc = escok
 escok = False
 Dim ot As Boolean
 
 If Not bstack.toback Then
-D.TabStop = False
-D.Parent.lockme = True
+d.TabStop = False
+d.Parent.lockme = True
 Else
-D.lockme = True
+d.lockme = True
 End If
 If Not Form1.Visible Then newshow Basestack1
-D.Visible = True
-If D.Visible Then D.SetFocus
+d.Visible = True
+If d.Visible Then d.SetFocus
 With Form1.TEXT1
 
 ProcTask2 bstack
@@ -3820,8 +3820,8 @@ y1& = Y&
 TextEditLineHeight = 1
 .glistN.BorderStyle = 0
 .glistN.BackStyle = 1
-Set Form1.Point2Me = D
-If D.Name = "Form1" Then
+Set Form1.Point2Me = d
+If d.Name = "Form1" Then
 .glistN.SkipForm = False
 Else
 .glistN.SkipForm = True
@@ -3869,8 +3869,8 @@ Else
 End If
 
 Dim scope As Long
-scope = ChooseByHue(D.ForeColor, rgb(16, 12, 8), rgb(253, 245, 232))
-If D.BackColor = ChooseByHue(scope, D.BackColor, rgb(128, 128, 128)) Then
+scope = ChooseByHue(d.ForeColor, rgb(16, 12, 8), rgb(253, 245, 232))
+If d.BackColor = ChooseByHue(scope, d.BackColor, rgb(128, 128, 128)) Then
 If lightconv(scope) > 192 Then
 scope = lightconv(scope) - 128
 .glistN.CapColor = rgb(128 + scope / 2, 128 + scope / 2, 128 + scope / 2)
@@ -3893,42 +3893,42 @@ End If
 .enabled = True
 '.glistN.AddPixels = 0
 .glistN.ZOrder 0
-.BackColor = D.BackColor
-.ForeColor = D.ForeColor
-.Font.Name = D.Font.Name
+.BackColor = d.BackColor
+.ForeColor = d.ForeColor
+.Font.Name = d.Font.Name
 Form1.SetText1
 .glistN.overrideTextHeight = prive.overrideTextHeight '   fonttest.TextHeight("fj")
-.Font.size = D.Font.size ' SZ 'Int(d.font.Size) Why
-.Font.charset = D.Font.charset
-.Font.Italic = D.Font.Italic
-.Font.bold = D.Font.bold
+.Font.size = d.Font.size ' SZ 'Int(d.font.Size) Why
+.Font.charset = d.Font.charset
+.Font.Italic = d.Font.Italic
+.Font.bold = d.Font.bold
 
-.Font.Name = D.Font.Name
+.Font.Name = d.Font.Name
 
-.Font.charset = D.Font.charset
+.Font.charset = d.Font.charset
 .Font.size = prive.SZ 'Int(d.font.Size)
 If bstack.toback Then
 If maxchar > 0 Then
 
 .move X& * prive.Xt - ExcludeThisLeft, Y& * prive.Yt, (x1& - X&) * prive.Xt + prive.Xt, (y1& - Y&) * prive.Yt + prive.Yt
-If D.Name = "Form1" Then
-.glistN.RepaintFromOut D.Image, D.Left, D.top
+If d.Name = "Form1" Then
+.glistN.RepaintFromOut d.Image, d.Left, d.top
 Else
-.glistN.RepaintFromOut D.Image, 0, 0
+.glistN.RepaintFromOut d.Image, 0, 0
 End If
 Else
 .move X& * prive.Xt, Y& * prive.Yt, (x1& - X&) * prive.Xt + prive.Xt, (y1& - Y&) * prive.Yt + prive.Yt
 End If
 Else
 If maxchar > 0 Then
-.move X& * prive.Xt + D.Left - ExcludeThisLeft, Y& * prive.Yt + D.top, (x1& - X&) * prive.Xt + prive.Xt, (y1& - Y&) * prive.Yt + prive.Yt
-If D.Name = "Form1" Then
-.glistN.RepaintFromOut D.Image, D.Left, D.top
+.move X& * prive.Xt + d.Left - ExcludeThisLeft, Y& * prive.Yt + d.top, (x1& - X&) * prive.Xt + prive.Xt, (y1& - Y&) * prive.Yt + prive.Yt
+If d.Name = "Form1" Then
+.glistN.RepaintFromOut d.Image, d.Left, d.top
 Else
-.glistN.RepaintFromOut D.Image, 0, 0
+.glistN.RepaintFromOut d.Image, 0, 0
 End If
 Else
-.move X& * prive.Xt + D.Left, Y& * prive.Yt + D.top, (x1& - X&) * prive.Xt + prive.Xt, (y1& - Y&) * prive.Yt + prive.Yt
+.move X& * prive.Xt + d.Left, Y& * prive.Yt + d.top, (x1& - X&) * prive.Xt + prive.Xt, (y1& - Y&) * prive.Yt + prive.Yt
 End If
 End If
 If a$ <> "" Then
@@ -4026,9 +4026,9 @@ If Form1.TEXT1.Visible Then Form1.TEXT1.Visible = False
  l = Form1.TEXT1.LastSelStart + 1
 
 If bstack.toback Then
-D.lockme = False
+d.lockme = False
 Else
-D.Parent.lockme = False
+d.Parent.lockme = False
 End If
 If Not CancelEDIT Then
 
@@ -4051,7 +4051,7 @@ UnHook Form1.hWnd
 INK$ = vbNullString
 Form1.TEXT1.glistN.UseTab = False
 escok = oldesc
-Set D = Nothing
+Set d = Nothing
 End Sub
 
 Function blockCheck(ByVal s$, ByVal Lang As Long, countlines As Long, Optional ByVal sbname$ = vbNullString, Optional Column As Long) As Boolean
@@ -4307,27 +4307,27 @@ End Function
 
 Sub ListChoise(bstack As basetask, a$, X&, Y&, x1&, y1&)
 On Error Resume Next
-Dim D As Object, oldh As Long
+Dim d As Object, oldh As Long
 Dim s$, prive As basket
 If NOEXECUTION Then Exit Sub
-Set D = bstack.Owner
-prive = players(GetCode(D))
+Set d = bstack.Owner
+prive = players(GetCode(d))
 Dim ot As Boolean, drop
 With Form1.List1
-.Font.Name = D.Font.Name
-Form1.Font.charset = D.Font.charset
+.Font.Name = d.Font.Name
+Form1.Font.charset = d.Font.charset
 Form1.Font.Strikethrough = False
-.Font.size = D.Font.size
-.Font.Name = D.Font.Name
-Form1.Font.charset = D.Font.charset
-.Font.size = D.Font.size
-If LEVCOLMENU < 2 Then .BackColor = D.ForeColor
-If LEVCOLMENU < 3 Then .ForeColor = D.BackColor
-.Font.bold = D.Font.bold
-.Font.Italic = D.Font.Italic
+.Font.size = d.Font.size
+.Font.Name = d.Font.Name
+Form1.Font.charset = d.Font.charset
+.Font.size = d.Font.size
+If LEVCOLMENU < 2 Then .BackColor = d.ForeColor
+If LEVCOLMENU < 3 Then .ForeColor = d.BackColor
+.Font.bold = d.Font.bold
+.Font.Italic = d.Font.Italic
 .addpixels = 2 * prive.uMineLineSpace / dv15
 .VerticalCenterText = True
-If D.Visible = False Then D.Visible = True
+If d.Visible = False Then d.Visible = True
 .StickBar = True
 s$ = .HeadLine
 .HeadLine = vbNullString
@@ -4342,9 +4342,9 @@ End If
 Else
 .restrictLines = (y1& - Y&) + 1
 If .BorderStyle = 0 Then
-.move X& * prive.Xt + D.Left, Y& * prive.Yt + D.top, (x1& - X&) * prive.Xt + prive.Xt, (y1& - Y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
+.move X& * prive.Xt + d.Left, Y& * prive.Yt + d.top, (x1& - X&) * prive.Xt + prive.Xt, (y1& - Y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
 Else
-.move X& * prive.Xt - dv15 + D.Left, Y& * prive.Yt - dv15 + D.top, (x1& - X&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - Y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
+.move X& * prive.Xt - dv15 + d.Left, Y& * prive.Yt - dv15 + d.top, (x1& - X&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - Y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
 End If
 End If
 .enabled = True
@@ -4465,11 +4465,11 @@ MOUT = False: NOEXECUTION = False
   Form1.List1.SetFocus
   Form1.List1.LeaveonChoose = True
   Else
-  D.TabStop = True
+  d.TabStop = True
   End If
   End If
 NOEDIT = True
-Set D = Nothing
+Set d = Nothing
 Form1.KeyPreview = True
 Targets = ot
 End Sub
@@ -4520,8 +4520,8 @@ Public Sub WaitDialog(bstack As basetask)
 Dim oldesc As Boolean, XX As GuiM2000
 oldesc = escok
 escok = False
-Dim D As Object
-Set D = bstack.Owner
+Dim d As Object
+Set d = bstack.Owner
 Dim ot As Boolean, drop
 ot = Targets
 Targets = False  ' do not use targets for now
@@ -5836,12 +5836,12 @@ Set cc = New cRegistry
 cc.Temp = fornow
 cc.ClassKey = HKEY_CURRENT_USER
 cc.SectionKey = basickey
-Dim D$, W$, p As Long, b As Long
+Dim d$, W$, p As Long, b As Long
 If s$ <> "" Then
     Do While FastSymbol(s$, "-")
-        If IsLabel(Basestack1, s$, D$) > 0 Then
-            D$ = UCase(D$)
-            If D$ = "TEST" Then
+        If IsLabel(Basestack1, s$, d$) > 0 Then
+            d$ = UCase(d$)
+            If d$ = "TEST" Then
                 STq = False
                 STEXIT = False
                 STbyST = True
@@ -5855,106 +5855,106 @@ If s$ <> "" Then
                 Form1.Show , Form5
                 If Form3.Visible Then Form3.skiptimer = True: Form3.WindowState = 0
                 trace = True
-            ElseIf D$ = "NORUN" Then
+            ElseIf d$ = "NORUN" Then
                 If ttl Then Form3.WindowState = vbNormal Else Form1.Show , Form5
                 NORUN1 = True
-            ElseIf D$ = "INP" Then
+            ElseIf d$ = "INP" Then
                 Use13 = False
-            ElseIf D$ = "FONT" Then
+            ElseIf d$ = "FONT" Then
             ' + LOAD NEW
                 cc.ValueKey = "FONT"
                 cc.ValueType = REG_SZ
                 cc.Value = "Monospac821Greek BT"
-            ElseIf D$ = "SEC" Then
+            ElseIf d$ = "SEC" Then
                 cc.ValueKey = "NEWSECURENAMES"
                 cc.ValueType = REG_DWORD
                 cc.Value = 0
                 SecureNames = False
-            ElseIf D$ = "DIV" Then
+            ElseIf d$ = "DIV" Then
                 cc.ValueKey = "DIV"
                 cc.ValueType = REG_DWORD
                 cc.Value = 0
                 UseIntDiv = False
-            ElseIf D$ = "LINESPACE" Then
+            ElseIf d$ = "LINESPACE" Then
                 cc.ValueKey = "LINESPACE"
                 cc.ValueType = REG_DWORD
                 cc.Value = 0
-            ElseIf D$ = "SIZE" Then
+            ElseIf d$ = "SIZE" Then
                 cc.ValueKey = "SIZE"
                 cc.ValueType = REG_DWORD
                 cc.Value = 15
-            ElseIf D$ = "PEN" Then
+            ElseIf d$ = "PEN" Then
                 cc.ValueKey = "PEN"
                 cc.ValueType = REG_DWORD
                 cc.Value = 0
                 cc.ValueKey = "PAPER"
                 cc.ValueType = REG_DWORD
                 cc.Value = 7
-            ElseIf D$ = "BOLD" Then
+            ElseIf d$ = "BOLD" Then
                 cc.ValueKey = "BOLD"
                 cc.ValueType = REG_DWORD
                 cc.Value = 0
-            ElseIf D$ = "PAPER" Then
+            ElseIf d$ = "PAPER" Then
                 cc.ValueKey = "PAPER"
                 cc.ValueType = REG_DWORD
                 cc.Value = 7
                 cc.ValueKey = "PEN"
                 cc.ValueType = REG_DWORD
                 cc.Value = 0
-            ElseIf D$ = "GREEK" Then
+            ElseIf d$ = "GREEK" Then
                 If Not fornow Then
                     cc.ValueKey = "COMMAND"
                     cc.ValueType = REG_SZ
                     cc.Value = "LATIN"
                 End If
                 pagio$ = "LATIN"
-            ElseIf D$ = "DARK" Then
+            ElseIf d$ = "DARK" Then
                 If Not fornow Then
                      cc.ValueKey = "HTML"
                      cc.ValueType = REG_SZ
                      cc.Value = "BRIGHT"
                 End If
                 pagiohtml$ = "BRIGHT"
-            ElseIf D$ = "CASESENSITIVE" Then
+            ElseIf d$ = "CASESENSITIVE" Then
                 If Not fornow Then
                     cc.ValueKey = "CASESENSITIVE"
                     cc.ValueType = REG_SZ
                     cc.Value = "NO"
                 End If
                 casesensitive = False
-            ElseIf D$ = "NBS" Then
+            ElseIf d$ = "NBS" Then
                 Nonbsp = True
-            ElseIf D$ = "RDB" Then
+            ElseIf d$ = "RDB" Then
                 RoundDouble = False
-            ElseIf D$ = "EXT" Then
+            ElseIf d$ = "EXT" Then
                 wide = False
-            ElseIf D$ = "TAB" Then
+            ElseIf d$ = "TAB" Then
                 UseTabInForm1Text1 = False
-            ElseIf D$ = "SBL" Then
+            ElseIf d$ = "SBL" Then
                 ShowBooleanAsString = False
-            ElseIf D$ = "DIM" Then
+            ElseIf d$ = "DIM" Then
                 DimLikeBasic = False
-            ElseIf D$ = "FOR" Then
+            ElseIf d$ = "FOR" Then
                 ForLikeBasic = False
-            ElseIf D$ = "PRI" Then
+            ElseIf d$ = "PRI" Then
                 cc.ValueKey = "PRIORITY-OR"
                 cc.ValueType = REG_DWORD
                 cc.Value = CLng(0)  ' FALSE IS WRONG VALUE HERE
                 priorityOr = False
-            ElseIf D$ = "REG" Then
+            ElseIf d$ = "REG" Then
                 gsb_file False
-            ElseIf D$ = "DEC" Then
+            ElseIf d$ = "DEC" Then
                 cc.ValueKey = "DEC"
                 cc.ValueType = REG_DWORD
                 cc.Value = CLng(0)
                 mNoUseDec = False
                 CheckDec
-            ElseIf D$ = "TXT" Then
+            ElseIf d$ = "TXT" Then
                 cc.ValueKey = "TEXTCOMPARE"
                 cc.ValueType = REG_DWORD
                 cc.Value = CLng(0)
                 mTextCompare = False
-            ElseIf D$ = "REC" Then
+            ElseIf d$ = "REC" Then
                 cc.ValueKey = "FUNCDEEP"  ' RESET
                 cc.ValueType = REG_DWORD
                 cc.Value = 300
@@ -5964,13 +5964,13 @@ If s$ <> "" Then
                 If findstack - 100000 > 0 Then
                     stacksize = findstack - 100000
                 End If
-            ElseIf D$ = "MDB" Then
+            ElseIf d$ = "MDB" Then
                 cc.ValueKey = "MDBHELP"
                 cc.ValueType = REG_DWORD
                 cc.Value = CLng(False)
                 UseMDBHELP = False
             Else
-                s$ = "-" + D$ + s$
+                s$ = "-" + d$ + s$
                 Exit Do
             End If
         Else
@@ -5979,9 +5979,9 @@ If s$ <> "" Then
         Sleep 2
     Loop
     Do While FastSymbol(s$, "+")
-        If IsLabel(Basestack1, s$, D$) > 0 Then
-            D$ = UCase(D$)
-            If D$ = "TEST" Then
+        If IsLabel(Basestack1, s$, d$) > 0 Then
+            d$ = UCase(d$)
+            If d$ = "TEST" Then
                 STq = False
                 STEXIT = False
                 STbyST = True
@@ -5995,34 +5995,34 @@ If s$ <> "" Then
                 Form1.Show , Form5
                 If Form3.Visible Then Form3.skiptimer = True: Form3.WindowState = 0
                 trace = True
-                ElseIf D$ = "REG" Then
+                ElseIf d$ = "REG" Then
                 gsb_file
-            ElseIf D$ = "INP" Then
+            ElseIf d$ = "INP" Then
                 Use13 = True
-            ElseIf D$ = "FONT" Then
+            ElseIf d$ = "FONT" Then
                 ' + LOAD NEW
                 cc.ValueKey = "FONT"
                 cc.ValueType = REG_SZ
                 If ISSTRINGA(s$, W$) Then cc.Value = W$
-            ElseIf D$ = "SEC" Then
+            ElseIf d$ = "SEC" Then
                 cc.ValueKey = "NEWSECURENAMES"
                 cc.ValueType = REG_DWORD
                 cc.Value = -1
                 SecureNames = True
-            ElseIf D$ = "DIV" Then
+            ElseIf d$ = "DIV" Then
                 cc.ValueKey = "DIV"
                 cc.ValueType = REG_DWORD
                 cc.Value = -1
                 UseIntDiv = True
-            ElseIf D$ = "LINESPACE" Then
+            ElseIf d$ = "LINESPACE" Then
                 cc.ValueKey = "LINESPACE"
                 cc.ValueType = REG_DWORD
                 If IsNumberLabel(s$, W$) Then If val(W$) >= 0 And val(W$) <= 60 * dv15 Then cc.Value = CLng(val(W$) * 2)
-            ElseIf D$ = "SIZE" Then
+            ElseIf d$ = "SIZE" Then
                 cc.ValueKey = "SIZE"
                 cc.ValueType = REG_DWORD
                 If IsNumberLabel(s$, W$) Then If val(W$) >= 8 And val(W$) <= 48 Then cc.Value = CLng(val(W$))
-            ElseIf D$ = "PEN" Then
+            ElseIf d$ = "PEN" Then
                 cc.ValueKey = "PAPER"
                 cc.ValueType = REG_DWORD
                 p = cc.Value
@@ -6032,12 +6032,12 @@ If s$ <> "" Then
                     If p = val(W$) Then p = 15 - p Else p = val(W$) Mod 16
                     cc.Value = CLng(val(p))
                 End If
-            ElseIf D$ = "BOLD" Then
+            ElseIf d$ = "BOLD" Then
                 cc.ValueKey = "BOLD"
                 cc.ValueType = REG_DWORD
                 cc.Value = 1
                 If IsNumberLabel(s$, W$) Then cc.Value = CLng(val(W$) Mod 16)
-            ElseIf D$ = "PAPER" Then
+            ElseIf d$ = "PAPER" Then
                 cc.ValueKey = "PEN"
                 cc.ValueType = REG_DWORD
                 p = cc.Value
@@ -6047,58 +6047,58 @@ If s$ <> "" Then
                     If p = val(W$) Then p = 15 - p Else p = val(W$) Mod 16
                     cc.Value = CLng(val(p))
                 End If
-            ElseIf D$ = "GREEK" Then
+            ElseIf d$ = "GREEK" Then
                 If Not fornow Then
                     cc.ValueKey = "COMMAND"
                     cc.ValueType = REG_SZ
                     cc.Value = "GREEK"
                 End If
                 pagio$ = "GREEK"
-            ElseIf D$ = "DARK" Then
+            ElseIf d$ = "DARK" Then
                 If Not fornow Then
                     cc.ValueKey = "HTML"
                     cc.ValueType = REG_SZ
                     cc.Value = "DARK"
                 End If
                 pagiohtml$ = "DARK"
-            ElseIf D$ = "CASESENSITIVE" Then
+            ElseIf d$ = "CASESENSITIVE" Then
                 If Not fornow Then
                     cc.ValueKey = "CASESENSITIVE"
                     cc.ValueType = REG_SZ
                     cc.Value = "YES"
                 End If
                 casesensitive = True
-            ElseIf D$ = "NBS" Then
+            ElseIf d$ = "NBS" Then
                 Nonbsp = False
-            ElseIf D$ = "RDB" Then
+            ElseIf d$ = "RDB" Then
                 RoundDouble = True
-            ElseIf D$ = "EXT" Then
+            ElseIf d$ = "EXT" Then
                 wide = True
-            ElseIf D$ = "TAB" Then
+            ElseIf d$ = "TAB" Then
                 UseTabInForm1Text1 = True
-            ElseIf D$ = "SBL" Then
+            ElseIf d$ = "SBL" Then
                 ShowBooleanAsString = True
-            ElseIf D$ = "DIM" Then
+            ElseIf d$ = "DIM" Then
                 DimLikeBasic = True
-            ElseIf D$ = "FOR" Then
+            ElseIf d$ = "FOR" Then
                 ForLikeBasic = True
-            ElseIf D$ = "PRI" Then
+            ElseIf d$ = "PRI" Then
                 cc.ValueKey = "PRIORITY-OR"
                 cc.ValueType = REG_DWORD
                 cc.Value = CLng(True)
                 priorityOr = True
-            ElseIf D$ = "TXT" Then
+            ElseIf d$ = "TXT" Then
                 cc.ValueKey = "TEXTCOMPARE"
                 cc.ValueType = REG_DWORD
                 cc.Value = CLng(True)
                 mTextCompare = True
-            ElseIf D$ = "DEC" Then
+            ElseIf d$ = "DEC" Then
                 cc.ValueKey = "DEC"
                 cc.ValueType = REG_DWORD
                 cc.Value = CLng(True)
                 mNoUseDec = True
                 CheckDec
-            ElseIf D$ = "REC" Then
+            ElseIf d$ = "REC" Then
                 cc.ValueKey = "FUNCDEEP"  ' RESET
                 cc.ValueType = REG_DWORD
                 funcdeep = 3260
@@ -6107,13 +6107,13 @@ If s$ <> "" Then
                 If findstack - 100000 > 0 Then
                     stacksize = findstack - 100000
                 End If
-            ElseIf D$ = "MDB" Then
+            ElseIf d$ = "MDB" Then
                 cc.ValueKey = "MDBHELP"
                 cc.ValueType = REG_DWORD
                 cc.Value = CLng(True)
                 UseMDBHELP = True
             Else
-                s$ = "+" + D$ + s$
+                s$ = "+" + d$ + s$
                 Exit Do
             End If
         Else
@@ -8041,7 +8041,7 @@ PointPos = j
 End If
 End Function
 Public Function ExtractType(f$, Optional JJ As Long = 0, Optional simple As Boolean = True) As String
-Dim i As Long, j As Long, D$
+Dim i As Long, j As Long, d$
 If FastSymbol(f$, Chr(34)) Then f$ = GetStrUntil(Chr(34), f$)
 If f$ = vbNullString Then ExtractType = vbNullString: Exit Function
 If simple Then
@@ -8051,10 +8051,10 @@ ElseIf JJ > 0 Then
 Else
     j = PointPos(f$)
 End If
-D$ = f$ + " "
-If j < Len(D$) Then
-For i = j To Len(D$)
-Select Case Mid$(D$, i, 1)
+d$ = f$ + " "
+If j < Len(d$) Then
+For i = j To Len(d$)
+Select Case Mid$(d$, i, 1)
 Case "/", "|", "'", " ", Is = Chr(34)
 i = i + 1
 Exit For
@@ -8063,7 +8063,7 @@ Next i
 If (i - j - 2) < 1 Then
 ExtractType = vbNullString
 Else
-ExtractType = mylcasefILE(Mid$(D$, j + 1, i - j - 2))
+ExtractType = mylcasefILE(Mid$(d$, j + 1, i - j - 2))
 End If
 Else
 ExtractType = vbNullString
@@ -8175,12 +8175,12 @@ End If
 End If
 End Function
 Function SimplePointPos(s$)
-Dim a As Long, b As Long, c As Long, D As Long
+Dim a As Long, b As Long, c As Long, d As Long
 a = rinstr(s$, ".")
 b = rinstr(s$, "\")
 c = rinstr(s$, "/")
-D = rinstr(s$, ":")
-If b < a And c < a And D < a Then
+d = rinstr(s$, ":")
+If b < a And c < a And d < a Then
     SimplePointPos = a
 Else
     SimplePointPos = Len(s$)
@@ -8931,7 +8931,7 @@ If Right$(UserPath2, 1) = "\" Then UserPath2 = Left$(UserPath2$, Len(UserPath2$)
 
 
 End Function
-Function Fast2Label(a$, c$, cl As Long, D$, dl As Long, ahead&) As Boolean
+Function Fast2Label(a$, c$, cl As Long, d$, dl As Long, ahead&) As Boolean
 Dim i As Long, Pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
@@ -8948,7 +8948,7 @@ Exit Function
 End If
 End If
 If j - i >= dl - 1 Then
-If InStr(D$, Left$(Pad$, dl)) > 0 Then
+If InStr(d$, Left$(Pad$, dl)) > 0 Then
 If Mid$(Pad$, dl + 1, 1) Like "[0-9+.\( @-]" Then
 a$ = Mid$(a$, MyTrimLi(a$, i + dl))
 Fast2Label = True
@@ -8956,7 +8956,7 @@ End If
 End If
 End If
 End Function
-Function Fast2LabelNoNum(a$, c$, cl As Long, D$, dl As Long, ahead&) As Boolean
+Function Fast2LabelNoNum(a$, c$, cl As Long, d$, dl As Long, ahead&) As Boolean
 Dim i As Long, Pad$, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
@@ -8978,7 +8978,7 @@ If j - i >= cl - 1 Then
     End If
 End If
 If j - i >= dl - 1 Then
-    If InStr(D$, Left$(Pad$, dl)) > 0 Then
+    If InStr(d$, Left$(Pad$, dl)) > 0 Then
         If Len(Pad$) > dl Then
             Select Case AscW(Mid$(Pad$, dl + 1, 1))
             Case Is < 36, 39, 47, 59, 92, 123, 160
@@ -8992,7 +8992,7 @@ If j - i >= dl - 1 Then
 End If
 End Function
 
-Function Fast2Symbol(a$, c$, k As Long, D$, l As Long) As Boolean
+Function Fast2Symbol(a$, c$, k As Long, d$, l As Long) As Boolean
 Dim i As Long, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
@@ -9007,7 +9007,7 @@ If j - i >= k - 1 Then
 End If
 'If j - i >= Len(d$) - 1 Then
 If j - i >= l - 1 Then
-    If InStr(D$, Mid$(a$, i, l)) > 0 Then
+    If InStr(d$, Mid$(a$, i, l)) > 0 Then
     a$ = Mid$(a$, MyTrimLi(a$, i + l))
     Fast2Symbol = True
     Exit Function
@@ -9732,7 +9732,7 @@ Else
 Set GiveForm = Form3
 End If
 End Function
-Function IsNumberD(a$, D As Double) As Boolean
+Function IsNumberD(a$, d As Double) As Boolean
 Dim a1 As Long, R
 If a$ <> "" Then
 For a1 = 1 To Len(a$) + 1
@@ -9746,7 +9746,7 @@ End Select
 Next a1
 If a1 > Len(a$) Then a1 = Len(a$) + 1
 If ValidNumberOnly(a$, R, False) Then
-    D = CDbl(R)
+    d = CDbl(R)
 End If
 a$ = Mid$(a$, a1)
 IsNumberD = True
@@ -10167,9 +10167,9 @@ Exit Function
 End Function
 
 
-Function IsNumberD2(a$, D As Variant, Optional noendtypes As Boolean = False, Optional exceptspecial As Boolean) As Boolean
+Function IsNumberD2(a$, d As Variant, Optional noendtypes As Boolean = False, Optional exceptspecial As Boolean) As Boolean
 ' for inline stacitems
-If VarType(D) = vbEmpty Then D = 0#
+If VarType(d) = vbEmpty Then d = 0#
 Dim a1 As Long
 If a$ <> "" Then
 For a1 = 1 To Len(a$) + 1
@@ -10182,15 +10182,15 @@ Exit For
 End Select
 Next a1
 If a1 > Len(a$) Then a1 = Len(a$) + 1
-    If IsNumberOnly(a$, 1, D, a1, noendtypes, exceptspecial) Then
+    If IsNumberOnly(a$, 1, d, a1, noendtypes, exceptspecial) Then
         a$ = Mid$(a$, a1)
         IsNumberD2 = True
     ElseIf MaybeIsSymbol(a$, "¡·ÿ¯TtFf") Then
         If Fast3Varl(a$, "¡À«»≈”", 6, "¡À«»«”", 6, "TRUE", 4, 6) Then
-            If VarType(D) = vbBoolean Then
-            D = True
+            If VarType(d) = vbBoolean Then
+            d = True
             Else
-            D = D - 1
+            d = d - 1
             End If
             IsNumberD2 = True
         ElseIf Fast3Varl(a$, "ÿ≈’ƒ≈”", 6, "ÿ≈’ƒ«”", 6, "FALSE", 5, 6) Then
@@ -10210,7 +10210,7 @@ End Function
 
 Function IsNumberD3(a$, fr As Long, a1 As Long) As Boolean
 ' for inline stacitems
-Dim D As Double
+Dim d As Double
 If a$ <> "" Then
 For a1 = fr To Len(a$) + 1
 Select Case Mid$(a$, a1, 1)
@@ -10222,13 +10222,13 @@ Exit For
 End Select
 Next a1
 If a1 > Len(a$) Then a1 = Len(a$) + 1
-If IsNumberOnly(a$, fr, D, a1) Then
+If IsNumberOnly(a$, fr, d, a1) Then
 IsNumberD3 = True
 ElseIf Fast3NoSpaceCheck(fr, a$, "¡À«»≈”", 6, "¡À«»«”", 6, "TRUE", 4, 6) Then
-D = True
+d = True
 IsNumberD3 = True
 ElseIf Fast3NoSpaceCheck(fr, a$, "ÿ≈’ƒ≈”", 6, "ÿ≈’ƒ«”", 6, "FALSE", 5, 6) Then
-D = False
+d = False
 IsNumberD3 = True
 Else
 a1 = fr
@@ -10976,11 +10976,11 @@ For i& = iu& To Id&
 Next i&
 End Sub
 Function BoxTarget(DSTACK As basetask, ByVal xl&, ByVal yl&, ByVal b As Long, ByVal f As Long, ByVal Tag$, ByVal Id&, ByVal COM$, XXT&, YYT&, LineSpace&) As target
-Dim X&, Y&, D As Object
+Dim X&, Y&, d As Object
 Dim half As Long
-Set D = DSTACK.Owner
+Set d = DSTACK.Owner
 Dim prive As basket
-prive = players(GetCode(D))
+prive = players(GetCode(d))
 With prive
 
 X& = .curpos
@@ -11011,18 +11011,18 @@ With BoxTarget
 .topval = 0
 .botval = 0
 .imagesize = 80
-If D.Name = "DIS" Then
+If d.Name = "DIS" Then
 .layer = 0
-ElseIf D.Name = "Form1" Then
+ElseIf d.Name = "Form1" Then
 .layer = -1
-ElseIf D.Name = "dSprite" Then
-.layer = D.Index
+ElseIf d.Name = "dSprite" Then
+.layer = d.Index
 Else
-.layer = GetCode(D)
+.layer = GetCode(d)
 End If
 End With
-If f <> &H81000000 Then BoxBigNew D, prive, xl& - 1, yl&, f
-If b <> &H81000000 Then BoxColorNew D, prive, xl& - 1, yl&, b
+If f <> &H81000000 Then BoxBigNew d, prive, xl& - 1, yl&, f
+If b <> &H81000000 Then BoxColorNew d, prive, xl& - 1, yl&, b
 If Id& < 100 Then
     Tag$ = Left$(Tag$, xl& - X&)
     If Tag$ <> "" Then
@@ -11042,13 +11042,13 @@ If Id& < 100 Then
     Case Else
     End Select
     If (Id& Mod 10) > 0 Then
-    LCTbasket D, prive, Y&, X&
-    D.FontTransparent = True
+    LCTbasket d, prive, Y&, X&
+    d.FontTransparent = True
         If half > 0 Then
-    D.currentY = D.currentY + prive.Yt \ 2
+    d.currentY = d.currentY + prive.Yt \ 2
     End If
-    PlainBaSket D, prive, Tag$, True, True
-    LCTbasket D, prive, BoxTarget.lY, BoxTarget.lX
+    PlainBaSket d, prive, Tag$, True, True
+    LCTbasket d, prive, BoxTarget.lY, BoxTarget.lX
     End If
     End If
 Else
@@ -11073,14 +11073,14 @@ Else
     End Select
     
     If (Id& Mod 10) > 0 Then
-    LCTbasket D, prive, Y&, X&
-    D.FontTransparent = True
-    D.currentX = D.currentX - dv15 * 2
+    LCTbasket d, prive, Y&, X&
+    d.FontTransparent = True
+    d.currentX = d.currentX - dv15 * 2
     If half > 0 Then
-    D.currentY = D.currentY + prive.Yt \ 2
+    d.currentY = d.currentY + prive.Yt \ 2
     End If
     wwPlain2 DSTACK, prive, Tag$, xl& - X&, 10000, , True, f, , , True
-    LCTbasket D, prive, BoxTarget.lY, BoxTarget.lX
+    LCTbasket d, prive, BoxTarget.lY, BoxTarget.lX
     End If
 End If
     

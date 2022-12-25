@@ -19,7 +19,7 @@ Private Type FILETIME
     dwLowDateTime As Long
     dwHighDateTime As Long
 End Type
-Private Declare Function timeGetTime Lib "winmm.dll" () As Long
+Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
 Private Const WAIT_ABANDONED& = &H80&
 Private Const WAIT_ABANDONED_0& = &H80&
 Private Const WAIT_FAILED& = -1&
@@ -505,7 +505,7 @@ Loop Until a > b.MARKTWO
 End Sub
 Public Sub SleepWaitEdit(bstack As basetask, lNumberOf10ThmiliSeconds As Long)
 On Error Resume Next
-If Forms.count < 3 Then
+If Forms.Count < 3 Then
 Sleep 1
  DoEvents
 Exit Sub
@@ -590,7 +590,7 @@ End Sub
         
 Public Sub SleepWaitEdit2(lNumberOf10ThmiliSeconds As Long)
 On Error Resume Next
-If Forms.count < 3 Then
+If Forms.Count < 3 Then
 Sleep 1
 DoEvents
 Exit Sub

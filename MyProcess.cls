@@ -31,7 +31,7 @@ Public hPipe As Long  ' τι δουλειά έχει εδώ;;
 Private pipename As String  '= "\\.\pipe\bigtest"
 Private myholdtime As Currency
 Private myBUFvar As String, res As Long
-Private Declare Function timeGetTime Lib "winmm.dll" () As Long
+Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
 Private myProcess As basetask  ' myprocess.process.id is the handler
 Private myProcessPureParent As basetask
 Private mNostretch As Boolean
