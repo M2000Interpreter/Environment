@@ -29,7 +29,7 @@ Enum cbnCallTypes
 End Enum
 ' Maybe need this http://support2.microsoft.com/kb/2870467/
 'To update oleaut32
-Private Declare Sub VariantCopy Lib "oleaut32.dll" (ByRef pvargDest As Variant, ByRef pvargSrc As Variant)
+Private Declare Sub VariantCopy Lib "OleAut32.dll" (ByRef pvargDest As Variant, ByRef pvargSrc As Variant)
 Private KnownProp As FastCollection
 Private Init As Boolean
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
@@ -44,7 +44,7 @@ Public Function FindDISPID(pobjTarget As Object, ByVal pstrProcName As Variant) 
     FindDISPID = -1
     If pobjTarget Is Nothing Then Exit Function
 
-    Dim A$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
+    Dim a$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
     ReDim myptr(0 To 0)
     myptr(0) = StrPtr(pstrProcName)
     
@@ -360,7 +360,7 @@ conthere:
                                         If Screen.ActiveForm.PopUpMenuVal Or Screen.ActiveForm.IamPopUp Then
                                             handlepopup = True
                                         End If
-                                    ElseIf GetForegroundWindow <> Screen.ActiveForm.hwnd Then
+                                    ElseIf GetForegroundWindow <> Screen.ActiveForm.hWnd Then
                                         handlepopup = False
                                         If Screen.ActiveForm.PopUpMenuVal Or Screen.ActiveForm.IamPopUp Then
                                         If Screen.ActiveForm.Visible Then
@@ -501,13 +501,16 @@ End If
 End If
 On Error GoTo there
 If TypeOf VarRet Is IUnknown Then
-Set robj = New mHandler
 If UCase(pstrProcName) = "_NEWENUM" Then
-robj.ConstructEnumerator VarRet
+Dim usehandler As mHandler
+Set usehandler = New mHandler
+usehandler.ConstructEnumerator VarRet
+Set usehandler = Nothing
 Else
 MyEr "cant use this object", "δεν μπορώ να χειριστώ αυτό το αντικείμενο"
 End If
 VarRet = CLng(0)
+
 End If
 there:
 Err.Clear
