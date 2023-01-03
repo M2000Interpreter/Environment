@@ -73,11 +73,11 @@ Private Type SAFEARRAY1D
     cLocks As Long
     pvData As Long
     cElements As Long
-    lLBound As Long
+    lLbound As Long
 End Type
 ' no second sort allowed per array
 Private sortmult As Long, sortoff As Long, upart As Long, part As Long, Col(), Piv, piv1()
-Public index As Long, Final As Boolean, refgroup As Object, grouperror As Boolean
+Public Index As Long, Final As Boolean, refgroup As Object, grouperror As Boolean
 Public refArray As Variant, StrArray As Boolean, IsByValue As Boolean
 Public Sub Compute0(p As Variant, ss$)
 If Final Then CantAssignValue: Exit Sub
@@ -333,16 +333,16 @@ Loop
 
 End Sub
 Property Get Value() As Variant
-If index >= 0 And index <= maxitems1 Then
+If Index >= 0 And Index <= maxitems1 Then
 
-If IsObject(actualdata(index)) Then
-    If Typename(actualdata(index)) = "PropReference" Then
-        Value = actualdata(index)
+If IsObject(actualdata(Index)) Then
+    If Typename(actualdata(Index)) = "PropReference" Then
+        Value = actualdata(Index)
     Else
-        Set Value = actualdata(index)
+        Set Value = actualdata(Index)
     End If
 Else
-Value = actualdata(index)
+Value = actualdata(Index)
 End If
 End If
 End Property
@@ -365,7 +365,7 @@ End Sub
 Friend Function ExportStrArray() As String()
 
 Dim i As Long
-Dim n As Byte, s$, m_base As Long, R1 As Long, where As Long
+Dim n As Byte, s$, m_base As Long, r1 As Long, where As Long
 
 ReDim strAr(maxitems) As String
 For i = 0 To maxitems - 1
@@ -385,7 +385,7 @@ Friend Sub FeedFromSrings(Carrier As Variant)
 Dim a() As String, i As Long
 a() = Carrier
 Carrier = Array()
-Dim zz As Variant, rCount As Long, dimActual As Long, dummy As Long, tst As Long
+Dim zz As Variant, rCount As Long, dimActual As Long, Dummy As Long, tst As Long
 Dim ii As Long
 CopyMemory ByVal VarPtr(refArray), zz, 16
 On Error GoTo TT
@@ -407,14 +407,14 @@ End If
 Dim sum As Long
 sum = rCount
 again:
-dummy = dimActual
+Dummy = dimActual
 On Error GoTo ok1
 tst = UBound(a(), dimActual + 1)
 rCount = UBound(a(), dimActual + 1) - LBound(a, dimActual + 1) + 1
 dimActual = dimActual + 1
 sum = sum * rCount
 ok1:
-If dimActual <> dummy Then
+If dimActual <> Dummy Then
 If dnum >= dimActual Then
 PushDim rCount, limBase(dimActual - 1)
 Else
@@ -435,7 +435,7 @@ PushEnd
 End If
 End Sub
 Friend Sub FixArray()
-Dim zz As Variant, rCount As Long, dimActual As Long, dummy As Long, tst As Long
+Dim zz As Variant, rCount As Long, dimActual As Long, Dummy As Long, tst As Long
 Dim hlp()
 CopyMemory ByVal VarPtr(refArray), zz, 16
 If IsByValue Then Exit Sub
@@ -461,14 +461,14 @@ End If
 Dim sum As Long
 sum = rCount
 again:
-dummy = dimActual
+Dummy = dimActual
 On Error GoTo ok1
 tst = UBound(actualdata(), dimActual + 1)
 rCount = UBound(actualdata(), dimActual + 1) - LBound(actualdata, dimActual + 1) + 1
 dimActual = dimActual + 1
 sum = sum * rCount
 ok1:
-If dimActual <> dummy Then
+If dimActual <> Dummy Then
 If dnum >= dimActual Then
 PushDim rCount, limBase(dimActual - 1)
 Else
@@ -511,8 +511,8 @@ End Sub
 Friend Sub LoadTuple(ar As Variant)
 Dim z As Long, i As Long
 actualdata = ar
-If Count <> UBound(actualdata()) - LBound(actualdata) + 1 Then
-i = Count
+If count <> UBound(actualdata()) - LBound(actualdata) + 1 Then
+i = count
 maxitems1 = UBound(actualdata()) - LBound(actualdata)
 maxitems = maxitems1 + 1
 z = 1
@@ -539,13 +539,13 @@ End Sub
 Friend Sub CopySerialize(mmm() As Variant)
 ' may we get an exception here
 Dim m_base As Long, first12 As Long
-Dim m_base_0 As Long, first12_0 As Long, R1 As Long, r2 As Long
+Dim m_base_0 As Long, first12_0 As Long, r1 As Long, r2 As Long
 
 GetMem4 VarPtrArray(mmm()), m_base
 GetMem4 VarPtrArray(actualdata()), m_base_0
-R1 = SafeArrayLock(m_base)
+r1 = SafeArrayLock(m_base)
 r2 = SafeArrayLock(m_base_0)
-R1 = SafeArrayAccessData(ByVal m_base, first12)
+r1 = SafeArrayAccessData(ByVal m_base, first12)
 r2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 
 'GetMem4 m_base + 12, first1
@@ -553,23 +553,23 @@ r2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 PutMem4 m_base + 12, first12_0
 PutMem4 m_base_0 + 12, first12
 r2 = SafeArrayUnaccessData(ByVal m_base_0)
-R1 = SafeArrayUnaccessData(ByVal m_base)
+r1 = SafeArrayUnaccessData(ByVal m_base)
 r2 = SafeArrayUnlock(m_base_0)
-R1 = SafeArrayUnlock(m_base)
+r1 = SafeArrayUnlock(m_base)
 
 End Sub
 Friend Sub CopyBackSerialize(mmm() As Variant)
 ' may we get an exception here
 Dim m_base As Long, first12 As Long
-Dim m_base_0 As Long, first12_0 As Long, R1 As Long, r2 As Long
+Dim m_base_0 As Long, first12_0 As Long, r1 As Long, r2 As Long
 If Not RevOrder Then Err.Raise vbObjectError + 12345, "CopyBack", "Failed. is not vb6"
 Dim backup()
 backup() = actualdata()
 GetMem4 VarPtrArray(mmm()), m_base
 GetMem4 VarPtrArray(backup()), m_base_0
-R1 = SafeArrayLock(m_base)
+r1 = SafeArrayLock(m_base)
 r2 = SafeArrayLock(m_base_0)
-R1 = SafeArrayAccessData(ByVal m_base, first12)
+r1 = SafeArrayAccessData(ByVal m_base, first12)
 r2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 
 'GetMem4 m_base + 12, first1
@@ -577,14 +577,14 @@ r2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 PutMem4 m_base + 12, first12_0
 PutMem4 m_base_0 + 12, first12
 r2 = SafeArrayUnaccessData(ByVal m_base_0)
-R1 = SafeArrayUnaccessData(ByVal m_base)
+r1 = SafeArrayUnaccessData(ByVal m_base)
 r2 = SafeArrayUnlock(m_base_0)
-R1 = SafeArrayUnlock(m_base)
+r1 = SafeArrayUnlock(m_base)
 End Sub
 Public Sub Car(m As Object)
 Dim k As New mArray, usehandler As mHandler, s$
 Dim i As Long, obj As Object, obj2 As Object, spare As lambda
-If Count > 0 Then
+If count > 0 Then
     k.PushDim 1: k.PushEnd: k.SerialItem actualdata(0), 0, 1
     If IsObject(Me.item(0)) Then
         s$ = Typename(Me.item(0))
@@ -631,7 +631,7 @@ Public Sub Cdr(m As Object)
 Dim k As New mArray
 Dim i As Long, obj As Object, obj2 As Object, spare As lambda
 If dnum > 0 Then
-    k.StartResize: k.PushDim Me.Count - 1: k.PushEnd
+    k.StartResize: k.PushDim Me.count - 1: k.PushEnd
 Else
     k.Arr = True
     Set k.GroupRef = Me.GroupRef
@@ -687,14 +687,14 @@ End Sub
 
 Public Sub AppendArray(k As mArray)
 'append this to k
-If k.Count = 0 Then
+If k.count = 0 Then
     Me.CopyArray k
     Exit Sub
 End If
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 Dim fromhere As Long
 fromhere = k.UpperMonoLimit + 1
-k.SerialItem v, Me.Count + k.Count, 10
+k.SerialItem v, Me.count + k.count, 10
 k.myarrbase = myarrbase
 k.RevOrder = RevOrder
 For i = 0 To Me.UpperMonoLimit
@@ -917,8 +917,8 @@ End Sub
 Public Function UpperMonoLimit()
 UpperMonoLimit = maxitems1
 End Function
-Public Property Get Count()
-    If dnum = 0 Then Count = 0 Else Count = maxitems1 + 1 ' sa
+Public Property Get count()
+    If dnum = 0 Then count = 0 Else count = maxitems1 + 1 ' sa
 End Property
 Public Property Let arrname(aName As String)
     mmname = aName
@@ -962,8 +962,8 @@ Else
     Else
         ReDim Preserve actualdata(maxitems1) As Variant
     End If
-    Dim mx As Long
-    mx = maxitems
+    Dim mX As Long
+    mX = maxitems
     i = 0
     If limit(i) > 0 Then
         If RevOrder Then
@@ -979,8 +979,8 @@ Else
             Next i
         End If
         For i = 0 To dnum - 1
-            dtable(i) = mx \ limit(i)
-            mx = dtable(i)
+            dtable(i) = mX \ limit(i)
+            mX = dtable(i)
         Next i
     Else
         GoTo there11
@@ -1171,7 +1171,7 @@ Public Property Get ItemType(curitem) As String
 On Error GoTo there1
 If Arr Then
     If maxitems1 >= curitem Then
-        ItemType = varTypename(actualdata(curitem))
+        ItemType = VarTypeName(actualdata(curitem))
     End If
 Else
 If curitem = -2 Then
@@ -1190,7 +1190,7 @@ End If
         Else
             Dim p
             p = usehandler.objref.Value
-            ItemType = varTypename(p)
+            ItemType = VarTypeName(p)
         End If
     Else
         ItemType = Typename(usehandler)
@@ -1424,7 +1424,7 @@ If Not GroupRef Is Nothing Then
         Dim usehandler As mHandler
         Set usehandler = GroupRef
         If usehandler.t1 = 1 Then
-            usehandler.objref.index = Abs(curitem + 100)
+            usehandler.objref.Index = Abs(curitem + 100)
             usehandler.objref.Done = True
             Set usehandler.objref.ValueObj = item
             Exit Property
@@ -1466,7 +1466,7 @@ If CheckInt64(item) Then
 For i = 0 To maxitems - 1
 actualdata(i) = item
 Next i
-ElseIf varTypename(item) = "Empty" Then
+ElseIf VarTypeName(item) = "Empty" Then
 Dim z As Variant
 CopyMemory ByVal VarPtr(refArray), z, 16
 ReDim actualdata(maxitems)
@@ -1521,7 +1521,7 @@ With myobject
         mygroup2.BeginFloat vvl + 2
         For x1 = 0 To vvl * 2 + 2
             .PeekItem x1, vvl
-            s$ = varTypename(vvl)
+            s$ = VarTypeName(vvl)
             If s$ = mgrp Then
                 Set subgroup = vvl
                 CopyGroupObj subgroup, sub2
@@ -1568,20 +1568,26 @@ Property Get IsEmpty() As Variant
 IsEmpty = dnum = 0
 End Property
 Function IsObj() As Boolean
-If index >= 0 And index <= maxitems1 Then
-If IsObject(actualdata(index)) Then
+If Index >= 0 And Index <= maxitems1 Then
+If IsObject(actualdata(Index)) Then
     IsObj = True
 End If
 End If
 End Function
 Function IsEnum(p As Variant) As Boolean
 Dim usehandler As mHandler
-If index >= 0 And index <= maxitems1 Then
-If IsObject(actualdata(index)) Then
-If Typename(actualdata(index)) = mHdlr Then
-    Set usehandler = actualdata(index)
+If Index >= 0 And Index <= maxitems1 Then
+If IsObject(actualdata(Index)) Then
+If Typename(actualdata(Index)) = mHdlr Then
+    Set usehandler = actualdata(Index)
     IsEnum = usehandler.t1 = 4
-    If IsEnum Then p = usehandler.index_cursor * usehandler.sign
+     If IsEnum Then
+        If myVarType(usehandler.index_cursor, vbString) Then
+            p = usehandler.index_cursor
+        Else
+            p = usehandler.index_cursor * usehandler.sign
+        End If
+     End If
 End If
 End If
 End If
@@ -1735,9 +1741,9 @@ End Sub
 Public Sub SortTuple(Optional Low As Long = -1, Optional high As Long = -1)
 Dim i As Long, n As Byte
 If dnum < 1 Then Exit Sub
-If Count > 0 Then
-If high = -1 Then high = Count - 1
-If high > Count - 1 Then high = Count - 1
+If count > 0 Then
+If high = -1 Then high = count - 1
+If high > count - 1 Then high = count - 1
 If Low = -1 Then Low = 0
 If Low >= high Then Exit Sub
 
@@ -1752,9 +1758,9 @@ End Sub
 Public Sub SortDesTuple(Optional Low As Long = -1, Optional high As Long = -1)
 Dim i As Long, n As Byte
 If dnum < 1 Then Exit Sub
-If Count > 0 Then
-If high = -1 Then high = Count - 1
-If high > Count - 1 Then high = Count - 1
+If count > 0 Then
+If high = -1 Then high = count - 1
+If high > count - 1 Then high = count - 1
 If Low = -1 Then Low = 0
 If Low >= high Then Exit Sub
 
@@ -1926,9 +1932,9 @@ GetDnum 1, i, mbase2
 If UBound(col0()) = 0 Then
 If CheckInt64(col0(0)) Then
 ' typename has problem with 20
-ElseIf varTypename(col0(0)) = "Variant()" Then
+ElseIf VarTypeName(col0(0)) = "Variant()" Then
     col0() = col0(0)
-ElseIf varTypename(col0(0)) = mHdlr Then
+ElseIf VarTypeName(col0(0)) = mHdlr Then
     Set usehandler = col0(0)
     If usehandler.t1 = 3 Then
         Set pppp = usehandler.objref
@@ -1947,7 +1953,7 @@ If UBound(Col()) < 1 Then
 
 ReDim Col(4)
 Col(0) = 0
-Col(1) = Count \ sortmult - 1
+Col(1) = count \ sortmult - 1
 Col(2) = 0
 Col(3) = 0
 ElseIf UBound(Col()) < 3 Then
@@ -1962,9 +1968,9 @@ For i = LBound(col0) To UBound(col0)
 Col(i) = CLng(col0(i))
 Next i
 there1:
-If Col(1) = -1 Then Col(1) = Count \ sortmult - 1
+If Col(1) = -1 Then Col(1) = count \ sortmult - 1
 
-If Col(1) > Count \ sortmult - 1 Then Col(1) = Count \ sortmult - 1
+If Col(1) > count \ sortmult - 1 Then Col(1) = count \ sortmult - 1
 If Col(0) < 0 Then Col(0) = 0
 If Col(0) >= Col(1) Then Exit Sub
 

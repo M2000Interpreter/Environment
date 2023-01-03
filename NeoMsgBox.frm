@@ -142,7 +142,7 @@ Private Type myImage
     Image As StdPicture
     Height As Long
     Width As Long
-    Top As Long
+    top As Long
     Left As Long
 End Type
 Dim Image1 As myImage
@@ -151,7 +151,7 @@ Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpD
 Private Declare Function DestroyCaret Lib "user32" () As Long
 Dim iTop As Long, iLeft As Long, iwidth As Long, iheight As Long
 Dim setupxy As Single
-Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
+Dim lX As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
 Dim a$
 Dim bordertop As Long, borderleft As Long
@@ -175,34 +175,36 @@ End Sub
 Private Sub command2_GotFocus()
 yo = 1
 End Sub
-Private Sub command1_KeyDown(keycode As Integer, shift As Integer)
+Private Sub command1_KeyDown(KeyCode As Integer, shift As Integer)
 
-If keycode = 39 Or keycode = 40 Then
-    keycode = 0
-ElseIf keycode = 37 Or keycode = 38 Then
-    keycode = 0
+If KeyCode = 39 Or KeyCode = 40 Then
+    KeyCode = 0
+ElseIf KeyCode = 37 Or KeyCode = 38 Then
+    KeyCode = 0
     If command2.Visible Then command2.SetFocus: LastActive = command2.Name
 End If
-If keycode = vbKeyPause And Not BreakMe Then
+If KeyCode = vbKeyPause And Not BreakMe Then
 ASKINUSE = False
-ElseIf keycode = vbKeyEscape Then
+ElseIf KeyCode = vbKeyEscape Then
+                AskResponse$ = AskCancel$
                 AskCancel$ = vbNullString
             ASKINUSE = False
 
 End If
 End Sub
-Private Sub command2_KeyDown(keycode As Integer, shift As Integer)
-If keycode = 39 Or keycode = 40 Then
-keycode = 0
+Private Sub command2_KeyDown(KeyCode As Integer, shift As Integer)
+If KeyCode = 39 Or KeyCode = 40 Then
+KeyCode = 0
 
 If command1.Visible Then command1.SetFocus: LastActive = command1.Name
 
-ElseIf keycode = 37 Or keycode = 38 Then
-    keycode = 0
+ElseIf KeyCode = 37 Or KeyCode = 38 Then
+    KeyCode = 0
 End If
-If keycode = vbKeyPause And Not BreakMe Then
+If KeyCode = vbKeyPause And Not BreakMe Then
 ASKINUSE = False
-ElseIf keycode = vbKeyEscape Then
+ElseIf KeyCode = vbKeyEscape Then
+            AskResponse$ = AskCancel$
                 AskCancel$ = vbNullString
             ASKINUSE = False
 
@@ -225,8 +227,8 @@ Private Sub Form_Deactivate()
     End If
 End Sub
 
-Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
-If keycode = vbKeyPause And Not BreakMe Then
+Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
+If KeyCode = vbKeyPause And Not BreakMe Then
 ASKINUSE = False
 End If
 End Sub
@@ -307,7 +309,7 @@ Set myOk = New myButton
 Set myOk.Container = command1
 
   Set myOk.Callback = Me
-  myOk.index = 1
+  myOk.Index = 1
   If Left$(AskOk$, 1) = "*" Then
   LastActive = command1.Name
   AskOk$ = Mid$(AskOk$, 2)
@@ -339,25 +341,25 @@ LastActive = gList3.Name
 End If
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
 
 If Button = 1 Then
     
     If lastfactor = 0 Then lastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
+    If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then
     dr = True
-    mousepointer = vbSizeNWSE
-    Lx = x
+    MousePointer = vbSizeNWSE
+    lX = X
     lY = y
     End If
     
     Else
-    If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
+    If (y > Height - bordertop And y < Height) And (X > Width - borderleft And X < Width) Then
     dr = True
-    mousepointer = vbSizeNWSE
-    Lx = x
+    MousePointer = vbSizeNWSE
+    lX = X
     lY = y
     End If
     End If
@@ -384,7 +386,7 @@ Set myCancel = Nothing
 AskDIB$ = vbNullString
 AskOk$ = vbNullString
 AskLastX = Left
-AskLastY = Top
+AskLastY = top
 ''Sleep 200
 ASKINUSE = False
 End Sub
@@ -402,20 +404,20 @@ skip = True
 End If
 End Sub
 
-Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
-If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
+Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
+If gList2.DoubleClickCheck(Button, item, X, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
             AskCancel$ = vbNullString
             ASKINUSE = False
 End If
 End Sub
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (y > Height - bordertop And y < Height) And (X > Width - borderleft And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
 End If
 If dr Then
 
@@ -424,11 +426,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - lY)
-     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
+     If X < (Width - 150) Or X > Width Then addX = (X - lX)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
-        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
+        If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
     End If
     
 
@@ -464,10 +466,10 @@ Else
 
         If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, Width
-        Lx = x
+        lX = X
         
         Else
-        Lx = x * lastfactor / factor
+        lX = X * lastfactor / factor
          ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
@@ -483,16 +485,16 @@ Else
         lY = lY * lastfactor / factor
         End If
         Else
-        Lx = x
+        lX = X
         lY = y
    
 End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, y As Single)
 
-If dr Then Me.mousepointer = 0
+If dr Then Me.MousePointer = 0
 dr = False
 End Sub
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
@@ -510,7 +512,7 @@ allheight = height1 * factor
 itemWidth = allwidth - 2 * borderleft
 itemwidth3 = (itemWidth - 2 * borderleft) / 3
 itemwidth2 = (itemWidth - borderleft) / 2
-move Left, Top, allwidth, allheight
+move Left, top, allwidth, allheight
 FontTransparent = False  ' clear background  or false to write over
 gList2.move borderleft, bordertop, itemWidth, bordertop * 3
 gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
@@ -554,7 +556,7 @@ iLeft = borderleft
 iTop = 5 * bordertop
 iwidth = itemwidth3
 iheight = bordertop * 12
- Line (0, 0)-(Scalewidth - dv15, Scaleheight - dv15), Me.BackColor, BF
+ Line (0, 0)-(ScaleWidth - dv15, ScaleHeight - dv15), Me.BackColor, BF
 If (curIwidth / iwidth) < (curIheight / iheight) Then
 sc = curIheight / iheight
 ImageMove Image1, iLeft + (iwidth - curIwidth / sc) / 2, iTop, curIwidth / sc, iheight
@@ -615,13 +617,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -661,20 +663,21 @@ End Sub
 
 
 
-Private Sub gList2_KeyDown(keycode As Integer, shift As Integer)
-If keycode = vbKeyEscape Then
+Private Sub gList2_KeyDown(KeyCode As Integer, shift As Integer)
+If KeyCode = vbKeyEscape Then
                 AskCancel$ = vbNullString
             ASKINUSE = False
 
 End If
 End Sub
 
-Private Sub gList2_MouseUp(x As Single, y As Single)
+Private Sub gList2_MouseUp(X As Single, y As Single)
 If yo = 0 Then
 If command1.Visible Then
-    If Not gList2.DoubleClickArea(x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor) Then
+    If Not gList2.DoubleClickArea(X, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor) Then
     command1.SetFocus
     Else
+    AskResponse$ = AskCancel$
      AskCancel$ = vbNullString
             ASKINUSE = False
     End If
@@ -682,9 +685,10 @@ End If
 
 Else
 If command2.Visible Then
-    If Not gList2.DoubleClickArea(x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor) Then
+    If Not gList2.DoubleClickArea(X, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor) Then
         command2.SetFocus
     Else
+        AskResponse$ = AskCancel$
         AskCancel$ = vbNullString
         ASKINUSE = False
     End If
@@ -696,8 +700,8 @@ Private Sub gList3_Selected2(item As Long)
  command1.SetFocus
 End Sub
 
-Private Sub InterPress_Press(index As Long)
-If index = 0 Then
+Private Sub InterPress_Press(Index As Long)
+If Index = 0 Then
 AskResponse$ = AskCancel$
 AskCancel$ = vbNullString
 Else

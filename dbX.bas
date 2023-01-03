@@ -777,7 +777,7 @@ Case 5 ' .............6
     Case 1
     fnames = "CURRENCY"
     Case Else
-     fnames = "Àœ√…”‘… œ"
+     fnames = "Àœ√…”‘… œ”"
     End Select
    Exit Function
 
@@ -850,7 +850,7 @@ Exit Function
 End If
 If IsLabelSymbolNew(R$, "‘œ–… «", "LOCAL", Lang) Then
 '
-If Not IsStrExp(bstackstr, R$, base) Then
+If Not IsStrExp(bstackstr, R$, base, False) Then
 MissStringExpr
 Exit Function
 Else
@@ -864,12 +864,12 @@ End If
 NewBase = True
 End If
 Else
-If Not IsStrExp(bstackstr, R$, base) Then
+If Not IsStrExp(bstackstr, R$, base, False) Then
 MissStringExpr
 Exit Function
 End If
 If FastSymbol(R$, ",") Then
-If Not IsStrExp(bstackstr, R$, othersettings) Then
+If Not IsStrExp(bstackstr, R$, othersettings, False) Then
 MissStringExpr
 Exit Function ' make it to give error
 End If
@@ -893,7 +893,7 @@ Exit Function
 End If
 End If
 
-CreateObject("ADOX.Catalog").Create (JetPrefix + base + JetPostfix + othersettings)   'create a new, empty *.mdb-File
+CreateObject("ADOX.Catalog").create (JetPrefix + base + JetPostfix + othersettings)   'create a new, empty *.mdb-File
 NewBase = True
 End If
 End Function
@@ -906,7 +906,7 @@ Set mb = vv
 
 Set tables = mb.tables()
 If FastSymbol(R$, ",") Then
-    If Not IsStrExp(bstackstr, R$, Tablename) Then
+    If Not IsStrExp(bstackstr, R$, Tablename, False) Then
     MissStringExpr
     Exit Function
     End If
@@ -985,7 +985,7 @@ End If
 End If
 End If
 If FastSymbol(R$, ",") Then
-If IsStrExp(bstackstr, R$, Tablename) Then
+If IsStrExp(bstackstr, R$, Tablename, False) Then
 scope = 2
 
 End If
@@ -1230,7 +1230,7 @@ Else
  GoTo noMk2
 End If
 If FastSymbol(R$, ",", True) Then
-    If IsStrExp(bstackstr, R$, table$) Then
+    If IsStrExp(bstackstr, R$, table$, False) Then
     
     If Lang <> -1 Then If IsLabelSymbolNew(R$, "”‘œ", "TO", Lang) Then If IsExp(bstackstr, R$, t) Then gindex = CLng(t) Else SyntaxError
 
@@ -1292,7 +1292,7 @@ If i& = 0 And Temp.item(4) Then
         Temp.item(5) = Temp.item(5) + 1
     End If
 End If
-ElseIf IsStrExp(bstackstr, R$, par$) Then
+ElseIf IsStrExp(bstackstr, R$, par$, False) Then
     If i& = 0 And Temp.item(4) Then
         If Not ed Then
             acc.item(p_acc.item(i&)) = Temp.item(4)
@@ -1304,7 +1304,7 @@ ElseIf IsStrExp(bstackstr, R$, par$) Then
         acc.item(p_acc.item(i&)) = par$
     End If
     If Not FastSymbol(R$, ",") Then Exit Do
-ElseIf IsExp(bstackstr, R$, TT) Then
+ElseIf IsExp(bstackstr, R$, TT, False) Then
     If i& = 0 And Temp.item(4) Then
         If Not ed Then
             acc.item(p_acc.item(i&)) = Temp.item(4)
@@ -1391,12 +1391,12 @@ Exit Function
 
 noMk2:
 If FastSymbol(R$, ",", True) Then
-If IsStrExp(bstackstr, R$, table$) Then
+If IsStrExp(bstackstr, R$, table$, False) Then
 ok = True
 End If
 End If
 If Not ok Then Exit Function
-If Lang <> -1 Then If IsLabelSymbolNew(R$, "”‘œ", "TO", Lang) Then If IsExp(bstackstr, R$, t) Then gindex = CLng(t) Else SyntaxError
+If Lang <> -1 Then If IsLabelSymbolNew(R$, "”‘œ", "TO", Lang) Then If IsExp(bstackstr, R$, t, False) Then gindex = CLng(t) Else SyntaxError
 Dim Id$
   If InStr(UCase(Trim$(table$)) + " ", "SELECT") = 1 Then
 Id$ = table$
@@ -1508,8 +1508,11 @@ End If
 If IsStrExp(bstackstr, R$, par$) Then
     rec.fields(i&) = par$
 ElseIf IsExp(bstackstr, R$, t) Then
-
+    If vartype(t) = vbString Then
+    rec.fields(i&) = t
+    Else
     rec.fields(i&) = CStr(t)   '??? convert to a standard format
+    End If
 End If
 
 i& = i& + 1
@@ -1531,24 +1534,24 @@ Dim mb As Mk2Base, tables As FastCollection, pppp As mArray, Temp As mArray, fie
 Dim vv, IndexList As FastCollection, many As Long, topi As Long, temp2 As mArray, ret As Boolean
 Dim LastRead As Long
 ok = False
-If IsStrExp(bstackstr, R$, base) Then
+If IsStrExp(bstackstr, R$, base, False) Then
     If getone(base, vv) Then
         If Not TypeOf vv Is Mk2Base Then GoTo noMk2
     Else
      GoTo noMk2
     End If
     If FastSymbol(R$, ",") Then
-        If IsStrExp(bstackstr, R$, table$) Then
+        If IsStrExp(bstackstr, R$, table$, False) Then
             If FastSymbol(R$, ",") Then
                 If IsExp(bstackstr, R$, fr) Then
                     from = CLng(fr)
                     ok = True
                     If FastSymbol(R$, ",") Then
                         ok = False
-                        If IsStrExp(bstackstr, R$, first$) Then
+                        If IsStrExp(bstackstr, R$, first$, False) Then
                             If FastSymbol(R$, ",") Then
                                 If Search$ = vbNullString Then
-                                If Not IsStrExp(bstackstr, R$, Search$) Then
+                                If Not IsStrExp(bstackstr, R$, Search$, False) Then
                                 Search$ = " = "
                                 End If
                                 If Not FastSymbol(R$, ",", True) Then Exit Sub
@@ -1713,21 +1716,27 @@ cont001:
 
 noMk2:
 If FastSymbol(R$, ",") Then
-If IsStrExp(bstackstr, R$, table$) Then
+If IsStrExp(bstackstr, R$, table$, False) Then
 If FastSymbol(R$, ",") Then
-If IsExp(bstackstr, R$, fr) Then
+If IsExp(bstackstr, R$, fr, , True) Then
 from = CLng(fr)
 If FastSymbol(R$, ",") Then
-If IsStrExp(bstackstr, R$, first$) Then
+If IsStrExp(bstackstr, R$, first$, False) Then
 If FastSymbol(R$, ",") Then
 If Search$ = vbNullString Then
-    If IsStrExp(bstackstr, R$, Search$) Then
+    If IsStrExp(bstackstr, R$, Search$, False) Then
     Search$ = " " + Search$ + " "
         If FastSymbol(R$, ",") Then
-                If IsExp(bstackstr, R$, p) Then
+                If IsExp(bstackstr, R$, p, , True) Then
+                If vartype(p) = vbString Then
+                Second$ = p
+                GoTo grw123
+                Else
                 Second$ = Search$ + Str$(p)
+                End If
                 ok = True
             ElseIf IsStrExp(bstackstr, R$, Second$) Then
+grw123:
             If InStr(Second$, "'") > 0 Then
                 Second$ = Search$ + Chr(34) + Second$ + Chr(34)
             Else
@@ -1740,9 +1749,14 @@ If Search$ = vbNullString Then
         End If
     Else
      If IsExp(bstackstr, R$, p) Then
+            If vartype(p) = vbString Then
+            Second$ = p
+            GoTo qtw3345
+            End If
             Second$ = Search$ + Str$(p)
             ok = True
             ElseIf IsStrExp(bstackstr, R$, Second$) Then
+qtw3345:
                       If InStr(Second$, "'") > 0 Then
                 Second$ = Search$ + Chr(34) + Second$ + Chr(34)
             Else
@@ -1983,7 +1997,7 @@ Public Sub GetNames(bstackstr As basetask, R$, bv As Object, Lang)
 Dim base As String, table$, from As Long, many As Long, ok As Boolean, fr As Double, stac1$, i&
 ok = False
 Dim vv
-If IsStrExp(bstackstr, R$, base) Then
+If IsStrExp(bstackstr, R$, base, False) Then
     If getone(base, vv) Then
         If Not TypeOf vv Is Mk2Base Then GoTo noMk2
     Else
@@ -1994,7 +2008,7 @@ If IsStrExp(bstackstr, R$, base) Then
 
 noMk2:
 If FastSymbol(R$, ",") Then
-If IsStrExp(bstackstr, R$, table$) Then
+If IsStrExp(bstackstr, R$, table$, False) Then
 If FastSymbol(R$, ",") Then
 If IsExp(bstackstr, R$, fr) Then
 from = CLng(fr)
@@ -2151,9 +2165,9 @@ Public Sub CommExecAndTimeOut(bstackstr As basetask, R$)
 Dim base As String, com2execute As String, comTimeOut As Double
 Dim ok As Boolean
 comTimeOut = 30
-If IsStrExp(bstackstr, R$, base) Then
+If IsStrExp(bstackstr, R$, base, False) Then
     If FastSymbol(R$, ",") Then
-        If IsStrExp(bstackstr, R$, com2execute) Then
+        If IsStrExp(bstackstr, R$, com2execute, False) Then
         ok = True
             If FastSymbol(R$, ",") Then
                 If Not IsExp(bstackstr, R$, comTimeOut) Then
@@ -2254,7 +2268,7 @@ Dim base As String, Tablename As String, fs As String, i&, o As Double, ok As Bo
 Dim pppp As mArray
 ok = False
 Dim mb As Mk2Base, vv, tables As FastCollection, param As mStiva2
-If Not IsStrExp(bstackstr, R$, base) Then
+If Not IsStrExp(bstackstr, R$, base, False) Then
 MissStringExpr
 Exit Function
 End If
@@ -2263,7 +2277,7 @@ If getone(base, vv) Then
 If Not TypeOf vv Is Mk2Base Then GoTo noMk2
 
     If FastSymbol(R$, ",", True) Then
-        If IsStrExp(bstackstr, R$, Tablename) Then
+        If IsStrExp(bstackstr, R$, Tablename, False) Then
             ok = True
         Else
             MissStringExpr
@@ -2281,7 +2295,7 @@ End If
 Set param = New mStiva2
     If FastSymbol(R$, ",") Then
         Do
-           If IsStrExp(bstackstr, R$, fs) Then
+           If IsStrExp(bstackstr, R$, fs, False) Then
             If FastSymbol(R$, ",", True) Then
             If IsExp(bstackstr, R$, o) Then
             
@@ -2305,7 +2319,7 @@ End If
 noMk2:
 
     If FastSymbol(R$, ",", True) Then
-        If IsStrExp(bstackstr, R$, Tablename) Then
+        If IsStrExp(bstackstr, R$, Tablename, False) Then
             ok = True
         Else
             MissStringExpr
@@ -2422,9 +2436,9 @@ Else
     pIndex.indexnulls = 0 ' standrard
   
         While FastSymbol(R$, ",")
-        If IsStrExp(bstackstr, R$, fs) Then
+        If IsStrExp(bstackstr, R$, fs, False) Then
         If FastSymbol(R$, ",") Then
-        If IsExp(bstackstr, R$, o) Then
+        If IsExp(bstackstr, R$, o, False) Then
         
         pIndex.Columns.Append fs
         If o = 0 Then
@@ -2462,7 +2476,7 @@ Dim base As String, Tablename As String, fs As String, i&, n As Double, l As Dou
 Dim vv, mb As Mk2Base, param As mStiva2, oldl As Double
 ok = False
 
-If Not IsStrExp(bstackstr, R$, base) Then
+If Not IsStrExp(bstackstr, R$, base, False) Then
     MissStringExpr
     Exit Function
 Else
@@ -2475,7 +2489,7 @@ Else
     If Not FastSymbol(R$, ",", True) Then
     Exit Function
     End If
-    If Not IsStrExp(bstackstr, R$, Tablename) Then
+    If Not IsStrExp(bstackstr, R$, Tablename, False) Then
     MissStringExpr
     Exit Function
     Else
@@ -2491,7 +2505,7 @@ Else
     End If
     Do
     NewTable = False
-    If Not IsStrExp(bstackstr, R$, fs) Then
+    If Not IsStrExp(bstackstr, R$, fs, False) Then
     MissStringExpr
     Exit Function
     End If
@@ -2520,7 +2534,7 @@ Else
 Exit Function
 noMk2:
 If FastSymbol(R$, ",", True) Then
-If IsStrExp(bstackstr, R$, Tablename) Then
+If IsStrExp(bstackstr, R$, Tablename, False) Then
 ok = True
 Else
 MissStringExpr
@@ -2621,7 +2635,7 @@ End If
 
                 Do While FastSymbol(R$, ",")
                 
-                        If IsStrExp(bstackstr, R$, fs) Then
+                        If IsStrExp(bstackstr, R$, fs, False) Then
                         one_ok = True
                                 If FastSymbol(R$, ",") Then
                                         If IsExp(bstackstr, R$, n) Then
@@ -2695,11 +2709,11 @@ End Function
 Sub BaseCompact(bstackstr As basetask, R$)
 
 Dim base As String, conn, BASE2 As String, realtype$
-If Not IsStrExp(bstackstr, R$, base) Then
+If Not IsStrExp(bstackstr, R$, base, False) Then
 MissParam R$
 Else
 If FastSymbol(R$, ",") Then
-If Not IsStrExp(bstackstr, R$, BASE2) Then
+If Not IsStrExp(bstackstr, R$, BASE2, False) Then
 MissParam R$
 Exit Sub
 End If
@@ -2794,7 +2808,7 @@ If IsExp(bstackstr, R$, p) Then
 aa.Remove p
 If Not aa.Done Then MyEr "Key not exist", "ƒÂÌ ı‹Ò˜ÂÈ Ù›ÙÔÈÔ ÍÎÂÈ‰ﬂ": Exit Do
 ok = True
-ElseIf IsStrExp(bstackstr, R$, first$) Then
+ElseIf IsStrExp(bstackstr, R$, first$, False) Then
 aa.Remove first$
 If Not aa.Done Then MyEr "Key not exist", "ƒÂÌ ı‹Ò˜ÂÈ Ù›ÙÔÈÔ ÍÎÂÈ‰ﬂ": Exit Do
 ok = True
@@ -2806,7 +2820,7 @@ DELfields = ok
 Set aa = Nothing
 Exit Function
 
-ElseIf IsStrExp(bstackstr, R$, base$) Then
+ElseIf IsStrExp(bstackstr, R$, base$, False) Then
 
     If getone(base, vv) Then
         If Not TypeOf vv Is Mk2Base Then GoTo noMk2
@@ -2817,11 +2831,11 @@ ElseIf IsStrExp(bstackstr, R$, base$) Then
     Exit Function
 noMk2:
 If FastSymbol(R$, ",") Then
-If IsStrExp(bstackstr, R$, table$) Then
+If IsStrExp(bstackstr, R$, table$, False) Then
 If FastSymbol(R$, ",") Then
-If IsStrExp(bstackstr, R$, first$) Then
+If IsStrExp(bstackstr, R$, first$, False) Then
 If FastSymbol(R$, ",") Then
-If IsStrExp(bstackstr, R$, Second$) Then
+If IsStrExp(bstackstr, R$, Second$, False) Then
 ok = True
 
            If InStr(Second$, "'") > 0 Then
@@ -2833,6 +2847,8 @@ ElseIf IsExp(bstackstr, R$, p) Then
 ok = True
     If CheckInt64(p) Then
         Second$ = CStr(p)
+    ElseIf vartype(p) = vbString Then
+        Second$ = LTrim$(p)
     Else
         Second$ = LTrim$(Str(p))
     End If
@@ -3079,7 +3095,7 @@ ftype = "¡–Àœ”"
     Case 5
 ftype = "ƒ…–Àœ”"
     Case 6
-ftype = "Àœ√…”‘… œ"
+ftype = "Àœ√…”‘… œ”"
     Case 7
 ftype = "«Ã≈—œÃ«Õ…¡"
     Case 8
@@ -3278,7 +3294,7 @@ End If
 End If
 End Function
 Public Sub SQL()
-Dim a$, R$, k As Long, R1$, waittablename As Boolean
+Dim a$, R$, k As Long, r1$, waittablename As Boolean
 Dim closepar As Long, getonename As Boolean
 a$ = "SELECT * FROM [COMMANDS alfa] WHERE ENGLISH LIKE '" + "MODULE%" + "' AND GROUPNUM = 3"
 a$ = "SELECT [ENGLISH] FROM COMMANDS WHERE GROUPNUM =" + Str$(100) + " ORDER BY [ENGLISH]"
@@ -3313,19 +3329,19 @@ Debug.Print "Command:";
 waittablename = True
 Case "GROUP"
 getonename = False
-If IsLabelOnly(a$, R1$) Then
-R1$ = UCase(R1$)
-If Not R1$ = "BY" Then Debug.Print "Missing BY", a$: Exit Sub
-R$ = R$ + " " + R1$
+If IsLabelOnly(a$, r1$) Then
+r1$ = UCase(r1$)
+If Not r1$ = "BY" Then Debug.Print "Missing BY", a$: Exit Sub
+R$ = R$ + " " + r1$
 Debug.Print "Command:";
 waittablename = False
 End If
 Case "ORDER"
 getonename = False
-If IsLabelOnly(a$, R1$) Then
-R1$ = UCase(R1$)
-If Not R1$ = "BY" Then Debug.Print "Missing BY", a$: Exit Sub
-R$ = R$ + " " + R1$
+If IsLabelOnly(a$, r1$) Then
+r1$ = UCase(r1$)
+If Not r1$ = "BY" Then Debug.Print "Missing BY", a$: Exit Sub
+R$ = R$ + " " + r1$
 Debug.Print "Command:";
 waittablename = False
 End If
@@ -3383,24 +3399,24 @@ If Len(R$) > 0 Then Debug.Print "operator: "; R$: getonename = False
 If Digits(a$, R$, False) Then
     If Left$(a$, 1) = "." Then
         R$ = R$ + "."
-        If Digits(a$, R1$, True) Then
-            R$ = R$ + R1$
+        If Digits(a$, r1$, True) Then
+            R$ = R$ + r1$
             If InStr("eE", Left$(a$, 1)) > 0 Then
                 If InStr("-+", Mid$(a$, 2, 1)) > 0 Then
-                    R1$ = "E" + Mid$(a$, 2, 1)
-                    If Digits(Mid$(a$, 3), (R1$), True) Then
-                        R$ = R$ + R1$
+                    r1$ = "E" + Mid$(a$, 2, 1)
+                    If Digits(Mid$(a$, 3), (r1$), True) Then
+                        R$ = R$ + r1$
                         a$ = Mid$(a$, 3)
-                        Digits a$, R1$, True
-                        R$ = R$ + R1$
+                        Digits a$, r1$, True
+                        R$ = R$ + r1$
                     End If
                 Else
-                    R1$ = "E"
-                    If Digits(Mid$(a$, 2), (R1$), True) Then
-                        R$ = R$ + R1$
+                    r1$ = "E"
+                    If Digits(Mid$(a$, 2), (r1$), True) Then
+                        R$ = R$ + r1$
                         a$ = Mid$(a$, 2)
-                        Digits a$, R1$, True
-                        R$ = R$ + R1$
+                        Digits a$, r1$, True
+                        R$ = R$ + r1$
                     End If
                 End If
             End If

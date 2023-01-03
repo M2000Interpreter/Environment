@@ -136,7 +136,7 @@ Else
             lngRet = IDsp.GetIDsOfNames(riid, myptr(0), fixnamearg + 1, Clid, varDISPID(0))
             dispid = varDISPID(0)
             If dispid = -2147414014 Then
-            Stop
+            'Stop
             
             End If
             
@@ -505,12 +505,10 @@ If UCase(pstrProcName) = "_NEWENUM" Then
 Dim usehandler As mHandler
 Set usehandler = New mHandler
 usehandler.ConstructEnumerator VarRet
-Set usehandler = Nothing
 Else
 MyEr "cant use this object", "δεν μπορώ να χειριστώ αυτό το αντικείμενο"
 End If
 VarRet = CLng(0)
-
 End If
 there:
 Err.Clear

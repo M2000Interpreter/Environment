@@ -13,7 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
 Dim mValue As Variant
-Public flag As Boolean
+Public mflag As Integer
 Public Property Get Value() As Variant
 Attribute Value.VB_UserMemId = 0
 If flag Then
@@ -30,13 +30,21 @@ Public Property Set Value(RHS As Variant)
 MyEr "Constant value", "Σταθερή τιμή"
 Err.Raise 20
 End Property
-
-Public Sub DefineOnce(RHS As Variant)
+Public Property Get flag() As Boolean
+    flag = (mflag And 1) <> 0
+End Property
+Public Property Get vtype() As Boolean
+    vtype = (mflag And 2) <> 0
+End Property
+Public Sub DefineOnce(RHS, Optional ByVal vtype)
 If Typename(mValue) = "Empty" Then
 If MyIsObject(RHS) Then
-    flag = True
+    mflag = mflag Or 1
     Set mValue = RHS
 Else
+    If Not IsMissing(vtype) Then
+    mflag = mflag Or 2
+    End If
     mValue = RHS
 End If
 End If

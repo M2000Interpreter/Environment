@@ -4,21 +4,23 @@ Public pw As Long, ph As Long, psw As Long, psh As Long, pwox As Long, phoy As L
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
 Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub GetMem81 Lib "msvbvm60" Alias "GetMem8" (ByVal Addr As Long, retval As Currency)
+
       Private Type DOCINFO
           cbSize As Long
           lpszDocName As String
           lpszOutput As String
       End Type
             Private Declare Function StartDoc Lib "gdi32" Alias "StartDocA" _
-          (ByVal hdc As Long, lpdi As DOCINFO) As Long
+          (ByVal hDC As Long, lpdi As DOCINFO) As Long
 
-      Private Declare Function StartPage Lib "gdi32" (ByVal hdc As Long) _
+      Private Declare Function StartPage Lib "gdi32" (ByVal hDC As Long) _
           As Long
 
-      Private Declare Function EndDoc Lib "gdi32" (ByVal hdc As Long) _
+      Private Declare Function EndDoc Lib "gdi32" (ByVal hDC As Long) _
           As Long
 
-      Private Declare Function EndPage Lib "gdi32" (ByVal hdc As Long) _
+      Private Declare Function EndPage Lib "gdi32" (ByVal hDC As Long) _
           As Long
 Private mp_hdc As Long
 Public MyDM() As Byte
@@ -31,10 +33,10 @@ Private Const PHYSICALWIDTH As Long = 110
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
 
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal iCapabilitiy As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal iCapabilitiy As Long) As Long
 
       Private Declare Function ResetDC Lib "gdi32" Alias "ResetDCA" _
-          (ByVal hdc As Long, lpInitData As Any) As Long
+          (ByVal hDC As Long, lpInitData As Any) As Long
 Private Declare Function CreateIC Lib "gdi32" Alias "CreateICA" _
           (ByVal lpDriverName As String, ByVal lpDeviceName As String, _
           ByVal lpOutput As String, lpInitData As Any) As Long
@@ -45,7 +47,7 @@ Private Declare Function CreateIC Lib "gdi32" Alias "CreateICA" _
       Private Declare Function CreateDC Lib "gdi32" Alias "CreateDCA" _
           (ByVal lpDriverName As String, ByVal lpDeviceName As String, _
           ByVal lpOutput As Long, lpInitData As Any) As Long
-      Private Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) _
+      Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) _
           As Long
       Private Const NULLPTR = 0&
       ' Constants for DEVMODE
@@ -175,34 +177,34 @@ End Sub
 
       Function ShowProperties(f As Object, szPrinterName As String, adevmode() As Byte) As Boolean
       Dim hPrinter As Long, i As Long
-      Dim nSize As Long
+      Dim nsize As Long
 
       Dim TempStr As String, oldfields As Long
       Dim pd As PRINTER_DEFAULTS
       pd.DesiredAccess = PRINTER_ACCESS_USE
         If OpenPrinter(szPrinterName, hPrinter, pd) <> 0 Then
-           nSize = DocumentProperties(NULLPTR, hPrinter, szPrinterName, NULLPTR, NULLPTR, 0)
+           nsize = DocumentProperties(NULLPTR, hPrinter, szPrinterName, NULLPTR, NULLPTR, 0)
           ' Form1.Caption = nSize
-          If nSize < 1 Then
+          If nsize < 1 Then
             ShowProperties = False
             Exit Function
           End If
           
-          If UBound(adevmode) <> nSize + 100 Then
-         ReDim adevmode(1 To nSize + 100) As Byte
+          If UBound(adevmode) <> nsize + 100 Then
+         ReDim adevmode(1 To nsize + 100) As Byte
          
-           nSize = DocumentProperties(NULLPTR, hPrinter, szPrinterName, adevmode(1), ByVal NULLPTR, DM_OUT_BUFFER)
+           nsize = DocumentProperties(NULLPTR, hPrinter, szPrinterName, adevmode(1), ByVal NULLPTR, DM_OUT_BUFFER)
           
-          If nSize < 0 Then
+          If nsize < 0 Then
             ShowProperties = False
             Exit Function
           End If
    
   End If
          If Not f Is Nothing Then
-          nSize = DocumentProperties(f.hWnd, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_PROMPT Or DM_IN_BUFFER Or DM_OUT_BUFFER)  '
+          nsize = DocumentProperties(f.hWnd, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_PROMPT Or DM_IN_BUFFER Or DM_OUT_BUFFER)  '
          Else
-         nSize = DocumentProperties(0, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_IN_BUFFER Or DM_OUT_BUFFER)
+         nsize = DocumentProperties(0, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_IN_BUFFER Or DM_OUT_BUFFER)
         End If
 
 
@@ -216,20 +218,20 @@ End Sub
          ShowProperties = False
       End If
       End Function
-Sub SwapPrinterDim(pw As Long, ph As Long, psw As Long, psh As Long, lpx As Long, lpy As Long)
+Sub SwapPrinterDim(pw As Long, ph As Long, psw As Long, psh As Long, LPX As Long, lpy As Long)
 Dim a As Long
 a = pw: pw = ph: ph = a
 a = psw: psw = psh: psh = a
-a = lpx: lpx = lpy: lpy = a
+a = LPX: LPX = lpy: lpy = a
 End Sub
-Sub PrinterDim(pw As Long, ph As Long, psw As Long, psh As Long, lpx As Long, lpy As Long)
+Sub PrinterDim(pw As Long, ph As Long, psw As Long, psh As Long, LPX As Long, lpy As Long)
           Dim ret As Long
           Dim LastError As Long
-          Dim dummy3 As Object
+          Dim Dummy3 As Object
        '   If mp_hdc <> 0 Then Exit Sub
           
 If UBound(MyDM) = 1 Then
-ShowProperties dummy3, Printer.DeviceName, MyDM
+ShowProperties Dummy3, Printer.DeviceName, MyDM
 End If
  Dim pDevMode As Long
         pDevMode = GlobalLock(VarPtr(MyDM(1)))
@@ -239,7 +241,7 @@ pw = GetDeviceCaps(mp_hdc, PHYSICALWIDTH)
 ph = GetDeviceCaps(mp_hdc, PHYSICALHEIGHT)
 psw = GetDeviceCaps(mp_hdc, HORZRES)
 psh = GetDeviceCaps(mp_hdc, VERTRES)
-lpx = GetDeviceCaps(mp_hdc, LOGPIXELSX)
+LPX = GetDeviceCaps(mp_hdc, LOGPIXELSX)
 lpy = GetDeviceCaps(mp_hdc, LOGPIXELSY)
 
           ret = DeleteDC(mp_hdc)
@@ -251,9 +253,9 @@ Function PrinterCap(cap As Long) As Long
         Dim p_hdc As Long
           Dim ret As Long
           Dim LastError As Long
-          Dim dummy3 As Object
+          Dim Dummy3 As Object
         If UBound(MyDM) = 1 Then
-            ShowProperties dummy3, Printer.DeviceName, MyDM
+            ShowProperties Dummy3, Printer.DeviceName, MyDM
         End If
           
           p_hdc = CreateIC(Printer.DriverName, Printer.DeviceName, 0, MyDM(1))
@@ -278,31 +280,31 @@ End If
 End Sub
 Function ChangeOrientation(f As Object, szPrinterName As String, adevmode() As Byte) As Boolean
       Dim hPrinter As Long, i As Long
-      Dim nSize As Long
+      Dim nsize As Long
       Dim pDevMode As DEVMODE
       Dim TempStr As String, oldfields As Long
       Dim pd As PRINTER_DEFAULTS
       pd.DesiredAccess = PRINTER_ACCESS_USE
         If OpenPrinter(szPrinterName, hPrinter, pd) <> 0 Then
-           nSize = DocumentProperties(NULLPTR, hPrinter, szPrinterName, _
+           nsize = DocumentProperties(NULLPTR, hPrinter, szPrinterName, _
            NULLPTR, NULLPTR, 0)
-          If nSize < 1 Then
+          If nsize < 1 Then
             ChangeOrientation = False
             Exit Function
           End If
-          If UBound(adevmode) <> nSize + 100 Then
-         ReDim adevmode(1 To nSize + 100) As Byte
+          If UBound(adevmode) <> nsize + 100 Then
+         ReDim adevmode(1 To nsize + 100) As Byte
          
-           nSize = DocumentProperties(NULLPTR, hPrinter, szPrinterName, adevmode(1), ByVal NULLPTR, DM_OUT_BUFFER)
+           nsize = DocumentProperties(NULLPTR, hPrinter, szPrinterName, adevmode(1), ByVal NULLPTR, DM_OUT_BUFFER)
           
-          If nSize < 0 Then
+          If nsize < 0 Then
             ChangeOrientation = False
             Exit Function
           End If
    
    End If
          If Not f Is Nothing Then
-          nSize = DocumentProperties(f.hWnd, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_PROMPT Or DM_OUT_BUFFER Or DM_IN_BUFFER)
+          nsize = DocumentProperties(f.hWnd, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_PROMPT Or DM_OUT_BUFFER Or DM_IN_BUFFER)
          Else
 
       
@@ -312,7 +314,7 @@ Function ChangeOrientation(f As Object, szPrinterName As String, adevmode() As B
      Call CopyMemory(adevmode(1), pDevMode, Len(pDevMode))
       
       
-         nSize = DocumentProperties(0, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_IN_BUFFER Or DM_OUT_BUFFER)
+         nsize = DocumentProperties(0, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_IN_BUFFER Or DM_OUT_BUFFER)
         End If
 
          Call CopyMemory(pDevMode, adevmode(1), Len(pDevMode))
@@ -422,12 +424,13 @@ End If
 End Function
 Function SignInt64(v)
 If v >= limitlonglong Then v = v - maxlonglong
-    SignInt64 = cInt64(v)
+    SignInt64 = cInt64(Fix(v))
 
 End Function
 
 
 Function uintnew0(ByVal a As Currency) As Double
+a = Fix(a)
 If a > 2147483647@ Then a = 2147483647@
 If a < -2147483648@ Then a = -2147483648@
 If a < 0 Then
@@ -437,6 +440,7 @@ uintnew0 = CDbl(a)
 End If
 End Function
 Function uintnew(ByVal a As Currency) As Currency
+a = Fix(a)
 If a > 2147483647@ Then a = 2147483647@
 If a < -2147483648@ Then a = -2147483648@
 If a < 0 Then
@@ -446,6 +450,8 @@ uintnew = a
 End If
 End Function
 Function add32(ByVal a As Currency, ByVal b As Currency) As Currency
+a = Fix(a)
+b = Fix(b)
 While a < 0: a = a + 4294967296@: Wend
 While b < 0: b = b + 4294967296@: Wend
 a = a + b
@@ -463,12 +469,14 @@ HexToUnsigned = CCur(a)
 End If
 End Function
 Function uintnew2(a As Double) As Double
-If a > 2147483647# Then a = 2147483647#
-If a < -2147483648# Then a = -2147483648#
-If a < 0 Then
-uintnew2 = 4294967296# + a
+Dim ucn As Currency
+ucn = Fix(a)
+If ucn > 2147483647# Then ucn = 2147483647#
+If ucn < -2147483648# Then ucn = -2147483648#
+If ucn < 0 Then
+uintnew2 = CDbl(4294967296# + ucn)
 Else
-uintnew2 = a
+uintnew2 = CDbl(ucn)
 End If
 End Function
 Function UINT(ByVal a As Long) As Long 'δίνει έναν integer σαν Unsigned integer σε long
@@ -499,19 +507,19 @@ Function LowWord(a As Long) As Long
 LowWord = a
 PutMem2 VarPtr(LowWord) + 2, 0
 End Function
-Function HighLow(h As Long, l As Long) As Long
+Function HighLow(H As Long, L As Long) As Long
 Dim a As Integer
-HighLow = l
-GetMem2 VarPtr(h), a
+HighLow = L
+GetMem2 VarPtr(H), a
 PutMem2 VarPtr(HighLow) + 2, a
 End Function
 Function HighWord(a As Long) As Long
-Dim h As Integer
-GetMem2 VarPtr(a) + 2, h
-PutMem2 VarPtr(HighWord), h
+Dim H As Integer
+GetMem2 VarPtr(a) + 2, H
+PutMem2 VarPtr(HighWord), H
 End Function
 Function cUlng2(a As Double) As Long ' for packlng, get a double as unsigned 32bit and return sign 32bit
-a = Int(a)
+a = Fix(a)
 If a > 4294967296# Then a = 4294967296#
 If a < 0 Then a = 0
 If a > 2147483647# Then
@@ -532,9 +540,9 @@ Exit Function
 cu1:
 cUlng = 0
 End Function
-Function Sput(ByVal Sl As String) As String
+Function Sput(ByVal sL As String) As String
 ' change to signed
-Sput = Chr(2) + Right$("00000000" & Hex$(Len(Sl)), 8) + Sl
+Sput = Chr(2) + Right$("00000000" & Hex$(Len(sL)), 8) + sL
 End Function
 Function PACKLNGUnsign$(a As Variant)
 If a < 0 Then
@@ -856,4 +864,16 @@ ORGAN = "Applause"
 Case 128
 ORGAN = "Gunshot"
 End Select
+End Function
+Function Copy64Cur(ByVal X) As Currency
+Dim L As Long
+If VarType(X) = 20 Then
+GetMem81 VarPtr(X) + 8, Copy64Cur
+End If
+End Function
+Function CopyCur64(ByVal c As Currency)
+    Static LL
+    If VarType(LL) <> 20 Then LL = cInt64(1)
+    CopyMemory ByVal VarPtr(LL) + 8, ByVal VarPtr(c), 8&
+    CopyCur64 = LL
 End Function

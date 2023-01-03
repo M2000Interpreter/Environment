@@ -195,23 +195,101 @@ Attribute VB_Exposed = False
 Option Explicit
 Public WithEvents testpad As TextViewer
 Attribute testpad.VB_VarHelpID = -1
-Public WithEvents Compute As myTextBox, previewKey As Boolean
+Public WithEvents Compute As myTextBox
 Attribute Compute.VB_VarHelpID = -1
+Public previewKey As Boolean, switchview As Integer, Busy As Boolean
 Private Label(0 To 2) As New myTextBox
 Dim run_in_basestack1 As Boolean
 Dim MyBaseTask As New basetask
 Dim setupxy As Single
 Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
-Dim a$
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long, itemwidth3 As Long, itemwidth2 As Long
 Dim height1 As Long, width1 As Long
 Dim doubleclick As Long
-
+Dim para(2) As Long, pospara(2) As Long, selpresrv(2) As Long
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim EXECUTED As Boolean
-Dim stolemodalid As Variant
+Dim stolemodalid As Variant, padtitle As String
+Public Sub generalFkey(a As Integer)
+Dim monitor As Long, titl$, once As Boolean
+If once Then Exit Sub
+once = True
+Debug.Print "OK", a
+If a = 2 Then
+gList0.SetFocus
+ElseIf a = 3 Then
+glist3_CheckGotFocus 2
+ElseIf a = 5 Then
+gList4.ListIndex = 0
+gList4_Selected2 0
+ElseIf a = 6 Then
+stoponerror = True
+If pagio$ = "GREEK" Then
+gList4.list(1) = "Στο Λάθος F6"
+Else
+gList4.list(1) = "To Error F6"
+End If
+' "Slow Flow" "Αργή Ροή"
+
+gList4.ListIndex = 1
+gList4_Selected2 1
+ElseIf a = 7 Then
+If pagio$ = "GREEK" Then
+gList4.list(1) = "Αργή Ροή F7"
+Else
+gList4.list(1) = "Slow Flow F7"
+End If
+stoponerror = False
+gList4.ListIndex = 1
+gList4_Selected2 1
+ElseIf a = 8 Then
+gList4.ListIndex = 2
+gList4_Selected2 2
+ElseIf switchview = 2 Then
+    If a = 1 Then
+        Errorlog.EmptyDoc
+        stackshow MyBaseTask
+    ElseIf a = 4 Then
+        If pagio$ = "GREEK" Then titl$ = "Καταγραφικό Λαθών" Else titl$ = "Error Log"
+        GoSub findwindow
+        sHelp titl$, Errorlog.textDoc, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+        If Not Form4.Visible Then vHelp True
+        Form4.label1.SelStartSilent = testpad.SelStart
+        vHelp
+    End If
+ElseIf a = 4 Then
+    GoSub findwindow
+    sHelp gList2.HeadLine, testpad.Text, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+    If TestShowCode Then
+        If Not Form4.Visible Then vHelp True
+        Form4.label1.Text = testpad.Text
+        
+        Form4.label1.SelStartSilent = testpad.SelStart
+        Form4.label1.SelLengthSilent = testpad.SelLength
+        Form4.label1.SelectionColor = rgb(255, 64, 128)
+         Form4.gList1.ShowMe '  label1.glistN.Show
+       ' If testpad.SelStart > 0 And testpad.SelLength > 0 Then Form4.label1.SelLength = testpad.SelLength: Form4.label1.glistN.ShowMe
+    Else
+       vHelp
+    End If
+    
+End If
+once = False
+Exit Sub
+findwindow:
+    If Not Form4.Visible Then
+        monitor = FindFormSScreen(Form1)
+    Else
+        monitor = FindFormSScreen(Form4)
+    End If
+    abt = False
+Return
+End Sub
+Public Property Get Process()
+    Set Process = MyBaseTask
+End Property
 Public Property Set Process(mBtask As basetask)
 If mBtask Is Nothing Then
 'Set MyBaseTask = Nothing
@@ -242,12 +320,12 @@ Public Sub ComputeNow()
 stackshow MyBaseTask
 End Sub
 
-Private Sub compute_KeyDown(keycode As Integer, shift As Integer)
+Private Sub compute_KeyDown(KeyCode As Integer, shift As Integer)
 Dim excode As Long
-If keycode = 13 Then
-keycode = 0
+If KeyCode = 13 Then
+KeyCode = 0
     If Compute.Prompt = "? " Then
-        gList3(2).backcolor = &H3B3B3B
+        gList3(2).BackColor = &H3B3B3B
         TestShowCode = False
         stackshow MyBaseTask
     Else
@@ -264,7 +342,7 @@ keycode = 0
         End If
         
     End If
-ElseIf keycode = 8 Then
+ElseIf KeyCode = 8 Then
 If Compute = vbNullString Then
     If Compute.Prompt <> ">" Then
         Compute.Prompt = ">"
@@ -282,7 +360,7 @@ If Compute = vbNullString Then
         End If
     End If
     Compute.vartext = vbNullString
-keycode = 0
+KeyCode = 0
 Exit Sub
 End If
 End If
@@ -298,8 +376,9 @@ If Modalid <> 0 Then
 stolemodalid = Modalid
 Modalid = Rnd * 645677887
 End If
-
+Else
 End If
+If Not Busy Then generalFkey 2 Else Debug.Print "test is busy"
 End Sub
 
 Private Sub Form_Deactivate()
@@ -309,11 +388,15 @@ stolemodalid = 0
 End If
 End Sub
 
-Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
-If keycode = 27 Then
-keycode = 0
+Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
+If KeyCode = vbKeyTab And (shift And &H2 = 2) Then
+choosenext
+Sleep 100
+KeyCode = 0
+ElseIf KeyCode = 27 Then
+KeyCode = 0
 Unload Me
-ElseIf keycode = 13 Then
+ElseIf KeyCode = 13 Then
 If Not EXECUTED Then
 If Not STq Then
 STbyST = True
@@ -324,6 +407,7 @@ End Sub
 
 Private Sub Form_Load()
 Dim i As Long
+Busy = True
 height1 = 5280 * DYP / 15
 width1 = 7860 * DXP / 15
 MoveFormToOtherMonitorOnly Me
@@ -332,6 +416,7 @@ LastWidth = -1
 HelpLastWidth = -1
 PopUpLastWidth = -1
 setupxy = 20
+padtitle = "F4 - Copy to help form | F1 clear error log"
 lastfactor = ScaleDialogFix(SizeDialog)
 ScaleDialog lastfactor, LastWidth
 gList4.NoCaretShow = True
@@ -348,9 +433,11 @@ gList2.MoveParent = True
 gList1.DragEnabled = False
 gList1.AutoPanPos = True
 Set testpad = New TextViewer
+gList1.bypassfirstClick = True
 gList1.NoWheel = True
 Set testpad.Container = gList1
 testpad.FileName = vbNullString
+testpad.glistN.CapColor = rgb(128, 128, 0)
 testpad.glistN.DropEnabled = False
 testpad.glistN.DragEnabled = False
 testpad.glistN.LeftMarginPixels = 8
@@ -358,12 +445,13 @@ testpad.NoMark = True
 testpad.NoColor = False
 testpad.EditDoc = False
 testpad.nowrap = False
-testpad.enabled = True
+paneltitle 0&
+testpad.Enabled = True
 Set Compute = New myTextBox
 Set Compute.Container = gList0
 Compute.MaxCharLength = 500 ' as a limit
 Compute.locked = False
-Compute.enabled = True
+Compute.Enabled = True
 Compute.Retired
 Set Label(0).Container = gList3(0)
 Set Label(1).Container = gList3(1)
@@ -376,9 +464,13 @@ Compute.FadePartColor = &H777777
 Label(0).Prompt = "Τμήμα: "
 Label(1).Prompt = "Εντολή: "
 Label(2).Prompt = "Επόμενο: "
-gList4.additemFast "Επόμενο Βήμα"
-gList4.additemFast "Αργή Ροή"
-gList4.additemFast "Διακοπή"
+gList4.additemFast "Επόμενο Βήμα F5"
+If stoponerror Then
+gList4.additemFast "Στο Λάθος F6"
+Else
+gList4.additemFast "Αργή Ροή F7"
+End If
+gList4.additemFast "Διακοπή F8"
 Else
 gList2.HeadLine = "Control"
 Compute.Prompt = "? "
@@ -387,18 +479,23 @@ Compute.FadePartColor = &H777777
 Label(0).Prompt = "Module: "
 Label(1).Prompt = "Id: "
 Label(2).Prompt = "Next: "
-gList4.additemFast "Next Step"
-gList4.additemFast "Slow Flow"
-gList4.additemFast "Stop"
+gList4.additemFast "Next Step F5"
+If stoponerror Then
+gList4.additemFast "To Error F6"
+Else
+gList4.additemFast "Slow Flow F7"
+End If
+gList4.additemFast "Stop F8"
 End If
 gList2.HeadlineHeight = gList2.HeightPixels
 gList2.PrepareToShow
 gList4.NoPanRight = False
 gList4.SingleLineSlide = True
 gList4.VerticalCenterText = True
-gList4.enabled = True
+gList4.Enabled = True
 gList4.ListindexPrivateUse = 0
 gList4.ShowMe
+Busy = False
 End Sub
 Sub FillAgainLabels()
 Dim oldindex As Long
@@ -413,9 +510,15 @@ Label(1).Prompt = "Εντολή: "
 Label(2).Prompt = "Επόμενο: "
 oldindex = gList4.ListIndex
 gList4.Clear
-gList4.additemFast "Επόμενο Βήμα"
-gList4.additemFast "Αργή Ροή"
-gList4.additemFast "Διακοπή"
+gList4.additemFast "Επόμενο Βήμα F5"
+If stoponerror Then
+gList4.additemFast "Στο Λάθος F6"
+Else
+gList4.additemFast "Αργή Ροή F7"
+End If
+gList4.additemFast "Διακοπή F8"
+
+
 gList4.ListindexPrivateUse = oldindex
 gList4.PrepareToShow
 gList2.PrepareToShow
@@ -434,9 +537,13 @@ Label(1).Prompt = "Id: "
 Label(2).Prompt = "Next: "
 oldindex = gList4.ListIndex
 gList4.Clear
-gList4.additemFast "Next Step"
-gList4.additemFast "Slow Flow"
-gList4.additemFast "Stop"
+gList4.additemFast "Next Step F5"
+If stoponerror Then
+gList4.additemFast "To Error F6"
+Else
+gList4.additemFast "Slow Flow F7"
+End If
+gList4.additemFast "Stop F8"
 gList4.ListindexPrivateUse = oldindex
 gList4.PrepareToShow
 gList2.PrepareToShow
@@ -445,6 +552,7 @@ End If
 
 End Sub
 Private Sub Form_Unload(Cancel As Integer)
+If Busy Then Cancel = True: Exit Sub
 testpad.Dereference
 Compute.Dereference
 Set MyBaseTask = Nothing
@@ -455,39 +563,29 @@ End Sub
 
 
 
+Private Sub gList0_Fkey(a As Integer)
+generalFkey a
+End Sub
+
+
 Private Sub gList1_CheckGotFocus()
-gList1.backcolor = &H606060
-gList1.ShowMe2
+gList1.BackColor = &H505050
+'testpad.SelLengthSilent = 0
+'gList1.ShowMe2
+SetPanelPos switchview
 End Sub
 
 Private Sub gList1_CheckLostFocus()
-
-gList1.backcolor = &H3B3B3B
+gList1.BackColor = &H3B3B3B
 gList1.ShowMe2
+GetPanelPos
 End Sub
 
 
-Private Sub gList1_MouseUp(x As Single, y As Single)
-Dim monitor As Long
-If Not Form4.Visible Then
-monitor = FindFormSScreen(Form1)
-Else
-monitor = FindFormSScreen(Form4)
-End If
-abt = False
-sHelp gList2.HeadLine, testpad.Text, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+Private Sub gList1_Fkey(a As Integer)
 
-If TestShowCode Then
-If Not Form4.Visible Then vHelp True
-Form4.label1.SelStartSilent = testpad.SelStart
-Form4.label1.SelLengthSilent = 0
-Form4.label1.SelectionColor = rgb(255, 64, 128)
-If testpad.SelStart > 0 And testpad.SelLength > 0 Then Form4.label1.SelLength = testpad.SelLength: Form4.label1.glistN.ShowMe
-Else
-vHelp Not Form4.Visible
-End If
+generalFkey a
 End Sub
-
 
 Private Sub gList2_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 
@@ -548,6 +646,10 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 
+Private Sub gList2_Fkey(a As Integer)
+generalFkey a
+End Sub
+
 Private Sub gList2_GotFocus()
 tracecounter = 100
 End Sub
@@ -571,6 +673,7 @@ End Sub
 Private Sub glist3_CheckGotFocus(index As Integer)
 Dim s$, z$
 gList4.SetFocus
+On Error GoTo there1
 If index < 2 Then
 abt = False
 
@@ -676,17 +779,32 @@ End Select
 End If
 End If
 ElseIf index = 2 Then
-TestShowCode = Not TestShowCode
-If TestShowCode Then
-gList3(2).backcolor = &H606060
-Label(2) = Label(2)
-Else
-gList3(2).backcolor = &H3B3B3B
-Label(2) = Label(2)
-testpad.SetRowColumn 1, 1
+    GetPanelPos
+    switchview = switchview + 1: If switchview > 2 Then switchview = 0
+    TestShowCode = switchview = 1
+    If TestShowCode Then
+        gList3(2).BackColor = &H606060
+        Label(2) = Label(2)
+    Else
+        If switchview = 2 Then
+            gList3(2).BackColor = &H3B3B6B
+            Label(2) = Label(2)
+        Else
+            gList3(2).BackColor = &H3B3B3B
+            Label(2) = Label(2)
+            testpad.SetRowColumn 1, 1
+            
+        End If
+    End If
+  paneltitle switchview
+  stackshow MyBaseTask
+  testpad.Enabled = True
 End If
-stackshow MyBaseTask
-End If
+there1:
+End Sub
+
+Private Sub gList3_Fkey(index As Integer, a As Integer)
+generalFkey a
 End Sub
 
 Private Sub gList4_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
@@ -712,13 +830,13 @@ b.Right = gList4.WidthPixels
     Else
           
           
-    SetTextColor thisHDC, gList4.forecolor
+    SetTextColor thisHDC, gList4.ForeColor
     b.top = b.Bottom - 1
     FillBack thisHDC, b, 0
     End If
     If item = gList4.ListIndex Then
   a.Left = a.Left + 1 * lastfactor + gList4.PanPosPixels
-  gList4.forecolor = rgb(128, 0, 128)
+  gList4.ForeColor = rgb(128, 0, 128)
   End If
    
    
@@ -726,6 +844,10 @@ b.Right = gList4.WidthPixels
     skip = True
 End Sub
  
+Private Sub gList4_Fkey(a As Integer)
+generalFkey a
+End Sub
+
 Private Sub gList4_PanLeftRight(direction As Boolean)
 EXECUTED = True
 Action
@@ -786,7 +908,7 @@ If Button = 1 Then
     If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
     dr = True
     tracecounter = 100
-    mousepointer = vbSizeNWSE
+    MousePointer = vbSizeNWSE
     Lx = x
     lY = y
     End If
@@ -795,7 +917,7 @@ If Button = 1 Then
     If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
     dr = True
     tracecounter = 100
-    mousepointer = vbSizeNWSE
+    MousePointer = vbSizeNWSE
     Lx = x
     lY = y
     End If
@@ -808,9 +930,9 @@ Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
 End If
 If dr Then
 
@@ -877,7 +999,7 @@ End Sub
 
 Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
 
-If dr Then Me.mousepointer = 0
+If dr Then Me.MousePointer = 0
 tracecounter = 0
 dr = False
 End Sub
@@ -904,6 +1026,13 @@ gList3(2).move borderleft, bordertop * 13, itemwidth2, bordertop * 4
 gList4.move borderleft * 2 + itemwidth2, bordertop * 5, itemwidth3, bordertop * 12
 gList1.move borderleft, bordertop * 18, itemWidth, bordertop * 12
 gList0.move borderleft, bordertop * 31, itemWidth, bordertop * 3
+On Error Resume Next
+If Not testpad Is Nothing Then
+If Not testpad.glistN Is Nothing Then
+testpad.NewTitle testpad.Title, 4 * factor
+'testpad.ReColor
+End If
+End If
 End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
 gList2.FontSize = 14.25 * factor * dv15 / 15
@@ -923,5 +1052,55 @@ If Not this Is Nothing Then this.NoWheel = True
 End Sub
 Sub ByeBye()
 Unload Me
+End Sub
+Public Sub ResetPanelPos()
+Dim i As Long
+For i = 0 To 2: para(i) = 0: Next i
+lastpanel = 0
+End Sub
+Public Sub paneltitle(ByVal that As Long)
+Dim oldlength As Long
+    Select Case that
+    Case 0
+        testpad.Title = "Stack & Variables | F4 = copy to help form"
+        testpad.ReplaceTitle = " "
+    Case 1
+        
+        testpad.Title = "Code View | F4 = copy to help form"
+        testpad.ReplaceTitle = " "
+    Case 2
+        testpad.Title = "Error Log | F1 - clear | F4 = copy to help form"
+        testpad.ReplaceTitle = " "
+    End Select
+End Sub
+
+Public Sub GetPanelPos(Optional ByVal that As Long = -1)
+Select Case that
+Case 0 To 2
+    
+    para(that) = testpad.mDoc.MarkParagraphID
+    pospara(that) = testpad.ParaSelStart
+    selpresrv(that) = testpad.SelLength
+    testpad.nowrap = that > 0
+    testpad.Enabled = Not STbyST
+Case -1
+    para(lastpanel) = testpad.mDoc.MarkParagraphID
+    pospara(lastpanel) = testpad.ParaSelStart
+End Select
+End Sub
+Public Sub SetPanelPos(ByVal that As Long)
+Select Case that
+Case 0 To 2
+    lastpanel = that
+    If para(that) = 0 Then Exit Sub
+    With testpad
+        .SelLengthSilent = selpresrv(that)
+        .mDoc.MarkParagraphID = para(that)
+        .glistN.Enabled = False
+        .ParaSelStart = pospara(that)
+        .glistN.Enabled = True
+        .glistN.ShowMe
+    End With
+End Select
 End Sub
 

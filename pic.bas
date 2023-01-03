@@ -20,7 +20,7 @@ Private Declare Function GetKeyboardState Lib "user32" (kbArray As KeyboardBytes
 Dim kbArray As KeyboardBytes
 Public fonttest As PictureBox
 Private Declare Function GetTextMetrics Lib "gdi32" _
-Alias "GetTextMetricsA" (ByVal hDC As Long, _
+Alias "GetTextMetricsA" (ByVal hdc As Long, _
 lpMetrics As TEXTMETRIC) As Long
 Private Type TEXTMETRIC
 tmHeight As Long
@@ -108,7 +108,7 @@ Public Type tagSize
     cx As Long
     cy As Long
 End Type
-Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hDC As Long, lpAspectRatio As tagSize) As Long
+Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hdc As Long, lpAspectRatio As tagSize) As Long
 Declare Function CreateRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Declare Function CombineRgn Lib "gdi32" (ByVal hDestRgn As Long, ByVal hSrcRgn1 As Long, ByVal hSrcRgn2 As Long, ByVal nCombineMode As Long) As Long
 Public Declare Function SetWindowRgn Lib "user32" (ByVal hWnd As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
@@ -152,20 +152,20 @@ Type Bitmap
         bmBitsPixel As Integer
         bmBits As Long
 End Type
-Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
-Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hDC As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
-Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
-Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
+Declare Function StretchBlt Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hdc As Long) As Long
+Declare Function SelectObject Lib "gdi32" (ByVal hdc As Long, ByVal hObject As Long) As Long
+Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) As Long
 Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 'Declare Function GetObject Lib "gdi32" Alias "GetObjectA" (ByVal hObject As Long, ByVal nCount As Long, lpObject As Any) As Long
-Declare Function GetPixel Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long) As Long
-Declare Function SetPixel Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long, ByVal crColor As Long) As Long
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
+Declare Function GetPixel Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long) As Long
+Declare Function SetPixel Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal crColor As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal nIndex As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function GetDesktopWindow Lib "user32" () As Long
-Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long) As Long
+Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hdc As Long) As Long
 Private Const BITSPIXEL = 12         '  Number of bits per pixel
 Private Declare Function RegisterClipboardFormat Lib "user32" Alias _
    "RegisterClipboardFormatA" (ByVal lpString As String) As Long
@@ -275,7 +275,7 @@ Public Type JOYINFOEX
     dwReserved2 As Long
 End Type
 Public Type MYJOYSTATtype
-enabled As Boolean
+Enabled As Boolean
 lngButton As Long
 joyPaD As direction
 AnalogX As Long
@@ -346,7 +346,7 @@ Public Function cInt64(v As Variant) As Variant
     Dim DecHdr As Dec_Hdr, m As Long
     On Error GoTo er111
     cInt64 = CDec(v)
-     If VarType(v) = vbString Then
+     If vartype(v) = vbString Then
         If InStr(1, v, "&h", vbTextCompare) = 1 Then
             Do
                 m = Len(v)
@@ -365,13 +365,13 @@ Public Function cInt64(v As Variant) As Variant
     cInt64 = Fix(cInt64)
     End If
     GetMem4 VarPtr(cInt64) + 12, m
-    If VarType(v) = vbString Then If m < 0 And Len(v) <= 10 Then GoTo er111
+    If vartype(v) = vbString Then If m < 0 And Len(v) <= 10 Then GoTo er111
     PutMem4 VarPtr(cInt64), VT_I8
     If (DecHdr.DecSign <> 0) And (cInt64 > 0) Then cInt64 = -cInt64
-    If (VarType(cInt64) <> VT_I8) Then Err.Raise 6
+    If (vartype(cInt64) <> VT_I8) Then Err.Raise 6
     Exit Function
 er111:
-     Err.Raise 6
+     Err.Raise Err.Number
 End Function
 Public Sub PlaceIcon(a As StdPicture)
 On Error Resume Next
@@ -391,7 +391,7 @@ If UseMe Is Nothing Then Exit Sub
         Else
         
             Form3.Timer1.Interval = 30
-            Form3.Timer1.enabled = True
+            Form3.Timer1.Enabled = True
             Form3.CaptionWsilent = a$
             Form3.CaptionW = a$
             Form1.CaptionW = vbNullString
@@ -446,14 +446,14 @@ Err.Clear
 End Sub
 Public Function StartJoypadk(Optional ByVal jn As Long = 0) As Boolean
     If joyGetDevCapsA(jn, MYJOYCAPS, 404) <> 0 Then 'Get Joypadk info
-    MYJOYSTAT(jn).enabled = False
+    MYJOYSTAT(jn).Enabled = False
         StartJoypadk = False
     Else
         MYJOYEX.dwSize = 64
         MYJOYEX.dwFlags = 255
         Call joyGetPosEx(jn, MYJOYEX)
         MYJOYSTAT(jn).Wait2Read = False
-         MYJOYSTAT(jn).enabled = True
+         MYJOYSTAT(jn).Enabled = True
         StartJoypadk = True
     End If
 End Function
@@ -468,7 +468,7 @@ Public Sub FlushJoyAll()
 
 Dim jn As Long
 For jn = 0 To 15
-MYJOYSTAT(jn).enabled = False
+MYJOYSTAT(jn).Enabled = False
 Next jn
 End Sub
 
@@ -477,7 +477,7 @@ Public Sub PollJoypadk()
     Dim jn As Long, wh As Long
     ' Get the Joypadk information
     For jn = 0 To 15
-    If MYJOYSTAT(jn).enabled Then
+    If MYJOYSTAT(jn).Enabled Then
     If Not MYJOYSTAT(jn).Wait2Read Then
       MYJOYEX.dwSize = 64
     MYJOYEX.dwFlags = 255
@@ -1225,9 +1225,9 @@ If cDibbuffer0.create(myw, myh) Then
 On Error GoTo there
         With bstack.Owner
          If bstack.toprinter Then
-         cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+         cDibbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
          Else
-        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
             End If
             BACKSPRITE = DIBtoSTR(cDibbuffer0)
         End With
@@ -1308,9 +1308,9 @@ On Error GoTo there
    
 With bstack.Owner
     If bstack.toprinter Then
-        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
     Else
-        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
     End If
     If Not nogetback Then BACKSPRITE = DIBtoSTR(cDibbuffer0)
 End With
@@ -1508,9 +1508,9 @@ cDibbuffer0.Cls bckColor
 Else
         With bstack.Owner
         If bstack.toprinter Then
-        cDibbuffer0.LoadPictureBlt .hDC, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
+        cDibbuffer0.LoadPictureBlt .hdc, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
         Else
-                      cDibbuffer0.LoadPictureBlt .hDC, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
+                      cDibbuffer0.LoadPictureBlt .hdc, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
            End If
         End With
         End If
@@ -1634,7 +1634,7 @@ Sub Conv24(cDibbuffer0 As Object)
  Dim cDIBbuffer1 As Object
  Set cDIBbuffer1 = New cDIBSection
 Call cDIBbuffer1.create(cDibbuffer0.Width, cDibbuffer0.Height)
-cDIBbuffer1.LoadPictureBlt cDibbuffer0.hDC
+cDIBbuffer1.LoadPictureBlt cDibbuffer0.hdc
 Set cDibbuffer0 = cDIBbuffer1
 Set cDIBbuffer1 = Nothing
 End Sub
@@ -1715,44 +1715,39 @@ Public Function ScaleRegion(hRgn As Long, size As Single) As Long
     End If
      DeleteObject hRgn
 End Function
-Function GetNewSpriteObj(Priority As Long, s$, tr As Long, rr As Long, Optional ByVal SZ As Single = 1, Optional ByVal rot As Single = 0, Optional BB$ = vbNullString) As Long
+Function GetNewSpriteObj(Priority As Long, s$, tr As Long, rr As Long, Optional ByVal SZ As Single = 1, Optional ByVal rot As Single = 0, Optional bb$ = vbNullString) As Long
 Dim photo As Object, myRgn As Long, oldobj As Long
 Dim photo2 As Object
  oldobj = FindSpriteByTag(Priority)
  If oldobj Then
 ' this priority...is used
 ' so change only image
-SpriteGetOtherImage oldobj, s$, tr, rr, SZ, rot, BB$
+SpriteGetOtherImage oldobj, s$, tr, rr, SZ, rot, bb$
 GetNewSpriteObj = oldobj
 
 Exit Function
 Else
       Set photo = New cDIBSection
         Set photo2 = New cDIBSection
-           If cDib(s$, photo) Then
- 
- If rr >= 0 Then
-
-  If BB$ <> "" Then
-   If cDib(BB$, photo2) Then
- myRgn = fRegionFromBitmap2(photo2)
- Else
- myRgn = fRegionFromBitmap2(photo, tr, CInt(rr))
- End If
- Else
- 
-myRgn = fRegionFromBitmap2(photo, tr, CInt(rr))
-End If
-  If myRgn = 0 Then
-
- myRgn = CreateRectRgn(0, 0, photo.Width, photo.Height)
- End If
- Else
-
-myRgn = CreateRectRgn(0, 0, photo.Width, photo.Height)
- End If
+        If cDib(s$, photo) Then
+            If rr >= 0 Then
+                If bb$ <> "" Then
+                    If cDib(bb$, photo2) Then
+                        myRgn = fRegionFromBitmap2(photo2)
+                    Else
+                        myRgn = fRegionFromBitmap2(photo, tr, CInt(rr))
+                    End If
+                Else
+                    myRgn = fRegionFromBitmap2(photo, tr, CInt(rr))
+                End If
+                If myRgn = 0 Then
+                    myRgn = CreateRectRgn(0, 0, photo.Width, photo.Height)
+                End If
+            Else
+                myRgn = CreateRectRgn(0, 0, photo.Width, photo.Height)
+            End If
  ''''''''''''''''If SZ <> 1 Then myRgn = ScaleRegion(myRgn, SZ)
- myRgn = RotateRegion(myRgn, (rot), photo.Width * SZ, photo.Height * SZ, SZ)
+            myRgn = RotateRegion(myRgn, (rot), photo.Width * SZ, photo.Height * SZ, SZ)
 
 
 
@@ -2012,7 +2007,7 @@ If k = 0 Then Exit Sub  ' there is no such a player
     
 
 End Sub
-Private Sub SpriteGetOtherImage(s As Long, b$, tran As Long, rrr As Long, SZ As Single, rot As Single, Optional BB$ = vbNullString) ' before take from priority the original sprite
+Private Sub SpriteGetOtherImage(s As Long, b$, tran As Long, rrr As Long, SZ As Single, rot As Single, Optional bb$ = vbNullString) ' before take from priority the original sprite
 Dim photo As Object, myRgn As Long
 Dim photo2 As Object
 If s < 1 Or s > PobjNum Then Exit Sub
@@ -2022,8 +2017,8 @@ If s < 1 Or s > PobjNum Then Exit Sub
            If cDib(b$, photo) Then
  
  If rrr >= 0 Then
- If BB$ <> "" Then
-   If cDib(BB$, photo2) Then
+ If bb$ <> "" Then
+   If cDib(bb$, photo2) Then
  myRgn = fRegionFromBitmap2(photo2)
  Else
  myRgn = fRegionFromBitmap2(photo, tran, CInt(rrr))
@@ -2067,7 +2062,7 @@ players(s).X = .Width / 2
 players(s).Y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, True)
 ''''''''''''''''''''''''UpdateWindow .hwnd
- DeleteObject myRgn
+ ''DeleteObject myRgn
 
 End With
 With players(s)
@@ -2490,25 +2485,25 @@ Public Function HTML(sText As String, _
 End Function
 
 Public Function SimpleHtmlData(ByVal sText As String)
-Dim lFormatId As Long, BB() As Byte
+Dim lFormatId As Long, bb() As Byte
 lFormatId = RegisterCF
 If lFormatId <> 0 Then
 If sText = vbNullString Then Exit Function
-BB() = HTML(sText)
+bb() = HTML(sText)
 If CBool(OpenClipboard(0)) Then
    
       Dim hMemHandle As Long, lpData As Long
       'If IsWine Then
       'hMemHandle = GlobalAlloc(0, UBound(bb()) - LBound(bb()) + 10)
       'Else
-      hMemHandle = GlobalAlloc(0, UBound(BB()) - LBound(BB()) + 10)
+      hMemHandle = GlobalAlloc(0, UBound(bb()) - LBound(bb()) + 10)
       'End If
       If CBool(hMemHandle) Then
                
          lpData = GlobalLock(hMemHandle)
          If lpData <> 0 Then
             
-            CopyMemory ByVal lpData, BB(0), UBound(BB()) - LBound(BB())
+            CopyMemory ByVal lpData, bb(0), UBound(bb()) - LBound(bb())
             GlobalUnlock hMemHandle
             EmptyClipboard
             SetClipboardData lFormatId, hMemHandle
@@ -2809,10 +2804,6 @@ End If
     End If
 
     resp = Form1.NeoASK(Basestack1)
-    
- If resp = 0 Then
- 
- End If
  
     If v = vbYesNo Then
         If resp = 1 Then MsgBoxN = vbYes Else MsgBoxN = vbNo
@@ -2983,6 +2974,13 @@ myIsNull = p = 1
 End Function
 
 ' VarByRef VarPtr(var2(items)), var(i)
+Sub VarByRefVariant(ByVal a As Long, ByRef b As Variant)
+    Dim t(0 To 3) As Long
+  
+   t(0) = vbVariant Or &H4000
+   t(2) = VarPtr(b)
+   CopyMemory ByVal a, t(0), 16
+End Sub
 Sub VarByRef(ByVal a As Long, ByRef b As Variant)
 Dim t(0 To 3) As Long
    CopyMemory t(0), ByVal VarPtr(b), 16
@@ -3226,7 +3224,7 @@ Case "THREAD", "THREAD.PLAN", "THREADS", "THREADS$", "TICK", "TIME$(", "TIME(", 
 Case "TO", "TODAY", "TONE", "TOP", "TRIM$(", "TRUE", "TRY", "TUNE", "TWIPSX"
 Case "TWIPSY", "TYPE", "TYPE$(", "UCASE$(", "UINT(", "UNARY", "UNDER", "UNICODE", "UNION.DATA$(", "UNIQUE", "UNTIL"
 Case "UP", "UPDATABLE", "UPDATE", "USE", "USER", "USERS", "USER.NAME$", "USGN("
-Case "VAL(", "VAL$(", "VALID(", "VALUE", "VALUE(", "VALUE$", "VERSION", "VIEW", "VOID", "VOLUME"
+Case "VAL(", "VAL$(", "VALID(", "VALUE", "VALUE(", "VALUE$", "VARIANT", "VERSION", "VIEW", "VOID", "VOLUME"
 Case "WAIT", "WCHAR", "WEAK", "WEAK$(", "WHILE", "WHEN", "WIDE", "WIDTH", "WIN", "WINDOW"
 Case "WITH", "WITHEVENTS", "WORDS", "WRITABLE(", "WRITE", "WRITER", "X.TWIPS", "XOR", "Y.TWIPS", "адеиас", "аниысг", "апеияо", "апой.ая$(", "апой.де$("
 Case "адеиасе", "ахя(", "ай(", "айеяаио.дуадийо(", "айеяаио", "айеяаиос", "акт", "акгхес", "акгхгс", "аккацг", "аккацг$("
@@ -3234,7 +3232,7 @@ Case "аккане", "аккиыс", "аккиыс.ам", "ам", "ам(", "амап(", "амап$(", "ам$(", "а
 Case "амакоцио$", "амакусг.охомгс", "амакусг.у", "амакусг.ь", "амакусг.в", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье"
 Case "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "амтийеилемо(", "амы", "аниа", "аниа(", "аниа$", "аниа(", "апая", "апаяихлгсг", "апедысе"
 Case "апко", "апкос", "апо", "апохгйеусг.ыс", "апой$(", "апойопг", "апойкеистийа", "апок(", "аяца", "аяихло", "аяихлос", "аяихлос.паяацяажоу("
-Case "аяис$(", "аяистеяолеяос$(", "аявеиа", "аявеио", "аявеио$(", "аявеиоу.лгйос(", "аявеиоу.сталпа(", "аявг", "аукос"
+Case "аяис$(", "аяистеяолеяос$(", "аявеиа", "аявеио", "аявеио$(", "аявеиоу.лгйос(", "аявеиоу.сталпа(", "аявг", "атупос", "аукос"
 Case "аукос$(", "аукоу", "ауноуса", "ауто", "ажаияесг", "ажгсе", "баке", "баке.адеиа$(", "басг"
 Case "басг(", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг", "бгла", "богхеиа", "цецомос", "цецомота", "целисе", "целисла"
 Case "цемийес", "цемийг", "цемийо", "циа", "цомийо", "цяалла", "цяалла$", "цяаллатосеияа", "цяаллатосеияа$", "цяаллесамажояас", "цяаллг"
@@ -3261,7 +3259,7 @@ Case "йимгсг.пв", "йимгсг.у", "йимгсг.уп", "йимгсг.ь", "йимгсг.ьп", "йимгсг.в", 
 Case "йкилан.в", "йол$", "йоимос", "йоимои", "йомсока", "йяата", "йяатгсе", "йяужо$(", "йяуье", "йуйкийа", "йуйкос"
 Case "йукисг", "йуяио", "йуяио.еяцо", "йыд(", "йыдийа", "йыдийосекида", "кабг", "кабг(", "кабг.амакоцийо.у(", "кабг.амакоцийо.ь("
 Case "кабг.амакоцийо.в(", "кабг.йатеухумсг(", "кахос", "кахос$", "кахос.таимиас$", "калда", "калда(", "калда$", "калда$(", "катимийа", "кенеис", "киста", "коц("
-Case "коцийо", "коцийос", "коцистийо", "коцос", "коцос$(", "кс$", "кж(", "лайяу", "лайяус", "ле", "лец(", "лец$(", "лецако("
+Case "коцийо", "коцийос", "коцистийос", "коцос", "коцос$(", "кс$", "кж(", "лайяус", "ле", "лец(", "лец$(", "лецако("
 Case "лецако.сеияас$(", "лецако.сеияас(", "лецецомота", "лецехос", "лецехос.сыяоу", "лецехос.у(", "лецехос.в(", "леходос", "лекос$(", "лекоус.тупос$("
 Case "лекыдиа", "леяос", "леяос(", "леяос$(", "лес$(", "лета", "летахесг", "летахесг(", "левяи", "лгдемийос", "лгйос", "лгйос(", "лгйос.елж("
 Case "лий(", "лий$(", "лийяо(", "лийяо.сеияас$(", "лийяо.сеияас(", "лийяос.йатакоцос$(", "лмглг", "ломадиаио", "ломадиаиос", "ломадийо", "лояжг$(", "лоусийг", "лоусийг.летягтгс", "лпип"
@@ -3468,6 +3466,12 @@ Else
                 r1 = r1 And Not R <= Len(a$)
                 a$ = Mid$(a$, 1, R - 1)
         End If
+        If cutdecimals Then
+        If InStr(a$, "e") > 0 Or InStr(a$, "E") > 0 Then
+        a$ = Replace(a$, "e", ""): a$ = Replace(a$, "E", "")
+        r1 = False
+        End If
+        End If
  End If
  End If
  End If
@@ -3480,13 +3484,22 @@ Else
                             End If
 ValidNum = r1
 End Function
+
 Function ValidNumberOnly(a$, R As Variant, skipdec As Boolean) As Boolean
-R = R - R
+If vartype(R) = vbString Then
+    R = CVar(0)
+Else
+    R = R - R
+End If
 ValidNumberOnly = IsNumberOnly(a$, (1), R, (0), skipdec)
 End Function
 Function ValidNumberOnlyClean(a$, R As Variant, skipdec As Boolean) As Long
 On Error Resume Next
-R = R - R
+If vartype(R) = vbString Then
+    R = CVar(0)
+Else
+    R = R - R
+End If
 Dim fr As Long, lr As Long
 fr = 1
 If IsNumberOnly(a$, fr, R, lr, skipdec) Then
@@ -3582,7 +3595,7 @@ cont123:
         
         Case "+", "-"
         If sg1 And Len(ex$) = 1 Then
-         ex$ = ex$ & Mid$(a$, sng, 1)
+             ex$ = ex$ & Mid$(a$, sng, 1)
         Else
         Exit Do
         End If
@@ -3591,6 +3604,7 @@ cont123:
         End Select
          sng = sng + 1
         Loop
+        
         If ex$ = "E" Or ex$ = "E-" Or ex$ = "E+" Then
         sng = sng - Len(ex$)
         End If
@@ -4403,7 +4417,7 @@ myid() = Array("THIS", 1, "ауто", 1, "RND", 2, "туваиос", 2, "PEN", 3, "пема", 3
 , "TWIPSX", 12, "пкатос.сглеиоу", 12, "REPORTLINES", 13, "цяаллесамажояас", 13, "LINESPACE", 14, "диастиво", 14, "MODE", 15, "тупос", 15 _
 , "MEMORY", 16, "лмглг", 16, "CHARSET", 17, "ваяайтгяес", 17, "ITALIC", 18, "пкациа", 18, "BOLD", 19, "жаядиа", 19, "COLORS", 20, "вяылата", 20 _
 , "ауноуса", 21, "ASCENDING", 21, "жхимоуса", 22, "DESCENDING", 22, "BOOLEAN", 23, "коцийос", 23, "BYTE", 24, "ьгжио", 24 _
-, "INTEGER", 25, "айеяаиос", 25, "LONG", 26, "лайяус", 26, "CURRENCY", 27, "коцистийо", 27, "SINGLE", 28, "апкос", 28, "DOUBLE", 29, "дипкос", 29 _
+, "INTEGER", 25, "айеяаиос", 25, "LONG", 26, "лайяус", 26, "CURRENCY", 27, "коцистийос", 27, "SINGLE", 28, "апкос", 28, "DOUBLE", 29, "дипкос", 29 _
 , "DATEFIELD", 30, "глеяолгмиа", 30, "BINARY", 31, "дуадийо", 31, "TEXT", 32, "йеилемо", 32, "OLE", 33, "MEMO", 34, "уполмгла", 34, "REVISION", 35, "амахеыягсг", 35, "BROWSER", 36, "амакоцио", 36, "VERSION", 37, "ейдосг", 37, "MOTION.X", 38, "йимгсг.в", 38, "MOTION.Y", 39, "йимгсг.у", 39, "йимгсг.ь", 39, "MOTION.XW", 40, "йимгсг.вп", 40, "MOTION.WX", 40, "йимгсг.пв", 40, "MOTION.YW", 41, "йимгсг.уп", 41, "йимгсг.ьп", 41, "MOTION.WY", 41, "йимгсг.пу", 41, "йимгсг.пь", 41 _
 , "FIELD", 42, "педио", 42, "MOUSE.KEY", 43, "деийтгс.йол", 43, "MOUSE", 44, "деийтгс", 44, "MOUSE.X", 45, "деийтгс.в", 45 _
 , "MOUSE.Y", 46, "деийтгс.у", 46, "деийтгс.ь", 46, "MOUSEA.X", 47, "деийтгса.в", 47, "MOUSEA.Y", 48, "деийтгса.у", 48, "деийтгса.ь", 48, "TRUE", 49, "акгхес", 49, "акгхгс", 49 _
@@ -4462,13 +4476,13 @@ mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "ASSERT", "BACK",
 , "DECLARE", "DEF", "DELETE", "DESKTOP", "DIM", "DIR", "DIV", "DO", "DOCUMENT", "DOS", "DOUBLE", "DRAW", "DRAWING", "DRAWINGS", "DROP", "DURATION", "EDIT", "EDIT.DOC", "ELSE", "ELSE.IF", "EMPTY", "END", "ENUM", "ENUMERATION", "ERASE", "ERROR", "ESCAPE", "EVENT", "EVERY", "EXECUTE", "EXIT", "EXPORT", "FAST", "FIELD", "FILES", "FILL", "FIND", "FKEY", "FLOODFILL", "FLUSH", "FONT", "FOR", "FORM", "FORMLABEL", "FRAME", "FUNCTION", "GET", "GLOBAL" _
 , "GOSUB", "GOTO", "GRADIENT", "GREEK", "GROUP", "HALT", "HEIGHT", "HELP", "HEX", "HIDE", "HOLD", "HTML", "ICON", "IF", "IMAGE", "INLINE", "INPUT", "INSERT", "INTEGER", "INVENTORY", "ITALIC", "JOYPAD", "KEYBOARD", "LATIN", "LAYER", "LEGEND", "LET", "LINE", "LINESPACE", "LINK", "LIST", "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LONG", "LOOP", "MAIN.TASK", "MARK", "MEDIA", "MENU", "MERGE.DOC", "METHOD", "MODE", "MODULE" _
 , "MODULES", "MONITOR", "MOTION", "MOTION.W", "MOUSE.ICON", "MOVE", "MOVIE", "MOVIES", "MUSIC", "NAME", "NEW", "NEXT", "NORMAL", "ON", "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPTIMIZATION", "ORDER", "OVER", "OVERWRITE", "PAGE", "PART", "PATH", "PEN", "PIPE", "PLAY", "PLAYER", "PLAYER(", "POLYGON", "PRINT", "PRINTER", "PRINTING", "PROFILER", "PROPERTIES", "PROTOTYPE", "PSET", "PUSH", "PUT", "READ", "RECURSION.LIMIT" _
-, "REFER", "REFRESH", "RELEASE", "REM", "REMOVE", "REPEAT", "REPORT", "RESTART", "RETRIEVE", "RETURN", "SAVE", "SAVE.AS", "SAVE.DOC", "SCAN", "SCORE", "SCREEN.PIXELS", "SCRIPT", "SCROLL", "SEARCH", "SEEK", "SELECT", "SET", "SETTINGS", "SHIFT", "SHIFTBACK", "SHOW", "SINGLE", "SLOW", "SMOOTH", "SORT", "SOUND", "SOUNDREC", "SOUNDS", "SPEECH", "SPLIT", "SPRITE", "STACK", "START", "STATIC", "STEP", "STOCK", "STOP", "STRUCTURE" _
-, "SUB", "SUBDIR", "SUPERCLASS", "SWAP", "SWEEP", "SWITCHES", "TAB", "TABLE", "TARGET", "TARGETS", "TASK.MAIN", "TEST", "TEXT", "THEN", "THREAD", "THREAD.PLAN", "THREADS", "TITLE", "TONE", "TRY", "TUNE", "UPDATE", "USE", "USER", "VERSION", "VIEW", "VOLUME", "WAIT", "WHILE", "WIDTH", "WIN", "WINDOW", "WITH", "WORDS", "WRITE", "WRITER", "адеиасе", "айеяаиос", "акт", "аккацг", "аккане", "аккиыс", "аккиыс.ам", "ам", "амафгтгсг" _
-, "амахеыягсг", "амайтгсг", "амакоцио", "амакусг.охомгс", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье", "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "аниысг", "апая", "апаяихлгсг", "апедысе", "апкос", "апо", "апохгйеусг.ыс", "апойопг", "аяца", "аяихлос", "аявеиа", "аявеио", "аявг", "аукос", "ауноуса", "ажаияесг", "ажгсе", "баке", "басг", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг" _
-, "бгла", "богхеиа", "цецомос", "целисе", "цемийес", "цемийг", "цемийо", "циа", "цяаллатосеияа", "цяаллг", "цяаье", "цягцояа", "деийтг.лояжг", "деине", "дейаен", "дес", "диабасе", "диацяажг", "диайопг", "диайоптес", "диалесоу", "диаяхяысг", "диаяйеиа", "диастиво", "диажамеиа", "диажамо", "диажуцг", "диайопг", "диейоье", "диояхысе", "дипка", "дипкос", "дойилг", "долг", "дяолеас", "дуадийо", "дысе", "еццяажо", "еийома", "еийомес", "еийомидио" _
+, "REFER", "REFRESH", "RELEASE", "REM", "REMOVE", "REPEAT", "REPORT", "RESTART", "RETRIEVE", "RETURN", "SAVE", "SAVE.AS", "SAVE.DOC", "SCAN", "SCORE", "SCREEN.PIXELS", "SCRIPT", "SCROLL", "SEARCH", "SEEK", "SELECT", "SET", "SETTINGS", "SHIFT", "SHIFTBACK", "SHOW", "SINGLE", "SLOW", "SMOOTH", "SORT", "SOUND", "SOUNDREC", "SOUNDS", "SPEECH", "SPLIT", "SPRITE", "STACK", "START", "STATIC", "STEP", "STOCK", "STOP", "STRING", "STRUCTURE" _
+, "SUB", "SUBDIR", "SUPERCLASS", "SWAP", "SWEEP", "SWITCHES", "TAB", "TABLE", "TARGET", "TARGETS", "TASK.MAIN", "TEST", "TEXT", "THEN", "THREAD", "THREAD.PLAN", "THREADS", "TITLE", "TONE", "TRY", "TUNE", "UPDATE", "USE", "USER", "VARIANT", "VERSION", "VIEW", "VOLUME", "WAIT", "WHILE", "WIDTH", "WIN", "WINDOW", "WITH", "WORDS", "WRITE", "WRITER", "адеиасе", "айеяаиос", "акт", "аккацг", "аккане", "аккиыс", "аккиыс.ам", "ам", "амафгтгсг" _
+, "амахеыягсг", "амайтгсг", "амакоцио", "амакусг.охомгс", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье", "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "аниысг", "апая", "апаяихлгсг", "апедысе", "апкос", "апо", "апохгйеусг.ыс", "апойопг", "аяца", "аяихлос", "аявеиа", "аявеио", "аявг", "атупос", "аукос", "ауноуса", "ажаияесг", "ажгсе", "баке", "басг", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг" _
+, "бгла", "богхеиа", "цецомос", "целисе", "цемийес", "цемийг", "цемийо", "циа", "цяалла", "цяаллатосеияа", "цяаллг", "цяаье", "цягцояа", "деийтг.лояжг", "деине", "дейаен", "дес", "диабасе", "диацяажг", "диайопг", "диайоптес", "диалесоу", "диаяхяысг", "диаяйеиа", "диастиво", "диажамеиа", "диажамо", "диажуцг", "диайопг", "диейоье", "диояхысе", "дипка", "дипкос", "дойилг", "долг", "дяолеас", "дуадийо", "дысе", "еццяажо", "еийома", "еийомес", "еийомидио" _
 , "еисацыцг", "ейдосг", "ейтекесг", "ейтупысг", "ейтупытгс", "екецвос", "еккгмийа", "емхесг", "емтасг", "емы", "емысе", "енацыцг", "енодос", "епамакабе", "епамекабе", "епекене", "епекене.амтийеилемо", "епекене.цяаллатосеияа", "епекене.ояцамо", "епекене.вяыла", "епицяажг", "епийаияо", "епикене", "епикене.амтийеилемо", "епикене.цяаллатосеияа", "епикене.ояцамо", "епикене.вяыла", "епикоцес", "епикоцг", "епикоцгс" _
 , "епипедо", "епистяожг", "епижамеиа", "еполемо", "етийета.жоялас", "еуяесг", "глеяолгмиа", "гвоцяажгсг", "гвои", "гвос", "хесе", "хесг", "идиотгтес", "исвмг", "ивмос", "йахаяг", "йахаяо", "йахе", "йакесе", "йалпукг", "йаме", "йамомийа", "йат", "йатакоцои", "йатакоцос", "йатастасг", "йатавыягсг", "йеилемо", "йемг", "йимгсг", "йимгсг.п", "йкасг", "йкеиди", "йкеисе", "йомсока", "йяата", "йяатгсе", "йяуье" _
-, "йуйкийа", "йуйкос", "йукисг", "йуяио.еяцо", "кабг", "кахос", "катимийа", "кенеис", "киста", "коцийос", "коцистийос", "коцос", "лайяус", "ле", "леходос", "лекыдиа", "леяос", "лета", "летахесг", "лоусийг", "лпип", "мео", "мгла", "мглата", "нейима", "охомг", "олада", "олака", "омола", "ояио.амадяолгс", "ояисе", "паийтгс", "паине", "памы", "паяахуяо", "паяе", "паяелбокг", "павос", "педио", "пема", "пеяи" _
+, "йуйкийа", "йуйкос", "йукисг", "йуяио.еяцо", "кабг", "кахос", "катимийа", "кенеис", "киста", "коцийос", "коцистийос", "коцос", "лайяус", "ле", "леходос", "лекыдиа", "леяос", "лета", "лоусийг", "лпип", "мео", "мгла", "мглата", "нейима", "охомг", "олада", "олака", "омола", "ояио.амадяолгс", "ояисе", "паийтгс", "паине", "памы", "паяахуяо", "паяе", "паяелбокг", "павос", "педио", "пема", "пеяи" _
 , "пеяихыяио", "пета", "пимайас", "пимайес", "пкациа", "пкаисио", "пкгйтяокоцио", "покуцымо", "пяос", "пяосхесе.еццяажо", "пяосхгйг", "пяытотупо", "пяовеияо", "яоутима", "яухлисеис", "с", "саяысе", "сбгсе", "сеияа", "секида", "семаяио", "сгл", "сглади", "стахеяг", "стахеяес", "статийг", "статийес", "стг", "стгм", "сто", "стой", "стовои", "стовос", "суццяажеас", "суццяажг", "суцвымеусе.еццяажо", "сулпиесг" _
 , "сумаятгсг", "сумевисе", "сус", "сустгла", "сведио", "сведиа", "сведио.мглатым", "сыяос", "сысе", "сысе.еццяажо", "таимиа", "таимиес", "танг", "танимолгсг", "текос", "титкос", "тлгла", "тлглата", "томос", "топийа", "топийес", "топийг", "топийо", "тоте", "тупос", "тупысе", "упеяйкасг", "упойатакоцос", "жаядиа", "жеяе", "жеяеписы", "жомто", "жояла", "жоятысе" _
 , "жоятысе.еццяажо", "жымг", "ваяайтгяес", "ваяане", "вягсг", "вягстг", "вягстгс", "вяыла", "вяылатисе", "?")
@@ -4491,10 +4505,14 @@ Case "SINGLE", "апкос"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoSingle)
 Case "BOOLEAN", "коцийос"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoBoolean)
+Case "VARIANT", "атупос"
+    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoVariant)
 Case "DECIMAL", "аяихлос"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDecimal)
 Case "CURRENCY", "коцистийос"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoCurrency)
+Case "STRING", "цяалла"
+    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoString)
 Case "CURSOR", "дяолеас"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoTextCursor)
 Case "MOUSE.ICON", "деийтг.лояжг"
@@ -4777,7 +4795,7 @@ If Err.Number > 0 Then aSize = 12: fonttest.Font.size = aSize
 End Sub
 Public Function InternalLeadingSpace() As Long
 On Error Resume Next
-    GetTextMetrics fonttest.hDC, TM
+    GetTextMetrics fonttest.hdc, TM
   With TM
 InternalLeadingSpace = (.tmInternalLeading = 0) Or Not (.tmInternalLeading > 0)
 End With
@@ -4785,7 +4803,7 @@ End Function
 Public Function AverCharSpace(DDD As Object, Optional breakchar) As Long
 On Error Resume Next
 Dim tmm As TEXTMETRIC
-    GetTextMetrics DDD.hDC, tmm
+    GetTextMetrics DDD.hdc, tmm
   With tmm
 AverCharSpace = .tmAveCharWidth
 breakchar = .tmBreakChar
@@ -4851,31 +4869,31 @@ crNew basestack, players(prive)
 ProcWriter = True
 End Function
 
-Sub SendAKey(ByVal keycode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
+Sub SendAKey(ByVal KeyCode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
 Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long, old As Long
 Const key_release As Byte = 2
-If keycode > 500 Then extended = 1: keycode = keycode - 500
+If KeyCode > 500 Then extended = 1: KeyCode = KeyCode - 500
 If extended = 0 Then
-If keycode > 64 And keycode < 91 Then
+If KeyCode > 64 And KeyCode < 91 Then
     If Not CapsLockOn() Then shift = Not shift
 End If
 End If
 
-Map = MapVirtualKey(keycode, 0)
+Map = MapVirtualKey(KeyCode, 0)
 smap = MapVirtualKey(&H10, 0)
 cmap = MapVirtualKey(&H11, 0)
 amap = MapVirtualKey(&H12, 0)
 
 
-keycode = keycode Mod 255
+KeyCode = KeyCode Mod 255
 ' press key
 If shift Then keybd_event &H10, smap, 0, 0
 If ctrl Then keybd_event &H11, cmap, 0, 0
 If alt Then keybd_event &H12, amap, 0, 0
-keybd_event keycode, Map, extended, 0
+keybd_event KeyCode, Map, extended, 0
 
 ' release key
-keybd_event keycode, Map, KEYEVENTF_KEYUP + extended, 0
+keybd_event KeyCode, Map, KEYEVENTF_KEYUP + extended, 0
 If shift Then keybd_event &H10, smap, KEYEVENTF_KEYUP, 0
 If ctrl Then keybd_event &H11, cmap, KEYEVENTF_KEYUP, 0
 If alt Then keybd_event &H12, amap, KEYEVENTF_KEYUP, 0
@@ -4961,4 +4979,10 @@ If bytes Then
     Set usehandler.objref = aPic
     Set basestack.lastobj = usehandler
 End If
+End Sub
+Sub TESTPARAM()
+Dim p
+p = "alfa"
+Debug.Print vartype(p)
+Debug.Print myVarType(p, vbString)
 End Sub

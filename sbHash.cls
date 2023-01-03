@@ -14,7 +14,7 @@ Attribute VB_Exposed = True
 Option Explicit
  Private Type item
  Key As String
-  ndx As Long
+  nDx As Long
   KeyType As Long  ' 0 as is , 1, reference/don't delete
  firsthash As Long
  lastpos As Long
@@ -25,10 +25,10 @@ Private PriveSpace() As item
 Public MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Private lastfind As String
 Private Hash() As Long
-Public index As Long
+Public Index As Long
 Private Sub Class_Initialize()
     MaxSpace = 10
     ReDim PriveSpace(MaxSpace) As item, Hash(MaxSpace * 2 + 3)
@@ -37,7 +37,7 @@ Private Sub Class_Initialize()
 End Sub
 Friend Sub ReadVar(where, Name$, num As Long)
     Name$ = PriveSpace(where).Key
-    num = PriveSpace(where).ndx
+    num = PriveSpace(where).nDx
 End Sub
 
 
@@ -71,8 +71,8 @@ Friend Sub ReduceHash(newTop As Long, v() As modfun)
             Hash(.lastpos) = 0
             .Key = vbNullString
         End If
-        If .KeyType = 0 And .ndx >= 0 Then
-                v(.ndx) = m
+        If .KeyType = 0 And .nDx >= 0 Then
+                v(.nDx) = m
             'v(.ndx).sb = vbNullString
             'v(.ndx).sbc = 0
             'v(.ndx).sbgroup = vbNullString
@@ -84,7 +84,7 @@ Friend Sub ReduceHash(newTop As Long, v() As modfun)
             'Set v(.ndx).subs = Nothing
         End If
         .KeyType = 0
-        .ndx = -1
+        .nDx = -1
             
         End With
 
@@ -182,7 +182,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    num = PriveSpace(k).ndx: Find = True: lastfind = Key: index = k: Exit Function
+    num = PriveSpace(k).nDx: Find = True: lastfind = Key: Index = k: Exit Function
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0
@@ -201,7 +201,7 @@ Do
     With PriveSpace(k)
     If .Key = Key Then
     internal = .KeyType
-    num = .ndx: Find2 = True: lastfind = Key: index = k: Exit Function
+    num = .nDx: Find2 = True: lastfind = Key: Index = k: Exit Function
     End If
      k = .Pleft - 1
      End With
@@ -225,10 +225,10 @@ End Function
 Friend Sub ItemCreator(Key As String, num As Long, Optional isRef As Boolean = False)
 Dim a As Long
 a = Malloc()
-If Left$(Key, 1) = "." Then Stop
+If Left$(Key, 1) = "." Then Err.Raise 5
 place HashFunc(Key), a
 With PriveSpace(a)
-    .ndx = num
+    .nDx = num
     If isRef Then
         .KeyType = 1
     Else
@@ -243,7 +243,7 @@ Dim a As Long
 a = Malloc()
 place HashFunc(Key), a
 With PriveSpace(a)
-    .ndx = num
+    .nDx = num
     If isRef Then
         .KeyType = 1
     Else
@@ -262,7 +262,7 @@ Dim a As Long
 a = Malloc()
 place HashFunc(Key), a
 With PriveSpace(a)
-    .ndx = num
+    .nDx = num
     .KeyType = internal
     .firsthash = HD(Key)
      SwapStrings .Key, Key
@@ -275,7 +275,7 @@ End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
     k = Hash(b)
-    If Not k = a + 1 Then
+    If Not Hash(b) = a + 1 Then
          Hash(b) = a + 1
          PriveSpace(a).Pleft = k
     End If
@@ -294,7 +294,7 @@ Function Show() As String
 Dim i As Long
 For i = 0 To toplim
 If InStr(PriveSpace(i).Key, ChrW(&H1FFF)) = 0 And InStr(PriveSpace(i).Key, ChrW(&HFFBF)) = 0 Then
-Show = Chr(1) + PriveSpace(i).Key + Str$(PriveSpace(i).ndx) + Chr(1) + Show
+Show = Chr(1) + PriveSpace(i).Key + Str$(PriveSpace(i).nDx) + Chr(1) + Show
 End If
 Next i
 End Function
@@ -307,7 +307,7 @@ Else
 For i = 0 To toplim
 ' remove if to take hidden functions
 If InStr(PriveSpace(i).Key, ChrW(&H1FFF)) = 0 And InStr(PriveSpace(i).Key, ChrW(&HFFBF)) = 0 Then
-ShowRev = ShowRev + Chr(1) + PriveSpace(i).Key + Str$(PriveSpace(i).ndx) + Chr(1)
+ShowRev = ShowRev + Chr(1) + PriveSpace(i).Key + Str$(PriveSpace(i).nDx) + Chr(1)
 End If
 Next i
 End If

@@ -36,6 +36,12 @@ Public Sub PopString(s$)
         SwapString2Variant s$, mItem
     ElseIf slot = 5 Then
         s$ = mItem
+    ElseIf slot = 2 Then
+        If VarType(mItem) = vbString Then
+            s$ = mItem
+        Else
+            s$ = vbNullString
+        End If
     Else
         s$ = vbNullString
     End If

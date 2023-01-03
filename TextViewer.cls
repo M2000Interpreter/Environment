@@ -133,10 +133,10 @@ End Type
 Dim tParam As DRAWTEXTPARAMS
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
 Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT) As Long
-Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hdc As Long, ByVal hRgn As Long) As Long
+Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hdc As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
-Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
+Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hDC As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
+Private Declare Function GetStringTypeExW Lib "Kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 
 'nTabPositions  here we use 1
 ' lpnTabStopPositions here we usen just a long variable, passed by reference.
@@ -267,7 +267,7 @@ If Title = vbNullString Then
 Else
 NoHeadwrap = False
 mDoc1.textDoc = Title
-
+If glistN Is Nothing Then Exit Sub
 glistN.VerticalCenterText = True
 If mDoc1.DocLines >= glistN.lines + 1 Then
 mDoc1.EmptyDoc
@@ -355,8 +355,8 @@ sp2 = sp1 + sp
 Set mDoc = New Document
 Set mDoc1 = New Document
 ResetSelColors
-mDoc.lcid = Clid
-mDoc1.lcid = Clid
+mDoc.LCID = Clid
+mDoc1.LCID = Clid
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 undopara = -1
@@ -1695,6 +1695,7 @@ End Sub
 '
 Private Sub glistN_MarkDestroy()
 ' destroy or open to change
+If Not EditDoc Then Exit Sub
 If Not ClickInsideMarkedText Then
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
@@ -1802,6 +1803,7 @@ End If
 End Sub
 Private Sub glistN_MarkOut()
 '
+If Not EditDoc Then Exit Sub
 expandCharPos = 0
 BlockEndPara = mDoc.MarkParagraphID
 BlockEndPos = ParaSelStart
@@ -1830,7 +1832,7 @@ End Sub
 
 'End Sub
 
-Private Sub glistN_ScrollSelected(item As Long, Y As Long)
+Private Sub glistN_ScrollSelected(item As Long, y As Long)
 If NoMark Then Exit Sub
 Dim what$, ThatPara As Long
    mDoc.TextParagraphLine item, what$, ThatPara
@@ -3667,7 +3669,9 @@ If NoHeadwrap Or (NoTitle) Or UsedAsTextBox Then
     datanext = Data
     Data = vbNullString
 Else
+If Not glistN Is Nothing Then
  glistN.BreakLine Data, datanext
+End If
 End If
 End Sub
 Private Sub FillBack(thathDC As Long, there As RECT, bgcolor As Long)

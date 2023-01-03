@@ -13,18 +13,18 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
  Private Type item
- Key As String
-  ndx As Long
- firsthash As Long
- lastpos As Long
- Pleft As Long  ' a list
+    Key As String
+    nDx As Long
+    firsthash As Long
+    lastpos As Long
+    Pleft As Long  ' a list
  End Type
 '
 Private PriveSpace() As item
 Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Private lastfind As String
 Private Hash() As Long
 Public index As Long
@@ -40,7 +40,7 @@ Private Sub Class_Initialize()
 End Sub
 Friend Sub ReadVar(where, Name$, num As Long)
     Name$ = PriveSpace(where).Key
-    num = PriveSpace(where).ndx
+    num = PriveSpace(where).nDx
 End Sub
 
 
@@ -71,7 +71,7 @@ If newTop = 0 Or newTop > toplim Then Exit Sub
             Hash(.lastpos) = 0
             .Key = vbNullString
         End If
-        .ndx = 0
+        .nDx = 0
             
         End With
 
@@ -153,8 +153,8 @@ Private Function Malloc() As Long
         toplim = toplim + 1
         Malloc = toplim
 End Function
-Property Get count()
-count = toplim + 1
+Property Get Count()
+Count = toplim + 1
 End Property
 Property Get LastKnown() As String
 LastKnown = lastfind
@@ -169,7 +169,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    num = PriveSpace(k).ndx
+    num = PriveSpace(k).nDx
     If num > 0 Then
         Find = True: lastfind = Key: index = k: Exit Function
     ElseIf badindex Then
@@ -200,7 +200,7 @@ a = Malloc()
 place HashFuncStored(Key), a
 With PriveSpace(a)
     .Key = Key
-    .ndx = num
+    .nDx = num
     .firsthash = HD(Key)
 End With
 
@@ -213,18 +213,18 @@ a = Malloc()
 place HashFunc(Key), a
 With PriveSpace(a)
     .Key = Key
-    .ndx = num
+    .nDx = num
     .firsthash = HD(Key)
 End With
 
 End Sub
 Property Get Percent()
-Percent = count / hashlen
+Percent = Count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
     k = Hash(b)
-    If Not k = a + 1 Then
+    If Not Hash(b) = a + 1 Then
          Hash(b) = a + 1
          PriveSpace(a).Pleft = k
     End If

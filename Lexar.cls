@@ -408,7 +408,7 @@ s$ = var.textDoc
 End Sub
 
 Private Function aheadstatus(a$, Optional srink As Boolean = True, Optional Pos As Long = 1) As String 'ok
-Dim b$, part$, w$, pos2 As Long, word$, item As Integer
+Dim b$, part$, W$, pos2 As Long, word$, item As Integer
 Dim OLDPOS As Long
 
 If a$ = vbNullString Then Exit Function
@@ -416,8 +416,8 @@ If Pos = 0 Then Pos = 1
 OLDPOS = Pos
 Do While Pos <= Len(a$)
 
-    w$ = Mid$(a$, Pos, 1)
-    If part$ = vbNullString And w$ = "0" Then
+    W$ = Mid$(a$, Pos, 1)
+    If part$ = vbNullString And W$ = "0" Then
         If Pos + 2 <= Len(a$) Then
             If LCase(Mid$(a$, Pos, 2)) Like "0[xВ]" Then
             'hexadecimal literal number....
@@ -429,7 +429,7 @@ Do While Pos <= Len(a$)
                 b$ = b$ & "N"
                 item = item + 1
                 If Pos <= Len(a$) Then
-                    w$ = Mid$(a$, Pos, 1)
+                    W$ = Mid$(a$, Pos, 1)
                 Else
                     Exit Do
                 End If
@@ -437,7 +437,7 @@ Do While Pos <= Len(a$)
         End If
     End If
 
-    If w$ = Chr(34) Then
+    If W$ = Chr(34) Then
     
         If part$ <> "" Then
         b$ = b$ & part$
@@ -451,7 +451,7 @@ Do While Pos <= Len(a$)
    
         Pos = Pos + 1
         Loop
-    ElseIf w$ = "(" Then
+    ElseIf W$ = "(" Then
         If part$ <> "" Then
             ' after
             ElseIf Right$(b$, 1) = "a" Then
@@ -467,7 +467,7 @@ Do While Pos <= Len(a$)
        If Mid$(a$, Pos + 1, 1) <> "." Then b$ = b$ & part$
         part$ = vbNullString
         
-    ElseIf w$ = "{" Then
+    ElseIf W$ = "{" Then
 If word$ <> "" Then
   Select Case myUcase(word$, True)
   Case "THEN", "ELSE", "тоте"
@@ -505,7 +505,7 @@ If word$ <> "" Then
 ''Exit Do
 
     Else
-        Select Case w$
+        Select Case W$
         Case ","  ' bye bye
         Exit Do
         Case "%"
@@ -608,7 +608,7 @@ JUMPHERE:
         Case "e", "E", "Е", "е"
         If LenB(word$) = 0 Then part$ = "N"
         
-        word$ = word$ + w$
+        word$ = word$ + W$
         
            If part$ = "S" Then
             
@@ -630,7 +630,7 @@ JUMPHERE:
                     part$ = "o"
                     Pos = Pos + 1
                     End If
-                ElseIf w$ = ">" And Pos > 1 Then
+                ElseIf W$ = ">" And Pos > 1 Then
                     If Mid$(a$, Pos - 1, 2) = "->" Then ' "->"
                    If Right$(b$, 1) = "S" Then
                     b$ = b$ + part$
@@ -650,33 +650,33 @@ JUMPHERE:
                 End If
 there1:
                 If b$ & part$ <> "" Then
-                w$ = Replace(b$ & part$, "a", "")
+                W$ = Replace(b$ & part$, "a", "")
             part$ = vbNullString
                If srink Then
                   Do
-                b$ = w$
-                w$ = Replace(b$, "NN", "N")
-                Loop While w$ <> b$
+                b$ = W$
+                W$ = Replace(b$, "NN", "N")
+                Loop While W$ <> b$
                          Do
-                        b$ = w$
-                          w$ = Replace(b$, "SlS", "N")
-                          Loop While w$ <> b$
+                        b$ = W$
+                          W$ = Replace(b$, "SlS", "N")
+                          Loop While W$ <> b$
                             Do
-                          b$ = w$
-                          w$ = Replace(b$, "NlN", "N")
-                          Loop While w$ <> b$
+                          b$ = W$
+                          W$ = Replace(b$, "NlN", "N")
+                          Loop While W$ <> b$
     
                 Do
-                b$ = w$
-                w$ = Replace(b$, "NoN", "N")
-                Loop While w$ <> b$
+                b$ = W$
+                W$ = Replace(b$, "NoN", "N")
+                Loop While W$ <> b$
                 
                 Do
-                b$ = w$
-                w$ = Replace(b$, "SoS", "S")
-                Loop While w$ <> b$
+                b$ = W$
+                W$ = Replace(b$, "SoS", "S")
+                Loop While W$ <> b$
                 Else
-              b$ = w$
+              b$ = W$
                End If
                
                 If Left$(b$, Len(b$) - 1) <> "l" Then part$ = "l"
@@ -689,15 +689,15 @@ there1:
         Case Else
         
         If part$ = "N" Then
-        word$ = word$ + w$
+        word$ = word$ + W$
         ElseIf part$ = "S" Then
-        word$ = word$ + w$
+        word$ = word$ + W$
         item = item + 1
         Else
         
      b$ = b$ & part$
      part$ = "N"
-     word$ = word$ + w$
+     word$ = word$ + W$
      item = item + 1
             End If
         End Select
@@ -707,29 +707,29 @@ there1:
 conthere:
 Loop
 
-    w$ = Replace(b$ & part$, "a", "")
+    W$ = Replace(b$ & part$, "a", "")
     
-    b$ = w$
+    b$ = W$
 If srink Then
          Do
-  b$ = w$
+  b$ = W$
 
-    w$ = Replace(b$, "SlS", "N")
-    Loop While w$ <> b$
+    W$ = Replace(b$, "SlS", "N")
+    Loop While W$ <> b$
       Do
-    b$ = w$
-    w$ = Replace(b$, "NlN", "N")
-    Loop While w$ <> b$
+    b$ = W$
+    W$ = Replace(b$, "NlN", "N")
+    Loop While W$ <> b$
     
     Do
-    b$ = w$
-    w$ = Replace(b$, "NoN", "N")
-    Loop While w$ <> b$
+    b$ = W$
+    W$ = Replace(b$, "NoN", "N")
+    Loop While W$ <> b$
     
     Do
-    b$ = w$
-    w$ = Replace(b$, "SoS", "S")
-    Loop While w$ <> b$
+    b$ = W$
+    W$ = Replace(b$, "SoS", "S")
+    Loop While W$ <> b$
 End If
    If item = 0 Then
    Pos = OLDPOS
@@ -754,7 +754,7 @@ Private Sub addone(ByVal thispos As Long, ByVal thiscolor As Long)
 Dim k As Long
 
 k = UBound(Col())
-If VarType(Col(0)) = 0 Then
+If vartype(Col(0)) = 0 Then
 makebase 14
 If thispos <> 1 Then
 k = UBound(Col())
@@ -867,7 +867,7 @@ Exit Sub
 ' FOR TESTS
   pos1 = 0
   For k = 1 To UBound(Col()) Step 2
-    If VarType(Col(k)) = 0 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
+    If vartype(Col(k)) = 0 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
     If Col(k) > pos1 Then pos1 = Col(k)
     If Col(k) < pos1 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
   Next k
@@ -1629,7 +1629,7 @@ Exit Sub
 ' FOR TESTS
   pos1 = 0
   For k = 1 To UBound(Col()) Step 2
-    If VarType(Col(k)) = 0 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
+    If vartype(Col(k)) = 0 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
     If Col(k) > pos1 Then pos1 = Col(k)
     If Col(k) < pos1 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
   Next k
@@ -2535,22 +2535,22 @@ End Function
 
 Private Function ISSTRINGA(a$, R$) As Boolean
 If Len(a$) < 2 Then ISSTRINGA = False: Exit Function
-Dim q$, w As Long
+Dim q$, W As Long
 R$ = vbNullString
 q$ = Chr(34)
-w = 1
+W = 1
 Do
-w = w + 1
-w = InStr(w, a$, q$)
-If w > 0 Then
-If Mid$(a$, w - 1, 1) <> "`" Then Exit Do
-ElseIf w = 0 Then
+W = W + 1
+W = InStr(W, a$, q$)
+If W > 0 Then
+If Mid$(a$, W - 1, 1) <> "`" Then Exit Do
+ElseIf W = 0 Then
 Exit Do
 End If
 Loop
-If w = 0 Then ISSTRINGA = False: Exit Function
-R$ = Mid$(a$, 2, w - 2)
-a$ = Mid$(a$, w + 1)
+If W = 0 Then ISSTRINGA = False: Exit Function
+R$ = Mid$(a$, 2, W - 2)
+a$ = Mid$(a$, W + 1)
 ISSTRINGA = True
 End Function
 Private Sub countbrakcet(a$, k As Long, counter As Long)
@@ -3290,7 +3290,7 @@ Case "йимгсг.пв", "йимгсг.у", "йимгсг.уп", "йимгсг.в", "йимгсг.вп", "йкасг", "йк
 Case "йкилан.в", "йол$", "йоимос", "йоимои", "йомсока", "йяата", "йяатгсе", "йяужо$(", "йяуье", "йуйкийа", "йуйкос"
 Case "йукисг", "йуяио", "йуяио.еяцо", "йыд(", "йыдийа", "йыдийосекида", "кабг", "кабг(", "кабг.амакоцийо.у("
 Case "кабг.амакоцийо.в(", "кабг.йатеухумсг(", "кахос", "кахос$", "кахос.таимиас$", "калда", "калда(", "калда$", "калда$(", "катимийа", "кенеис", "киста", "коц("
-Case "коцийо", "коцийос", "коцистийо", "коцос", "коцос$(", "кс$", "кж(", "лайяу", "лайяус", "ле", "лец(", "лец$(", "лецако("
+Case "коцийо", "коцийос", "коцистийос", "коцос", "коцос$(", "кс$", "кж(", "лайяус", "ле", "лец(", "лец$(", "лецако("
 Case "лецако.сеияас$(", "лецако.сеияас(", "лецецомота", "лецехос", "лецехос.сыяоу", "лецехос.у(", "лецехос.в(", "леходос", "лекос$(", "лекоус.тупос$("
 Case "лекыдиа", "леяос", "леяос(", "леяос$(", "лес$(", "лета", "летахесг", "летахесг(", "левяи", "лгйос", "лгйос(", "лгйос.елж("
 Case "лий(", "лий$(", "лийяо(", "лийяо.сеияас$(", "лийяо.сеияас(", "лийяос.йатакоцос$(", "лмглг", "ломадиаио", "ломадиаиос", "ломадийо", "лояжг$(", "лоусийг", "лоусийг.летягтгс", "лпип"

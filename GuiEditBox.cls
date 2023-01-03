@@ -178,10 +178,10 @@ End Type
 Dim tParam As DRAWTEXTPARAMS
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
 Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT) As Long
-Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hdc As Long, ByVal hRgn As Long) As Long
+Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hdc As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
-Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
+Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hDC As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
+Private Declare Function GetStringTypeExW Lib "Kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 Private tmpshow As Boolean
 Private WordOnly As Boolean
 Private ColArr(0 To 15) As Long
@@ -493,8 +493,8 @@ mDoc.NoIgnoreCase = Not mUseCase
 mDoc.ColorEvent = True
 Set mDoc1 = New Document
 ResetSelColors
-mDoc.lcid = Clid
-mDoc1.lcid = Clid
+mDoc.LCID = Clid
+mDoc1.LCID = Clid
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 undopara = -1
@@ -879,12 +879,12 @@ Render
 End Sub
 
 
-Private Sub glistN_OutPopUp(X As Single, Y As Single, myButton As Integer)
+Private Sub glistN_OutPopUp(x As Single, y As Single, myButton As Integer)
 '
 If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(Y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
    Else
-      Callback.Callback mesCtrlName + ".PopUp(" + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(Y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
       End If
 End Sub
 
@@ -978,6 +978,7 @@ Private Sub glistN_ChangeListItem(item As Long, content As String)
 Dim selstart2 As Long, checklistindex As Long, old$
 '' only for M2000, use NumberOnly
 If NumberOnly Or NumberIntOnly Then
+content = MyTrim(content)
 NumberOnly = True
 If Len(content) > glistN.maxchar Then
 Charpos = glistN.maxchar
@@ -1654,9 +1655,20 @@ ElseIf keycode = vbKeyV And (shift And 3) = 2 Then
     If Len(Text) + Len(Pad$) > glistN.maxchar Then
         Pad$ = Myleft$(Pad$, glistN.maxchar - Len(Text))
     End If
-    End If
     SelText = Pad$
     RemoveUndo SelText
+    ElseIf NumberOnly Or NumberIntOnly Then
+    glistN.MarkNext = 0
+    glistN.MarkALL
+    SelText = Pad$
+    glistN.MarkNext = 0
+    glistN.MarkALL
+    RemoveUndo SelText
+    SelLength = 0
+    Else
+    SelText = Pad$
+    RemoveUndo SelText
+    End If
     keycode = 0
     ReColorBlock
 ElseIf keycode = vbKeyA And (shift And 3) = 2 Then
@@ -2403,7 +2415,7 @@ End Sub
 
 'End Sub
 
-Private Sub glistN_ScrollSelected(item As Long, Y As Long)
+Private Sub glistN_ScrollSelected(item As Long, y As Long)
 If NoMark Then Exit Sub
 Dim what$, ThatPara As Long
    mDoc.TextParagraphLine item, what$, ThatPara
@@ -6456,8 +6468,6 @@ End If
 End Property
 Public Property Let SelText(ByVal RHS As String)
 Dim kk As Long, Pad$, prev As Boolean
-
-
 kk = SelStart
 SelStart = kk
 prev = HaveMarkedText
@@ -6476,22 +6486,7 @@ If Right$(RHS, 1) = vbCr Then RHS = RHS + vbLf
 If RHS <> "" Then
 If prev Then undoprev = prev
 If NumberOnly Then
-If undotext = vbNullString Then
-undotext = glistN.list(0)
-ElseIf glistN.list(0) = vbNullString And undotext <> "" Then
-glistN.list(0) = undotext
-End If
-Pad$ = space$(Len(RHS) + Len(glistN.list(0)))
-Mid$(Pad$, 1, Charpos - 1) = Myleft$(glistN.list(0), Charpos - 1)
-Mid$(Pad$, Charpos, Len(RHS)) = RHS
-If Len(glistN.list(0)) > 0 Then
-If Mid$(glistN.list(0), Charpos) <> "" Then
-Mid$(Pad$, Charpos + Len(RHS) - 1) = Mid$(undotext, Charpos)
-End If
-End If
-RHS = glistN.list(0)
- glistN.list(0) = Pad$
-If Not glistN.list(0) = Pad$ Then glistN.list(0) = RHS: undotext = vbNullString
+glistN.list(0) = RHS
 Else
 mDoc.InsertDoc mDoc.MarkParagraphID, Charpos, RHS, , , Not NoColor
 End If
@@ -7966,16 +7961,16 @@ End If
 aheadstatus = b$
 End Function
 
-Public Sub move(X, Y, Optional W, Optional H)
+Public Sub move(x, y, Optional W, Optional H)
 glistN.HideBarAsap
 If IsMissing(W) Then
-glistN.MoveTwips CLng(X), CLng(Y), 0, 0
+glistN.MoveTwips CLng(x), CLng(y), 0, 0
 ElseIf IsMissing(H) Then
 
-glistN.MoveTwips CLng(X), CLng(Y), CLng(W), 0
+glistN.MoveTwips CLng(x), CLng(y), CLng(W), 0
 RelocateMarkedText
 Else
-glistN.MoveTwips CLng(X), CLng(Y), CLng(W), CLng(H)
+glistN.MoveTwips CLng(x), CLng(y), CLng(W), CLng(H)
 RelocateMarkedText
 End If
 
@@ -8104,10 +8099,10 @@ LastSearchType = 2 - Abs(shift Mod 2 = 1)
 shift = 0
 If SelText <> "" Then s$ = SelText
 If pagio$ = "GREEK" Then
-s$ = InputBoxN("Αναζήτησε προς την αρχή " & IIf(LastSearchType = 1, "(και σε μέρος λέξης):" & vbCrLf & " Ctrl+F2 για λέξεις μόνο", ":" & vbCrLf & " Ctrl+F2 και για μέρη λέξεων"), "Συγγραφή Κειμένου", s$, noinp)
+s$ = InputBoxN("Αναζήτησε προς την αρχή " & IIf(LastSearchType = 1, "σειρά χαρακτήρων" & vbCrLf & " Ctrl+F2 αναζήτηση λέξης", "λέξη" & vbCrLf & " Shift+F2 αναζήτηση χαρακτήρων"), "Συγγραφή Κειμένου", s$, noinp)
 
 Else
-s$ = InputBoxN("Search to top " & IIf(LastSearchType = 1, "(inside words also):" & vbCrLf & " Ctrl+F2 words only", ":" & vbCrLf & " Shift+F2 for any position "), "Text Editor", s$, noinp)
+s$ = InputBoxN("Search to the top " & IIf(LastSearchType = 1, " characters" & vbCrLf & " Ctrl+F2 search word", "word" & vbCrLf & " Shift+F2 search characters/symbols"), "Text Editor", s$, noinp)
 End If
 If Not noinp = 1 Then
 noentrance = False
@@ -8133,9 +8128,9 @@ If (shift And 4) = 4 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
     shift = 0
         If s$ = vbNullString And SelText <> "" Then s$ = SelText
         If pagio$ = "GREEK" Then
-            s$ = InputBoxN("Αναζήτησε προς το τέλος " & IIf(LastSearchType = 1, "(και σε μέρος λέξης):" & vbCrLf & " Ctrl+F3 για λέξεις μόνο", ":" & vbCrLf & " Ctrl+F3 και για μέρη λέξεων"), "Συγγραφή Κειμένου", s$, noinp)
+            s$ = InputBoxN("Αναζήτησε προς το τέλος " & IIf(LastSearchType = 1, "σειρά χαρακτήρων" & vbCrLf & " Ctrl+F3 αναζήτηση λέξης", "λέξη" & vbCrLf & " Shift+F3 αναζήτηση χαρακτήρων"), "Συγγραφή Κειμένου", s$, noinp)
         Else
-            s$ = InputBoxN("Search to end " & IIf(LastSearchType = 1, "(inside words also):" & vbCrLf & " Ctrl+F3 words only", ":" & vbCrLf & " Shift+F3 for any position "), "Text Editor", s$, noinp)
+            s$ = InputBoxN("Search to the end " & IIf(LastSearchType = 1, " characters" & vbCrLf & " Ctrl+F3 search word", "word" & vbCrLf & " Shift+F3 search characters/symbols"), "Text Editor", s$, noinp)
         End If
         If Not noinp = 1 Then
             noentrance = False
@@ -8426,9 +8421,9 @@ W = mDoc.MarkParagraphID   ' this is the not the order
 SelStartSilent = SelStart
 l = Charpos
 
-OldLcid = mDoc.lcid
+OldLcid = mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.lcid = TempLcid
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
   If Not mDoc.FindStrDown(s$, W, l) Then GoTo sdnOut
@@ -8449,16 +8444,16 @@ ParaSelStart = l
 glistN.enabled = True
 SelLength = Len(s$)
 sdnOut:
-mDoc.lcid = OldLcid
+mDoc.LCID = OldLcid
 End Sub
 Sub Searchup(s$, Optional anystr As Boolean = False)
 Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
 W = mDoc.MarkParagraphID
 SelStartSilent = SelStart - (SelLength > 1)
 l = Charpos + Len(s$)
-OldLcid = mDoc.lcid
+OldLcid = mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.lcid = TempLcid
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
    If Not mDoc.FindStrUp(s$, W, l) Then GoTo sdupOut
@@ -8479,7 +8474,7 @@ ParaSelStart = l
 glistN.enabled = True
 SelLength = Len(s$)
 sdupOut:
-mDoc.lcid = OldLcid
+mDoc.LCID = OldLcid
 End Sub
 Public Sub helpmeSub()
       If mIndex >= 0 Then
@@ -8513,9 +8508,9 @@ SelStartSilent = SelStart  'MOVE CHARPOS TO SELSTART
 
 el = Charpos  ' charpos maybe is in the start or the end of block
 s$ = SelText
-OldLcid = mDoc.lcid
+OldLcid = mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.lcid = TempLcid
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
 
 l = el + 1
 If EditTextWord Then
@@ -8550,7 +8545,7 @@ End If
 Loop Until (W = eW And l = el) Or safety = 2
 
 End If
-mDoc.lcid = OldLcid
+mDoc.LCID = OldLcid
 Render
 If glistN.Visible Then glistN.SetFocus
 End Sub
@@ -8595,9 +8590,9 @@ End If
 End If
 
 If noinp <> 1 Then Exit Sub
-OldLcid = mDoc.lcid
+OldLcid = mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.lcid = TempLcid
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
 If Len(neo$) >= Len(s$) Then
     Set mDoc10 = New Document
     
@@ -8719,7 +8714,7 @@ If prof1.MARKTWO > 1000 Then ProcTask2 Basestack1: prof1.MARKTWO
 Loop Until safety = 2 Or KeyPressed(16)
 glistN.DropKey = False
 End If
-mDoc.lcid = OldLcid
+mDoc.LCID = OldLcid
 If w2 > 0 Then mDoc.WrapAgainBlock w2, w2:   mDoc.ColorThis w2
 glistN.SuspDraw = False
 Render
@@ -8758,7 +8753,7 @@ Else ' goto that paragraph
         If UserCodePage = 1253 Then
             ReplaceTitle = "Δεν βρέθηκε παράγραφος - διαγράφτηκε ο δείκτης"
         Else
-            ReplaceTitle = "Paragraph noτ found - mark deleted"
+            ReplaceTitle = "Paragraph not found - mark deleted"
         End If
     End If
 End If
@@ -8824,7 +8819,7 @@ Public Property Let MultiLineComment2(ByVal vNewValue As Variant)
 mMultiLineComment2 = vNewValue
 mDoc.Final = vNewValue
 End Property
-Public Sub PopUpMenu(poptitle$, X As Variant, Y As Variant)
+Public Sub PopUpMenu(poptitle$, x As Variant, y As Variant)
 Dim oldModalId As Variant, i As Long
 ''If UsedAsTextBox Then Exit Sub
 i = SelLength
@@ -8841,7 +8836,7 @@ Modalid = Rnd * 113314324
 'UnHook Callback.hWnd
 UNhookMe
 MyPopUp.feedlabels Me, False
-MyPopUp.UpGui Callback, X, Y, poptitle$
+MyPopUp.UpGui Callback, x, y, poptitle$
 MyPopUp.Visible = True
 MyPopUp.ZOrder 0
 
@@ -9013,10 +9008,10 @@ glistN.EditFlag = OnOff
 glistN.NoCaretShow = NoMark
 End Sub
 Sub Transparent()
-Dim X  As Long, Y As Long
+Dim x  As Long, y As Long
 glistN.BackStyle = 1
-glistN.GetLeftTop X, Y
-glistN.RepaintFromOut Callback.Image, X, Y
+glistN.GetLeftTop x, y
+glistN.RepaintFromOut Callback.Image, x, y
 glistN.ShowMe
 Callback.RefreshList = Callback.RefreshList + 1
 End Sub
