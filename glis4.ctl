@@ -7185,7 +7185,7 @@ Set UserControl.MouseIcon = RHS
 End Property
 Function GetLocale() As Long
     Dim R&
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
+      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
       GetLocale = val("&H" & Right(Hex(R), 4))
 End Function
 Function GetKeY(ascii As Integer) As String
@@ -7193,7 +7193,7 @@ Function GetKeY(ascii As Integer) As String
 
     Buffer = String$(514, 0)
     Dim R&
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
+      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
       R = val("&H" & Right(Hex(R), 4))
     ret = GetLocaleInfo(R, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
     If ret > 0 Then

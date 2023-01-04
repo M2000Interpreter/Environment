@@ -389,7 +389,7 @@ End If
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = vbKeyTab And (shift And &H2 = 2) Then
+If KeyCode = vbKeyTab And ((shift And &H2) = 2) Then
 choosenext
 Sleep 100
 KeyCode = 0

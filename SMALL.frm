@@ -136,10 +136,10 @@ If lastform Is Nothing Then Exit Sub
 If lastform.enabled = False Then Beep: Exit Sub
 End Sub
 
-Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
+Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
 If QRY Or GFQRY Then
 If Form1.Visible Then Form1.SetFocus
-ElseIf keycode = 27 And (ASKINUSE Or loadfileiamloaded) Then
+ElseIf KeyCode = 27 And (ASKINUSE Or loadfileiamloaded) Then
 
     NOEXECUTION = True
 Else
@@ -178,7 +178,7 @@ Timer1.enabled = False
 If UnloadMode = (vbFormControlMenu Or byPassCallback) And lastform Is Nothing Then
 
 Dim f As Form, i As Long, F1 As GuiM2000
-For i = Forms.Count - 1 To 0 Step -1
+For i = Forms.count - 1 To 0 Step -1
 Set f = Forms(i)
 If TypeOf f Is GuiM2000 Then
     Set F1 = f
@@ -298,7 +298,7 @@ End If
      once2 = False
     Exit Sub
     
- ElseIf Forms.Count > 4 Then
+ ElseIf Forms.count > 4 Then
  If Not lastform Is Nothing Then
  Timer1.enabled = True
      ElseIf Not (CaptionW <> "" And WindowState = 0) Then
@@ -346,7 +346,7 @@ starthere:
             Set f2 = F1
             If F1.Enablecontrol Then
             'we have the top
-                For i = 0 To Forms.Count - 1
+                For i = 0 To Forms.count - 1
                     If TypeOf Forms(i) Is GuiM2000 Then
                         Set F1 = Forms(i)
                         If Not f2 Is F1 Then
@@ -385,7 +385,7 @@ starthere:
             Else
             ' we have something else
                 
-                For i = 0 To Forms.Count - 1
+                For i = 0 To Forms.count - 1
                     If TypeOf Forms(i) Is GuiM2000 Then
                         Set F1 = Forms(i)
                         If F1.Enablecontrol Then
@@ -417,7 +417,7 @@ Else
         If Not F1.Minimized Then
         If F1.Modal <> 0 Then
         thismodal = F1.Modal
-        For i = Forms.Count - 1 To 0 Step -1
+        For i = Forms.count - 1 To 0 Step -1
             If TypeOf Forms(i) Is GuiM2000 Then
                 Set F1 = Forms(i)
                 If Not F1.Minimized Then
@@ -542,7 +542,7 @@ If affiliatehwnd = 0 Then
     Set lastform = Nothing
 Else
 Dim i As Long
-    For i = 1 To Forms.Count - 1
+    For i = 1 To Forms.count - 1
         If Forms(i).hWnd = affiliatehwnd Then Set lastform = Forms(i)
     Next i
 End If
@@ -551,7 +551,7 @@ End Property
 Public Property Set lastform(vNewValue As Form)
 On Error Resume Next
 Dim i
-For i = 1 To Forms.Count - 1
+For i = 1 To Forms.count - 1
 If Forms(i) Is vNewValue Then affiliatehwnd = Forms(i).hWnd: Exit Property
 Next i
 affiliatehwnd = 0

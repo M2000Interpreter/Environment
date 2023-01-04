@@ -42,7 +42,7 @@ GOOD = item
 End Function
 Private Sub ExpandKey(Key As String)
 Dim i As Long, b As Long, k As Long, c As Long, cx1 As Long, c2 As Long, c1 As Long
-Dim pad$
+Dim Pad$
 Randomize
 b = Len(Key)
 Key = String$(Len(Key), " ") + Key
@@ -58,7 +58,7 @@ Next i
 End Sub
 Private Function UINT(ByVal a As Long) As Long
  Dim b As Integer
- b = a And &HFFFF
+ b = a And &HFFFF&
  If b < 0 Then
  UINT = CLng(&H10000 + b)
  Else

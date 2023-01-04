@@ -35,7 +35,7 @@ Private pipename As String  '= "\\.\pipe\bigtest"
 Private mytarget As String
 Private myBUFvar As String, res As Long
 Private myBase As TaskInterface
-Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
+Private Declare Function timeGetTime Lib "Kernel32.dll" Alias "GetTickCount" () As Long
 Private myProcess As basetask
 
 Private Property Get TaskInterface_Process() As basetask

@@ -213,7 +213,7 @@ Private Declare Function GetDateFormat Lib "kernel32" Alias "GetDateFormatW" ( _
 ) As Long
 Private Declare Function VarDateFromStr Lib "OleAut32.dll" ( _
     ByVal psDateIn As Long, _
-    ByVal lcid As Long, _
+    ByVal LCID As Long, _
     ByVal uwFlags As Long, _
     ByRef dtOut As Date) As Long
 Private Const S_OK = 0
@@ -226,7 +226,7 @@ Private Declare Function VariantTimeToSystemTime Lib "OleAut32.dll" ( _
     ByVal vTime As Date, _
     ByRef lpSystemTime As SYSTEMTIME _
 ) As Long
-Private Declare Function GetTimeZoneInformation Lib "kernel32.dll" (lpTimeZoneInformation As TIME_ZONE_INFORMATION) As Long
+Private Declare Function GetTimeZoneInformation Lib "Kernel32.dll" (lpTimeZoneInformation As TIME_ZONE_INFORMATION) As Long
   
 Private Declare Function CreateDirectory Lib "kernel32" Alias "CreateDirectoryW" (ByVal lpszPath As Long, ByVal lpSA As Long) As Long
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
@@ -236,7 +236,7 @@ Dim lPowers18(63) As Long, bTrans(255) As Byte, lPowers6(63) As Long, lPowers12(
 
 
 
-Public Function DateFromString(ByVal sDateIn As String, ByVal lcid As Long) As Date
+Public Function DateFromString(ByVal sDateIn As String, ByVal LCID As Long) As Date
 
     Dim hResult As Long
     Dim dtOut As Date
@@ -247,7 +247,7 @@ Public Function DateFromString(ByVal sDateIn As String, ByVal lcid As Long) As D
     Const LOCALE_NOUSEROVERRIDE = &H80000000
 
     ' Do the conversion
-    hResult = VarDateFromStr(StrPtr(sDateIn), lcid, LOCALE_NOUSEROVERRIDE, dtOut)
+    hResult = VarDateFromStr(StrPtr(sDateIn), LCID, LOCALE_NOUSEROVERRIDE, dtOut)
 
     Select Case hResult
 
@@ -641,7 +641,7 @@ Else
     Sleep 1
     Set a = New Document
     a.MaxParaLength = 1000
-    a.lcid = Clid
+    a.LCID = Clid
     a.ReadUnicodeOrANSI afile$, , what
     
     If InStr(simple$, vbCr) > 0 Then
@@ -678,7 +678,32 @@ again:
 End If
 inc1:
 End Function
-
+Public Function DecodeHEX(sString As String, ok As Boolean) As String
+    ok = True
+    sString = Replace(sString, vbCr, "")
+    sString = Replace(sString, vbLf, "")
+    sString = Replace(sString, vbTab, "")
+    sString = Replace(sString, " ", "")
+    sString = Replace(sString, Chr(160), "")  ' nbsp
+    sString = Replace(sString, "_", "")
+    sString = Replace(sString, ",", "")
+    If Len(sString) < 2 Or (Len(sString) Mod 2) = 1 Then Exit Function
+    Dim bOut() As Byte, lPos As Long, sOut As String, hx$, i As Long
+    hx$ = "&H00"
+    ReDim bOut(LenB(sString) \ 2)
+    For i = 1 To Len(sString) Step 2
+        Mid$(hx$, 3, 2) = Mid$(sString, i, 2)
+        bOut(lPos) = hx$: lPos = lPos + 1:
+    Next i
+cont1:
+    If lPos Mod 2 = 1 Then
+        sOut = StrConv(String$(lPos, Chr(0)), vbFromUnicode)
+    Else
+        sOut = String$((lPos + 1) \ 2, Chr(0))
+    End If
+    CopyMemory ByVal StrPtr(sOut), bOut(0), LenB(sOut)
+    DecodeHEX = sOut
+End Function
 ' from VbForoums after corrections by me.
 ' http://www.vbforums.com/showthread.php?379072-VB-Fast-Base64-Encoding-and-Decoding
 Public Function Decode64(sString As String, ok As Boolean) As String
@@ -852,9 +877,9 @@ error1:
             Exit Function
     End If
 cont1:
-If lPos Mod 2 = 1 Then
-    sOut = StrConv(String$(lPos, Chr(0)), vbFromUnicode)
-Else
+    If lPos Mod 2 = 1 Then
+        sOut = StrConv(String$(lPos, Chr(0)), vbFromUnicode)
+    Else
     sOut = String$((lPos + 1) \ 2, Chr(0))
     End If
     CopyMemory ByVal StrPtr(sOut), bOut(0), LenB(sOut)

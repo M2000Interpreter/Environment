@@ -7,43 +7,60 @@ BEGIN
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
 Attribute VB_Name = "RefArray"
-Attribute VB_GlobalNameSpace = True
+Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
+Private Const VbLongLong = 20
+Private Enum VARENUM
+   VT_I8 = &H14
+End Enum
+Private Type Dec_Hdr
+    DecType     As Integer
+    DecScale    As Byte
+    DecSign     As Byte
+End Type
+Private Type SAFEARRAYBOUND
+    cElements                   As Long
+    lLbound                     As Long
+End Type
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Function pArrPtr Lib "msvbvm60" Alias "VarPtr" (ptr() As Any) As Long
+'Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
+'Private Declare Function CompareStringOrdinal Lib "kernel32.dll" (ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long, ByVal bIgnoreCase As Long) As Long
+'Private Declare Function SafeArrayAccessData Lib "OleAut32.dll" (ByVal pSA As Long, ppVdata As Long) As Long
+'Private Declare Function SafeArrayUnaccessData Lib "OleAut32.dll" (ByVal pSA As Long) As Long
+Private Declare Function pArrPtr Lib "msvbvm60" Alias "VarPtr" (Ptr() As Any) As Long
 Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
+Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-
+Private mError As Long
 Private p As Variant
 Private ihavearray As Boolean, isok As Boolean
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" _
   (pDst As Any, pSrc As Any, ByVal ByteLen As Long)
-Private PadDim(0 To 1) As Long
-Private Declare Function SafeArrayRedim Lib "oleaut32" (ByVal saPtr As Long, saBound As Long) As Long
-Function NewRef(Optional ByRef RHS) As RefArray
-Dim z As New RefArray
+Private Declare Function SafeArrayRedim Lib "oleaut32" (ByVal saPtr As Long, ByVal saBound As Long) As Long
+Function NewRef(Optional ByRef RHS) As refArray
+Dim z As New refArray
 If Not IsMissing(RHS) Then z.writevalue = RHS
 Set NewRef = z
 End Function
-Property Get Copy() As RefArray
-Dim z As New RefArray, pp
+Property Get Copy() As refArray
+Dim z As New refArray, pp
 If isok Then
     Dim i As Long, j As Long, m
     For i = UBound(p) To 0 Step -1
         If IsObject(p(i)) Then
-            If TypeOf p(i) Is RefArray Then
+            If TypeOf p(i) Is refArray Then
                 Set m = p(i).Copy()
                 z(i) = m
             End If
         Else
             pp = p(i)
             j = Elements(pp)
-            If Typename$(pp) = "Variant()" Then
+            If VarType(pp) = vbVariant + vbArray Then
             If j > 0 Then
                 For j = j - 1 To 0 Step -1
                 
@@ -58,7 +75,7 @@ If isok Then
                 Next j
             End If
             End If
-            z.Value(i) = pp
+            z(i) = pp
         End If
     Next i
 Else
@@ -104,19 +121,25 @@ entry1:
         End If
     ElseIf what >= 0 Then
         If Elements(p(where)) + 1 < what Then
-            Dim ThisPtr As Long
-            PadDim(0) = what + 1
-            GetMem4 UnsignedAdd(VarPtr(p(where)), 8), ThisPtr
-            If SafeArrayRedim(ThisPtr, PadDim(0)) <> 0& Then Err.Raise 5
-            PutMem4 UnsignedAdd(VarPtr(p(where)), 8), ThisPtr
-            
+            Dim ThisPtr As Long, PadDim As SAFEARRAYBOUND
+            PadDim.cElements = what + 1
+            ThisPtr = Peek(UnsignedAdd(VarPtr(p(where)), 8))
+            If SafeArrayRedim(ByVal ThisPtr, VarPtr(PadDim)) <> 0& Then Err.Raise 5
         End If
-        If VarType(that) = vbObject Then
-            Set p(where)(what) = that
-        Else
         On Error Resume Next
+        Select Case VarType(p(where)) - vbArray
+        Case vbObject
+            Set p(where)(what) = that
+        Case VbLongLong ' 20
+                If Not VarType(that) = 20 Then
+                    that = cInt64(that)
+                End If
+                If Not VarType(that) = 20 Then mError = 6: Exit Property
+                CopyMemory ByVal ((ArrPtr(where) Xor &H80000000) + 8 * CLng(what)) Xor &H80000000, ByVal ((VarPtr(that) Xor &H80000000) + 8) Xor &H80000000, 8
+        Case Else
             p(where)(what) = that
-        End If
+        End Select
+        If Err Then mError = Err.Number: Err.Clear
     End If
 ElseIf Not IsMissing(where) Then
     ihavearray = True
@@ -147,31 +170,46 @@ If ihavearray Then
     pp = Elements(p(where))
         If pp > 0 Then
             If what >= 0 And what < pp Then
-                If VarType(p(where)(what)) = vbObject Then
+                
+                Select Case VarType(p(where)) - vbArray
+                Case vbObject
                     Set Value = p(where)(what)
-                Else
+                Case 20
+                    CopyMemory ByVal ((VarPtr(Value) Xor &H80000000) + 8) Xor &H80000000, ByVal ((ArrPtr(where) Xor &H80000000) + 8 * CLng(what)) Xor &H80000000, 8
+                    PutMem2 ByVal VarPtr(Value), 20
+                Case vbVariant
+                    If VarType(p(where)(what)) = VbLongLong Then
+                        CopyMemory ByVal VarPtr(Value), ByVal ((ArrPtr(where) Xor &H80000000) + 16 * CLng(what)) Xor &H80000000, 16
+                    Else
+                        Value = p(where)(what)
+                    End If
+                Case Else
+                    
                     Value = p(where)(what)
-                End If
+                End Select
+                
             End If
         End If
     End If
 Else
-If IsObject(p) Then
-    Set Value = p
-Else
-    Value = p
-End If
+    If IsObject(p) Then
+        Set Value = p
+    Else
+        Value = p
+    End If
 End If
 End Property
-
-Property Get Count(Optional m)
-Count = 0&
+Property Get AssignError()
+    AssignError = mError
+End Property
+Property Get count(Optional m)
+count = 0&
 If isok Then
     If IsMissing(m) Then
-        Count = Elements(p)
+        count = Elements(p)
     ElseIf m >= 0 And m <= UBound(p) Then
         On Error Resume Next
-        Count = UBound(p(m)) + 1
+        count = UBound(p(m)) + 1
         Err.Clear
     End If
 End If
@@ -241,39 +279,50 @@ Public Function UnsignedAdd(ByVal lUnsignedPtr As Long, ByVal lSignedOffset As L
 End Function
 Public Sub DefArrayAt(where, Arrtype, Optional size As Long = 10)
 If size < 1 Then size = 1
-Dim aPtr As Long, bb As Byte
-    
+Dim aPtr As Long, BB As Byte
+Dim Dummy0() As Object
+Dim Dummy1() As String
+Dim Dummy2() As Long
+Dim Dummy3() As Currency
+Dim Dummy4() As Variant
+Dim Dummy5() As Double
+Dim Dummy6() As Single
+Dim Dummy7() As Byte
+Dim Dummy8() As Integer
 Select Case Arrtype
-Case vbByte
-    Dim Dummy7() As Byte
-    ReDim Dummy7(size)
-    Value(where) = Dummy7()
-Case vbInteger
-    Dim Dummy8() As Integer
-    ReDim Dummy8(size)
-    Value(where) = Dummy8()
+Case vbObject
+    ReDim Dummy0(size)
+    Value(where) = Dummy0()
+Case vbString
+    ReDim Dummy1(size)
+    Value(where) = Dummy1()
 Case vbLong
-    Dim Dummy() As Long
-    ReDim Dummy(size)
-    Value(where) = Dummy()
+    ReDim Dummy2(size)
+    Value(where) = Dummy2()
+Case vbCurrency
+    ReDim Dummy3(size)
+    Value(where) = Dummy3()
+Case vbDecimal
+    ReDim Dummy4(size)
+    Value(where) = Dummy4()
+    PutMem2 VarPtr(p(where)), vbDecimal + vbArray
 Case vbDouble
-    Dim Dummy5() As Double
     ReDim Dummy5(size)
     Value(where) = Dummy5()
 Case vbSingle
-    Dim Dummy6() As Single
     ReDim Dummy6(size)
     Value(where) = Dummy6()
-Case vbString
-    Dim Dummy1() As String
-    ReDim Dummy1(size)
-    Value(where) = Dummy1()
-Case vbCurrency
-    Dim Dummy3() As Currency
+Case vbByte
+    ReDim Dummy7(size)
+    Value(where) = Dummy7()
+Case vbInteger
+    ReDim Dummy8(size)
+    Value(where) = Dummy8()
+Case VbLongLong
     ReDim Dummy3(size)
     Value(where) = Dummy3()
+    PutMem2 VarPtr(p(where)), vbArray + VbLongLong
 Case vbVariant
-    Dim Dummy4()
     ReDim Dummy4(size)
     Value(where) = Dummy4()
 End Select
@@ -288,8 +337,19 @@ Property Get ItemType(item) As Long
         End If
     End If
 End Property
-Property Get Hash(item As Long, Optional what As Long = -1, Optional ByVal size As Long = 4) As Byte()
-    Dim mPtr As Long, ssize As Long, aPtr As Long
+
+Public Function tuple(ParamArray v())
+    Dim p() As Variant
+    p = v
+    If Elements(p) > 0 Then
+        tuple = p
+    Else
+        Dim z() As Variant
+        tuple = z()
+    End If
+End Function
+Property Get Hash(item As Long, Optional what As Long = -1, Optional ByVal size As Long = 4) As Long
+    Dim mPtr As Long, ssize As Long
     If size < 1 Then Exit Property
     If ihavearray And isok Then
     
@@ -302,46 +362,87 @@ Property Get Hash(item As Long, Optional what As Long = -1, Optional ByVal size 
             GetMem4 UnsignedAdd(mPtr, 12), mPtr
             GetMem4 mPtr + 4 * what, mPtr
             If mPtr = 0 Then
-                ReDim Hash(size - 1)
-                mPtr = pArrPtr(Hash)
-                GetMem4 mPtr, mPtr  ' is by reference (we get *safearray1D)
-                GetMem4 UnsignedAdd(mPtr, 12), mPtr 'we get the *pvData)
-                PutMem1 mPtr, 1  ' just set 1
+                Hash = 1
             Else
-                ReDim Hash(size - 1)
-                aPtr = pArrPtr(Hash)
-                GetMem4 aPtr, aPtr  ' is by reference (we get *safearray1D)
-                GetMem4 UnsignedAdd(aPtr, 12), aPtr 'we get the *pvData)
                 GetMem4 mPtr - 4, ssize
-                HashData mPtr, ssize, aPtr, size
+                HashData mPtr, ssize, VarPtr(Hash), size
             End If
         End If
     End Select
     End If
 End Property
-Property Get HashkEY(Key, Optional ByVal size As Long = 4) As Byte()
-    Dim aPtr As Long, sPtr As Long, ssize As Long
-    If size < 1 Then Exit Property
-        ReDim HashkEY(size - 1)
-        aPtr = pArrPtr(HashkEY)
-        GetMem4 aPtr, aPtr  ' is by reference (we get *safearray1D)
-        GetMem4 UnsignedAdd(aPtr, 12), aPtr 'we get the *pvData)
-        GetMem4 VarPtr(Key) + 8, sPtr
-        GetMem4 sPtr - 4, ssize
-        If ssize = 0 Then
-            PutMem1 aPtr, 1
-        Else
-            HashData sPtr, ssize, aPtr, size
-        End If
-End Property
-Public Function tuple(ParamArray v())
-    Dim p() As Variant
-    p = v
-    If Elements(p) > 0 Then
-        tuple = p
-    Else
-        Dim z() As Variant
-        tuple = z()
-    End If
-End Function
+Friend Function CompareStrEq(where As Long, what As Long, thisstr As String) As Boolean
+        Const CSTR_EQUAL            As Long = 2&
+        Dim mPtr As Long, ssize As Long, lPtr As Long
+        GetMem4 ((VarPtr(p(where)) Xor &H80000000) + 8) Xor &H80000000, mPtr
+        ''SafeArrayAccessData mPtr, iPtr
+        GetMem4 ((mPtr Xor &H80000000) + 12) Xor &H80000000, mPtr
+        GetMem4 mPtr + 4 * what, mPtr
+            
+            If mPtr = 0 Then
+                GoTo ex1
+            Else
+                GetMem4 mPtr - 4, ssize
+                ssize = ssize \ 2
+                If ssize <> Len(thisstr) Then Exit Function 'GoTo ex1
+                If ssize = 0 Then CompareStrEq = True: Exit Function 'GoTo ex1
+                lPtr = StrPtr(thisstr)
+                While ssize > 0
+                    If PeekInt(lPtr) <> PeekInt(mPtr) Then Exit Function
+                    ssize = ssize - 1
+                    lPtr = ((lPtr Xor &H80000000) + 2) Xor &H80000000
+                    mPtr = ((mPtr Xor &H80000000) + 2) Xor &H80000000
+                Wend
+                CompareStrEq = True
+            End If
+ex1:
+''SafeArrayUnaccessData mPtr
 
+End Function
+Public Function cInt64(v As Variant) As Variant
+    Dim DecHdr As Dec_Hdr, m As Long
+    On Error GoTo er111
+    cInt64 = CDec(v)
+     If VarType(v) = vbString Then
+        If InStr(1, v, "&h", vbTextCompare) = 1 Then
+            Do
+                m = Len(v)
+                v = Replace(v, "&H0", "&H", , , vbTextCompare)
+            Loop Until Len(v) = m Or m < 5
+            If m = 10 Then
+                If cInt64 < 0 Then
+                    cInt64 = CDec("&H100000000") + cInt64
+                End If
+            End If
+            
+        End If
+    End If
+    CopyMemory DecHdr, ByVal VarPtr(cInt64), LenB(DecHdr)
+    If DecHdr.DecScale Then
+    cInt64 = Fix(cInt64)
+    End If
+    GetMem4 VarPtr(cInt64) + 12, m
+    If VarType(v) = vbString Then If m < 0 And Len(v) <= 10 Then GoTo er111
+    PutMem4 VarPtr(cInt64), VT_I8
+    If (DecHdr.DecSign <> 0) And (cInt64 > 0) Then cInt64 = -cInt64
+    If (VarType(cInt64) <> VT_I8) Then Err.Raise 6
+    Exit Function
+er111:
+     Err.Raise 6
+End Function
+Property Get vtType(Optional where) As Integer
+If ihavearray Then
+    If isok Then
+        If IsMissing(where) Then
+            GetMem2 VarPtr(p), vtType
+        Else
+            Dim pp As Long
+            pp = Elements(p(where))
+            If pp > 0 Then
+                GetMem2 VarPtr(p(where)), vtType
+                vtType = vtType - vbArray
+            End If
+        End If
+    End If
+End If
+End Property

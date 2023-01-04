@@ -27,7 +27,7 @@ Private mHideCaret As Boolean, mTitle As String, mfactor As Single
 Private lastshift As Boolean, lastitem As Long
 Public maychange As Boolean
 Public SkipFirstClick As Boolean
-Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
+Private Declare Function GetStringTypeExW Lib "Kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 
 Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
@@ -60,14 +60,14 @@ If Not glistN Is Nothing Then glistN.Shutdown
 Set Callback = Nothing
 Set glistN = Nothing
 End Sub
-Public Sub move(X, y, Optional w, Optional h)
+Public Sub move(x, y, Optional W, Optional H)
 glistN.HideBarAsap
-If IsMissing(w) Then
-glistN.MoveTwips CLng(X), CLng(y), 0, 0
-ElseIf IsMissing(h) Then
-glistN.MoveTwips CLng(X), CLng(y), CLng(w), 0
+If IsMissing(W) Then
+glistN.MoveTwips CLng(x), CLng(y), 0, 0
+ElseIf IsMissing(H) Then
+glistN.MoveTwips CLng(x), CLng(y), CLng(W), 0
 Else
-glistN.MoveTwips CLng(X), CLng(y), CLng(w), CLng(h)
+glistN.MoveTwips CLng(x), CLng(y), CLng(W), CLng(H)
 End If
 If mHeaderOnly Then
     If glistN.HeadLine = "" Then glistN.HeadLine = " "
@@ -131,7 +131,7 @@ End With
 
 End Sub
 
-Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
+Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 Dim oldtab As Long, where As Long, oldscroll As Long
 
 
@@ -140,12 +140,12 @@ ElseIf maychange And Button = 0 Then
 oldtab = glistN.Column
 oldscroll = glistN.PanPos
 glistN.PanPos = 0
-glistN.REALCUR item, CSng(X * dv15), (0), where
+glistN.REALCUR item, CSng(x * dv15), (0), where
 If lastitem = item And oldtab = glistN.Column Then
 glistN.PanPos = oldscroll
 Exit Sub
 End If
-glistN.mousepointer = 1
+glistN.MousePointer = 1
 If glistN.ListSep(item) Then Exit Sub
 
 If Button = 0 Then OneClick
@@ -167,33 +167,33 @@ retvalue = RealX1(mHdc, ExtSelStart, that)
 ok = True
 End Sub
 
-Private Sub glistN_KeyDownAfter(KeyCode As Integer, Shift As Integer)
-If mHeaderOnly Then KeyCode = 0: Shift = 0
+Private Sub glistN_KeyDownAfter(KeyCode As Integer, shift As Integer)
+If mHeaderOnly Then KeyCode = 0: shift = 0
 End Sub
 
-Private Sub glistN_MouseMove(myButton As Integer, Shift As Integer, X As Single, y As Single)
+Private Sub glistN_MouseMove(myButton As Integer, shift As Integer, x As Single, y As Single)
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".MouseMove(" + Str(mIndex) + "," + Str(X) + "," + Str(y) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+        Callback.Callback mesCtrlName + ".MouseMove(" + Str(mIndex) + "," + Str(x) + "," + Str(y) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
     Else
-        Callback.Callback mesCtrlName + ".MouseMove(" + Str(X) + "," + Str(y) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+        Callback.Callback mesCtrlName + ".MouseMove(" + Str(x) + "," + Str(y) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
     End If
 
 End Sub
 
-Private Sub glistN_MouseUp(X As Single, y As Single)
+Private Sub glistN_MouseUp(x As Single, y As Single)
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".MouseUp(" + Str(mIndex) + "," + Str(X) + "," + Str(y) + ")"
+        Callback.Callback mesCtrlName + ".MouseUp(" + Str(mIndex) + "," + Str(x) + "," + Str(y) + ")"
     Else
-        Callback.Callback mesCtrlName + ".MouseUp(" + Str(X) + "," + Str(y) + ")"
+        Callback.Callback mesCtrlName + ".MouseUp(" + Str(x) + "," + Str(y) + ")"
     End If
 End Sub
 
-Private Sub glistN_OutPopUp(X As Single, y As Single, myButton As Integer)
-If myButton And &H2 = 2 Then
+Private Sub glistN_OutPopUp(x As Single, y As Single, myButton As Integer)
+If (myButton And &H2) = 2 Then
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+        Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
     Else
-        Callback.Callback mesCtrlName + ".PopUp(" + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+        Callback.Callback mesCtrlName + ".PopUp(" + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
     End If
 End If
 End Sub
@@ -353,7 +353,7 @@ Dim ff As New StdFont
 With Callback
 ff.Name = .CtrlFontName
 ff.charset = Form1.DIS.Font.charset
-ff.Size = .CtrlFontSize
+ff.size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 End With
 SkipFirstClick = True
@@ -383,7 +383,7 @@ If ThisFontName <> "" Then
 
 aa.Name = ThisFontName
 
-If ThisMode > 7 Then aa.Size = ThisMode Else aa = 7
+If ThisMode > 7 Then aa.size = ThisMode Else aa = 7
 aa.bold = ThisBold
 Set glistN.Font = aa
 End If
@@ -420,27 +420,27 @@ cListCount = VR(0)
 End Sub
 
 
-Private Sub glistN_KeyDown(KeyCode As Integer, Shift As Integer)
-lastshift = (Shift And 1) = 0
+Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
+lastshift = (shift And 1) = 0
 Dim VR(2)
 VR(0) = KeyCode
-VR(1) = Shift
+VR(1) = shift
    If mIndex >= 0 Then
    Callback.CallbackNow mesCtrlName + ".KeyDown(" + Str(mIndex) + ")", VR()
    Else
       Callback.CallbackNow mesCtrlName + ".KeyDown()", VR()
       End If
       ' UseHeaderOnly
-If KeyCode <> VR(0) Or Shift <> VR(1) Then
+If KeyCode <> VR(0) Or shift <> VR(1) Then
 KeyCode = VR(0)
-Shift = VR(1)
+shift = VR(1)
 ElseIf mHeaderOnly Then
 ' handle move by keys
 
     OneClick
     Exit Sub
 End If
-If KeyCode = vbKeyF10 And Shift <> 0 Then
+If KeyCode = vbKeyF10 And shift <> 0 Then
 KeyCode = 0
 If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
@@ -611,11 +611,11 @@ Public Property Let Enabled(ByVal RHS As Boolean)
 mEnabled = RHS
 End Property
 
-Public Property Get Linespace() As Variant
-Linespace = dv15 * (glistN.addpixels) / 2
+Public Property Get LineSpace() As Variant
+LineSpace = dv15 * (glistN.addpixels) / 2
 End Property
 
-Public Property Let Linespace(ByVal vNewValue As Variant)
+Public Property Let LineSpace(ByVal vNewValue As Variant)
     vNewValue = (vNewValue \ 30) * 60
  
 glistN.addpixels = vNewValue / dv15
@@ -691,7 +691,7 @@ Public Property Let list(ByVal index As Long, ByVal vNewValue As Variant)
     If glistN.Visible Then glistN.PrepareToShow
 End Property
 Sub Add(content$)
-glistN.additem content$
+glistN.AddItem content$
 End Sub
 Sub AddFast(index As Long, content$)
 glistN.additemFast content$
@@ -997,7 +997,7 @@ Private Sub OneClick()
 On Error Resume Next
 If SkipFirstClick Then glistN.PrepareClick
 End Sub
-Public Sub AccKey(a, Optional Shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
 If MyIsNumeric(a) Then
 a = CLng(a)
@@ -1015,7 +1015,7 @@ End Select
 End If
 If Opcode < 0 Then Opcode = 0
 If a = 0 Then Exit Sub
-a = a - 1000 * Shift - 10000 * ctrl - 100000 * alt
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
 Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
 Private Sub gListN_AccKey(m As Long)
@@ -1694,7 +1694,7 @@ Sub UseMove()
     glistN.NoHorMove = False
     glistN.NoVerMove = False
     If mHeaderOnly Then
-        glistN.mousepointer = 5
+        glistN.MousePointer = 5
     End If
 End Sub
 Sub UseÍïMove()
@@ -1702,7 +1702,7 @@ Sub UseÍïMove()
     glistN.FloatList = False
     glistN.NoHorMove = False
     glistN.NoVerMove = False
-    glistN.mousepointer = 1
+    glistN.MousePointer = 1
 End Sub
 Sub UseHorMove()
     If glistN Is Nothing Then Exit Sub
@@ -1710,7 +1710,7 @@ Sub UseHorMove()
     glistN.NoHorMove = False
     glistN.NoVerMove = True
     If mHeaderOnly Then
-    glistN.mousepointer = 9
+    glistN.MousePointer = 9
     End If
 End Sub
 Sub UseVerMove()
@@ -1719,20 +1719,20 @@ Sub UseVerMove()
     glistN.NoHorMove = True
     glistN.NoVerMove = False
     If mHeaderOnly Then
-    glistN.mousepointer = 7
+    glistN.MousePointer = 7
     End If
 End Sub
 
-Private Sub glistN_ValidMove(X As Single, y As Single)
+Private Sub glistN_ValidMove(x As Single, y As Single)
 Dim VR(2)
-VR(0) = X
+VR(0) = x
 VR(1) = y
    If mIndex >= 0 Then
    Callback.CallbackNow mesCtrlName + ".ValidMove(" + Str(mIndex) + "," + Str(mIndex) + ")", VR()
    Else
       Callback.CallbackNow mesCtrlName + ".ValidMove()", VR()
       End If
-X = VR(0)
+x = VR(0)
 y = VR(1)
 End Sub
 Property Let MoveParent(ByVal RHS As Boolean)
@@ -1791,8 +1791,8 @@ Property Let TitleBackColor(ByVal RHS As Long)
         End If
     End If
 End Property
-Private Sub glistN_AddSelStart(val As Long, Shift As Integer)
-Dim w As Long, a$, l As Long, b$
+Private Sub glistN_AddSelStart(val As Long, shift As Integer)
+Dim W As Long, a$, l As Long, b$
 Const sp1 = ",+-*/=<>^!.&[]{}()^;""" + "'!"
 Dim sp As String: sp = " " + ChrW(9) + ChrW(160)
 Dim sp2 As String: sp2 = sp1 + sp
@@ -1803,8 +1803,8 @@ Else
 a$ = Mid$(list(ListIndex), glistN.SelStart)
 End If
     If Len(a$) > 0 Then
-        w = AscW(a$)
-        If (Shift And 2) = 2 Then
+        W = AscW(a$)
+        If (shift And 2) = 2 Then
             l = Len(a$)
             val = 1
             If l < 2 Then Exit Sub
@@ -1828,15 +1828,15 @@ End If
                     val = val - 1
                 End If
             End If
-        ElseIf w > -10241 And w < -9216 Then
+        ElseIf W > -10241 And W < -9216 Then
             val = 2
         End If
     End If
 End If
 End Sub
 
-Private Sub glistN_SubSelStart(val As Long, Shift As Integer)
-Dim w As Long, a$, l As Long, b$
+Private Sub glistN_SubSelStart(val As Long, shift As Integer)
+Dim W As Long, a$, l As Long, b$
 Const sp1 = ",+-*/=<>^!.&[]{}()^;""" + "'!"
 Dim sp As String: sp = " " + ChrW(9) + ChrW(160)
 Dim sp2 As String: sp2 = sp1 + sp
@@ -1849,8 +1849,8 @@ vartext = list(ListIndex)
 End If
 a$ = Mid$(vartext, glistN.SelStart - 1, 1)
 If Len(a$) > 0 Then
-w = AscW(a$)
-        If (Shift And 2) = 2 Then
+W = AscW(a$)
+        If (shift And 2) = 2 Then
             a$ = Mid$(vartext, 1, glistN.SelStart - 1)
             l = Len(a$)
             val = l
@@ -1877,7 +1877,7 @@ w = AscW(a$)
                 l = l - 1
             End If
             val = val - l
-        ElseIf w > -9217 And w < -8192 Then
+        ElseIf W > -9217 And W < -8192 Then
             val = 2
         End If
 

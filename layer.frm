@@ -70,22 +70,22 @@ MediaPlayer1.closeMovie
   Set TaskMaster = Nothing
 Set Basestack1.Owner = Nothing
 Set Basestack1 = Nothing
-Dim X As Form
+Dim x As Form
 If IsWine Then
 Modalid = 0
 
-For Each X In Forms
-If X.Visible Then X.Visible = False
+For Each x In Forms
+If x.Visible Then x.Visible = False
 Next
-Set X = Nothing
+Set x = Nothing
 'Form1.helper1
 'MsgBox "quit"
 'Exit Sub
 Else
-For Each X In Forms
-If X.Name <> Me.Name Then Unload X
+For Each x In Forms
+If x.Name <> Me.Name Then Unload x
 Next
-Set X = Nothing
+Set x = Nothing
 End If
 
 If m_bInIDE Then Exit Sub
@@ -103,16 +103,16 @@ MediaPlayer1.closeMovie
  If Not TaskMaster Is Nothing Then TaskMaster.Dispose
   Set TaskMaster = Nothing
   
-Dim X As Form
+Dim x As Form
 Modalid = 0
 
-For Each X In Forms
-If X.Name <> Me.Name Then
-Set X.icon = LoadPicture("")
-If X.Visible Then X.Visible = False
+For Each x In Forms
+If x.Name <> Me.Name Then
+Set x.icon = LoadPicture("")
+If x.Visible Then x.Visible = False
 End If
 Next
-Set X = Nothing
+Set x = Nothing
 Form1.helper1
 
 End Sub
@@ -131,7 +131,7 @@ End Sub
     Dim Buffer As String, ret As Long
     Buffer = String$(514, 0)
     Dim R&, k&
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF
+      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
       R = val("&H" & Right(Hex(R), 4))
     ret = GetLocaleInfo(R, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
     If ret > 0 Then

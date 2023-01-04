@@ -2,7 +2,7 @@ Attribute VB_Name = "Module8"
 'Author: Merri of vbforums.com
 'http://www.vbforums.com/showthread.php?t=499661
 Option Explicit
-Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
+Private Declare Function timeGetTime Lib "Kernel32.dll" Alias "GetTickCount" () As Long
 Public Type rndvars
      lngX   As Long
      lngY   As Long
@@ -10,9 +10,9 @@ Public Type rndvars
      blnInit As Boolean
 End Type
 Public Sub RandomizeIt(m As rndvars, NeoNumber As Long)
-    Dim d As Double
+    Dim D As Double
     If NeoNumber = 0 Then m.blnInit = False
-    d = RndM(m, NeoNumber)
+    D = RndM(m, NeoNumber)
 End Sub
 Public Function RndM(m As rndvars, Optional ByVal Number As Long) As Double
 ' Static lngX As Long, lngY As Long, lngZ As Long, blnInit As Boolean

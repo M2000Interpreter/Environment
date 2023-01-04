@@ -7,7 +7,7 @@ Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
 Private Const Pi = 3.14159265359
 Private Type SAFEARRAYBOUND
     cElements As Long
-    lLBound As Long
+    lLbound As Long
 End Type
 Private Type SAFEARRAY2D
     cDims As Integer
@@ -25,14 +25,35 @@ Public Sub SaveBmp(sFile As String, ByVal Scr As Object)
             photo.SaveDib sFile
        
 End Sub
+Public Function DecodeHEXtoMemBloc(ByVal a$, ok As Boolean, Optional forcode As Boolean = False) As Object
+    Dim mem As New MemBlock, BLen As Long
+    a$ = DecodeHEX(a$, ok)
+    If ok And LenB(a$) > 0 Then
+        BLen = LenB(a$)
+        mem.Construct 1, BLen, , forcode
+        CopyBytes BLen, mem.GetPtr(0), StrPtr(a$)
+        Set DecodeHEXtoMemBloc = mem
+    ElseIf Len(a$) = 0 Then
+        ok = False
+        MyEr "Empty String to make buffer", "Αδειο αλφαριθμητικό για να φτιάξω διάρθρωση"
+    Else
+        MyEr "Problem with DecodeΗΕΧ", "Πρόβλημα αποκωδικοποίησης δεκαεξαδικού"
+    End If
+    
+End Function
 Public Function Decode64toMemBloc(ByVal a$, ok As Boolean, Optional forcode As Boolean = False) As Object
     Dim mem As New MemBlock, BLen As Long
     a$ = Decode64(a$, ok)
-    If ok Then
+    If ok And LenB(a$) > 0 Then
         BLen = LenB(a$)
         mem.Construct 1, BLen, , forcode
         CopyBytes BLen, mem.GetPtr(0), StrPtr(a$)
         Set Decode64toMemBloc = mem
+    ElseIf Len(a$) = 0 Then
+        ok = False
+        MyEr "Empty String to make buffer", "Αδειο αλφαριθμητικό για να φτιάξω διάρθρωση"
+    Else
+        MyEr "Problem with Decode64", "Πρόβλημα αποκωδικοποίησης 64"
     End If
     
 End Function
@@ -137,16 +158,16 @@ If cDIBbuffer1.create(pih, piw) Then
 
 cDIBbuffer1.GetDpiDIB cDibbuffer0
 Dim bDib() As Byte, bDib1() As Byte
-Dim X As Long, Y As Long
+Dim x As Long, y As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
 On Error Resume Next
     With tSA
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLBound = 0
+        .Bounds(0).lLbound = 0
         .Bounds(0).cElements = cDibbuffer0.Height
-        .Bounds(1).lLBound = 0
+        .Bounds(1).lLbound = 0
         .Bounds(1).cElements = cDibbuffer0.BytesPerScanLine()
         .pvData = cDibbuffer0.DIBSectionBitsPtr
     End With
@@ -154,9 +175,9 @@ On Error Resume Next
     With tSA1
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLBound = 0
+        .Bounds(0).lLbound = 0
         .Bounds(0).cElements = cDIBbuffer1.Height
-        .Bounds(1).lLBound = 0
+        .Bounds(1).lLbound = 0
         .Bounds(1).cElements = cDIBbuffer1.BytesPerScanLine()
         .pvData = cDIBbuffer1.DIBSectionBitsPtr
     End With
@@ -169,29 +190,29 @@ ttt = 1 + 100000 / piw
 
 myx = 0
 If MEDOEV Then
-  For Y = pih - 1 To 0 Step -1
+  For y = pih - 1 To 0 Step -1
     oldx = 0
     TTC = TTC - 1
     If TTC = 0 Then DoEvents: TTC = ttt
-        For X = 0 To piw - 1
-                        bDib1(myx, X) = bDib(oldx, Y)
-                        bDib1(myx + 1, X) = bDib(oldx + 1, Y)
-                        bDib1(myx + 2, X) = bDib(oldx + 2, Y)
+        For x = 0 To piw - 1
+                        bDib1(myx, x) = bDib(oldx, y)
+                        bDib1(myx + 1, x) = bDib(oldx + 1, y)
+                        bDib1(myx + 2, x) = bDib(oldx + 2, y)
                         oldx = oldx + 3
-       Next X
+       Next x
        myx = myx + 3
-    Next Y
+    Next y
 Else
-  For Y = pih - 1 To 0 Step -1
+  For y = pih - 1 To 0 Step -1
     oldx = 0
-        For X = 0 To piw - 1
-                        bDib1(myx, X) = bDib(oldx, Y)
-                        bDib1(myx + 1, X) = bDib(oldx + 1, Y)
-                        bDib1(myx + 2, X) = bDib(oldx + 2, Y)
+        For x = 0 To piw - 1
+                        bDib1(myx, x) = bDib(oldx, y)
+                        bDib1(myx + 1, x) = bDib(oldx + 1, y)
+                        bDib1(myx + 2, x) = bDib(oldx + 2, y)
                         oldx = oldx + 3
-       Next X
+       Next x
        myx = myx + 3
-    Next Y
+    Next y
     End If
 
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
@@ -215,16 +236,16 @@ If cDIBbuffer1.create(pih, piw) Then
 cDIBbuffer1.GetDpiDIB cDibbuffer0
 cDIBbuffer1.Cls
 Dim bDib() As Byte, bDib1() As Byte
-Dim X As Long, Y As Long
+Dim x As Long, y As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
 On Error Resume Next
     With tSA
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLBound = 0
+        .Bounds(0).lLbound = 0
         .Bounds(0).cElements = cDibbuffer0.Height
-        .Bounds(1).lLBound = 0
+        .Bounds(1).lLbound = 0
         .Bounds(1).cElements = cDibbuffer0.BytesPerScanLine()
         .pvData = cDibbuffer0.DIBSectionBitsPtr
     End With
@@ -232,9 +253,9 @@ On Error Resume Next
     With tSA1
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLBound = 0
+        .Bounds(0).lLbound = 0
         .Bounds(0).cElements = cDIBbuffer1.Height
-        .Bounds(1).lLBound = 0
+        .Bounds(1).lLbound = 0
         .Bounds(1).cElements = cDIBbuffer1.BytesPerScanLine()
         .pvData = cDIBbuffer1.DIBSectionBitsPtr
     End With
@@ -246,29 +267,29 @@ Dim ttt As Long, TTC As Long
 
 ttt = 1 + 100000 / piw
 If MEDOEV Then
-    For Y = pih - 1 To 0 Step -1
+    For y = pih - 1 To 0 Step -1
     oldx = piw * 3 - 3
       TTC = TTC - 1
     If TTC = 0 Then DoEvents: TTC = ttt
-        For X = 0 To piw - 1
-                        bDib1(myx, X) = bDib(oldx, Y)
-                        bDib1(myx + 1, X) = bDib(oldx + 1, Y)
-                        bDib1(myx + 2, X) = bDib(oldx + 2, Y)
+        For x = 0 To piw - 1
+                        bDib1(myx, x) = bDib(oldx, y)
+                        bDib1(myx + 1, x) = bDib(oldx + 1, y)
+                        bDib1(myx + 2, x) = bDib(oldx + 2, y)
                         oldx = oldx - 3
-       Next X
+       Next x
        myx = myx - 3
-    Next Y
+    Next y
        Else
-        For Y = pih - 1 To 0 Step -1
+        For y = pih - 1 To 0 Step -1
     oldx = piw * 3 - 3
-        For X = 0 To piw - 1
-                        bDib1(myx, X) = bDib(oldx, Y)
-                        bDib1(myx + 1, X) = bDib(oldx + 1, Y)
-                        bDib1(myx + 2, X) = bDib(oldx + 2, Y)
+        For x = 0 To piw - 1
+                        bDib1(myx, x) = bDib(oldx, y)
+                        bDib1(myx + 1, x) = bDib(oldx + 1, y)
+                        bDib1(myx + 2, x) = bDib(oldx + 2, y)
                         oldx = oldx - 3
-       Next X
+       Next x
        myx = myx - 3
-    Next Y
+    Next y
     End If
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
     CopyMemory ByVal VarPtrArray(bDib1), 0&, 4
@@ -292,16 +313,16 @@ If cDibbuffer0.hDib = 0 Then Exit Function
  cDIBbuffer1.GetDpiDIB cDibbuffer0
 
 Dim bDib() As Byte, bDib1() As Byte
-Dim X As Long, Y As Long
+Dim x As Long, y As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
 On Error Resume Next
     With tSA
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLBound = 0
+        .Bounds(0).lLbound = 0
         .Bounds(0).cElements = cDibbuffer0.Height
-        .Bounds(1).lLBound = 0
+        .Bounds(1).lLbound = 0
         .Bounds(1).cElements = cDibbuffer0.BytesPerScanLine()
         .pvData = cDibbuffer0.DIBSectionBitsPtr
     End With
@@ -309,9 +330,9 @@ On Error Resume Next
     With tSA1
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLBound = 0
+        .Bounds(0).lLbound = 0
         .Bounds(0).cElements = cDIBbuffer1.Height
-        .Bounds(1).lLBound = 0
+        .Bounds(1).lLbound = 0
         .Bounds(1).cElements = cDIBbuffer1.BytesPerScanLine()
         .pvData = cDIBbuffer1.DIBSectionBitsPtr
     End With
@@ -324,35 +345,35 @@ Dim ttt As Long, TTC As Long
 
 ttt = 1 + 100000 / piw
 If MEDOEV Then
-    For Y = 0 To pih - 1
+    For y = 0 To pih - 1
   myx = oldx - 3
   oldx = 0
       TTC = TTC - 1
     If TTC = 0 Then DoEvents: TTC = ttt
-        For X = 0 To piw - 1
-                        bDib1(myx, oldy) = bDib(oldx, Y)
-                        bDib1(myx + 1, oldy) = bDib(oldx + 1, Y)
-                        bDib1(myx + 2, oldy) = bDib(oldx + 2, Y)
+        For x = 0 To piw - 1
+                        bDib1(myx, oldy) = bDib(oldx, y)
+                        bDib1(myx + 1, oldy) = bDib(oldx + 1, y)
+                        bDib1(myx + 2, oldy) = bDib(oldx + 2, y)
                         myx = myx - 3
                         oldx = oldx + 3
-       Next X
+       Next x
        oldy = oldy - 1
        myx = myx + 3
-    Next Y
+    Next y
 Else
-    For Y = 0 To pih - 1
+    For y = 0 To pih - 1
   myx = oldx - 3
   oldx = 0
-        For X = 0 To piw - 1
-                        bDib1(myx, oldy) = bDib(oldx, Y)
-                        bDib1(myx + 1, oldy) = bDib(oldx + 1, Y)
-                        bDib1(myx + 2, oldy) = bDib(oldx + 2, Y)
+        For x = 0 To piw - 1
+                        bDib1(myx, oldy) = bDib(oldx, y)
+                        bDib1(myx + 1, oldy) = bDib(oldx + 1, y)
+                        bDib1(myx + 2, oldy) = bDib(oldx + 2, y)
                         myx = myx - 3
                         oldx = oldx + 3
-       Next X
+       Next x
        oldy = oldy - 1
        myx = myx + 3
-    Next Y
+    Next y
     End If
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
     CopyMemory ByVal VarPtrArray(bDib1), 0&, 4

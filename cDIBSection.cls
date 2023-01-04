@@ -24,7 +24,7 @@ Private Declare Function DrawState Lib "user32" Alias "DrawStateA" _
         ByVal lParam As Long, _
         ByVal wParam As Long, _
         ByVal X As Long, _
-        ByVal Y As Long, _
+        ByVal y As Long, _
         ByVal cx As Long, _
         ByVal cy As Long, _
         ByVal fuFlags As Long) As Long
@@ -61,12 +61,12 @@ Public Event Progress(ByVal lPosition As Long)
 Public Event Complete(ByVal lTimeMs As Long)
 Const PS_NULL = 5
 Const PS_SOLID = 0
-Private Declare Function LineTo Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long) As Long
-Private Declare Function MoveToEx Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long, lpPoint As POINTAPI) As Long
+Private Declare Function LineTo Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long) As Long
+Private Declare Function MoveToEx Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long, lpPoint As POINTAPI) As Long
 Private Declare Function SetBrushOrgEx Lib "gdi32" (ByVal hDC As Long, ByVal nXOrg As Long, ByVal nYOrg As Long, ByVal lppt As Long) As Long
 Private Type POINTAPI
         X As Long
-        Y As Long
+        y As Long
 End Type
 
 Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long) As Long
@@ -170,13 +170,13 @@ Private Declare Function CreateDIBSection Lib "gdi32" _
 
 Private Declare Function SetDIBColorTable Lib "gdi32" (ByVal hDC As Long, ByVal un1 As Long, ByVal un2 As Long, pcRGBQuad As RGBQUAD) As Long
 
-Private Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
-Private Declare Function StretchDIBits Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long, ByVal dX As Long, ByVal dY As Long, ByVal srcX As Long, ByVal srcY As Long, ByVal wSrcWidth As Long, ByVal wSrcHeight As Long, lpBits As Any, lpBitsInfo As Any, ByVal wUsage As Long, ByVal dwRop As Long) As Long
+Private Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Private Declare Function StretchDIBits Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long, ByVal dX As Long, ByVal dY As Long, ByVal srcX As Long, ByVal srcY As Long, ByVal wSrcWidth As Long, ByVal wSrcHeight As Long, lpBits As Any, lpBitsInfo As Any, ByVal wUsage As Long, ByVal dwRop As Long) As Long
 Private Declare Function SetStretchBltMode Lib "gdi32" (ByVal hDC As Long, ByVal nStretchMode As Long) As Long
 Private Const COLORONCOLOR = 3
 Private Const HALFTONE = 4
 
-Private Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
+Private Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 'Private Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) As Long
@@ -278,7 +278,7 @@ Private Type PicBmp
     Type As Long
     hBmp As Long
     hPal As Long
-    reserved As Long
+    Reserved As Long
     End Type
 Private Declare Function GlobalHandle Lib "kernel32" (wMem As Any) As Long
 
@@ -820,19 +820,19 @@ Public Sub StretchPicture( _
     If (lSrcWidth = -1) Then lSrcWidth = m_tBI.bmiHeader.biWidth
     If (lSrcHeight = -1) Then lSrcHeight = m_tBI.bmiHeader.biHeight
 Dim PrevStretchMode As Long
-    Dim d As Long
+    Dim D As Long
 needHDC
   PrevStretchMode = SetStretchBltMode(lHDC, COLORONCOLOR) 'coloroncolor
   If PrevStretchMode Then
   If SetBrushOrgEx(lHDC, 0, 0, (0)) Then
   If ratio = 1 Then
-  d = StretchDIBits(lHDC, lDestLeft / m_logx, lDestTop / m_logy, lDestWidth / m_logx, lDestHeight / m_logy, lSrcLeft, lSrcTop, lSrcWidth, lSrcHeight, ByVal m_lPtr, m_tBI, DIB_RGB_COLORS, eRop)
+  D = StretchDIBits(lHDC, lDestLeft / m_logx, lDestTop / m_logy, lDestWidth / m_logx, lDestHeight / m_logy, lSrcLeft, lSrcTop, lSrcWidth, lSrcHeight, ByVal m_lPtr, m_tBI, DIB_RGB_COLORS, eRop)
 
   ElseIf ratio > 1 Then
-  d = StretchDIBits(lHDC, lDestLeft / m_logx, lDestTop / m_logy, lDestWidth / m_logx, lDestHeight / m_logy, lSrcLeft + (lSrcWidth - lSrcWidth / ratio) / 2, lSrcTop, lSrcWidth / ratio, lSrcHeight, ByVal m_lPtr, m_tBI, DIB_RGB_COLORS, eRop)
+  D = StretchDIBits(lHDC, lDestLeft / m_logx, lDestTop / m_logy, lDestWidth / m_logx, lDestHeight / m_logy, lSrcLeft + (lSrcWidth - lSrcWidth / ratio) / 2, lSrcTop, lSrcWidth / ratio, lSrcHeight, ByVal m_lPtr, m_tBI, DIB_RGB_COLORS, eRop)
   
   Else
-    d = StretchDIBits(lHDC, lDestLeft / m_logx, lDestTop / m_logy, lDestWidth / m_logx, lDestHeight / m_logy, lSrcLeft, lSrcTop + (lSrcHeight - lSrcHeight * ratio) / 2, lSrcWidth, lSrcHeight * ratio, ByVal m_lPtr, m_tBI, DIB_RGB_COLORS, eRop)
+    D = StretchDIBits(lHDC, lDestLeft / m_logx, lDestTop / m_logy, lDestWidth / m_logx, lDestHeight / m_logy, lSrcLeft, lSrcTop + (lSrcHeight - lSrcHeight * ratio) / 2, lSrcWidth, lSrcHeight * ratio, ByVal m_lPtr, m_tBI, DIB_RGB_COLORS, eRop)
   End If
     SetBrushOrgEx lHDC, 0, 0, (0)
     End If
@@ -859,19 +859,19 @@ Public Sub StretchPictureH( _
     If (lSrcWidth = -1) Then lSrcWidth = m_tBI.bmiHeader.biWidth
     If (lSrcHeight = -1) Then lSrcHeight = m_tBI.bmiHeader.biHeight
 Dim PrevStretchMode As Long
-    Dim d As Long
+    Dim D As Long
 needHDC
   PrevStretchMode = SetStretchBltMode(lHDC, HALFTONE)
   If PrevStretchMode Then
 If SetBrushOrgEx(m_hDC, 0, 0, (0)) Then
   If ratio = 1 Then
-  d = StretchDIBits(lHDC, lDestLeft / m_logx, lDestTop / m_logy, lDestWidth / m_logx, lDestHeight / m_logy, lSrcLeft, lSrcTop, lSrcWidth, lSrcHeight, ByVal m_lPtr, m_tBI, DIB_RGB_COLORS, eRop)
+  D = StretchDIBits(lHDC, lDestLeft / m_logx, lDestTop / m_logy, lDestWidth / m_logx, lDestHeight / m_logy, lSrcLeft, lSrcTop, lSrcWidth, lSrcHeight, ByVal m_lPtr, m_tBI, DIB_RGB_COLORS, eRop)
 
   ElseIf ratio > 1 Then
-  d = StretchDIBits(lHDC, lDestLeft / m_logx, lDestTop / m_logy, lDestWidth / m_logx, lDestHeight / m_logy, lSrcLeft + (lSrcWidth - lSrcWidth / ratio) / 2, lSrcTop, lSrcWidth / ratio, lSrcHeight, ByVal m_lPtr, m_tBI, DIB_RGB_COLORS, eRop)
+  D = StretchDIBits(lHDC, lDestLeft / m_logx, lDestTop / m_logy, lDestWidth / m_logx, lDestHeight / m_logy, lSrcLeft + (lSrcWidth - lSrcWidth / ratio) / 2, lSrcTop, lSrcWidth / ratio, lSrcHeight, ByVal m_lPtr, m_tBI, DIB_RGB_COLORS, eRop)
   
   Else
-    d = StretchDIBits(lHDC, lDestLeft / m_logx, lDestTop / m_logy, lDestWidth / m_logx, lDestHeight / m_logy, lSrcLeft, lSrcTop + (lSrcHeight - lSrcHeight * ratio) / 2, lSrcWidth, lSrcHeight * ratio, ByVal m_lPtr, m_tBI, DIB_RGB_COLORS, eRop)
+    D = StretchDIBits(lHDC, lDestLeft / m_logx, lDestTop / m_logy, lDestWidth / m_logx, lDestHeight / m_logy, lSrcLeft, lSrcTop + (lSrcHeight - lSrcHeight * ratio) / 2, lSrcWidth, lSrcHeight * ratio, ByVal m_lPtr, m_tBI, DIB_RGB_COLORS, eRop)
     End If
     SetBrushOrgEx lHDC, 0, 0, (0)
     End If
@@ -891,7 +891,7 @@ Public Sub RandomiseBits( _
         Optional ByVal bGray As Boolean = False _
     )
 Dim bDib() As Byte
-Dim X As Long, Y As Long, z As Long
+Dim X As Long, y As Long, z As Long
 Dim lc As Long
 Dim tSA As SAFEARRAY2D
 Dim xend As Long
@@ -915,23 +915,23 @@ If mStep > 3 Then cStep = 3 Else cStep = mStep
     
     xend = (Width - 1) * mStep
     If (bGray) Then
-        For Y = 0 To m_tBI.bmiHeader.biHeight - 1
+        For y = 0 To m_tBI.bmiHeader.biHeight - 1
             For X = 0 To xend Step mStep
                 lc = Rnd * 255
                 For z = 0 To cStep
-                bDib(X + z, Y) = lc
+                bDib(X + z, y) = lc
                 Next z
             Next X
-        Next Y
+        Next y
     Else
         For X = 0 To xend Step mStep
-            For Y = 0 To m_tBI.bmiHeader.biHeight - 1
+            For y = 0 To m_tBI.bmiHeader.biHeight - 1
             
-                bDib(X, Y) = 0
+                bDib(X, y) = 0
                 For z = 1 To cStep
-                bDib(X + 1, Y) = Rnd * 255
+                bDib(X + 1, y) = Rnd * 255
                 Next z
-            Next Y
+            Next y
         Next X
     End If
     
@@ -1037,7 +1037,7 @@ c = a: a = b: b = c
 End Sub
 
 Public Sub ThumbnailPaint(DestPic As Object, Optional ByVal zf As Single = -1, Optional ByVal FitToPic As Boolean = True, Optional CROP As Boolean = False, Optional over As Boolean = False, Optional ByVal fr As Long = 0, Optional ByVal offsetX As Long = 0, Optional ByVal offsetY As Long, Optional ByVal Border As Long = 0, Optional ByVal rtxy As Double = 1#)
-   Dim oldSc As Long, Dummy1 As Boolean, dummy2 As Boolean, sw As Long, sh As Long
+   Dim oldSc As Long, Dummy1 As Boolean, Dummy2 As Boolean, sw As Long, sh As Long
    Dim swProbe As Long, shProbe As Long, osh As Double
    Dim Myleft As Long, mytop As Long, mywidth As Long, myheight As Long
    
@@ -1161,7 +1161,7 @@ Property Get PrinterOn()
     PrinterOn = OpenPrinter
 End Property
 Public Sub ThumbnailPaintPrinter(copiesNUM As Long, Optional ByVal zf As Single = -1, Optional ByVal FitToPic As Boolean = True, Optional CROP As Boolean = False, Optional over As Boolean = False, Optional ByVal fr As Long = 0, Optional ByVal offsetX As Long = 0, Optional ByVal offsetY As Long, Optional ByVal Border As Long = 0, Optional ByVal rtxy As Double = 1#, Optional pname As String = vbNullString)
-   Dim oldSc As Long, Dummy1 As Boolean, dummy2 As Boolean, sw As Long, sh As Long
+   Dim oldSc As Long, Dummy1 As Boolean, Dummy2 As Boolean, sw As Long, sh As Long
    Dim swProbe As Long, shProbe As Long, osh As Double
    Dim Myleft As Long, mytop As Long, mywidth As Long, myheight As Long
    Dim lox As Long, loy As Long
@@ -1284,7 +1284,7 @@ sh = sh * m_logy
 End Sub
 
 Public Sub ThumbnailPaintDummy(DestPic As Object, Optional ByVal zf As Single = -1, Optional ByVal FitToPic As Boolean = True, Optional CROP As Boolean = False, Optional over As Boolean = False, Optional ByVal fr As Long = 0, Optional ByVal offsetX As Long = 0, Optional ByVal offsetY As Long, Optional ByVal Border As Long = 0, Optional ByVal rtxy As Double = 1#)
-   Dim oldSc As Long, Dummy1 As Boolean, dummy2 As Boolean, sw As Long, sh As Long
+   Dim oldSc As Long, Dummy1 As Boolean, Dummy2 As Boolean, sw As Long, sh As Long
    Dim swProbe As Long, shProbe As Long, osh As Double
    Dim Myleft As Long, mytop As Long, mywidth As Long, myheight As Long
    
@@ -1383,7 +1383,7 @@ If zf <= 0 Then
     ' gdiflush
 End Sub
 Public Sub ThumbnailPaintDummyOLD(DestPic As Object, Optional ByVal zf As Single = -1, Optional ByVal FitToPic As Boolean = True, Optional CROP As Boolean = False, Optional over As Boolean = False, Optional ByVal fr As Long = 0, Optional ByVal offsetX As Long = 0, Optional ByVal offsetY As Long, Optional ByVal Border As Long = 0)
-   Dim oldSc As Long, Dummy1 As Boolean, dummy2 As Boolean, sw As Long, sh As Long
+   Dim oldSc As Long, Dummy1 As Boolean, Dummy2 As Boolean, sw As Long, sh As Long
    Dim swProbe As Long, shProbe As Long, osh As Double
    Dim Myleft As Long, mytop As Long, mywidth As Long, myheight As Long
      Dim a As Single
@@ -1646,7 +1646,7 @@ If Me.Height > 0 Then
 End If
 
 End Sub
-Public Sub Text(p$, X As Long, Y As Long, Optional s As Single = -1, Optional DE# = 0#, Optional Style As Long = 272, Optional mWidth As Long = -1, Optional expnd As Single = -1)
+Public Sub Text(p$, X As Long, y As Long, Optional s As Single = -1, Optional DE# = 0#, Optional Style As Long = 272, Optional mWidth As Long = -1, Optional expnd As Single = -1)
 Dim old_brush As Long, old_pen As Long, my_brush As Long, my_pen As Long, ra As Long
 Dim f As LOGFONT, hPrevFont As Long, hFont As Long
 Dim fff As Long, dr1 As RECT
@@ -1687,7 +1687,7 @@ Else
   hPrevFont = SelectObject(m_hDC, hFont)
 
 With dr1
-.top = Y
+.top = y
 .Left = X
 If mWidth = -1 Then
 .Right = X + Width
@@ -1695,7 +1695,7 @@ Else
 .Right = mWidth
 
 End If
-.Bottom = Y + Height
+.Bottom = y + Height
 End With
 fff = Style '(256 + 16) Or DT_NOPREFIX
 
@@ -1716,7 +1716,7 @@ hFont = SelectObject(m_hDC, hPrevFont)
 
 FreeHDC
 End Sub
-Public Sub TextW(p$, X As Long, Y As Long, x1 As Long, y1 As Long, Optional s As Single = -1, Optional DE# = 0#, Optional Style As Long = 272)
+Public Sub TextW(p$, X As Long, y As Long, x1 As Long, y1 As Long, Optional s As Single = -1, Optional DE# = 0#, Optional Style As Long = 272)
 Dim old_brush As Long, old_pen As Long, my_brush As Long, my_pen As Long, ra As Long
 Dim f As LOGFONT, hPrevFont As Long, hFont As Long
 Dim fff As Long, dr1 As RECT, expnd As Long
@@ -1757,7 +1757,7 @@ Else
   hPrevFont = SelectObject(m_hDC, hFont)
 
 With dr1
-.top = Y
+.top = y
 .Left = X
 .Right = x1
 .Bottom = y1
@@ -1780,13 +1780,13 @@ FreeHDC
 
 End Sub
 
-Public Sub kiklos(Radius As Long, X As Long, Y As Long)  ' circle
+Public Sub kiklos(Radius As Long, X As Long, y As Long)  ' circle
 '
 Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long
 x1 = X - Radius
-y1 = Y - Radius
+y1 = y - Radius
 x2 = X + Radius
-y2 = Y + Radius
+y2 = y + Radius
 
 Dim old_brush As Long, old_pen As Long, my_brush As Long, my_pen As Long, ra As Long
 
@@ -2049,18 +2049,21 @@ Const emff = 24.9428571428571
 
 Dim my_brush As Long
 create picthis.Width * 0.567 / DXP, picthis.Height * 0.567 / DYP
-
+Me.ClearBits m_BackColor
 needHDC
+
 my_brush = CreateSolidBrush(m_BackColor)
-DrawIconEx HDC1, 0, 0, picthis, 0, 0, 0, my_brush, DI_IMAGE
+'DrawIconEx HDC1, 0, 0, picthis, 48, 48, 0, my_brush, &H3 ' DI_MASK
+
 If IsWine Then
 ' THIS DRAW  INVERt PIXELS AS TRANSPARENT
-DrawState HDC1, 0, 0, picthis.Handle, 0, 0, 0, 0, 0, &H3
+DrawIconEx HDC1, 0, 0, picthis, 48, 48, 0, my_brush, DI_IMAGE
+DrawState HDC1, 0, 0, picthis.Handle, 48, 48, 0, 0, 0, DI_IMAGE & DI_MASK
 Else
 ' THIS CONVERT INVERT PIXELS TO BLACK
 DrawState HDC1, 0, 0, picthis.Handle, 0, 0, 0, 0, 0, &H83
-DrawState HDC1, 0, 0, picthis.Handle, 0, 0, 0, 0, 0, &H3
-DrawState HDC1, 0, 0, picthis.Handle, 0, 0, 0, 0, 0, &H3
+DrawState HDC1, my_brush, 0, picthis.Handle, 0, 0, 0, 0, 0, &H3
+DrawState HDC1, my_brush, 0, picthis.Handle, 0, 0, 0, 0, 0, &H3
 End If
 
 DeleteObject my_brush
@@ -2360,7 +2363,7 @@ once = False
 End Sub
 
 Public Sub ThumbnailPaintdib(DestPic As cDIBSection, Optional ByVal zf As Single = -1, Optional ByVal FitToPic As Boolean = True, Optional CROP As Boolean = False, Optional over As Boolean = False, Optional ByVal fr As Long = 0, Optional ByVal offsetX As Long = 0, Optional ByVal offsetY As Long, Optional ByVal Border As Long = 0, Optional ByVal rtxy As Double = 1#)
-   Dim oldSc As Long, Dummy1 As Boolean, dummy2 As Boolean, sw As Long, sh As Long
+   Dim oldSc As Long, Dummy1 As Boolean, Dummy2 As Boolean, sw As Long, sh As Long
    Dim swProbe As Long, shProbe As Long, osh As Double
    Dim Myleft As Long, mytop As Long, mywidth As Long, myheight As Long
    If Width = 0 Then GoTo tp1

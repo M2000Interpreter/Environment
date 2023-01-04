@@ -1,17 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 12 active-X
-This is the first revision of Version 12.
-This version an advanced expression evaluator, similar to VB6. Now -2^2 return -4, (Vesion 11 and lower works like Excel, so 0-2^2 return -4 but -2^2 return 4).
-Also has an advanced system for error control.
-We may have strings with id names like numeric.we can define like this a="string". Some work needed for checking all embeded functions.
-So Mid$(a$,1,3) works with names as numeric variables Mid$(a, 2, 3).
-There is a new type, the Variant. So we can use local variables which may change type. This needed for passing by reference for invoking methods for external objects, which have by reference Variant. (old versions, use variants but for by reference call pass the type, so there was nothing from interpreter to know if a variable (which was a variant) can pass as variant or as the type. So now Interpreter having the type Variant, knows that the by reference pass have type Variant.
-
-
-
-This isn't a finished version, although I do a lot of debugging.
-
+Version 12 Revision 1 active-X
+A beta version of 12 (not tested a lot)
 
 
 George Karras, Kallithea Attikis, Greece.

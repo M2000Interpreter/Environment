@@ -20,7 +20,7 @@ Private Declare Function GetKeyboardState Lib "user32" (kbArray As KeyboardBytes
 Dim kbArray As KeyboardBytes
 Public fonttest As PictureBox
 Private Declare Function GetTextMetrics Lib "gdi32" _
-Alias "GetTextMetricsA" (ByVal hdc As Long, _
+Alias "GetTextMetricsA" (ByVal hDC As Long, _
 lpMetrics As TEXTMETRIC) As Long
 Private Type TEXTMETRIC
 tmHeight As Long
@@ -108,7 +108,7 @@ Public Type tagSize
     cx As Long
     cy As Long
 End Type
-Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hdc As Long, lpAspectRatio As tagSize) As Long
+Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hDC As Long, lpAspectRatio As tagSize) As Long
 Declare Function CreateRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Declare Function CombineRgn Lib "gdi32" (ByVal hDestRgn As Long, ByVal hSrcRgn1 As Long, ByVal hSrcRgn2 As Long, ByVal nCombineMode As Long) As Long
 Public Declare Function SetWindowRgn Lib "user32" (ByVal hWnd As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
@@ -141,7 +141,7 @@ Private Type SAFEARRAY2D
 End Type
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
 
-Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
+Private Declare Function timeGetTime Lib "Kernel32.dll" Alias "GetTickCount" () As Long
 
 Type Bitmap
         bmType As Long
@@ -152,20 +152,20 @@ Type Bitmap
         bmBitsPixel As Integer
         bmBits As Long
 End Type
-Declare Function StretchBlt Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
-Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hdc As Long) As Long
-Declare Function SelectObject Lib "gdi32" (ByVal hdc As Long, ByVal hObject As Long) As Long
-Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) As Long
+Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hDC As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
+Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
+Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
 Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
+Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 'Declare Function GetObject Lib "gdi32" Alias "GetObjectA" (ByVal hObject As Long, ByVal nCount As Long, lpObject As Any) As Long
-Declare Function GetPixel Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long) As Long
-Declare Function SetPixel Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal crColor As Long) As Long
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal nIndex As Long) As Long
+Declare Function GetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long) As Long
+Declare Function SetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function GetDesktopWindow Lib "user32" () As Long
-Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hdc As Long) As Long
+Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long) As Long
 Private Const BITSPIXEL = 12         '  Number of bits per pixel
 Private Declare Function RegisterClipboardFormat Lib "user32" Alias _
    "RegisterClipboardFormatA" (ByVal lpString As String) As Long
@@ -346,7 +346,7 @@ Public Function cInt64(v As Variant) As Variant
     Dim DecHdr As Dec_Hdr, m As Long
     On Error GoTo er111
     cInt64 = CDec(v)
-     If vartype(v) = vbString Then
+     If VarType(v) = vbString Then
         If InStr(1, v, "&h", vbTextCompare) = 1 Then
             Do
                 m = Len(v)
@@ -365,10 +365,10 @@ Public Function cInt64(v As Variant) As Variant
     cInt64 = Fix(cInt64)
     End If
     GetMem4 VarPtr(cInt64) + 12, m
-    If vartype(v) = vbString Then If m < 0 And Len(v) <= 10 Then GoTo er111
+    If VarType(v) = vbString Then If m < 0 And Len(v) <= 10 Then GoTo er111
     PutMem4 VarPtr(cInt64), VT_I8
     If (DecHdr.DecSign <> 0) And (cInt64 > 0) Then cInt64 = -cInt64
-    If (vartype(cInt64) <> VT_I8) Then Err.Raise 6
+    If (VarType(cInt64) <> VT_I8) Then Err.Raise 6
     Exit Function
 er111:
      Err.Raise Err.Number
@@ -612,22 +612,22 @@ Else
     Set CDib2Pic = emptypic
 End If
 End Function
-Public Function SetDIBPixel(ssdib As Variant, ByVal X As Long, ByVal Y As Long, aColor As Long) As Double
+Public Function SetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long, aColor As Long) As Double
 Dim W As Long, H As Long, bpl As Long, rgb(2) As Byte
 W = val("&H" & Mid$(ssdib, 5, 4))
 H = val("&H" & Mid$(ssdib, 9, 4))
 If Len(ssdib) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
 If W * H <> 0 Then
 bpl = (LenB(ssdib) - 24) \ H
-W = (W - X - 1) Mod W
-H = (Y Mod H) * bpl + W * 3 + 24
+W = (W - x - 1) Mod W
+H = (y Mod H) * bpl + W * 3 + 24
 CopyMemory rgb(0), ByVal StrPtr(ssdib) + H, 3
 
 SetDIBPixel = -(rgb(2) * 256# * 256# + rgb(1) * 256# + rgb(0))
 CopyMemory ByVal StrPtr(ssdib) + H, aColor, 3
 End If
 End Function
-Public Function GetDIBPixel(ssdib As Variant, ByVal X As Long, ByVal Y As Long) As Double
+Public Function GetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long) As Double
 Dim W As Long, H As Long, bpl As Long, rgb(2) As Byte
 'a = ssdib$
 W = val("&H" & Mid$(ssdib, 5, 4))
@@ -635,9 +635,9 @@ H = val("&H" & Mid$(ssdib, 9, 4))
 If Len(ssdib) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
 If W * H <> 0 Then
 bpl = (LenB(ssdib) - 24) \ H   ' Len(ssdib$) 2 bytes per char
-W = (W - X - 1) Mod W
+W = (W - x - 1) Mod W
 
-H = (Y Mod H) * bpl + W * 3 + 24
+H = (y Mod H) * bpl + W * 3 + 24
 
 
 CopyMemory rgb(0), ByVal StrPtr(ssdib) + H, 3
@@ -782,7 +782,7 @@ cDibbuffer0.Cls bckColor
 
 there:
 Dim bDib2() As Byte, bDib1() As Byte
-Dim X As Long, Y As Long
+Dim x As Long, y As Long
 Dim lc As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
@@ -902,7 +902,7 @@ End Function
 
 Public Function Merge3Dib(backdib As cDIBSection, maskdib As cDIBSection, frontdib As cDIBSection, Optional Reverse As Boolean = False)
 
-Dim X As Long, Y As Long
+Dim x As Long, y As Long
 
 Dim xmax As Long, yMax As Long
     yMax = backdib.Height - 1
@@ -948,21 +948,21 @@ Dim tSA2 As SAFEARRAY2D
         '-----------------------------------------------
         If Reverse Then
         
-    For X = 0 To (xmax * 3) Step 3
-        For Y = yMax To 0 Step -1
-            bDib(X, Y) = (CLng(bDib(X, Y)) * bDib1(X, Y) + CLng(bDib2(X, Y)) * (255 - bDib1(X, Y))) \ 256
-            bDib(X + 1, Y) = (CLng(bDib(X + 1, Y)) * bDib1(X + 1, Y) + CLng(bDib2(X + 1, Y)) * (255 - bDib1(X + 1, Y))) \ 256
-            bDib(X + 2, Y) = (CLng(bDib(X + 2, Y)) * bDib1(X + 2, Y) + CLng(bDib2(X + 2, Y)) * (255 - bDib1(X + 2, Y))) \ 256
-        Next Y
-        Next X
+    For x = 0 To (xmax * 3) Step 3
+        For y = yMax To 0 Step -1
+            bDib(x, y) = (CLng(bDib(x, y)) * bDib1(x, y) + CLng(bDib2(x, y)) * (255 - bDib1(x, y))) \ 256
+            bDib(x + 1, y) = (CLng(bDib(x + 1, y)) * bDib1(x + 1, y) + CLng(bDib2(x + 1, y)) * (255 - bDib1(x + 1, y))) \ 256
+            bDib(x + 2, y) = (CLng(bDib(x + 2, y)) * bDib1(x + 2, y) + CLng(bDib2(x + 2, y)) * (255 - bDib1(x + 2, y))) \ 256
+        Next y
+        Next x
         Else
-     For X = 0 To (xmax * 3) Step 3
-        For Y = yMax To 0 Step -1
-            bDib(X, Y) = (CLng(bDib2(X, Y)) * bDib1(X, Y) + CLng(bDib(X, Y)) * (255 - bDib1(X, Y))) \ 256
-            bDib(X + 1, Y) = (CLng(bDib2(X + 1, Y)) * bDib1(X + 1, Y) + CLng(bDib(X + 1, Y)) * (255 - bDib1(X + 1, Y))) \ 256
-            bDib(X + 2, Y) = (CLng(bDib2(X + 2, Y)) * bDib1(X + 2, Y) + CLng(bDib(X + 2, Y)) * (255 - bDib1(X + 2, Y))) \ 256
-        Next Y
-        Next X
+     For x = 0 To (xmax * 3) Step 3
+        For y = yMax To 0 Step -1
+            bDib(x, y) = (CLng(bDib2(x, y)) * bDib1(x, y) + CLng(bDib(x, y)) * (255 - bDib1(x, y))) \ 256
+            bDib(x + 1, y) = (CLng(bDib2(x + 1, y)) * bDib1(x + 1, y) + CLng(bDib(x + 1, y)) * (255 - bDib1(x + 1, y))) \ 256
+            bDib(x + 2, y) = (CLng(bDib2(x + 2, y)) * bDib1(x + 2, y) + CLng(bDib(x + 2, y)) * (255 - bDib1(x + 2, y))) \ 256
+        Next y
+        Next x
         End If
 
    '-----------------------------------------------
@@ -1225,9 +1225,9 @@ If cDibbuffer0.create(myw, myh) Then
 On Error GoTo there
         With bstack.Owner
          If bstack.toprinter Then
-         cDibbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+         cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
          Else
-        cDibbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
             End If
             BACKSPRITE = DIBtoSTR(cDibbuffer0)
         End With
@@ -1308,9 +1308,9 @@ On Error GoTo there
    
 With bstack.Owner
     If bstack.toprinter Then
-        cDibbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
     Else
-        cDibbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
     End If
     If Not nogetback Then BACKSPRITE = DIBtoSTR(cDibbuffer0)
 End With
@@ -1508,9 +1508,9 @@ cDibbuffer0.Cls bckColor
 Else
         With bstack.Owner
         If bstack.toprinter Then
-        cDibbuffer0.LoadPictureBlt .hdc, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
+        cDibbuffer0.LoadPictureBlt .hDC, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
         Else
-                      cDibbuffer0.LoadPictureBlt .hdc, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
+                      cDibbuffer0.LoadPictureBlt .hDC, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
            End If
         End With
         End If
@@ -1634,7 +1634,7 @@ Sub Conv24(cDibbuffer0 As Object)
  Dim cDIBbuffer1 As Object
  Set cDIBbuffer1 = New cDIBSection
 Call cDIBbuffer1.create(cDibbuffer0.Width, cDibbuffer0.Height)
-cDIBbuffer1.LoadPictureBlt cDibbuffer0.hdc
+cDIBbuffer1.LoadPictureBlt cDibbuffer0.hDC
 Set cDibbuffer0 = cDIBbuffer1
 Set cDIBbuffer1 = Nothing
 End Sub
@@ -1761,8 +1761,8 @@ With Form1.dSprite(PobjNum)
 .Picture = photo.Picture(SZ)
 
 
-players(PobjNum).X = .Width / 2
-players(PobjNum).Y = .Height / 2
+players(PobjNum).x = .Width / 2
+players(PobjNum).y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, 0)
 
 .Tag = Priority
@@ -1784,8 +1784,8 @@ End With
 
 GetNewSpriteObj = PobjNum
 With players(PobjNum)
-.MAXXGRAPH = .X * 2
-.MAXYGRAPH = .Y * 2
+.MAXXGRAPH = .x * 2
+.MAXYGRAPH = .y * 2
 .hRgn = True
 End With
 SetText Form1.dSprite(PobjNum)
@@ -1904,13 +1904,13 @@ If k < 1 Or k > PobjNum Then Exit Function
  PosSpriteY = Form1.dSprite(k).top
 End Function
 
-Sub PosSprite(aPrior As Long, ByVal X As Long, ByVal Y As Long) ' ' before take from priority the original sprite
+Sub PosSprite(aPrior As Long, ByVal x As Long, ByVal y As Long) ' ' before take from priority the original sprite
 Dim k As Long
 k = FindSpriteByTag(aPrior)
 If k < 1 Or k > PobjNum Then Exit Sub
  
 
-Form1.dSprite(k).move X, Y
+Form1.dSprite(k).move x, y
 
 End Sub
 Sub SrpiteHideShow(ByVal aPrior As Long, ByVal wh As Boolean) ' this is a priority
@@ -2056,10 +2056,10 @@ With Form1.dSprite(s)
 .Height = photo.Height * DYP * SZ
 .Width = photo.Width * DXP * SZ
 .Picture = photo.Picture(SZ)
-.Left = .Left + players(s).X - .Width / 2
-players(s).X = .Width / 2
-.top = .top + players(s).Y - .Height / 2
-players(s).Y = .Height / 2
+.Left = .Left + players(s).x - .Width / 2
+players(s).x = .Width / 2
+.top = .top + players(s).y - .Height / 2
+players(s).y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, True)
 ''''''''''''''''''''''''UpdateWindow .hwnd
  ''DeleteObject myRgn
@@ -2067,8 +2067,8 @@ Call SetWindowRgn(.hWnd, myRgn, True)
 End With
 With players(s)
 
-.MAXXGRAPH = .X * 2
-.MAXYGRAPH = .Y * 2
+.MAXXGRAPH = .x * 2
+.MAXYGRAPH = .y * 2
 End With
 SetText Form1.dSprite(s)
 End If
@@ -2086,7 +2086,7 @@ For i = PobjNum To 1 Step -1
         players(i) = Zero
         Prefresh(i) = zerocounter
         PobjNum = i
-If Form1.dSprite.Count > PobjNum Then Unload Form1.dSprite(PobjNum)
+If Form1.dSprite.count > PobjNum Then Unload Form1.dSprite(PobjNum)
 Next i
 PobjNum = 0
 
@@ -3486,7 +3486,7 @@ ValidNum = r1
 End Function
 
 Function ValidNumberOnly(a$, R As Variant, skipdec As Boolean) As Boolean
-If vartype(R) = vbString Then
+If VarType(R) = vbString Then
     R = CVar(0)
 Else
     R = R - R
@@ -3495,7 +3495,7 @@ ValidNumberOnly = IsNumberOnly(a$, (1), R, (0), skipdec)
 End Function
 Function ValidNumberOnlyClean(a$, R As Variant, skipdec As Boolean) As Long
 On Error Resume Next
-If vartype(R) = vbString Then
+If VarType(R) = vbString Then
     R = CVar(0)
 Else
     R = R - R
@@ -4795,7 +4795,7 @@ If Err.Number > 0 Then aSize = 12: fonttest.Font.size = aSize
 End Sub
 Public Function InternalLeadingSpace() As Long
 On Error Resume Next
-    GetTextMetrics fonttest.hdc, TM
+    GetTextMetrics fonttest.hDC, TM
   With TM
 InternalLeadingSpace = (.tmInternalLeading = 0) Or Not (.tmInternalLeading > 0)
 End With
@@ -4803,7 +4803,7 @@ End Function
 Public Function AverCharSpace(DDD As Object, Optional breakchar) As Long
 On Error Resume Next
 Dim tmm As TEXTMETRIC
-    GetTextMetrics DDD.hdc, tmm
+    GetTextMetrics DDD.hDC, tmm
   With tmm
 AverCharSpace = .tmAveCharWidth
 breakchar = .tmBreakChar
@@ -4933,30 +4933,30 @@ Public Function Keyboards(what) As String
 End Function
 
 Sub GetQrCode(basestack As basetask, a$, ab$)
-Dim ErrLevel As Long, X As Variant, QRcolor As Long, sq As Boolean
+Dim ErrLevel As Long, x As Variant, QRcolor As Long, sq As Boolean
 sq = True
 On Error Resume Next
 If FastSymbol(a$, ",") Then
-    If IsExp(basestack, a$, X, , True) Then
-        QRcolor = mycolor(X)
+    If IsExp(basestack, a$, x, , True) Then
+        QRcolor = mycolor(x)
     End If
 Else
     GoTo step2
 End If
 
 If FastSymbol(a$, ",") Then
-    If IsExp(basestack, a$, X, , True) Then
-        If X = 1 Then
+    If IsExp(basestack, a$, x, , True) Then
+        If x = 1 Then
             ErrLevel = 1
-        ElseIf X = 2 Then
+        ElseIf x = 2 Then
             ErrLevel = 2
-        ElseIf X = 3 Then
+        ElseIf x = 3 Then
             ErrLevel = 3
         End If
     End If
     If FastSymbol(a$, ",") Then
-    If IsExp(basestack, a$, X, , True) Then
-        If X = 0 Then sq = False
+    If IsExp(basestack, a$, x, , True) Then
+        If x = 0 Then sq = False
     End If
 End If
 
@@ -4983,6 +4983,6 @@ End Sub
 Sub TESTPARAM()
 Dim p
 p = "alfa"
-Debug.Print vartype(p)
+Debug.Print VarType(p)
 Debug.Print myVarType(p, vbString)
 End Sub

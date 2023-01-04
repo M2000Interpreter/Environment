@@ -44,7 +44,7 @@ Friend Function GetAppIcon() As StdPicture
 On Error Resume Next
 Dim k As StdPicture
 If IhaveExtForm Then
-GetAppIcon = UnPackData(ExtForm.GetAppIcon)
+Set GetAppIcon = UnPackData(ExtForm.GetAppIcon)
 End If
 End Function
 Private Function UnPackData(sData As String) As Object
@@ -141,9 +141,10 @@ Dim f As Form, i As Long, F1 As GuiM2000, nook As Long
 NERR = True: NOEXECUTION = True
 ExTarget = True: INK$ = Chr(27): UKEY$ = Chr$(27)
 If Cancel = -100 Then Exit Sub
-
-For i = Forms.Count - 1 To 0 Step -1
+Set Form3AppIcon = LoadPicture("")
+For i = Forms.count - 1 To 0 Step -1
 Set f = Forms(i)
+Set f.icon = LoadPicture("")
 If TypeOf f Is GuiM2000 Then
     Set F1 = f
     
@@ -164,14 +165,18 @@ If TypeOf f Is GuiM2000 Then
         
         End If
     End If
+
 End If
 If nook Then Cancel = True: Exit For
 Next i
+
 Set f = Nothing
+
 
 
 If Cancel Then Exit Sub
 End If
+
 byPassCallback = True
 NOEXECUTION = True
 If Cancel > 0 Then
@@ -192,8 +197,20 @@ MyDoEvents
     exWnd = 0
 
     End If
-'If form5iamloaded Then Unload Form5
+For i = Forms.count - 1 To 0 Step -1
+Set f = Forms(i)
+Unload f
+Next i
+Set f = Nothing
+
+If Not ExtForm Is Nothing Then
+
+ExtForm.Shutdown
+
 Set ExtForm = Nothing
+End If
+
+'If form5iamloaded Then Unload Form5
 Finished = True
 End Sub
 Public Sub AsyncCli(LoadFileAndSwitches$, Optional Prompt$ = ">")
@@ -320,58 +337,57 @@ DoEvents
 Sleep 5
 End If
 On Error Resume Next
-If Not ExtForm Is Nothing Then ExtForm.Shutdown
 Dim i As Long
 For i = UBound(var()) To 0 Step -1: var(i) = 0&: Next i
 Finished = True
 End Sub
 Property Let ShowGui(RHS As Boolean)
-If Forms.Count = 0 Then Exit Property
+If Forms.count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
 If Form1.top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).top
 Else
 If Form1.WindowState = 0 Then
-If Not (Forms.Count > 5) Then Form1.Visible = False
+If Not (Forms.count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
-Public Sub ExecuteStatement(ByVal code$)
+Public Sub ExecuteStatement(ByVal Code$)
 Dim what$, Pos As Long, func As Boolean, param$, drop$
-If IsLabelOnly(code$, what$) > 4 Then
+If IsLabelOnly(Code$, what$) > 4 Then
     func = True
 ElseIf what$ = vbNullString Then
     Exit Sub
-ElseIf LTrim$(code$) = vbNullString Then
+ElseIf LTrim$(Code$) = vbNullString Then
 ' one call
 Call Run(what$)
 Exit Sub
 End If
 Do
  Pos = 1
-  drop$ = aheadstatus(code$, True, Pos)
-  If drop$ = vbNullString And Pos > Len(code$) Then Exit Sub
+  drop$ = aheadstatus(Code$, True, Pos)
+  If drop$ = vbNullString And Pos > Len(Code$) Then Exit Sub
   If param$ <> "" Then
-  param$ = param$ + ", " + Left$(code$, Pos - 1)
+  param$ = param$ + ", " + Left$(Code$, Pos - 1)
   Else
-  param$ = Left$(code$, Pos - 1)
+  param$ = Left$(Code$, Pos - 1)
   End If
-  code$ = Mid$(code$, Pos)
-  Loop Until Not FastSymbol(code$, ",")
+  Code$ = Mid$(Code$, Pos)
+  Loop Until Not FastSymbol(Code$, ",")
   If func Then
   Call Run(what$ + " " + param$ + ")")
   Else
   Call Run(what$ + " " + param$)
   End If
 End Sub
-Public Function Eval(code$) As Variant
+Public Function Eval(Code$) As Variant
 Dim Pos As Long, p As Double, s As String, drop$
  Pos = 1
-  drop$ = aheadstatus(code$, True, Pos)
-  If drop$ = vbNullString And Pos > Len(code$) Then Exit Function
+  drop$ = aheadstatus(Code$, True, Pos)
+  If drop$ = vbNullString And Pos > Len(Code$) Then Exit Function
   If InStr(drop$, "N") Then
-  If IsExp(objref, Left$(code$, Pos), p) Then
+  If IsExp(objref, Left$(Code$, Pos), p) Then
   If Not objref.lastobj Is Nothing Then
   Set Eval = objref.lastobj
   
@@ -380,7 +396,7 @@ Dim Pos As Long, p As Double, s As String, drop$
    End If
   End If
   Else
-  If IsStrExp(objref, Left$(code$, Pos), s$) Then
+  If IsStrExp(objref, Left$(Code$, Pos), s$) Then
   If Not objref.lastobj Is Nothing Then
       Set Eval = objref.lastobj
   Else
@@ -390,11 +406,11 @@ Dim Pos As Long, p As Double, s As String, drop$
   End If
 Set objref.lastobj = Nothing
 End Function
-Public Sub AddExecCode(code$)
+Public Sub AddExecCode(Code$)
 If locked Then Exit Sub
-Call Run(code$, False)
+Call Run(Code$, False)
 End Sub
-Public Function Run(ByVal code$, Optional clean As Boolean = True) As Boolean
+Public Function Run(ByVal Code$, Optional clean As Boolean = True) As Boolean
 Dim ohere$, stay As Variant
 If elevatestatus Then Exit Function
 byPassCallback = False
@@ -412,7 +428,7 @@ Run = True
         LastErNum = 0: LastErNum1 = 0
         LastErName = vbNullString
         LastErNameGR = vbNullString
-If Execute(objref, code$, False) <> 1 Then
+If Execute(objref, Code$, False) <> 1 Then
         Run = False
                  MOUT = True
 End If
@@ -537,8 +553,8 @@ For i = -2 To 1000
     players(i) = Zero
     Prefresh(i) = zerocounter
 Next i
-If Forms.Count > 0 Then
-For i = Forms.Count - 1 To 0
+If Forms.count > 0 Then
+For i = Forms.count - 1 To 0
 Set Forms(i).icon = LoadPicture("")
 Unload Forms(i)
 Next i
@@ -634,3 +650,13 @@ Public Sub SendMess(a$)
         
     End If
 End Sub
+Public Property Get Code() As String
+' GetCode
+    If Not ExtForm Is Nothing Then
+        On Error Resume Next
+        Code = ExtForm.GetCode
+        
+        
+    End If
+End Property
+

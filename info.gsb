@@ -133,7 +133,7 @@ MODULE GEORGE {Binary {
 
 Gradient 13,5
 ImgRenderX=scale.x div 2
-For ImgRenderX=ImgRenderX to ImgRenderX/4 step 150
+For ImgRenderX=ImgRenderX to ImgRenderX/4 STEP 150
 	TopMargin=(scale.y-(ImgRenderX)*image.y(A)/image.x(A)) div 2
 	LeftMargin=(scale.x-ImgRenderX) div 2
 	move LeftMargin, TopMargin
@@ -651,7 +651,7 @@ MODULE DD8 {Module Pairs {
       Next i
       \\ the same for horizontal axis
       HalfTextHeight=Size.y("1","courier", size9pt)/2
-      For i=basey-dy to basey-dy*x#max() Step dy
+      For i=basey-dy to basey-dy*x#max() step dy
             Move basex, i
             Step -twipsx*10
             Width 1, dotline { draw scale.x/2+twipsx*10,,7}
@@ -2576,8 +2576,8 @@ Module RationalNumbers {
       Print Z.real
       Print z.tostring$;" = ";eval(z.tostring$)   
       Print Z=Z
-      Print Z=N  ' false
-      Print Z=-Z  ' false
+      Print Z=N, "            SHOULD BE FALSE"  ' false
+      Print Z=-Z , "            SHOULD BE FALSE"  ' false
       ZZ=-Z
       Print ZZ=ZZ
       Print -Z=-Z
@@ -2744,6 +2744,7 @@ Module TestGroup2 {
 TestGroup2
 }
 MODULE PEND {Module Pendulum {
+	thread.plan sequential
       back()
       degree=180/pi
       THETA=Pi/2  ' +p/8
@@ -2757,8 +2758,8 @@ MODULE PEND {Module Pendulum {
       accold=0
       ACCEL=0 'G*SIN(THETA*degree)*L
       time=now
-      timed=1/24/3600*(cc*1.5)/1000
-            Thread {
+      timed=1/24/3600*(cc*1.4)/1000
+      Thread {
             time+=timed
             ACCEL=G*SIN(THETA*degree)*L
             SPEED+=ACCEL/cc
@@ -2766,7 +2767,7 @@ MODULE PEND {Module Pendulum {
             if sgn(accold)<>sgn(ACCEL) then lasttimecount=timecount: Profiler
             accold=ACCEL
       } as M interval cc
-      Main.Task 20 {
+      Main.Task 1000/250 {
             Pendulum(THETA)
             if KeyPress(32) Then Exit
       }
@@ -6130,7 +6131,7 @@ You can:
 push key$ : drop
 TryIt
 test !
-Keyboard "infobasic"+chr$(13)
+if module(infobasic) then keyboard "infobasic", 13
 }
 MODULE LIST33 {Declare Simple Form
 With Simple, "Title" As myTitle$
@@ -8404,7 +8405,7 @@ Class BigNum {
             if len(.a)=0 then ="0" : Exit
             if len(.a)=1 then =str$(Stackitem(.a),"") : Exit
             document buf$=str$(Stackitem(.a, len(.a)),"")
-            for i=len(.a)-1 to  1 {
+            for i=len(.a)-1 to  1  {
                   Stack .a {
                         buf$=str$(StackItem(i), "00000000000000")
                   }
@@ -9432,6 +9433,7 @@ end if
 
 }
 MODULE ICONS {function dummy {
+	const mess$="press right mouse button or escape to exit, spacebar to change mode, L for Lock/Unlock"
 	if isWine then sp=10 : r=30 else sp=40 : r=60
 	Escape off
 	Def a,b,c
@@ -9442,11 +9444,7 @@ MODULE ICONS {function dummy {
 	\\ call global
 	Fade 5, 0
 	useM200sprites=random(1,2)=1
-	move scale.x/2, scale.y/2
-	legend str$(sp,0)+If$(useM200sprites->" M2000"," GDI+")+{ Sprites
-	rotating,resizing
-	changing opacity
-	}, "Arial Black", 22,0,2,1,150
+
 	hold
 	Wait 500
 	mouse.icon hide
@@ -9463,7 +9461,13 @@ MODULE ICONS {function dummy {
 			hold
 			p=false
 			end if
-			
+			move 0,0
+			legend "press right mouse button to exit", "arial", 12
+			move scale.x/2, scale.y/2
+			legend str$(sp,0)+If$(useM200sprites->" M2000"," GDI+")+{ Sprites
+			rotating,resizing
+			changing opacity
+			}, "Arial Black", 22,0,2,1,150			
 			For i=1 to sp {
 				move Random(14000)+1000, Random(10000)+1000
 				let  a=random(90), b=random(50)+150, c=random(50)-50*(random(10)=1)
@@ -9486,7 +9490,13 @@ MODULE ICONS {function dummy {
 			hold
 			p=false
 			end if
-			
+			move 0,0
+			legend "press right mouse button to exit", "arial", 12
+			move scale.x/2, scale.y/2
+			legend str$(sp,0)+If$(useM200sprites->" M2000"," GDI+")+{ Sprites
+			rotating,resizing
+			changing opacity
+			}, "Arial Black", 22,0,2,1,150
 			For i=1 to sp {
 				move Random(14000)+1000, Random(10000)+1000
 				let  a=random(90), b=random(50)+150, c=random(50)-50*(random(10)=1)
@@ -9509,45 +9519,128 @@ MODULE ICONS {function dummy {
 	mouse.icon show
 	Refresh 30
 	If Ask("Save the file","icons","Save it","No", all$)=1 then
-	Menu  ' erase menu list
-	files + "screen*.bmp"
+	Menu  ' erase Menu list
+	files + ! "screen*.bmp"
 	copy "screen"+str$(menuitems+1,"000")+".bmp"
 	End if
 	cls,0
 	
-	\\ In console M2000 has no events, except for this:,  an old variant of Menu can get the finish event in a global menu.
-	\\ so giving the globalmenu Menu statement open the menu end leave it there to be used in a loop or something.
+	\\ In console M2000 has no events, except for this:,  an old variant of Menu can get the finish event in a global Menu.
+	\\ so giving the globalmenu Menu statement open the Menu end leave it there to be used in a loop or something.
 	Menu
 	Menu title "MOVE ME" 
 	Menu fill #F377FF, 7, 0
 	files + "screen*.bmp"
 	if menuitems=0 then exit
-	global ex=false, loadnow=0
+	global ex=false, loadnow=1, preview =0, LockThere as boolean, menu1=0, press=0
 	Module Global globalmenu {
-	\\ unhide this to exit menu if get a double click
+	\\ unhide this to exit Menu if get a double click
 	\\	ex<=true  \\ we can use this to exit on double click or enter.
-		if menu=0 then ex<=true : Print "You press Esc" else loadnow<=menu
+		if Menu=0 then ex<=true : Print "You press Esc"
+		press<=10
+
 	}
+	showAsYouMove=false
 	Print @(0,0), "Select Image or End:";
 	Menu @ "globalmenu" !
+	hold
 	wait 200
-	menu1=0
-	do {
-		wait 100
-		refresh
-		if keypress(2) or ex then exit
-		menu1=menu
-		if menu1=0 then continue
-	\\ using this line we open one if double click or press enter
-	Rem	if  loadnow=0 then continue
-	\\using this we get response also as we move the menu caret
-	 	if loadnow=0 then loadnow<=menu1
-		move 0,0
-		image menu$(loadnow), scale.x
-		Print @(0,0), "Image:";menu$(loadnow)
-		loadnow<=0
-	} always
+	
+	refresh 100
+	do
+		wait 50
+		if ex then exit
+		menu1<=Menu
+		if menu1=0 then menu1<=loadnow
+		if keypress(76) then
+			press<=0
+			LockThere~
+			refresh 1000		
+			if LockThere then
+				release 
+				move scale.x-scale.x/16, scale.y-scale.y/16: legend "L", "arial black", 32
+			 	Menu
+			else
+rem				gradient 5, 0
+rem				hold
+			 	Menu
+				Menu title "MOVE ME" 
+				Menu fill #F377FF, 7, 0
+			 	files + "screen*.bmp"
+		 		Menu @ "globalmenu" !
+			 	loadnow<=0
+			 	press<=-2
+			 	release
+			 	cursor 0, 1
+				Report mess$
+			end if
+			refresh 20
+			wait 2000
+			continue		
+		end if
+		if LockThere then continue
+		if keypress(32) then
+			press<=-2
+			showAsYouMove~
+			release
+			cursor 0, 1
+			Report mess$
+			refresh 20
+			beep
+			wait 2000
+		end if
+		if keypress(2) then exit
+		if showAsYouMove  then
+			if menu1=0 or keypress(1) then continue
+		 	if loadnow<>menu1 then
+			 	loadnow<=menu1
+			 	refresh 1000
+				move 0,0
+				image Menu$(loadnow), scale.x
+				Print @(0,0), "Image:";Menu$(loadnow)
+				hold
+				Report mess$
+				refresh 20
+			end if
+		else
+			if menu1=0 then continue
+			if press>=3 and not keypress(1) then
+				press<=0
+			 	if loadnow<>menu1 then
+				 	loadnow<=menu1
+				 	refresh 1000
+					gradient 5, 0
+					move 0,0
+					try {
+						image Menu$(loadnow), scale.x
+						Print @(0,0), "Image:";Menu$(loadnow)
+						hold						
+						Report mess$
+						preview<=loadnow
+					}
+					refresh 20
+				end if
+			else
+				if preview<>menu1 and loadnow<>0 then
+					refresh 1000
+					preview<=menu1
+					release
+					if preview<>loadnow then
+						press<=0
+						move scale.x-scale.x/8, scale.y-scale.y/8
+						try {
+							image Menu$(menu1), scale.x/8
+						}
+					end if
+					cursor 0, 1
+					Report mess$
+					refresh 20
+				end if
+			end if
+		end if
+	always
 	Menu
+	menu fill 1
 	Escape On
 }
 Inline Code LibFade
@@ -9557,7 +9650,12 @@ function dummy1 {
 }
 FadeScreen &Dummy(), 1.7
 }
-MODULE COMPILER {Module CompilerExample {
+MODULE COMPILER {// THIS TINY LANGUAGE NEED A DIV TYPE LIKE VB6, NOT LIKE PYTHON.
+// THE "-div" SWITCH SET THE VB6 TYPE DIV
+// THE "+div" SWITCH SET THE PYTHON TYPE DIV
+// SO THIS MODULE USE "OWN" DIV, TO BE  INDEPENDENT FROM CURRENT SWITCH, AND NOT CHANGE IT USING: SET SWITCH "-DIV"  (WHICH CHANGE IT UNTIL THE M2000 INTERPRETER GET A BREAK FROM BUTTON BREAK OR A NEW SET SWITCH CHANGE IT)
+// USING SWITCH STATEMENT FROM CONSOLE WRITE THE CHANGE TO REGISTRY
+Module CompilerExample {
 	Set Fast !
 	Module lexical_analyzer (a$){
 		lim=Len(a$)
@@ -10206,8 +10304,8 @@ MODULE COMPILER {Module CompilerExample {
 		Append  func, add_:=lambda->{Return stack_, sp+1:=uint(sint(eval(stack_, sp+1))+sint(eval(stack_, sp))):sp++}
 		Append  func, sub_:=lambda->{Return stack_, sp+1:=uint(sint(eval(stack_, sp+1))-sint(eval(stack_, sp))):sp++}
 		Append  func, mul_:=lambda->{Return stack_, sp+1:=uint(sint(eval(stack_, sp+1))*sint(eval(stack_, sp))):sp++}
-		Append  func, div_:=lambda->{Return stack_, sp+1:=uint(sint(eval(stack_, sp+1)) div sint(eval(stack_, sp))):sp++}
-		Append  func, mod_:=lambda->{Return stack_, sp+1:=uint(sint(eval(stack_, sp+1)) mod sint(eval(stack_, sp))) :sp++}
+		Append  func, div_:=lambda->{Return stack_, sp+1:=uint(div(sint(eval(stack_, sp+1)),sint(eval(stack_, sp)))):sp++}
+		Append  func, mod_:=lambda->{Return stack_, sp+1:=uint(mod(sint(eval(stack_, sp+1)),sint(eval(stack_, sp)))) :sp++}
 		Append  func, not_:=lambda->{Return stack_, sp:=if(eval(stack_, sp)=0->uint(-1),0)}
 		Append  func, neg_:=lambda->{Return stack_, sp:=uint(-sint(eval(stack_, sp)))}
 		Append  func, and_:=lambda->{Return stack_, sp+1:=binary.and(eval(stack_, sp+1),eval(stack_, sp)):sp++	}
@@ -10275,6 +10373,8 @@ MODULE COMPILER {Module CompilerExample {
 		Always
 		Print "Press any key" : Push key$ : Drop
 		// Prepare VM
+		def mod(a,b)=a- sint(uint(a / b))*b
+		def div(a,b)=sint(uint(a / b))
 		profiler
 		let pc=0, sp=len(stack_) div 4
 		do
@@ -10291,6 +10391,8 @@ MODULE COMPILER {Module CompilerExample {
 		Print "Prepare M2000 Code"
 		Flush
 		prolog$={Global z
+			global mod=lambda (b, a)->{push a- sint(uint(a / b))*b}
+			global div=lambda (b,a)->{push sint(uint(a / b))}
 			Module Halt {Error "stop"}
 			Module neg {push -number}
 			Module not {push number=0}
@@ -10303,9 +10405,9 @@ MODULE COMPILER {Module CompilerExample {
 			Module ne {push number<>number}
 			Module eq {push number=number}
 			Module mul {push number*number}
-			Module div {shift 2 : push number div number}
-			Module mod {shift 2 : push number mod number}
-			Module sub {shift 2 : push number - number}
+			Module div {call div()}
+			Module mod {call mod()}
+			Module sub {shift 2: push number - number}
 			Module add {push number + number}
 			Module prtc {Print #-2, chrcode$(number);:Refresh}
 			Module prts {Print #-2, format$(var$(number));:Refresh}
@@ -10362,14 +10464,16 @@ MODULE COMPILER {Module CompilerExample {
 				Read var(x)
 			End Sub
 			Sub fetch(x)
-				Push  var(x)
+				Push var(x)
 			End Sub
 		}
 		document M2000Code$="Module Run {" +prolog$ + Variable$(Vars,"var")
-		M2000Code$=Variable$(Strings,"var$", true) +feedstrings$ + "Try {" + {
-		} + code$+"}"+Subs$+"}"
-		//clipboard M2000code$
-		//exit
+		M2000Code$=Variable$(Strings,"var$", true) +feedstrings$ +{
+		}+"Try {" + {
+		} + code$+"}"+{
+		}+Subs$+"}"
+		 // clipboard M2000code$
+		// exit
 		Inline M2000Code$
 		Print "Press any key" : Push key$ : Drop
 		profiler
@@ -12092,10 +12196,10 @@ again:
             Local i
             if x1=x2 then
                   y1+=y2<=>y1
-                  for i=y1 to y2 {maze$(x1, i)=" " } 
+                  for i=y1 to y2 step sgn(y2-y1) {maze$(x1, i)=" " } 
             Else
                   x1+=x2<=>x1
-                  for i=x1 to x2 {maze$(i, y1)=" "}                   
+                  for i=x1 to x2  step sgn(x2-x1)  {maze$(i, y1)=" "}                   
             End if
       End Sub
       Sub ShowMaze()
@@ -12111,7 +12215,7 @@ Rem            cls ,4  ' split screen - preserve lines form 0 to 3
 }
 Maze2
 Cursor 0,0
-keyboard "info"+chr$(13)
+if module(infobasic) then keyboard "infobasic", 13
 
 }
 MODULE MAZE {Module Maze {
@@ -12576,22 +12680,6 @@ PRINT #-2, {
 }
 }
 MODULE CALENDAR (YEAR, LOCALEID) {
-      FUNCTION GETMAX(YEAR, MONTH) {
-            A=DATE(STR$(YEAR)+"-"+STR$(MONTH)+"-1")
-            MAX=32
-            DO {
-                  MAX--
-                  M=VAL(STR$(CDATE(A,0,0,MAX), "M"))  
-            } UNTIL M=MONTH
-             =MAX+1    
-      }
-      FUNCTION SKIPMO(YEAR, MONTH) {
-            A=DATE(STR$(YEAR)+"-"+STR$(MONTH)+"-1")
-            =(VAL(STR$(A, "W"))-8) MOD 7 +7
-      }
-      FUNCTION TITLE$(A$) {
-            =UCASE$(LEFT$(A$,1))+LCASE$(MID$(A$, 2))
-      }
       LOCALE LOCALEID
       IF NOT PRINT_IT THEN CURSOR 0,HEIGHT-1  ' LAST LINE, SO EACH NEW LINE SCROLL ALL LINES UP
       SNOOPY
@@ -12599,62 +12687,62 @@ MODULE CALENDAR (YEAR, LOCALEID) {
       PRINT UNDER  ' PRINT UNDERLINE
       PRINT OVER $(2), YEAR
       PRINT
-      FOR J=0 TO 1 {
+      FOR J=0 TO 1
             PRINT
-            FOR I=1 TO 6 {
+            FOR I=1 TO 6
                   MONTH=I+J*6
                   PRINT  PART @((I-1)*22+1), $(2,21), UCASE$(LOCALE$(55+MONTH))
-            }
+            NEXT I
             PRINT
             DIM SKIP(1 TO 6), COUNT(1 TO 6), D(1 TO 6)=1
-            FOR I=1 TO 6 {
+            FOR I=1 TO 6
                   MONTH=I+J*6
                   IF I>1 THEN PRINT " ";
                   FOR K=42 TO 48 :PRINT " ";UCASE$(LEFT$(LOCALE$(K),2));:NEXT K 
-                  SKIP(I)=SKIPMO(YEAR, MONTH)
-                  COUNT(I)=GETMAX(YEAR, MONTH)
-            }
+                  SKIP(I)=@SKIPMO(YEAR, MONTH)
+                  COUNT(I)=@GETMAX(YEAR, MONTH)
+            NEXT I
             PRINT
             IF PRINT_IT ELSE REFRESH 1000
-            FOR I=1 TO 6 {
+            FOR I=1 TO 6
                       IF I>1 THEN PRINT " ";
-                      FOR K=1 TO 7 {
+                      FOR K=1 TO 7
                         SKIP(I)--
-                        IF  SKIP(I)>0 THEN PRINT "   "; :CONTINUE
+                        IF  SKIP(I)>0 THEN PRINT "   "; :CONTINUE FOR
                         COUNT(I)--
                         PRINT FORMAT$(" {0::-2}", D(I));
                         D(I)++
-                  }
-            }
+                      NEXT K
+            NEXT I
             PRINT
             IF PRINT_IT ELSE REFRESH 1000
             PRINT @(0)
-            FOR M=1 TO 5 {
-                  FOR I=1 TO 6 {
+            FOR M=1 TO 5
+                  FOR I=1 TO 6
                         IF I>1 THEN PRINT " ";
-                        FOR K=1 TO 7 {
+                        FOR K=1 TO 7
                               COUNT(I)--
-                              IF COUNT(I)<0 THEN PRINT "   "; : CONTINUE
+                              IF COUNT(I)<0 THEN PRINT "   "; : CONTINUE FOR
                               PRINT FORMAT$(" {0::-2}", D(I));
                               D(I)++
-                        }
-                  }
+                        NEXT K
+                  NEXT I
             PRINT
             IF PRINT_IT ELSE REFRESH 1000 
-            }
-      }     
+            NEXT M
+      NEXT J     
 }
 WHILE INKEY$<>"" :  END WHILE
 IF PRINT_IT THEN PRINTING ON ELSE REFRESH 1000
 FONT "COURIER NEW"
 PEN 0
 CLS 15, 0
-if module(fixmode) then
+if MODULE(fixmode) THEN
 fixmode 132,68
-else
+ELSE
 FORM 132,68
-end if
-mode=mode*.8
+END IF
+MODE=MODE*.8
 
 
 CALENDAR 1966, 1032 ' GREEK
@@ -12673,6 +12761,23 @@ IF PRINT_IT THEN RETURN
 WHILE INKEY$="" AND MOUSE=0
 END WHILE
 RETURN
+FUNCTION GETMAX(YEAR, MONTH)
+      LOCAL A=DATE(STR$(YEAR)+"-"+STR$(MONTH)+"-1")
+      LOCAL MAX=32
+      DO
+            MAX--
+            M=VAL(STR$(CDATE(A,0,0,MAX), "M"))  
+       UNTIL M=MONTH
+       =MAX+1    
+END FUNCTION
+FUNCTION SKIPMO(YEAR, MONTH)
+      LOCAL A=DATE(STR$(YEAR)+"-"+STR$(MONTH)+"-1")
+      =(VAL(STR$(A, "W"))-8) MOD 7 +7
+END FUNCTION
+REM NOT USED
+FUNCTION TITLE$(A$)
+      =UCASE$(LEFT$(A$,1))+LCASE$(MID$(A$, 2))
+END FUNCTION
 }
 MODULE LINKED_LIST {\\ This example use pointers to groups.
 \\ Class Node
@@ -16158,7 +16263,7 @@ Font oldfont$
 Form 60,30
 Show
 ESCAPE ON
-Keyboard "Info"+chr$(13)
+if module(info) then Keyboard "Info"+chr$(13)
 End
 Functions:
 Function Nu$ {
@@ -21107,55 +21212,74 @@ MODULE SNAKE {Αν Τοπικό=1032 ή Ελληνικά Τότε {
 
 }
 MODULE MAXITEM {Module TestThis {
-      Print "Search a tuple type list (is an array also)"
+      Pen 15 {Print "Search a tuple type list (is an array also)"}
       A=(,)
       For i=1 to Random(1,10)
       Append A, (Random(1,100),)
       Next
       Print Len(A)
       Print A
+      Pen 11 {
+          Print "using A#max()"
+      }
       Print A#max()
       
-      Print "Search an array"
+      Pen 15 {Print "Search an array"}
       B=lambda->Random(1,100)
       Rem Dim A(1 to Random(1,10))<<B()
       Dim A(1 to Random(1,10))<<lambda->{=Random(1,100)}()
       Print Len(A())
       Print A()
+      Pen 11 {
+          Print "using A()#max()"
+      }
       Print A()#max()
       
       \\ #max() skip non numeric values
       Rem Print (1,"100",3)#max()=3
       
-      Print "Search an inventory list"
+      Pen 15{Print "Search an inventory list"}
       Inventory C
       for i=1 to Random(1,10)
             do
                   key=random(10000)
             until not exist(c, key)
             \\ we can put a number as string
-            if random(1,2)=1 then Append c, key:=B() else Append c, key:=str$(B())
+            if random(1,2)=1 then Append c, key:=B() else Append c, key:="String"
       Next
       
       \\ if inventory item is string with a number work fine
+      \\ update for Version 12
+      \\ Version 12 return always the string type as string from list numeric interface
+      \\ Version 11 convert to number, so if the string has no value, return 0.
+      \\ So now, in Version 12, we have 0 as numeric always.
+      \\ to retirn to Version 11 style you have to use Val(), Val(10) return 10, and Val("10") return 10.
+      \\ so Val(a(key)) return always 0 or number (for numeric data, which maybe is 0 too)
       Function MaxItem(a) {
-            k=each(a,2)
-            val=a(0!)
+            k=each(a)
+            val=-infinity
             while k
                   \\ using stack of values
                   \\ over -equal to over 1 - copy value from 1 to top, means double the top value
                   \\ number - pop top value
                   \\ drop -equal to drop 1 : drop top value 
-                  Push a(k^!): Over : If Number>val then Read Val else drop
+                  Push a(k^!)
+                  if isnum then
+                      Over
+                      If Number>val then Read Val else drop
+                  else
+                        drop
+                  end if
                   Rem If a(k^!)>Val Then Val=a(k^!)
             end while
             =val
       }
       Print Len(C)
       Print C
-      Print MaxItem(C)
+      ret=MaxItem(C)
+      if ret=-infinity then print "No numbers found" else print ret
       
-      Print "Search a stack object"
+      Pen 15 {Print "Search a stack object"}
       \\ a stack object is the same as the stack of values
       \\ which always is present
       D=stack
@@ -22884,7 +23008,7 @@ MODULE SIMPLETXT {Παλιό.Τοπικό=Τοπικό
 Μέθοδος Κειμ3, "Move", θεσηΧ,2400,5000,400
 νγ$={
 }
-Με Κειμ1, "ShowAlways", Αληθές, "NumberOnly", Αληθές, "Value" ως Τιμ1
+Με Κειμ1, "ShowAlways", Αληθές, "NumberOnly", Αληθές, "Value" ως Τιμ1, "WordCharLeft","(", "WordCharRight",")"
 Με Κειμ2, "ShowAlways", Αληθές, "NumberIntOnly",Αληθές, "Value" ως Τιμ2
 Με Κειμ3, "ShowAlways", Αληθές, "UsedAsTextBox", Αληθές,"Text" ως Τιμ3$
 Τιμ1=93.112
@@ -23462,6 +23586,7 @@ Scroll Split  row+1
 Pen 0
 threads erase
 Thread {
+	IF KEYPRESS(1) ELSE STATE<=0
 	scan 0.01 : thread this interval 10 
 	Layer {Cursor 0,messrow : Print  Over  : Print Part ~(0),"waiting..." , kk }
 } as LL
@@ -25482,7 +25607,8 @@ Print A3.Two$(A1, A2)
 
 
 }
-MODULE GROUPTYPES {// from revision 33 version 9.9 we have group types
+MODULE GROUPTYPES {Cls, 0
+// from revision 33 version 9.9 we have group types
 Report {First Example
 Theory:
 	Static groups may have a type or not.
@@ -25516,8 +25642,8 @@ public:
 beta=alfa
 beta.changeL (lambda->1)
 alfa.process &beta
-Print beta.tostring$()
-
+Print beta.tostring$() , { should be: x=11 y=51}
+pause()
 Report {
 
 Second Example
@@ -25553,9 +25679,12 @@ class delta {
 }
 delta=delta()
 Print delta is type delta
+Report { should be: True or Αληθές - if you use GREEK statement, Use LATIN to change it to True}
 Print delta.One=delta.Two
+Report { delta.One=delta.Two   -  should be: True}
 Print delta.one=delta
-
+Report { delta.One=delta   -  should be: False, not same class, check the operator "=" for class zeta in class delta}
+pause()
 //third example using pointers and types for group pointers too
 Report {
 
@@ -25639,15 +25768,23 @@ Group ReplaceTostring {
 }
 M1->epsilon(10,40)   ' create one
 Print M1=>ToString$()
+Report {M1=>ToString$()              - should be: private data: x=10, y=40 }
 M2->epsilon(10, 40) '  2 created until now
-M3->(epsilon(30,40)  with ReplaceToString) ' 3 created until now through constructor.
+M3->(epsilon(30,40) with ReplaceToString) ' 3 created until now through constructor.
+report {creation of M3 as pointer to a combined group: epsilon(30,40) with ReplaceToString}
 Print M3 is type epsilon
+Report {M3 is type epsilon             -  should be: True}
 Print M3=>tostring$()
+Report {M3=>tostring$()              - should be: private data: x=30, y=40 from replaced function}
 Print M1=M2, M2=M3
+Report { M1=M2, M2=M3               -  should be: True  False}
 M4=M3=>add5(M3)  ' 4 created, the 4th without constructor.
 Print M4=>tostring$()
+Report {M4=>tostring$()              - should be: private data: x=35, y=45 from replaced function}
 M5=M4=>sub5(M3)  
 Print M5=>tostring$()
+Report {M5=>tostring$()              - should be: private data: x=25, y=35 from replaced function}
+pause()
 Report {
 	Additional Example (to third one)
 	
@@ -25689,6 +25826,10 @@ Print M6 is M4
 Print M4=>tostring$()
 Print M6=>tostring$()
 Print M4=M6
+sub pause()
+Print "Press any key"
+push key$: drop: cls
+end sub
 }
 MODULE TRAVERSAL2 {Report {
           Tree traversal
@@ -26986,6 +27127,7 @@ Module Led_Clock{
 	end sub
 }
 Led_Clock
+if module(infobasic) then keyboard "infobasic", 13
 }
 MODULE HANDLER {escape off
 Form 100, 60
@@ -34911,6 +35053,7 @@ With image1,"KeyEvent", true, "Enabled" as enabled, "tabstop", true, "showcaret"
 With Text1, "ShowAlways", true, "text" as text1.text$, "MoveOnEnter", false
 Method Image1, "AccKey", "D", alt:=true, opcode:= 1
 Method Text1, "AccKey", "T", alt:=true, opcode:= 0
+Method Image1, "CurveMask", 0, 25
 enabled=true
 caret=true
 layer image1 {
@@ -35442,14 +35585,18 @@ MODULE VBCOLLECTION {Module GetC {
             try ok {
                   method c, "item", akey$ as ret
             }
-            If type$(Ret)="Empty" Then Error "Key not used"
+            If type$(Ret)="Empty" Then Error  if$(locale=1032->"Το κλειδί δεν χρησιμοποιείται","Key not used")
             =ret
       }
       Print c.item("Hello")
       Try {
             val=c.item("Hello12")
       }
-      Print Error$
+      if locale=1032 then
+          Print Λάθος$  ' the greek version return message in greek language (if exist else in english)
+      else
+          Print Error$
+      end if
       Push c
       \\ normaly we can use this line
       \\ but if we omit this, Interpreter do this for us
@@ -36210,11 +36357,14 @@ try ok {
 }
 Print Error$
 }
-MODULE BUTTONSONFRAME {declare form1 form
+MODULE BUTTONSONFRAME {smooth off
+declare form1 form
 declare frame1 image form form1
+declare frame2 image form form1
 declare button1(3) button form form1 image frame1
-method form1 "move", ,, 120000, 14000
-method frame1 "move", 600,600, 10000, 12000
+method form1 "move",1000,1000,10000, 5000
+method frame1 "move", 600,600, 10000-2*600, 4000
+method frame2 "move", 600,600, 10000-2*600, 4000
 for i=0 to 2
 method button1(i), "move", 1000, 1000+1000*i, 3000, 600
 next
@@ -36223,6 +36373,99 @@ for i=3 to 5
 	method button1(i), "move", 4600, 1000+1000*(i-3), 3000, 600
 next
 max=5
+with frame1, "visible" as visible, "tabstop", false
+with frame2, "visible" as visible2, "tabstop", false
+with form1, "LastControl" as LastControl$, "backcolor" as backcolor  ' read only
+Function SetTab(Where, x, s$, forecolor, tabcolor, thiscolor){
+	cls thiscolor
+	pen forecolor
+	double
+	bold 1
+	w=size.x(s$, fontname$, mode)
+	h=size.y("fj", fontname$, mode)
+	h1=h+twipsY*2
+	width 4 {
+		move twipsX*2, h1
+		draw x
+		draw ,-h
+		draw w
+		draw h, h
+		draw to scale.x-twipsX*2
+		draw to ,scale.y-twipsY*2
+		draw to twipsX*2
+		draw to twipsX*2,h1
+	}
+	move 100, 100
+	floodfill  x+150, 150, tabcolor
+	method Where, "MaskColor", thiscolor
+	move X+twipsX*6, twipsY*2
+	italic 1
+	legend s$, fontname$, mode,0,0,1
+	=w
+}
+myBc=backcolor
+Layer frame1{
+	w1=SetTab(Frame1, 0,  " Frame1 ", 11, 1, myBc)
+}
+Module Mess(s$) {
+	normal
+	italic 0
+ 	cursor 0, height/2
+ 	report 2, s$
+}
+Layer frame2{
+	w1= SetTab(Frame2, w1+twipsX*10,  " Frame2 ", 15,  2, myBc)
+	Mess "This is frame 2"
+}
+layer form1 {
+	cls myBc
+	gradient 5, 1
+}
+function restroreFocus {
+	local s$=LastControl$
+	if s$<>"" then
+		// we use New here because the event function has same scope as the module's scope
+		// Control method get number of string
+		method form1, "Control", s$ As new UserControl
+		method  UserControl, "SetFocus"
+	end if
+}
+function frame1.click {
+	print "click frame1"
+	method frame1,"Zorder"
+	call local restroreFocus()
+	refresh
+}
+function frame2.click {
+	print "click frame2"
+	method frame2,"Zorder"
+	refresh
+}
+function form1.click {
+	print "click form1"
+	if visible then
+		visible=false
+		Layer frame2{
+			w1= SetTab(Frame2, 0,  " Frame2 ", 11, 2, myBc)
+			Mess "This is frame 2"
+		}
+	else
+	refresh 1000
+		Layer frame1{
+			w1=SetTab(Frame1, 0,  " Frame1 ", 15, 1, myBc)
+		}
+		Layer frame2{
+			w1= SetTab(Frame2, w1+twipsX*10,  " Frame2 ", 11,  2, myBc)
+			Mess "This is frame 2"
+		}
+		layer form1 {
+			gradient 5, 1
+		}		
+		visible=true
+		call local restroreFocus()
+	end if
+	refresh 10
+}
 function button1.click(index) {
 	print index
 	refresh
@@ -36749,5 +36992,206 @@ Module TestMenu {
 	Print "That was the ";If$(Menu->"1st","2nd","3rd","4th");" option, bravo;"
 }
 TestMenu
+}
+MODULE HASHLIST {Report {
+	This example use the M2000.hashlist object
+	Hashlist object can be used for lists of specific type
+	A hashlist for long values, need 4 byte per item - plus some extra for hash table
+	A inventory type list has a variant type, 16  bytes per value plus extra for hash table
+	HashList has no delete item method
+	HashList has auto expanded hash keys, from byte to integer to long
+	this alter the size of extra bytes."
+	We can use the prepare method for reserve space. This space not taken from this method,
+	but when we place the first item, then the space taken from memory
+	
+	We use Variant type by reference pass for method find of a COM object
+	This is new, the variant type at variable level, and for passing by reference for external call
+	}
+function Global NewHashList {
+	declare hash "m2000.hashlist"
+	=hash
+}	
+const vbVariant=12&
+double
+Report "First Example: HashList, using variant type item"
+normal
+hash=NewHashList()
+method hash, "prepare", 2000
+method hash, "add",12345678912345678900123456@, 100&, vbVariant as where
+with hash, "count" as hash.count, "value" as hash$(), "value" as hash(), "key" as Hash.key$(), "KeyNoReHash" as Hash.KeyNoRehash()
+with hash, "KeyNum" as KeyNum()
+decimal z= hash(where)
+zz=hash(where)
+print type$(zz), zz
+method hash, "add","alfa", 101& as where
+zz$=hash$(where)
+print type$(zz$), zz$
+print hash.count
+for i=0 to hash.count-1
+	print format$("{0::-30} - {1}",hash(i), KeyNum(i))
+next i
+variant vv
+// call hash.find using named parameter v
+method hash, "find", 101&, v:=&vv as ok
+print type$(vv), vv
+//list   // list of variables
+method hash, "find", 100&, v:=&vv as ok
+print type$(vv), vv
+//list
+method hash, "find", 100&, where:=&vv as ok
+Hash.KeyNoRehash(vv)=1234&
+method hash,"rehash"
+Pen 11 {
+Print "change key and then rehash the list"
+for i=0 to hash.count-1
+	print format$("{0::-30} - {1}",hash(i), KeyNum(i))
+next i
+}
+double
+Report "Second Example: Assign a new HashList (old one deleted - automatic), of type Decimal"
+normal
+hash=NewHashList()
+method hash, "prepare", 2000
+// now the first add method define the type (we didn't use the third parameter)
+method hash, "add",12345678912345678900123456@, "one" as where
+method hash, "add",123.456789123@, "two" as where
+method hash, "add",12345678@, "three" as where
+for i=0 to hash.count-1
+	print format$("{0::-30} - {1} ", hash(i), Hash.key$(i)) 
+next i
+for j=1 to 10
+	if j>4 then
+		method hash, "find", "NewKey" as ok
+		if not ok then
+		Pen 13 {
+			m=random(0, 2)
+			print "************** change key:";Hash.key$(m);" with new key:";
+				Hash.key$(m)="NewKey"
+			print Hash.key$(m)
+		}
+		for i=0 to hash.count-1
+			print format$("{0::-30} - {1} ", hash(i), Hash.key$(i)) 
+		next i
+		end if
+	end if
+	a$=("NewKey","one","two", "three", "notexist")#val$(random(0,3))
+	method hash, "find", a$, v:=&vv as ok
+	if ok then print "found ";vv;" for key:";a$ else print "key "+a$+" not found in this hashlist"
+next
+}
+MODULE TYPES {cls
+a="123123"
+print "a",a, type$(a) // double
+// using$
+a$="12345"
+print"a$", a$, type$(a$), a$+"..."+a$  // string
+string b="1234556"
+print "b", b, type$(b), b+"..."+b   // string
+print "b+string literal+a$", b+"...."+a$
+print "a$+string literal+b", a$+"..."+b
+Print "variant can be string also"
+variant c="12345678"
+print "c", c, type$(c)  // string
+c=12345
+print "c", c, type$(c) // Double
+c=12345~
+print "c", c, type$(c) // Single
+c=12345&&
+print "c", c, type$(c) // Long Long
+c=12345&
+print "c", c, type$(c) // Long
+c=12345%
+print "c", c, type$(c) // Integer
+c=12345#
+print "c", c, type$(c) // Currency
+c=12345@
+print "c", c, type$(c) // Decimal
+c=1=1
+print "c", c, type$(c) // Boolean
+double d=10e-32
+print "d", d, type$(d) // Double
+single s=12e12
+print "s", s, type$(s) // Single
+long long ll=12345&&
+print "ll", ll, type$(ll) // Long long
+long l=12345&
+print "l", l, type$(l) // Long
+integer i=12345%
+print "i", i, type$(i) // Integer
+currency cc=1.2345#
+print "cc", cc, type$(cc) // Currency
+decimal dd=1.2345@
+print "dd", dd, type$(dd) // Decimal
+boolean bb=True
+print "bb", bb, type$(bb) // Decimal
+list
+}
+MODULE VER12 {if module(types) then types
+print
+Pen 15 {print "TEST for variable a as string"}
+a="THIS IS A STRING"
+print "use of qoute$(a)"
+print "a = "+quote$(a)
+print " left$(a,3)"
+print left$(a,3)
+print " right$(a,3)"
+print right$(a,3)
+print " mid$(a, 6)"
+print mid$(a, 6)
+print " mid$(a, 6, 2)"
+print mid$(a, 6,2)
+print { rightpart$(a, " IS A ")}
+print rightpart$(a, " IS A ")
+print { leftpart$(a, " IS A ")}
+print leftpart$(a, " IS A ")
+password= "password"
+pass2=len(a)*2
+print "Using Hide$()"
+z= hide$(a, password, pass2)
+print z
+print "Using Show$()"
+print show$(z, password, pass2)
+vbcrlf=chr$(13)+chr$(10)
+// change title statement, now is a string variable
+title="this is a title"
+ok="PASS"
+cancel=""
+print ask$(a + vbcrlf + "Press something", title, ok, cancel)
+print ask(a + vbcrlf + "Press something", title, ,cancel)
+Print union.data$(a,32, 65,32,"ok")
+}
+MODULE CHECKSTR {Pen 15 {Print "TEST for variable a$ as string"}
+a$="THIS IS A STRING"
+print "use of qoute$(a$)"
+print "a$ = "+quote$(a$)
+print " left$(a$,3)"
+print left$(a$,3)
+print " right$(a$,3)"
+print right$(a$,3)
+print " mid$(a$, 6)"
+print mid$(a$, 6)
+print " mid$(a$, 6, 2)"
+print mid$(a$, 6,2)
+print { rightpart$(a$, " IS A ")}
+print rightpart$(a$, " IS A ")
+print { leftpart$(a$, " IS A ")}
+print leftpart$(a$, " IS A ")
+
+
+}
+MODULE BIGENUM {Enumeration Names {
+	a="hello"
+	b="hello two"
+}
+
+m=b
+select case m
+case a
+	? "is a"
+case b
+	? " is b"
+end select
+	? "done"
+? m
 }
 UseThis : InfoBasic : ShowKeys : Pen 15 {Print "Press F3 now"}
