@@ -16,7 +16,7 @@ Private mstack As New Collection
 Private mMany As Long
 Dim BeginFrom As Long
 ' interface for iteration
-Public Index As Long
+Public index As Long
 ' new idea to not include a VarItem
 ' we place three items, the slot, the type (or subtype), the data.
 ' so each item is a multiple of three
@@ -60,14 +60,14 @@ End If
 End Sub
 Public Sub Copy2TopItem(where As Long)
 'we pick an item and to the top
-Dim aa As VarItem, BB As VarItem, mm As Object, mn As mArray, work As Object
+Dim aa As VarItem, bb As VarItem, mm As Object, mn As mArray, work As Object
 On Error Resume Next
-Set BB = mstack.item(where)
-If BB.ObjectRef Is Nothing Then
-    If BB.slot = 4 Then BB.slot = 5
-    Set aa = BB
+Set bb = mstack.item(where)
+If bb.ObjectRef Is Nothing Then
+    If bb.slot = 4 Then bb.slot = 5
+    Set aa = bb
 Else
-    Set work = BB.ObjectRef
+    Set work = bb.ObjectRef
     Select Case Typename(work)
         Case "Group"
             Set aa = NewVarItem()
@@ -119,16 +119,16 @@ MergeFromOther.MergeBottom mm
 End Function
 Public Sub Copy2TopNItems2FromStiva(many As Long, Source As mStiva)
 'we pick an item and to the top
-Dim aa As VarItem, BB As VarItem, mm As Object, mn As mArray, work As Object
+Dim aa As VarItem, bb As VarItem, mm As Object, mn As mArray, work As Object
 On Error Resume Next
 For many = many To 1 Step -1
     If Source.Total >= many Then
-        Set BB = Source.StackPickRef2(many)
-        If BB.ObjectRef Is Nothing Then
-            If BB.slot = 4 Then BB.slot = 5
-            Set aa = BB
+        Set bb = Source.StackPickRef2(many)
+        If bb.ObjectRef Is Nothing Then
+            If bb.slot = 4 Then bb.slot = 5
+            Set aa = bb
         Else
-            Set work = BB.ObjectRef
+            Set work = bb.ObjectRef
             Select Case Typename(work)
             Case "Group"
                 Set aa = NewVarItem()
@@ -150,7 +150,7 @@ For many = many To 1 Step -1
             Case Else
             
             
-            Set aa = BB
+            Set aa = bb
             
             End Select
             Set work = Nothing
@@ -168,16 +168,16 @@ Next many
 End Sub
 Public Sub Copy2BottomNItems2FromStiva(many1 As Long, Source As mStiva)
 ' reverse order
-Dim aa As VarItem, BB As VarItem, mm As Object, mn As mArray, work As Object, many As Long
+Dim aa As VarItem, bb As VarItem, mm As Object, mn As mArray, work As Object, many As Long
 On Error Resume Next
 For many = Source.Total - many1 + 1 To Source.Total
 
 If Source.Total >= many Then
-    Set BB = Source.StackPickRef2(many)
-    If BB.ObjectRef Is Nothing Then
-        Set aa = BB
+    Set bb = Source.StackPickRef2(many)
+    If bb.ObjectRef Is Nothing Then
+        Set aa = bb
     Else
-        Set work = BB.ObjectRef
+        Set work = bb.ObjectRef
         Select Case Typename(work)
         Case "Group"
             Set aa = NewVarItem()
@@ -197,7 +197,7 @@ If Source.Total >= many Then
             work.CopyArray mn
             Set aa.ObjectRef = mn
         Case Else
-        Set aa = BB
+        Set aa = bb
         End Select
         Set work = Nothing
         End If
@@ -239,7 +239,7 @@ mess:
 MyEr "offset out of limits", "Δείκτης εκτός ορίων"
 End Property
 Public Property Get StackItemTypeObjectType(where As Long) As String
-Dim aa As VarItem, BB As Object, mh As mHandler
+Dim aa As VarItem, bb As Object, mh As mHandler
 On Error Resume Next
 
 Set aa = mstack.item(where)
@@ -247,15 +247,15 @@ Select Case aa.Typename
 Case "N", "S", "?", "L"
 StackItemTypeObjectType = vbNullString
 Case "*"
-Set BB = aa.ObjectRef
-If TypeOf BB Is mHandler Then
-Set mh = BB
-Set BB = mh.objref
-CheckDeepAny BB
-If Not TypeOf BB Is mHandler Then
+Set bb = aa.ObjectRef
+If TypeOf bb Is mHandler Then
+Set mh = bb
+Set bb = mh.objref
+CheckDeepAny bb
+If Not TypeOf bb Is mHandler Then
 StackItemTypeObjectType = "*[" + Typename(mh.objref) + "]"
 Else
-Set mh = BB
+Set mh = bb
 If mh.t1 = 3 Or mh.t1 = 0 Then
 StackItemTypeObjectType = "*[" + Typename(mh.objref) + "]"
 ElseIf mh.t1 = 1 Then
@@ -267,17 +267,17 @@ StackItemTypeObjectType = "*[Enum]"
 End If
 End If
 Else
-StackItemTypeObjectType = VarTypeName(BB)
+StackItemTypeObjectType = VarTypeName(bb)
 End If
-Set BB = Nothing
+Set bb = Nothing
 Case Else
-Set BB = aa.ObjectRef
-StackItemTypeObjectType = VarTypeName(BB)
-Set BB = Nothing
+Set bb = aa.ObjectRef
+StackItemTypeObjectType = VarTypeName(bb)
+Set bb = Nothing
 End Select
 End Property
 Public Property Get StackItemTypeIsObject(where As Long) As Boolean
-Dim aa As VarItem, BB As Object
+Dim aa As VarItem, bb As Object
 On Error Resume Next
 
 Set aa = mstack.item(where)
@@ -864,8 +864,8 @@ Next i
 End Function
 Property Get Value() As Variant
 Dim aa As VarItem
-If Index >= 0 And Index < mMany Then
-    Set aa = mstack.item(Index + 1)
+If index >= 0 And index < mMany Then
+    Set aa = mstack.item(index + 1)
     If aa.slot = 1 Then
         Set Value = aa.mItem
     Else
@@ -875,8 +875,8 @@ End If
 End Property
 Function IsObj() As Boolean
 Dim aa As VarItem
-If Index >= 0 And Index < mMany Then
-    Set aa = mstack.item(Index + 1)
+If index >= 0 And index < mMany Then
+    Set aa = mstack.item(index + 1)
     If aa.slot = 1 Then
         IsObj = True
     End If
@@ -884,8 +884,8 @@ End If
 End Function
 Function IsEnum(p As Variant) As Boolean
 Dim aa As VarItem, usehandler As mHandler
-If Index >= 0 And Index < mMany Then
-    Set aa = mstack.item(Index + 1)
+If index >= 0 And index < mMany Then
+    Set aa = mstack.item(index + 1)
     If aa.slot = 1 Then
         If Typename(aa.mItem) = "mHandler" Then
             Set usehandler = aa.mItem

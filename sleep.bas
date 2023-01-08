@@ -19,7 +19,7 @@ Private Type FILETIME
     dwLowDateTime As Long
     dwHighDateTime As Long
 End Type
-Private Declare Function timeGetTime Lib "Kernel32.dll" Alias "GetTickCount" () As Long
+Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
 Private Const WAIT_ABANDONED& = &H80&
 Private Const WAIT_ABANDONED_0& = &H80&
 Private Const WAIT_FAILED& = -1&
@@ -96,8 +96,8 @@ Private Declare Function MsgWaitForMultipleObjects Lib "user32" ( _
 ''DoEvents alternative function.
 Private Declare Function FlushInstructionCache Lib "kernel32" (ByVal hProcess As Long, lpBaseAddress As Any, ByVal dwSize As Long) As Long
 Private Declare Function HeapAlloc Lib "kernel32" (ByVal hHeap As Long, ByVal dwFlags As Long, ByVal dwBytes As Long) As Long
-Private Declare Function HeapReAlloc Lib "Kernel32.dll" (ByVal hHeap As Long, ByVal dwFlags As Long, ByVal lpMem As Long, ByVal dwBytes As Long) As Long
-Private Declare Function HeapSize Lib "Kernel32.dll" (ByVal hHeap As Long, ByVal dwFlags As Long, ByVal lpMem As Long) As Long
+Private Declare Function HeapReAlloc Lib "kernel32.dll" (ByVal hHeap As Long, ByVal dwFlags As Long, ByVal lpMem As Long, ByVal dwBytes As Long) As Long
+Private Declare Function HeapSize Lib "kernel32.dll" (ByVal hHeap As Long, ByVal dwFlags As Long, ByVal lpMem As Long) As Long
 Private Declare Function HeapFree Lib "kernel32" (ByVal hHeap As Long, ByVal dwFlags As Long, ByVal lpMem As Long) As Long
 Private Declare Function GetProcessHeap Lib "kernel32" () As Long
 Private Declare Function VirtualAlloc Lib "kernel32" (ByVal lpAddress As Long, ByVal dwSize As Long, ByVal flAllocationType As Long, ByVal flProtect As Long) As Long
@@ -105,7 +105,7 @@ Private Declare Function VirtualFree Lib "kernel32" (ByVal lpAddress As Long, By
 Private Declare Function VirtualLock Lib "kernel32" (ByVal lpAddress As Long, ByVal dwSize As Long) As Long
 Private Declare Function VirtualUnlock Lib "kernel32" (ByVal lpAddress As Long, ByVal dwSize As Long) As Long
 Private Declare Function VirtualProtect Lib "kernel32" (ByVal lpAddress As Long, ByVal dwSize As Long, ByVal flNewProtect As Long, lpflOldProtect As Long) As Long
-Public Declare Function Wow64EnableWow64FsRedirection Lib "Kernel32.dll" (ByVal Enable As Boolean) As Boolean
+Public Declare Function Wow64EnableWow64FsRedirection Lib "kernel32.dll" (ByVal Enable As Boolean) As Boolean
 Private Declare Function GetProcAddress Lib "kernel32" (ByVal hModule As Long, ByVal lpProcName As String) As Long
 Private Declare Function GetModuleHandle Lib "kernel32" Alias "GetModuleHandleA" (ByVal lpModuleName As String) As Long
 Private Declare Function GetCurrentProcess Lib "kernel32" () As Long

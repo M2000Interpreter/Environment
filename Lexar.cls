@@ -754,7 +754,7 @@ Private Sub addone(ByVal thispos As Long, ByVal thiscolor As Long)
 Dim k As Long
 
 k = UBound(Col())
-If vartype(Col(0)) = 0 Then
+If VarType(Col(0)) = 0 Then
 makebase 14
 If thispos <> 1 Then
 k = UBound(Col())
@@ -867,7 +867,7 @@ Exit Sub
 ' FOR TESTS
   pos1 = 0
   For k = 1 To UBound(Col()) Step 2
-    If vartype(Col(k)) = 0 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
+    If VarType(Col(k)) = 0 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
     If Col(k) > pos1 Then pos1 = Col(k)
     If Col(k) < pos1 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
   Next k
@@ -1629,7 +1629,7 @@ Exit Sub
 ' FOR TESTS
   pos1 = 0
   For k = 1 To UBound(Col()) Step 2
-    If vartype(Col(k)) = 0 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
+    If VarType(Col(k)) = 0 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
     If Col(k) > pos1 Then pos1 = Col(k)
     If Col(k) < pos1 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
   Next k

@@ -97,7 +97,7 @@ If Done Then
                    k = PriveSpace(k).Pleft - 1
             Loop
             If k = k1 Then
-               ReHash
+               Rehash
             ElseIf k = top1 Then
                PriveSpace(k1).Pleft = index + 1
             End If
@@ -113,22 +113,22 @@ here:
 End If
 End Sub
 Public Sub Remove(RHS)
-Dim k As Long, k1 As Long, vvv As Variant, top1 As Long, ndx As Long, Parndx As Long
+Dim k As Long, k1 As Long, vvv As Variant, top1 As Long, nDx As Long, Parndx As Long
 
 If toplim < 0 Then Exit Sub
 top1 = toplim
-If Find2(RHS, Parndx, ndx) Then
+If Find2(RHS, Parndx, nDx) Then
         Done = True
-        index = ndx
+        index = nDx
         ' here we make a clean to pointers to PriveSpace, so we exclude the removing item
         If Parndx > -1 Then
             ' if we have a parent then just push to parent the Pleft pointer
             ' Pleft is always +1 (so Pleft 0 give -1 null for this context)
-            PriveSpace(Parndx).Pleft = PriveSpace(ndx).Pleft
+            PriveSpace(Parndx).Pleft = PriveSpace(nDx).Pleft
 
         Else
         ' so we have no parent, just out Pleft to Hash
-        Hash(PriveSpace(ndx).lastpos) = PriveSpace(ndx).Pleft
+        Hash(PriveSpace(nDx).lastpos) = PriveSpace(nDx).Pleft
 
         End If
         ' we don't have to see Hash() any more for RHS
@@ -138,25 +138,25 @@ If Find2(RHS, Parndx, ndx) Then
         ' we can check this but it is faster to not check this (more often top1 isn't ndx)
         ' Using SwapVariant we can swap any kind of Variant, including objects (swaping pointers only)
         SwapVariant vvv, PriveSpace(top1).iValue
-        PriveSpace(ndx).iValue = -1 ' is good to pass a number - so we break any pointer to object
-        PriveSpace(ndx) = PriveSpace(top1) ' now we perform a copy (no objects included)
+        PriveSpace(nDx).iValue = -1 ' is good to pass a number - so we break any pointer to object
+        PriveSpace(nDx) = PriveSpace(top1) ' now we perform a copy (no objects included)
         PriveSpace(top1) = new_item
         ' so now we put back iValue (maybe is an object)
-        SwapVariant vvv, PriveSpace(ndx).iValue
+        SwapVariant vvv, PriveSpace(nDx).iValue
         ' here Lastpos is from previous PriveSpace(top1) which is PriveSpace(ndx)
-        k = Hash(PriveSpace(ndx).lastpos) - 1
+        k = Hash(PriveSpace(nDx).lastpos) - 1
         If k = top1 Then
             ' we have to give the new position to Hash()
-            Hash(PriveSpace(ndx).lastpos) = ndx + 1
+            Hash(PriveSpace(nDx).lastpos) = nDx + 1
         Else
             Do While k >= 0 And k <> top1 And k <> k1
                    k1 = k
                    k = PriveSpace(k).Pleft - 1
             Loop
             If k = k1 Then
-               ReHash
+               Rehash
             ElseIf k = top1 Then
-               PriveSpace(k1).Pleft = ndx + 1
+               PriveSpace(k1).Pleft = nDx + 1
             End If
         End If
   
@@ -227,9 +227,9 @@ End If
 End Property
 Private Sub ExpandHash()
     hashlen = hashlen * 2 + 3
-    ReHash
+    Rehash
 End Sub
-Private Sub ReHash()
+Private Sub Rehash()
     Dim i As Long
     ReDim Hash(hashlen) As Long
     For i = 0 To toplim
@@ -254,7 +254,7 @@ Private Sub ReduceHash(newTop As Long)
                 
                 hashlen = MaxSpace * 2 + 3
                 
-                ReHash
+                Rehash
             End If
     Else
             On Error Resume Next
@@ -264,7 +264,7 @@ Private Sub ReduceHash(newTop As Long)
             MaxSpace = 2 * (newTop + 1) + 1
             ReDim Preserve PriveSpace(MaxSpace) As item
             hashlen = MaxSpace * 2 + 3
-            ReHash
+            Rehash
     End If
    End If
 End Sub
@@ -280,8 +280,8 @@ Private Function Malloc() As Long
     toplim = toplim + 1
     Malloc = toplim
 End Function
-Property Get Count()
-    Count = toplim + 1
+Property Get count()
+    count = toplim + 1
 End Property
 
 Function IsObj() As Boolean
@@ -309,7 +309,7 @@ Do
     k = PriveSpace(k).Pleft - 1
 Loop Until k < 0 Or k = k1
 If k = k1 Then
-ReHash
+Rehash
 k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 ParentIndex = -1
@@ -324,7 +324,7 @@ End If
 End If
 End If
 End Function
-Private Function Find2(RHS, Parndx As Long, ndx As Long) As Boolean
+Private Function Find2(RHS, Parndx As Long, nDx As Long) As Boolean
 If toplim = -1 Then Exit Function
 Dim k As Long, Key As Long, k1 As Long
 
@@ -334,20 +334,20 @@ k = Hash(HashFunc(Key)) - 1
 k1 = -2
 If k >= 0 Then
 Do
-    If PriveSpace(k).Key = Key Then Find2 = True: ndx = k: Exit Function
+    If PriveSpace(k).Key = Key Then Find2 = True: nDx = k: Exit Function
      Parndx = k
      k1 = k
      k = PriveSpace(k).Pleft - 1
      
 Loop Until k < 0 Or k1 = k
 If k1 = k Then
-ReHash
+Rehash
 Parndx = -1
 k1 = -2
 k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
-    If PriveSpace(k).Key = Key Then Find2 = True: ndx = k: Exit Function
+    If PriveSpace(k).Key = Key Then Find2 = True: nDx = k: Exit Function
      Parndx = k
      k1 = k
      k = PriveSpace(k).Pleft - 1
@@ -410,7 +410,7 @@ Done = True
 End Sub
 
 Property Get Percent()
-Percent = 100 * Count / hashlen
+Percent = 100 * count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
@@ -441,11 +441,11 @@ Private Function UINT(ByVal a As Integer) As Long
  End If
  
  End Function
-Private Function MyModOld(R1 As Double, po) As Double
-MyModOld = R1 - Fix(R1 / po) * po
+Private Function MyModOld(r1 As Double, po) As Double
+MyModOld = r1 - Fix(r1 / po) * po
 End Function
-Private Function MyMod(R1, po) As Variant
-MyMod = R1 - Fix(R1 / po) * po
+Private Function MyMod(r1, po) As Variant
+MyMod = r1 - Fix(r1 / po) * po
 End Function
 Private Function uintnew(ByVal a As Currency) As Currency
 If a > 2147483647@ Then a = 2147483647@
@@ -492,11 +492,11 @@ End If
 End Property
 Public Sub ToStart()
 index = 0
-Done = Count > 0
+Done = count > 0
 End Sub
 Public Sub ToEnd()
-index = Count - 1
-Done = Count > 0
+index = count - 1
+Done = count > 0
 End Sub
 
 Public Sub NextIndex()

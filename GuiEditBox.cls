@@ -181,7 +181,7 @@ Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT
 Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hDC As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
-Private Declare Function GetStringTypeExW Lib "Kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
+Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 Private tmpshow As Boolean
 Private WordOnly As Boolean
 Private ColArr(0 To 15) As Long
@@ -879,12 +879,12 @@ Render
 End Sub
 
 
-Private Sub glistN_OutPopUp(x As Single, y As Single, myButton As Integer)
+Private Sub glistN_OutPopUp(X As Single, y As Single, myButton As Integer)
 '
 If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
    Else
-      Callback.Callback mesCtrlName + ".PopUp(" + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
       End If
 End Sub
 
@@ -7961,16 +7961,16 @@ End If
 aheadstatus = b$
 End Function
 
-Public Sub move(x, y, Optional W, Optional H)
+Public Sub move(X, y, Optional W, Optional H)
 glistN.HideBarAsap
 If IsMissing(W) Then
-glistN.MoveTwips CLng(x), CLng(y), 0, 0
+glistN.MoveTwips CLng(X), CLng(y), 0, 0
 ElseIf IsMissing(H) Then
 
-glistN.MoveTwips CLng(x), CLng(y), CLng(W), 0
+glistN.MoveTwips CLng(X), CLng(y), CLng(W), 0
 RelocateMarkedText
 Else
-glistN.MoveTwips CLng(x), CLng(y), CLng(W), CLng(H)
+glistN.MoveTwips CLng(X), CLng(y), CLng(W), CLng(H)
 RelocateMarkedText
 End If
 
@@ -8819,7 +8819,7 @@ Public Property Let MultiLineComment2(ByVal vNewValue As Variant)
 mMultiLineComment2 = vNewValue
 mDoc.Final = vNewValue
 End Property
-Public Sub PopUpMenu(poptitle$, x As Variant, y As Variant)
+Public Sub PopUpMenu(poptitle$, X As Variant, y As Variant)
 Dim oldModalId As Variant, i As Long
 ''If UsedAsTextBox Then Exit Sub
 i = SelLength
@@ -8836,7 +8836,7 @@ Modalid = Rnd * 113314324
 'UnHook Callback.hWnd
 UNhookMe
 MyPopUp.feedlabels Me, False
-MyPopUp.UpGui Callback, x, y, poptitle$
+MyPopUp.UpGui Callback, X, y, poptitle$
 MyPopUp.Visible = True
 MyPopUp.ZOrder 0
 
@@ -9008,10 +9008,10 @@ glistN.EditFlag = OnOff
 glistN.NoCaretShow = NoMark
 End Sub
 Sub Transparent()
-Dim x  As Long, y As Long
+Dim X  As Long, y As Long
 glistN.BackStyle = 1
-glistN.GetLeftTop x, y
-glistN.RepaintFromOut Callback.Image, x, y
+glistN.GetLeftTop X, y
+glistN.RepaintFromOut Callback.Image, X, y
 glistN.ShowMe
 Callback.RefreshList = Callback.RefreshList + 1
 End Sub

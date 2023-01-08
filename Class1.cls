@@ -18,12 +18,11 @@ Attribute doit.VB_UserMemId = 0
 Dim test
 Dim link$
 
-If Dir(App.path + "\" + App.ExeName + ".gsb") <> "" Then
-link$ = "{dir " + Chr$(34) + App.path + Chr$(34) + " : load " & App.ExeName & "}"
+If ExistResource Then
+    link$ = "{dir " + Chr$(34) + App.path + Chr$(34) + " : icon 0: start 0}"
+ElseIf Dir(App.path + "\" + App.ExeName + ".gsb") <> "" Then
+    link$ = "{dir " + Chr$(34) + App.path + Chr$(34) + " : load " & App.ExeName & "}"
 End If
-'If Dir(App.path + "\M2000.gsb") <> "" Then
-'link$ = "{dir " + Chr$(34) + App.path + Chr$(34) + " : load M2000}"
-'End If
 Set f = New Form1
 f.Move VirtualScreenWidth() + 2000, VirtualScreenHeight() + 2000
 
@@ -56,43 +55,47 @@ End If
 ' check for old m2000.dll
 test = m.WindowState
 If Err Then
-Debug.Assert (InIDECheck = True)
-m.run "start"
-m.StackMax -12345
-a$ = commandW
-If Trim$(a$) = "-h" Or Trim$(a$) = "/?" Then frmAbout.Show 1: ExitNow = True: Exit Sub
-If a$ = "" And link$ <> "" Then a$ = link$
-If m.Status = 0 Then
-m.Cli a$, ">"
-End If
-Set m = Nothing
-ExitNow = True
-Exit Sub
-
+    Debug.Assert (InIDECheck = True)
+    m.run "start"
+    m.StackMax -12345
+    a$ = commandW
+    If Trim$(a$) = "-h" Or Trim$(a$) = "/?" Then frmAbout.Show 1: ExitNow = True: Exit Sub
+    If a$ = "" And link$ <> "" Then a$ = link$
+    If m.Status = 0 Then
+        m.Cli a$, ">"
+    End If
+    Set m = Nothing
+    ExitNow = True
+    Exit Sub
 Else
-m.getform f
-Debug.Assert (InIDECheck = True)
-m.run "start"
-m.StackMax -12345
-a$ = commandW
-
-If Trim$(a$) = "-h" Or Trim$(a$) = "/?" Then frmAbout.Show 1: ExitNow = True: Exit Sub
-If a$ = "" And link$ <> "" Then a$ = link$
-If m.Status = 0 Then
-Set f.mm = Me
-Set f.m = m
-
-Sleep 100
-m.AsyncCli a$, ">"
-Debug.Print "ok"
-
-Else
-Set m = Nothing
-ShutDownAll
-End If
+    m.getform f
+    Debug.Assert (InIDECheck = True)
+    m.run "start"
+    m.StackMax -12345
+    a$ = commandW
+    If Trim$(a$) = "-h" Or Trim$(a$) = "/?" Then frmAbout.Show 1: ExitNow = True: Exit Sub
+    If a$ = "" And link$ <> "" Then a$ = link$
+    If m.Status = 0 Then
+        Set f.mm = Me
+        Set f.m = m
+        Sleep 100
+        m.AsyncCli a$, ">"
+        Debug.Print "ok"
+    Else
+        Set m = Nothing
+        ShutDownAll
+    End If
 End If
 End Sub
 
+Public Property Get ExistResource() As Boolean
+    Const RT_RCDATA                 As Long = 10&
+    On Error Resume Next
+    Dim resp$
+    resp$ = LoadResData(101&, RT_RCDATA)
+    ExistResource = Len(resp$) > 0
+    Err.Clear
+End Property
 Private Sub Class_Initialize()
 Set f = Nothing
 'If m Is Nothing Then Exit Sub

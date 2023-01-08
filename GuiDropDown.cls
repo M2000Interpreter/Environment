@@ -111,14 +111,14 @@ End With
  mesCtrlName = Name$
 End Sub
 
-Public Sub move(X, y, Optional w, Optional h)
+Public Sub move(X, y, Optional W, Optional H)
 With Textbox
-If IsMissing(w) Then
+If IsMissing(W) Then
 .glistN.MoveTwips CLng(X), CLng(y), 0, 0
-ElseIf IsMissing(h) Then
-.glistN.MoveTwips CLng(X), CLng(y), CLng(w), 0
+ElseIf IsMissing(H) Then
+.glistN.MoveTwips CLng(X), CLng(y), CLng(W), 0
 Else
-.glistN.MoveTwips CLng(X), CLng(y), CLng(w), CLng(h)
+.glistN.MoveTwips CLng(X), CLng(y), CLng(W), CLng(H)
 End If
 Pad.move Pad.Left, Pad.top, .glistN.widthtwips, .glistN.HeightTwips * 5
 End With
@@ -140,7 +140,7 @@ If ThisFontName <> "" Then
 
 aa.Name = ThisFontName
 
-If ThisMode > 7 Then aa.Size = ThisMode Else aa = 7
+If ThisMode > 7 Then aa.size = ThisMode Else aa = 7
 aa.bold = ThisBold
 Set Textbox.glistN.Font = aa
 End If
@@ -177,7 +177,7 @@ Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, By
 If item = -1 Then
 
 Else
-glistN.mousepointer = 1
+glistN.MousePointer = 1
 If lastitem = item Then Exit Sub
 If glistN.ListSep(item) Then Exit Sub
 glistN.ListindexPrivateUse = item
@@ -268,7 +268,7 @@ End If
 Iam = True
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
 If KeyCode = vbKeyLeft Or KeyCode = vbKeyRight Then
 If Textbox.glistN.EditFlag Then
 Iam = True
@@ -284,9 +284,9 @@ Textbox.SetFocus
 Pad.Visible = False
 If mMenuStyle Then
 playnext = KeyCode
-playnextshift = Shift
+playnextshift = shift
 KeyCode = 0
-Shift = 0
+shift = 0
 Exit Sub
 Else
 KeyCode = 9
@@ -440,7 +440,7 @@ Private Sub Textbox_Fkey(a As Integer)
 Callback.SendFKEY a
 End Sub
 
-Private Sub textbox_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub textbox_KeyDown(KeyCode As Integer, shift As Integer)
 'If Not glistN.enabled Then KeyCode = 0: shift = 0: Exit Sub
 Dim b$
 Dim gl As Long, X As Long, x1 As gList, XX As Boolean
@@ -554,7 +554,7 @@ glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
    ' glistN.SetFocus
 
      If AutoComplete Then
-            glistN.moveto Text
+            glistN.MoveTo Text
             If glistN.ListIndex < 0 Then
                 glistN.ListIndex = 0
             Else
@@ -566,7 +566,7 @@ glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
             ElseIf mMenuStyle Then
                 glistN.ListindexPrivateUseFirstFree 0
             Else
-                glistN.moveto Text
+                glistN.MoveTo Text
                 If glistN.ListIndex < 0 Then
                     glistN.ListIndex = 0
                 Else
@@ -686,7 +686,7 @@ End If
 End Sub
 
 
-Private Sub textbox_MouseMove(Button As Integer, Shift As Integer, X As Single, y As Single)
+Private Sub textbox_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
 Dim gl As Long
 playnext = 0
 If mMenuStyle Then
@@ -745,7 +745,7 @@ If glistN.Visible Then glistN.Enabled = True: Textbox.SkipProcAtExitFocus = True
 '     Pad.Width = Callback.Controls(ctrlName).Width
 '     End If
 '     Else
-'Pad.Width = CLng(Callback.Controls(ctrlName).Width / 1.618 * dv15) \ dv15
+'Pad.Width = CLNG(Callback.Controls(ctrlName).Width / 1.618 * dv15) \ dv15
 'End If
 
 If Callback.Controls(ctrlName).Height * gl < ScrY() * 3 / 5 Then
@@ -765,7 +765,7 @@ glistN.ShowBar = False
     Textbox.SkipProcAtExitFocus = True
     glistN.LeaveonChoose = True
   If AutoComplete Then
-        glistN.moveto Text
+        glistN.MoveTo Text
         If glistN.ListIndex < 0 Then
         glistN.ListIndex = 0
         Else
@@ -778,7 +778,7 @@ glistN.ShowBar = False
     'ElseIf mMenuStyle Then
     'glistN.ListindexPrivateUseFirstFree 0
     Else
-            glistN.moveto Text
+            glistN.MoveTo Text
                 If glistN.ListIndex < 0 Then
                 glistN.ListIndex = 0
                 Else
@@ -886,7 +886,7 @@ End If
 End If
 Textbox.locked = RHS
 End Property
-Public Sub additem(a$)
+Public Sub AddItem(a$)
 glistN.additemFast a$
 Text = a$
 End Sub
@@ -894,7 +894,7 @@ End Sub
 Public Sub additemFast(a$)
 glistN.additemFast a$
 End Sub
-Public Sub MenuItem(a$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional ByVal Id, Optional ByVal acc, Optional ByVal Shift, Optional ByVal ctrl, Optional ByVal alt, Optional legend)
+Public Sub MenuItem(a$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional ByVal Id, Optional ByVal acc, Optional ByVal shift, Optional ByVal ctrl, Optional ByVal alt, Optional legend)
 Dim item, disp$
 If Not mMenuStyle Then
     MenuStyle = True
@@ -942,8 +942,8 @@ If Not IsMissing(ctrl) Then
 acc = acc - 10000 * CBool(ctrl)
 disp$ = "Ctrl+" + disp$
 End If
-If Not IsMissing(Shift) Then
-acc = acc - 1000 * CBool(Shift)
+If Not IsMissing(shift) Then
+acc = acc - 1000 * CBool(shift)
 disp$ = "Shift+" + disp$
 End If
 
@@ -953,7 +953,7 @@ If acckeys.ExistKey(item - 1) Then acckeys.Value = disp$ Else acckeys.AddKey ite
 
 End If
 End Sub
-Public Sub MenuRadio(a$, Optional enabledthis As Boolean = True, Optional firstate As Boolean = False, Optional ByVal Id, Optional ByVal acc, Optional ByVal Shift, Optional ByVal ctrl, Optional ByVal alt, Optional legend)
+Public Sub MenuRadio(a$, Optional enabledthis As Boolean = True, Optional firstate As Boolean = False, Optional ByVal Id, Optional ByVal acc, Optional ByVal shift, Optional ByVal ctrl, Optional ByVal alt, Optional legend)
 Dim item, checked As Boolean, disp$
 checked = False
 If Not mMenuStyle Then
@@ -1003,8 +1003,8 @@ If Not IsMissing(ctrl) Then
 acc = acc - 10000 * CBool(ctrl)
 disp$ = "Ctrl+" + disp$
 End If
-If Not IsMissing(Shift) Then
-acc = acc - 1000 * CBool(Shift)
+If Not IsMissing(shift) Then
+acc = acc - 1000 * CBool(shift)
 disp$ = "Shift+" + disp$
 End If
 Callback.RegisterAcc acc, ctrlName, -item
@@ -1075,11 +1075,11 @@ Dim ff1 As New StdFont
 With Callback
 ff.Name = .CtrlFontName
 ff.charset = Form1.DIS.Font.charset
-ff.Size = .CtrlFontSize
+ff.size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 ff1.Name = .CtrlFontName
 ff1.charset = Form1.DIS.Font.charset
-ff1.Size = .CtrlFontSize
+ff1.size = .CtrlFontSize
 ff1.bold = .CtrlFontBold
 
 
@@ -1317,11 +1317,11 @@ Public Sub SetBarStyle(bColor As Long, Optional bHatch As Long, Optional BHatchC
     glistN.BarHatch = bHatch
     glistN.BarHatchColor = BHatchColor
 End Sub
-Public Property Get Linespace() As Variant
-Linespace = dv15 * (glistN.addpixels) / 2
+Public Property Get LineSpace() As Variant
+LineSpace = dv15 * (glistN.addpixels) / 2
 End Property
 
-Public Property Let Linespace(ByVal vNewValue As Variant)
+Public Property Let LineSpace(ByVal vNewValue As Variant)
     vNewValue = (vNewValue \ 30) * 60
 On Error Resume Next
 glistN.addpixels = CLng(vNewValue / dv15)
@@ -1338,7 +1338,7 @@ Private Sub OneClick()
 On Error Resume Next
 If SkipFirstClick Then glistN.PrepareClick
 End Sub
-Public Sub AccKey(a, Optional Shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
 If MyIsNumeric(a) Then
 a = CLng(a)
@@ -1356,7 +1356,7 @@ End Select
 End If
 If Opcode < 0 Then Opcode = 0
 If a = 0 Then Exit Sub
-a = a - 1000 * Shift - 10000 * ctrl - 100000 * alt
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
 Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
 

@@ -174,7 +174,32 @@ End Sub
 Public Function GetAppIcon() As String
     GetAppIcon = PackData(MyIcon)
 End Function
-
+Public Function GetResource(ResID As Long, retdata() As Byte) As Boolean
+    Const RT_RCDATA                 As Long = 10&
+    On Error Resume Next
+    retdata() = LoadResData(ResID, RT_RCDATA)
+    If Err Then
+            Err.Clear
+    Else
+        GetResource = True
+    End If
+End Function
+Public Property Get GetCode() As String
+    Dim packet() As Byte, i As Long, part As String, final As String, k As Long
+    i = 1
+    k = FreeFile
+    'Open App.path + "\data.txt" For Binary As #k
+    Do
+    ReDim packet(0)
+    If Not GetResource(i + 100, packet) Then Exit Do
+    'Put #k, , packet
+    part = packet
+    final = final + part
+    i = i + 1
+    Loop
+    'Close #k
+    GetCode = RTrim(final)
+End Property
 Private Function UnPackData(sData As String) As Object
     Dim pbTemp  As PropertyBag
     Dim arData()    As Byte

@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 1 active-X
-A beta version of 12 (not tested a lot)
+Version 12 Revision 2 active-X
+Work in progress.
 
 
 George Karras, Kallithea Attikis, Greece.

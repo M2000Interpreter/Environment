@@ -123,7 +123,7 @@ End Type
 
 Private Type SAFEARRAYBOUND
     cElements                   As Long
-    lLBound                     As Long
+    lLbound                     As Long
 End Type
 
 Private Type SAFEARRAY_1D
@@ -348,7 +348,7 @@ Private Function pvGetParamArray(ByVal Ptr As Long, numArg As Long) As Variant()
     ' array pointing to the param array
     With SafeArray
         .Bounds(0).cElements = tDPAR.cArgs
-        .Bounds(0).lLBound = 0
+        .Bounds(0).lLbound = 0
         .cDims = 1
         .cbElements = 16
         .pvData = tDPAR.rgPointerToVariantArray
@@ -589,9 +589,9 @@ End Sub
 Public Function Attached() As Boolean
     Attached = blnAttached
 End Function
-Sub Process(VarProc As Long, A As Long, Ptr1 As Long, usestring As Boolean, stval$)
+Sub Process(VarProc As Long, a As Long, Ptr1 As Long, usestring As Boolean, stval$)
     Dim t(0 To 8) As Integer, Zero, Ptr As Long, ItsVariantRef As Boolean
-    CpyMem ByVal VarPtr(t(0)), ByVal A, 16
+    CpyMem ByVal VarPtr(t(0)), ByVal a, 16
 again:
     CpyMem Ptr, ByVal VarPtr(t(4)), 4
 
@@ -639,11 +639,11 @@ again:
                 End If
                 Exit Sub
             Else
-            CpyMem ByVal A, VarPtr(Zero), 16
+            CpyMem ByVal a, VarPtr(Zero), 16
             End If
         Else
             Ptr1 = -Ptr1
-            CpyMem ByVal A, VarPtr(Zero), 16
+            CpyMem ByVal a, VarPtr(Zero), 16
         End If
     End If
     CpyMem ByVal VarProc, ByVal VarPtr(t(0)), 16

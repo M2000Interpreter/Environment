@@ -1086,7 +1086,7 @@ If zf <= 0 Then
                         swProbe = CLng(sh * swProbe / shProbe) - 2 * Border / osh
                         shProbe = sh - 2 * Border * osh
                    End If
-                   ' Τελευταία αλλαγή - έφυγαν τα clng(border/osh) από τα x,y για να τυπώνει σωστά τα offset
+                   ' Τελευταία αλλαγή - έφυγαν τα CLNG(border/osh) από τα x,y για να τυπώνει σωστά τα offset
                  If (swProbe / Width) > (shProbe / Height) Then
                     zf = Width / swProbe
                     If swProbe > shProbe Then
@@ -1233,7 +1233,7 @@ sh = sh * m_logy
                         swProbe = CLng(sh * swProbe / shProbe) - 2 * Border / osh
                         shProbe = sh - 2 * Border * osh
                    End If
-                   ' Τελευταία αλλαγή - έφυγαν τα clng(border/osh) από τα x,y για να τυπώνει σωστά τα offset
+                   ' Τελευταία αλλαγή - έφυγαν τα CLNG(border/osh) από τα x,y για να τυπώνει σωστά τα offset
                  If (swProbe / Width) > (shProbe / Height) Then
                     zf = Width / swProbe
                     If swProbe > shProbe Then
@@ -1333,20 +1333,20 @@ If zf <= 0 Then
                         swProbe = CLng(sh * swProbe / shProbe) - 2 * Border / osh
                         shProbe = sh - 2 * Border * osh
                    End If
-                   ' Τελευταία αλλαγή - έφυγαν τα clng(border/osh) από τα x,y για να τυπώνει σωστά τα offset
+                   ' Τελευταία αλλαγή - έφυγαν τα CLNG(border/osh) από τα x,y για να τυπώνει σωστά τα offset
                  If (swProbe / Width) > (shProbe / Height) Then
                     zf = Width / swProbe
                     If swProbe > shProbe Then
-                      ' StretchPicture DestPic.hdc, CLng(fr) + offsetx + CLng(border * osh), CLng((sh - sw * shProbe / swProbe) / 2 + fr) + offsety + border, sw - border * 2, CLng(sw * shProbe / swProbe) - border * 2, 0, CLng((height - shProbe * zf)) / 2, width, CLng(shProbe * zf), , rtxy
+                      ' StretchPicture DestPic.hdc, CLNG(fr) + offsetx + CLNG(border * osh), CLNG((sh - sw * shProbe / swProbe) / 2 + fr) + offsety + border, sw - border * 2, CLNG(sw * shProbe / swProbe) - border * 2, 0, CLNG((height - shProbe * zf)) / 2, width, CLNG(shProbe * zf), , rtxy
                     Else
-                      '  StretchPicture DestPic.hdc, CLng(fr) + CLng((sw - sh * swProbe / shProbe) / 2) + offsetx + CLng(border / osh), CLng(fr) + offsety + border, CLng(sh * swProbe / shProbe) - 2 * border, sh - 2 * border, 0, CLng((height - shProbe * zf)) / 2, width, CLng(shProbe * zf), , rtxy
+                      '  StretchPicture DestPic.hdc, CLNG(fr) + CLNG((sw - sh * swProbe / shProbe) / 2) + offsetx + CLNG(border / osh), CLNG(fr) + offsety + border, CLNG(sh * swProbe / shProbe) - 2 * border, sh - 2 * border, 0, CLNG((height - shProbe * zf)) / 2, width, CLNG(shProbe * zf), , rtxy
                     End If
                 Else
                     zf = Height / shProbe
                     If swProbe > shProbe Then
-                '     StretchPicture DestPic.hdc, CLng(fr) + offsetx + CLng(border * osh), CLng((sh - sw * shProbe / swProbe) / 2 + fr) + offsety + border, sw - border * 2, CLng(sw * shProbe / swProbe) - border * 2, (width - swProbe * zf) / 2, 0, CLng(swProbe * zf), height, , rtxy
+                '     StretchPicture DestPic.hdc, CLNG(fr) + offsetx + CLNG(border * osh), CLNG((sh - sw * shProbe / swProbe) / 2 + fr) + offsety + border, sw - border * 2, CLNG(sw * shProbe / swProbe) - border * 2, (width - swProbe * zf) / 2, 0, CLNG(swProbe * zf), height, , rtxy
                     Else
-                 '    StretchPicture DestPic.hdc, CLng(fr) + CLng((sw - sh * swProbe / shProbe) / 2) + offsetx + border, CLng(fr) + offsety + CLng(border * osh), CLng(sh * swProbe / shProbe) - 2 * border, sh - 2 * border, (width - swProbe * zf) / 2, 0, CLng(swProbe * zf), height, , rtxy
+                 '    StretchPicture DestPic.hdc, CLNG(fr) + CLNG((sw - sh * swProbe / shProbe) / 2) + offsetx + border, CLNG(fr) + offsety + CLNG(border * osh), CLNG(sh * swProbe / shProbe) - 2 * border, sh - 2 * border, (width - swProbe * zf) / 2, 0, CLNG(swProbe * zf), height, , rtxy
                  End If
                   End If
              Else
@@ -1355,7 +1355,7 @@ If zf <= 0 Then
                 Else
                     zf = sh / Height
                 End If
-             '   StretchPicture DestPic.hdc, (sw - width * zf) / 2 + offsetx, (sh - height * zf) / 2 + offsety, CLng(width * zf), CLng(height * zf), , , , , , rtxy
+             '   StretchPicture DestPic.hdc, (sw - width * zf) / 2 + offsetx, (sh - height * zf) / 2 + offsety, CLNG(width * zf), CLNG(height * zf), , , , , , rtxy
             End If
         End If
     Else
@@ -2199,7 +2199,7 @@ Else
 If Not vso Is Nothing Then
 If vso.Visible = False Then
 vso.Visible = True
-vso.enabled = False: vso.Value = 0: vso.enabled = True
+vso.Enabled = False: vso.Value = 0: vso.Enabled = True
 End If
 vso.Visible = True
 VredX = redX
@@ -2218,7 +2218,7 @@ Else
 If Not hso Is Nothing Then
 If hso.Visible = False Then
 hso.Visible = True
-hso.enabled = False: hso.Value = 0: hso.enabled = True
+hso.Enabled = False: hso.Value = 0: hso.Enabled = True
 End If
 hso.Visible = True
 VredY = redY
@@ -2260,7 +2260,7 @@ If Not vso Is Nothing Then vso.Visible = False: redX = 0
 Else
 If Not vso Is Nothing Then
 If vso.Visible = False Then
-vso.Visible = True: vso.enabled = False: vso.Value = 0: vso.enabled = True
+vso.Visible = True: vso.Enabled = False: vso.Value = 0: vso.Enabled = True
 End If
 vso.Visible = True: redX = vso.Width
 End If
@@ -2300,7 +2300,7 @@ End If
 Else
 If Not vso Is Nothing Then
 If vso.Visible = False Then
-vso.Visible = True: vso.enabled = False: vso.Value = 0: vso.enabled = True
+vso.Visible = True: vso.Enabled = False: vso.Value = 0: vso.Enabled = True
 End If
 vso.Visible = True
 VredX = redX
@@ -2317,7 +2317,7 @@ End If
 Else
 If Not hso Is Nothing Then
 If hso.Visible = False Then
-hso.Visible = True: hso.enabled = False: hso.Value = 0: hso.enabled = True
+hso.Visible = True: hso.Enabled = False: hso.Value = 0: hso.Enabled = True
 End If
 hso.Visible = True
 VredY = redY
@@ -2410,7 +2410,7 @@ If zf <= 0 Then
                         swProbe = CLng(sh * swProbe / shProbe) - 2 * Border / osh
                         shProbe = sh - 2 * Border * osh
                    End If
-                   ' Τελευταία αλλαγή - έφυγαν τα clng(border/osh) από τα x,y για να τυπώνει σωστά τα offset
+                   ' Τελευταία αλλαγή - έφυγαν τα CLNG(border/osh) από τα x,y για να τυπώνει σωστά τα offset
                  If (swProbe / Width) > (shProbe / Height) Then
                     zf = Width / swProbe
                     If swProbe > shProbe Then

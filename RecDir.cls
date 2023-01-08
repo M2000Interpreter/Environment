@@ -113,15 +113,15 @@ Public Function GetLongName(strTest As String) As String
    Dim sLongPath As String
    Dim buff As String
    Dim cbbuff As Long
-   Dim Result As Long
+   Dim result As Long
  
    buff = space$(MAX_PATH_UNICODE)
    cbbuff = Len(buff)
  
-   Result = GetLongPathName(StrPtr(strTest), StrPtr(buff), cbbuff)
+   result = GetLongPathName(StrPtr(strTest), StrPtr(buff), cbbuff)
  
-   If Result > 0 Then
-      sLongPath = Left$(buff, Result)
+   If result > 0 Then
+      sLongPath = Left$(buff, result)
    End If
  
    GetLongName = sLongPath
@@ -225,13 +225,13 @@ End Function
 
 
 
-Public Property Get Path() As String
+Public Property Get path() As String
 If Len(LastPath) = 0 Then
 Else
 If Right$(LastPath, 1) <> "\" Then
-Path = LastPath & "\"
+path = LastPath & "\"
 Else
-Path = LastPath
+path = LastPath
 End If
 End If
 End Property
@@ -264,7 +264,7 @@ Public Function FindFolder(item As Long) As String
 Dim i As Long, lev As Integer
 lev = Abs(myLevel(item))
 If lev = 1 Then
-FindFolder = Path
+FindFolder = path
 Else
 For i = item - 1 To 0 Step -1
 If Abs(myLevel(i)) < lev Then Exit For
@@ -318,11 +318,11 @@ If LastPath <> "" And ff = vbNullString Then
 Else
 LastPath = ff
 
-Static ndx As Long
+Static nDx As Long
 If ff = vbNullString Then
 ClearList
 
-ndx = 0
+nDx = 0
 For i = 1 To NumberofDrives
  AddAFile Chr$(2) + DriveName(i) + ":", 1 + Abs(TotalDiskSpace(DriveName(i)) < 0) 'use level as not enabled
 Next i
@@ -338,30 +338,30 @@ Dim s As String
 
 If ff <> "" Then
 If Append Then
-ndx = listcount
+nDx = listcount
 Else
             ClearList ' CHANGE THIS TO APPEND...
-           ndx = 0
+           nDx = 0
     End If
                 abort = False
 ' ff must be a path
 ' so strip \
             If Right$(ff, 1) = "\" Then ff = Left$(ff, Len(ff) - 1)
         
-                If look(1, ff, (ndx), IncludedFolders, Nofiles) > 0 Then
+                If look(1, ff, (nDx), IncludedFolders, Nofiles) > 0 Then
                
-                    Dir2 = list(ndx)
-                    ndx = ndx + 1
+                    Dir2 = list(nDx)
+                    nDx = nDx + 1
      
      
                     End If
            
 Else
-            If listcount > ndx Then
-            Dir2 = list(ndx)
-            ndx = ndx + 1   ' read with auto increment
+            If listcount > nDx Then
+            Dir2 = list(nDx)
+            nDx = nDx + 1   ' read with auto increment
             Else
-            ndx = 0  ' reset
+            nDx = 0  ' reset
                 Dir2 = vbNullString ' this is the end
             End If
 End If
@@ -442,7 +442,7 @@ Public Function Dir1(ByVal ThisFile As String, curdir As String) As String
     If ExtractPath(ThisFile) = vbNullString Then ThisFile = curdir & ThisFile
     If ExistFile(ThisFile) Then Dir1 = ThisFile
 End Function
-Private Function look(ByVal Level As Integer, ByVal folder As String, Optional Offset As Long = 0, Optional foldersincluded As Boolean = False, Optional foldersonly As Boolean = False) As Long
+Private Function look(ByVal Level As Integer, ByVal folder As String, Optional offset As Long = 0, Optional foldersincluded As Boolean = False, Optional foldersonly As Boolean = False) As Long
 Dim lookpath As String, guard As String, mf$(), maxf As Long, k As Long
 If LevelStop > 0 Then If Level > LevelStop Then Exit Function
 Dim fold$(), fff As Long, addthis As Long, mlen As Long
@@ -597,10 +597,10 @@ End Select
 End If
 Select Case SortType
 Case 1, 2
-maxf = maxf + look(Level + 1, folder & "\" & fold$(i), maxf + Offset, IncludedFolders, Nofiles)
+maxf = maxf + look(Level + 1, folder & "\" & fold$(i), maxf + offset, IncludedFolders, Nofiles)
 
 Case Else
-maxf = maxf + look(Level + 1, folder & "\" & Mid$(fold$(i), 20), maxf + Offset, IncludedFolders, Nofiles)
+maxf = maxf + look(Level + 1, folder & "\" & Mid$(fold$(i), 20), maxf + offset, IncludedFolders, Nofiles)
 End Select
 If abort Then Exit For
 Next i
@@ -1166,7 +1166,7 @@ IsNumberInFilename = False
 End If
 End Function
 Private Function IsNumberOnly(a$, fr As Long, R As Double, lr As Long) As Boolean
-Dim SG As Long, i As Long, ig$
+Dim sg As Long, i As Long, ig$
 If a$ = vbNullString Then IsNumberOnly = False: Exit Function
 i = fr
 
@@ -1199,7 +1199,7 @@ End If
 End Function
 
 
-Public Function FindItemStartWidth(ByVal Key As String, NoCase As Boolean, ByVal Offset) As Long
+Public Function FindItemStartWidth(ByVal Key As String, NoCase As Boolean, ByVal offset) As Long
 Dim i As Long, j As Long, cp$
 
 j = Len(Key)
@@ -1207,13 +1207,13 @@ i = -1
 FindItemStartWidth = -1
 If j = 0 Then Exit Function
 If NoCase Then
-For i = Offset To listcount - 1
+For i = offset To listcount - 1
 cp$ = myfile(i)
 If Len(cp$) > 0 Then If AscW(cp$) = 2 Then cp$ = Mid$(cp$, rinstr(cp$, "\") + 1)
 If StrComp(Left$(cp$, j), Key, vbTextCompare) = 0 Then Exit For
 Next i
 Else
-For i = Offset To listcount - 1
+For i = offset To listcount - 1
 cp$ = myfile(i)
 If Len(cp$) > 0 Then If AscW(cp$) = 2 Then cp$ = Mid$(cp$, rinstr(cp$, "\") + 1)
 If StrComp(Left$(cp$, j), Key, vbBinaryCompare) = 0 Then Exit For

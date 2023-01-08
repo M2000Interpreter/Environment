@@ -68,8 +68,8 @@ Private Sub Form_Click()
 If MediaPlayer1.isMoviePlaying Then GETLOST
 End Sub
 
-Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
-keycode = 0
+Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
+KeyCode = 0
 If Form1.Visible Then
 If Form1.TEXT1.Visible Then
 Form1.TEXT1.SetFocus
@@ -106,8 +106,8 @@ If UseAviSize And MediaPlayer1.Height > 2 Then
             AviSizeX = (ScrInfo(Console).Width - 1) * 0.99
             AviSizeY = (ScrInfo(Console).Height - 1) * 0.99
         Else
-            AviSizeX = Me.Scalewidth
-            AviSizeY = Me.Scaleheight
+            AviSizeX = Me.ScaleWidth
+            AviSizeY = Me.ScaleHeight
         End If
     Else
         If AviSizeX = 0 And AviSizeY <> 0 Then

@@ -216,7 +216,7 @@ Public TrueVisible As Boolean, previewKey As Boolean
 Public WithEvents TEXT1 As TextViewer
 Attribute TEXT1.VB_VarHelpID = -1
 Public EditTextWord As Boolean
-Private Declare Function timeGetTime Lib "Kernel32.dll" Alias "GetTickCount" () As Long
+Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
 ' by default EditTextWord is false, so we look for identifiers not words
 Private Pad$, s$
 Private Declare Function DefWindowProcW Lib "user32" (ByVal hWnd As Long, ByVal wMsg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
@@ -224,7 +224,7 @@ Private Declare Function DefWindowProcW Lib "user32" (ByVal hWnd As Long, ByVal 
 Private LastDocTitle$, para1 As Long, PosPara1 As Long, Para2 As Long, PosPara2 As Long, Para3 As Long, PosPara3 As Long
 Public ShadowMarks As Boolean
 Private nochange As Boolean, LastSearchType As Long
-Private Declare Function lstrlenW Lib "Kernel32.dll" (ByVal psString As Long) As Long
+Private Declare Function lstrlenW Lib "kernel32.dll" (ByVal psString As Long) As Long
 Private Declare Function EmptyClipboard Lib "user32" () As Long
 Public MY_BACK As New cDIBSection, Back_Back As New cDIBSection
 Private mynum$, LastNumX
@@ -246,7 +246,7 @@ Const WM_KEYFIRST = &H100
 Const WM_CHAR = &H102
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
-    x As Long
+    X As Long
     y As Long
 End Type
  Private Type Msg
@@ -327,7 +327,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub DIS_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
+Private Sub DIS_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -349,7 +349,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub dSprite_OLEDragOver(index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
+Private Sub dSprite_OLEDragOver(index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -434,7 +434,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub Form_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
+Private Sub Form_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -519,6 +519,20 @@ End If
 End If
 End Sub
 
+Public Sub StoreBookMarks()
+    Dim bm(0 To 5) As Long
+    
+    bm(0) = TEXT1.mDoc.ParagraphOrder(para1): bm(1) = TEXT1.mDoc.ParagraphOrder(Para2): bm(3) = TEXT1.mDoc.ParagraphOrder(Para3)
+    bm(3) = PosPara1: bm(4) = PosPara2: bm(5) = PosPara3
+    If BookMarks.Find(LastDocTitle$) Then
+            BookMarks.Value = CVar(bm())
+    Else
+          
+        BookMarks.AddKey CVar(LastDocTitle$), CVar(bm())
+    End If
+
+End Sub
+
 Private Sub glist1_MarkOut()
 Pack1
 End Sub
@@ -541,7 +555,7 @@ If KeyAscii = 9 Then KeyAscii = 0: Exit Sub
 If KeyAscii = 13 Then KeyAscii = 0: Exit Sub
 End Sub
 
-Private Sub gList1_OutPopUp(x As Single, y As Single, myButton As Integer)
+Private Sub gList1_OutPopUp(X As Single, y As Single, myButton As Integer)
 Dim i As Long
 
 If Not gList1.Enabled Then Exit Sub
@@ -558,7 +572,7 @@ i = .SelLength
 End With
 UNhookMe
 MyPopUp.feedlabels TEXT1, EditTextWord
-MyPopUp.Up x + gList1.Left, y + gList1.top
+MyPopUp.Up X + gList1.Left, y + gList1.top
 myButton = 0
 End Sub
 
@@ -645,7 +659,7 @@ End If
 End Select
 End Sub
 
-Private Sub List1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub List1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
 If item = -1 Then
 
 Else
@@ -1020,7 +1034,7 @@ End If
 
 End Sub
 
-Private Sub DIS_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub DIS_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
 If Not NoAction Then
 NoAction = True
 
@@ -1028,7 +1042,7 @@ If Button > 0 And Targets Then
 
 If Button = 1 Then
 Dim sel&
-    sel& = ScanTarget(q(), CLng(x), CLng(y), 0)
+    sel& = ScanTarget(q(), CLng(X), CLng(y), 0)
     If sel& >= 0 Then
         Select Case q(sel&).Id Mod 100
         Case Is < 10
@@ -1062,7 +1076,7 @@ End Sub
 
 
 
-Private Sub dSprite_MouseDown(index As Integer, Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub dSprite_MouseDown(index As Integer, Button As Integer, shift As Integer, X As Single, y As Single)
 Dim p As Long, u2 As Long
 If lockme Then Exit Sub
 If Not NoAction Then
@@ -1074,7 +1088,7 @@ With players(p)
 
         If Button > 0 And Targets Then
 
-        sel& = ScanTarget(q(), CLng(x), CLng(y), index)
+        sel& = ScanTarget(q(), CLng(X), CLng(y), index)
             If sel& >= 0 Then
                 If Button = 1 Then
                 Select Case q(sel&).Id Mod 100
@@ -1623,13 +1637,13 @@ End Sub
 
 
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
 If NoAction Then Exit Sub
 NoAction = True
 Dim sel&
 
 If Button > 0 And Targets Then
-sel& = ScanTarget(q(), CLng(x), CLng(y), -1)
+sel& = ScanTarget(q(), CLng(X), CLng(y), -1)
 
 If sel& >= 0 Then
 
@@ -2638,7 +2652,7 @@ On Error Resume Next
 'tf2$ = THISFILE
 needset = False
 Dim MSD As String
-MSD = App.Path
+MSD = App.path
 AddDirSep MSD
 'View1.TabStop = True
 
@@ -3226,11 +3240,19 @@ End Sub
 Function Mark$()
 If ShadowMarks Then Mark$ = vbNullString: Exit Function
 If TEXT1.Title = vbNullString Then  'reset all para
-para1 = 0: Para2 = 0: Para3 = 0
+    para1 = 0: Para2 = 0: Para3 = 0
 ElseIf LastDocTitle$ <> TEXT1.Title Then
-para1 = 0: Para2 = 0: Para3 = 0
-LastDocTitle$ = TEXT1.Title
+    LastDocTitle$ = TEXT1.Title
+    If BookMarks.Find(LastDocTitle$) Then
+        Dim bm
+        bm = BookMarks.Value
+        para1 = TEXT1.mDoc.ParagraphFromOrder(bm(0)): Para2 = TEXT1.mDoc.ParagraphFromOrder(bm(1)): Para3 = TEXT1.mDoc.ParagraphFromOrder(bm(2))
+        PosPara1 = bm(3): PosPara2 = bm(4): PosPara3 = bm(5)
+    Else
+        para1 = 0: Para2 = 0: Para3 = 0
+    End If
 End If
+
 Dim s$
 If para1 <> 0 Then
 If TEXT1.mDoc.InvalidPara(para1) Then para1 = 0
@@ -3266,9 +3288,7 @@ Mark$ = s$
 
 End Function
 Public Sub ResetMarks()
-para1 = 0: Para2 = 0: Para3 = 0
-
-
+    para1 = 0: Para2 = 0: Para3 = 0
 End Sub
 Public Sub hookme(this As gList)
 Set LastGlist = this
@@ -3478,20 +3498,20 @@ End If
     MyDoEvents
     End If
    
-    Dim mycode As Double, oldcodeid As Double, x As Form
+    Dim mycode As Double, oldcodeid As Double, X As Form
     mycode = Rnd * 12312314
     oldcodeid = Modalid
-    For Each x In Forms
-        If x.Name = "GuiM2000" Then
-            Set XX = x
+    For Each X In Forms
+        If X.Name = "GuiM2000" Then
+            Set XX = X
             If XX.Enablecontrol Then
                 If XX.Modal = 0 Then XX.Modal = mycode
                 XX.Enablecontrol = False
             End If
         End If
         Set XX = Nothing
-    Next x
-    Set x = Nothing
+    Next X
+    Set X = Nothing
 If INFOONLY Then
 NeoMsgBox.command1.SetFocus
 End If
@@ -3530,9 +3550,9 @@ BLOCKkey = False
 AskTitle$ = vbNullString
 Dim z As Form
 Set z = Nothing
-For Each x In Forms
-    If x.Name = "GuiM2000" Then
-        Set XX = x
+For Each X In Forms
+    If X.Name = "GuiM2000" Then
+        Set XX = X
         If Not XX.Enablecontrol Then
         XX.TestModal mycode
         End If
@@ -3540,8 +3560,8 @@ For Each x In Forms
         'End If
         Set XX = Nothing
     End If
-Next x
-Set x = Nothing
+Next X
+Set X = Nothing
 If Not zz Is Nothing Then Set z = zz
 On Error Resume Next
 If Typename(z) = "GuiM2000" Then

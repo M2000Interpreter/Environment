@@ -153,8 +153,8 @@ Private Function Malloc() As Long
         toplim = toplim + 1
         Malloc = toplim
 End Function
-Property Get Count()
-Count = toplim + 1
+Property Get count()
+count = toplim + 1
 End Property
 Property Get LastKnown() As String
 LastKnown = lastfind
@@ -219,7 +219,7 @@ End With
 
 End Sub
 Property Get Percent()
-Percent = Count / hashlen
+Percent = count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long

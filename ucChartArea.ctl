@@ -39,14 +39,14 @@ Private Declare Function GetModuleHandleA Lib "kernel32" (ByVal lpModuleName As 
 Private Declare Function GetProcAddress Lib "kernel32" (ByVal hModule As Long, ByVal lpProcName As String) As Long
 Private Declare Function LoadLibrary Lib "kernel32.dll" Alias "LoadLibraryA" (ByVal lpLibFileName As String) As Long
 Private Declare Function MulDiv Lib "kernel32.dll" (ByVal nNumber As Long, ByVal nNumerator As Long, ByVal nDenominator As Long) As Long
-Private Declare Function CreateWindowExA Lib "user32.dll" (ByVal dwExStyle As Long, ByVal lpClassName As String, ByVal lpWindowName As String, ByVal dwStyle As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hWndParent As Long, ByVal hMenu As Long, ByVal hInstance As Long, ByRef lpParam As Any) As Long
+Private Declare Function CreateWindowExA Lib "user32.dll" (ByVal dwExStyle As Long, ByVal lpClassName As String, ByVal lpWindowName As String, ByVal dwStyle As Long, ByVal X As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hWndParent As Long, ByVal hMenu As Long, ByVal hInstance As Long, ByRef lpParam As Any) As Long
 Private Declare Function SetWindowLong Lib "user32.dll" Alias "SetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 Private Declare Function GetParent Lib "user32.dll" (ByVal hWnd As Long) As Long
 Private Declare Function GetWindow Lib "user32.dll" (ByVal hWnd As Long, ByVal wCmd As Long) As Long
 Private Declare Function FindWindowEx Lib "user32.dll" Alias "FindWindowExA" (ByVal hWnd1 As Long, ByVal hWnd2 As Long, ByVal lpsz1 As String, ByVal lpsz2 As String) As Long
 Private Declare Function GetDC Lib "user32.dll" (ByVal hWnd As Long) As Long
-Private Declare Function ReleaseDC Lib "user32.dll" (ByVal hWnd As Long, ByVal hdc As Long) As Long
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal nIndex As Long) As Long
+Private Declare Function ReleaseDC Lib "user32.dll" (ByVal hWnd As Long, ByVal hDC As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Declare Function GetSysColor Lib "user32.dll" (ByVal nIndex As Long) As Long
 Private Declare Function GdipCreatePen2 Lib "GdiPlus.dll" (ByVal mBrush As Long, ByVal mWidth As Single, ByVal mUnit As Long, ByRef mPen As Long) As Long
 Private Declare Function GdipDeletePen Lib "GdiPlus.dll" (ByVal mPen As Long) As Long
@@ -57,7 +57,7 @@ Private Declare Function GdipRotatePathGradientTransform Lib "GdiPlus.dll" (ByVa
 Private Declare Function GdipTranslatePathGradientTransform Lib "GdiPlus.dll" (ByVal mBrush As Long, ByVal mDx As Single, ByVal mDy As Single, ByVal mOrder As MatrixOrder) As Long
 Private Declare Function GdipTranslateTextureTransform Lib "GdiPlus.dll" (ByVal mBrush As Long, ByVal mDx As Single, ByVal mDy As Single, ByVal mOrder As MatrixOrder) As Long
 Private Declare Function GdipTranslateWorldTransform Lib "gdiplus" (ByVal graphics As Long, ByVal dX As Single, ByVal dY As Single, ByVal Order As Long) As Long
-Private Declare Function GdipCreateFromHDC Lib "gdiplus" (ByVal hdc As Long, ByRef graphics As Long) As Long
+Private Declare Function GdipCreateFromHDC Lib "gdiplus" (ByVal hDC As Long, ByRef graphics As Long) As Long
 Private Declare Function GdipDeleteGraphics Lib "gdiplus" (ByVal graphics As Long) As Long
 Private Declare Function GdipSetSmoothingMode Lib "GdiPlus.dll" (ByVal mGraphics As Long, ByVal mSmoothingMode As Long) As Long
 Private Declare Function GdipDeleteBrush Lib "GdiPlus.dll" (ByVal mBrush As Long) As Long
@@ -116,12 +116,12 @@ Private Declare Function GdipClosePathFigure Lib "GdiPlus.dll" (ByVal mPath As L
 
 Private Type POINTL
     X As Long
-    Y As Long
+    y As Long
 End Type
 
 Private Type POINTF
     X As Single
-    Y As Single
+    y As Single
 End Type
 
 Private Enum LineCap
@@ -145,14 +145,14 @@ End Enum
 
 Private Type RECTF
     Left As Single
-    Top As Single
+    top As Single
     Width As Single
     Height As Single
 End Type
 
 Private Type RectL
     Left As Long
-    Top As Long
+    top As Long
     Width As Long
     Height As Long
 End Type
@@ -229,9 +229,9 @@ Private Const GDIP_OK                   As Long = &H0
 
 Public Event Click()
 Public Event DblClick()
-Public Event MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
-Public Event MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
-Public Event MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Public Event MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
+Public Event MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
+Public Event MouseUp(Button As Integer, shift As Integer, X As Single, y As Single)
 'Public Event PrePaint(hdc As Long)
 'Public Event PostPaint(ByVal hdc As Long)
 'Public Event KeyPress(KeyAscii As Integer)
@@ -359,7 +359,7 @@ End Property
 Public Property Set TitleFont(New_Font As StdFont)
     With m_TitleFont
         .Name = New_Font.Name
-        .Size = New_Font.Size
+        .size = New_Font.size
         .bold = New_Font.bold
         .Italic = New_Font.Italic
         .Underline = New_Font.Underline
@@ -436,7 +436,7 @@ End Property
 Public Property Set Font(New_Font As StdFont)
     With UserControl.Font
         .Name = New_Font.Name
-        .Size = New_Font.Size
+        .size = New_Font.size
         .bold = New_Font.bold
         .Italic = New_Font.Italic
         .Underline = New_Font.Underline
@@ -559,9 +559,9 @@ Public Property Let LegendAlign(ByVal New_Value As ucCA_LegendAlign)
     PropertyChanged "LegendAlign"
     Refresh
 End Property
-Private Sub UserControl_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
     Dim XX As Single, YY As Single, i As Long
-    If X > MarginLeft And Y > TopHeader And X < MarginLeft + mWidth And Y < TopHeader + mHeight Then
+    If X > MarginLeft And y > TopHeader And X < MarginLeft + mWidth And y < TopHeader + mHeight Then
         If SerieCount = 0 Then Exit Sub
         XX = X - MarginLeft + PtDistance / 2
         'YY = Y '- TopHeader
@@ -574,7 +574,7 @@ Private Sub UserControl_MouseMove(Button As Integer, Shift As Integer, X As Sing
     Else
         For i = 0 To SerieCount - 1
 
-            If PtInRectL(m_Serie(i).LegendRect, X, Y) Then
+            If PtInRectL(m_Serie(i).LegendRect, X, y) Then
                 If mHotSerie <> i Then
                     mHotSerie = i
                     mHotBar = -1
@@ -596,9 +596,9 @@ Private Sub UserControl_MouseMove(Button As Integer, Shift As Integer, X As Sing
     End If
 End Sub
 
-Private Function PtInRectL(RECT As RectL, ByVal X As Single, ByVal Y As Single) As Boolean
+Private Function PtInRectL(RECT As RectL, ByVal X As Single, ByVal y As Single) As Boolean
     With RECT
-        If X >= .Left And X <= .Left + .Width And Y >= .Top And Y <= .Top + .Height Then
+        If X >= .Left And X <= .Left + .Width And y >= .top And y <= .top + .Height Then
             PtInRectL = True
         End If
     End With
@@ -694,7 +694,7 @@ Private Sub UserControl_InitProperties()
     m_AxisXVisible = True
     m_AxisYVisible = True
     m_TitleFont.Name = UserControl.Font.Name
-    m_TitleFont.Size = UserControl.Font.Size + 8
+    m_TitleFont.size = UserControl.Font.size + 8
     m_AxisMax = 0
     m_AxisMin = 0
     'm_LabelsPositions = LP_CENTER
@@ -707,7 +707,7 @@ Private Sub UserControl_InitProperties()
     If Not Ambient.UserMode Then Call Example
 End Sub
 
-Private Function DrawText(ByVal hGraphics As Long, ByVal text As String, ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single, ByVal oFont As StdFont, ByVal ForeColor As Long, Optional HAlign As TextAlignmentH, Optional VAlign As TextAlignmentV, Optional bWordWrap As Boolean, Optional Angle As Single) As Long
+Private Function DrawText(ByVal hGraphics As Long, ByVal Text As String, ByVal X As Single, ByVal y As Single, ByVal Width As Single, ByVal Height As Single, ByVal oFont As StdFont, ByVal ForeColor As Long, Optional HAlign As TextAlignmentH, Optional VAlign As TextAlignmentV, Optional bWordWrap As Boolean, Optional Angle As Single) As Long
     Dim hBrush As Long
     Dim hFontFamily As Long
     Dim hFormat As Long
@@ -715,7 +715,7 @@ Private Function DrawText(ByVal hGraphics As Long, ByVal text As String, ByVal X
     Dim lFontSize As Long
     Dim lFontStyle As GDIPLUS_FONTSTYLE
     Dim hFont As Long
-    Dim hdc As Long
+    Dim hDC As Long
     Dim W As Single, H As Single
     W = Width
     H = Height
@@ -735,9 +735,9 @@ Private Function DrawText(ByVal hGraphics As Long, ByVal text As String, ByVal X
      
         Width = W
         
-        GdipTranslateWorldTransform hGraphics, X + Width / 2, Y + Height / 2, 0
+        GdipTranslateWorldTransform hGraphics, X + Width / 2, y + Height / 2, 0
         GdipRotateWorldTransform hGraphics, Angle, 0
-        GdipTranslateWorldTransform hGraphics, -(X + Width / 2), -(Y + Height / 2), 0
+        GdipTranslateWorldTransform hGraphics, -(X + Width / 2), -(y + Height / 2), 0
     End If
         
 
@@ -758,16 +758,16 @@ Private Function DrawText(ByVal hGraphics As Long, ByVal text As String, ByVal X
     If oFont.Strikethrough Then lFontStyle = lFontStyle Or FontStyleStrikeout
         
 
-    hdc = GetDC(0&)
-    lFontSize = MulDiv(oFont.Size, GetDeviceCaps(UserControl.hdc, LOGPIXELSY), 72)
-    ReleaseDC 0&, hdc
+    hDC = GetDC(0&)
+    lFontSize = MulDiv(oFont.size, GetDeviceCaps(UserControl.hDC, LOGPIXELSY), 72)
+    ReleaseDC 0&, hDC
 
-    layoutRect.Left = X: layoutRect.Top = Y
+    layoutRect.Left = X: layoutRect.top = y
     layoutRect.Width = Width: layoutRect.Height = Height
 
     If GdipCreateSolidFill(ForeColor, hBrush) = GDIP_OK Then
         If GdipCreateFont(hFontFamily, lFontSize, lFontStyle, UnitPixel, hFont) = GDIP_OK Then
-            GdipDrawString hGraphics, StrPtr(text), -1, hFont, layoutRect, hFormat, hBrush
+            GdipDrawString hGraphics, StrPtr(Text), -1, hFont, layoutRect, hFormat, hBrush
             GdipDeleteFont hFont
         End If
         GdipDeleteBrush hBrush
@@ -781,10 +781,10 @@ End Function
 
 
 Public Function GetWindowsDPI() As Double
-    Dim hdc As Long, LPX  As Double
-    hdc = GetDC(0)
-    LPX = CDbl(GetDeviceCaps(hdc, LOGPIXELSX))
-    ReleaseDC 0, hdc
+    Dim hDC As Long, LPX  As Double
+    hDC = GetDC(0)
+    LPX = CDbl(GetDeviceCaps(hDC, LOGPIXELSX))
+    ReleaseDC 0, hDC
 
     If (LPX = 0) Then
         GetWindowsDPI = 1#
@@ -793,7 +793,7 @@ Public Function GetWindowsDPI() As Double
     End If
 End Function
 
-Private Sub UserControl_HitTest(X As Single, Y As Single, HitResult As Integer)
+Private Sub UserControl_HitTest(X As Single, y As Single, HitResult As Integer)
     If UserControl.Enabled Then
         HitResult = vbHitResultHit
         If Ambient.UserMode Then
@@ -803,10 +803,10 @@ Private Sub UserControl_HitTest(X As Single, Y As Single, HitResult As Integer)
                 GetCursorPos pt
                 ScreenToClient c_lhWnd, pt
                 m_PT.X = pt.X - X
-                m_PT.Y = pt.Y - Y
+                m_PT.y = pt.y - y
     
                 m_Left = ScaleX(Extender.Left, vbContainerSize, UserControl.ScaleMode)
-                m_Top = ScaleY(Extender.Top, vbContainerSize, UserControl.ScaleMode)
+                m_Top = ScaleY(Extender.top, vbContainerSize, UserControl.ScaleMode)
  
               
                 tmrMOUSEOVER.Interval = 1
@@ -973,15 +973,15 @@ Private Function SafeRange(Value, Min, Max)
 End Function
 
 
-Public Function RGBtoARGB(ByVal RGBColor As Long, ByVal Opacity As Long) As Long
+Public Function RGBtoARGB(ByVal RGBcolor As Long, ByVal Opacity As Long) As Long
     'By LaVople
     ' GDI+ color conversion routines. Most GDI+ functions require ARGB format vs standard RGB format
     ' This routine will return the passed RGBcolor to RGBA format
     ' Passing VB system color constants is allowed, i.e., vbButtonFace
     ' Pass Opacity as a value from 0 to 255
 
-    If (RGBColor And &H80000000) Then RGBColor = GetSysColor(RGBColor And &HFF&)
-    RGBtoARGB = (RGBColor And &HFF00&) Or (RGBColor And &HFF0000) \ &H10000 Or (RGBColor And &HFF) * &H10000
+    If (RGBcolor And &H80000000) Then RGBcolor = GetSysColor(RGBcolor And &HFF&)
+    RGBtoARGB = (RGBcolor And &HFF00&) Or (RGBcolor And &HFF0000) \ &H10000 Or (RGBcolor And &HFF) * &H10000
     Opacity = CByte((Abs(Opacity) / 100) * 255)
     If Opacity < 128 Then
         If Opacity < 0& Then Opacity = 0&
@@ -995,34 +995,34 @@ End Function
 
 Private Function GetMax() As Single
 
-    Dim i As Long, j As Long, M As Single
+    Dim i As Long, j As Long, m As Single
     
     For i = 0 To SerieCount - 1
         For j = 1 To m_Serie(i).Values.count
-            If M < m_Serie(i).Values(j) Then
-                M = m_Serie(i).Values(j)
+            If m < m_Serie(i).Values(j) Then
+                m = m_Serie(i).Values(j)
             End If
         Next
     Next
 
-    GetMax = M
+    GetMax = m
 
 End Function
 
 
 Private Function GetMin() As Single
-    Dim i As Long, j As Long, M As Single
+    Dim i As Long, j As Long, m As Single
    
     If SerieCount = 0 Then Exit Function
     For i = 0 To SerieCount - 1
        For j = 1 To m_Serie(i).Values.count
-           If m_Serie(i).Values(j) < M Then
-               M = m_Serie(i).Values(j)
+           If m_Serie(i).Values(j) < m Then
+               m = m_Serie(i).Values(j)
            End If
        Next
     Next
     
-    GetMin = M
+    GetMin = m
 
 End Function
 '*1
@@ -1062,7 +1062,7 @@ Private Sub Draw()
     Dim BarSpace As Single
     Dim RangeHeight As Single
 
-    If GdipCreateFromHDC(hdc, hGraphics) Then Exit Sub
+    If GdipCreateFromHDC(hDC, hGraphics) Then Exit Sub
   
     Call GdipSetSmoothingMode(hGraphics, SmoothingModeAntiAlias)
     Call GdipSetCompositingQuality(hGraphics, &H3) 'CompositingQualityGammaCorrected
@@ -1257,7 +1257,7 @@ Private Sub Draw()
     Loop
 
 
-    If GdipCreateFromHDC(hdc, hGraphics) = 0 Then
+    If GdipCreateFromHDC(hDC, hGraphics) = 0 Then
   
         Call GdipSetSmoothingMode(hGraphics, SmoothingModeAntiAlias)
         Call GdipSetCompositingQuality(hGraphics, &H3) 'CompositingQualityGammaCorrected
@@ -1316,9 +1316,9 @@ Private Sub Draw()
                     .X = MarginLeft + PtDistance * j
                     '.Y = TopHeader + mHeight - (m_Serie(i).Values(j + 1) * (Max * mHeight / toLines) / Max)
                     If Value >= 0 Then
-                        .Y = ZeroPoint - (Value * (ZeroPoint - TopHeader) / toLines)
+                        .y = ZeroPoint - (Value * (ZeroPoint - TopHeader) / toLines)
                     Else
-                        .Y = ZeroPoint + (Value * (TopHeader + mHeight - ZeroPoint) / forLines)
+                        .y = ZeroPoint + (Value * (TopHeader + mHeight - ZeroPoint) / forLines)
                     End If
                 End With
             Next
@@ -1338,7 +1338,7 @@ Private Sub Draw()
                     
                     If m_FillGradient Then
                         With RectL
-                            .Top = TopHeader
+                            .top = TopHeader
                             
                             .Width = mWidth
                             .Height = ZeroPoint - TopHeader
@@ -1381,9 +1381,9 @@ Private Sub Draw()
                                     .Left = MarginLeft + mWidth + PT16
                                 End If
                                 If ColRow = 1 Then
-                                    .Top = TopHeader + mHeight / 2 - .Height / 2
+                                    .top = TopHeader + mHeight / 2 - .Height / 2
                                 Else
-                                    .Top = TopHeader
+                                    .top = TopHeader
                                 End If
                             End If
                             
@@ -1393,21 +1393,21 @@ Private Sub Draw()
             
                             If TextHeight + m_Serie(i).TextHeight > mHeight Then
                                  If i > 0 Then .Left = .Left + TextWidth
-                                .Top = TopHeader
+                                .top = TopHeader
                                  TextHeight = 0
                             End If
                             m_Serie(i).LegendRect.Left = .Left
-                            m_Serie(i).LegendRect.Top = .Top
+                            m_Serie(i).LegendRect.top = .top
                             m_Serie(i).LegendRect.Width = m_Serie(i).TextWidth
                             m_Serie(i).LegendRect.Height = m_Serie(i).TextHeight
                             
                             GdipCreateSolidFill RGBtoARGB(m_Serie(i).SeireColor, 100), hBrush
-                            GdipFillRectangleI hGraphics, hBrush, .Left, .Top + m_Serie(i).TextHeight / 4, m_Serie(i).TextHeight / 2, m_Serie(i).TextHeight / 2
+                            GdipFillRectangleI hGraphics, hBrush, .Left, .top + m_Serie(i).TextHeight / 4, m_Serie(i).TextHeight / 2, m_Serie(i).TextHeight / 2
                             GdipDeleteBrush hBrush
                             
-                            DrawText hGraphics, m_Serie(i).SerieName, .Left + m_Serie(i).TextHeight / 1.5, .Top, m_Serie(i).TextWidth, m_Serie(i).TextHeight, UserControl.Font, lForeColor, cLeft, cMiddle
+                            DrawText hGraphics, m_Serie(i).SerieName, .Left + m_Serie(i).TextHeight / 1.5, .top, m_Serie(i).TextWidth, m_Serie(i).TextHeight, UserControl.Font, lForeColor, cLeft, cMiddle
                             TextHeight = TextHeight + m_Serie(i).TextHeight
-                            .Top = .Top + m_Serie(i).TextHeight
+                            .top = .top + m_Serie(i).TextHeight
                             
                         End With
                         
@@ -1420,26 +1420,26 @@ Private Sub Draw()
                                     .Left = MarginLeft
                                 End If
                                 If m_LegendAlign = LA_TOP Then
-                                    .Top = PT16 + TitleSize.Height
+                                    .top = PT16 + TitleSize.Height
                                 Else
-                                    .Top = TopHeader + mHeight + TitleSize.Height + PT16 / 2
+                                    .top = TopHeader + mHeight + TitleSize.Height + PT16 / 2
                                 End If
                             End If
             
                             If .Left + m_Serie(i).TextWidth - MarginLeft > mWidth Then
                                 .Left = MarginLeft
-                                .Top = .Top + m_Serie(i).TextHeight
+                                .top = .top + m_Serie(i).TextHeight
                             End If
             
                             GdipCreateSolidFill RGBtoARGB(m_Serie(i).SeireColor, 100), hBrush
-                            GdipFillRectangleI hGraphics, hBrush, .Left, .Top + m_Serie(i).TextHeight / 4, m_Serie(i).TextHeight / 2, m_Serie(i).TextHeight / 2
+                            GdipFillRectangleI hGraphics, hBrush, .Left, .top + m_Serie(i).TextHeight / 4, m_Serie(i).TextHeight / 2, m_Serie(i).TextHeight / 2
                             GdipDeleteBrush hBrush
                             m_Serie(i).LegendRect.Left = .Left
-                            m_Serie(i).LegendRect.Top = .Top
+                            m_Serie(i).LegendRect.top = .top
                             m_Serie(i).LegendRect.Width = m_Serie(i).TextWidth
                             m_Serie(i).LegendRect.Height = m_Serie(i).TextHeight
                             
-                            DrawText hGraphics, m_Serie(i).SerieName, .Left + m_Serie(i).TextHeight / 1.5, .Top, m_Serie(i).TextWidth, m_Serie(i).TextHeight, UserControl.Font, lForeColor, cLeft, cMiddle
+                            DrawText hGraphics, m_Serie(i).SerieName, .Left + m_Serie(i).TextHeight / 1.5, .top, m_Serie(i).TextWidth, m_Serie(i).TextHeight, UserControl.Font, lForeColor, cLeft, cMiddle
                             .Left = .Left + m_Serie(i).TextWidth '+ m_Serie(i).TextHeight / 1.5
                         End With
                 End Select
@@ -1477,18 +1477,18 @@ Private Sub Draw()
             
                   If mHotSerie = i Then
                     GdipCreateSolidFill RGBtoARGB(m_Serie(i).SeireColor, 50), hBrush
-                    GdipFillEllipseI hGraphics, hBrush, m_Serie(i).pt(j).X - PTSZ * 2, m_Serie(i).pt(j).Y - PTSZ * 2, PTSZ * 4, PTSZ * 4
+                    GdipFillEllipseI hGraphics, hBrush, m_Serie(i).pt(j).X - PTSZ * 2, m_Serie(i).pt(j).y - PTSZ * 2, PTSZ * 4, PTSZ * 4
                     GdipDeleteBrush hBrush
                   End If
                   
                   GdipCreateSolidFill RGBtoARGB(m_Serie(i).SeireColor, 100), hBrush
-                  GdipFillEllipseI hGraphics, hBrush, m_Serie(i).pt(j).X - PTSZ, m_Serie(i).pt(j).Y - PTSZ, PTSZ * 2, PTSZ * 2
+                  GdipFillEllipseI hGraphics, hBrush, m_Serie(i).pt(j).X - PTSZ, m_Serie(i).pt(j).y - PTSZ, PTSZ * 2, PTSZ * 2
                   
                  'RectangleI hGraphics, hBrush, UserControl.ScaleWidth - MarginRight + MaxAxisHeight / 3, TopHeader + MaxAxisHeight * i + MaxAxisHeight / 4, MaxAxisHeight / 2, MaxAxisHeight / 2
                   GdipDeleteBrush hBrush
                   
                   Call GdipCreatePen1(RGBtoARGB(m_BackColor, 100 - m_FillOpacity), mPenWidth, &H2, hPen)
-                  GdipDrawEllipseI hGraphics, hPen, m_Serie(i).pt(j).X - PTSZ, m_Serie(i).pt(j).Y - PTSZ, PTSZ * 2, PTSZ * 2
+                  GdipDrawEllipseI hGraphics, hPen, m_Serie(i).pt(j).X - PTSZ, m_Serie(i).pt(j).y - PTSZ, PTSZ * 2, PTSZ * 2
                   GdipDeletePen hPen
                   
                   'Serie Text
@@ -1562,27 +1562,27 @@ Private Sub ShowToolTips(hGraphics As Long)
         With RECTF
 
             .Left = m_Serie(IndexMax).pt(mHotBar).X - SZ.Width / 2
-            .Top = m_Serie(IndexMax).pt(mHotBar).Y - SZ.Height - 10 * nScale - TM
+            .top = m_Serie(IndexMax).pt(mHotBar).y - SZ.Height - 10 * nScale - TM
             .Width = SZ.Width + TM * 5
             .Height = SZ.Height + TM * 2
             
             If .Left < 0 Then .Left = LW
-            If .Top < 0 Then .Top = LW
+            If .top < 0 Then .top = LW
             If .Left + .Width > UserControl.ScaleWidth Then .Left = UserControl.ScaleWidth - .Width - LW
-            If .Top + .Height > UserControl.ScaleHeight Then .Top = UserControl.ScaleHeight - .Height - LW
+            If .top + .Height > UserControl.ScaleHeight Then .top = UserControl.ScaleHeight - .Height - LW
         End With
         
         RoundRect hGraphics, RECTF, RGBtoARGB(m_BackColor, 90), RGBtoARGB(m_LinesColor, 80), TM
         
         RECTF.Left = RECTF.Left + TM
-        RECTF.Top = RECTF.Top + TM
+        RECTF.top = RECTF.top + TM
         
         If cAxisItem.count = m_Serie(0).Values.count Then
             sText = cAxisItem(mHotBar + 1)
             With RECTF
                 GetTextSize hGraphics, sText, 0, 0, UserControl.Font, False, SZ
-                DrawText hGraphics, sText, .Left, .Top, .Width, 0, UserControl.Font, lForeColor, cLeft, cTop
-                .Top = .Top + SZ.Height
+                DrawText hGraphics, sText, .Left, .top, .Width, 0, UserControl.Font, lForeColor, cLeft, cTop
+                .top = .top + SZ.Height
             End With
         End If
     
@@ -1601,16 +1601,16 @@ Private Sub ShowToolTips(hGraphics As Long)
                         sText = m_Serie(i).SerieName & ": "
                         GetTextSize hGraphics, sText, 0, 0, UserControl.Font, False, SZ
                         GdipCreateSolidFill RGBtoARGB(m_Serie(i).SeireColor, 100), hBrush
-                        GdipFillRectangleI hGraphics, hBrush, .Left, .Top + SZ.Height / 4, SZ.Height / 2, SZ.Height / 2
+                        GdipFillRectangleI hGraphics, hBrush, .Left, .top + SZ.Height / 4, SZ.Height / 2, SZ.Height / 2
                         GdipDeleteBrush hBrush
                         
-                        DrawText hGraphics, sText, .Left + SZ.Height / 1.5, .Top, .Width, 0, UserControl.Font, lForeColor, cLeft, cTop
+                        DrawText hGraphics, sText, .Left + SZ.Height / 1.5, .top, .Width, 0, UserControl.Font, lForeColor, cLeft, cTop
                         
                         UserControl.Font.bold = True
-                        DrawText hGraphics, sDisplay, .Left + SZ.Height / 1.5 + SZ.Width, .Top, .Width, 0, UserControl.Font, lForeColor, cLeft, cTop
+                        DrawText hGraphics, sDisplay, .Left + SZ.Height / 1.5 + SZ.Width, .top, .Width, 0, UserControl.Font, lForeColor, cLeft, cTop
                         UserControl.Font.bold = False
 
-                        .Top = .Top + SZ.Height
+                        .top = .top + SZ.Height
                         ' TextWidth = UserControl.TextWidth(m_Serie(I).SerieName) * 1.3
                         'DrawText hGraphics, m_Serie(I).SerieName & ": ", .Left, .Top, .Width, 0, UserControl.Font, lForeColor, cLeft, cTop
                        ' .Left = .Left + TextWidth
@@ -1636,17 +1636,17 @@ Private Sub RoundRect(ByVal hGraphics As Long, RECT As RECTF, ByVal BackColor As
 
     If Round = 0 Then
         With RECT
-            GdipFillRectangleI hGraphics, hBrush, .Left, .Top, .Width, .Height
-            If hPen Then GdipDrawRectangleI hGraphics, hPen, .Left, .Top, .Width, .Height
+            GdipFillRectangleI hGraphics, hBrush, .Left, .top, .Width, .Height
+            If hPen Then GdipDrawRectangleI hGraphics, hPen, .Left, .top, .Width, .Height
         End With
     Else
         If GdipCreatePath(&H0, mPath) = 0 Then
             Round = Round * 2
             With RECT
-                GdipAddPathArcI mPath, .Left, .Top, Round, Round, 180, 90
-                GdipAddPathArcI mPath, .Left + .Width - Round, .Top, Round, Round, 270, 90
-                GdipAddPathArcI mPath, .Left + .Width - Round, .Top + .Height - Round, Round, Round, 0, 90
-                GdipAddPathArcI mPath, .Left, .Top + .Height - Round, Round, Round, 90, 90
+                GdipAddPathArcI mPath, .Left, .top, Round, Round, 180, 90
+                GdipAddPathArcI mPath, .Left + .Width - Round, .top, Round, Round, 270, 90
+                GdipAddPathArcI mPath, .Left + .Width - Round, .top + .Height - Round, Round, Round, 0, 90
+                GdipAddPathArcI mPath, .Left, .top + .Height - Round, Round, Round, 90, 90
                 GdipClosePathFigure mPath
             End With
             GdipFillPath hGraphics, hBrush, mPath
@@ -1662,7 +1662,7 @@ End Sub
 
 
 
-Private Function GetTextSize(ByVal hGraphics As Long, ByVal text As String, ByVal Width As Long, ByVal Height As Long, ByVal oFont As StdFont, ByVal bWordWrap As Boolean, ByRef SZ As SIZEF) As Long
+Private Function GetTextSize(ByVal hGraphics As Long, ByVal Text As String, ByVal Width As Long, ByVal Height As Long, ByVal oFont As StdFont, ByVal bWordWrap As Boolean, ByRef SZ As SIZEF) As Long
     Dim hBrush As Long
     Dim hFontFamily As Long
     Dim hFormat As Long
@@ -1685,18 +1685,18 @@ Private Function GetTextSize(ByVal hGraphics As Long, ByVal text As String, ByVa
     If oFont.Strikethrough Then lFontStyle = lFontStyle Or FontStyleStrikeout
         
 
-    lFontSize = MulDiv(oFont.Size, GetDeviceCaps(UserControl.hdc, LOGPIXELSY), 72)
+    lFontSize = MulDiv(oFont.size, GetDeviceCaps(UserControl.hDC, LOGPIXELSY), 72)
 
     layoutRect.Width = Width * nScale: layoutRect.Height = Height * nScale
 
     Call GdipCreateFont(hFontFamily, lFontSize, lFontStyle, UnitPixel, hFont)
       
-    Dim BB As RECTF, CF As Long, LF As Long
+    Dim bb As RECTF, CF As Long, LF As Long
 
-    GdipMeasureString hGraphics, StrPtr(text), -1, hFont, layoutRect, hFormat, BB, CF, LF
+    GdipMeasureString hGraphics, StrPtr(Text), -1, hFont, layoutRect, hFormat, bb, CF, LF
 
-    SZ.Width = BB.Width
-    SZ.Height = BB.Height
+    SZ.Width = bb.Width
+    SZ.Height = bb.Height
     
     GdipDeleteFont hFont
     GdipDeleteStringFormat hFormat
@@ -1712,12 +1712,12 @@ Public Sub tmrMOUSEOVER_Timer()
  
     With RECT
         .Left = m_PT.X - (m_Left - ScaleX(Extender.Left, vbContainerSize, UserControl.ScaleMode))
-        .Top = m_PT.Y - (m_Top - ScaleY(Extender.Top, vbContainerSize, UserControl.ScaleMode))
+        .top = m_PT.y - (m_Top - ScaleY(Extender.top, vbContainerSize, UserControl.ScaleMode))
         .Width = UserControl.ScaleWidth
         .Height = UserControl.ScaleHeight
     End With
 
-    If PtInRectL(RECT, pt.X, pt.Y) = 0 Then
+    If PtInRectL(RECT, pt.X, pt.y) = 0 Then
         mHotBar = -1
         mHotSerie = -1
         tmrMOUSEOVER.Interval = 0

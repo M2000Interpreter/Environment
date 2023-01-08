@@ -49,7 +49,7 @@ Private Sub Class_Terminate()
 Dim i As Long, myMutex As Long
 If Mymutexs.count > 0 Then
 For i = 0 To Mymutexs.count - 1
-Mymutexs.Index = i
+Mymutexs.index = i
 ReleaseMutex CLng(Mymutexs.Value)
 CloseHandle CLng(Mymutexs.Value)
 Next i

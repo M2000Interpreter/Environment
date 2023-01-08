@@ -35,7 +35,7 @@ Const WM_KEYFIRST = &H100
 Const WM_CHAR = &H102
 Const WM_KEYLAST = &H108
 Private Type POINTAPI
-    x As Long
+    X As Long
     y As Long
 End Type
 Private Type Msg
@@ -105,13 +105,13 @@ Public Sub deconstruct()
 Set Callback = Nothing
 Set pbox = Nothing
 End Sub
-Public Sub move(x, y, Optional W, Optional H)
+Public Sub move(X, y, Optional W, Optional H)
 If IsMissing(W) Then
-pbox.move CLng(x), CLng(y), 0, 0
+pbox.move CLng(X), CLng(y), 0, 0
 ElseIf IsMissing(H) Then
-pbox.move CLng(x), CLng(y), CLng(W), 0
+pbox.move CLng(X), CLng(y), CLng(W), 0
 Else
-pbox.move CLng(x), CLng(y), CLng(W), CLng(H)
+pbox.move CLng(X), CLng(y), CLng(W), CLng(H)
 End If
 End Sub
 
@@ -413,7 +413,7 @@ preserveINK$ = INK$
 INK$ = ""
 End Sub
 
-Private Sub pbox_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub pbox_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
 Dim bstack As basetask, oldHere$
 If Not Enabled Then Exit Sub
 If Not Relax Then
@@ -421,7 +421,7 @@ Relax = True
 Dim sel&
 
 If Button > 0 And Targets Then
-    sel& = ScanTarget(q(), CLng(x), CLng(y), prive)
+    sel& = ScanTarget(q(), CLng(X), CLng(y), prive)
     If sel& >= 0 Then
         If Button = 1 Then
             Select Case q(sel&).Id Mod 100
@@ -455,33 +455,33 @@ End If
 
 
 If mIndex > -1 Then
-    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(y) + ")"
 Else
-    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(y) + ")"
 End If
 Relax = False
 End If
 End Sub
-Private Sub pbox_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub pbox_MouseUp(Button As Integer, shift As Integer, X As Single, y As Single)
 If Not Enabled Then Exit Sub
 If Not Relax Then
 Relax = True
 If mIndex > -1 Then
-Callback.Callback mesCtrlName + ".MouseUp(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback.Callback mesCtrlName + ".MouseUp(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(y) + ")"
 Else
-Callback.Callback mesCtrlName + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback.Callback mesCtrlName + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(y) + ")"
 End If
 Relax = False
 End If
 End Sub
-Private Sub pbox_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub pbox_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
 If Not Enabled Then Exit Sub
 If Not Relax Then
 Relax = True
 If mIndex > -1 Then
-Callback.Callback mesCtrlName + ".MouseMove(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback.Callback mesCtrlName + ".MouseMove(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(y) + ")"
 Else
-Callback.Callback mesCtrlName + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback.Callback mesCtrlName + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(y) + ")"
 End If
 Relax = False
 End If
@@ -524,7 +524,7 @@ Public Sub DisAllTargets()
 DisableTargets q(), prive
 End Sub
 Friend Sub RenderTarget(bstack As basetask, rest$, Lang As Long, tHandle As Variant)
-Dim p, W$, x, y As Long
+Dim p, W$, X, y As Long
 If tHandle \ 10000 <> prive Then
     MyEr "target not for this image", "Ô ÛÙ¸˜ÔÚ ‰ÂÌ ÂﬂÌ·È „È· ·ıÙﬁ ÙÁÌ ÂÈÍ¸Ì·"
     Exit Sub
@@ -532,7 +532,7 @@ End If
 p = tHandle Mod 10000
 If p >= 0 And p < UBound(q()) Then
     While FastSymbol(rest$, ",")
-        x = Empty
+        X = Empty
         y = 0
         If IsLabelSymbolNew(rest$, "÷—¡”«", "TEXT", Lang, y) Then
             If IsStrExp(bstack, rest$, W$) Then
@@ -541,20 +541,20 @@ If p >= 0 And p < UBound(q()) Then
                 GoTo skipcommand
             End If
         ElseIf IsLabelSymbolNew(rest$, "–≈Õ¡", "PEN", Lang, y) Then
-            If IsExp(bstack, rest$, x, , True) Then
-                q(p).pen = x
+            If IsExp(bstack, rest$, X, , True) Then
+                q(p).pen = X
             Else
                 GoTo skipcommand
             End If
         ElseIf IsLabelSymbolNew(rest$, "÷œÕ‘œ", "BACK", Lang, y) Then
-            If IsExp(bstack, rest$, x, , True) Then
-                q(p).back = x
+            If IsExp(bstack, rest$, X, , True) Then
+                q(p).back = X
             Else
                 GoTo skipcommand
             End If
         ElseIf IsLabelSymbolNew(rest$, "–À¡…”…œ", "BORDER", Lang, y) Then
-            If IsExp(bstack, rest$, x, , True) Then
-                q(p).fore = x
+            If IsExp(bstack, rest$, X, , True) Then
+                q(p).fore = X
             Else
                 GoTo skipcommand
             End If
@@ -565,40 +565,40 @@ If p >= 0 And p < UBound(q()) Then
                 GoTo skipcommand
             End If
         ElseIf IsLabelSymbolNew(rest$, "‘…Ã«", "VALUE", Lang, y) Then
-            If IsExp(bstack, rest$, x, , True) Then
-                q(p).topval = Int(x * 100)
+            If IsExp(bstack, rest$, X, , True) Then
+                q(p).topval = Int(X * 100)
             Else
                 GoTo skipcommand
             End If
         ElseIf IsLabelSymbolNew(rest$, "¬¡”«", "BASE", Lang, y) Then
-            If IsExp(bstack, rest$, x, , True) Then
-                q(p).botval = Int(x * 100)
+            If IsExp(bstack, rest$, X, , True) Then
+                q(p).botval = Int(X * 100)
             Else
                 GoTo skipcommand
             End If
         ElseIf IsLabelSymbolNew(rest$, "◊—ŸÃ¡", "COLOR", Lang, y) Then
-            If IsExp(bstack, rest$, x, , True) Then
-                q(p).barC = x
+            If IsExp(bstack, rest$, X, , True) Then
+                q(p).barC = X
             Else
                 GoTo skipcommand
             End If
         ElseIf IsLabelSymbolNew(rest$, "Ã≈√≈»œ”", "SIZE", Lang, y) Then
-            If IsExp(bstack, rest$, x, , True) Then
-                If x > 100 Then x = 100
-                If x < -100 Then x = -100
-                q(p).imagesize = Int(x)
+            If IsExp(bstack, rest$, X, , True) Then
+                If X > 100 Then X = 100
+                If X < -100 Then X = -100
+                q(p).imagesize = Int(X)
             Else
                 GoTo skipcommand
             End If
 ' " ¡»≈‘«", "PORTRAIT"
         ElseIf IsLabelSymbolNew(rest$, " ¡»≈‘«", "PORTRAIT", Lang, y) Then
-            If IsExp(bstack, rest$, x, , True) Then
-                q(p).Vertical = Int(x) <> 0
+            If IsExp(bstack, rest$, X, , True) Then
+                q(p).Vertical = Int(X) <> 0
             Else
                 GoTo skipcommand
             End If
         ElseIf IsLabelSymbolNew(rest$, "≈… œÕ¡", "IMAGE", Lang, y) Then
-            If IsExp(bstack, rest$, x) Then
+            If IsExp(bstack, rest$, X) Then
                 If bstack.lastobj Is Nothing Then
                     Set q(p).drawimage = Nothing
                 ElseIf TypeOf bstack.lastobj Is mHandler Then

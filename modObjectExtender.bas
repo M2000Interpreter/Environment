@@ -133,13 +133,13 @@ Public Sub InitObjExtender()
     CLSIDFromString StrPtr(IIDSTR_IUnknown), IID_IUnknown
     CLSIDFromString StrPtr(IIDSTR_IDispatch), IID_IDispatch
 
-    ObjExt_vtbl(0) = addr(AddressOf ObjExt_QueryInterface)
-    ObjExt_vtbl(1) = addr(AddressOf ObjExt_AddRef)
-    ObjExt_vtbl(2) = addr(AddressOf ObjExt_Release)
-    ObjExt_vtbl(3) = addr(AddressOf ObjExt_GetTypeInfoCount)
-    ObjExt_vtbl(4) = addr(AddressOf ObjExt_GetTypeInfo)
-    ObjExt_vtbl(5) = addr(AddressOf ObjExt_GetIDsOfNames)
-    ObjExt_vtbl(6) = addr(AddressOf ObjExt_Invoke)
+    ObjExt_vtbl(0) = Addr(AddressOf ObjExt_QueryInterface)
+    ObjExt_vtbl(1) = Addr(AddressOf ObjExt_AddRef)
+    ObjExt_vtbl(2) = Addr(AddressOf ObjExt_Release)
+    ObjExt_vtbl(3) = Addr(AddressOf ObjExt_GetTypeInfoCount)
+    ObjExt_vtbl(4) = Addr(AddressOf ObjExt_GetTypeInfo)
+    ObjExt_vtbl(5) = Addr(AddressOf ObjExt_GetIDsOfNames)
+    ObjExt_vtbl(6) = Addr(AddressOf ObjExt_Invoke)
 
     blnInit = True
 End Sub
@@ -193,13 +193,13 @@ Private Function ObjExt_GetTypeInfoCount(this As EventSink, pctinfo As Long) As 
 End Function
 
 ' IDispatch::GetTypeInfo
-Private Function ObjExt_GetTypeInfo(this As EventSink, ByVal iTInfo As Long, ByVal lcid As Long, ppTInfo As Long) As Long
+Private Function ObjExt_GetTypeInfo(this As EventSink, ByVal iTInfo As Long, ByVal LCID As Long, ppTInfo As Long) As Long
     ppTInfo = 0
     ObjExt_GetTypeInfo = E_NOTIMPL
 End Function
 
 ' IDispatch::GetIDsOfNames
-Private Function ObjExt_GetIDsOfNames(this As EventSink, riid As GUID, rgszNames As Long, ByVal cNames As Long, ByVal lcid As Long, rgDispId As Long) As Long
+Private Function ObjExt_GetIDsOfNames(this As EventSink, riid As GUID, rgszNames As Long, ByVal cNames As Long, ByVal LCID As Long, rgDispId As Long) As Long
     ObjExt_GetIDsOfNames = E_NOTIMPL
 End Function
 
@@ -207,7 +207,7 @@ End Function
 Private Function ObjExt_Invoke(this As EventSink, _
          ByVal dispIdMember As Long, _
          riid As GUID, _
-         ByVal lcid As Long, _
+         ByVal LCID As Long, _
          ByVal wFlags As Integer, _
          ByVal pDispParams As Long, _
          ByVal pVarResult As Long, _
@@ -242,8 +242,8 @@ Public Function CreateEventSink(IID As GUID, objext As ComShinkEvent) As Object
     ' return the object
     CpyMem CreateEventSink, sink.hMem, 4&
 End Function
-Private Function addr(p As Long) As Long
-    addr = p
+Private Function Addr(p As Long) As Long
+    Addr = p
 End Function
 
 ' Pointer->Object
@@ -330,9 +330,9 @@ Private Sub AddPush(pASM As Long, lng As Long)
     AddLong pASM, lng
 End Sub
 
-Private Sub AddCall(pASM As Long, addr As Long)
+Private Sub AddCall(pASM As Long, Addr As Long)
     AddByte pASM, &HE8
-    AddLong pASM, addr - pASM - 4
+    AddLong pASM, Addr - pASM - 4
 End Sub
 
 Private Sub AddLong(pASM As Long, lng As Long)

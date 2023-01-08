@@ -136,7 +136,7 @@ Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT
 Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hDC As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
-Private Declare Function GetStringTypeExW Lib "Kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
+Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 
 'nTabPositions  here we use 1
 ' lpnTabStopPositions here we usen just a long variable, passed by reference.
@@ -2382,6 +2382,11 @@ If kind > 0 Then
   End If
   pos2 = k - Len(a$) + 1
   If kind > 3 Then
+  If kind = 8 Then
+  addone pos2, 14
+  a$ = Mid$(a$, 2)
+  pos2 = k - Len(a$) + 1
+  End If
 CheckThis:
   pos1 = 1
  drop$ = aheadstatus(a$, False, pos1)
@@ -2420,7 +2425,12 @@ If feedthis = 15 Then GoTo use15
 
 Exit Sub
 End If
-If kind > 4 And onetime Then
+If kind = 8 And Left$(a$, 1) = "]" Then '****************************fix this
+
+addone pos2, 14
+a$ = Mid$(a$, 2)
+    pos2 = k - Len(a$) + 1
+ElseIf kind > 4 And onetime Then
 If FastSymbol(a$, ",") Then
   addone pos2, 14
     pos2 = k - Len(a$) + 1
@@ -2467,7 +2477,12 @@ If FastSymbol(a$, ",") Then
 
 here3:
 If kind > 0 Then
-If MaybeIsSymbol(a$, ".") Then
+If Left$(a$, 1) = "[" Then
+a$ = Mid$(a$, 2)
+addone pos2, 14
+pos2 = k + 1
+
+ElseIf MaybeIsSymbol(a$, ".") Then
 If FastSymbol(a$, ".(", , 2) Then
 addone pos2, 14
 a$ = vbNullString
@@ -2557,7 +2572,6 @@ feedback = 0
 a$ = Mid$(a$, pos1)
 
 ColorizeInnerStatements a$, k, pos2, feedback, True
-
 If MaybeIsSymbol(a$, ")") Then
 addone pos2, lastcol
 FastSymbol a$, ")"
@@ -2986,7 +3000,12 @@ If kind > 0 Then
        End If
         '' for the end
    Else
-   If kind > 4 And kind < 8 Then lastpar = 10
+   If kind > 4 And kind < 9 Then lastpar = 10
+If kind = 1 And Right$(a$, 1) = "]" Then
+lastpar = 14
+'Mid$(drop$, Len(a$)) = "?"
+'a$ = Left$(a$, Len(a$) - 1)
+End If
    If kind = 10 Then
         lastcol = 13
    ElseIf kind = 20 Then
@@ -3004,6 +3023,11 @@ If kind > 0 Then
   End If
   pos2 = k - Len(a$) + 1
  If kind > 3 Then
+   If kind = 8 Then
+  addone pos2, 14
+  a$ = Mid$(a$, 2)
+  pos2 = k - Len(a$) + 1
+  End If
 checklambda:
   Do
   pos1 = 1
@@ -3025,7 +3049,7 @@ checklambda:
    Exit Do
    End If
    Loop
-    If MaybeIsSymbol(a$, "(") Then
+If MaybeIsSymbol(a$, "(") Then
 addone pos2, 14
 lastpar = 14
 FastSymbol a$, "("
@@ -3289,6 +3313,12 @@ a$ = NLtrim$(a$)
         End If
 
     Loop
+   If InStr(R$, "[") > 1 Then
+        a$ = Mid$(R$, InStr(R$, "[")) + a$
+        R$ = Left$(R$, InStr(R$, "[") - 1)
+        rr& = 8
+    End If
+    
        R$ = firstdot$ + myUcase(R$, gr)
     IsLabelDot = rr&
    'a$ = LTrim$(a$)
@@ -3516,9 +3546,23 @@ checkexp:
                 End If
                 If Len(LTrim$(R$)) > 18 Then rr& = 0
             Else
+             '    If rr& = 1 Then
+              '   If c$ = "]" And InStr(R$, "[") = 0 Then Exit Do
+               '  End If
                  R$ = R$ & Left$(a$, 1)
                  a$ = Mid$(a$, 2)
+                 
                  rr& = 1 'is an identifier or floating point variable
+                 'If R$ = "][" Then
+                 '   rr& = 0: Exit Do
+                 'ElseIf c$ = "[" And R$ = "[" Then
+                  '  If Left$(a$, 1) <> "]" Then
+                   '    rr& = 0: Exit Do
+                   ' Else
+                    '   R$ = R$ & Left$(a$, 1)
+                    '   a$ = Mid$(a$, 2)
+                    'End If
+                 'End If
             End If
         End If
     Case 36 ' "$"
@@ -3617,8 +3661,28 @@ checkexp:
         End If
         End If
     End If
+    
     If R$ = "&" Then
         IsLabelOnly = 10
+    ElseIf R$ = "[" Or R$ = "]" Or R$ = "][" Then
+        IsLabelOnly = 100
+    ElseIf InStr(R$, "][") > 1 Then
+         a$ = "??" + Mid$(R$, InStr(R$, "][") + 2) + a$
+        R$ = Left$(R$, InStr(R$, "][") - 1)
+        IsLabelOnly = 1
+    ElseIf InStr(R$, "[") > 1 Then
+        a$ = "?" + Mid$(R$, InStr(R$, "[") + 1) + a$
+        R$ = Left$(R$, InStr(R$, "[") - 1)
+        IsLabelOnly = 1
+    
+    ElseIf InStr(R$, "]") > 1 And R$ <> "[]" Then
+        a$ = "?" + a$
+        R$ = Left$(R$, Len(R$) - 1)
+        IsLabelOnly = 1
+    ElseIf Right$(R$, 2) = "[]" And Len(R$) > 2 Then
+        a$ = "??" + a$
+        R$ = Left$(R$, Len(R$) - 2)
+        IsLabelOnly = 1
     ElseIf rr& > 3 And rr& < 9 Then
         IsLabelOnly = rr& + Extra&
     ElseIf CheckFree(Left$(a$, 1)) Then
@@ -5176,8 +5240,17 @@ there1:
                 End If
         Case ")", "}", Is < " ", ":", ";", "'", "\", "/"
         Exit Do
+        Case "]"
+        If InStr(word$, "[") = 1 Then
+        GoTo here123
+        Else
+            part$ = ""
+            Exit Do
+        End If
         Case Else
+here123:
         If part$ = "N" Then
+        If W$ = "[" Then Exit Do
         word$ = word$ + W$
         ElseIf part$ = "S" Then
        

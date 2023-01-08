@@ -27,7 +27,7 @@ Private mHideCaret As Boolean, mTitle As String, mfactor As Single
 Private lastshift As Boolean, lastitem As Long
 Public maychange As Boolean
 Public SkipFirstClick As Boolean
-Private Declare Function GetStringTypeExW Lib "Kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
+Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 
 Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
@@ -60,14 +60,14 @@ If Not glistN Is Nothing Then glistN.Shutdown
 Set Callback = Nothing
 Set glistN = Nothing
 End Sub
-Public Sub move(x, y, Optional W, Optional H)
+Public Sub move(X, y, Optional W, Optional H)
 glistN.HideBarAsap
 If IsMissing(W) Then
-glistN.MoveTwips CLng(x), CLng(y), 0, 0
+glistN.MoveTwips CLng(X), CLng(y), 0, 0
 ElseIf IsMissing(H) Then
-glistN.MoveTwips CLng(x), CLng(y), CLng(W), 0
+glistN.MoveTwips CLng(X), CLng(y), CLng(W), 0
 Else
-glistN.MoveTwips CLng(x), CLng(y), CLng(W), CLng(H)
+glistN.MoveTwips CLng(X), CLng(y), CLng(W), CLng(H)
 End If
 If mHeaderOnly Then
     If glistN.HeadLine = "" Then glistN.HeadLine = " "
@@ -131,7 +131,7 @@ End With
 
 End Sub
 
-Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
 Dim oldtab As Long, where As Long, oldscroll As Long
 
 
@@ -140,7 +140,7 @@ ElseIf maychange And Button = 0 Then
 oldtab = glistN.Column
 oldscroll = glistN.PanPos
 glistN.PanPos = 0
-glistN.REALCUR item, CSng(x * dv15), (0), where
+glistN.REALCUR item, CSng(X * dv15), (0), where
 If lastitem = item And oldtab = glistN.Column Then
 glistN.PanPos = oldscroll
 Exit Sub
@@ -171,29 +171,29 @@ Private Sub glistN_KeyDownAfter(KeyCode As Integer, shift As Integer)
 If mHeaderOnly Then KeyCode = 0: shift = 0
 End Sub
 
-Private Sub glistN_MouseMove(myButton As Integer, shift As Integer, x As Single, y As Single)
+Private Sub glistN_MouseMove(myButton As Integer, shift As Integer, X As Single, y As Single)
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".MouseMove(" + Str(mIndex) + "," + Str(x) + "," + Str(y) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+        Callback.Callback mesCtrlName + ".MouseMove(" + Str(mIndex) + "," + Str(X) + "," + Str(y) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
     Else
-        Callback.Callback mesCtrlName + ".MouseMove(" + Str(x) + "," + Str(y) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+        Callback.Callback mesCtrlName + ".MouseMove(" + Str(X) + "," + Str(y) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
     End If
 
 End Sub
 
-Private Sub glistN_MouseUp(x As Single, y As Single)
+Private Sub glistN_MouseUp(X As Single, y As Single)
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".MouseUp(" + Str(mIndex) + "," + Str(x) + "," + Str(y) + ")"
+        Callback.Callback mesCtrlName + ".MouseUp(" + Str(mIndex) + "," + Str(X) + "," + Str(y) + ")"
     Else
-        Callback.Callback mesCtrlName + ".MouseUp(" + Str(x) + "," + Str(y) + ")"
+        Callback.Callback mesCtrlName + ".MouseUp(" + Str(X) + "," + Str(y) + ")"
     End If
 End Sub
 
-Private Sub glistN_OutPopUp(x As Single, y As Single, myButton As Integer)
+Private Sub glistN_OutPopUp(X As Single, y As Single, myButton As Integer)
 If (myButton And &H2) = 2 Then
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+        Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
     Else
-        Callback.Callback mesCtrlName + ".PopUp(" + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+        Callback.Callback mesCtrlName + ".PopUp(" + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
     End If
 End If
 End Sub
@@ -1723,16 +1723,16 @@ Sub UseVerMove()
     End If
 End Sub
 
-Private Sub glistN_ValidMove(x As Single, y As Single)
+Private Sub glistN_ValidMove(X As Single, y As Single)
 Dim VR(2)
-VR(0) = x
+VR(0) = X
 VR(1) = y
    If mIndex >= 0 Then
    Callback.CallbackNow mesCtrlName + ".ValidMove(" + Str(mIndex) + "," + Str(mIndex) + ")", VR()
    Else
       Callback.CallbackNow mesCtrlName + ".ValidMove()", VR()
       End If
-x = VR(0)
+X = VR(0)
 y = VR(1)
 End Sub
 Property Let MoveParent(ByVal RHS As Boolean)

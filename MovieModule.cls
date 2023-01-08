@@ -424,14 +424,14 @@ Public Function extractCurrentMovieSize(wLeft As Long, wTop As Long, wWidth As L
     Dim b As String
     Dim c As String
     Dim f As String
-    Dim g As String
+    Dim G As String
     a = getCurrentSize
     b = InStr(1, a, " ")
     c = InStr(b + 1, a, " ")
     f = Mid$(a, c + 1)
-    g = InStr(1, f, " ")
-    wWidth = val(Left(f, g)) 'width
-    wHeight = val(Mid$(f, g)) 'height
+    G = InStr(1, f, " ")
+    wWidth = val(Left(f, G)) 'width
+    wHeight = val(Mid$(f, G)) 'height
 End Function
 Public Function MovieHeight() As Long
     'Returns the size parameters of the m"+str(myID)+"
@@ -440,13 +440,13 @@ Public Function MovieHeight() As Long
     Dim b As String
     Dim c As String
     Dim f As String
-    Dim g As String
+    Dim G As String
     a = getCurrentSize
     b = InStr(1, a, " ")
     c = InStr(b + 1, a, " ")
     f = Mid$(a, c + 1)
-    g = InStr(1, f, " ")
-       MovieHeight = val(Mid$(f, g)) 'height
+    G = InStr(1, f, " ")
+       MovieHeight = val(Mid$(f, G)) 'height
 End Function
 Public Function extractDefaultMovieSize(wWidth As Long, wHeight As Long)
     'Returns the default size of the m"+str(myID)+" even if the size
@@ -456,14 +456,14 @@ Public Function extractDefaultMovieSize(wWidth As Long, wHeight As Long)
     Dim b As String
     Dim c As String
     Dim f As String
-    Dim g As String
+    Dim G As String
     a = getDefaultSize
     b = InStr(1, a, " ") '2
     c = InStr(b + 1, a, " ") '4
     f = Mid$(a, c + 1) '9
-    g = InStr(1, f, " ")
-    wWidth = val(Left(f, g)) 'width
-    wHeight = val(Mid$(f, g)) 'height
+    G = InStr(1, f, " ")
+    wWidth = val(Left(f, G)) 'width
+    wHeight = val(Mid$(f, G)) 'height
 End Function
 Public Function getBitsPerPixel()
     'Will get the m"+str(myID)+" bitsperpixel
@@ -595,7 +595,7 @@ End Function
 Public Function pauseMovie()
     'Pause the m"+str(myID)+"
     If AVIRUN Then
-    AVI.Timer1.enabled = False
+    AVI.Timer1.Enabled = False
     If (Me.getLengthInMS - Me.getPositionInMS) > 0 Then
     
     AVI.Interval = Me.getLengthInMS - Me.getPositionInMS
@@ -763,7 +763,7 @@ Public Function setPositionTo(Second As Double)
     mciSendString "seek m" + LTrim$(Str$(myid)) + " to " + Second, 0, 0, 0
     End If
      If AVIRUN Then
-    AVI.Timer1.enabled = False
+    AVI.Timer1.Enabled = False
     
      If (Me.getLengthInMS - Me.getPositionInMS) > 0 Then
     
@@ -779,9 +779,9 @@ Public Function restartMovie()
     'function to start playing from the beginning
     Error = mciSendString("seek m" + LTrim$(Str$(myid)) + " to start", 0, 0, 0)
      If AVIRUN Then
-    AVI.Timer1.enabled = False
-    AVI.Timer1.enabled = Me.getLengthInMS
-      AVI.Timer1.enabled = True
+    AVI.Timer1.Enabled = False
+    AVI.Timer1.Enabled = Me.getLengthInMS
+      AVI.Timer1.Enabled = True
     End If
     playMovie
 End Function

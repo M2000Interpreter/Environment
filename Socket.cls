@@ -176,7 +176,7 @@ Private Sub connection_not_sync()
 MyEr "Connection isn't synchronus", "Η σύνδεση δεν είναι σύγχρονη"
 End Sub
 
-Public Function Create( _
+Public Function create( _
             Optional ByVal SocketPort As Variant, _
             Optional ByVal SocketType As Variant, _
             Optional ByVal EventMask As Variant, _
@@ -188,7 +188,7 @@ Public Function Create( _
         If IsMissing(SocketAddress) Then iSocketAddress = vbNullString Else iSocketAddress = CVar(SocketAddress)
         If m_hSocket = 0 Then Set mySocket = New cAsyncSocket: m_hSocket = mySocket.SocketHandle
         SyncEnabled = False
-        Create = mySocket.Create(CLng(SocketPort), CLng(SocketType), CLng(EventMask), iSocketAddress)
+        create = mySocket.create(CLng(SocketPort), CLng(SocketType), CLng(EventMask), iSocketAddress)
         SocketAddress = iSocketAddress
 End Function
 Public Function GetPeerName(PeerAddress As Variant, PeerPort As Variant) As Variant
@@ -368,12 +368,12 @@ Public Function Send( _
     HostAddress = iHostAddress
     
 End Function
-Public Function ShutDown(Optional ByVal How) As Variant
+Public Function Shutdown(Optional ByVal How) As Variant
     Dim iHow As Long
     If m_hSocket = 0 Then socket_not_init: Exit Function
     If IsMissing(How) = 1 Then iHow = 1 Else iHow = How
     SyncEnabled = False
-    ShutDown = mySocket.ShutDown(iHow)
+    Shutdown = mySocket.Shutdown(iHow)
 End Function
 Public Function GetErrorDescription(ByVal ErrorCode) As Variant
         If m_hSocket = 0 Then socket_not_init: Exit Function
@@ -386,7 +386,7 @@ End Function
 '' sync part not yet
 
 Public Function SyncConnect(HostAddress As Variant, ByVal HostPort As Variant, Optional ByVal Timeout As Variant) As Variant
-Dim tm As clsProfiler
+Dim TM As clsProfiler
 SyncEnabled = True
 CloseOk = False
 AcceptOk = False
@@ -406,15 +406,15 @@ Dim iHostAddress As String, iHostPort As Long, iTimeout As Long
     iTimeout = CLng(Timeout)
     End If
     If iTimeout > 0 Then
-        Set tm = New clsProfiler
-        tm.MARKONE
+        Set TM = New clsProfiler
+        TM.MARKONE
     End If
     ok = mySocket.Connect(iHostAddress, iHostPort)
     If ok Then
         Do
             ProcTask2 Basestack1
             If escok Then escnow = KeyPressed(&H1B)
-        Loop Until OnConnect Or ErrorOk Or CloseOk Or escnow Or tm.MARKTWO > iTimeout
+        Loop Until OnConnect Or ErrorOk Or CloseOk Or escnow Or TM.MARKTWO > iTimeout
         SyncConnect = OnConnect
     Else
     SyncConnect = False
@@ -472,7 +472,7 @@ Public Function SyncReceiveText( _
             Optional ByVal CodePage) As Variant
     If m_hSocket = 0 Then socket_not_init: Exit Function
     If Not SyncEnabled Then connection_not_sync: Exit Function
-    Dim tm As clsProfiler
+    Dim TM As clsProfiler
     Dim iNeedLen As Long, iTimeout As Long
     If IsMissing(NeedLen) Then iNeedLen = 0 Else iNeedLen = NeedLen
     If IsMissing(iTimeout) Then
@@ -489,28 +489,28 @@ Public Function SyncReceiveText( _
     ErrorOk = False
     CloseOk = False
     SyncEnabled = True
-    Dim escnow As Long, part$, Count As Long
+    Dim escnow As Long, part$, count As Long
     If iTimeout > 0 Then
-        Set tm = New clsProfiler
-        tm.MARKONE
+        Set TM = New clsProfiler
+        TM.MARKONE
     End If
-    If NeedLen > 0 Then SyncReceiveText = space$(NeedLen): Count = 1
+    If NeedLen > 0 Then SyncReceiveText = space$(NeedLen): count = 1
 again:
         If Not ReceiveOk Then
          Do
             ProcTask2 Basestack1
             If escok Then escnow = KeyPressed(&H1B)
-        Loop Until ReceiveOk Or ErrorOk Or CloseOk Or escnow Or tm.MARKTWO > iTimeout
+        Loop Until ReceiveOk Or ErrorOk Or CloseOk Or escnow Or TM.MARKTWO > iTimeout
         End If
         If ReceiveOk And Not (ErrorOk Or CloseOk Or escnow) Then
         ReceiveOk = False
         If NeedLen > 0 Then
              part$ = mySocket.ReceiveText(iHostAddress, iHostPort, iCodePage)
              If Len(part$) > 0 Then
-                Mid$(SyncReceiveText, Count, Len(part$)) = part$
-                Count = Count + Len(part$)
+                Mid$(SyncReceiveText, count, Len(part$)) = part$
+                count = count + Len(part$)
              End If
-             If Count <= NeedLen Then GoTo again
+             If count <= NeedLen Then GoTo again
         Else
         SyncReceiveText = mySocket.ReceiveText(iHostAddress, iHostPort, iCodePage)
         End If
@@ -529,21 +529,21 @@ Private Function SyncReceive( _
             Optional HostAddress As String = STR_CHR1, _
             Optional HostPort As Long, _
             Optional ByVal Flags As Long = 0) As Boolean
-            Dim tm As New clsProfiler, escnow As Boolean
+            Dim TM As New clsProfiler, escnow As Boolean
             
             ErrorOk = False
             CloseOk = False
             If Timeout = 0 Then
                 Timeout = Znl(mySocket.SockOpt(&H1006), 5000)
             End If
-            tm.MARKONE
+            TM.MARKONE
             Debug.Print "Receive now", ReceiveOk
 again:
             If Not ReceiveOk Then
             Do
                 ProcTask2 Basestack1
                 If escok Then escnow = KeyPressed(&H1B)
-            Loop Until ReceiveOk Or ErrorOk Or CloseOk Or escnow Or tm.MARKTWO > Timeout
+            Loop Until ReceiveOk Or ErrorOk Or CloseOk Or escnow Or TM.MARKTWO > Timeout
             End If
              If ReceiveOk And Not (ErrorOk Or CloseOk Or escnow) Then  '
                 ReceiveOk = False
@@ -603,13 +603,13 @@ Private Function SyncSend( _
             Optional HostAddress As String, _
             Optional ByVal HostPort As Long, _
             Optional ByVal Flags As Long = 0) As Boolean
-            Dim tm As New clsProfiler, escnow As Boolean, lResult As Long
+            Dim TM As New clsProfiler, escnow As Boolean, lResult As Long
             ErrorOk = False
             CloseOk = False
             If Timeout = 0 Then
                 Timeout = Znl(mySocket.SockOpt(&H1005), 5000)
             End If
-            tm.MARKONE
+            TM.MARKONE
             Debug.Print "Send now", SendOk
 again:
             If Not SendOk Then
@@ -617,7 +617,7 @@ again:
             Do
                 ProcTask2 Basestack1
                 If escok Then escnow = KeyPressed(&H1B)
-            Loop Until SendOk Or ErrorOk Or CloseOk Or escnow Or tm.MARKTWO > Timeout
+            Loop Until SendOk Or ErrorOk Or CloseOk Or escnow Or TM.MARKTWO > Timeout
             End If
             If SendOk And Not (ErrorOk Or CloseOk Or escnow) Then
                 Debug.Print "send start"

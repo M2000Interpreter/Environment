@@ -189,16 +189,16 @@ If InUseHandlers.ExistKey(RHS) Then
 End If
 End Property
 Public Property Let FileSeek(RHS, vvv)
-Dim H, where, ret As Currency, lowlong As Long, highlong As Long
+Dim H, where, ret As Currency, LowLong As Long, HighLong As Long
 Dim FileError As Long
 ret = CCur(Int(vvv)) - 1
 If InUseHandlers.ExistKey(RHS) Then
     H = InUseHandlers.Value
     where = H(0)
-    Size2Long ret, lowlong, highlong
-    lowlong = SetFilePointer(where, lowlong, highlong, FILE_BEGIN)
+    Size2Long ret, LowLong, HighLong
+    LowLong = SetFilePointer(where, LowLong, HighLong, FILE_BEGIN)
     FileError = GetLastError()
-    If lowlong = INVALID_SET_FILE_POINTER And FileError <> 0 Then
+    If LowLong = INVALID_SET_FILE_POINTER And FileError <> 0 Then
         MyEr "Can't write the seek value", "Δεν μπορώ να γράψω τη τιμή μετάθεσης"
     End If
 Else
@@ -206,18 +206,18 @@ Else
 End If
 End Property
 Public Property Get FileSeek(RHS) As Variant
-Dim H, where, ret As Currency, lowlong As Long, highlong As Long
+Dim H, where, ret As Currency, LowLong As Long, HighLong As Long
 FileSeek = ret
 If InUseHandlers.ExistKey(RHS) Then
     H = InUseHandlers.Value
     where = H(0)
-    lowlong = 0
-    highlong = 0
-    lowlong = SetFilePointer(where, lowlong, highlong, FILE_CURRENT)
-    If lowlong = INVALID_SET_FILE_POINTER Then
+    LowLong = 0
+    HighLong = 0
+    LowLong = SetFilePointer(where, LowLong, HighLong, FILE_CURRENT)
+    If LowLong = INVALID_SET_FILE_POINTER Then
         MyEr "Can't read the seek value", "Δεν μπορώ να διαβάσω τη τιμή μετάθεσης"
     Else
-        Long2Size lowlong, highlong, ret
+        Long2Size LowLong, HighLong, ret
         FileSeek = ret + 1
     End If
 Else
@@ -225,52 +225,52 @@ Else
 End If
 End Property
 Public Property Let FileSeekFH(where As Long, ByVal ret As Currency)
-Dim lowlong As Long, highlong As Long
+Dim LowLong As Long, HighLong As Long
 Dim FileError As Long
-    Size2Long ret - 1@, lowlong, highlong
-    lowlong = SetFilePointer(where, lowlong, highlong, FILE_BEGIN)
+    Size2Long ret - 1@, LowLong, HighLong
+    LowLong = SetFilePointer(where, LowLong, HighLong, FILE_BEGIN)
     FileError = GetLastError()
-    If lowlong = INVALID_SET_FILE_POINTER And FileError <> 0 Then
+    If LowLong = INVALID_SET_FILE_POINTER And FileError <> 0 Then
         MyEr "Can't write the seek value", "Δεν μπορώ να γράψω τη τιμή μετάθεσης"
     End If
 End Property
 Public Property Get FileSeekFH(where As Long) As Currency
-Dim lowlong As Long, highlong As Long
-    lowlong = SetFilePointer(where, lowlong, highlong, FILE_CURRENT)
-    If lowlong = INVALID_SET_FILE_POINTER Then
+Dim LowLong As Long, HighLong As Long
+    LowLong = SetFilePointer(where, LowLong, HighLong, FILE_CURRENT)
+    If LowLong = INVALID_SET_FILE_POINTER Then
         MyEr "Can't read the seek value", "Δεν μπορώ να διαβάσω τη τιμή μετάθεσης"
     Else
-        Long2Size lowlong, highlong, FileSeekFH
+        Long2Size LowLong, HighLong, FileSeekFH
         FileSeekFH = FileSeekFH + 1
     End If
 End Property
 Public Property Get FileEOFFH(where As Long) As Boolean
-Dim ret As Currency, lowlong As Long, highlong As Long
+Dim ret As Currency, LowLong As Long, HighLong As Long
 Dim fsize As Currency
-    lowlong = SetFilePointer(where, lowlong, highlong, FILE_CURRENT)
-    If lowlong = INVALID_SET_FILE_POINTER Then
+    LowLong = SetFilePointer(where, LowLong, HighLong, FILE_CURRENT)
+    If LowLong = INVALID_SET_FILE_POINTER Then
         MyEr "Can't read the seek value on Eof() function", "Δεν μπορώ να διαβάσω τη τιμή μετάθεσης στη συνάρτηση Μετάθεση()"
     Else
-        Long2Size lowlong, highlong, ret
-        lowlong = GetFileSize(where, highlong)
-        Long2Size lowlong, highlong, fsize
+        Long2Size LowLong, HighLong, ret
+        LowLong = GetFileSize(where, HighLong)
+        Long2Size LowLong, HighLong, fsize
         FileEOFFH = ret >= fsize
     End If
 End Property
 
 Public Property Get FileEOF(RHS) As Boolean
-Dim H, where, ret As Currency, lowlong As Long, highlong As Long
+Dim H, where, ret As Currency, LowLong As Long, HighLong As Long
 Dim fsize As Currency
 If InUseHandlers.ExistKey(RHS) Then
     H = InUseHandlers.Value
     where = H(0)
-    lowlong = SetFilePointer(where, lowlong, highlong, FILE_BEGIN)
-    If lowlong = INVALID_SET_FILE_POINTER Then
+    LowLong = SetFilePointer(where, LowLong, HighLong, FILE_BEGIN)
+    If LowLong = INVALID_SET_FILE_POINTER Then
         MyEr "Can't read the seek value on Eof() function", "Δεν μπορώ να διαβάσω τη τιμή μετάθεσης στη συνάρτηση Μετάθεση()"
     Else
-        Long2Size lowlong, highlong, ret
-        lowlong = GetFileSize(where, highlong)
-        Long2Size lowlong, highlong, fsize
+        Long2Size LowLong, HighLong, ret
+        LowLong = GetFileSize(where, HighLong)
+        Long2Size LowLong, HighLong, fsize
         FileEOF = ret >= fsize
     End If
 Else
@@ -981,7 +981,7 @@ Const mHdlr = "mHandler"
 Const mGroup = "Group"
 Const myArray = "mArray"
 MyRead = True
-Dim p As Variant, x As Double
+Dim p As Variant, X As Double
 Dim pppp As mArray
 ohere$ = here$
 Dim Col As Long
@@ -1508,8 +1508,8 @@ Set ps = New mStiva
 Do While ss$ <> ""
 If ISSTRINGA(ss$, pa$) Then
 ps.DataStr pa$
-ElseIf IsNumberD(ss$, x) Then
-ps.DataVal x
+ElseIf IsNumberD(ss$, X) Then
+ps.DataVal X
 Else
 Exit Do
 End If
@@ -2724,12 +2724,12 @@ conthereEnum:
             Case Else
                 ss$ = s$
                 it = True
-                  If MyIsNumeric(p) Then x = p: it = False
+                  If MyIsNumeric(p) Then X = p: it = False
                   If IsEnumAs(bstack, ss$, p, ok, rest$) Then
                     If Not it Then
                     
                         Set usehandler = p
-                        p = x
+                        p = X
                         Set usehandler = usehandler.objref.SearchValue(p, ok)
                         Set myobject = usehandler
                         If ok Then

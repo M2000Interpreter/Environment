@@ -148,7 +148,7 @@ Private Declare Function OpenProcess Lib "kernel32" _
    ByVal bInheritHandle As Long, _
    ByVal dwProcessID As Long) As Long
    
-Private Declare Function GetLocaleInfo Lib "kernel32.dll" Alias "GetLocaleInfoW" (ByVal lcid As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+Private Declare Function GetLocaleInfo Lib "kernel32.dll" Alias "GetLocaleInfoW" (ByVal LCID As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
 Private Declare Function GetUserDefaultUILanguage Lib "kernel32.dll" () As Long
 Private Declare Function GetSystemDefaultUILanguage Lib "kernel32.dll" () As Long
 Private Declare Function GetSystemDefaultLCID Lib "kernel32.dll" () As Long
@@ -195,8 +195,8 @@ Private Declare Function NtOpenSymbolicLinkObject Lib "ntdll.dll" (LinkHandle As
 'Private Declare Function NtOpenDirectoryObject Lib "ntdll.dll" (DirectoryHandle As Long, ByVal DesiredAccess As Long, ObjectAttributes As OBJECT_ATTRIBUTES) As Long
 Private Declare Function NtClose Lib "ntdll.dll" (ByVal Handle As Long) As Long
 'Private Declare Function IsOS Lib "Shlwapi.dll" Alias "#437" (ByVal dwOS As Long) As Long
-Private Declare Function GetUserName Lib "advapi32.dll" Alias "GetUserNameW" (ByVal lpBuffer As Long, nSize As Long) As Long
-Private Declare Function GetComputerName Lib "kernel32.dll" Alias "GetComputerNameW" (ByVal lpBuffer As Long, nSize As Long) As Long
+Private Declare Function GetUserName Lib "advapi32.dll" Alias "GetUserNameW" (ByVal lpBuffer As Long, nsize As Long) As Long
+Private Declare Function GetComputerName Lib "kernel32.dll" Alias "GetComputerNameW" (ByVal lpBuffer As Long, nsize As Long) As Long
 Private Declare Function lstrlen Lib "kernel32.dll" Alias "lstrlenW" (ByVal lpString As Long) As Long
 
 Private Const MAX_PATH                  As Long = 260&
@@ -284,7 +284,7 @@ Dim ReleaseId_              As Long
 Dim DisplayVersion_         As String
 Dim IsServer_               As Boolean
 Dim IsDomainController_     As Boolean
-Dim inIDE                   As Boolean
+Dim InIDE                   As Boolean
 Dim IsWin64_                As Boolean
 Dim SecureBoot_             As Boolean
 Dim PlatformID_             As Long
@@ -300,7 +300,7 @@ Private Sub Class_Initialize()
     
     Dim dec             As Single
     Dim ProductType     As Long
-    Dim lret            As Long
+    Dim lRet            As Long
     Dim Pos             As Long
     Dim tmp             As String
     Dim hLib            As Long
@@ -308,7 +308,7 @@ Private Sub Class_Initialize()
     Dim dwMinor         As Long
     Dim dwBuild         As Long
     
-    inIDE = (App.LogMode = 0)
+    InIDE = (App.LogMode = 0)
     
     LangDisplayCode_ = GetUserDefaultUILanguage Mod &H10000
     LangDisplayName_ = GetLangNameByCultureCode(LangDisplayCode_)
@@ -330,7 +330,7 @@ Private Sub Class_Initialize()
         GetVersionEx osi
     End If
     
-    If inIDE Then
+    If InIDE Then
         'query correct OS version without manifest
         Dim oWMI As Object
         Dim colOS As Object
@@ -368,9 +368,9 @@ Private Sub Class_Initialize()
     
     IsWin64_ = (Bitness_ = "x64")
     
-    lret = GetSystemMetrics(SM_CLEANBOOT)
-    IsSafeBoot_ = (lret > 0)
-    Select Case lret
+    lRet = GetSystemMetrics(SM_CLEANBOOT)
+    IsSafeBoot_ = (lRet > 0)
+    Select Case lRet
         Case 1
             SafeBootMode_ = "Safe mode"
         Case 2
@@ -667,11 +667,11 @@ Private Sub Class_Initialize()
             .Attributes = 0
         End With
         
-        lret = NtOpenSymbolicLinkObject(hDir, DIRECTORY_QUERY, OA)
+        lRet = NtOpenSymbolicLinkObject(hDir, DIRECTORY_QUERY, OA)
         
         If hDir <> 0 Then NtClose hDir
         
-        If lret = STATUS_OBJECT_NAME_NOT_FOUND Then
+        If lRet = STATUS_OBJECT_NAME_NOT_FOUND Then
             IsSystemCaseSensitive_ = True
         End If
     End If
@@ -720,11 +720,11 @@ ErrorHandler:
     ErrorMsg Err, "clsOSver.GetCodePageInfo"
 End Sub
 
-Private Function GetLangNameFullByCultureCode(lcid As Long) As String
+Private Function GetLangNameFullByCultureCode(LCID As Long) As String
     Dim buf As String
     Dim lr  As Long
     buf = String$(1000, vbNullChar)
-    lr = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, StrPtr(buf), ByVal 1000&)
+    lr = GetLocaleInfo(LCID, LOCALE_SENGLANGUAGE, StrPtr(buf), ByVal 1000&)
     If lr Then
         GetLangNameFullByCultureCode = Left$(buf, lr - 1)
     End If
@@ -1480,10 +1480,10 @@ End Function
 
 Public Function IsWow64() As Boolean   ' Разрядность ОС
     Dim hModule As Long, procAddr As Long, lIsWin64 As Long
-    Static isinit As Boolean, Result As Boolean
+    Static isinit As Boolean, result As Boolean
     
     If isinit Then
-        IsWow64 = Result
+        IsWow64 = result
     Else
         isinit = True
         hModule = LoadLibrary(StrPtr("kernel32.dll"))
@@ -1491,8 +1491,8 @@ Public Function IsWow64() As Boolean   ' Разрядность ОС
             procAddr = GetProcAddress(hModule, "IsWow64Process")
             If procAddr <> 0 Then
                 IsWow64Process GetCurrentProcess(), lIsWin64
-                Result = CBool(lIsWin64)
-                IsWow64 = Result
+                result = CBool(lIsWin64)
+                IsWow64 = result
             End If
             FreeLibrary hModule
         End If

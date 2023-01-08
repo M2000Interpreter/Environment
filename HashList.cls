@@ -13,14 +13,6 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
 Private Const VbLongLong = 20
-Private Enum VARENUM
-   VT_I8 = &H14
-End Enum
-Private Type Dec_Hdr
-    DecType     As Integer
-    DecScale    As Byte
-    DecSign     As Byte
-End Type
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
 Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
@@ -646,34 +638,12 @@ Public Function create(ParamArray v()) As HashList
     End If
     Set create = hl
 End Function
-Public Function cInt64(v As Variant) As Variant
-    Dim DecHdr As Dec_Hdr, m As Long
-    On Error GoTo er111
-    cInt64 = CDec(v)
-     If VarType(v) = vbString Then
-        If InStr(1, v, "&h", vbTextCompare) = 1 Then
-            Do
-                m = Len(v)
-                v = Replace(v, "&H0", "&H", , , vbTextCompare)
-            Loop Until Len(v) = m Or m < 5
-            If m = 10 Then
-                If cInt64 < 0 Then
-                    cInt64 = CDec("&H100000000") + cInt64
-                End If
-            End If
-            
-        End If
-    End If
-    CopyMemory DecHdr, ByVal VarPtr(cInt64), LenB(DecHdr)
-    If DecHdr.DecScale Then
-    cInt64 = Fix(cInt64)
-    End If
-    GetMem4 VarPtr(cInt64) + 12, m
-    If VarType(v) = vbString Then If m < 0 And Len(v) <= 10 Then GoTo er111
-    PutMem4 VarPtr(cInt64), VT_I8
-    If (DecHdr.DecSign <> 0) And (cInt64 > 0) Then cInt64 = -cInt64
-    If (VarType(cInt64) <> VT_I8) Then Err.Raise 6
+Public Function cInt64(ByVal a)
+    Dim p
+    PutMem1 VarPtr(p), 20
+    PutMem1 VarPtr(p) + 8, 1
+    cInt64 = -p And a
     Exit Function
 er111:
-     Err.Raise 6
+     Err.Raise Err.Number
 End Function

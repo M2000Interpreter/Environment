@@ -18,11 +18,11 @@ Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Private mark1 As Long, mark2 As Long
 Event ValidString(ThatString As String, setpos As Long)
-Event KeyDown(KeyCode As Integer, Shift As Integer)
+Event KeyDown(KeyCode As Integer, shift As Integer)
 Event LostFocus()
 Event GotFocus()
 Event KeyPress(KeyAscii As Integer)
-Event MouseMove(Button As Integer, Shift As Integer, X As Single, y As Single)
+Event MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
 Event SpinnerValue(ThisValue As Long)
 Event DeployMenu()
 Event CascadeSelect(item As Long)  ' 1 based
@@ -75,7 +75,7 @@ Private Declare Function CloseClipboard Lib "user32" _
     Private Pad$, mStayOpen As Boolean
 Public Property Get Text() As String
 If glistN.listcount = 0 Then
-glistN.additem mprompt
+glistN.AddItem mprompt
 Else
 Text = glistN.list(0)
 End If
@@ -83,7 +83,7 @@ End Property
 Public Property Get vartext() As String
 Attribute vartext.VB_UserMemId = 0
 If glistN.listcount = 0 Then
-glistN.additem ""
+glistN.AddItem ""
 Else
 vartext = Mid$(glistN.list(0), 1 + Len(mprompt))
 End If
@@ -94,7 +94,7 @@ glistN.HeadLine = vbNullString ' no info
 glistN.HeadlineHeight = 0
 
 If glistN.listcount = 0 Then
-glistN.additem mprompt + RHS
+glistN.AddItem mprompt + RHS
 Else
 glistN.list(0) = mprompt + RHS
 End If
@@ -108,7 +108,7 @@ glistN.restrictLines = 1
 glistN.HeadLine = vbNullString ' no info
 glistN.HeadlineHeight = 0
 If glistN.listcount = 0 Then
-glistN.additem RHS
+glistN.AddItem RHS
 Else
 glistN.list(0) = RHS
 End If
@@ -280,11 +280,11 @@ Private Sub glistN_HeaderSelected(Button As Integer)
 Text = Text
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, Shift As Integer)
-RaiseEvent KeyDown(KeyCode, Shift)
+Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
+RaiseEvent KeyDown(KeyCode, shift)
 If KeyCode = vbKeyUp Then
 ElseIf KeyCode = vbKeyDown Then
-ElseIf KeyCode = vbKeyV And (Shift And 3) = 2 Then
+ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
 If Not Enabled Then Exit Sub
 Pad$ = GetTextData(13)
 If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
@@ -313,8 +313,8 @@ On Error Resume Next
 glistN.SetFocus
 End Sub
 
-Private Sub glistN_MouseMove(Button As Integer, Shift As Integer, X As Single, y As Single)
-RaiseEvent MouseMove(Button, Shift, X, y)
+Private Sub glistN_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
+RaiseEvent MouseMove(Button, shift, X, y)
 End Sub
 Friend Sub OneClick()
 On Error Resume Next
@@ -489,26 +489,26 @@ Public Property Let FadePartColor(ByVal vNewValue As Variant)
 On Error Resume Next
 mPartColor = CLng(vNewValue)
 End Property
-Private Sub glistN_AddSelStart(val As Long, Shift As Integer)
-Dim w As Long, a$
+Private Sub glistN_AddSelStart(val As Long, shift As Integer)
+Dim W As Long, a$
 If glistN.SelStart > 0 Then
 a$ = Mid$(vartext, glistN.SelStart, 1)
 If Len(a$) > 0 Then
-w = AscW(a$)
-If w > -10241 And w < -9216 Then
+W = AscW(a$)
+If W > -10241 And W < -9216 Then
 val = 2
 End If
 End If
 End If
 End Sub
 
-Private Sub glistN_SubSelStart(val As Long, Shift As Integer)
-Dim w As Long, a$
+Private Sub glistN_SubSelStart(val As Long, shift As Integer)
+Dim W As Long, a$
 If glistN.SelStart < 2 Then Exit Sub
 a$ = Mid$(vartext, glistN.SelStart - 1, 1)
 If Len(a$) > 0 Then
-w = AscW(a$)
-If w > -9217 And w < -8192 Then
+W = AscW(a$)
+If W > -9217 And W < -8192 Then
 
 val = 2
 

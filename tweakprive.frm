@@ -496,25 +496,25 @@ DIS.TabStop = False
 gList2.TabStop = False
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
 
 If Button = 1 Then
     
     If lastfactor = 0 Then lastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
+    If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then
     dr = True
-    mousepointer = vbSizeNWSE
-    Lx = x
+    MousePointer = vbSizeNWSE
+    Lx = X
     lY = y
     End If
     
     Else
-    If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
+    If (y > Height - bordertop And y < Height) And (X > Width - borderleft And X < Width) Then
     dr = True
-    mousepointer = vbSizeNWSE
-    Lx = x
+    MousePointer = vbSizeNWSE
+    Lx = X
     lY = y
     End If
     End If
@@ -522,14 +522,14 @@ If Button = 1 Then
 End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (y > Height - bordertop And y < Height) And (X > Width - borderleft And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
 End If
 If dr Then
 
@@ -538,11 +538,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - lY)
-     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
+     If X < (Width - 150) Or X > Width Then addX = (X - Lx)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
-        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
+        If X < (Width - borderleft) Or X > Width Then addX = (X - Lx)
     End If
     
 
@@ -569,10 +569,10 @@ Else
 
         If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, Width
-        Lx = x
+        Lx = X
         
         Else
-        Lx = x * lastfactor / factor
+        Lx = X * lastfactor / factor
          ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
@@ -588,16 +588,16 @@ Else
         lY = lY * lastfactor / factor
         End If
         Else
-        Lx = x
+        Lx = X
         lY = y
    
 End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, y As Single)
 
-If dr Then Me.mousepointer = 0
+If dr Then Me.MousePointer = 0
 dr = False
 End Sub
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
@@ -613,7 +613,7 @@ allheight = height1 * factor
 itemWidth = allwidth - 2 * borderleft
 itemwidth3 = (itemWidth - 2 * borderleft) / 3
 itemwidth2 = (itemWidth - borderleft) / 2
-move Left, Top, allwidth, allheight
+move Left, top, allwidth, allheight
 FontTransparent = False  ' clear background  or false to write over
 gList2.move borderleft, bordertop, itemWidth, bordertop * 3
 gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
@@ -776,7 +776,7 @@ End If
         tbPen = CStr(pen)
         tbPen.Value = CStr(pen)
 tbPen.Enabled = True
-      DIS.forecolor = QBColor(tbPen)
+      DIS.ForeColor = QBColor(tbPen)
     cc.ValueKey = "PAPER"
         cc.ValueType = REG_DWORD
         tbPaper = CStr(cc.Value)
@@ -785,8 +785,8 @@ tbPen.Enabled = True
         cc.ValueKey = "COMMAND"
         cc.ValueType = REG_SZ
 
-        combo2.additem "GREEK"
-        combo2.additem "LATIN"
+        combo2.AddItem "GREEK"
+        combo2.AddItem "LATIN"
         
         
         
@@ -800,8 +800,8 @@ tbPen.Enabled = True
 Else
 DIS.Font.charset = 0
 End If
-     combo3.additem "BRIGHT"
-        combo3.additem "DARK"
+     combo3.AddItem "BRIGHT"
+        combo3.AddItem "DARK"
         cc.ValueKey = "HTML"
         cc.ValueType = REG_SZ
         If cc.Value = vbNullString Then
@@ -1093,13 +1093,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -1151,8 +1151,8 @@ skip = True
 End If
 End Sub
 
-Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
-If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
+Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
+If gList2.DoubleClickCheck(Button, item, X, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
                       ShutMe
 End If
 End Sub
@@ -1191,19 +1191,19 @@ Dim b$
 If combo2.ListText <> "" Then b$ = combo2.ListText Else b$ = combo2.Text
 DIS.Font.Italic = False
 If b$ = "GREEK" Then
-DIS.Font.Size = tbSize.Value
+DIS.Font.size = tbSize.Value
 DIS.Font.charset = 161
 DIS.Font.Name = c$
 DIS.Font.Italic = False
-DIS.Font.Size = tbSize.Value
+DIS.Font.size = tbSize.Value
 DIS.Font.charset = 161
 DIS.Font.Name = c$
 Else
-DIS.Font.Size = tbSize.Value
+DIS.Font.size = tbSize.Value
 DIS.Font.charset = 0
 DIS.Font.Name = c$
 DIS.Font.Italic = False
-DIS.Font.Size = tbSize.Value
+DIS.Font.size = tbSize.Value
 DIS.Font.charset = 0
 DIS.Font.Name = c$
 
@@ -1286,7 +1286,7 @@ If ThatString = vbNullString Then ThatString = "0"
 a = CLng(ThatString)
 If a = CLng(tbPen) Or Err.Number > 0 Then
 
-''tbPaper.Value = CLng(tbPaper)
+''tbPaper.Value = CLNG(tbPaper)
 ThatString = k: setpos = 1: tbPaper.ResetPan
 If Abs(tbPaper.Value - CLng(k)) > 2 Then tbPaper.Value = CLng(k)
 Exit Sub
@@ -1319,7 +1319,7 @@ End If
 tbPen.Value = a
 a = tbPen.Value  ' cut max or min
 tbPen.Value = a
-DIS.forecolor = mycolor(a)
+DIS.ForeColor = mycolor(a)
 DIS.ShowMe2
 'tbpen.Info = "This is info box" + vbCrLf + "X = " + CStr(a)
 ThatString = CStr(a)

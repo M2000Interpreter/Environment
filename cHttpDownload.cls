@@ -31,7 +31,7 @@ Private Const MODULE_NAME As String = "cHttpDownload"
 '=========================================================================
 ' Events
 '=========================================================================
-Event Start(ByVal remotehost$, ByVal remoteport As Long)
+Event Start(ByVal remotehost$, ByVal RemotePort As Long)
 Event DownloadProgress(ByVal BytesRead As Double, ByVal BytesTotal As Double)
 Event DownloadError(ByVal Number As Long, ByVal Description As String)
 Event DownloadComplete(ByVal LocalFileName As String)
@@ -83,7 +83,7 @@ Private Type UcsParsedUrl
     Protocol        As String
     Host            As String
     Port            As Long
-    Path            As String
+    path            As String
     User            As String
     Pass            As String
 End Type
@@ -101,7 +101,7 @@ End Sub
 '=========================================================================
 
 Property Get url() As String
-    url = m_uRemote.Protocol & "://" & m_uRemote.Host & m_uRemote.Path
+    url = m_uRemote.Protocol & "://" & m_uRemote.Host & m_uRemote.path
 End Property
 
 Property Get LocalFileName() As String
@@ -300,8 +300,8 @@ Private Function pvParseUrl(sUrl As String, uParsed As UcsParsedUrl) As Boolean
     With uParsed
     .Host = GetUrlParts(sUrl, URL_PART_HOSTNAME)
     .Pass = GetUrlParts(sUrl, URL_PART_PASSWORD)
-    .Path = GetUrlPath(sUrl)
-     If Len(.Path) = 0 Then .Path = "/"
+    .path = GetUrlPath(sUrl)
+     If Len(.path) = 0 Then .path = "/"
     .Port = CLng("0" + GetUrlParts(sUrl, URL_PART_PORT))
     .Protocol = GetUrlParts(sUrl, URL_PART_SCHEME)
     .User = GetUrlParts(sUrl, URL_PART_USERNAME)
@@ -337,7 +337,7 @@ Private Sub m_oSocket_OnConnect()
     
     On Error GoTo EH
     m_eState = ucsWaitHeaders
-    If Not m_oSocket.SendText("GET " & m_uRemote.Path & " HTTP/1.0" & vbCrLf & _
+    If Not m_oSocket.SendText("GET " & m_uRemote.path & " HTTP/1.0" & vbCrLf & _
             "Host: " & m_uRemote.Host & vbCrLf & _
             "Accept: */*" & vbCrLf & vbCrLf, CodePage:=ucsScpAcp) Then
         pvSetError m_oSocket.LastError

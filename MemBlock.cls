@@ -561,7 +561,7 @@ there1:
    
  
 End Function
-Public Function DrawEmfToHdc(Scr As Object, x As Long, y As Long, Angle!, Width As Long, Height As Long) As Boolean
+Public Function DrawEmfToHdc(Scr As Object, X As Long, y As Long, Angle!, Width As Long, Height As Long) As Boolean
    Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
    If mSubtype = 0 Then
         If IsEmf Then
@@ -578,7 +578,7 @@ Public Function DrawEmfToHdc(Scr As Object, x As Long, y As Long, Angle!, Width 
         .pvData = Me.GetPtr(0)
     End With
     CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-    DrawEmfToHdc = DrawEmfFromBuffer(Scr, a(), x, y, Angle!, Width, Height)
+    DrawEmfToHdc = DrawEmfFromBuffer(Scr, a(), X, y, Angle!, Width, Height)
     
     CopyMemory ByVal VarPtrArray(a), 0&, 4
  
@@ -605,7 +605,7 @@ Public Function DrawSpriteToHdc(bstack As basetask, sprt As Boolean, Angle!, zoo
     CopyMemory ByVal VarPtrArray(a), 0&, 4
  
 End Function
-Public Function DrawImageToHdc(where As Object, Optional x As Long = 0&, Optional y As Long = 0&, Optional Width As Long = -1, Optional Height As Long = -1) As Boolean
+Public Function DrawImageToHdc(where As Object, Optional X As Long = 0&, Optional y As Long = 0&, Optional Width As Long = -1, Optional Height As Long = -1) As Boolean
    Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
      With a1
         .cbElements = 1
@@ -615,7 +615,7 @@ Public Function DrawImageToHdc(where As Object, Optional x As Long = 0&, Optiona
         .pvData = Me.GetPtr(0)
     End With
    CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-   DrawImageToHdc = DrawImageFromBuffer(a(), where.hDC, x, y, (Width), (Height))
+   DrawImageToHdc = DrawImageFromBuffer(a(), where.hDC, X, y, (Width), (Height))
    CopyMemory ByVal VarPtrArray(a), 0&, 4
  
 End Function

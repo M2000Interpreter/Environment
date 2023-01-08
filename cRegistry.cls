@@ -99,13 +99,13 @@ Private Declare Function RegOpenKeyEx Lib "advapi32" Alias "RegOpenKeyExA" _
   ByVal samDesired As Long, phkResult As Long) As Long
 
 Private Declare Function RegSetValueExStr Lib "advapi32" Alias "RegSetValueExA" _
-  (ByVal hKey As Long, ByVal lpValueName As String, ByVal reserved As Long, _
+  (ByVal hKey As Long, ByVal lpValueName As String, ByVal Reserved As Long, _
    ByVal dwType As Long, ByVal szData As String, ByVal cbData As Long) As Long
 Private Declare Function RegSetValueExLong Lib "advapi32" Alias "RegSetValueExA" _
-  (ByVal hKey As Long, ByVal lpValueName As String, ByVal reserved As Long, _
+  (ByVal hKey As Long, ByVal lpValueName As String, ByVal Reserved As Long, _
    ByVal dwType As Long, szData As Long, ByVal cbData As Long) As Long
 Private Declare Function RegSetValueExByte Lib "advapi32" Alias "RegSetValueExA" _
-  (ByVal hKey As Long, ByVal lpValueName As String, ByVal reserved As Long, _
+  (ByVal hKey As Long, ByVal lpValueName As String, ByVal Reserved As Long, _
    ByVal dwType As Long, szData As Byte, ByVal cbData As Long) As Long
 
 Private Declare Function RegCloseKey Lib "advapi32" (ByVal hKey As Long) As Long
@@ -121,7 +121,7 @@ Private Declare Function RegQueryValueExByte Lib "advapi32" Alias "RegQueryValue
    ByRef lpType As Long, szData As Byte, ByRef lpcbData As Long) As Long
    
 Private Declare Function RegCreateKeyEx Lib "advapi32" Alias "RegCreateKeyExA" _
-  (ByVal hKey As Long, ByVal lpSubKey As String, ByVal reserved As Long, _
+  (ByVal hKey As Long, ByVal lpSubKey As String, ByVal Reserved As Long, _
    ByVal lpClass As String, ByVal dwOptions As Long, ByVal samDesired As Long, _
    lpSecurityAttributes As SECURITY_ATTRIBUTES, phkResult As Long, _
    lpdwDisposition As Long) As Long
@@ -169,7 +169,7 @@ Private Declare Function RegDeleteValue Lib "advapi32.dll" Alias "RegDeleteValue
 ' Other declares:
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-Private Declare Function ExpandEnvironmentStrings Lib "kernel32" Alias "ExpandEnvironmentStringsA" (ByVal lpSrc As String, ByVal lpDst As String, ByVal nSize As Long) As Long
+Private Declare Function ExpandEnvironmentStrings Lib "kernel32" Alias "ExpandEnvironmentStringsA" (ByVal lpSrc As String, ByVal lpDst As String, ByVal nsize As Long) As Long
 
 
 Public Enum ERegistryClassConstants

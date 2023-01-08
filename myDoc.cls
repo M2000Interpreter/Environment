@@ -48,15 +48,15 @@ Public BackMove As Boolean
 Public LastSelStart As Long
 Public ListLoadedType As Long
 Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
-Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
 Private words$, unique As Long
 Private p3 As Long
 Dim mlcid As Long
 Dim sortmlcid As Long
 Private Pos() As Long, slen() As Long, hit() As Long
 Dim Buffer() As Byte, bufOffset As Long, bufsize As Long, SeekBuf As Long
-Public busy As Boolean
+Public Busy As Boolean
 Private mSortstyle As VbCompareMethod
 Public ColorEvent As Boolean, ForEditBox As Boolean
 Public Switchon As Boolean
@@ -593,7 +593,7 @@ Property Let textDocFast(norawtext As String)
     End If
 End Property
 Property Let textDoc(norawtext As String)
-    busy = True
+    Busy = True
     If Len(norawtext) = 0 Then
     AppendParagraph norawtext
     Else
@@ -615,7 +615,7 @@ Property Let textDoc(norawtext As String)
       a() = Split(norawtext, vbLf)
       For where = LBound(a()) To UBound(a())
       RaiseEvent MayQuit(ok)
-      If ok Then busy = False: Exit Property
+      If ok Then Busy = False: Exit Property
       AppendParagraph a(where)
       Next where
     End If
@@ -624,10 +624,10 @@ Property Let textDoc(norawtext As String)
     ' colorize at a second stage...(new)
 MarkParagraphID = 0
 WrapAgain
-busy = False
+Busy = False
 End Property
 Property Let textDoc2(norawtext As String)
-    busy = True
+    Busy = True
 
     
     If Len(norawtext) = 0 Then
@@ -638,7 +638,7 @@ Property Let textDoc2(norawtext As String)
       a() = Split(norawtext, vbCrLf)
       For where = LBound(a()) To UBound(a())
       RaiseEvent MayQuit(ok)
-      If ok Then busy = False: Exit Property
+      If ok Then Busy = False: Exit Property
       AppendParagraph a(where)
       
       Next where
@@ -646,12 +646,12 @@ Property Let textDoc2(norawtext As String)
     ' colorize at a second stage...(new)
 MarkParagraphID = 0
 WrapAgain
-busy = False
+Busy = False
 End Property
 
 Property Let FasttextDoc(norawtext As String)
     EmptyDoc
-    busy = True
+    Busy = True
 
     If Len(norawtext) = 0 Then
     AppendParagraph norawtext
@@ -677,7 +677,7 @@ Property Let FasttextDoc(norawtext As String)
         End If
     End If
     MarkParagraphID = 0
-    busy = False
+    Busy = False
 End Property
 Property Let textDocColor(norawtext As String)
 
@@ -1827,39 +1827,39 @@ Sub GoTopLineNextParagraph(lineno As Long, thistext As String, ParaNum As Long)
     End If
 End Sub
 Public Sub WrapAgain()
-busy = True
+Busy = True
 Dim mycur As Long, ok
 mycur = DocParaNext(0)
 Do While mycur <> 0
  ReWritePara mycur, TextParagraph(mycur), True
        RaiseEvent MayQuit(ok)
-      If ok Then busy = False: Exit Sub
+      If ok Then Busy = False: Exit Sub
 mycur = DocParaNext(mycur)
 Loop
-busy = False
+Busy = False
 End Sub
 Public Sub WrapAgainBlock(startblock As Long, endblock As Long)
-busy = True
+Busy = True
 Dim mycur As Long, ok
 mycur = startblock
 Do While mycur <> 0
  ReWritePara mycur, TextParagraph(mycur), True
        RaiseEvent MayQuit(ok)
-      If ok Then busy = False: Exit Sub
+      If ok Then Busy = False: Exit Sub
  If mycur = endblock Then Exit Do
  mycur = DocParaNext(mycur)
 Loop
-busy = False
+Busy = False
 End Sub
 
 Public Sub WrapAgainColor2()
-busy = False = True
+Busy = False = True
 Dim mycur As Long, ok
 mycur = DocParaNext(0)
 
 Do While mycur <> 0
       RaiseEvent MayQuit(ok)
-      If ok Then busy = False: Exit Sub
+      If ok Then Busy = False: Exit Sub
 If para(mycur).colordata(1) = 0 Then
 ColorThis mycur
 Else
@@ -1867,11 +1867,11 @@ mycur = DocParaNext(mycur)
 End If
 
 Loop
-busy = False
+Busy = False
 End Sub
 
 Public Sub WrapAgainColorBlock(startblock As Long, endblock As Long)
-busy = True
+Busy = True
 Dim mycur As Long, ok
 mycur = startblock
 If startblock = endblock Then
@@ -1879,17 +1879,17 @@ ColorThis mycur
 Else
 Do While mycur <> 0
       RaiseEvent MayQuit(ok)
-      If ok Then busy = False: Exit Sub
+      If ok Then Busy = False: Exit Sub
 ColorThis mycur
 
 If mycur = endblock Then Exit Do
 Loop
 If mycur = endblock Then ColorThis mycur
 End If
-busy = False
+Busy = False
 End Sub
 Public Sub WrapAgainColorBlock2(startblock As Long, endblock As Long)
-busy = True
+Busy = True
 Dim mycur As Long, ok
 mycur = startblock
 If startblock = endblock Then
@@ -1909,7 +1909,7 @@ Loop
 
 If mycur = endblock Then ColorThis mycur
 End If
-busy = False
+Busy = False
 End Sub
 Private Sub Class_Initialize()
 ' from this version paramax= docmax
@@ -2221,7 +2221,7 @@ End Function
 Public Function SaveUnicodeOrAnsi(ByVal FileName As String, Optional mode2save As Long = 0, Optional Append As Boolean = False) As Boolean
 ' using doc as extension you can read it from word...with automatic conversion to unicode
 ' OVERWRITE ALWAYS
-Dim w As Long, a() As Byte, f$, i As Long, bb As Byte, yesswap As Boolean, LF$
+Dim W As Long, a() As Byte, f$, i As Long, bb As Byte, yesswap As Boolean, LF$
 Const Utf8CodePage As Long = 65001
 On Error GoTo t12345
 '' 0 vbcrlf, 1 vblf, 2 vbcr
@@ -2236,11 +2236,11 @@ If Not Append Then
 End If
 f$ = GetDosPath(FileName)
 If Err.Number > 0 Or f$ = vbNullString Then Exit Function
-w = FreeFile
-Open f$ For Binary As w
+W = FreeFile
+Open f$ For Binary As W
 ' mode2save
 ' 0 is utf-le
-If Append Then Seek #w, LOF(w) + 1
+If Append Then Seek #W, LOF(W) + 1
 mode2save = mode2save Mod 10
 Dim maxmw As Long, iPos As Long
  Dim bbBuf() As Byte, iLen As Long
@@ -2249,17 +2249,17 @@ Dim maxmw As Long, iPos As Long
 
 If Abs(mode2save) = 7 Or mode2save = 0 Then
  a() = ChrW(&HFEFF)
-If Not Append And mode2save >= 0 Then Put #w, , a()
+If Not Append And mode2save >= 0 Then Put #W, , a()
 
 ElseIf mode2save = 1 Then
 a() = ChrW(&HFFFE) ' big endian...need swap
-If Not Append And mode2save > 0 Then Put #w, , a()
+If Not Append And mode2save > 0 Then Put #W, , a()
 yesswap = True
 ElseIf Abs(mode2save) = 2 Then  'utf8
 If mode2save > 0 And Not Append Then
-        Put #w, , CByte(&HEF)
-        Put #w, , CByte(&HBB)
-        Put #w, , CByte(&HBF)
+        Put #W, , CByte(&HEF)
+        Put #W, , CByte(&HBB)
+        Put #W, , CByte(&HBF)
         End If
      ''   Put #W, , Utf16toUtf8(buf)
             iPos = DocParaNext(0)
@@ -2273,12 +2273,12 @@ If mode2save > 0 And Not Append Then
             If iLen > 0 Then
             ReDim bbBuf(0 To iLen - 1)
             iLen = WideCharToMultiByte(Utf8CodePage, 0, VarPtr(a(0)), CLng(UBound(a) - LBound(a) + 1) \ 2, VarPtr(bbBuf(0)), iLen, 0, 0)
-            Put #w, , bbBuf()
+            Put #W, , bbBuf()
             End If
         Wend
      End If
      
-        Close w
+        Close W
     SaveUnicodeOrAnsi = True
         Exit Function
 ElseIf Abs(mode2save) = 3 Then ' ascii
@@ -2287,9 +2287,9 @@ ElseIf Abs(mode2save) = 3 Then ' ascii
 If mlcid < 4 Then mlcid = Module1.Clid
             While iPos <> 0
             
-                Put #w, , Convert2Ansi(textString(LF$, iPos, maxmw), mlcid)
+                Put #W, , Convert2Ansi(textString(LF$, iPos, maxmw), mlcid)
             Wend
-            Close w
+            Close W
             SaveUnicodeOrAnsi = True
             Exit Function
 End If
@@ -2303,17 +2303,17 @@ a() = textArray(LF$, iPos, maxmw)
 For i = 0 To UBound(a()) - 1 Step 2
 bb = a(i): a(i) = a(i + 1): a(i + 1) = bb
 Next i
-Put #w, , a()
+Put #W, , a()
 Wend
 Else
 
 
 While iPos <> 0
 a() = textArray(LF$, iPos, maxmw)
-Put #w, , a()
+Put #W, , a()
 Wend
 End If
-Close w
+Close W
 SaveUnicodeOrAnsi = True
 t12345:
 End Function
@@ -2437,7 +2437,7 @@ Public Function ContainsUTF16(ByRef Source() As Byte) As Long
     End If
 End Function
 Public Sub ReadUnicodeOrANSI(FileName As String, Optional Merge As Boolean = False, Optional feedback As Long, Optional insert2index As Boolean = False)
-busy = True
+Busy = True
 Dim i&, FNr&, BLen&, WChars&, bom As Integer, BTmp As Byte, b() As Byte, lbt As Long
 Dim mLof As Long, ok, nobom As Long
 nobom = 1
@@ -2566,7 +2566,7 @@ If mlcid < 4 Then mlcid = Module1.Clid
 
     
 ErrHandler:
-busy = False
+Busy = False
 If FNr Then Close FNr
 ReDim Buffer(1 To 1) As Byte
 bufOffset = 0
@@ -2642,12 +2642,12 @@ Pos = -2
 End Function
 
 Public Sub CompactLines(Optional addtimes As Boolean = True)
-busy = True
+Busy = True
 Dim mycur As Long, nextCur As Long, s$, many As Long, ok
 mycur = DocParaNext(0)
 Do While mycur <> 0
       RaiseEvent MayQuit(ok)
-      If ok Then busy = False: Exit Sub
+      If ok Then Busy = False: Exit Sub
 many = 1
 s$ = TextParagraph(mycur)
 nextCur = DocParaNext(mycur)
@@ -2663,7 +2663,7 @@ Loop
 If addtimes Then TextParagraph(mycur) = TextParagraph(mycur) & " - " & (many)
 mycur = nextCur
 Loop
-busy = False
+Busy = False
 End Sub
 Public Function UniqueWords(Optional uLCID As Long = -1, Optional nowrap As Boolean = True) As Long
 If uLCID = -1 Then uLCID = sortmlcid
@@ -2785,17 +2785,17 @@ If unique = 0 Then
 a() = Split(mWordMap(textDoc))
 QuickSortString a(), LBound(a()), UBound(a())
 For i = LBound(a()) To UBound(a())
-THISOBJECT.additem a(i)
+THISOBJECT.AddItem a(i)
 Next i
 Exit Sub
 Else
 If usenumbers Then
 For i = 1 To unique
-THISOBJECT.additem MakeString(Pos(i), slen(i)) & " (" & (hit(i) + 1) & ")"
+THISOBJECT.AddItem MakeString(Pos(i), slen(i)) & " (" & (hit(i) + 1) & ")"
 Next i
 Else
 For i = 1 To unique
-THISOBJECT.additem MakeString(Pos(i), slen(i))
+THISOBJECT.AddItem MakeString(Pos(i), slen(i))
 Next i
 
 End If
@@ -3095,7 +3095,7 @@ PutMem2 VarPtr(acc), mValue
 RangeUnsignInteger = acc >= Abs(mFrom) And acc <= Abs(mTo)
 End Function
 Function FindWord(Find$, direction As Boolean, there As Long, cur As Long) As Boolean
-Dim oncemore As Boolean, result As Boolean, res$, code As Integer
+Dim oncemore As Boolean, result As Boolean, res$, Code As Integer
 again:
 If direction Then
  result = FindStrDown(Find$, there, cur)
@@ -3105,9 +3105,9 @@ If direction Then
 If result Then
 res$ = TextParagraph(there)
 If cur > 1 Then
-    code = AscW(Mid$(res$, cur - 1, 1))
-    If Not RangeUnsignInteger(code, &H2000&, &H206F&) Then
-        Select Case code
+    Code = AscW(Mid$(res$, cur - 1, 1))
+    If Not RangeUnsignInteger(Code, &H2000&, &H206F&) Then
+        Select Case Code
         Case 39, 65 To 90, 97 To 122, Is > 127
         If direction Then cur = cur + 1 Else cur = cur - 1
         GoTo again
@@ -3116,9 +3116,9 @@ If cur > 1 Then
     End If
 End If
 If (Len(res$) - cur + 1) > Len(Find$) Then
-    code = AscW(Mid$(res$, cur + Len(Find$), 1))
-    If Not RangeUnsignInteger(code, &H2000&, &H206F&) Then
-    Select Case code
+    Code = AscW(Mid$(res$, cur + Len(Find$), 1))
+    If Not RangeUnsignInteger(Code, &H2000&, &H206F&) Then
+    Select Case Code
     Case 39, 65 To 90, 97 To 122, Is > 127
     
     If direction Then

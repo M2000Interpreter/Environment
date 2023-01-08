@@ -24,7 +24,7 @@ Dim jobnameID As Long
 Dim metronome As Long
 Dim mybusy As Boolean
 Private myBase As TaskInterface
-Private Declare Function timeGetTime Lib "Kernel32.dll" Alias "GetTickCount" () As Long
+Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
 Private myProcess As basetask
 
 Private Sub Class_Terminate()

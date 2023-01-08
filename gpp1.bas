@@ -424,7 +424,7 @@ End If
 End Function
 Function SignInt64(v)
 If v >= limitlonglong Then v = v - maxlonglong
-    SignInt64 = cInt64(Fix(v))
+    SignInt64 = cInt64(v)
 
 End Function
 
@@ -450,13 +450,8 @@ uintnew = a
 End If
 End Function
 Function add32(ByVal a As Currency, ByVal b As Currency) As Currency
-a = Fix(a)
-b = Fix(b)
-While a < 0: a = a + 4294967296@: Wend
-While b < 0: b = b + 4294967296@: Wend
-a = a + b
-While a > 4294967296@: a = a - 4294967296@: Wend
-add32 = a
+add32 = uintnew1(LowLong(cInt64(CDec(a) + CDec(b))))
+
 End Function
 
 Function HexToUnsigned(s$) As Currency
@@ -529,16 +524,17 @@ cUlng2 = CLng(a)
 End If
 Exit Function
 End Function
-Function cUlng(ByVal a As Currency) As Long ' πέρνει έναν unsigned long και τον κάνει νορμάλ χωρίς αλλαγή των bits
-On Error GoTo cu1
-Dim ret As Long
-a = Abs(a)
-a = a / 10000@
-GetMem4 VarPtr(a), ret
-cUlng = ret
-Exit Function
+' πέρνει έναν unsigned long και τον κάνει νορμάλ χωρίς αλλαγή των bits
+Function cUlng(ByVal a As Currency) As Long
+    On Error GoTo cu1
+    Dim ret As Long
+    a = Abs(a)
+    a = a / 10000@
+    GetMem4 VarPtr(a), ret
+    cUlng = ret
+    Exit Function
 cu1:
-cUlng = 0
+    cUlng = 0
 End Function
 Function Sput(ByVal sL As String) As String
 ' change to signed
@@ -566,32 +562,14 @@ Dim internal As Long, a As Currency, high$, v64 As Boolean
 v64 = myVarType(z, 20)
 j1112243:
 If myVarType(z, 20) Then
-    CopyMemory internal, ByVal VarPtr(z) + 12, 4
-    If internal <> 0 Or v64 Then
-        If (internal And &HFFFF0000) = 0 And Not v64 Then
-            high$ = "0x" + Right$("0000" & Hex$(internal), 4)
-        Else
-            high$ = "0x" + Right$("00000000" & Hex$(internal), 8)
-        End If
-        CopyMemory internal, ByVal VarPtr(z) + 8, 4
-        If Not v64 Then
-            If high$ = "0xFFFFFFFF" And internal < 0 Then
-                GoTo jump1
-            End If
-        End If
-        PACKLNG2$ = high$ + Right$("00000000" & Hex$(internal), 8)
-    Else
-        CopyMemory internal, ByVal VarPtr(z) + 8, 4
-        GoTo jump1
-    End If
+    PACKLNG2$ = Hex64$(z)
 ElseIf myVarType(z, vbDecimal) Then
-    z = cInt64((z))
-    GoTo j1112243
+    PACKLNG2$ = Hex64$(z)
 ElseIf myVarType(z, vbSingle) Then
-    z = cInt64((z))
+    z = cInt64(z)
     GoTo j1112243
 ElseIf myVarType(z, vbDouble) Then
-    z = cInt64((z))
+    z = cInt64(z)
     GoTo j1112243
 ElseIf myVarType(z, vbLong) Then
     PACKLNG2$ = "0x" + Right$("0000000" & Hex$(z), 8)
@@ -890,10 +868,10 @@ Case 128
 ORGAN = "Gunshot"
 End Select
 End Function
-Function Copy64Cur(ByVal x) As Currency
+Function Copy64Cur(ByVal X) As Currency
 Dim l As Long
-If VarType(x) = 20 Then
-GetMem81 VarPtr(x) + 8, Copy64Cur
+If VarType(X) = 20 Then
+GetMem81 VarPtr(X) + 8, Copy64Cur
 End If
 End Function
 Function CopyCur64(ByVal c As Currency)

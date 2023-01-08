@@ -60,18 +60,18 @@ End If
 If lngRet = 0 Then FindDISPID = dispid
 End Function
 Public Sub ShutEnabledGuiM2000(Optional all As Boolean = False)
-Dim X As Form, BB As Boolean
+Dim X As Form, bb As Boolean
 
 Do
 For Each X In Forms
-BB = True
+bb = True
 If TypeOf X Is GuiM2000 Then
-    If X.enabled Then BB = False: X.CloseNow: BB = False: Exit For
+    If X.Enabled Then bb = False: X.CloseNow: bb = False: Exit For
     
 End If
 Next X
 
-Loop Until BB Or Not all
+Loop Until bb Or Not all
 
 End Sub
 

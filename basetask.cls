@@ -283,13 +283,13 @@ If Not StaticCollection.Find(Name$) Then Exit Function
                 If ss$ = "++" Then
                         If usehandler.index_start < usehandler.objref.count - 1 Then
                             usehandler.index_start = usehandler.index_start + 1
-                            usehandler.objref.Index = usehandler.index_start
+                            usehandler.objref.index = usehandler.index_start
                             usehandler.index_cursor = usehandler.objref.Value
                         End If
         ElseIf ss$ = "--" Then
                     If usehandler.index_start > 0 Then
                             usehandler.index_start = usehandler.index_start - 1
-                            usehandler.objref.Index = usehandler.index_start
+                            usehandler.objref.index = usehandler.index_start
                             usehandler.index_cursor = usehandler.objref.Value
                         End If
         ElseIf ss$ = "-!" Then
@@ -392,13 +392,13 @@ End Function
 Static Function MyRound(a As Variant, Optional ByVal i As Integer = 0)
 Dim c As Variant, j As VbVarType
 Dim n(1 To 28) As Single, D(1 To 28) As Double, cur(1 To 28) As Currency, dec(1 To 28) As Variant
-Dim SG(-1 To 1) As Single, sg4(-1 To 1) As Double, sg8(-1 To 1) As Currency
+Dim sg(-1 To 1) As Single, sg4(-1 To 1) As Double, sg8(-1 To 1) As Currency
 j = VarType(a)
 If j < vbSingle Then MyRound = a: Exit Function
 On Error GoTo there
 If n(1) = 0 Then
-    SG(-1) = CSng(-0.5)
-    SG(1) = CSng(0.5)
+    sg(-1) = CSng(-0.5)
+    sg(1) = CSng(0.5)
     sg4(-1) = -0.5
     sg4(1) = 0.5
     sg8(-1) = CCur(-0.5)
@@ -437,7 +437,7 @@ End If
         Select Case j
         Case vbSingle
             If n(i) > 0 Then
-                c = SG(Sgn(a))
+                c = sg(Sgn(a))
                 MyRound = Fix(a * n(i) + c) / n(i)
             Else
                 MyRound = a

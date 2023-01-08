@@ -77,7 +77,7 @@ Private Type SAFEARRAY1D
 End Type
 ' no second sort allowed per array
 Private sortmult As Long, sortoff As Long, upart As Long, part As Long, Col(), Piv, piv1()
-Public Index As Long, Final As Boolean, refgroup As Object, grouperror As Boolean
+Public index As Long, Final As Boolean, refgroup As Object, grouperror As Boolean
 Public refArray As Variant, StrArray As Boolean, IsByValue As Boolean
 Public Sub Compute0(p As Variant, ss$)
 If Final Then CantAssignValue: Exit Sub
@@ -333,16 +333,16 @@ Loop
 
 End Sub
 Property Get Value() As Variant
-If Index >= 0 And Index <= maxitems1 Then
+If index >= 0 And index <= maxitems1 Then
 
-If IsObject(actualdata(Index)) Then
-    If Typename(actualdata(Index)) = "PropReference" Then
-        Value = actualdata(Index)
+If IsObject(actualdata(index)) Then
+    If Typename(actualdata(index)) = "PropReference" Then
+        Value = actualdata(index)
     Else
-        Set Value = actualdata(Index)
+        Set Value = actualdata(index)
     End If
 Else
-Value = actualdata(Index)
+Value = actualdata(index)
 End If
 End If
 End Property
@@ -385,7 +385,7 @@ Friend Sub FeedFromSrings(Carrier As Variant)
 Dim a() As String, i As Long
 a() = Carrier
 Carrier = Array()
-Dim zz As Variant, rCount As Long, dimActual As Long, Dummy As Long, tst As Long
+Dim zz As Variant, rCount As Long, dimActual As Long, dummy As Long, tst As Long
 Dim ii As Long
 CopyMemory ByVal VarPtr(refArray), zz, 16
 On Error GoTo TT
@@ -407,14 +407,14 @@ End If
 Dim sum As Long
 sum = rCount
 again:
-Dummy = dimActual
+dummy = dimActual
 On Error GoTo ok1
 tst = UBound(a(), dimActual + 1)
 rCount = UBound(a(), dimActual + 1) - LBound(a, dimActual + 1) + 1
 dimActual = dimActual + 1
 sum = sum * rCount
 ok1:
-If dimActual <> Dummy Then
+If dimActual <> dummy Then
 If dnum >= dimActual Then
 PushDim rCount, limBase(dimActual - 1)
 Else
@@ -435,7 +435,7 @@ PushEnd
 End If
 End Sub
 Friend Sub FixArray()
-Dim zz As Variant, rCount As Long, dimActual As Long, Dummy As Long, tst As Long
+Dim zz As Variant, rCount As Long, dimActual As Long, dummy As Long, tst As Long
 Dim hlp()
 CopyMemory ByVal VarPtr(refArray), zz, 16
 If IsByValue Then Exit Sub
@@ -461,14 +461,14 @@ End If
 Dim sum As Long
 sum = rCount
 again:
-Dummy = dimActual
+dummy = dimActual
 On Error GoTo ok1
 tst = UBound(actualdata(), dimActual + 1)
 rCount = UBound(actualdata(), dimActual + 1) - LBound(actualdata, dimActual + 1) + 1
 dimActual = dimActual + 1
 sum = sum * rCount
 ok1:
-If dimActual <> Dummy Then
+If dimActual <> dummy Then
 If dnum >= dimActual Then
 PushDim rCount, limBase(dimActual - 1)
 Else
@@ -1424,7 +1424,7 @@ If Not GroupRef Is Nothing Then
         Dim usehandler As mHandler
         Set usehandler = GroupRef
         If usehandler.t1 = 1 Then
-            usehandler.objref.Index = Abs(curitem + 100)
+            usehandler.objref.index = Abs(curitem + 100)
             usehandler.objref.Done = True
             Set usehandler.objref.ValueObj = item
             Exit Property
@@ -1568,18 +1568,18 @@ Property Get IsEmpty() As Variant
 IsEmpty = dnum = 0
 End Property
 Function IsObj() As Boolean
-If Index >= 0 And Index <= maxitems1 Then
-If IsObject(actualdata(Index)) Then
+If index >= 0 And index <= maxitems1 Then
+If IsObject(actualdata(index)) Then
     IsObj = True
 End If
 End If
 End Function
 Function IsEnum(p As Variant) As Boolean
 Dim usehandler As mHandler
-If Index >= 0 And Index <= maxitems1 Then
-If IsObject(actualdata(Index)) Then
-If Typename(actualdata(Index)) = mHdlr Then
-    Set usehandler = actualdata(Index)
+If index >= 0 And index <= maxitems1 Then
+If IsObject(actualdata(index)) Then
+If Typename(actualdata(index)) = mHdlr Then
+    Set usehandler = actualdata(index)
     IsEnum = usehandler.t1 = 4
      If IsEnum Then
         If myVarType(usehandler.index_cursor, vbString) Then

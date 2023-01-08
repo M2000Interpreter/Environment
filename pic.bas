@@ -4,7 +4,7 @@ Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal By
 Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Any)
 Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
 Public Const KEYEVENTF_KEYUP = &H2
 Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
@@ -141,7 +141,7 @@ Private Type SAFEARRAY2D
 End Type
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
 
-Private Declare Function timeGetTime Lib "Kernel32.dll" Alias "GetTickCount" () As Long
+Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
 
 Type Bitmap
         bmType As Long
@@ -152,16 +152,16 @@ Type Bitmap
         bmBitsPixel As Integer
         bmBits As Long
 End Type
-Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
 Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hDC As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
 Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
 Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
 Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
+Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 'Declare Function GetObject Lib "gdi32" Alias "GetObjectA" (ByVal hObject As Long, ByVal nCount As Long, lpObject As Any) As Long
-Declare Function GetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long) As Long
-Declare Function SetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
+Declare Function GetPixel Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long) As Long
+Declare Function SetPixel Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long, ByVal crColor As Long) As Long
 Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function GetDesktopWindow Lib "user32" () As Long
@@ -331,47 +331,86 @@ Public Const KL_NAMELENGTH = 9
 Declare Function LoadKeyboardLayout Lib "user32" Alias "LoadKeyboardLayoutA" (ByVal pwszKLID As String, ByVal Flags As Long) As Long
 Declare Function UnloadKeyboardLayout Lib "user32" (ByVal HKL As Long) As Long
 Declare Function ActivateKeyboardLayout Lib "user32" (ByVal HKL As Long, ByVal Flags As Long) As Long
-
-Private Enum VARENUM
-   VT_I8 = &H14
-End Enum ' } VARENUM;
-
-Private Type Dec_Hdr
-    DecType     As Integer
-    DecScale    As Byte
-    DecSign     As Byte
-End Type
-
-Public Function cInt64(v As Variant) As Variant
-    Dim DecHdr As Dec_Hdr, m As Long
-    On Error GoTo er111
-    cInt64 = CDec(v)
-     If VarType(v) = vbString Then
-        If InStr(1, v, "&h", vbTextCompare) = 1 Then
-            Do
-                m = Len(v)
-                v = Replace(v, "&H0", "&H", , , vbTextCompare)
-            Loop Until Len(v) = m Or m < 5
-            If m = 10 Then
-                If cInt64 < 0 Then
-                    cInt64 = CDec("&H100000000") + cInt64
-                End If
-            End If
-            
+Public Function HighLong(a) As Long
+    HighLong = LowLong(cInt64(a) \ OneBigLongLong())
+End Function
+Public Function LowLong(ByVal p) As Long
+    If Not myVarType(p, 20) Then p = cInt64(p)
+    CopyMemory ByVal VarPtr(LowLong), ByVal VarPtr(p) + 8, 4
+End Function
+Function Hex64$(a, Optional showlong)
+    Dim p, p1, sg As Integer
+    a = cInt64(a)
+    sg = Sgn(a)
+    p = -OneLongLong() And a
+    p1 = p \ OneBigLongLong()
+    p1 = LowLong(p1)
+    p = LowLong(p)
+    If Not IsMissing(showlong) Then If showlong Then sg = Sgn(p)
+    
+    If p1 = 0 And sg = -1 Then
+        Hex64$ = "FFFFFFFF" + Right$("0000000" + Hex$(p), 8)
+    Else
+        Hex64$ = Right$("0000000" + Hex$(p1), 8) + Right$("0000000" + Hex$(p), 8)
+    End If
+End Function
+Public Function OneLongLong() As Variant
+    Static p
+    If p = Empty Then
+        PutMem2 VarPtr(p), 20
+        PutMem1 VarPtr(p) + 8, 1
+    End If
+    OneLongLong = p
+End Function
+Public Function OneBigLongLong() As Variant
+    Static p
+    If p = Empty Then
+        PutMem2 VarPtr(p), 20
+        PutMem1 VarPtr(p) + 12, 1
+    End If
+    OneBigLongLong = p
+End Function
+Public Function MaskLowLongLong() As Variant
+    PutMem2 VarPtr(OneBigLongLong), 20
+    PutMem4 VarPtr(OneBigLongLong) + 12, -1&
+End Function
+Public Function cInt64(p)
+    Dim a
+    Dim i As Integer
+    GetMem2 VarPtr(p), i
+    Select Case i
+    Case vbDecimal
+        a = Fix(p)
+        If a < -limitlonglong - 1 Then
+            While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
         End If
-    End If
-    CopyMemory DecHdr, ByVal VarPtr(cInt64), LenB(DecHdr)
-    If DecHdr.DecScale Then
-    cInt64 = Fix(cInt64)
-    End If
-    GetMem4 VarPtr(cInt64) + 12, m
-    If VarType(v) = vbString Then If m < 0 And Len(v) <= 10 Then GoTo er111
-    PutMem4 VarPtr(cInt64), VT_I8
-    If (DecHdr.DecSign <> 0) And (cInt64 > 0) Then cInt64 = -cInt64
-    If (VarType(cInt64) <> VT_I8) Then Err.Raise 6
-    Exit Function
-er111:
-     Err.Raise Err.Number
+        While a > limitlonglong: a = a - maxlonglong: Wend
+        cInt64 = -OneLongLong() And a
+    Case 20
+        cInt64 = p
+    Case vbLong, vbInteger
+        cInt64 = -OneLongLong() And p
+    Case Else
+        a = Fix(CDec(p))
+        If a <= -limitlonglong - 1 Then
+            While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
+        End If
+        While a > limitlonglong: a = a - maxlonglong: Wend
+        cInt64 = -OneLongLong() And a
+        If i = vbString Then
+            If Left$(p, 1) = "&" And a < 0 Then
+            If Len(p) = 10 Then
+            If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) = 1 Then
+            cInt64 = OneBigLongLong() + cInt64
+            End If
+            Else
+            If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) = 0 Then
+            cInt64 = OneBigLongLong() + cInt64
+            End If
+            End If
+            End If
+        End If
+    End Select
 End Function
 Public Sub PlaceIcon(a As StdPicture)
 On Error Resume Next
@@ -612,14 +651,14 @@ Else
     Set CDib2Pic = emptypic
 End If
 End Function
-Public Function SetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long, aColor As Long) As Double
+Public Function SetDIBPixel(ssdib As Variant, ByVal X As Long, ByVal y As Long, aColor As Long) As Double
 Dim W As Long, H As Long, bpl As Long, rgb(2) As Byte
 W = val("&H" & Mid$(ssdib, 5, 4))
 H = val("&H" & Mid$(ssdib, 9, 4))
 If Len(ssdib) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
 If W * H <> 0 Then
 bpl = (LenB(ssdib) - 24) \ H
-W = (W - x - 1) Mod W
+W = (W - X - 1) Mod W
 H = (y Mod H) * bpl + W * 3 + 24
 CopyMemory rgb(0), ByVal StrPtr(ssdib) + H, 3
 
@@ -627,7 +666,7 @@ SetDIBPixel = -(rgb(2) * 256# * 256# + rgb(1) * 256# + rgb(0))
 CopyMemory ByVal StrPtr(ssdib) + H, aColor, 3
 End If
 End Function
-Public Function GetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long) As Double
+Public Function GetDIBPixel(ssdib As Variant, ByVal X As Long, ByVal y As Long) As Double
 Dim W As Long, H As Long, bpl As Long, rgb(2) As Byte
 'a = ssdib$
 W = val("&H" & Mid$(ssdib, 5, 4))
@@ -635,7 +674,7 @@ H = val("&H" & Mid$(ssdib, 9, 4))
 If Len(ssdib) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
 If W * H <> 0 Then
 bpl = (LenB(ssdib) - 24) \ H   ' Len(ssdib$) 2 bytes per char
-W = (W - x - 1) Mod W
+W = (W - X - 1) Mod W
 
 H = (y Mod H) * bpl + W * 3 + 24
 
@@ -782,7 +821,7 @@ cDibbuffer0.Cls bckColor
 
 there:
 Dim bDib2() As Byte, bDib1() As Byte
-Dim x As Long, y As Long
+Dim X As Long, y As Long
 Dim lc As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
@@ -902,7 +941,7 @@ End Function
 
 Public Function Merge3Dib(backdib As cDIBSection, maskdib As cDIBSection, frontdib As cDIBSection, Optional Reverse As Boolean = False)
 
-Dim x As Long, y As Long
+Dim X As Long, y As Long
 
 Dim xmax As Long, yMax As Long
     yMax = backdib.Height - 1
@@ -948,21 +987,21 @@ Dim tSA2 As SAFEARRAY2D
         '-----------------------------------------------
         If Reverse Then
         
-    For x = 0 To (xmax * 3) Step 3
+    For X = 0 To (xmax * 3) Step 3
         For y = yMax To 0 Step -1
-            bDib(x, y) = (CLng(bDib(x, y)) * bDib1(x, y) + CLng(bDib2(x, y)) * (255 - bDib1(x, y))) \ 256
-            bDib(x + 1, y) = (CLng(bDib(x + 1, y)) * bDib1(x + 1, y) + CLng(bDib2(x + 1, y)) * (255 - bDib1(x + 1, y))) \ 256
-            bDib(x + 2, y) = (CLng(bDib(x + 2, y)) * bDib1(x + 2, y) + CLng(bDib2(x + 2, y)) * (255 - bDib1(x + 2, y))) \ 256
+            bDib(X, y) = (CLng(bDib(X, y)) * bDib1(X, y) + CLng(bDib2(X, y)) * (255 - bDib1(X, y))) \ 256
+            bDib(X + 1, y) = (CLng(bDib(X + 1, y)) * bDib1(X + 1, y) + CLng(bDib2(X + 1, y)) * (255 - bDib1(X + 1, y))) \ 256
+            bDib(X + 2, y) = (CLng(bDib(X + 2, y)) * bDib1(X + 2, y) + CLng(bDib2(X + 2, y)) * (255 - bDib1(X + 2, y))) \ 256
         Next y
-        Next x
+        Next X
         Else
-     For x = 0 To (xmax * 3) Step 3
+     For X = 0 To (xmax * 3) Step 3
         For y = yMax To 0 Step -1
-            bDib(x, y) = (CLng(bDib2(x, y)) * bDib1(x, y) + CLng(bDib(x, y)) * (255 - bDib1(x, y))) \ 256
-            bDib(x + 1, y) = (CLng(bDib2(x + 1, y)) * bDib1(x + 1, y) + CLng(bDib(x + 1, y)) * (255 - bDib1(x + 1, y))) \ 256
-            bDib(x + 2, y) = (CLng(bDib2(x + 2, y)) * bDib1(x + 2, y) + CLng(bDib(x + 2, y)) * (255 - bDib1(x + 2, y))) \ 256
+            bDib(X, y) = (CLng(bDib2(X, y)) * bDib1(X, y) + CLng(bDib(X, y)) * (255 - bDib1(X, y))) \ 256
+            bDib(X + 1, y) = (CLng(bDib2(X + 1, y)) * bDib1(X + 1, y) + CLng(bDib(X + 1, y)) * (255 - bDib1(X + 1, y))) \ 256
+            bDib(X + 2, y) = (CLng(bDib2(X + 2, y)) * bDib1(X + 2, y) + CLng(bDib(X + 2, y)) * (255 - bDib1(X + 2, y))) \ 256
         Next y
-        Next x
+        Next X
         End If
 
    '-----------------------------------------------
@@ -1761,7 +1800,7 @@ With Form1.dSprite(PobjNum)
 .Picture = photo.Picture(SZ)
 
 
-players(PobjNum).x = .Width / 2
+players(PobjNum).X = .Width / 2
 players(PobjNum).y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, 0)
 
@@ -1784,7 +1823,7 @@ End With
 
 GetNewSpriteObj = PobjNum
 With players(PobjNum)
-.MAXXGRAPH = .x * 2
+.MAXXGRAPH = .X * 2
 .MAXYGRAPH = .y * 2
 .hRgn = True
 End With
@@ -1904,13 +1943,13 @@ If k < 1 Or k > PobjNum Then Exit Function
  PosSpriteY = Form1.dSprite(k).top
 End Function
 
-Sub PosSprite(aPrior As Long, ByVal x As Long, ByVal y As Long) ' ' before take from priority the original sprite
+Sub PosSprite(aPrior As Long, ByVal X As Long, ByVal y As Long) ' ' before take from priority the original sprite
 Dim k As Long
 k = FindSpriteByTag(aPrior)
 If k < 1 Or k > PobjNum Then Exit Sub
  
 
-Form1.dSprite(k).move x, y
+Form1.dSprite(k).move X, y
 
 End Sub
 Sub SrpiteHideShow(ByVal aPrior As Long, ByVal wh As Boolean) ' this is a priority
@@ -2056,8 +2095,8 @@ With Form1.dSprite(s)
 .Height = photo.Height * DYP * SZ
 .Width = photo.Width * DXP * SZ
 .Picture = photo.Picture(SZ)
-.Left = .Left + players(s).x - .Width / 2
-players(s).x = .Width / 2
+.Left = .Left + players(s).X - .Width / 2
+players(s).X = .Width / 2
 .top = .top + players(s).y - .Height / 2
 players(s).y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, True)
@@ -2067,7 +2106,7 @@ Call SetWindowRgn(.hWnd, myRgn, True)
 End With
 With players(s)
 
-.MAXXGRAPH = .x * 2
+.MAXXGRAPH = .X * 2
 .MAXYGRAPH = .y * 2
 End With
 SetText Form1.dSprite(s)
@@ -3292,17 +3331,17 @@ ismine = False
 End Select
 End Function
 Private Function IsNumberQuery(a$, fr As Long, R As Variant, lr As Long, skipdecimals As Boolean) As Boolean
-Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$, rr As Double
+Dim sg As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$, rr As Double
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberQuery = False: Exit Function
-SG = 1
+sg = 1
 sng = fr - 1
     Do While sng < Len(a$)
     sng = sng + 1
     Select Case Mid$(a$, sng, 1)
     Case " ", "+" ', ChrW(160)
     Case "-"
-    SG = -SG
+    sg = -sg
     Case Else
     Exit Do
     End Select
@@ -3393,7 +3432,7 @@ cont1234:
     IsNumberQuery = False
     lr = 1
     Else
-    If SG < 0 Then ig$ = "-" & ig$
+    If sg < 0 Then ig$ = "-" & ig$
     Err.Clear
     On Error Resume Next
     n$ = ig$ & DE$ & ex$
@@ -3510,17 +3549,17 @@ End If
 
 End Function
 Private Function IsNumberOnly(a$, fr As Long, R As Variant, lr As Long, skipdecimals As Boolean) As Boolean
-Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
+Dim sg As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberOnly = False: Exit Function
-SG = 1
+sg = 1
 sng = fr - 1
     Do While sng < Len(a$)
     sng = sng + 1
     Select Case Mid$(a$, sng, 1)
     Case " ", "+"
     Case "-"
-    SG = -SG
+    sg = -sg
     Case Else
     Exit Do
     End Select
@@ -3613,7 +3652,7 @@ cont123:
         IsNumberOnly = False
         lr = 1
     Else
-        If SG < 0 Then ig$ = "-" & ig$
+        If sg < 0 Then ig$ = "-" & ig$
         If Len(ig$ + DE$) > 13 And LenB(ex$) = 0 Then
             On Error Resume Next
             If Len(DE$) > 0 Then
@@ -4933,30 +4972,30 @@ Public Function Keyboards(what) As String
 End Function
 
 Sub GetQrCode(basestack As basetask, a$, ab$)
-Dim ErrLevel As Long, x As Variant, QRcolor As Long, sq As Boolean
+Dim ErrLevel As Long, X As Variant, QRcolor As Long, sq As Boolean
 sq = True
 On Error Resume Next
 If FastSymbol(a$, ",") Then
-    If IsExp(basestack, a$, x, , True) Then
-        QRcolor = mycolor(x)
+    If IsExp(basestack, a$, X, , True) Then
+        QRcolor = mycolor(X)
     End If
 Else
     GoTo step2
 End If
 
 If FastSymbol(a$, ",") Then
-    If IsExp(basestack, a$, x, , True) Then
-        If x = 1 Then
+    If IsExp(basestack, a$, X, , True) Then
+        If X = 1 Then
             ErrLevel = 1
-        ElseIf x = 2 Then
+        ElseIf X = 2 Then
             ErrLevel = 2
-        ElseIf x = 3 Then
+        ElseIf X = 3 Then
             ErrLevel = 3
         End If
     End If
     If FastSymbol(a$, ",") Then
-    If IsExp(basestack, a$, x, , True) Then
-        If x = 0 Then sq = False
+    If IsExp(basestack, a$, X, , True) Then
+        If X = 0 Then sq = False
     End If
 End If
 

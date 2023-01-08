@@ -112,7 +112,7 @@ If IsArray(node) Then
     Set ProcessBag = New Collection
     ProcessBag.Add node
     Else
-    ProcessBag.Add node, , , ProcessBag.Count
+    ProcessBag.Add node, , , ProcessBag.count
     End If
 Else
     MyEr "Not a valid node", "Δεν υπάρχει κόμβος"
@@ -196,7 +196,7 @@ ElseIf (node(3) And &H1) Then
         Set root(2) = c
     Else
         Set c = root(2)
-        c.Add p, , , c.Count
+        c.Add p, , , c.count
     End If
 Else
     MyEr "No childs for this node, only attributes", "όχι παιδιά για αυτόν τον κόμβο, μόνο ιδιότητες"
@@ -213,7 +213,7 @@ Public Sub AppendChildObj(p As XmlMonoInternal)
         Set root(2) = c
     Else
         Set c = root(2)
-        c.Add p, , , c.Count
+        c.Add p, , , c.count
     End If
 End Sub
 Property Get FirstChild() As XmlMonoInternal
@@ -227,7 +227,7 @@ ElseIf (root(3) And 1) Then
     Else
         Set c = val
         Set FirstChild = c.item(1)
-        thelast = achild = c.Count - 1
+        thelast = achild = c.count - 1
         achild = 0
     End If
 Else
@@ -244,7 +244,7 @@ ElseIf (root(3) And 1) Then
         MyEr "I have't childs yet", "δεν έχω παιδιά ακόμα"
     Else
         Set c = val
-        achild = c.Count - 1
+        achild = c.count - 1
         thelast = True
         Set lastchild = c.item(achild + 1)
     End If
@@ -264,10 +264,10 @@ ElseIf (root(3) And 1) Then
         Set c = val
         
         achild = achild + 1
-        If achild > c.Count - 1 Then
+        If achild > c.count - 1 Then
             MyEr "No more childs", "Δεν υπάρχουν άλλα παιδιά"
         Else
-            thelast = achild = c.Count - 1
+            thelast = achild = c.count - 1
             Set Nextchild = c(achild + 1)
         End If
     End If
@@ -286,7 +286,7 @@ ElseIf (root(3) And 1) Then
     Else
         Set c = val
 
-        If p < 0 Or p > c.Count - 1 Then
+        If p < 0 Or p > c.count - 1 Then
             MyEr "index fault", "δείκτης εκτός ορίων"
         Else
             Set Anychild = c(p + 1)
@@ -308,7 +308,7 @@ ElseIf (root(3) And 1) Then
     Else
         Set c = val
         Dim i As Long
-        For i = 1 To c.Count
+        For i = 1 To c.count
         Set aXml = c(i)
         If aXml.Tag = Tag$ Then Set ScanForTag = aXml: ok = True: Exit Function
         Next i
@@ -382,7 +382,7 @@ Friend Function deep(Tag$, child As XmlMonoInternal, guard As Long) As Boolean
     Else
         Set c = val
         Dim i As Long
-        For i = 1 To c.Count
+        For i = 1 To c.count
         Set aXml = c(i)
         If aXml.beautify = guard Then Exit Function ' safety
         If aXml.Tag = Tag$ Then Set child = aXml: deep = True: Exit Function
@@ -404,13 +404,13 @@ Friend Sub adddeep(Tag$, bag As Collection, Optional many = -1)
     Else
         Set c = val
         Dim i As Long
-        For i = 1 To c.Count
+        For i = 1 To c.count
         Set aXml = c(i)
             If aXml.Tag = Tag$ Then
-                If bag.Count = 0 Then
+                If bag.count = 0 Then
                     bag.Add aXml
                 Else
-                    bag.Add aXml, , , bag.Count
+                    bag.Add aXml, , , bag.count
                 End If
                 If many > 0 Then many = many - 1
                 If many = 0 Then Exit Sub
@@ -434,15 +434,15 @@ Friend Sub adddeepexport(Tag$, bag As Collection, Optional many = -1)
     Else
         Set c = val
         Dim i As Long
-        For i = 1 To c.Count
+        For i = 1 To c.count
         Set aXml = c(i)
             If aXml.Tag = Tag$ Then
                 Set bXml = New XmlMono
                 bXml.createTree aXml
-                If bag.Count = 0 Then
+                If bag.count = 0 Then
                     bag.Add bXml
                 Else
-                    bag.Add bXml, , , bag.Count
+                    bag.Add bXml, , , bag.count
                 End If
                 If many > 0 Then many = many - 1
                 If many = 0 Then Exit Sub
@@ -498,7 +498,7 @@ ElseIf (root(3) And 1) Then
     Else
         Set c = val
 
-        ChildCount = c.Count
+        ChildCount = c.count
       
     End If
 Else
@@ -564,7 +564,7 @@ Private Function AnyNodeAttr(node) As String
         If Not node(1) Is Nothing Then
             Set c = node(1)
             m() = Split(node(5))
-            For i = 1 To c.Count
+            For i = 1 To c.count
                 AnyNodeAttr = AnyNodeAttr + " " + m(i) + "=" + c(i)
             Next i
         End If
@@ -587,7 +587,7 @@ End If
         If beautify > 0 Then Id$ = space(beautify)
         Xml = Id$
         If Not ProcessBag Is Nothing Then
-        For i = 1 To ProcessBag.Count
+        For i = 1 To ProcessBag.count
         p = ProcessBag(i)
         If p(1) Is Nothing And Left$(p(0), 1) = "!" Then
         Xml = Xml + "<" + p(5)
@@ -605,7 +605,7 @@ End If
             If Not root(2) Is Nothing Then
                     Set c = root(2)
                     If beautify Then Xml = Xml + vbCrLf
-                    For i = 1 To c.Count
+                    For i = 1 To c.count
                     Set D = c(i)
                     If D Is guard Then Set D = Nothing: Exit Property
                     D.skip = skip
@@ -669,7 +669,7 @@ Function AttrExist(t$, Optional attr As String) As Boolean
     End If
 End Function
 Function AlterProcessAttr(Id, t$, NewValue As String, Optional OldValue As String) As Boolean
-If ProcessBag.Count < Id Or Id < 1 Then MyEr "index fault", "δείκτης εκτός ορίων": Exit Function
+If ProcessBag.count < Id Or Id < 1 Then MyEr "index fault", "δείκτης εκτός ορίων": Exit Function
 Dim node, i As Long, c As Collection
 node = ProcessBag.item(Id)
 If Typename(node(1)) = "Nothing" Then
@@ -679,7 +679,7 @@ If Typename(node(1)) = "Nothing" Then
 Else
 On Error GoTo er1
 Set c = node(1)
-If c.Count = 0 Then GoTo er1
+If c.count = 0 Then GoTo er1
 OldValue = c(t$)
 c.Remove t$
 c.Add CVar(NewValue), t$
@@ -692,13 +692,13 @@ Property Get CountProcess() As Long
     If ProcessBag Is Nothing Then
         CountProcess = 0
     Else
-        CountProcess = ProcessBag.Count
+        CountProcess = ProcessBag.count
     End If
 End Property
 Property Get ProcessInstruction(i As Long) As Variant()
 If ProcessBag Is Nothing Then
     MyEr "there are no instructions in this node", "δεν υπάρχουν οδηγίες σε αυτόν το κόμβο"
-ElseIf i < 0 Or i >= ProcessBag.Count Then
+ElseIf i < 0 Or i >= ProcessBag.count Then
     MyEr "index fault", "δείκτης εκτός ορίων"
 Else
     ProcessInstruction = ProcessBag.item(i)
@@ -1090,8 +1090,8 @@ ElseIf (root(3) And &H1) Then
     Else
         Set c = root(2)
         c.Remove achild + 1
-        If achild >= c.Count Then achild = achild - 1
-        If c.Count = 0 Then Set root(2) = Nothing: achild = -1
+        If achild >= c.count Then achild = achild - 1
+        If c.count = 0 Then Set root(2) = Nothing: achild = -1
     End If
 Else
     MyEr "No childs for this node, only attributes", "όχι παιδιά για αυτόν τον κόμβο, μόνο ιδιότητες"

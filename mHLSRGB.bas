@@ -2,51 +2,51 @@ Attribute VB_Name = "mHLSRGB"
 Option Explicit
 
 Public Sub RGBToHLS( _
-      ByVal r As Long, ByVal g As Long, ByVal b As Long, _
-      h As Single, s As Single, l As Single _
+      ByVal R As Long, ByVal G As Long, ByVal b As Long, _
+      H As Single, s As Single, l As Single _
    )
-Dim max As Single
+Dim Max As Single
 Dim Min As Single
 Dim delta As Single
 Dim rr As Single, rG As Single, rB As Single
-If r < 0 Then r = 0 Else If r > 255 Then r = 255
-If g < 0 Then g = 0 Else If g > 255 Then g = 255
+If R < 0 Then R = 0 Else If R > 255 Then R = 255
+If G < 0 Then G = 0 Else If G > 255 Then G = 255
 If b < 0 Then b = 0 Else If b > 255 Then b = 255
 
-   rr = r / 255: rG = g / 255: rB = b / 255
+   rr = R / 255: rG = G / 255: rB = b / 255
 
-        max = Maximum(rr, rG, rB)
+        Max = Maximum(rr, rG, rB)
         Min = Minimum(rr, rG, rB)
-     l = (max + Min) / 2    '{This is the lightness}
+     l = (Max + Min) / 2    '{This is the lightness}
 
-        If max = Min Then
+        If Max = Min Then
             'begin {Acrhomatic case}
             s = 0
-            h = 0
+            H = 0
            'end {Acrhomatic case}
         Else
            'begin {Chromatic case}
                 '{First calculate the saturation.}
            If l <= 0.5 Then
-               s = (max - Min) / (max + Min)
+               s = (Max - Min) / (Max + Min)
            Else
-               s = (max - Min) / (2 - max - Min)
+               s = (Max - Min) / (2 - Max - Min)
             End If
             '{Next calculate the hue.}
-            delta = max - Min
+            delta = Max - Min
 
-           If rr = max Then
-                h = (rG - rB) / delta    '{Resulting color is between yellow and magenta}
-           ElseIf rG = max Then
-                h = 2 + (rB - rr) / delta '{Resulting color is between cyan and yellow}
-           ElseIf rB = max Then
-                h = 4 + (rr - rG) / delta '{Resulting color is between magenta and cyan}
+           If rr = Max Then
+                H = (rG - rB) / delta    '{Resulting color is between yellow and magenta}
+           ElseIf rG = Max Then
+                H = 2 + (rB - rr) / delta '{Resulting color is between cyan and yellow}
+           ElseIf rB = Max Then
+                H = 4 + (rr - rG) / delta '{Resulting color is between magenta and cyan}
             End If
       End If
 'end {RGB_to_HLS}
 End Sub
 
-Public Function rgbconv(h As Long) As String
+Public Function rgbconv(H As Long) As String
 Dim mr As Long, mg As Long, mb As Long
 Dim mg1 As Long, mb1 As Long
 Dim hh As Single, ss As Single, LL As Single
@@ -55,7 +55,7 @@ For mr = 0 To 255
 For mg = 0 To 255
 For mb = 0 To 255
 RGBToHLS mr, mg, mb, hh, ss, LL
-If h = CLng(Int(hh * 60) Mod 360) Then
+If H = CLng(Int(hh * 60) Mod 360) Then
 rgbconv = Hex$(mb + mg * 256 + mr * 256 * 256)
 mb = 255
 mg = 255
@@ -124,18 +124,18 @@ RGBToHLS mr, mg, mb, hh, ss, LL
 satconv = CLng(LL * 255)
 
 End Function
-Public Function HSL(ByVal h, ByVal s, ByVal l) As Double
-Dim r As Long, g As Long, b As Long
-HLSToRGB CSng((h * 100&) Mod 36000) / 6000!, s / 100, l / 100, r, g, b
-HSL = r + (g + b * 256#) * 256#
+Public Function HSL(ByVal H, ByVal s, ByVal l) As Double
+Dim R As Long, G As Long, b As Long
+HLSToRGB CSng((H * 100&) Mod 36000) / 6000!, s / 100, l / 100, R, G, b
+HSL = R + (G + b * 256#) * 256#
 End Function
 
 Public Sub HLSToRGB( _
-      ByVal h As Single, ByVal s As Single, ByVal l As Single, _
-      r As Long, g As Long, b As Long _
+      ByVal H As Single, ByVal s As Single, ByVal l As Single, _
+      R As Long, G As Long, b As Long _
    )
 Dim rr As Single, rG As Single, rB As Single
-Dim Min As Single, max As Single
+Dim Min As Single, Max As Single
 Dim Minl As Long, Maxl As Long, MidL As Long, dif As Single
 
    If s = 0 Then
@@ -154,45 +154,45 @@ Dim Minl As Long, Maxl As Long, MidL As Long, dif As Single
          Min = l - s * (1 - l)
       End If
       ' Get the Max value:
-      max = 2 * l - Min
+      Max = 2 * l - Min
       
       ' Now depending on sector we can evaluate the h,l,s:
-      If (h < 1) Then
-         rr = max
-         If (h < 0) Then
+      If (H < 1) Then
+         rr = Max
+         If (H < 0) Then
             rG = Min
-            rB = rG - h * (max - Min)
+            rB = rG - H * (Max - Min)
          Else
             rB = Min
-            rG = h * (max - Min) + rB
+            rG = H * (Max - Min) + rB
          End If
-      ElseIf (h < 3) Then
-         rG = max
-         If (h < 2) Then
+      ElseIf (H < 3) Then
+         rG = Max
+         If (H < 2) Then
             rB = Min
-            rr = rB - (h - 2) * (max - Min)
+            rr = rB - (H - 2) * (Max - Min)
          Else
             rr = Min
-            rB = (h - 2) * (max - Min) + rr
+            rB = (H - 2) * (Max - Min) + rr
          End If
       Else
-         rB = max
-         If (h < 4) Then
+         rB = Max
+         If (H < 4) Then
             rr = Min
-            rG = rr - (h - 4) * (max - Min)
+            rG = rr - (H - 4) * (Max - Min)
          Else
             rG = Min
-            rr = (h - 4) * (max - Min) + rG
+            rr = (H - 4) * (Max - Min) + rG
          End If
          
       End If
             
    End If
-   r = rr * 255: g = rG * 255: b = rB * 255
-   If r < 0 Or g < 0 Or b < 0 Or r > 255 Or g > 255 Or b > 255 Then
-   Maxl = Maximuml(r, g, b)
-   Minl = Minimuml(r, g, b)
-   MidL = r + g + b - Maxl - Minl
+   R = rr * 255: G = rG * 255: b = rB * 255
+   If R < 0 Or G < 0 Or b < 0 Or R > 255 Or G > 255 Or b > 255 Then
+   Maxl = Maximuml(R, G, b)
+   Minl = Minimuml(R, G, b)
+   MidL = R + G + b - Maxl - Minl
    If Maxl > Minl Then
    If Minl < 0 Then Maxl = Maxl - Minl: MidL = MidL - Minl: Minl = 0
    If Maxl > 255 Then
@@ -200,31 +200,31 @@ Dim Minl As Long, Maxl As Long, MidL As Long, dif As Single
    Maxl = (Maxl - Minl) * dif + Minl
    MidL = (MidL - Minl) * dif + Minl
    End If
-   If Maximuml(r, g, b) = r Then
-   r = Maxl
-            If Minimuml(r, g, b) = g Then
-            g = Minl: b = MidL
+   If Maximuml(R, G, b) = R Then
+   R = Maxl
+            If Minimuml(R, G, b) = G Then
+            G = Minl: b = MidL
             Else
-            g = Minl: b = MidL
+            G = Minl: b = MidL
             End If
-   ElseIf Maximuml(r, g, b) = g Then
-            g = Maxl
-            If Minimuml(r, g, b) = r Then
-            r = Minl: b = MidL
+   ElseIf Maximuml(R, G, b) = G Then
+            G = Maxl
+            If Minimuml(R, G, b) = R Then
+            R = Minl: b = MidL
             Else
-            b = Minl: r = MidL
+            b = Minl: R = MidL
             End If
    Else
    b = Maxl
-   If Minimuml(r, g, b) = r Then
-            r = Minl: g = MidL
+   If Minimuml(R, G, b) = R Then
+            R = Minl: G = MidL
             Else
-            g = Minl: r = MidL
+            G = Minl: R = MidL
             End If
 
    End If
    Else
-   r = 0: b = 0: g = 0
+   R = 0: b = 0: G = 0
    End If
    End If
    

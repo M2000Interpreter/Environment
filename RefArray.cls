@@ -13,14 +13,6 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
 Private Const VbLongLong = 20
-Private Enum VARENUM
-   VT_I8 = &H14
-End Enum
-Private Type Dec_Hdr
-    DecType     As Integer
-    DecScale    As Byte
-    DecSign     As Byte
-End Type
 Private Type SAFEARRAYBOUND
     cElements                   As Long
     lLbound                     As Long
@@ -279,7 +271,7 @@ Public Function UnsignedAdd(ByVal lUnsignedPtr As Long, ByVal lSignedOffset As L
 End Function
 Public Sub DefArrayAt(where, Arrtype, Optional size As Long = 10)
 If size < 1 Then size = 1
-Dim aPtr As Long, BB As Byte
+Dim aPtr As Long, bb As Byte
 Dim Dummy0() As Object
 Dim Dummy1() As String
 Dim Dummy2() As Long
@@ -399,36 +391,14 @@ ex1:
 ''SafeArrayUnaccessData mPtr
 
 End Function
-Public Function cInt64(v As Variant) As Variant
-    Dim DecHdr As Dec_Hdr, m As Long
-    On Error GoTo er111
-    cInt64 = CDec(v)
-     If VarType(v) = vbString Then
-        If InStr(1, v, "&h", vbTextCompare) = 1 Then
-            Do
-                m = Len(v)
-                v = Replace(v, "&H0", "&H", , , vbTextCompare)
-            Loop Until Len(v) = m Or m < 5
-            If m = 10 Then
-                If cInt64 < 0 Then
-                    cInt64 = CDec("&H100000000") + cInt64
-                End If
-            End If
-            
-        End If
-    End If
-    CopyMemory DecHdr, ByVal VarPtr(cInt64), LenB(DecHdr)
-    If DecHdr.DecScale Then
-    cInt64 = Fix(cInt64)
-    End If
-    GetMem4 VarPtr(cInt64) + 12, m
-    If VarType(v) = vbString Then If m < 0 And Len(v) <= 10 Then GoTo er111
-    PutMem4 VarPtr(cInt64), VT_I8
-    If (DecHdr.DecSign <> 0) And (cInt64 > 0) Then cInt64 = -cInt64
-    If (VarType(cInt64) <> VT_I8) Then Err.Raise 6
+Public Function cInt64(ByVal a)
+    Dim p
+    PutMem1 VarPtr(p), 20
+    PutMem1 VarPtr(p) + 8, 1
+    cInt64 = -p And a
     Exit Function
 er111:
-     Err.Raise 6
+     Err.Raise Err.Number
 End Function
 Property Get vtType(Optional where) As Integer
 If ihavearray Then

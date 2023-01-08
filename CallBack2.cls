@@ -31,14 +31,14 @@ a.NoPublic objref, mineHere$
 Set CopyOfMe = a
 End Property
 Property Let ShowGui(RHS As Boolean)
-If Forms.Count = 0 Then Exit Property
+If Forms.count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
 If Form1.top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).top
 Else
 If Form1.WindowState = 0 Then
-If Not (QRY Or GFQRY Or Forms.Count > 5) Then Form1.Visible = False
+If Not (QRY Or GFQRY Or Forms.count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
@@ -134,22 +134,22 @@ Set oldsoros = Nothing
 here$ = ohere$
 End Sub
 Private Function GetSubFullName2(nm$, fullname$, retnum As Long) As Boolean
-Dim Dummy As Long
+Dim dummy As Long
 If Len(here$) > 0 Then
     If Len(here$) > Len(nm$) Then
         If Mid$(here$, Len(here$) - Len(nm$)) = "." + nm$ Then
-            GetSubFullName2 = subHash.Find2(nm$, retnum, Dummy)
+            GetSubFullName2 = subHash.Find2(nm$, retnum, dummy)
           fullname = nm$: Exit Function
         End If
     End If
 End If
 
 If here$ <> "" Then
-     GetSubFullName2 = subHash.Find2(here$ & "." & nm$, retnum, Dummy)
+     GetSubFullName2 = subHash.Find2(here$ & "." & nm$, retnum, dummy)
   If GetSubFullName2 Then fullname$ = here$ & "." & nm$: Exit Function
 End If
 
-    GetSubFullName2 = subHash.Find2(nm$, retnum, Dummy)
+    GetSubFullName2 = subHash.Find2(nm$, retnum, dummy)
  If GetSubFullName2 Then fullname$ = nm$
 
 
@@ -191,7 +191,7 @@ here$ = full$
 
 Dim i As Long, ms As New mStiva, ar As mArray, j As Long
 Dim manydim As Long, maxitems As Long, probe As Long, v() As Variant, probelow As Long
-Dim IhaveSignature As Boolean, sign$, sign2$, Dummy$, look As Long
+Dim IhaveSignature As Boolean, sign$, sign2$, dummy$, look As Long
 If reghash.Find(myUcase(modulename$, True)) Then
 sign$ = reghash.Value
 sign2$ = sign$
@@ -231,10 +231,10 @@ ar.RevOrder = True
 ar.CopySerialize v()
 ''
 If IhaveSignature Then
-look = IsLabelOnly(sign$, Dummy$)
+look = IsLabelOnly(sign$, dummy$)
 If look = 2 Then ' byref
-look = IsLabelOnly(sign$, Dummy$)
-look = globalvarGroup("b" & (var2used) & "." & Dummy$, True) ' perhaps this is a fault, why is true??
+look = IsLabelOnly(sign$, dummy$)
+look = globalvarGroup("b" & (var2used) & "." & dummy$, True) ' perhaps this is a fault, why is true??
 ElseIf look > 4 Then
 FastSymbol sign, ")", True
 ms.DataObj ar
@@ -302,42 +302,42 @@ here$ = ohere$
 once = False
 End Sub
 
-Public Sub ExecuteStatement(ByVal code$)
+Public Sub ExecuteStatement(ByVal Code$)
 Dim what$, Pos As Long, func As Boolean, param$, drop$
 If status <> 0 Then Exit Sub
-If IsLabelOnly(code$, what$) > 4 Then
+If IsLabelOnly(Code$, what$) > 4 Then
     func = True
 ElseIf what$ = vbNullString Then
     Exit Sub
-ElseIf LTrim$(code$) = vbNullString Then
+ElseIf LTrim$(Code$) = vbNullString Then
 ' one call
 Call Run(what$)
 Exit Sub
 End If
 Do
  Pos = 1
-  drop$ = aheadstatus(code$, True, Pos)
-  If drop$ = vbNullString And Pos > Len(code$) Then Exit Sub
+  drop$ = aheadstatus(Code$, True, Pos)
+  If drop$ = vbNullString And Pos > Len(Code$) Then Exit Sub
   If param$ <> "" Then
-  param$ = param$ + ", " + Left$(code$, Pos - 1)
+  param$ = param$ + ", " + Left$(Code$, Pos - 1)
   Else
-  param$ = Left$(code$, Pos - 1)
+  param$ = Left$(Code$, Pos - 1)
   End If
-  code$ = Mid$(code$, Pos)
-  Loop Until Not FastSymbol(code$, ",")
+  Code$ = Mid$(Code$, Pos)
+  Loop Until Not FastSymbol(Code$, ",")
   If func Then
   Call Run(what$ + " " + param$ + ")")
   Else
   Call Run(what$ + " " + param$)
   End If
 End Sub
-Public Function Eval(code$) As Variant
+Public Function Eval(Code$) As Variant
 Dim Pos As Long, p As Double, s As String, drop$
  Pos = 1
-  drop$ = aheadstatus(code$, True, Pos)
-  If drop$ = vbNullString And Pos > Len(code$) Then Exit Function
+  drop$ = aheadstatus(Code$, True, Pos)
+  If drop$ = vbNullString And Pos > Len(Code$) Then Exit Function
   If InStr(drop$, "N") Then
-  If IsExp(objref, Left$(code$, Pos), p) Then
+  If IsExp(objref, Left$(Code$, Pos), p) Then
   If Not objref.lastobj Is Nothing Then
   Set Eval = objref.lastobj
   
@@ -346,7 +346,7 @@ Dim Pos As Long, p As Double, s As String, drop$
    End If
   End If
   Else
-  If IsStrExp(objref, Left$(code$, Pos), s$) Then
+  If IsStrExp(objref, Left$(Code$, Pos), s$) Then
   If Not objref.lastobj Is Nothing Then
       Set Eval = objref.lastobj
   Else
@@ -356,11 +356,11 @@ Dim Pos As Long, p As Double, s As String, drop$
   End If
 Set objref.lastobj = Nothing
 End Function
-Public Sub AddExecCode(code$)
+Public Sub AddExecCode(Code$)
 If locked Then Exit Sub
-Call Run(code$, False)
+Call Run(Code$, False)
 End Sub
-Public Function Run(ByVal code$, Optional clean As Boolean = True) As Boolean
+Public Function Run(ByVal Code$, Optional clean As Boolean = True) As Boolean
 Dim ohere$, stay As Variant
 If status <> 0 Then Exit Function
 If elevatestatus2 Then Exit Function
@@ -377,7 +377,7 @@ Run = True
         LastErNum = 0: LastErNum1 = 0
         LastErName = vbNullString
         LastErNameGR = vbNullString
-If Execute(objref, code$, False) <> 1 Then
+If Execute(objref, Code$, False) <> 1 Then
 Run = False
 
 If Not App.StartMode = vbSModeStandalone Then

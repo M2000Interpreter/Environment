@@ -64,7 +64,7 @@ Dim Callback As GuiM2000
 Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long
 Dim tParam As DRAWTEXTPARAMS
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
-Private Declare Function GetStringTypeExW Lib "Kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
+Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 Public NumberOnly As Boolean
 Public NumberIntOnly As Boolean
 Friend Property Get GetCallBack() As GuiM2000
@@ -256,12 +256,12 @@ retvalue = RealX1(mHdc, ExtSelStart, that)
 ok = True
 End Sub
 
-Private Sub glistN_OutPopUp(x As Single, y As Single, myButton As Integer)
+Private Sub glistN_OutPopUp(X As Single, y As Single, myButton As Integer)
 If (myButton And &H2) = 2 Then
 If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
    Else
-      Callback.Callback mesCtrlName + ".PopUp(" + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(X + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
       End If
       End If
 End Sub
@@ -1274,13 +1274,13 @@ If Err.Number > 0 Then glistN.NoWheel = True
 
 End Sub
 
-Public Sub move(x, y, Optional W, Optional H)
+Public Sub move(X, y, Optional W, Optional H)
 If IsMissing(W) Then
-glistN.MoveTwips CLng(x), CLng(y), 0, 0
+glistN.MoveTwips CLng(X), CLng(y), 0, 0
 ElseIf IsMissing(H) Then
-glistN.MoveTwips CLng(x), CLng(y), CLng(W), 0
+glistN.MoveTwips CLng(X), CLng(y), CLng(W), 0
 Else
-glistN.MoveTwips CLng(x), CLng(y), CLng(W), CLng(H)
+glistN.MoveTwips CLng(X), CLng(y), CLng(W), CLng(H)
 End If
 End Sub
 Public Sub deconstruct()
@@ -1325,12 +1325,12 @@ On Error Resume Next
 If CBool(RHS) Then Callback.Default = ctrlName
 End Property
 Sub Transparent()
-Dim x  As Long, y As Long
+Dim X  As Long, y As Long
 glistN.FadeLastLinePart = mPartColor
 glistN.ForeColor = black
 glistN.BackStyle = 1
-glistN.GetLeftTop x, y
-glistN.RepaintFromOut Callback.Image, x, y
+glistN.GetLeftTop X, y
+glistN.RepaintFromOut Callback.Image, X, y
 Callback.RefreshList = Callback.RefreshList + 1
 End Sub
 Sub TransparentOff()

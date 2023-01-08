@@ -441,8 +441,8 @@ Public DBtype As String ' can be mdb or something else
 Public Const DBtypeHelp = ".mdb" 'allways help has an mdb as type"
 Public Const DBSecurityOFF = ";Persist Security Info=False"
 
-Private Declare Function MoveFileW Lib "Kernel32.dll" (ByVal lpExistingFileName As Long, ByVal lpNewFileName As Long) As Long
-Private Declare Function DeleteFileW Lib "Kernel32.dll" (ByVal lpFileName As Long) As Long
+Private Declare Function MoveFileW Lib "kernel32.dll" (ByVal lpExistingFileName As Long, ByVal lpNewFileName As Long) As Long
+Private Declare Function DeleteFileW Lib "kernel32.dll" (ByVal lpFileName As Long) As Long
 Public Sub KillFile(sFilenName As String)
 DeleteFileW StrPtr(sFilenName)
 End Sub
@@ -559,7 +559,7 @@ Dim ss$
 Exit Sub
 End If
 
-CD = App.Path
+CD = App.path
 AddDirSep CD
 If UseMDBHELP Then
 

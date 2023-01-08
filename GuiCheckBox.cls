@@ -85,13 +85,13 @@ Public Property Let Enabled(ByVal RHS As Long)
 If glistN Is Nothing Then Exit Property
 glistN.Enabled = RHS
 End Property
-Public Sub move(X, y, Optional w, Optional h)
-If IsMissing(w) Then
+Public Sub move(X, y, Optional W, Optional H)
+If IsMissing(W) Then
 glistN.MoveTwips CLng(X), CLng(y), 0, 0
-ElseIf IsMissing(h) Then
-glistN.MoveTwips CLng(X), CLng(y), CLng(w), 0
+ElseIf IsMissing(H) Then
+glistN.MoveTwips CLng(X), CLng(y), CLng(W), 0
 Else
-glistN.MoveTwips CLng(X), CLng(y), CLng(w), CLng(h)
+glistN.MoveTwips CLng(X), CLng(y), CLng(W), CLng(H)
 End If
 End Sub
 Public Sub deconstruct()
@@ -108,7 +108,7 @@ Dim ff As New StdFont
 With Callback
 ff.Name = .CtrlFontName
 ff.charset = Form1.DIS.Font.charset
-ff.Size = .CtrlFontSize
+ff.size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 End With
 SkipFirstClick = True
@@ -119,7 +119,7 @@ With glistN
 .NoArrowUp = True
 .NoEscapeKey = True
 .bypassfirstClick = True
-.additem "  " + mCaptext
+.AddItem "  " + mCaptext
 .NoCaretShow = True
 .NoPanRight = False
 .VerticalCenterText = True
@@ -220,7 +220,7 @@ If ThisFontName <> "" Then
 
 aa.Name = ThisFontName
 
-If ThisMode > 7 Then aa.Size = ThisMode Else aa = 7
+If ThisMode > 7 Then aa.size = ThisMode Else aa = 7
 aa.bold = ThisBold
 Set glistN.Font = aa
 End If
@@ -301,7 +301,7 @@ Else
 Callback.SendFKEY a
 End If
 End Sub
-Public Sub AccKey(a, Optional Shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 If MyIsNumeric(a) Then
 a = CLng(a)
 If a < 0 Then Exit Sub
@@ -318,7 +318,7 @@ End Select
 End If
 If Opcode < 0 Then Opcode = 0
 If a = 0 Then Exit Sub
-a = a - 1000 * Shift - 10000 * ctrl - 100000 * alt
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
 Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
 Private Sub gListN_AccKey(m As Long)

@@ -12,11 +12,11 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
 ' a stack only for strings for group objects
 Private mstack As New Collection
 Public Property Get Total() As Long

@@ -8,7 +8,7 @@ Private Const FILE_ATTRIBUTE_NORMAL     As Long = &H80
 Private Const FILE_BEGIN                As Long = &H0
 Private Const RT_ICON                   As Long = &H3
 Private Const RT_GROUP_ICON             As Long = &HE
- 
+Private Const RT_RCDATA                 As Long = 10&
 Private Type ICONDIRENTRY
     bWidth          As Byte
     bHeight         As Byte
@@ -57,7 +57,7 @@ Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination
 Public Function CopyM2000Exe(NewName$, Optional copyHelp) As Boolean
 ' copy the app.EXEName from appdir$
 On Error GoTo 1234
-Dim ap$, bp$, cp1 As Boolean, R4, there$, d As New Document
+Dim ap$, bp$, cp1 As Boolean, R4, there$, D As New Document, mycoder As New coder
 there$ = ExtractPath(NewName$, , True)
 If there$ = "" Then
     If ExtractPath(NewName$) <> "" Then
@@ -100,15 +100,39 @@ If 0 <> CopyFile(StrPtr(ap$), StrPtr(bp$), 1) Then
                 End If
             End If
         End If
-        If CFname(there$ + NewName$ + ".gsb") = "" Then
-            d.SaveUnicodeOrAnsi there$ + NewName$ + ".gsb", 2
-        End If
+
         If CFname(there$ + NewName$ + ".ico") <> "" Then
             ap$ = there$ + NewName$ + ".exe"
             bp$ = there$ + NewName$ + ".ico"
             CopyM2000Exe = ChangeIcon(ap$, bp$)
+            
         Else
             MyEr "Can't find  " + ExtractNameOnly(ap$) + ".ico", "δεν βρήκα το " + ExtractNameOnly(ap$) + ".ico"
+        End If
+        If CFname(there$ + NewName$ + ".gsb") = "" Then
+             
+            D.SaveUnicodeOrAnsi there$ + NewName$ + ".gsb", 2
+        Else
+           D.ReadUnicodeOrANSI there$ + NewName$ + ".gsb"
+           '' bb() = D.textDoc 'mycoder.must1()
+           ap$ = D.textDoc
+           Dim LCID, i As Long
+           Dim ResHdl As Long: ResHdl = BeginUpdateResource(StrPtr("\\?\" + there$ + NewName$ + ".exe"), 0)
+           If ResHdl Then
+            On Error GoTo 1
+           Debug.Print Len(ap$)
+           For i = 1 To Len(ap$) \ 8192
+                bp$ = space$(8192)
+                LSet bp$ = Mid$(ap$, (i - 1) * 8192 + 1, 8192)
+                UpdateResource ResHdl, RT_RCDATA, i + 100, LCID, StrPtr(bp$), LenB(bp$)
+           Next i
+           If Len(ap$) Mod 8192 > 0 Then
+                bp$ = space$(8192)
+                LSet bp$ = Mid$(ap$, (i - 1) * 8192 + 1)
+                UpdateResource ResHdl, RT_RCDATA, i + 100, LCID, StrPtr(bp$), LenB(bp$)
+           End If
+1          Debug.Print EndUpdateResource(ResHdl, IIf(Err, 1, 0)), i
+           End If
         End If
     Else
         MyEr "Can't copy " + ExtractName(ap$), "δεν μπορώ να αντιγράψω το " + ExtractName(ap$)
@@ -200,3 +224,29 @@ Public Function ChangeIcon(ByVal strExePath As String, ByVal strIcoPath As Strin
     ChangeIcon = True
 End Function
 
+Public Function WriteResData(ByVal ResSubID As Long, ResTypeOrID, BytesOrString, FileNameToExeOrDll As String, Optional ByVal LCID As Long) As Boolean
+  
+  Dim ResTyp As Long: ResTyp = IIf(VarType(ResTypeOrID) = vbString, StrPtr(ResTypeOrID), ResTypeOrID)
+  'Dim Data() As Byte: Data = IIf(IsArray(BytesOrString), BytesOrString, StrConv(BytesOrString, vbFromUnicode))
+  'Dim LenDat As Long: LenDat = UBound(Data) - LBound(Data) + 1
+  'Dim lpData As Long: If LenDat Then lpData = VarPtr(Data(LBound(Data)))
+  Dim ResHdl As Long: ResHdl = BeginUpdateResource(StrPtr("\\?\" + FileNameToExeOrDll), 0)
+  
+  If ResHdl Then
+     On Error GoTo 1
+     
+     Debug.Print UpdateResource(ResHdl, ResTyp, ResSubID, LCID, StrPtr(BytesOrString), LenB(BytesOrString))
+     
+1    WriteResData = EndUpdateResource(ResHdl, IIf(Err, 1, 0))
+  End If
+End Function
+Public Function UpdateManifestData(sManifestContent As String, FileNameToExeOrDll As String) As Boolean
+  Dim IsExe As Boolean: IsExe = LCase$(Right$(FileNameToExeOrDll, 4)) = ".exe"
+  Const RT_MANIFEST As Long = 24
+  
+  UpdateManifestData = WriteResData(IIf(IsExe, 1, 2), RT_MANIFEST, sManifestContent, FileNameToExeOrDll, 1033)
+End Function
+
+Public Function RemoveManifestData(FileNameToExeOrDll As String) As Boolean
+  RemoveManifestData = UpdateManifestData("", FileNameToExeOrDll)
+End Function

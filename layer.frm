@@ -70,22 +70,22 @@ MediaPlayer1.closeMovie
   Set TaskMaster = Nothing
 Set Basestack1.Owner = Nothing
 Set Basestack1 = Nothing
-Dim x As Form
+Dim X As Form
 If IsWine Then
 Modalid = 0
 
-For Each x In Forms
-If x.Visible Then x.Visible = False
+For Each X In Forms
+If X.Visible Then X.Visible = False
 Next
-Set x = Nothing
+Set X = Nothing
 'Form1.helper1
 'MsgBox "quit"
 'Exit Sub
 Else
-For Each x In Forms
-If x.Name <> Me.Name Then Unload x
+For Each X In Forms
+If X.Name <> Me.Name Then Unload X
 Next
-Set x = Nothing
+Set X = Nothing
 End If
 
 If m_bInIDE Then Exit Sub
@@ -103,16 +103,16 @@ MediaPlayer1.closeMovie
  If Not TaskMaster Is Nothing Then TaskMaster.Dispose
   Set TaskMaster = Nothing
   
-Dim x As Form
+Dim X As Form
 Modalid = 0
 
-For Each x In Forms
-If x.Name <> Me.Name Then
-Set x.icon = LoadPicture("")
-If x.Visible Then x.Visible = False
+For Each X In Forms
+If X.Name <> Me.Name Then
+Set X.icon = LoadPicture("")
+If X.Visible Then X.Visible = False
 End If
 Next
-Set x = Nothing
+Set X = Nothing
 Form1.helper1
 
 End Sub

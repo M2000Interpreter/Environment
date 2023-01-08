@@ -89,7 +89,7 @@ Do
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0 Or k1 = k
 If k1 = k Then
-ReHash
+Rehash
 k = Hash(HashFunc(Key)) - 1
 k1 = -2
 ParentIndex = -1
@@ -139,7 +139,7 @@ If Done Then
                    k = PriveSpace(k).Pleft - 1
             Loop
             If k = k1 Then
-               ReHash
+               Rehash
             ElseIf k = top1 Then
                PriveSpace(k1).Pleft = index + 1
             End If
@@ -228,9 +228,9 @@ End If
 End Property
 Private Sub ExpandHash()
     hashlen = MaxSpace * 2 + 3
-    ReHash
+    Rehash
 End Sub
-Private Sub ReHash()
+Private Sub Rehash()
     Dim i As Long
     ReDim Hash(hashlen) As Long
     For i = 0 To toplim
@@ -268,14 +268,14 @@ If entrance > 0 Then Exit Sub
                 
                 hashlen = MaxSpace * 2 + 3
                 
-                ReHash
+                Rehash
             End If
     Else
             If MaxSpace - newTop + 1 > 2 * newTop + 2 Then
             MaxSpace = 2 * (newTop + 1) + 1
             hashlen = MaxSpace * 2 + 3
             ReDim Preserve PriveSpace(MaxSpace) As item
-            ReHash
+            Rehash
     End If
    End If
    entrance = entrance - 1
@@ -327,7 +327,7 @@ If k >= 0 Then
         
     Loop Until k < 0 Or k = k1
     If k = k1 Then
-        ReHash
+        Rehash
         k = Hash(HashFunc(Key)) - 1
         If k >= 0 Then
         Do
@@ -351,7 +351,7 @@ If k >= 0 Then
         k = PriveSpace(k).Pleft - 1
     Loop Until k < 0 Or k = k1
     If k = k1 Then
-        ReHash
+        Rehash
         k = Hash(HashFunc(Key)) - 1
         If k >= 0 Then
         Do
@@ -667,9 +667,9 @@ Sub Assign(Key As String, RHS)
         AddKey Key, RHS
     End If
 End Sub
-Sub AssignPath(Path$, RHS, Optional sep As String = ".")
-Dim part$(), w As Long, n As Long, s As Long
-part$ = Split2(Path$, sep)
+Sub AssignPath(path$, RHS, Optional sep As String = ".")
+Dim part$(), W As Long, n As Long, s As Long
+part$ = Split2(path$, sep)
 Dim m As Object, ma As JsonArray, mo As JsonObject
 s = UBound(part$)
 n = 0
@@ -678,18 +678,18 @@ again:
 If n > UBound(part$) Then Exit Sub
 If TypeOf m Is JsonArray Then
     Set ma = m
-    w = val(part$(n))
+    W = val(part$(n))
     If n = s Then
-        ma.Assign w, RHS
+        ma.Assign W, RHS
     ElseIf Left$(part$(n), 1) = " " Then
-            If ma.count <= w Or Not ma.ValType(w) > 3 Then
+            If ma.count <= W Or Not ma.ValType(W) > 3 Then
                     If Left$(part$(n + 1), 1) = " " Then
-                        ma.Assign w, New JsonArray
+                        ma.Assign W, New JsonArray
                     Else
-                        ma.Assign w, New JsonObject
+                        ma.Assign W, New JsonObject
                     End If
             End If
-            Set m = ma(w)
+            Set m = ma(W)
             n = n + 1
             GoTo again
     Else
@@ -745,9 +745,9 @@ Else
 End If
 End Sub
 Function ToString(Key As String, Optional dot As String = ".")
-Dim w As Long, hlp$, ja As JsonArray, jo As JsonObject
-w = ValType(Key)
-Select Case w
+Dim W As Long, hlp$, ja As JsonArray, jo As JsonObject
+W = ValType(Key)
+Select Case W
 Case 0
     ToString = "null"
 Case 1
@@ -767,9 +767,9 @@ Case 33
 End Select
 End Function
 Private Function ToString2(n As Long, ww As Long)
-Dim w As Long, hlp$, ja As JsonArray, jo As JsonObject
-w = ValType2()
-Select Case w
+Dim W As Long, hlp$, ja As JsonArray, jo As JsonObject
+W = ValType2()
+Select Case W
 Case 0
     ToString2 = "null"
 Case 1
@@ -788,12 +788,12 @@ Case 33
     ToString2 = Replace(PriveSpace(index).iValue, curdot$, ".")
 End Select
 End Function
-Property Get Json(Optional sp As Long = 0, Optional w As Long = -1) As String
+Property Get Json(Optional sp As Long = 0, Optional W As Long = -1) As String
     Dim hlp$, acc$, nl$
     sp = Abs(sp)
-    If sp Then nl$ = vbCrLf + space$(sp): hlp$ = space$(sp): If w = -1 Then w = sp
+    If sp Then nl$ = vbCrLf + space$(sp): hlp$ = space$(sp): If W = -1 Then W = sp
     For index = 0 To count - 1
-        acc$ = acc$ + hlp$ + nl$ + """" + StringToEscapeStr(PriveSpace(index).Key) + """" + " : " + ToString2(sp - w * (sp > 0), w)
+        acc$ = acc$ + hlp$ + nl$ + """" + StringToEscapeStr(PriveSpace(index).Key) + """" + " : " + ToString2(sp - W * (sp > 0), W)
         If index = 0 Then
             If sp Then
                 hlp$ = ","
@@ -807,7 +807,7 @@ Property Get Json(Optional sp As Long = 0, Optional w As Long = -1) As String
     If sp = 0 Then
     Json = "{" + acc$ + "}"
     Else
-    Json = "{" + acc$ + vbCrLf + space(sp - w) + "}"
+    Json = "{" + acc$ + vbCrLf + space(sp - W) + "}"
     End If
     index = -1
 End Property
@@ -847,9 +847,9 @@ Property Set item(Key As String, RHS)
     Assign Key, RHS
 End Property
 
-Property Get ItemPath(Path$, Optional sep As String = ".")
-Dim part$(), w As Long, n As Long, ma As JsonArray, mo As JsonObject
-part$ = Split2(Path$, sep)
+Property Get ItemPath(path$, Optional sep As String = ".")
+Dim part$(), W As Long, n As Long, ma As JsonArray, mo As JsonObject
+part$ = Split2(path$, sep)
 Dim m As Object
 
 n = 0
@@ -858,16 +858,16 @@ again:
 If n > UBound(part$) Then Exit Property
 If TypeOf m Is JsonArray Then
     Set ma = m
-    w = val(part$(n))
-    Select Case ma.ValType(w)
+    W = val(part$(n))
+    Select Case ma.ValType(W)
     Case 0
     Case 4, 5
-        Set m = ma(w)
+        Set m = ma(W)
         n = n + 1
         If n <= UBound(part$) Then GoTo again
         Set ItemPath = m
     Case Else
-        ItemPath = ma(w)
+        ItemPath = ma(W)
     End Select
 Else
     Set mo = m
