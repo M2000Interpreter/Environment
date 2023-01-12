@@ -130,21 +130,18 @@ End With
    End Function
 
 Public Sub CheckOrientation(a As cDIBSection, f As String)
-
-          If LCase(ExtractType(f, (0))) = "jpg" Then
-           Dim qw As New ExifRead
-             qw.Load f
- 
-            Select Case qw.Tag(Orientation)
-                  Case 3
-              RotateDib180 a
-              Case 8
-              RotateDib90 a
-              Case 6
-              RotateDib270 a
-              End Select
-                         
-                         End If
+    If LCase(ExtractType(f, (0))) = "jpg" Then
+        Dim qw As New ExifRead
+        qw.Load f
+        Select Case qw.Tag(Orientation)
+        Case 3
+          RotateDib180 a
+        Case 8
+          RotateDib90 a
+        Case 6
+          RotateDib270 a
+        End Select
+    End If
 End Sub
 Public Function RotateDib90(cDibbuffer0 As cDIBSection, Optional MEDOEV As Boolean = False)
 Dim piw As Long, pih As Long
@@ -158,7 +155,7 @@ If cDIBbuffer1.create(pih, piw) Then
 
 cDIBbuffer1.GetDpiDIB cDibbuffer0
 Dim bDib() As Byte, bDib1() As Byte
-Dim x As Long, y As Long
+Dim X As Long, y As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
 On Error Resume Next
@@ -194,23 +191,23 @@ If MEDOEV Then
     oldx = 0
     TTC = TTC - 1
     If TTC = 0 Then DoEvents: TTC = ttt
-        For x = 0 To piw - 1
-                        bDib1(myx, x) = bDib(oldx, y)
-                        bDib1(myx + 1, x) = bDib(oldx + 1, y)
-                        bDib1(myx + 2, x) = bDib(oldx + 2, y)
+        For X = 0 To piw - 1
+                        bDib1(myx, X) = bDib(oldx, y)
+                        bDib1(myx + 1, X) = bDib(oldx + 1, y)
+                        bDib1(myx + 2, X) = bDib(oldx + 2, y)
                         oldx = oldx + 3
-       Next x
+       Next X
        myx = myx + 3
     Next y
 Else
   For y = pih - 1 To 0 Step -1
     oldx = 0
-        For x = 0 To piw - 1
-                        bDib1(myx, x) = bDib(oldx, y)
-                        bDib1(myx + 1, x) = bDib(oldx + 1, y)
-                        bDib1(myx + 2, x) = bDib(oldx + 2, y)
+        For X = 0 To piw - 1
+                        bDib1(myx, X) = bDib(oldx, y)
+                        bDib1(myx + 1, X) = bDib(oldx + 1, y)
+                        bDib1(myx + 2, X) = bDib(oldx + 2, y)
                         oldx = oldx + 3
-       Next x
+       Next X
        myx = myx + 3
     Next y
     End If
@@ -236,7 +233,7 @@ If cDIBbuffer1.create(pih, piw) Then
 cDIBbuffer1.GetDpiDIB cDibbuffer0
 cDIBbuffer1.Cls
 Dim bDib() As Byte, bDib1() As Byte
-Dim x As Long, y As Long
+Dim X As Long, y As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
 On Error Resume Next
@@ -271,23 +268,23 @@ If MEDOEV Then
     oldx = piw * 3 - 3
       TTC = TTC - 1
     If TTC = 0 Then DoEvents: TTC = ttt
-        For x = 0 To piw - 1
-                        bDib1(myx, x) = bDib(oldx, y)
-                        bDib1(myx + 1, x) = bDib(oldx + 1, y)
-                        bDib1(myx + 2, x) = bDib(oldx + 2, y)
+        For X = 0 To piw - 1
+                        bDib1(myx, X) = bDib(oldx, y)
+                        bDib1(myx + 1, X) = bDib(oldx + 1, y)
+                        bDib1(myx + 2, X) = bDib(oldx + 2, y)
                         oldx = oldx - 3
-       Next x
+       Next X
        myx = myx - 3
     Next y
        Else
         For y = pih - 1 To 0 Step -1
     oldx = piw * 3 - 3
-        For x = 0 To piw - 1
-                        bDib1(myx, x) = bDib(oldx, y)
-                        bDib1(myx + 1, x) = bDib(oldx + 1, y)
-                        bDib1(myx + 2, x) = bDib(oldx + 2, y)
+        For X = 0 To piw - 1
+                        bDib1(myx, X) = bDib(oldx, y)
+                        bDib1(myx + 1, X) = bDib(oldx + 1, y)
+                        bDib1(myx + 2, X) = bDib(oldx + 2, y)
                         oldx = oldx - 3
-       Next x
+       Next X
        myx = myx - 3
     Next y
     End If
@@ -313,7 +310,7 @@ If cDibbuffer0.hDib = 0 Then Exit Function
  cDIBbuffer1.GetDpiDIB cDibbuffer0
 
 Dim bDib() As Byte, bDib1() As Byte
-Dim x As Long, y As Long
+Dim X As Long, y As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
 On Error Resume Next
@@ -350,13 +347,13 @@ If MEDOEV Then
   oldx = 0
       TTC = TTC - 1
     If TTC = 0 Then DoEvents: TTC = ttt
-        For x = 0 To piw - 1
+        For X = 0 To piw - 1
                         bDib1(myx, oldy) = bDib(oldx, y)
                         bDib1(myx + 1, oldy) = bDib(oldx + 1, y)
                         bDib1(myx + 2, oldy) = bDib(oldx + 2, y)
                         myx = myx - 3
                         oldx = oldx + 3
-       Next x
+       Next X
        oldy = oldy - 1
        myx = myx + 3
     Next y
@@ -364,13 +361,13 @@ Else
     For y = 0 To pih - 1
   myx = oldx - 3
   oldx = 0
-        For x = 0 To piw - 1
+        For X = 0 To piw - 1
                         bDib1(myx, oldy) = bDib(oldx, y)
                         bDib1(myx + 1, oldy) = bDib(oldx + 1, y)
                         bDib1(myx + 2, oldy) = bDib(oldx + 2, y)
                         myx = myx - 3
                         oldx = oldx + 3
-       Next x
+       Next X
        oldy = oldy - 1
        myx = myx + 3
     Next y

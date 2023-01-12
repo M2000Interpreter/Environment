@@ -2792,7 +2792,7 @@ If kind > 0 Then
        End If
         '' for the end
    Else
-   If kind > 4 And kind < 8 Then lastpar = 10
+   If kind > 4 And kind < 9 Then lastpar = 10
    If kind = 10 Then
         lastcol = 13
    ElseIf kind = 20 Then
@@ -2847,13 +2847,30 @@ pos2 = k - Len(a$) + 1
     If thispara1 <> thispara Then
     Exit Sub
     End If
-  addone2000 pos2, 14
-FastSymbol a$, ")"
-pos2 = k - Len(a$) + 1
+    If kind = 8 Then
+      addone2000 pos2, 10
+      FastSymbol a$, "]"
+    
+    Else
+      addone2000 pos2, 14
+      FastSymbol a$, ")"
+    End If
+    pos2 = k - Len(a$) + 1
 ElseIf IsSymbol(a$, ",") Then
 addone2000 pos2, 14
 pos2 = k - Len(a$) + 1
     GoTo again
+ElseIf MaybeIsSymbol(a$, "]") Then
+    pos2 = k - Len(a$) + 1
+    addone2000 pos2, lastcol
+    If FastSymbol(a$, "][", , 2) Then
+    GoTo checklambda
+    Else
+        pos2 = k - Len(a$) + 2
+        addone2000 pos2, 14
+        FastSymbol a$, "]"
+        pos2 = k - Len(a$) + 1
+    End If
 ElseIf MaybeIsSymbol(a$, ")") Then
     pos2 = k - Len(a$) + 1
     If kind >= 10 Then
@@ -2876,9 +2893,6 @@ GoTo again
 ElseIf MaybeIsSymbol(a$, "(", , True) Then
     addone2000 pos2, 14
     pos2 = k - Len(a$) + 1
-    'lastcol = 14
-   ' ColorizeExpressions2000 a$, k - Len(a$) + 1, pos2, feedthis
-   ' a$ = Mid$(a$, pos2)
    GoTo again
 ElseIf MaybeIsSymbol(a$, "{") Then
 addone2000 pos2, 15
@@ -2903,6 +2917,17 @@ End If
 drop$ = vbNullString
 pos2 = k - Len(a$) + 1
     GoTo again
+ElseIf MaybeIsSymbol(a$, Chr(34)) Then
+
+If Not ISSTRINGA(a$, drop$) Then
+a$ = vbNullString
+addone2000 pos2, 10
+Else
+addone2000 pos2, 15
+End If
+drop$ = vbNullString
+pos2 = k - Len(a$) + 1
+    GoTo again
 Else
 If Col((UBound(Col()) \ 2) * 2) <> 14 Then addone2000 pos2, 14
 a$ = Mid$(a$, 2)
@@ -2913,9 +2938,6 @@ If pos2 > 0 Then addone2000 pos2, 14
 
 
 End Sub
-
-
-
 Private Sub ColorizeExpressions(a$, k As Long, pos2 As Long, feedthis As Long)
 Dim drop$, pos1 As Long, kind As Long
 Dim lastcol As Long
@@ -3559,9 +3581,36 @@ a$ = NLtrim$(a$)
             If one Then
             Exit Do
             Else
-            R$ = R$ & Myleft$(a$, 1)
-            a$ = Mid$(a$, 2)
-            rr& = 1 'is an identifier or floating point variable
+                If Myleft$(R$, 1) <> "[" And c$ = "]" Then
+                    If InStr(R$, ".[") > 0 Then
+                        R$ = R$ + "]"
+                        a$ = Mid$(a$, 2)
+                    Else
+                        Exit Do
+                    End If
+                ElseIf Myleft$(R$, 1) = "[" And c$ = "]" And Mid$(a$, 2, 1) = "." Then
+                    R$ = R$ & "]"
+                    a$ = Mid$(a$, 2)
+                    Exit Do
+                ElseIf Right$(R$, 2) = "]$" And c$ = "]" Then
+                    Exit Do
+                ElseIf Right$(R$, 1) = "]" And c$ = "]" Then
+                    Exit Do
+                ElseIf c$ = "[" And Len(R$) > 0 Then
+                    R$ = R$ & "["
+                    a$ = Mid$(a$, 2)
+                    If Right$(R$, 2) <> ".[" Then
+                        If Myleft$(R$, 1) <> "[" Then
+                            rr& = 8
+                            Exit Do
+                        End If
+                    End If
+
+                Else
+                    R$ = R$ & Myleft$(a$, 1)
+                    a$ = Mid$(a$, 2)
+                End If
+                rr& = 1 'is an identifier or floating point variable
             End If
         Case 36 ' "$"
         
@@ -3632,10 +3681,36 @@ a$ = NLtrim$(a$)
             If one Then
             Exit Do
             Else
-            gr = True
-            R$ = R$ & Myleft$(a$, 1)
-            a$ = Mid$(a$, 2)
-            rr& = 1 'is an identifier or floating point variable
+                If Myleft$(R$, 1) <> "[" And c$ = "]" Then
+                    If InStr(R$, ".[") > 0 Then
+                        R$ = R$ + "]"
+                        a$ = Mid$(a$, 2)
+                    Else
+                        Exit Do
+                    End If
+                ElseIf Myleft$(R$, 1) = "[" And c$ = "]" And Mid$(a$, 2, 1) = "." Then
+                    R$ = R$ & "]"
+                    a$ = Mid$(a$, 2)
+                    Exit Do
+                ElseIf Right$(R$, 2) = "]$" And c$ = "]" Then
+                    Exit Do
+                ElseIf Right$(R$, 1) = "]" And c$ = "]" Then
+                    Exit Do
+                ElseIf c$ = "[" And Len(R$) > 0 Then
+                    R$ = R$ & "["
+                    a$ = Mid$(a$, 2)
+                    If Right$(R$, 2) <> ".[" Then
+                        If Myleft$(R$, 1) <> "[" Then
+                            rr& = 8
+                            Exit Do
+                        End If
+                    End If
+
+                Else
+                    R$ = R$ & Myleft$(a$, 1)
+                    a$ = Mid$(a$, 2)
+                End If
+                rr& = 1 'is an identifier or floating point variable
             End If
         End If
 
@@ -3645,6 +3720,7 @@ a$ = NLtrim$(a$)
    'a$ = LTrim$(a$)
 
 End Function
+
 
 Private Function IsLabelOnly(a$, R$) As Long 'ok
 
@@ -4079,7 +4155,11 @@ Do While Len(a$) > 0
         If one Then
             Exit Do
         ElseIf R$ <> "" Then
+            If c$ = "_" Then
+            R$ = " " & R$
+            Else
             R$ = R$ & Myleft$(a$, 1)
+            End If
             a$ = Mid$(a$, 2)
             If Extra& > 0 Then
                 If Myleft$(a$, 1) = "%" Then
@@ -4214,9 +4294,36 @@ checkexp:
                 End If
                 If Len(R$) > 18 Then rr& = 0
             Else
-                 R$ = R$ & Myleft$(a$, 1)
-                 a$ = Mid$(a$, 2)
-                 rr& = 1 'is an identifier or floating point variable
+                If Myleft$(R$, 1) <> "[" And c$ = "]" Then
+                    If InStr(R$, ".[") > 0 Then
+                        R$ = R$ + "]"
+                        a$ = Mid$(a$, 2)
+                    Else
+                        Exit Do
+                    End If
+                ElseIf Myleft$(R$, 1) = "[" And c$ = "]" And Mid$(a$, 2, 1) = "." Then
+                    R$ = R$ & "]"
+                    a$ = Mid$(a$, 2)
+                    Exit Do
+                ElseIf Right$(R$, 2) = "]$" And c$ = "]" Then
+                    Exit Do
+                ElseIf Right$(R$, 1) = "]" And c$ = "]" Then
+                    Exit Do
+                ElseIf c$ = "[" And Len(R$) > 0 Then
+                    R$ = R$ & "["
+                    a$ = Mid$(a$, 2)
+                    If Right$(R$, 2) <> ".[" Then
+                        If Myleft$(R$, 1) <> "[" Then
+                            rr& = 8
+                            Exit Do
+                        End If
+                    End If
+
+                Else
+                    R$ = R$ & Myleft$(a$, 1)
+                    a$ = Mid$(a$, 2)
+                End If
+                rr& = 1 'is an identifier or floating point variable
             End If
         End If
     Case 36 ' "$"
@@ -4294,9 +4401,36 @@ checkexp:
             If one Then
             Exit Do
             Else
-             R$ = R$ & Myleft$(a$, 1)
-            a$ = Mid$(a$, 2)
-            rr& = 1 'is an identifier or floating point variable
+                If Myleft$(R$, 1) <> "[" And c$ = "]" Then
+                    If InStr(R$, ".[") > 0 Then
+                        R$ = R$ + "]"
+                        a$ = Mid$(a$, 2)
+                    Else
+                        Exit Do
+                    End If
+                ElseIf Myleft$(R$, 1) = "[" And c$ = "]" And Mid$(a$, 2, 1) = "." Then
+                    R$ = R$ & "]"
+                    a$ = Mid$(a$, 2)
+                    Exit Do
+                ElseIf Right$(R$, 2) = "]$" And c$ = "]" Then
+                    Exit Do
+                ElseIf Right$(R$, 1) = "]" And c$ = "]" Then
+                    Exit Do
+                ElseIf c$ = "[" And Len(R$) > 0 Then
+                    R$ = R$ & "["
+                    a$ = Mid$(a$, 2)
+                    If Right$(R$, 2) <> ".[" Then
+                        If Myleft$(R$, 1) <> "[" Then
+                            rr& = 8
+                            Exit Do
+                        End If
+                    End If
+
+                Else
+                    R$ = R$ & Myleft$(a$, 1)
+                    a$ = Mid$(a$, 2)
+                End If
+                rr& = 1 'is an identifier or floating point variable
             End If
         End If
     Loop
@@ -4331,6 +4465,7 @@ checkexp:
         End If
     End If
 End Function
+
 
 
 Private Function MaybeIsSymbol(a$, c$, Optional tail$ = vbNullString, Optional Remove As Boolean = False) As Boolean
@@ -4694,6 +4829,12 @@ If kind > 0 Then
   End If
   pos2 = k - Len(a$) + 1
   If kind > 3 Then
+  If kind = 8 Then
+  lastcol = 10
+  If Myleft$(a$, 1) = "]" Then
+  GoTo checkthistoo
+  End If
+  End If
 CheckThis:
   pos1 = 1
  drop$ = aheadstatus2000(a$, False, pos1)
@@ -4732,7 +4873,18 @@ If feedthis = 15 Then GoTo use15
 
 Exit Sub
 End If
-If kind > 4 And onetime Then
+If kind = 8 And Myleft$(a$, 1) = "]" Then '****************************fix this
+pos2 = k - Len(a$) + 1
+addone2000 pos2, 10
+a$ = Mid$(a$, 2)
+pos2 = pos2 + 1 'k - Len(a$) + 1
+If Myleft$(a$, 1) = "[" Then
+a$ = Mid$(a$, 2)
+pos2 = k - Len(a$) + 1
+GoTo CheckThis
+End If
+onetime = False
+ElseIf kind > 4 And onetime Then
 If FastSymbol(a$, ",") Then
   addone2000 pos2, 14
     pos2 = k - Len(a$) + 1
@@ -5060,6 +5212,8 @@ End If
 
 'End If
 GoTo again
+ElseIf FastSymbol(a$, "//", , 2) Then
+GoTo here1
 ElseIf MaybeIsSymbol(a$, "\", , True) Then
 
 If lastkind = 1 Then
@@ -5201,6 +5355,7 @@ If Col(1) = 0 Then
 makebase 0
 End If
 End Sub
+
 
 
 Private Sub mDoc_ColorDataEvent1(thispara As Long, data1 As String, feedback As Long)
@@ -7391,21 +7546,32 @@ Do While Pos <= Len(a$)
    
         Pos = Pos + 1
         Loop
-    ElseIf W$ = "(" Then
+    ElseIf W$ = "(" Or W$ = "[" Then
         If part$ <> "" Then
             ' after
             ElseIf Right$(b$, 1) = "a" Then
-            b$ = Myleft$(b$, Len(b$) - 1)
+            b$ = Myleft(b$, Len(b$) - 1)
             part$ = vbNullString
             Else
             part$ = "N"
               
         End If
       Pos = Pos + 1
-        If Not BlockParam2(a$, Pos) Then Exit Do
+        If W$ = "(" Then
+            If Not BlockParam2(a$, Pos, 1, 0) Then Exit Do
+            If Mid$(a$, Pos + 1, 1) <> "." Then b$ = b$ + part$
+            part$ = vbNullString
+        Else
+            If Not BlockParam2(a$, Pos, 0, 1) Then Exit Do
+            If Len(word$) = 0 Then
+            
+            word$ = Mid$(a$, 1, Pos)
+            b$ = b$ + part$
+            part$ = "N"
+            End If
+        End If
+       
         
-       If Mid$(a$, Pos + 1, 1) <> "." Then b$ = b$ & part$
-        part$ = vbNullString
         
     ElseIf W$ = "{" Then
 If word$ <> "" Then
@@ -7619,19 +7785,18 @@ there1:
                 Exit Do
                 End If
         
-        Case ")", "}", Is < " ", ":", ";", "'", "\"
-        Exit Do
+        Case ")", "}", Is < " ", ":", ";", "'", "\", "/", "]"
+            Exit Do
         Case Else
-        If part$ = "N" Then
-        word$ = word$ + W$
-        ElseIf part$ = "S" Then
-       
-        Else
-        
-     b$ = b$ & part$
-     part$ = "N"
-     word$ = word$ + W$
+            If part$ = "N" Then
+                word$ = word$ + W$
+            ElseIf part$ = "S" Then
+            Else
+                b$ = b$ & part$
+                part$ = "N"
+                word$ = word$ + W$
             End If
+           
         End Select
         End If
         
@@ -7672,6 +7837,7 @@ End If
 
 
 End Function
+
 
 Private Function aheadstatus(a$, Optional srink As Boolean = True, Optional Pos As Long = 1) As String 'ok
 Dim b$, part$, W$, pos2 As Long, word$
@@ -9360,6 +9526,44 @@ End Property
 Public Property Let BracketsForArrays(ByVal RHS As Boolean)
 Brackets = RHS
 End Property
+Function BlockParam2(s$, Pos As Long, j As Long, j1 As Long) As Boolean
+' need to be open
+Dim i As Long, ii As Long, exit1 As Boolean
+exit1 = j <> 0
+For i = Pos To Len(s$)
+Select Case AscW(Mid$(s$, i, 1))
+Case 0
+Exit For
+Case 34
+again:
+ii = InStr(i + 1, s$, """")
+If ii = 0 Then Exit Function
+ i = ii
+If Mid$(s$, ii - 1, 1) = "`" Then GoTo again
+Case 91
+j1 = j1 + 1
+Case 93
+j1 = j1 - 1
+If Not exit1 Then If j1 = 0 Then Exit For
+If j1 < 0 Then Exit For
+Case 40
+j = j + 1
+Case 41
+j = j - 1
+If exit1 Then If j = 0 Then Exit For
+If j < 0 Then Exit For
+Case 123
+i = i + 1
+If blockStringPOS(s$, i) Then
+Else
+i = 0
+End If
+If i = 0 Then Exit Function
+End Select
+Next i
+If j = 0 And j1 = 0 Then Pos = i: BlockParam2 = True
+End Function
+
 Function BlockParam4(s$, Pos As Long, what As Long) As Boolean
 ' need to be open
 Dim i As Long, j As Long, ii As Long

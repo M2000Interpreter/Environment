@@ -3266,11 +3266,11 @@ Case "UP", "UPDATABLE", "UPDATE", "USE", "USER", "USERS", "USER.NAME$", "USGN("
 Case "VAL(", "VAL$(", "VALID(", "VALUE", "VALUE(", "VALUE$", "VARIANT", "VERSION", "VIEW", "VOID", "VOLUME"
 Case "WAIT", "WCHAR", "WEAK", "WEAK$(", "WHILE", "WHEN", "WIDE", "WIDTH", "WIN", "WINDOW"
 Case "WITH", "WITHEVENTS", "WORDS", "WRITABLE(", "WRITE", "WRITER", "X.TWIPS", "XOR", "Y.TWIPS", "адеиас", "аниысг", "апеияо", "апой.ая$(", "апой.де$("
-Case "адеиасе", "ахя(", "ай(", "айеяаио.дуадийо(", "айеяаио", "айеяаиос", "акт", "акгхес", "акгхгс", "аккацг", "аккацг$("
+Case "адеиасе", "ахя(", "ай(", "айеяаио.дуадийо(", "айеяаиос", "акт", "акгхес", "акгхгс", "аккацг", "аккацг$("
 Case "аккане", "аккиыс", "аккиыс.ам", "ам", "ам(", "амап(", "амап$(", "ам$(", "амт(", "ама", "амафгтгсг", "амахеыягсг", "амайтгсг", "амакоцио"
 Case "амакоцио$", "амакусг.охомгс", "амакусг.у", "амакусг.ь", "амакусг.в", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье"
 Case "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "амтийеилемо(", "амы", "аниа", "аниа(", "аниа$", "аниа(", "апая", "апаяихлгсг", "апедысе"
-Case "апко", "апкос", "апо", "апохгйеусг.ыс", "апой$(", "апойопг", "апойкеистийа", "апок(", "аяца", "аяихло", "аяихлос", "аяихлос.паяацяажоу("
+Case "апкос", "апо", "апохгйеусг.ыс", "апой$(", "апойопг", "апойкеистийа", "апок(", "аяца", "аяихлос", "аяихлос.паяацяажоу("
 Case "аяис$(", "аяистеяолеяос$(", "аявеиа", "аявеио", "аявеио$(", "аявеиоу.лгйос(", "аявеиоу.сталпа(", "аявг", "атупос", "аукос"
 Case "аукос$(", "аукоу", "ауноуса", "ауто", "ажаияесг", "ажгсе", "баке", "баке.адеиа$(", "басг"
 Case "басг(", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг", "бгла", "богхеиа", "цецомос", "цецомота", "целисе", "целисла"
@@ -3279,7 +3279,7 @@ Case "цяажг$(", "цяаье", "цягцояа", "цымиа", "дапед(", "деийтг.лояжг", "деийтгс"
 Case "деийтгса.ь", "деийтгса.у", "деийтгса.в", "деине", "дей(", "дейаен", "дейаен$(", "дем", "демевеи(", "дениос", "дени$(", "денилеяос$(", "дес", "дглосио"
 Case "диа", "диабасе", "диацяажг", "диадийтуо", "диадийтуо$", "диадовийо", "диайопг", "диайоптес", "диалесоу", "диаяхяысг", "диаяхяысг(", "диаяйеиа", "диастасг("
 Case "диастиво", "диажамеиа", "диажамеиа$", "диажамо", "диажуцг", "диайопг", "диейоье", "диеухумсгапо", "дийтуо$", "диояхысе"
-Case "дипка", "дипко", "дипкос", "дойилг", "дойилг(", "долг", "дяолеас", "дуадийг.пеяистяожг(", "дуадийо", "дуадийо(", "дуадийо.айеяаио("
+Case "дипка", "дипкос", "дойилг", "дойилг(", "долг", "дяолеас", "дуадийг.пеяистяожг(", "дуадийо", "дуадийо(", "дуадийо.айеяаио("
 Case "дуадийо.амти(", "дуадийо.амтистяожо(", "дуадийо.апо(", "дуадийо.г(", "дуадийо.йаи(", "дуадийо.окисхгсг(", "дуадийо.ови(", "дуадийо.пяосхесг(", "дуадийо.пяо(", "дуолиса(", "дысе"
 Case "еццяажес(", "еццяажо", "еццяажоу.кенеис(", "еццяажоу.лгйос(", "еццяажоу.ломадийес.кенеис(", "еццяажоу.пая(", "еццяаьило(", "ецйуяо(", "еий$("
 Case "еийома", "еийома(", "еийома.ь(", "еийома.ь.сглеиа(", "еийома.у(", "еийома.у.сглеиа(", "еийома.в(", "еийома.в.сглеиа(", "еийомес", "еийомидио", "еимая", "еимаи", "еимця"
@@ -3298,7 +3298,7 @@ Case "йимгсг.пв", "йимгсг.у", "йимгсг.уп", "йимгсг.ь", "йимгсг.ьп", "йимгсг.в", 
 Case "йкилан.в", "йол$", "йоимос", "йоимои", "йомсока", "йяата", "йяатгсе", "йяужо$(", "йяуье", "йуйкийа", "йуйкос"
 Case "йукисг", "йуяио", "йуяио.еяцо", "йыд(", "йыдийа", "йыдийосекида", "кабг", "кабг(", "кабг.амакоцийо.у(", "кабг.амакоцийо.ь("
 Case "кабг.амакоцийо.в(", "кабг.йатеухумсг(", "кахос", "кахос$", "кахос.таимиас$", "калда", "калда(", "калда$", "калда$(", "катимийа", "кенеис", "киста", "коц("
-Case "коцийо", "коцийос", "коцистийос", "коцос", "коцос$(", "кс$", "кж(", "лайяус", "ле", "лец(", "лец$(", "лецако("
+Case "коцийос", "коцистийос", "коцос", "коцос$(", "кс$", "кж(", "лайяус", "ле", "лец(", "лец$(", "лецако("
 Case "лецако.сеияас$(", "лецако.сеияас(", "лецецомота", "лецехос", "лецехос.сыяоу", "лецехос.у(", "лецехос.в(", "леходос", "лекос$(", "лекоус.тупос$("
 Case "лекыдиа", "леяос", "леяос(", "леяос$(", "лес$(", "лета", "летахесг", "летахесг(", "левяи", "лгдемийос", "лгйос", "лгйос(", "лгйос.елж("
 Case "лий(", "лий$(", "лийяо(", "лийяо.сеияас$(", "лийяо.сеияас(", "лийяос.йатакоцос$(", "лмглг", "ломадиаио", "ломадиаиос", "ломадийо", "лояжг$(", "лоусийг", "лоусийг.летягтгс", "лпип"
@@ -4154,244 +4154,6 @@ i1233:
 
 
 End Function
-Public Function IsLabelDotSub(where$, a$, rrr$, R$, Lang As Long, Optional p1 As Integer = 0) As Long
-' for left side...no &
-
-Dim rr&, one As Boolean, c$, firstdot$, gr As Boolean
-rrr$ = vbNullString
-R$ = vbNullString
-Dim i&, l As Long, p3 As Integer
-Dim p2 As Long, p4 As Long  '', excludesp As Long
-  l = Len(a$): If l = 0 Then IsLabelDotSub = 0: Lang = 1: Exit Function
-p2 = StrPtr(a$): l = l - 1
-  p4 = p2 + l * 2
-  For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
-    Case 13
-    If i < p4 Then
-    GetMem2 i + 2, p3
-    If p3 = 10 Then
-    IsLabelDotSub = 1234
-    If i + 6 > p4 Then
-    a$ = vbNullString
-    Else
-    i = i + 4
-    Do While i < p4
-
-    GetMem2 i, p1
-    If p1 = 32 Or p1 = 160 Or p1 = 9 Then
-    i = i + 2
-    Else
-    GetMem2 i + 2, p3
-    If p1 <> 13 And p3 <> 10 Then Exit Do
-    i = i + 4
-    End If
-    Loop
-    a$ = Mid$(a$, (i + 2 - p2) \ 2)
-    End If
-    Else
-    If i > p2 Then a$ = Mid$(a$, (i - 2 - p2) \ 2)
-    End If
-    Else
-    If i > p2 Then a$ = Mid$(a$, (i - 2 - p2) \ 2)
-    End If
-    
-    Lang = 1
-    Exit Function
-    Case 0 To 7, 32, 160, 9
-    Case 8
-    IsLabelDotSub = 8: Exit Function
-   ' End If
-    Case Else
-     ''excludesp = (i - p2) \ 2
-   Exit For
-  End Select
-  Next i
-  
-  If i > p4 Then a$ = vbNullString: IsLabelDotSub = 0: Exit Function
-  
-  For i = i To p4 Step 2
-  
-  GetMem2 i, p1
- If p1 < 256 Then
-  Select Case p1
-     Case 0 To 6
-    
-     ' no chars
-     Case 7
-                If i + 2 <= p4 Then
-                GetMem2 i + 2, p1
-                Select Case p1
-                Case 61, 40
-                If Len(R$) > 1 Then R$ = Left$(R$, Len(R$) - 1)
-
-                End Select
-                End If
-     Case 64  '"@"
-            If i < p4 And R$ <> "" Then
-            GetMem2 i + 2, p1
-            If ChrW(p1) <> "(" Then
-              where$ = myUcase(R$, gr)
-            R$ = vbNullString
-            rrr$ = vbNullString
-            Else
-              IsLabelDotSub = 0: a$ = firstdot$ + Mid$(a$, (i - p2) \ 2): Exit Function
-            End If
-            Else
-            If LenB(R$) = 0 And i < p4 Then
-            R$ = R$ + "@"
-
-            Else
-              IsLabelDotSub = 0: a$ = vbNullString: Exit Function
-              End If
-            End If
-    Case 63 '"?"
-        If R$ = vbNullString And firstdot$ = vbNullString Then
-        rrr$ = "?"
-        R$ = rrr$
-        i = i + 4
-        a$ = Mid$(a$, (i - p2) \ 2)
-        IsLabelDotSub = 1
-        
-        Lang = -1
-      
-        Exit Function
-    
-        ElseIf firstdot$ = vbNullString Then
-        IsLabelDotSub = 1
-        Lang = 1 + CLng(gr)
-        If Lang = 1 Then
-        rrr$ = UCase(R$)
-        Else
-        rrr$ = myUcase(R$)
-        End If
-    
-        a$ = Mid$(a$, (i + 2 - p2) \ 2)
-        Exit Function
-        Else
-        IsLabelDotSub = 0
-        a$ = Mid$(a$, (i + 2 - p2) \ 2)
-        Exit Function
-        End If
-    Case 46 '"."
-            If one Then
-            Exit For
-            ElseIf R$ <> "" And i < p4 Then
-            GetMem2 i + 2, p1
-            If ChrW(p1) = "." Or ChrW(p1) = " " Then
-            If ChrW(p1) = "." And i + 2 < p4 Then
-            
-                GetMem2 i + 4, p1
-                If ChrW(p1) = " " Then i = i + 4: Exit For
-            Else
-                i = i + 2
-               Exit For
-            End If
-            End If
-            GetMem2 i, p1
-            R$ = R$ & ChrW(p1)
-            rr& = 1
-            Else
-            firstdot$ = firstdot$ + "."
-            End If
-        Case 92, 94, 123 To 126, 160 '"\","^", "{" To "~"
-            Exit For
-        Case 48 To 57, 95 '"0" To "9", "_"
-           If one Then
-
-            Exit For
-            ElseIf R$ <> "" Then
-            R$ = R$ & ChrW(p1)
-            rr& = 1 'is an identifier or floating point variable
-            Else
-            Exit For
-            End If
-        Case Is < 0, Is > 64 ' >=A and negative
-            If one Then
-            Exit For
-            Else
-            R$ = R$ & ChrW(p1)
-            rr& = 1 'is an identifier or floating point variable
-            End If
-        Case 36 ' "$"
-            If one Then Exit For
-            If R$ <> "" Then
-            one = True
-            rr& = 3 ' is string variable
-            R$ = R$ & ChrW(p1)
-            Else
-            Exit For
-            End If
-        Case 37 ' "%"
-            If one Then Exit For
-            If R$ <> "" Then
-            one = True
-            rr& = 4 ' is long variable
-            R$ = R$ & ChrW(p1)
-            Else
-            Exit For
-            End If
-    Case 40 '"("
-            If R$ <> "" Then
-            If i + 4 <= p4 Then
-                GetMem2 i + 2, p1
-                GetMem2 i + 2, p3
-                If ChrW(p1) + ChrW(p3) = ")@" Then
-                    R$ = R$ & "()."
-                    i = i + 4
-                Else
-                    GoTo i123
-                End If
-                            Else
-i123:
-                                       Select Case rr&
-                                       Case 1
-                                       rr& = 5 ' float array or function
-                                       Case 3
-                                       rr& = 6 'string array or function
-                                       Case 4
-                                       rr& = 7 ' long array
-                                       Case Else
-                                       Exit For
-                                       End Select
-                     GetMem2 i, p1
-                                        
-                                        R$ = R$ & ChrW(p1)
-                                    
-                                        i = i + 2
-                                   Exit For
-                            
-                          End If
-               Else
-                        Exit For
-            
-            End If
-        Case Else
-        Exit For
-  End Select
-  Else
-    If one Then
-              Exit For
-              Else
-              gr = True
-              R$ = R$ & ChrW(p1)
-              rr& = 1 'is an identifier or floating point variable
-              End If
-    End If
-  Next i
-  If i > p4 Then
-  a$ = vbNullString: p1 = 0
-  Else
-  If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
-  End If
-       rrr$ = firstdot$ + myUcase(R$, gr)
-       Lang = 1 + CLng(gr)
-    IsLabelDotSub = rr&
-   'a$ = LTrim$(a$)
-
-End Function
-
 Public Function NLtrim$(a$)
 If Len(a$) > 0 Then NLtrim$ = Mid$(a$, MyTrimL(a$))
 End Function

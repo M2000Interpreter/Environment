@@ -573,7 +573,11 @@ Next there
 
 NewLine = there + 1
 there = Code(there).codepos - Code(fromhere).codepos + 1
+If Code(fromhere).codepos > 0 Then
 codeline = Mid$(mycode$, Code(fromhere).codepos, there)
+Else
+codeline = vbNullString
+End If
 fromhere = NewLine
 
 End Function
@@ -989,7 +993,7 @@ Case 24, 19, 18, 17, 14, 9, 8, 5
     varcost(LastVar) = CVar(v)
     End If
 Case 13
-Stop
+'Stop
 ' HTML COLOR
 
 GetHandler

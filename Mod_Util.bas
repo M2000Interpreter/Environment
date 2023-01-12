@@ -1,6 +1,8 @@
 Attribute VB_Name = "Module2"
 Option Explicit
 Const CSIDL_TEMPLATES = &H15&
+Global Const OpSq = "«"
+Global Const ClSq = "»"
 Const MAX_PATH = 260
 Public Errorlog As New Document
 Private Const mProp = "PropReference"
@@ -876,7 +878,7 @@ If i > 0 Then
     i = rinstr(v$, ".")
     MyErMacro a$, "Unknown Variable " + Mid$(v$, i), "’γνωστη μεταβλητή " + Mid$(v$, i)
 Else
-    i = rinstr(v$, "].")
+    i = rinstr(v$, "».")
     If i > 0 Then
         MyErMacro a$, "Unknown Variable " + Mid$(v$, i + 2), "’γνωστη μεταβλητή " + Mid$(v$, i + 2)
     Else
@@ -3147,8 +3149,8 @@ SetTextBasketBack dq, mybasket, True
                                                 End If
 '''sleepwait 1
                                     Wend
-                                                                        BLOCKkey = False
-                                                                        End If
+                        BLOCKkey = False
+                        End If
                  Exit Do
         End If
         Select Case Len(cc$)
@@ -7534,7 +7536,7 @@ If i > 0 Then
     i = rinstr(v$, ".")
     MyEr "Unknown Variable " + Mid$(v$, i), "’γνωστη μεταβλητή " + Mid$(v$, i)
 Else
-    i = rinstr(v$, "].")
+    i = rinstr(v$, "».")
     If i > 0 Then
         MyEr "Unknown Variable " + Mid$(v$, i + 2), "’γνωστη μεταβλητή " + Mid$(v$, i + 2)
     Else
@@ -12359,12 +12361,17 @@ Else
 End If
 Case "REV", "ΑΝΑΠ"
 Set pppp1 = New mArray
+If pppp1.MyTypeToBe <> vbVariant Then
+    pppp.CopyArrayRevFast pppp1
+Else
 If original > 0 Then
     pppp.CopyArrayRevFast pppp1
 Else
     pppp.CopyArrayRev pppp1
 End If
+End If
 original = original + 1
+
 Set pppp = pppp1
 Set pppp1 = Nothing
 res = 0
@@ -13903,7 +13910,7 @@ Dim pp As Variant, par As Boolean, r2 As Variant, R3 As Variant, R4 As Variant
 End Function
 Function IsTimeVal(bstack As basetask, a$, R As Variant) As Boolean
 Dim s$
-    If IsStrExp(bstack, a$, s$) Then
+    If IsStrExp(bstack, a$, s$, False) Then
     On Error Resume Next
     If UCase(s$) = "UTC" Then
     R = CDbl(GetUTCTime)
@@ -13934,7 +13941,7 @@ IsTimeVal = FastSymbol(a$, ")", True)
 End Function
 Function IsDataVal(bstack As basetask, a$, R As Variant) As Boolean
  Dim s$, p
-    If IsStrExp(bstack, a$, s$) Then
+    If IsStrExp(bstack, a$, s$, False) Then
     If FastSymbol(a$, ",") Then
     If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
         p = Clid
@@ -16065,7 +16072,7 @@ j5884:
     End If
     MissParam a$
     Set bstack.lastobj = Nothing
-ElseIf IsStrExp(bstack, a$, s$) Then
+ElseIf IsStrExp(bstack, a$, s$, False) Then
 j58885:
     s$ = CFname(s$)
     If s$ <> "" Then
@@ -17441,7 +17448,7 @@ With players(prive)
     Do While pn& < varhash.count
         varhash.ReadVar pn&, s$, H&
         If SecureNames Then
-            a() = Split(s$, "].")
+            a() = Split(s$, "».")
             If UBound(a()) = 1 Then
                 a(0) = GetName(a(0))
                 s$ = Join(a(), ".")
@@ -17668,6 +17675,27 @@ With players(prive)
                             End If
                         End Select
                         Set usehandler = Nothing
+                    ElseIf TypeOf var(H&) Is refArray Then
+                    Dim ra As refArray
+                    Set ra = var(H&)
+                    If ra.MarkTwoDimension Then
+                        If ra.vtType(0) = 20 Then
+                        s$ = s$ & "[" & ra.count() & "][" & ra.count(0) & "]*Long long()"
+                        ElseIf ra.vtType(0) = 12 Then
+                        s$ = s$ & "[" & ra.count() & "][" & ra.count(0) & "]*Variant()"
+                        Else
+                        s$ = s$ & "[" & ra.count() & "][" & ra.count(0) & "]*" & Typename(ra(0, 0)) + "()"
+                        End If
+
+                    Else
+                        If ra.vtType(0) = 20 Then
+                            s$ = s$ & "[" & ra.count(0) & "]*Long long()"
+                        ElseIf ra.vtType(0) = vbVariant Then
+                            s$ = s$ & "[" & ra.count(0) & "]*Variant()"
+                        Else
+                            s$ = s$ & "[" & ra.count(0) & "]*" & Typename(ra(0, 0)) + "()"
+                        End If
+                    End If
                     Else
                         If TypeOf var(H&) Is Constant Then
                             On Error Resume Next
@@ -21973,7 +22001,7 @@ End Function
 Function FixName(s$) As String
 Dim a() As String
 If SecureNames Then
-a() = Split(s$, "].")
+a() = Split(s$, "».")
 If UBound(a()) = 1 Then
 a(0) = GetName(a(0))
 FixName = Join(a(), ".")
@@ -25180,17 +25208,21 @@ End If
 End If
 End Function
 Function MyAnyType(basestack As basetask, rest$, Lang As Long, Optional alocal As Boolean, Optional thattype As Integer = vbLong, Optional SameIfExist As Boolean = False) As Boolean
-    Dim s$, what$, i As Long, p As Variant, lnglng As Boolean
+    Dim s$, what$, i As Long, p As Variant, p1 As Variant, lnglng As Boolean, j As Long
     MyAnyType = True
     If thattype = vbLong Then lnglng = IsLabelSymbolNew(rest$, "ΜΑΚΡΥΣ", "LONG", Lang)
     If lnglng Then thattype = 20
-    Do While CheckTwoVal(Abs(IsLabel(basestack, rest$, what$)), 1, 4)
+    j = Abs(IsLabel(basestack, rest$, what$))
+    
+    
+    Do While j <> 0
+        If Not (j = 1 Or j = 4 Or j = 8) Then MyEr "wrong variable type name " + what$, "λάθος τύπος ονόματος μεταβλητής " + what$: MyAnyType = False: Exit Function
+        If thattype = vbVariant And (j <> 1 And j <> 8) Then MyEr "variants can't be used with % or $ at the end", "Οι άτυποι δεν μπορούν να έχουν % ή $ στο όνομά τους": MyAnyType = False: Exit Function
+        
         If basestack.priveflag Then what$ = ChrW(&HFFBF) + what$
         If Not FastSymbol(rest$, "<") Then  ' get local var first
-            If alocal And Not SameIfExist Then
-                i = globalvar(basestack.GroupName + what$, s$, UseType:=thattype <> vbVariant) ' MAKE ONE  '
-                GoTo makeitnow1
-            ElseIf SameIfExist Then
+
+            If SameIfExist Then
             
                 If GetlocalVar(basestack.GroupName + what$, i) Then
                     p = var(i)
@@ -25199,11 +25231,12 @@ Function MyAnyType(basestack As basetask, rest$, Lang As Long, Optional alocal A
                     p = var(i)
                     GoTo there01
                 Else
-                    i = globalvar(basestack.GroupName + what$, s$, UseType:=thattype <> vbVariant)      ' MAKE ONE  '
+                    i = globalvar(basestack.GroupName + what$, Empty, UseType:=thattype <> vbVariant)      ' MAKE ONE  '
                     GoTo makeitnow1
                 End If
             Else
-                Stop
+                    i = globalvar(basestack.GroupName + what$, Empty, makeitglobal:=Not alocal, UseType:=thattype <> vbVariant)       ' MAKE ONE  '
+                    GoTo makeitnow1
             End If
         ElseIf GetVar(basestack, basestack.GroupName + what$, i) Then
             
@@ -25250,9 +25283,39 @@ there01:
             End If
             GoTo there12
         Else
-            i = globalvar(basestack.GroupName + what$, s$, UseType:=thattype <> vbVariant) ' MAKE ONE
+            i = globalvar(basestack.GroupName + what$, Empty, UseType:=thattype <> vbVariant) ' MAKE ONE
             If i <> 0 Then
 makeitnow1:
+                If j = 8 Then
+                Dim ra As refArray
+                Set ra = New refArray
+                
+                If Not IsExp(basestack, rest$, p, flatobject:=True, nostring:=thattype <> vbString) Then
+                    MyAnyType = False: MissNumExpr: Exit Function
+                End If
+                p = Abs(Int(p))
+                If Not FastSymbol1(rest$, "]") Then
+                        MyAnyType = False: SyntaxError: Exit Function
+                End If
+                If FastSymbol1(rest$, "[") Then
+                    If Not IsExp(basestack, rest$, p1, flatobject:=True, nostring:=thattype <> vbString) Then
+                        MyAnyType = False: MissNumExpr: Exit Function
+                    End If
+                    p1 = Abs(Int(p1))
+                    If Not FastSymbol1(rest$, "]") Then
+                        MyAnyType = False: SyntaxError: Exit Function
+                    End If
+                    For p = p To 0 Step -1
+                        ra.DefArrayAt p, thattype, CLng(p1)
+                    Next p
+                    ra.MarkTwoDimension = True
+                Else
+                    ra.DefArrayAt 0, thattype, CLng(p)
+                    ra.MarkTwoDimension = False
+                End If
+                    Set var(i) = ra
+                    GoTo contnext
+                Else
                 Select Case thattype
                 Case vbInteger
                     var(i) = CInt(p)
@@ -25281,6 +25344,7 @@ makeitnow1:
                     MyAnyType = False
                     Exit Function
                 End If
+                End If
 there12:
                 If FastSymbol(rest$, "=") Then
                     If IsExp(basestack, rest$, p) Then
@@ -25301,12 +25365,16 @@ there12:
                         Case vbLong
                             var(i) = CLng(p)
                         Case vbDecimal
+                            If j = 4 Then p = Round(p)
                             var(i) = CDec(p)
                         Case vbCurrency
+                            If j = 4 Then p = Round(p)
                             var(i) = CCur(p)
                         Case vbSingle
+                            If j = 4 Then p = Round(p)
                             var(i) = CSng(p)
                         Case vbDouble
+                            If j = 4 Then p = Round(p)
                             var(i) = CDbl(p)
                         Case vbBoolean
                             var(i) = CBool(p)
@@ -25314,8 +25382,11 @@ there12:
                             var(i) = CStr(p)
                         End Select
                     Else
+                        If j = 4 Then p = Round(p)
+                        
                         var(i) = p
                     End If
+                    
                 Set basestack.lastobj = Nothing
                 Set basestack.lastpointer = Nothing
                     If Err > 0 Then
@@ -25353,8 +25424,10 @@ there12:
                 End If
             End If
         End If
+contnext:
         If Not FastSymbol(rest$, ",") Then Exit Do
         DropCommentOrLine rest$
+        j = Abs(IsLabel(basestack, rest$, what$))
     Loop
 End Function
 
@@ -26777,7 +26850,7 @@ End If
  Else
  
  End If
-If IsStrExp(bstack, a$, s$) Then
+If IsStrExp(bstack, a$, s$, False) Then
     s$ = s$ + "("
     If neoGetArray(bstack, s$, pppp) Then
     
@@ -27263,14 +27336,14 @@ If Len(R$) = 0 Then Exit Function
            R$ = GetName(Left$(here$, Len(here$) - Len(R$)))
            R$ = Left$(R$, Len(R$) - 1)
         Else
-            R$ = sbf(val(Mid$(here$, rinstr(here$, "[") + 1))).sbgroup
+            R$ = sbf(val(Mid$(here$, rinstr(here$, "«") + 1))).sbgroup
             If Len(R$) > 0 Then
                 R$ = Mid$(R$, rinstr(R$, ".", 2) + 1)
                 R$ = Left$(R$, Len(R$) - 1)
             End If
         End If
     End If
-    If InStr(R$, "[") > 0 Then R$ = GetName(R$)
+    If InStr(R$, "«") > 0 Then R$ = GetName(R$)
     If InStr(R$, ").") Then R$ = Mid$(R$, InStr(R$, ").") + 2)
 End Function
 Public Function IsPoint(bstack As basetask, a$, R As Variant) As Boolean
@@ -27830,7 +27903,7 @@ If basestack.priveflag Then what$ = ChrW(&HFFBF) + what$
                         If Not MyIsObject(var(i)) Then MakeitObjectInventory var(i)
                     Else
 makeitnow:
-                        i = globalvar(basestack.GroupName + what$, s$, glob)
+                        i = globalvar(basestack.GroupName + what$, Empty, glob)
                         MakeitObjectInventory var(i)
                         Set usehandler = var(i)
                         usehandler.objref.UcaseKeys = True
@@ -31613,49 +31686,50 @@ Case "GLOBAL", "ΓΕΝΙΚΟ", "ΓΕΝΙΚΗ", "ΓΕΝΙΚΕΣ"
 MyEr "No global variables in groups, create global group", "Όχι γενικές μεταβλητές σε ομάδα - φτιάξε γενική ομάδα"
 ExecuteGroupStruct = 0
 Exit Function
+
 Case "INTEGER", "ΑΚΕΡΑΙΟΣ"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbInteger))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbInteger, Not (alocal Or glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "DOUBLE", "ΔΙΠΛΟΣ"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbDouble))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbDouble, Not (alocal Or glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "SINGLE", "ΑΠΛΟΣ"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbSingle))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbSingle, Not (alocal Or glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "BOOLEAN", "ΛΟΓΙΚΟΣ"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbBoolean))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbBoolean, Not (alocal Or glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "DECIMAL", "ΑΡΙΘΜΟΣ"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbDecimal))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbDecimal, Not (alocal Or glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "CURRENCY", "ΛΟΓΙΣΤΙΚΟΣ"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbCurrency))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbCurrency, Not (alocal Or glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "LONG", "ΜΑΚΡΥΣ"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbLong))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbLong, Not (alocal Or glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "STRING", "ΓΡΑΜΜΑ"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbString))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbString, Not (alocal Or glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "VARIANT", "ΑΤΥΠΟΣ"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbVariant))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbVariant, Not (alocal Or glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "ΚΑΤΑΣΤΑΣΗ", "INVENTORY"
@@ -32492,7 +32566,7 @@ i = -1
 Do
     i = i + 1
     If Len(aheadstatus(a$, False, i)) Then many = many + 1 Else Exit Do
-    Debug.Print Mid$(a$, i, 30)
+   ' Debug.Print Mid$(a$, i, 30)
     Select Case Mid$(a$, i, 1)
     Case ")"
         Exit Do

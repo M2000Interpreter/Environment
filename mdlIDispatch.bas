@@ -177,6 +177,7 @@ passhere:
                     
                 ElseIf TypeOf pArgs(lngLoop) Is MemBlock Then
                     varArr(fixnamearg + items - 1 - lngLoop) = pArgs(lngLoop).ExportToByte
+                    ' fix this 8200 for all array types....
                 ElseIf VarType(pArgs(lngLoop)) = 8200 Then
                     varArr(fixnamearg + items - 1 - lngLoop) = pArgs(lngLoop)
                 Else

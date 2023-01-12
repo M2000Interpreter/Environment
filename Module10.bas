@@ -306,7 +306,7 @@ End If
 End Function
 ' internal use  You have to close file first
 Public Sub CloseHandler(RHS)
-Dim H&, ar() As Variant
+Dim H&, aR() As Variant
 On Error Resume Next
 If InUseHandlers.ExistKey(RHS) Then
     H& = CLng(InUseHandlers.sValue)
@@ -1177,7 +1177,7 @@ there182741:
                             Exit Function
                         Else
                             
-                            Stop
+                            '' find it
                             
                         End If
                         
@@ -3236,11 +3236,11 @@ contstrhere:
     ElseIf bs.IsObjectRef(myobject) Then
         If Typename$(myobject) = "lambda" Then
             If flag2 Then
-               i = globalvar(what$, s$)
+               i = globalvar(what$, Empty)
             ElseIf GetVar3(bstack, what$, i, , , flag) Then
                 CheckVar var(i), s$
             Else
-                i = globalvar(what$, s$)
+                i = globalvar(what$, Empty)
             End If
             Set var(i) = myobject
             If ohere$ = vbNullString Then

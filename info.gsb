@@ -147,6 +147,7 @@ while mouse=0 and inkey$=""
 End While
 Escape On
 cls 
+if module(infobasic) then infobasic
 }
 MODULE B {\\ m is an auto array (a tuple)
 \\ z is an iterator of m
@@ -14337,7 +14338,9 @@ Module Checkit {
 }
 checkit
 }
-MODULE MULSH {Module CheckIt {
+MODULE MULSH {Print "A variant array who have variant type arrays"
+Print "Using a for loop checking size of arrays in main array"
+Module CheckIt {
       Dim Base 1, A(12)
       Mult=lambda (n)-> {
             Flush  ' empty stack
@@ -14363,7 +14366,8 @@ MODULE MULSH {Module CheckIt {
       }
 }
 CheckIt
-
+Print "A variant array who have variant type arrays"
+Print "Using iterator object for the inner loop"
 Module CheckIt2 {
       Dim Base 1, A(12)
       Mult=lambda (n)-> {
@@ -14392,6 +14396,36 @@ Module CheckIt2 {
       }
 }
 CheckIt2
+Print "A variant array who have integer type arrays (16bit)"
+Print "Using iterator object for the inner loop"
+Module CheckIt3 {
+      Dim Base 1, A(12)
+      Mult=lambda (n as integer)-> {
+            dim base 0, M(n) as integer
+            For i=0% to n-1 : m(i)=(i+1)*n : Next
+            =M()
+      }
+      i=Each(A())
+      Print "  |";
+      while i {
+            Print Format$("{0:0:-4}",i^+1);
+            A(i^+1)=Mult(i^+1)
+      }
+      Print
+      Print "--+"+string$("-",4*12)
+      For i=1 to 12 {
+            j=Each(A())
+            Print Format$("{0:0:-2}|",i); 
+            While j {
+                  r1=A(j^+1)
+                  If len(r1)>=i then {
+                        Print Format$("{0:0:-4}",Array(r1,i-1));
+                  } Else Print "    ";
+            }
+            Print
+      }
+}
+CheckIt3
 }
 MODULE PA15 {Module Puzzle15 {
 \\ BASIC STYLE  FROM COMMODORE BASIC
@@ -33046,6 +33080,7 @@ end sub
 }
 MODULE FINALE {διαφυγή Όχι
 Συνάρτηση Γενική Όλα {
+	Αναφορα ! 4
 	Πένα 14, 255
 	Ωρα$=""
 	Σχέδιο{
@@ -35493,25 +35528,24 @@ Print N.a(0)=19, N.z.a(0)=21
 Print k=>a(0)=19, K=>z.a(0)=21
 }
 MODULE CRC {Module CheckApi {
-      Declare CRC32 LIB c "ntdll.RtlComputeCrc32" {Long Zero, a$, long s}
+      Declare CRC32 LIB c "ntdll.RtlComputeCrc32" {Long Zero, a$, Long s}
       a$=Str$("The quick brown fox jumps over the lazy dog")
       // a len of 3.5 is 7 bytes. Len is a double which return number of words
       // so a 0.5 word is a byte
-      // because we get a long (singed) we convert it to unsigned 32 bit (using same bits)
+      // because we get a Long (singed) we convert it to unsigned 32 bit (using same bits)
       Hex Uint(CRC32(sint(0x0),a$,len(a$)*2))
 }
 CheckApi
 Module CheckApi {
-      Declare CRC32 LIB "ntdll.RtlComputeCrc32" {Long Zero, a$, long s}
+      Declare CRC32 LIB "ntdll.RtlComputeCrc32" {Long Zero, a$, Long s}
       a$=Str$("The quick brown fox")
       b$=Str$(" jumps over the lazy dog")
       Hex Uint(CRC32(CRC32(0,a$,len(a$)*2),b$,len(b$)*2))
 }
 CheckApi
 Module CheckIt {
-
 	Function PrepareTable {
-		Dim Base 0, table(256)
+		Dim Base 0, table(256) as currency // new from version 12
 		For i = 0 To 255
 			k = i
 			For j = 0 To 7
@@ -35543,8 +35577,8 @@ Module CheckIt {
 		}
 	// str$() convert Utf16LE to ANSI 8bit
 	// Hex is like Print but conver unsigned numbers to hex
-	Hex crc32(0@, Str$("The quick brown fox jumps over the lazy dog")) ' return 0x414fa339
-	Hex crc32(crc32(0@, str$("The quick brown fox")), str$(" jumps over the lazy dog")) ' return 0x414fa339
+	Hex crc32(0#, Str$("The quick brown fox jumps over the lazy dog")) ' return 0x414fa339
+	Hex crc32(crc32(0#, str$("The quick brown fox")), str$(" jumps over the lazy dog")) ' return 0x414fa339
 }
 CheckIt
 }
@@ -36981,6 +37015,20 @@ arr$(1, 5)="Hello from M2000"
 // so 1001 long type values have 4*1001 bytes  (4 times more data from a variant type array)
 ? addr(0)  // first item place in array in place 2
 ? addr(1)  // first item place in array in place 1
+// there is a new type of array using the pointer
+? arr[0][20]
+? arr[1][5]
+
+
+Print "we can define refArrays using this:"
+Print "long long LLarr[10][10] "
+long long LLarr[10][10]
+Print "We can use properties"
+Print {with LLarr, "ArrPtr" as LLarr.Ptr()}
+with LLarr, "ArrPtr" as LLarr.Ptr()
+Print "This type the memory address of first item for each sub array"
+Print {Print LLarr.Ptr(0),  LLarr.Ptr(1)}
+Print LLarr.Ptr(0),  LLarr.Ptr(1)
 }
 MODULE USEMENU {// https://rosettacode.org/wiki/Menu
 Module TestMenu {
@@ -37193,5 +37241,50 @@ case b
 end select
 	? "done"
 ? m
+}
+MODULE EXPRVER12 {? -(2*1.5)^2=-9, " : False for Ver <12"
+? -((2*1.5)^2)=-9, " : True  for all versions"
+? -(2*1.5)^2*10=-90, " : False for Ver <12"
+? -((2*1.5)^2)*10=-90, " : True  for all versions"
+? -3^2*12=-108, " : False for Ver <12"
+? 12*-3^2=-108, " : False for Ver <12"
+? 100+12*-3^2=-8, " : False for Ver <12"
+? -3^2-3^2=-18, " : False for Ver <12"
+? -2^2-2^2=-8, " : False for Ver <12"
+}
+MODULE DIMVER12 {dim base 1, M(10) as integer=10
+? M()
+Mult=lambda (n as integer)-> {
+      //dim base 0, M(n) as integer
+      dim M(0 to n-1) as integer
+      For i=0% to n-1 : m(i)=(i+1)*n : Next
+      =M()
+}
+? mult(4)
+
+
+dim p(1 to 5) as long=500
+group alfa {
+	dim p(1 to 5) as decimal=500  ' try currency, double, single
+}
+Print alfa.p(1)
+z1->(alfa)
+Print z1=>p(1)
+
+for z1 {
+	for i=1 to 5: .p(i)*=.0005*i: next
+}
+
+z=group(z1)
+Print z.p()
+Print type$(z.p(1))
+m=z.p()#REV()
+Print m
+m+=10
+L=m#val(0)
+Print type$(L)
+Print type$(m)="mArray"
+Print m#sum()
+list
 }
 UseThis : InfoBasic : ShowKeys : Pen 15 {Print "Press F3 now"}

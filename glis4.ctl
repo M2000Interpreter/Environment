@@ -6572,6 +6572,9 @@ st = st1
 End If
 End If
 Wend
+If probeX > UserControlTextWidth2(s$, st0) Then
+    st1 = st0
+End If
 addlength = -1
 mark1 = probeX \ scrTwips
 st1 = st1 + 1

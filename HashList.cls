@@ -638,12 +638,4 @@ Public Function create(ParamArray v()) As HashList
     End If
     Set create = hl
 End Function
-Public Function cInt64(ByVal a)
-    Dim p
-    PutMem1 VarPtr(p), 20
-    PutMem1 VarPtr(p) + 8, 1
-    cInt64 = -p And a
-    Exit Function
-er111:
-     Err.Raise Err.Number
-End Function
+

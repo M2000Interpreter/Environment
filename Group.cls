@@ -22,7 +22,7 @@ Dim mFloatGroupName As String
 Dim FloatGroup As Boolean
 Dim bank As mArray
 Dim mTeam As Boolean
-Dim LinkToGroup As Object
+Dim LinkToGroup As Group
 Dim mTag As String
 Public Patch As String
 Public IamGlobal As Boolean, IamRef As Boolean
@@ -84,7 +84,7 @@ If mytypes Is RHS Then
     Exit Function
 End If
 'If mytypes.count <> extypes.count Then Exit Function
-If mytypes.Count * extypes.Count = 0 Then Exit Function
+If mytypes.count * extypes.count = 0 Then Exit Function
 For Each k In extypes
     If TypeGroupNow(k) Then MatchTypes = True: Exit Function
 Next
@@ -100,7 +100,7 @@ Public Sub ResetEvents()
 If eventlist Is Nothing Then Exit Sub
 Dim i As Long
 With eventlist
-For i = 0 To .Count - 1
+For i = 0 To .count - 1
     .index = i
     .Done = True
     .Value = vbNullString
@@ -115,7 +115,7 @@ If eventlist Is Nothing Then Exit Sub
 Dim eventlist2 As New FastCollection
 Dim i As Long
 With eventlist
-For i = 0 To .Count - 1
+For i = 0 To .count - 1
     .index = i
     .Done = True
     eventlist2.AddKey .KeyToString, ""
@@ -295,14 +295,12 @@ Public Sub BeginFloat(Total As Long)
 FloatGroup = True
 Set bank = New mArray
 bank.grouperror = True
-'flitems = Total
 bank.PushDim Total * 2
 bank.PushEnd
 End Sub
 
 Public Sub BeginFloat2(Total As Long)
 FloatGroup = True
-'flitems = Total
 bank.PushDim Total * 2
 bank.PushEnd
 End Sub

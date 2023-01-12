@@ -946,10 +946,3 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
     Next
         
 End Sub
-
-
-
-
-
-
-

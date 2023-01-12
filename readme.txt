@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 2 active-X
-Work in progress.
+Version 12 Revision 3 active-X
+Work in progress. Look new examples in INFO.GSB
 
 
 George Karras, Kallithea Attikis, Greece.
