@@ -1,6 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 3 active-X
+Version 12 Revision 4 active-X
 Work in progress. Look new examples in INFO.GSB
 
 
