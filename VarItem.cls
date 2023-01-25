@@ -33,7 +33,12 @@ Property Let ItemStr(ByRef RHS As String)
 End Property
 Public Sub PopString(s$)
     If slot = 4 Then
-        SwapString2Variant s$, mItem
+        If Not myVarType(mItem, vbString) Then
+            mItem = 0
+            s$ = vbNullString
+        Else
+            SwapString2Variant s$, mItem
+        End If
     ElseIf slot = 5 Then
         s$ = mItem
     ElseIf slot = 2 Then

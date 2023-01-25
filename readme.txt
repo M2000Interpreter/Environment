@@ -1,7 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 4 active-X
-Work in progress. Look new examples in INFO.GSB
+Version 12 Revision 5 active-X
+99% ok.
+I have to write new manual.
 
 
 George Karras, Kallithea Attikis, Greece.

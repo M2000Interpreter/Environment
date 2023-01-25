@@ -96,6 +96,10 @@ Exit Function
 End If
 Next i
 If Not ok Then
+If myVarType(v, vbString) Then
+    
+Else
+
 v = -v
 For i = 0 To toplim
 If v = PriveSpace(i).iValue Then
@@ -110,7 +114,7 @@ Set SearchValue = mm
 Exit Function
 End If
 Next i
-
+End If
 End If
 Set SearchValue = New mHandler
 End Function

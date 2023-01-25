@@ -28,6 +28,7 @@ Public Sub SendString(a)
 
     On Error Resume Next
     Dim b$
+    If Not myVarType(a, vbString) Then a = vbNullString
     SwapString2Variant b$, a
     RaiseEvent GetString(b$)
     SwapString2Variant b$, a
@@ -48,9 +49,9 @@ Public Sub SendData(ParamArray flds())
     RaiseEvent GetData
 End Sub
 Public Function GetData() As Object
-Dim m As New mArray, h As New mHandler
+Dim m As New mArray, H As New mHandler
     m.LoadTuple resp
-    h.t1 = 3
-    Set h.objref = m
-    Set GetData = h
+    H.t1 = 3
+    Set H.objref = m
+    Set GetData = H
 End Function

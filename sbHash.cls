@@ -302,7 +302,7 @@ Function ShowRev() As String
 Dim i As Long
 If toplim > UBound(PriveSpace()) Then
 toplim = UBound(PriveSpace()) - 1
-InternalEror
+InternalError
 Else
 For i = 0 To toplim
 ' remove if to take hidden functions

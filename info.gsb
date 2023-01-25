@@ -1505,7 +1505,7 @@ MODULE W1 { Report {
         Then algorithm make small changes and produce a number of solutions, and get the better one using the fitness function
         So the alogrithm produce always a same or better solution in each iteration.
         Finally we get the solution with the maximum fitness, which means we get the target string.
-        Without the algorithm we need to more then  1.18376868261619E+39 strings to check
+        Without the algorithm we need to more than  1.18376868261619E+39 strings to check
         Or Miliion of computational years.
         Here the tools to find it are two major:
               The small random changes
@@ -4338,7 +4338,12 @@ MODULE QSORT3 {Module Checkit3 {
 }
 Checkit3
 }
-MODULE CONC {Thread.Plan Concurrent
+MODULE CONC {SET SLOW
+// NEWER VERSIONS DON'T USE REFERESH IN THREADS (SAME AS FAST!)
+// SO YOU HAVE TO PLACE REFRESH WHERE YOU WANT OR
+// USE SET SLOW TO HANDLE IT FROM M2000
+// BUT ONLY FOR EXAMPLES LIKE THIS.
+Thread.Plan Concurrent
 Module CheckIt {
       Flush  \\ empty stack of values
       Data "Enjoy", "Rosetta", "Code"
@@ -4384,7 +4389,7 @@ Module CheckIt {
       Rem : Wait 3000   ' we can use just a wait loop, or the main.task loop
       \\ main.task exit if all threads erased
       Main.Task 30 {
-      rem refresh  ' use refresh to show something
+      'Refresh  ' use refresh to show something
       }
 \\ when module exit all threads from this module get a signal to stop.
 \\ we can use Threads Erase to erase all threads.
@@ -4392,6 +4397,7 @@ Module CheckIt {
 }
 CheckIt
 Thread.Plan Sequential
+SET FAST
 }
 MODULE LISP {Profiler
 EntryLevel =0
@@ -4698,8 +4704,8 @@ SET FAST !
 PEN #fff9aa
 // BLOCK ESCAPE KEY
 ESCAPE OFF
-thread.plan sequential //WE CAN USE THREAD plan sequential also.
-//THREAD.PLAN CONCURRENT
+//thread.plan sequential //WE CAN USE THREAD plan sequential also.
+THREAD.PLAN CONCURRENT
 ox=scale.x*1.4
 oy=scale.y*1.4
 REFRESH  500 
@@ -4852,26 +4858,27 @@ enshow3:
 RETURN
 basicpart:
       range = SQRT((x-SCALE.X/2)**2+(y-SCALE.Y/2)**2)
+      range2=range*2
       ANGLE =(360*(SCALE.Y-y)/SCALE.Y/2)*(SCALE.X/2-x)/SCALE.X
       sx=SCALE.X/2-(x-SCALE.X/2)/4
       sy=SCALE.Y/2-(y-SCALE.Y/2)/4
       MOVE sx, sy
       CIRCLE 300
-      MOVE 0,SCALE.Y-range/2
-      PEN 2 { polygon 2, 0,0,SCALE.X, 0,0, range/2,-SCALE.X,0,0,-range/2 }
+      MOVE 0,SCALE.Y-range2/2
+      PEN 2 { polygon 2, 0,0,SCALE.X, 0,0, range2/2,-SCALE.X,0,0,-range2/2 }
       STEP SCALE.X/2,0
       PEN 0 {
             DRAW to SCALE.X/2+(x-SCALE.X/2)/4, SCALE.Y
             IF 1.1-PP<1 THEN {
-                  MOVE 0, SCALE.Y-range/2*(1.1-PP)
+                  MOVE 0, SCALE.Y-range2/2*(1.1-PP)
                   DRAW SCALE.X,0 
             }
-            MOVE 0, SCALE.Y-range/1.9*(.9-PP)
+            MOVE 0, SCALE.Y-range2/1.9*(.9-PP)
             DRAW SCALE.X,0
-            MOVE 0, SCALE.Y-range/1.8*(.7-PP)
+            MOVE 0, SCALE.Y-range2/1.8*(.7-PP)
             DRAW SCALE.X,0
             IF NOT 1.1-PP<1 THEN {
-                  MOVE 0, SCALE.Y-range/1.75*(.5-PP)
+                  MOVE 0, SCALE.Y-range2/1.75*(.5-PP)
                   DRAW SCALE.X,0
             }
             pp+=.04
@@ -5632,7 +5639,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 44 for M2000 Interpreter version 11, revision 20 and above"
+	Report " A collection of modules for tests version 45 for M2000 Interpreter version 12, revision 4 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -5976,14 +5983,17 @@ MODULE FORM44 {Module TryIt {
 	With form1(0), "Visible" As visible
 	CloseThisForm=0
 	CloseThisTitle$=""
+	closeme=false
 	Function CloseAfter {
 	
 	      If Ask("Close Form?", CloseThisTitle$)=1 Then {
 	      If CloseThisForm=1 Then Form1_1=false
 	      Method Form1(CloseThisForm), "CloseNow"
 	      }
+	      closeme=false
 	}
 	Function Form1.Unload {
+		if closeme then exit sub
 	      Read New index, &Nook
 	      Nook=True  \\ no unload now
 	      \\ After make an unamed thread
@@ -5992,7 +6002,7 @@ MODULE FORM44 {Module TryIt {
 	      with Form1(index), "title" as title$
 	      CloseThisTitle$=title$
 	      CloseThisForm=Index
-	      After 50  { Call Local CloseAfter() }
+ 	      closeme=true
 	}
 	Function Button1.Click {
 	      Read New K, L
@@ -6067,15 +6077,15 @@ MODULE FORM44 {Module TryIt {
 	\\ Inform is the Thread Handler, we don't use it here
 	aaa:
 	\\ Need a thread to run a Main.Task
+	thread {
+		threads: refresh
+	} as showthreads interval 200
 	Main.Task 100 {
 	'Every 100 {
 	      \\ using property  \\ 
-	      
-	            
 	            Rem 1 :       Print Type$(Visible), Type$(Form1_1)
 	            If Not visible Then break
-	            threads
-	      
+	            if closeme  then Call Local CloseAfter()
 	}
 	
 	\\  Cleaning;
@@ -6673,7 +6683,7 @@ Thread {
 			Method Math, "UnitVect", vAxis
 	}  As once
 } As Compute
-dim All(1 to 3)
+dim All(1 to 3) as object  // new from Version 12
 Layer Alfa {
 	Window 12, 10000, 8000;
 	Form 40, 20
@@ -8911,6 +8921,7 @@ print foo()=4
 
 }
 MODULE TR {\\ goto no_random_mode
+set fast !
 m=random(700,1100)/1000
 mode 8, scale.x*m, scale.y*m
 
@@ -8949,7 +8960,7 @@ b 2000*sc,alfa div 2, &My_Circle.a(), 0
 flash=true
 introtime=0
 timeinterval=600
-Dim Fcol(-1 to 0)
+Dim Fcol(-1 to 0) as long
 Fcol(-1)=#ff3322, #773300
 thread {
 	flash~
@@ -8965,7 +8976,7 @@ Hold
 i=0
 k=1
 tipstop=8000*sc
-Every 10 { 
+Every 1000/120 { 
       Pen 15 {
             Refresh 1500
             Release  ' we get the background using Hold.
@@ -8997,6 +9008,7 @@ Escape off
 \\ call info again
 Keyboard "info"+chr$(13)
 smooth off
+set fast
 Exit
 put_a_title:
       Move -320*sc, scale.y
@@ -9017,7 +9029,7 @@ Return
 define_module_b:
 Module b {
       Read a, n, &ar(), cir
-      Dim ar(alfa,2)
+      Dim ar(alfa, 2)
       const pi=3.14159~
       z=pi/2
       km=0
@@ -9051,7 +9063,7 @@ Module b {
 Return
 make_classes:
 Class drw {
-      Dim a(0)
+      Dim a(0) as long
       x, y
       Module drw {
             Read .x, .y
@@ -9521,8 +9533,9 @@ MODULE ICONS {function dummy {
 	Refresh 30
 	If Ask("Save the file","icons","Save it","No", all$)=1 then
 	Menu  ' erase Menu list
-	files + ! "screen*.bmp"
-	copy "screen"+str$(menuitems+1,"000")+".bmp"
+	k=1
+	while exist("screen"+str$(k,"000")+".bmp")	: k++:end while
+	copy "screen"+str$(k,"000")+".bmp"
 	End if
 	cls,0
 	
@@ -9531,7 +9544,7 @@ MODULE ICONS {function dummy {
 	Menu
 	Menu title "MOVE ME" 
 	Menu fill #F377FF, 7, 0
-	files + "screen*.bmp"
+	files ! + "screen*.bmp"
 	if menuitems=0 then exit
 	global ex=false, loadnow=1, preview =0, LockThere as boolean, menu1=0, press=0
 	Module Global globalmenu {
@@ -12694,25 +12707,25 @@ MODULE CALENDAR (YEAR, LOCALEID) {
                   MONTH=I+J*6
                   PRINT  PART @((I-1)*22+1), $(2,21), UCASE$(LOCALE$(55+MONTH))
             NEXT I
-            PRINT
-            DIM SKIP(1 TO 6), COUNT(1 TO 6), D(1 TO 6)=1
+            PRINT            
+            INTEGER SKIP[6], COUNT[6] , D[6]=1
             FOR I=1 TO 6
                   MONTH=I+J*6
                   IF I>1 THEN PRINT " ";
                   FOR K=42 TO 48 :PRINT " ";UCASE$(LEFT$(LOCALE$(K),2));:NEXT K 
-                  SKIP(I)=@SKIPMO(YEAR, MONTH)
-                  COUNT(I)=@GETMAX(YEAR, MONTH)
+                  SKIP[I]=@SKIPMO(YEAR, MONTH)
+                  COUNT[I]=@GETMAX(YEAR, MONTH)
             NEXT I
             PRINT
             IF PRINT_IT ELSE REFRESH 1000
             FOR I=1 TO 6
                       IF I>1 THEN PRINT " ";
                       FOR K=1 TO 7
-                        SKIP(I)--
-                        IF  SKIP(I)>0 THEN PRINT "   "; :CONTINUE FOR
-                        COUNT(I)--
-                        PRINT FORMAT$(" {0::-2}", D(I));
-                        D(I)++
+                        SKIP[I]--
+                        IF  SKIP[I]>0 THEN PRINT "   "; :CONTINUE FOR
+                        COUNT[I]--
+                        PRINT FORMAT$(" {0::-2}", D[I]);
+                        D[I]++
                       NEXT K
             NEXT I
             PRINT
@@ -12722,10 +12735,10 @@ MODULE CALENDAR (YEAR, LOCALEID) {
                   FOR I=1 TO 6
                         IF I>1 THEN PRINT " ";
                         FOR K=1 TO 7
-                              COUNT(I)--
-                              IF COUNT(I)<0 THEN PRINT "   "; : CONTINUE FOR
-                              PRINT FORMAT$(" {0::-2}", D(I));
-                              D(I)++
+                              COUNT[I]--
+                              IF COUNT[I]<0 THEN PRINT "   "; : CONTINUE FOR
+                              PRINT FORMAT$(" {0::-2}", D[I]);
+                              D[I]++
                         NEXT K
                   NEXT I
             PRINT
@@ -12762,14 +12775,14 @@ IF PRINT_IT THEN RETURN
 WHILE INKEY$="" AND MOUSE=0
 END WHILE
 RETURN
-FUNCTION GETMAX(YEAR, MONTH)
+FUNCTION GETMAX(YEAR AS INTEGER, MONTH AS INTEGER)
       LOCAL A=DATE(STR$(YEAR)+"-"+STR$(MONTH)+"-1")
-      LOCAL MAX=32
+      LOCAL INTEGER MAX=32, M
       DO
             MAX--
             M=VAL(STR$(CDATE(A,0,0,MAX), "M"))  
        UNTIL M=MONTH
-       =MAX+1    
+       =MAX+1%
 END FUNCTION
 FUNCTION SKIPMO(YEAR, MONTH)
       LOCAL A=DATE(STR$(YEAR)+"-"+STR$(MONTH)+"-1")
@@ -13143,7 +13156,7 @@ Module Checkit {
             For This {
                   \\ we have to use a temporary variable name, here A
                          A=If(useother->L.RemoveTail(),L.RemoveHead())
-                         ? A=>dat
+                        ? A=>dat
                         useother~
                         \\ now we can try to perform removing
                         clear A
@@ -13681,7 +13694,7 @@ MODULE PERMSTEP {Module StepByStep {
           if m=0 then Error "No items to make permutations"
           c=c1
           While m>1
-                c1=lambda c2=c,p, m=(,) (&f, a, clear as boolean=false) ->{
+                c1=lambda c2=c,p=0, m=(,) (&f, a, clear as boolean=false) ->{
                       if clear then m=(,)
                       if len(m)=0 then m=a
                       =cons(car(m),c2(&f, cdr(m)))
@@ -14568,10 +14581,10 @@ MODULE CRYPTO {// https://en.wikipedia.org/wiki/RIPEMD
 
 Module Checkit {
 	Function Prepare_RiPeMd_160 {
-		Dim Base 0,  K(5), K1(5)
+		Dim Base 0,  K(5) AS CURRENCY, K1(5) AS CURRENCY
 		K(0)=0x00000000, 0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xA953FD4E
 		K1(0)=0x50A28BE6,0x5C4DD124, 0x6D703EF3, 0x7A6D76E9, 0x00000000
-		Dim Base 0,r(80), r1(80), s(80), s1(80)
+		Dim Base 0,r(80) AS INTEGER, r1(80) AS INTEGER, s(80) AS INTEGER, s1(80) AS INTEGER
 		r(0)=0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 		r(16)=7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8
 		r(32)= 3, 10, 14, 4, 9, 15, 8, 1, 2, 7, 0, 6, 13, 11, 5, 12
@@ -14599,62 +14612,73 @@ Module Checkit {
 		s1(48)=15, 5, 8, 11, 14, 14, 6, 14, 6, 9, 12, 9, 12, 5, 15, 8
 		s1(64)=8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11
 		
-		Dim Base 0, T(5), TT(5)
-		T(0)=lambda ->binary.xor(binary.xor(number,number),number)
-		T(1)=lambda (B,C,D)->binary.or(binary.and(B,C), binary.and(binary.not(B), D))
-		T(2)=lambda ->binary.xor(binary.or(number, binary.not(number)), number)
-		T(3)=lambda (B,C,D)->binary.or(binary.and(B,D), binary.and(C,binary.not(D)))
-		T(4)=lambda ->binary.xor(number, binary.or(number, binary.not(number)))
-		
-		// no need for variables we read form stack with number
-		TT(0)=lambda ->binary.xor(number, binary.or(number, binary.not(number)))
-		TT(1)=lambda (BB,CC,DD)->binary.or(binary.and(BB,DD), binary.and(CC,binary.not(DD)))	
-		TT(2)=lambda ->binary.xor(binary.or(number, binary.not(number)), number)
-		TT(3)=lambda (BB,CC,DD)->binary.or(binary.and(BB,CC), binary.and(binary.not(BB),DD))	
-		TT(4)=lambda ->binary.xor(binary.xor(number,number),number)
-		
 		// return of this function is a lambda function
 		// all arrays are closures to this lambda
-		=lambda K(),K1(),TT(), T(),r(),r1(), s(), s1() (&message$, ansi as boolean=true, ansiid=1033)-> {
+		=lambda K(),K1(),TT, T,r(),r1(), s(), s1() (&message$, ansi as boolean=true, ansiid=1033)-> {
 			set fast!
-			def h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE
-			def h3 = 0x10325476, h4 = 0xC3D2E1F0
-			def i, j, l, padding, l1, blocks, acc, f64 as boolean=true, oldid
+			CURRENCY  h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE
+			CURRENCY  h3 = 0x10325476, h4 = 0xC3D2E1F0
+			LONG L, L1, blocks, acc, padding
+			INTEGER  i, j
+			BOOLEAN  f64=true
+			INTEGER oldid
 			if ansi then oldid=locale : locale ansiid
 			// we use a buffer of 64 bytes
 			buffer clear message as byte*64
-			l=len(message$)*if(ansi->1,2 )
-			if binary.and(l,63)>55 then  padding=64 
-			padding+= 64 - (l Mod 64)
-			l1=padding+l+1
+			L=len(message$)*if(ansi->1&, 2&)
+			if binary.and(L,63&)>55& then  padding=64&
+			padding+= 64& - (L Mod 64&)
+			L1=padding+L+1&
 	
-			f64=binary.and(l,63)<>0
+			f64=binary.and(L,63)<>0
 	
-			blocks=l1 div 64
+			blocks=L1 div 64&
 rem
 			Print "blocks:";blocks
 			// now prepare the buffer
 			PrepareBuffer()
-			def decimal  A, B, C, D, E, AA, BB, CC, DD, EE, T, TT
+			CURRENCY  A, B, C, D, E, AA, BB, CC, DD, EE, T, TT, tmp1
 			do
 			A  = h0 : B  = h1 : C  = h2 : D  = h3 : E  = h4
 			AA = h0 : BB = h1 : CC = h2 : DD = h3 : EE = h4
-			for J=0 to 79 {
+			JJ=0
+			for J=0 to 15 {
+				push Binary.add(Binary.Rotate(binary.add(A,binary.xor(binary.xor(B,C),D),eval(message ,r(j) as long),k(jj)), s(j)), e)
+				A = E : E = D : D = Binary.Rotate(C, 10) : C = B :B=Number 
+				push binary.add(Binary.Rotate(binary.add(AA,binary.xor(BB, binary.or(CC, binary.not(DD))),eval(message, r1(j) as long),k1(jj)),s1(j)),EE)
+				AA = EE : EE = DD : DD = Binary.Rotate(CC, 10) : CC = BB : BB=number
+			} : JJ++
+			for J=16 to 31 {
+				push binary.add(Binary.Rotate(binary.add(A,binary.or(binary.and(B,C), binary.and(binary.not(B), D)),eval(message ,r(j) as long),k(jj)), s(j)), e)
+				A = E : E = D : D = Binary.Rotate(C, 10) : C = B :B=Number 
+				push binary.add(Binary.Rotate(binary.add(AA,binary.or(binary.and(BB,DD), binary.and(CC,binary.not(DD))),eval(message, r1(j) as long),k1(jj)),s1(j)),EE)
+				AA = EE : EE = DD : DD = Binary.Rotate(CC, 10) : CC = BB :BB=Number
+			} :JJ++
+			for J=32 to 47 {
+				push binary.add(Binary.Rotate(binary.add(A,binary.xor(binary.or(B, binary.not(C)), D),eval(message ,r(j) as long),k(jj)), s(j)), e)
+				A = E : E = D : D = Binary.Rotate(C, 10) : C = B :B=Number 
+				push binary.add(Binary.Rotate(binary.add(AA,binary.xor(binary.or(BB, binary.not(CC)), DD),eval(message, r1(j) as long),k1(jj)),s1(j)),EE)
+				AA = EE : EE = DD : DD = Binary.Rotate(CC, 10) : CC = BB :BB=Number
+			}: JJ++
+			for J=48 to 63 {
 				JJ=J DIV 16
-				PUSH binary.add(Binary.Rotate(binary.add(A,T(JJ)(B,C,D),eval(message ,r(j) as long),k(jj)), s(j)), e)
-				A = E : E = D : D = Binary.Rotate(C, 10) : C = B : READ B 
-				PUSH binary.add(Binary.Rotate(binary.add(AA,TT(JJ)(BB,CC,DD),eval(message, r1(j) as long),k1(jj)),s1(j)),EE)
-				AA = EE : EE = DD : DD = Binary.Rotate(CC, 10) : CC = BB : READ BB
+				push binary.add(Binary.Rotate(binary.add(A,binary.or(binary.and(B,D), binary.and(C,binary.not(D))),eval(message ,r(j) as long),k(jj)), s(j)), e)
+				A = E : E = D : D = Binary.Rotate(C, 10) : C = B :B=Number 
+				push binary.add(Binary.Rotate(binary.add(AA,binary.or(binary.and(BB,CC), binary.and(binary.not(BB),DD)),eval(message, r1(j) as long),k1(jj)),s1(j)),EE)
+				AA = EE : EE = DD : DD = Binary.Rotate(CC, 10) : CC = BB :BB=Number
+			}: JJ++
+			for J=64 to 79 {
+				push binary.add(Binary.Rotate(binary.add(A,binary.xor(B, binary.or(C, binary.not(D))),eval(message ,r(j) as long),k(jj)), s(j)), e)
+				A = E : E = D : D = Binary.Rotate(C, 10) : C = B :B=Number 
+				push binary.add(Binary.Rotate(binary.add(AA,binary.xor(binary.xor(BB,CC),DD),eval(message, r1(j) as long),k1(jj)),s1(j)),EE)
+				AA = EE : EE = DD : DD = Binary.Rotate(CC, 10) : CC = BB :BB=Number
 			}
-			push binary.add(h1, C, DD)
-			h1 = binary.add(h2, D, EE)
-			h2 = binary.add(h3, E, AA)
-			h3 = binary.add(h4, A, BB)
-			h4 = binary.add(h0, B, CC)
-			Read h0
+			push binary.add(h1, C, DD):h1 = binary.add(h2, D, EE)
+			h2 = binary.add(h3, E, AA):h3 = binary.add(h4, A, BB)
+			h4 = binary.add(h0, B, CC):Read h0
 			blocks--
 rem
-			print over $(0,8), blocks : Refresh
+			IF blocks mod 10=0 then print over $(0,8), blocks : Refresh
 			if blocks=0 then exit
 			PrepareBuffer()
 			always
@@ -14669,19 +14693,19 @@ rem
 			
 			Sub PrepareBuffer()
 				
-				if l-acc>=64 then
+				if L-acc>=64 then
 					LoadPart(64)
 				else.if blocks=1 then
 					return message, 0:=string$(chr$(0),32)
-					if l-acc=0 and f64 then
-						Return message, 56:=l*8 as long, 60 :=binary.shift(l,-29) as long
+					if L-acc=0 and f64 then
+						Return message, 56:=L*8 as long, 60 :=binary.shift(L,-29) as long
 					else
-						Return message, l-acc:=0x80, 56:=l*8 as long, 60 :=binary.shift(l,-29) as long
-						if l>acc then LoadPart(l-acc)
+						Return message, L-acc:=0x80, 56:=L*8 as long, 60 :=binary.shift(L,-29) as long
+						if L>acc then LoadPart(L-acc)
 					end if
 				else
-					Return message, l-acc:=0x80
-					LoadPart(l-acc)
+					Return message, L-acc:=0x80
+					LoadPart(L-acc)
 				end if
 			End Sub
 			sub LoadPart(many)
@@ -14708,7 +14732,7 @@ rem
 		Data "b0e20b6e3116640286ed3a87a5713079b21f5189"
 		Data "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 		Data "9b752e45573d4b39f4dbd3323cab82bf63326bfb", String$("1234567890",8)
-rem		Data "52783243c1697bdbe16d37f97f68f08325dc1528", String$("a",1000000)
+		Data "52783243c1697bdbe16d37f97f68f08325dc1528", String$("a",1000000)
 		
 		While not empty
 			Read check$, text$
@@ -14723,11 +14747,12 @@ rem		Data "52783243c1697bdbe16d37f97f68f08325dc1528", String$("a",1000000)
 				answer$+=hex$(eval(ans,i),1)
 			next i
 			Print lcase$(answer$)
-			Print lcase$(answer$)=check$
+			Print lcase$(answer$)=check$: Refresh
 		end sub
 	}
-	TestHash Prepare_RiPeMd_160()	
+	TestHash Prepare_RiPeMd_160()
 }
+Print "Press Esc to exit before the end of the last big string 1 million characters"
 Checkit
 }
 MODULE DIJKSTRA {Module Dijkstra`s_algorithm {
@@ -15587,7 +15612,7 @@ Module CheckIt {
 			link .a to v()
 			for i=dimension(.a,1,0) to dimension(.a, 1,1) 
 			for j=dimension(.a,2,0) to dimension(.a, 2,1) 
-			print  v(i,j),: next j: print : next i
+			print v(i,j),: next j: print : next i
  
 		}
 	Class:
@@ -16113,10 +16138,12 @@ Mouse.Icon Hide
 Cls #222222,0
 Print @(5,5),
 Pen 7 {
-      Report {Game SoloPong II
+      Report {Game SoloPong III
             Press P for pause
             Press space...
             ...to end the game
+            ...use mouse  left button
+            ...to move the bat front/back
             }
       }
 For i=0 to Scale.Y Step twipsY*2 { Move 0,i : Draw scale.X, 0, #555555 }
@@ -16188,12 +16215,16 @@ Thread {
       }
       Rem 1 : Cursor 0,Height-1 : Print Over $(,8),xm, ym , Abs(y-yp), tx, tm
       Player 2,xd1+kp,y
+      
       'Player 4, xm,ym     
       Player 4, xm,ym Use a$,1,0, xm mod 360 size (2*xk-Abs(xm-xk))/xk
       REFRESH 5000
+       
+
       xm+=tx       
       ym+=tm
-      } As mp Interval 10
+} As mp Interval 10
+
 Thread {
 Pen 7 {
       Cursor 0,0 : Print Part $(6,8),@(Width -8), ~(Pen,#555555),Str$(Now,"hh:mm:ss")
@@ -16201,9 +16232,9 @@ Pen 7 {
 } As tt Interval 1000
 Thread {
 If xm>xk0 And xa00=0 Then {
-      xa00=twipsX*20
+      xa00=twipsX*8
 }
-} As dd Interval 10000
+} As dd Interval 3000
 Refresh 50
 kr=True
 finish=False
@@ -16217,12 +16248,13 @@ Main.Task 100 {
                   If tx>0  or xk0 <xm Then {
                   Thread dd Hold
                   xa00=0 
-                  }  Else xa00=-twipsX*20 : Thread dd Restart
+                  }  Else xa00=-twipsX*8 : Thread dd Restart :Thread dd interval random(30)*100
             }
             If xa0<850 Then xa0=850 : xa00=0
             xa2=xa0+150
             Player 1,xa0,yo
             Player 3,xa0,yb
+            refresh 5000
             Rem 2 : Cursor 0,Height-1 : Print Over $(,8), yo, yb, Score
       }
       If xm>x3  or xm<850  Then {
@@ -16254,7 +16286,7 @@ Main.Task 100 {
                               Cls 0, 0
                               Pen 15 {
                                     Cursor 0, 0
-                                    Print Over $(6),"Solo Pong II"
+                                    Print Over $(6),"Solo Pong III"
                                     Cursor 0, Height/2-1
                                     Print Over $(6),"Press P or p to continue.."
                                     Print Under
@@ -16829,6 +16861,66 @@ MODULE EN1 {Module Checkit {
       End Sub
 }
 Checkit
+
+Module Checkit {
+      \\ need version 12 revision 4 and up
+      Enum Fruit  {apple="apple", banana="banana", cherry="cherry"}
+      Enum Fruit2  {apple2=10, banana2=20, cherry2=30}
+      Print apple, banana, cherry
+      Print apple2, banana2, cherry2
+      Print Len(apple)=0
+      Print Len(banana)=1
+      Print Len(cherry)=2
+      Print Len(cherry2)=2, Cherry2=30, Type$(Cherry2)="Fruit2", cherry="cherry"
+
+      k=each(Fruit) 
+      While k {
+            \\ name of variable, value, length from first (0, 1, 2)
+            Print Eval$(k), Eval(k), k^
+      }
+      m=apple
+      Print Eval$(m)="apple"
+      Print Eval(m)=m
+      m++
+      Print Eval$(m)="banana"
+      Try {
+            \\ error, m is an object
+            m=100
+      }
+      report error$
+      Try {
+            \\ error not the same type
+            m=apple2
+      }
+      report error$
+      Try {
+            \\ read only can't change
+            apple2++
+      }
+      report error$
+      m++
+      Print Eval$(m)="cherry", m
+      k=Each(Fruit2 end to start) 
+      While k {
+             Print Eval$(k), Eval(k) , k^   
+             CheckByValue(Eval(k))
+      }
+      m2=apple2
+      Print "-------------------------"
+      CheckByValue(m2)
+      CheckByReference(&m2)
+      Print m2
+ 
+      Sub CheckByValue(z as Fruit2)
+            Print Eval$(z), z
+      End Sub
+ 
+      Sub CheckByReference(&z as Fruit2)
+            z++
+            Print Eval$(z), z
+      End Sub
+}
+Checkit
 }
 MODULE WUMPUS {Module WumpusGame {
       Print "Game: Hunt The Wumpus"
@@ -17197,8 +17289,7 @@ function eertree(s$) {
                   if b>0 Then If  mid$(s$, b+1,1)=c$ then exit
             } Always
             e=tree(n).edges(c$)
-            if e>=0 then tree(suffix).suffix=e
- 
+            if e>=0 then tree(suffix).suffix=e 
       } 
       =tree
 }
@@ -21365,8 +21456,8 @@ MODULE USETHIS {try {
 	Bold 1
 	PEN 14
 	CLS,0
-	If Version<11 then Error "No proper M2000 version (must be >=11)"
-	If Version=11 and revision<20 then Error "No proper M2000 revision for version 11 (need revision >=20)"
+	If Version<12 then Error "No proper M2000 version (must be >=12)"
+	If Version=12 and revision<4 then Error "No proper M2000 revision for version 4 (need revision >=4)"
 	Set Fast
 	Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 	dir user
@@ -24296,9 +24387,7 @@ MODULE WORKER {Καθαρό
 Τμήμα Βιογραφικό {
       \\ τροποποίηση για να διαβάζει και με αναφορά και με τιμή
       \\ Περιμένει κάτι με υπερκλάση μισθωτός
-      Αν Ταύτιση("Ο") τότε {
-            Διαβασε Α
-      } Αλλιώς Διάβασε &Α
+      Αν Ταύτιση("Ο") τότε Διαβασε Α Αλλιώς Διάβασε &Α
       Τμήμα Εμφάνιση {
             ΑΑ$=""
             Διάβασε Α
@@ -24320,24 +24409,24 @@ MODULE WORKER {Καθαρό
             }
             Πένα 13 {
                   Τύπωσε "Κατάσταση";
-                  Αν .Είναι_Άνεργος() Τότε {
+                  Αν .Είναι_Άνεργος() Τότε
                         Τύπωσε γραφη$(.Είναι_Άνεργος(),ειναιδενειναι$)+.Λεκτικό_Άνεργος$()
-                 } Αλλιώς {
+                 Αλλιώς
                        Τύπωσε " εργάζεται"
                        Σωρός Νέος {
                              Πένα 14 {
                                    Εμφάνιση .τρέχουσα(0)
                              }
                         }
-                  }
+                  τέλος αν
             }
-            Αν .Έχει_Προϋπηρεσία() τότε {
+            Αν .Έχει_Προϋπηρεσία() τότε
                   Τύπωσε "Προϋπηρεσία"
                   κ=Διάσταση(.προϋπηρεσία(),1)
-                  Για ι=κ-1 εως 0 {
+                  Για ι=κ-1 εως 0
                               Εμφάνιση .προϋπηρεσία(ι), μορφη$("{0::-3})", κ-ι)
-                  }
-            }
+                  επόμενο
+            τέλος αν
       }
 
 }
@@ -24357,9 +24446,7 @@ MODULE WORKER {Καθαρό
       }
 Κλάση:
       Τμήμα Εργασία {
-            Αν όχι Κενό τότε {
-                  Διάβασε .ΑφμΕργοδ$, .ΙδιότηταΕργαζομένου$, .ΗμΠρόσλ
-            }
+            Αν όχι Κενό τότε  Διάβασε .ΑφμΕργοδ$, .ΙδιότηταΕργαζομένου$, .ΗμΠρόσλ
       }
 }
 Κλάση Μισθωτός {
@@ -24393,7 +24480,7 @@ MODULE WORKER {Καθαρό
             =Διάσταση(.τρεχουσα())=0
       }
       Συνάρτηση Λεκτικό_Άνεργος$ {
-            Αν .Φύλο=1 Τότε { = "άνεργος" } Αλλιώς ="άνεργη"
+            Αν .Φύλο=1 Τότε = "άνεργος" Αλλιώς ="άνεργη"
       }
       Συνάρτηση Έχει_Προϋπηρεσία {
             =Διάσταση(.προϋπηρεσία())<>0
@@ -24408,13 +24495,13 @@ MODULE WORKER {Καθαρό
             \\ αφήνουμε την ημερομηνία για το άλλο τμημα:
             .τρέχουσα(0).Διακοπή_Συνεργασίας
             κ=Διάσταση(.προϋπηρεσία())
-            Αν κ=0 τότε {
+            Αν κ=0 τότε
                   κ=1
                   Πίνακας .προϋπηρεσία(1)=Εργασια()
-             } αλλιώς {
+            αλλιώς
                   κ=Διάσταση(.προϋπηρεσία(),1)+1
                   Πίνακας .προϋπηρεσία(κ)
-            }
+            τέλος αν
             .προϋπηρεσία(κ-1)=.τρέχουσα(0)
             Πίνακας .τρέχουσα()
       }
@@ -24422,32 +24509,32 @@ MODULE WORKER {Καθαρό
             Εγγραφο Α$
             Α$=Σωρός$(.αμκα$, .όνομ_επων$, .φύλο, .αφμ$, .μισθός, .έτη_ασφ, .κρατήσεις)
             κ=Διάσταση(.κλιμακα())
-            Αν κ<>2 τότε {
+            Αν κ<>2 τότε
                   Α$=Σωρός$(0)
-            } Αλλιώς {
+            Αλλιώς
                   Α$=Σωρός$(Διάσταση(.κλιμακα(),1))
-                  Για ι=0 έως Διάσταση(.κλιμακα(),1)-1 {
+                  Για ι=0 έως Διάσταση(.κλιμακα(),1)-1
                         Α$=Σωρός$(.κλιμακα(ι,0),.κλιμακα(ι,1))
-                  }
-            }
+                  επομενο
+            τέλος αν
             κ=Διάσταση(.τρέχουσα())
-            Αν κ=0 τότε {
+            Αν κ=0 τότε
                   Α$=Σωρός$(0)
-            } αλλιώς {
+            αλλιώς
                   Α$=Σωρός$(Διάσταση(.τρέχουσα(),1))
-                  Για ι=0 έως Διάσταση(.τρέχουσα(),1)-1 {
+                  Για ι=0 έως Διάσταση(.τρέχουσα(),1)-1
                         Α$=Σωρός$(.τρέχουσα(ι).στοιχεία$())
-                  }
-            }
+                  επόμενο
+            τέλος αν
             κ=Διάσταση(.προϋπηρεσία())
-            Αν κ=0 τότε {
+            Αν κ=0 τότε
                   Α$=Σωρός$(0)
-            } αλλιώς {
+            αλλιώς
                   Α$=Σωρός$(Διάσταση(.προϋπηρεσία(),1))
-                  Για ι=0 έως Διάσταση(.προϋπηρεσία(),1)-1 {
+                  Για ι=0 έως Διάσταση(.προϋπηρεσία(),1)-1
                         Α$=Σωρός$(.προϋπηρεσία(ι).στοιχεία$())
-                  }
-            }
+                  επόμενο
+            τέλος αν
             =Α$
       }
       Τμήμα Στοιχεία {
@@ -24455,44 +24542,39 @@ MODULE WORKER {Καθαρό
             Σωρός Α$
             Διάβασε .αμκα$, .όνομ_επων$, .φύλο, .αφμ$, .μισθός, .έτη_ασφ, .κρατήσεις
             Διαβασε κ
-            Αν κ>0 τότε {
+            Αν κ>0 τότε
                   Πίνακας .κλιμακα(κ,2)
-                  Για ι=0 έως κ-1 {
+                  Για ι=0 έως κ-1
                   Διάβασε .κλιμακα(ι,0), .κλιμακα(ι,1)
-                  }
-            } Αλλιώς {
+                  επόμενο
+            Αλλιώς
                   Πίνακας .κλιμακα()
-            }
+            τέλος αν
             Διάβασε κ
-            Αν κ>0 τότε {
+            Αν κ>0 τότε
                   Πίνακας .τρέχουσα(0)
                   Πίνακας .τρέχουσα(κ)=Εργασια()
-                  Για ι=0 έως κ-1 {
+                  Για ι=0 έως κ-1
                         .τρέχουσα(ι).στοιχεια γράμμα$
-                  }
-            } Αλλιώς {
+                  επόμενο
+            Αλλιώς
                   Πίνακας .τρέχουσα(0)
-            }
+            τέλος αν
             Διάβασε κ
-            Αν κ>0 τότε {
+            Αν κ>0 τότε
                   Πίνακας .προϋπηρεσία(0)
                   Πίνακας .προϋπηρεσία(κ)=Εργασια()
-                  Για ι=0 έως κ-1 {
+                  Για ι=0 έως κ-1
                         .προϋπηρεσία(ι).στοιχεια γράμμα$
-                  }
-            } Αλλιώς {
+                  επόμενο
+            Αλλιώς
                   Πίνακας .προϋπηρεσία(0)
-            }
+            τέλος αν
       }
       \\ εδώ στον κατασκευαστή ορίζουμε μια κλάση
 Κλάση:
       Τμήμα ΥπερΜισθωτός {
-            Αν Κενό τότε {
-                  Αυτό=Μισθωτός()
-            } αλλιώς {
-                  Διάβασε Μισθ
-                  Αυτό=Μισθ
-            }
+            Αν Κενό τότε  Αυτό=Μισθωτός() αλλιώς  Διάβασε Μισθ: Αυτό=Μισθ
       }
 }
 
@@ -24766,13 +24848,14 @@ MODULE REMTST {module test1 {
 			Print "remove"
 		}
 	}
-	Dim A(10)<<Pointer(alfa())
+	Dim A(10) as object<<Pointer(alfa())
 	Print "delete 5"
 	Dim A(5)
 	Print "Now exit"
 }
 module test2 {
 	Pen 15 {Print "test2: insert 8001 variables"}
+	// Local and Global statements always make new variables
 	For i=1 to 8000
 		local i 
 	next i
@@ -24786,7 +24869,17 @@ module test2 {
 		}
 	}
 	m->alfa()
-	Print "now module end and deconstructor make 10001 variables"
+	Print "now insert 8001 more variables"
+	For i=1 to 8000
+		local i 
+	next i
+	Print "now module end, removing all variables, starting from last one"
+	Print "and after 8000 variables, removes the m pointer to group."
+	print "So at the removing of the pointer, find that is the last one"
+	print "So that enable the  deconstructor Remove, which make 10000 variables,"
+	Print "then at the ending of the Remove method:"
+	Print "first remove the 10000 variables and then remove the last 8000."
+	Print "the Remove method run in own namespace, different from the erasing module"
 }
 module test3 {
 	Pen 15 {Print "test3: A class with a group and one inner group"}
@@ -32548,15 +32641,15 @@ Layer 3 {
 Player 1 show
 End Sub
 Function WhoisThere2()
-	local i
+	local i, hit=-1
 	for i=3 to 1
 	layer i {
 		move mouse.x, mouse.y
 		if point=0x7FFFFFFF then exit
 		if point=#333333 then exit
-		local hit=i
+		hit=i
 	}
-	if valid(hit) then = i : exit for
+	if hit>-1 then = i : exit for
 	next i
 End Function
 Function WhoisThere()
@@ -33991,7 +34084,7 @@ function getnextchild(xml, &xmlmono) {
 // (when we use AS we connect the properties with a property of another object, so when we change that object, the other properties follow)
 // (you see that in the For Next blocks after each element append to xml)
 With xml, "LastChild" set Child1
-with child1, "tag" as child1.tag$, "attr" as child1.attr$(), "text" as child1.text$, "xml" as child1.doc$, "anychild" as child1.child()
+with child1, "tag" as child1.tag$, "attr" as child1.attr$(),   "text" as child1.text$, "xml" as child1.doc$, "anychild" as child1.child()
 declare inner xmlData
 with inner, "tag" as inner.tag$, "text" as inner.text$
 
@@ -34045,11 +34138,11 @@ end while
 method xml, "GetListByTag", "element" as list_in_a_stack_object
 one=each(list_in_a_stack_object)
 with child1, "textFromChild" as child1.child.text$()
+nobel$=""
 while one
 	child1=stackitem(one)
-	nobel$=""
-	Try{nobel$=child.attr$("Nobel")}
-	Print "Id="+child1.attr$("Id") ',  if$(nobel$=""-> "","Nobel="+nobel$)
+	method child1, "AttrExist","Nobel", &nobel$ as ok_exist
+	Print "Id="+child1.attr$("Id") ,  if$(ok_exist-> "Nobel="+nobel$, " --- ")
 	Print "codename:"; child1.child.text$("codename"), "sold: ";child1.child.text$("sold")
 end while
 
@@ -37003,6 +37096,7 @@ declare form1 nothing
 MODULE REFARRAY {vblong=3
 vbString=8
 DECLARE arr "M2000.REFARRAY"
+
 with arr, "value" as arr(), "count" as arr.len, "ArrPtr" as Addr(), "ArrPtr" as Addr
 with arr, "value" as arr$()
 
@@ -37030,6 +37124,20 @@ with LLarr, "ArrPtr" as LLarr.Ptr()
 Print "This type the memory address of first item for each sub array"
 Print {Print LLarr.Ptr(0),  LLarr.Ptr(1)}
 Print LLarr.Ptr(0),  LLarr.Ptr(1)
+
+Print "We can make: Dim a(10, 3) as Long Long=100"
+Print "This is a mArray which drive a RefArray inside"
+Print "We can use operators like ++ *="
+// 1000 and 10 are double literal values
+// we can use 1000&& and 10& for long long literals
+Dim a(10, 3) as Long Long=100
+Print type$(a(1,1))
+Print a(1,1)
+a(1,1)++
+a(1,1)*=10
+Print a(1,1)
+Print type$(a(1,1))
+
 }
 MODULE USEMENU {// https://rosettacode.org/wiki/Menu
 Module TestMenu {
@@ -39720,5 +39828,325 @@ every t {
 }
 refresh 40
 
+}
+MODULE FINDWORD {read W as string="*"
+if left$(w,1)="*" then
+	report {FindWord "Print"}
+else
+	print "search: ";w
+	modules  ? "", w
+end if
+}
+MODULE COMP_NUM {Class Complex {
+Private:
+	k, lim=0
+	Function copy {
+		=group(this)
+	}
+Public:
+	Property Ptr {
+		value {link parent k to k: value=k(0)}
+	}
+	Property Ubound {
+		value {link parent lim to lim: value=lim}	
+	}
+	Final Lbound=0&
+	// we use clear to clear value variable which property define as double by default
+	// using Property a { }=0& we can define the value as long
+	// but here we use Real for two different buffers, one with type double and one with type single
+	Property Real {
+		value {clear:link parent k to k: value=eval(k,0)}
+	}
+	Group Real {
+		operator "++" {
+			link parent k to k: Return k, 0:=eval(k, 0)+1
+		}
+	}
+	Property Imaginary {
+		value {clear:link parent k to k:	value=eval(k,1)}
+	}
+	Group Imaginary {
+		operator "++" {
+			link parent k to k: Return k, 1:=eval(k, 1)+1
+		}
+	}
+	Property toString$ {
+		 value {
+		 	Link parent k, lim to k, lim
+		 	read ? where=0&
+		 	if where<0 or where>lim then error "Index out of bound"
+		 	where*=2
+			m=eval(k,where+1)
+			if m==0 then
+				 value$=format$("({0})",eval(k, where))
+			else.if eval(k,0)==0 then
+				u$="({1}i)"
+				value$=format$("({0}i)",eval(k,where+ 1))
+			else
+				if abs(m)==1 then u$="({0}{2}i)" else u$="({0}{2}{1}i)"
+				value$=format$(u$,eval(k, where),abs(m), IF$(m<0->"-","+"))
+			end if
+		}
+	}
+	Function Export$() {
+		=eval$(.k)
+	}
+	Module Import (This$) {
+		m=len(This$)*2
+		if m>0 and m<=len(.k) then
+			Return .k, 0:=This$
+		end if
+	}
+	Module SwapBuffers (&a as Complex){
+		if .len<> a.len then  Error "Not compatible buffers"
+		swap .k, a.k
+		swap .lim, a.lim
+		
+	}
+Class:
+	Module Complex {
+		Error "Can't define objects"
+	}
+}
+Class DoubleComplex as Complex {
+Private:
+	len=16
+	Function newDoubleComplex(a as DoubleComplex, w) {
+		buffer z as double*2
+		return z, 0:=eval$(.k, w*.len!, .len)
+		let a.k=z, a.lim=0  // k is Private in a
+		=group(a) 
+	}
+	Function copyme(a as DoubleComplex) {
+		buffer z as double*2*(a.lim+1)
+		return z, 0:=eval$(.k)
+		let a.k=z
+		=group(a) 
+	}
+Public:
+	Operator "+"  {
+		read a as Complex
+		let this=.newFloatComplex(this, 0)
+		return .k, 0:=eval(.k,0)+a.real, 1:=eval(.k, 1)+a.imaginary
+	}
+	Operator "-"  {
+		read a as Complex
+		let this=.newFloatComplex(this, 0)
+		return .k, 0:=eval(.k,0)-a.real, 1:=eval(.k, 1)-a.imaginary
+	}
+	Set () {
+		read a as Complex
+		read ? where=0&
+		if where<0 or where>.lim then error "Index out of bound" else  where*=2
+		if a is type FloatComplex then
+			return .k, where:=a.real, where+1:=a.imaginary
+		else.if a is type DoubleComplex then
+			return .k, where:=eval$(a.k)
+		else
+			error "can't assign this group"
+		end if
+	}
+	Module Redim (many as long) {
+		if many<1 then error "Wrong Dimension"
+		buffer clear .k as double*2*many: .lim<=many-1
+	}
+	Module RedimPreserve (many as long) {
+		if many<1 then error "Wrong Dimension"
+		buffer .k as double*2*many: .lim<=many-1
+	}
+	Function final copy {
+		=.copyme(this)
+	}
+	value () {
+		read ? where=0&
+		if where<0 or where>.lim then error "Index out of bound"
+		 
+		 if where=0 and .lim=0 then
+		 	=this
+		 else
+	 	 	=.newDoubleComplex(this, where)
+	 	 end if
+	}
+Class:
+	Module DoubleComplex (r as double=0, i as double=0, many=1&) {
+		if many<1 then error "Wrong Dimension"
+		buffer clear .k as double*2*many: .lim<=many-1
+		return .k, 0:=r, 1:=i	
+	}
+}
+Class FloatComplex as Complex{
+Private:
+	len=8
+	Function newFloatComplex(a as FloatComplex, w) {
+		buffer z as single*2
+		return z, 0:=eval$(.k, w*.len!, .len)
+		let a.k=z, a.lim=0
+		=group(a) 
+	}
+	Function copyme(a as FloatComplex) {
+		buffer z as single*2*(a.lim+1)
+		return z, 0:=eval$(.k)
+		let a.k=z
+		=group(a) 
+	}
+Public:
+	Operator "+"  {
+		read a as Complex
+		let this=.newFloatComplex(this, 0)
+		return .k, 0:=eval(.k,0)+a.real, 1:=eval(.k, 1)+a.imaginary
+	}
+	Operator "-"  {
+		read a as Complex
+		let this=.newFloatComplex(this, 0)
+		return .k, 0:=eval(.k,0)-a.real, 1:=eval(.k, 1)-a.imaginary
+	}
+	Set  () {
+		read a as Complex
+		read ? where=0&
+		if where<0 or where>.lim then error "Index out of bound" else  where*=2
+		if a  is type DoubleComplex then
+			return .k, where:=a.real, where+1:=a.imaginary
+		else.if a is type FloatComplex then
+			return .k, where:=eval$(a.k)
+		else
+			error "can't assign this group"
+		end if
+	}
+	Module Redim (many as long) {
+		if many<1 then error "Wrong Dimension"
+		buffer clear .k as single*2*many: .lim<=many-1
+	}
+	Module RedimPreserve (many as long) {
+		if many<1 then error "Wrong Dimension"
+		buffer .k as single*2*many: .lim<=many-1
+	}
+	Function final copy {
+		=.copyme(this)
+	}
+	value (){
+		read ? where=0&
+		if where<0 or where>.lim then error "Index out of bound"
+		if where=0 and .lim=0 then
+			=this
+		else
+			=.newFloatComplex(this, where)
+		end if
+	}
+Class:
+	Module FloatComplex (r as single=0, i as single=0, many=1&) {
+		if many<1 then error "Wrong Dimension"
+		buffer clear .k as single*2*many: .lim<=many-1
+		return .k, 0:=r, 1:=i
+	}
+}
+def typename$(x)=type$(x) 
+z1=FloatComplex(2,2) : print z1.toString$="(2+2i)"
+z2=DoubleComplex(-2,3) :print  z2.toString$="(-2+3i)"
+print typename$(z2.real)="Double"
+z5=FloatComplex(10,-5) : print z5.toString$="(10-5i)"
+print typename$(z5.real)="Single"
+z5=FloatComplex(10) :print z5.toString$="(10)"
+z6=DoubleComplex() : print z6.toString$="(0)"
+z6=z5 :print z6.toString$="(10)"
+print z5 is type FloatComplex = true
+print z6 is type DoubleComplex = true
+z2.imaginary++
+z2.imaginary++
+print  z2.toString$="(-2+5i)"
+z5=z2
+print typename$(z5.real)="Single"
+print z5 is type FloatComplex = true
+z5.real++
+print z5.toString$="(-1+5i)"
+zArray=FloatComplex(1,1,10)
+zArray(4)=FloatComplex(30,-5)
+zArray(5)=FloatComplex(3,-75)
+zArray(7)=zArray(4)
+for i=zArray.Lbound to zArray.Ubound
+	print  i, zArray.toString$(i)
+next
+z5=zArray(4)
+print z5.toString$="(30-5i)"
+print zArray(4).toString$ = zArray.toString$(4)
+print  z5.toString$="(30-5i)"
+zk=z5+zArray+FloatComplex(5, 100)
+print zArray(4).toString$="(30-5i)"
+print zk.tostring$()="(36+96i)"
+zk=zArray
+// print zk.ubound, zk.ptr, zArray.ptr, zArray.Ubound
+zA=zArray.Copy()  // copy 10 items
+zArray(5)=FloatComplex(3, 4)
+print zArray(5).toString$="(3+4i)"
+print za(5).toString$="(3-75i)"
+za(7)=zArray(5)+za(5)
+print za(7).toString$="(6-71i)"
+za(7)=za(7)-za(5)
+print za(7).toString$="(3+4i)"
+za(7)=za(7)-zArray(5)
+print za(7).toString$="(0)"
+z5.import z1.export$()
+print z5.tostring$="(2+2i)"
+zArray.import za.export$()
+print zArray.toString$(7)="(0)"
+print zArray.ptr<>za.ptr
+print zArray.Ubound=9,  z5.Ubound=0
+zArray.SwapBuffers &z5   // swap data only
+print zArray.Ubound=0, z5.Ubound=9, z5(5).toString$="(3-75i)"
+}
+MODULE SPEEDTST {CLS,0
+PRINT "SPEED TEST"
+PRINT "You can use Ctrl+C or Esc (not in Fast !)", $("0"),,
+MODULE TESTA {
+	PROFILER:Z=100000
+	FOR I=1 TO 100000:Z++:NEXT
+	PRINT TIMECOUNT
+}
+
+MODULE TESTB {
+	PROFILER:I=100000
+	WHILE I>0:I--:END WHILE
+	PRINT TIMECOUNT
+}
+MODULE TESTC {
+	PROFILER:I=100000
+	DO:I--:UNTIL I<1
+	PRINT TIMECOUNT
+}
+MODULE TESTD {
+	PROFILER:I=100000
+	{LOOP:I--:IF I<1 THEN EXIT
+	}:PRINT TIMECOUNT
+}
+SET SLOW
+	PRINT "SET SLOW"
+TESTA
+	PRINT "FOR 100000":REFRESH
+TESTB
+	PRINT "WHILE 100000":REFRESH
+TESTC
+	PRINT "DO 100000":REFRESH
+TESTD
+	PRINT "LOOP 100000":REFRESH
+SET FAST
+	PRINT "SET FAST"
+TESTA
+	PRINT "FOR 100000":REFRESH
+TESTB
+	PRINT "WHILE 100000":REFRESH
+TESTC
+	PRINT "DO 100000":REFRESH
+TESTD
+	PRINT "LOOP 100000":REFRESH
+SET FAST !
+	PRINT "SET FAST!"
+TESTA
+	PRINT "FOR 100000":REFRESH
+TESTB
+	PRINT "WHILE 100000":REFRESH
+TESTC
+	PRINT "DO 100000":REFRESH
+TESTD
+	PRINT "LOOP 100000":REFRESH
+SET FAST
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

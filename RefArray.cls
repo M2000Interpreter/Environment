@@ -124,6 +124,7 @@ Else
 End If
 End Property
 Property Let Value(Optional where, Optional what, that)
+Dim mt As Integer, wt As Integer
 If IsMissing(where) Then
 If IsObject(that) Then
     Set p = that
@@ -172,38 +173,81 @@ entry1:
                 End If
             End If
         Else
-            
-            If VarType(that) = vbObject Then
-                Set p(where) = that
-            ElseIf VarType(p(where)) = VbLongLong Then
+            On Error Resume Next
+            mt = vtType()
+            wt = VarType(that)
+            If wt = vbObject Then
+                If mt = 8201 Or mt = 8204 Then
+                    Set p(where) = that
+                Else
+                    mError = 91
+                End If
+            ElseIf mt = 8201 Then ' vbObject + vbArray
+                mError = 91
+            ElseIf mt = 8212 Then
                 If Not VarType(that) = VbLongLong Then
                     that = cInt64(that)
                 End If
                 If Not VarType(that) = VbLongLong Then mError = 6: Exit Property
                 CopyMemory ByVal ((ArrPtr() Xor &H80000000) + 8 * CLng(where)) Xor &H80000000, ByVal ((VarPtr(that) Xor &H80000000) + 8) Xor &H80000000, 8
+            ElseIf mt = 8200 Then
+                If wt = vbString Then
+                        p(where) = that
+                Else
+                    mError = 5030
+                End If
+            ElseIf wt = vbString Then
+                If mt = vbVariant Or mt = vbString Then
+                    p(where) = that
+                Else
+                    mError = 5020
+                End If
             Else
                 p(where) = that
             End If
+            If Err Then mError = Err.Number: Err.Clear
         End If
     ElseIf what >= 0 Then
-        If Elements(p(where)) + 1 < what Then
+        If Elements(p(where)) < what + 1 Then
             Dim ThisPtr As Long, PadDim As SAFEARRAYBOUND
             PadDim.cElements = what + 1
             ThisPtr = Peek(UnsignedAdd(VarPtr(p(where)), 8))
             If SafeArrayRedim(ByVal ThisPtr, VarPtr(PadDim)) <> 0& Then Err.Raise 5
         End If
         On Error Resume Next
-        Select Case VarType(p(where)) - vbArray
+            mt = vtType(where)
+            wt = VarType(that)
+        Select Case mt
         Case vbObject
-            Set p(where)(what) = that
+            If wt = vbObject Then
+                Set p(where)(what) = that
+            Else
+                mError = 91
+            End If
         Case VbLongLong ' 20
                 If Not VarType(that) = VbLongLong Then
                     that = cInt64(that)
                 End If
                 If Not VarType(that) = VbLongLong Then mError = 6: Exit Property
                 CopyMemory ByVal ((ArrPtr(where) Xor &H80000000) + 8 * CLng(what)) Xor &H80000000, ByVal ((VarPtr(that) Xor &H80000000) + 8) Xor &H80000000, 8
+        Case vbVariant
+            If wt = vbObject Then
+                Set p(where)(what) = that
+            Else
+                p(where)(what) = that
+            End If
+        Case vbString
+            If wt = vbString Then
+                p(where)(what) = that
+            Else
+                mError = 5030
+            End If
         Case Else
-            p(where)(what) = that
+            If wt = vbString Then
+                mError = 5020
+            Else
+                p(where)(what) = that
+            End If
         End Select
         If Err Then mError = Err.Number: Err.Clear
     End If
@@ -280,6 +324,8 @@ If ihavearray Then
                 Case vbVariant
                     If VarType(p(where)(what)) = VbLongLong Then
                         CopyMemory ByVal VarPtr(Value), ByVal ((ArrPtr(where) Xor &H80000000) + 16 * CLng(what)) Xor &H80000000, 16
+                    ElseIf myVarType(p(where)(what), vbObject) Then
+                     Set Value = p(where)(what)
                     Else
                         Value = p(where)(what)
                     End If
@@ -390,6 +436,7 @@ Dim Dummy5() As Double
 Dim Dummy6() As Single
 Dim Dummy7() As Byte
 Dim Dummy8() As Integer
+Dim Dummy9() As Boolean
 Select Case Arrtype
 Case vbObject
     ReDim Dummy0(size)
@@ -434,6 +481,9 @@ Case VbLongLong
 Case vbVariant
     ReDim Dummy4(size)
     Value(where) = Dummy4()
+Case vbBoolean
+    ReDim Dummy9(size)
+    Value(where) = Dummy9()
 End Select
 If where > 0 Then OneDimension = False
 End Sub
@@ -523,12 +573,16 @@ If ihavearray Then
             End If
         Else
             Dim pp As Long
+            If Elements(p) >= where Then
             pp = Elements(p(where))
             If pp > 0 Then
                 GetMem2 VarPtr(p(where)), vtType
                 vtType = vtType - vbArray
             Else
                 GetMem2 VarPtr(p(where)), vtType ' not an array ??
+            End If
+            Else
+            vtType = -1
             End If
         End If
     End If
@@ -549,13 +603,13 @@ End Property
 Private Sub Class_Initialize()
 OneDimension = True
 End Sub
-Public Sub ResetToType(ThisType As Integer, Optional many)
+Public Sub ResetToType(thistype As Integer, Optional many)
 OneDimension = True
-flat = ThisType <> 12
+flat = thistype <> 12
 If Not IsMissing(many) Then
-DefArrayAt -1, ThisType, Abs(CLng(many))
+DefArrayAt -1, thistype, Abs(CLng(many))
 Else
-DefArrayAt -1, ThisType, 0
+DefArrayAt -1, thistype, 0
 End If
 End Sub
 Public Sub RedimForFlat(size As Long)
