@@ -1,8 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 5 active-X
-99% ok.
-I have to write new manual.
+Version 12 Revision 6 active-X
+some fixes on new RefArray items (work continue for object/variant types).
 
 
 George Karras, Kallithea Attikis, Greece.

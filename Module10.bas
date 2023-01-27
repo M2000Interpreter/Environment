@@ -1041,7 +1041,7 @@ Case1:
     UseType = True
     GoTo assignpointer
     Case -1
-    Exec1 = 0: ExecuteVar = 8: Exit Function
+        GoTo err000
     End Select
     i = MyTrimL(b$)
 
@@ -1101,7 +1101,6 @@ If VarStat Then
             Else
                 If Not IsEnumAs(bstack, b$, p) Then
                     ExpectedEnumType
-                    ' MyEr "No type found", "δεν βρήκα τύπο"
                     Exit Function
                 End If
             End If
@@ -1218,8 +1217,7 @@ If Left$(b$, 1) = "_" Then
         Else
             UnknownVariable W$
         End If
-            Exec1 = 0: ExecuteVar = 8
-            Exit Function
+            GoTo err000
         End If
 ElseIf MaybeIsSymbol(b$, "/*-+=~^|<") Then
         If Mid$(b$, i, 2) = "//" Then
@@ -1265,8 +1263,7 @@ ElseIf MaybeIsSymbol(b$, "/*-+=~^|<") Then
         Else
             UnknownVariable W$
         End If
-            Exec1 = 0: ExecuteVar = 8
-            Exit Function
+            GoTo err000
         End If
         ' do something here
         ElseIf varhash.Find2(here$ + "." + myUcase(W$), v, UseType) Then
@@ -1285,28 +1282,11 @@ assignvalue3:
                             If AssignTypeNumeric(p, VarType(var(v))) Then
                                 var(v) = p
                             Else
-                                Exec1 = 0: ExecuteVar = 8: Exit Function
+                                GoTo err000
                             End If
                             Else
-                           ' If VarType(var(v)) = vbLong Then
-                           '     On Error Resume Next
-                           '         If VarType(p) <> vbLong Then var(v) = CLNG(P) Else var(v) = p
-                           '         If Err.Number > 0 Then OverflowValue: Exec1 = 0: ExecuteVar = 8: Exit Function
-                           '         On Error GoTo 0
-                           ' ElseIf VarType(var(v)) = vbInteger Then
-                           '     On Error Resume Next
-                           '         If VarType(p) <> vbInteger Then var(v) = CINT(p) Else var(v) = p
-                           '         If Err.Number > 0 Then OverflowValue vbInteger: Exec1 = 0: ExecuteVar = 8: Exit Function
-                           '         On Error GoTo 0
-                           ' ElseIf VarType(var(v)) = 20 Then
-                           '     On Error Resume Next
-                           '         If VarType(p) <> 20 Then var(v) = cInt64(p) Else var(v) = p
-                           '         If Err.Number > 0 Then OverflowValue vbInteger: Exec1 = 0: ExecuteVar = 8: Exit Function
-                           ' Else
-                           
                                 var(v) = p
-                            'End If
-                        End If
+                            End If
                         Else
                       
 checkobject:
@@ -1365,7 +1345,7 @@ checkobject:
                                         Set var(v) = var(usehandler.indirect)
                                     Else
                                         BadObjectDecl
-                                        Exec1 = 0: ExecuteVar = 8: Exit Function
+                                        GoTo err000
                                     End If
                                 Else
                                     Set var(v) = usehandler
@@ -1422,7 +1402,7 @@ checkobject:
                                     NoObjectAssign
                                     If var(v) = vbEmpty Then var(v) = 0#
                                 End If
-                                Exec1 = 0: ExecuteVar = 8: Exit Function
+                                GoTo err000
                             End If
                             Set bstack.lastpointer = Nothing
                             Set bstack.lastobj = Nothing
@@ -1448,18 +1428,18 @@ checkobject:
                             If AssignTypeNumeric(p, VarType(var(v))) Then
                                 var(v) = p
                             Else
-                                Exec1 = 0: ExecuteVar = 8: Exit Function
+                                GoTo err000
                             End If
                             Else
                             If myVarType(var(v), vbLong) Then
                                 On Error Resume Next
                                     var(v) = CLng(p)
-                                    If Err.Number > 0 Then OverflowValue: Exec1 = 0: ExecuteVar = 8: Exit Function
+                                    If Err.Number > 0 Then OverflowValue: GoTo err000
                                     On Error GoTo 0
                             ElseIf myVarType(var(v), vbInteger) Then
                                 On Error Resume Next
                                     var(v) = CInt(p)
-                                    If Err.Number > 0 Then OverflowValue vbInteger: Exec1 = 0: ExecuteVar = 8: Exit Function
+                                    If Err.Number > 0 Then OverflowValue vbInteger: GoTo err000
                                     On Error GoTo 0
                             Else
                                 var(v) = p
@@ -1474,8 +1454,7 @@ checkobject:
                     ' if is string then what???
                         If var(v) = vbEmpty Then var(v) = 0#
                         NoValueForVar W$
-                        Exec1 = 0: ExecuteVar = 8
-                        Exit Function
+                        GoTo err000
                     End If
                     If extreme Then GoTo NewCheck2 Else GoTo NewCheck
                 ElseIf Not MyIsObject(var(v)) Then
@@ -1504,8 +1483,7 @@ assigngroup:
                         End If
                     End If
                         AssigntoNothing  ' Use Declare
-                        Exec1 = 0: ExecuteVar = 8
-                        Exit Function
+                        GoTo err000
                     ElseIf TypeOf var(v) Is Group Then
                         If IsExp(bstack, b$, p) Then
 
@@ -1527,16 +1505,14 @@ assigngroup:
                                 Set myobject = Nothing
                             ElseIf bstack.lastobj Is Nothing Then
                                 NeedAGroupInRightExpression
-                                Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                GoTo err000
                             ElseIf TypeOf bstack.lastobj Is Group Then
                                 Set myobject = bstack.lastobj
                                 Set bstack.lastobj = Nothing
                                 ss$ = bstack.GroupName
                                 If var(v).HasValue Or var(v).HasSet Then
                                 PropCantChange
-                                Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                GoTo err000
                                 Else
                                 If Len(var(v).GroupName) > Len(W$) Then
                                     If var(v).IamRef Then ' Or Len(bstack.UseGroupname ) > 0
@@ -1571,8 +1547,7 @@ assigngroup:
                                         Else
                                             GroupWrongUse
                                         End If
-                                        Exec1 = 0: ExecuteVar = 8
-                                        Exit Function
+                                        GoTo err000
                                     End If
                                 End If
                                 End If
@@ -1581,8 +1556,7 @@ assigngroup:
                                 Set bstack.lastpointer = Nothing
                             Else
                                 WrongObject
-                                Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                GoTo err000
                             End If
                             If extreme Then GoTo NewCheck2 Else GoTo NewCheck
                             
@@ -1615,7 +1589,7 @@ noexpression1:
                             Set myobject = Nothing
                             Set bstack.lastobj = Nothing
                             MissNumExpr
-                            Exec1 = 0: ExecuteVar = 8
+                            GoTo err000
                             End If
                             Exit Function
                         
@@ -1652,20 +1626,18 @@ noexpression1:
                             Else
                                 Expected "lambda", "λάμδα"
                             End If
-                            Exec1 = 0: ExecuteVar = 8
-                            Exit Function
+                            GoTo err000
 
                         Else
                             MissNumExpr
-                            Exec1 = 0: ExecuteVar = 8
-                            Exit Function
+                            GoTo err000
                         End If
                     ElseIf TypeOf var(v) Is mHandler Then  ' CHECK IF IT IS A HANDLER
                         Set usehandler = var(v)
                         If IsExp(bstack, b$, p) Then
                             If usehandler.ReadOnly Then
                                 ReadOnly
-                                Exec1 = 0: ExecuteVar = 8: Exit Function
+                                GoTo err000
                             End If
 jumpbackhere:
                             Set usehandler = var(v)
@@ -1677,11 +1649,11 @@ checkfromstring:
                                         Set var(v) = myobject
                                     Else
                                         ExpectedEnumType
-                                        Exec1 = 0: ExecuteVar = 8: Exit Function
+                                        GoTo err000
                                     End If
                                 Else
                                     NoObjectFound
-                                    Exec1 = 0: ExecuteVar = 8: Exit Function
+                                    GoTo err000
                                 End If
                             ElseIf Typename(bstack.lastobj) = mHdlr Then
                             
@@ -1711,7 +1683,7 @@ checkfromstring:
 contwrong1:
                                             WrongType
                                             Set bstack.lastobj = Nothing
-                                            Exec1 = 0: ExecuteVar = 8: Exit Function
+                                            GoTo err000
                                         End If
                                     End If
                                 End If
@@ -1741,8 +1713,7 @@ contwrong1:
                                 End If
                             End If
                             MissNumExpr
-                            Exec1 = 0: ExecuteVar = 8
-                            Exit Function
+                            GoTo err000
                             
                         End If
                         Set bstack.lastobj = Nothing
@@ -1755,13 +1726,11 @@ contwrong1:
                                 Else
                                     CantAssignValue
                                     MissNumExpr
-                                    Exec1 = 0: ExecuteVar = 8
-                                    Exit Function
+                                    GoTo err000
                                 End If
                             Else
                                 MissNumExpr
-                                Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                GoTo err000
                             End If
                         Else
                             If InStr(ss$, ".") = 0 Or var(v).flag Then
@@ -1769,8 +1738,7 @@ contwrong1:
                             Else
                                 NoOperatorForThatObject "="
                             End If
-                            Exec1 = 0: ExecuteVar = 8
-                            Exit Function
+                            GoTo err000
                         End If
                       ElseIf TypeOf var(v) Is mEvent Then
                       If IsExp(bstack, b$, p) Then
@@ -1781,9 +1749,8 @@ contwrong1:
                             Set bstack.lastobj = Nothing
                             End If
                         Else
-misnum:                            MissNumExpr
-                            Exec1 = 0: ExecuteVar = 8
-                            Exit Function
+misnum:                     MissNumExpr
+                            GoTo err000
                         End If
                     ElseIf MyIsObject(var(v)) Then
                     If IsExp(bstack, b$, p) Then
@@ -1794,8 +1761,7 @@ misnum:                            MissNumExpr
                     
                     Else
                     WrongObject
-                           Exec1 = 0: ExecuteVar = 8
-                            Exit Function
+                    GoTo err000
                     
                     End If
                     Else
@@ -1866,8 +1832,7 @@ somethingelse:
                         If IsExp(bstack, b$, p) Then
                             If Int(p) = 0 Then
                                 DevZero
-                                Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                GoTo err000
                             End If
                             var(v) = CInt(var(v) \ Int(p))
                         Else
@@ -1887,8 +1852,7 @@ somethingelse:
                         If IsExp(bstack, b$, p) Then
                             If Int(p) = 0 Then
                                 DevZero
-                                Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                GoTo err000
                             End If
                             Select Case ss$
                             Case "DIV", "ΔΙΑ"
@@ -1946,8 +1910,7 @@ somethingelse:
                             If IsExp(bstack, b$, p) Then
                                 If Int(p) = 0 Then
                                     DevZero
-                                    Exec1 = 0: ExecuteVar = 8
-                                    Exit Function
+                                    GoTo err000
                                 End If
                                 var(v) = CLng(var(v) \ Int(p))
                             Else
@@ -1967,8 +1930,7 @@ somethingelse:
                         If IsExp(bstack, b$, p) Then
                             If Int(p) = 0 Then
                                 DevZero
-                                Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                GoTo err000
                             End If
                             Select Case ss$
                             Case "DIV", "ΔΙΑ"
@@ -2002,8 +1964,7 @@ checksyntax:
                          If extreme Then GoTo NewCheck2 Else GoTo NewCheck
                         End If
                         SyntaxError
-                        Exec1 = 0: ExecuteVar = 8
-                        Exit Function
+                        GoTo err000
                 On Error GoTo 0
                 Else
                 
@@ -2057,8 +2018,7 @@ checksyntax:
                         If IsExp(bstack, b$, p) Then
                             If p = 0# Then
                                 DevZero
-                                Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                GoTo err000
                             End If
                             If VarType(var(v)) = 20 Then
                                 If Not VarType(p) = 20 Then p = cInt64(p)
@@ -2104,8 +2064,7 @@ checksyntax:
                         If IsExp(bstack, b$, p) Then
                             If Int(p) = 0 Then
                                 DevZero
-                                Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                GoTo err000
                             End If
                             Select Case ss$
                             Case "DIV", "ΔΙΑ"
@@ -2174,7 +2133,7 @@ checksyntax:
                         SyntaxError
                     End If
                     
-                    ExecuteVar = 8: Exit Function
+                    GoTo err000
 
                 End Select
                 If Err.Number = 6 Then
@@ -2200,8 +2159,7 @@ checksyntax:
                 GoTo stroper001
                 Else
                 MissNumExpr
-                Exec1 = 0: ExecuteVar = 8
-                Exit Function
+                GoTo err000
                 End If
                 ElseIf var(v) Is Nothing Then
                 Stop
@@ -2253,8 +2211,7 @@ comeoper:
                     If Not ok Then
 here1234:
                         If LastErNum = 0 Then MissOperator ss$
-                        Exec1 = 0: ExecuteVar = 8
-                        Exit Function
+                        GoTo err000
                     End If
                 Else
                     Set myobject = var(v)
@@ -2293,8 +2250,7 @@ here1234:
                                     Else
 NotArray1:
                                         NotArray
-                                        Exec1 = 0: ExecuteVar = 8
-                                        Exit Function
+                                        GoTo err000
                                     End If
                                 End If
                             Else
@@ -2315,7 +2271,7 @@ NotArray1:
                         If usehandler.t1 = 4 Then
                             If usehandler.ReadOnly Then
                                     ReadOnly
-                                    Exec1 = 0: ExecuteVar = 8: Exit Function
+                                    GoTo err000
                             ElseIf ss$ = "++" Then
                                 If usehandler.index_start < usehandler.objref.count - 1 Then
                                     usehandler.index_start = usehandler.index_start + 1
@@ -2332,19 +2288,16 @@ NotArray1:
                                 usehandler.sign = -usehandler.sign
                             Else
                                 NoOperatorForThatObject ss$
-                                Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                GoTo err000
                             End If
                             Set usehandler = Nothing
                         Else
                             NoOperatorForThatObject ss$
-                            Exec1 = 0: ExecuteVar = 8
-                            Exit Function
+                            GoTo err000
                         End If
                     Else
                         NoOperatorForThatObject ss$
-                        Exec1 = 0: ExecuteVar = 8
-                        Exit Function
+                        GoTo err000
                     End If
                 End If
             End If
@@ -2456,12 +2409,12 @@ checkobject1:
                     End If
                     If Right$(ss$, 1) = "=" Or Len(ss$) > 2 Then
                     If IsExp(bstack, b$, p) Then
-                 If Not bstack.AlterVar(W$, p, ss$, False) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+                 If Not bstack.AlterVar(W$, p, ss$, False) Then GoTo err000
                  Else
                  GoTo aproblem1
                  End If
                  Else
-                 If Not bstack.AlterVar(W$, p, ss$, False) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+                 If Not bstack.AlterVar(W$, p, ss$, False) Then GoTo err000
                  End If
                     If extreme Then GoTo NewCheck2 Else GoTo NewCheck
                 
@@ -2477,7 +2430,7 @@ checkobject1:
                     Else
                         SyntaxError
                         Set bstack.lastobj = Nothing
-                        Exec1 = 0: ExecuteVar = 8: Exit Function
+                        GoTo err000
                     End If
                 Else
                 v = globalvar(W$, p, , VarStat, temphere$)
@@ -2501,7 +2454,7 @@ jumphere1:
             End If
             End If
             OnlyForGroupPointers
-            Exec1 = 0: ExecuteVar = 8: Exit Function
+            GoTo err000
             ElseIf AscW(W$) = &H1FFF Then
             If GetVar(bstack, W$, v, True, , , , UseType) Then newid = False: GoTo assignvalue
             If GetlocalVar(W$, v) Then UseType = varhash.vType(varhash.Index): newid = False: GoTo assignvalue
@@ -2546,7 +2499,7 @@ jumpgrouphere:
                         CanyAssignPointer2Group
                     Set bstack.lastpointer = Nothing
                         Set bstack.lastobj = Nothing  '???
-                     Exec1 = 0: ExecuteVar = 8: Exit Function
+                     GoTo err000
                     Else
                      Set var(v) = bstack.lastpointer
                      End If
@@ -2561,7 +2514,7 @@ jumpgrouphere:
                    
                      MissingPointer
                        Set bstack.lastobj = Nothing
-                     Exec1 = 0: ExecuteVar = 8: Exit Function
+                     GoTo err000
                     End If
                     If extreme Then GoTo NewCheck2 Else GoTo NewCheck
                 
@@ -2572,7 +2525,7 @@ Case3:
 If AscW(W$) = 46 Then
                If Not expanddot(bstack, W$) Then
                ManyDots
-                Exec1 = 0: ExecuteVar = 8: Exit Function
+                GoTo err000
                End If
 Else
 Select Case CheckThis(bstack, W$, b$, v, Lang)
@@ -2582,7 +2535,7 @@ Case 1
 UseType = True
 GoTo assignvaluestr1
 Case -1
-Exec1 = 0: ExecuteVar = 8: Exit Function
+GoTo err000
 End Select
 End If
 
@@ -2663,8 +2616,7 @@ End If
                                 GoTo cont184575
                             Else
                                 NoValueForVar W$
-                                Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                GoTo err000
                             End If
                         Else
                             If NewStat Then
@@ -2723,16 +2675,14 @@ assignvaluestr1:
                                         Else
                                             If bstack.lastobj Is Nothing Then
                                                 NeedAGroupInRightExpression
-                                                Exec1 = 0: ExecuteVar = 8
-                                                Exit Function
+                                                GoTo err000
                                             ElseIf TypeOf bstack.lastobj Is Group Then
                                                 Set myobject = bstack.lastobj
                                                 Set bstack.lastobj = Nothing
                                                 ss$ = bstack.GroupName
                                                 If var(v).HasValue Or var(v).HasSet Then
                                                     PropCantChange
-                                                    Exec1 = 0: ExecuteVar = 8
-                                                    Exit Function
+                                                    GoTo err000
                                                 Else
                                                     W$ = Left$(W$, Len(W$) - 1)
                                                     If Len(var(v).GroupName) > Len(W$) Then
@@ -2744,8 +2694,7 @@ assignvaluestr1:
                                                             UnFloatGroupReWriteVars bstack, W$, v, myobject
                                                         Else
                                                             GroupWrongUse
-                                                            Exec1 = 0: ExecuteVar = 8
-                                                            Exit Function
+                                                            GoTo err000
                                                         End If
                                                     End If
                                                 End If
@@ -2766,8 +2715,7 @@ itsAconstant:
                                                     Else
                                                         NoObjectAssign
                                                         MissNumExpr
-                                                        Exec1 = 0: ExecuteVar = 8
-                                                        Exit Function
+                                                        GoTo err000
                                                     End If
                                                 Else
                                                     CantAssignValue
@@ -2775,7 +2723,7 @@ itsAconstant:
                                             Else
                                                 ExpectedObj VarTypeName(var(v))
                                             End If
-                                            Exec1 = 0: ExecuteVar = 8: Exit Function
+                                            GoTo err000
                                         End If
                                     End If
                                 End If
@@ -2806,8 +2754,7 @@ cont184575:
                                     End If
                                     If VarTypeName(var(i)) = "Constant" Then
                                         CantAssignValue
-                                        Exec1 = 0: ExecuteVar = 8
-                                    Exit Function
+                                        GoTo err000
                                     End If
                                     If here$ = vbNullString Or VarStat Then
                                         GlobalSub W$ + "()", "", , , i
@@ -2823,19 +2770,16 @@ cont184575:
                                 End If
                             ElseIf Typename$(bstack.lastobj) = mGroup Then
                                 If Not ProcGroup(200 + (VarStat Or isglobal), bstack, W$, Lang) Then
-                                    Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                    GoTo err000
                             End If
                         Else
                             NoValueForVar W$
-                            Exec1 = 0: ExecuteVar = 8
-                            Exit Function
+                            GoTo err000
                         End If
                     End If
                 Else
                     NoValueForVar W$
-                    Exec1 = 0: ExecuteVar = 8
-                    Exit Function
+                    GoTo err000
                 End If
             End If
         End If
@@ -2876,7 +2820,7 @@ stroper001:
                     ElseIf Typename$(var(v)) = mGroup Then
                            If sw$ = "g" Then
                            sw$ = ":="
-                           If Not var(v).HasSet Then GroupCantSetValue: Exec1 = 0: ExecuteVar = 8: Exit Function
+                           If Not var(v).HasSet Then GroupCantSetValue: GoTo err000
                            End If
                            Set myobject = bstack.soros
                             Set bstack.Sorosref = New mStiva
@@ -2902,8 +2846,7 @@ a325674:
                CheckVar var(v), ss$, sw$ = "+="
                Else
                             NoValueForVar W$
-                            Exec1 = 0: ExecuteVar = 8
-                            Exit Function
+                            GoTo err000
                End If
                
                End If
@@ -2916,8 +2859,7 @@ a325674:
                 ElseIf myVarType(var(v), vbString) Then
                     MissStringExpr
                     NoValueForVar CStr(p)
-                    Exec1 = 0: ExecuteVar = 8
-                    Exit Function
+                    GoTo err000
                 End If
                
             End If
@@ -2938,7 +2880,7 @@ Else
         End If
 
                  NoValueForVar W$
-                    Exec1 = 0: ExecuteVar = 8
+                    GoTo err000
              
 End If
  ExecuteVar = 7
@@ -2947,7 +2889,7 @@ Case4:
 If AscW(W$) = 46 Then
                If Not expanddot(bstack, W$) Then
                ManyDots
-                Exec1 = 0: ExecuteVar = 8: Exit Function
+                GoTo err000
                End If
 Else
 Select Case CheckThis(bstack, W$, b$, v, Lang)
@@ -2955,7 +2897,7 @@ Case 1
 UseType = True
 GoTo assignvalue100
 Case -1
-Exec1 = 0: ExecuteVar = 8: Exit Function
+GoTo err000
 End Select
 
 End If
@@ -2978,8 +2920,7 @@ End If
                 Else
                       If LastErNum <> -2 Then
                      NoValueForVar W$
-                    Exec1 = 0: ExecuteVar = 8
-                     Exit Function
+                    GoTo err000
                      End If
             
             End If
@@ -3012,8 +2953,7 @@ assignvalue100:
                         Else
                             
                             ExpectedObj VarTypeName(var(v))
-                            Exec1 = 0: ExecuteVar = 8
-                            Exit Function
+                            GoTo err000
                             End If
                ElseIf MyIsObject(var(v)) Then
                         If TypeOf var(v) Is Constant Then
@@ -3023,9 +2963,8 @@ assignvalue100:
                                           If extreme Then GoTo NewCheck2 Else GoTo NewCheck
                                     Else
                                           NoObjectAssign
-                                                        MissNumExpr
-                                                      Exec1 = 0: ExecuteVar = 8
-                                                      Exit Function
+                                          MissNumExpr
+                                          GoTo err000
                                     End If
                        
                                 Else
@@ -3035,15 +2974,14 @@ assignvalue100:
                            ExpectedObj VarTypeName(var(v))
                            
                         End If
-                        Exec1 = 0: ExecuteVar = 8
-                                    Exit Function
+                        GoTo err000
                 Else
                         p = MyRound(p)
                         If UseType Then
                                    If AssignTypeNumeric(p, VarType(var(v))) Then
                                        var(v) = p
                                    Else
-                                       Exec1 = 0: ExecuteVar = 8: Exit Function
+                                       GoTo err000
                                    End If
                        Else
                      var(v) = p
@@ -3079,9 +3017,8 @@ abc2345:
                                 Set var(v) = bstack.lastobj
                                 Set bstack.lastobj = Nothing
                                 Else
-                                     NoValueForVar W$
-                            Exec1 = 0: ExecuteVar = 8
-                            Exit Function
+                                    NoValueForVar W$
+                                    GoTo err000
                                 End If
            Else
             p = MyRound(p)
@@ -3093,8 +3030,7 @@ abc2345:
                       If LastErNum <> -2 Then
 aproblem1:
                      NoValueForVar W$
-                    Exec1 = 0: ExecuteVar = 8
-                     Exit Function
+                    GoTo err000
                      End If
             
             End If
@@ -3125,12 +3061,11 @@ again1234567:
         'NOT YET FOR PropReference
       If MyIsObject(var(v)) Then
             If VarTypeName(var(v)) = mProp Then
-                    Exec1 = 0: ExecuteVar = 8: Exit Function
+                    GoTo err000
             End If
             If TypeOf var(v) Is Constant Then
                 NoOperatorForThatObject ss$
-                Exec1 = 0: ExecuteVar = 8
-                Exit Function
+                GoTo err000
             End If
             
       End If
@@ -3185,15 +3120,15 @@ again1234567:
             GoTo checksyntax
      Else
         If v = -1 Then
-         If Len(ss$) = 1 Then If Not IsExp(bstack, b$, p) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+         If Len(ss$) = 1 Then If Not IsExp(bstack, b$, p) Then GoTo err000
                     
-             If Not bstack.AlterVar(W$, p, ss$, True) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+             If Not bstack.AlterVar(W$, p, ss$, True) Then GoTo err000
                     If extreme Then GoTo NewCheck2 Else GoTo NewCheck
 
     Else
         If ss$ = "g" Then ss$ = "=":   GoTo again1234567
        NoValueForVar W$
-       Exec1 = 0: ExecuteVar = 8: Exit Function
+       GoTo err000
        End If
       End If
    
@@ -3255,7 +3190,7 @@ Else
         sss = Len(b$): ExecuteVar = 4: Exit Function
     Else
         NoValueForVar W$
-        Exec1 = 0: ExecuteVar = 8: Exit Function
+        GoTo err000
     End If
 End If
 Exit Function
@@ -3265,7 +3200,7 @@ case5:
     If AscW(W$) = 46 Then
         If Not expanddot(bstack, W$) Then
             ManyDots
-            Exec1 = 0: ExecuteVar = 8: Exit Function
+            GoTo err000
         End If
     End If
     If funid.Find(W$, i) Then
@@ -3288,8 +3223,7 @@ arr1111:
     If neoGetArray(bstack, W$, ppppAny, , , , True) Then
 againarray:
         If ppppAny Is Nothing Then
-            Exec1 = 0: ExecuteVar = 8
-            Exit Function
+            GoTo err000
         End If
         If Not ppppAny.Arr Then
             If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , True, idx) Then GoTo errorarr
@@ -3338,17 +3272,16 @@ againarray:
                 Else
                     SyntaxError
                 End If
-                Exec1 = 0: ExecuteVar = 8
-                Exit Function
+                GoTo err000
             End If
     ElseIf Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then
 errorarr:
 If LastErNum = -2 Then
 
 Execute bstack, b$, True
-Exec1 = 0: ExecuteVar = 8: Exit Function
+GoTo err000
 Else
-Exec1 = 0: ExecuteVar = 8
+Exec1 = 0
 ExecuteVar = 1
 Exit Function
 End If
@@ -3360,7 +3293,7 @@ here66678:
 '****************************************
 '*********************************************
     With ppppAny
-        If ppppAny.Final Then CantAssignValue: Exec1 = 0: ExecuteVar = 8: Exit Function
+        If ppppAny.Final Then CantAssignValue: GoTo err000
         If MyIsObject(.item(v)) Then
             If v = -2 Then
                 Set myobject = .item(v)
@@ -3372,7 +3305,7 @@ here66678:
                         PushParamGeneral bstack, b$
                         If Not FastSymbol(b$, ")", True) Then
                             Set bstack.Sorosref = myobject
-                            Exec1 = 0: ExecuteVar = 8: Exit Function
+                            GoTo err000
                         End If
                         If FastSymbol(b$, "=") Then
                             If IsExp(bstack, b$, p) Then
@@ -3398,8 +3331,7 @@ here66678:
                         End If
                         Set bstack.Sorosref = myobject
                         SyntaxError
-                        Exec1 = 0: ExecuteVar = 8
-                        Exit Function
+                        GoTo err000
                     Else
                     End If
                 Else
@@ -3474,17 +3406,16 @@ contassignhere:
                 FeedArray pppp, v, myobject
                 ExecuteVar = 7
             Else
-                Exec1 = 0
-                ExecuteVar = 8
+                GoTo err000
             End If
             Exit Function
         ElseIf .IsStringItem(v) Then
             If FastSymbol(b$, "+=", , 2) Then
-                If Not IsStrExp(bstack, b$, sw$, False) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+                If Not IsStrExp(bstack, b$, sw$, False) Then GoTo err000
                 .item(v) = .item(v) + sw$
             Else
                 WrongOperator
-                Exec1 = 0: ExecuteVar = 8: Exit Function
+                GoTo err000
             End If
         Else
             AssignTypeNumeric sp, VarType(.item(v))
@@ -3495,16 +3426,16 @@ contassignhere:
                 .item(v) = .itemnumeric(v) - 1
                 If extreme Then GoTo NewCheck2 Else GoTo NewCheck
             ElseIf FastSymbol(b$, "+=", , 2) Then
-                If Not IsExp(bstack, b$, p) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+                If Not IsExp(bstack, b$, p) Then GoTo err000
                 .item(v) = .itemnumeric(v) + p
             ElseIf FastSymbol(b$, "-=", , 2) Then
-                If Not IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+                If Not IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then GoTo err000
                 .item(v) = .itemnumeric(v) - p
             ElseIf FastSymbol(b$, "*=", , 2) Then
-                If Not IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+                If Not IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then GoTo err000
                 .item(v) = .itemnumeric(v) * p
             ElseIf FastSymbol(b$, "/=", , 2) Then
-                If Not IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+                If Not IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then GoTo err000
                 If p = 0# Then
                     DevZero
                 Else
@@ -3541,8 +3472,7 @@ contassignhere:
                     If IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then
                         If Int(p) = 0 Then
                             DevZero
-                            Exec1 = 0: ExecuteVar = 8
-                            Exit Function
+                            GoTo err000
                         End If
                         Select Case ss$
                         Case "DIV", "ΔΙΑ"
@@ -3571,7 +3501,7 @@ contassignhere:
                     WrongOperator
                 End If
             ElseIf FastSymbol(b$, "->", , 2) Then
-                If Not GetPointer(bstack, b$) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+                If Not GetPointer(bstack, b$) Then GoTo err000
                 If Typename(bstack.lastobj) = mGroup Then
                     If Typename(.item(v)) <> mGroup Then
                         If bstack.lastpointer Is Nothing Then
@@ -3583,7 +3513,7 @@ contassignhere:
                         If .item(v).IamApointer Then
                             If bstack.lastpointer Is Nothing Then
                                 ExpectedPointer
-                                Exec1 = 0: ExecuteVar = 8: Exit Function
+                                GoTo err000
                             Else
                                 Set .item(v) = bstack.lastpointer
                             End If
@@ -3593,9 +3523,9 @@ contassignhere:
                     Set bstack.lastpointer = Nothing
                     If extreme Then GoTo NewCheck2 Else GoTo NewCheck
                 End If
-               Exec1 = 0: ExecuteVar = 8: Exit Function
+               GoTo err000
             Else
-               Exec1 = 0: ExecuteVar = 8: Exit Function
+               GoTo err000
             End If
         End If
         If Not myVarType(VarType(.item(v)), VarType(sp)) Then
@@ -3623,7 +3553,7 @@ End If
                 Mid$(b$, 1, 1) = ChrW(7)
                 Exec1 = SpeedGroup(bstack, ppppAny, "", W$, b$, v)
             End If
-            If Exec1 = 0 Then ExecuteVar = 8: Exit Function
+            If Exec1 = 0 Then GoTo err000
             If extreme Then GoTo NewCheck2 Else GoTo NewCheck
         End If
     ElseIf IsOperator(b$, "(") Then
@@ -3637,7 +3567,7 @@ again12568:
             PushParamStraight bstack, b$
             If Not FastSymbol(b$, ")", True) Then
                     Set bstack.Sorosref = myobject
-                    Exec1 = 0: ExecuteVar = 8: Exit Function
+                    GoTo err000
             End If
             If Not FastSymbol(b$, "=", True) Then
                 sss = 0
@@ -3649,7 +3579,7 @@ again12568:
                 Else
                     MissNumExpr
                 End If
-                Exec1 = 0: ExecuteVar = 8: Exit Function
+                GoTo err000
             End If
             If bstack.lastobj Is Nothing Then
                 bstack.soros.DataVal p
@@ -3658,7 +3588,7 @@ again12568:
                 Set bstack.lastobj = Nothing
             End If
             Exec1 = SpeedGroup(bstack, pppp, "@READ2", "", b$, v)
-            If Exec1 = 0 Then ExecuteVar = 8: Exit Function
+            If Exec1 = 0 Then GoTo err000
             If extreme Then GoTo NewCheck2 Else GoTo NewCheck
         End If
     ElseIf Not FastSymbol(b$, "=") Then
@@ -3677,7 +3607,7 @@ again12568:
                     If MaybeIsSymbol3(b$, "=", i) Then
                         Mid$(b$, i - 1, 2) = "  "
                         If IsExp(bstack, b$, p) Then GoTo here12500
-                        Exec1 = 0: ExecuteVar = 8: Exit Function
+                        GoTo err000
                     Else
                         If FastSymbol(b$, "(") Then
                         GoTo again12568
@@ -3708,7 +3638,7 @@ again12568:
         End If
      End If
      WrongFatArrow
-     Exec1 = 0: ExecuteVar = 8: Exit Function
+     GoTo err000
 ElseIf Not IsExp(bstack, b$, p) Then
     If IsStrExp(bstack, b$, sw$) Then
         p = vbNullString
@@ -3719,7 +3649,7 @@ ElseIf Not IsExp(bstack, b$, p) Then
         Else
             MissNumExpr
         End If
-        Exec1 = 0: ExecuteVar = 8: Exit Function
+        GoTo err000
     End If
 End If
 again12569:
@@ -3812,7 +3742,7 @@ here65654:
                 Else
                     ppppAny.item(v) = p
                 End If
-                If LastErNum1 Then Exec1 = 0: ExecuteVar = 8: Exit Function
+                If LastErNum1 Then GoTo err000
             End If
         ElseIf Typename(ppppAny.GroupRef) = mProp Then
             Set myProp = ppppAny.GroupRef
@@ -3840,7 +3770,7 @@ here65654:
     Do While FastSymbol(b$, ",")
         If pppp.UpperMonoLimit > v Then
             v = v + 1
-            If Not IsExp(bstack, b$, p) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+            If Not IsExp(bstack, b$, p) Then GoTo err000
             If Not bstack.lastobj Is Nothing Then
             Set myobject = pppp.GroupRef
             If pppp.IhaveClass Then
@@ -3873,7 +3803,7 @@ here65654:
 Loop
 End If
 Else
-    If LastErNum <> 0 Then Exec1 = 0: ExecuteVar = 8: Exit Function
+    If LastErNum <> 0 Then GoTo err000
     bstack.tmpstr = ss$
     ExecuteVar = 2  ' GoTo autogosub
     Exit Function
@@ -3882,8 +3812,8 @@ Exit Function
 Case6:
 If AscW(W$) = 46 Then
                If Not expanddot(bstack, W$) Then
-               ' MyEr "too many dots", "πολλές τελείες"
-                Exec1 = 0: ExecuteVar = 8: Exit Function
+               ManyDots
+                GoTo err000
                End If
 End If
 If VarStat Or NewStat Then
@@ -3896,7 +3826,7 @@ MakeArray bstack, W$, 6, b$, pppp, NewStat, VarStat
 End If
 If neoGetArray(bstack, W$, ppppAny) Then
     If Not ppppAny.Arr Then
-If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , , idx) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , , idx) Then GoTo err000
 GoTo there12567
 ElseIf FastSymbol(b$, ")") Then
     'need to found an expression - HEREHERE
@@ -3982,15 +3912,14 @@ ElseIf FastSymbol(b$, ")") Then
     Else
                 SyntaxError
             End If
-            Exec1 = 0: ExecuteVar = 8
-            Exit Function
+            GoTo err000
         End If
   
         
         End If
 If v = -2 Then GoTo checkpar
 againstrarr:
-If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
 ' WHY BEFORE WAS : If pppp.itemtype(v) = myArray And Not pppp.Arr Then
 there12567:
@@ -4011,7 +3940,7 @@ PushParamGeneral bstack, b$
 'PushParamStraight bstack, b$
     If Not FastSymbol(b$, ")", True) Then
             Set bstack.Sorosref = myobject
-            Exec1 = 0: ExecuteVar = 8: Exit Function
+            GoTo err000
     End If
     If FastSymbol(b$, "=") Then
         If IsStrExp(bstack, b$, ss$) Then
@@ -4040,17 +3969,14 @@ PushParamGeneral bstack, b$
                                 Set bstack.Sorosref = myobject
                                 Set myobject = Nothing
                                 SyntaxError
-                                Exec1 = 0: ExecuteVar = 8
-                                Exit Function
+                                GoTo err000
 ElseIf v < 0 Then
     WrongOperator
-    Exec1 = 0: ExecuteVar = 8
-    Exit Function
+    GoTo err000
 ElseIf Not FastSymbol(b$, "=") Then
     If Not TypeOf ppppAny Is mArray Then
         WrongObject
-        Exec1 = 0: ExecuteVar = 8
-    Exit Function
+        GoTo err000
     End If
     Set pppp = ppppAny
   If FastSymbol(b$, ":=", , 2) Then
@@ -4060,16 +3986,16 @@ ElseIf Not FastSymbol(b$, "=") Then
     ElseIf IsOperator(b$, "+=", 2) Then
     
     If pppp.IsStringItem(v) Then
-    If Not IsStrExp(bstack, b$, ss$, False) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+    If Not IsStrExp(bstack, b$, ss$, False) Then GoTo err000
     If bstack.lastobj Is Nothing Then
         pppp.ItemStr(v) = pppp.item(v) + ss$
     Else
         NeedString
-        Exec1 = 0: ExecuteVar = 8: Exit Function
+        GoTo err000
     End If
     Else
             FoundNoStringItem
-            Exec1 = 0: ExecuteVar = 8: Exit Function
+            GoTo err000
     End If
     ElseIf IsOperator(b$, "(") Then
         If pppp.ItemType(v) = myArray Then
@@ -4083,7 +4009,7 @@ ElseIf Not FastSymbol(b$, "=") Then
             PushParamStraight bstack, b$
             If Not FastSymbol(b$, ")", True) Then
                     Set bstack.Sorosref = myobject
-                    Exec1 = 0: ExecuteVar = 8: Exit Function
+                    GoTo err000
             End If
             If Not FastSymbol(b$, "=", True) Then
                 sss = 0
@@ -4095,7 +4021,7 @@ ElseIf Not FastSymbol(b$, "=") Then
                 Else
                 MissNumExpr
                 End If
-                Exec1 = 0: ExecuteVar = 8: Exit Function
+                GoTo err000
             End If
    '
             If bstack.lastobj Is Nothing Then
@@ -4109,7 +4035,7 @@ ElseIf Not FastSymbol(b$, "=") Then
             If extreme Then GoTo NewCheck2 Else GoTo NewCheck
         End If
    ElseIf FastSymbol(b$, "->", , 2) Then
-    If Not GetPointer(bstack, b$) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+    If Not GetPointer(bstack, b$) Then GoTo err000
     With pppp
     If Typename(bstack.lastobj) = mGroup Then
         If Typename(.item(v)) <> mGroup Then
@@ -4124,7 +4050,7 @@ ElseIf Not FastSymbol(b$, "=") Then
         If .item(v).IamApointer Then
             If bstack.lastpointer Is Nothing Then
                 ExpectedPointer
-                   Exec1 = 0: ExecuteVar = 8: Exit Function
+                   GoTo err000
             Else
                 Set .item(v) = bstack.lastpointer
             End If
@@ -4136,7 +4062,7 @@ ElseIf Not FastSymbol(b$, "=") Then
           If extreme Then GoTo NewCheck2 Else GoTo NewCheck
     End If
     End With
-   Exec1 = 0: ExecuteVar = 8: Exit Function
+   GoTo err000
    ElseIf FastSymbol(b$, "+=", , 2) Then
    If IsStrExp(bstack, b$, ss$) Then
     
@@ -4145,13 +4071,13 @@ ElseIf Not FastSymbol(b$, "=") Then
         
   Exit Function
   Else
-  Exec1 = 0: ExecuteVar = 8: Exit Function
+  GoTo err000
   End If
     Else
-        Exec1 = 0: ExecuteVar = 8: Exit Function
+        GoTo err000
     End If
 Else
-    If Not IsStrExp(bstack, b$, ss$, False) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+    If Not IsStrExp(bstack, b$, ss$, False) Then GoTo err000
     
     If Not MyIsObject(ppppAny.item(v)) Then
     
@@ -4209,7 +4135,7 @@ Else
         Do While FastSymbol(b$, ",")
         If pppp.UpperMonoLimit > v Then
         v = v + 1
-        If Not IsStrExp(bstack, b$, ss$) Then MissStringExpr: Exec1 = 0: ExecuteVar = 8: Exit Function
+        If Not IsStrExp(bstack, b$, ss$) Then MissStringExpr: GoTo err000
         
         If Not MyIsObject(pppp.item(v)) Then
           pppp.item(v) = ss$
@@ -4223,7 +4149,7 @@ Else
         End If
 End If
 Else
-Exec1 = 0: ExecuteVar = 8
+GoTo err000
 End If
 Exit Function
 Case8:
@@ -4238,11 +4164,11 @@ FastSymbol1 b$, "["
 
 If Not IsExp(bstack, b$, p, , flatobject:=True, nostring:=True) Then
     MissNumExpr
-    Exec1 = 0: ExecuteVar = 8: Exit Function
+    GoTo err000
 End If
 If Not FastSymbol(b$, "]") Then
     SyntaxError
-    Exec1 = 0: ExecuteVar = 8: Exit Function
+    GoTo err000
 End If
 
 If Left$(b$, 1) = "[" Then
@@ -4267,8 +4193,8 @@ entry100101:
         Select Case Left$(b$, 1)
         Case "="
             Mid(b$, 1, 1) = " "
-            If Left$(b$, 2) = "=>" Then
-        
+            If Left$(b$, 2) = " >" Then
+            
                 GoTo forwidearrow
             End If
             ww = 8
@@ -4325,9 +4251,11 @@ entry00022:
                 p = Abs(Int(p))
                 sp = i
                 If ar.vtType(0) = vbObject And ok Then
-                    If ar(0, sp) Is Nothing Then
+                    If ar.count > 1 Then
+                    
+                    ElseIf ar(0, sp) Is Nothing Then
                         GoTo nRefArray
-                    ElseIf TypeOf ar(0, i) Is refArray Then
+                    ElseIf TypeOf ar(0, sp) Is refArray Then
                         Set ar = ar(0, sp)
                         sp = 0
                         ok = False
@@ -4356,10 +4284,10 @@ entry00022:
                 If p.link.IamFloatGroup Then
                     ExecuteVar = 10
     
-                    Mid$(b$, 1, 1) = ChrW(3)
+                    Mid$(b$, 1, 2) = ChrW(7) + ChrW(3)
                 Else
                     ExecuteVar = 9
-                    Mid$(b$, 1, 1) = Chr$(0)
+                    Mid$(b$, 1, 1) = Chr$(0) + Chr$(0) ' cause we have two chars
                 End If
                 Set bstack.lastpointer = p
                 Exit Function
@@ -4382,16 +4310,58 @@ entry00121:
                         Set ar = var(v)
 entry00122:
                         If ar.MarkTwoDimension And Not ok Then
+                        If ar.vtType(0) = vbVariant Then
+                        If Not bstack.lastobj Is Nothing Then
+                        If TypeOf bstack.lastobj Is refArray Then
+                        If Not bstack.lastobj Is ar Then
+                            If ww = 8 Then
+                            
+                             ar(p) = CVar(bstack.lastobj)
+                            Set bstack.lastobj = Nothing
+                            GoTo NewCheck
+                            End If
+                        End If
+                        End If
+                        End If
+                        End If
+                        
 entry00123:
                            MissingIndexMore
                         Else
+                        
                             p = Abs(Int(p))
-                            If ar.vtType(0) = vbObject And ok Then
-                                If ar(0, CVar(i)) Is Nothing Then
+                            
+                            If ar.IsInnerRefArray(i, ar) Then
+                            
+                                i = 0
+                                ok = False
+                            GoTo entry00122
+                            End If
+                            If (ar.vtType(0) = vbObject) And ok Then  ' Or ar.vtType(0) = vbVariant
+                                If ar.count > 1 Then
+                                                                
+                                If ar.count(CVar(i)) = 0 Then
+                                    Set sp = bstack.lastobj
+                                    Set bstack.lastobj = Nothing
+                                    GoTo count0
+                                End If
+                                
+                                GoTo takeitnow
+                                
+                                ElseIf ar(0, CVar(i)) Is Nothing Then
                                 ' error for [ ]
+                                If Not bstack.lastobj Is Nothing Then
+                                If ar.count(CVar(i)) = 0 Then
+                                    Set sp = bstack.lastobj
+                                    Set bstack.lastobj = Nothing
+                                    GoTo count0
+                                End If
+                                GoTo takeitnow
+                                Else
 nRefArray:
                                     ExpRefArray i
                                     GoTo cont00100203
+                                End If
                                 ElseIf TypeOf ar(0, CVar(i)) Is refArray Then
                                     Set ar = ar(0, CVar(i))
                                     i = 0
@@ -4402,12 +4372,13 @@ nRefArray:
                                     GoTo nRefArray
                                 End If
                             ElseIf ar.count(CVar(i)) = 0 Then
+count0:
                                 ar.DefArrayAt i, ar.vtType(0), CLng(p)
                                 ' if ar.vtType(0)=vbstring  ......... check for string
                                 Select Case ww
                                 Case 0
                                 ar(CVar(i), p) = True
-                                Case 8, 4
+                                Case 8, 4, 18, 14
                                 ar(CVar(i), p) = sp
                                 Case 5
                                     If myVarType(sp, vbString) Then
@@ -4417,12 +4388,19 @@ nRefArray:
                                     End If
                                 End Select
                             Else
+
                                 If Not bstack.lastobj Is Nothing Then
+takeitnow:
                                     If ww <> 8 Then
                                         WrongOperator
                                         
                                     Else
-                                        If TypeOf bstack.lastobj Is Group Then
+                                        If bstack.lastobj Is Nothing Then
+                                        If sp <> 0 Then
+                                        MissType
+                                        GoTo err000
+                                        End If
+                                        ElseIf TypeOf bstack.lastobj Is Group Then
                                                 Set sp = bstack.lastobj
                                                 MakeGroupPointer bstack, sp
                                                 sp = 0
@@ -4450,19 +4428,17 @@ nRefArray:
                             End If
                             Select Case ar.AssignError
                             Case 6
-                                Exec1 = 0: ExecuteVar = 8
+                               
                                 OverflowValue VarType(ar(i, p))
-                                Exit Function
+                                GoTo err000
                             Case 0
                             Case Else
-                                If W = 14 Or W = 18 Then
+                                If ww = 14 Or ww = 18 Then
                                     NeedString
                                 Else
                                     MissType
                                 End If
-                                Exec1 = 0: ExecuteVar = 8
-                                
-                                Exit Function
+                                GoTo err000
                             End Select
                             Set bstack.lastobj = Nothing
                             Set bstack.lastpointer = Nothing
@@ -4491,7 +4467,7 @@ nRefArray:
     End If
 End If
 cont00100203:
-Exec1 = 0: ExecuteVar = 8: Exit Function
+GoTo err000
 Exit Function
 Case7:
 If AscW(W$) = 46 Then
@@ -4518,12 +4494,11 @@ If neoGetArray(bstack, W$, pppp) Then
             Else
                 SyntaxError
             End If
-            Exec1 = 0: ExecuteVar = 8
-            Exit Function
+            GoTo err000
         End If
         End If
 againintarr:
-If Not NeoGetArrayItem(pppp, bstack, W$, v, b$) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+If Not NeoGetArrayItem(pppp, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
 If pppp.ItemType(v) = myArray And pppp.Arr Then
 If FastSymbol(b$, "(") Then
@@ -4532,7 +4507,7 @@ GoTo againintarr
 End If
 End If
 If lookTwoSame(b$, "/") Then
-Exec1 = 0: ExecuteVar = 8: Exit Function
+GoTo err000
 ElseIf MaybeIsSymbol(b$, "+-*/~|") Then
 On Error Resume Next
 With pppp
@@ -4541,16 +4516,16 @@ If IsOperator0(b$, "++", 2) Then
 ElseIf IsOperator0(b$, "--", 2) Then
 .item(v) = .itemnumeric(v) - 1
 ElseIf FastSymbol(b$, "+=", , 2) Then
-If Not IsExp(bstack, b$, p) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+If Not IsExp(bstack, b$, p) Then GoTo err000
 .item(v) = .itemnumeric(v) + MyRound(p)
 ElseIf FastSymbol(b$, "-=", , 2) Then
-If Not IsExp(bstack, b$, p) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+If Not IsExp(bstack, b$, p) Then GoTo err000
 .item(v) = .itemnumeric(v) - MyRound(p)
 ElseIf FastSymbol(b$, "*=", , 2) Then
-If Not IsExp(bstack, b$, p) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+If Not IsExp(bstack, b$, p) Then GoTo err000
 .item(v) = MyRound(.itemnumeric(v) * MyRound(p))
 ElseIf FastSymbol(b$, "/=", , 2) Then
-If Not IsExp(bstack, b$, p) Then Exec1 = 0: ExecuteVar = 8: Exit Function
+If Not IsExp(bstack, b$, p) Then GoTo err000
 If MyRound(p) = 0 Then
  DevZero
  Else
@@ -4579,8 +4554,7 @@ ElseIf IsOperator0(b$, "|") Then
         If IsExp(bstack, b$, p) Then
             If Int(p) = 0 Then
                 DevZero
-                Exec1 = 0: ExecuteVar = 8
-                Exit Function
+                GoTo err000
             End If
             Select Case ss$
             Case "DIV", "ΔΙΑ"
@@ -4621,9 +4595,9 @@ If Not FastSymbol(b$, "=") Then
   
     GoTo contassignhere
 End If
-Exec1 = 0: ExecuteVar = 8: Exit Function
+GoTo err000
 End If
-If Not IsExp(bstack, b$, p) Then MissNumExpr: Exec1 = 0: ExecuteVar = 8: Exit Function
+If Not IsExp(bstack, b$, p) Then MissNumExpr: GoTo err000
 If Not bstack.lastobj Is Nothing Then
     If TypeOf bstack.lastobj Is mArray Then
                                  If bstack.lastobj.Arr Then
@@ -4642,17 +4616,16 @@ If Not bstack.lastobj Is Nothing Then
                           End If
 Else
 p = MyRound(p)
-If Err.Number > 0 Then Exec1 = 0: ExecuteVar = 8: Exit Function
+If Err.Number > 0 Then GoTo err000
 pppp.item(v) = p
 Do While FastSymbol(b$, ",")
 If pppp.UpperMonoLimit > v Then
 v = v + 1
-If Not IsExp(bstack, b$, p) Then MissNumExpr: Exec1 = 0: ExecuteVar = 8: Exit Function
+If Not IsExp(bstack, b$, p) Then MissNumExpr: GoTo err000
 If Not bstack.lastobj Is Nothing Then
     MissNumExpr
     Set bstack.lastobj = Nothing
-    Exec1 = 0: ExecuteVar = 8
-Exit Function
+    GoTo err000
 End If
 pppp.item(v) = MyRound(p)
 Else
@@ -4661,23 +4634,24 @@ End If
 Loop
 End If
 Else
-Exec1 = 0: ExecuteVar = 8: Exit Function
+GoTo err000
 End If
         Exit Function
 LONGERR:
     If Err.Number = 6 Then
-            Exec1 = 0: ExecuteVar = 8
             OverflowValue lasttype
+            GoTo err000
     ElseIf Err.Number = 450 Then
-            Exec1 = 0: ExecuteVar = 8
             WrongOperator
+            GoTo err000
     ElseIf Err.Number = 0 Then
-        Exec1 = 0: ExecuteVar = 8
             OverflowValue lasttype
+            GoTo err000
     End If
-
 Case2:
 Exit Function
+err000:
+            Exec1 = 0: ExecuteVar = 8: Exit Function
 NewCheck:
     If CheckFree(b$) Then
 NewCheck2:

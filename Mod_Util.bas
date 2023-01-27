@@ -12111,35 +12111,31 @@ lookagain:
                             Exit Function
 conthere11:
         ElseIf TypeOf bstack.lastobj Is Group Then
-                                    Set pppp = BoxGroupVar(bstack.lastobj)
-                                    Set bstack.lastpointer = Nothing
-                                    Set bstack.lastobj = Nothing
-                                w2 = 0
-                
-                a$ = NLtrim(a$)
+            Dim ppppL As iBoxArray
+            Set ppppL = BoxGroupVar(bstack.lastobj)
+            Set bstack.lastpointer = Nothing
+            Set bstack.lastobj = Nothing
+            w2 = 0
+            a$ = NLtrim(a$)
             If Left$(a$, 1) = "," Then
                 If Mid$(Pad$, cut - 1, 1) = "$" Then
                     Mid$(a$, 1, 1) = " "
-                    Matrix = SpeedGroup(bstack, pppp, "VAL$", pppp.CodeName + "$(", a$, w2) = 1
-                
+                    Matrix = SpeedGroup(bstack, ppppL, "VAL$", pppp.CodeName + "$(", a$, w2) = 1
                 Else
                     Mid$(a$, 1, 1) = "("
-                    Matrix = SpeedGroup(bstack, pppp, "VAL", pppp.CodeName, a$, w2) = 1
+                    Matrix = SpeedGroup(bstack, ppppL, "VAL", pppp.CodeName, a$, w2) = 1
                     res = bstack.LastValue
                 End If
             Else
                 If Mid$(Pad$, cut - 1, 1) = "$" Then
-                    Matrix = SpeedGroup(bstack, pppp, "VAL$", pppp.CodeName + "$(", a$, w2) = 1
-                
+                    Matrix = SpeedGroup(bstack, ppppL, "VAL$", pppp.CodeName + "$(", a$, w2) = 1
                 Else
-                    Matrix = SpeedGroup(bstack, pppp, "VAL", pppp.CodeName, a$, w2) = 1
+                    Matrix = SpeedGroup(bstack, ppppL, "VAL", pppp.CodeName, a$, w2) = 1
                     res = bstack.LastValue
                 End If
-                    FastSymbol a$, ")", True
+                FastSymbol a$, ")", True
             End If
-            
             res = bstack.LastValue
-            
             Exit Function
         Else
             Set bstack.lastobj = Nothing
@@ -17786,7 +17782,7 @@ With players(prive)
                         If Len(var(H&)) > 3 * .mX Then
                             hlp$ = " = " + Chr(34) + Left$(CStr(var(H&)), 4) + "..." + Chr(34)
                         Else
-                            hlp$ = " = " & Chr(34) & (var(H&)) + Chr(34)
+                            hlp$ = " = " & Chr(34) & (var(H&)) & Chr(34)
                         End If
                     End If
                 End If
@@ -25570,7 +25566,7 @@ contGetStr:
                             Else
 contGetStr0:
                              For i = CLng(p1) To 0 Step -1
-                                   Set ra(0, i) = basestack.lastobj
+                                   ra(0, i) = CVar(basestack.lastobj)
                                    p1 = ra.AssignError
                                     If p1 <> 0 Then
                                         MyEr Err.Description, Err.Description
@@ -25601,7 +25597,7 @@ contGetStr0:
                              Next i
                             Else
                              For i = CLng(p) To 0 Step -1
-                                   Set ra(0, i) = basestack.lastobj
+                                    ra(0, i) = CVar(basestack.lastobj)
                                    p1 = ra.AssignError
                                     If p1 <> 0 Then
                                         MyEr Err.Description, Err.Description

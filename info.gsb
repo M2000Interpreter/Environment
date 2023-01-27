@@ -3164,7 +3164,8 @@ MODULE GAME {Module Game2048 {
 }
 Game2048
 }
-MODULE FIX1 {Where=random(1, monitors)
+MODULE FIX1 {
+Where=random(1, monitors)
 //mm=where=window
 mm=0
 Title "M2000", mm
@@ -6661,14 +6662,17 @@ Function DepthSort() {
 }
 Thread {
 	part {
-		Method Math, "RotVectMult", 4, vRot1, vAxis, vRot1, dAngle
+		Method Math, "RotVectMult", 4, vRot1, vAxis, vRot1, dAngle  ' , bDegrees:=false  ' true by default
 		Push Eval(Var, vBase.y As double), Eval(Var, vBase.x As double)
 		\\ x is in top, y is after x
 		Over 2, 2 \\  copy two times from second, so double two top
-		Push Eval(Var, vRot4.x As double)+Number : Over 1, 2 \\ copy 2 times top only
-			Read Line1.X1, Line2.X1, Line3.X1
-			Push Eval(Var, vRot4.y As double)+Number : Over 1, 2
-			Read Line1.Y1, Line2.Y1, Line3.Y1
+			Line1.X1=Eval(Var, vRot4.x As double)+Number
+			Line2.X1=Line1.X1
+			Line3.X1=Line1.X1
+			
+			Line1.Y1=Eval(Var, vRot4.y As double)+Number
+			Line2.Y1=Line1.Y1
+			Line3.Y1=Line1.Y1
 			Over 2, 4 \\ now original 2 values copied 4 times
 			Line1.X2 = Eval(Var, vRot1.x As double)+Number
 			Line1.Y2 = Eval(Var, vRot1.y As double)+Number
@@ -6705,7 +6709,8 @@ Layer Alfa {
 	Method Math, "Vector", vAxis, -.8, 1.6, .3
 	Method Math, "UnitVect", vAxis
 	Rad2Deg =Lambda pidivby180=pi/180 (RadAngle)->RadAngle / pidivby180
-	dAngle =5
+	// dAngle =pi/128   ' Rad - use the optionallast  parameter as false (bDegrees:=false)
+	dAngle=6.5  ' Degrees
 	Pen 0
 	Cls 7
 	Gradient 11, 13
@@ -8744,66 +8749,55 @@ MODULE CO {Module Check {
       Double  ' Double height characters
       Report Center, "Color wheel"
       Normal  ' restore to normal
-      Atan2=Lambda Math (a, b) ->{
-            Method Math, "Atan2", a, b As ret
-            =ret
-      }
-      \\ brightness=1 for this program
-      hsb2rgb=Lambda (hue, sat) ->{
-            If sat == 0 Then {
-                = 255, 255, 255
-           } Else {
-                  h=frac(hue+1)*6
-                  f = frac(h)  
-                  p = Int((1-sat)*255 + 0.5)
-                  q = Int((1-sat*f)*255 + 0.5)
-                  t = Int((1-sat*(1-f))*255 + 0.5)
-                  Select Case Int(h)
-                  Case 1
-                      = q, 255, p
-                  Case 2
-                      = p, 255, t
-                  Case 3
-                     = p, q, 255
-                  Case 4
-                      = t, p, 255
-                  Case 5
-                      = 255, p, q
-                  Else Case
-                      = 255, t, p
-                  End Select
-          }
-      }
       Let OffsetX=X.twips/2-128*TwipsX, OffsetY=Y.twips/2-128*TwipsY
       \\ a pixel has a size of TwipsX x TwipsY
       OffsetX=(OffsetX div TwipsX)*TwipsX
       OffsetY=(OffsetY div TwipsY)*TwipsY
-      \\ We set hsb2rgb, OffsetX, OffsetY as closures to PrintPixel
-      \\ We send to stack the R G B values using Stack ! array
-      \\ hsb2rgb() return an array of values
-      \\ we pop these values using Number
-      PrintPixel = Lambda  hsb2rgb, OffsetX, OffsetY (x,y, theta, sat)  -> {
-            Stack ! hsb2rgb(theta,sat)  
-            PSet Color(number, number, number), x*TwipsX+offsetX, y*TwipsY+offsetY
+
+      PrintPixel = Lambda (hue as single, sat as single)  -> {
+            If sat == 0 Then
+                PSet 15
+            Else
+                single h=frac(hue+1~)*6~, f = frac(h) 
+                integer p = round((1~-sat)*255~), q = round((1~-sat*f)*255~), t = round((1~-sat*(1-f))*255~)
+                Select Case Int(h)
+                Case 1
+                    PSet Color(q, 255, p)
+                Case 2
+                    PSet Color(p, 255, t)
+                Case 3
+                    PSet Color( p, q, 255)
+                Case 4
+                    PSet Color(t, p, 255)
+                Case 5
+                    PSet Color(255, p, q)
+                Else Case
+                    PSet Color(255, t, p)
+                End Select
+          End if
       }
       \\ set Atan2, tau as closures to HueCircle
       \\ we can rotate/flip the wheel by changing signs in Atan2() and
       \\ by changing order of arguments (dx,dy) or (dy,dx). 8 combinations
-      HueCircle= Lambda Atan2, tau (PrintPixel) -> {
-            Let  c_width=256, c_height=256
-            Let  cx=c_width/2, cy=c_height/2
-            Let  radius=If(cx<=cy->cx, cy)
+      HueCircle= Lambda Math, tau,  OffsetX, OffsetY (PrintPixel) -> {
+            integer  c_width=256, c_height=256, y, x, dy, dx, dy2
+            integer  cx=c_width/2, cy=c_height/2, jmpx
+            double radius=If(cx<=cy->cx, cy), dist
+            boolean skip
             c_width--
             c_height--
             dy=-cy
+            refresh 2000
             For y=0 To c_height {
-                  dy++ : dy2=dy*dy : dx=-cx
-                  For x=0 To c_width {
-                        dx++ : dist=Sqrt(dx^2+dy2)
-                        If dist>radius Then continue
-                        Call PrintPixel(x,y, Atan2(dx, -dy)/tau, dist/radius)
+                  dy++ : dy2=dy*dy : dx=-cx: jmpx=c_width+1:skip=true
+                  move  offsetX, y*TwipsY+offsetY
+                  For x=0 To c_width {if x>jmpx then exit
+                    dx++ : dist=Sqrt(dx*dx+dy2): If dist>radius Then step Twipsx : continue
+                    if skip then jmpx-=x: skip~
+                    Method Math, "Atan2", dx, -dy As ret
+                    Call PrintPixel(ret/tau, dist/radius): step Twipsx
                   }
-            }
+            } refresh 40
       }
       Call HueCircle(PrintPixel)
       Scr$=""  ' we use this string  to load an image
@@ -39832,6 +39826,7 @@ refresh 40
 MODULE FINDWORD {read W as string="*"
 if left$(w,1)="*" then
 	report {FindWord "Print"}
+	keyboard {FindWord "Remove {"}, 13
 else
 	print "search: ";w
 	modules  ? "", w
@@ -40148,5 +40143,210 @@ TESTC
 TESTD
 	PRINT "LOOP 100000":REFRESH
 SET FAST
+}
+MODULE JENKINS {// https://en.wikipedia.org/wiki/Jenkins_hash_function
+rem {
+    uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t length) {
+      size_t i = 0;
+      uint32_t hash = 0;
+      while (i != length) {
+        hash += key[i++];
+        hash += hash << 10;
+        hash ^= hash >> 6;
+      }
+      hash += hash << 3;
+      hash ^= hash >> 11;
+      hash += hash << 15;
+      return hash;
+    }
+}
+FUNCTION jenkins_one_at_a_time_hash(key as buffer, length as currency) {
+	currency hash, i
+	while i<>length
+		hash=binary.add(hash, eval(key, i)) : i++          // hash+=key[i++]
+		hash=binary.add(hash, binary.shift(hash, 10))  // hash+=hash << 10
+		hash=binary.xor(hash, binary.shift(hash, -6))  // hash^=hash >> 6
+	end while
+	hash=binary.add(hash, binary.shift(hash, 3))   // hash+=hash << 3
+	hash=binary.xor(hash, binary.shift(hash, -11))  // hash^=hash >> 11
+	hash=binary.add(hash, binary.shift(hash, 15))  // hash+=hash << 15
+	=hash
+}
+buffer clear mem as byte*8192
+return mem, 0:=str$("a")
+hex jenkins_one_at_a_time_hash(mem, 1)
+return mem, 0:=str$("The quick brown fox jumps over the lazy dog")
+hex jenkins_one_at_a_time_hash(mem, 43)
+}
+MODULE RAREBITS {//Linespace twipsX*4
+// Form 64
+// using two parameters we get automatic Linespace
+oldpen=Pen
+Form 64, 38
+move 0,0: oldBack=point
+Cls 0
+Pen #DDaabb
+Gradient #1c1c3c, #1c1c7f
+Report ! 4   // 4 characters per Tab (9)
+// counting bits
+// help functions/Const
+Const Zero=0&&
+Const Zero$="000000000000000"
+Const retColor=#ffdd66
+Const labelColor=#66bbCC
+Const preparePower1=lambda one=1&, two=2&&  (m=32&, unsigned=false)->{
+	if m<0 or m>64 then error "out of limits in preparePower1"
+	dim a(0 to m-1)
+      a(0)=one
+      if m=64 then
+          m--
+          if unsigned then
+              a(63)=0x8000_0000_0000_0000
+          else
+              a(63)=0x8000_0000_0000_0000&&
+          end if
+      end if
+	for i=1 to m-1
+		a(i)= two*a(i-1)
+	next
+	=a()
+}
+Const preparePower2=lambda (m=16)->{
+	dim a(1 to m)
+	for i=0 to m-1
+		a(m-i)= 2&&**i
+	next
+	=a()
+}
+Const k$=lambda$ (m as Decimal, b as Decimal=2) -> {
+	if b<2 or b>16 then error "base out of range"
+	if m<0 then m=binary.add(m, 0)
+	if m=0 then ="0" : exit
+	z$="0123456789ABCDEF"	
+	=lambda$ z$, b (m) ->{
+		=if$(m=0->"", lambda$(m div b)+mid$(z$, m mod b + 1, 1))
+	}(m)
+}
+Const  k=lambda  p()=preparepower1(64, true)  (m$, b as long long=2) -> {
+	if b<2 or b>16 then error "base out of range"
+	m$=trim$(m$)
+	if m$="0" then =0 : exit
+	z$="0123456789ABCDEF"	
+	=lambda z$, b, p() (m$) ->{
+		=if(Len(m$)=0->0, lambda(mid$(m$,2))+(instr(z$, left$(m$,1))-1&&)*p(len(m$)-1))
+	}(m$)
+}
+// function composition
+Const K32$=lambda$ K$=K$, zero$ (b, lbl$="")->{
+	=Right$(zero$+K$(b,2), 32)+lbl$
+}
+Const K16$=lambda$ K$=K$, zero$ (b, lbl$="")->{
+	=Right$(zero$+K$(b,2), 16)+lbl$
+}
+
+Set16bit=lambda p()=preparePower2(16) (a()) ->{
+	ret=0
+	for i=0 to len(a())-1
+		ret+=p(a(i))
+	next
+	=ret
+}
+
+
+Rem {// remove Rem to see how the Z value (long long) convert to 32bit unsigned
+	Z=-5&&
+	Print K32$(Z)
+	Hex K(K32$(Z))
+	Print Sint(K(K32$(Z)))=-5
+	Exit
+}
+Print Over ~(labelColor, #1c3c2c, #1c3c2c) : Print
+Print Over ~(labelColor, #1c3c2c, #1c3c2c) : Print
+Cursor 0, row-2
+double
+Report "Programming Tips"
+normal
+Cursor 4  // left margin for report
+Pen 15 {
+	Report {
+	From http://www2.arnes.si/~ubolti/ininuga/programming.htm
+	When working with wheels, you will frequently need to count the numbers in an intersection of two sets, i.e. in how many numbers they match. Typically, that is a small number of numbers. So when sets are represented as bitmaps, only a few bits are set to 1, most are 0. Here is a fast way to count them in such case.
+	}, width-8   // set 4 right margin (with - left margin - right margin)
+}
+Print
+Pen labelColor {
+	Report "Counting Rare Bits"
+	Cursor 0, row-1 :Print under
+} 
+Long Long One=K("00010000010010000010000000000000")
+Long Two=One-1
+Print K32$(One, ":X")
+Print k32$(Two, ":X-1")
+Cursor 4
+Pen 15 {
+	Report {// top on the module:
+Const Zero=0&&
+// at the end the static simple function:
+Function Count(x as long long)
+	Local Count as integer
+	While x<>Zero
+		x=Binary.And(X, X-1)
+		Count++
+	End While
+	=Count
+End Function}
+}
+Cursor 0
+Pen retColor {Report @Count$(One, "bit")+" for X And X-1"}
+
+Pen labelColor {
+	Report "Making Bits Rare"
+	Cursor 0, row-1 :Print under
+}
+C=(16,6,4,5)
+W=(2,4,6,7, 8)
+G=(1,2,3,4,6,7)
+WR=Set16bit(W)  //K("0101011100000000")
+GR=Set16bit(G)  //K("1111011000000000")
+// the intersection contain 4 numbers: 2,4,6,7 (4 bits to count)
+cursor 4
+Pen 15 {
+	Report {The wheel set: {16, 6, 4, 5}, for testing we need  to match a "way" to a "game"}
+	Report "The Way set: {"+W#str$(", ")+"}" 
+	Report "The Game set: {"+ G#str$(", ")+"}"
+}
+cursor 0
+Print K16$(WR,":W")
+Print K16$(GR, ":G")
+// Intersection AS-IS
+WG=Binary.And(WR,GR)
+Print Part $(0), K16$(WG,":");$(9);"W AND G (Intersection using AND binary)": Print
+Pen retColor {Report @Count$(WG,"bit")+" for W AND G"}
+AdvancedWG=Binary.And(WR,Binary.Not(GR))
+Print Part $(0), K16$(AdvancedWG, ":");$(8);"W AND NOT G (Intersection making 1 bits rare)" : Print
+
+Pen retColor {
+	Report @Count$(AdvancedWG,"bit")+" for W AND NOT G"
+	Report 2, "press any key"
+}
+// wait for a key
+push key$: drop
+cls oldback,0
+pen oldpen
+
+// user simple static function (called using @Count())
+Function Count$(v, tp$)
+	ret=@Count(v)
+	=Str$(ret,0)+if$(ret=1->" "+tp$, " "+tp$+"s")
+End Function
+Function Count(x as long long)
+	Local Count as integer
+	While x<>Zero
+		x=Binary.And(X, X-1)
+		Count++
+	End While
+	=Count
+End Function
+
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

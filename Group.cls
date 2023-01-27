@@ -60,8 +60,8 @@ End If
 End Function
 Private Function TypeGroupNow(RHS) As Boolean
     On Error Resume Next
-    TypeGroupNow = Len(mytypes(RHS))
-    ' TypeGroupNow = True
+  '  TypeGroupNow = Len(mytypes(RHS))
+    TypeGroupNow = True
     Err.Clear
 End Function
 Sub mergeTypes(RHS As Collection)
@@ -102,7 +102,7 @@ If eventlist Is Nothing Then Exit Sub
 Dim i As Long
 With eventlist
 For i = 0 To .count - 1
-    .index = i
+    .Index = i
     .Done = True
     .Value = vbNullString
     .sValue = 0
@@ -117,7 +117,7 @@ Dim eventlist2 As New FastCollection
 Dim i As Long
 With eventlist
 For i = 0 To .count - 1
-    .index = i
+    .Index = i
     .Done = True
     eventlist2.AddKey .KeyToString, ""
 Next i

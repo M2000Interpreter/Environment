@@ -70,18 +70,22 @@ If isok Then
             Set Copy = z
             Exit Property
         End If
-
+Dim ppp As Object
     For i = UBound(p) To 0 Step -1
         If IsObject(p(i)) Then
-            If TypeOf p(i) Is refArray Then
+        Set ppp = p(i)
+            If ppp Is Nothing Then
+                z(i) = CVar(Nothing)
+            ElseIf TypeOf p(i) Is refArray Then
                 Set ra = p(i)
                 If ra.MarkTwoDimension Then
                     Set ra = ra.Copy
                     ra.MarkTwoDimension = True
-                    Set z(i) = ra
+                     z(i) = CVar(ra)
                 Else
-                    Set z(i) = ra.Copy
+                   z(i) = CVar(ra.Copy)
                 End If
+                
             End If
         Else
             pp = p(i)
@@ -91,13 +95,31 @@ If isok Then
                 For j = j - 1 To 0 Step -1
                 
                     If IsObject(pp(j)) Then
-                        Set m = pp(i)
+                        
+                        Set m = pp(j)
                         On Error Resume Next
-                        Set m = pp(i).Copy()
+                        Set m = pp(j).Copy()
                         Err.Clear
-                        z(i) = m
+                        z(j) = m
                         Set m = Nothing
                     End If
+                Next j
+            End If
+            ElseIf VarType(pp) = vbArray + vbObject Then
+            If j > 0 Then
+                For j = j - 1 To 0 Step -1
+                
+                   
+                        Set m = pp(j)
+                        If Not m Is Nothing Then
+                        On Error Resume Next
+                        Set m = m.Copy()
+                        Err.Clear
+                        Set ppp = m
+                         Set z(j) = ppp
+                        End If
+                        Set m = Nothing
+                   
                 Next j
             End If
             End If
@@ -202,6 +224,8 @@ entry1:
                 Else
                     mError = 5020
                 End If
+            ElseIf myVarType(that, vbObject) Then
+                Set p(where) = that
             Else
                 p(where) = that
             End If
@@ -221,6 +245,8 @@ entry1:
         Case vbObject
             If wt = vbObject Then
                 Set p(where)(what) = that
+            ElseIf myVarType(that, vbObject) Then
+                    Set p(where)(what) = that
             Else
                 mError = 91
             End If
@@ -232,6 +258,8 @@ entry1:
                 CopyMemory ByVal ((ArrPtr(where) Xor &H80000000) + 8 * CLng(what)) Xor &H80000000, ByVal ((VarPtr(that) Xor &H80000000) + 8) Xor &H80000000, 8
         Case vbVariant
             If wt = vbObject Then
+                Set p(where)(what) = that
+            ElseIf myVarType(that, vbObject) Then
                 Set p(where)(what) = that
             Else
                 p(where)(what) = that
@@ -354,6 +382,16 @@ count = 0&
 If isok Then
     If IsMissing(m) Then
         count = Elements(p)
+    
+    ElseIf myVarType(p, vbObject) Then
+        If p Is Nothing Then
+        ElseIf TypeOf p Is refArray Then
+            If m >= 0 And m <= p.count Then
+                On Error Resume Next
+                count = p.count(m)
+                Err.Clear
+            End If
+        End If
     ElseIf m >= 0 And m <= UBound(p) Then
         On Error Resume Next
         count = UBound(p(m)) + 1
@@ -490,12 +528,47 @@ End Sub
 Property Get ItemType(item) As Long
     If ihavearray And isok Then
         If Not IsMissing(item) Then
-            ItemType = VarType(p(item))
+            Dim vt As Integer
+                GetMem2 VarPtr(p(item)), vt
+                ItemType = vt
+           
         Else
             ItemType = VarType(p)
         End If
     End If
 End Property
+Public Function IsInnerRefArray(item, R As refArray) As Boolean
+ If ihavearray And isok Then
+     
+            Dim vt As Integer, pp As Object
+                If Me.MarkTwoDimension Then
+                If Elements(p) > item Then
+                    GetMem2 VarPtr(p(item)), vt
+                    If vt = 9 Then
+                        Set pp = p(item)
+                    If Not pp Is Nothing Then
+                    If TypeOf pp Is refArray Then
+                        Set R = pp
+                        IsInnerRefArray = True
+                        End If
+                        End If
+                    End If
+                End If
+                ElseIf Elements(p(0)) > item Then
+                    GetMem2 VarPtr(p(0)(item)), vt
+                    If vt = 9 Then
+                        Set pp = p(0)(item)
+                    If Not pp Is Nothing Then
+                    If TypeOf pp Is refArray Then
+                        Set R = pp
+                        IsInnerRefArray = True
+                        End If
+                        End If
+                    End If
+            End If
+        End If
+
+End Function
 
 Public Function tuple(ParamArray v())
     Dim p() As Variant
