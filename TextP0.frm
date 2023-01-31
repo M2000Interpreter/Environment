@@ -604,7 +604,7 @@ End Sub
 
 
 
-Private Sub List1_ListError(Code As Long)
+Private Sub List1_ListError(code As Long)
 Dim dummy As Long
 List1.ListIndex = -1
 List1.LeaveonChoose = False
@@ -617,7 +617,7 @@ dummy = interpret(Basestack1, List1.Tag)
 'Me.KeyPreview = True
 End If
 End If
-MyEr "Menu Error " & CStr(Code), "ËÜèïò óôçí ÅÐÉËÏÃÇ áñéèìüò " & CStr(Code)
+MyEr "Menu Error " & CStr(code), "ËÜèïò óôçí ÅÐÉËÏÃÇ áñéèìüò " & CStr(code)
 End Sub
 
 
@@ -1786,8 +1786,8 @@ If HaltLevel = 0 Then
     PlaceCaption ""
 End If
 Dim mybasket As basket
-mybasket = players(DisForm)
 Do
+mybasket = players(DisForm)
     Do
         escok = True
         MOUT = True
@@ -1797,7 +1797,11 @@ Do
                 If Form2.Busy Then
                     Do
                         Sleep 10
-                    Loop Until Form2.Busy = False
+                        If Not Form2.Visible Then
+                                Form2.Visible = True
+                                
+                        End If
+                    Loop Until Form2.Busy = False Or MOUT = True
                 End If
                 Form2.Busy = True
                 PrepareLabel Basestack1
@@ -2597,7 +2601,7 @@ Sleep 1
 If Form1.Visible Then Form1.Refresh
 End Sub
 Private Sub Prepare(basestack As basetask, ByVal Nb As String)
-Dim G As Long, ic As Long
+Dim g As Long, ic As Long
 Dim VP As String, vv As String, CM$, b As String
 If needset Then
 Nb = StrConv(Nb, vbUnicode)
@@ -2608,8 +2612,8 @@ Else
 b = Nb
 b = Replace(b, Chr(0), "")
 End If
-G = InStr(b, "?")
-If G > 0 Then b = Mid$(b, G + 1) Else Exit Sub
+g = InStr(b, "?")
+If g > 0 Then b = Mid$(b, g + 1) Else Exit Sub
 If b <> "" Then
 Do While Parameters(b, VP, vv)
 CM$ = VP & "$=" & """" + vv + """"

@@ -565,7 +565,7 @@ Private Function AnyNodeAttr(node) As String
             Set c = node(1)
             m() = Split(node(5))
             For i = 1 To c.count
-                AnyNodeAttr = AnyNodeAttr + " " + m(i) + "=" + c(i)
+                AnyNodeAttr = AnyNodeAttr + " " + m(i) + "=" + c(m(i))
             Next i
         End If
 End Function
@@ -581,11 +581,11 @@ End If
     If Not IsArray(root) Then
      '   MyEr "node not inserted yet", "δεν έχει εισαχθεί κόμβος"
     Else
-        Dim i As Long, c As Collection, m(), p, j As Long, D As XmlMonoInternal, t$
-        Dim Id$
+        Dim i As Long, c As Collection, p, j As Long, D As XmlMonoInternal, t$
+        Dim id$
         
-        If beautify > 0 Then Id$ = space(beautify)
-        Xml = Id$
+        If beautify > 0 Then id$ = space(beautify)
+        Xml = id$
         If Not ProcessBag Is Nothing Then
         For i = 1 To ProcessBag.count
         p = ProcessBag(i)
@@ -594,7 +594,7 @@ End If
         Else
         Xml = Xml + "<?" + p(0) + AnyNodeAttr(p) + "?>"
         End If
-        If beautify Then Xml = Xml + vbCrLf + Id$
+        If beautify Then Xml = Xml + vbCrLf + id$
         Next i
         End If
         If (root(3) And 1) = 0 Then
@@ -619,7 +619,7 @@ End If
                     If guard Is Nothing Then Set root(2) = Nothing ' weave untik top
                     If Len(D.status) > 0 Then status = "<" + root(0) + " child='" + Trim$(Str$(i)) + "'>" + D.status + "</" + root(0) + ">": GoTo 1000
                     Next i
-                    Xml = Xml + Id$
+                    Xml = Xml + id$
             Else
                     Xml = Xml + root(4)
             End If
@@ -668,10 +668,10 @@ Function AttrExist(t$, Optional attr As String) As Boolean
         AttrExist = Err.Number = 0
     End If
 End Function
-Function AlterProcessAttr(Id, t$, NewValue As String, Optional OldValue As String) As Boolean
-If ProcessBag.count < Id Or Id < 1 Then MyEr "index fault", "δείκτης εκτός ορίων": Exit Function
+Function AlterProcessAttr(id, t$, NewValue As String, Optional OldValue As String) As Boolean
+If ProcessBag.count < id Or id < 1 Then MyEr "index fault", "δείκτης εκτός ορίων": Exit Function
 Dim node, i As Long, c As Collection
-node = ProcessBag.item(Id)
+node = ProcessBag.item(id)
 If Typename(node(1)) = "Nothing" Then
     i = InStrRev(node(5), ">")
     OldValue = Mid$(node(5), i - 1)

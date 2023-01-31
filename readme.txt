@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 6 active-X
-some fixes on new RefArray items (work continue for object/variant types).
+Version 12 Revision 7 active-X
+Fixed 99.9%. This is a complete work, for Version 12. Many small bugs removed, including one in xml object. Now I have to revise the manuals (Greek and English).
 
 
 George Karras, Kallithea Attikis, Greece.

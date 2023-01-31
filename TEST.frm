@@ -202,7 +202,7 @@ Private Label(0 To 2) As New myTextBox
 Dim run_in_basestack1 As Boolean
 Dim MyBaseTask As New basetask
 Dim setupxy As Single
-Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
+Dim lX As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long, itemwidth3 As Long, itemwidth2 As Long
@@ -320,10 +320,10 @@ Public Sub ComputeNow()
 stackshow MyBaseTask
 End Sub
 
-Private Sub compute_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub compute_KeyDown(keycode As Integer, shift As Integer)
 Dim excode As Long
-If KeyCode = 13 Then
-KeyCode = 0
+If keycode = 13 Then
+keycode = 0
     If Compute.Prompt = "? " Then
         gList3(2).BackColor = &H3B3B3B
         TestShowCode = False
@@ -342,7 +342,7 @@ KeyCode = 0
         End If
         
     End If
-ElseIf KeyCode = 8 Then
+ElseIf keycode = 8 Then
 If Compute = vbNullString Then
     If Compute.Prompt <> ">" Then
         Compute.Prompt = ">"
@@ -360,7 +360,7 @@ If Compute = vbNullString Then
         End If
     End If
     Compute.vartext = vbNullString
-KeyCode = 0
+keycode = 0
 Exit Sub
 End If
 End If
@@ -378,7 +378,7 @@ Modalid = Rnd * 645677887
 End If
 Else
 End If
-If Not Busy Then generalFkey 2 Else Debug.Print "test is busy"
+'If Not Busy Then generalFkey 2 Else Debug.Print "test is busy"
 End Sub
 
 Private Sub Form_Deactivate()
@@ -388,15 +388,15 @@ stolemodalid = 0
 End If
 End Sub
 
-Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = vbKeyTab And ((shift And &H2) = 2) Then
+Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
+If keycode = vbKeyTab And ((shift And &H2) = 2) Then
 choosenext
 Sleep 100
-KeyCode = 0
-ElseIf KeyCode = 27 Then
-KeyCode = 0
+keycode = 0
+ElseIf keycode = 27 Then
+keycode = 0
 Unload Me
-ElseIf KeyCode = 13 Then
+ElseIf keycode = 13 Then
 If Not EXECUTED Then
 If Not STq Then
 STbyST = True
@@ -446,12 +446,12 @@ testpad.NoColor = False
 testpad.EditDoc = False
 testpad.nowrap = False
 paneltitle 0&
-testpad.Enabled = True
+testpad.enabled = True
 Set Compute = New myTextBox
 Set Compute.Container = gList0
 Compute.MaxCharLength = 500 ' as a limit
 Compute.locked = False
-Compute.Enabled = True
+Compute.enabled = True
 Compute.Retired
 Set Label(0).Container = gList3(0)
 Set Label(1).Container = gList3(1)
@@ -492,7 +492,7 @@ gList2.PrepareToShow
 gList4.NoPanRight = False
 gList4.SingleLineSlide = True
 gList4.VerticalCenterText = True
-gList4.Enabled = True
+gList4.enabled = True
 gList4.ListindexPrivateUse = 0
 gList4.ShowMe
 Busy = False
@@ -798,7 +798,7 @@ ElseIf index = 2 Then
     End If
   paneltitle switchview
   stackshow MyBaseTask
-  testpad.Enabled = True
+  testpad.enabled = True
 End If
 there1:
 End Sub
@@ -909,7 +909,7 @@ If Button = 1 Then
     dr = True
     tracecounter = 100
     MousePointer = vbSizeNWSE
-    Lx = x
+    lX = x
     lY = y
     End If
     
@@ -918,7 +918,7 @@ If Button = 1 Then
     dr = True
     tracecounter = 100
     MousePointer = vbSizeNWSE
-    Lx = x
+    lX = x
     lY = y
     End If
     End If
@@ -941,11 +941,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - lY)
-     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
+     If x < (Width - 150) Or x > Width Then addX = (x - lX)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
-        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
+        If x < (Width - borderleft) Or x > Width Then addX = (x - lX)
     End If
     
 
@@ -972,10 +972,10 @@ Else
 
         If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, Width
-        Lx = x
+        lX = x
         
         Else
-        Lx = x * lastfactor / factor
+        lX = x * lastfactor / factor
          ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
@@ -990,7 +990,7 @@ Else
         lY = lY * lastfactor / factor
         End If
         Else
-        Lx = x
+        lX = x
         lY = y
    
 End If
@@ -1082,7 +1082,7 @@ Case 0 To 2
     pospara(that) = testpad.ParaSelStart
     selpresrv(that) = testpad.SelLength
     testpad.nowrap = that > 0
-    testpad.Enabled = Not STbyST
+    testpad.enabled = Not STbyST
 Case -1
     para(lastpanel) = testpad.mDoc.MarkParagraphID
     pospara(lastpanel) = testpad.ParaSelStart
@@ -1096,9 +1096,9 @@ Case 0 To 2
     With testpad
         .SelLengthSilent = selpresrv(that)
         .mDoc.MarkParagraphID = para(that)
-        .glistN.Enabled = False
+        .glistN.enabled = False
         .ParaSelStart = pospara(that)
-        .glistN.Enabled = True
+        .glistN.enabled = True
         .glistN.ShowMe
     End With
 End Select

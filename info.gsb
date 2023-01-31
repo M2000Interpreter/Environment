@@ -5717,7 +5717,7 @@ Fkey + Enter to see the Function Keys
 back {refresh 50}
 Refresh 50
 show
-End
+end
 Sub title(a$)
 Pen #ffeeff {
 	cursor 0
@@ -36853,7 +36853,8 @@ METHOD FORM1 "SHOW", 1
 
 declare FORM1 NOTHING
 }
-MODULE NINEBUTTONS {Enum UcsNineButtonStateEnum {
+MODULE NINEBUTTONS {// updated (now form has some code to support better this buttons - see the hovet function)
+Enum UcsNineButtonStateEnum {
     ucsBstNormal = 0
     ucsBstHover = 1
     ucsBstPressed = 2
@@ -36919,11 +36920,12 @@ With z,"ButtonTextFlags" as ButtonTextFlags()
 for i=0 to 14
 	
 	Method Button(i), "move", 1000,1000+630*i, 4000, 600
-	With Button(i), "Style", i+1, "ManualFocus",true
+	With Button(i), "Style", i+1, "ManualFocus",true, "AnimationDuration", 1.2~, "AutoRedraw",True,
+		With Button(i+15),  "ButtonTextFlags", ucsBstNormal @ ucsBflHorRight
 	z=Button(i)
 	ButtonTextFlags(ucsBstPressed)=2^random(1, 6)
 	Method Button(i+15), "move", 6000,1000+630*i, 4000, 600
-	With Button(i+15), "Style", i+16, "ButtonTextFlags", ucsBstFocused @ ucsBflHorRight
+	With Button(i+15), "Style", i+16, "ButtonTextFlags", ucsBstNormal @ ucsBflHorRight
 Next i
 Layer Form1 {Gradient 11, #7777aa}
 function form1.click {
@@ -40348,5 +40350,213 @@ Function Count(x as long long)
 	=Count
 End Function
 
+}
+MODULE BASICO {// this is a simple program on a more advanced input/output to M2000 console through threds.
+
+form 60, 32
+// guess.bas
+// Guess a number game
+// Trasnlation from BASICO version 0.9
+// addition of a thread system to emulate reading/writing to CONSOLE
+global backColor=5, mypen=14
+cls backColor,0
+string keybuffer, outbuffer, lastchar, c, z, s
+// echo = false
+boolean query, querynumber, echo=true, blink=true, feed
+integer p=pos, chars=0, limitInput=10
+
+// this thread blink the cursor at 4hz .
+thread {
+	blink~
+	feed=true
+} as blinkit interval 1000/4
+
+// this is the output stream
+// send to console 1/10 second (10hz)
+thread {
+	if len(outbuffer)>0 then
+		 Print #-2, outbuffer;
+		 refresh
+		 p=pos
+		 cursor p, row ' Correction for  Print #-2
+		 c="":z=""
+		 outbuffer=""
+		 keybuffer=""
+		 lastchar=""
+	end if
+} as streamout interval 100
+
+// this is the input thread (50hz)
+// we can delete characters using BackSpace
+// sound Beep at the event of a full character buffer
+
+thread {
+	if query then
+		if feed then
+			feed=false
+			if echo then
+				mycursorOnly(p+chars)
+			end if
+		end if
+		if len(outbuffer)=0 then
+			c=inkey$
+			if len(c)>1 then
+				c=""
+			else
+				for this {
+					local integer cc=asc(c)
+					if querynumber then if (cc<48 or cc>59 and cc<>13 and cc<>8) then c=""
+				}
+			end if
+			if c="" else 
+				z=c
+				while z=c:z=inkey$:if len(z)>1 then z=""
+				wait 10:end while
+				if c=chr$(13) then query=false: mycursorOnly(p+chars): outbuffer+=format$("\n")
+				if chars>=limitInput and c<>chr$(8) and c<>chr$(13) then
+					beep
+				else
+					if c<>chr$(13) then keybuffer+=c
+					lastchar=c
+					if c=chr$(8) then
+						chars--					
+						if chars<0 then c="":chars="": chars=0 
+						mycursorOnly(p+chars)
+					else
+						chars++
+						if echo then mycursor(lastchar, p+chars-1)
+					end if					
+				end if
+				c=z	
+			end if
+		end if
+	end if
+} as consoleread every 1000/50
+
+main()
+FlushOutBuffer()
+print
+threads erase
+End
+
+sub main()
+local long myNumber, yourNumber, guesses
+local string ch
+
+  printf("Guess a number game\n")
+  printf("Numbers are between 1 and 50\n") 
+//  srand(time(0))  // get time in seconds since 1970, init Random Generator
+  while 1
+    myNumber = random(1, 100)     // get a random number  
+    myNumber = myNumber mod 50 + 1
+    guesses = 0
+    while 1
+      printf("Your guess: ")
+      yourNumber = @getDecimal()
+      guesses = guesses + 1
+      if yourNumber = myNumber then
+        printf(format$("You guessed it in {0} guesses!\n", guesses))
+        exit
+      else
+        if yourNumber > myNumber then
+          printf("Your guess is to high\n")
+        else
+          printf("Your guess is to low\n")
+        end if
+      end if
+    end while
+    printf("Another game (y or n): ")
+    ch = @getchar(true)
+    if ch="n" or ch="N" then exit 
+    dummy=@getchar(true) 
+  end while
+  printf("Goodbye.\n")
+End Sub
+sub printf(a$)
+	query=false
+	outbuffer+=format$(a$)
+end sub
+sub printN(a)
+	outbuffer+=str$(a,0)
+end sub
+sub FlushOutBuffer()
+	query=false
+	while not len(outbuffer)=0: wait 10: end while
+end sub
+function getchar(use_text as boolean=false, maxchar as integer=10)
+	local integer k
+	limitInput=maxchar
+	if len(keybuffer)=0 then
+		FlushOutBuffer()
+		querynumber=not use_text
+		query=true
+		thread blinkit restart
+		every 1000/50 {
+			if  not query  then exit
+		}
+		keybuffer+=chr$(13)
+		CleanQuery(true)
+	end if
+	if len(keybuffer)>0 then
+		 	k=asc(left$(keybuffer,1)):keybuffer=mid$(keybuffer, 2)
+	 end if
+	 if k=13 then query=false
+	=chr$(k)
+end function
+function getchar_RETURN_AT_ENTER(use_text as boolean=false, maxchar as integer=10)
+	local integer k
+	limitInput=maxchar
+	querynumber=not use_text
+	FlushOutBuffer()
+	query=true
+	thread blinkit restart
+	every 1000/50 {
+		if len(keybuffer)>0 then
+		 	k=asc(left$(keybuffer,1)):keybuffer=mid$(keybuffer, 2)
+		 else
+		 	k=-1
+		 end if
+		if k<>-1 or not query  then exit
+	}
+	if not query then CleanQuery(): k=13
+	=chr$(k)
+end function
+function getDecimal()
+	local string charnum, cg
+	while 1 
+		ch = @getchar(,8)
+		if ch=chr$(8) then
+			if len(charnum)>1 then charnum=left$(charnum, len(charnum)-1) else charnum=""
+		else.if (ch>="0") and (ch<="9") then
+			charnum+=ch
+		else  // from enter
+			=val(charnum) : exit
+		end if
+	end while
+end function
+sub mycursor(s, p)
+		if s<>"" then if uint(chrcode(s))<32 then s="" 
+		if p>0 then
+			print part @(p), $(0,4), ~(mypen+1, backColor, backColor), s
+		 else
+			 print over $(0), s
+		end if
+end sub
+sub mycursorOnly(p)
+		if p>0 then
+			print part @(p), $(0,4), ~(mypen+1, backColor, backColor), if$(blink and query->"_","")
+		 else
+			 print over $(0), if$(blink and query->"_","")
+		end if
+end sub
+Sub CleanQuery(holdbuffer as boolean=false)
+	thread blinkit hold
+	mycursorOnly(p+chars)
+	if holdbuffer Else keybuffer=""
+	chars=0
+	p=0
+	c="":z=""
+	lastchar=""
+end sub
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

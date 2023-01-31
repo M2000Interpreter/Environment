@@ -281,7 +281,7 @@ End Property
 Public Function BigFileHandler(FH As Long, ftype As Long, fst As Long, unif As Long) As Long
 Static MaxNum As Long
 Dim where As Long
-If FreeUseHandlers.count = 0 Then
+If FreeUseHandlers.Count = 0 Then
     MaxNum = MaxNum + 1
     InUseHandlers.AddKey CVar(MaxNum), Array(FH, ftype, fst, unif)
     InUseHandlers.sValue = FH
@@ -322,7 +322,7 @@ End Sub
 Public Sub CloseAllHandlers()
 Dim H&
 On Error Resume Next
-Do While InUseHandlers.count > 0
+Do While InUseHandlers.Count > 0
     InUseHandlers.ToEnd
     H& = CLng(InUseHandlers.sValue)
     API_CloseFile H&
@@ -1599,12 +1599,12 @@ noexpression1:
                                     If IsExp(bstack, b$, sp, flatobject:=True) Then
                                         If myVarType(sp, vbString) Then
                                             SwapString2Variant ss$, sp
-                                            var(v).Index = ss$: ss$ = vbNullString
+                                            var(v).index = ss$: ss$ = vbNullString
                                         Else
-                                            var(v).Index = p: sp = 0
+                                            var(v).index = p: sp = 0
                                         End If
                                     ElseIf IsStrExp(bstack, b$, ss$, False) Then
-                                        var(v).Index = ss$: ss$ = vbNullString
+                                        var(v).index = ss$: ss$ = vbNullString
                                     End If
                                     var(v).UseIndex = True
                                 End If
@@ -2273,15 +2273,15 @@ NotArray1:
                                     ReadOnly
                                     GoTo err000
                             ElseIf ss$ = "++" Then
-                                If usehandler.index_start < usehandler.objref.count - 1 Then
+                                If usehandler.index_start < usehandler.objref.Count - 1 Then
                                     usehandler.index_start = usehandler.index_start + 1
-                                    usehandler.objref.Index = usehandler.index_start
+                                    usehandler.objref.index = usehandler.index_start
                                     usehandler.index_cursor = usehandler.objref.Value
                                 End If
                             ElseIf ss$ = "--" Then
                                 If usehandler.index_start > 0 Then
                                     usehandler.index_start = usehandler.index_start - 1
-                                    usehandler.objref.Index = usehandler.index_start
+                                    usehandler.objref.index = usehandler.index_start
                                     usehandler.index_cursor = usehandler.objref.Value
                                 End If
                             ElseIf ss$ = "-!" Then
@@ -2457,7 +2457,7 @@ jumphere1:
             GoTo err000
             ElseIf AscW(W$) = &H1FFF Then
             If GetVar(bstack, W$, v, True, , , , UseType) Then newid = False: GoTo assignvalue
-            If GetlocalVar(W$, v) Then UseType = varhash.vType(varhash.Index): newid = False: GoTo assignvalue
+            If GetlocalVar(W$, v) Then UseType = varhash.vType(varhash.index): newid = False: GoTo assignvalue
             Else
           '  UseType = False
             v = globalvar(W$, p, , VarStat, temphere$)
@@ -2489,34 +2489,31 @@ End If
 Exit Function
 assignpointer:
                     If GetPointer(bstack, b$) Then
-                    If MyIsObject(var(v)) Then
-                    If var(v) Is Nothing Then
-                    GoTo jumpgrouphere
-                    ElseIf var(v).IamApointer Then
+                        If MyIsObject(var(v)) Then
+                            If var(v) Is Nothing Then
+                                GoTo jumpgrouphere
+                            ElseIf var(v).IamApointer Then
 jumpgrouphere:
-                    Set var(v) = bstack.lastpointer
-                    ElseIf var(v).soros.count > 0 Or var(v).FuncList <> vbNullString Then
-                        CanyAssignPointer2Group
-                    Set bstack.lastpointer = Nothing
-                        Set bstack.lastobj = Nothing  '???
-                     GoTo err000
-                    Else
-                     Set var(v) = bstack.lastpointer
-                     End If
-                     Else
-                     Set var(v) = bstack.lastpointer
-                     End If
-                     Set bstack.lastpointer = Nothing
-                        Set bstack.lastobj = Nothing  '???
-  
-                    
-                    Else
-                   
-                     MissingPointer
-                       Set bstack.lastobj = Nothing
-                     GoTo err000
-                    End If
-                    If extreme Then GoTo NewCheck2 Else GoTo NewCheck
+                                Set var(v) = bstack.lastpointer
+                                ElseIf var(v).soros.Count > 0 Or var(v).FuncList <> vbNullString Then
+                                    CanyAssignPointer2Group
+                                    Set bstack.lastpointer = Nothing
+                                    Set bstack.lastobj = Nothing  '???
+                                    GoTo err000
+                                Else
+                                    Set var(v) = bstack.lastpointer
+                                End If
+                            Else
+                                Set var(v) = bstack.lastpointer
+                            End If
+                            Set bstack.lastpointer = Nothing
+                            Set bstack.lastobj = Nothing  '???
+                        Else
+                            MissingPointer
+                            Set bstack.lastobj = Nothing
+                            GoTo err000
+                        End If
+                        If extreme Then GoTo NewCheck2 Else GoTo NewCheck
                 
 '***********************
 '' Case 2
@@ -2633,9 +2630,9 @@ assignvaluestr1:
                                     If VarTypeName(var(v)) = mProp Then
                                         If FastSymbol(b$, "@") Then
                                             If IsExp(bstack, b$, sp) Then
-                                                var(v).Index = p: sp = 0
+                                                var(v).index = p: sp = 0
                                             ElseIf IsStrExp(bstack, b$, sw$, Len(bstack.tmpstr) = 0) Then
-                                                var(v).Index = sw$: sw$ = vbNullString
+                                                var(v).index = sw$: sw$ = vbNullString
                                             End If
                                             var(v).UseIndex = True
                                         End If
@@ -2794,9 +2791,9 @@ stroper001:
                  If VarTypeName(var(v)) = mProp Then
                         If FastSymbol(b$, "@") Then
                             If IsExp(bstack, b$, sp) Then
-                            var(v).Index = p: sp = 0
+                            var(v).index = p: sp = 0
                             ElseIf IsStrExp(bstack, b$, sw$, Len(bstack.tmpstr) = 0) Then
-                            var(v).Index = sw$: sw$ = vbNullString
+                            var(v).index = sw$: sw$ = vbNullString
                             End If
                              var(v).UseIndex = True
                         End If
@@ -2934,9 +2931,9 @@ assignvalue100:
                 If VarTypeName(var(v)) = mProp Then
                   If FastSymbol(b$, "@") Then
                             If IsExp(bstack, b$, sp) Then
-                            var(v).Index = p: sp = 0
+                            var(v).index = p: sp = 0
                         ElseIf IsStrExp(bstack, b$, ss$, Len(bstack.tmpstr) = 0) Then
-                        var(v).Index = ss$: ss$ = vbNullString
+                        var(v).index = ss$: ss$ = vbNullString
                         End If
                          var(v).UseIndex = True
                         End If
@@ -4084,7 +4081,7 @@ Else
     If TypeOf ppppAny Is mArray Then
         If ppppAny.Arr Then
         Set pppp = ppppAny
-        If pppp.count = 0 Then
+        If pppp.Count = 0 Then
             pppp.GroupRef.Value = ss$
         ElseIf bstack.lastobj Is Nothing Then
             pppp.ItemStr(v) = ss$
@@ -4251,7 +4248,7 @@ entry00022:
                 p = Abs(Int(p))
                 sp = i
                 If ar.vtType(0) = vbObject And ok Then
-                    If ar.count > 1 Then
+                    If ar.Count > 1 Then
                     
                     ElseIf ar(0, sp) Is Nothing Then
                         GoTo nRefArray
@@ -4264,13 +4261,13 @@ entry00022:
                         WrongObject
                         GoTo nRefArray
                     End If
-                ElseIf ar.count < i Then
+                ElseIf ar.Count < i Then
                         OutOfLimit
                         GoTo nRefArray
-                ElseIf ar.count(sp) = 0 Then
+                ElseIf ar.Count(sp) = 0 Then
                         OutOfLimit
                         GoTo nRefArray
-                ElseIf ar.count(sp) <= p Then
+                ElseIf ar.Count(sp) <= p Then
                         OutOfLimit
                         GoTo nRefArray
                 End If
@@ -4338,9 +4335,9 @@ entry00123:
                             GoTo entry00122
                             End If
                             If (ar.vtType(0) = vbObject) And ok Then  ' Or ar.vtType(0) = vbVariant
-                                If ar.count > 1 Then
+                                If ar.Count > 1 Then
                                                                 
-                                If ar.count(CVar(i)) = 0 Then
+                                If ar.Count(CVar(i)) = 0 Then
                                     Set sp = bstack.lastobj
                                     Set bstack.lastobj = Nothing
                                     GoTo count0
@@ -4351,7 +4348,7 @@ entry00123:
                                 ElseIf ar(0, CVar(i)) Is Nothing Then
                                 ' error for [ ]
                                 If Not bstack.lastobj Is Nothing Then
-                                If ar.count(CVar(i)) = 0 Then
+                                If ar.Count(CVar(i)) = 0 Then
                                     Set sp = bstack.lastobj
                                     Set bstack.lastobj = Nothing
                                     GoTo count0
@@ -4371,7 +4368,7 @@ nRefArray:
                                     WrongObject
                                     GoTo nRefArray
                                 End If
-                            ElseIf ar.count(CVar(i)) = 0 Then
+                            ElseIf ar.Count(CVar(i)) = 0 Then
 count0:
                                 ar.DefArrayAt i, ar.vtType(0), CLng(p)
                                 ' if ar.vtType(0)=vbstring  ......... check for string
@@ -5261,7 +5258,7 @@ backfromstr:
                 If Fast2VarNoTrim(rest$, "ыс", 2, "AS", 2, 3, ff) Then
                    If Not MyIsObject(var(i)) Then
                         p = var(i)
-                        If Not varhash.vType(varhash.Index) Then
+                        If Not varhash.vType(varhash.index) Then
                             If Not Fast2Varl(rest$, "атупос", 6, "VARIANT", 7, 7, ff) Then MyRead = False: MissType: Exit Function
                             GoTo jumpref02
                         End If
@@ -5436,7 +5433,7 @@ jumpref02:
                 If Not ReboundVar(bstack, what$, i) Then globalvar what$, i, True
             Else
     
-                globalvar what$, i, True, UseType:=varhash.vType(varhash.Index)
+                globalvar what$, i, True, UseType:=varhash.vType(varhash.index)
                 If VarTypeName(var(i)) = "lambda" Then
 islambda:
                 
@@ -6068,7 +6065,7 @@ checkpointer:
         
 comehere:
         i = globalvar(what$, 0)
-        it = varhash.Index
+        it = varhash.index
       
         If Typename$(myobject) = mGroup Then
             If Fast2VarNoTrim(rest$, "ыс", 2, "AS", 2, 3, ff) Then
@@ -6301,7 +6298,7 @@ jump0001233:
                                         Set myobject = usehandler1.objref
                                         usehandler.index_cursor = myobject.Value
                                         Set usehandler.objref = myobject
-                                        usehandler.index_start = myobject.Index
+                                        usehandler.index_start = myobject.index
                                         usehandler.sign = 1
                                         Set myobject = usehandler
                                         GoTo t14

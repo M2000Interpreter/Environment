@@ -20,7 +20,7 @@ Dim OwnSoros As mStiva2
 Dim mName As String
 Dim mFloatGroupName As String
 Dim FloatGroup As Boolean
-Dim bank As mArray
+Dim bank As refArray
 Dim mTeam As Boolean
 Dim LinkToGroup As Group
 Dim mTag As String
@@ -85,7 +85,7 @@ If mytypes Is RHS Then
     Exit Function
 End If
 'If mytypes.count <> extypes.count Then Exit Function
-If mytypes.count * extypes.count = 0 Then Exit Function
+If mytypes.Count * extypes.Count = 0 Then Exit Function
 For Each k In extypes
     If TypeGroupNow(k) Then MatchTypes = True: Exit Function
 Next
@@ -101,8 +101,8 @@ Public Sub ResetEvents()
 If eventlist Is Nothing Then Exit Sub
 Dim i As Long
 With eventlist
-For i = 0 To .count - 1
-    .Index = i
+For i = 0 To .Count - 1
+    .index = i
     .Done = True
     .Value = vbNullString
     .sValue = 0
@@ -116,8 +116,8 @@ If eventlist Is Nothing Then Exit Sub
 Dim eventlist2 As New FastCollection
 Dim i As Long
 With eventlist
-For i = 0 To .count - 1
-    .Index = i
+For i = 0 To .Count - 1
+    .index = i
     .Done = True
     eventlist2.AddKey .KeyToString, ""
 Next i
@@ -247,12 +247,12 @@ Public Sub PeekItem(cursor As Long, item)
 '' used in the float mode
 Dim JJ As Variant
 
-If IsObject(bank.item(cursor)) Then
-Set item = bank.item(cursor)
+If IsObject(bank(cursor)) Then
+Set item = bank(cursor)
 Else
 
 If mTeam Then
-        If cursor = bank.item(1) * 2 + 3 Then
+        If cursor = bank(1) * 2 + 3 Then
             ' we need common definitions for functions and modules all elements
                 If Not LinkToGroup.IamApointer Then
                 
@@ -261,7 +261,7 @@ If mTeam Then
                 LinkToGroup.PeekItem JJ * 2 + 3, item
                         Exit Sub
                         End If
-            ElseIf cursor = bank.item(1) * 2 + 2 Then
+            ElseIf cursor = bank(1) * 2 + 2 Then
                     If Not LinkToGroup.IamApointer Then
                     LinkToGroup.PeekItem 1, JJ
                   '  If JJ = 0 Then Exit Sub
@@ -271,7 +271,7 @@ If mTeam Then
             End If
 End If
 
-item = bank.item(cursor)
+item = bank(cursor)
 End If
 
 End Sub
@@ -280,31 +280,27 @@ Public Sub PokeItem(cursor As Long, item)
 'Debug.Print Typename$(item)
 If IsObject(item) Then
 
-Set bank.item(cursor) = item
+bank(cursor) = item
 Else
 ' always last two items are for local vars and functions
-If mTeam And cursor >= bank.item(1) * 2 + 2 Then
+If mTeam And cursor >= bank(1) * 2 + 2 Then
 
 '' do nothing
 Else
- bank.item(cursor) = item
+ bank(cursor) = item
  End If
 End If
 End Sub
 
 Public Sub BeginFloat(Total As Long)
 FloatGroup = True
-Set bank = New mArray
-bank.grouperror = True
-bank.PushDim Total * 2
-bank.PushEnd
+Set bank = New refArray
+bank(Total * 2 - 1) = Empty
+'bank.grouperror = True
+'bank.PushDim Total * 2
+'bank.PushEnd
 End Sub
 
-Public Sub BeginFloat2(Total As Long)
-FloatGroup = True
-bank.PushDim Total * 2
-bank.PushEnd
-End Sub
 Public Property Get IamFloatGroup()
 IamFloatGroup = FloatGroup
 End Property
@@ -312,7 +308,7 @@ Public Property Get IamTeam()
 IamTeam = mTeam
 End Property
 Public Sub EndFloat()
-If FloatGroup Then bank.SerialItem (0), 0, 7
+'If FloatGroup Then bank.SerialItem (0), 0, 7
 FloatGroup = False
 Set bank = Nothing
 End Sub
@@ -325,7 +321,7 @@ mTeam = False
 Set LinkToGroup = a
 If a Is Nothing Then Exit Property
 'erase functions,,,
- bank.item(bank.item(1) * 2 + 3) = vbNullString
+ bank(bank(1) * 2 + 3) = vbNullString
 mTeam = True
 Else
 ' only when is in an array as Float Group
