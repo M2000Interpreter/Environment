@@ -4930,7 +4930,8 @@ prive = players(GetCode(dq))
 With prive
 If .currow >= .mY Or .lastprint Then
 crNew bstack, prive: .lastprint = False
-Else
+ElseIf USELIST Then
+If .curpos > 0 Then crNew bstack, prive: .lastprint = False
  .curpos = 0
 End If
 LCTbasketCur dq, prive
@@ -19391,7 +19392,13 @@ jump1:
             End If
         ElseIf DeclareGUI(bstack, what$, rest$, MyDeclare, Lang, i, , , , Y3) Then
             If Y3 Then
-                If GetShink(ev, i, W$) Then
+                If Not MyIsObject(var(i)) Then
+                    If Not GetVar(bstack, ChrW(&HFFBF) + "_" + W$, ii) Then
+                        ii = globalvarGroup(ChrW(&HFFBF) + "_" + W$, s$, , y1 = True)
+                    End If
+                     var(ii) = Empty
+                        GoTo exitHere
+                ElseIf GetShink(ev, i, W$) Then
                     If Not GetVar(bstack, ChrW(&HFFBF) + "_" + W$, ii) Then
                         ii = globalvarGroup(ChrW(&HFFBF) + "_" + W$, s$, , y1 = True)
                     End If
@@ -19431,6 +19438,7 @@ ElseIf x1 = 5 Then
 Else
     BadObjectDecl
 End If
+exitHere:
 MyDeclare = True
 Set declobj = Nothing
 End Function
@@ -21280,6 +21288,7 @@ Else
 MissingObj
 End If
 End Function
+
 
 Function MyWrite(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim p As Variant, s$, it As Long, par As Boolean, i As Long, skip As Boolean

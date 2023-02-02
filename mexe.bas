@@ -36,7 +36,6 @@ Public UnloadForm1 As Boolean, a$
 Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 Public dv15 As Long
 Public ExitNow As Boolean
-Dim cfie As New cfie
 Private Type PictDesc
     Size As Long
     Type As Long
@@ -87,9 +86,14 @@ Sub Main()
 Dim mIcons As Long, there As String, iconHandler As Long
 dv15 = 1440 / DpiScrX
 DisableProcessWindowsGhosting
-If cfie.ReadFeature(cfie.ExeName, cfie.InstalledVersion * 1000) = Empty Then
-Debug.Print cfie.InstalledVersion
-End If
+  With New cIEFeatures
+     .FEATURE_BROWSER_EMULATION = Int(Val(.InstalledVersion)) 'use the most recent pre-installed IE-engine on the current system
+     .FEATURE_96DPI_PIXEL = 1   'ensure DPI-awareness
+     .FEATURE_GPU_RENDERING = 0 'not needed for this simple control (when at 1, it's misbehaving with "System-Enhanced" DPI-scaling in Win10)
+  End With
+'If cfie.ReadFeature(cfie.ExeName, cfie.InstalledVersion * 1000) = Empty Then
+'Debug.Print cfie.InstalledVersion
+'End If
 there = App.path
 If Right$(there, 1) <> "\" Then
 there = there + "\" + App.ExeName + ".exe"

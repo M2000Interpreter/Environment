@@ -225,6 +225,29 @@ Public VarIndex As Long, ItemIndex As Long
 ' by Edanmo
 Private exclude As New LongHash, inUse As New LongHash
 Public StaticCollection As FastCollection
+Private Declare Function lstrlenW Lib "kernel32" (ByVal lpString As Long) As Long
+Private Declare Sub RtlMoveMemory Lib "kernel32" (Dst As Any, Src As Any, ByVal BLen As Long)
+
+Private Declare Function StringFromCLSID Lib "ole32.dll" ( _
+                         ByRef Clsid As GUID, _
+                         lpszProgID As Long) As Long
+Private Declare Sub CoTaskMemFree Lib "ole32.dll" _
+                            (ByVal hMem As Long)
+Private Function GetBStrFromPtr(lpSrc As Long) As String
+Dim slen As Long
+  If lpSrc = 0 Then Exit Function
+  slen = lstrlenW(lpSrc)
+  If slen Then GetBStrFromPtr = space$(slen) Else Exit Function
+   RtlMoveMemory ByVal StrPtr(GetBStrFromPtr), ByVal lpSrc, slen * 2
+End Function
+
+Private Function GetGUIDstr(g As GUID) As String
+Dim ret As Long, here As Long
+ret = StringFromCLSID(g, here)
+If ret Then Exit Function
+GetGUIDstr = GetBStrFromPtr(here)
+CoTaskMemFree here
+End Function
 Private Sub pvSetParamArray(ByVal Ptr As Long, aParams() As Variant)
     Dim tDPAR       As DISPPARAMS
     Dim SafeArray   As SAFEARRAY_1D
@@ -475,7 +498,7 @@ Public Sub fireevent(ByVal dispid As Long, ByVal params As Long)
 ' change to fire events, when also othet events are fired.
     Static once As Boolean
     If once Then Exit Sub
-    If exclude.ExistKey(dispid) Then Exit Sub
+   ' If exclude.ExistKey(dispid) Then Exit Sub
     once = True
     Dim strEvent    As String
     Dim vParams()   As Variant
@@ -492,7 +515,7 @@ Public Sub fireevent(ByVal dispid As Long, ByVal params As Long)
     Dim refc() As Long
     vParams = pvGetParamArray2(params, NumVar, refc)
     On Error Resume Next
-   
+    Debug.Print ">>"; strEvent
     If Not CallEventFromCOM1(Me, strEvent, what$, NumVar, vParams, refc, delme, ItemIndex) Then
        MyEr "Problem With Event: " + strEvent, "Πρόβλημα με το γεγονός: " + strEvent
     End If
@@ -522,6 +545,7 @@ Public Function Attach(obj As Object) As Boolean
     Dim iid_ICP     As GUID
     Const E_NOTIMPL As Long = &H80004001
     ' already connected to an object?
+    Dim check$
     If blnAttached Then Detach
 
     ' IUnknown VTable
@@ -553,7 +577,7 @@ Public Function Attach(obj As Object) As Boolean
     ' IEnumConnectionPoints VTable
     CpyMem pVTblECP, ByVal pECP, 4
     CpyMem oECP, ByVal pVTblECP, Len(oECP)
-
+AGAIN:
     ' take the first best Connection Point
     hRet = CallPointer(oECP.Next, pECP, 1, VarPtr(pCP), VarPtr(cReturned))
     If hRet Then Exit Function
@@ -565,6 +589,11 @@ Public Function Attach(obj As Object) As Boolean
     ' IID of the event interface
     hRet = CallPointer(oCP.GetConnectionInterface, pCP, VarPtr(iid_event))
     If hRet Then Exit Function
+    check$ = GetGUIDstr(iid_event)
+    ' IPropertyNotifySink  not this
+    If check$ = "{9BFBBC02-EFF1-101A-84ED-00AA00341D07}" Then GoTo AGAIN
+    ' ITridentEventSink not this
+    If check$ = "{1DC9CA50-06EF-11D2-8415-006008C3FBFC}" Then GoTo AGAIN
 
     ' create a new event sink
     Set oSink = CreateEventSink(iid_event, Me)
@@ -592,7 +621,7 @@ End Function
 Sub Process(VarProc As Long, a As Long, Ptr1 As Long, usestring As Boolean, stval$)
     Dim t(0 To 8) As Integer, Zero, Ptr As Long, ItsVariantRef As Boolean
     CpyMem ByVal VarPtr(t(0)), ByVal a, 16
-again:
+AGAIN:
     CpyMem Ptr, ByVal VarPtr(t(4)), 4
 
     If (t(0) And &H4000) > 0 Then
@@ -619,7 +648,7 @@ again:
         ElseIf t(0) = 12 Then
             CpyMem ByVal VarPtr(t(0)), ByVal Ptr, 16
             ItsVariantRef = True
-            If (t(0) And &H4000 > 0) Then GoTo again
+            If (t(0) And &H4000 > 0) Then GoTo AGAIN
         Else
             CpyMem ByVal VarPtr(t(1)), ByVal Ptr + 2, 14
         End If

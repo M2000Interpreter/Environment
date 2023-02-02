@@ -20,10 +20,10 @@ Dim mIndex As Long
 Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
 End Property
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
-Friend Property Let Index(ByVal RHS As Long)
+Friend Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Friend Property Get ControlName() As String
@@ -63,13 +63,24 @@ Set another = Nothing
 End Sub
 
 Private Sub mycontrol_ObjectEvent(Info As EventInfo)
-Dim Values(), m As Long
+Dim Values(), m As Long, uk1 As Object
 If Info.EventParameters.Count > 0 Then
 ReDim Values(0 To Info.EventParameters.Count)
 Dim evinf As EventParameter
 m = 0
 For Each evinf In Info.EventParameters
-    Values(m) = evinf.Value
+Err.Clear
+On Error Resume Next
+    If IsObject(evinf.Value) Then
+        Set Values(m) = evinf.Value
+    Else
+        Values(m) = evinf.Value
+    End If
+    If Err Then
+        Err.Clear
+        Values(m) = "Error"
+    End If
+    
     m = m + 1
 Next evinf
 If mIndex <> -1 Then
@@ -79,7 +90,12 @@ Else
 End If
 With Info.EventParameters
 For m = m - 1 To 0
-    .item(m).Value = Values(m)
+    If IsObject(Values(m)) Then
+        Set .item(m).Value = Values(m)
+        Err.Clear
+    Else
+        .item(m).Value = Values(m)
+    End If
 Next m
 End With
 ElseIf mIndex <> -1 Then

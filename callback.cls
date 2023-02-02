@@ -142,7 +142,7 @@ NERR = True: NOEXECUTION = True
 ExTarget = True: INK$ = Chr(27): UKEY$ = Chr$(27)
 If Cancel = -100 Then Exit Sub
 Set Form3AppIcon = LoadPicture("")
-For i = Forms.count - 1 To 0 Step -1
+For i = Forms.Count - 1 To 0 Step -1
 Set f = Forms(i)
 Set f.icon = LoadPicture("")
 If TypeOf f Is GuiM2000 Then
@@ -197,7 +197,7 @@ MyDoEvents
     exWnd = 0
 
     End If
-For i = Forms.count - 1 To 0 Step -1
+For i = Forms.Count - 1 To 0 Step -1
 Set f = Forms(i)
 Unload f
 Next i
@@ -342,14 +342,14 @@ For i = UBound(var()) To 0 Step -1: var(i) = 0&: Next i
 Finished = True
 End Sub
 Property Let ShowGui(RHS As Boolean)
-If Forms.count = 0 Then Exit Property
+If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
 If Form1.top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).top
 Else
 If Form1.WindowState = 0 Then
-If Not (Forms.count > 5) Then Form1.Visible = False
+If Not (Forms.Count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
@@ -553,8 +553,8 @@ For i = -2 To 1000
     players(i) = Zero
     Prefresh(i) = zerocounter
 Next i
-If Forms.count > 0 Then
-For i = Forms.count - 1 To 0
+If Forms.Count > 0 Then
+For i = Forms.Count - 1 To 0
 Set Forms(i).icon = LoadPicture("")
 Unload Forms(i)
 Next i
@@ -577,8 +577,12 @@ Public Sub StopTimer2()
   End If
 End Sub
 Public Sub SetFocus()
+On Error Resume Next
 If WindowState = 1 Then WindowState = 0
-If Form1.Visible Then Form1.Show , Form5:   Form1.SetFocus
+If Form1.Visible Then
+Form1.Show , Form5
+If Form1.enabled Then Form1.SetFocus
+End If
 
    
 End Sub

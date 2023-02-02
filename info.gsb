@@ -40559,4 +40559,67 @@ Sub CleanQuery(holdbuffer as boolean=false)
 	lastchar=""
 end sub
 }
+MODULE ROSETTA {// Need version 12, revision 8  and up
+linespace 0
+form 80
+ ' just make the dummy event place, because event functions clear the "event hidden variable"
+declare withevents alfa
+declare Form1 form
+with form1, "Title" as Form1.Title$
+declare wb type "shell.explorer.2" form Form1
+//print type$(wb)
+method Form1,"move", 1000, 1000, 14000, 12000
+Layer Form1 {Gradient 11, #7777aa}
+method wb, "move", 1000, 1000, 12000, 10000
+with wb, "silent", true, "object" set wb1, "visible" as visible
+with wb,"RegisterAsBrowser", true
+method wb,"Navigate2", "https://rosettacode.org"
+with wb1, "readystate" as readystate
+
+function wb.TitleChange {
+	read new &a$
+	Pen 15 {Print "Title:"; a$}
+	Form1.Title$=a$
+}
+function alfa_onmousewheel {
+	Print "You rotate the mouse wheel"
+	refresh
+}
+function alfa_ondblclick {
+	Print "Double Click, wow"
+	refresh
+}
+function alfa_onkeydown {
+	read new a, b
+	local object pa, ev1
+	local keycode
+	with alfa, "parentWindow" set pa
+	with pa, "event" set ev1
+	with ev1, "keycode" get keycode
+	print "this is the key:", keycode
+	refresh
+}
+function wb.BeforeNavigate2 {
+	Pen 15 {? "_BeforeNavigate2"}
+//	stack
+	refresh
+}
+// we get the document each time a Document Complete
+// and we make a new event sink object
+function wb.DocumentComplete {
+	with wb, "document" get withevents alfa
+	Pen 11 {print "DocumentComplete"}
+	refresh
+}
+function form1.click {
+	visible=not visible
+	print readystate
+	print type$(alfa)
+	refresh
+}
+method Form1 "show", 1
+
+declare Form1 nothing
+
+}
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

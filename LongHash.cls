@@ -65,8 +65,8 @@ Private Function Malloc() As Long
         toplim = toplim + 1
         Malloc = toplim
 End Function
-Property Get count()
-count = toplim + 1
+Property Get Count()
+Count = toplim + 1
 End Property
 Private Function Find(Key As Long) As Boolean
 Dim k As Long
@@ -100,9 +100,9 @@ If index > -1 Then
     Key = PriveSpace(index).Key
 End If
 End Property
-Public Property Get Child() As Boolean
+Public Property Get child() As Boolean
 If index > -1 Then
-    Child = Hash(PriveSpace(index).lastpos) - 1 <> index
+    child = Hash(PriveSpace(index).lastpos) - 1 <> index
 End If
 End Property
 Public Property Get HasCollision() As Boolean
@@ -146,7 +146,7 @@ End Sub
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
     k = Hash(b)
-    If Not k = a + 1 Then
+    If Not Hash(b) = a + 1 Then
          Hash(b) = a + 1
          PriveSpace(a).Pleft = k
     End If
@@ -156,7 +156,7 @@ Private Function HashFunc2(where As Long)
 HashFunc2 = PriveSpace(where).firsthash Mod hashlen
 End Function
 Public Function HD(ByVal v As Long) As Long
-       If v = 0 Then v = 1 Else HD = v
+       If v = 0 Then v = 1 Else HD = Abs(v)
 End Function
 Private Function HashFunc1(readyhash)
 HashFunc1 = readyhash Mod hashlen
@@ -192,7 +192,7 @@ Else
 End If
 End Property
 Property Get Percent()
-Percent = 100 * count / hashlen
+Percent = 100 * Count / hashlen
 End Property
 
 
