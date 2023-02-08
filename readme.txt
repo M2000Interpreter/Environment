@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 8 active-X
-Fixed 99.99%. A bug removed, plus a fix for loading controls (Can load WebBrowser control in a form, see rosetta module in info.gsb).
-
+Version 12 Revision 9 active-X
+Now we can remove controls from forms (and from arrays of controls). See example BUTTONSONFRAME in info.gsb
+Also timers adjusted for smoother running.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

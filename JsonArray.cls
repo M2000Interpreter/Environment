@@ -10,7 +10,7 @@ Attribute VB_Name = "JsonArray"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 ' George Karras, Kalithea, Greece
 ' Version 3.2
 ' GNU Lesser General Public License version 3
@@ -96,10 +96,10 @@ Private Sub ClearVariant(ByRef VarVar)
 Dim t(0 To 3) As Long
    CopyMemory ByVal VarPtr(VarVar), t(0), 16
 End Sub
-Private Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
+Private Sub SwapVariant(ByRef A As Variant, ByRef b As Variant)
    Dim t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory t(0), ByVal VarPtr(a), 16
-   CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
+   CopyMemory t(0), ByVal VarPtr(A), 16
+   CopyMemory ByVal VarPtr(A), ByVal VarPtr(b), 16
    CopyMemory ByVal VarPtr(b), t(0), 16
 End Sub
 Public Function StringToEscapeStr(RHS As Variant) As Variant
@@ -192,43 +192,43 @@ Private Function ParseHexChar( _
     ParseHexChar = ChrW$(Value)
 End Function
 
-Sub InsertNull(index As Long, Optional many As Long = 1)
+Sub InsertNull(Index As Long, Optional many As Long = 1)
 If many <= 0 Then Exit Sub
-Dim w As Long, i As Long
-w = count
-ReDim Preserve ar(w + many)
-For i = w - 1 To index Step -1
+Dim W As Long, i As Long
+W = count
+ReDim Preserve ar(W + many)
+For i = W - 1 To Index Step -1
     SwapVariant ar(i + many), ar(i)
     ClearVariant ar(i)
 Next
 
 End Sub
-Sub DeleteItems(index As Long, Optional many As Long = 1)
+Sub DeleteItems(Index As Long, Optional many As Long = 1)
 If many <= 0 Then Exit Sub
-Dim w As Long, i As Long
-If w - many = 0 Then
+Dim W As Long, i As Long
+If W - many = 0 Then
 ReDim ar(0)
 Else
-w = count
+W = count
 
-For i = index + many To w - 1
+For i = Index + many To W - 1
     SwapVariant ar(i - many), ar(i)
     ClearVariant ar(i)
 Next
-ReDim Preserve ar(w - many)
+ReDim Preserve ar(W - many)
 End If
 End Sub
-Sub Assign(index As Long, RHS)
+Sub Assign(Index As Long, RHS)
     If IsObject(RHS) Then
-        Set ValueObj(index) = RHS
+        Set ValueObj(Index) = RHS
     Else
-        Value(index) = RHS
+        Value(Index) = RHS
     End If
 End Sub
-Sub AssignPath(Path$, RHS, Optional sep As String = ".")
-Dim part$(), w As Long, n As Long, s As Long
+Sub AssignPath(path$, RHS, Optional sep As String = ".")
+Dim part$(), W As Long, n As Long, s As Long
 
-part$ = Split2(Path$, sep)
+part$ = Split2(path$, sep)
 Dim m As Object, ma As JsonArray, mo As JsonObject
 s = UBound(part$)
 n = 0
@@ -237,34 +237,34 @@ again:
 If n > UBound(part$) Then Exit Sub
 If TypeOf m Is JsonArray Then
     Set ma = m
-    w = val(part$(n))
+    W = val(part$(n))
     If n = s Then
-        ma.Assign w, RHS
+        ma.Assign W, RHS
     ElseIf n = 0 Then
         If Left$(part$(0), 1) = " " Then
         
-            If Not ma.ValType(w) > 3 Then
+            If Not ma.ValType(W) > 3 Then
                 If Left$(part$(1), 1) = " " Then
-                    ma.Assign w, New JsonArray
+                    ma.Assign W, New JsonArray
                 Else
-                    ma.Assign w, New JsonObject
+                    ma.Assign W, New JsonObject
                 End If
             End If
-            Set m = ar(w)
+            Set m = ar(W)
             n = n + 1
             GoTo again
         Else
             Err.Raise 8005, "Not a numeric index:" + part$(0)
         End If
     ElseIf Left$(part$(n), 1) = " " Then
-            If Not ma.ValType(w) > 3 Then
+            If Not ma.ValType(W) > 3 Then
                 If Left$(part$(n + 1), 1) = " " Then
-                ma.Assign w, New JsonArray
+                ma.Assign W, New JsonArray
                 Else
-                ma.Assign w, New JsonObject
+                ma.Assign W, New JsonObject
                 End If
             End If
-            Set m = ma(w)
+            Set m = ma(W)
             n = n + 1
             GoTo again
     Else
@@ -299,13 +299,13 @@ Else
     End If
 End If
 End Sub
-Function anArray(index As Long, RHS) As JsonArray
+Function anArray(Index As Long, RHS) As JsonArray
     Dim m As New JsonArray
     If IsObject(RHS) Then
-        Set m.ValueObj(index) = RHS
+        Set m.ValueObj(Index) = RHS
     Else
         
-        m.Value(index) = RHS
+        m.Value(Index) = RHS
     End If
     Set anArray = m
     
@@ -315,17 +315,17 @@ Function anObject(Key As String, RHS) As JsonObject
     m.Assign Key, RHS
     Set anObject = m
 End Function
-Function ValType(index As Long) As Long
+Function ValType(Index As Long) As Long
 If Not IsEmpty Then
-    If Not ValueIsNull(index) Then  ' 0 for null
-        If IsObject(ar(index)) Then
-            If TypeOf ar(index) Is JsonArray Then
+    If Not ValueIsNull(Index) Then  ' 0 for null
+        If IsObject(ar(Index)) Then
+            If TypeOf ar(Index) Is JsonArray Then
                 ValType = 4
             Else
                 ValType = 5
             End If
         Else
-            Select Case VarType(ar(index))
+            Select Case VarType(ar(Index))
             Case 1, 10
             Case vbString
                 ValType = 1
@@ -340,56 +340,56 @@ If Not IsEmpty Then
     End If
 End If
 End Function
-Function ToString(index As Long, Optional dot As String = ".")
-Dim w As Long, hlp$, ja As JsonArray, jo As JsonObject
-w = ValType(index)
-Select Case w
+Function ToString(Index As Long, Optional dot As String = ".")
+Dim W As Long, hlp$, ja As JsonArray, jo As JsonObject
+W = ValType(Index)
+Select Case W
 Case 0
     ToString = "null"
 Case 1
-    ToString = """" + StringToEscapeStr(ar(index)) + """"
+    ToString = """" + StringToEscapeStr(ar(Index)) + """"
 Case 2
-    If ar(index) Then ToString = "true" Else ToString = "false"
+    If ar(Index) Then ToString = "true" Else ToString = "false"
 Case 3
-    ToString = Replace(ar(index), curdot$, dot)
+    ToString = Replace(ar(Index), curdot$, dot)
 Case 4
-    Set ja = ar(index)
+    Set ja = ar(Index)
     ToString = ja.Json
 Case 5
-    Set jo = ar(index)
+    Set jo = ar(Index)
     ToString = jo.Json
 Case 33
-        ToString = Replace(ar(index), curdot$, dot)
+        ToString = Replace(ar(Index), curdot$, dot)
 End Select
 End Function
-Private Function ToString2(index As Long, n As Long, ww As Long)
-Dim w As Long, hlp$, ja As JsonArray, jo As JsonObject
-w = ValType(index)
-Select Case w
+Private Function ToString2(Index As Long, n As Long, ww As Long)
+Dim W As Long, hlp$, ja As JsonArray, jo As JsonObject
+W = ValType(Index)
+Select Case W
 Case 0
     ToString2 = "null"
 Case 1
-    ToString2 = """" + StringToEscapeStr(ar(index)) + """"
+    ToString2 = """" + StringToEscapeStr(ar(Index)) + """"
 Case 2
-    If ar(index) Then ToString2 = "true" Else ToString2 = "false"
+    If ar(Index) Then ToString2 = "true" Else ToString2 = "false"
 Case 3
-    ToString2 = LTrim$(Str$(ar(index)))
+    ToString2 = LTrim$(Str$(ar(Index)))
 Case 4
-    Set ja = ar(index)
+    Set ja = ar(Index)
     ToString2 = ja.Json(n, ww)
 Case 5
-    Set jo = ar(index)
+    Set jo = ar(Index)
     ToString2 = jo.Json(n, ww)
 Case 33
-    ToString2 = Replace(ar(index), curdot$, ".")
+    ToString2 = Replace(ar(Index), curdot$, ".")
 End Select
 End Function
-Property Get Json(Optional sp As Long = 0, Optional w As Long = -1) As String
+Property Get Json(Optional sp As Long = 0, Optional W As Long = -1) As String
     Dim i As Long, hlp$, acc$, nl$
     sp = Abs(sp)
-    If sp Then nl$ = vbCrLf + space$(sp): hlp$ = space$(sp): If w = -1 Then w = sp
+    If sp Then nl$ = vbCrLf + space$(sp): hlp$ = space$(sp): If W = -1 Then W = sp
     For i = 0 To count - 1
-        acc$ = acc$ + hlp$ + nl$ + ToString2(i, sp - w * (sp > 0), w)
+        acc$ = acc$ + hlp$ + nl$ + ToString2(i, sp - W * (sp > 0), W)
         If i = 0 Then
              If sp Then
                 hlp$ = ","
@@ -401,20 +401,20 @@ Property Get Json(Optional sp As Long = 0, Optional w As Long = -1) As String
         If sp = 0 Then
     Json = "[" + acc$ + "]"
     Else
-    Json = "[" + acc$ + vbCrLf + space(sp - w) + "]"
+    Json = "[" + acc$ + vbCrLf + space(sp - W) + "]"
     End If
 End Property
-Property Get item(index As Long)
+Property Get item(Index As Long)
 Attribute item.VB_UserMemId = 0
-Select Case ValType(index)
+Select Case ValType(Index)
 Case 0
 Case 4, 5
-    Set item = ar(index)
+    Set item = ar(Index)
 Case 33
 Dim s As String
-    s = ar(index)
+    s = ar(Index)
     If InStr(s, curdot$) > 0 Then
-        s = Replace(ar(index), curdot$, ".")
+        s = Replace(ar(Index), curdot$, ".")
     End If
     If InStr(s, ".") > 25 Then
         item = val(s)
@@ -427,19 +427,19 @@ Dim s As String
         End If
     End If
 Case Else
-    item = ar(index)
+    item = ar(Index)
 End Select
 End Property
-Property Let item(index As Long, RHS)
-    Assign index, RHS
+Property Let item(Index As Long, RHS)
+    Assign Index, RHS
 End Property
-Property Set item(index As Long, RHS)
-    Assign index, RHS
+Property Set item(Index As Long, RHS)
+    Assign Index, RHS
 End Property
 
-Property Get ItemPath(Path$, Optional sep As String = ".")
-Dim part$(), w As Long, n As Long, ma As JsonArray, mo As JsonObject
-part$ = Split2(Path$, sep)
+Property Get ItemPath(path$, Optional sep As String = ".")
+Dim part$(), W As Long, n As Long, ma As JsonArray, mo As JsonObject
+part$ = Split2(path$, sep)
 Dim m As Object
 
 n = 0
@@ -448,16 +448,16 @@ again:
 If n > UBound(part$) Then Exit Property
 If TypeOf m Is JsonArray Then
     Set ma = m
-    w = val(part$(n))
-    Select Case ma.ValType(w)
+    W = val(part$(n))
+    Select Case ma.ValType(W)
     Case 0
     Case 4, 5
-        Set m = ma(w)
+        Set m = ma(W)
         n = n + 1
         If n <= UBound(part$) Then GoTo again
         Set ItemPath = m
     Case Else
-        ItemPath = ma(w)
+        ItemPath = ma(W)
     End Select
 Else
     Set mo = m
@@ -473,16 +473,16 @@ Else
     End Select
 End If
 End Property
-Private Function Split2(a$, Optional sep As String = ".") As String()
+Private Function Split2(A$, Optional sep As String = ".") As String()
 Dim s() As String, i As Long, look As Boolean, many As Long, lastsep As Long
 Dim strip As Boolean
 ' pass one
 ReDim s(0)
-If Len(a$) = 0 Then Split2 = s: Exit Function
+If Len(A$) = 0 Then Split2 = s: Exit Function
 many = 0
 look = True
-For i = 1 To Len(a$)
-    Select Case Mid$(a$, i, 1)
+For i = 1 To Len(A$)
+    Select Case Mid$(A$, i, 1)
     Case "["
         If lastsep = i - 1 Then look = False
     Case "]"
@@ -495,8 +495,8 @@ ReDim s(many)
 lastsep = 0
 many = 0
 look = True
-For i = 1 To Len(a$)
-    Select Case Mid$(a$, i, 1)
+For i = 1 To Len(A$)
+    Select Case Mid$(A$, i, 1)
     Case "["
         If lastsep = i - 1 Then look = False: strip = True
     Case "]"
@@ -504,9 +504,9 @@ For i = 1 To Len(a$)
     Case sep
         If look Then
             If strip Then
-                s(many) = Trim$(Mid$(a$, lastsep + 2, i - lastsep - 3))
+                s(many) = Trim$(Mid$(A$, lastsep + 2, i - lastsep - 3))
             Else
-                s(many) = Trim$(Mid$(a$, lastsep + 1, i - lastsep - 1))
+                s(many) = Trim$(Mid$(A$, lastsep + 1, i - lastsep - 1))
                 If IsNumeric(s(many)) Then s(many) = " " + s(many)
             End If
             strip = False
@@ -515,115 +515,115 @@ For i = 1 To Len(a$)
     End Select
 Next i
 If strip Then
-    s(many) = Trim$(Mid$(a$, lastsep + 2, i - lastsep - 3))
+    s(many) = Trim$(Mid$(A$, lastsep + 2, i - lastsep - 3))
 Else
-    s(many) = Trim$(Mid$(a$, lastsep + 1, i - lastsep - 1))
+    s(many) = Trim$(Mid$(A$, lastsep + 1, i - lastsep - 1))
     If IsNumeric(s(many)) Then s(many) = " " + s(many)
 End If
 Split2 = s
 End Function
-Function Parser(a$) As Object
-Dim i As Long, jumpstring As Long, ch As String, Level As Long, v
+Function Parser(A$) As Object
+Dim i As Long, jumpstring As Long, ch As String, level As Long, v
 Dim b() As Byte
 ReDim b(0)
 Dim ma As JsonArray, mo As JsonObject
 Dim markin As Long
 Dim p()
 ReDim p(100), mm(100)
-Level = -1
-For i = 1 To Len(a$)
-ch = Mid$(a$, i, 1)
+level = -1
+For i = 1 To Len(A$)
+ch = Mid$(A$, i, 1)
 If ch = "{" Then
-    Level = Level + 1
-    If Level > UBound(p) Then ReDim Preserve p(Level * 2): ReDim Preserve mm(Level * 2)
-    p(Level) = ""
-    Set mm(Level) = New JsonObject
-    Set mo = mm(Level)
+    level = level + 1
+    If level > UBound(p) Then ReDim Preserve p(level * 2): ReDim Preserve mm(level * 2)
+    p(level) = ""
+    Set mm(level) = New JsonObject
+    Set mo = mm(level)
 ElseIf ch = "}" Then
-    If ma Is mm(Level) Then Exit Function
-    Level = Level - 1
-    If Level < 0 Then Set Parser = mo: Exit Function
-    If TypeOf mm(Level) Is JsonArray Then
-    Set ma = mm(Level)
-        ma.Assign 0 + p(Level), mm(Level + 1)
+    If ma Is mm(level) Then Exit Function
+    level = level - 1
+    If level < 0 Then Set Parser = mo: Exit Function
+    If TypeOf mm(level) Is JsonArray Then
+    Set ma = mm(level)
+        ma.Assign 0 + p(level), mm(level + 1)
     Else
-        Set mo = mm(Level)
-        mo.Assign "" + p(Level), mm(Level + 1)
+        Set mo = mm(level)
+        mo.Assign "" + p(level), mm(level + 1)
     End If
 ElseIf ch = "[" Then
-    Level = Level + 1
-    If Level > UBound(p) Then ReDim Preserve p(Level * 2): ReDim Preserve mm(Level * 2)
-    p(Level) = 0
-    Set mm(Level) = New JsonArray
-    Set ma = mm(Level)
+    level = level + 1
+    If level > UBound(p) Then ReDim Preserve p(level * 2): ReDim Preserve mm(level * 2)
+    p(level) = 0
+    Set mm(level) = New JsonArray
+    Set ma = mm(level)
 ElseIf ch = "]" Then
-    If mo Is mm(Level) Then Exit Function
-    Level = Level - 1
-    If Level < 0 Then Set Parser = ma:  Exit Function
-    If TypeOf mm(Level) Is JsonArray Then
-    Set ma = mm(Level)
-        ma.Assign 0 + p(Level), mm(Level + 1)
+    If mo Is mm(level) Then Exit Function
+    level = level - 1
+    If level < 0 Then Set Parser = ma:  Exit Function
+    If TypeOf mm(level) Is JsonArray Then
+    Set ma = mm(level)
+        ma.Assign 0 + p(level), mm(level + 1)
     Else
-        Set mo = mm(Level)
-        mo.Assign "" + p(Level), mm(Level + 1)
+        Set mo = mm(level)
+        mo.Assign "" + p(level), mm(level + 1)
     End If
 ElseIf ch = """" Then
     markin = i + 1
     i = i + 1
-    ch = Mid$(a$, i, 1)
-    While i < Len(a$) And ch <> """"
+    ch = Mid$(A$, i, 1)
+    While i < Len(A$) And ch <> """"
         If ch = "\" Then i = i + 1
         i = i + 1
-        ch = Mid$(a$, i, 1)
+        ch = Mid$(A$, i, 1)
     Wend
     If ch = """" Then
-        If ma Is mm(Level) Then
-            ma.Assign 0 + p(Level), ma.EscapeStrToString(Mid$(a$, markin, i - markin))
-        ElseIf p(Level) = "" Then
-            p(Level) = mo.EscapeStrToString(Mid$(a$, markin, i - markin))
-            If p(Level) = "" Then Exit Function
-            While i < Len(a$) And ch <> ":"
+        If ma Is mm(level) Then
+            ma.Assign 0 + p(level), ma.EscapeStrToString(Mid$(A$, markin, i - markin))
+        ElseIf p(level) = "" Then
+            p(level) = mo.EscapeStrToString(Mid$(A$, markin, i - markin))
+            If p(level) = "" Then Exit Function
+            While i < Len(A$) And ch <> ":"
                 i = i + 1
-                ch = Mid$(a$, i, 1)
+                ch = Mid$(A$, i, 1)
             Wend
             If ch <> ":" Then Exit Function
         Else
-            mo.Assign "" + p(Level), ma.EscapeStrToString(Mid$(a$, markin, i - markin))
+            mo.Assign "" + p(level), ma.EscapeStrToString(Mid$(A$, markin, i - markin))
         End If
     Else
         Exit Function
     End If
 ElseIf ch = "," Then
-    If ma Is mm(Level) Then p(Level) = p(Level) + 1 Else p(Level) = ""
+    If ma Is mm(level) Then p(level) = p(level) + 1 Else p(level) = ""
 ElseIf ch = "t" Then
-    If Mid$(a$, i, 4) = "true" Then
+    If Mid$(A$, i, 4) = "true" Then
         i = i + 3
-        If ma Is mm(Level) Then
-            ma.Assign 0 + p(Level), True
+        If ma Is mm(level) Then
+            ma.Assign 0 + p(level), True
         Else
-            mo.Assign "" + p(Level), True
+            mo.Assign "" + p(level), True
         End If
     Else
         Exit Function
     End If
 ElseIf ch = "f" Then
-    If Mid$(a$, i, 5) = "false" Then
+    If Mid$(A$, i, 5) = "false" Then
         i = i + 4
-        If ma Is mm(Level) Then
-            ma.Assign 0 + p(Level), False
+        If ma Is mm(level) Then
+            ma.Assign 0 + p(level), False
         Else
-            mo.Assign "" + p(Level), False
+            mo.Assign "" + p(level), False
         End If
     Else
         Exit Function
     End If
 ElseIf ch = "n" Then
-    If Mid$(a$, i, 4) = "null" Then
+    If Mid$(A$, i, 4) = "null" Then
         i = i + 3
-        If ma Is mm(Level) Then
-            ma.Assign 0 + p(Level), ma.NullValue
+        If ma Is mm(level) Then
+            ma.Assign 0 + p(level), ma.NullValue
         Else
-            mo.Assign "" + p(Level), mo.NullValue
+            mo.Assign "" + p(level), mo.NullValue
         End If
     Else
         Exit Function
@@ -631,41 +631,41 @@ ElseIf ch = "n" Then
 ElseIf ch Like "[+-0123456789.]" Then
     markin = i
     i = i + 1
-    Do While i <= Len(a$)
-        ch = Mid$(a$, i, 1)
+    Do While i <= Len(A$)
+        ch = Mid$(A$, i, 1)
         Select Case ch
         Case Is < "!", "]", "}", ","
-        If Not IsNumeric(Mid$(a$, markin, i - markin)) Then Exit Function
+        If Not IsNumeric(Mid$(A$, markin, i - markin)) Then Exit Function
         i = i - 1
         Exit Do
         End Select
         i = i + 1
     Loop
-    If i > Len(a$) Then Exit Function
-    ch$ = Mid$(a$, markin, i - markin + 1)
-    If ma Is mm(Level) Then
+    If i > Len(A$) Then Exit Function
+    ch$ = Mid$(A$, markin, i - markin + 1)
+    If ma Is mm(level) Then
         If Len(ch) > 28 Then
             If InStr(ch$, ".") > 0 Then Mid$(ch$, InStr(ch$, ".")) = curdot$
             b() = ch
             v = b()
-            ma.Assign 0 + p(Level), v
+            ma.Assign 0 + p(level), v
         ElseIf InStr(1, ch, "e", vbTextCompare) = 0 And ch > 14 Then
             If InStr(ch$, ".") > 0 Then Mid$(ch$, InStr(ch$, ".")) = curdot$
-            ma.Assign 0 + p(Level), CDec(ch)
+            ma.Assign 0 + p(level), CDec(ch)
         Else
-            ma.Assign 0 + p(Level), val(ch)
+            ma.Assign 0 + p(level), val(ch)
         End If
     Else
         If Len(ch) > 28 Then
             If InStr(ch$, ".") > 0 Then Mid$(ch$, InStr(ch$, ".")) = curdot$
             b() = ch
             v = b()
-            mo.Assign "" + p(Level), v
+            mo.Assign "" + p(level), v
         ElseIf InStr(1, ch, "e", vbTextCompare) = 0 And Len(ch) > 14 Then
             If InStr(ch$, ".") > 0 Then Mid$(ch$, InStr(ch$, ".")) = curdot$
-            mo.Assign "" + p(Level), CDec(ch)
+            mo.Assign "" + p(level), CDec(ch)
         Else
-            mo.Assign "" + p(Level), val(ch)
+            mo.Assign "" + p(level), val(ch)
         End If
     End If
 End If

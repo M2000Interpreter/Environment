@@ -601,6 +601,7 @@ If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor,
             Me.Visible = False
             Unload Me
 End If
+
 End Sub
 
 Public Property Let Label1prompt(ByVal index As Long, ByVal RHS As String)

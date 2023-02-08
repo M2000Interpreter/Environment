@@ -8,9 +8,9 @@ BEGIN
 END
 Attribute VB_Name = "ExtControl"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Public WithEvents mycontrol As VBControlExtender
 Attribute mycontrol.VB_VarHelpID = -1
 Dim another As Object
@@ -20,10 +20,10 @@ Dim mIndex As Long
 Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
 End Property
-Public Property Get index() As Long
-index = mIndex
+Public Property Get Index() As Long
+Index = mIndex
 End Property
-Friend Property Let index(ByVal RHS As Long)
+Friend Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Friend Property Get ControlName() As String
@@ -64,8 +64,8 @@ End Sub
 
 Private Sub mycontrol_ObjectEvent(Info As EventInfo)
 Dim Values(), m As Long, uk1 As Object
-If Info.EventParameters.Count > 0 Then
-ReDim Values(0 To Info.EventParameters.Count)
+If Info.EventParameters.count > 0 Then
+ReDim Values(0 To Info.EventParameters.count)
 Dim evinf As EventParameter
 m = 0
 For Each evinf In Info.EventParameters

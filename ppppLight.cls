@@ -8,9 +8,9 @@ BEGIN
 END
 Attribute VB_Name = "ppppLight"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Implements iBoxArray
 Option Explicit
 Public refgroup As Object, GroupRef As Object, Arr As Boolean, IhaveClass As Boolean, CodeName As String
@@ -36,8 +36,8 @@ End Sub
 Public Sub PushEnd(Optional thisarr As Variant)
 dnum = ndnum
 End Sub
-Public Sub PushProp(a As Variant)
-Set GroupRef = a
+Public Sub PushProp(A As Variant)
+Set GroupRef = A
 Arr = False
 End Sub
 Public Function IsObjAt(curitem As Long, peekvalue As Variant) As Boolean
@@ -212,11 +212,11 @@ Private Property Get iBoxArray_itemObject(curitem As Long) As Variant
 If Arr Then
     
     If MyIsObject(actualData) Then
-        iBoxArray_itemObject = Not actualData Is Nothing
+        Set iBoxArray_itemObject = actualData
     End If
     
 Else
-    iBoxArray_itemObject = Not GroupRef Is Nothing
+    Set iBoxArray_itemObject = GroupRef
 End If
 End Property
 
@@ -229,13 +229,18 @@ If Arr Then
 Else
 If curitem = -2 Then
 iBoxArray_ItemType = Typename(GroupRef)
+ElseIf curitem = 0 Then
+If Not TypeOf GroupRef Is mHandler Then GoTo e1245
+GoTo a123
 ElseIf curitem < 0 Then
 If Not TypeOf GroupRef Is mHandler Then GoTo e1245
+a123:
 Dim usehandler As mHandler
 Set usehandler = GroupRef
 If usehandler.t1 <> 1 Then
 e1245:
    iBoxArray_ItemType = Typename(GroupRef)
+   Exit Function
 End If
     If usehandler.objref.Done Then
         If usehandler.objref.IsObj Then
@@ -265,8 +270,8 @@ Private Sub iBoxArray_PushEnd(Optional thisarr As Variant)
 dnum = ndnum
 End Sub
 
-Private Sub iBoxArray_PushProp(a As Variant)
-PushProp a
+Private Sub iBoxArray_PushProp(A As Variant)
+PushProp A
 End Sub
 
 Private Property Set iBoxArray_refgroup(ByVal RHS As Object)

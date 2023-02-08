@@ -8,9 +8,9 @@ BEGIN
 END
 Attribute VB_Name = "ZipTool"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Option Explicit
 Dim WithEvents Zip As cZipArchive
 Attribute Zip.VB_VarHelpID = -1
@@ -59,15 +59,15 @@ Public Function CreateZipBuffer() As mHandler
     LockControl = True
    
     Dim ret As Boolean, p() As Byte
-    Dim mem As New MemBlock, Handler As New mHandler
+    Dim mem As New MemBlock, handler As New mHandler
 
     ret = Zip.CompressArchive(p, , , vbTrue)
     If ret Then
         mem.Construct 1, UBound(p) + 1
         CopyMemory ByVal mem.GetPtr(0), p(0), UBound(p) + 1
-        Handler.t1 = 2
-        Set Handler.objref = mem
-        Set CreateZipBuffer = Handler
+        handler.t1 = 2
+        Set handler.objref = mem
+        Set CreateZipBuffer = handler
     End If
     LockControl = False
     mLastCancel = False
@@ -89,30 +89,30 @@ Public Function AddFileFromFolder(sFolderAndMask As String, _
     AddFileFromFolder = Zip.AddFromFolder(sFolderAndMask, Recursive, TargetFolder, IncludeEmptyFolders, Password, EncrStrength, level)
 End Function
 Public Property Get FileInfo(FileNum) As Object
-Dim Handler As New mHandler, touple As New mArray
+Dim handler As New mHandler, touple As New mArray
 Dim pp
 pp = Zip.FileInfo(FileNum)
 touple.LoadTuple pp
-Set Handler.objref = touple
-Handler.t1 = 3
-Set FileInfo = Handler
+Set handler.objref = touple
+handler.t1 = 3
+Set FileInfo = handler
 End Property
 
 
-Public Sub ExtractToPath(ByVal Path$, Optional ByVal FileMask$, Optional ByVal Pass$)
+Public Sub ExtractToPath(ByVal path$, Optional ByVal FileMask$, Optional ByVal Pass$)
     If LockControl Then
         MessErr
         Exit Sub
     End If
     LockControl = True
     Dim p, ret As Boolean
-    p = Path$
+    p = path$
     mLastCancel = False
     If FileMask$ = "" Then
-        ret = Zip.Extract(Path$, , Pass$)
+        ret = Zip.Extract(path$, , Pass$)
     Else
         ClearStr FileMask$
-        ret = Zip.Extract(Path$, FileMask$, Pass$)
+        ret = Zip.Extract(path$, FileMask$, Pass$)
     End If
     LockControl = False
     mLastCancel = False
@@ -125,16 +125,16 @@ Public Function ExtractOneToBuffer(ByVal FileName$, Optional ByVal Pass$) As mHa
     ClearStr FileName$
     FileName$ = CleanStr(FileName$, "?*")
     LockControl = True
-    Dim p() As Byte, ret As Boolean, Handler As New mHandler, mem As New MemBlock
+    Dim p() As Byte, ret As Boolean, handler As New mHandler, mem As New MemBlock
     mLastCancel = False
     
     ret = Zip.Extract(p(), FileName$, Pass$)
     If ret Then
     mem.Construct 1, UBound(p) + 1
     CopyMemory ByVal mem.GetPtr(0), p(0), UBound(p) + 1
-    Handler.t1 = 2
-    Set Handler.objref = mem
-    Set ExtractOneToBuffer = Handler
+    handler.t1 = 2
+    Set handler.objref = mem
+    Set ExtractOneToBuffer = handler
     End If
     LockControl = False
     mLastCancel = False

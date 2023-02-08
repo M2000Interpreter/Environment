@@ -23,7 +23,7 @@ Private Type WAVEINCAPS
 End Type
 Private Declare Function mciGetErrorString Lib "winmm.dll" Alias "mciGetErrorStringA" (ByVal dwError As Long, ByVal lpstrBuffer As String, ByVal uLength As Long) As Long 'Get the error message of the mcidevice if any
 Private Declare Function mciSendString Lib "winmm.dll" Alias "mciSendStringA" (ByVal lpstrCommand As String, ByVal lpstrReturnString As String, ByVal uReturnLength As Long, ByVal hwndCallback As Long) As Long 'Send command strings to the mci device
-Private Declare Function mciSendString2 Lib "winmm.dll" Alias "mciSendStringA" (ByVal lpstrCommand As String, ByVal Id As Long, ByVal something1 As Long, ByVal hwndCallback As Long) As Long
+Private Declare Function mciSendString2 Lib "winmm.dll" Alias "mciSendStringA" (ByVal lpstrCommand As String, ByVal id As Long, ByVal something1 As Long, ByVal hwndCallback As Long) As Long
 
 Private Declare Function waveInGetNumDevs Lib "winmm.dll" () As Long
 Private Declare Function waveInGetID Lib "winmm.dll" ( _

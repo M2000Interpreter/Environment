@@ -12,6 +12,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements IControlIndex
 Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Private mEnabled As Boolean
@@ -167,8 +168,8 @@ retvalue = RealX1(mHdc, ExtSelStart, that)
 ok = True
 End Sub
 
-Private Sub glistN_KeyDownAfter(KeyCode As Integer, shift As Integer)
-If mHeaderOnly Then KeyCode = 0: shift = 0
+Private Sub glistN_KeyDownAfter(keycode As Integer, shift As Integer)
+If mHeaderOnly Then keycode = 0: shift = 0
 End Sub
 
 Private Sub glistN_MouseMove(myButton As Integer, shift As Integer, X As Single, y As Single)
@@ -283,7 +284,7 @@ Callback.RealHover = ctrlName
 If Not locked Then
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 If Not trans Then
-    If Enabled Then
+    If enabled Then
         glistN.ForeColor = black
         glistN.BackColor = white
         glistN.NoCaretShow = False
@@ -353,7 +354,7 @@ Dim ff As New StdFont
 With Callback
 ff.Name = .CtrlFontName
 ff.charset = Form1.DIS.Font.charset
-ff.size = .CtrlFontSize
+ff.Size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 End With
 SkipFirstClick = True
@@ -371,9 +372,9 @@ Set .Font = ff
 .ForeColor = white
 .dcolor = Callback.Controls(1).dcolor
 .NoCaretShow = False
-.Enabled = True
+.enabled = True
 .StickBar = True
-Enabled = True
+enabled = True
 .ShowMe
 End With
 End Sub
@@ -383,24 +384,24 @@ If ThisFontName <> "" Then
 
 aa.Name = ThisFontName
 
-If ThisMode > 7 Then aa.size = ThisMode Else aa = 7
+If ThisMode > 7 Then aa.Size = ThisMode Else aa = 7
 aa.bold = ThisBold
 Set glistN.Font = aa
 End If
 End Sub
-Public Property Get index() As Long
-index = mIndex
+Public Property Get Index() As Long
+Index = mIndex
 End Property
 
-Friend Property Let index(ByVal RHS As Long)
+Friend Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Get locked() As Boolean
-locked = Not glistN.Enabled
+locked = Not glistN.enabled
 End Property
 
 Public Property Let locked(ByVal RHS As Boolean)
-glistN.Enabled = Not RHS
+glistN.enabled = Not RHS
 End Property
 
 Private Sub glistN_ExposeListcount(cListCount As Long)
@@ -420,10 +421,10 @@ cListCount = VR(0)
 End Sub
 
 
-Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub glistN_KeyDown(keycode As Integer, shift As Integer)
 lastshift = (shift And 1) = 0
 Dim VR(2)
-VR(0) = KeyCode
+VR(0) = keycode
 VR(1) = shift
    If mIndex >= 0 Then
    Callback.CallbackNow mesCtrlName + ".KeyDown(" + Str(mIndex) + ")", VR()
@@ -431,8 +432,8 @@ VR(1) = shift
       Callback.CallbackNow mesCtrlName + ".KeyDown()", VR()
       End If
       ' UseHeaderOnly
-If KeyCode <> VR(0) Or shift <> VR(1) Then
-KeyCode = VR(0)
+If keycode <> VR(0) Or shift <> VR(1) Then
+keycode = VR(0)
 shift = VR(1)
 ElseIf mHeaderOnly Then
 ' handle move by keys
@@ -440,8 +441,8 @@ ElseIf mHeaderOnly Then
     OneClick
     Exit Sub
 End If
-If KeyCode = vbKeyF10 And shift <> 0 Then
-KeyCode = 0
+If keycode = vbKeyF10 And shift <> 0 Then
+keycode = 0
 If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
    Else
@@ -603,11 +604,11 @@ Public Property Let ListText(ByVal vNewValue As Variant)
 mListText = vNewValue
 
 End Property
-Public Property Get Enabled() As Boolean
-Enabled = mEnabled
+Public Property Get enabled() As Boolean
+enabled = mEnabled
 End Property
 
-Public Property Let Enabled(ByVal RHS As Boolean)
+Public Property Let enabled(ByVal RHS As Boolean)
 mEnabled = RHS
 End Property
 
@@ -636,12 +637,12 @@ Else
     glistN.SplitLine item
 End If
 End Property
-Public Property Get list(ByVal index As Long) As Variant
+Public Property Get list(ByVal Index As Long) As Variant
 On Error Resume Next
 If Columns > 1 Then
-    list = glistN.listAtColumn(index, glistN.Column)
+    list = glistN.listAtColumn(Index, glistN.Column)
 Else
-    list = glistN.list(index)
+    list = glistN.list(Index)
 End If
 End Property
 Property Get ListSelected(item As Long) As Boolean
@@ -672,28 +673,28 @@ End Property
 Property Let ListSep(item As Long, RHS As Boolean)
     glistN.ListSep(item) = RHS
 End Property
-Public Property Let listAtColumn(ByVal index As Long, ByVal thiscolumn As Long, ByVal vNewValue As Variant)
+Public Property Let listAtColumn(ByVal Index As Long, ByVal thiscolumn As Long, ByVal vNewValue As Variant)
     On Error Resume Next
-    glistN.listAtColumn(index, thiscolumn) = CStr(vNewValue)
+    glistN.listAtColumn(Index, thiscolumn) = CStr(vNewValue)
     If glistN.Visible Then glistN.PrepareToShow
 End Property
-Public Property Get listAtColumn(ByVal index As Long, ByVal thiscolumn As Long) As Variant
+Public Property Get listAtColumn(ByVal Index As Long, ByVal thiscolumn As Long) As Variant
     On Error Resume Next
-    listAtColumn = glistN.listAtColumn(index, thiscolumn)
+    listAtColumn = glistN.listAtColumn(Index, thiscolumn)
 End Property
-Public Property Let list(ByVal index As Long, ByVal vNewValue As Variant)
+Public Property Let list(ByVal Index As Long, ByVal vNewValue As Variant)
     On Error Resume Next
     If glistN.Columns > 0 Then
-        glistN.listAtColumn(index, glistN.Column) = CStr(vNewValue)
+        glistN.listAtColumn(Index, glistN.Column) = CStr(vNewValue)
     Else
-        glistN.list(index) = CStr(vNewValue)
+        glistN.list(Index) = CStr(vNewValue)
     End If
     If glistN.Visible Then glistN.PrepareToShow
 End Property
 Sub Add(content$)
 glistN.AddItem content$
 End Sub
-Sub AddFast(index As Long, content$)
+Sub AddFast(Index As Long, content$)
 glistN.additemFast content$
 End Sub
 Sub Insert(content$)
@@ -704,8 +705,8 @@ glistN.Clear
 If glistN.Visible Then glistN.ShowMe2
 End Sub
 
-Sub Delete(index As Long)
-glistN.Removeitem index
+Sub Delete(Index As Long)
+glistN.Removeitem Index
 End Sub
 
 Public Property Get ListIndex() As Variant
@@ -736,8 +737,8 @@ End Property
 Public Property Get listcount() As Variant
 listcount = glistN.listcount
 End Property
-Public Sub ShowThis(index As Long, Optional noselect)
-glistN.ShowThis index, CBool(noselect)
+Public Sub ShowThis(Index As Long, Optional noselect)
+glistN.ShowThis Index, CBool(noselect)
 End Sub
 
 Public Property Get Text() As Variant
@@ -800,8 +801,8 @@ Public Sub Sort(Optional SkipChar As Long = 1, Optional SortType, Optional Colum
     glistN.SkipChars = SkipChar
     If IsMissing(Columns) Then Columns = 1
     Dim oEnabled As Boolean
-    oEnabled = glistN.Enabled
-    glistN.Enabled = False
+    oEnabled = glistN.enabled
+    glistN.enabled = False
     If Not glistN.JoinLinesCount > 0 Then
         glistN.QuickSortExtended CLng(Columns), CLng(LowLim), CLng(HighLim)
     Else
@@ -822,7 +823,7 @@ Public Sub Sort(Optional SkipChar As Long = 1, Optional SortType, Optional Colum
             glistN.Expand CLng(LowLim), CLng(HighLim), many
         End If
     End If
-    glistN.Enabled = oEnabled
+    glistN.enabled = oEnabled
     If oEnabled Then glistN.ListIndex = glistN.ListIndex: glistN.PrepareToShow 2
     
 End Sub
@@ -990,33 +991,33 @@ Public Sub SetBarStyle(bColor As Long, Optional bHatch As Long, Optional BHatchC
     glistN.BarHatch = bHatch
     glistN.BarHatchColor = BHatchColor
 End Sub
-Private Sub glistN_PreviewKeyboardUnicode(a As String)
-Callback.SpreadKey a
+Private Sub glistN_PreviewKeyboardUnicode(A As String)
+Callback.SpreadKey A
 End Sub
 Private Sub OneClick()
 On Error Resume Next
 If SkipFirstClick Then glistN.PrepareClick
 End Sub
-Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(A, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
-If MyIsNumeric(a) Then
-a = CLng(a)
-If a < 0 Then Exit Sub
-If a > 499 Then Exit Sub
+If MyIsNumeric(A) Then
+A = CLng(A)
+If A < 0 Then Exit Sub
+If A > 499 Then Exit Sub
 Else
-a = UCase(a)
-Select Case a
+A = UCase(A)
+Select Case A
 Case "F1" To "F9"
-a = 611 + val(Mid(a, 2))
+A = 611 + val(Mid(A, 2))
 Case Else
-a = AscW(a)
-If a > 126 Then a = 0
+A = AscW(A)
+If A > 126 Then A = 0
 End Select
 End If
 If Opcode < 0 Then Opcode = 0
-If a = 0 Then Exit Sub
-a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
-Callback.RegisterAcc a, ctrlName, Opcode
+If A = 0 Then Exit Sub
+A = A - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc A, ctrlName, Opcode
 End Sub
 Private Sub gListN_AccKey(m As Long)
 Callback.AccProces m
@@ -1685,8 +1686,8 @@ End If
 
 
 End Sub
-Private Function Myleft$(a As String, Pos As Long)
-If Pos < 1 Then Myleft$ = vbNullString Else Myleft$ = Mid$(a, 1, Pos)
+Private Function Myleft$(A As String, Pos As Long)
+If Pos < 1 Then Myleft$ = vbNullString Else Myleft$ = Mid$(A, 1, Pos)
 End Function
 Sub UseMove()
     If glistN Is Nothing Then Exit Sub
@@ -1792,33 +1793,33 @@ Property Let TitleBackColor(ByVal RHS As Long)
     End If
 End Property
 Private Sub glistN_AddSelStart(val As Long, shift As Integer)
-Dim W As Long, a$, l As Long, b$
+Dim W As Long, A$, l As Long, b$
 Const sp1 = ",+-*/=<>^!.&[]{}()^;""" + "'!"
 Dim sp As String: sp = " " + ChrW(9) + ChrW(160)
 Dim sp2 As String: sp2 = sp1 + sp
 If glistN.SelStart > 0 Then
 If Columns > 1 Then
-a$ = Mid$(listAtColumn(ListIndex, Column), glistN.SelStart)
+A$ = Mid$(listAtColumn(ListIndex, Column), glistN.SelStart)
 Else
-a$ = Mid$(list(ListIndex), glistN.SelStart)
+A$ = Mid$(list(ListIndex), glistN.SelStart)
 End If
-    If Len(a$) > 0 Then
-        W = AscW(a$)
+    If Len(A$) > 0 Then
+        W = AscW(A$)
         If (shift And 2) = 2 Then
-            l = Len(a$)
+            l = Len(A$)
             val = 1
             If l < 2 Then Exit Sub
-                b$ = Mid$(a$, val, 1)
+                b$ = Mid$(A$, val, 1)
                 If InStr(sp1, b$) = 0 Then
                 Do While val < l And InStr(sp, b$) > 0
                     val = val + 1
-                    b$ = Mid$(a$, val, 1)
+                    b$ = Mid$(A$, val, 1)
                 Loop
                 If InStr(sp1, b$) = 0 Then
                     If val = 1 Then
                         Do While val < l And InStr(sp2, b$) = 0
                             val = val + 1
-                            b$ = Mid$(a$, val, 1)
+                            b$ = Mid$(A$, val, 1)
                         Loop
                         If InStr(sp2, b$) > 0 Then val = val - 1
                     Else
@@ -1836,7 +1837,7 @@ End If
 End Sub
 
 Private Sub glistN_SubSelStart(val As Long, shift As Integer)
-Dim W As Long, a$, l As Long, b$
+Dim W As Long, A$, l As Long, b$
 Const sp1 = ",+-*/=<>^!.&[]{}()^;""" + "'!"
 Dim sp As String: sp = " " + ChrW(9) + ChrW(160)
 Dim sp2 As String: sp2 = sp1 + sp
@@ -1847,25 +1848,25 @@ vartext = listAtColumn(ListIndex, Column)
 Else
 vartext = list(ListIndex)
 End If
-a$ = Mid$(vartext, glistN.SelStart - 1, 1)
-If Len(a$) > 0 Then
-W = AscW(a$)
+A$ = Mid$(vartext, glistN.SelStart - 1, 1)
+If Len(A$) > 0 Then
+W = AscW(A$)
         If (shift And 2) = 2 Then
-            a$ = Mid$(vartext, 1, glistN.SelStart - 1)
-            l = Len(a$)
+            A$ = Mid$(vartext, 1, glistN.SelStart - 1)
+            l = Len(A$)
             val = l
             If val = 1 Then Exit Sub
-            b$ = Mid$(a$, l, 1)
+            b$ = Mid$(A$, l, 1)
             If InStr(sp1, b$) = 0 Then
                 Do While l > 1 And InStr(sp, b$) > 0
                     l = l - 1
-                    b$ = Mid$(a$, l, 1)
+                    b$ = Mid$(A$, l, 1)
                 Loop
                 If InStr(sp1, b$) = 0 Then
                     If l = val Then
                         Do While l > 1 And InStr(sp2, b$) = 0
                             l = l - 1
-                            b$ = Mid$(a$, l, 1)
+                            b$ = Mid$(A$, l, 1)
                         Loop
                         If l = 1 And Not InStr(sp2, b$) > 0 Then l = l - 1
                         
@@ -1887,3 +1888,19 @@ End Sub
 Private Sub glistN_WindowKey(VbKeyThis As Integer)
     Callback.ProcessWinKey VbKeyThis
 End Sub
+Public Property Let IControlIndex_Index(ByVal RHS As Long)
+mIndex = RHS
+End Property
+Public Property Get IControlIndex_Index() As Long
+IControlIndex_Index = mIndex
+End Property
+
+Public Sub IControlIndex_UnloadMe()
+On Error Resume Next
+If glistN Is Nothing Then Exit Sub
+Set glistN = Nothing
+Callback.RemoveGuiControl ctrlName
+mIndex = -1
+Set Callback = Nothing
+End Sub
+

@@ -13,6 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 ' From Tools make changed property as default
+Implements IControlIndex
 Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Dim check1focus As Boolean
@@ -34,11 +35,10 @@ Private Sub OneClick()
 On Error Resume Next
 If SkipFirstClick Then glistN.PrepareClick
 End Sub
-Public Property Get index() As Long
-index = mIndex
+Public Property Get Index() As Long
+Index = mIndex
 End Property
-
-Friend Property Let index(ByVal RHS As Long)
+Friend Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Private Sub glistN_CtrlPlusF1()
@@ -77,13 +77,13 @@ Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Public Property Get Enabled() As Long
-Enabled = glistN.Enabled
+Public Property Get enabled() As Long
+enabled = glistN.enabled
 End Property
 
-Public Property Let Enabled(ByVal RHS As Long)
+Public Property Let enabled(ByVal RHS As Long)
 If glistN Is Nothing Then Exit Property
-glistN.Enabled = RHS
+glistN.enabled = RHS
 End Property
 Public Sub move(X, y, Optional W, Optional H)
 If IsMissing(W) Then
@@ -108,7 +108,7 @@ Dim ff As New StdFont
 With Callback
 ff.Name = .CtrlFontName
 ff.charset = Form1.DIS.Font.charset
-ff.size = .CtrlFontSize
+ff.Size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 End With
 SkipFirstClick = True
@@ -131,7 +131,7 @@ Set .Font = ff
 .dcolor = Callback.Controls(1).dcolor
 .LeftMarginPixels = .HeightPixels
 .ShowMe
-.Enabled = True
+.enabled = True
 End With
 End Sub
 Public Property Let Caption(myCap As String)
@@ -211,7 +211,7 @@ End Property
 Sub Shutdown()
 If Not glistN Is Nothing Then
 glistN.Shutdown
-glistN.Enabled = False
+glistN.enabled = False
 End If
 End Sub
 Public Sub FontAttr(ThisFontName, Optional ThisMode = -1, Optional ThisBold = True)
@@ -220,7 +220,7 @@ If ThisFontName <> "" Then
 
 aa.Name = ThisFontName
 
-If ThisMode > 7 Then aa.size = ThisMode Else aa = 7
+If ThisMode > 7 Then aa.Size = ThisMode Else aa = 7
 aa.bold = ThisBold
 Set glistN.Font = aa
 End If
@@ -291,35 +291,35 @@ glistN.icon = RHS
 
 End Property
 
-Private Sub glistN_PreviewKeyboardUnicode(a As String)
-Callback.SpreadKey a
+Private Sub glistN_PreviewKeyboardUnicode(A As String)
+Callback.SpreadKey A
 End Sub
-Private Sub glistN_Fkey(a As Integer)
-If a > 1000 Then
-Callback.SendFKEY a - 1000
+Private Sub glistN_Fkey(A As Integer)
+If A > 1000 Then
+Callback.SendFKEY A - 1000
 Else
-Callback.SendFKEY a
+Callback.SendFKEY A
 End If
 End Sub
-Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
-If MyIsNumeric(a) Then
-a = CLng(a)
-If a < 0 Then Exit Sub
-If a > 499 Then Exit Sub
+Public Sub AccKey(A, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+If MyIsNumeric(A) Then
+A = CLng(A)
+If A < 0 Then Exit Sub
+If A > 499 Then Exit Sub
 Else
-a = UCase(a)
-Select Case a
+A = UCase(A)
+Select Case A
 Case "F1" To "F9"
-a = 611 + val(Mid(a, 2))
+A = 611 + val(Mid(A, 2))
 Case Else
-a = AscW(a)
-If a > 126 Then a = 0
+A = AscW(A)
+If A > 126 Then A = 0
 End Select
 End If
 If Opcode < 0 Then Opcode = 0
-If a = 0 Then Exit Sub
-a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
-Callback.RegisterAcc a, ctrlName, Opcode
+If A = 0 Then Exit Sub
+A = A - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc A, ctrlName, Opcode
 End Sub
 Private Sub gListN_AccKey(m As Long)
 Callback.AccProces m
@@ -356,3 +356,20 @@ End Property
 Private Sub glistN_WindowKey(VbKeyThis As Integer)
 Callback.ProcessWinKey VbKeyThis
 End Sub
+Public Property Let IControlIndex_Index(ByVal RHS As Long)
+mIndex = RHS
+End Property
+
+Public Property Get IControlIndex_Index() As Long
+IControlIndex_Index = mIndex
+End Property
+
+Public Sub IControlIndex_UnloadMe()
+If glistN Is Nothing Then Exit Sub
+Shutdown
+Set glistN = Nothing
+Callback.RemoveGuiControl ctrlName
+mIndex = -1
+Set Callback = Nothing
+End Sub
+

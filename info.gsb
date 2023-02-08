@@ -2759,7 +2759,8 @@ MODULE PEND {Module Pendulum {
       accold=0
       ACCEL=0 'G*SIN(THETA*degree)*L
       time=now
-      timed=1/24/3600*(cc*1.4)/1000
+      // fix 1.2 to 1.6 depends on machine
+      timed=1/24/3600*(cc*1.24)/1000
       Thread {
             time+=timed
             ACCEL=G*SIN(THETA*degree)*L
@@ -21479,7 +21480,7 @@ layer form1 {
 }
 Method form1, "show"
 cls,0
-report 2, "Download 4 Files using Download object"
+report 2, "Download 4 Files using Download object - Https/http"
 cls, 10
 declare withevents d(3) download
 w=0
@@ -21539,9 +21540,13 @@ for i=0 to len(d())-1
 	With d(i), "url" as url$(i)  \\ connect property url of d(i) to url$(i)
 next i
 Method d(0), "DownloadFile", "http://www.columbia.edu/~fdc/sample.html", dir$+"sample.html"
-Method d(2), "DownloadFile", "http://www.columbia.edu/~fdc/family/hallshill.html", dir$+"hallshill.html"
+'Method d(2), "DownloadFile", "http://www.columbia.edu/~fdc/family/hallshill.html", dir$+"hallshill.html"
+' "http://drive.google.com/uc?export=download&id=1pHBjLVeaGkyMhyyfvXyvh42cJ3njY7wa" , dir$+"M2000paper.pdf"
+'Method d(2), "DownloadFile","https://drive.google.com/uc?export=download&id=1pHBjLVeaGkyMhyyfvXyvh42cJ3njY7wa", dir$+"M2000paper.pdf"
+Method d(2), "DownloadFile","https://dl.unicontsoft.com/upload/pix/ss_vbyoga_flex_container.gif", dir$+"this.gif"
 Method d(1), "DownloadFile","http://www.columbia.edu/~fdc/family/frankfurt.html", dir$+"frankfurt.html"
 Method d(3), "DownloadFile","http://www.columbia.edu/~fdc/family/family.html", dir$+"family.html"
+
 cursor 0, m
 
 for i=0 to len(d())-1
@@ -21578,7 +21583,9 @@ cursor 0,2
 print over $(4),"live connections:";w
 cursor 0,m
 If exist("sample.html") then Print "sample.html - ";Filelen("sample.html")
-If exist("hallshill.html") then Print "hallshill.html - ";Filelen("hallshill.html")
+'If exist("M2000paper.pdf") then Print "M2000paper.pdf - ";Filelen("M2000paper.pdf")
+'If exist("hallshill.html") then Print "hallshill.html - ";Filelen("hallshill.html")
+If exist("this.gif") then Print "this.gif - ";Filelen("this.gif")
 If exist("frankfurt.html") then Print "frankfurt.html - ";Filelen("frankfurt.html")
 If exist("family.html") then Print "family.html - ";Filelen("family.html")
 print "done"
@@ -36479,7 +36486,10 @@ try ok {
 }
 Print Error$
 }
-MODULE BUTTONSONFRAME {smooth off
+MODULE BUTTONSONFRAME {// new version
+// we can unload buttons from array
+//
+smooth off
 declare form1 form
 declare frame1 image form form1
 declare frame2 image form form1
@@ -36487,6 +36497,7 @@ declare button1(3) button form form1 image frame1
 method form1 "move",1000,1000,10000, 5000
 method frame1 "move", 600,600, 10000-2*600, 4000
 method frame2 "move", 600,600, 10000-2*600, 4000
+integer lastindex=-1
 for i=0 to 2
 method button1(i), "move", 1000, 1000+1000*i, 3000, 600
 next
@@ -36541,7 +36552,10 @@ Layer frame2{
 }
 layer form1 {
 	cls myBc
+	form width, height
 	gradient 5, 1
+	Print @(0,height-1),
+	Print Part $(6, width),"Double click in a button and then click on frame to unload it"
 }
 function restroreFocus {
 	local s$=LastControl$
@@ -36556,7 +36570,12 @@ function frame1.click {
 	print "click frame1"
 	method frame1,"Zorder"
 	call local restroreFocus()
+	if lastindex<>-1 then
+		declare button1() remove lastindex
+		lastindex=-1
+	end if
 	refresh
+
 }
 function frame2.click {
 	print "click frame2"
@@ -36582,14 +36601,18 @@ function form1.click {
 		}
 		layer form1 {
 			gradient 5, 1
+			Print @(0,height-1),
+			Print Part $(6, width),"Double click in a button and then click on frame to unload it"
 		}		
 		visible=true
 		call local restroreFocus()
 	end if
 	refresh 10
 }
-function button1.click(index) {
-	print index
+function button1.click( new index) {
+	with button1(index), "caption" as new cap$
+	lastindex=index
+	print "("+index +") "+ cap$
 	refresh
 }
 method form1, "show", 1
@@ -37181,7 +37204,7 @@ zz$=hash$(where)
 print type$(zz$), zz$
 print hash.count
 for i=0 to hash.count-1
-	print format$("{0::-30} - {1}",hash(i), KeyNum(i))
+	print format$("{0:-30} - {1}",hash$(i), KeyNum(i))
 next i
 variant vv
 // call hash.find using named parameter v
@@ -37332,20 +37355,124 @@ print leftpart$(a$, " IS A ")
 
 
 }
-MODULE BIGENUM {Enumeration Names {
-	a="hello"
-	b="hello two"
+MODULE UNIVERSAL {Module Universal_QuickSort {
+	const yellow=14, cyan=11
+	Class Quick {
+	Private:
+		module quicksort (&a()) {
+			do If Stackitem()>=Stackitem(2) Then Drop 2:if  empty then exit else continue
+				over 2,2
+				Read p, r : i = p-1 : x=a(r)
+				For j=p to r-1:If .LE(a(j), x) Then i++:Swap a(i),a(j) //: print "Swap",
+				Next j : Swap a(i+1), a(r) :  Push  i+2, i:shift 3 //: print "Swap": print a()
+			always
+		}
+	Public:
+		// a and b can be strings or numbers
+		LE=Lambda (a, b)->a<=b
+		// this is final, we can't change it
+		Function Final Sort(&a(), a_min, a_max){
+			stack new {
+				.quicksort &a(), a_min, a_max
+			}
+		}
+	}
+	print("Numeric Sort")
+	Quick=Quick()
+	Dim a(10)<<Random(50, 100)
+	print "", a()#str$(", ")
+	Call Quick.Sort(&a(), 0, Len(a())-1)
+	result()
+	print "", a()#str$(", ")
+	print("OIDS, object identifiers SORT")
+	Quick=Quick()
+	integer i
+	Stack New {
+		Data "1.3.6.1.4.1.11.2.17.19.3.4.0.4" , "1.3.6.1.4.1.11.2.17.19.3.4.0.1"
+		Data "1.3.6.1.4.1.11150.3.4.0.1", "1.3.6.1.4.1.11150.3.4.0"
+		Data "1.3.6.1.4.1.11.2.17.19.3.4.0.10", "1.3.6.1.4.1.11.2.17.5.2.0.79"
+		Dim arr(0 to Stack.Size-1)
+		While not Empty
+			arr(i)=piece$(letter$, ".")
+			i++
+		End While
+	}
+	// change comparison function
+	// Version 12 can make comparisons with strings in a() and b()
+	// a and b are pointer to array
+	// so we link to a() and b()
+	// if we use (a(), b()) we get copies of whatever array have in stack
+	// so here we don't want copies.
+	// We can use until Val(a(i))<>Val(b(i)) if numbers may have leading zeroes
+	Quick.LE=lambda (a as array, b as array)->{
+		Link a, b to a(), b()
+		long i, k=min.data(len(a), len(b))-1
+		
+		do i++:if i>k then exit
+		when a(i)=b(i)
+		If i>=len(b) Then =i>=len(a):Exit
+		If i>=len(a) Then =true:Exit
+		=Val(a(i))<=Val(b(i))
+	}
+	For i=0 to len(arr())-1
+		print "", arr(i)#str$(".")
+	Next
+	result()
+	Call Quick.Sort(&arr(), 0, Len(arr())-1)
+	For i=0 to len(arr())-1
+		print "", arr(i)#str$(".")
+	Next
+	print("String Sort")
+	Quick=Quick()
+	Dim a$()
+	a$()=("one","two", "three","four", "five")
+	print "", a$()
+	Call Quick.Sort(&a$(), 0, Len(a$())-1)
+	result()
+	print "", a$()
+	Enum Language {English=0, Greek}
+	Enum(English)
+	Enum(Greek)
+	italic:print : print "press any key":italic
+	push key$:drop
+	end
+	sub Enum(a)
+		if a=English then
+			print("Sort string enumarates (english version)")
+			Local num: Enum num {one="one",two="two", three="three",four="four", five="five"}
+		else
+			print("Sort string enumarates (greek version)")
+			Local num: Enum num {one="ένα",two="δύο", three="τρία",four="τέσσερα", five="πέντε"}
+		end if
+		Local a()
+		a()=(five, three, one, two, four)
+		local Quick=Quick()
+		Quick.LE=lambda (a, b)->len(a)<len(b)
+		print "", a()#str$(", ")
+		Call Quick.Sort(&a(), 0, Len(a$())-1)
+		result()
+		print "", a()#str$(", ")
+	end sub
+	sub print(a$)
+		print:bold:Pen yellow {print a$}:	bold: print
+	end sub
+	sub result()
+		print:bold:Pen cyan {print "Result:"}:bold
+	end sub
 }
-
-m=b
-select case m
-case a
-	? "is a"
-case b
-	? " is b"
-end select
-	? "done"
-? m
+const white=15, black=0, tabwidth=6, formatprint$=""
+Cls black
+Back {Cls black}
+Bold 0
+Pen white
+form 68, 56
+Print $(formatprint$,tabwidth)
+Double: Bold
+Print "Universal QuickSort"
+Normal: Bold
+Print
+Universal_QuickSort
+if module(Infobasic) then keyboard "Infobasic", 13
 }
 MODULE EXPRVER12 {? -(2*1.5)^2=-9, " : False for Ver <12"
 ? -((2*1.5)^2)=-9, " : True  for all versions"
@@ -40621,5 +40748,162 @@ method Form1 "show", 1
 
 declare Form1 nothing
 
+}
+MODULE MACHINECODE2 {linespace 0
+font "Courier New"
+form 120
+k=bold
+bold 0
+Cls #050f05, 0
+pen #fff0ff
+Pen 14 {Print "This is an example of machine code executing a loop calling M200 code"}
+far=if(rnd>.5->false, true)
+Print if$(far=true->"Using dec ecx && jnz rel32","Using loop rel8")
+const clip=false // true to produce code and place it to clipboard
+Print "Use this disassembler:"
+Print "https://defuse.ca/online-x86-assembler.htm#disassembly2"
+currency ms=monitor.stack   // cast double to currency
+Hex "Size in use of return stack = ";ms
+Hex  "Total size of return stack (including free memory), >30MByte = ";monitor.stack.size
+// Version 11 Revision 15
+Buffer clear BinaryData as Long*10
+Return BinaryData, 1:=500
+Buffer code clear alfa as byte*1024
+
+module beta {
+	print :print "done"
+}
+dim values(0 to 99) as long
+long idx 
+module beta2 {
+	values(idx)=eval(BinaryData,0)
+	print values(idx),
+	idx++
+}
+flush
+Pc=0
+	Op(0x31, 0xC0)
+	OpLong(0xb9, 100)  ' mov ecx, 100
+mLoop=pc  // need that
+	op(0x01, 0xc8) ' add eax, ecx  (eax=eax+ecx)
+	OpLong(0xa3, BinaryData(0))  ' mov ds:BinaryData(0), eax  ' copy to data section
+
+	CallModule(AddressOf beta2)
+
+	if far then
+		op(0x49) ' dec ecx
+		Loop2(mLoop)
+	else
+		Loop(mLoop)  // 2 bytes (dec ecx)
+	end if
+	CallModule(AddressOf beta)
+	Op(0x31, 0xc0)  '  zero eax
+	Ret(20)  ' 5 long values are pushed by Execute Code.
+document doc$
+for i=0 to pc-1
+doc$=Hex$(eval(alfa, i),1)
+next
+Print "Code:";doc$
+Print @(tab(1))
+report {
+ORG 0x}+Hex$(alfa(0))+{
+}+Hex$(alfa(0))+{: 31 c0                   xor    eax,eax
+}+Hex$(alfa(2))+{: b9 64 00 00 00          mov    ecx,0x64		; 100 to eax
+}+Hex$(alfa(7))+{: 01 c8                   add    eax,ecx
+}+Hex$(alfa(9))+{: a3 }+@hexdump(BinaryData(0))+{          mov    ds:0x}+@hexlow(BinaryData(0))+{,eax	; memory address of BinaryData(0)
+}+Hex$(alfa(0xe))+{: 51                      push   ecx
+}+Hex$(alfa(0xf))+{: 50                      push   eax
+}+Hex$(alfa(0x10))+{: 68 }+@hexdump(AddressOf beta2)+{          push   0x}+Hex$(AddressOf beta2)+{		; AddressOf beta2
+}+Hex$(alfa(0x15))+{: e8 }+@hexdump(binary.add(module(), binary.not(alfa(0x15)+4)))+{          call   0x}+@hexlow(module())+{
+}+Hex$(alfa(0x1a))+{: 58                      pop    eax
+}+Hex$(alfa(0x1b))+{: 59                      pop    ecx
+}+Hex$(alfa(0x1b))+{: 49                      dec    ecx
+}+Hex$(alfa(0x1d))+{: 0f 85 e4 ff ff ff       jne    0x7
+}+Hex$(alfa(0x23))+{: 51                      push   ecx
+}+Hex$(alfa(0x24))+{: 50                      push   eax
+}+Hex$(alfa(0x25))+{: 68 }+@hexdump(AddressOf beta)+{          push   0x}+Hex$(AddressOf beta)+{		; AddressOf beta
+}+Hex$(alfa(0x2a))+{: e8 }+@hexdump(binary.add(module(), binary.not(alfa(0x2a)+4)))+{          call   0x}+@hexlow(module())+{
+}+Hex$(alfa(0x2f))+{: 58                      pop    eax
+}+Hex$(alfa(0x30))+{: 59                      pop    ecx
+}+Hex$(alfa(0x31))+{: 31 c0                   xor    eax,eax
+}+Hex$(alfa(0x33))+{: c2 14 00                ret    0x14
+}
+print
+if clip then clipboard doc$: exit
+Try Ok {
+	profiler
+	Execute Code alfa, 0
+	print timecount
+}
+M=Uint(Error)
+Print eval(BinaryData,0), " value at BinaryData(0)"
+ms=monitor.stack
+Hex "Size in use of return stack = ";ms
+Print "From array values()"
+print values()
+print "press a key"
+push key$: drop
+if module(infobasic) then keyboard "infobasic", 13
+bold k
+End
+Sub Op()
+	while not empty
+		Return alfa, pc:=number
+		pc++
+	end while
+End Sub
+Sub OpLong()
+	Return alfa, pc:=number, pc+1:=number as long
+	pc+=5
+End Sub
+Sub Ret(n=0)
+	if n<>0 then
+		Return alfa, pc:=0xC2, pc+1:=n as integer
+		pc+=3
+	else
+		Return alfa, pc:=0xC3
+		pc++
+	end if
+End Sub
+// module() return the real address of then module calling function.
+// The [AddressOf modulename_something] pass as parameter to this function
+// so we Push the AddressOf modulename_something
+// and then we call code at address module() (using relative addressing)
+// the module called like it is a part of this module (like a gosub/return structure)
+Sub CallModule()
+	Stack New {Op(0x51, 0x50)}
+	Return alfa, pc:=0x68, pc+1:=number as long
+	pc+=5
+	Return alfa, pc:=0xE8, pc+1:=binary.add(module(), binary.not(alfa(pc)+4)) as long
+	local zz=binary.add(module(), binary.not(alfa(pc+4)))
+//	? Hex$(module());" = ";Hex$(binary.add(alfa(pc), 5, zz))
+//	? Hex$(module()-pc-5-alfa(0));" = ";Hex$(binary.add(module(), binary.not(alfa(pc+4))))
+	pc+=5
+	Stack New {Op(0x58, 0x59)}
+End Sub
+// 0xE2 cb	LOOP rel8	D	Valid	Valid	Decrement ECX ; jump short if count ≠ 0.
+// 0xE1 cb	LOOPE rel8	D	Valid	Valid	Decrement ECX ; jump short if count ≠ 0 and ZF = 1.
+// 0xE0 cb	LOOPNE rel8	D	Valid	Valid	Decrement ECX ; jump short if count ≠ 0 and ZF = 0.
+Sub Loop()
+	Return alfa, pc:=0xe2, pc+1:=(number-pc-2+256)
+	pc+=2
+End Sub
+// 0x49                      dec    ecx  // OF, SF, ZF, AF, and PF flags are set according to the result.
+// 0x85 jnz rel32
+// by default this (number-pc-5+0xFFFFFFFF) is type of modulo 2^32  (same as binary.add())
+Sub Loop2()
+	Return alfa, pc:=0x0F,pc+1:=0x85, pc+2:=(number-pc-5+0xFFFFFFFF) as long
+	pc+=6
+End Sub
+function hexlow(a as currency)
+	=lcase$(Hex$(a))
+end function
+function hexlowInt(a as currency)
+	=lcase$(Hex$(a,2))
+end function
+function hexdump(a as currency)
+	local string z=Hex$(a)
+	=lcase$(mid$(z,7,2)+" "+mid$(z,5,2)+" "+mid$(z,3,2)+" "+mid$(z,1,2))
+end function
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

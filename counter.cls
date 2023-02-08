@@ -24,8 +24,9 @@ Implements TaskInterface
 Dim jobnameID As Long
 ' load code or just use it as a counter
 ' load code first time
-Dim m_duration As Currency
-Dim mYspace As Currency
+Dim m_duration As Long
+Dim m_now As Long
+Dim mYspace As Long
     Dim myholdtime As Currency
 Dim mycode As String
 Dim MyMode As Long
@@ -54,8 +55,9 @@ End If
 End Sub
 
 Private Property Let TaskInterface_interval(ByVal RHS As Currency)
-mYspace = RHS
-m_duration = uintnew(CCur(timeGetTime)) + mYspace
+m_now = timeGetTime
+m_duration = Signed(RHS)
+mYspace = m_duration
 End Property
 
 Private Property Get TaskInterface_interval() As Currency
@@ -87,14 +89,14 @@ On Error GoTo poulos
     
     On Error Resume Next
    jobnameID = CLng(Values(0)) ' this is the hanlde
-   mYspace = CCur(Values(1)) '
- '  m_duration = uintnew(Ccur(timeGetTime)) '+ mYspace
+   mYspace = Signed(Values(1)) '
+ 
   pipename = "\\.\pipe\" & Values(2) + ChrW$(0)
 'pipename = validpipename(CStr(Values(2)))
-   myholdtime = CCur(Values(3))
+   myholdtime = Signed(Values(3))
 
-   
-    m_duration = uintnew(CCur(timeGetTime)) + myholdtime
+   m_now = timeGetTime
+    m_duration = myholdtime
    mytarget$ = Values(4)
    ' AND A VARIABLE....TO PLACE DATA
    Dim openMode, pipeMode As Long
@@ -138,9 +140,10 @@ Private Function TaskInterface_Tick() As Boolean
  Dim X As Integer, mycnt As Long
 Dim lpBuffer(2048) As Byte
 On Error GoTo there
-If m_duration <= uintnew(CCur(timeGetTime)) Then
+If UnsignedSub(timeGetTime, m_now) > m_duration Then
     TaskInterface_Tick = True
-   m_duration = uintnew(CCur(timeGetTime)) + mYspace
+    m_now = timeGetTime
+   m_duration = mYspace
    If hPipe <> 0 Then
   ' mybuf$ = String$(2001, Chr(0))
    If ConnectNamedPipe(hPipe, ByVal 0) = 0 Then

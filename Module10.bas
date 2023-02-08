@@ -13,8 +13,8 @@ End Type
 
 Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (Arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
 Private Declare Function SafeArrayGetDim Lib "OleAut32.dll" (ByVal Ptr As Long) As Long
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
 Private Const E_POINTER As Long = &H80004003
 Private Const S_OK As Long = 0
 Private Const INTERNET_MAX_URL_LENGTH As Long = 2083
@@ -26,13 +26,13 @@ Private Const URL_PART_PASSWORD As Long = 4
 Private Const URL_PART_PORT As Long = 5
 Private Const URL_PART_QUERY As Long = 6
 Private Declare Function UrlEscape Lib "shlwapi" Alias "UrlEscapeW" ( _
-    ByVal pszUrl As Long, _
+    ByVal pszURL As Long, _
     ByVal pszEscaped As Long, _
     ByRef pcchEscaped As Long, _
     ByVal dwFlags As Long) As Long
 
 Private Declare Function UrlUnescape Lib "shlwapi" Alias "UrlUnescapeW" ( _
-    ByVal pszUrl As Long, _
+    ByVal pszURL As Long, _
     ByVal pszUnescaped As Long, _
     ByRef pcchUnescaped As Long, _
     ByVal dwFlags As Long) As Long
@@ -44,7 +44,7 @@ Private Declare Function UrlGetPart Lib "shlwapi" Alias "UrlGetPartW" ( _
     ByVal dwPart As Long, _
     ByVal dwFlags As Long) As Long
 Private Declare Function UrlCanonicalizeApi Lib "shlwapi" Alias "UrlCanonicalizeW" ( _
-    ByVal pszUrl As Long, _
+    ByVal pszURL As Long, _
     ByVal pszCanonicalized As Long, _
     pcchCanonicalized As Long, _
     ByVal dwFlags As Long) As Long
@@ -281,7 +281,7 @@ End Property
 Public Function BigFileHandler(FH As Long, ftype As Long, fst As Long, unif As Long) As Long
 Static MaxNum As Long
 Dim where As Long
-If FreeUseHandlers.Count = 0 Then
+If FreeUseHandlers.count = 0 Then
     MaxNum = MaxNum + 1
     InUseHandlers.AddKey CVar(MaxNum), Array(FH, ftype, fst, unif)
     InUseHandlers.sValue = FH
@@ -322,7 +322,7 @@ End Sub
 Public Sub CloseAllHandlers()
 Dim H&
 On Error Resume Next
-Do While InUseHandlers.Count > 0
+Do While InUseHandlers.count > 0
     InUseHandlers.ToEnd
     H& = CLng(InUseHandlers.sValue)
     API_CloseFile H&
@@ -395,13 +395,13 @@ ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
 ret = ReadFile(FileNumber, Data(0), BlockSize, SizeRead, 0&)
 BlockSize = SizeRead
 End Sub
-Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal Addr As Long)
+Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal addr As Long)
 Dim PosL As Long
 Dim PosH As Long
 Dim SizeRead As Long
 Dim ret As Long
 ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
-ret = ReadFile(FileNumber, ByVal Addr, BlockSize, SizeRead, 0&)
+ret = ReadFile(FileNumber, ByVal addr, BlockSize, SizeRead, 0&)
 End Sub
 
 Public Sub API_CloseFile(ByVal FileNumber As Long)
@@ -436,16 +436,16 @@ End Sub
 
 
 
-Public Function ApiCanonicalize(ByVal url As String, Optional dwFlags As Long = 0) As String
-    url = Left$(url, INTERNET_MAX_URL_LENGTH)
+Public Function ApiCanonicalize(ByVal Url As String, Optional dwFlags As Long = 0) As String
+    Url = Left$(Url, INTERNET_MAX_URL_LENGTH)
    Dim dwSize As Long, res As String
    
-   If Len(url) > 0 Then
+   If Len(Url) > 0 Then
    
       ApiCanonicalize = space$(INTERNET_MAX_URL_LENGTH)
       dwSize = Len(ApiCanonicalize)
      
-      If UrlCanonicalizeApi(StrPtr(url), _
+      If UrlCanonicalizeApi(StrPtr(Url), _
                     StrPtr(ApiCanonicalize), _
                     dwSize, _
                     dwFlags) = 0 Then
@@ -491,19 +491,19 @@ Public Function GetUrlPort(ByVal Address As String) As String
 
 End Function
 Public Function URLDecode( _
-    ByVal url As String, _
+    ByVal Url As String, _
     Optional ByVal PlusSpace As Boolean = True, Optional Flags As Long = 0) As String
-    url = Left$(url, INTERNET_MAX_URL_LENGTH)
+    Url = Left$(Url, INTERNET_MAX_URL_LENGTH)
     Dim cchUnescaped As Long
     Dim hResult As Long
     
-    If PlusSpace Then url = Replace$(url, "+", " ")
-    cchUnescaped = Len(url)
+    If PlusSpace Then Url = Replace$(Url, "+", " ")
+    cchUnescaped = Len(Url)
     URLDecode = String$(cchUnescaped, 0)
-    hResult = UrlUnescape(StrPtr(url), StrPtr(URLDecode), cchUnescaped, Flags)
+    hResult = UrlUnescape(StrPtr(Url), StrPtr(URLDecode), cchUnescaped, Flags)
     If hResult = E_POINTER Then
         URLDecode = String$(cchUnescaped, 0)
-        hResult = UrlUnescape(StrPtr(url), StrPtr(URLDecode), cchUnescaped, Flags)
+        hResult = UrlUnescape(StrPtr(Url), StrPtr(URLDecode), cchUnescaped, Flags)
     End If
     
     If hResult <> S_OK Then
@@ -515,21 +515,21 @@ Public Function URLDecode( _
 End Function
 
 Public Function URLEncode( _
-    ByVal url As String, _
+    ByVal Url As String, _
     Optional ByVal SpacePlus As Boolean = True) As String
-    url = Left$(url, INTERNET_MAX_URL_LENGTH)
+    Url = Left$(Url, INTERNET_MAX_URL_LENGTH)
     Dim cchEscaped As Long
     Dim hResult As Long
     If SpacePlus Then
       
-        url = Replace$(url, " ", "+")
+        Url = Replace$(Url, " ", "+")
     End If
-    cchEscaped = Len(url) * 1.5
+    cchEscaped = Len(Url) * 1.5
     URLEncode = String$(cchEscaped, 0)
-    hResult = UrlEscape(StrPtr(url), StrPtr(URLEncode), cchEscaped, URL_ESCAPE_PERCENT + &H40000)
+    hResult = UrlEscape(StrPtr(Url), StrPtr(URLEncode), cchEscaped, URL_ESCAPE_PERCENT + &H40000)
     If hResult = E_POINTER Then
         URLEncode = String$(cchEscaped, 0)
-        hResult = UrlEscape(StrPtr(url), StrPtr(URLEncode), cchEscaped, URL_ESCAPE_PERCENT + &H40000)
+        hResult = UrlEscape(StrPtr(Url), StrPtr(URLEncode), cchEscaped, URL_ESCAPE_PERCENT + &H40000)
     End If
     If hResult <> S_OK Then
       Exit Function
@@ -801,9 +801,9 @@ End Function
 'Public Function RemoveIllegals(ByVal pstrCheckString As String) As String
      
 'End Function
-Public Function GetHost(url$) As String
+Public Function GetHost(Url$) As String
         Dim W As Long
-        GetHost = GetDomainName(url$, True)
+        GetHost = GetDomainName(Url$, True)
         If GetHost <> vbNullString Then
         If Left$(GetHost, 1) <> "[" Then
             W = InStr(GetHost, "@")
@@ -936,12 +936,12 @@ Public Function URLEncodeEsc(cc As String, Optional space_as_plus As Boolean = F
 End Function
 Function DecodeEscape(c$, plus_as_space As Boolean) As String
 If plus_as_space Then c$ = Replace(c$, "+", " ")
-Dim a() As String, i As Long
-a() = Split(c$, "%")
-For i = 1 To UBound(a())
-a(i) = Chr(val("&h" + Left$(a(i), 2))) + Mid$(a(i), 3)
+Dim A() As String, i As Long
+A() = Split(c$, "%")
+For i = 1 To UBound(A())
+A(i) = Chr(val("&h" + Left$(A(i), 2))) + Mid$(A(i), 3)
 Next i
-DecodeEscape = utf8decode(StrConv(Join(a(), ""), vbFromUnicode))
+DecodeEscape = utf8decode(StrConv(Join(A(), ""), vbFromUnicode))
 
 End Function
 Sub ClearState1()
@@ -1279,6 +1279,7 @@ assignvalue2:
 assignvalue3:
                         If bstack.lastobj Is Nothing Then
                             If UseType And Not newid Then
+                                                        
                             If AssignTypeNumeric(p, VarType(var(v))) Then
                                 var(v) = p
                             Else
@@ -1415,8 +1416,11 @@ checkobject:
                     If bstack.lastobj Is Nothing Then
                     If newid Or Not UseType Or VarStat Or NewStat Then
                     var(v) = ss$
-                    ElseIf UseType And myVarType(var(v), vbString) Then
+                    ElseIf UseType And MemInt(VarPtr(var(v))) = vbString Then
                     var(v) = ss$
+                    ElseIf UseType And MemInt(VarPtr(var(v))) = 36 Then
+                        MissType
+                        GoTo err000
                     ElseIf ss$ = vbNullString Then
                     
                     var(v) = 0#
@@ -1458,7 +1462,27 @@ checkobject:
                     End If
                     If extreme Then GoTo NewCheck2 Else GoTo NewCheck
                 ElseIf Not MyIsObject(var(v)) Then
-                GoTo assignvalue2
+                    If MemInt(VarPtr(var(v))) = 36 And UseType And Not newid Then
+                    If IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then
+                        Stop
+                        If MemInt(VarPtr(p)) = 36 Then
+                        If Typename(p) = Typename(var(v)) Then
+                            SwapVariant var(v), p
+                        Else
+                            MyEr "missing type " + Typename(var(v)), "δεν βρηκα τύπο " + Typename(var(v))
+                            GoTo err000
+                        End If
+                        Else
+                        MyEr "missing type " + Typename(var(v)), "δεν βρηκα τύπο " + Typename(var(v))
+                        GoTo err000
+                        End If
+                    Else
+                        MyEr "missing type " + Typename(var(v)), "δεν βρηκα τύπο " + Typename(var(v))
+                        GoTo err000
+                    End If
+                    Else
+                    GoTo assignvalue2
+                    End If
                 Else
                 If Left$(b$, 2) <> " >" Then
                     If UseType = False Then
@@ -1599,12 +1623,12 @@ noexpression1:
                                     If IsExp(bstack, b$, sp, flatobject:=True) Then
                                         If myVarType(sp, vbString) Then
                                             SwapString2Variant ss$, sp
-                                            var(v).index = ss$: ss$ = vbNullString
+                                            var(v).Index = ss$: ss$ = vbNullString
                                         Else
-                                            var(v).index = p: sp = 0
+                                            var(v).Index = p: sp = 0
                                         End If
                                     ElseIf IsStrExp(bstack, b$, ss$, False) Then
-                                        var(v).index = ss$: ss$ = vbNullString
+                                        var(v).Index = ss$: ss$ = vbNullString
                                     End If
                                     var(v).UseIndex = True
                                 End If
@@ -2273,15 +2297,15 @@ NotArray1:
                                     ReadOnly
                                     GoTo err000
                             ElseIf ss$ = "++" Then
-                                If usehandler.index_start < usehandler.objref.Count - 1 Then
+                                If usehandler.index_start < usehandler.objref.count - 1 Then
                                     usehandler.index_start = usehandler.index_start + 1
-                                    usehandler.objref.index = usehandler.index_start
+                                    usehandler.objref.Index = usehandler.index_start
                                     usehandler.index_cursor = usehandler.objref.Value
                                 End If
                             ElseIf ss$ = "--" Then
                                 If usehandler.index_start > 0 Then
                                     usehandler.index_start = usehandler.index_start - 1
-                                    usehandler.objref.index = usehandler.index_start
+                                    usehandler.objref.Index = usehandler.index_start
                                     usehandler.index_cursor = usehandler.objref.Value
                                 End If
                             ElseIf ss$ = "-!" Then
@@ -2457,7 +2481,7 @@ jumphere1:
             GoTo err000
             ElseIf AscW(W$) = &H1FFF Then
             If GetVar(bstack, W$, v, True, , , , UseType) Then newid = False: GoTo assignvalue
-            If GetlocalVar(W$, v) Then UseType = varhash.vType(varhash.index): newid = False: GoTo assignvalue
+            If GetlocalVar(W$, v) Then UseType = varhash.vType(varhash.Index): newid = False: GoTo assignvalue
             Else
           '  UseType = False
             v = globalvar(W$, p, , VarStat, temphere$)
@@ -2495,7 +2519,7 @@ assignpointer:
                             ElseIf var(v).IamApointer Then
 jumpgrouphere:
                                 Set var(v) = bstack.lastpointer
-                                ElseIf var(v).soros.Count > 0 Or var(v).FuncList <> vbNullString Then
+                                ElseIf var(v).soros.count > 0 Or var(v).FuncList <> vbNullString Then
                                     CanyAssignPointer2Group
                                     Set bstack.lastpointer = Nothing
                                     Set bstack.lastobj = Nothing  '???
@@ -2630,9 +2654,9 @@ assignvaluestr1:
                                     If VarTypeName(var(v)) = mProp Then
                                         If FastSymbol(b$, "@") Then
                                             If IsExp(bstack, b$, sp) Then
-                                                var(v).index = p: sp = 0
+                                                var(v).Index = p: sp = 0
                                             ElseIf IsStrExp(bstack, b$, sw$, Len(bstack.tmpstr) = 0) Then
-                                                var(v).index = sw$: sw$ = vbNullString
+                                                var(v).Index = sw$: sw$ = vbNullString
                                             End If
                                             var(v).UseIndex = True
                                         End If
@@ -2791,9 +2815,9 @@ stroper001:
                  If VarTypeName(var(v)) = mProp Then
                         If FastSymbol(b$, "@") Then
                             If IsExp(bstack, b$, sp) Then
-                            var(v).index = p: sp = 0
+                            var(v).Index = p: sp = 0
                             ElseIf IsStrExp(bstack, b$, sw$, Len(bstack.tmpstr) = 0) Then
-                            var(v).index = sw$: sw$ = vbNullString
+                            var(v).Index = sw$: sw$ = vbNullString
                             End If
                              var(v).UseIndex = True
                         End If
@@ -2931,9 +2955,9 @@ assignvalue100:
                 If VarTypeName(var(v)) = mProp Then
                   If FastSymbol(b$, "@") Then
                             If IsExp(bstack, b$, sp) Then
-                            var(v).index = p: sp = 0
+                            var(v).Index = p: sp = 0
                         ElseIf IsStrExp(bstack, b$, ss$, Len(bstack.tmpstr) = 0) Then
-                        var(v).index = ss$: ss$ = vbNullString
+                        var(v).Index = ss$: ss$ = vbNullString
                         End If
                          var(v).UseIndex = True
                         End If
@@ -4081,7 +4105,7 @@ Else
     If TypeOf ppppAny Is mArray Then
         If ppppAny.Arr Then
         Set pppp = ppppAny
-        If pppp.Count = 0 Then
+        If pppp.count = 0 Then
             pppp.GroupRef.Value = ss$
         ElseIf bstack.lastobj Is Nothing Then
             pppp.ItemStr(v) = ss$
@@ -4248,7 +4272,7 @@ entry00022:
                 p = Abs(Int(p))
                 sp = i
                 If ar.vtType(0) = vbObject And ok Then
-                    If ar.Count > 1 Then
+                    If ar.count > 1 Then
                     
                     ElseIf ar(0, sp) Is Nothing Then
                         GoTo nRefArray
@@ -4261,13 +4285,13 @@ entry00022:
                         WrongObject
                         GoTo nRefArray
                     End If
-                ElseIf ar.Count < i Then
+                ElseIf ar.count < i Then
                         OutOfLimit
                         GoTo nRefArray
-                ElseIf ar.Count(sp) = 0 Then
+                ElseIf ar.count(sp) = 0 Then
                         OutOfLimit
                         GoTo nRefArray
-                ElseIf ar.Count(sp) <= p Then
+                ElseIf ar.count(sp) <= p Then
                         OutOfLimit
                         GoTo nRefArray
                 End If
@@ -4335,9 +4359,9 @@ entry00123:
                             GoTo entry00122
                             End If
                             If (ar.vtType(0) = vbObject) And ok Then  ' Or ar.vtType(0) = vbVariant
-                                If ar.Count > 1 Then
+                                If ar.count > 1 Then
                                                                 
-                                If ar.Count(CVar(i)) = 0 Then
+                                If ar.count(CVar(i)) = 0 Then
                                     Set sp = bstack.lastobj
                                     Set bstack.lastobj = Nothing
                                     GoTo count0
@@ -4348,7 +4372,7 @@ entry00123:
                                 ElseIf ar(0, CVar(i)) Is Nothing Then
                                 ' error for [ ]
                                 If Not bstack.lastobj Is Nothing Then
-                                If ar.Count(CVar(i)) = 0 Then
+                                If ar.count(CVar(i)) = 0 Then
                                     Set sp = bstack.lastobj
                                     Set bstack.lastobj = Nothing
                                     GoTo count0
@@ -4368,7 +4392,7 @@ nRefArray:
                                     WrongObject
                                     GoTo nRefArray
                                 End If
-                            ElseIf ar.Count(CVar(i)) = 0 Then
+                            ElseIf ar.count(CVar(i)) = 0 Then
 count0:
                                 ar.DefArrayAt i, ar.vtType(0), CLng(p)
                                 ' if ar.vtType(0)=vbstring  ......... check for string
@@ -4669,7 +4693,7 @@ Const mHdlr = "mHandler"
 Const mGroup = "Group"
 Const myArray = "mArray"
 MyRead = True
-Dim p As Variant, x As Double
+Dim p As Variant, X As Double
 Dim pppp As mArray
 ohere$ = here$
 Dim Col As Long
@@ -5196,8 +5220,8 @@ Set ps = New mStiva
 Do While ss$ <> ""
 If ISSTRINGA(ss$, pa$) Then
 ps.DataStr pa$
-ElseIf IsNumberD(ss$, x) Then
-ps.DataVal x
+ElseIf IsNumberD(ss$, X) Then
+ps.DataVal X
 Else
 Exit Do
 End If
@@ -5258,7 +5282,7 @@ backfromstr:
                 If Fast2VarNoTrim(rest$, "ΩΣ", 2, "AS", 2, 3, ff) Then
                    If Not MyIsObject(var(i)) Then
                         p = var(i)
-                        If Not varhash.vType(varhash.index) Then
+                        If Not varhash.vType(varhash.Index) Then
                             If Not Fast2Varl(rest$, "ΑΤΥΠΟΣ", 6, "VARIANT", 7, 7, ff) Then MyRead = False: MissType: Exit Function
                             GoTo jumpref02
                         End If
@@ -5433,7 +5457,7 @@ jumpref02:
                 If Not ReboundVar(bstack, what$, i) Then globalvar what$, i, True
             Else
     
-                globalvar what$, i, True, UseType:=varhash.vType(varhash.index)
+                globalvar what$, i, True, UseType:=varhash.vType(varhash.Index)
                 If VarTypeName(var(i)) = "lambda" Then
 islambda:
                 
@@ -6065,7 +6089,7 @@ checkpointer:
         
 comehere:
         i = globalvar(what$, 0)
-        it = varhash.index
+        it = varhash.Index
       
         If Typename$(myobject) = mGroup Then
             If Fast2VarNoTrim(rest$, "ΩΣ", 2, "AS", 2, 3, ff) Then
@@ -6298,7 +6322,7 @@ jump0001233:
                                         Set myobject = usehandler1.objref
                                         usehandler.index_cursor = myobject.Value
                                         Set usehandler.objref = myobject
-                                        usehandler.index_start = myobject.index
+                                        usehandler.index_start = myobject.Index
                                         usehandler.sign = 1
                                         Set myobject = usehandler
                                         GoTo t14
@@ -6499,12 +6523,12 @@ conthereEnum:
             Case Else
                 ss$ = s$
                 it = True
-                  If MyIsNumeric(p) Then x = p: it = False
+                  If MyIsNumeric(p) Then X = p: it = False
                   If IsEnumAs(bstack, ss$, p, ok, rest$) Then
                     If Not it Then
                     
                         Set usehandler = p
-                        p = x
+                        p = X
                         Set usehandler = usehandler.objref.SearchValue(p, ok)
                         Set myobject = usehandler
                         If ok Then

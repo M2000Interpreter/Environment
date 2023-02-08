@@ -226,7 +226,7 @@ Private Declare Function VariantTimeToSystemTime Lib "OleAut32.dll" ( _
     ByVal vTime As Date, _
     ByRef lpSystemTime As SYSTEMTIME _
 ) As Long
-Private Declare Function GetTimeZoneInformation Lib "Kernel32.dll" (lpTimeZoneInformation As TIME_ZONE_INFORMATION) As Long
+Private Declare Function GetTimeZoneInformation Lib "kernel32.dll" (lpTimeZoneInformation As TIME_ZONE_INFORMATION) As Long
   
 Private Declare Function CreateDirectory Lib "kernel32" Alias "CreateDirectoryW" (ByVal lpszPath As Long, ByVal lpSA As Long) As Long
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
@@ -294,14 +294,14 @@ End Function
 Public Function GetTimeZoneInfo() As String
 
 Dim TZI As TIME_ZONE_INFORMATION ' receives information on the time zone
-Dim retval As Long ' return value
+Dim RetVal As Long ' return value
 Dim c As Long ' counter variable needed to display time zone name
 
-    retval = GetTimeZoneInformation(TZI) ' read information on the computer's selected time zone
+    RetVal = GetTimeZoneInformation(TZI) ' read information on the computer's selected time zone
      If zones.ExistKey(Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")) Then
      ' do nothing. now zone$ has set the index field to standard name.
      End If
-    If retval = 2 Then
+    If RetVal = 2 Then
     GetTimeZoneInfo = Replace(StrConv(TZI.DaylightName, vbFromUnicode), Chr(0), "")
     Else
     GetTimeZoneInfo = Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")
@@ -367,37 +367,37 @@ Public Function PathMakeDirs(ByVal Pathd As String) As Boolean
    End Function
  
 Function PurifyPath(sPath$) As String
-Dim a$(), i
+Dim A$(), i
 If sPath$ = vbNullString Then Exit Function
-a$() = Split(sPath, "\")
-If isdir(a$(LBound(a$()))) Then i = i + 1
-For i = LBound(a$()) + i To UBound(a$())
-a$(i) = PurifyName(a$(i))
+A$() = Split(sPath, "\")
+If isdir(A$(LBound(A$()))) Then i = i + 1
+For i = LBound(A$()) + i To UBound(A$())
+A$(i) = PurifyName(A$(i))
 Next i
-If LBound(a()) = UBound(a()) Then
-PurifyPath = a$(UBound(a$()))
+If LBound(A()) = UBound(A()) Then
+PurifyPath = A$(UBound(A$()))
 Else
-PurifyPath = ExtractPath(Join(a$, "\") + "\", False)
+PurifyPath = ExtractPath(Join(A$, "\") + "\", False)
 End If
 End Function
 Public Function PurifyName(sStr As String) As String
 Dim noValidcharList
 noValidcharList = "*?\<>:/|" + Chr$(34)
-Dim a$, i As Long, ddt As Boolean, j As Long
+Dim A$, i As Long, ddt As Boolean, j As Long
 If Len(sStr) > 0 Then
-a$ = space$(Len(sStr))
+A$ = space$(Len(sStr))
 j = 1
 For i = 1 To Len(sStr)
 If InStr(noValidcharList, Mid$(sStr, i, 1)) = 0 Then
-Mid$(a$, j, 1) = Mid$(sStr, i, 1)
+Mid$(A$, j, 1) = Mid$(sStr, i, 1)
 Else
-Mid$(a$, j, 1) = "-"
+Mid$(A$, j, 1) = "-"
 End If
 j = j + 1
 Next i
-a$ = Left$(a$, j - 1)
+A$ = Left$(A$, j - 1)
 End If
-PurifyName = a$
+PurifyName = A$
 End Function
 
 Public Sub FixPath(s$)
@@ -603,19 +603,19 @@ End If
 CloseHandle hPipe
 Sleep 1
 End Function
-Function validpipename(ByVal a$) As String
+Function validpipename(ByVal A$) As String
 Dim b$
-a$ = myUcase(a$)
-b$ = Left$(a$, InStr(1, a$, "\pipe\", vbTextCompare))
+A$ = myUcase(A$)
+b$ = Left$(A$, InStr(1, A$, "\pipe\", vbTextCompare))
 If b$ = vbNullString Then
-validpipename = "\\" + strMachineName + "\pipe\" + a$
+validpipename = "\\" + strMachineName + "\pipe\" + A$
 Else
-validpipename = a$
+validpipename = A$
 End If
 End Function
 
 Function Included(afile$, ByVal simple$) As String
-Dim a As Document
+Dim A As Document
 On Error GoTo inc1
 Dim what As Long
 Dim st&, pa&, po&
@@ -639,14 +639,14 @@ If Len(simple$) <= 1 Then
 Included = ExtractName(afile$, True)
 Else
     Sleep 1
-    Set a = New Document
-    a.MaxParaLength = 1000
-    a.LCID = Clid
-    a.ReadUnicodeOrANSI afile$, , what
+    Set A = New Document
+    A.MaxParaLength = 1000
+    A.LCID = Clid
+    A.ReadUnicodeOrANSI afile$, , what
     
     If InStr(simple$, vbCr) > 0 Then
     'work with any char but using computer locale
-    If InStr(1, a.textDoc, word$(0), vbTextCompare) > 0 Then
+    If InStr(1, A.textDoc, word$(0), vbTextCompare) > 0 Then
                 Included = ExtractName(afile$, True)
     End If
     Else
@@ -654,13 +654,13 @@ Else
   
 again:
 
-    st& = a.FindStr(word$(0), st&, pa&, po&)
+    st& = A.FindStr(word$(0), st&, pa&, po&)
     
     If st& > 0 Then
     
      If Max > 0 Then
      po& = po& + Len(word$(0))
-     Line$ = a.TextParagraph(a.ParagraphFromOrder(pa&))
+     Line$ = A.TextParagraph(A.ParagraphFromOrder(pa&))
      For it = 1 To Max
      ok = InStr(po&, Line$, word$(it), vbTextCompare) > 0
      If Not ok Then Exit For
@@ -673,7 +673,7 @@ again:
            End If
     End If
     End If
-    Set a = Nothing
+    Set A = Nothing
 
 End If
 inc1:
@@ -808,16 +808,16 @@ finish:
     If Not ok Then
     iPad = 0
     
-    Dim offset As Long
-        Do While lChar3 + offset <= ubnd
-        Select Case bIn(lChar3 + offset)
+    Dim Offset As Long
+        Do While lChar3 + Offset <= ubnd
+        Select Case bIn(lChar3 + Offset)
             Case 10, 13, 32
-            If iPad > 0 Then offset = 0: Exit Do
-            offset = offset + 1
+            If iPad > 0 Then Offset = 0: Exit Do
+            Offset = Offset + 1
             
             Case 61
             iPad = iPad + 1
-            offset = offset + 1
+            Offset = Offset + 1
             Case Else
              If lChar2 = 0 Then GoTo error1
                 
@@ -830,7 +830,7 @@ finish:
                 End If
               End If
             
-             offset = 0
+             Offset = 0
             
             Exit Do
          

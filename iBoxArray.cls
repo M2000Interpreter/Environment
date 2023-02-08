@@ -92,7 +92,7 @@ End Sub
 Public Sub PushEnd(Optional thisarr)
 
 End Sub
-Public Sub PushProp(a As Variant)
+Public Sub PushProp(A As Variant)
 
 End Sub
 Function IsObjAt(curitem As Long, peekvalue) As Boolean

@@ -26,7 +26,7 @@ Private Type GUID
     data4(7) As Byte
 End Type
 Private Type PicBmp
-    size As Long
+    Size As Long
     Type As Long
     hBmp As Long
     hPal As Long
@@ -41,7 +41,7 @@ Private Declare Function GetSystemPaletteEntries Lib "gdi32" (ByVal hDC As Long,
 Private Declare Function CreatePalette Lib "gdi32" (lpLogPalette As LOGPALETTE) As Long
 Private Declare Function SelectPalette Lib "gdi32" (ByVal hDC As Long, ByVal HPALETTE As Long, ByVal bForceBackground As Long) As Long
 Private Declare Function RealizePalette Lib "gdi32" (ByVal hDC As Long) As Long
-Private Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
+Private Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function OpenPrinter Lib "winspool.drv" Alias "OpenPrinterA" (ByVal pPrinterName As String, phPrinter As Long, pDefault As Any) As Long
@@ -87,11 +87,11 @@ End Type
 ' New Win95 Page Setup dialogs are up to you
 Private Type POINTL
     X As Long
-    y As Long
+    Y As Long
 End Type
 Private Type RECT
     Left As Long
-    top As Long
+    Top As Long
     Right As Long
     Bottom As Long
 End Type
@@ -174,7 +174,7 @@ Function CreateBitmapPicture(ByVal hBmp As Long, ByVal hPal As Long) As Picture
 
     'Fill picture info
     With pic
-        .size = Len(pic) ' Length of structure
+        .Size = Len(pic) ' Length of structure
         .Type = vbPicTypeBitmap ' Type of Picture (bitmap)
         .hBmp = hBmp ' Handle to bitmap
         .hPal = hPal ' Handle to palette (may be null)
@@ -289,21 +289,21 @@ Function DriveSerial(ByVal path$) As Long
 End Function
 
 Function WeCanWrite(ByVal path$) As Boolean
-Dim SecondTry As Boolean, pp$
+Dim SecondTry As Boolean, PP$
 On Error GoTo wecant
-pp$ = ExtractPath(path$, , True)
-pp$ = GetDosPath(pp$)
-If pp$ = vbNullString Then
+PP$ = ExtractPath(path$, , True)
+PP$ = GetDosPath(PP$)
+If PP$ = vbNullString Then
 MyEr "Not writable device " & path$, "Δεν μπορώ να γράψω στη συσκευή " & path$
 Exit Function
 End If
-pp$ = PathStrip2root(path$)
+PP$ = PathStrip2root(path$)
 
 
-    Select Case GetDriveType(pp$)
+    Select Case GetDriveType(PP$)
 
         Case 2, 3, 4, 6
-          WeCanWrite = Not GetAttr(pp$) = vbReadOnly
+          WeCanWrite = Not GetAttr(PP$) = vbReadOnly
         Case 5
            WeCanWrite = False
     End Select
@@ -338,7 +338,7 @@ If sapi.getvoices().count > 0 Then
 NumVoices = sapi.getvoices().count
 End If
 End Function
-Public Sub SPEeCH(ByVal a$, Optional BOY As Boolean = False, Optional ByVal vNumber As Long = -1)
+Public Sub SPEeCH(ByVal A$, Optional BOY As Boolean = False, Optional ByVal vNumber As Long = -1)
 Static lastvoice As Long
 If vNumber = -1 Then vNumber = lastvoice
 On Error Resume Next
@@ -354,13 +354,13 @@ If sapi.getvoices().count < vNumber Or sapi.getvoices().count < 1 Then vNumber =
         
          .rate = 2
        ' boy
-         .Speak "<pitch absmiddle='25'>" & a$
+         .Speak "<pitch absmiddle='25'>" & A$
          Else
          
          'man
        .rate = 1
        .volume = IIf(vol = 0, 0, 50 + vol \ 2)
-         .Speak "<pitch absmiddle='-5'>" & a$
+         .Speak "<pitch absmiddle='-5'>" & A$
          End If
        End With
        lastvoice = vNumber

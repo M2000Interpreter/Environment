@@ -12,17 +12,10 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
-Private Const VbLongLong = 20
+Private Const vbLongLong = 20
+Private maxlonglong, limitlonglong
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
-Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
 Private HasHandlers As Boolean
-Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
-    lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 Private mem As New refArray
 Private hashsize As Integer
 Private p As Long, nextVal As Long, datasize As Long, hashmod As Long, lastDataSize As Long
@@ -44,9 +37,9 @@ End If
 End Sub
 Function MyIsNumeric(v As Variant) As Boolean
 Dim n As Byte
-GetMem1 VarPtr(v), n
+n = MemByte(VarPtr(v))
 If n < 2 Then Exit Function
-If n < 5 Then MyIsNumeric = True
+If n <= 5 Then MyIsNumeric = True
 End Function
 Function Add(val, bkey, Optional thistype) As Long
 If HasHandlers Then Err.Raise "Only Handlers Support"
@@ -74,7 +67,7 @@ If VarType(bkey) <> vbLong And VarType(bkey) <> vbString Then Err.Raise 5
         mem(HashSizeStore) = hashsize
         If IsMissing(thistype) Then
         Select Case VarType(val)
-        Case vbLong, vbInteger, vbSingle, vbCurrency, vbString, vbByte, VbLongLong, vbDecimal
+        Case vbLong, vbInteger, vbSingle, vbCurrency, vbString, vbByte, vbLongLong, vbDecimal
             mem.DefArrayAt DataArray, VarType(val), datasize
         Case Else
             mem.DefArrayAt DataArray, vbVariant, datasize
@@ -115,7 +108,7 @@ If VarType(bkey) <> vbLong And VarType(bkey) <> vbString Then Err.Raise 5
     
     If VarType(bkey) = vbLong Then
         akey = space$(2)
-        PutMem4 StrPtr(akey), bkey
+        MemLong(StrPtr(akey)) = bkey
     Else
         SwapVariant akey, bkey
     End If
@@ -125,13 +118,11 @@ If VarType(bkey) <> vbLong And VarType(bkey) <> vbString Then Err.Raise 5
     pv = mem.Hash(keyArray, nextVal, hashsize)
     Select Case hashsize
     Case 1
-        GetMem1 VarPtr(pv), pv2
-        pv2 = pv2 And CByte(127)
+        pv2 = MemByte(VarPtr(pv)) And CByte(127)
         mem(FirstKey, nextVal) = pv2
         pv = pv2 Mod hashmod
     Case 2
-        GetMem2 VarPtr(pv), pv1
-        pv1 = pv1 And &H7FFF
+        pv1 = MemInt(VarPtr(pv)) And &H7FFF
         mem(FirstKey, nextVal) = pv1
         pv = pv1 Mod hashmod
     Case Else
@@ -209,13 +200,11 @@ Function AddHandler(akey As String) As Long
     pv = mem.Hash(keyArray, nextVal, hashsize)
     Select Case hashsize
     Case 1
-        GetMem1 VarPtr(pv), pv2
-        pv2 = pv2 And CByte(127)
+        pv2 = MemByte(VarPtr(pv)) And CByte(127)
         mem(FirstKey, nextVal) = pv2
         pv = pv2 Mod hashmod
     Case 2
-        GetMem2 VarPtr(pv), pv1
-        pv1 = pv1 And &H7FFF
+        pv1 = MemInt(VarPtr(pv)) And &H7FFF
         mem(FirstKey, nextVal) = pv1
         pv = pv1 Mod hashmod
     Case Else
@@ -257,7 +246,7 @@ Function Find(bkey, Optional v, Optional where, Optional queue) As Boolean
     If VarType(bkey) = vbLong Then
         akey = space$(2)
         
-        PutMem4 StrPtr(akey), bkey
+        MemLong(StrPtr(akey)) = bkey
     Else
         akey = bkey
     End If
@@ -271,12 +260,10 @@ Function Find(bkey, Optional v, Optional where, Optional queue) As Boolean
         If pv = 0 Then Exit Function
         Select Case hashsize
         Case 1
-            GetMem1 VarPtr(pv), pv2
-            pv2 = pv2 And CByte(127)
+            pv2 = MemByte(VarPtr(pv)) And CByte(127)
             pv = pv2 Mod hashmod
         Case 2
-            GetMem2 VarPtr(pv), pv1
-            pv1 = pv1 And &H7FFF
+            pv1 = MemInt(VarPtr(pv)) And &H7FFF
             pv = pv1 Mod hashmod
         Case Else
             pv = pv And &H7FFFFFFF
@@ -288,11 +275,7 @@ Function Find(bkey, Optional v, Optional where, Optional queue) As Boolean
         k = k - 1
        
         If mem.CompareStrEq(keyArray, k, akey) Then
-            If Not IsMissing(v) Then
-           
-           
-            v = mem(DataArray, k)
-            End If
+            If Not IsMissing(v) Then v = mem(DataArray, k)
             If Not IsMissing(where) Then where = k
             If Not IsMissing(queue) Then queue = mem(Pleft, k)
             Find = True
@@ -317,7 +300,7 @@ jump1:
     GoTo jump1
     End If
 End Function
-Function FindHandler(akey As String, hashcode As Long, handler As Long) As Boolean
+Function FindHandler(akey As String, hashcode As Long, Handler As Long) As Boolean
         If datasize = 0 Then
             datasize = mem.count(Pleft)
             lastDataSize = datasize
@@ -331,12 +314,10 @@ Function FindHandler(akey As String, hashcode As Long, handler As Long) As Boole
         pv = HashkEY(akey, hashsize)
         Select Case hashsize
         Case 1
-            GetMem1 VarPtr(pv), pv2
-            pv2 = pv2 And CByte(127)
+            pv2 = MemByte(VarPtr(pv)) And CByte(127)
             pv = pv2 Mod hashmod
         Case 2
-            GetMem2 VarPtr(pv), pv1
-            pv1 = pv1 And &H7FFF
+            pv1 = MemInt(VarPtr(pv)) And &H7FFF
             pv = pv1 Mod hashmod
         Case Else
             pv = pv And &H7FFFFFFF
@@ -348,7 +329,7 @@ Function FindHandler(akey As String, hashcode As Long, handler As Long) As Boole
         k = k - 1
         
         If mem.CompareStrEq(keyArray, k, akey) Then
-            handler = k
+            Handler = k
             hashcode = mem(FirstKey, k)
             FindHandler = True
             Exit Function
@@ -381,7 +362,7 @@ Property Let Key(ByVal where As Long, bkey)
    
     If MyIsNumeric(bkey) Then
         akey = space$(2)
-        PutMem4 StrPtr(akey), bkey
+        MemLong(StrPtr(akey)) = bkey
     Else
         akey = bkey
     End If
@@ -391,12 +372,10 @@ Property Let Key(ByVal where As Long, bkey)
     
     Select Case hashsize
     Case 1
-        GetMem1 VarPtr(pv), pv2
-        pv2 = pv2 And CByte(127)
+        pv2 = MemByte(VarPtr(pv)) And CByte(127)
         mem(FirstKey, where) = pv2
     Case 2
-        GetMem2 VarPtr(pv), pv1
-        pv1 = pv1 And &H7FFF
+        pv1 = MemInt(VarPtr(pv)) And &H7FFF
         mem(FirstKey, where) = pv1
     Case Else
         pv = pv And &H7FFFFFFF
@@ -411,7 +390,7 @@ Property Let KeyNoReHash(ByVal where As Long, bkey)
    
     If MyIsNumeric(bkey) Then
         akey = space$(2)
-        PutMem4 StrPtr(akey), bkey
+        MemLong(StrPtr(akey)) = bkey
     Else
         akey = bkey
     End If
@@ -421,12 +400,10 @@ Property Let KeyNoReHash(ByVal where As Long, bkey)
     
     Select Case hashsize
     Case 1
-        GetMem1 VarPtr(pv), pv2
-        pv2 = pv2 And CByte(127)
+        pv2 = MemByte(VarPtr(pv)) And CByte(127)
         mem(FirstKey, where) = pv2
     Case 2
-        GetMem2 VarPtr(pv), pv1
-        pv1 = pv1 And &H7FFF
+        pv1 = MemInt(VarPtr(pv)) And &H7FFF
         mem(FirstKey, where) = pv1
     Case Else
         pv = pv And &H7FFFFFFF
@@ -447,12 +424,12 @@ Set Copy = New HashList
 If HasHandlers Then Copy.Prepare 0, HasHandlers
 Set Copy.PlaceRefArray = mem
 End Property
-Property Get HashkEY(Key$, Optional ByVal size As Long = 4) As Long
-        If size < 1 Then Exit Property
+Property Get HashkEY(Key$, Optional ByVal Size As Long = 4) As Long
+        If Size < 1 Then Exit Property
         If LenB(Key$) = 0 Then
             HashkEY = 1
         Else
-            HashData StrPtr(Key$), LenB(Key$), VarPtr(HashkEY), size
+            HashData StrPtr(Key$), LenB(Key$), VarPtr(HashkEY), Size
         End If
 End Property
 Property Get count()
@@ -471,25 +448,25 @@ Sub Clear()
     datasize = 0
     lastDataSize = datasize
 End Sub
-Private Function KeyNumeric(akey) As Long
+Function KeyNumeric(akey) As Long
 If VarType(akey) <> vbString Then Err.Raise 5
 If Len(akey) = 2 Then
-    GetMem4 StrPtr(akey), KeyNumeric
+    KeyNumeric = MemLong(StrPtr(akey))
 End If
 End Function
 Property Get KeyNum(ByVal where As Long) As Long
     If where < 0 Or where > mem.count(DataArray) Then Exit Property
     KeyNum = KeyNumeric(mem(keyArray, where))
 End Property
-Property Get KeyNum2(ByVal where As Long) As Long
+Property Get KeyNum2(where As Long) As Long
     If where < 0 Or where > mem.count(DataArray) Then Exit Property
     KeyNum2 = KeyNumeric(mem(keyArray, where)) And &HFFFF&
 End Property
-Private Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
+Sub SwapVariant(ByRef A As Variant, ByRef b As Variant)
    Static t(0 To 3) As Long  ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory t(0), ByVal VarPtr(a), 16
-   CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
-   CopyMemory ByVal VarPtr(b), t(0), 16
+   MemCopy VarPtr(t(0)), ByVal VarPtr(A), 16
+   MemCopy VarPtr(A), VarPtr(b), 16
+   MemCopy VarPtr(b), VarPtr(t(0)), 16
 End Sub
 Private Sub ReHashByte()
     mem(HashArray) = Empty
@@ -567,8 +544,7 @@ Private Sub ReHash2()
     If Not HasHandlers Then mem(DataArray, datasize) = mem(DataArray, 0)
     For i = 0 To count - 1
         p = mem.Hash(keyArray, CLng(i), hashsize)
-        GetMem2 VarPtr(p), pv1
-        pv1 = pv1 And &H7FFF
+        pv1 = MemInt(VarPtr(p)) And &H7FFF
         
         mem(FirstKey, i) = pv1
         pv = pv1 Mod hashmod
@@ -605,7 +581,7 @@ Private Sub ReHash4()
         'End If
     Next i
 End Sub
-Public Sub Rehash()
+Sub Rehash()
 If count > 0 Then
     Select Case hashsize
     Case 1
@@ -620,12 +596,12 @@ End Sub
 Function Initialized(p) As Boolean
     Initialized = mem.Elements(p) > 0
 End Function
-Sub SwapStrings(a$, b$)
+Sub SwapStrings(A$, b$)
     Dim i As Long, j As Long
-    GetMem4 VarPtr(a$), i
-    GetMem4 VarPtr(b$), j
-    PutMem4 VarPtr(a$), j
-    PutMem4 VarPtr(b$), i
+    i = MemLong(VarPtr(A$))
+    j = MemLong(VarPtr(b$))
+    MemLong(VarPtr(A$)) = j
+    MemLong(VarPtr(b$)) = i
 End Sub
 Public Function create(ParamArray v()) As HashList
     Dim hl As New HashList, i As Long
@@ -638,4 +614,54 @@ Public Function create(ParamArray v()) As HashList
     End If
     Set create = hl
 End Function
+Public Function cInt64(p)
+    Static maxlonglong, limitlonglong, OneLongLong, OneBigLongLong
+    Dim A, i As Integer
+    If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+        limitlonglong = CDec("9223372036854775808")
+        MemInt(VarPtr(OneLongLong)) = 20
+        MemByte(VarPtr(OneLongLong) + 8) = 1
+        MemInt(VarPtr(OneBigLongLong)) = 20
+        MemByte(VarPtr(OneBigLongLong) + 12) = 1
+    End If
+    i = MemInt(VarPtr(p))
+    Select Case i
+    Case vbDecimal
+        A = Fix(p)
+        A = A - Int(A / maxlonglong) * maxlonglong
+        If A < -limitlonglong - 1 Then
+            While A <= -limitlonglong - 1: A = A + maxlonglong: Wend
+        End If
+        While A > limitlonglong: A = A - maxlonglong: Wend
+        cInt64 = -OneLongLong And A
+    Case 20
+        cInt64 = p
+    Case vbLong, vbInteger
+        cInt64 = -OneLongLong And p
+    Case Else
+        On Error GoTo er1
+        A = Fix(CDec(p))
+        A = A - Int(A / maxlonglong) * maxlonglong
+        If A <= -limitlonglong - 1 Then
+            While A <= -limitlonglong - 1: A = A + maxlonglong: Wend
+        End If
+        While A > limitlonglong: A = A - maxlonglong: Wend
+        cInt64 = -OneLongLong And A
+        If i = vbString Then
+            If Left$(p, 1) = "&" And A < 0 Then
+            If Len(p) = 10 Then
+            If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) > 0 Then
+            cInt64 = OneBigLongLong + cInt64
+            End If
+            End If
+            End If
+            End If
+        
+    End Select
+    Exit Function
+er1:
+    cInt64 = OneLongLong - OneLongLong
+End Function
+
 

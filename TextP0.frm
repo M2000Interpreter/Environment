@@ -246,8 +246,8 @@ Const WM_KEYFIRST = &H100
 Const WM_CHAR = &H102
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
 End Type
  Private Type Msg
     hWnd As Long
@@ -327,7 +327,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub DIS_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, State As Integer)
+Private Sub DIS_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, State As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -337,19 +337,19 @@ End If
         End If
 End Sub
 
-Private Sub dSprite_GotFocus(index As Integer)
+Private Sub dSprite_GotFocus(Index As Integer)
 If lockme Then TEXT1.SetFocus: Exit Sub
 
 End Sub
 
-Private Sub dSprite_LostFocus(index As Integer)
+Private Sub dSprite_LostFocus(Index As Integer)
 If iamactive Then
 iamactive = False
 DestroyCaret
 End If
 End Sub
 
-Private Sub dSprite_OLEDragOver(index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, State As Integer)
+Private Sub dSprite_OLEDragOver(Index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, State As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -434,7 +434,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub Form_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, State As Integer)
+Private Sub Form_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, State As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -555,7 +555,7 @@ If KeyAscii = 9 Then KeyAscii = 0: Exit Sub
 If KeyAscii = 13 Then KeyAscii = 0: Exit Sub
 End Sub
 
-Private Sub gList1_OutPopUp(x As Single, y As Single, myButton As Integer)
+Private Sub gList1_OutPopUp(X As Single, Y As Single, myButton As Integer)
 Dim i As Long
 
 If Not gList1.enabled Then Exit Sub
@@ -572,7 +572,7 @@ i = .SelLength
 End With
 UNhookMe
 MyPopUp.feedlabels TEXT1, EditTextWord
-MyPopUp.Up x + gList1.Left, y + gList1.top
+MyPopUp.Up X + gList1.Left, Y + gList1.Top
 myButton = 0
 End Sub
 
@@ -659,7 +659,7 @@ End If
 End Select
 End Sub
 
-Private Sub List1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub List1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 If item = -1 Then
 
 Else
@@ -1034,7 +1034,7 @@ End If
 
 End Sub
 
-Private Sub DIS_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub DIS_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Not NoAction Then
 NoAction = True
 
@@ -1042,7 +1042,7 @@ If Button > 0 And Targets Then
 
 If Button = 1 Then
 Dim sel&
-    sel& = ScanTarget(q(), CLng(x), CLng(y), 0)
+    sel& = ScanTarget(q(), CLng(X), CLng(Y), 0)
     If sel& >= 0 Then
         Select Case q(sel&).id Mod 100
         Case Is < 10
@@ -1076,24 +1076,24 @@ End Sub
 
 
 
-Private Sub dSprite_MouseDown(index As Integer, Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub dSprite_MouseDown(Index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim p As Long, u2 As Long
 If lockme Then Exit Sub
 If Not NoAction Then
 NoAction = True
 Dim sel&
-p = val("0" & dSprite(index).Tag)
+p = val("0" & dSprite(Index).Tag)
 With players(p)
     u2 = .uMineLineSpace * 2
 
         If Button > 0 And Targets Then
 
-        sel& = ScanTarget(q(), CLng(x), CLng(y), index)
+        sel& = ScanTarget(q(), CLng(X), CLng(Y), Index)
             If sel& >= 0 Then
                 If Button = 1 Then
                 Select Case q(sel&).id Mod 100
                 Case Is < 10
-                If Not interpret(DisStack, "LAYER " & dSprite(index).Tag + " {" + vbCrLf + q(sel&).Comm + vbCrLf & "}") Then Beep
+                If Not interpret(DisStack, "LAYER " & dSprite(Index).Tag + " {" + vbCrLf + q(sel&).Comm + vbCrLf & "}") Then Beep
                 Case Else
                 INK$ = q(sel&).Comm
                 End Select
@@ -1332,7 +1332,7 @@ End If
 End If
 End If
 Case vbKeyPause  '(this is the break key!!!!!'
-If Forms.Count > 5 Then keycode = 0: Exit Sub
+If Forms.count > 5 Then keycode = 0: Exit Sub
 If Not TaskMaster Is Nothing Then If TaskMaster.QueueCount > 0 Then keycode = 0: Exit Sub
 If QRY Or GFQRY Then
 If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
@@ -1629,7 +1629,7 @@ Switches para$  ' ,TRUE CHECK THIS
   On Error Resume Next
   Dim i As Long
   
-      For i = 0 To Controls.Count - 1
+      For i = 0 To Controls.count - 1
      If Typename(Controls(i)) <> "Menu" Then Controls(i).TabStop = False
       Next i
 End Sub
@@ -1637,13 +1637,13 @@ End Sub
 
 
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 If NoAction Then Exit Sub
 NoAction = True
 Dim sel&
 
 If Button > 0 And Targets Then
-sel& = ScanTarget(q(), CLng(x), CLng(y), -1)
+sel& = ScanTarget(q(), CLng(X), CLng(Y), -1)
 
 If sel& >= 0 Then
 
@@ -2119,7 +2119,7 @@ If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
                 Form1.SetFocus
             End If
             End If
-            If Forms.Count > 5 Then keycode = 0: Exit Sub
+            If Forms.count > 5 Then keycode = 0: Exit Sub
             If Not TaskMaster Is Nothing Then If TaskMaster.QueueCount > 0 Then keycode = 0: Exit Sub
             If BreakMe Then noentrance = False: Exit Sub
             If ASKINUSE Then
@@ -2515,7 +2515,7 @@ End If
 End Sub
 
 
-Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, url As Variant, Flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
+Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, Url As Variant, Flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
 If look1 Then
 look1 = False:  lookfirst = False
 
@@ -2528,12 +2528,12 @@ If lookfirst Then look1 = True: view1.Silent = True
 End Sub
 
 
-Private Sub view1_DocumentComplete(ByVal pDisp As Object, url As Variant)
+Private Sub view1_DocumentComplete(ByVal pDisp As Object, Url As Variant)
    Set HTML = view1.Document
 
 End Sub
 
-Private Sub view1_NavigateComplete2(ByVal pDisp As Object, url As Variant)
+Private Sub view1_NavigateComplete2(ByVal pDisp As Object, Url As Variant)
 '
 On Error Resume Next
 If look1 Then
@@ -2680,7 +2680,7 @@ If IsWine Then
 With view1
 On Error Resume Next
     .Visible = True
-    .top = IEY
+    .Top = IEY
     .Left = IEX
     .Width = IESizeX
     .Height = IESizeY
@@ -3358,12 +3358,12 @@ End Select
 TEXT1.mDoc.ColorEvent = Not TEXT1.NoColor
 
 End Sub
-Private Sub mywait11(bstack As basetask, pp As Double)
+Private Sub mywait11(bstack As basetask, ByVal PP)
 Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents
-If pp = 0 Then Exit Sub
+If PP = 0 Then Exit Sub
 Else
 
 Err.Clear
@@ -3375,11 +3375,10 @@ Exit Sub
 End If
 End If
 End If
-pp = pp + CCur(timeGetTime)
-
+Dim tn As Long, dt As Long
+tn = timeGetTime
+If PP < 1 Then dt = 1 Else dt = Signed(PP)
 Do
-
-
 If TaskMaster.Processing And Not bstack.TaskMain Then
         If Not bstack.toprinter Then bstack.Owner.Refresh
         'If TaskMaster.tickdrop > 0 Then TaskMaster.tickdrop
@@ -3399,7 +3398,7 @@ Exit Do
 End If
 End If
 End If
-Loop Until pp <= CCur(timeGetTime) Or NOEXECUTION
+Loop Until UnsignedSub(timeGetTime, tn) > dt Or NOEXECUTION
 
                        If exWnd <> 0 Then
                 MyTitle$ bstack
@@ -3487,7 +3486,7 @@ If IsWine Then
         Exit Function
     End If
 Else
-If Forms.Count < 6 Then SleepWaitEdit bstack, 30
+If Forms.count < 6 Then SleepWaitEdit bstack, 30
 End If
 If AskInput Then
 NeoMsgBox.gList3.SetFocus
@@ -3502,20 +3501,20 @@ End If
     MyDoEvents
     End If
    
-    Dim mycode As Double, oldcodeid As Double, x As Form
+    Dim mycode As Double, oldcodeid As Double, X As Form
     mycode = Rnd * 12312314
     oldcodeid = Modalid
-    For Each x In Forms
-        If x.Name = "GuiM2000" Then
-            Set XX = x
+    For Each X In Forms
+        If X.Name = "GuiM2000" Then
+            Set XX = X
             If XX.Enablecontrol Then
                 If XX.Modal = 0 Then XX.Modal = mycode
                 XX.Enablecontrol = False
             End If
         End If
         Set XX = Nothing
-    Next x
-    Set x = Nothing
+    Next X
+    Set X = Nothing
 If INFOONLY Then
 NeoMsgBox.command1.SetFocus
 End If
@@ -3554,9 +3553,9 @@ BLOCKkey = False
 AskTitle$ = vbNullString
 Dim z As Form
 Set z = Nothing
-For Each x In Forms
-    If x.Name = "GuiM2000" Then
-        Set XX = x
+For Each X In Forms
+    If X.Name = "GuiM2000" Then
+        Set XX = X
         If Not XX.Enablecontrol Then
         XX.TestModal mycode
         End If
@@ -3564,8 +3563,8 @@ For Each x In Forms
         'End If
         Set XX = Nothing
     End If
-Next x
-Set x = Nothing
+Next X
+Set X = Nothing
 If Not zz Is Nothing Then Set z = zz
 On Error Resume Next
 If Typename(z) = "GuiM2000" Then
@@ -3617,12 +3616,12 @@ ask = NeoASK(bstack)
 
 End Function
 
-Sub mywait(bstack As basetask, pp As Double, Optional SLEEPSHORT As Boolean = False)
+Sub mywait(bstack As basetask, PP As Double, Optional SLEEPSHORT As Boolean = False)
 Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents1 Form1
-If pp = 0 Then Exit Sub
+If PP = 0 Then Exit Sub
 Else
 
 Err.Clear
@@ -3635,7 +3634,7 @@ End If
 End If
 End If
 
-pp = pp + CCur(timeGetTime)
+PP = PP + CCur(timeGetTime)
 
 Do
 
@@ -3658,7 +3657,7 @@ Exit Do
 End If
 End If
 End If
-Loop Until pp <= CCur(timeGetTime) Or NOEXECUTION Or MOUT
+Loop Until PP <= CCur(timeGetTime) Or NOEXECUTION Or MOUT
 
                        If exWnd <> 0 Then
                 MyTitle$ bstack

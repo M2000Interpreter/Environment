@@ -14,6 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 ' If you copy and paste code
 ' don't forget to set default property to vartext (changed from text)
+Implements IControlIndex
 Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Private mprompt As String
@@ -63,7 +64,7 @@ Dim mIndex As Long, mStayOpen As Boolean
 Dim Callback As GuiM2000
 Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long
 Dim tParam As DRAWTEXTPARAMS
-Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
+Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
 Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 Public NumberOnly As Boolean
 Public NumberIntOnly As Boolean
@@ -100,6 +101,7 @@ Text = glistN.list(0)
 End If
 End Property
 Public Property Get vartext() As String
+Attribute vartext.VB_UserMemId = 0
 If glistN.listcount = 0 Then
 glistN.AddItem ""
 Else
@@ -180,14 +182,14 @@ With Callback
 white = .Controls(1).ForeColor
 ff.Name = .CtrlFontName
 ff.charset = Form1.DIS.Font.charset
-ff.size = .CtrlFontSize
+ff.Size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 End With
 MoveOnEnter = True
 With glistN
 .NoEscapeKey = True
 .bypassfirstClick = True
-.Enabled = True
+.enabled = True
 Info = vbNullString
 If .listcount = 0 Then Text = vbNullString
 .NoCaretShow = True
@@ -200,7 +202,7 @@ Set .Font = ff
 .ShowMe
 End With
 locked = False
-Enabled = True
+enabled = True
 Retired
 
 End Sub
@@ -243,11 +245,11 @@ End If
 End Sub
 
 
-Private Sub glistN_Fkey(a As Integer)
-If a > 1000 Then
-Callback.SendFKEY a - 1000
+Private Sub glistN_Fkey(A As Integer)
+If A > 1000 Then
+Callback.SendFKEY A - 1000
 Else
-Callback.SendFKEY a
+Callback.SendFKEY A
 End If
 End Sub
 
@@ -333,11 +335,11 @@ glistN.LastLinePart = " " & RHS
 End Property
 
 
-Public Property Get Enabled() As Boolean
-Enabled = glistN.EditFlag
+Public Property Get enabled() As Boolean
+enabled = glistN.EditFlag
 End Property
 
-Public Property Let Enabled(ByVal RHS As Boolean)
+Public Property Let enabled(ByVal RHS As Boolean)
 glistN.EditFlag = RHS
 glistN.Arrows2Tab = Not RHS
 glistN.NoCaretShow = Not RHS
@@ -351,7 +353,7 @@ Callback.RealHover = ctrlName
 If Not locked Then
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 ' RaiseEvent GotFocus
-If Enabled Then
+If enabled Then
 glistN.FadeLastLinePart = mPartColor
 If glistN.BackStyle <> 1 Then
 glistN.ForeColor = black
@@ -416,30 +418,30 @@ Private Sub glistN_HeaderSelected(Button As Integer)
 Text = Text
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub glistN_KeyDown(keycode As Integer, shift As Integer)
 If MoveOnEnter Then
-If KeyCode = 13 Then
+If keycode = 13 Then
 If shift = 1 Then
 glistN.Goback
 Else
 glistN.GoON
 End If
 Exit Sub
-KeyCode = 0
+keycode = 0
 End If
 End If
 Dim VR(2)
-VR(0) = KeyCode
+VR(0) = keycode
 VR(1) = shift
    If mIndex >= 0 Then
    Callback.CallbackNow mesCtrlName + ".KeyDown(" + Str(mIndex) + ")", VR()
    Else
       Callback.CallbackNow mesCtrlName + ".KeyDown()", VR()
       End If
-KeyCode = VR(0)
+keycode = VR(0)
 shift = VR(1)
-If KeyCode = vbKeyF10 And shift <> 0 Then
-KeyCode = 0
+If keycode = vbKeyF10 And shift <> 0 Then
+keycode = 0
 If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
    Else
@@ -447,10 +449,10 @@ If mIndex >= 0 Then
       End If
 Exit Sub
 End If
-If KeyCode = vbKeyUp Then
-ElseIf KeyCode = vbKeyDown Then
-ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
-If Not Enabled Then Exit Sub
+If keycode = vbKeyUp Then
+ElseIf keycode = vbKeyDown Then
+ElseIf keycode = vbKeyV And (shift And 3) = 2 Then
+If Not enabled Then Exit Sub
 Pad$ = GetTextData(13)
 If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
 If Pad$ <> "" Then
@@ -1115,11 +1117,11 @@ Private Sub glistN_SpinnerValue(ThatValue As Long)
       End If
 End Sub
 Public Property Get locked() As Boolean
-locked = Not glistN.Enabled
+locked = Not glistN.enabled
 End Property
 
 Public Property Let locked(ByVal RHS As Boolean)
-glistN.Enabled = Not RHS
+glistN.enabled = Not RHS
 End Property
 Public Sub Spinner(ShowBar As Boolean, MinValue As Long, maxvalue As Long, LargeValue As Long)
 If Not ShowBar Then
@@ -1127,11 +1129,11 @@ glistN.Spinner = False
 glistN.ShowBar = False
 glistN.EnabledBar = False
 Else
-glistN.Enabled = False
+glistN.enabled = False
 glistN.restrictLines = 1
 glistN.Spinner = True
 glistN.SetSpin MinValue, maxvalue, LargeValue
-glistN.Enabled = True
+glistN.enabled = True
 glistN.EnabledBar = True
 glistN.ShowBar = True
 
@@ -1193,8 +1195,8 @@ Public Property Let MaxCharLength(ByVal RHS As Long)
 glistN.maxchar = RHS
 End Property
 
-Private Function Myleft$(a As String, Pos As Long)
-If Pos < 1 Then Myleft$ = vbNullString Else Myleft$ = Mid$(a, 1, Pos)
+Private Function Myleft$(A As String, Pos As Long)
+If Pos < 1 Then Myleft$ = vbNullString Else Myleft$ = Mid$(A, 1, Pos)
 End Function
 Private Function GetTextData(ByVal lFormatId As Long) As String
 '' Addition to myTextBox for ctrl+V
@@ -1261,8 +1263,8 @@ Dim hMem As Long, lSize As Long, lPtr As Long
     End If
 End Function
 
-Private Sub glistN_PreviewKeyboardUnicode(a As String)
-Callback.SpreadKey a
+Private Sub glistN_PreviewKeyboardUnicode(A As String)
+Callback.SpreadKey A
 End Sub
 
 Private Sub glistN_UnregisterGlist()
@@ -1295,16 +1297,16 @@ If ThisFontName <> "" Then
 
 aa.Name = ThisFontName
 
-If ThisMode > 7 Then aa.size = ThisMode Else aa = 7
+If ThisMode > 7 Then aa.Size = ThisMode Else aa = 7
 aa.bold = ThisBold
 Set glistN.Font = aa
 End If
 End Sub
-Public Property Get index() As Long
-index = mIndex
+Public Property Get Index() As Long
+Index = mIndex
 End Property
 
-Friend Property Let index(ByVal RHS As Long)
+Friend Property Let Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Let ShowAlways(ByVal vNewValue As Variant)
@@ -1359,7 +1361,7 @@ dimm1 = mycolor(dimm11)
 If Not IsMissing(dimm21) Then dimm2 = mycolor(dimm21)
 End If
 End If
-If Enabled Then
+If enabled Then
 glistN.ForeColor = white
 Else
 glistN.ForeColor = black
@@ -1393,27 +1395,27 @@ Public Property Get drop()
 drop = glistN.DropEnabled
 End Property
 Private Sub glistN_AddSelStart(val As Long, shift As Integer)
-Dim W As Long, a$, l As Long, b$
+Dim W As Long, A$, l As Long, b$
 If glistN.SelStart > 0 Then
-a$ = Mid$(vartext, glistN.SelStart)
+A$ = Mid$(vartext, glistN.SelStart)
 
-    If Len(a$) > 0 Then
-        W = AscW(a$)
+    If Len(A$) > 0 Then
+        W = AscW(A$)
         If (shift And 2) = 2 Then
-            l = Len(a$)
+            l = Len(A$)
             val = 1
             If l < 2 Then Exit Sub
-                b$ = Mid$(a$, val, 1)
+                b$ = Mid$(A$, val, 1)
                 If InStr(sp1, b$) = 0 Then
                 Do While val < l And InStr(sp, b$) > 0
                     val = val + 1
-                    b$ = Mid$(a$, val, 1)
+                    b$ = Mid$(A$, val, 1)
                 Loop
                 If InStr(sp1, b$) = 0 Then
                     If val = 1 Then
                         Do While val < l And InStr(sp2, b$) = 0
                             val = val + 1
-                            b$ = Mid$(a$, val, 1)
+                            b$ = Mid$(A$, val, 1)
                         Loop
                         If InStr(sp2, b$) > 0 Then val = val - 1
                     Else
@@ -1431,27 +1433,27 @@ End If
 End Sub
 
 Private Sub glistN_SubSelStart(val As Long, shift As Integer)
-Dim W As Long, a$, l As Long, b$
+Dim W As Long, A$, l As Long, b$
 If glistN.SelStart < 2 Then Exit Sub
-a$ = Mid$(vartext, glistN.SelStart - 1, 1)
-If Len(a$) > 0 Then
-W = AscW(a$)
+A$ = Mid$(vartext, glistN.SelStart - 1, 1)
+If Len(A$) > 0 Then
+W = AscW(A$)
         If (shift And 2) = 2 Then
-            a$ = Mid$(vartext, 1, glistN.SelStart - 1)
-            l = Len(a$)
+            A$ = Mid$(vartext, 1, glistN.SelStart - 1)
+            l = Len(A$)
             val = l
             If val = 1 Then Exit Sub
-            b$ = Mid$(a$, l, 1)
+            b$ = Mid$(A$, l, 1)
             If InStr(sp1, b$) = 0 Then
                 Do While l > 1 And InStr(sp, b$) > 0
                     l = l - 1
-                    b$ = Mid$(a$, l, 1)
+                    b$ = Mid$(A$, l, 1)
                 Loop
                 If InStr(sp1, b$) = 0 Then
                     If l = val Then
                         Do While l > 1 And InStr(sp2, b$) = 0
                             l = l - 1
-                            b$ = Mid$(a$, l, 1)
+                            b$ = Mid$(A$, l, 1)
                         Loop
                         If l = 1 And Not InStr(sp2, b$) > 0 Then l = l - 1
                         
@@ -1474,26 +1476,26 @@ Public Sub SetBarStyle(bColor As Long, Optional bHatch As Long, Optional BHatchC
     glistN.BarHatch = bHatch
     glistN.BarHatchColor = BHatchColor
 End Sub
-Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(A, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
-If MyIsNumeric(a) Then
-a = CLng(a)
-If a < 0 Then Exit Sub
-If a > 499 Then Exit Sub
+If MyIsNumeric(A) Then
+A = CLng(A)
+If A < 0 Then Exit Sub
+If A > 499 Then Exit Sub
 Else
-a = UCase(a)
-Select Case a
+A = UCase(A)
+Select Case A
 Case "F1" To "F9"
-a = 611 + val(Mid(a, 2))
+A = 611 + val(Mid(A, 2))
 Case Else
-a = AscW(a)
-If a > 126 Then a = 0
+A = AscW(A)
+If A > 126 Then A = 0
 End Select
 End If
 If Opcode < 0 Then Opcode = 0
-If a = 0 Then Exit Sub
-a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
-Callback.RegisterAcc a, ctrlName, Opcode
+If A = 0 Then Exit Sub
+A = A - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc A, ctrlName, Opcode
 End Sub
 Private Sub gListN_AccKey(m As Long)
 Callback.AccProces m
@@ -1501,4 +1503,20 @@ End Sub
 
 Private Sub glistN_WindowKey(VbKeyThis As Integer)
 Callback.ProcessWinKey VbKeyThis
+End Sub
+Public Property Let IControlIndex_Index(ByVal RHS As Long)
+mIndex = RHS
+End Property
+
+Public Property Get IControlIndex_Index() As Long
+IControlIndex_Index = mIndex
+End Property
+
+Public Sub IControlIndex_UnloadMe()
+On Error Resume Next
+If glistN Is Nothing Then Exit Sub
+Set glistN = Nothing
+Callback.RemoveGuiControl ctrlName
+mIndex = -1
+Set Callback = Nothing
 End Sub

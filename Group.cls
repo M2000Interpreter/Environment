@@ -20,7 +20,7 @@ Dim OwnSoros As mStiva2
 Dim mName As String
 Dim mFloatGroupName As String
 Dim FloatGroup As Boolean
-Dim bank As refArray
+Dim bank
 Dim mTeam As Boolean
 Dim LinkToGroup As Group
 Dim mTag As String
@@ -84,7 +84,6 @@ If mytypes Is RHS Then
     MatchTypes = True
     Exit Function
 End If
-'If mytypes.count <> extypes.count Then Exit Function
 If mytypes.Count * extypes.Count = 0 Then Exit Function
 For Each k In extypes
     If TypeGroupNow(k) Then MatchTypes = True: Exit Function
@@ -280,7 +279,7 @@ Public Sub PokeItem(cursor As Long, item)
 'Debug.Print Typename$(item)
 If IsObject(item) Then
 
-bank(cursor) = item
+Set bank(cursor) = item
 Else
 ' always last two items are for local vars and functions
 If mTeam And cursor >= bank(1) * 2 + 2 Then
@@ -294,8 +293,8 @@ End Sub
 
 Public Sub BeginFloat(Total As Long)
 FloatGroup = True
-Set bank = New refArray
-bank(Total * 2 - 1) = Empty
+ bank = LibMemory.EmptyArray(1, vbVariant)
+ ReDim bank(Total * 2 - 1)
 'bank.grouperror = True
 'bank.PushDim Total * 2
 'bank.PushEnd
@@ -310,7 +309,7 @@ End Property
 Public Sub EndFloat()
 'If FloatGroup Then bank.SerialItem (0), 0, 7
 FloatGroup = False
-Set bank = Nothing
+bank = Empty
 End Sub
 Public Property Set LinkRef(a As Object)
 If FloatGroup Then

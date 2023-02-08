@@ -31,7 +31,7 @@ Private Declare Function midiOutSetVolume Lib "winmm" (ByVal uDeviceID As Long, 
 Private Declare Function waveOutSetVolume Lib "winmm.dll" (ByVal uDeviceID As Long, ByVal dwVolume As Long) As Long
 Private Declare Function waveOutGetVolume Lib "winmm.dll" (ByVal uDeviceID As Long, dwVolume As Long) As Long
 
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 
 
 Private myid As Long
@@ -336,7 +336,7 @@ End Function
 Public Function openMovie()
 
     'Open a m"+str(myID)+" in the default window style(Popup)
-    Dim a As Long, LASTF As String
+    Dim A As Long, LASTF As String
     LASTF = """" + FileName + """"
   '  error = mciSendString("close all", 0, 0, 0)
     'Decide which way you want the mci device to work below
@@ -420,50 +420,50 @@ End Function
 Public Function extractCurrentMovieSize(wLeft As Long, wTop As Long, wWidth As Long, wHeight As Long)
     'Returns the size parameters of the m"+str(myID)+"
     On Error Resume Next
-    Dim a As String
+    Dim A As String
     Dim b As String
     Dim c As String
     Dim f As String
-    Dim G As String
-    a = getCurrentSize
-    b = InStr(1, a, " ")
-    c = InStr(b + 1, a, " ")
-    f = Mid$(a, c + 1)
-    G = InStr(1, f, " ")
-    wWidth = val(Left(f, G)) 'width
-    wHeight = val(Mid$(f, G)) 'height
+    Dim g As String
+    A = getCurrentSize
+    b = InStr(1, A, " ")
+    c = InStr(b + 1, A, " ")
+    f = Mid$(A, c + 1)
+    g = InStr(1, f, " ")
+    wWidth = val(Left(f, g)) 'width
+    wHeight = val(Mid$(f, g)) 'height
 End Function
 Public Function MovieHeight() As Long
     'Returns the size parameters of the m"+str(myID)+"
     On Error Resume Next
-    Dim a As String
+    Dim A As String
     Dim b As String
     Dim c As String
     Dim f As String
-    Dim G As String
-    a = getCurrentSize
-    b = InStr(1, a, " ")
-    c = InStr(b + 1, a, " ")
-    f = Mid$(a, c + 1)
-    G = InStr(1, f, " ")
-       MovieHeight = val(Mid$(f, G)) 'height
+    Dim g As String
+    A = getCurrentSize
+    b = InStr(1, A, " ")
+    c = InStr(b + 1, A, " ")
+    f = Mid$(A, c + 1)
+    g = InStr(1, f, " ")
+       MovieHeight = val(Mid$(f, g)) 'height
 End Function
 Public Function extractDefaultMovieSize(wWidth As Long, wHeight As Long)
     'Returns the default size of the m"+str(myID)+" even if the size
     'of the m"+str(myID)+" has been changed
     On Error Resume Next
-    Dim a As String
+    Dim A As String
     Dim b As String
     Dim c As String
     Dim f As String
-    Dim G As String
-    a = getDefaultSize
-    b = InStr(1, a, " ") '2
-    c = InStr(b + 1, a, " ") '4
-    f = Mid$(a, c + 1) '9
-    G = InStr(1, f, " ")
-    wWidth = val(Left(f, G)) 'width
-    wHeight = val(Mid$(f, G)) 'height
+    Dim g As String
+    A = getDefaultSize
+    b = InStr(1, A, " ") '2
+    c = InStr(b + 1, A, " ") '4
+    f = Mid$(A, c + 1) '9
+    g = InStr(1, f, " ")
+    wWidth = val(Left(f, g)) 'width
+    wHeight = val(Mid$(f, g)) 'height
 End Function
 Public Function getBitsPerPixel()
     'Will get the m"+str(myID)+" bitsperpixel
@@ -487,11 +487,11 @@ Public Function getAudioStatus() As String
     Error = mciSendString("status m" + LTrim$(Str$(myid)) + " audio", Data, 128, 0)
     getAudioStatus = StrPart(Data)
 End Function
-Public Function sizeLocateMovie(Left As Long, top As Long, Width As Long, Height As Long)
+Public Function sizeLocateMovie(Left As Long, Top As Long, Width As Long, Height As Long)
     'Change the size of the m"+str(myID)+" and the location of
     'the m"+str(myID)+" in Pixels
 ' 120 120 200 200 frame 0 0 200 200 source 0 0 200 200
-    Error = mciSendString("put m" + LTrim$(Str$(myid)) + " window at " & Left & " " & top & " " & Width & " " & Height, 0, 0, 0)
+    Error = mciSendString("put m" + LTrim$(Str$(myid)) + " window at " & Left & " " & Top & " " & Width & " " & Height, 0, 0, 0)
 
 'error = mciSendString("put m"+str(myID)+" video 120 120 200 200 frame 0 0 200 200 source 0 0 200 200 ", 0, 0, 0)
 
@@ -595,7 +595,7 @@ End Function
 Public Function pauseMovie()
     'Pause the m"+str(myID)+"
     If AVIRUN Then
-    AVI.Timer1.Enabled = False
+    AVI.Timer1.enabled = False
     If (Me.getLengthInMS - Me.getPositionInMS) > 0 Then
     
     AVI.Interval = Me.getLengthInMS - Me.getPositionInMS
@@ -763,7 +763,7 @@ Public Function setPositionTo(Second As Double)
     mciSendString "seek m" + LTrim$(Str$(myid)) + " to " + Second, 0, 0, 0
     End If
      If AVIRUN Then
-    AVI.Timer1.Enabled = False
+    AVI.Timer1.enabled = False
     
      If (Me.getLengthInMS - Me.getPositionInMS) > 0 Then
     
@@ -779,9 +779,9 @@ Public Function restartMovie()
     'function to start playing from the beginning
     Error = mciSendString("seek m" + LTrim$(Str$(myid)) + " to start", 0, 0, 0)
      If AVIRUN Then
-    AVI.Timer1.Enabled = False
-    AVI.Timer1.Enabled = Me.getLengthInMS
-      AVI.Timer1.Enabled = True
+    AVI.Timer1.enabled = False
+    AVI.Timer1.enabled = Me.getLengthInMS
+      AVI.Timer1.enabled = True
     End If
     playMovie
 End Function
@@ -882,9 +882,9 @@ If Error = 0 Then
     vol = part1
     GetMem2 VarPtr(thisvol) + 2, part1
     If UINT(vol) < UINT(part1) Then vol = part1
-    Dim a As Double
-    a = UINT(vol) \ 655.36
-    vol = CLng(a)
+    Dim A As Double
+    A = UINT(vol) \ 655.36
+    vol = CLng(A)
     
 End If
 End Sub

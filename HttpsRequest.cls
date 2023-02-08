@@ -7,10 +7,10 @@ BEGIN
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
 Attribute VB_Name = "clsHttpsRequest"
-Attribute VB_GlobalNameSpace = False
+Attribute VB_GlobalNameSpace = True
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Private Const MODULE_NAME As String = "clsHttpsRequest"
 Private WithEvents m_oSocket    As cTlsSocket
 Attribute m_oSocket.VB_VarHelpID = -1
@@ -24,7 +24,7 @@ Private Type UcsParsedUrl
     Protocol        As String
     Host            As String
     Port            As Long
-    Path            As String
+    path            As String
     QueryString     As String
     Anchor          As String
     User            As String
@@ -38,7 +38,7 @@ Private lContentLength  As Long
 Private sEncoding       As String
 Private sConnection     As String
 Private sError As String
-Event Start(ByVal remobtehost$, ByVal RemotePort As Long)
+Event start(ByVal remobtehost$, ByVal RemotePort As Long)
 Event Cancel(ByRef CancelMe)
 Event DownloadError(ByVal Number As Long, ByVal Description As String)
 Event Complete()
@@ -101,7 +101,7 @@ Public Function HttpsRequest(https, Optional ByVal aWait As Boolean = False) As 
         m_sServerName = uRemote.Host & ":" & uRemote.Port
     End If
     '--- send TLS application data and wait for reply
-    sRequest = "GET " & uRemote.Path & uRemote.QueryString & " HTTP/1.1" & vbCrLf & _
+    sRequest = "GET " & uRemote.path & uRemote.QueryString & " HTTP/1.1" & vbCrLf & _
                "Connection: keep-alive" & vbCrLf & _
                "Host: " & uRemote.Host & vbCrLf & vbCrLf
                
@@ -192,7 +192,7 @@ Private Function ParseUrl(sUrl As String, uParsed As UcsParsedUrl, Optional DefP
         .Global = True
         .Pattern = "^(?:(.*)://)?(?:(?:([^:]*):)?([^@]*)@)?([A-Za-z0-9\-\.]+)(:[0-9]+)?(/[^?#]*)?(\?[^#]*)?(#.*)?$"
         With .Execute(sUrl)
-            If .Count > 0 Then
+            If .count > 0 Then
                 With .item(0).SubMatches
                     uParsed.Protocol = .item(0)
                     uParsed.User = .item(1)
@@ -213,9 +213,9 @@ Private Function ParseUrl(sUrl As String, uParsed As UcsParsedUrl, Optional DefP
                             uParsed.Port = 80
                         End Select
                     End If
-                    uParsed.Path = .item(5)
-                    If LenB(uParsed.Path) = 0 Then
-                        uParsed.Path = "/"
+                    uParsed.path = .item(5)
+                    If LenB(uParsed.path) = 0 Then
+                        uParsed.path = "/"
                     End If
                     uParsed.QueryString = .item(6)
                     uParsed.Anchor = .item(7)
@@ -241,16 +241,16 @@ Public Property Get HeadersCount() As Variant
 If Not IsEmpty(vHeaders) Then
         Dim c As Collection
         Set c = vHeaders
-        HeadersCount = c.Count
+        HeadersCount = c.count
 End If
 End Property
-Public Property Get Header(index) As Variant
+Public Property Get Header(Index) As Variant
     Header = vbNullString
     If Not IsEmpty(vHeaders) Then
         On Error Resume Next
         Dim c As Collection
         Set c = vHeaders
-        Header = c.item(index)
+        Header = c.item(Index)
     End If
 End Property
 Public Property Get Headers() As Variant
@@ -297,10 +297,10 @@ On Error Resume Next
     End If
 End Property
 Sub EmptyVariant(ByVal b As Long)
-   Dim a As Variant
+   Dim A As Variant
    Static t(3) As Long
-   CopyMemory t(0), ByVal VarPtr(a), 16
-   CopyMemory ByVal VarPtr(a), ByVal b, 16
+   CopyMemory t(0), ByVal VarPtr(A), 16
+   CopyMemory ByVal VarPtr(A), ByVal b, 16
    CopyMemory ByVal b, t(0), 16
 End Sub
 

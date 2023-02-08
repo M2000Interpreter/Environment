@@ -44,7 +44,7 @@ Public Function FindDISPID(pobjTarget As Object, ByVal pstrProcName As Variant) 
     FindDISPID = -1
     If pobjTarget Is Nothing Then Exit Function
 
-    Dim a$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
+    Dim A$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
     ReDim myptr(0 To 0)
     myptr(0) = StrPtr(pstrProcName)
     
@@ -66,7 +66,7 @@ Do
 For Each X In Forms
 bb = True
 If TypeOf X Is GuiM2000 Then
-    If X.Enabled Then bb = False: X.CloseNow: bb = False: Exit For
+    If X.enabled Then bb = False: X.CloseNow: bb = False: Exit For
     
 End If
 Next X
@@ -225,16 +225,16 @@ End If
 If LastErNum = 0 Then
         lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
 End If
-If LastErNum <> 0 Then GoTo exithere
+If LastErNum <> 0 Then GoTo exitHere
 If lngRet <> 0 Then
     If lngRet = DISP_E_EXCEPTION Then
         ' CallByName pobjTarget, pstrProcName, VbMethod
         MyEr GetBStrFromPtr(Excep.StrPtrDescription, False), GetBStrFromPtr(Excep.StrPtrDescription, False)
-        GoTo exithere
+        GoTo exitHere
         Err.Raise Excep.wCode
     ElseIf Typename$(pobjTarget) = "GuiM2000" Then
 JUMPHERE:
-            On Error GoTo exithere
+            On Error GoTo exitHere
             lngRet = 0
             If UCase(pstrProcName) = "HIDE" Then
                 
@@ -448,6 +448,7 @@ If lngRet = -2147352573 Then
 GoTo jumpe1
 End If
     Err.Raise lngRet
+
 End If
 End If
     Else
@@ -515,7 +516,7 @@ there:
 Err.Clear
 CallByNameFixParamArray = VarRet
 Exit Function
-exithere:
+exitHere:
     If Err.Number <> 0 Then CallByNameFixParamArray = VarRet
 Err.Clear
     If items > 0 Then

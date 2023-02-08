@@ -19,7 +19,8 @@ Private Type FILETIME
     dwLowDateTime As Long
     dwHighDateTime As Long
 End Type
-Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
+Declare Function GetSystemTimeAsFileTime Lib "kernel32.dll" (lpSystemTimeAsFileTime As Currency) As Long
+Public basictimer As Currency
 Private Const WAIT_ABANDONED& = &H80&
 Private Const WAIT_ABANDONED_0& = &H80&
 Private Const WAIT_FAILED& = -1&
@@ -187,10 +188,11 @@ Public Sub MyRefresh(bstack As basetask)
 On Error Resume Next
 Dim some As Object
 With Prefresh(GetCode(bstack.Owner))
-            If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+            Call GetSystemTimeAsFileTime(basictimer)
+            If basictimer > .k1 Then .RRCOUNTER = 0
             
                 If .RRCOUNTER = 0 Then
-                    .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
+                    .k1 = basictimer + REFRESHRATE: .RRCOUNTER = 1
                     If Not bstack.toprinter Then
                     Set some = bstack.Owner
                     
@@ -209,14 +211,16 @@ With Prefresh(GetCode(bstack.Owner))
                  End With
 End Sub
 Public Sub SkipRefresh(bstack As basetask)
-            With Prefresh(GetCode(bstack.Owner))
-                   .k1 = uintnew(timeGetTime + REFRESHRATE)
-                 End With
+    With Prefresh(GetCode(bstack.Owner))
+        Call GetSystemTimeAsFileTime(basictimer)
+        .k1 = basictimer + REFRESHRATE
+    End With
 End Sub
 Public Sub PrintRefresh(bstack As basetask, Scr As Object)
     With Prefresh(GetCode(bstack.Owner))
-        If uintnew(timeGetTime) > .k1 Then
-            .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
+        Call GetSystemTimeAsFileTime(basictimer)
+        If basictimer > .k1 Then
+            .k1 = basictimer + REFRESHRATE: .RRCOUNTER = 1
             If Scr.Visible Then Scr.Refresh
             If Not TaskMaster Is Nothing Then
                 TaskMaster.StopProcess
@@ -232,9 +236,10 @@ End Sub
 Public Sub MyDoEvents0new(some As Object)
    On Error GoTo procbliah3
 With Prefresh(GetCode(some))
-    If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+    Call GetSystemTimeAsFileTime(basictimer)
+    If basictimer > .k1 Then .RRCOUNTER = 0
         If .RRCOUNTER = 0 Then
-            .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
+            .k1 = basictimer + REFRESHRATE: .RRCOUNTER = 1
             If byPassCallback Then Exit Sub
             If some.Visible Then some.Refresh
             If Not TaskMaster Is Nothing Then
@@ -255,9 +260,10 @@ End Sub
 Public Sub MyDoEvents0(some As Object)
     On Error GoTo procbliah3
     With Prefresh(GetCode(some))
-        If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+        Call GetSystemTimeAsFileTime(basictimer)
+        If basictimer > .k1 Then .RRCOUNTER = 0
         If .RRCOUNTER = 0 Then
-            .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
+            .k1 = basictimer + REFRESHRATE: .RRCOUNTER = 1
             If byPassCallback Then Exit Sub
             If some.Visible Then
                 If TypeOf some Is GuiM2000 Then
@@ -287,11 +293,12 @@ Static once As Boolean
             If DOeVONLY Then
                 DoEvents
             Else
-                If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+                Call GetSystemTimeAsFileTime(basictimer)
+                If basictimer > k1 Then RRCOUNTER = 0
                     If REFRESHRATE <> 25 And ResetK1 Then RRCOUNTER = 0
                         If RRCOUNTER = 0 Then
                             If ResetK1 Then REFRESHRATE = 25
-                            k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+                            k1 = basictimer + REFRESHRATE: RRCOUNTER = 1
                         End If
                     End If
                 Else
@@ -310,11 +317,11 @@ Static once As Boolean
                             DoEvents
                         End If
                     Else
-                        If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+                        If basictimer > k1 Then RRCOUNTER = 0
                         If REFRESHRATE <> 25 And ResetK1 Then RRCOUNTER = 0
                         If RRCOUNTER = 0 Then
                             If ResetK1 Then REFRESHRATE = 25
-                            k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+                            k1 = basictimer + REFRESHRATE: RRCOUNTER = 1
                             TaskMaster.Dispose
                             If Not once Then
                                 once = True
@@ -341,11 +348,12 @@ Static once As Boolean
             If DOeVONLY Then
                 DoEvents
             Else
-                If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+                Call GetSystemTimeAsFileTime(basictimer)
+                If basictimer > .k1 Then .RRCOUNTER = 0
                 If REFRESHRATE <> 25 And ResetK1 Then .RRCOUNTER = 0
                 If .RRCOUNTER = 0 Then
                     If ResetK1 Then REFRESHRATE = 25
-                    .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
+                    .k1 = basictimer + REFRESHRATE: .RRCOUNTER = 1
                     If byPassCallback Then Exit Sub
                     If some.Visible Then
                         If TypeOf some Is GuiM2000 Then
@@ -372,11 +380,12 @@ Static once As Boolean
                     DoEvents
                 End If
             Else
-                If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+                Call GetSystemTimeAsFileTime(basictimer)
+                If basictimer > .k1 Then .RRCOUNTER = 0
                 If REFRESHRATE <> 25 And ResetK1 Then .RRCOUNTER = 0
                 If .RRCOUNTER = 0 Then
                     If ResetK1 Then REFRESHRATE = 25
-                    .k1 = uintnew(timeGetTime) + REFRESHRATE: .RRCOUNTER = 1
+                    .k1 = basictimer + REFRESHRATE: .RRCOUNTER = 1
                     If byPassCallback Then Exit Sub
                     If some.Visible Then
                         If TypeOf some Is GuiM2000 Then
@@ -406,17 +415,19 @@ End Sub
 
 Public Sub MyDoEvents2(Optional obj As Object)
 On Error GoTo endevents
-If k1 = 0 Then k1 = uintnew(timeGetTime): RRCOUNTER = 1
-   If TaskMaster.PlayMusic Then
-                    TaskMaster.OnlyMusic = True
-                        TaskMaster.TimerTick
-                        TaskMaster.OnlyMusic = False
-    End If
-    If TaskMaster.Processing Then
+If TaskMaster.PlayMusic Then
+    If k1 = 0 Then Call GetSystemTimeAsFileTime(basictimer): k1 = basictimer: RRCOUNTER = 1
+    TaskMaster.OnlyMusic = True
+    TaskMaster.TimerTick
+    TaskMaster.OnlyMusic = False
+End If
+If TaskMaster.Processing Then
     If Not extreme Then
         If Not obj Is Nothing Then
               With Prefresh(GetCode(obj))
-                If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+                Call GetSystemTimeAsFileTime(basictimer)
+                If k1 = 0 Then k1 = basictimer: RRCOUNTER = 1
+                If basictimer > .k1 Then .RRCOUNTER = 0
                 If RRCOUNTER = 0 Then
                     If obj.Visible Then
                         If Kform Then
@@ -429,28 +440,25 @@ If k1 = 0 Then k1 = uintnew(timeGetTime): RRCOUNTER = 1
                         Else
                             MyDoEvents1 obj
                         End If
-                       '.k1 = uintnew(timeGetTime + REFRESHRATE)
                        .RRCOUNTER = 1
                     End If
                 End If
             End With
+        Else
+            If k1 = 0 Then Call GetSystemTimeAsFileTime(basictimer): k1 = basictimer: RRCOUNTER = 1
         End If
-        
     Else
-         If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
-         If RRCOUNTER = 0 Then k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
-               
-
-
-
+        Call GetSystemTimeAsFileTime(basictimer)
+        If k1 = 0 Then k1 = basictimer: RRCOUNTER = 1
+        If basictimer > k1 Then RRCOUNTER = 0
+        If RRCOUNTER = 0 Then k1 = basictimer + REFRESHRATE: RRCOUNTER = 1
     End If
 Else
-
-
-
- If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
- If RRCOUNTER = 0 Then
-        k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+    Call GetSystemTimeAsFileTime(basictimer)
+    If k1 = 0 Then: k1 = basictimer: RRCOUNTER = 1
+    If basictimer > k1 Then RRCOUNTER = 0
+    If RRCOUNTER = 0 Then
+        k1 = basictimer + REFRESHRATE: RRCOUNTER = 1
         If QRY Then
              DoEvents
         Else
@@ -467,7 +475,7 @@ Else
 End If
 Exit Sub
 endevents:
- DoEvents
+DoEvents
 End Sub
 
 
@@ -483,25 +491,25 @@ Loop Until lNumberOf10ThmiliSeconds < 0
 
 End Sub
 
-Public Sub SleepWaitNO(ByVal a As Long)
+Public Sub SleepWaitNO(ByVal A As Long)
 Exit Sub
  Dim b As New clsProfiler
 Dim l As Boolean, k
 l = NOEDIT
   b.MARKONE
-While a > b.MARKTWO And l = NOEDIT
+While A > b.MARKTWO And l = NOEDIT
 MyDoEvents2 Form1
 If Not TaskMaster Is Nothing Then If TaskMaster.Processing Then TaskMaster.TimerTick Else Sleep 0
 
- a = a \ 3
+ A = A \ 3
 Wend
 End Sub
-Private Sub SleepWaitNew(a As Long)
+Private Sub SleepWaitNew(A As Long)
  Dim b As New clsProfiler
   b.MARKONE
 Do
  MyDoEvents
-Loop Until a > b.MARKTWO
+Loop Until A > b.MARKTWO
 End Sub
 Public Sub SleepWaitEdit(bstack As basetask, lNumberOf10ThmiliSeconds As Long)
 On Error Resume Next
@@ -547,7 +555,7 @@ TaskMaster.rest
     ' try to convert the value to GMT.
     ft.dwHighDateTime = -CLng(dblDelay / dblUnits) - 1
     dblDelayLow = -dblUnits * (dblDelay / dblUnits - _
-        Fix(dblDelay / dblUnits))
+    Fix(dblDelay / dblUnits))
     
     If dblDelayLow < CDbl(&H80000000) Then
         ' &H80000000 is MAX_LONG, so you are just making sure
@@ -556,33 +564,31 @@ TaskMaster.rest
         dblDelayLow = dblUnits + dblDelayLow
         ft.dwHighDateTime = ft.dwHighDateTime + 1
     End If
-    
     ft.dwLowDateTime = CLng(dblDelayLow)
     lRet = SetWaitableTimer(hTimer, ft, 0, 0, 0, False)
-   With Prefresh(GetCode(bstack.Owner))
-    Do
-        ' QS_ALLINPUT means that MsgWaitForMultipleObjects will
-        ' return every time the thread in which it is running gets
-        ' a message. If you wanted to handle messages in here you could,
-        ' but by calling Doevents you are letting DefWindowProc
-        ' do its normal windows message handling---Like DDE, etc.
-        lBusy = MsgWaitForMultipleObjects(1, hTimer, False, _
-            INFINITE, QS_ALLINPUT&)
- 
-       If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
-            
+    With Prefresh(GetCode(bstack.Owner))
+        Do
+            ' QS_ALLINPUT means that MsgWaitForMultipleObjects will
+            ' return every time the thread in which it is running gets
+            ' a message. If you wanted to handle messages in here you could,
+            ' but by calling Doevents you are letting DefWindowProc
+            ' do its normal windows message handling---Like DDE, etc.
+            lBusy = MsgWaitForMultipleObjects(1, hTimer, False, _
+                INFINITE, QS_ALLINPUT&)
+            Call GetSystemTimeAsFileTime(basictimer)
+            If basictimer > .k1 Then .RRCOUNTER = 0
             If .RRCOUNTER = 0 Then
-            .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
-          If TaskMaster Is Nothing Then
-            DoEvents
-           Else
-             TaskMaster.StopProcess
-             DoEvents
-         TaskMaster.StartProcess
-         End If
-                  End If
-  Loop Until lBusy = WAIT_OBJECT_0
-  End With
+                    .k1 = basictimer + REFRESHRATE: .RRCOUNTER = 1
+                If TaskMaster Is Nothing Then
+                    DoEvents
+                Else
+                    TaskMaster.StopProcess
+                    DoEvents
+                    TaskMaster.StartProcess
+                End If
+            End If
+        Loop Until lBusy = WAIT_OBJECT_0
+    End With
     ' Close the handles when you are done with them.
     CloseHandle hTimer
 If Not TaskMaster Is Nothing Then TaskMaster.RestEnd
@@ -647,33 +653,31 @@ End If
     lRet = SetWaitableTimer(hTimer, ft, 0, 0, 0, False)
     Dim handlepopup As Boolean, lastpopup As Long
     Do
-         lBusy = MsgWaitForMultipleObjects(1, hTimer, False, _
-            INFINITE, QS_ALLINPUT&)
-           
-                  DoEvents
-            If Not Screen.ActiveForm Is Nothing Then
-                    If TypeOf Screen.ActiveForm Is GuiM2000 Then
-
-                        If Not handlepopup Then
-                            If Screen.ActiveForm.PopUpMenuVal Then
-                            lastpopup = Screen.ActiveForm.hDC
-                            handlepopup = True
-                            End If
-                       ElseIf GetForegroundWindow <> Screen.ActiveForm.hWnd Then
-       If handlepopup Then
+        lBusy = MsgWaitForMultipleObjects(1, hTimer, False, _
+        INFINITE, QS_ALLINPUT&)
+        
+        DoEvents
+        If Not Screen.ActiveForm Is Nothing Then
+            If TypeOf Screen.ActiveForm Is GuiM2000 Then
+                If Not handlepopup Then
+                    If Screen.ActiveForm.PopUpMenuVal Then
+                        lastpopup = Screen.ActiveForm.hDC
+                        handlepopup = True
+                    End If
+                ElseIf GetForegroundWindow <> Screen.ActiveForm.hWnd Then
+                    If handlepopup Then
                         handlepopup = False
                         SetVisibleByHDC lastpopup, False
-                        End If
-                        End If
-Else
-                        If GetForegroundWindow <> Screen.ActiveForm.hWnd Then Exit Do
-                        End If
-      
-
-
-End If
-Loop Until lBusy = WAIT_OBJECT_0
-    CloseHandle hTimer
+                    End If
+                End If
+            Else
+                If GetForegroundWindow <> Screen.ActiveForm.hWnd Then
+                    Exit Do
+                End If
+            End If
+        End If
+    Loop Until lBusy = WAIT_OBJECT_0
+CloseHandle hTimer
 If Not TaskMaster Is Nothing Then TaskMaster.RestEnd
 End Sub
 Sub SetVisibleByHDC(whatHDC As Long, setit As Long)

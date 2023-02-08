@@ -14,7 +14,10 @@ Attribute VB_Exposed = True
 Option Explicit
 'class for call back
 Private Declare Function GetCurrentProcessId Lib "kernel32" () As Long
-
+Private Declare Function timeBeginPeriod Lib _
+"winmm.dll" (ByVal uPeriod As Long) As Long
+Private Declare Function timeEndPeriod Lib _
+"winmm.dll" (ByVal uPeriod As Long) As Long
 Private objref As basetask
 Private mineHere$
 Private setstacklimit As Boolean
@@ -33,11 +36,11 @@ Friend Sub NoPublic(bstack As basetask, where$)
         Set objref.Owner = bstack.Owner
         mineHere$ = where$
 End Sub
-Friend Sub GetIcon(a As StdPicture)
+Friend Sub GetIcon(A As StdPicture)
 On Error Resume Next
 Dim k As StdPicture
 If IhaveExtForm Then
-ExtForm.GetIcon PackData(a)
+ExtForm.GetIcon PackData(A)
 End If
 End Sub
 Friend Function GetAppIcon() As StdPicture
@@ -73,16 +76,16 @@ End Function
 Property Get IhaveExtForm() As Boolean
 IhaveExtForm = Not ExtForm Is Nothing
 End Property
-Public Sub SetExtCaption(a$)
+Public Sub SetExtCaption(A$)
 On Error Resume Next
 If ExtForm Is Nothing Then Exit Sub
-If LenB(a$) = 0 Then
+If LenB(A$) = 0 Then
 Hide
 Form1.CaptionW = ExtForm.CaptionW
 Else
 Show
-lasttitle = a$
-ExtForm.CaptionW = a$
+lasttitle = A$
+ExtForm.CaptionW = A$
 End If
 End Sub
 Public Sub GetForm(f As Object)
@@ -94,7 +97,7 @@ Set Form3AppIcon = UnPackData(ExtForm.GetAppIcon())
 Err.Clear
 'If F Is Nothing Then Exit Sub
 End Sub
-Public Sub StackMax(stack As Long)
+Public Sub StackMax(Stack As Long)
 If IsWine Then
 stacksize = 32000000
 findstack = stacksize - 100000
@@ -107,10 +110,10 @@ If findstack - 100000 > 0 Then
 End If
 Exit Sub
 End If
-If stack = -12345 Then stacksize = 32000000: Exit Sub
-If stack > 1000000 Then
- stacksize = stack - 100000
- findstack = stack
+If Stack = -12345 Then stacksize = 32000000: Exit Sub
+If Stack > 1000000 Then
+ stacksize = Stack - 100000
+ findstack = Stack
 Else
 ClaimStack
 If findstack - 100000 > 0 Then
@@ -142,7 +145,7 @@ NERR = True: NOEXECUTION = True
 ExTarget = True: INK$ = Chr(27): UKEY$ = Chr$(27)
 If Cancel = -100 Then Exit Sub
 Set Form3AppIcon = LoadPicture("")
-For i = Forms.Count - 1 To 0 Step -1
+For i = Forms.count - 1 To 0 Step -1
 Set f = Forms(i)
 Set f.icon = LoadPicture("")
 If TypeOf f Is GuiM2000 Then
@@ -197,7 +200,7 @@ MyDoEvents
     exWnd = 0
 
     End If
-For i = Forms.Count - 1 To 0 Step -1
+For i = Forms.count - 1 To 0 Step -1
 Set f = Forms(i)
 Unload f
 Next i
@@ -342,14 +345,14 @@ For i = UBound(var()) To 0 Step -1: var(i) = 0&: Next i
 Finished = True
 End Sub
 Property Let ShowGui(RHS As Boolean)
-If Forms.Count = 0 Then Exit Property
+If Forms.count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
-If Form1.top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).top
+If Form1.Top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).Top
 Else
 If Form1.WindowState = 0 Then
-If Not (Forms.Count > 5) Then Form1.Visible = False
+If Not (Forms.count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
@@ -533,6 +536,7 @@ Private Sub Class_Initialize()
 Dim anyname As Long
 startaddress = VarPtr(anyname)
 stacksize = 900000
+timeBeginPeriod 1
  If Not l_complete Then NeoSubMain
         Set objref = New basetask
         Set objref.Owner = Form1.DIS
@@ -553,14 +557,15 @@ For i = -2 To 1000
     players(i) = Zero
     Prefresh(i) = zerocounter
 Next i
-If Forms.Count > 0 Then
-For i = Forms.Count - 1 To 0
+If Forms.count > 0 Then
+For i = Forms.count - 1 To 0
 Set Forms(i).icon = LoadPicture("")
 Unload Forms(i)
 Next i
 End If
 ReleaseMem
 l_complete = False
+timeEndPeriod 1
 End Sub
 Public Sub StopTimer()
   If hTimer <> 0 Then
@@ -633,20 +638,20 @@ End Property
 Public Property Get MayQuit() As Boolean
 MayQuit = Not Check2Save
 End Property
-Public Sub GetMess(a$)
+Public Sub GetMess(A$)
     If Not ExtForm Is Nothing Then
-        ExtForm.GetMessNow a$
+        ExtForm.GetMessNow A$
     End If
 End Sub
-Public Sub GetMessOneChar(a$)
+Public Sub GetMessOneChar(A$)
     If Not ExtForm Is Nothing Then
-        ExtForm.GetMessNow a$
+        ExtForm.GetMessNow A$
     End If
 End Sub
-Public Sub SendMess(a$)
+Public Sub SendMess(A$)
     If Not ExtForm Is Nothing Then
     On Error Resume Next
-        ExtForm.SendMessNow a$
+        ExtForm.SendMessNow A$
         If Err Then
         Me.Shutdown True
         

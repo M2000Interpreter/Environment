@@ -7,7 +7,7 @@ BEGIN
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
 Attribute VB_Name = "cTlsClient"
-Attribute VB_GlobalNameSpace = False
+Attribute VB_GlobalNameSpace = True
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
@@ -273,7 +273,7 @@ Public Function Connect( _
             ByVal HostPort As Long, _
             Optional ByVal UseTls As Boolean) As Boolean
     Const FUNC_NAME     As String = "Connect"
-    Dim tm As New clsProfiler, ok As Boolean
+    Dim TM As New clsProfiler, ok As Boolean
     On Error GoTo EH
     Close_
     CloseOk = False
@@ -283,13 +283,13 @@ Public Function Connect( _
     OnConnect = False
     Set m_oSocket = New cAsyncSocket
     Set mySocket = m_oSocket
-    tm.MARKONE
+    TM.MARKONE
     ok = m_oSocket.Connect(HostAddress, HostPort)
     If ok Then
         Do
             ProcTask2 Basestack1
             
-        Loop Until OnConnect Or CloseOk Or ErrorOk Or tm.MARKTWO > m_lConnectTimeout
+        Loop Until OnConnect Or CloseOk Or ErrorOk Or TM.MARKTWO > m_lConnectTimeout
         ok = OnConnect
     End If
     If Not ok Then
@@ -927,14 +927,14 @@ Private Function SyncReceive( _
             Optional HostAddress As String = STR_CHR1, _
             Optional HostPort As Long, _
             Optional ByVal Flags As Long = 0) As Boolean
-            Dim tm As New clsProfiler, escnow As Boolean
+            Dim TM As New clsProfiler, escnow As Boolean
             
             ErrorOk = False
             CloseOk = False
             If Timeout = 0 Then
                 Timeout = Znl(mySocket.SockOpt(&H1006), 5000)
             End If
-            tm.MARKONE
+            TM.MARKONE
             Debug.Print "Receive now", ReceiveOk
 again:
             If Not ReceiveOk Then
@@ -942,7 +942,7 @@ again:
             Do
                 ProcTask2 Basestack1
                 If escok Then escnow = KeyPressed(&H1B)
-            Loop Until ReceiveOk Or ErrorOk Or CloseOk Or escnow Or tm.MARKTWO > Timeout
+            Loop Until ReceiveOk Or ErrorOk Or CloseOk Or escnow Or TM.MARKTWO > Timeout
             End If
              If ReceiveOk And Not (ErrorOk Or CloseOk Or escnow) Then  '
                 ReceiveOk = False
@@ -962,13 +962,13 @@ Private Function SyncSend( _
             Optional HostAddress As String, _
             Optional ByVal HostPort As Long, _
             Optional ByVal Flags As Long = 0) As Boolean
-            Dim tm As New clsProfiler, escnow As Boolean, lResult As Long
+            Dim TM As New clsProfiler, escnow As Boolean, lResult As Long
             ErrorOk = False
             CloseOk = False
             If Timeout = 0 Then
                 Timeout = Znl(mySocket.SockOpt(&H1005), 5000)
             End If
-            tm.MARKONE
+            TM.MARKONE
             Debug.Print "Send now", SendOk
 again:
             If Not SendOk Then
@@ -976,7 +976,7 @@ again:
             Do
                 ProcTask2 Basestack1
                 If escok Then escnow = KeyPressed(&H1B)
-            Loop Until SendOk Or ErrorOk Or CloseOk Or escnow Or tm.MARKTWO > Timeout
+            Loop Until SendOk Or ErrorOk Or CloseOk Or escnow Or TM.MARKTWO > Timeout
             End If
             If SendOk And Not (ErrorOk Or CloseOk Or escnow) Then
                 Debug.Print "send start"
