@@ -44,7 +44,7 @@ Public Function FindDISPID(pobjTarget As Object, ByVal pstrProcName As Variant) 
     FindDISPID = -1
     If pobjTarget Is Nothing Then Exit Function
 
-    Dim A$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
+    Dim a$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
     ReDim myptr(0 To 0)
     myptr(0) = StrPtr(pstrProcName)
     
@@ -145,46 +145,46 @@ End If
 passhere:
         If items > 0 Or fixnamearg > 0 Then
                 ReDim varArr(0 To items - 1 + fixnamearg)
-                ReDim varARR2(0 To items - 1 + fixnamearg)
+                ReDim varArr2(0 To items - 1 + fixnamearg)
                 For lngLoop = 0 To items - 1 + fixnamearg
-
-                
-                If Not MyIsNumericPointer(pArgs(lngLoop)) Then
-                If myIsNull(pArgs(lngLoop)) Then
-                SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop)
-                ElseIf TypeOf pArgs(lngLoop) Is mArray Then
-                Set mmm = pArgs(lngLoop)
-                    If mmm.StrArray Then
-                    'SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop).refArray
-                    If VarType(mmm.refArray) = vbString Then
-                    varARR2(fixnamearg + items - 1 - lngLoop) = mmm.ExportStrArray()
-                    VarByRef VarPtr(varArr(fixnamearg + items - 1 - lngLoop)), varARR2(fixnamearg + items - 1 - lngLoop)
+                    If myIsNull(pArgs(lngLoop)) Then
+                        SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop)
+                    ElseIf Not MyIsNumericPointer(pArgs(lngLoop)) Then
+                        If TypeOf pArgs(lngLoop) Is refArray Then
+                        Dim ra As refArray
+                        Set ra = pArgs(lngLoop)
+                            ra.CreateRef VarPtr(varArr(fixnamearg + items - 1 - lngLoop))
+                        ElseIf TypeOf pArgs(lngLoop) Is mArray Then
+                            Set mmm = pArgs(lngLoop)
+                            ' fix for types
+                            If mmm.StrArray Then
+                            'SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop).refArray
+                                If VarType(mmm.refArray) = vbString Then
+                                    varArr2(fixnamearg + items - 1 - lngLoop) = mmm.ExportStrArray()
+                                    VarByRef VarPtr(varArr(fixnamearg + items - 1 - lngLoop)), varArr2(fixnamearg + items - 1 - lngLoop)
+                                Else
+                                    varArr(fixnamearg + items - 1 - lngLoop) = mmm.ExportStrArray()
+                                End If    '
+                            ElseIf VarTypeName(mmm.refArray) = "Long" Then
+                                If mmm.IsByValue Then
+                                    varArr(fixnamearg + items - 1 - lngLoop) = mmm.ExportArrayCopy()
+                                Else
+                                    mmm.ExportArrayNow
+                                    SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop).refArray
+                                End If
+                            Else
+                                SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop).refArray
+                            End If
+                        ElseIf TypeOf pArgs(lngLoop) Is MemBlock Then
+                            varArr2(fixnamearg + items - 1 - lngLoop) = pArgs(lngLoop).ExportToByte
+                            VarByRef VarPtr(varArr(fixnamearg + items - 1 - lngLoop)), varArr2(fixnamearg + items - 1 - lngLoop)
+                        Else
+                            SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop)
+                        End If
+                    ElseIf VarType(pArgs(lngLoop)) = 8200 Then
+                        varArr(fixnamearg + items - 1 - lngLoop) = pArgs(lngLoop)
                     Else
-                    varArr(fixnamearg + items - 1 - lngLoop) = mmm.ExportStrArray()
-                    End If
-'
-                    ElseIf VarTypeName(mmm.refArray) = "Long" Then
-                    If mmm.IsByValue Then
-                        varArr(fixnamearg + items - 1 - lngLoop) = mmm.ExportArrayCopy()
-                    Else
-                    mmm.ExportArrayNow
-                    
-                    SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop).refArray
-                    End If
-                    Else
-                    SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop).refArray
-                    End If
-                    
-                ElseIf TypeOf pArgs(lngLoop) Is MemBlock Then
-                    varArr(fixnamearg + items - 1 - lngLoop) = pArgs(lngLoop).ExportToByte
-                    ' fix this 8200 for all array types....
-                ElseIf VarType(pArgs(lngLoop)) = 8200 Then
-                    varArr(fixnamearg + items - 1 - lngLoop) = pArgs(lngLoop)
-                Else
-                    SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop)
-                End If
-                Else
-                    SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop)
+                        SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop)
                     End If
                 Next
               With params
@@ -461,6 +461,7 @@ End If
     ' filled in reverse order.
         For lngLoop = 0 To items - 1 + fixnamearg
             where = fixnamearg + items - 1 - lngLoop
+            
             If VariantIsRef(VarPtr(varArr(where))) Then
                 If Not MyIsNumericPointer(pArgs(lngLoop)) Then
                     If Not MyIsNumericPointer(varArr(where)) Then
@@ -472,10 +473,34 @@ End If
                         ElseIf VarType(varArr(where)) = 8200 Then
                             VarByRefClean VarPtr(varArr(where))
                             Set mmm = pArgs(lngLoop)
-                            mmm.FeedFromSrings varARR2(where)
+                            mmm.FeedFromSrings varArr2(where)
                             
                             Set mmm = Nothing
+                        ElseIf VarType(varArr(where)) = 8209 Then
+                            VarByRefClean VarPtr(varArr(where))
+                            If MyIsObject(pArgs(lngLoop)) Then
+                                If Not pArgs(lngLoop) Is Nothing Then
+                                    If TypeOf pArgs(lngLoop) Is MemBlock Then
+                                        Dim aMem As MemBlock
+                                        Set aMem = pArgs(lngLoop)
+                                        If aMem.ItemSize = 1 Then
+                                            If MemLong(ArrPtr(varArr2(where)) + 16) > 0 Then
+                                                If MemLong(ArrPtr(varArr2(where)) + 16) <> aMem.SizeByte Then
+                                                    aMem.ResizeItems MemLong(ArrPtr(varArr2(where)) + 16)
+                                                End If
+                                                MemCopy aMem.GetBytePtr(0), MemLong(ArrPtr(varArr2(where)) + 12), MemLong(ArrPtr(varArr2(where)) + 16)
+                                            Else
+                                            aMem.ResizeItems 4
+                                            MemLong(aMem.GetBytePtr(0)) = 0
+                                            End If
+                                            GoTo contnext
+                                        End If
+                                    End If
+                                End If
+                            End If
+                            GoTo regular
                         Else
+regular:
                             VarByRefCleanRef VarPtr(varArr(where))
                             SwapVariant varArr(where), pArgs(lngLoop)
                         End If
@@ -492,6 +517,7 @@ End If
             Else
                 SwapVariant varArr(where), pArgs(lngLoop)
             End If
+contnext:
             Next
     End If
     On Error Resume Next
@@ -499,18 +525,20 @@ End If
     Set IDsp = Nothing
     If IsObject(VarRet) Then
             Set robj = VarRet
-         VarRet = CLng(0)
-End If
+         VarRet = 0&
+    
+    
+    End If
 On Error GoTo there
 If TypeOf VarRet Is IUnknown Then
 If UCase(pstrProcName) = "_NEWENUM" Then
-Dim usehandler As mHandler
-Set usehandler = New mHandler
-usehandler.ConstructEnumerator VarRet
+Dim useHandler As mHandler
+Set useHandler = New mHandler
+useHandler.ConstructEnumerator VarRet
 Else
 MyEr "cant use this object", "δεν μπορώ να χειριστώ αυτό το αντικείμενο"
 End If
-VarRet = CLng(0)
+VarRet = 0&
 End If
 there:
 Err.Clear

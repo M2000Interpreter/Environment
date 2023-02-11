@@ -53,8 +53,9 @@ Dim myfile$(), myLevel() As Integer
 Public Event DirFinished()
 Public Event feedback(FileName$) ' dir or filenames...
 Dim Filetypes2find As String  ' input  "jpg|bmp"  or ""
+Public Event Add2List(FileName$) ' only files
 Dim mrec As Boolean
-Public abort As Boolean
+Public Abort As Boolean
 Public SortType As Long ' 0 is the default, 1 by name, 2 by type
 Public IncludedFolders As Boolean
 Public Nofiles As Boolean
@@ -172,7 +173,7 @@ Function NumberofDrives() As Integer
     Exit Function
 End Function
 
-Function DriveName(index As Integer) As String
+Function DriveName(Index As Integer) As String
     Dim i As Integer
     Dim Buffer As String
     Buffer = String$(260, 0)
@@ -188,7 +189,7 @@ Function DriveName(index As Integer) As String
           TheDrive = TheDrive & Mid$(Buffer, i, 1)
         If Asc(Mid$(Buffer, i, 1)) = 0 Then 'null separates drives
             DriveCount = DriveCount + 1
-            If DriveCount = index Then
+            If DriveCount = Index Then
                 DriveName = UCase(Left(TheDrive, 1))
                 Exit Function
             End If
@@ -225,13 +226,13 @@ End Function
 
 
 
-Public Property Get path() As String
+Public Property Get Path() As String
 If Len(LastPath) = 0 Then
 Else
 If Right$(LastPath, 1) <> "\" Then
-path = LastPath & "\"
+Path = LastPath & "\"
 Else
-path = LastPath
+Path = LastPath
 End If
 End If
 End Property
@@ -264,7 +265,7 @@ Public Function FindFolder(item As Long) As String
 Dim i As Long, lev As Integer
 lev = Abs(myLevel(item))
 If lev = 1 Then
-FindFolder = path
+FindFolder = Path
 Else
 For i = item - 1 To 0 Step -1
 If Abs(myLevel(i)) < lev Then Exit For
@@ -290,16 +291,16 @@ ReDim myfile$(100)
 ReDim myLevel(100) As Integer
 InUseItems = 0
 End Sub
-Public Property Get list(index As Long) As String
-If index < 0 Then
+Public Property Get list(Index As Long) As String
+If Index < 0 Then
 list = vbNullString
 Else
 If Not onetime Then onetime = True: once
-list = myfile$(index)
+list = myfile$(Index)
 End If
 End Property
-Public Property Let list(index As Long, RHS As String)
-myfile$(index) = RHS
+Public Property Let list(Index As Long, RHS As String)
+myfile$(Index) = RHS
 End Property
 
 Private Function CheckFile(ByVal expan$) As Boolean
@@ -343,7 +344,7 @@ Else
             ClearList ' CHANGE THIS TO APPEND...
            nDx = 0
     End If
-                abort = False
+                Abort = False
 ' ff must be a path
 ' so strip \
             If Right$(ff, 1) = "\" Then ff = Left$(ff, Len(ff) - 1)
@@ -476,7 +477,7 @@ End If
 If fhandle > 0 Then
 lookpath = StripNulls(wfd.cFileName)
 End If
-If Level = 3 Then mywait Basestack1, 5
+If Level = 3 Then DoEvents
 
 While lookpath <> ""
 If Pattern <> "" Then
@@ -488,7 +489,7 @@ If Not LCase(lookpath) Like LCase(Pattern) Then
 End If
 End If
 
-If fff Mod 30 = 29 Then mywait Basestack1, 1
+If fff Mod 30 = 29 Then DoEvents
     If isdirP(wfd) Or lookpath = ".." Then
          If lookpath = "." Or lookpath = ".." Then
         Else
@@ -530,7 +531,8 @@ Wend
 FindClose fhandle
 ' #1
 ' maybe we can hide that with a switch
- If Level = 1 And folder <> "" And ((LCase$(folder + "\") <> LCase$(TopFolder)) Or (TopFolder = "\")) Then AddAFile "...", Level: addthis = addthis + 1  '  may we needaswitch here to exclude that
+' use TopFolder to disable this
+If Level = 1 And folder <> "" And ((LCase$(folder + "\") <> LCase$(TopFolder)) Or (TopFolder = "\")) Then AddAFile "...", Level: addthis = addthis + 1  '  may we needaswitch here to exclude that
 If foldersonly Or foldersincluded Then
      ' #2
     If fff > 1 Then
@@ -549,21 +551,25 @@ If maxf > 0 Then
     Else
     QuickSortExtended mf$(), 1, maxf
     End If
+   
     Select Case SortType
     Case 1
     For k = 1 To maxf
         AddAFile mf$(k), Level
+        RaiseEvent Add2List(folder + "\" + mf$(k))
     Next k
     Case 2
     For k = 1 To maxf
         AddAFile Mid$(mf$(k), InStr(mf$(k), "#") + 1), Level
+        RaiseEvent Add2List(folder + "\" + Mid$(mf$(k), InStr(mf$(k), "#") + 1))
     Next k
     Case Else
     For k = 1 To maxf
         AddAFile Mid$(mf$(k), 20), Level
+        RaiseEvent Add2List(folder + "\" + Mid$(mf$(k), 20))
     Next k
     End Select
-  
+   
   If Level < 3 Then RaiseEvent feedback(folder & " (" & (maxf) & ") files")
 End If
 If Not mrec Then
@@ -602,7 +608,7 @@ maxf = maxf + look(Level + 1, folder & "\" & fold$(i), maxf + offset, IncludedFo
 Case Else
 maxf = maxf + look(Level + 1, folder & "\" & Mid$(fold$(i), 20), maxf + offset, IncludedFolders, Nofiles)
 End Select
-If abort Then Exit For
+If Abort Then Exit For
 Next i
 End If
 End If
@@ -615,90 +621,91 @@ look = 0
 End Function
 
 
-Public Sub QuickSortExtended(Arr() As String, ByVal LB As Long, ByVal UB As Long)
+
+Public Sub QuickSortExtended(arr() As String, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
 Dim Piv As String, tmp As String '<- adjust types here, when switching to something different than Long
      If UB - LB = 1 Then
      M1 = LB
-      If Arr(M1) > Arr(UB) Then tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = tmp
+      If arr(M1) > arr(UB) Then tmp = arr(M1): arr(M1) = arr(UB): arr(UB) = tmp
       Exit Sub
      Else
        M1 = (LB + UB) \ 2
-             If Arr(M1) = Arr(LB) Then
+             If arr(M1) = arr(LB) Then
                 M2 = UB - 1
                 M1 = LB
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If Arr(UB) < Arr(LB) Then tmp = Arr(LB): Arr(LB) = Arr(UB): Arr(UB) = tmp
+                        If arr(UB) < arr(LB) Then tmp = arr(LB): arr(LB) = arr(UB): arr(UB) = tmp
                         Exit Sub
                     End If
-                Loop Until Arr(M1) <> Arr(LB)
-                Piv = Arr(M1)
-                If M1 > LB Then If Arr(LB) > Piv Then Arr(M1) = Arr(LB): Arr(LB) = Piv: Piv = Arr(M1)
+                Loop Until arr(M1) <> arr(LB)
+                Piv = arr(M1)
+                If M1 > LB Then If arr(LB) > Piv Then arr(M1) = arr(LB): arr(LB) = Piv: Piv = arr(M1)
             Else
-                Piv = Arr(M1)
+                Piv = arr(M1)
                 M1 = LB
-                Do While (Arr(M1) < Piv): M1 = M1 + 1: Loop
+                Do While (arr(M1) < Piv): M1 = M1 + 1: Loop
             End If
     End If
     M2 = UB
     Do
-      Do While (Arr(M2) > Piv): M2 = M2 - 1: Loop
+      Do While (arr(M2) > Piv): M2 = M2 - 1: Loop
       If M1 <= M2 Then
-        tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = tmp 'swap
+        tmp = arr(M1): arr(M1) = arr(M2): arr(M2) = tmp 'swap
         M1 = M1 + 1
         M2 = M2 - 1
       End If
       If M1 > M2 Then Exit Do
-      Do While (Arr(M1) < Piv): M1 = M1 + 1: Loop
+      Do While (arr(M1) < Piv): M1 = M1 + 1: Loop
     Loop
-    If LB < M2 Then QuickSortExtended Arr, LB, M2
-    If M1 < UB Then QuickSortExtended Arr, M1, UB
+    If LB < M2 Then QuickSortExtended arr, LB, M2
+    If M1 < UB Then QuickSortExtended arr, M1, UB
 End Sub
-Private Sub QuickSortItemsFileNames(Arr() As String, ByVal LB As Long, ByVal UB As Long)
+Private Sub QuickSortItemsFileNames(arr() As String, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
 On Error GoTo abc1
 Dim Piv As String, tmp As String '<- adjust types here, when switching to something different than Long
      If UB - LB = 1 Then
      M1 = LB
-       If compareStr4(Arr(M1), Arr(UB)) = 1 Then tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = tmp
+       If compareStr4(arr(M1), arr(UB)) = 1 Then tmp = arr(M1): arr(M1) = arr(UB): arr(UB) = tmp
       Exit Sub
      Else
        M1 = (LB + UB) \ 2 '+ 1
-       Piv = Arr(M1)
-             If compareStr4(Arr(LB), Piv) = 0 Then
+       Piv = arr(M1)
+             If compareStr4(arr(LB), Piv) = 0 Then
                 M2 = UB - 1
                 M1 = LB
-                Piv = Arr(LB)
+                Piv = arr(LB)
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If compareStr4(Arr(UB), Piv) = -1 Then tmp = Arr(LB): Arr(LB) = Arr(UB): Arr(UB) = tmp
+                        If compareStr4(arr(UB), Piv) = -1 Then tmp = arr(LB): arr(LB) = arr(UB): arr(UB) = tmp
                         Exit Sub
                     End If
-                Loop Until compareStr4(Arr(M1), Piv)
-                Piv = Arr(M1)
-                If M1 > LB Then If compareStr4(Arr(LB), Piv) = 1 Then tmp = Arr(LB): Arr(LB) = Arr(M1): Arr(M1) = tmp: Piv = Arr(M1)
+                Loop Until compareStr4(arr(M1), Piv)
+                Piv = arr(M1)
+                If M1 > LB Then If compareStr4(arr(LB), Piv) = 1 Then tmp = arr(LB): arr(LB) = arr(M1): arr(M1) = tmp: Piv = arr(M1)
             Else
-                Piv = Arr(M1)
+                Piv = arr(M1)
                 M1 = LB
-                Do While compareStr4(Arr(M1), Piv) = -1: M1 = M1 + 1: Loop
+                Do While compareStr4(arr(M1), Piv) = -1: M1 = M1 + 1: Loop
             End If
     End If
     M2 = UB
     Do
-      Do While compareStr4(Arr(M2), Piv) = 1: M2 = M2 - 1: Loop
+      Do While compareStr4(arr(M2), Piv) = 1: M2 = M2 - 1: Loop
       If M1 <= M2 Then
-       If M1 <> M2 Then tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = tmp
+       If M1 <> M2 Then tmp = arr(M1): arr(M1) = arr(M2): arr(M2) = tmp
         M1 = M1 + 1
         M2 = M2 - 1
       End If
       If M1 > M2 Then Exit Do
-      Do While compareStr4(Arr(M1), Piv) = -1: M1 = M1 + 1: Loop
+      Do While compareStr4(arr(M1), Piv) = -1: M1 = M1 + 1: Loop
     Loop
-    If LB < M2 Then QuickSortItemsFileNames Arr, LB, M2
-    If M1 < UB Then QuickSortItemsFileNames Arr, M1, UB
+    If LB < M2 Then QuickSortItemsFileNames arr, LB, M2
+    If M1 < UB Then QuickSortItemsFileNames arr, M1, UB
     Exit Sub
 abc1:
     
@@ -937,7 +944,7 @@ CleanName = Replace(Name$, "|", "-")
 End Function
 
 Private Sub Class_Terminate()
-abort = True
+Abort = True
 End Sub
 Private Function myFILEDATeTIME(aa As FILETIME) As String
 ' i need 14 bytes,

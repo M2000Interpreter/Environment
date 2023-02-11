@@ -273,7 +273,7 @@ Private Function OpenJPGFile(ByVal inFile As String)
  qqq = FileLen(inFile)
  
     Open inFile For Binary Access Read As #fFile
-    If qqq > 2000 Then qqq = 2000
+    If qqq > 4000 Then qqq = 4000
 ReDim ExifTemp(qqq) As Byte
 
    

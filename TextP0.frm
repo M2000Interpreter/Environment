@@ -247,7 +247,7 @@ Const WM_CHAR = &H102
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
     X As Long
-    Y As Long
+    y As Long
 End Type
  Private Type Msg
     hWnd As Long
@@ -281,10 +281,10 @@ Public Property Get CaptionW() As String
 End Property
 
 
-Public Property Let CaptionW(ByVal NewValue As String)
+Public Property Let CaptionW(ByVal newValue As String)
 
-    m_Caption = NewValue
-DefWindowProcW Me.hWnd, &HC, 0, ByVal StrPtr(NewValue)
+    m_Caption = newValue
+DefWindowProcW Me.hWnd, &HC, 0, ByVal StrPtr(newValue)
 
 
 End Property
@@ -327,7 +327,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub DIS_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, State As Integer)
+Private Sub DIS_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -349,7 +349,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub dSprite_OLEDragOver(Index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, State As Integer)
+Private Sub dSprite_OLEDragOver(Index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -434,7 +434,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub Form_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, State As Integer)
+Private Sub Form_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -555,7 +555,7 @@ If KeyAscii = 9 Then KeyAscii = 0: Exit Sub
 If KeyAscii = 13 Then KeyAscii = 0: Exit Sub
 End Sub
 
-Private Sub gList1_OutPopUp(X As Single, Y As Single, myButton As Integer)
+Private Sub gList1_OutPopUp(X As Single, y As Single, myButton As Integer)
 Dim i As Long
 
 If Not gList1.enabled Then Exit Sub
@@ -572,7 +572,7 @@ i = .SelLength
 End With
 UNhookMe
 MyPopUp.feedlabels TEXT1, EditTextWord
-MyPopUp.Up X + gList1.Left, Y + gList1.Top
+MyPopUp.Up X + gList1.Left, y + gList1.top
 myButton = 0
 End Sub
 
@@ -659,7 +659,7 @@ End If
 End Select
 End Sub
 
-Private Sub List1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
+Private Sub List1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
 If item = -1 Then
 
 Else
@@ -1034,7 +1034,7 @@ End If
 
 End Sub
 
-Private Sub DIS_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub DIS_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
 If Not NoAction Then
 NoAction = True
 
@@ -1042,7 +1042,7 @@ If Button > 0 And Targets Then
 
 If Button = 1 Then
 Dim sel&
-    sel& = ScanTarget(q(), CLng(X), CLng(Y), 0)
+    sel& = ScanTarget(q(), CLng(X), CLng(y), 0)
     If sel& >= 0 Then
         Select Case q(sel&).id Mod 100
         Case Is < 10
@@ -1076,7 +1076,7 @@ End Sub
 
 
 
-Private Sub dSprite_MouseDown(Index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub dSprite_MouseDown(Index As Integer, Button As Integer, shift As Integer, X As Single, y As Single)
 Dim p As Long, u2 As Long
 If lockme Then Exit Sub
 If Not NoAction Then
@@ -1088,7 +1088,7 @@ With players(p)
 
         If Button > 0 And Targets Then
 
-        sel& = ScanTarget(q(), CLng(X), CLng(Y), Index)
+        sel& = ScanTarget(q(), CLng(X), CLng(y), Index)
             If sel& >= 0 Then
                 If Button = 1 Then
                 Select Case q(sel&).id Mod 100
@@ -1637,13 +1637,13 @@ End Sub
 
 
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
 If NoAction Then Exit Sub
 NoAction = True
 Dim sel&
 
 If Button > 0 And Targets Then
-sel& = ScanTarget(q(), CLng(X), CLng(Y), -1)
+sel& = ScanTarget(q(), CLng(X), CLng(y), -1)
 
 If sel& >= 0 Then
 
@@ -2515,7 +2515,7 @@ End If
 End Sub
 
 
-Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, Url As Variant, Flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
+Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, Url As Variant, flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
 If look1 Then
 look1 = False:  lookfirst = False
 
@@ -2656,7 +2656,7 @@ On Error Resume Next
 'tf2$ = THISFILE
 needset = False
 Dim MSD As String
-MSD = App.path
+MSD = App.Path
 AddDirSep MSD
 'View1.TabStop = True
 
@@ -2680,7 +2680,7 @@ If IsWine Then
 With view1
 On Error Resume Next
     .Visible = True
-    .Top = IEY
+    .top = IEY
     .Left = IEX
     .Width = IESizeX
     .Height = IESizeY
@@ -2860,7 +2860,7 @@ If Not cc.KeyExists Then
     
     cc.ValueKey = "DIV"
     cc.ValueType = REG_DWORD
-    cc.Value = CLng(0)
+    cc.Value = 0&
     UseIntDiv = False
     
     cc.ValueKey = "LINESPACE"
@@ -2919,7 +2919,7 @@ If Not cc.KeyExists Then
     
     cc.ValueKey = "INP-SWITCH"
     cc.ValueType = REG_DWORD
-    cc.Value = CLng(0)
+    cc.Value = 0&
     Use13 = False
     
     cc.ValueKey = "NBS-SWITCH"
@@ -2949,17 +2949,17 @@ If Not cc.KeyExists Then
     
     cc.ValueKey = "FOR-LIKE-BASIC"
     cc.ValueType = REG_DWORD
-    cc.Value = CLng(0)  ' NO бу DEFAULT
+    cc.Value = 0&  ' NO бу DEFAULT
     ForLikeBasic = False
 
     cc.ValueKey = "PRIORITY-OR"
     cc.ValueType = REG_DWORD
-    cc.Value = CLng(0)
+    cc.Value = 0&
     priorityOr = False  ' NO бу DEFAULT
 
     cc.ValueKey = "MDBHELP"
     cc.ValueType = REG_DWORD
-    cc.Value = CLng(0)
+    cc.Value = 0&
 Else
 ' *****************************
     If cc.Value = vbNullString Then
@@ -3358,12 +3358,12 @@ End Select
 TEXT1.mDoc.ColorEvent = Not TEXT1.NoColor
 
 End Sub
-Private Sub mywait11(bstack As basetask, ByVal PP)
+Private Sub mywait11(bstack As basetask, ByVal pp)
 Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents
-If PP = 0 Then Exit Sub
+If pp = 0 Then Exit Sub
 Else
 
 Err.Clear
@@ -3377,7 +3377,7 @@ End If
 End If
 Dim tn As Long, dt As Long
 tn = timeGetTime
-If PP < 1 Then dt = 1 Else dt = Signed(PP)
+If pp < 1 Then dt = 1 Else dt = Signed(pp)
 Do
 If TaskMaster.Processing And Not bstack.TaskMain Then
         If Not bstack.toprinter Then bstack.Owner.Refresh
@@ -3616,12 +3616,12 @@ ask = NeoASK(bstack)
 
 End Function
 
-Sub mywait(bstack As basetask, PP As Double, Optional SLEEPSHORT As Boolean = False)
+Sub mywait(bstack As basetask, pp As Double, Optional SLEEPSHORT As Boolean = False)
 Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents1 Form1
-If PP = 0 Then Exit Sub
+If pp = 0 Then Exit Sub
 Else
 
 Err.Clear
@@ -3634,7 +3634,7 @@ End If
 End If
 End If
 
-PP = PP + CCur(timeGetTime)
+pp = pp + CCur(timeGetTime)
 
 Do
 
@@ -3657,7 +3657,7 @@ Exit Do
 End If
 End If
 End If
-Loop Until PP <= CCur(timeGetTime) Or NOEXECUTION Or MOUT
+Loop Until pp <= CCur(timeGetTime) Or NOEXECUTION Or MOUT
 
                        If exWnd <> 0 Then
                 MyTitle$ bstack

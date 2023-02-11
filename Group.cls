@@ -84,7 +84,7 @@ If mytypes Is RHS Then
     MatchTypes = True
     Exit Function
 End If
-If mytypes.Count * extypes.Count = 0 Then Exit Function
+If mytypes.count * extypes.count = 0 Then Exit Function
 For Each k In extypes
     If TypeGroupNow(k) Then MatchTypes = True: Exit Function
 Next
@@ -100,8 +100,8 @@ Public Sub ResetEvents()
 If eventlist Is Nothing Then Exit Sub
 Dim i As Long
 With eventlist
-For i = 0 To .Count - 1
-    .index = i
+For i = 0 To .count - 1
+    .Index = i
     .Done = True
     .Value = vbNullString
     .sValue = 0
@@ -115,8 +115,8 @@ If eventlist Is Nothing Then Exit Sub
 Dim eventlist2 As New FastCollection
 Dim i As Long
 With eventlist
-For i = 0 To .Count - 1
-    .index = i
+For i = 0 To .count - 1
+    .Index = i
     .Done = True
     eventlist2.AddKey .KeyToString, ""
 Next i
@@ -324,6 +324,7 @@ If a Is Nothing Then Exit Property
 mTeam = True
 Else
 ' only when is in an array as Float Group
+Set LinkToGroup = a
 End If
 End Property
 Friend Property Get LinkGroup() As Group

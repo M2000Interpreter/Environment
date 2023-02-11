@@ -11,10 +11,10 @@ Private Type PeekArrayType
     Reserved    As Currency
 End Type
 
-Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (Arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
+Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
 Private Declare Function SafeArrayGetDim Lib "OleAut32.dll" (ByVal Ptr As Long) As Long
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
 Private Const E_POINTER As Long = &H80004003
 Private Const S_OK As Long = 0
 Private Const INTERNET_MAX_URL_LENGTH As Long = 2083
@@ -492,7 +492,7 @@ Public Function GetUrlPort(ByVal Address As String) As String
 End Function
 Public Function URLDecode( _
     ByVal Url As String, _
-    Optional ByVal PlusSpace As Boolean = True, Optional Flags As Long = 0) As String
+    Optional ByVal PlusSpace As Boolean = True, Optional flags As Long = 0) As String
     Url = Left$(Url, INTERNET_MAX_URL_LENGTH)
     Dim cchUnescaped As Long
     Dim hResult As Long
@@ -500,10 +500,10 @@ Public Function URLDecode( _
     If PlusSpace Then Url = Replace$(Url, "+", " ")
     cchUnescaped = Len(Url)
     URLDecode = String$(cchUnescaped, 0)
-    hResult = UrlUnescape(StrPtr(Url), StrPtr(URLDecode), cchUnescaped, Flags)
+    hResult = UrlUnescape(StrPtr(Url), StrPtr(URLDecode), cchUnescaped, flags)
     If hResult = E_POINTER Then
         URLDecode = String$(cchUnescaped, 0)
-        hResult = UrlUnescape(StrPtr(Url), StrPtr(URLDecode), cchUnescaped, Flags)
+        hResult = UrlUnescape(StrPtr(Url), StrPtr(URLDecode), cchUnescaped, flags)
     End If
     
     If hResult <> S_OK Then
@@ -936,12 +936,12 @@ Public Function URLEncodeEsc(cc As String, Optional space_as_plus As Boolean = F
 End Function
 Function DecodeEscape(c$, plus_as_space As Boolean) As String
 If plus_as_space Then c$ = Replace(c$, "+", " ")
-Dim A() As String, i As Long
-A() = Split(c$, "%")
-For i = 1 To UBound(A())
-A(i) = Chr(val("&h" + Left$(A(i), 2))) + Mid$(A(i), 3)
+Dim a() As String, i As Long
+a() = Split(c$, "%")
+For i = 1 To UBound(a())
+a(i) = Chr(val("&h" + Left$(a(i), 2))) + Mid$(a(i), 3)
 Next i
-DecodeEscape = utf8decode(StrConv(Join(A(), ""), vbFromUnicode))
+DecodeEscape = utf8decode(StrConv(Join(a(), ""), vbFromUnicode))
 
 End Function
 Sub ClearState1()
@@ -1098,6 +1098,9 @@ If VarStat Then
                 v = globalvar(W$, p, , VarStat, temphere$, UseType:=False)
             
               If extreme Then GoTo NewCheck2 Else GoTo NewCheck
+            ElseIf IsLabelSymbolNew(b$, "ÿ«÷…œ", "BYTE", Lang) Then
+                If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+                p = CByte(p)
             Else
                 If Not IsEnumAs(bstack, b$, p) Then
                     ExpectedEnumType
@@ -1166,6 +1169,9 @@ ElseIf NewStat Then
                 End If
                 v = globalvar(W$, p, , VarStat, temphere$, UseType:=False)
                 If extreme Then GoTo NewCheck2 Else GoTo NewCheck
+            ElseIf IsLabelSymbolNew(b$, "ÿ«÷…œ", "BYTE", Lang) Then
+                If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
+                p = CByte(p)
             Else
                 If Not IsEnumAs(bstack, b$, p) Then
                     ExpectedEnumType
@@ -3196,6 +3202,9 @@ Else
                         End If
                     End If
                 End If
+            ElseIf IsLabelSymbolNew(b$, "ÿ«÷…œ", "BYTE", Lang) Then
+                If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+                p = CByte(p)
             Else
                 If Not IsEnumAs(bstack, b$, p) Then
                     ExpectedEnumType
@@ -3246,7 +3255,7 @@ againarray:
         If ppppAny Is Nothing Then
             GoTo err000
         End If
-        If Not ppppAny.Arr Then
+        If Not ppppAny.arr Then
             If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , True, idx) Then GoTo errorarr
         ElseIf FastSymbol(b$, ")") Then
             Set pppp = ppppAny
@@ -3280,7 +3289,7 @@ againarray:
                     Else
                         Set pppp1 = New mArray: pppp1.PushDim (1): pppp1.PushEnd
                         pppp1.SerialItem 0, 2, 9
-                        pppp1.Arr = True
+                        pppp1.arr = True
                         If bstack.lastobj Is Nothing Then
                             pppp1.item(0) = p
                         Else
@@ -3710,7 +3719,7 @@ again12569:
             Else
                 If Not bstack.lastobj Is Nothing Then
                     If TypeOf bstack.lastobj Is iBoxArray Then
-                        If bstack.lastobj.Arr Then
+                        If bstack.lastobj.arr Then
                             Set ppppAny.item(v) = CopyArray(bstack.lastobj)
                         Else
                             Set ppppAny.item(v) = bstack.lastobj
@@ -3739,7 +3748,7 @@ again12569:
         End If
         Set bstack.lastobj = Nothing
      Else
-        If ppppAny.Arr Then
+        If ppppAny.arr Then
             If ppppAny.ItemType(v) = mGroup Then
 here12500:
                 If ppppAny.item(v).IamApointer Then
@@ -3751,7 +3760,7 @@ here65654:
                     Exec1 = SpeedGroup(bstack, ppppAny, "@READ", W$, b$, v)
                 Else
                     If p = 0# Then
-                        pppp.item(v) = CLng(0)  ' release pointer
+                        pppp.item(v) = 0&  ' release pointer
                     Else
                         GroupCantSetValue
                     End If
@@ -3782,7 +3791,7 @@ here65654:
             myProp.PushIndexes idx
             myProp.Value = p
             Set myProp = Nothing
-        ElseIf Not pppp.Arr Then
+        ElseIf Not pppp.arr Then
             NoAssignThere
         End If
     End If
@@ -3846,7 +3855,7 @@ MakeArray bstack, W$, 6, b$, pppp, NewStat, VarStat
         sss = Len(b$): ExecuteVar = 4: Exit Function
 End If
 If neoGetArray(bstack, W$, ppppAny) Then
-    If Not ppppAny.Arr Then
+    If Not ppppAny.arr Then
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , , idx) Then GoTo err000
 GoTo there12567
 ElseIf FastSymbol(b$, ")") Then
@@ -3920,7 +3929,7 @@ ElseIf FastSymbol(b$, ")") Then
         Else
             Set pppp1 = New mArray: pppp1.PushDim (1): pppp1.PushEnd
             pppp1.SerialItem 0, 2, 9
-            pppp1.Arr = True
+            pppp1.arr = True
             If bstack.lastobj Is Nothing Then
                 pppp1.item(0) = vbNullString
             Else
@@ -3944,7 +3953,7 @@ If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
 ' WHY BEFORE WAS : If pppp.itemtype(v) = myArray And Not pppp.Arr Then
 there12567:
-If ppppAny.Arr Then
+If ppppAny.arr Then
 If ppppAny.ItemType(v) = myArray Then
 If FastSymbol(b$, "(") Then
 Set ppppAny = ppppAny.item(v)
@@ -4103,7 +4112,7 @@ Else
     If Not MyIsObject(ppppAny.item(v)) Then
     
     If TypeOf ppppAny Is mArray Then
-        If ppppAny.Arr Then
+        If ppppAny.arr Then
         Set pppp = ppppAny
         If pppp.count = 0 Then
             pppp.GroupRef.Value = ss$
@@ -4111,7 +4120,7 @@ Else
             pppp.ItemStr(v) = ss$
         Else
             If Typename(bstack.lastobj) = myArray Then
-                If bstack.lastobj.Arr Then
+                If bstack.lastobj.arr Then
                     Set pppp.item(v) = CopyArray(bstack.lastobj)
                 Else
                     Set pppp.item(v) = bstack.lastobj.GroupRef
@@ -4297,23 +4306,28 @@ entry00022:
                 End If
                 
                 If myVarType(ar(sp, p), vbObject) Then
+                
                 Set p = ar(sp, p)
                 If p Is Nothing Then
-                    NoOperatorForThatObject Typename(p)
+                    NoOperatorForThatObject "=>"
                 ElseIf TypeOf p Is Group Then
-    
-                If p.link.IamFloatGroup Then
-                    ExecuteVar = 10
-    
-                    Mid$(b$, 1, 2) = ChrW(7) + ChrW(3)
+                    If p.link Is Nothing Then
+                        NoOperatorForThatObject "=>"
+                        
+                    ElseIf p.link.IamFloatGroup Then
+                        ExecuteVar = 10
+        
+                        Mid$(b$, 1, 2) = ChrW(7) + ChrW(3)
+                        Set bstack.lastpointer = p
+                        Exit Function
+                    Else
+                        ExecuteVar = 9
+                        Mid$(b$, 1, 1) = Chr$(0) + Chr$(0) ' cause we have two chars
+                        Set bstack.lastpointer = p
+                        Exit Function
+                    End If
                 Else
-                    ExecuteVar = 9
-                    Mid$(b$, 1, 1) = Chr$(0) + Chr$(0) ' cause we have two chars
-                End If
-                Set bstack.lastpointer = p
-                Exit Function
-                Else
-                    NoOperatorForThatObject Typename(p)
+                    NoOperatorForThatObject "=>"
                 End If
                 Else
                     WrongType
@@ -4423,8 +4437,14 @@ takeitnow:
                                         End If
                                         ElseIf TypeOf bstack.lastobj Is Group Then
                                                 Set sp = bstack.lastobj
+                                                If Not sp.IamApointer Then
+                                                Set bstack.lastobj = Nothing
+                                                Set bstack.lastpointer = Nothing
                                                 MakeGroupPointer bstack, sp
                                                 sp = 0
+                                                Else
+                                                Set sp = Nothing
+                                                End If
                                         End If
                                     ' check this
                                         ar(CVar(i), p) = CVar(bstack.lastobj)
@@ -4521,7 +4541,7 @@ If neoGetArray(bstack, W$, pppp) Then
 againintarr:
 If Not NeoGetArrayItem(pppp, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
-If pppp.ItemType(v) = myArray And pppp.Arr Then
+If pppp.ItemType(v) = myArray And pppp.arr Then
 If FastSymbol(b$, "(") Then
 Set pppp = pppp.item(v)
 GoTo againintarr
@@ -4621,7 +4641,7 @@ End If
 If Not IsExp(bstack, b$, p) Then MissNumExpr: GoTo err000
 If Not bstack.lastobj Is Nothing Then
     If TypeOf bstack.lastobj Is mArray Then
-                                 If bstack.lastobj.Arr Then
+                                 If bstack.lastobj.arr Then
                                          Set pppp.item(v) = CopyArray(bstack.lastobj)
 
                                  Else
@@ -5017,7 +5037,7 @@ Case 5, 7
                         Set pppp.item(it) = myobject
                         Set myobject = Nothing
                     ElseIf Typename$(myobject) = myArray Then
-                                  If myobject.Arr Then
+                                  If myobject.arr Then
                         Set pppp.item(it) = CopyArray(myobject)
                     Else
                         Set pppp.item(it) = myobject
@@ -5082,7 +5102,7 @@ Case 5, 7
                     Set pppp.item(it) = myobject
                     Set myobject = Nothing
                 ElseIf Typename$(myobject) = myArray Then
-                    If myobject.Arr Then
+                    If myobject.arr Then
                         Set pppp.item(it) = CopyArray(myobject)
                     Else
                         Set pppp.item(it) = myobject
@@ -5309,6 +5329,8 @@ checkconstant:
                             If Not Fast2Varl(rest$, "√—¡ÃÃ¡", 6, "STRING", 6, 6, ff) Then
                                 MyRead = False: MissType: Exit Function
                             End If
+                        Case vbByte
+                            If Not Fast2Varl(rest$, "ÿ«÷…œ", 5, "BYTE", 4, 5, ff) Then MyRead = False: MissType: Exit Function
                         Case Else
                             p = IsLabel(bstack, rest$, (what$))  ' just throw any name
                         End Select
@@ -5542,7 +5564,7 @@ islambda:
         If Left$(s$, 1) = "#" Then  ' for copy in
             s$ = Mid$(s$, 2)
             If IsNumberNew(bstack, (s$), p, False) Then
-                ss$ = "_" + Str$(var2used)
+                ss$ = "_" + str$(var2used)
                 If bstack.SubLevel > 0 Then
                     MyEr "not for Read statement", "¸˜È „È· ÙÁÌ ƒÈ‹‚·ÛÂ"
                     MyRead = False
@@ -5754,13 +5776,13 @@ arrconthere:
         If GetSub(s$, i) Then
         If Len(sbf(i).sbgroup) > 0 Then
         If sbf(i).Extern > 0 Then
-        s$ = Left$(what$, Len(what$) - 1) + " {CALL EXTERN" + Str$(sbf(i).Extern) + "'" + ChrW(&H1FFD) + "}" + sbf(i).sbgroup
+        s$ = Left$(what$, Len(what$) - 1) + " {CALL EXTERN" + str$(sbf(i).Extern) + "'" + ChrW(&H1FFD) + "}" + sbf(i).sbgroup
         Else
         s$ = Left$(what$, Len(what$) - 1) + " {" + sbf(i).sb + "}" + sbf(i).sbgroup
         End If
         Else
         If sbf(i).Extern > 0 Then
-        s$ = Left$(what$, Len(what$) - 1) + " {CALL EXTERN" + Str$(sbf(i).Extern) + "'" + ChrW(&H1FFD) + "}"
+        s$ = Left$(what$, Len(what$) - 1) + " {CALL EXTERN" + str$(sbf(i).Extern) + "'" + ChrW(&H1FFD) + "}"
         Else
         s$ = Left$(what$, Len(what$) - 1) + " {" + sbf(i).sb + "}"
         End If
@@ -6520,6 +6542,9 @@ conthereEnum:
                 End If
                 End If
                 ihavetype = False
+            Case "ÿ«÷…œ", "BYTE"
+                If FastSymbol(rest$, "=") Then optlocal = Not useoptionals: useoptionals = True: If Not IsNumberD2(rest$, (p)) Then missNumber: Exit Function
+                p = CByte(p)
             Case Else
                 ss$ = s$
                 it = True
@@ -6706,6 +6731,8 @@ cont112233:
                             p = Empty
                             ihavetype = False
                             checktype = False
+                        Case "ÿ«÷…œ", "BYTE"
+                            p = CByte(0)
                         Case Else
 cont234356:
                         
@@ -7197,6 +7224,12 @@ Case 4
                         optlocal = Not useoptionals: useoptionals = True
                     End If
                 p = CCur(p)
+            ElseIf Fast2Varl(rest$, "ÿ«÷…œ", 5, "BYTE", 4, 5, ff) Then
+                    If FastSymbol(rest$, "=") Then
+                        If Not IsNumberD2(rest$, (p), True) Then missNumber: Exit Function
+                        optlocal = Not useoptionals: useoptionals = True
+                    End If
+                p = CByte(p)
             Else
             GoTo er110
             End If
@@ -7355,7 +7388,7 @@ Case 5, 7
             MyRead = True
             GoTo loopcont123
         ElseIf Typename$(myobject) = myArray Then
-            If myobject.Arr Then
+            If myobject.arr Then
                 Set pppp.item(it) = CopyArray(myobject)
             Else
                 Set pppp.item(it) = myobject
@@ -7426,7 +7459,7 @@ Case 6
                     Set myobject = Nothing
 
             ElseIf Typename$(myobject) = myArray Then
-                    If myobject.Arr Then
+                    If myobject.arr Then
                         Set pppp.item(it) = CopyArray(myobject)
                     Else
                         Set pppp.item(it) = myobject

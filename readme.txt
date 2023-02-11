@@ -1,10 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 10 active-X
-Remove the String Bug (for version 12):
-Dim A$(10): Print A$(3)=""
-now return true (previous the A$(3) have an empty type variant and that turned to "0", nut now turned to empty string).
-Now kb module in info run as expected.
+Version 12 Revision 12 active-X
+Byte as new type (so now all arithmetic types are same as in VB6)
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

@@ -25,6 +25,20 @@ Private ihavearray As Boolean, isok As Boolean
 Private Declare Function SafeArrayRedim Lib "oleaut32" (ByVal saPtr As Long, ByVal saBound As Long) As Long
 Private OneDimension As Boolean
 Public flat As Boolean
+Friend Sub CreateRef(ByVal a As Long)
+    If flat Then
+        VarByRef a, p
+    Else
+        VarByRef a, p(0)
+    End If
+End Sub
+Private Sub VarByRef(ByVal a As Long, ByRef b As Variant)
+Dim t(0 To 3) As Long
+   CopyMemory t(0), ByVal VarPtr(b), 16
+   t(0) = t(0) Or &H4000
+   t(2) = VarPtr(b) + 8
+   CopyMemory ByVal a, t(0), 16
+End Sub
 Function NewRef(Optional ByRef RHS) As refArray
 Dim z As New refArray
 If Not IsMissing(RHS) Then z.writevalue = RHS
@@ -32,7 +46,7 @@ z.flat = flat
 Set NewRef = z
 End Function
 Property Get Copy() As refArray
-Dim z As New refArray, PP
+Dim z As New refArray, pp
 If isok Then
         Dim i As Long, j As Long, m, ra As refArray
         If flat Then
@@ -77,29 +91,29 @@ Dim ppp As Object
                 
             End If
         Else
-            PP = p(i)
-            j = Elements(PP)
-            If VarType(PP) = vbVariant + vbArray Then
+            pp = p(i)
+            j = Elements(pp)
+            If VarType(pp) = vbVariant + vbArray Then
             If j > 0 Then
                 For j = j - 1 To 0 Step -1
                 
-                    If IsObject(PP(j)) Then
+                    If IsObject(pp(j)) Then
                         
-                        Set m = PP(j)
+                        Set m = pp(j)
                         On Error Resume Next
-                        Set m = PP(j).Copy()
+                        Set m = pp(j).Copy()
                         Err.Clear
                         z(j) = m
                         Set m = Nothing
                     End If
                 Next j
             End If
-            ElseIf VarType(PP) = vbArray + vbObject Then
+            ElseIf VarType(pp) = vbArray + vbObject Then
             If j > 0 Then
                 For j = j - 1 To 0 Step -1
                 
                    
-                        Set m = PP(j)
+                        Set m = pp(j)
                         If Not m Is Nothing Then
                         On Error Resume Next
                         Set m = m.Copy()
@@ -112,7 +126,7 @@ Dim ppp As Object
                 Next j
             End If
             End If
-            z(i) = PP
+            z(i) = pp
         End If
     Next i
 Else
@@ -134,7 +148,7 @@ Else
     
 End If
 End Property
-Property Let Value(Optional where, Optional what, that)
+Property Let Value(Optional where, Optional what, Optional WHAT1, Optional what2, that)
 Dim mt As Integer, wt As Integer
 
 If IsMissing(where) Then
@@ -213,6 +227,10 @@ entry1:
                 End If
             ElseIf myVarType(that, vbObject) Then
                 Set p(where) = that
+                
+            ElseIf (MemInt(VarPtr(that)) And vbArray) <> 0 Then
+            
+                SwapVariant p(where), that
             Else
                 p(where) = that
             End If
@@ -269,7 +287,7 @@ entry1:
 ElseIf Not IsMissing(where) Then
     ihavearray = True
     If where < 0 Then
-        p = that
+        p = what
         isok = True
     Else
         p = Array()
@@ -279,7 +297,7 @@ ElseIf Not IsMissing(where) Then
     End If
 End If
 End Property
-Property Get Value(Optional where, Optional what)
+Property Get Value(Optional where, Optional what, Optional WHAT1, Optional what2)
 Attribute Value.VB_UserMemId = 0
 If ihavearray Then
     If isok Then
@@ -325,10 +343,10 @@ If ihavearray Then
                 End Select
         End If
     Else
-    Dim PP As Long
-    PP = Elements(p(where))
-        If PP > 0 Then
-            If what >= 0 And what < PP Then
+    Dim pp As Long
+    pp = Elements(p(where))
+        If pp > 0 Then
+            If what >= 0 And what < pp Then
                 
                 Select Case VarType(p(where)) - vbArray
                 Case vbObject
@@ -393,19 +411,23 @@ Sub UBoundTo(where)
         End If
     End If
 End Sub
-Property Get ArrPtr(Optional where) As Long
+Property Get ArrPtr(Optional where, Optional where1, Optional where2) As Long
+Dim pp As Long
 If ihavearray Then
     If isok Then
         If IsMissing(where) Then
             ArrPtr = MemLong(UnsignedAdd(VarPtr(p), 8))
             ArrPtr = MemLong(UnsignedAdd(ArrPtr, 12))
-        Else
-            Dim PP As Long
-            PP = Elements(p(where))
-            If PP > 0 Then
+        ElseIf IsMissing(where1) Then
+            pp = Elements(p(where))
+            If pp > 0 Then
             ArrPtr = MemLong(UnsignedAdd(VarPtr(p(where)), 8))
             ArrPtr = MemLong(UnsignedAdd(ArrPtr, 12))
             End If
+        ElseIf IsMissing(where2) Then
+            pp = Elements(p(where))
+        Else
+        
         End If
     End If
 End If
@@ -416,9 +438,9 @@ If ihavearray Then
         If IsMissing(where) Then
             SafeArrPtr = MemLong(UnsignedAdd(VarPtr(p), 8))
         Else
-            Dim PP As Long
-            PP = Elements(p(where))
-            If PP > 0 Then
+            Dim pp As Long
+            pp = Elements(p(where))
+            If pp > 0 Then
                 SafeArrPtr = MemLong(UnsignedAdd(VarPtr(p(where)), 8))
             End If
         End If
@@ -438,12 +460,30 @@ Function Elements(vArray As Variant) As Long
     End If
     End If
 End Function
+Public Function Elements2(vArray As Variant) As Long
+    Dim lPtr            As Long
+    Const VT_BYREF      As Long = &H4000
+    If IsArray(vArray) Then
+    lPtr = MemLong(UnsignedAdd(VarPtr(vArray), 8))
+    If (MemLong(VarPtr(vArray)) And VT_BYREF) <> 0 Then
+        lPtr = MemLong(lPtr)
+    End If
+    If lPtr <> 0 Then
+        Dim i As Long, p As Long
+        p = 1
+        For i = 1 To MemInt(lPtr)
+            p = p * MemLong(UnsignedAdd(lPtr, 8 + i * 8))
+        Next i
+        Elements2 = p
+    End If
+    End If
+End Function
 Public Function UnsignedAdd(ByVal lUnsignedPtr As Long, ByVal lSignedOffset As Long) As Long
     '--- note: safely add *signed* offset to *unsigned* ptr for *unsigned* retval w/o overflow in LARGEADDRESSAWARE processes
     UnsignedAdd = ((lUnsignedPtr Xor &H80000000) + lSignedOffset) Xor &H80000000
 End Function
-Public Sub DefArrayAt(where, Arrtype, Optional Size As Long = 10)
-If Size < 0 Then Size = 0
+Public Sub DefArrayAt(where, Arrtype, Optional size As Long = 10, Optional Size1 As Long, Optional Size2 As Long)
+If size < 0 Then size = 0
 If ihavearray Then
     If isok Then
         If UBound(p) < where Then
@@ -463,13 +503,24 @@ Else
          isok = True
 
 End If
-Dim PP
-PP = LibMemory.EmptyArray(1, Arrtype)
-ReDim PP(Size)
+Dim pp
+
 If where = -1 Then
-    SwapVariant p, PP
+    pp = LibMemory.EmptyArray(1, Arrtype)
+    ReDim pp(size)
+    SwapVariant p, pp
 Else
-    SwapVariant p(where), PP
+    If Size1 <= 0 Then
+        pp = LibMemory.EmptyArray(1, Arrtype)
+        ReDim pp(size)
+    ElseIf Size2 <= 0 Then
+        pp = LibMemory.EmptyArray(2, Arrtype)
+        ReDim pp(size, Size1)
+    Else
+        pp = LibMemory.EmptyArray(3, Arrtype)
+        ReDim pp(size, Size1, Size2)
+    End If
+    SwapVariant p(where), pp
 End If
 ihavearray = True
 isok = True
@@ -486,14 +537,14 @@ Property Get ItemType(item) As Long
 End Property
 Public Function IsInnerRefArray(item, R As refArray) As Boolean
  If ihavearray And isok Then
-            Dim PP As Object
+            Dim pp As Object
                 If Me.MarkTwoDimension Then
                 If Elements(p) > item Then
                     If MemInt(VarPtr(p(item))) = 9 Then
-                        Set PP = p(item)
-                    If Not PP Is Nothing Then
-                    If TypeOf PP Is refArray Then
-                        Set R = PP
+                        Set pp = p(item)
+                    If Not pp Is Nothing Then
+                    If TypeOf pp Is refArray Then
+                        Set R = pp
                         IsInnerRefArray = True
                         End If
                         End If
@@ -501,10 +552,10 @@ Public Function IsInnerRefArray(item, R As refArray) As Boolean
                 End If
                 ElseIf Elements(p(0)) > item Then
                     If MemInt(VarPtr(p(0)(item))) = 9 Then
-                        Set PP = p(0)(item)
-                    If Not PP Is Nothing Then
-                    If TypeOf PP Is refArray Then
-                        Set R = PP
+                        Set pp = p(0)(item)
+                    If Not pp Is Nothing Then
+                    If TypeOf pp Is refArray Then
+                        Set R = pp
                         IsInnerRefArray = True
                         End If
                         End If
@@ -524,9 +575,9 @@ Public Function tuple(ParamArray v())
         tuple = z()
     End If
 End Function
-Property Get Hash(item As Long, Optional what As Long = -1, Optional ByVal Size As Long = 4) As Long
+Property Get Hash(item As Long, Optional what As Long = -1, Optional ByVal size As Long = 4) As Long
     Dim mPtr As Long, ssize As Long
-    If Size < 1 Then Exit Property
+    If size < 1 Then Exit Property
     If ihavearray And isok Then
     
     Select Case VarType(Value(item))
@@ -541,7 +592,7 @@ Property Get Hash(item As Long, Optional what As Long = -1, Optional ByVal Size 
                 Hash = 1
             Else
                 ssize = MemLong(mPtr - 4)
-                HashData mPtr, ssize, VarPtr(Hash), Size
+                HashData mPtr, ssize, VarPtr(Hash), size
             End If
         End If
     End Select
@@ -575,6 +626,124 @@ ex1:
 ''SafeArrayUnaccessData mPtr
 
 End Function
+Private Function VarTypeNameList(v, Optional addstr As String) As String
+Dim n As Integer
+    n = MemInt(VarPtr(v))
+    Select Case n
+        Case 0
+            VarTypeNameList = "Empty"
+        Case 1
+            VarTypeNameList = "Null"
+        Case 2
+            VarTypeNameList = "Integer"
+        Case 3
+            VarTypeNameList = "Long"
+        Case 4
+            VarTypeNameList = "Single"
+        Case 5
+            VarTypeNameList = "Double"
+        Case 6
+            VarTypeNameList = "Currency"
+        Case 7
+            VarTypeNameList = "Date"
+        Case 8
+            VarTypeNameList = "String"
+        Case 10
+            VarTypeNameList = "Error"
+        Case 9, 13
+            VarTypeNameList = Typename(v)
+        Case 11
+            VarTypeNameList = "Boolean"
+        Case 12, 1
+            VarTypeNameList = "Variant"
+        Case 14
+            VarTypeNameList = "Decimal"
+        Case 17
+            VarTypeNameList = "Byte"
+        Case 20
+            VarTypeNameList = "Long Long"
+        Case 36
+            VarTypeNameList = Typename(v)
+        Case Is > 8192
+            VarTypeNameList = ArrayDesc(v, addstr)
+        Case Else
+            VarTypeNameList = "type" & VarType(v)
+    End Select
+End Function
+Public Function ArrayDesc(vArray As Variant, str As String) As String
+    Dim lPtr            As Long
+    Const VT_BYREF      As Long = &H4000
+    If IsArray(vArray) Then
+        lPtr = MemLong(UnsignedAdd(VarPtr(vArray), 8))
+        If (MemLong(VarPtr(vArray)) And VT_BYREF) <> 0 Then
+            lPtr = MemLong(lPtr)
+        End If
+        If lPtr <> 0 Then
+            Dim i As Long, p As String, aType As String
+            Select Case MemInt(VarPtr(vArray)) And &HFFF
+            Case 2
+                aType = "Integer"
+            Case 3
+                aType = "Long"
+            Case 4
+                aType = "Single"
+            Case 5
+                aType = "Double"
+            Case 6
+                aType = "Currency"
+            Case 7
+                aType = "Date"
+            Case 8
+                aType = "String"
+            Case 9, 13  '   VT_DISPATCH = 9, VT_UNKNOWN = 13
+                aType = "Object"
+            Case 11
+                aType = "Boolean"
+            Case 12, 1
+                aType = "Variant"
+            Case 14
+                aType = "Decimal"
+            Case 17 ' VT_UI1 = 17
+                aType = "Byte"
+            Case 20
+                aType = "Long Long"
+            Case 27 '  VT_SAFEARRAY = 27
+                aType = "Array"
+            Case 29 ' VT_USERDEFINED = 29
+                aType = "UDT"
+            Case 36
+                aType = Typename(vArray)
+            End Select
+            For i = 1 To MemInt(lPtr)
+                p = p & "[" & MemLong(UnsignedAdd(lPtr, 8 + i * 8)) & "]"
+            Next i
+            ArrayDesc = aType & str & p
+            Exit Function
+        End If
+        ArrayDesc = "EmptyArray"
+        Exit Function
+    End If
+    ArrayDesc = "type" & VarType(vArray)
+End Function
+Property Get vtTypeString(Optional where) As String
+If ihavearray Then
+    If isok Then
+        If IsMissing(where) Or flat Then
+            If Not IsMissing(where) Then
+                vtTypeString = VarTypeNameList(p(where))
+            Else
+                If MarkTwoDimension Then
+                    vtTypeString = VarTypeNameList(p(0), Mid$(VarTypeNameList(p), 8))
+                Else
+                    vtTypeString = VarTypeNameList(p)
+                End If
+            End If
+        Else
+            vtTypeString = VarTypeNameList(p(where))
+        End If
+    End If
+End If
+End Property
 Property Get vtType(Optional where) As Integer
 If ihavearray Then
     If isok Then
@@ -590,10 +759,10 @@ If ihavearray Then
                 
             End If
         Else
-            Dim PP As Long
+            Dim pp As Long
             If Elements(p) >= where Then
-            PP = Elements(p(where))
-            If PP > 0 Then
+            pp = Elements(p(where))
+            If pp > 0 Then
                 vtType = MemInt(VarPtr(p(where))) - vbArray
             Else
                 vtType = MemInt(VarPtr(p(where))) ' not an array ??
@@ -629,11 +798,11 @@ Else
 DefArrayAt -1, thistype, 0
 End If
 End Sub
-Public Sub RedimForFlat(Size As Long)
+Public Sub RedimForFlat(size As Long)
     If ihavearray Then
     If isok Then
     If flat Then
-        ReDim Preserve p(Size)
+        ReDim Preserve p(size)
     End If
     End If
     End If
