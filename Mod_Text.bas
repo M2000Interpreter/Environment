@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 11
+Global Const Revision = 12
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -9082,14 +9082,34 @@ conthere123:
         End If
         
     Else
-        If MyIsNumeric(var(VR)) Then
+        Select Case MemInt(VarPtr(var(VR)))
+        Case Is < 8, 11, 17, 14, 20
             R = var(VR)
-       '
-        ElseIf Not MyIsObject(var(VR)) Then
+        Case 36 ' udt
+            If FastSymbol(a$, "|") Then
+             If FastPureLabel(a$, s$) > 0 Then
+                Err.Clear
+                On Error Resume Next
+                GetUDTValue var(VR), s$, R
+                If Err Then
+                    MyEr Err.Description & " " & Err.Number, Err.Description & " " & Err.Number
+                ElseIf MyIsObject(p) Then
+                    Set bstack.lastobj = R
+                    Set R = Nothing
+                    R = 0
+                End If
+             Else
+                SyntaxError
+             End If
+            Else
             R = var(VR)
-        Else
+            End If
+        Case 8192 To 8228
+            ' make it an refarray???
+            R = var(VR)
+        Case Else
             R = 0
-        End If
+        End Select
     End If
     IsNumberNew = True
 ElseIf VR = -1 Then
@@ -9145,7 +9165,7 @@ Else
                     If VarType(var(V1&)) = vbObject Then
                         If TypeOf var(V1&) Is stdCallFunction Then
                             w2 = var(V1&).GetAddress
-                            R = -uintnew1(w2)
+                            R = w2
                             
                             IsLabel bstack, a$, v$
                             IsNumberNew = True
@@ -10647,7 +10667,7 @@ contAr2L:
     End If
     
     If ppppL.arr Then
-                                                                                   Set pppp = ppppL
+        Set pppp = ppppL
         dn = 0
         pppp.SerialItem (0), dd, 5
         dd = dd - 1
@@ -10937,8 +10957,28 @@ comehere:
                     On Error Resume Next
                     If TypeOf ppppL Is mArray Then
                         Set pppp = ppppL
+                        If pppp.ItemTypeNum(w2) = 36 Then
+                             If FastSymbol(a$, "|") Then
+                                If FastPureLabel(a$, s$) > 0 Then
+                                    Err.Clear
+                                    On Error Resume Next
+                                    GetUDTValue pppp.item(w2), s$, R
+                                    If Err Then
+                                        MyEr Err.Description & " " & Err.Number, Err.Description & " " & Err.Number
+                                    ElseIf MyIsObject(p) Then
+                                        Set bstack.lastobj = R
+                                        Set R = Nothing
+                                        R = 0
+                                    End If
+                                Else
+                                    SyntaxError
+                                End If
+                            Else
+                                R = pppp.itemnumeric(w2)
+                            End If
+                        Else
                         R = pppp.itemnumeric(w2)
-                        
+                        End If
                         If Err Then R = 0: Err.Clear
                         On Error GoTo 0
                     Else
@@ -14696,6 +14736,7 @@ jump1:
                             Set bstackstr.lastobj = ppppL.GroupRef.lastobjfinal
                             If Not bstackstr.lastobj Is Nothing Then p = vbNullString
                             If FastSymbol(a$, "#") Then
+                                    
                                 If TypeOf bstackstr.lastobj Is mHandler Then
                                     Set usehandler = bstackstr.lastobj
                                     Set bstackstr.lastobj = Nothing
@@ -24964,7 +25005,7 @@ End If
 End If
 End Function
 
-Function NeoGetArrayItem(pp As iBoxArray, bstack As basetask, v$, offset As Long, rst$, Optional noObject As Boolean = False, Optional closepar As Boolean = True, Optional fromstr As Boolean, Optional rightexpr As Boolean = False, Optional idx As mIndexes) As Boolean
+Function NeoGetArrayItem(pp As iBoxArray, bstack As basetask, v$, Offset As Long, rst$, Optional noObject As Boolean = False, Optional closepar As Boolean = True, Optional fromstr As Boolean, Optional rightexpr As Boolean = False, Optional idx As mIndexes) As Boolean
 If pp Is Nothing Then
     MyEr "Internal Error: NeoGetArrayItem", "εσωτερικό λάθος: NeoGetArrayItem": Exit Function
 End If
@@ -24995,7 +25036,7 @@ If Not pp.arr Then
                         .Index = Int(p)
                     End If
                     .Index = p
-                    offset = -.Index - 100
+                    Offset = -.Index - 100
                     .Done = True
                 Else
                     MyEr "Index out of limits", "Δείκτης εκτός ορίων"
@@ -25010,7 +25051,7 @@ contlabel1:
                     NeoGetArrayItem = False
                     Exit Function
                 Else
-                    offset = -.Index - 100
+                    Offset = -.Index - 100
                 End If
                 If Typename(.ValueObj) = mGroup Then
                     If .ValueObj.HasParametersSet Or .ValueObj.HasParameters Then
@@ -25053,7 +25094,7 @@ contlabel1:
                 End If
             End If
         End If
-        offset = -2
+        Offset = -2
         NeoGetArrayItem = True
         Exit Function
     Else
@@ -25083,7 +25124,7 @@ conthere:
         Set pppp = pp
         If pppp.SerialItem((0), dd, 5) Then
             dd = dd - 1
-            offset = 0
+            Offset = 0
             If dd < 0 Then If VarTypeName(pppp.GroupRef) = mProp Then GoTo contprop
             Do While dn <= dd
                 pppp.GetDnum dn, w3, lim
@@ -25098,7 +25139,7 @@ conthere:
                     If p < -lim Then
                         MyEr "index too low for array " + v$ + sp$, "χαμηλός δείκτης στο πίνακα " + v$ + sp$: Exit Function
                     End If
-                    If pppp.PushOffset(offset, dn, CLng(p)) Then
+                    If pppp.PushOffset(Offset, dn, CLng(p)) Then
                         NeoGetArrayItem = True
                     Else
                         MyEr "index too high for array " + v$ + sp$, "δείκτης υψηλός για το πίνακα " + v$ + sp$: Exit Function
@@ -25116,15 +25157,15 @@ conthere:
     End If
     If lookOne(rst, "(") Then
 CheckThis:
-        ppp$ = VarTypeName(pp.item(offset))
+        ppp$ = VarTypeName(pp.item(Offset))
         If ppp$ = myArray Then
             FastSymbol rst$, "("
-            Set pp = pp.item(offset)
+            Set pp = pp.item(Offset)
             NeoGetArrayItem = False
             GoTo again123
         ElseIf ppp$ = mHdlr Then
             FastSymbol rst$, "("
-            Set usehandler = pp.item(offset)
+            Set usehandler = pp.item(Offset)
             If usehandler.t1 = 3 Then
                 If Typename(usehandler.objref) = myArray Then
                     Set pp = usehandler.objref
@@ -25140,7 +25181,7 @@ CheckThis:
             p = vbEmpty
             NeoGetArrayItem = pp.arr
             GoTo again123
-        ElseIf VarTypeName(pp.item(offset)) = mGroup Then
+        ElseIf VarTypeName(pp.item(Offset)) = mGroup Then
             NeoGetArrayItem = True
         End If
 End If
@@ -32954,7 +32995,7 @@ Else
 Between = (a >= b And a <= c) And Not a = exclude
 End If
 End Function
-Function StructPage(basestack As basetask, rest$, Lang As Long, ByVal offset, ByRef offset2, offsetlist As FastCollection, ByVal lasthead$) As Boolean
+Function StructPage(basestack As basetask, rest$, Lang As Long, ByVal Offset, ByRef offset2, offsetlist As FastCollection, ByVal lasthead$) As Boolean
 Dim what$, offset1 As Long, i As Long, s$, b$, p As Variant, w2 As Long, maxOffset As Long, probeoffset As Long, usehandler As mHandler
 Dim itissingle As Boolean
     b$ = NLtrim$(block(rest$))
@@ -32985,7 +33026,7 @@ again1:
     ElseIf FastSymbol(b$, "{") Then
     ' IS A NEW PAGE
     probeoffset = 0
-    If StructPage(basestack, b$, Lang, offset, probeoffset, offsetlist, lasthead$) Then
+    If StructPage(basestack, b$, Lang, Offset, probeoffset, offsetlist, lasthead$) Then
         If probeoffset > maxOffset Then maxOffset = probeoffset
         FastSymbol b$, ","
         ' leave offset as is
@@ -33007,17 +33048,17 @@ again1:
         Exit Function
         End If
 
-        If StructPage(basestack, b$, Lang, offset, probeoffset, offsetlist, lasthead$ + what$ + ".") Then
+        If StructPage(basestack, b$, Lang, Offset, probeoffset, offsetlist, lasthead$ + what$ + ".") Then
             If FastSymbol(b$, "*") Then
                 p = 1&
                 If Not IsExp(basestack, b$, p) Then MissNumExpr: Exit Function
                 p = MyRound(p)
-                If p * (probeoffset - offset) + offset > &H1FFFFFFF Then ' half gigabyte for struct (is very big too)
+                If p * (probeoffset - Offset) + Offset > &H1FFFFFFF Then ' half gigabyte for struct (is very big too)
                     GoTo err111
                 ElseIf p <= 0 Then
                     GoTo err222
                 End If
-                probeoffset = p * (probeoffset - offset) + offset
+                probeoffset = p * (probeoffset - Offset) + Offset
             End If
             
             
@@ -33025,11 +33066,11 @@ again1:
 
             ' leave offset as is
     
-            offsetlist.AddKey myUcase(lasthead$ + what$, True), CVar(offset)
+            offsetlist.AddKey myUcase(lasthead$ + what$, True), CVar(Offset)
             If offsetlist.Done Then
-            offsetlist.sValue = probeoffset - offset
+            offsetlist.sValue = probeoffset - Offset
             If FastSymbol(b$, ";") Then
-            offset = probeoffset
+            Offset = probeoffset
             End If
             ' keytype not used for strucrures except for single values
             ' so Eval() can read single from 4 bytes
@@ -33114,7 +33155,7 @@ comehere:
             Exit Function
         Else
             p = MyRound(p)
-            If p * Abs(offset1) + offset > &H1FFFFFFF Then  ' half gigabyte for struct (is very big too)
+            If p * Abs(offset1) + Offset > &H1FFFFFFF Then  ' half gigabyte for struct (is very big too)
 err111:
                 MyEr "Too big size for struct", "Μεγάλο μέγεθος για δομή"
                 Exit Function
@@ -33134,10 +33175,10 @@ err222:
     Exit Function
     End If
     
-    offsetlist.AddKey myUcase(lasthead$ + what$, True), CVar(offset)
+    offsetlist.AddKey myUcase(lasthead$ + what$, True), CVar(Offset)
     If offsetlist.Done Then offsetlist.sValue = w2
     If itissingle Then offsetlist.KeyTypeValue = CInt(vbSingle): itissingle = False
-    offset = offset + Abs(offset1)
+    Offset = Offset + Abs(offset1)
     If FastSymbol(b$, ",") Then
     If NocharsInLine(b$) Or b$ = vbNullString Then
     GoTo cont147
@@ -33153,16 +33194,16 @@ err222:
     End If
 cont147:
     Loop Until Not Between(FastPureLabel(b$, what$), 1, 3, 2)
-    If maxOffset < offset Then
-        offset2 = offset
+    If maxOffset < Offset Then
+        offset2 = Offset
     Else
         offset2 = maxOffset
     End If
     StructPage = True
     GoTo again1
    End If
-    If maxOffset < offset Then
-    offset2 = offset
+    If maxOffset < Offset Then
+    offset2 = Offset
     Else
     offset2 = maxOffset
     End If
@@ -33337,6 +33378,7 @@ Case vbDouble
 v = CDbl(v)
 Case vbByte
 v = CByte(v)
+Case 36
 Case vbUserDefinedType
 If MemInt(VarPtr(v)) <> i Then
 MissType
@@ -44730,13 +44772,16 @@ If isboolean Then
 Else
 contboolean:
 On Error Resume Next
- If CheckInt64(p) Then
+ Select Case MemByte(VarPtr(p))
+ Case 20
     s$ = CStr(p)
- ElseIf VarType(p) = vbString Then
+ Case vbString
     s$ = LTrim$(p)
- Else
+ Case 9, 36
+    s$ = "*" + Typename$(p)
+ Case Else
     s$ = LTrim$(str(p))
- End If
+ End Select
  If Err Then s$ = Typename$(p): Err.Clear
     If Left$(s$, 1) = "." Then
     s$ = "0" + s$

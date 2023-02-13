@@ -1,7 +1,8 @@
 M2000 Interpreter and Environment
 
 Version 12 Revision 12 active-X
-Byte as new type (so now all arithmetic types are same as in VB6)
+Bug removed (now ZipWork module in info run as expected).
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
