@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 12
+Global Const Revision = 13
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -9083,7 +9083,7 @@ conthere123:
         
     Else
         Select Case MemInt(VarPtr(var(VR)))
-        Case Is < 8, 11, 17, 14, 20
+        Case Is < 9, 11, 17, 14, 20
             R = var(VR)
         Case 36 ' udt
             If FastSymbol(a$, "|") Then

@@ -269,8 +269,13 @@ If mTeam Then
                           End If
             End If
 End If
+If MemInt(VarPtr(bank(cursor))) = 20 Then
+item = MemCur(VarPtr(bank(cursor)))
+MemInt(VarPtr(item)) = 20
 
+Else
 item = bank(cursor)
+End If
 End If
 
 End Sub

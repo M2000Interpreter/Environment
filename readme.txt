@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 12 active-X
-Bug removed (now ZipWork module in info run as expected).
-
+Version 12 Revision 13 active-X
+Some bugs removed, one from revision 12, and others older (but from version 12).
+Also some new modules added in info file and an update on CE (ceasar encode/decode message). New modules: RANKING, LIFEGAME, KERNIGHAN, PRIMITIVE.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

@@ -5627,7 +5627,7 @@ BackGround {
 if height.pixels=1024 or height.pixels/width.pixels>0.70 then
       Form  80,68
 else
-	Window 12, sx*.95, sy*.92;
+	Window 12, sx*.95, sy*.86;
 	BackGround {cls,0 }
        form 100, height+2;
   end if
@@ -5641,7 +5641,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 45 for M2000 Interpreter version 12, revision 4 and above"
+	Report " A collection of modules for tests version 46 for M2000 Interpreter version 12, revision 13 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -8727,18 +8727,25 @@ MODULE CE {a$="THIS IS MY TEXT TO ENCODE WITH CAESAR CIPHER"
 Function Cipher$(a$, N) {
       If Len(a$)=0 Then Exit
       a$=Ucase$(a$)
-      N=N mod 25 +1
       \\ Integer in Mem is unsigned number
       Buffer Mem as Integer*Len(a$)
       Return Mem, 0:=a$
       For i=0 to Len(a$)-1 {
-            If Eval(mem, i)>=65 and Eval(mem, i)<=90 then Return Mem, i:=(Eval(mem, i)-65+N) mod 26+65
+            If Eval(mem, i)>=65 and Eval(mem, i)<=90 then Return Mem, i:=(Eval(mem, i)-39+n) mod 26 + 65
        }
        =Eval$(Mem)
 }
-B$=Cipher$(a$, 12)
+B$=Cipher$(a$, 10)
 Print B$
-Print Cipher$(B$,12)
+Print Cipher$(B$,-10)
+B$=Cipher$(a$, 24)
+Print B$
+Print Cipher$(B$,-24)
+n=1 ' n negative or positive or zero
+for i=65 to 65+25
+	a=(1+(i -64)+n+24) mod 26 + 65
+	? chr$(a), 
+next
 }
 MODULE CO {Module Check {
       \\ we use an internal object for Math functions (here for Atan2)
@@ -21452,7 +21459,7 @@ MODULE USETHIS {try {
 	PEN 14
 	CLS,0
 	If Version<12 then Error "No proper M2000 version (must be >=12)"
-	If Version=12 and revision<4 then Error "No proper M2000 revision for version 4 (need revision >=4)"
+	If Version=12 and revision<13 then Error "No proper M2000 revision for version 4 (need revision >=13)"
 	Set Fast
 	Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 	dir user
@@ -21684,8 +21691,8 @@ back {
 	Def en_passant_rank=0, en_passant_file=0
 	for i=1 to 8 :emptydisp$(i)=string$(" ",i):next i
 	Def board$, status$, oldI, color1, color2, C=14
-	color1=Color(209, 139, 71)
-	color2=Color(255, 206,158)
+	color2=Color(209, 139, 71)
+	color1=Color(255, 206,158)
 	
 	dim line$()
 	Def flashtime=300
@@ -40458,11 +40465,14 @@ Pen retColor {
 	Report @Count$(AdvancedWG,"bit")+" for W AND NOT G"
 	Report 2, "press any key"
 }
-// wait for a key
-push key$: drop
-cls oldback,0
-pen oldpen
-
+Push key$
+Drop
+If module(Infobasic) then
+	keyboard "Infobasic", 13
+else
+	cls oldback,0
+	pen oldpen
+end if
 // user simple static function (called using @Count())
 Function Count$(v, tp$)
 	ret=@Count(v)
@@ -41029,5 +41039,252 @@ Print "Press Any Key"
 Push Key$
 Drop
 If module(infobasic) then keyboard "infobasic", 13
+}
+MODULE LIFEGAME {//  https://rosettacode.org/wiki/Kernighans_large_earthquake_problem#M2000_Interpreter
+Module Life {
+	Font "arial"
+	if random(2)=1 then
+		Form 40, 18
+		linespace 0	
+		form 40, 18;
+		form 	
+	else
+		Form 40, 18
+	end if
+	Cls 3,0
+	Double
+	Report 2,  "Game of Life"
+	Normal
+	Cls 5, 2
+	Const Mx=20, My=10
+	Dim A(0 to Mx+1, 0 to My+1)=0
+	Flush
+rem 	Data (2,2),(2,3),(3,3),(4,3),(5,4),(,3,4),(5,3),(6,2),(8,5),(5,8)
+	Data (5,3)
+	Data (5,4)
+	Data (5,5)
+	generation=1
+	While not empty
+		(A, B)=Array
+		A(A,B)=1
+	End While
+	Display()
+	Do
+		k$=Key$
+		If k$=chr$(13) Then exit
+		A()=@GetNext()
+		refresh 500
+		Display()
+	Until A()#Sum()=0
+	K$=Key$
+	Cls, 0
+	End
+	Function GetNext()
+		Local B()
+		B()=A()  ' copy array
+		Local B=B()  ' get a pointer
+		B*=0  ' make all element zero
+		Local i, j, tot
+		For j=1 to My
+			For i=1 to Mx
+				tot=-A(i,j)
+				For k=j-1 to j+1
+					For m=i-1 to i+1
+						tot+=A(m, k)
+					Next
+				Next
+				If A(i,j)=1 Then
+					If tot=2 or tot=3 Then B(i,j)=1
+				Else.if tot=3 Then
+					B(i,j)=1
+				End If
+			Next
+		Next
+		=B()
+	End Function
+	Sub Display()
+		Cursor 0,2
+		move !    ' move graphic to character cursor
+		Fill scale.x, scale.y-pos.Y, 1, 5
+		Print "Generation:";Generation
+		Generation++
+		Local i, j
+		For j=1 to My
+			Print @(width div 2-Mx div 2);
+			For i=1 to Mx
+				Print If$(A(I,J)=1->"■", "□");
+			Next
+			Print
+		Next
+		Print 
+		Report 2, "Press enter to exit or any other key for Next generation"
+	End Sub
+}
+Life
+if module(infobasic) then keyboard "infobasic", 13
+}
+MODULE KERNIGHAN {Module Find_Magnitude  {
+	data$={8/27/1883    Krakatoa            8.8
+	5/18/1980    MountStHelens       7.6
+	3/13/2009    CostaRica           5.1
+	1/23/4567    EdgeCase1           6
+	1/24/4567    EdgeCase2           6.0
+	1/25/4567    EdgeCase3           6.1
+	}
+	Open "data.txt" for output as F
+	Print #F, data$;
+	Close #F
+	Open "data.txt" for input as F
+	While not eof(#F)
+		Line Input #f, part$
+		REM if val(mid$(part$,30))>6 then print part$
+		if val(mid$(part$,rinstr(rtrim$(part$)," ")))>6 then print part$
+	End While
+	Close #F
+}
+Find_Magnitude
+}
+MODULE PRIMITIVE {// https://rosettacode.org/wiki/Define_a_primitive_data_type#M2000_Interpreter
+cls 0
+pen 15
+linespace 0
+font "Arial"
+Form 80, 70;
+double
+Report 6, {Define a primitive data type
+
+}
+normal
+Report {Demonstrate how to define a type that behaves like an integer but has a lowest valid value of 1 and a highest valid value of 10. Include all bounds checking you need to write, or explain how the compiler or interpreter creates those bounds checks for you.
+
+}
+Report {            Class typeA {
+            Private:
+                  mval as currency 
+            Public:
+                  Property min {value}=-1
+                  Property max {value}=0
+                  Operator "++" {
+                        if .mval=.[max] then Error "Number bigger than Max Value"
+                        .mval++
+                  }
+                  Operator "--" {
+                        if .mval=.[min] then Error "Number lower than Min Value"
+                        .mval--
+                  }
+                  Operator "+=" (x){
+                        if .mval>.[max]+x then Error "Number bigger than Max Value"
+                        .mval+=x
+                  }
+                  Operator "-=" (x) {
+                        if .mval<.[min]-x then Error "Number lower than Min Value"
+                        .mval-=x
+                  }
+                  Value {
+                    =.mval
+                  }
+                  Set (x) {
+                        if x>.[max] then Error "Number bigger than Max Value"
+                        if x<.[min] then Error "Number lower than Min Value"
+                        currency .mval<=int(x)
+                  }
+            Class:
+                  Module typeA (.[min], .[max]) {
+                      .mval<=.[min]
+                  }
+            }
+
+
+}
+
+Module CheckDataType {
+      Print "Example"
+      Module CheckThis {
+            Class typeA {
+            Private:
+                  mval as currency 
+            Public:
+                  Property min {value}=-1
+                  Property max {value}=0
+                  Operator "++" {
+                        if .mval=.[max] then Error "Number bigger than Max Value"
+                        .mval++
+                  }
+                  Operator "--" {
+                        if .mval=.[min] then Error "Number lower than Min Value"
+                        .mval--
+                  }
+                  Operator "+=" (x){
+                        if .mval>.[max]+x then Error "Number bigger than Max Value"
+                        .mval+=x
+                  }
+                  Operator "-=" (x) {
+                        if .mval<.[min]-x then Error "Number lower than Min Value"
+                        .mval-=x
+                  }
+                  Value {
+                    =.mval
+                  }
+                  Set (x) {
+                        if x>.[max] then Error "Number bigger than Max Value"
+                        if x<.[min] then Error "Number lower than Min Value"
+                        .mval<=int(x)
+                  }
+            Class:
+                  Module typeA (.[min], .[max]) {
+                      .mval<=.[min]
+                  }
+            }
+            K=typeA(1, 10)
+            K=5
+            Def TypeExp$(x)=Type$(x)
+            Print Type$(K)="Group", TypeExp$(K)="Currency"
+            K--
+            Print K
+            K=K+1
+            Print K, K.Max, K.Min
+            K+=4
+            Print K, K.Max, K.Min
+            Print -K*4=-36
+            Try Ok {
+                  K=400
+            }
+            If  Error or Not Ok then Print Error$
+            \\ make a new K as K with name Z
+            Z=Group(K)
+            Print Z.Max, Z.Min, Z
+            K++
+            Z=Group(K)
+            Print Z=K
+            K-=5
+            \\ We make M as pointer to K
+            M->K
+            Print Eval(M), K
+            For M {This++}
+            Print Eval(M), K
+            For M {This=8}
+            Print Eval(M), K
+            Push Group(M), Group(M)
+      }
+      CheckThis
+      \\ Read Group from stack of values and place a copy in each item in A()
+      Dim A(4)=Group
+      \\ We have one more group in stack, so we read it to new variable What
+      \\ What isn't a pointer to object, is the object (internal is a pointer to objet but isn't usable for M2000)
+      Read What 
+      What++
+      Print What.Max=10, What.Min=1, What=9  ' True True True
+      Print A(2).Max=10, A(2).Min=1, A(2)=8 ' True True True
+      m->A(2) ' m is a pointer to object in A(2), and now A(2) is a pointer also
+      Print m is type typeA
+      Print Eval(m)=8, m=>Max, m=>Min
+      m=>=10
+      Print eval(A(2))=10, A(2).Min, A(2).Max,  A(2)=>Min, A(2)=>Max
+}
+CheckDataType
+Pen 11 {Print "Press any key"}
+Push key$
+Drop
+If module(Infobasic) then keyboard "Infobasic", 13
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
