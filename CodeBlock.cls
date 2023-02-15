@@ -626,7 +626,7 @@ If ms.LookTopVal = "&" Then
         If Not Identifiers.ExistKey(v) Then
             Identifiers.AddKey v
         End If
-        Code(p).codevar = Identifiers.index
+        Code(p).codevar = Identifiers.Index
 End If
 
 End If
@@ -704,7 +704,7 @@ If ms.LookTopVal = "&" Then
         If Not Identifiers.ExistKey(v) Then
             Identifiers.AddKey v
         End If
-        Code(p).codevar = Identifiers.index
+        Code(p).codevar = Identifiers.Index
 End If
 End If
 End If
@@ -932,7 +932,7 @@ End If
 If Not Identifiers.ExistKey(v) Then
     Identifiers.AddKey v
 End If
-.codevar = Identifiers.index
+.codevar = Identifiers.Index
 Case 16
 If .codevar = -1 Then
     GetHandler
@@ -1034,7 +1034,7 @@ End If
 
 End Sub
 Function RetStr(X As Integer, base As Long) As String
-If X > 0 Then RetStr = " skip to" + Str$(X + base)
+If X > 0 Then RetStr = " skip to" + str$(X + base)
 End Function
 Sub ExportStr(b As Object)
 
@@ -1057,7 +1057,7 @@ End If
 For i = 0 To LastCode
     With Code(i)
     
-    Add Str$(i) + Str$(.codepos) + Str$(.codetype)
+    Add str$(i) + str$(.codepos) + str$(.codetype)
     Select Case .codetype
     Case 9
         If .codevar < -1 Then
@@ -1133,11 +1133,11 @@ For i = 0 To LastCode
     End Select
     End With
 Next i
-Add "Number Literals:" + Str$(numbers) + vbCrLf
-Add "String Literals:" + Str$(strconst) + vbCrLf
-Add "Identifiers:" + Str$(Identifiers.count) + vbCrLf
+Add "Number Literals:" + str$(numbers) + vbCrLf
+Add "String Literals:" + str$(strconst) + vbCrLf
+Add "Identifiers:" + str$(Identifiers.count) + vbCrLf
 If LastVar - numbers - strconst + 1 > 0 Then
-Add "Labels :" + Str$(LastVar - numbers - strconst + 1) + vbCrLf
+Add "Labels :" + str$(LastVar - numbers - strconst + 1) + vbCrLf
 End If
 ex12:
 ' unhide next two lines to get results to clipboard
@@ -1153,6 +1153,8 @@ Else
 Clipboard.Clear
 SetTextData CF_UNICODETEXT, (docvar.textDoc)      'set as unicode text
 End If
+        Clipboard.Clear
+       SetTextData CF_UNICODETEXT, docvar.textDoc
 RepPlain bstack, bstack.Owner, (docvar.textDoc)
 
         'For i = 0 To LastVar

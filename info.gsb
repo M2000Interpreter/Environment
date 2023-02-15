@@ -5430,7 +5430,18 @@ Function Run1.DblClick {
 \\ the code use If with blocks {}  ' not updated yet
 \\ The Break statement stopped only from a Try {},
 \\ so Break make exit from all blocks, and exit from function.
-
+Function CheckText(a as string) {
+	if exist(a) then
+		if filelen(a)>0 then
+			object z=buffer(a)
+			where=instr(eval$(z), str$(chr$(13)) as byte)
+			=where>0 and where<2000
+		else
+			boolean T=True
+			=T
+		end if
+	end if
+}
 Function File1.DblClick {
 	Read New File1index
 	Local cont, cont2, f$, nl$={
@@ -5456,25 +5467,34 @@ Open1:
 		Method Pad,"GetFocus"
 		Read f$
 		If f$<>"" Then
-			If exist(F$) Then {
-				Clear LoadFile$
-				Method Pad,"PressKey", 0, 0
-				LoadState=true
-				Call Local InformNow("Loading...")
-				layer NotePad {
-					Load.Doc LoadFile$, f$
-				}
-				\\ set the current directory
-				If quit Then break
-				Filename$=f$
-				dir file.path$(Filename$)
-				If not quit Then 
-					Caption$=TitleStr$(File.Name$(Filename$)) +" - M2000 Pad"
-					Clear Backup$
-					BackUp$=LoadFile$
+			if exist(F$) then {
+				If CheckText(F$) Then 
 					Clear LoadFile$
-					Pad.Text$=BackUp$
-				End If
+					Method Pad,"PressKey", 0, 0
+					LoadState=true
+					Call Local InformNow("Loading...")
+					layer NotePad {
+						Load.Doc LoadFile$, f$
+					}
+					\\ set the current directory
+					If quit Then break
+					Filename$=f$
+					dir file.path$(Filename$)
+					If not quit Then 
+						Caption$=TitleStr$(File.Name$(Filename$)) +" - M2000 Pad"
+						Clear Backup$
+						BackUp$=LoadFile$
+						Clear LoadFile$
+						Pad.Text$=BackUp$
+					End If
+				Else
+					Local A, info$
+					Info$={
+						This file has not text
+						(it is probably an encrypted file)
+					}
+					A=Ask(info$,Title$,"","")
+				end if
 			} Else Pad.text$="": Clear BackUp$
 			Call Local InformNow("Rendering...")
 			Method Pad, "Resize"
@@ -5641,7 +5661,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 46 for M2000 Interpreter version 12, revision 13 and above"
+	Report " A collection of modules for tests version 47 for M2000 Interpreter version 12, revision 13 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -41286,5 +41306,108 @@ Pen 11 {Print "Press any key"}
 Push key$
 Drop
 If module(Infobasic) then keyboard "Infobasic", 13
+}
+MODULE ARCH {// each new run select one of two ways to make a new console:
+
+// 1 make console only and make Black (0) at 100% transparent
+// 2 without transparent
+// 3 make new  window (back + console)  // statement window has ; at the end to to place at the center of the monitor screen.
+Escape Off
+module Archimedean_spiral {
+	smooth on ' enable GDI+
+	linespace 0 
+	way=random(1,3)
+	def r(θ)=5+3*θ
+	cls #002222,0
+	pen #FFFF00
+	refresh 5000
+	flush
+	data random(10, 18)*1000, random(8, 12)*1000
+	sc$=""
+	Draw2Layer(1)
+	back {cls 0,0}
+	if way=1 then desktop 255, 0 : form ; else desktop 255
+	refresh 1000
+	every 1000 {
+		\\ redifine window (console width and height) and place it to center (symbol ;)
+		gradient 11, 7
+		refresh 1000
+		Read a, b
+		if way<3 then mode 12, a, b else 	window 12, a, b;
+		copy 0,0 use sc$
+		print part "#";Way
+		refresh 100
+              data random(10, 18)*1000, random(8, 12)*1000
+		Draw2Layer(1)	
+		\\ press space to exit loop
+		if  keypress(32) then exit
+	}
+	if way=1 then desktop 255
+	pen 14
+	cls 5
+	refresh 50
+	player 0  // flush players/layers of console
+	sub  Draw2Layer(N)
+		layer N {
+			over 2, 2
+			read a, b
+			window 12, a, b
+			gradient 11, 7
+			spiral()
+			copy a,b to sc$
+		}
+	end sub
+	sub spiral()	
+		move scale.x/2, scale.y/2
+		local n=2, k1=pi/120, k=k1, z=true
+		pen 1
+		for i=1 to int(1200*min.data(scale.x, scale.y)/18000)
+			if z then Width 3 {draw angle k, r(k)*n} else step angle k, r(k)*n
+			k+=k1: z~
+		next
+		move 0,0
+		cursor 0,0:Report 1, "Archimedean Spiral"
+		cursor 0,height-1:Print Part $(6, width),~(#ff5522), "Press Space Bar"
+		Print Part $(7, width), time$(now, locale, "Short Time")
+	end sub
+}
+Archimedean_spiral
+Escape on
+if module(Infobasic) then keyboard "infobasic", 13
+}
+MODULE MAPRANGE {module MapRange {
+	class Map {
+	private:
+		a, b, f
+	public:
+		value (x){
+			=.b+(x-.a)*.f
+		}
+	class:
+		module Map (.a,a2,.b,b2) {
+			if a2-.a=0 then error "wrong parameters"
+			.f<=(b2-.b)/(a2-.a)
+		}
+	}
+	
+	m1=Map(0,10, -1, 0)
+	for i=0 to 10
+		Print i," maps to ";m1(i)
+	next
+}
+MapRange
+
+module MapRange {
+	Map=lambda  (a,a2,b,b2) -> {
+		if a2-a=0 then error "wrong parameters"
+		f=(b2-b)/(a2-a)
+		=lambda a,b,f (x)->b+(x-a)*f
+	}
+	m1=Map(0,10, -1, 0)
+	for i=0 to 10
+		Print i," maps to ";m1(i)
+	next
+}
+MapRange
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

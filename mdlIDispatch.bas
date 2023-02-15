@@ -60,16 +60,16 @@ End If
 If lngRet = 0 Then FindDISPID = dispid
 End Function
 Public Sub ShutEnabledGuiM2000(Optional all As Boolean = False)
-Dim X As Form, bb As Boolean
+Dim x As Form, bb As Boolean
 
 Do
-For Each X In Forms
+For Each x In Forms
 bb = True
-If TypeOf X Is GuiM2000 Then
-    If X.enabled Then bb = False: X.CloseNow: bb = False: Exit For
+If TypeOf x Is GuiM2000 Then
+    If x.enabled Then bb = False: x.CloseNow: bb = False: Exit For
     
 End If
-Next X
+Next x
 
 Loop Until bb Or Not all
 
@@ -127,7 +127,7 @@ If Not getone(Typename$(pobjTarget) & "." & pstrProcName, dispid) Then
             
 End If
 Else
-         ReDim myptr(0 To fixnamearg)
+            ReDim myptr(0 To fixnamearg)
             myptr(0) = StrPtr(pstrProcName)
             For lngLoop = fixnamearg To 1 Step -1
             myptr(fixnamearg - lngLoop + 1) = StrPtr(pargs2(lngLoop))
@@ -301,17 +301,17 @@ conthere:
                     Else
                         pobjTarget.Modal = mycodeid
                    End If
-                   Dim X As Form, z As Form, zz As Form
+                   Dim x As Form, z As Form, zz As Form
                    Set zz = Screen.ActiveForm
                    If zz.Name = "Form3" Then
                    Set zz = zz.lastform
                    End If
                    If Not pobjTarget.IamPopUp Then
-                        For Each X In Forms
-                            If X.Name = "GuiM2000" Then
-                            Set mm = X
+                        For Each x In Forms
+                            If x.Name = "GuiM2000" Then
+                            Set mm = x
                             If mm.Modal = 0 Then
-                                If Not X Is pobjTarget Then
+                                If Not x Is pobjTarget Then
                                 If mm.TrueVisible Then
                                     If mm.Enablecontrol Then
                                         mm.Modal = mycodeid
@@ -322,7 +322,7 @@ conthere:
                                 End If
                             End If
                             Set mm = Nothing
-                        Next X
+                        Next x
                     End If
                     If pobjTarget.NeverShow Then
                     Modalid = mycodeid
@@ -381,16 +381,16 @@ conthere:
                     Modalid = mycodeid
                 End If
                 Set z = Nothing
-                For Each X In Forms
-                    If X.Name = "GuiM2000" Then
-                        Set mm = X
+                For Each x In Forms
+                    If x.Name = "GuiM2000" Then
+                        Set mm = x
                         ' If x.Modal = 0 Then
                         mm.TestModal mycodeid
-                        If mm.Enablecontrol Then Set z = X
+                        If mm.Enablecontrol Then Set z = x
                         Set mm = Nothing
                         'End If
                     End If
-                Next X
+                Next x
                 If Not zz Is Nothing Then Set z = zz
                 If Typename(z) = "GuiM2000" Then
                     Set mm = z
@@ -493,7 +493,7 @@ End If
                                             aMem.ResizeItems 4
                                             MemLong(aMem.GetBytePtr(0)) = 0
                                             End If
-                                            GoTo contnext
+                                            GoTo contNext
                                         End If
                                     End If
                                 End If
@@ -517,7 +517,7 @@ regular:
             Else
                 SwapVariant varArr(where), pArgs(lngLoop)
             End If
-contnext:
+contNext:
             Next
     End If
     On Error Resume Next
@@ -532,9 +532,9 @@ contnext:
 On Error GoTo there
 If TypeOf VarRet Is IUnknown Then
 If UCase(pstrProcName) = "_NEWENUM" Then
-Dim useHandler As mHandler
-Set useHandler = New mHandler
-useHandler.ConstructEnumerator VarRet
+Dim usehandler As mHandler
+Set usehandler = New mHandler
+usehandler.ConstructEnumerator VarRet
 Else
 MyEr "cant use this object", "δεν μπορώ να χειριστώ αυτό το αντικείμενο"
 End If
@@ -609,9 +609,9 @@ Exit Function
 Else
         If lngRet <> 0 Then
             If lngRet = DISP_E_EXCEPTION Then
-             ERrR$ = Str$(Excep.wCode)
+             ERrR$ = str$(Excep.wCode)
             Else
-              ERrR$ = Str$(lngRet)
+              ERrR$ = str$(lngRet)
             End If
             Exit Function
         End If
@@ -699,9 +699,9 @@ Exit Function
 Else
         If lngRet <> 0 Then
             If lngRet = DISP_E_EXCEPTION Then
-             ERrR$ = Str$(Excep.wCode)
+             ERrR$ = str$(Excep.wCode)
             Else
-              ERrR$ = Str$(lngRet)
+              ERrR$ = str$(lngRet)
             End If
             Exit Function
         End If
@@ -771,9 +771,9 @@ Public Sub ChangeOneParameter(pobjTarget As Object, dispid As Long, val1, ERrR$)
 
         If lngRet <> 0 Then
             If lngRet = DISP_E_EXCEPTION Then
-             ERrR$ = Str$(Excep.wCode)
+             ERrR$ = str$(Excep.wCode)
             Else
-              ERrR$ = Str$(lngRet)
+              ERrR$ = str$(lngRet)
             End If
             Exit Sub
         End If
@@ -844,9 +844,9 @@ Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, val1, E
 
         If lngRet <> 0 Then
             If lngRet = DISP_E_EXCEPTION Then
-             ERrR$ = Str$(Excep.wCode)
+             ERrR$ = str$(Excep.wCode)
             Else
-              ERrR$ = Str$(lngRet)
+              ERrR$ = str$(lngRet)
             End If
             Exit Sub
         End If

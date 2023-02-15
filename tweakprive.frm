@@ -452,7 +452,7 @@ Dim myCancel As myButton
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim Mysize As Single
 Dim setupxy As Single
-Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
+Dim lX As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
 Dim a$
 Dim bordertop As Long, borderleft As Long
@@ -487,7 +487,7 @@ Hook hWnd, Nothing
 End Sub
 
 Private Sub Form_Load()
-DIS.Enabled = True
+DIS.enabled = True
 AutoRedraw = True
 Form_Load1
 'AS A LABEL ONLY
@@ -506,7 +506,7 @@ If Button = 1 Then
     If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then
     dr = True
     MousePointer = vbSizeNWSE
-    Lx = X
+    lX = X
     lY = y
     End If
     
@@ -514,7 +514,7 @@ If Button = 1 Then
     If (y > Height - bordertop And y < Height) And (X > Width - borderleft And X < Width) Then
     dr = True
     MousePointer = vbSizeNWSE
-    Lx = X
+    lX = X
     lY = y
     End If
     End If
@@ -538,11 +538,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - lY)
-     If X < (Width - 150) Or X > Width Then addX = (X - Lx)
+     If X < (Width - 150) Or X > Width Then addX = (X - lX)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
-        If X < (Width - borderleft) Or X > Width Then addX = (X - Lx)
+        If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
     End If
     
 
@@ -569,10 +569,10 @@ Else
 
         If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, Width
-        Lx = X
+        lX = X
         
         Else
-        Lx = X * lastfactor / factor
+        lX = X * lastfactor / factor
          ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
@@ -588,7 +588,7 @@ Else
         lY = lY * lastfactor / factor
         End If
         Else
-        Lx = X
+        lX = X
         lY = y
    
 End If
@@ -772,10 +772,10 @@ End If
     cc.ValueKey = "PEN"
         cc.ValueType = REG_DWORD
         pen = cc.Value
-    tbPen.Enabled = False
+    tbPen.enabled = False
         tbPen = CStr(pen)
         tbPen.Value = CStr(pen)
-tbPen.Enabled = True
+tbPen.enabled = True
       DIS.ForeColor = QBColor(tbPen)
     cc.ValueKey = "PAPER"
         cc.ValueType = REG_DWORD
@@ -785,8 +785,8 @@ tbPen.Enabled = True
         cc.ValueKey = "COMMAND"
         cc.ValueType = REG_SZ
 
-        combo2.AddItem "GREEK"
-        combo2.AddItem "LATIN"
+        combo2.additem "GREEK"
+        combo2.additem "LATIN"
         
         
         
@@ -800,8 +800,8 @@ tbPen.Enabled = True
 Else
 DIS.Font.charset = 0
 End If
-     combo3.AddItem "BRIGHT"
-        combo3.AddItem "DARK"
+     combo3.additem "BRIGHT"
+        combo3.additem "DARK"
         cc.ValueKey = "HTML"
         cc.ValueType = REG_SZ
         If cc.Value = vbNullString Then
@@ -889,7 +889,7 @@ combo1.Label = "Font name"
 End If
 'Mode edit but exist in list
 textbox2.Retired
-textbox2.Enabled = True:   combo1.UseOnlyTheList = True
+textbox2.enabled = True:   combo1.UseOnlyTheList = True
 
 ' Combobox2 SetUp
 gList5.restrictLines = 2
@@ -898,7 +898,7 @@ Set textbox3.Container = gList4
 Set combo2 = New dropdownlist
 combo2.UseOnlyTheList = True
 
-textbox3.Enabled = False
+textbox3.enabled = False
 Set combo2.Textbox = textbox3
 Set combo2.Container = gList5
 combo2.locked = False
@@ -916,7 +916,7 @@ Set textbox4.Container = gList13
 Set combo3 = New dropdownlist
 combo3.UseOnlyTheList = True
 
-textbox4.Enabled = False
+textbox4.enabled = False
 Set combo3.Textbox = textbox4
 Set combo3.Container = gList14
 combo3.locked = False
@@ -941,7 +941,7 @@ Dim aa As New Document, bb As New FastCollection
     Next i
     aa.SortDoc 1, 1, aa.DocLines
 gList3.Text = aa.textDoc
- gList11.Enabled = True
+ gList11.enabled = True
 gList11.BackStyle = 1
 gList11.FontSize = 10.25
 gList11.NoCaretShow = True
@@ -960,7 +960,7 @@ Else
 LastWidth = -1
 End If
 FontName = "Arial"
-gList2.Enabled = True
+gList2.enabled = True
 gList2.CapColor = rgb(255, 160, 0)
 gList2.FloatList = True
 gList2.MoveParent = True
@@ -1010,7 +1010,7 @@ End If
 tbPaper.Spinner True, 0, 15, 1
 tbPaper.Value = 0
 tbPaper.Retired
-tbPaper.Enabled = True
+tbPaper.enabled = True
 
 Set tbPen = New myTextBox
 Set tbPen.Container = gList7
@@ -1022,7 +1022,7 @@ End If
 tbPen.Spinner True, 0, 15, 1
 tbPen.Value = 15
 tbPen.Retired
-tbPen.Enabled = True
+tbPen.enabled = True
 
 Set tbSize = New myTextBox
 Set tbSize.Container = gList8
@@ -1036,7 +1036,7 @@ tbSize.ThisKind = "pt"
 tbSize.Spinner True, 8, 48, 1
 tbSize.Value = 15
 tbSize.Retired
-tbSize.Enabled = True
+tbSize.enabled = True
 
 Set tbLineSpacing = New myTextBox
 Set tbLineSpacing.Container = gList12
@@ -1050,7 +1050,7 @@ tbLineSpacing.ThisKind = "twips"
 tbLineSpacing.Spinner True, 0, 60 * dv15, 2 * dv15
 tbLineSpacing.Value = 0
 tbLineSpacing.Retired
-tbLineSpacing.Enabled = True
+tbLineSpacing.enabled = True
 
 Set myCommand = New myButton
 Set myCommand.Container = command1(0)
@@ -1060,8 +1060,8 @@ Else
 myCommand.Caption = "OK"
 End If
   Set myCommand.Callback = Me
-  myCommand.index = 1
-myCommand.Enabled = True
+  myCommand.Index = 1
+myCommand.enabled = True
 Set myUnicode = New myButton
 Set myUnicode.Container = command1(1)
 If TweakLang = 0 Then
@@ -1070,17 +1070,17 @@ Else
 myUnicode.Caption = "Ansi Preview"
 End If
   Set myUnicode.Callback = Me
-myUnicode.Enabled = True
+myUnicode.enabled = True
 Set myCancel = New myButton
 Set myCancel.Container = command1(2)
-myCancel.index = 2
+myCancel.Index = 2
 If TweakLang = 0 Then
 myCancel.Caption = "¡ ’—œ"
 Else
 myCancel.Caption = "CANCEL"
 End If
   Set myCancel.Callback = Me
-myCancel.Enabled = True
+myCancel.enabled = True
 MyFill
  playall
  End Sub
@@ -1174,7 +1174,7 @@ End Sub
 
 
 Private Sub gList4_ChangeListItem(item As Long, content As String)
-If gList11.Enabled Then playall
+If gList11.enabled Then playall
 End Sub
 Private Sub playall()
 
@@ -1219,12 +1219,12 @@ DIS.ShowMe2
 
 End Sub
 
-Private Sub InterPress_Press(index As Long)
-If index = 1 Then
+Private Sub InterPress_Press(Index As Long)
+If Index = 1 Then
 
 Command111_Click
 'Unload Me  'remove this line
-ElseIf index = 2 Then
+ElseIf Index = 2 Then
 ShutMe
 Else
 If myUnicode.Caption = "Unicode Preview" Then

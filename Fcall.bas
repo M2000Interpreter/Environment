@@ -57,7 +57,7 @@ Dim v(), HRes As Long, i As Long
         stdCallW = vbEmpty
  End If
 End Function
-Public Function Fast_stdCallW(ByVal Addr As Long, ByVal RetType As Variant, p() As Variant, j As Long)
+Public Function Fast_stdCallW(ByVal addr As Long, ByVal RetType As Variant, p() As Variant, j As Long)
 Dim v(), HRes As Long, i As Long
  
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
@@ -73,7 +73,7 @@ Dim v(), HRes As Long, i As Long
     
   Next i
 
-  HRes = DispCallFunc(0, Addr, CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), Fast_stdCallW)
+  HRes = DispCallFunc(0, addr, CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), Fast_stdCallW)
 
   If HRes Then Err.Raise HRes
 ' p() = v()
@@ -102,7 +102,7 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
   End If
 End Function
 
-Public Function Fast_cdeclCallW(ByVal Addr, ByVal RetType As Variant, p() As Variant, j As Long)
+Public Function Fast_cdeclCallW(ByVal addr, ByVal RetType As Variant, p() As Variant, j As Long)
 Dim i As Long, pFunc As Long, v(), HRes As Long
  
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
@@ -112,7 +112,7 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
     vPtr(i) = VarPtr(v(i))
   Next i
 
-  HRes = DispCallFunc(0, Addr, CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), Fast_cdeclCallW)
+  HRes = DispCallFunc(0, addr, CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), Fast_cdeclCallW)
 
   If HRes Then Err.Raise HRes
   If VarType(Fast_cdeclCallW) = vbNull Then

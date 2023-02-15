@@ -1194,7 +1194,7 @@ Private Function VarTypeName(nVarType As Long) As String
         Case 8192
             VarTypeName = "Array"
         Case Else
-        VarTypeName = "type" + Trim(Str$(nVarType))
+        VarTypeName = "type" + Trim(str$(nVarType))
             'Stop
     End Select
 End Function
