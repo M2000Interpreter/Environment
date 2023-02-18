@@ -4339,6 +4339,7 @@ MODULE QSORT3 {Module Checkit3 {
       Print A$()
 }
 Checkit3
+Print "See Universal - newer module"
 }
 MODULE CONC {SET SLOW
 // NEWER VERSIONS DON'T USE REFERESH IN THREADS (SAME AS FAST!)
@@ -16033,13 +16034,13 @@ Thread {
 Module DisplayWindow (a$){
       Declare MyForm Form
       \\ split statement from rem to see the change in form's title
-      Rem With MyForm,"Title", a$
+      With MyForm,"Title", a$
       Method MyForm,"Show",1    ' wait to close
       Print "close now"
 }
-DisplayWindow "Window 1"
-DisplayWindow "Window 2"
-DisplayWindow "Window 3"
+DisplayWindow "Window 1/3"
+DisplayWindow "Window 2/3"
+DisplayWindow "Window 3/3"
 Thread k Erase
 }
 MODULE KNUTH {\\ Trabb Pardo–Knuth algorithm
@@ -23148,6 +23149,9 @@ Report 2, "ברוכים הבאים الجامعات والكليات" , 4
 Cursor 22, r
 Report 1, "ברוכים הבאים الجامعات والكليات" , 5
 Print
+if module(infobasic) then
+	Print "Press F3"
+end if
 }
 MODULE SIMPLETXT {Παλιό.Τοπικό=Τοπικό
 Τοπικό 1032
@@ -25227,7 +25231,7 @@ MODULE FORMTARGET {\\ FROM 9.9 REVISION 29
 \\ TO SCAN FOR THEM WE USE SCAN STATEMENT USING A NUMBER FOR A TIME WINDOW.
 
 \\ TARGETS VS BUTTONS ON FORMS
-\\ A BUTTON IS A CONTROL, WITH METHODS AND PROPERTIES.
+\\ A BUTTON is a CONTROL, WITH METHODS AND PROPERTIES.
 \\ TAB AND SHIFT TAB CAN CHOOSE ANY ENABLED BUTTON TO GET FOCUS
 \\ TARGETS HAVE NO FOCUS. USED ONLY WITH MOUSE
 \\ EACH TARGET IS AN ARRAY OF DATA TO BE USED FOR RENDERING AND SCANNING
@@ -25286,6 +25290,21 @@ Layer form1 {
 	cursor 4, 8
 	\\ 115 means 5 center, 10 use target event, 100 proportional font rendering
 	target B,"?", 10, 2, 5,15, 115, "press me too"
+	move 1000,800
+	FormLabel "This is a Label Using form's Font/size "
+	move 6000,3000
+	Pen #444444 {
+		width 2 {
+			color 5, 0 {
+				FormLabel "This is a Label", "Arial Black", 26,0,60
+			}
+		}
+	}
+	move 6000, 2400
+	FormLabel "This is a Label", "Times", 16, 0, 150
+	move 6000,3000
+	Legend "This is a Label", "Times", 16, pi/2, 1, 1, 150
+	
 }
 Method form1,"show",1
 Declare form1 nothing
@@ -41409,5 +41428,61 @@ module MapRange {
 	next
 }
 MapRange
+}
+MODULE VARPTR {// msvbvm60.dll exist in all versions of Windows. It is the runtime companion for every Visual Basic 6 program
+// M2000 Environament is a VB6 program (so run with this companion)
+// this library is not a virtual machine. This program compile for maximum speed (is a 32 bit application)
+// Although is 32bit, can handle files above 2GBytes, but the limit of memory is at the 2GBytes.
+//
+// Poking/Peeiking bytes anywhere is a risk for the program only. Not harm the PC.
+//
+// VrapTr() now support variables
+// Use ArrPtr for RefArrays (arrays with [ ] for indexes)
+
+
+// these two functions expect on the second argument byvalue integer and Long type value. (only Long support for automatic conversion this version of M2000)
+declare PutMem2 lib "msvbvm60.PutMem2" {long addr, newval}  ' newval has to be integer 
+declare PutMem4 lib "msvbvm60.PutMem4" {long addr, Long newval}
+// these two functions expect on the second argument by refernece so we have Long,
+//             and we have to place Varptr() for at least the Bytes which the functions replace with new value
+declare GetMem2 lib "msvbvm60.GetMem2" {long addr, long retValue}
+declare GetMem4 lib "msvbvm60.GetMem4" {long addrl, long retVaule}
+integer a[2], nv
+With a, "ArrPtr" as global a.ArrPtr()
+def aPtr(x as long)=a.ArrPtr(0)+x*2&
+Hex "Varptr(a[0]) = ";a.ArrPtr(0), aPtr(0)
+nv=123
+call PutMem2(a.ArrPtr(0), nv)
+call PutMem2(a.ArrPtr(0)+2&, nv+1%)
+call PutMem2(a.ArrPtr(0)+4&, nv+2%)
+Print a[0]=123, a[1]=124, a[2]=125
+hex aPtr(0)
+hex aPtr(1)
+hex aPtr(2)
+
+
+// variables
+// all variable use a variant type container, but the VarPtr() return the address of the value
+// excpet for Variant type which return the address of the first byte of the variant
+// also Decimal type has 16 bytes, 18 for value and 2 for the type (always is a part of variant)
+// M2000 knows which variable can change type (is variant by use) and which can't (has type)
+
+
+long K=100
+Print K
+Call PutMem4(varptr(K), 1000&)
+Print K
+variant Z=100&
+// We now that long value is at an offset of 8
+Call PutMem4(varptr(Z)+8, 1234&)
+Print Z
+long retval
+// We can read the type of variant (from the first two bytes)
+Call GetMem2(varptr(Z), varptr(retval))
+Print retval=3 ' vt_long
+Call GetMem4(varptr(Z)+8, varptr(retval))
+Print retval=1234
+
+// do not change the value of variables who hold objects. Objects have counter and befaure changing the value (the pointer to object) interpreterhandle the counter. If the cunterget zero value then the object deleted. So if we change the pointer to a random value,when the variable get out of scope, has to call the method to subtract one from the counter and perhasp to erase the memory from the object, to destroy it, and for that using the pointer (but if the pointer show something else  we get a memory excpetion which halt the program)
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

@@ -60,16 +60,16 @@ End If
 If lngRet = 0 Then FindDISPID = dispid
 End Function
 Public Sub ShutEnabledGuiM2000(Optional all As Boolean = False)
-Dim x As Form, bb As Boolean
+Dim X As Form, bb As Boolean
 
 Do
-For Each x In Forms
+For Each X In Forms
 bb = True
-If TypeOf x Is GuiM2000 Then
-    If x.enabled Then bb = False: x.CloseNow: bb = False: Exit For
+If TypeOf X Is GuiM2000 Then
+    If X.enabled Then bb = False: X.CloseNow: bb = False: Exit For
     
 End If
-Next x
+Next X
 
 Loop Until bb Or Not all
 
@@ -89,6 +89,7 @@ Public Function CallByNameFixParamArray _
     ' New by George
      ' pargs2() the names of arguments
      ' fixnamearg = the number of named arguments
+    Dim usehandler As mHandler
     Dim myform As Form
     Dim IDsp        As IDispatch.IDispatchM2000
     Dim riid        As IDispatch.IID
@@ -301,17 +302,17 @@ conthere:
                     Else
                         pobjTarget.Modal = mycodeid
                    End If
-                   Dim x As Form, z As Form, zz As Form
+                   Dim X As Form, z As Form, zz As Form
                    Set zz = Screen.ActiveForm
                    If zz.Name = "Form3" Then
                    Set zz = zz.lastform
                    End If
                    If Not pobjTarget.IamPopUp Then
-                        For Each x In Forms
-                            If x.Name = "GuiM2000" Then
-                            Set mm = x
+                        For Each X In Forms
+                            If X.Name = "GuiM2000" Then
+                            Set mm = X
                             If mm.Modal = 0 Then
-                                If Not x Is pobjTarget Then
+                                If Not X Is pobjTarget Then
                                 If mm.TrueVisible Then
                                     If mm.Enablecontrol Then
                                         mm.Modal = mycodeid
@@ -322,7 +323,7 @@ conthere:
                                 End If
                             End If
                             Set mm = Nothing
-                        Next x
+                        Next X
                     End If
                     If pobjTarget.NeverShow Then
                     Modalid = mycodeid
@@ -381,16 +382,16 @@ conthere:
                     Modalid = mycodeid
                 End If
                 Set z = Nothing
-                For Each x In Forms
-                    If x.Name = "GuiM2000" Then
-                        Set mm = x
+                For Each X In Forms
+                    If X.Name = "GuiM2000" Then
+                        Set mm = X
                         ' If x.Modal = 0 Then
                         mm.TestModal mycodeid
-                        If mm.Enablecontrol Then Set z = x
+                        If mm.Enablecontrol Then Set z = X
                         Set mm = Nothing
                         'End If
                     End If
-                Next x
+                Next X
                 If Not zz Is Nothing Then Set z = zz
                 If Typename(z) = "GuiM2000" Then
                     Set mm = z
@@ -532,11 +533,19 @@ contNext:
 On Error GoTo there
 If TypeOf VarRet Is IUnknown Then
 If UCase(pstrProcName) = "_NEWENUM" Then
-Dim usehandler As mHandler
-Set usehandler = New mHandler
-usehandler.ConstructEnumerator VarRet
+    
+    Set usehandler = New mHandler
+    usehandler.ConstructEnumerator VarRet
 Else
+On Error Resume Next
+If Err Then
+
 MyEr "cant use this object", "δεν μπορώ να χειριστώ αυτό το αντικείμενο"
+Else
+Set pUnk = VarRet
+
+
+End If
 End If
 VarRet = 0&
 End If

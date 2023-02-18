@@ -62,8 +62,8 @@ Private dotcol(dotcolmax) As String, curdotcol As Long
 Public StaticCollection As FastCollection
 Private topdotlevel As Long
 Public IndexSub As Long
-Public lastobj As Object
-Public FuncObj As Object
+Public lastobj As Variant
+Public FuncObj As Variant
 Public FuncRec As String
 Public FuncValue As Variant
 Public ErrorOriginal As Long
@@ -275,7 +275,7 @@ If Not StaticCollection.Find(Name$) Then Exit Function
         If usehandler.t1 = 3 Then
             Dim mm As mArray
             Set mm = usehandler.objref
-            If mm.Arr Then
+            If mm.arr Then
                 mm.Compute0 p, ss$
             End If
             Set mm = Nothing
@@ -283,13 +283,13 @@ If Not StaticCollection.Find(Name$) Then Exit Function
                 If ss$ = "++" Then
                         If usehandler.index_start < usehandler.objref.count - 1 Then
                             usehandler.index_start = usehandler.index_start + 1
-                            usehandler.objref.index = usehandler.index_start
+                            usehandler.objref.Index = usehandler.index_start
                             usehandler.index_cursor = usehandler.objref.Value
                         End If
         ElseIf ss$ = "--" Then
                     If usehandler.index_start > 0 Then
                             usehandler.index_start = usehandler.index_start - 1
-                            usehandler.objref.index = usehandler.index_start
+                            usehandler.objref.Index = usehandler.index_start
                             usehandler.index_cursor = usehandler.objref.Value
                         End If
         ElseIf ss$ = "-!" Then
@@ -801,7 +801,7 @@ Public Sub PushThread(Threadid As Long, threadvar As String)
 Dim aa As New mThreadref
 checkialive
 Set aa.thread = Nothing  ' no thread
-aa.Id = Threadid
+aa.id = Threadid
 aa.VarName = threadvar
 If Not threadsnames.Find(Threadid) Then threadsnames.AddKey Threadid
 Set threadsnames.ValueObj = aa
@@ -861,7 +861,7 @@ Else
 a$ = a$ + "INTERNAL THREAD "
 End If
 Else
-a$ = a$ + aa.VarName + Str$(aa.Id) + " "
+a$ = a$ + aa.VarName + str$(aa.id) + " "
 End If
 threadsnames.NextIndex
 Wend
@@ -903,16 +903,16 @@ If threadsnames.count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
 Set aa = threadsnames.ValueObj
-If idexclude <> aa.Id Then
+If idexclude <> aa.id Then
 If Not TaskMaster Is Nothing Then
-        If TaskMaster.ThrowOne(aa.Id) Then
-        ThrowOne aa.Id
+        If TaskMaster.ThrowOne(aa.id) Then
+        ThrowOne aa.id
         ElseIf Not IamThread Then
         threadsnames.RemoveWithNoFind
         GoTo cont
         End If
 Else
-ThrowOne aa.Id
+ThrowOne aa.id
 End If
 End If
 threadsnames.NextIndex
@@ -960,13 +960,13 @@ R = parentSoros.PopValLong
 IsNumber = True
 End If
 End Function
-Public Function IsVariant(R As Variant) As Boolean
+Public Function isvariant(R As Variant) As Boolean
 If parentSoros.LookNull Then
 R = parentSoros.PopVal
-IsVariant = True
+isvariant = True
 ElseIf parentSoros.PopType = "D" Then
 R = parentSoros.PopVariant
-IsVariant = True
+isvariant = True
 End If
 End Function
 Public Sub RemoveOptionals()
@@ -1085,6 +1085,11 @@ R = soros.PopStr
 IsInStackString = True
 End If
 End Function
+
+Private Sub Class_Initialize()
+Set lastobj = Nothing
+Set FuncObj = Nothing
+End Sub
 
 Private Sub Class_Terminate()
 Me.ThrowThreads

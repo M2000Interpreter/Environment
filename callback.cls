@@ -36,11 +36,11 @@ Friend Sub NoPublic(bstack As basetask, where$)
         Set objref.Owner = bstack.Owner
         mineHere$ = where$
 End Sub
-Friend Sub GetIcon(A As StdPicture)
+Friend Sub GetIcon(a As StdPicture)
 On Error Resume Next
 Dim k As StdPicture
 If IhaveExtForm Then
-ExtForm.GetIcon PackData(A)
+ExtForm.GetIcon PackData(a)
 End If
 End Sub
 Friend Function GetAppIcon() As StdPicture
@@ -76,16 +76,16 @@ End Function
 Property Get IhaveExtForm() As Boolean
 IhaveExtForm = Not ExtForm Is Nothing
 End Property
-Public Sub SetExtCaption(A$)
+Public Sub SetExtCaption(a$)
 On Error Resume Next
 If ExtForm Is Nothing Then Exit Sub
-If LenB(A$) = 0 Then
+If LenB(a$) = 0 Then
 Hide
 Form1.CaptionW = ExtForm.CaptionW
 Else
 Show
-lasttitle = A$
-ExtForm.CaptionW = A$
+lasttitle = a$
+ExtForm.CaptionW = a$
 End If
 End Sub
 Public Sub GetForm(f As Object)
@@ -231,7 +231,7 @@ End If
 pid = GetCurrentProcessId()
 If strTemp = vbNullString Then strTemp = GetTempPathgg()
 Dim m As Long
-mylogfile$ = strTemp + LTrim$(Str$(pid)) + ".M2000"
+mylogfile$ = strTemp + LTrim$(str$(pid)) + ".M2000"
 m = 1
 Open mylogfile$ For Output As #m
 Close #m
@@ -349,7 +349,7 @@ If Forms.count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
-If Form1.Top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).Top
+If Form1.top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).top
 Else
 If Form1.WindowState = 0 Then
 If Not (Forms.count > 5) Then Form1.Visible = False
@@ -544,12 +544,17 @@ timeBeginPeriod 1
 End Sub
 
 Private Sub Class_Terminate()
+On Error Resume Next
 Dim Zero As basket, i As Long, zerocounter As Counters
 StopTimer
-If objref Is Nothing Then Exit Sub
+If objref Is Nothing Then
+GoTo jumphere
+'Exit Sub
+End If
 Set objref.Owner = Nothing
 Set objref.Sorosref = Nothing
 Set objref = Nothing
+jumphere:
 globalstack.Flush
 TerminateM2000
 terminatefinal
@@ -638,20 +643,20 @@ End Property
 Public Property Get MayQuit() As Boolean
 MayQuit = Not Check2Save
 End Property
-Public Sub GetMess(A$)
+Public Sub GetMess(a$)
     If Not ExtForm Is Nothing Then
-        ExtForm.GetMessNow A$
+        ExtForm.GetMessNow a$
     End If
 End Sub
-Public Sub GetMessOneChar(A$)
+Public Sub GetMessOneChar(a$)
     If Not ExtForm Is Nothing Then
-        ExtForm.GetMessNow A$
+        ExtForm.GetMessNow a$
     End If
 End Sub
-Public Sub SendMess(A$)
+Public Sub SendMess(a$)
     If Not ExtForm Is Nothing Then
     On Error Resume Next
-        ExtForm.SendMessNow A$
+        ExtForm.SendMessNow a$
         If Err Then
         Me.Shutdown True
         

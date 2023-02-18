@@ -1,9 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 14 active-X
-Added logic on making types with type at the left of variable (long a=100). So now we didn't change a global variable with same name if that global variable was made before the current module/function. For previous versions only the Long exist as a modifier to long type. To modify a global we have to use Set before the type modifier so the interpreter at that moment turn to global scope and do the modification. This difference breaks compatibility with older versions, but is a small one. There are some other differences with old version like the A[123] which for older versions is an identifier, but for version 12 is A (has to be a pointer to a RefArray) with index 123. A name may have [ ] characters if has the first one or the first character after dot. So the hidden variables of properties for groups which have these characters are ok. So a proprty A for group B has a This.[A] or .[A] or [A] identifier for the private variable which make the interpreter automatic.
-Alsp two more modules added in info file: Arch (Archemides Spiral) and MapRange.
-
+Version 12 Revision 15 active-X
+Introduce the Varptr()  (ArrPtr exist as method for RefArray type of arrays). There is a module named VarPtr in Info file which show how we can use the VarPtr to pass pointer of variables by reference for external functions (previous we have to use Buffer (memory block) and pass addresses from that block), or using automatic handle of by reference using &nameofvariable. The varptr can be used for machine code blocks, to return values immediate to variables.
+Now Interpreter can get iUnknown objects, from external functions, and soon will be use Interfaces (not just the default one on each object).
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

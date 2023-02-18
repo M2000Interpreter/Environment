@@ -24,7 +24,6 @@ Private Const MEM_RELEASE = &H8000
 Private Const MEM_COMMIT = &H1000
 Private Const MEM_RESERVE = &H2000
 Private Const PAGE_EXECUTE_READWRITE = &H40
-
 Private Declare Function CallWindowProcA Lib "user32" ( _
     ByVal adr As Long, ByVal p1 As Long, ByVal p2 As Long, _
     ByVal p3 As Long, ByVal p4 As Long) As Long
@@ -133,13 +132,13 @@ Public Sub InitObjExtender()
     CLSIDFromString StrPtr(IIDSTR_IUnknown), IID_IUnknown
     CLSIDFromString StrPtr(IIDSTR_IDispatch), IID_IDispatch
 
-    ObjExt_vtbl(0) = Addr(AddressOf ObjExt_QueryInterface)
-    ObjExt_vtbl(1) = Addr(AddressOf ObjExt_AddRef)
-    ObjExt_vtbl(2) = Addr(AddressOf ObjExt_Release)
-    ObjExt_vtbl(3) = Addr(AddressOf ObjExt_GetTypeInfoCount)
-    ObjExt_vtbl(4) = Addr(AddressOf ObjExt_GetTypeInfo)
-    ObjExt_vtbl(5) = Addr(AddressOf ObjExt_GetIDsOfNames)
-    ObjExt_vtbl(6) = Addr(AddressOf ObjExt_Invoke)
+    ObjExt_vtbl(0) = addr(AddressOf ObjExt_QueryInterface)
+    ObjExt_vtbl(1) = addr(AddressOf ObjExt_AddRef)
+    ObjExt_vtbl(2) = addr(AddressOf ObjExt_Release)
+    ObjExt_vtbl(3) = addr(AddressOf ObjExt_GetTypeInfoCount)
+    ObjExt_vtbl(4) = addr(AddressOf ObjExt_GetTypeInfo)
+    ObjExt_vtbl(5) = addr(AddressOf ObjExt_GetIDsOfNames)
+    ObjExt_vtbl(6) = addr(AddressOf ObjExt_Invoke)
 
     blnInit = True
 End Sub
@@ -242,8 +241,8 @@ Public Function CreateEventSink(IID As GUID, objext As ComShinkEvent) As Object
     ' return the object
     CpyMem CreateEventSink, sink.hMem, 4&
 End Function
-Private Function Addr(p As Long) As Long
-    Addr = p
+Private Function addr(p As Long) As Long
+    addr = p
 End Function
 
 ' Pointer->Object
@@ -258,18 +257,18 @@ End Function
 
 
 Public Function CallPointer(ByVal fnc As Long, ParamArray params()) As Long
-Static once As Boolean
-If once Then Exit Function
-once = True
-
-If btASM = 0 Then
- btASM = VirtualAlloc(ByVal 0&, MAXCODE, MEM_COMMIT, PAGE_EXECUTE_READWRITE)
- End If
- If btASM = 0 Then
- MyEr "DEP or memory problem", "Πρόβλημα με την μνήμη"
- CallPointer = -1
- Exit Function
- End If
+    Static once As Boolean
+    If once Then Exit Function
+    once = True
+    If btASM = 0 Then
+        btASM = VirtualAlloc(ByVal 0&, MAXCODE, MEM_COMMIT, PAGE_EXECUTE_READWRITE)
+    End If
+    If btASM = 0 Then
+        MyEr "DEP or memory problem", "Πρόβλημα με την μνήμη"
+        CallPointer = -1
+        once = False
+        Exit Function
+    End If
     VirtualLock btASM, MAXCODE
    ' Dim btASM(MAXCODE - 1)  As Byte
     Dim pASM                As Long
@@ -302,23 +301,15 @@ If btASM = 0 Then
 
     AddCall pASM, fnc                   ' CALL rel addr
     AddByte pASM, &HC3                  ' RET
-    Dim bt As Byte
-Dim ii As Long
-
-'For ii = btASM To pASM - 1
-' CpyMem bt, ByVal ii, 1
-' Debug.Print Right$("00" + Hex$(bt), 2);
-' Next ii
-' Debug.Print
  
-  CallPointer = CallWindowProcA(btASM, _
-                                  0, 0, 0, 0)
+    CallPointer = CallWindowProcA(btASM, 0, 0, 0, 0)
             
-             VirtualUnlock btASM, MAXCODE
+    VirtualUnlock btASM, MAXCODE
 
 
     once = False
 End Function
+
 Public Sub ReleaseMem()
 If btASM <> 0 Then
         VirtualFree btASM, MAXCODE, MEM_DECOMMIT
@@ -330,9 +321,9 @@ Private Sub AddPush(pASM As Long, lng As Long)
     AddLong pASM, lng
 End Sub
 
-Private Sub AddCall(pASM As Long, Addr As Long)
+Private Sub AddCall(pASM As Long, addr As Long)
     AddByte pASM, &HE8
-    AddLong pASM, Addr - pASM - 4
+    AddLong pASM, addr - pASM - 4
 End Sub
 
 Private Sub AddLong(pASM As Long, lng As Long)

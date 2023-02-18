@@ -16,7 +16,7 @@ Private mstack As New Collection
 Private mMany As Long
 Dim BeginFrom As Long
 ' interface for iteration
-Public index As Long
+Public Index As Long
 ' new idea to not include a VarItem
 ' we place three items, the slot, the type (or subtype), the data.
 ' so each item is a multiple of three
@@ -382,7 +382,8 @@ mstack.Add aa, , 1
 End If
 Inc
 End Sub
-Public Sub PushObj(RHS As Object)
+
+Public Sub PushObj(RHS As Variant)
 Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = "*"  'something
@@ -403,7 +404,7 @@ mstack.Add RHS, , 1
 End If
 Inc
 End Sub
-Public Property Get PopObj() As Object
+Public Property Get PopObj() As Variant
 On Error Resume Next
 Dim aa As VarItem
 dec
@@ -602,7 +603,7 @@ mstack.Add aa, , , mstack.count
 End If
 Inc
 End Sub
-Public Sub DataObj(RHS As Object)
+Public Sub DataObj(RHS As Variant)
 Dim aa As VarItem
 If RHS Is Nothing Then
     Set aa = NewVarItem()
@@ -635,7 +636,7 @@ End Sub
 Public Sub Begin(from As Long)
 BeginFrom = from
 End Sub
-Public Sub AddItem(ByRef a As String)
+Public Sub additem(ByRef a As String)
 Dim aa As VarItem
 Set aa = NewVarItem()
     aa.Typename = "S"
@@ -766,7 +767,7 @@ With ExportArray
     .myarrbase = 0
     .PushDim (items)
     .PushEnd
-    .Arr = True
+    .arr = True
 
 
 For i = 1 To items
@@ -864,8 +865,8 @@ Next i
 End Function
 Property Get Value() As Variant
 Dim aa As VarItem
-If index >= 0 And index < mMany Then
-    Set aa = mstack.item(index + 1)
+If Index >= 0 And Index < mMany Then
+    Set aa = mstack.item(Index + 1)
     If aa.slot = 1 Then
         Set Value = aa.mItem
     Else
@@ -875,8 +876,8 @@ End If
 End Property
 Function IsObj() As Boolean
 Dim aa As VarItem
-If index >= 0 And index < mMany Then
-    Set aa = mstack.item(index + 1)
+If Index >= 0 And Index < mMany Then
+    Set aa = mstack.item(Index + 1)
     If aa.slot = 1 Then
         IsObj = True
     End If
@@ -884,8 +885,8 @@ End If
 End Function
 Function IsEnum(p As Variant) As Boolean
 Dim aa As VarItem, usehandler As mHandler
-If index >= 0 And index < mMany Then
-    Set aa = mstack.item(index + 1)
+If Index >= 0 And Index < mMany Then
+    Set aa = mstack.item(Index + 1)
     If aa.slot = 1 Then
         If Typename(aa.mItem) = "mHandler" Then
             Set usehandler = aa.mItem

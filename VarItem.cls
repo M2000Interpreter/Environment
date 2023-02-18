@@ -87,11 +87,11 @@ End Property
 Public Property Get ArrayRef() As Object
     If slot = 9 Then Set ObjectRef = mItem
 End Property
-Public Property Set ObjectRef(RHS As Object)
+Public Property Set ObjectRef(RHS As Variant)
     slot = 1
     Set mItem = RHS
 End Property
-Public Property Get ObjectRef() As Object
+Public Property Get ObjectRef() As Variant
     If slot = 1 Then Set ObjectRef = mItem
 End Property
 Public Sub Recycle()
