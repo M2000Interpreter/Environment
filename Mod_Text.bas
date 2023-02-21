@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 15
+Global Const Revision = 16
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -670,11 +670,18 @@ jumphere1:
                     Pos = Pos + 1
                     While Mid$(a$, Pos, 1) = "_": Pos = Pos + 1: Wend
                 Loop
-                If Mid$(a$, Pos, 1) = "&" Then
+                Select Case Mid$(a$, Pos, 1)
+                Case "&"
                 If Mid$(a$, Pos + 1, 1) = "&" Then Pos = Pos + 2 Else Pos = Pos + 1
-                ElseIf Mid$(a$, Pos, 1) = "%" Then
+                Case "%"
                     Pos = Pos + 1
+                Case "u", "U"
+                If Len(Mid$(a$, Pos + 1, 1)) > 0 Then
+                If InStr("BbDd", Mid$(a$, Pos + 1, 1)) > 0 Then
+                    Pos = Pos + 2
                 End If
+                End If
+                End Select
                 If CheckFree(Mid$(a$, Pos, 1)) Then
                 b$ = b$ + "N"
                 Else
@@ -2903,7 +2910,7 @@ Set bb1 = aa.objref
                         If Not IsExp(bstack, rest$, p, , True) Then
                             GoTo there
                         End If
-                         If myVarType(p, vbString) Then
+                         If MemInt(VarPtr(p)) = vbString Then
                             s$ = p
                             GoTo q1239877
                         End If
@@ -4970,8 +4977,7 @@ Dim i
 i = Len(a)
 fr = i - fr
 If fr < 0 Or fr > i Then fr = i + 1
-
-If i > 0 Then rinstr = InStrRev(a, b, fr)
+If fr > 0 Then rinstr = InStrRev(a, b, fr)
 End Function
 Function rinstrb(a As String, b As String, Optional ByVal fr As Long) As Long
 '
@@ -5117,7 +5123,7 @@ JetPrefixUser = JetPrefixHelp
 JetPostfixUser = JetPostfixHelp
 JetPostfix = JetPostfixHelp
 JetPrefix = JetPrefixHelp
-basickey = "Software\M2000v" & VerMajor & "\" + Mid$(App.Path, rinstr(App.Path, "\") + 1) + "\" + App.EXENAME + "\"
+basickey = "Software\M2000v" & VerMajor & "\" + Mid$(App.path, rinstr(App.path, "\") + 1) + "\" + App.EXENAME + "\"
 ' by default
 'AddTwipsTop = 4 * Screen.TwipsPerPixelY
 casesensitive = False
@@ -7050,7 +7056,7 @@ Do
     End If
 Loop
 If logical(bstack, aa$, R, , True, , IntVal, nostring) Then
-
+    
     If myVarType(po, vbString) Then
     ' convert to string
     
@@ -7072,7 +7078,21 @@ If logical(bstack, aa$, R, , True, , IntVal, nostring) Then
     
     End If
         MUL = 0
-        
+    ElseIf myVarType(R, vbString) Then
+        If CheckInt64(po) Then
+            po = CStr(po) + R
+        Else
+            ut$ = LTrim$(str(po))
+            If Left$(ut$, 1) = "." Then
+            ut$ = "0" + ut$
+            ElseIf Left$(ut$, 2) = "-." Then
+            ut$ = "-0" + Mid$(ut$, 2)
+            End If
+            ut$ = ut$ + R
+            po = vbNullString
+            SwapString2Variant ut$, po
+        End If
+        MUL = 0
     Else
         MUL = 0 ' from 3
         If ac = 0 Then
@@ -7498,6 +7518,7 @@ End Function
 Function IsNumber(bstack As basetask, a$, R As Variant, Optional flatobject As Boolean = False, Optional sg As Integer = 1) As Boolean
 Dim sng&, ex$, ig$, DE$, i As Long, sg1 As Boolean, j As Integer
 
+
 If lookOne(a$, "(") Then IsNumber = False: Exit Function
 If Len(a$) = 0 Then IsNumber = False: Exit Function
 If MaybeIsSymbol2(a$, "#+-", sng&) Then
@@ -7615,6 +7636,23 @@ jumphere1:
                             R = CInt("&H" + Mid$(a$, sng - i, i))
                         End If
                         sng& = sng& + 1
+                    ElseIf LCase$(Mid$(a$, sng&, 1)) = "u" Then
+                     If Not LCase$(Mid$(a$, sng& + 1, 1)) = "b" Then
+                        SyntaxError
+                        IsNumber = False
+                        Exit Function
+                     End If
+                     If i - j > 2 Then
+                            OverflowValue vbByte
+                            IsNumber = False
+                            Exit Function
+                     End If
+                        If j > 0 Then
+                            R = CByte("&H" + Replace$(Mid$(a$, sng - i, i), "_", ""))
+                        Else
+                            R = CByte("&H" + Mid$(a$, sng - i, i))
+                        End If
+                        sng& = sng& + 2
                     Else
                         If i - j > 8 Then ' maybe long long or decimal
                             If Mid$(a$, sng&, 2) = "&&" Then
@@ -7879,6 +7917,22 @@ cont123:
                 'If DE$ <> vbNullString Then Mid$(DE$, 1, 1) = "."
                 'R = val(ig$ + DE$)
                 End If
+            Case 117, 85
+                Select Case Mid$(a$, sng + 1, 1)
+                Case "b", "B"
+                    Mid$(a$, sng, 2) = "  "
+                    sg = 1
+                    
+                    R = CByte(Abs(val(ig$)))
+                Case "d", "D"
+                    Mid$(a$, sng, 2) = "  "
+                    sg = 1
+                    R = CDate(Abs(val(ig$ + DE$)))
+                Case Else
+                    Mid$(a$, sng, 1) = " "
+                    sg = 1
+                    R = Abs(val(ig$ + DE$))
+                End Select
             Case Else
                 R = val(ig$ + DE$)
             End Select
@@ -9140,8 +9194,15 @@ Else
     IsNumberNew = False
     If IsObject(bstack.LastEnum) Then
         R = bstack.LastEnum.SearchSimple(v$, par)
+        
         If par Then
-            
+            Set usehandler = New mHandler
+            Set usehandler.objref = bstack.LastEnum
+            usehandler.t1 = 4
+            usehandler.ReadOnly = True
+            usehandler.index_cursor = R
+            usehandler.index_start = bstack.LastEnum.Index
+            Set bstack.lastobj = usehandler
             IsNumberNew = True
             Exit Function
         End If
@@ -9371,7 +9432,7 @@ w1 = Len(s1$)
     FastSymbol s1$, ","
 Loop Until Trim$(s1) = vbNullString Or w1 = Len(s1$)
 ElseIf IsExp(bstack, a$, p) Then
-    If myVarType(p, vbString) Then s1$ = p: GoTo j1993874
+    If MemInt(VarPtr(p)) = vbString Then s1$ = p: GoTo j1993874
     If bstack.lastobj Is Nothing Then
         ExpectedObjInline a$
     ElseIf TypeOf bstack.lastobj Is mHandler Then
@@ -14389,17 +14450,30 @@ checkpointer:
 comehere:
                             p = vbNullString
                             IsStr1 = Matrix(bstackstr, a$, var(w1), p)
-                            If myVarType(p, vbString) Then SwapString2Variant R$, p Else R$ = vbNullString
+                            If MemInt(VarPtr(p)) = vbString Then SwapString2Variant R$, p Else R$ = vbNullString
                             Exit Function
                         Else
                             Set usehandler = var(w1)
                             If Not usehandler.objref Is Nothing Then
                                 If TypeOf usehandler.objref Is Enumeration Then
-                                    If myVarType(usehandler.objref.Value, vbString) Then
+                                    If myVarType(usehandler.index_cursor, vbString) Then
                                         R$ = usehandler.index_cursor
                                         IsStr1 = True
                                         Exit Function
                                     Else
+                                        If MyIsNumeric(usehandler.index_cursor) Then
+                                        If CheckInt64(usehandler.index_cursor) Then
+                                            R$ = CStr(usehandler.index_cursor)
+                                        Else
+                                            R$ = LTrim$(str(usehandler.index_cursor))
+                                            If Left$(R$, 1) = "." Then
+                                                R$ = "0" + R$
+                                            ElseIf Left$(R$, 2) = "-." Then
+                                                R$ = "-0" + Mid$(R$, 2)
+                                            End If
+                                        End If
+                                        IsStr1 = True
+                                        End If
                                         Exit Function
                                     End If
                                 End If
@@ -14411,9 +14485,9 @@ comehere:
                                 '''''''''''''''''''''''''''''''''''Stop''''''''''''''''''''''''
                         Else
                             p = var(w1).Value
-                            If myVarType(p, vbString) Then
+                            If MemInt(VarPtr(p)) = vbString Then
                                 R$ = p
-                            ElseIf myVarType(p, 20) Then
+                            ElseIf MemInt(VarPtr(p)) = 20 Then
                                 R$ = CStr(p)
                             Else
                                 R$ = LTrim$(str$(p))
@@ -14541,7 +14615,7 @@ foundprivate:
                                 End If
                                 Set bstackstr.lastobj = Nothing
                                 IsStr1 = Matrix(bstackstr, a$, pp, p)
-                                If myVarType(p, vbString) Then SwapString2Variant R$, p Else R$ = vbNullString
+                                If MemInt(VarPtr(p)) = vbString Then SwapString2Variant R$, p Else R$ = vbNullString
                                 Exit Function
                             End If
                         Else
@@ -14702,7 +14776,7 @@ cont1002001:
                             GoTo cont1002001
                             End If
                             End If
-                            If myVarType(p, vbString) Then SwapString2Variant R$, p Else R$ = vbNullString
+                            If MemInt(VarPtr(p)) = vbString Then SwapString2Variant R$, p Else R$ = vbNullString
                             Exit Function
                         Else
                         Set anything = pppp.item(W)
@@ -14728,7 +14802,7 @@ jump1:
                                         GoTo cont1002001
                                     End If
                                 End If
-                                If myVarType(p, vbString) Then SwapString2Variant R$, p Else R$ = vbNullString
+                                If MemInt(VarPtr(p)) = vbString Then SwapString2Variant R$, p Else R$ = vbNullString
                                 Exit Function
                             Else
                                 Set bstackstr.lastobj = pppp.item(4)
@@ -14752,7 +14826,7 @@ jump1:
                             End If
                         ElseIf Not ppppL.IsObjAt(W, p) Then
 getsomethinghere:
-                            If myVarType(p, vbString) Then
+                            If MemInt(VarPtr(p)) = vbString Then
                                 SwapString2Variant R$, p
                             Else
                                 If CheckInt64(p) Then
@@ -14887,7 +14961,7 @@ Final:
                 Set pp = bstackstr.lastobj
                 Set bstackstr.lastobj = Nothing
                 IsStr1 = Matrix(bstackstr, a$, pp, p)
-                If myVarType(p, vbString) Then SwapString2Variant R$, p Else R$ = vbNullString
+                If MemInt(VarPtr(p)) = vbString Then SwapString2Variant R$, p Else R$ = vbNullString
     
                 Exit Function
             ElseIf Left$(a$, 2) = "=>" Then
@@ -14899,7 +14973,7 @@ Final:
                     Mid$(a$, 1, 2) = "." + ChrW(3)
                     GoTo groupstrvalue
                     End If
-            ElseIf myVarType(p, vbString) Then
+            ElseIf MemInt(VarPtr(p)) = vbString Then
                 SwapString2Variant R$, p
                 IsStr1 = True
                 Exit Function
@@ -15218,8 +15292,8 @@ contrightstrpar:
        ' Set usehandler = pppp.GroupRef
         With usehandler.objref
             If IsExp(bstackstr, a$, p, , True) Then
-                If myVarType(p, vbString) Then R$ = p: GoTo str00012344
-                If myVarType(p, vbBoolean) Then p = CLng(p)
+                If MemInt(VarPtr(p)) = vbString Then R$ = p: GoTo str00012344
+                If MemInt(VarPtr(p)) = vbBoolean Then p = CLng(p)
                 If FastSymbol(a$, "!") Then
                     If Abs(p) < .count Then
                         If p < 0 Then
@@ -15960,17 +16034,20 @@ Dim p As Variant, ii As Long, ss$, what As Long, vType As Boolean
             ElseIf IsLabelSymbolNew(b$, "√—¡ÃÃ¡", "STRING", Lang) Then
                 what = 0
                 p = vbNullString
+            ElseIf IsLabelSymbolNew(b$, "ÿ«÷…œ", "BYTE", Lang) Then
+                what = 0
+                p = CByte(0)
             Else
                 MyEr "No type found", "‰ÂÌ ‚ÒﬁÍ· Ù˝Ô"
                 Exit Function
             End If
             
             If FastSymbol(b$, "=") Then
-                If vType Or myVarType(p, vbString) Then
+                If vType Or MemInt(VarPtr(p)) = vbString Then
                     If ISSTRINGA(b$, ss$) Then
                         p = ss$
                         GoTo conthere
-                    ElseIf myVarType(p, vbString) Then
+                    ElseIf MemInt(VarPtr(p)) = vbString Then
                         MissString
                         Exit Function
                     End If
@@ -15978,7 +16055,7 @@ Dim p As Variant, ii As Long, ss$, what As Long, vType As Boolean
                 If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                 
             Else
-                If myVarType(p, vbString) Then
+                If MemInt(VarPtr(p)) = vbString Then
                 MissString
                 Else
                 missNumber
@@ -17023,6 +17100,8 @@ cont10456:
                                         p = cInt64(p)
                                     Case vbByte
                                         p = CByte(p)
+                                    Case vbDate
+                                        p = CDate(p)
                                     Case Else
                                         p = CInt(p)
                                     End Select
@@ -17070,6 +17149,8 @@ eos:
                                         sp = cInt64(sp)
                                     Case vbByte
                                         sp = CByte(sp)
+                                    Case vbDate
+                                        sp = CDate(sp)
                                     Case Else
                                         sp = CInt(sp)
                                     End Select
@@ -17257,6 +17338,8 @@ contfor:
                                                             var(x2) = cInt64(p)
                                                         Case vbByte
                                                             var(x2) = CByte(p)
+                                                        Case vbDate
+                                                            var(x2) = CDate(p)
                                                         Case Else
                                                             var(x2) = CDbl(MyRound(p, 10))
                                                         End Select
@@ -22583,6 +22666,10 @@ If Right$(Name$, 2) <> "$(" Then
         afto.MyTypeToBe = vbVariant
         ElseIf IsLabelSymbolNew(rst$, "¡Õ‘… ≈…Ã≈Õœ", "OBJECT", j, i) Then
         afto.MyTypeToBe = vbObject
+        ElseIf IsLabelSymbolNew(rst$, "«Ã≈—œÃ«Õ…¡", "DATE", j, i) Then
+            afto.MyTypeToBe = vbDate
+      '  ElseIf IsLabelSymbolNew(rst$, "ƒ…≈–¡÷«", "INTERFACE", j, i) Then
+      '      afto.MyTypeToBe = vbDataObject
         End If
     End If
 End If
@@ -23965,8 +24052,10 @@ If Not mTextCompare Then
         If IsStrExp(basestack, s$, s2$, False) Then
             logical = True
             D = b$ = s2$
-            Exit Function
+        Else
+            MissStringExpr
         End If
+        Exit Function
     ElseIf FastSymbol(s$, "<") Then
         logical = False
         If Left$(s$, 1) = "=" Then
@@ -23983,27 +24072,33 @@ If Not mTextCompare Then
                     Case Else
                         D = 1
                     End Select
-                    Exit Function
+                Else
+                    MissStringExpr
                 End If
             Else
                 If IsStrExp(basestack, s$, s2$, False) Then
                     logical = True
                     D = b$ <= s2$
-                    Exit Function
+                Else
+                    MissStringExpr
                 End If
             End If
+            Exit Function
         ElseIf Left$(s$, 1) = ">" Then
             Mid$(s$, 1, 1) = " "
             If IsStrExp(basestack, s$, s2$, False) Then
                 logical = True
                 D = b$ <> s2$
-                Exit Function
+            Else
+                MissStringExpr
             End If
         ElseIf IsStrExp(basestack, s$, s2$, False) Then
             logical = True
             D = b$ < s2$
-            Exit Function
+        Else
+            MissStringExpr
         End If
+        Exit Function
     ElseIf FastSymbol(s$, ">") Then
         logical = False
         If Left$(s$, 1) = "=" Then
@@ -24011,20 +24106,25 @@ If Not mTextCompare Then
             If IsStrExp(basestack, s$, s2$, False) Then
                 logical = True
                 D = b$ >= s2$
-                Exit Function
+            Else
+                MissStringExpr
             End If
         ElseIf IsStrExp(basestack, s$, s2$, False) Then
             logical = True
             D = b$ > s2$
-            Exit Function
+        Else
+            MissStringExpr
         End If
+        Exit Function
     ElseIf FastSymbol(s$, "~") Then
         logical = False
         If IsStrExp(basestack, s$, s2$, False) Then
             logical = True
             D = b$ Like s2$
-            Exit Function
+        Else
+            MissStringExpr
         End If
+        Exit Function
     ElseIf MaybeIsSymbol(s$, "+") Then
     If myVarType(D, vbString) Then
         logical = False
@@ -24048,9 +24148,9 @@ If Not mTextCompare Then
                 End If
             b$ = b$ + s2$
             
-            
            GoTo conthere
-    
+        Else
+            MissStringExpr
         End If
     End If
     ElseIf MaybeIsSymbol(s$, "-") Then
@@ -24067,8 +24167,10 @@ Else
         If IsStrExp(basestack, s$, s2$, False) Then
             logical = True
             D = CompareStr2(b$, s2$) = 0
-            Exit Function
+        Else
+            MissStringExpr
         End If
+        Exit Function
     ElseIf FastSymbol(s$, "<") Then
         logical = False
         If Left$(s$, 1) = "=" Then
@@ -24078,25 +24180,30 @@ Else
                 If IsStrExp(basestack, s$, s2$, False) Then
                     logical = True
                     D = CompareStr2(b$, s2$)
-                    Exit Function
+                Else
+                    MissStringExpr
                 End If
             ElseIf IsStrExp(basestack, s$, s2$, False) Then
-                    logical = True
-                    D = CompareStr2(b$, s2$) < 1
-                    Exit Function
+                logical = True
+                D = CompareStr2(b$, s2$) < 1
+            Else
+                MissStringExpr
             End If
         ElseIf Left$(s$, 1) = ">" Then
             Mid$(s$, 1, 1) = " "
             If IsStrExp(basestack, s$, s2$, False) Then
                 logical = True
                 D = CompareStr2(b$, s2$) <> 0
-                Exit Function
+            Else
+                MissStringExpr
             End If
-            ElseIf IsStrExp(basestack, s$, s2$, False) Then
-                logical = True
-                D = CompareStr2(b$, s2$) = -1
-                Exit Function
-            End If
+        ElseIf IsStrExp(basestack, s$, s2$, False) Then
+            logical = True
+            D = CompareStr2(b$, s2$) = -1
+        Else
+            MissStringExpr
+        End If
+        Exit Function
         ElseIf FastSymbol(s$, ">") Then
             logical = False
             If Left$(s$, 1) = "=" Then
@@ -24104,31 +24211,35 @@ Else
                 If IsStrExp(basestack, s$, s2$, False) Then
                     logical = True
                     D = CompareStr2(b$, s2$) > -1
-                    Exit Function
+                Else
+                    MissStringExpr
                 End If
             ElseIf IsStrExp(basestack, s$, s2$, False) Then
                 logical = True
                 D = CompareStr2(b$, s2$) = 1
-                Exit Function
+            Else
+                MissStringExpr
             End If
+            Exit Function
         ElseIf FastSymbol(s$, "~") Then
             logical = False
             If IsStrExp(basestack, s$, s2$, False) Then
                 logical = True
                 D = b$ Like s2$
-                Exit Function
+            Else
+                MissStringExpr
             End If
-            ElseIf MaybeIsSymbol(s$, "+") Then
-                If myVarType(D, vbString) Then
-                    logical = False
-                    Mid$(s$, 1, 1) = " "
-                    If IsStrExp(basestack, s$, s2$, False) Then
-                        logical = True
-                        b$ = b$ + s2$
-                       GoTo conthere
-                    End If
+            Exit Function
+        ElseIf MaybeIsSymbol(s$, "+") Then
+            If myVarType(D, vbString) Then
+                logical = False
+                Mid$(s$, 1, 1) = " "
+                If IsStrExp(basestack, s$, s2$, False) Then
+                    logical = True
+                    b$ = b$ + s2$
+                   GoTo conthere
                 End If
-    
+            End If
         ElseIf MaybeIsSymbol(s$, "-") Then
             If myVarType(D, vbEmpty) Then
                 D = vbNullString
@@ -24469,7 +24580,7 @@ again:
 ii = InStr(i + 1, s$, """")
 If ii = 0 Then Exit Function
  i = ii
-If Mid$(s$, ii - 1, 1) = "`" Then GoTo again
+'If Mid$(s$, ii - 1, 1) = "`" Then GoTo again
 Case 91
 j1 = j1 + 1
 Case 93
@@ -24504,7 +24615,7 @@ again:
 ii = InStr(i + 1, s$, """")
 If ii = 0 Then Exit Function
  i = ii
-If Mid$(s$, ii - 1, 1) = "`" Then GoTo again
+'If Mid$(s$, ii - 1, 1) = "`" Then GoTo again
 Case 91
 j1 = j1 + 1
 Case 93
@@ -24539,7 +24650,7 @@ again:
 ii = InStr(i + 1, s$, """")
 If ii = 0 Then Exit Function
  i = ii
-If Mid$(s$, ii - 1, 1) = "`" Then GoTo again
+'If Mid$(s$, ii - 1, 1) = "`" Then GoTo again
 Case 91
 j1 = j1 + 1
 Case 93
@@ -29631,7 +29742,10 @@ S3 = x1
 Do
     bb$ = Mid$(sbf(S3).sb, i)
 againmod:
-    If LastErNum = -1 Then GoTo myerror1
+    If LastErNum = -1 Then
+        If bs.SubLevel > 0 Then GoTo unwindstack
+        GoTo myerror1
+    End If
     EXITNOW = False
     Select Case Execute(bs, bb$, EXITNOW, False, loopthis, , restart)
     Case 0
@@ -29755,6 +29869,7 @@ thh1:
         If Len(bb$) <> 0 Then
             If bb$ = ChrW$(0) Then
                 If trace Then TestShowBypass = False
+unwindstack:
                 If Not bs.IsInRetStackString(small$) Then
                     p = bs.isPop3Long(S3, sbi)
                     If p > 0 Then
@@ -29788,13 +29903,24 @@ fulty:
                     If InStr(small$, " ") > 0 Then
                         bs.PushSecondThird S3, sbi
                         If searchsub(x1, small$, i, S3, bb$) Then
-                            If Len(small$) <> 0 Then If Not MyRead(7, bs, small$, 1) Then GoTo thh
+                            If Len(small$) <> 0 Then
+                                If Not MyRead(7, bs, small$, 1) Then
+                                    bb$ = "  "
+                                    GoTo myerror1
+                                End If
+                            End If
                             GoTo contSub
                             ' x1 here is wrong...Check this
                         'ElseIf x1 <> basestack.OriginalCode And basestack.OriginalCode <> 0 Then
                             ElseIf basestack.IamChild Then  ' maybe I use this line not above
                             If searchsub(FindPrevOriginal(bs), small$, i, S3, bb$) Then
-                                If Len(small$) <> 0 Then If Not MyRead(7, bs, small$, 1) Then GoTo thh
+                                If Len(small$) <> 0 Then
+                                If Not MyRead(7, bs, small$, 1) Then
+                                
+                                'bb$ = "  "
+                                'GoTo myerror1
+                                End If
+                                End If
 contSub:
                                 If Len(bb$) = 0 Then
                                     If S3 < 0 Then
@@ -29809,6 +29935,9 @@ contSub:
                                     Else
                                         sbi = Len(sbf(S3).sb) - i - Len(bb$)
                                     End If
+                                End If
+                                If LastErNum = -1 Then
+                                    GoTo unwindstack
                                 End If
                                 If trace Then
                                     TestShowBypass = True
@@ -33402,6 +33531,8 @@ Case vbDouble
 v = CDbl(v)
 Case vbByte
 v = CByte(v)
+Case vbDate
+v = CDate(v)
 Case 36
 Case vbUserDefinedType
 If MemInt(VarPtr(v)) <> i Then
@@ -33443,6 +33574,8 @@ Case 20
 v = cInt64(v)
 Case vbByte
 v = CByte(v)
+Case vbDate
+v = CDate(v)
 Case vbUserDefinedType
 If MemInt(VarPtr(v)) <> i Then
 MissType
@@ -33840,7 +33973,7 @@ If i = 1 Or i = 3 Then
                       
                       Exit Function
                       End If
-                      If myVarType(p, vbString) Then
+                      If MemInt(VarPtr(p)) = vbString Then
                           SwapString2Variant pa$, p
                           ProcMethod bstack, var(), i, pa$, rest$, Lang, ok
                       Else
@@ -33957,7 +34090,7 @@ If FastSymbol(rest$, "!") Then
     Exit Function
 End If
 If IsExp(bstack, rest$, p, , True) Then
-If myVarType(p, vbString) Then s$ = p: p = 0: GoTo there123
+If MemInt(VarPtr(p)) = vbString Then s$ = p: p = 0: GoTo there123
     If Not FastSymbol(rest$, ",") Then MissPar:: Exit Function
 Else
     p = 0
@@ -36859,7 +36992,7 @@ If FastSymbol(rest$, ",") Then
 stac1$ = vbNullString
 Do
 If IsExp(basestack, rest$, p, , True) Then
-    If myVarType(p, 20) Then
+    If MemInt(VarPtr(p)) = 20 Then
         stac1$ = stac1$ + " " + CStr(p)
     ElseIf VarType(p) = vbString Then
         stac1$ = stac1$ + " " + LTrim$(p)
@@ -39558,13 +39691,13 @@ If n < 8 Then IsNumericPrint = True: Exit Function
 IsNumericPrint = (n = 11) Or (n = 17) Or (n = 14) Or (n = 20)
 End Function
 Function MyIsUnknown(v As Variant) As Boolean
-Dim n As Integer
-GetMem2 VarPtr(v), n
+Dim n As Byte
+GetMem1 VarPtr(v), n
 MyIsUnknown = n = 13
 End Function
 Function MyIsObject(v As Variant) As Boolean
-Dim n As Integer
-GetMem2 VarPtr(v), n
+Dim n As Byte
+GetMem1 VarPtr(v), n
 MyIsObject = n = 9
 End Function
 Function MyVal(v As Variant) As Variant
@@ -44362,7 +44495,7 @@ jmpstr1222:
                 p = 0
                     If FastSymbol(rest$, ",") Then
                         If IsExp(basestack, rest$, p, , True) Then
-                        If myVarType(p, vbString) Then s$ = p: GoTo jmpstr1222
+                        If MemInt(VarPtr(p)) = vbString Then s$ = p: GoTo jmpstr1222
                             If p <> 0 Then p = True
                         Else
                         p = True
@@ -44415,7 +44548,7 @@ jmpstr1222:
 conthere:
 w3 = -1
         If IsExp(basestack, rest$, p, , True) Then
-        If myVarType(p, vbString) Then .FTXT = p: GoTo str123456
+        If MemInt(VarPtr(p)) = vbString Then .FTXT = p: GoTo str123456
         If Not par Then p = 0
             .FTEXT = Abs(p) Mod 10
             ' 0 STANDARD LEFT chars before typed beyond the line are directed to the next line
@@ -44581,7 +44714,7 @@ Else
                        
                             Set usehandler = Nothing
                             Set myobject = Nothing
-                            If myVarType(p, vbString) Then
+                            If MemInt(VarPtr(p)) = vbString Then
                             s$ = p
                                 GoTo isAstring
                             Else
@@ -45433,11 +45566,14 @@ exit2:
 'If Len(rest$) > 0 Then RevisionPrint = False
 If Len(rest$) > 0 Then
     If Len(rest$) < where Then
+     
         If where - Len(rest$) = 1 Then
             Mid$(rest1$, 1, Len(rest$)) = rest$
-        Else
+        ElseIf where - Len(rest$) <= Len(rest1$) Then
             Mid$(rest1$, where - Len(rest$), Len(rest$)) = rest$
             rest1$ = Mid$(rest1$, where - Len(rest$))
+        Else
+        Stop
         End If
     Else
         rest1$ = rest$ + rest1$
@@ -45557,6 +45693,18 @@ conthere1012:
                                                     usehandler.sign = 1
                                                     IsEnumAs = True
                                                     Exit Function
+                                                Else
+                                                    usehandler0.CopyTo usehandler0
+                                                    If usehandler.objref.ExistFromOther2(usehandler0) Then
+                                                        Set usehandler0.objref = usehandler.objref
+                                                        usehandler0.index_start = usehandler.objref.Index
+                                                        initval = True
+                                                        Set usehandler = usehandler0
+                                                        usehandler.sign = 1
+                                                        Set p = usehandler
+                                                        IsEnumAs = True
+                                                        Exit Function
+                                                    End If
                                                 End If
                                             End If
                                         End If
@@ -45593,6 +45741,18 @@ conthere1002:
                                                 initval = True
                                                 IsEnumAs = True
                                                 Exit Function
+                                            Else
+                                                usehandler0.CopyTo usehandler0
+                                                If usehandler.objref.ExistFromOther2(usehandler0) Then
+                                                    Set usehandler0.objref = usehandler.objref
+                                                    usehandler0.index_start = usehandler.objref.Index
+                                                    initval = True
+                                                    Set usehandler = usehandler0
+                                                    usehandler.sign = 1
+                                                    Set p = usehandler
+                                                    IsEnumAs = True
+                                                    Exit Function
+                                                End If
                                             End If
                                         End If
                                     End If
@@ -45627,514 +45787,517 @@ End Function
 Public Function exeSelect(ExecuteLong, once As Boolean, bstack As basetask, b$, v As Long, Lang As Long) As Boolean
 Dim ok As Boolean, x1 As Long, y1 As Long, sp As Variant, st As Variant, sw$, slct As Long, ss$
 Dim x2 As Long, y2 As Long, p As Variant, W$, dum As Boolean, i As Long, nd&, lbl$, usehandler As mHandler
-        exeSelect = True
-                x1 = 0 ' mode numbers using p, sp and st
-                ' x1=2 using sw$ w$ ss$
+Dim checkenum As Boolean, enumindex As Long, EnumName As String
+exeSelect = True
+x1 = 0 ' mode numbers using p, sp and st
+If IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang) Then
 
-            If IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang) Then
-            
-                        If IsExp(bstack, b$, sp, , True) Then
-                        If myVarType(sp, vbString) Then
-                            sw$ = sp
-                            x1 = 2
-                        Else
-                        x1 = 1
-                        End If
-                        ElseIf IsStrExp(bstack, b$, sw$) Then
-                        x1 = 2
-                        End If
-                    If x1 > 0 Then ' SELECT CASE NUMBER or STRING
-                        SetNextLine b$
-                        While MaybeIsSymbol(b$, RemChar)
-                        SetNextLine b$
-                        Wend
-                    slct = 1
-                       If NocharsInLine(b$) Then
-                       ExpectedCaseorElseorEnd
-                        ExecuteLong = 0
-                            Exit Function
+    If IsExp(bstack, b$, sp, , Not checkenum) Then
+        If myVarType(sp, vbString) Then
+            sw$ = sp
+            x1 = 2
+        Else
+             x1 = 1
+        End If
+    ElseIf IsStrExp(bstack, b$, sw$) Then
+        x1 = 2
+    End If
+secondentry:
+    If x1 > 0 Then ' SELECT CASE NUMBER or STRING
+        SetNextLine b$
+        While MaybeIsSymbol(b$, RemChar)
+            SetNextLine b$
+        Wend
+        slct = 1
+        If NocharsInLine(b$) Then
+            ExpectedCaseorElseorEnd
+            ExecuteLong = 0
+            Exit Function
+        End If
+        Do
+            If NocharsInLine(b$) Then Exit Do
+            IsNumberLabel b$, lbl$
+            If IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang) Then  ' WE HAVE CASE
+jumphere1:
+                If IsLabelSymbolNew(b$, "¡ÀÀ…Ÿ”", "ELSE", Lang) Then GoTo case1else
+                If ok Then
+                    ExpectedEndSelect
+                    ExecuteLong = 0
+                    Exit Function
+                End If
+                If slct > 0 Then         ' WE ARE IN SEARCH
+                    Do
+                        x2 = 0
+                        If x1 = 1 Then
+                            If IsExp(bstack, b$, p, , Not checkenum) Then
+                                If checkenum Then
+                                    If bstack.lastobj Is Nothing Then GoTo cont00123
+                                    If Not TypeOf bstack.lastobj Is mHandler Then GoTo err001101
+                                    Set usehandler = bstack.lastobj
+                                    Set bstack.lastobj = Nothing
+                                    If usehandler.t1 <> 4 Then GoTo err001101
+                                    usehandler.objref.Index = usehandler.index_start
+                                    If EnumName = usehandler.objref.KeyToString() Or slct = -1 Then
+                                        Set usehandler = Nothing
+                                        If slct = 1 Then slct = 0: GoTo selslct0
+                                        GoTo contLoop
+                                    End If
+                                Else
+cont00123:
+                                    If MemInt(VarPtr(p)) = vbString Then W$ = p: x2 = 2 Else x2 = 1
+                                End If
+                            ElseIf IsStrExp(bstack, b$, W$) Then
+                                x2 = 2
                             End If
-                        Do
-                        If NocharsInLine(b$) Then
-               
+                        Else
+                            If IsExp(bstack, b$, p, , Not checkenum) Then
+                                If MemInt(VarPtr(p)) = vbString Then W$ = p: x2 = 2 Else x2 = 1
+                            ElseIf IsStrExp(bstack, b$, W$, False) Then
+                                x2 = 2
+                            End If
+                        End If
+                        If x2 > 0 Then 'WE HAVE NUMBER OR STRING
+                            If checkenum Then
+                            ' do nothing
+                            GoTo cont1234
+                            ElseIf IsLabelSymbolNew(b$, "≈Ÿ”", "TO", Lang) Then   ' range ?
+                                y1 = 0
+                                If x1 = 1 Then
+                                    If IsExp(bstack, b$, st, , True) Then y1 = 1
+                                Else
+                                    If IsStrExp(bstack, b$, ss$) Then y1 = 2
+                                End If
+                                If y1 > 0 Then
+                                    y2 = 0
+                                    If x1 = 1 Then
+                                        If (sp >= p And sp <= st) Then y2 = 1
+                                    Else
+                                        If sw$ >= W$ And sw$ <= ss$ Then y2 = 2
+                                    End If
+                                    If y2 > 0 Or slct = -1 Then 'slct=-1 from break
+                                        If slct = 1 Then slct = 0   ' slct=0 we found
+                                        ' start ExecuteLong command or block
+                                    End If
+                                Else
+                                    MyEr "Wrong expression type in To clause in Case", "À‹ËÔÚ Ù˝ÔÚ ›ÍˆÒ·ÛÁÚ ÛÙÁÌ ∏˘Ú ÛÙÁÌ ÃÂ"
+                                    ExecuteLong = 0
+                                    Exit Function
+                                End If
+                            Else
+cont1234:
+                                ' NO WE HAVE ONE VALUE...X1 MASTER, X2 ONE VALUE  Y2 FOR LAST CHECK
+                                y2 = 0
+                                If x1 = 1 Then
+                                    If sp = p And x2 = 1 Then y2 = 1
+                                Else
+                                    If W$ = sw$ Then y2 = 2
+                                End If
+                                If y2 > 0 Or slct = -1 Then ' ONE VALUE
+                                    If slct = 1 Then slct = 0
+                                End If
+                            End If
+                        ElseIf Not checkenum Then
+                            If x1 = 1 Then
+                                If myVarType(sp, vbString) Then
+                                '     b$ = sp + " " + b$
+                                Else
+                                    b$ = str$(sp) + " " + b$
+                                End If
+                            Else
+                            ' HERE............................IS A PROBLEM IF SW$ HAS <3 ASCII CODE
+                                b$ = Sput(sw$) + b$
+                            End If
+                            If IsExp(bstack, b$, p, , True) Then
+                                If p <> 0 Or slct = -1 Then
+                                    If slct = 1 Then slct = 0
+                                    ' start ExecuteLong command or block
+                                End If
+                            Else
+                                MyEr "Expected logic half expression in Case", "–ÂÒﬂÏÂÌ· ÎÔ„ÈÍﬁ ÏÈÛﬁ ›ÍˆÒ·ÛÁ ÛÙÁÌ ÃÂ"
+                                ExecuteLong = 0
+                                Exit Function
+                            End If
+                        End If
+                        If slct = 0 Then
+selslct0:
+                            If Left$(b$, 4) = vbCrLf + vbCrLf Then
+                                ExpectedCaseorElseorEnd
+                                b$ = Mid$(b$, 3)
+                                ExecuteLong = 0: Exit Function
+                            End If
+                            SetNextLine b$
+conthere:
+                            If FastSymbol(b$, "{") Then  ' block
+                                ss$ = block(b$)
+                                dum = False
+                                i = 1
+                                ' #3 call a block
+                                TraceStore bstack, nd&, b$, 0
+                                Call executeblock(i, bstack, ss$, False, dum, , True)
+                                TraceRestore bstack, nd&
+                                If i = 1 Then
+                                    FastSymbol b$, "}"
+                                    If Not MaybeIsSymbol(b$, RemChar) Then
+                                        If Not Left$(b$, 2) = vbCrLf Then
+                                            ExpectedCommentsOnly
+                                            ExecuteLong = 0: Exit Function
+                                        End If
+                                    End If
+                                Else
+                                    If i = 0 Then
+                                        b$ = ss$ + b$
+                                        ExecuteLong = 0: Exit Function
+                                    ElseIf i = 2 Then
+                                        If Len(ss$) > 0 Then b$ = ss$
+                                        If dum = True And b$ <> "" Then
+                                            slct = -1
+                                        Else
+                                            GoTo ContGoto
+                                        End If
+                                    ElseIf i = 3 Then
+                                        If Len(ss$) > 0 Then b$ = ss$
+                                        If dum = True And b$ <> "" Then slct = 0
+                                    End If
+                                End If
+                            Else   ' or line
+                                dum = True
+                                i = 1
+                                IsNumberLabel b$, lbl$
+                                While IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang)
+                                    SetNextLine b$
+                                    IsNumberLabel b$, lbl$
+                                Wend
+                                ' #4 call one command
+                                If lookOne(b$, "{") Then
+                                    GoTo conthere
+                                End If
+                                once = True
+                                ss$ = GetNextLine(b$) + vbCrLf + "'"
+                                TraceStore bstack, nd&, b$, 3
+                                Call executeblock(i, bstack, ss$, once, dum, True, True)
+                                bstack.addlen = nd&
+                                If i = 0 Then
+                                    ExecuteLong = 0: Exit Function
+                                ElseIf i = 1 And ss$ = vbNullString And once Then 'this is an exit œ 3
+                                    b$ = vbNullString
+                                    ExecuteLong = 1
+                                    Exit Function
+                                ElseIf i = 2 Then
+                                    If dum = True And Len(ss$) > 0 Then
+                                        slct = -1
+                                    ElseIf Len(ss$) > 0 Then
+                                        b$ = ss$
+                                        ExecuteLong = 2
+                                        once = False
+                                        Exit Function
+                                    Else
+                                        ExecuteLong = i
+                                        b$ = ss$
+                                        exeSelect = dum
+                                    End If
+                                ElseIf i = 3 Then
+                                    If dum = True And ss$ <> "" Then
+                                        slct = 0
+                                    Else
+                                        i = 2
+                                        b$ = vbNullString
+                                        exeSelect = True
+                                    End If
+                                ElseIf i = 5 Then
+                                    ExecuteLong = 2
+                                    exeSelect = False
+                                End If
+                            End If
                             Exit Do
                         End If
-                                IsNumberLabel b$, lbl$
-                                
-                                
-                                If IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang) Then  ' WE HAVE CASE
-jumphere1:
-                                If IsLabelSymbolNew(b$, "¡ÀÀ…Ÿ”", "ELSE", Lang) Then GoTo case1else
-                                If ok Then
-                                ExpectedEndSelect
-                                ExecuteLong = 0
-                                Exit Function
-                  
-                                    End If
-                                If slct > 0 Then         ' WE ARE IN SEARCH
-                                Do
-                                ' Â‰˛ ÍÔÈÙ‹ÏÂ Ù· CASE
-                                x2 = 0
-                                If x1 = 1 Then
-                                    If IsExp(bstack, b$, p, , True) Then
-                                        If myVarType(p, vbString) Then W$ = p: x2 = 2 Else x2 = 1
-                                    ElseIf IsStrExp(bstack, b$, W$) Then
-                                            x2 = 2
-                                    End If
-                                Else
-                                    If IsStrExp(bstack, b$, W$, False) Then
-                                        x2 = 2
-                                    ElseIf IsExp(bstack, b$, p, , True) Then
-                                        If myVarType(p, vbString) Then W$ = p: x2 = 2 Else x2 = 1
-                                    End If
-                                End If
-                                       If x2 > 0 Then 'WE HAVE NUMBER OR STRING
-                                            If IsLabelSymbolNew(b$, "≈Ÿ”", "TO", Lang) Then   ' range ?
-                                            y1 = 0
-                                               If x1 = 1 Then
-                                                    If IsExp(bstack, b$, st, , True) Then y1 = 1
-
-                                                Else
-                                                    If IsStrExp(bstack, b$, ss$) Then y1 = 2
-                                                End If
-                                                If y1 > 0 Then
-                                                y2 = 0
-                                                   If x1 = 1 Then
-                                                    If (sp >= p And sp <= st) Then y2 = 1
-
-                                                Else
-                                                    If sw$ >= W$ And sw$ <= ss$ Then y2 = 2
-                                                End If
-                                                    If y2 > 0 Or slct = -1 Then 'slct=-1 from break
-                                                   If slct = 1 Then slct = 0   ' slct=0 we found
-                                                   ' start ExecuteLong command or block
-
-                                            End If
-                                                Else
-                                                    MyEr "Wrong expression type in To clause in Case", "À‹ËÔÚ Ù˝ÔÚ ›ÍˆÒ·ÛÁÚ ÛÙÁÌ ∏˘Ú ÛÙÁÌ ÃÂ"
-                                                    ExecuteLong = 0
-                                                    Exit Function
-                                                End If
-                                            Else
-                                            ' NO WE HAVE ONE VALUE...X1 MASTER, X2 ONE VALUE  Y2 FOR LAST CHECK
-                                                y2 = 0
-                                                If x1 = 1 Then
-                                                    If sp = p Then y2 = 1
-                                                Else
-                                                    If W$ = sw$ Then y2 = 2
-                                                End If
-                                                If y2 > 0 Or slct = -1 Then ' ONE VALUE
-                                                     If slct = 1 Then slct = 0
-                                                End If
-                                            End If
-                                        Else
-                                            If x1 = 1 Then
-                                                If myVarType(sp, vbString) Then
-                                           '     b$ = sp + " " + b$
-                                                Else
-                                                b$ = str$(sp) + " " + b$
-                                                End If
-                                            Else
-                                                ' HERE............................IS A PROBLEM IF SW$ HAS <3 ASCII CODE
-                                                b$ = Sput(sw$) + b$
-                                            End If
-                                        If IsExp(bstack, b$, p, , True) Then
-                                            If p <> 0 Or slct = -1 Then
-                                             If slct = 1 Then slct = 0
-                                             ' start ExecuteLong command or block
-                                             End If
-                                        Else
-                                        MyEr "Expected logic half expression in Case", "–ÂÒﬂÏÂÌ· ÎÔ„ÈÍﬁ ÏÈÛﬁ ›ÍˆÒ·ÛÁ ÛÙÁÌ ÃÂ"
-                                        ExecuteLong = 0
-                                        Exit Function
-                                        End If
-                                        End If
-                                        If slct = 0 Then
-                                            If Left$(b$, 4) = vbCrLf + vbCrLf Then
-                                                                ExpectedCaseorElseorEnd
-                                                                b$ = Mid$(b$, 3)
-                                                                ExecuteLong = 0: Exit Function
-                                                                End If
-                                                    SetNextLine b$
-                                                     '    v = Len(b$)
-conthere:
-                                                        If FastSymbol(b$, "{") Then  ' block
-                                                          ss$ = block(b$)
-                                                            dum = False
-                                                            i = 1
-                                                            ' #3 call a block
-                                                            TraceStore bstack, nd&, b$, 0
-                                                            Call executeblock(i, bstack, ss$, False, dum, , True)
-                                                           TraceRestore bstack, nd&
-                                                            
-                                                            
-                                                            If i = 1 Then
-                                                            FastSymbol b$, "}"
-                                                            If Not MaybeIsSymbol(b$, RemChar) Then
-                                                            If Not Left$(b$, 2) = vbCrLf Then
-                                                                ExpectedCommentsOnly
-                                                                ExecuteLong = 0: Exit Function
-                                                            End If
-                                                            End If
-                                                            Else
-                                                            
-                                                            If i = 0 Then
-                                                                b$ = ss$ + b$
-                                                                ExecuteLong = 0: Exit Function
-                                                            ElseIf i = 2 Then
-                                                                If Len(ss$) > 0 Then b$ = ss$
-                                                                If dum = True And b$ <> "" Then
-                                                                slct = -1
-                                                                Else
-                                                                GoTo ContGoto
-                                                                End If
-                                                            ElseIf i = 3 Then
-                                                                If Len(ss$) > 0 Then b$ = ss$
-                                                               If dum = True And b$ <> "" Then slct = 0
-                                                            End If
-                                                            End If
-                                                        Else   ' or line
-                                                            dum = True
-                                                        
-                                                            i = 1
-                                                            IsNumberLabel b$, lbl$
-                                                            While IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang)
-                                                           SetNextLine b$
-                                                           IsNumberLabel b$, lbl$
-                                                            Wend
-                                                            ' #4 call one command
-                                                            If lookOne(b$, "{") Then
-                                                            GoTo conthere
-                                                            End If
-                                                            once = True
-                                                            
-                                                            ss$ = GetNextLine(b$) + vbCrLf + "'"
-                                                           
-                                                            TraceStore bstack, nd&, b$, 3
-                                                            Call executeblock(i, bstack, ss$, once, dum, True, True)
-                                                            bstack.addlen = nd&
-
-                                                            If i = 0 Then
-                                                                ExecuteLong = 0: Exit Function
-                                                            ElseIf i = 1 And ss$ = vbNullString And once Then 'this is an exit œ 3
-                                                                
-                                                                b$ = vbNullString
-                                                                ExecuteLong = 1
-                                                                Exit Function
-                                                            ElseIf i = 2 Then
-                                                                If dum = True And Len(ss$) > 0 Then
-                                                                    slct = -1
-                                                                ElseIf Len(ss$) > 0 Then
-                                                                    b$ = ss$
-                                                                    ExecuteLong = 2
-                                                                    once = False
-                                                                    Exit Function
-                                                                Else
-                                                                    ExecuteLong = i
-                                                                    b$ = ss$
-                                                                    exeSelect = dum
-                                                                End If
-                                                            ElseIf i = 3 Then
-                                                                If dum = True And ss$ <> "" Then
-                                                                    slct = 0
-                                                                Else
-                                                                    i = 2
-                                                                    b$ = vbNullString
-                                                                    exeSelect = True
-                                                                End If
-                                                            ElseIf i = 5 Then
-                                                                ExecuteLong = 2
-                                                                exeSelect = False
-                                                            End If
-                                                        End If
-                                                        Exit Do
-                                        End If
-                                    Loop While FastSymbol(b$, ",")
-                                    
-                                     End If
-                                SetNextLine b$
-                                                                     If Left$(b$, 2) = vbCrLf Then
-                                                                     ExpectedCaseorElseorEnd
-                                                                ExecuteLong = 0
-                                                                Exit Function
-                                                                End If
-                                ' drop case
-                                IsNumberLabel b$, lbl$
-                                
-                                If IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang) Then
-                                    GoTo jumphere1
-                                ElseIf IsLabelSymbolNew(b$, "¡ÀÀ…Ÿ”", "ELSE", Lang) Then
-                                    GoTo jumphere2
-                                ElseIf IsLabelSymbolNew(b$, "‘≈Àœ”", "END", Lang) Then
-                                    GoTo jumphere3
-                                Else
-                                    If FastSymbol(b$, "{") Then
-                                           If slct >= 0 Then
-                                                    ss$ = block(b$) + "}"
-                                                    b$ = NLtrim$(Mid$(b$, 2))
-                                            Else
-                                                    ss$ = block(b$)
-                                                    dum = False
-                                                    i = 1
-                                                    ' #7 call block inside Case (Break) ok
-                                                    TraceStore bstack, nd&, b$, 0
-                                                            Call executeblock(i, bstack, ss$, False, dum, , True)
-                                                            TraceRestore bstack, nd&
-                                                            If i = 1 Then
-                                                            FastSymbol b$, "}"
-                                                            If Not MaybeIsSymbol(b$, RemChar) Then
-                                                            If Not Left$(b$, 2) = vbCrLf Then
-                                                                ExpectedCommentsOnly
-                                                                ExecuteLong = 0: Exit Function
-                                                            End If
-                                                            End If
-                                                                    Else
-                                                            
-                                                            If i = 0 Then
-                                                               b$ = ss$ + b$
-                                                                ExecuteLong = 0: Exit Function
-                                                            ElseIf i = 2 Then
-                                                                    If Len(ss$) > 0 Then b$ = ss$
-                                                                    If dum = True And b$ <> "" Then
-                                                                    slct = -1
-                                                                    Else
-                                                                    GoTo ContGoto
-                                                                    End If
-                                                           
-                                                             ElseIf i = 3 Then
-                                                                    If Len(ss$) > 0 Then b$ = ss$
-                                                                    If dum = True And b$ <> "" Then slct = 0
-        
-                                                             End If
-                                                            End If
-                                            End If
-                                     
-                                        SetNextLine b$
-                                      ElseIf slct < 0 Then
-                                                        dum = True
-                                                   
-                                                            i = 1
-                                                            ' #8 call one command inside Case (Break) ok
-                                                            once = True
-                                                            
-                                                            ss$ = GetNextLine(b$) + vbCrLf + "'"
-                                                           
-                                                            TraceStore bstack, nd&, b$, 3
-                                                            Call executeblock(i, bstack, ss$, once, dum, True, True)
-                                                            bstack.addlen = nd&
-                                                            If i = 0 Then
-                                                                ExecuteLong = 0: Exit Function
-                                                            ElseIf i = 1 And ss$ = vbNullString And once Then  'this is an exit œ 3
-                                                                b$ = vbNullString
-                                                                ExecuteLong = 1
-                                                                Exit Function
-                                                            ElseIf i = 2 Then
-                                                                If dum = True And Len(ss$) > 0 Then
-                                                                    slct = -1
-                                                                ElseIf Len(ss$) > 0 Then
-                                                                    b$ = ss$
-                                                                    ExecuteLong = 2
-                                                                    once = False
-                                                                    Exit Function
-                                                                Else
-                                                                    ExecuteLong = i
-                                                                    b$ = ss$
-                                                                    exeSelect = dum
-                                                                End If
-                                                            ElseIf i = 3 Then
-                                                                If dum = True And ss$ <> "" Then
-                                                                    slct = 0
-                                                                Else
-                                                                    i = 2
-                                                                    b$ = vbNullString
-                                                                    exeSelect = True
-                                                                End If
-                                                            ElseIf i = 5 Then
-                                                                ExecuteLong = 2
-                                                                exeSelect = False
-                                                            End If
-  
-        
-                                    SetNextLine b$
-                                    Else
-                                    SetNextLine b$
-                                
-                                        End If
-                                    
-                                End If
-                                
-                                ElseIf IsLabelSymbolNew(b$, "¡ÀÀ…Ÿ”", "ELSE", Lang) Then
-jumphere2:
-                                        IsLabelSymbolNew b$, "Ã≈", "CASE", Lang
-case1else:
-                                
-                                           If ok Then
-                                ExpectedEndSelect
-                                ExecuteLong = 0
-                                Exit Function
-                                Else
-                                    ok = True
-                                    End If
-                                    SetNextLine b$
-                                    If FastSymbol(b$, "{") Then
-                                        ss$ = block(b$)
-                                    If slct > 0 Then
-                                                    dum = False
-                                                    i = 1
-                                                    ' #9 call block inside Else
-                                                    TraceStore bstack, nd&, b$, 0
-                                                       Call executeblock(i, bstack, ss$, False, dum, , True)
-                                                       TraceRestore bstack, nd&
-                                                       If i = 1 Then
-                                                            FastSymbol b$, "}"
-                                                            If Not MaybeIsSymbol(b$, RemChar) Then
-                                                            If Not Left$(b$, 2) = vbCrLf Then
-                                                                ExpectedCommentsOnly
-                                                                ExecuteLong = 0: Exit Function
-                                                            End If
-                                                            End If
-                                                            Else
-                                                              
-                                                            If i = 0 Then
-                                                                b$ = ss$ + b$
-                                                                ExecuteLong = 0: Exit Function
-                                                            ElseIf i = 2 Then
-                                                                        If Len(ss$) > 0 Then b$ = ss$
-                                                                          If dum = True And b$ <> "" Then
-                                                                            slct = -1
-                                                                          ElseIf b$ <> "" Then
-                                                                        GoTo ContGoto
-                                                                          Else
-                                                                            once = True
-                                                                            Exit Function
-                                                                        End If
-                                                            ElseIf i = 3 Then
-                                                            If Len(ss$) > 0 Then b$ = ss$
-                                                                If dum = True And b$ <> "" Then slct = 0: b$ = Mid$(b$, 2): GetNextLine (ss$)
-                                                            End If
-                                                            End If
-                                        Else
-                                        b$ = NLtrim$(Mid$(b$, 2))
-                                        End If
-                                    Else
-                                    If slct > 0 Then
-                                                                       dum = True
-                                             
-                                                            i = 1
-                                                            ' #10 call one command inside ELSE
-                                                            once = True
-                                                            dum = True
-                                                            'TraceStore bstack, nd&, b$, 0
-                                                            ss$ = GetNextLine(b$) + vbCrLf + "'"
-                                                            TraceStore bstack, nd&, b$, 3
-                                                            Call executeblock(i, bstack, ss$, once, dum, True, True)
-                                                        
-                                                            TraceRestore bstack, nd&
-                                                            If i = 0 Then
-                                                                    ExecuteLong = 0: Exit Function
-                                                            ElseIf i = 1 And ss$ = vbNullString And once Then  'this is an exit
-                                                                b$ = vbNullString
-                                                                ExecuteLong = 1
-                                                                Exit Function
-                                                            ElseIf i = 2 Then
-                                                              
-                                                                          If dum = True And Len(ss$) > 0 Then
-                                                                            slct = -1
-                                                                          ElseIf Len(ss$) > 0 Then
-                                                                            b$ = ss$
-                                                                            ExecuteLong = 2
-                                                                            once = False
-                                                                             Exit Function
-                                                                          Else
-                                                                            ExecuteLong = i
-                                                                            b$ = ss$
-                                                                            exeSelect = dum
-                                                                            Exit Function
-                                                                        End If
-                                                            ElseIf i = 3 Then
-                                                                If dum = True And ss$ <> "" Then
-                                                                    slct = 0
-                                                                Else
-                                                                    i = 2
-                                                                    b$ = vbNullString
-                                                                    exeSelect = True
-                                                                End If
-                                                            ElseIf i = 5 Then
-                                                                ExecuteLong = 2
-                                                                exeSelect = False
-                                              End If
+contLoop:
+                    Loop While FastSymbol(b$, ",")
+                End If
+                SetNextLine b$
+                If Left$(b$, 2) = vbCrLf Then
+                    ExpectedCaseorElseorEnd
+                    ExecuteLong = 0
+                    Exit Function
+                End If
+                ' drop case
+                IsNumberLabel b$, lbl$
+                If IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang) Then
+                    GoTo jumphere1
+                ElseIf IsLabelSymbolNew(b$, "¡ÀÀ…Ÿ”", "ELSE", Lang) Then
+                    GoTo jumphere2
+                ElseIf IsLabelSymbolNew(b$, "‘≈Àœ”", "END", Lang) Then
+                    GoTo jumphere3
+                Else
+                    If FastSymbol(b$, "{") Then
+                        If slct >= 0 Then
+                            ss$ = block(b$) + "}"
+                            b$ = NLtrim$(Mid$(b$, 2))
+                        Else
+                            ss$ = block(b$)
+                            dum = False
+                            i = 1
+                            ' #7 call block inside Case (Break) ok
+                            TraceStore bstack, nd&, b$, 0
+                            Call executeblock(i, bstack, ss$, False, dum, , True)
+                            TraceRestore bstack, nd&
+                            If i = 1 Then
+                                FastSymbol b$, "}"
+                                If Not MaybeIsSymbol(b$, RemChar) Then
+                                    If Not Left$(b$, 2) = vbCrLf Then
+                                        ExpectedCommentsOnly
+                                        ExecuteLong = 0: Exit Function
                                     End If
                                 End If
-                                SetNextLine b$
-                                slct = 0
-                        ElseIf IsLabelSymbolNew(b$, "‘≈Àœ”", "END", Lang) Then
-jumphere3:
-                            If IsLabelSymbolNew(b$, "≈–…Àœ√«”", "SELECT", Lang) Then
-                                slct = 0
-                                Exit Do
                             Else
-                                ExpectedEndSelect
-                                ExecuteLong = 0
+                                If i = 0 Then
+                                    b$ = ss$ + b$
+                                    ExecuteLong = 0: Exit Function
+                                ElseIf i = 2 Then
+                                    If Len(ss$) > 0 Then b$ = ss$
+                                    If dum = True And b$ <> "" Then
+                                        slct = -1
+                                    Else
+                                        GoTo ContGoto
+                                    End If
+                                ElseIf i = 3 Then
+                                    If Len(ss$) > 0 Then b$ = ss$
+                                    If dum = True And b$ <> "" Then slct = 0
+                                End If
+                            End If
+                        End If
+                        SetNextLine b$
+                    ElseIf slct < 0 Then
+                        dum = True
+                        i = 1
+                        ' #8 call one command inside Case (Break) ok
+                        once = True
+                        ss$ = GetNextLine(b$) + vbCrLf + "'"
+                        TraceStore bstack, nd&, b$, 3
+                        Call executeblock(i, bstack, ss$, once, dum, True, True)
+                        bstack.addlen = nd&
+                        If i = 0 Then
+                            ExecuteLong = 0: Exit Function
+                        ElseIf i = 1 And ss$ = vbNullString And once Then  'this is an exit œ 3
+                            b$ = vbNullString
+                            ExecuteLong = 1
+                            Exit Function
+                        ElseIf i = 2 Then
+                            If dum = True And Len(ss$) > 0 Then
+                                slct = -1
+                            ElseIf Len(ss$) > 0 Then
+                                b$ = ss$
+                                ExecuteLong = 2
+                                once = False
                                 Exit Function
+                            Else
+                                ExecuteLong = i
+                                b$ = ss$
+                                exeSelect = dum
+                            End If
+                        ElseIf i = 3 Then
+                            If dum = True And ss$ <> "" Then
+                                slct = 0
+                            Else
+                                i = 2
+                                b$ = vbNullString
+                                exeSelect = True
+                            End If
+                        ElseIf i = 5 Then
+                            ExecuteLong = 2
+                            exeSelect = False
+                        End If
+                        SetNextLine b$
+                    Else
+                        SetNextLine b$
+                    End If
+                End If
+            ElseIf IsLabelSymbolNew(b$, "¡ÀÀ…Ÿ”", "ELSE", Lang) Then
+jumphere2:
+                IsLabelSymbolNew b$, "Ã≈", "CASE", Lang
+case1else:
+                If ok Then
+                    ExpectedEndSelect
+                    ExecuteLong = 0
+                    Exit Function
+                Else
+                    ok = True
+                End If
+                SetNextLine b$
+                If FastSymbol(b$, "{") Then
+                    ss$ = block(b$)
+                    If slct > 0 Then
+                        dum = False
+                        i = 1
+                        ' #9 call block inside Else
+                        TraceStore bstack, nd&, b$, 0
+                        Call executeblock(i, bstack, ss$, False, dum, , True)
+                        TraceRestore bstack, nd&
+                        If i = 1 Then
+                            FastSymbol b$, "}"
+                            If Not MaybeIsSymbol(b$, RemChar) Then
+                                If Not Left$(b$, 2) = vbCrLf Then
+                                    ExpectedCommentsOnly
+                                    ExecuteLong = 0: Exit Function
+                                End If
                             End If
                         Else
-                             If ok Then
-                             ExpectedEndSelect2
-                             Else
-                             ExpectedCaseorElseorEnd2
-                             End If
-                            ExecuteLong = 0
-                            Exit Function
+                            If i = 0 Then
+                                b$ = ss$ + b$
+                                ExecuteLong = 0: Exit Function
+                            ElseIf i = 2 Then
+                                If Len(ss$) > 0 Then b$ = ss$
+                                If dum = True And b$ <> "" Then
+                                    slct = -1
+                                ElseIf b$ <> "" Then
+                                    GoTo ContGoto
+                                Else
+                                    once = True
+                                    Exit Function
+                                End If
+                            ElseIf i = 3 Then
+                                If Len(ss$) > 0 Then b$ = ss$
+                                If dum = True And b$ <> "" Then slct = 0: b$ = Mid$(b$, 2): GetNextLine (ss$)
+                            End If
                         End If
-  
-                        Loop
-                        If slct > 0 Then
-                        ExecuteLong = 0: Exit Function
-                        End If
-                        
-                    '-----------ENDIF ---------------
-                       Else
-                        ExecuteLong = 0
-                        Exit Function
+                    Else
+                        b$ = NLtrim$(Mid$(b$, 2))
                     End If
-        Else
-           ExecuteLong = 0
-           Exit Function
-        End If
-     exeSelect = False
-     Exit Function
-ContGoto:
-      '  If checkbreakEsc(bstack) Then ExecuteLong = 1: Exit Function
-        If MyTrim$(b$) = vbNullString Or FastSymbol(b$, ":") Then
+                Else
+                    If slct > 0 Then
+                        dum = True
+                        i = 1
+                        ' #10 call one command inside ELSE
+                        once = True
+                        dum = True
+                        'TraceStore bstack, nd&, b$, 0
+                        ss$ = GetNextLine(b$) + vbCrLf + "'"
+                        TraceStore bstack, nd&, b$, 3
+                        Call executeblock(i, bstack, ss$, once, dum, True, True)
+                        TraceRestore bstack, nd&
+                        If i = 0 Then
+                            ExecuteLong = 0: Exit Function
+                        ElseIf i = 1 And ss$ = vbNullString And once Then  'this is an exit
+                            b$ = vbNullString
+                            ExecuteLong = 1
+                            Exit Function
+                        ElseIf i = 2 Then
+                            If dum = True And Len(ss$) > 0 Then
+                                slct = -1
+                            ElseIf Len(ss$) > 0 Then
+                                b$ = ss$
+                                ExecuteLong = 2
+                                once = False
+                                Exit Function
+                            Else
+                                ExecuteLong = i
+                                b$ = ss$
+                                exeSelect = dum
+                                Exit Function
+                            End If
+                        ElseIf i = 3 Then
+                            If dum = True And ss$ <> "" Then
+                                slct = 0
+                            Else
+                                i = 2
+                                b$ = vbNullString
+                                exeSelect = True
+                            End If
+                        ElseIf i = 5 Then
+                            ExecuteLong = 2
+                            exeSelect = False
+                        End If
+                    End If
+                End If
+                SetNextLine b$
+                slct = 0
+            ElseIf IsLabelSymbolNew(b$, "‘≈Àœ”", "END", Lang) Then
+jumphere3:
+                If IsLabelSymbolNew(b$, "≈–…Àœ√«”", "SELECT", Lang) Then
+                    slct = 0
+                    Exit Do
+                Else
+                    ExpectedEndSelect
+                    ExecuteLong = 0
+                    Exit Function
+                End If
+            Else
+                If ok Then
+                    ExpectedEndSelect2
+                Else
+                    ExpectedCaseorElseorEnd2
+                End If
                 ExecuteLong = 0
-                MissingLabel
                 Exit Function
-        Else
-        ' GET OUT FOR NEXT
-    
+            End If
+        Loop
+        If slct > 0 Then
+            ExecuteLong = 0: Exit Function
+        End If
+    Else
+        ExecuteLong = 0
+        Exit Function
+    End If
+ElseIf IsLabelSymbolNew(b$, "¡–¡—", "ENUM", Lang) Then
+here12002:
+    If IsExp(bstack, b$, sp) Then
+        If bstack.lastobj Is Nothing Then GoTo err001101
+        If Not TypeOf bstack.lastobj Is mHandler Then GoTo err001101
+        Set usehandler = bstack.lastobj
+        Set bstack.lastobj = Nothing
+        If usehandler.t1 <> 4 Then GoTo err001101
+        sp = usehandler.index_cursor
         
-        i = FastPureLabel(b$, W$)
-
-                If i = 1 Then
-                
-                once = False
-                b$ = W$
-                ExecuteLong = 2
-                Exit Function
-                ElseIf i = 0 Then
-                If IsNumberLabel(b$, W$) Then
-                      once = False
-                b$ = W$
-                ExecuteLong = 2
-                Exit Function
-                Else
-                 b$ = W$ + b$
-                End If
-                Else
-                b$ = W$ + b$
-                
-                End If
-              End If
+        If myVarType(sp, vbString) Then
+            sw$ = sp
+            x1 = 2
+        Else
+             x1 = 1
+        End If
+        
+        enumindex = usehandler.index_start
+        usehandler.objref.Index = enumindex
+        EnumName = usehandler.objref.KeyToString()
+        checkenum = True
+        Set usehandler = Nothing
+        
+        GoTo secondentry
+    End If
+    GoTo err001101
+ElseIf IsLabelSymbolNew(b$, "¡–¡—…»Ã«”«", "ENUMERATION", Lang) Then
+    GoTo here12002
+Else
+err001101:
+    ExecuteLong = 0
+    Exit Function
+End If
+exeSelect = False
+Exit Function
+ContGoto:
+If MyTrim$(b$) = vbNullString Or FastSymbol(b$, ":") Then
+    ExecuteLong = 0
+    MissingLabel
+    Exit Function
+Else
+' GET OUT FOR NEXT
+    i = FastPureLabel(b$, W$)
+    If i = 1 Then
+        once = False
+        b$ = W$
+        ExecuteLong = 2
+        Exit Function
+    ElseIf i = 0 Then
+        If IsNumberLabel(b$, W$) Then
+            once = False
+            b$ = W$
+            ExecuteLong = 2
+            Exit Function
+        Else
+            b$ = W$ + b$
+        End If
+    Else
+        b$ = W$ + b$
+    End If
+End If
 End Function
 
 Function GetArrayReference(bstack As basetask, a$, v$, pp, result As mArray, Index As Long) As Boolean
@@ -47221,9 +47384,7 @@ Function CheckFreeExecute(a$) As Boolean
         End Select
 End Function
 Public Function myVarType(z, j As Integer) As Boolean
-Dim i As Integer
-GetMem2 VarPtr(z), i
-myVarType = i = j
+myVarType = MemInt(VarPtr(z)) = j
 End Function
 Public Function IntExp(n, X, ByVal R)
 On Error GoTo 100
@@ -47403,7 +47564,7 @@ lit25: '    Case "SPRITE$", "ƒ…¡÷¡Õ≈…¡$"
                 strLiterals = True
                 Exit Function
 lit26: '    Case "APPDIR$", "≈÷¡—Ãœ√«. ¡‘$"
-                R$ = GetLongName(App.Path)
+                R$ = GetLongName(App.path)
                 If Right(R$, 1) <> "\" Then R$ = R$ + "\"
                 strLiterals = True
                 Exit Function
@@ -48121,7 +48282,7 @@ fstr28: ' "LEFTPART$(", "¡—…”‘≈—œÃ≈—œ”$("
                 R$ = GetStrUntil(q$, s$)
                 strFunctions = FastSymbol(a$, ")")
             ElseIf IsExp(bstackstr, a$, p, , True) Then
-                If myVarType(p, vbString) Then
+                If MemInt(VarPtr(p)) = vbString Then
                     q$ = p
                     R$ = GetStrUntil(q$, s$)
                 Else
@@ -48140,7 +48301,7 @@ fstr29: '"RIGHTPART$(", "ƒ≈Œ…Ã≈—œ”$("
                 DropLeft q$, R$
                 strFunctions = FastSymbol(a$, ")")
             ElseIf IsExp(bstackstr, a$, p, , True) Then
-                If myVarType(p, vbString) Then
+                If MemInt(VarPtr(p)) = vbString Then
                     q$ = p
                     DropLeft q$, R$
                 Else
@@ -48726,7 +48887,7 @@ fstr40: '"REPLACE$(", "¡ÀÀ¡√«$("
     Exit Function
 fstr41: '"PATH$(", "‘œ–œ”$("
       If IsExp(bstackstr, a$, p, , True) Then
-      If myVarType(p, vbString) Then
+      If MemInt(VarPtr(p)) = vbString Then
         q$ = p
         R$ = ExtractPath$(q$)
       Else
@@ -49170,9 +49331,9 @@ If IsStrExp(bstackstr, a$, q$) Then
 jmp12984657:
  R$ = R$ + q1$ + Chr(34) + q$ + Chr(34)
 ElseIf IsExp(bstackstr, a$, p, , True) Then
-            If myVarType(p, 20) Then
+            If MemInt(VarPtr(p)) = 20 Then
                 R$ = R$ + q1$ + CStr(p)
-            ElseIf myVarType(p, vbString) Then
+            ElseIf MemInt(VarPtr(p)) = vbString Then
                 q$ = p
                 GoTo jmp12984657
             Else
@@ -49376,18 +49537,18 @@ fstr60: '"STR$(", "√—¡÷«$("
         Set bstackstr.lastobj = Nothing
         Set usehandler = Nothing
         End If
-    ElseIf myVarType(p, vbString) Then
+    ElseIf MemInt(VarPtr(p)) = vbString Then
         SwapString2Variant R$, p
             GoTo KM234
         End If
         
         If FastSymbol(a$, ",") Then
             If IsExp(bstackstr, a$, pp, flatobject:=True) Then
-            If myVarType(pp, vbString) Then
+            If MemInt(VarPtr(pp)) = vbString Then
                 SwapString2Variant q$, pp
                 GoTo KM123
             ElseIf pp = 0 Then
-                If myVarType(p, vbBoolean) Then
+                If MemInt(VarPtr(p)) = vbBoolean Then
                     R$ = Format$(p, DefBooleanString)
                 Else
                     R$ = CStr(p)
@@ -49469,7 +49630,7 @@ contstrhere:
             End If
             
             ElseIf IsExp(bstackstr, a$, pp, , True) Then
-                If myVarType(p, 20) Then
+                If MemInt(VarPtr(p)) = 20 Then
                     R$ = CStr(p)
                 ElseIf VarType(p) = vbString Then
                     R$ = LTrim$(p)
@@ -49545,7 +49706,7 @@ fstr61: '"CHRCODE$(", "◊¡— Ÿƒ$("
     
 fstr62: ' "CHR$(", "◊¡—$("
     If IsExp(bstackstr, a$, p, , True) Then
-        If myVarType(p, vbString) Then q$ = p: GoTo g131993
+        If MemInt(VarPtr(p)) = vbString Then q$ = p: GoTo g131993
         If FastSymbol(a$, ",") Then
                 If IsExp(bstackstr, a$, pp, flatobject:=True, nostring:=True) Then
                 If pp = 0 Then
@@ -49652,9 +49813,11 @@ Function mEval(ByVal q$, bstackstr As basetask, a$, R$) As Boolean
     Dim myGroup As Group, usehandler As mHandler, w2 As Long, w3 As Long
     Dim p, pp, dd As Long, anything As Object, s$, pppp As mArray
     If IsExp(bstackstr, a$, p) Then
-    If myVarType(p, vbString) Then
-        Set bstackstr.lastobj = Nothing
+    If MemInt(VarPtr(p)) = vbString Then
+        If bstackstr.lastobj Is Nothing Then
+    
         q$ = p: GoTo g19383
+        End If
     End If
     If bstackstr.lastobj Is Nothing Then Exit Function
     If TypeOf bstackstr.lastobj Is mHandler Then

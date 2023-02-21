@@ -247,6 +247,14 @@ entry1:
             mt = vtType(where)
             wt = VarType(that)
         Select Case mt
+        Case vbDataObject  ' 13 iUnKnown
+            If wt = vbDataObject Then
+                Set p(where)(what) = that
+            ElseIf myVarType(that, vbDataObject) Then
+                    Set p(where)(what) = that
+            Else
+                mError = 91
+            End If
         Case vbObject
             If wt = vbObject Then
                 Set p(where)(what) = that
@@ -316,13 +324,15 @@ If ihavearray Then
             If where = 0 Then
                 If VarType(p(what)) = vbObject Then
                     Set Value = p(what)
+                ElseIf VarType(p(what)) = vbDataObject Then
+                    Set Value = p(what)
                 Else
                     Value = p(what)
                 End If
             Else
                 Select Case VarType(p(where))
                 
-                Case vbObject
+                Case vbObject, vbDataObject
                     Set Value = p(where)
                 Case vbLongLong
                     MemCopy ((VarPtr(Value) Xor &H80000000) + 8) Xor &H80000000, ((ArrPtr() Xor &H80000000) + 8 * CLng(where)) Xor &H80000000, 8
@@ -333,7 +343,7 @@ If ihavearray Then
             End If
         Else
                 Select Case VarType(p(where))
-                Case vbObject
+                Case vbObject, vbDataObject ' vbDataObject is vt_IUnknown
                     Set Value = p(where)
                 Case vbLongLong
                     MemCopy ((VarPtr(Value) Xor &H80000000) + 8) Xor &H80000000, ((ArrPtr() Xor &H80000000) + 8 * CLng(where)) Xor &H80000000, 8
@@ -349,7 +359,7 @@ If ihavearray Then
             If what >= 0 And what < pp Then
                 
                 Select Case VarType(p(where)) - vbArray
-                Case vbObject
+                Case vbObject, vbDataObject
                     Set Value = p(where)(what)
                 Case 20
                     MemCopy ((VarPtr(Value) Xor &H80000000) + 8) Xor &H80000000, ((ArrPtr(where) Xor &H80000000) + 8 * CLng(what)) Xor &H80000000, 8
@@ -482,8 +492,8 @@ Public Function UnsignedAdd(ByVal lUnsignedPtr As Long, ByVal lSignedOffset As L
     '--- note: safely add *signed* offset to *unsigned* ptr for *unsigned* retval w/o overflow in LARGEADDRESSAWARE processes
     UnsignedAdd = ((lUnsignedPtr Xor &H80000000) + lSignedOffset) Xor &H80000000
 End Function
-Public Sub DefArrayAt(where, Arrtype, Optional size As Long = 10, Optional Size1 As Long, Optional Size2 As Long)
-If size < 0 Then size = 0
+Public Sub DefArrayAt(where, Arrtype, Optional Size As Long = 10, Optional Size1 As Long, Optional Size2 As Long)
+If Size < 0 Then Size = 0
 If ihavearray Then
     If isok Then
         If UBound(p) < where Then
@@ -507,18 +517,18 @@ Dim pp
 
 If where = -1 Then
     pp = LibMemory.EmptyArray(1, Arrtype)
-    ReDim pp(size)
+    ReDim pp(Size)
     SwapVariant p, pp
 Else
     If Size1 <= 0 Then
         pp = LibMemory.EmptyArray(1, Arrtype)
-        ReDim pp(size)
+        ReDim pp(Size)
     ElseIf Size2 <= 0 Then
         pp = LibMemory.EmptyArray(2, Arrtype)
-        ReDim pp(size, Size1)
+        ReDim pp(Size, Size1)
     Else
         pp = LibMemory.EmptyArray(3, Arrtype)
-        ReDim pp(size, Size1, Size2)
+        ReDim pp(Size, Size1, Size2)
     End If
     SwapVariant p(where), pp
 End If
@@ -575,9 +585,9 @@ Public Function tuple(ParamArray v())
         tuple = z()
     End If
 End Function
-Property Get Hash(item As Long, Optional what As Long = -1, Optional ByVal size As Long = 4) As Long
+Property Get Hash(item As Long, Optional what As Long = -1, Optional ByVal Size As Long = 4) As Long
     Dim mPtr As Long, ssize As Long
-    If size < 1 Then Exit Property
+    If Size < 1 Then Exit Property
     If ihavearray And isok Then
     
     Select Case VarType(Value(item))
@@ -592,7 +602,7 @@ Property Get Hash(item As Long, Optional what As Long = -1, Optional ByVal size 
                 Hash = 1
             Else
                 ssize = MemLong(mPtr - 4)
-                HashData mPtr, ssize, VarPtr(Hash), size
+                HashData mPtr, ssize, VarPtr(Hash), Size
             End If
         End If
     End Select
@@ -798,11 +808,11 @@ Else
 DefArrayAt -1, thistype, 0
 End If
 End Sub
-Public Sub RedimForFlat(size As Long)
+Public Sub RedimForFlat(Size As Long)
     If ihavearray Then
     If isok Then
     If flat Then
-        ReDim Preserve p(size)
+        ReDim Preserve p(Size)
     End If
     End If
     End If
@@ -835,7 +845,7 @@ Public Function cInt64(p)
         If a < -limitlonglong - 1 Then
             While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
         End If
-        While a > limitlonglong: a = a - maxlonglong: Wend
+        While a >= limitlonglong: a = a - maxlonglong: Wend
         cInt64 = -OneLongLong And a
     Case 20
         cInt64 = p
@@ -843,28 +853,35 @@ Public Function cInt64(p)
         cInt64 = -OneLongLong And p
     Case Else
         On Error GoTo er1
+        
         a = Fix(CDec(p))
-        a = a - Int(a / maxlonglong) * maxlonglong
+        If a > limitlonglong Or a <= -limitlonglong Then
+        a = a - Int(a / (maxlonglong)) * (maxlonglong)
         If a <= -limitlonglong - 1 Then
             While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
         End If
-        While a > limitlonglong: a = a - maxlonglong: Wend
+        While a >= limitlonglong: a = a - maxlonglong: Wend
+        End If
         cInt64 = -OneLongLong And a
         If i = vbString Then
             If Left$(p, 1) = "&" And a < 0 Then
-            If Len(p) = 10 Then
-            If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) > 0 Then
-            cInt64 = OneBigLongLong + cInt64
+            Select Case Len(p)
+            Case 10
+                If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) > 0 Then
+                cInt64 = OneBigLongLong + cInt64
+                End If
+            Case 18
+                If Mid$(p, 3, 8) = "00000000" Then
+                    cInt64 = OneBigLongLong + cInt64
+                End If
+            Case 11 To 17
+            If cInt64 < 0 Then cInt64 = OneBigLongLong + cInt64
+            End Select
             End If
-            End If
-            End If
-            End If
-        
+         End If
     End Select
     Exit Function
 er1:
     cInt64 = OneLongLong - OneLongLong
 End Function
-
-
 

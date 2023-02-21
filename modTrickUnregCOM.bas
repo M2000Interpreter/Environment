@@ -212,7 +212,7 @@ End Enum
 
 Public Type fncinf
     Name                    As String
-    addr                    As Long
+    Addr                    As Long
     params                  As Integer
 End Type
 
@@ -314,7 +314,7 @@ End Function
 
 ' // Get all co-classes described in type library.
 Public Function GetAllCoclasses( _
-                ByRef Path As String, _
+                ByRef path As String, _
                 ByRef listOfClsid() As GUID, _
                 ByRef listOfNames() As String, _
                 ByRef countCoClass As Long) As Boolean
@@ -327,7 +327,7 @@ Public Function GetAllCoclasses( _
     Dim pAttr   As Long
     Dim tKind   As Long
     
-    ret = LoadTypeLibEx(StrPtr(Path), REGKIND_NONE, typeLib)
+    ret = LoadTypeLibEx(StrPtr(path), REGKIND_NONE, typeLib)
     
     If ret Then
         Err.Raise ret
@@ -722,20 +722,20 @@ End Function
                 
 ' // Create object by CLSID and path.
 Public Function CreateObjectEx( _
-                ByRef Path As String, _
+                ByRef path As String, _
                 ByRef Clsid As GUID) As IUnknown
                 
     Dim hLib    As Long
     Dim lpAddr  As Long
     Dim isLoad  As Boolean
     
-    hLib = GetModuleHandle(StrPtr(Path))
+    hLib = GetModuleHandle(StrPtr(path))
     
     If hLib = 0 Then
     
-        hLib = LoadLibrary(StrPtr(Path))
+        hLib = LoadLibrary(StrPtr(path))
         If hLib = 0 Then
-            Err.Raise 53, , Error(53) & " " & Chr$(34) & Path & Chr$(34)
+            Err.Raise 53, , Error(53) & " " & Chr$(34) & path & Chr$(34)
             Exit Function
         End If
         
@@ -747,7 +747,7 @@ Public Function CreateObjectEx( _
     
     If lpAddr = 0 Then
         If isLoad Then FreeLibrary hLib
-        Err.Raise 453, , "Can't find dll entry point DllGetClasesObject in " & Chr$(34) & Path & Chr$(34)
+        Err.Raise 453, , "Can't find dll entry point DllGetClasesObject in " & Chr$(34) & path & Chr$(34)
         Exit Function
     End If
 
@@ -787,7 +787,7 @@ End Function
 
 ' // Unload DLL if not used.
 Public Function UnloadLibrary( _
-                ByRef Path As String) As Boolean
+                ByRef path As String) As Boolean
                 
     Dim hLib    As Long
     Dim lpAddr  As Long
@@ -795,7 +795,7 @@ Public Function UnloadLibrary( _
     
     If Not isinit Then Exit Function
     
-    hLib = GetModuleHandle(StrPtr(Path))
+    hLib = GetModuleHandle(StrPtr(path))
     If hLib = 0 Then Exit Function
     
     lpAddr = GetProcAddress(hLib, "DllCanUnloadNow")
@@ -1205,20 +1205,16 @@ Dim ppTInfo As Long, pCustTypeInfo As IUnknown, bstrType As String, ret As Long
 On Error Resume Next
 ITypeInfo_GetRefTypeInfo pTypeInfo, hreftype, ppTInfo
 If ppTInfo = 0 Or Err Then
-If Not ppTInfo = 0 Then
-Set pCustTypeInfo = ResolveObjPtrNoRef(ppTInfo)
-Set pCustTypeInfo = Nothing
-End If
-Err.Clear: stringifyCustomType = "UnknownCustomType"
-
-
-Exit Function
+    If Not ppTInfo = 0 Then
+    Set pCustTypeInfo = ResolveObjPtrNoRef(ppTInfo)
+    Set pCustTypeInfo = Nothing
+    End If
+    Err.Clear: stringifyCustomType = "UnknownCustomType:" & hreftype
+    Exit Function
 End If
 
 Set pCustTypeInfo = ResolveObjPtrNoRef(ppTInfo)
-' 1 TO DUMM1
-'    ret = ITypeInfo_GetDocumentation(pCustTypeInfo, 1, bstrType, vbNullString, 0&, vbNullString)
-    ret = ITypeInfo_GetDocumentation(pCustTypeInfo, -1, bstrType, vbNullString, 0&, vbNullString)
+ret = ITypeInfo_GetDocumentation(pCustTypeInfo, -1, bstrType, vbNullString, 0&, vbNullString)
 Set pCustTypeInfo = Nothing
 If ret Then stringifyCustomType = "UnknownCustomType": Exit Function
 stringifyCustomType = bstrType
@@ -1227,17 +1223,11 @@ End Function
 Private Function stringifyTypeDesc(TypeDesc As TTYPEDESC, pTypeInfo As IUnknown) As String
 Dim out$, Td As TTYPEDESC
 If IsBadCodePtr(TypeDesc.pTypeDesc) Then
-If TypeDesc.vt = VT_PTR Then
-stringifyTypeDesc = "LONG"
-ElseIf TypeDesc.vt = VT_USERDEFINED Then
-   ' memcpy Td, ByVal TypeDesc.pTypeDesc, Len(Td)
-    stringifyTypeDesc = stringifyCustomType(Td.pTypeDesc, pTypeInfo) ' hreftype=td.pTypeDesc
-
-
-   ' stringifyTypeDesc = "USERDEFINED"
-    'stringifyTypeDesc = stringifyCustomType(TypeDesc.pTypeDesc, pTypeInfo)   ' hreftype=td.pTypeDesc
+    If TypeDesc.vt = VT_PTR Then
+        stringifyTypeDesc = "LONG"
+    ElseIf TypeDesc.vt = VT_USERDEFINED Then
+        stringifyTypeDesc = stringifyCustomType(TypeDesc.pTypeDesc, pTypeInfo)
     Exit Function
-
 Else
 GoTo a123
 End If
@@ -1245,7 +1235,7 @@ Exit Function
 End If
 If TypeDesc.vt = VT_PTR Then
     memcpy Td, ByVal TypeDesc.pTypeDesc, Len(Td)
-    stringifyTypeDesc = stringifyTypeDesc(Td, pTypeInfo)
+    stringifyTypeDesc = "*" + stringifyTypeDesc(Td, pTypeInfo)
     Exit Function
 End If
 If TypeDesc.vt = VT_SAFEARRAY Then
@@ -1259,8 +1249,8 @@ If TypeDesc.vt = VT_CARRAY Then
     Exit Function
 End If
 If TypeDesc.vt = VT_USERDEFINED Then
-    memcpy Td, ByVal TypeDesc.pTypeDesc, Len(Td)
-    stringifyTypeDesc = stringifyCustomType(Td.pTypeDesc, pTypeInfo) ' hreftype=td.pTypeDesc
+    stringifyTypeDesc = stringifyCustomType(TypeDesc.pTypeDesc, pTypeInfo)
+  
     Exit Function
 End If
 a123:
@@ -1299,7 +1289,7 @@ Public Function NewObjectFromActivexDll(ByVal pathToDll As String, _
                                         ByVal className As String) As IUnknown
     Set NewObjectFromActivexDll = CreateObjectEx2(pathToDll, pathToDll, className)
 End Function
-Public Function UnloadActivexDll(ByVal Path As String) As Long
+Public Function UnloadActivexDll(ByVal path As String) As Long
     Dim hLib    As Long
     Dim lpAddr  As Long
     Dim ret     As Long
@@ -1307,7 +1297,7 @@ Public Function UnloadActivexDll(ByVal Path As String) As Long
     UnloadActivexDll = 1
     If isinit Then
         UnloadActivexDll = 2
-        hLib = GetModuleHandle(StrPtr(Path))
+        hLib = GetModuleHandle(StrPtr(path))
         If hLib <> 0 Then
             UnloadActivexDll = 3
             lpAddr = GetProcAddress(hLib, "DllCanUnloadNow")

@@ -67,7 +67,7 @@ If VarType(bkey) <> vbLong And VarType(bkey) <> vbString Then Err.Raise 5
         mem(HashSizeStore) = hashsize
         If IsMissing(thistype) Then
         Select Case VarType(val)
-        Case vbLong, vbInteger, vbSingle, vbCurrency, vbString, vbByte, vbLongLong, vbDecimal
+        Case vbLong, vbInteger, vbSingle, vbCurrency, vbString, vbByte, vbDate, vbLongLong, vbDecimal, vbObject, vbDataObject
             mem.DefArrayAt DataArray, VarType(val), datasize
         Case Else
             mem.DefArrayAt DataArray, vbVariant, datasize
@@ -462,10 +462,10 @@ Property Get KeyNum2(where As Long) As Long
     If where < 0 Or where > mem.count(DataArray) Then Exit Property
     KeyNum2 = KeyNumeric(mem(keyArray, where)) And &HFFFF&
 End Property
-Sub SwapVariant(ByRef A As Variant, ByRef b As Variant)
+Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
    Static t(0 To 3) As Long  ' 4 Longs * 4 bytes each = 16 bytes
-   MemCopy VarPtr(t(0)), ByVal VarPtr(A), 16
-   MemCopy VarPtr(A), VarPtr(b), 16
+   MemCopy VarPtr(t(0)), ByVal VarPtr(a), 16
+   MemCopy VarPtr(a), VarPtr(b), 16
    MemCopy VarPtr(b), VarPtr(t(0)), 16
 End Sub
 Private Sub ReHashByte()
@@ -596,11 +596,11 @@ End Sub
 Function Initialized(p) As Boolean
     Initialized = mem.Elements(p) > 0
 End Function
-Sub SwapStrings(A$, b$)
+Sub SwapStrings(a$, b$)
     Dim i As Long, j As Long
-    i = MemLong(VarPtr(A$))
+    i = MemLong(VarPtr(a$))
     j = MemLong(VarPtr(b$))
-    MemLong(VarPtr(A$)) = j
+    MemLong(VarPtr(a$)) = j
     MemLong(VarPtr(b$)) = i
 End Sub
 Public Function create(ParamArray v()) As HashList
@@ -616,7 +616,7 @@ Public Function create(ParamArray v()) As HashList
 End Function
 Public Function cInt64(p)
     Static maxlonglong, limitlonglong, OneLongLong, OneBigLongLong
-    Dim A, i As Integer
+    Dim a, i As Integer
     If MemInt(VarPtr(maxlonglong)) = 0 Then
         maxlonglong = CDec("18446744073709551616")
         limitlonglong = CDec("9223372036854775808")
@@ -628,40 +628,48 @@ Public Function cInt64(p)
     i = MemInt(VarPtr(p))
     Select Case i
     Case vbDecimal
-        A = Fix(p)
-        A = A - Int(A / maxlonglong) * maxlonglong
-        If A < -limitlonglong - 1 Then
-            While A <= -limitlonglong - 1: A = A + maxlonglong: Wend
+        a = Fix(p)
+        a = a - Int(a / maxlonglong) * maxlonglong
+        If a < -limitlonglong - 1 Then
+            While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
         End If
-        While A > limitlonglong: A = A - maxlonglong: Wend
-        cInt64 = -OneLongLong And A
+        While a >= limitlonglong: a = a - maxlonglong: Wend
+        cInt64 = -OneLongLong And a
     Case 20
         cInt64 = p
     Case vbLong, vbInteger
         cInt64 = -OneLongLong And p
     Case Else
         On Error GoTo er1
-        A = Fix(CDec(p))
-        A = A - Int(A / maxlonglong) * maxlonglong
-        If A <= -limitlonglong - 1 Then
-            While A <= -limitlonglong - 1: A = A + maxlonglong: Wend
-        End If
-        While A > limitlonglong: A = A - maxlonglong: Wend
-        cInt64 = -OneLongLong And A
-        If i = vbString Then
-            If Left$(p, 1) = "&" And A < 0 Then
-            If Len(p) = 10 Then
-            If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) > 0 Then
-            cInt64 = OneBigLongLong + cInt64
-            End If
-            End If
-            End If
-            End If
         
+        a = Fix(CDec(p))
+        If a > limitlonglong Or a <= -limitlonglong Then
+        a = a - Int(a / (maxlonglong)) * (maxlonglong)
+        If a <= -limitlonglong - 1 Then
+            While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
+        End If
+        While a >= limitlonglong: a = a - maxlonglong: Wend
+        End If
+        cInt64 = -OneLongLong And a
+        If i = vbString Then
+            If Left$(p, 1) = "&" And a < 0 Then
+            Select Case Len(p)
+            Case 10
+                If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) > 0 Then
+                cInt64 = OneBigLongLong + cInt64
+                End If
+            Case 18
+                If Mid$(p, 3, 8) = "00000000" Then
+                    cInt64 = OneBigLongLong + cInt64
+                End If
+            Case 11 To 17
+            If cInt64 < 0 Then cInt64 = OneBigLongLong + cInt64
+            End Select
+            End If
+         End If
     End Select
     Exit Function
 er1:
     cInt64 = OneLongLong - OneLongLong
 End Function
-
 

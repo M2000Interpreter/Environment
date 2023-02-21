@@ -289,7 +289,7 @@ For j = 3 To UBound(mDoc.Paracolordata(i)) Step 2
     LastCode = 15
     End If
     Else
-    Add Str$(counter + j0) + ", 15, " + Mid$(s$, j0, j1 - j0) + vbCrLf
+    Add str$(counter + j0) + ", 15, " + Mid$(s$, j0, j1 - j0) + vbCrLf
     End If
     Else
     
@@ -301,35 +301,35 @@ For j = 3 To UBound(mDoc.Paracolordata(i)) Step 2
         zz = MyTrimL(symb$)
         If zz > 1 Then symb$ = Mid$(symb$, zz): zz = zz - 1 Else zz = 0
         If symb$ = "{" Then
-            symb$ = "START_BRACKET" + Str$(var.DocParagraphs)
+            symb$ = "START_BRACKET" + str$(var.DocParagraphs)
             ms.PushVal CVar(var.DocParagraphs)
             LastCode = 140
         ElseIf symb$ = "}" Then
             br = CLng(ms.PopVal)
-            var.ReWritePara br, var.TextParagraph(br) + ", " + Str$(var.DocParagraphs)
-            symb$ = "END_BRACKET" + Str$(br)
+            var.ReWritePara br, var.TextParagraph(br) + ", " + str$(var.DocParagraphs)
+            symb$ = "END_BRACKET" + str$(br)
             LastCode = 141
         ElseIf symb$ = ")" Then
         If noucase Then nclev = nclev + 1
         ElseIf symb$ = ":" Then
         noucase = False
         End If
-        Add Str$(counter + j0 + zz) + "," + Str$(LastCode) + ", " + symb$ + vbCrLf
+        Add str$(counter + j0 + zz) + "," + str$(LastCode) + ", " + symb$ + vbCrLf
     Case 20
-        Add Str$(counter + j0 + zz) + "," + Str$(LastCode) + ", " + Mid$(s$, j0, j1 - j0) + vbCrLf
+        Add str$(counter + j0 + zz) + "," + str$(LastCode) + ", " + Mid$(s$, j0, j1 - j0) + vbCrLf
     Case Else
         If noucase And nclev > 0 Then
         symb$ = MyTrimRW(Mid$(s$, j0, j1 - j0))
         zz = MyTrimL(symb$)
         If zz > 1 Then symb$ = Mid$(symb$, zz): zz = zz - 1 Else zz = 0
         If Right$(symb$, 1) = "(" Then nclev = nclev - 1
-        Add Str$(counter + j0 + zz) + "," + Str$(LastCode) + ", " + symb$ + vbCrLf
+        Add str$(counter + j0 + zz) + "," + str$(LastCode) + ", " + symb$ + vbCrLf
         Else
         symb$ = MyTrimRW(Mid$(s$, j0, j1 - j0))
         zz = MyTrimL(symb$)
         If zz > 1 Then symb$ = Mid$(symb$, zz): zz = zz - 1 Else zz = 0
 
-        Add Str$(counter + j0 + zz) + "," + Str$(LastCode) + ", " + myUcase(symb$) + vbCrLf
+        Add str$(counter + j0 + zz) + "," + str$(LastCode) + ", " + myUcase(symb$) + vbCrLf
         End If
         If (LastCode = 111 Or LastCode = 112) And Not noucase Then noucase = True: nclev = 1
     
@@ -350,10 +350,10 @@ Else
 If mDoc.Paracolordata(i)(j - 3) = 7 Then
 ElseIf mDoc.Paracolordata(i)(j - 3) = 15 Then
 If Mid$(s$, j0, 1) = Chr$(34) Then
-Add Str$(counter + j0) + ", 15, " + Mid$(s$, j0) + vbCrLf
+Add str$(counter + j0) + ", 15, " + Mid$(s$, j0) + vbCrLf
 LastCode = 0
 Else
-Add Str$(counter + j0) + ", 16, " + Mid$(s$, j0)
+Add str$(counter + j0) + ", 16, " + Mid$(s$, j0)
 LastCode = 16
 End If
 Else
@@ -364,28 +364,28 @@ Case 14
     zz = MyTrimL(symb$)
     If zz > 1 Then symb$ = Mid$(symb$, zz): zz = zz - 1 Else zz = 0
     If symb$ = "{" Then
-        symb$ = "START_BRACKET" + Str$(var.DocParagraphs)
+        symb$ = "START_BRACKET" + str$(var.DocParagraphs)
         ms.PushVal CVar(var.DocParagraphs)
         LastCode = 140
     ElseIf symb$ = "}" Then
         
         br = CLng(ms.PopVal)
-        var.ReWritePara br, var.TextParagraph(br) + ", " + Str$(var.DocParagraphs)
-        symb$ = "END_BRACKET" + Str$(br)
+        var.ReWritePara br, var.TextParagraph(br) + ", " + str$(var.DocParagraphs)
+        symb$ = "END_BRACKET" + str$(br)
         LastCode = 141
     End If
-    Add Str$(counter + j0 + zz) + "," + Str$(LastCode) + ", " + symb$ + vbCrLf
+    Add str$(counter + j0 + zz) + "," + str$(LastCode) + ", " + symb$ + vbCrLf
 Case 20
-    Add Str$(counter + j0) + "," + Str$(LastCode) + ", " + Mid$(s$, j0) + vbCrLf
+    Add str$(counter + j0) + "," + str$(LastCode) + ", " + Mid$(s$, j0) + vbCrLf
 Case Else
     symb$ = MyTrimRW(Mid$(s$, j0))
     zz = MyTrimL(symb$)
     If zz > 1 Then symb$ = Mid$(symb$, zz): zz = zz - 1 Else zz = 0
     
     If noucase And nclev > 0 Then
-        Add Str$(counter + j0 + zz) + "," + Str$(LastCode) + ", " + symb$ + vbCrLf
+        Add str$(counter + j0 + zz) + "," + str$(LastCode) + ", " + symb$ + vbCrLf
     Else
-        Add Str$(counter + j0 + zz) + "," + Str$(LastCode) + ", " + myUcase(symb$) + vbCrLf
+        Add str$(counter + j0 + zz) + "," + str$(LastCode) + ", " + myUcase(symb$) + vbCrLf
     End If
 End Select
 LastCode = 0
@@ -396,7 +396,7 @@ End If
 conthere1:
 
 If LastCode = 0 Then
-If Not emptystr Then Add Str$(counter + j0) + ", 0" + vbCrLf: emptystr = True
+If Not emptystr Then Add str$(counter + j0) + ", 0" + vbCrLf: emptystr = True
 Else
 emptystr = False
 End If
@@ -446,7 +446,8 @@ Do While Pos <= Len(a$)
         item = item + 1
         Pos = Pos + 1
         Do While Pos <= Len(a$)
-        If Mid$(a$, Pos, 1) = Chr(34) And Mid$(a$, Pos - 1, 1) <> "`" Then Exit Do
+        'If Mid$(a$, Pos, 1) = Chr(34) And Mid$(a$, Pos - 1, 1) <> "`" Then Exit Do
+        If Mid$(a$, Pos, 1) = Chr(34) Then Exit Do
     If Asc(Mid$(a$, Pos, 1)) < 32 Then Exit Do
    
         Pos = Pos + 1
@@ -783,15 +784,15 @@ Col(k + 2) = thispos
 End Sub
 
 
-Private Sub mDoc_ColorDataEvent(thispara1 As Long, Data As String, feedback As Long)
+Private Sub mDoc_ColorDataEvent(thispara1 As Long, data As String, feedback As Long)
 
 thispara = thispara1
 Col() = mDoc.Paracolordata(thispara)
 If feedback = 0 Then
 ReDim Col(1)
 End If
-lastdata = Data
-ColorizeInnerStatements (Data), Len(Data), (0), feedback
+lastdata = data
+ColorizeInnerStatements (data), Len(data), (0), feedback
 If feedback = -1 Then
 If thispara <> 0 Then
 mDoc.Paracolordata(thispara) = Col()
@@ -2538,16 +2539,17 @@ If Len(a$) < 2 Then ISSTRINGA = False: Exit Function
 Dim q$, W As Long
 R$ = vbNullString
 q$ = Chr(34)
-W = 1
-Do
-W = W + 1
-W = InStr(W, a$, q$)
-If W > 0 Then
-If Mid$(a$, W - 1, 1) <> "`" Then Exit Do
-ElseIf W = 0 Then
-Exit Do
-End If
-Loop
+'W = 1
+'Do
+'W = W + 1
+W = InStr(2, a$, q$)
+'If W > 0 Then
+'If Mid$(a$, W - 1, 1) <> "`" Then Exit Do
+'Exit Do
+'ElseIf W = 0 Then
+'Exit Do
+'End If
+'Loop
 If W = 0 Then ISSTRINGA = False: Exit Function
 R$ = Mid$(a$, 2, W - 2)
 a$ = Mid$(a$, W + 1)

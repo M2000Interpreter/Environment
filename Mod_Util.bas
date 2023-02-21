@@ -5950,7 +5950,7 @@ End With
 End Sub
 Public Sub gsb_file(Optional assoc As Boolean = True)
    Dim CD As String
-     CD = App.Path
+     CD = App.path
         AddDirSep CD
 
         If assoc Then
@@ -7880,6 +7880,8 @@ ElseIf b = 100 Then
     MyEr "Overflow Exponet", "Υπερχείλιση εκθέτη"
 ElseIf b = 101 Then
     MyEr "Negative Exponet", "Αρνητικός εκθέτης"
+ElseIf b = vbByte Then
+    MyEr "Overflow Byte", "Υπερχείλιση Ψηφείου"
 Else  ' 20
     MyEr "Overflow", "Υπερχείλιση"
 End If
@@ -8325,7 +8327,7 @@ Sleep 1
 If a$ <> "" Then
 On Error GoTo 1
 b$ = mDir.Dir1(a$, GetCurDir)
-If b$ = vbNullString Then b$ = mDir.Dir1(a$, mDir.GetLongName(App.Path))
+If b$ = vbNullString Then b$ = mDir.Dir1(a$, mDir.GetLongName(App.path))
 If b$ <> "" Then
 CFname = mylcasefILE(b$)
 If Not IsMissing(TS) Then
@@ -8489,7 +8491,7 @@ Public Function GetCurDir(Optional AppPath As Boolean = False) As String
 Dim a$, CD As String
 
 If AppPath Then
-CD = App.Path
+CD = App.path
 AddDirSep CD
 a$ = mylcasefILE(CD)
 Else
@@ -8859,7 +8861,20 @@ Set bstack = ObjFromPtr(basestackLP)
 resp = MyAnyType(bstack, rest$, Lang, Len(here$) > 0, vbBoolean, True)
 Set bstack = Nothing
 End Sub
+Sub NeoDate(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
+Dim bstack As basetask, k As Long
 
+Set bstack = ObjFromPtr(basestackLP)
+k = MyTrimL(rest$): If k > 1 Then rest$ = Mid$(rest$, k)
+If CheckFreeExecute(rest$) Then
+    SetDouble bstack.Owner
+    resp = True
+Else
+    resp = MyAnyType(bstack, rest$, Lang, Len(here$) > 0, vbDate, True)
+End If
+Set bstack = Nothing
+
+End Sub
 Sub NeoDouble(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 Dim bstack As basetask, k As Long
 
@@ -11169,7 +11184,7 @@ If IsStrExp(bstack, rest$, Final$, False) Then
                     pat$ = pat$ + "}"
                     If IsExp(bstack, rest$, p, , True) Then
                     If myVarType(p, vbString) Then q$ = p: GoTo fromboolean
-                    If myVarType(p, vbBoolean) Then q$ = Format$(p, DefBooleanString): GoTo fromboolean
+                    If MemInt(VarPtr(p)) = vbBoolean Then q$ = Format$(p, DefBooleanString): GoTo fromboolean
 again1:
                     pl2 = InStr(pl2, Final$, pat1$)
                     If pl2 > 0 Then
@@ -11525,136 +11540,252 @@ End Sub
 
 Function ProcEnumGroup(bstack As basetask, rest$, Optional Glob As Boolean = False) As Boolean
 
-    Dim s$, w1$, v As Long, enumvalue As Long, myenum As Enumeration, mh As mHandler, V1 As Long
-    Dim gr As Boolean
-    enumvalue = 0
-    If FastPureLabel(rest$, w1$, , , , , , gr) = 1 Then
-
-        v = globalvar(bstack.GroupName + myUcase(w1$, gr), v, , Glob)
-        Set myenum = New Enumeration
-        
-        myenum.EnumName = w1$
-        Else
-        MyEr "No proper name for enumeration", "μη κανονικό όνομα για απαρίθμηση"
-        Exit Function
-    End If
-    If FastSymbol(rest$, "{") Then
-        s$ = block(rest$)
-        
-        Do
+Dim s$, w1$, v As Long, enumvalue As Long, myenum As Enumeration, mh As mHandler, V1 As Long, i As Long
+Dim s1$, badd As Byte, lasttype, feed, w2$, usehandler As mHandler, myother As Enumeration
+Dim gr As Boolean, fromvar As Long, j As Long
+fromvar = varhash.count
+enumvalue = 0#
+lasttype = enumvalue
+badd = CByte(1)
+feed = enumvalue
+If FastPureLabel(rest$, w1$, , , , , , gr) = 1 Then
+    v = globalvar(bstack.GroupName + myUcase(w1$, gr), v, , Glob)
+    Set myenum = New Enumeration
+    myenum.EnumName = w1$
+Else
+    MyEr "No proper name for enumeration", "μη κανονικό όνομα για απαρίθμηση"
+    Exit Function
+End If
+If FastSymbol(rest$, "{") Then
+    s$ = block(rest$)
+    Do
         If FastSymbol(s$, vbCrLf, , 2) Then
-        While FastSymbol(s$, vbCrLf, , 2)
-        Wend
+            While FastSymbol(s$, vbCrLf, , 2)
+            Wend
         ElseIf FastPureLabel(s$, w1$, , , , , , gr) = 1 Then
-            'w1 = myUcase(w1$)
-            If FastSymbol(s$, "=") Then
-            If IsExp(bstack, s$, enumvalue) Then
-                If Not bstack.lastobj Is Nothing Then
-                    MyEr "No Object allowed as enumeration value", "Δεν επιτρέπεται αντικείμενο για τιμή απαριθμητή"
-                    Exit Function
+            w2$ = myUcase(w1$, gr)
+            If GetVar(bstack, bstack.GroupName + w2$, j) Then
+                If j <= fromvar Then
+                    If Typename(var(j)) = "mHandler" Then
+                        Set usehandler = var(j)
+                        If usehandler.t1 = 4 Then
+                            Set myother = usehandler.objref
+                            Set usehandler = Nothing
+                            If myUcase(myother.EnumName, True) = w2$ Then
+                                ' just copy the names from other enum here
+                                For j = 0 To myother.count - 1
+                                    myother.Index = j
+                                    If AssignTypeNumeric(enumvalue + badd, VarType(lasttype)) Then
+                                        enumvalue = enumvalue + badd
+                                    End If
+                                    feed = myother.Value
+                                    If MyIsNumeric(feed) Then
+                                        lasttype = feed
+                                        enumvalue = feed
+                                    End If
+                                    myenum.addone myother.KeyToString, feed
+                                Next j
+                                ProcEnumGroup = True
+                                GoTo conthere
+                            End If
+                        End If
                     End If
+                    MyEr "name " + w1$ + " exist", "το όνομα " + w1$ + " υπάρχει"
+                    If fromvar < varhash.count Then
+                        varhash.ReduceHash fromvar, var()
+                    End If
+                    ProcEnumGroup = False
+                    Exit Function
                 End If
-            Else
-                    enumvalue = enumvalue + 1
             End If
-            myenum.addone w1$, enumvalue
+            If FastSymbol(s$, "=") Then
+                If IsExp(bstack, s$, enumvalue, , True) Then
+                    feed = enumvalue
+                    If MyIsNumeric(feed) Then lasttype = feed
+                Else
+                   'MyEr "No String allowed as enumeration value", "Δεν επιτρέπεται αλφαριθμητικό για τιμή απαριθμητή"
+                   If IsStrExp(bstack, s$, s1$, False) Then
+                       If AssignTypeNumeric(enumvalue + badd, VarType(lasttype)) Then
+                           enumvalue = enumvalue + badd
+                       Else
+                           Exit Function
+                       End If
+                       feed = CVar(s1$)
+                   Else
+                       Exit Function
+                   End If
+                End If
+            ElseIf AssignTypeNumeric(enumvalue + badd, VarType(lasttype)) Then
+                enumvalue = enumvalue + badd
+                feed = enumvalue
+            Else
+                Exit Function
+            End If
+            myenum.addone w1$, feed
             Set mh = New mHandler
             Set mh.objref = myenum
             mh.t1 = 4
             mh.ReadOnly = True
-            mh.index_cursor = enumvalue
+            mh.index_cursor = feed
             mh.index_start = myenum.count - 1
-             V1 = globalvar(bstack.GroupName + myUcase(w1$, gr), V1, , Glob)
-             Set var(V1) = mh
+            V1 = globalvar(bstack.GroupName + myUcase(w1$, gr), V1, , Glob)
+            Set var(V1) = mh
             ProcEnumGroup = True
         Else
             Exit Do
         End If
+conthere:
         If FastSymbol(s$, ",") Then ProcEnumGroup = False
-        Loop
-        If V1 > v Then Set var(v) = var(V1) Else MyEr "Empty Enumeration", "Άδεια Απαρίθμηση": Exit Function
-        ProcEnumGroup = FastSymbol(rest$, "}", True)
+    Loop
+    If V1 > v Then
+        Set var(v) = var(V1)
     Else
-        MissingEnumBlock
-        Exit Function
+        If myenum.count = 0 Then
+            MyEr "Empty Enumeration", "Άδεια Απαρίθμηση": Exit Function
+        Else
+            Set mh = New mHandler
+            Set mh.objref = myenum
+            myenum.Index = myenum.count - 1
+            mh.index_cursor = myenum.Value
+            mh.index_start = myenum.Index
+            mh.t1 = 4
+            mh.ReadOnly = True
+            Set var(v) = mh
+        End If
     End If
-    
-    
+    ProcEnumGroup = FastSymbol(rest$, "}", True)
+Else
+    MissingEnumBlock
+    Exit Function
+End If
+        
 End Function
 Function ProcEnum(bstack As basetask, rest$, Optional Glob As Boolean = False) As Boolean
-
-    Dim s$, w1$, v As Long, enumvalue As Variant, myenum As Enumeration, mh As mHandler, V1 As Long, i As Long
-    Dim s1$
-    Dim gr As Boolean
-    enumvalue = 0#
-    If FastPureLabel(rest$, w1$, , , , , , gr) = 1 Then
-       ' w1$ = myucase(w1$)
-        v = globalvar(myUcase(w1$, gr), v, , Glob)
-        Set myenum = New Enumeration
-        
-        myenum.EnumName = w1$
-        Else
-        MyEr "No proper name for enumeration", "μη κανονικό όνομα για απαρίθμηση"
-        Exit Function
-    End If
-    If FastSymbol(rest$, "{") Then
-        s$ = block(rest$)
-        
-        Do
+Dim s$, w1$, v As Long, enumvalue As Variant, myenum As Enumeration, mh As mHandler, V1 As Long, i As Long
+Dim s1$, badd As Byte, lasttype, feed, w2$, usehandler As mHandler, myother As Enumeration
+Dim gr As Boolean, fromvar As Long, j As Long
+fromvar = varhash.count
+enumvalue = 0#
+lasttype = enumvalue
+badd = CByte(1)
+feed = enumvalue
+If FastPureLabel(rest$, w1$, , , , , , gr) = 1 Then
+    v = globalvar(myUcase(w1$, gr), v, , Glob)
+    Set myenum = New Enumeration
+    myenum.EnumName = w1$
+Else
+    MyEr "No proper name for enumeration", "μη κανονικό όνομα για απαρίθμηση"
+    Exit Function
+End If
+If FastSymbol(rest$, "{") Then
+    s$ = block(rest$)
+    Do
         If FastSymbol(s$, vbCrLf, , 2) Then
-        While FastSymbol(s$, vbCrLf, , 2)
-        Wend
+            While FastSymbol(s$, vbCrLf, , 2)
+            Wend
         ElseIf MaybeIsSymbol(s$, "/\'") Then
-        
-        SetNextLine s$
+            SetNextLine s$
         ElseIf FastPureLabel(s$, w1$, , , , , , gr) = 1 Then
-   
+            w2$ = myUcase(w1$, gr)
+            If GetVar(bstack, w2$, j, Glob) Then
+                If j <= fromvar Then
+                    If Typename(var(j)) = "mHandler" Then
+                        Set usehandler = var(j)
+                        If usehandler.t1 = 4 Then
+                            Set myother = usehandler.objref
+                            Set usehandler = Nothing
+                            If myUcase(myother.EnumName, True) = w2$ Then
+                                ' just copy the names from other enum here
+                                For j = 0 To myother.count - 1
+                                    myother.Index = j
+                                    If AssignTypeNumeric(enumvalue + badd, VarType(lasttype)) Then
+                                        enumvalue = enumvalue + badd
+                                    End If
+                                    feed = myother.Value
+                                    If MyIsNumeric(feed) Then
+                                        lasttype = feed
+                                        enumvalue = feed
+                                    End If
+                                    myenum.addone myother.KeyToString, feed
+                                Next j
+                                ProcEnum = True
+                                GoTo conthere
+                            End If
+                        End If
+                    End If
+                  MyEr "name " + w1$ + " exist", "το όνομα " + w1$ + " υπάρχει"
+                  If fromvar < varhash.count Then
+                    varhash.ReduceHash fromvar, var()
+                  End If
+                  ProcEnum = False
+                  Exit Function
+                End If
+            End If
             If FastSymbol(s$, "=") Then
-            If IsExp(bstack, s$, enumvalue, , True) Then
-                If Not bstack.lastobj Is Nothing Then
-                    MyEr "No Object allowed as enumeration value", "Δεν επιτρέπεται αντικείμενο για τιμή απαριθμητή"
-                    Exit Function
-                   End If
-            Else
+                If IsExp(bstack, s$, enumvalue, , True) Then
+                    feed = enumvalue
+                    If MyIsNumeric(feed) Then lasttype = feed
+                Else
                     'MyEr "No String allowed as enumeration value", "Δεν επιτρέπεται αλφαριθμητικό για τιμή απαριθμητή"
                     If IsStrExp(bstack, s$, s1$, False) Then
-                    enumvalue = CVar(s1$)
+                        If AssignTypeNumeric(enumvalue + badd, VarType(lasttype)) Then
+                            enumvalue = enumvalue + badd
+                        Else
+                            Exit Function
+                        End If
+                        feed = CVar(s1$)
                     Else
                         Exit Function
                     End If
-                    
-     
                 End If
             Else
-                    enumvalue = enumvalue + 1
+                If AssignTypeNumeric(enumvalue + badd, VarType(lasttype)) Then
+                    enumvalue = enumvalue + badd
+                    feed = enumvalue
+                Else
+                    Exit Function
+                End If
             End If
-            myenum.addone w1$, enumvalue
+            myenum.addone w1$, feed
             w1$ = myUcase(w1$, gr)
             If numid.Find(w1$, i) Then If i > 0 Then numid.ItemCreator2 w1$, -1
-            
             Set mh = New mHandler
             Set mh.objref = myenum
             mh.t1 = 4
             mh.ReadOnly = True
-            mh.index_cursor = enumvalue
+            mh.index_cursor = feed
             mh.index_start = myenum.count - 1
-            
-             V1 = globalvar(w1$, V1, , Glob)
-             Set var(V1) = mh
+            V1 = globalvar(w1$, V1, , Glob)
+            Set var(V1) = mh
             ProcEnum = True
         Else
             Exit Do
         End If
+conthere:
         If FastSymbol(s$, ",") Then ProcEnum = False
-        Loop
-        If V1 > v Then Set var(v) = var(V1) Else MyEr "Empty Enumeration", "Άδεια Απαρίθμηση": Exit Function
-        ProcEnum = FastSymbol(rest$, "}", True)
+    Loop
+        
+    If V1 > v Then
+        Set var(v) = var(V1)
     Else
-        MissingEnumBlock
-        Exit Function
+        If myenum.count = 0 Then
+            MyEr "Empty Enumeration", "Άδεια Απαρίθμηση": Exit Function
+        Else
+            Set mh = New mHandler
+            Set mh.objref = myenum
+            myenum.Index = myenum.count - 1
+            mh.index_cursor = myenum.Value
+            mh.index_start = myenum.Index
+            mh.t1 = 4
+            mh.ReadOnly = True
+            Set var(v) = mh
+        End If
     End If
-    
-    
+    ProcEnum = FastSymbol(rest$, "}", True)
+Else
+    MissingEnumBlock
+    Exit Function
+End If
 End Function
 Function CallLambdaASAP(bstack As basetask, a$, R, Optional forstring As Boolean = False) As Long
 Dim w2 As Long, w1 As Long, nbstack As basetask
@@ -13696,7 +13827,7 @@ ss$ = "M" + CStr(p)
 End If
 If ML <> 1 Then
 If stac1$ = vbNullString And Left$(s$, 1) = "S" Then
-s$ = App.Path
+s$ = App.path
 AddDirSep s$
 s$ = s$ + "M2000.EXE "
 If Shell(s$ + Chr(34) + pa$ + frm$ + ".gsb" + para$ + Chr(34), vbNormalFocus) > 0 Then
@@ -13732,7 +13863,7 @@ Print #i, "DIR " + Chr(34) + pa$ + Chr(34) + " : LOAD " + Chr(34) + frm$ + para$
 End If
 Close i
 tempList2delete = Sput(strTemp + ss$) + tempList2delete
-s$ = App.Path
+s$ = App.path
 AddDirSep s$
 s$ = s$ + "M2000.EXE "
 LastUse = MyShell(s$ + Chr(34) + strTemp + ss$ + Chr(34), vbNormalFocus - 4 * (ML <> 0 Or IsSymbol(rest$, ";")))
@@ -13976,7 +14107,7 @@ Dim pp As Variant, par As Boolean, r2 As Variant, R3 As Variant, R4 As Variant
     r2 = Int(r2)
     R4 = R4 + (R3 - Int(R3)) * 30
     R3 = Int(R3)
-     R = CDbl(DateSerial(Year(R) + r2, Month(R) + R3, Day(R) + R4) + pp)
+     R = DateSerial(Year(R) + r2, Month(R) + R3, Day(R) + R4) + CDate(pp)
               If Err.Number > 0 Then
     WrongArgument a$
     Err.Clear
@@ -13996,10 +14127,10 @@ Dim s$
     If IsStrExp(bstack, a$, s$, False) Then
     On Error Resume Next
     If UCase(s$) = "UTC" Then
-    R = CDbl(GetUTCTime)
+    R = GetUTCTime
     R = R - Int(R)
     Else
-    R = CDbl(CDate(TimeValue(s$)))
+    R = CDate(TimeValue(s$))
     End If
     
          If Err.Number > 0 Then
@@ -14030,7 +14161,7 @@ Function IsDataVal(bstack As basetask, a$, R As Variant) As Boolean
         p = Clid
     End If
     On Error Resume Next
-    R = CDbl(DateFromString(s$, p))
+    R = DateFromString(s$, p)
     
      If Err.Number > 0 Then
     
@@ -14041,9 +14172,9 @@ Function IsDataVal(bstack As basetask, a$, R As Variant) As Boolean
     Else
     On Error Resume Next
     If s$ = "UTC" Then
-    R = CDbl(Int(GetUTCDate))
+    R = CDate(Int(GetUTCDate))
     Else
-    R = CDbl(DateValue(s$))
+    R = DateValue(s$)
     End If
     
      If Err.Number > 0 Then
@@ -18906,7 +19037,7 @@ If IsExp(bstack, a$, R, flatobject:=True, nostring:=True) Then
     r2 = Int(r2)
     R4 = R4 + (R3 - Int(R3)) * 60
     R3 = Int(R3)
-    R = CDbl(TimeSerial(Hour(CDate(R)) + r2, Minute(CDate(R)) + R3, Second(CDate(R)) + R4) + Int(Abs(R)))
+    R = TimeSerial(Hour(CDate(R)) + r2, Minute(CDate(R)) + R3, Second(CDate(R)) + R4) + CDate(Int(Abs(R)))
     
                 If Err.Number > 0 Then
     WrongArgument a$
@@ -25326,18 +25457,18 @@ End With
 End Function
 Public Function GetSpecialfolder(CSIDL As Long) As String
     Dim R As Long
-    Dim IDL As Long, NoError As Long, Path$
+    Dim IDL As Long, NoError As Long, path$
     'Get the special folder
     R = SHGetSpecialFolderLocation(100, CSIDL, IDL)
     If R = NoError Then
         'Create a buffer
         If IDL Then
-        Path$ = space$(1024)
+        path$ = space$(1024)
         
         'Get the path from the IDList
-        R = SHGetPathFromIDList(IDL, StrPtr(Path$))
+        R = SHGetPathFromIDList(IDL, StrPtr(path$))
         'Remove the unnecessary chr$(0)'s
-        GetSpecialfolder = mylcasefILE(Left$(Path, InStr(Path, vbNullChar) - 1))
+        GetSpecialfolder = mylcasefILE(Left$(path, InStr(path, vbNullChar) - 1))
         Call CoTaskMemFree(IDL)
         Exit Function
         End If
@@ -25656,6 +25787,8 @@ there01:
                 var(i) = p
             Case vbByte
                 var(i) = CByte(p)
+            Case vbDate
+                var(i) = CDate(p)
             Case vbVariant
                 varhash.vType(varhash.Index) = False
                 If MyIsObject(p) Then
@@ -25856,6 +25989,8 @@ contGetStr0:
                     var(i) = Empty
                 Case vbByte
                     var(i) = CByte(0)
+                Case vbDate
+                    var(i) = CDate(0)
                 End Select
                 If Err > 0 Then
                     If Err.Number = 6 Then OverflowValue thattype
@@ -25918,6 +26053,8 @@ jumphereObject:
                             var(i) = CStr(p)
                         Case vbByte
                             var(i) = CByte(p)
+                        Case vbDate
+                            var(i) = CDate(p)
                         End Select
                     Else
                         If j = 4 Then p = Round(p)
@@ -28551,7 +28688,7 @@ Set offsetlist = Nothing
 End If
 End Function
 Function ProcKeyboard(basestack As basetask, rest$, Lang As Long) As Boolean
-Dim par As Boolean, s$, p As Variant, w3 As Long, g As gList
+Dim par As Boolean, s$, p As Variant, w3 As Long, G As gList
 Dim alt, shift, ctrl, again As Boolean
 On Error Resume Next
 If IsLabelSymbolNew(rest$, "ΦΟΡΤΩΣΕ", "LOAD", Lang) Then
@@ -32546,10 +32683,17 @@ Case 1
                                                     If TypeOf p Is mHandler Then
                                                         Set usehandler2 = p
                                                         If usehandler2.t1 = 4 Then
-                                                            If Not usehandler.objref Is usehandler2.objref Then
+                                                           If Not usehandler.objref Is usehandler2.objref Then
+                                                               usehandler2.CopyTo usehandler2
+                                                               If usehandler.objref.ExistFromOther2(usehandler2) Then
+                                                               Set usehandler2.objref = usehandler.objref
+                                                               Set usehandler = usehandler2
+                                                               GoTo cont120345
+                                                               Else
                                                                 s$ = usehandler.objref.EnumName
                                                                 Expected s$, s$
                                                                 Exit Function
+                                                                End If
                                                             End If
                                                             
                                                         Else
@@ -32557,6 +32701,7 @@ Case 1
                                                             Exit Function
                                                         End If
                                                         usehandler2.CopyTo usehandler
+cont120345:
                                                         Set p = usehandler
                                                         Set usehandler2 = Nothing
                                                     Else

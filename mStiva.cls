@@ -344,7 +344,7 @@ End Sub
 Public Sub PushVal(a As Variant)
 Dim aa As VarItem
 Set aa = NewVarItem()
-If VarType(a) = vbString Then
+If MemInt(VarPtr(a)) = vbString Then
 aa.Typename = "S"
 aa.ItemDouble = a
 Else
@@ -554,8 +554,13 @@ End Sub
 Public Sub DataVal(a As Variant)
 Dim aa As VarItem
 Set aa = NewVarItem()
+If MemInt(VarPtr(a)) = vbString Then
+aa.Typename = "S"
+aa.ItemDouble = a
+Else
 aa.Typename = "N"
 aa.ItemVariant = a
+End If
 If mstack.count = 0 Then
 mstack.Add aa
 Else

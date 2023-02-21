@@ -241,9 +241,9 @@ Dim slen As Long
    RtlMoveMemory ByVal StrPtr(GetBStrFromPtr), ByVal lpSrc, slen * 2
 End Function
 
-Private Function GetGUIDstr(g As GUID) As String
+Private Function GetGUIDstr(G As GUID) As String
 Dim ret As Long, here As Long
-ret = StringFromCLSID(g, here)
+ret = StringFromCLSID(G, here)
 If ret Then Exit Function
 GetGUIDstr = GetBStrFromPtr(here)
 CoTaskMemFree here
@@ -267,7 +267,7 @@ Private Sub pvSetParamArray(ByVal Ptr As Long, aParams() As Variant)
 
         ' get the variant's type
         CpyMem iVarType, ByVal lVarPtr + (lIdx * 16&), 2&
-Debug.Print iVarType, "pvSetParam", lIdx
+'Debug.Print iVarType, "pvSetParam", lIdx
         If (iVarType And VT_BYREF) = VT_BYREF Then
         
             ' ByRef Parameter
@@ -577,7 +577,7 @@ Public Function Attach(obj As Object) As Boolean
     ' IEnumConnectionPoints VTable
     CpyMem pVTblECP, ByVal pECP, 4
     CpyMem oECP, ByVal pVTblECP, Len(oECP)
-AGAIN:
+again:
     ' take the first best Connection Point
     hRet = CallPointer(oECP.Next, pECP, 1, VarPtr(pCP), VarPtr(cReturned))
     If hRet Then Exit Function
@@ -591,9 +591,9 @@ AGAIN:
     If hRet Then Exit Function
     check$ = GetGUIDstr(iid_event)
     ' IPropertyNotifySink  not this
-    If check$ = "{9BFBBC02-EFF1-101A-84ED-00AA00341D07}" Then GoTo AGAIN
+    If check$ = "{9BFBBC02-EFF1-101A-84ED-00AA00341D07}" Then GoTo again
     ' ITridentEventSink not this
-    If check$ = "{1DC9CA50-06EF-11D2-8415-006008C3FBFC}" Then GoTo AGAIN
+    If check$ = "{1DC9CA50-06EF-11D2-8415-006008C3FBFC}" Then GoTo again
 
     ' create a new event sink
     Set oSink = CreateEventSink(iid_event, Me)
@@ -621,7 +621,7 @@ End Function
 Sub Process(VarProc As Long, a As Long, Ptr1 As Long, usestring As Boolean, stval$)
     Dim t(0 To 8) As Integer, Zero, Ptr As Long, ItsVariantRef As Boolean
     CpyMem ByVal VarPtr(t(0)), ByVal a, 16
-AGAIN:
+again:
     CpyMem Ptr, ByVal VarPtr(t(4)), 4
 
     If (t(0) And &H4000) > 0 Then
@@ -648,7 +648,7 @@ AGAIN:
         ElseIf t(0) = 12 Then
             CpyMem ByVal VarPtr(t(0)), ByVal Ptr, 16
             ItsVariantRef = True
-            If (t(0) And &H4000 > 0) Then GoTo AGAIN
+            If (t(0) And &H4000 > 0) Then GoTo again
         Else
             CpyMem ByVal VarPtr(t(1)), ByVal Ptr + 2, 14
         End If

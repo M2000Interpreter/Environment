@@ -71,12 +71,22 @@ Dim i As Long
 For i = 0 To toplim
 If RHS = PriveSpace(i).iValue Then ExistFromOther = True: Exit Function
 Next i
+End Function
+Function ExistFromOther2(usehandler As mHandler) As Boolean
+Dim other As Enumeration
+Set other = usehandler.objref
+other.Index = usehandler.index_start
+Dim s$, i As Long
+s$ = other.KeyToString
+For i = 0 To toplim
+If s$ = PriveSpace(i).Key Then ExistFromOther2 = True: usehandler.index_start = i: Exit For
+Next i
 
 End Function
 Function SearchSimple(what As String, ByRef ok As Boolean) As Variant
 Dim i As Long
 For i = 0 To toplim
-If what = PriveSpace(i).KeyUCase Then ok = True: SearchSimple = PriveSpace(i).iValue: Exit Function
+If what = PriveSpace(i).KeyUCase Then ok = True: SearchSimple = PriveSpace(i).iValue: Index = i: Exit Function
 Next i
 End Function
 Function SearchValue(v As Variant, ByRef ok As Boolean) As Variant
@@ -96,7 +106,7 @@ Exit Function
 End If
 Next i
 If Not ok Then
-If myVarType(v, vbString) Then
+If MemInt(VarPtr(v)) = vbString Then
     
 Else
 

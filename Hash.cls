@@ -29,7 +29,7 @@ Public MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
-Public index As Long
+Public Index As Long
 Private Hash() As Long
 Private entrance As Long
 Public Sub BigSize(n As Long)
@@ -50,17 +50,17 @@ Friend Sub ReadVar(where, Name$, num As Long)
     num = PriveSpace(where).nDx
 End Sub
 Public Property Get lastNDX() As Long
-If index < 0 Then
+If Index < 0 Then
 lastNDX = 0
 Else
-lastNDX = PriveSpace(index).nDx
+lastNDX = PriveSpace(Index).nDx
 End If
 End Property
 Public Property Get lastkey() As String
-If index < 0 Then
+If Index < 0 Then
 lastkey = vbCrLf
 Else
-lastkey = PriveSpace(index).Key
+lastkey = PriveSpace(Index).Key
 End If
 End Property
 
@@ -155,8 +155,8 @@ Friend Sub Expand(NewMaxSpace As Long)
            ReDim Preserve PriveSpace(MaxSpace) As item
            If MaxSpace > hashlen Then ExpandHash
 End Sub
-Property Get Count()
-Count = toplim + 1
+Property Get count()
+count = toplim + 1
 End Property
 Friend Function Find2(Key As String, num As Long, Optional checktype As Boolean, Optional isglobal As Boolean) As Boolean
 Dim k As Long
@@ -168,7 +168,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    num = PriveSpace(k).nDx: Find2 = True: index = k:  checktype = PriveSpace(k).originaltype: isglobal = PriveSpace(k).globalvar: Exit Function
+    num = PriveSpace(k).nDx: Find2 = True: Index = k:  checktype = PriveSpace(k).originaltype: isglobal = PriveSpace(k).globalvar: Exit Function
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0
@@ -184,7 +184,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    num = PriveSpace(k).nDx: Find3 = True: index = k: isglobal = PriveSpace(k).globalvar: Exit Function
+    num = PriveSpace(k).nDx: Find3 = True: Index = k: isglobal = PriveSpace(k).globalvar: Exit Function
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0
@@ -200,7 +200,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    num = PriveSpace(k).nDx: Find = True: index = k: Exit Function
+    num = PriveSpace(k).nDx: Find = True: Index = k: Exit Function
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0
@@ -255,14 +255,14 @@ With PriveSpace(a)
     .firsthash = HD(Key)
      SwapStrings .Key, Key
 End With
-index = a
+Index = a
 exxx:
 End Sub
-Friend Sub ItemCreator2(Id As idHash, Key As String, num As Long, Optional isRef As Boolean = False, Optional isglobal As Boolean = False, Optional deftype As Boolean = False)
+Friend Sub ItemCreator2(id As idHash, Key As String, num As Long, Optional isRef As Boolean = False, Optional isglobal As Boolean = False, Optional deftype As Boolean = False)
 Dim a As Long
 a = Malloc()
 On Error GoTo exxx
-place Id.lastHashFunc0 Mod hashlen, a
+place id.lastHashFunc0 Mod hashlen, a
 With PriveSpace(a)
     .nDx = num
     .KeyType = CByte(Abs(isRef))
@@ -271,11 +271,11 @@ With PriveSpace(a)
     .firsthash = HD(Key)
      .Key = Key
 End With
-index = a
+Index = a
 exxx:
 End Sub
 Property Get Percent()
-Percent = Count / hashlen
+Percent = count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
@@ -295,7 +295,7 @@ Private Function HashFunc(a$)
 HashFunc = HD(a$) Mod hashlen
 End Function
 Sub flat()
-index = -1
+Index = -1
 End Sub
 
 Friend Property Get vType(where As Long) As Boolean
