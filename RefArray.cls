@@ -215,16 +215,22 @@ entry1:
                 MemCopy ((ArrPtr() Xor &H80000000) + 8 * CLng(where)) Xor &H80000000, ((VarPtr(that) Xor &H80000000) + 8) Xor &H80000000, 8
             ElseIf mt = 8200 Then
                 If wt = vbString Then
-                        p(where) = that
+                    p(where) = that
                 Else
                     mError = 5030
                 End If
+            ElseIf mt = 8199 Then
+                p(where) = CDate(that)
+                If Err Then mError = 5040: Err.Clear
+                
             ElseIf wt = vbString Then
                 If mt = vbVariant Or mt = vbString Or mt = 8204 Then
                     p(where) = that
                 Else
                     mError = 5020
                 End If
+            ElseIf wt = vbDate Then
+                p(where) = CDate(that)
             ElseIf myVarType(that, vbObject) Then
                 Set p(where) = that
                 
@@ -283,6 +289,9 @@ entry1:
             Else
                 mError = 5030
             End If
+        Case vbDate
+            p(where)(what) = CDate(that)
+            If Err Then mError = 5040: Err.Clear
         Case Else
             If wt = vbString Then
                 mError = 5020

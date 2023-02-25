@@ -5662,7 +5662,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 47 for M2000 Interpreter version 12, revision 13 and above"
+	Report " A collection of modules for tests version 48 for M2000 Interpreter version 12, revision 17 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -8479,60 +8479,93 @@ For i=1 to 2000 {
 }
 Set Fast
 }
-MODULE BN {Dim Mod$(0 to 99), Mul(0 to 9,0 to 9)
-for j=0 to 9 : For i=0 to 9:Mod$(i+j*10)=str$(i mod 10,0): Mul(i,j)=i*j : Next i :Next j
-profiler
-a$="9231231231231231231231231231232132131213130989802139080120931920389590859034898509385094850943850943850348083409850934809534809583458340958340985093458934850349"
+MODULE BN {Print "Arbitrary-precision multiplication"
+Dim Mu(0 to 9,0 to 9) as integer
+integer j, i
+for j=0 to 9 : For i=0 to 9:Mu(i,j)=i*j : Next i :Next j
+Dim md(100) as string
+for i=0 to 99:md(i)=str$(i mod 10%, 0)
+Next i
+/a$="200000123412122"
+a$="92312312312312312312312312312321321312131309898021390801209319203895908590348985093850948509438509438503480834098509348095348095834583409583409850934589348503496237846327674273439498349837878934272893749837"
 \\ a$ x n
-n1$="1234567767765675576765234324243122131213122113123120898031238910823"
-// try to swap these variables
-// swap a$, n1$
-print val(n1$)*val(a$)
+n1$=a$+"0000000000000000000000000000000000000000000001"
+//n1$="211221212119912121212121212687686756567"
+//n1$="1234567767765675576765234324243122131213122113123120898031238910823"
+gosub mult
+a$="131072"
+n1$="65535"
+gosub mult
+a$="1234"
+n1$="5678"
+gosub mult
+end
+mult:
+profiler
+if len(a$)>len(n1$) then swap a$, n1$
+integer j, i, k, n1,digit, l, n
+print a$
+print "x"
+print n1$
+print "Normal multiplication:";val(n1$)*val(a$)
+refresh
 k=0
+l=len(a$)
 a$=strrev$(a$)
 inventory num
-rev3$=""
+//dgt=list:="0":=0%,"1":=1%,"2":=2%,"3":=3%,"4":=4%,"5":=5%, "6":=6%,"7":=7%,"8":=8%,"9":=9%, "":=0%
+string rev1="", rev2="", rev3="", tp=""
 n1=len(n1$)
 while n1>0 
     n=val(mid$(n1$,n1,1))
     n1--
-    rev2$=string$("0", k)
-    rev1$=""
+    rev2=string$("0", k)
+    rev1=""
     k++
     
     if n>0 then
         if not exist(num, n) then
-            digit=0&
-            For i=1 to len(a$)
-                digit+=n*val(mid$(a$,i,1))
-                rev1$+=str$(digit mod 10,0)
-                digit/=10&
-            Next i
-            if digit then rev1$+=str$(digit mod 10,0)
-            Append num, n:=rev1$
+            digit=0%
+            if n=1 then
+                rev1=a$                
+            else
+                For i=1 to l{digit+=n*val(mid$(a$,i,1)):rev1+=md(digit):digit/=10%}
+                if digit then rev1+=md(digit)
+            end if
+            Append num, n:=rev1
         else
-            rev1$=num$(n)
+            rev1=num$(n)
         End if
-        rev2$+=rev1$
-        if len(rev3$)=0 then
-            swap rev2$, rev3$
+        rev2+=rev1
+        if len(rev3)=0 then
+            swap rev2, rev3
         else
-            swap rev1$, rev3$
-            rev3$=""
-            if rev2$<rev1$ then swap rev1$, rev2$
-            digit=0
-            For i=1 to len(rev1$)
-                digit+=val(mid$(rev1$, i, 1))+val(mid$(rev2$, i, 1))
-                rev3$+=str$(digit mod 10,0)
-                digit/=10&
-            next i
-            if digit>0 then rev3$+=str$(digit mod 10,0)
+            swap rev1, rev3
+            rev3=""
+            if rev2<rev1 then swap rev1, rev2
+            digit=0%
+            For i=1 to len(rev1) {digit+=val(mid$(rev1, i, 1))+val(mid$(rev2, i, 1)):rev3+=md(digit):digit/=10%}
+            if digit>0 then rev3+=md(digit)
         end  if
     End if
 End While
-print strrev$(rev3$)
-print timecount
-print Len(Num)
+tp=strrev$(rev3)
+if len(tp)>10 then
+print left$(tp,1)+"."+mid$(tp,2)+"E+"+(len(tp)-1)
+else
+print "Result: "+tp
+end if
+print timecount+" milliseconds"
+print "Registers used:";Len(Num)
+nn=each(Num)
+while nn
+	if Len(eval$(nn)	)<10 then
+		Print "Digit:"+eval$(nn!), strrev$(eval$(nn))
+	else
+		Print "Digit:"+eval$(nn!), "Length:"+(Len(eval$(nn)))
+	end if
+end while
+return
 }
 MODULE DI {inline code libdiv
 op=Pen
@@ -8762,11 +8795,13 @@ Print Cipher$(B$,-10)
 B$=Cipher$(a$, 24)
 Print B$
 Print Cipher$(B$,-24)
-n=1 ' n negative or positive or zero
-for i=65 to 65+25
-	a=(1+(i -64)+n+24) mod 26 + 65
-	? chr$(a), 
-next
+REM {
+	n=1 ' n negative or positive or zero
+	for i=65 to 65+25
+		a=(1+(i -64)+n+24) mod 26 + 65
+		? chr$(a), 
+	next
+}
 }
 MODULE CO {Module Check {
       \\ we use an internal object for Math functions (here for Atan2)
@@ -21480,7 +21515,7 @@ MODULE USETHIS {try {
 	PEN 14
 	CLS,0
 	If Version<12 then Error "No proper M2000 version (must be >=12)"
-	If Version=12 and revision<13 then Error "No proper M2000 revision for version 4 (need revision >=13)"
+	If Version=12 and revision<17 then Error "No proper M2000 revision for version 4 (need revision >=17)"
 	Set Fast
 	Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 	dir user
@@ -35674,14 +35709,14 @@ MODULE CRC {Module CheckApi {
       // a len of 3.5 is 7 bytes. Len is a double which return number of words
       // so a 0.5 word is a byte
       // because we get a Long (singed) we convert it to unsigned 32 bit (using same bits)
-      Hex Uint(CRC32(sint(0x0),a$,len(a$)*2))
+      hex CRC32(sint(0x0),a$,len(a$)*2)
 }
 CheckApi
 Module CheckApi {
       Declare CRC32 LIB "ntdll.RtlComputeCrc32" {Long Zero, a$, Long s}
       a$=Str$("The quick brown fox")
       b$=Str$(" jumps over the lazy dog")
-      Hex Uint(CRC32(CRC32(0,a$,len(a$)*2),b$,len(b$)*2))
+      Hex CRC32(CRC32(0,a$,len(a$)*2),b$,len(b$)*2)
 }
 CheckApi
 Module CheckIt {
@@ -35930,9 +35965,9 @@ with CR, "ClassKey",  HKEY_CURRENT_USER
 with CR, "SectionKey", "Control Panel\Desktop\"
 with CR, "ValueType", REG_DWORD , "ValueKey", "CaretTimeout"
 with CR,"KeyExists" as CaretTimeout.Exist, "Value" as CaretTimeout.value
-If CaretTimeout.Exist then Print  "Old Value: 0x"+Hex$(uint(CaretTimeout.value))+"&", CaretTimeout.value
+If CaretTimeout.Exist then Print  "Old Value: 0x"+Hex$(uint(CaretTimeout.value),4)+"&", CaretTimeout.value
 CaretTimeout.value=0xFFFFFFFF&
-If CaretTimeout.Exist then Print  "New Value: 0x"+ Hex$(uint(CaretTimeout.value))+"&", CaretTimeout.value
+If CaretTimeout.Exist then Print  "New Value: 0x"+ Hex$(uint(CaretTimeout.value),4)+"&", CaretTimeout.value
 }
 MODULE GRAPH2 {Font "Tahoma"
 Pen 14
@@ -41642,5 +41677,113 @@ module Return_multiple_values {
 }
 Return_multiple_values
 Print "Done"
+}
+MODULE EUCLID {Pen 15 {Print "Part I - Positive numbers:"}
+long long R=1234567, Q
+long long D=5678
+Print  R+" div "+D+" = " + (R div D)
+Print R+" mod "+D+" = " + (R mod D)
+Print "Using Euclid's algorithm"
+while R>=D
+	R-=D
+	Q++
+end while
+Print Q, R
+
+Pen 15 {Print "Part II. Test https://en.wikipedia.org/wiki/Division_algorithm  algorithm"}
+N1=123456789&&
+if random(1,2)=1 then N1-!
+D1=56789&&
+if random(1,2)=1 then D1-!
+Print N1+" div "+D1
+(Q, R)=@divide(N1, D1)
+? Q, R, "from @divide()"
+? Q*D1+R
+Q1= N1 div# D1
+R1= N1 mod#  D1
+? Q1, R1, " using div# & mod#"
+? Q1*D1+R1
+function divide(N as long long, D as long long)
+	if D = 0&& then error "Division By Zero"
+	if D < 0&& then (Q, R)=@divide(N, -D): =-Q, R:exit function
+	if N < 0 then
+		(Q,R)=@divide(-N, D)
+		if R = 0 then
+			=-Q, 0&&
+		else
+			=-Q - 1, D - R
+		end if
+	else	
+		=@divide_unsigned(N, D)
+	end if
+end  function
+function divide_unsigned(N, D)
+	local  long long Q = 0,  R= N
+	while R >= D
+		R-=D
+		Q++
+	end while
+	=Q, R
+end function
+}
+MODULE DIVISION {print "Normal division"
+N1=123456789&&
+D1=56789&&
+? N1 + " div " + d1
+Q1= N1 div D1
+R1= N1 mod  D1
+? Q1, R1
+? Q1*D1+R1
+N1=-123456789&&
+D1=56789&&
+? N1 + " div " + d1
+Q1= N1 div D1
+R1= N1 mod  D1
+? Q1, R1
+? Q1*D1+R1
+N1=123456789&&
+D1=-56789&&
+? N1 + " div " + d1
+Q1= N1 div D1
+R1= N1 mod  D1
+? Q1, R1
+? Q1*D1+R1
+N1=-123456789&&
+D1=-56789&&
+? N1 + " div " + d1
+Q1= N1 div D1
+R1= N1 mod  D1
+? Q1, R1
+? Q1*D1+R1
+
+Print "Euclidean division"
+N1=123456789&&
+D1=56789&&
+? N1 + " div# " + d1
+Q1= N1 div# D1
+R1= N1 mod#  D1
+? Q1, R1
+? Q1*D1+R1
+N1=-123456789&&
+D1=56789&&
+? N1 + " div# " + d1
+Q1= N1 div# D1
+R1= N1 mod#  D1
+? Q1, R1
+? Q1*D1+R1
+N1=123456789&&
+D1=-56789&&
+? N1 + " div# " + d1
+Q1= N1 div# D1
+R1= N1 mod#  D1
+? Q1, R1
+? Q1*D1+R1
+N1=-123456789&&
+D1=-56789&&
+? N1 + " div# " + d1
+Q1= N1 div# D1
+R1= N1 mod#  D1
+? Q1, R1
+? Q1*D1+R1
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
