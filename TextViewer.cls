@@ -1882,7 +1882,7 @@ End Sub
 
 'End Sub
 
-Private Sub glistN_ScrollSelected(item As Long, Y As Long)
+Private Sub glistN_ScrollSelected(item As Long, y As Long)
 If NoMark Then Exit Sub
 Dim what$, ThatPara As Long
    mDoc.TextParagraphLine item, what$, ThatPara
@@ -2391,7 +2391,12 @@ If kind > 0 Then
                 End If
             End If
             If pos2 > 0 Then
-                addone pos2, 10
+                If kind = 8 Then
+                   addone k - Len(A$) - Len(drop$) + 1, 10
+                   addone k - Len(A$), 13
+                Else
+                    addone pos2, 10
+                End If
             Else
                 lastkind = 0
                 If kind = 8 Then

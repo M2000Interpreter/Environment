@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 17 active-X
-This version is 99% complete. 1% left for using Interfaces and creating UDT (a type of variant with fields). This revision among other fixes, fix the div# (euclidean division) for integer type variables.
-
+Version 12 Revision 18 active-X
+1. A bug removed
+2. Syntax Highlight adjust for handling a[ ] after : symbol (on edit and on EditBox control)
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

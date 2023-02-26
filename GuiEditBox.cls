@@ -880,12 +880,12 @@ Render
 End Sub
 
 
-Private Sub glistN_OutPopUp(X As Single, Y As Single, myButton As Integer)
+Private Sub glistN_OutPopUp(X As Single, y As Single, myButton As Integer)
 '
 If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".PopUp(" + str(mIndex) + "," + str(X + Callback.Controls(ctrlName).Left) + "," + str(Y + Callback.Controls(ctrlName).top) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
+   Callback.Callback mesCtrlName + ".PopUp(" + str(mIndex) + "," + str(X + Callback.Controls(ctrlName).Left) + "," + str(y + Callback.Controls(ctrlName).top) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
    Else
-      Callback.Callback mesCtrlName + ".PopUp(" + str(X + Callback.Controls(ctrlName).Left) + "," + str(Y + Callback.Controls(ctrlName).top) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
+      Callback.Callback mesCtrlName + ".PopUp(" + str(X + Callback.Controls(ctrlName).Left) + "," + str(y + Callback.Controls(ctrlName).top) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
       End If
 End Sub
 
@@ -2418,7 +2418,7 @@ End Sub
 
 'End Sub
 
-Private Sub glistN_ScrollSelected(item As Long, Y As Long)
+Private Sub glistN_ScrollSelected(item As Long, y As Long)
 If NoMark Then Exit Sub
 Dim what$, ThatPara As Long
    mDoc.TextParagraphLine item, what$, ThatPara
@@ -4846,7 +4846,12 @@ If kind > 0 Then
                     End If
             End If
             If pos2 > 0 Then
-                addone2000 pos2, 10
+                If kind = 8 Then
+                   addone2000 k - Len(A$) - Len(drop$) + 1, 10
+                   addone2000 k - Len(A$), 13
+                Else
+                    addone2000 pos2, 10
+                End If
             Else
                 lastkind = 0
                 If kind = 8 Then
@@ -8151,16 +8156,16 @@ End If
 aheadstatus = b$
 End Function
 
-Public Sub move(X, Y, Optional W, Optional H)
+Public Sub move(X, y, Optional W, Optional H)
 glistN.HideBarAsap
 If IsMissing(W) Then
-glistN.MoveTwips CLng(X), CLng(Y), 0, 0
+glistN.MoveTwips CLng(X), CLng(y), 0, 0
 ElseIf IsMissing(H) Then
 
-glistN.MoveTwips CLng(X), CLng(Y), CLng(W), 0
+glistN.MoveTwips CLng(X), CLng(y), CLng(W), 0
 RelocateMarkedText
 Else
-glistN.MoveTwips CLng(X), CLng(Y), CLng(W), CLng(H)
+glistN.MoveTwips CLng(X), CLng(y), CLng(W), CLng(H)
 RelocateMarkedText
 End If
 
@@ -9009,7 +9014,7 @@ Public Property Let MultiLineComment2(ByVal vNewValue As Variant)
 mMultiLineComment2 = vNewValue
 mDoc.Final = vNewValue
 End Property
-Public Sub PopUpMenu(poptitle$, X As Variant, Y As Variant)
+Public Sub PopUpMenu(poptitle$, X As Variant, y As Variant)
 Dim oldModalId As Variant, i As Long
 ''If UsedAsTextBox Then Exit Sub
 i = SelLength
@@ -9026,7 +9031,7 @@ Modalid = Rnd * 113314324
 'UnHook Callback.hWnd
 UNhookMe
 MyPopUp.feedlabels Me, False
-MyPopUp.UpGui Callback, X, Y, poptitle$
+MyPopUp.UpGui Callback, X, y, poptitle$
 MyPopUp.Visible = True
 MyPopUp.ZOrder 0
 
@@ -9198,10 +9203,10 @@ glistN.EditFlag = OnOff
 glistN.NoCaretShow = NoMark
 End Sub
 Sub Transparent()
-Dim X  As Long, Y As Long
+Dim X  As Long, y As Long
 glistN.BackStyle = 1
-glistN.GetLeftTop X, Y
-glistN.RepaintFromOut Callback.Image, X, Y
+glistN.GetLeftTop X, y
+glistN.RepaintFromOut Callback.Image, X, y
 glistN.ShowMe
 Callback.RefreshList = Callback.RefreshList + 1
 End Sub

@@ -67,7 +67,11 @@ Property Let ItemVariant(RHS As Variant)
     mItem = RHS
 End Property
 Property Get ItemVariantOnly() As Variant
-    ItemVariantOnly = mItem
+    If slot = 1 Then
+        Set ItemVariantOnly = mItem
+    Else
+        ItemVariantOnly = mItem
+    End If
 End Property
 
 Property Get ItemVariant() As Variant
@@ -80,19 +84,12 @@ End Property
 Property Get NoValue() As Boolean
     If slot = 1 Then NoValue = mItem Is Nothing Else NoValue = slot = 0
 End Property
-Public Property Set ArrayRef(RHS As Object)
-    slot = 9
-    Set mItem = RHS
-End Property
-Public Property Get ArrayRef() As Object
-    If slot = 9 Then Set ObjectRef = mItem
-End Property
 Public Property Set ObjectRef(RHS As Variant)
     slot = 1
     Set mItem = RHS
 End Property
 Public Property Get ObjectRef() As Variant
-    If slot = 1 Then Set ObjectRef = mItem
+    If slot = 1 Then Set ObjectRef = mItem Else Set ObjectRef = Nothing
 End Property
 Public Sub Recycle()
     Dim obj As IUnknown, GetRefCount As Long

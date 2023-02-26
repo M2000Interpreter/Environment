@@ -3435,7 +3435,7 @@ report {
 	We can make number or string functions. The name of a function used by the subs system, with one exception: We can call an inner function if this function has different name from any of internal functions like Abs() and Sgn().  We can replace Abs() using regular function for a module, but the @Abs() always call the internal original function. So inner functions use the @ character, so first the interpreter check if it is an internal code and then call the inner function.
 	An inner function has the same scope as a sub, has module scope.
 	An inner function use the same stack for values as the module (regular functions and lambdas in an expresion start with a fresh stack of values, if we call them using Call like a module then we pass the module stack).
-	We can't call an inner function using Call or Function() and Funcrion$().
+	We can't call an inner function using Call or Function() and Function$().
 	Interpreter search for inner function  the first time from the end in current code or from parent original code, but the code executed in the scope of current executed code.
 	Goto can be used inside a Function ...End Function structure, also we can call subs or simple routines from.
 	
@@ -5662,7 +5662,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 48 for M2000 Interpreter version 12, revision 17 and above"
+	Report " A collection of modules for tests version 49 for M2000 Interpreter version 12, revision 17 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -41364,7 +41364,11 @@ Push key$
 Drop
 If module(Infobasic) then keyboard "Infobasic", 13
 }
-MODULE ARCH {// each new run select one of two ways to make a new console:
+MODULE ARCH {Print "Hold Space to start/end"
+while not keypress(32)
+wait 50
+end while
+// each new run select one of two ways to make a new console:
 
 // 1 make console only and make Black (0) at 100% transparent
 // 2 without transparent
@@ -41397,7 +41401,7 @@ module Archimedean_spiral {
               data random(10, 18)*1000, random(8, 12)*1000
 		Draw2Layer(1)	
 		\\ press space to exit loop
-		if  keypress(32) then exit
+		if  keypress(32) then flush:exit
 	}
 	if way=1 then desktop 255
 	pen 14
