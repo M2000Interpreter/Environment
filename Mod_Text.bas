@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 18
+Global Const Revision = 19
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5802,7 +5802,9 @@ Function IsExpA(bstack As basetask, aa$, rr As Variant, parenthesis As Long, Opt
         If FastSymbol23(aa$, "-", cur, leavespace) Then
             po = -po
         ElseIf FastSymbol23(aa$, "+", cur, leavespace) Then
-            
+            If Abs(po) < 10 Then
+            If po < 0 Then po = -10 Else po = 10
+            End If
         ElseIf FastSymbol23(aa$, "(", cur, leavespace) Then
                 
                 If Not IsExpA(bstack, aa$, R, 0, noand, Comp, ByPass, nostring) Then
@@ -5827,6 +5829,10 @@ enteragain:
             po = -po
         ElseIf Not FastSymbol23(aa$, "+", cur, leavespace) Then
             Exit Do
+        Else
+            If Abs(po) < 10 Then
+            If po < 0 Then po = -10 Else po = 10
+            End If
         End If
     Loop
 cont123:
@@ -5837,6 +5843,7 @@ cont123:
 cont456:
     If IntVal = 2 Then
     po = 1#
+    'IntVal =1
     Else
     po = 0#
     End If
@@ -6491,7 +6498,15 @@ secodlooplogic:
         
             Set bstack.lastobj = Nothing
             ' get from right number or expression
+            If IntVal = 0 And po < 0 Then
+                po = Abs(po)
+                IntVal = 2
+            ElseIf IntVal2 = -1 Then
+                IntVal = 0
+            End If
             IntVal2 = 1
+            
+            
 
             If IsNumber(bstack, aa$, R, True, IntVal2) Then
             If IntVal2 = 2 Then
@@ -6501,6 +6516,11 @@ secodlooplogic:
                   Exit Function
                 End If
                 R = -R
+            ElseIf IntVal2 = 10 Then
+                If Not rightoperator(bstack, aa$, R, True) Then
+                  IsExpA = False
+                  Exit Function
+                End If
             ElseIf R < 0 Then
                 If Not rightoperator(bstack, aa$, R, True) Then
                   IsExpA = False
@@ -6568,7 +6588,6 @@ secodlooplogic:
                     End If
                 End If
             ElseIf FastSymbol1(aa$, "(") Then
-            
                 If IsExp(bstack, aa$, R, , True) Then
                     If R >= 1 And IntVal2 = 1 Then
                         po = po ^ R
@@ -6580,14 +6599,18 @@ secodlooplogic:
                             po = po ^ -R
                         Else
                             po = po ^ R
+                            
                         End If
                     End If
                     If IntVal = 2 Then
                         If po > 0 Then po = -po
                     ElseIf IntVal < 0 Then
                         po = -po
+                        IntVal = 1
+                    Else
+                        IntVal = 1
                     End If
-                    IntVal = 0
+                    
                     MUL = 1
                     If Err.Number Then
                         po = Infinity()
@@ -7149,9 +7172,16 @@ ElseIf MaybeIsSymbol(aa$, "AΑXΚΗOαaxκηoήΉ") And noand Then
         Exit Do
     End If
 ElseIf lookOne(aa$, ")") And parenthesis > 0 Then
+
 Do While FastSymbol1(aa$, ")")
+'If IntVal < 2 Then IntVal = 0
 parenthesis = parenthesis - 1
-If parenthesis = 0 Then Exit Do
+
+If parenthesis = 0 Then
+    If IntVal < 0 Then po = -po
+    IntVal = 1
+    Exit Do
+End If
 Loop
 MUL = 0
 If IntVal < 0 Then po = -po: IntVal = 0
@@ -7714,13 +7744,16 @@ Case "#"
     '' out
     End If
     Exit Function
-Case " ", "+", ChrW(160)
+Case " ", ChrW(160)
+Case "+"
+    If Abs(sg) < 10 Then sg = sg * 10
 Case "-"
 sg = -sg
 Case Else
 Exit Do
 End Select
 Loop
+
 End If
 If sng& > 1 Then Mid$(A$, 1, sng& - 1) = space$(sng& - 1)
 If MaybeIsSymbol3(A$, ".", sng&) Then
@@ -8012,7 +8045,9 @@ cont123:
                  
                 End If
         Else
-        If sg < 0 Then ig$ = "-" + ig$: sg = 2
+        If sg < 0 Then
+            ig$ = "-" + ig$: sg = 2
+        End If
             If sng <= Len(A$) Then
             
             On Error Resume Next
@@ -8119,9 +8154,9 @@ cont123:
             End If
         End If
       Mid$(A$, 1, sng& - 1) = space$(sng& - 1)
-  
+    
     IsNumber = True
-
+    Set bstack.lastobj = Nothing
 
 End Function
 
@@ -15288,6 +15323,8 @@ contStrArr:
                     End If
                 End If
             Else
+            SyntaxError
+            Exit Function
             Stop  ' LOOK FOR STOP HERE
             End If
             p = 0
@@ -17742,7 +17779,9 @@ startwithgroup:
                                         Exit Function
                                     End If
                                 Else
-                                    Stop  ' LOOK THE STOP HERE
+                                        Execute = 0
+                                        Exit Function
+                                    ' Stop  ' LOOK THE STOP HERE
                                 End If
                             End If
                         Else
@@ -34641,12 +34680,39 @@ Function MyInput(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim i As Long, p As Variant, pp As Variant, s$, ss$, what$, f As Long, x1 As Long, y As Double, X As Double
 Dim frm$, par As Boolean, pppp As mArray, prive As Long, it As Long, W$, mystack As mStiva
 If IsLabelSymbolNew(rest$, "ΜΕ", "WITH", Lang) Then
-    If IsStrExp(bstack, rest$, s$) Then
+    
+    If IsExp(bstack, rest$, p, , True) Then
+        If MemInt(VarPtr(p)) = vbString Then
+            SwapString2Variant s$, p
+            p = Empty
+            GoTo wehavestring
+        Else
+            MissStringExpr
+        End If
+    ElseIf IsStrExp(bstack, rest$, s$, False) Then
+wehavestring:
         inpcsvsep$ = Left$(s$, 1)
-        If FastSymbol(rest$, ",") Then If IsStrExp(bstack, rest$, s$) Then inpcsvDec$ = Left$(s$, 1): MyInput = True
+        If FastSymbol(rest$, ",") Then
+        
+        If IsExp(bstack, rest$, p, , True) Then
+            If MemInt(VarPtr(p)) = vbString Then
+                SwapString2Variant s$, p
+                p = Empty
+                GoTo wehavestring2
+            Else
+                MissStringExpr
+            End If
+        ElseIf IsStrExp(bstack, rest$, s$, False) Then
+wehavestring2:
+            inpcsvDec$ = Left$(s$, 1): MyInput = True
+        End If
+        
+        End If
         inpcsvuseescape = False
         If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then inpcsvuseescape = CBool(p): MyInput = True
          If FastSymbol(rest$, ",") Then MyInput = False: If IsExp(bstack, rest$, p) Then inpcleanstrings = CBool(p): MyInput = True
+    Else
+        MissStringExpr
     End If
     Exit Function
 End If
@@ -34685,6 +34751,13 @@ If FastSymbol(rest$, "!") Then
         f = Abs(IsLabel(bstack, rest$, what$))
         Select Case f
         Case 1, 4
+                If f = 1 Then
+                    If GetVar(bstack, what$, i) Then
+                        If Not MyIsNumeric(var(i)) Then
+                            GoTo jumpthere2
+                        End If
+                    End If
+                End If
                      If Not FastSymbol(rest$, ",") Then MissPar: Exit Function
                      If Not IsExp(bstack, rest$, p) Then p = .mX
                      X = p
@@ -34812,6 +34885,7 @@ If FastSymbol(rest$, "!") Then
                      MyInput = True
                      Form1.ShadowMarks = False
         Case 3
+jumpthere2:
                      If Not FastSymbol(rest$, ",") Then MissPar: Exit Function
                      If Not IsExp(bstack, rest$, p) Then p = .mX
                      X = p
@@ -34868,11 +34942,15 @@ comehere:
                      MyInput = True
                      Form1.ShadowMarks = False
         Case 5, 7 ' NUMBER IN ARRAY
-                            If neoGetArray(bstack, what$, pppp) Then
+        
+                    If neoGetArray(bstack, what$, pppp) Then
                             If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then Exit Function
                     Else
                         MyEr "No such Array", "Δεν υπάρχει τέτοιος πίνακας"
                             Exit Function
+                    End If
+                    If pppp.IsStringItem(it) Then
+                    GoTo jumpthere3
                     End If
                     If Not FastSymbol(rest$, ",") Then MissPar: Exit Function
                     If Not IsExp(bstack, rest$, p) Then p = .mX
@@ -34935,6 +35013,7 @@ comehere:
                         MyEr "No such Array", "Δεν υπάρχει τέτοιος πίνακας"
                         Exit Function
                     End If
+jumpthere3:
                     If Not FastSymbol(rest$, ",") Then MissPar: Exit Function
                     If Not IsExp(bstack, rest$, p) Then p = .mX
                     X = p
@@ -35019,6 +35098,11 @@ Else
     Do
         Select Case Abs(IsLabel(bstack, rest$, what$))
         Case 1
+            If GetVar(bstack, what$, i) Then
+            If Not MyIsNumeric(var(i)) Then
+            GoTo jumpthere
+            End If
+            End If
             If FastSymbol(rest$, "=") Then IsNumberCheck rest$, p Else p = 0#
             If p <> 0 Then p = p - p
             If par Then
@@ -35143,6 +35227,7 @@ Else
                 End If
                 MyInput = True
         Case 3
+jumpthere:
             If par Then
                 If uni(f) Then
                     getUniStringComma f, s$, inpcleanstrings
@@ -35287,6 +35372,9 @@ Else
                 MyEr "No such array", "Δεν υπάρχει τέτοιος πίνακας"
                 Fkey = 0:  Exit Function
             End If
+            If pppp.IsStringItem(it) Then
+                GoTo jumpthere4
+            End If
             If FastSymbol(rest$, "=") Then IsNumberCheck rest$, p Else p = 0#
             MyInput = True
             If par Then
@@ -35334,6 +35422,7 @@ Else
                 MyEr "No such array", "Δεν υπάρχει τέτοιος πίνακας"
                 Fkey = 0: Exit Function
             End If
+jumpthere4:
             MyInput = True
             If par Then
                 If uni(f) Then
@@ -35444,159 +35533,169 @@ Function MyCopy(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim p As Variant, Scr As Object, photo As cDIBSection, s$, it As Long, what$
 MyCopy = True
 Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, pppp As mArray, y22 As Single
-            If IsStrExp(bstack, rest$, s$) Then
-             If Left$(s$, 4) = "cDIB" And Len(s$) > 12 Then
-                Set photo = New cDIBSection
-                If cDib(s$, photo) Then
-                If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
-                If IsStrExp(bstack, rest$, s$) Then
-                       photo.SaveDib s$
-                       Set photo = Nothing
-                       End If
-                       End If
-                       Exit Function
-                Else
-                        noImage s$
-                        Exit Function
-                End If
-             Else
-                If ExtractType(s$) = vbNullString Then s$ = s$ + ".bmp"
-                FixPath s$
-                If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
-            
-             
-            On Error Resume Next
-            
-            Set photo = New cDIBSection
-            photo.CopyPicture bstack.Owner
-            photo.SaveDib s$
-            Set photo = Nothing
-            Exit Function
-            End If
-Else
-If IsExp(bstack, rest$, p) Then x1 = p
-If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y1 = p
 
-If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
-Select Case Abs(IsLabel(bstack, rest$, s$))
-Case 3
-    If GetVar(bstack, s$, it) Then
-    
-    Set photo = New cDIBSection
-    Set Scr = bstack.Owner
-    With players(GetCode(Scr))
-    x1 = Scr.ScaleX(x1 + .XGRAPH, 1, 3) - Scr.ScaleX(.XGRAPH, 1, 3)
-    y1 = Scr.ScaleX(y1 + .YGRAPH, 1, 3) - Scr.ScaleX(.YGRAPH, 1, 3)
-    If photo.create(CLng(x1), CLng(y1)) Then
-    photo.LoadPictureBlt Scr.hDC, CLng(Scr.ScaleX(.XGRAPH, 1, 3)), CLng(Scr.ScaleX(.YGRAPH, 1, 3))
-    
-    If photo.bitsPerPixel <> 24 Then Conv24 photo
-    
-    var(it) = DIBtoSTR(photo)
-    ' DOSE OK
-    End If
-    End With
-     Set photo = Nothing
-     Set Scr = Nothing
-    Exit Function
+If IsExp(bstack, rest$, p, , True) Then
+    If MemInt(VarPtr(p)) = vbString Then
+        SwapString2Variant s$, p
+        p = Empty
+        GoTo wehavestring
     Else
-    what$ = s$
-    MyCopy = False
-    Exit Function
+        x1 = p
+        GoTo wehavenumber
     End If
-Case 6
-    ' ΑΠΟ ΠΙΝΑΚΑ
-    Dim W6 As Long
-    If neoGetArray(bstack, s$, pppp) Then
-           If Not NeoGetArrayItem(pppp, bstack, s$, W6, rest$) Then Exit Function
-    
-    
-      Set photo = New cDIBSection
-      Set Scr = bstack.Owner
-      With players(GetCode(Scr))
-    x1 = Scr.ScaleX(x1 + .XGRAPH, 1, 3) - Scr.ScaleX(.XGRAPH, 1, 3)
-    y1 = Scr.ScaleX(y1 + .YGRAPH, 1, 3) - Scr.ScaleX(.YGRAPH, 1, 3)
-    If photo.create(CLng(x1), CLng(y1)) Then
-            photo.LoadPictureBlt Scr.hDC, CLng(Scr.ScaleX(.XGRAPH, 1, 3)), CLng(Scr.ScaleX(.YGRAPH, 1, 3))
-
-            If photo.bitsPerPixel <> 24 Then Conv24 photo
-                If MyIsObject(pppp.item(W6)) Then
-                        MyEr "can't copy image to " + pppp.ItemType(W6), "δεν μπορώ να αντιγράψω εικόνα σε " + pppp.ItemType(W6)
-                        MyCopy = False
-                Else
-                        pppp.item(W6) = DIBtoSTR(photo)
-                End If
-            ' DOSE OK
-        End If
-        End With
-        Set photo = Nothing
-        Set Scr = Nothing
-        Exit Function
-    
+ElseIf IsStrExp(bstack, rest$, s$, False) Then
+wehavestring:
+    If Left$(s$, 4) = "cDIB" And Len(s$) > 12 Then
+        Set photo = New cDIBSection
+        If cDib(s$, photo) Then
+            If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
+                If IsStrExp(bstack, rest$, s$) Then
+                   photo.SaveDib s$
+                   Set photo = Nothing
+               End If
+            End If
+            Exit Function
         Else
-    what$ = s$
-    MyCopy = False
-    Exit Function
+            noImage s$
+            Exit Function
+        End If
+    Else
+        If ExtractType(s$) = vbNullString Then s$ = s$ + ".bmp"
+        FixPath s$
+        If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
+        On Error Resume Next
+        Set photo = New cDIBSection
+        photo.CopyPicture bstack.Owner
+        photo.SaveDib s$
+        Set photo = Nothing
+        Exit Function
     End If
-
-End Select
-ElseIf IsLabelSymbolNew(rest$, "ΜΕ", "USE", Lang) Then
-
-If IsStrExp(bstack, rest$, s$) Then
- Set photo = New cDIBSection
-
-If cDib(s$, photo) Then
-y22 = 0!
-  Set Scr = bstack.Owner
-    If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y22 = p
-    If y2 = 0 Then y2 = 100
-    If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y2 = p Else y2 = 100
-
- If Not (y22 = 0 And y2 = 100) Then
-     RotateDib1 bstack, photo, y22, y2, Scr.BackColor
-     End If
-      photo.PaintPicture Scr.hDC, CLng(Scr.ScaleX(x1, 1, 3)), CLng(Scr.ScaleX(y1, 1, 3))
-
-End If
-Set photo = Nothing
-Set Scr = Nothing
 Else
- MyCopy = False: MissNumExpr: Exit Function
-End If
-ElseIf IsLabelSymbolNew(rest$, "ΕΠΑΝΩ", "TOP", Lang) Then
-
-If IsStrExp(bstack, rest$, s$) Then
- Set photo = New cDIBSection
-Set Scr = bstack.Owner
-If cDib(s$, photo) Then
-y22 = 0!
-    If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y22 = p
-    If y2 = 0 Then y2 = 100
-    If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y2 = p Else y2 = 100
+wehavenumber:
+    If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y1 = p
+    If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
+        Select Case Abs(IsLabel(bstack, rest$, s$))
+        Case 3, 1
+            If GetVar(bstack, s$, it) Then
+                Set photo = New cDIBSection
+                Set Scr = bstack.Owner
+                With players(GetCode(Scr))
+                    x1 = Scr.ScaleX(x1 + .XGRAPH, 1, 3) - Scr.ScaleX(.XGRAPH, 1, 3)
+                    y1 = Scr.ScaleX(y1 + .YGRAPH, 1, 3) - Scr.ScaleX(.YGRAPH, 1, 3)
+                    If photo.create(CLng(x1), CLng(y1)) Then
+                        photo.LoadPictureBlt Scr.hDC, CLng(Scr.ScaleX(.XGRAPH, 1, 3)), CLng(Scr.ScaleX(.YGRAPH, 1, 3))
+                        If photo.bitsPerPixel <> 24 Then Conv24 photo
+                        var(it) = DIBtoSTR(photo)
+                    End If
+                End With
+                Set photo = Nothing
+                Set Scr = Nothing
+                Exit Function
+            Else
+                what$ = s$
+                MyCopy = False
+                Exit Function
+            End If
+        Case 6, 5
+            Dim W6 As Long
+            If neoGetArray(bstack, s$, pppp) Then
+                If Not NeoGetArrayItem(pppp, bstack, s$, W6, rest$) Then Exit Function
+                Set photo = New cDIBSection
+                Set Scr = bstack.Owner
+                With players(GetCode(Scr))
+                    x1 = Scr.ScaleX(x1 + .XGRAPH, 1, 3) - Scr.ScaleX(.XGRAPH, 1, 3)
+                    y1 = Scr.ScaleX(y1 + .YGRAPH, 1, 3) - Scr.ScaleX(.YGRAPH, 1, 3)
+                    If photo.create(CLng(x1), CLng(y1)) Then
+                        photo.LoadPictureBlt Scr.hDC, CLng(Scr.ScaleX(.XGRAPH, 1, 3)), CLng(Scr.ScaleX(.YGRAPH, 1, 3))
+                        If photo.bitsPerPixel <> 24 Then Conv24 photo
+                        If MyIsObject(pppp.item(W6)) Then
+wrongitemtype:
+                            MyEr "can't copy image to " + pppp.ItemType(W6), "δεν μπορώ να αντιγράψω εικόνα σε " + pppp.ItemType(W6)
+                            MyCopy = False
+                        Else
+                            On Error Resume Next
+                            pppp.item(W6) = DIBtoSTR(photo)
+                            If Err Then
+                            Err.Clear
+                            GoTo wrongitemtype
+                            End If
+                        End If
+                    End If
+                End With
+                Set photo = Nothing
+                Set Scr = Nothing
+                Exit Function
+            Else
+                what$ = s$
+                MyCopy = False
+                Exit Function
+            End If
+        End Select
+    ElseIf IsLabelSymbolNew(rest$, "ΜΕ", "USE", Lang) Then
     
-If Not (y22 = 0 And y2 = 100) Then
-     RotateDib1 bstack, photo, y22, y2, , CLng(x1), CLng(y1)
-       End If
-        photo.PaintPicture Scr.hDC, MyRound((Scr.ScaleX(x1, 1, 3)), 0), MyRound((Scr.ScaleX(y1, 1, 3)), 0) '', photo.Width * y2 \ 100, photo.Height * y2 \ 100
-     
- 
-End If
-Set photo = Nothing
-Set Scr = Nothing
-Else
- MyCopy = False: MissNumExpr: Exit Function
-End If
-Else
-If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then x2 = p
-
-If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y2 = p Else MyCopy = False: MissNumExpr: Exit Function
-
-If x2 = 0 Or y2 = 0 Then MyCopy = False: MissNumExpr: Exit Function
-ICOPY bstack.Owner, x1, y1, x2, CLng(y2)
-End If
+        If IsExp(bstack, rest$, p, , True) Then
+            If MemInt(VarPtr(p)) = vbString Then
+                SwapString2Variant s$, p
+                p = Empty
+                GoTo wehavestring2
+            Else
+                MissStringExpr
+            End If
+        ElseIf IsStrExp(bstack, rest$, s$, False) Then
+wehavestring2:
+            Set photo = New cDIBSection
+            If cDib(s$, photo) Then
+                y22 = 0!
+                Set Scr = bstack.Owner
+                If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y22 = p
+                If y2 = 0 Then y2 = 100
+                If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y2 = p Else y2 = 100
+                If Not (y22 = 0 And y2 = 100) Then
+                    RotateDib1 bstack, photo, y22, y2, Scr.BackColor
+                End If
+                photo.PaintPicture Scr.hDC, CLng(Scr.ScaleX(x1, 1, 3)), CLng(Scr.ScaleX(y1, 1, 3))
+            End If
+            Set photo = Nothing
+            Set Scr = Nothing
+        Else
+            MyCopy = False: Exit Function
+        End If
+    ElseIf IsLabelSymbolNew(rest$, "ΕΠΑΝΩ", "TOP", Lang) Then
+        If IsExp(bstack, rest$, p, , True) Then
+            If MemInt(VarPtr(p)) = vbString Then
+                SwapString2Variant s$, p
+                p = Empty
+                GoTo wehavestring3
+            Else
+                MissStringExpr
+            End If
+        ElseIf IsStrExp(bstack, rest$, s$, False) Then
+wehavestring3:
+            Set photo = New cDIBSection
+            Set Scr = bstack.Owner
+            If cDib(s$, photo) Then
+                y22 = 0!
+                If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y22 = p
+                If y2 = 0 Then y2 = 100
+                If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y2 = p Else y2 = 100
+                If Not (y22 = 0 And y2 = 100) Then
+                    RotateDib1 bstack, photo, y22, y2, , CLng(x1), CLng(y1)
+                End If
+                photo.PaintPicture Scr.hDC, MyRound((Scr.ScaleX(x1, 1, 3)), 0), MyRound((Scr.ScaleX(y1, 1, 3)), 0) '', photo.Width * y2 \ 100, photo.Height * y2 \ 100
+            End If
+            Set photo = Nothing
+            Set Scr = Nothing
+        Else
+            MyCopy = False: MissNumExpr: Exit Function
+        End If
+    Else
+        If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then x2 = p
+        If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y2 = p Else MyCopy = False: MissNumExpr: Exit Function
+        If x2 = 0 Or y2 = 0 Then MyCopy = False: MissNumExpr: Exit Function
+        ICOPY bstack.Owner, x1, y1, x2, CLng(y2)
+    End If
 End If
 MyDoEvents1 bstack.Owner
-
 End Function
 
 
@@ -36350,7 +36449,16 @@ End Function
 Function ProcOpen(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim s$, what$, it As Long, p As Variant, x1 As Long, i As Long, skip As Boolean, excl As Boolean
 Dim id$, mUni As Long
-If IsStrExp(bstack, rest$, s$) Then
+If IsExp(bstack, rest$, p, , True) Then
+    If MemInt(VarPtr(p)) = vbString Then
+        SwapString2Variant s$, p
+        p = Empty
+        GoTo wehavestring
+    Else
+        MissStringExpr
+    End If
+ElseIf IsStrExp(bstack, rest$, s$, False) Then
+wehavestring:
     If s$ <> "" Then
         FixPath s$
     Else
@@ -39610,7 +39718,16 @@ Function MyClipboard(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim s$, photo As cDIBSection, R As Variant
 Dim Width As Long, Height As Long
 Dim p
-If IsStrExp(basestack, rest$, s$) Then
+If IsExp(basestack, rest$, R) Then
+    If MemInt(VarPtr(R)) = vbString Then
+        SwapString2Variant s$, R
+        R = Empty
+        GoTo wehavestring
+    Else
+        GoTo wehavenumber
+    End If
+ElseIf IsStrExp(basestack, rest$, s$, False) Then
+wehavestring:
     If (Left$(s$, 4) = "cDIB" And Len(s$) > 12) Then         ' MAGIC LETTERS cDIB choose the bitmap
         Set photo = New cDIBSection
         If Not cDib(s$, photo) Then  ' copy from string to cDIBSection
@@ -39626,7 +39743,8 @@ If IsStrExp(basestack, rest$, s$) Then
         Clipboard.Clear
        SetTextData CF_UNICODETEXT, s$   'set as unicode text
     End If
-ElseIf IsExp(basestack, rest$, R) Then
+Else
+wehavenumber:
     If basestack.lastobj Is Nothing Then
         Clipboard.Clear
         If FastSymbol(rest$, ",") Then
@@ -46079,7 +46197,8 @@ If Len(rest$) > 0 Then
             Mid$(rest1$, where - Len(rest$), Len(rest$)) = rest$
             rest1$ = Mid$(rest1$, where - Len(rest$))
         Else
-        Stop
+        
+        'Stop
         End If
     Else
         rest1$ = rest$ + rest1$

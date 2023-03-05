@@ -5662,7 +5662,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 49 for M2000 Interpreter version 12, revision 17 and above"
+	Report " A collection of modules for tests version 50 for M2000 Interpreter version 12, revision 19 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -15384,7 +15384,6 @@ MODULE PYTH1 {MODULE Pythagoras_Example{
 Pythagoras_Example
 }
 MODULE RPN {Module Rpn_Calc {  
-
 	\\ insert a new line after rem to use hidden statements 
 	Rem Form 80,60
 	function rpn_calc(a$) {
@@ -21515,7 +21514,7 @@ MODULE USETHIS {try {
 	PEN 14
 	CLS,0
 	If Version<12 then Error "No proper M2000 version (must be >=12)"
-	If Version=12 and revision<17 then Error "No proper M2000 revision for version 4 (need revision >=17)"
+	If Version=12 and revision<19 then Error "No proper M2000 revision for version 4 (need revision >=19)"
 	Set Fast
 	Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 	dir user
@@ -37564,6 +37563,14 @@ MODULE EXPRVER12 {? -(2*1.5)^2=-9, " : False for Ver <12"
 ? 100+12*-3^2=-8, " : False for Ver <12"
 ? -3^2-3^2=-18, " : False for Ver <12"
 ? -2^2-2^2=-8, " : False for Ver <12"
+? (-2)^(-3)^(-4)=4096, " : True for Ver <12"
+? -2^-3^-4==-0.991479137495678, " : False for Ver <12"
+? -2^+-3^-4==-0.991479137495678, " : False for Ver <12"
+? -2^-3^-4==-0.991479137495678, " : False for Ver <12"
+? -2^(-3)^-4=-4096, " : False for Ver <12"
+? 2^(-3)^-4=4096, " : True for Ver <12"
+? 2^3^-4==0.000244140625, " : True for Ver <12"
+? 2^+3^-4==1.008594091577, " : False for Ver <12"
 }
 MODULE DIMVER12 {dim base 1, M(10) as integer=10
 ? M()
@@ -41789,5 +41796,213 @@ Q1= N1 div# D1
 R1= N1 mod#  D1
 ? Q1, R1
 ? Q1*D1+R1
+}
+MODULE EVALUATOR {Module CheckEvaluator (Expr$) {
+	function rpn_to_infix$(a$) {
+		def m=0
+		inventory precendence="-":=2,"+":=2,"*":=3,"/":=3,"u-":=4, "u+":=4, "^":=5 
+		dim token$()
+		token$()=piece$(a$," ")
+		l=len(token$())
+		dim type(l)=0, right(l)=0, infix$(l)
+		infix=-1
+		for i=0 to  l-1
+			if exist(precendence, token$(i)) then
+				type(i)=precendence(token$(i))
+				if type(i)>=4 then right(i)=-1
+			end if
+			if type(i)=0 then
+				infix++
+				infix$(infix)=token$(i)
+				type(infix)=100
+			else
+				if right(i) then
+					if type(i)=5 then
+						if type(infix)<type(i) then infix$(infix)="("+infix$(infix)+")"
+						if type(infix-1)<100 then infix$(infix-1)="("+infix$(infix-1)+")"
+						infix$(infix-1)=infix$(infix-1)+token$(i)+infix$(infix)
+					else.if token$(i)="u-" then
+						infix$(infix)="-"+infix$(infix)
+						infix++
+					else
+						infix$(infix)="+"+infix$(infix)
+						infix++
+					end if
+				else
+					if type(infix)<type(i) then infix$(infix)="("+infix$(infix)+")"
+					if type(infix-1)<type(i) then
+						infix$(infix-1)="("+infix$(infix-1)+")"+token$(i)+infix$(infix)
+					else
+						infix$(infix-1)=infix$(infix-1)+token$(i)+infix$(infix)
+					end if
+				end if
+				type(infix-1)=type(i)
+				infix--
+			end if
+		next i
+		=infix$(0)
+	}
+	class EvalAst {
+	private:
+		Function Ast(&in$) {
+			object Ast=stack, op=stack, op1=stack
+			do
+			in$=Trim$(in$)
+			oper$=left$(in$,1)
+			if oper$="-" then
+				in$=Mid$(in$, 2)
+				stack op1 {push "u-"}
+			else.if oper$="+" then
+				in$=Mid$(in$, 2)
+				stack op1 {push "u+"}
+			else
+				exit
+			end if
+			always
+			Do
+				stack Ast {stack .Ast1(&in$, &op1): stack op1}
+				in$=Trim$(in$)
+				oper$=left$(in$,1)
+				if Instr("+-", oper$)>0 else exit
+				stack Ast { stack op}
+				if len(oper$)>0 then stack op {data oper$}
+				in$=Mid$(in$, 2)
+			until len(in$)=0
+			stack Ast { stack op}
+			=Ast
+		}
+		Function Ast1(&in$, &op1) {
+			object Ast=stack, op=stack, op3=stack
+			Do
+				stack Ast {stack .Ast2(&in$, &op3)}
+				in$=Trim$(in$)
+				oper$=left$(in$,1)
+				if Instr("*/", oper$)>0 else exit
+				if len(oper$)>0 then  stack op {push oper$}
+				in$=Mid$(in$, 2)
+			until len(in$)=0
+			stack Ast { stack op: stack op1}
+			=Ast
+		}
+		Function Ast2(&in$, &op1) {
+			object Ast=stack
+			integer m
+			Do
+				stack Ast {stack .Ast3(&in$)}
+				m++
+				in$=Trim$(in$)
+				oper$=left$(in$,1)
+				if m>1 then
+					stack Ast {data "^"
+					if oper$<>"^" then 	stack op1
+					}
+				end if
+				oper$=left$(in$,1)
+				if oper$="^" else exit
+				in$=ltrim$(Mid$(in$, 2))
+				oper$=left$(in$,1)
+				if Instr("-+", oper$)>0  then
+					op2=stack
+					do
+						in$=ltrim$(Mid$(in$, 2))
+						if oper$="-" then stack op2 {data "u-"} else  stack op2 {data "u+"} 
+						oper$=left$(in$,1)
+					when  Instr("-+", oper$)>0 
+					stack Ast {
+						stack .Ast2(&in$, &op2)
+						stack op2
+						data "^"
+					}
+				  	exit 
+				end if
+			until len(in$)=0
+			=Ast
+		}
+		Function Ast3(&in$) {
+			in$=Trim$(in$)
+			if Asc(in$)<>40 then =.GetNumber(&in$) : exit
+			in$=Mid$(in$, 2)
+			=.Ast(&in$)
+			in$=Mid$(in$, 2) 
+		}
+		Function GetNumber (&in$) {
+			string ch, num
+			boolean once
+			if left$(in$,1)="-" then sg=-1 : in$=ltrim$(Mid$(in$, 2)) else sg=1
+			Do
+			ch=left$(in$,1)
+			if once then
+				if instr("0123456789", ch)>0  else exit
+			else
+				if instr(".0123456789", ch)>0  else exit
+				if ch="." then once=true
+			end if
+			num+=ch
+			in$=Mid$(in$, 2)
+			until len(in$)=0
+			if num="." then Error "missing number"
+			=stack:=val(num)*sg
+		}
+	public:
+		value () {
+			=.Ast(![])
+		}
+	}
+	Ast=EvalAst()
+	Pen 15 {
+		Pen 12 {print "input expression:";}
+		Pen 14 {print Expr$}
+		print "Result through eval$:";
+		pen 10 {print eval(Expr$)}
+		mres=Ast(&Expr$)
+		print "computed RPN    :";array(stack(mres))#str$()
+		MM$=rpn_to_infix$(array(stack(mres))#str$())
+		print "cumputed INFIX  :";rpn_to_infix$(array(stack(mres))#str$())
+		print "Using Eval$() on infix:";eval(MM$)
+		pen 11 {
+			Print "Compute RPN value:";
+		}
+		reg=stack
+		mm=each(mres)
+		while mm
+			if stacktype$(mm)="String" then 
+				stack reg {
+					select case stackitem$(mm)
+					case "+"
+					push number+number
+					case "-"
+					shift 2:push number-number
+					case "*"
+					push number*number
+					case "/"
+					shift 2:push number/number  // shif 2 swap top 2 values
+					case "^"
+					shift 2:push number**number
+					case "u-"
+					push -number
+					end select
+				}
+			else
+				stack reg {push stackitem(mm)}
+			end if
+		end while
+		if len(reg)<>1 then Error "Wrong Evaluation" else pen 10 { print stackitem(reg)}
+	}
+}
+cls
+Report{INFIX to RPN to INFIX example - Compute value for RPN through flast list (as stack object)
+Symbols: + - * / ^  ( ) 0 1 2 3 4 5 6 7 8 9 .
+Precendence (high to low): Exponentiation (^), unary identity (+) and  negation (-), Multiplication (*)and Division (/), Addition (+) and Subtraction (-)
+}
+CheckEvaluator "-2^+3^-4"
+CheckEvaluator "-2^-3^-4"
+CheckEvaluator "-2^(-3)^-4"
+CheckEvaluator "-2^2-2^2"
+CheckEvaluator "-2^3-2^3"
+CheckEvaluator "(-2.5)^2"
+CheckEvaluator "(-2)^3"
+CheckEvaluator "(-(2))^3"
+CheckEvaluator "--++--3.45"
+CheckEvaluator "1+2 * (3 + ( 2 ^ 2 * 5 + 6 * 7 * 2^3) - 9) / 10"
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

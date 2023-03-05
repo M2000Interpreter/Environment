@@ -1480,7 +1480,7 @@ checkobject:
                 ElseIf Not MyIsObject(var(v)) Then
                     If MemInt(VarPtr(var(v))) = 36 And UseType And Not newid Then
                     If IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then
-                        Stop
+                      '  Stop
                         If MemInt(VarPtr(p)) = 36 Then
                         If Typename(p) = Typename(var(v)) Then
                             SwapVariant var(v), p
@@ -2236,11 +2236,11 @@ checksyntax:
                 End If
                 End If
                 ElseIf var(v) Is Nothing Then
-                Stop
+               ' Stop
                 If ss$ = "->" Then
                  GoTo assignpointer
                 Else
-                    Stop
+                    'Stop
                 End If
                 ElseIf TypeOf var(v) Is Group Then
                 If ss$ = "->" Then

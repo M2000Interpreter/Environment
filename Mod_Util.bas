@@ -26017,7 +26017,7 @@ contGetStr0:
                 Case vbObject
                     Set var(i) = Nothing
                 Case vbInteger
-                    var(i) = CInt(p)
+                    var(i) = 0
                 Case 20
                     var(i) = cInt64(0)
                 Case vbLong
