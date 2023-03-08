@@ -1172,21 +1172,22 @@ Global Const VERIFY_CONTEXT As Long = 0xF0000000&
 
  
 Function  Random2 {
-      Long Rand=0, hProv=0
+      long Rand=0, hProv=0
       Call void CryptAcquireContext(&hProv, "", "", PROV_RSA_FULL, VERIFY_CONTEXT)
-      Call Void CryptGenRandom( hProv, 4&, &Rand)
+      Call Void CryptGenRandom(hProv, 4&, &Rand)
       Call Void CryptReleaseContext(hProv, 0&)
       =Rand
 }
 m= Random2()
-mUnsigned=uint(m)
+mUnsigned=uint(m)   ' uint() return Long Long if m is Long (Version 12)
 Print m
 Print mUnsigned
+
 Print hex$(mUnsigned, 4)
-Print sint(mUnsigned)=m
+Print sint(mUnsigned)=m   ' can use long long input  to get lower 32bits.
 
 Print m=eval("0x"+hex$(mUnsigned, 4)+"&")  ' using & at the end we get the signed long 32 bit
-Print type$(mUnsigned)
+Print type$(mUnsigned)  
 m1=sint(mUnsigned)
 Print type$(m1)
 m2=binary.and(m1, 0xFF00FF00)
@@ -1206,6 +1207,16 @@ hex k, k2
 k3=binary.add(0xFF123456,0xF1234567,0xFFFFFFFF)
 Print type$(k3)
 hex K3
+Function  Random3 {
+      Long Long Rand=0
+      Long hProv=0
+      Call void CryptAcquireContext(&hProv, "", "", PROV_RSA_FULL, VERIFY_CONTEXT)
+      Call Void CryptGenRandom(hProv, 8&, &Rand)
+      Call Void CryptReleaseContext(hProv, 0&)
+      =Rand
+}
+Print "Long Long (Random3)"
+Hex Random3()
 }
 MODULE URL {Report {See also DD7 module which decoding for URI using internal functions
 Here we see the decoding using M2000 code (slow)
@@ -5662,7 +5673,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 50 for M2000 Interpreter version 12, revision 19 and above"
+	Report " A collection of modules for tests version 51 for M2000 Interpreter version 12, revision 19 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -8305,7 +8316,7 @@ inside
 print mid$("aaa",2), integer, control$="MAIN"
 
 sub see_work()
-	Local integer=10, control$="Hello"
+	Local integer1=10, control$="Hello"
 	\\ we can redifine functions, but using New, we make a new one, without erasing an other
 	\\ if you change new with global you get error because mid$() defined as local in this module
 	\\ so a local function has priority over a global one
@@ -8315,7 +8326,7 @@ sub see_work()
 		=str$(x,"0.00")
 	}
 	'inside
-	Print mid$(10), integer, control$
+	Print mid$(10), integer1, control$
 end sub
 }
 MODULE FL {\\ Slow,  Fast and Fast !
@@ -36094,7 +36105,7 @@ print "console at monitor ";z
 long zz
 again2:
 input "Switch console to monitor:", zz
-if zz>=0 and zz<monitors then {
+if zz>=0 and zz<=monitors then {
 	if zz<>z then {
 		window mode, zz
 		form ! 80, 35
@@ -41797,18 +41808,19 @@ R1= N1 mod#  D1
 ? Q1, R1
 ? Q1*D1+R1
 }
-MODULE EVALUATOR {Module CheckEvaluator (Expr$) {
+MODULE EVALUATOR {form 96, 82
+Module CheckEvaluator (Expr$) {
 	function rpn_to_infix$(a$) {
 		def m=0
-		inventory precendence="-":=2,"+":=2,"*":=3,"/":=3,"u-":=4, "u+":=4, "^":=5 
+		inventory precedence="-":=2,"+":=2,"*":=3,"/":=3,"u-":=4, "u+":=4, "^":=5 
 		dim token$()
 		token$()=piece$(a$," ")
 		l=len(token$())
 		dim type(l)=0, right(l)=0, infix$(l)
 		infix=-1
 		for i=0 to  l-1
-			if exist(precendence, token$(i)) then
-				type(i)=precendence(token$(i))
+			if exist(precedence, token$(i)) then
+				type(i)=precedence(token$(i))
 				if type(i)>=4 then right(i)=-1
 			end if
 			if type(i)=0 then
@@ -41842,113 +41854,99 @@ MODULE EVALUATOR {Module CheckEvaluator (Expr$) {
 		next i
 		=infix$(0)
 	}
-	class EvalAst {
-	private:
-		Function Ast(&in$) {
-			object Ast=stack, op=stack, op1=stack
+	Function Ast(&in$) {
+		flush
+		Ast()
+		=[]
+
+		sub Ast()
+			Local op=stack
 			do
-			in$=Trim$(in$)
-			oper$=left$(in$,1)
-			if oper$="-" then
-				in$=Mid$(in$, 2)
-				stack op1 {push "u-"}
-			else.if oper$="+" then
-				in$=Mid$(in$, 2)
-				stack op1 {push "u+"}
-			else
-				exit
-			end if
-			always
-			Do
-				stack Ast {stack .Ast1(&in$, &op1): stack op1}
+				Ast1()
+				do
+					in$=Ltrim$(in$)
+					oper$=left$(in$,1)
+					if oper$="*" then
+						in$=Mid$(in$, 2)
+						Ast1()
+						data "*"
+					else.if oper$="/" then
+						in$=Mid$(in$, 2)
+						Ast1()
+						data "/"
+					else
+						exit
+					end if
+				until len(in$)=0
 				in$=Trim$(in$)
 				oper$=left$(in$,1)
 				if Instr("+-", oper$)>0 else exit
-				stack Ast { stack op}
+				stack op
 				if len(oper$)>0 then stack op {data oper$}
 				in$=Mid$(in$, 2)
 			until len(in$)=0
-			stack Ast { stack op}
-			=Ast
-		}
-		Function Ast1(&in$, &op1) {
-			object Ast=stack, op=stack, op3=stack
-			Do
-				stack Ast {stack .Ast2(&in$, &op3)}
-				in$=Trim$(in$)
-				oper$=left$(in$,1)
-				if Instr("*/", oper$)>0 else exit
-				if len(oper$)>0 then  stack op {push oper$}
-				in$=Mid$(in$, 2)
-			until len(in$)=0
-			stack Ast { stack op: stack op1}
-			=Ast
-		}
-		Function Ast2(&in$, &op1) {
-			object Ast=stack
-			integer m
-			Do
-				stack Ast {stack .Ast3(&in$)}
+			stack op
+		End sub
+		Sub Ast1()
+			local object op1=stack
+			local integer m
+			do
+				do
+					in$=Trim$(in$)
+					oper$=left$(in$,1)
+					if oper$="-" then
+						in$=Mid$(in$, 2)
+						stack op1 {push "u-"}
+					else.if oper$="+" then
+						in$=Mid$(in$, 2)
+						stack op1 {push "u+"}
+					else
+						exit
+					end if
+				always
+					in$=Trim$(in$)
+					if Asc(in$)<>40 then
+						string ch="", num=""
+						boolean once=false
+						do
+							ch=left$(in$,1)
+							if once then
+								if instr("0123456789", ch)>0  else exit
+							else
+								if instr(".0123456789", ch)>0  else exit
+								if ch="." then once=true
+							end if
+							num+=ch
+							in$=Mid$(in$, 2)
+						until len(in$)=0
+						if num="." then Error "missing number"
+						if len(num)=0 then =stack: exit
+						data val(num)
+					else
+						in$=Mid$(in$, 2)
+						Ast()
+						in$=Mid$(in$, 2)
+					end if
+
 				m++
 				in$=Trim$(in$)
 				oper$=left$(in$,1)
 				if m>1 then
-					stack Ast {data "^"
-					if oper$<>"^" then 	stack op1
-					}
+					data "^"
+					if oper$<>"^" then stack op1
 				end if
-				oper$=left$(in$,1)
 				if oper$="^" else exit
 				in$=ltrim$(Mid$(in$, 2))
 				oper$=left$(in$,1)
 				if Instr("-+", oper$)>0  then
-					op2=stack
-					do
-						in$=ltrim$(Mid$(in$, 2))
-						if oper$="-" then stack op2 {data "u-"} else  stack op2 {data "u+"} 
-						oper$=left$(in$,1)
-					when  Instr("-+", oper$)>0 
-					stack Ast {
-						stack .Ast2(&in$, &op2)
-						stack op2
-						data "^"
-					}
-				  	exit 
+					Ast1()
+					data "^"
+			  		exit 
 				end if
 			until len(in$)=0
-			=Ast
-		}
-		Function Ast3(&in$) {
-			in$=Trim$(in$)
-			if Asc(in$)<>40 then =.GetNumber(&in$) : exit
-			in$=Mid$(in$, 2)
-			=.Ast(&in$)
-			in$=Mid$(in$, 2) 
-		}
-		Function GetNumber (&in$) {
-			string ch, num
-			boolean once
-			if left$(in$,1)="-" then sg=-1 : in$=ltrim$(Mid$(in$, 2)) else sg=1
-			Do
-			ch=left$(in$,1)
-			if once then
-				if instr("0123456789", ch)>0  else exit
-			else
-				if instr(".0123456789", ch)>0  else exit
-				if ch="." then once=true
-			end if
-			num+=ch
-			in$=Mid$(in$, 2)
-			until len(in$)=0
-			if num="." then Error "missing number"
-			=stack:=val(num)*sg
-		}
-	public:
-		value () {
-			=.Ast(![])
-		}
+			stack op1
+		end sub
 	}
-	Ast=EvalAst()
 	Pen 15 {
 		Pen 12 {print "input expression:";}
 		Pen 14 {print Expr$}
@@ -41975,7 +41973,7 @@ MODULE EVALUATOR {Module CheckEvaluator (Expr$) {
 					case "*"
 					push number*number
 					case "/"
-					shift 2:push number/number  // shif 2 swap top 2 values
+					shift 2: push number/number  // shift 2 swap top 2 values
 					case "^"
 					shift 2:push number**number
 					case "u-"
@@ -41990,9 +41988,9 @@ MODULE EVALUATOR {Module CheckEvaluator (Expr$) {
 	}
 }
 cls
-Report{INFIX to RPN to INFIX example - Compute value for RPN through flast list (as stack object)
+Report{INFIX to RPN to INFIX example - Compute value for RPN through flat list (as stack object)
 Symbols: + - * / ^  ( ) 0 1 2 3 4 5 6 7 8 9 .
-Precendence (high to low): Exponentiation (^), unary identity (+) and  negation (-), Multiplication (*)and Division (/), Addition (+) and Subtraction (-)
+Precedence (high to low): Exponentiation (^), unary identity (+) and  negation (-), Multiplication (*)and Division (/), Addition (+) and Subtraction (-)
 }
 CheckEvaluator "-2^+3^-4"
 CheckEvaluator "-2^-3^-4"
@@ -42004,5 +42002,163 @@ CheckEvaluator "(-2)^3"
 CheckEvaluator "(-(2))^3"
 CheckEvaluator "--++--3.45"
 CheckEvaluator "1+2 * (3 + ( 2 ^ 2 * 5 + 6 * 7 * 2^3) - 9) / 10"
+CheckEvaluator "2/3/4"
+CheckEvaluator "2*-(3)/-4*(-5)+--3"
+}
+MODULE EVAL2 {module CheckEvaluator (Expr$){
+	class EvalAst {
+	private:
+		Function Ast(&in as string) {
+			string Ast, op, op1
+			do
+			in=Trim$(in)
+			oper$=left$(in,1)
+			if oper$="-" then
+				in=Mid$(in, 2)
+				 op1+="push -number:"
+			else.if oper$="+" then
+				in=Mid$(in, 2)
+				rem op1+=":"
+			else
+				exit
+			end if
+			always
+			Do
+				Ast+=.Ast1(&in , op1): op1=""
+				in=Trim$(in)
+				oper$=left$(in,1)
+				if Instr("+-", oper$)>0 else exit
+				Ast+=op : op=""
+				if len(oper$)>0 then
+					if oper$="+" then op+="push number+number:" else op+="shift 2: push number-number:"
+				end if
+				in=Mid$(in, 2)
+			until len(in)=0
+			=Ast+op '+op1
+		}
+		Function Ast1(&in as string, op1 as string) {
+			string Ast, op
+			Ast+=.Ast2(&in, &op1)
+			Do
+				in=Ltrim$(in)
+				oper$=left$(in,1)
+				if oper$="*" then
+					in=Mid$(in, 2)
+					Ast+=.Ast2(&in, &op)
+					Ast+="push number*number:"+op1 
+					op1=""
+				else.if oper$="/" then
+					in=Mid$(in, 2)
+					Ast+=.Ast2(&in, &op)
+					Ast+="shift 2:push number/number:"+op1
+					op1=""
+				else
+					exit
+				end if
+			until len(in)=0
+			=Ast
+		}
+		Function Ast2(&in as string, &op1 as string) {
+			string Ast, op2
+			integer m
+			Do
+				Do
+					in=Trim$(in)
+					oper$=left$(in,1)
+					if oper$="-" then
+						in=Mid$(in, 2)
+						 op1+="push -number:"
+					else.if oper$="+" then
+						in=Mid$(in, 2)
+						rem op1+=":"
+					else
+						exit
+					end if
+				always
+				Ast+=.Ast3(&in)
+				m++
+				in=Trim$(in)
+				oper$=left$(in,1)
+				if m>1 then
+					Ast+="shift 2:push number^number:"
+					if oper$<>"^" then 	Ast+=op1: op1=""
+				end if
+				oper$=left$(in,1)
+				if oper$="^" else exit
+				in=ltrim$(Mid$(in, 2))
+				oper$=left$(in,1)
+				if oper$="" then exit
+				if Instr("-+", oper$)>0  then
+					op2=""
+					do
+						in=ltrim$(Mid$(in, 2))
+						if oper$="-" then op2+="push -number:"
+						oper$=left$(in,1): if oper$="" then exit
+					when  Instr("-+", oper$)>0 and len(oper$)>0
+					Ast+=.Ast2(&in, &op2)+op2+"shift 2:push number^number:"
+					op2=""
+				  	exit 
+				end if
+			until len(in)=0
+			=Ast+op1: op1=""
+		}
+		Function Ast3(&in as string) {
+			in=Trim$(in)
+			if Asc(in)<>40 then =.GetNumber(&in) : exit
+			in=Mid$(in, 2)
+			=.Ast(&in)
+			in=Mid$(in, 2) 
+		}
+		Function GetNumber (&in as string) {
+			string ch, num
+			boolean once
+			Do
+				ch=left$(in,1)
+				if once then
+					if instr("0123456789", ch)>0  else exit
+				else
+					if instr(".0123456789", ch)>0  else exit
+					if ch="." then once=true
+				end if
+				num+=ch
+				in=Mid$(in, 2)
+			until len(in)=0
+			if num="." then Error "missing number"
+			if len(num)=0 then =stack: exit
+			="push "+num+":"
+		}
+	public:
+		value () {
+			=.Ast(![])+"Print number"
+		}
+	}
+	Ast=EvalAst()
+	
+	print "Evaluation using Eval():";
+	Pen 11 {print expr$+"="+ eval(expr$)}
+	r$=Ast(&Expr$)
+	print "       Remain:"+Expr$
+	print "           ";
+	Report r$, width-pos*2
+	print @(0),
+	Print "       Result :";
+	Pen 15 {inline r$}
+}
+CheckEvaluator "-2^-3^-4"
+CheckEvaluator "-2^(-3)^-4"
+CheckEvaluator "-2^2-2^2"
+CheckEvaluator "(-2.5)^2"
+CheckEvaluator "(-2)^3"
+CheckEvaluator "(-(2))^3"
+CheckEvaluator "--++--3.45"
+CheckEvaluator "(-((-(4)))) alfa"
+CheckEvaluator "1+2 * (3 + ( 2 ^ 2 * 5 + 6 * 7 * 2^3) - 9)  / 10"
+CheckEvaluator "-10*-2/-3*-5"
+CheckEvaluator "-10*-(2/-3*-5)"
+CheckEvaluator "2/3/4"
+checkevaluator "-2/3^(3*4)"
+CheckEvaluator "-(2/2)^(3*-4)"
+CheckEvaluator "-2/(3)^(3*-4)"
+CheckEvaluator "-2/(2)^-12"
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

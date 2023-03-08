@@ -12067,19 +12067,19 @@ If pppp.MyIsNumeric(pppp.item(w3)) Then If pppp.item(w3) > res Then res = pppp.i
 Next w3
 End If
 If Not FastSymbol(A$, ")") Then
-    
     bstack.soros.PushVal w4
     If Not getone(bstack, A$) Then Exit Function
-    
 Else
     Matrix = True
     Exit Function
 End If
 Case "EVAL", "EVAL$", "ΕΚΦΡ", "ΕΚΦΡ$"
-If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
+If lookOne(A$, ")") Then
+    w2 = 0
+ElseIf IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
     w2 = CLng(p)
 Else
-    w2 = 0
+    GoTo missexp
 End If
 If w2 < 0 Or w2 >= pppp.count Then
 MyEr "offset out of limits", "Δείκτης εκτός ορίων"
@@ -12351,10 +12351,15 @@ Else
 End If
 
 Case "VAL", "ΤΙΜΗ", "VAL$", "ΤΙΜΗ$"
-If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
+If lookOne(A$, ")") Then
+    w2 = 0
+ElseIf IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
     w2 = CLng(p)
 Else
-    w2 = 0
+missexp:
+    MissNumExpr
+    Matrix = False
+    Exit Function
 End If
 If w2 < 0 Or w2 >= pppp.count Then
 MyEr "offset out of limits", "Δείκτης εκτός ορίων"
@@ -12474,18 +12479,26 @@ Case "SORT", "ΤΑΞΙΝΟΜΗΣΗ"
 w2 = 0
 w3 = -1
 w4 = -1
-If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
-w2 = CLng(p)
+If lookOne(A$, ")") Then
+    w2 = 0
+ElseIf IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
+    w2 = CLng(p)
+Else
+    GoTo missexp
 End If
 If FastSymbol(A$, ",") Then
-If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
-w3 = CLng(p)
-End If
+    If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
+        w3 = CLng(p)
+    Else
+       GoTo missexp
+    End If
 End If
 If FastSymbol(A$, ",") Then
-If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
-w4 = CLng(p)
-End If
+    If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
+        w4 = CLng(p)
+    Else
+        GoTo missexp
+    End If
 End If
 If original > 0 Then
     Set pppp1 = pppp
@@ -13236,7 +13249,7 @@ ElseIf lookOne(rest$, ",") Then
                 ChangeValues = False
         Else
                 If Left$(ah, 1) = "N" Then
-                    If Not IsExp(bstack, rest$, p) Then
+                    If Not IsExp(bstack, rest$, p, , True) Then
                         ChangeValues = False
                         GoTo there
                     End If

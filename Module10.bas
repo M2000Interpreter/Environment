@@ -2874,12 +2874,22 @@ cont184575:
         End If
     Else    ' g
 again12345:
-          If GetVar(bstack, W$, v, ss$ = "g") Then
+        If GetVar(bstack, W$, v, ss$ = "g") Then
 stroper001:
-          sw$ = ss$
-          p = W$
-                W$ = varhash.lastkey
-               If IsStrExp(bstack, b$, ss$, False) Then
+            sw$ = ss$
+            p = W$
+            W$ = varhash.lastkey
+            If IsExp(bstack, b$, p) Then
+                 If MemInt(VarPtr(p)) = vbString Then
+                     SwapString2Variant ss$, p
+                     p = Empty
+                 Else
+                     ss$ = vbNullString
+                 End If
+                 GoTo strcont111
+            End If
+            If IsStrExp(bstack, b$, ss$, False) Then
+strcont111:
                  If VarTypeName(var(v)) = mProp Then
                         If FastSymbol(b$, "@") Then
                             If IsExp(bstack, b$, sp) Then
@@ -3484,7 +3494,17 @@ contassignhere:
             Exit Function
         ElseIf .IsStringItem(v) Then
             If FastSymbol(b$, "+=", , 2) Then
-                If Not IsStrExp(bstack, b$, sw$, False) Then GoTo err000
+            If IsExp(bstack, b$, p) Then
+                 If MemInt(VarPtr(p)) = vbString Then
+                     SwapString2Variant sw$, p
+                     p = Empty
+                 Else
+                     sw$ = vbNullString
+                 End If
+            ElseIf Not IsStrExp(bstack, b$, sw$, False) Then
+                GoTo err000
+            End If
+                
                 .item(v) = .item(v) + sw$
             Else
                 WrongOperator

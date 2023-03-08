@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 19
+Global Const Revision = 20
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5856,7 +5856,13 @@ again2:
                 Set usehandler = bstack.lastobj
                 If usehandler.t1 = 4 Then
                     If myVarType(usehandler.index_cursor, vbString) Then
-                        R = usehandler.index_cursor: Set bstack.LastEnum = usehandler.objref
+                        If nostring Then
+                            MissNumExpr
+                            IsExpA = False
+                            Exit Function
+                        Else
+                            R = usehandler.index_cursor: Set bstack.LastEnum = usehandler.objref
+                        End If
                     Else
                         R = usehandler.index_cursor * usehandler.sign: Set bstack.LastEnum = usehandler.objref
                         If po < 0 Then R = -R: po = -po: usehandler.sign = -usehandler.sign
@@ -6611,7 +6617,7 @@ secodlooplogic:
                         IntVal = 1
                     End If
                     
-                    MUL = 1
+                    If MUL = 0 Then MUL = 1
                     If Err.Number Then
                         po = Infinity()
                     End If
@@ -9284,7 +9290,9 @@ conthere123:
                     Set nbstack = Nothing  ' ???
                     If FastSymbol(A$, "#") Then
                         If Not usehandler.t1 = 3 Then WrongObject: Exit Function
-                        IsNumberNew = Matrix(bstack, A$, usehandler, R)
+                        If Not Matrix(bstack, A$, usehandler, R) Then
+                            Exit Function
+                        End If
                         
                     ElseIf flatobject Then
                         If usehandler.t1 = 4 Then
@@ -24483,6 +24491,7 @@ If TypeOf basestack.lastobj Is mHandler Then
 Set usehandler = basestack.lastobj
 If usehandler.t1 = 4 Then
 If myVarType(usehandler.index_cursor, vbString) Then
+    If nostring Then GoTo jumpnostr1
     b$ = usehandler.index_cursor
     Set basestack.lastobj = Nothing
     GoTo conthere
@@ -24804,6 +24813,7 @@ ElseIf Not basestack.lastobj Is Nothing Then
     Set usehandler = basestack.lastobj
     If usehandler.t1 = 4 Then
     If myVarType(usehandler.index_cursor, vbString) Then
+        If nostring Then GoTo jumpnostr1
         b$ = usehandler.index_cursor
         Set basestack.lastobj = Nothing
         GoTo conthere
@@ -42425,7 +42435,7 @@ ss$ = s$
             If Not IsGroupOnly Is Nothing Then
                
                 If Not pppp Is Nothing And w2 <> -2 Then
-                    
+reentry1:
                     A$ = Mid$(A$, w1 + 1 - Len(s$))
                     If IsGroupOnly.HasParameters Then
                         If Mid$(A$, 1, 1) <> "," Then
@@ -42495,7 +42505,14 @@ ss$ = s$
                                     If Typename(bstack.lastobj) = mHdlr Then GoTo handlehandlers
                                 End If
                             End If
-                            
+                        ElseIf IsGroupOnly.HasValue Then
+                                Set pppp = New ppppLight
+                                pppp.PushDim 1
+                                pppp.PushEnd
+                                pppp.Arr = True
+                                Set pppp.item(0) = IsGroupOnly
+                                w2 = 0
+                                GoTo reentry1
                         Else
                             IsEval = IsNumber(bstack, A$, R)
                             If Typename(bstack.lastobj) = mHdlr Then GoTo handlehandlers

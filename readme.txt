@@ -1,13 +1,53 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 19 active-X
-1. Sign + now used as unary + (identity) as unary - (negation). Also evaluator fixed now, so (-2)^2 return 4, and (-2)^3 return -8. There is a new module in INFO file the Evaluator which test using code written in M2000 to produce RPN and execute it, with identical results with interval evaluator, which use through Eval(). ? -2^+3^-4==-1.008594091577 return true (== used for rounding to 13th and then check equality). ? -2^3^-4==-0.000244140625 (look seems  -2^+3^-4 is -2^3^-4 but it isn't). Use Evaluator module to find the RPN (Reverse Polish Notation) for these expressions.
+Version 12 Revision 20 active-X
+1. Fixed: an error in M2000 expression evaluator when occur open parenthesis after exponation operator.(was a mistake on code, introduced in version 12, from early revisions). Update Evaluator module (infix to RPN) at INFO file (look how you load the Info file at the end of this text). New module Eval2, produce evaluation to a line of M2000 statements and execute this using INLINE statement (the Eval2 based on a previous Evaluator, but gives same numeric results as Evaluator module.
+2. Fixed: += for string variables/arrays without suffix $ 
+3. Fixed: EnumStringValue used in Return ListObjectPointer, EnumStringValue:=value
+4. R2 module in info, has a Local integer=... which can't parse from version 12, because local integer is statement which require an identifier least (the old module use the simple form Local identifier_name, which also works in current version, but no for names like double, integer etc).
+5. Fixed the descent parse of M2000 (which immediate execute parsing fragments) for these situations:
+Using keys as strings for lists which retrieve the value from an enum constant with string value. There is also two more examples which use stack object, and pointer to tuple (array). Just do this: Edit A then  press <enter> then copy these and press <Esc>, and write A and press <enter>. Module check1 redefined two times more, this is normal for modules in M2000.
 
-2. bug removed: integer x=1, y (now y isn't 1 but 0)
-
-3.Fixed some statements to use strings with variable name without suffix $:
-open, copy, clipboard, Input (this work continue, so check next revisions)
-For input statement we can use also arrays and now interpreter check if it has numeric or string value. Prior this not happen, because Input use the suffix to find if we want to input string or number. Now also look the suffix, but without suffix look for type too. So old programs can be used as is.
+module check1{
+	enum alfa {
+		s="yes"
+		k="no"
+	}
+	def z as alfa=s
+	a=list:=1:="ok",s:=z,2:=3
+	print a
+	z++
+	return a, s:=z
+	print a, a("yes")
+	
+}
+check1
+module check1{
+	enum alfa {
+		s="yes"
+		k="no"
+	}
+	def z as alfa=s
+	a=Stack:="ok",z,3
+	print a
+	z++
+	return a, 2:=z
+	print a, stackitem(a, 2)
+}
+check1
+module check1{
+	enum alfa {
+		s="yes"
+		k="no"
+	}
+	def z as alfa=s
+	a=("ok",z,3)
+	print a
+	z++
+	return a, 1:=z
+	print a, a#val(1), array(a,1)="no"
+}
+check1
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
