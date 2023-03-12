@@ -51,10 +51,10 @@ Private Type SAFEArrayPart
    cLocks                       As Long
    pvData                       As Long
    End Type
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
   Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" _
       (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
@@ -377,8 +377,8 @@ Else
 End If
 End If
 End Property
-Public Sub PushProp(a As Variant)
-Set GroupRef = a
+Public Sub PushProp(A As Variant)
+Set GroupRef = A
 Arr = False
 End Sub
 Friend Sub ExportArrayNow()
@@ -422,16 +422,16 @@ ReDim makeonedim(0 To items - 1)
 End Function
 
 Friend Sub FeedFromSrings(Carrier As Variant)
-Dim a() As String, i As Long
+Dim A() As String, i As Long
 If myVarType(actualData, vbObject) Then Exit Sub
 If VarType(actualData) <> vbArray + vbVariant Then Exit Sub
-a() = Carrier
+A() = Carrier
 Carrier = Array()
 Dim zz As Variant, rCount As Long, dimActual As Long, dummy As Long, tst As Long
 Dim ii As Long
 CopyMemory ByVal VarPtr(refArray), zz, 16
 On Error GoTo TT
-rCount = UBound(a()) - LBound(a) + 1
+rCount = UBound(A()) - LBound(A) + 1
 dimActual = 1
 TT:
 If dimActual = 0 Then
@@ -451,8 +451,8 @@ sum = rCount
 again:
 dummy = dimActual
 On Error GoTo ok1
-tst = UBound(a(), dimActual + 1)
-rCount = UBound(a(), dimActual + 1) - LBound(a, dimActual + 1) + 1
+tst = UBound(A(), dimActual + 1)
+rCount = UBound(A(), dimActual + 1) - LBound(A, dimActual + 1) + 1
 dimActual = dimActual + 1
 sum = sum * rCount
 ok1:
@@ -468,9 +468,9 @@ If dimActual <> 1 Then
 MyEr "wrong array dimensions", "λάθος διαστάσεις πίνακα"
 Else
 actualData = makeonedim(sum)
-ii = LBound(a)
+ii = LBound(A)
 For i = LBound(actualData, 1) To UBound(actualData, 1)
-actualData(i) = a(ii)
+actualData(i) = A(ii)
 ii = ii + 1
 Next i
 PushEnd
@@ -552,9 +552,9 @@ End If
 '
 
 End Sub
-Friend Sub LoadTuple(ar As Variant)
+Friend Sub LoadTuple(aR As Variant)
 Dim z As Long, i As Long
-actualData = ar
+actualData = aR
 If count <> UBound(actualData) - LBound(actualData) + 1 Then
 i = count
 maxitems1 = UBound(actualData) - LBound(actualData)
@@ -1044,13 +1044,13 @@ Else
     maxitems1 = nmaxitems1
     If nmaxitems1 < 0 Then
         If isnew And Not MyTypeToBe = vbVariant Then
-            Dim ar As refArray
-            Set ar = New refArray
-            ar.ResetToType MyTypeToBe, 1
-            Set actualData = ar
+            Dim aR As refArray
+            Set aR = New refArray
+            aR.ResetToType MyTypeToBe, 1
+            Set actualData = aR
         ElseIf myVarType(actualData, vbObject) Then
-            Set ar = actualData
-            ar.RedimForFlat 1
+            Set aR = actualData
+            aR.RedimForFlat 1
         Else
             ReDim actualData(1)
         End If
@@ -1060,13 +1060,13 @@ Else
                 Set actualData = thisarr
         ElseIf isnew And Not MyTypeToBe = vbVariant Then
           '  Dim aR As refArray
-            Set ar = New refArray
-            ar.ResetToType MyTypeToBe, maxitems1
-            Set actualData = ar
+            Set aR = New refArray
+            aR.ResetToType MyTypeToBe, maxitems1
+            Set actualData = aR
         Else
         If myVarType(actualData, vbObject) Then
-            Set ar = actualData
-            ar.RedimForFlat maxitems1
+            Set aR = actualData
+            aR.RedimForFlat maxitems1
         Else
  
                 ReDim Preserve actualData(maxitems1)
@@ -1104,8 +1104,8 @@ dnum = 0
 maxitems = 1
 maxitems1 = 0
     If myVarType(actualData, vbObject) Then
-        Set ar = actualData
-        ar.RedimForFlat maxitems
+        Set aR = actualData
+        aR.RedimForFlat maxitems
     Else
         ReDim actualData(maxitems)
     End If
@@ -1250,8 +1250,8 @@ End Function
 Public Property Get itemPtr(curitem As Long) As Long
 itemPtr = VarPtr(actualData(curitem))
 End Property
-Friend Sub CopyVariantArray(ByRef a As Variant, ByRef b As Variant)
-    CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
+Friend Sub CopyVariantArray(ByRef A As Variant, ByRef b As Variant)
+    CopyMemory ByVal VarPtr(A), ByVal VarPtr(b), 16
 End Sub
 Friend Sub SwapItem(curitem As Long, thisvariant)
 Static p
@@ -1532,7 +1532,7 @@ there1:
 End Property
 
 Public Property Let item(curitem As Long, item As Variant)
-Dim usehandler As mHandler, ar As refArray
+Dim usehandler As mHandler, aR As refArray
 On Error Resume Next
 If curitem < 0 Then
 If curitem <> -2 Then
@@ -1558,13 +1558,13 @@ Else
 CantAssignValue
 End If
 ElseIf myVarType(actualData, vbObject) Then
-Set ar = actualData
+Set aR = actualData
 'If myVarType(item, vbObject) Then
-    ar(curitem) = item
-    Select Case ar.AssignError
+    aR(curitem) = item
+    Select Case aR.AssignError
     Case 0
     Case 6
-        OverflowValue ar.vtType(curitem)
+        OverflowValue aR.vtType(curitem)
     Case 5020
         missNumber
     Case 5030
@@ -2294,10 +2294,11 @@ End If
 ReDim piv1(1)
 End Sub
 Property Get ArrPtr() As Long  ' 32 bit address
-
+Dim aR As refArray
 If myVarType(actualData, vbObject) Then
     If actualData.count > 0 Then
-        ArrPtr = actualData.ArrPtr(0)
+        Set aR = actualData
+        ArrPtr = aR.ArrPtr
     End If
 ElseIf Elements(actualData) > 0 Then
     ArrPtr = VarPtr(actualData(0))
@@ -2424,8 +2425,8 @@ Private Sub iBoxArray_PushEnd(Optional thisarr As Variant)
     End If
 End Sub
 
-Private Sub iBoxArray_PushProp(a As Variant)
-PushProp a
+Private Sub iBoxArray_PushProp(A As Variant)
+PushProp A
 End Sub
 
 Private Property Set iBoxArray_refgroup(ByVal RHS As Object)

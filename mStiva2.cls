@@ -12,10 +12,10 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
 Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
 ' a stack only for strings for group objects
 Private mstack As New Collection
@@ -54,14 +54,14 @@ LookTopVal = mstack.item(1)
 End If
 End Property
 Public Function LookTopValIsLong(p As Long) As Boolean
-Dim a, t As Byte
+Dim A, t As Byte
 If mstack.count > 0 Then
-a = mstack.item(1)
-GetMem1 VarPtr(a), t
+A = mstack.item(1)
+GetMem1 VarPtr(A), t
 If t = 3 Then
 LookTopValIsLong = True
 mstack.Remove 1
-p = CLng(a)
+p = CLng(A)
 End If
 End If
 
@@ -77,38 +77,38 @@ PopVal = mstack.item(1)
    mstack.Remove 1
 End If
 End Property
-Public Sub PushVal(a As Variant)
+Public Sub PushVal(A As Variant)
 If mstack.count = 0 Then
-mstack.Add a
+mstack.Add A
 Else
-mstack.Add a, , 1
+mstack.Add A, , 1
 End If
 End Sub
-Public Sub PushVariant(a As Variant)
+Public Sub PushVariant(A As Variant)
 If mstack.count = 0 Then
-mstack.Add a
+mstack.Add A
 Else
-mstack.Add a, , 1
+mstack.Add A, , 1
 End If
 End Sub
-Public Sub PushLong(a As Long)
+Public Sub PushLong(A As Long)
 If mstack.count = 0 Then
-mstack.Add CVar(a)
+mstack.Add CVar(A)
 Else
-mstack.Add CVar(a), , 1
+mstack.Add CVar(A), , 1
 End If
 End Sub
 Public Sub MakeTopItem(where As Long)
 'we pick an item and to the top
-Dim a As Variant
+Dim A As Variant
 On Error Resume Next
 If where > 1 Then
-a = mstack.item(where)
+A = mstack.item(where)
 mstack.Remove where
 If mstack.count = 0 Then
-mstack.Add a
+mstack.Add A
 Else
-mstack.Add a, , 1
+mstack.Add A, , 1
 End If
 End If
 End Sub
@@ -118,11 +118,11 @@ For num = 1 To mstack.count
    mstack.Remove 1
 Next num
 End Sub
-Public Sub PushStr(ByRef a As String)
+Public Sub PushStr(ByRef A As String)
 If mstack.count = 0 Then
-mstack.Add CVar(a)
+mstack.Add CVar(A)
 Else
-mstack.Add CVar(a), , 1
+mstack.Add CVar(A), , 1
 End If
 End Sub
 Public Property Get StackItem2(where As Long, maxvalue As Long) As Variant
@@ -144,28 +144,16 @@ End Property
 Public Sub DataObj(RHS As Object)
 Dim aa
 Set aa = RHS
-If mstack.count = 0 Then
 mstack.Add aa
-Else
-mstack.Add aa, , , mstack.count
-End If
 End Sub
-Public Sub DataVal(a As Variant)
-If mstack.count = 0 Then
-mstack.Add a
-Else
-mstack.Add a, , , mstack.count
-End If
+Public Sub DataVal(A As Variant)
+mstack.Add A
 End Sub
-Public Sub DataStr(ByRef a As String)
+Public Sub DataStr(ByRef A As String)
 Dim v As Variant
 v = vbNullString
-SwapString2Variant a, v
-If mstack.count = 0 Then
+SwapString2Variant A, v
 mstack.Add v
-Else
-mstack.Add v, , , mstack.count
-End If
 End Sub
 Sub GetStackPick(where, ByRef v As Variant)
 SwapVariant v, mstack.item(where)
@@ -176,24 +164,20 @@ Public Property Get StackPick(where As Long) As Variant
 StackPick = mstack.item(where)
 mstack.Remove where
 End Property
-Public Sub MergeBottom(a As mStiva2)
-If Me Is a Then Exit Sub
+Public Sub MergeBottom(A As mStiva2)
+If Me Is A Then Exit Sub
 Dim i As Long, aa As Variant
-If a.Total > 0 Then
+If A.Total > 0 Then
 Do
-aa = a.StackPick(1)
-If mstack.count = 0 Then
+aa = A.StackPick(1)
 mstack.Add aa
-Else
-mstack.Add aa, , , mstack.count    'push so first of a is first on mstack
-End If
-Loop Until a.Total < 1
+Loop Until A.Total < 1
 End If
 End Sub
-Public Sub DataStrUn(a As String)
+Public Sub DataStrUn(A As String)
 Dim aa As Variant, i As Long, b As String
-b = Split(a)(0)
-aa = a
+b = Split(A)(0)
+aa = A
 If mstack.count = 0 Then
 mstack.Add aa
 Else
@@ -211,7 +195,7 @@ End If
 Exit Sub
 End If
 Next i
-mstack.Add aa, , , mstack.count
+mstack.Add aa
 End If
 End Sub
 Public Sub drop(ByVal items As Long)

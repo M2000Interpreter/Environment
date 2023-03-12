@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 20
+Global Const Revision = 21
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -11251,8 +11251,12 @@ comehere:
 contrightpar:
                     If Typename(ppppL.GroupRef) = mHdlr Then
                         Set usehandler = ppppL.GroupRef
-                        If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
+                        If IsExp(bstack, A$, p, flatobject:=True) Then
                             If usehandler.t1 = 2 Then ' OK for Buffer
+                                If MemInt(VarPtr(p)) = vbString Then
+                                ' no good goto this
+                                GoTo syntax1
+                                End If
                                 With usehandler.objref
                                 If FastSymbol(A$, "!") Then
                                   
@@ -11459,11 +11463,12 @@ inv100:                                 Expected "Inventory", "Κατάσταση"
                                     End If
                                 End If
                                 If Not .IsObj Then
-                                    If .ValueType(0, R, s$) Then
-                                        If MyIsNumeric(R) Then
+                                    R = s$
+                                    If Not .ValueType(0, R, s$) Then
+                                   '     If MyIsNumeric(R) Then
                                         
-                                        End If
-                                    Else
+                                    '    End If
+                                    'Else
                                         R = 0
                                     End If
                                 Else
@@ -22657,8 +22662,8 @@ FList = q.FuncList
 ohere$ = here$
 here$ = Left$(Name$, Len(Name$) - 1)
 Dim iamvariant As Boolean
-For i = 1 To q.soros.Total
-    aa$ = q.soros.StackItem(i)
+For i = 1 To q.FieldsCount
+    aa$ = q.ReadField(i)
     v = Abs(Split(aa$)(1))
     Vlist = True
     If MyIsObject(var(v)) Then
@@ -22683,7 +22688,7 @@ For i = 1 To q.soros.Total
                         itGroup.edittag = .edittag
                         itGroup.FuncList = .FuncList
                         itGroup.GroupName = ss$ + "."
-                        Set itGroup.Sorosref = .soros.Copy
+                       ' Set itGroup.Sorosref = .soros.Copy
                         itGroup.HasValue = .HasValue
                         itGroup.HasSet = .HasSet
                         itGroup.HasStrValue = .HasStrValue
@@ -22713,7 +22718,7 @@ For i = 1 To q.soros.Total
                             itGroup.edittag = .link.edittag
                             itGroup.FuncList = .link.FuncList
                             itGroup.GroupName = ss$ + "."
-                            Set itGroup.Sorosref = .link.soros.Copy
+                           ' Set itGroup.Sorosref = .link.soros.Copy
                             itGroup.HasValue = .link.HasValue
                             itGroup.HasSet = .link.HasSet
                             itGroup.HasStrValue = .link.HasStrValue
@@ -27959,17 +27964,20 @@ Dim k As Group, i As Long, j As Long, s$, w3 As Long, w1 As Integer
 Dim b$(), vvl As Variant, delme As Document, myfirstArray As mArray, mySecondArray As mArray
 
 Set k = New Group
-Set k.Sorosref = myGroup.soros.Copy
+'Set k.Sorosref = myGroup.soros.Copy
 Dim BI As Long
 BI = 1
 
-i = myGroup.soros.Total
+'i = myGroup.soros.Total
+i = myGroup.FieldsCount
 k.BeginFloat i + 2
 k.PokeItem 0, "Variables-Arrays"
 k.PokeItem 1, i
 Dim usevariant As Boolean
 For j = 2 To i * 2 + 1 Step 2
-    b$() = Split(k.soros.StackItem(BI), " ")
+'Debug.Print k.soros.StackItem(BI), BI
+'Debug.Print myGroup.ReadField(BI), BI
+    b$() = Split(myGroup.ReadField(BI), " ")
     w3 = Abs(val(b$(1)))
     w1 = AscW(Right$(b$(0), 1))
     If w1 = 41 Then
@@ -28072,15 +28080,15 @@ End If
 Dim Name$, k As Group, i As Long, j As Long, s$, w3 As Long, w1 As Integer
 Dim b$(), vvl As Variant
 Set k = New Group
-Set k.Sorosref = myGroup.soros.Copy
+'Set k.Sorosref = myGroup.soros.Copy
 Dim BI As Long
 BI = 1
-i = myGroup.soros.Total
+i = myGroup.FieldsCount 'myGroup.soros.Total
 k.BeginFloat i + 2
 k.PokeItem 0, "Variables-Arrays"
 k.PokeItem 1, i
 For j = 2 To i * 2 + 1 Step 2
-    b$() = Split(k.soros.StackItem(BI), " ")
+    b$() = Split(myGroup.ReadField(BI), " ")
     w3 = Abs(val(b$(1)))
     w1 = AscW(Right$(b$(0), 1))
     If w1 = 41 Then
@@ -28175,8 +28183,8 @@ End If
 BI = 1
 If Not k.IamFloatGroup Then Exit Function
     k.PokeItem 0, "Variables-Arrays"
-    For j = 2 To myGroup.soros.Total * 2 + 1 Step 2
-        b$() = Split(myGroup.soros.StackItem(BI), " ")
+    For j = 2 To myGroup.FieldsCount * 2 + 1 Step 2
+        b$() = Split(myGroup.ReadField(BI), " ")
         w3 = Abs(val(b$(1)))
         w1 = AscW(Right$(b$(0), 1))
         If w1 = 41 Then
@@ -28233,8 +28241,8 @@ Dim BI As Long
 BI = 1
 If Not k.IamFloatGroup Then Exit Function
 k.PokeItem 0, "Variables-Arrays"
-For j = 2 To myGroup.soros.Total * 2 + 1 Step 2
-    b$() = Split(myGroup.soros.StackItem(BI), " ")
+For j = 2 To myGroup.FieldsCount * 2 + 1 Step 2
+    b$() = Split(myGroup.ReadField(BI), " ")
     w3 = Abs(val(b$(1)))
     w1 = AscW(Right$(b$(0), 1))
     If w1 = 41 Then
@@ -28290,10 +28298,9 @@ While Right$(what$, 1) = "."
     what$ = Left$(what$, Len(what$) - 1)
 Wend
 If Len(what$) = 0 Then Exit Sub
-Dim ps As mStiva2, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$, frmarr$, sss$, j As Long
+Dim v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$, frmarr$, sss$, j As Long
 Dim grtype As Variant, ps2push As String, uni As Boolean, uni1 As Boolean, other As Group
 Dim UnhidePrivate As Boolean
-
 If bstack.tpointer <> 0 Then
     x1 = bstack.tpointer
     If MyIsObject(var(x1)) Then
@@ -28316,7 +28323,7 @@ If Not myobject.SuperClassList Is Nothing Then
     If myobject Is Nothing Then Exit Sub
     If myobject.IamSuperClass Then Set myobject = myobject.SuperClassList: uni = True
 End If
-Set ps = ThisGroup.soros
+'Set ps = ThisGroup.soros
 Dim subgroup As Object, pppp As mArray
 Dim ohere$, oldgroupname$
 ohere$ = here$
@@ -28381,9 +28388,11 @@ With myobject
                 varhash.ItemCreator ThisGroup.Patch + "." + Mid$(s$, 2), j, True, , True
                 End If
                 If usevariant Then
-                    ps.DataStr "#" + s$ + " " + str(-j)
+                    'ps.DataStr "#" + s$ + " " + str(-j)
+                    ThisGroup.Add2Field "#" + s$ + " " + str(-j)
                 Else
-                    ps.DataStr s$ + str(j)
+                    'ps.DataStr s$ + str(j)
+                    ThisGroup.Add2Field s$ + str(j)
                 End If
             ElseIf frm$ = "lambda" Then
                 v = globalvarGroup(ThisGroup.Patch + "." + s$, 0, , True)
@@ -28437,7 +28446,8 @@ With myobject
                             Set other = Nothing
                             Set spare = Nothing
                         End If
-                        ps.DataStr s$ + str(v)
+                        'ps.DataStr s$ + str(v)
+                        ThisGroup.Add2Field s$ + str(v)
                     Else
                         v = globalvarGroup(bstack.GroupName + s$, 0)
                         Set spare = vvl
@@ -28445,7 +28455,8 @@ With myobject
                         UnFloatGroup bstack, s$, v, spare, Glob, Temp, MakeNew
                         here$ = ohere$
                         Set spare = Nothing
-                        ps.DataStr "*" + s$ + str(v)
+                        'ps.DataStr "*" + s$ + str(v)
+                        ThisGroup.Add2Field "*" + s$ + str(v)
                     End If
                 Else
                     If Right$(s$, 2) = "()" Then
@@ -28464,9 +28475,11 @@ conthere2:
                         var(v) = vvl
                     End If
                     If usevariant Then
-                        ps.DataStr "#" + s$ + " " + str(-v)
+                        'ps.DataStr "#" + s$ + " " + str(-v)
+                        ThisGroup.Add2Field "#" + s$ + " " + str(-v)
                     Else
-                        ps.DataStr s$ + str(v)
+                        'ps.DataStr s$ + str(v)
+                        ThisGroup.Add2Field s$ + str(v)
                     End If
                 End If
             End If
@@ -28610,7 +28623,7 @@ Set myobject = myobject1
 Set ThisGroup = var(i)
 If myobject.IamApointer Then
     If ThisGroup.IamApointer Then Set var(i) = myobject: Exit Sub
-    If myobject.link.IamFloatGroup And ThisGroup.soros.Total = 0 Then
+    If myobject.link.IamFloatGroup And ThisGroup.FieldsCount = 0 Then
         Set var(i) = myobject
         Exit Sub
     ElseIf myobject.link.IamFloatGroup Then
@@ -28658,10 +28671,10 @@ End If
 End If
 End If
 End If
-Dim ps As mStiva2, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$, frmarr$, sss$, j As Long
+Dim v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$, frmarr$, sss$, j As Long
 Dim grtype As Variant, ps2push As String, ff$, uni As Boolean, limit As Long   ' TT As Long
 Dim usevariant As Boolean
-Set ps = var(i).soros
+'Set ps = var(i).soros
 Dim subgroup As Object, pppp As mArray
 Dim oldgroupname$, Glob As Boolean
 ohere$ = here$  ' get a backup
@@ -28737,9 +28750,11 @@ conthere1111:
                     End If
                     If addon Then
                         If usevariant Then
-                            ps.DataStrUn "#" + s$ + " " + str$(-j)
+                            ' PS.DataStrUn "#" + s$ + " " + str$(-j)
+                            ThisGroup.MergeField "#" + s$ + " " + str$(-j)
                         Else
-                            ps.DataStrUn s$ + str$(j)
+                            ' PS.DataStrUn s$ + str$(j)
+                            ThisGroup.MergeField s$ + str$(j)
                         End If
                     End If
                 ElseIf TypeOf vvl Is lambda Then
@@ -28754,7 +28769,10 @@ conthere1111:
                         End If
                     End If
                     Set var(v) = vvl
-                    If addon Then ps.DataStrUn s$ + str(v)
+                    If addon Then
+                    ' PS.DataStrUn s$ + str(v)
+                    ThisGroup.MergeField s$ + str(v)
+                    End If
                 Else  ' is not array so...
                         '' drop *
                     If AscW(s$) = 42 Then s$ = Mid$(s$, 2)
@@ -28785,7 +28803,10 @@ cont1928374:
                             here$ = ss$
                         End If
                         Set spare = Nothing
-                        If addon Then ps.DataStrUn "*" + s$ + str(v)
+                        If addon Then
+                        ' PS.DataStrUn "*" + s$ + str(v)
+                        ThisGroup.MergeField "*" + s$ + str(v)
+                        End If
                         GoTo cont1010
                     ElseIf TypeOf vvl Is mHandler Then
                         Set vvl = CopyHandlerObj(vvl)
@@ -28804,9 +28825,11 @@ cont1928374:
                     Set var(v) = vvl
                     If addon Then ' ps.DataStrUn s$ + Str(v)
                         If usevariant Then
-                            ps.DataStrUn "#" + s$ + " " + str$(-v)
+                            ' PS.DataStrUn "#" + s$ + " " + str$(-v)
+                            ThisGroup.MergeField "#" + s$ + " " + str$(-v)
                         Else
-                            ps.DataStrUn s$ + str$(v)
+                            ' PS.DataStrUn s$ + str$(v)
+                            ThisGroup.MergeField s$ + str$(v)
                         End If
                     End If
                 End If
@@ -28822,9 +28845,11 @@ cont1928374:
                 var(v) = vvl
                 If addon Then
                     If usevariant Then
-                        ps.DataStrUn "#" + s$ + " " + str$(-v)
+                        ' PS.DataStrUn "#" + s$ + " " + str$(-v)
+                        ThisGroup.MergeField "#" + s$ + " " + str$(-v)
                     Else
-                        ps.DataStrUn s$ + str$(v)
+                        ' PS.DataStrUn s$ + str$(v)
+                        ThisGroup.MergeField s$ + str$(v)
                     End If
                 End If
             End If
@@ -29122,8 +29147,9 @@ If ByPass Then GoTo bye
 
 '
 Dim ss$, W$, i As Long, nm$, nt$, CM$, nt1$, j As Long, k As Long, dropit As Long
-Dim s() As String
-      With var(vvv)
+Dim s() As String, eGroup As Group
+Set eGroup = var(vvv)
+      With eGroup
 
   
         
@@ -29147,22 +29173,27 @@ Dim s() As String
                           If nt$ = mGroup Then
                           If Right$(ss$, 1) <> "$" Then
                           
-                         .soros.DataStr "*" + Mid$(ss$, Len(W$) + 1) + str(j)
+                         '.soros.DataStr "*" + Mid$(ss$, Len(W$) + 1) + str(j)
+                         .Add2Field "*" + Mid$(ss$, Len(W$) + 1) + str(j)
                          Else
                          
                          End If
                          Else
                          If varhash.vType(i - 1) = False Then
                          If unique Then
-                         .soros.DataStr "#@" + Mid$(ss$, Len(W$) + 1) + " " + str(-j)
+                         '.soros.DataStr "#@" + Mid$(ss$, Len(W$) + 1) + " " + str(-j)
+                         .Add2Field "#@" + Mid$(ss$, Len(W$) + 1) + " " + str(-j)
                          Else
-                         .soros.DataStr "#" + Mid$(ss$, Len(W$) + 1) + " " + str(-j)
+                         '.soros.DataStr "#" + Mid$(ss$, Len(W$) + 1) + " " + str(-j)
+                         .Add2Field "#" + Mid$(ss$, Len(W$) + 1) + " " + str(-j)
                          End If
                          Else
                          If unique Then
-                         .soros.DataStr "@" + Mid$(ss$, Len(W$) + 1) + str(j)
+                         '.soros.DataStr "@" + Mid$(ss$, Len(W$) + 1) + str(j)
+                         .Add2Field "@" + Mid$(ss$, Len(W$) + 1) + str(j)
                          Else
-                         .soros.DataStr Mid$(ss$, Len(W$) + 1) + str(j)
+                         '.soros.DataStr Mid$(ss$, Len(W$) + 1) + str(j)
+                         .Add2Field Mid$(ss$, Len(W$) + 1) + str(j)
                          End If
                         End If
                          End If
@@ -34262,233 +34293,185 @@ End Function
 Function MyClear(bstack As basetask, rest$) As Boolean
 Dim curbstack As basetask, i As Long, y1 As Long, what$, it As Long, pppp As mArray, myobject As mStiva
 Dim usehandler As mHandler
-'Dim bs As basetask
 MyClear = True
-
-
 Do
-y1 = Abs(IsLabel(bstack, rest$, what$))
-
-
-If y1 = 3 Then
-      If GetVar(bstack, what$, i) Then
-        If VarTypeName(var(i)) = doc Then
-        Set var(i) = New Document
-        var(i).LCID = LCID_DEF
-        var(i).textDoc = vbNullString
-        Else
-        var(i) = vbNullString
-        End If
-       Else
-        globalvar what$, ""
-        
-       End If
-ElseIf y1 < 5 And y1 > 0 Then
-      If GetVar(bstack, what$, i) Then
-        If MyIsObject(var(i)) Then
-        ' PUT ZERO TO VARIABLES INSIDE GROUP
-       If Typename(var(i)) = "lambda" Then
-       Set var(i) = Nothing
-       Dim ok As Boolean
-       var(i) = 0&
-       ElseIf Typename(var(i)) = mGroup Then
-        If Not var(i).IamCleared Then
-        CallClear bstack, what$, var(i)
-
-        
-        
-        If var(i).IamApointer Then
-        Set var(i) = New Group
-        
-        Else
-       var(i).ResetGroup
-       End If
-        End If
-       ElseIf Typename(var(i)) = mHdlr Then
-       Set usehandler = var(i)
-       If usehandler.t1 = 1 Then
-       If usehandler.ReadOnly Then
-            ReadOnly
-            MyClear = False
-            Exit Function
-        End If
-        If usehandler.UseIterator Then
-            ReadOnly
-            MyClear = False
-            Exit Function
-        End If
-            If usehandler.objref.IsQueue Then
-            Set var(i) = Nothing
-            MakeitObjectInventory var(i), True
+    y1 = Abs(IsLabel(bstack, rest$, what$))
+    If y1 = 3 Then
+        If GetVar(bstack, what$, i) Then
+            If VarTypeName(var(i)) = doc Then
+                Set var(i) = New Document
+                var(i).LCID = LCID_DEF
+                var(i).textDoc = vbNullString
             Else
-            Set var(i) = Nothing
-            MakeitObjectInventory var(i)
+                var(i) = vbNullString
             End If
-           
-       ElseIf usehandler.t1 = 2 Then
-       
-        Set usehandler = New mHandler
-        Set var(i) = usehandler
-         usehandler.t1 = 2
-            Set usehandler.objref = New MemBlock
-       Else
-       If usehandler.UseIterator Then
-       Set var(i) = Nothing
-       var(i) = 0&
-       Else
-
-       If Typename$(usehandler.objref) = myArray Then
-            Set usehandler.objref = New mArray
-       ElseIf Typename$(usehandler.objref) = "mStiva" Then
-                Set usehandler.objref = New mStiva
-       
-       End If
-       End If
-       End If
-       Else
-       'If Typename$(var(i)) = mProp Then
-      ' var(i) = Empty
-      ' Else
-         var(i) = Empty
-       '  End If
-       End If
         Else
-        If myVarType(var(i), vbLong) Then
-        var(i) = 0&
-        ElseIf myVarType(var(i), vbString) Then
-            var(i) = vbNullString
-        Else
-            var(i) = 0#
-            End If
+            globalvar what$, ""
         End If
-        
-       Else
-        globalvar what$, it
-       End If
-ElseIf y1 = 5 Or y1 = 7 Then
-  If neoGetArray(bstack, what$, pppp) Then
-  If Not pppp.Arr Then NotArray: MyClear = False: Exit Function
-                If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then MyClear = False: Exit Function
-                        If pppp.ItemType(it) = mGroup Then
-                            Set pppp.item(it) = Nothing
-                            EmptyVariantArrayItem pppp, it
-
-
-                         ElseIf pppp.ItemType(it) = "lambda" Then
-                         Set pppp.item(it) = Nothing
-                         EmptyVariantArrayItem pppp, it
-                         Else
-                         SyntaxError
-                         MyClear = False
-                         End If
-                 
-       Else
-       SyntaxError
-       MyClear = False
-       End If
-ElseIf y1 = 6 Then
+    ElseIf y1 < 5 And y1 > 0 Then
+        If GetVar(bstack, what$, i) Then
+            If MyIsObject(var(i)) Then
+            ' PUT ZERO TO VARIABLES INSIDE GROUP
+                If Typename(var(i)) = "lambda" Then
+                    Set var(i) = Nothing
+                    Dim ok As Boolean
+                    var(i) = 0&
+                ElseIf Typename(var(i)) = mGroup Then
+                    If Not var(i).IamCleared Then
+                        CallClear bstack, what$, var(i)
+                        If var(i).IamApointer Then
+                            Set var(i) = New Group
+                        Else
+                            var(i).ResetGroup
+                        End If
+                    End If
+                ElseIf Typename(var(i)) = mHdlr Then
+                    Set usehandler = var(i)
+                    If usehandler.t1 = 1 Then
+                        If usehandler.ReadOnly Then
+                            ReadOnly
+                            MyClear = False
+                            Exit Function
+                        End If
+                        If usehandler.UseIterator Then
+                            ReadOnly
+                            MyClear = False
+                            Exit Function
+                        End If
+                        If usehandler.objref.IsQueue Then
+                            Set var(i) = Nothing
+                            MakeitObjectInventory var(i), True
+                        Else
+                            Set var(i) = Nothing
+                            MakeitObjectInventory var(i)
+                        End If
+                    ElseIf usehandler.t1 = 2 Then
+                        Set usehandler = New mHandler
+                        Set var(i) = usehandler
+                        usehandler.t1 = 2
+                        Set usehandler.objref = New MemBlock
+                    ElseIf usehandler.UseIterator Then
+                        Set var(i) = Nothing
+                        var(i) = 0&
+                    ElseIf Typename$(usehandler.objref) = myArray Then
+                        Set usehandler.objref = New mArray
+                    ElseIf Typename$(usehandler.objref) = "mStiva" Then
+                         Set usehandler.objref = New mStiva
+                    End If
+                Else
+                     var(i) = Empty
+                End If
+            ElseIf myVarType(var(i), vbLong) Then
+                var(i) = 0&
+            ElseIf myVarType(var(i), vbString) Then
+                var(i) = vbNullString
+            Else
+                var(i) = 0#
+            End If
+        Else
+            globalvar what$, it
+        End If
+    ElseIf y1 = 5 Or y1 = 7 Then
         If neoGetArray(bstack, what$, pppp) Then
-        If Not pppp.Arr Then NotArray: MyClear = False: Exit Function
-                If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then MyClear = False: Exit Function
-                         If pppp.ItemType(it) = mGroup Then
-                            Set pppp.item(it) = Nothing
-                            EmptyVariantArrayItem pppp, it
-                         ElseIf pppp.ItemType(it) = doc Then
-                             Set pppp.item(it) = New Document
-                             pppp.item(it).textDoc = vbNullString
-                         ElseIf pppp.ItemType(it) = "lambda" Then
-                            Set pppp.item(it) = Nothing
-                            EmptyVariantArrayItem pppp, it
-                         Else
-                         pppp.item(it) = vbNullString
-                         End If
-                 
-       Else
-       SyntaxError
-       MyClear = False
-       End If
-ElseIf y1 > 0 Then
-  SyntaxError
-       MyClear = False
-Else
-Form1.List1.Clear
-If bstack.IamThread Then
-If Not bstack.StaticCollection Is Nothing Then
-Set bstack.StaticCollection = Nothing
- End If
-ElseIf bstack.IamAnEvent Then
-
- 
-If Not bstack.StaticCollection Is Nothing Then
-If Not bstack.Parent Is Nothing Then
-    If Not bstack.Parent.StaticCollection Is Nothing Then
-    If bstack.Parent.StaticCollection.ExistKey("%_" + here$) Then
-            bstack.Parent.StaticCollection.RemoveWithNoFind
-    End If
-    End If
-    End If
-    Set bstack.StaticCollection = Nothing
-  
+            If Not pppp.Arr Then NotArray: MyClear = False: Exit Function
+            If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then MyClear = False: Exit Function
+                If pppp.ItemType(it) = mGroup Then
+                    Set pppp.item(it) = Nothing
+                    EmptyVariantArrayItem pppp, it
+                ElseIf pppp.ItemType(it) = "lambda" Then
+                    Set pppp.item(it) = Nothing
+                    EmptyVariantArrayItem pppp, it
+                Else
+                    SyntaxError
+                    MyClear = False
+                End If
+            Else
+                SyntaxError
+                MyClear = False
+            End If
+    ElseIf y1 = 6 Then
+        If neoGetArray(bstack, what$, pppp) Then
+            If Not pppp.Arr Then NotArray: MyClear = False: Exit Function
+            If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then MyClear = False: Exit Function
+            If pppp.ItemType(it) = mGroup Then
+                Set pppp.item(it) = Nothing
+                EmptyVariantArrayItem pppp, it
+            ElseIf pppp.ItemType(it) = doc Then
+                Set pppp.item(it) = New Document
+                pppp.item(it).textDoc = vbNullString
+            ElseIf pppp.ItemType(it) = "lambda" Then
+                Set pppp.item(it) = Nothing
+                EmptyVariantArrayItem pppp, it
+            Else
+                pppp.item(it) = vbNullString
+            End If
+        Else
+            SyntaxError
+            MyClear = False
+        End If
+    ElseIf y1 > 0 Then
+        SyntaxError
+        MyClear = False
     Else
- MyEr "Only static variables can clear in an event", "Μόνο στατικές μπορώ να σβήσω σε ένα γεγονός"
-End If
-Else
-bstack.clearbasket
-
-Set curbstack = bstack
-
+        Form1.List1.Clear
+        If bstack.IamThread Then
+            If Not bstack.StaticCollection Is Nothing Then
+                Set bstack.StaticCollection = Nothing
+            End If
+        ElseIf bstack.IamAnEvent Then
+            If Not bstack.StaticCollection Is Nothing Then
+                If Not bstack.Parent Is Nothing Then
+                    If Not bstack.Parent.StaticCollection Is Nothing Then
+                        If bstack.Parent.StaticCollection.ExistKey("%_" + here$) Then
+                            bstack.Parent.StaticCollection.RemoveWithNoFind
+                        End If
+                    End If
+                End If
+                Set bstack.StaticCollection = Nothing
+  
+            Else
+                MyEr "Only static variables can clear in an event", "Μόνο στατικές μπορώ να σβήσω σε ένα γεγονός"
+            End If
+        Else
+            bstack.clearbasket
+            Set curbstack = bstack
 again1234:
-
- If curbstack.IamChild Then
- If curbstack.IamThread Then Set curbstack = Nothing: Exit Function
-
- If Not curbstack.Parent.IamChild And Not curbstack.Parent.IamAnEvent Then
-        Set EventStaticCollection = New FastCollection
- End If
- If curbstack.IamAnEvent Then Set curbstack = Nothing: Exit Function
- With curbstack
-   'Set .StaticCollection = Nothing
-      If .SkipClear > 0 Then Set curbstack = Nothing: Exit Function
-      
-      var2used = curbstack.Vars
-      varhash.ReduceHash curbstack.Vname, var()
-      
-   End With
-
-'Set curbstack = curbstack.Parent
-'If here$ = vbNullString Then GoTo again1234
-'If curbstack.SkipClear = 0 Then
-'var2used = curbstack.Vars
-'varhash.ReduceHash curbstack.Vname, var()
-'End If
-Exit Function
-End If
-GarbageFlush
-Set curbstack = Nothing
-Set EventStaticCollection = New FastCollection
-Set bstack.StaticCollection = Nothing
-
-varhash.ReduceHash 0, var()
-varhash.BigSize 3000
-var2used = 0
-ReDim var(3000) As Variant
-
-Set curbstack = bstack
+            If curbstack.IamChild Then
+                If curbstack.IamThread Then Set curbstack = Nothing: Exit Function
+                If Not curbstack.Parent.IamChild And Not curbstack.Parent.IamAnEvent Then
+                    Set EventStaticCollection = New FastCollection
+                End If
+                If curbstack.IamAnEvent Then Set curbstack = Nothing: Exit Function
+                With curbstack
+                    If .SkipClear > 0 Then Set curbstack = Nothing: Exit Function
+                    var2used = curbstack.Vars
+                    varhash.ReduceHash curbstack.Vname, var()
+                End With
+                Exit Function
+            End If
+            GarbageFlush
+            Set curbstack = Nothing
+            Set EventStaticCollection = New FastCollection
+            Set bstack.StaticCollection = Nothing
+            varhash.ReduceHash 0, var()
+            varhash.BigSize 3000
+            var2used = 0
+            ReDim var(3000) As Variant
+            Set curbstack = bstack
 again12345:
- If curbstack.IamChild Then
-            With curbstack
-                 If .Vars = 0 Then Set curbstack = Nothing: Exit Function
-                     .Vars = 0
-   
-            End With
-            Set curbstack = curbstack.Parent
-            GoTo again12345
-End If
-Set curbstack = Nothing
-End If
-Exit Do
-End If
-If Not MyClear Then Exit Do
+            If curbstack.IamChild Then
+                With curbstack
+                    If .Vars = 0 Then Set curbstack = Nothing: Exit Function
+                    .Vars = 0
+                End With
+                Set curbstack = curbstack.Parent
+                GoTo again12345
+            End If
+            Set curbstack = Nothing
+        End If
+        Exit Do
+    End If
+    If Not MyClear Then Exit Do
 Loop Until Not FastSymbol(rest$, ",")
 End Function
 Function MyMethod(bstack As basetask, rest$, Lang As Long) As Boolean

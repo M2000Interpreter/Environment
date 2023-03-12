@@ -16,7 +16,7 @@ Dim VarRef As String
 Dim FuncRef As String
 Public oldFuncRef As String
 Dim LocalRef As String  ' used only for classes
-Dim OwnSoros As mStiva2
+Dim Fields() As String
 Dim mName As String
 Dim mFloatGroupName As String
 Dim FloatGroup As Boolean
@@ -42,6 +42,40 @@ Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
 Public PointerPtr As Long
 Public ToDelete As Boolean, HasRemove As Boolean, mytypes As Collection
 Public IamCleared As Boolean
+Sub Add2Field(st$)
+    Dim there As Long
+    there = UBound(Fields()) + 1
+    ReDim Preserve Fields(there)
+    SwapStrings st$, Fields(there)
+End Sub
+Function ReadField(there As Long) As String
+'If FieldsCount < there Then Exit Function
+
+    ReadField = Fields(there)
+  '  there = there + 1
+End Function
+Sub MergeField(st$)
+Dim b As String, i As Long
+b = Split(st$)(0)
+If FieldsCount = 0 Then
+    i = UBound(Fields()) + 1
+    ReDim Preserve Fields(i)
+    Fields(i) = st$
+Else
+    For i = 1 To FieldsCount
+        If Split(Fields(i))(0) = b Then
+            Fields(i) = st$
+            Exit Sub
+        End If
+    Next i
+    i = UBound(Fields()) + 1
+    ReDim Preserve Fields(i)
+    Fields(i) = st$
+End If
+End Sub
+Property Get FieldsCount() As Long
+    FieldsCount = UBound(Fields()) - LBound(Fields())
+End Property
 Friend Property Let PutIs(RHS As String)
 If mytypes Is Nothing Then
     Set mytypes = New Collection
@@ -124,16 +158,16 @@ Next i
 End With
 Set eventlist = eventlist2
 End Sub
-Public Sub RegisterEvent(ByVal a$)
-a$ = myUcase(a$)
+Public Sub RegisterEvent(ByVal A$)
+A$ = myUcase(A$)
 If eventlist Is Nothing Then Set eventlist = New FastCollection
-If eventlist.ExistKey(a$) Then Exit Sub
-eventlist.AddKey a$, vbNullString
+If eventlist.ExistKey(A$) Then Exit Sub
+eventlist.AddKey A$, vbNullString
 End Sub
-Public Function EventFuncPos(a$, retName$, Pos As Long) As Boolean
+Public Function EventFuncPos(A$, retName$, Pos As Long) As Boolean
 If eventlist Is Nothing Then EventFuncPos = 0: Exit Function
 With eventlist
-If eventlist.ExistKey(a$) Then
+If eventlist.ExistKey(A$) Then
     retName$ = .Value
     If retName$ <> vbNullString Then Pos = .sValue: EventFuncPos = True
 End If
@@ -142,11 +176,11 @@ End Function
 
 Public Function PrepareSoros(ByRef v(), ByVal topname$) As mStiva2
 Dim i As Long, AllSoros As New mStiva2, s As String, vv As mStiva2
-For i = 1 To OwnSoros.Total
-s = OwnSoros.StackItem(i)
-'Debug.Print s, topname$, GroupName
+For i = 1 To FieldsCount
+s = Fields(i)
+'Debug.Print fields(i), topname$, GroupName
 
-If Left$(s$, 1) = "*" Then
+If Left$(s, 1) = "*" Then
 AllSoros.DataStr "*" + topname$ + GroupName + Mid$(s, 2)
  If Not IsObject(v(val(Split(s)(1)))) Then Set v(val(Split(s)(1))) = New Group
 ' If here$ <> "" And Not IamGlobal Then
@@ -168,10 +202,10 @@ Set PrepareSoros = AllSoros
 
 End Function
 Public Function PrepareSoros1(ByRef v(), ByVal topname$) As mStiva2
-Dim i As Long, AllSoros As New mStiva2, s As String, vv As mStiva2
-For i = 1 To OwnSoros.Total
-s = OwnSoros.StackItem(i)
-If Left$(s$, 1) = "*" Then
+Dim i As Long, AllSoros As New mStiva2, vv As mStiva2, s As String
+For i = 1 To FieldsCount
+s = Fields(i)
+If Left$(s, 1) = "*" Then
 AllSoros.DataStr "*" + topname$ + "." + Split(Mid$(s, 2))(0)
 
  Set vv = v(val(Split(s)(1))).PrepareSoros1(v(), GroupName)
@@ -181,12 +215,12 @@ Else
 AllSoros.DataStr GroupName + Split(s)(0)
 End If
 Next
-Dim a() As String
+Dim A() As String
 If FuncRef$ <> "" Then
-a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
-If UBound(a()) > 0 Then
-For i = 1 To UBound(a())
-AllSoros.DataStr topname$ + "." + Split(a(i))(0)
+A() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
+If UBound(A()) > 0 Then
+For i = 1 To UBound(A())
+AllSoros.DataStr topname$ + "." + Split(A(i))(0)
 Next i
 End If
 End If
@@ -194,44 +228,35 @@ Set PrepareSoros1 = AllSoros
 
 End Function
 Public Function PrepareSorosToCompare(ByRef v()) As mStiva2
-Dim i As Long, AllSoros As New mStiva2, s As String, vv As mStiva2
-For i = 1 To OwnSoros.Total
-s = OwnSoros.StackItem(i)
-'Debug.Print s, topname$, GroupName
-
-If Left$(s$, 1) = "*" Then
-AllSoros.DataStr "*" + Split(Mid$(s, 2))(0)
- If Not IsObject(v(val(Split(s)(1)))) Then Set v(val(Split(s)(1))) = New Group
- 
- Set vv = v(val(Split(s)(1))).PrepareSoros1(v(), "")
- 
- 
- 
-AllSoros.MergeBottom vv
-Else
-
-AllSoros.DataStr (Split(s)(0))
-
-End If
+Dim i As Long, AllSoros As New mStiva2, vv As mStiva2, s As String
+For i = 1 To FieldsCount
+    s = Fields(i)
+    If Left$(s, 1) = "*" Then
+        AllSoros.DataStr "*" + Split(Mid$(s, 2))(0)
+        If Not IsObject(v(val(Split(s)(1)))) Then Set v(val(Split(s)(1))) = New Group
+        Set vv = v(val(Split(s)(1))).PrepareSoros1(v(), "")
+        AllSoros.MergeBottom vv
+    Else
+        AllSoros.DataStr (Split(s)(0))
+    End If
 Next
-Dim a() As String
+Dim A() As String
 If FuncRef$ <> "" Then
-a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
-If UBound(a()) > 0 Then
-For i = 1 To UBound(a())
-AllSoros.DataStr (Split(a(i))(0))
+A() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
+If UBound(A()) > 0 Then
+For i = 1 To UBound(A())
+AllSoros.DataStr (Split(A(i))(0))
 Next i
 End If
 End If
 Set PrepareSorosToCompare = AllSoros
-
 End Function
 Public Function types() As String
 Dim i As Long, s$
-i = OwnSoros.Total
+i = FieldsCount
 On Error Resume Next
 While i > 0
-If InStr(OwnSoros.StackItem(i), "( ") > 0 Then
+If InStr(Fields(i), "( ") > 0 Then
 s$ = "A" + s$
 Else
 s$ = "V" + s$
@@ -316,20 +341,20 @@ Public Sub EndFloat()
 FloatGroup = False
 bank = Empty
 End Sub
-Public Property Set LinkRef(a As Object)
+Public Property Set LinkRef(A As Object)
 If FloatGroup Then
-If Typename(a) <> "Group" Then
+If Typename(A) <> "Group" Then
 Exit Property
 End If
 mTeam = False
-Set LinkToGroup = a
-If a Is Nothing Then Exit Property
+Set LinkToGroup = A
+If A Is Nothing Then Exit Property
 'erase functions,,,
  bank(bank(1) * 2 + 3) = vbNullString
 mTeam = True
 Else
 ' only when is in an array as Float Group
-Set LinkToGroup = a
+Set LinkToGroup = A
 End If
 End Property
 Friend Property Get LinkGroup() As Group
@@ -337,16 +362,6 @@ Set LinkGroup = LinkToGroup
 End Property
 Public Property Get link() As Object
 Set link = LinkToGroup
-End Property
-Public Property Set Sorosref(a As mStiva2)
-If FloatGroup And Not IamApointer Then
-' we can't do anything with stored values
-Else
-Set OwnSoros = a
-End If
-End Property
-Public Property Get soros() As mStiva2
-Set soros = OwnSoros
 End Property
 
 Public Property Let Varlist(vNewValue As String)
@@ -395,7 +410,7 @@ End Property
 
 
 Private Sub Class_Initialize()
-Set OwnSoros = New mStiva2
+ReDim Fields(0) As String
 End Sub
 
 Private Sub Class_Terminate()
@@ -448,10 +463,8 @@ IamCleared = True
 Set SuperClassList = Nothing
 If FloatGroup Then EndFloat
 Set LinkToGroup = Nothing
-'mName = vbNullString
-'mFloatGroupName = vbNullString
 FloatGroup = False
-Set OwnSoros = New mStiva2
+ReDim Fields(0)
 Set mytypes = Nothing
 HasValue = False
 HasSet = False

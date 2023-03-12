@@ -544,11 +544,7 @@ Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = "L"
 aa.ItemVariant = A
-If mstack.count = 0 Then
 mstack.Add aa
-Else
-mstack.Add aa, , , mstack.count
-End If
 Inc
 End Sub
 Public Sub DataVal(A As Variant)
@@ -561,11 +557,7 @@ Else
 aa.Typename = "N"
 aa.ItemVariant = A
 End If
-If mstack.count = 0 Then
 mstack.Add aa
-Else
-mstack.Add aa, , , mstack.count
-End If
 Inc
 End Sub
 Public Sub DataOptional()
@@ -573,11 +565,7 @@ Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = ">"
 aa.ItemDouble = 0
-    If mstack.count = 0 Then
-        mstack.Add aa
-    Else
-        mstack.Add aa, , , mstack.count
-    End If
+mstack.Add aa
 Inc
 End Sub
 Public Sub DataStrVariant(ByRef A As Variant)
@@ -585,12 +573,7 @@ Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = "S"
 aa.ItemStrVar = A
-
-If mstack.count = 0 Then
 mstack.Add aa
-Else
-mstack.Add aa, , , mstack.count
-End If
 Inc
 End Sub
 
@@ -599,13 +582,7 @@ Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = "S"
 aa.ItemStr = A$
-
-
-If mstack.count = 0 Then
 mstack.Add aa
-Else
-mstack.Add aa, , , mstack.count
-End If
 Inc
 End Sub
 Public Sub DataObj(RHS As Variant)
@@ -623,19 +600,11 @@ Else
     Set aa.ObjectRef = RHS
     Set RHS = Nothing
 End If
-If mstack.count = 0 Then
 mstack.Add aa
-Else
-mstack.Add aa, , , mstack.count
-End If
 Inc
 End Sub
 Public Sub DataObjVaritem(RHS As Object)
-If mstack.count = 0 Then
 mstack.Add RHS
-Else
-mstack.Add RHS, , , mstack.count
-End If
 Inc
 End Sub
 Public Sub Begin(from As Long)
@@ -798,11 +767,7 @@ Dim i As Long, aa As VarItem
 If A.Total > 0 Then
 Do
 Set aa = A.StackPick(1)
-If mstack.count = 0 Then
 mstack.Add aa
-Else
-mstack.Add aa, , , mstack.count    'push so first of a is first on mstack
-End If
 Inc
 Loop Until A.Total < 1
 End If
@@ -914,11 +879,7 @@ Set thisstiva = fromstiva.objref
 If item > thisstiva.count Then item = thisstiva.count
 For i = 1 To item
     Set aa = thisstiva.StackPick(1)
-        If mstack.count = 0 Then
         mstack.Add aa
-        Else
-        mstack.Add aa, , , mstack.count
-        End If
         Inc
 Next i
 End Sub
@@ -929,11 +890,7 @@ Set thisstiva = fromstiva.objref
 If item < 1 Then item = 1
 For i = item To thisstiva.count
     Set aa = thisstiva.StackPick(item)
-        If mstack.count = 0 Then
         mstack.Add aa
-        Else
-        mstack.Add aa, , , mstack.count
-        End If
         Inc
 Next i
 End Sub

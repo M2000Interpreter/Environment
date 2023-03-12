@@ -5673,7 +5673,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 51 for M2000 Interpreter version 12, revision 19 and above"
+	Report " A collection of modules for tests version 52 for M2000 Interpreter version 12, revision 19 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -41500,13 +41500,16 @@ MODULE VARPTR {// msvbvm60.dll exist in all versions of Windows. It is the runti
 // Use ArrPtr for RefArrays (arrays with [ ] for indexes)
 
 
-// these two functions expect on the second argument byvalue integer and Long type value. (only Long support for automatic conversion this version of M2000)
+// these two functions expect on the second argument a byvalue integer and a byvalue Long type value. (only Long support for automatic conversion for this version of M2000)
 declare PutMem2 lib "msvbvm60.PutMem2" {long addr, newval}  ' newval has to be integer 
 declare PutMem4 lib "msvbvm60.PutMem4" {long addr, Long newval}
-// these two functions expect on the second argument by refernece so we have Long,
+declare global PutMem8 lib "msvbvm60.PutMem8" {long addr, newval}  ' we have to pass a 8byte value
+// these two functions expect oF the second argument by refernece so we have Long,
 //             and we have to place Varptr() for at least the Bytes which the functions replace with new value
-declare GetMem2 lib "msvbvm60.GetMem2" {long addr, long retValue}
-declare GetMem4 lib "msvbvm60.GetMem4" {long addrl, long retVaule}
+declare global GetMem1 lib "msvbvm60.GetMem1" {Long addr, Long retValue}
+declare global GetMem2 lib "msvbvm60.GetMem2" {Long addr, Long retValue}
+declare global GetMem4 lib "msvbvm60.GetMem4" {Long addr, Long retValue}
+declare global GetMem8 lib "msvbvm60.GetMem8" {Long addr, Long retValue}
 integer a[2], nv
 With a, "ArrPtr" as global a.ArrPtr()
 def aPtr(x as long)=a.ArrPtr(0)+x*2&
@@ -41544,6 +41547,65 @@ Call GetMem4(varptr(Z)+8, varptr(retval))
 Print retval=1234
 
 // do not change the value of variables who hold objects. Objects have counter and befaure changing the value (the pointer to object) interpreterhandle the counter. If the cunterget zero value then the object deleted. So if we change the pointer to a random value,when the variable get out of scope, has to call the method to subtract one from the counter and perhasp to erase the memory from the object, to destroy it, and for that using the pointer (but if the pointer show something else  we get a memory excpetion which halt the program)
+
+Report "Varptr for items of arrays"
+
+module check1 {
+	pen 11 {Report "dim a(2, 3) as Long Long (8 bytes per item)"}
+	dim a(2, 3) as Long Long=12345678901234&&
+	Long Long z
+	a(1,2)++
+	m=getmem8(varptr(a(1,2)),varptr(z))
+	Print "z="+z
+	Print "a(1,2)="+a(1,2)
+	Print "Put a long long value to a(1,1), using by value pass of a long long value"
+	m=PutMem8(varptr(a(1,1)), z)
+	Print "a(1,1)="+a(1,1)
+	Print
+}
+check1
+module check2 {
+	pen 11 {Report "dim a(2, 3)=1233&   (is a variant type - 16 bytes per item)"}
+	dim a(2, 3)=1233&
+	Long z
+	a(1,2)++
+	m=getmem4(varptr(a(1,2))+8,varptr(z))
+	Print "z="+z
+	Print "a(1,2)="+a(1,2)
+	Print
+}
+check2
+module check3 {
+	Pen 11 {Report "Long a[3]=500  (is Long type - 4 bytes per item)"}
+	Long a[3]=500
+	With a, "ArrPtr" as global a.ArrPtr()
+	Long z
+	a[0]+=100
+	a[1]+=200
+	// this type of array can't use VarPtr  (Varptr(a) return the memory address of the variable a, Varptr(a[..]) not work yet)
+	m=getmem4(a.ArrPtr(0)+4,varptr(z))
+	Print "z=700 -> " + (z=a[1])
+	m=getmem4(a.ArrPtr(0),varptr(z))
+	Print "z=600 -> " + (z=a[0])
+	Print
+}
+check3
+module check4 {
+	Pen 11 {Report "Long a[2][3] (is 3 arrays [0] to [2] of long type items, 4 bytes each)"}
+	Long a[2][3]=500
+	With a, "ArrPtr" as a.ArrPtr()
+	Print a.Arrptr(0)+" first element in a[0]"
+	Print a.Arrptr(1)+" first element in a[1]"
+	Long z
+	a[1][0]+=100
+	a[2][1]+=200
+	// this type of array can't use VarPtr  (Varptr(a) return the memory address of the variable a, Varptr(a[..]) not work yet)
+	m=getmem4(a.ArrPtr(2)+4,varptr(z))
+	Print "z=700 -> " + (z=a[2][1])
+	m=getmem4(a.ArrPtr(1),varptr(z))
+	Print "z=600 -> " + (z=a[1][0])
+}
+check4
 }
 MODULE MULTI {module Return_multiple_values{
 	Print "Using a function"
@@ -42160,5 +42222,81 @@ checkevaluator "-2/3^(3*4)"
 CheckEvaluator "-(2/2)^(3*-4)"
 CheckEvaluator "-2/(3)^(3*-4)"
 CheckEvaluator "-2/(2)^-12"
+}
+MODULE FUSC {// https://rosettacode.org/wiki/Fusc_sequence
+// use keyboard for 0x2022 unicode character, •(bulltet Point):hold alt down and press + symbbol, then 2, then 0, then 2 then 2 release alt.
+Report {Fusc sequence
+	The   fusc   integer sequence is defined as:
+		• fusc(0) = 0
+		• fusc(1) = 1
+		• for n>1,   the   nth   term is defined as:
+			if   n   is even;     fusc(n) = fusc(n/2)
+			if   n   is   odd;     fusc(n) = fusc((n-1)/2)   +   fusc((n+1)/2)
+
+Wait 3-4 minutes, or press escape
+}
+refresh
+module Fusc_sequence (max as long) {
+	long n, max_len=-1, m
+	string fmt="#,##0", fs="{0:-10} : {1}"
+	dim f(0 to max) as long
+	f(0)=0, 1
+	for n=2 To max{If binary.and(n,1)Then f(n)=f((n-1)/2)+f((n+1)/2) else f(n)=f(n/2)}
+	print "First 61 terms:"
+	print "["+f()#slice(0,60)#str$(", ")+"]"
+	print "Points in the sequence where an item has more digits than any previous items:"
+	print format$(fs, "index", "value")
+	for n=0 to max{if f(n)>max_len then m++:max_len=10&**m:print format$(fs,str$(n,fmt),str$(f(n),fmt)):refresh}
+}
+Profiler
+Fusc_sequence 700000
+Print Timecount
+module checkthis {
+	// some other language have Yeld function which return back to caller values, before the function end.
+	// we can do similar using events. This is like call back.
+	// Or we can use a call back function, a function which run like a block on the module which we execute the lazy$() function
+	
+	
+	Report "Another way without use of array, and without use of / and - operators"
+	class z {
+		boolean noStop=true
+		module generate(&k()) {
+			object q=stack:=1
+			call k(0)
+			call k(1)
+			stack q {
+				x=number:data x:call k(x)
+				x+=stackitem():data x:call k(x)
+				if .noStop then loop
+			}
+			q=stack
+			.noStop<=true
+		}
+	}
+	z=z()
+	long max=61, n, k=-1, m
+	string fmt="#,##0", fs="{0:-10} : {1}", prev, nl={
+	}
+	function f1(new x) {
+		n++
+		if n=1 then print "First 61 terms:":print "[";
+		if n<max then
+			print x+", ";
+		else.if n=max then
+			print x+"]"
+			z.noStop=false
+		end if
+	}
+	profiler
+	z.generate lazy$(&f1())
+	print "Points in the sequence where an item has more digits than any previous items:"
+	print format$(fs, "index", "value")
+	n=0: max=5
+	function f2(new x) {if x>k then m++:k=10&**m:print format$(fs,str$(n,fmt),str$(x,fmt)):if m=max then z.noStop=false
+	n++}
+	z.generate lazy$(&f2())
+	print timecount
+}
+checkthis 
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

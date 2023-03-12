@@ -2820,19 +2820,19 @@ End Sub
 
 Public Sub ScrollUpNew(D As Object, mb As basket)
 If TypeOf D Is MetaDc Then Exit Sub
-Dim ar As RECT, R As Long
+Dim aR As RECT, R As Long
 Dim p As Long
 With mb
-ar.Left = 0
-ar.Bottom = D.Height / dv15
-ar.Right = D.Width / dv15
-ar.top = .mysplit * .Yt / dv15
+aR.Left = 0
+aR.Bottom = D.Height / dv15
+aR.Right = D.Width / dv15
+aR.top = .mysplit * .Yt / dv15
 p = .Yt / dv15
-R = BitBlt(D.hDC, CLng(ar.Left), CLng(ar.top), CLng(ar.Right), CLng(ar.Bottom - p), D.hDC, CLng(ar.Left), CLng(ar.top + p), SRCCOPY)
+R = BitBlt(D.hDC, CLng(aR.Left), CLng(aR.top), CLng(aR.Right), CLng(aR.Bottom - p), D.hDC, CLng(aR.Left), CLng(aR.top + p), SRCCOPY)
 
  
-  ar.top = ar.Bottom - p
-FillBack D.hDC, ar, .Paper
+  aR.top = aR.Bottom - p
+FillBack D.hDC, aR, .Paper
 .curpos = 0
 .currow = .mY - 1
 End With
@@ -2840,15 +2840,15 @@ GdiFlush
 End Sub
 Public Sub ScrollDownNew(D As Object, mb As basket)
 If TypeOf D Is MetaDc Then Exit Sub
-Dim ar As RECT, R As Long
+Dim aR As RECT, R As Long
 Dim p As Long
 With mb
-ar.Left = 0
-ar.Bottom = D.ScaleY(D.Height, 1, 3)
-ar.Right = D.ScaleX(D.Width, 1, 3)
-ar.top = D.ScaleY(.mysplit * .Yt, 1, 3)
+aR.Left = 0
+aR.Bottom = D.ScaleY(D.Height, 1, 3)
+aR.Right = D.ScaleX(D.Width, 1, 3)
+aR.top = D.ScaleY(.mysplit * .Yt, 1, 3)
 p = D.ScaleY(.Yt, 1, 3)
-R = BitBlt(D.hDC, CLng(ar.Left), CLng(ar.top + p), CLng(ar.Right), CLng(ar.Bottom - p), D.hDC, CLng(ar.Left), CLng(ar.top), SRCCOPY)
+R = BitBlt(D.hDC, CLng(aR.Left), CLng(aR.top + p), CLng(aR.Right), CLng(aR.Bottom - p), D.hDC, CLng(aR.Left), CLng(aR.top), SRCCOPY)
 D.Line (0, .mysplit * .Yt)-(D.ScaleWidth, .mysplit * .Yt + .Yt), .Paper, BF
 .currow = .mysplit
 .curpos = 0
@@ -7496,8 +7496,8 @@ End Sub
 Public Sub MissingLabel()
 MyEr "Missing label/Number line", "ÀÂﬂÂÈ ≈ÙÈÍ›Ù·/¡ÒÈËÏ¸Ú „Ò·ÏÏﬁÚ"
 End Sub
-Public Sub MissFuncParammeterdOCVar(ar$)
-MyEr "Not a Document variable " + ar$, "ƒÂÌ ÂﬂÌ·È ÏÂÙ·‚ÎÁÙﬁ Ù˝Ôı Â„„Ò‹ˆÔı " + ar$
+Public Sub MissFuncParammeterdOCVar(aR$)
+MyEr "Not a Document variable " + aR$, "ƒÂÌ ÂﬂÌ·È ÏÂÙ·‚ÎÁÙﬁ Ù˝Ôı Â„„Ò‹ˆÔı " + aR$
 End Sub
 Public Sub MissingBlock()  ' this is for identifier or execute part
 MyEr "missing block {} or string expression", "ÎÂﬂÂÈ Í˛‰ÈÍ·Ú ÛÂ {} Á ·Îˆ·ÒÈËÏÁÙÈÍﬁ ›ÍˆÒ·ÛÁ"
@@ -7928,8 +7928,8 @@ Else
 MyEr en$, gr$
 End If
 End Sub
-Public Sub ZeroParam(ar$)   ' we use MyErMacro in isNumber and isString
-MyErMacro ar$, "Empty parameter", "ÃÁ‰ÂÌÈÍﬁ ·Ò‹ÏÂÙÒÔÚ"
+Public Sub ZeroParam(aR$)   ' we use MyErMacro in isNumber and isString
+MyErMacro aR$, "Empty parameter", "ÃÁ‰ÂÌÈÍﬁ ·Ò‹ÏÂÙÒÔÚ"
 End Sub
 Public Sub MissPar()
 MyEr "missing parameter", "ÎÂﬂÂÈ ·Ò‹ÏÂÙÒÔÚ"
@@ -7954,17 +7954,17 @@ End Sub
 Public Sub MissVarName()
 MyEr "Missing variable name", "ÀÂﬂÂÈ ¸ÌÔÏ· ÏÂÙ·‚ÎÁÙﬁÚ"
 End Sub
-Public Sub MissParamref(ar$)
-MyErMacro ar$, "missing by reference parameter", "ÎÂﬂÂÈ ÏÂ ·Ì·ˆÔÒ‹ ·Ò‹ÏÂÙÒÔÚ"
+Public Sub MissParamref(aR$)
+MyErMacro aR$, "missing by reference parameter", "ÎÂﬂÂÈ ÏÂ ·Ì·ˆÔÒ‹ ·Ò‹ÏÂÙÒÔÚ"
 End Sub
-Public Sub MissParam(ar$)
-MyErMacro ar$, "missing parameter", "ÎÂﬂÂÈ ·Ò‹ÏÂÙÒÔÚ"
+Public Sub MissParam(aR$)
+MyErMacro aR$, "missing parameter", "ÎÂﬂÂÈ ·Ò‹ÏÂÙÒÔÚ"
 End Sub
 Public Sub MissFuncParameterStringVar()
 MyEr "Not a string variable", "ƒÂÌ ÂﬂÌ·È ·Îˆ·ÒÈËÏÁÙÈÍﬁ ÏÂÙ·‚ÎÁÙﬁ"
 End Sub
-Public Sub MissFuncParameterStringVarMacro(ar$)
-MyErMacro ar$, "Not a string variable", "ƒÂÌ ÂﬂÌ·È ·Îˆ·ÒÈËÏÁÙÈÍﬁ ÏÂÙ·‚ÎÁÙﬁ"
+Public Sub MissFuncParameterStringVarMacro(aR$)
+MyErMacro aR$, "Not a string variable", "ƒÂÌ ÂﬂÌ·È ·Îˆ·ÒÈËÏÁÙÈÍﬁ ÏÂÙ·‚ÎÁÙﬁ"
 End Sub
 Public Sub NoSuchFolder()
 MyEr "No such folder", "ƒÂÌ ı‹Ò˜ÂÈ Ù›ÙÔÈÔÚ ˆ‹ÍÂÎÔÚ"
@@ -8506,14 +8506,16 @@ End If
 GetCurDir = A$
 End Function
 Sub MakeGroupPointer(bstack As basetask, v, Optional usethisname As String = "", Optional Glob As Boolean)
-Dim varv As New Group
+Dim varv As New Group, vv As Group
+Set vv = v
     With varv
-        .IamGlobal = v.IamGlobal
+        .IamGlobal = vv.IamGlobal
         .IamApointer = True
         .BeginFloat 2
-        Set .Sorosref = v.soros
-        If v.IamFloatGroup Then
-        v.ToDelete = False
+       ' Debug.Print varv.soros.Total
+       ' Set .Sorosref = vv.soros
+        If vv.IamFloatGroup Then
+        vv.ToDelete = False
         Else
             If Len(usethisname) > 0 Then
                 If Glob Then
@@ -8526,8 +8528,8 @@ Dim varv As New Group
                 If Not .IamGlobal Then
                     .lasthere = here$
                 End If
-                If Len(v.GroupName) > 1 Then
-                    .GroupName = Mid$(v.GroupName, 1, Len(v.GroupName) - 1)
+                If Len(vv.GroupName) > 1 Then
+                    .GroupName = Mid$(vv.GroupName, 1, Len(vv.GroupName) - 1)
                 End If
             End If
         End If
@@ -11350,7 +11352,7 @@ Public Function GetDeflocaleString(ByVal this As Long) As String
 1234:
 End Function
 Function RetM2000array(var As Variant) As Variant
-Dim ar As New mArray, v(), manydim As Long, probe As Long, probelow As Long
+Dim aR As New mArray, v(), manydim As Long, probe As Long, probelow As Long
 Dim j As Long
 v() = var
 On Error GoTo ma100
@@ -11365,13 +11367,13 @@ For j = manydim To 1 Step -1
     probe = UBound(v, j)
     If Err Then Exit For
     probelow = LBound(v, j)
-    ar.PushDim probe - probelow + 1
+    aR.PushDim probe - probelow + 1
 Next j
-ar.PushEnd
-ar.RevOrder = True
-ar.CopySerialize v()
+aR.PushEnd
+aR.RevOrder = True
+aR.CopySerialize v()
 ma100:
-Set RetM2000array = ar
+Set RetM2000array = aR
 
 End Function
 
@@ -18085,13 +18087,13 @@ With players(prive)
                         End Select
                         Set usehandler = Nothing
                     ElseIf TypeOf var(H&) Is refArray Then
-                    Dim ra As refArray
-                    Set ra = var(H&)
+                    Dim rA As refArray
+                    Set rA = var(H&)
                     
-                    If ra.MarkTwoDimension Then
-                        s$ = s$ & "*" & ra.vtTypeString()
+                    If rA.MarkTwoDimension Then
+                        s$ = s$ & "*" & rA.vtTypeString()
                     Else
-                        s$ = s$ & "*" & ra.vtTypeString(0)
+                        s$ = s$ & "*" & rA.vtTypeString(0)
                     End If
                     Else
                         If TypeOf var(H&) Is Constant Then
@@ -18357,7 +18359,7 @@ it = globalvar(what$, it)
                 var(it).edittag = .edittag
                 var(it).FuncList = .FuncList
                 var(it).GroupName = myUcase(what$) & "."
-                Set var(it).Sorosref = .soros.Copy
+               ' Set var(it).Sorosref = .soros.Copy
                 var(it).HasValue = .HasValue
                 var(it).HasSet = .HasSet
                 var(it).HasStrValue = .HasStrValue
@@ -18376,7 +18378,7 @@ it = globalvar(what$, it)
             var(it).edittag = .edittag
             var(it).FuncList = .FuncList
             var(it).GroupName = myUcase(what$) & "."
-            Set var(it).Sorosref = .soros.Copy
+            'Set var(it).Sorosref = .soros.Copy
             var(it).HasValue = .HasValue
             var(it).HasSet = .HasSet
             var(it).HasStrValue = .HasStrValue
@@ -19882,7 +19884,7 @@ Private Function GetContainer(bstack As basetask, rest$, ByVal Lang As Long) As 
         End If
     End If
 End Function
-Function DeclareGUI(bstack As basetask, what$, rest$, ifier As Boolean, Lang As Long, i As Long, Optional ar As Long = 0, Optional oName As String = vbNullString, Optional Glob As Long = 0, Optional Y3 As Boolean, Optional ArrPos As Long = 0)
+Function DeclareGUI(bstack As basetask, what$, rest$, ifier As Boolean, Lang As Long, i As Long, Optional aR As Long = 0, Optional oName As String = vbNullString, Optional Glob As Long = 0, Optional Y3 As Boolean, Optional ArrPos As Long = 0)
 DeclareGUI = True
 On Error GoTo wrong
 Dim W$, x1 As Long, y1 As Long, s$, useold As Boolean, bp As Long
@@ -19912,7 +19914,7 @@ Dim pppp As mArray, mmmm As mEvent
                DeclareGUI = False: Exit Function
            End If
         End If
-        If ar = 0 Then
+        If aR = 0 Then
             If Not useold Then ProcEvent bstack, "{Read msg$, &obj}", 1, y1
             CreateFormObject var(i), 1
             Set alfa = var(i)
@@ -19930,7 +19932,7 @@ Dim pppp As mArray, mmmm As mEvent
         End If
     Else
             bp = True
-            If ar = 0 Then
+            If aR = 0 Then
                 CreateFormObject var(i), 1
                 Set alfa = var(i)
                 Set mmmm = New mEvent
@@ -19965,7 +19967,7 @@ contEvArray:
                             .GenItemCreator LTrim$(str(i * 3456)), "{ Module " + here$ + vbCrLf + "try { call local " + here$ + "." + bstack.GroupName + what$ + "() } }" + here$ + "." + bstack.GroupName
                         End With
                     End If
-                    For i = 0 To ar - 1
+                    For i = 0 To aR - 1
                         CreateFormObject aVar, 1
                         Set pppp.item(i) = aVar
                         Dim aaa As GuiM2000, safe As LongHash
@@ -19998,7 +20000,7 @@ contEvArray:
                 Exit Function
             End If
             Dim aa2 As GuiButton
-            If ar = 0 Then
+            If aR = 0 Then
                 CreateFormObject var(i), 2
                 Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
@@ -20024,7 +20026,7 @@ contEvArray:
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
-                    For i = 0 To ar - 1
+                    For i = 0 To aR - 1
                         CreateFormObject aVar, 2
                         Set pppp.item(i) = aVar
                         Set aa2 = aVar
@@ -20057,7 +20059,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈…”¡√Ÿ√«", "TEXTBOX", Lang) Then
                 Exit Function
             End If
             Dim aa3 As GuiTextBox
-            If ar = 0 Then
+            If aR = 0 Then
                 CreateFormObject var(i), 3
                 Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
@@ -20083,7 +20085,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈…”¡√Ÿ√«", "TEXTBOX", Lang) Then
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
-                    For i = 0 To ar - 1
+                    For i = 0 To aR - 1
                         CreateFormObject aVar, 3
                         Set pppp.item(i) = aVar
                         Set aa3 = aVar
@@ -20116,7 +20118,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈–…Àœ√«", "CHECKBOX", Lang) Then
                 Exit Function
             End If
             Dim aa4 As GuiCheckBox
-            If ar = 0 Then
+            If aR = 0 Then
                 CreateFormObject var(i), 4
                 Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
@@ -20142,7 +20144,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈–…Àœ√«", "CHECKBOX", Lang) Then
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
-                    For i = 0 To ar - 1
+                    For i = 0 To aR - 1
                         CreateFormObject aVar, 4
                         Set pppp.item(i) = aVar
                         Set aa4 = aVar
@@ -20175,7 +20177,7 @@ ElseIf IsLabelSymbolNew(rest$, " ≈…Ã≈Õœ", "EDITBOX", Lang) Then
                 Exit Function
             End If
             Dim aa5 As GuiEditBox
-            If ar = 0 Then
+            If aR = 0 Then
                 CreateFormObject var(i), 5
                 Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
@@ -20206,7 +20208,7 @@ ElseIf IsLabelSymbolNew(rest$, " ≈…Ã≈Õœ", "EDITBOX", Lang) Then
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
-                    For i = 0 To ar - 1
+                    For i = 0 To aR - 1
                         CreateFormObject aVar, 5
                         Set pppp.item(i) = aVar
                         Set aa5 = aVar
@@ -20244,7 +20246,7 @@ ElseIf IsLabelSymbolNew(rest$, "À…”‘¡", "LISTBOX", Lang) Then
                 Exit Function
             End If
             Dim aa6 As GuiListBox
-            If ar = 0 Then
+            If aR = 0 Then
                 CreateFormObject var(i), 6
                 Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
@@ -20271,7 +20273,7 @@ ElseIf IsLabelSymbolNew(rest$, "À…”‘¡", "LISTBOX", Lang) Then
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
-                    For i = 0 To ar - 1
+                    For i = 0 To aR - 1
                         CreateFormObject aVar, 6
                         Set pppp.item(i) = aVar
                         Set aa6 = aVar
@@ -20309,7 +20311,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈… œÕ¡", "IMAGE", Lang) Then
                 Exit Function
             End If
             Dim aa8 As GuiImage
-            If ar = 0 Then
+            If aR = 0 Then
                 CreateFormObject var(i), 8
                 Set alfa = bstack.lastobjIndirect(var())
                 Set bstack.lastobj = Nothing
@@ -20326,7 +20328,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈… œÕ¡", "IMAGE", Lang) Then
                     what$ = Left$(what$, Len(oName$))
                     Set alfa = bstack.lastobjIndirect(var())
                     Set bstack.lastobj = Nothing
-                    For i = 0 To ar - 1
+                    For i = 0 To aR - 1
                         CreateFormObject aVar, 7
                         Set pppp.item(i) = aVar
                         Set aa8 = aVar
@@ -20355,7 +20357,7 @@ ElseIf IsLabelSymbolNew(rest$, "À…”‘¡.≈…”¡√Ÿ√«”", "COMBOBOX", Lang) Then
                 Exit Function
             End If
             Dim aa7 As GuiDropDown
-            If ar = 0 Then
+            If aR = 0 Then
                 CreateFormObject var(i), 7
                 Set alfa = bstack.lastobjIndirect(var())
                 Set bstack.lastobj = Nothing
@@ -20371,7 +20373,7 @@ ElseIf IsLabelSymbolNew(rest$, "À…”‘¡.≈…”¡√Ÿ√«”", "COMBOBOX", Lang) Then
                     what$ = Left$(what$, Len(oName$))
                     Set alfa = bstack.lastobjIndirect(var())
                     Set bstack.lastobj = Nothing
-                    For i = 0 To ar - 1
+                    For i = 0 To aR - 1
                         CreateFormObject aVar, 7
                         Set pppp.item(i) = aVar
                         Set aa7 = aVar
@@ -20402,7 +20404,7 @@ ElseIf IsLabelSymbolNew(rest$, "‘’–œ”", "TYPE", Lang) Then
                     Exit Function
                 End If
                 
-                If ar = 0 Then
+                If aR = 0 Then
                     On Error Resume Next
                     
                     If W$ <> "" Then
@@ -20443,7 +20445,7 @@ ElseIf IsLabelSymbolNew(rest$, "‘’–œ”", "TYPE", Lang) Then
                             Licenses.Add s$, W$
                         End If
                         If Err Then GoTo wrong
-                        For i = 0 To ar - 1
+                        For i = 0 To aR - 1
                             CreateFormObject aVar, 9
                             Set pppp.item(i) = aVar
                             Set ec1 = aVar
@@ -20473,7 +20475,7 @@ ElseIf IsLabelSymbolNew(rest$, "‘’–œ”", "TYPE", Lang) Then
 ElseIf IsLabelSymbolNew(rest$, "–À«—œ÷œ—…≈”", "INFORMATION", Lang) Then
     
     Y3 = False ' no withevents in declare
-    If ar > 0 Then
+    If aR > 0 Then
     MyEr "not for array", "¸˜È „È· ﬂÌ·Í·"
     DeclareGUI = False
     End If
@@ -20481,7 +20483,7 @@ ElseIf IsLabelSymbolNew(rest$, "–À«—œ÷œ—…≈”", "INFORMATION", Lang) Then
 ElseIf IsLabelSymbolNew(rest$, "Ã«‘—Ÿœ.”’”‘«Ã¡‘œ”", "WINDOWS.REGISTRY", Lang) Then
     
     Y3 = False ' no withevents in declare
-    If ar > 0 Then
+    If aR > 0 Then
     MyEr "not for array", "¸˜È „È· ﬂÌ·Í·"
     DeclareGUI = False
     End If
@@ -20489,19 +20491,19 @@ ElseIf IsLabelSymbolNew(rest$, "Ã«‘—Ÿœ.”’”‘«Ã¡‘œ”", "WINDOWS.REGISTRY", Lang) Th
 ElseIf IsLabelSymbolNew(rest$, "–«√«.√≈√œÕœ‘œ”", "SINK.EVENT", Lang) Then
     
     Y3 = True
-    If ar > 0 Then
+    If aR > 0 Then
     MyEr "not for array", "¸˜È „È· ﬂÌ·Í·"
     DeclareGUI = False
     End If
     Set var(i) = New SinkEvent
 
 ElseIf IsLabelSymbolNew(rest$, "”’Ã–…≈”‘«”", "COMPRESSOR", Lang) Then
-    If ar = 0 Then
+    If aR = 0 Then
         Set var(i) = New ZipTool
     Else
         what$ = Left$(what$, Len(oName$))
         Set pppp = var(ArrPos)
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set pppp.item(i) = New ZipTool
         Next i
     End If
@@ -20510,131 +20512,131 @@ ElseIf IsLabelSymbolNew(rest$, "Ã¡»«Ã¡‘… ¡", "MATH", Lang) Then
     Y3 = False ' no withevents in declare
     Set var(i) = New Math
 ElseIf IsLabelSymbolNew(rest$, "”‘¡»Ãœ”", "SOCKET", Lang) Then
-    If ar = 0 Then
+    If aR = 0 Then
         Set var(i) = New cTlsSocket
     Else
         what$ = Left$(what$, Len(oName$))
         Set pppp = var(ArrPos)
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set pppp.item(i) = New cTlsSocket
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "¡’Àœ”", "SHELLPIPE", Lang) Then
-    If ar = 0 Then
+    If aR = 0 Then
         Set var(i) = New ShellPipe
     Else
         what$ = Left$(what$, Len(oName$))
         Set pppp = var(ArrPos)
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set pppp.item(i) = New ShellPipe
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "”≈…—…¡ «", "SERIALPORT", Lang) Then
-    If ar = 0 Then
+    If aR = 0 Then
         Set var(i) = New SerialPort
     Else
         what$ = Left$(what$, Len(oName$))
         Set pppp = var(ArrPos)
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set pppp.item(i) = New SerialPort
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, " ¡‘≈¬¡”Ã¡", "DOWNLOAD", Lang) Then
-    If ar = 0 Then
+    If aR = 0 Then
         Set var(i) = New cHttpDownload
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set pppp.item(i) = New cHttpDownload
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "¡…‘«Ã¡.”’Õƒ≈”«”", "HTTPS.REQUEST", Lang) Then
-    If ar = 0 Then
+    If aR = 0 Then
         Set var(i) = New clsHttpsRequest
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set pppp.item(i) = New clsHttpsRequest
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "–≈À¡‘«”", "CLIENT", Lang) Then
     Y3 = False ' no withevents in declare
-    If ar = 0 Then
+    If aR = 0 Then
         Set var(i) = New cTlsClient
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set pppp.item(i) = New cTlsClient
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "”’ÀÀœ√«", "COLLECTION", Lang) Then
     Y3 = False ' no withevents in declare
-    If ar = 0 Then
+    If aR = 0 Then
         Set var(i) = New Collection
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set pppp.item(i) = New Collection
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "”‘œ…◊≈…¡XML", "XMLDATA", Lang) Then
     Y3 = False ' no withevents in declare
-    If ar = 0 Then
+    If aR = 0 Then
         Set var(i) = xmlMonoNew
         
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set pppp.item(i) = xmlMonoNew
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "–…Õ¡ ¡”JSON", "JSONARRAY", Lang) Then
     Y3 = False
-    If ar = 0 Then
+    If aR = 0 Then
         Set var(i) = New JsonArray
         
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set pppp.item(i) = New JsonArray
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "À…”‘¡JSON", "JSONOBJECT", Lang) Then
     Y3 = False
-    If ar = 0 Then
+    If aR = 0 Then
         Set var(i) = New JsonObject
         
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set pppp.item(i) = New JsonObject
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "ÃœÕ¡ƒ… œ", "MUTEX", Lang) Then
     Y3 = False ' no withevents in declare
-    If ar = 0 Then
+    If aR = 0 Then
         Set var(i) = New Mutex
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set pppp.item(i) = New Mutex
         Next i
     End If
@@ -20643,7 +20645,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈÷¡—Ãœ√«", "APPLICATION", Lang) Then
     If IsLabelSymbolNew(rest$, "÷œ—Ã¡", "FORM", Lang) Then
         Set var(i) = Form1
     Else
-        If ar = 0 Then
+        If aR = 0 Then
             Set mm = New CallBack2
             mm.NoPublic bstack, ""
             Set var(i) = mm
@@ -20651,7 +20653,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈÷¡—Ãœ√«", "APPLICATION", Lang) Then
         Else
             Set pppp = var(ArrPos)
             what$ = Left$(what$, Len(oName$))
-            For i = 0 To ar - 1
+            For i = 0 To aR - 1
                 Set mm = New CallBack2
                 mm.NoPublic bstack, ""
                 Set pppp.item(i) = mm
@@ -20661,7 +20663,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈÷¡—Ãœ√«", "APPLICATION", Lang) Then
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "‘Ã«Ã¡", "MODULE", Lang) Then
-    If ar = 0 Then
+    If aR = 0 Then
             Set mm = New CallBack2
             mm.NoPublic bstack, here$
             Set var(i) = mm
@@ -20669,7 +20671,7 @@ ElseIf IsLabelSymbolNew(rest$, "‘Ã«Ã¡", "MODULE", Lang) Then
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set mm = New CallBack2
             mm.NoPublic bstack, here$
             Set pppp.item(i) = mm
@@ -20681,12 +20683,12 @@ ElseIf IsLabelSymbolNew(rest$, "Ÿ”", "AS", Lang) Then
 ElseIf IsStrExp(bstack, rest$, s$) Then
 ccc:
     Y3 = False ' no withevents in declare
-    If ar = 0 Then
+    If aR = 0 Then
         CreateitObject var(i), s$
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To ar - 1
+        For i = 0 To aR - 1
             Set p = Nothing
             CreateitObject p, s$
             Set pppp.item(i) = p
@@ -25870,8 +25872,8 @@ there01:
             If i <> 0 Then
 makeitnow1:
                 If j = 8 Then
-                Dim ra As refArray
-                Set ra = New refArray
+                Dim rA As refArray
+                Set rA = New refArray
                 
                 If Not IsExp(basestack, rest$, p, flatobject:=True, nostring:=thattype <> vbString) Then
                     MyAnyType = False: MissNumExpr: Exit Function
@@ -25880,7 +25882,7 @@ makeitnow1:
                 If Not FastSymbol1(rest$, "]") Then
                         MyAnyType = False: SyntaxError: Exit Function
                 End If
-                Set var(i) = ra
+                Set var(i) = rA
                 p1 = 0
                 If FastSymbol1(rest$, "[") Then
                     If Not IsExp(basestack, rest$, p1, flatobject:=True, nostring:=thattype <> vbString) Then
@@ -25892,9 +25894,9 @@ makeitnow1:
                     i = Abs(Int(p1))
                     j = CLng(p)
                     For j = j To 0 Step -1
-                        ra.DefArrayAt CVar(j), thattype, i
+                        rA.DefArrayAt CVar(j), thattype, i
                     Next j
-                    ra.MarkTwoDimension = True
+                    rA.MarkTwoDimension = True
                     If FastSymbol(rest$, "=") Then
                         j = CLng(p)
                         If IsExp(basestack, rest$, p) Then
@@ -25904,12 +25906,12 @@ makeitnow1:
                         End If
                         For i = i To 0 Step -1
                         For p1 = j To 0 Step -1
-                            ra(p1, i) = p
-                            Select Case ra.AssignError
+                            rA(p1, i) = p
+                            Select Case rA.AssignError
                             Case 0
                             Case 6
                                 Err.Clear
-                                OverflowValue VarType(ra(p1, i))
+                                OverflowValue VarType(rA(p1, i))
                                 MyAnyType = False
                                 Exit Function
                             Case Else
@@ -25924,8 +25926,8 @@ makeitnow1:
 contGetStr:
                             For i = i To 0 Step -1
                             For p1 = j To 0 Step -1
-                            ra(p1, i) = s$
-                            p = ra.AssignError
+                            rA(p1, i) = s$
+                            p = rA.AssignError
                             If p <> 0 Then
                              MyEr Err.Description, Err.Description
                              Err.Clear
@@ -25946,8 +25948,8 @@ contGetStr:
  
                     
                 Else
-                    ra.DefArrayAt 0, thattype, CLng(p)
-                    ra.MarkTwoDimension = False
+                    rA.DefArrayAt 0, thattype, CLng(p)
+                    rA.MarkTwoDimension = False
                     p1 = p
                     If FastSymbol(rest$, "=") Then
                         If IsExp(basestack, rest$, p) Then
@@ -25957,12 +25959,12 @@ contGetStr:
                         End If
                             If basestack.lastobj Is Nothing Then
                              For i = CLng(p1) To 0 Step -1
-                                    ra(0, i) = p
-                                    p1 = ra.AssignError
+                                    rA(0, i) = p
+                                    p1 = rA.AssignError
                                     If p1 <> 0 Then
                                         If p1 = 6 Then
                                             Err.Clear
-                                            OverflowValue VarType(ra(0, i))
+                                            OverflowValue VarType(rA(0, i))
                                             MyAnyType = False
                                             Exit Function
                                         Else
@@ -25976,8 +25978,8 @@ contGetStr:
                             Else
 contGetStr0:
                              For i = CLng(p1) To 0 Step -1
-                                   ra(0, i) = CVar(basestack.lastobj)
-                                   p1 = ra.AssignError
+                                   rA(0, i) = CVar(basestack.lastobj)
+                                   p1 = rA.AssignError
                                     If p1 <> 0 Then
                                         MyEr Err.Description, Err.Description
                                         Err.Clear
@@ -25990,12 +25992,12 @@ contGetStr0:
                              If basestack.lastobj Is Nothing Then
                              For i = CLng(p1) To 0 Step -1
                                     
-                                    ra(0, i) = s$
-                                    p1 = ra.AssignError
+                                    rA(0, i) = s$
+                                    p1 = rA.AssignError
                                     If p1 <> 0 Then
                                         If p1 = 6 Then
                                             Err.Clear
-                                            OverflowValue VarType(ra(0, i))
+                                            OverflowValue VarType(rA(0, i))
                                             MyAnyType = False
                                             Exit Function
                                         Else
@@ -26008,8 +26010,8 @@ contGetStr0:
                              Next i
                             Else
                              For i = CLng(p) To 0 Step -1
-                                    ra(0, i) = CVar(basestack.lastobj)
-                                   p1 = ra.AssignError
+                                    rA(0, i) = CVar(basestack.lastobj)
+                                   p1 = rA.AssignError
                                     If p1 <> 0 Then
                                         MyEr Err.Description, Err.Description
                                         Err.Clear
@@ -28061,6 +28063,7 @@ Function getVarPtr(bstack As basetask, A$, R) As Boolean
 Dim VR As Long, v$, V1&, w1 As Long, w2 As Long, s1$
 Dim anything As Object, n$, gr As Boolean
 Dim sg1 As Boolean, s$, par As Boolean
+Dim ppppAny As iBoxArray, pppp As mArray
 R = 0&
 w2 = Len(A$)
 If Len(A$) < 129 Then
@@ -28092,26 +28095,48 @@ Else
 End If
 V1& = Abs(V1&)
 If V1& > 0 And V1& < 5 Then
-par = False
-If GetVar(bstack, v$, w1, , , , , par) Then
-If par Then
-w2 = MemInt(VarPtr(var(w1)))
-Select Case w2
-    Case vbBoolean, vbByte, vbInteger, vbLong, vbString, vbDouble, vbSingle, vbCurrency, 20, vbObject, 13
-        R = VarPtr(var(w1)) + 8
-    Case vbDecimal, vbUserDefinedType
-        R = VarPtr(var(w1))
-    Case Else
-        R = 0
-End Select
-
-Else
-    R = VarPtr(var(w1))
-End If
-If FastSymbol(A$, ")") Then
-getVarPtr = True
-End If
-End If
+    par = False
+    If GetVar(bstack, v$, w1, , , , , par) Then
+        If par Then
+            w2 = MemInt(VarPtr(var(w1)))
+            Select Case w2
+                Case vbBoolean, vbByte, vbInteger, vbLong, vbString, vbDouble, vbSingle, vbCurrency, 20, vbObject, 13
+                    R = VarPtr(var(w1)) + 8
+                Case vbDecimal, vbUserDefinedType
+                    R = VarPtr(var(w1))
+                Case Else
+                    R = 0
+            End Select
+        Else
+            R = VarPtr(var(w1))
+        End If
+        If FastSymbol(A$, ")") Then getVarPtr = True
+    End If
+ElseIf neoGetArray(bstack, v$, ppppAny) Then
+    If ppppAny Is Nothing Then
+        WrongObject
+        Exit Function
+    ElseIf FastSymbol(A$, ")") Then
+        If Not ppppAny.Arr Then WrongObject: Exit Function
+    Else
+    If Not ppppAny.Arr Then WrongObject: Exit Function
+    If Not NeoGetArrayItem(ppppAny, bstack, v$, w1, A$) Then Exit Function
+        Set pppp = ppppAny
+        Select Case pppp.MyTypeToBe
+            Case vbByte
+                R = pppp.ArrPtr + w1
+            Case vbBoolean, vbInteger
+                R = pppp.ArrPtr + w1 * 2&
+            Case vbLong, vbString, vbSingle, vbObject, 13
+                R = pppp.ArrPtr + w1 * 4&
+            Case vbDouble, vbCurrency, 20
+                R = pppp.ArrPtr + w1 * 8&
+            Case Else
+                R = pppp.ArrPtr + w1 * 16&
+        End Select
+        
+    End If
+    If FastSymbol(A$, ")") Then getVarPtr = True
 Else
     SyntaxError
 End If
