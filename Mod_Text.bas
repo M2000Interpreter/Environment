@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 21
+Global Const Revision = 22
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7323,7 +7323,10 @@ If logical(bstack, aa$, R, , True, , IntVal, nostring) Then
     End If
     End If
 ElseIf Not nostring Then
-    If myVarType(po, vbString) Then
+
+            
+    Select Case MemInt(VarPtr(po))
+    Case vbString
         If IsStrExp(bstack, aa$, ut$) Then
             po = po + CVar(ut$)
         Else
@@ -7331,15 +7334,31 @@ ElseIf Not nostring Then
             IsExpA = False
             Exit Function
         End If
-    Else
+    Case 20
         If IsStrExp(bstack, aa$, ut$) Then
-        po = CVar(CStr(po) + ut$)
+            po = CVar(CStr(po) + ut$)
         Else
-        MissNumExpr
-        IsExpA = False
-        Exit Function
+            MissNumExpr
+            IsExpA = False
+            Exit Function
         End If
-    End If
+    Case Else
+        ut$ = LTrim$(str(po))
+        If Left$(ut$, 1) = "." Then
+            ut$ = "0" + ut$
+        ElseIf Left$(ut$, 2) = "-." Then
+            ut$ = "-0" + Mid$(ut$, 2)
+        End If
+        po = vbNullString
+        SwapString2Variant ut$, po
+        If IsStrExp(bstack, aa$, ut$) Then
+            po = CVar(LTrim$(str$(po)) + ut$)
+        Else
+            MissNumExpr
+            IsExpA = False
+            Exit Function
+        End If
+    End Select
 Else
     MissNumExpr
     IsExpA = False
@@ -9171,15 +9190,15 @@ foundprivate:
             End If
         ElseIf v$ = "RefArray" Then
         If V1& = 8 Then
-            Dim ra As refArray
-            Set ra = var(VR)
+            Dim rA As refArray
+            Set rA = var(VR)
 jump8:
             If Not IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
                 If Not FastSymbol(A$, "]") Then
                     SyntaxError
                     Exit Function
                 Else
-                    Set bstack.lastobj = ra.Copy
+                    Set bstack.lastobj = rA.Copy
                     R = 0
                 End If
             Else
@@ -9189,11 +9208,11 @@ jump8:
                 End If
                 p = Abs(Int(p))
 conthere123:
-                If ra.MarkTwoDimension Then
+                If rA.MarkTwoDimension Then
                     If Not FastOperator(A$, "[", 1) Then
                         ReDim R(0)
-                        R(0) = ra(p)
-                        Set bstack.lastobj = ra.NewRef(R)
+                        R(0) = rA(p)
+                        Set bstack.lastobj = rA.NewRef(R)
                         R = 0
                     ElseIf Not IsExp(bstack, A$, pp, flatobject:=True, nostring:=True) Then
                         If Not FastSymbol(A$, "]") Then
@@ -9201,8 +9220,8 @@ conthere123:
                             Exit Function
                         End If
                         ReDim R(0)
-                        R(0) = ra(p)
-                        Set bstack.lastobj = ra.NewRef(R)
+                        R(0) = rA(p)
+                        Set bstack.lastobj = rA.NewRef(R)
                         R = 0
                     Else
                         If Not FastSymbol(A$, "]") Then
@@ -9212,15 +9231,15 @@ conthere123:
                         pp = Abs(Int(pp))
                         'Set bstack.lastobj = Nothing
                     '' check for object?? not implemented yet
-                        If ra.count <= p Then
+                        If rA.count <= p Then
                             OutOfLimit
                             Exit Function
-                        ElseIf ra.count(p) <= pp Then
-                            If ra.vtType(p) = 9 Then
+                        ElseIf rA.count(p) <= pp Then
+                            If rA.vtType(p) = 9 Then
                             
                             
                             
-                            If ra.IsInnerRefArray(p, ra) Then
+                            If rA.IsInnerRefArray(p, rA) Then
                                 ' IT IS A REFARRAY???
                                 'Set ra = R
                                 p = pp
@@ -9235,33 +9254,33 @@ conthere123:
                             Exit Function
                         End If
                         
-                        If myVarType(ra(p, pp), vbObject) Then
+                        If myVarType(rA(p, pp), vbObject) Then
                             Set nbstack = bstack
-                            Set nbstack.lastobj = ra(p, pp)
+                            Set nbstack.lastobj = rA(p, pp)
                             p = 0
                             
                             GoTo goodjump
                             'If FastSymbol(a$, "#") Then GoTo comehere
                         Else
-                        R = ra(p, pp)
+                        R = rA(p, pp)
                         End If
                     End If
                 Else
                     Set bstack.lastobj = Nothing
                     '' check for object?? not implemented yet
-                    If ra.count((0)) <= p Then
+                    If rA.count((0)) <= p Then
                             OutOfLimit
                             Exit Function
                         Else
-                        If myVarType(ra((0), p), vbObject) Then
+                        If myVarType(rA((0), p), vbObject) Then
                             Set nbstack = bstack
-                            Set nbstack.lastobj = ra((0), p)
+                            Set nbstack.lastobj = rA((0), p)
                             p = 0
                             GoTo goodjump
                             'If FastSymbol(a$, "#") Then GoTo comehere
                         Else
                         
-                        R = ra((0), p)
+                        R = rA((0), p)
                         End If
                     End If
                 End If
@@ -10832,7 +10851,7 @@ again1001:
         ElseIf Left$(A$, 1) = "[" Then
          If Not nbstack.lastobj Is Nothing Then
          If TypeOf nbstack.lastobj Is refArray Then
-         Set ra = nbstack.lastobj
+         Set rA = nbstack.lastobj
          Set nbstack.lastobj = Nothing
          Set bstack.lastobj = Nothing
          Mid$(A$, 1, 1) = " "
@@ -14431,7 +14450,7 @@ Dim W As Long
 End Sub
 Function IsStr1(bstackstr As basetask, A$, R$) As Boolean
 Dim nbstack As basetask, n$
-Dim p As Variant, pp As Variant, pppp As mArray, ppppL As iBoxArray, usehandler As mHandler, ra As refArray
+Dim p As Variant, pp As Variant, pppp As mArray, ppppL As iBoxArray, usehandler As mHandler, rA As refArray
 Dim q$, W As Long, w1 As Long, w2 As Long, s$, par As Boolean, usebackup As Boolean
 Dim q1$, q2$, w3 As Long, dn As Long, dd As Long, bs As basetask, sg1 As Boolean
 Dim anything As Object, gr As Boolean
@@ -14562,7 +14581,7 @@ cont2345:
         If MyIsObject(var(w1)) Then
             If Typename(var(w1)) = "RefArray" Then
                 FastSymbol1 A$, "["
-                Set ra = var(w1)
+                Set rA = var(w1)
                 R$ = BlockParamSq(A$)
                 If R$ = "" Then
                     SyntaxError
@@ -14571,7 +14590,7 @@ cont2345:
                 Mid$(A$, 1, Len(R$)) = space$(Len(R$))
                 If IsExp(bstackstr, R$, p, flatobject:=True, nostring:=True) Then
                     p = Abs(Int(p))
-                    If ra.MarkTwoDimension Then
+                    If rA.MarkTwoDimension Then
                             If FastSymbol(A$, "][", True, 2) Then
                             R$ = BlockParamSq(A$)
                             If R$ = "" Then
@@ -14581,16 +14600,16 @@ cont2345:
                             Mid$(A$, 1, Len(R$)) = space$(Len(R$))
                             If IsExp(bstackstr, R$, pp, flatobject:=True, nostring:=True) Then
                                 pp = Abs(Int(pp))
-                                If ra.count <= p Then
+                                If rA.count <= p Then
                                     OutOfLimit
                                     Exit Function
-                                ElseIf ra.count(p) <= pp Then
+                                ElseIf rA.count(p) <= pp Then
                                     OutOfLimit
                                     Exit Function
-                                ElseIf myVarType(ra(p, pp), 9) Then
-                                Set bstackstr.lastobj = ra(p, pp)
+                                ElseIf myVarType(rA(p, pp), 9) Then
+                                Set bstackstr.lastobj = rA(p, pp)
                                 Else
-                                R$ = ra(p, pp)
+                                R$ = rA(p, pp)
                                 End If
                                 
                                 If FastSymbol(A$, "]") Then
@@ -14603,14 +14622,14 @@ cont2345:
                             End If
                         End If
                     Else
-                            If ra.count((0)) <= p Then
+                            If rA.count((0)) <= p Then
                                 OutOfLimit
                                 Exit Function
-                            ElseIf myVarType(ra(0, p), 9) Then
-                                Set bstackstr.lastobj = ra(0, p)
+                            ElseIf myVarType(rA(0, p), 9) Then
+                                Set bstackstr.lastobj = rA(0, p)
                             
                             Else
-                                R$ = ra(0, p)
+                                R$ = rA(0, p)
                             End If
                         If FastSymbol(A$, "]") Then
                             GoTo Final
@@ -27291,7 +27310,7 @@ Else
              Glob = IsLabelSymbolNew(rest$, "цемийг", "GLOBAL", language)
              
               newvar = IsLabelSymbolNew(rest$, "мео", "NEW", language)
-             Dim ra As refArray
+             Dim rA As refArray
              Select Case Abs(IsLabel(bstack, rest$, what$))
              Case 1
                                If newvar Then
@@ -27302,10 +27321,10 @@ Else
                                 Else
                                     If (MemInt(VarPtr(result)) And vbArray) <> 0 Then
                                         If (MemInt(ArrPtr(result))) = 1 Then
-                                        Set ra = New refArray
-                                            ra.Value(0) = result
+                                        Set rA = New refArray
+                                            rA.Value(0) = result
                                             'ra.flat = True
-                                            Set result = ra
+                                            Set result = rA
                                         End If
                                     End If
                                     globalvar what$, result, , Glob
@@ -41866,7 +41885,7 @@ IsHIWORD = FastSymbol(A$, ")", True)
     End If
 End Function
 Private Function IsLen(bstack As basetask, A$, R As Variant) As Boolean
-Dim anything As Object, p As Variant, s$, usehandler As mHandler, ra As refArray
+Dim anything As Object, p As Variant, s$, usehandler As mHandler, rA As refArray
     If IsExp(bstack, A$, p) Then
 len1234:
         If bstack.lastobj Is Nothing Then GoTo bypass1
@@ -41929,21 +41948,21 @@ len1234:
                 Exit Function
         ElseIf TypeOf bstack.lastobj Is refArray Then
                 
-                Set ra = bstack.lastobj
-                If ra.MarkTwoDimension Then
+                Set rA = bstack.lastobj
+                If rA.MarkTwoDimension Then
                     If FastSymbol1(A$, ",") Then
                         If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
                             p = Abs(Int(p))
-                            R = ra.count(p)
+                            R = rA.count(p)
                         Else
                             MissParam A$
                             Exit Function
                         End If
                     Else
-                        R = ra.count
+                        R = rA.count
                     End If
                 Else
-                    R = ra.count(0)
+                    R = rA.count(0)
                 End If
                 IsLen = FastSymbol(A$, ")", True)
                 Set bstack.lastobj = Nothing

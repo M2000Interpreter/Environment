@@ -2820,19 +2820,19 @@ End Sub
 
 Public Sub ScrollUpNew(D As Object, mb As basket)
 If TypeOf D Is MetaDc Then Exit Sub
-Dim aR As RECT, R As Long
+Dim ar As RECT, R As Long
 Dim p As Long
 With mb
-aR.Left = 0
-aR.Bottom = D.Height / dv15
-aR.Right = D.Width / dv15
-aR.top = .mysplit * .Yt / dv15
+ar.Left = 0
+ar.Bottom = D.Height / dv15
+ar.Right = D.Width / dv15
+ar.top = .mysplit * .Yt / dv15
 p = .Yt / dv15
-R = BitBlt(D.hDC, CLng(aR.Left), CLng(aR.top), CLng(aR.Right), CLng(aR.Bottom - p), D.hDC, CLng(aR.Left), CLng(aR.top + p), SRCCOPY)
+R = BitBlt(D.hDC, CLng(ar.Left), CLng(ar.top), CLng(ar.Right), CLng(ar.Bottom - p), D.hDC, CLng(ar.Left), CLng(ar.top + p), SRCCOPY)
 
  
-  aR.top = aR.Bottom - p
-FillBack D.hDC, aR, .Paper
+  ar.top = ar.Bottom - p
+FillBack D.hDC, ar, .Paper
 .curpos = 0
 .currow = .mY - 1
 End With
@@ -2840,15 +2840,15 @@ GdiFlush
 End Sub
 Public Sub ScrollDownNew(D As Object, mb As basket)
 If TypeOf D Is MetaDc Then Exit Sub
-Dim aR As RECT, R As Long
+Dim ar As RECT, R As Long
 Dim p As Long
 With mb
-aR.Left = 0
-aR.Bottom = D.ScaleY(D.Height, 1, 3)
-aR.Right = D.ScaleX(D.Width, 1, 3)
-aR.top = D.ScaleY(.mysplit * .Yt, 1, 3)
+ar.Left = 0
+ar.Bottom = D.ScaleY(D.Height, 1, 3)
+ar.Right = D.ScaleX(D.Width, 1, 3)
+ar.top = D.ScaleY(.mysplit * .Yt, 1, 3)
 p = D.ScaleY(.Yt, 1, 3)
-R = BitBlt(D.hDC, CLng(aR.Left), CLng(aR.top + p), CLng(aR.Right), CLng(aR.Bottom - p), D.hDC, CLng(aR.Left), CLng(aR.top), SRCCOPY)
+R = BitBlt(D.hDC, CLng(ar.Left), CLng(ar.top + p), CLng(ar.Right), CLng(ar.Bottom - p), D.hDC, CLng(ar.Left), CLng(ar.top), SRCCOPY)
 D.Line (0, .mysplit * .Yt)-(D.ScaleWidth, .mysplit * .Yt + .Yt), .Paper, BF
 .currow = .mysplit
 .curpos = 0
@@ -7496,8 +7496,8 @@ End Sub
 Public Sub MissingLabel()
 MyEr "Missing label/Number line", "ÀÂﬂÂÈ ≈ÙÈÍ›Ù·/¡ÒÈËÏ¸Ú „Ò·ÏÏﬁÚ"
 End Sub
-Public Sub MissFuncParammeterdOCVar(aR$)
-MyEr "Not a Document variable " + aR$, "ƒÂÌ ÂﬂÌ·È ÏÂÙ·‚ÎÁÙﬁ Ù˝Ôı Â„„Ò‹ˆÔı " + aR$
+Public Sub MissFuncParammeterdOCVar(ar$)
+MyEr "Not a Document variable " + ar$, "ƒÂÌ ÂﬂÌ·È ÏÂÙ·‚ÎÁÙﬁ Ù˝Ôı Â„„Ò‹ˆÔı " + ar$
 End Sub
 Public Sub MissingBlock()  ' this is for identifier or execute part
 MyEr "missing block {} or string expression", "ÎÂﬂÂÈ Í˛‰ÈÍ·Ú ÛÂ {} Á ·Îˆ·ÒÈËÏÁÙÈÍﬁ ›ÍˆÒ·ÛÁ"
@@ -7928,8 +7928,8 @@ Else
 MyEr en$, gr$
 End If
 End Sub
-Public Sub ZeroParam(aR$)   ' we use MyErMacro in isNumber and isString
-MyErMacro aR$, "Empty parameter", "ÃÁ‰ÂÌÈÍﬁ ·Ò‹ÏÂÙÒÔÚ"
+Public Sub ZeroParam(ar$)   ' we use MyErMacro in isNumber and isString
+MyErMacro ar$, "Empty parameter", "ÃÁ‰ÂÌÈÍﬁ ·Ò‹ÏÂÙÒÔÚ"
 End Sub
 Public Sub MissPar()
 MyEr "missing parameter", "ÎÂﬂÂÈ ·Ò‹ÏÂÙÒÔÚ"
@@ -7954,17 +7954,17 @@ End Sub
 Public Sub MissVarName()
 MyEr "Missing variable name", "ÀÂﬂÂÈ ¸ÌÔÏ· ÏÂÙ·‚ÎÁÙﬁÚ"
 End Sub
-Public Sub MissParamref(aR$)
-MyErMacro aR$, "missing by reference parameter", "ÎÂﬂÂÈ ÏÂ ·Ì·ˆÔÒ‹ ·Ò‹ÏÂÙÒÔÚ"
+Public Sub MissParamref(ar$)
+MyErMacro ar$, "missing by reference parameter", "ÎÂﬂÂÈ ÏÂ ·Ì·ˆÔÒ‹ ·Ò‹ÏÂÙÒÔÚ"
 End Sub
-Public Sub MissParam(aR$)
-MyErMacro aR$, "missing parameter", "ÎÂﬂÂÈ ·Ò‹ÏÂÙÒÔÚ"
+Public Sub MissParam(ar$)
+MyErMacro ar$, "missing parameter", "ÎÂﬂÂÈ ·Ò‹ÏÂÙÒÔÚ"
 End Sub
 Public Sub MissFuncParameterStringVar()
 MyEr "Not a string variable", "ƒÂÌ ÂﬂÌ·È ·Îˆ·ÒÈËÏÁÙÈÍﬁ ÏÂÙ·‚ÎÁÙﬁ"
 End Sub
-Public Sub MissFuncParameterStringVarMacro(aR$)
-MyErMacro aR$, "Not a string variable", "ƒÂÌ ÂﬂÌ·È ·Îˆ·ÒÈËÏÁÙÈÍﬁ ÏÂÙ·‚ÎÁÙﬁ"
+Public Sub MissFuncParameterStringVarMacro(ar$)
+MyErMacro ar$, "Not a string variable", "ƒÂÌ ÂﬂÌ·È ·Îˆ·ÒÈËÏÁÙÈÍﬁ ÏÂÙ·‚ÎÁÙﬁ"
 End Sub
 Public Sub NoSuchFolder()
 MyEr "No such folder", "ƒÂÌ ı‹Ò˜ÂÈ Ù›ÙÔÈÔÚ ˆ‹ÍÂÎÔÚ"
@@ -11194,7 +11194,13 @@ Function enthesi(bstack As basetask, rest$) As String
 'first is the string "label {0} other {1}
 Dim counter As Long, pat$, Final$, pat1$, pl1 As Long, pl2 As Long, pl3 As Long
 Dim q$, p As Variant, p1 As Integer, pd$
+If IsExp(bstack, rest$, p, , True) Then
+    If MemInt(VarPtr(p)) = vbString Then SwapString2Variant Final$, p: p = Empty: GoTo cont1
+    MissStringExpr
+    Exit Function
+End If
 If IsStrExp(bstack, rest$, Final$, False) Then
+cont1:
   If FastSymbol(rest$, ",") Then
     Do
                 pl2 = 1
@@ -11206,6 +11212,7 @@ If IsStrExp(bstack, rest$, Final$, False) Then
                     If MemInt(VarPtr(p)) = vbBoolean Then q$ = Format$(p, DefBooleanString): GoTo fromboolean
 again1:
                     pl2 = InStr(pl2, Final$, pat1$)
+again11:
                     If pl2 > 0 Then
                     pl1 = InStr(pl2, Final$, "}")
                     If Mid$(Final$, pl2 + Len(pat1$), 1) = ":" Then
@@ -11216,97 +11223,108 @@ again1:
                     
                     pl3 = val(Mid$(Final$, pl2 + Len(pat1$) + Len(str$(p1))) + "}")
                     If p1 < 0 Then p1 = 13 '22
-                    If p1 > 13 Then p1 = 13
+                    'If p1 > 13 Then p1 = 13
                   p = MyRound(p, p1)
                   End If
-                  
-                  
-                    If CheckInt64(p) Then
-                        pd$ = CStr(p)
-                     ElseIf VarType(p) = vbString Then
+                    Select Case MemInt(VarPtr(p))
+                    Case vbLong, vbInteger, vbByte, 20
+                        If p1 > 0 Then pd$ = Format$(p, String$(p1, "0")) Else pd$ = CStr(p)
+                    Case vbString
                         pd$ = LTrim$(p)
-                     Else
+                    Case vbDouble, vbSingle
                         pd$ = LTrim$(str(p))
-                     End If
-                  If InStr(pd$, "E") > 0 Or InStr(pd$, "e") > 0 Then '' we can change e to greek Â
-                  pd$ = Format$(p, "0." + String$(p1, "0") + "E+####")
-                       If Not NoUseDec Then
-                               If Not OverideDec Then
-                                pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
-                                pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
-                                pd$ = Replace$(pd$, Chr(2), NowDec$)
-                                pd$ = Replace$(pd$, Chr(3), NowThou$)
-                                
-                            ElseIf InStr(pd$, NowDec$) > 0 Then
-                            pd$ = Replace$(pd$, NowDec$, Chr(2))
-                            pd$ = Replace$(pd$, NowThou$, Chr(3))
-                            pd$ = Replace$(pd$, Chr(2), ".")
-                            pd$ = Replace$(pd$, Chr(3), ",")
-                            
+                        If InStr(pd$, "E") > 0 Then
+                            GoTo cont2234
+                        ElseIf InStr(pd$, "e") > 0 Then '' we can change e to greek Â
+cont2234:
+                            pd$ = Format$(p, "0." + String$(p1, "0") + "E+####")
+                            If Not NoUseDec Then
+                                If Not OverideDec Then
+                                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                                    pd$ = Replace$(pd$, Chr(2), NowDec$)
+                                    pd$ = Replace$(pd$, Chr(3), NowThou$)
+                                ElseIf GetDeflocaleString(LOCALE_SDECIMAL) <> NowDec$ Then
+                                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                                    pd$ = Replace$(pd$, Chr(2), NowDec$)
+                                    pd$ = Replace$(pd$, Chr(3), NowThou$)
+                                End If
+                            End If
+                        Else
+                            GoTo cont5534
+                        End If
+                    Case Else
+cont5534:
+                        If p1 <> 0 Then
+                            pd$ = Format$(p, "0." + String$(p1, "0"))
+                            If Not NoUseDec Then
+                                If Not OverideDec Then
+                                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                                    pd$ = Replace$(pd$, Chr(2), NowDec$)
+                                    pd$ = Replace$(pd$, Chr(3), NowThou$)
+                                ElseIf GetDeflocaleString(LOCALE_SDECIMAL) <> NowDec$ Then
+                                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                                    pd$ = Replace$(pd$, Chr(2), NowDec$)
+                                    pd$ = Replace$(pd$, Chr(3), NowThou$)
+                                End If
+                            End If
+                        Else
+                                pd$ = LTrim$(str(p))
+                                If Left$(pd$, 1) = "." Then
+                                pd$ = "0" + pd$
+                                ElseIf Left$(pd$, 2) = "-." Then pd$ = "-0" + Mid$(pd$, 2)
+                                End If
+                            If InStr(pd$, ".") > 0 Then
+                                If NowDec$ <> "." Then
+                                    pd$ = Replace$(pd$, ".", Chr(2))
+                                    pd$ = Replace$(pd$, ",", Chr(3))
+                                    pd$ = Replace$(pd$, Chr(2), NowDec$)
+                                    pd$ = Replace$(pd$, Chr(3), NowThou$)
+                                End If
                             End If
                         End If
-                  ElseIf p1 <> 0 Then
-                   pd$ = Format$(p, "0." + String$(p1, "0"))
-                        If Not NoUseDec Then
-                        If Not OverideDec Then
-                        pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
-                        pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
-                        pd$ = Replace$(pd$, Chr(2), NowDec$)
-                        pd$ = Replace$(pd$, Chr(3), NowThou$)
-                        ElseIf InStr(pd$, NowDec$) > 0 Then
-                        pd$ = Replace$(pd$, NowDec$, Chr(2))
-                        pd$ = Replace$(pd$, NowThou$, Chr(3))
-                        pd$ = Replace$(pd$, Chr(2), ".")
-                        pd$ = Replace$(pd$, Chr(3), ",")
-                        
-                        End If
-                        End If
-                    ElseIf pl3 <> 0 Then
-                    If NowDec$ <> "." Then
-                        pd$ = Replace$(pd$, ".", Chr(2))
-                        pd$ = Replace$(pd$, ",", Chr(3))
-                        pd$ = Replace$(pd$, Chr(2), NowDec$)
-                        pd$ = Replace$(pd$, Chr(3), NowThou$)
-                    End If
-                  End If
-               
-                  If pl3 <> 0 Then
-                    If pl3 > 0 Then
-                        pd$ = Left$(pd$ + space$(pl3), pl3)
+                    End Select
+                    If pl3 <> 0 Then
+                        If pl3 > 0 Then
+                            pd$ = Left$(pd$ + space$(pl3), pl3)
                         Else
-                        pd$ = Right$(space$(Abs(pl3)) + pd$, Abs(pl3))
+                            pd$ = Right$(space$(Abs(pl3)) + pd$, Abs(pl3))
                         End If
-                        
-                        
-                  End If
-                        Final$ = Replace$(Final$, Mid$(Final$, pl2, pl1 - pl2 + 1), pd$)
-                        GoTo again1
-                    Else
-                    
-                    If NoUseDec Then
-                        Final$ = Replace$(Final$, pat$, CStr(p))
-                    Else
-                    If CheckInt64(p) Then
+                    End If
+                    Final$ = Replace$(Final$, Mid$(Final$, pl2, pl1 - pl2 + 1), pd$)
+                    pl2 = InStr(pl2, Final$, pat1$)
+                    If pl2 > 0 Then GoTo again11
+                    If InStr(Final$, pat$) > 0 Then GoTo cont7747
+                Else
+cont7747:
+                    Select Case MemInt(VarPtr(p))
+                    Case vbLong, vbInteger, vbByte, 20
                         pd$ = CStr(p)
-                    ElseIf VarType(p) = vbString Then
+                    Case vbString
                         pd$ = LTrim$(p)
-                    Else
+                    Case Else
                         pd$ = LTrim$(str(p))
-                    End If
+                        If Left$(pd$, 1) = "." Then
+                            pd$ = "0" + pd$
+                        ElseIf Left$(pd$, 2) = "-." Then pd$ = "-0" + Mid$(pd$, 2)
+                        End If
+                        If Not OverideDec Then
+                        Final$ = Replace$(Final$, pat$, Replace(pd$, ".", NowDec$))
+                        Else
+                        Final$ = Replace$(Final$, pat$, pd$)
+                        End If
+                    End Select
                     
-                    
-                    
-                     If Left$(pd$, 1) = "." Then
-                    pd$ = "0" + pd$
-                    ElseIf Left$(pd$, 2) = "-." Then pd$ = "-0" + Mid$(pd$, 2)
-                    End If
-                    If Not OverideDec Then
-                    Final$ = Replace$(Final$, pat$, Replace(pd$, ".", NowDec$))
-                    Else
-                    Final$ = Replace$(Final$, pat$, pd$)
-                    End If
-                    End If
-                    
+                        Final$ = Replace$(Final$, pat$, pd$)
+                        If pl2 = 0 Then
+                        pl2 = InStr(Final$, pat1$)
+                        Else
+                        pl2 = InStr(pl2, Final$, pat1$)
+                        End If
+                        If pl2 > 0 Then GoTo again11
                     
                         End If
                         If Not FastSymbol(rest$, ",") Then Exit Do
@@ -11352,7 +11370,7 @@ Public Function GetDeflocaleString(ByVal this As Long) As String
 1234:
 End Function
 Function RetM2000array(var As Variant) As Variant
-Dim aR As New mArray, v(), manydim As Long, probe As Long, probelow As Long
+Dim ar As New mArray, v(), manydim As Long, probe As Long, probelow As Long
 Dim j As Long
 v() = var
 On Error GoTo ma100
@@ -11367,13 +11385,13 @@ For j = manydim To 1 Step -1
     probe = UBound(v, j)
     If Err Then Exit For
     probelow = LBound(v, j)
-    aR.PushDim probe - probelow + 1
+    ar.PushDim probe - probelow + 1
 Next j
-aR.PushEnd
-aR.RevOrder = True
-aR.CopySerialize v()
+ar.PushEnd
+ar.RevOrder = True
+ar.CopySerialize v()
 ma100:
-Set RetM2000array = aR
+Set RetM2000array = ar
 
 End Function
 
@@ -19884,7 +19902,7 @@ Private Function GetContainer(bstack As basetask, rest$, ByVal Lang As Long) As 
         End If
     End If
 End Function
-Function DeclareGUI(bstack As basetask, what$, rest$, ifier As Boolean, Lang As Long, i As Long, Optional aR As Long = 0, Optional oName As String = vbNullString, Optional Glob As Long = 0, Optional Y3 As Boolean, Optional ArrPos As Long = 0)
+Function DeclareGUI(bstack As basetask, what$, rest$, ifier As Boolean, Lang As Long, i As Long, Optional ar As Long = 0, Optional oName As String = vbNullString, Optional Glob As Long = 0, Optional Y3 As Boolean, Optional ArrPos As Long = 0)
 DeclareGUI = True
 On Error GoTo wrong
 Dim W$, x1 As Long, y1 As Long, s$, useold As Boolean, bp As Long
@@ -19914,7 +19932,7 @@ Dim pppp As mArray, mmmm As mEvent
                DeclareGUI = False: Exit Function
            End If
         End If
-        If aR = 0 Then
+        If ar = 0 Then
             If Not useold Then ProcEvent bstack, "{Read msg$, &obj}", 1, y1
             CreateFormObject var(i), 1
             Set alfa = var(i)
@@ -19932,7 +19950,7 @@ Dim pppp As mArray, mmmm As mEvent
         End If
     Else
             bp = True
-            If aR = 0 Then
+            If ar = 0 Then
                 CreateFormObject var(i), 1
                 Set alfa = var(i)
                 Set mmmm = New mEvent
@@ -19967,7 +19985,7 @@ contEvArray:
                             .GenItemCreator LTrim$(str(i * 3456)), "{ Module " + here$ + vbCrLf + "try { call local " + here$ + "." + bstack.GroupName + what$ + "() } }" + here$ + "." + bstack.GroupName
                         End With
                     End If
-                    For i = 0 To aR - 1
+                    For i = 0 To ar - 1
                         CreateFormObject aVar, 1
                         Set pppp.item(i) = aVar
                         Dim aaa As GuiM2000, safe As LongHash
@@ -20000,7 +20018,7 @@ contEvArray:
                 Exit Function
             End If
             Dim aa2 As GuiButton
-            If aR = 0 Then
+            If ar = 0 Then
                 CreateFormObject var(i), 2
                 Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
@@ -20026,7 +20044,7 @@ contEvArray:
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
-                    For i = 0 To aR - 1
+                    For i = 0 To ar - 1
                         CreateFormObject aVar, 2
                         Set pppp.item(i) = aVar
                         Set aa2 = aVar
@@ -20059,7 +20077,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈…”¡√Ÿ√«", "TEXTBOX", Lang) Then
                 Exit Function
             End If
             Dim aa3 As GuiTextBox
-            If aR = 0 Then
+            If ar = 0 Then
                 CreateFormObject var(i), 3
                 Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
@@ -20085,7 +20103,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈…”¡√Ÿ√«", "TEXTBOX", Lang) Then
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
-                    For i = 0 To aR - 1
+                    For i = 0 To ar - 1
                         CreateFormObject aVar, 3
                         Set pppp.item(i) = aVar
                         Set aa3 = aVar
@@ -20118,7 +20136,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈–…Àœ√«", "CHECKBOX", Lang) Then
                 Exit Function
             End If
             Dim aa4 As GuiCheckBox
-            If aR = 0 Then
+            If ar = 0 Then
                 CreateFormObject var(i), 4
                 Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
@@ -20144,7 +20162,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈–…Àœ√«", "CHECKBOX", Lang) Then
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
-                    For i = 0 To aR - 1
+                    For i = 0 To ar - 1
                         CreateFormObject aVar, 4
                         Set pppp.item(i) = aVar
                         Set aa4 = aVar
@@ -20177,7 +20195,7 @@ ElseIf IsLabelSymbolNew(rest$, " ≈…Ã≈Õœ", "EDITBOX", Lang) Then
                 Exit Function
             End If
             Dim aa5 As GuiEditBox
-            If aR = 0 Then
+            If ar = 0 Then
                 CreateFormObject var(i), 5
                 Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
@@ -20208,7 +20226,7 @@ ElseIf IsLabelSymbolNew(rest$, " ≈…Ã≈Õœ", "EDITBOX", Lang) Then
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
-                    For i = 0 To aR - 1
+                    For i = 0 To ar - 1
                         CreateFormObject aVar, 5
                         Set pppp.item(i) = aVar
                         Set aa5 = aVar
@@ -20246,7 +20264,7 @@ ElseIf IsLabelSymbolNew(rest$, "À…”‘¡", "LISTBOX", Lang) Then
                 Exit Function
             End If
             Dim aa6 As GuiListBox
-            If aR = 0 Then
+            If ar = 0 Then
                 CreateFormObject var(i), 6
                 Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
@@ -20273,7 +20291,7 @@ ElseIf IsLabelSymbolNew(rest$, "À…”‘¡", "LISTBOX", Lang) Then
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
-                    For i = 0 To aR - 1
+                    For i = 0 To ar - 1
                         CreateFormObject aVar, 6
                         Set pppp.item(i) = aVar
                         Set aa6 = aVar
@@ -20311,7 +20329,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈… œÕ¡", "IMAGE", Lang) Then
                 Exit Function
             End If
             Dim aa8 As GuiImage
-            If aR = 0 Then
+            If ar = 0 Then
                 CreateFormObject var(i), 8
                 Set alfa = bstack.lastobjIndirect(var())
                 Set bstack.lastobj = Nothing
@@ -20328,7 +20346,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈… œÕ¡", "IMAGE", Lang) Then
                     what$ = Left$(what$, Len(oName$))
                     Set alfa = bstack.lastobjIndirect(var())
                     Set bstack.lastobj = Nothing
-                    For i = 0 To aR - 1
+                    For i = 0 To ar - 1
                         CreateFormObject aVar, 7
                         Set pppp.item(i) = aVar
                         Set aa8 = aVar
@@ -20357,7 +20375,7 @@ ElseIf IsLabelSymbolNew(rest$, "À…”‘¡.≈…”¡√Ÿ√«”", "COMBOBOX", Lang) Then
                 Exit Function
             End If
             Dim aa7 As GuiDropDown
-            If aR = 0 Then
+            If ar = 0 Then
                 CreateFormObject var(i), 7
                 Set alfa = bstack.lastobjIndirect(var())
                 Set bstack.lastobj = Nothing
@@ -20373,7 +20391,7 @@ ElseIf IsLabelSymbolNew(rest$, "À…”‘¡.≈…”¡√Ÿ√«”", "COMBOBOX", Lang) Then
                     what$ = Left$(what$, Len(oName$))
                     Set alfa = bstack.lastobjIndirect(var())
                     Set bstack.lastobj = Nothing
-                    For i = 0 To aR - 1
+                    For i = 0 To ar - 1
                         CreateFormObject aVar, 7
                         Set pppp.item(i) = aVar
                         Set aa7 = aVar
@@ -20404,7 +20422,7 @@ ElseIf IsLabelSymbolNew(rest$, "‘’–œ”", "TYPE", Lang) Then
                     Exit Function
                 End If
                 
-                If aR = 0 Then
+                If ar = 0 Then
                     On Error Resume Next
                     
                     If W$ <> "" Then
@@ -20445,7 +20463,7 @@ ElseIf IsLabelSymbolNew(rest$, "‘’–œ”", "TYPE", Lang) Then
                             Licenses.Add s$, W$
                         End If
                         If Err Then GoTo wrong
-                        For i = 0 To aR - 1
+                        For i = 0 To ar - 1
                             CreateFormObject aVar, 9
                             Set pppp.item(i) = aVar
                             Set ec1 = aVar
@@ -20475,7 +20493,7 @@ ElseIf IsLabelSymbolNew(rest$, "‘’–œ”", "TYPE", Lang) Then
 ElseIf IsLabelSymbolNew(rest$, "–À«—œ÷œ—…≈”", "INFORMATION", Lang) Then
     
     Y3 = False ' no withevents in declare
-    If aR > 0 Then
+    If ar > 0 Then
     MyEr "not for array", "¸˜È „È· ﬂÌ·Í·"
     DeclareGUI = False
     End If
@@ -20483,7 +20501,7 @@ ElseIf IsLabelSymbolNew(rest$, "–À«—œ÷œ—…≈”", "INFORMATION", Lang) Then
 ElseIf IsLabelSymbolNew(rest$, "Ã«‘—Ÿœ.”’”‘«Ã¡‘œ”", "WINDOWS.REGISTRY", Lang) Then
     
     Y3 = False ' no withevents in declare
-    If aR > 0 Then
+    If ar > 0 Then
     MyEr "not for array", "¸˜È „È· ﬂÌ·Í·"
     DeclareGUI = False
     End If
@@ -20491,19 +20509,19 @@ ElseIf IsLabelSymbolNew(rest$, "Ã«‘—Ÿœ.”’”‘«Ã¡‘œ”", "WINDOWS.REGISTRY", Lang) Th
 ElseIf IsLabelSymbolNew(rest$, "–«√«.√≈√œÕœ‘œ”", "SINK.EVENT", Lang) Then
     
     Y3 = True
-    If aR > 0 Then
+    If ar > 0 Then
     MyEr "not for array", "¸˜È „È· ﬂÌ·Í·"
     DeclareGUI = False
     End If
     Set var(i) = New SinkEvent
 
 ElseIf IsLabelSymbolNew(rest$, "”’Ã–…≈”‘«”", "COMPRESSOR", Lang) Then
-    If aR = 0 Then
+    If ar = 0 Then
         Set var(i) = New ZipTool
     Else
         what$ = Left$(what$, Len(oName$))
         Set pppp = var(ArrPos)
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set pppp.item(i) = New ZipTool
         Next i
     End If
@@ -20512,131 +20530,131 @@ ElseIf IsLabelSymbolNew(rest$, "Ã¡»«Ã¡‘… ¡", "MATH", Lang) Then
     Y3 = False ' no withevents in declare
     Set var(i) = New Math
 ElseIf IsLabelSymbolNew(rest$, "”‘¡»Ãœ”", "SOCKET", Lang) Then
-    If aR = 0 Then
+    If ar = 0 Then
         Set var(i) = New cTlsSocket
     Else
         what$ = Left$(what$, Len(oName$))
         Set pppp = var(ArrPos)
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set pppp.item(i) = New cTlsSocket
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "¡’Àœ”", "SHELLPIPE", Lang) Then
-    If aR = 0 Then
+    If ar = 0 Then
         Set var(i) = New ShellPipe
     Else
         what$ = Left$(what$, Len(oName$))
         Set pppp = var(ArrPos)
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set pppp.item(i) = New ShellPipe
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "”≈…—…¡ «", "SERIALPORT", Lang) Then
-    If aR = 0 Then
+    If ar = 0 Then
         Set var(i) = New SerialPort
     Else
         what$ = Left$(what$, Len(oName$))
         Set pppp = var(ArrPos)
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set pppp.item(i) = New SerialPort
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, " ¡‘≈¬¡”Ã¡", "DOWNLOAD", Lang) Then
-    If aR = 0 Then
+    If ar = 0 Then
         Set var(i) = New cHttpDownload
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set pppp.item(i) = New cHttpDownload
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "¡…‘«Ã¡.”’Õƒ≈”«”", "HTTPS.REQUEST", Lang) Then
-    If aR = 0 Then
+    If ar = 0 Then
         Set var(i) = New clsHttpsRequest
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set pppp.item(i) = New clsHttpsRequest
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "–≈À¡‘«”", "CLIENT", Lang) Then
     Y3 = False ' no withevents in declare
-    If aR = 0 Then
+    If ar = 0 Then
         Set var(i) = New cTlsClient
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set pppp.item(i) = New cTlsClient
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "”’ÀÀœ√«", "COLLECTION", Lang) Then
     Y3 = False ' no withevents in declare
-    If aR = 0 Then
+    If ar = 0 Then
         Set var(i) = New Collection
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set pppp.item(i) = New Collection
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "”‘œ…◊≈…¡XML", "XMLDATA", Lang) Then
     Y3 = False ' no withevents in declare
-    If aR = 0 Then
+    If ar = 0 Then
         Set var(i) = xmlMonoNew
         
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set pppp.item(i) = xmlMonoNew
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "–…Õ¡ ¡”JSON", "JSONARRAY", Lang) Then
     Y3 = False
-    If aR = 0 Then
+    If ar = 0 Then
         Set var(i) = New JsonArray
         
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set pppp.item(i) = New JsonArray
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "À…”‘¡JSON", "JSONOBJECT", Lang) Then
     Y3 = False
-    If aR = 0 Then
+    If ar = 0 Then
         Set var(i) = New JsonObject
         
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set pppp.item(i) = New JsonObject
         Next i
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "ÃœÕ¡ƒ… œ", "MUTEX", Lang) Then
     Y3 = False ' no withevents in declare
-    If aR = 0 Then
+    If ar = 0 Then
         Set var(i) = New Mutex
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set pppp.item(i) = New Mutex
         Next i
     End If
@@ -20645,7 +20663,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈÷¡—Ãœ√«", "APPLICATION", Lang) Then
     If IsLabelSymbolNew(rest$, "÷œ—Ã¡", "FORM", Lang) Then
         Set var(i) = Form1
     Else
-        If aR = 0 Then
+        If ar = 0 Then
             Set mm = New CallBack2
             mm.NoPublic bstack, ""
             Set var(i) = mm
@@ -20653,7 +20671,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈÷¡—Ãœ√«", "APPLICATION", Lang) Then
         Else
             Set pppp = var(ArrPos)
             what$ = Left$(what$, Len(oName$))
-            For i = 0 To aR - 1
+            For i = 0 To ar - 1
                 Set mm = New CallBack2
                 mm.NoPublic bstack, ""
                 Set pppp.item(i) = mm
@@ -20663,7 +20681,7 @@ ElseIf IsLabelSymbolNew(rest$, "≈÷¡—Ãœ√«", "APPLICATION", Lang) Then
     End If
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "‘Ã«Ã¡", "MODULE", Lang) Then
-    If aR = 0 Then
+    If ar = 0 Then
             Set mm = New CallBack2
             mm.NoPublic bstack, here$
             Set var(i) = mm
@@ -20671,7 +20689,7 @@ ElseIf IsLabelSymbolNew(rest$, "‘Ã«Ã¡", "MODULE", Lang) Then
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set mm = New CallBack2
             mm.NoPublic bstack, here$
             Set pppp.item(i) = mm
@@ -20683,12 +20701,12 @@ ElseIf IsLabelSymbolNew(rest$, "Ÿ”", "AS", Lang) Then
 ElseIf IsStrExp(bstack, rest$, s$) Then
 ccc:
     Y3 = False ' no withevents in declare
-    If aR = 0 Then
+    If ar = 0 Then
         CreateitObject var(i), s$
     Else
         Set pppp = var(ArrPos)
         what$ = Left$(what$, Len(oName$))
-        For i = 0 To aR - 1
+        For i = 0 To ar - 1
             Set p = Nothing
             CreateitObject p, s$
             Set pppp.item(i) = p
@@ -24418,9 +24436,14 @@ If entrypoint = 1 Then dum = True  ' means documend append to file
                 End If
     End If
     If FastSymbol(rest$, ",") Then
-    If Not IsStrExp(basestack, rest$, W$) Then
-        If Not dum Then
-            If Not IsExp(basestack, rest$, p) Then GoTo sdmess
+        If Not IsStrExp(basestack, rest$, W$) Then
+            If Not dum Then
+                If Not IsExp(basestack, rest$, p, , True) Then GoTo sdmess
+                If MemInt(VarPtr(p)) = vbString Then
+                    SwapString2Variant W$, p
+                    GoTo cont154
+                End If
+            
 pass2:
                  If FastPureLabel(rest$, W$, , True) = 1 Then
 
@@ -24449,33 +24472,32 @@ pass2:
                     ProcSaveDoc = True
                     Exit Function
                 Else
-                MissPar
-                Exit Function
+                    MissPar
+                    Exit Function
                 End If
-            
             End If
-    
 sdmess:
-        MissStringExpr
-        Exit Function
-    End If
-    ss$ = GetNextLine(W$)
-    SetNextLine W$
-    If W$ <> "" Then
-    MyEr "filename with line breaks", "¸ÌÔÏ· ·Ò˜ÂﬂÔı ÏÂ ·ÎÎ·„›Ú „Ò·ÏÏ˛Ì"
-    Exit Function
-    End If
-    ' check valid name
-    If ExtractNameOnly(ss$, True) = vbNullString Then BadFilename: Exit Function
-    If ExtractPath(ss$) = vbNullString Then
-    ss$ = mylcasefILE(mcd + ss$)
-    End If
-    If ExtractType(ss$) = vbNullString Then ss$ = ss$ + ".txt"
+            MissStringExpr
+            Exit Function
+        End If
+cont154:
+        ss$ = GetNextLine(W$)
+        SetNextLine W$
+        If W$ <> "" Then
+            MyEr "filename with line breaks", "¸ÌÔÏ· ·Ò˜ÂﬂÔı ÏÂ ·ÎÎ·„›Ú „Ò·ÏÏ˛Ì"
+            Exit Function
+        End If
+        ' check valid name
+        If ExtractNameOnly(ss$, True) = vbNullString Then BadFilename: Exit Function
+        If ExtractPath(ss$) = vbNullString Then
+            ss$ = mylcasefILE(mcd + ss$)
+        End If
+        If ExtractType(ss$) = vbNullString Then ss$ = ss$ + ".txt"
+    ElseIf entrypoint = 1 Then
+        GoTo sdmess
     Else
-    
-                    dum = False
-                GoTo pass2
-    
+        dum = True
+        GoTo pass2
     End If
     
      If FastSymbol(rest$, ",") Then
@@ -27656,6 +27678,7 @@ End Function
 
 Function ProcLoadDoc(entrypoint As Long, basestack As basetask, rest$) As Boolean
 Dim dum As Boolean, pppp As mArray, s$, i As Long, x1 As Long, y1 As Long, frm$, ss$
+Dim p As Variant
 ProcLoadDoc = True
 If entrypoint = 1 Then dum = True
       y1 = Abs(IsLabel(basestack, rest$, s$))
@@ -27669,11 +27692,17 @@ If entrypoint = 1 Then dum = True
                 End If
     End If
     If FastSymbol(rest$, ",") Then
-    If Not IsStrExp(basestack, rest$, frm$) Then
-    MissStringExpr
+        If IsExp(basestack, rest$, p, , True) Then
+            If MemInt(VarPtr(p)) <> vbString Then
+                MissStringExpr
+                Exit Function
+            End If
+            SwapString2Variant frm$, p
+        ElseIf Not IsStrExp(basestack, rest$, frm$) Then
+            MissStringExpr
+            Exit Function
+        End If
     
-    Exit Function
-    End If
     ss$ = GetNextLine(frm$)
     SetNextLine frm$
     If frm$ <> "" Then
@@ -27700,7 +27729,7 @@ If entrypoint = 1 Then dum = True
                 x1 = 2
                 On Error Resume Next
                 If FastSymbol(rest$, ",") Then
-                Dim p As Variant
+                
                 If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
                 var(i).LCID = CLng(p)
                 End If
