@@ -1551,12 +1551,19 @@ assigngroup:
                         GoTo err000
                     ElseIf TypeOf var(v) Is Group Then
                         If IsExp(bstack, b$, p) Then
-
+hasstr1:
                             If var(v).HasSet Then
                                 Set myobject = bstack.soros
                                 Set bstack.Sorosref = New mStiva
                                 If bstack.lastobj Is Nothing Then
                                     bstack.soros.PushVal p
+                                ElseIf TypeOf bstack.lastobj Is mHandler Then
+                                Set usehandler = bstack.lastobj
+                                If usehandler.t1 = 4 Then
+                                    bstack.soros.PushVal p
+                                Else
+                                    bstack.soros.DataObj bstack.lastobj
+                                End If
                                 Else
                                 If TypeOf bstack.lastobj Is VarItem Then
                                 bstack.soros.DataOptional
@@ -1625,7 +1632,12 @@ assigngroup:
                             End If
                             If extreme Then GoTo NewCheck2 Else GoTo NewCheck
                             
+                        ElseIf IsStrExp(bstack, b$, ss$, False) Then
+                            p = vbNullString
+                            SwapString2Variant ss$, p
+                            GoTo hasstr1
                         Else
+                        
 noexpression:
                         If Left$(b$, 1) = ">" Then
 noexpression1:
@@ -6183,6 +6195,20 @@ existAs07:
                 End If
                 End If
                 GoTo er103
+                ElseIf IsObject(var(i)) Then
+                If TypeOf var(i) Is Group Then
+                Set bstack.lastobj = myobject
+                If TypeOf myobject Is mHandler Then
+                    Set usehandler = myobject
+                    If usehandler.t1 = 4 Then
+                        p = usehandler.index_cursor
+                        If MemInt(VarPtr(p)) <> vbString Then p = p * usehandler.sign
+                    End If
+                End If
+                GoTo checkenum
+                Else
+                GoTo er103
+                End If
                 Else
                      MyRead = False
                      If VarTypeName(var(i)) = "Nothing" Then
@@ -6816,6 +6842,7 @@ contenumok:
                 If var(i) Is Nothing Then
                     MissingObjRef
                 ElseIf TypeOf var(i) Is Group Then
+checkenum:
                     If var(i).HasSet Then
                        
                         Set m = bstack.soros

@@ -31745,6 +31745,7 @@ there12345:
                     f$ = f$ + "set {link parent " + hlp + " to " + W$ + ": read " + W$ + "}" + vbCrLf
                 End If
                 FastSymbol rest$, "}"
+                If Right$(hlp, 1) <> "$" Then hlp = "variant " + hlp
                 If FastSymbol(rest$, "=") Then
                     x1 = 1
                     aheadstatus rest$, , x1
@@ -31769,6 +31770,7 @@ there12345:
                     rest$ = f$ + vbCrLf + "}" + vbCrLf + rest$
                 End If
             Else
+                If Right$(hlp, 1) <> "$" Then hlp = "variant " + hlp
                 If FastSymbol(rest$, "=") Then
                     x1 = 1
                     aheadstatus rest$, , x1

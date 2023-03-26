@@ -58,9 +58,9 @@ Property Get IsEmpty()
 End Property
 
 Public Sub addone(Key As String, nValue As Variant)
-Dim a As Long
-a = Malloc()
-With PriveSpace(a)
+Dim A As Long
+A = Malloc()
+With PriveSpace(A)
     .Key = Key
     .KeyUCase = myUcase(Key, True)
     .iValue = nValue
@@ -92,6 +92,7 @@ End Function
 Function SearchValue(v As Variant, ByRef ok As Boolean) As Variant
 Dim i As Long, mm As mHandler
 ok = False
+again:
 For i = 0 To toplim
 If v = PriveSpace(i).iValue Then
 ok = True
@@ -107,7 +108,8 @@ End If
 Next i
 If Not ok Then
 If MemInt(VarPtr(v)) = vbString Then
-    
+v = val(v)
+GoTo again
 Else
 
 v = -v

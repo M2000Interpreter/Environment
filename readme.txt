@@ -1,9 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 22 active-X
-Some fixes on string variables without suffix.
-the += operator for strings works with numeric expressions (automatic converted to string).
-
+Version 12 Revision 23 active-X
+1. Addition logic for properties of Group objects to handle enum types and string from names without suffix $.
+2. More modules in info.gsb: INTSQR, ZIGZAG, ULAM, PRIMESEQ, DOT
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

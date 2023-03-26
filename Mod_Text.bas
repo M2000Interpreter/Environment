@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 22
+Global Const Revision = 23
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3656,8 +3656,11 @@ Public Sub ProcessOper(bstack As basetask, first As Object, oper$, R As Variant,
 Dim where As Long, W$, ok As Boolean
 Dim soroslen As Long, flag As Boolean, backup As Object, oldkillvars As Boolean
 flag = Not first Is Nothing
+'Dim buser As String
 oldkillvars = bstack.nokillvars
 If oper$ = "''" Then
+'buser = bstack.UseGroupname
+'bstack.UseGroupname = ""
 bstack.nokillvars = True
 End If
 If Not oldkillvars Then PushStage bstack, False
@@ -3698,14 +3701,16 @@ If soroslen < bstack.soros.Total Then
    End If
     bstack.DropNdot 2
     bstack.nokillvars = oldkillvars
-    If Not oldkillvars Then PopStage bstack
+    If Not oldkillvars Then PopStage bstack ': bstack.UseGroupname = buser
     Exit Sub
     End If
 End If
 If ok And Not skip Then Set bstack.lastobj = CopyGroupObj(var(where)) Else Set bstack.lastobj = Nothing
 bstack.DropNdot 2
 bstack.nokillvars = oldkillvars
-If Not oldkillvars Then PopStage bstack
+If Not oldkillvars Then
+PopStage bstack ': bstack.UseGroupname = buser
+End If
 End Sub
 Public Sub ProcessOperRemove(first As Group)
 Dim where As Long, W$, ok As Boolean
@@ -35269,7 +35274,11 @@ jumpthere:
                                 bstack.soros.PushObj bstack.lastobj
                                 Set bstack.lastobj = Nothing
                             End If
-                            NeoCall2 bstack, Left$(what$, Len(what$) - 1) + "." + ChrW(&H1FFF) + ":=()", MyInput
+                            If Right$(what$, 1) <> "$" Then
+                                NeoCall2 bstack, what$ + "." + ChrW(&H1FFF) + ":=()", MyInput
+                            Else
+                                NeoCall2 bstack, Left$(what$, Len(what$) - 1) + "." + ChrW(&H1FFF) + ":=()", MyInput
+                            End If
                             Set bstack.Sorosref = mystack
                             Set mystack = Nothing
                         Else
@@ -38884,27 +38893,27 @@ i = 0
     If y1 = 3 Then
         that = vbNullString
         GoTo jumpnow
-    ElseIf IsLabelSymbolNew(what$, "аяихлос", "DECIMAL", Lang, i) Then
+    ElseIf IsLabelSymbolNew(what$, "аяихло", "DECIMAL", Lang, i) Then
     that = CDec(0)
-    ElseIf IsLabelSymbolNew(what$, "дипкос", "DOUBLE", Lang, i) Then
+    ElseIf IsLabelSymbolNew(what$, "дипко", "DOUBLE", Lang, i) Then
     that = 0#
-    ElseIf IsLabelSymbolNew(what$, "апкос", "SINGLE", Lang, i) Then
+    ElseIf IsLabelSymbolNew(what$, "апко", "SINGLE", Lang, i) Then
     that = 0!
-    ElseIf IsLabelSymbolNew(what$, "коцийос", "BOOLEAN", Lang, i) Then
+    ElseIf IsLabelSymbolNew(what$, "коцийо", "BOOLEAN", Lang, i) Then
     that = False
-    ElseIf IsLabelSymbolNew(what$, "лайяус", "LONG", Lang, i) Then
-        If IsLabelSymbolNew(rest$, "лайяус", "LONG", Lang) Then
+    ElseIf IsLabelSymbolNew(what$, "лайяу", "LONG", Lang, i) Then
+        If IsLabelSymbolNew(rest$, "лайяу", "LONG", Lang) Then
             that = cInt64(0)
         Else
             that = 0&
         End If
-    ElseIf IsLabelSymbolNew(what$, "айеяаиос", "INTEGER", Lang, i) Then
+    ElseIf IsLabelSymbolNew(what$, "айеяаио", "INTEGER", Lang, i) Then
     that = 0
-    ElseIf IsLabelSymbolNew(what$, "коцистийос", "CURRENCY", Lang, i) Then
+    ElseIf IsLabelSymbolNew(what$, "коцистийо", "CURRENCY", Lang, i) Then
     that = 0@
     ElseIf IsLabelSymbolNew(what$, "цяалла", "STRING", Lang, i) Then
     that = vbNullString
-    ElseIf IsLabelSymbolNew(what$, "атупос", "VARIANT", Lang, i) Then
+    ElseIf IsLabelSymbolNew(what$, "атупо", "VARIANT", Lang, i) Then
     notypes = True
     that = Empty
     ElseIf IsLabelSymbolNew(what$, "ьгжио", "BYTE", Lang, i) Then
