@@ -2530,7 +2530,11 @@ Module RationalNumbers {
             }
             class:
             Module Rational (.numerator, .denominator) {
-                  if .denominator=0 then Error "Zero denominator"
+                  if .denominator=0 then .denominator<=1
+                  while frac(.numerator)<>0 {
+                        .numerator*=10@
+                        .denominator*=10@
+                  }
                   sgn=Sgn(.numerator)*Sgn(.denominator)
                   .denominator<=abs(.denominator)
                   .numerator<=abs(.numerator)*sgn
@@ -5674,7 +5678,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 54 for M2000 Interpreter version 12, revision 19 and above"
+	Report " A collection of modules for tests version 55 for M2000 Interpreter version 12, revision 19 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -42608,5 +42612,77 @@ MODULE DOT {Module dot_product {
       Print result=3, type$(result)="Long Long"     
 }
 Module dot_product
+}
+MODULE STRLEN {module  String_length {
+	A$=format$("J\u0332o\u0332s\u0332e\u0301\u0332")
+	Print Len(A$) = 9  ' true Utf-16LE
+	Print Len.Disp(A$) = 4 \\ display length
+	Buffer Clear Mem as Byte*100
+	\\ Write at memory at offset 0 or address Mem(0)
+	Return Mem, 0:=A$
+	Print Eval$(Mem, 0, 18)
+	For i=0 to 17 step 2
+	      \\ print hex value and character
+	      Hex Eval(Mem, i as integer), ChrCode$(Eval(Mem, i as integer))
+	Next i
+	Document B$=A$
+	\\ encode to utf-8 with BOM (3 bytes 0xEF,0xBB,0xBF)
+	Save.Doc B$, "Checklen.doc", 2
+	Print Filelen("Checklen.doc")=17
+	\\ So length is 14 bytes + 3 the BOM
+	Mem=Buffer("Checklen.doc")
+	Print len(Mem)=17 // len works for buffers too - unit byte
+	// version 12 can handle strings without suffix $
+	C=eval$(mem, 3, 14) // from 4th byte get 14 bytes in a string
+	Print len(C)*2=14 ' bytes   // len()) for strings return double type of words (can return 0.5)
+	C=string$(C as utf8dec) ' decode bytes from utf8 to utf16LE
+	Print len(C)=9, C=A$, Len.Disp(C)=4
+	Print C
+	Report 2, C  // proportional print on console - for text center justified rendering (2 - center)
+}
+String_length
+}
+MODULE BIG {if ask("This example use 12 GByte from disk","What to do", "Continue","*Exit")=1 else exit
+buffer clear alfa as byte*12*1024*1024
+const filename="giant"
+const rJustNonProp=3
+const columnwidth=14
+const what="This is a big file"
+string ReadWhat
+// you can press Esc (automatic close all files, with last statement)
+R=random(1, 2)
+Try ok {
+	If R=1 then
+		open filename for output exclusive as #f
+	else
+		open filename for wide output exclusive as #f
+	end if
+	for i=1 to 1024
+	m=seek(#f)
+	put #f, alfa, m
+	print over $(rJustNonProp, columnwidth), m, str$(i/1024,"#.0%"), records(#f)
+	refresh
+	next
+	Z=seek(#f)
+	print #f, what
+	close #f
+	print
+	print filelen(filename)
+	if R=1 then
+		open filename for input exclusive as #f
+	else
+		open filename for wide input exclusive as #f
+	end if
+	print records(#f)
+	seek #f, z
+	line input #f, ReadWhat
+	close #f
+	print ReadWhat
+}
+close
+if exist(filename) else exit
+if ask("Delete file from disk ?","What to do", "*Yes","No")=1 then
+	dos "del "+quote$(dir$+filename), 200;
+end if
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

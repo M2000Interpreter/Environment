@@ -25685,7 +25685,15 @@ If FastSymbol(rest$, "#") Then
     If Not FastSymbol(rest$, ",") Then Exit Function
     f = CLng(p)
     Select Case Abs(IsLabel(bstack, rest$, what$))
+    Case 1
+        If GetVar(bstack, what$, i) Then
+            If MemInt(VarPtr(var(i))) = vbString Then GoTo haveit
+            MyEr "Missing Strung Type", "Δεν βρήκα τύπο ΓΡΑΜΜΑ": Exit Function
+        Else
+            GoTo haveit
+        End If
     Case 3
+haveit:
     MyLineInput = True
     If uni(f) Then
     If Not getUniStringlINE(f, s$) Then MyLineInput = False: MyEr "Can't input, not UTF16LE", "Δεν μπορώ να εισάγω, όχι UTF16LE": Exit Function
@@ -25697,7 +25705,7 @@ If FastSymbol(rest$, "#") Then
     Else
     globalvar what$, s$
     End If
-    Case 6
+    Case 6, 5
     If neoGetArray(bstack, what$, pppp) Then
 
     If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then Exit Function

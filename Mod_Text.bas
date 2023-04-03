@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 23
+Global Const Revision = 24
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5940,7 +5940,7 @@ againoper:
                             Else
                                 If (TypeOf bstack.lastobj Is Group) And (TypeOf park Is Group) Then
                                     ProcessOper bstack, park, ss$, R, 1
-                                    MUL = 1  ' why: used from MID$()
+                                    MUL = 0 ' not used  old: 1  ' why: used from MID$()
                                     GoTo cont4567
                                 Else
                                     MissingGroup
@@ -6166,7 +6166,7 @@ cont4567:
                                      Set park = Nothing
                                     Exit Function
                                 End If
-                                
+                                ' maybe here a MUL=0
                             End If
                             po = 1
                             If Not bstack.lastobj Is Nothing Then GoTo again2
