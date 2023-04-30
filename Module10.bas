@@ -3424,7 +3424,9 @@ here66678:
 '*********************************************
     With ppppAny
         If ppppAny.Final Then CantAssignValue: GoTo err000
-        If MyIsObject(.item(v)) Then
+        If Not .Arr Then
+            ' continue ...
+        ElseIf MyIsObject(.item(v)) Then
             If v = -2 Then
                 Set myobject = .item(v)
                 If myobject.HasParametersSet Then
@@ -3529,7 +3531,7 @@ a1297654:
     Set pppp = ppppAny
     With pppp
         If FastSymbol(b$, ":=", , 2) Then
-    
+            If Not .Arr Then GoTo NotArray1
     ' new on rev 20
 contassignhere:
             If GetData(bstack, b$, myobject) Then
@@ -3984,7 +3986,7 @@ MakeArray bstack, W$, 6, b$, pppp, NewStat, VarStat
  'If Not lookone(b$, ",") Then b$ = " :" + b$
         sss = Len(b$): ExecuteVar = 4: Exit Function
 End If
-If neoGetArray(bstack, W$, ppppAny) Then
+If neoGetArray(bstack, W$, ppppAny, , , , True) Then
     If Not ppppAny.Arr Then
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , , idx) Then GoTo err000
 GoTo there12567
@@ -4130,33 +4132,30 @@ PushParamGeneral bstack, b$
                                 Set myobject = Nothing
                                 SyntaxError
                                 GoTo err000
-ElseIf v < 0 Then
-    WrongOperator
-    GoTo err000
+
 ElseIf Not FastSymbol(b$, "=") Then
     If Not TypeOf ppppAny Is mArray Then
         WrongObject
         GoTo err000
     End If
     Set pppp = ppppAny
-  If FastSymbol(b$, ":=", , 2) Then
-  
-       GoTo contassignhere
-  
-    ElseIf IsOperator(b$, "+=", 2) Then
-    
-    If pppp.IsStringItem(v) Then
-    If Not IsStrExp(bstack, b$, ss$, False) Then GoTo err000
-    If bstack.lastobj Is Nothing Then
-        pppp.ItemStr(v) = pppp.item(v) + ss$
-    Else
-        NeedString
-        GoTo err000
+    If pppp.Arr Then
+        If FastSymbol(b$, ":=", , 2) Then GoTo contassignhere
     End If
-    Else
+    
+  If IsOperator(b$, "+=", 2) Then
+        If pppp.IsStringItem(v) Then
+            If Not IsStrExp(bstack, b$, ss$, False) Then GoTo err000
+            If bstack.lastobj Is Nothing Then
+                pppp.ItemStr(v) = pppp.item(v) + ss$
+            Else
+                NeedString
+                GoTo err000
+            End If
+        Else
             FoundNoStringItem
             GoTo err000
-    End If
+        End If
     ElseIf IsOperator(b$, "(") Then
         If pppp.ItemType(v) = myArray Then
             Set pppp = pppp.item(v)

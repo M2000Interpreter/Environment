@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 24
+Global Const Revision = 25
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -21275,12 +21275,6 @@ RepPara = True
         If Not IsExp(basestack, rest$, YY) Then
         Err.Clear
         On Error Resume Next
-            y = CLng(YY)
-            If Err Then
-            Overflow
-            RepPara = False
-            Exit Function
-            End If
             ' new mode
             x1 = Abs(IsLabel(basestack, rest$, what$))
             If x1 = 3 Then
@@ -21380,6 +21374,14 @@ RepPara = True
             Exit Function
             
         Else
+                Err.Clear
+        On Error Resume Next
+            y = CLng(YY)
+            If Err Then
+            Overflow
+            RepPara = False
+            Exit Function
+            End If
          If FastSymbol(rest$, ",") Then
                     If IsExp(basestack, rest$, X) Then
                         X = Int(X)
@@ -23222,7 +23224,11 @@ Else
 checkforglobal:
             If TypeOf var(k) Is mHandler Then
                 If var(k).t1 < 3 Then
+                        If rightexpression Then
+                        Set ga = New mArray
+                        Else
                         Set ga = New ppppLight
+                        End If
                         Set ga.GroupRef = var(k)
 
                         ga.Arr = False
@@ -24246,6 +24252,7 @@ Else
     logical = True
 End If
 Else
+comehere:
 If Not IsNumber(basestack, s$, D, flatobject, sg) Then
     Set basestack.lastobj = Nothing
     If LastErNum1 < 0 Then Exit Function
@@ -24258,12 +24265,18 @@ If par > 0 Then
 If Not GetArr(basestack, s$, D, s2$, 0) Then
     Set basestack.lastobj = Nothing
 Else
+    
     If Len(s$) > 0 Then
     If AscW(s$) = 8 Then
+    
     par = par - 1
-    ' what ????
-    ByPass = True
-    GoTo again11
+    If basestack.lastobj Is Nothing Then
+        If basestack.soros.StackItemType(1) = "S" Then GoTo 123456
+        GoTo comehere
+    Else
+        ByPass = True
+        GoTo again11
+    End If
    End If
     End If
     logical = True
@@ -24274,9 +24287,26 @@ par = par - 1
 End If
 Exit Function
 Else
+If AscW(s$) = 8 Then
+123456
+If IsString(basestack, s$, b$) Then
+s$ = NLtrim$(s$)
+If Len(s$) > 0 Then
+If InStr("<=>~", Left$(s$, 1)) > 0 Then
+GoTo conthere
+End If
+End If
+
+D = vbNullString
+SwapString2Variant b$, D
+logical = True
+End If
+Else
 logical = False
 End If
 End If
+End If
+12345
 If nostring Then If myVarType(D, vbString) Then GoTo jumpnostr1
 s$ = NLtrim$(s$)
 Exit Function
@@ -27881,7 +27911,7 @@ Dim ar As refArray
                         If TypeOf myobject Is mHandler Then
                         If CheckIsmArray(myobject) Then
                             Set var(varhash.lastNDX) = myobject
-                            var(varhash.lastNDX).common = pppp.common
+                            var(varhash.lastNDX).common = ppppAny.common
                             Else
                                   NotArray
                                   Exit Function
@@ -33940,7 +33970,9 @@ err222:
     Loop Until Not NocharsInLine(b$) Or b$ = vbNullString
     End If
 cont147:
+    If MaybeIsSymbol(b$, "{") Then GoTo a192929
     Loop Until Not Between(FastPureLabel(b$, what$), 1, 3, 2)
+a192929:
     If maxOffset < Offset Then
         offset2 = Offset
     Else

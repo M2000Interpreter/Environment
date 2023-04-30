@@ -21346,8 +21346,9 @@ useArray:
                                             mm.StartResize
                                             mm.PushDim y1, (0)
                                             mm.PushEnd
-                                            mm.ExportArrayNow
-                                            pppp.SortColumns mm.refArray
+                                            
+                                            'mm.ExportArrayNow
+                                            pppp.SortColumns mm.ExportArrayCopy
                                   Else
                                             If IsExp(basestack, rest$, p) Then
                                                 x1 = p
@@ -22416,9 +22417,10 @@ End Sub
 
 Function MyModules(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim frm$, s$, pa$, ss$, mDir As recDir, showlocal As Boolean, i As Long, Filter$, filter2$
+Dim A() As String, aa() As String
 showlocal = FastSymbol(rest$, "?")
 LastErNum = 0
-If IsStrExp(bstack, rest$, Filter$, False) Then
+ If IsStrExp(bstack, rest$, Filter$, False) Then
 Filter$ = myUcase(Filter$, True)
 If Left$(Filter$, 1) <> "*" Then Filter$ = Filter$ + "*"
 If FastSymbol(rest$, ",") Then
@@ -22441,6 +22443,19 @@ Do While ISSTRINGA(frm$, s$)
 If pa$ <> "" Then
     If InStrRev(s$, ") ") > 0 Then
     ss$ = FixName(Left$(s$, InStrRev(s$, ")")))
+        If SecureNames Then
+            A() = Split(ss$, "».")
+            If UBound(A()) = 1 Then
+                A(0) = GetName(A(0))
+                s$ = Join(A(), ".")
+            End If
+            aa() = Split(ss$, "›.")
+            If UBound(aa()) = 1 Then
+            aa(0) = sbf(val(Mid$(aa(0), 2))).goodname
+            ss$ = Join(aa(), ".")
+            End If
+            
+        End If
     If Len(Filter$) > 0 Then
     If ss$ Like Filter$ Then
         If Len(filter2$) > 0 Then
@@ -22456,6 +22471,21 @@ If pa$ <> "" Then
     End If
     ElseIf InStrRev(s$, " ") > 0 Then
     ss$ = FixName(Left$(s$, InStrRev(s$, " ") - 1))
+    If SecureNames Then
+            A() = Split(ss$, "».")
+            If UBound(A()) = 1 Then
+                A(0) = GetName(A(0))
+                s$ = Join(A(), ".")
+            End If
+            aa() = Split(ss$, "›.")
+            If UBound(aa()) = 1 Then
+            aa(0) = sbf(val(Mid$(aa(0), 2))).goodname
+            ss$ = Join(aa(), ".")
+            End If
+            
+        End If
+    
+    
     If Len(Filter$) > 0 Then
         If ss$ Like Filter$ Then
             If Len(filter2$) > 0 Then
@@ -32145,12 +32175,12 @@ funcoperator:
                                     sbf(i).sb = ss$
                                 End If
                                 Set sbf(i).subs = Nothing
+                                sbf(i).locked = Final
                             End If
-                            sbf(i).locked = Final
                             GoTo continuehere22
                         End If
-                        MyEr "group struct error1", "προβλημα στη δομή1"
-                        ExecuteGroupStruct = 0: Exit Function
+                        Rem MyEr "group struct error1", "προβλημα στη δομή1"
+                        Rem ExecuteGroupStruct = 0: Exit Function
                     End If
                 End If
             End If
@@ -32286,48 +32316,47 @@ BYPASS3:
      
 
 Case "MODULE", "ΤΜΗΜΑ"
-If IsLabelSymbolNew(rest$, "ΓΕΝΙΚΗ", "GLOBAL", Lang) Then
-MyEr "GLOBAL can't be used in a Group", "Η συνάρτηση στην ομάδα δεν μπορεί να είναι γενική"
-ExecuteGroupStruct = 0
-Exit Function
-End If
-Final = IsLabelSymbolNew(rest$, "ΤΕΛΙΚΟ", "FINAL", Lang)
-x1 = Abs(IsLabelF(rest$, f$))
-    If prv Then f$ = ChrW(&HFFBF) + f$
-If x1 <> 0 Then
-  If ThisGroup.FuncList <> "" And Not alocal Then  ' maybe we have it
-  If InStr(ThisGroup.FuncList, Chr$(3) + f$ + " ") > 0 Then
-    If FastSymbol(rest$, "(") Then
-        frm$ = BlockParam(rest$)
-        If frm$ <> "" Then Mid$(rest$, 1, Len(frm$)) = space$(Len(frm$)) ': If InStr(frm$, "=") > 0 Then frm$ = "? " + frm$
-        If Not FastSymbol(rest$, ")") Then
-        End If
-        frm$ = Trim$(frm$)
-    Else
-        frm$ = vbNullString
+    If IsLabelSymbolNew(rest$, "ΓΕΝΙΚΗ", "GLOBAL", Lang) Then
+        MyEr "GLOBAL can't be used in a Group", "Η συνάρτηση στην ομάδα δεν μπορεί να είναι γενική"
+        ExecuteGroupStruct = 0
+        Exit Function
     End If
+    Final = IsLabelSymbolNew(rest$, "ΤΕΛΙΚΟ", "FINAL", Lang)
+    x1 = Abs(IsLabelF(rest$, f$))
+    If prv Then f$ = ChrW(&HFFBF) + f$
+    If x1 <> 0 Then
+        If ThisGroup.FuncList <> "" And Not alocal Then  ' maybe we have it
+            If InStr(ThisGroup.FuncList, Chr$(3) + f$ + " ") > 0 Then
+                If FastSymbol(rest$, "(") Then
+                    frm$ = BlockParam(rest$)
+                    If frm$ <> "" Then Mid$(rest$, 1, Len(frm$)) = space$(Len(frm$)) ': If InStr(frm$, "=") > 0 Then frm$ = "? " + frm$
+                    If Not FastSymbol(rest$, ")") Then
+                    End If
+                    frm$ = Trim$(frm$)
+                Else
+                    frm$ = vbNullString
+                End If
   
-      IsSymbol3 rest$, "{"
-    ss$ = block(rest$)
-  '  If Right$(ss$, 2) <> vbCrLf Then ss$ = ss$ + vbCrLf
-    If FastSymbol(rest$, "}") Then
-             If GetSub(bstack.GroupName + f$, i) Then
-                           bstack.IndexSub = i
-                          If sbf(bstack.IndexSub).locked Then
-                          Else
-                          If frm$ <> "" Then
-                            If Lang = 1 Then
-                                sbf(i).sb = "READ " + frm$ + vbCrLf + ss$
+                IsSymbol3 rest$, "{"
+                ss$ = block(rest$)
+                If FastSymbol(rest$, "}") Then
+                    If GetSub(bstack.GroupName + f$, i) Then
+                        bstack.IndexSub = i
+                        If Not sbf(bstack.IndexSub).locked Then
+                            If frm$ <> "" Then
+                              If Lang = 1 Then
+                                  sbf(i).sb = "READ " + frm$ + vbCrLf + ss$
+                              Else
+                                  sbf(i).sb = "ΔΙΑΒΑΣΕ " + frm$ + vbCrLf + ss$
+                              End If
                             Else
-                                sbf(i).sb = "ΔΙΑΒΑΣΕ " + frm$ + vbCrLf + ss$
+                                sbf(i).sb = ss$
                             End If
-                          Else
-                          sbf(i).sb = ss$
-                          End If
-                          End If
-                          Set sbf(i).subs = Nothing
-                          GoTo continuehere22 'there12345
-                          End If
+                            Set sbf(i).subs = Nothing
+                            sbf(i).locked = Final
+                        End If
+                        GoTo continuehere22 'there12345
+                    End If
 
 
  

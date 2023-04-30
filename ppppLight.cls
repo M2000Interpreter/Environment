@@ -14,7 +14,7 @@ Attribute VB_Exposed = True
 Implements iBoxArray
 Option Explicit
 Public refgroup As Object, GroupRef As Object, Arr As Boolean, IhaveClass As Boolean, CodeName As String
-Public Final As Boolean
+Public Final As Boolean, common As Boolean
 Private ndnum As Long, dnum As Long
 Private actualData As Variant
 Public Property Set item(curitem As Long, item As Variant)
@@ -281,4 +281,11 @@ End Property
 
 Private Property Get iBoxArray_refgroup() As Object
 Set iBoxArray_refgroup = refgroup
+End Property
+Private Property Let iBoxArray_common(ByVal RHS As Boolean)
+common = RHS
+End Property
+
+Private Property Get iBoxArray_common() As Boolean
+iBoxArray_common = common
 End Property

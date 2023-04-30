@@ -85,6 +85,14 @@ End Property
 Public Property Let Final(ByVal vNewValue As Boolean)
 
 End Property
+
+Public Property Get common() As Boolean
+
+End Property
+
+Public Property Let common(ByVal vNewValue As Boolean)
+
+End Property
 Public Sub PushDim(nDim As Long, Optional limBase As Variant)
 
 End Sub

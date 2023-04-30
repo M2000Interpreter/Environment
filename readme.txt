@@ -1,44 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 24 active-X
-1. Fix a bug introduced on latest revisions, which prevent the gates AND/OR/XOR to operate after the use of programmable logic operator on groups:
-class AType {
-private:
-	x=1
-public:
-	operator "<=" (z as Atype) {
-		push .x<=z.x
-	}
-class:
-	module Atype(.x) {
-	}
-}
-B=Atype(1)
-C=Atype(1)
-Print (B <= C) and true  ' now is ok
-Print B <= C and true  ' now is ok
-
-2. Fix LINE INPUT to work with string variables without suffix $ (also added for arrays without suffix$).
-string buf
-open "d.txt" for output as #F
-	print #F, "123213 123 12 312 3123"
-close #F
-open "d.txt" for input as #F
-	line input #F, buf
-close #F
-print buf="123213 123 12 312 3123"  ' true
-
-dim buf(10) as string
-open "d.txt" for output as #F
-	print #F, "123213 123 12 312 3123"
-close #F
-open "d.txt" for input as #F
-	line input #F, buf(1)
-close #F
-print buf(1)="123213 123 12 312 3123" ' true
-
-
-3. More modules in info.gsb: STRLEN, BIG
+Version 12 Revision 25 active-X
+A great number of corrections when M2000paper.pdf updated for version 12.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

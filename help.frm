@@ -67,7 +67,7 @@ Private jump As Boolean
  Dim scrTwips As Long
 
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
-Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
+Dim lX As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long
 Dim UAddPixelsTop As Long, flagmarkout As Boolean
@@ -174,25 +174,25 @@ End If
 End If
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
 
 If Button = 1 Then
     
     If Helplastfactor = 0 Then Helplastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
+    If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then
     dr = True
-    mousepointer = vbSizeNWSE
-    Lx = x
+    MousePointer = vbSizeNWSE
+    lX = X
     lY = y
     End If
     
     Else
-    If (x > Width - borderleft And x < Width) Or (y > Height - bordertop) Then  ' (y > Height - bordertop And y < Height) And
+    If (X > Width - borderleft And X < Width) Or (y > Height - bordertop) Then  ' (y > Height - bordertop And y < Height) And
     dr = True
-    mousepointer = vbSizeNWSE
-    Lx = x
+    MousePointer = vbSizeNWSE
+    lX = X
     lY = y
     End If
     End If
@@ -200,14 +200,14 @@ If Button = 1 Then
 End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (y > Height - bordertop And y < Height) And (X > Width - borderleft And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
 End If
 If dr Then
 
@@ -216,11 +216,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - lY)
-     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
+     If X < (Width - 150) Or X > Width Then addX = (X - lX)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
-        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
+        If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
     End If
     
 
@@ -249,10 +249,10 @@ Else
         
         If Helplastfactor <> factor Then ScaleDialog Helplastfactor, Width
 
-        Lx = x
+        lX = X
         
         Else
-        Lx = x * Helplastfactor / factor
+        lX = X * Helplastfactor / factor
              ScaleDialog Helplastfactor, (Width + addX) * Helplastfactor / factor
          
    
@@ -266,16 +266,16 @@ Else
         lY = lY * Helplastfactor / factor
         End If
         Else
-        Lx = x
+        lX = X
         lY = y
    
 End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, y As Single)
 
-If dr Then Me.mousepointer = 0
+If dr Then Me.MousePointer = 0
 dr = False
 End Sub
 
@@ -289,22 +289,22 @@ Private Sub Form_Terminate()
 ''''Set HelpStack.Owner = Nothing
 End Sub
 
-Private Sub ffhelp(a$)
-If a$ = "цемийа" Then a$ = "ока"
-If a$ = "GENERAL" Then a$ = "ALL"
-If Left$(a$, 1) = "#" Then
-If Mid$(a$, 2) < "а" Then
-fHelp Basestack1, a$, True
+Private Sub ffhelp(A$)
+If A$ = "цемийа" Then A$ = "ока"
+If A$ = "GENERAL" Then A$ = "ALL"
+If Left$(A$, 1) = "#" Then
+If Mid$(A$, 2) < "а" Then
+fHelp Basestack1, A$, True
 Else
-fHelp Basestack1, a$
+fHelp Basestack1, A$
 End If
 
 Else
 
-If Left$(a$, 1) < "а" Then
-fHelp Basestack1, a$, True
+If Left$(A$, 1) < "а" Then
+fHelp Basestack1, A$, True
 Else
-fHelp Basestack1, a$
+fHelp Basestack1, A$
 End If
 End If
 End Sub
@@ -318,23 +318,23 @@ helpSizeDialog = 1
 Form4Loaded = False
 End Sub
 
-Private Sub glist1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub glist1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
 If item = -1 Then
-If gList1.DoubleClickCheck(Button, item, x, y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor, -1) Then
+If gList1.DoubleClickCheck(Button, item, X, y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor, -1) Then
             HelpLastWidth = -1
             Unload Me
 End If
 Else
-gList1.mousepointer = 1
+gList1.MousePointer = 1
 End If
 End Sub
 
 
-Private Sub glist1_getpair(a As String, b As String)
+Private Sub glist1_getpair(A As String, b As String)
 If mHelp Or abt Then
 gList1.EditFlag = False
-    MKEY$ = MKEY$ & a
-    a = vbNullString
+    MKEY$ = MKEY$ & A
+    A = vbNullString
 End If
 End Sub
 
@@ -366,15 +366,15 @@ flagmarkout = False: Exit Sub
 End If
 End Sub
 
-Private Sub gList1_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub gList1_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
 flagmarkout = True
 If mHelp Then
 shift = 0
 End If
 End Sub
 
-Private Sub gList1_MouseUp(x As Single, y As Single)
-If gList1.DoubleClickArea(x, y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor) Then
+Private Sub gList1_MouseUp(X As Single, y As Single)
+If gList1.DoubleClickArea(X, y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor) Then
             HelpLastWidth = -1
             Unload Me
             End If
@@ -420,45 +420,45 @@ ThisWord = vbNullString
 
 End Sub
 Public Sub FillThereMyVersion2(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim a As RECT, b As Long
+Dim A As RECT, b As Long
 b = setupxy / 3
 
-CopyFromLParamToRect a, thatRect
-a.Right = a.Right - b
-a.Left = a.Right - setupxy - b
-a.top = b
-a.Bottom = b + setupxy / 5
-FillThere thathDC, VarPtr(a), thatbgcolor
-a.top = b + setupxy / 5 + setupxy / 10
-a.Bottom = b + setupxy \ 2
-FillThere thathDC, VarPtr(a), thatbgcolor
-a.top = b + 2 * (setupxy / 5 + setupxy / 10)
-a.Bottom = a.top + setupxy / 5
-FillThere thathDC, VarPtr(a), thatbgcolor
+CopyFromLParamToRect A, thatRect
+A.Right = A.Right - b
+A.Left = A.Right - setupxy - b
+A.top = b
+A.Bottom = b + setupxy / 5
+FillThere thathDC, VarPtr(A), thatbgcolor
+A.top = b + setupxy / 5 + setupxy / 10
+A.Bottom = b + setupxy \ 2
+FillThere thathDC, VarPtr(A), thatbgcolor
+A.top = b + 2 * (setupxy / 5 + setupxy / 10)
+A.Bottom = A.top + setupxy / 5
+FillThere thathDC, VarPtr(A), thatbgcolor
 
 End Sub
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim a As RECT, b As Long
+Dim A As RECT, b As Long
 b = 2
-CopyFromLParamToRect a, thatRect
-a.Left = a.Right - b
-a.Right = a.Right - setupxy + b
-a.top = b
-a.Bottom = setupxy - b
-FillThere thathDC, VarPtr(a), gList1.dcolor
+CopyFromLParamToRect A, thatRect
+A.Left = A.Right - b
+A.Right = A.Right - setupxy + b
+A.top = b
+A.Bottom = setupxy - b
+FillThere thathDC, VarPtr(A), gList1.dcolor
 b = 5
-a.Left = a.Left - 3
-a.Right = a.Right + 3
-a.top = b
-a.Bottom = setupxy - b
-FillThere thathDC, VarPtr(a), gList1.CapColor
+A.Left = A.Left - 3
+A.Right = A.Right + 3
+A.top = b
+A.Bottom = setupxy - b
+FillThere thathDC, VarPtr(A), gList1.CapColor
 
 
 End Sub
 Public Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim a As RECT
-CopyFromLParamToRect a, thatRect
-FillBack thathDC, a, thatbgcolor
+Dim A As RECT
+CopyFromLParamToRect A, thatRect
+FillBack thathDC, A, thatbgcolor
 End Sub
 Private Sub FillBack(thathDC As Long, there As RECT, bgcolor As Long)
 ' create brush
@@ -481,7 +481,7 @@ factor = gList1.FontSize / 14.25 / dv15 * 15
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
-Dim h As Long, i As Long
+Dim H As Long, i As Long
 Helplastfactor = factor
 setupxy = 20 * factor
 bordertop = 10 * dv15 * factor

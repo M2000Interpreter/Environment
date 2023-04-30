@@ -2413,207 +2413,206 @@ MODULE RAT {Report {
 	We can make arrays of rational numbers
 }
 Module RationalNumbers {
-      Class Rational {
-            numerator as decimal, denominator as decimal
-            gcd=lambda->0
-            lcm=lambda->0
-            operator "+" {
-                 Read l
-                 denom=.lcm(l.denominator, .denominator)
-                 .numerator<=denom/l.denominator*l.numerator+denom/.denominator*.numerator
-                 if .numerator==0 then denom=1
-                 .denominator<=denom
-            }
-            Operator Unary {
-                  .numerator-!
-            }
-            Operator "-" {
-                  Read l
-                  Call Operator "+", -l
-            }
-            Operator high "*" {
-                  Read l
-                  g1=.gcd(l.numerator,.denominator)
-                  g2=.gcd(.numerator, l.denominator)
-                  Push l.numerator/g1*.numerator/g2
-                  Push l.denominator/g2*.denominator/g1
-                  Read .denominator, .numerator
+Class Rational {
+	numerator as decimal, denominator as decimal
+	gcd=lambda->0
+	lcm=lambda->0
+	operator "+" {
+		Read l
+		denom=.lcm(l.denominator, .denominator)
+		.numerator<=denom/l.denominator*l.numerator+denom/.denominator*.numerator
+		if .numerator==0 then denom=1
+		.denominator<=denom
+	}
+	Operator Unary {
+		.numerator-!
+	}
+	Operator "-" {
+		Read l
+		Call Operator "+", -l
+	}
+	Operator high "*" {
+		Read l
+		g1=.gcd(l.numerator,.denominator)
+		g2=.gcd(.numerator, l.denominator)
+		Push l.numerator/g1*.numerator/g2
+		Push l.denominator/g2*.denominator/g1
+		Read .denominator, .numerator
+	}
+	Function Inverse {
+		if .numerator==0 then Error "Division by zero"
+		ret=This
+		sign=Sgn(ret.numerator) : if sign<0 then ret.numerator-!
+		swap ret.numerator, ret.denominator
+		if sign<0 then ret.numerator-!
+		=ret
+	}
+	Operator high"/" {
+		Read l
+		call operator "*", l.inverse()
+	}
+	Function Power {
+		Read pow as long
+		ret=This
+		ret.numerator<=.numerator^pow
+		ret.denominator<=.denominator^pow
+		=ret
+	}
+	Operator "=" {
+		Read l
+		Boolean T=True, F=False
+		if Abs(Sgn(l.numerator))+Abs(Sgn(.numerator))=0 then Push T: exit
+		if Sgn(l.numerator) <>Sgn(.numerator) then Push F : exit
+		pcomp=l/this
+		Push pcomp.numerator=1 and pcomp.denominator=1
+	}
+	Operator  ">" {
+		Read l
+		Boolean F
+		if Abs(Sgn(l.numerator))+Abs(Sgn(.numerator))=0 then Push F: exit
+		if Sgn(l.numerator)=0 then {
+			Push .numerator>0
+		} Else {
+			pcomp=this/l
+			Push pcomp.real>1
+		}
+	}
+	Operator ">=" {
+		Read l
+		if Sgn(l.numerator)=0 then {
+			Push .numerator>=0
+		} Else {
+			pcomp=this/l
+			Push pcomp.real>=1
+		}
+	}      
+	Operator "<" {
+		Read l
+		Boolean F
+		if Abs(Sgn(l.numerator))+Abs(Sgn(.numerator))=0 then Push F: exit
+		if Sgn(l.numerator)=0 then {
+			Push .numerator<0
+		} Else {
+			pcomp=this/l
+			Push pcomp.real<1
+		}
+	}
+	Operator "<=" {
+		Read l
+		if Sgn(l.numerator)=0 then {
+			Push .numerator<=0
+		} Else {
+			pcomp=this/l
+			Push pcomp.real<=1
+		}            
+	}
+	Operator "<>" {
+		Read l
+		if Sgn(l.numerator)=0 then {
+			Push .numerator<>0
+		} Else {
+			pcomp=this/l
+			Push pcomp.real<>1
+		}            
+	}
+	Group Real {
+		value {
+			link parent numerator, denominator to n, d
+			=n/d
+		}
+	}
+	Group ToString$ {
+		value {
+			link parent numerator, denominator to n, d
+			=Str$(n)+"/"+Str$(d,"")
+		}      
+	}
+class:
+	Module Rational (.numerator, .denominator) {
+		if .denominator=0 then .denominator<=1
+		while frac(.numerator)<>0 {
+			.numerator*=10@
+			.denominator*=10@
+		}
+		sgn=Sgn(.numerator)*Sgn(.denominator)
+		.denominator<=abs(.denominator)
+		.numerator<=abs(.numerator)*sgn
+		gcd1=lambda (a as decimal, b as decimal) -> {
+			if a<b then swap a,b
+			g=a mod b
+			while g {
+				a=b:b=g: g=a mod b
+			}
+			=abs(b)
+		}
+		gdcval=gcd1(abs(.numerator), .denominator)
+		if gdcval<.denominator and gdcval<>0 then
+			.denominator/=gdcval
+			.numerator/=gdcval
+		end if
+		.gcd<=gcd1
+		.lcm<=lambda gcd=gcd1 (a as decimal, b as decimal) -> {
+		=a/gcd(a,b)*b
+		}
+	}
+}
+Print rational(-3,3)<>rational(-3,3)  ' false
+M=Rational(10, 150)
+N=Rational(2, 4)
+Print "M.real+N.real=";M.real+N.real
+Print "Z=M+N"
+Z=M+N
+Print 10/150@+2/4@
+Print "Z.real="; Z.real
+Print "(";M.numerator;"/"; M.denominator;") + (";N.numerator;"/"; N.denominator;") = (";Z.numerator;"/";Z.denominator;")"
+Print M.tostring$+ " +"+N.tostring$+" ="+Z.tostring$
+Print -10/150@+2/4@
+Z=-M+N
+Print "-"+M.tostring$+ " +"+N.tostring$+" ="+Z.tostring$
+Print Z.numerator, Z.denominator, Z.numerator/Z.denominator
+Print -10/150@+2/4@
+Print Z.real
+Z=M-N
+Print Z.numerator, Z.denominator
+Print 10/150@-2/4@
+Print Z.real
+Z=M*N
+Print Z.numerator, Z.denominator
+Print (10/150@)*(2/4@)
+Print Z.real
+Z=M/N
+Print Z.numerator, Z.denominator
+Print (10/150@)/(2/4@)
+Print z.tostring$
+Print Z.real
+Print "Z power 2 = ";
 
-            }
-            Function Inverse {
-                  if .numerator==0 then Error "Division by zero"
-                  ret=This
-                  sign=Sgn(ret.numerator) : if sign<0 then ret.numerator-!
-                  swap ret.numerator, ret.denominator
-                  if sign<0 then ret.numerator-!
-                  =ret
-            }
-            Operator high"/" {
-                  Read l
-                  call operator "*", l.inverse()
-            }
-            Function Power {
-                  Read pow as long
-                  ret=This
-                  ret.numerator<=.numerator^pow
-                  ret.denominator<=.denominator^pow
-                  =ret
-            }
-            Operator "=" {
-                  Read l
-                  Def boolean T=True, F=False
-                  if Abs(Sgn(l.numerator))+Abs(Sgn(.numerator))=0 then Push T: exit
-                  if Sgn(l.numerator) <>Sgn(.numerator) then Push F : exit
-                  pcomp=l/this
-                  PUSH pcomp.numerator=1 and pcomp.denominator=1
-            }
-            Operator  ">" {
-                  Read l
-                  Def boolean F
-                  if Abs(Sgn(l.numerator))+Abs(Sgn(.numerator))=0 then Push F: exit
-                  if Sgn(l.numerator)=0 then {
-                        PUSH .numerator>0
-                  } Else {
-                        pcomp=this/l
-                        PUSH pcomp.real>1
-                  }
-            }
-            Operator ">=" {
-                  Read l
-                  if Sgn(l.numerator)=0 then {
-                        PUSH .numerator>=0
-                  } Else {
-                        pcomp=this/l
-                        PUSH pcomp.real>=1
-                  }
-            }      
-            Operator "<" {
-                  Read l
-                  Def boolean F
-                  if Abs(Sgn(l.numerator))+Abs(Sgn(.numerator))=0 then Push F: exit
-                  if Sgn(l.numerator)=0 then {
-                        PUSH .numerator<0
-                  } Else {
-                        pcomp=this/l
-                        PUSH pcomp.real<1
-                  }
-            }
-            Operator "<=" {
-                  Read l
-                  if Sgn(l.numerator)=0 then {
-                        PUSH .numerator<=0
-                  } Else {
-                        pcomp=this/l
-                        PUSH pcomp.real<=1
-                  }            
-            }
-            Operator "<>" {
-                  Read l
-                  if Sgn(l.numerator)=0 then {
-                        PUSH .numerator<>0
-                  } Else {
-                        pcomp=this/l
-                        PUSH pcomp.real<>1
-                  }            
-            }
-            Group Real {
-                  value {
-                        link parent numerator, denominator to n, d
-                        =n/d
-                  }
-            }
-            Group ToString$ {
-                 value {
-                        link parent numerator, denominator to n, d
-                        =Str$(n)+"/"+Str$(d,"")
-                  }      
-            }
-            class:
-            Module Rational (.numerator, .denominator) {
-                  if .denominator=0 then .denominator<=1
-                  while frac(.numerator)<>0 {
-                        .numerator*=10@
-                        .denominator*=10@
-                  }
-                  sgn=Sgn(.numerator)*Sgn(.denominator)
-                  .denominator<=abs(.denominator)
-                  .numerator<=abs(.numerator)*sgn
-                  gcd1=lambda (a as decimal, b as decimal) -> {
-                        if a<b then swap a,b
-                        g=a mod b
-                        while g {
-                              a=b:b=g: g=a mod b
-                        }
-                              =abs(b)
-                  }
-                  gdcval=gcd1(abs(.numerator), .denominator)
-                  if gdcval<.denominator and gdcval<>0 then
-                        .denominator/=gdcval
-                        .numerator/=gdcval
-                  end if
-                  .gcd<=gcd1
-                  .lcm<=lambda gcd=gcd1 (a as decimal, b as decimal) -> {
-                        =a/gcd(a,b)*b
-                  }
-            }
-      }
-      Print rational(-3,3)<>rational(-3,3)  ' false
-      M=Rational(10, 150)
-      N=Rational(2, 4)
-      Print "M.real+N.real=";M.real+N.real
-      Print "Z=M+N"
-      Z=M+N
-      Print 10/150@+2/4@
-      Print "Z.real="; Z.real
-      Print "(";M.numerator;"/"; M.denominator;") + (";N.numerator;"/"; N.denominator;") = (";Z.numerator;"/";Z.denominator;")"
-      Print M.tostring$+ " +"+N.tostring$+" ="+Z.tostring$
-      Print -10/150@+2/4@
-      Z=-M+N
-      Print "-"+M.tostring$+ " +"+N.tostring$+" ="+Z.tostring$
-      Print Z.numerator, Z.denominator, Z.numerator/Z.denominator
-      Print -10/150@+2/4@
-      Print Z.real
-      Z=M-N
-      Print Z.numerator, Z.denominator
-      Print 10/150@-2/4@
-      Print Z.real
-      Z=M*N
-      Print Z.numerator, Z.denominator
-      Print (10/150@)*(2/4@)
-      Print Z.real
-      Z=M/N
-      Print Z.numerator, Z.denominator
-      Print (10/150@)/(2/4@)
-      Print z.tostring$
-      Print Z.real
-      Print "Z power 2 = ";
-      
-      Z=Z.Power(2)
-      Print Z.real
-      Print z.tostring$;" = ";eval(z.tostring$)   
-      Print Z=Z
-      Print Z=N, "            SHOULD BE FALSE"  ' false
-      Print Z=-Z , "            SHOULD BE FALSE"  ' false
-      ZZ=-Z
-      Print ZZ=ZZ
-      Print -Z=-Z
-      Print Z.numerator, Z.denominator
-      Print Z.real, Z.tostring$
-      \\ Array of rational numbers
-      Dim K(100)=rational(1,1)
-      M=K(4)+K(3)
-      Print M.real
-      Print K(4).toString$
+Z=Z.Power(2)
+Print Z.real
+Print z.tostring$;" = ";eval(z.tostring$)   
+Print Z=Z
+Print Z=N, "            SHOULD BE FALSE"  ' false
+Print Z=-Z , "            SHOULD BE FALSE"  ' false
+ZZ=-Z
+Print ZZ=ZZ
+Print -Z=-Z
+Print Z.numerator, Z.denominator
+Print Z.real, Z.tostring$
+\\ Array of rational numbers
+Dim K(100)=rational(1,1)
+M=K(4)+K(3)
+Print M.real
+Print K(4).toString$
 
-      pk->(Z)
-      Print pk=>toString$+" +"
-      zzz=k(4)+pk
-      Print zzz.toString$+ " ="+K(4).toString$+" +"+pk=>toString$
-      
-      zzz=Rational(10,1)+Rational(3,1)*Rational(2,1)
-      Print zzz.toString$, zzz.real=16
-      zzz=Rational(10,1)*Rational(3,1)+Rational(2,1)
-      Print zzz.toString$, zzz.real=32
+pk->(Z)
+Print pk=>toString$+" +"
+zzz=k(4)+pk
+Print zzz.toString$+ " ="+K(4).toString$+" +"+pk=>toString$
+
+zzz=Rational(10,1)+Rational(3,1)*Rational(2,1)
+Print zzz.toString$, zzz.real=16
+zzz=Rational(10,1)*Rational(3,1)+Rational(2,1)
+Print zzz.toString$, zzz.real=32
 
 }
 RationalNumbers
@@ -5652,7 +5651,6 @@ window 6, window
 refresh 10000
 linespace 0
 wait 100
-'Form 80, 66
 BackGround {
 	cls 0,0
 	height.pixels=scale.y  div twipsY
@@ -5660,14 +5658,10 @@ BackGround {
 	sx=scale.x
 	sy=scale.y
 }
-if height.pixels=1024 or height.pixels/width.pixels>0.70 then
-      Form  80,68
-else
-	Window 12, Window 
-	// Window 12, sx*.95, sy*.86;
-	BackGround {cls,0 }
-       form 100, height+2;
-  end if
+Window 12, Window 
+BackGround {cls,0 }
+form 100;
+linespace 15
 backcolor=5   'point
 oldpen=14  ' pen
 Pen 0 {
@@ -5678,7 +5672,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 55 for M2000 Interpreter version 12, revision 19 and above"
+	Report " A collection of modules for tests version 57 for M2000 Interpreter version 12, revision 19 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -5695,6 +5689,7 @@ Report {
 	Modules ? "","Print"  (search all loaded modules for those who have Print in any case like PrINt)
 	You can call any module by name, try Info
 	Modules (Show every loaded module, plus files on user folder)
+	*** Use module Caret (write Caret and press enter) to adjust caret blinking timeout
 	}
 Pen 15 {
 	Modules ?
@@ -6610,47 +6605,47 @@ Title "", 0 ' 0  to hide console
 Set FAST !
 \\ by api
 Structure VecType {
-          x As Double
-          y As Double
-          z As Double
+	x As Double
+	y As Double
+	z As Double
 }
 \\ Program
 Structure Variables {
-      vRot1 As VecType
-      vRot2 As VecType
-      vRot3 As VecType
-      vRot4 As VecType
-      vBase As VecType
-      vAxis As VecType
+	vRot1 As VecType
+	vRot2 As VecType
+	vRot3 As VecType
+	vRot4 As VecType
+	vBase As VecType
+	vAxis As VecType
 }
 Buffer Clear Var As Variables
 \\ utility function
 VecAdr=Lambda Var (a$) -> {
-      =Var(0,a$)
+	=Var(0,a$)
 }
 VecOff=Lambda Var, VecType (a$, b$) -> {
-      =Var(0, a$, VecType(b$)!)
+	=Var(0, a$, VecType(b$)!)
 }
 Class cLine {
-      X1, Y1, X2, Y2, color
-      Module Render {
-            ' read Number from stack
-            z=Round(Number,4)
-            z1=Round(Number, 4)
-            If z>=z1 Then {
-                  Move .X1, .Y1
-                  Width 3 {Draw to .X2, .Y2, .color}
-                  Circle Fill #aa33cc, z/40+200
-            } Else {
-                  Move .X2, .Y2
-                  Circle Fill #aa33cc, z/40+200
-                  Width 3 {Draw to .X1, .Y1, .color}
-            }
-      }
+	X1, Y1, X2, Y2, color
+	Module Render {
+		' read Number from stack
+		z=Round(Number,4)
+		z1=Round(Number, 4)
+		If z>=z1 Then {
+			Move .X1, .Y1
+			Width 3 {Draw to .X2, .Y2, .color}
+			Circle Fill #aa33cc, z/40+200
+		} Else {
+			Move .X2, .Y2
+			Circle Fill #aa33cc, z/40+200
+			Width 3 {Draw to .X1, .Y1, .color}
+		}
+	}
 Class:
-      Module cLine (.color){
-            If Match("NNNN") Then Read .X1, .Y1, .X2, .Y2
-      }     
+	Module cLine (.color){
+		If Match("NNNN") Then Read .X1, .Y1, .X2, .Y2
+	}
 }
 
 \\ find address
@@ -6795,31 +6790,31 @@ Layer Alfa {
 State=False
 blinking=False
 Thread {
-       If state Then disp~
+	If state Then disp~
  } As blink
 Thread blink Hold
 ExitNow=False
 Function Alfa.Unload {
-      ExitNow=True
-      threads erase
+	ExitNow=True
+	threads erase
 }
 Function Alfa.Click {
-                  State~
-                  If State Then {
-                         Thread compute Hold
-                         Thread blink interval 1000/4
-                         Thread blink Restart
-                         blinking=true
-                  } Else {
-                        disp=False
-                        If blinking Then Thread blink  Hold : blinking~
-                        Thread compute Restart
-                  }
+	State~
+	If State Then
+		Thread compute Hold
+		Thread blink interval 1000/4
+		Thread blink Restart
+		blinking=true
+	Else
+		disp=False
+		If blinking Then Thread blink  Hold : blinking~
+		Thread compute Restart
+	End If
 }
 if IsWine then
-      Thread PlayThis interval 1000/30
+	Thread PlayThis interval 1000/30
 else
-      Thread PlayThis interval 1000/Rate
+	Thread PlayThis interval 1000/Rate
 end if  
 Thread compute interval ComputeInterval
 Wait 200
@@ -6828,8 +6823,8 @@ Method Alfa, "Show"
 \\ Task.Main is a Thread
 \\ ExitNow needed If we have Every in place of Task.Main
 Task.Main TM {
-      if not together  then if OpenInfo then showinfo()
-      If ExitNow Then Exit
+	if not together  then if OpenInfo then showinfo()
+	If ExitNow Then Exit
 }
 Threads Erase
 Thread.plan sequential   ' to default plan
@@ -8508,6 +8503,8 @@ a$="9231231231231231231231231231232132131213130989802139080120931920389590859034
 n1$=a$+"0000000000000000000000000000000000000000000001"
 //n1$="211221212119912121212121212687686756567"
 //n1$="1234567767765675576765234324243122131213122113123120898031238910823"
+print "wait.."
+refresh
 gosub mult
 a$="131072"
 n1$="65535"
@@ -9244,7 +9241,7 @@ MODULE KB {Function CallMe {
      \\  Fkey Clear  - not used
       \\ Keyboard - can play two or more notes at once
       \\ some keybards can play max 6 notes, some other max 4
-            refresh 5000
+      refresh 5000
       Thread.Plan Sequential
       Play 0 \\ clear music threads
           
@@ -13046,214 +13043,214 @@ MODULE LINKED_LIST1 {\\ Second Version
 \ \ Head and Tail are private
 
 Module Checkit {
-      Form 80, 50
-      Class LList {
-      Private:
-            Group Head, Tail
-            Class Null {}
-      Public:
-            Property Null {Value}
-            Group GetHead {
-                  Value {
-                        link parent Head to Head
-                        ->Head
-                  }
-            }
-            Group GetTail {
-                  Value {
-                        link parent Tail to Tail
-                        ->Tail
-                  }
-            }
-            Function Node {
-                  Group Ret {
-                        group pred, succ
-                        dat=0
-                        Remove {
-                              Print "destroyed", .dat
-                        }
-                  }
-                  Ret.pred->.[Null]
-                  Ret.succ->.[Null]
-                  if match("N") Then Read Ret.dat
-                   ->(Ret)
-            }
-            Module PushTail(k as pointer) {
-                  if .Tail is .[Null] then {
-                        .Head<=k
-                        .Tail<=k
-                  } else {
-                        n=.Tail
-                        .Tail<=k
-                        k=>pred=n=>pred
-                        n=>pred=k
-                        k=>succ=n
-                  }
-            }
-            Function RemoveTail {
-                  n=.Tail
-                  if n is .Head then {
-                        .Head->.[Null]
-                        .Tail->.[Null]
-                  } Else { 
-                        .Tail<=n=>succ
-                        .Tail=>pred=n=>pred
-                        n=>pred->.[Null]
-                  }
-                  for n, This {
-                        .succ->..[Null]
-                        .pred->..[Null]
-                  }
-                  =n
-            }
-            Module PushHead(k as pointer) {
-                  if .head is .[Null] then {
-                        .Head<=k
-                        .Tail<=k
-                  } else {
-                        n=.head
-                        .head<=k
-                        k=>succ=n=>succ
-                        n=>succ=k
-                        k=>pred=n
-                  }
-            }
-            Function RemoveHead {
-                  n=.Head
-                  if n is .Tail then {
-                        .Head->.[Null]
-                        .Tail->.[Null]
-                  } Else { 
-                      .Head<=n=>pred
-                      .Head=>succ=n=>succ
-                       n=>succ->.[Null]
-                   }
-                  for n, This {
-                        .succ->..[Null]
-                        .pred->..[Null]
-                  }
-                  =n
-            }
-            Module RemoveNode(k as pointer) {
-                  pred=k=>pred
-                  succ=k=>succ
-                  if pred is succ then {
-                        if .head is k else Error "Can't remove this node"
-                        k=.RemoveHead()
-                        clear k
-                  } else {
-                       pred=>succ=succ
-                       succ=>pred=pred 
-                  }
-            }
-            Module InsertAfter(k as pointer, n as pointer) {
-                  pred=k=>pred
-                  n=>pred=pred
-                  n=>succ=k
-                  pred=>succ=n
-                  k=>pred=n
-            }
-            Module DeleteAll {
-                  While not .IsEmpty(){
-                        For This {
-                              A=.RemoveTail()
-                              clear A
-                         }
-                  }                  
-            }
-            Remove {
-                  .DeleteAll
-            }
-            Function IsEmpty {
-                  = .Head is .[Null] or .tail is .[Null]
-            }
-      class:
-            Module LList {
-                  .[Null]->.Null()
-                  .Head->.[Null]
-                  .Tail->.[Null]
-            }
-      }
-
-      L=LList()
-      Null=L.Null
-      m->L.Node(100)      
-      L.PushTail m
-      If not L.GetHead is Null then Print L.GetHead=>dat=100
-      for i=101 to 103 {
-            m->L.Node(i)
-            L.PushTail m
-            Print "ok....", i
-      }
-      for i=104 to 106 {
-            m->L.Node(i)
-            L.PushHead m
-            Print "ok....", i
-      }
- 
-      Print "Use Head to display from last to first"
-      m=L.GetHead
-      do {
-            Print m=>dat
-            m=m=>pred
-      } Until m is Null
-      Print "ok, now find 3rd and remove it"
-      m1=L.GetHead
-      i=1 
-      Index=3
-      While i<Index {
-            if m1 is Null then exit
-            m1=m1=>pred
-            i++
-      }
-      If i<>Index then {
-            Print "List has less than "; Index;" Items"
-      } Else {
-            Print "First add one new node"
-                  newNode->L.Node(1000)
-                  L.InsertAfter m1, newNode
-                  L.RemoveNode m1
-                  clear m1  ' last time m1 used here
-                  newNode=Null
-            Print "ok.............."
-      }
-      Print "Use Tail to display from first to last"
-      m=L.GetTail
-      do {
-            Print m=>dat
-            m=m=>succ
-      } Until m is Null
- 
-      If rnd<.5 Then 
-      useother=True
-      While not L.IsEmpty(){
-            For This {
-                  \\ we have to use a temporary variable name, here A
-                         A=If(useother->L.RemoveTail(),L.RemoveHead())
-                        ? A=>dat
-                        useother~
-                        \\ now we can try to perform removing
-                        clear A
-             }
-      }
-      Else
-      L.deleteAll
-      End if
-      Print "list is empty:"; If$(L.IsEmpty()->"Yes","No")
-      mm=0
-      for i=50 to 80 {
-            m->L.Node(i)
-            L.PushTail m
-           mm++
-      }
-      m->Null
-      Print "Added ";mm; " nodes"
-      Push Pointer((L))
+	Form 80, 50
+	Class LList {
+	Private:
+		Group Head, Tail
+		Class Null {}
+	Public:
+		Property Null {Value}
+		Group GetHead {
+			Value {
+				link parent Head to Head
+				->Head
+			}
+		}
+		Group GetTail {
+			Value {
+				link parent Tail to Tail
+			->Tail
+			}
+		}
+		Function Node {
+			Group Ret {
+				Group pred, succ
+				dat=0
+				Remove {
+					Print "destroyed", .dat
+				}
+			}
+			Ret.pred->.[Null]
+			Ret.succ->.[Null]
+			If match("N") Then Read Ret.dat
+			->(Ret)
+		}
+		Module PushTail(k as pointer) {
+			If .Tail is .[Null] then
+				.Head<=k
+				.Tail<=k
+			Else
+				n=.Tail
+				.Tail<=k
+				k=>pred=n=>pred
+				n=>pred=k
+				k=>succ=n
+			End If
+		}
+		Function RemoveTail {
+			n=.Tail
+			If n is .Head then
+				.Head->.[Null]
+				.Tail->.[Null]
+			Else
+				.Tail<=n=>succ
+				.Tail=>pred=n=>pred
+				n=>pred->.[Null]
+			End If
+			For n, This {
+				.succ->..[Null]
+				.pred->..[Null]
+			}
+			=n
+		}
+		Module PushHead(k as pointer) {
+			If .head is .[Null] then
+				.Head<=k
+				.Tail<=k
+			Else
+				n=.head
+				.head<=k
+				k=>succ=n=>succ
+				n=>succ=k
+				k=>pred=n
+			End If
+		}
+		Function RemoveHead {
+			n=.Head
+			If n is .Tail then
+				.Head->.[Null]
+				.Tail->.[Null]
+			Else
+				.Head<=n=>pred
+				.Head=>succ=n=>succ
+				n=>succ->.[Null]
+			End If
+			For n, This {
+				.succ->..[Null]
+				.pred->..[Null]
+			}
+			=n
+		}
+		Module RemoveNode(k as pointer) {
+			pred=k=>pred
+			succ=k=>succ
+			If pred is succ then
+				If .head is k Else Error "Can't remove this node"
+				k=.RemoveHead()
+				Clear k
+			Else
+				pred=>succ=succ
+				succ=>pred=pred 
+			End If
+		}
+		Module InsertAfter(k as pointer, n as pointer) {
+			pred=k=>pred
+			n=>pred=pred
+			n=>succ=k
+			pred=>succ=n
+			k=>pred=n
+		}
+		Module DeleteAll {
+			While not .IsEmpty()
+				For This {
+					A=.RemoveTail()
+					Clear A
+				}
+			End While
+		}
+		Remove {
+			.DeleteAll
+		}
+		Function IsEmpty {
+			= .Head is .[Null] or .tail is .[Null]
+		}
+	class:
+		Module LList {
+			.[Null]->.Null()
+			.Head->.[Null]
+			.Tail->.[Null]
+		}
+	}
+	
+	L=LList()
+	Null=L.Null
+	m->L.Node(100)      
+	L.PushTail m
+	If not L.GetHead is Null then Print L.GetHead=>dat=100
+	For i=101 to 103
+		m->L.Node(i)
+		L.PushTail m
+		Print "ok....", i
+	Next
+	For i=104 to 106
+		m->L.Node(i)
+		L.PushHead m
+		Print "ok....", i
+	Next
+		
+	Print "Use Head to display from last to first"
+	m=L.GetHead
+	do
+		Print m=>dat
+		m=m=>pred
+	Until m is Null
+	Print "ok, now find 3rd and remove it"
+	m1=L.GetHead
+	i=1 
+	Index=3
+	While i<Index
+		If m1 is Null then exit
+		m1=m1=>pred
+		i++
+	End While
+	If i<>Index then
+		Print "List has less than "; Index;" Items"
+	Else
+		Print "First add one new node"
+		newNode->L.Node(1000)
+		L.InsertAfter m1, newNode
+		L.RemoveNode m1
+		Clear m1  ' last time m1 used here
+		newNode=Null
+		Print "ok.............."
+	End If
+	Print "Use Tail to display from first to last"
+	m=L.GetTail
+	do
+		Print m=>dat
+		m=m=>succ
+	Until m is Null
+	
+	If rnd<.5 Then 
+		useother=True
+		While not L.IsEmpty()
+			For This {
+				\\ we have to use a temporary variable name, here A
+				A=If(useother->L.RemoveTail(),L.RemoveHead())
+				Print A=>dat
+				useother~
+				\\ now we can try to perform removing
+				Clear A
+			}
+		End While
+	Else
+		L.deleteAll
+	End If
+	Print "list is empty:"; If$(L.IsEmpty()->"Yes","No")
+	mm=0
+	For i=50 to 80
+		m->L.Node(i)
+		L.PushTail m
+		mm++
+	Next
+	m->Null
+	Print "Added ";mm; " nodes"
+	Push Pointer((L))
 }
 Checkit
 Stack
-Print "Press a key for phase 2"
-Print "now Linked_list is a pointer to a group object"
+Print "Press a key For phase 2"
+Print "now Linked_list is a pointer to a Group object"
 Push key$ : Drop
 Read Linked_List
 Null=Linked_List=>Null
@@ -13263,10 +13260,10 @@ While not m is Null
 	m=m=>pred
 End While
 List
-\\ we have to use Clear. Clear act only if the pointer is the last one.
-\\ Then Linlked_List Remove do a Clear for each node. If we didn't use any extenal pointer for these we get all destroyed.
+\\ we have to use Clear. Clear act only If the pointer is the last one.
+\\ Then Linlked_List Remove do a Clear For each node. If we didn't use any extenal pointer For these we get all destroyed.
 Clear Linked_list, Null, m
-Print " now all variables aren't pointers. They have an empty group"
+Print " now all variables aren't pointers. They have an empty Group"
 List
 }
 MODULE LINKED_LIST2 {
@@ -15432,7 +15429,7 @@ MODULE RPN {Module Rpn_Calc {
 	document export$
 	example1=rpn_calc("3 4 2 * 1 5 - 2 3 ^ ^ / +")
 	example2=rpn_calc("1 2 + 3 4 + ^ 5 6 + ^")
-	Print example1, example2
+	Print Part $(0,18), example1, example2: Print
 	Rem	Print #-2, Export$
 	ClipBoard Export$
 }
@@ -17106,28 +17103,28 @@ Form 80,50
 Print "Forth's Blocks"
 // Forth Blocks
 Structure Line16 {
-      a`Line as byte*64
+      a_Line as byte*64
 }
 NewBlock=lambda Line16 -> {
-      Buffer a`Block as Line16*16
+      Buffer a_Block as Line16*16
       // fill spaces
-      Return a`Block, 0:=str$(string$(" ",1024))
-      =a`Block
+      Return a_Block, 0:=str$(string$(" ",1024))
+      =a_Block
 }
 // Events are value types, but for closures and groups are reference types
 Event Doit {
       Read something$
 }
 Header=Doit
-DisplayBlock= Lambda NewBlock, Line16, Doit, Header (Blocks`File$,Block`Number, UseLocale=1033)->{
+DisplayBlock= Lambda NewBlock, Line16, Doit, Header (Blocks_File$, Block_Number, UseLocale=1033)->{
       Page1=NewBlock()
-      Open Blocks`File$ for input as #f
-            Seek #f, 1024*(Block`Number-1)+1
+      Open Blocks_File$ for input as #f
+            Seek #f, 1024*(Block_Number-1)+1
             Get #f,Page1
       Close #f
       Document NewDoc$
       // need to convert from Ansi
-      Call Event Header, "Block:"+Str$(Block`Number)
+      Call Event Header, "Block:"+Str$(Block_Number)
       oldlocale=locale
       locale UseLocale
       For i=0 to 15
@@ -17152,8 +17149,8 @@ ForthCode$=string$(ForthCode$,5)
 Print "Make Block"
 Page1=NewBlock()
 Locale 1033
-Blocks`File$="Forth Blocks"
-Block`Number=1
+Blocks_File$="Forth Blocks"
+Block_Number=1
 // Apppend three times same blocks
 For Pass=1 to 3
       If Doc.Len(ForthCode$)>0 then
@@ -17187,40 +17184,40 @@ Function Disp(aline$) {
 DocumentKeeper=DocumentKeeper()
 Event Doit New Disp()
 Event Header New Disp()
-For i=1 to Block`Number-1
-      Call DisplayBlock(Blocks`File$, i)
+For i=1 to Block_Number-1
+      Call DisplayBlock(Blocks_File$, i)
       Print "Press any key"
       Push key$ : Drop
 Next i
 Event Doit Drop Disp()
 Event Doit New DocumentKeeper.AppendLine()
 Event Header Hold
-For i=1 to Block`Number-1
-      Call DisplayBlock(Blocks`File$, i)
+For i=1 to Block_Number-1
+      Call DisplayBlock(Blocks_File$, i)
 Next i
 Report DocumentKeeper.Text$
  
 End 
 SaveBlock:
-      Print "Save as Number ";Block`Number
-      If Exist(Blocks`File$) then 
+      Print "Save as Number ";Block_Number
+      If Exist(Blocks_File$) then 
             // check if there is space for this block
-            If Not filelen(Blocks`File$) div 1024>=Block`Number-1 Then
+            If Not filelen(Blocks_File$) div 1024>=Block_Number-1 Then
                   Error "Wrong Block Number"
             End if
       Else
             Print "not exist"
-            Open Blocks`File$ for output as #f
+            Open Blocks_File$ for output as #f
             Close #f
             Wait 100
             // or Error "Empty File" if we wish only read
-            If Block`Number<>1 then Error "Wrong Block Number"
+            If Block_Number<>1 then Error "Wrong Block Number"
       End if
-      Open Blocks`File$ for append as #f
-      Seek #f, Block`Number*1024-1023 ' so we seek to first byte
+      Open Blocks_File$ for append as #f
+      Seek #f, Block_Number*1024-1023 ' so we seek to first byte
       Put #f, Page1
       Close #f
-      Block`Number++
+      Block_Number++
       Page1=NewBlock()
 Return
 }
@@ -35919,10 +35916,11 @@ Print Len(A())=13
 Print A()
 }
 MODULE SHOWKEYS {refresh 50
-back {refresh 50}
-n=mode
-x=scale.x*4/5
-y=scale.y*3/4
+back {refresh 50
+	n=mode*.8
+	x=scale.x*4/5
+	y=scale.y*2/3
+}
 declare form1 form
 Method form1, "NoTaskBar"
 With form1, "Title", "FKEY List", "previewKey", true
@@ -35944,7 +35942,8 @@ after 10000 {
 M=20
 layer form1 {
 	window n,  x, y;
-	form 60, 28
+	form 60, 28;
+	motion.w;
 	gradient 4,7, 0
 	cls 0x333333, 2
 	pen 15
@@ -37265,7 +37264,8 @@ Module TestMenu {
 }
 TestMenu
 }
-MODULE HASHLIST {Report {
+MODULE HASHLIST {if linespace=0 then linespace 30:mode mode
+Report {
 	This example use the M2000.hashlist object
 	Hashlist object can be used for lists of specific type
 	A hashlist for long values, need 4 byte per item - plus some extra for hash table
@@ -40861,7 +40861,7 @@ declare Form1 nothing
 }
 MODULE MACHINECODE2 {linespace 0
 font "Courier New"
-form 120
+form 120, 56
 k=bold
 bold 0
 Cls #050f05, 0
@@ -42684,5 +42684,106 @@ if exist(filename) else exit
 if ask("Delete file from disk ?","What to do", "*Yes","No")=1 then
 	dos "del "+quote$(dir$+filename), 200;
 end if
+}
+MODULE SPAGHETI {Module OldSort (w as boolean) {
+   function mxstrcmp(&Cmp$,  start1,end1, start2,end2) {
+      end1+=1-start1
+      end2+=1-start2
+      
+      hlp1$=mid$(Cmp$,start1,end1)
+      hlp2$=mid$(Cmp$,start2,end2)
+      =compare(hlp1$,hlp2$)
+   }
+   function Getone$(&buffer$, start1, end1) {
+      end1+=1-start1
+      =mid$(buffer$,start1,end1)
+   }
+   if w then
+       strSearch$ = "3ne2wo1hree6ive5ix4orth"
+   else
+       strSearch$ = "OneTwoThreeFiveSixForth"
+   end if
+   Flush ' empty stack
+   Data 1,4,7,12,16,19,0  ' these are offsets (base 1) in string strSearch$
+   i=0   ' we place one more so we use arrays from index 1
+   read startKeyWord
+   do ' same as Repeat
+      dim smarkerskt(i+1), emarkerskt(i+1)
+      read nextStart
+      smarkerskt(i)=startKeyWord  
+      If nextStart = 0 Then
+         emarkerskt(i)=len(strSearch$)
+         exit    ' no Break here 
+                 ' (Break stopped only in a Try { } and in module block )
+      Else
+         emarkerskt(i)=NextStart-1
+         startKeyWord=NextStart
+      end If
+      i++
+   always
+   nKeywordskt=i+1
+   dim sortptrs(nKeywordskt)
+   module fillme {
+      read &ar()
+          //  if len(ar())=0 then error "empty array"
+        //    if dimension(ar())<>1 then error "not one dimension"
+      k=dimension(ar(),1)-1 : Dim ar(0 to k)=0
+      do  ar(k)=k :k-- when k>0
+   }
+   fillme &sortptrs()
+   for i=1 to nKeywordskt
+      Print getone$(&strSearch$, smarkerskt(sortptrs(i-1)), emarkerskt(sortptrs(i-1)))
+   Next
+   Print  "items:";nKeywordskt
+   
+\\ here the old code start   
+   s1 = nKeywordskt
+   s2 = s1
+   s3 = 0 :  s4 = 0 :  s5 = 0 :  s6 = 0
+   a = 0
+   
+GP_SP_S1:   
+   s1 = int(s1 / 2)
+   If s1 = 0 Then Goto GP_SP_S5   
+   s3 = s2 - s1
+   s4 = 1
+   
+GP_SP_S2:
+   s5 = s4
+   
+GP_SP_S3:
+   s6 = s5 + s1
+   a = mxstrcmp(&strSearch$, smarkerskt(sortptrs(s5-1)), emarkerskt(sortptrs(s5-1)), smarkerskt(sortptrs(s6-1)), emarkerskt(sortptrs(s6-1)))
+   If a = 0 Then
+      If sortptrs(s5-1) < sortptrs(s6-1) Then
+         a = -1
+      Else
+         a = 1
+      End If
+   End If
+   If a <= 0 Then  Goto GP_SP_S4   
+   Swap sortptrs(s5-1), sortptrs(s6-1)   
+   s5 -= s1   
+   If s5 >= 1 Then Goto GP_SP_S3
+   
+GP_SP_S4:
+   s4++
+   If s4 > s3 Then Goto GP_SP_S1   
+   Goto GP_SP_S2
+   
+GP_SP_S5:   
+   s1 = 0
+   \* here the old code end.
+
+   Print "--------------------------------------------------"
+   for i=1 to nKeywordskt
+      Print getone$( &strSearch$, smarkerskt(sortptrs(i-1)), emarkerskt(sortptrs(i-1)))
+   Next i
+   Print "done"   
+}
+Print "First....."
+OldSort false
+Print "Second......."
+OldSort true
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
