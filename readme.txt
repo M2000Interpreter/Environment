@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 25 active-X
-A great number of corrections when M2000paper.pdf updated for version 12.
+Version 12 Revision 26 active-X
+VBCollection at info.gsb now run as expected.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

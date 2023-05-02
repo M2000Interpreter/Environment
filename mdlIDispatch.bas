@@ -44,7 +44,7 @@ Public Function FindDISPID(pobjTarget As Object, ByVal pstrProcName As Variant) 
     FindDISPID = -1
     If pobjTarget Is Nothing Then Exit Function
 
-    Dim a$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
+    Dim A$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
     ReDim myptr(0 To 0)
     myptr(0) = StrPtr(pstrProcName)
     
@@ -152,9 +152,9 @@ passhere:
                         SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop)
                     ElseIf Not MyIsNumericPointer(pArgs(lngLoop)) Then
                         If TypeOf pArgs(lngLoop) Is refArray Then
-                        Dim ra As refArray
-                        Set ra = pArgs(lngLoop)
-                            ra.CreateRef VarPtr(varArr(fixnamearg + items - 1 - lngLoop))
+                        Dim rA As refArray
+                        Set rA = pArgs(lngLoop)
+                            rA.CreateRef VarPtr(varArr(fixnamearg + items - 1 - lngLoop))
                         ElseIf TypeOf pArgs(lngLoop) Is mArray Then
                             Set mmm = pArgs(lngLoop)
                             ' fix for types
@@ -536,6 +536,7 @@ If UCase(pstrProcName) = "_NEWENUM" Then
     
     Set usehandler = New mHandler
     usehandler.ConstructEnumerator VarRet
+    Set robj = usehandler
 Else
 On Error Resume Next
 If Err Then
