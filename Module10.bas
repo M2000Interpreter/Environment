@@ -3568,8 +3568,41 @@ contassignhere:
                 .item(v) = .itemnumeric(v) - 1
                 If extreme Then GoTo NewCheck2 Else GoTo NewCheck
             ElseIf FastSymbol(b$, "+=", , 2) Then
-                If Not IsExp(bstack, b$, p) Then GoTo err000
+                ww = Len(b$)
+                If Not IsExp(bstack, b$, p) Then
+                    If ww = Len(b$) Then
+                        If IsStrExp(bstack, b$, ss$, False) Then
+                             If Not .IsStringItem(v) Then
+                                If .ItemTypeNum(v) = vbEmpty Then
+                                    .ItemStr(v) = ss$
+                                Else
+                                p = .itemnumeric(v)
+                                If CheckInt64(p) Then
+                                    sw$ = CStr(p)
+                                Else
+                                    sw$ = LTrim$(str(p))
+                                    If Left$(sw$, 1) = "." Then
+                                        sw$ = "0" + sw$
+                                    ElseIf Left$(sw$, 2) = "-." Then
+                                        sw$ = "-0" + Mid$(sw$, 2)
+                                    End If
+                                End If
+                                .ItemStr(v) = sw$ + ss$
+                                End If
+                             Else
+                             .ItemStr(v) = .item(v) + ss$
+                             End If
+                             If extreme Then GoTo NewCheck2 Else GoTo NewCheck
+                        Else
+                            GoTo err000
+                        End If
+                    Else
+                        GoTo err000
+                    End If
+                Else
                 .item(v) = .itemnumeric(v) + p
+                End If
+                
             ElseIf FastSymbol(b$, "-=", , 2) Then
                 If Not IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then GoTo err000
                 .item(v) = .itemnumeric(v) - p
@@ -7694,11 +7727,32 @@ Case 5, 7
         ' do nothing
         MyRead = True
     Else
+    
         If Not bs.IsNumber(p) Then
+            If pppp.IsStringItem(it) Then
+                If bs.IsString(s$) Then
+                pppp.item(it) = s$
+                Else
+                bstack.soros.drop 1
+                MissStackStr
+                MyRead = False
+                Exit Do
+                End If
+            ElseIf pppp.MyTypeToBe = vbVariant Then
+            If bs.IsString(s$) Then
+                pppp.item(it) = s$
+                Else
+                bstack.soros.drop 1
+                MissStackStr
+                MyRead = False
+                Exit Do
+                End If
+            Else
             bstack.soros.drop 1
                 MissStackNumber
                 MyRead = False
                 Exit Do
+                End If
             ElseIf x1 = 7 Then
                 pppp.item(it) = Round(p)
             Else

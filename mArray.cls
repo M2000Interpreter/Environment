@@ -1550,7 +1550,7 @@ End If
 there1:
 
 End Property
-Public Property Get ItemTypeNum(curitem) As String
+Public Property Get ItemTypeNum(curitem) As Integer
 On Error GoTo there1
 If Arr Then
     If maxitems1 >= curitem Then
