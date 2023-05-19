@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 26 active-X
-VBCollection at info.gsb now run as expected.
+Version 12 Revision 28 active-X
+Greek statement as english SEEK now work as for previous vesrions like version 10.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
