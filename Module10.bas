@@ -3425,9 +3425,10 @@ here66678:
     With ppppAny
         If ppppAny.Final Then CantAssignValue: GoTo err000
         If Not .Arr Then
-            ' continue ...
+            If v = -2 Then GoTo con123
         ElseIf MyIsObject(.item(v)) Then
             If v = -2 Then
+con123:
                 Set myobject = .item(v)
                 If myobject.HasParametersSet Then
                     If myobject.HasSet Then

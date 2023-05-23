@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 28 active-X
-Greek statement as english SEEK now work as for previous vesrions like version 10.
+Version 12 Revision 29 active-X
+Some corrections (from revision 25). Comp_Num module now run as expected
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

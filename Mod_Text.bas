@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 28
+Global Const Revision = 29
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -10745,7 +10745,16 @@ contlambda01:
         GoTo contlambda01
     Else
         If Right$(s1$, 3) <> "$()" Then
-            If neoGetArray(bstack, Left$(s1$, Len(s1$) - 2) + "$(", ppppL) Then GoTo contAr2
+            If neoGetArray(bstack, Left$(s1$, Len(s1$) - 2) + "$(", ppppL) Then
+            If Typename(ppppL.GroupRef) = mGroup Then
+            If Typename(ppppL) = "mArray" Then
+            v$ = Left$(s1$, Len(s1$) - 2)
+            Set pppp = ppppL
+            pppp.CodeName = v$
+            End If
+            End If
+            GoTo contAr2
+           End If
         End If
         dd = dd + 1
         If dd > 30 Then
@@ -10893,6 +10902,7 @@ contAr2L:
         If Not ppppL.Arr Then
             If Typename(ppppL.GroupRef) = mGroup Then
                 If ppppL.GroupRef.HasParameters Then
+                
                     GoTo conthere102030
                 Else
                 MyErMacro A$, "No parameter list for this group", "Δεν υπάρχει λίστα παραμέτρων για αυτήν την ομάδα"
@@ -11060,9 +11070,10 @@ contlambdahere:
                         Set ppppL = pppp
                         Select Case pppp.ItemType(w2)
                         Case "lambda"
+contlambdahere2:
                             PushStage bstack, False
                             w1 = globalvarGroup("A_" & (Abs(w2)), 0#)
-                            Set var(w1) = pppp.item(w2)
+                            Set var(w1) = ppppL.item(w2)
                             If here$ = vbNullString Then
                                 GlobalSub "A_" & (Abs(w2)) & "()", "", , , w1
                             Else
@@ -11467,7 +11478,7 @@ inv100:                                 Expected "Inventory", "Κατάσταση"
                                     Mid$(A$, 1, 1) = " "
                                     If .IsObj Then
                                         w2 = -.Index - 100
-                                        If TypeOf .ValueObj Is lambda Then GoTo contlambdahere
+                                        If TypeOf .ValueObj Is lambda Then GoTo contlambdahere2
                                         If TypeOf .ValueObj Is mArray Then
                                             Set ppppL = .ValueObj
                                             w3 = 0
@@ -15256,11 +15267,9 @@ findthird:
 IsStr1 = strFunctions(w2, q$, bstackstr, A$, R$)
 Exit Function
 itisarrayorfunction:
-    MakeThisSubNum bstackstr, q$
     q1$ = q$
-    
     If Right$(q1$, 1) <> ")" Then q1$ = q1$ + ")"
-    
+    MakeThisSubNum bstackstr, q1$
             If IsSymbol(A$, "*") Then
             'is a function allways...
             If GetlocalSub(q1$, w1) Then
@@ -15696,8 +15705,19 @@ contlambda01:
                 GoTo contStrFun
             ElseIf q1$ = "ΛΑΜΔΑ$()" Then
                 GoTo contlambda01
+            ElseIf neoGetArray(bstackstr, Left$(q1$, Len(q1$) - 3) + "(", ppppL, , True) Then
+                If Typename(ppppL.GroupRef) = mGroup Then
+                    If Typename(ppppL) = "mArray" Then
+                        q$ = Left$(q1$, Len(q1$) - 3)
+                        Set pppp = ppppL
+                        pppp.CodeName = q$
+                    End If
+                End If
+                GoTo contStrArr
             End If
+            
         End If
+        
         If strfunidbackup.Find(q$, w2) Then GoTo findthird
         If FindNameForGroup(bstackstr, q$) Then
             MyErMacroStr A$, "unknown method/array  " + q$, "’γνωστη μέθοδος/πίνακας " + q$
