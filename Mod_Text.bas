@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 29
+Global Const Revision = 30
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -36841,12 +36841,13 @@ ProcStack = True
    Else
 If FastSymbol(rest$, "!") Then
 If VALIDATEpart(rest$, s$) Then
+X = Empty
 Do While s$ <> ""
 If ISSTRINGA(s$, pa$) Then
 bstack.soros.DataStr pa$
-ElseIf IsNumberD2(s$, X) Then
+ElseIf IsNumberD2fix(s$, X) Then
 bstack.soros.DataVal X
-X = vbEmpty
+X = Empty
 Else
 Exit Do
 End If
@@ -36895,14 +36896,28 @@ Exit Function
 Else
 i = 0
 If IsLabelSYMB33(rest$, what$, i) Then
-    If Mid$(rest$, i + 1, 2) = "$(" Then
+    If Mid$(rest$, i, 2) = "$(" Then
         x1 = 6
-        what$ = what$ + "$("
-        Mid$(rest$, 1, i + 2) = space$(i + 2)
-    ElseIf Mid$(rest$, i + 1, 2) = "$" Then
-        x1 = 3
-        what$ = what$ + "$"
+        what$ = myUcase(what$, True) + "$("
         Mid$(rest$, 1, i + 1) = space$(i + 1)
+    ElseIf Mid$(rest$, i, 1) = "(" Then
+        x1 = 6
+        what$ = myUcase(what$, True) + "("
+        Mid$(rest$, 1, i) = space$(i)
+    ElseIf Mid$(rest$, i, 1) = "$" Then
+        x1 = 3
+        what$ = myUcase(what$, True) + "$"
+        Mid$(rest$, 1, i) = space$(i)
+    Else
+        what$ = myUcase(what$, True)
+        If GetVar(bstack, what$, it) Then
+            If myVarType(var(it), vbString) Then
+                x1 = 3
+                Mid$(rest$, 1, i - 1) = space$(i - 1)
+            Else
+                x1 = 0
+            End If
+        End If
     End If
 Else
 x1 = 0
@@ -36929,7 +36944,7 @@ If x1 = 3 Then
                         If ISSTRINGA(ss$, pa$) Then ps.DataStr pa$
                     Else
                         X = vbEmpty
-                        If IsNumberD2(ss$, X) Then ps.DataVal X
+                        If IsNumberD2fix(ss$, X) Then ps.DataVal X
                     End If
                     IsSymbol ss$, ","
                     i = i + 1
@@ -36944,8 +36959,8 @@ If x1 = 3 Then
             Else
                 MyEr "Stack can't read choosen types", "Ο σωρός δεν μπορεί να διαβάσει τους επιλεγμένους τύπους"
                 ProcStack = False
-                Exit Function
             End If
+            Exit Function
         Else
             Nosuchvariable what$
         End If
@@ -36963,7 +36978,8 @@ If x1 = 3 Then
                     If Mid$(frm$, i, 1) = "S" Then
                         If ISSTRINGA(ss$, pa$) Then ps.DataStr pa$
                     Else
-                        If IsNumberD(ss$, x0) Then ps.DataVal x0
+                        X = vbEmpty
+                        If IsNumberD2fix(ss$, X) Then ps.DataVal X
                     End If
                     IsSymbol ss$, ","
                     i = i + 1
@@ -36984,6 +37000,10 @@ If x1 = 3 Then
 ElseIf x1 = 6 Then
     If neoGetArray(bstack, what$, pppp) Then
         If Not NeoGetArrayItem(pppp, bstack, what$, f, rest$) Then ProcStack = False: Exit Function
+        If pppp.ItemIsObject(f) Then
+            Set myobject = pppp.itemObject(f)
+            GoTo isAnobject2
+        End If
         ss$ = pppp.item(f)
         If FastSymbol(rest$, ",") Then
             If Not IsStrExp(bstack, rest$, pa$) Then ProcStack = False: Exit Function
@@ -37006,7 +37026,8 @@ ElseIf x1 = 6 Then
                 If Mid$(frm$, i, 1) = "S" Then
                     If ISSTRINGA(ss$, pa$) Then ps.DataStr pa$
                 Else
-                    If IsNumberD(ss$, x0) Then ps.DataVal x0
+                    X = vbEmpty
+                    If IsNumberD2fix(ss$, X) Then ps.DataVal X
                 End If
                 IsSymbol ss$, ","
                 i = i + 1
@@ -37018,7 +37039,8 @@ ElseIf x1 = 6 Then
                     .soros.MergeTop ps
                 End If
             End With
-        'stack$(bstack) = ss$ & stack$(bstack)
+        
+        Exit Function
         Else
             MyEr "String has no valid stack", "Το αλφαριθμητικό δεν έχει έγκυρα στοιχεία σωρού"
         End If
@@ -37037,7 +37059,9 @@ isAstring:
                 If Mid$(frm$, i, 1) = "S" Then
                     If ISSTRINGA(ss$, pa$) Then ps.DataStr pa$
                 Else
-                    If IsNumberD(ss$, x0) Then ps.DataVal x0
+                    X = vbEmpty
+                    If IsNumberD2fix(ss$, X) Then ps.DataVal X
+                    ''If IsNumberD(ss$, x0) Then ps.DataVal x0
                 End If
                 IsSymbol ss$, ","
                 i = i + 1
@@ -37057,9 +37081,14 @@ isAstring:
         End If
                     Exit Function
     ElseIf IsExp(bstack, rest$, X) Then
+        If myVarType(X, vbString) Then
+            SwapString2Variant ss$, X
+            GoTo isAstring
+        End If
 isAnobject:
         Set myobject = bstack.lastobj
         Set bstack.lastobj = Nothing
+isAnobject2:
         If Err Then MyEr "Not a stack", "Δεν είναι σωρός": Exit Function
         If CheckDeepAny(myobject) Then
             If Not TypeOf myobject Is mStiva Then MyEr "Not a stack", "Δεν είναι σωρός": Exit Function

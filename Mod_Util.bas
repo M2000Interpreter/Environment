@@ -10573,7 +10573,42 @@ er111:
 Exit Function
 
 End Function
+Function IsNumberD2fix(A$, D As Variant, Optional noendtypes As Boolean = False, Optional exceptspecial As Boolean) As Boolean
+' for inline stacitems
+If VarType(D) = vbEmpty Then D = 0#
+Dim a1 As Long
+If A$ <> "" Then
+For a1 = 1 To Len(A$) + 1
+Select Case Mid$(A$, a1, 1)
+Case " ", ChrW(160), vbTab
+If a1 > 1 Then Exit For
+Case Is = Chr(2)
+If a1 = 1 Then Exit Function
+Exit For
+End Select
+Next a1
+If a1 > Len(A$) Then a1 = Len(A$) + 1
+    If IsNumberOnly(A$, 1, D, a1, noendtypes, exceptspecial) Then
+        A$ = Mid$(A$, a1)
+        IsNumberD2fix = True
+    ElseIf MaybeIsSymbol(A$, "¡·ÿ¯TtFf") Then
+        If Fast3Varl(A$, "¡À«»≈”", 6, "¡À«»«”", 6, "TRUE", 4, 6) Then
+            D = True
+            IsNumberD2fix = True
+        ElseIf Fast3Varl(A$, "ÿ≈’ƒ≈”", 6, "ÿ≈’ƒ«”", 6, "FALSE", 5, 6) Then
+            D = False
+            IsNumberD2fix = True
+        Else
+            IsNumberD2fix = False
+        End If
+    Else
+    IsNumberD2fix = False
+    End If
+Else
+    IsNumberD2fix = False
+End If
 
+End Function
 
 Function IsNumberD2(A$, D As Variant, Optional noendtypes As Boolean = False, Optional exceptspecial As Boolean) As Boolean
 ' for inline stacitems
@@ -28877,7 +28912,7 @@ Set offsetlist = Nothing
 End If
 End Function
 Function ProcKeyboard(basestack As basetask, rest$, Lang As Long) As Boolean
-Dim par As Boolean, s$, p As Variant, w3 As Long, G As gList
+Dim par As Boolean, s$, p As Variant, w3 As Long, g As gList
 Dim alt, shift, ctrl, again As Boolean
 On Error Resume Next
 If IsLabelSymbolNew(rest$, "÷œ—‘Ÿ”≈", "LOAD", Lang) Then

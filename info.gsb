@@ -24657,7 +24657,7 @@ MODULE WORKER {Καθαρό
       }
 }
 
-\\\\   ΚΥΡΙΟ ΠΡΑΓΜΑ  ////
+\\\\   ΚΥΡΙΟ ΠΡΟΓΡΑΜΜΑ  ////
 
 Πίνακας Φορολογία(5,2)
 Φορολογία(0,0)=10000,22,10000,35,10000,50
@@ -41159,10 +41159,10 @@ Module Life {
 	Const Mx=20, My=10
 	Dim A(0 to Mx+1, 0 to My+1)=0
 	Flush
-rem 	Data (2,2),(2,3),(3,3),(4,3),(5,4),(,3,4),(5,3),(6,2),(8,5),(5,8)
-	Data (5,3)
-	Data (5,4)
-	Data (5,5)
+ 	Data (2,2),(2,3),(3,3),(4,3),(5,4),(,3,4),(5,3),(6,2),(8,5),(5,8)
+/	Data (5,3)
+/	Data (5,4)
+/	Data (5,5)
 	generation=1
 	While not empty
 		(A, B)=Array
@@ -42785,5 +42785,30 @@ Print "First....."
 OldSort false
 Print "Second......."
 OldSort true
+}
+MODULE MAC {Module Checkit {
+      httpGet$=lambda$  (url$, timeout=500)->{
+            declare htmldoc "WinHttp.WinHttpRequest.5.1"
+            Method htmldoc "SetTimeouts", timeout, timeout, timeout, timeout
+            Method htmldoc "open","GET", url$, false
+            Method htmldoc "setRequestHeader","Content-Type", "application/x-www-form-urlencoded"
+            Method htmldoc "send"
+            With  htmldoc, "responseText" as ready$ 
+            res$=trim$(ready$)
+            if left$(res$,1)="{" then 
+                  ="N/A"
+            else
+                   =res$
+            end if
+            declare htmldoc nothing
+      }
+       Urls=("88:53:2E:67:07:BE", "FC:FB:FB:01:FA:21", "D4:F4:6F:C9:EF:8D", "BC:5F:F4")
+       url=each(URLs)
+       While Url {
+             Print Array$(URL),@(20), httpGet$("https://api.macvendors.com/"+Array$(URL))
+             Wait 1500
+      }
+}
+Checkit
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
