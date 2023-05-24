@@ -372,7 +372,7 @@ Public Function MaskLowLongLong() As Variant
 End Function
 Public Function Signed(A) As Long
     Dim p
-    p = CDec(Int(A))
+    p = Fix(CDec(A))
     Signed = MemLong(VarPtr(p) + 8)
 End Function
 Public Function UnsignedSub(A As Long, b As Long)

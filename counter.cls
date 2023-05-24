@@ -136,7 +136,6 @@ Private Function BytesToStr(ab() As Byte) As String
     
 End Function
 Private Function TaskInterface_Tick() As Boolean
-
  Dim X As Integer, mycnt As Long
 Dim lpBuffer(2048) As Byte
 On Error GoTo there
