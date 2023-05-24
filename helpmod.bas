@@ -24,16 +24,16 @@ Public Const DFC_POPUPMENU = 5            'Only Win98/2000 !!
 Public Const DFCS_BUTTON3STATE = &H10
 
 Public Const DC_GRADIENT = &H20          'Only Win98/2000 !!
-Public Declare Function FillRect Lib "user32" (ByVal hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Public Declare Function FillRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Public Declare Function CreateSolidBrush Lib "gdi32" (ByVal crColor As Long) As Long
 Public Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Public Declare Function SetTextColor Lib "gdi32" (ByVal hdc As Long, ByVal crColor As Long) As Long
+Public Declare Function SetTextColor Lib "gdi32" (ByVal hDC As Long, ByVal crColor As Long) As Long
 Public Const OPAQUE = 2
-Public Declare Function SetBkMode Lib "gdi32" (ByVal hdc As Long, ByVal nBkMode As Long) As Long
-Public Declare Function DrawFrameControl Lib "user32" (ByVal hdc As Long, lpRect As RECT, ByVal un1 As Long, ByVal un2 As Long) As Long
-Public Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal hdc As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
+Public Declare Function SetBkMode Lib "gdi32" (ByVal hDC As Long, ByVal nBkMode As Long) As Long
+Public Declare Function DrawFrameControl Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal un1 As Long, ByVal un2 As Long) As Long
+Public Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal hDC As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
 Public Declare Function SetRect Lib "user32" (lpRect As RECT, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
-Public Declare Function OffsetRect Lib "user32" (lpRect As RECT, ByVal X As Long, ByVal Y As Long) As Long
+Public Declare Function OffsetRect Lib "user32" (lpRect As RECT, ByVal X As Long, ByVal y As Long) As Long
 
 Public Const DT_BOTTOM As Long = &H8&
 Public Const DT_CALCRECT As Long = &H400&
@@ -112,7 +112,7 @@ Function NumberofDrives() As Integer
     NumberofDrives = DriveCount
 End Function
 
-Function DriveName(index As Integer) As String
+Function DriveName(Index As Integer) As String
     
     Dim Buffer As String * 255
     Dim BuffLen As Long
@@ -127,7 +127,7 @@ Function DriveName(index As Integer) As String
           TheDrive = TheDrive & Mid$(Buffer, i, 1)
         If AscW(Mid$(Buffer, i, 1)) = 0 Then 'null separates drives
             DriveCount = DriveCount + 1
-            If DriveCount = index Then
+            If DriveCount = Index Then
                 DriveName = UCase(Left(TheDrive, 1))
                 Exit Function
             End If
@@ -145,9 +145,9 @@ Set oFolder = oshell.NameSpace(NET_HOOD)
 For Each ofile In oFolder.items
 If ofile.Name = vbNullString Then
 If all = vbNullString Then
-all = "(" + ofile.GetLink.Path + ")"
+all = "(" + ofile.GetLink.path + ")"
 Else
-     all = all + vbCrLf + "(" + ofile.GetLink.Path + ")"
+     all = all + vbCrLf + "(" + ofile.GetLink.path + ")"
      End If
 
 Else
@@ -183,7 +183,7 @@ Set oFolder = oshell.NameSpace(NET_HOOD)
 
 For Each ofile In oFolder.items
 If ofile.Name = giveAname Then
-FindNetworkFolderPath = ofile.GetLink.Path
+FindNetworkFolderPath = ofile.GetLink.path
 Exit For
 End If
 Next ofile
@@ -202,12 +202,12 @@ Else
 For i = 0 To many - 1
 If l(i).GatewayIP <> "0.0.0.0" Then getIP = l(i).IP: Exit For
 Next i
-If Typename(getIP) = "Empty" Then
+If myVarType(getIP, vbEmpty) Then
 For i = 0 To many - 1
 If l(i).IP <> "0.0.0.0" Then getIP = l(i).IP: Exit For
 Next i
 End If
-If Typename(getIP) = "Empty" Then getIP = "127.0.0.1"
+If myVarType(getIP, vbEmpty) Then getIP = "127.0.0.1"
 End If
 End Function
 Public Sub showmodules()
@@ -237,11 +237,11 @@ If Not Connected Then
         stamp = Empty
 Else
     If VarType(stamp) = vbEmpty Then GoTo there
-    If (CDec(Now + Time) - stamp) < CDec(0.0005) Then
+    If (CDec(Now + time) - stamp) < CDec(0.0005) Then
         GetExternalIP = lastresp
     Else
 there:
-        stamp = CDec(Now + Time)
+        stamp = CDec(Now + time)
         Set m = New clsHttpsRequest
         If m.HttpsRequest("https://ifconfig.co/ip") Then
             lastresp = m.BodyFistLine

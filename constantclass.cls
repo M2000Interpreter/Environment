@@ -33,16 +33,16 @@ End Property
 Public Property Get flag() As Boolean
     flag = (mflag And 1) <> 0
 End Property
-Public Property Get vtype() As Boolean
-    vtype = (mflag And 2) <> 0
+Public Property Get vType() As Boolean
+    vType = (mflag And 2) <> 0
 End Property
-Public Sub DefineOnce(RHS, Optional ByVal vtype)
-If Typename(mValue) = "Empty" Then
+Public Sub DefineOnce(RHS, Optional ByVal vType)
+If myVarType(mValue, vbEmpty) Then
 If MyIsObject(RHS) Then
     mflag = mflag Or 1
     Set mValue = RHS
 Else
-    If Not IsMissing(vtype) Then
+    If Not IsMissing(vType) Then
     mflag = mflag Or 2
     End If
     mValue = RHS

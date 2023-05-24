@@ -25,7 +25,7 @@ Private PriveSpace() As item
 Public MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Private lastfind As String
 Private Hash() As Long
 Public Index As Long
@@ -144,7 +144,7 @@ Do
                 place HashFunc2(k), k
             Next k
 
-    
+            lastfind = NewKey
             RenameKey = True
             Exit Function
                
@@ -223,11 +223,11 @@ End Function
 
 
 Friend Sub ItemCreator(Key As String, num As Long, Optional isRef As Boolean = False)
-Dim a As Long
-a = Malloc()
+Dim A As Long
+A = Malloc()
 If Left$(Key, 1) = "." Then Err.Raise 5
-place HashFunc(Key), a
-With PriveSpace(a)
+place HashFunc(Key), A
+With PriveSpace(A)
     .nDx = num
     If isRef Then
         .KeyType = 1
@@ -239,10 +239,10 @@ With PriveSpace(a)
 End With
 End Sub
 Friend Sub ItemCreatorNoSwap(Key As String, num As Long, Optional isRef As Boolean = False)
-Dim a As Long
-a = Malloc()
-place HashFunc(Key), a
-With PriveSpace(a)
+Dim A As Long
+A = Malloc()
+place HashFunc(Key), A
+With PriveSpace(A)
     .nDx = num
     If isRef Then
         .KeyType = 1
@@ -258,10 +258,10 @@ End With
 End Sub
 Friend Sub ItemCreator2(Key As String, num As Long, internal As Long)
 '' used with KeyType as Long not a flag
-Dim a As Long
-a = Malloc()
-place HashFunc(Key), a
-With PriveSpace(a)
+Dim A As Long
+A = Malloc()
+place HashFunc(Key), A
+With PriveSpace(A)
     .nDx = num
     .KeyType = internal
     .firsthash = HD(Key)
@@ -272,29 +272,29 @@ End Sub
 Property Get Percent()
 Percent = count / hashlen
 End Property
-Private Sub place(ByVal b, ByVal a)
+Private Sub place(ByVal b, ByVal A)
     Dim k As Long
     k = Hash(b)
-    If Not Hash(b) = a + 1 Then
-         Hash(b) = a + 1
-         PriveSpace(a).Pleft = k
+    If Not Hash(b) = A + 1 Then
+         Hash(b) = A + 1
+         PriveSpace(A).Pleft = k
     End If
-    PriveSpace(a).lastpos = b
+    PriveSpace(A).lastpos = b
 End Sub
 
 Private Function HashFunc2(where As Long)
 HashFunc2 = PriveSpace(where).firsthash Mod hashlen
 End Function
 
-Private Function HashFunc(a$)
-HashFunc = HD(a$) Mod hashlen
+Private Function HashFunc(A$)
+HashFunc = HD(A$) Mod hashlen
 End Function
 
 Function Show() As String
 Dim i As Long
 For i = 0 To toplim
 If InStr(PriveSpace(i).Key, ChrW(&H1FFF)) = 0 And InStr(PriveSpace(i).Key, ChrW(&HFFBF)) = 0 Then
-Show = Chr(1) + PriveSpace(i).Key + Str$(PriveSpace(i).nDx) + Chr(1) + Show
+Show = Chr(1) + PriveSpace(i).Key + str$(PriveSpace(i).nDx) + Chr(1) + Show
 End If
 Next i
 End Function
@@ -307,7 +307,7 @@ Else
 For i = 0 To toplim
 ' remove if to take hidden functions
 If InStr(PriveSpace(i).Key, ChrW(&H1FFF)) = 0 And InStr(PriveSpace(i).Key, ChrW(&HFFBF)) = 0 Then
-ShowRev = ShowRev + Chr(1) + PriveSpace(i).Key + Str$(PriveSpace(i).nDx) + Chr(1)
+ShowRev = ShowRev + Chr(1) + PriveSpace(i).Key + str$(PriveSpace(i).nDx) + Chr(1)
 End If
 Next i
 End If

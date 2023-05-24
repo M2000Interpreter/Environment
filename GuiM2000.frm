@@ -92,7 +92,7 @@ Private Declare Function SetWindowTextW Lib "user32" (ByVal hWnd As Long, ByVal 
     Private Const GWL_WNDPROC = -4
     Private m_Caption As String
 Dim setupxy As Single
-Dim Lx As Single, lY As Single, dr As Boolean
+Dim lX As Single, lY As Single, dr As Boolean
 Dim scrTwips As Long
 Dim bordertop As Long, borderleft As Long
 Dim allwidth As Long, itemWidth As Long
@@ -212,11 +212,11 @@ If IsExp(bstack, rest$, X) Then
     If bstack.lastobj Is Nothing Then
     Set q(p).drawimage = Nothing
     ElseIf TypeOf bstack.lastobj Is mHandler Then
-        Dim useHandler As mHandler
-        Set useHandler = bstack.lastobj
+        Dim usehandler As mHandler
+        Set usehandler = bstack.lastobj
         Set bstack.lastobj = Nothing
-        If useHandler.t1 = 2 Then
-        Set q(p).drawimage = useHandler.objref
+        If usehandler.t1 = 2 Then
+        Set q(p).drawimage = usehandler.objref
         Else
         GoTo err123
         End If
@@ -252,11 +252,11 @@ Public Sub ClearTargets()
     Targets = False
     ReDim q(0) As target
 End Sub
-Public Property Let CaptionW(ByVal newValue As String)
+Public Property Let CaptionW(ByVal NewValue As String)
 If mNoCaption Then Exit Property
-If LenB(newValue) = 0 Then newValue = "M2000"
-    m_Caption = newValue
-DefWindowProcW Me.hWnd, WM_SETTEXT, 0, ByVal StrPtr(newValue)
+If LenB(NewValue) = 0 Then NewValue = "M2000"
+    m_Caption = NewValue
+DefWindowProcW Me.hWnd, WM_SETTEXT, 0, ByVal StrPtr(NewValue)
 End Property
 
 Friend Property Let Default(ctrlName$)
@@ -269,10 +269,10 @@ Public Property Get CaptionW() As String
         CaptionW = m_Caption
     End If
 End Property
-Public Property Let NoCaption(ByVal newValue As Boolean) ' for task manager
-mNoCaption = newValue
+Public Property Let NoCaption(ByVal NewValue As Boolean) ' for task manager
+mNoCaption = NewValue
 If mNoCaption Then
-DefWindowProcW Me.hWnd, WM_SETTEXT, 0, ByVal StrPtr(newValue)
+DefWindowProcW Me.hWnd, WM_SETTEXT, 0, ByVal StrPtr(NewValue)
 End If
 End Property
 
@@ -767,9 +767,9 @@ If Button > 0 And Targets Then
             Case Else
             
             If mIndex > -1 Then
-                Callback mMyName$ + ".Target" + "(" + CStr(Index) + "," + Str(sel& + prive * 10000) + ")"
+                Callback mMyName$ + ".Target" + "(" + CStr(Index) + "," + str(sel& + prive * 10000) + ")"
             Else
-                Callback mMyName$ + ".Target" + "(" + Str(sel& + prive * 10000) + ")"
+                Callback mMyName$ + ".Target" + "(" + str(sel& + prive * 10000) + ")"
             End If
 
             End Select
@@ -838,6 +838,7 @@ If mModalid = Modalid And Modalid <> 0 Then
     If mModalid <> 0 Then Modalid = 0
     Cancel = Not byPassCallback
     novisible = False
+    VisibleOldState = False
 ElseIf mModalid <> 0 And Visible Then
     mModalid = mModalIdPrev
     mModalIdPrev = 0
@@ -885,20 +886,20 @@ If mTimes > 0 Then
     gList2.BlinkON = False: gList2.CapColor = mBarColor
     If Stored Then RestoreBlibkStatus
     Else
-        state Face
+        State Face
     End If
 Else
-    state Face
+    State Face
 End If
 gList2.ShowMe
 If Stored Then Exit Sub
   If mIndex >= 0 Then
-   Callback mMyName$ + ".Blink(" + Str(Index) + "," + Str(Face) + ")"
+   Callback mMyName$ + ".Blink(" + str(Index) + "," + str(Face) + ")"
    Else
-      Callback mMyName$ + ".Blink(" + Str(Face) + ")"
+      Callback mMyName$ + ".Blink(" + str(Face) + ")"
       End If
 End Sub
-Public Sub state(Face As Boolean)
+Public Sub State(Face As Boolean)
     If Face Then
         gList2.CapColor = rgb(255, 160, 0)
     Else
@@ -1256,7 +1257,7 @@ scrTwips = Screen.TwipsPerPixelX
 lastfactor = 1
 setupxy = 20
 gList2.FreeMouse = True
-gList2.Font.size = 14.25 * dv15 / 15
+gList2.Font.Size = 14.25 * dv15 / 15
 gList2.enabled = True
 mIconColor = 0
 mBarColor = rgb(255, 160, 0)
@@ -1270,7 +1271,7 @@ gList2.SoftEnterFocus
 gList2.TabStop = False
 With gList2.Font
 CtrlFont.Name = .Name
-CtrlFont.size = .size
+CtrlFont.Size = .Size
 CtrlFont.bold = .bold
 End With
 gList2.FloatLimitTop = VirtualScreenHeight() - 600
@@ -1323,173 +1324,173 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 Private Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim a As RECT
-CopyFromLParamToRect a, thatRect
+Dim A As RECT
+CopyFromLParamToRect A, thatRect
 
-FillBack thathDC, a, thatbgcolor
+FillBack thathDC, A, thatbgcolor
 End Sub
 Private Sub FillThereMyVersionTrans(thathDC As Long, thatRect As Long, thatbgcolor As Long, Reverse As Boolean)
-Dim a As RECT, b As Long, aline As RECT
+Dim A As RECT, b As Long, aline As RECT
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
-CopyFromLParamToRect a, thatRect
+CopyFromLParamToRect A, thatRect
 If Reverse Then
-    a.Left = a.Right - setupxy + b
-    a.Right = a.Right - b
+    A.Left = A.Right - setupxy + b
+    A.Right = A.Right - b
 Else
-    a.Left = b
-    a.Right = setupxy - b
+    A.Left = b
+    A.Right = setupxy - b
 End If
-a.top = b
-a.Bottom = setupxy - b
+A.top = b
+A.Bottom = setupxy - b
 If b < 1 Then b = 1 Else b = b * 2 - 1
-aline = a
-aline.Left = a.Right - b
+aline = A
+aline.Left = A.Right - b
 FillThere thathDC, VarPtr(aline), mIconColor
-aline = a
-aline.Right = a.Left + b
+aline = A
+aline.Right = A.Left + b
 FillThere thathDC, VarPtr(aline), mIconColor
 
-aline = a
-aline.Bottom = a.top + b
+aline = A
+aline.Bottom = A.top + b
 FillThere thathDC, VarPtr(aline), mIconColor
-aline = a
-aline.top = a.Bottom - b
+aline = A
+aline.top = A.Bottom - b
 FillThere thathDC, VarPtr(aline), mIconColor
 End Sub
 Private Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long, Reverse As Boolean)
-Dim a As RECT, b As Long
+Dim A As RECT, b As Long
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
-CopyFromLParamToRect a, thatRect
+CopyFromLParamToRect A, thatRect
 If Reverse Then
-    a.Left = a.Right - setupxy + b
-    a.Right = a.Right - b
+    A.Left = A.Right - setupxy + b
+    A.Right = A.Right - b
 Else
-    a.Left = b
-    a.Right = setupxy - b
+    A.Left = b
+    A.Right = setupxy - b
 End If
-a.top = b
-a.Bottom = setupxy - b
-FillThere thathDC, VarPtr(a), mIconColor
-CopyFromLParamToRect a, thatRect
+A.top = b
+A.Bottom = setupxy - b
+FillThere thathDC, VarPtr(A), mIconColor
+CopyFromLParamToRect A, thatRect
 b = 5 * lastfactor
 If Reverse Then
-    a.Left = a.Right - setupxy + b
-    a.Right = a.Right - b
+    A.Left = A.Right - setupxy + b
+    A.Right = A.Right - b
 Else
-    a.Left = b
-    a.Right = setupxy - b
+    A.Left = b
+    A.Right = setupxy - b
 End If
-a.top = b
-a.Bottom = setupxy - b
-FillThere thathDC, VarPtr(a), thatbgcolor
+A.top = b
+A.Bottom = setupxy - b
+FillThere thathDC, VarPtr(A), thatbgcolor
 End Sub
 Private Sub FillThereMyVersion2(thathDC As Long, thatRect As Long, butPos As Long, Reverse As Boolean)
-Dim a As RECT, b As Long, c As Long
+Dim A As RECT, b As Long, c As Long
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
 c = setupxy * (butPos)
-CopyFromLParamToRect a, thatRect
+CopyFromLParamToRect A, thatRect
 If Reverse Then
-    a.Left = a.Right - (c + setupxy * 2) + b
-    a.Right = a.Right - b - c - setupxy
+    A.Left = A.Right - (c + setupxy * 2) + b
+    A.Right = A.Right - b - c - setupxy
 
 Else
-    a.Left = b + c + setupxy
-    a.Right = setupxy - 2 * b + a.Left
+    A.Left = b + c + setupxy
+    A.Right = setupxy - 2 * b + A.Left
 End If
-a.Bottom = setupxy - b
+A.Bottom = setupxy - b
 b = 5 * lastfactor
 
 If 5 * lastfactor < 1 Then
-a.top = a.Bottom - 1
+A.top = A.Bottom - 1
 Else
-a.top = setupxy - b
+A.top = setupxy - b
 End If
-FillThere thathDC, VarPtr(a), mIconColor
+FillThere thathDC, VarPtr(A), mIconColor
 End Sub
 Private Sub FillThereMyVersion3Trans(thathDC As Long, thatRect As Long, thatbgcolor As Long, butPos As Long, Reverse As Boolean)
-Dim a As RECT, b As Long, c As Long
+Dim A As RECT, b As Long, c As Long
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
 c = setupxy * butPos
-CopyFromLParamToRect a, thatRect
+CopyFromLParamToRect A, thatRect
 If Reverse Then
-    a.Left = a.Right - (c + setupxy * 2) + b
-    a.Right = a.Right - b - c - setupxy
+    A.Left = A.Right - (c + setupxy * 2) + b
+    A.Right = A.Right - b - c - setupxy
 Else
-    a.Left = b + c + setupxy
-    a.Right = setupxy - 2 * b + a.Left
+    A.Left = b + c + setupxy
+    A.Right = setupxy - 2 * b + A.Left
 End If
-a.top = 3 * b
-a.Bottom = setupxy - b
+A.top = 3 * b
+A.Bottom = setupxy - b
 Dim aline As RECT
 If b < 2 Then b = 2 Else b = b * 2 - 1
-aline = a
-aline.Left = a.Right - b
+aline = A
+aline.Left = A.Right - b
 FillThere thathDC, VarPtr(aline), mIconColor
-aline = a
-aline.Right = a.Left + b
+aline = A
+aline.Right = A.Left + b
 FillThere thathDC, VarPtr(aline), mIconColor
 
-aline = a
-aline.Bottom = a.top + b
+aline = A
+aline.Bottom = A.top + b
 FillThere thathDC, VarPtr(aline), mIconColor
-aline = a
-aline.Bottom = a.Bottom - b * 2
-aline.top = a.Bottom - b
+aline = A
+aline.Bottom = A.Bottom - b * 2
+aline.top = A.Bottom - b
 FillThere thathDC, VarPtr(aline), mIconColor
 End Sub
 Private Sub FillThereMyVersion3(thathDC As Long, thatRect As Long, thatbgcolor As Long, butPos As Long, Reverse As Boolean)
-Dim a As RECT, b As Long, c As Long
+Dim A As RECT, b As Long, c As Long
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
 c = setupxy * butPos
-CopyFromLParamToRect a, thatRect
+CopyFromLParamToRect A, thatRect
 If Reverse Then
-    a.Left = a.Right - (c + setupxy * 2) + b
-    a.Right = a.Right - b - c - setupxy
+    A.Left = A.Right - (c + setupxy * 2) + b
+    A.Right = A.Right - b - c - setupxy
 Else
-    a.Left = b + c + setupxy
-    a.Right = setupxy - 2 * b + a.Left
+    A.Left = b + c + setupxy
+    A.Right = setupxy - 2 * b + A.Left
 End If
-a.top = 3 * b
-a.Bottom = setupxy - b
-FillThere thathDC, VarPtr(a), mIconColor
-CopyFromLParamToRect a, thatRect
+A.top = 3 * b
+A.Bottom = setupxy - b
+FillThere thathDC, VarPtr(A), mIconColor
+CopyFromLParamToRect A, thatRect
 b = 5 * lastfactor
 If b < 2 Then b = 2
 If Reverse Then
-    a.Left = a.Right - (c + setupxy * 2) + b
-    a.Right = a.Right - b - c - setupxy
+    A.Left = A.Right - (c + setupxy * 2) + b
+    A.Right = A.Right - b - c - setupxy
 
 Else
-    a.Left = b + c + setupxy
-    a.Right = setupxy - 2 * b + a.Left
+    A.Left = b + c + setupxy
+    A.Right = setupxy - 2 * b + A.Left
 End If
 
 
-a.top = 4 * b
-a.Bottom = setupxy - b
-FillThere thathDC, VarPtr(a), thatbgcolor
-a.Bottom = a.top - b
+A.top = 4 * b
+A.Bottom = setupxy - b
+FillThere thathDC, VarPtr(A), thatbgcolor
+A.Bottom = A.top - b
 b = 2 * lastfactor
 If b < 2 Then b = 2
-a.Bottom = a.Bottom - b - b / 2
+A.Bottom = A.Bottom - b - b / 2
 
-a.top = 4 * b + b / 2
-FillThere thathDC, VarPtr(a), thatbgcolor
+A.top = 4 * b + b / 2
+FillThere thathDC, VarPtr(A), thatbgcolor
 
 
 End Sub
 Private Sub FillThereMyVersion4(thathDC As Long, thatRect As Long, butPos As Long, Reverse As Boolean)
-Dim a As RECT, b As Long, c As Long
+Dim A As RECT, b As Long, c As Long
 Dim color1 As Long
 color1 = mIconColor
 If Not moveMe And Not ByPassColor Then
@@ -1502,31 +1503,31 @@ End If
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
-CopyFromLParamToRect a, thatRect
+CopyFromLParamToRect A, thatRect
 If Reverse Then
 c = setupxy * (butPos - 1)
-a.Left = b + c + setupxy
-a.Right = setupxy - 2 * b + a.Left
+A.Left = b + c + setupxy
+A.Right = setupxy - 2 * b + A.Left
 Else
 c = setupxy * butPos
-a.Left = a.Right - (c + setupxy) + b
- a.Right = a.Right - b - c
+A.Left = A.Right - (c + setupxy) + b
+ A.Right = A.Right - b - c
 End If
-a.Bottom = setupxy - b
+A.Bottom = setupxy - b
 b = 5 * lastfactor
 
 If 5 * lastfactor < 1 Then
-a.top = a.Bottom - 1
+A.top = A.Bottom - 1
 Else
-a.top = setupxy - b
+A.top = setupxy - b
 End If
-FillThere thathDC, VarPtr(a), color1
-a.top = a.top - b
-a.Bottom = a.Bottom - b
-FillThere thathDC, VarPtr(a), color1
-a.top = a.top - b
-a.Bottom = a.Bottom - b
-FillThere thathDC, VarPtr(a), color1
+FillThere thathDC, VarPtr(A), color1
+A.top = A.top - b
+A.Bottom = A.Bottom - b
+FillThere thathDC, VarPtr(A), color1
+A.top = A.top - b
+A.Bottom = A.Bottom - b
+FillThere thathDC, VarPtr(A), color1
 
 End Sub
 Public Property Get Title() As Variant
@@ -1675,7 +1676,7 @@ If ThisFontName <> "" Then
 
 aa.Name = ThisFontName
 
-If ThisMode > 7 Then aa.size = ThisMode Else aa = 7
+If ThisMode > 7 Then aa.Size = ThisMode Else aa = 7
 aa.bold = ThisBold
 Set gList2.Font = aa
 gList2.Height = gList2.HeadlineHeightTwips
@@ -1691,7 +1692,7 @@ If ThisFontName <> "" Then
 
 CtrlFont.Name = ThisFontName
 
-If ThisMode > 7 Then CtrlFont.size = ThisMode Else CtrlFont = 7
+If ThisMode > 7 Then CtrlFont.Size = ThisMode Else CtrlFont = 7
 CtrlFont.bold = ThisBold
 
 End If
@@ -1700,25 +1701,25 @@ Public Property Get CtrlFontName()
     CtrlFontName = CtrlFont.Name
 End Property
 Public Property Get CtrlFontSize()
-    CtrlFontSize = CtrlFont.size
+    CtrlFontSize = CtrlFont.Size
 End Property
 Public Property Get CtrlFontBold()
     CtrlFontBold = CtrlFont.bold
 End Property
-Friend Sub SendFKEY(a As Integer)
+Friend Sub SendFKEY(A As Integer)
 
  If mIndex >= 0 Then
-      Callback mMyName$ + ".Fkey(" + Str(mIndex) + "," + Str(a) + ")"
+      Callback mMyName$ + ".Fkey(" + str(mIndex) + "," + str(A) + ")"
    Else
-      Callback mMyName$ + ".Fkey(" + Str(a) + ")"
+      Callback mMyName$ + ".Fkey(" + str(A) + ")"
       End If
 End Sub
 
-Private Sub gList2_Fkey(a As Integer)
-If a > 1000 Then
-SendFKEY a - 1000
+Private Sub gList2_Fkey(A As Integer)
+If A > 1000 Then
+SendFKEY A - 1000
 Else
-SendFKEY a
+SendFKEY A
 End If
 End Sub
 
@@ -1930,8 +1931,8 @@ Set LastGlist = this
 End Sub
 
 
-Private Sub gList2_PreviewKeyboardUnicode(a As String)
-SpreadKey a
+Private Sub gList2_PreviewKeyboardUnicode(A As String)
+SpreadKey A
 End Sub
 
 Private Sub glistN_CheckGotFocus()
@@ -1966,11 +1967,11 @@ lastitem = item
 End If
 End Sub
 
-Private Sub glistN_Fkey(a As Integer)
-If a > 1000 Then
-SendFKEY a - 1000
+Private Sub glistN_Fkey(A As Integer)
+If A > 1000 Then
+SendFKEY A - 1000
 Else
-SendFKEY a
+SendFKEY A
 End If
 End Sub
 
@@ -2006,7 +2007,7 @@ Private Sub ResizeMark_MouseDown(Button As Integer, shift As Integer, X As Singl
         y = y + ResizeMark.top
         dr = Button = 1
         ResizeMark.MousePointer = vbSizeNWSE
-        Lx = X
+        lX = X
         lY = y
         If dr Then Relax = False
     Else
@@ -2020,7 +2021,7 @@ If Sizable And Not dr Then
     y = y + ResizeMark.top
     dr = Button = 1
     ResizeMark.MousePointer = vbSizeNWSE
-    Lx = X
+    lX = X
     lY = y
 End If
 End Sub
@@ -2034,11 +2035,11 @@ If Not Relax Then
     Relax = True
     If dr Then
          If y < (Height - 150) Or y >= Height Then addy = (y - lY) Else addy = 0 ' dv15 * 5
-         If X < (Width - 150) Or X >= Width Then addX = (X - Lx) Else addX = 0 'dv15 * 5
+         If X < (Width - 150) Or X >= Width Then addX = (X - lX) Else addX = 0 'dv15 * 5
          If addy = 0 And addX = 0 Then Relax = False: Exit Sub
          If Width + addX >= 1800 And Width + addX < VirtualScreenWidth() Then
              If Height + addy >= 1800 And Height + addy < VirtualScreenHeight() Then
-                Lx = X
+                lX = X
                 lY = y
                 move Left, top, Width + addX, Height + addy
                 IhaveLastPos = False
@@ -2063,7 +2064,7 @@ If Not Relax Then
             If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then
                     dr = Button = 1
                     ResizeMark.MousePointer = vbSizeNWSE
-                    Lx = X
+                    lX = X
                     lY = y
                     If dr Then Relax = False: Exit Sub
             Else
@@ -2223,9 +2224,9 @@ Case glistN.listcount - 1
 End Select
 End If
    If mIndex >= 0 Then
-      Callback mMyName$ + ".InfoClick(" + Str(mIndex) + "," + Str(item) + ")"
+      Callback mMyName$ + ".InfoClick(" + str(mIndex) + "," + str(item) + ")"
    Else
-      Callback mMyName$ + ".InfoClick(" + Str(item) + ")"
+      Callback mMyName$ + ".InfoClick(" + str(item) + ")"
       End If
       
   
@@ -2297,9 +2298,9 @@ Case glistN.listcount - 1
 End Select
 End If
    If mIndex >= 0 Then
-      Callback mMyName$ + ".InfoClick(" + Str(mIndex) + "," + Str(item) + ")"
+      Callback mMyName$ + ".InfoClick(" + str(mIndex) + "," + str(item) + ")"
    Else
-      Callback mMyName$ + ".InfoClick(" + Str(item) + ")"
+      Callback mMyName$ + ".InfoClick(" + str(item) + ")"
       End If
     
 Else
@@ -2308,14 +2309,14 @@ End If
 End Sub
 
 
-Public Sub additem(a$)
+Public Sub additem(A$)
 If Not NoEventInfo Then Exit Sub
-glistN.additemFast a$
+glistN.additemFast A$
 End Sub
 
-Public Sub additemFast(a$)
+Public Sub additemFast(A$)
 If Not NoEventInfo Then Exit Sub
-glistN.additemFast a$
+glistN.additemFast A$
 End Sub
 Public Property Get MenuWidth() As Long
 MenuWidth = mMenuWidth
@@ -2343,12 +2344,12 @@ On Error Resume Next
 If item < 0 Then Exit Sub
 glistN.Removeitem item
 End Sub
-Public Sub Insert(item, a$)
+Public Sub Insert(item, A$)
 If Not NoEventInfo Then Exit Sub
 On Error Resume Next
 glistN.ListindexPrivateUse = item
 If glistN.ListIndex > -1 Then
-glistN.additemAtListIndex a$
+glistN.additemAtListIndex A$
 End If
 End Sub
 Public Sub MenuItemAtListIndex(Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional IdD)
@@ -2364,14 +2365,14 @@ glistN.MenuItem item, checked, radiobutton, firstate, CStr(IdD)
 End If
 glistN.menuEnabled(CLng(item - 1)) = enabledthis
 End Sub
-Public Sub MenuItem(a$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional IdD)
+Public Sub MenuItem(A$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional IdD)
 If Not NoEventInfo Then Exit Sub
 Dim item
-If Not a$ = vbNullString Then
-glistN.additemFast a$
+If Not A$ = vbNullString Then
+glistN.additemFast A$
 End If
 item = glistN.listcount
-If a$ = vbNullString Then
+If A$ = vbNullString Then
 glistN.AddSep
 Else
 If IsMissing(IdD) Then
@@ -2383,16 +2384,16 @@ End If
 glistN.menuEnabled(CLng(item - 1)) = enabledthis
 End If
 End Sub
-Public Sub MenuRadio(a$, Optional enabledthis As Boolean = True, Optional firstate As Boolean = False, Optional IdD)
+Public Sub MenuRadio(A$, Optional enabledthis As Boolean = True, Optional firstate As Boolean = False, Optional IdD)
 If Not NoEventInfo Then Exit Sub
 Dim item, checked As Boolean
 checked = False
 
-If Not a$ = vbNullString Then
-glistN.additemFast a$
+If Not A$ = vbNullString Then
+glistN.additemFast A$
 End If
 item = glistN.listcount
-If a$ = vbNullString Then
+If A$ = vbNullString Then
 glistN.AddSep
 Else
 If IsMissing(IdD) Then
@@ -2624,7 +2625,7 @@ End If
 End If
 DeleteObject my_brush
 End Sub
-Public Function GetPicture(ByVal s$, Optional size, Optional ColorDepth, Optional X, Optional y) As StdPicture
+Public Function GetPicture(ByVal s$, Optional Size, Optional ColorDepth, Optional X, Optional y) As StdPicture
 Dim where$
 On Error Resume Next
 where$ = CFname(s$)
@@ -2633,20 +2634,20 @@ If LenB(where$) = 0 Then
 Else
 where$ = GetDosPath(where$)
 If LenB(where$) = 0 Then Set GetPicture = LoadPicture(""): Exit Function
-If IsMissing(size) And IsMissing(ColorDepth) And IsMissing(X) And IsMissing(y) Then
+If IsMissing(Size) And IsMissing(ColorDepth) And IsMissing(X) And IsMissing(y) Then
 Set GetPicture = LoadPicture(where$)
 ElseIf IsMissing(ColorDepth) And IsMissing(X) And IsMissing(y) Then
-Set GetPicture = LoadPicture(where$, size)
+Set GetPicture = LoadPicture(where$, Size)
 ElseIf IsMissing(X) And IsMissing(y) Then
-Set GetPicture = LoadPicture(where$, size, ColorDepth)
+Set GetPicture = LoadPicture(where$, Size, ColorDepth)
 ElseIf IsMissing(y) Then
-Set GetPicture = LoadPicture(where$, size, ColorDepth, X)
+Set GetPicture = LoadPicture(where$, Size, ColorDepth, X)
 Else
-Set GetPicture = LoadPicture(where$, size, ColorDepth, X, y)
+Set GetPicture = LoadPicture(where$, Size, ColorDepth, X, y)
 End If
 End If
 End Function
-Public Sub ReloadIcon(ByVal s$, Optional size, Optional ColorDepth, Optional X, Optional y)
+Public Sub ReloadIcon(ByVal s$, Optional Size, Optional ColorDepth, Optional X, Optional y)
 Dim where$
 On Error Resume Next
 where$ = CFname(s$)
@@ -2660,16 +2661,16 @@ If LenB(where$) = 0 Then
 Else
 where$ = GetDosPath(where$)
     If LenB(where$) = 0 Then Exit Sub
-If IsMissing(size) And IsMissing(ColorDepth) And IsMissing(X) And IsMissing(y) Then
+If IsMissing(Size) And IsMissing(ColorDepth) And IsMissing(X) And IsMissing(y) Then
 Set icon = LoadPicture(where$)
 ElseIf IsMissing(ColorDepth) And IsMissing(X) And IsMissing(y) Then
-Set icon = LoadPicture(where$, size)
+Set icon = LoadPicture(where$, Size)
 ElseIf IsMissing(X) And IsMissing(y) Then
-Set icon = LoadPicture(where$, size, ColorDepth)
+Set icon = LoadPicture(where$, Size, ColorDepth)
 ElseIf IsMissing(y) Then
-Set icon = LoadPicture(where$, size, ColorDepth, X)
+Set icon = LoadPicture(where$, Size, ColorDepth, X)
 Else
-Set icon = LoadPicture(where$, size, ColorDepth, X, y)
+Set icon = LoadPicture(where$, Size, ColorDepth, X, y)
 End If
 End If
 If MyForm3 Is Nothing Then Exit Sub
@@ -2710,12 +2711,12 @@ Case 3
  glistN.menuEnabled(3) = True: glistN.menuEnabled(4) = False
  End Select
 End Sub
-Sub InsertMenuItem(a$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional IdD)
+Sub InsertMenuItem(A$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional IdD)
 If Not NoEventInfo Then Exit Sub
 Dim item
-glistN.additemAtListIndex a$
+glistN.additemAtListIndex A$
 item = glistN.ListIndex
-If a$ = vbNullString Then
+If A$ = vbNullString Then
 glistN.ListSep(item - 1) = True
 Else
 If IsMissing(IdD) Then
@@ -2835,13 +2836,13 @@ If Not acclist Is Nothing Then
                 
                 todo = todo Mod 1000
                 If todo > 500 Then todo = todo - 500
-                Dim a As Control
-                Set a = Controls(acclist.Value)
+                Dim A As Control
+                Set A = Controls(acclist.Value)
                 Dim aa As gList, bb As GuiImage
-                If TypeOf a Is gList Then
-                    Set aa = a
+                If TypeOf A Is gList Then
+                    Set aa = A
                     aa.TakeKey CInt(todo), shift + ctrl + alt
-                ElseIf TypeOf a Is VB.PictureBox Then
+                ElseIf TypeOf A Is VB.PictureBox Then
                     Set bb = GuiControls(acclist.Value)
                     bb.TakeKey CInt(todo), shift + ctrl + alt
                 End If
@@ -2856,44 +2857,44 @@ If Not acclist Is Nothing Then
     End If
 End If
 End Sub
-Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(A, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
-If MyIsNumeric(a) Then
-a = CLng(a)
-If a < 0 Then Exit Sub
-If a > 499 Then Exit Sub
+If MyIsNumeric(A) Then
+A = CLng(A)
+If A < 0 Then Exit Sub
+If A > 499 Then Exit Sub
 Else
-a = UCase(a)
-Select Case a
+A = UCase(A)
+Select Case A
 Case "F1" To "F9"
-a = 611 + val(Mid(a, 2))
+A = 611 + val(Mid(A, 2))
 Case Else
-a = AscW(a)
-If a > 126 Then a = 0
+A = AscW(A)
+If A > 126 Then A = 0
 End Select
 End If
-If a = 0 Then Exit Sub
-a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
-RegisterAcc a, "gList2", Opcode
+If A = 0 Then Exit Sub
+A = A - 1000 * shift - 10000 * ctrl - 100000 * alt
+RegisterAcc A, "gList2", Opcode
 End Sub
-Public Sub SendScanCode(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean)
+Public Sub SendScanCode(A, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean)
 ' send only scancodes if a<500 or a-500 for a>500 with extend option. F4 is 615 (500+115)
-If MyIsNumeric(a) Then
-a = CLng(a)
-If a < 0 Then Exit Sub
-If a > 754 Then Exit Sub
+If MyIsNumeric(A) Then
+A = CLng(A)
+If A < 0 Then Exit Sub
+If A > 754 Then Exit Sub
 Else
-a = UCase(a)
-Select Case a
+A = UCase(A)
+Select Case A
 Case "F1" To "F9"
-a = 611 + val(Mid(a, 2))
+A = 611 + val(Mid(A, 2))
 Case Else
-a = AscW(a)
-If a > 254 Then a = 0
+A = AscW(A)
+If A > 254 Then A = 0
 End Select
 End If
-If a = 0 Then Exit Sub
-SendAKey a, shift, ctrl, alt
+If A = 0 Then Exit Sub
+SendAKey A, shift, ctrl, alt
 End Sub
 Property Get CapsLock() As Boolean
     CapsLock = CapsLockOn()

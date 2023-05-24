@@ -1,33 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 30 active-X
-Corrections on Stack statement
-// works for aa$(10) too.
-Dim aa(10)
-aa(1)=stack$(1=1, 1234567891234567891234567@)
-Stack aa(1), "N"
-Stack
-Read a
-Print Type$(a)="Boolean" 
-Print aa(1)
-Stack aa(1), "N"
-Read b
-Print Type$(b)="Decimal"
-Clear
-///And for stack objects now work with array items:
-Dim A(10)
-A(3)=STACK:=1,2,"Hello",4
-Print A(3)
-k=1
-Variant Z
-Stack A(3) {
-	if empty then exit
-	Read Z  // can take any type, it is variant type
-	Print Z
-	k++
-	if k<4 then loop
-}
-Print ">>>", A(3)
+Version 12 Revision 31 active-X
+1. Removed  some bugs (one was from revision 30, now Priority module in info runs as expected)
+All programs in Info file run as expected
+2. Latest release of GreekManual.pdf (exist in M2000 setup, see Releases on github)
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
@@ -56,11 +32,11 @@ https://github.com/M2000Interpreter/Environment
 
 M2000language.exe (Chrome can't scan, say it is a virus - heuristic choise)
 All exe files are signed
-https://drive.google.com/u/0/uc?id=1hjEO6XvAu-l7TTwPYmPEkZZrxAXPtA41
+https://github.com/M2000Interpreter/Environment/releases
 
 M2000 paper (305 pages). Included in M2000language.exe
 https://drive.google.com/file/d/1pHBjLVeaGkyMhyyfvXyvh42cJ3njY7wa
 
 M2000 Greek Small Manual (488 pages). Included in M2000language.exe
-https://drive.google.com/file/d/0BwSrrDW66vvvS2lzQzhvZWJ0RVE
+https://drive.google.com/file/d/1_2E-4_Eg10yvdGAhEaS3IxW2nI0jDtrH
                                                              

@@ -11,7 +11,7 @@ Private Type PeekArrayType
     Reserved    As Currency
 End Type
 
-Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (Arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
+Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
 Private Declare Function SafeArrayGetDim Lib "OleAut32.dll" (ByVal Ptr As Long) As Long
 Private Declare Function vbaVarLateMemSt Lib "msvbvm60" _
                          Alias "__vbaVarLateMemSt" ( _
@@ -1315,7 +1315,7 @@ checkobject:
                                     Else
                                         If UseType Then
                                             myobject.ToDelete = True
-                                            UnFloatGroup bstack, W$, v, myobject, VarStat Or isglobal, , VarTypeName(var(v)) = "Empty"       ' global??
+                                            UnFloatGroup bstack, W$, v, myobject, VarStat Or isglobal, , myVarType(var(v), vbEmpty)        ' global??
                                             If Len(bstack.UseGroupname) <> 0 Then
                                                 var(v).IamRef = True
                                                 If Not (VarStat Or isglobal) Then
@@ -1587,16 +1587,15 @@ hasstr1:
                                 GoTo err000
                                 Else
                                 If Len(var(v).GroupName) > Len(W$) Then
-                                    If var(v).IamRef Then ' Or Len(bstack.UseGroupname ) > 0
-                                
+                                '  If var(v).IamRef Then ' Or Len(bstack.UseGroupname ) > 0
+                                '  Debug.Print var(v).IamRef
                                      sw$ = here$
                                       here$ = vbNullString
                                     UnFloatGroupReWriteVars bstack, var(v).Patch, v, myobject
                                     here = sw$
-                                    Else
-                                    
-                                    UnFloatGroupReWriteVars bstack, W$, v, myobject
-                                    End If
+                                 '   Else
+                                  '  UnFloatGroupReWriteVars bstack, W$, v, myobject
+                                   ' End If
                                     myobject.ToDelete = True
                                 Else
                                     bstack.GroupName = Left$(W$, Len(W$) - Len(var(v).GroupName) + 1)
@@ -1803,7 +1802,7 @@ contwrong1:
                         Set bstack.lastobj = Nothing
                         Set myobject = Nothing
                       ElseIf TypeOf var(v) Is Constant Then
-                        If VarTypeName(var(v).Value) = "Empty" Then
+                        If myVarType(var(v).Value, vbEmpty) Then
                             If IsExp(bstack, b$, p) Then
                                 If bstack.lastobj Is Nothing Then
                                     var(v).DefineOnce p
@@ -2817,7 +2816,7 @@ str99399:
                                         If CheckVarOnlyNo(var(v), ss$) Then
                                             If VarTypeName(var(v)) = "Constant" Then
 itsAconstant:
-                                                If VarTypeName(var(v).Value) = "Empty" Then
+                                                If myVarType(var(v).Value, vbEmpty) Then
                                                     If bstack.lastobj Is Nothing Then
                                                         var(v).DefineOnce ss$
                                                         If extreme Then GoTo NewCheck2 Else GoTo NewCheck
@@ -2948,7 +2947,7 @@ strcont111:
                         End If
                         var(v).Value = ss$
                   ElseIf VarTypeName(var(v)) = "Constant" Then
-                  If VarTypeName(var(v).Value) = "Empty" Then
+                  If myVarType(var(v).Value, vbEmpty) Then
                   var(v).DefineOnce ss$
                   Else
                       CantAssignValue
@@ -3103,7 +3102,7 @@ assignvalue100:
                             End If
                ElseIf MyIsObject(var(v)) Then
                         If TypeOf var(v) Is Constant Then
-                              If VarTypeName(var(v).Value) = "Empty" Then
+                              If myVarType(var(v).Value, vbEmpty) Then
                                     If bstack.lastobj Is Nothing Then
                                           var(v).DefineOnce MyRound(p)
                                           If extreme Then GoTo NewCheck2 Else GoTo NewCheck
@@ -3355,7 +3354,7 @@ againarray:
         If ppppAny Is Nothing Then
             GoTo err000
         End If
-        If Not ppppAny.Arr Then
+        If Not ppppAny.arr Then
             If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , True, idx) Then GoTo errorarr
         ElseIf FastSymbol(b$, ")") Then
             Set pppp = ppppAny
@@ -3389,7 +3388,7 @@ againarray:
                     Else
                         Set pppp1 = New mArray: pppp1.PushDim (1): pppp1.PushEnd
                         pppp1.SerialItem 0, 2, 9
-                        pppp1.Arr = True
+                        pppp1.arr = True
                         If bstack.lastobj Is Nothing Then
                             pppp1.item(0) = p
                         Else
@@ -3424,7 +3423,7 @@ here66678:
 '*********************************************
     With ppppAny
         If ppppAny.Final Then CantAssignValue: GoTo err000
-        If Not .Arr Then
+        If Not .arr Then
             If v = -2 Then GoTo con123
         ElseIf MyIsObject(.item(v)) Then
             If v = -2 Then
@@ -3532,7 +3531,7 @@ a1297654:
     Set pppp = ppppAny
     With pppp
         If FastSymbol(b$, ":=", , 2) Then
-            If Not .Arr Then GoTo NotArray1
+            If Not .arr Then GoTo NotArray1
     ' new on rev 20
 contassignhere:
             If GetData(bstack, b$, myobject) Then
@@ -3885,7 +3884,7 @@ again12569:
             Else
                 If Not bstack.lastobj Is Nothing Then
                     If TypeOf bstack.lastobj Is iBoxArray Then
-                        If bstack.lastobj.Arr Then
+                        If bstack.lastobj.arr Then
                             Set ppppAny.item(v) = CopyArray(bstack.lastobj)
                         Else
                             Set ppppAny.item(v) = bstack.lastobj
@@ -3914,7 +3913,7 @@ again12569:
         End If
         Set bstack.lastobj = Nothing
      Else
-        If ppppAny.Arr Then
+        If ppppAny.arr Then
             If ppppAny.ItemType(v) = mGroup Then
 here12500:
                 If ppppAny.item(v).IamApointer Then
@@ -3957,7 +3956,7 @@ here65654:
             myProp.PushIndexes idx
             myProp.Value = p
             Set myProp = Nothing
-        ElseIf Not pppp.Arr Then
+        ElseIf Not pppp.arr Then
             NoAssignThere
         End If
     End If
@@ -4021,7 +4020,7 @@ MakeArray bstack, W$, 6, b$, pppp, NewStat, VarStat
         sss = Len(b$): ExecuteVar = 4: Exit Function
 End If
 If neoGetArray(bstack, W$, ppppAny, , , , True) Then
-    If Not ppppAny.Arr Then
+    If Not ppppAny.arr Then
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , , idx) Then GoTo err000
 GoTo there12567
 ElseIf FastSymbol(b$, ")") Then
@@ -4095,7 +4094,7 @@ ElseIf FastSymbol(b$, ")") Then
         Else
             Set pppp1 = New mArray: pppp1.PushDim (1): pppp1.PushEnd
             pppp1.SerialItem 0, 2, 9
-            pppp1.Arr = True
+            pppp1.arr = True
             If bstack.lastobj Is Nothing Then
                 pppp1.item(0) = vbNullString
             Else
@@ -4119,7 +4118,7 @@ If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
 ' WHY BEFORE WAS : If pppp.itemtype(v) = myArray And Not pppp.Arr Then
 there12567:
-If ppppAny.Arr Then
+If ppppAny.arr Then
 If ppppAny.ItemType(v) = myArray Then
 If FastSymbol(b$, "(") Then
 Set ppppAny = ppppAny.item(v)
@@ -4173,7 +4172,7 @@ ElseIf Not FastSymbol(b$, "=") Then
         GoTo err000
     End If
     Set pppp = ppppAny
-    If pppp.Arr Then
+    If pppp.arr Then
         If FastSymbol(b$, ":=", , 2) Then GoTo contassignhere
     End If
     
@@ -4275,7 +4274,7 @@ Else
     If Not MyIsObject(ppppAny.item(v)) Then
     
     If TypeOf ppppAny Is mArray Then
-        If ppppAny.Arr Then
+        If ppppAny.arr Then
         Set pppp = ppppAny
         If pppp.count = 0 Then
             pppp.GroupRef.Value = ss$
@@ -4283,7 +4282,7 @@ Else
             pppp.ItemStr(v) = ss$
         Else
             If Typename(bstack.lastobj) = myArray Then
-                If bstack.lastobj.Arr Then
+                If bstack.lastobj.arr Then
                     Set pppp.item(v) = CopyArray(bstack.lastobj)
                 Else
                     Set pppp.item(v) = bstack.lastobj.GroupRef
@@ -4702,7 +4701,7 @@ If neoGetArray(bstack, W$, pppp) Then
 againintarr:
 If Not NeoGetArrayItem(pppp, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
-If pppp.ItemType(v) = myArray And pppp.Arr Then
+If pppp.ItemType(v) = myArray And pppp.arr Then
 If FastSymbol(b$, "(") Then
 Set pppp = pppp.item(v)
 GoTo againintarr
@@ -4802,7 +4801,7 @@ End If
     If Not IsExp(bstack, b$, p) Then MissNumExpr: GoTo err000
     If Not bstack.lastobj Is Nothing Then
         If TypeOf bstack.lastobj Is mArray Then
-            If bstack.lastobj.Arr Then
+            If bstack.lastobj.arr Then
                 Set pppp.item(v) = CopyArray(bstack.lastobj)
             Else
                 Set pppp.item(v) = bstack.lastobj
@@ -5197,7 +5196,7 @@ Case 5, 7
                         Set pppp.item(it) = myobject
                         Set myobject = Nothing
                     ElseIf Typename$(myobject) = myArray Then
-                                  If myobject.Arr Then
+                                  If myobject.arr Then
                         Set pppp.item(it) = CopyArray(myobject)
                     Else
                         Set pppp.item(it) = myobject
@@ -5262,7 +5261,7 @@ Case 5, 7
                     Set pppp.item(it) = myobject
                     Set myobject = Nothing
                 ElseIf Typename$(myobject) = myArray Then
-                    If myobject.Arr Then
+                    If myobject.arr Then
                         Set pppp.item(it) = CopyArray(myobject)
                     Else
                         Set pppp.item(it) = myobject
@@ -5680,67 +5679,76 @@ islambda:
         Else
             it = globalvar(what$, it)
             MakeitObject2 var(it)
+            Dim aG As Group, bG As Group
+            Set bG = var(it)
             If var(i).IamApointer Then
             If var(i).link.IamFloatGroup Then
-               Set var(it).LinkRef = var(i).link
-                var(it).IamApointer = True
-                var(it).isRef = True
+               Set bG.LinkRef = var(i).link
+                bG.IamApointer = True
+                bG.isRef = True
             Else
-            With var(i).link
             
-                var(it).edittag = .edittag
-                var(it).FuncList = .FuncList
-                var(it).GroupName = myUcase(what$) + "."
-                'Set var(it).Sorosref = .soros.Copy
-                var(it).HasValue = .HasValue
-                var(it).HasSet = .HasSet
-                var(it).HasStrValue = .HasStrValue
-                var(it).HasParameters = .HasParameters
-                var(it).HasParametersSet = .HasParametersSet
-                var(it).HasRemove = .HasRemove
-                        Set var(it).Events = .Events
+            Set aG = var(i).link
             
-                var(it).highpriorityoper = .highpriorityoper
-                var(it).HasUnary = .HasUnary
+            With aG
+            
+                bG.edittag = .edittag
+                bG.FuncList = .FuncList
+                bG.GroupName = myUcase(what$) + "."
+                'Set bG.Sorosref = .soros.Copy
+                If UBound(.Fields) > 1 Then bG.Fields = .Fields
+                bG.HasValue = .HasValue
+                bG.HasSet = .HasSet
+                bG.HasStrValue = .HasStrValue
+                bG.HasParameters = .HasParameters
+                bG.HasParametersSet = .HasParametersSet
+                bG.HasRemove = .HasRemove
+                        Set bG.Events = .Events
+            
+                bG.highpriorityoper = .highpriorityoper
+                bG.HasUnary = .HasUnary
                 If Len(here$) > 0 Then
-                var(it).Patch = here$ + "." + what$
+                bG.Patch = here$ + "." + what$
                 Else
-                var(it).Patch = what$
+                bG.Patch = what$
                 End If
-                Set var(it).mytypes = .mytypes
+                Set bG.mytypes = .mytypes
             End With
             End If
             
             Else
-            With var(i)
+            Set aG = var(i)
+            With aG
             
-                var(it).edittag = .edittag
-                var(it).FuncList = .FuncList
-                var(it).GroupName = myUcase(what$) + "."
-             '   Set var(it).Sorosref = .soros.Copy
-                var(it).HasValue = .HasValue
-                var(it).HasSet = .HasSet
-                var(it).HasStrValue = .HasStrValue
-                var(it).HasParameters = .HasParameters
-                var(it).HasParametersSet = .HasParametersSet
-                var(it).HasRemove = .HasRemove
-                        Set var(it).Events = .Events
+                bG.edittag = .edittag
+                bG.FuncList = .FuncList
+                bG.GroupName = myUcase(what$) + "."
+             '   Set bG.Sorosref = .soros.Copy
+                If UBound(.Fields) > 1 Then bG.Fields = .Fields
+                bG.HasValue = .HasValue
+                bG.HasSet = .HasSet
+                bG.HasStrValue = .HasStrValue
+                bG.HasParameters = .HasParameters
+                bG.HasParametersSet = .HasParametersSet
+                bG.HasRemove = .HasRemove
+                        Set bG.Events = .Events
             
-                var(it).highpriorityoper = .highpriorityoper
-                var(it).HasUnary = .HasUnary
+                bG.highpriorityoper = .highpriorityoper
+                bG.HasUnary = .HasUnary
                 If Len(here$) > 0 Then
-                var(it).Patch = here$ + "." + what$
+                bG.Patch = here$ + "." + what$
                 Else
-                var(it).Patch = what$
+                bG.Patch = what$
                 End If
-                Set var(it).mytypes = .mytypes
+                Set bG.mytypes = .mytypes
             End With
-             var(it).IamRef = Len(bstack.UseGroupname) > 0
+             bG.IamRef = Len(bstack.UseGroupname) > 0
              End If
             If var(i).HasStrValue Then
                 globalvar what$ + "$", it, True
             End If
-            
+            Set bG = Nothing
+            Set aG = Nothing
         End If
         MyRead = True
     End If
@@ -7690,7 +7698,7 @@ Case 5, 7
             MyRead = True
             GoTo loopcont123
         ElseIf Typename$(myobject) = myArray Then
-            If myobject.Arr Then
+            If myobject.arr Then
                 Set pppp.item(it) = CopyArray(myobject)
             Else
                 Set pppp.item(it) = myobject
@@ -7782,7 +7790,7 @@ Case 6
                     Set myobject = Nothing
 
             ElseIf Typename$(myobject) = myArray Then
-                    If myobject.Arr Then
+                    If myobject.arr Then
                         Set pppp.item(it) = CopyArray(myobject)
                     Else
                         Set pppp.item(it) = myobject

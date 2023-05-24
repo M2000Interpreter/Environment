@@ -16,7 +16,6 @@ Dim VarRef As String
 Dim FuncRef As String
 Public oldFuncRef As String
 Dim LocalRef As String  ' used only for classes
-Dim Fields() As String
 Dim mName As String
 Dim mFloatGroupName As String
 Dim FloatGroup As Boolean
@@ -42,39 +41,44 @@ Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
 Public PointerPtr As Long
 Public ToDelete As Boolean, HasRemove As Boolean, mytypes As Collection
 Public IamCleared As Boolean
+Public Fields As Variant
 Sub Add2Field(st$)
     Dim there As Long
-    there = UBound(Fields()) + 1
-    ReDim Preserve Fields(there)
-    SwapStrings st$, Fields(there)
+    On Error Resume Next
+    there = UBound(Fields)
+    If Err Then Err.Clear: there = 0
+    ReDim Preserve Fields(there + 1)
+   ' SwapStrings st$,
+    Fields(there) = st$
+    st$ = vbNullString
 End Sub
 Function ReadField(there As Long) As String
-'If FieldsCount < there Then Exit Function
-
     ReadField = Fields(there)
-  '  there = there + 1
 End Function
 Sub MergeField(st$)
 Dim b As String, i As Long
 b = Split(st$)(0)
-If FieldsCount = 0 Then
-    i = UBound(Fields()) + 1
-    ReDim Preserve Fields(i)
+If UBound(Fields) - 1 = 0 Then
+    i = UBound(Fields)
+    ReDim Preserve Fields(i + 1)
     Fields(i) = st$
 Else
-    For i = 1 To FieldsCount
+    For i = 1 To UBound(Fields) - 1
         If Split(Fields(i))(0) = b Then
             Fields(i) = st$
             Exit Sub
         End If
     Next i
-    i = UBound(Fields()) + 1
-    ReDim Preserve Fields(i)
+    i = UBound(Fields)
+    ReDim Preserve Fields(i + 1)
     Fields(i) = st$
 End If
 End Sub
 Property Get FieldsCount() As Long
-    FieldsCount = UBound(Fields()) - LBound(Fields())
+    On Error Resume Next
+  
+    FieldsCount = UBound(Fields) - 1
+    
 End Property
 Friend Property Let PutIs(RHS As String)
 If mytypes Is Nothing Then
@@ -410,7 +414,9 @@ End Property
 
 
 Private Sub Class_Initialize()
-ReDim Fields(0) As String
+Dim f() As String
+ReDim f(1) As String
+Fields = f()
 End Sub
 
 Private Sub Class_Terminate()

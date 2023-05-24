@@ -3180,7 +3180,7 @@ MODULE GAME {Module Game2048 {
 Game2048
 }
 MODULE FIX1 {
-Where=random(1, monitors)
+Where=random(0, monitors-1)
 //mm=where=window
 mm=0
 Title "M2000", mm
@@ -42343,7 +42343,7 @@ MODULE OCTAL {Module CountInOctal {
 	 k=OctalDigitsCounter(4)
 	// you can press Esc to stop it
 	cls, 0
-	Print "press Esc to stop"
+	Print "press Esc to stop counting"
 	cls, 1
 	escape off
 	refresh 100 // to synchronize the scrolling, so we always see the numbers not the empty line 
