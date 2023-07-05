@@ -1,9 +1,10 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 31 active-X
-1. Removed  some bugs (one was from revision 30, now Priority module in info runs as expected)
-All programs in Info file run as expected
-2. Latest release of GreekManual.pdf (exist in M2000 setup, see Releases on github)
+Version 12 Revision 32 active-X
+1. Remove bug at Stack Stack(a) where Stack( not trated as function but as array (which didn't exist). See example ranking in info.gsb (now works fine).
+2. Update info.gsb for (1) and for two modules:
+2.1 Module Pyth (now adjust Pythagorian Tree better for any screen ratio scale.x/scale.y).
+2.2 Module machinecode2 correct a typo at first label (M200 to M2000).
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

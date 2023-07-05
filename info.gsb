@@ -5672,7 +5672,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 57 for M2000 Interpreter version 12, revision 19 and above"
+	Report " A collection of modules for tests version 58 for M2000 Interpreter version 12, revision 19 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -15303,8 +15303,8 @@ MODULE PYTH {MODULE Pythagoras_tree {
 	CLS 5, 0  ' MAGENTA, NO SPLIT SCREEN
 	PEN 14   ' YELLOW
 	\\ code from zkl/Free Basic
-	LET w = scale.x, h = w * 11 div 16
-	LET w2 = w div 2, diff = w div 12
+	LET w = min.data(scale.x, scale.y), h = w * 11 div 16
+	LET w2 = scale.x div 2, diff = w div 12
 	LET TreeOrder = 6
 	pythagoras_tree(w2 - diff, h -10, w2 + diff, h -10, 0)
  
@@ -40866,7 +40866,7 @@ k=bold
 bold 0
 Cls #050f05, 0
 pen #fff0ff
-Pen 14 {Print "This is an example of machine code executing a loop calling M200 code"}
+Pen 14 {Print "This is an example of machine code executing a loop calling M2000 code"}
 far=if(rnd>.5->false, true)
 Print if$(far=true->"Using dec ecx && jnz rel32","Using loop rel8")
 const clip=false // true to produce code and place it to clipboard
