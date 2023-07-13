@@ -51,10 +51,10 @@ Private Type SAFEArrayPart
    cLocks                       As Long
    pvData                       As Long
    End Type
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
   Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" _
       (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
@@ -603,7 +603,7 @@ Friend Function ExportStrArray() As String()
 If myVarType(actualData, vbObject) Then Exit Function
 If VarType(actualData) <> vbArray + vbVariant Then Exit Function
 Dim i As Long
-Dim n As Byte, s$, m_base As Long, r1 As Long, where As Long
+Dim n As Byte, s$, m_base As Long, R1 As Long, where As Long
 
 ReDim strAr(maxitems) As String
 For i = 0 To maxitems - 1
@@ -782,14 +782,14 @@ Friend Sub CopySerialize(mmm As Variant)
 ' may we get an exception here
 If VarType(actualData) = vbArray + vbVariant Then
 Dim m_base As Long, first12 As Long
-Dim m_base_0 As Long, first12_0 As Long, r1 As Long, r2 As Long
+Dim m_base_0 As Long, first12_0 As Long, R1 As Long, r2 As Long
 GetMem4 UnsignedAdd(VarPtr(actualData), 8), m_base_0
 If m_base_0 <> 0 Then
 GetMem4 LibMemory.ArrPtr(mmm), m_base
 'GetMem4 VarPtrArray(actualdata()), m_base_0
-r1 = SafeArrayLock(m_base)
+R1 = SafeArrayLock(m_base)
 r2 = SafeArrayLock(m_base_0)
-r1 = SafeArrayAccessData(ByVal m_base, first12)
+R1 = SafeArrayAccessData(ByVal m_base, first12)
 r2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 
 'GetMem4 m_base + 12, first1
@@ -797,24 +797,24 @@ r2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 PutMem4 m_base + 12, first12_0
 PutMem4 m_base_0 + 12, first12
 r2 = SafeArrayUnaccessData(ByVal m_base_0)
-r1 = SafeArrayUnaccessData(ByVal m_base)
+R1 = SafeArrayUnaccessData(ByVal m_base)
 r2 = SafeArrayUnlock(m_base_0)
-r1 = SafeArrayUnlock(m_base)
+R1 = SafeArrayUnlock(m_base)
 End If
 End If
 End Sub
 Friend Sub CopyBackSerialize(mmm As Variant)
 ' may we get an exception here
 Dim m_base As Long, first12 As Long
-Dim m_base_0 As Long, first12_0 As Long, r1 As Long, r2 As Long
+Dim m_base_0 As Long, first12_0 As Long, R1 As Long, r2 As Long
 If Not RevOrder Then Err.Raise vbObjectError + 12345, "CopyBack", "Failed. is not vb6"
 Dim backup
 backup = actualData
 GetMem4 LibMemory.ArrPtr(mmm), m_base
 GetMem4 LibMemory.ArrPtr(backup), m_base_0
-r1 = SafeArrayLock(m_base)
+R1 = SafeArrayLock(m_base)
 r2 = SafeArrayLock(m_base_0)
-r1 = SafeArrayAccessData(ByVal m_base, first12)
+R1 = SafeArrayAccessData(ByVal m_base, first12)
 r2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 
 'GetMem4 m_base + 12, first1
@@ -822,9 +822,9 @@ r2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 PutMem4 m_base + 12, first12_0
 PutMem4 m_base_0 + 12, first12
 r2 = SafeArrayUnaccessData(ByVal m_base_0)
-r1 = SafeArrayUnaccessData(ByVal m_base)
+R1 = SafeArrayUnaccessData(ByVal m_base)
 r2 = SafeArrayUnlock(m_base_0)
-r1 = SafeArrayUnlock(m_base)
+R1 = SafeArrayUnlock(m_base)
 End Sub
 Public Sub Car(m As Object)
 Dim k As New mArray, usehandler As mHandler, s$
@@ -1854,7 +1854,7 @@ If Not GroupRef Is Nothing Then
         Dim usehandler As mHandler
         Set usehandler = GroupRef
         If usehandler.t1 = 1 Then
-            usehandler.objref.Index = Abs(curitem + 100)
+            usehandler.objref.Index = Abs(curitem + 6000)
             usehandler.objref.Done = True
             Set usehandler.objref.ValueObj = item
             Exit Property

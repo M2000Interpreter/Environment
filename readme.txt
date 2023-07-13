@@ -1,10 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 32 active-X
-1. Remove bug at Stack Stack(a) where Stack( not trated as function but as array (which didn't exist). See example ranking in info.gsb (now works fine).
-2. Update info.gsb for (1) and for two modules:
-2.1 Module Pyth (now adjust Pythagorian Tree better for any screen ratio scale.x/scale.y).
-2.2 Module machinecode2 correct a typo at first label (M200 to M2000).
+Version 12 Revision 33 active-X
+Expand buffer for printer data an additional 6000 bytes, because some printers DevMode size is bigger than the calculated one from  DocumentProperties() function from winspool.drv.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
