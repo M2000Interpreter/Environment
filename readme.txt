@@ -1,7 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 33 active-X
-Expand buffer for printer data an additional 6000 bytes, because some printers DevMode size is bigger than the calculated one from  DocumentProperties() function from winspool.drv.
+Version 12 Revision 34 active-X
+1. Remove a bug from rev 33, so now eertree module run as expected.
+2. Now print to One Note for Windows 10 works. I found the need for placing a document name to printer, which some other printers not needed - like "Microsoft Print to PDF" which works with empty document name. So now M2000 insert a dummy documen name "M2000 printing" and we get the printout.
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

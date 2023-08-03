@@ -190,8 +190,8 @@ End Sub
             Exit Function
           End If
           
-          If UBound(adevmode) <> nSize + 6000 Then
-         ReDim adevmode(1 To nSize + 6000) As Byte
+          If UBound(adevmode) <> nSize + 20000 Then
+         ReDim adevmode(1 To nSize + 20000) As Byte
          
            nSize = DocumentProperties(NULLPTR, hPrinter, szPrinterName, adevmode(1), ByVal NULLPTR, DM_OUT_BUFFER)
           
@@ -292,8 +292,8 @@ Function ChangeOrientation(f As Object, szPrinterName As String, adevmode() As B
             ChangeOrientation = False
             Exit Function
           End If
-          If UBound(adevmode) <> nSize + 6000 Then
-         ReDim adevmode(1 To nSize + 6000) As Byte
+          If UBound(adevmode) <> nSize + 20000 Then
+         ReDim adevmode(1 To nSize + 20000) As Byte
          
            nSize = DocumentProperties(NULLPTR, hPrinter, szPrinterName, adevmode(1), ByVal NULLPTR, DM_OUT_BUFFER)
           
