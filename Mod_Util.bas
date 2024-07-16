@@ -27,7 +27,7 @@ Private Declare Function SHGetSpecialFolderLocation Lib "shell32.dll" (ByVal hWn
 Private Declare Function SHGetPathFromIDList Lib "shell32.dll" Alias "SHGetPathFromIDListW" (ByVal pidl As Long, ByVal lpszPath As Long) As Long
 Private Declare Function FindExecutable Lib "shell32.dll" Alias "FindExecutableW" (ByVal lpFile As Long, ByVal lpDirectory As Long, ByVal lpResult As Long) As Long
 Private Declare Function GetForegroundWindow Lib "user32" () As Long
-Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
+Private Declare Function SelectClipRgn Lib "gdi32" (ByVal Hdc As Long, ByVal hRgn As Long) As Long
 Private Declare Function MessageBeep Lib "user32" (ByVal wType As Long) As Long
 Public Declare Function GetLocaleInfoW Lib "kernel32" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
 Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
@@ -58,7 +58,7 @@ Public Type Counters
 End Type
 Public Type basket
     used As Long
-    X As Long  ' for hotspot
+    x As Long  ' for hotspot
     y As Long  '
     XGRAPH As Long  ' graphic cursor
     YGRAPH As Long
@@ -117,14 +117,14 @@ Private Const LOCALE_USER_DEFAULT As Long = &H800
 Private Const C3_DIACRITIC As Long = &H2
 Private Const CT_CTYPE3 As Byte = &H4
 Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
-Private Declare Function SetTextCharacterExtra Lib "gdi32" (ByVal hDC As Long, ByVal nCharExtra As Long) As Long
+Private Declare Function SetTextCharacterExtra Lib "gdi32" (ByVal Hdc As Long, ByVal nCharExtra As Long) As Long
 Private Declare Function WideCharToMultiByte Lib "kernel32" (ByVal CodePage As Long, ByVal dwFlags As Long, ByVal lpWideCharStr As Long, ByVal cchWideChar As Long, ByVal lpMultiByteStr As Long, ByVal cchMultiByte As Long, ByVal lpDefaultChar As Long, ByVal lpUsedDefaultChar As Long) As Long
 Private Declare Function GdiFlush Lib "gdi32" () As Long
 Public iamactive As Boolean
 Declare Function MultiByteToWideChar& Lib "kernel32" (ByVal CodePage&, ByVal dwFlags&, MultiBytes As Any, ByVal cBytes&, ByVal pWideChars&, ByVal cWideChars&)
-Private Declare Function FillRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Private Declare Function FillRect Lib "user32" (ByVal Hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Private Declare Function CreateSolidBrush Lib "gdi32" (ByVal crColor As Long) As Long
-Private Declare Function GetClipRgn Lib "gdi32" (ByVal hDC As Long, _
+Private Declare Function GetClipRgn Lib "gdi32" (ByVal Hdc As Long, _
          hRgn As Long) As Long
 Declare Function CreateRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
@@ -168,7 +168,7 @@ Public Declare Function DestroyCaret Lib "user32" () As Long
 Public Declare Function CreateCaret Lib "user32" (ByVal hWnd As Long, ByVal hBitmap As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
 Public Declare Function ShowCaret Lib "user32" (ByVal hWnd As Long) As Long
 Public Declare Function GetFocus Lib "user32" () As Long
-Public Declare Function SetCaretPos Lib "user32" (ByVal X As Long, ByVal y As Long) As Long
+Public Declare Function SetCaretPos Lib "user32" (ByVal x As Long, ByVal y As Long) As Long
 Public Declare Function HideCaret Lib "user32" (ByVal hWnd As Long) As Long
 Const dv = 0.877551020408163
 Public QUERYLIST As String
@@ -189,27 +189,27 @@ Public vH_y As Long
 Public ttl As Boolean
 Public Const SRCCOPY = &HCC0020
 Public Release As Boolean
-Private Declare Function SetBkMode Lib "gdi32" (ByVal hDC As Long, ByVal nBkMode As Long) As Long
-Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
-Declare Function RoundRect Lib "gdi32" (ByVal hDC As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal Y3 As Long) As Long
+Private Declare Function SetBkMode Lib "gdi32" (ByVal Hdc As Long, ByVal nBkMode As Long) As Long
+Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
+Declare Function RoundRect Lib "gdi32" (ByVal Hdc As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal Y3 As Long) As Long
 Declare Function UpdateWindow Lib "user32" (ByVal hWnd As Long) As Long
-Declare Function ScrollDC Lib "user32" (ByVal hDC As Long, ByVal dX As Long, ByVal dY As Long, lprcScroll As RECT, lprcClip As RECT, ByVal hrgnUpdate As Long, lprcUpdate As RECT) As Long
+Declare Function ScrollDC Lib "user32" (ByVal Hdc As Long, ByVal dX As Long, ByVal dY As Long, lprcScroll As RECT, lprcClip As RECT, ByVal hrgnUpdate As Long, lprcUpdate As RECT) As Long
 Public LastErName As String
 Public LastErNameGR As String
 Public LastErNum As Long
 Public LastErNum1 As Long, LastErNum2 As Long
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
 
 Type POINTAPI
-        X As Long
+        x As Long
         y As Long
 End Type
-Private Declare Function GetTextExtentPoint32 Lib "gdi32" Alias "GetTextExtentPoint32W" (ByVal hDC As Long, ByVal lpsz As Long, ByVal cbString As Long, lpSize As POINTAPI) As Long
+Private Declare Function GetTextExtentPoint32 Lib "gdi32" Alias "GetTextExtentPoint32W" (ByVal Hdc As Long, ByVal lpsz As Long, ByVal cbString As Long, lpSize As POINTAPI) As Long
 
 Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
-Declare Function PaintDesktop Lib "user32" (ByVal hDC As Long) As Long
-Declare Function SelectClipPath Lib "gdi32" (ByVal hDC As Long, ByVal iMode As Long) As Long
+Declare Function PaintDesktop Lib "user32" (ByVal Hdc As Long) As Long
+Declare Function SelectClipPath Lib "gdi32" (ByVal Hdc As Long, ByVal iMode As Long) As Long
   Public Const RGN_AND = 1
     Public Const RGN_COPY = 5
     Public Const RGN_DIFF = 4
@@ -217,14 +217,14 @@ Declare Function SelectClipPath Lib "gdi32" (ByVal hDC As Long, ByVal iMode As L
     Public Const RGN_MIN = RGN_AND
     Public Const RGN_OR = 2
     Public Const RGN_XOR = 3
-Declare Function StrokePath Lib "gdi32" (ByVal hDC As Long) As Long
-Declare Function Polygon Lib "gdi32" (ByVal hDC As Long, lpPoint As POINTAPI, ByVal nCount As Long) As Long
-Declare Function PolyBezier Lib "gdi32.dll" (ByVal hDC As Long, lppt As POINTAPI, ByVal cPoints As Long) As Long
-Declare Function PolyBezierTo Lib "gdi32.dll" (ByVal hDC As Long, lppt As POINTAPI, ByVal cCount As Long) As Long
-Declare Function BeginPath Lib "gdi32" (ByVal hDC As Long) As Long
-Declare Function EndPath Lib "gdi32" (ByVal hDC As Long) As Long
-Declare Function FillPath Lib "gdi32" (ByVal hDC As Long) As Long
-Declare Function StrokeAndFillPath Lib "gdi32" (ByVal hDC As Long) As Long
+Declare Function StrokePath Lib "gdi32" (ByVal Hdc As Long) As Long
+Declare Function Polygon Lib "gdi32" (ByVal Hdc As Long, lpPoint As POINTAPI, ByVal nCount As Long) As Long
+Declare Function PolyBezier Lib "gdi32.dll" (ByVal Hdc As Long, lppt As POINTAPI, ByVal cPoints As Long) As Long
+Declare Function PolyBezierTo Lib "gdi32.dll" (ByVal Hdc As Long, lppt As POINTAPI, ByVal cCount As Long) As Long
+Declare Function BeginPath Lib "gdi32" (ByVal Hdc As Long) As Long
+Declare Function EndPath Lib "gdi32" (ByVal Hdc As Long) As Long
+Declare Function FillPath Lib "gdi32" (ByVal Hdc As Long) As Long
+Declare Function StrokeAndFillPath Lib "gdi32" (ByVal Hdc As Long) As Long
 
 Public PLG() As POINTAPI
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
@@ -248,8 +248,8 @@ Global Const HWND_TOPMOST = -1
 Global Const HWND_NOTOPMOST = -2
 Global Const SWP_NOACTIVATE = &H10
 Global Const SWP_SHOWWINDOW = &H40
-Declare Sub SetWindowPos Lib "user32" (ByVal hWnd As Long, ByVal hWndInsertAfter As Long, ByVal X As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal wFlags As Long)
-Declare Function ExtFloodFill Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long, ByVal crColor As Long, ByVal wFillType As Long) As Long
+Declare Sub SetWindowPos Lib "user32" (ByVal hWnd As Long, ByVal hWndInsertAfter As Long, ByVal x As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal wFlags As Long)
+Declare Function ExtFloodFill Lib "gdi32" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long, ByVal wFillType As Long) As Long
 Public Const FLOODFILLSURFACE = 1
 Public Const FLOODFILLBORDER = 0
 
@@ -335,10 +335,10 @@ Private Type LOGFONT
 End Type
 Private Declare Function CreateRoundRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal Y3 As Long) As Long
 
-Private Declare Function PathToRegion Lib "gdi32" (ByVal hDC As Long) As Long
+Private Declare Function PathToRegion Lib "gdi32" (ByVal Hdc As Long) As Long
 Private Declare Function SetWindowRgn Lib "user32" (ByVal hWnd As Long, ByVal hRgn As Long, ByVal bRedraw As Boolean) As Long
 Private Declare Function CreateFontIndirect Lib "gdi32" Alias "CreateFontIndirectA" (lpLogFont As LOGFONT) As Long
-Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
+Private Declare Function SelectObject Lib "gdi32" (ByVal Hdc As Long, ByVal hObject As Long) As Long
 
 ' OCTOBER 2000
 Public dStyle As Long
@@ -359,14 +359,14 @@ Const DFC_POPUPMENU = 5            'Only Win98/2000 !!
 Const DFCS_BUTTON3STATE = &H10
 Const DC_GRADIENT = &H20          'Only Win98/2000 !!
 
-Private Declare Function DrawCaption Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long, pcRect As RECT, ByVal un As Long) As Long
-Private Declare Function DrawEdge Lib "user32" (ByVal hDC As Long, qrc As RECT, ByVal edge As Long, ByVal grfFlags As Long) As Long
-Private Declare Function DrawFocusRect Lib "user32" (ByVal hDC As Long, lpRect As RECT) As Long
-Private Declare Function DrawFrameControl Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal un1 As Long, ByVal un2 As Long) As Long
-Private Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal hDC As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
-Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hDC As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
+Private Declare Function DrawCaption Lib "user32" (ByVal hWnd As Long, ByVal Hdc As Long, pcRect As RECT, ByVal un As Long) As Long
+Private Declare Function DrawEdge Lib "user32" (ByVal Hdc As Long, qrc As RECT, ByVal edge As Long, ByVal grfFlags As Long) As Long
+Private Declare Function DrawFocusRect Lib "user32" (ByVal Hdc As Long, lpRect As RECT) As Long
+Private Declare Function DrawFrameControl Lib "user32" (ByVal Hdc As Long, lpRect As RECT, ByVal un1 As Long, ByVal un2 As Long) As Long
+Private Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal Hdc As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
+Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal Hdc As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
 Private Declare Function SetRect Lib "user32" (lpRect As RECT, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
-Private Declare Function OffsetRect Lib "user32" (lpRect As RECT, ByVal X As Long, ByVal y As Long) As Long
+Private Declare Function OffsetRect Lib "user32" (lpRect As RECT, ByVal x As Long, ByVal y As Long) As Long
 ''API declarations
 ' old api..
 Private Declare Function AddFontResource Lib "gdi32" Alias "AddFontResourceW" (ByVal lpFileName As Long) As Long
@@ -390,11 +390,11 @@ Public Const TA_LEFT = 0
 Public Const TA_RIGHT = 2
 Public Const TA_CENTER = 6
 Public Const TA_RTLREADING = &H100&
-Public Declare Function SetTextJustification Lib "gdi32" (ByVal hDC As Long, ByVal nBreakExtra As Long, ByVal nBreakCount As Long) As Long
-Public Declare Function SetTextAlign Lib "gdi32" (ByVal hDC As Long, ByVal wFlags As Long) As Long
-Public Declare Function TabbedTextOut Lib "user32" Alias "TabbedTextOutW" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long, ByVal lpString As Long, ByVal nCount As Long, ByVal nTabPositions As Long, ByRef lpnTabStopPositions As Long, ByVal nTabOrigin As Long) As Long
-Public Declare Function TextOut Lib "gdi32" Alias "TextOutW" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long, ByVal lpString As Long, ByVal nCount As Long) As Long
-Public Declare Function GetTabbedTextExtent Lib "user32" Alias "GetTabbedTextExtentW" (ByVal hDC As Long, ByVal lpString As Long, ByVal nCount As Long, ByVal nTabPositions As Long, lpnTabStopPositions As Long) As Long
+Public Declare Function SetTextJustification Lib "gdi32" (ByVal Hdc As Long, ByVal nBreakExtra As Long, ByVal nBreakCount As Long) As Long
+Public Declare Function SetTextAlign Lib "gdi32" (ByVal Hdc As Long, ByVal wFlags As Long) As Long
+Public Declare Function TabbedTextOut Lib "user32" Alias "TabbedTextOutW" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal lpString As Long, ByVal nCount As Long, ByVal nTabPositions As Long, ByRef lpnTabStopPositions As Long, ByVal nTabOrigin As Long) As Long
+Public Declare Function TextOut Lib "gdi32" Alias "TextOutW" (ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal lpString As Long, ByVal nCount As Long) As Long
+Public Declare Function GetTabbedTextExtent Lib "user32" Alias "GetTabbedTextExtentW" (ByVal Hdc As Long, ByVal lpString As Long, ByVal nCount As Long, ByVal nTabPositions As Long, lpnTabStopPositions As Long) As Long
 Public Form3AppIcon As StdPicture
 Function CheckItemType(bstackstr As basetask, v As Variant, A$, R$, Optional ByVal wasarr As Boolean = False, Optional UseCase As Boolean) As Boolean
 Dim usehandler As mHandler, fastcol As FastCollection, pppp As mArray, w1 As Long, p As Variant, s$
@@ -754,15 +754,15 @@ MEXIT:
 End Function
 
 Public Function MOUSEX(Optional Offset As Long = 0) As Long
-Static X As Long
+Static x As Long
 On Error GoTo MOUSEX
 Dim tp As POINTAPI
-MOUSEX = X
+MOUSEX = x
 If Not Screen.ActiveForm Is Nothing Then
 If GetForegroundWindow = Screen.ActiveForm.hWnd Then
    GetCursorPos tp
-   X = tp.X * dv15 - Offset
-  MOUSEX = X
+   x = tp.x * dv15 - Offset
+  MOUSEX = x
   End If
 End If
 MOUSEX:
@@ -991,10 +991,10 @@ End Sub
 
 
 
-Sub myform(m As Object, X As Long, y As Long, x1 As Long, y1 As Long, Optional t As Boolean = False, Optional factor As Single = 1)
+Sub myform(m As Object, x As Long, y As Long, x1 As Long, y1 As Long, Optional t As Boolean = False, Optional factor As Single = 1)
 Dim hRgn As Long
 If y1 = 0 Then Exit Sub
-m.move X, y, x1, y1
+m.move x, y, x1, y1
 If Int(25 * factor) > 2 Then
 m.ScaleMode = vbPixels
 
@@ -1010,30 +1010,30 @@ End Sub
 Sub MyRect(m As Object, mb As basket, x1 As Long, y1 As Long, way As Long, par As Variant, Optional zoom As Long = 0)
 Dim R As RECT, b$
 With mb
-Dim x0&, y0&, X As Long, y As Long
+Dim x0&, y0&, x As Long, y As Long
 GetXYb m, mb, x0&, y0&
-X = m.ScaleX(x0& * .Xt - DXP, 1, 3)
+x = m.ScaleX(x0& * .Xt - DXP, 1, 3)
 y = m.ScaleY(y0& * .Yt - DYP, 1, 3)
 If x1 >= .mX Then x1 = m.ScaleX(m.ScaleWidth, 1, 3) Else x1 = m.ScaleX(x1 * .Xt, 1, 3)
 If y1 >= .mY Then y1 = m.ScaleY(m.ScaleHeight, 1, 3) Else y1 = m.ScaleY(y1 * .Yt + .Yt, 1, 3)
 
-SetRect R, X + zoom, y + zoom, x1 - zoom, y1 - zoom
+SetRect R, x + zoom, y + zoom, x1 - zoom, y1 - zoom
 Select Case way
 Case 0
-DrawEdge m.hDC, R, CLng(par) Mod 256, CLng(par) \ 256
+DrawEdge m.Hdc, R, CLng(par) Mod 256, CLng(par) \ 256
 Case 1
-DrawCaption m.hWnd, m.hDC, R, CLng(par)
+DrawCaption m.hWnd, m.Hdc, R, CLng(par)
 Case 2
-DrawEdge m.hDC, R, CLng(par), BF_RECT
+DrawEdge m.Hdc, R, CLng(par), BF_RECT
 Case 3
-DrawFocusRect m.hDC, R
+DrawFocusRect m.Hdc, R
 Case 4
-DrawFrameControl m.hDC, R, DFC_BUTTON, DFCS_BUTTON3STATE
+DrawFrameControl m.Hdc, R, DFC_BUTTON, DFCS_BUTTON3STATE
 Case 5
 b$ = Replace(CStr(par), ChrW(&HFFFFF8FB), ChrW(&H2007))
-DrawText m.hDC, StrPtr(b$), Len(CStr(par)), R, DT_CENTER + DT_NOCLIP
+DrawText m.Hdc, StrPtr(b$), Len(CStr(par)), R, DT_CENTER + DT_NOCLIP
 Case 6
-DrawFrameControl m.hDC, R, CLng(par) Mod 256, CLng(par) \ 256
+DrawFrameControl m.Hdc, R, CLng(par) Mod 256, CLng(par) \ 256
 Case Else
 k1 = 0
 MyDoEvents1 Form1
@@ -1043,32 +1043,32 @@ End With
 End Sub
 Sub MyFill(m As Object, x1 As Long, y1 As Long, way As Long, par As Variant, Optional zoom As Long = 0)
 Dim R As RECT, b$
-Dim X As Long, y As Long
+Dim x As Long, y As Long
 Const sp$ = " "
 With players(GetCode(m))
 x1 = .XGRAPH + x1
 y1 = .YGRAPH + y1
 x1 = m.ScaleX(x1, 1, 3)
 y1 = m.ScaleY(y1, 1, 3)
-X = m.ScaleX(.XGRAPH, 1, 3)
+x = m.ScaleX(.XGRAPH, 1, 3)
 y = m.ScaleY(.YGRAPH, 1, 3)
-SetRect R, X + zoom, y + zoom, x1 - zoom, y1 - zoom
+SetRect R, x + zoom, y + zoom, x1 - zoom, y1 - zoom
 Select Case way
 Case 0
-DrawEdge m.hDC, R, CLng(par) Mod 256, CLng(par) \ 256
+DrawEdge m.Hdc, R, CLng(par) Mod 256, CLng(par) \ 256
 Case 1
-DrawCaption m.hWnd, m.hDC, R, CLng(par)
+DrawCaption m.hWnd, m.Hdc, R, CLng(par)
 Case 2
-DrawEdge m.hDC, R, CLng(par), BF_RECT
+DrawEdge m.Hdc, R, CLng(par), BF_RECT
 Case 3
-DrawFocusRect m.hDC, R
+DrawFocusRect m.Hdc, R
 Case 4
-DrawFrameControl m.hDC, R, DFC_BUTTON, DFCS_BUTTON3STATE
+DrawFrameControl m.Hdc, R, DFC_BUTTON, DFCS_BUTTON3STATE
 Case 5
 b$ = Replace(CStr(par), ChrW(&HFFFFF8FB), ChrW(&H2007))
-DrawText m.hDC, StrPtr(b$), Len(CStr(par)), R, DT_CENTER + DT_NOCLIP
+DrawText m.Hdc, StrPtr(b$), Len(CStr(par)), R, DT_CENTER + DT_NOCLIP
 Case 6
-DrawFrameControl m.hDC, R, CLng(par) Mod 256, CLng(par) \ 256
+DrawFrameControl m.Hdc, R, CLng(par) Mod 256, CLng(par) \ 256
 Case Else
 k1 = 0
 MyDoEvents1 Form1
@@ -1086,7 +1086,7 @@ D.ForeColor = tc And &HFFFFFF
 mb.mypen = D.ForeColor
 End Sub
 
-Public Sub LCTNo(DqQQ As Object, ByVal y As Long, ByVal X As Long)
+Public Sub LCTNo(DqQQ As Object, ByVal y As Long, ByVal x As Long)
 
 ''DqQQ.CurrentX = x * Xt
 ''DqQQ.CurrentY = y * Yt + UAddTwipsTop
@@ -1101,22 +1101,22 @@ DqQQ.currentY = .currow * .Yt + .uMineLineSpace
 
 End With
 End Sub
-Public Sub LCTbasket(DqQQ As Object, mybasket As basket, ByVal y As Long, ByVal X As Long)
-DqQQ.currentX = X * mybasket.Xt
+Public Sub LCTbasket(DqQQ As Object, mybasket As basket, ByVal y As Long, ByVal x As Long)
+DqQQ.currentX = x * mybasket.Xt
 DqQQ.currentY = y * mybasket.Yt + mybasket.uMineLineSpace
-mybasket.curpos = X
+mybasket.curpos = x
 mybasket.currow = y
 End Sub
-Public Sub nomoveLCTC(dqq As Object, mb As basket, y As Long, X As Long, t&)
+Public Sub nomoveLCTC(dqq As Object, mb As basket, y As Long, x As Long, t&)
 Dim oldx&, oldy&
 With mb
 oldx& = dqq.currentX
 oldy& = dqq.currentY
 dqq.DrawMode = vbXorPen
 If t& = 1 Then
-dqq.Line (X * .Xt, Int(y * .Yt + .uMineLineSpace))-(X * .Xt + .Xt - DXP, y * .Yt - .uMineLineSpace + .Yt - DYP), (mycolor(.mypen) Xor dqq.BackColor), BF
+dqq.Line (x * .Xt, Int(y * .Yt + .uMineLineSpace))-(x * .Xt + .Xt - DXP, y * .Yt - .uMineLineSpace + .Yt - DYP), (mycolor(.mypen) Xor dqq.BackColor), BF
 Else
-dqq.Line (X * .Xt, Int((y + 1) * .Yt - .uMineLineSpace - .Yt \ 6 - DYP))-(X * .Xt + .Xt - DXP, (y + 1) * .Yt - .uMineLineSpace - DYP), (mycolor(.mypen) Xor dqq.BackColor), BF
+dqq.Line (x * .Xt, Int((y + 1) * .Yt - .uMineLineSpace - .Yt \ 6 - DYP))-(x * .Xt + .Xt - DXP, (y + 1) * .Yt - .uMineLineSpace - DYP), (mycolor(.mypen) Xor dqq.BackColor), BF
 End If
 dqq.DrawMode = vbCopyPen
 dqq.currentX = oldx&
@@ -1146,11 +1146,11 @@ End If
 End With
 dqq.DrawMode = vbCopyPen
 End Sub
-Public Sub LCTCnew(dqq As Object, mb As basket, y As Long, X As Long)
+Public Sub LCTCnew(dqq As Object, mb As basket, y As Long, x As Long)
 DestroyCaret
 With mb
 CreateCaret dqq.hWnd, 0, dqq.ScaleX(.Xt, 1, 3), dqq.ScaleY((.Yt - .uMineLineSpace * 2) * 0.2, 1, 3)
-SetCaretPos dqq.ScaleX(X * .Xt, 1, 3), dqq.ScaleY((y + 0.8) * .Yt, 1, 3)
+SetCaretPos dqq.ScaleX(x * .Xt, 1, 3), dqq.ScaleY((y + 0.8) * .Yt, 1, 3)
 End With
 End Sub
 Public Sub LCTCB(dqq As Object, mb As basket, t&)
@@ -1216,23 +1216,23 @@ End With
 
 End Sub
 Sub CircleBig(dqq As Object, mb As basket, x1&, y1&, c As Long, el As Boolean)
-Dim X&, y&
+Dim x&, y&
 With mb
-X& = .curpos
+x& = .curpos
 y& = .currow
 dqq.FillColor = mycolor(c)
 dqq.FillStyle = vbFSSolid
 If TypeOf dqq Is MetaDc Then
 If el Then
-DrawCircleApi dqq, Form1.ScaleX(((X& + x1& + 1) / 2 * .Xt) - DXP, 1, 3), Form1.ScaleY(((y& + y1& + 1) / 2 * .Yt) - DYP, 1, 3), Form1.ScaleX(RMAX((x1& - X& + 1) * .Xt, (y1& - y& + 1) * .Yt) / 2 - DYP, 1, 3), mycolor(c), ((y1& - y& + 1) * .Yt - DYP) / ((x1& - X& + 1) * .Xt - DXP)
+DrawCircleApi dqq, Form1.ScaleX(((x& + x1& + 1) / 2 * .Xt) - DXP, 1, 3), Form1.ScaleY(((y& + y1& + 1) / 2 * .Yt) - DYP, 1, 3), Form1.ScaleX(RMAX((x1& - x& + 1) * .Xt, (y1& - y& + 1) * .Yt) / 2 - DYP, 1, 3), mycolor(c), ((y1& - y& + 1) * .Yt - DYP) / ((x1& - x& + 1) * .Xt - DXP)
 Else
-DrawCircleApi dqq, Form1.ScaleX(((X& + x1& + 1) / 2 * .Xt) - DXP, 1, 3), Form1.ScaleY(((y& + y1& + 1) / 2 * .Yt) - DYP, 1, 3), Form1.ScaleX(RMAX((x1& - X& + 1) * .Xt, (y1& - y& + 1) * .Yt) / 2 - DYP, 1, 3), mycolor(c)
+DrawCircleApi dqq, Form1.ScaleX(((x& + x1& + 1) / 2 * .Xt) - DXP, 1, 3), Form1.ScaleY(((y& + y1& + 1) / 2 * .Yt) - DYP, 1, 3), Form1.ScaleX(RMAX((x1& - x& + 1) * .Xt, (y1& - y& + 1) * .Yt) / 2 - DYP, 1, 3), mycolor(c)
 End If
 Else
 If el Then
-dqq.Circle (((X& + x1& + 1) / 2 * .Xt) - DXP, ((y& + y1& + 1) / 2 * .Yt) - DYP), RMAX((x1& - X& + 1) * .Xt, (y1& - y& + 1) * .Yt) / 2 - DYP, mycolor(c), , , ((y1& - y& + 1) * .Yt - DYP) / ((x1& - X& + 1) * .Xt - DXP)
+dqq.Circle (((x& + x1& + 1) / 2 * .Xt) - DXP, ((y& + y1& + 1) / 2 * .Yt) - DYP), RMAX((x1& - x& + 1) * .Xt, (y1& - y& + 1) * .Yt) / 2 - DYP, mycolor(c), , , ((y1& - y& + 1) * .Yt - DYP) / ((x1& - x& + 1) * .Xt - DXP)
 Else
-dqq.Circle (((X& + x1& + 1) / 2 * .Xt) - DXP, ((y& + y1& + 1) / 2 * .Yt) - DYP), (RMIN((x1& - X& + 1) * .Xt, (y1& - y& + 1) * .Yt) / 2 - DYP), mycolor(c)
+dqq.Circle (((x& + x1& + 1) / 2 * .Xt) - DXP, ((y& + y1& + 1) / 2 * .Yt) - DYP), (RMIN((x1& - x& + 1) * .Xt, (y1& - y& + 1) * .Yt) / 2 - DYP), mycolor(c)
 
 End If
 End If
@@ -1250,9 +1250,9 @@ End If
 dqq.FillColor = mycolor(c)
 dqq.FillStyle = vbFSSolid
 If v Then
-ExtFloodFill dqq.hDC, dqq.ScaleX(x1, 1, 3), dqq.ScaleY(y1, 1, 3), dqq.point(dqq.ScaleX(x1, 1, 3), dqq.ScaleY(y1, 1, 3)), FLOODFILLSURFACE
+ExtFloodFill dqq.Hdc, dqq.ScaleX(x1, 1, 3), dqq.ScaleY(y1, 1, 3), dqq.point(dqq.ScaleX(x1, 1, 3), dqq.ScaleY(y1, 1, 3)), FLOODFILLSURFACE
 Else
-ExtFloodFill dqq.hDC, dqq.ScaleX(x1, 1, 3), dqq.ScaleY(y1, 1, 3), mycolor(.mypen), FLOODFILLBORDER
+ExtFloodFill dqq.Hdc, dqq.ScaleX(x1, 1, 3), dqq.ScaleY(y1, 1, 3), mycolor(.mypen), FLOODFILLBORDER
 End If
 If Not .IamEmf Then
 dqq.ScaleMode = osm
@@ -1476,7 +1476,7 @@ Else
         Pcw = raster.Width \ 2
         Pch = raster.Height \ 2
         With players(GetCode(d1))
-        raster.PaintPicture d1.hDC, Int(d1.ScaleX(.XGRAPH, 1, 3) - Pcw), Int(d1.ScaleX(.YGRAPH, 1, 3) - Pch)
+        raster.PaintPicture d1.Hdc, Int(d1.ScaleX(.XGRAPH, 1, 3) - Pcw), Int(d1.ScaleX(.YGRAPH, 1, 3) - Pch)
         End With
     GoTo cont1
 End If
@@ -1486,7 +1486,7 @@ RotateDib bstack, raster, rot, sp, i, NoUseBack, (blend), amask$
 Pcw = raster.Width \ 2
 Pch = raster.Height \ 2
 With players(GetCode(d1))
-raster.PaintPicture d1.hDC, Int(d1.ScaleX(.XGRAPH, 1, 3) - Pcw), Int(d1.ScaleX(.YGRAPH, 1, 3) - Pch)
+raster.PaintPicture d1.Hdc, Int(d1.ScaleX(.XGRAPH, 1, 3) - Pcw), Int(d1.ScaleX(.YGRAPH, 1, 3) - Pch)
 End With
 cont1:
 If Not bstack.toprinter Then
@@ -1581,11 +1581,11 @@ If Left$(f, 4) = "cDIB" And Len(f) > 12 Then
 Dim ph As New cDIBSection
 If cDib(f, ph) Then
 If x1 = 0 Then
-ph.PaintPicture d1.hDC, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleX(.YGRAPH, 1, 3))
+ph.PaintPicture d1.Hdc, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleX(.YGRAPH, 1, 3))
 Exit Sub
 Else
 If y1 = 0 Then y1 = Abs(ph.Height * x1 / ph.Width)
-ph.StretchPictureH d1.hDC, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleX(.YGRAPH, 1, 3)), CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleX(y1, 1, 3))
+ph.StretchPictureH d1.Hdc, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleX(.YGRAPH, 1, 3)), CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleX(y1, 1, 3))
 Exit Sub
 End If
 End If
@@ -1679,7 +1679,7 @@ End Function
 
 Public Function MyTextWidth(D As Object, A$) As Long
 Dim nr As RECT
-CalcRect D.hDC, A$, nr
+CalcRect D.Hdc, A$, nr
 'MyTextWidth = nr.Right * d.ScaleX(1, 3, 1)
 MyTextWidth = nr.Right * DXP
 End Function
@@ -1708,7 +1708,7 @@ Dim nr As RECT, nl As Long, mytop As Long
 mytop = DDD.currentY
 If s$ = vbNullString Then
 nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
-CalcRect DDD.hDC, " ", nr
+CalcRect DDD.Hdc, " ", nr
 nr.Left = DDD.currentX / dv15
 nr.Right = nr.Right + nr.Left
 nr.top = DDD.currentY / dv15
@@ -1722,14 +1722,14 @@ DDD.currentX = nr.Right * dv15
 End If
 Else
 nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
-CalcRect DDD.hDC, s$, nr
+CalcRect DDD.Hdc, s$, nr
 nr.Left = DDD.currentX / dv15
 nr.Right = nr.Right + nr.Left
 nr.top = DDD.currentY / dv15
 nr.Bottom = nr.top + nr.Bottom
 nl = (nr.Bottom + 1) * dv15
 If Not fake Then
-If nr.Left * dv15 < DDD.Width Then PrintLineControlSingle DDD.hDC, s$, nr
+If nr.Left * dv15 < DDD.Width Then PrintLineControlSingle DDD.Hdc, s$, nr
 End If
 If cr Then
 DDD.currentY = nl + UAddTwipsTop ''* 2
@@ -1745,7 +1745,7 @@ Public Sub MyPrint(DDD As Object, s$)
 Dim nr As RECT, nl As Long
 If s$ = vbNullString Then
     nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
-    CalcRect DDD.hDC, " ", nr
+    CalcRect DDD.Hdc, " ", nr
     nr.Left = DDD.currentX / dv15
     nr.Right = nr.Right + nr.Left
     nr.top = DDD.currentY / dv15
@@ -1755,13 +1755,13 @@ If s$ = vbNullString Then
     DDD.currentX = 0
 Else
 nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
-CalcRect DDD.hDC, s$, nr
+CalcRect DDD.Hdc, s$, nr
 nr.Left = DDD.currentX / dv15
 nr.Right = nr.Right + nr.Left
 nr.top = DDD.currentY / dv15
 nr.Bottom = nr.top + nr.Bottom
 nl = (nr.Bottom + 1) * dv15
-If nr.Left * dv15 <= DDD.Width Then PrintLineControlSingle DDD.hDC, s$, nr
+If nr.Left * dv15 <= DDD.Width Then PrintLineControlSingle DDD.Hdc, s$, nr
 DDD.currentY = nl
 DDD.currentX = 0
 End If
@@ -1769,29 +1769,29 @@ End Sub
 
 Public Function TextWidth(DDD As Object, A$) As Long
 Dim nr As RECT
-CalcRect DDD.hDC, A$, nr
+CalcRect DDD.Hdc, A$, nr
 TextWidth = nr.Right * dv15
 End Function
 Public Function TextWidth2(DDD As Object, A$) As Long
 Dim nr As RECT
-CalcRectNoSingle DDD.hDC, A$, nr
+CalcRectNoSingle DDD.Hdc, A$, nr
 TextWidth2 = nr.Right * dv15
 
 End Function
 Public Function TextWidthPixels(DDD As Object, A$) As Long
 Dim nr As RECT
-CalcRect DDD.hDC, A$, nr
+CalcRect DDD.Hdc, A$, nr
 TextWidthPixels = nr.Right
 End Function
 Private Function TextHeight(DDD As Object, A$) As Long
 Dim nr As RECT
-CalcRect DDD.hDC, A$, nr
+CalcRect DDD.Hdc, A$, nr
 
 TextHeight = nr.Bottom * dv15
 End Function
 Private Function TextHeight2(DDD As Object, A$) As Long
 Dim nr As RECT
-CalcRectNoSingle DDD.hDC, A$, nr
+CalcRectNoSingle DDD.Hdc, A$, nr
 
 TextHeight2 = nr.Bottom * dv15
 End Function
@@ -1802,7 +1802,7 @@ Dim PX As Long, PY As Long, R As Long, p$, c$, LEAVEME As Boolean, nr As RECT, n
 Dim p2 As Long, mUAddPixelsTop As Long
 Dim pixX As Long, pixY As Long
 Dim rTop As Long, rBottom As Long
-Dim lenw&, realR&, realstop&, r1 As Long, WHAT1$, ff As Long, LL$(), must As Long
+Dim lenw&, realR&, realstop&, R1 As Long, WHAT1$, ff As Long, LL$(), must As Long
 If processcr Then
     If Len(what$) = 0 Then Exit Sub
     LL$() = Split(what, vbLf)
@@ -1862,11 +1862,11 @@ With mybasket
             .top = rTop
             .Bottom = rBottom
         End With
-         FillBack DDD.hDC, nr2, .Paper
+         FillBack DDD.Hdc, nr2, .Paper
          End If
         DDD.currentX = PX * .Xt
         DDD.currentY = PY * .Yt + .uMineLineSpace
-        r1 = .mX - PX - 1 + R
+        R1 = .mX - PX - 1 + R
 
         If DDD.currentX = 0 And clearline Then
             If Not TypeOf DDD Is MetaDc Then DDD.Line (0&, PY * .Yt)-((.mX - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
@@ -1913,7 +1913,7 @@ With mybasket
                 R = R + Len(c$): If ii > mark1 Then R = R - 1
                 mark1 = nr.Right
                 nr.Right = (PX + Len(what$)) * pixX + 1
-                DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_NOPREFIX + DT_NOCLIP
+                DrawText DDD.Hdc, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_NOPREFIX + DT_NOCLIP
                 mark1 = TextWidth(DDD, c$)
                 mark1 = mark1 \ .Xt - (mark1 Mod .Xt > 0)
                 nr.Right = nr.Left + mark1 * pixX + 1
@@ -1932,11 +1932,11 @@ checkcombine:
                             If Not nounder32(p$) Then Mid$(WHAT1$, R + 2, 1) = " ": Exit Do
                             c$ = c$ + p$
                             R = R + 1
-                            If R >= r1 Then Exit Do
+                            If R >= R1 Then Exit Do
                          Loop Until (a1(R + 1) And 7) = 0
                      End If
                  End If
-                 DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
+                 DrawText DDD.Hdc, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
             Else
 CHECK100:
                 If c$ = Chr$(7) Then
@@ -2087,7 +2087,7 @@ skipthis:
             .top = rTop
             .Bottom = rBottom
         End With
-        FillBack DDD.hDC, nr2, mybasket.Paper
+        FillBack DDD.Hdc, nr2, mybasket.Paper
     End If
     realR& = 0
     If Len(what$) > R Then
@@ -2096,8 +2096,8 @@ skipthis:
         If DDD.currentX = 0 And clearline Then
             If Not TypeOf DDD Is MetaDc Then DDD.Line (0&, PY * .Yt)-((.mX - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
         End If
-        r1 = Len(what$) - 1
-        For R = R To r1
+        R1 = Len(what$) - 1
+        For R = R To R1
             c$ = Mid$(WHAT1$, R + 1, 1)
             W = AscW(c$)
             If W > -10241 And W < -9216 Then
@@ -2119,7 +2119,7 @@ skipthis:
                 If ii > mark1 Then R = R - 1
                 mark1 = TextWidth(DDD, c$) \ DXP
                 nr.Right = nr.Left + mark1 + 1
-                DrawTextEx DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_NOPREFIX + DT_NOCLIP, 0
+                DrawTextEx DDD.Hdc, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_NOPREFIX + DT_NOCLIP, 0
                 .curpos = nr.Right \ pixX
                 realR& = realR + mark1 \ pixX - (mark1 Mod pixX > 0) * 1
                 DDD.currentX = .curpos * .Xt
@@ -2135,7 +2135,7 @@ checkcombine1:
                             If Not nounder32(p$) Then Mid$(WHAT1$, R + 2, 1) = " ": Exit Do
                             c$ = c$ + p$
                             R = R + 1
-                            If R >= r1 Then Exit Do
+                            If R >= R1 Then Exit Do
                         Loop Until (a1(R + 1) And 7) = 0
                     End If
                 End If
@@ -2227,7 +2227,7 @@ CHECK1:
                 End If
                 c$ = ChrW(AscW(c$) + &H2400)
             End If
-            DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
+            DrawText DDD.Hdc, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
             realR& = realR + 1
 contNew:
             With nr
@@ -2277,7 +2277,7 @@ Dim prive As Long
 prive = GetCode(DDD)
 ExtraWidth = ExtraWidth \ dv15
 If ExtraWidth <> 0 Then
-SetTextCharacterExtra DDD.hDC, ExtraWidth
+SetTextCharacterExtra DDD.Hdc, ExtraWidth
 End If
 On Error Resume Next
 With players(prive)
@@ -2304,7 +2304,7 @@ f.lfWeight = Abs(.bold) * 800
   f.lfHeight = (Size * -20) / DYP
 
   hFont = CreateFontIndirect(f)
-  hPrevFont = SelectObject(DDD.hDC, hFont)
+  hPrevFont = SelectObject(DDD.Hdc, hFont)
  what$ = Replace$(what, vbCrLf, vbCr) + vbCr
 Dim textmetrics As POINTAPI, Max, maxx As Long, sumy As Long
 Do While what$ <> ""
@@ -2316,22 +2316,22 @@ fline$ = GetStrUntil(vbCr, what$)
 End If
 If Len(what$) = 0 And Len(fline$) = 0 Then If sumy > 0 Then Exit Do
   
-textmetrics.X = 0
+textmetrics.x = 0
 textmetrics.y = 0
     If Len(fline$) = 0 Then
         fline$ = " "
-        GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
-        textmetrics.X = 0
+        GetTextExtentPoint32 DDD.Hdc, StrPtr(fline$), Len(fline$), textmetrics
+        textmetrics.x = 0
     Else
-        GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
+        GetTextExtentPoint32 DDD.Hdc, StrPtr(fline$), Len(fline$), textmetrics
     End If
 sumy = sumy + textmetrics.y
-If maxx < textmetrics.X Then maxx = textmetrics.X
+If maxx < textmetrics.x Then maxx = textmetrics.x
 Loop
 nTextY = Int(Abs(maxx * dv15 * Sin(degree)) + Abs(sumy * dv15 * Cos(degree)))
-  hFont = SelectObject(DDD.hDC, hPrevFont)
+  hFont = SelectObject(DDD.Hdc, hPrevFont)
   DeleteObject hFont
-If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.hDC, 0
+If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.Hdc, 0
 End With
 PlaceBasket DDD, players(prive)
 
@@ -2349,7 +2349,7 @@ On Error Resume Next
 With players(prive)
 ExtraWidth = ExtraWidth \ dv15
 If ExtraWidth <> 0 Then
-SetTextCharacterExtra DDD.hDC, ExtraWidth
+SetTextCharacterExtra DDD.Hdc, ExtraWidth
 End If
 BFONT = DDD.Font.Name
 If Font <> "" Then
@@ -2376,7 +2376,7 @@ f.lfWeight = Abs(.bold) * 800
   f.lfHeight = (Size * -20) / DYP
 
   hFont = CreateFontIndirect(f)
-  hPrevFont = SelectObject(DDD.hDC, hFont)
+  hPrevFont = SelectObject(DDD.Hdc, hFont)
   what$ = Replace$(what, vbCrLf, vbCr) + vbCr
 Dim textmetrics As POINTAPI, Max, maxx As Long, sumy As Long
 Do While what$ <> ""
@@ -2388,24 +2388,24 @@ fline$ = GetStrUntil(vbCr, what$)
 End If
 If Len(what$) = 0 And Len(fline$) = 0 Then If sumy > 0 Then Exit Do
   
-textmetrics.X = 0
+textmetrics.x = 0
 textmetrics.y = 0
     If Len(fline$) = 0 Then
         fline$ = " "
-        GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
-        textmetrics.X = 0
+        GetTextExtentPoint32 DDD.Hdc, StrPtr(fline$), Len(fline$), textmetrics
+        textmetrics.x = 0
     Else
-        GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
+        GetTextExtentPoint32 DDD.Hdc, StrPtr(fline$), Len(fline$), textmetrics
     End If
 sumy = sumy + textmetrics.y
-If maxx < textmetrics.X Then maxx = textmetrics.X
+If maxx < textmetrics.x Then maxx = textmetrics.x
 Loop
 
 nText = Int(Abs(maxx * dv15 * Cos(degree)) + Abs(sumy * dv15 * Sin(degree)))
 
-  hFont = SelectObject(DDD.hDC, hPrevFont)
+  hFont = SelectObject(DDD.Hdc, hPrevFont)
   DeleteObject hFont
-If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.hDC, 0
+If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.Hdc, 0
 
 End With
 PlaceBasket DDD, players(prive)
@@ -2646,9 +2646,9 @@ Dim BFONT As String
 On Error Resume Next
 BFONT = DDD.Font.Name
 If ExtraWidth <> 0 Then
-SetTextCharacterExtra DDD.hDC, ExtraWidth
+SetTextCharacterExtra DDD.Hdc, ExtraWidth
 End If
-Dim icx As Long, icy As Long, X As Long, y As Long, icH As Long
+Dim icx As Long, icy As Long, x As Long, y As Long, icH As Long
 
 If JUSTIFY < 0 Then degree = 0
 DEGR = (degree) * 180# / Pi
@@ -2664,9 +2664,9 @@ DEGR = (degree) * 180# / Pi
   End If
   f.lfHeight = (Size * -20) / DYP
   hFont = CreateFontIndirect(f)
-  hPrevFont = SelectObject(DDD.hDC, hFont)
+  hPrevFont = SelectObject(DDD.Hdc, hFont)
   icH = TextHeight(DDD, "fq")
-  hFont = SelectObject(DDD.hDC, hPrevFont)
+  hFont = SelectObject(DDD.Hdc, hPrevFont)
   DeleteObject hFont
   f.lfItalic = Abs(basestack.myitalic)
   f.lfWeight = Abs(basestack.myBold) * 800
@@ -2683,7 +2683,7 @@ DEGR = (degree) * 180# / Pi
 
   
     hFont = CreateFontIndirect(f)
-  hPrevFont = SelectObject(DDD.hDC, hFont)
+  hPrevFont = SelectObject(DDD.Hdc, hFont)
 
 TT = ExtraWidth \ 2
 icy = CLng(Cos(degree) * icH)
@@ -2694,22 +2694,22 @@ If JUSTIFY < 0 Then
 JUSTIFY = Abs(JUSTIFY) - 1
 If JUSTIFY = 0 Then
 y = .YGRAPH - icy
-X = .XGRAPH - icx * 2
+x = .XGRAPH - icx * 2
 ElseIf JUSTIFY = 1 Then
 y = .YGRAPH
-X = .XGRAPH
+x = .XGRAPH
 Else
 y = .YGRAPH - icy / 2
-X = .XGRAPH - icx
+x = .XGRAPH - icx
 End If
 Else
 y = .YGRAPH - icy
-X = .XGRAPH - icx
+x = .XGRAPH - icx
 
 End If
 End With
 If TT > 0 Then
-X = X + (Cos(degree) * TT * dv15)
+x = x + (Cos(degree) * TT * dv15)
 y = y - (Sin(degree) * TT * dv15)
 End If
 what$ = Replace$(what, vbCrLf, vbCr) + vbCr
@@ -2722,29 +2722,29 @@ what$ = Mid$(what$, 2)
 Else
 fline$ = GetStrUntil(vbCr, what$)
 End If
-textmetrics.X = 0
+textmetrics.x = 0
 textmetrics.y = 0
-GetTextExtentPoint32 DDD.hDC, StrPtr(fline$), Len(fline$), textmetrics
-X = X + icx
+GetTextExtentPoint32 DDD.Hdc, StrPtr(fline$), Len(fline$), textmetrics
+x = x + icx
 y = y + icy
 If JUSTIFY = 1 Then
-    DDD.currentX = X - Int((textmetrics.X * Cos(degree) + textmetrics.y * Sin(degree)) * dv15)
-    DDD.currentY = y + Int((textmetrics.X * Sin(degree) - textmetrics.y * Cos(degree)) * dv15)
+    DDD.currentX = x - Int((textmetrics.x * Cos(degree) + textmetrics.y * Sin(degree)) * dv15)
+    DDD.currentY = y + Int((textmetrics.x * Sin(degree) - textmetrics.y * Cos(degree)) * dv15)
 ElseIf JUSTIFY = 2 Then
 'If tt <> 0 Then textmetrics.X = textmetrics.X - tt * 1.5
 
-     DDD.currentX = X - Int((textmetrics.X * Cos(degree) + textmetrics.y * Sin(degree)) * dv15) \ 2
-    DDD.currentY = y + Int((textmetrics.X * Sin(degree) - textmetrics.y * Cos(degree)) * dv15) \ 2
+     DDD.currentX = x - Int((textmetrics.x * Cos(degree) + textmetrics.y * Sin(degree)) * dv15) \ 2
+    DDD.currentY = y + Int((textmetrics.x * Sin(degree) - textmetrics.y * Cos(degree)) * dv15) \ 2
 Else
 
-    DDD.currentX = X
+    DDD.currentX = x
     DDD.currentY = y
 End If
 MyPrint DDD, fline$
 Loop
-  hFont = SelectObject(DDD.hDC, hPrevFont)
+  hFont = SelectObject(DDD.Hdc, hPrevFont)
   DeleteObject hFont
-If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.hDC, 0
+If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.Hdc, 0
 End Sub
 
 Public Sub nForm(bstack As basetask, TheSize As Single, nW As Long, nH As Long, myLineSpace As Long)
@@ -2782,7 +2782,7 @@ End With
 End Sub
 
 Public Sub CdESK()
-Dim X, y, ff As Form, useform1 As Boolean
+Dim x, y, ff As Form, useform1 As Boolean
 If Form1.Visible Then
     If Form5.Visible Then
     Set ff = Form5
@@ -2792,7 +2792,7 @@ If Form1.Visible Then
     Else
     Set ff = Form1
     End If
-    X = ff.Left / DXP
+    x = ff.Left / DXP
     y = ff.top / DYP
     If useform1 Then Form1.Visible = False
     ff.Hide
@@ -2800,7 +2800,7 @@ If Form1.Visible Then
     MyDoEvents1 ff, True
     
     Dim aa As New cDIBSection
-    aa.CreateFromPicture hDCToPicture(GetDC(0), X, y, ff.Width / DXP, ff.Height / DYP)
+    aa.CreateFromPicture hDCToPicture(GetDC(0), x, y, ff.Width / DXP, ff.Height / DYP)
     aa.ThumbnailPaint ff
     GdiFlush
       ff.Visible = True
@@ -2828,11 +2828,11 @@ ar.Bottom = D.Height / dv15
 ar.Right = D.Width / dv15
 ar.top = .mysplit * .Yt / dv15
 p = .Yt / dv15
-R = BitBlt(D.hDC, CLng(ar.Left), CLng(ar.top), CLng(ar.Right), CLng(ar.Bottom - p), D.hDC, CLng(ar.Left), CLng(ar.top + p), SRCCOPY)
+R = BitBlt(D.Hdc, CLng(ar.Left), CLng(ar.top), CLng(ar.Right), CLng(ar.Bottom - p), D.Hdc, CLng(ar.Left), CLng(ar.top + p), SRCCOPY)
 
  
   ar.top = ar.Bottom - p
-FillBack D.hDC, ar, .Paper
+FillBack D.Hdc, ar, .Paper
 .curpos = 0
 .currow = .mY - 1
 End With
@@ -2848,7 +2848,7 @@ ar.Bottom = D.ScaleY(D.Height, 1, 3)
 ar.Right = D.ScaleX(D.Width, 1, 3)
 ar.top = D.ScaleY(.mysplit * .Yt, 1, 3)
 p = D.ScaleY(.Yt, 1, 3)
-R = BitBlt(D.hDC, CLng(ar.Left), CLng(ar.top + p), CLng(ar.Right), CLng(ar.Bottom - p), D.hDC, CLng(ar.Left), CLng(ar.top), SRCCOPY)
+R = BitBlt(D.Hdc, CLng(ar.Left), CLng(ar.top + p), CLng(ar.Right), CLng(ar.Bottom - p), D.Hdc, CLng(ar.Left), CLng(ar.top), SRCCOPY)
 D.Line (0, .mysplit * .Yt)-(D.ScaleWidth, .mysplit * .Yt + .Yt), .Paper, BF
 .currow = .mysplit
 .curpos = 0
@@ -3030,7 +3030,7 @@ End If
 End With
 End Sub
 
-Function gf$(bstack As basetask, ByVal y&, ByVal X&, ByVal A$, c&, f&, Optional STAR As Boolean = False)
+Function gf$(bstack As basetask, ByVal y&, ByVal x&, ByVal A$, c&, f&, Optional STAR As Boolean = False)
 On Error Resume Next
 Dim cLast&, b$, cc$, dq As Object, ownLinespace, oldrefresh As Double, noinp As Double
 oldrefresh = REFRESHRATE
@@ -3049,20 +3049,20 @@ End If
 If dq.Visible = False Then dq.Visible = True
 If exWnd = 0 Then dq.SetFocus
 dq.FontTransparent = False
-LCTbasket dq, mybasket, y&, X&
+LCTbasket dq, mybasket, y&, x&
 Dim o$
 o$ = A$
 If A$ = vbNullString Then A$ = " "
 INK$ = vbNullString
 
 Dim XX&
-XX& = X&
+XX& = x&
 
-X& = X& - 1
+x& = x& - 1
 
 cLast& = Len(A$)
 '*****************
-If cLast& + X& >= .mX Then
+If cLast& + x& >= .mX Then
 MyDoEvents
 If dq.Font.charset = 161 Then
 b$ = InputBoxN("≈ÈÛ·„˘„ﬁ ‘ÈÏﬁÚ –Â‰ﬂÔı", MesTitle$, A$, noinp)
@@ -3075,9 +3075,9 @@ gf$ = b$
 If XX& < .mX Then
 dq.FontTransparent = False
 If STAR Then
-PlainBaSket dq, mybasket, StarSTR(Left$(b$, .mX - X&)), True, , addpixels
+PlainBaSket dq, mybasket, StarSTR(Left$(b$, .mX - x&)), True, , addpixels
 Else
-PlainBaSket dq, mybasket, Left$(b$, .mX - X&), True, , addpixels
+PlainBaSket dq, mybasket, Left$(b$, .mX - x&), True, , addpixels
 End If
 End If
 GoTo GFEND
@@ -3093,7 +3093,7 @@ End If
 '************
 b$ = A$
 .currow = y&
-.curpos = c& + X&
+.curpos = c& + x&
 LCTCB dq, mybasket, ins&
 
 Do
@@ -3116,19 +3116,19 @@ SetTextBasketBack dq, mybasket, True
         If iamactive Then
            If Screen.ActiveForm Is Nothing Then
                             DestroyCaret
-                      nomoveLCTC dq, mybasket, y&, c& + X&, ins&
+                      nomoveLCTC dq, mybasket, y&, c& + x&, ins&
                       iamactive = False
            Else
                 If Not (GetForegroundWindow = Screen.ActiveForm.hWnd And Screen.ActiveForm.Name = "Form1") Then
                  
                       DestroyCaret
-                      nomoveLCTC dq, mybasket, y&, c& + X&, ins&
+                      nomoveLCTC dq, mybasket, y&, c& + x&, ins&
                       iamactive = False
              Else
                          If ShowCaret(dq.hWnd) = 0 Then
                                    HideCaret dq.hWnd
                                    .currow = y&
-                                   .curpos = c& + X&
+                                   .curpos = c& + x&
                                    LCTCB dq, mybasket, ins&
                                    ShowCaret dq.hWnd
                          End If
@@ -3138,12 +3138,12 @@ SetTextBasketBack dq, mybasket, True
   If Not Screen.ActiveForm Is Nothing Then
             If GetForegroundWindow = Screen.ActiveForm.hWnd And Screen.ActiveForm.Name = "Form1" Then
            
-                          nomoveLCTC dq, mybasket, y&, c& + X&, ins&
+                          nomoveLCTC dq, mybasket, y&, c& + x&, ins&
                              iamactive = True
                               If ShowCaret(dq.hWnd) = 0 And Screen.ActiveForm.Name = "Form1" Then
                                    HideCaret dq.hWnd
                                    .currow = y&
-                                   .curpos = c& + X&
+                                   .curpos = c& + x&
                                    LCTCB dq, mybasket, ins&
                                    ShowCaret dq.hWnd
                          End If
@@ -3204,7 +3204,7 @@ SetTextBasketBack dq, mybasket, True
                          c& = c& - 1
                          dq.FontTransparent = False
                                    .currow = y&
-                                   .curpos = c& + X&
+                                   .curpos = c& + x&
                                    LCTCB dq, mybasket, ins&
                         If STAR Then
                         PlainBaSket dq, mybasket, StarSTR(Mid$(b$, c&)), True, , addpixels
@@ -3213,7 +3213,7 @@ SetTextBasketBack dq, mybasket, True
                         End If
                          dq.Refresh
                                    .currow = y&
-                                   .curpos = c& + X&
+                                   .curpos = c& + x&
                                    LCTCB dq, mybasket, ins&
                         End If
                 Case 6
@@ -3254,7 +3254,7 @@ SetTextBasketBack dq, mybasket, True
                        Case 32 To 126, Is > 128
            
                         .currow = y&
-                        .curpos = c& + X&
+                        .curpos = c& + x&
                         LCTCB dq, mybasket, ins&
                         If ins& = 1 Then
                           If AscW(cc$) = 32 And STAR Then
@@ -3277,7 +3277,7 @@ SetTextBasketBack dq, mybasket, True
                         End If
                         If c& < Len(b$) Then c& = c& + 1
                                    .currow = y&
-                                   .curpos = c& + X&
+                                   .curpos = c& + x&
                                    LCTCB dq, mybasket, ins&
                         Else
                                  If AscW(cc$) = 32 And STAR Then
@@ -3298,7 +3298,7 @@ SetTextBasketBack dq, mybasket, True
                         End If
                         If c& < cLast& Then c& = c& + 1
                                 .currow = y&
-                                .curpos = c& + X&
+                                .curpos = c& + x&
                                 LCTCB dq, mybasket, ins&
                         End If
                 End Select
@@ -3323,11 +3323,11 @@ SetTextBasketBack dq, mybasket, True
                 Case 75 'LEFT
                         If c& > 1 Then
                                    .currow = y&
-                                .curpos = c& + X&
+                                .curpos = c& + x&
                                 LCTCB dq, mybasket, ins&
                         c& = c& - 1:
                         .currow = y&
-                        .curpos = c& + X&
+                        .curpos = c& + x&
                         LCTCB dq, mybasket, ins&
                         End If
                 Case 77 'RIGHT
@@ -3337,11 +3337,11 @@ SetTextBasketBack dq, mybasket, True
                 
              
                                     .currow = y&
-                                .curpos = c& + X&
+                                .curpos = c& + x&
                                 LCTCB dq, mybasket, ins&
                         c& = c& + 1:
                         .currow = y&
-                                .curpos = c& + X&
+                                .curpos = c& + x&
                                 LCTCB dq, mybasket, ins&
                         End If
                         End If
@@ -3355,23 +3355,23 @@ SetTextBasketBack dq, mybasket, True
                 Exit Do
                 Case 82
                             .currow = y&
-                                .curpos = c& + X&
+                                .curpos = c& + x&
                                 LCTCB dq, mybasket, ins&
                 ins& = 1 - ins&
                            .currow = y&
-                                .curpos = c& + X&
+                                .curpos = c& + x&
                                 LCTCB dq, mybasket, ins&
                 Case 83
                         Mid$(b$, c&) = Mid$(b$, c& + 1) + " "
                         dq.FontTransparent = False
-                        LCTbasket dq, mybasket, y&, c& + X&
+                        LCTbasket dq, mybasket, y&, c& + x&
                         If STAR Then
                         PlainBaSket dq, mybasket, StarSTR(Mid$(b$, c&)), True, , addpixels
                         Else
                         PlainBaSket dq, mybasket, Mid$(b$, c&), True, , addpixels
                         End If
                                .currow = y&
-                                .curpos = c& + X&
+                                .curpos = c& + x&
                                 LCTCB dq, mybasket, ins&
                      dq.Refresh
                 End Select
@@ -3381,8 +3381,8 @@ Loop
 
 GFEND:
 REFRESHRATE = oldrefresh
-LCTbasket dq, mybasket, y&, X& + 1
-If X& < .mX And Not XX& > .mX Then
+LCTbasket dq, mybasket, y&, x& + 1
+If x& < .mX And Not XX& > .mX Then
 If STAR Then
  PlainBaSket dq, mybasket, StarSTR(b$), True, , addpixels
 Else
@@ -3657,29 +3657,29 @@ D.currentY = 0
 End With
 End Sub
 Function iText(bb As basetask, ByVal v$, wi&, Hi&, aTitle$, n As Long, Optional NumberOnly As Boolean = False, Optional UseIntOnly As Boolean = False, Optional curset = -1&) As String
-Dim X&, y&, dd As Object, wh&, shiftlittle As Long, oldV$
+Dim x&, y&, dd As Object, wh&, shiftlittle As Long, oldV$
 Set dd = bb.Owner
 With players(GetCode(dd))
 If .lastprint Then
-X& = (dd.currentX + .Xt - dv15) \ .Xt
+x& = (dd.currentX + .Xt - dv15) \ .Xt
 y& = dd.currentY \ .Yt
-shiftlittle = X& * .Xt - dd.currentX
+shiftlittle = x& * .Xt - dd.currentX
 If y& > .mX Then
 y& = .mX - 1
 crNew bb, players(GetCode(dd))
 
 End If
 Else
-X& = .curpos
+x& = .curpos
 y& = .currow
 End If
-If .mX - X& - 1 < wi& Then wi& = .mX - X&
+If .mX - x& - 1 < wi& Then wi& = .mX - x&
 If .mY - y& - 1 < Hi& Then Hi& = .mY - y& - 1
 If wi& = 0 Or Hi& < 0 Then
 iText = v$
 Exit Function
 End If
-wi& = wi& + X&
+wi& = wi& + x&
 Hi& = Hi& + y&
 Form1.EditTextWord = True
 wh& = CLng(curset)
@@ -3694,14 +3694,14 @@ With Form1.TEXT1
         .NumberOnly = True
         .NumberIntOnly = UseIntOnly
         oldV$ = v$
-        ScreenEdit bb, v$, X&, y&, wi& - 1, Hi&, wh&, , n, shiftlittle
+        ScreenEdit bb, v$, x&, y&, wi& - 1, Hi&, wh&, , n, shiftlittle
         If result = 99 Then v$ = oldV$
         .NumberIntOnly = False
         .NumberOnly = False
     Else
     .glistN.UseTab = True
         oldV$ = v$
-        ScreenEdit bb, v$, X&, y&, wi& - 1, Hi&, wh&, , n, shiftlittle
+        ScreenEdit bb, v$, x&, y&, wi& - 1, Hi&, wh&, , n, shiftlittle
         If result = 99 And Hi& = wi& Then v$ = oldV$
     End If
     .showparagraph = oldshow
@@ -3710,7 +3710,7 @@ End With
 iText = v$
 End With
 End Function
-Sub ScreenEditDOC(bstack As basetask, aaa As Variant, X&, y&, x1&, y1&, Optional l As Long = 0, Optional usecol As Boolean = False, Optional Col As Long)
+Sub ScreenEditDOC(bstack As basetask, aaa As Variant, x&, y&, x1&, y1&, Optional l As Long = 0, Optional usecol As Boolean = False, Optional Col As Long)
 On Error Resume Next
 Dim ot As Boolean, back As New Document, i As Long, D As Object
 Dim prive As basket
@@ -3800,9 +3800,9 @@ Form1.SetText1
 With prive
 If bstack.toback Then
 
-Form1.TEXT1.move X& * .Xt, y& * .Yt, (x1& - X&) * .Xt + .Xt, (y1& - y&) * .Yt + .Yt
+Form1.TEXT1.move x& * .Xt, y& * .Yt, (x1& - x&) * .Xt + .Xt, (y1& - y&) * .Yt + .Yt
 Else
-Form1.TEXT1.move X& * .Xt + D.Left, y& * .Yt + D.top, (x1& - X&) * .Xt + .Xt, (y1& - y&) * .Yt + .Yt
+Form1.TEXT1.move x& * .Xt + D.Left, y& * .Yt + D.top, (x1& - x&) * .Xt + .Xt, (y1& - y&) * .Yt + .Yt
 End If
 End With
 If D.ForeColor = tcol Then
@@ -3902,7 +3902,7 @@ escok = oldesc
 Set D = Nothing
 End With
 End Sub
-Sub ScreenEdit(bstack As basetask, A$, X&, y&, x1&, y1&, Optional l As Long = 0, Optional changelinefeeds As Long = 0, Optional maxchar As Long = 0, Optional ExcludeThisLeft As Long = 0, Optional internal As Boolean = False)
+Sub ScreenEdit(bstack As basetask, A$, x&, y&, x1&, y1&, Optional l As Long = 0, Optional changelinefeeds As Long = 0, Optional maxchar As Long = 0, Optional ExcludeThisLeft As Long = 0, Optional internal As Boolean = False)
 On Error Resume Next
 ' allways a$ enter with crlf,but exit with crlf or cr or lf depents from changelinefeeds
 Dim oldesc As Boolean, D As Object
@@ -4029,25 +4029,25 @@ Form1.SetText1
 If bstack.toback Then
 If maxchar > 0 Then
 
-.move X& * prive.Xt - ExcludeThisLeft, y& * prive.Yt, (x1& - X&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt
+.move x& * prive.Xt - ExcludeThisLeft, y& * prive.Yt, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt
 If D.Name = "Form1" Then
 .glistN.RepaintFromOut D.Image, D.Left, D.top
 Else
 .glistN.RepaintFromOut D.Image, 0, 0
 End If
 Else
-.move X& * prive.Xt, y& * prive.Yt, (x1& - X&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt
+.move x& * prive.Xt, y& * prive.Yt, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt
 End If
 Else
 If maxchar > 0 Then
-.move X& * prive.Xt + D.Left - ExcludeThisLeft, y& * prive.Yt + D.top, (x1& - X&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt
+.move x& * prive.Xt + D.Left - ExcludeThisLeft, y& * prive.Yt + D.top, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt
 If D.Name = "Form1" Then
 .glistN.RepaintFromOut D.Image, D.Left, D.top
 Else
 .glistN.RepaintFromOut D.Image, 0, 0
 End If
 Else
-.move X& * prive.Xt + D.Left, y& * prive.Yt + D.top, (x1& - X&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt
+.move x& * prive.Xt + D.Left, y& * prive.Yt + D.top, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt
 End If
 End If
 If A$ <> "" Then
@@ -4424,7 +4424,7 @@ End If
 
 End Function
 
-Sub ListChoise(bstack As basetask, A$, X&, y&, x1&, y1&)
+Sub ListChoise(bstack As basetask, A$, x&, y&, x1&, y1&)
 On Error Resume Next
 Dim D As Object, oldh As Long
 Dim s$, prive As basket
@@ -4461,9 +4461,9 @@ End If
 Else
 .restrictLines = (y1& - y&) + 1
 If .BorderStyle = 0 Then
-.move X& * prive.Xt + D.Left, y& * prive.Yt + D.top, (x1& - X&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
+.move x& * prive.Xt + D.Left, y& * prive.Yt + D.top, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
 Else
-.move X& * prive.Xt - dv15 + D.Left, y& * prive.Yt - dv15 + D.top, (x1& - X&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
+.move x& * prive.Xt - dv15 + D.Left, y& * prive.Yt - dv15 + D.top, (x1& - x&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
 End If
 End If
 .enabled = True
@@ -4524,15 +4524,15 @@ If A$ = vbNullString Then
     If .HeadlineHeight <> oldh Then
     If .BorderStyle = 0 Then
     If ((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .top > ScrY() Then
-    .move .Left, .top - (((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .top - ScrY()), (x1& - X&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
+    .move .Left, .top - (((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .top - ScrY()), (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
     Else
-.move .Left, .top, (x1& - X&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
+.move .Left, .top, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
 End If
 Else
 If ((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .top > ScrY() Then
-.move .Left, .top - (((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .top - ScrY()), (x1& - X&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
+.move .Left, .top - (((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .top - ScrY()), (x1& - x&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
 Else
-.move .Left, .top, (x1& - X&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
+.move .Left, .top, (x1& - x&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
 End If
 End If
   
@@ -4656,17 +4656,17 @@ Targets = False  ' do not use targets for now
     Dim mycode As Double, oldcodeid As Double
 mycode = Rnd * 1233312231
 oldcodeid = Modalid
-Dim X As Form, zz As Form
+Dim x As Form, zz As Form
 Set zz = Screen.ActiveForm
-For Each X In Forms
-    If X.Name = "GuiM2000" Then
-        Set XX = X
+For Each x In Forms
+    If x.Name = "GuiM2000" Then
+        Set XX = x
         If XX.Enablecontrol Then
             If XX.Modal = 0 Then XX.Modal = mycode
         End If
         XX.Enablecontrol = False
     End If
-Next X
+Next x
 On Error Resume Next
 If zz.enabled Then zz.SetFocus
 Set zz = Nothing
@@ -4687,9 +4687,9 @@ While KeyPressed(&H1B)
     ProcTask2 bstack
     NOEXECUTION = False
 Wend
-For Each X In Forms
-    If X.Name = "GuiM2000" Then
-        Set XX = X
+For Each x In Forms
+    If x.Name = "GuiM2000" Then
+        Set XX = x
         If XX.TrueVisible Then
             If Not XX.Enablecontrol Then
                 XX.TestModal mycode
@@ -4699,7 +4699,7 @@ For Each X In Forms
          '   End If
         End If
     End If
-Next X
+Next x
 Modalid = oldcodeid
 BLOCKkey = False
 escok = oldesc
@@ -4709,12 +4709,12 @@ Targets = ot
 mywait11 bstack, 5
 End Sub
 
-Public Sub FrameText(dd As Object, ByVal Size As Single, X As Long, y As Long, cc As Long, Optional myCut As Boolean = False)
+Public Sub FrameText(dd As Object, ByVal Size As Single, x As Long, y As Long, cc As Long, Optional myCut As Boolean = False)
 Dim i As Long, mymul As Long
 
 If dd Is Form1.PrinterDocument1 Then
 ' check this please
-dd.Width = X
+dd.Width = x
 dd.Height = y
 Pr_Back dd, Size
 Exit Sub
@@ -4728,8 +4728,8 @@ With players(basketcode)
 .currow = 0
 .XGRAPH = 0
 .YGRAPH = 0
-If X = 0 Then
-X = dd.Width
+If x = 0 Then
+x = dd.Width
 y = dd.Height
 End If
 
@@ -4763,10 +4763,10 @@ dd.Font.Size = Size
 .Yt = TextHeight(fonttest, "fj")
 .Xt = fonttest.TextWidth("W") + dv15
 
-.mX = Int(X / .Xt)
+.mX = Int(x / .Xt)
 .mY = Int(y / (.Yt + .MineLineSpace * 2))
 .Yt = .Yt + .MineLineSpace * 2
-If .mX < 2 Then .mX = 2: X = 2 * .Xt
+If .mX < 2 Then .mX = 2: x = 2 * .Xt
 If .mY < 2 Then .mY = 2: y = 2 * .Yt
 If (.mX Mod 2) = 1 And .mX > 1 Then
 .mX = .mX - 1
@@ -4791,7 +4791,7 @@ If .mX Mod 4 <> 0 Then .mX = 4 * (.mX \ 4)
 If .mX < 4 Then .mX = 4
 '.My = Int(y / (.Yt + .MineLineSpace * 2))
 '.Yt = .Yt + .MineLineSpace * 2
-If .mX < 2 Then .mX = 2: X = 2 * .Xt
+If .mX < 2 Then .mX = 2: x = 2 * .Xt
 If .mY < 2 Then .mY = 2: y = 2 * .Yt
 If (.mX Mod 2) = 1 And .mX > 1 Then
 .mX = .mX - 1
@@ -5322,7 +5322,7 @@ Loop
  
 If Not QRY Then s$ = vbNullString
 dq.FontTransparent = True
-SetBkMode dq.hDC, 1
+SetBkMode dq.Hdc, 1
 QRY = False
 
 Call mouse
@@ -5353,37 +5353,37 @@ TaskMaster.RestEnd1
 End Function
 
 
-Public Sub GetXYb(dd As Object, mb As basket, X As Long, y As Long)
+Public Sub GetXYb(dd As Object, mb As basket, x As Long, y As Long)
 With mb
 If dd.currentY Mod .Yt <= dv15 Then
 y = (dd.currentY) \ .Yt
 Else
 y = (dd.currentY - .uMineLineSpace) \ .Yt
 End If
-X = dd.currentX \ .Xt
+x = dd.currentX \ .Xt
 
 ''
 End With
 End Sub
-Public Sub GetXYb2(dd As Object, mb As basket, X As Long, y As Long)
+Public Sub GetXYb2(dd As Object, mb As basket, x As Long, y As Long)
 With mb
-X = dd.currentX \ .Xt
+x = dd.currentX \ .Xt
 y = Int((dd.currentY / .Yt) + 0.5)
 End With
 End Sub
 Sub Gradient(TheObject As Object, ByVal f&, ByVal t&, ByVal xx1&, ByVal xx2&, ByVal yy1&, ByVal yy2&, ByVal hor As Boolean, ByVal all As Boolean)
     Dim Redval&, Greenval&, Blueval&
-    Dim r1&, G1&, b1&, sr&, sg&, sb&
+    Dim R1&, G1&, b1&, sr&, sg&, sb&
     Dim obj As MetaDc
     f& = f& Mod &H1000000
     t& = t& Mod &H1000000
     Redval& = f& And &H10000FF
     Greenval& = (f& And &H100FF00) / &H100
     Blueval& = (f& And &HFF0000) / &H10000
-    r1& = t& And &H10000FF
+    R1& = t& And &H10000FF
     G1& = (t& And &H100FF00) / &H100
     b1& = (t& And &HFF0000) / &H10000
-    sr& = (r1& - Redval&) * 1000 / 127
+    sr& = (R1& - Redval&) * 1000 / 127
     sg& = (G1& - Greenval&) * 1000 / 127
     sb& = (b1& - Blueval&) * 1000 / 127
     Redval& = Redval& * 1000
@@ -5541,15 +5541,15 @@ End Function
 Sub ICOPY(d1 As Object, x1 As Long, y1 As Long, W As Long, H As Long)
 Dim sV As Long
 With players(GetCode(d1))
-sV = BitBlt(d1.hDC, CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleY(y1, 1, 3)), CLng(d1.ScaleX(W, 1, 3)), CLng(d1.ScaleY(H, 1, 3)), d1.hDC, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleY(.YGRAPH, 1, 3)), SRCCOPY)
+sV = BitBlt(d1.Hdc, CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleY(y1, 1, 3)), CLng(d1.ScaleX(W, 1, 3)), CLng(d1.ScaleY(H, 1, 3)), d1.Hdc, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleY(.YGRAPH, 1, 3)), SRCCOPY)
 'sv = UpdateWindow(d1.hwnd)
 End With
 End Sub
 
-Sub sHelp(Title$, doc$, X As Long, y As Long)
+Sub sHelp(Title$, doc$, x As Long, y As Long)
 vH_title$ = Title$
 vH_doc$ = doc$
-vH_x = X
+vH_x = x
 vH_y = y
 End Sub
 
@@ -7166,43 +7166,43 @@ Dim catchit As Boolean
 On Error Resume Next
 If Not Screen.ActiveForm Is Nothing Then
 Debug.Print "choose next"
-    Dim X As Form
-     For Each X In Forms
-     If X.Name = "Form1" Or X.Name = "GuiM2000" Or X.Name = "Form2" Or X.Name = "Form4" Then
-         If X.Visible And X.enabled Then
-             If catchit Then X.SetFocus: Exit Sub
-             If X.hWnd = GetForegroundWindow Then
+    Dim x As Form
+     For Each x In Forms
+     If x.Name = "Form1" Or x.Name = "GuiM2000" Or x.Name = "Form2" Or x.Name = "Form4" Then
+         If x.Visible And x.enabled Then
+             If catchit Then x.SetFocus: Exit Sub
+             If x.hWnd = GetForegroundWindow Then
              catchit = True
              End If
          End If
     End If
          
-     Next X
-     Set X = Nothing
-     For Each X In Forms
-     If X.Name = "Form1" Or X.Name = "GuiM2000" Or X.Name = "Form2" Or X.Name = "Form4" Then
-         If X.Visible And X.enabled Then X.SetFocus: Exit Sub
+     Next x
+     Set x = Nothing
+     For Each x In Forms
+     If x.Name = "Form1" Or x.Name = "GuiM2000" Or x.Name = "Form2" Or x.Name = "Form4" Then
+         If x.Visible And x.enabled Then x.SetFocus: Exit Sub
              
              
          End If
-     Next X
-     Set X = Nothing
+     Next x
+     Set x = Nothing
     End If
 
 End Sub
 Public Sub ChooseNextLeft(A As Object, b As GuiM2000, Optional ByVal useAny As Boolean = False)
-    Dim X As gList, x1 As VB.PictureBox, backlist As Object, XX As Control, NoSkip As Boolean
+    Dim x As gList, x1 As VB.PictureBox, backlist As Object, XX As Control, NoSkip As Boolean
     If b Is Nothing Then Exit Sub
     For Each XX In b.Controls
         If TypeOf XX Is gList Then
             If XX.Name <> "gList2" Then
-                Set X = XX
-                If useAny Then NoSkip = True Else NoSkip = X.Arrows2Tab Or X.TabStopSoft
+                Set x = XX
+                If useAny Then NoSkip = True Else NoSkip = x.Arrows2Tab Or x.TabStopSoft
                 
-                If X.Visible And X.enabled And NoSkip And Not X Is A Then
-                    Set backlist = X
+                If x.Visible And x.enabled And NoSkip And Not x Is A Then
+                    Set backlist = x
                 End If
-                If X Is A Then
+                If x Is A Then
                     If Not backlist Is Nothing Then
                         backlist.SetFocus
                     End If
@@ -7226,17 +7226,17 @@ Public Sub ChooseNextLeft(A As Object, b As GuiM2000, Optional ByVal useAny As B
     Next
 End Sub
 Public Sub ChooseNextRight(A As Object, b As GuiM2000, Optional ByVal useAny As Boolean = False)
-    Dim X As gList, x1 As VB.PictureBox, GetNext As Boolean, XX As Control, NoSkip As Boolean
+    Dim x As gList, x1 As VB.PictureBox, GetNext As Boolean, XX As Control, NoSkip As Boolean
     If b Is Nothing Then Exit Sub
     For Each XX In b.Controls
         If TypeOf XX Is gList Then
-            Set X = XX
-            If useAny Then NoSkip = True Else NoSkip = X.Arrows2Tab Or X.TabStopSoft
-            If X.Visible And X.enabled And NoSkip And GetNext Then
-                X.SetFocus
+            Set x = XX
+            If useAny Then NoSkip = True Else NoSkip = x.Arrows2Tab Or x.TabStopSoft
+            If x.Visible And x.enabled And NoSkip And GetNext Then
+                x.SetFocus
                 Exit Sub
             End If
-            If X Is A Then GetNext = True
+            If x Is A Then GetNext = True
         ElseIf TypeOf XX Is VB.PictureBox Then
             Set x1 = XX
             NoSkip = x1.TabStop
@@ -11439,16 +11439,16 @@ For i& = iu& To id&
 Next i&
 End Sub
 Function BoxTarget(DSTACK As basetask, ByVal xl&, ByVal yl&, ByVal b As Long, ByVal f As Long, ByVal Tag$, ByVal id&, ByVal COM$, XXT&, YYT&, LineSpace&) As target
-Dim X&, y&, D As Object
+Dim x&, y&, D As Object
 Dim half As Long
 Set D = DSTACK.Owner
 Dim prive As basket
 prive = players(GetCode(D))
 With prive
 
-X& = .curpos
+x& = .curpos
 y& = .currow
-xl& = xl& + X&
+xl& = xl& + x&
 
 
 yl& = yl& + y& - 1
@@ -11458,7 +11458,7 @@ With BoxTarget
 .Comm = COM$
 .id = id&
 .Tag = Tag$
-.lX = X&
+.lX = x&
 .lY = y&
 .tx = xl& - 1
 .ty = yl&
@@ -11487,7 +11487,7 @@ End With
 If f <> &H81000000 Then BoxBigNew D, prive, xl& - 1, yl&, f
 If b <> &H81000000 Then BoxColorNew D, prive, xl& - 1, yl&, b
 If id& < 100 Then
-    Tag$ = Left$(Tag$, xl& - X&)
+    Tag$ = Left$(Tag$, xl& - x&)
     If Tag$ <> "" Then
     
     Select Case id& Mod 10
@@ -11499,13 +11499,13 @@ If id& < 100 Then
     End Select
     Select Case id& Mod 10
     Case 2, 5, 8
-    X& = (xl& + X& - Len(Tag$)) \ 2
+    x& = (xl& + x& - Len(Tag$)) \ 2
     Case 3, 6, 9
-    X& = xl& - Len(Tag$)
+    x& = xl& - Len(Tag$)
     Case Else
     End Select
     If (id& Mod 10) > 0 Then
-    LCTbasket D, prive, y&, X&
+    LCTbasket D, prive, y&, x&
     D.FontTransparent = True
         If half > 0 Then
     D.currentY = D.currentY + prive.Yt \ 2
@@ -11536,13 +11536,13 @@ Else
     End Select
     
     If (id& Mod 10) > 0 Then
-    LCTbasket D, prive, y&, X&
+    LCTbasket D, prive, y&, x&
     D.FontTransparent = True
     D.currentX = D.currentX - dv15 * 2
     If half > 0 Then
     D.currentY = D.currentY + prive.Yt \ 2
     End If
-    wwPlain2 DSTACK, prive, Tag$, xl& - X&, 10000, , True, f, , , True
+    wwPlain2 DSTACK, prive, Tag$, xl& - x&, 10000, , True, f, , , True
     LCTbasket D, prive, BoxTarget.lY, BoxTarget.lX
     End If
 End If
@@ -11550,8 +11550,8 @@ End If
 End If
 End With
 End Function
-Private Function MyMod(r1, po) As Variant
-MyMod = r1 - Fix(r1 / po) * po
+Private Function MyMod(R1, po) As Variant
+MyMod = R1 - Fix(R1 / po) * po
 End Function
 Sub SetTmpPath()
      strTemp = mylcasefILE(GetTempPathgg)
@@ -11982,7 +11982,7 @@ textDel = (chk <> "")
 If chk <> "" Then KillFile chk
 End Function
 Function MyPset(bstack As basetask, rest$) As Boolean
-Dim prive As Long, X As Double, p As Variant, y As Double, Col As Long
+Dim prive As Long, x As Double, p As Variant, y As Double, Col As Long
 Dim Scr As Object, ss$
 Set Scr = bstack.Owner
 prive = GetCode(Scr)
@@ -11990,14 +11990,14 @@ With players(prive)
     Col = players(prive).mypen
     If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then Col = mycolor(p)
     If FastSymbol(rest$, ",") Then
-        If IsExp(bstack, rest$, X, , True) Then
+        If IsExp(bstack, rest$, x, , True) Then
             If FastSymbol(rest$, ",") Then
                 If IsExp(bstack, rest$, y, , True) Then
                     If TypeOf Scr Is MetaDc Then
                      
-                        Scr.Line2 X, y, X, y, Col, False, False
+                        Scr.Line2 x, y, x, y, Col, False, False
                     Else
-                        Scr.PSet (X, y), Col
+                        Scr.PSet (x, y), Col
                     End If
                      MyPset = True
                 Else
@@ -12009,7 +12009,7 @@ With players(prive)
         End If
     Else
         If TypeOf Scr Is MetaDc Then
-            Scr.Line2 X, y, X, y, Col, False, False
+            Scr.Line2 x, y, x, y, Col, False, False
         Else
             Scr.PSet (.XGRAPH, .YGRAPH), Col
         End If
@@ -13742,7 +13742,7 @@ End If
 End Sub
 
 Function ProcUSE(basestack As basetask, rest$, Lang As Long) As Boolean
-Dim ss$, ML As Long, X As Double, pa$, s$, stac1$, p As Variant, frm$, i As Long, W$, pppp As mArray
+Dim ss$, ML As Long, x As Double, pa$, s$, stac1$, p As Variant, frm$, i As Long, W$, pppp As mArray
 Dim it As Long, what$
 If IsStrExp(basestack, rest$, ss$) Then   'gsb
 ElseIf Not Abs(IsLabel(basestack, rest$, ss$)) = 1 Then ' WITHOUT " .gsb"
@@ -13760,9 +13760,9 @@ If VALIDATEpart(rest$, s$) Then
 Do While s$ <> ""
     If ISSTRINGA(s$, pa$) Then
         basestack.soros.DataStr pa$
-    ElseIf IsNumberD2(s$, X) Then
-        basestack.soros.DataVal X
-        X = vbEmpty
+    ElseIf IsNumberD2(s$, x) Then
+        basestack.soros.DataVal x
+        x = vbEmpty
     Else
         Exit Do
     End If
@@ -14443,10 +14443,10 @@ Dim prive As basket, cb As CodeBlock
 'b$ = Trim$(b$)
 Dim W$, ww#, LLL As Long, sss As Long, v As Long, p As Variant, ss$, sw$, ohere$
 Dim pppp As mArray, i1 As Long, Lang As Long
-Dim r1 As Long, r2 As Long
+Dim R1 As Long, r2 As Long
 ' uink$ = VbNullString
 di.FontTransparent = True
-SetBkMode di.hDC, 1
+SetBkMode di.Hdc, 1
 ohere$ = here$
 If Not ByPass Then here$ = vbNullString
 bstack.LoadOnly = ByPass
@@ -16281,7 +16281,7 @@ Sub BackPort(A$)
 If Len(A$) = 0 Then A$ = Chr(8) Else Mid$(A$, 1, 1) = Chr(8)
 End Sub
 Function ExistNum(bstack As basetask, A$, R As Variant) As Boolean
-Dim p As Variant, dd As Long, dn As Long, X As Variant, anything As Object, s$, usehandler As mHandler
+Dim p As Variant, dd As Long, dn As Long, x As Variant, anything As Object, s$, usehandler As mHandler
 ExistNum = False
 If IsExp(bstack, A$, p) Then
     If myVarType(p, vbString) Then
@@ -16306,23 +16306,23 @@ If IsExp(bstack, A$, p) Then
                             GoTo j5884
                         End If
                         If FastSymbol(A$, ",") Then
-                            If IsExp(bstack, A$, X, , True) Then
-                                If myVarType(X, vbString) Then
+                            If IsExp(bstack, A$, x, , True) Then
+                                If myVarType(x, vbString) Then
                                     MissParam A$
                                     Exit Function
                                 End If
-                                X = Int(X)
-                                If X = 0 Then
-                                    R = .objref.FindOne(p, X)
-                                    R = X
-                                ElseIf X > 0 Then
-                                    dn = X
-                                    X = 0
-                                    R = .objref.FindOne(p, X)
-                                    X = -X + dn - 1
-                                    R = .objref.FindOne(p, X)
+                                x = Int(x)
+                                If x = 0 Then
+                                    R = .objref.FindOne(p, x)
+                                    R = x
+                                ElseIf x > 0 Then
+                                    dn = x
+                                    x = 0
+                                    R = .objref.FindOne(p, x)
+                                    x = -x + dn - 1
+                                    R = .objref.FindOne(p, x)
                                 Else
-                                    R = .objref.FindOne(p, X)
+                                    R = .objref.FindOne(p, x)
                                 End If
                             Else
                                 MissParam A$
@@ -16336,24 +16336,24 @@ If IsExp(bstack, A$, p) Then
 j5884:
                         Set bstack.lastobj = Nothing
                         If FastSymbol(A$, ",") Then
-                            If IsExp(bstack, A$, X, , True) Then
-                                If myVarType(X, vbString) Then
+                            If IsExp(bstack, A$, x, , True) Then
+                                If myVarType(x, vbString) Then
                                     MissParam A$
                                     Exit Function
                                 End If
 
-                                X = Int(X)
-                                If X = 0 Then
-                                    R = .objref.FindOne(s$, X)
-                                    R = X
-                                ElseIf X > 0 Then
-                                    dn = X
-                                    X = 0
-                                    R = .objref.FindOne(s$, X)
-                                    X = -X + dn - 1
-                                    R = .objref.FindOne(s$, X)
+                                x = Int(x)
+                                If x = 0 Then
+                                    R = .objref.FindOne(s$, x)
+                                    R = x
+                                ElseIf x > 0 Then
+                                    dn = x
+                                    x = 0
+                                    R = .objref.FindOne(s$, x)
+                                    x = -x + dn - 1
+                                    R = .objref.FindOne(s$, x)
                                 Else
-                                    R = .objref.FindOne(s$, X)
+                                    R = .objref.FindOne(s$, x)
                                 End If
                             Else
                                 MissParam A$
@@ -16871,7 +16871,7 @@ End Function
 Function MakeForm(basestack As basetask, rest$) As Boolean
 On Error Resume Next
 MakeForm = True
-Dim Scr As Object, XX As Single, p As Variant, x1 As Long, y1 As Long, X As Double, y As Double
+Dim Scr As Object, XX As Single, p As Variant, x1 As Long, y1 As Long, x As Double, y As Double
 Dim w3 As Long, w4 As Long, sX As Double, adjustlinespace As Boolean, SZ As Single, reduce As Single
 reduce = 1
 Set Scr = basestack.Owner
@@ -16897,17 +16897,17 @@ mAddTwipsTop = .uMineLineSpace  ' the basic
 Dim wishX As Long, wishY As Long
 If IsExp(basestack, rest$, p) Then
     If p < 10 Then p = 10
-    X = 4
+    x = 4
     XX = 4
     If Scr.Name = "DIS" Then
     Do
     y = CDbl(XX)
-    XX = CSng(X)
+    XX = CSng(x)
     nForm basestack, XX, w3, w4, mAddTwipsTop   'using line spacing
-    If XX > CSng(X) Then X = CDbl(XX)
+    If XX > CSng(x) Then x = CDbl(XX)
     
     If Form1.Width * reduce < w3 * p Then Exit Do
-    X = X + 0.25
+    x = x + 0.25
     Loop
  
     
@@ -16915,17 +16915,17 @@ If IsExp(basestack, rest$, p) Then
     Do
     
     y = CDbl(XX)
-    XX = CSng(X)
+    XX = CSng(x)
 
     nForm basestack, XX, w3, w4, mAddTwipsTop  'using line spacing
-    If XX > CSng(X) Then X = CDbl(XX)
+    If XX > CSng(x) Then x = CDbl(XX)
     
     If Scr.Width * reduce < w3 * p Then Exit Do
     
-    X = X + 0.4
+    x = x + 0.4
     Loop
     End If
-    X = y
+    x = y
     sX = 0
     wishX = p
     If FastSymbol(rest$, ",") Then
@@ -16958,10 +16958,10 @@ End If
     
 Sleep 1
 End If
-nForm basestack, CSng(X), w3, w4, 0
+nForm basestack, CSng(x), w3, w4, 0
 Dim mmx As Long, mmy As Long
 If sX = 0 Then
-SZ = CSng(X)
+SZ = CSng(x)
 mmx = Scr.Width * reduce
  If Scr.Name = "DIS" Then
  mmy = CLng(mmx * Form1.Height / Form1.Width) ' WHY 3/4 ??
@@ -16983,7 +16983,7 @@ safety = sX * w4
 XX = y / (dv20 * sX)
 
 nForm basestack, XX, w3, w4, 0  'using no spacing so we put a lot of lines
-X = CDbl(XX)
+x = CDbl(XX)
 y = y * 0.9
 Wend
 
@@ -16996,8 +16996,8 @@ Do While sX * w4 > Scr.Height * reduce
 
 XX = y / (dv20 * sX)
 nForm basestack, XX, w3, w4, 0  'using no spacing so we put a lot of lines
-If X = CDbl(XX) Then Exit Do
-X = CDbl(XX)
+If x = CDbl(XX) Then Exit Do
+x = CDbl(XX)
 y = y * 0.9
 Loop
 
@@ -17009,8 +17009,8 @@ End If
 If Scr.Name = "DIS" Then
 If Not adjustlinespace Then If Scr.Height * reduce >= Form1.Height * reduce - dv15 Then mAddTwipsTop = dv15 * (((Scr.Height * reduce - sX * w4) / sX / 2) \ dv15)
 End If
-nForm basestack, (X), w3, w4, mAddTwipsTop
-SZ = CSng(X)
+nForm basestack, (x), w3, w4, mAddTwipsTop
+SZ = CSng(x)
 'If mmx < scr.Width Then
 mmx = Scr.Width * reduce
 
@@ -17168,7 +17168,7 @@ End If
 Set getSafeFormList = myCol.mylist
 End Function
 Function ProcBrowser(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim s$, W$, X As Double
+Dim s$, W$, x As Double
 ProcBrowser = True
 If Not IsStrExp(bstack, rest$, s$) Then
 
@@ -17188,13 +17188,13 @@ If Not IsStrExp(bstack, rest$, s$) Then
     End If
 End If
             If FastSymbol(rest$, ",") Then
-                    If IsExp(bstack, rest$, X) Then IEX = CLng(X): IESizeX = Form1.ScaleWidth - IEX Else MissNumExpr: ProcBrowser = False: Exit Function
+                    If IsExp(bstack, rest$, x) Then IEX = CLng(x): IESizeX = Form1.ScaleWidth - IEX Else MissNumExpr: ProcBrowser = False: Exit Function
                 If FastSymbol(rest$, ",") Then
-                    If IsExp(bstack, rest$, X) Then IEY = CLng(X): IESizeY = Form1.ScaleHeight - IEY Else MissNumExpr: ProcBrowser = False: Exit Function
+                    If IsExp(bstack, rest$, x) Then IEY = CLng(x): IESizeY = Form1.ScaleHeight - IEY Else MissNumExpr: ProcBrowser = False: Exit Function
                                 If FastSymbol(rest$, ",") Then
-                    If IsExp(bstack, rest$, X) Then IESizeX = CLng(X) Else MissNumExpr: ProcBrowser = False: Exit Function
+                    If IsExp(bstack, rest$, x) Then IESizeX = CLng(x) Else MissNumExpr: ProcBrowser = False: Exit Function
                                     If FastSymbol(rest$, ",") Then
-                    If IsExp(bstack, rest$, X) Then IESizeY = CLng(X) Else MissNumExpr: ProcBrowser = False: Exit Function
+                    If IsExp(bstack, rest$, x) Then IESizeY = CLng(x) Else MissNumExpr: ProcBrowser = False: Exit Function
                  End If
                 End If
              End If
@@ -17307,7 +17307,7 @@ End Function
 
 Function IdPara(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim x1 As Long, y1 As Long, i As Long, it As Long, vvl As Variant
-Dim X As Double, y As Double, s$, what$, w3 As Long, w4 As Long, z As Double
+Dim x As Double, y As Double, s$, what$, w3 As Long, w4 As Long, z As Double
 Dim xa As Long, ya As Long
 Dim pppp As mArray
 
@@ -17322,9 +17322,9 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
         y = y - 1
         If y < 0 Then y = -1
         If FastSymbol(rest$, ",") Then
-            If IsExp(basestack, rest$, X) Then
-                X = Int(X)
-                If X < 1 Then
+            If IsExp(basestack, rest$, x) Then
+                x = Int(x)
+                If x < 1 Then
                     MyErMacro rest$, "the index base must be >=1", "Á ‚‹ÛÁ ‰ÂﬂÍÙÁ Ò›ÂÈ Ì· ÂﬂÌ·È >=1"
                     Exit Function
                 End If
@@ -17341,7 +17341,7 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
                 z = 0
             End If
         Else
-            X = 0
+            x = 0
         End If
         x1 = Abs(IsLabel(basestack, rest$, what$))
         If x1 = 3 Then
@@ -17364,7 +17364,7 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
                             CheckVar var(i), s$
                         ElseIf y < 1 Then
                             w3 = var(i).ParagraphFromOrder(1)
-                            w4 = X
+                            w4 = x
                             If z > 0 Then
                                 var(i).BackSpaceNchars w3, w4 + CLng(z), CLng(z)
                             End If
@@ -17372,7 +17372,7 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
                             If Len(s$) > 0 Then var(i).InsertDoc w3, w4, s$
                         Else
                             w3 = var(i).ParagraphFromOrder(y + 1)
-                            w4 = X
+                            w4 = x
                             If z > 0 Then
                                 var(i).BackSpaceNchars w3, w4 + CLng(z), CLng(z)
                             End If
@@ -17405,7 +17405,7 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
                                 CheckVar pppp.item(it), s$
                             ElseIf y < 1 Then
                                 w3 = pppp.item(it).ParagraphFromOrder(1)
-                                w4 = X
+                                w4 = x
                                 If z > 0 Then
                                     pppp.item(it).BackSpaceNchars w3, w4 + CLng(z), CLng(z)
                                 End If
@@ -17413,7 +17413,7 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
                                 If Len(s$) > 0 Then pppp.item(it).InsertDoc w3, w4, s$
                             Else
                                 w3 = pppp.item(it).ParagraphFromOrder(y + 1)
-                                w4 = X
+                                w4 = x
                                 If z > 0 Then
                                     pppp.item(it).BackSpaceNchars w3, w4 + CLng(z), CLng(z)
                                 End If
@@ -17439,9 +17439,9 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
             Exit Function
         End If
     End If
-ElseIf IsExp(basestack, rest$, X) Then
-    X = Int(X)
-    If X < 1 Then
+ElseIf IsExp(basestack, rest$, x) Then
+    x = Int(x)
+    If x < 1 Then
         MyErMacro rest$, "the index base must be >=1", "Á ‚‹ÛÁ ‰ÂﬂÍÙÁ Ò›ÂÈ Ì· ÂﬂÌ·È >=1"
         ' not needed to change idpara must be true because macro embed an ERROR command
         Exit Function
@@ -17475,12 +17475,12 @@ ElseIf IsExp(basestack, rest$, X) Then
                             Exit Function
                         Else
                             If y = 0 Then
-                                var(i).FindPos 1, 0, CLng(X), x1, y1, w3, w4
+                                var(i).FindPos 1, 0, CLng(x), x1, y1, w3, w4
                                 If w4 = 0 Then
                                  ' ' merge to previous
                                 End If
                             Else
-                                var(i).FindPos 1, 0, X + y, x1, y1, w3, w4
+                                var(i).FindPos 1, 0, x + y, x1, y1, w3, w4
                                 ' so now we now the paragraph w3 and the position w4
                                 var(i).BackSpaceNchars w3, w4, y
                             End If
@@ -17503,17 +17503,17 @@ ElseIf IsExp(basestack, rest$, X) Then
                             Exit Function
                         Else
                             If y = 0 Then
-                                var(i) = Left$(var(i), X - 1) + s$ + Mid$(var(i), X)
+                                var(i) = Left$(var(i), x - 1) + s$ + Mid$(var(i), x)
                             Else
                                 If s$ = vbNullString Then
-                                    var(i) = Left$(var(i), X - 1) + Mid$(var(i), X + y)
+                                    var(i) = Left$(var(i), x - 1) + Mid$(var(i), x + y)
                                 Else
                                     If Len(s$) = y Then
-                                        Mid$(var(i), X, y) = s$
+                                        Mid$(var(i), x, y) = s$
                                     ElseIf Len(s$) < y Then
-                                        Mid$(var(i), X, y) = s$ + space$(y - Len(s$))
+                                        Mid$(var(i), x, y) = s$ + space$(y - Len(s$))
                                     Else
-                                        var(i) = Left$(var(i), X - 1) + s$ + Mid$(var(i), X + y)
+                                        var(i) = Left$(var(i), x - 1) + s$ + Mid$(var(i), x + y)
                                     End If
                                 End If
                             End If
@@ -17532,12 +17532,12 @@ ElseIf IsExp(basestack, rest$, X) Then
                     If FastSymbol(rest$, "=") Then
                         If IsStrExp(basestack, rest$, s$) Then
                             If y = 0 Then
-                                pppp.item(it).FindPos 1, 0, CLng(X), xa, ya, w3, w4
+                                pppp.item(it).FindPos 1, 0, CLng(x), xa, ya, w3, w4
                                  If w4 = 0 Then
                                 ' ' merge to previous
                                  End If
                             Else
-                                pppp.item(it).FindPos 1, 0, X + y, xa, ya, w3, w4
+                                pppp.item(it).FindPos 1, 0, x + y, xa, ya, w3, w4
                                 ' so now we now the paragraph w3 and the position w4
                                 pppp.item(it).BackSpaceNchars w3, w4, y
                             End If
@@ -17551,18 +17551,18 @@ ElseIf IsExp(basestack, rest$, X) Then
                 If FastSymbol(rest$, "=") Then
                     If IsStrExp(basestack, rest$, s$) Then
                         If y = 0 Then
-                            pppp.item(it) = Left$(pppp.item(it), X - 1) + s$ + Mid$(var(i), X)
+                            pppp.item(it) = Left$(pppp.item(it), x - 1) + s$ + Mid$(var(i), x)
                         Else
                             If s$ = vbNullString Then
-                                pppp.item(it) = Left$(pppp.item(it), X - 1) + Mid$(pppp.item(it), X + y)
+                                pppp.item(it) = Left$(pppp.item(it), x - 1) + Mid$(pppp.item(it), x + y)
                             Else
                                 vvl = pppp.item(it)
                                 If Len(vvl) = y Then
-                                    Mid$(vvl, X, y) = s$
+                                    Mid$(vvl, x, y) = s$
                                 ElseIf Len(s$) < y Then
-                                    Mid$(vvl, X, y) = s$ + space$(y - Len(s$))
+                                    Mid$(vvl, x, y) = s$ + space$(y - Len(s$))
                                 Else
-                                    vvl = Left$(vvl, X - 1) + s$ + Mid$(vvl, X + y)
+                                    vvl = Left$(vvl, x - 1) + s$ + Mid$(vvl, x + y)
                                 End If
                                 pppp.item(it) = vvl
                             End If
@@ -17887,7 +17887,7 @@ Sub mylist(bstack As basetask, Optional tofile As Long = -1, Optional Lang As Lo
 Dim Scr As Object, prive As Long
 Set Scr = bstack.Owner
 prive = GetCode(Scr)
-Dim p As Variant, i As Long, s$, pn&, X As Double, y As Double, it As Long, f As Long, pa$
+Dim p As Variant, i As Long, s$, pn&, x As Double, y As Double, it As Long, f As Long, pa$
 Dim x1 As Long, y1 As Long, frm$, par As Boolean, ohere$, ss$, W$, sX As Double, sY As Double, modname$
 Dim pppp As mArray, hlp$, H&, all$, myobject As Object, usehandler As mHandler, usegroup As Group
 Dim w1 As Long, w2 As Long, w3 As Long, dum As Boolean, virtualtop As Long
@@ -17992,12 +17992,12 @@ With players(prive)
                                 End If
                             End If
                     End If
-                    X = f - 1
-                    While X > 0
-                        X = X - 1
+                    x = f - 1
+                    While x > 0
+                        x = x - 1
                         pppp.GetDnum w1, w2, w3
                         w1 = w1 + 1
-                        If X > 0 Then
+                        If x > 0 Then
                             If tofile < 0 Then
                                 If tofile = -1 Then
                                     If .mX - .curpos < Len(Trim$(str$(w2)) + ",") Then crNew bstack, players(prive)
@@ -18889,7 +18889,7 @@ End If
 rest$ = Mid$(rest$, Pos)
 End Function
 Function ProcAbout(basestack As basetask, rest$, Lang As Long) As Boolean
-Dim par As Boolean, s$, ss$, X As Double, y As Double, i As Long
+Dim par As Boolean, s$, ss$, x As Double, y As Double, i As Long
 Dim kk As New Document
 Dim UAddPixelsTop As Long  ' just not used
 If IsLabelSymbolNewExp(rest$, "ƒ≈…Œ≈", "SHOW", Lang, ss$) Then
@@ -18915,7 +18915,7 @@ ElseIf FastSymbol(rest$, "!") Then
                 GoTo conthere
             Else
                 par = par And FastSymbol(rest$, ",")
-                par = par And IsExp(basestack, rest$, X)
+                par = par And IsExp(basestack, rest$, x)
                 par = par And FastSymbol(rest$, ",")
                 par = par And IsExp(basestack, rest$, y)
                 par = par And FastSymbol(rest$, ",")
@@ -18933,7 +18933,7 @@ ElseIf FastSymbol(rest$, "!") Then
                     ' save to
                     lastAboutHTitle = s$
                     LastAboutText = kk.textFormat(vbCrLf)
-                    sHelp lastAboutHTitle, LastAboutText, CLng(X), CLng(y)
+                    sHelp lastAboutHTitle, LastAboutText, CLng(x), CLng(y)
                 End If
             End If
         End If
@@ -18964,13 +18964,13 @@ ElseIf FastSymbol(rest$, "!") Then
             kk.textDoc = ReplaceSpace(s$)
             s$ = kk.TextParagraph(1)
             i = 0
-            X = (ScrInfo(Console).Width - 1) * 2 / 5
+            x = (ScrInfo(Console).Width - 1) * 2 / 5
             y = (ScrInfo(Console).Height - 1) / 7
             vH_title$ = s$
             If FastSymbol(rest$, ",") Then
                 par = True
-                If Not IsExp(basestack, rest$, X) Then
-                    X = (ScrInfo(Console).Width - 1) * 2 / 5: par = False
+                If Not IsExp(basestack, rest$, x) Then
+                    x = (ScrInfo(Console).Width - 1) * 2 / 5: par = False
                 Else
                     i = 1
                 End If
@@ -18986,7 +18986,7 @@ ElseIf FastSymbol(rest$, "!") Then
             If Not Form4.Visible Then
                 Helplastfactor = 1
                 helpSizeDialog = 1
-                vH_x = CLng(X * Helplastfactor)
+                vH_x = CLng(x * Helplastfactor)
                 vH_y = CLng(y * Helplastfactor)
                 If Screen.ActiveForm Is Nothing Then
                     Form4.Show
@@ -18997,9 +18997,9 @@ ElseIf FastSymbol(rest$, "!") Then
                     Form4.Show , Screen.ActiveForm
                 End If
             End If
-            myform Form4, ScrInfo(Console).Width - CLng(X * Helplastfactor), ScrInfo(Console).Height - CLng(y * Helplastfactor), CLng(X * Helplastfactor), CLng(y * Helplastfactor), True, 1  'Helplastfactor
+            myform Form4, ScrInfo(Console).Width - CLng(x * Helplastfactor), ScrInfo(Console).Height - CLng(y * Helplastfactor), CLng(x * Helplastfactor), CLng(y * Helplastfactor), True, 1  'Helplastfactor
             MoveFormToOtherMonitorOnly Form4, True
-            HelpLastWidth = X
+            HelpLastWidth = x
             GoTo there
         ElseIf i <> 0 Then
             If Screen.ActiveForm Is Nothing Then
@@ -19009,7 +19009,7 @@ ElseIf FastSymbol(rest$, "!") Then
             Else
                 Form4.Show , Screen.ActiveForm
             End If
-            myform Form4, Form4.Left, Form4.top, CLng(X * Helplastfactor), CLng(y * Helplastfactor), True, Helplastfactor
+            myform Form4, Form4.Left, Form4.top, CLng(x * Helplastfactor), CLng(y * Helplastfactor), True, Helplastfactor
             MoveFormToOtherMonitorOnly Form4
             GoTo there
         End If
@@ -21082,7 +21082,7 @@ A$ = NLtrim$(A$)
 
 End Function
 Function ProcDrawWidth(bstack As basetask, rest$) As Boolean
-Dim X As Double, p As Variant, it As Long, ss$, i As Long, x1 As Long, nd&, once As Boolean
+Dim x As Double, p As Variant, it As Long, ss$, i As Long, x1 As Long, nd&, once As Boolean
 ProcDrawWidth = True
 Dim Scr As Object
 Set Scr = bstack.Owner
@@ -21093,12 +21093,12 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
     Scr.DrawWidth = p
    
         If FastSymbol(rest$, ",") Then
-            If IsExp(bstack, rest$, X, , True) Then
+            If IsExp(bstack, rest$, x, , True) Then
                 On Error Resume Next
-                X = Int(X)
-                If X >= 0 Or X <= 6 Then
-                    Scr.DrawStyle = X
-                    If Err Then X = 0: Scr.DrawStyle = Int(X)
+                x = Int(x)
+                If x >= 0 Or x <= 6 Then
+                    Scr.DrawStyle = x
+                    If Err Then x = 0: Scr.DrawStyle = Int(x)
                     Scr.DrawWidth = p
                 End If
             End If
@@ -21137,7 +21137,7 @@ Scr.DrawStyle = x1
 Set Scr = Nothing
 End Function
 Function ProcCurve(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim par As Boolean, sX As Double, sY As Double, X As Double, y As Double, x1 As Integer, p As Variant, f As Long
+Dim par As Boolean, sX As Double, sY As Double, x As Double, y As Double, x1 As Integer, p As Variant, f As Long
 Dim Scr As Object
 
 Set Scr = bstack.Owner
@@ -21147,25 +21147,25 @@ If IsLabelSymbolNew(rest$, "√ŸÕ…¡", "ANGLE", Lang) Then par = True
 f = 32
 ReDim PLG(f)
 x1 = 1
-PLG(0).X = Scr.ScaleX(.XGRAPH, 1, 3)
+PLG(0).x = Scr.ScaleX(.XGRAPH, 1, 3)
 PLG(0).y = Scr.ScaleY(.YGRAPH, 1, 3)
 Do
 If x1 >= f Then f = f * 2: ReDim Preserve PLG(f)
 If IsExp(bstack, rest$, p) Then
-X = p
+x = p
 
 If Not FastSymbol(rest$, ",") Then ProcCurve = False: MissNumExpr: Exit Function
 If IsExp(bstack, rest$, p) Then
 If par Then
-sX = X / PI2
+sX = x / PI2
 sX = (sX - Fix(sX)) * PI2
 .XGRAPH = .XGRAPH + Cos(sX) * p
 .YGRAPH = .YGRAPH - Sin(sX) * p
 Else
-.XGRAPH = .XGRAPH + CLng(X)
+.XGRAPH = .XGRAPH + CLng(x)
 .YGRAPH = .YGRAPH + CLng(p)
 End If
-PLG(x1).X = Scr.ScaleX(.XGRAPH, 1, 3)
+PLG(x1).x = Scr.ScaleX(.XGRAPH, 1, 3)
 PLG(x1).y = Scr.ScaleY(.YGRAPH, 1, 3)
 
 Else
@@ -21209,12 +21209,12 @@ If mGDILines Then
         PLG(x1 + 2) = PLG(0)
         PLG(x1 + 3) = PLG(0)
         PLG(x1 + 4) = PLG(0)
-        DrawBezierGdi Scr.hDC, pencol, Col, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 4)
+        DrawBezierGdi Scr.Hdc, pencol, Col, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 4)
     Else
-        DrawBezierGdi Scr.hDC, pencol, 0, 1, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 1)
+        DrawBezierGdi Scr.Hdc, pencol, 0, 1, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 1)
     End If
 Else
-If PolyBezier(Scr.hDC, PLG(0), x1 + 1) = 0 Then
+If PolyBezier(Scr.Hdc, PLG(0), x1 + 1) = 0 Then
 BadGraphic
  Exit Function
 End If
@@ -23629,7 +23629,7 @@ End If
 If basestack.toprinter Then
 If oprinter.Height > 0 Then
 oprinter.Cls CLng(mycolor(.Paper))
-oprinter.PaintPicture Form1.PrinterDocument1.hDC
+oprinter.PaintPicture Form1.PrinterDocument1.Hdc
 .curpos = 0
 .currow = .mysplit
 .lastprint = False
@@ -23698,7 +23698,7 @@ Public Function AddBackslash(s As String) As String
 End Function
 Function ProcCreateEmf(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim W, H  ' these are twips - need to convert to .01 mm
-Dim f As Boolean, p As Variant, Col As Long, it As Long, ss$, X As Double, par As Boolean, prive As Long
+Dim f As Boolean, p As Variant, Col As Long, it As Long, ss$, x As Double, par As Boolean, prive As Long
 Dim nd&, once As Boolean
 ProcCreateEmf = True
 prive = GetCode(bstack.Owner)
@@ -23741,7 +23741,7 @@ If FastSymbol(rest$, "{") Then
 
 End Function
 Function ProcPath(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim f As Boolean, p As Variant, Col As Long, it As Long, ss$, X As Double, par As Boolean, prive As Long
+Dim f As Boolean, p As Variant, Col As Long, it As Long, ss$, x As Double, par As Boolean, prive As Long
 Dim OldGDILines As Boolean, Region As Boolean, oldpathcolor As Long, oldpathfillstyle As Integer, nd&, once As Boolean
 ProcPath = True
 prive = GetCode(bstack.Owner)
@@ -23751,9 +23751,9 @@ If FastSymbol(rest$, "!") Then par = True
 If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
         Col = CLng(p)  ' using a fill color
         If FastSymbol(rest$, ",") Then
-           If Not IsExp(bstack, rest$, X, , True) Then MissNumExpr
+           If Not IsExp(bstack, rest$, x, , True) Then MissNumExpr
            Else
-           X = vbSolid
+           x = vbSolid
            End If
         If FastSymbol(rest$, "{") Then
 
@@ -23769,9 +23769,9 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
                 oldpathcolor = players(prive).pathcolor
                 
                 players(prive).pathcolor = mycolor(Col)
-                players(prive).pathfillstyle = Int(X) Mod 8
+                players(prive).pathfillstyle = Int(x) Mod 8
                 
-                BeginPath bstack.Owner.hDC
+                BeginPath bstack.Owner.Hdc
               '  If (par Or F) And GDILines Then OldGDILines = True: players(prive).NoGDI = True
                 If (par Or Region) Then players(prive).NoGDI = True: If GDILines Then OldGDILines = True
                 Call executeblock(it, bstack, ss$, False, once, , True)
@@ -23786,20 +23786,20 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
                 End If
                         
                 ' what for 2 and 3 values
-                EndPath bstack.Owner.hDC
+                EndPath bstack.Owner.Hdc
         
-                bstack.Owner.FillStyle = Int(X) Mod 8
+                bstack.Owner.FillStyle = Int(x) Mod 8
                 bstack.Owner.FillColor = mycolor(Col)
                 Col = p ' from  6.3 change
                 If par Then bstack.Owner.DrawMode = 7
                 If f Then  ' from 8 rev 83
                       If bstack.Owner.FillStyle = 1 Then
-                           StrokeAndFillPath bstack.Owner.hDC
+                           StrokeAndFillPath bstack.Owner.Hdc
                         Else
-                            FillPath bstack.Owner.hDC
+                            FillPath bstack.Owner.Hdc
                           End If
                 Else
-                     StrokeAndFillPath bstack.Owner.hDC         ' stroke and fill path
+                     StrokeAndFillPath bstack.Owner.Hdc         ' stroke and fill path
                 End If
                 If par Then bstack.Owner.DrawMode = 13
                 bstack.Owner.FillStyle = vbFSTransparent
@@ -23838,7 +23838,7 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
 contthere:
               If FastSymbol(rest$, ";") Then
  
-                  SelectClipRgn bstack.Owner.hDC, 0&
+                  SelectClipRgn bstack.Owner.Hdc, 0&
               End If
               bstack.addlen = nd&
               Exit Function
@@ -23852,13 +23852,13 @@ contthere2:
                 oldpathcolor = players(prive).pathcolor
                 
                 players(prive).pathcolor = mycolor(Col)
-                players(prive).pathfillstyle = Int(X) Mod 8
-                BeginPath bstack.Owner.hDC
+                players(prive).pathfillstyle = Int(x) Mod 8
+                BeginPath bstack.Owner.Hdc
                 'If (par Or region) And GDILines Then OldGDILines = True: players(prive).NoGDI = True
                 If (par Or Region) Then players(prive).NoGDI = True: If GDILines Then OldGDILines = True
                 Call executeblock(it, bstack, ss$, False, once, , , True)
                 
-                EndPath bstack.Owner.hDC
+                EndPath bstack.Owner.Hdc
                 players(prive).pathgdi = players(prive).pathgdi - 1
                 If players(prive).pathgdi > 0 Then
                     players(prive).pathcolor = oldpathcolor
@@ -23870,15 +23870,15 @@ contthere2:
                 If Region Then            ' path { block of commands };
                     
                     If f Then
-                        SelectClipPath bstack.Owner.hDC, 2
+                        SelectClipPath bstack.Owner.Hdc, 2
                     Else
-                        SelectClipPath bstack.Owner.hDC, RGN_COPY  ' make a clip path
+                        SelectClipPath bstack.Owner.Hdc, RGN_COPY  ' make a clip path
                     End If
                 
                     
                 Else
                     If par Then bstack.Owner.DrawMode = 7
-                    StrokePath bstack.Owner.hDC               ' stroke path
+                    StrokePath bstack.Owner.Hdc               ' stroke path
                     If par Then bstack.Owner.DrawMode = 13
                 End If
                  bstack.Owner.FillStyle = vbFSTransparent
@@ -24748,7 +24748,7 @@ End If
 ProcSpeech = True
 End Function
 Function ProcField(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim prive As Long, pppp As mArray, s$, it As Long, X As Double, y As Double, p As Variant
+Dim prive As Long, pppp As mArray, s$, it As Long, x As Double, y As Double, p As Variant
 Dim i As Long, x1 As Long, y1 As Long, what$, par As Boolean
 prive = GetCode(bstack.Owner)
 If prive > 32 Then
@@ -24764,7 +24764,7 @@ ProcField = True
         End If
         If IsLabelSymbolNew(rest$, "”’Õ»«Ã¡", "PASSWORD", Lang) Then i = True
     
-        If Not IsExp(bstack, rest$, X) Then X = .curpos
+        If Not IsExp(bstack, rest$, x) Then x = .curpos
         If Not FastSymbol(rest$, ",") Then Exit Function
         If Not IsExp(bstack, rest$, y) Then y = .currow
         If FastSymbol(rest$, ",") Then
@@ -24790,7 +24790,7 @@ ProcField = True
         s$ = s$ + String$(p - Len(s$), " ")
         x1 = 1
         
-        s$ = gf(bstack, y, X, s$, x1, y1, CBool(i))
+        s$ = gf(bstack, y, x, s$, x1, y1, CBool(i))
         
         
         If y1 <> 99 Then
@@ -25267,7 +25267,7 @@ End Function
 
 Function ProcDesktop(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim work1 As Boolean, oldleft As Long, oldtop As Long
-Dim photo As cDIBSection, s$, p As Variant, X As Double, aPic As StdPicture
+Dim photo As cDIBSection, s$, p As Variant, x As Double, aPic As StdPicture
 olamazi
 If IsLabelSymbolNew(rest$, "≈… œÕ¡", "IMAGE", Lang) Then
 If IsStrExp(bstack, rest$, s$) Then
@@ -25355,11 +25355,11 @@ Form1.Visible = True
 End If
 If IsExp(bstack, rest$, p) Then
     If FastSymbol(rest$, ",") Then
-        If IsExp(bstack, rest$, X) Then
+        If IsExp(bstack, rest$, x) Then
         
         Form5.Visible = True
         Form5.ZOrder 1
-        SetTrans Form1, CByte(p And &HFF), mycolor(X), True
+        SetTrans Form1, CByte(p And &HFF), mycolor(x), True
         
         End If
     Else
@@ -25560,14 +25560,14 @@ End If
 ProcTone = True
 End Function
 Function ProcGradient(bstack As basetask, rest$) As Boolean
-Dim X As Long, y As Long, p As Variant, trans As Long, useold As Boolean
+Dim x As Long, y As Long, p As Variant, trans As Long, useold As Boolean
 Dim whois As Long
 whois = GetCode(bstack.Owner)
 ProcGradient = True
 With players(whois)
 trans = .mypentrans
 useold = .NoGDI
-If Not IsExp(bstack, rest$, p) Then X = rgb(255, 255, 255) Else X = mycolor(p)
+If Not IsExp(bstack, rest$, p) Then x = rgb(255, 255, 255) Else x = mycolor(p)
 If Not FastSymbol(rest$, ",") Then
 y = 0
 Else
@@ -25575,12 +25575,12 @@ If Not IsExp(bstack, rest$, p) Then y = 0 Else y = mycolor(p)
 End If
 If Not FastSymbol(rest$, ",") Then
 If useold Then
-TwoColorsGradient bstack, GRADIENT_FILL_RECT_V, GDIP_ARGB1(trans, X), GDIP_ARGB1(trans, y)
+TwoColorsGradient bstack, GRADIENT_FILL_RECT_V, GDIP_ARGB1(trans, x), GDIP_ARGB1(trans, y)
 Else
 If .hRgn Then
-GdiPlusGradientRegion whois, 0, 0, bstack.Owner.ScaleWidth / dv15 + 1, bstack.Owner.ScaleHeight / dv15 + 1, GDIP_ARGB1(trans, X), GDIP_ARGB1(trans, y), 1
+GdiPlusGradientRegion whois, 0, 0, bstack.Owner.ScaleWidth / dv15 + 1, bstack.Owner.ScaleHeight / dv15 + 1, GDIP_ARGB1(trans, x), GDIP_ARGB1(trans, y), 1
 Else
-GdiPlusGradient bstack.Owner.hDC, 0, 0, bstack.Owner.ScaleWidth / dv15 + 1, bstack.Owner.ScaleHeight / dv15 + 1, GDIP_ARGB1(trans, X), GDIP_ARGB1(trans, y), 1
+GdiPlusGradient bstack.Owner.Hdc, 0, 0, bstack.Owner.ScaleWidth / dv15 + 1, bstack.Owner.ScaleHeight / dv15 + 1, GDIP_ARGB1(trans, x), GDIP_ARGB1(trans, y), 1
 End If
 End If
 
@@ -25591,12 +25591,12 @@ If Not IsExp(bstack, rest$, p) Then
 ProcGradient = IfierVal: Exit Function
 Else
 If useold Then
-TwoColorsGradient bstack.Owner, -CLng(p <> 0), GDIP_ARGB1(trans, X), GDIP_ARGB1(trans, y)
+TwoColorsGradient bstack.Owner, -CLng(p <> 0), GDIP_ARGB1(trans, x), GDIP_ARGB1(trans, y)
 Else
 If p = 0 Then
-GdiPlusGradient bstack.Owner.hDC, 0, 0, bstack.Owner.ScaleWidth / dv15 + 1, bstack.Owner.ScaleHeight / dv15 + 1, GDIP_ARGB1(trans, y), GDIP_ARGB1(trans, X), 0&
+GdiPlusGradient bstack.Owner.Hdc, 0, 0, bstack.Owner.ScaleWidth / dv15 + 1, bstack.Owner.ScaleHeight / dv15 + 1, GDIP_ARGB1(trans, y), GDIP_ARGB1(trans, x), 0&
 Else
-GdiPlusGradient bstack.Owner.hDC, 0, 0, bstack.Owner.ScaleWidth / dv15 + 1, bstack.Owner.ScaleHeight / dv15 + 1, GDIP_ARGB1(trans, X), GDIP_ARGB1(trans, y), 1&
+GdiPlusGradient bstack.Owner.Hdc, 0, 0, bstack.Owner.ScaleWidth / dv15 + 1, bstack.Owner.ScaleHeight / dv15 + 1, GDIP_ARGB1(trans, x), GDIP_ARGB1(trans, y), 1&
 End If
 End If
 
@@ -25655,7 +25655,7 @@ End Sub
 
 Function MyFrame(bstack As basetask, rest$) As Boolean
 Dim prive As Long, x1 As Long, y1 As Long, Col As Long, p As Variant
-Dim X As Double, y As Double, ss$
+Dim x As Double, y As Double, ss$
 MyFrame = True
 prive = GetCode(bstack.Owner)
 With players(prive)
@@ -25683,15 +25683,15 @@ End If
 y = 5
 If FastSymbol(rest$, ",") Then If Not IsExp(bstack, rest$, y) Then y = 5
 If FastSymbol(rest$, ",") Then
-If IsExp(bstack, rest$, X) Then
+If IsExp(bstack, rest$, x) Then
 If FastSymbol(rest$, ",") Then
 If IsExp(bstack, rest$, p) Then
-MyRect bstack.Owner, players(prive), (x1), (y1), (y), (X), (p)
+MyRect bstack.Owner, players(prive), (x1), (y1), (y), (x), (p)
 Else
  MyFrame = False: MissNumExpr: Exit Function
 End If
 Else
-MyRect bstack.Owner, players(prive), (x1), (y1), (y), (X)
+MyRect bstack.Owner, players(prive), (x1), (y1), (y), (x)
 End If
 ElseIf IsStrExp(bstack, rest$, ss$) Then
 MyRect bstack.Owner, players(prive), (x1), (y1), (y), ss$
@@ -26283,7 +26283,7 @@ End Function
 
 Function ProcSoundRec(basestack As basetask, rest$, Lang As Long) As Boolean
 ' not tested yet...
-Dim s$, p As Variant, ss$, X As Double, y As Double
+Dim s$, p As Variant, ss$, x As Double, y As Double
 Dim LRec As RecordMci
     
     
@@ -26324,9 +26324,9 @@ Dim LRec As RecordMci
     ElseIf IsLabelSymbolNewExp(rest$, "¡ÀÀ¡√«", "OVERWRITE", Lang, ss$) Then
         LRec.ReCapture
     ElseIf IsLabelSymbolNewExp(rest$, "¡–œ œ–«", "DELETE", Lang, ss$) Then
-            If IsExp(basestack, rest$, X, , True) Then
+            If IsExp(basestack, rest$, x, , True) Then
             Else
-                X = 0
+                x = 0
             End If
             If IsLabelSymbolNew(rest$, "≈Ÿ”", "TO", Lang) Then
                 If Not IsExp(basestack, rest$, y, , True) Then
@@ -26335,12 +26335,12 @@ Dim LRec As RecordMci
             Else
                 y = LRec.getLengthInMS
             End If
-            LRec.CutRecordMs CDbl(X), CDbl(y)
+            LRec.CutRecordMs CDbl(x), CDbl(y)
     ElseIf IsLabelSymbolNewExp(rest$, "≈Õ‘¡”«", "VOLUME", Lang, ss$) Then
-                If IsExp(basestack, rest$, X, , True) Then
-                    If X < 0 Then X = 0
-                    If X > 100 Then X = 100
-                    LRec.setVolume CLng(X)
+                If IsExp(basestack, rest$, x, , True) Then
+                    If x < 0 Then x = 0
+                    If x > 100 Then x = 100
+                    LRec.setVolume CLng(x)
                 Else
                     LRec.setVolume 50&
                 End If
@@ -26350,15 +26350,15 @@ Dim LRec As RecordMci
         LRec.recPlay
     ElseIf IsLabelSymbolNewExp(rest$, "»≈”«", "POS", Lang, ss$) Then
         If LRec.isRecPlaying Then
-            If IsExp(basestack, rest$, X, , True) Then
-            LRec.recPlayFromMs X
+            If IsExp(basestack, rest$, x, , True) Then
+            LRec.recPlayFromMs x
             Else
             LRec.recPlay
             End If
         Else
         ' SEEK
-            If IsExp(basestack, rest$, X, , True) Then
-            LRec.oneMCI "seek capture to " + CStr(CLng(X))
+            If IsExp(basestack, rest$, x, , True) Then
+            LRec.oneMCI "seek capture to " + CStr(CLng(x))
             Else
             LRec.oneMCI "seek capture to 0"
             End If
@@ -26384,7 +26384,7 @@ MissMic
   
 End Function
 
-Public Function ScanTarget(j() As target, ByVal X As Long, ByVal y As Long, ByVal myl As Long) As Long
+Public Function ScanTarget(j() As target, ByVal x As Long, ByVal y As Long, ByVal myl As Long) As Long
 Dim iu&, id&, i&, XX&, YY&
 
 iu& = LBound(j())
@@ -26393,7 +26393,7 @@ ScanTarget = -1
 For i& = iu& To id&
 With j(i&)
 If .Enable And .layer = myl Then
-XX& = X \ .Xt
+XX& = x \ .Xt
 YY& = y \ .Yt
 If .lX <= XX& And .tx >= XX& And .lY <= YY& And .ty >= YY& Then
 ScanTarget = i&
@@ -26405,7 +26405,7 @@ Next i&
 End Function
 Function ProcMedia(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim Scr As Object
-Dim s$, ss$, X As Double, y As Double
+Dim s$, ss$, x As Double, y As Double
 Set Scr = basestack.Owner
 On Error Resume Next
 ProcMedia = True
@@ -26517,8 +26517,8 @@ If IsLabelSymbolNew(rest$, "÷œ—‘Ÿ”≈", "LOAD", Lang) Then
                     ProcMedia = True
                     Exit Function
         ElseIf IsLabelSymbolNewExp(rest$, "”‘œ", "TO", Lang, ss$) Then
-                    If IsExp(basestack, rest$, X) Then
-                        If MediaPlayer1.getLengthInMS > 0 Then MediaPlayer1.setPositionTo X
+                    If IsExp(basestack, rest$, x) Then
+                        If MediaPlayer1.getLengthInMS > 0 Then MediaPlayer1.setPositionTo x
                         
                     End If
                     Set Scr = Nothing
@@ -26531,7 +26531,7 @@ If IsLabelSymbolNew(rest$, "÷œ—‘Ÿ”≈", "LOAD", Lang) Then
     End If
     ss$ = vbNullString
 ' do nothing until here
-If IsExp(basestack, rest$, X) Then
+If IsExp(basestack, rest$, x) Then
    
             If FastSymbol(rest$, ",") Then
     
@@ -26541,22 +26541,22 @@ If IsExp(basestack, rest$, X) Then
     aviX = 0
     aviY = 0
     UseAviSize = False
-    UseAviXY = True: aviX = CLng(X): aviY = 0
+    UseAviXY = True: aviX = CLng(x): aviY = 0
             If IsExp(basestack, rest$, y) Then aviY = CLng(y) Else ProcMedia = False: UseAviXY = False: aviX = 0
             Else ' SPECIAL
             If MediaPlayer1.getLengthInMS > 0 Then
-                If X < 0 Then
+                If x < 0 Then
                 MediaPlayer1.pauseMovie
                 AVIRUN = MediaPlayer1.isMoviePlaying
                 If Scr.Name <> "Printer" Then
                 If Scr.Visible Then Scr.SetFocus
                 End If
-                ElseIf X = 0 Then
+                ElseIf x = 0 Then
                           
                 MediaPlayer1.playMovie
                 MyDoEvents
                 Else
-                MediaPlayer1.setPositionTo X
+                MediaPlayer1.setPositionTo x
                 End If
                 ProcMedia = True
         Else
@@ -26567,9 +26567,9 @@ If IsExp(basestack, rest$, X) Then
             End If
             If aviX = 0 Then UseAviXY = False
             If FastSymbol(rest$, ",") Then
-                    If IsExp(basestack, rest$, X) Then AviSizeX = CLng(X) Else rest$ = "," + rest$
+                    If IsExp(basestack, rest$, x) Then AviSizeX = CLng(x) Else rest$ = "," + rest$
                 If FastSymbol(rest$, ",") Then
-            If IsExp(basestack, rest$, X) Then AviSizeY = CLng(X) Else rest$ = "," + rest$
+            If IsExp(basestack, rest$, x) Then AviSizeY = CLng(x) Else rest$ = "," + rest$
                 End If
                 UseAviSize = (Abs(AviSizeY) + Abs(AviSizeX)) <> 0 Or (aviX = 0 And aviY = 0)
                 
@@ -27055,7 +27055,7 @@ End If
 End Function
  
 Function ProcPlayer(bstack As basetask, rest$, Lang As Long)
-Dim par As Boolean, sX As Double, sY As Double, X As Double, y As Double, x1 As Integer, p As Variant, it As Long
+Dim par As Boolean, sX As Double, sY As Double, x As Double, y As Double, x1 As Integer, p As Variant, it As Long
 Dim Col As Long, Scr As Object, what$, i As Long, s$, pppp As mArray, frm$, sxy As Double, orig As Long, zX As Variant, zY As Variant
 If IsExp(bstack, rest$, p) Then
     If p = 0 Then   ' ZERO CLEAR ALL HARDWARE SPRITES
@@ -27067,11 +27067,11 @@ If IsExp(bstack, rest$, p) Then
     orig = CLng(p)
     it = FindSpriteByTag(orig)
     If FastSymbol(rest$, ",") Then
-        If Not IsExp(bstack, rest$, X) Then  ' get new left or leave it empty
+        If Not IsExp(bstack, rest$, x) Then  ' get new left or leave it empty
             If it = 0 Then
-                X = 0
+                x = 0
             Else
-                X = Form1.dSprite(it).Left + players(it).X
+                x = Form1.dSprite(it).Left + players(it).x
             End If
             If FastSymbol(rest$, ",") Then
                 If Not IsExp(bstack, rest$, y) Then MissNumExpr: ProcPlayer = False: Exit Function
@@ -27168,11 +27168,11 @@ mis:
                 players(it).HotSpotX = -zX * sY
                     players(it).HotSpotY = -zY * sY
  
-            PosSprite orig, X - players(it).X + players(it).HotSpotX, y - players(it).y + players(it).HotSpotY
+            PosSprite orig, x - players(it).x + players(it).HotSpotX, y - players(it).y + players(it).HotSpotY
         Else ' without USE
       
     On Error Resume Next
-         PosSprite orig, X - players(it).X + players(it).HotSpotX, y - players(it).y + players(it).HotSpotY
+         PosSprite orig, x - players(it).x + players(it).HotSpotX, y - players(it).y + players(it).HotSpotY
         
         End If
         Else ' without x, y
@@ -27239,22 +27239,22 @@ mis:
         ElseIf IsLabelSymbolNew(rest$, " —’ÿ≈", "HIDE", Lang) Then        ' HIDE
             SrpiteHideShow orig, (False)
         ElseIf IsLabelSymbolNew(rest$, "–¡ÕŸ", "OVER", Lang) Then      ' –¡ÕŸ
-            If IsExp(bstack, rest$, X) Then
-                If orig <> X Then SpriteControlOver orig, CLng(X)
+            If IsExp(bstack, rest$, x) Then
+                If orig <> x Then SpriteControlOver orig, CLng(x)
                 
             Else
                 ProcPlayer = False
             End If
         ElseIf IsLabelSymbolNew(rest$, "’–œ", "UNDER", Lang) Then
-            If IsExp(bstack, rest$, X) Then
-                If orig <> X Then SpriteControlUnder orig, CLng(X)
+            If IsExp(bstack, rest$, x) Then
+                If orig <> x Then SpriteControlUnder orig, CLng(x)
                 
             Else
                 ProcPlayer = False
             End If
         ElseIf IsLabelSymbolNew(rest$, "¡ÀÀ¡Œ≈", "SWAP", Lang) Then       ' SWAP
-            If IsExp(bstack, rest$, X) Then
-                If orig <> X Then SpriteControl orig, CLng(X)
+            If IsExp(bstack, rest$, x) Then
+                If orig <> x Then SpriteControl orig, CLng(x)
                 
             Else
                 ProcPlayer = False
@@ -27296,7 +27296,7 @@ ArrBase = 0
 End Sub
 
 Function ProcPrinter(basestack As basetask, rest$) As Boolean
-Dim xp As Printer, i As Long, p As Variant, x1 As Long, y1 As Long, X As Double, y As Double
+Dim xp As Printer, i As Long, p As Variant, x1 As Long, y1 As Long, x As Double, y As Double
 Dim s$, ss$, f As Long, pa$, sX As Double, it As Long, ya As Long, AddTwipsTopL As Long, nd&
 Dim Scr As Object
 ProcPrinter = True
@@ -27974,11 +27974,11 @@ Locale:
 End Function
 
 Function ProcScreenRes(basestack As basetask, rest$) As Boolean
-Dim X As Double, y As Double
-If IsExp(basestack, rest$, X) Then
+Dim x As Double, y As Double
+If IsExp(basestack, rest$, x) Then
     If FastSymbol(rest$, ",") Then
         If IsExp(basestack, rest$, y) Then
-            ChangeScreenRes CLng(X), CLng(y)
+            ChangeScreenRes CLng(x), CLng(y)
         Else
             
             MissNumExpr
@@ -29074,7 +29074,7 @@ ProcKeyboard = True
 End Function
 
 Function ProcCHANGE(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim p As Variant, X As Double, W$, GuiForm As GuiM2000, GuiImg As GuiImage
+Dim p As Variant, x As Double, W$, GuiForm As GuiM2000, GuiImg As GuiImage
 Dim V1 As Long
 If IsExp(bstack, rest$, p) Then
     p = CLng(p)
@@ -29094,7 +29094,7 @@ If IsExp(bstack, rest$, p) Then
             Dim ss$
             While FastSymbol(rest$, ",")
                 ss$ = vbNullString
-                X = Empty
+                x = Empty
                 If IsLabelSymbolNewExp(rest$, "÷—¡”«", "TEXT", Lang, ss$) Then
                     If IsStrExp(bstack, rest$, W$) Then
                         q(p).Tag = W$
@@ -29102,20 +29102,20 @@ If IsExp(bstack, rest$, p) Then
                         GoTo skipcommand
                     End If
                 ElseIf IsLabelSymbolNewExp(rest$, "–≈Õ¡", "PEN", Lang, ss$) Then
-                    If IsExp(bstack, rest$, X, , True) Then
-                        q(p).pen = X
+                    If IsExp(bstack, rest$, x, , True) Then
+                        q(p).pen = x
                     Else
                         GoTo skipcommand
                     End If
                 ElseIf IsLabelSymbolNewExp(rest$, "÷œÕ‘œ", "BACK", Lang, ss$) Then
-                    If IsExp(bstack, rest$, X, , True) Then
-                        q(p).back = X
+                    If IsExp(bstack, rest$, x, , True) Then
+                        q(p).back = x
                     Else
                         GoTo skipcommand
                     End If
                 ElseIf IsLabelSymbolNewExp(rest$, "–À¡…”…œ", "BORDER", Lang, ss$) Then
-                    If IsExp(bstack, rest$, X, , True) Then
-                        q(p).fore = X
+                    If IsExp(bstack, rest$, x, , True) Then
+                        q(p).fore = x
                     Else
                         GoTo skipcommand
                     End If
@@ -29126,39 +29126,39 @@ If IsExp(bstack, rest$, p) Then
                         GoTo skipcommand
                     End If
                 ElseIf IsLabelSymbolNewExp(rest$, "‘…Ã«", "VALUE", Lang, ss$) Then
-                    If IsExp(bstack, rest$, X, , True) Then
-                        q(p).topval = Int(X * 100)
+                    If IsExp(bstack, rest$, x, , True) Then
+                        q(p).topval = Int(x * 100)
                     Else
                         GoTo skipcommand
                     End If
                 ElseIf IsLabelSymbolNewExp(rest$, "¬¡”«", "BASE", Lang, ss$) Then
-                    If IsExp(bstack, rest$, X, , True) Then
-                        q(p).botval = Int(X * 100)
+                    If IsExp(bstack, rest$, x, , True) Then
+                        q(p).botval = Int(x * 100)
                     Else
                         GoTo skipcommand
                     End If
                 ElseIf IsLabelSymbolNewExp(rest$, "◊—ŸÃ¡", "COLOR", Lang, ss$) Then
-                    If IsExp(bstack, rest$, X, , True) Then
-                        q(p).barC = X
+                    If IsExp(bstack, rest$, x, , True) Then
+                        q(p).barC = x
                     Else
                         GoTo skipcommand
                     End If
                 ElseIf IsLabelSymbolNewExp(rest$, "Ã≈√≈»œ”", "SIZE", Lang, ss$) Then
-                    If IsExp(bstack, rest$, X, , True) Then
-                        If X > 100 Then X = 100
-                        If X < -100 Then X = -100
-                        q(p).imagesize = Int(X)
+                    If IsExp(bstack, rest$, x, , True) Then
+                        If x > 100 Then x = 100
+                        If x < -100 Then x = -100
+                        q(p).imagesize = Int(x)
                     Else
                         GoTo skipcommand
                     End If
                 ElseIf IsLabelSymbolNewExp(rest$, " ¡»≈‘«", "PORTRAIT", Lang, ss$) Then
-                    If IsExp(bstack, rest$, X, , True) Then
-                        q(p).Vertical = Int(X) <> 0
+                    If IsExp(bstack, rest$, x, , True) Then
+                        q(p).Vertical = Int(x) <> 0
                     Else
                         GoTo skipcommand
                     End If
                 ElseIf IsLabelSymbolNewExp(rest$, "≈… œÕ¡", "IMAGE", Lang, ss$) Then
-                    If IsExp(bstack, rest$, X) Then
+                    If IsExp(bstack, rest$, x) Then
                         If bstack.lastobj Is Nothing Then
                             Set q(p).drawimage = Nothing
                         ElseIf TypeOf bstack.lastobj Is mHandler Then
@@ -29591,15 +29591,15 @@ End Function
 
 Function ProcPage(basestack As basetask, rest$, Lang As Long) As Boolean
 ProcPage = True
-Dim Scr As Object, X As Double, skip As Boolean
+Dim Scr As Object, x As Double, skip As Boolean
 Set Scr = basestack.Owner
 If basestack.toprinter Then getnextpage: skip = True
 If IsLabelSymbolNew(rest$, " ¡»≈‘«", "PORTRAIT", Lang) Then
     Portrait basestack
 ElseIf IsLabelSymbolNew(rest$, "œ—…∆œÕ‘…¡", "LANDSCAPE", Lang) Then
     Landscape basestack
-ElseIf IsNumber(basestack, rest$, X) Then
-    If X = 1 Then Portrait basestack Else Landscape basestack
+ElseIf IsNumber(basestack, rest$, x) Then
+    If x = 1 Then Portrait basestack Else Landscape basestack
 ElseIf Not skip Then
     ClearScr Scr, mycolor(PaperOne)
 End If
@@ -29808,7 +29808,7 @@ End Function
 
 Sub i3MouseIcon(basestack As basetask, rest$, Lang As Long)
 On Error Resume Next
-Dim Scr As Object, s$, X As Double, aPic As StdPicture, i As Long
+Dim Scr As Object, s$, x As Double, aPic As StdPicture, i As Long
 Set Scr = basestack.Owner
 
 If basestack.toprinter Then
@@ -29914,10 +29914,10 @@ Else
                 End If
                 
                 
-    ElseIf IsExp(basestack, rest$, X) Then
+    ElseIf IsExp(basestack, rest$, x) Then
                 basestack.LastState = False
                 On Error Resume Next
-                If CLng(X) = 99 Then
+                If CLng(x) = 99 Then
                 With players(GetCode(Scr))
                 If .LastIconPic Is Nothing Then
                 Set Scr.MouseIcon = Form1.PrinterDocument1.MouseIcon
@@ -29927,13 +29927,13 @@ Else
                 End If
                 Scr.MousePointer = 99
                 
-                    .LastIcon = CLng(X)
+                    .LastIcon = CLng(x)
                 End With
                 Else
-                Scr.MousePointer = CLng(X)
+                Scr.MousePointer = CLng(x)
                 If Err Then MyEr "Bad icon bumber", "–Ò¸‚ÎÁÏ· ÏÂ ÙÔÌ ·ÒÈËÏ¸": Err.Clear: Exit Sub
                 With players(GetCode(Scr))
-                    .LastIcon = CLng(X)
+                    .LastIcon = CLng(x)
                 End With
                 End If
     Else
@@ -30057,7 +30057,7 @@ Sub MakeMyTitle(s$, Lang As Long)
     End If
 End Sub
 Sub ProcBackGround(bstack As basetask, rest$, Lang As Long, afier As Boolean)
-Dim s$, nd&, p As Variant, i As Long, x1 As Long, X As Double, y As Double, f As Long, y1 As Long, sX As Double, ss$, pa$, it As Long
+Dim s$, nd&, p As Variant, i As Long, x1 As Long, x As Double, y As Double, f As Long, y1 As Long, sX As Double, ss$, pa$, it As Long
 Dim Scr As Object, frm$, w3 As Long, ya As Long, AddTwipsTopL As Long, once As Boolean, oldprintFlag As Boolean
 Set Scr = bstack.Owner
 afier = True
@@ -30160,12 +30160,12 @@ Function pipename(bstackstr As basetask, A$, R$) As Boolean
 End Function
 
 Function ProcCircle(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim par As Boolean, sX As Double, sY As Double, X As Double, y As Double, x1 As Long, p As Variant
+Dim par As Boolean, sX As Double, sY As Double, x As Double, y As Double, x1 As Long, p As Variant
 Dim Col As Long, Col2 As Long, Scr As Object, isarc As Boolean, trans As Long
 ProcCircle = True
 par = False
 If IsLabelSymbolNew(rest$, "√≈Ã…”Ã¡", "FILL", Lang) Then
-If IsExp(bstack, rest$, p) Then X = p
+If IsExp(bstack, rest$, p) Then x = p
 If Not FastSymbol(rest$, ",") Then MissNumExpr: ProcCircle = False: Exit Function
 par = True
 End If
@@ -30209,7 +30209,7 @@ End If
 
 If par Then
     Scr.FillStyle = vbSolid
-    Scr.FillColor = mycolor(X)
+    Scr.FillColor = mycolor(x)
     If sX = sY Then sY = PI2
     If sX = sY Or Abs(sX - sY) + 0.0001 > PI2 Then
         If mGDILines Then
@@ -30218,11 +30218,11 @@ If par Then
             M2000Pen trans, Col2
             If y > 1 Then
                 If .pathgdi > 0 Then
-                    DrawEllipseGdi Scr.hDC, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
+                    DrawEllipseGdi Scr.Hdc, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
                 Else
-                     Col2 = mycolor(X)
+                     Col2 = mycolor(x)
                      M2000Pen trans, Col2
-                    DrawEllipseGdi Scr.hDC, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
+                    DrawEllipseGdi Scr.Hdc, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
                 End If
             Else
                 If .pathgdi > 0 Then
@@ -30233,14 +30233,14 @@ If par Then
                        ' Scr.DrawStyle = 5
                        ' DrawCircleApi Scr, Scr.ScaleX(.XGRAPH, 1, 3), Scr.ScaleY(.YGRAPH, 1, 3), Scr.ScaleX(x1, 1, 3), Col, (Y)
                        ' Scr.DrawStyle = St
-                        DrawEllipseGdi Scr.hDC, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
+                        DrawEllipseGdi Scr.Hdc, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
                     'Else
-                        DrawEllipseGdi Scr.hDC, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
+                        DrawEllipseGdi Scr.Hdc, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
                     'End If
                 Else
-                    Col2 = mycolor(X)
+                    Col2 = mycolor(x)
                     M2000Pen trans, Col2
-                    DrawEllipseGdi Scr.hDC, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3)
+                    DrawEllipseGdi Scr.Hdc, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3)
                 End If
             End If
         Else
@@ -30262,20 +30262,20 @@ If par Then
             M2000Pen trans, Col2
             If y > 1 Then
             If .pathgdi > 0 Then
-                    DrawArcPieGdi Scr.hDC, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
+                    DrawArcPieGdi Scr.Hdc, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
                 Else
-                Col2 = mycolor(X)
+                Col2 = mycolor(x)
                     M2000Pen trans, Col2
                 
-                    DrawArcPieGdi Scr.hDC, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
+                    DrawArcPieGdi Scr.Hdc, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
                 End If
             Else
                 If .pathgdi > 0 Then
-                    DrawArcPieGdi Scr.hDC, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
+                    DrawArcPieGdi Scr.Hdc, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
                 Else
-                    Col2 = mycolor(X)
+                    Col2 = mycolor(x)
                     M2000Pen trans, Col2
-                    DrawArcPieGdi Scr.hDC, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
+                    DrawArcPieGdi Scr.Hdc, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
                 End If
             End If
         Else
@@ -30303,29 +30303,29 @@ If par Then
             If sX = sY Or Abs(sX - sY) + 0.0001 > PI2 Then
             If y > 1 Then
             If .pathgdi > 0 Then
-                    DrawEllipseGdi Scr.hDC, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
+                    DrawEllipseGdi Scr.Hdc, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
                 Else
-                    DrawEllipseGdi Scr.hDC, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
+                    DrawEllipseGdi Scr.Hdc, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
                 End If
             Else
                 If .pathgdi > 0 Then
-                    DrawEllipseGdi Scr.hDC, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
+                    DrawEllipseGdi Scr.Hdc, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
                 Else
-                    DrawEllipseGdi Scr.hDC, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3)
+                    DrawEllipseGdi Scr.Hdc, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3)
                 End If
             End If
         Else
             If y > 1 Then
                 If .pathgdi > 0 Then
-                    DrawArcPieGdi Scr.hDC, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
+                    DrawArcPieGdi Scr.Hdc, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
                 Else
-                    DrawArcPieGdi Scr.hDC, Col, Col2, 1, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
+                    DrawArcPieGdi Scr.Hdc, Col, Col2, 1, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
                 End If
             Else
                 If .pathgdi > 0 Then
-                    DrawArcPieGdi Scr.hDC, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
+                    DrawArcPieGdi Scr.Hdc, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
                 Else
-                    DrawArcPieGdi Scr.hDC, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
+                    DrawArcPieGdi Scr.Hdc, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
                 End If
             End If
         End If
@@ -30363,7 +30363,7 @@ MyDoEvents1 bstack.Owner
 ProcFLOODFILL = True
 End Function
 Function ProcFill(bstack As basetask, rest$) As Boolean
-Dim prive As Long, X As Double, p As Variant, y As Double, x1 As Long, y1 As Long, par As Boolean, Col As Long
+Dim prive As Long, x As Double, p As Variant, y As Double, x1 As Long, y1 As Long, par As Boolean, Col As Long
 Dim Scr As Object, ss$
 Dim mm As MetaDc
 Set Scr = bstack.Owner
@@ -30384,16 +30384,16 @@ If par Then
 y = 5
 If FastSymbol(rest$, ",") Then If Not IsExp(bstack, rest$, y) Then y = 5
 If FastSymbol(rest$, ",") Then
-If IsExp(bstack, rest$, X) Then
+If IsExp(bstack, rest$, x) Then
 If FastSymbol(rest$, ",") Then
 If IsExp(bstack, rest$, p) Then
-MyFill Scr, (x1), (y1), (y), (X), (p)
+MyFill Scr, (x1), (y1), (y), (x), (p)
 Else
     MissNumExpr
     Exit Function
 End If
 Else
-MyFill Scr, (x1), (y1), (y), (X)
+MyFill Scr, (x1), (y1), (y), (x)
 End If
 ElseIf IsStrExp(bstack, rest$, ss$) Then
 MyFill Scr, (x1), (y1), (y), ss$
@@ -30409,8 +30409,8 @@ Else
 If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then Col = p Else MissNumExpr: Exit Function
 If FastSymbol(rest$, ",") Then 'ok
 par = False
-    If Not IsExp(bstack, rest$, X) Then
-        If Col = 0 Then X = rgb(255, 255, 255) Else X = 0
+    If Not IsExp(bstack, rest$, x) Then
+        If Col = 0 Then x = rgb(255, 255, 255) Else x = 0
         Else
         par = True
     End If
@@ -30431,9 +30431,9 @@ par = False
     If par Then
     If CBool(p) And Not .NoGDI Then
     If y Then
-    GdiPlusGradient bstack.Owner.hDC, .XGRAPH / dv15, .YGRAPH / dv15, (x1 + .XGRAPH) / dv15, (y1 + .YGRAPH) / dv15, GDIP_ARGB1(.mypentrans, CLng(mycolor(Col))), GDIP_ARGB1(.mypentrans, CLng(mycolor(X))), -CLng(y <> 0)
+    GdiPlusGradient bstack.Owner.Hdc, .XGRAPH / dv15, .YGRAPH / dv15, (x1 + .XGRAPH) / dv15, (y1 + .YGRAPH) / dv15, GDIP_ARGB1(.mypentrans, CLng(mycolor(Col))), GDIP_ARGB1(.mypentrans, CLng(mycolor(x))), -CLng(y <> 0)
     Else
-    GdiPlusGradient bstack.Owner.hDC, .XGRAPH / dv15, .YGRAPH / dv15, (x1 + .XGRAPH) / dv15, (y1 + .YGRAPH) / dv15, GDIP_ARGB1(.mypentrans, CLng(mycolor(X))), GDIP_ARGB1(.mypentrans, CLng(mycolor(Col))), -CLng(y <> 0)
+    GdiPlusGradient bstack.Owner.Hdc, .XGRAPH / dv15, .YGRAPH / dv15, (x1 + .XGRAPH) / dv15, (y1 + .YGRAPH) / dv15, GDIP_ARGB1(.mypentrans, CLng(mycolor(x))), GDIP_ARGB1(.mypentrans, CLng(mycolor(Col))), -CLng(y <> 0)
     End If
     Else
 If .NoGDI And .IamEmf Then
@@ -30446,7 +30446,7 @@ If .NoGDI And .IamEmf Then
     mm.ForeColor = p
 Else
 
-   TwoColorsGradientPart Scr, CBool(p), -CLng(y <> 0), .XGRAPH, .YGRAPH, x1 + .XGRAPH, y1 + .YGRAPH, mycolor(Col), mycolor(X)
+   TwoColorsGradientPart Scr, CBool(p), -CLng(y <> 0), .XGRAPH, .YGRAPH, x1 + .XGRAPH, y1 + .YGRAPH, mycolor(Col), mycolor(x)
 End If
    End If
     .XGRAPH = .XGRAPH + x1
@@ -30971,7 +30971,7 @@ bstack.Owner.Font.bold = Abs(p <> 0)
 
 End Sub
 Function ProcPoly(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim par As Boolean, sX As Double, sY As Double, X As Double, y As Double, x1 As Integer, p As Variant, f As Long
+Dim par As Boolean, sX As Double, sY As Double, x As Double, y As Double, x1 As Integer, p As Variant, f As Long
 Dim Col As Long, Scr As Object, trans As Long
 ProcPoly = True
 trans = 255
@@ -30989,26 +30989,26 @@ ReDim PLG(f)
 x1 = 1
 With players(GetCode(Scr))
 trans = .mypentrans
-PLG(0).X = Scr.ScaleX(.XGRAPH, 1, 3)
+PLG(0).x = Scr.ScaleX(.XGRAPH, 1, 3)
 PLG(0).y = Scr.ScaleY(.YGRAPH, 1, 3)
 Do
 If x1 >= f Then f = f * 2: ReDim Preserve PLG(f)
 If IsExp(bstack, rest$, p) Then
-X = p
+x = p
 
 If Not FastSymbol(rest$, ",") Then SyntaxError: ProcPoly = False: Set Scr = Nothing: Exit Function
     If IsExp(bstack, rest$, p) Then
         If par Then
       
-            sX = X / PI2
+            sX = x / PI2
             sX = (sX - Fix(sX)) * PI2
             .XGRAPH = .XGRAPH + Cos(sX) * p
             .YGRAPH = .YGRAPH - Sin(sX) * p
         Else
-            .XGRAPH = .XGRAPH + CLng(X)
+            .XGRAPH = .XGRAPH + CLng(x)
             .YGRAPH = .YGRAPH + CLng(p)
         End If
-        PLG(x1).X = Scr.ScaleX(.XGRAPH, 1, 3)
+        PLG(x1).x = Scr.ScaleX(.XGRAPH, 1, 3)
         PLG(x1).y = Scr.ScaleY(.YGRAPH, 1, 3)
     
     Else
@@ -31059,11 +31059,11 @@ pencol = .mypen
     If .pathgdi > 0 Then Col = .pathcolor: bstyle = .pathfillstyle Else bstyle = Scr.FillStyle
     M2000Pen trans, Col
  If trans < 255 And bstyle = 5 Then M2000Pen trans, pencol Else M2000Pen 255, pencol
-    DrawPolygonGdi Scr.hDC, pencol, Col, bstyle, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 1)
+    DrawPolygonGdi Scr.Hdc, pencol, Col, bstyle, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 1)
     
 
 Else
-If Polygon(Scr.hDC, PLG(0), x1) = 0 Then
+If Polygon(Scr.Hdc, PLG(0), x1) = 0 Then
     ProcPoly = True: BadGraphic: Set Scr = Nothing: Exit Function
 End If
 End If
@@ -31075,23 +31075,23 @@ Set Scr = Nothing
 End Function
 
 
-Sub DrawFrameForEmf(Scr As Object, ByVal X As Long, ByVal y As Long, ByVal x1 As Long, ByVal y1 As Long)
+Sub DrawFrameForEmf(Scr As Object, ByVal x As Long, ByVal y As Long, ByVal x1 As Long, ByVal y1 As Long)
 Dim PLG(4) As POINTAPI
-X = X / dv15
+x = x / dv15
 y = y / dv15
 x1 = x1 / dv15
 y1 = y1 / dv15
-PLG(0).X = X
+PLG(0).x = x
 PLG(0).y = y
-PLG(1).X = x1
+PLG(1).x = x1
 PLG(1).y = y
-PLG(2).X = x1
+PLG(2).x = x1
 PLG(2).y = y1
-PLG(3).X = X
+PLG(3).x = x
 PLG(3).y = y1
 'Scr.FillStyle = vbSolid
 'Scr.FillColor = 0
-Polygon Scr.hDC, PLG(0), 4
+Polygon Scr.Hdc, PLG(0), 4
 End Sub
 
 Function ProcDraw(bstack As basetask, rest$, Lang As Long) As Boolean
@@ -31134,7 +31134,7 @@ Scr.currentY = .YGRAPH
 
 If GDILines And Not (Scr.DrawWidth < 2 And TypeOf Scr Is MetaDc) Then
 M2000Pen trans, Col
-DrawLineGdi Scr.hDC, Col, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH, 1, 3), Scr.ScaleX(.YGRAPH, 1, 3), Scr.ScaleX(x1, 1, 3), Scr.ScaleX(y1, 1, 3)
+DrawLineGdi Scr.Hdc, Col, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH, 1, 3), Scr.ScaleX(.YGRAPH, 1, 3), Scr.ScaleX(x1, 1, 3), Scr.ScaleX(y1, 1, 3)
 .XGRAPH = x1
 .YGRAPH = y1
 Else
@@ -31190,7 +31190,7 @@ Scr.currentY = .YGRAPH
 
 If GDILines Or TypeOf Scr Is MetaDc And Not (Scr.DrawWidth = 1 And Scr.DrawStyle > 1 And trans = 255) Then
 M2000Pen trans, Col
-DrawLineGdi Scr.hDC, Col, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH, 1, 3), Scr.ScaleX(.YGRAPH, 1, 3), Scr.ScaleX(.XGRAPH + x1, 1, 3), Scr.ScaleX(.YGRAPH + y1, 1, 3)
+DrawLineGdi Scr.Hdc, Col, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH, 1, 3), Scr.ScaleX(.YGRAPH, 1, 3), Scr.ScaleX(.XGRAPH + x1, 1, 3), Scr.ScaleX(.YGRAPH + y1, 1, 3)
 .XGRAPH = .XGRAPH + x1
 .YGRAPH = .YGRAPH + y1
 ElseIf TypeOf Scr Is MetaDc Then
@@ -31869,24 +31869,40 @@ there12345:
                     rest$ = f$ + vbCrLf + "}" + vbCrLf + rest$
                 End If
             Else
-                If Right$(hlp, 1) <> "$" Then hlp = "variant " + hlp
+               ' If Right$(hlp, 1) <> "$" Then hlp = "variant " + hlp
                 If FastSymbol(rest$, "=") Then
                     x1 = 1
                     aheadstatus rest$, , x1
                     frm$ = Mid$(rest$, 1, x1 - 1)
                     rest$ = Mid$(rest$, x1)
                     If frm$ = vbNullString Then MyEr "Nothing to assign", "‘ﬂÔÙ· „È· Ì· »›Û˘": Exit Function
+                    If Right$(hlp, 1) <> "$" Then
+                    If prv Then
+                        f$ = vbCrLf + "variant " + hlp + "=" + frm$ + vbCrLf + "public:" + vbCrLf + "group " + W$ + "{" + vbCrLf + f$
+                    Else
+                        f$ = vbCrLf + "private:" + vbCrLf + "variant " + hlp + "=" + frm$ + vbCrLf + "public:" + vbCrLf + "group " + W$ + "{" + vbCrLf + f$
+                    End If
+                    Else
                     If prv Then
                         f$ = vbCrLf + hlp + "=" + frm$ + vbCrLf + "public:" + vbCrLf + "group " + W$ + "{" + vbCrLf + f$
                     Else
                         f$ = vbCrLf + "private:" + vbCrLf + hlp + "=" + frm$ + vbCrLf + "public:" + vbCrLf + "group " + W$ + "{" + vbCrLf + f$
                     End If
+                    End If
                 Else
+                If Right$(hlp, 1) <> "$" Then
                     If prv Then
+                        f$ = vbCrLf + "variant " + hlp + vbCrLf + "public:" + vbCrLf + "group " + W$ + "{" + vbCrLf + f$
+                    Else
+                        f$ = vbCrLf + "private:" + vbCrLf + "variant " + hlp + vbCrLf + "public:" + vbCrLf + "group " + W$ + "{" + vbCrLf + f$
+                    End If
+                Else
+                      If prv Then
                         f$ = vbCrLf + hlp + vbCrLf + "public:" + vbCrLf + "group " + W$ + "{" + vbCrLf + f$
                     Else
                         f$ = vbCrLf + "private:" + vbCrLf + hlp + vbCrLf + "public:" + vbCrLf + "group " + W$ + "{" + vbCrLf + f$
                     End If
+                End If
                 End If
                 f$ = f$ + "value {link parent " + hlp + " to " + W$ + ":=" + W$ + "}" + vbCrLf
                 f$ = f$ + "set {link parent " + hlp + " to " + W$ + ": read " + W$ + "}" + vbCrLf

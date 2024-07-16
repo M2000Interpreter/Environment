@@ -1,8 +1,16 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 34 active-X
-1. Remove a bug from rev 33, so now eertree module run as expected.
-2. Now print to One Note for Windows 10 works. I found the need for placing a document name to printer, which some other printers not needed - like "Microsoft Print to PDF" which works with empty document name. So now M2000 insert a dummy documen name "M2000 printing" and we get the printout.
+Version 12 Revision 35 active-X
+
+fix this example. Beta is a variant type. Using property beta {value, set} = 1000 was already ok. Now work without the vakue or and set part.
+
+group alfa {
+	property beta = 1000
+}
+print alfa.beta
+alfa.beta="ok"
+print alfa.beta
+
 
 
 George Karras, Kallithea Attikis, Greece.
