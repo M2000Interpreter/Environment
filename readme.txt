@@ -1,15 +1,19 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 35 active-X
+Version 12 Revision 36 active-X
+This code can't print 4 because the c event are in hold state (previous revisions not copy the enamble state of a to c) 
 
-fix this example. Beta is a variant type. Using property beta {value, set} = 1000 was already ok. Now work without the vakue or and set part.
-
-group alfa {
-	property beta = 1000
+event a {
+	read a
+	function {
+		print a
+	}
 }
-print alfa.beta
-alfa.beta="ok"
-print alfa.beta
+
+event a hold
+c=a
+call event c, 4
+
 
 
 
@@ -39,7 +43,7 @@ only source, with old revisions and a wiki, for executables see releases
 https://github.com/M2000Interpreter/Environment
 
 M2000language.exe (Chrome can't scan, say it is a virus - heuristic choise)
-All exe files are signed
+All exe/dll files are signed
 https://github.com/M2000Interpreter/Environment/releases
 
 M2000 paper (305 pages). Included in M2000language.exe

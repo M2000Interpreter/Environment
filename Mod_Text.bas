@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 35
+Global Const Revision = 36
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -32583,6 +32583,7 @@ End Function
 Sub CopyEvent(A As Variant, bstack As basetask)
 Dim alfa As New mEvent, i As Long
 Dim aa As mEvent
+
 Set aa = A
 '' now put code to copy a to alfa
 alfa.BypassInit CLng(A.CurMaxSpace)
@@ -32591,6 +32592,7 @@ aa.CopySpaceUp aaa(), bbb(), mytop
 alfa.CopySpaceDown aaa(), bbb(), mytop
 alfa.ParamBlock aa.ParamsRead, aa.params
 alfa.NoHere = aa.NoHere
+alfa.enabled = aa.enabled
 Set bstack.lastobj = alfa
 Set aa = Nothing
 End Sub
