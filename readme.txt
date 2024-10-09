@@ -1,20 +1,48 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 36 active-X
-This code can't print 4 because the c event are in hold state (previous revisions not copy the enamble state of a to c) 
+Version 12 Revision 37 active-X
 
-event a {
-	read a
-	function {
-		print a
-	}
-}
+Now reading values from file using Input #FileHandler when we use no character 34 for strings, handle null string.
+So we have this ANSI csv file as test.csv:
+header1;Header2;header3
+label1;;
+label2 bla bla;3;
+label3 bla;0;
+label4;8;
 
-event a hold
-c=a
-call event c, 4
+And we can read it using this (see after label1 we have null value, and for header3 we have for each row a null value:
 
+Input With ";",,,true
+string A, B, C
+open "test.csv" for input as #F
+while not eof(#F) 
+	input #F, A, B, C		
+	Print A, B, C
+	print 
+end while
+close #F
 
+// we can save the test.csv as UTF16LE without BOM, as "testUTF16LE.csv" and we change the code like this (we place Wide on OPEN statement):
+open "test.csv" for wide input as #F
+
+//Also you can check with Unix line separator:
+// This Encode ANSI (based on Locale - change using Locale 1033 or other number)
+// new line lf and no BOM
+
+document a$
+load.doc a$, "test.csv"
+a=-13
+save.doc a$, "testUnix.csv", a
+
+Print " Encode "+if$(abs(a mod 10) mod 4+1->"UTF-16LE", "UTF-16BE", "UTF-8", "ANSI");
+Print " | newline:"+if$(abs(a div 10) +1->"crlf", "lf", "cr");
+Print " | BOM: "+if$(a<0->"No ", "Yes")
+
+// using a=10 we have Encode UTF16LE, lf, BOM
+// For Reading, we have to skip BOM using:
+Seek #F, 2   
+
+// For M2000 we can use Seek statement and Seek() function, to read/set the file cursor for specific file handler (we may have more than one file handler for any file). Also files may have more than 2Gbytes (value type for Seek is Currency).
 
 
 George Karras, Kallithea Attikis, Greece.

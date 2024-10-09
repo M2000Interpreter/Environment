@@ -6811,14 +6811,34 @@ s = vbNullString
 On Error GoTo a1115
 Do While Not FileEOFFH(FH) '(LOF(F) < Seek(F))
     Module10.FileReadString FH, s1, 2
-    If s1 <> " " Then
     If nochar34 Then s = s1: Exit Do
+    If s1 <> " " Then
+    
     If s1 = """" Then inside = True: Exit Do
     End If
 Loop
 
-If Not nochar34 Then If s1 <> """" Then Exit Sub
-
+If Not nochar34 Then
+    If s1 <> """" Then Exit Sub
+Else
+    If s1 = inpcsvsep$ Then
+        s = vbNullString
+        Exit Sub
+    ElseIf s1 = vbCr Then
+        s = vbNullString
+        If Not FileEOFFH(FH) Then
+            ss = Module10.FileSeekFH(FH)
+            Module10.FileReadString FH, s1, 2
+            If s1 <> vbLf Then
+                Module10.FileSeekFH(FH) = ss
+            End If
+        End If
+        Exit Sub
+    ElseIf s1 = vbLf Then
+        s = vbNullString
+        Exit Sub
+    End If
+End If
 Do While Not FileEOFFH(FH)
     Module10.FileReadString FH, s1, 2
     If s1 <> vbCr And s1 <> vbLf And nochar34 And Not s1 = inpcsvsep$ Then
@@ -6878,14 +6898,34 @@ On Error GoTo a1111
 Do While Not FileEOFFH(FH)  'LOF(f) < Seek(f)
     Module10.FileReadBytes FH, A(), 1
     s1 = ChrW(AscW(StrConv(ChrW(A(0)), vbUnicode, Clid)))
+    If nochar34 Then s = s1: Exit Do
     If s1 <> " " Then
-        If nochar34 Then s = s1: Exit Do
         If s1 = """" Then inside = True: Exit Do
     End If
 Loop
 ' we throw the first
-If Not nochar34 Then If s1 <> """" Then Exit Sub
-
+If Not nochar34 Then
+    If s1 <> """" Then Exit Sub
+Else
+    If s1 = inpcsvsep$ Then
+        s = vbNullString
+        Exit Sub
+    ElseIf s1 = vbCr Then
+        s = vbNullString
+        If Not FileEOFFH(FH) Then
+            ss = Module10.FileSeekFH(FH)
+            Module10.FileReadBytes FH, A(), 1
+            s1 = ChrW(AscW(StrConv(ChrW(A(0)), vbUnicode, Clid)))
+            If s1 <> vbLf Then
+                Module10.FileSeekFH(FH) = ss
+            End If
+        End If
+        Exit Sub
+    ElseIf s1 = vbLf Then
+        s = vbNullString
+        Exit Sub
+    End If
+End If
 Do While Not FileEOFFH(FH)  'LOF(f) < Seek(f)
     Module10.FileReadBytes FH, A(), 1
     s1 = ChrW(AscW(StrConv(ChrW(A(0)), vbUnicode, Clid)))

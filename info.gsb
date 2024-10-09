@@ -5672,11 +5672,11 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 58 for M2000 Interpreter version 12, revision 19 and above"
+	Report " A collection of modules for tests version 58 for M2000 Interpreter version 12, revision 37 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
-		Report 1, "George Karras 2022-2023"
+		Report 1, "George Karras 2023-2024"
 	}
 }
 cls backcolor, row
@@ -11980,93 +11980,92 @@ Module OOP {
 OOP
 Pen 15 {Print "OOP - Event object as visitor"}
 Module OOP {
-      \\ Class is a global function (until this module end)
-      Class Null {
-      }
-      \\ Null is a pointer to an object returned from class Null()
-      Global Null->Null()
-      Class Node {
-      Public:
-            x, Group LeftNode, Group RightNode
-            Module preorder (visitor){
-                  T->This
-                  printtree(T)
-                  sub printtree(T as pointer)
-                        If T is Null then Exit sub
-                        call event visitor, T=>x
-                        printtree(T=>LeftNode)
-                        printtree(T=>RightNode)
-                  end sub
+    Class Node {
+    Public:
+        x, LeftNode=pointer(), RightNode=pointer()
+        Module preorder (visitor){
+            T->This
+            printtree(T)
+            sub printtree(T as pointer)
+                If T is type Null then Exit sub
+                call event visitor, T=>x
+                printtree(T=>LeftNode)
+                printtree(T=>RightNode)
+            end sub
+        }
+        Module inorder (visitor){
+            T->This
+            printtree(T)
+            sub printtree(T as pointer)
+                If T is type Null then Exit sub
+                printtree(T=>LeftNode)
+                call event visitor, T=>x
+                printtree(T=>RightNode)
+            end sub
+        }
+        Module postorder (visitor) {
+            T->This
+            printtree(T)
+            sub printtree(T as pointer)
+                If T is type Null then Exit sub
+                printtree(T=>LeftNode)
+                printtree(T=>RightNode)        
+                call event visitor, T=>x
+            end sub
+        }
+        Module level_order (visitor){
+            T->This
+            Stack New {
+                printtree(T)
+                if empty then exit
+                Read T
+                Loop
             }
-            Module inorder (visitor){
-                  T->This
-                  printtree(T)
-                  sub printtree(T as pointer)
-                        If T is Null then Exit sub
-                        printtree(T=>LeftNode)
-                        call event visitor, T=>x
-                        printtree(T=>RightNode)
-                  end sub
-            }
-            Module postorder (visitor) {
-                  T->This
-                  printtree(T)
-                  sub printtree(T as pointer)
-                        If T is Null then Exit sub
-                        printtree(T=>LeftNode)
-                        printtree(T=>RightNode)            
-                        call event visitor, T=>x
-                  end sub
-            }
-            Module level_order (visitor){
-                  T->This
-                  Stack New {
-                        printtree(T)
-                        if empty then exit
-                        Read T
-                        Loop
-                  }
-                  sub printtree(T as pointer)
-                        If T is Null else
-                              call event visitor, T=>x
-                              Data T=>LeftNode, T=>RightNode
-                        end if
-                  end sub
-            }
-      Class:
-            \\ after class:  anything exist one time,
-            \\ not included in final object
-            Module Node {
-                  .LeftNode<=Null
-                  .RightNode<=Null
-                  Read .x
-                  \\ read ? for optional values
-                  Read ? .LeftNode, .RightNode
-            }
-      }
-      \\ NodeTree return a pointer to a new Node
-      Function NodeTree {
-            \\ ![] pass currrent stack to Node()
-            ->Node(![])
-      }
+            sub printtree(T as pointer)
+                If T is type Null else
+                  call event visitor, T=>x
+                  Data T=>LeftNode, T=>RightNode
+                end if
+            end sub
+        }
+        remove {
+          Print "Node removed ";.x
+        }
+    Class:
+        \\ after class:  anything exist one time,
+        \\ not included in final object
+        Module Node {
+            Read .x
+            \\ read ? for optional values
+            Read ? .LeftNode, .RightNode
+        }
+    }
+    \\ NodeTree return a pointer to a new Node
+    Function NodeTree {
+        \\ ![] pass currrent stack to Node()
+        ->Node(![])
+    }
  
-      Tree=NodeTree(1, NodeTree(2,NodeTree(4, NodeTree(7)), NodeTree(5)), NodeTree(3, NodeTree(6, NodeTree(8), NodeTree(9))))
-      Event PrintAnum {
-            read x
-      }
-      Function PrintThis(x) {
-                Print x;" ";      
-      }
-      Event PrintAnum New PrintThis()
-      printnum=lambda PrintAnum (title$) -> {
-            Print
-            Print title$;
-            =PrintAnum
-      }
-      Tree=>preorder printnum("preorder:    ")
-      Tree=>inorder printnum("inorder:     ")
-      Tree=>postorder printnum("postorder:   ")
-      Tree=>level_order printnum("level-order: ")
+    Tree=NodeTree(1, NodeTree(2,NodeTree(4, NodeTree(7)), NodeTree(5)), NodeTree(3, NodeTree(6, NodeTree(8), NodeTree(9))))
+    Event PrintAnum {
+        read x
+    }
+    Function PrintThis(x) {
+          Print x;" ";    
+    }
+    Event PrintAnum New PrintThis()
+   //  Event PrintAnum Hold
+    printnum=lambda PrintAnum (title$) -> {
+        Print
+        Print title$;
+        =PrintAnum
+    }
+    Tree=>preorder printnum("preorder:  ")
+    Tree=>inorder printnum("inorder:   ")
+    Tree=>postorder printnum("postorder:   ")
+    Tree=>level_order printnum("level-order: ")
+    Print
+    Print "Removing nodes like a preorder traversal"
 }
 OOP
 }
@@ -21529,7 +21528,7 @@ MODULE USETHIS {try {
 	PEN 14
 	CLS,0
 	If Version<12 then Error "No proper M2000 version (must be >=12)"
-	If Version=12 and revision<19 then Error "No proper M2000 revision for version 4 (need revision >=19)"
+	If Version=12 and revision<37 then Error "No proper M2000 revision for version 4 (need revision >=37)"
 	Set Fast
 	Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 	dir user
@@ -23956,6 +23955,8 @@ MODULE WRITEWITH {Report {
 				so we can put mulrinlie text withoutbreaking the line
 	Nouseofchr34	a  no zero value means no "" araound a string.
 	
+	if Nouseofchr34 then null string from revision 37 version 12 works 
+	
 	so Write With "", "" reset the writing using Write
 	
 	The same for Input #
@@ -23968,13 +23969,14 @@ MODULE WRITEWITH {Report {
 	
 }
 
-
-
+// sep$=chr$(9)
+sep$=";"
+boolean noQuotes=true
 Pen 11{Print "Ansi first"}
 Print "Export csv using tab as seperator, and dot for decimal char"
 open "testnochr34.csv" for output as k
-Write With chr$(9), ".", ,1
-Write #k, "Hello There", "And There", 1212.12, "Bye"
+Write With sep$, ".", ,noQuotes
+Write #k, "Hello There","And There", 1212.12, "Bye",  ""
 Close #k
 Document docA$
 Load.Doc docA$, "testnochr34.csv"   ' automatic get the file type
@@ -23983,26 +23985,26 @@ Pen 15 {report DocA$}
 Print "ok..."
 Print "Now we use Input # programming the separator and dot"
 open "testnochr34.csv" for input as k
-Input With chr$(9), ".", ,1
-Input #k, A$, B$, C, D$
+Input With sep$, ".", ,noQuotes
+Input #k, A$, B$, C, D$, LAST$
 Close #k
 Print "Results"
-Print A$, B$, C, D$
+Print A$, B$, C, D$, LAST$=""
 Pen 11{Print "For UTF16LE wide chars"}
 open "testnochr34.csv" for wide output as k
-Write With chr$(9), ".", ,1
-Write #k, "Hello There", "surrogate 𐐷", 1212.12, "1234 ברוכים הבאים abc"
+Write With sep$, ".", ,noQuotes
+Write #k, "Hello There", "surrogate 𐐷", 1212.12, "1234 ברוכים הבאים abc", ""
 Close #k
 Document docA$
 Load.Doc docA$, "testnochr34.csv"
 Print "The file as a string - tabs are expanded"
 Pen 15 {report DocA$}
 open "testnochr34.csv" for wide input as k
-Input With chr$(9), ".", ,1
-Input #k, A$, B$, C, D$
+Input With sep$, ".", ,noQuotes
+Input #k, A$, B$, C, D$, LAST$
 Close #k
 Print "Results"
-Print A$, B$, C, D$
+Print A$, B$, C, D$, LAST$=""
 }
 MODULE DUTCH {Report "Dutch Flag from Dijkstra"
 const center=2
