@@ -42971,8 +42971,4 @@ module testme {
 }
 TestMe
 }
-FUNCTION ‹283›.ΦΟΡΜΑ4$ {'11001EDIT ΑΘΡΟΙΣΜΑ,-42
-  @read Χ
-=Δεξι$("    "+Γραφή$(Χ,"##0"),4) 
-}
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
