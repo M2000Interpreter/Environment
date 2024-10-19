@@ -936,7 +936,7 @@ If k.count = 0 Then
     Me.CopyArray k
     Exit Sub
 End If
-Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
+Dim v As Variant, i As Long, obj As Object, obj2 As Object
 Dim fromhere As Long
 fromhere = k.UpperMonoLimit + 1
 k.SerialItem v, Me.count + k.count, 10

@@ -12570,6 +12570,55 @@ Set usehandler = New mHandler
 usehandler.t1 = 3
 Set usehandler.objref = pppp
 Set bstack.lastobj = usehandler
+Case "END", "тек"
+retresonly = True
+GoTo cont1111
+Case "START", "аявг"
+retresonly = False
+cont1111:
+If IsExp(bstack, A$, p) Then
+    Set anything = bstack.lastobj
+    Set bstack.lastobj = Nothing
+    If Not CheckLastHandlerOrIterator(anything, w3) Then MissingArray: Exit Function
+    Set usehandler = anything
+    If Not TypeOf usehandler.objref Is mArray Then
+        If usehandler.t1 = 4 Then Set usehandler = Nothing: Set anything = Nothing: GoTo again1
+        Exit Function
+    End If
+    If pppp.count > 0 Then
+        If retresonly Then
+            If original > 0 Then
+                Set anything = pppp
+                Set pppp = usehandler.objref
+                Set pppp1 = anything
+            Else
+                Set pppp1 = New mArray
+                pppp.CopyArray pppp1
+                Set pppp = usehandler.objref
+            End If
+            pppp.AppendArray pppp1
+        Else
+            Set anything = pppp
+            Set pppp1 = usehandler.objref
+            Set pppp = New mArray
+            pppp1.CopyArray pppp
+            Set pppp1 = anything
+            pppp1.AppendArray pppp
+            Set pppp1 = pppp
+        End If
+        
+    Else
+        Set pppp1 = usehandler.objref
+    End If
+    original = original + 1
+    retresonly = False
+    Set anything = Nothing
+    Set usehandler = Nothing
+    GoTo cont12321
+Else
+    MissingArray
+End If
+Exit Function
 Case "SORT", "танимолгсг"
 w2 = 0
 w3 = -1
@@ -12608,6 +12657,7 @@ pppp1.SortDesTuple w3, w4
 Else
 pppp1.SortTuple w3, w4
 End If
+cont12321:
 Set pppp = pppp1
 Set pppp1 = Nothing
 multi = True

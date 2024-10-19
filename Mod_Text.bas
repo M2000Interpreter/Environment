@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 37
+Global Const Revision = 38
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -21814,7 +21814,6 @@ Case "DIR", "йатакоцос"
     Identifier = ProcDir(basestack, rest$, Lang)
 Exit Function
 Case "START", "аявг"
-    
     Identifier = newStart(basestack, rest$)
     Exit Function
 Case "REMOVE", "диацяажг"
