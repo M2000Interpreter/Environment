@@ -12089,18 +12089,36 @@ Select Case Left$(Pad$, cut - 1)
 Case "SUM", "ΑΘΡ"
 res = 0
 For w3 = 0 To pppp.count - 1
-If pppp.MyIsNumeric(pppp.item(w3)) Then res = res + pppp.item(w3)
+If pppp.MyIsNumeric(pppp.item(w3)) Then
+res = res + pppp.item(w3)
+ElseIf pppp.IsEnum2(w3, p) Then
+If MyIsNumeric(p) Then
+    res = res + p
+End If
+End If
 Next w3
 Case "MIN", "ΜΙΚ"
 res = 0
 w4 = -1
 If pppp.count > 0 Then
 For w3 = 0 To pppp.count - 1
-If pppp.MyIsNumeric(w3) Then res = pppp.itemnumeric(w3): w4 = w3: Exit For
+If pppp.MyIsNumeric(w3) Then
+res = pppp.itemnumeric(w3): w4 = w3: Exit For
+ElseIf pppp.IsEnum2(w3, p) Then
+If MyIsNumeric(p) Then
+    res = p: w4 = w3: Exit For
+End If
+End If
 Next w3
 
 For w3 = w3 To pppp.count - 1
-If pppp.MyIsNumeric(pppp.item(w3)) Then If pppp.item(w3) < res Then res = pppp.item(w3): w4 = w3
+If pppp.MyIsNumeric(pppp.item(w3)) Then
+If pppp.item(w3) < res Then res = pppp.item(w3): w4 = w3
+ElseIf pppp.IsEnum2(w3, p) Then
+If MyIsNumeric(p) Then
+    If p < res Then res = p: w4 = w3
+End If
+End If
 Next w3
 End If
 If Not FastSymbol(A$, ")") Then
@@ -12115,11 +12133,27 @@ res = vbNullString
 w4 = -1
 If pppp.count > 0 Then
 For w3 = 0 To pppp.count - 1
-If pppp.IsStringItem(w3) Then res = pppp.item(w3): w4 = w3: Exit For
+    If pppp.IsStringItem(w3) Then
+        If pppp.IsEnum2(w3, p) Then
+            If VarType(p) = vbString Then
+                res = p: w4 = w3: Exit For
+            End If
+        Else
+            res = pppp.item(w3): w4 = w3: Exit For
+        End If
+    End If
 Next w3
 
 For w3 = w3 To pppp.count - 1
-If pppp.IsStringItem(w3) Then If pppp.item(w3) < res Then res = pppp.item(w3): w4 = w3
+    If pppp.IsStringItem(w3) Then
+        If pppp.IsEnum2(w3, p) Then
+            If VarType(p) = vbString Then
+                If p < res Then res = p: w4 = w3
+            End If
+        Else
+            If pppp.item(w3) < res Then res = pppp.item(w3): w4 = w3
+        End If
+    End If
 Next w3
 End If
 If Not FastSymbol(A$, ")") Then
@@ -12135,11 +12169,27 @@ res = vbNullString
 w4 = -1
 If pppp.count > 0 Then
 For w3 = 0 To pppp.count - 1
-If pppp.IsStringItem(w3) Then res = pppp.item(w3): w4 = w3: Exit For
+    If pppp.IsStringItem(w3) Then
+        If pppp.IsEnum2(w3, p) Then
+            If VarType(p) = vbString Then
+                res = p: w4 = w3: Exit For
+            End If
+        Else
+            res = pppp.item(w3): w4 = w3: Exit For
+        End If
+    End If
 Next w3
 
 For w3 = w3 To pppp.count - 1
-If pppp.IsStringItem(w3) Then If pppp.item(w3) > res Then res = pppp.item(w3): w4 = w3
+    If pppp.IsStringItem(w3) Then
+        If pppp.IsEnum2(w3, p) Then
+            If VarType(p) = vbString Then
+                If p > res Then res = p: w4 = w3
+            End If
+        Else
+            If pppp.item(w3) > res Then res = pppp.item(w3): w4 = w3
+        End If
+    End If
 Next w3
 End If
 If Not FastSymbol(A$, ")") Then
@@ -12154,11 +12204,23 @@ res = 0
 w4 = -1
 If pppp.count > 0 Then
 For w3 = 0 To pppp.count - 1
-If pppp.MyIsNumeric(pppp.item(w3)) Then res = pppp.itemnumeric(w3): w4 = w3: Exit For
+If pppp.MyIsNumeric(pppp.item(w3)) Then
+res = pppp.itemnumeric(w3): w4 = w3: Exit For
+ElseIf pppp.IsEnum2(w3, p) Then
+If MyIsNumeric(p) Then
+    res = p: w4 = w3: Exit For
+End If
+End If
 Next w3
 
 For w3 = w3 To pppp.count - 1
-If pppp.MyIsNumeric(pppp.item(w3)) Then If pppp.item(w3) > res Then res = pppp.item(w3): w4 = w3
+If pppp.MyIsNumeric(pppp.item(w3)) Then
+    If pppp.item(w3) > res Then res = pppp.item(w3): w4 = w3
+ElseIf pppp.IsEnum2(w3, p) Then
+If MyIsNumeric(p) Then
+    If p > res Then res = p: w4 = w3
+End If
+End If
 Next w3
 End If
 If Not FastSymbol(A$, ")") Then
@@ -12535,7 +12597,7 @@ Else
 End If
 Case "SLICE", "ΜΕΡΟΣ"
 If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
-If p < 0 Or p >= pppp.count Then
+If p < 0 Then
     MyEr "start offset out of limits", "Δείκτης αρχής εκτός ορίων"
     Matrix = False
     Exit Function
@@ -12545,7 +12607,10 @@ p = 0
 End If
 If FastSymbol(A$, ",") Then
 If IsExp(bstack, A$, R, flatobject:=True, nostring:=True) Then
-    If R >= pppp.count Or R < p Then
+    If R <= 0 Then
+    Set pppp = pppp.EmptyArraySameType()
+        GoTo JMPeMPTY
+    ElseIf R >= pppp.count Or R < p Then
     MyEr "end offset out of limits", "Δείκτης τέλους εκτός ορίων"
     Matrix = False
     Exit Function
@@ -12556,14 +12621,19 @@ End If
 Else
 R = pppp.count - 1
 End If
+If CLng(p) >= pppp.count Then
+    Set pppp = pppp.EmptyArraySameType()
+        GoTo JMPeMPTY
+End If
 If original > 0 Then
 pppp.CopyArraySliceFast pppp1, CLng(p), CLng(R)
 Else
 pppp.CopyArraySlice pppp1, CLng(p), CLng(R)
 End If
-original = original + 1
 Set pppp = pppp1
 Set pppp1 = Nothing
+JMPeMPTY:
+original = original + 1
 multi = True
 Matrix = True
 Set usehandler = New mHandler
@@ -12737,17 +12807,39 @@ If IsExp(bstack, A$, p) Then
             
         End If
         Set bstack.lastobj = Nothing
-        CallLambdaArrayFold bstack, pppp, anything, res
+        Set R = Nothing
+        CallLambdaArrayFold bstack, pppp, anything, res, R
+        If Not R Is Nothing Then
+        
+            If TypeOf R Is mHandler Then
+                Set usehandler = R
+                If usehandler.t1 = 3 Then
+                 If TypeOf usehandler.objref Is mArray Then
+                    Set pppp = usehandler.objref
+                    Set pppp1 = Nothing
+                    multi = True
+                    Matrix = True
+                    original = original + 1
+                    Set bstack.lastobj = R
+                    GoTo abcdef
+                End If
+                End If
+            End If
+            Set bstack.lastobj = R
+
+        End If
     Else
         MyEr "missing a lambda function", "λείπει μια λάμδα συνάρτηση"
         Matrix = False
         Exit Function
     End If
+abcdef:
 Else
     MyEr "missing a lambda function", "λείπει μια λάμδα συνάρτηση"
     Matrix = False
     Exit Function
 End If
+
 Case "REV", "ΑΝΑΠ"
 Set pppp1 = New mArray
 If pppp1.MyTypeToBe <> vbVariant Then
@@ -13210,7 +13302,12 @@ Dim R, what As Long, where As Long
 For w1 = 0 To pppp.count - 1
  
   If pppp.IsStringItem(w1) Then
-    tempsoros.PushStrVariant pppp.item(w1)
+   ' tempsoros.PushStrVariant pppp.item(w1)
+    If pppp.IsEnum2(w1, R) Then
+        tempsoros.PushStrVariant R
+    Else
+        tempsoros.PushStrVariant pppp.item(w1)
+    End If
     what = 1
   ElseIf pppp.MyIsObject(pppp.item(w1)) Then
     tempsoros.PushObj pppp.item(w1)
@@ -13262,32 +13359,56 @@ finalpppp.StartResize: finalpppp.PushDim pppp.count: finalpppp.PushEnd
 Set oldsoros = bstack.soros
 Set bstack.Sorosref = tempsoros
 Dim R, what As Long, where As Long
-For w1 = 0 To pppp.count - 1
- 
+w1 = 0
+Do While w1 < pppp.count
   If pppp.IsStringItem(w1) Then
-    tempsoros.PushStrVariant pppp.item(w1)
+    If pppp.IsEnum2(w1, R) Then
+        tempsoros.PushStrVariant R
+    Else
+        tempsoros.PushStrVariant pppp.item(w1)
+    End If
   ElseIf pppp.MyIsObject(pppp.item(w1)) Then
     tempsoros.PushObj pppp.item(w1)
   Else
       tempsoros.PushVal pppp.item(w1)
   End If
-  If Not GoFunc(nbstack, "A_" & (Abs(w2)) & "()", vbNullString, R, w2, , , True) Then Exit For
-  If tempsoros.count > 0 Then
-  If tempsoros.StackItemTypeIsObject(1) Then
-  Set finalpppp.item(w1) = tempsoros.PopObj
-  Else
-   finalpppp.item(w1) = tempsoros.PopAnyNoObject
-  End If
+  If Not GoFunc(nbstack, "A_" & (Abs(w2)) & "()", vbNullString, R, w2, , , True) Then Exit Do
+    If tempsoros.count > 0 Then
+        If tempsoros.count > 1 Then
+            what = tempsoros.count
+            finalpppp.SerialItem 0, finalpppp.count + what - 1, 10
+            While tempsoros.count > 0
+                If tempsoros.StackItemTypeIsObject(1) Then
+                    Set finalpppp.item(where) = tempsoros.PopObj
+                Else
+                    finalpppp.item(where) = tempsoros.PopAnyNoObject
+                End If
+                where = where + 1
+            Wend
+            
+        Else
+            If tempsoros.StackItemTypeIsObject(1) Then
+                Set finalpppp.item(where) = tempsoros.PopObj
+            Else
+                finalpppp.item(where) = tempsoros.PopAnyNoObject
+            End If
+            where = where + 1
+        End If
+    Else
+        finalpppp.SerialItem 0, where, 10
+        Exit Do
     End If
-  
+ 
   tempsoros.Flush
-Next w1
+  w1 = w1 + 1
+  
+Loop
 Set bstack.Sorosref = oldsoros
 PopStage bstack
 Set pppp = finalpppp
 
 End Sub
-Sub CallLambdaArrayFold(bstack As basetask, pppp As mArray, mylambda As lambda, res As Variant)
+Sub CallLambdaArrayFold(bstack As basetask, pppp As mArray, mylambda As lambda, res As Variant, ByRef retObj As Variant)
 Dim w2 As Long, w1 As Long, nbstack As basetask
 PushStage bstack, False
 w2 = var2used
@@ -13321,18 +13442,21 @@ End If
 For w1 = 0 To pppp.count - 1
 
   If pppp.IsStringItem(w1) Then
-    tempsoros.PushStrVariant pppp.item(w1)
+    If pppp.IsEnum2(w1, R) Then
+        tempsoros.PushStrVariant R
+    Else
+        tempsoros.PushStrVariant pppp.item(w1)
+    End If
   ElseIf pppp.MyIsObject(pppp.item(w1)) Then
     tempsoros.PushObj pppp.item(w1)
   Else
       tempsoros.PushVal pppp.item(w1)
   End If
   If Not GoFunc(nbstack, "A_" & (Abs(w2)) & "()", vbNullString, R, w2, , , True) Then Exit For
-  
 Next w1
   If tempsoros.count > 0 Then
   If tempsoros.StackItemTypeIsObject(1) Then
-        Set bstack.lastobj = tempsoros.PopObj
+        Set retObj = tempsoros.PopObj
         res = 0
   Else
         res = tempsoros.PopAnyNoObject

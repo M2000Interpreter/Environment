@@ -1113,6 +1113,22 @@ k.IHaveGui = Me.IHaveGui
 k.IhaveClass = Me.IhaveClass
 k.Final = Me.Final
 End Sub
+Public Function EmptyArraySameType() As Object
+Dim k As mArray
+Set k = New mArray
+k.MyTypeToBe = MyTypeToBe
+k.myarrbase = myarrbase
+k.RevOrder = False
+k.StartResize
+k.PushEnd
+k.RevOrder = RevOrder
+Set k.GroupRef = Me.GroupRef
+k.arr = Me.arr
+k.IHaveGui = Me.IHaveGui
+k.IhaveClass = Me.IhaveClass
+k.Final = Me.Final
+Set EmptyArraySameType = k
+End Function
 Public Sub CopyArraySlice(k As mArray, fromS As Long, toS As Long)
 'copy this to k
 ' make one dimemsion only
@@ -2075,6 +2091,24 @@ If Typename(actualData(Index)) = mHdlr Then
     Set usehandler = actualData(Index)
     IsEnum = usehandler.t1 = 4
      If IsEnum Then
+        If myVarType(usehandler.index_cursor, vbString) Then
+            p = usehandler.index_cursor
+        Else
+            p = usehandler.index_cursor * usehandler.sign
+        End If
+     End If
+End If
+End If
+End If
+End Function
+Function IsEnum2(curitem As Long, p As Variant) As Boolean
+Dim usehandler As mHandler
+If curitem >= 0 And curitem <= maxitems1 Then
+If IsObject(actualData(curitem)) Then
+If Typename(actualData(curitem)) = mHdlr Then
+    Set usehandler = actualData(curitem)
+    IsEnum2 = usehandler.t1 = 4
+     If IsEnum2 Then
         If myVarType(usehandler.index_cursor, vbString) Then
             p = usehandler.index_cursor
         Else
