@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 39
+Global Const Revision = 40
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -14312,8 +14312,9 @@ cont1234:
 End Function
 Function IsStrExp(basestack As basetask, aa$, rr$, Optional check As Boolean = True) As Boolean
 Dim ac$, fault As Boolean, p
-If check Then If Not aheadstatusStr(aa$) Then Exit Function
 If Len(aa$) = 0 Then Exit Function
+If check Then If Not aheadstatusStr(aa$) Then Exit Function
+
 'If check Then If Left$(aheadstatus(aa$, False), 1) <> "S" Then IsStrExp = False: Exit Function
 If LastErNum = -2 Then LastErNum = 0 ': LastErNum1 = 0
 
@@ -14626,6 +14627,8 @@ cont2345:
                                 Set bstackstr.lastobj = rA(p, pp)
                                 Else
                                 R$ = rA(p, pp)
+                                IsStr1 = FastSymbol(A$, "]")
+                                Exit Function
                                 End If
                                 
                                 If FastSymbol(A$, "]") Then
@@ -14646,6 +14649,8 @@ cont2345:
                             
                             Else
                                 R$ = rA(0, p)
+                                IsStr1 = FastSymbol(A$, "]")
+                                Exit Function
                             End If
                         If FastSymbol(A$, "]") Then
                             GoTo Final

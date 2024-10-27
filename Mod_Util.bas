@@ -9946,9 +9946,9 @@ Dim p As Variant
 End Function
 Function IsSin(bstack As basetask, A$, R As Variant) As Boolean
    If IsExp(bstack, A$, R, flatobject:=True, nostring:=True) Then
-    R = Sin(R * 1.74532925199433E-02)
+       R = Sin(R * 1.74532925199433E-02)
     ''r = Sgn(r) * Int(Abs(r) * 10000000000000#) / 10000000000000#
-    If Abs(R) < 1E-16 Then R = 0
+    If Abs(R) < 0.00000000000001 Then R = 0#
     
     
     
@@ -9974,8 +9974,8 @@ Function IsCos(bstack As basetask, A$, R As Variant) As Boolean
   If IsExp(bstack, A$, R, flatobject:=True, nostring:=True) Then
 
     R = Cos(R * 1.74532925199433E-02)
- 
-    If Abs(R) < 1E-16 Then R = 0
+    If Abs(R) < 0.00000000000001 Then R = 0#
+    'If Abs(R) < 1E-16 Then R = 0
     
     
     

@@ -1,79 +1,66 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 39 active-X
+Version 12 Revision 40 active-X
+Fix a bug for using special arrays like a[] and a[][] for string expressions:
+string a[10]="ok1234"
+Print a[5] ' works as before
+Print left$(a[5],3)="ok1"  ' now works
+Print a[2]+a[3]="ok1234ok1234"
 
-1) a=(1,2,3): ? LEN(a#slice(1,0))=0 ' NOT RAISE ERROR, RETURN EMPTY ARRAY
-? LEN(a#slice(2,1))=0 ' RAISE ERROR - AS PREVIOUS
-? LEN(a#slice(3,))=0 ' NOT RAISE ERROR, RETURN EMPTY ARRAY
-2) slice from fold function. Now fold function may return objects, and arrays too.
-a=(1,2,"aaa","bbb",5,6,7)
-fold1=lambda (skip, many) -> {
-	=lambda t=(,), m=0, skip, many -> {
-		if m=0 then shift 2: drop: m=1: data t
-		read q, k as array
-		if skip<=0 then
-			if many>0 then append k, (q,)
-			data k
-			many--
-		else
-			data t
-		end if
-		skip--
+string b[10][4]="ok1234"
+Print b[5][1] ' works as before
+Print left$(b[5][1],3)="ok1"  ' now works
+Print b[2][1]+b[3][1]="ok1234ok1234"
+
+b[12][6]="expand"
+? b[12][6]
+
+these special arrays have indexes from 0 always and expand length simply by using a bigger index. For two dimension arrays, each sub array may have different length.
+
+For these arrays we want to pass pointer to c functions:
+Look module TestArr, we work with pointers. PathAddBackslashW need an address to first character of string. We constract the Declare using Long parameter.
+The array a[] has 4 bytes per string to point to string (or maybe is null)
+So to find the string at index 1 we have to multiply by 4 and add to address offset of the first item.
+
+The second module show the construction of declaration using by reference string. The first two arrays, a$() and a() are type of variant, but the third is type of string (has inside an object same as the a[] array, but is an marray object who handle max 10 dimensions)
+
+module testArr {
+	Declare PathAddBackslash Lib "Shlwapi.PathAddBackslashW" { long string_pointer}
+	Declare global GetMem4 lib "msvbvm60.GetMem4" {Long addr, Long retValue}
+	
+	string a[2]="ok1234"
+	a[1] = "C:"+String$(Chr$(0), 250)
+	function ArrPtr(a, x) {
+		long ret
+		With a, "ArrPtr" as a.ArrPtr()
+		x=GetMem4(a.ArrPtr(0)+4*x, varptr(ret))
+		=ret
 	}
+	if len(a[1])=0 then exit
+	m = PathAddBackslash(Arrptr(a, 1))
+	Print LeftPart$(a[1],0)
 }
-? a#fold(fold1(2, 5))#str$(", ")
-? a#fold(fold1(1, 3))#str$(", ")
-3)Map function exit when we want just flush the stack of values.
-List1=(1,2,3,4,5,6,7,8,9)
-List2=(10,11)' ,12,13,14,15,16,17,18)
-List3=(19,20,21,22,23,24,25,26,27)
-map1=lambda (list0 as array) ->{
-	dim a()
-	a()=list0  // we get a copy
-	=lambda a(), n=-1 ->{
-		if n<len(a())-1 then
-			n++
-			if islet then		
-				push letter$+(a(n))
-			else
-				push number+""+(a(n))
-			end if
-		else
-			flush  ' if not return value the map function exit ' addition from 39
-		end if
-	}
-}
-? "["+list1#map(map1(list2), map1(list3))#str$(", ")+"]"
-map2=map1(list2)
-map3=map1(list3)
-list2=()
-list3=()
-// map2 and map3 has a copy of list2, list3 before we erase it
-? "["+list1#map(map2, map3)#str$(", ")+"]"
+testArr
 
-4)Map allow now to make 1 to many maps.
-dim a(3) as long
-a(0):=1,2,3
-map1=lambda ->{
-	push random(10)+number, 100 ' two values for one
+module testArr2 {
+	Declare PathAddBackslash Lib "Shlwapi.PathAddBackslashW" { &Path$ }
+	dim a$(4)
+	a$(3) = "C:"+String$(Chr$(0), 250)
+	A = PathAddBackslash(&a$(3))
+	Print LeftPart$(a$(3),0)
+	
+	dim a(4)
+	a(3) = "C:"+String$(Chr$(0), 250)
+	A = PathAddBackslash(&a(3))
+	Print LeftPart$(a(3),0)
+	
+	dim s(4, 2, 3) as string
+	s(3, 1, 2) = "C:"+String$(Chr$(0), 250)
+	A = PathAddBackslash(&s(3,1,2))
+	Print LeftPart$(s(3,1,2),0)
 }
-? a()#map(map1)#str$(", ")
-// 100, 8, 100, 3, 100, 4
+testArr2
 
-5)Fix Sum/Min/Max/Min$/Max$ for tuple using Enum values. Sort not work with enum values (they are objects, which know the name of value, the value (numeric as  number and sign or a string value), also know the order, so a variable of some enum type can advance to next using ++ operator or go back using -- operator. This example use Sort after a map function, which map the enum values only to simple values (without the object). Also a Map function can get more than one lambda function to make more maps, one after the other.
-
-enum m {a=50, b=200, c=30}
-k=(a, b, c)
-? k#max(),  k#min(), k#val(0), k#Sum()
-z=each(k)
-strip = lambda->{
-		read t as long:data t
-}
-strip1 = lambda->{
-		read t as long:data t+100
-}
-k=k#map(strip,strip1)#sort()
-? k#str$(", ")
 
 
 George Karras, Kallithea Attikis, Greece.
