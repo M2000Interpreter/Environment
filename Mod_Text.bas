@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 40
+Global Const Revision = 41
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -20802,7 +20802,7 @@ If here$ <> ohere$ Or mystack.IamChild Or basestack.IamAnEvent Then
             numid.pushtopGlobal
             funid.pushtopGlobal
             strfunid.pushtopGlobal
-            funid.pushtopGlobal
+            strid.pushtopGlobal
         End If
     Else
         mystack.ErrVars = var2used
@@ -21259,6 +21259,13 @@ emptyfunc:
                 subHash.ReduceHash snames, sbf()
                 If UBound(sbf()) <> subHash.MaxSpace Then
                         ReDim Preserve sbf(subHash.MaxSpace) As modfun
+                End If
+            Else
+                If sbf(x1).sbc Then
+                    numid.poptopGlobal
+                    funid.poptopGlobal
+                    strfunid.poptopGlobal
+                    strid.poptopGlobal
                 End If
             End If
             Exit Do
@@ -27119,9 +27126,6 @@ contherenew:
             Y3 = IsLabelSymbolNew(rest$, "ΜΕΓΕΓΟΝΟΤΑ", "WITHEVENTS", language)
             l = FindDISPID(vv, FN$)
             FN$ = UCase(FN$)
-            'If l <> -1 Then
-            '    Debug.Print "found IT"
-            'End If
             x1 = Abs(IsLabel(bstack, rest$, s$))
             If ReadOneParameter(vv, l, s$, myVar) Then
             
@@ -27221,8 +27225,8 @@ jumpFromGet:
                             If Not GetVar(bstack, ChrW(&HFFBF) + "_" + s$, Y3) Then
                                         Y3 = globalvarGroup(ChrW(&HFFBF) + "_" + s$, CVar(vbNullString), , y1)
                             End If
-                           Set var(Y3) = ev
-                            Debug.Print "WithEvents Set 0"
+                            Set var(Y3) = ev
+                            'Debug.Print "WithEvents Set 0"
                          Else
                             MyEr "Can't handle events here", "Δεν μπορώ να χειριστώ γεγονότα"
                             GoTo there
@@ -27242,7 +27246,7 @@ jumpnewvar:
                         If GetShink(ev, NewRef, s$) Then
                             Y3 = globalvarGroup(ChrW(&HFFBF) + "_" + s$, CVar(vbNullString), , y1)
                             Set var(Y3) = ev
-                            Debug.Print "WithEvents Set"
+                            'Debug.Print "WithEvents Set"
                          Else
                             MyEr "Can't handle events here", "Δεν μπορώ να χειριστώ γεγονότα"
                             GoTo there
@@ -30335,12 +30339,12 @@ With bs
         numid.pushtopGlobal
         funid.pushtopGlobal
         strfunid.pushtopGlobal
-        funid.pushtopGlobal
+        strid.pushtopGlobal
     Else
         numid.pushtop
         funid.pushtop
         strfunid.pushtop
-        funid.pushtop
+        strid.pushtop
     End If
     subs = sb2used: snames = subHash.count
     .UseGroupname = sbf(x1).sbgroup

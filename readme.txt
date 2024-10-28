@@ -1,66 +1,61 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 40 active-X
-Fix a bug for using special arrays like a[] and a[][] for string expressions:
-string a[10]="ok1234"
-Print a[5] ' works as before
-Print left$(a[5],3)="ok1"  ' now works
-Print a[2]+a[3]="ok1234ok1234"
+Version 12 Revision 41 active-X
 
-string b[10][4]="ok1234"
-Print b[5][1] ' works as before
-Print left$(b[5][1],3)="ok1"  ' now works
-Print b[2][1]+b[3][1]="ok1234ok1234"
+1) Fix the Point() internal function.
+Cls #005580, 0: move 0, 6000
+Pen 14 // yellow
+Cursor !  // get the pos, row for characters from graphic cursor
+Scroll Split Row 
+a$=" "
+Move 0,0: Copy 1000, 1000 to a$: Print Point(a$, 0, 0)=#005580
+// Point return color from graphic cursor
+Print Point(a$, 0, 0)=Point,  Point=#005580
+for i=0 to Image.x.pixels(a$)-1: old=Point(a$, i, i, #FF5580):next
+Print old=Point, old=#005580,  Point(a$, 0, 0)=#ff5580
+Move 0,0 : image a$, 6000  // make the image X6
+move 3000, 1000: image a$  // original size
 
-b[12][6]="expand"
-? b[12][6]
+2) Fix a rare situation, when the class has same name as an internal function. also the class has the module with the same name as constructor, and we call them from an inner module (if we change the name point() to point1() no error happened). A class definition is global (we can use it anywhere, as long as the module where the definition executed not exit yet. Objects defined from class definition no need the definition, so we can return an object from  a module/function which we have the object definition.
 
-these special arrays have indexes from 0 always and expand length simply by using a bigger index. For two dimension arrays, each sub array may have different length.
-
-For these arrays we want to pass pointer to c functions:
-Look module TestArr, we work with pointers. PathAddBackslashW need an address to first character of string. We constract the Declare using Long parameter.
-The array a[] has 4 bytes per string to point to string (or maybe is null)
-So to find the string at index 1 we have to multiply by 4 and add to address offset of the first item.
-
-The second module show the construction of declaration using by reference string. The first two arrays, a$() and a() are type of variant, but the third is type of string (has inside an object same as the a[] array, but is an marray object who handle max 10 dimensions)
-
-module testArr {
-	Declare PathAddBackslash Lib "Shlwapi.PathAddBackslashW" { long string_pointer}
-	Declare global GetMem4 lib "msvbvm60.GetMem4" {Long addr, Long retValue}
-	
-	string a[2]="ok1234"
-	a[1] = "C:"+String$(Chr$(0), 250)
-	function ArrPtr(a, x) {
-		long ret
-		With a, "ArrPtr" as a.ArrPtr()
-		x=GetMem4(a.ArrPtr(0)+4*x, varptr(ret))
-		=ret
+class point {
+	X as integer, Y as integer
+class:
+	module point (a as integer, b as integer) {.X<=a:.Y<=b}
+}
+module inner {
+	z1=point(10 ,20)
+	print z1.X, z1.Y
+	try {
+		z2=point(30, 50)
+		print z2.X, z2.Y
 	}
-	if len(a[1])=0 then exit
-	m = PathAddBackslash(Arrptr(a, 1))
-	Print LeftPart$(a[1],0)
 }
-testArr
+Call inner 
 
-module testArr2 {
-	Declare PathAddBackslash Lib "Shlwapi.PathAddBackslashW" { &Path$ }
-	dim a$(4)
-	a$(3) = "C:"+String$(Chr$(0), 250)
-	A = PathAddBackslash(&a$(3))
-	Print LeftPart$(a$(3),0)
-	
-	dim a(4)
-	a(3) = "C:"+String$(Chr$(0), 250)
-	A = PathAddBackslash(&a(3))
-	Print LeftPart$(a(3),0)
-	
-	dim s(4, 2, 3) as string
-	s(3, 1, 2) = "C:"+String$(Chr$(0), 250)
-	A = PathAddBackslash(&s(3,1,2))
-	Print LeftPart$(s(3,1,2),0)
+3)The #fold() special function for tuple/arrays, can get an object as starting value. This not apply to #fold$() which used for returning string (and we can pass a string as starting value). The example use tuple as zero length as (,), the stack, the list and the queue. 
+
+map=lambda (k, m as array)-> {
+	append m, (k^2,): push m
 }
-testArr2
-
+? (1,2,3,4,5,6)#fold(map, (,))
+? (1,2,3,4,5,6)#fold(map, (,))#fold(map, (,))
+? (4,5,6)#fold(map, (1,2,3)#fold(map, (,)))#fold(map, (,))
+map2stack=lambda -> {
+	read k, m as stack   // we can put the read statement too
+	stack m {data k^2}: push m
+}
+? (1,2,3,4,5,6)#fold(map2stack, stack)   // no #function for stack
+map2list=lambda (k, m as list) ->{
+	//using (k, m as list) is the same as Read k, m as list
+	append m, k^2: push m
+}
+? (1,2,3,4,5,6)#fold(map2list, list)  // no #function for list
+map2queue=lambda -> {
+	read k, m as queue // here we place the read statement
+	append m, k^2: push m
+}
+? (1,1,3,4,5,6)#fold(map2queue, queue)  // no #function for queue
 
 
 George Karras, Kallithea Attikis, Greece.

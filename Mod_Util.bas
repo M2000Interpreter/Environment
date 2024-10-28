@@ -7205,7 +7205,7 @@ Public Sub choosenext()
 Dim catchit As Boolean
 On Error Resume Next
 If Not Screen.ActiveForm Is Nothing Then
-Debug.Print "choose next"
+'Debug.Print "choose next"
     Dim x As Form
      For Each x In Forms
      If x.Name = "Form1" Or x.Name = "GuiM2000" Or x.Name = "Form2" Or x.Name = "Form4" Then
@@ -12795,8 +12795,12 @@ If IsExp(bstack, A$, p) Then
     If Not bstack.lastobj Is Nothing Then
         Set anything = bstack.lastobj
         If FastSymbol(A$, ",") Then
-            If IsExp(bstack, A$, p, , True) Then
+            If IsExp(bstack, A$, p) Then
+                If Not bstack.lastobj Is Nothing Then
+                Set res = bstack.lastobj
+                Else
                  res = p
+                 End If
             ElseIf IsStrExp(bstack, A$, Pad$, False) Then
                 res = Pad$
             Else

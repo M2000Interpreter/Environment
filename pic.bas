@@ -328,9 +328,9 @@ Public Const KLF_REORDER = &H8
 ''' Size of KeyboardLayoutName (number of characters), including nul terminator
 Public Const KL_NAMELENGTH = 9
 
-Declare Function LoadKeyboardLayout Lib "user32" Alias "LoadKeyboardLayoutA" (ByVal pwszKLID As String, ByVal flags As Long) As Long
+Declare Function LoadKeyboardLayout Lib "user32" Alias "LoadKeyboardLayoutA" (ByVal pwszKLID As String, ByVal Flags As Long) As Long
 Declare Function UnloadKeyboardLayout Lib "user32" (ByVal HKL As Long) As Long
-Declare Function ActivateKeyboardLayout Lib "user32" (ByVal HKL As Long, ByVal flags As Long) As Long
+Declare Function ActivateKeyboardLayout Lib "user32" (ByVal HKL As Long, ByVal Flags As Long) As Long
 Public Function HighLong(ByVal p) As Long
     If MemInt(VarPtr(p)) <> 20 Then p = cInt64(p)
     HighLong = MemLong(VarPtr(p) + 12)
@@ -688,15 +688,22 @@ Public Function SetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long, 
 Dim W As Long, H As Long, bpl As Long, rgb(2) As Byte
 W = val("&H" & Mid$(ssdib, 5, 4))
 H = val("&H" & Mid$(ssdib, 9, 4))
+x = W - Abs(x) - 1
+y = Abs(H - y - 1) Mod H
+
 If Len(ssdib) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
 If W * H <> 0 Then
 bpl = (LenB(ssdib) - 24) \ H
 W = (W - x - 1) Mod W
-H = (y Mod H) * bpl + W * 3 + 24
+H = y * bpl + W * 3 + 24
 CopyMemory rgb(0), ByVal StrPtr(ssdib) + H, 3
-
-SetDIBPixel = -(rgb(2) * 256# * 256# + rgb(1) * 256# + rgb(0))
-CopyMemory ByVal StrPtr(ssdib) + H, aColor, 3
+W = rgb(0): rgb(0) = rgb(2): rgb(2) = W
+bpl = 0
+CopyMemory ByVal VarPtr(bpl), rgb(0), 3
+SetDIBPixel = -1# * bpl
+CopyMemory rgb(0), ByVal VarPtr(aColor), 3
+W = rgb(0): rgb(0) = rgb(2): rgb(2) = W
+CopyMemory ByVal StrPtr(ssdib) + H, rgb(0), 3
 End If
 End Function
 Public Function GetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long) As Double
@@ -704,17 +711,21 @@ Dim W As Long, H As Long, bpl As Long, rgb(2) As Byte
 'a = ssdib$
 W = val("&H" & Mid$(ssdib, 5, 4))
 H = val("&H" & Mid$(ssdib, 9, 4))
+x = W - Abs(x) - 1
+y = Abs(H - y - 1) Mod H
 If Len(ssdib) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
 If W * H <> 0 Then
 bpl = (LenB(ssdib) - 24) \ H   ' Len(ssdib$) 2 bytes per char
 W = (W - x - 1) Mod W
 
-H = (y Mod H) * bpl + W * 3 + 24
-
-
+H = y * bpl + W * 3 + 24
 CopyMemory rgb(0), ByVal StrPtr(ssdib) + H, 3
+W = rgb(0): rgb(0) = rgb(2): rgb(2) = W
+bpl = 0
+CopyMemory ByVal VarPtr(bpl), rgb(0), 3
+GetDIBPixel = -1# * bpl
 
-GetDIBPixel = -(rgb(2) * 256# * 256# + rgb(1) * 256# + rgb(0))
+'GetDIBPixel = -(rgb(0) * 256# * 256# + rgb(1) * 256# + rgb(2))
 End If
 End Function
 Public Function cDIBwidth1(A) As Long

@@ -24,10 +24,10 @@ Private PriveSpace() As item
 Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private lastfind As String
 Private Hash() As Long
-Public index As Long
+Public Index As Long
 Public lastHashFunc0 As Long
 Private limitGlobal As Long
 Private clean As New mStiva2
@@ -162,6 +162,7 @@ End Property
 
 Friend Function Find(Key As String, num As Long, Optional badindex As Long = 0) As Boolean
 Dim k As Long
+
 num = 0
 If Len(Key) = 0 Then Exit Function
 k = Hash(HashFunc(Key)) - 1
@@ -171,16 +172,17 @@ Do
     If PriveSpace(k).Key = Key Then
     num = PriveSpace(k).nDx
     If num > 0 Then
-        Find = True: lastfind = Key: index = k: Exit Function
+        Find = True: lastfind = Key: Index = k: Exit Function
     ElseIf badindex Then
     
-       If badindex <= k Then Find = True: lastfind = Key: index = k: Exit Function
-       If k >= limitGlobal Then If num < -1 Then Find = True: lastfind = Key: index = k: Exit Function
+       If badindex <= k Then Find = True: lastfind = Key: Index = k: Exit Function
+       If k >= limitGlobal Then If num < -1 Then Find = True: lastfind = Key: Index = k: Exit Function
     End If
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0
 End If
+
 End Function
 Friend Function ExistKey(Key As String) As Boolean
 Dim k As Long
@@ -195,10 +197,10 @@ Loop Until k < 0
 End If
 End Function
 Friend Sub ItemCreator2(Key As String, num As Long)
-Dim a As Long
-a = Malloc()
-place HashFuncStored(Key), a
-With PriveSpace(a)
+Dim A As Long
+A = Malloc()
+place HashFuncStored(Key), A
+With PriveSpace(A)
     .Key = Key
     .nDx = num
     .firsthash = HD(Key)
@@ -208,10 +210,10 @@ End With
 End Sub
 
 Friend Sub ItemCreator(Key As String, num As Long)
-Dim a As Long
-a = Malloc()
-place HashFunc(Key), a
-With PriveSpace(a)
+Dim A As Long
+A = Malloc()
+place HashFunc(Key), A
+With PriveSpace(A)
     .Key = Key
     .nDx = num
     .firsthash = HD(Key)
@@ -221,26 +223,26 @@ End Sub
 Property Get Percent()
 Percent = count / hashlen
 End Property
-Private Sub place(ByVal b, ByVal a)
+Private Sub place(ByVal b, ByVal A)
     Dim k As Long
     k = Hash(b)
-    If Not Hash(b) = a + 1 Then
-         Hash(b) = a + 1
-         PriveSpace(a).Pleft = k
+    If Not Hash(b) = A + 1 Then
+         Hash(b) = A + 1
+         PriveSpace(A).Pleft = k
     End If
-    PriveSpace(a).lastpos = b
+    PriveSpace(A).lastpos = b
 End Sub
 
 Private Function HashFunc2(where As Long)
 HashFunc2 = PriveSpace(where).firsthash Mod hashlen
 End Function
 
-Private Function HashFunc(a$)
-lastHashFunc0 = HD(a$)
+Private Function HashFunc(A$)
+lastHashFunc0 = HD(A$)
 HashFunc = lastHashFunc0 Mod hashlen
 End Function
 
-Private Function HashFuncStored(a$)
+Private Function HashFuncStored(A$)
 HashFuncStored = lastHashFunc0 Mod hashlen
 End Function
 
@@ -252,7 +254,6 @@ End Sub
 Public Sub poptopGlobal()
 ReduceHash CLng(clean.PopVal)
 limitGlobal = CLng(clean.PopVal)
- 
 End Sub
 
 Public Sub pushtop()
