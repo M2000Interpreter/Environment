@@ -1,62 +1,61 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 41 active-X
+Version 12 Revision 42 active-X
+1. #SORT() FOR BYTE ARRAYS NOW WORKS.
+Dim a(3) as byte
+a(0)=255,12,18
+Print a()#sort()
 
-1) Fix the Point() internal function.
-Cls #005580, 0: move 0, 6000
-Pen 14 // yellow
-Cursor !  // get the pos, row for characters from graphic cursor
-Scroll Split Row 
-a$=" "
-Move 0,0: Copy 1000, 1000 to a$: Print Point(a$, 0, 0)=#005580
-// Point return color from graphic cursor
-Print Point(a$, 0, 0)=Point,  Point=#005580
-for i=0 to Image.x.pixels(a$)-1: old=Point(a$, i, i, #FF5580):next
-Print old=Point, old=#005580,  Point(a$, 0, 0)=#ff5580
-Move 0,0 : image a$, 6000  // make the image X6
-move 3000, 1000: image a$  // original size
+2. date$(a, language_ID) works as expected
+LOCALE 1033
+date a="2024-12-25"
+? date$(a, 1032)="12/25/2024"
+? date$(a)<>"25/12/2024" 
+LOCALE 1032
+date b="2024-12-23"
+? date$(b, 1033)="12/23/2024"
+? date$(b)<>"23/12/2024" 
+Long d=a-b
+? d=2
 
-2) Fix a rare situation, when the class has same name as an internal function. also the class has the module with the same name as constructor, and we call them from an inner module (if we change the name point() to point1() no error happened). A class definition is global (we can use it anywhere, as long as the module where the definition executed not exit yet. Objects defined from class definition no need the definition, so we can return an object from  a module/function which we have the object definition.
+3. RefArray type of arrays (extension)
+- using [] not ()
+- each "dimension" may have different length
+- adjust size by using index: byte b[0]: b[7]=255:Print Len(b)=8
+- Was 1 to 2 dimension, now can be more, making object arrays to hold 1 or 2 dimension arrays.
 
-class point {
-	X as integer, Y as integer
-class:
-	module point (a as integer, b as integer) {.X<=a:.Y<=b}
-}
-module inner {
-	z1=point(10 ,20)
-	print z1.X, z1.Y
-	try {
-		z2=point(30, 50)
-		print z2.X, z2.Y
-	}
-}
-Call inner 
+3.1 Multi assign values
+variant z[10]
+z[0]="George", 12122, 12&, "hello", 0.0001212312312312312@, 0.0001212312312312312
+for i=0 to 10:print z[i]: next
 
-3)The #fold() special function for tuple/arrays, can get an object as starting value. This not apply to #fold$() which used for returning string (and we can pass a string as starting value). The example use tuple as zero length as (,), the stack, the list and the queue. 
-
-map=lambda (k, m as array)-> {
-	append m, (k^2,): push m
+3.2 Making 4 dimension array (using a function to pack arrays inside objects)
+// Integer is 16 bit (2 bytes), Object is 4 bytes (32 bit pointer to object).
+function multidim_integer() {
+	if stack.size=1 then
+		integer a[number]
+		=a 
+	else.if stack.size=2 then
+		integer a[number][number]
+		=a
+	else.if stack.size>2 then
+		read k
+		bb=[]
+		object b[0]
+		for j=0 to k
+			b[j]=lambda(!stack(bb))
+		next
+		=b
+	end if
 }
-? (1,2,3,4,5,6)#fold(map, (,))
-? (1,2,3,4,5,6)#fold(map, (,))#fold(map, (,))
-? (4,5,6)#fold(map, (1,2,3)#fold(map, (,)))#fold(map, (,))
-map2stack=lambda -> {
-	read k, m as stack   // we can put the read statement too
-	stack m {data k^2}: push m
-}
-? (1,2,3,4,5,6)#fold(map2stack, stack)   // no #function for stack
-map2list=lambda (k, m as list) ->{
-	//using (k, m as list) is the same as Read k, m as list
-	append m, k^2: push m
-}
-? (1,2,3,4,5,6)#fold(map2list, list)  // no #function for list
-map2queue=lambda -> {
-	read k, m as queue // here we place the read statement
-	append m, k^2: push m
-}
-? (1,1,3,4,5,6)#fold(map2queue, queue)  // no #function for queue
-
+// 0 to 2, 0 to 4, 0 to 2, 0 to 3
+// 3*5*3*4=180 items
+k=multidim_integer(2, 4, 2, 3)
+k[1][4][2][3]=100
+k[1][4][2][3]++
+Print k[1][4][2][3]=101
+k[1][4][1][0]=1, 2, 3, 4
+for i=0 to 3: Print k[1][4][1][i],:Next:Print
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

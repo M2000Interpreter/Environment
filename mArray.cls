@@ -2419,7 +2419,7 @@ If Low >= high Then Exit Sub
 
 For i = Low To high
 GetMem1 VarPtr(actualData(i)), n
-If (n > 8 Or n < 2) And Not (n = 14 Or n = 20) Then Exit Sub
+If (n > 8 Or n < 2) And Not (n = 14 Or n = 20 Or n = 17) Then Exit Sub
 Next i
 If MyIsObject(actualData) Then
     QuickSortItemsWithSameKeyO Low, high

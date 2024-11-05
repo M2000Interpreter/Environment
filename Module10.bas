@@ -32,8 +32,8 @@ Private Declare Function vbaVarLateMemCallLdRf2 CDecl Lib "msvbvm60" _
                          ByVal cArgs As Long, _
                          ByVal vArg1) As Long
 
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
 Private Const E_POINTER As Long = &H80004003
 Private Const S_OK As Long = 0
 Private Const INTERNET_MAX_URL_LENGTH As Long = 2083
@@ -508,13 +508,13 @@ ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
 ret = ReadFile(FileNumber, Data(0), BlockSize, SizeRead, 0&)
 BlockSize = SizeRead
 End Sub
-Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal Addr As Long)
+Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal addr As Long)
 Dim PosL As Long
 Dim PosH As Long
 Dim SizeRead As Long
 Dim ret As Long
 ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
-ret = ReadFile(FileNumber, ByVal Addr, BlockSize, SizeRead, 0&)
+ret = ReadFile(FileNumber, ByVal addr, BlockSize, SizeRead, 0&)
 End Sub
 
 Public Sub API_CloseFile(ByVal FileNumber As Long)
@@ -605,7 +605,7 @@ Public Function GetUrlPort(ByVal Address As String) As String
 End Function
 Public Function URLDecode( _
     ByVal Url As String, _
-    Optional ByVal PlusSpace As Boolean = True, Optional flags As Long = 0) As String
+    Optional ByVal PlusSpace As Boolean = True, Optional Flags As Long = 0) As String
     Url = Left$(Url, INTERNET_MAX_URL_LENGTH)
     Dim cchUnescaped As Long
     Dim hResult As Long
@@ -613,10 +613,10 @@ Public Function URLDecode( _
     If PlusSpace Then Url = Replace$(Url, "+", " ")
     cchUnescaped = Len(Url)
     URLDecode = String$(cchUnescaped, 0)
-    hResult = UrlUnescape(StrPtr(Url), StrPtr(URLDecode), cchUnescaped, flags)
+    hResult = UrlUnescape(StrPtr(Url), StrPtr(URLDecode), cchUnescaped, Flags)
     If hResult = E_POINTER Then
         URLDecode = String$(cchUnescaped, 0)
-        hResult = UrlUnescape(StrPtr(Url), StrPtr(URLDecode), cchUnescaped, flags)
+        hResult = UrlUnescape(StrPtr(Url), StrPtr(URLDecode), cchUnescaped, Flags)
     End If
     
     If hResult <> S_OK Then
@@ -1049,12 +1049,12 @@ Public Function URLEncodeEsc(cc As String, Optional space_as_plus As Boolean = F
 End Function
 Function DecodeEscape(c$, plus_as_space As Boolean) As String
 If plus_as_space Then c$ = Replace(c$, "+", " ")
-Dim A() As String, i As Long
-A() = Split(c$, "%")
-For i = 1 To UBound(A())
-A(i) = Chr(val("&h" + Left$(A(i), 2))) + Mid$(A(i), 3)
+Dim a() As String, i As Long
+a() = Split(c$, "%")
+For i = 1 To UBound(a())
+a(i) = Chr(val("&h" + Left$(a(i), 2))) + Mid$(a(i), 3)
 Next i
-DecodeEscape = utf8decode(StrConv(Join(A(), ""), vbFromUnicode))
+DecodeEscape = utf8decode(StrConv(Join(a(), ""), vbFromUnicode))
 
 End Function
 Sub ClearState1()
@@ -4353,7 +4353,7 @@ If AscW(W$) = 46 Then
                End If
 End If
 FastSymbol1 b$, "["
-
+st11234:
 If Not IsExp(bstack, b$, p, , flatobject:=True, nostring:=True) Then
     MissNumExpr
     GoTo err000
@@ -4362,6 +4362,7 @@ If Not FastSymbol(b$, "]") Then
     SyntaxError
     GoTo err000
 End If
+st112233:
 
 If Left$(b$, 1) = "[" Then
     i = Abs(CLng(p))
@@ -4371,6 +4372,68 @@ If Left$(b$, 1) = "[" Then
         If Not FastSymbol(b$, "]") Then
             SyntaxError
         Else
+            If Left$(b$, 1) = "[" Then
+                If GetVar(bstack, W$, v, True) Then
+                If Not Typename(var(v)) = "RefArray" Then
+                        WrongType
+                      GoTo err000
+                End If
+                Set ar = var(v)
+st12123434:
+                If Not ar.MarkTwoDimension Then
+st9994:
+                    If Typename$(ar.Value(0, i)) = "RefArray" Then
+                        Set ar = ar.Value(0, i)
+st3535435:
+                        If ar.MarkTwoDimension Then
+                            'FastSymbol1 b$, "["
+                            Mid$(b$, 1, 1) = " "
+                            i = p
+st38383:
+                            If IsExp(bstack, b$, p, , flatobject:=True, nostring:=True) Then
+                                If Not FastSymbol(b$, "]") Then
+                                    SyntaxError
+                                Else
+                                    GoTo entry100101
+                                End If
+                            End If
+                        ElseIf Typename$(ar(0, p)) = "RefArray" Then
+                            
+                            Set ar = ar(0, p)
+st29939:
+                            Mid$(b$, 1, 1) = " "
+                            If IsExp(bstack, b$, p, , flatobject:=True, nostring:=True) Then
+                                If Not FastSymbol(b$, "]") Then
+                                    SyntaxError
+                                Else
+                                   If ar.MarkTwoDimension Then
+                                    GoTo st3535435
+                                   Else
+                                   If Left$(b$, 1) = "[" Then
+                                    i = p
+                                    GoTo st9994
+                                    Else
+                                        i = 0
+                                        GoTo entry100101
+                                    End If
+                                   End If
+                                End If
+                            End If
+                        Else
+                        i = 0
+                        GoTo st29939
+                        End If
+                    Else
+                        i = 0
+                        GoTo entry100101
+                    End If
+                End If
+                    WrongType
+                    GoTo err000
+                Else
+                    UnknownVariable W$
+                End If
+            End If
             GoTo entry100101
         End If
     Else
@@ -4382,11 +4445,11 @@ Else
 
     
 entry100101:
+        
         Select Case Left$(b$, 1)
         Case "="
             Mid(b$, 1, 1) = " "
             If Left$(b$, 2) = " >" Then
-            
                 GoTo forwidearrow
             End If
             ww = 8
@@ -4500,7 +4563,9 @@ entry00022:
             GoTo cont00100203
         Else
             If IsExp(bstack, b$, sp) Then
+            
 entry00101:
+                If Not ar Is Nothing Then GoTo entry00122
                 If varhash.Find2(here$ + "." + myUcase(W$), v, UseType) Then
 entry00121:
                     If Typename(var(v)) = "RefArray" Then
@@ -4514,7 +4579,16 @@ entry00122:
                             If ww = 8 Then
                             
                              ar(p) = CVar(bstack.lastobj)
-                            Set bstack.lastobj = Nothing
+                                Set bstack.lastobj = Nothing
+                                        While FastSymbol(b$, ",")
+                                        If Not IsExp(bstack, b$, sp) Then
+                                            WrongType
+                                            GoTo err000
+                                        End If
+                                        p = p + 1
+                                        ar(p) = CVar(bstack.lastobj)
+                                        Set bstack.lastobj = Nothing
+                                        Wend
                             GoTo NewCheck
                             End If
                         End If
@@ -4529,10 +4603,9 @@ entry00123:
                             p = Abs(Int(p))
                             
                             If ar.IsInnerRefArray(i, ar) Then
-                            
                                 i = 0
                                 ok = False
-                            GoTo entry00122
+                                GoTo entry00122
                             End If
                             If (ar.vtType(0) = vbObject) And ok Then  ' Or ar.vtType(0) = vbVariant
                                 If ar.count > 1 Then
@@ -4577,6 +4650,8 @@ count0:
                                 ar(CVar(i), p) = True
                                 Case 8, 4, 18, 14
                                 ar(CVar(i), p) = sp
+                                GoTo st9993993
+                                
                                 Case 5
                                     If myVarType(sp, vbString) Then
                                         ar(CVar(i), p) = sp
@@ -4610,6 +4685,17 @@ takeitnow:
                                         End If
                                     ' check this
                                         ar(CVar(i), p) = CVar(bstack.lastobj)
+                                        Set bstack.lastobj = Nothing
+                                        While FastSymbol(b$, ",")
+                                        If Not IsExp(bstack, b$, sp) Then
+                                            WrongType
+                                            GoTo err000
+                                        End If
+                                        p = p + 1
+                                        ar(CVar(i), p) = CVar(bstack.lastobj)
+                                        Set bstack.lastobj = Nothing
+                                        Wend
+                                        
                                     End If
                                 Else
                                     Select Case ww
@@ -4621,9 +4707,39 @@ takeitnow:
                                     Case 5: ar(CVar(i), p) = ar(CVar(i), p) - sp
                                     Case 6: ar(CVar(i), p) = ar(CVar(i), p) * sp
                                     Case 7: ar(CVar(i), p) = ar(CVar(i), p) / sp
-                                    Case 8: ar(CVar(i), p) = sp
+                                    Case 8
+                                    
+                                    ar(CVar(i), p) = sp
+st9993993:
+                                    
+                                    While FastSymbol(b$, ",")
+                                    If Not IsExp(bstack, b$, sp, , flatobject:=True) Then
+                                        If IsStrExp(bstack, b$, sw$, False) Then
+                                            sp = sw$
+                                        Else
+                                            SyntaxError
+                                            GoTo err000
+                                        End If
+                                    End If
+                                    p = p + 1
+                                    ar(CVar(i), p) = sp
+                                    Wend
+                                    
                                     Case 14: ar(CVar(i), p) = ar(CVar(i), p) + sp
-                                    Case 18: ar(CVar(i), p) = sp
+                                    Case 18
+                                    ar(CVar(i), p) = sp
+                                    While FastSymbol(b$, ",")
+                                    If Not IsExp(bstack, b$, sp, , flatobject:=True) Then
+                                        If IsStrExp(bstack, b$, sw$, False) Then
+                                            sp = sw$
+                                        Else
+                                            SyntaxError
+                                            GoTo err000
+                                        End If
+                                    End If
+                                    p = p + 1
+                                    ar(CVar(i), p) = sp
+                                    Wend
                                     End Select
                                 End If
                             End If
@@ -4867,7 +4983,7 @@ Const mHdlr = "mHandler"
 Const mGroup = "Group"
 Const myArray = "mArray"
 MyRead = True
-Dim p As Variant, X As Double
+Dim p As Variant, x As Double
 Dim pppp As mArray
 ohere$ = here$
 Dim Col As Long
@@ -5399,8 +5515,8 @@ Set ps = New mStiva
 Do While ss$ <> ""
 If ISSTRINGA(ss$, pa$) Then
 ps.DataStr pa$
-ElseIf IsNumberD(ss$, X) Then
-ps.DataVal X
+ElseIf IsNumberD(ss$, x) Then
+ps.DataVal x
 Else
 Exit Do
 End If
@@ -6824,12 +6940,12 @@ conthereEnum:
                 Else
                     ss$ = s$
                     it = True
-                  If MyIsNumeric(p) Then X = p: it = False
+                  If MyIsNumeric(p) Then x = p: it = False
                    
                   If IsEnumAs(bstack, ss$, p, ok, rest$) Then
                     If Not it Then
                         Set usehandler = p
-                        p = X
+                        p = x
                         Set usehandler = usehandler.objref.SearchValue(p, ok)
                         Set myobject = usehandler
                         If ok Then

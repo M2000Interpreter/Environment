@@ -25,19 +25,19 @@ Private ihavearray As Boolean, isok As Boolean
 Private Declare Function SafeArrayRedim Lib "oleaut32" (ByVal saPtr As Long, ByVal saBound As Long) As Long
 Private OneDimension As Boolean
 Public flat As Boolean
-Friend Sub CreateRef(ByVal A As Long)
+Friend Sub CreateRef(ByVal a As Long)
     If flat Then
-        VarByRef A, p
+        VarByRef a, p
     Else
-        VarByRef A, p(0)
+        VarByRef a, p(0)
     End If
 End Sub
-Private Sub VarByRef(ByVal A As Long, ByRef b As Variant)
+Private Sub VarByRef(ByVal a As Long, ByRef b As Variant)
 Dim t(0 To 3) As Long
    CopyMemory t(0), ByVal VarPtr(b), 16
    t(0) = t(0) Or &H4000
    t(2) = VarPtr(b) + 8
-   CopyMemory ByVal A, t(0), 16
+   CopyMemory ByVal a, t(0), 16
 End Sub
 Function NewRef(Optional ByRef RHS) As refArray
 Dim z As New refArray
@@ -549,13 +549,18 @@ isok = True
 If where > 0 Then OneDimension = False
 End Sub
 Property Get ItemType(item) As Long
+On Error GoTo alfa
     If ihavearray And isok Then
         If Not IsMissing(item) Then
+        
             ItemType = MemInt(VarPtr(p(item)))
         Else
             ItemType = VarType(p)
         End If
     End If
+    Exit Property
+alfa:
+    ItemType = -1
 End Property
 Public Function IsInnerRefArray(item, R As refArray) As Boolean
  If ihavearray And isok Then
@@ -783,7 +788,13 @@ If ihavearray Then
         Else
             Dim pp As Long
             If Elements(p) >= where Then
+            On Error Resume Next
             pp = Elements(p(where))
+            If Err Then
+
+            vtType = -1
+            Exit Property
+            End If
             If pp > 0 Then
                 vtType = MemInt(VarPtr(p(where))) - vbArray
             Else
@@ -832,15 +843,15 @@ End Sub
 Public Function myVarType(z, j As Integer) As Boolean
     myVarType = MemInt(VarPtr(z)) = j
 End Function
-Sub SwapVariant(ByRef A As Variant, ByRef b As Variant)
+Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
    Static t(0 To 3) As Long  ' 4 Longs * 4 bytes each = 16 bytes
-   MemCopy VarPtr(t(0)), ByVal VarPtr(A), 16
-   MemCopy VarPtr(A), VarPtr(b), 16
+   MemCopy VarPtr(t(0)), ByVal VarPtr(a), 16
+   MemCopy VarPtr(a), VarPtr(b), 16
    MemCopy VarPtr(b), VarPtr(t(0)), 16
 End Sub
 Public Function cInt64(p)
     Static maxlonglong, limitlonglong, OneLongLong, OneBigLongLong
-    Dim A, i As Integer
+    Dim a, i As Integer
     If MemInt(VarPtr(maxlonglong)) = 0 Then
         maxlonglong = CDec("18446744073709551616")
         limitlonglong = CDec("9223372036854775808")
@@ -852,13 +863,13 @@ Public Function cInt64(p)
     i = MemInt(VarPtr(p))
     Select Case i
     Case vbDecimal
-        A = Fix(p)
-        A = A - Int(A / maxlonglong) * maxlonglong
-        If A < -limitlonglong - 1 Then
-            While A <= -limitlonglong - 1: A = A + maxlonglong: Wend
+        a = Fix(p)
+        a = a - Int(a / maxlonglong) * maxlonglong
+        If a < -limitlonglong - 1 Then
+            While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
         End If
-        While A >= limitlonglong: A = A - maxlonglong: Wend
-        cInt64 = -OneLongLong And A
+        While a >= limitlonglong: a = a - maxlonglong: Wend
+        cInt64 = -OneLongLong And a
     Case 20
         cInt64 = p
     Case vbLong, vbInteger
@@ -866,17 +877,17 @@ Public Function cInt64(p)
     Case Else
         On Error GoTo er1
         
-        A = Fix(CDec(p))
-        If A > limitlonglong Or A <= -limitlonglong Then
-        A = A - Int(A / (maxlonglong)) * (maxlonglong)
-        If A <= -limitlonglong - 1 Then
-            While A <= -limitlonglong - 1: A = A + maxlonglong: Wend
+        a = Fix(CDec(p))
+        If a > limitlonglong Or a <= -limitlonglong Then
+        a = a - Int(a / (maxlonglong)) * (maxlonglong)
+        If a <= -limitlonglong - 1 Then
+            While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
         End If
-        While A >= limitlonglong: A = A - maxlonglong: Wend
+        While a >= limitlonglong: a = a - maxlonglong: Wend
         End If
-        cInt64 = -OneLongLong And A
+        cInt64 = -OneLongLong And a
         If i = vbString Then
-            If Left$(p, 1) = "&" And A < 0 Then
+            If Left$(p, 1) = "&" And a < 0 Then
             Select Case Len(p)
             Case 10
                 If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) > 0 Then
