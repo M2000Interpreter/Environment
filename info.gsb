@@ -43515,6 +43515,7 @@ MODULE LONGP {Module LongPrimes {
                   if empty then exit for
             next i
       end While
+      Flush
       print
 }
 LongPrimes
@@ -43547,5 +43548,106 @@ MODULE SONG {MODULE LikeBasic {
 }
 LikeBasic ""
 LikeBasic
+}
+MODULE MRANGE {// From Revision 43, Version 12
+// Fix passing enum constant with minus sign converted to number (so Range has ... as long)
+// Previous revisions lost sign at conversion of an enum
+Module MultipleLoop {
+	long sum=0, x=+5,y=-5, z=-2, j
+	double prod=1
+	Enum ABC {
+		one=1&, three=3&, seven=7&
+	}
+	Range=lambda (a as long, b as long, c as long=1) ->{
+		=lambda a, b, c (&f)-> {
+			if compare(a,b)=sgn(c) then =false else =true: f=a: a+=c
+		}
+	}
+	MultipleRange=Lambda -> {
+		a=array([])  '  convert stack items in current stack [] to an array of items
+		=lambda  a, k=0 (&f) ->{
+			do : if k<len(a) Else exit
+			if a#eval(k, &f) then =true: exit
+			k++ : always
+		}
+	}
+	flush
+	data Range(-three, 3**3, three), Range(-seven, +seven, x), Range(555, 550-y), Range(22, -28, -three)
+	data Range(1927, 1939), Range(x,y,z), Range(11**x, 11**x+one)
+	Exec=MultipleRange(![])
+	j=0
+	while Exec(&j)
+		sum+=abs(j)
+		if abs(prod) < 2^27 And j <> 0 then prod*=j
+	End While
+	Print "sum=";sum
+	Print "prod=";prod
+}
+MultipleLoop
+// using Const
+Module MultipleLoop {
+	long sum=0, x=+5,y=-5, z=-2, j
+	double prod=1
+	Const one=1&, three=3&, seven=7&
+	Range=lambda (a, b, c=1) ->{
+		=lambda a, b, c (&f)-> {
+			if compare(a,b)=sgn(c) then =false else =true: f=a: a+=c
+		}
+	}
+	MultipleRange=Lambda -> {
+		a=array([])  '  convert stack items in current stack [] to an array of items
+		=lambda  a, k=0 (&f) ->{
+			do : if k<len(a) Else exit
+			if a#eval(k, &f) then =true: exit
+			k++ : always
+		}
+	}
+	flush
+	data Range(-three, 3**3, three), Range(-seven, +seven, x), Range(555, 550-y), Range(22, -28, -three)
+	data Range(1927, 1939), Range(x,y,z), Range(11**x, 11**x+one)
+	Exec=MultipleRange(![])
+	j=0
+	while Exec(&j)
+		sum+=abs(j)
+		if abs(prod) < 2^27 And j <> 0 then prod*=j
+	End While
+	Print "sum=";sum
+	Print "prod=";prod
+}
+MultipleLoop
+}
+MODULE REFARRAY2 {// From Vrsion 12 Revion 43
+// Read and Let works for RefArray type of Array
+
+function multidim_integer(v) {
+	select case stack.size
+	case 0
+		error "Missing Parameters"	
+	case 1
+		integer a[number]=v:=a
+	case 2
+		integer a[number][number]=v:=a
+	else case ' after each case One line or One Block
+	{
+		read k: bb=[]: object b[0]
+		for j=0 to k: b[j]=lambda(v, !stack(bb)): next
+		=b
+	}
+	end select
+}
+k=multidim_integer(500, 2, 4, 2, 3)
+Print "K has ";3*5*3*4; " items with starting value:";500  ' 180 items
+k[0][1][2][0]=1,2,3,4
+Print k[0][0][0][0]-99=k[0][1][2][0]+400 ' true
+flush
+data 100,200,300,400
+for i=0 to 3
+	read k[0][1][1][i]
+	k[0][1][1][i]++
+	k[2][1][1][i]+=1000
+	Let k[1][1][2][i] = k[0][1][1][i] - 50
+	print k[0][1][1][i], k[0][1][2][i], k[1][1][2][i], k[2][1][1][i]
+next
+
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

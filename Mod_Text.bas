@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 42
+Global Const Revision = 43
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -15387,7 +15387,6 @@ contStrArr:
             Else
             SyntaxError
             Exit Function
-            Stop  ' LOOK FOR STOP HERE
             End If
             p = 0
             pp = 0
@@ -17870,7 +17869,6 @@ startwithgroup:
                                 Else
                                         Execute = 0
                                         Exit Function
-                                    ' Stop  ' LOOK THE STOP HERE
                                 End If
                             End If
                         Else
@@ -30555,8 +30553,6 @@ unwindstack:
                     If p > 0 Then
                         If S3 > 0 Then
                             bb$ = Mid$(sbf(S3).sb, Len(sbf(S3).sb) - p - sbi + 1, p)
-                       ' ElseIf S3 = 0 Then
-                       '     Stop
                         Else
                             bb$ = Mid$(var(-S3).Code$, Len(var(-S3).Code$) - p - sbi + 1, p)
                         End If
@@ -31405,8 +31401,6 @@ ALFA12:
                         End If
                     ElseIf Not bstack.IsDecimal Then
                         If RetStackSize < bstack.RetStackTotal Then PopStagePartContinue bstack, bstack.RetStackTotal - RetStackSize
-                    Else
-''                        Stop
                     End If
                     i = 1
 from123:
@@ -34056,12 +34050,35 @@ a192929:
 End Function
 
 Function MyLet(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim what$, ss$, i As Long, x1 As Long, flag As Boolean
+Dim what$, ss$, s$, i As Long, x1 As Long, flag As Boolean
 MyLet = True
 Do
     x1 = Abs(IsLabelBig(bstack, rest$, what$))
     If x1 <> 0 Then
-        If x1 > 4 Then
+        If x1 = 8 Then
+        ss$ = BlockParamSq(rest$)
+        i = Len(ss$)
+        If i = 0 Then SyntaxError: MyLet = False: Exit Function
+        Mid$(rest$, 1, i) = space(i):
+        i = i + 1
+        If Mid$(rest$, i, 2) = "][" Then
+        While Mid$(rest$, i, 2) = "]["
+            Mid$(rest$, i, 2) = "  "
+            
+            s$ = BlockParamSq(rest$)
+            
+            If Len(s$) - i < 2 Then SyntaxError: MyLet = False: Exit Function
+            
+            Mid$(rest$, 1, Len(s$)) = space(Len(s$))
+            ss$ = ss$ + "][" + Trim(s$)
+            i = 1 + Len(s$)
+        Wend
+       ' ss$ = ss$ + "][" + s$
+        End If
+        If Mid$(rest$, i, 1) <> "]" Then SyntaxError: MyLet = False: Exit Function
+        Mid$(rest$, i, 1) = " "
+        s$ = what$ + "[" + ss$ + "]"
+        ElseIf x1 > 4 Then
             ss$ = BlockParam(rest$)
             what$ = what$ + ss$ + ")"
             Mid$(rest$, 1, Len(ss$) + 1) = space(Len(ss$) + 1)
@@ -34090,7 +34107,11 @@ Do
                     Exit Function
                 End If
                 If MyLet Then
-                    MyLet = MyRead(6, bstack, (what$), 1, what$, x1)
+                    If x1 = 8 Then
+                        MyLet = MyRead(6, bstack, s$, 1, s$, x1)
+                    Else
+                        MyLet = MyRead(6, bstack, (what$), 1, what$, x1)
+                    End If
                     rest$ = Mid$(rest$, i)
                 Else
                     MyEr "Nothing to assign", "Τίποτα για να δώσω"

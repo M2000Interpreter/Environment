@@ -1124,6 +1124,52 @@ End Sub
 Public Sub ExpRefArray(i As Long)
 MyEr "expected RefArray at index " & i, "ПЕЯъЛЕМА RefArray СТОМ ДЕъЙТГ " & i
 End Sub
+Private Sub PartExecVar(ss$, v, p, sp)
+                Select Case ss$
+                Case "DIV", "диа"
+                    If VarType(var(v)) = 20 Then
+                    If Not VarType(p) = 20 Then p = cInt64(p)
+                    var(v) = var(v) \ p
+                    Else
+                    var(v) = Fix(var(v) / p)
+                    End If
+                Case "DIV#", "диа#"
+                If VarType(var(v)) = 20 Then
+                If Not VarType(p) = 20 Then p = cInt64(p)
+                If p < 0 Then
+                        var(v) = ((var(v) - Abs(var(v) - Abs(p) * (var(v) \ Abs(p)))) \ p)
+                    Else
+                        var(v) = var(v) \ p
+                    End If
+                Else
+                    If p < 0 Then
+                        var(v) = Int((var(v) - Abs(var(v) - Abs(p) * Int(var(v) / Abs(p)))) / p)
+                    Else
+                        var(v) = Int(var(v) / p)
+                    End If
+                End If
+                Case "MOD", "упок", "упокоипо"
+                    If VarType(var(v)) = 20 Then
+                    If Not VarType(p) = 20 Then p = cInt64(p)
+                        sp = var(v) - (var(v) \ p) * p
+                    Else
+                        sp = var(v) - Fix(var(v) / p) * p
+                    End If
+                    If Abs(sp) >= Abs(p) Then sp = sp - sp
+                    var(v) = sp
+                 Case "MOD#", "упок#", "упокоипо#"
+                    If VarType(var(v)) = 20 Then
+                    If Not VarType(p) = 20 Then p = cInt64(p)
+                        sp = Abs(var(v) - Abs(p) * (var(v) \ Abs(p)))
+                    Else
+                        sp = Abs(var(v) - Abs(p) * Int(var(v) / Abs(p)))
+                    End If
+                    If Abs(sp) >= Abs(p) Then sp = sp - sp
+                    var(v) = sp
+                Case Else
+                    WrongOperator
+                End Select
+End Sub
 Public Function ExecuteVar(Exec1 As Long, ByVal jumpto As Long, bstack As basetask, W$, b$, v As Long, Lang As Long, VarStat As Boolean, NewStat As Boolean, nchr As Integer, ss$, sss As Long, temphere$) As Long
 Dim i As Long, p As Variant, myobject As Object, ok As Boolean, sw$, sp As Variant, UseType As Boolean
 Dim pppp As mArray, lasttype As Integer, pppp1 As mArray, isglobal As Boolean, usehandler As mHandler, usehandler1 As mHandler, idx As mIndexes, myProp As PropReference
@@ -1138,7 +1184,7 @@ Const b123 = vbCr + "'\/"
 Const b1234 = vbCr + "'\/:"
 Const b12345 = vbCr + "'\/:}"
 Const RemChar = "'\/"
-On jumpto GoTo Case1, Case2, Case3, Case4, case5, Case6, Case7, Case8
+On jumpto GoTo Case1, Case2, Case3, Case4, case5, Case6, Case7, Case8, Case8new
 Exit Function
 Case1:
     Select Case CheckThis(bstack, W$, b$, v, Lang)
@@ -1482,7 +1528,6 @@ checkobject:
                     If UseType And Not newid Then
                     If ww = 36 Then
                         If IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then
-                          '  Stop
                             If MemInt(VarPtr(p)) = 36 Then
                             If Typename(p) = Typename(var(v)) Then
                                 SwapVariant var(v), p
@@ -2149,50 +2194,7 @@ checksyntax:
                                 DevZero
                                 GoTo err000
                             End If
-                            Select Case ss$
-                            Case "DIV", "диа"
-                                If VarType(var(v)) = 20 Then
-                                If Not VarType(p) = 20 Then p = cInt64(p)
-                                var(v) = var(v) \ p
-                                Else
-                                var(v) = Fix(var(v) / p)
-                                End If
-                            Case "DIV#", "диа#"
-                            If VarType(var(v)) = 20 Then
-                            If Not VarType(p) = 20 Then p = cInt64(p)
-                            If p < 0 Then
-                                    var(v) = ((var(v) - Abs(var(v) - Abs(p) * (var(v) \ Abs(p)))) \ p)
-                                Else
-                                    var(v) = var(v) \ p
-                                End If
-                            Else
-                                If p < 0 Then
-                                    var(v) = Int((var(v) - Abs(var(v) - Abs(p) * Int(var(v) / Abs(p)))) / p)
-                                Else
-                                    var(v) = Int(var(v) / p)
-                                End If
-                            End If
-                            Case "MOD", "упок", "упокоипо"
-                                If VarType(var(v)) = 20 Then
-                                If Not VarType(p) = 20 Then p = cInt64(p)
-                                    sp = var(v) - (var(v) \ p) * p
-                                Else
-                                    sp = var(v) - Fix(var(v) / p) * p
-                                End If
-                                If Abs(sp) >= Abs(p) Then sp = sp - sp
-                                var(v) = sp
-                             Case "MOD#", "упок#", "упокоипо#"
-                                If VarType(var(v)) = 20 Then
-                                If Not VarType(p) = 20 Then p = cInt64(p)
-                                    sp = Abs(var(v) - Abs(p) * (var(v) \ Abs(p)))
-                                Else
-                                    sp = Abs(var(v) - Abs(p) * Int(var(v) / Abs(p)))
-                                End If
-                                If Abs(sp) >= Abs(p) Then sp = sp - sp
-                                var(v) = sp
-                            Case Else
-                                WrongOperator
-                            End Select
+                            PartExecVar ss$, v, p, sp
                         Else
                             GoTo noexpression
                         End If
@@ -2272,11 +2274,8 @@ checksyntax:
                 End If
                 End If
                 ElseIf var(v) Is Nothing Then
-               ' Stop
                 If ss$ = "->" Then
                  GoTo assignpointer
-                Else
-                    'Stop
                 End If
                 ElseIf TypeOf var(v) Is Group Then
                 If ss$ = "->" Then
@@ -4353,6 +4352,7 @@ If AscW(W$) = 46 Then
                End If
 End If
 FastSymbol1 b$, "["
+Case8new:
 st11234:
 If Not IsExp(bstack, b$, p, , flatobject:=True, nostring:=True) Then
     MissNumExpr
@@ -4445,7 +4445,10 @@ Else
 
     
 entry100101:
-        
+       If jumpto = 9 Then
+            ww = -100
+            GoTo entry00101
+       Else
         Select Case Left$(b$, 1)
         Case "="
             Mid(b$, 1, 1) = " "
@@ -4487,6 +4490,7 @@ entry100101:
             End Select
             Mid$(b$, 1, 2) = "  "
         End Select
+    End If
     If ww > 3 Then
         If False Then
 forwidearrow:
@@ -4664,8 +4668,14 @@ count0:
                                 If Not bstack.lastobj Is Nothing Then
 takeitnow:
                                     If ww <> 8 Then
+                                        If ww = -100 Then
+                                        If bstack.IsObjectRef(myobject) Then
+                                            ar(CVar(i), p) = CVar(myobject)
+                                            GoTo NewCheck2
+                                        End If
+                                        Else
                                         WrongOperator
-                                        
+                                        End If
                                     Else
                                         If bstack.lastobj Is Nothing Then
                                         If sp <> 0 Then
@@ -4699,7 +4709,16 @@ takeitnow:
                                     End If
                                 Else
                                     Select Case ww
-                                    Case 0: ar(CVar(i), p) = ar(CVar(i), p) = 0
+                                    Case -100
+                                    If bstack.IsNumber(sp) Then
+                                    ar(CVar(i), p) = sp
+                                    ElseIf bstack.IsString(sw$) Then
+                                    ar(CVar(i), p) = CVar(sw$)
+                                    ElseIf bstack.IsObjectRef(myobject) Then
+                                    ar(CVar(i), p) = CVar(myobject)
+                                    End If
+                                    Case 0:
+                                    ar(CVar(i), p) = ar(CVar(i), p) = 0
                                     Case 1: ar(CVar(i), p) = ar(CVar(i), p) + 1
                                     Case 2: ar(CVar(i), p) = ar(CVar(i), p) - 1
                                     Case 3: ar(CVar(i), p) = -ar(CVar(i), p)
@@ -5427,6 +5446,8 @@ Case 5, 7
         MyRead = True
     End If
 '*****************************************************
+    Case 8
+    GoTo jump8
     End Select
     p = 0#
     Exit Function
@@ -6110,9 +6131,6 @@ Else
 ' here not for LET any more
 read2:
 x1 = Abs(IsLabel(bstack, rest$, what$))
-'If x1 <> 0 Then
-'    If what$ <> myUcase(what$) Then Stop
-'End If
 fromEnumDeref:
 
 Select Case x1
@@ -6348,6 +6366,24 @@ existAs07:
                 If myobject.IamApointer Then
                 Set var(i) = myobject
                 GoTo cont10101
+                End If
+                Else
+                If TypeOf myobject Is mHandler Then
+                    Set usehandler = myobject
+                    If usehandler.t1 = 4 Then
+                        p = usehandler.index_cursor
+                        If MemInt(VarPtr(p)) <> vbString Then
+                            p = p * usehandler.sign
+                            bs.soros.PushVal p
+                        Else
+                            bs.soros.PushStrVariant p
+                        End If
+                        Set usehandler1 = Nothing
+                        jumpAs = False
+                        GoTo fromEnumDeref
+                        
+                    End If
+                
                 End If
                 End If
                 End If
@@ -6741,7 +6777,7 @@ existAs15:
                                         bs.soros.PushStrVariant usehandler1.index_cursor
                                         
                                     Else
-                                        bs.soros.PushVal usehandler1.index_cursor
+                                        bs.soros.PushVal usehandler1.index_cursor * usehandler1.sign
                                     End If
                                     Set usehandler1 = Nothing
                                     jumpAs = True
@@ -7958,6 +7994,11 @@ Case 6
         End If
         MyRead = True
     End If
+Case 8
+jump8:
+it = -1
+x1 = ExecuteVar(1, 9, bstack, what$, rest$, it, 0&, False, False, 91, "", 0, "")
+MyRead = True
 
 End Select
 End If

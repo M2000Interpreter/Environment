@@ -1,61 +1,26 @@
 M2000 Interpreter and Environment
 
 Version 12 Revision 42 active-X
-1. #SORT() FOR BYTE ARRAYS NOW WORKS.
-Dim a(3) as byte
-a(0)=255,12,18
-Print a()#sort()
+1. A Bug removed. Passing Enum value with minus sing as parameter to a numeric variable now has the proper sign.
+enum aa {one=1, two=2}
+def foo(x as long)=x
+print foo(-one)=-1  ' previous was 1
+2. Using READ and LET for arrays with square brackets
+Single a[4]
+// the Let evaluate first the expression right from assign symbol =
+// then evaluate the index(es) of the array 
+Let a[4]=1.343 ' not supported before
+// without Let evaluation of index(es) of array and then expression after =
+a[5]=1.343  ' had no problem
+Print a[4], a[5]
+data 1.4545
+k=random(0, 4)
+// Read not supported before for array items of this type of array
+read a[k]
+print k, a[k]
+// still the by reference pass of an array item of this type not supported
 
-2. date$(a, language_ID) works as expected
-LOCALE 1033
-date a="2024-12-25"
-? date$(a, 1032)="12/25/2024"
-? date$(a)<>"25/12/2024" 
-LOCALE 1032
-date b="2024-12-23"
-? date$(b, 1033)="12/23/2024"
-? date$(b)<>"23/12/2024" 
-Long d=a-b
-? d=2
 
-3. RefArray type of arrays (extension)
-- using [] not ()
-- each "dimension" may have different length
-- adjust size by using index: byte b[0]: b[7]=255:Print Len(b)=8
-- Was 1 to 2 dimension, now can be more, making object arrays to hold 1 or 2 dimension arrays.
-
-3.1 Multi assign values
-variant z[10]
-z[0]="George", 12122, 12&, "hello", 0.0001212312312312312@, 0.0001212312312312312
-for i=0 to 10:print z[i]: next
-
-3.2 Making 4 dimension array (using a function to pack arrays inside objects)
-// Integer is 16 bit (2 bytes), Object is 4 bytes (32 bit pointer to object).
-function multidim_integer() {
-	if stack.size=1 then
-		integer a[number]
-		=a 
-	else.if stack.size=2 then
-		integer a[number][number]
-		=a
-	else.if stack.size>2 then
-		read k
-		bb=[]
-		object b[0]
-		for j=0 to k
-			b[j]=lambda(!stack(bb))
-		next
-		=b
-	end if
-}
-// 0 to 2, 0 to 4, 0 to 2, 0 to 3
-// 3*5*3*4=180 items
-k=multidim_integer(2, 4, 2, 3)
-k[1][4][2][3]=100
-k[1][4][2][3]++
-Print k[1][4][2][3]=101
-k[1][4][1][0]=1, 2, 3, 4
-for i=0 to 3: Print k[1][4][1][i],:Next:Print
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
