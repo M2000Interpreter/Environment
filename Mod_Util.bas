@@ -1205,12 +1205,19 @@ End With
 End Sub
 
 Sub BoxBigNew(dqq As Object, mb As basket, x1&, y1&, c As Long)
+Dim mm As MetaDc
 With mb
+
  If TypeOf dqq Is MetaDc Then
- dqq.Line2 .curpos * .Xt - DXP, .currow * .Yt - DYP, x1& * .Xt - DXP + .Xt, y1& * .Yt + .Yt - DYP, mycolor(c), , True
+ Set mm = dqq
+ mm.Line2 .curpos * .Xt - DXP, .currow * .Yt - DYP, x1& * .Xt - DXP + .Xt, y1& * .Yt + .Yt - DYP, mycolor(c), , True
  
  Else
+Dim oldf As Integer
+oldf = dqq.FillStyle
+dqq.FillStyle = vbFSTransparent
 dqq.Line (.curpos * .Xt - DXP, .currow * .Yt - DYP)-(x1& * .Xt - DXP + .Xt, y1& * .Yt + .Yt - DYP), mycolor(c), B
+dqq.FillStyle = oldf
 End If
 End With
 
@@ -21437,7 +21444,7 @@ BadGraphic
  Exit Function
 End If
 End If
-Scr.FillStyle = vbSolid
+Scr.FillStyle = vbFSTransparent
 End With
 MyRefresh bstack
 'MyDoEvents1 Scr
@@ -24084,7 +24091,7 @@ contthere2:
                 Else
                     If (par Or Region) Then players(prive).NoGDI = False: GDILines = OldGDILines
                 End If
-                bstack.Owner.FillStyle = vbSolid
+                bstack.Owner.FillStyle = vbFSSolid
                 If Region Then            ' path { block of commands };
                     
                     If f Then
@@ -24099,7 +24106,7 @@ contthere2:
                     StrokePath bstack.Owner.Hdc               ' stroke path
                     If par Then bstack.Owner.DrawMode = 13
                 End If
-                 bstack.Owner.FillStyle = vbFSTransparent
+                bstack.Owner.FillStyle = vbFSTransparent
                 If it = 2 Then
                     If ss$ = "" Then
                     If once Then rest$ = ": Break": If trace Then WaitShow = 2: TestShowSub = vbNullString
@@ -30427,7 +30434,7 @@ Else
 End If
 
 If par Then
-    Scr.FillStyle = vbSolid
+    Scr.FillStyle = vbFSSolid
     Scr.FillColor = mycolor(x)
     If sX = sY Then sY = PI2
     If sX = sY Or Abs(sX - sY) + 0.0001 > PI2 Then
@@ -30508,9 +30515,9 @@ If par Then
                 End If
             End If
         End If
-        Scr.FillStyle = 1
+        Scr.FillStyle = vbFSTransparent
     Else
-        Scr.FillStyle = 1
+        Scr.FillStyle = vbFSTransparent
         If mGDILines Then
             If Not par Then M2000Pen trans, Col Else M2000Pen 255, Col
             If .pathgdi > 0 Then
@@ -30657,7 +30664,7 @@ par = False
     Else
 If .NoGDI And .IamEmf Then
     Set mm = Scr
-    mm.FillStyle = vbSolid
+    mm.FillStyle = vbFSSolid
     mm.FillColor = mycolor(Col)
     p = mm.ForeColor
     mm.ForeColor = mycolor(Col)
@@ -30687,12 +30694,13 @@ jump:
     y1 = y1 + .YGRAPH
 '    mm.Line2 .XGRAPH, .YGRAPH, x1, y1, mycolor(Col), True
     
-    mm.FillStyle = vbSolid
+    mm.FillStyle = vbFSSolid
     mm.FillColor = mycolor(Col)
     p = mm.ForeColor
     mm.ForeColor = mycolor(Col)
     
     DrawFrameForEmf Scr, .XGRAPH, .YGRAPH, x1, y1
+    mm.FillStyle = vbFSTransparent
     mm.ForeColor = p
   .XGRAPH = x1
     .YGRAPH = y1
@@ -31201,7 +31209,7 @@ Col = mycolor(p)
 End If
 If Not FastSymbol(rest$, ",") Then SyntaxError: ProcPoly = False: Exit Function
 If IsLabelSymbolNew(rest$, "цымиа", "ANGLE", Lang) Then par = True
-Scr.FillStyle = vbSolid
+Scr.FillStyle = vbFSSolid
 Scr.FillColor = Col
 f = 32
 ReDim PLG(f)
@@ -31286,7 +31294,7 @@ If Polygon(Scr.Hdc, PLG(0), x1) = 0 Then
     ProcPoly = True: BadGraphic: Set Scr = Nothing: Exit Function
 End If
 End If
-Scr.FillStyle = vbSolid
+Scr.FillStyle = vbFSTransparent
 End With
 MyRefresh bstack
 'MyDoEvents1 Scr
@@ -31308,8 +31316,6 @@ PLG(2).x = x1
 PLG(2).y = y1
 PLG(3).x = x
 PLG(3).y = y1
-'Scr.FillStyle = vbSolid
-'Scr.FillColor = 0
 Polygon Scr.Hdc, PLG(0), 4
 End Sub
 

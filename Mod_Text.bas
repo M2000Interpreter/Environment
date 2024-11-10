@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 43
+Global Const Revision = 44
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7365,10 +7365,15 @@ ElseIf Not nostring Then
         ElseIf Left$(ut$, 2) = "-." Then
             ut$ = "-0" + Mid$(ut$, 2)
         End If
+        If OverideDec Then ut$ = Replace$(ut$, ".", NowDec$)
         po = vbNullString
         SwapString2Variant ut$, po
         If IsStrExp(bstack, aa$, ut$) Then
-            po = CVar(LTrim$(str$(po)) + ut$)
+            ut$ = LTrim$(po) + ut$
+
+            SwapString2Variant ut$, po
+            
+            'po = CVar(LTrim$(po) + ut$)
         Else
             MissNumExpr
             IsExpA = False
@@ -14779,6 +14784,9 @@ comehere:
                             ElseIf Left$(R$, 2) = "-." Then
                                 R$ = "-0" + Mid$(R$, 2)
                             End If
+                            If OverideDec Then R$ = Replace$(R$, ".", NowDec$)
+                            'If InStr(R$, ".") > 0 Then
+                            'End If
                         End If
                         IsStr1 = True
                     End If
@@ -29727,7 +29735,7 @@ prive = players(GetCode(Scr))
 ProcLegend = True
 If FastSymbol(rest$, "!") Then
 ProcLegend = False
-If IsStrExp(basestack, rest$, s$) Then
+If IsStrExp(basestack, rest$, s$, False) Then
       If InStr(s$, ChrW(&HFFFFF8FB)) > 0 Then s$ = Replace(s$, ChrW(&HFFFFF8FB), ChrW(&H2007))
 
     ProcLegend = True
@@ -29747,14 +29755,14 @@ If IsStrExp(basestack, rest$, s$) Then
     wPlain Scr, prive, s$, (x), y - 1
 End If
 Else
-If Not IsStrExp(basestack, rest$, s$) Then Exit Function
+If Not IsStrExp(basestack, rest$, s$, False) Then Exit Function
 
 
 frm$ = Replace(s$, ChrW(&HFFFFF8FB), ChrW(&H2007))
 s$ = vbNullString
 x = 0
 If FastSymbol(rest$, ",") Then
-If Not IsStrExp(basestack, rest$, s$) Then Exit Function
+If Not IsStrExp(basestack, rest$, s$, False) Then Exit Function
 End If
 If FastSymbol(rest$, ",") Then
 If Not IsExp(basestack, rest$, x) Then Exit Function
@@ -45255,9 +45263,6 @@ jmpstr1222:
                     If FastSymbol(rest$, ",") Then
                         If IsExp(basestack, rest$, x, , True) Then
                             If par Then BoxBigNew Scr, prive, x1 - 1, y1 - 1, (x)
-                            
-                            
-                            
                         Else
                             RevisionPrint = False
                             Set Scr = Nothing

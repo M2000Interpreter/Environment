@@ -74,7 +74,7 @@ Public Sub DrawCircleApi(Scr As Object, x As Single, y As Single, Radius As Sing
     iY = y
     
     If IsMissing(Color) Then
-        iColor = Scr.forecolor
+        iColor = Scr.ForeColor
     Else
         iColor = Color
     End If
@@ -105,7 +105,7 @@ Public Sub DrawCircleApi(Scr As Object, x As Single, y As Single, Radius As Sing
     End If
   
     If (IsMissing(StartArc) And IsMissing(EndArc)) Or (iStartArcIsNegative And iEndArcIsNegative) Then
-        If Scr.fillstyle = vbSolid Then
+        If Scr.FillStyle = vbFSSolid Then
             iFilledFigure = True
         End If
     End If
@@ -173,8 +173,8 @@ Public Sub TwoColorsGradient(Scr As Object, ByVal typegrad As Long, ByVal col1 A
 
     
     With vert(1)
-        .x = Scr.Scalewidth \ dv15
-        .y = Scr.Scaleheight \ dv15
+        .x = Scr.ScaleWidth \ dv15
+        .y = Scr.ScaleHeight \ dv15
         GetMem1 VarPtr(Col2), bt
         PutMem1 VarPtr(.Blue), bt
         GetMem1 VarPtr(Col2) + 1, bt
@@ -247,8 +247,8 @@ gRect.UpperLeft = 0
 
     
     With vert(1)
-        .x = Scr.Scalewidth \ dv15
-        .y = Scr.Scaleheight \ dv15
+        .x = Scr.ScaleWidth \ dv15
+        .y = Scr.ScaleHeight \ dv15
         GetMem1 VarPtr(Col2), bt
         PutMem1 VarPtr(.Red), bt
         GetMem1 VarPtr(Col2) + 1, bt

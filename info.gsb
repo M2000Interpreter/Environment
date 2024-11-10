@@ -10980,7 +10980,7 @@ Module CheckFirst {
       For i=0 To 2 {
             Print A(i)(B(i)(.5)), C(i)(.5)
       }
-            Print $("")
+       Print $("")
 }
 CheckFirst
  
@@ -43651,5 +43651,903 @@ for i=0 to 3
 	print k[0][1][1][i], k[0][1][2][i], k[1][1][2][i], k[2][1][1][i]
 next
 
+}
+MODULE BINOMIAL {// Binomial_transform
+// https://rosettacode.org/wiki/Binomial_transform
+Stack New {
+	Data (1, 1, 2, 5, 14, 42, 132, 429, 1430, 4862, 16796, 58786, 208012, 742900, 2674440, 9694845, 35357670, 129644790, 477638700, 1767263190)
+	Data (0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+	Data (0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181)
+	Data (1, 0, 0, 1, 0, 1, 1, 1, 2, 2, 3, 4, 5, 7, 9, 12, 16, 21, 28, 37)
+	Dim TestArr()
+	TestArr()=Array([])
+}
+Dim forwardResult(), selfResult(), tempSeq()
+
+' Test each sequence
+sequences=("Catalan number sequence:", "Prime flip-flop sequence:", "Fibonacci number sequence:", "Padovan number sequence:" )
+
+Integer i, j
+For i = 0 To 3
+    Print sequences#val$(i)
+    ' Copy the appropriate sequence to tempSeq
+    tempSeq() = TestArr(i)    
+    print tempSeq()#str$()
+    
+    Print "Forward binomial transform:"
+    forwardResult()=@binomialFwd(&tempSeq())
+    print forwardResult()#str$()
+    
+    Print "Inverse binomial transform:"
+    print @binomialInv(&tempSeq())#str$()
+    
+    Print "Round trip:"
+    print @binomialInv(&forwardResult())#str$()
+    
+    Print "Self-inverting:"
+    selfResult()=@binomialSelfInv(&tempSeq())
+    print selfResult()#str$()
+    
+    Print "Re-inverted:"
+    print @binomialSelfInv(&selfResult())#str$()
+    
+    If i < 3 Then Print
+Next
+' Calculate binomial coefficient
+Function binomial(n As Integer, k As Integer)
+    If k > n Then =0: Exit Function
+    If k = 0 Or k = n Then =1: Exit Function
+    
+    Local  Double result = 1
+    k = if(k > n - k -> n - k, k)
+    local  Integer i
+    if k>0 then
+        For i = 0 To k - 1
+            result *= n - i
+            result /= i + 1
+        Next
+    end if
+    = result
+End Function
+
+' Forward binomial transform
+Function binomialFwd(&seq())
+    Local Integer n, k, lim=len(seq())
+    Local result(lim)
+    For n = 0 To lim - 1
+        For k = 0 To n
+            result(n) += @binomial(n, k) * seq(k)
+        Next
+    Next
+    =result()
+End Function
+
+' Inverse binomial transform
+Function binomialInv(&seq())
+    Local Integer n, k, sign, lim=len(seq())
+    Local result(lim)
+    For n = 0 To lim - 1
+        For k = 0 To n
+            sign = if((n - k) Mod 2 = 0 -> 1, -1)
+            result(n) += sign * @binomial(n, k) * seq(k)
+        Next
+    Next
+    =result()
+End Function
+
+' Self-inverting binomial transform
+Function binomialSelfInv(&seq())
+    Local Integer n, k, sign, lim=len(seq())
+    Local result(lim)   
+    For n = 0 To lim - 1
+        For k = 0 To n
+            sign = if(k Mod 2 = 0-> 1, -1)
+            result(n) += sign * @binomial(n, k) * seq(k)
+        Next
+    Next
+    =result()
+End Function
+}
+MODULE ROOT_MEAN_SQUARE {// https://rosettacode.org/wiki/Averages/Root_mean_square
+
+Module TestThis {
+	Locale 1033 ' this choose dot for decimals
+	feed=lambda m=1->{=m:m++}
+	fold1=lambda (a, s)->{push a*a+s}
+	
+	feed1=feed
+	Dim Vector1(1 To 10) As Single<<feed1()
+	Print "Quadratic mean (or RMS) is :";sqrt(Vector1()#fold(fold1, 0)/Len(Vector1()))
+	Print Type$(Vector1(10))="Single", Vector1(10)=10
+	
+	feed1=feed ' reset feed1
+	Dim Vector2(-100 To 1) as Byte<<feed1()
+	Print "Quadratic mean (or RMS) is :";sqrt(Vector2()#fold(fold1, 0)/Len(Vector2()))
+	Print Type$(Vector2(-100))="Byte", Vector2(-100)=1
+}
+TestThis
+}
+MODULE SUMDIGITISOFANINTEGER {Form 60
+const z="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+sumdigits=lambda z (m as string) ->{
+	integer ret, i
+	m=ucase$(m)
+	if len(m)=0 then =ret:exit
+	for i=1 to len(m):ret+=instr(z, mid$(m,i,1))-1:next
+	=ret
+}
+CheckBase=lambda z (m as string, base as integer)->{
+	if len(m)=0 then Error "not valid input"
+	if base<2 or base>len(z) then Error "not valid input"
+	integer ret=1
+	m=ucase$(m)
+	for i=1 to len(m)
+		ret*=instr(z, mid$(m,i,1))<=base
+		if ret=0 then exit for
+	next
+	=ret<>0
+}
+string n
+integer b
+stack new {
+	data "1", 10
+	data "1234", 10
+	data ""+0xfe, 10
+	data "fe", 16
+	data "f0e", 16
+	while not empty
+		read n, b
+		Print n+" (base:"+b+") sums to "+sumdigits(n)
+	end while
+}
+Input "number, base :", n, b
+if CheckBase(n, b) then
+	Print "sums to "+sumdigits(n)
+else
+	Print n;" isn't a number of base "+b
+end if
+Print "Press any key"
+push key$
+drop
+if module(info) then keyboard "info"+chr$(13)
+}
+MODULE VECTOR_PRODUCTS {Class Vector {
+private:
+      single a,b,c
+public:
+      Property ToString$ {
+            Value {
+                link parent a,b,c to a,b,c 
+                 value$=format$("({0}, {1}, {2})",a,b,c)
+            }
+      }
+      Operator "==" {
+            read n as vector
+            push .a==n.a and .b==n.b and .c==n.c
+      }
+      Operator Unary {
+            .a-! : .b-! : .c-!
+      }
+      Operator "+"  {
+            Read v2 as Vector
+            For this, v2 {
+                  .a+=..a :.b+=..b:.c+=..c:
+            }
+      }
+      Function Mul(r as single)  {
+            vv=this 
+            for vv {
+                  .a*=r:.b*=r:.c*=r
+            }
+            =vv
+      }
+      Function Dot(v2 as Vector)  {
+            def double sum
+            for  this, v2 {
+                sum=.a*..a+.b*..b+.c*..c
+            }
+            =sum
+      }
+      Operator "*" (v2 as Vector) {
+            For This, v2 {
+                  Push .b*..c-.c*..b
+                  Push .c*..a-.a*..c
+                  .c<=.a*..b-.b*..a
+                  Read .b, .a
+            }
+      }      
+      Class:
+      module Vector {
+            if match("NNN") then {
+                  Read .a,.b,.c
+            }
+      }
+}
+A=Vector(3,4,5)
+B=Vector(4,3,5)
+C=Vector(-5,-12,-13)
+Print "A=";A.toString$
+Print "B=";B.toString$
+Print "C=";C.toString$
+Print "A dot B="; A.dot(B)
+AxB=A*B
+Print "A x B="; AxB.toString$
+Print "A dot (B x C)=";A.dot(B*C)
+AxBxC=A*(B*C)
+Print "A x (B x C)=";AxBxC.toString$
+Def ToString$(a)=a.toString$
+Print "A x (B x C)=";ToString$(A*(B*C))
+Print A==Vector(3,4,5)  ' true
+Print A==Vector(3,-4,5)  ' False
+A1=A.Mul(100)
+Print A1==Vector(300,400,500) ' true
+}
+MODULE COMPASS {Form 100,40    ' set console to 80 characters by 50 lines
+Locale 1033   'change decimal point char to dot.
+\\goto 2000
+\\ Function heading() get a positive double as degrees and return the  compass index (1 for North)
+Function heading(d) {
+      d1=d div 11.25
+      if d1 mod 3= 1 then d+=5.62 :d1=d div 11.25
+      =d1 mod 32 +1
+}
+Dim wind$(1 to 32)
+wind$(1)="North", "North by east", "North-northeast", "Northeast by north", "Northeast"
+wind$(6)="Northeast by east", "East-northeast", "East by north", "East", "East by south", "East-southeast"
+wind$(12)="Southeast by east", "Southeast", "Southeast by south", "South-southeast", "South by east", "South"
+wind$(18)="South by west", "South-southwest", "Southwest by south", "Southwest", "Southwest by west", "West-southwest"
+wind$(24)="West by south", "West", "West by north", "West-northwest", "Northwest by west", "Northwest", "Northwest by north"
+wind$(31)="North-northwest", "North by west"
+oldvalue=-2
+newvalue=2
+Print " angle | box | compass point"
+Print "-------+-----+--------------------"
+For i=0 to 360 step 0.005
+      newvalue=heading(i)
+      if (newvalue mod 3) =2 then i+=5.62: newvalue=heading(i)
+      if oldvalue<>newvalue then Print format$("{0:2:-6}°|  {1::-2} |{2}",i, newvalue, wind$(newvalue)) : oldvalue=newvalue : refresh
+Next i
+2000
+global p32=12, d32=360/p32, d64=d32/2
+Function heading(d) {
+      d1=d div d32
+      if d1 mod 3= 1 then d+=d64-0.005 :d1=d div d32
+      =d1 mod p32 +1
+}
+String wind[p32], short[p32]
+wind[1]="(N) Tramontana"
+wind[2]="(N by NE)"
+wind[3]="(NE) Greco (or Bora in some Venetian sources)"
+wind[4]="(E) Levante (sometimes Oriente)"
+wind[5]="(E by SE)"
+wind[6]="(SE) Scirocco (or Exaloc in Catalan)"
+wind[7]="(S) Ostro (or Mezzogiorno in Venetian)"
+wind[8]="(S by SW)"
+wind[9]="(SW) Libeccio (or Garbino, Eissalot in Provençal)"
+wind[10]="(W) Ponente (or Zephyrus in Greek)"
+wind[11]="(W by NW)"
+wind[12]="(NW) Maestro (or Mistral in Provençal)"
+short[1]="Tramontana"
+short[2]="Greco"
+short[3]="Levante"
+short[4]="Scirocco"
+short[5]="Ostro"
+short[6]="Libeccio"
+short[7]="Ponente"
+short[8]="Maestro"
+
+p=1
+oldvalue=2
+newvalue=2
+anglelist=list
+cursor 0,0
+Print @(35), " angle | box | compass point"
+Print @(35), "-------+-----+--------------------------------"
+For i=0 to 361 step 0.05
+      newvalue=heading(i)
+      if (newvalue mod 3) =2 then i+=d64: newvalue=heading(i)
+      if oldvalue<>newvalue then
+          Print Part $(0), @(35), format$("{0:2:-6}°|  {1::-2} |{2}",i,newvalue, wind[newvalue]) : oldvalue=newvalue : Print:refresh  
+          if  wind[newvalue]<>"" then
+              if instr(wind[newvalue], "by")=0 then
+                  append anglelist, p:=i
+                  p++
+              end if
+          end if
+      end if
+Next i
+Move !
+single x, y
+RC=scale.x/6
+(x,y) = (scale.x*2/3, 5000+pos.y)
+integer z=0
+string s
+smooth on
+for n=1 to 8
+	move x,y
+	rot=pi/2-anglelist(n)/180*pi
+	draw angle rot, RC
+	if anglelist(n)>180 then
+		z=2
+		s=(int(anglelist(n)))+" "+short[n]
+		rot+=pi
+	else
+		s=short[n]+" "+(int(anglelist(n)))
+	end if
+	legend s, fontname$, mode*3/2,rot,1+z,1, 45
+next
+move x,y
+circle RC+30
+smooth off
+cursor 0, 38
+}
+MODULE STATS1 {// https://rosettacode.org/wiki/Statistics/Normal_distribution#M2000_Interpreter
+module Statistics_Normal_distribution {    
+    form 80, 50
+    n=100000
+    locale 1033
+    function generate (n as long = 100){
+       long i, m = n + n mod 2
+       double values[n], max=-10000,  min=10000
+       double average, deviation, s, sq
+        for i=0 to m-1 step 2 {
+            double x,y,rsq,f
+            do 
+                x = 2*rnd-1 
+                y = 2*rnd-1
+                rsq = x^2 + y^2
+            when rsq >=1 or rsq=0
+            f=sqrt(-2*ln(rsq)/rsq)
+            values[i]= x * f
+            values[i+1]= y * f
+            s+=values[i]+values[i+1]
+            sq+=values[i]**2+values[i+1]**2
+            max=max.data(max, values[i], values[i+1]) 
+            min=min.data(min, values[i], values[i+1])
+        }
+        =values, s, sq, max, min
+    }
+    (a, sum, sumSq, max, min)=generate(n)
+    open "out2.txt" for output as #f
+    print #f, n; " Samples used."
+    mean = sum / n
+    print #f, "Mean    = "; mean
+    print #f, "Std Dev = "; (sumSq /n -mean^2)^0.5
+    print #f, "Min     = ";min
+    print #f, "Max     = ";max    
+    bins = 30
+    dim bins(0 to bins)
+    mm=max-min
+    mb=mm/bins    
+    for i = 0 to len(a)-1
+         long k=(a[i]-min)/mb
+         bins(k)++
+    next i
+    
+    print
+    max=bins()#max()
+    for b = 0 to bins
+        print #f, format$("{0:2:-5}|{1:68}",b*mb+min,string$("*",bins(b)/max*60)+" "+str$(bins(b)/n*100, locale)+"%")
+    next b
+    close #f
+    win "Notepad", dir$+"out2.txt"
+}
+Statistics_Normal_distribution
+}
+MODULE STATS2 {form 80, 32
+module statistics1 {
+    filename="out1.txt"
+    open filename for output as #f
+        sample(100)
+        sample(1000)
+        sample(10000)
+//        sample(100000)
+//        sample(1000000)
+    close #f
+    if filename<>""then Win "NotePad", dir$+filename
+    Sub sample(n)
+        Print "wait.."+n+" samples produced"
+        local samp(1 to n) as double<<rnd
+        ' calculate mean, standard deviation
+        local sum, sumSq, i, max, mean, bins, b
+        for i = 1 to n
+            sum += samp(i)
+            sumSq += samp(i)^2
+        next i
+        print #f, n; " Samples used."
+        mean = sum / n
+        print #f, "Mean    = "; mean
+     
+        print #f, "Std Dev = "; (sumSq /n -mean^2)^0.5
+     
+        '------- Show histogram
+        bins = 10
+        dim bins(bins)
+        for i = 1 to n
+            bins(int(bins * samp(i)))++
+        next i
+        max=bins()#max()
+        for b = 0 to bins -1
+            print #f, b;" ";string$("*",bins(b)/max*60);" ";bins(b)/n*100;"%"
+        next b
+        print #f
+    end sub
+}
+statistics1
+}
+MODULE BERNOULLI {module Bernoulli_Numbers (filename as string) {
+	Class Rational {
+		numerator as decimal, denominator as decimal
+		gcd=lambda->0
+		lcm=lambda->0
+		operator "+" {
+			Read l
+			denom=.lcm(l.denominator, .denominator)
+			.numerator<=denom/l.denominator*l.numerator+denom/.denominator*.numerator
+			if .numerator==0 then denom=1
+			.denominator<=denom
+		}
+		Operator Unary {
+			.numerator-!
+		}
+		Operator "-" {
+			Read l
+			Call Operator "+", -l
+		}
+		Group Real {
+			value {
+				link parent numerator, denominator to n, d
+				=n/d
+			}
+		}
+		Group ToString$ {
+			value {
+				link parent numerator, denominator to n, d
+				=Str$(n)+"/"+Str$(d,"")
+			}      
+		}
+	class:
+		Module Rational (.numerator, .denominator) {
+			if .denominator=0 then .denominator<=1
+			while frac(.numerator)<>0 {
+				.numerator*=10@
+				.denominator*=10@
+			}
+			sgn=Sgn(.numerator)*Sgn(.denominator)
+			.denominator<=abs(.denominator)
+			.numerator<=abs(.numerator)*sgn
+			gcd1=lambda (a as decimal, b as decimal) -> {
+				if a<b then swap a,b
+				g=a mod b
+				while g {
+					a=b:b=g: g=a mod b
+				}
+				=abs(b)
+			}
+			gdcval=gcd1(abs(.numerator), .denominator)
+			if gdcval<.denominator and gdcval<>0 then
+				.denominator/=gdcval
+				.numerator/=gdcval
+			end if
+			.gcd<=gcd1
+			.lcm<=lambda gcd=gcd1 (a as decimal, b as decimal) -> {
+			=a/gcd(a,b)*b
+			}
+		}
+	}
+	Open filename for output as #f
+	r1=Rational(1,1)
+	b=0	
+	nextBern()
+	b=1
+	nextBern()
+	for b=2 to 28 step 2
+		nextBern()
+	next
+	close #f
+	if filename<>""then Win "NotePad", dir$+filename : Print "Export to file ";dir$+filename 
+	sub nextBern()
+		local m=@bernoulli(b)
+		Print #F, format$("B({0::-2})={1}",b, m.tostring$)
+	end sub
+	function bernoulli(n as decimal)
+		Local a(1 to n+1)=Rational(1,1), z
+		local decimal m, j
+		for m=0 to n
+			a(m + 1) = Rational(1 , m + 1)
+			if m<1 then continue
+			for j = m to 1
+				z= a(J) - a(j+1) + r1
+				a(j)=z
+				nn=z.gcd(j, z.denominator)
+				a(j).numerator*=j/nn
+				a(j).denominator/=nn
+			next
+			for a(1) {
+				this=rational(.numerator, .denominator)
+			}		
+		next
+		=a(1)
+	end function	
+}
+//? "Wait..."
+//Bernoulli_Numbers ""
+? "Wait... to export to file"
+refresh
+Bernoulli_Numbers "out.txt"
+Document doc$
+load.doc doc$, "out.txt"
+report doc$
+
+}
+MODULE FIXPOINT {module Fixed_point_combinator_variadic{
+	y1=lambda (f) ->f(f, ![])
+	Print y1(lambda (g, n)->if(n=0->1, n*g(g, n-1)), 10)=3628800
+	Print y1(lambda (g)->if(empty->0, number+g(g, ![])), 10, 20, 30)=60
+	Print y1(lambda (g)->if(empty->0, number+g(g, ![])))=0
+	Print y1(lambda (g)->if(empty->0, number+g(g, ![])), 10, 20, 30, 1, 2, 3)=66
+}
+Fixed_point_combinator_variadic
+Module Fix_Point_Combinator{
+	class fixer {
+		function final fix(x) {
+			=.f(x)
+		}
+	private:
+		function f() {
+		error "virtual"
+		}
+	}
+	class fact as fixer {
+	private:
+		function final f(x as long){
+			if x=0 then =1 else =x*.fix(x-1)
+		}
+	}
+	Print fact()=>fix(5)=120
+}
+Fix_Point_Combinator
+// M2000 no need to use combinator:
+Fact=lambda (x as long) -> {
+	if x=0 then =1 else =x*lambda(x-1)
+}
+Print fact(10)=3628800
+function fibmake {
+	dim a(1 to 2) as decimal
+	a(2)=1
+	fib=lambda a() (x as decimal) -> {
+		flush
+		x=int(x)+1
+		if x<2 then =0: exit
+		z=len(a())
+		if z<x then
+			dim a(1 to x)
+			for i=z+1 to x
+				a(i)=a(i-1)+a(i-2)
+			next
+		end if
+		=a(x)
+	}
+	z=fib(138)
+	=fib
+}
+fib=fibmake()
+for i=0 to 138
+	Print i,fib(i)
+next
+}
+MODULE MERSENNE {Module Factors_of_a_Mersenne_number{
+	Dim q()
+	// 67 need a lot of time 51 minutes (3082671msec) where 71 need 3.5 second (3505msec)
+	q()= (11, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71, 73, 79, 83, 97, 929)
+	profiler
+	For k = 0 To len(q())-1
+		REM
+		if k=9 then continue 
+		If @isPrime(q(k)) Then
+			long p, r, d, r=q(k), dd
+			long long i
+			dd =2*q(k)
+			d=dd+1
+			while r>0: r=sint(binary.add(r,r)): end while
+			Do
+				i=1:p=r
+				While p<>0
+					i=i^2@ Mod d:If p<0 Then i*=2
+					If i>d Then i-=d
+					p=sint(binary.add(p,p))
+				End While
+				If i=1 Then Exit
+				d+=dd
+			Always
+			Print "2^"; q(k); @(6); " - 1 = 0 (mod "; d; ")"
+		Else
+			Print q(k); " is not prime"
+		End If
+		Print ceil(timecount),"msec":profiler
+	Next
+	
+	Function isPrime(n As long)
+		If n Mod 2 = 0 Then = n=2 : Exit Function
+		If n Mod 3 = 0 Then = n=3 : Exit Function
+		Local d As long = 5
+		While d * d <= n
+			If n Mod d = 0 Then =False: exit function
+			d += 2
+			If n Mod d = 0 Then = False: exit function
+			d += 4
+		End While
+		=True
+	End Function
+}
+Factors_of_a_Mersenne_number
+}
+MODULE PASSMAKER {module SetUp{
+	form 80, 50
+	print "Password Generator"
+	
+	input "Set seed (press enter without number to skip):"; seed$
+	seed$=trim$(seed$)
+	' we always push a new seed - there is a two stage queue
+	if len(seed$)>0 then
+		x=random(!val(seed$))
+	else
+		x=random(!timecount)
+	end if
+	def zone(x, a, b) = x >=a and x<=b
+	do
+		Input "Length for password (6 to 30), Number of passwords (1 to 20):", a%, b%
+	until zone(a%, 6, 30) and zone(b%, 1, 20)
+	print "choose mode:";
+	menu "safe", "unsafe"
+	unsafe= menu=2
+	if unsafe then print "unsafe" else print "safe"
+	menu ' clear menu
+	flush
+	data not unsafe, a%, b%
+}
+module pass (safe as  boolean, a1 as integer, b1 as integer) {
+	dim a(0 to 4) as string,  b(1 to 4) as boolean
+	if safe then
+		a(1) := "346789",  "ABCDEFGHJKLMNPQRTUVWXY", "abcdefghijkmnopqrstuvwxyz"
+	else
+		a(1) := "0123456789", "ABCDEFGHIJKLMNOPQRSTUVWXYZ",  "abcdefghijklmnopqrstuvwxyz" 
+	end if
+	a(4) = "!" + """" + "#$%&'()*+,-./:;<=>?@[]^_{|}~"
+	a(0)= a(1) + a(2) + a(3) + a(4)
+	string s, d
+	integer k=1
+	while b1
+		do
+			s=""
+			for j=1 to 4:	b(j)=false:next
+			for i=1 to a1
+				s+=mid$((a(0)), random(1, len(a(0))), 1)
+				for j=1 to 4
+					if  instr(a(j), d)>0 then b(j)=true
+				next
+			next
+		until b(1) and b(2) and b(3) and b(4)    
+		menu + format$("{0::-2}. {1}", k, s)
+		b1--
+		k++
+	end while
+	x=random(!) ' pop the old seed back
+}
+module copy2clipboard {
+	if menuitems>0 then
+		print "choose one:";
+		menu !
+		if menu>0 then
+			m=menu
+		else
+			m=1
+		end if
+		print mid$(menu$(m), 5)
+		try {	
+			clipboard mid$(menu$(m), 5)
+			print "clipboard set"
+		}
+	end if
+}
+' now we call the three parts - modules
+setup
+pass       ' paraneters are in stack of values
+copy2clipboard
+}
+MODULE APOLLONIUS {// https://rosettacode.org/wiki/Problem_of_Apollonius#M2000_Interpreter
+module SolverApollo {
+    Locale 1033
+    String circle1 = "  0.000,  0.000,  1.000"
+    String circle2 = "  4.000,  0.000,  1.000"
+    String circle3 = "  2.000,  4.000,  2.000"
+    
+    Print "  x_pos   y_pos   radius"
+    Print circle1
+    Print circle2
+    Print circle3
+    Print
+    Print "R1: " : ApolloniusSolver(circle1, circle2, circle3,  1,  1,  1)
+    Print "R2: " : ApolloniusSolver(circle1, circle2, circle3, -1, -1, -1)
+    
+    
+    Sub ApolloniusSolver(c1 As String, c2 As String, c3 As String, s1 As Single, s2 As Single, s3 As Single)
+        Single x1, x2, x3, y1, y2, y3, r1, r2, r3
+        Single v11, v12, v13, v14, v21, v22, v23, v24, w12, w13, w14
+        Single w22, w23, w24,P, Q, M, N, a, b, c, D
+        Single Radius, XPos, YPos
+        
+        x1 = Val(Mid$(c1, 3, 1)): y1 = Val(Mid$(c1, 11, 1)): r1 = Val(Mid$(c1, 19, 1))
+        x2 = Val(Mid$(c2, 3, 1)): y2 = Val(Mid$(c2, 11, 1)): r2 = Val(Mid$(c2, 19, 1))
+        x3 = Val(Mid$(c3, 3, 1)): y3 = Val(Mid$(c3, 11, 1)): r3 = Val(Mid$(c3, 19, 1))
+        
+        v11 = 2 * x2 - 2 * x1
+        v12 = 2 * y2 - 2* y1
+        v13 = x1 * x1 - x2 * x2 + y1 * y1 - y2 * y2 - r1 * r1 + r2 * r2
+        v14 = 2 * s2 * r2 - 2 * s1 * r1
+        
+        v21 = 2 * x3 - 2 * x2
+        v22 = 2 * y3 - 2 * y2
+        v23 = x2 * x2 - x3 * x3 + y2 * y2 - y3 * y3 - r2 * r2 + r3 * r3
+        v24 = 2 * s3 * r3 - 2 * s2 * r2
+        
+        w12 = v12 / v11
+        w13 = v13 / v11
+        w14 = v14 / v11
+        
+        w22 = v22 / v21 - w12
+        w23 = v23 / v21 - w13
+        w24 = v24 / v21 - w14
+        
+        P   = 0 - w23 / w22
+        Q   =     w24 / w22
+        M   = 0 - w12 * P - w13
+        N   =     w14 - w12 *  Q
+        
+        a   = N * N + Q * Q - 1
+        b   = 2 * M * N - 2 * N * x1 + 2 * P * Q - 2 * Q * y1 + 2 * s1 * r1
+        c   = x1 * x1 + M * M -2 * M * x1 + P * P + y1 * y1 - 2 * P * y1 - r1 * r1
+        
+        D   = b *  b - 4 * a * c
+        
+        Radius = (0 - b - Sqrt(D)) / (2 * a)
+        XPos   = M + N * Radius
+        YPos   = P + Q * Radius
+        Using=lambda (n, a$)->{
+            read a$:if len(a$)>1 then a$+=", " 
+            push a$+format$("{0:3:-6}", n)
+        }
+        Print (XPos, YPos, Radius)#fold$(Using," ")
+    End Sub
+}
+SolverApollo
+}
+MODULE SHAPE {superclass MainTest {
+unique: 
+	document Doc$
+	module PutValue {
+		.Doc$<=letter$+{
+		}	
+	}
+public:
+	property counter{value}=0
+	function result {
+		for superclass {
+			=.Doc$
+		}
+	}	
+	module Test1 (thisType, ThisValue) {
+		select case thistype
+		case 0
+			single a
+		case 1
+			double a
+		case 3
+			currency a
+		case else
+			decimal a
+		end select
+		a=ThisValue
+		aa=a
+		.[counter]++
+		long long i=1
+		do
+			o=a
+			a+=3  ' double literal value
+			a*=.86 ' double literal value
+			if o=a then exit
+			i++
+		always
+		for superclass {
+			.PutValue format$("{0:8} {1:2:-12} {2::-3} {3}",type$(aa), aa, i, a)
+		}
+	}
+}
+document result$
+dim a(0 to 3)=MainTest
+for i=0 to 3
+	a(i).test1 i, 4
+	a(i).test1 i, 123456789	
+	result$ = "test on a("+i+") so far:"+a(i).counter+{
+	}
+next
+result$ = "Results" + {
+}+a(1).result()
+
+clipboard result$
+Print #-2, result$
+}
+MODULE CHINESE {module Chinese_zodiac {
+	yy= ("yang", "yin")
+	elements = ("Metal", "Water", "Wood", "Fire", "Earth")
+	animals = ("Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat", "Monkey", "Rooster", "Dog", "Pig")
+	testThis = (1801, 1861, 1966, 1984, 2017, 2020, 2186, 76543)
+	i=each(testThis)
+	long yr, y, e, a
+	string d
+	while i
+	   yr = array(i)
+	   y = yr mod 2
+	   e = (yr div 2) mod 5
+	   a = (yr - 4) mod 12
+	   outstr = yr+" is the year of the "
+	   outstr += elements#val$(e)+" " + animals#val$(a) + " (" + yy#val$(y) + ")." 
+	   print outstr
+	   d+=outstr+{
+	   }
+	end while
+	clipboard d
+}
+Chinese_zodiac
+}
+MODULE YIN {Τμήμα YinYang {
+	Οθόνη 5,0
+	Φόντο 0, 5
+	Διπλά
+	Τύπωσε Πάνω
+	Δρομέας 0,0
+	Αναφορά 2,  "阴阳 Yin and yang 음양"
+	Κανονικά
+	Σχέδιο {
+		Κύκλος Γέμισμα 0, 3000,1, 0
+		Κύκλος Γέμισμα 15, 3000,1,0, πι/2, -πι/2
+		Βήμα 0, -1500
+		Κύκλος Γέμισμα 15, 1500,1,15
+		Πάχος 4 {
+			Κύκλος Γέμισμα 0, 500,1,0
+		}
+		Βήμα 0, 3000
+		Κύκλος Γέμισμα 0, 1500,1,0 
+		Πάχος 4 {
+			Κύκλος Γέμισμα 15, 500,1,15
+			Βήμα 0, -1500
+			Κύκλος 3000,1,0
+		}
+	} ως Σχήμα1
+	Θέση 6000, 5000-1500
+	Εικόνα Σχήμα1, 6000
+	Θέση 2000, 5000
+	Εικόνα Σχήμα1, 3000 
+	Θέση 2000+1500, 5000+1500
+	κράτησε
+	Δείκτη.Μορφή Κρύψε
+	ι=0
+	Κάθε 1000/60 {
+		Αν  ενκομ$=" " η  Δείκτης=2 Τότε exit
+		Άφησε
+		Θέση δείκτης.χ, δείκτης.ψ
+		Εικόνα Σχήμα1, 3000, ,ι : ι+=5:Αν ι>355 Τότε ι=0
+		Ανανέωση 20
+		Αν mouse=1 Τότε κράτησε
+	}
+	Δείκτη.Μορφή Δείξε
+	Όνομα_Αρχείου$="yin and yang.emf"
+	Άνοιξε Όνομα_Αρχείου$ για εξαγωγή ως #Φ
+	Δώσε #Φ, Σχήμα1, 1
+	Κλείσε #Φ
+	Σύστημα "mspaint", Παράθεση$(Κατ$+Όνομα_Αρχείου$)
+}
+YinYang
+if module(info) then keyboard "info", 13
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
