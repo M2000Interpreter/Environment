@@ -5672,7 +5672,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 58 for M2000 Interpreter version 12, revision 38 and above"
+	Report " A collection of modules for tests version 58 for M2000 Interpreter version 12, revision 45 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -21528,7 +21528,7 @@ MODULE USETHIS {try {
 	PEN 14
 	CLS,0
 	If Version<12 then Error "No proper M2000 version (must be >=12)"
-	If Version=12 and revision<38 then Error "No proper M2000 revision for version 4 (need revision >=38)"
+	If Version=12 and revision<45 then Error "No proper M2000 revision for version 4 (need revision >=38)"
 	Set Fast
 	Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 	dir user
@@ -44549,5 +44549,58 @@ MODULE YIN {Τμήμα YinYang {
 }
 YinYang
 if module(info) then keyboard "info", 13
+}
+MODULE MAX_DIF {module Maximum_Difffer (r as integer, a as array){
+	locale 1033
+	fold1=lambda (a, s$)->{
+		if len(s$)=0 then s$=""+a else s$+=","+a
+		push s$  
+	}
+	dif=lambda r ->{
+		s=(,)
+		=lambda n=1, b, s, r (a)-> {
+			drop ' drop accumulator item
+			if n=1 then n=0 else append  s, (Round(abs(a-b), r),)
+			b=a
+			push s	' this is our accumulator
+		}
+	}
+	b=a#fold(dif(r))
+	max_diff=b#max()
+	from_where=0
+	do
+		n=b#pos(from_where->max_diff)
+		if n<0 then exit
+		from_where=n+1
+		? A#slice(n, n+1)#fold$(fold1)+" ==>";abs(a#val(n+1)-a#val(n))
+'		? A#slice(n, n+1)#str$(",")+" ==>";abs(a#val(n+1)-a#val(n))
+	Always
+}
+Maximum_Difffer 0, (1,8,2,-3,0,1,1,-2.3,0,5.5,8,6,2,9,11,10,3)
+Maximum_Difffer 2, (0.12, -0.04, 0.34, 0.72, 0.34, 0.27, -0.1)
+Maximum_Difffer 0, (10E30, 20E30, 15E30, 5E30, -5E30)
+Maximum_Difffer 0, (,)  ' print nothing, because b=(.), then n=-1 end exit
+
+Module Maximum_Difffer (a()) {
+	locale 1033
+	if len(a())<2 then exit
+	maxDif=-1
+	for i=1 to len(a())-1
+		diff1=abs(a(i)-a(i-1))
+		if diff1> maxDif then
+				flush :	maxDif=diff1
+		else.if diff1==maxDif Else  '' use of == for round on 13th
+			continue
+		end if
+		data (a(i-1))+","+(a(i))+" ===>"+maxDif
+	next
+	while not empty
+		print letter$
+	end while
+}
+Maximum_Difffer (1, 8, 2, -3, 0, 1, 1, -2.3, 0, 5.5, 8,6, 2, 9, 11, 10, 3)
+Maximum_Difffer (0.12, -0.04, 0.34, 0.72, 0.34, 0.27, -0.1)
+Maximum_Difffer (10E30, 20E30, 15E30, 5E30, -5E30)
+Maximum_Difffer (,)
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
