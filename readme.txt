@@ -1,19 +1,34 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 45 active-X
-1. #Str$() now works with strings without $:
-string s=", "
-Print (1,2,3,4)#str$(s)
-string s="-", f="0000"
-Print (1,2,3,4)#str$(s,f)
-0001-0002-0003-0004
-2. Fix Format$() when using {0} and numbers with decimal digits to follow the current decimal point as Locale set.
-Locale 1033
-Print Format$("{0} {1}", 1.2, 1.3)
-// same as
-Print Format$("{0::} {1::}", 1.2, 1.3)
-// we can use Locale to change the decimal point
+Version 12 Revision 44 active-X
+1. A bug removed about the @() special function for Print statement.
+move 5000, 3000
+polygon 3, ANGLE PI/4,3000,-PI/4,3000,PI/4,-3000,-PI/4,-3000
+Print @(10, 10, 10+tab(1), 10+1, 5, 15);"George"
 
+2. Use of a string expression using string variables without $ for:
+
+statement Legend.
+
+3. Hanlde for decimal point based on locale for expression with strings and numeric variables.
+locale 1033
+a=12.4
+? "... "+a    ' ... 12.4
+? a+" ..."    ' 12.4 ...
+locale 1032
+a=12.4
+? "... "+a    ' ... 12,4
+? a+" ..."    ' 12,4 ...
+
+For using numeric expression we have to put parenthesis:
+? "width "+(round(sqrt(2), 2))+" mm ("+locale+")"
+width 1.41 mm (1033)
+     or
+width 1,41 mm (1032)
+     base on locale
+
+4. Udpated Info file. So load it again using Dir Appdir$: Load Info
+Then press F1 to overwrite the old one on user directory.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
