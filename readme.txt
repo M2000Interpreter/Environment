@@ -1,24 +1,17 @@
 M2000 Interpreter and Environment
 
 Version 12 Revision 45 active-X
-1. #Str$() now works with strings without $:
-string s=", "
-Print (1,2,3,4)#str$(s)
-string s="-", f="0000"
-Print (1,2,3,4)#str$(s,f)
-0001-0002-0003-0004
-2. Fix Format$() when using {0} and numbers with decimal digits to follow the current decimal point as Locale set.
-Locale 1033
-Print Format$("{0} {1}", 1.2, 1.3)
-// same as
-Print Format$("{0::} {1::}", 1.2, 1.3)
-// we can use Locale to change the decimal point
-3.
-Greek ' error messages Greek language, plus locale 1032
-Latin ' error messages English language, plus locale 1032
-a=1.45
-? a+"-"+a
-? (a)+"-"+(a)
+1. Fix #slice() special function for tuples:
+? (1,2,3)#slice(0,0)   ' print 1 before nothing...
+? (1,2,3)#slice(1,2)   ' print 2  3 
+2. Updated Info.gsb
+
+
+
+The M2000language.exe (the setup exe) google say is a virus (but it isn't) due to the use of VB6. The file is signed see bellow.
+This is the MD5 file checksum: c324d1b358c62e6366a1735a54212ace
+
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

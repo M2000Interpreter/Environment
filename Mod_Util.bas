@@ -12617,7 +12617,7 @@ p = 0
 End If
 If FastSymbol(a$, ",") Then
 If IsExp(bstack, a$, R, flatobject:=True, nostring:=True) Then
-    If R <= 0 Then
+    If R < 0 Then
     Set pppp = pppp.EmptyArraySameType()
         GoTo JMPeMPTY
     ElseIf R >= pppp.count Or R < p Then
