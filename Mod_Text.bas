@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 46
+Global Const Revision = 47
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -8290,10 +8290,20 @@ Else
     If w1 < 0 Then GoTo LOOKFORVARNUM
 End If
 findsecond:
-On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89, num90, num91, num92, num93, num94, num95, num96, num97, num98, num99, num100, num101, num102, num103, num104, num105
+On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89, num90, num91, num92, num93, num94, num95, num96, num97, num98, num99, num100, num101, num102, num103, num104, num105, num106, num107
 IsNumberNew = 0
 InternalError
 Exit Function
+num107:
+        
+    R = MediaPlayer1.Height * Screen.TwipsPerPixelY
+    IsNumberNew = True
+    Exit Function
+num106:
+    R = MediaPlayer1.Width * Screen.TwipsPerPixelX
+    IsNumberNew = True
+    Exit Function
+
 num105: ' "ADDRESSOF","диеухумсгапо"
 IsNumberNew = False
     If findAddress(bstack, a$, R) Then
@@ -31320,7 +31330,7 @@ fromfirst0:
 cont111:
     Select Case w3
     Case 0
-error1:
+Error1:
                 
         If bstack.RetStackTotal - RetStackSize > 0 Then
             bstack.UseofIf = olduseofif
@@ -31677,7 +31687,7 @@ AGAINGOTO:
                                          End If
                                     End If
                                     bstack.RetStackDrop 3 '5
-                                    GoTo error1
+                                    GoTo Error1
                                 End If
                             Else
                                 bstack.RetStackDrop 3 '5

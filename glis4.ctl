@@ -113,7 +113,7 @@ Private Enum flagtype
     joinpRevline = 16   ' if this is true means we have a join with previous row.
 End Enum
 Private Type itemlist
-    flags As Integer ' selected
+    Flags As Integer ' selected
     morerows As Integer  ' pixels??? not used now
     content As JsonObject
 End Type
@@ -148,7 +148,7 @@ Private Declare Function Ellipse Lib "gdi32" (ByVal hDC As Long, ByVal x1 As Lon
 Private Declare Function CreatePen Lib "gdi32" (ByVal nPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 
 Private Const PS_NULL = 5
 Private Const PS_SOLID = 0
@@ -589,7 +589,7 @@ If new_text <> "" Then
             With mList(i)
                 If .content Is Nothing Then Set .content = New JsonObject
                 .content.AssignPath "C." & thiscolumn, GetStrUntilB(mpos, vbCrLf, new_text)
-                .flags = 0
+                .Flags = 0
             End With
             i = i + 1
         End If
@@ -3291,8 +3291,8 @@ With mList(item)
 If .content Is Nothing Then Set .content = New JsonObject
 If Not .content.ItemPath("C." & thiscolumn) = b$ Then RaiseEvent ChangeColumnListItem(item, thiscolumn, b$)
 .content.AssignPath "C." & thiscolumn, CVar(b$)
-.flags = .flags Or (fline + fselected + joinpRevline)
-.flags = .flags Xor (fline + fselected + joinpRevline)
+.Flags = .Flags Or (fline + fselected + joinpRevline)
+.Flags = .Flags Xor (fline + fselected + joinpRevline)
 End With
 End If
 nnn1:
@@ -3307,15 +3307,15 @@ End If
 If item >= 1 And item < itemcount Then
 With mList(item)
 If Not .content Is Nothing Then Set .content = Nothing
-    If (.flags And joinpRevline) = 0 Then
+    If (.Flags And joinpRevline) = 0 Then
         JoinLines = JoinLines + 1
-        .flags = ((.flags Or 15) Xor 15) Or joinpRevline
+        .Flags = ((.Flags Or 15) Xor 15) Or joinpRevline
         i = item - 1
         If .morerows > 0 Then
             mList(i).morerows = .morerows + 1
             .morerows = 0
         Else
-            Do While i > 0 And (mList(i).flags And joinpRevline) <> 0
+            Do While i > 0 And (mList(i).Flags And joinpRevline) <> 0
                 i = i - 1
             Loop
             mList(i).morerows = mList(i).morerows + 1
@@ -3334,17 +3334,17 @@ If itemcount = 0 Or BlockItemcount Then
 End If
 If item >= 1 And item < itemcount Then
 With mList(item)
-If (.flags And joinpRevline) <> 0 Then
+If (.Flags And joinpRevline) <> 0 Then
 JoinLines = JoinLines - 1
-.flags = .flags Or joinpRevline
-.flags = .flags Xor joinpRevline
+.Flags = .Flags Or joinpRevline
+.Flags = .Flags Xor joinpRevline
     i = item - 1
-    Do While i > 0 And (mList(i).flags And joinpRevline) <> 0
+    Do While i > 0 And (mList(i).Flags And joinpRevline) <> 0
         i = i - 1
     Loop
     mList(i).morerows = item - i + 1
     i = item + 1
-    Do While i < itemcount And (mList(i).flags And joinpRevline) <> 0
+    Do While i < itemcount And (mList(i).Flags And joinpRevline) <> 0
         i = i + 1
     Loop
     .morerows = i - item - 1
@@ -3554,8 +3554,8 @@ With mList(item)
 If .content Is Nothing Then Set .content = New JsonObject
 If Not .content.ItemPath("C.1") = b$ Then RaiseEvent ChangeListItem(item, b$)
 .content.AssignPath "C.1", CVar(b$)
-.flags = .flags Or (fline + fselected + joinpRevline)
-.flags = .flags Xor (fline + fselected + joinpRevline)
+.Flags = .Flags Or (fline + fselected + joinpRevline)
+.Flags = .Flags Xor (fline + fselected + joinpRevline)
 End With
 End If
 nnn1:
@@ -3563,9 +3563,9 @@ End Property
 Property Let menuEnabled(item As Long, ByVal RHS As Boolean)
 If item >= 0 Then
 With mList(item)
-.flags = .flags Or fline
+.Flags = .Flags Or fline
 If RHS Then
-.flags = .flags Xor fline
+.Flags = .Flags Xor fline
 End If
 ''.Line = Not RHS   ' The line flag used as enabled flag, in reverse logic
 End With
@@ -3576,9 +3576,9 @@ If itemcount = 0 Or BlockItemcount Then Exit Property
 If item >= 0 And item < itemcount Then
 With mList(item)
 '.Line = RHS
-.flags = .flags Or fline
+.Flags = .Flags Or fline
 If Not RHS Then
-.flags = .flags Xor fline
+.Flags = .Flags Xor fline
 End If
 End With
 End If
@@ -3593,7 +3593,7 @@ End If
 If itemcount = 0 Or BlockItemcount Then Exit Property
 If item >= 0 And item < itemcount Then
 With mList(item)
-ListSep = .flags And fline
+ListSep = .Flags And fline
 End With
 End If
 End Property
@@ -3601,7 +3601,7 @@ Property Get ListJoin(item As Long) As Boolean
 If itemcount = 0 Or BlockItemcount Then Exit Property
 If item >= 0 And item < itemcount Then
 With mList(item)
-ListJoin = .flags And joinpRevline
+ListJoin = .Flags And joinpRevline
 End With
 End If
 End Property
@@ -3620,29 +3620,29 @@ Dim first As Long, last As Long
 If itemcount > 0 And Not BlockItemcount Then
 If item >= 0 And item < itemcount Then
 
-If mList(item).flags And fradiobutton Then
+If mList(item).Flags And fradiobutton Then
         ' erase all
         first = item
-        While first > 0 And (mList(first).flags And fradiobutton)
+        While first > 0 And (mList(first).Flags And fradiobutton)
         first = first - 1
         Wend
-        If Not (mList(first).flags And fradiobutton) Then first = first + 1
+        If Not (mList(first).Flags And fradiobutton) Then first = first + 1
         last = item
-        While last < listcount - 1 And (mList(last).flags And fradiobutton)
+        While last < listcount - 1 And (mList(last).Flags And fradiobutton)
         last = last + 1
         Wend
-        If Not (mList(last).flags And fradiobutton) Then last = last - 1
+        If Not (mList(last).Flags And fradiobutton) Then last = last - 1
         For first = first To last
         With mList(first)
         'mList(first).selected = False
-        .flags = .flags Or fselected
-        .flags = .flags Xor fselected
+        .Flags = .Flags Or fselected
+        .Flags = .Flags Xor fselected
         End With
         Next first
 End If
 With mList(item)
-        .flags = .flags Or fselected
-        If Not b Then .flags = .flags Xor fselected
+        .Flags = .Flags Or fselected
+        If Not b Then .Flags = .Flags Xor fselected
         '.selected = b
 End With
 End If
@@ -3653,9 +3653,9 @@ Dim first As Long, last As Long
 If itemcount > 0 And Not BlockItemcount Then
     If item >= 0 And item < itemcount Then
         With mList(item)
-            .flags = .flags Or fselected
+            .Flags = .Flags Or fselected
             If Not b Then
-            .flags = .flags Xor fselected
+            .Flags = .Flags Xor fselected
             End If
         End With
     End If
@@ -3665,7 +3665,7 @@ Property Get ListSelected(item As Long) As Boolean
 If itemcount > 0 And Not BlockItemcount Then
     If item >= 0 And item < itemcount Then
         With mList(item)
-            ListSelected = .flags And fselected
+            ListSelected = .Flags And fselected
         End With
     End If
 End If
@@ -3674,9 +3674,9 @@ Property Let ListRadio(item As Long, ByVal b As Boolean)
 If itemcount > 0 And Not BlockItemcount Then
 If item >= 0 And item < itemcount Then
     With mList(item)
-        .flags = .flags Or fradiobutton
+        .Flags = .Flags Or fradiobutton
         If Not b Then
-            .flags = .flags Xor fradiobutton
+            .Flags = .Flags Xor fradiobutton
         End If
     End With
 End If
@@ -3686,7 +3686,7 @@ Property Get ListRadio(item As Long) As Boolean
 If itemcount > 0 And Not BlockItemcount Then
 If item >= 0 And item < itemcount Then
     With mList(item)
-        ListRadio = .flags And fradiobutton
+        ListRadio = .Flags And fradiobutton
     End With
 End If
 End If
@@ -3696,7 +3696,7 @@ If itemcount > 0 And Not BlockItemcount Then
     If item >= 0 And item < itemcount Then
         With mList(item)
         'ListMenu = .radiobutton Or .checked
-            ListMenu = .flags And (fradiobutton + fchecked)
+            ListMenu = .Flags And (fradiobutton + fchecked)
         End With
     End If
 End If
@@ -3706,9 +3706,9 @@ If itemcount > 0 And Not BlockItemcount Then
 If item >= 0 Then
 With mList(item)
 '.checked = b
-    .flags = .flags Or fchecked
+    .Flags = .Flags Or fchecked
     If Not b Then
-        .flags = .flags Xor fchecked
+        .Flags = .Flags Xor fchecked
     End If
 End With
 End If
@@ -3718,7 +3718,7 @@ Property Get ListChecked(item As Long) As Boolean
 If itemcount > 0 And Not BlockItemcount Then
     If item >= 0 Then
         With mList(item)
-            ListChecked = .flags And fchecked
+            ListChecked = .Flags And fchecked
         End With
     End If
 End If
@@ -3912,8 +3912,8 @@ itemcount = itemcount + 1
 With mList(itemcount - 1)
 Set .content = New JsonObject
 If Trim(a$) <> "" Then .content.AssignPath "C.1", CVar(a$)
-.flags = .flags Or (fline + fselected + joinpRevline)
-.flags = .flags Xor (fline + fselected + joinpRevline)
+.Flags = .Flags Or (fline + fselected + joinpRevline)
+.Flags = .Flags Xor (fline + fselected + joinpRevline)
 End With
 Timer1.enabled = False
 Timer1.Interval = 100
@@ -3935,8 +3935,8 @@ On Error Resume Next
 Set .content = .content.Parser(mList(i + 1).content.Json())
 If .content.ExistKey("C") Then .content.RemoveOne
 .content.AssignPath "C.1", CVar(a$)
-.flags = .flags Or (fline + fselected + joinpRevline)
-.flags = .flags Xor (fline + fselected + joinpRevline)
+.Flags = .Flags Or (fline + fselected + joinpRevline)
+.Flags = .Flags Xor (fline + fselected + joinpRevline)
 End With
 Timer1.enabled = False
 Timer1.Interval = 100
@@ -3955,7 +3955,7 @@ For i = itemcount - 1 To ListIndex + Rows Step -1
 Next i
 For i = ListIndex + 1 To ListIndex + Rows
 With mList(i)
-.flags = joinpRevline
+.Flags = joinpRevline
 Set .content = Nothing
 End With
 Next i
@@ -4009,8 +4009,8 @@ itemcount = itemcount + 1
 With mList(itemcount - 1)
 Set .content = New JsonObject
 .content.AssignPath "C.1", CVar(a$)
-.flags = .flags Or (fline + fselected + joinpRevline)
-.flags = .flags Xor (fline + fselected + joinpRevline)
+.Flags = .Flags Or (fline + fselected + joinpRevline)
+.Flags = .Flags Xor (fline + fselected + joinpRevline)
 End With
 End Sub
 Public Sub Removeitem(ByVal ii As Long)
@@ -6377,15 +6377,15 @@ If itemcount > 0 And Not BlockItemcount Then
         If LeftMarginPixels < mytPixels Then LeftMarginPixels = mytPixels
         'mList(item).checked = checked ' means that can be checked
         With mList(item)
-            .flags = .flags Or fchecked
-            If Not checked Then .flags = .flags Xor fchecked
+            .Flags = .Flags Or fchecked
+            If Not checked Then .Flags = .Flags Xor fchecked
             If .content Is Nothing Then Set .content = New JsonObject
               .content.AssignPath "C.0", CVar(id$)   ' now contendID is in 0
         End With
         ListSelected(item) = firstState
         With mList(item)
-            .flags = .flags Or fradiobutton
-            If Not radiobutton Then .flags = .flags Xor fradiobutton
+            .Flags = .Flags Or fradiobutton
+            If Not radiobutton Then .Flags = .Flags Xor fradiobutton
         End With
     End If
 End If
@@ -6781,7 +6781,7 @@ Do While ListJoin(item) And item > 0
 Loop
 SkipReadEditflag = False
 For X = item To listcount - 1
-If (mList(X).flags And (fline + joinpRevline)) = 0 Then SELECTEDITEM = X + 1: Exit For
+If (mList(X).Flags And (fline + joinpRevline)) = 0 Then SELECTEDITEM = X + 1: Exit For
 Next X
 If item = listcount Then SELECTEDITEM = 0
 Else
@@ -7620,11 +7620,11 @@ End Sub
 Friend Function compact(ByVal fr As Long, ByVal ed As Long) As Long
     Dim i As Long, many As Long, pc As Long
     Dim emp() As itemlist, EM As itemlist
-    EM.flags = joinpRevline
+    EM.Flags = joinpRevline
     ReDim emp(fr To ed) As itemlist
     pc = fr
     For i = fr To ed
-        If (mList(i).flags And joinpRevline) = 0 Then
+        If (mList(i).Flags And joinpRevline) = 0 Then
             emp(pc) = mList(i)
             pc = pc + 1
         Else
@@ -7642,7 +7642,7 @@ Friend Function compact(ByVal fr As Long, ByVal ed As Long) As Long
 End Function
 Friend Sub Expand(ByVal fr As Long, ByVal ed As Long, many As Long)
     Dim EM As itemlist, pc As Long, i As Long, H As Integer, j As Long, mm As Long
-    EM.flags = joinpRevline
+    EM.Flags = joinpRevline
     
     pc = fr + many
     mm = many
@@ -7683,7 +7683,7 @@ Else
 End If
 For i = 0 To listcount - 1
     With mList(i)
-        If (.flags And joinpRevline) = 0 Then
+        If (.Flags And joinpRevline) = 0 Then
         If Not .content Is Nothing Then
             If .content.ExistKey("C") Then
                 Set ja = .content.ValueObj

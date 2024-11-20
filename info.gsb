@@ -2413,207 +2413,206 @@ MODULE RAT {Report {
 	We can make arrays of rational numbers
 }
 Module RationalNumbers {
-Class Rational {
-	numerator as decimal, denominator as decimal
-	gcd=lambda->0
-	lcm=lambda->0
-	operator "+" {
-		Read l
-		denom=.lcm(l.denominator, .denominator)
-		.numerator<=denom/l.denominator*l.numerator+denom/.denominator*.numerator
-		if .numerator==0 then denom=1
-		.denominator<=denom
-	}
-	Operator Unary {
-		.numerator-!
-	}
-	Operator "-" {
-		Read l
-		Call Operator "+", -l
-	}
-	Operator high "*" {
-		Read l
-		g1=.gcd(l.numerator,.denominator)
-		g2=.gcd(.numerator, l.denominator)
-		Push l.numerator/g1*.numerator/g2
-		Push l.denominator/g2*.denominator/g1
-		Read .denominator, .numerator
-	}
-	Function Inverse {
-		if .numerator==0 then Error "Division by zero"
-		ret=This
-		sign=Sgn(ret.numerator) : if sign<0 then ret.numerator-!
-		swap ret.numerator, ret.denominator
-		if sign<0 then ret.numerator-!
-		=ret
-	}
-	Operator high"/" {
-		Read l
-		call operator "*", l.inverse()
-	}
-	Function Power {
-		Read pow as long
-		ret=This
-		ret.numerator<=.numerator^pow
-		ret.denominator<=.denominator^pow
-		=ret
-	}
-	Operator "=" {
-		Read l
-		Boolean T=True, F=False
-		if Abs(Sgn(l.numerator))+Abs(Sgn(.numerator))=0 then Push T: exit
-		if Sgn(l.numerator) <>Sgn(.numerator) then Push F : exit
-		pcomp=l/this
-		Push pcomp.numerator=1 and pcomp.denominator=1
-	}
-	Operator  ">" {
-		Read l
-		Boolean F
-		if Abs(Sgn(l.numerator))+Abs(Sgn(.numerator))=0 then Push F: exit
-		if Sgn(l.numerator)=0 then {
-			Push .numerator>0
-		} Else {
-			pcomp=this/l
-			Push pcomp.real>1
+	Class Rational {
+		numerator as decimal, denominator as decimal
+		gcd=lambda->0
+		lcm=lambda->0
+		operator "+" {
+			Read l
+			denom=.lcm(l.denominator, .denominator)
+			.numerator<=denom/l.denominator*l.numerator+denom/.denominator*.numerator
+			if .numerator==0 then denom=1
+			.denominator<=denom
 		}
-	}
-	Operator ">=" {
-		Read l
-		if Sgn(l.numerator)=0 then {
-			Push .numerator>=0
-		} Else {
-			pcomp=this/l
-			Push pcomp.real>=1
+		Operator Unary {
+			.numerator-!
 		}
-	}      
-	Operator "<" {
-		Read l
-		Boolean F
-		if Abs(Sgn(l.numerator))+Abs(Sgn(.numerator))=0 then Push F: exit
-		if Sgn(l.numerator)=0 then {
-			Push .numerator<0
-		} Else {
-			pcomp=this/l
-			Push pcomp.real<1
+		Operator "-" {
+			Read l
+			Call Operator "+", -l
 		}
-	}
-	Operator "<=" {
-		Read l
-		if Sgn(l.numerator)=0 then {
-			Push .numerator<=0
-		} Else {
-			pcomp=this/l
-			Push pcomp.real<=1
-		}            
-	}
-	Operator "<>" {
-		Read l
-		if Sgn(l.numerator)=0 then {
-			Push .numerator<>0
-		} Else {
-			pcomp=this/l
-			Push pcomp.real<>1
-		}            
-	}
-	Group Real {
-		value {
-			link parent numerator, denominator to n, d
-			=n/d
+		Operator high "*" {
+			Read l
+			g1=.gcd(l.numerator,.denominator)
+			g2=.gcd(.numerator, l.denominator)
+			Push l.numerator/g1*.numerator/g2
+			Push l.denominator/g2*.denominator/g1
+			Read .denominator, .numerator
 		}
-	}
-	Group ToString$ {
-		value {
-			link parent numerator, denominator to n, d
-			=Str$(n)+"/"+Str$(d,"")
-		}      
-	}
-class:
-	Module Rational (.numerator, .denominator) {
-		if .denominator=0 then .denominator<=1
-		while frac(.numerator)<>0 {
-			.numerator*=10@
-			.denominator*=10@
+		Function Inverse {
+			if .numerator==0 then Error "Division by zero"
+			ret=This
+			sign=Sgn(ret.numerator) : if sign<0 then ret.numerator-!
+			swap ret.numerator, ret.denominator
+			if sign<0 then ret.numerator-!
+			=ret
 		}
-		sgn=Sgn(.numerator)*Sgn(.denominator)
-		.denominator<=abs(.denominator)
-		.numerator<=abs(.numerator)*sgn
-		gcd1=lambda (a as decimal, b as decimal) -> {
-			if a<b then swap a,b
-			g=a mod b
-			while g {
-				a=b:b=g: g=a mod b
+		Operator high"/" {
+			Read l
+			call operator "*", l.inverse()
+		}
+		Function Power {
+			Read pow as long
+			ret=This
+			ret.numerator<=.numerator^pow
+			ret.denominator<=.denominator^pow
+			=ret
+		}
+		Operator "=" {
+			Read l
+			Boolean T=True, F=False
+			if Abs(Sgn(l.numerator))+Abs(Sgn(.numerator))=0 then Push T: exit
+			if Sgn(l.numerator) <>Sgn(.numerator) then Push F : exit
+			pcomp=l/this
+			Push pcomp.numerator=1 and pcomp.denominator=1
+		}
+		Operator  ">" {
+			Read l
+			Boolean F
+			if Abs(Sgn(l.numerator))+Abs(Sgn(.numerator))=0 then Push F: exit
+			if Sgn(l.numerator)=0 then {
+				Push .numerator>0
+			} Else {
+				pcomp=this/l
+				Push pcomp.real>1
 			}
-			=abs(b)
 		}
-		gdcval=gcd1(abs(.numerator), .denominator)
-		if gdcval<.denominator and gdcval<>0 then
-			.denominator/=gdcval
-			.numerator/=gdcval
-		end if
-		.gcd<=gcd1
-		.lcm<=lambda gcd=gcd1 (a as decimal, b as decimal) -> {
-		=a/gcd(a,b)*b
+		Operator ">=" {
+			Read l
+			if Sgn(l.numerator)=0 then {
+				Push .numerator>=0
+			} Else {
+				pcomp=this/l
+				Push pcomp.real>=1
+			}
+		}      
+		Operator "<" {
+			Read l
+			Boolean F
+			if Abs(Sgn(l.numerator))+Abs(Sgn(.numerator))=0 then Push F: exit
+			if Sgn(l.numerator)=0 then {
+				Push .numerator<0
+			} Else {
+				pcomp=this/l
+				Push pcomp.real<1
+			}
+		}
+		Operator "<=" {
+			Read l
+			if Sgn(l.numerator)=0 then {
+				Push .numerator<=0
+			} Else {
+				pcomp=this/l
+				Push pcomp.real<=1
+			}            
+		}
+		Operator "<>" {
+			Read l
+			if Sgn(l.numerator)=0 then {
+				Push .numerator<>0
+			} Else {
+				pcomp=this/l
+				Push pcomp.real<>1
+			}            
+		}
+		Group Real {
+			value {
+				link parent numerator, denominator to n, d
+				=n/d
+			}
+		}
+		Group ToString$ {
+			value {
+				link parent numerator, denominator to n, d
+				=Str$(n)+"/"+Str$(d,"")
+			}      
+		}
+	class:
+		Module Rational (.numerator, .denominator) {
+			if .denominator=0 then .denominator<=1
+			while frac(.numerator)<>0 {
+				.numerator*=10@
+				.denominator*=10@
+			}
+			sgn=Sgn(.numerator)*Sgn(.denominator)
+			.denominator<=abs(.denominator)
+			.numerator<=abs(.numerator)*sgn
+			gcd1=lambda (a as decimal, b as decimal) -> {
+				if a<b then swap a,b
+				g=a mod b
+				while g {
+					a=b:b=g: g=a mod b
+				}
+				=abs(b)
+			}
+			gdcval=gcd1(abs(.numerator), .denominator)
+			if gdcval<.denominator and gdcval<>0 then
+				.denominator/=gdcval
+				.numerator/=gdcval
+			end if
+			.gcd<=gcd1
+			.lcm<=lambda gcd=gcd1 (a as decimal, b as decimal) -> {
+			=a/gcd(a,b)*b
+			}
 		}
 	}
-}
-Print rational(-3,3)<>rational(-3,3)  ' false
-M=Rational(10, 150)
-N=Rational(2, 4)
-Print "M.real+N.real=";M.real+N.real
-Print "Z=M+N"
-Z=M+N
-Print 10/150@+2/4@
-Print "Z.real="; Z.real
-Print "(";M.numerator;"/"; M.denominator;") + (";N.numerator;"/"; N.denominator;") = (";Z.numerator;"/";Z.denominator;")"
-Print M.tostring$+ " +"+N.tostring$+" ="+Z.tostring$
-Print -10/150@+2/4@
-Z=-M+N
-Print "-"+M.tostring$+ " +"+N.tostring$+" ="+Z.tostring$
-Print Z.numerator, Z.denominator, Z.numerator/Z.denominator
-Print -10/150@+2/4@
-Print Z.real
-Z=M-N
-Print Z.numerator, Z.denominator
-Print 10/150@-2/4@
-Print Z.real
-Z=M*N
-Print Z.numerator, Z.denominator
-Print (10/150@)*(2/4@)
-Print Z.real
-Z=M/N
-Print Z.numerator, Z.denominator
-Print (10/150@)/(2/4@)
-Print z.tostring$
-Print Z.real
-Print "Z power 2 = ";
-
-Z=Z.Power(2)
-Print Z.real
-Print z.tostring$;" = ";eval(z.tostring$)   
-Print Z=Z
-Print Z=N, "            SHOULD BE FALSE"  ' false
-Print Z=-Z , "            SHOULD BE FALSE"  ' false
-ZZ=-Z
-Print ZZ=ZZ
-Print -Z=-Z
-Print Z.numerator, Z.denominator
-Print Z.real, Z.tostring$
-\\ Array of rational numbers
-Dim K(100)=rational(1,1)
-M=K(4)+K(3)
-Print M.real
-Print K(4).toString$
-
-pk->(Z)
-Print pk=>toString$+" +"
-zzz=k(4)+pk
-Print zzz.toString$+ " ="+K(4).toString$+" +"+pk=>toString$
-
-zzz=Rational(10,1)+Rational(3,1)*Rational(2,1)
-Print zzz.toString$, zzz.real=16
-zzz=Rational(10,1)*Rational(3,1)+Rational(2,1)
-Print zzz.toString$, zzz.real=32
-
+	Print rational(-3,3)<>rational(-3,3)  ' false
+	M=Rational(10, 150)
+	N=Rational(2, 4)
+	Print "M.real+N.real=";M.real+N.real
+	Print "Z=M+N"
+	Z=M+N
+	Print 10/150@+2/4@
+	Print "Z.real="; Z.real
+	Print "(";M.numerator;"/"; M.denominator;") + (";N.numerator;"/"; N.denominator;") = (";Z.numerator;"/";Z.denominator;")"
+	Print M.tostring$+ " +"+N.tostring$+" ="+Z.tostring$
+	Print -10/150@+2/4@
+	Z=-M+N
+	Print "-"+M.tostring$+ " +"+N.tostring$+" ="+Z.tostring$
+	Print Z.numerator, Z.denominator, Z.numerator/Z.denominator
+	Print -10/150@+2/4@
+	Print Z.real
+	Z=M-N
+	Print Z.numerator, Z.denominator
+	Print 10/150@-2/4@
+	Print Z.real
+	Z=M*N
+	Print Z.numerator, Z.denominator
+	Print (10/150@)*(2/4@)
+	Print Z.real
+	Z=M/N
+	Print Z.numerator, Z.denominator
+	Print (10/150@)/(2/4@)
+	Print z.tostring$
+	Print Z.real
+	Print "Z power 2 = ";
+	
+	Z=Z.Power(2)
+	Print Z.real
+	Print z.tostring$;" = ";eval(z.tostring$)   
+	Print Z=Z
+	Print Z=N, "            SHOULD BE FALSE"  ' false
+	Print Z=-Z , "            SHOULD BE FALSE"  ' false
+	ZZ=-Z
+	Print ZZ=ZZ
+	Print -Z=-Z
+	Print Z.numerator, Z.denominator
+	Print Z.real, Z.tostring$
+	\\ Array of rational numbers
+	Dim K(100)=rational(1,1)
+	M=K(4)+K(3)
+	Print M.real
+	Print K(4).toString$
+	
+	pk->(Z)
+	Print pk=>toString$+" +"
+	zzz=k(4)+pk
+	Print zzz.toString$+ " ="+K(4).toString$+" +"+pk=>toString$
+	
+	zzz=Rational(10,1)+Rational(3,1)*Rational(2,1)
+	Print zzz.toString$, zzz.real=16
+	zzz=Rational(10,1)*Rational(3,1)+Rational(2,1)
+	Print zzz.toString$, zzz.real=32
 }
 RationalNumbers
 }
@@ -4416,7 +4415,9 @@ CheckIt
 Thread.Plan Sequential
 SET FAST
 }
-MODULE LISP {Profiler
+MODULE LISP {CLS,0
+REFRESH
+Profiler
 EntryLevel =0
 Module forall {  \\ For all subs - reusable code use Call ! Local forall
       Local MyAcc$
@@ -4663,7 +4664,7 @@ Function Parser {
 \\ Mini lisp ver 0.01
 Clear \\ clear variables
 Flush \\ empty stack
-Form ! 60,48
+Form 80,64
 
 Print "MiniLisp Ver 0.01"
 Scroll Split  Row  \\ make this row start of scrolling screen
@@ -4689,8 +4690,9 @@ Document a$={
                         (write (+ 1 2 3))
                         }                    
 Print "Parse:";
-Report a$
+pen 15 {Report a$}
 Print
+Refresh
 nl$={
 } \\ nl$ is new line
 Let level=0, one$="", numeric=False, prints=0, com=False, profil=1, ch10$=chr$(10),ch13$=chr$(13), qu$=chr$(34)
@@ -4710,10 +4712,17 @@ Try ok {  Call Local Parser(level,  &Result$)}
 If Error or Not Ok Then Print Error$
 If level>0 Then Error "more ("
 If Not Mess Then {
-      Report 2, "Results" 
+      Report 2, "== Results ==" 
       Report Replace$(nl$," ", Result$)
 }
-Print Timecount
+pen 15 {
+	oldit= italic
+	Italic 1 
+	Print over $(7),Timecount+" msec"
+	Print 
+		if module(info) then print over $(2), "Press F3": Print
+	Italic oldit
+}
 }
 MODULE P {// this is not a game is an example for how we make a game using threads and sprites. Images are simple for this example.
 
@@ -12206,7 +12215,7 @@ Module Maze2 {
       \\ depth-first search
       While Inkey$<>"" {}  ' drop keys
       Const View as boolean=True
-      Def tc
+      Double tc
 
       Form 80,50
 again:
@@ -12302,60 +12311,56 @@ Cursor 0,0
 if module(infobasic) then keyboard "infobasic", 13
 
 }
-MODULE MAZE {Module Maze {
-      width% = 40
-      height% = 20
-      \\ we can use DIM maze$(0 to width%,0 to  height%)="#"
-      \\ so we can delete the two For loops
-      DIM maze$(0 to width%,0 to  height%)
-      FOR x% = 0 TO width%
-          FOR y% = 0 TO height%
-              maze$(x%, y%) = "#"
-          NEXT y%
-      NEXT x%
+MODULE MAZE {MODULE  Maze {
+      INTEGER W = 40, H = 20, X, Y, CX, CY, OX, OY, I
+      BOOLEAN DONE
+      DIM MAZE(0 TO W, 0 TO  H) AS STRING
+      FOR X = 0 TO W
+          FOR Y = 0 TO H
+              MAZE(X, Y) = "#"
+          NEXT Y
+      NEXT X
  
-      currentx% = INT(RND * (width% - 1))
-      currenty% = INT(RND * (height% - 1))
+      CX = RND * (W - 1)
+      CY = RND * (H - 1)
  
-      IF currentx% MOD 2 = 0 THEN currentx%++
-      IF currenty% MOD 2 = 0 THEN currenty%++
-      maze$(currentx%, currenty%) = " "
+      IF CX MOD 2 = 0 THEN CX++
+      IF CY MOD 2 = 0 THEN CY++
+      MAZE(CX, CY) = " "
  
-      done% = 0
-      WHILE done% = 0 {
-          FOR i% = 0 TO 99
-              oldx% = currentx%
-              oldy% = currenty%
-              SELECT CASE INT(RND * 4)
+      WHILE NOT DONE
+          FOR I = 0 TO 99
+              OX = CX
+              OY = CY
+              SELECT CASE RANDOM(0, 3)
                   CASE 0
-                      IF currentx% + 2 < width% THEN currentx%+=2
+                      IF CX + 2 < W THEN CX+=2
                   CASE 1
-                      IF currenty% + 2 < height% THEN currenty%+=2
+                      IF CY + 2 < H THEN CY+=2
                   CASE 2
-                      IF currentx% - 2 > 0 THEN currentx%-=2
+                      IF CX - 2 > 0 THEN CX-=2
                   CASE 3
-                      IF currenty% - 2 > 0 THEN currenty%-=2
+                      IF CY - 2 > 0 THEN CY-=2
               END SELECT
-              IF maze$(currentx%, currenty%) = "#"  Then {
-                  maze$(currentx%, currenty%) = " "
-                  maze$(INT((currentx% + oldx%) / 2), ((currenty% + oldy%) / 2)) = " "
-             }
-          NEXT i%
-          done% = 1
-          FOR x% = 1 TO width% - 1 STEP 2
-              FOR y% = 1 TO height% - 1 STEP 2
-                  IF maze$(x%, y%) = "#" THEN done% = 0
-              NEXT y%
-          NEXT x%
-      }
+              IF MAZE(CX, CY) = "#"  THEN
+                  MAZE(CX, CY) = " "
+                  MAZE((CX + OX) DIV 2, (CY + OY) DIV 2) = " "
+             END IF
+          NEXT I
+          DONE = TRUE
+          FOR X = 1 TO W - 1 STEP 2
+              FOR Y = 1 TO H - 1 STEP 2
+                  IF MAZE(X, Y) = "#" THEN DONE = FALSE
+              NEXT Y
+          NEXT X
+      END WHILE 
  
- 
-      FOR y% = 0 TO height%
-          FOR x% = 0 TO width%
-              PRINT maze$(x%, y%);
-          NEXT x%
+      FOR Y = 0 TO H
+          FOR X = 0 TO W
+              PRINT MAZE(X, Y);
+          NEXT X
           PRINT
-      NEXT y%
+      NEXT Y
 }
 Maze
 }
@@ -15638,7 +15643,7 @@ Module CheckMatMult2 {
 	b(0,2)= 4, -3, 4/3, -1/4, -13/3, 19/4, -7/3, 11/24, 3/2, -2, 7/6, -1/4, -1/6, 1/4, -1/6, 1/24
 	res()=MatMul(&a(), &b())
 	for i=0 to 3 :for j=0 to 3
-	Print res(i,j),
+	Print round(res(i,j)),
 	next j : Print : next i
 }
 CheckMatMult2
@@ -36144,12 +36149,12 @@ input "Another try (no zero value):", zz
 if zz<>0 then goto again2
 print "done"
 }
-MODULE VPLAYER {def resp$
+MODULE VPLAYER {volume 60, 50
+string resp
 movie // close any open video
 cls 0, 0
 back {cls 0,0}
 Print "Video Player 0.1"
-volume 30
 video$=path$(0xE)
 Print video$
 dir video$
@@ -36164,8 +36169,15 @@ if menu>0 then
 	if menu=1 then Print menu$(menu) else Print "no"
 	if menu=1 then
 		movie p$
-		resp$=movie.error$
-		if resp$<>"" then
+		do 
+			resp=movie.error$
+			print string$("*", random(1, width*.8))
+			IF INKEY$=" "THEN MOVIE mousea.x, mousea.y
+			wait 1000/60
+		until not movie
+		cls 5
+		
+		if resp<>"" then
 			Report {You need video codecs, perhaps from:
 				https://www.mediaplayercodecpack.com/standard/
 				You get Opera and mcAfee web protection, but you can uninstall them.
@@ -36173,13 +36185,13 @@ if menu>0 then
 		else
 			//MOVIE 1000+motion.xW,1000+motion.yW 
 			report {Click on video to stop/hide it, or write Movie and press enter}
-			wait 3000
+			wait 100
 		end if
 	end if
 end if
 dir user
 volume 50
-if resp$="" then if module(info) then info
+if resp="" then if module(InfoBasic) then InfoBasic
 }
 MODULE PRIORITY {Module OrdrerQueue (filename$, emptysecndqueue as boolean)  {
       // f=-2  or use empty filename for screen
@@ -43811,7 +43823,7 @@ push key$
 drop
 if module(info) then keyboard "info"+chr$(13)
 }
-MODULE VECTOR_PRODUCTS {Class Vector {
+MODULE VECTOR.PRODUCTS {Class Vector {
 private:
       single a,b,c
 public:
@@ -43981,56 +43993,65 @@ circle RC+30
 smooth off
 cursor 0, 38
 }
-MODULE STATS1 {// https://rosettacode.org/wiki/Statistics/Normal_distribution#M2000_Interpreter
-module Statistics_Normal_distribution {    
-    form 80, 50
-    n=100000
-    locale 1033
-    function generate (n as long = 100){
-       long i, m = n + n mod 2
-       double values[n], max=-10000,  min=10000
-       double average, deviation, s, sq
-        for i=0 to m-1 step 2 {
-            double x,y,rsq,f
-            do 
-                x = 2*rnd-1 
-                y = 2*rnd-1
-                rsq = x^2 + y^2
-            when rsq >=1 or rsq=0
-            f=sqrt(-2*ln(rsq)/rsq)
-            values[i]= x * f
-            values[i+1]= y * f
-            s+=values[i]+values[i+1]
-            sq+=values[i]**2+values[i+1]**2
-            max=max.data(max, values[i], values[i+1]) 
-            min=min.data(min, values[i], values[i+1])
-        }
-        =values, s, sq, max, min
-    }
-    (a, sum, sumSq, max, min)=generate(n)
-    open "out2.txt" for output as #f
-    print #f, n; " Samples used."
-    mean = sum / n
-    print #f, "Mean    = "; mean
-    print #f, "Std Dev = "; (sumSq /n -mean^2)^0.5
-    print #f, "Min     = ";min
-    print #f, "Max     = ";max    
-    bins = 30
-    dim bins(0 to bins)
-    mm=max-min
-    mb=mm/bins    
-    for i = 0 to len(a)-1
-         long k=(a[i]-min)/mb
-         bins(k)++
-    next i
-    
-    print
-    max=bins()#max()
-    for b = 0 to bins
-        print #f, format$("{0:2:-5}|{1:68}",b*mb+min,string$("*",bins(b)/max*60)+" "+str$(bins(b)/n*100, locale)+"%")
-    next b
-    close #f
-    win "Notepad", dir$+"out2.txt"
+MODULE STATS1 {module Statistics_Normal_distribution {    
+	form 80, 50
+	n=1000000
+	Print "Samples: "+n
+	locale 1033
+	Print "wait..."
+	refresh	
+	function generate (n as long = 100){
+		long i, m = n + n mod 2
+		double v[m-1], max=-10000,  min=10000
+		double average, deviation, s, sq, x, y, r, f	
+		for i=0 to m-2 step 2 {
+			do  {x=2*rnd-1:y=2*rnd-1:r=x^2+y^2:if r else restart
+			} until r<1
+			f=sqrt(-2*ln(r)/r)
+			x*=f: y*=f:	s+=x+y:sq+=x**2+y**2
+			max=max.data(max, x, y) 
+			min=min.data(min, x, y)
+			v[i]=x:v[i+1]=y		
+		}
+		=v, s, sq, max, min
+	}
+	profiler
+	(a, sum, sumSq, max, min)=generate(n)
+	print timecount
+	Print "Array generated.",,"Wait...": refresh
+	open "out2.txt" for wide output as #f
+	print #f, n; " Samples used."
+	mean = sum / n
+	print #f, "Mean    = "; mean
+	print #f, "Std Dev = "; (sumSq /n -mean^2)^0.5
+	print #f, "Min     = ";min
+	print #f, "Max     = ";max    
+	bins = 30
+	dim bins(0 to bins)
+	mm=max-min
+	mb=mm/bins
+	print "feed bins"
+	profiler
+	for i = 0 to len(a)-1
+		long k=(a[i]-min)/mb
+		bins(k)++
+	next i
+	print timecount
+	print "Bins are ok.",,"Wait for export file: out2.txt"
+	max=bins()#max()
+	for b = 0 to bins
+	print #f, format$("{0:2:-5}|{1:68}",b*mb+min,string$("*",bins(b)/max*60)+" "+str$(round(bins(b)/n*100,2), locale)+"%")
+	next b
+	close #f
+	print "Done"
+	// win "out2.txt" or we can write without quotes
+	win out2.txt
+	open "out2.txt" for wide input as #f
+	while not eof(#f)
+		line input #f, thisline$
+		Pen 15 {print thisline$}
+	end while
+	close #f
 }
 Statistics_Normal_distribution
 }

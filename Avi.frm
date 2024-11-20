@@ -37,6 +37,7 @@ Public previewKey As Boolean
 
 Private Sub Form_Activate()
 If HOOKTEST <> 0 Then UnHook HOOKTEST
+
 CLICK_COUNT = CLICK_COUNT + 1
 If getout Then Exit Sub
 If CLICK_COUNT < 2 Then
@@ -56,20 +57,22 @@ SetWindowPos Me.hWnd, HWND_TOPMOST, aviX / dv15, _
 End If
 End If
 ElseIf AVIRUN Then
+Debug.Print mouse
+If mouse <> 2 Then
 If Me.Height > 0 Then getout = True
+End If
 Else
 End If
+
 If getout Then
 GETLOST
 End If
 End Sub
 
-Private Sub Form_Click()
-If MediaPlayer1.isMoviePlaying Then GETLOST
-End Sub
 
-Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
-KeyCode = 0
+
+Private Sub Form_KeyDown(keycode As Integer, Shift As Integer)
+keycode = 0
 If Form1.Visible Then
 If Form1.TEXT1.Visible Then
 Form1.TEXT1.SetFocus
@@ -94,7 +97,7 @@ getout = True
 Else
 MediaPlayer1.hideMovie
 MediaPlayer1.FileName = avifile
-Timer1.Enabled = False
+Timer1.enabled = False
 Interval = MediaPlayer1.Length
 hmonitor = FindMonitorFromPixel(Form1.Left, Form1.top)
 
@@ -158,7 +161,7 @@ End If
 End If
 
 
-Timer1.Enabled = False
+Timer1.enabled = False
 
 
 
@@ -173,15 +176,19 @@ AVIUP = True
 End Sub
 
 Public Sub Avi2Up()
-Timer1.Enabled = True
+Timer1.enabled = True
 Me.ZOrder
 MediaPlayer1.playMovie
 
-Timer1.Enabled = True
+Timer1.enabled = True
 AVIRUN = True
 End Sub
 
 
+
+Private Sub Form_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+If (Button And 1) = 1 Then If MediaPlayer1.isMoviePlaying Then GETLOST
+End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
 getout = False
@@ -193,11 +200,12 @@ End Sub
 
 Public Sub GETLOST()
 getout = True
-Timer1.Enabled = False
+Timer1.enabled = False
 Hide
 MediaPlayer1.hideMovie
 MediaPlayer1.stopMovie
 MediaPlayer1.closeMovie
+MediaPlayer1.Error = 0
 AVIRUN = False
 MyDoEvents
 If Form1.Visible Then Form1.Refresh: If Form1.DIS.Visible Then Form1.DIS.Refresh

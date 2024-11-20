@@ -1,15 +1,48 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 45 active-X
-1. Fix #slice() special function for tuples:
-? (1,2,3)#slice(0,0)   ' print 1 before nothing...
-? (1,2,3)#slice(1,2)   ' print 2  3 
-2. Updated Info.gsb
+Version 12 Revision 47 active-X
+1. Fixed a bug in WIN statement, and now the Win "file.txt" open file.txt from current folder to default app for txt files.
+2. Fixed some bugs in MovieModule for video player (see also Vplayer on info file)
+3. Movie.Height and Movie.Width now return the height and width of movie in twips.
+4. A new event for use form, called MoveTo which return X and Y the left and top values before the form get the new one, when we moving the window. This is usefull if we have a video on user form and we want to move the video together with the form.
 
+boolean mymovie
+// here we have the code for making the window (see examples in info)
+Declare form1 form
 
+// before the form close we have to erase the movie using this:
+function form1.unload {
+  movie
+}
+// we can play from the start by clicking the form
+function form1.click {
+  if mymovie else exit            
+  movie to 0
+  movie restart
+}
+// this is the new one to move the movie when we move the window.
+function form1.moveto {
+  read new x, y
+  movie x+7000, y+1000
+}
+// before we turn visible the form:
+layer form1 {
+  cls #333333, 0
+  movie motion.x+7000, motion.y+1000, 2000
+  // we can load the movie without playing using movie load statement.
+  movie load "Second"  
+  mymovie=true  ' so now we mark tha the video Second.avi is loaded
+  // this code run after 300 msec (when the form is open)
+  after 300 {
+    movie show
+    movie restart
+  }
+}
+// so now we can show the form
+      Method form1, "show", 1
+      Declare form1 nothing
 
-The M2000language.exe (the setup exe) google say is a virus (but it isn't) due to the use of VB6. The file is signed see bellow.
-This is the MD5 file checksum: c324d1b358c62e6366a1735a54212ace
+5. Updated Info.gsb
 
 
 
