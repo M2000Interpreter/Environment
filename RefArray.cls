@@ -149,7 +149,7 @@ Else
 End If
 End Property
 Property Let Value(Optional where, Optional what, Optional WHAT1, Optional what2, that)
-Dim mt As Integer, wt As Integer
+Dim mt As Integer, wt As Integer, ss$
 
 If IsMissing(where) Then
     If IsObject(that) Then
@@ -286,8 +286,18 @@ entry1:
         Case vbString
             If wt = vbString Then
                 p(where)(what) = that
+            ElseIf wt = vbBoolean Then
+                p(where)(what) = Format$(that, DefBooleanString)
+            ElseIf wt = 20 Then
+                p(where)(what) = CStr(that)
             Else
-                mError = 5030
+                ss$ = LTrim$(str(that))
+                If Left$(ss$, 1) = "." Then
+                ss$ = "0" + ss$
+                ElseIf Left$(ss$, 2) = "-." Then
+                ss$ = "-0" + Mid$(ss$, 2)
+                End If
+                p(where)(what) = ss$
             End If
         Case vbDate
             p(where)(what) = CDate(that)

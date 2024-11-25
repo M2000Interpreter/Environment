@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 47
+Global Const Revision = 48
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7272,29 +7272,38 @@ If logical(bstack, aa$, R, , True, , IntVal, nostring) Then
     
         po = po + R
     Else
-    If CheckInt64(R) Then
-                   ut$ = CStr(R)
+                If CheckInt64(R) Then
+                   po = po + CStr(R)
+                ElseIf myVarType(R, vbBoolean) Then
+                    po = po + Format$(R, DefBooleanString)
                 Else
-                   ut$ = LTrim$(str(R))
+                    ut$ = LTrim$(str(R))
                     If Left$(ut$, 1) = "." Then
                         ut$ = "0" + ut$
                     ElseIf Left$(ut$, 2) = "-." Then
                         ut$ = "-0" + Mid$(ut$, 2)
                     End If
+                    If InStr(ut$, ".") > 0 Then
+                        If NoUseDec Then ut$ = Replace(ut$, ".", NowDec$)
+                    End If
+                    po = po + ut$
                 End If
-                po = po + ut$
-    
     End If
         MUL = 0
     ElseIf myVarType(R, vbString) Then
         If CheckInt64(po) Then
             po = CStr(po) + R
+        ElseIf myVarType(po, vbBoolean) Then
+            po = Format(po, DefBooleanString) + R
         Else
             ut$ = LTrim$(str(po))
             If Left$(ut$, 1) = "." Then
             ut$ = "0" + ut$
             ElseIf Left$(ut$, 2) = "-." Then
             ut$ = "-0" + Mid$(ut$, 2)
+            End If
+            If InStr(ut$, ".") > 0 Then
+                If NoUseDec Then ut$ = Replace(ut$, ".", NowDec$)
             End If
             ut$ = ut$ + R
             po = vbNullString
@@ -7345,6 +7354,14 @@ ElseIf Not nostring Then
     Case vbString
         If IsStrExp(bstack, aa$, ut$) Then
             po = po + CVar(ut$)
+        Else
+            MissStringExpr
+            IsExpA = False
+            Exit Function
+        End If
+    Case vbBoolean
+        If IsStrExp(bstack, aa$, ut$) Then
+            po = Format(po, DefBooleanString) + CVar(ut$)
         Else
             MissStringExpr
             IsExpA = False
@@ -14383,6 +14400,8 @@ cont003003:
                    rr$ = CStr(p)
                 Case vbDate
                     rr$ = p
+                Case vbBoolean
+                    rr$ = Format$(p, DefBooleanString)
                 Case Else
                    rr$ = LTrim$(str(p))
                     If Left$(rr$, 1) = "." Then
@@ -14750,12 +14769,19 @@ comehere:
                                         If MyIsNumeric(usehandler.index_cursor) Then
                                         If CheckInt64(usehandler.index_cursor) Then
                                             R$ = CStr(usehandler.index_cursor)
+                                        ElseIf myVarType(var(w1), vbBoolean) Then
+                                            R$ = Format$(var(w1), DefBooleanString)
                                         Else
                                             R$ = LTrim$(str(usehandler.index_cursor))
                                             If Left$(R$, 1) = "." Then
                                                 R$ = "0" + R$
                                             ElseIf Left$(R$, 2) = "-." Then
                                                 R$ = "-0" + Mid$(R$, 2)
+                                            End If
+                                            If InStr(R$, ".") > 0 Then
+                                            If NoUseDec Then
+                                            R$ = Replace$(R$, ".", NowDec$)
+                                            End If
                                             End If
                                         End If
                                         IsStr1 = True
@@ -14783,13 +14809,15 @@ comehere:
                         End If
                     End If
                 Else
-                    If VarType(var(w1)) = vbString Then
+                    If myVarType(var(w1), vbString) Then
                         R$ = var(w1)
                         IsStr1 = True
                         Exit Function
                     ElseIf Not myVarType(var(w1), vbObject) Then
                         If CheckInt64(var(w1)) Then
                            R$ = CStr(var(w1))
+                        ElseIf myVarType(var(w1), vbBoolean) Then
+                            R$ = Format$(var(w1), DefBooleanString)
                         Else
                             R$ = LTrim$(str(var(w1)))
                             If Left$(R$, 1) = "." Then
@@ -15122,12 +15150,19 @@ getsomethinghere:
                             Else
                                 If CheckInt64(p) Then
                                     R$ = CStr(p)
+                                ElseIf myVarType(p, vbBoolean) Then
+                                    R$ = Format$(p, DefBooleanString)
                                 Else
                                     R$ = LTrim$(str(p))
                                     If Left$(R$, 1) = "." Then
                                         R$ = "0" + R$
                                     ElseIf Left$(R$, 2) = "-." Then
                                         R$ = "-0" + Mid$(R$, 2)
+                                    End If
+                                    If InStr(R$, ".") > 0 Then
+                                    If NoUseDec Then
+                                    R$ = Replace$(R$, ".", NowDec$)
+                                    End If
                                     End If
                                 End If
                             End If
@@ -15271,12 +15306,19 @@ Final:
             Else
                 If CheckInt64(p) Then
                     R$ = CStr(p)
+                ElseIf myVarType(p, vbBoolean) Then
+                    R$ = Format$(p, DefBooleanString)
                 Else
                     R$ = LTrim$(str(p))
                     If Left$(R$, 1) = "." Then
                         R$ = "0" + R$
                     ElseIf Left$(R$, 2) = "-." Then
                         R$ = "-0" + Mid$(R$, 2)
+                    End If
+                    If InStr(R$, ".") > 0 Then
+                    If NoUseDec Then
+                    R$ = Replace$(R$, ".", NowDec$)
+                    End If
                     End If
                 End If
                 IsStr1 = True
@@ -15543,16 +15585,23 @@ againlambda:
                         p = pppp.item(w2)
                         If myVarType(p, vbEmpty) Then
                             R$ = ""
-                         ElseIf CheckInt64(p) Then
-                                    R$ = CStr(p)
-                                Else
-                                    R$ = LTrim$(str(p))
-                                    If Left$(R$, 1) = "." Then
-                                        R$ = "0" + R$
-                                    ElseIf Left$(R$, 2) = "-." Then
-                                        R$ = "-0" + Mid$(R$, 2)
-                                    End If
-                                End If
+                        ElseIf CheckInt64(p) Then
+                            R$ = CStr(p)
+                        ElseIf myVarType(p, vbBoolean) Then
+                            R$ = Format$(p, DefBooleanString)
+                        Else
+                            R$ = LTrim$(str(p))
+                            If Left$(R$, 1) = "." Then
+                                R$ = "0" + R$
+                            ElseIf Left$(R$, 2) = "-." Then
+                                R$ = "-0" + Mid$(R$, 2)
+                            End If
+                            If InStr(R$, ".") > 0 Then
+                            If NoUseDec Then
+                            R$ = Replace$(R$, ".", NowDec$)
+                            End If
+                            End If
+                        End If
                 End If
             End If
             IsStr1 = True
@@ -25014,7 +25063,7 @@ Case 40
 j = j + 1
 Case 41
 j = j - 1
-If j = 0 Then Exit For
+If j < 0 Then Exit For
 Case 123
 i = InStr(i + 1, s$, Chr$(125))
 If i = 0 Then Exit Function
@@ -34096,7 +34145,6 @@ Do
             ss$ = ss$ + "][" + Trim(s$)
             i = 1 + Len(s$)
         Wend
-       ' ss$ = ss$ + "][" + s$
         End If
         If Mid$(rest$, i, 1) <> "]" Then SyntaxError: MyLet = False: Exit Function
         Mid$(rest$, i, 1) = " "
@@ -42276,18 +42324,34 @@ w1 = Abs(IsLabel(bstack, a$, s$))
 End Function
 
 Private Function IsCompMinMax(ByVal dn As Long, bstack As basetask, a$, R As Variant) As Boolean
-Dim s$, w1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp As mArray, pppp1 As mArray
+Dim s$, w1 As Long, ow1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp As mArray, pppp1 As mArray
     w1 = Abs(IsLabel(bstack, a$, s$))
+    ow1 = w1
     If w1 = 1 Or w1 = 4 Then dd = 1  'WE NEED NUMBERS
     If w1 = 5 Or w1 = 7 Then dd = 2 'WE NEED NUMBERS
     If w1 = 0 Then MissingnumVar:: Exit Function
-    If (w1 = 3 Or w1 = 6) And dd > 0 Then SyntaxError:: Exit Function
+    
     If dd = 1 Then
         If GetVar(bstack, s$, w1) Then
-                If Not FastSymbol(a$, ",") Then MissingnumVar:: Exit Function
-                w3 = Abs(IsLabel(bstack, a$, s1$))
+            If Not FastSymbol(a$, ",") Then MissingnumVar:: Exit Function
+            w3 = Abs(IsLabel(bstack, a$, s1$))
             If w3 = 1 Or w3 = 4 Then
                 If GetVar(bstack, s1$, w2) Then
+                If myVarType(var(w1), vbString) Then
+                    If Not myVarType(var(w2), vbString) Then
+                        NeedString
+                        IsCompMinMax = False
+                        Exit Function
+                    End If
+                    Select Case dn
+                    Case 1
+                        If CompareStr3(var(w1), var(w2)) = -1 Then R = var(w1) Else R = var(w2)
+                    Case 2
+                        If CompareStr3(var(w1), var(w2)) = 1 Then R = var(w1) Else R = var(w2)
+                    Case Else
+                    If w1 <> w2 Then R = CompareStr3(var(w1), var(w2))
+                    End Select
+                Else
                 Select Case dn
                 Case 1
                     If var(w1) < var(w2) Then
@@ -42299,6 +42363,7 @@ Dim s$, w1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp As mArray, ppp
                         
                     End If
                 Case 2
+                    
                     If var(w1) > var(w2) Then
                         R = var(w1)
                         
@@ -42307,26 +42372,25 @@ Dim s$, w1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp As mArray, ppp
                         
                     End If
                 Case Else
+
                     If var(w1) = 0 Then
-                    If var(w2) = 0 Then
-                    R = 0
+                        If var(w2) = 0 Then
+                            R = 0
+                        Else
+                        R = Sgn(0 - MyRound(var(w2), 10))
+                        
+                        End If
                     Else
-                    R = Sgn(0 - MyRound(var(w2), 10))
-                    
+                        If MyRound((var(w2) - var(w1)) / var(w1), 10) = 0 Then
+                            R = 0
+                        ElseIf var(w1) > var(w2) Then
+                            R = 1
+                        Else
+                            R = -1
+                        End If
                     End If
-                    Else
-                    If MyRound((var(w2) - var(w1)) / var(w1), 10) = 0 Then
-                    R = 0
-                    ElseIf var(w1) > var(w2) Then
-                    R = 1
-                    Else
-                        R = -1
-                    End If
-                    End If
-                
-                
-                  
                 End Select
+                End If
                     
                     IsCompMinMax = FastSymbol(a$, ")", True)
                 Exit Function
@@ -42338,45 +42402,64 @@ Dim s$, w1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp As mArray, ppp
             ElseIf w3 = 5 Or w3 = 7 Then
                 If neoGetArray(bstack, s1$, pppp) Then
                     If Not NeoGetArrayItem(pppp, bstack, s1$, w2, a$) Then Exit Function
-                    Select Case dn
-                Case 1
-                    If var(w1) < pppp.itemnumeric(w2) Then
-                        R = var(w1)
-                        
-                    Else
-                        R = pppp.itemnumeric(w2)
-                        
-                    End If
-                Case 2
-                    If var(w1) > pppp.itemnumeric(w2) Then
-                        R = var(w1)
-                        
-                    Else
-                        R = pppp.itemnumeric(w2)
-                        
-                    End If
-              Case Else
-                   If var(w1) = 0 Then
-                            If pppp.itemnumeric(w2) = 0 Then
-                            R = 0
+                    If myVarType(var(w1), vbString) Then
+                        R = CVar(pppp.item(w2))
+                        If myVarType(R, vbString) Then
+                            If dn = 1 Then
+                                If CompareStr3(var(w1), R) = -1 Then R = var(w1)
+                            ElseIf dn = 2 Then
+                                If CompareStr3(var(w1), R) = 1 Then R = var(w1)
                             Else
-                            R = Sgn(0 - MyRound(pppp.itemnumeric(w2), 10))
-                            
+                            R = CompareStr3(var(w1), R)
                             End If
+                        Else
+                            R = 0
+                            NeedString
+                            IsCompMinMax = False
+                            Exit Function
+                        End If
                     Else
+                    Select Case dn
+                    Case 1
+                        If var(w1) < pppp.itemnumeric(w2) Then
+                            R = var(w1)
+                        Else
+                            R = pppp.itemnumeric(w2)
+                        End If
+                    Case 2
+                        If var(w1) > pppp.itemnumeric(w2) Then
+                            R = var(w1)
+                        Else
+                            R = pppp.itemnumeric(w2)
+                        End If
+                    Case Else
+                        If var(w1) = 0 Then
+                            If pppp.itemnumeric(w2) = 0 Then
+                                R = 0
+                            Else
+                                R = Sgn(0 - MyRound(pppp.itemnumeric(w2), 10))
+                            End If
+                        Else
                             R = Sgn(MyRound(((var(w1) - pppp.itemnumeric(w2)) / var(w1)), 10))
-                            
-                    End If
-              
-                
+                        End If
                     End Select
-                    
+                    End If
                     IsCompMinMax = FastSymbol(a$, ")", True)
                 Else
                     Nosuchvariable s1$
                     
                     Exit Function
                 End If
+            ElseIf w3 = 3 And ow1 = 1 Then
+                If myVarType(var(w1), vbString) Then
+                    GoTo s12
+                End If
+                MissingStrVar
+            ElseIf w3 = 6 And ow1 = 1 Then
+                If myVarType(var(w1), vbString) Then
+                    GoTo s11
+                End If
+                MissingStrVar
             Else
                 MissingnumVar
                 
@@ -42391,13 +42474,25 @@ Dim s$, w1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp As mArray, ppp
     ElseIf dd = 2 Then
         If neoGetArray(bstack, s$, pppp) Then
             If Not NeoGetArrayItem(pppp, bstack, s$, w1, a$) Then Exit Function
-            If Not FastSymbol(a$, ",") Then MissingnumVar:: Exit Function
+            If Not FastSymbol(a$, ",") Then MissingnumVar: Exit Function
                 w3 = Abs(IsLabel(bstack, a$, s1$))
-            If w3 = 1 Or w3 = 4 Then
+            If w3 = 1 Or w3 = 3 Or w3 = 4 Then
                     If GetVar(bstack, s1$, w2) Then
                     Select Case dn
                     Case 1
-                        If pppp.itemnumeric(w1) < var(w2) Then
+                        If myVarType(var(w2), vbString) Then
+                            R = pppp.item(w1)
+                            If myVarType(R, vbString) Then
+                                If R > var(w2) Then
+                                    R = var(w2)
+                                End If
+                            Else
+                                R = 0
+                                NeedString
+                                IsCompMinMax = False
+                                Exit Function
+                            End If
+                        ElseIf pppp.itemnumeric(w1) < var(w2) Then
                             R = pppp.itemnumeric(w1)
                             
                         Else
@@ -42405,7 +42500,21 @@ Dim s$, w1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp As mArray, ppp
                             
                         End If
                     Case 2
-                        If pppp.itemnumeric(w1) > var(w2) Then
+                        
+                        If myVarType(var(w2), vbString) Then
+                            R = pppp.item(w1)
+                        If myVarType(R, vbString) Then
+                            
+                            If R < var(w2) Then
+                                R = var(w2)
+                            End If
+                        Else
+                            R = 0
+                            NeedString
+                            IsCompMinMax = False
+                            Exit Function
+                        End If
+                        ElseIf pppp.itemnumeric(w1) > var(w2) Then
                             R = pppp.itemnumeric(w1)
                             
                         Else
@@ -42415,7 +42524,17 @@ Dim s$, w1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp As mArray, ppp
                     Case Else
                     
                     
-                      If pppp.itemnumeric(w1) = 0 Then
+                       If myVarType(var(w2), vbString) Then
+                            R = pppp.item(w1)
+                            If myVarType(R, vbString) Then
+                            R = CompareStr3(R, var(w2))
+                            Else
+                            R = 0
+                            NeedString
+                            IsCompMinMax = False
+                            Exit Function
+                            End If
+                        ElseIf pppp.itemnumeric(w1) = 0 Then
                             If var(w2) = 0 Then
                             R = 0
                             Else
@@ -42435,40 +42554,43 @@ Dim s$, w1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp As mArray, ppp
                         
                         Exit Function
                     End If
-            ElseIf w3 = 5 Or w3 = 7 Then
+            ElseIf w3 > 5 And w3 < 8 Then
                     If neoGetArray(bstack, s1$, pppp1) Then
                         If Not NeoGetArrayItem(pppp1, bstack, s1$, w2, a$) Then Exit Function
-                    Select Case dn
-                    Case 1
-                        If pppp.itemnumeric(w1) < pppp1.itemnumeric(w2) Then
-                            R = pppp.itemnumeric(w1)
-                            
+                        If pppp.ItemTypeNum(w1) = vbString And w3 = 6 Then
+                            GoTo st12321
                         Else
-                            R = pppp1.itemnumeric(w2)
-                            
-                        End If
-                    Case 2
-                        If pppp.itemnumeric(w1) > pppp1.itemnumeric(w2) Then
-                            R = pppp.itemnumeric(w1)
-                            
-                        Else
-                            R = pppp1.itemnumeric(w2)
-                            
-                        End If
-                    Case Else
-                        If pppp.itemnumeric(w1) = 0 Then
-                            If pppp1.itemnumeric(w2) = 0 Then
-                            R = 0
+                            Select Case dn
+                            Case 1
+                                If pppp.itemnumeric(w1) < pppp1.itemnumeric(w2) Then
+                                    R = pppp.itemnumeric(w1)
+                                    
+                                Else
+                                    R = pppp1.itemnumeric(w2)
+                                    
+                                End If
+                            Case 2
+                                If pppp.itemnumeric(w1) > pppp1.itemnumeric(w2) Then
+                                    R = pppp.itemnumeric(w1)
+                                    
+                                Else
+                                    R = pppp1.itemnumeric(w2)
+                                    
+                                End If
+                            Case Else
+                                If pppp.itemnumeric(w1) = 0 Then
+                                    If pppp1.itemnumeric(w2) = 0 Then
+                                    R = 0
+                                    Else
+                                    R = Sgn(0 - MyRound(pppp1.itemnumeric(w2), 10))
+                                    
+                                    End If
                             Else
-                            R = Sgn(0 - MyRound(pppp1.itemnumeric(w2), 10))
-                            
+                                    R = Sgn(MyRound(((pppp.itemnumeric(w1) - pppp1.itemnumeric(w2)) / pppp.itemnumeric(w1)), 10))
+                                    
                             End If
-                    Else
-                            R = Sgn(MyRound(((pppp.itemnumeric(w1) - pppp1.itemnumeric(w2)) / pppp.itemnumeric(w1)), 10))
-                            
-                    End If
-                    End Select
-                        
+                            End Select
+                        End If
                         IsCompMinMax = FastSymbol(a$, ")", True)
                     Else
                         MissingnumVar
@@ -42487,21 +42609,40 @@ Dim s$, w1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp As mArray, ppp
         End If
     ElseIf w1 = 3 Then
             If GetVar(bstack, s$, w1) Then
-            If Not FastSymbol(a$, ",") Then MissingnumVar:: Exit Function
+            If Not FastSymbol(a$, ",") Then MissingnumVar: Exit Function
+                
                 w3 = Abs(IsLabel(bstack, a$, s1$))
                 If w3 = 6 Then
+s11:
                     If Not neoGetArray(bstack, s1$, pppp) Then MissingStrVar::   Exit Function
                     If Not NeoGetArrayItem(pppp, bstack, s1$, w2, a$) Then Exit Function
-
-                    R = CompareStr3(var(w1), CStr(pppp.item(w2)))    'StrComp(var(w1), CStr(pppp.item(w2)))
                     
-
+                    R = pppp.item(w2)
+                    If dn = 1 Then
+                        If CompareStr3(var(w1), R) = -1 Then R = var(w1)
+                    ElseIf dn = 2 Then
+                        If CompareStr3(var(w1), R) = 1 Then R = var(w1)
+                    Else
+                        R = CompareStr3(var(w1), R)    'StrComp(var(w1), CStr(pppp.item(w2)))
+                    End If
+                ElseIf w3 = 1 Then
+                If Not GetVar(bstack, s1$, w2) Then MissingStrVar: Exit Function
+                If Not myVarType(var(w2), vbString) Then MissingStrVar: Exit Function
+                GoTo s13
                 ElseIf w3 = 3 Then
-                    If Not GetVar(bstack, s1$, w2) Then: Exit Function
-
-                    R = CompareStr3(var(w1), var(w2))  ' StrComp(var(w1), var(w2))
-                    
-                            Else
+s12:
+                    If Not GetVar(bstack, s1$, w2) Then MissingStrVar: Exit Function
+s13:
+                    If dn = 1 Then
+                        If var(w1) < var(w2) Then R = var(w1) Else R = var(w2)
+                    ElseIf dn = 2 Then
+                        If var(w1) > var(w2) Then R = var(w1) Else R = var(w2)
+                    Else
+                    If w1 <> w2 Then R = CompareStr3(var(w1), var(w2))   ' StrComp(var(w1), var(w2))
+                    End If
+            ElseIf w3 = 5 Then
+                GoTo s11
+            Else
                 
                 MissFuncParameterStringVarMacro a$
                 Exit Function
@@ -42514,21 +42655,51 @@ Dim s$, w1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp As mArray, ppp
             End If
     ElseIf w1 = 6 Then
             If neoGetArray(bstack, s$, pppp) Then
-                If Not NeoGetArrayItem(pppp, bstack, s$, w2, a$) Then Exit Function
+                If Not NeoGetArrayItem(pppp, bstack, s$, w1, a$) Then Exit Function
                 If Not FastSymbol(a$, ",") Then MissingnumVar:: Exit Function
                 w3 = Abs(IsLabel(bstack, a$, s1$))
-                If w3 = 6 Then
-                    If Not neoGetArray(bstack, s1$, pppp1) Then MissingStrVar::   Exit Function
-                    If Not NeoGetArrayItem(pppp1, bstack, s1$, w3, a$) Then Exit Function
-
-                    R = CompareStr3(pppp.item(w2), pppp1.item(w3))
+                If w3 = 6 Or w3 = 5 Then
+                    If Not neoGetArray(bstack, s1$, pppp1) Then MissingStrVar: Exit Function
+                    If Not NeoGetArrayItem(pppp1, bstack, s1$, w2, a$) Then Exit Function
                     
- 
+                    If pppp.ItemTypeNum(w1) = vbString And pppp1.ItemTypeNum(w2) = vbString Then
+st12321:
+                        If dn = 1 Then
+                            If CompareStr3(pppp.item(w1), pppp1.item(w2)) = -1 Then
+                                R = pppp.item(w1)
+                            Else
+                                R = pppp1.item(w2)
+                            End If
+                        ElseIf dn = 2 Then
+                            If CompareStr3(pppp.item(w1), pppp1.item(w2)) = 1 Then
+                                R = pppp.item(w1)
+                            Else
+                                R = pppp1.item(w2)
+                            End If
+                        Else
+                        R = CompareStr3(pppp.item(w1), pppp1.item(w2))
+                        End If
+                    Else
+                        MissingStrVar
+                        Exit Function
+                    End If
+                    
+                ElseIf w3 = 1 Then
+                    If Not GetVar(bstack, s1$, w3) Then MissingStrVar: Exit Function
+                    If Not myVarType(var(w3), vbString) Then MissingStrVar: Exit Function
+                    GoTo s14
                 ElseIf w3 = 3 Then
                     If Not GetVar(bstack, s1$, w3) Then: Exit Function
-
-                    R = CompareStr3(pppp.item(w2), var(w3))
-                    
+s14:
+                    R = pppp.item(w1)
+                    If Not myVarType(R, vbString) Then MissingStrVar: Exit Function
+                    If dn = 1 Then
+                        If R > var(w3) Then R = var(w3)
+                    ElseIf dn = 2 Then
+                        If R < var(w3) Then R = var(w3)
+                    Else
+                    R = CompareStr3(R, var(w3))
+                    End If
                 Else
                 
                 MissFuncParameterStringVarMacro a$
@@ -43763,36 +43934,50 @@ w1 = Abs(IsLabel(bstack, a$, s$))
     End If
 End Function
 Private Function IsMaxData(bstack As basetask, a$, R As Variant) As Boolean
-Dim p As Variant
-If IsExp(bstack, a$, R, , True) Then
-  
-  Do While FastSymbol(a$, ",")
-  If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then: MissNumExpr: Exit Function
-  If p > R Then R = p
-  
-  Loop
-
-    
-    IsMaxData = FastSymbol(a$, ")", True)
-        Else
-            MissNumExpr
-        End If
+Dim p As Variant, s$
+If IsExp(bstack, a$, R, flatobject:=True) Then
+If myVarType(R, vbString) Then GoTo there
+Do While FastSymbol(a$, ",")
+    If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
+    If p > R Then R = p
+Loop
+IsMaxData = FastSymbol(a$, ")", True)
+ 
+ElseIf IsStrExp(bstack, a$, s$, False) Then
+R = vbNullString
+SwapString2Variant s$, R
+there:
+Do While FastSymbol(a$, ",")
+    If Not IsStrExp(bstack, a$, s$, False) Then MissStringExpr: Exit Function
+    If s$ > R Then SwapString2Variant s$, R
+Loop
+IsMaxData = FastSymbol(a$, ")", True)
+Else
+    SyntaxError
+End If
 End Function
 Private Function IsMinData(bstack As basetask, a$, R As Variant) As Boolean
-Dim p As Variant
-If IsExp(bstack, a$, R, , True) Then
-  
-  Do While FastSymbol(a$, ",")
-  If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then: MissNumExpr: Exit Function
-  If p < R Then R = p
-  
-  Loop
-  
-    
-    IsMinData = FastSymbol(a$, ")", True)
-        Else
-        MissNumExpr
-        End If
+Dim p As Variant, s$
+If IsExp(bstack, a$, R, flatobject:=True) Then
+If myVarType(R, vbString) Then GoTo there
+Do While FastSymbol(a$, ",")
+    If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
+    If p < R Then R = p
+Loop
+IsMinData = FastSymbol(a$, ")", True)
+ 
+ElseIf IsStrExp(bstack, a$, s$, False) Then
+R = vbNullString
+SwapString2Variant s$, R
+there:
+Do While FastSymbol(a$, ",")
+    If Not IsStrExp(bstack, a$, s$, False) Then MissStringExpr: Exit Function
+    If s$ < R Then SwapString2Variant s$, R
+Loop
+IsMinData = FastSymbol(a$, ")", True)
+Else
+    SyntaxError
+End If
 End Function
 Private Function IsProperty(bstack As basetask, a$, R As Variant) As Boolean
 Dim w1 As Long, s$, w2 As Long, pppp As mArray

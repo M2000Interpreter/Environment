@@ -1,48 +1,64 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 47 active-X
-1. Fixed a bug in WIN statement, and now the Win "file.txt" open file.txt from current folder to default app for txt files.
-2. Fixed some bugs in MovieModule for video player (see also Vplayer on info file)
-3. Movie.Height and Movie.Width now return the height and width of movie in twips.
-4. A new event for use form, called MoveTo which return X and Y the left and top values before the form get the new one, when we moving the window. This is usefull if we have a video on user form and we want to move the video together with the form.
+Version 12 Revision 48 active-X
+Updated info file.
 
-boolean mymovie
-// here we have the code for making the window (see examples in info)
-Declare form1 form
+1. Fix function Compare() for strings without $ (and arrays with strings without $)
+(not work for arrays with brackets. use <=> )
+2. Fix statement Swap for strings without $
+a$="aaaa" :b="klmn"
+swap b, a$ : print a$, b
+swap a$, b : print a$, b
+3. Fix Swap for arrays with brackets: A[]
+long b[3][4]=100
+object c[3]
+c[0]=b[]  // get a copy of b
+let c[0][2][1]=40
+? c[0][2][1]<> b[2][1]
+c[1]=b   // get a pointer to b
+let c[1][2][1]=400
+? c[1][2][1]=b[2][1]
 
-// before the form close we have to erase the movie using this:
-function form1.unload {
-  movie
+gen=lambda k=0 ->{
+	k++
+	=k
 }
-// we can play from the start by clicking the form
-function form1.click {
-  if mymovie else exit            
-  movie to 0
-  movie restart
-}
-// this is the new one to move the movie when we move the window.
-function form1.moveto {
-  read new x, y
-  movie x+7000, y+1000
-}
-// before we turn visible the form:
-layer form1 {
-  cls #333333, 0
-  movie motion.x+7000, motion.y+1000, 2000
-  // we can load the movie without playing using movie load statement.
-  movie load "Second"  
-  mymovie=true  ' so now we mark tha the video Second.avi is loaded
-  // this code run after 300 msec (when the form is open)
-  after 300 {
-    movie show
-    movie restart
-  }
-}
-// so now we can show the form
-      Method form1, "show", 1
-      Declare form1 nothing
+? c[1][2][1]=400, c[0][2][1]=40
+// gen() ret 1 then ret 2
+// swap c[1][2][1], c[0][2][1]
+swap c[gen()][gen()][1], c[0][2][1]
+? c[1][2][1]=40, c[0][2][1]=400
 
-5. Updated Info.gsb
+4. Fix Max.Data() and Min.Data() for using String Expressions too. The first expression define the type of the other expressions (numeric or string).
+
+5. Fix boolean to string conversion using Locale (for English and Greek people):
+dim b$(10)
+link b$() to b()
+boolean t=true
+Locale 1033
+b(2)=t
+b(3)=122.23
+? b$(2)="True", b$(3)="122.23"
+boolean z
+string s
+s = z
+Print "FalseFalseFalse"=z+s+z ' True
+clear  'erase all variables
+dim b$(10)
+link b$() to b()
+boolean t=true
+Locale 1032
+b(2)=t
+b(3)=122.23
+? b$(2)="Αληθές", b$(3)="122,23"
+boolean z
+string s
+s = z
+Print "ΨευδέςΨευδέςΨευδές"=z+s+z  ' Αληθές΅
+exit
+This not work: z+s+z="ΨευδέςΨευδέςΨευδές"
+because z is not string
+This work: ""+z+s+z="ΨευδέςΨευδέςΨευδές"
 
 
 

@@ -3262,9 +3262,9 @@ Case "JOYPAD", "JOYPAD(", "JOYPAD.ANALOG.X(", "JOYPAD.ANALOG.Y(", "JOYPAD.DIRECT
 Case "KEYPRESS(", "LAMBDA", "LAMBDA(", "LAMBDA$", "LAMBDA$(", "LAN$", "LANDSCAPE", "LATIN", "LAYER", "LAZY$(", "LCASE$(", "LEFT$(", "LEFTPART$(", "LEGEND", "LEN"
 Case "LEN(", "LEN.DISP(", "LET", "LETTER$", "LIB", "LICENSE", "LINE", "LINESPACE", "LINK", "LIST", "LN("
 Case "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LOCALE$(", "LOCALE(", "LOG(", "LONG", "LOOP"
-Case "LOWORD(", "LOWWORD(", "LTRIM$(", "MAIN.TASK", "MAP(", "MARK", "MASTER", "MATCH(", "MAX(", "MAX$(", "MAX.DATA$("
+Case "LOWORD(", "LOWWORD(", "LTRIM$(", "MAIN.TASK", "MAP(", "MARK", "MASTER", "MATCH(", "MAX(", "MAX.DATA$("
 Case "MAX.DATA(", "MDB(", "MEDIA", "MEDIA.COUNTER", "MEMBER$(", "MEMBER.TYPE$(", "MEMO", "MEMORY", "MENU"
-Case "MENU$(", "MENU.VISIBLE", "MENUITEMS", "MERGE.DOC", "METHOD", "MID$(", "MIN(", "MIN$(", "MIN.DATA$(", "MIN.DATA("
+Case "MENU$(", "MENU.VISIBLE", "MENUITEMS", "MERGE.DOC", "METHOD", "MID$(", "MIN(", "MIN.DATA$(", "MIN.DATA("
 Case "MOD", "MODE", "MODULE", "MODULE$", "MODULE(", "MODULES", "MODULE.NAME$", "MONITOR", "MONITORS", "MONITOR.STACK", "MONITOR.STACK.SIZE", "MOTION", "MOTION.W", "MOTION.WX"
 Case "MOTION.WY", "MOTION.X", "MOTION.XW", "MOTION.Y", "MOTION.YW", "MOUSE", "MOUSE.ICON", "MOUSE.KEY", "MOUSE.X"
 Case "MOUSE.Y", "MOUSEA.X", "MOUSEA.Y", "MOVE", "MOVIE", "MOVIE.COUNTER", "MOVIE.DEVICE$", "MOVIE.ERROR$", "MOVIE.HEIGHT", "MOVIE.STATUS$", "MOVIE.WIDTH"
@@ -4703,13 +4703,13 @@ crNew basestack, players(prive)
 ProcWriter = True
 End Function
 
-Sub SendAKey(ByVal keycode As Integer, ByVal Shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
+Sub SendAKey(ByVal keycode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
 Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long, old As Long
 Const key_release As Byte = 2
 If keycode > 500 Then extended = 1: keycode = keycode - 500
 If extended = 0 Then
 If keycode > 64 And keycode < 91 Then
-    If Not CapsLockOn() Then Shift = Not Shift
+    If Not CapsLockOn() Then shift = Not shift
 End If
 End If
 
@@ -4721,14 +4721,14 @@ amap = MapVirtualKey(&H12, 0)
 
 keycode = keycode Mod 255
 ' press key
-If Shift Then keybd_event &H10, smap, 0, 0
+If shift Then keybd_event &H10, smap, 0, 0
 If ctrl Then keybd_event &H11, cmap, 0, 0
 If alt Then keybd_event &H12, amap, 0, 0
 keybd_event keycode, Map, extended, 0
 
 ' release key
 keybd_event keycode, Map, KEYEVENTF_KEYUP + extended, 0
-If Shift Then keybd_event &H10, smap, KEYEVENTF_KEYUP, 0
+If shift Then keybd_event &H10, smap, KEYEVENTF_KEYUP, 0
 If ctrl Then keybd_event &H11, cmap, KEYEVENTF_KEYUP, 0
 If alt Then keybd_event &H12, amap, KEYEVENTF_KEYUP, 0
 

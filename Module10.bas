@@ -32,8 +32,8 @@ Private Declare Function vbaVarLateMemCallLdRf2 CDecl Lib "msvbvm60" _
                          ByVal cArgs As Long, _
                          ByVal vArg1) As Long
 
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
 Private Const E_POINTER As Long = &H80004003
 Private Const S_OK As Long = 0
 Private Const INTERNET_MAX_URL_LENGTH As Long = 2083
@@ -508,13 +508,13 @@ ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
 ret = ReadFile(FileNumber, Data(0), BlockSize, SizeRead, 0&)
 BlockSize = SizeRead
 End Sub
-Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal addr As Long)
+Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal Addr As Long)
 Dim PosL As Long
 Dim PosH As Long
 Dim SizeRead As Long
 Dim ret As Long
 ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
-ret = ReadFile(FileNumber, ByVal addr, BlockSize, SizeRead, 0&)
+ret = ReadFile(FileNumber, ByVal Addr, BlockSize, SizeRead, 0&)
 End Sub
 
 Public Sub API_CloseFile(ByVal FileNumber As Long)
@@ -1547,6 +1547,8 @@ checkobject:
                         If IsExp(bstack, b$, p, , True) Then
                             Select Case MemInt(VarPtr(p))
                             Case vbString
+                            Case vbBoolean
+                            p = Format(p, DefBooleanString)
                             Case 20
                             p = CStr(p)
                             Case Else
@@ -5002,7 +5004,7 @@ Const mHdlr = "mHandler"
 Const mGroup = "Group"
 Const myArray = "mArray"
 MyRead = True
-Dim p As Variant, x As Double
+Dim p As Variant, X As Double
 Dim pppp As mArray
 ohere$ = here$
 Dim Col As Long
@@ -5536,8 +5538,8 @@ Set ps = New mStiva
 Do While ss$ <> ""
 If ISSTRINGA(ss$, pa$) Then
 ps.DataStr pa$
-ElseIf IsNumberD(ss$, x) Then
-ps.DataVal x
+ElseIf IsNumberD(ss$, X) Then
+ps.DataVal X
 Else
 Exit Do
 End If
@@ -6976,12 +6978,12 @@ conthereEnum:
                 Else
                     ss$ = s$
                     it = True
-                  If MyIsNumeric(p) Then x = p: it = False
+                  If MyIsNumeric(p) Then X = p: it = False
                    
                   If IsEnumAs(bstack, ss$, p, ok, rest$) Then
                     If Not it Then
                         Set usehandler = p
-                        p = x
+                        p = X
                         Set usehandler = usehandler.objref.SearchValue(p, ok)
                         Set myobject = usehandler
                         If ok Then

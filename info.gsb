@@ -3525,7 +3525,10 @@ MODULE EV {Module CheckEvents {
 }
 CheckEvents
 }
-MODULE MG {oldfont$=Fontname$
+MODULE MG {OldLocale=locale
+locale 1033
+// try locale 1032 using "," instead "." for decimal dot
+oldfont$=Fontname$
 Font "Arial"
 Form 60,44
 Escape Off
@@ -4271,6 +4274,7 @@ Report InpValue2.Json$(0)
 Escape on
 bold true
 Font OldFont$
+locale OldLocale
 }
 MODULE QSORT3 {Module Checkit3 {
       Class Quick {
@@ -36065,7 +36069,7 @@ PointMaker=lambda (Xax,Yax,Xs,Ys, Ev_l)
 			if plotme then Width 8 {Pset 14, wX, wY}	
 			if lbl$<>"" then
 				move wX, wY
-				Pen 15 {Legend format$("[{0},{1}]", round(X,2),round(Y,2))+lbl$, "Courier", Ys/72}
+				Pen 15 {Legend format$("[{0}][{1}]", round(X,2),round(Y,2))+lbl$, "Courier", Ys/72}
 			end if
 			=(wX, wY)
 		}
@@ -36172,7 +36176,7 @@ if menu>0 then
 		do 
 			resp=movie.error$
 			print string$("*", random(1, width*.8))
-			IF INKEY$=" "THEN MOVIE mousea.x, mousea.y
+			IF MOUSE=2 THEN MOVIE mousea.x, mousea.y
 			wait 1000/60
 		until not movie
 		cls 5
@@ -44740,5 +44744,92 @@ a=array([])  ' get current stack (leave an empty one) then return an array
 CheckISBN  "isbn.txt", a
 win file.app$("txt"), dir$+"isbn.txt"
 CheckISBN  "", a
+}
+MODULE FORMATEXAMPLE {OldLocale=Locale
+Value1=-1.23345e30
+Value2=2=2
+locale 1033
+Print format$(" {0:3:10}|{1:6}|", Value1, Value2), str$(value1, 1033)
+Print format$(" {0:3:}|{1:6}|", Value1, Value2)
+locale 1032
+Print format$(" {0:3:10}|{1:6}|", Value1, Value2), str$(value1, 1032)
+Print format$(" {0:3:}|{1:6}|", Value1, Value2)
+Locale OldLocale
+}
+MODULE BUFFERSORT {k=random(!123456)
+form 60, 44
+Class Quick {
+Private:
+	buffer a as byte
+	module quicksort {
+		long m, n
+		do If Stackitem()>=Stackitem(2) Then Drop 2:if  empty then exit else continue
+			over 2,2
+			Read p, r : i = p-1 : x=eval(.a, r)
+			For j=p to r-1:If x>eval(.a, j) Then i++:Swap(i,j) 
+			Next j : Swap(i+1,r) :  Push  i+2, i:shift 3
+		always
+		sub Swap()
+			read m, n: local v=eval(.a, m), w=eval(.a, n)
+			return .a, m:=w, n:=v
+		end sub
+	}
+Public:
+	Function Final Sort(from, to){
+		stack new {
+			.quicksort from, to
+		}
+	}
+class:
+	Module Quick (z as buffer) {
+		.a<=z
+	}
+}
+print "Double Type", $("0.000000000000000e+000", width/4),,
+n=20
+buffer alfa as double*n
+for i=0 to n-1: return alfa, i:=rnd*10^random(129, 130): print eval(alfa, i),:next
+print
+print "Sort start"
+S=Quick(alfa)
+Call S.Sort(0, n-1)
+open "double.data" for output as #f
+	put #f, alfa, 1
+close #f
+report "Saved to file "+dir$+"double.data ("+(filelen("double.data"))+" bytes)"
+print
+print "Single  Type", $("0.000", width div 6),,
+n=20
+buffer beta as single*n
+for i=0 to n-1: return beta, i:=(random(1e7)-5e6)/1000: print eval(beta, i),:next
+print
+print "Sort start"
+S=Quick(beta)
+Call S.Sort(0, n-1)
+open "single.data" for output as #f
+	put #f, beta, 1
+close #f
+print
+report "Saved to file "+dir$+"single.data ("+(filelen("single.data"))+" bytes)"
+print
+clear
+Print "Read each file"
+
+buffer alfa as double*filelen("double.data") div 8
+open "double.data" for input as #f
+	get #f, alfa, 1
+close #f
+print $("0.000000000000000e+000", width/4),
+for i=0 to len(alfa) div 8 - 1: print eval(alfa, i),:next
+print $("0.000", width div 6),
+buffer beta as single*filelen("single.data") div 4
+open "single.data" for input as #f
+	get #f, beta, 1
+close #f
+print 
+for i=0 to len(beta) div 4-1: print eval(beta, i),:next
+print
+print $(""),"Press any key"
+push key$: drop: if module(infobasic) then keyboard "infobasic", 13
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
