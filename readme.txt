@@ -1,64 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 48 active-X
-Updated info file.
-
-1. Fix function Compare() for strings without $ (and arrays with strings without $)
-(not work for arrays with brackets. use <=> )
-2. Fix statement Swap for strings without $
-a$="aaaa" :b="klmn"
-swap b, a$ : print a$, b
-swap a$, b : print a$, b
-3. Fix Swap for arrays with brackets: A[]
-long b[3][4]=100
-object c[3]
-c[0]=b[]  // get a copy of b
-let c[0][2][1]=40
-? c[0][2][1]<> b[2][1]
-c[1]=b   // get a pointer to b
-let c[1][2][1]=400
-? c[1][2][1]=b[2][1]
-
-gen=lambda k=0 ->{
-	k++
-	=k
-}
-? c[1][2][1]=400, c[0][2][1]=40
-// gen() ret 1 then ret 2
-// swap c[1][2][1], c[0][2][1]
-swap c[gen()][gen()][1], c[0][2][1]
-? c[1][2][1]=40, c[0][2][1]=400
-
-4. Fix Max.Data() and Min.Data() for using String Expressions too. The first expression define the type of the other expressions (numeric or string).
-
-5. Fix boolean to string conversion using Locale (for English and Greek people):
-dim b$(10)
-link b$() to b()
-boolean t=true
-Locale 1033
-b(2)=t
-b(3)=122.23
-? b$(2)="True", b$(3)="122.23"
-boolean z
-string s
-s = z
-Print "FalseFalseFalse"=z+s+z ' True
-clear  'erase all variables
-dim b$(10)
-link b$() to b()
-boolean t=true
-Locale 1032
-b(2)=t
-b(3)=122.23
-? b$(2)="Αληθές", b$(3)="122,23"
-boolean z
-string s
-s = z
-Print "ΨευδέςΨευδέςΨευδές"=z+s+z  ' Αληθές΅
-exit
-This not work: z+s+z="ΨευδέςΨευδέςΨευδές"
-because z is not string
-This work: ""+z+s+z="ΨευδέςΨευδέςΨευδές"
+Version 12 Revision 49 active-X
+A bug on Inkey$ when we have ""=inkey$ without hit any key and we choose +TXT from switches "+TXT" (compare strings as ignoring case (A and a are equal)
+Also Compare() and <=> fix a bug for using switch +TXT (ignoring case)
 
 
 

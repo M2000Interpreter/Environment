@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 48
+Global Const Revision = 49
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -40774,10 +40774,11 @@ End Sub
 
 Private Function CompareStr2(a$, b$) As Long
 On Error GoTo comperr
+
 If UserCodePage = DefCodePage Then
 CompareStr2 = StrComp(a$, b$, vbTextCompare)
 Else
-CompareStr2 = -2 + CompareString(Clid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
+CompareStr2 = -2 + CompareString(Clid, &H1001, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
 End If
 Exit Function
 comperr:
@@ -40791,7 +40792,7 @@ CompareStr3 = StrComp(a, b)
 ElseIf UserCodePage = DefCodePage Then
 CompareStr3 = StrComp(a, b, vbTextCompare)
 Else
-CompareStr3 = -2 + CompareString(Clid, &H1000, StrPtr(a), Len(a), StrPtr(b), Len(b))
+CompareStr3 = -2 + CompareString(Clid, &H1001, StrPtr(a), Len(a), StrPtr(b), Len(b))
 End If
 Exit Function
 comperr:
@@ -48605,7 +48606,7 @@ lit29: '    Case "INKEY$", "≈Õ œÃ$"
         End If
         R$ = UINKEY$
         If R$ = vbNullString Then
-            R$ = INKEY$
+          R$ = INKEY$
         End If
     End If
     strLiterals = True

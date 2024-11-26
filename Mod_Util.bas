@@ -4895,7 +4895,7 @@ If INK$ <> "" Then
     End If
 Else
     'Αν δεν έχουμε τίποτα...δεν κάνουμε τίποτα...γυρίζουμε το τίποτα!
-    INKEY$ = vbNullString
+    INKEY$ = ""
 End If
 
 End Function
