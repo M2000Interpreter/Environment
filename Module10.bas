@@ -32,8 +32,8 @@ Private Declare Function vbaVarLateMemCallLdRf2 CDecl Lib "msvbvm60" _
                          ByVal cArgs As Long, _
                          ByVal vArg1) As Long
 
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
 Private Const E_POINTER As Long = &H80004003
 Private Const S_OK As Long = 0
 Private Const INTERNET_MAX_URL_LENGTH As Long = 2083
@@ -508,13 +508,13 @@ ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
 ret = ReadFile(FileNumber, Data(0), BlockSize, SizeRead, 0&)
 BlockSize = SizeRead
 End Sub
-Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal Addr As Long)
+Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal addr As Long)
 Dim PosL As Long
 Dim PosH As Long
 Dim SizeRead As Long
 Dim ret As Long
 ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
-ret = ReadFile(FileNumber, ByVal Addr, BlockSize, SizeRead, 0&)
+ret = ReadFile(FileNumber, ByVal addr, BlockSize, SizeRead, 0&)
 End Sub
 
 Public Sub API_CloseFile(ByVal FileNumber As Long)
@@ -5246,11 +5246,20 @@ there182741:
         Else
                 If Not exist Then globalvar what$, p Else Nosuchvariable what$
         End If
+    Else
+        If bs.IsString(s$) Then
+        GoTo jump001
+           ' If GetVar3(bstack, what$, i, , , flag, s$, checktype, isAglobal, True, ok) Then
+                
+            'End If
+        End If
     End If
 Case 3
     If bs.IsString(s$) Then
         MyRead = True
+jump001:
         If GetVar3(bstack, what$, i, , , flag, , checktype, isAglobal, True) Then
+
             If MyIsObject(var(i)) Then
                 If TypeOf var(i) Is Group Then
                     Set m = bstack.soros
@@ -6896,6 +6905,7 @@ contsethere:
     ElseIf bs.IsNumber(p) Then
 contStr1:
     ihavetype = True
+contStr2:
     If Not lookOne(rest$, ",") Then
     ' FF used again
         If jumpAs Then jumpAs = False: GoTo conthereEnum
@@ -7506,6 +7516,9 @@ existAs05:
                                 Exit Function
                             End If
                         End If
+                      GoTo contStr2
+                    Else
+                    GoTo contStr2
                     End If
                 End If
                 GoTo contStr1

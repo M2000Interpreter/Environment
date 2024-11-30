@@ -44832,4 +44832,308 @@ print
 print $(""),"Press any key"
 push key$: drop: if module(infobasic) then keyboard "infobasic", 13
 }
+MODULE PERFECT {Module PerfectNumbers {
+	Function Is_Perfect(n as decimal) {
+		s=1 : sN=Sqrt(n):last= n=sN*sN:t=n
+		If n mod 2=0 then s+=2+n div 2
+		i=3 : sN--
+		While i<sN {
+			if  n mod i=0 then t=n div i :i=max.data(n div t, i): s+=t+i
+			i++
+		}
+		=n=s 
+	}
+	IsPrime=lambda -> {
+		Known1=List:=2@, 3@
+		boolean T=true, F
+		=lambda T,F,Known1 (x as decimal) -> {
+			=F
+			if exist(Known1, x) then =T : exit
+			if x<=5 OR frac(x) then
+				if x = 2 OR x = 3 OR x = 5 then Append Known1, x : =T
+				break
+			end if
+			if frac(x/2) else exit
+			if frac(x/3) else exit
+			x1=sqrt(x):d = 5@
+			do	if frac(x/d ) else exit
+				d += 2: if d>x1 then Append Known1, x : =T : exit
+				if frac(x/d) else exit
+				d += 4: if d<= x1 else Append Known1, x :  =T: exit
+			Always
+		} 
+	}() ' execute, so IsPrime get the inner lambda
+	\\ Check a perfect and a non perfect number
+	p=2 : n=3 : n1=2
+	Document Doc$
+	IsPerfect( 0, 28)
+	IsPerfect( 0, 1544)
+	While p<32 { ' max 32
+		if isprime(2^p-1@) then {
+			perf=(2^p-1@)*2@^(p-1@)
+			Rem  Print perf
+                     \\ decompose pretty fast the Perferct Numbers
+                     \\ all have a series of 2 and last a prime equal to perf/2^(p-1)
+			factors=queue
+			For i=1 to p-1 {Append factors, 2@}
+			Append factors, perf/2^(p-1)
+			\\ end decompose
+			Rem Print factors
+			IsPerfect(factors, Perf)
+		}
+		p++
+	}
+	Clipboard Doc$
+	\\ exit here. No need for Exit statement
+	Sub IsPerfect(factors, n)
+		s=false
+		if n<10000 or type$(factors)<>"Inventory" then {
+			s=Is_Perfect(n)
+		} else {
+			local mm=each(factors, 1, -2), f =true
+			while mm {if eval(mm)<>2 then f=false
+			}
+			if f then if n/2@**(len(mm)-1)= factors(len(factors)-1!) then s=true	
+		}
+		Local a$=format$("{0} is {1}perfect number", n, If$(s->"", "not "))
+		Doc$=a$+{
+		}
+		Print a$
+	End Sub
+}
+
+PerfectNumbers
+}
+MODULE TOPO {// https://rosettacode.org/wiki/Topological_sort/Extracted_top_item#M2000_Interpreter
+Module Topological_sort {
+	a$={FILE    FILE DEPENDENCIES
+		====    =================
+		top1, des1, ip1, ip2
+		top2, des1, ip2, ip3
+		ip1, extra1, ip1a, ipcommon
+		ip2, ip2a, ip2b, ip2c, ipcommon
+		des1, des1a, des1b, des1c
+		des1a, des1a1, des1a2
+		des1c, des1c1, extra1
+		}
+	dim a$()
+	nl$={
+	}
+	a$()=piece$(a$, nl$)
+	L=len(a$())
+	if L<3 then exit
+	files=List
+	for i=2 to L-1
+		if len(a$(i))=0 then continue
+		let a=piece$(a$(i), ", ")
+		if not exist(files,a#val$(0)) then
+			z=(0, list)
+			Append files,  a#val$(0):=z
+		else
+			let z=eval(files)
+		end if
+		if len(a)<2 then continue
+	    	for j=1 to len(a)-1
+	    		if a#val$(j)=a#val$(0) then continue
+	    		zz=z#val(1)
+	    		if not exist(files, a#val$(j)) then
+	    			zzz=(0, list)
+	    			Append files, a#val$(j):=zzz
+	    		else
+	    			zzz=eval(files)
+	    		end if
+	    		if not exist(zz, a#val$(j)) then Append zz, a#val$(j) : Return zzz, 0:=zzz#val(0)+1
+	     	next
+	next
+	flush
+	document doc$
+	k=each(files)
+	while k
+		deps=eval(k)#val(0)
+		if deps>0 then continue
+		data eval$(k!)
+	end while
+	Doc$="top levels: ["+array([])#str$(", ")+{]
+	}
+	Doc$={Extracts a compile order for targes:
+	}
+	Doc$=@ExtractDeps("top1")
+	Doc$=@ExtractDeps("top2")
+	Doc$=@ExtractDeps("top1", "top2")
+	Doc$=@ExtractDeps("ip1")
+	Report Doc$
+	Clipboard Doc$
+	Function ExtractDeps()
+		local p=array([])
+		local compile_list=list, exclude=list, z
+		local k, zz, dep$, top$
+		for i=0 to len(p)-1
+			top$=p#val$(i)
+			z=files(top$)#val(1)
+			k=each(z)
+			if exist(exclude, top$) else Append exclude, top$
+			while k
+				dep$=eval$(k!)
+				if exist(exclude, dep$) then continue
+				if dep$=top$ then continue
+				if exist(compile_list, dep$) then continue
+				ExtractDepsLevel(dep$)
+			end while
+			if exist(compile_list, top$) else Append compile_list, top$
+		next
+		k=each(compile_list)
+		flush
+		while k
+			data eval$(k)
+		end while
+		="target ["+p#str$(", ")+"] order: ["+array([])#str$(", ")+"]"+{
+		}
+	end function
+	sub ExtractDepsLevel(top$)
+		local z=files(top$)#val(1)
+		local k=each(z), zz, dep$
+		if exist(exclude, top$) else Append exclude, top$
+		while k
+			dep$=eval$(k!)
+			if exist(exclude, dep$) then continue
+			if dep$=top$ then continue
+			if exist(compile_list, dep$) then continue
+			ExtractDepsLevel(dep$)
+		end while
+		if exist(compile_list, top$) else Append compile_list, top$
+	end sub
+}
+Topological_sort
+}
+MODULE NUMNAMES {module Number_names {
+	numname=lambda ->{
+		flush
+		data "", "one", "two", "three", "four"
+		data "five", "six", "seven", "eight", "nine", "ten"
+		data "eleven", "twelve", "thirteen", "fourteen", "fifteen"
+		data "sixteen", "seventeen","eighteen", "nineteen"
+		dim lows(), tens(), lev()
+		lows()=array([])
+		data "", "", "twenty", "thirty", "forty","fifty", "sixty"
+		data "seventy", "eighty", "ninety"
+		tens()=array([])
+		lev()=("", "thousand", "million", "billion")
+		numname_int=lambda lows(), tens(), lev() (n as long) -> {
+			if n=0 then ="zero": exit
+			long tr[0], t=-1, i
+			string ret, prefix
+			if n < 0 then prefix= "negative ": n-! else prefix=""
+			while n>0
+				t++
+				tr[t]= n mod 1000
+				n|div 1000
+			end while
+			for i=t to 0
+				tripn=""
+				if tr[i]=0 then continue for
+				lt= tr[i] mod 100
+				h= tr[i] div 100
+				if lt<20 then
+					tripn+=lows(lt)
+				else
+					tripn= tens(lt div 10)+if$(lt mod 10 >0 ->"-"+lows(lt mod 10),"")
+				end if
+				if h>0 then
+					if lt>0 then tripn = " and " + tripn
+					tripn = lows(h)+" hundred" + tripn
+				end if
+				if i=0 and t>0 and h = 0 then tripn = "and " + tripn
+				ret +=tripn+" "+lev(i)+" "
+			next i
+			=prefix+trim$(ret)
+		}
+		=lambda numname_int (n as currency) ->{
+			if int(n)=n then =numname_int(n): exit
+			string prefix= numname_int(int(abs(n)))+" point "
+			string decdig = str$(abs(n)-int(abs(n))), ret
+			if n<0 then prefix="negative "+prefix
+			ret=prefix
+			for i = 3 to  len(decdig)
+				ret+=lambda(val(mid$(decdig, i, 1)))+" "
+			next i
+			=trim$(ret)
+		}
+	}()
+	report numname(0)
+	report numname(1.0)
+	report numname(-1.7)
+	report numname(910000)
+	report numname(987654)
+	report numname(100000017)
+}
+Number_names
+}
+MODULE MAGIC4 {module Four_is_magic {
+	numname=lambda ->{
+		flush
+		data "", "one", "two", "three", "four"
+		data "five", "six", "seven", "eight", "nine", "ten"
+		data "eleven", "twelve", "thirteen", "fourteen", "fifteen"
+		data "sixteen", "seventeen","eighteen", "nineteen"
+		dim lows(), tens(), lev()
+		lows()=array([])
+		data "", "", "twenty", "thirty", "forty","fifty", "sixty"
+		data "seventy", "eighty", "ninety"
+		tens()=array([])
+		lev()=("", "thousand", "million", "billion")
+		=lambda lows(), tens(), lev() (n as long) -> {
+			if n=0 then ="zero": exit
+			long i, tr : boolean t : string ret, prefix
+			if n < 0 then prefix= "negative ": n-! else prefix=""
+			while n>0 {push n mod 1000: n|div 1000}
+			t=stack.size>1
+			while not empty {
+			 	tripn="" : read tr : if tr=0 then continue
+				lt= tr mod 100 : h= tr div 100
+				if lt<20 then
+					tripn+=lows(lt) 
+				else
+					tripn= tens(lt div 10)+if$(lt mod 10 >0 ->"-"+lows(lt mod 10),"")
+				end if
+				if h>0 then 	tripn = lows(h)+" hundred " + tripn
+				if empty then if t and h = 0 then tripn = " and " + tripn
+				ret += tripn+" "+lev(stack.size)+" "
+			}
+			=prefix+trim$(ret)
+		}
+	}()
+	TitleStr=lambda (s as string) ->{
+		=ucase$(left$(s,1))+mid$(s, 2)
+	}
+	magic=lambda numname, TitleStr (n as integer)-> {
+		first$=numname(n)
+		count$=numname(len(first$))
+		while first$<>"four"
+			data first$+" is "+count$
+			swap first$, count$
+			count$=numname(len(first$))
+		end while
+		data "four is magic."
+		=TitleStr(array([])#str$(", "))
+	}
+	document doc$
+	for i=0 to 9
+		doc$ = magic(i)+{
+		}
+	next
+	doc$ = magic(23)+{
+	}
+	doc$ = magic(130)+{
+	}
+	doc$ = magic(151)+{
+	}
+	doc$ = magic(-7)+{
+	}
+	doc$ = magic(20140)+{
+	}
+	report doc$
+	clipboard doc$
+}
+Four_is_magic
+}
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

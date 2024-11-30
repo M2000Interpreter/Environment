@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 49
+Global Const Revision = 50
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -219,7 +219,7 @@ Const GFSR_USERRESOURCES = 2
 
 Declare Function SetLocaleInfo Lib "kernel32" Alias "SetLocaleInfoA" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As String) As Long
 Declare Function GetLocaleInfo Lib "kernel32" Alias "GetLocaleInfoA" (ByVal Locale As Long, ByVal LCType As Long, lpLCData As String, ByVal cchData As Long) As Long
-Public Declare Function GetWindowsDirectory Lib "kernel32" Alias "GetWindowsDirectoryA" (ByVal lpBuffer As String, ByVal nsize As Long) As Long
+Public Declare Function GetWindowsDirectory Lib "kernel32" Alias "GetWindowsDirectoryA" (ByVal lpBuffer As String, ByVal nSize As Long) As Long
 
 
 Private Const LOCALE_USER_DEFAULT = 0&
@@ -3254,9 +3254,9 @@ End Function
 
 Public Function kUpper(a$, p As Variant) As String
 'idea from Bonnie West, FROM VBFORUMS
-Dim nsize As Long
-    nsize = Len(a$)
-    If nsize Then SysReAllocStringLen VarPtr(kUpper), , nsize Else Exit Function
+Dim nSize As Long
+    nSize = Len(a$)
+    If nSize Then SysReAllocStringLen VarPtr(kUpper), , nSize Else Exit Function
     Const LCMAP_UPPERCASE = &H200&
 Dim mLid As Long
 If p = 0 Then
@@ -3309,14 +3309,14 @@ End Select
 
 Next i
 End If
-    nsize = LCMapStringW(mLid, LCMAP_UPPERCASE, StrPtr(a$), nsize, StrPtr(kUpper), nsize)
+    nSize = LCMapStringW(mLid, LCMAP_UPPERCASE, StrPtr(a$), nSize, StrPtr(kUpper), nSize)
 End Function
 
 Public Function kUpper2(a$, p As Variant) As String
 'idea from Bonnie West, FROM VBFORUMS
-Dim nsize As Long
-    nsize = Len(a$)
-    If nsize Then SysReAllocStringLen VarPtr(kUpper2), , nsize Else Exit Function
+Dim nSize As Long
+    nSize = Len(a$)
+    If nSize Then SysReAllocStringLen VarPtr(kUpper2), , nSize Else Exit Function
     Const LCMAP_UPPERCASE = &H200&
 Dim mLid As Long
 If p = 0 Then
@@ -3366,13 +3366,13 @@ Next i
 
 
 End If
-    nsize = LCMapStringW(mLid, LCMAP_UPPERCASE, StrPtr(a$), nsize, StrPtr(kUpper2), nsize)
+    nSize = LCMapStringW(mLid, LCMAP_UPPERCASE, StrPtr(a$), nSize, StrPtr(kUpper2), nSize)
 End Function
 Public Function klower(a$, p As Variant) As String
 Const LCMAP_LOWERCASE As Long = &H100
-Dim nsize As Long
-    nsize = Len(a$)
-    If nsize Then SysReAllocStringLen VarPtr(klower), , nsize Else Exit Function
+Dim nSize As Long
+    nSize = Len(a$)
+    If nSize Then SysReAllocStringLen VarPtr(klower), , nSize Else Exit Function
 
 Dim mLid As Long
 If p = 0 Then
@@ -3380,7 +3380,7 @@ mLid = Clid
 Else
 mLid = p
 End If
-nsize = LCMapStringW(mLid, LCMAP_LOWERCASE, StrPtr(a$), nsize, StrPtr(klower), nsize)
+nSize = LCMapStringW(mLid, LCMAP_LOWERCASE, StrPtr(a$), nSize, StrPtr(klower), nSize)
 a$ = klower
 If p = 1032 Then
 a$ = a$ + Chr(0)
@@ -5491,7 +5491,7 @@ GetArr = ExpMatrix(bstack, b$, p)
 If GetArr Then
 If bstack.lastobj Is Nothing Then
             If VarTypeName(p) = "String" Then
-            s$ = p
+            SwapString2Variant s$, p
             bstack.soros.PushStr s$
             bstack.tmpstr = "@LETTER$ " + Left$(b$, 1)
             Else
@@ -30830,7 +30830,7 @@ Dim ps As mStiva, p As Variant, s$, usehandler As mHandler, usestiva As mStiva
             If FastSymbol(rest$, "?") Then
                         ps.DataOptional
             ElseIf FastSymbol(rest$, "!") Then
-                If IsExp(basestack, rest$, p) Then
+                If IsExp(basestack, rest$, p, nostring:=True) Then
                 If basestack.lastobj Is Nothing Then
                    ps.DataValLong p
                 ElseIf TypeOf basestack.lastobj Is mHandler Then
@@ -30853,29 +30853,31 @@ Dim ps As mStiva, p As Variant, s$, usehandler As mHandler, usestiva As mStiva
                 Set basestack.lastobj = Nothing
                 End If
                 ElseIf IsExp(basestack, rest$, p) Then
-        If Not basestack.lastobj Is Nothing Then
-        If TypeOf basestack.lastobj Is mStiva Then
-            Set usestiva = basestack.lastobj
-            ps.MergeBottom usestiva
-            Set usestiva = Nothing
-        ElseIf Not basestack.lastpointer Is Nothing Then
-            ps.DataObj basestack.lastobj
-            Set basestack.lastpointer = Nothing
-            
-        ElseIf Not basestack.lastobj Is Nothing Then
-           ps.DataObj basestack.lastobj
+                If Not basestack.lastobj Is Nothing Then
+                If TypeOf basestack.lastobj Is mStiva Then
+                    Set usestiva = basestack.lastobj
+                    ps.MergeBottom usestiva
+                    Set usestiva = Nothing
+                ElseIf Not basestack.lastpointer Is Nothing Then
+                    ps.DataObj basestack.lastobj
+                    Set basestack.lastpointer = Nothing
+                    
+                ElseIf Not basestack.lastobj Is Nothing Then
+                    ps.DataObj basestack.lastobj
 
+                End If
+                Set basestack.lastobj = Nothing
+       
+            Else
+            If myVarType(p, vbString) Then
+                SwapString2Variant s$, p
+                ps.DataStr s$
+            Else
+                ps.DataVal p
+            End If
         End If
-       Set basestack.lastobj = Nothing
-       
-        Else
-            ps.DataVal p
-            
-         End If
     ElseIf Not LastErNum <> 0 Then
-    If IsStrExp(basestack, rest$, s$, Len(basestack.tmpstr) = 0) Then
-       
-       
+    If IsStrExp(basestack, rest$, s$, False) Then  ' Len(basestack.tmpstr) = 0
        If Not basestack.lastpointer Is Nothing Then
             ps.DataObj basestack.lastobj
             Set basestack.lastpointer = Nothing
@@ -30962,11 +30964,16 @@ Set ParentStack.lastobj = Nothing
                 End If
                 Set ParentStack.lastobj = Nothing
             Else
+            If myVarType(p, vbString) Then
+                SwapString2Variant s$, p
+                ps.DataStr s$
+            Else
                 ps.DataVal p
+            End If
             End If
     ElseIf Not LastErNum <> 0 Then
     ParentStack.modfuncall = True
-    If IsStrExp(ParentStack, rest$, s$, Len(ParentStack.tmpstr) = 0) Then
+    If IsStrExp(ParentStack, rest$, s$, False) Then 'Len(ParentStack.tmpstr) = 0
        If Not ParentStack.lastpointer Is Nothing Then
             ps.DataObj ParentStack.lastobj
             Set ParentStack.lastpointer = Nothing
@@ -31052,11 +31059,16 @@ Dim ps As mStiva, p As Variant, s$, ok As Long, usehandler As mHandler, usestiva
                 End If
                 Set basestack.lastobj = Nothing
             Else
-                ps.DataVal p
+                If myVarType(p, vbString) Then
+                    SwapString2Variant s$, p
+                    ps.DataStr s$
+                Else
+                    ps.DataVal p
+                End If
             End If
         ElseIf Not LastErNum <> 0 Then
             basestack.modfuncall = True
-            If IsStrExp(basestack, rest$, s$, Len(basestack.tmpstr) = 0) Then
+            If IsStrExp(basestack, rest$, s$, False) Then ' Len(basestack.tmpstr) = 0
                 If Not basestack.lastpointer Is Nothing Then
                     ps.DataObj basestack.lastobj
                     Set basestack.lastpointer = Nothing
@@ -31107,9 +31119,14 @@ Dim p As Variant, s$
                                 ps.DataObj basestack.lastobj
                                 Set basestack.lastobj = Nothing
                             Else
-                                ps.DataVal p
+                                If myVarType(p, vbString) Then
+                                    SwapString2Variant s$, p
+                                    ps.DataStr s$
+                                Else
+                                    ps.DataVal p
+                                End If
                             End If
-                    ElseIf IsStrExp(basestack, rest$, s$, Len(basestack.tmpstr) = 0) Then
+                    ElseIf IsStrExp(basestack, rest$, s$, False) Then ' Len(basestack.tmpstr) = 0
                     
                             If Not basestack.lastpointer Is Nothing Then
                                 ps.DataObj basestack.lastobj
@@ -34398,7 +34415,12 @@ myp123:
         End If
     ElseIf IsExp(bstack, rest$, p) Then
         If bstack.lastobj Is Nothing Then
-            bstack.soros.PushVal p
+            If myVarType(p, vbString) Then
+                SwapString2Variant s$, p
+                bstack.soros.PushStr s$
+            Else
+                bstack.soros.PushVal p
+            End If
         Else
             If TypeOf bstack.lastobj Is mStiva Then
                 Set bstack.Sorosref = bstack.lastobj
@@ -34436,7 +34458,7 @@ Dim s$, p As Variant, usehandler As mHandler
 MyData = True
 Do
     If FastSymbol(rest$, "!") Then
-        If IsExp(bstack, rest$, p) Then
+        If IsExp(bstack, rest$, p, nostring:=True) Then
             If bstack.lastobj Is Nothing Then
                 bstack.soros.DataValLong p
             ElseIf TypeOf bstack.lastobj Is mHandler Then
@@ -34463,7 +34485,12 @@ myd123:
         End If
     ElseIf IsExp(bstack, rest$, p) Then
         If bstack.lastobj Is Nothing Then
-            bstack.soros.DataVal p
+            If myVarType(p, vbString) Then
+                SwapString2Variant s$, p
+                bstack.soros.DataStr s$
+            Else
+                bstack.soros.DataVal p
+            End If
         Else
             If TypeOf bstack.lastobj Is mStiva Then
                 Set bstack.Sorosref = bstack.lastobj
