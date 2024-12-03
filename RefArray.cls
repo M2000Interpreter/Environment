@@ -291,13 +291,7 @@ entry1:
             ElseIf wt = 20 Then
                 p(where)(what) = CStr(that)
             Else
-                ss$ = LTrim$(str(that))
-                If Left$(ss$, 1) = "." Then
-                ss$ = "0" + ss$
-                ElseIf Left$(ss$, 2) = "-." Then
-                ss$ = "-0" + Mid$(ss$, 2)
-                End If
-                p(where)(what) = ss$
+                p(where)(what) = fixthis(that)
             End If
         Case vbDate
             p(where)(what) = CDate(that)
@@ -917,4 +911,14 @@ Public Function cInt64(p)
 er1:
     cInt64 = OneLongLong - OneLongLong
 End Function
-
+Private Function fixthis(p As Variant) As String
+        fixthis = LTrim$(str(p))
+        If Left$(fixthis, 1) = "." Then
+        fixthis = "0" + fixthis
+        ElseIf Left$(fixthis, 2) = "-." Then
+        fixthis = "-0" + Mid$(fixthis, 2)
+        End If
+        If InStr(fixthis, ".") > 0 Then
+        If NoUseDec Then fixthis = Replace(fixthis, ".", NowDec$)
+        End If
+End Function

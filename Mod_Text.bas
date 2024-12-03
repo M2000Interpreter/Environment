@@ -39,16 +39,16 @@ Private Declare Function timeGetTime1 Lib "kernel32.dll" Alias "GetTickCount" ()
 
 
 Public Declare Function IsValidCodePage Lib "kernel32" (ByVal CodePage As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
-Public Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
-Private Declare Sub GetMemS Lib "msvbvm60" Alias "GetMem4" (ByVal Addr As Long, RetVal As Single)
-Private Declare Sub GetMem8 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Double)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
-Public Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub PutMemS Lib "msvbvm60" Alias "PutMem4" (ByVal Addr As Long, ByVal NewVal As Single)
-Private Declare Sub PutMem8 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Double)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
+Public Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
+Private Declare Sub GetMemS Lib "msvbvm60" Alias "GetMem4" (ByVal addr As Long, RetVal As Single)
+Private Declare Sub GetMem8 Lib "msvbvm60" (ByVal addr As Long, RetVal As Double)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
+Public Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMemS Lib "msvbvm60" Alias "PutMem4" (ByVal addr As Long, ByVal NewVal As Single)
+Private Declare Sub PutMem8 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Double)
 Private Declare Function CopyBytes Lib "msvbvm60.dll" Alias "__vbaCopyBytes" (ByVal ByteLen As Long, ByVal Destination As Long, ByVal Source As Long) As Long
 Private Declare Function ObjSetAddRef Lib "msvbvm60.dll" Alias "__vbaObjSetAddref" (ByRef objDest As Object, ByVal pObject As Long) As Long
 Public Declare Function IsBadCodePtr Lib "kernel32" (ByVal lpfn As Long) As Long
@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 50
+Global Const Revision = 51
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -312,11 +312,8 @@ jumphere1:
             ElseIf W$ = "(" Then
 again:
                 If part$ <> "" Then
-            ' after
                     If part$ = "S" Then
-            '
                         If Mid$(a$, Pos + 1, 1) = ")" Then Pos = Pos + 2: GoTo conthere
-             
                     End If
                 ElseIf Right$(b$, 1) = "a" Then
                     b$ = Left$(b$, Len(b$) - 1)
@@ -2832,7 +2829,7 @@ Pos = lenA + 2
 
 End Sub
 Function ChangeValuesMem(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim aa As mHandler, ah As String, p As Variant, s$, Addr As Long, pp As Variant, what$, R As Double
+Dim aa As mHandler, ah As String, p As Variant, s$, addr As Long, pp As Variant, what$, R As Double
 Dim bb1 As MemBlock, w2 As Variant, rs As Single, itissingle As Boolean, itisInt64 As Boolean
 Set aa = bstack.lastobj
 Set bstack.lastobj = Nothing
@@ -2906,7 +2903,7 @@ Set bb1 = aa.objref
                         
                           GoTo err30
                     End If
-                    Addr = CLng(Fix(p))
+                    addr = CLng(Fix(p))
                 
                     
                 Else
@@ -2925,13 +2922,13 @@ Set bb1 = aa.objref
                             s$ = p
                             GoTo q1239877
                         End If
-                        If Addr = 0 Then
+                        If addr = 0 Then
                             
                 
                             GoTo err30
                         Else
                                 ' this ia a part to poke some data to buffer
-                            If Addr = 0 Then
+                            If addr = 0 Then
                                 
                         
                                 GoTo err30
@@ -2964,38 +2961,38 @@ Set bb1 = aa.objref
                                 Select Case pp
                                 Case 1
                                     ChangeValuesMem = True
-                                    PutMem1 Addr, CByte(LowWord(signlong(p)) And &HFF)
+                                    PutMem1 addr, CByte(LowWord(signlong(p)) And &HFF)
                                Case 2
-                                   If bb1.ValidArea(Addr, 2) Then
+                                   If bb1.ValidArea(addr, 2) Then
                                         ChangeValuesMem = True
-                                        PutMem2 Addr, cUint(LowWord(signlong(p)))
+                                        PutMem2 addr, cUint(LowWord(signlong(p)))
                                     Else
                                         GoTo err10
                                         
                                     End If
                                 Case 4
-                                    If bb1.ValidArea(Addr, 4) Then
+                                    If bb1.ValidArea(addr, 4) Then
                                         ChangeValuesMem = True
                                         If itissingle Then
                                             rs = CSng(p)
-                                            PutMemS Addr, rs
+                                            PutMemS addr, rs
                                         Else
-                                            PutMem4 Addr, signlong(p)
+                                            PutMem4 addr, signlong(p)
                                         End If
                                     Else
                                         GoTo err10
                                         
                                    End If
                                 Case 8
-                                   If bb1.ValidArea(Addr, 8) Then
+                                   If bb1.ValidArea(addr, 8) Then
                                         ChangeValuesMem = True
                                         If itisInt64 Then
                                         p = cInt64(p)
-                                        CopyMemory ByVal Addr, ByVal VarPtr(p) + 8, 8
+                                        CopyMemory ByVal addr, ByVal VarPtr(p) + 8, 8
                                         
                                         'PutMem8 Addr, R
                                         Else
-                                        PutMem8 Addr, p
+                                        PutMem8 addr, p
                                         End If
                                    Else
                                         GoTo err10
@@ -3029,7 +3026,7 @@ q1239877:
                             GoTo there
                             
                         Else
-                                If Addr = 0 Then
+                                If addr = 0 Then
                                     
                                     GoTo err30
                                 Else
@@ -3037,15 +3034,15 @@ q1239877:
                             Err.Clear
                             On Error Resume Next
                           If pp < 0 Or bb1.WhatIsBasicItem = vbString Then
-                          If bb1.ValidArea(Addr, 4) Then
+                          If bb1.ValidArea(addr, 4) Then
                           ChangeValuesMem = True
-                            PutMem4 Addr, CLng(bb1.PutStringAtOffset(Addr, s$))
+                            PutMem4 addr, CLng(bb1.PutStringAtOffset(addr, s$))
                           End If
                           Else
                       
-                           If bb1.ValidArea(Addr, LenB(s$)) Then
+                           If bb1.ValidArea(addr, LenB(s$)) Then
                            ChangeValuesMem = True
-                           CopyBytes LenB(s$), Addr, StrPtr(s$)
+                           CopyBytes LenB(s$), addr, StrPtr(s$)
                      
                            Else
                             GoTo err10
@@ -7277,16 +7274,7 @@ If logical(bstack, aa$, R, , True, , IntVal, nostring) Then
                 ElseIf myVarType(R, vbBoolean) Then
                     po = po + Format$(R, DefBooleanString)
                 Else
-                    ut$ = LTrim$(str(R))
-                    If Left$(ut$, 1) = "." Then
-                        ut$ = "0" + ut$
-                    ElseIf Left$(ut$, 2) = "-." Then
-                        ut$ = "-0" + Mid$(ut$, 2)
-                    End If
-                    If InStr(ut$, ".") > 0 Then
-                        If NoUseDec Then ut$ = Replace(ut$, ".", NowDec$)
-                    End If
-                    po = po + ut$
+                    po = po + fixthis(R)
                 End If
     End If
         MUL = 0
@@ -7296,18 +7284,7 @@ If logical(bstack, aa$, R, , True, , IntVal, nostring) Then
         ElseIf myVarType(po, vbBoolean) Then
             po = Format(po, DefBooleanString) + R
         Else
-            ut$ = LTrim$(str(po))
-            If Left$(ut$, 1) = "." Then
-            ut$ = "0" + ut$
-            ElseIf Left$(ut$, 2) = "-." Then
-            ut$ = "-0" + Mid$(ut$, 2)
-            End If
-            If InStr(ut$, ".") > 0 Then
-                If NoUseDec Then ut$ = Replace(ut$, ".", NowDec$)
-            End If
-            ut$ = ut$ + R
-            po = vbNullString
-            SwapString2Variant ut$, po
+            po = fixthis(po) + R
         End If
         MUL = 0
     Else
@@ -7376,21 +7353,9 @@ ElseIf Not nostring Then
             Exit Function
         End If
     Case Else
-        ut$ = LTrim$(str(po))
-        If Left$(ut$, 1) = "." Then
-            ut$ = "0" + ut$
-        ElseIf Left$(ut$, 2) = "-." Then
-            ut$ = "-0" + Mid$(ut$, 2)
-        End If
-        If NoUseDec Then ut$ = Replace$(ut$, ".", NowDec$)
-        po = vbNullString
-        SwapString2Variant ut$, po
+        po = fixthis(po)
         If IsStrExp(bstack, aa$, ut$) Then
-            ut$ = LTrim$(po) + ut$
-
-            SwapString2Variant ut$, po
-            
-            'po = CVar(LTrim$(po) + ut$)
+            po = po + ut$
         Else
             MissNumExpr
             IsExpA = False
@@ -9973,7 +9938,7 @@ BLOCKkey = False
 Exit Function
 fun11: ' "ΤΜΗΜΑ(", "MODULE("
     If FastSymbol(a$, ")") Then
-        R = uintnew1(Addr(AddressOf Module2.ExtCall))
+        R = uintnew1(addr(AddressOf Module2.ExtCall))
         
         IsNumberNew = True
     Else
@@ -12845,8 +12810,8 @@ End If
 nocommand = IsLabelBig And (Len(R$) = 1 Or nocommand)
 
 End Function
-Function IsLabelFileName(bstack As basetask, a$, rrr$, Optional nocommand As Boolean, Optional R$, Optional noconvert As Boolean = False) As Long
-Dim rr&, one As Boolean, c$, dot&, gr As Boolean, skipcase As Boolean, cc As Long
+Function IsLabelFileName(bstack As basetask, a$, R$) As Long
+Dim rr&, one As Boolean, dot As Boolean, c$, gr As Boolean, cc As Long, p, notwopass As Boolean
 R$ = vbNullString
 If a$ = vbNullString Then IsLabelFileName = 0: Exit Function  'ok
 a$ = NLtrim$(a$)
@@ -12867,7 +12832,7 @@ a$ = NLtrim$(a$)
             End If
         Case 63 '"?"
         If R$ = vbNullString Then
-        rrr$ = "?"
+        R$ = "?"
         
         IsLabelFileName = 1
         Exit Function
@@ -12903,40 +12868,14 @@ a$ = NLtrim$(a$)
         Case 46 ' "."
             
             If one Then
-  
-            Exit Do
-           ElseIf R$ <> "" Then
-           
-                    R$ = R$ + c$
-                       a$ = Mid$(a$, 2)
-           ''
-           ElseIf Not Mid$(a$, 2, 1) Like "[0-9]" Then
             
-                       If R$ <> "" Then
-                       R$ = R$ + c$
-                      rr& = 1
-                                      
-                            Else
-                            
-                            dot& = dot& + 1
-                    
-                            End If
-                         
-                         a$ = Mid$(a$, 2)
-                        
-                        
+            
+            Exit Do
             Else
-                         If R$ = vbNullString And dot& > 0 Then
-                                  nocommand = True
-                                 rrr$ = String$(dot& + 1, ".")     ' i want this only in right position for "dir .. "
-                                 R$ = rrr$
-                                  a$ = Mid$(a$, 2)
-                                 IsLabelFileName = 1
-                         Else
-                              IsLabelFileName = 0
-                        End If
-                    
-            Exit Function
+                If R$ = vbNullString Then dot = True
+                R$ = R$ + c$
+                a$ = Mid$(a$, 2)
+                rr& = 1 'is an identifier or floating point variable
             End If
         Case 94, 123 To 126, 160  '"{" To "~", "^"
             Exit Do
@@ -12944,7 +12883,7 @@ a$ = NLtrim$(a$)
         Case 92 '"\"
            If one Then
             Exit Do
-            ElseIf R$ <> "" Or dot& Then
+            ElseIf R$ <> "" Then
             R$ = R$ + c$
             a$ = Mid$(a$, 2)
             rr& = 1 'is an identifier or floating point variable
@@ -12952,20 +12891,23 @@ a$ = NLtrim$(a$)
               Exit Do
             End If
         Case 48 To 57, 95  ' "0" To "9", "_"
-       
-           If one Then
-            Exit Do
+            If one Then
+                Exit Do
             ElseIf R$ <> "" Then
-            R$ = R$ + c$
+                R$ = R$ + c$
+                a$ = Mid$(a$, 2)
+              
+                rr& = 1 'is an identifier or floating point variable
+            End If
+        Case 91
+            If R$ = vbNullString Then
+               R$ = R$ + c$
             a$ = Mid$(a$, 2)
-             nocommand = True
             rr& = 1 'is an identifier or floating point variable
             Else
-            If dot& > 0 Then a$ = "." + a$: dot& = 0
-            
-            Exit Do
+                GoTo alfa
             End If
-Case Is < 0, Is > 64 ' >=A and negative
+        Case Is < 0, Is > 64 ' >=A and negative
             If one Then
             Exit Do
             Else
@@ -12974,115 +12916,11 @@ Case Is < 0, Is > 64 ' >=A and negative
             rr& = 1 'is an identifier or floating point variable
             End If
         Case 38 '"&"
-        
-            If one Then Exit Do
-            
-            If R$ <> "" Then
-                'ERROR
-                rr& = 0
-                '' r$ = VbNullString
-                rrr$ = vbNullString
-                Exit Function
-            Else
-           nocommand = True
-                
-                If noconvert Then
-                IsLabelFileName = 0
-                Exit Function
-                Else
-                a$ = Mid$(a$, 2)
-                rr& = Abs(IsLabelFileName(bstack, a$, R$))
-                End If
-                skipcase = True
-                If rr& < 5 Then
-                    Dim i As Long
-         
-                    If GetlocalVar(R$, i) Then
-                        a$ = Chr(34) + here$ + "." + R$ + Chr(34) + a$
-                    ElseIf Left$(R$, 5) = "ΑΥΤΟ." Or Left$(R$, 5) = "THIS." Then
-                        If Len(bstack.UseGroupname) > 0 Then
-                                 c$ = bstack.UseGroupname + Mid$(R$, 6)
-                                 
-                         Else
-                             c$ = StripThis2(here$)
-                             If c$ <> "" Then c$ = c$ + "." + Mid$(R$, 6) Else c$ = here$ + "." + R$
-                         End If
-                    a$ = Chr(34) + c$ + Chr(34) + a$
-                    
-                  ElseIf varhash.Find(R$, cc) Then
-                         a$ = Chr(34) + R$ + Chr(34) + a$
-                    Else
-                    '' r$ = myUcase(r$, gr)
-                    
-                    If R$ = "THIS" Or R$ = "ΑΥΤΟ" Then
-                    rrr$ = R$
-                   IsLabelFileName = -100
-                   
-                   Exit Function
-                    Else
-                If GetSub(R$ + ")", rr&) Then
-                
-                                 R$ = "{" + sbf(rr&).sb + "} " + sbf(rr&).sbgroup
-                                 
-                    rr& = 2
-                    Exit Do
-                    Else
-                 If Not bstack.NoError Then MyErMacro a$, "can't pass reference", "δεν μπορώ να βάλω αναφορά"
-                    End If
-                    End If
-                    End If
-                Else
-                    If FastSymbol(a$, ")") Then
-                           '' r$ = myUcase(r$, gr)
-                            rr& = 0
-                            If Left$(R$, 5) = "ΑΥΤΟ." Or Left$(R$, 5) = "THIS." Then
-                            If varhash.ExistKey(bstack.UseGroupname + Mid$(R$, 6)) Then
-                       
-                                    a$ = Chr(34) + bstack.UseGroupname + Mid$(R$, 6, Len(R$) - 6) + Chr(34) + a$
-                                    Else
-                                    rr& = 2
-                                    End If
-                                ElseIf varhash.ExistKey(here$ + "." + R$) Then
-                               a$ = Chr(34) + here$ + "." + R$ + Chr(34) + a$
-  
-                                ElseIf varhash.ExistKey(R$) Then
-                                    a$ = Chr(34) + R$ + Chr(34) + a$
-                                Else
-                                   rr& = 3
-                                End If
-                                 If rr& > 0 Then
-                                 If rr& = 2 Then
-                                 If Len(bstack.UseGroupname) > 0 Then
-                                 R$ = bstack.UseGroupname + Mid$(R$, 6)
-                                 End If
-                                 End If
-                                 rr& = 1
-                                 If GetSub(R$ + ")", rr&) Then
-                            R$ = "{" + sbf(rr&).sb + "}" + sbf(rr&).sbgroup
-                                 
-                    rr& = 2
-     
-                    Exit Do
-                    
-                    Else
-                    If Not bstack.NoError Then MyErMacro a$, "can't pass reference", "δεν μπορώ να βάλω αναφορά"
-                    End If
-               
-                                 
-                                 End If
-                                 rr& = 0
-                                 R$ = vbNullString
-                                Exit Do
-                            End If
-                    End If
-                    
-                    R$ = vbNullString
-                    rr& = 0
-                    Exit Do
-            End If
-            
+            SyntaxError
+            rr& = 0
+            If Len(a$) > 0 Then Mid$(a$, 1, 1) = ":" Else a$ = ":"
         Case 36 '"$"
-       If one Then Exit Do
+            If one Then Exit Do
             If R$ <> "" Then
             one = True
             rr& = 3 ' is string variable
@@ -13097,7 +12935,7 @@ Case Is < 0, Is > 64 ' >=A and negative
             one = True
             rr& = 4 ' is long variable
             R$ = R$ + c$
-            nocommand = True
+
             a$ = Mid$(a$, 2)
             Else
             Exit Do
@@ -13108,18 +12946,41 @@ Case Is < 0, Is > 64 ' >=A and negative
                  R$ = R$ + "()."
               a$ = Mid$(a$, 4)
                 Else
-                Select Case rr&
-                Case 1
-                rr& = 5 ' float array or function
-                Case 3
-                rr& = 6 'string array or function
-                Case 4
-                rr& = 7 ' long array
-                Case Else
-                Exit Do
-                End Select
-                R$ = R$ + c$
-                a$ = Mid$(a$, 2)
+                    notwopass = True
+                    dot = False
+                    Select Case rr&
+                    Case 3
+                    rr& = 1 '5 ' float array or function
+                    bstack.tmpstr = R$ + Left$(a$, 1)
+                    BackPort a$
+                    If Not IsStrExp(bstack, a$, R$, False) Then
+                        MissString
+                        rr& = 0
+                    End If
+                    Exit Do
+                    Case 1
+alfa:
+                    rr& = 1
+                    bstack.tmpstr = R$ + Left$(a$, 1)
+                    BackPort a$
+                    If IsExp(bstack, a$, p, flatobject:=True, nostring:=False) Then
+                    If myVarType(p, vbString) Then
+                        SwapString2Variant R$, p
+                    Else
+                        MissString
+                        rr& = 0
+                    End If
+                    Exit Do
+                    End If
+                    Case 4
+                    ''rr& = 7 long array
+                    ' this is an error
+                    Case Else
+                    Exit Do
+                    End Select
+                '    R$ = R$ + c$
+                 '   a$ = Mid$(a$, 2)
+                    
                Exit Do
             
             End If
@@ -13139,40 +13000,44 @@ Case Is < 0, Is > 64 ' >=A and negative
             rr& = 1 'is an identifier or floating point variable
             End If
         End If
+        
     Loop
-    If skipcase Then
-    rrr$ = R$
-    Else
-    rrr$ = myUcase(R$, gr)
+    If rr& = 1 Then
+        If Not notwopass Then
+            If dot Then
+                If Right$(R$, 1) <> "." Then
+                GoTo 1212
+                End If
+            ElseIf GetVar(bstack, myUcase(R$, True), rr&) Then
+1212:
+                    bstack.tmpstr = R$ + Left$(a$, 1)
+                    BackPort a$
+                    If IsExp(bstack, a$, p, flatobject:=True, nostring:=False) Then
+                    If myVarType(p, vbString) Then
+                        rr& = 1
+                        SwapString2Variant R$, p
+                    Else
+                        MissString
+                        rr& = 0
+                    End If
+                    
+                    End If
+            End If
+        End If
+    ElseIf rr& = 3 Then
+        bstack.tmpstr = R$ + Left$(a$, 1)
+        BackPort a$
+        If IsStrExp(bstack, a$, R$, False) Then
+            rr& = 1
+            
+          Else
+                        MissString
+                        rr& = 0
+        End If
     End If
-   If dot& Then
-   nocommand = True
-                           If R$ <> "" Then
-     If Left$(rrr$, 1) = "\" Then
-                     R$ = String$(dot&, ".") + rrr$
-                          rrr$ = R$
-                          rr& = 1
-     Else
-                        rr& = bstack.GetDotNew(rrr$, dot&) * rr&
-                        End If
-
-                        nocommand = rr&
-                           Else
-                           
-                         
-                          'rrr$ = String$(dot&, ".") + rrr$: If rr& = 0 Then rr& = 1
-                          R$ = String$(dot&, ".") + rrr$
-                          rrr$ = R$
-                          rr& = 1
-                          
-                          End If
-    
-    
-   End If
-   
-    IsLabelFileName = rr&
-    nocommand = IsLabelFileName And (Len(R$) = 1 Or nocommand)
- '' a$ = LTrim$(a$)
+   IsLabelFileName = rr&
+ 
+ 
 
 End Function
 Function IsLabel(bstack As basetask, a$, rrr$, Optional skipdot As Boolean) As Long
@@ -14403,15 +14268,7 @@ cont003003:
                 Case vbBoolean
                     rr$ = Format$(p, DefBooleanString)
                 Case Else
-                   rr$ = LTrim$(str(p))
-                    If Left$(rr$, 1) = "." Then
-                        rr$ = "0" + rr$
-                    ElseIf Left$(rr$, 2) = "-." Then
-                        rr$ = "-0" + Mid$(rr$, 2)
-                    End If
-                    If InStr(rr$, ".") > 0 Then
-                    If NoUseDec Then rr$ = Replace(rr$, ".", NowDec$)
-                    End If
+                   rr$ = fixthis(p)
                 End Select
             End If
         End If
@@ -14772,17 +14629,7 @@ comehere:
                                         ElseIf myVarType(var(w1), vbBoolean) Then
                                             R$ = Format$(var(w1), DefBooleanString)
                                         Else
-                                            R$ = LTrim$(str(usehandler.index_cursor))
-                                            If Left$(R$, 1) = "." Then
-                                                R$ = "0" + R$
-                                            ElseIf Left$(R$, 2) = "-." Then
-                                                R$ = "-0" + Mid$(R$, 2)
-                                            End If
-                                            If InStr(R$, ".") > 0 Then
-                                            If NoUseDec Then
-                                            R$ = Replace$(R$, ".", NowDec$)
-                                            End If
-                                            End If
+                                            R$ = fixthis(usehandler.index_cursor)
                                         End If
                                         IsStr1 = True
                                         End If
@@ -14801,8 +14648,10 @@ comehere:
                                 R$ = p
                             ElseIf MemInt(VarPtr(p)) = 20 Then
                                 R$ = CStr(p)
+                            ElseIf myVarType(p, vbBoolean) Then
+                                R$ = Format$(p, DefBooleanString)
                             Else
-                                R$ = LTrim$(str$(p))
+                                R$ = fixthis(p)
                             End If
                             IsStr1 = True
                             Exit Function
@@ -14819,17 +14668,7 @@ comehere:
                         ElseIf myVarType(var(w1), vbBoolean) Then
                             R$ = Format$(var(w1), DefBooleanString)
                         Else
-                            R$ = LTrim$(str(var(w1)))
-                            If Left$(R$, 1) = "." Then
-                                R$ = "0" + R$
-                            ElseIf Left$(R$, 2) = "-." Then
-                                R$ = "-0" + Mid$(R$, 2)
-                            End If
-                            If InStr(R$, ".") > 0 Then
-                            If NoUseDec Then
-                            R$ = Replace$(R$, ".", NowDec$)
-                            End If
-                            End If
+                            R$ = fixthis(var(w1))
                         End If
                         IsStr1 = True
                     End If
@@ -15153,17 +14992,7 @@ getsomethinghere:
                                 ElseIf myVarType(p, vbBoolean) Then
                                     R$ = Format$(p, DefBooleanString)
                                 Else
-                                    R$ = LTrim$(str(p))
-                                    If Left$(R$, 1) = "." Then
-                                        R$ = "0" + R$
-                                    ElseIf Left$(R$, 2) = "-." Then
-                                        R$ = "-0" + Mid$(R$, 2)
-                                    End If
-                                    If InStr(R$, ".") > 0 Then
-                                    If NoUseDec Then
-                                    R$ = Replace$(R$, ".", NowDec$)
-                                    End If
-                                    End If
+                                    R$ = fixthis(p)
                                 End If
                             End If
                             IsStr1 = True
@@ -15309,17 +15138,7 @@ Final:
                 ElseIf myVarType(p, vbBoolean) Then
                     R$ = Format$(p, DefBooleanString)
                 Else
-                    R$ = LTrim$(str(p))
-                    If Left$(R$, 1) = "." Then
-                        R$ = "0" + R$
-                    ElseIf Left$(R$, 2) = "-." Then
-                        R$ = "-0" + Mid$(R$, 2)
-                    End If
-                    If InStr(R$, ".") > 0 Then
-                    If NoUseDec Then
-                    R$ = Replace$(R$, ".", NowDec$)
-                    End If
-                    End If
+                    R$ = fixthis(p)
                 End If
                 IsStr1 = True
                 Exit Function
@@ -15590,17 +15409,7 @@ againlambda:
                         ElseIf myVarType(p, vbBoolean) Then
                             R$ = Format$(p, DefBooleanString)
                         Else
-                            R$ = LTrim$(str(p))
-                            If Left$(R$, 1) = "." Then
-                                R$ = "0" + R$
-                            ElseIf Left$(R$, 2) = "-." Then
-                                R$ = "-0" + Mid$(R$, 2)
-                            End If
-                            If InStr(R$, ".") > 0 Then
-                            If NoUseDec Then
-                            R$ = Replace$(R$, ".", NowDec$)
-                            End If
-                            End If
+                            R$ = fixthis(p)
                         End If
                 End If
             End If
@@ -20570,13 +20379,16 @@ If Len(bstack.tmpstr) > 0 And Len(b$) > 0 Then
         Else
         nchr = AscW(sw$)
         End If
-        Else
+        ElseIf Len(W$) > 0 Then
         nchr = AscW(W$)
+        Else
+        nchr = 0
         End If
         
         End If
         
         bstack.tmpstr = vbNullString
+        
         GoTo again4
     
 Else
@@ -21405,18 +21217,24 @@ RepPara = True
         Err.Clear
         On Error Resume Next
             ' new mode
+            If Left$(rest$, 1) = "&" Then Mid$(rest$, 1, 1) = " "
             x1 = Abs(IsLabel(basestack, rest$, what$))
-            If x1 = 3 Then
+            If x1 = 8 Then
+               NotForArrayBrackets
+               RepPara = False
+               Exit Function
+            ElseIf x1 = 3 Or x1 = 1 Then
                     If GetVar(basestack, what$, i) Then
+                        If x1 = 1 Then If Not myVarType(var(i), vbString) Then MissingStrVar: RepPara = False: Exit Function
                         If FastSymbol(rest$, ",") Then
-                            If IsStrExp(basestack, rest$, ss$) Then
+                            If IsStrExp(basestack, rest$, ss$, False) Then
                                   aa = Split(var(i), ss$)
                                     Do While FastSymbol(rest$, ",")
                                         RepPara = True
-                                        If IsExp(basestack, rest$, p) Then
+                                        If IsExp(basestack, rest$, p, flatobject:=True) Then
                                             p = Abs(p)
                                             If FastSymbol(rest$, ":=", , 2) Then
-                                                If IsStrExp(basestack, rest$, s$) Then
+                                                If IsStrExp(basestack, rest$, s$, False) Then
                                                 ' HERE PLACE PART TO ARRAY, MAKE IT BIGGER IF NEEDED
                                                     If UBound(aa) < p Then
                                                         ReDim Preserve aa(p)
@@ -21450,18 +21268,25 @@ RepPara = True
                         MissPar
                         End If
                     End If
-            ElseIf x1 = 6 Then
+            ElseIf x1 = 6 Or x1 = 5 Then
                     If neoGetArray(basestack, what$, pppp) Then
                         If Not NeoGetArrayItem(pppp, basestack, what$, i, rest$) Then RepPara = False: Exit Function
+                        If Not pppp.IsStringItem(i) Then
+                        If pppp.ItemType(i) <> doc Then
+                            MissType
+                            RepPara = False
+                            Exit Function
+                            End If
+                        End If
                         If FastSymbol(rest$, ",") Then
                             If IsStrExp(basestack, rest$, ss$) Then
                                   aa = Split(pppp.item(i), ss$)
                                     Do While FastSymbol(rest$, ",")
                                         RepPara = True
-                                        If IsExp(basestack, rest$, p) Then
+                                        If IsExp(basestack, rest$, p, flatobject:=True) Then
                                             p = Abs(p)
                                             If FastSymbol(rest$, ":=", , 2) Then
-                                                If IsStrExp(basestack, rest$, s$) Then
+                                                If IsStrExp(basestack, rest$, s$, False) Then
                                                 ' HERE PLACE PART TO ARRAY, MAKE IT BIGGER IF NEEDED
                                                     If UBound(aa) < p Then
                                                         ReDim Preserve aa(p)
@@ -21503,6 +21328,7 @@ RepPara = True
             Exit Function
             
         Else
+            
                 Err.Clear
         On Error Resume Next
             Y = CLng(YY)
@@ -21524,7 +21350,7 @@ RepPara = True
                 X = 0
             End If
         
-           
+            If Left$(rest$, 1) = "&" Then Mid$(rest$, 1, 1) = " "
             x1 = Abs(IsLabel(basestack, rest$, what$))
             If x1 = 3 Then
                     If GetVar(basestack, what$, i) Then
@@ -24541,14 +24367,11 @@ If Not mTextCompare Then
             
             If CheckInt64(D) Then
                    s2$ = CStr(D)
-                Else
-                   s2$ = LTrim$(str(D))
-                    If Left$(s2$, 1) = "." Then
-                        s2$ = "0" + s2$
-                    ElseIf Left$(s2$, 2) = "-." Then
-                        s2$ = "-0" + Mid$(s2$, 2)
-                    End If
-                End If
+            ElseIf MemInt(VarPtr(D)) = vbBoolean Then
+                s2$ = Format$(D, DefBooleanString)
+            Else
+                s2$ = fixthis(D)
+            End If
             b$ = b$ + s2$
             
            GoTo conthere
@@ -24866,16 +24689,13 @@ conthere:
                 
                 If CheckInt64(D) Then
                        s2$ = CStr(D)
-                    Else
-                       s2$ = LTrim$(str(D))
-                        If Left$(s2$, 1) = "." Then
-                            s2$ = "0" + s2$
-                        ElseIf Left$(s2$, 2) = "-." Then
-                            s2$ = "-0" + Mid$(s2$, 2)
-                        End If
-                    End If
+                ElseIf MemInt(VarPtr(D)) = vbBoolean Then
+                    s2$ = Format$(D, DefBooleanString)
+                Else
+                    s2$ = fixthis(D)
+                End If
                 b$ = b$ + s2$
-                
+
                GoTo conthere
             Else
                 MissStringExpr
@@ -35839,7 +35659,7 @@ wehavenumber:
                         photo.LoadPictureBlt Scr.hDC, CLng(Scr.ScaleX(.XGRAPH, 1, 3)), CLng(Scr.ScaleX(.YGRAPH, 1, 3))
                         If photo.bitsPerPixel <> 24 Then Conv24 photo
                         If MyIsObject(pppp.item(W6)) Then
-wrongitemtype:
+WrongItemType:
                             MyEr "can't copy image to " + pppp.ItemType(W6), "δεν μπορώ να αντιγράψω εικόνα σε " + pppp.ItemType(W6)
                             MyCopy = False
                         Else
@@ -35847,7 +35667,7 @@ wrongitemtype:
                             pppp.item(W6) = DIBtoSTR(photo)
                             If Err Then
                             Err.Clear
-                            GoTo wrongitemtype
+                            GoTo WrongItemType
                             End If
                         End If
                     End If
@@ -38704,12 +38524,11 @@ s$ = vbNullString
                 End If
             End If
 Else
-x1 = Abs(IsLabelFileName(basestack, rest$, ss$, , W$))
+x1 = IsLabelFileName(basestack, rest$, W$)
 If x1 = 1 Then
-ss$ = W$
-ElseIf x1 = 0 Or x1 = 3 Or x1 = 6 Then
-rest$ = ss$ + rest$
-x1 = IsStrExp(basestack, rest$, ss$)
+    SwapStrings ss$, W$
+Else
+    x1 = IsStrExp(basestack, rest$, ss$, False)
 End If
 
 'If Left$(ss$, 1) = "." Then x1 = 1
@@ -45058,10 +44877,12 @@ Do
 If IsExp(basestack, s$, p) Then
 If CheckInt64(p) Then
     ww$ = ww$ + CStr(p)
+ElseIf MemInt(VarPtr(p)) = vbBoolean Then
+    ww$ = ww$ + Format$(p, DefBooleanString)
 ElseIf VarType(p) = vbString Then
     ww$ = ww$ + LTrim$(p)
 Else
-    ww$ = ww$ + LTrim$(str(p))
+    ww$ = ww$ + fixthis(p)
 End If
 ElseIf IsStrExp(basestack, s$, ww1$) Then
 ww$ = ww$ + Chr$(34) + ww1$ + Chr$(34)
@@ -48233,11 +48054,11 @@ Sub StaticWork(basestack As basetask, mystack As basetask, ByVal where$)
         If MyIsObject(vvv) Then Set mystack.StaticCollection = vvv
     End If
 End Sub
-Private Function Addr(ByVal p As Long) As Long
+Private Function addr(ByVal p As Long) As Long
     'If m_bInIDE Then
     '    addr = CLNG(add32(uintnew1(p), 12@))
     'Else
-        Addr = p
+        addr = p
     'End If
 End Function
 Public Function VarTypeName(v) As String
@@ -49060,14 +48881,14 @@ g12367:
             Module10.FileReadString w2, R$, CLng(MyRound(Int(p * 2)))
             If FastSymbol(a$, ",") Then
                 SwapStrings R$, q1$
-                GoTo JUMP001
+                GoTo jump001
             End If
         Else
             w2 = Module10.ReadFileHandler(dd)
             If w2 = 0 Then strFunctions = False: Exit Function
             Module10.FileReadString w2, q1$, CLng(Abs(Int(p / 2)))
             If FastSymbol(a$, ",") Then
-JUMP001:
+jump001:
                 If IsExp(bstackstr, a$, p, flatobject:=True, nostring:=True) Then
                         If p < 0 Then
                         R$ = utf8decode(q1$)
@@ -51414,6 +51235,17 @@ i123:
     rrr$ = firstdot$ + myUcase(R$, gr)
     Lang = 1 + CLng(gr)
     IsLabelDotSub = rr&
+End Function
+Private Function fixthis(p As Variant) As String
+        fixthis = LTrim$(str(p))
+        If Left$(fixthis, 1) = "." Then
+        fixthis = "0" + fixthis
+        ElseIf Left$(fixthis, 2) = "-." Then
+        fixthis = "-0" + Mid$(fixthis, 2)
+        End If
+        If InStr(fixthis, ".") > 0 Then
+        If NoUseDec Then fixthis = Replace(fixthis, ".", NowDec$)
+        End If
 End Function
 
 

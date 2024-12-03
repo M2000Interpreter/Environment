@@ -1544,7 +1544,7 @@ checkobject:
                             GoTo err000
                         End If
                     ElseIf ww = vbString Then
-                        If IsExp(bstack, b$, p, , True) Then
+                           If IsExp(bstack, b$, p, , True) Then
                             Select Case MemInt(VarPtr(p))
                             Case vbString
                             Case vbBoolean
@@ -1553,12 +1553,7 @@ checkobject:
                             p = CStr(p)
                             Case Else
                            
-                            ss$ = LTrim$(str(p))
-                            If Left$(ss$, 1) = "." Then
-                            ss$ = "0" + ss$
-                            ElseIf Left$(ss$, 2) = "-." Then
-                            ss$ = "-0" + Mid$(ss$, 2)
-                            End If
+                            ss$ = fixthis(p)
                             p = vbNullString
                             SwapString2Variant ss$, p
                             End Select
@@ -1791,8 +1786,7 @@ checkfromstring:
                                     Set var(v) = usehandler
                                     Set usehandler1 = New mHandler
                                     bstack.lastobj.CopyTo usehandler1
-                                    'Set myobject = usehandler1
-                                ElseIf usehandler1.t1 = 4 Then
+                                 ElseIf usehandler1.t1 = 4 Then
                                     Set usehandler = var(v)
                                     If Not usehandler.objref Is usehandler1.objref Then
                                         If usehandler.objref.EnumName = usehandler1.objref.EnumName Then
@@ -2839,18 +2833,16 @@ itsAconstant:
                                 Select Case MemInt(VarPtr(p))
                                     Case vbString
                                         SwapString2Variant ss$, p
+                                    Case vbBoolean
+                                        ss$ = Format$(p, DefBooleanString)
                                     Case 20
                                         ss$ = CStr(p)
                                     Case vbDate
                                         ss$ = p
                                     Case Else
-                                        ss$ = LTrim$(str(p))
-                                        If Left$(ss$, 1) = "." Then
-                                        ss$ = "0" + ss$
-                                        ElseIf Left$(ss$, 2) = "-." Then
-                                        ss$ = "-0" + Mid$(ss$, 2)
-                                        End If
+                                        ss$ = fixthis(p)
                                     End Select
+                                    
                                 GoTo str99399
                                 End If
                             ElseIf Not bstack.StaticCollection Is Nothing Then
@@ -2920,17 +2912,14 @@ stroper001:
                     Select Case MemInt(VarPtr(p))
                     Case vbString
                         SwapString2Variant ss$, p
+                    Case vbBoolean
+                        ss$ = Format$(p, DefBooleanString)
                     Case 20
                         ss$ = CStr(p)
                     Case vbDate
                         ss$ = p
                     Case Else
-                        ss$ = LTrim$(str(p))
-                        If Left$(ss$, 1) = "." Then
-                        ss$ = "0" + ss$
-                        ElseIf Left$(ss$, 2) = "-." Then
-                        ss$ = "-0" + Mid$(ss$, 2)
-                        End If
+                        ss$ = fixthis(p)
                     End Select
                     If sw = "+=" Then Set bstack.lastobj = Nothing
                  GoTo strcont111
@@ -3577,18 +3566,21 @@ contassignhere:
                                 If .ItemTypeNum(v) = vbEmpty Then
                                     .ItemStr(v) = ss$
                                 Else
-                                p = .itemnumeric(v)
-                                If CheckInt64(p) Then
-                                    sw$ = CStr(p)
-                                Else
-                                    sw$ = LTrim$(str(p))
-                                    If Left$(sw$, 1) = "." Then
-                                        sw$ = "0" + sw$
-                                    ElseIf Left$(sw$, 2) = "-." Then
-                                        sw$ = "-0" + Mid$(sw$, 2)
-                                    End If
-                                End If
-                                .ItemStr(v) = sw$ + ss$
+                                    p = .itemnumeric(v)
+                                    Select Case MemInt(VarPtr(p))
+                                    Case vbString
+                                        SwapString2Variant sw$, p
+                                    Case vbBoolean
+                                        sw$ = Format$(p, DefBooleanString)
+                                    Case 20
+                                        sw$ = CStr(p)
+                                    Case vbDate
+                                        sw$ = p
+                                    Case Else
+                                        sw$ = fixthis(p)
+                                    End Select
+                                    .ItemStr(v) = sw$ + ss$
+
                                 End If
                              Else
                              .ItemStr(v) = .item(v) + ss$
@@ -4270,8 +4262,24 @@ ElseIf Not FastSymbol(b$, "=") Then
         GoTo err000
     End If
 Else
-    If Not IsStrExp(bstack, b$, ss$, False) Then GoTo err000
-    
+    If IsExp(bstack, b$, p, nostring:=False) Then
+        Select Case MemInt(VarPtr(p))
+        Case vbString
+            SwapString2Variant ss$, p
+        Case vbBoolean
+            ss$ = Format$(p, DefBooleanString)
+        Case 20
+            ss$ = CStr(p)
+        Case vbDate
+            ss$ = p
+        Case Else
+            ss$ = fixthis(p)
+        End Select
+        GoTo jmp1112
+    ElseIf Not IsStrExp(bstack, b$, ss$, False) Then
+        GoTo err000
+    End If
+jmp1112:
     If Not MyIsObject(ppppAny.item(v)) Then
     
     If TypeOf ppppAny Is mArray Then
@@ -4568,7 +4576,7 @@ entry00022:
             End If
             GoTo cont00100203
         Else
-            If IsExp(bstack, b$, sp) Then
+            If IsExp(bstack, b$, sp, nostring:=False) Then
             
 entry00101:
                 If Not ar Is Nothing Then GoTo entry00122
@@ -4785,7 +4793,7 @@ st9993993:
                     Else
                         WrongObject
                     End If
-                ElseIf ww <> 8 Then
+                ElseIf ww <> 8 Or here$ = vbNullString Then
                     If GetVar(bstack, W$, v, True) Then
                         GoTo entry00121
                     Else
@@ -8105,3 +8113,15 @@ Public Sub GetUDTValue2(p, Name$, rep, Index As Long)
     If Len(Name$) < 0 Then Exit Sub
     vbaVarLateMemCallLdRf2 rep, p, ByVal StrPtr(LCase(Name$)), 1, Index
 End Sub
+Public Function fixthis(p As Variant) As String
+        fixthis = LTrim$(str(p))
+        If Left$(fixthis, 1) = "." Then
+        fixthis = "0" + fixthis
+        ElseIf Left$(fixthis, 2) = "-." Then
+        fixthis = "-0" + Mid$(fixthis, 2)
+        End If
+        If InStr(fixthis, ".") > 0 Then
+        If NoUseDec Then fixthis = Replace(fixthis, ".", NowDec$)
+        End If
+End Function
+
