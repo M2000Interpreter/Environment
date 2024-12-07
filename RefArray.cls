@@ -18,6 +18,14 @@ Private Type SAFEARRAYBOUND
     cElements                   As Long
     lLbound                     As Long
 End Type
+Private Type SAFEARRAY1D
+    cDims As Integer
+    fFeatures As Integer
+    cbElements As Long
+    cLocks As Long
+    pvData As Long
+    onebound(0 To 0) As SAFEARRAYBOUND
+End Type
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
 Private mError As Long
 Private p As Variant
@@ -45,6 +53,17 @@ If Not IsMissing(RHS) Then z.writevalue = RHS
 z.flat = flat
 Set NewRef = z
 End Function
+Friend Sub UnFlat()
+Dim z, z1
+If flat Then
+    z = p
+    ResetToType vbVariant, 0
+    CopyVariantArray p(0), z
+    CopyVariantArray z, z1
+  
+End If
+
+End Sub
 Property Get Copy() As refArray
 Dim z As New refArray, pp
 If isok Then
@@ -835,11 +854,79 @@ Else
 DefArrayAt -1, thistype, 0
 End If
 End Sub
+Friend Sub CopyVariantArray(ByRef a As Variant, ByRef b As Variant)
+    CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
+End Sub
+Public Function putData(f As Long, ndx As Long, lengthInBytes As Long) As Boolean
+    Dim addr, mitems, itemlen
+    
+    itemlen = MemInt(UnsignedAdd(MemLong(UnsignedAdd(VarPtr(p(0)), 8)), 4))
+    mitems = Me.Elements(p(0))
+    If Not (ndx >= 0 And ndx < mitems) Then
+        OutOfLimit
+        GoTo there
+    End If
+    lengthInBytes = Abs(lengthInBytes)
+    If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - ndx) Then
+        lengthInBytes = itemlen * (mitems - ndx)
+    End If
+    addr = UnsignedAdd(Me.ArrPtr(0), itemlen * ndx)
+    
+    On Error GoTo there
+    Dim a1 As SAFEARRAY1D, a() As Byte
+     With a1
+        .cbElements = 1
+        .cDims = 1
+        .onebound(0).lLbound = 0
+        .onebound(0).cElements = lengthInBytes
+        .pvData = addr
+    End With
+        CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
+        On Error GoTo there1
+        Dim FH As Long
+        FH = Module10.ReadFileHandler(CLng(f))
+        Module10.FileWriteBytes FH, a()
+        If Err.Number > 0 Then Exit Function
+        CopyMemory ByVal VarPtrArray(a), 0&, 4
+        putData = True
+Exit Function
+there1:
+        CopyMemory ByVal VarPtrArray(a), 0&, 4
+there:
+End Function
+Friend Function GetData(f As Long, ndx As Long, lengthInBytes As Long) As Boolean
+    Dim addr, mitems, itemlen
+    
+    itemlen = MemInt(UnsignedAdd(MemLong(UnsignedAdd(VarPtr(p(0)), 8)), 4))
+    mitems = Me.Elements(p(0))
+    If Not (ndx >= 0 And ndx < mitems) Then
+        OutOfLimit
+        GoTo there
+    End If
+    lengthInBytes = Abs(lengthInBytes)
+    If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - ndx) Then
+        lengthInBytes = itemlen * (mitems - ndx)
+    End If
+    addr = UnsignedAdd(Me.ArrPtr(0), itemlen * ndx)
+    On Error GoTo there
+    Dim FH As Long
+    FH = Module10.ReadFileHandler(CLng(f))
+    If FH = 0 Then Exit Function
+    Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(addr)
+    GetData = True
+    Exit Function
+there:
+    
+End Function
 Public Sub RedimForFlat(Size As Long)
     If ihavearray Then
     If isok Then
     If flat Then
+    If Size > -1 Then
         ReDim Preserve p(Size)
+    Else
+        ReDim p(0)
+    End If
     End If
     End If
     End If

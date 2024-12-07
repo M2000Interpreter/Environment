@@ -59,24 +59,24 @@ Public Function CreateZipBuffer() As mHandler
     LockControl = True
    
     Dim ret As Boolean, p() As Byte
-    Dim mem As New MemBlock, handler As New mHandler
+    Dim mem As New MemBlock, Handler As New mHandler
 
     ret = Zip.CompressArchive(p, , , vbTrue)
     If ret Then
         mem.Construct 1, UBound(p) + 1
         CopyMemory ByVal mem.GetPtr(0), p(0), UBound(p) + 1
-        handler.t1 = 2
-        Set handler.objref = mem
-        Set CreateZipBuffer = handler
+        Handler.t1 = 2
+        Set Handler.objref = mem
+        Set CreateZipBuffer = Handler
     End If
     LockControl = False
     mLastCancel = False
 End Function
-Public Function AddFromMemory(FileBuf() As Byte, Optional Name As String, Optional Comment As String, Optional Password As String, Optional EncrStrength As Long, Optional level As Long = -1) As Boolean
-    AddFromMemory = Zip.AddFile(CVar(FileBuf), Name, Comment, Password, EncrStrength, level)
+Public Function AddFromMemory(FileBuf() As Byte, Optional Name As String, Optional Comment As String, Optional Password As String, Optional EncrStrength As Long, Optional Level As Long = -1) As Boolean
+    AddFromMemory = Zip.AddFile(CVar(FileBuf), Name, Comment, Password, EncrStrength, Level)
 End Function
-Public Function AddFile(FileStr As String, Optional Name As String, Optional Comment As String, Optional Password As String, Optional EncrStrength As Long, Optional level As Long = -1) As Boolean
-    AddFile = Zip.AddFile(CVar(FileStr), Name, Comment, Password, EncrStrength, level)
+Public Function AddFile(FileStr As String, Optional Name As String, Optional Comment As String, Optional Password As String, Optional EncrStrength As Long, Optional Level As Long = -1) As Boolean
+    AddFile = Zip.AddFile(CVar(FileStr), Name, Comment, Password, EncrStrength, Level)
 End Function
 Public Function AddFileFromFolder(sFolderAndMask As String, _
             Optional Recursive As Boolean, _
@@ -84,18 +84,18 @@ Public Function AddFileFromFolder(sFolderAndMask As String, _
             Optional IncludeEmptyFolders As Boolean, _
             Optional Password As String, _
             Optional EncrStrength As Long, _
-            Optional level As Long = -1) As Boolean
+            Optional Level As Long = -1) As Boolean
     'Zip.AddFile
-    AddFileFromFolder = Zip.AddFromFolder(sFolderAndMask, Recursive, TargetFolder, IncludeEmptyFolders, Password, EncrStrength, level)
+    AddFileFromFolder = Zip.AddFromFolder(sFolderAndMask, Recursive, TargetFolder, IncludeEmptyFolders, Password, EncrStrength, Level)
 End Function
 Public Property Get FileInfo(FileNum) As Object
-Dim handler As New mHandler, touple As New mArray
+Dim Handler As New mHandler, touple As New mArray
 Dim pp
 pp = Zip.FileInfo(FileNum)
 touple.LoadTuple pp
-Set handler.objref = touple
-handler.t1 = 3
-Set FileInfo = handler
+Set Handler.objref = touple
+Handler.t1 = 3
+Set FileInfo = Handler
 End Property
 
 
@@ -125,16 +125,16 @@ Public Function ExtractOneToBuffer(ByVal FileName$, Optional ByVal Pass$) As mHa
     ClearStr FileName$
     FileName$ = CleanStr(FileName$, "?*")
     LockControl = True
-    Dim p() As Byte, ret As Boolean, handler As New mHandler, mem As New MemBlock
+    Dim p() As Byte, ret As Boolean, Handler As New mHandler, mem As New MemBlock
     mLastCancel = False
     
     ret = Zip.Extract(p(), FileName$, Pass$)
     If ret Then
     mem.Construct 1, UBound(p) + 1
     CopyMemory ByVal mem.GetPtr(0), p(0), UBound(p) + 1
-    handler.t1 = 2
-    Set handler.objref = mem
-    Set ExtractOneToBuffer = handler
+    Handler.t1 = 2
+    Set Handler.objref = mem
+    Set ExtractOneToBuffer = Handler
     End If
     LockControl = False
     mLastCancel = False
@@ -152,7 +152,7 @@ Private Sub Class_Terminate()
 Set Zip = Nothing
 End Sub
 
-Private Sub Zip_BeforeCompress(ByVal FileIdx As Long, level As Long, SkipFile As Boolean, mCancel As Boolean)
+Private Sub Zip_BeforeCompress(ByVal FileIdx As Long, Level As Long, SkipFile As Boolean, mCancel As Boolean)
     RaiseEvent Cancel(mCancel)
 End Sub
 

@@ -26322,7 +26322,7 @@ there123:
                     End If
                 Else
 newvar:
-                    i = globalvar(basestack.GroupName + what$, Empty, UseType:=thattype <> vbVariant)      ' MAKE ONE  '
+                    i = globalvar(basestack.GroupName + what$, Empty, UseType:=(thattype <> vbVariant Or j = 8))     ' MAKE ONE  '
                     GoTo makeitnow1
                 End If
             Else

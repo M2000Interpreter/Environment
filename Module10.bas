@@ -1876,17 +1876,57 @@ contwrong1:
 misnum:                     MissNumExpr
                             GoTo err000
                         End If
+          
                     ElseIf MyIsObject(var(v)) Then
                     If IsExp(bstack, b$, p) Then
                     Set p = bstack.lastobj
+                    If Not p Is Nothing Then
                     Set bstack.lastobj = Nothing
                     If VarTypeName(p) = VarTypeName(var(v)) Then
                     Set var(v) = p
                     
+                    ElseIf TypeOf var(v) Is refArray Then
+                    Set ar = var(v)
+                       Set myobject = p
+                       If Not CheckIsmArray(myobject) Then
+                       WrongObject
+                        GoTo err000
+                       End If
+                       Set p = myobject
+                        If TypeOf p Is mArray Then
+                            Set pppp = p
+                            If pppp.count = 0 Then
+                                ar.ResetToType ar.vtType(0), 0
+                                ar.UnFlat
+                            Else
+                            p = CVar(pppp.ExportArrayCopy)
+                            
+                            If myVarType(p, vbEmpty) Then
+                            Set ar = pppp.ExportArrayCopy
+                            
+                            Else
+                            
+                            ar.writevalue = p
+                            ar.flat = True
+                            ar.RedimForFlat pppp.count - 1
+                        
+                            
+                            End If
+                            ar.UnFlat
+                            Set var(v) = ar
+                            End If
+                        
+                        Else
+                        WrongObject
+                        GoTo err000
+                        End If
                     Else
                     WrongObject
                     GoTo err000
-                    
+                    End If
+                    Else
+                    WrongObject
+                    GoTo err000
                     End If
                     Else
                         GoTo misnum

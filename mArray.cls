@@ -575,8 +575,8 @@ Else
 End If
 End If
 End Property
-Public Sub PushProp(A As Variant)
-Set GroupRef = A
+Public Sub PushProp(a As Variant)
+Set GroupRef = a
 arr = False
 End Sub
 Friend Sub ExportArrayNow()
@@ -603,7 +603,7 @@ Friend Function ExportStrArray() As String()
 If myVarType(actualData, vbObject) Then Exit Function
 If VarType(actualData) <> vbArray + vbVariant Then Exit Function
 Dim i As Long
-Dim n As Byte, s$, m_base As Long, R1 As Long, where As Long
+Dim n As Byte, s$, m_base As Long, r1 As Long, where As Long
 
 ReDim strAr(maxitems) As String
 For i = 0 To maxitems - 1
@@ -620,16 +620,16 @@ ReDim makeonedim(0 To items - 1)
 End Function
 
 Friend Sub FeedFromSrings(Carrier As Variant)
-Dim A() As String, i As Long
+Dim a() As String, i As Long
 If myVarType(actualData, vbObject) Then Exit Sub
 If VarType(actualData) <> vbArray + vbVariant Then Exit Sub
-A() = Carrier
+a() = Carrier
 Carrier = Array()
 Dim zz As Variant, rCount As Long, dimActual As Long, dummy As Long, tst As Long
 Dim ii As Long
 CopyMemory ByVal VarPtr(refArray), zz, 16
 On Error GoTo TT
-rCount = UBound(A()) - LBound(A) + 1
+rCount = UBound(a()) - LBound(a) + 1
 dimActual = 1
 TT:
 If dimActual = 0 Then
@@ -649,8 +649,8 @@ sum = rCount
 again:
 dummy = dimActual
 On Error GoTo ok1
-tst = UBound(A(), dimActual + 1)
-rCount = UBound(A(), dimActual + 1) - LBound(A, dimActual + 1) + 1
+tst = UBound(a(), dimActual + 1)
+rCount = UBound(a(), dimActual + 1) - LBound(a, dimActual + 1) + 1
 dimActual = dimActual + 1
 sum = sum * rCount
 ok1:
@@ -666,9 +666,9 @@ If dimActual <> 1 Then
 MyEr "wrong array dimensions", "λάθος διαστάσεις πίνακα"
 Else
 actualData = makeonedim(sum)
-ii = LBound(A)
+ii = LBound(a)
 For i = LBound(actualData, 1) To UBound(actualData, 1)
-actualData(i) = A(ii)
+actualData(i) = a(ii)
 ii = ii + 1
 Next i
 PushEnd
@@ -782,14 +782,14 @@ Friend Sub CopySerialize(mmm As Variant)
 ' may we get an exception here
 If VarType(actualData) = vbArray + vbVariant Then
 Dim m_base As Long, first12 As Long
-Dim m_base_0 As Long, first12_0 As Long, R1 As Long, r2 As Long
+Dim m_base_0 As Long, first12_0 As Long, r1 As Long, r2 As Long
 GetMem4 UnsignedAdd(VarPtr(actualData), 8), m_base_0
 If m_base_0 <> 0 Then
 GetMem4 LibMemory.ArrPtr(mmm), m_base
 'GetMem4 VarPtrArray(actualdata()), m_base_0
-R1 = SafeArrayLock(m_base)
+r1 = SafeArrayLock(m_base)
 r2 = SafeArrayLock(m_base_0)
-R1 = SafeArrayAccessData(ByVal m_base, first12)
+r1 = SafeArrayAccessData(ByVal m_base, first12)
 r2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 
 'GetMem4 m_base + 12, first1
@@ -797,24 +797,24 @@ r2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 PutMem4 m_base + 12, first12_0
 PutMem4 m_base_0 + 12, first12
 r2 = SafeArrayUnaccessData(ByVal m_base_0)
-R1 = SafeArrayUnaccessData(ByVal m_base)
+r1 = SafeArrayUnaccessData(ByVal m_base)
 r2 = SafeArrayUnlock(m_base_0)
-R1 = SafeArrayUnlock(m_base)
+r1 = SafeArrayUnlock(m_base)
 End If
 End If
 End Sub
 Friend Sub CopyBackSerialize(mmm As Variant)
 ' may we get an exception here
 Dim m_base As Long, first12 As Long
-Dim m_base_0 As Long, first12_0 As Long, R1 As Long, r2 As Long
+Dim m_base_0 As Long, first12_0 As Long, r1 As Long, r2 As Long
 If Not RevOrder Then Err.Raise vbObjectError + 12345, "CopyBack", "Failed. is not vb6"
 Dim backup
 backup = actualData
 GetMem4 LibMemory.ArrPtr(mmm), m_base
 GetMem4 LibMemory.ArrPtr(backup), m_base_0
-R1 = SafeArrayLock(m_base)
+r1 = SafeArrayLock(m_base)
 r2 = SafeArrayLock(m_base_0)
-R1 = SafeArrayAccessData(ByVal m_base, first12)
+r1 = SafeArrayAccessData(ByVal m_base, first12)
 r2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 
 'GetMem4 m_base + 12, first1
@@ -822,9 +822,9 @@ r2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 PutMem4 m_base + 12, first12_0
 PutMem4 m_base_0 + 12, first12
 r2 = SafeArrayUnaccessData(ByVal m_base_0)
-R1 = SafeArrayUnaccessData(ByVal m_base)
+r1 = SafeArrayUnaccessData(ByVal m_base)
 r2 = SafeArrayUnlock(m_base_0)
-R1 = SafeArrayUnlock(m_base)
+r1 = SafeArrayUnlock(m_base)
 End Sub
 Public Sub Car(m As Object)
 Dim k As New mArray, usehandler As mHandler, s$
@@ -1414,12 +1414,18 @@ If dnum = 1 Then
 End If
 maxitems1 = maxitems - 1
 ElseIf Command = 10 Then
-   
+   If myVarType(actualData, vbObject) Then
+    actualData.RedimForFlat cursor
+    
+   Else
     ReDim Preserve actualData(cursor) ' As Variant
+    End If
     maxitems = cursor
+    
     limit(0) = maxitems
-dnum = 1
-maxitems1 = maxitems - 1
+    dnum = 1
+    maxitems1 = maxitems - 1
+
 ElseIf Command = 11 Then   ' new from 9.4  rev 4
 If cursor > 9 Or cursor < 0 Then
 item = 0
@@ -1439,7 +1445,21 @@ End If
 SerialItem = True
 
 End Function
-
+Friend Sub SupportRefArray(ar As refArray)
+Set ar = ar.Copy()
+If ar.count = 1 Then
+    MyTypeToBe = ar.vtType(0)
+    PushDim ar.count(0)
+    ar.Value = ar.Value(0)
+    ar.flat = True
+    
+    PushEnd ar
+   
+Else
+    MyEr "RefArray has more dimensions than one", "Ο RefArray έχει περισσότερες διαστάσεις από μια"
+    
+End If
+End Sub
 Public Function PushOffset(curitem As Long, curdim As Long, nDim As Long) As Boolean
 If curdim >= dnum Then
 ' error...
@@ -1464,8 +1484,8 @@ End Function
 Public Property Get itemPtr(curitem As Long) As Long
 itemPtr = VarPtr(actualData(curitem))
 End Property
-Friend Sub CopyVariantArray(ByRef A As Variant, ByRef b As Variant)
-    CopyMemory ByVal VarPtr(A), ByVal VarPtr(b), 16
+Friend Sub CopyVariantArray(ByRef a As Variant, ByRef b As Variant)
+    CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
 End Sub
 Friend Sub SwapItem(curitem As Long, thisvariant)
 Static p
@@ -3057,8 +3077,8 @@ Private Sub iBoxArray_PushEnd(Optional thisarr As Variant)
     End If
 End Sub
 
-Private Sub iBoxArray_PushProp(A As Variant)
-PushProp A
+Private Sub iBoxArray_PushProp(a As Variant)
+PushProp a
 End Sub
 
 Private Property Set iBoxArray_refgroup(ByVal RHS As Object)

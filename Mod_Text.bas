@@ -69,7 +69,7 @@ Public NoOptimum As Boolean
 Dim Zero As basket
  Public Type GenItem
  Key As String
- nDx As String
+ ndx As String
  firsthash As Long
  lastpos As Long
  Pleft As Long  ' a list
@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 52
+Global Const Revision = 53
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -18135,8 +18135,8 @@ CONDwhen:
                                     End If
                                   End If
                                 W$ = Left$(W$, Len(W$) - Len(b$))
-                                If nchr Then p = Not p
-                                If Not p Then
+                                If nchr Then p = p = 0
+                                If p = 0 Then
                                     bb$ = W$
                                     ok = False
                                     Do
@@ -18201,7 +18201,7 @@ CONDwhen:
                                          Set usehandler = Nothing
                                         End If
                                     End If
-                                    If nchr Then p = Not p
+                                    If nchr Then p = p = 0
                                     Loop Until p
                                     SwapStrings sw$, here$
                                 End If
@@ -37469,11 +37469,11 @@ there1:
 Err.Clear
 End Function
 Function ProcGet(basestack As basetask, rest$) As Boolean
-Dim pppp As mArray, it As Long, what$, p As Variant, f As Variant, par As Boolean, s$, arr As Boolean
-Dim flag As Boolean, usehandler As mHandler, pp As Variant
+Dim pppp As iBoxArray, it As Long, what$, p As Variant, f As Variant, par As Boolean, s$, arr As Boolean
+Dim flag As Boolean, usehandler As mHandler, pp As Variant, RF As refArray
 IsSymbol3 rest$, "#"
 
-If IsExp(basestack, rest$, p) Then
+If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
     f = Int(p)
     If Fkind(f) = FnoUse Or Fkind(f) = Foutput Then MyEr "Wrong File Handler", "Λάθος Χειριστής Αρχείου": ProcGet = False: Exit Function
     If Not FastSymbol(rest$, ",") Then GoTo ex123
@@ -37486,26 +37486,38 @@ If IsExp(basestack, rest$, p) Then
                     ReadOnly
                     GoTo ex123
                 End If
-            End If
             Set usehandler = var(it)
             flag = True
+            ElseIf myVarType(var(it), vbObject) Then
+            If Not var(it) Is Nothing Then
+                If TypeOf var(it) Is refArray Then
+                        GoTo checkRF
+                End If
+            End If
+            End If
+            
         End If
         par = False
     Case 5  'check for handler
         what$ = Left$(what$, Len(what$) - 1)
         If GetVar(basestack, what$, it) Then
             pp = 0
-                If IsExp(basestack, rest$, pp) Then
+                If IsExp(basestack, rest$, pp, flatobject:=True, nostring:=True) Then
                     ' nothing here
                     arr = True
                 End If
                 If Not FastSymbol(rest$, ")") Then GoTo ex123
                 If Not VarTypeName(var(it)) = mHdlr Then GoTo ex123
-                If var(it).ReadOnly Then
+                
+                Set usehandler = var(it)
+                If usehandler.t1 <> 2 Then
+                    MissType
+                    GoTo ex123
+                End If
+                If usehandler.ReadOnly Then
                     ReadOnly
                     GoTo ex123
                 End If
-                Set usehandler = var(it)
                 flag = True
             End If
             par = False
@@ -37515,12 +37527,54 @@ If IsExp(basestack, rest$, p) Then
         Case 6
             If Fkind(f) <> Frandom Then MyEr "Wrong File Handler", "Λάθος Χειριστής Αρχείου": ProcGet = False: Exit Function
             par = False: If neoGetArray(basestack, what$, pppp) Then If Not NeoGetArrayItem(pppp, basestack, what$, it, rest$) Then GoTo ex123
+        Case 8
+        If GetVar(basestack, what$, it) Then
+            If myVarType(var(it), vbObject) Then
+                If TypeOf var(it) Is refArray Then
+                If Not IsExp(basestack, rest$, pp, flatobject:=True, nostring:=True) Then
+                    pp = 0
+                End If
+                If FastSymbol(rest$, "]", True) Then
+checkRF:
+                    Set RF = var(it)
+                    If RF.MarkTwoDimension Then GoTo err11
+                    Select Case RF.ItemType(0)
+                    Case vbObject, vbVariant, vbString
+err11:
+                        MissType
+                        GoTo ex123
+                        
+                    Case Else
+                    If FastSymbol(rest$, ",") Then
+                            If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
+                                FileSeek(f) = (Int(p) - 1@) * Fstep(f) + 1@
+                            End If
+                        End If
+                        If FastSymbol(rest$, ",") Then
+                            If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
+                                p = Int(Abs(p))
+                            Else
+                                GoTo ok112
+                            End If
+                        Else
+                            p = 0
+                        End If
+                        RF.GetData (f), CLng(pp), CLng(p)
+                        GoTo ok112
+                    End Select
+                End If
+                End If
+            End If
+        End If
+        
+            MissingStrVar
+            GoTo ex123
         Case Else
             MissingStrVar
             GoTo ex123
         End Select
         If FastSymbol(rest$, ",") Then
-            If IsExp(basestack, rest$, p) Then
+            If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
                 FileSeek(f) = (Int(p) - 1@) * Fstep(f) + 1@
             ElseIf Not flag Then
                 MissNumExpr
@@ -37528,6 +37582,10 @@ If IsExp(basestack, rest$, p) Then
             End If
         End If
         If flag Then
+            If usehandler.t1 = 1 Then
+                MissType
+                GoTo ex123
+            End If
             Dim buf As MemBlock
             Dim aa() As Byte
             Set buf = usehandler.objref
@@ -37535,10 +37593,12 @@ If IsExp(basestack, rest$, p) Then
                 ' pp is offset
                 If Fstep(f) = 1 Then
                     If FastSymbol(rest$, ",") Then
-                        If IsExp(basestack, rest$, p) Then
+                        If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
                             p = Int(Abs(p))
                         If FastSymbol(rest$, ",") Then
-                            If IsExp(basestack, rest$, pp) Then
+                            If IsExp(basestack, rest$, pp, flatobject:=True, nostring:=True) Then
+reenter1:
+                            
                                 pp = Int(Abs(pp))
                                 If pp = 0 Then GoTo wrong
                                 If .ValidArea(p, CLng(pp)) Then
@@ -37552,9 +37612,9 @@ If IsExp(basestack, rest$, p) Then
                                 GoTo ex123
                             End If
                         Else
-                            MissNumExpr
-                            ProcGet = False
-                            GoTo ex123
+                            SwapVariant pp, p
+                            p = .GetPtr(p)
+                            GoTo reenter1
                         End If
                     Else
                         MissNumExpr
@@ -37569,7 +37629,7 @@ If IsExp(basestack, rest$, p) Then
                 If arr Then
                     p = 1
                     If FastSymbol(rest$, ",") Then
-                        If Not IsExp(basestack, rest$, p) Then
+                        If Not IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
                             MissNumExpr
                             GoTo ex123
                         End If
@@ -37606,7 +37666,11 @@ wrong:
         If par Then
             CheckVar var(it), s$
         Else
-            If pppp.ItemType(it) = doc Then
+            If pppp Is Nothing Then
+            NotArray
+            ProcGet = False
+            GoTo ex123
+            ElseIf pppp.ItemType(it) = doc Then
                 Set pppp.item(it) = New Document
                 If s$ <> "" Then pppp.item(it).textDoc = s$
             Else
@@ -37615,6 +37679,7 @@ wrong:
         End If
     End If
 End If
+ok112:
 ProcGet = True
 ex123:
 Set pppp = Nothing
@@ -38269,7 +38334,7 @@ End If
 End Function
 Function MyPut(basestack As basetask, rest$) As Boolean
 Dim s$, f As Long, p As Variant, i As Long, pp As Variant, it As Long, flag As Boolean, arr As Boolean
-Dim usehandler As mHandler, what$
+Dim usehandler As mHandler, what$, RF As refArray
 MyPut = False
  IsSymbol3 rest$, "#"
 If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
@@ -38282,17 +38347,23 @@ If Not FastSymbol(rest$, ",") Then Exit Function
 Select Case IsLabel(basestack, rest$, what$)
     Case 1  ' check to see if is a handler
     If GetVar(basestack, what$, it) Then
-     pp = 0
-     If VarTypeName(var(it)) = mHdlr Then
-    
-        If var(it).ReadOnly Then
-                     ReadOnly
-                             GoTo ex123
-                     End If
+        pp = 0
+        If VarTypeName(var(it)) = mHdlr Then
+            If var(it).ReadOnly Then
+                ReadOnly
+                GoTo ex123
+            End If
+            Set usehandler = var(it)
+        ElseIf myVarType(var(it), vbObject) Then
+            If Not var(it) Is Nothing Then
+                If TypeOf var(it) Is refArray Then
+                        GoTo checkRF
+                End If
+            End If
         End If
-      Set usehandler = var(it)
-     
-     flag = True
+        
+        flag = True
+    
     End If
 
     Case 5  'check for handler
@@ -38312,6 +38383,48 @@ Select Case IsLabel(basestack, rest$, what$)
                         End If
         Set usehandler = var(it)
         flag = True
+    End If
+    Case 8
+    If GetVar(basestack, what$, it) Then
+            If myVarType(var(it), vbObject) Then
+                If TypeOf var(it) Is refArray Then
+                If Not IsExp(basestack, rest$, pp, flatobject:=True, nostring:=True) Then
+                    pp = 0
+                End If
+                If FastSymbol(rest$, "]", True) Then
+checkRF:
+                    Set RF = var(it)
+                    If RF.MarkTwoDimension Then GoTo err11
+                    Select Case RF.ItemType(0)
+                    Case vbObject, vbVariant, vbString
+err11:
+                        MissType
+                        GoTo ex123
+                        
+                    Case Else
+                    If FastSymbol(rest$, ",") Then
+                            If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
+                                FileSeek(f) = (Int(p) - 1@) * Fstep(f) + 1@
+                            End If
+                        End If
+                        If FastSymbol(rest$, ",") Then
+                            If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
+                                p = Int(Abs(p))
+                            Else
+                                GoTo ok112
+                            End If
+                        Else
+                            p = 0
+                        End If
+                        RF.putData (f), CLng(pp), CLng(p)
+                        GoTo ok112
+                    End Select
+                
+                    
+                    
+                End If
+                End If
+            End If
     End If
     
     Case Else
@@ -38419,6 +38532,7 @@ End If
 i = Module10.ReadFileHandler(CLng(f))
 Module10.FileWriteString i, s$
 End If
+ok112:
 MyPut = True
 End If
 ex123:
@@ -39804,13 +39918,13 @@ wehavenumber:
                         End If
                     End If
                     If FastSymbol(rest$, ",") Then
-                        Dim W, H
+                        Dim W, h
                         If IsExp(basestack, rest$, W, , True) Then
                             If Not FastSymbol(rest$, ",") Then
                                 mb.SentToClipBoard CLng(W), , , True, True
                                 MyClipboard = True
-                            ElseIf IsExp(basestack, rest$, H, , True) Then
-                                mb.SentToClipBoard CLng(W), CLng(H), , True, True
+                            ElseIf IsExp(basestack, rest$, h, , True) Then
+                                mb.SentToClipBoard CLng(W), CLng(h), , True, True
                                 MyClipboard = True
                             Else
                                 MissParam rest$
@@ -41343,7 +41457,7 @@ ElseIf IsExp(bstack, a$, R, , True) Then
 
 End Function
 Private Function IsArrayFun(bstack As basetask, a$, R As Variant) As Boolean
-Dim s$, w1 As Long, pppp As mArray, anything As Object, p As Variant, ms As mStiva, usehandler As mHandler
+Dim s$, w1 As Long, pppp As mArray, anything As Object, p As Variant, ms As mStiva, usehandler As mHandler, RF As refArray
 If IsStrExp(bstack, a$, s$) Then
         If bstack.lastobj Is Nothing Then
             If Right$("!!" + s$, 2) = "()" Then
@@ -41409,7 +41523,7 @@ checkIterator:
             Set bstack.lastobj = Nothing
             SyntaxError
         End If
-    ElseIf IsExp(bstack, a$, p) Then
+    ElseIf IsExp(bstack, a$, p, nostring:=True) Then
         If Not bstack.lastobj Is Nothing Then
             If TypeOf bstack.lastobj Is mHandler Then
                 Set usehandler = bstack.lastobj
@@ -41468,6 +41582,13 @@ checkIterator:
                 Set pppp = bstack.lastobj
                 
                 GoTo check123678
+            ElseIf TypeOf bstack.lastobj Is refArray Then
+                Set pppp = New mArray
+                Set RF = bstack.lastobj
+                pppp.SupportRefArray CVar(RF)
+                Set bstack.lastobj = pppp
+                IsArrayFun = FastSymbol(a$, ")", True)
+                
             End If
         End If
     Else

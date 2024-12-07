@@ -61,13 +61,13 @@ Private Width As Long, Height As Long, mSubtype As Long
 ' mSubtype = 2 Emf
 ' mSubtype = 3 Wmf
 Private Declare Function SetWinMetaFileBits Lib "gdi32" (ByVal cbBuffer As Long, lpbBuffer As Byte, ByVal hdcRef As Long, lpmfp As Any) As Long
-Private Declare Function GetMetaFileBitsEx Lib "gdi32" (ByVal hmf As Long, ByVal nsize As Long, lpvData As Any) As Long
-Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nsize As Long, lpData As Byte) As Long
+Private Declare Function GetMetaFileBitsEx Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
+Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nSize As Long, lpData As Byte) As Long
 
 Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
  Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
@@ -78,7 +78,7 @@ Private Declare Function CloseClipboard Lib "user32" () As Long
 Private Declare Function SetClipboardData Lib "user32" (ByVal wFormat As Long, ByVal hMem As Long) As Long
 Private Declare Function EmptyClipboard Lib "user32" () As Long
 Private Declare Function SetEnhMetaFileBits Lib "gdi32" (ByVal cbBuffer As Long, lpData As Any) As Long
-Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nsize As Long, lpvData As Any) As Long
+Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
 Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As Long
@@ -186,24 +186,24 @@ Public Property Get WhatIsBasicItem() As Integer
 WhatIsBasicItem = BasicItem
 End Property
 
-Public Property Get GetBytePtr(offset As Variant) As Long
+Public Property Get GetBytePtr(Offset As Variant) As Long
 If ErrorMes = 0 And mItems > 0 Then
-    If offset < 0 Or offset >= mItems * ItemLen Then
+    If Offset < 0 Or Offset >= mItems * ItemLen Then
         ErrorMes = 4
     Else
-    GetBytePtr = signlong(uintnew(mPtr) + offset)
+    GetBytePtr = signlong(uintnew(mPtr) + Offset)
     End If
 Else
     GetBytePtr = 0  ' null
 End If
 End Property
-Public Property Get GetPtr(offset As Variant) As Long
+Public Property Get GetPtr(Offset As Variant) As Long
 If ErrorMes = 0 And mItems > 0 Then
-If offset < 0 Or offset >= mItems Then
+If Offset < 0 Or Offset >= mItems Then
     ' zero
     ErrorMes = 4
 Else
-    GetPtr = cUlng(uintnew(mPtr) + ItemLen * offset)
+    GetPtr = cUlng(uintnew(mPtr) + ItemLen * Offset)
     End If
 Else
     GetPtr = 0  ' null
@@ -288,20 +288,20 @@ Public Property Get NoRun() As Boolean
 NoRun = mExecBloc
 End Property
 
-Public Function PutStringAtOffset(Addr As Variant, AnyString As String) As Variant
-Dim offset
-offset = uintnew(Addr) - uintnew(mPtr)
+Public Function PutStringAtOffset(addr As Variant, AnyString As String) As Variant
+Dim Offset
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mItems > 0 Then
-    If offset < 0 Or offset + 3 >= mItems * ItemLen Then
+    If Offset < 0 Or Offset + 3 >= mItems * ItemLen Then
         ErrorMes = 4
     Else
         If Strings Is Nothing Then Set Strings = New LongHash
         With Strings
-        If .ExistKey(cUlng(offset + 1)) Then
+        If .ExistKey(cUlng(Offset + 1)) Then
            .ValueStr = AnyString
            PutStringAtOffset = .StrPointer
         Else
-        .ItemCreator2 cUlng(offset + 1), AnyString
+        .ItemCreator2 cUlng(Offset + 1), AnyString
         PutStringAtOffset = .StrPointer
         End If
         .Done = False
@@ -311,22 +311,22 @@ Else
     PutStringAtOffset = 0  ' null
 End If
 End Function
-Public Function GetStringFromOffset(Addr As Variant, AnyString As String) As Variant
-Dim offset
-offset = uintnew(Addr) - uintnew(mPtr)
+Public Function GetStringFromOffset(addr As Variant, AnyString As String) As Variant
+Dim Offset
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mItems > 0 Then
-    If offset < 0 Or offset + 3 >= mItems * ItemLen Then
+    If Offset < 0 Or Offset + 3 >= mItems * ItemLen Then
         ErrorMes = 4
         AnyString = "Crash"
     Else
         If Strings Is Nothing Then Set Strings = New LongHash
         With Strings
-        If .ExistKey(cUlng(offset + 1)) Then
+        If .ExistKey(cUlng(Offset + 1)) Then
            AnyString = .Value
            GetStringFromOffset = .StrPointer
         Else
             AnyString = "Crash"
-            GetStringFromOffset = Addr
+            GetStringFromOffset = addr
         End If
         .Done = False
         End With
@@ -338,11 +338,11 @@ Else
 End If
 
 End Function
-Public Function GetData1(f As Long, Addr, lengthInBytes As Long) As Boolean
-Dim offset, place
-offset = uintnew(Addr) - uintnew(mPtr)
+Public Function GetData1(f As Long, addr, lengthInBytes As Long) As Boolean
+Dim Offset, place
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mItems > 0 Then
-    If offset < 0 Or offset + lengthInBytes - 1 >= mItems * ItemLen Then
+    If Offset < 0 Or Offset + lengthInBytes - 1 >= mItems * ItemLen Then
         ErrorMes = 4
         GetData1 = False
     Else
@@ -353,7 +353,7 @@ If ErrorMes = 0 And mItems > 0 Then
         .cDims = 1
         .onebound(0).lLbound = 0
         .onebound(0).cElements = lengthInBytes
-        .pvData = Addr
+        .pvData = addr
     End With
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
 
@@ -372,17 +372,17 @@ there:
 End If
         
 End Function
-Public Function GetData(f As Long, ByVal Addr, lengthInBytes As Long) As Boolean
-Dim offset, place, range
-range = uintnew(Addr) - uintnew1(GetPtr(0))
+Public Function GetData(f As Long, ByVal addr, lengthInBytes As Long) As Boolean
+Dim Offset, range
+range = uintnew(addr) - uintnew1(GetPtr(0))
 If range < 0 Or range >= mItems * ItemLen Then
         ErrorMes = 4
         GetData = False
         Exit Function
 End If
-offset = uintnew(Addr) - uintnew(mPtr)
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mItems > 0 Then
-    If offset < 0 Or offset + lengthInBytes - 1 >= (mItems * ItemLen - range) Then
+    If Offset < 0 Or Offset + lengthInBytes - 1 >= (mItems * ItemLen - range) Then
         ErrorMes = 4
         GetData = False
     Else
@@ -390,7 +390,7 @@ If ErrorMes = 0 And mItems > 0 Then
         Dim FH As Long
         FH = Module10.ReadFileHandler(CLng(f))
         If FH = 0 Then Exit Function
-        Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(Addr)
+        Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(addr)
         GetData = True
         Exit Function
   End If
@@ -434,17 +434,17 @@ End Function
 
 
 
-Public Function putData(f As Long, Addr, lengthInBytes As Long) As Boolean
-Dim offset, place, range
-range = uintnew(Addr) - uintnew1(GetPtr(0))
+Public Function putData(f As Long, addr, lengthInBytes As Long) As Boolean
+Dim Offset, place, range
+range = uintnew(addr) - uintnew1(GetPtr(0))
 If range < 0 Or range >= mItems * ItemLen Then
         ErrorMes = 4
         putData = False
         Exit Function
 End If
-offset = uintnew(Addr) - uintnew(mPtr)
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mItems > 0 Then
-    If offset < 0 Or offset + lengthInBytes - 1 >= mItems * ItemLen Then
+    If Offset < 0 Or Offset + lengthInBytes - 1 >= mItems * ItemLen Then
         ErrorMes = 4
         putData = False
     Else
@@ -455,7 +455,7 @@ If ErrorMes = 0 And mItems > 0 Then
         .cDims = 1
         .onebound(0).lLbound = 0
         .onebound(0).cElements = lengthInBytes
-        .pvData = Addr
+        .pvData = addr
     End With
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
         place = 1
@@ -561,7 +561,7 @@ there1:
    
  
 End Function
-Public Function DrawEmfToHdc(Scr As Object, X As Long, y As Long, Angle!, Width As Long, Height As Long) As Boolean
+Public Function DrawEmfToHdc(Scr As Object, X As Long, Y As Long, Angle!, Width As Long, Height As Long) As Boolean
    Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
    If mSubtype = 0 Then
         If IsEmf Then
@@ -578,7 +578,7 @@ Public Function DrawEmfToHdc(Scr As Object, X As Long, y As Long, Angle!, Width 
         .pvData = Me.GetPtr(0)
     End With
     CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-    DrawEmfToHdc = DrawEmfFromBuffer(Scr, a(), X, y, Angle!, Width, Height)
+    DrawEmfToHdc = DrawEmfFromBuffer(Scr, a(), X, Y, Angle!, Width, Height)
     
     CopyMemory ByVal VarPtrArray(a), 0&, 4
  
@@ -605,7 +605,7 @@ Public Function DrawSpriteToHdc(bstack As basetask, sprt As Boolean, Angle!, zoo
     CopyMemory ByVal VarPtrArray(a), 0&, 4
  
 End Function
-Public Function DrawImageToHdc(where As Object, Optional X As Long = 0&, Optional y As Long = 0&, Optional Width As Long = -1, Optional Height As Long = -1) As Boolean
+Public Function DrawImageToHdc(where As Object, Optional X As Long = 0&, Optional Y As Long = 0&, Optional Width As Long = -1, Optional Height As Long = -1) As Boolean
    Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
      With a1
         .cbElements = 1
@@ -615,7 +615,7 @@ Public Function DrawImageToHdc(where As Object, Optional X As Long = 0&, Optiona
         .pvData = Me.GetPtr(0)
     End With
    CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-   DrawImageToHdc = DrawImageFromBuffer(a(), where.hDC, X, y, (Width), (Height))
+   DrawImageToHdc = DrawImageFromBuffer(a(), where.hDC, X, Y, (Width), (Height))
    CopyMemory ByVal VarPtrArray(a), 0&, 4
  
 End Function
@@ -921,10 +921,10 @@ If w2 <> -1 Then w2 = w2 / dv15
         aa.SaveDibToMeMBlock k
         
     End If
-    Dim handler As New mHandler
-    handler.t1 = 2
-    Set handler.objref = k
-    Set CreateFromPicture = handler
+    Dim Handler As New mHandler
+    Handler.t1 = 2
+    Set Handler.objref = k
+    Set CreateFromPicture = Handler
     
 End Function
 
