@@ -3145,7 +3145,11 @@ Public Sub mn3sub()
 On Error Resume Next
 Dim aa$
 aa$ = GetTextData(13)
-If aa$ = vbNullString Then aa$ = Clipboard.GetText(1)
+If aa$ = vbNullString Then
+On Error Resume Next
+aa$ = Clipboard.GetText(1)
+If Err Then Err.Clear: Exit Sub
+End If
 With TEXT1
 If .ParaSelStart = 2 And .glistN.list(.glistN.ListIndex) = vbNullString Then
 .SelStart = .SelStart - 1

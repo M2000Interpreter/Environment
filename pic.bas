@@ -661,15 +661,15 @@ cDib = False
 If Len(a) >= 12 Then
 ' read magicNo, witdh, height
 If Left$(a, 4) = "cDIB" Then
-Dim W As Long, H As Long
+Dim W As Long, h As Long
 W = val("&H" & Mid$(a, 5, 4))
-H = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
+h = val("&H" & Mid$(a, 9, 4))
+If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 mdib.ClearUp
 
-If mdib.create(W, H) Then
-If Len(a) * 2 < mdib.BytesPerScanLine * H + 24 Then Exit Function
-CopyMemory ByVal mdib.DIBSectionBitsPtr, ByVal StrPtr(a) + 24, mdib.BytesPerScanLine * H
+If mdib.create(W, h) Then
+If Len(a) * 2 < mdib.BytesPerScanLine * h + 24 Then Exit Function
+CopyMemory ByVal mdib.DIBSectionBitsPtr, ByVal StrPtr(a) + 24, mdib.BytesPerScanLine * h
 cDib = True
 End If
 End If
@@ -685,41 +685,41 @@ Else
 End If
 End Function
 Public Function SetDIBPixel(ssdib As Variant, ByVal X As Long, ByVal Y As Long, aColor As Long) As Double
-Dim W As Long, H As Long, bpl As Long, rgb(2) As Byte
+Dim W As Long, h As Long, bpl As Long, rgb(2) As Byte
 W = val("&H" & Mid$(ssdib, 5, 4))
-H = val("&H" & Mid$(ssdib, 9, 4))
+h = val("&H" & Mid$(ssdib, 9, 4))
 X = W - Abs(X) - 1
-Y = Abs(H - Y - 1) Mod H
+Y = Abs(h - Y - 1) Mod h
 
-If Len(ssdib) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
-If W * H <> 0 Then
-bpl = (LenB(ssdib) - 24) \ H
+If Len(ssdib) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+If W * h <> 0 Then
+bpl = (LenB(ssdib) - 24) \ h
 W = (W - X - 1) Mod W
-H = Y * bpl + W * 3 + 24
-CopyMemory rgb(0), ByVal StrPtr(ssdib) + H, 3
+h = Y * bpl + W * 3 + 24
+CopyMemory rgb(0), ByVal StrPtr(ssdib) + h, 3
 W = rgb(0): rgb(0) = rgb(2): rgb(2) = W
 bpl = 0
 CopyMemory ByVal VarPtr(bpl), rgb(0), 3
 SetDIBPixel = -1# * bpl
 CopyMemory rgb(0), ByVal VarPtr(aColor), 3
 W = rgb(0): rgb(0) = rgb(2): rgb(2) = W
-CopyMemory ByVal StrPtr(ssdib) + H, rgb(0), 3
+CopyMemory ByVal StrPtr(ssdib) + h, rgb(0), 3
 End If
 End Function
 Public Function GetDIBPixel(ssdib As Variant, ByVal X As Long, ByVal Y As Long) As Double
-Dim W As Long, H As Long, bpl As Long, rgb(2) As Byte
+Dim W As Long, h As Long, bpl As Long, rgb(2) As Byte
 'a = ssdib$
 W = val("&H" & Mid$(ssdib, 5, 4))
-H = val("&H" & Mid$(ssdib, 9, 4))
+h = val("&H" & Mid$(ssdib, 9, 4))
 X = W - Abs(X) - 1
-Y = Abs(H - Y - 1) Mod H
-If Len(ssdib) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
-If W * H <> 0 Then
-bpl = (LenB(ssdib) - 24) \ H   ' Len(ssdib$) 2 bytes per char
+Y = Abs(h - Y - 1) Mod h
+If Len(ssdib) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+If W * h <> 0 Then
+bpl = (LenB(ssdib) - 24) \ h   ' Len(ssdib$) 2 bytes per char
 W = (W - X - 1) Mod W
 
-H = Y * bpl + W * 3 + 24
-CopyMemory rgb(0), ByVal StrPtr(ssdib) + H, 3
+h = Y * bpl + W * 3 + 24
+CopyMemory rgb(0), ByVal StrPtr(ssdib) + h, 3
 W = rgb(0): rgb(0) = rgb(2): rgb(2) = W
 bpl = 0
 CopyMemory ByVal VarPtr(bpl), rgb(0), 3
@@ -729,43 +729,43 @@ GetDIBPixel = -1# * bpl
 End If
 End Function
 Public Function cDIBwidth1(a) As Long
-Dim W As Long, H As Long
+Dim W As Long, h As Long
 cDIBwidth1 = -1
 
 W = val("&H" & Mid$(a, 5, 4))
-H = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
+h = val("&H" & Mid$(a, 9, 4))
+If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 cDIBwidth1 = W
 End Function
 Public Function cDIBwidth(a) As Long
-Dim W As Long, H As Long
+Dim W As Long, h As Long
 cDIBwidth = -1
 If Len(a) >= 12 Then
 If Left$(a, 4) = "cDIB" Then
 W = val("&H" & Mid$(a, 5, 4))
-H = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
+h = val("&H" & Mid$(a, 9, 4))
+If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 cDIBwidth = W
 End If
 End If
 End Function
 Public Function cDIBheight1(a) As Long
-Dim W As Long, H As Long
+Dim W As Long, h As Long
 cDIBheight1 = -1
 W = val("&H" & Mid$(a, 5, 4))
-H = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
-cDIBheight1 = H
+h = val("&H" & Mid$(a, 9, 4))
+If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+cDIBheight1 = h
 End Function
 Public Function cDIBheight(a) As Long
-Dim W As Long, H As Long
+Dim W As Long, h As Long
 cDIBheight = -1
 If Len(a) >= 12 Then
 If Left$(a, 4) = "cDIB" Then
 W = val("&H" & Mid$(a, 5, 4))
-H = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * H - 24 Then Exit Function
-cDIBheight = H
+h = val("&H" & Mid$(a, 9, 4))
+If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+cDIBheight = h
 End If
 End If
 End Function
@@ -2689,7 +2689,9 @@ End Function
 
 Public Function GetTextData(ByVal lFormatId As Long) As String
 Dim bData() As Byte, sr As String, sr1 As String
+On Error Resume Next
 sr1 = Clipboard.GetText(1)
+If Err Then Err.Clear: Beep: Exit Function
 If (OpenClipboard(0) <> 0) Then
 
         

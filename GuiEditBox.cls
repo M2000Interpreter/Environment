@@ -310,7 +310,9 @@ If Pos < 1 Then Myleft$ = vbNullString Else Myleft$ = Mid$(a, 1, Pos)
 End Function
 Private Function GetTextData(ByVal lFormatId As Long) As String
 Dim bData() As Byte, sr As String, sr1 As String
+On Error Resume Next
 sr1 = Clipboard.GetText(1)
+If Err Then Err.Clear: Beep: Exit Function
 If (OpenClipboard(0) <> 0) Then
 
         
@@ -1630,7 +1632,11 @@ MarkCopy
 keycode = 0
 ElseIf keycode = vbKeyV And (shift And 3) = 2 Then
     Pad$ = GetTextData(13)
-    If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
+    If Pad$ = vbNullString Then
+        On Error Resume Next
+        Pad$ = Clipboard.GetText(1)
+        If Err Then Err.Clear: keycode = 0: Exit Sub
+    End If
     If NumberOnly Or NumberIntOnly Then
         If Not ValidNum(Pad$, False, NumberIntOnly) Then GoTo conthere
         NumberOnly = True
@@ -2816,6 +2822,16 @@ If kind > 0 Then
             addone2000 pos2 + Len(drop$) - 1, lastcol
         Else
             addone2000 pos2, lastcol
+       If lastcol = 13 And Myleft$(drop$, 1) <> "0" And Myleft$(drop$, 1) <> "#" Then
+            If UCase(Myleft$(drop$, 2)) = "&H" And Len(drop$) > 2 Then
+       
+            Else
+            addone2000 pos2 + 1, 10
+            End If
+       End If
+            
+            
+            
         End If
     Else
        addone2000 k - Len(a$) - Len(drop$) + 1, lastcol
@@ -8164,16 +8180,16 @@ End If
 aheadstatus = b$
 End Function
 
-Public Sub move(X, Y, Optional W, Optional H)
+Public Sub move(X, Y, Optional W, Optional h)
 glistN.HideBarAsap
 If IsMissing(W) Then
 glistN.MoveTwips CLng(X), CLng(Y), 0, 0
-ElseIf IsMissing(H) Then
+ElseIf IsMissing(h) Then
 
 glistN.MoveTwips CLng(X), CLng(Y), CLng(W), 0
 RelocateMarkedText
 Else
-glistN.MoveTwips CLng(X), CLng(Y), CLng(W), CLng(H)
+glistN.MoveTwips CLng(X), CLng(Y), CLng(W), CLng(h)
 RelocateMarkedText
 End If
 
@@ -9068,7 +9084,11 @@ Public Sub mn3sub()
 On Error Resume Next
 Dim aa$
 aa$ = GetTextData(13)
-If aa$ = vbNullString Then aa$ = Clipboard.GetText(1)
+If aa$ = vbNullString Then
+On Error Resume Next
+aa$ = Clipboard.GetText(1)
+If Err Then Err.Clear: Exit Sub
+End If
 If NumberOnly Or NumberIntOnly Then
     If Not ValidNum(aa$, False, NumberIntOnly) Then Exit Sub
     NumberOnly = True

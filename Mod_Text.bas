@@ -98,7 +98,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 53
+Global Const Revision = 54
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -15689,7 +15689,12 @@ againsub:
                 IsStr1 = True
                 Set bstackstr.lastobj = bstackstr.FuncObj
                 Set bstackstr.FuncObj = Nothing
+                If myVarType(bstackstr.FuncValue, vbString) Then
+                
                 R$ = bstackstr.FuncValue
+                Else
+                R$ = fixthis(bstackstr.FuncValue)
+                End If
                 bstackstr.FuncValue = Empty
             Else
                 IsStr1 = False
@@ -21144,12 +21149,28 @@ emptyfunc:
             Set mystack.FuncObj = Nothing
             If MyIsObject(mystack.lastobj) Then
                 If mystack.lastobj Is Nothing Then
-                    vl = mystack.FuncValue
+                    If myVarType(vl, &H4008) Then
+                    If myVarType(mystack.FuncValue, vbString) Then
+                        vl = mystack.FuncValue
+                    Else
+                        vl = fixthis(mystack.FuncValue)
+                    End If
+                    Else
+                        vl = mystack.FuncValue
+                    End If
                 Else
                     Set basestack.lastobj = mystack.lastobj
                 End If
             Else
-                vl = mystack.FuncValue
+                If myVarType(vl, &H4008) Then
+                    If myVarType(mystack.FuncValue, vbString) Then
+                        vl = mystack.FuncValue
+                    Else
+                        vl = fixthis(mystack.FuncValue)
+                    End If
+                Else
+                    vl = mystack.FuncValue
+                End If
             End If
             here$ = ohere$
             If Not mystack.CallLocalLast Then
@@ -45694,7 +45715,7 @@ Else
             Else
                 isboolean = True
             End If
-            ElseIf VarType(p) = vbString Then
+            ElseIf myVarType(p, vbString) Then
             s$ = p
             GoTo isAstring
             End If
@@ -50531,7 +50552,7 @@ fstr60: '"STR$(", "√—¡÷«$("
                 q$ = GetlocaleString2(14, pp)
                 If VarType(p) = vbBoolean Then
                     If pp = 1032 Then
-                        R$ = Format$(p, ";\¡\Î\Á\Ë\ﬁ\Ú;\ÿ\Â\ı\‰\ﬁ\Ú")
+                        R$ = Format$(p, ";¡ÎÁË›Ú;ÿÂı‰›Ú")
                     ElseIf pp = 1033 Then
                         R$ = Format$(p, ";\T\r\u\e;\F\a\l\s\e")
                     Else

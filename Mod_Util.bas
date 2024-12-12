@@ -5545,10 +5545,10 @@ End Function
 
 
 
-Sub ICOPY(d1 As Object, x1 As Long, y1 As Long, W As Long, H As Long)
+Sub ICOPY(d1 As Object, x1 As Long, y1 As Long, W As Long, h As Long)
 Dim sV As Long
 With players(GetCode(d1))
-sV = BitBlt(d1.hDC, CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleY(y1, 1, 3)), CLng(d1.ScaleX(W, 1, 3)), CLng(d1.ScaleY(H, 1, 3)), d1.hDC, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleY(.YGRAPH, 1, 3)), SRCCOPY)
+sV = BitBlt(d1.hDC, CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleY(y1, 1, 3)), CLng(d1.ScaleX(W, 1, 3)), CLng(d1.ScaleY(h, 1, 3)), d1.hDC, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleY(.YGRAPH, 1, 3)), SRCCOPY)
 'sv = UpdateWindow(d1.hwnd)
 End With
 End Sub
@@ -8207,7 +8207,7 @@ cont1:
                 bstack.FuncValue = p
                 x1 = x1 + 1
         End If
-        ElseIf IsStrExp(bstack, b$, ss$, Len(bstack.tmpstr) = 0) Then
+        ElseIf IsStrExp(bstack, b$, ss$, False) Then  ' Len(bstack.tmpstr) = 0
             If x1 = 0 Then If lookOne(b$, ",") Then x1 = 1: Set pppp = New mArray: pppp.PushDim (1): pppp.PushEnd
             If x1 = 0 Then
               '  If Len(bstack.originalname$) > 3 Then
@@ -8247,7 +8247,7 @@ misum: '                     MissNumExpr
          Set bstack.FuncObj = pppp
          Set pppp = New mArray
          Set bstack.lastobj = Nothing
-         If VarType(bstack.FuncValue) = 5 Then
+         If myVarType(bstack.FuncValue, vbString) Then
          bstack.FuncValue = 0
          Else
          bstack.FuncValue = vbNullString
@@ -10003,12 +10003,12 @@ End Function
 Function IsTan(bstack As basetask, a$, R As Variant) As Boolean
 If IsExp(bstack, a$, R, flatobject:=True, nostring:=True) Then
      
-     If R = Int(R) Then
-        If R Mod 90 = 0 And R Mod 180 <> 0 Then
-        MyErMacro a$, "Wrong Tan Parameter", "Λάθος παράμετρος εφαπτομένης"
-        IsTan = False: Exit Function
-        End If
-        End If
+     'If R = Int(R) Then
+     '   If R Mod 90 = 0 And R Mod 180 <> 0 Then
+     '   MyErMacro a$, "Wrong Tan Parameter", "Λάθος παράμετρος εφαπτομένης"
+     '  IsTan = False: Exit Function
+      '  End If
+      '  End If
     R = Sgn(R) * Tan(R * 1.74532925199433E-02)
 
      If Abs(R) < 1E-16 Then R = 0
@@ -18305,13 +18305,13 @@ Set Scr = bstack.Owner
 prive = GetCode(Scr)
 Dim p As Variant, i As Long, s$, pn&, X As Double, Y As Double, it As Long, f As Long, pa$
 Dim x1 As Long, y1 As Long, frm$, par As Boolean, ohere$, ss$, W$, sX As Double, sY As Double, modname$
-Dim pppp As mArray, hlp$, H&, all$, myobject As Object, usehandler As mHandler, usegroup As Group
+Dim pppp As mArray, hlp$, h&, all$, myobject As Object, usehandler As mHandler, usegroup As Group
 Dim w1 As Long, w2 As Long, w3 As Long, dum As Boolean, virtualtop As Long
 pn& = 0
 virtualtop = varhash.count - 1
 'GoTo ByPass  '********************************
 For pn& = virtualtop To 0 Step -1
-    varhash.ReadVar pn&, s$, H&
+    varhash.ReadVar pn&, s$, h&
     If InStr(s$, ChrW(&H1FFF)) = 0 And InStr(s$, ChrW(&HFFBF)) = 0 Then Exit For
     virtualtop = virtualtop - 1
 Next pn&
@@ -18320,7 +18320,7 @@ pn& = 0
 Dim a() As String, aa() As String
 With players(prive)
     Do While pn& < varhash.count
-        varhash.ReadVar pn&, s$, H&
+        varhash.ReadVar pn&, s$, h&
         If SecureNames Then
             a() = Split(s$, "».")
             If UBound(a()) = 1 Then
@@ -18334,14 +18334,14 @@ With players(prive)
             End If
             
         End If
-        If H& <> -1 Then
+        If h& <> -1 Then
             If InStr(s$, ChrW(&HFFBF)) > 0 Then
                 GoTo LOOPNEXT
             ElseIf InStr(s$, ChrW(&H1FFF)) > 0 Then
                 GoTo LOOPNEXT
             ElseIf Right$(s$, 1) = "(" Then
-                If MyIsObject(var(H&)) Then
-                    Set myobject = var(H&)
+                If MyIsObject(var(h&)) Then
+                    Set myobject = var(h&)
                     If Not CheckIsmArray(myobject) Then
                         If Not myobject Is Nothing Then
                             If TypeOf myobject Is mArray Then
@@ -18465,48 +18465,48 @@ With players(prive)
                 End If
                 GoTo LOOPNEXT
             ElseIf Right$(s$, 1) = "$" Or Right$(s$, 3) = "$()" Then  ' WHY "$()"
-                If VarTypeName(var(H&)) = doc Then
-                    If var(H&).IsEmpty Then
+                If VarTypeName(var(h&)) = doc Then
+                    If var(h&).IsEmpty Then
                         hlp$ = " [Empty Document]"
                     Else
-                        hlp$ = " [Document " & (var(H&).SizeCRLF) & " chars]"
+                        hlp$ = " [Document " & (var(h&).SizeCRLF) & " chars]"
                     End If
-                ElseIf VarTypeName(var(H&)) = "PropReference" Then
+                ElseIf VarTypeName(var(h&)) = "PropReference" Then
                     hlp$ = " [Object Property]"
                 Else
-                    If MyIsObject(var(H&)) Then
-                        If TypeOf var(H&) Is lambda Then
+                    If MyIsObject(var(h&)) Then
+                        If TypeOf var(h&) Is lambda Then
                             hlp$ = "[lambda$]"
                         Else
-                            If TypeOf var(H&) Is Constant Then
-                                If var(H&).flag Then
-                                    hlp$ = "[" + VarTypeNameList(var(H&).Value) + "$]"
+                            If TypeOf var(h&) Is Constant Then
+                                If var(h&).flag Then
+                                    hlp$ = "[" + VarTypeNameList(var(h&).Value) + "$]"
                                 Else
-                                    If Len(CStr(var(H&))) > 3 * .mX Then
-                                        hlp$ = " = [" + Left$(CStr(var(H&)), 4) + "...]"
+                                    If Len(CStr(var(h&))) > 3 * .mX Then
+                                        hlp$ = " = [" + Left$(CStr(var(h&)), 4) + "...]"
                                     Else
-                                        hlp$ = " = [" & (var(H&)) & "]"
+                                        hlp$ = " = [" & (var(h&)) & "]"
                                     End If
                                 End If
                             Else
-                                hlp$ = "[" + VarTypeNameList(var(H&)) + "]"
+                                hlp$ = "[" + VarTypeNameList(var(h&)) + "]"
                             End If
                         End If
                     Else
-                        If Len(var(H&)) > 3 * .mX Then
-                            hlp$ = " = " + Chr(34) + Left$(CStr(var(H&)), 4) + "..." + Chr(34)
+                        If Len(var(h&)) > 3 * .mX Then
+                            hlp$ = " = " + Chr(34) + Left$(CStr(var(h&)), 4) + "..." + Chr(34)
                         Else
-                            hlp$ = " = " & Chr(34) & (var(H&)) & Chr(34)
+                            hlp$ = " = " & Chr(34) & (var(h&)) & Chr(34)
                         End If
                     End If
                 End If
                 s$ = s$ + hlp$
             Else
-                If MyIsObject(var(H&)) Then
-                    If var(H&) Is Nothing Then
+                If MyIsObject(var(h&)) Then
+                    If var(h&) Is Nothing Then
                         s$ = s$ + "*[Nothing]"
-                    ElseIf TypeOf var(H&) Is mHandler Then
-                        Set usehandler = var(H&)
+                    ElseIf TypeOf var(h&) Is mHandler Then
+                        Set usehandler = var(h&)
                         Select Case usehandler.t1
                         Case 1
                             If usehandler.ReadOnly Then
@@ -18555,9 +18555,9 @@ With players(prive)
                             End If
                         End Select
                         Set usehandler = Nothing
-                    ElseIf TypeOf var(H&) Is refArray Then
+                    ElseIf TypeOf var(h&) Is refArray Then
                     Dim rA As refArray
-                    Set rA = var(H&)
+                    Set rA = var(h&)
                     
                     If rA.MarkTwoDimension Then
                         s$ = s$ & "*" & rA.vtTypeString()
@@ -18565,57 +18565,57 @@ With players(prive)
                         s$ = s$ & "*" & rA.vtTypeString(0)
                     End If
                     Else
-                        If TypeOf var(H&) Is Constant Then
+                        If TypeOf var(h&) Is Constant Then
                             On Error Resume Next
-                            If VarType(var(H&)) = 20 Then
-                            s$ = s$ + " = [" + CStr(var(H&)) + "]"
-                            ElseIf VarType(var(H&)) = vbString Then
-                            s$ = s$ + " = [" + LTrim$(var(H&).Value) + "]"
+                            If VarType(var(h&)) = 20 Then
+                            s$ = s$ + " = [" + CStr(var(h&)) + "]"
+                            ElseIf VarType(var(h&)) = vbString Then
+                            s$ = s$ + " = [" + LTrim$(var(h&).Value) + "]"
                             Else
-                            s$ = s$ + " = [" + LTrim$(str(var(H&))) + "]"
+                            s$ = s$ + " = [" + LTrim$(str(var(h&))) + "]"
                             End If
                             If Err Then
-                                s$ = s$ & " = [" & var(H&) & "]"
+                                s$ = s$ & " = [" & var(h&) & "]"
                                 Err.Clear
                             End If
                         Else
-                            If TypeOf var(H&) Is Group Then
-                                Set usegroup = var(H&)
+                            If TypeOf var(h&) Is Group Then
+                                Set usegroup = var(h&)
                                 If usegroup.IamApointer Then
                                     s$ = s$ + "*[Group]"
                                 Else
                                     s$ = s$ + "[Group]"
                                 End If
                                 Set usegroup = Nothing
-                            ElseIf TypeOf var(H&) Is PropReference Then
+                            ElseIf TypeOf var(h&) Is PropReference Then
                                 s$ = s$ + " [Object Property]"
                             Else
-                                s$ = s$ + "[" + VarTypeNameList(var(H&)) + "]"
+                                s$ = s$ + "[" + VarTypeNameList(var(h&)) + "]"
                             End If
                         End If
                     End If
                 Else
                     On Error Resume Next
-                    Select Case VarType(var(H&))
+                    Select Case VarType(var(h&))
                     Case 20
-                        s$ = s$ + " = " + CStr(var(H&)) + "&&"
+                        s$ = s$ + " = " + CStr(var(h&)) + "&&"
                     Case vbByte
-                        s$ = s$ + " = " + CStr(var(H&)) + "|0x" + Hex(var(H&))
+                        s$ = s$ + " = " + CStr(var(h&)) + "|0x" + Hex(var(h&))
                     Case vbString
-                        If Len(var(H&)) > 3 * .mX Then
-                            s$ = s$ + " = " + Chr(34) + Left$(LTrim$(var(H&)), 4) + "..." + Chr(34)
+                        If Len(var(h&)) > 3 * .mX Then
+                            s$ = s$ + " = " + Chr(34) + Left$(LTrim$(var(h&)), 4) + "..." + Chr(34)
                         Else
-                            s$ = s$ + " = " + Chr(34) + LTrim$(var(H&)) + Chr(34)
+                            s$ = s$ + " = " + Chr(34) + LTrim$(var(h&)) + Chr(34)
                         End If
                     Case 13
-                        s$ = s$ + "*[" + Typename(var(H&)) + "]"
+                        s$ = s$ + "*[" + Typename(var(h&)) + "]"
                     Case 36
-                        s$ = s$ + "[" + Typename(var(H&)) + "]"
+                        s$ = s$ + "[" + Typename(var(h&)) + "]"
                     Case Else
-                        s$ = s$ + " = " + LTrim$(str(var(H&)))
+                        s$ = s$ + " = " + LTrim$(str(var(h&)))
                     End Select
                     If Err Then
-                        hlp$ = "" & var(H&)
+                        hlp$ = "" & var(h&)
                         If Len(hlp$) > 3 * .mX Then
                             s$ = s$ + " = " + Chr(34) + Left$(hlp$, 4) + "..." + Chr(34)
                         Else
@@ -18624,7 +18624,7 @@ With players(prive)
 
                         Err.Clear
                     End If
-                    Select Case VarType(var(H&))
+                    Select Case VarType(var(h&))
                     Case vbLong
                         s$ = s$ + "&"
                     Case vbDecimal
@@ -18721,7 +18721,7 @@ ElseIf VarType(mList.Value) = vbDate Then
 ElseIf VarType(mList.Value) = 20 Then
     s$ = s$ & mList.KeyToString & " = " & CStr(mList.Value) & "&&"
 Else
-    If Len(var(H&)) > 3 * .mX Then
+    If Len(var(h&)) > 3 * .mX Then
         s$ = s$ + mList.KeyToString + " = " + Chr(34) + Left$(mList.Value, 4) + "..." + Chr(34)
     Else
         s$ = s$ & mList.KeyToString & " = " & Chr(34) & mList.Value & Chr(34)
@@ -19660,7 +19660,7 @@ err010:
     
 End Function
 Function ExpandGui(bstack As basetask, what$, rest$, ifier As Boolean, Lang As Long, oName As String)
-Dim pppp As mArray, aVar As Variant, H$
+Dim pppp As mArray, aVar As Variant, h$
  Dim i As Long
 '' add new GuiItems but not visible
 what$ = Left$(what$, Len(what$) - 1)
@@ -19684,12 +19684,12 @@ what$ = Left$(what$, Len(what$) - 1)
         Set aa0 = pppp.item(0)
         With aa0
         Set aaa.EventObj = .EventObj
-        H$ = .modulename
+        h$ = .modulename
         End With
         
         With aaa
         .myname = what$
-        .modulename = H$
+        .modulename = h$
         .TempTitle = what$ & "(" & (i) & ")"
         .Index = i
         End With
@@ -22643,18 +22643,18 @@ End Sub
 
 
 
-Sub scrMove00(Scr As Object, Optional ByVal W As Variant, Optional ByVal H As Variant)
+Sub scrMove00(Scr As Object, Optional ByVal W As Variant, Optional ByVal h As Variant)
 If TypeOf Scr Is Form Then
-If IsMissing(W) And IsMissing(H) Then
+If IsMissing(W) And IsMissing(h) Then
 Scr.move ScrInfo(Console).Left, ScrInfo(Console).top
 Else
-Scr.move ScrInfo(Console).Left, ScrInfo(Console).top, W, H
+Scr.move ScrInfo(Console).Left, ScrInfo(Console).top, W, h
 End If
 Else
- If IsMissing(W) And IsMissing(H) Then
+ If IsMissing(W) And IsMissing(h) Then
 Scr.move 0, 0
 Else
-Scr.move 0, 0, W, H
+Scr.move 0, 0, W, h
 End If
 End If
 End Sub
@@ -24113,7 +24113,7 @@ Public Function AddBackslash(s As String) As String
 
 End Function
 Function ProcCreateEmf(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim W, H  ' these are twips - need to convert to .01 mm
+Dim W, h  ' these are twips - need to convert to .01 mm
 Dim f As Boolean, p As Variant, Col As Long, it As Long, ss$, X As Double, par As Boolean, prive As Long
 Dim nd&, once As Boolean
 ProcCreateEmf = True
@@ -24121,7 +24121,7 @@ prive = GetCode(bstack.Owner)
 ' skip for now
 If IsExp(bstack, rest$, W, , True) Then
     If FastSymbol(rest$, ",") Then
-           If Not IsExp(bstack, rest$, H, , True) Then MissNumExpr
+           If Not IsExp(bstack, rest$, h, , True) Then MissNumExpr
     Else
     
     End If
@@ -28806,7 +28806,7 @@ End If
 End Function
 
 Function StaticNew(bstack As basetask, b$, W$, Lang As Long) As Boolean
-Dim p As Variant, ii As Long, ss$, usehandler As mHandler, H As Variant, ok As Boolean
+Dim p As Variant, ii As Long, ss$, usehandler As mHandler, h As Variant, ok As Boolean
 
 If bstack.StaticCollection Is Nothing Then
 
@@ -28841,10 +28841,10 @@ Do
                             Set .objref = anything
                             End With
                             Set p = usehandler
-                            Set H = usehandler
-                      bstack.SetVarobJvalue W$, H
+                            Set h = usehandler
+                      bstack.SetVarobJvalue W$, h
                       Set usehandler = Nothing
-                      Set H = Nothing
+                      Set h = Nothing
                     ElseIf CheckLastHandler(anything) Then
                         Set usehandler = anything
                         If usehandler.t1 = 2 Then
@@ -30122,16 +30122,16 @@ ProcWords = True
 End Function
 
 Function ProcSound(bstack As basetask, rest$) As Boolean
-Dim s$, ss, H As mHandler, m As MemBlock
+Dim s$, ss, h As mHandler, m As MemBlock
 If IsStrExp(bstack, rest$, s$) Then
 PlaySoundNew s$
 ProcSound = True
 ElseIf IsExp(bstack, rest$, ss) Then
 If Not bstack.lastobj Is Nothing Then
 If TypeOf bstack.lastobj Is mHandler Then
-    Set H = bstack.lastobj
-    If H.t1 = 2 Then
-        Set m = H.objref
+    Set h = bstack.lastobj
+    If h.t1 = 2 Then
+        Set m = h.objref
         PlaySoundNew2 m.GetPtr(0)
         ProcSound = True
     Else

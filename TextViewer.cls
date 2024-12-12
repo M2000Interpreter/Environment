@@ -193,7 +193,10 @@ End Sub
 
 Private Function GetTextData(ByVal lFormatId As Long) As String
 Dim bData() As Byte, sr As String, sr1 As String
+On Error Resume Next
 sr1 = Clipboard.GetText(1)
+If Err Then Err.Clear: Beep: Exit Function
+
 If (OpenClipboard(0) <> 0) Then
 
         
@@ -1141,7 +1144,11 @@ MarkCopy
 keycode = 0
 ElseIf keycode = vbKeyV And (shift And 3) = 2 Then
 Pad$ = GetTextData(13)
-If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
+If Pad$ = vbNullString Then
+On Error Resume Next
+Pad$ = Clipboard.GetText(1)
+If Err Then Err.Clear: keycode = 0: Exit Sub
+End If
 If ParaSelStart = 2 And glistN.list(glistN.ListIndex) = vbNullString Then
 SelStart = SelStart - 1
 End If
@@ -2871,7 +2878,6 @@ End If
 End If
 Exit Sub
 End If
-
 drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
 If kind = 0 Then
     If IsSymbol(a$, "@") Then
@@ -2979,9 +2985,13 @@ If pos2 > 0 Then
         Else
         
        addone pos2, lastcol
-       If lastcol = 13 Then
+       If lastcol = 13 And Left$(drop$, 1) <> "0" And Left$(drop$, 1) <> "#" Then
        'k = k - 1
+       If UCase(Left$(drop$, 2)) = "&H" And Len(drop$) > 2 Then
+       
+       Else
        addone pos2 + 1, 10
+       End If
        End If
        End If
    Else
