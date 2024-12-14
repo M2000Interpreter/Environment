@@ -1,15 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 54 active-X
-1. A numeric value from function result can be convert to string if we place it in a string expression with the proper decimal point (depend on locale number)
-locale 1033
-Def A()=10.03
-Print ""+A()
-
-2. Fix a problem when clipboard had problem and at ctrl+x we get fatal error.
-
-3. Fix syntax color for 0x0000 and &h0000 (hex values), and #000000 (html color codes). (was break before 2 revisions).
-
+Version 12 Revision 54 - 1 active-X
+Change manifest on mexe.vbp (so M2000.exe now run when compiled on windows 11)
 
 
 George Karras, Kallithea Attikis, Greece.
