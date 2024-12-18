@@ -1108,11 +1108,11 @@ End Sub
 
 
 
-Private Sub glistN_KeyDown(keycode As Integer, shift As Integer)
-If keycode = vbKeyTab Then
+Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
+If KeyCode = vbKeyTab Then
 If shift = 2 Then choosenext
         
-    keycode = 0
+    KeyCode = 0
     Exit Sub
     
 
@@ -1120,11 +1120,11 @@ End If
 
 Dim selstart2 As Long, b As Boolean, Pad$, cc As Long
 Dim l1 As Long, c1 As Long
-If keycode = 18 Then
+If KeyCode = 18 Then
 Exit Sub
 End If
-If keycode = 16 And shift <> 0 Then
-keycode = 0
+If KeyCode = 16 And shift <> 0 Then
+KeyCode = 0
 If glistN.SelStart = 0 Then
 RaiseEvent inform(glistN.ListIndex + 1, 1)
 Else
@@ -1132,22 +1132,22 @@ RaiseEvent inform(glistN.ListIndex + 1, glistN.SelStart)
 End If
 Exit Sub
 End If
-If NoMark Then keycode = 0: Exit Sub
+If NoMark Then KeyCode = 0: Exit Sub
 
-If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
-ElseIf keycode = vbKeyX And (shift And 3) = 2 Then
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+ElseIf KeyCode = vbKeyX And (shift And 3) = 2 Then
 MarkCut
 Show
-keycode = 0
-ElseIf keycode = vbKeyC And (shift And 3) = 2 Then
+KeyCode = 0
+ElseIf KeyCode = vbKeyC And (shift And 3) = 2 Then
 MarkCopy
-keycode = 0
-ElseIf keycode = vbKeyV And (shift And 3) = 2 Then
+KeyCode = 0
+ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
 Pad$ = GetTextData(13)
 If Pad$ = vbNullString Then
 On Error Resume Next
 Pad$ = Clipboard.GetText(1)
-If Err Then Err.Clear: keycode = 0: Exit Sub
+If Err Then Err.Clear: KeyCode = 0: Exit Sub
 End If
 If ParaSelStart = 2 And glistN.list(glistN.ListIndex) = vbNullString Then
 SelStart = SelStart - 1
@@ -1163,13 +1163,13 @@ End If
 SelText = Pad$
 RemoveUndo SelText
 
-keycode = 0
+KeyCode = 0
 'mDoc.WrapAgainColorBlock mDoc.MarkParagraphID, mDoc.MarkParagraphID
-ElseIf keycode = vbKeyA And (shift And 3) = 2 Then
+ElseIf KeyCode = vbKeyA And (shift And 3) = 2 Then
 glistN.MarkNext = 0
 glistN.MarkALL
-keycode = 0
-ElseIf keycode = vbKeyY And (shift And 3) = 2 Then
+KeyCode = 0
+ElseIf KeyCode = vbKeyY And (shift And 3) = 2 Then
 ' Redo
 profundo.MARKONE
 againY:
@@ -1249,8 +1249,8 @@ End If
 If undoprev Then GoTo againY
 End If
 
-keycode = 0
-ElseIf keycode = vbKeyZ And (shift And 3) = 2 Then
+KeyCode = 0
+ElseIf KeyCode = vbKeyZ And (shift And 3) = 2 Then
 ' 2nd version of undo system
 ' undopos now is selstart
 profundo.MARKONE
@@ -1324,36 +1324,36 @@ undomode = 0
 End If
 If undoprev Then GoTo againZ
 
-keycode = 0
-ElseIf keycode = vbKeyA And (shift And 3) = 3 Then
+KeyCode = 0
+ElseIf KeyCode = vbKeyA And (shift And 3) = 3 Then
 glistN.MarkNext = 0
 BlockEndPara = mDoc.MarkParagraphID
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 glistN.ShowPan
-keycode = 0
+KeyCode = 0
 
-ElseIf keycode = vbKeyDelete Then
+ElseIf KeyCode = vbKeyDelete Then
 If HaveMarkedText Then
 ClearRedo
 PushUndo
 glistN_MarkDelete False
 
-keycode = 0
+KeyCode = 0
 End If
-ElseIf keycode = vbKeyBack Then
+ElseIf KeyCode = vbKeyBack Then
 If HaveMarkedText Then
 ClearRedo
 PushUndo
 glistN_MarkDelete False
 
-keycode = 0
+KeyCode = 0
 End If
 End If
 
 End Sub
 
-Private Sub glistN_KeyDownAfter(keycode As Integer, shift As Integer)
+Private Sub glistN_KeyDownAfter(KeyCode As Integer, shift As Integer)
 If NoMark Then Exit Sub
 If HaveMarkedText Then
 If shift = 0 Then
@@ -1363,20 +1363,20 @@ BlockStartPos = BlockEndPos
 glistN.RefreshNow
 ElseIf (shift And 1) = 1 Then
 
-If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
 glistN_MarkOut
 End If
 
 End If
 ElseIf (shift And 1) = 1 And glistN.MarkNext = 0 Then
-If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
 
 glistN.MarkNext = 1
 glistN_MarkIn
 
 End If
 ElseIf (shift And 1) = 1 And glistN.MarkNext > 0 Then
-If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
 glistN.MarkNext = 2
 glistN_MarkOut
 End If
@@ -1889,7 +1889,7 @@ End Sub
 
 'End Sub
 
-Private Sub glistN_ScrollSelected(item As Long, Y As Long)
+Private Sub glistN_ScrollSelected(item As Long, y As Long)
 If NoMark Then Exit Sub
 Dim what$, ThatPara As Long
    mDoc.TextParagraphLine item, what$, ThatPara
@@ -2964,7 +2964,7 @@ If kind > 0 Then
    Else
    If kind > 4 And kind < 9 Then lastpar = 10 - (kind = 8) * 3
    If kind = 10 Then
-If pos2 > 0 Then
+    If pos2 > 0 Then
        addone pos2, 13
     Else
        addone k - Len(a$) - Len(drop$) + 1, 13
@@ -2985,9 +2985,8 @@ If pos2 > 0 Then
         Else
         
        addone pos2, lastcol
-       If lastcol = 13 And Left$(drop$, 1) <> "0" And Left$(drop$, 1) <> "#" Then
-       'k = k - 1
-       If UCase(Left$(drop$, 2)) = "&H" And Len(drop$) > 2 Then
+       If lastcol = 13 And Left$(LTrim(drop$), 1) <> "0" And Left$(drop$, 1) <> "#" Then
+       If UCase(Left$(LTrim$(drop$), 2)) = "&H" And Len(drop$) > 2 Then
        
        Else
        addone pos2 + 1, 10

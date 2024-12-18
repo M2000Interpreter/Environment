@@ -280,34 +280,34 @@ Private Function proc101(b$) As String
 End Function
 
 Public Property Get uni(RHS) As Long
-Dim H
+Dim h
 If InUseHandlers.ExistKey(RHS) Then
-    H = InUseHandlers.Value
-    uni = H(3)
+    h = InUseHandlers.Value
+    uni = h(3)
 End If
 End Property
 
 Public Property Get Fstep(RHS) As Long
-Dim H
+Dim h
 If InUseHandlers.ExistKey(RHS) Then
-    H = InUseHandlers.Value
-    Fstep = H(2)
+    h = InUseHandlers.Value
+    Fstep = h(2)
 End If
 End Property
 Public Property Get Fkind(RHS) As Ftypes
-Dim H
+Dim h
 If InUseHandlers.ExistKey(RHS) Then
-    H = InUseHandlers.Value
-    Fkind = H(1)
+    h = InUseHandlers.Value
+    Fkind = h(1)
 End If
 End Property
 Public Property Let FileSeek(RHS, vvv)
-Dim H, where, ret As Currency, LowLong As Long, HighLong As Long
+Dim h, where, ret As Currency, LowLong As Long, HighLong As Long
 Dim FileError As Long
 ret = CCur(Int(vvv)) - 1
 If InUseHandlers.ExistKey(RHS) Then
-    H = InUseHandlers.Value
-    where = H(0)
+    h = InUseHandlers.Value
+    where = h(0)
     Size2Long ret, LowLong, HighLong
     LowLong = SetFilePointer(where, LowLong, HighLong, FILE_BEGIN)
     FileError = GetLastError()
@@ -319,11 +319,11 @@ Else
 End If
 End Property
 Public Property Get FileSeek(RHS) As Variant
-Dim H, where, ret As Currency, LowLong As Long, HighLong As Long
+Dim h, where, ret As Currency, LowLong As Long, HighLong As Long
 FileSeek = ret
 If InUseHandlers.ExistKey(RHS) Then
-    H = InUseHandlers.Value
-    where = H(0)
+    h = InUseHandlers.Value
+    where = h(0)
     LowLong = 0
     HighLong = 0
     LowLong = SetFilePointer(where, LowLong, HighLong, FILE_CURRENT)
@@ -372,11 +372,11 @@ Dim fsize As Currency
 End Property
 
 Public Property Get FileEOF(RHS) As Boolean
-Dim H, where, ret As Currency, LowLong As Long, HighLong As Long
+Dim h, where, ret As Currency, LowLong As Long, HighLong As Long
 Dim fsize As Currency
 If InUseHandlers.ExistKey(RHS) Then
-    H = InUseHandlers.Value
-    where = H(0)
+    h = InUseHandlers.Value
+    where = h(0)
     LowLong = SetFilePointer(where, LowLong, HighLong, FILE_BEGIN)
     If LowLong = INVALID_SET_FILE_POINTER Then
         MyEr "Can't read the seek value on Eof() function", "Δεν μπορώ να διαβάσω τη τιμή μετάθεσης στη συνάρτηση Μετάθεση()"
@@ -410,8 +410,8 @@ Else
 End If
 End Function
 'internal use
-Public Function ReadFileHandler(H&) As Variant
-If InUseHandlers.Find(CVar(H&)) Then
+Public Function ReadFileHandler(h&) As Variant
+If InUseHandlers.Find(CVar(h&)) Then
     ReadFileHandler = InUseHandlers.sValue
 Else
     MyEr "No such file handler", "Δεν υπάρχει τέτοιο χειριστής αρχείου"
@@ -419,29 +419,29 @@ End If
 End Function
 ' internal use  You have to close file first
 Public Sub CloseHandler(RHS)
-Dim H&, ar() As Variant
+Dim h&, ar() As Variant
 On Error Resume Next
 If InUseHandlers.ExistKey(RHS) Then
-    H& = CLng(InUseHandlers.sValue)
-    API_CloseFile H&
-    H& = InUseHandlers.KeyToNumber
+    h& = CLng(InUseHandlers.sValue)
+    API_CloseFile h&
+    h& = InUseHandlers.KeyToNumber
     InUseHandlers.RemoveWithNoFind
-    FreeUseHandlers.AddKey CVar(H&)
+    FreeUseHandlers.AddKey CVar(h&)
 Else
     ' no error... (I am thinking about it)
 End If
 
 End Sub
 Public Sub CloseAllHandlers()
-Dim H&
+Dim h&
 On Error Resume Next
 Do While InUseHandlers.count > 0
     InUseHandlers.ToEnd
-    H& = CLng(InUseHandlers.sValue)
-    API_CloseFile H&
-    H& = InUseHandlers.KeyToNumber
+    h& = CLng(InUseHandlers.sValue)
+    API_CloseFile h&
+    h& = InUseHandlers.KeyToNumber
     InUseHandlers.RemoveWithNoFind
-    FreeUseHandlers.AddKey CVar(H&)
+    FreeUseHandlers.AddKey CVar(h&)
 Loop
 End Sub
 Function myFileLen(ByVal FileName As String) As Currency

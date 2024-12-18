@@ -162,16 +162,16 @@ Next i
 End With
 Set eventlist = eventlist2
 End Sub
-Public Sub RegisterEvent(ByVal A$)
-A$ = myUcase(A$)
+Public Sub RegisterEvent(ByVal a$)
+a$ = myUcase(a$)
 If eventlist Is Nothing Then Set eventlist = New FastCollection
-If eventlist.ExistKey(A$) Then Exit Sub
-eventlist.AddKey A$, vbNullString
+If eventlist.ExistKey(a$) Then Exit Sub
+eventlist.AddKey a$, vbNullString
 End Sub
-Public Function EventFuncPos(A$, retName$, Pos As Long) As Boolean
+Public Function EventFuncPos(a$, retName$, Pos As Long) As Boolean
 If eventlist Is Nothing Then EventFuncPos = 0: Exit Function
 With eventlist
-If eventlist.ExistKey(A$) Then
+If eventlist.ExistKey(a$) Then
     retName$ = .Value
     If retName$ <> vbNullString Then Pos = .sValue: EventFuncPos = True
 End If
@@ -219,12 +219,12 @@ Else
 AllSoros.DataStr GroupName + Split(s)(0)
 End If
 Next
-Dim A() As String
+Dim a() As String
 If FuncRef$ <> "" Then
-A() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
-If UBound(A()) > 0 Then
-For i = 1 To UBound(A())
-AllSoros.DataStr topname$ + "." + Split(A(i))(0)
+a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
+If UBound(a()) > 0 Then
+For i = 1 To UBound(a())
+AllSoros.DataStr topname$ + "." + Split(a(i))(0)
 Next i
 End If
 End If
@@ -244,12 +244,12 @@ For i = 1 To FieldsCount
         AllSoros.DataStr (Split(s)(0))
     End If
 Next
-Dim A() As String
+Dim a() As String
 If FuncRef$ <> "" Then
-A() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
-If UBound(A()) > 0 Then
-For i = 1 To UBound(A())
-AllSoros.DataStr (Split(A(i))(0))
+a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
+If UBound(a()) > 0 Then
+For i = 1 To UBound(a())
+AllSoros.DataStr (Split(a(i))(0))
 Next i
 End If
 End If
@@ -299,9 +299,8 @@ If mTeam Then
             End If
 End If
 If MemInt(VarPtr(bank(cursor))) = 20 Then
-item = MemCur(VarPtr(bank(cursor)))
+item = MemCur(VarPtr(bank(cursor)) + 8)
 MemInt(VarPtr(item)) = 20
-
 Else
 item = bank(cursor)
 End If
@@ -345,20 +344,20 @@ Public Sub EndFloat()
 FloatGroup = False
 bank = Empty
 End Sub
-Public Property Set LinkRef(A As Object)
+Public Property Set LinkRef(a As Object)
 If FloatGroup Then
-If Typename(A) <> "Group" Then
+If Typename(a) <> "Group" Then
 Exit Property
 End If
 mTeam = False
-Set LinkToGroup = A
-If A Is Nothing Then Exit Property
+Set LinkToGroup = a
+If a Is Nothing Then Exit Property
 'erase functions,,,
  bank(bank(1) * 2 + 3) = vbNullString
 mTeam = True
 Else
 ' only when is in an array as Float Group
-Set LinkToGroup = A
+Set LinkToGroup = a
 End If
 End Property
 Friend Property Get LinkGroup() As Group
