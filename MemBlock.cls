@@ -13,8 +13,8 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 Private mPtr As Long
-Private mItems As Long
-Private ItemLen As Long
+Private mitems As Long
+Private itemlen As Long
 Private mBytes As Long
 Private ErrorMes As Long
 Public structref As FastCollection
@@ -86,8 +86,8 @@ Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As L
 
 Const CF_ENHMETAFILE = 14
 Sub Construct(ByteLen As Long, Optional Times As Long = 1, Optional clearme As Long = 0, Optional executable As Boolean = False, Optional thatbasicitem As Integer)
-If mItems <> 0 Then
-If mItems <> Times Or mBytes <> ByteLen * Times Then
+If mitems <> 0 Then
+If mitems <> Times Or mBytes <> ByteLen * Times Then
     ErrorMes = 1: Exit Sub
     End If
 End If
@@ -105,8 +105,8 @@ ByteLen = Abs(ByteLen)
 
 If ByteLen < 1 Then ErrorMes = ErrorMes + 4
 If ErrorMes <> 0 Then Exit Sub
-ItemLen = ByteLen
-mItems = Times
+itemlen = ByteLen
+mitems = Times
 mExecBloc = Not executable
 If clearme Then
     If mPtr <> 0 Then
@@ -132,7 +132,7 @@ Public Sub RemovePtr(hMem As Long)
     mPtr = 0
 End Sub
 Property Get ItemSize()
-ItemSize = ItemLen
+ItemSize = itemlen
 End Property
 Public Sub ClearError()
     ErrorMes = 0
@@ -148,27 +148,27 @@ Dim oPtr As Long
 
 If NewSize > 0 Then
     If mExecBloc Then
-        oPtr = BlockResizemalloc(mPtr, ItemLen * NewSize, clearme)
+        oPtr = BlockResizemalloc(mPtr, itemlen * NewSize, clearme)
         If oPtr <> 0 Then
-            mItems = NewSize
+            mitems = NewSize
             mPtr = oPtr
         Else
             ErrorMes = 3
         End If
     Else
     
-    If ItemLen * NewSize <= mBytes Then
-            mPtr = BlockResizeVirtual(mPtr, ItemLen * NewSize)
-            mItems = NewSize
-            mBytes = ItemLen * NewSize
+    If itemlen * NewSize <= mBytes Then
+            mPtr = BlockResizeVirtual(mPtr, itemlen * NewSize)
+            mitems = NewSize
+            mBytes = itemlen * NewSize
     Else
-       oPtr = Blockmalloc(ItemLen * NewSize, clearme, mExecBloc)
+       oPtr = Blockmalloc(itemlen * NewSize, clearme, mExecBloc)
        If oPtr <> 0 Then
-            VirtualBlockCopy oPtr, mPtr, ItemLen * NewSize, mBytes
+            VirtualBlockCopy oPtr, mPtr, itemlen * NewSize, mBytes
            
             BlockFreeVirtual mPtr, mBytes
-            mItems = NewSize
-            mBytes = ItemLen * NewSize
+            mitems = NewSize
+            mBytes = itemlen * NewSize
             mPtr = oPtr
         Else
             ErrorMes = 3
@@ -187,8 +187,8 @@ WhatIsBasicItem = BasicItem
 End Property
 
 Public Property Get GetBytePtr(Offset As Variant) As Long
-If ErrorMes = 0 And mItems > 0 Then
-    If Offset < 0 Or Offset >= mItems * ItemLen Then
+If ErrorMes = 0 And mitems > 0 Then
+    If Offset < 0 Or Offset >= mitems * itemlen Then
         ErrorMes = 4
     Else
     GetBytePtr = signlong(uintnew(mPtr) + Offset)
@@ -198,19 +198,19 @@ Else
 End If
 End Property
 Public Property Get GetPtr(Offset As Variant) As Long
-If ErrorMes = 0 And mItems > 0 Then
-If Offset < 0 Or Offset >= mItems Then
+If ErrorMes = 0 And mitems > 0 Then
+If Offset < 0 Or Offset >= mitems Then
     ' zero
     ErrorMes = 4
 Else
-    GetPtr = cUlng(uintnew(mPtr) + ItemLen * Offset)
+    GetPtr = cUlng(uintnew(mPtr) + itemlen * Offset)
     End If
 Else
     GetPtr = 0  ' null
 End If
 End Property
 Public Property Get SizeByte() As Long
-If ErrorMes = 0 And mItems > 0 Then
+If ErrorMes = 0 And mitems > 0 Then
 If mExecBloc Then
     SizeByte = BlockSize(mPtr)
     Else
@@ -219,32 +219,32 @@ If mExecBloc Then
 End If
 End Property
 Public Property Get items() As Long
-If ErrorMes = 0 And mItems > 0 And ItemLen > 0 Then
+If ErrorMes = 0 And mitems > 0 And itemlen > 0 Then
 If mExecBloc Then
-    items = BlockSize(mPtr) \ ItemLen
+    items = BlockSize(mPtr) \ itemlen
     Else
-    items = mBytes \ ItemLen
+    items = mBytes \ itemlen
     End If
     
 End If
 End Property
 Public Function ValidArea(ByVal ThisStart, ByVal ThisWidth) As Boolean
-Dim a As Currency
+Dim A As Currency
 ' ThisStart is a sign long which hold same bits with Unsigned address
-If ErrorMes = 0 And mItems > 0 Then
-a = uintnew(CCur(mPtr))   ' make mptr an Unsigned
+If ErrorMes = 0 And mitems > 0 Then
+A = uintnew(CCur(mPtr))   ' make mptr an Unsigned
 If ThisStart = 0 Then
-    ThisStart = a
+    ThisStart = A
 Else
     ThisStart = uintnew(ThisStart)
 End If
 ThisWidth = CCur(ThisWidth)
 ' we have to make both Unsigned and then check them
-If ThisStart - a >= 0 Then
+If ThisStart - A >= 0 Then
 If mExecBloc Then
-If ThisStart + ThisWidth <= a + BlockSize(mPtr) Then ValidArea = True
+If ThisStart + ThisWidth <= A + BlockSize(mPtr) Then ValidArea = True
 Else
-If ThisStart + ThisWidth <= a + mBytes Then ValidArea = True
+If ThisStart + ThisWidth <= A + mBytes Then ValidArea = True
 End If
 End If
 End If
@@ -252,12 +252,12 @@ End If
 End Function
 Public Function ValidArea2(ByVal ThisOffsetU As Double, ByVal ThisWidth As Double) As Boolean
 ' ThisOffsetU is Unsigned
-If ErrorMes = 0 And mItems > 0 Then
+If ErrorMes = 0 And mitems > 0 Then
 If ThisOffsetU >= 0 Then
 If mExecBloc Then
-If ThisOffsetU * ItemLen + ThisWidth <= uintnew2(CDbl(BlockSize(mPtr))) Then ValidArea2 = True
+If ThisOffsetU * itemlen + ThisWidth <= uintnew2(CDbl(BlockSize(mPtr))) Then ValidArea2 = True
 Else
-If ThisOffsetU * ItemLen + ThisWidth <= mBytes Then ValidArea2 = True
+If ThisOffsetU * itemlen + ThisWidth <= mBytes Then ValidArea2 = True
 End If
 End If
 End If
@@ -291,8 +291,8 @@ End Property
 Public Function PutStringAtOffset(addr As Variant, AnyString As String) As Variant
 Dim Offset
 Offset = uintnew(addr) - uintnew(mPtr)
-If ErrorMes = 0 And mItems > 0 Then
-    If Offset < 0 Or Offset + 3 >= mItems * ItemLen Then
+If ErrorMes = 0 And mitems > 0 Then
+    If Offset < 0 Or Offset + 3 >= mitems * itemlen Then
         ErrorMes = 4
     Else
         If Strings Is Nothing Then Set Strings = New LongHash
@@ -314,8 +314,8 @@ End Function
 Public Function GetStringFromOffset(addr As Variant, AnyString As String) As Variant
 Dim Offset
 Offset = uintnew(addr) - uintnew(mPtr)
-If ErrorMes = 0 And mItems > 0 Then
-    If Offset < 0 Or Offset + 3 >= mItems * ItemLen Then
+If ErrorMes = 0 And mitems > 0 Then
+    If Offset < 0 Or Offset + 3 >= mitems * itemlen Then
         ErrorMes = 4
         AnyString = "Crash"
     Else
@@ -341,13 +341,13 @@ End Function
 Public Function GetData1(f As Long, addr, lengthInBytes As Long) As Boolean
 Dim Offset, place
 Offset = uintnew(addr) - uintnew(mPtr)
-If ErrorMes = 0 And mItems > 0 Then
-    If Offset < 0 Or Offset + lengthInBytes - 1 >= mItems * ItemLen Then
+If ErrorMes = 0 And mitems > 0 Then
+    If Offset < 0 Or Offset + lengthInBytes - 1 >= mitems * itemlen Then
         ErrorMes = 4
         GetData1 = False
     Else
     On Error GoTo there
-    Dim a1 As SAFEARRAY1D, a() As Byte
+    Dim a1 As SAFEARRAY1D, A() As Byte
      With a1
         .cbElements = 1
         .cDims = 1
@@ -355,18 +355,18 @@ If ErrorMes = 0 And mItems > 0 Then
         .onebound(0).cElements = lengthInBytes
         .pvData = addr
     End With
-        CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
+        CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
 
         place = 1
-        Get #f, , a()
-        CopyMemory ByVal VarPtrArray(a), 0&, 4
+        Get #f, , A()
+        CopyMemory ByVal VarPtrArray(A), 0&, 4
         GetData1 = True
   End If
     
 Else
 there:
         If place = 1 Then
-                CopyMemory ByVal VarPtrArray(a), 0&, 4
+                CopyMemory ByVal VarPtrArray(A), 0&, 4
         End If
         GetData1 = False
 End If
@@ -375,14 +375,14 @@ End Function
 Public Function GetData(f As Long, ByVal addr, lengthInBytes As Long) As Boolean
 Dim Offset, range
 range = uintnew(addr) - uintnew1(GetPtr(0))
-If range < 0 Or range >= mItems * ItemLen Then
+If range < 0 Or range >= mitems * itemlen Then
         ErrorMes = 4
         GetData = False
         Exit Function
 End If
 Offset = uintnew(addr) - uintnew(mPtr)
-If ErrorMes = 0 And mItems > 0 Then
-    If Offset < 0 Or Offset + lengthInBytes - 1 >= (mItems * ItemLen - range) Then
+If ErrorMes = 0 And mitems > 0 Then
+    If Offset < 0 Or Offset + lengthInBytes - 1 >= (mitems * itemlen - range) Then
         ErrorMes = 4
         GetData = False
     Else
@@ -402,10 +402,10 @@ End If
 End Function
 Public Function ExportToByte() As Byte()
 Dim place
-If ErrorMes = 0 And mItems > 0 Then
+If ErrorMes = 0 And mitems > 0 Then
 
     On Error GoTo there
-    Dim a1 As SAFEARRAY1D, a() As Byte
+    Dim a1 As SAFEARRAY1D, A() As Byte
      With a1
         .cbElements = 1
         .cDims = 1
@@ -413,20 +413,20 @@ If ErrorMes = 0 And mItems > 0 Then
         .onebound(0).cElements = SizeByte
         .pvData = GetPtr(0)
     End With
-        CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
+        CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
 
         place = 1
         On Error Resume Next
-        ExportToByte = a()
+        ExportToByte = A()
         If Err.Number > 0 Then Exit Function
-        CopyMemory ByVal VarPtrArray(a), 0&, 4
+        CopyMemory ByVal VarPtrArray(A), 0&, 4
        
   End If
     
 Exit Function
 there:
         If place = 1 Then
-                CopyMemory ByVal VarPtrArray(a), 0&, 4
+                CopyMemory ByVal VarPtrArray(A), 0&, 4
         End If
         
 
@@ -437,19 +437,19 @@ End Function
 Public Function putData(f As Long, addr, lengthInBytes As Long) As Boolean
 Dim Offset, place, range
 range = uintnew(addr) - uintnew1(GetPtr(0))
-If range < 0 Or range >= mItems * ItemLen Then
+If range < 0 Or range >= mitems * itemlen Then
         ErrorMes = 4
         putData = False
         Exit Function
 End If
 Offset = uintnew(addr) - uintnew(mPtr)
-If ErrorMes = 0 And mItems > 0 Then
-    If Offset < 0 Or Offset + lengthInBytes - 1 >= mItems * ItemLen Then
+If ErrorMes = 0 And mitems > 0 Then
+    If Offset < 0 Or Offset + lengthInBytes - 1 >= mitems * itemlen Then
         ErrorMes = 4
         putData = False
     Else
     On Error GoTo there
-    Dim a1 As SAFEARRAY1D, a() As Byte
+    Dim a1 As SAFEARRAY1D, A() As Byte
      With a1
         .cbElements = 1
         .cDims = 1
@@ -457,28 +457,28 @@ If ErrorMes = 0 And mItems > 0 Then
         .onebound(0).cElements = lengthInBytes
         .pvData = addr
     End With
-        CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
+        CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
         place = 1
         On Error Resume Next
         Dim FH As Long
         FH = Module10.ReadFileHandler(CLng(f))
-        Module10.FileWriteBytes FH, a()
+        Module10.FileWriteBytes FH, A()
         If Err.Number > 0 Then Exit Function
-        CopyMemory ByVal VarPtrArray(a), 0&, 4
+        CopyMemory ByVal VarPtrArray(A), 0&, 4
         putData = True
   End If
     
 Else
 there:
         If place = 1 Then
-                CopyMemory ByVal VarPtrArray(a), 0&, 4
+                CopyMemory ByVal VarPtrArray(A), 0&, 4
         End If
         putData = False
 End If
         
 End Function
 Friend Function GetStdPicture1(Optional Width As Long = -1, Optional Height As Long = -1, Optional ByVal BackColor As Long = vbWhite, Optional RetainRatio As Boolean = False, Optional Bitmap As Boolean = False, Optional magia1 As Boolean = False) As IPicture
-   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
+   Dim a1 As SAFEARRAY1D, A() As Byte, token As Long
      With a1
         .cbElements = 1
         .cDims = 1
@@ -500,9 +500,9 @@ ElseIf mSubtype = 300 Then
 GoTo there1
 End If
     If mSubtype <> 2 Or Bitmap Then
-        CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-        Set GetStdPicture1 = LoadImageFromBuffer3(a(), Width, Height, BackColor, magia1)
-         CopyMemory ByVal VarPtrArray(a), 0&, 4
+        CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
+        Set GetStdPicture1 = LoadImageFromBuffer3(A(), Width, Height, BackColor, magia1)
+         CopyMemory ByVal VarPtrArray(A), 0&, 4
     Else
        Dim hEmf As Long
     On Error Resume Next
@@ -521,7 +521,7 @@ there1:
  
 End Function
 Public Function GetStdPicture(Optional Width As Long = -1, Optional Height As Long = -1, Optional ByVal BackColor As Long = vbWhite, Optional FlipOrRotate As Long = 0, Optional Bitmap As Boolean = False) As IPicture
-   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
+   Dim a1 As SAFEARRAY1D, A() As Byte, token As Long
      With a1
         .cbElements = 1
         .cDims = 1
@@ -539,9 +539,9 @@ Public Function GetStdPicture(Optional Width As Long = -1, Optional Height As Lo
     GoTo there1
     End If
     If mSubtype <> 2 Or Bitmap Then
-        CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-        Set GetStdPicture = LoadImageFromBuffer2(a(), Width, Height, BackColor, FlipOrRotate)
-         CopyMemory ByVal VarPtrArray(a), 0&, 4
+        CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
+        Set GetStdPicture = LoadImageFromBuffer2(A(), Width, Height, BackColor, FlipOrRotate)
+         CopyMemory ByVal VarPtrArray(A), 0&, 4
     Else
        Dim hEmf As Long
     
@@ -562,7 +562,7 @@ there1:
  
 End Function
 Public Function DrawEmfToHdc(Scr As Object, X As Long, Y As Long, Angle!, Width As Long, Height As Long) As Boolean
-   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
+   Dim a1 As SAFEARRAY1D, A() As Byte, token As Long
    If mSubtype = 0 Then
         If IsEmf Then
         mSubtype = 2
@@ -577,14 +577,14 @@ Public Function DrawEmfToHdc(Scr As Object, X As Long, Y As Long, Angle!, Width 
         .onebound(0).cElements = Me.SizeByte
         .pvData = Me.GetPtr(0)
     End With
-    CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-    DrawEmfToHdc = DrawEmfFromBuffer(Scr, a(), X, Y, Angle!, Width, Height)
+    CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
+    DrawEmfToHdc = DrawEmfFromBuffer(Scr, A(), X, Y, Angle!, Width, Height)
     
-    CopyMemory ByVal VarPtrArray(a), 0&, 4
+    CopyMemory ByVal VarPtrArray(A), 0&, 4
  
 End Function
 Public Function DrawSpriteToHdc(bstack As basetask, sprt As Boolean, Angle!, zoomfactor!, blend!, Optional BackColor As Long = -1) As Boolean
-   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
+   Dim a1 As SAFEARRAY1D, A() As Byte, token As Long
    If mSubtype = 0 Then
         If IsEmf Then
         mSubtype = 2
@@ -599,14 +599,14 @@ Public Function DrawSpriteToHdc(bstack As basetask, sprt As Boolean, Angle!, zoo
         .onebound(0).cElements = Me.SizeByte
         .pvData = Me.GetPtr(0)
     End With
-    CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-    DrawSpriteToHdc = DrawSpriteFromBuffer(bstack, a(), Not sprt, Angle!, zoomfactor!, blend!, BackColor, mSubtype = 2)
+    CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
+    DrawSpriteToHdc = DrawSpriteFromBuffer(bstack, A(), Not sprt, Angle!, zoomfactor!, blend!, BackColor, mSubtype = 2)
     
-    CopyMemory ByVal VarPtrArray(a), 0&, 4
+    CopyMemory ByVal VarPtrArray(A), 0&, 4
  
 End Function
 Public Function DrawImageToHdc(where As Object, Optional X As Long = 0&, Optional Y As Long = 0&, Optional Width As Long = -1, Optional Height As Long = -1) As Boolean
-   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
+   Dim a1 As SAFEARRAY1D, A() As Byte, token As Long
      With a1
         .cbElements = 1
         .cDims = 1
@@ -614,14 +614,14 @@ Public Function DrawImageToHdc(where As Object, Optional X As Long = 0&, Optiona
         .onebound(0).cElements = Me.SizeByte
         .pvData = Me.GetPtr(0)
     End With
-   CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-   DrawImageToHdc = DrawImageFromBuffer(a(), where.hDC, X, Y, (Width), (Height))
-   CopyMemory ByVal VarPtrArray(a), 0&, 4
+   CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
+   DrawImageToHdc = DrawImageFromBuffer(A(), where.hDC, X, Y, (Width), (Height))
+   CopyMemory ByVal VarPtrArray(A), 0&, 4
  
 End Function
 Public Function ReadImageSizeX(SizeX As Variant) As Boolean
 If Width <> -1 Then SizeX = Width: ReadImageSizeX = True: Exit Function
-   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
+   Dim a1 As SAFEARRAY1D, A() As Byte, token As Long
      With a1
         .cbElements = 1
         .cDims = 1
@@ -629,8 +629,8 @@ If Width <> -1 Then SizeX = Width: ReadImageSizeX = True: Exit Function
         .onebound(0).cElements = Me.SizeByte
         .pvData = Me.GetPtr(0)
     End With
-    CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-    If ReadSizeImageFromBuffer(a(), Width, Height) Then
+    CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
+    If ReadSizeImageFromBuffer(A(), Width, Height) Then
     SizeX = Width
     ReadImageSizeX = True
         Else
@@ -638,13 +638,13 @@ If Width <> -1 Then SizeX = Width: ReadImageSizeX = True: Exit Function
         Height = -1&
     End If
     
-    CopyMemory ByVal VarPtrArray(a), 0&, 4
+    CopyMemory ByVal VarPtrArray(A), 0&, 4
 
 
 End Function
 Public Function ReadImageSizeY(SizeY As Variant) As Boolean
 If Height <> -1 Then SizeY = Height: ReadImageSizeY = True: Exit Function
-   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
+   Dim a1 As SAFEARRAY1D, A() As Byte, token As Long
      With a1
         .cbElements = 1
         .cDims = 1
@@ -652,8 +652,8 @@ If Height <> -1 Then SizeY = Height: ReadImageSizeY = True: Exit Function
         .onebound(0).cElements = Me.SizeByte
         .pvData = Me.GetPtr(0)
     End With
-    CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-    If ReadSizeImageFromBuffer(a(), Width, Height) Then
+    CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
+    If ReadSizeImageFromBuffer(A(), Width, Height) Then
     SizeY = Height
     ReadImageSizeY = True
     Else
@@ -661,10 +661,10 @@ If Height <> -1 Then SizeY = Height: ReadImageSizeY = True: Exit Function
         Height = -1&
     End If
     
-    CopyMemory ByVal VarPtrArray(a), 0&, 4
+    CopyMemory ByVal VarPtrArray(A), 0&, 4
 End Function
 Public Sub ResetImageSize()
-Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
+Dim a1 As SAFEARRAY1D, A() As Byte, token As Long
      With a1
         .cbElements = 1
         .cDims = 1
@@ -672,43 +672,43 @@ Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
         .onebound(0).cElements = Me.SizeByte
         .pvData = Me.GetPtr(0)
     End With
-    CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
-    If Not ReadSizeImageFromBuffer(a(), Width, Height) Then
+    CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
+    If Not ReadSizeImageFromBuffer(A(), Width, Height) Then
      Width = -1&
         Height = -1&
     End If
     
-    CopyMemory ByVal VarPtrArray(a), 0&, 4
+    CopyMemory ByVal VarPtrArray(A), 0&, 4
 End Sub
-Function Copy(Optional R As Long = 0, Optional p As Long = 0) As Object
+Function Copy(Optional R As Long = 0, Optional P As Long = 0) As Object
 Dim aCopy As New MemBlock, BLen As Long, hMem As Long
-If mItems > 0 Then
+If mitems > 0 Then
     If mExecBloc Then
         BLen = BlockSize(mPtr)
     Else
         BLen = mBytes
     End If
-    mItems = BLen \ ItemLen
+    mitems = BLen \ itemlen
     If R <> 0 Then
-        If R >= 0 And R < mItems Then
-            If p >= 1 Then
-                aCopy.Construct ItemLen, CLng(p), , R = 0 And Not mExecBloc
-                If mItems > p Then
-                    p = mItems
+        If R >= 0 And R < mitems Then
+            If P >= 1 Then
+                aCopy.Construct itemlen, CLng(P), , R = 0 And Not mExecBloc
+                If mitems > P Then
+                    P = mitems
                 End If
-                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(R), ItemLen * p
+                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(R), itemlen * P
             Else
            
-                aCopy.Construct ItemLen, 1&, , Not mExecBloc
+                aCopy.Construct itemlen, 1&, , Not mExecBloc
                 
-                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(R), ItemLen
+                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(R), itemlen
             End If
         Else
-            aCopy.Construct ItemLen, 1&, , Not mExecBloc
-            CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(R), ItemLen
+            aCopy.Construct itemlen, 1&, , Not mExecBloc
+            CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(R), itemlen
         End If
     Else
-    aCopy.Construct ItemLen, mItems, , Not mExecBloc
+    aCopy.Construct itemlen, mitems, , Not mExecBloc
     hMem = GlobalLock(aCopy.GetPtr(0))
     
     CopyMemory ByVal hMem, ByVal mPtr, BLen
@@ -718,17 +718,17 @@ If mItems > 0 Then
 End If
 End Function
 Public Function Search(from As Long, what) As Long
-Dim limit As Long, b As Byte, i As Long, W As Byte
+Dim limit As Long, b As Byte, I As Long, W As Byte
 b = Abs(what) And &HFF
 limit = SizeByte - 1
 
-For i = from To limit
-    GetMem1 GetBytePtr(i), W
+For I = from To limit
+    GetMem1 GetBytePtr(I), W
     If b = W Then
-    Search = i + 1: Exit Function
+    Search = I + 1: Exit Function
     End If
 Next
-Search = i + 1
+Search = I + 1
 End Function
 
 Public Property Get SubType() As Variant
@@ -758,20 +758,17 @@ Public Sub SentToClipBoard(Optional pWidth As Long = -1, Optional ByVal pHeight 
         Exit Sub
     End If
     If mm.Handle <> 0 Then
-        If (OpenClipboard(0) <> 0) Then
-            EmptyClipboard
-          If mm.Type = 2 Then
-                hEmf = getEmf(mm)
-             If SetClipboardData(14, hEmf) = 0 Then
-                Debug.Print "its zero"
-                End If
-            ElseIf mm.Type = 4 Then
-                If SetClipboardData(14, mm.Handle) = 0 Then
-                
-                End If
-            Else
-                If SetClipboardData(2, mm.Handle) = 0 Then
-               
+        If (OpenClipboard(Form1.hWnd) <> 0) Then
+           If EmptyClipboard Then
+                If mm.Type = 2 Then
+                    hEmf = getEmf(mm)
+                    If SetClipboardData(14, hEmf) = 0 Then
+                        DeleteEnhMetaFile hEmf
+                    End If
+                ElseIf mm.Type = 4 Then
+                    SetClipboardData 14, mm.Handle
+                Else
+                    SetClipboardData 2, mm.Handle
                 End If
             End If
             CloseClipboard
@@ -781,33 +778,33 @@ Public Sub SentToClipBoard(Optional pWidth As Long = -1, Optional ByVal pHeight 
 
 End Sub
 Public Function IsPng() As Boolean
-    Dim H As Long
-       CopyMemory H, ByVal GetBytePtr(0), 4
-        If H = &H474E5089 Then
+    Dim h As Long
+       CopyMemory h, ByVal GetBytePtr(0), 4
+        If h = &H474E5089 Then
             mSubtype = 1
             IsPng = True
         End If
 End Function
 Public Function IsIco() As Boolean
-    Dim H As Long
-       CopyMemory H, ByVal GetBytePtr(0), 4
-        If H = &H10000 Then
+    Dim h As Long
+       CopyMemory h, ByVal GetBytePtr(0), 4
+        If h = &H10000 Then
             mSubtype = 1
             IsIco = True
         End If
 End Function
 Public Function IsBmp() As Boolean
-    Dim H As Long
-       CopyMemory H, ByVal GetBytePtr(0), 4
-        If (H And &HFFFF&) = &H4D42 Then
+    Dim h As Long
+       CopyMemory h, ByVal GetBytePtr(0), 4
+        If (h And &HFFFF&) = &H4D42 Then
             mSubtype = 1
             IsBmp = True
         End If
 End Function
 Public Function IsJpg() As Boolean
-    Dim H As Long
-       CopyMemory H, ByVal GetBytePtr(0), 4
-        If (H And &HFFFF&) = &HD8FF Then
+    Dim h As Long
+       CopyMemory h, ByVal GetBytePtr(0), 4
+        If (h And &HFFFF&) = &HD8FF Then
             mSubtype = 1
             IsJpg = True
         End If
@@ -822,9 +819,9 @@ Public Function IsWmf() As Boolean
         End If
 End Function
 Public Function IsGif() As Boolean
-    Dim H As Long
-       CopyMemory H, ByVal GetBytePtr(0), 4
-        If H = &H38464947 Then
+    Dim h As Long
+       CopyMemory h, ByVal GetBytePtr(0), 4
+        If h = &H38464947 Then
             mSubtype = 1
             IsGif = True
         End If
@@ -847,11 +844,11 @@ Public Sub SentEmfToClipBoard()
         Exit Sub
     End If
     If hEmf <> 0 Then
-        If (OpenClipboard(0) <> 0) Then
+        If (OpenClipboard(Form1.hWnd) <> 0) Then
             EmptyClipboard
-                If SetClipboardData(CF_ENHMETAFILE, hEmf) = 0 Then
+            If SetClipboardData(CF_ENHMETAFILE, hEmf) = 0 Then
                 DeleteEnhMetaFile hEmf
-                End If
+            End If
             CloseClipboard
         End If
     End If
@@ -887,11 +884,11 @@ Public Sub SentWmfToClipBoard()
         Exit Sub
     End If
     If hEmf <> 0 Then
-        If (OpenClipboard(0) <> 0) Then
+        If (OpenClipboard(Form1.hWnd) <> 0) Then
             EmptyClipboard
-                If SetClipboardData(CF_ENHMETAFILE, hEmf) = 0 Then
+            If SetClipboardData(CF_ENHMETAFILE, hEmf) = 0 Then
                 DeleteEnhMetaFile hEmf
-                End If
+            End If
             CloseClipboard
         End If
     End If
@@ -922,7 +919,7 @@ If w2 <> -1 Then w2 = w2 / dv15
         
     End If
     Dim Handler As New mHandler
-    Handler.t1 = 2
+    Handler.T1 = 2
     Set Handler.objref = k
     Set CreateFromPicture = Handler
     

@@ -1,67 +1,70 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 55 active-X
-1)fix #val$() to return decimal based on locale, if item is numeric
-#val() to string work ok (we have to place parenthesis in string expression)
-locale 1033
-a=(1.333,)
-? a#val$(0), "["+(a#val(0))+"]"
-locale 1032
-? a#val$(0), "["+(a#val(0))+"]"
+Version 12 Revision 56 active-X
+1. Fix the "paste problem". A not careful clear cliboard produce later a problem when using ctrl + V (paste) at M2000 command line.
 
-2)fix lambda function as final member after a copy. Here we get a copy from class to m.
-group alfa {
-	final k=lambda ->500
-}
-m=alfa
-try {? m.k()}  ' now print 500 before raise error k() not found.
+2. Fixing global/local for properties for objects. See VarPtr in info.gsb. There is a a.ArrPtr() property of a, a RefArray object, which defined as global. So we defined in Check3 and Check4 but from a bug was no new object, so we get an ArrPtr() from the global a, not the new one at check3 and check4. Now works fine as expected.
 
-3)fix copy of long long value after copy of group.
-group alfa {
-	long long k=12345
-	k1=12345&&  ' it is a long long too
-}
-m=alfa
-? type$(m.k), m.k=12345
-? type$(m.k1), m.k1=12345
+3. Handle of UDT type of variants from objects MATH and MATH2 (new library). We can use UDT values from external DLL (we have to get one as return value).
+We can use UDT in variables and arrays (both () and [] types)
 
-4) Fix reading long long value
-structure cc {
-	d as integer
-	c as long long  ' usigned long long (8 bytes)
-}
-buffer clear mem as cc*100
-a=0xFFFF_FFFF_FFFF_FFFF
-' unsigned long long are Decimal types
-Print type$(a)="Decimal"
-' but we fit it on 8 bytes (the first 64bit)
-return mem, 10!c:=0xFFFF_FFFF_FFFF_FFFF
-z=eval(mem, 10!c)
-Print type$(z)="Decimal", z=18446744073709551615@
-k=sint(z)  'same bits as long long (signed) )is the number -1
-Print type$(k)="Long Long", k=-1  ' so k is long long signed
+MATH library 
+Public Type VecType
+    X As Double
+    Y As Double
+    Z As Double
+End Type
 
-5. Underscore for all numbers (except Html Colors):
-? 0x6000_0000_0000_0000&& ' long long 64bit
-? 9_223_372_036_854_775_807&& ' max long long
-? 0x0000_0000& ' long 32 bit
-? 2_147_483_647& ' max long
-? 0x0000%  ' integer 16bit
-? 32_767% ' max integer
-? 0x00ub ' byte 8bit unsigned only (0 to 255)
-? 2_55ub ' max byte
-? 0x8000_0000_0000_0000   ' decimal type (hold values as unsigned long long)
-? 18_446_744_073_709_551_615@ ' max usnigned long long (decimal type)
-? 123_456_789.876_543_210@   ' decimal type 27 digits
-? #FFFFFF, #FFFF00=-65535  ' HTML COLORS - NO underscore
-? 46_000ud=date("9/12/2025")
-Def t(x)=type$(x)
-? t(12_456.123_4#)="Currency"
-? t(1_012.232e-10~)="Single"
+Public Type SegType
+    Origin As VecType
+    AxisF  As VecType   ' Forward, West,  AxisX
+    AxisL  As VecType   ' Left,    North, AxisY
+    AxisU  As VecType   ' Up,      Up,    AxisZ
+End Type
 
-6. Fix syntax color for 0XFF.. and &HFF..
+Public Type LineType
+    point1 As VecType
+    point2 As VecType
+End Type
 
+Public Type QuatType                      
+    W As Double
+    X As Double
+    Y As Double
+    Z As Double
+End Type
 
+MATH2 Library
+
+Public Type cxComplex
+    r   As Double
+    I   As Double
+End Type
+
+Public Type Matrix
+    Col As Long                 ' Number of columns
+    Row As Long                 ' Number of rows
+    D() As Double
+End Type
+
+4. BigInteger (Credit to Rebecca Gabriella's String Math Module)
+// methods
+// MULTIPLY, DIVIDE, SUBTRACT, ADD, ANYBASEINPUT, MODULUS, INTPOWER
+a=bigInteger("6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151")
+b=bigInteger("162259276829213363391578010288127987979798")
+method a, "multiply", b as c
+with c, "tostring" as ret1  
+Print "C=";ret1
+method c, "add", biginteger("500") as c
+Print "C=";ret1
+method c, "modulus", b as c
+Print "C=";ret1  '500
+' use this to get the result to clipboard: clipboard ret1
+
+==========Output=========
+C=1113877103911668754551067286547922604225256302130205294556686724395491813360805268911760151336381665870098050947868749061640471753019685645335076862009313458611655962295771807497288683885535803435498
+C=1113877103911668754551067286547922604225256302130205294556686724395491813360805268911760151336381665870098050947868749061640471753019685645335076862009313458611655962295771807497288683885535803435998
+C=500
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

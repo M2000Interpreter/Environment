@@ -20,14 +20,21 @@ Dim Init As Boolean
 Dim IamMethod  As Boolean
 Dim hardlink As Object, useobj As Boolean
 Private mLastObj As Object
-Public Arr As Boolean
+Public arr As Boolean
 Dim oEnum As IUnknown
 Private IndexList As mIndexes
 Private IndexNew As Boolean
 Function IsObj()
     IsObj = useobj
 End Function
-
+Property Get ObjectType() As String
+On Error Resume Next
+If Not hardlink Is Nothing Then
+    ObjectType = "*" + Typename(ObjectRef)
+Else
+    ObjectType = "[" + Typename(var(ObjectRef)) + "]"
+End If
+End Property
 Sub Construct(ref As Long, vtrefnumber As Long, Optional indirect As Boolean = False)
 If useobj Then Exit Sub
 Init = True
@@ -185,15 +192,15 @@ IndexNew = True
 mIndex = 0
 OptVariant mIndex
 End Sub
-Public Property Get index() As Variant
-index = mIndex
+Public Property Get Index() As Variant
+Index = mIndex
 End Property
 Public Sub ArrayIndex(ParamArray RHS())
 'IndexNew = True
     mIndex = RHS
 End Sub
 
-Public Property Let index(ByVal RHS As Variant)
+Public Property Let Index(ByVal RHS As Variant)
 IndexNew = True
 mIndex = RHS
 End Property
@@ -202,7 +209,7 @@ If idx Is Nothing Then Exit Sub
 IndexNew = True
 UseIndex = True
 If IndexList Is Nothing Then
-    If idx.Count = 1 Then
+    If idx.count = 1 Then
        idx.Dump 0, mIndex
     Else
     idx.GetArr mIndex

@@ -17,6 +17,17 @@ Public slot As Byte
 Public mTypeName As Byte
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
+Friend Sub GrabItem(ByRef RHS)
+    If MemInt(VarPtr(mItem)) = 36 Then
+        SwapVariant mItem, RHS
+    ElseIf slot = 1 Then
+        Set RHS = mItem
+    ElseIf slot = 4 Then
+        SwapVariant mItem, RHS
+    Else
+        RHS = mItem
+    End If
+End Sub
 Property Let Typename(ByRef RHS As String)
     mTypeName = Asc(RHS)
 End Property
@@ -31,24 +42,24 @@ Property Let ItemStr(ByRef RHS As String)
     slot = 4
     MoveStringToVariant RHS, mItem
 End Property
-Public Sub PopString(s$)
+Public Sub PopString(S$)
     If slot = 4 Then
         If Not myVarType(mItem, vbString) Then
             mItem = 0
-            s$ = vbNullString
+            S$ = vbNullString
         Else
-            SwapString2Variant s$, mItem
+            SwapString2Variant S$, mItem
         End If
     ElseIf slot = 5 Then
-        s$ = mItem
+        S$ = mItem
     ElseIf slot = 2 Then
         If VarType(mItem) = vbString Then
-            s$ = mItem
+            S$ = mItem
         Else
-            s$ = vbNullString
+            S$ = vbNullString
         End If
     Else
-        s$ = vbNullString
+        S$ = vbNullString
     End If
 End Sub
 Property Get ItemStr() As String

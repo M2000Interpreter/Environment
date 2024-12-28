@@ -25,7 +25,7 @@ Private Const MEM_COMMIT = &H1000
 Private Const MEM_RESERVE = &H2000
 Private Const PAGE_EXECUTE_READWRITE = &H40
 Private Declare Function CallWindowProcA Lib "user32" ( _
-    ByVal adr As Long, ByVal p1 As Long, ByVal p2 As Long, _
+    ByVal adr As Long, ByVal P1 As Long, ByVal P2 As Long, _
     ByVal p3 As Long, ByVal p4 As Long) As Long
 Public Declare Function VariantCopyIndPtr Lib "oleaut32" Alias "VariantCopyInd" ( _
     ByVal pvargDest As Long, ByVal pvargSrc As Long) As Long
@@ -241,8 +241,8 @@ Public Function CreateEventSink(IID As GUID, objext As ComShinkEvent) As Object
     ' return the object
     CpyMem CreateEventSink, sink.hMem, 4&
 End Function
-Private Function addr(p As Long) As Long
-    addr = p
+Private Function addr(P As Long) As Long
+    addr = P
 End Function
 
 ' Pointer->Object
@@ -254,8 +254,6 @@ End Function
 Public Function Getenumerator(uOnk As IUnknown) As Boolean
 Getenumerator = True
 End Function
-
-
 Public Function CallPointer(ByVal fnc As Long, ParamArray params()) As Long
     Static once As Boolean
     If once Then Exit Function
@@ -272,7 +270,7 @@ Public Function CallPointer(ByVal fnc As Long, ParamArray params()) As Long
     VirtualLock btASM, MAXCODE
    ' Dim btASM(MAXCODE - 1)  As Byte
     Dim pASM                As Long
-    Dim i                   As Integer
+    Dim I                   As Integer
 
     pASM = btASM
 
@@ -287,15 +285,15 @@ Public Function CallPointer(ByVal fnc As Long, ParamArray params()) As Long
 
     If UBound(params) = 0 Then
         If IsArray(params(0)) Then
-            For i = UBound(params(0)) To 0 Step -1
-                AddPush pASM, CLng(params(0)(i))    ' PUSH dword
+            For I = UBound(params(0)) To 0 Step -1
+                AddPush pASM, CLng(params(0)(I))    ' PUSH dword
             Next
         Else
            AddPush pASM, CLng(params(0))       ' PUSH dword
         End If
     Else
-        For i = UBound(params) To 0 Step -1
-            AddPush pASM, CLng(params(i))           ' PUSH dword
+        For I = UBound(params) To 0 Step -1
+            AddPush pASM, CLng(params(I))           ' PUSH dword
         Next
     End If
 
@@ -335,33 +333,31 @@ Private Sub AddByte(pASM As Long, bt As Byte)
     CpyMem ByVal pASM, bt, 1
     pASM = pASM + 1
 End Sub
-Public Function CallCdecl( _
+Public Function CallCdecl(btASM() As Byte, _
     ByVal lpfn As Long, _
     ParamArray Args() As Variant _
 ) As Long
-
-    Dim btASM(&HEC00& - 1)  As Byte
     Dim pASM                As Long
     Dim btArgSize           As Byte
-    Dim i                   As Integer
+    Dim I                   As Integer
 
     pASM = VarPtr(btASM(0))
 
     If UBound(Args) = 0 Then
         If IsArray(Args(0)) Then
-            For i = UBound(Args(0)) To 0 Step -1
-                AddPush pASM, CLng(Args(0)(i))    ' PUSH dword
+            For I = UBound(Args(0)) To 0 Step -1
+                AddPush pASM, CLng(Args(0)(I))    ' PUSH dword
                 btArgSize = btArgSize + 4
             Next
         Else
-            For i = UBound(Args) To 0 Step -1
-                AddPush pASM, CLng(Args(i))       ' PUSH dword
+            For I = UBound(Args) To 0 Step -1
+                AddPush pASM, CLng(Args(I))       ' PUSH dword
                 btArgSize = btArgSize + 4
             Next
         End If
     Else
-        For i = UBound(Args) To 0 Step -1
-            AddPush pASM, CLng(Args(i))           ' PUSH dword
+        For I = UBound(Args) To 0 Step -1
+            AddPush pASM, CLng(Args(I))           ' PUSH dword
             btArgSize = btArgSize + 4
         Next
     End If
@@ -379,5 +375,42 @@ Public Function CallCdecl( _
 
     CallCdecl = CallWindowProcA(VarPtr(btASM(0)), _
                                0, 0, 0, 0)
+End Function
+Public Function CallStdCall(btASM() As Byte, _
+    ByVal lpfn As Long, _
+    ParamArray Args() As Variant _
+) As Long
+    Dim pASM                As Long
+    Dim I                   As Integer
+    
+    pASM = VarPtr(btASM(0))
+    
+    AddByte pASM, &H58                  ' POP EAX
+    AddByte pASM, &H59                  ' POP ECX
+    AddByte pASM, &H59                  ' POP ECX
+    AddByte pASM, &H59                  ' POP ECX
+    AddByte pASM, &H59                  ' POP ECX
+    AddByte pASM, &H50                  ' PUSH EAX
+
+    If UBound(Args) = 0 Then
+        If IsArray(Args(0)) Then
+            For I = UBound(Args(0)) To 0 Step -1
+                AddPush pASM, CLng(Args(0)(I))    ' PUSH dword
+            Next
+        Else
+            For I = UBound(Args) To 0 Step -1
+                AddPush pASM, CLng(Args(I))       ' PUSH dword
+            Next
+        End If
+    Else
+        For I = UBound(Args) To 0 Step -1
+            AddPush pASM, CLng(Args(I))           ' PUSH dword
+        Next
+    End If
+
+    AddCall pASM, lpfn                  ' CALL rel addr
+    AddByte pASM, &HC3                  ' RET
+ 
+    CallStdCall = CallWindowProcA(VarPtr(btASM(0)), 0, 0, 0, 0)
 End Function
 

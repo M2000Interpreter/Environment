@@ -174,7 +174,7 @@ If nook Then Cancel = True: Exit For
 Next i
 
 Set f = Nothing
-
+If Not nook Then Cancel = False
 
 
 If Cancel Then Exit Sub
@@ -548,13 +548,13 @@ On Error Resume Next
 Dim Zero As basket, i As Long, zerocounter As Counters
 StopTimer
 If objref Is Nothing Then
-GoTo jumphere
+GoTo JUMPHERE
 'Exit Sub
 End If
 Set objref.Owner = Nothing
 Set objref.Sorosref = Nothing
 Set objref = Nothing
-jumphere:
+JUMPHERE:
 globalstack.Flush
 TerminateM2000
 terminatefinal

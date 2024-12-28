@@ -294,14 +294,14 @@ End Function
 Public Function GetTimeZoneInfo() As String
 
 Dim TZI As TIME_ZONE_INFORMATION ' receives information on the time zone
-Dim retval As Long ' return value
-Dim c As Long ' counter variable needed to display time zone name
+Dim RetVal As Long ' return value
+Dim C As Long ' counter variable needed to display time zone name
 
-    retval = GetTimeZoneInformation(TZI) ' read information on the computer's selected time zone
+    RetVal = GetTimeZoneInformation(TZI) ' read information on the computer's selected time zone
      If zones.ExistKey(Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")) Then
      ' do nothing. now zone$ has set the index field to standard name.
      End If
-    If retval = 2 Then
+    If RetVal = 2 Then
     GetTimeZoneInfo = Replace(StrConv(TZI.DaylightName, vbFromUnicode), Chr(0), "")
     Else
     GetTimeZoneInfo = Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")
@@ -367,37 +367,37 @@ Public Function PathMakeDirs(ByVal Pathd As String) As Boolean
    End Function
  
 Function PurifyPath(sPath$) As String
-Dim a$(), i
+Dim A$(), I
 If sPath$ = vbNullString Then Exit Function
-a$() = Split(sPath, "\")
-If isdir(a$(LBound(a$()))) Then i = i + 1
-For i = LBound(a$()) + i To UBound(a$())
-a$(i) = PurifyName(a$(i))
-Next i
-If LBound(a()) = UBound(a()) Then
-PurifyPath = a$(UBound(a$()))
+A$() = Split(sPath, "\")
+If isdir(A$(LBound(A$()))) Then I = I + 1
+For I = LBound(A$()) + I To UBound(A$())
+A$(I) = PurifyName(A$(I))
+Next I
+If LBound(A()) = UBound(A()) Then
+PurifyPath = A$(UBound(A$()))
 Else
-PurifyPath = ExtractPath(Join(a$, "\") + "\", False)
+PurifyPath = ExtractPath(Join(A$, "\") + "\", False)
 End If
 End Function
 Public Function PurifyName(sStr As String) As String
 Dim noValidcharList
 noValidcharList = "*?\<>:/|" + Chr$(34)
-Dim a$, i As Long, ddt As Boolean, j As Long
+Dim A$, I As Long, ddt As Boolean, j As Long
 If Len(sStr) > 0 Then
-a$ = space$(Len(sStr))
+A$ = space$(Len(sStr))
 j = 1
-For i = 1 To Len(sStr)
-If InStr(noValidcharList, Mid$(sStr, i, 1)) = 0 Then
-Mid$(a$, j, 1) = Mid$(sStr, i, 1)
+For I = 1 To Len(sStr)
+If InStr(noValidcharList, Mid$(sStr, I, 1)) = 0 Then
+Mid$(A$, j, 1) = Mid$(sStr, I, 1)
 Else
-Mid$(a$, j, 1) = "-"
+Mid$(A$, j, 1) = "-"
 End If
 j = j + 1
-Next i
-a$ = Left$(a$, j - 1)
+Next I
+A$ = Left$(A$, j - 1)
 End If
-PurifyName = a$
+PurifyName = A$
 End Function
 
 Public Sub FixPath(s$)
@@ -537,14 +537,14 @@ End Function
 Public Function GetDosPath(LongPath As String) As String
 
 Dim s As String
-Dim i As Long
+Dim I As Long
 Dim PathLength As Long
 If Len(LongPath) = 0 Then Exit Function
-        i = Len(LongPath) * 2 + 2
+        I = Len(LongPath) * 2 + 2
 
         s = String(1024, 0)
 
-        PathLength = GetShortPathName(StrPtr(LongPath), StrPtr(s), i)
+        PathLength = GetShortPathName(StrPtr(LongPath), StrPtr(s), I)
 
         GetDosPath = Left$(s, PathLength)
 
@@ -603,19 +603,19 @@ End If
 CloseHandle hPipe
 Sleep 1
 End Function
-Function validpipename(ByVal a$) As String
+Function validpipename(ByVal A$) As String
 Dim b$
-a$ = myUcase(a$)
-b$ = Left$(a$, InStr(1, a$, "\pipe\", vbTextCompare))
+A$ = myUcase(A$)
+b$ = Left$(A$, InStr(1, A$, "\pipe\", vbTextCompare))
 If b$ = vbNullString Then
-validpipename = "\\" + strMachineName + "\pipe\" + a$
+validpipename = "\\" + strMachineName + "\pipe\" + A$
 Else
-validpipename = a$
+validpipename = A$
 End If
 End Function
 
 Function Included(afile$, ByVal simple$) As String
-Dim a As Document
+Dim A As Document
 On Error GoTo inc1
 Dim what As Long
 Dim st&, pa&, po&
@@ -639,14 +639,14 @@ If Len(simple$) <= 1 Then
 Included = ExtractName(afile$, True)
 Else
     Sleep 1
-    Set a = New Document
-    a.MaxParaLength = 1000
-    a.LCID = Clid
-    a.ReadUnicodeOrANSI afile$, , what
+    Set A = New Document
+    A.MaxParaLength = 1000
+    A.LCID = Clid
+    A.ReadUnicodeOrANSI afile$, , what
     
     If InStr(simple$, vbCr) > 0 Then
     'work with any char but using computer locale
-    If InStr(1, a.textDoc, word$(0), vbTextCompare) > 0 Then
+    If InStr(1, A.textDoc, word$(0), vbTextCompare) > 0 Then
                 Included = ExtractName(afile$, True)
     End If
     Else
@@ -654,13 +654,13 @@ Else
   
 again:
 
-    st& = a.FindStr(word$(0), st&, pa&, po&)
+    st& = A.FindStr(word$(0), st&, pa&, po&)
     
     If st& > 0 Then
     
      If Max > 0 Then
      po& = po& + Len(word$(0))
-     Line$ = a.TextParagraph(a.ParagraphFromOrder(pa&))
+     Line$ = A.TextParagraph(A.ParagraphFromOrder(pa&))
      For it = 1 To Max
      ok = InStr(po&, Line$, word$(it), vbTextCompare) > 0
      If Not ok Then Exit For
@@ -673,7 +673,7 @@ again:
            End If
     End If
     End If
-    Set a = Nothing
+    Set A = Nothing
 
 End If
 inc1:
@@ -688,13 +688,13 @@ Public Function DecodeHEX(sString As String, ok As Boolean) As String
     sString = Replace(sString, "_", "")
     sString = Replace(sString, ",", "")
     If Len(sString) < 2 Or (Len(sString) Mod 2) = 1 Then Exit Function
-    Dim bOut() As Byte, lPos As Long, sOut As String, hx$, i As Long
+    Dim bOut() As Byte, lPos As Long, sOut As String, hx$, I As Long
     hx$ = "&H00"
     ReDim bOut(LenB(sString) \ 2)
-    For i = 1 To Len(sString) Step 2
-        Mid$(hx$, 3, 2) = Mid$(sString, i, 2)
+    For I = 1 To Len(sString) Step 2
+        Mid$(hx$, 3, 2) = Mid$(sString, I, 2)
         bOut(lPos) = hx$: lPos = lPos + 1:
-    Next i
+    Next I
 cont1:
     If lPos Mod 2 = 1 Then
         sOut = StrConv(String$(lPos, Chr(0)), vbFromUnicode)
@@ -819,7 +819,7 @@ finish:
             iPad = iPad + 1
             Offset = Offset + 1
             Case Else
-             If lChar2 = 0 Then GoTo error1
+             If lChar2 = 0 Then GoTo Error1
                 
               If iPad = 0 Then
                   iPad = Int(-(lChar3 = lChar2) - (lChar3 = lchar1) - (lChar3 = lChar)) * 3
@@ -836,14 +836,14 @@ finish:
          
         End Select
         Loop
-        If iPad > 3 Then GoTo error1
+        If iPad > 3 Then GoTo Error1
         If iPad = 0 Then
             If (lPos + 2) Mod 3 + 1 <> 3 Then
-                GoTo error1
+                GoTo Error1
             End If
         Else
             If (lPos + 3 - iPad) Mod 3 + iPad <> 3 Then
-                GoTo error1
+                GoTo Error1
             End If
         End If
  
@@ -873,7 +873,7 @@ finish:
         End If
         
         GoTo cont1
-error1:
+Error1:
             Exit Function
     End If
 cont1:
@@ -951,18 +951,18 @@ End Function
 
 '
 Public Function FileToEncode64(f$, leftmargin As Long) As String
-Dim i As Long, fl As Long
+Dim I As Long, fl As Long
 
 fl = FileLen(GetDosPath(f$))
 If fl = 0 Then Exit Function
-    i = FreeFile
-    Open GetDosPath(f$) For Binary Access Read As i
+    I = FreeFile
+    Open GetDosPath(f$) For Binary Access Read As I
     Dim bOut() As Byte, bIn() As Byte
     Dim lChar As Long, lTrip As Long, iPad As Integer, lLen As Long, lTemp As Long, lPos As Long, lOutSize As Long
     iPad = (3 - FileLen(GetDosPath(f$)) Mod 3) Mod 3                          'See if the length is divisible by 3
     ReDim bIn(0 To fl - 1)
-    Get #i, , bIn()
-    Close i
+    Get #I, , bIn()
+    Close I
     ReDim Preserve bIn(0 To fl - 1 + iPad)
     lLen = ((UBound(bIn) + 1) \ 3) * 4                  'Length of resulting string.
     ' set to 60 wchar for each line break
@@ -1055,7 +1055,13 @@ ClearState1
 If UseMe Is Nothing Then once = False: Exit Sub
 UseMe.Shutdown Cancel
 
-If Cancel Then GoTo backhere
+If Cancel Then
+If Basestack1.Owner Is Nothing Then
+GoTo byenow
+End If
+GoTo backhere
+End If
+byenow:
 If Not UseMe.IhaveExtForm Then
 UseMe.ShowGui = False
 End If

@@ -9,7 +9,7 @@ Private Type GUID
 End Type
 
 Private Type PICTDESC
-   size     As Long
+   Size     As Long
    Type     As Long
    hBmp     As Long
    hPal     As Long
@@ -96,8 +96,8 @@ Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, By
 Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As Long
 
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
 ' GDI Functions
 Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
 Private Declare Sub OleCreatePictureIndirect2 Lib "OleAut32.dll" Alias "OleCreatePictureIndirect" _
@@ -106,7 +106,7 @@ Private Declare Sub OleCreatePictureIndirect2 Lib "OleAut32.dll" Alias "OleCreat
 Private Declare Function OleCreatePictureIndirect Lib "olepro32.dll" (PicDesc As PICTDESC, RefIID As GUID, ByVal fPictureOwnsHandle As Long, ipic As IPicture) As Long
 Private Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hDC As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
 Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
-Private Declare Function PatBlt Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal dwRop As Long) As Long
+Private Declare Function PatBlt Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal dwRop As Long) As Long
 Private Declare Function CreateBitmap Lib "gdi32" (ByVal nWidth As Long, ByVal nHeight As Long, ByVal nPlanes As Long, ByVal nBitCount As Long, lpBits As Any) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 Private Declare Function CreateSolidBrush Lib "gdi32" (ByVal crColor As Long) As Long
@@ -139,7 +139,7 @@ End Type
 
 Private Type GDIP_EnhMetaHeader3
     iType As Long
-    nsize As Long
+    nSize As Long
     rclBounds As RECT1
     rclFrame As RECT1
     dSignature As Long
@@ -182,7 +182,7 @@ Private Declare Function GdipGetMetafileHeaderFromMetafile Lib "gdiplus" (ByVal 
 Private Declare Function GdipCreateRegionHrgn Lib "GdiPlus.dll" (ByVal hRgn As Long, Region As Long) As Long
 Private Declare Function GdipDeleteRegion Lib "GdiPlus.dll" (ByVal Region As Long) As Long
 Private Declare Function GdipGetImageType Lib "gdiplus" (ByVal Image As Long, ImageType As Long) As Long
-Private Declare Function GdipDrawImage Lib "gdiplus" (ByVal graphics As Long, ByVal Image As Long, ByVal X As Single, ByVal y As Single) As Long
+Private Declare Function GdipDrawImage Lib "gdiplus" (ByVal graphics As Long, ByVal Image As Long, ByVal X As Single, ByVal Y As Single) As Long
 Private Declare Function GdipCreateFromHWND Lib "gdiplus" (ByVal hWnd As Long, graphics As Long) As Long
 Private Declare Function GdipSetSmoothingMode Lib "GdiPlus.dll" (ByVal mGraphics As Long, ByVal mSmoothingMode As Long) As Long
 Private Declare Function GdipTranslateWorldTransform Lib "gdiplus" (ByVal graphics As Long, ByVal dX As Single, ByVal dY As Single, ByVal Order As Long) As Long
@@ -196,7 +196,7 @@ Private Declare Function GdipLoadImageFromFile Lib "GdiPlus.dll" (ByVal FileName
 Private Declare Function GdiplusStartup Lib "GdiPlus.dll" (token As Long, gdipInput As GDIPlusStartupInput, GdiplusStartupOutput As Long) As Long
 Private Declare Function GdipCreateFromHDC Lib "GdiPlus.dll" (ByVal hDC As Long, GpGraphics As Long) As Long
 Private Declare Function GdipSetInterpolationMode Lib "GdiPlus.dll" (ByVal graphics As Long, ByVal InterMode As Long) As Long
-Private Declare Function GdipDrawImageRectI Lib "GdiPlus.dll" (ByVal graphics As Long, ByVal Img As Long, ByVal X As Long, ByVal y As Long, ByVal Width As Long, ByVal Height As Long) As Long
+Private Declare Function GdipDrawImageRectI Lib "GdiPlus.dll" (ByVal graphics As Long, ByVal Img As Long, ByVal X As Long, ByVal Y As Long, ByVal Width As Long, ByVal Height As Long) As Long
 
 Private Declare Function GdipConvertToEmfPlus Lib "gdiplus" (ByVal hGraphics As Long, ByVal srcMetafile As Long, ByRef conversionSuccess As Long, ByVal typeOfEMF As Long, ByVal ptrToMetafileDescription As Long, ByRef dstMetafilePtr As Long) As Long
 
@@ -236,11 +236,11 @@ Private Declare Function GdipFillRegion Lib "gdiplus" (ByVal graphics As Long, B
 Private Declare Function GdipFillPath Lib "gdiplus" (ByVal graphics As Long, ByVal Brush As Long, ByVal path As Long) As Long
 Private Declare Function GdipDrawPath Lib "gdiplus" (ByVal graphics As Long, ByVal mPen As Long, ByVal path As Long) As Long
 Private Declare Function GdipDeletePath Lib "gdiplus" (ByVal path As Long) As Long
-Private Declare Function GdipDrawEllipseI Lib "gdiplus" (ByVal graphics As Long, ByVal mPen As Long, ByVal X As Long, ByVal y As Long, ByVal mWidth As Long, ByVal mHeight As Long) As Long
-Private Declare Function GdipFillEllipseI Lib "gdiplus" (ByVal graphics As Long, ByVal Brush As Long, ByVal X As Long, ByVal y As Long, ByVal mWidth As Long, ByVal mHeight As Long) As Long
-Private Declare Function GdipDrawPieI Lib "gdiplus" (ByVal graphics As Long, ByVal pen As Long, ByVal X As Long, ByVal y As Long, ByVal Width As Long, ByVal Height As Long, ByVal startAngle As Single, ByVal sweepAngle As Single) As Long
-Private Declare Function GdipFillPie Lib "gdiplus" (ByVal graphics As Long, ByVal Brush As Long, ByVal X As Single, ByVal y As Single, ByVal Width As Single, ByVal Height As Single, ByVal startAngle As Single, ByVal sweepAngle As Single) As Long
-Private Declare Function GdipDrawArcI Lib "gdiplus" (ByVal graphics As Long, ByVal pen As Long, ByVal X As Long, ByVal y As Long, ByVal Width As Long, ByVal Height As Long, ByVal startAngle As Single, ByVal sweepAngle As Single) As Long
+Private Declare Function GdipDrawEllipseI Lib "gdiplus" (ByVal graphics As Long, ByVal mPen As Long, ByVal X As Long, ByVal Y As Long, ByVal mWidth As Long, ByVal mHeight As Long) As Long
+Private Declare Function GdipFillEllipseI Lib "gdiplus" (ByVal graphics As Long, ByVal Brush As Long, ByVal X As Long, ByVal Y As Long, ByVal mWidth As Long, ByVal mHeight As Long) As Long
+Private Declare Function GdipDrawPieI Lib "gdiplus" (ByVal graphics As Long, ByVal pen As Long, ByVal X As Long, ByVal Y As Long, ByVal Width As Long, ByVal Height As Long, ByVal startAngle As Single, ByVal sweepAngle As Single) As Long
+Private Declare Function GdipFillPie Lib "gdiplus" (ByVal graphics As Long, ByVal Brush As Long, ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single, ByVal startAngle As Single, ByVal sweepAngle As Single) As Long
+Private Declare Function GdipDrawArcI Lib "gdiplus" (ByVal graphics As Long, ByVal pen As Long, ByVal X As Long, ByVal Y As Long, ByVal Width As Long, ByVal Height As Long, ByVal startAngle As Single, ByVal sweepAngle As Single) As Long
 Private Declare Function GdipFlush Lib "gdiplus" (ByVal graphics As Long, ByVal intention As Long) As Long
 Private Declare Function GdipResetPageTransform Lib "gdiplus" (ByVal graphics As Long) As Long
 Private Declare Function GdipSetSolidFillColor Lib "gdiplus" (ByVal Brush As Long, ByVal argb As Long) As Long
@@ -751,7 +751,7 @@ Private Sub gdipResizeRotate(Scr As Object, Img As Long, Angle!, x1 As Long, y1 
     Dim orHeight   As Long      ' Original Image Height
     Dim m_Attr As Long
     
-       Const Pi = 3.14159!
+       Const PI = 3.14159!
     Angle! = -MyMod(Angle!, 360!)
     If Angle! < 0 Then Angle! = Angle! + 360!
 
@@ -759,7 +759,7 @@ Private Sub gdipResizeRotate(Scr As Object, Img As Long, Angle!, x1 As Long, y1 
     
    
     Dim prive As Long
-    Dim bWidth As Long, bHeight As Long, a As Long, b As Long, size As Single, bleft As Long, btop As Long
+    Dim bWidth As Long, bHeight As Long, A As Long, b As Long, Size As Single, bleft As Long, btop As Long
     Dim bWidth1 As Long, bHeight1 As Long, bLeft1 As Long, bTop1 As Long, SizeY As Single
     
     Dim shiftX As Long, shiftY As Long
@@ -776,12 +776,12 @@ Private Sub gdipResizeRotate(Scr As Object, Img As Long, Angle!, x1 As Long, y1 
         If orWidth = 0 Or orHeight = 0 Then Exit Sub
         If Width = -1 And Height <> -1 Then
            Height = Height / dv15
-           size = Height / orHeight
-           Width = orWidth * size
+           Size = Height / orHeight
+           Width = orWidth * Size
         ElseIf Width <> -1 And Height = -1 Then
            Width = Width / dv15
-           size = Width / orWidth
-           Height = orHeight * size
+           Size = Width / orWidth
+           Height = orHeight * Size
         ElseIf Width = -1 Then
            Width = orWidth
            Height = orHeight
@@ -805,25 +805,25 @@ Private Sub gdipResizeRotate(Scr As Object, Img As Long, Angle!, x1 As Long, y1 
           End If
         If Width = -1 And Height <> -1 Then
             Height = Height / dv15
-            size = Height / orHeight
-            SizeY = size
-            Width = orWidth * size
-            bHeight1 = bHeight * size
-            bWidth1 = bWidth * size
-            bTop1 = btop * size
-            bLeft1 = bleft * size
+            Size = Height / orHeight
+            SizeY = Size
+            Width = orWidth * Size
+            bHeight1 = bHeight * Size
+            bWidth1 = bWidth * Size
+            bTop1 = btop * Size
+            bLeft1 = bleft * Size
         ElseIf Width <> -1 And Height = -1 Then
             Width = Width / dv15
-            size = Width / orWidth
-            SizeY = size
-            Height = orHeight * size
-            bHeight1 = bHeight * size
-            bWidth1 = bWidth * size
-            bTop1 = btop * size
-            bLeft1 = bleft * size
+            Size = Width / orWidth
+            SizeY = Size
+            Height = orHeight * Size
+            bHeight1 = bHeight * Size
+            bWidth1 = bWidth * Size
+            bTop1 = btop * Size
+            bLeft1 = bleft * Size
         ElseIf Width = -1 Then
-        size = 1
-        SizeY = size
+        Size = 1
+        SizeY = Size
             Width = orWidth
             Height = orHeight
             bHeight1 = bHeight
@@ -831,15 +831,15 @@ Private Sub gdipResizeRotate(Scr As Object, Img As Long, Angle!, x1 As Long, y1 
             bTop1 = btop
             bLeft1 = bleft
         Else
-        size = 1
+        Size = 1
             Width = Width / dv15
             Height = Height / dv15
-            size = Width / orWidth
+            Size = Width / orWidth
             SizeY = Height / orHeight
-            bHeight1 = bHeight * size
+            bHeight1 = bHeight * Size
             
             bWidth1 = bWidth * SizeY
-            bTop1 = btop * size
+            bTop1 = btop * Size
             bLeft1 = bleft * SizeY
         End If
 
@@ -868,7 +868,7 @@ End If
        If ay < 0 Then ay = 0
        If ax > ay Then ay = ax Else ax = ay
     End With
-    ax1 = ax * size
+    ax1 = ax * Size
     ay1 = ay * SizeY
     
         End If
@@ -918,7 +918,7 @@ Private Sub gdipResizeToXY(bstack As basetask, Img As Long, Angle!, zoomfactor A
     Dim orHeight   As Long      ' Original Image Height
     Dim m_Attr As Long
     
-       Const Pi = 3.14159!
+       Const PI = 3.14159!
     Angle! = -MyMod(Angle!, 360!)
     If Angle! < 0 Then Angle! = Angle! + 360!
   If zoomfactor <= 1 Then zoomfactor = 1
@@ -985,7 +985,7 @@ Public Function gCreatePicture(hBitmap As Long, Optional aType As Long = PICTYPE
     IID_IDispatch.data4(7) = &H46
         
     ' Fill Pic with necessary parts
-    pic.size = Len(pic)        ' Length of structure
+    pic.Size = Len(pic)        ' Length of structure
     pic.Type = aType  ' Type of Picture (bitmap)
     pic.hBmp = hBitmap         ' Handle to bitmap
 
@@ -1014,9 +1014,9 @@ Public Function ReadSizeImageFromBuffer(ResData() As Byte, Width As Long, Height
     Call CreateStreamOnHGlobal(VarPtr(ResData(0)), False, Stream)
     If Not (Stream Is Nothing) Then
         If GdiPlusExec(GdipLoadImageFromStream(Stream, Img)) = ok Then
-        Dim a As Long, b As Long
-            GetImageDimension Img, Width, Height, , , a, b
-            If a <> 0 Then Width = a - 2: Height = b - 3
+        Dim A As Long, b As Long
+            GetImageDimension Img, Width, Height, , , A, b
+            If A <> 0 Then Width = A - 2: Height = b - 3
             GdipDisposeImage Img
             ReadSizeImageFromBuffer = True
         End If
@@ -1198,7 +1198,7 @@ er$ = "GDI+: " & Err.Number & ". " & Err.Description
     Resume PROC_EXIT
 
 End Function
-Public Function DrawImageFromBuffer(ResData() As Byte, hDC As Long, Optional X As Long = 0&, Optional y As Long = 0&, Optional Width As Long = -1, Optional Height As Long = -1) As Boolean
+Public Function DrawImageFromBuffer(ResData() As Byte, hDC As Long, Optional X As Long = 0&, Optional Y As Long = 0&, Optional Width As Long = -1, Optional Height As Long = -1) As Boolean
     
     On Error GoTo PROC_ERR
     Dim Stream As IUnknown
@@ -1237,9 +1237,9 @@ Public Function DrawImageFromBuffer(ResData() As Byte, hDC As Long, Optional X A
             End If
         End If
         If bWidth = 0 Then
-            gdipResizeToXYsimple Img, hDC, X, y, Width, Height, bleft, btop, orWidth, orHeight
+            gdipResizeToXYsimple Img, hDC, X, Y, Width, Height, bleft, btop, orWidth, orHeight
         Else
-            gdipResizeToXYsimple Img, hDC, X, y, Width, Height, bleft, btop, orWidth, orHeight
+            gdipResizeToXYsimple Img, hDC, X, Y, Width, Height, bleft, btop, orWidth, orHeight
         End If
         
         GdipDisposeImage Img
@@ -1362,7 +1362,7 @@ er$ = "GDI+: " & Err.Number & ". " & Err.Description
     Resume PROC_EXIT
 
 End Function
-Public Function DrawEmfFromBuffer(Scr As Object, ResData() As Byte, X As Long, y As Long, Angle!, Width As Long, Height As Long) As Boolean
+Public Function DrawEmfFromBuffer(Scr As Object, ResData() As Byte, X As Long, Y As Long, Angle!, Width As Long, Height As Long) As Boolean
     
     On Error GoTo PROC_ERR
     Dim Stream As IUnknown
@@ -1372,7 +1372,7 @@ Public Function DrawEmfFromBuffer(Scr As Object, ResData() As Byte, X As Long, y
     Call CreateStreamOnHGlobal(VarPtr(ResData(0)), False, Stream)
     If Not (Stream Is Nothing) Then
         If GdiPlusExec(GdipLoadImageFromStream(Stream, Img)) = ok Then
-            gdipResizeRotate Scr, Img, Angle!, X, y, (Width), (Height)
+            gdipResizeRotate Scr, Img, Angle!, X, Y, (Width), (Height)
             GdipDisposeImage Img
         End If
     End If
@@ -1523,7 +1523,7 @@ Public Function HandleToPicture(ByVal hGDIHandle As Long, _
     
     ' Initialisiert die PICTDESC Structur
     With tPictDesc
-         .size = Len(tPictDesc)
+         .Size = Len(tPictDesc)
         .Type = ObjectType
         .hBmp = hGDIHandle
         .hPal = hPal
@@ -1586,15 +1586,15 @@ Sub GdiPlusGradient(hDC As Long, x1 As Long, y1 As Long, x2 As Long, y2 As Long,
 Dim point(4) As POINTAPI, graphics As Long, hBrush As Long
 
 point(0).X = x1
-point(0).y = y1
+point(0).Y = y1
 point(1).X = x2
-point(1).y = y1
+point(1).Y = y1
 point(2).X = x2
-point(2).y = y2
+point(2).Y = y2
 point(3).X = x1
-point(3).y = y2
+point(3).Y = y2
 point(4).X = x1
-point(4).y = y2
+point(4).Y = y2
 UseVertical = Abs(UseVertical <> 0) * 2
 GdipCreateFromHDC hDC, graphics
 GdipCreateLineBrushI point(UseVertical), point(1), color2, color1, 1, hBrush
@@ -1607,15 +1607,15 @@ Dim point(4) As POINTAPI, graphics As Long, hBrush As Long, hRegion As Long, myR
 myRgn = CreateRectRgn(0&, 0&, 0&, 0&)
 If GetWindowRgn(Form1.dSprite(whois).hWnd, myRgn) <> 0 Then
 point(0).X = x1
-point(0).y = y1
+point(0).Y = y1
 point(1).X = x2
-point(1).y = y1
+point(1).Y = y1
 point(2).X = x2
-point(2).y = y2
+point(2).Y = y2
 point(3).X = x1
-point(3).y = y2
+point(3).Y = y2
 point(4).X = x1
-point(4).y = y2
+point(4).Y = y2
 UseVertical = Abs(UseVertical <> 0) * 2
 GdipCreateFromHDC Form1.dSprite(whois).hDC, graphics
 GdipCreateRegionHrgn myRgn, hRegion

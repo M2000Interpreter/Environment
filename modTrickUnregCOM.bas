@@ -97,6 +97,9 @@ Private Const REGKIND_NONE        As Long = 2
 Private Const TKIND_COCLASS       As Long = 5
 Private Const TKIND_DISPATCH      As Long = 4
 Private Const TKIND_INTERFACE     As Long = 3
+Private Const TKIND_RECORD        As Long = 1
+Private Const TKIND_ENUM          As Long = 0
+'
 
 Dim iidClsFctr      As GUID
 Dim iidUnk          As GUID
@@ -212,7 +215,7 @@ End Enum
 
 Public Type fncinf
     Name                    As String
-    Addr                    As Long
+    addr                    As Long
     params                  As Integer
 End Type
 
@@ -284,18 +287,18 @@ End Enum
 
 
 
-Public Function GetGUIDstr(g As GUID) As String
+Public Function GetGUIDstr(G As GUID) As String
 Dim ret As Long, here As Long
 
-ret = StringFromCLSID(g, here)
+ret = StringFromCLSID(G, here)
 If ret Then Exit Function
 GetGUIDstr = GetBStrFromPtr(here)
 CoTaskMemFree here
 End Function
-Public Function strProgID(g As GUID) As String
+Public Function strProgID(G As GUID) As String
 Dim ret As Long, here As Long
 
-ret = ProgIDFromCLSID(g, here)
+ret = ProgIDFromCLSID(G, here)
 If ret Then Exit Function
 strProgID = GetBStrFromPtr(here)
 CoTaskMemFree here
@@ -412,7 +415,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
     Dim ppFuncDesc As Long, fncdsc As FUNCDESC, cFuncs As Long
     Dim ppVarDesc As Long, vardsc As VARDESC
     Dim ParamDesc As TPARAMDESC, hlp As Long, pRefType As Long
-    Dim TypeDesc As TTYPEDESC, retval$
+    Dim TypeDesc As TTYPEDESC, RetVal$
     Dim ret As Long, pctinfo As Long, ppTInfo As Long, typeInf As IUnknown
     Dim pAttr   As Long
     Dim tKind   As Long
@@ -505,10 +508,10 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
                         End If
                         acc = acc + 16
                         ttt$ = ""
-                        retval$ = ""
+                        RetVal$ = ""
                         If strNames(i) = "" Then strNames(i) = "Value"
                         If (ParamDesc.wParamFlags And PARAMFLAG_FRETVAL) = &H8 Then
-                            retval$ = " as " + stringifyTypeDesc(TypeDesc, typeInf)
+                            RetVal$ = " as " + stringifyTypeDesc(TypeDesc, typeInf)
                         Else
                             If (ParamDesc.wParamFlags And PARAMFLAG_FIN) = &H1 Then ttt$ = "in "
                             If (ParamDesc.wParamFlags And PARAMFLAG_FOUT) = &H2 Then ttt$ = ttt$ + "out "
@@ -528,7 +531,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
                 End If
             End If
             
-            If retval$ = "" Then
+            If RetVal$ = "" Then
                 If fncdsc.elemdesc.vt = 24 Then
                     mList.Value = strName
                 Else
@@ -536,7 +539,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
                     mList.Value = strName + " as " + stringifyTypeDesc(TypeDesc, typeInf)
                 End If
             Else
-                mList.Value = strName + retval$
+                mList.Value = strName + RetVal$
             End If
             ITypeInfo_ReleaseFuncDesc typeInf, ppFuncDesc
         Next j

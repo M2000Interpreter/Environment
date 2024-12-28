@@ -47,21 +47,21 @@ Attribute DblClick.VB_UserMemId = -601
 Event ContextMenu()
 Event OwnerDraw(ByVal hGraphics As Long, ByVal hFont As Long, ByVal ButtonState As UcsNineButtonStateEnum, ClientLeft As Long, ClientTop As Long, ClientWidth As Long, ClientHeight As Long, Caption As String, ByVal hPicture As Long)
 Event RegisterCancelMode(oCtl As Object, Handled As Boolean)
-Event KeyDown(keycode As Integer, shift As Integer)
+Event KeyDown(KeyCode As Integer, shift As Integer)
 Attribute KeyDown.VB_UserMemId = -602
 Event KeyPress(KeyAscii As Integer)
 Attribute KeyPress.VB_UserMemId = -604
-Event KeyUp(keycode As Integer, shift As Integer)
+Event KeyUp(KeyCode As Integer, shift As Integer)
 Event AccessKeyPress(KeyAscii As Integer)
-Event MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Event MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 Attribute MouseDown.VB_UserMemId = -605
-Event MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Event MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 Attribute MouseMove.VB_UserMemId = -606
-Event MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Event MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 Attribute MouseUp.VB_UserMemId = -607
 Event OLECompleteDrag(Effect As Long)
-Event OLEDragDrop(Data As Object, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single)
-Event OLEDragOver(Data As Object, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
+Event OLEDragDrop(Data As Object, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single)
+Event OLEDragOver(Data As Object, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
 Event OLEGiveFeedback(Effect As Long, DefaultCursors As Boolean)
 Event OLESetData(Data As Object, DataFormat As Integer)
 Event OLEStartDrag(Data As Object, AllowedEffects As Long)
@@ -155,7 +155,7 @@ Private Const DIB_RGB_COLORS                As Long = 0 '  color table in RGBs
 '--- for GdipBitmapLockBits
 Private Const ImageLockModeRead             As Long = &H1
 Private Const ImageLockModeWrite            As Long = &H2
-'--- for matrix order
+'--- for fMatrix order
 'Private Const MatrixOrderPrepend            As Long = 0
 Private Const MatrixOrderAppend             As Long = 1
 '--- for thunks
@@ -166,16 +166,16 @@ Private Const CRYPT_STRING_BASE64           As Long = 1
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (lpDst As Any, lpSrc As Any, ByVal ByteLength As Long)
 Private Declare Function ArrPtr Lib "msvbvm60" Alias "VarPtr" (Ptr() As Any) As Long
 Private Declare Function OleTranslateColor Lib "oleaut32" (ByVal lOleColor As Long, ByVal lHPalette As Long, ByVal lColorRef As Long) As Long
-Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal Hdc As Long) As Long
-Private Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) As Long
-Private Declare Function SelectObject Lib "gdi32" (ByVal Hdc As Long, ByVal hObject As Long) As Long
+Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
+Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
+Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Private Declare Function GetModuleHandle Lib "kernel32" Alias "GetModuleHandleA" (ByVal lpModuleName As String) As Long
 Private Declare Function GetIconInfo Lib "user32" (ByVal hIcon As Long, pIconInfo As ICONINFO) As Long
-Private Declare Function GetDIBits Lib "gdi32" (ByVal Hdc As Long, ByVal hBitmap As Long, ByVal nStartScan As Long, ByVal nNumScans As Long, lpBits As Any, lpBI As BITMAPINFOHEADER, ByVal wUsage As Long) As Long
-Private Declare Function CreateDIBSection Lib "gdi32" (ByVal Hdc As Long, lpBitsInfo As BITMAPINFOHEADER, ByVal wUsage As Long, lpBits As Long, ByVal Handle As Long, ByVal dw As Long) As Long
+Private Declare Function GetDIBits Lib "gdi32" (ByVal hDC As Long, ByVal hBitmap As Long, ByVal nStartScan As Long, ByVal nNumScans As Long, lpBits As Any, lpBI As BITMAPINFOHEADER, ByVal wUsage As Long) As Long
+Private Declare Function CreateDIBSection Lib "gdi32" (ByVal hDC As Long, lpBitsInfo As BITMAPINFOHEADER, ByVal wUsage As Long, lpBits As Long, ByVal Handle As Long, ByVal dw As Long) As Long
 Private Declare Function ApiUpdateWindow Lib "user32" Alias "UpdateWindow" (ByVal hWnd As Long) As Long
-Private Declare Function GetEnvironmentVariable Lib "kernel32" Alias "GetEnvironmentVariableA" (ByVal lpName As String, ByVal lpBuffer As String, ByVal nsize As Long) As Long
+Private Declare Function GetEnvironmentVariable Lib "kernel32" Alias "GetEnvironmentVariableA" (ByVal lpName As String, ByVal lpBuffer As String, ByVal nSize As Long) As Long
 Private Declare Function SetEnvironmentVariable Lib "kernel32" Alias "SetEnvironmentVariableA" (ByVal lpName As String, ByVal lpValue As String) As Long
 Private Declare Function AlphaBlend Lib "msimg32" (ByVal hDestDC As Long, ByVal lX As Long, ByVal lY As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal widthSrc As Long, ByVal heightSrc As Long, ByVal blendFunct As Long) As Boolean
 Private Declare Function GetCurrentProcessId Lib "kernel32" () As Long
@@ -186,7 +186,7 @@ Private Declare Function GdipDisposeImage Lib "gdiplus" (ByVal hImage As Long) A
 Private Declare Function GdipGetImageGraphicsContext Lib "gdiplus" (ByVal hImage As Long, hGraphics As Long) As Long
 Private Declare Function GdipDeleteGraphics Lib "gdiplus" (ByVal hGraphics As Long) As Long
 Private Declare Function GdipDrawImageRectRect Lib "gdiplus" (ByVal hGraphics As Long, ByVal hImage As Long, ByVal dstX As Single, ByVal dstY As Single, ByVal dstWidth As Single, ByVal dstHeight As Single, ByVal srcX As Single, ByVal srcY As Single, ByVal srcWidth As Single, ByVal srcHeight As Single, Optional ByVal srcUnit As Long = UnitPixel, Optional ByVal hImageAttributes As Long, Optional ByVal pfnCallback As Long, Optional ByVal lCallbackData As Long) As Long
-Private Declare Function GdipCreateFromHDC Lib "gdiplus" (ByVal Hdc As Long, hGraphics As Long) As Long
+Private Declare Function GdipCreateFromHDC Lib "gdiplus" (ByVal hDC As Long, hGraphics As Long) As Long
 Private Declare Function GdipCreateImageAttributes Lib "gdiplus" (hImgAttr As Long) As Long
 Private Declare Function GdipSetImageAttributesColorMatrix Lib "gdiplus" (ByVal hImgAttr As Long, ByVal lAdjustType As Long, ByVal fAdjustEnabled As Long, clrMatrix As Any, grayMatrix As Any, ByVal lFlags As Long) As Long
 Private Declare Function GdipSetImageAttributesColorKeys Lib "gdiplus" (ByVal hImgAttr As Long, ByVal lAdjustType As Long, ByVal fAdjustEnabled As Long, ByVal clrLow As Long, ByVal clrHigh As Long) As Long
@@ -213,7 +213,7 @@ Private Declare Function GdipGetImageDimension Lib "gdiplus" (ByVal Image As Lon
 Private Declare Function GdipCloneImage Lib "gdiplus" (ByVal hImage As Long, hCloneImage As Long) As Long
 Private Declare Function GdipBitmapLockBits Lib "gdiplus" (ByVal hBitmap As Long, lpRect As Any, ByVal lFlags As Long, ByVal lPixelFormat As Long, uLockedBitmapData As BitmapData) As Long
 Private Declare Function GdipBitmapUnlockBits Lib "gdiplus" (ByVal hBitmap As Long, uLockedBitmapData As BitmapData) As Long
-Private Declare Function GdipTranslateWorldTransform Lib "gdiplus" (ByVal hGraphics As Long, ByVal nDx As Single, ByVal nDy As Single, ByVal lOrder As Long) As Long
+Private Declare Function GdipTranslateWorldTransform Lib "gdiplus" (ByVal hGraphics As Long, ByVal ndx As Single, ByVal nDy As Single, ByVal lOrder As Long) As Long
 Private Declare Function GdipScaleWorldTransform Lib "gdiplus" (ByVal hGraphics As Long, ByVal nSx As Single, ByVal nSy As Single, ByVal lOrder As Long) As Long
 #If Not ImplNoIdeProtection Then
     Private Declare Function FindWindowEx Lib "user32" Alias "FindWindowExA" (ByVal hWndParent As Long, ByVal hWndChildAfter As Long, ByVal lpszClass As String, ByVal lpszWindow As String) As Long
@@ -268,9 +268,9 @@ End Type
 
 Private Type UcsRgbQuad
     R                   As Byte
-    g                   As Byte
+    G                   As Byte
     b                   As Byte
-    a                   As Byte
+    A                   As Byte
 End Type
 
 Private Type ICONINFO
@@ -1324,7 +1324,7 @@ Private Function pvPrepareFont(oFont As StdFont, hFont As Long) As Boolean
         Or FontStyleItalic * -oFont.Italic _
         Or FontStyleUnderline * -oFont.Underline _
         Or FontStyleStrikeout * -oFont.Strikethrough
-    If GdipCreateFont(hFamily, oFont.size, eStyle, UnitPoint, hNewFont) <> 0 Then
+    If GdipCreateFont(hFamily, oFont.Size, eStyle, UnitPoint, hNewFont) <> 0 Then
         GoTo QH
     End If
     '--- commit
@@ -1547,11 +1547,11 @@ Private Function pvTranslateColor(ByVal clrValue As OLE_COLOR, Optional ByVal Al
     uQuad.b = lTemp
     lTemp = Alpha * &HFF
     If lTemp > 255 Then
-        uQuad.a = 255
+        uQuad.A = 255
     ElseIf lTemp < 0 Then
-        uQuad.a = 0
+        uQuad.A = 0
     Else
-        uQuad.a = lTemp
+        uQuad.A = lTemp
     End If
     Call CopyMemory(pvTranslateColor, uQuad, 4)
 End Function
@@ -1570,17 +1570,17 @@ Private Function pvParentRegisterCancelMode(oCtl As Object) As Boolean
 QH:
 End Function
 
-Private Function pvHitTest(ByVal x As Single, ByVal y As Single) As HitResultConstants
+Private Function pvHitTest(ByVal X As Single, ByVal Y As Single) As HitResultConstants
     Const FUNC_NAME     As String = "pvHitTest"
     Dim uQuad           As UcsRgbQuad
     
     On Error GoTo EH
     pvHitTest = vbHitResultHit
-    If GdipBitmapGetPixel(m_hBitmap, x, y, uQuad) <> 0 Then
+    If GdipBitmapGetPixel(m_hBitmap, X, Y, uQuad) <> 0 Then
         GoTo QH
     End If
-    If uQuad.a < 255 Then
-        If uQuad.a > 0 Then
+    If uQuad.A < 255 Then
+        If uQuad.A > 0 Then
             pvHitTest = vbHitResultTransparent
         Else
             pvHitTest = vbHitResultOutside
@@ -1988,16 +1988,16 @@ Private Sub pvSetEmptyStyle()
     Next
 End Sub
 
-Private Sub pvHandleMouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub pvHandleMouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
     Const FUNC_NAME     As String = "pvHandleMouseDown"
     
     On Error GoTo EH
     m_nDownButton = Button
     m_nDownShift = shift
-    m_sngDownX = x
-    m_sngDownY = y
+    m_sngDownX = X
+    m_sngDownY = Y
     If (Button And vbLeftButton) <> 0 Then
-        If pvHitTest(x, y) <> vbHitResultOutside Then
+        If pvHitTest(X, Y) <> vbHitResultOutside Then
             pvParentRegisterCancelMode Me
             pvState(ucsBstPressed Or ucsBstFocused * (1 + m_bManualFocus)) = True
         End If
@@ -2022,10 +2022,10 @@ EH:
     Resume Next
 End Sub
 
-Private Sub pvRenderPicture(pPicture As IPicture, ByVal Hdc As Long, ByVal x As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal xSrc As OLE_XPOS_HIMETRIC, ByVal ySrc As OLE_YPOS_HIMETRIC, ByVal cxSrc As OLE_XSIZE_HIMETRIC, ByVal cySrc As OLE_YSIZE_HIMETRIC)
+Private Sub pvRenderPicture(pPicture As IPicture, ByVal hDC As Long, ByVal X As Long, ByVal Y As Long, ByVal cx As Long, ByVal cy As Long, ByVal xSrc As OLE_XPOS_HIMETRIC, ByVal ySrc As OLE_YPOS_HIMETRIC, ByVal cxSrc As OLE_XSIZE_HIMETRIC, ByVal cySrc As OLE_YSIZE_HIMETRIC)
     If Not pPicture Is Nothing Then
         If pPicture.Handle <> 0 Then
-            pPicture.Render Hdc, x, y, cx, cy, xSrc, ySrc, cxSrc, cySrc, ByVal 0
+            pPicture.Render hDC, X, Y, cx, cy, xSrc, ySrc, cxSrc, cySrc, ByVal 0
         End If
     End If
 End Sub
@@ -2108,7 +2108,7 @@ Public Sub pvRefresh()
     UserControl.Refresh
 End Sub
 
-Private Function pvPaintControl(ByVal Hdc As Long) As Boolean
+Private Function pvPaintControl(ByVal hDC As Long) As Boolean
     Const FUNC_NAME     As String = "pvPaintControl"
     Dim hGraphics       As Long
     Dim hMergeBitmap    As Long
@@ -2134,7 +2134,7 @@ Private Function pvPaintControl(ByVal Hdc As Long) As Boolean
                 End If
             End If
         End If
-        If GdipCreateFromHDC(Hdc, hGraphics) <> 0 Then
+        If GdipCreateFromHDC(hDC, hGraphics) <> 0 Then
             GoTo QH
         End If
         If m_hFocusBitmap <> 0 Then
@@ -2337,16 +2337,16 @@ Private Sub UserControl_AmbientChanged(PropertyName As String)
     End If
 End Sub
 
-Private Sub UserControl_HitTest(x As Single, y As Single, HitResult As Integer)
+Private Sub UserControl_HitTest(X As Single, Y As Single, HitResult As Integer)
     If Ambient.UserMode Then
-        HitResult = pvHitTest(x, y)
+        HitResult = pvHitTest(X, Y)
     Else
         HitResult = vbHitResultHit
     End If
 End Sub
 
-Private Sub UserControl_KeyDown(keycode As Integer, shift As Integer)
-    RaiseEvent KeyDown(keycode, shift)
+Private Sub UserControl_KeyDown(KeyCode As Integer, shift As Integer)
+    RaiseEvent KeyDown(KeyCode, shift)
 End Sub
 
 Private Sub UserControl_KeyPress(KeyAscii As Integer)
@@ -2365,24 +2365,24 @@ Private Sub UserControl_AccessKeyPress(KeyAscii As Integer)
     End If
 End Sub
 
-Private Sub UserControl_KeyUp(keycode As Integer, shift As Integer)
-    RaiseEvent KeyUp(keycode, shift)
+Private Sub UserControl_KeyUp(KeyCode As Integer, shift As Integer)
+    RaiseEvent KeyUp(KeyCode, shift)
 End Sub
 
-Private Sub UserControl_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
-    RaiseEvent MouseDown(Button, shift, ScaleX(x, ScaleMode, m_eContainerScaleMode), ScaleY(y, ScaleMode, m_eContainerScaleMode))
-    pvHandleMouseDown Button, shift, x, y
+Private Sub UserControl_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
+    RaiseEvent MouseDown(Button, shift, ScaleX(X, ScaleMode, m_eContainerScaleMode), ScaleY(Y, ScaleMode, m_eContainerScaleMode))
+    pvHandleMouseDown Button, shift, X, Y
 End Sub
 
-Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
     Const FUNC_NAME     As String = "UserControl_MouseMove"
     
     On Error GoTo EH
-    RaiseEvent MouseMove(Button, shift, ScaleX(x, ScaleMode, m_eContainerScaleMode), ScaleY(y, ScaleMode, m_eContainerScaleMode))
+    RaiseEvent MouseMove(Button, shift, ScaleX(X, ScaleMode, m_eContainerScaleMode), ScaleY(Y, ScaleMode, m_eContainerScaleMode))
     If Button = -1 Then
         GoTo QH
     End If
-    If x >= 0 And x < ScaleWidth And y >= 0 And y < ScaleHeight Then
+    If X >= 0 And X < ScaleWidth And Y >= 0 And Y < ScaleHeight Then
         If Not pvState(ucsBstHover) Then
             If pvParentRegisterCancelMode(Me) Then
                 pvState(ucsBstHover) = True
@@ -2399,18 +2399,18 @@ EH:
     Resume Next
 End Sub
 
-Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
     Const FUNC_NAME     As String = "UserControl_MouseUp"
     
     On Error GoTo EH
-    RaiseEvent MouseUp(Button, shift, ScaleX(x, ScaleMode, m_eContainerScaleMode), ScaleY(y, ScaleMode, m_eContainerScaleMode))
+    RaiseEvent MouseUp(Button, shift, ScaleX(X, ScaleMode, m_eContainerScaleMode), ScaleY(Y, ScaleMode, m_eContainerScaleMode))
     If Button = -1 Then
         GoTo QH
     End If
     If (Button And vbLeftButton) <> 0 Then
         pvState(ucsBstPressed) = False
     End If
-    If Button <> 0 And x >= 0 And x < ScaleWidth And y >= 0 And y < ScaleHeight Then
+    If Button <> 0 And X >= 0 And X < ScaleWidth And Y >= 0 And Y < ScaleHeight Then
         If (m_nDownButton And Button And vbLeftButton) <> 0 Then
             Call ApiUpdateWindow(ContainerHwnd) '--- pump WM_PAINT
             RaiseEvent Click
@@ -2443,7 +2443,7 @@ Private Sub UserControl_Paint()
     
     On Error GoTo EH
     If AutoRedraw Then
-        hMemDC = CreateCompatibleDC(Hdc)
+        hMemDC = CreateCompatibleDC(hDC)
         If hMemDC = 0 Then
             GoTo DefPaint
         End If
@@ -2458,11 +2458,11 @@ Private Sub UserControl_Paint()
         Else
             hPrevDib = SelectObject(hMemDC, m_hRedrawDib)
         End If
-        If AlphaBlend(Hdc, 0, 0, ScaleWidth, ScaleHeight, hMemDC, 0, 0, ScaleWidth, ScaleHeight, AC_SRC_ALPHA * &H1000000 + Opacity * &H10000) = 0 Then
+        If AlphaBlend(hDC, 0, 0, ScaleWidth, ScaleHeight, hMemDC, 0, 0, ScaleWidth, ScaleHeight, AC_SRC_ALPHA * &H1000000 + Opacity * &H10000) = 0 Then
             GoTo DefPaint
         End If
     Else
-        If Not pvPaintControl(Hdc) Then
+        If Not pvPaintControl(hDC) Then
             GoTo DefPaint
         End If
     End If
@@ -2520,12 +2520,12 @@ Private Sub UserControl_OLECompleteDrag(Effect As Long)
     RaiseEvent OLECompleteDrag(Effect)
 End Sub
 
-Private Sub UserControl_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single)
-    RaiseEvent OLEDragDrop(Data, Effect, Button, shift, x, y)
+Private Sub UserControl_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single)
+    RaiseEvent OLEDragDrop(Data, Effect, Button, shift, X, Y)
 End Sub
 
-Private Sub UserControl_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
-    RaiseEvent OLEDragOver(Data, Effect, Button, shift, x, y, state)
+Private Sub UserControl_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
+    RaiseEvent OLEDragOver(Data, Effect, Button, shift, X, Y, state)
 End Sub
 
 Private Sub UserControl_OLEGiveFeedback(Effect As Long, DefaultCursors As Boolean)

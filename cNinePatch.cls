@@ -85,7 +85,7 @@ Private Declare Function GdipEndContainer Lib "gdiplus" (ByVal hGraphics As Long
 
 Private Type APIRECTL
     Left                As Long
-    Top                 As Long
+    top                 As Long
     Right               As Long
     Bottom              As Long
 End Type
@@ -202,12 +202,12 @@ Public Function CalcBoundingBox( _
     If Width < m_uHorParts(0).Size Then
         Width = m_uHorParts(0).Size
     End If
-    Height = m_uPadding.Top + ClientHeight + m_uPadding.Bottom
+    Height = m_uPadding.top + ClientHeight + m_uPadding.Bottom
     If Height < m_uVertParts(0).Size Then
         Height = m_uVertParts(0).Size
     End If
     ClientX = m_uPadding.Left
-    ClientY = m_uPadding.Top
+    ClientY = m_uPadding.top
     '--- success
     CalcBoundingBox = True
 End Function
@@ -220,12 +220,12 @@ Public Function CalcClientRect( _
         Optional Width As Long, _
         Optional Height As Long) As Boolean
     X = m_uPadding.Left
-    Y = m_uPadding.Top
+    Y = m_uPadding.top
     Width = BoxWidth - m_uPadding.Left - m_uPadding.Right
     If Width < 0 Then
         Width = 0
     End If
-    Height = BoxHeight - m_uPadding.Top - m_uPadding.Bottom
+    Height = BoxHeight - m_uPadding.top - m_uPadding.Bottom
     If Height < 0 Then
         Height = 0
     End If
@@ -446,7 +446,7 @@ Private Function pvParseDataFrame() As Boolean
     If pvGetParts(UnsignedAdd(uData.Scan0, 4 * (m_lWidth - 1)), uData.Stride, m_lHeight - 2, clrStatic, clrRepeat, uPadParts) Then
         If UBound(uPadParts) = 3 Then
             If uPadParts(1).Type = ucsPrtStatic And uPadParts(2).Type <> ucsPrtStatic And uPadParts(3).Type = ucsPrtStatic Then
-                 m_uPadding.Top = uPadParts(1).Size
+                 m_uPadding.top = uPadParts(1).Size
                  m_uPadding.Bottom = uPadParts(3).Size
             End If
         End If

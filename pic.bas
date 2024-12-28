@@ -126,7 +126,7 @@ Public Const RGN_OR = 2
 '**********************************
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-Private Const Pi = 3.14159265359
+Private Const PI = 3.14159265359
 Private Type SAFEARRAYBOUND
     cElements As Long
     lLbound As Long
@@ -340,11 +340,11 @@ Public Function LowLong(ByVal p) As Long
     LowLong = MemLong(VarPtr(p) + 8)
 End Function
 Function Hex64$(a, Optional bytes = 8)
-    Dim p, p1, z
-    z = cInt64(a)
-    p = MemLong(VarPtr(z) + 8)
-    p1 = MemLong(VarPtr(z) + 12)
-    Hex64$ = Right$(Right$("0000000" + Hex$(p1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
+    Dim p, P1, Z
+    Z = cInt64(a)
+    p = MemLong(VarPtr(Z) + 8)
+    P1 = MemLong(VarPtr(Z) + 12)
+    Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
 End Function
 Public Function OneLongLong() As Variant
     Static p
@@ -667,7 +667,7 @@ h = val("&H" & Mid$(a, 9, 4))
 If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 mdib.ClearUp
 
-If mdib.create(W, h) Then
+If mdib.Create(W, h) Then
 If Len(a) * 2 < mdib.BytesPerScanLine * h + 24 Then Exit Function
 CopyMemory ByVal mdib.DIBSectionBitsPtr, ByVal StrPtr(a) + 24, mdib.BytesPerScanLine * h
 cDib = True
@@ -827,8 +827,8 @@ If cDibbuffer0.hDib = 0 Then Exit Function
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim a As Single, b As Single, k As Single, R As Single
-Dim br As Byte, bG As Byte, bbb As Byte ', ba$
+Dim a As Single, b As Single, K As Single, r As Single
+Dim bR As Byte, bG As Byte, bbb As Byte ', ba$
 Dim BR1 As Byte, BG1 As Byte, bbb1 As Byte, ppBa As Long
 BR1 = 255 * ((100 - Alpha) / 100#)
 BG1 = 255 * ((100 - Alpha) / 100#)
@@ -836,7 +836,7 @@ bbb1 = 255 * ((100 - Alpha) / 100#)
 ppBa = VarPtr(bckColor)
 GetMem1 ppBa, bbb
 GetMem1 ppBa + 1, bG
-GetMem1 ppBa + 2, br
+GetMem1 ppBa + 2, bR
 
 'ba$ = Hex$(bckColor)
 'ba$ = Right$("00000" & ba$, 6)
@@ -846,20 +846,20 @@ GetMem1 ppBa + 2, br
 Dim pw As Long, ph As Long
     piw = cDibbuffer0.Width
     pih = cDibbuffer0.Height
-    R = Atn(CSng(piw) / CSng(pih)) + Pi / 2#
-     k = Fix(Abs((piw / Cos(R) / 2) * zoomfactor) + 0.5)
+    r = Atn(CSng(piw) / CSng(pih)) + PI / 2#
+     K = Fix(Abs((piw / Cos(r) / 2) * zoomfactor) + 0.5)
 
 Dim cDIBbuffer1 As Object
  Dim olddpix As Long, olddpiy As Long
  olddpix = cDibbuffer0.dpix
  olddpiy = cDibbuffer0.dpiy
- myw = 2 * k
-myh = 2 * k
+ myw = 2 * K
+myh = 2 * K
 
     pw = cDibbuffer0.Width
     ph = cDibbuffer0.Height
  cDibbuffer0.ClearUp
-Call cDibbuffer0.create(myw, myh)
+Call cDibbuffer0.Create(myw, myh)
 cDibbuffer0.GetDpi olddpix, olddpiy
 cDibbuffer0.Cls bckColor
 
@@ -900,17 +900,17 @@ On Error Resume Next
     ph1 = ph
     pws = pw
     phs = ph
-    R = Atn(CSng(myw) / CSng(myh))
-    k = -myw / (2# * Sin(R))
+    r = Atn(CSng(myw) / CSng(myh))
+    K = -myw / (2# * sIn(r))
     
 
-       x_step2 = CLng(Fix(Cos(Angle! + Pi / 2) * pw))
-    y_step2 = CLng(Fix(Sin(Angle! + Pi / 2) * ph))
+       x_step2 = CLng(Fix(Cos(Angle! + PI / 2) * pw))
+    y_step2 = CLng(Fix(sIn(Angle! + PI / 2) * ph))
 
     x_step = CLng(Fix(Cos(Angle!) * pw))
-    y_step = CLng(Fix(Sin(Angle!) * ph))
-  image_x = CLng(Fix(pw / 2 - Fix(k * Sin(Angle! - R)))) * pw
-   image_y = CLng(Fix(ph / 2 + Fix(k * Cos(Angle! - R)))) * ph
+    y_step = CLng(Fix(sIn(Angle!) * ph))
+  image_x = CLng(Fix(pw / 2 - Fix(K * sIn(Angle! - r)))) * pw
+   image_y = CLng(Fix(ph / 2 + Fix(K * Cos(Angle! - r)))) * ph
 Dim pw1out As Long, ph1out As Long, pwOut As Long, phOut As Long, much As Single
 ''Dim cw1 As Long, ch1 As Long, outf As Single, fadex As Long, fadey As Long, outf1 As Single, outf2 As Single
 pw1 = pw1 - 1
@@ -945,27 +945,27 @@ nomalo = Not (ang Mod 90 = 0)
                         If nomalo Then
                       If mmx <= 1 Then
                       
-                      bDib1(screen_x, screen_y) = br * xf1
+                      bDib1(screen_x, screen_y) = bR * xf1
                         
-                        bDib1(screen_x + 1, screen_y) = br * xf1  ' * yf / 2
-                       bDib1(screen_x + 2, screen_y) = br * xf1 '* yf / 2
+                        bDib1(screen_x + 1, screen_y) = bR * xf1  ' * yf / 2
+                       bDib1(screen_x + 2, screen_y) = bR * xf1 '* yf / 2
                        ElseIf mmx >= pw1out Then
-                        bDib1(screen_x, screen_y) = br * xf
+                        bDib1(screen_x, screen_y) = bR * xf
                         
-                        bDib1(screen_x + 1, screen_y) = br * xf
+                        bDib1(screen_x + 1, screen_y) = bR * xf
 
-                        bDib1(screen_x + 2, screen_y) = br * xf
+                        bDib1(screen_x + 2, screen_y) = bR * xf
                        End If
                        If mmy >= ph1out Then
-                         bDib1(screen_x, screen_y) = br * yf
+                         bDib1(screen_x, screen_y) = bR * yf
                         
-                        bDib1(screen_x + 1, screen_y) = br * yf
-                       bDib1(screen_x + 2, screen_y) = br * yf
+                        bDib1(screen_x + 1, screen_y) = bR * yf
+                       bDib1(screen_x + 2, screen_y) = bR * yf
                        ElseIf mmy <= 1 Then
-                          bDib1(screen_x, screen_y) = br * yf1
+                          bDib1(screen_x, screen_y) = bR * yf1
                         
-                        bDib1(screen_x + 1, screen_y) = br * yf1
-                       bDib1(screen_x + 2, screen_y) = br * yf1
+                        bDib1(screen_x + 1, screen_y) = bR * yf1
+                       bDib1(screen_x + 2, screen_y) = bR * yf1
                       End If
                
                  End If
@@ -1066,7 +1066,7 @@ Else
 piw = wcm
 pih = hcm
 End If
-If cDIBbuffer1.create(piw, pih) Then
+If cDIBbuffer1.Create(piw, pih) Then
     cDIBbuffer1.Cls bColor
     cDIBbuffer1.GetDpiDIB cDibbuffer0
     
@@ -1112,10 +1112,10 @@ End Sub
 
 Public Sub RotateDibNew(cDibbuffer0 As cDIBSection, Optional ByVal Angle! = 0, _
         Optional ByVal zoomfactor As Single = 1, Optional bckColor As Long = &HFFFFFF)
-Const Pi = 3.14159!
+Const PI = 3.14159!
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim k As Single, R As Single
-Dim br As Byte, bG As Byte, bbb As Byte, ppBa As Long
+Dim K As Single, r As Single
+Dim bR As Byte, bG As Byte, bbb As Byte, ppBa As Long
 Dim bDib() As Byte, bDib1() As Byte
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
@@ -1140,24 +1140,24 @@ If zoomfactor <= 0.01! Then zoomfactor = 0.01!
 ppBa = VarPtr(bckColor)
 GetMem1 ppBa, bbb
 GetMem1 ppBa + 1, bG
-GetMem1 ppBa + 2, br
+GetMem1 ppBa + 2, bR
 piw = cDibbuffer0.Width
 pih = cDibbuffer0.Height
-R = Atn(piw / pih) + Pi / 2!
-k = Abs((piw / Cos(R) / 2!) * zoomfactor)
+r = Atn(piw / pih) + PI / 2!
+K = Abs((piw / Cos(r) / 2!) * zoomfactor)
 Dim cDIBbuffer1 As Object
 Set cDIBbuffer1 = New cDIBSection
 If piw <= 1 Then piw = 2
 If pih <= 1 Then pih = 2
-Call cDIBbuffer1.create((piw) * zoomfactor, (pih) * zoomfactor)
+Call cDIBbuffer1.Create((piw) * zoomfactor, (pih) * zoomfactor)
 cDIBbuffer1.GetDpiDIB cDibbuffer0
 cDibbuffer0.needHDC
 cDIBbuffer1.LoadPictureStretchBlt cDibbuffer0.HDC1, , , , , pix, piy, piw, pih
 cDibbuffer0.FreeHDC
-myw = Fix(2 * k)
-myh = Fix(2 * k)
+myw = Fix(2 * K)
+myh = Fix(2 * K)
 cDibbuffer0.ClearUp
-If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
+If cDibbuffer0.Create(CLng(myw), CLng(myh)) Then
     On Error Resume Next
     With tSA
         .cbElements = 1
@@ -1186,8 +1186,8 @@ If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
     pw = cDIBbuffer1.Width
     ph = cDIBbuffer1.Height
 
-    R = Atn(CSng(myw) / CSng(myh))
-    k = -CSng(myw) / (2! * Sin(R))
+    r = Atn(CSng(myw) / CSng(myh))
+    K = -CSng(myw) / (2! * sIn(r))
   
     Const pidicv2 = 1.570795!
     pw1 = pw + 1
@@ -1195,17 +1195,17 @@ If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
    
     pws = pw1 * zoomfactor
     phs = ph1 * zoomfactor
-    image_x = ((pws - zoomfactor - b) / 2 - (k * Sin(Angle! - R))) * pw
-    image_y = ((phs - zoomfactor - b) / 2 + (k * Cos(Angle! - R))) * ph
+    image_x = ((pws - zoomfactor - b) / 2 - (K * sIn(Angle! - r))) * pw
+    image_y = ((phs - zoomfactor - b) / 2 + (K * Cos(Angle! - r))) * ph
     image_x = image_x - MyMod(image_x, CSng(dv15))
     image_y = image_y - MyMod(image_y, CSng(dv15))
    
 
     x_step2 = Cos(Angle! + pidicv2) * pw
-    y_step2 = Sin(Angle! + pidicv2) * ph
+    y_step2 = sIn(Angle! + pidicv2) * ph
     
     x_step = Cos(Angle!) * pw
-    y_step = Sin(Angle!) * ph
+    y_step = sIn(Angle!) * ph
     
     pws = pws + 1
     phs = phs + 1
@@ -1230,7 +1230,7 @@ If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
                  bDib1(screen_x + 1, screen_y) = yf1 * (xf1 * bDib(mmx + 1, mmy) + xf * bDib(mmx + 4, mmy)) + yf * (xf1 * bDib(mmx + 1, mmy + 1) + xf * bDib(mmx + 4, mmy + 1))
                  bDib1(screen_x + 2, screen_y) = yf1 * (xf1 * bDib(mmx + 2, mmy) + xf * bDib(mmx + 5, mmy)) + yf * (xf1 * bDib(mmx + 2, mmy + 1) + xf * bDib(mmx + 5, mmy + 1))
              Else
-                 bDib1(screen_x, screen_y) = br
+                 bDib1(screen_x, screen_y) = bR
                  bDib1(screen_x + 1, screen_y) = bG
                  bDib1(screen_x + 2, screen_y) = bbb
              End If
@@ -1254,12 +1254,12 @@ If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long
   
-myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * zoomfactor, 0) + 4
-myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0) + 4
+myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * sIn(Angle!))) * zoomfactor, 0) + 4
+myh = Round((Abs(piw * sIn(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0) + 4
 Dim prive As basket
 prive = players(GetCode(bstack.Owner))
 Dim cDibbuffer0 As New cDIBSection
-If cDibbuffer0.create(myw, myh) Then
+If cDibbuffer0.Create(myw, myh) Then
 On Error GoTo there
         With bstack.Owner
          If bstack.toprinter Then
@@ -1282,12 +1282,12 @@ If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long
   
-myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * zoomfactor, 0) + 4
-myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0) + 4
+myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * sIn(Angle!))) * zoomfactor, 0) + 4
+myh = Round((Abs(piw * sIn(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0) + 4
 Dim prive As basket
 prive = players(GetCode(bstack.Owner))
 Dim cDibbuffer0 As New cDIBSection
-If cDibbuffer0.create(myw, myh) Then
+If cDibbuffer0.Create(myw, myh) Then
 On Error GoTo there
         With bstack.Owner
          If bstack.toprinter Then
@@ -1307,7 +1307,7 @@ End Function
 '
 Public Function RotateDib(bstack As basetask, cDibbuffer0 As cDIBSection, Optional ByVal Angle! = 0, Optional ByVal zoomfactor As Single = 100, _
     Optional bckColor As Long = -1, Optional nogetback As Boolean = False, Optional Alpha As Long = 100, Optional amask$ = vbNullString)
-    Const Pi = 3.14159!
+    Const PI = 3.14159!
      Dim b As Single
    b = CSng(CLng(Angle!) Mod 90 = 0)
 Angle! = -MyMod(Angle!, 360!) * 1.745329E-02!
@@ -1351,24 +1351,24 @@ End If
 
 
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim k As Single, R As Single, ppBa As Long
-Dim br As Byte, bG As Byte, bbb As Byte, ba$
+Dim K As Single, r As Single, ppBa As Long
+Dim bR As Byte, bG As Byte, bbb As Byte, bA$
 Dim BR1 As Byte, BG1 As Byte, bbb1 As Byte
 ppBa = VarPtr(bckColor)
 GetMem1 ppBa, bbb
 GetMem1 ppBa + 1, bG
-GetMem1 ppBa + 2, br
+GetMem1 ppBa + 2, bR
 
     piw = cDibbuffer0.Width
     pih = cDibbuffer0.Height
  Set cDIBbuffer1 = cDibbuffer0 'New cDIBSection
  Set cDibbuffer0 = New cDIBSection
-myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * zoomfactor, 0)
-myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0)
+myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * sIn(Angle!))) * zoomfactor, 0)
+myh = Round((Abs(piw * sIn(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0)
 cDibbuffer0.ClearUp
 Dim prive As basket
 prive = players(GetCode(bstack.Owner))
-If cDibbuffer0.create(myw, myh) Then
+If cDibbuffer0.Create(myw, myh) Then
 On Error GoTo there
 
    
@@ -1425,16 +1425,16 @@ Dim tSA2 As SAFEARRAY2D
      pws = pw * zoomfactor
     phs = ph * zoomfactor
     
-    R = Atn(CSng(myw) / CSng(myh))
-    k = -CSng(myw) / (2! * Sin(R))
+    r = Atn(CSng(myw) / CSng(myh))
+    K = -CSng(myw) / (2! * sIn(r))
     
     x_step = Cos(Angle!) * pw
-    y_step = Sin(Angle!) * ph
+    y_step = sIn(Angle!) * ph
 
     x_step2 = Cos(Angle! + pidicv2) * pw
-    y_step2 = Sin(Angle! + pidicv2) * ph
-  image_x = ((pws - b) / 2 - (k * Sin(Angle! - R))) * pw
-   image_y = ((phs - b) / 2 + (k * Cos(Angle! - R))) * ph
+    y_step2 = sIn(Angle! + pidicv2) * ph
+  image_x = ((pws - b) / 2 - (K * sIn(Angle! - r))) * pw
+   image_y = ((phs - b) / 2 + (K * Cos(Angle! - r))) * ph
       image_x = image_x - MyMod(image_x, CSng(dv15))
    image_y = image_y - MyMod(image_y, CSng(dv15))
   pws = pws + 1
@@ -1465,7 +1465,7 @@ Dim tSA2 As SAFEARRAY2D
                 
                               If mmx >= 0 And mmx < pw And mmy >= 0 And mmy < ph Then  'new
                                  mmx = mmx * 3
-                                                           If bDib(mmx, mmy) <> br Or bDib(mmx + 1, mmy) <> bG Or bDib(mmx + 2, mmy) <> bbb Then
+                                                           If bDib(mmx, mmy) <> bR Or bDib(mmx + 1, mmy) <> bG Or bDib(mmx + 2, mmy) <> bbb Then
                                  bDib1(screen_x, screen_y) = (bDib(mmx, mmy) * CLng(255 - bDib2(mmx, mmy)) + bDib1(screen_x, screen_y) * CLng(bDib2(mmx, mmy))) \ 255
                                  bDib1(screen_x + 1, screen_y) = (bDib(mmx + 1, mmy) * CLng(255 - bDib2(mmx + 1, mmy)) + bDib1(screen_x + 1, screen_y) * CLng(bDib2(mmx + 1, mmy))) \ 255
                                  bDib1(screen_x + 2, screen_y) = (bDib(mmx + 2, mmy) * CLng(255 - bDib2(mmx + 2, mmy)) + bDib1(screen_x + 2, screen_y) * CLng(bDib2(mmx + 2, mmy))) \ 255
@@ -1492,7 +1492,7 @@ Dim tSA2 As SAFEARRAY2D
                     mmy = Int(temp_image_y / phs)
                      If mmx >= 0 And mmx < pw And mmy >= 0 And mmy < ph Then ' new
                         mmx = mmx * 3
-                        If bDib(mmx, mmy) <> br Or bDib(mmx + 1, mmy) <> bG Or bDib(mmx + 2, mmy) <> bbb Then
+                        If bDib(mmx, mmy) <> bR Or bDib(mmx + 1, mmy) <> bG Or bDib(mmx + 2, mmy) <> bbb Then
                                       If Alpha = 0 Then
                                       ElseIf Alpha = 100 Then
                                         bDib1(screen_x, screen_y) = bDib(mmx, mmy)
@@ -1540,7 +1540,7 @@ End Function
 
 Public Function RotateDib1(bstack As basetask, cDibbuffer0 As cDIBSection, Optional ByVal Angle! = 0, Optional ByVal zoomfactor As Single = 100, _
    Optional bckColor As Long = -1, Optional BACKx As Long, Optional BACKy As Long)
-   Const Pi = 3.14159!
+   Const PI = 3.14159!
    Dim b As Single
    
    b = CSng(Angle! Mod 90 = 0)
@@ -1548,7 +1548,7 @@ Angle! = -MyMod(Angle!, 360!) * 1.745329E-02!
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100!
 Dim myw As Single, myh As Single, piw As Long, pih As Long, pix As Long, piy As Long
-Dim k As Single, R As Single
+Dim K As Single, r As Single
 Const pidicv2 = 1.570795!
 'If zoomfactor = 1 And angle! = 0 Then Exit Function
     piw = cDibbuffer0.Width
@@ -1556,18 +1556,18 @@ Const pidicv2 = 1.570795!
  Dim cDIBbuffer1 As Object, cDIBbuffer2 As Object
  Set cDIBbuffer1 = New cDIBSection
 
-Call cDIBbuffer1.create(piw, pih)
+Call cDIBbuffer1.Create(piw, pih)
 cDIBbuffer1.GetDpiDIB cDibbuffer0
 cDibbuffer0.needHDC
 cDIBbuffer1.LoadPictureBlt cDibbuffer0.HDC1
 cDibbuffer0.FreeHDC
   
  
-myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * zoomfactor, 0)
-myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0)
+myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * sIn(Angle!))) * zoomfactor, 0)
+myh = Round((Abs(piw * sIn(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0)
 
 cDibbuffer0.ClearUp
-If cDibbuffer0.create(myw, myh) Then
+If cDibbuffer0.Create(myw, myh) Then
 On Error GoTo there
 If bckColor >= 0 Then
 cDibbuffer0.Cls bckColor
@@ -1620,8 +1620,8 @@ Dim tSA2 As SAFEARRAY2D
     Dim pw As Long, ph As Long
      pw = piw
     ph = pih
-    R = Atn(CSng(myw) / CSng(myh))
-    k = -myw / (2! * Sin(R))
+    r = Atn(CSng(myw) / CSng(myh))
+    K = -myw / (2! * sIn(r))
   
     Dim pw1 As Long, ph1 As Long
     
@@ -1632,15 +1632,15 @@ Dim tSA2 As SAFEARRAY2D
    
          pws = pw1 * zoomfactor
     phs = ph1 * zoomfactor
-  image_x = ((pws - zoomfactor - b) / 2 - (k * Sin(Angle! - R))) * pw
-   image_y = ((phs - zoomfactor - b) / 2 + (k * Cos(Angle! - R))) * ph
+  image_x = ((pws - zoomfactor - b) / 2 - (K * sIn(Angle! - r))) * pw
+   image_y = ((phs - zoomfactor - b) / 2 + (K * Cos(Angle! - r))) * ph
    image_x = image_x - MyMod(image_x, CSng(dv15))
    image_y = image_y - MyMod(image_y, CSng(dv15))
    x_step2 = Cos(Angle! + pidicv2) * pw
-    y_step2 = Sin(Angle! + pidicv2) * ph
+    y_step2 = sIn(Angle! + pidicv2) * ph
 
     x_step = Cos(Angle!) * pw
-    y_step = Sin(Angle!) * ph
+    y_step = sIn(Angle!) * ph
   pws = pws + 1
   phs = phs + 1
     pw1 = pw - 1
@@ -1699,7 +1699,7 @@ End Function
 Sub Conv24(cDibbuffer0 As Object)
  Dim cDIBbuffer1 As Object
  Set cDIBbuffer1 = New cDIBSection
-Call cDIBbuffer1.create(cDibbuffer0.Width, cDibbuffer0.Height)
+Call cDIBbuffer1.Create(cDibbuffer0.Width, cDibbuffer0.Height)
 cDIBbuffer1.LoadPictureBlt cDibbuffer0.hDC
 Set cDibbuffer0 = cDIBbuffer1
 Set cDIBbuffer1 = Nothing
@@ -1726,28 +1726,28 @@ Call SetWindowRgn(.hWnd, (0), False)
 End With
 End Sub
 Public Function RotateRegion(hRgn As Long, Angle As Single, ByVal piw As Long, ByVal pih As Long, ByVal Size As Single) As Long
-Dim k As Single, R As Single, aa As Single
+Dim K As Single, r As Single, aa As Single
 aa = (CLng(Angle! * 100) Mod 36000) / 100
 
 Angle! = -Angle * 1.74532925199433E-02
-   R = Atn(piw / CSng(pih)) + Pi / 2!
-    k = piw / Cos(R)
+   r = Atn(piw / CSng(pih)) + PI / 2!
+    K = piw / Cos(r)
     Dim myw As Long, myh As Long
- myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * Size, 0)
-myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * Size, 0)
+ myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * sIn(Angle!))) * Size, 0)
+myh = Round((Abs(piw * sIn(Angle!)) + Abs(pih * Cos(Angle!))) * Size, 0)
 hRgn = ScaleRegion(hRgn, Size)
 
 
     Dim uXF As XFORM
     Dim D2R As Single, rData() As Byte, rSize As Long
     uXF.eM11 = Cos(Angle!)
-    uXF.eM12 = Sin(Angle!)
-    uXF.eM21 = -Sin(Angle!)
+    uXF.eM12 = sIn(Angle!)
+    uXF.eM21 = -sIn(Angle!)
     uXF.eM22 = Cos(Angle!)
-k = Abs(k)
+K = Abs(K)
 
-uXF.eDx = Round(k * Cos(Angle! - R) / 2! + k / 2!, 0)
-uXF.eDy = Round(k * Sin(Angle! - R) / 2! + k / 2!, 0)
+uXF.eDx = Round(K * Cos(Angle! - r) / 2! + K / 2!, 0)
+uXF.eDy = Round(K * sIn(Angle! - r) / 2! + K / 2!, 0)
 
 
     rSize = GetRegionData(hRgn, rSize, ByVal 0&)
@@ -1858,21 +1858,21 @@ SetText Form1.dSprite(PobjNum)
 End If
 
 End If
-Dim i As Long, k As Integer
+Dim i As Long, K As Integer
 
 For i = Priority To 32
-k = FindSpriteByTag(i)
-If k <> 0 Then Form1.dSprite(k).ZOrder 0
+K = FindSpriteByTag(i)
+If K <> 0 Then Form1.dSprite(K).ZOrder 0
 Next i
 
 
 End Function
 Function CollidePlayers(Priority As Long, Percent As Long) As Long
-Dim i As Long, k As Integer, suma As Long
+Dim i As Long, K As Integer, suma As Long
 Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, it As Long
-k = FindSpriteByTag(Priority)
-If k = 0 Then Exit Function
-With Form1.dSprite(k)
+K = FindSpriteByTag(Priority)
+If K = 0 Then Exit Function
+With Form1.dSprite(K)
 it = val("0" & .Tag)
 x1 = .Left + .Width * (100 - Percent) / 200 - players(it).HotSpotX
 y1 = .top + .Height * (100 - Percent) / 200 - players(it).HotSpotY
@@ -1880,9 +1880,9 @@ x2 = .Left + .Width * (1 - (100 - Percent) / 200) - players(it).HotSpotX
 y2 = .top + .Height * (1 - (100 - Percent) / 200) - players(it).HotSpotY
 End With
 For i = Priority - 1 To 1 Step -1
-k = FindSpriteByTag(i)
-If k <> 0 Then
-    With Form1.dSprite(k)
+K = FindSpriteByTag(i)
+If K <> 0 Then
+    With Form1.dSprite(K)
         If (x2 < .Left + .Width / 4) Or (x1 >= .Left + .Width * 3 / 4) Or (y2 <= .top + .Height / 4) Or (y1 > .top + .Height * 3 / 4) Then
         Else
         suma = suma + 2 ^ (i - 1)
@@ -1893,10 +1893,10 @@ Next i
 CollidePlayers = suma
 End Function
 Function SpriteVisible(Priority As Long) As Boolean
-Dim k As Long
-    k = FindSpriteByTag(Priority)
-    If k = 0 Then Exit Function
-    SpriteVisible = Form1.dSprite(k).Visible
+Dim K As Long
+    K = FindSpriteByTag(Priority)
+    If K = 0 Then Exit Function
+    SpriteVisible = Form1.dSprite(K).Visible
 End Function
 Function CollideArea(Priority As Long, Percent As Long, basestack As basetask, rest$) As Boolean
 ' nx2 isn't width but absolute line at nx2
@@ -1916,13 +1916,13 @@ End If
 End If
 
 
-Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, k As Long
-k = FindSpriteByTag(Priority)
-If k = 0 Then Exit Function
-x1 = Form1.dSprite(k).Left + Form1.dSprite(k).Width * (100 - Percent) / 200
-y1 = Form1.dSprite(k).top + Form1.dSprite(k).Height * (100 - Percent) / 200
-x2 = x1 + Form1.dSprite(k).Width * (1 - 2 * (100 - Percent) / 200)
-y2 = y1 + Form1.dSprite(k).Height * (1 - 2 * (100 - Percent) / 200)
+Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, K As Long
+K = FindSpriteByTag(Priority)
+If K = 0 Then Exit Function
+x1 = Form1.dSprite(K).Left + Form1.dSprite(K).Width * (100 - Percent) / 200
+y1 = Form1.dSprite(K).top + Form1.dSprite(K).Height * (100 - Percent) / 200
+x2 = x1 + Form1.dSprite(K).Width * (1 - 2 * (100 - Percent) / 200)
+y2 = y1 + Form1.dSprite(K).Height * (1 - 2 * (100 - Percent) / 200)
 If x2 < nx1 Or x1 >= nx2 Or y2 <= ny1 Or y1 > ny2 Then
 CollideArea = False
 Else
@@ -1933,7 +1933,7 @@ Function GetNewLayerObj(Priority As Long, ByVal lWidth As Long, ByVal lHeight As
 Dim photo As cDIBSection, myRgn As Long, oldobj As Long
 
 Set photo = New cDIBSection
-If photo.create(lWidth / DXP, lHeight / DYP) Then
+If photo.Create(lWidth / DXP, lHeight / DYP) Then
 photo.WhiteBits
 addSprite
 Load Form1.dSprite(PobjNum)
@@ -1948,64 +1948,64 @@ On Error Resume Next
 .ZOrder 0
 End With
 GetNewLayerObj = PobjNum
-Dim i As Long, k As Integer
+Dim i As Long, K As Integer
 For i = Priority To 32
-k = FindSpriteByTag(i)
-If k <> 0 Then Form1.dSprite(k).ZOrder 0
+K = FindSpriteByTag(i)
+If K <> 0 Then Form1.dSprite(K).ZOrder 0
 Next i
 End If
 End Function
 
 Function PosSpriteX(aPrior As Long) As Long ' before take from priority the original sprite
 '
-Dim k As Long
-k = FindSpriteByTag(aPrior)
-If k < 1 Or k > PobjNum Then Exit Function
-PosSpriteX = Form1.dSprite(k).Left
+Dim K As Long
+K = FindSpriteByTag(aPrior)
+If K < 1 Or K > PobjNum Then Exit Function
+PosSpriteX = Form1.dSprite(K).Left
 End Function
 Function PosSpriteY(aPrior As Long) As Long ' before take from priority the original sprite
-Dim k As Long
-k = FindSpriteByTag(aPrior)
-If k < 1 Or k > PobjNum Then Exit Function
- PosSpriteY = Form1.dSprite(k).top
+Dim K As Long
+K = FindSpriteByTag(aPrior)
+If K < 1 Or K > PobjNum Then Exit Function
+ PosSpriteY = Form1.dSprite(K).top
 End Function
 
 Sub PosSprite(aPrior As Long, ByVal X As Long, ByVal Y As Long) ' ' before take from priority the original sprite
-Dim k As Long
-k = FindSpriteByTag(aPrior)
-If k < 1 Or k > PobjNum Then Exit Sub
+Dim K As Long
+K = FindSpriteByTag(aPrior)
+If K < 1 Or K > PobjNum Then Exit Sub
  
 
-Form1.dSprite(k).move X, Y
+Form1.dSprite(K).move X, Y
 
 End Sub
 Sub SrpiteHideShow(ByVal aPrior As Long, ByVal wh As Boolean) ' this is a priority
 On Error Resume Next
-Dim k As Long
-k = FindSpriteByTag(aPrior)
-If k < 1 Or k > PobjNum Then Exit Sub
-Form1.dSprite(k).Visible = wh
+Dim K As Long
+K = FindSpriteByTag(aPrior)
+If K < 1 Or K > PobjNum Then Exit Sub
+Form1.dSprite(K).Visible = wh
 If wh Then
 If Form1.Visible Then
-MyDoEvents1 Form1.dSprite(k)
+MyDoEvents1 Form1.dSprite(K)
 End If
 End If
 End Sub
 Sub SpriteControl(ByVal aPrior As Long, ByVal bPrior As Long) ' these are priorities
-Dim k As Long, m As Long, i As Long
-k = FindSpriteByTag(aPrior)
+Dim K As Long, m As Long, i As Long
+K = FindSpriteByTag(aPrior)
 
-If k = 0 Then Exit Sub  ' there is no such a player
+If K = 0 Then Exit Sub  ' there is no such a player
 
     m = FindSpriteByTag(bPrior)
         If m = 0 Then Exit Sub
-        Form1.dSprite(k).Tag = bPrior
+        Form1.dSprite(K).Tag = bPrior
         Form1.dSprite(m).Tag = aPrior
         
     If aPrior < bPrior Then
     For i = aPrior To 32
-        k = FindSpriteByTag(i)
-        If k <> 0 Then Form1.dSprite(k).ZOrder 0
+        K = FindSpriteByTag(i)
+        If K <> 0 Then Form1.dSprite(K).ZOrder 0
     Next i
     Else
     For i = bPrior To 32
@@ -2015,10 +2015,10 @@ If k = 0 Then Exit Sub  ' there is no such a player
 End If
 End Sub
 Sub SpriteControlOver(ByVal aPrior As Long, ByVal bPrior As Long) ' these are priorities
-Dim k As Long, m As Long, i As Long, LL As Long
-k = FindSpriteByTag(aPrior)
+Dim K As Long, m As Long, i As Long, LL As Long
+K = FindSpriteByTag(aPrior)
 
-If k = 0 Then Exit Sub  ' there is no such a player
+If K = 0 Then Exit Sub  ' there is no such a player
 
     LL = FindSpriteByTag(bPrior)
         If LL = 0 Then Exit Sub
@@ -2032,9 +2032,9 @@ If k = 0 Then Exit Sub  ' there is no such a player
             aPrior = bPrior
         End If
     Next i
-    Form1.dSprite(k).ZOrder 0
-    bPrior = Form1.dSprite(k).Tag
-    Form1.dSprite(k).Tag = aPrior
+    Form1.dSprite(K).ZOrder 0
+    bPrior = Form1.dSprite(K).Tag
+    Form1.dSprite(K).Tag = aPrior
     For i = LL To 32
         m = FindSpriteByTag(i)
         If m <> 0 Then
@@ -2044,15 +2044,15 @@ If k = 0 Then Exit Sub  ' there is no such a player
 
 End Sub
 Sub SpriteControlUnder(ByVal aPrior As Long, ByVal bPrior As Long) ' these are priorities
-Dim k As Long, m As Long, i As Long, LL As Long
-k = FindSpriteByTag(aPrior)
+Dim K As Long, m As Long, i As Long, LL As Long
+K = FindSpriteByTag(aPrior)
 
-If k = 0 Then Exit Sub  ' there is no such a player
+If K = 0 Then Exit Sub  ' there is no such a player
 
     LL = FindSpriteByTag(bPrior)
         If LL = 0 Then Exit Sub
     LL = bPrior - 1
-     For i = k - 1 To LL Step -1
+     For i = K - 1 To LL Step -1
         m = FindSpriteByTag(i)
         If m <> 0 Then
             Form1.dSprite(m).ZOrder 1
@@ -2061,9 +2061,9 @@ If k = 0 Then Exit Sub  ' there is no such a player
             aPrior = bPrior
         End If
     Next i
-    Form1.dSprite(k).ZOrder 1
-    bPrior = Form1.dSprite(k).Tag
-    Form1.dSprite(k).Tag = aPrior
+    Form1.dSprite(K).ZOrder 1
+    bPrior = Form1.dSprite(K).Tag
+    Form1.dSprite(K).Tag = aPrior
     For i = LL To 1 Step -1
         m = FindSpriteByTag(i)
         If m <> 0 Then
@@ -2146,10 +2146,10 @@ PobjNum = PobjNum + 1
 End Sub
 Sub ClrSprites()
 On Error Resume Next
-Dim i As Long, Zero As basket, zerocounter As Counters
+Dim i As Long, zero As basket, zerocounter As Counters
 If PobjNum > 0 Then
 For i = PobjNum To 1 Step -1
-        players(i) = Zero
+        players(i) = zero
         Prefresh(i) = zerocounter
         PobjNum = i
 If Form1.dSprite.count > PobjNum Then Unload Form1.dSprite(PobjNum)
@@ -2182,11 +2182,11 @@ Dim tSA As SAFEARRAY2D
     End With
     CopyMemory ByVal VarPtrArray(bDib()), VarPtr(tSA), 4
 '.........................
-Dim br As Integer, bG As Integer, bbb As Integer, ppBa As Long  ', ba$, copy1 as long
+Dim bR As Integer, bG As Integer, bbb As Integer, ppBa As Long  ', ba$, copy1 as long
 ppBa = VarPtr(lBackColor)
 GetMem1 ppBa, bbb
 GetMem1 ppBa + 1, bG
-GetMem1 ppBa + 2, br
+GetMem1 ppBa + 2, bR
 
 'ba$ = Hex$(lBackColor)
 'ba$ = Right$("00000" & ba$, 6)
@@ -2214,7 +2214,7 @@ Dim GLHEIGHT, GLWIDTH As Long
             '
             Do While lCol < GLWIDTH
              
-            If Abs(bDib(mmx, mmy) - br) > range Or Abs(bDib(mmx + 1, mmy) - bG) > range Or Abs(bDib(mmx + 2, mmy) - bbb) > range Then Exit Do
+            If Abs(bDib(mmx, mmy) - bR) > range Or Abs(bDib(mmx + 1, mmy) - bG) > range Or Abs(bDib(mmx + 2, mmy) - bbb) > range Then Exit Do
                lCol = lCol + 1
                 mmx = mmx + 3
             Loop
@@ -2227,7 +2227,7 @@ Dim GLHEIGHT, GLWIDTH As Long
                 lStart = lCol
                
                 Do While lCol < GLWIDTH
-                 If Not (Abs(bDib(mmx, mmy) - br) > range Or Abs(bDib(mmx + 1, mmy) - bG) > range Or Abs(bDib(mmx + 2, mmy) - bbb) > range) Then Exit Do
+                 If Not (Abs(bDib(mmx, mmy) - bR) > range Or Abs(bDib(mmx + 1, mmy) - bG) > range Or Abs(bDib(mmx + 2, mmy) - bbb) > range) Then Exit Do
 
                 mmx = mmx + 3
                     lCol = lCol + 1
@@ -2277,16 +2277,16 @@ Dim tSA As SAFEARRAY2D
     End With
     CopyMemory ByVal VarPtrArray(bDib()), VarPtr(tSA), 4
 '.........................
-Dim br As Integer, bG As Integer, bbb As Integer, ppBa As Long, ba$
+Dim bR As Integer, bG As Integer, bbb As Integer, ppBa As Long, bA$
 ppBa = VarPtr(lBackColor)
 GetMem1 ppBa, bbb
 GetMem1 ppBa + 1, bG
-GetMem1 ppBa + 2, br
-ba$ = Hex$(lBackColor)
-ba$ = Right$("00000" & ba$, 6)
-br = val("&h" & Mid$(ba$, 1, 2))
-bG = val("&h" & Mid$(ba$, 3, 2))
-bbb = val("&h" & Mid$(ba$, 5, 2))
+GetMem1 ppBa + 2, bR
+bA$ = Hex$(lBackColor)
+bA$ = Right$("00000" & bA$, 6)
+bR = val("&h" & Mid$(bA$, 1, 2))
+bG = val("&h" & Mid$(bA$, 3, 2))
+bbb = val("&h" & Mid$(bA$, 5, 2))
 
 '..................................
 Dim mmx As Long, mmy As Long, cc As Long
@@ -2306,7 +2306,7 @@ lSkinRgn = CreateRectRgn(0, 0, 0, 0)
             ' color as the background color.
             '
             Do While lCol < GLWIDTH
-            If Abs(bDib(mmx, mmy) - br) > range Or Abs(bDib(mmx + 1, mmy) - bG) > range Or Abs(bDib(mmx + 2, mmy) - bbb) > range Then Exit Do
+            If Abs(bDib(mmx, mmy) - bR) > range Or Abs(bDib(mmx + 1, mmy) - bG) > range Or Abs(bDib(mmx + 2, mmy) - bbb) > range Then Exit Do
                 lCol = lCol + 1
                 mmx = mmx + 3
             Loop
@@ -2318,7 +2318,7 @@ lSkinRgn = CreateRectRgn(0, 0, 0, 0)
                 '
                 lStart = lCol
                 Do While lCol < GLWIDTH
-                If Not (Abs(bDib(mmx, mmy) - br) > range Or Abs(bDib(mmx + 1, mmy) - bG) > range Or Abs(bDib(mmx + 2, mmy) - bbb) > range) Then Exit Do
+                If Not (Abs(bDib(mmx, mmy) - bR) > range Or Abs(bDib(mmx + 1, mmy) - bG) > range Or Abs(bDib(mmx + 2, mmy) - bbb) > range) Then Exit Do
 
                 mmx = mmx + 3
                     lCol = lCol + 1
@@ -2490,24 +2490,36 @@ Set bsdady = bs.Parent
           TaskMaster.RestEnd
 
 End Sub
+Public Sub ClearClipBoard()
+    If (OpenClipboard(Form1.hWnd) <> 0) Then
+        EmptyClipboard
+        CloseClipboard
+    End If
+End Sub
 Public Function SetTextData( _
         ByVal lFormatId As Long, _
          sText As String _
     ) As Boolean
     ' use strptr and lenb
+
     Dim hMem As Long, lPtr As Long
     Dim lSize As Long
-        lSize = LenB(sText)
+    lSize = LenB(sText)
     hMem = GlobalAlloc(0, lSize + 2)
-If (hMem > 0) Then
+    If (hMem > 0) Then
         lPtr = GlobalLock(hMem)
         CopyMemory ByVal lPtr, ByVal StrPtr(sText), lSize + 1
         GlobalUnlock hMem
-       If (OpenClipboard(0) <> 0) Then
-    
-      SetClipboardData lFormatId, hMem
-      CloseClipboard
-       End If
+        If (OpenClipboard(Form1.hWnd) <> 0) Then
+            If EmptyClipboard Then
+                If SetClipboardData(lFormatId, hMem) = 0 Then
+                    GlobalFree hMem
+                End If
+            Else
+                GlobalFree hMem
+            End If
+        CloseClipboard
+    End If
           
     End If
     
@@ -2522,18 +2534,18 @@ Public Function HTML(sText As String, _
                   "EndHTML:bbbbbbbbbb" + vbCrLf + _
                   "StartFragment:cccccccccc" + vbCrLf + _
                   "EndFragment:dddddddddd" + vbCrLf
-    Dim a() As Byte, b() As Byte, c() As Byte
+    Dim a() As Byte, b() As Byte, C() As Byte
    '' sText = "<FONT FACE=Arial SIZE=1 COLOR=BLUE>" + sText + "</FONT>"
    
     a() = Utf16toUtf8(sContextStart & "<!--StartFragment -->")
     b() = Utf16toUtf8(sText)
-    c() = Utf16toUtf8("<!--EndFragment -->" & sContextEnd)
+    C() = Utf16toUtf8("<!--EndFragment -->" & sContextEnd)
    Dim sData As String, mdata As Long, eData As Long, fData As Long
 
    
     eData = UBound(a()) - LBound(a()) + 1
    mdata = UBound(b()) - LBound(b()) + 1
-   fData = UBound(c()) - LBound(c()) + 1
+   fData = UBound(C()) - LBound(C()) + 1
    m_sDescription = Replace(m_sDescription, "aaaaaaaaaa", Format(Len(m_sDescription), "0000000000"))
    m_sDescription = Replace(m_sDescription, "bbbbbbbbbb", Format(Len(m_sDescription) + eData + mdata + fData, "0000000000"))
    m_sDescription = Replace(m_sDescription, "cccccccccc", Format(Len(m_sDescription) + eData, "0000000000"))
@@ -2545,35 +2557,45 @@ Public Function HTML(sText As String, _
   CopyMemory all(0), m(0), Len(m_sDescription)
   CopyMemory all(Len(m_sDescription)), a(0), eData
   CopyMemory all(Len(m_sDescription) + eData), b(0), mdata
-  CopyMemory all(Len(m_sDescription) + eData + mdata), c(0), fData
+  CopyMemory all(Len(m_sDescription) + eData + mdata), C(0), fData
   HTML = all()
   
 End Function
 
-Public Function SimpleHtmlData(ByVal sText As String)
+Public Function SimpleHtmlData(ByVal sText As String, ByVal stext2)
 Dim lFormatId As Long, bb() As Byte
 lFormatId = RegisterCF
 If lFormatId <> 0 Then
 If sText = vbNullString Then Exit Function
 bb() = HTML(sText)
-If CBool(OpenClipboard(0)) Then
-   
+
+If CBool(OpenClipboard(Form1.hWnd)) Then
       Dim hMemHandle As Long, lpData As Long
-      'If IsWine Then
-      'hMemHandle = GlobalAlloc(0, UBound(bb()) - LBound(bb()) + 10)
-      'Else
       hMemHandle = GlobalAlloc(0, UBound(bb()) - LBound(bb()) + 10)
-      'End If
       If CBool(hMemHandle) Then
-               
          lpData = GlobalLock(hMemHandle)
          If lpData <> 0 Then
-            
             CopyMemory ByVal lpData, bb(0), UBound(bb()) - LBound(bb())
             GlobalUnlock hMemHandle
-            EmptyClipboard
-            SetClipboardData lFormatId, hMemHandle
-                        
+            If EmptyClipboard Then
+                If SetClipboardData(lFormatId, hMemHandle) = 0 Then
+                   GlobalFree hMemHandle
+                End If
+                Dim lSize As Long, hMem As Long, lPtr As Long
+                lSize = LenB(stext2)
+                If lSize > 0 Then
+                    lFormatId = 13
+                    hMem = GlobalAlloc(0, lSize + 2)
+                    lPtr = GlobalLock(hMem)
+                    CopyMemory ByVal lPtr, ByVal StrPtr(stext2), lSize + 1
+                    GlobalUnlock hMem
+                    If SetClipboardData(lFormatId, hMem) = 0 Then
+                        GlobalFree hMem
+                    End If
+                End If
+            Else
+                GlobalFree hMemHandle
+            End If
          End If
       
       End If
@@ -2595,30 +2617,6 @@ Function RegisterCF() As Long
    RegisterCF = m_cfHTMLClipFormat
    
 End Function
-Public Function SetTextDataLong( _
-        ByVal lFormatId As Long, _
-         dLong As Long _
-    ) As Boolean
-    ' use strptr and lenb
-    Dim hMem As Long, lPtr As Long
-    Dim checkme As Long
-    Dim lSize As Long
-        lSize = 4
-    hMem = GlobalAlloc(0, lSize)
-If (hMem > 0) Then
-        lPtr = GlobalLock(hMem)
-        CopyMemory ByVal lPtr, dLong, lSize
-        CopyMemory checkme, ByVal lPtr, lSize
-        GlobalUnlock hMem
-       If (OpenClipboard(0) <> 0) Then
-       SetClipboardData lFormatId, hMem
-      CloseClipboard
-       End If
-          
-    End If
-    
-
-End Function
 Public Function SetBinaryData( _
         ByVal lFormatId As Long, _
         ByRef bData() As Byte _
@@ -2634,9 +2632,14 @@ Dim hMem As Long
         CopyMemory ByVal lPtr, bData(LBound(bData)), lSize
         GlobalUnlock hMem
         OpenClipboard Form1.hWnd
-        EmptyClipboard
-        If (SetClipboardData(lFormatId, hMem) <> 0) Then
-          SetBinaryData = True
+        If EmptyClipboard Then
+            If (SetClipboardData(lFormatId, hMem) <> 0) Then
+              SetBinaryData = True
+            Else
+              GlobalFree hMem
+            End If
+        Else
+            GlobalFree hMem
         End If
        CloseClipboard
     End If
@@ -2690,12 +2693,14 @@ End Function
 Public Function GetTextData(ByVal lFormatId As Long) As String
 Dim bData() As Byte, sr As String, sr1 As String
 On Error Resume Next
-sr1 = Clipboard.GetText(1)
-If Err Then Err.Clear: Beep: Exit Function
-If (OpenClipboard(0) <> 0) Then
-
-        
-        If (GetBinaryData(lFormatId, bData())) Then
+Sleep 10
+    sr1 = Clipboard.GetText(1)
+    If Err.Number = 521 Then GoTo cont1
+    If Err Then Err.Clear: Beep: Exit Function
+cont1:
+Err.Clear
+If (OpenClipboard(Form1.hWnd) <> 0) Then
+    If (GetBinaryData(lFormatId, bData())) Then
         sr = bData
         If IsWine Then
                 sr1 = Left$(sr, Len(sr1))
@@ -2717,7 +2722,7 @@ Const CF_DIB = 8
 Const CF_ENHMETAFILE = 14
 Dim okb As Boolean
 If IsClipboardFormatAvailable(CF_ENHMETAFILE) Then
-     If (OpenClipboard(0) <> 0) Then
+     If (OpenClipboard(Form1.hWnd) <> 0) Then
          hEmf = GetClipboardData(CF_ENHMETAFILE)
          If hEmf <> 0 Then
              ' hCOPY = CopyEnhMetaFile(hemf, ByVal 0)
@@ -2737,14 +2742,14 @@ If IsClipboardFormatAvailable(CF_ENHMETAFILE) Then
     End If
     If aPic Is Nothing Then
         mypic.ClearUp
-        mypic.create 128, 128
+        mypic.Create 128, 128
         mypic.WhiteBits
         mypic.GetDpi 96, 96
         mypic.SaveDibToMeMBlock aPic
         aPic.SubType = 1 ' bitmap
     End If
     Set Carrier.objref = aPic
-    Carrier.t1 = 2
+    Carrier.T1 = 2
     Set GetImageEmf = Carrier
 
 
@@ -2757,7 +2762,7 @@ Dim aPic As MemBlock
 Dim Carrier As New mHandler
 Const CF_DIB = 8
 Dim okb As Boolean
-     If (OpenClipboard(0) <> 0) Then
+     If (OpenClipboard(Form1.hWnd) <> 0) Then
         
         hMem = GetClipboardData(CF_DIB)
         If hMem <> 0 Then
@@ -2784,14 +2789,14 @@ Dim okb As Boolean
     CloseClipboard
     If aPic Is Nothing Then
         mypic.ClearUp
-        mypic.create 128, 128
+        mypic.Create 128, 128
         mypic.WhiteBits
         mypic.GetDpi 96, 96
         mypic.SaveDibToMeMBlock aPic
         aPic.SubType = 1 ' bitmap
     End If
     Set Carrier.objref = aPic
-    Carrier.t1 = 2
+    Carrier.T1 = 2
     Set GetImageDIB = Carrier
 End If
 
@@ -2802,7 +2807,7 @@ Dim mypic As New cDIBSection
 Const CF_DIB = 8
 Dim okb As Boolean
     
-If (OpenClipboard(0) <> 0) Then
+If (OpenClipboard(Form1.hWnd) <> 0) Then
     hMem = GetClipboardData(CF_DIB)
     If hMem <> 0 Then
         hDib = GlobalLock(hMem)
@@ -3082,22 +3087,24 @@ Dim t(0 To 3) As Long
    CopyMemory ByVal a, t(0), 2
 End Sub
 Sub VarByRefClean(ByVal a As Long)
-Static z As Variant
-CopyMemory ByVal a, z, 16
+Static Z As Variant
+CopyMemory ByVal a, Z, 16
 End Sub
 Function VariantIsRef(ByVal a As Long) As Boolean
-Static z As Integer
-   CopyMemory z, ByVal a, 2
-   VariantIsRef = (z And &H4000) = &H4000
+Static Z As Integer
+   CopyMemory Z, ByVal a, 2
+   VariantIsRef = (Z And &H4000) = &H4000
 End Function
-Sub SwapVariantRef(ByRef a As Variant, ByVal b As Long)
-    Static z As Variant
+Sub SwapVariantRef(ByVal a As Long, ByVal b As Long)
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory ByVal VarPtr(t(0)), ByVal b, 16
-  ' t(0) = 17 ' t(0) Or &H4000
    
-   CopyMemory ByVal VarPtr(a), ByVal VarPtr(t(0)), 16
-   CopyMemory ByVal b, ByVal VarPtr(z), 16
+  ' If VariantIsRef(a) Then
+  Dim from As Long, em
+   from = MemLong(a + 8)
+   CopyMemory ByVal VarPtr(t(0)), ByVal from, 16
+   CopyMemory ByVal a, ByVal em, 16
+   CopyMemory ByVal b, VarPtr(t(0)), 16
+  ' End If
 End Sub
 Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
    Static t(0 To 3) As Long  ' 4 Longs * 4 bytes each = 16 bytes
@@ -3111,10 +3118,10 @@ Sub SwapVariant2(ByRef a As Variant, ByRef b As mArray, i As Long)
    CopyMemory ByVal VarPtr(a), ByVal b.itemPtr(i), 16
    CopyMemory ByVal b.itemPtr(i), t(0), 16
 End Sub
-Sub SwapVariant3(ByRef a As mArray, k As Long, ByRef b As mArray, i As Long)
+Sub SwapVariant3(ByRef a As mArray, K As Long, ByRef b As mArray, i As Long)
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory t(0), ByVal a.itemPtr(k), 16
-   CopyMemory ByVal a.itemPtr(k), ByVal b.itemPtr(i), 16
+   CopyMemory t(0), ByVal a.itemPtr(K), 16
+   CopyMemory ByVal a.itemPtr(K), ByVal b.itemPtr(i), 16
    CopyMemory ByVal b.itemPtr(i), t(0), 16
 End Sub
 Sub EmptyVariantArrayItem(ByRef b As mArray, i As Long)
@@ -3237,7 +3244,7 @@ Select Case a$
 Case "@(", "$(", "~(", "?", "->", "[]"
 Case "ABOUT", "ABOUT$", "ABS(", "ADDRESSOF", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
 Case "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
-Case "BACK", "BACKGROUND", "BACKWARD(", "BANK(", "BASE", "BEEP", "BINARY", "BINARY.ADD(", "BINARY.AND(", "BINARY.NEG(", "BINARY.NOT("
+Case "BACK", "BACKGROUND", "BACKWARD(", "BANK(", "BASE", "BEEP", "BIGINTEGER(", "BINARY", "BINARY.ADD(", "BINARY.AND(", "BINARY.NEG(", "BINARY.NOT("
 Case "BINARY.OR(", "BINARY.ROTATE(", "BINARY.SHIFT(", "BINARY.XOR(", "BITMAPS", "BMP$(", "BOLD"
 Case "BOOLEAN", "BORDER", "BREAK", "BROWSER", "BROWSER$", "BUFFER", "BUFFER(", "BYTE", "CALL", "CASE", "CASCADE", "CAT", "CAR("
 Case "CDATE(", "CDR(", "CEIL(", "CENTER", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN"
@@ -3328,7 +3335,7 @@ Case "йкилан.в", "йол$", "йоимос", "йоимои", "йомсока", "йяата", "йяатгсе", "йяу
 Case "йукисг", "йуяио", "йуяио.еяцо", "йыд(", "йыдийа", "йыдийосекида", "кабг", "кабг(", "кабг.амакоцийо.у(", "кабг.амакоцийо.ь("
 Case "кабг.амакоцийо.в(", "кабг.йатеухумсг(", "кахос", "кахос$", "кахос.таимиас$", "калда", "калда(", "калда$", "калда$(", "катимийа", "кенеис", "киста", "коц("
 Case "коцийо", "коцийос", "коцистийо", "коцистийос", "коцос", "коцос$(", "кс$", "кж(", "лайяу", "лайяус", "ле", "лец(", "лец$(", "лецако("
-Case "лецако.сеияас$(", "лецако.сеияас(", "лецецомота", "лецехос", "лецехос.сыяоу", "лецехос.у(", "лецехос.в(", "леходос", "лекос$(", "лекоус.тупос$("
+Case "лецако.сеияас$(", "лецако.сеияас(", "лецакосайеяаиос(", "лецецомота", "лецехос", "лецехос.сыяоу", "лецехос.у(", "лецехос.в(", "леходос", "лекос$(", "лекоус.тупос$("
 Case "лекыдиа", "леяос", "леяос(", "леяос$(", "лес$(", "лета", "летахесг", "летахесг(", "левяи", "лгдемийос", "лгйос", "лгйос(", "лгйос.елж("
 Case "лий(", "лий$(", "лийяо(", "лийяо.сеияас$(", "лийяо.сеияас(", "лийяос.йатакоцос$(", "лмглг", "ломадиаио", "ломадиаиос", "ломадийо", "лояжг$(", "лоусийг", "лоусийг.летягтгс", "лпип"
 Case "лпяоста(", "маи", "меа", "мео", "меои", "меос", "мгла", "мглата", "мглата$"
@@ -3359,7 +3366,7 @@ Case Else
 ismine = False
 End Select
 End Function
-Private Function IsNumberQuery(a$, fr As Long, R As Variant, lr As Long, skipdecimals As Boolean) As Boolean
+Private Function IsNumberQuery(a$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
 Dim sg As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$, rr As Double
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberQuery = False: Exit Function
@@ -3470,7 +3477,7 @@ cont1234:
     If Err.Number > 0 Then
          lr = 0
     Else
-        R = rr
+        r = rr
        lr = sng - fr + 2
        IsNumberQuery = True
     End If
@@ -3482,7 +3489,7 @@ End Function
 
 
 Static Function ValidNum(a$, Final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
-Dim R As Long
+Dim r As Long
 Dim r1 As Long
 r1 = 1
            If Not NoUseDec Then
@@ -3495,9 +3502,9 @@ r1 = 1
               
 Dim v As Double, b$
 If Final Then
-r1 = IsNumberOnly(a$, r1, v, R, cutdecimals)
+r1 = IsNumberOnly(a$, r1, v, r, cutdecimals)
 
-r1 = (r1 And Len(a$) <= R) Or (a$ = vbNullString)
+r1 = (r1 And Len(a$) <= r) Or (a$ = vbNullString)
 If r1 Then
 Select Case checktype
 Case vbLong
@@ -3525,14 +3532,14 @@ Else
 If (a$ = "-") Or a$ = vbNullString Then
 r1 = True
 Else
- r1 = IsNumberQuery(a$, r1, v, R, cutdecimals)
+ r1 = IsNumberQuery(a$, r1, v, r, cutdecimals)
     If a$ <> "" Then
-         If R < 2 Then
-                r1 = Not (R <= Len(a$))
+         If r < 2 Then
+                r1 = Not (r <= Len(a$))
                 a$ = vbNullString
         Else
-                r1 = r1 And Not R <= Len(a$)
-                a$ = Mid$(a$, 1, R - 1)
+                r1 = r1 And Not r <= Len(a$)
+                a$ = Mid$(a$, 1, r - 1)
         End If
         If cutdecimals Then
         If InStr(a$, "e") > 0 Or InStr(a$, "E") > 0 Then
@@ -3553,31 +3560,31 @@ Else
 ValidNum = r1
 End Function
 
-Function ValidNumberOnly(a$, R As Variant, skipdec As Boolean) As Boolean
-If VarType(R) = vbString Then
-    R = CVar(0)
+Function ValidNumberOnly(a$, r As Variant, skipdec As Boolean) As Boolean
+If VarType(r) = vbString Then
+    r = CVar(0)
 Else
-    R = R - R
+    r = r - r
 End If
-ValidNumberOnly = IsNumberOnly(a$, (1), R, (0), skipdec)
+ValidNumberOnly = IsNumberOnly(a$, (1), r, (0), skipdec)
 End Function
-Function ValidNumberOnlyClean(a$, R As Variant, skipdec As Boolean) As Long
+Function ValidNumberOnlyClean(a$, r As Variant, skipdec As Boolean) As Long
 On Error Resume Next
-If VarType(R) = vbString Then
-    R = CVar(0)
+If VarType(r) = vbString Then
+    r = CVar(0)
 Else
-    R = R - R
+    r = r - r
 End If
 Dim fr As Long, lr As Long
 fr = 1
-If IsNumberOnly(a$, fr, R, lr, skipdec) Then
+If IsNumberOnly(a$, fr, r, lr, skipdec) Then
 ValidNumberOnlyClean = lr
 Else
 ValidNumberOnlyClean = -1
 End If
 
 End Function
-Private Function IsNumberOnly(a$, fr As Long, R As Variant, lr As Long, skipdecimals As Boolean) As Boolean
+Private Function IsNumberOnly(a$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
 Dim sg As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberOnly = False: Exit Function
@@ -3686,15 +3693,15 @@ cont123:
             On Error Resume Next
             If Len(DE$) > 0 Then
                 Mid$(DE$, 1, 1) = DefaultDec$
-                R = CDec(ig$ & DE$)
+                r = CDec(ig$ & DE$)
             Else
-                R = CDec(ig$)
+                r = CDec(ig$)
             End If
             If Err.Number = 6 Then
-                R = CDbl(ig$ & DE$)
+                r = CDbl(ig$ & DE$)
             End If
          Else
-            R = val(ig$ & DE$ & ex$)
+            r = val(ig$ & DE$ & ex$)
              If Err.Number > 0 Then
              Err.Clear
              IsNumberOnly = False
@@ -3715,71 +3722,71 @@ ScrY = GetSystemMetrics(SM_CYSCREEN) * dv15
 End Function
 
 Public Function MyTrimL3Len(s$) As Long
-Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimL3Len = 0: Exit Function
-  p2 = StrPtr(s): l = l - 1
-  p4 = p2 + l * 2
-  For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+Dim i&, L As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
+  L = Len(s): If L = 0 Then MyTrimL3Len = 0: Exit Function
+  P2 = StrPtr(s): L = L - 1
+  p4 = P2 + L * 2
+  For i = P2 To p4 Step 2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 7
     Case Else
      
    Exit For
   End Select
   Next i
- MyTrimL3Len = (i - p2) \ 2
+ MyTrimL3Len = (i - P2) \ 2
 End Function
 Public Function MyTrimL2(s$) As Long
-Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimL2 = 1: Exit Function
-  p2 = StrPtr(s): l = l - 1
-  p4 = p2 + l * 2
-  For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+Dim i&, L As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
+  L = Len(s): If L = 0 Then MyTrimL2 = 1: Exit Function
+  P2 = StrPtr(s): L = L - 1
+  p4 = P2 + L * 2
+  For i = P2 To p4 Step 2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 7
     Case Else
-     MyTrimL2 = (i - p2) \ 2 + 1
+     MyTrimL2 = (i - P2) \ 2 + 1
    Exit Function
   End Select
   Next i
- MyTrimL2 = l + 2
+ MyTrimL2 = L + 2
 End Function
 
 Public Function MyTrimR(s$) As Long
-Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimR = 1: Exit Function
-  p2 = StrPtr(s): l = l - 1
-  p4 = p2 + l * 2
-  For i = p4 To p2 Step -2
-  GetMem2 i, p1
-  Select Case p1
+Dim i&, L As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
+  L = Len(s): If L = 0 Then MyTrimR = 1: Exit Function
+  P2 = StrPtr(s): L = L - 1
+  p4 = P2 + L * 2
+  For i = p4 To P2 Step -2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
-     MyTrimR = (i - p2) \ 2 + 1
+     MyTrimR = (i - P2) \ 2 + 1
    Exit Function
   End Select
   Next i
- MyTrimR = l + 2
+ MyTrimR = L + 2
 End Function
 
 
 Public Function MyTrimL2NoTab(s$) As Long
-Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
-  p2 = StrPtr(s): l = l - 1
-  p4 = p2 + l * 2
-  For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+Dim i&, L As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
+  L = Len(s): If L = 0 Then MyTrimL2NoTab = 0: Exit Function
+  P2 = StrPtr(s): L = L - 1
+  p4 = P2 + L * 2
+  For i = P2 To p4 Step 2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
-     MyTrimL2NoTab = (i - p2) \ 2 + 1
+     MyTrimL2NoTab = (i - P2) \ 2 + 1
    Exit Function
   End Select
   Next i
@@ -3788,180 +3795,180 @@ End Function
 
 Public Function MyTrimRfrom(s$, st As Long, ByVal en As Long) As Long
 Dim i&
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
   If st > Len(s$) Then MyTrimRfrom = en: Exit Function
   If en > Len(s$) Then MyTrimRfrom = en: Exit Function
   If en <= st Then MyTrimRfrom = en: Exit Function
   If st < 1 Then MyTrimRfrom = en: Exit Function
-  p2 = StrPtr(s) + (st - 1) * 2: en = en - 1
-  p4 = p2 + (en - st) * 2
-  For i = p4 To p2 Step -2
-  GetMem2 i, p1
-  Select Case p1
+  P2 = StrPtr(s) + (st - 1) * 2: en = en - 1
+  p4 = P2 + (en - st) * 2
+  For i = p4 To P2 Step -2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 9
     Case Else
      ' MyTrimRfrom = en + 1
-     MyTrimRfrom = (i - p2) \ 2 + st + 1
+     MyTrimRfrom = (i - P2) \ 2 + st + 1
    Exit Function
   End Select
   Next i
  MyTrimRfrom = st
 End Function
 Public Function MyTrimCR(s$) As String
-Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(s): If l = 0 Then Exit Function
+Dim i&, L As Long
+Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+L = Len(s): If L = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
-  p22 = p2
-  p4 = p2 + l * 2
-  For i = p4 To p2 Step -2
-  GetMem2 i, p1
-  Select Case p1
+  P2 = StrPtr(s): L = L - 1
+  p22 = P2
+  p4 = P2 + L * 2
+  For i = p4 To P2 Step -2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 10, 13
     Case Else
      Exit For
   End Select
   Next i
   p4 = i
-  For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  For i = P2 To p4 Step 2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 10, 13
     Case Else
      
    Exit For
   End Select
   Next i
-  p2 = i
-  If p2 > p4 Then MyTrimCR = vbNullString Else MyTrimCR = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+  P2 = i
+  If P2 > p4 Then MyTrimCR = vbNullString Else MyTrimCR = Mid$(s$, (P2 - p22) \ 2 + 1, (p4 - P2) \ 2 + 1)
  
 End Function
 
 Public Function MyTrim(s$) As String
-Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(s): If l = 0 Then Exit Function
+Dim i&, L As Long
+Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+L = Len(s): If L = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
-  p22 = p2
-  p4 = p2 + l * 2
-  For i = p4 To p2 Step -2
-  GetMem2 i, p1
-  Select Case p1
+  P2 = StrPtr(s): L = L - 1
+  p22 = P2
+  p4 = P2 + L * 2
+  For i = p4 To P2 Step -2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      Exit For
   End Select
   Next i
   p4 = i
-  For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  For i = P2 To p4 Step 2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      
    Exit For
   End Select
   Next i
-  p2 = i
-  If p2 > p4 Then MyTrim = vbNullString Else MyTrim = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+  P2 = i
+  If P2 > p4 Then MyTrim = vbNullString Else MyTrim = Mid$(s$, (P2 - p22) \ 2 + 1, (p4 - P2) \ 2 + 1)
  
 End Function
 Public Function MyTrimLW(s$) As String
-Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(s): If l = 0 Then Exit Function
+Dim i&, L As Long
+Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+L = Len(s): If L = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
-  p22 = p2
-  p4 = p2 + l * 2
-  For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  P2 = StrPtr(s): L = L - 1
+  p22 = P2
+  p4 = P2 + L * 2
+  For i = P2 To p4 Step 2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      
    Exit For
   End Select
   Next i
-  p2 = i
-  If p2 > p4 Then MyTrimLW = vbNullString Else MyTrimLW = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+  P2 = i
+  If P2 > p4 Then MyTrimLW = vbNullString Else MyTrimLW = Mid$(s$, (P2 - p22) \ 2 + 1, (p4 - P2) \ 2 + 1)
  
 End Function
 Public Function MyTrimRW(s$) As String
-Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(s): If l = 0 Then Exit Function
+Dim i&, L As Long
+Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+L = Len(s): If L = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
-  p22 = p2
-  p4 = p2 + l * 2
-  For i = p4 To p2 Step -2
-  GetMem2 i, p1
-  Select Case p1
+  P2 = StrPtr(s): L = L - 1
+  p22 = P2
+  p4 = P2 + L * 2
+  For i = p4 To P2 Step -2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      Exit For
   End Select
   Next i
   p4 = i
-   If p2 > p4 Then MyTrimRW = vbNullString Else MyTrimRW = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+   If P2 > p4 Then MyTrimRW = vbNullString Else MyTrimRW = Mid$(s$, (P2 - p22) \ 2 + 1, (p4 - P2) \ 2 + 1)
  
 End Function
 
 Public Function MyTrimRB(s$) As String
-Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = LenB(s): If l = 0 Then Exit Function
+Dim i&, L As Long
+Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+L = LenB(s): If L = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
-  p22 = p2
-  p4 = p2 + l
-  For i = p4 To p2 Step -1
-  GetMem1 i, p1
-  Select Case p1
+  P2 = StrPtr(s): L = L - 1
+  p22 = P2
+  p4 = P2 + L
+  For i = p4 To P2 Step -1
+  GetMem1 i, P1
+  Select Case P1
     Case 32
     Case Else
    Exit For
   End Select
   Next i
   p4 = i
-  If p2 > p4 Then MyTrimRB = vbNullString Else MyTrimRB = MidB$(s$, (p2 - p22) + 1, (p4 - p2) + 1)
+  If P2 > p4 Then MyTrimRB = vbNullString Else MyTrimRB = MidB$(s$, (P2 - p22) + 1, (p4 - P2) + 1)
  
 End Function
 Public Function MyTrimLB(s$) As String
-Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = LenB(s): If l = 0 Then Exit Function
+Dim i&, L As Long
+Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+L = LenB(s): If L = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
-  p22 = p2
-  p4 = p2 + l
-  For i = p2 To p4 Step 1
-  GetMem1 i, p1
-  Select Case p1
+  P2 = StrPtr(s): L = L - 1
+  p22 = P2
+  p4 = P2 + L
+  For i = P2 To p4 Step 1
+  GetMem1 i, P1
+  Select Case P1
     Case 32
     Case Else
   
    Exit For
   End Select
     Next i
-    p2 = i
-  If p2 > p4 Then MyTrimLB = vbNullString Else MyTrimLB = MidB$(s$, (p2 - p22) + 1, (p4 - p2) + 1)
+    P2 = i
+  If P2 > p4 Then MyTrimLB = vbNullString Else MyTrimLB = MidB$(s$, (P2 - p22) + 1, (p4 - P2) + 1)
  
 End Function
 Public Function MyTrimB(s$) As String
-Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = LenB(s): If l = 0 Then Exit Function
+Dim i&, L As Long
+Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+L = LenB(s): If L = 0 Then Exit Function
 
-  p2 = StrPtr(s): l = l - 1
-  p22 = p2
-  p4 = p2 + l
-  For i = p4 To p2 Step -1
-  GetMem1 i, p1
-  Select Case p1
+  P2 = StrPtr(s): L = L - 1
+  p22 = P2
+  p4 = P2 + L
+  For i = p4 To P2 Step -1
+  GetMem1 i, P1
+  Select Case P1
     Case 32
     Case Else
   
@@ -3969,34 +3976,34 @@ l = LenB(s): If l = 0 Then Exit Function
   End Select
   Next i
   p4 = i
-  For i = p2 To p4 Step 1
-  GetMem1 i, p1
-  Select Case p1
+  For i = P2 To p4 Step 1
+  GetMem1 i, P1
+  Select Case P1
     Case 32
     Case Else
 
    Exit For
   End Select
   Next i
-  p2 = i
-  If p2 > p4 Then MyTrimB = vbNullString Else MyTrimB = MidB$(s$, (p2 - p22) + 1, (p4 - p2) + 1)
+  P2 = i
+  If P2 > p4 Then MyTrimB = vbNullString Else MyTrimB = MidB$(s$, (P2 - p22) + 1, (p4 - P2) + 1)
  
 End Function
-Function IsLabelAnew(where$, a$, R$, Lang As Long) As Long
+Function IsLabelAnew(where$, a$, r$, Lang As Long) As Long
 ' for left side...no &
 
-Dim rr&, one As Boolean, c$, gr As Boolean
-R$ = vbNullString
+Dim rr&, one As Boolean, C$, gr As Boolean
+r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
-Dim i&, l As Long, p3 As Integer
-Dim p2 As Long, p1 As Integer, p4 As Long
-l = Len(a$): If l = 0 Then IsLabelAnew = 0: Lang = 1: Exit Function
+Dim i&, L As Long, p3 As Integer
+Dim P2 As Long, P1 As Integer, p4 As Long
+L = Len(a$): If L = 0 Then IsLabelAnew = 0: Lang = 1: Exit Function
 
-p2 = StrPtr(a$): l = l - 1
-  p4 = p2 + l * 2
-  For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+P2 = StrPtr(a$): L = L - 1
+  p4 = P2 + L * 2
+  For i = P2 To p4 Step 2
+  GetMem2 i, P1
+  Select Case P1
     Case 13
     
     If i < p4 Then
@@ -4009,22 +4016,22 @@ p2 = StrPtr(a$): l = l - 1
     i = i + 4
     Do While i < p4
 
-    GetMem2 i, p1
-    If p1 = 32 Or p1 = 160 Then
+    GetMem2 i, P1
+    If P1 = 32 Or P1 = 160 Then
     i = i + 2
     Else
     GetMem2 i + 2, p3
-    If p1 <> 13 And p3 <> 10 Then Exit Do
+    If P1 <> 13 And p3 <> 10 Then Exit Do
     i = i + 4
     End If
     Loop
-    a$ = Mid$(a$, (i + 2 - p2) \ 2)
+    a$ = Mid$(a$, (i + 2 - P2) \ 2)
     End If
     Else
-    If i > p2 Then a$ = Mid$(a$, (i - 2 - p2) \ 2)
+    If i > P2 Then a$ = Mid$(a$, (i - 2 - P2) \ 2)
     End If
     Else
-    If i > p2 Then a$ = Mid$(a$, (i - 2 - p2) \ 2)
+    If i > P2 Then a$ = Mid$(a$, (i - 2 - P2) \ 2)
     End If
     
     Lang = 1
@@ -4037,25 +4044,25 @@ p2 = StrPtr(a$): l = l - 1
   Next i
     If i > p4 Then a$ = vbNullString: IsLabelAnew = 0: Exit Function
   For i = i To p4 Step 2
-  GetMem2 i, p1
-  If p1 < 256 Then
-  Select Case p1
+  GetMem2 i, P1
+  If P1 < 256 Then
+  Select Case P1
         Case 64  '"@"
-            If i < p4 And R$ <> "" Then
-                GetMem2 i + 2, p1
-                where$ = R$
-                R$ = vbNullString
+            If i < p4 And r$ <> "" Then
+                GetMem2 i + 2, P1
+                where$ = r$
+                r$ = vbNullString
             Else
-              IsLabelAnew = 0: a$ = Mid$(a$, (i - p2) \ 2): Exit Function
+              IsLabelAnew = 0: a$ = Mid$(a$, (i - P2) \ 2): Exit Function
             End If
         Case 63 '"?"
-        If R$ = vbNullString Then
-            R$ = "?"
+        If r$ = vbNullString Then
+            r$ = "?"
             i = i + 4
         Else
             i = i + 2
         End If
-        a$ = Mid$(a$, (i - p2) \ 2)
+        a$ = Mid$(a$, (i - P2) \ 2)
         IsLabelAnew = 1
         Lang = -1
               
@@ -4064,33 +4071,33 @@ p2 = StrPtr(a$): l = l - 1
         Case 46 '"."
             If one Then
                 Exit For
-            ElseIf R$ <> "" And i < p4 Then
-                GetMem2 i + 2, p1
-                If ChrW(p1) = "." Or ChrW(p1) = " " Then
-                If ChrW(p1) = "." And i + 2 < p4 Then
-                    GetMem2 i + 4, p1
-                    If ChrW(p1) = " " Then i = i + 4: Exit For
+            ElseIf r$ <> "" And i < p4 Then
+                GetMem2 i + 2, P1
+                If ChrW(P1) = "." Or ChrW(P1) = " " Then
+                If ChrW(P1) = "." And i + 2 < p4 Then
+                    GetMem2 i + 4, P1
+                    If ChrW(P1) = " " Then i = i + 4: Exit For
                 Else
                     i = i + 2
                    Exit For
                 End If
             End If
-                GetMem2 i, p1
-                R$ = R$ & ChrW(p1)
+                GetMem2 i, P1
+                r$ = r$ & ChrW(P1)
                 rr& = 1
             End If
       Case 38 ' "&"
-            If R$ = vbNullString Then
+            If r$ = vbNullString Then
             rr& = 2
             'a$ = Mid$(a$, 2)
             End If
             Exit For
     Case 91
-        If R$ = vbNullString Then
-                R$ = ChrW(p1)
+        If r$ = vbNullString Then
+                r$ = ChrW(P1)
                 rr& = 1
         Else
-                If Left$(R$, 1) <> "[" Then rr& = 8: Exit For
+                If Left$(r$, 1) <> "[" Then rr& = 8: Exit For
         End If
     Case 92, 94, 123 To 126, 160 '"\","^", "{" To "~"
           Exit For
@@ -4099,8 +4106,8 @@ p2 = StrPtr(a$): l = l - 1
               If one Then
 
             Exit For
-            ElseIf R$ <> "" Then
-            R$ = R$ & ChrW(p1)
+            ElseIf r$ <> "" Then
+            r$ = r$ & ChrW(P1)
             '' A$ = Mid$(A$, 2)
             rr& = 1 'is an identifier or floating point variable
             Else
@@ -4110,35 +4117,35 @@ p2 = StrPtr(a$): l = l - 1
             If one Then
             Exit For
             Else
-            R$ = R$ & ChrW(p1)
+            r$ = r$ & ChrW(P1)
             rr& = 1 'is an identifier or floating point variable
             End If
         Case 36 ' "$"
             If one Then Exit For
-            If R$ <> "" Then
+            If r$ <> "" Then
             one = True
             rr& = 3 ' is string variable
-            R$ = R$ & ChrW(p1)
+            r$ = r$ & ChrW(P1)
             Else
             Exit For
             End If
         Case 37 ' "%"
             If one Then Exit For
-            If R$ <> "" Then
+            If r$ <> "" Then
             one = True
             rr& = 4 ' is long variable
-            R$ = R$ & ChrW(p1)
+            r$ = r$ & ChrW(P1)
             Else
             Exit For
             End If
             
         Case 40 ' "("
-            If R$ <> "" Then
+            If r$ <> "" Then
             If i + 4 <= p4 Then
-                GetMem2 i + 2, p1
+                GetMem2 i + 2, P1
                 GetMem2 i + 2, p3
-                If ChrW(p1) + ChrW(p3) = ")@" Then
-                    R$ = R$ & "()."
+                If ChrW(P1) + ChrW(p3) = ")@" Then
+                    r$ = r$ & "()."
                     i = i + 4
                 Else
                     GoTo i1233
@@ -4155,8 +4162,8 @@ i1233:
                                        Case Else
                                        Exit For
                                        End Select
-                     GetMem2 i, p1
-                                        R$ = R$ & ChrW(p1)
+                     GetMem2 i, P1
+                                        r$ = r$ & ChrW(P1)
                                         i = i + 2
                                       ' A$ = Mid$(A$, 2)
                                    Exit For
@@ -4175,15 +4182,15 @@ i1233:
               Exit For
               Else
               gr = True
-              R$ = R$ & ChrW(p1)
+              r$ = r$ & ChrW(P1)
               rr& = 1 'is an identifier or floating point variable
               End If
     End If
 
 
     Next i
-  If i > p4 Then a$ = vbNullString Else If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
-       R$ = myUcase(R$, gr)
+  If i > p4 Then a$ = vbNullString Else If (i + 2 - P2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - P2) \ 2)
+       r$ = myUcase(r$, gr)
        Lang = 1 + CLng(gr)
 
     IsLabelAnew = rr&
@@ -4295,7 +4302,7 @@ myfun() = Array("PARAM(", 1, "паяал(", 1, "STACKITEM(", 2, "тилгсыяоу(", 2, "SGN
 , "BINARY.ROTATE(", 81, "дуадийг.пеяистяожг(", 81, "SINT(", 82, "айеяаио.дуадийо(", 82, "USGN(", 83, "дуадийо(", 83, "UINT(", 84, "дуадийо.айеяаио(", 84, "ROUND(", 85, "стяоцц(", 85 _
 , "INT(", 86, "ай(", 86, "SEEK(", 87, "летахесг(", 87, "EOF(", 88, "текос(", 88, "RANDOM(", 89, "туваиос(", 89, "CHRCODE(", 90, "ваяйыд(", 90, "ASC(", 91, "йыд(", 91 _
 , "GROUP(", 92, "олада(", 92, "TEST(", 93, "дойилг(", 93, "CONS(", 94, "емысг(", 94, "CAR(", 95, "пяыто(", 95, "CDR(", 96, "еполема(", 96, "сыяос(", 24, "STACK(", 24, "READY(", 97, "етоило(", 97, "PROPERTY(", 98, "идиотгта(", 98, "IF(", 99, "ам(", 99, "ORDER(", 100, "танг(", 100, "BANK(", 101, "тяап(", 101, "CEIL(", 102, "ояож(", 102, "FLOOR(", 86, "дапед(", 86, "еийома(", _
-103, "IMAGE(", 103, "BUFFER(", 104, "диаяхяысг(", 104, "BINARY.NOT(", 105, "дуадийо.ови(", 105, "POINTER(", 108, "деийтгс(", 108, "BINARY.ADD(", 109, "дуадийо.пяосхесг(", 109, "дуадийо.пяо(", 109, "HSL(", 110, "вйж(", 110, "PLAYER(", 111, "паийтгс(", 111, "GETOBJECT(", 112, "ANTIKEIMENO(", 112, "VARPTR(", 113, "диеухл(", 113)
+103, "IMAGE(", 103, "BUFFER(", 104, "диаяхяысг(", 104, "BINARY.NOT(", 105, "дуадийо.ови(", 105, "POINTER(", 108, "деийтгс(", 108, "BINARY.ADD(", 109, "дуадийо.пяосхесг(", 109, "дуадийо.пяо(", 109, "HSL(", 110, "вйж(", 110, "PLAYER(", 111, "паийтгс(", 111, "GETOBJECT(", 112, "ANTIKEIMENO(", 112, "VARPTR(", 113, "диеухл(", 113, "BIGINTEGER(", 114, "лецакосайеяаиос(", 114)
 If Not bhashbackup Is Nothing Then
 For i = 0 To UBound(myfun()) Step 2
     bhashbackup.ItemCreator CStr(myfun(i)), CLng(myfun(i + 1))
@@ -4712,31 +4719,31 @@ crNew basestack, players(prive)
 ProcWriter = True
 End Function
 
-Sub SendAKey(ByVal keycode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
+Sub SendAKey(ByVal KeyCode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
 Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long, old As Long
 Const key_release As Byte = 2
-If keycode > 500 Then extended = 1: keycode = keycode - 500
+If KeyCode > 500 Then extended = 1: KeyCode = KeyCode - 500
 If extended = 0 Then
-If keycode > 64 And keycode < 91 Then
+If KeyCode > 64 And KeyCode < 91 Then
     If Not CapsLockOn() Then shift = Not shift
 End If
 End If
 
-Map = MapVirtualKey(keycode, 0)
+Map = MapVirtualKey(KeyCode, 0)
 smap = MapVirtualKey(&H10, 0)
 cmap = MapVirtualKey(&H11, 0)
 amap = MapVirtualKey(&H12, 0)
 
 
-keycode = keycode Mod 255
+KeyCode = KeyCode Mod 255
 ' press key
 If shift Then keybd_event &H10, smap, 0, 0
 If ctrl Then keybd_event &H11, cmap, 0, 0
 If alt Then keybd_event &H12, amap, 0, 0
-keybd_event keycode, Map, extended, 0
+keybd_event KeyCode, Map, extended, 0
 
 ' release key
-keybd_event keycode, Map, KEYEVENTF_KEYUP + extended, 0
+keybd_event KeyCode, Map, KEYEVENTF_KEYUP + extended, 0
 If shift Then keybd_event &H10, smap, KEYEVENTF_KEYUP, 0
 If ctrl Then keybd_event &H11, cmap, KEYEVENTF_KEYUP, 0
 If alt Then keybd_event &H12, amap, KEYEVENTF_KEYUP, 0
@@ -4818,7 +4825,7 @@ If bytes Then
     Call GetEnhMetaFileBits(emfP.Handle, bytes, ByVal aPic.GetBytePtr(0))
     aPic.SubType = 2 ' emf
     Set usehandler = New mHandler
-    usehandler.t1 = 2
+    usehandler.T1 = 2
     Set usehandler.objref = aPic
     Set basestack.lastobj = usehandler
 End If

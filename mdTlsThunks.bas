@@ -472,7 +472,7 @@ Public Type UcsTlsContext
     ClientCertCallback  As Long
     AlpnProtocols       As String
     '--- state
-    State               As UcsTlsStatesEnum
+    state               As UcsTlsStatesEnum
     LastErrNumber       As Long
     LastError           As String
     LastErrSource       As String
@@ -646,19 +646,19 @@ End Sub
 '=========================================================================
 
 Public Property Get TlsIsClosed(uCtx As UcsTlsContext) As Boolean
-    TlsIsClosed = (uCtx.State = ucsTlsStateClosed)
+    TlsIsClosed = (uCtx.state = ucsTlsStateClosed)
 End Property
 
 Public Property Get TlsIsStarted(uCtx As UcsTlsContext) As Boolean
-    TlsIsStarted = (uCtx.State > ucsTlsStateClosed)
+    TlsIsStarted = (uCtx.state > ucsTlsStateClosed)
 End Property
 
 Public Property Get TlsIsReady(uCtx As UcsTlsContext) As Boolean
-    TlsIsReady = (uCtx.State >= ucsTlsStatePostHandshake)
+    TlsIsReady = (uCtx.state >= ucsTlsStatePostHandshake)
 End Property
 
 Public Property Get TlsIsShutdown(uCtx As UcsTlsContext) As Boolean
-    TlsIsShutdown = (uCtx.State = ucsTlsStateShutdown)
+    TlsIsShutdown = (uCtx.state = ucsTlsStateShutdown)
 End Property
 
 '=========================================================================
@@ -679,7 +679,7 @@ Public Function TlsInitClient( _
     End If
     With uEmpty
         pvTlsClearLastError uEmpty
-        .State = ucsTlsStateHandshakeStart
+        .state = ucsTlsStateHandshakeStart
         .RemoteHostName = RemoteHostName
         .LocalFeatures = LocalFeatures
         .ClientCertCallback = ObjPtr(ClientCertCallback)
@@ -717,7 +717,7 @@ Public Function TlsInitServer( _
     With uEmpty
         pvTlsClearLastError uEmpty
         .IsServer = True
-        .State = ucsTlsStateExpectClientHello
+        .state = ucsTlsStateExpectClientHello
         .RemoteHostName = RemoteHostName
         .LocalFeatures = LocalFeatures
         Set .LocalCertificates = Certificates
@@ -739,7 +739,7 @@ EH:
 End Function
 
 Public Function TlsTerminate(uCtx As UcsTlsContext)
-    uCtx.State = ucsTlsStateClosed
+    uCtx.state = ucsTlsStateClosed
 End Function
 
 Public Function TlsHandshake(uCtx As UcsTlsContext, baInput() As Byte, ByVal lSize As Long, baOutput() As Byte, lOutputPos As Long) As Boolean
@@ -747,16 +747,16 @@ Public Function TlsHandshake(uCtx As UcsTlsContext, baInput() As Byte, ByVal lSi
     
     On Error GoTo EH
     With uCtx
-        If .State = ucsTlsStateClosed Then
+        If .state = ucsTlsStateClosed Then
             pvTlsSetLastError uCtx, vbObjectError, MODULE_NAME & "." & FUNC_NAME, ERR_CONNECTION_CLOSED
             Exit Function
         End If
         pvTlsClearLastError uCtx
         '--- swap-in
         pvArraySwap .SendBuffer.Data, .SendBuffer.Size, baOutput, lOutputPos
-        If .State = ucsTlsStateHandshakeStart Then
+        If .state = ucsTlsStateHandshakeStart Then
             pvTlsBuildClientHello uCtx, .SendBuffer
-            .State = ucsTlsStateExpectServerHello
+            .state = ucsTlsStateExpectServerHello
         Else
             If lSize < 0 Then
                 lSize = pvArraySize(baInput)
@@ -821,7 +821,7 @@ Public Function TlsReceive(uCtx As UcsTlsContext, baInput() As Byte, ByVal lSize
             TlsReceive = True
             Exit Function
         End If
-        If .State = ucsTlsStateClosed Then
+        If .state = ucsTlsStateClosed Then
             pvTlsSetLastError uCtx, vbObjectError, MODULE_NAME & "." & FUNC_NAME, ERR_CONNECTION_CLOSED
             Exit Function
         End If
@@ -862,7 +862,7 @@ Public Function TlsSend(uCtx As UcsTlsContext, baPlainText() As Byte, ByVal lSiz
         If lSize < 0 Then
             lSize = pvArraySize(baPlainText)
         End If
-        If .State = ucsTlsStateClosed Then
+        If .state = ucsTlsStateClosed Then
             pvTlsSetLastError uCtx, vbObjectError, MODULE_NAME & "." & FUNC_NAME, ERR_CONNECTION_CLOSED
             Exit Function
         End If
@@ -894,14 +894,14 @@ End Function
 Public Function TlsShutdown(uCtx As UcsTlsContext, baOutput() As Byte, lOutputPos As Long) As Boolean
     On Error GoTo EH
     With uCtx
-        If .State = ucsTlsStateClosed Then
+        If .state = ucsTlsStateClosed Then
             Exit Function
         End If
         pvTlsClearLastError uCtx
         '--- swap-in
         pvArraySwap .SendBuffer.Data, .SendBuffer.Size, baOutput, lOutputPos
         pvTlsBuildAlert uCtx, .SendBuffer, uscTlsAlertCloseNotify, TLS_ALERT_LEVEL_WARNING
-        .State = ucsTlsStateShutdown
+        .state = ucsTlsStateShutdown
         '--- success
         TlsShutdown = True
 QH:
@@ -1215,7 +1215,7 @@ Private Sub pvTlsBuildClientLegacyKeyExchange(uCtx As UcsTlsContext, uOutput As 
                     pvBufferWriteBlockStart uOutput, Size:=3
                         For lIdx = 1 To pvCollectionCount(.LocalCertificates)
                             pvBufferWriteBlockStart uOutput, Size:=3
-                                baCert = .LocalCertificates.Item(lIdx)
+                                baCert = .LocalCertificates.item(lIdx)
                                 pvBufferWriteArray uOutput, baCert
                             pvBufferWriteBlockEnd uOutput
                         Next
@@ -1310,7 +1310,7 @@ Private Sub pvTlsBuildClientHandshakeFinished(uCtx As UcsTlsContext, uOutput As 
                     pvBufferWriteBlockStart uOutput, Size:=3
                         For lIdx = 1 To pvCollectionCount(.LocalCertificates)
                             pvBufferWriteBlockStart uOutput, Size:=3
-                                baCert = .LocalCertificates.Item(lIdx)
+                                baCert = .LocalCertificates.item(lIdx)
                                 pvBufferWriteArray uOutput, baCert
                             pvBufferWriteBlockEnd uOutput
                             '--- certificate extensions
@@ -1329,7 +1329,7 @@ Private Sub pvTlsBuildClientHandshakeFinished(uCtx As UcsTlsContext, uOutput As 
                         pvBufferWriteLong uOutput, .CertRequestSignatureScheme, Size:=2
                         pvBufferWriteBlockStart uOutput, Size:=2
                             pvTlsGetHandshakeHash uCtx, baHandshakeHash
-                            pvBufferWriteString uVerify, Space$(64) & "TLS 1.3, client CertificateVerify" & Chr$(0)
+                            pvBufferWriteString uVerify, space$(64) & "TLS 1.3, client CertificateVerify" & Chr$(0)
                             pvBufferWriteArray uVerify, baHandshakeHash
                             pvBufferWriteEOF uVerify
                             pvTlsSignatureSign baSignature, .LocalCertificates, .LocalPrivateKey, .CertRequestSignatureScheme, uVerify.Data
@@ -1493,7 +1493,7 @@ Private Sub pvTlsBuildServerLegacyKeyExchange(uCtx As UcsTlsContext, uOutput As 
                 pvBufferWriteBlockStart uOutput, Size:=3
                     For lIdx = 1 To pvCollectionCount(.LocalCertificates)
                         pvBufferWriteBlockStart uOutput, Size:=3
-                            baCert = .LocalCertificates.Item(lIdx)
+                            baCert = .LocalCertificates.item(lIdx)
                             pvBufferWriteArray uOutput, baCert
                         pvBufferWriteBlockEnd uOutput
                     Next
@@ -1583,7 +1583,7 @@ Private Sub pvTlsBuildServerHandshakeFinished(uCtx As UcsTlsContext, uOutput As 
                 pvBufferWriteBlockStart uOutput, Size:=3
                     For lIdx = 1 To pvCollectionCount(.LocalCertificates)
                         pvBufferWriteBlockStart uOutput, Size:=3
-                            baCert = .LocalCertificates.Item(lIdx)
+                            baCert = .LocalCertificates.item(lIdx)
                             pvBufferWriteArray uOutput, baCert
                         pvBufferWriteBlockEnd uOutput
                         '--- certificate extensions
@@ -1601,7 +1601,7 @@ Private Sub pvTlsBuildServerHandshakeFinished(uCtx As UcsTlsContext, uOutput As 
                 pvBufferWriteLong uOutput, .SignatureScheme, Size:=2
                 pvBufferWriteBlockStart uOutput, Size:=2
                     pvTlsGetHandshakeHash uCtx, baHandshakeHash
-                    pvBufferWriteString uVerify, Space$(64) & "TLS 1.3, server CertificateVerify" & Chr$(0)
+                    pvBufferWriteString uVerify, space$(64) & "TLS 1.3, server CertificateVerify" & Chr$(0)
                     pvBufferWriteArray uVerify, baHandshakeHash
                     pvBufferWriteEOF uVerify
                     pvTlsSignatureSign baSignature, .LocalCertificates, .LocalPrivateKey, .SignatureScheme, uVerify.Data
@@ -1677,14 +1677,14 @@ Private Sub pvTlsBuildAlert(uCtx As UcsTlsContext, uOutput As UcsBuffer, ByVal e
     
     With uCtx
 #If ImplTlsServer Then
-        If .State = ucsTlsStateExpectClientFinished And .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS13 Then
+        If .state = ucsTlsStateExpectClientFinished And .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS13 Then
             '--- alerts must be protected with application data traffic secrets (not handshake)
-            .State = ucsTlsStatePostHandshake
+            .state = ucsTlsStatePostHandshake
             pvTlsGetHandshakeHash uCtx, baHandshakeHash
             pvTlsDeriveApplicationSecrets uCtx, baHandshakeHash
         End If
 #End If
-        If .State = ucsTlsStatePostHandshake And .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS13 Then
+        If .state = ucsTlsStatePostHandshake And .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS13 Then
             '--- for TLS 1.3 -> tunnel alert through application data traffic protection
             pvArrayByte baTemp, lAlertLevel, eAlertDesc
             pvTlsBuildApplicationData uCtx, uOutput, baTemp, 0, UBound(baTemp) + 1, TLS_CONTENT_TYPE_ALERT
@@ -1870,7 +1870,7 @@ Unencrypted:
                 If uInput.Pos + 1 <> lEnd Then
                     GoTo UnexpectedRecordSize
                 End If
-                If .State = ucsTlsStatePostHandshake Then
+                If .state = ucsTlsStatePostHandshake Then
                     GoTo UnexpectedRecordType
                 End If
                 If .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS12 Then
@@ -1897,9 +1897,9 @@ Unencrypted:
                 Case TLS_ALERT_LEVEL_WARNING
                     .LastAlertCode = uInput.Data(uInput.Pos + 1)
                     #If ImplUseDebugLog Then
-                        DebugLog MODULE_NAME, FUNC_NAME, pvTlsGetLastAlert(uCtx) & " (TLS_ALERT_LEVEL_WARNING)"
+                        debugLog MODULE_NAME, FUNC_NAME, pvTlsGetLastAlert(uCtx) & " (TLS_ALERT_LEVEL_WARNING)"
                     #End If
-                    If .LastAlertCode = uscTlsAlertCloseNotify And .State <> ucsTlsStateShutdown Then
+                    If .LastAlertCode = uscTlsAlertCloseNotify And .state <> ucsTlsStateShutdown Then
                         pvTlsSetLastError uCtx, AlertCode:=uscTlsAlertCloseNotify
                     End If
                 End Select
@@ -1933,7 +1933,7 @@ Unencrypted:
                     End If
                 End If
             Case TLS_CONTENT_TYPE_APPDATA
-                If .IsServer And .State < ucsTlsStatePostHandshake Then
+                If .IsServer And .state < ucsTlsStatePostHandshake Then
                     GoTo UnexpectedRecordType
                 End If
                 pvBufferWriteBlob .DecrBuffer, VarPtr(uInput.Data(uInput.Pos)), lEnd - uInput.Pos
@@ -2024,7 +2024,7 @@ Private Function pvTlsParseHandshake(uCtx As UcsTlsContext, uInput As UcsBuffer,
             #If ImplUseDebugLog Then
 '                DebugLog MODULE_NAME, FUNC_NAME, ".State=" & pvTlsGetStateAsText(.State) & ", lMessageType=" & pvTlsGetMessageName(lMessageType)
             #End If
-            Select Case .State
+            Select Case .state
             Case ucsTlsStateExpectServerHello
                 Select Case lMessageType
                 Case TLS_HANDSHAKE_SERVER_HELLO
@@ -2039,17 +2039,17 @@ Private Function pvTlsParseHandshake(uCtx As UcsTlsContext, uInput As UcsBuffer,
                         pvBufferWriteLong .HandshakeMessages, .DigestSize, Size:=3
                         pvBufferWriteArray .HandshakeMessages, baHandshakeHash
                     Else
-                        .State = ucsTlsStateExpectEncryptedExtensions
+                        .state = ucsTlsStateExpectEncryptedExtensions
                     End If
                 Case Else
                     GoTo UnexpectedMessageType
                 End Select
                 pvTlsAppendHandshakeHash uCtx, uInput.Data, lMessagePos, lMessageSize + 4
                 '--- post-process ucsTlsStateExpectServerHello
-                If .State = ucsTlsStateExpectServerHello And .HelloRetryRequest Then
+                If .state = ucsTlsStateExpectServerHello And .HelloRetryRequest Then
                     pvTlsBuildClientHello uCtx, .SendBuffer
                 End If
-                If .State = ucsTlsStateExpectEncryptedExtensions And .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS13 Then
+                If .state = ucsTlsStateExpectEncryptedExtensions And .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS13 Then
                     pvTlsDeriveHandshakeSecrets uCtx
                 End If
             Case ucsTlsStateExpectEncryptedExtensions
@@ -2178,7 +2178,7 @@ Private Function pvTlsParseHandshake(uCtx As UcsTlsContext, uInput As UcsBuffer,
                         GoTo NoServerCertificate
                     End If
                     pvTlsGetHandshakeHash uCtx, baHandshakeHash
-                    pvBufferWriteString uVerify, Space$(64) & "TLS 1.3, server CertificateVerify" & Chr$(0)
+                    pvBufferWriteString uVerify, space$(64) & "TLS 1.3, server CertificateVerify" & Chr$(0)
                     pvBufferWriteArray uVerify, baHandshakeHash
                     pvBufferWriteEOF uVerify
                     If Not pvTlsSignatureVerify(baCert, lSignatureScheme, uVerify.Data, baSignature, sError, eAlertCode) Then
@@ -2192,7 +2192,7 @@ Private Function pvTlsParseHandshake(uCtx As UcsTlsContext, uInput As UcsBuffer,
                     If Not pvArrayEqual(uVerify.Data, baMessage) Then
                         GoTo ServerHandshakeFailed
                     End If
-                    .State = ucsTlsStatePostHandshake
+                    .state = ucsTlsStatePostHandshake
                 Case IIf(.ProtocolVersion = TLS_PROTOCOL_VERSION_TLS12, TLS_HANDSHAKE_SERVER_KEY_EXCHANGE, -1)
                     If uInput.Pos + 4 > lMessageEnd Then
                         GoTo InvalidSize
@@ -2205,7 +2205,7 @@ Private Function pvTlsParseHandshake(uCtx As UcsTlsContext, uInput As UcsBuffer,
                     pvBufferReadLong uInput, lNamedCurve, Size:=2
                     pvTlsSetupExchGroup uCtx, lNamedCurve
                     #If ImplUseDebugLog Then
-                        DebugLog MODULE_NAME, FUNC_NAME, "With exchange group " & pvTlsGetExchGroupName(.ExchGroup)
+                        debugLog MODULE_NAME, FUNC_NAME, "With exchange group " & pvTlsGetExchGroupName(.ExchGroup)
                     #End If
                     pvBufferReadBlockStart uInput, BlockSize:=lSignatureSize
                         If uInput.Pos + lSignatureSize > lMessageEnd Then
@@ -2239,7 +2239,7 @@ Private Function pvTlsParseHandshake(uCtx As UcsTlsContext, uInput As UcsBuffer,
                         GoTo QH
                     End If
                 Case IIf(.ProtocolVersion = TLS_PROTOCOL_VERSION_TLS12, TLS_HANDSHAKE_SERVER_HELLO_DONE, -1)
-                    .State = ucsTlsStateExpectServerFinished
+                    .state = ucsTlsStateExpectServerFinished
                     uInput.Pos = uInput.Pos + lMessageSize
                     Set .RemoteTickets = New Collection
                 Case TLS_HANDSHAKE_CERTIFICATE_REQUEST
@@ -2265,19 +2265,19 @@ Private Function pvTlsParseHandshake(uCtx As UcsTlsContext, uInput As UcsBuffer,
                         pvBufferReadBlockEnd uInput
                     Else
                         #If ImplUseDebugLog Then
-                            DebugLog MODULE_NAME, FUNC_NAME, Replace("Unknown status_type (%1) in certificate_status", "%1", lStatusType)
+                            debugLog MODULE_NAME, FUNC_NAME, Replace("Unknown status_type (%1) in certificate_status", "%1", lStatusType)
                         #End If
                     End If
                 Case Else
                     #If ImplUseDebugLog Then
-                        DebugLog MODULE_NAME, FUNC_NAME, Replace("Unknown handshake message (%1) during ExpectEncryptedExtensions", "%1", pvTlsGetMessageName(lMessageType))
+                        debugLog MODULE_NAME, FUNC_NAME, Replace("Unknown handshake message (%1) during ExpectEncryptedExtensions", "%1", pvTlsGetMessageName(lMessageType))
                     #End If
                     '--- do nothing
                     uInput.Pos = uInput.Pos + lMessageSize
                 End Select
                 pvTlsAppendHandshakeHash uCtx, uInput.Data, lMessagePos, lMessageSize + 4
                 '--- post-process ucsTlsStateExpectEncryptedExtensions
-                If .State = ucsTlsStateExpectServerFinished And .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS12 Then
+                If .state = ucsTlsStateExpectServerFinished And .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS12 Then
                     If .UseRsaKeyTransport Then
                         If Not SearchCollection(.RemoteCertificates, 1, RetVal:=baCert) Then
                             GoTo NoServerCertificate
@@ -2296,7 +2296,7 @@ Private Function pvTlsParseHandshake(uCtx As UcsTlsContext, uInput As UcsBuffer,
                     End If
                     pvTlsBuildClientLegacyKeyExchange uCtx, .SendBuffer
                 End If
-                If .State = ucsTlsStatePostHandshake And .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS13 Then
+                If .state = ucsTlsStatePostHandshake And .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS13 Then
                     pvTlsGetHandshakeHash uCtx, baHandshakeHash
                     pvTlsBuildClientHandshakeFinished uCtx, .SendBuffer
                     pvTlsDeriveApplicationSecrets uCtx, baHandshakeHash
@@ -2320,11 +2320,11 @@ Private Function pvTlsParseHandshake(uCtx As UcsTlsContext, uInput As UcsBuffer,
                     If SearchCollection(.RemoteExtensions, "#" & TLS_EXTENSION_RENEGOTIATION_INFO) Then
                         .RemoteLegacyVerifyData = baMessage
                     End If
-                    .State = ucsTlsStatePostHandshake
+                    .state = ucsTlsStatePostHandshake
                 Case Else
                     GoTo UnexpectedMessageType
                 End Select
-                If .State = ucsTlsStatePostHandshake Then
+                If .state = ucsTlsStatePostHandshake Then
                     pvTlsResetHandshakeHash uCtx
                 Else
                     pvTlsAppendHandshakeHash uCtx, uInput.Data, lMessagePos, lMessageSize + 4
@@ -2373,7 +2373,7 @@ RenegotiateClientHello:
                             End If
                         Else
                             .HelloRetryRequest = False
-                            .State = ucsTlsStateExpectClientFinished
+                            .state = ucsTlsStateExpectClientFinished
                         End If
                     ElseIf .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS12 Then
                         If .ExchGroup = 0 Then
@@ -2392,7 +2392,7 @@ RenegotiateClientHello:
                             End If
                             pvTlsSetupExchGroup uCtx, lExchGroup
                         End If
-                        .State = ucsTlsStateExpectClientKeyExchange
+                        .state = ucsTlsStateExpectClientKeyExchange
                     End If
                 Case Else
                     GoTo UnexpectedMessageType
@@ -2408,11 +2408,11 @@ RenegotiateClientHello:
                     pvBufferWriteArray .HandshakeMessages, baHandshakeHash
                 End If
                 pvTlsBuildServerHello uCtx, .SendBuffer
-                If .State = ucsTlsStateExpectClientFinished Then
+                If .state = ucsTlsStateExpectClientFinished Then
                     pvTlsDeriveHandshakeSecrets uCtx
                     pvTlsBuildServerHandshakeFinished uCtx, .SendBuffer
                 End If
-                If .State = ucsTlsStateExpectClientKeyExchange Then
+                If .state = ucsTlsStateExpectClientKeyExchange Then
                     pvTlsBuildServerLegacyKeyExchange uCtx, .SendBuffer
                 End If
             Case ucsTlsStateExpectClientKeyExchange
@@ -2443,14 +2443,14 @@ RenegotiateClientHello:
                             End If
                         pvBufferReadBlockEnd uInput
                     End If
-                    .State = ucsTlsStateExpectClientFinished
+                    .state = ucsTlsStateExpectClientFinished
                 Case TLS_HANDSHAKE_CERTIFICATE
                     '--- ToDo: impl
                 Case Else
                     GoTo UnexpectedMessageType
                 End Select
                 pvTlsAppendHandshakeHash uCtx, uInput.Data, lMessagePos, lMessageSize + 4
-                If .State = ucsTlsStateExpectClientFinished Then
+                If .state = ucsTlsStateExpectClientFinished Then
                     pvTlsDeriveLegacySecrets uCtx
                 End If
             Case ucsTlsStateExpectClientFinished
@@ -2474,7 +2474,7 @@ RenegotiateClientHello:
                     If Not pvArrayEqual(uVerify.Data, baMessage) Then
                         GoTo ServerHandshakeFailed
                     End If
-                    .State = ucsTlsStatePostHandshake
+                    .state = ucsTlsStatePostHandshake
                 Case IIf(.ProtocolVersion = TLS_PROTOCOL_VERSION_TLS12, TLS_HANDSHAKE_CERTIFICATE_VERIFY, -1)
                     '--- ToDo: impl
                 Case Else
@@ -2484,7 +2484,7 @@ RenegotiateClientHello:
                     pvTlsAppendHandshakeHash uCtx, uInput.Data, lMessagePos, lMessageSize + 4
                 End If
                 '--- post-process ucsTlsStateExpectClientFinished
-                If .State = ucsTlsStatePostHandshake Then
+                If .state = ucsTlsStatePostHandshake Then
                     If .ProtocolVersion = TLS_PROTOCOL_VERSION_TLS13 Then
                         pvTlsGetHandshakeHash uCtx, baHandshakeHash
                         pvTlsDeriveApplicationSecrets uCtx, baHandshakeHash
@@ -2501,12 +2501,12 @@ RenegotiateClientHello:
                 Select Case lMessageType
                 Case IIf(.ProtocolVersion = TLS_PROTOCOL_VERSION_TLS12 And Not .IsServer, TLS_HANDSHAKE_HELLO_REQUEST, -1)
                     #If ImplUseDebugLog Then
-                        DebugLog MODULE_NAME, FUNC_NAME, "Received Hello Request. Will renegotiate"
+                        debugLog MODULE_NAME, FUNC_NAME, "Received Hello Request. Will renegotiate"
                     #End If
                     If lMessageSize <> 0 Then
                         GoTo InvalidSize
                     End If
-                    .State = ucsTlsStateExpectServerHello
+                    .state = ucsTlsStateExpectServerHello
                     .AlpnNegotiated = vbNullString
                     .SniRequested = vbNullString
                     '--- renegotiate ephemeral keys too
@@ -2518,14 +2518,14 @@ RenegotiateClientHello:
 #If ImplTlsServer Then
                 Case IIf(.ProtocolVersion = TLS_PROTOCOL_VERSION_TLS12 And .IsServer, TLS_HANDSHAKE_CLIENT_HELLO, -1)
                     #If ImplUseDebugLog Then
-                        DebugLog MODULE_NAME, FUNC_NAME, "Received Client Hello. Will renegotiate"
+                        debugLog MODULE_NAME, FUNC_NAME, "Received Client Hello. Will renegotiate"
                     #End If
                     #If Not ImplTlsServerAllowInsecureRenegotiation Then
                         If pvArraySize(.RemoteLegacyVerifyData) = 0 Then
                             GoTo SecureRenegotiationFailed
                         End If
                     #End If
-                    .State = ucsTlsStateExpectClientHello
+                    .state = ucsTlsStateExpectClientHello
                     .AlpnNegotiated = vbNullString
                     .SniRequested = vbNullString
                     '--- renegotiate ephemeral keys too
@@ -2542,7 +2542,7 @@ RenegotiateClientHello:
                     End If
                 Case TLS_HANDSHAKE_KEY_UPDATE
                     #If ImplUseDebugLog Then
-                        DebugLog MODULE_NAME, FUNC_NAME, "Received TLS_HANDSHAKE_KEY_UPDATE"
+                        debugLog MODULE_NAME, FUNC_NAME, "Received TLS_HANDSHAKE_KEY_UPDATE"
                     #End If
                     If lMessageSize <> 1 Then
                         GoTo InvalidSize
@@ -2577,7 +2577,7 @@ RenegotiateClientHello:
 QH:
     Exit Function
 UnexpectedMessageType:
-    sError = Replace(Replace(ERR_UNEXPECTED_MSG_TYPE, "%1", pvTlsGetStateAsText(uCtx.State)), "%2", pvTlsGetMessageName(lMessageType))
+    sError = Replace(Replace(ERR_UNEXPECTED_MSG_TYPE, "%1", pvTlsGetStateAsText(uCtx.state)), "%2", pvTlsGetMessageName(lMessageType))
     eAlertCode = uscTlsAlertUnexpectedMessage
     GoTo QH
 ServerHandshakeFailed:
@@ -2601,7 +2601,7 @@ UnsupportedCurveType:
     eAlertCode = uscTlsAlertHandshakeFailure
     GoTo QH
 InvalidStateHandshake:
-    sError = Replace(ERR_INVALID_STATE_HANDSHAKE, "%1", pvTlsGetStateAsText(uCtx.State))
+    sError = Replace(ERR_INVALID_STATE_HANDSHAKE, "%1", pvTlsGetStateAsText(uCtx.state))
     eAlertCode = uscTlsAlertHandshakeFailure
     GoTo QH
 SecureRenegotiationFailed:
@@ -2668,7 +2668,7 @@ Private Function pvTlsParseHandshakeServerHello(uCtx As UcsTlsContext, uInput As
         pvBufferReadLong uInput, lCipherSuite, Size:=2
         pvTlsSetupCipherSuite uCtx, lCipherSuite
         #If ImplUseDebugLog Then
-            DebugLog MODULE_NAME, FUNC_NAME, "Using " & pvTlsGetCipherSuiteName(.CipherSuite) & " from " & .RemoteHostName
+            debugLog MODULE_NAME, FUNC_NAME, "Using " & pvTlsGetCipherSuiteName(.CipherSuite) & " from " & .RemoteHostName
         #End If
         If .HelloRetryRequest Then
             .HelloRetryCipherSuite = lCipherSuite
@@ -2700,7 +2700,7 @@ Private Function pvTlsParseHandshakeServerHello(uCtx As UcsTlsContext, uInput As
                                 .HelloRetryExchGroup = lExchGroup
                             Else
                                 #If ImplUseDebugLog Then
-                                    DebugLog MODULE_NAME, FUNC_NAME, "With exchange group " & pvTlsGetExchGroupName(.ExchGroup)
+                                    debugLog MODULE_NAME, FUNC_NAME, "With exchange group " & pvTlsGetExchGroupName(.ExchGroup)
                                 #End If
                                 If lExtSize < 4 Then
                                     GoTo InvalidSize
@@ -2966,7 +2966,7 @@ Private Function pvTlsParseHandshakeClientHello(uCtx As UcsTlsContext, uInput As
                             End If
                             Set cAlpnPrefs = New Collection
                             For Each vElem In Split(.AlpnProtocols, "|")
-                                cAlpnPrefs.Add cAlpnPrefs.Count, "#" & vElem
+                                cAlpnPrefs.Add cAlpnPrefs.count, "#" & vElem
                             Next
                             lAlpnPref = 1000
                             pvBufferReadBlockStart uInput, Size:=2, BlockSize:=lBlockSize
@@ -2991,7 +2991,7 @@ Private Function pvTlsParseHandshakeClientHello(uCtx As UcsTlsContext, uInput As
                                     GoTo InvalidSize
                                 End If
                             pvBufferReadBlockEnd uInput
-                            If LenB(.AlpnNegotiated) = 0 And cAlpnPrefs.Count > 0 Then
+                            If LenB(.AlpnNegotiated) = 0 And cAlpnPrefs.count > 0 Then
                                 GoTo NoAlpnNegotiated
                             End If
                         Case IIf((.LocalFeatures And ucsTlsSupportTls13) <> 0, TLS_EXTENSION_KEY_SHARE, -1)
@@ -3048,7 +3048,7 @@ Private Function pvTlsParseHandshakeClientHello(uCtx As UcsTlsContext, uInput As
                                                 GoTo InvalidRemoteKey
                                             End If
                                             #If ImplUseDebugLog Then
-                                                DebugLog MODULE_NAME, FUNC_NAME, "With exchange group " & pvTlsGetExchGroupName(.ExchGroup)
+                                                debugLog MODULE_NAME, FUNC_NAME, "With exchange group " & pvTlsGetExchGroupName(.ExchGroup)
                                             #End If
                                         End If
                                     pvBufferReadBlockEnd uInput
@@ -3216,7 +3216,7 @@ Private Function pvTlsParseHandshakeClientHello(uCtx As UcsTlsContext, uInput As
             Next
         End If
         #If ImplUseDebugLog Then
-            DebugLog MODULE_NAME, FUNC_NAME, "Using " & pvTlsGetCipherSuiteName(.CipherSuite) & " from " & .RemoteHostName
+            debugLog MODULE_NAME, FUNC_NAME, "Using " & pvTlsGetCipherSuiteName(.CipherSuite) & " from " & .RemoteHostName
         #End If
     End With
     '--- success
@@ -3695,7 +3695,7 @@ Private Sub pvTlsSetupExchRsaPreMasterSecret(uCtx As UcsTlsContext, baEnc() As B
         If lVersion <> .RemoteProtocolVersion Then
 UseRandom:
             #If ImplUseDebugLog Then
-                DebugLog MODULE_NAME, FUNC_NAME, "Will use random LocalExchPrivate"
+                debugLog MODULE_NAME, FUNC_NAME, "Will use random LocalExchPrivate"
             #End If
             pvTlsGetRandom .LocalExchPrivate, TLS_LEGACY_SECRET_SIZE
         End If
@@ -3980,13 +3980,13 @@ Private Sub pvTlsSetLastError( _
             If AlertCode >= 0 Then
                 pvTlsBuildAlert uCtx, .SendBuffer, AlertCode, TLS_ALERT_LEVEL_FATAL
             End If
-            .State = ucsTlsStateClosed
+            .state = ucsTlsStateClosed
         End If
         #If ImplCaptureTraffic <> 0 Then
-            Clipboard.Clear
-            Clipboard.SetText TlsConcatCollection(.TrafficDump, vbCrLf)
+        '   Clipboard.Clear
+         '   Clipboard.SetText TlsConcatCollection(.TrafficDump, vbCrLf)
             #If ImplUseDebugLog Then
-                DebugLog MODULE_NAME, FUNC_NAME, "Traffic dump copied to clipboard"
+                debugLog MODULE_NAME, FUNC_NAME, "Traffic dump copied to clipboard"
             #End If
         #End If
     End With
@@ -4560,7 +4560,7 @@ Private Sub pvTlsSignatureSign(baRetVal() As Byte, cCerts As Collection, cPrivKe
     Dim sErrDesc        As String
         
     #If ImplUseDebugLog Then
-        DebugLog MODULE_NAME, FUNC_NAME, "Signing with " & pvTlsGetSignatureName(lSignatureScheme) & " signature"
+        debugLog MODULE_NAME, FUNC_NAME, "Signing with " & pvTlsGetSignatureName(lSignatureScheme) & " signature"
     #End If
     If Not pvAsn1DecodePrivateKey(cCerts, cPrivKey, uKeyInfo) Then
         sErrDesc = ERR_UNSUPPORTED_PRIVATE_KEY
@@ -4803,7 +4803,7 @@ Private Function pvTlsSignatureVerify(baCert() As Byte, ByVal lSignatureScheme A
     pvTlsSignatureVerify = True
 QH:
     #If ImplUseDebugLog Then
-        DebugLog MODULE_NAME, FUNC_NAME, IIf(pvTlsSignatureVerify, IIf(bSkip, "Skipping ", IIf(bDeprecated, "Deprecated ", "Valid ")), "Invalid ") & pvTlsGetSignatureName(lSignatureScheme) & " signature" & IIf(bDeprecated, " (lCurveSize=" & lCurveSize & " from server's public key)", vbNullString)
+        debugLog MODULE_NAME, FUNC_NAME, IIf(pvTlsSignatureVerify, IIf(bSkip, "Skipping ", IIf(bDeprecated, "Deprecated ", "Valid ")), "Invalid ") & pvTlsGetSignatureName(lSignatureScheme) & " signature" & IIf(bDeprecated, " (lCurveSize=" & lCurveSize & " from server's public key)", vbNullString)
     #End If
     Exit Function
 UnsupportedCertificate:
@@ -4932,7 +4932,7 @@ Private Sub pvBufferWriteRecordEnd(uOutput As UcsBuffer, uCtx As UcsTlsContext)
     With uCtx
         If pvArraySize(.LocalTrafficKey) > 0 Then
                 '--- . . . continues from start-of-record
-                vRecordData = uOutput.Stack.Item(1)
+                vRecordData = uOutput.Stack.item(1)
                 uOutput.Stack.Remove 1
                 lRecordPos = vRecordData(0)
                 lMessagePos = vRecordData(1)
@@ -4996,7 +4996,7 @@ Private Sub pvBufferWriteBlockStart(uOutput As UcsBuffer, Optional ByVal Size As
         If .Stack Is Nothing Then
             Set .Stack = New Collection
         End If
-        If .Stack.Count = 0 Then
+        If .Stack.count = 0 Then
             .Stack.Add .Size
         Else
             .Stack.Add .Size, Before:=1
@@ -5013,7 +5013,7 @@ Private Sub pvBufferWriteBlockEnd(uOutput As UcsBuffer)
     
     With uOutput
         lPos = .Size
-        .Size = .Stack.Item(1)
+        .Size = .Stack.item(1)
         .Stack.Remove 1
         pvBufferWriteLong uOutput, lPos - .Size - .Data(.Size), Size:=.Data(.Size)
         .Size = lPos
@@ -5094,7 +5094,7 @@ Private Sub pvBufferReadBlockStart(uInput As UcsBuffer, Optional ByVal Size As L
             Set .Stack = New Collection
         End If
         pvBufferReadLong uInput, BlockSize, Size
-        If .Stack.Count = 0 Then
+        If .Stack.count = 0 Then
             .Stack.Add uInput.Pos + BlockSize
         Else
             .Stack.Add uInput.Pos + BlockSize, Before:=1
@@ -5106,7 +5106,7 @@ Private Sub pvBufferReadBlockEnd(uInput As UcsBuffer)
     Dim lEnd          As Long
     
     With uInput
-        lEnd = .Stack.Item(1)
+        lEnd = .Stack.item(1)
         .Stack.Remove 1
         Debug.Assert .Pos = lEnd
     End With
@@ -5324,7 +5324,7 @@ End Function
 
 Private Function pvCollectionCount(oCol As Collection) As Long
     If Not oCol Is Nothing Then
-        pvCollectionCount = oCol.Count
+        pvCollectionCount = oCol.count
     End If
 End Function
 
@@ -5672,35 +5672,35 @@ Private Function pvAsn1DecodePrivateKey(cCerts As Collection, cPrivKey As Collec
         uRetVal.BitLen = uCertInfo.BitLen
         With cPrivKey
             If pvCollectionCount(cPrivKey) = IDX_PROVNAME Then
-                hResult = NCryptOpenStorageProvider(hNProv, StrPtr(.Item(IDX_PROVNAME)), 0)
+                hResult = NCryptOpenStorageProvider(hNProv, StrPtr(.item(IDX_PROVNAME)), 0)
                 If hResult < 0 Then
                     sApiSource = "NCryptOpenStorageProvider"
                     GoTo QH
                 End If
-                hResult = NCryptOpenKey(hNProv, uRetVal.hNKey, StrPtr(.Item(IDX_KEYNAME)), 0, 0)
+                hResult = NCryptOpenKey(hNProv, uRetVal.hNKey, StrPtr(.item(IDX_KEYNAME)), 0, 0)
                 If hResult < 0 Then
                     sApiSource = "NCryptOpenKey"
                     GoTo QH
                 End If
             Else
-                If .Item(IDX_PROVTYPE) = PROV_RSA_FULL Then
+                If .item(IDX_PROVTYPE) = PROV_RSA_FULL Then
                     '--- try using PROV_RSA_AES to have SHA-2 available in pvTlsSignatureSign
-                    Call CryptAcquireContext(hProv, StrPtr(.Item(IDX_KEYNAME)), 0, PROV_RSA_AES, 0)
+                    Call CryptAcquireContext(hProv, StrPtr(.item(IDX_KEYNAME)), 0, PROV_RSA_AES, 0)
                 End If
                 If hProv = 0 Then
-                    If CryptAcquireContext(hProv, StrPtr(.Item(IDX_KEYNAME)), StrPtr(.Item(IDX_PROVNAME)), .Item(IDX_PROVTYPE), 0) = 0 Then
+                    If CryptAcquireContext(hProv, StrPtr(.item(IDX_KEYNAME)), StrPtr(.item(IDX_PROVNAME)), .item(IDX_PROVTYPE), 0) = 0 Then
                         hResult = Err.LastDllError
                         sApiSource = "CryptAcquireContext"
                         GoTo QH
                     End If
                 End If
-                If CryptGetUserKey(hProv, .Item(IDX_KEYSPEC), uRetVal.hKey) = 0 Then
+                If CryptGetUserKey(hProv, .item(IDX_KEYSPEC), uRetVal.hKey) = 0 Then
                     hResult = Err.LastDllError
                     sApiSource = "CryptGetUserKey"
                     GoTo QH
                 End If
                 uRetVal.hProv = hProv: hProv = 0
-                uRetVal.dwKeySpec = .Item(IDX_KEYSPEC)
+                uRetVal.dwKeySpec = .item(IDX_KEYSPEC)
             End If
         End With
     ElseIf SearchCollection(cPrivKey, 1, RetVal:=baPrivKey) Then
@@ -7009,7 +7009,7 @@ Public Sub TestCryptoAesGcm(oJson As Object)
                     Else
                         lFailed = lFailed + 1
                         sComment = JsonValue(oTest, "comment")
-                        DebugLog MODULE_NAME, FUNC_NAME, "[-] " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString)
+                        debugLog MODULE_NAME, FUNC_NAME, "[-] " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString)
                     End If
                 Else
                     lSkipped = lSkipped + 1
@@ -7019,7 +7019,7 @@ Public Sub TestCryptoAesGcm(oJson As Object)
             End If
         Next
     Next
-    DebugLog MODULE_NAME, FUNC_NAME, "[+] Passed=" & lPassed & ", Failed=" & lFailed & ", Skipped=" & lSkipped
+    debugLog MODULE_NAME, FUNC_NAME, "[+] Passed=" & lPassed & ", Failed=" & lFailed & ", Skipped=" & lSkipped
 End Sub
 
 Public Sub TestCryptoAesCbc(oJson As Object)
@@ -7066,7 +7066,7 @@ Public Sub TestCryptoAesCbc(oJson As Object)
                     Else
                         lFailed = lFailed + 1
                         sComment = JsonValue(oTest, "comment")
-                        DebugLog MODULE_NAME, FUNC_NAME, "[-] " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString)
+                        debugLog MODULE_NAME, FUNC_NAME, "[-] " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString)
                     End If
                 Else
                     lSkipped = lSkipped + 1
@@ -7076,7 +7076,7 @@ Public Sub TestCryptoAesCbc(oJson As Object)
             End If
         Next
     Next
-    DebugLog MODULE_NAME, FUNC_NAME, "[+] Passed=" & lPassed & ", Failed=" & lFailed & ", Skipped=" & lSkipped
+    debugLog MODULE_NAME, FUNC_NAME, "[+] Passed=" & lPassed & ", Failed=" & lFailed & ", Skipped=" & lSkipped
 End Sub
 
 Public Sub TestCryptoChacha20(oJson As Object)
@@ -7124,7 +7124,7 @@ Public Sub TestCryptoChacha20(oJson As Object)
                     Else
                         lFailed = lFailed + 1
                         sComment = JsonValue(oTest, "comment")
-                        DebugLog MODULE_NAME, FUNC_NAME, "[-] " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString)
+                        debugLog MODULE_NAME, FUNC_NAME, "[-] " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString)
                     End If
                 Else
                     lSkipped = lSkipped + 1
@@ -7134,7 +7134,7 @@ Public Sub TestCryptoChacha20(oJson As Object)
             End If
         Next
     Next
-    DebugLog MODULE_NAME, FUNC_NAME, "[+] Passed=" & lPassed & ", Failed=" & lFailed & ", Skipped=" & lSkipped
+    debugLog MODULE_NAME, FUNC_NAME, "[+] Passed=" & lPassed & ", Failed=" & lFailed & ", Skipped=" & lSkipped
 End Sub
 
 Public Sub TestCryptoEcdh(oJson As Object)
@@ -7200,7 +7200,7 @@ Public Sub TestCryptoEcdh(oJson As Object)
                         Else
                             lFailed = lFailed + 1
                             sComment = JsonValue(oTest, "comment")
-                            DebugLog MODULE_NAME, FUNC_NAME, "[-] " & sCurve & ", " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString) & _
+                            debugLog MODULE_NAME, FUNC_NAME, "[-] " & sCurve & ", " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString) & _
                                 IIf(LenB(sFlags) <> 0, ", " & sFlags, vbNullString) & ", sResult=" & sResult & " vs " & JsonValue(oTest, "result")
                         End If
                     ElseIf sCurve = "secp384r1" And UBound(baPrivate) = LNG_SECP384R1_KEYSZ - 1 And UBound(baPublic) >= LNG_SECP384R1_KEYSZ Then
@@ -7217,7 +7217,7 @@ Public Sub TestCryptoEcdh(oJson As Object)
                         Else
                             lFailed = lFailed + 1
                             sComment = JsonValue(oTest, "comment")
-                            DebugLog MODULE_NAME, FUNC_NAME, "[-] " & sCurve & ", " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString) & _
+                            debugLog MODULE_NAME, FUNC_NAME, "[-] " & sCurve & ", " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString) & _
                                 IIf(LenB(sFlags) <> 0, ", " & sFlags, vbNullString) & ", sResult=" & sResult & " vs " & JsonValue(oTest, "result")
                         End If
                     Else
@@ -7229,7 +7229,7 @@ Public Sub TestCryptoEcdh(oJson As Object)
             Next
         End If
     Next
-    DebugLog MODULE_NAME, FUNC_NAME, "[+] Passed=" & lPassed & ", Failed=" & lFailed & ", Skipped=" & lSkipped
+    debugLog MODULE_NAME, FUNC_NAME, "[+] Passed=" & lPassed & ", Failed=" & lFailed & ", Skipped=" & lSkipped
 End Sub
 
 Public Sub TestCryptoEcdsa(oJson As Object)
@@ -7282,7 +7282,7 @@ Public Sub TestCryptoEcdsa(oJson As Object)
                         Else
                             lFailed = lFailed + 1
                             sComment = JsonValue(oTest, "comment")
-                            DebugLog MODULE_NAME, FUNC_NAME, "[-] " & sCurve & ", " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString) & _
+                            debugLog MODULE_NAME, FUNC_NAME, "[-] " & sCurve & ", " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString) & _
                                 IIf(LenB(sFlags) <> 0, ", " & sFlags, vbNullString) & ", sResult=" & sResult & " vs " & JsonValue(oTest, "result")
                         End If
                     Else ' If sCurve = "secp384r1" Then
@@ -7297,7 +7297,7 @@ Public Sub TestCryptoEcdsa(oJson As Object)
                         Else
                             lFailed = lFailed + 1
                             sComment = JsonValue(oTest, "comment")
-                            DebugLog MODULE_NAME, FUNC_NAME, "[-] " & sCurve & ", " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString) & _
+                            debugLog MODULE_NAME, FUNC_NAME, "[-] " & sCurve & ", " & JsonValue(oTest, "tcId") & IIf(LenB(sComment) <> 0, " (" & sComment & ")", vbNullString) & _
                                 IIf(LenB(sFlags) <> 0, ", " & sFlags, vbNullString) & ", sResult=" & sResult & " vs " & JsonValue(oTest, "result")
                         End If
                     End If
@@ -7307,7 +7307,7 @@ Public Sub TestCryptoEcdsa(oJson As Object)
             Next
         End If
     Next
-    DebugLog MODULE_NAME, FUNC_NAME, "[+] Passed=" & lPassed & ", Failed=" & lFailed & ", Skipped=" & lSkipped
+    debugLog MODULE_NAME, FUNC_NAME, "[+] Passed=" & lPassed & ", Failed=" & lFailed & ", Skipped=" & lSkipped
 End Sub
 
 #End If ' ImplTestCrypto

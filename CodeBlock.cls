@@ -33,8 +33,8 @@ Const strline = ":==<=<>=>+=-=/=*=*()^++--*#&/!=~,[]{}%@\;.?<=>**|" + """"""
 Private ms As mStiva2, docvar As Document
 Private Identifiers As FastCollection
 Private mycode$, SkipCode As Boolean, CurLine As Long
-Private Function GetLang(a$) As Long
-GetLang = Abs(AscW(a$) < 256)
+Private Function GetLang(A$) As Long
+GetLang = Abs(AscW(A$) < 256)
 End Function
 
 
@@ -59,9 +59,9 @@ With Code(there)
 End With
 
 End Function
-Function SkipId(there, a$) As Boolean
+Function SkipId(there, A$) As Boolean
 With Code(there)
-    If .codetype > 170 Then If a$ = Identifiers.KeyToString3(.codevar) Then there = there + 1: SkipId = True
+    If .codetype > 170 Then If A$ = Identifiers.KeyToString3(.codevar) Then there = there + 1: SkipId = True
 End With
 
 End Function
@@ -106,7 +106,7 @@ With Code(there)
     IsNum = .codetype = 100
 End With
 End Function
-Function MaybeIsSymbolAny(there As Long, a$) As Boolean
+Function MaybeIsSymbolAny(there As Long, A$) As Boolean
 Dim j As Long
 With Code(there)
     If .codevar < -2 Then
@@ -121,38 +121,38 @@ With Code(there)
                   '  If a$ = "<=>" Then
                    ' MaybeIsSymbolAny = True
                    ' Else
-                    MaybeIsSymbolAny = InStr(a$, Mid$(strline, j, 1)) > 0
+                    MaybeIsSymbolAny = InStr(A$, Mid$(strline, j, 1)) > 0
                    ' End If
                 End Select
     End If
 End With
 End Function
-Function FastSymbol(there As Long, a$) As Boolean
+Function FastSymbol(there As Long, A$) As Boolean
 Dim j As Long
 With Code(there)
     If .codetype = 14 Then
         j = -.codevar - 2
             Select Case j
                 Case Is > 200
-                    FastSymbol = Mid$(strline, j - 200, 3) = a$
+                    FastSymbol = Mid$(strline, j - 200, 3) = A$
                 Case Is > 100
-                    FastSymbol = Mid$(strline, j - 100, 2) = a$
+                    FastSymbol = Mid$(strline, j - 100, 2) = A$
                 Case Is < 1
                 ' nothing
                 Case Else
-                    FastSymbol = Mid$(strline, j, 1) = a$
+                    FastSymbol = Mid$(strline, j, 1) = A$
                 End Select
     ElseIf .codetype = 19 Then
-        FastSymbol = a$ = ")"
+        FastSymbol = A$ = ")"
     End If
 End With
 If FastSymbol Then there = there + 1
 End Function
-Friend Function IsStrExp(basestack As basetask, there As Long, a$, Optional check As Boolean = True) As Boolean
+Friend Function IsStrExp(basestack As basetask, there As Long, A$, Optional check As Boolean = True) As Boolean
 With Code(there)
     Select Case .codetype
     Case 15, 16
-    a$ = varcost(Code(there).codevar)
+    A$ = varcost(Code(there).codevar)
     there = there + 1
     IsStrExp = True
     End Select
@@ -195,7 +195,7 @@ End Select
 
 End Function
 Friend Function logical(basestack As basetask, pc As Long, D As Variant, Optional par As Long = 0, Optional flatobject As Boolean = False, Optional ByPass As Boolean = False) As Boolean
-Dim b$, s2$, S3$ ' , OSTAC$
+Dim b$, S2$, S3$ ' , OSTAC$
 Dim ah As String, s$
 If ByPass Then
 ah = aheadstatusFast(basestack.tmpstr)  ' wrong
@@ -213,7 +213,7 @@ Else
 End If
 Else
 If par > 0 Then
-If Not GetArr(basestack, pc, D, s2$, 0) Then
+If Not GetArr(basestack, pc, D, S2$, 0) Then
     Set basestack.lastobj = Nothing
 Else
     If Len(s$) > 0 Then
@@ -221,7 +221,7 @@ Else
     par = par - 1
     If ah = "S" Then Exit Function
     IsStr1 basestack, s$, b$
-    s2$ = s$
+    S2$ = s$
 
    GoTo conthere
    End If
@@ -243,7 +243,7 @@ End If
 On Error Resume Next
 
 If Err.Number > 0 Then Exit Function
-s2$ = s$
+S2$ = s$
 
 If Left$(ah, 1) <> "N" Then
  IsStrExp basestack, pc, b$
@@ -252,9 +252,9 @@ logical = False
 If Not mTextCompare Then
 If FastSymbol(pc, "=") Then
     logical = False
-    If IsStrExp(basestack, pc, s2$) Then
+    If IsStrExp(basestack, pc, S2$) Then
     logical = True
-    D = b$ = s2$
+    D = b$ = S2$
     Exit Function
     Else
     If LastErNum = -2 Then logical = True
@@ -266,12 +266,12 @@ ElseIf FastSymbol(pc, "<") Then
         Mid$(s$, 1, 1) = " "
         If Left$(s$, 2) = " >" Then
             Mid$(s$, 2, 1) = " "
-            If IsStrExp(basestack, pc, s2$) Then
+            If IsStrExp(basestack, pc, S2$) Then
                 logical = True
                 Select Case b$
-                Case Is < s2$
+                Case Is < S2$
                     D = -1
-                Case Is = s2$
+                Case Is = S2$
                     D = 0
                 Case Else
                     D = 1
@@ -282,9 +282,9 @@ ElseIf FastSymbol(pc, "<") Then
             Exit Function
             End If
         Else
-            If IsStrExp(basestack, pc, s2$) Then
+            If IsStrExp(basestack, pc, S2$) Then
                 logical = True
-                D = b$ <= s2$
+                D = b$ <= S2$
                 Exit Function
             Else
                 If LastErNum = -2 Then logical = True
@@ -293,17 +293,17 @@ ElseIf FastSymbol(pc, "<") Then
         End If
     ElseIf Left$(s$, 1) = ">" Then
         Mid$(s$, 1, 1) = " "
-        If IsStrExp(basestack, pc, s2$) Then
+        If IsStrExp(basestack, pc, S2$) Then
             logical = True
-            D = b$ <> s2$
+            D = b$ <> S2$
             Exit Function
         Else
             If LastErNum = -2 Then logical = True
             Exit Function
         End If
-    ElseIf IsStrExp(basestack, pc, s2$) Then
+    ElseIf IsStrExp(basestack, pc, S2$) Then
     logical = True
-    D = b$ < s2$
+    D = b$ < S2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -313,17 +313,17 @@ ElseIf FastSymbol(pc, ">") Then
     logical = False
     If Left$(s$, 1) = "=" Then
         Mid$(s$, 1, 1) = " "
-        If IsStrExp(basestack, pc, s2$) Then
+        If IsStrExp(basestack, pc, S2$) Then
             logical = True
-            D = b$ >= s2$
+            D = b$ >= S2$
             Exit Function
         Else
             If LastErNum = -2 Then logical = True
             Exit Function
         End If
-    ElseIf IsStrExp(basestack, pc, s2$) Then
+    ElseIf IsStrExp(basestack, pc, S2$) Then
     logical = True
-    D = b$ > s2$
+    D = b$ > S2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -331,9 +331,9 @@ ElseIf FastSymbol(pc, ">") Then
     End If
 ElseIf FastSymbol(pc, "~") Then
     logical = False
-    If IsStrExp(basestack, pc, s2$) Then
+    If IsStrExp(basestack, pc, S2$) Then
     logical = True
-    D = b$ Like s2$
+    D = b$ Like S2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -343,7 +343,7 @@ End If
 Else
 If FastSymbol(pc, "=") Then
     logical = False
-    If IsStrExp(basestack, pc, s2$) Then
+    If IsStrExp(basestack, pc, S2$) Then
     logical = True
    ' d = CompareStr2(b$, s2$) = 0
     Exit Function
@@ -358,7 +358,7 @@ If FastSymbol(pc, "=") Then
         Mid$(s$, 1, 1) = " "
         If Left$(s$, 2) = " >" Then
             Mid$(s$, 2, 1) = " "
-            If IsStrExp(basestack, pc, s2$) Then
+            If IsStrExp(basestack, pc, S2$) Then
                 logical = True
                 'd = CompareStr2(b$, s2$)
                 Exit Function
@@ -366,7 +366,7 @@ If FastSymbol(pc, "=") Then
                 If LastErNum = -2 Then logical = True
                 Exit Function
             End If
-        ElseIf IsStrExp(basestack, pc, s2$) Then
+        ElseIf IsStrExp(basestack, pc, S2$) Then
             logical = True
           '  d = CompareStr2(b$, s2$) < 1
             Exit Function
@@ -376,7 +376,7 @@ If FastSymbol(pc, "=") Then
         End If
     ElseIf Left$(s$, 1) = ">" Then
         Mid$(s$, 1, 1) = " "
-        If IsStrExp(basestack, pc, s2$) Then
+        If IsStrExp(basestack, pc, S2$) Then
             logical = True
            ' d = CompareStr2(b$, s2$) <> 0
             Exit Function
@@ -384,7 +384,7 @@ If FastSymbol(pc, "=") Then
             If LastErNum = -2 Then logical = True
             Exit Function
         End If
-    ElseIf IsStrExp(basestack, pc, s2$) Then
+    ElseIf IsStrExp(basestack, pc, S2$) Then
         logical = True
        ' d = CompareStr2(b$, s2$) = -1
         Exit Function
@@ -396,7 +396,7 @@ ElseIf FastSymbol(pc, ">") Then
     logical = False
     If Left$(s$, 1) = "=" Then
         Mid$(s$, 1, 1) = " "
-        If IsStrExp(basestack, pc, s2$) Then
+        If IsStrExp(basestack, pc, S2$) Then
             logical = True
           ' d = CompareStr2(b$, s2$) > -1
             Exit Function
@@ -404,7 +404,7 @@ ElseIf FastSymbol(pc, ">") Then
             If LastErNum = -2 Then logical = True
             Exit Function
         End If
-    ElseIf IsStrExp(basestack, pc, s2$) Then
+    ElseIf IsStrExp(basestack, pc, S2$) Then
         logical = True
        ' d = CompareStr2(b$, s2$) = 1
         Exit Function
@@ -414,9 +414,9 @@ ElseIf FastSymbol(pc, ">") Then
     End If
 ElseIf FastSymbol(pc, "~") Then
     logical = False
-    If IsStrExp(basestack, pc, s2$) Then
+    If IsStrExp(basestack, pc, S2$) Then
     logical = True
-    D = b$ Like s2$
+    D = b$ Like S2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -425,11 +425,11 @@ ElseIf FastSymbol(pc, "~") Then
 End If
 
 End If
-If LastErNum <> -2 Then s$ = s2$
+If LastErNum <> -2 Then s$ = S2$
 
 Else
 
-s$ = s2$
+s$ = S2$
 cont145:
 If IsNumber(basestack, pc, D, flatobject) Then
 logical = True
@@ -440,17 +440,17 @@ End If
 End Function
 
 
-Friend Function GetArr(bstack As basetask, pc As Long, p As Variant, s$, skip As Long) As Boolean
+Friend Function GetArr(bstack As basetask, pc As Long, P As Variant, s$, skip As Long) As Boolean
 Dim pppp As mArray, x1 As Long
 x1 = 1
-Set pppp = New mArray: pppp.myarrbase = 0: pppp.PushDim (1): pppp.PushEnd: pppp.Arr = True
+Set pppp = New mArray: pppp.myarrbase = 0: pppp.PushDim (1): pppp.PushEnd: pppp.arr = True
 If skip = 1 Then GoTo firstexp Else If skip = 2 Then GoTo firststr
-If IsExp(bstack, pc, p) Then
+If IsExp(bstack, pc, P) Then
 firstexp:
             x1 = x1 + 1
             pppp.SerialItem 0, x1, 10
             If bstack.lastobj Is Nothing Then
-                pppp.item(x1 - 2) = p
+                pppp.item(x1 - 2) = P
             Else
                 Set pppp.item(x1 - 2) = bstack.lastobj
                 Set bstack.lastobj = Nothing
@@ -472,11 +472,11 @@ If MaybeIsSymbolAny(pc, ")") Then
 
 pppp.SerialItem 0, x1 - 1, 10
 Exit Do
-ElseIf IsExp(bstack, pc, p) Then
+ElseIf IsExp(bstack, pc, P) Then
 x1 = x1 + 1
             pppp.SerialItem 0, x1, 10
             If bstack.lastobj Is Nothing Then
-                pppp.item(x1 - 2) = p
+                pppp.item(x1 - 2) = P
             Else
                 Set pppp.item(x1 - 2) = bstack.lastobj
                 Set bstack.lastobj = Nothing
@@ -492,9 +492,9 @@ x1 = x1 + 1
             End If
 End If
 Loop
-p = 0
+P = 0
 Set bstack.lastobj = New mHandler
-bstack.lastobj.t1 = 3
+bstack.lastobj.T1 = 3
 Set bstack.lastobj.objref = pppp
 End Function
 Friend Function IsExp(basestack As basetask, pc As Long, R As Variant, Optional ByVal noand1 As Boolean = True, Optional flatobject As Boolean = False, Optional Comp As Boolean = True) As Boolean
@@ -581,12 +581,12 @@ End If
 fromhere = NewLine
 
 End Function
-Public Sub Construct(a$)
+Public Sub Construct(A$)
     Set ms = New mStiva2
     Set LL = New Lexar
     Set Identifiers = New FastCollection
-    LL.Construct2 a$
-    SwapStrings a$, mycode$
+    LL.Construct2 A$
+    SwapStrings A$, mycode$
 End Sub
 Private Sub Class_Initialize()
 LastCode = -1
@@ -610,7 +610,7 @@ End Sub
 
 Private Sub LL_addone(n As Long, t As Long)
 If t = 3 Or SkipCode Then Exit Sub
-Dim p As Long, v As String
+Dim P As Long, v As String
 LastCode = LastCode + 1
 Code(LastCode).codevar = -1
 If LastCode >= mcode Then
@@ -621,12 +621,12 @@ If t = 5 Then t = 14
 If t = 14 Or t = 18 Then
 If ms.LookTopVal = "&" Then
         ms.drop 1
-        p = CLng(ms.PopVal)
+        P = CLng(ms.PopVal)
         v = myUcase(CStr(ms.PopVal), True)
         If Not Identifiers.ExistKey(v) Then
             Identifiers.AddKey v
         End If
-        Code(p).codevar = Identifiers.Index
+        Code(P).codevar = Identifiers.Index
 End If
 
 End If
@@ -646,9 +646,9 @@ With Code(LastCode)
     .codetype = t
    If ms.LookTopVal = "}" Then
     ms.drop 1
-    p = CLng(ms.PopVal)
-    Code(p).codevar = LastCode + 1
-    .codevar = p + 1
+    P = CLng(ms.PopVal)
+    Code(P).codevar = LastCode + 1
+    .codevar = P + 1
     End If
 End With
 
@@ -670,8 +670,8 @@ again:
     If ms.LookSecondVal + 1 < LastCode Then
         If Code(CLng(ms.LookSecondVal)).codemore > 0 Then
                 ms.drop 1
-                p = CLng(ms.PopVal)
-                Code(p).codehelp = CInt(LastCode - p + 1)
+                P = CLng(ms.PopVal)
+                Code(P).codehelp = CInt(LastCode - P + 1)
                 GoTo again
         End If
         
@@ -682,8 +682,8 @@ again:
            If ms.LookSecondVal + 1 < LastCode Then
         If Code(CLng(ms.LookSecondVal)).codemore > 0 Then
                     ms.drop 1
-                    p = CLng(ms.PopVal)
-                    Code(p).codehelp = CInt(LastCode - p + 1)
+                    P = CLng(ms.PopVal)
+                    Code(P).codehelp = CInt(LastCode - P + 1)
                     GoTo again
         End If
         
@@ -699,12 +699,12 @@ If LastCode > 0 Then
 If Code(LastCode - 1).codetype = 19 Then
 If ms.LookTopVal = "&" Then
         ms.drop 1
-        p = CLng(ms.PopVal)
+        P = CLng(ms.PopVal)
         v = CStr(ms.PopVal)
         If Not Identifiers.ExistKey(v) Then
             Identifiers.AddKey v
         End If
-        Code(p).codevar = Identifiers.Index
+        Code(P).codevar = Identifiers.Index
 End If
 End If
 End If
@@ -723,7 +723,7 @@ End Sub
 
 Private Sub LL_addstr(v As String, UseCase As Boolean)
 If SkipCode Then Exit Sub
-Dim z As Long, s$, zz As Integer
+Dim Z As Long, s$, zz As Integer
 With Code(LastCode)
 Select Case .codetype
 Case 15, 16
@@ -799,20 +799,20 @@ If .codetype = 171 Then
             If iselse(CStr(ms.LookTopVal)) Then
                 If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
                     ms.drop 1
-                    z = CLng(ms.PopVal)
-                    Code(z).codehelp = CInt(LastCode - z + 1)
+                    Z = CLng(ms.PopVal)
+                    Code(Z).codehelp = CInt(LastCode - Z + 1)
                 End If
             ElseIf IsThen(CStr(ms.LookTopVal)) Then
                 If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
                     ms.drop 1
-                    z = CLng(ms.PopVal)
-                    Code(z).codehelp = CInt(LastCode - z + 1)
+                    Z = CLng(ms.PopVal)
+                    Code(Z).codehelp = CInt(LastCode - Z + 1)
                 End If
             ElseIf IsElseIf(CStr(ms.LookTopVal)) Then
                 If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
                     ms.drop 1
-                    z = CLng(ms.PopVal)
-                    Code(z).codehelp = CInt(LastCode - z + 1)
+                    Z = CLng(ms.PopVal)
+                    Code(Z).codehelp = CInt(LastCode - Z + 1)
                 End If
             End If
         Else
@@ -836,8 +836,8 @@ If .codetype = 171 Then
         ElseIf IsElseIf(ms.LookTopVal) Then
             If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
                 ms.drop 1
-                z = CLng(ms.PopVal)
-                Code(z).codehelp = CInt(LastCode - z)   ' NOT +1
+                Z = CLng(ms.PopVal)
+                Code(Z).codehelp = CInt(LastCode - Z)   ' NOT +1
                 ms.PushVal CVar(LastCode)
                 ms.PushStr v
                 .codetype = 10
@@ -855,8 +855,8 @@ syer:
 iselse:
             If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
                 ms.drop 1
-                z = CLng(ms.PopVal)
-                Code(z).codehelp = CInt(LastCode - z)   ' NOT +1
+                Z = CLng(ms.PopVal)
+                Code(Z).codehelp = CInt(LastCode - Z)   ' NOT +1
                 ms.PushVal CVar(LastCode)
                  ms.PushStr v
                  .codetype = 10
@@ -877,8 +877,8 @@ iselse:
         If IsIf(CStr(ms.LookTopVal)) Then
             If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
                 ms.drop 1
-                z = CLng(ms.PopVal)
-                Code(z).codehelp = CInt(LastCode - z)   ' NOT +1
+                Z = CLng(ms.PopVal)
+                Code(Z).codehelp = CInt(LastCode - Z)   ' NOT +1
                 ms.PushVal CVar(LastCode)
                 ms.PushStr v
                 .codetype = 10
@@ -889,8 +889,8 @@ iselse:
         ElseIf IsThen(CStr(ms.LookTopVal)) Then
             If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
                 ms.drop 1
-                z = CLng(ms.PopVal)
-                Code(z).codehelp = CInt(LastCode - z + 1)
+                Z = CLng(ms.PopVal)
+                Code(Z).codehelp = CInt(LastCode - Z + 1)
                 ms.PushVal CVar(LastCode)
                 ms.PushStr v
                 .codetype = 10
@@ -901,8 +901,8 @@ iselse:
         ElseIf IsElseIf(CStr(ms.LookTopVal)) Then
             If GetLang(CStr(ms.LookTopVal)) = GetLang(v) Then
                 ms.drop 1
-                z = CLng(ms.PopVal)
-                Code(z).codehelp = CInt(LastCode - z)   ' NOT +1
+                Z = CLng(ms.PopVal)
+                Code(Z).codehelp = CInt(LastCode - Z)   ' NOT +1
                 ms.PushVal CVar(LastCode)
                 ms.PushStr v
                 .codetype = 10
@@ -953,12 +953,12 @@ Case 24, 19, 18, 17, 14, 9, 8, 5
         myabort = True
         Else
         ms.drop 1
-        z = CLng(ms.PopVal)
-        Code(z).codehelp = CInt(LastCode - z + 1)
+        Z = CLng(ms.PopVal)
+        Code(Z).codehelp = CInt(LastCode - Z + 1)
         
         If ms.LookTopVal = "#" Then
         ms.drop 1
-        ms.PushVal CVar(z)
+        ms.PushVal CVar(Z)
         ms.PushStr "&"
         
         End If
@@ -968,21 +968,21 @@ Case 24, 19, 18, 17, 14, 9, 8, 5
     .codetype = 14
     ElseIf .codetype = 8 Then
     If ms.LookTopVal = ")" Then
-        z = ms.LookSecondVal
-        If Code(z).codetype = 17 Then Code(z).codetype = 21   ' 21 for tuple
+        Z = ms.LookSecondVal
+        If Code(Z).codetype = 17 Then Code(Z).codetype = 21   ' 21 for tuple
     End If
     ElseIf .codetype = 9 Then
     If .codevar <> -1 Then Exit Sub
     End If
-    z = InStr(strline, v)
-    If z > 0 Then
+    Z = InStr(strline, v)
+    If Z > 0 Then
     Select Case Len(v)
     Case 1
-        .codevar = -z - 2
+        .codevar = -Z - 2
     Case 2
-        .codevar = -z - 102
+        .codevar = -Z - 102
     Case 3
-        .codevar = -z - 202
+        .codevar = -Z - 202
     End Select
 
     Else
@@ -1033,14 +1033,14 @@ docvar.InsertDoc docvar.LastParagraph, docvar.TextParagraphLen(docvar.LastParagr
 End If
 
 End Sub
-Function RetStr(X As Integer, base As Long) As String
-If X > 0 Then RetStr = " skip to" + str$(X + base)
+Function RetStr(X As Integer, Base As Long) As String
+If X > 0 Then RetStr = " skip to" + str$(X + Base)
 End Function
 Sub ExportStr(b As Object)
 
 Dim bstack As basetask
 Set bstack = b
-Dim i As Long, j As Long, numbers As Long, strconst As Long
+Dim I As Long, j As Long, numbers As Long, strconst As Long
 Set docvar = New Document
 If myabort Then
 If LastCode > 0 Then
@@ -1054,31 +1054,31 @@ RepPlain bstack, bstack.Owner, (docvar.textDoc)
 End If
 Exit Sub
 End If
-For i = 0 To LastCode
-    With Code(i)
+For I = 0 To LastCode
+    With Code(I)
     
-    Add str$(i) + str$(.codepos) + str$(.codetype)
+    Add str$(I) + str$(.codepos) + str$(.codetype)
     Select Case .codetype
     Case 9
         If .codevar < -1 Then
         Add " :" + vbCrLf
         Else
-        Add " Identifier: " + Identifiers.KeyToString3(.codevar) + RetStr(.codehelp, i) & " id (" & .codevar & ")" & vbCrLf
+        Add " Identifier: " + Identifiers.KeyToString3(.codevar) + RetStr(.codehelp, I) & " id (" & .codevar & ")" & vbCrLf
         End If
     Case 21
-        Add " TUPLE (" + RetStr(.codehelp, i) + vbCrLf
+        Add " TUPLE (" + RetStr(.codehelp, I) + vbCrLf
     Case 10, 11, 112, 111, Is > 160
         If Identifiers.count < .codevar Then
             Add " Syntax Error:" + vbCrLf
-            Add " " + codeline(i) + vbCrLf
+            Add " " + codeline(I) + vbCrLf
             GoTo ex12
         Else
             If .codevar = -1 Then
                 Add " Syntax Error:" + vbCrLf
-                Add " " + codeline(i) + vbCrLf
+                Add " " + codeline(I) + vbCrLf
                 GoTo ex12
             Else
-                Add " Identifier: " + Identifiers.KeyToString3(.codevar) + RetStr(.codehelp, i) & " id (" & .codevar & ")" & vbCrLf
+                Add " Identifier: " + Identifiers.KeyToString3(.codevar) + RetStr(.codehelp, I) & " id (" & .codevar & ")" & vbCrLf
             End If
         End If
     Case 140
@@ -1099,7 +1099,7 @@ For i = 0 To LastCode
                     
                 Case Else
                 'If Mid$(strline, j, 1) = ")" And .codetype <> 19 Then Stop
-                    Add " " + Mid$(strline, j, 1) + RetStr(.codehelp, i) & " symbol id (" & j & ")" & vbCrLf
+                    Add " " + Mid$(strline, j, 1) + RetStr(.codehelp, I) & " symbol id (" & j & ")" & vbCrLf
                 End Select
             Case -2
                 Add " " + """""" + vbCrLf
@@ -1107,21 +1107,21 @@ For i = 0 To LastCode
 
                     'add " " + Replace(Replace(CStr(varcost(.codevar)), vbCrLf, "\n"), vbTab, "\t") + vbCrLf
                 If .codetype = 16 Then
-                    Add " {" & (varcost(.codevar)) & "}" + RetStr(.codehelp, i) & " strliteral (" & .codevar & ")" & vbCrLf
+                    Add " {" & (varcost(.codevar)) & "}" + RetStr(.codehelp, I) & " strliteral (" & .codevar & ")" & vbCrLf
                 
                         strconst = strconst + 1
                 ElseIf .codetype = 15 Then
-                    Add " " + """" & (varcost(.codevar)) & """" & RetStr(.codehelp, i) & " strliteral (" & .codevar & ")" & vbCrLf
+                    Add " " + """" & (varcost(.codevar)) & """" & RetStr(.codehelp, I) & " strliteral (" & .codevar & ")" & vbCrLf
                         strconst = strconst + 1
                 ElseIf .codetype = 14 Then
-                    Add " >>>>>>>>>>>>>>>>>>>  " & (varcost(.codevar)) + RetStr(.codehelp, i) + vbCrLf
+                    Add " >>>>>>>>>>>>>>>>>>>  " & (varcost(.codevar)) + RetStr(.codehelp, I) + vbCrLf
                         
                 Else
                     On Error Resume Next
                     Add " " & (varcost(.codevar)) & " " & Typename$(varcost(.codevar)) & " numliteral (" & .codevar & ")" & vbCrLf
                     If Err.Number > 0 Then
                         Add " Syntax Error:" & vbCrLf
-                        Add " " + codeline(i) + vbCrLf
+                        Add " " + codeline(I) + vbCrLf
                         GoTo ex12
                     End If
                     numbers = numbers + 1
@@ -1132,7 +1132,7 @@ For i = 0 To LastCode
         End Select
     End Select
     End With
-Next i
+Next I
 Add "Number Literals:" + str$(numbers) + vbCrLf
 Add "String Literals:" + str$(strconst) + vbCrLf
 Add "Identifiers:" + str$(Identifiers.count) + vbCrLf
@@ -1143,19 +1143,16 @@ ex12:
 ' unhide next two lines to get results to clipboard
 If ms.Total > 0 Then
 Set docvar = New Document
-i = CLng(ms.LookSecondVal)
+I = CLng(ms.LookSecondVal)
 If pagio = "GREEK" Then
-Add "Δεν έκλεισε σωστά στη θέση χαρακτήρα " & Code(i).codepos
+Add "Δεν έκλεισε σωστά στη θέση χαρακτήρα " & Code(I).codepos
 Else
-Add "Not Properly closed at char pos " & Code(i).codepos
+Add "Not Properly closed at char pos " & Code(I).codepos
 End If
 Else
-Clipboard.Clear
-SetTextData CF_UNICODETEXT, (docvar.textDoc)      'set as unicode text
 End If
-        Clipboard.Clear
-       SetTextData CF_UNICODETEXT, docvar.textDoc
-RepPlain bstack, bstack.Owner, (docvar.textDoc)
+    SetTextData CF_UNICODETEXT, (docvar.textDoc)
+    RepPlain bstack, bstack.Owner, (docvar.textDoc)
 
         'For i = 0 To LastVar
         'RepPlain bstack, bstack.Owner, (varcost(i))
@@ -1175,15 +1172,15 @@ End Function
 Private Function IsThen(v As String) As Boolean
    If v = "THEN" Or v = "ΤΟΤΕ" Then IsThen = True
 End Function
-Function isEnd(a$) As Boolean
-a$ = myUcase(a$, True)
-Select Case a$
+Function isEnd(A$) As Boolean
+A$ = myUcase(A$, True)
+Select Case A$
 Case "END", "ΤΕΛΟΣ"
 isEnd = True
 End Select
 End Function
 
-Private Sub LL_NewLine(ByVal i As Long)
+Private Sub LL_NewLine(ByVal I As Long)
 SkipCode = False
-CurLine = i
+CurLine = I
 End Sub

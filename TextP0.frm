@@ -220,12 +220,11 @@ Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () 
 ' by default EditTextWord is false, so we look for identifiers not words
 Private Pad$, s$
 Private Declare Function DefWindowProcW Lib "user32" (ByVal hWnd As Long, ByVal wMsg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
-
+Private Declare Function OpenClipboard Lib "user32" (ByVal hWnd As Long) As Long
 Private LastDocTitle$, para1 As Long, PosPara1 As Long, Para2 As Long, PosPara2 As Long, Para3 As Long, PosPara3 As Long
 Public ShadowMarks As Boolean
 Private nochange As Boolean, LastSearchType As Long
 Private Declare Function lstrlenW Lib "kernel32.dll" (ByVal psString As Long) As Long
-Private Declare Function EmptyClipboard Lib "user32" () As Long
 Public MY_BACK As New cDIBSection, Back_Back As New cDIBSection
 Private mynum$, LastNumX
 Dim OneOnly As Boolean
@@ -387,42 +386,42 @@ Private Sub Form_GotFocus()
 If Not lockme Then If QRY Or GFQRY Then Form1.KeyPreview = True
 End Sub
 
-Private Sub Form_KeyUp(keycode As Integer, shift As Integer)
-Dim i As Long
+Private Sub Form_KeyUp(KeyCode As Integer, shift As Integer)
+Dim I As Long
  If List1.LeaveonChoose Then Exit Sub
 clickMe = -1
-i = -1
-If keycode = vbKeyV Then
+I = -1
+If KeyCode = vbKeyV Then
 Exit Sub
 End If
 If shift <> 4 And mynum$ <> "" Then
 On Error Resume Next
 If Left$(mynum$, 1) = "0" Then
-i = val(mynum$)
+I = val(mynum$)
 Else
-i = val(mynum$)
+I = val(mynum$)
 End If
 mynum$ = vbNullString
-If i > 32 Then
+If I > 32 Then
 
-If i >= &H10000 And i <= &H10FFFF Then
-i = i - &H10000
-UKEY$ = ChrW(UINT(i \ &H400& + &HD800&)) + ChrW(UINT((i And &H3FF&) + &HDC00&))
+If I >= &H10000 And I <= &H10FFFF Then
+I = I - &H10000
+UKEY$ = ChrW(UINT(I \ &H400& + &HD800&)) + ChrW(UINT((I And &H3FF&) + &HDC00&))
 Else
-UKEY$ = ChrW(i)
+UKEY$ = ChrW(I)
 End If
 If LastNumX Then Form_KeyPress 44
 Refresh
 Exit Sub
 End If
 Else
-i = GetLastKeyPressed
+I = GetLastKeyPressed
 End If
 
- If i <> -1 And i <> 94 Then
-    UKEY$ = ChrW(i)
+ If I <> -1 And I <> 94 Then
+    UKEY$ = ChrW(I)
  Else
- If i <> -1 Then UKEY$ = vbNullString
+ If I <> -1 Then UKEY$ = vbNullString
  End If
 
 End Sub
@@ -449,17 +448,17 @@ If Me.WindowState <> 0 Then WindowState = 0: Exit Sub
 End Sub
 
 Private Sub gList1_ChangeListItem(item As Long, content As String)
-Dim i As Long
+Dim I As Long
 
 If nochange Then
 nochange = True
 With TEXT1
-i = .SelLength
-.Form1mn1Enabled = i > 0
-.Form1mn2Enabled = i > 0
+I = .SelLength
+.Form1mn1Enabled = I > 0
+.Form1mn2Enabled = I > 0
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
-.Form1sdnEnabled = i > 0 And (.Length - .SelStart) > i
-.Form1supEnabled = i > 0 And .SelStart > i
+.Form1sdnEnabled = I > 0 And (.Length - .SelStart) > I
+.Form1supEnabled = I > 0 And .SelStart > I
 .Form1mscatEnabled = .Form1sdnEnabled Or .Form1supEnabled
 .Form1rthisEnabled = .Form1mscatEnabled
 End With
@@ -468,16 +467,16 @@ End If
 End Sub
 
 Private Sub gList1_ChangeSelStart(thisselstart As Long)
-Dim i As Long
+Dim I As Long
 
 If gList1.enabled Then
 With TEXT1
-i = .SelLength
-.Form1mn1Enabled = i > 0
-.Form1mn2Enabled = i > 0
+I = .SelLength
+.Form1mn1Enabled = I > 0
+.Form1mn2Enabled = I > 0
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
-.Form1sdnEnabled = i > 0 And (.Length - .SelStart) > i
-.Form1supEnabled = i > 0 And .SelStart > i
+.Form1sdnEnabled = I > 0 And (.Length - .SelStart) > I
+.Form1supEnabled = I > 0 And .SelStart > I
 .Form1mscatEnabled = .Form1sdnEnabled Or .Form1supEnabled
 .Form1rthisEnabled = .Form1mscatEnabled
 End With
@@ -490,17 +489,17 @@ Set pic = Point2Me
 End Sub
 
 Private Sub gList1_HeaderSelected(Button As Integer)
-Dim i As Long
+Dim I As Long
 
 If Not gList1.enabled Then Exit Sub
 With TEXT1
 If .UsedAsTextBox Then Exit Sub
-i = .SelLength
-.Form1mn1Enabled = i > 0
-.Form1mn2Enabled = i > 0
+I = .SelLength
+.Form1mn1Enabled = I > 0
+.Form1mn2Enabled = I > 0
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
-.Form1sdnEnabled = i > 0 And (.Length - .SelStart) > .SelLength
-.Form1supEnabled = i > 0 And .SelStart > .SelLength
+.Form1sdnEnabled = I > 0 And (.Length - .SelStart) > .SelLength
+.Form1supEnabled = I > 0 And .SelStart > .SelLength
 .Form1mscatEnabled = .Form1sdnEnabled Or .Form1supEnabled
 .Form1rthisEnabled = .Form1mscatEnabled
 End With
@@ -510,11 +509,11 @@ MyPopUp.Up
 
 End Sub
 
-Private Sub gList1_KeyDownAfter(keycode As Integer, shift As Integer)
-If keycode = vbKeyTab Then
+Private Sub gList1_KeyDownAfter(KeyCode As Integer, shift As Integer)
+If KeyCode = vbKeyTab Then
 If shift = 2 Then
 choosenext
-keycode = 0
+KeyCode = 0
 End If
 End If
 End Sub
@@ -537,14 +536,14 @@ Private Sub glist1_MarkOut()
 Pack1
 End Sub
 Public Sub Pack1()
-Dim i As Long
+Dim I As Long
 With TEXT1
-i = .SelLength
-.Form1mn1Enabled = i > 0
-.Form1mn2Enabled = i > 0
+I = .SelLength
+.Form1mn1Enabled = I > 0
+.Form1mn2Enabled = I > 0
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
-.Form1sdnEnabled = i > 0 And (.Length - .SelStart) > i
-.Form1supEnabled = i > 0 And .SelStart > i
+.Form1sdnEnabled = I > 0 And (.Length - .SelStart) > I
+.Form1supEnabled = I > 0 And .SelStart > I
 .Form1mscatEnabled = .Form1sdnEnabled Or .Form1supEnabled
 .Form1rthisEnabled = .Form1mscatEnabled
 End With
@@ -556,17 +555,17 @@ If KeyAscii = 13 Then KeyAscii = 0: Exit Sub
 End Sub
 
 Private Sub gList1_OutPopUp(X As Single, Y As Single, myButton As Integer)
-Dim i As Long
+Dim I As Long
 
 If Not gList1.enabled Then Exit Sub
 With TEXT1
 If .UsedAsTextBox Then Exit Sub
-i = .SelLength
-.Form1mn1Enabled = i > 0
-.Form1mn2Enabled = i > 0
+I = .SelLength
+.Form1mn1Enabled = I > 0
+.Form1mn2Enabled = I > 0
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
-.Form1sdnEnabled = i > 0 And (.Length - .SelStart) > .SelLength
-.Form1supEnabled = i > 0 And .SelStart > .SelLength
+.Form1sdnEnabled = I > 0 And (.Length - .SelStart) > .SelLength
+.Form1supEnabled = I > 0 And .SelStart > .SelLength
 .Form1mscatEnabled = .Form1sdnEnabled Or .Form1supEnabled
 .Form1rthisEnabled = .Form1mscatEnabled
 End With
@@ -594,11 +593,11 @@ End If
 End If
 End Sub
 
-Private Sub ffhelp(a$)
-If Left$(a$, 1) < "Á" Then
-fHelp Basestack1, a$, True
+Private Sub ffhelp(A$)
+If Left$(A$, 1) < "Á" Then
+fHelp Basestack1, A$, True
 Else
-fHelp Basestack1, a$
+fHelp Basestack1, A$
 End If
 End Sub
 
@@ -640,7 +639,7 @@ End Function
 
 
 Private Sub HTML_onkeydown()
-Select Case view1.Document.parentWindow.event.keycode
+Select Case view1.Document.parentWindow.event.KeyCode
 Case vbKeyF1
 IEUP homepage$
 Form1.KeyPreview = False
@@ -732,7 +731,7 @@ End Sub
 
 Public Sub mscatsub()
 ''
-Dim l As Long, W As Long, s$, TempLcid As Long, OldLcid As Long
+Dim L As Long, W As Long, s$, TempLcid As Long, OldLcid As Long
 Dim el As Long, eW As Long, safety As Long, TT$
 
 W = TEXT1.mDoc.MarkParagraphID
@@ -745,36 +744,36 @@ OldLcid = TEXT1.mDoc.LCID
 TempLcid = FoundLocaleId(s$)
 If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
 
-l = el + 1
+L = el + 1
 If EditTextWord Then
 Do
-If TEXT1.mDoc.FindWord(s$, True, W, l) Then
+If TEXT1.mDoc.FindWord(s$, True, W, L) Then
 TT$ = TEXT1.mDoc.TextParagraph(W)
-Mid$(TT$, l, Len(s$)) = s$
+Mid$(TT$, L, Len(s$)) = s$
 TEXT1.mDoc.ReWritePara W, TT$
 TEXT1.mDoc.WrapAgainBlock W, W
 TEXT1.mDoc.ColorThis (W)
 Else
 W = 1
-l = 0
+L = 0
 safety = safety + 1
 End If
-Loop Until (W = eW And l = el) Or safety = 2
+Loop Until (W = eW And L = el) Or safety = 2
 
 Else
 Do
-If TEXT1.mDoc.FindIdentifier(s$, True, W, l) Then
+If TEXT1.mDoc.FindIdentifier(s$, True, W, L) Then
 TT$ = TEXT1.mDoc.TextParagraph(W)
-Mid$(TT$, l, Len(s$)) = s$
+Mid$(TT$, L, Len(s$)) = s$
 TEXT1.mDoc.TextParagraph(W) = TT$
 TEXT1.mDoc.WrapAgainBlock W, W
 TEXT1.mDoc.ColorThis (W)
 Else
 W = 1
-l = 0
+L = 0
 safety = safety + 1
 End If
-Loop Until (W = eW And l = el) Or safety = 2
+Loop Until (W = eW And L = el) Or safety = 2
 
 End If
 TEXT1.mDoc.LCID = OldLcid
@@ -785,7 +784,7 @@ End Sub
 
 Public Sub rthissub(Optional anystr As Boolean = False)
 If TEXT1.mDoc.Busy Then Exit Sub
-Dim l As Long, W As Long, s$, TempLcid As Long, OldLcid As Long, noinp As Double
+Dim L As Long, W As Long, s$, TempLcid As Long, OldLcid As Long, noinp As Double
 Dim el As Long, eW As Long, safety As Long, TT$, w1 As Long, i1 As Long
 Dim neo$, mDoc10 As Document, addthat As Long, w2 As Long
 Dim prof1 As New clsProfiler
@@ -828,33 +827,33 @@ If TEXT1.mDoc.DocParagraphs > 50 Then
 TEXT1.glistN.SuspDraw = True
 End If
 i1 = el
-l = i1 + addthat
+L = i1 + addthat
 w1 = W
 If EditTextWord Or anystr Then
 TEXT1.glistN.DropKey = True
 Dim ok1 As Boolean
 Do
 If anystr Then
-ok1 = TEXT1.mDoc.FindStrDown(s$, W, l)
+ok1 = TEXT1.mDoc.FindStrDown(s$, W, L)
 Else
-ok1 = TEXT1.mDoc.FindWord(s$, True, W, l)
+ok1 = TEXT1.mDoc.FindWord(s$, True, W, L)
 End If
 If ok1 Then
 If safety And W = w1 Then
 If w2 > 0 Then If w2 <> W Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
 w2 = W
-If l = i1 Then
+If L = i1 Then
  TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = W
  TEXT1.glistN.enabled = False
-TEXT1.ParaSelStart = l
+TEXT1.ParaSelStart = L
  TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
 TEXT1.SelText = neo$
 TEXT1.RemoveUndo TEXT1.SelText
 Exit Do
-ElseIf l - addthat < i1 Then
+ElseIf L - addthat < i1 Then
 i1 = i1 + Len(neo$) - Len(s$)
 Else
 
@@ -863,7 +862,7 @@ End If
 TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = W
  TEXT1.glistN.enabled = False
-TEXT1.ParaSelStart = l
+TEXT1.ParaSelStart = L
  TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
@@ -874,7 +873,7 @@ TEXT1.GroupUndo
 
 Else
 W = 1
-l = 0
+L = 0
 safety = safety + 1
 End If
 If prof1.MARKTWO > 1000 Then ProcTask2 Basestack1: prof1.MARKONE
@@ -885,24 +884,24 @@ Else
 ''If l > 0 Then l = l - 1
 TEXT1.glistN.DropKey = True
 Do
-If TEXT1.mDoc.FindIdentifier(s$, True, W, l) Then
+If TEXT1.mDoc.FindIdentifier(s$, True, W, L) Then
 'If w2 > 0 Then TEXT1.mDoc.ColorThis w2: TEXT1.WrapMarkedPara
 If w2 > 0 Then If w2 <> W Then TEXT1.mDoc.WrapAgainBlock w2, w2:    TEXT1.mDoc.ColorThis w2
 w2 = W
 If safety And W = w1 Then
 
-If l = i1 Then
+If L = i1 Then
  TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = W
  TEXT1.glistN.enabled = False
-TEXT1.ParaSelStart = l
+TEXT1.ParaSelStart = L
  TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
 TEXT1.SelText = neo$
 TEXT1.RemoveUndo TEXT1.SelText
 Exit Do
-ElseIf l - addthat < i1 Then
+ElseIf L - addthat < i1 Then
 i1 = i1 + Len(neo$) - Len(s$)
 Else
 
@@ -911,7 +910,7 @@ End If
 TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = W
  TEXT1.glistN.enabled = False
-TEXT1.ParaSelStart = l
+TEXT1.ParaSelStart = L
  TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
@@ -919,11 +918,11 @@ TEXT1.AddUndo ""
 TEXT1.SelText = neo$
 TEXT1.RemoveUndo TEXT1.SelText
 TEXT1.GroupUndo
-l = l + Len(neo$)
+L = L + Len(neo$)
 
 Else
 W = 1
-l = 0
+L = 0
 safety = safety + 1
 End If
 If prof1.MARKTWO > 1000 Then ProcTask2 Basestack1: prof1.MARKONE
@@ -945,28 +944,28 @@ If s$ = vbNullString Or InStr(s$, Chr$(13)) > 0 Or InStr(s$, Chr$(10)) > 0 Then 
 SearchDown s$
 End Sub
 Sub SearchDown(s$, Optional anystr As Boolean = False)
-Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
+Dim L As Long, W As Long, TempLcid As Long, OldLcid As Long
 
 W = TEXT1.mDoc.MarkParagraphID   ' this is the not the order
 TEXT1.SelStartSilent = TEXT1.SelStart
-l = TEXT1.Charpos
+L = TEXT1.Charpos
 
 OldLcid = TEXT1.mDoc.LCID
 TempLcid = FoundLocaleId(s$)
 If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
-  If Not TEXT1.mDoc.FindStrDown(s$, W, l) Then GoTo sdnOut
+  If Not TEXT1.mDoc.FindStrDown(s$, W, L) Then GoTo sdnOut
   Else
-    If Not TEXT1.mDoc.FindWord(s$, True, W, l) Then GoTo sdnOut
+    If Not TEXT1.mDoc.FindWord(s$, True, W, L) Then GoTo sdnOut
     End If
 Else
-    If Not TEXT1.mDoc.FindIdentifier(s$, True, W, l) Then GoTo sdnOut
+    If Not TEXT1.mDoc.FindIdentifier(s$, True, W, L) Then GoTo sdnOut
 End If
 TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = W
 TEXT1.glistN.enabled = False
-TEXT1.ParaSelStart = l
+TEXT1.ParaSelStart = L
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdnOut:
@@ -981,26 +980,26 @@ If s$ = vbNullString Or InStr(s$, Chr$(13)) > 0 Or InStr(s$, Chr$(10)) > 0 Then 
 Searchup s$
 End Sub
 Sub Searchup(s$, Optional anystr As Boolean = False)
-Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
+Dim L As Long, W As Long, TempLcid As Long, OldLcid As Long
 W = TEXT1.mDoc.MarkParagraphID
 TEXT1.SelStartSilent = TEXT1.SelStart - (TEXT1.SelLength > 1)
-l = TEXT1.Charpos + Len(s$)
+L = TEXT1.Charpos + Len(s$)
 OldLcid = TEXT1.mDoc.LCID
 TempLcid = FoundLocaleId(s$)
 If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
-   If Not TEXT1.mDoc.FindStrUp(s$, W, l) Then GoTo sdupOut
+   If Not TEXT1.mDoc.FindStrUp(s$, W, L) Then GoTo sdupOut
    Else
-       If Not TEXT1.mDoc.FindWord(s$, False, W, l) Then GoTo sdupOut
+       If Not TEXT1.mDoc.FindWord(s$, False, W, L) Then GoTo sdupOut
     End If
 Else
-    If Not TEXT1.mDoc.FindIdentifier(s$, False, W, l) Then GoTo sdupOut
+    If Not TEXT1.mDoc.FindIdentifier(s$, False, W, L) Then GoTo sdupOut
 End If
 TEXT1.SelLengthSilent = 0
 TEXT1.mDoc.MarkParagraphID = W
 TEXT1.glistN.enabled = False
-TEXT1.ParaSelStart = l
+TEXT1.ParaSelStart = L
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdupOut:
@@ -1018,9 +1017,9 @@ clickMe2 = -1
 If QRY Or GFQRY Then Form1.KeyPreview = True
 End Sub
 
-Private Sub DIS_KeyDown(keycode As Integer, shift As Integer)
-If keycode = vbKeyPause Then
-Form_KeyDown keycode, shift
+Private Sub DIS_KeyDown(KeyCode As Integer, shift As Integer)
+If KeyCode = vbKeyPause Then
+Form_KeyDown KeyCode, shift
 End If
 End Sub
 Public Sub GiveASoftBreak(Sorry As Boolean)
@@ -1077,13 +1076,13 @@ End Sub
 
 
 Private Sub dSprite_MouseDown(Index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
-Dim p As Long, u2 As Long
+Dim P As Long, u2 As Long
 If lockme Then Exit Sub
 If Not NoAction Then
 NoAction = True
 Dim sel&
-p = val("0" & dSprite(Index).Tag)
-With players(p)
+P = val("0" & dSprite(Index).Tag)
+With players(P)
     u2 = .uMineLineSpace * 2
 
         If Button > 0 And Targets Then
@@ -1112,27 +1111,27 @@ End If
 End Sub
 
 
-Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
-Dim i As Long
+Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
+Dim I As Long
 Form1.Font.charset = GetCharSet(GetCodePage(GetLCIDFromKeyboard))
 
 Static ctrl As Boolean, noentrance As Boolean
-If keycode = 13 And List1.Visible And (Not List1.LeaveonChoose) And Not QRY Then
-keycode = 0
+If KeyCode = 13 And List1.Visible And (Not List1.LeaveonChoose) And Not QRY Then
+KeyCode = 0
 List1.PressSoft
 Exit Sub
 End If
-If keycode = 13 And trace Then
+If KeyCode = 13 And trace Then
 If GFQRY Or QRY Then
 ElseIf List1.Visible Then
 Exit Sub
 ElseIf gList1.Visible Then
 Exit Sub
 Else
-If Not STq Then STbyST = True: keycode = 0
+If Not STq Then STbyST = True: KeyCode = 0
 End If
 End If
-clickMe = HighLow(CLng(shift), CLng(keycode))
+clickMe = HighLow(CLng(shift), CLng(KeyCode))
 If clickMe2 = -2 Then clickMe2 = clickMe
 If clickMe = 27 And escok Then
 NOEXECUTION = True
@@ -1160,31 +1159,31 @@ If QRY Or GFQRY Then KeyPreview = True Else Form1.KeyPreview = False
 
 End If
 
-If clickMe2 <> -1 Then keycode = 0: Exit Sub
+If clickMe2 <> -1 Then KeyCode = 0: Exit Sub
 
 If BLOCKkey Then Exit Sub
 If noentrance Then
-keycode = 0
+KeyCode = 0
 Exit Sub
 End If
 If shift = 4 Then
-If keycode = 18 Then
+If KeyCode = 18 Then
 If mynum$ = vbNullString Then mynum$ = "0"
-keycode = 0
+KeyCode = 0
 Exit Sub
 End If
-Select Case keycode
+Select Case KeyCode
 Case vbKeyAdd, vbKeyInsert
 mynum$ = "&h"
 Case vbKey0 To vbKey9
-mynum$ = mynum$ + Chr$(keycode - vbKey0 + 48)
+mynum$ = mynum$ + Chr$(KeyCode - vbKey0 + 48)
 LastNumX = True
 Case vbKeyNumpad0 To vbKeyNumpad9
-mynum$ = mynum$ + Chr$(keycode - vbKeyNumpad0 + 48)
+mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 48)
 LastNumX = False
 Case vbKeyA To vbKeyF
 If Left$(mynum$, 1) = "&" Then
-mynum$ = mynum$ + Chr$(keycode - vbKeyNumpad0 + 65)
+mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 65)
 LastNumX = True
 Else
 mynum$ = vbNullString
@@ -1199,7 +1198,7 @@ End If
 mynum$ = vbNullString
 
 
-Select Case keycode
+Select Case KeyCode
 Case vbKeyE, vbKeyD
 If ctrl And (shift And &H2) = 2 Then
 If QRY Then
@@ -1295,29 +1294,35 @@ End If
 Case vbKeyTab
     If (shift And 1) = 1 Then
     INK$ = INK$ & Chr$(6)
-    keycode = 0
+    KeyCode = 0
     ElseIf ctrl Or shift = 2 Or Not (QRY Or GFQRY) Then
     ctrl = False
         choosenext
-        keycode = 0
+        KeyCode = 0
         
     End If
 Case vbKeyV
     If ctrl And (shift And &H2) = 2 Then
-        Pad$ = GetTextData(CF_UNICODETEXT)
+    On Error Resume Next
+    Pad$ = GetTextData(13)
+    If Err Or Pad$ = "" Then
+    Pad$ = Clipboard.GetText(1)
+    If Err Or Pad$ = "" Then Err.Clear: KeyCode = 0: Exit Sub
+    End If
+  '      pad$ = GetTextData(CF_UNICODETEXT)
         If Pad$ <> "" Then
                 INK$ = Pad$
         End If
-         keycode = 0
+         KeyCode = 0
         Exit Sub
     End If
 
 Case vbKeyC, &HFFFE
-If (ctrl And (shift And &H2) = 2) Or keycode = &HFFFE Then
+If (ctrl And (shift And &H2) = 2) Or KeyCode = &HFFFE Then
 If QRY Then
 INK$ = INK$ & "CLS" & Chr$(13)
 Else
-keycode = 0
+KeyCode = 0
 If Form4Loaded Then
 If Form4.Visible Then
 Form4.Visible = False
@@ -1332,11 +1337,11 @@ End If
 End If
 End If
 Case vbKeyPause  '(this is the break key!!!!!'
-If Forms.count > 5 Then keycode = 0: Exit Sub
-If Not TaskMaster Is Nothing Then If TaskMaster.QueueCount > 0 Then keycode = 0: Exit Sub
+If Forms.count > 5 Then KeyCode = 0: Exit Sub
+If Not TaskMaster Is Nothing Then If TaskMaster.QueueCount > 0 Then KeyCode = 0: Exit Sub
 If QRY Or GFQRY Then
 If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
-i = MOUT
+I = MOUT
 If ASKINUSE Then
 If BreakMe Then Exit Sub
 Unload NeoMsgBox: ASKINUSE = False: Exit Sub
@@ -1344,7 +1349,7 @@ End If
 BreakMe = True
 If MsgBoxN(BreakMes, vbYesNo, MesTitle$) <> vbNo Then
 Check2SaveModules = False
-MOUT = i
+MOUT = I
 
 extreme = False
 If AVIRUN Then AVI.GETLOST
@@ -1377,7 +1382,7 @@ End If
 BreakMe = False
 End If
 If IsWine Then releasemouse = True
-keycode = 0
+KeyCode = 0
 Case vbKeyLeft
 INK$ = INK$ & Chr(0) + Chr(75)   ' GWBASIC Codes
 Case vbKeyRight
@@ -1408,11 +1413,11 @@ End If
 NOEXECUTION = True
 End If
 Case vbKeyF1 To vbKeyF12
-If Fkey >= 0 Then Fkey = (keycode - vbKeyF1 + 1) + 12 * (shift And 1)
+If Fkey >= 0 Then Fkey = (KeyCode - vbKeyF1 + 1) + 12 * (shift And 1)
 If Abs(Fkey) = 1 And ctrl And (shift And &H2) = 2 Then
 If lastAboutHTitle <> "" Then abt = True: vH_title$ = vbNullString
 
-Fkey = 0: keycode = 0: vHelp
+Fkey = 0: KeyCode = 0: vHelp
 ElseIf Fkey = 4 And ctrl And QRY Then
 interpret DisStack, "END"
 End If
@@ -1420,10 +1425,10 @@ End If
 Case vbKeyControl
 
 ctrl = True
-keycode = 0
+KeyCode = 0
 Exit Sub
 Case Else
-If ctrl And (shift And &H2) = 2 And lckfrm = 0 And keycode <> 3 And keycode <> 16 Then
+If ctrl And (shift And &H2) = 2 And lckfrm = 0 And KeyCode <> 3 And KeyCode <> 16 Then
 If escok Then
 STq = False
 STEXIT = False
@@ -1447,12 +1452,12 @@ End Select
 
 ctrl = False
  If List1.LeaveonChoose Then Exit Sub
- If keycode = 91 Then Exit Sub
-i = GetLastKeyPressed
- If i <> -1 And i <> 94 Then UKEY$ = ChrW(i) Else If i <> -1 Then UKEY$ = vbNullString
+ If KeyCode = 91 Then Exit Sub
+I = GetLastKeyPressed
+ If I <> -1 And I <> 94 Then UKEY$ = ChrW(I) Else If I <> -1 Then UKEY$ = vbNullString
  If List1.Visible Then
  Else
-keycode = 0
+KeyCode = 0
 End If
 End Sub
 
@@ -1514,11 +1519,7 @@ Else
 MOUT = False
 End If
 End If
-
-'noentrance = False
 End If
-EmptyClipboard
-
 iamhere = False
 End Sub
 
@@ -1627,11 +1628,11 @@ Switches para$  ' ,TRUE CHECK THIS
 111:
 
   On Error Resume Next
-  Dim i As Long
+  Dim I As Long
   
-      For i = 0 To Controls.count - 1
-     If Typename(Controls(i)) <> "Menu" Then Controls(i).TabStop = False
-      Next i
+      For I = 0 To Controls.count - 1
+     If Typename(Controls(I)) <> "Menu" Then Controls(I).TabStop = False
+      Next I
 End Sub
 
 
@@ -1713,7 +1714,7 @@ MOUT = False
 On Error Resume Next
 Const HWND_BROADCAST = &HFFFF&
 Const WM_FONTCHANGE = &H1D
-Dim pn As Long, a As New cDIBSection
+Dim pn As Long, A As New cDIBSection
 AutoRedraw = True
  If App.StartMode = vbSModeStandalone Then If OneOnly Then Exit Sub
 OneOnly = True
@@ -1750,7 +1751,7 @@ Basestack1.myCharSet = 0
 Basestack1.Owner.move 0, 0, ScaleWidth, ScaleHeight
 
 If NoAction Then Exit Sub
-Dim dummy As Boolean, i
+Dim dummy As Boolean, I
 NOEXECUTION = False
 '
 myBreak Basestack1
@@ -1924,7 +1925,7 @@ NoAction = True
 NOEXECUTION = False
 Basestack1.toprinter = False
 MOUT = False
-ClearLabels
+If UBound(sbf) > 0 Then ClearLabels
 Dim kolpo As Boolean
 If Not thisbs Is Nothing Then
 kolpo = False
@@ -2084,12 +2085,12 @@ End Sub
 
 
 
-Private Sub gList1_KeyDown(keycode As Integer, shift As Integer)
+Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
 Static ctrl As Boolean, noentrance As Boolean, where As Long, noinp As Double
 
-Dim aa$, a$, JJ As Long, ii As Long, gothere As Long, gocolumn As Long
-If keycode = vbKeyEscape Then
-keycode = 0
+Dim aa$, A$, JJ As Long, ii As Long, gothere As Long, gocolumn As Long
+If KeyCode = vbKeyEscape Then
+KeyCode = 0
  If Not EditTextWord Then
  ' check if { } is ok...
  If nobypasscheck Then
@@ -2110,8 +2111,8 @@ keycode = 0
  If TEXT1.UsedAsTextBox Then result = 99
 NOEDIT = True: noentrance = False: Exit Sub
 End If
-If keycode = vbKeyPause Then
- keycode = 0: NOEDIT = True: noentrance = False
+If KeyCode = vbKeyPause Then
+ KeyCode = 0: NOEDIT = True: noentrance = False
 If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
             If Form1.Visible Then
              If TEXT1.Visible Then
@@ -2119,8 +2120,8 @@ If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
                 Form1.SetFocus
             End If
             End If
-            If Forms.count > 5 Then keycode = 0: Exit Sub
-            If Not TaskMaster Is Nothing Then If TaskMaster.QueueCount > 0 Then keycode = 0: Exit Sub
+            If Forms.count > 5 Then KeyCode = 0: Exit Sub
+            If Not TaskMaster Is Nothing Then If TaskMaster.QueueCount > 0 Then KeyCode = 0: Exit Sub
             If BreakMe Then noentrance = False: Exit Sub
             If ASKINUSE Then
                 
@@ -2158,7 +2159,7 @@ End If
 '***************************************
 'Exit Sub
 If TEXT1.UsedAsTextBox Then
-Select Case keycode
+Select Case KeyCode
 Case Is = vbKeyTab And (shift Mod 2 = 1), vbKeyUp
 result = -1
 Case vbKeyReturn
@@ -2169,7 +2170,7 @@ Case Else
 noentrance = False
 Exit Sub
 End Select
-keycode = 0
+KeyCode = 0
 
 NOEDIT = True: noentrance = False: Exit Sub
 
@@ -2177,7 +2178,7 @@ Exit Sub
 End If
 
 If noentrance Then
-keycode = 0
+KeyCode = 0
 noentrance = False
 Exit Sub
 End If
@@ -2188,29 +2189,29 @@ With TEXT1
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
 End With
 
-If keycode = 13 And shift = 2 Then
-keycode = 0
+If KeyCode = 13 And shift = 2 Then
+KeyCode = 0
 shift = 0
 UKEY$ = vbNullString
 TEXT1.insertbrackets
 noentrance = False
 Exit Sub
 End If
-Select Case keycode
+Select Case KeyCode
 Case vbKeyReturn
 nochange = True
 
 
 
 If TEXT1.AutoIntNewLine Then
-    keycode = 0
+    KeyCode = 0
     nochange = False
     Exit Sub
 End If
 nochange = False
 Case vbKeyControl
 ctrl = True
-keycode = 0
+KeyCode = 0
 Case vbKeyF1
 If (shift And 2) = 2 Then
 If TEXT1.SelText <> "" Then
@@ -2225,7 +2226,7 @@ TEXT1.Render
 TEXT1.ManualInform
 End If
 
-keycode = 0
+KeyCode = 0
 Case vbKeyF2
 If shift <> 0 Then
 LastSearchType = 2 - Abs(shift Mod 2 = 1)
@@ -2246,7 +2247,7 @@ supsub
 End If
 End If
 
-keycode = 0
+KeyCode = 0
 Case vbKeyF3
 
 If shift <> 0 Then
@@ -2268,25 +2269,25 @@ Else
 sdnSub
 End If
 End If
-keycode = 0
+KeyCode = 0
 Case vbKeyF4
 
 If TEXT1.SelText <> "" Then mscatsub Else TEXT1.dothis
 
-keycode = 0
+KeyCode = 0
 Case vbKeyF5
 If TEXT1.SelText <> "" Then rthissub shift Mod 2 = 1
-keycode = 0
+KeyCode = 0
 Case vbKeyF6  ' Set/Show/Reset Para1
 
 MarkSoftButton para1, PosPara1
-keycode = 0
+KeyCode = 0
 Case vbKeyF7  'Set/Show/Reset Para2
 MarkSoftButton Para2, PosPara2
-keycode = 0
+KeyCode = 0
 Case vbKeyF8  'Set/Show/Reset Para2
 MarkSoftButton Para3, PosPara3
-keycode = 0
+KeyCode = 0
 
 Case vbKeyF9  ' Count Words/
 If shift <> 0 Then
@@ -2314,7 +2315,7 @@ TEXT1.ReplaceTitle = "Words in text:" + CStr(TEXT1.mDoc.WordCount)
 End If
 End If
 End If
-keycode = 0
+KeyCode = 0
 Case vbKeyF10
 If shift <> 0 Then
 With TEXT1
@@ -2336,14 +2337,14 @@ TEXT1.showparagraph = Not TEXT1.showparagraph
 TEXT1.mDoc.WrapAgain
 TEXT1.Render
 End If
-keycode = 0
+KeyCode = 0
 
 Case vbKeyF11
 fState = fState + 1
 SetText1
 TEXT1.WrapAll
 TEXT1.ManualInform
-keycode = 0
+KeyCode = 0
 Case vbKeyF12
 If shift <> 0 Then
 mn5sub
@@ -2351,7 +2352,7 @@ mn5sub
 Else
 showmodules
 End If
-keycode = 0
+KeyCode = 0
 Case vbKeyPageUp
 Case vbKeyPageDown
 Case vbKeyTab
@@ -2377,47 +2378,47 @@ If TEXT1.HaveMarkedText Then TEXT1.SelStartSilent = TEXT1.SelStart
 
 
     If TEXT1.SelText <> "" Then
-        a$ = vbCrLf + TEXT1.SelText & "*"
+        A$ = vbCrLf + TEXT1.SelText & "*"
         If gList1.UseTab Then
             If shift <> 0 Then
-                If InStr(a$, vbCrLf + vbTab) = 0 Then
-                a$ = Replace(a$, vbCrLf + String$(TabControl + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod TabControl, ChrW(160)), vbCrLf)
-                a$ = Replace(a$, vbCrLf + space$(TabControl + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod TabControl), vbCrLf)
+                If InStr(A$, vbCrLf + vbTab) = 0 Then
+                A$ = Replace(A$, vbCrLf + String$(TabControl + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod TabControl, ChrW(160)), vbCrLf)
+                A$ = Replace(A$, vbCrLf + space$(TabControl + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod TabControl), vbCrLf)
                 Else
-                a$ = Replace(a$, vbCrLf + vbTab, vbCrLf)
+                A$ = Replace(A$, vbCrLf + vbTab, vbCrLf)
                 
                 End If
-                TEXT1.InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
+                TEXT1.InsertTextNoRender = Mid$(A$, 3, Len(A$) - 3)
                  TEXT1.SelStartSilent = ii
-                 TEXT1.SelLengthSilent = Len(a$) - 3
+                 TEXT1.SelLengthSilent = Len(A$) - 3
                  
             Else
-                If InStr(a$, vbCrLf + " ") > 0 Or InStr(a$, vbCrLf + ChrW(160)) > 0 Then
-                a$ = Replace(a$, vbCrLf, vbCrLf + space$(TabControl))
-                TEXT1.InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
+                If InStr(A$, vbCrLf + " ") > 0 Or InStr(A$, vbCrLf + ChrW(160)) > 0 Then
+                A$ = Replace(A$, vbCrLf, vbCrLf + space$(TabControl))
+                TEXT1.InsertTextNoRender = Mid$(A$, 3, Len(A$) - 3)
                 TEXT1.SelStartSilent = where + TabControl
-                TEXT1.SelLengthSilent = Len(a$) - 3 - (where + TabControl - ii)
+                TEXT1.SelLengthSilent = Len(A$) - 3 - (where + TabControl - ii)
                 Else
-                a$ = Replace(a$, vbCrLf, vbCrLf + vbTab)
+                A$ = Replace(A$, vbCrLf, vbCrLf + vbTab)
                 
-                TEXT1.InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
+                TEXT1.InsertTextNoRender = Mid$(A$, 3, Len(A$) - 3)
                 TEXT1.SelStartSilent = where + 1
-                TEXT1.SelLengthSilent = Len(a$) - 3 - (where + 1 - ii)
+                TEXT1.SelLengthSilent = Len(A$) - 3 - (where + 1 - ii)
                End If
             End If
         Else
             If shift <> 0 Then
-                a$ = Replace(a$, vbCrLf + String$(TabControl + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod TabControl, ChrW(160)), vbCrLf)
-                a$ = Replace(a$, vbCrLf + space$(TabControl + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod TabControl), vbCrLf)
-                TEXT1.InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
+                A$ = Replace(A$, vbCrLf + String$(TabControl + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod TabControl, ChrW(160)), vbCrLf)
+                A$ = Replace(A$, vbCrLf + space$(TabControl + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod TabControl), vbCrLf)
+                TEXT1.InsertTextNoRender = Mid$(A$, 3, Len(A$) - 3)
                  TEXT1.SelStartSilent = ii
-                 TEXT1.SelLengthSilent = Len(a$) - 3
+                 TEXT1.SelLengthSilent = Len(A$) - 3
                  
             Else
-                a$ = Replace(a$, vbCrLf, vbCrLf + space$(TabControl))
-                TEXT1.InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
+                A$ = Replace(A$, vbCrLf, vbCrLf + space$(TabControl))
+                TEXT1.InsertTextNoRender = Mid$(A$, 3, Len(A$) - 3)
                 TEXT1.SelStartSilent = where + TabControl
-                TEXT1.SelLengthSilent = Len(a$) - 3 - (where + TabControl - ii)
+                TEXT1.SelLengthSilent = Len(A$) - 3 - (where + TabControl - ii)
                
             End If
         End If
@@ -2472,7 +2473,7 @@ TEXT1.glistN.Noflashingcaret = False
 TEXT1.Render
 
 nochange = False
-keycode = 0
+KeyCode = 0
 shift = 0
 'gList1_MarkOut
 Case Else
@@ -2482,14 +2483,14 @@ End Select
 noentrance = False
 End Sub
 
-Private Sub List1_SyncKeyboardUnicode(a As String)
+Private Sub List1_SyncKeyboardUnicode(A As String)
 'refresh
 MyDoEvents2
 If QRY Or GFQRY Then
-If a = Left$(INK$, 1) Then INK$ = Mid$(a, 2)
-a = ""
+If A = Left$(INK$, 1) Then INK$ = Mid$(A, 2)
+A = ""
 Else
-INK$ = INK$ & a
+INK$ = INK$ & A
 End If
 End Sub
 
@@ -2590,13 +2591,13 @@ End Sub
 
 
 
-Public Sub view1_StatusTextChange11(bstack As basetask, ByVal t1 As String)
+Public Sub view1_StatusTextChange11(bstack As basetask, ByVal T1 As String)
 On Error Resume Next
 exWnd = 0
 
 view1.Visible = False
 Sleep 1
-Prepare bstack, t1
+Prepare bstack, T1
 Sleep 1
 If Form1.Visible Then Form1.Refresh
 End Sub
@@ -2731,20 +2732,20 @@ End If
 End Sub
 
 
-Private Function Parameters(a As String, b As String, c As String) As Boolean
-Dim i, ch As Boolean, vl As Boolean, chs$, all$, many As Long
+Private Function Parameters(A As String, b As String, C As String) As Boolean
+Dim I, ch As Boolean, vl As Boolean, chs$, all$, many As Long
 b = vbNullString
-c = vbNullString
+C = vbNullString
 
 'parameters = False
 ch = False
 vl = False
-Do While i < Len(a)
-i = i + 1
-Select Case Mid$(a, i, 1)
+Do While I < Len(A)
+I = I + 1
+Select Case Mid$(A, I, 1)
 Case "%"
-If Mid$(a, i + 1, 1) = "u" Then
-i = i + 1
+If Mid$(A, I + 1, 1) = "u" Then
+I = I + 1
 'we have four bytes
 many = 6
 Else
@@ -2759,7 +2760,7 @@ b = vbNullString
 End If
 Case "+"
 If vl = True Then
-c = c & " "
+C = C & " "
 Else
 b = b & " "
 End If
@@ -2773,7 +2774,7 @@ Exit Do
 End If
 Case Else
 If ch = True Then
-chs$ = chs$ & Mid$(a, i, 1)
+chs$ = chs$ & Mid$(A, I, 1)
 If Len(chs$) = many Then
 If many = 4 Then
 chs$ = Chr(Int(chs$))
@@ -2782,20 +2783,20 @@ chs$ = StrConv(Chr(CLng("&h" & Mid$(chs$, 5))) + Chr(CLng(Left$(chs$, 4))), vbFr
 End If
 ch = False
 If vl Then
-c = c + chs$
+C = C + chs$
 Else
 b = b + chs$
 End If
 End If
 ElseIf vl = False Then
-b = b + Mid$(a, i, 1)
+b = b + Mid$(A, I, 1)
 Else
-c = c + Mid$(a, i, 1)
+C = C + Mid$(A, I, 1)
 End If
 End Select
 Loop
-If c <> "" Then Parameters = True
-a = Mid$(a, i + 1)
+If C <> "" Then Parameters = True
+A = Mid$(A, I + 1)
 End Function
 
 
@@ -3143,19 +3144,20 @@ End Sub
 
 Public Sub mn3sub()
 On Error Resume Next
-Dim aa$
-aa$ = GetTextData(13)
-If aa$ = vbNullString Then
+Dim Pad$
+Sleep 10
 On Error Resume Next
-aa$ = Clipboard.GetText(1)
-If Err Then Err.Clear: Exit Sub
+Pad$ = GetTextData(13)
+If Err Or Pad$ = "" Then
+Pad$ = Clipboard.GetText(1)
+If Err Or Pad$ = "" Then Err.Clear: Exit Sub
 End If
 With TEXT1
 If .ParaSelStart = 2 And .glistN.list(.glistN.ListIndex) = vbNullString Then
 .SelStart = .SelStart - 1
 End If
 .AddUndo ""
-.SelText = aa$
+.SelText = Pad$
 .RemoveUndo .SelText
 End With
 End Sub
@@ -3302,9 +3304,9 @@ Public Sub hookme(this As gList)
 Set LastGlist = this
 End Sub
 Public Function mybreak1() As Boolean
-Dim i As Long
+Dim I As Long
 If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
-i = MOUT
+I = MOUT
 If ASKINUSE Then
 If BreakMe Then Exit Function
 Unload NeoMsgBox: ASKINUSE = False: Exit Function
@@ -3363,7 +3365,7 @@ TEXT1.mDoc.ColorEvent = Not TEXT1.NoColor
 
 End Sub
 Private Sub mywait11(bstack As basetask, ByVal pp)
-Dim p As Boolean, e As Boolean
+Dim P As Boolean, E As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents
@@ -3371,10 +3373,10 @@ If pp = 0 Then Exit Sub
 Else
 
 Err.Clear
-p = bstack.Process.Done
+P = bstack.Process.Done
 If Err.Number = 0 Then
-e = True
-If p <> 0 Then
+E = True
+If P <> 0 Then
 Exit Sub
 End If
 End If
@@ -3394,10 +3396,10 @@ Else
         ' SleepWait 1
         MyDoEvents
         End If
-If e Then
-p = bstack.Process.Done
+If E Then
+P = bstack.Process.Done
 If Err.Number = 0 Then
-If p <> 0 Then
+If P <> 0 Then
 Exit Do
 End If
 End If
@@ -3555,33 +3557,33 @@ recover:
 On Error GoTo recover2
 BLOCKkey = False
 AskTitle$ = vbNullString
-Dim z As Form
-Set z = Nothing
+Dim Z As Form
+Set Z = Nothing
 For Each X In Forms
     If X.Name = "GuiM2000" Then
         Set XX = X
         If Not XX.Enablecontrol Then
         XX.TestModal mycode
         End If
-        If XX.Enablecontrol Then Set z = XX
+        If XX.Enablecontrol Then Set Z = XX
         'End If
         Set XX = Nothing
     End If
 Next X
 Set X = Nothing
-If Not zz Is Nothing Then Set z = zz
+If Not zz Is Nothing Then Set Z = zz
 On Error Resume Next
-If Typename(z) = "GuiM2000" Then
-    Set XX = z
+If Typename(Z) = "GuiM2000" Then
+    Set XX = Z
     XX.Enablecontrol = True
     If XX.Visible Then
     XX.ShowmeALL
     If Not XX.Minimized Then XX.SetFocus
     End If
-    Set z = Nothing
+    Set Z = Nothing
     Set XX = Nothing
-ElseIf Not z Is Nothing Then
-    If z.Visible Then z.SetFocus
+ElseIf Not Z Is Nothing Then
+    If Z.Visible Then Z.SetFocus
 End If
 Modalid = oldcodeid
           
@@ -3612,16 +3614,16 @@ Exit Function
 
 End Function
 
-Public Function ask(bstack As basetask, a$) As Double
+Public Function ask(bstack As basetask, A$) As Double
 If ASKINUSE Then Exit Function
 DialogSetupLang DialogLang
-AskText$ = a$
+AskText$ = A$
 ask = NeoASK(bstack)
 
 End Function
 
 Sub mywait(bstack As basetask, pp As Double, Optional SLEEPSHORT As Boolean = False)
-Dim p As Boolean, e As Boolean
+Dim P As Boolean, E As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents1 Form1
@@ -3629,10 +3631,10 @@ If pp = 0 Then Exit Sub
 Else
 
 Err.Clear
-p = bstack.Process.Done
+P = bstack.Process.Done
 If Err.Number = 0 Then
-e = True
-If p <> 0 Then
+E = True
+If P <> 0 Then
 Exit Sub
 End If
 End If
@@ -3653,10 +3655,10 @@ Do
         MyDoEvents0 Me
         End If
 If SLEEPSHORT Then Sleep 1
-If e Then
-p = bstack.Process.Done
+If E Then
+P = bstack.Process.Done
 If Err.Number = 0 Then
-If p <> 0 Then
+If P <> 0 Then
 Exit Do
 End If
 End If

@@ -9605,7 +9605,6 @@ MODULE ICONS {function dummy {
 			if keypress(2) then exit
 			p= keypress(1)
 			refresh 1500
-
 		}
 		Set Fast
 	end if
@@ -9736,6 +9735,7 @@ rem				hold
 				end if
 			end if
 		end if
+		wait 10
 	always
 	Menu
 	menu fill 1
@@ -17326,80 +17326,84 @@ MODULE EERTREE {\\ https://rosettacode.org/wiki/Eertree
 \\ https://en.wikipedia.org/wiki/Trie
 \\ https://en.wikipedia.org/wiki/Suffix_tree
 \\ Construct an eertree for the string "eertree", then output all sub-palindromes by traversing the tree.
-Class Node {
-      inventory myedges
-      length, suffix=0
-      Function edges(s$) {
-            =-1 : if exist(.myedges, s$) then =eval(.myedges)
-      }
-      Module edges_append (a$, where) {
-            Append .myedges, a$:=where
-      }
-Class:
-      Module Node(.length) {
-            Read ? .suffix, .myedges
-      }     
+' ver 2.9  (change some string variables without $ as the last character)
+' also change palindrome$() to palindrome()
+
+
+function eertree(s as string) {
+	Class Node {
+		inventory myedges
+		length, suffix=0
+		Function edges(s) {
+			=-1 : if exist(.myedges, s) then =eval(.myedges)
+		}
+		Module edges_append (a, where) {
+			Append .myedges, a:=where
+		}
+		Class:
+		Module Node(.length) {
+			Read ? .suffix, .myedges
+		}
+	}	
+	Const evenRoot=0, oddRoot=1
+	Tree=List:= oddRoot:=Node(-1,1),evenRoot:=Node(0,1)
+	k=0
+	suffix=oddRoot
+	for i=0 to len(s)-1
+		d=mid$(s,i+1,1)
+		n=suffix
+		Do
+			k=tree(n).length
+			b=i-k-1
+			if b>=0 then if mid$(s,b+1,1)=d Then exit
+			n =tree(n).suffix  
+		Always
+		e=tree(n).edges(d)
+		if e>=0 then suffix=e :continue
+		suffix=len(Tree)
+		Append Tree, len(Tree):=Node(k+2)
+		Tree(n).edges_append d, suffix
+		If tree(suffix).length=1 then tree(suffix).suffix=0 : continue
+		Do
+			n=tree(n).suffix
+			b=i-tree(n).length-1
+			if b>0 Then If  mid$(s, b+1,1)=d then exit
+		Always
+		e=tree(n).edges(d)
+		if e>=0 then tree(suffix).suffix=e
+	next
+	=tree
 }
-function eertree(s$) {
-      Const evenRoot=0, oddRoot=1
-      Inventory Tree= oddRoot:=Node(-1,1),evenRoot:=Node(0,1)
-      k=0
-      suffix=oddRoot
-      for i=0 to len(s$)-1 {
-            c$=mid$(s$,i+1,1)
-            n=suffix
-            Do {
-                 k=tree(n).length
-                 b=i-k-1
-                 if b>=0 then if mid$(s$,b+1,1)=c$ Then exit
-                 n =tree(n).suffix  
-            } Always
-            e=tree(n).edges(c$)
-            if e>=0 then suffix=e :continue
-            suffix=len(Tree)
- 
-            Append Tree, len(Tree):=Node(k+2)
-            Tree(n).edges_append c$, suffix
-            If tree(suffix).length=1 then tree(suffix).suffix=0 : continue
-            Do {
-                  n=tree(n).suffix
-                  b=i-tree(n).length-1
-                  if b>0 Then If  mid$(s$, b+1,1)=c$ then exit
-            } Always
-            e=tree(n).edges(c$)
-            if e>=0 then tree(suffix).suffix=e 
-      } 
-      =tree
-}
-children=lambda (s, tree,  n, root$="")->{
-            L=Len(tree(n).myEdges)
-            if L=0 then =s : exit
-            L--
-            For i=0 to L {
-                  c=tree(n).myEdges
-                  c$=Eval$(c, i)  ' read keys at position i
-                  nxt=c(i!)   '  read value using position 
-                  p$ = if$(n=1 -> c$, c$+root$+c$)
-                  append s, (p$,)
-                  \\ better use lambda() and not children()
-                  \\ for recursion when we copy this lambda to other identifier.
-                  s = lambda(s, tree, nxt, p$)
-            }
-         = s
-      }
-aString=Lambda ->{
-          Push Quote$(Letter$)
-}
-aLine=Lambda ->{
-      Shift 2  ' swap two top stack items
-      if stackitem$()="" then  { Drop}  Else Push letter$+", "+Letter$
-}
-Palindromes$=Lambda$ children, aString, aLine (Tree)-> {
-            ="("+children(children((,), Tree, 0), Tree, 1)#Map(aString)#Fold$(aline,"")+")"
- }
- 
-Print Palindromes$(eertree("eertree"))
-Print Palindromes$(eertree("banana"))
+Palindromes=lambda ->{
+	children=lambda (s, tree,  n, root as string="")->{
+		L=Len(tree(n).myEdges)
+		if L=0 then =s : exit
+		L--
+		For i=0 to L
+			c=tree(n).myEdges
+			d=Eval$(c, i)  ' read keys at position i
+			nxt=c(i!)   '  read value using position 
+			p = if(n=1 -> d, d+root+d)
+			append s, (p,)
+			\\ better use lambda() and not children()
+			\\ for recursion when we copy this lambda to other identifier.
+			s = lambda(s, tree, nxt, p)
+		Next
+		= s
+	}
+	aString=Lambda ->{
+		Push Quote$(Letter$)
+	}
+	aLine=Lambda ->{
+		Shift 2  ' swap two top stack items
+		if stackitem$()="" then  { Drop}  Else Push letter$+", "+Letter$
+	}
+	=Lambda children, aString, aLine (Tree)-> {
+		="("+children(children((,), Tree, 0), Tree, 1)#Map(aString)#Fold$(aline,"")+")"
+	}
+}()  ' execute lambda now so palindromes take the result (another lambda)
+Print Palindromes(eertree("eertree"))
+Print Palindromes(eertree("banana"))
 }
 MODULE COMMON {thread.plan sequential   ' can run as concurrent too
 linespace twipsY*2
@@ -23693,6 +23697,19 @@ if menu then
       Print "Current OS system time zone: ";
       Pen 15 {Print time$()}
 End If
+Print "Press any key"
+push key$
+drop
+checkthis()
+
+sub checkthis()
+	local zones=time()
+	local m=each(zones)
+	' key - value
+	while m
+		? eval$(m!), @(30), eval(m)
+	end while
+end sub
 }
 MODULE WIND4 {Clear
 \\ An old example, new revision.
@@ -45369,5 +45386,359 @@ Module Check (filename as string="") {
 }
 Check "out.txt"
 Check   ' just show here
+}
+MODULE HANDSQR {function sqr(a as decimal) {
+	decimal b, x,y,x1, c,c1,p
+	string cc
+	integer k, k1
+	b=int(a)
+	cc=str$(b,"")
+	if len(cc) mod 2=1 then cc="0"+cc
+	k=len(cc) div 2
+	dim a(0 to k)
+	for i=1 to k
+		a(i)=val(mid$(cc, i*2-1, 2))
+	next
+	b=frac(a)
+	if b>0 then
+		cc=mid$(str$(b,""),3)
+		if len(cc) mod 2=1 then cc+="0"
+		k1=len(cc) div 2
+		dim a(0 to k+k1)
+		for i=1 to k1
+		a(i+k)=val(mid$(cc, i*2-1, 2))
+		next
+	end if
+	if k+k1<28 then k1=28-k: dim a(0 to k+k1)
+	dim v(1 to k+k1)=0
+	i=1
+	p=0
+	for i=1 to k+k1
+		x=10
+		y=a(i-1)+a(i)
+		do
+			x--
+			c=x*(20*p+x)
+		when y-c<x and x>0
+		X1=x+1
+		C1=x1*(20*p+x1)
+		if y-c1>=0 then c=c1: x=x1
+		a(i)=(y-c)*100
+		p=p*10+x
+		v(i)=x
+	next
+	cc= str$(p,"")
+	// using "@" for val to return decimal
+	=val(mid$(cc,1, k)+"."+mid$(cc, k+1)+"@")
+}
+Print sqr(2)=1.414213562373095048801688724@
+Print sqr(152.2756)=12.34@
+Print sqrt(152.2756)=12.34
+Print sqr(1234.5678)=35.13641700572214008000953985@
+Print sqrt(1234.5678)==35.1364170057221
+}
+MODULE DUTCH2 {function Dutch_national_flag_problem {
+	enum bands {red=1, white, blue}
+	s=red
+	check_in_order=lambda s, (a as array) ->{
+		boolean true=@true, false
+		k=each(a)
+		m=s
+		Z=S
+		=true
+		while k
+			z=array(k)
+			if m=z else
+				if m=blue then
+					=false
+					break
+				else
+					m++
+					if m=z else =false : break
+				end if
+			end if
+		end while
+	}
+	SortElse=lambda (m(), &swaps,  &compares)->{
+		long t=len(m())
+		dim c(1 to 3)=t
+		c=1
+		for i=0 to len(m())-1
+			rem ? "pos:";i;" ";
+			w=m(i)
+			if w<c then
+			 	compares++
+				rem ?
+				k=c
+				j=i
+				rem ? "before swapped array :", m()#str$()
+				while k-w>0
+					if c(k)=t then k-- : continue
+					if m(j)<m(c(k)) then
+						compares++
+						if c(m(j))>c(k) then c(m(j))=c(k)
+						rem ? "swap:";m(j);" at pos "+j;" with ";m(c(k)); " at pos ";c(k)
+						swap m(j), m(c(k))
+						rem ? "just swapped array :", m()#str$()
+						rem ? "c()", c()#str$()
+						swaps++
+						j=c(k)
+						c(k)++
+					end if
+					k--
+					rem ? "k=";k, c(k)
+				end while
+			else.if w>c then
+				c=w
+				if i-c(c)>1 else 	c(c)=i
+			end if
+		next
+		=m()
+	}
+	random_band=lambda->random(1, 3)
+	n=random(10, 20)
+	if n<3 then exit  ' need at least 3 colors for the flag - although n now didn't get value 3 we place it to remember it later
+	do
+		do
+			dim balls(n)<<random_band()
+		until balls()#have(1) and balls()#have(2) and balls()#have(3)
+	until not check_in_order(balls())
+	Rem Sort balls()   ' we can sort using Sort statement
+	Rem boolean skip
+	Rem balls()=(1,1,3,3,1,1,1,2,1,1) : skip=true
+	Print "unsort:";balls()#str$(" ")
+	many=0
+	comp=0
+	dim unsorted()
+	unsorted()=balls()
+	balls()=SortElse(balls(), &many, &comp)
+	sorted=check_in_order(balls())
+	Print "sort checked:";sorted
+	Rem if skip else if not sorted then clipboard unsorted()#str$(",") : ? "clipboard copied"
+	Print "swaps:";many,"  compares:";comp
+	Print "sort:";balls()#str$(" ")
+	=sorted
+}
+for i=1 to 100
+	if not Dutch_national_flag_problem() then 200
+next
+print"GOOD"
+exit
+200 print "BAD"
+}
+MODULE DUTCH3 {// using Dijkstra's sort less swaps more compares
+function Dutch_national_flag_problem {
+	enum bands {red=1, white, blue}
+	s=red
+	check_in_order=lambda s, (a as array) ->{
+		boolean true=@true, false
+		k=each(a)
+		m=s
+		Z=S
+		=true
+		while k
+			z=array(k)
+			if m=z else
+				if m=blue then
+					=false
+					break
+				else
+					m++
+					if m=z else =false : break
+				end if
+			end if
+		end while
+	}
+	SortElse=lambda white (a(), &swaps, &compares)->{
+		long mid=white
+		long i, j, k=len(a())-1
+		while j<=k
+			
+			if a(j)<mid then
+				compares++
+				swap a(i), a(j)
+				swaps++
+				i++
+				j++
+			else.if a(j)>mid then
+				compares+=2
+				swap a(j), a(k)
+				swaps++
+				k--
+			else
+				compares+=2
+				j++
+			end if
+		end while
+		=a()
+	}
+	random_band=lambda->random(1, 3)
+	n=random(10, 20)
+	if n<3 then exit  ' need at least 3 colors for the flag - although n now didn't get value 3 we place it to remember it later
+	do
+		do
+			dim balls(n)<<random_band()
+		until balls()#have(1) and balls()#have(2) and balls()#have(3)
+	until not check_in_order(balls())
+	Rem Sort balls()   ' we can sort using Sort statement
+	Rem boolean skip
+	Rem balls()=(1,1,3,3,1,1,1,2,1,1) : skip=true
+	Print "unsort:";balls()#str$(" ")
+	many=0
+	comp=0
+	dim unsorted()
+	unsorted()=balls()
+	balls()=SortElse(balls(), &many, &comp)
+	sorted=check_in_order(balls())
+	Print "sort checked:";sorted
+	Rem if skip else if not sorted then clipboard unsorted()#str$(",") : ? "clipboard copied"
+	Print "swaps:";many,"  compares:";comp
+	Print "sort:";balls()#str$(" ")
+	=sorted
+}
+for i=1 to 100
+	if not Dutch_national_flag_problem() then 200
+next
+print"GOOD"
+exit
+200 print "BAD"
+}
+MODULE CXCOMPLEX {declare global m math2
+method m,"cxone" as one
+method m,"cxzero" as zero
+function disp(a as cxComplex) {
+	string ret
+	vi=a|i
+	vr=a|r
+	if vi then
+		if vr then
+			if vi>0 then
+				if vi==1 then
+					ret="("+vr+"+i)"
+				else
+					ret="("+vr+"+"+vi+"i)"
+				end if
+			else
+				if vi==-1 then
+					ret="("+vr+"-i)"
+				else
+					ret="("+vr+""+vi+"i)"
+				end if
+			end if
+		else
+			if vi=1 then
+				ret="(i)"
+			else.if vi=-1 then
+				ret="(-i)"
+			else
+				ret="("+vi+"i)"
+			end if
+		end if
+	else
+		ret="("+vr+")"
+	end if
+	=ret
+}
+function complex(a, b) {
+	method m, "cxNew", a, b as ret
+	=ret
+}
+function inv(a) {
+	method m, "cxInv", a as ret
+	=ret
+}
+function mul(a, b) {
+	method m, "cxMul", a, b as ret
+	=ret
+}
+function div(a, b) {
+	method m, "cxDiv", a, b as ret
+	=ret
+}
+function add(a, b) {
+	method m, "cxAdd", a, b as ret
+	=ret
+}
+function sub(a, b) {
+	method m, "cxSub", a, b as ret
+	=ret
+}
+function exp(a, r=13) {
+	method m, "cxExp", a as ret
+	ret|r=round(ret|r, r)
+	ret|i=round(ret|i, r)
+	=ret
+}
+function Arg(a) {
+	method m, "cxArg", a as ret
+	=ret
+}
+function Cabs(a) {
+	method m, "cxMod", a as ret
+	=ret
+}
+A=complex(8, -3)
+? "A=";disp(A)
+? "     r=";Cabs(A);" θ=";Arg(A);" rad"
+B=inv(A)
+? "B=";disp(B)
+? "     r=";Cabs(B);" θ=";Arg(B);" rad"
+C=mul(A, B)
+? disp(A);"*";disp(B);"=";disp(C)
+D=div(one, B)
+? disp(one);"/";disp(B);"=";disp(D)
+E=div(A, A)
+? disp(A);"/";disp(A);"=";disp(E)
+F=add(A, A)
+? disp(A);"+";disp(A);"=";disp(F)
+G=sub(A, A)
+? disp(A);"-";disp(A);"=";disp(G)
+H=sub(zero, A)
+? "-";disp(A);"=";disp(H)
+? "(round exp to 13th decimal)"
+I=add(exp(complex(0, pi)), one)
+? "e^(πi)+1=";disp(i)
+? "(without rounding)"
+I=add(exp(complex(0, pi), 20), one)
+? "e^(πi)+1=";disp(i)
+}
+MODULE MANDELBROT {Module Mandelbrot(x=0&,y=0&,z=1&) {
+      If z<1  then z=1
+      If z>16 then z=16
+      Const iXmax=32*z
+      Const iYmax=26*z
+      Def single Cx, Cy, CxMin=-2.05, CxMax=0.85, CyMin=-1.2,  CyMax=1.2
+      Const PixelWidth=(CxMax-CxMin)/iXmax, iXm=(iXmax-1)*PixelWidth
+      Const PixelHeight=(CyMax-CyMin)/iYmax,Ph2=PixelHeight/2
+      Const Iteration=25
+      Const EscRadious=2.5, ER2=EscRadious**2
+      Def single preview
+      preview=iXmax*twipsX*(z/16)
+      Def long yp, xp, dx, dy, dx1, dy1
+      Let dx=twipsx*(16/z), dx1=dx-1
+      Let dy=twipsy*(16/z), dy1=dy-1
+      yp=y
+      For iY=0 to (iYmax-1)*PixelHeight step PixelHeight {
+            Cy=CyMin+iY
+            xp=x
+            if abs(Cy)<Ph2 Then Cy=0
+            For iX=0 to iXm Step PixelWidth {
+                  Let  Cx=CxMin+iX,Zx=0,Zy=0,Zx2=Zx**2,Zy2=Zy**2
+                  For It=Iteration to 1 {Let Zy=2*Zx*Zy+Cy,Zx=Zx2-Zy2+Cx,Zx2=Zx**2,Zy2=Zy**2 :if Zx2+Zy2>ER2 Then exit
+                  }
+                  if it>13 then {it-=13} else.if it=0 then SetPixel(xp,yp,0): xp+=dx : continue
+                  it*=10:SetPixel(xp,yp,color(it, it,255)) :xp+=dx
+            } : yp+=dy
+      }
+      Sub SetPixel()
+            move number, number: fill  dx1, dy1, number
+      End Sub
+}
+Cls 1,0
+sz=(1,2,4,8,16)
+i=each(sz)
+While i {
+      Mandelbrot 250*twipsx,100*twipsy, array(i)
+}
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
