@@ -15,8 +15,8 @@ Option Explicit
 Private val As String
 Private cReminder As String
 Private outbase As Integer
-Friend Property Get value() As String
-    value = val
+Friend Property Get Value() As String
+    Value = val
 End Property
 Property Get Reminder()
     Reminder = CVar(cReminder)
@@ -26,7 +26,7 @@ Property Get ToString()
     If outbase = 0 Or outbase = 10 Then
         ToString = CVar(Module13.TrimZero(val))
     Else
-        ToString = CVar(Module13.TrimZero(BigIntToString(value, outbase)))
+        ToString = CVar(Module13.TrimZero(BigIntToString(Value, outbase)))
     End If
 End Property
 Friend Sub Load(v As String, b As Integer)
@@ -51,37 +51,49 @@ End If
 End Property
 Function AnyBaseOuput(Optional b = 10) As String
     If b > 1 And b < 37 Then
-    AnyBaseOuput = BigIntToString(value, CInt(b))
+    AnyBaseOuput = BigIntToString(Value, CInt(b))
     End If
 End Function
 
 Function Add(v As BigInteger) As BigInteger
     Set Add = New BigInteger
-    Add.Load Module13.Add(value, v.value), outbase
+    Add.Load Module13.Add(Value, v.Value), outbase
 End Function
 Function subtract(v As BigInteger) As BigInteger
     Set subtract = New BigInteger
-    subtract.Load Module13.subtract(value, v.value), outbase
+    subtract.Load Module13.subtract(Value, v.Value), outbase
 End Function
 Function divide(v As BigInteger) As BigInteger
     Set divide = New BigInteger
-    divide.Load Module13.divide(value, v.value), outbase
+    divide.Load Module13.divide(Value, v.Value), outbase
     cReminder = Module13.TrimZero(Module13.LastModulus())
 End Function
 Function multiply(v As BigInteger) As BigInteger
     Set multiply = New BigInteger
-    multiply.Load Module13.multiply(value, v.value), outbase
+    multiply.Load Module13.multiply(Value, v.Value), outbase
 End Function
 Function Modulus(v As BigInteger) As BigInteger
     Set Modulus = New BigInteger
-    Modulus.Load Module13.Modulus(value, v.value), outbase
+    Modulus.Load Module13.Modulus(Value, v.Value), outbase
 End Function
 Function intpower(v As BigInteger) As BigInteger
     Set intpower = New BigInteger
-    intpower.Load Module13.IntStrByExp(value, v.value), outbase
+    intpower.Load Module13.IntStrByExp(Value, v.Value), outbase
+End Function
+Function modpow(v As BigInteger, m As BigInteger) As BigInteger
+    Set modpow = New BigInteger
+    modpow.Load Module13.modpow(Value, v.Value, m.Value), outbase
+End Function
+Function IntSqr() As BigInteger
+    Set IntSqr = New BigInteger
+    IntSqr.Load Module13.IntSqr(Value), outbase
+End Function
+
+Function IsProbablyPrime(k As Integer) As Boolean
+    IsProbablyPrime = Module13.IsProbablyPrime(Value, k)
 End Function
 Function compare(v As BigInteger) As Integer
-    compare = Module13.compare(value, v.value)
+    compare = Module13.compare(Value, v.Value)
 End Function
 
 Private Sub Class_Initialize()

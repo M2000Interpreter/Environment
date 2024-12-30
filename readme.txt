@@ -1,70 +1,176 @@
 M2000 Interpreter and Environment
 
 Version 12 Revision 56 active-X
-1. Fix the "paste problem". A not careful clear cliboard produce later a problem when using ctrl + V (paste) at M2000 command line.
+1. Addition for BigInteger Class:
+- IsProbablyPrime( BigNumber, Iterations as integer)
+- IntSqr()
+- modpow(expBigNumber, ModulusBigNumber)
+2.
+// modpow example
+function ToString(x as *BigInteger) {
+	with x,"toString" as ret
+	=ret	
+}
+Function PowerTen(x as integer) {
+	a=Biginteger("10")
+	method a, "intPower", biginteger(str$(x,"")) as a
+	=a
+}
+a=bigInteger("2988348162058574136915891421498819466320163312926952423791023078876139")
+b=biginteger("2351399303373464486466122544523690094744975233415544072992656881240319")
+profiler
+	method a, "modpow", b, PowerTen(40) as result
+print timecount
+Print "A=";ToString(a)
+Print "B=";ToString(b)
+Print "R=";ToString(result)
 
-2. Fixing global/local for properties for objects. See VarPtr in info.gsb. There is a a.ArrPtr() property of a, a RefArray object, which defined as global. So we defined in Check3 and Check4 but from a bug was no new object, so we get an ArrPtr() from the global a, not the new one at check3 and check4. Now works fine as expected.
+3.  isProbablyPrime example
+// finding ULTRA-USEFUL primes of 2^(2^n)-k, where k is the smaller number where the formula give a prime number.
+// you can go more than 6th but you need time for the process.
+minusOne=biginteger("-1")	
+one=biginteger("1")
+two=biginteger("2")
+num=biginteger("0")
+k=num
+with num,"tostring" as numS
+with k,"tostring" as kS
+for n= 1 to 6
+	k=minusOne
+	kk=-1
+	n1=biginteger(str$(n,""))
+	method two,"intpower", n1 as n1
+	do
+		method k,"add", two as k
+		kk+=2
+		method two, "intpower", n1 as num
+		method num, "subtract", k as num
+		method num,"isProbablyPrime", 10 as ret
+		if ret then
+			Print n, kk : Refresh
+			exit
+		end if
+	always
+next
 
-3. Handle of UDT type of variants from objects MATH and MATH2 (new library). We can use UDT values from external DLL (we have to get one as return value).
-We can use UDT in variables and arrays (both () and [] types)
+4. Using IntSqr inside isPrime (isProbablyPrime is faster).
+IsPrime=lambda -> {
+	boolean T=true, F
+	zero=BigInteger("0")
+	two=BigInteger("2")
+	three=BigInteger("3")
+	four=BigInteger("4")
+	five=BigInteger("5")
+	=lambda T,F,Known1, IntSqrt, zero, two, three, four, five (x as *BigInteger) -> {
+		=F
+		with x, "toString" as xs
+		method x, "compare", five as c
+		if c<1 then   ' x<=5
+			if c=0 Then =T: break
+			method x, "compare", two as c
+			if c=0 then =T: break
+			method x, "compare", three as c
+			if c=0 then =T: break
+		end if
+		method x,"modulus", two as frac
+		method frac,"compare", zero as c
+		if c=0 then Exit
+		method x,"modulus", three as frac
+		method frac,"compare", zero as c
+		if c=0 then Exit
+		method x,"IntSqr" as x1
+		d = five
+		with d,"tostring" as ds
+		with frac,"tostring" as fracS
+		do
+			method x,"modulus", d as frac
+			method frac,"compare", zero as c
+			if c=0 then Exit
+			method d, "add", two as d
+			method d, "compare", x1 as c
+			if c=1 then =T : exit
+			method x,"modulus", d as frac
+			method frac,"compare", zero as c
+			if c=0 then Exit
+			method d, "add", four as d
+			method d, "compare", x1 as c				
+			if c=1 then =T: exit
+		Always
+	} 
+}() ' execute, so IsPrime get the inner lambda
 
-MATH library 
-Public Type VecType
-    X As Double
-    Y As Double
-    Z As Double
-End Type
+a=BigInteger("5400349")
+profiler
+? IsPrime(a)
+? timecount
+profiler
+method a,"isProbablyPrime", 5 as ret
+? ret
+? timecount
+5. isProbablyPrime using M2000 code
+// place here the Isprime
+function isProbablyPrime(n as *BigInteger, k as long) {
+	boolean T=true, F=false
+	=F
+	Zero=BigInteger("0")
+	One=BigInteger("1")
+	Two=BigInteger("2")
+	Method n, "compare", Two as c1
+	Method n, "modulus", Two as m2
+	method m2,"compare", zero as C2
+	if c1=0 or c2=0 then exit
+	with n, "toString" as ns$
+	s=0
+	Method n, "subtract", one as nn
+	d=nn
+	
+	with d, "tostring" as dstr$
+	do
+		method d,"modulus", two as m2
+		method m2,"compare", zero as C
+		if c else exit
+		s++
+		method d, "divide", two as d
+	Always
+	z=len(ns$)
+	a=one
+	with a, "toString" as astr$
+	x=a
+	=T
+	for i=1 to k {
+		do
+			zs=""
+			for j=1 to len(ns$)
+				zs+=chr$(47+random(1,10))
+			next
+			a=bigInteger(zs)
+			method nn,"compare", a as C
+			method a,"compare", one as c1
+		until c=1 and c1>-1
+		method a, "modpow", d, n as x
+		method x,"compare", one as c1
+		if c1 else continue
+		method x,"compare", nn as c1
+		if c1 else continue
+		for r=1 to s	{
+			method x, "modpow", two, n  as x
+			method x,"compare", one as c1
+			if c1 else =F : break
+			method x,"compare", nn as c1
+			if c1 else exit
+		}
+		if c1 then =F: break
+	}
+}
+a=BigInteger("5400349")
+profiler
+? IsPrime(a)
+? timecount
+profiler
+ret=isProbablyPrime(a, 5)
+? ret
+? timecount
 
-Public Type SegType
-    Origin As VecType
-    AxisF  As VecType   ' Forward, West,  AxisX
-    AxisL  As VecType   ' Left,    North, AxisY
-    AxisU  As VecType   ' Up,      Up,    AxisZ
-End Type
-
-Public Type LineType
-    point1 As VecType
-    point2 As VecType
-End Type
-
-Public Type QuatType                      
-    W As Double
-    X As Double
-    Y As Double
-    Z As Double
-End Type
-
-MATH2 Library
-
-Public Type cxComplex
-    r   As Double
-    I   As Double
-End Type
-
-Public Type Matrix
-    Col As Long                 ' Number of columns
-    Row As Long                 ' Number of rows
-    D() As Double
-End Type
-
-4. BigInteger (Credit to Rebecca Gabriella's String Math Module)
-// methods
-// MULTIPLY, DIVIDE, SUBTRACT, ADD, ANYBASEINPUT, MODULUS, INTPOWER
-a=bigInteger("6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151")
-b=bigInteger("162259276829213363391578010288127987979798")
-method a, "multiply", b as c
-with c, "tostring" as ret1  
-Print "C=";ret1
-method c, "add", biginteger("500") as c
-Print "C=";ret1
-method c, "modulus", b as c
-Print "C=";ret1  '500
-' use this to get the result to clipboard: clipboard ret1
-
-==========Output=========
-C=1113877103911668754551067286547922604225256302130205294556686724395491813360805268911760151336381665870098050947868749061640471753019685645335076862009313458611655962295771807497288683885535803435498
-C=1113877103911668754551067286547922604225256302130205294556686724395491813360805268911760151336381665870098050947868749061640471753019685645335076862009313458611655962295771807497288683885535803435998
-C=500
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
