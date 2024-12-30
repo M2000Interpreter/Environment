@@ -135,5 +135,5 @@ ctxWinsock = 156, 156, 968, 591, , 78, 78, 926, 513, C
 mdTlsThunks = 208, 208, 1223, 700, 
 IControlIndex = 78, 78, 963, 526, C
 MATH2 = 0, 0, 0, 0, C
-BigInteger = 52, 52, 884, 626, Z
-Module13 = 156, 156, 618, 575, 
+BigInteger = 52, 52, 884, 626, 
+Module13 = 156, 156, 618, 575, Z

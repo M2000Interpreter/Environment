@@ -24,9 +24,9 @@ End Property
 
 Property Get ToString()
     If outbase = 0 Or outbase = 10 Then
-        ToString = CVar(Module13.TrimZero(val))
+        ToString = CVar(StrConv(Module13.TrimZero(val), vbUnicode))
     Else
-        ToString = CVar(Module13.TrimZero(BigIntToString(Value, outbase)))
+        ToString = CVar(StrConv(Module13.TrimZero(BigIntToString(Value, outbase)), vbUnicode))
     End If
 End Property
 Friend Sub Load(v As String, b As Integer)
@@ -36,13 +36,12 @@ End Sub
 Sub AnyBaseInput(v As String, Optional ByVal basem = 10)
 
     Dim b As Integer
-
     b = CInt(Abs(basem))
     If b < 2 Or b > 36 Then
         MyEr "base out of limit", "η βάση είναι εκτός ορίων"
         Exit Sub
     End If
-    val = Module13.BigIntFromString(v, b)
+    val = Module13.BigIntFromString(StrConv(v, vbUnicode), b)
 End Sub
 Property Let OutputBase(b)
 If b > 1 And b < 37 Then
@@ -51,7 +50,7 @@ End If
 End Property
 Function AnyBaseOuput(Optional b = 10) As String
     If b > 1 And b < 37 Then
-    AnyBaseOuput = BigIntToString(Value, CInt(b))
+    AnyBaseOuput = StrConv(BigIntToString(Value, CInt(b)), vbUnicode)
     End If
 End Function
 
@@ -80,17 +79,17 @@ Function intpower(v As BigInteger) As BigInteger
     Set intpower = New BigInteger
     intpower.Load Module13.IntStrByExp(Value, v.Value), outbase
 End Function
-Function modpow(v As BigInteger, m As BigInteger) As BigInteger
+Function modpow(v As BigInteger, M As BigInteger) As BigInteger
     Set modpow = New BigInteger
-    modpow.Load Module13.modpow(Value, v.Value, m.Value), outbase
+    modpow.Load Module13.modpow(Value, v.Value, M.Value), outbase
 End Function
 Function IntSqr() As BigInteger
     Set IntSqr = New BigInteger
     IntSqr.Load Module13.IntSqr(Value), outbase
 End Function
 
-Function IsProbablyPrime(k As Integer) As Boolean
-    IsProbablyPrime = Module13.IsProbablyPrime(Value, k)
+Function IsProbablyPrime(K As Integer) As Boolean
+    IsProbablyPrime = Module13.IsProbablyPrime(Value, K)
 End Function
 Function compare(v As BigInteger) As Integer
     compare = Module13.compare(Value, v.Value)

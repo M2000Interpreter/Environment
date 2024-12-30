@@ -15,25 +15,11 @@ Private Type PartialDivideInfo
 End Type
 
 Private sLastRemainder As String
-Private Const Alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+' Alphabet moved to Module1 as variable, now has an Ansi format(1 byte per letter/digit)
+'Private Const Alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 Property Get LastRemainder()
     LastRemainder = CVar(sLastRemainder)
 End Property
-Sub TestMultAndDiv()
-    'Run this to test multiplication and division with integer strings
-    'Open immediate window in View or with ctrl-g to see results
-    
-    Dim sP1 As String, sP2 As String, sRes1 As String, sRes2 As String
-    
-    sP1 = "100"
-    sP2 = "2"             '33 digits and also prime
-
-
-    sRes1 = Modulus(sP1, sP2)
-    
-    Debug.Print "Modulus : " & sRes1
-
-End Sub
 
 Public Function compare(sA As String, sb As String) As Integer
     'Parameters are string integers of any length, for example "-345...", "973..."
@@ -43,13 +29,13 @@ Public Function compare(sA As String, sb As String) As Integer
     'https://cosxoverx.livejournal.com/47220.html
     
     Dim bAN As Boolean, bBN As Boolean, bRN As Boolean
-    Dim i As Long, iA As Long, iB As Long
+    Dim I As Long, iA As Long, iB As Long
     
     'handle any early exits on basis of signs
-    bAN = (Left(sA, 1) = "-")
-    bBN = (Left(sb, 1) = "-")
-    If bAN Then sA = Mid(sA, 2)
-    If bBN Then sb = Mid(sb, 2)
+    bAN = (LeftB$(sA, 1) = ChrB$(45))
+    bBN = (LeftB$(sb, 1) = ChrB$(45))
+    If bAN Then sA = MidB$(sA, 2)
+    If bBN Then sb = MidB$(sb, 2)
     If bAN And bBN Then
         bRN = True
     ElseIf bBN Then
@@ -66,31 +52,31 @@ Public Function compare(sA As String, sb As String) As Integer
     Dim CROP As Long, lim As Long
     
     CROP = 1
-    lim = Len(sA)
+    lim = LenB(sA)
     Do While CROP <= lim
-        If Mid$(sA, CROP, 1) <> "0" Then Exit Do
+        If MidB$(sA, CROP, 1) <> ChrB$(48) Then Exit Do
         CROP = CROP + 1
     Loop
-    sA = Mid$(sA, CROP)
+    sA = MidB$(sA, CROP)
     CROP = 1
-    lim = Len(sb)
+    lim = LenB(sb)
     Do While CROP <= lim
-       If Mid$(sb, CROP, 1) <> "0" Then Exit Do
+       If MidB$(sb, CROP, 1) <> ChrB$(48) Then Exit Do
        CROP = CROP + 1
     Loop
-    sb = Mid$(sb, CROP)
+    sb = MidB$(sb, CROP)
     
     'then decide size first on basis of length
-    If Len(sA) < Len(sb) Then
+    If LenB(sA) < LenB(sb) Then
         compare = -1
-    ElseIf Len(sA) > Len(sb) Then
+    ElseIf LenB(sA) > LenB(sb) Then
         compare = 1
     Else 'unless they are the same length
         compare = 0
         'then check each digit by digit
-        For i = 1 To Len(sA)
-            iA = CInt(Mid(sA, i, 1))
-            iB = CInt(Mid(sb, i, 1))
+        For I = 1 To LenB(sA)
+            iA = AscB(MidB$(sA, I, 1))
+            iB = AscB(MidB$(sb, I, 1))
             If iA < iB Then
                 compare = -1
                 Exit For
@@ -99,7 +85,7 @@ Public Function compare(sA As String, sb As String) As Integer
                 Exit For
             Else 'defaults zero
             End If
-        Next i
+        Next I
     End If
     
     'decide about any negative signs
@@ -117,19 +103,19 @@ Public Function Add(sA As String, sb As String) As String
     'https://cosxoverx.livejournal.com/47220.html
     
     Dim bAN As Boolean, bBN As Boolean, bRN As Boolean
-    Dim iA As Integer, iB As Integer, iCarry As Integer
+    Dim iA As Long, iB As Long, iCarry As Integer
        
     'test for empty parameters
-    If Len(sA) = 0 Or Len(sb) = 0 Then
+    If LenB(sA) = 0 Or LenB(sb) = 0 Then
         MyEr "Empty parameter in Add", "Κενοί Παράμετροι στην Add"
         Exit Function
     End If
         
     'handle some negative values with Subtract()
-    bAN = (Left(sA, 1) = "-")
-    bBN = (Left(sb, 1) = "-")
-    If bAN Then sA = Mid(sA, 2)
-    If bBN Then sb = Mid(sb, 2)
+    bAN = (LeftB$(sA, 1) = ChrB$(45))
+    bBN = (LeftB$(sb, 1) = ChrB$(45))
+    If bAN Then sA = MidB$(sA, 2)
+    If bBN Then sb = MidB$(sb, 2)
     If bAN And bBN Then 'both negative
         bRN = True      'set output reminder
     ElseIf bBN Then     'use subtraction
@@ -141,44 +127,62 @@ Public Function Add(sA As String, sb As String) As String
     Else
         bRN = False
     End If
+    Dim cur As Long
     
     'add column by column
-    iA = Len(sA)
-    iB = Len(sb)
+    iA = LenB(sA)
+    iB = LenB(sb)
     iCarry = 0
-    Add = ""
+    If iA > iB Then
+    cur = iA + 1
+    Add = SpaceB(cur)
+    Else
+    cur = iB + 1
+    Add = SpaceB(cur)
+    End If
     Do While iA > 0 And iB > 0
-        iCarry = iCarry + CInt(Mid(sA, iA, 1)) + CInt(Mid(sb, iB, 1))
-        Add = CStr(iCarry Mod 10) + Add
+        iCarry = iCarry + AscB(MidB$(sA, iA, 1)) + AscB(MidB$(sb, iB, 1)) - 96
+        MidB$(Add, cur, 1) = ChrB$(iCarry Mod 10 + 48)
         iCarry = iCarry \ 10
         iA = iA - 1
         iB = iB - 1
+        cur = cur - 1
     Loop
     
     'Assuming param sA is longer
     Do While iA > 0
-        iCarry = iCarry + CInt(Mid(sA, iA, 1))
-        Add = CStr(iCarry Mod 10) + Add
+        iCarry = iCarry + AscB(MidB$(sA, iA, 1)) - 48
+        MidB$(Add, cur, 1) = ChrB$(iCarry Mod 10 + 48)
         iCarry = iCarry \ 10
         iA = iA - 1
+        cur = cur - 1
     Loop
     'Assuming param sB is longer
     Do While iB > 0
-        iCarry = iCarry + CInt(Mid(sb, iB, 1))
-        Add = CStr(iCarry Mod 10) + Add
+        iCarry = iCarry + AscB(MidB$(sb, iB, 1)) - 48
+        MidB$(Add, cur, 1) = ChrB$(iCarry Mod 10 + 48)
         iCarry = iCarry \ 10
         iB = iB - 1
+        cur = cur - 1
     Loop
-    Add = CStr(iCarry) + Add
-    
+    MidB$(Add, cur, 1) = ChrB$(iCarry + 48)
+    cur = cur - 1
+    Do While cur > 0
+        MidB$(Add, cur, 1) = ChrB$(48)
+        cur = cur - 1
+    Loop
     'remove any leading zeros
-    Do While Len(Add) > 1 And Left(Add, 1) = "0"
-        Add = Mid(Add, 2)
-    Loop
-    
+    'Do While LenB(Add) > 1 And LeftB$(Add, 1) = ChrB$(48)
+    '    Add = MidB$(Add, 2)
+    'Loop
+  '  If cur + 1 = 1 Then
+    Add = TrimZero(Add)
+ '   Else
+ '   Add = TrimZero(MidB$(Add, cur + 2))
+  '  End If
     'decide about any negative signs
-    If Add <> "0" And bRN Then
-        Add = "-" + Add
+    If Add <> ChrB$(48) And bRN Then
+        Add = ChrB$(45) + Add
     End If
 
 End Function
@@ -235,23 +239,23 @@ Public Function subtract(sA As String, sb As String) As String
     Dim iA As Long, iB As Long, iComp As Integer
     
     'test for empty parameters
-    If Len(sA) = 0 Or Len(sb) = 0 Then
+    If LenB(sA) = 0 Or LenB(sb) = 0 Then
         MyEr "Empty parameter in Subtract", "Κενοί Παράμετροι στην Subtract"
         Exit Function
     End If
         
     'handle some negative values with Add()
-    bAN = (Left(sA, 1) = "-")
-    bBN = (Left(sb, 1) = "-")
-    If bAN Then sA = Mid(sA, 2)
-    If bBN Then sb = Mid(sb, 2)
+    bAN = (LeftB$(sA, 1) = ChrB$(45))
+    bBN = (LeftB$(sb, 1) = ChrB$(45))
+    If bAN Then sA = MidB$(sA, 2)
+    If bBN Then sb = MidB$(sb, 2)
     If bAN And bBN Then
         bRN = True
     ElseIf bBN Then
         subtract = Add(sA, sb)
         Exit Function
     ElseIf bAN Then
-        subtract = "-" + Add(sA, sb)
+        subtract = ChrB$(45) + Add(sA, sb)
         Exit Function
     Else
         bRN = False
@@ -260,43 +264,44 @@ Public Function subtract(sA As String, sb As String) As String
     'get biggest value into variable sA
     iComp = compare(sA, sb)
     If iComp = 0 Then     'parameters equal in size
-        subtract = "0"
+        subtract = ChrB$(48)
         Exit Function
     ElseIf iComp < 0 Then 'sA < sB
-        subtract = sA     'so swop sA and sB
-        sA = sb           'to ensure sA >= sB
-        sb = subtract
+        SwapStrings sA, sb
+        'subtract = sA     'so swop sA and sB
+        'sA = sb           'to ensure sA >= sB
+        'sb = subtract
         bRN = Not bRN     'and reverse output sign
     End If
-    iA = Len(sA)          'recheck lengths
-    iB = Len(sb)
+    iA = LenB(sA)          'recheck lengths
+    iB = LenB(sb)
     iComp = 0
     subtract = ""
-        
+    subtract = SpaceB(iA)
     'subtract column by column
     Do While iA > 0 And iB > 0
-        iComp = iComp + CInt(Mid(sA, iA, 1)) - CInt(Mid(sb, iB, 1))
-        subtract = CStr(RealMod(iComp, 10)) + subtract
+        iComp = iComp + AscB(MidB$(sA, iA, 1)) - AscB(MidB$(sb, iB, 1))
+        MidB$(subtract, iA, 1) = ChrB$(RealMod(iComp, 10) + 48) '+ subtract
         iComp = RealDiv(iComp, 10)
         iA = iA - 1
         iB = iB - 1
     Loop
     'then assuming param sA is longer
     Do While iA > 0
-        iComp = iComp + CInt(Mid(sA, iA, 1))
-        subtract = CStr(RealMod(iComp, 10)) + subtract
+        iComp = iComp + AscB(MidB$(sA, iA, 1)) - 48
+        MidB$(subtract, iA, 1) = ChrB$(RealMod(iComp, 10) + 48)
         iComp = RealDiv(iComp, 10)
         iA = iA - 1
     Loop
     
     'remove any leading zeros from result
-    Do While Len(subtract) > 1 And Left(subtract, 1) = "0"
-        subtract = Mid(subtract, 2)
-    Loop
-    
+    'Do While LenB(subtract) > 1 And LeftB$(subtract, 1) = ChrB$(48)
+    '    subtract = MidB$(subtract, 2)
+    'Loop
+    subtract = TrimZero(subtract)
     'decide about any negative signs
-    If subtract <> "0" And bRN Then
-        subtract = "-" + subtract
+    If subtract <> ChrB$(48) And bRN Then
+        subtract = ChrB$(45) + subtract
     End If
 
 End Function
@@ -308,29 +313,29 @@ Public Function multiply(sA As String, sb As String) As String
     'https://cosxoverx.livejournal.com/47220.html
     
     Dim bAN As Boolean, bBN As Boolean, bRN As Boolean
-    Dim m() As Long, iCarry As Long
+    Dim M() As Long, iCarry As Long
     Dim iAL As Long, iBL As Long, iA As Long, iB As Long
         
     'test for empty parameters
-    If Len(sA) = 0 Or Len(sb) = 0 Then
+    If LenB(sA) = 0 Or LenB(sb) = 0 Then
         MyEr "Empty parameter in Multiply", "Κενοί Παράμετροι στην Multiply"
         Exit Function
     End If
         
     'handle any negative signs
-    bAN = (Left(sA, 1) = "-")
-    bBN = (Left(sb, 1) = "-")
-    If bAN Then sA = Mid(sA, 2)
-    If bBN Then sb = Mid(sb, 2)
+    bAN = (LeftB$(sA, 1) = ChrB$(45))
+    bBN = (LeftB$(sb, 1) = ChrB$(45))
+    If bAN Then sA = MidB$(sA, 2)
+    If bBN Then sb = MidB$(sb, 2)
     bRN = (bAN <> bBN)
-    iAL = Len(sA)
-    iBL = Len(sb)
+    iAL = LenB(sA)
+    iBL = LenB(sb)
     
     'perform long multiplication without carry in notional columns
-    ReDim m(1 To (iAL + iBL - 1)) 'expected length of product
+    ReDim M(1 To (iAL + iBL - 1)) 'expected length of product
     For iA = 1 To iAL
         For iB = 1 To iBL
-            m(iA + iB - 1) = m(iA + iB - 1) + CLng(Mid(sA, iAL - iA + 1, 1)) * CLng(Mid(sb, iBL - iB + 1, 1))
+            M(iA + iB - 1) = M(iA + iB - 1) + CLng(AscB(MidB$(sA, iAL - iA + 1, 1)) - 48) * CLng(AscB(MidB$(sb, iBL - iB + 1, 1)) - 48)
         Next iB
     Next iA
     iCarry = 0
@@ -338,20 +343,20 @@ Public Function multiply(sA As String, sb As String) As String
     
     'add up column results with carry
     For iA = 1 To iAL + iBL - 1
-        iCarry = iCarry + m(iA)
-        multiply = CStr(iCarry Mod 10) + multiply
+        iCarry = iCarry + M(iA)
+        multiply = ChrB$(iCarry Mod 10 + 48) + multiply
         iCarry = iCarry \ 10
     Next iA
-    multiply = CStr(iCarry) + multiply
+    multiply = ChrB$(iCarry + 48) + multiply
     
     'remove any leading zeros
-    Do While Len(multiply) > 1 And Left(multiply, 1) = "0"
-        multiply = Mid(multiply, 2)
-    Loop
-    
+   ' Do While LenB(multiply) > 1 And LeftB$(multiply, 1) = ChrB$(48)
+   '     multiply = MidB$(multiply, 2)
+   ' Loop
+    multiply = TrimZero(multiply)
     'decide about any negative signs
-    If multiply <> "0" And bRN Then
-        multiply = "-" + multiply
+    If multiply <> ChrB$(48) And bRN Then
+        multiply = ChrB$(45) + multiply
     End If
 
 End Function
@@ -363,16 +368,16 @@ Private Function PartialDivide(sA As String, sb As String) As PartialDivideInfo
     'https://cosxoverx.livejournal.com/47220.html
         
     For PartialDivide.Quotient = 9 To 1 Step -1                                'propose a divisor to fit
-        PartialDivide.Subtrahend = multiply((sb), CStr(PartialDivide.Quotient))   'test by multiplying it out
+        SwapStrings PartialDivide.Subtrahend, multiply((sb), ChrB$(PartialDivide.Quotient + 48)) 'test by multiplying it out
         If compare(PartialDivide.Subtrahend, (sA)) <= 0 Then                      'best fit found
-            PartialDivide.Remainder = subtract((sA), (PartialDivide.Subtrahend))   'get remainder
+            SwapStrings PartialDivide.Remainder, subtract((sA), (PartialDivide.Subtrahend))   'get remainder
             Exit Function                                                      'exit with best fit details
         End If
     Next PartialDivide.Quotient
     
     'no fit found, divisor too big
     PartialDivide.Quotient = 0
-    PartialDivide.Subtrahend = "0"
+    PartialDivide.Subtrahend = ChrB$(48)
     PartialDivide.Remainder = sA
 
 End Function
@@ -387,61 +392,61 @@ Public Function divide(sA As String, sb As String) As String
     Dim bAN  As Boolean, bBN As Boolean, bRN As Boolean
     Dim iC As Long
     Dim s As String
-    Dim d As PartialDivideInfo
+    Dim D As PartialDivideInfo
     
     'test for empty parameters
-    If Len(sA) = 0 Or Len(sb) = 0 Then
+    If LenB(sA) = 0 Or LenB(sb) = 0 Then
         MyEr "Empty parameter in Divide", "Κενοί Παράμετροι στην Divide"
         Exit Function
     End If
     
-    bAN = (Left(sA, 1) = "-") 'true for neg
-    bBN = (Left(sb, 1) = "-")
-    If bAN Then sA = Mid(sA, 2) 'take two charas if neg
-    If bBN Then sb = Mid(sb, 2)
+    bAN = (LeftB$(sA, 1) = ChrB$(45)) 'true for neg
+    bBN = (LeftB$(sb, 1) = ChrB$(45))
+    If bAN Then sA = MidB$(sA, 2) 'take two charas if neg
+    If bBN Then sb = MidB$(sb, 2)
     bRN = (bAN <> bBN)
-    If compare(sb, "0") = 0 Then
+    If compare(sb, ChrB$(48)) = 0 Then
         Err.Raise 11
         Exit Function
-    ElseIf compare(sA, "0") = 0 Then
-        divide = "0"
-        sLastRemainder = "0"
+    ElseIf compare(sA, ChrB$(48)) = 0 Then
+        divide = ChrB$(48)
+        sLastRemainder = ChrB$(48)
         Exit Function
     End If
     iC = compare(sA, sb)
     If iC < 0 Then
-        divide = "0"
+        divide = ChrB$(48)
         sLastRemainder = sA
         Exit Function
     ElseIf iC = 0 Then
         If bRN Then
-            divide = "-1"
+            divide = ChrB$(45) + ChrB$(49)
         Else
-            divide = "1"
+            divide = ChrB$(49)
         End If
-        sLastRemainder = "0"
+        sLastRemainder = ChrB$(48)
         Exit Function
     End If
-    divide = ""
+    divide = SpaceB(LenB(sA) + 1)
     s = ""
     
     'Long division method
-    For iC = 1 To Len(sA)
+    For iC = 1 To LenB(sA)
         'take increasing number of digits
-        s = s + Mid(sA, iC, 1)
-        d = PartialDivide(s, sb)   'find best fit
-        divide = divide + CStr(d.Quotient)
-        s = d.Remainder
+        s = s + MidB$(sA, iC, 1)
+        D = PartialDivide(s, sb)   'find best fit
+        MidB$(divide, iC, 1) = ChrB$(D.Quotient + 48)
+        s = D.Remainder
     Next iC
     
     'remove any leading zeros
-    Do While Len(divide) > 1 And Left(divide, 1) = "0"
-        divide = Mid(divide, 2)
-    Loop
-    
+    'Do While LenB(divide) > 1 And LeftB$(divide, 1) = ChrB$(48)
+    '    divide = MidB$(divide, 2)
+    'Loop
+    divide = TrimZero(RtrimB(divide))
     'decide about the signs
-    If divide <> "0" And bRN Then
-        divide = "-" + divide
+    If divide <> ChrB$(48) And bRN Then
+        divide = ChrB$(45) + divide
     End If
     
     sLastRemainder = s 'string integer remainder
@@ -468,24 +473,24 @@ Public Function BigIntFromString(sIn As String, iBaseIn As Integer) As String
     Dim iP As Long, iV As Long
     
     'test for empty parameters
-    If Len(sIn) = 0 Or iBaseIn = 0 Then
+    If LenB(sIn) = 0 Or iBaseIn = 0 Then
         MyEr "Bad parameter in BigIntFromString", "Προβληματικοί παράμετροι στη BigIntFromString"
         Exit Function
     End If
         
     'handle negative signs
-    If Left(sIn, 1) = "-" Then
+    If LeftB$(sIn, 1) = ChrB$(45) Then
         bRN = True
-        sIn = Mid(sIn, 2)
+        sIn = MidB$(sIn, 2)
     Else
         bRN = False
     End If
     sBS = CStr(iBaseIn)
     
-    BigIntFromString = "0"
-    For iP = 1 To Len(sIn)
+    BigIntFromString = ChrB$(48)
+    For iP = 1 To LenB(sIn)
         'use constant list position and base for conversion
-        iV = InStr(Alphabet, UCase(Mid(sIn, iP, 1)))
+        iV = InStrB(Alphabet, MidB$(sIn, iP, 1))
         If iV > 0 Then 'accumulate
             BigIntFromString = multiply(BigIntFromString, sBS)
             BigIntFromString = Add(BigIntFromString, CStr(iV - 1))
@@ -494,7 +499,7 @@ Public Function BigIntFromString(sIn As String, iBaseIn As Integer) As String
     
     'decide on any negative signs
     If bRN Then
-        BigIntFromString = "-" + BigIntFromString
+        BigIntFromString = ChrB$(45) + BigIntFromString
     End If
 
 End Function
@@ -510,15 +515,15 @@ Public Function BigIntToString(sIn As String, iBaseOut As Integer) As String
     Dim iV As Long
     
     'test for empty parameters
-    If Len(sIn) = 0 Or iBaseOut = 0 Then
+    If LenB(sIn) = 0 Or iBaseOut = 0 Then
         MyEr "Bad parameter in BigIntToString", "Προβληματικοί παράμετροι στη BigIntToString"
         Exit Function
     End If
     
     'handle negative signs
-    If Left(sIn, 1) = "-" Then
+    If LeftB$(sIn, 1) = ChrB$(45) Then
         bRN = True
-        sIn = Mid(sIn, 2)
+        sIn = MidB$(sIn, 2)
     Else
         bRN = False
     End If
@@ -526,18 +531,18 @@ Public Function BigIntToString(sIn As String, iBaseOut As Integer) As String
     
     BigIntToString = ""
     On Error GoTo 100
-    Do While compare((sIn), "0") > 0
+    Do While compare((sIn), ChrB$(48)) > 0
         sIn = divide(sIn, sb)
-        iV = CInt(LastModulus())
+        iV = CLng(LastModulus())
         'locates appropriate alphabet character
-        BigIntToString = Mid(Alphabet, iV + 1, 1) + BigIntToString
+        BigIntToString = MidB$(Alphabet, iV + 1, 1) + BigIntToString
     Loop
     
     'decide on any negative signs
     If BigIntToString = "" Then
-        BigIntToString = "0"
-    ElseIf BigIntToString <> "0" And bRN Then
-        BigIntToString = "-" + BigIntToString
+        BigIntToString = ChrB$(48)
+    ElseIf BigIntToString <> ChrB$(48) And bRN Then
+        BigIntToString = ChrB$(45) + BigIntToString
     End If
     Exit Function
 100
@@ -551,7 +556,7 @@ Function IntStrByExp(sA As String, sExp As String) As String
     Dim ba As Boolean, br As Boolean
     
     'check parameter
-    If Left$(sExp, 1) = "-" Then
+    If LeftB$(sExp, 1) = ChrB$(45) Then
         MyEr "Negative power in IntPower", "Αρνητική δύναμη στην IntPower"
         Exit Function
     End If
@@ -560,17 +565,17 @@ Function IntStrByExp(sA As String, sExp As String) As String
     
     
     'handle any negative signs
-    ba = (Left(sA, 1) = "-")
-    If ba Then sA = Mid(sA, 2) 'Else sA = Mid(sA, 1)
-    If Len(sExp) > 4 Then
+    ba = (LeftB$(sA, 1) = ChrB$(45))
+    If ba Then sA = MidB$(sA, 2) 'Else sA = midb$(sA, 1)
+    If LenB(sExp) > 4 Then
         MyEr "too big exponent", "υπερβολικά μεγάλη δύναμη"
-        IntStrByExp = "1"
+        IntStrByExp = ChrB$(49)
         Exit Function
     End If
-    If ba And val(Right$(sExp, 1)) Mod 2 <> 0 Then br = True
-    VarZ = CDec(sExp)
+    If ba And val(RightB$(sExp, 1)) Mod 2 <> 0 Then br = True
+    VarZ = CDec(StrConv(sExp, vbUnicode))
     'run multiplication loop
-    IntStrByExp = "1"
+    IntStrByExp = ChrB$(49)
     Do Until VarZ = 0
         IntStrByExp = multiply(IntStrByExp, sA)
         VarZ = VarZ - 1
@@ -580,98 +585,100 @@ Function IntStrByExp(sA As String, sExp As String) As String
     IntStrByExp = TrimZero(IntStrByExp)
     
     'decide on any signs
-    If IntStrByExp <> "0" And br Then
-       IntStrByExp = "-" & IntStrByExp
+    If IntStrByExp <> ChrB$(48) And br Then
+       IntStrByExp = ChrB$(45) & IntStrByExp
     End If
 
 End Function
-Function IsProbablyPrime(sA As String, k As Integer) As Boolean
-    If Len(sA) < 1 Then Exit Function
-    If Left$(sA, 1) = "-" Then
+Function IsProbablyPrime(sA As String, K As Integer) As Boolean
+    If LenB(sA) < 1 Then Exit Function
+    If LeftB$(sA, 1) = ChrB$(45) Then
         MyEr "Negative Prime not exist", "Αρνητικός πρώτος δεν υπάρχει"
         Exit Function
     End If
-    If sA = "2" Then IsProbablyPrime = True: Exit Function
-    If val(Right$(sA, 1)) Mod 2 = 0 Then Exit Function
-    If sA = "1" Then Exit Function
+    If sA = ChrB$(50) Then IsProbablyPrime = True: Exit Function
+    If val(RightB$(sA, 1)) Mod 2 = 0 Then Exit Function
+    If sA = ChrB$(49) Then Exit Function
     
-    Dim nn As String, d As String, s As Long, z As Long
-    nn = subtract(sA, "1")
-    d = nn
-    While compare(Modulus((d), "2"), "0") = 0
+    Dim nn As String, D As String, s As Long, Z As Long
+    nn = subtract(sA, ChrB$(49))
+    D = nn
+    While compare(Modulus((D), ChrB$(50)), ChrB$(48)) = 0
         s = s + 1
-        d = divide(d, "2")
+        D = divide(D, ChrB$(50))
     Wend
-    z = Len(sA)
-    Dim a As String, x As String, i As Integer, j As Integer
+    Z = LenB(sA)
+    Dim A As String, X As String, I As Long, j As Long
     
     IsProbablyPrime = True
-    For i = 1 To k
+    For I = 1 To K
+        
         Do
-            a = ""
-            For j = 1 To Len(sA)
-                a = a + Chr$(47 + Int(10 * RndM(rndbase) + 1))
+            A = SpaceB(LenB(sA))
+            For j = 1 To LenB(sA)
+                MidB$(A, j, 1) = ChrB$(47 + Int(10 * RndM(rndbase) + 1))
             Next
-        Loop Until compare(nn, a) = 1 And compare(a, "1") > -1
-        x = modpow(a, (d), (sA))
-        If compare(x, "1") <> 0 Then ' continue
-            If compare(x, nn) <> 0 Then ' continue
+        Loop Until compare(nn, A) = 1 And compare(A, ChrB$(49)) > -1
+        X = modpow(A, (D), (sA))
+        If compare(X, ChrB$(49)) <> 0 Then ' continue
+            If compare(X, nn) <> 0 Then ' continue
                 For j = 1 To s
-                    x = modpow(x, "2", (sA))
-                    If compare(x, "1") = 0 Then IsProbablyPrime = False: Exit Function
-                    If compare(x, nn) = 0 Then Exit For
+                    X = modpow(X, ChrB$(50), (sA))
+                    If compare(X, ChrB$(49)) = 0 Then IsProbablyPrime = False: Exit Function
+                    If compare(X, nn) = 0 Then Exit For
                 Next
             End If
-            If compare(x, nn) <> 0 Then IsProbablyPrime = False: Exit Function
+            If compare(X, nn) <> 0 Then IsProbablyPrime = False: Exit Function
         End If
     Next
 End Function
 
 Public Function modpow(sBase As String, sExp As String, sMod As String) As String
-    If Left$(sExp, 1) = "-" Then
+    If LeftB$(sExp, 1) = ChrB$(45) Then
         MyEr "Negative power in modpow", "Αρνητική δύναμη στην modpow"
         Exit Function
     End If
-    If Left$(sMod, 1) = "-" Or sMod = "0" Then
+    If LeftB$(sMod, 1) = ChrB$(45) Or sMod = ChrB$(48) Then
         MyEr "Zero or negative Modules in modpow", "Μηδενικό ή Αρνητικό Μέτρο στην modpow"
         Exit Function
     End If
     Dim br As Boolean, ba As Boolean
-    ba = (Left(sBase, 1) = "-")
-    If ba Then sBase = Mid(sBase, 2)
-    If ba And AscW(Right$(sExp, 1)) Mod 2 <> 0 Then br = True
-    modpow = "1"
-    Do While sExp <> "0"
-        If AscW(Right$(sExp, 1)) Mod 2 = 1 Then
+    ba = (LeftB$(sBase, 1) = ChrB$(45))
+    If ba Then sBase = MidB$(sBase, 2)
+    If ba And AscB(RightB$(sExp, 1)) Mod 2 <> 0 Then br = True
+    modpow = ChrB$(49)
+    Do While sExp <> ChrB$(48)
+        If AscB(RightB$(sExp, 1)) Mod 2 = 1 Then
             modpow = Module13.Modulus(Module13.multiply(modpow, (sBase)), (sMod))
         End If
-        sExp = divide(sExp, "2")
+        sExp = divide(sExp, ChrB$(50))
         sBase = Modulus(multiply(sBase, (sBase)), sMod)
     Loop
     
-    If modpow <> "0" And br Then
-       modpow = "-" & modpow
+    If modpow <> ChrB$(48) And br Then
+       modpow = ChrB$(45) & modpow
     End If
 End Function
 Public Function IntSqr(sA As String) As String
-    If Left$(sA, 1) = "-" Or sA = "0" Then
+    If LeftB$(sA, 1) = ChrB$(45) Or sA = ChrB$(48) Then
         MyEr "Zero or negative paramter for integer Square Root", "Μηδενική ή Αρνητική παράμετρος για ακέραια τετραγωνική ρίζα"
         Exit Function
     End If
-    Dim q As String, r As String, t As String, z As String
-    z = sA
-    r = "0"
-    q = "1"
+    Dim q As String, r As String, t As String, Z As String, minusone As String
+    minusone = ChrB$(45) + ChrB$(49)
+    Z = sA
+    r = ChrB$(48)
+    q = ChrB$(49)
     Do
-    q = multiply(q, "4")
+    q = multiply(q, ChrB$(52))
     Loop Until compare((q), (sA)) = 1
     Do
-        If compare((q), "1") < 1 Then Exit Do
-        q = divide(q, "4")
-        t = subtract(subtract((z), (r)), (q))
-        r = divide(r, "2")
-        If compare((t), "-1") > -1 Then
-            SwapStrings z, t
+        If compare((q), ChrB$(49)) < 1 Then Exit Do
+        q = divide(q, ChrB$(52))
+        t = subtract(subtract((Z), (r)), (q))
+        r = divide(r, ChrB$(50))
+        If compare((t), (minusone)) > -1 Then
+            SwapStrings Z, t
             r = Add(r, (q))
         End If
     Loop
@@ -679,37 +686,38 @@ Public Function IntSqr(sA As String) As String
 End Function
 Private Function IsPrime(sA As String) As Boolean
     ' works but not used - use IsProbablyPrime()
-    If Len(sA) < 1 Then Exit Function
-    If Left$(sA, 1) = "-" Then
+    If LenB(sA) < 1 Then Exit Function
+    If LeftB$(sA, 1) = ChrB$(45) Then
         MyEr "Negative Prime not exist", "Αρνητικός πρώτος δεν υπάρχει"
         Exit Function
     End If
-    Dim d As String
+    Dim D As String
     
-    If sA = "2" Then IsPrime = True: Exit Function
-    If val(Right$(sA, 1)) Mod 2 = 0 Then Exit Function
-    If sA = "1" Then Exit Function
-    If sA = "3" Then IsPrime = True: Exit Function
-    If sA = "5" Then IsPrime = True: Exit Function
-    If compare(Modulus((sA), "3"), "0") = 0 Then Exit Function
+    If sA = ChrB$(50) Then IsPrime = True: Exit Function
+    If val(RightB$(sA, 1)) Mod 2 = 0 Then Exit Function
+    If sA = ChrB$(49) Then Exit Function
+    If sA = ChrB$(51) Then IsPrime = True: Exit Function
+    If sA = ChrB$(53) Then IsPrime = True: Exit Function
+    If compare(Modulus((sA), ChrB$(51)), ChrB$(48)) = 0 Then Exit Function
     Dim x1 As String
     x1 = IntSqr(sA)
-    d = "5"
+    D = ChrB$(53)
     Do
-        If compare(Modulus((sA), (d)), "0") = 0 Then Exit Do
-        d = Add("2", d)
-        If compare((d), (x1)) = 1 Then IsPrime = True: Exit Function
-        If compare(Modulus((sA), (d)), "0") = 0 Then Exit Do
-        d = Add("4", d)
-        If compare((d), (x1)) = 1 Then IsPrime = True: Exit Function
+        If compare(Modulus((sA), (D)), ChrB$(48)) = 0 Then Exit Do
+        D = Add(ChrB$(50), D)
+        If compare((D), (x1)) = 1 Then IsPrime = True: Exit Function
+        If compare(Modulus((sA), (D)), ChrB$(48)) = 0 Then Exit Do
+        D = Add(ChrB$(52), D)
+        If compare((D), (x1)) = 1 Then IsPrime = True: Exit Function
     Loop
 End Function
+' GET UNICODE AND CHANGE IT TO ANSI
 Public Function CreateBigInteger(s$, Optional basenum) As BigInteger
     Set CreateBigInteger = New BigInteger
-    s$ = TrimZero(s$)
+    s$ = TrimZeroU(s$)
     If IsMissing(basenum) Then
         If TestNumber(s$) Then
-            CreateBigInteger.Load s$, 10
+            CreateBigInteger.Load StrConv(s$, vbFromUnicode), 10
         Else
             MyEr "not in base 10 (invalid chars)", "Δεν είναι στη βάση 10 (αντικανονικοί χαρακτήρες)"
         End If
@@ -726,44 +734,79 @@ Public Function CreateBigInteger(s$, Optional basenum) As BigInteger
     End If
 End Function
 Public Function TestNumberOnBase(s$, b As Integer) As Boolean
-    Dim i As Long, lim As Long, ss As String
-    
+    Dim I As Long, lim As Long, ss As String
+    Const Alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     ss = Mid$(Alphabet, 1, b)
     lim = Len(s$)
     If lim = 0 Then Exit Function
-    i = 1
-    If Left$(s$, 1) = "-" Then i = i + 1: If lim = 1 Then Exit Function
-    Do While i <= lim
-    If InStr(ss, Mid$(s$, i, 1)) = 0 Then Exit Function
-    i = i + 1
+    I = 1
+    If Left$(s$, 1) = Chr$(45) Then I = I + 1: If lim = 1 Then Exit Function
+    Do While I <= lim
+    If InStr(ss, Mid$(s$, I, 1)) = 0 Then Exit Function
+    I = I + 1
     Loop
     TestNumberOnBase = True
 End Function
 Public Function TestNumber(s$) As Boolean
-    Dim i As Long, lim As Long
+    Dim I As Long, lim As Long
     lim = Len(s$)
     If lim = 0 Then Exit Function
-    i = 1
-    If Left$(s$, 1) = "-" Then i = i + 1: If lim = 1 Then Exit Function
-    Do While i <= lim
-    If InStr("0123456789", Mid$(s$, i, 1)) = 0 Then Exit Function
-    i = i + 1
+    I = 1
+    If Left$(s$, 1) = Chr$(45) Then I = I + 1: If lim = 1 Then Exit Function
+    Do While I <= lim
+    If InStr("0123456789", Mid$(s$, I, 1)) = 0 Then Exit Function
+    I = I + 1
     Loop
     TestNumber = True
 End Function
 Public Function TrimZero(s$) As String
-    Dim i As Long, j As Long, lim As Long
-    lim = Len(s$)
+    Dim I As Long, j As Long, lim As Long
+    lim = LenB(s$)
     If lim = 0 Then Exit Function
     j = 1
-    TrimZero = space(Len(s$))
-    If Left$(s$, j) = "-" Then Mid$(TrimZero, j, 1) = "-": j = j + 1
-    i = j
+    TrimZero = SpaceB(LenB(s$))
+    If LeftB$(s$, j) = ChrB$(45) Then MidB$(TrimZero, j, 1) = ChrB$(45): j = j + 1
+    I = j
     lim = lim - 1
-    Do While i <= lim
-    If Mid$(s$, i, 1) <> "0" Then Exit Do
-    i = i + 1
+    Do While I <= lim
+        If MidB$(s$, I, 1) <> ChrB$(48) Then Exit Do
+        I = I + 1
     Loop
-    Mid$(TrimZero, j, lim - i + 2) = Mid$(s$, i)
-    TrimZero = RTrim$(TrimZero)
+    MidB$(TrimZero, j, lim - I + 2) = MidB$(s$, I)
+    TrimZero = RtrimB(TrimZero)
+End Function
+Public Function RtrimB(s$) As String
+    Dim I As Long, j As Long
+    j = LenB(s$)
+    If j = 0 Then Exit Function
+    For I = j To 1 Step -1
+        If MidB$(s$, I, 1) <> ChrB$(32) Then Exit For
+    Next
+    If I = j Then RtrimB = s$: Exit Function
+    If I < 1 Then RtrimB = "": Exit Function
+    RtrimB = LeftB$(s$, I)
+End Function
+Public Function SpaceB(n As Long) As String
+If n = 1 Then
+    SpaceB = ChrB$(32)
+Else
+    SpaceB = StrConv(space(n), vbFromUnicode)
+End If
+End Function
+
+Public Function TrimZeroU(s$) As String
+    Dim I As Long, j As Long, lim As Long
+    lim = LenB(s$)
+    If lim = 0 Then Exit Function
+    j = 1
+    TrimZeroU = space(Len(s$))
+    If Left$(s$, j) = "-" Then Mid$(TrimZeroU, j, 1) = "-": j = j + 1
+    I = j
+    lim = lim - 1
+    Do While I <= lim
+    If Mid$(s$, I, 1) <> ChrB$(48) Then Exit Do
+    I = I + 1
+    Loop
+    Mid$(TrimZeroU, j, lim - I + 2) = Mid$(s$, I)
+    TrimZeroU = RTrim$(TrimZeroU)
 End Function
