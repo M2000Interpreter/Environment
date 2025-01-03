@@ -79,9 +79,9 @@ Private Type SAFEARRAY1D
 End Type
 ' no second sort allowed per array
 Private sortmult As Long, sortoff As Long, upart As Long, part As Long, Col(), Piv, piv1()
-Public index As Long, Final As Boolean, refgroup As Object, grouperror As Boolean
+Public Index As Long, Final As Boolean, refgroup As Object, grouperror As Boolean
 Public refArray As Variant, StrArray As Boolean, IsByValue As Boolean
-Public Sub Compute0(P As Variant, ss$)
+Public Sub Compute0(p As Variant, ss$)
 If Final Then CantAssignValue: Exit Sub
 Dim v As Long, sp As Variant, ii As Variant
 Dim n As Byte
@@ -97,14 +97,14 @@ Do While v <= Me.UpperMonoLimit
             item(v) = ii
             GoTo conthere
         Case "+"
-            item(v) = ii + P
+            item(v) = ii + p
         Case "*"
-            item(v) = P * ii
+            item(v) = p * ii
         Case "-"
-            item(v) = ii - P
+            item(v) = ii - p
         Case "/"
-            If P = 0 Then Exit Do
-            item(v) = ii / P
+            If p = 0 Then Exit Do
+            item(v) = ii / p
         Case "~", "!!"
             item(v) = -1 - (ii <> 0)
             GoTo conthere
@@ -118,45 +118,45 @@ Do While v <= Me.UpperMonoLimit
             item(v) = -ii
             GoTo conthere
         Case "+="
-            item(v) = ii + P
+            item(v) = ii + p
         Case "*="
-            item(v) = P * ii
+            item(v) = p * ii
         Case "-="
-            item(v) = ii - P
+            item(v) = ii - p
         Case "/="
-            If P = 0 Then DevZero: Exit Do
-            item(v) = ii / P
+            If p = 0 Then DevZero: Exit Do
+            item(v) = ii / p
         Case "DIV", "диа"
-            If P = 0 Then
+            If p = 0 Then
                 DevZero
                 Exit Do
             End If
-            item(v) = Fix(ii / P)
+            item(v) = Fix(ii / p)
         Case "DIV#", "диа#"
-            If P = 0 Then
+            If p = 0 Then
                 DevZero
                 Exit Do
             End If
-            If P < 0 Then
-                item(v) = Int((ii - Abs(ii - Abs(P) * Int(ii / Abs(P)))) / P)
+            If p < 0 Then
+                item(v) = Int((ii - Abs(ii - Abs(p) * Int(ii / Abs(p)))) / p)
             Else
-                item(v) = Int(ii / P)
+                item(v) = Int(ii / p)
             End If
         Case "MOD", "упок", "упокоипо"
-            If P = 0 Then
+            If p = 0 Then
                 DevZero
                 Exit Do
             End If
-            sp = ii - Fix(ii / P) * P
-            If Abs(sp) >= Abs(P) Then sp = sp - sp
+            sp = ii - Fix(ii / p) * p
+            If Abs(sp) >= Abs(p) Then sp = sp - sp
             actualData(v) = sp
         Case "MOD#", "упок#", "упокоипо#"
-             If P = 0 Then
+             If p = 0 Then
                 DevZero
                 Exit Do
             End If
-            sp = Abs(ii - Abs(P) * Int(ii / Abs(P)))
-            If Abs(sp) >= Abs(P) Then sp = sp - sp
+            sp = Abs(ii - Abs(p) * Int(ii / Abs(p)))
+            If Abs(sp) >= Abs(p) Then sp = sp - sp
             actualData(v) = sp
         Case Else
             WrongOperator
@@ -166,17 +166,17 @@ Do While v <= Me.UpperMonoLimit
     ElseIf (n < 8) Or (n = 11) Or (n = 17) Or (n = 14) Then
         Select Case ss$
         Case "=", "g"
-            actualData(v) = P
+            actualData(v) = p
             GoTo conthere
         Case "+"
-            actualData(v) = P + actualData(v)
+            actualData(v) = p + actualData(v)
         Case "*"
-            actualData(v) = P * actualData(v)
+            actualData(v) = p * actualData(v)
         Case "-"
-            actualData(v) = actualData(v) - P
+            actualData(v) = actualData(v) - p
         Case "/"
-            If P = 0 Then Exit Do
-            actualData(v) = actualData(v) / P
+            If p = 0 Then Exit Do
+            actualData(v) = actualData(v) / p
         Case "~", "!!"
             actualData(v) = -1 - (actualData(v) <> 0)
         Case "++"
@@ -187,45 +187,45 @@ Do While v <= Me.UpperMonoLimit
             actualData(v) = -actualData(v)
             GoTo conthere
         Case "+="
-            actualData(v) = actualData(v) + P
+            actualData(v) = actualData(v) + p
         Case "*="
-            actualData(v) = P * actualData(v)
+            actualData(v) = p * actualData(v)
         Case "-="
-            actualData(v) = actualData(v) - P
+            actualData(v) = actualData(v) - p
         Case "/="
-            If P = 0 Then DevZero: Exit Do
-            actualData(v) = actualData(v) / P
+            If p = 0 Then DevZero: Exit Do
+            actualData(v) = actualData(v) / p
         Case "DIV", "диа"
-            If P = 0 Then
+            If p = 0 Then
                 DevZero
                 Exit Do
             End If
-            actualData(v) = Fix(actualData(v) / P)
+            actualData(v) = Fix(actualData(v) / p)
         Case "DIV#", "диа#"
-            If P = 0 Then
+            If p = 0 Then
                 DevZero
                 Exit Do
             End If
-            If P < 0 Then
-                actualData(v) = Int((actualData(v) - Abs(actualData(v) - Abs(P) * Int(actualData(v) / Abs(P)))) / P)
+            If p < 0 Then
+                actualData(v) = Int((actualData(v) - Abs(actualData(v) - Abs(p) * Int(actualData(v) / Abs(p)))) / p)
             Else
-                actualData(v) = Int(actualData(v) / P)
+                actualData(v) = Int(actualData(v) / p)
             End If
         Case "MOD", "упок", "упокоипо"
-            If P = 0 Then
+            If p = 0 Then
                 DevZero
                 Exit Do
             End If
-            sp = actualData(v) - Fix(actualData(v) / P) * P
-            If Abs(sp) >= Abs(P) Then sp = sp - sp
+            sp = actualData(v) - Fix(actualData(v) / p) * p
+            If Abs(sp) >= Abs(p) Then sp = sp - sp
             actualData(v) = sp
         Case "MOD#", "упок#", "упокоипо#"
-             If P = 0 Then
+             If p = 0 Then
                 DevZero
                 Exit Do
             End If
-            sp = Abs(actualData(v) - Abs(P) * Int(actualData(v) / Abs(P)))
-            If Abs(sp) >= Abs(P) Then sp = sp - sp
+            sp = Abs(actualData(v) - Abs(p) * Int(actualData(v) / Abs(p)))
+            If Abs(sp) >= Abs(p) Then sp = sp - sp
             actualData(v) = sp
         Case Else
             WrongOperator
@@ -239,7 +239,7 @@ conthere:
 Loop
 
 End Sub
-Public Sub Compute(P As Double, ss$)
+Public Sub Compute(p As Double, ss$)
 If Final Then CantAssignValue: Exit Sub
 Dim v As Long, ii As Variant
 Dim n As Byte
@@ -255,14 +255,14 @@ Do While v <= Me.UpperMonoLimit
             item(v) = ii
             GoTo conthere
         Case "+"
-            item(v) = ii + P
+            item(v) = ii + p
         Case "*"
-            item(v) = P * ii
+            item(v) = p * ii
         Case "-"
-            item(v) = ii - P
+            item(v) = ii - p
         Case "/"
-            If P = 0 Then Exit Do
-            actualData(v) = actualData(v) / P
+            If p = 0 Then Exit Do
+            actualData(v) = actualData(v) / p
         Case "~", "!!"
             item(v) = -1 - (ii <> 0)
             GoTo conthere
@@ -280,18 +280,18 @@ Do While v <= Me.UpperMonoLimit
     ElseIf (n < 8) Or (n = 11) Or (n = 17) Or (n = 14) Then
         Select Case ss$
         Case "=", "g"
-            actualData(v) = P
+            actualData(v) = p
             GoTo conthere
         Case "+"
-            actualData(v) = P + actualData(v)
+            actualData(v) = p + actualData(v)
         Case "*"
-            actualData(v) = P * actualData(v)
+            actualData(v) = p * actualData(v)
         Case "-"
-        actualData(v) = actualData(v) - P
+        actualData(v) = actualData(v) - p
         If RoundDouble Then If VarType(actualData(v)) = vbDouble Then actualData(v) = MyRound(actualData(v), 13)
         Case "/"
-            If P = 0 Then Exit Do
-            actualData(v) = actualData(v) / P
+            If p = 0 Then Exit Do
+            actualData(v) = actualData(v) / p
         Case "~", "!!"
             actualData(v) = -1 - (actualData(v) <> 0)
             GoTo conthere
@@ -313,7 +313,7 @@ conthere:
 Loop
 
 End Sub
-Public Function CompareItem(v As Long, P As Variant, ss$, ret As Boolean) As Boolean
+Public Function CompareItem(v As Long, p As Variant, ss$, ret As Boolean) As Boolean
 ret = False
 On Error GoTo there
 Dim ii As Variant
@@ -324,58 +324,58 @@ If n = 20 Then
     PutMem2 VarPtr(ii), 20
     Select Case ss$
     Case ">"
-    ret = ii > P
+    ret = ii > p
     Case ">="
-    ret = ii >= P
+    ret = ii >= p
     Case "<"
-    ret = ii < P
+    ret = ii < p
     Case "<="
-    ret = ii <= P
+    ret = ii <= p
     Case "<>"
-    ret = ii <> P
+    ret = ii <> p
     Case "="
-    ret = ii = P
+    ret = ii = p
     End Select
     ii = Empty
 ElseIf (n < 8) Or (n = 11) Or (n = 17) Or (n = 14) Then
     Select Case ss$
     Case ">"
-    ret = actualData(v) > P
+    ret = actualData(v) > p
     Case ">="
-    ret = actualData(v) >= P
+    ret = actualData(v) >= p
     Case "<"
-    ret = actualData(v) < P
+    ret = actualData(v) < p
     Case "<="
-    ret = actualData(v) <= P
+    ret = actualData(v) <= p
     Case "<>"
-    ret = actualData(v) <> P
+    ret = actualData(v) <> p
     Case "="
-    ret = actualData(v) = P
+    ret = actualData(v) = p
     End Select
 
 Else
 Select Case UCase(ss$)
 Case ">"
-ret = actualData(v) > P
+ret = actualData(v) > p
 Case ">="
-ret = actualData(v) >= P
+ret = actualData(v) >= p
 Case "<"
-ret = actualData(v) < P
+ret = actualData(v) < p
 Case "<="
-ret = actualData(v) <= P
+ret = actualData(v) <= p
 Case "<>"
-ret = actualData(v) <> P
+ret = actualData(v) <> p
 Case "="
-ret = actualData(v) = P
+ret = actualData(v) = p
 Case "LIKE"
-ret = actualData(v) Like Replace$(CStr(P), "%", "*")
+ret = actualData(v) Like Replace$(CStr(p), "%", "*")
 
 End Select
 End If
 CompareItem = True
 there:
 End Function
-Public Sub Compute2(P As Variant, ss$)
+Public Sub Compute2(p As Variant, ss$)
 If Final Then CantAssignValue: Exit Sub
 Dim v As Long, sp As Variant, ii As Variant
 Dim n As Byte
@@ -391,45 +391,45 @@ Do While v <= Me.UpperMonoLimit
                 item(v) = ii
                 GoTo conthere
             Case "+="
-                item(v) = ii + P
+                item(v) = ii + p
             Case "*="
-                item(v) = P * ii
+                item(v) = p * ii
             Case "-="
-                item(v) = ii - P
+                item(v) = ii - p
             Case "/="
-                If P = 0 Then DevZero: Exit Do
-                item(v) = ii / P
+                If p = 0 Then DevZero: Exit Do
+                item(v) = ii / p
             Case "DIV", "диа"
-                If P = 0 Then
+                If p = 0 Then
                     DevZero
                     Exit Do
                 End If
-                item(v) = Fix(ii / P)
+                item(v) = Fix(ii / p)
             Case "DIV#", "диа#"
-                If P = 0 Then
+                If p = 0 Then
                     DevZero
                     Exit Do
                 End If
-                If P < 0 Then
-                    item(v) = Int((ii - Abs(ii - Abs(P) * Int(ii / Abs(P)))) / P)
+                If p < 0 Then
+                    item(v) = Int((ii - Abs(ii - Abs(p) * Int(ii / Abs(p)))) / p)
                 Else
-                    item(v) = Int(ii / P)
+                    item(v) = Int(ii / p)
                 End If
             Case "MOD", "упок", "упокоипо"
-                If P = 0 Then
+                If p = 0 Then
                     DevZero
                     Exit Do
                 End If
-                sp = ii - Fix(ii / P) * P
-                If Abs(sp) >= Abs(P) Then sp = sp - sp
+                sp = ii - Fix(ii / p) * p
+                If Abs(sp) >= Abs(p) Then sp = sp - sp
                 item(v) = sp
              Case "MOD#", "упок#", "упокоипо#"
-                 If P = 0 Then
+                 If p = 0 Then
                     DevZero
                     Exit Do
                 End If
-                sp = Abs(ii - Abs(P) * Int(ii / Abs(P)))
-                If Abs(sp) >= Abs(P) Then sp = sp - sp
+                sp = Abs(ii - Abs(p) * Int(ii / Abs(p)))
+                If Abs(sp) >= Abs(p) Then sp = sp - sp
                 item(v) = sp
             Case Else
                 WrongOperator
@@ -439,48 +439,48 @@ Do While v <= Me.UpperMonoLimit
     ElseIf (n < 8) Or (n = 11) Or (n = 17) Or (n = 14) Then
         Select Case ss$
             Case "="
-                actualData(v) = P
+                actualData(v) = p
                 GoTo conthere
             Case "+="
-                actualData(v) = actualData(v) + P
+                actualData(v) = actualData(v) + p
             Case "*="
-                actualData(v) = P * actualData(v)
+                actualData(v) = p * actualData(v)
             Case "-="
-                actualData(v) = actualData(v) - P
+                actualData(v) = actualData(v) - p
             Case "/="
-                If P = 0 Then DevZero: Exit Do
-                 actualData(v) = actualData(v) / P
+                If p = 0 Then DevZero: Exit Do
+                 actualData(v) = actualData(v) / p
             Case "DIV", "диа"
-                If P = 0 Then
+                If p = 0 Then
                     DevZero
                     Exit Do
                 End If
-                actualData(v) = Fix(actualData(v) / P)
+                actualData(v) = Fix(actualData(v) / p)
             Case "DIV#", "диа#"
-                If P = 0 Then
+                If p = 0 Then
                     DevZero
                     Exit Do
                 End If
-                If P < 0 Then
-                    actualData(v) = Int((actualData(v) - Abs(actualData(v) - Abs(P) * Int(actualData(v) / Abs(P)))) / P)
+                If p < 0 Then
+                    actualData(v) = Int((actualData(v) - Abs(actualData(v) - Abs(p) * Int(actualData(v) / Abs(p)))) / p)
                 Else
-                    actualData(v) = Int(actualData(v) / P)
+                    actualData(v) = Int(actualData(v) / p)
                 End If
             Case "MOD", "упок", "упокоипо"
-                If P = 0 Then
+                If p = 0 Then
                     DevZero
                     Exit Do
                 End If
-                sp = actualData(v) - Fix(actualData(v) / P) * P
-                If Abs(sp) >= Abs(P) Then sp = sp - sp
+                sp = actualData(v) - Fix(actualData(v) / p) * p
+                If Abs(sp) >= Abs(p) Then sp = sp - sp
                 actualData(v) = sp
              Case "MOD#", "упок#", "упокоипо#"
-                 If P = 0 Then
+                 If p = 0 Then
                     DevZero
                     Exit Do
                 End If
-                sp = Abs(actualData(v) - Abs(P) * Int(actualData(v) / Abs(P)))
-                If Abs(sp) >= Abs(P) Then sp = sp - sp
+                sp = Abs(actualData(v) - Abs(p) * Int(actualData(v) / Abs(p)))
+                If Abs(sp) >= Abs(p) Then sp = sp - sp
                 actualData(v) = sp
             Case Else
                 WrongOperator
@@ -555,9 +555,9 @@ Case Else
     item(v) = CDbl(Not CBool(itemnumeric(v)))
 End Select
 End Sub
-Public Function PlaceValue2UDTArray(ByVal P As Long, Name$, v, index As Long) As Boolean
+Public Function PlaceValue2UDTArray(ByVal p As Long, Name$, v, Index As Long) As Boolean
 On Error Resume Next
-Module10.PlaceValue2UDTArray actualData(P), Name$, v, index
+Module10.PlaceValue2UDTArray actualData(p), Name$, v, Index
 
 If Err Then
     MyEr Err.Description, Err.Description
@@ -566,9 +566,9 @@ If Err Then
 End If
 PlaceValue2UDTArray = True
 End Function
-Public Function PlaceValue2UDT(ByVal P As Long, Name$, v) As Boolean
+Public Function PlaceValue2UDT(ByVal p As Long, Name$, v) As Boolean
 On Error Resume Next
-Module10.PlaceValue2UDT actualData(P), Name$, v
+Module10.PlaceValue2UDT actualData(p), Name$, v
 If Err Then
     MyEr Err.Description, Err.Description
     Err.Clear
@@ -576,33 +576,33 @@ If Err Then
 End If
 PlaceValue2UDT = True
 End Function
-Public Function GetUDTValue(ByVal P As Long, Name$, Optional ndx)
+Public Function GetUDTValue(ByVal p As Long, Name$, Optional ndx)
 On Error Resume Next
 If IsMissing(ndx) Then
-GetUDTValue = Module10.GetUDTValue(actualData(P), Name$)
+GetUDTValue = Module10.GetUDTValue(actualData(p), Name$)
 Else
-GetUDTValue = Module10.GetUDTValueArray(actualData(P), Name$, CLng(ndx))
+GetUDTValue = Module10.GetUDTValueArray(actualData(p), Name$, CLng(ndx))
 End If
 End Function
 Property Get Value() As Variant
-If index >= 0 And index <= maxitems1 Then
+If Index >= 0 And Index <= maxitems1 Then
 
-If IsObject(actualData(index)) Then
-    If Typename(actualData(index)) = "PropReference" Then
-        Value = actualData(index)
+If IsObject(actualData(Index)) Then
+    If Typename(actualData(Index)) = "PropReference" Then
+        Value = actualData(Index)
     Else
-        Set Value = actualData(index)
+        Set Value = actualData(Index)
     End If
 Else
             If myVarType(actualData, vbObject) Then
                
-                    Value = actualData(index)
-                ElseIf VarType(actualData(index)) = 20 Then
+                    Value = actualData(Index)
+                ElseIf VarType(actualData(Index)) = 20 Then
                 
-                    CopyMemory ByVal VarPtr(Value) + 8, ByVal VarPtr(actualData(index)) + 8, 8
+                    CopyMemory ByVal VarPtr(Value) + 8, ByVal VarPtr(actualData(Index)) + 8, 8
                     PutMem2 VarPtr(Value), 20
                 Else
-                    Value = actualData(index)
+                    Value = actualData(Index)
                  
                 End If
 
@@ -861,31 +861,31 @@ R2 = SafeArrayUnlock(m_base_0)
 r1 = SafeArrayUnlock(m_base)
 End Sub
 Public Sub Car(M As Object)
-Dim k As New mArray, usehandler As mHandler, s$
+Dim K As New mArray, usehandler As mHandler, s$
 Dim I As Long, obj As Object, obj2 As Object, spare As lambda
 If count > 0 Then
-    k.PushDim 1: k.PushEnd: k.SerialItem actualData(0), 0, 1
+    K.PushDim 1: K.PushEnd: K.SerialItem actualData(0), 0, 1
     If ItemIsObject(0) Then
         s$ = ItemType(0)
         Select Case s$
         Case mgrp
             Set obj = item(0)
             CopyGroupObj obj, obj2
-            Set k.item(0) = obj2
+            Set K.item(0) = obj2
             Set obj2 = Nothing
         Case mlmbd
             Dim actualdata1()
             With item(0)
             .CopyTo spare, actualdata1()
             End With
-            Set k.item(0) = spare
+            Set K.item(0) = spare
             Set spare = Nothing
         Case Else
             If s$ = mHdlr Then
                 Set usehandler = item(0)
                 If usehandler.T1 = 3 Then
                     Set M = usehandler
-                    Set k = Nothing
+                    Set K = Nothing
                     Exit Sub
                 End If
              ElseIf s$ = mArr Then
@@ -893,61 +893,61 @@ If count > 0 Then
                 usehandler.T1 = 3
                 Set usehandler.objref = item(0)
                 Set M = usehandler
-                Set k = Nothing
+                Set K = Nothing
                 Exit Sub
             End If
-            Set k.item(0) = item(0)
+            Set K.item(0) = item(0)
         End Select
     Else
-        k.item(0) = item(0)
+        K.item(0) = item(0)
     End If
 End If
-k.arr = True
-Set M = k
-Set k = Nothing
+K.arr = True
+Set M = K
+Set K = Nothing
 End Sub
 Public Sub Cdr(M As Object)
-Dim k As New mArray
+Dim K As New mArray
 Dim I As Long, obj As Object, obj2 As Object, spare As lambda
 If dnum > 0 Then
-    k.StartResize: k.PushDim Me.count - 1: k.PushEnd
+    K.StartResize: K.PushDim Me.count - 1: K.PushEnd
 Else
-    k.arr = True
-    Set k.GroupRef = Me.GroupRef
-    k.IHaveGui = Me.IHaveGui
-    k.IhaveClass = Me.IhaveClass
-    Set M = k
+    K.arr = True
+    Set K.GroupRef = Me.GroupRef
+    K.IHaveGui = Me.IHaveGui
+    K.IhaveClass = Me.IhaveClass
+    Set M = K
     Exit Sub
 End If
-k.myarrbase = myarrbase
-k.RevOrder = False
+K.myarrbase = myarrbase
+K.RevOrder = False
 For I = 1 To Me.UpperMonoLimit
     If IsObject(Me.item(I)) Then
         Select Case Typename(Me.item(I))
         Case mgrp
             Set obj = Me.item(I)
             CopyGroupObj obj, obj2
-            Set k.item(I - 1) = obj2
+            Set K.item(I - 1) = obj2
             Set obj2 = Nothing
         Case mlmbd
             Dim actualdata1()
             With Me.item(I)
                 .CopyTo spare, actualdata1()
             End With
-            Set k.item(I - 1) = spare
+            Set K.item(I - 1) = spare
             Set spare = Nothing
         Case Else
-            Set k.item(I - 1) = Me.item(I)
+            Set K.item(I - 1) = Me.item(I)
         End Select
     Else
-        k.item(I - 1) = Me.item(I)
+        K.item(I - 1) = Me.item(I)
     End If
 Next I
 ' why not in CAR ???
-Set k.GroupRef = Me.GroupRef
-k.IHaveGui = Me.IHaveGui
-k.IhaveClass = Me.IhaveClass
-Set M = k
+Set K.GroupRef = Me.GroupRef
+K.IHaveGui = Me.IHaveGui
+K.IhaveClass = Me.IhaveClass
+Set M = K
 End Sub
 Public Sub processAppend(M As Object)
 Dim pppp As New mArray, pppp1 As mArray
@@ -964,117 +964,117 @@ Set pppp = Nothing
 Set pppp1 = Nothing
 End Sub
 
-Public Sub AppendArray(k As mArray)
+Public Sub AppendArray(K As mArray)
 'append this to k
-If k.count = 0 Then
-    Me.CopyArray k
+If K.count = 0 Then
+    Me.CopyArray K
     Exit Sub
 End If
 Dim v As Variant, I As Long, obj As Object, obj2 As Object
 Dim fromhere As Long
-fromhere = k.UpperMonoLimit + 1
-k.SerialItem v, Me.count + k.count, 10
-k.myarrbase = myarrbase
-k.RevOrder = RevOrder
+fromhere = K.UpperMonoLimit + 1
+K.SerialItem v, Me.count + K.count, 10
+K.myarrbase = myarrbase
+K.RevOrder = RevOrder
 For I = 0 To Me.UpperMonoLimit
     If IsObject(Me.item(I)) Then
         Select Case Typename(Me.item(I))
         Case mgrp
             Set obj = Me.item(I)
             CopyGroupObj obj, obj2
-            Set k.item(I + fromhere) = obj2
+            Set K.item(I + fromhere) = obj2
             Set obj2 = Nothing
         Case Else
-            Set k.item(I + fromhere) = Me.item(I)
+            Set K.item(I + fromhere) = Me.item(I)
         End Select
     Else
-        k.item(I + fromhere) = Me.item(I)
+        K.item(I + fromhere) = Me.item(I)
     End If
 Next I
 '' new
-Set k.GroupRef = Me.GroupRef
-k.IHaveGui = Me.IHaveGui
-k.IhaveClass = Me.IhaveClass
+Set K.GroupRef = Me.GroupRef
+K.IHaveGui = Me.IHaveGui
+K.IhaveClass = Me.IhaveClass
 End Sub
 
 
 
-Public Sub CopyArray(k As mArray)
+Public Sub CopyArray(K As mArray)
 'copy this to k
 
-If k Is Me Then Exit Sub
-If k Is Nothing Then Set k = New mArray
+If K Is Me Then Exit Sub
+If K Is Nothing Then Set K = New mArray
 Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda
-k.MyTypeToBe = MyTypeToBe
+K.MyTypeToBe = MyTypeToBe
 ' no use, we do the redim in PushEnd
 'k.SerialItem v, Me.UpperMonoLimit, 8
-k.myarrbase = myarrbase
-k.RevOrder = False
-k.StartResize
+K.myarrbase = myarrbase
+K.RevOrder = False
+K.StartResize
 For I = 0 To dnum - 1
-    k.PushDim limit(I), limBase(I)
+    K.PushDim limit(I), limBase(I)
 Next I
 
 If myVarType(actualData, vbObject) And MyTypeToBe <> vbVariant Then
-    k.PushEnd CVar(actualData.Copy)
-    k.RevOrder = RevOrder
-    Set k.GroupRef = Me.GroupRef
+    K.PushEnd CVar(actualData.Copy)
+    K.RevOrder = RevOrder
+    Set K.GroupRef = Me.GroupRef
 Else
-    k.PushEnd
-    k.RevOrder = RevOrder
-    Set k.GroupRef = Me.GroupRef
+    K.PushEnd
+    K.RevOrder = RevOrder
+    Set K.GroupRef = Me.GroupRef
     For I = 0 To Me.UpperMonoLimit
         If myVarType(Me.item(I), vbObject) Then
             Select Case Typename(Me.item(I))
             Case mgrp
                 Set obj = Me.item(I)
                 CopyGroupObj obj, obj2
-                Set k.item(I) = obj2
+                Set K.item(I) = obj2
                 Set obj2 = Nothing
             Case mlmbd
                 Dim actualdata1()
                 With Me.item(I)
                 .CopyTo spare, actualdata1()
                 End With
-                Set k.item(I) = spare
+                Set K.item(I) = spare
                 Set spare = Nothing
             Case "RefArray"
-                Set k.item(I) = Me.item(I).Copy()
+                Set K.item(I) = Me.item(I).Copy()
             Case Else
-                Set k.item(I) = Me.item(I)
+                Set K.item(I) = Me.item(I)
             End Select
         Else
-            k.item(I) = Me.item(I)
+            K.item(I) = Me.item(I)
         End If
     Next I
 '' new
 End If
-k.arr = Me.arr
-k.IHaveGui = Me.IHaveGui
-k.IhaveClass = Me.IhaveClass
-k.Final = Me.Final
+K.arr = Me.arr
+K.IHaveGui = Me.IHaveGui
+K.IhaveClass = Me.IhaveClass
+K.Final = Me.Final
 End Sub
-Public Sub CopyArrayRev(k As mArray)
+Public Sub CopyArrayRev(K As mArray)
 'copy this to k
-If k Is Me Then Exit Sub
+If K Is Me Then Exit Sub
 Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda
 Dim mm As Long, M1 As Long
-k.MyTypeToBe = MyTypeToBe
+K.MyTypeToBe = MyTypeToBe
 'k.SerialItem v, Me.UpperMonoLimit, 8
-k.myarrbase = myarrbase
-k.RevOrder = False
-k.StartResize
+K.myarrbase = myarrbase
+K.RevOrder = False
+K.StartResize
 For I = 0 To dnum - 1
-    k.PushDim limit(I), limBase(I)
+    K.PushDim limit(I), limBase(I)
 Next I
-k.PushEnd
-k.RevOrder = RevOrder
-Set k.GroupRef = Me.GroupRef
+K.PushEnd
+K.RevOrder = RevOrder
+Set K.GroupRef = Me.GroupRef
 mm = Me.UpperMonoLimit
 If myVarType(actualData, vbObject) And MyTypeToBe <> vbVariant Then
     For I = 0 To Me.UpperMonoLimit
         M1 = mm - I
-        k.item(I) = Me.item(M1)
+        K.item(I) = Me.item(M1)
     Next I
 Else
 For I = 0 To Me.UpperMonoLimit
@@ -1084,161 +1084,161 @@ For I = 0 To Me.UpperMonoLimit
         Case mgrp
             Set obj = Me.item(I)
             CopyGroupObj obj, obj2
-            Set k.item(I) = obj2
+            Set K.item(I) = obj2
             Set obj2 = Nothing
         Case mlmbd
             Dim actualdata1()
             With Me.item(M1)
                 .CopyTo spare, actualdata1()
             End With
-            Set k.item(I) = spare
+            Set K.item(I) = spare
             Set spare = Nothing
         Case "RefArray"
-            Set k.item(I) = Me.item(I).Copy()
+            Set K.item(I) = Me.item(I).Copy()
         Case Else
-            Set k.item(I) = Me.item(M1)
+            Set K.item(I) = Me.item(M1)
         End Select
     Else
-        k.item(I) = Me.item(M1)
+        K.item(I) = Me.item(M1)
     End If
 Next I
 End If
 '' new
-k.arr = Me.arr
-k.IHaveGui = Me.IHaveGui
-k.IhaveClass = Me.IhaveClass
-k.Final = Me.Final
+K.arr = Me.arr
+K.IHaveGui = Me.IHaveGui
+K.IhaveClass = Me.IhaveClass
+K.Final = Me.Final
 End Sub
-Public Sub CopyArrayRevFast(k As mArray)
+Public Sub CopyArrayRevFast(K As mArray)
 'copy this to k
-If k Is Me Then Exit Sub
+If K Is Me Then Exit Sub
 Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda
 Dim mm As Long, M1 As Long
-k.MyTypeToBe = MyTypeToBe
+K.MyTypeToBe = MyTypeToBe
 'k.SerialItem v, Me.UpperMonoLimit, 8
-k.myarrbase = myarrbase
-k.RevOrder = False
-k.StartResize
+K.myarrbase = myarrbase
+K.RevOrder = False
+K.StartResize
 For I = 0 To dnum - 1
-    k.PushDim limit(I), limBase(I)
+    K.PushDim limit(I), limBase(I)
 Next I
-k.PushEnd
-k.RevOrder = RevOrder
-Set k.GroupRef = Me.GroupRef
+K.PushEnd
+K.RevOrder = RevOrder
+Set K.GroupRef = Me.GroupRef
 mm = Me.UpperMonoLimit
 If myVarType(actualData, vbObject) And MyTypeToBe <> vbVariant Then
 For I = 0 To Me.UpperMonoLimit
     M1 = mm - I
-    k.item(I) = actualData(M1)
+    K.item(I) = actualData(M1)
 Next I
 Else
 For I = 0 To Me.UpperMonoLimit
     M1 = mm - I
     If myVarType(Me.item(M1), vbObject) Then
-        Set k.item(I) = Me.item(M1)
+        Set K.item(I) = Me.item(M1)
     Else
-        k.item(I) = Me.item(M1)
+        K.item(I) = Me.item(M1)
     End If
 Next I
 End If
 '' new
-k.arr = Me.arr
-k.IHaveGui = Me.IHaveGui
-k.IhaveClass = Me.IhaveClass
-k.Final = Me.Final
+K.arr = Me.arr
+K.IHaveGui = Me.IHaveGui
+K.IhaveClass = Me.IhaveClass
+K.Final = Me.Final
 End Sub
 Public Function EmptyArraySameType() As Object
-Dim k As mArray
-Set k = New mArray
-k.MyTypeToBe = MyTypeToBe
-k.myarrbase = myarrbase
-k.RevOrder = False
-k.StartResize
-k.PushEnd
-k.RevOrder = RevOrder
-Set k.GroupRef = Me.GroupRef
-k.arr = Me.arr
-k.IHaveGui = Me.IHaveGui
-k.IhaveClass = Me.IhaveClass
-k.Final = Me.Final
-Set EmptyArraySameType = k
+Dim K As mArray
+Set K = New mArray
+K.MyTypeToBe = MyTypeToBe
+K.myarrbase = myarrbase
+K.RevOrder = False
+K.StartResize
+K.PushEnd
+K.RevOrder = RevOrder
+Set K.GroupRef = Me.GroupRef
+K.arr = Me.arr
+K.IHaveGui = Me.IHaveGui
+K.IhaveClass = Me.IhaveClass
+K.Final = Me.Final
+Set EmptyArraySameType = K
 End Function
-Public Sub CopyArraySlice(k As mArray, fromS As Long, toS As Long)
+Public Sub CopyArraySlice(K As mArray, fromS As Long, toS As Long)
 'copy this to k
 ' make one dimemsion only
-If k Is Me Then Exit Sub
-If k Is Nothing Then Set k = New mArray
+If K Is Me Then Exit Sub
+If K Is Nothing Then Set K = New mArray
 Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda
-k.MyTypeToBe = MyTypeToBe
+K.MyTypeToBe = MyTypeToBe
 'k.SerialItem v, toS - fromS + 1, 8
-k.myarrbase = myarrbase
-k.RevOrder = False
-k.StartResize
+K.myarrbase = myarrbase
+K.RevOrder = False
+K.StartResize
 For I = 0 To 0
-    k.PushDim toS - fromS + 1, 0
+    K.PushDim toS - fromS + 1, 0
 Next I
-k.PushEnd
-k.RevOrder = RevOrder
-Set k.GroupRef = Me.GroupRef
+K.PushEnd
+K.RevOrder = RevOrder
+Set K.GroupRef = Me.GroupRef
 For I = fromS To toS
     If IsObject(Me.item(I)) Then
         Select Case Typename(Me.item(I))
         Case mgrp
             Set obj = Me.item(I)
             CopyGroupObj obj, obj2
-            Set k.item(I - fromS) = obj2
+            Set K.item(I - fromS) = obj2
             Set obj2 = Nothing
         Case mlmbd
             Dim actualdata1()
             With Me.item(I)
             .CopyTo spare, actualdata1()
             End With
-            Set k.item(I - fromS) = spare
+            Set K.item(I - fromS) = spare
             Set spare = Nothing
         Case "RefArray"
-            Set k.item(I - fromS) = Me.item(I).Copy()
+            Set K.item(I - fromS) = Me.item(I).Copy()
         Case Else
-            Set k.item(I - fromS) = Me.item(I)
+            Set K.item(I - fromS) = Me.item(I)
         End Select
     Else
-        k.item(I - fromS) = Me.item(I)
+        K.item(I - fromS) = Me.item(I)
     End If
 Next I
 '' new
-k.arr = Me.arr
-k.IHaveGui = Me.IHaveGui
-k.IhaveClass = Me.IhaveClass
-k.Final = Me.Final
+K.arr = Me.arr
+K.IHaveGui = Me.IHaveGui
+K.IhaveClass = Me.IhaveClass
+K.Final = Me.Final
 End Sub
-Public Sub CopyArraySliceFast(k As mArray, fromS As Long, toS As Long)
+Public Sub CopyArraySliceFast(K As mArray, fromS As Long, toS As Long)
 'copy this to k
 ' make one dimemsion only
-If k Is Me Then Exit Sub
-If k Is Nothing Then Set k = New mArray
+If K Is Me Then Exit Sub
+If K Is Nothing Then Set K = New mArray
 Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda
-k.MyTypeToBe = MyTypeToBe
+K.MyTypeToBe = MyTypeToBe
 'k.SerialItem v, toS - fromS + 1, 8
-k.myarrbase = myarrbase
-k.RevOrder = False
-k.StartResize
+K.myarrbase = myarrbase
+K.RevOrder = False
+K.StartResize
 For I = 0 To 0
-    k.PushDim toS - fromS + 1, 0
+    K.PushDim toS - fromS + 1, 0
 Next I
-k.PushEnd
-k.RevOrder = RevOrder
-Set k.GroupRef = Me.GroupRef
+K.PushEnd
+K.RevOrder = RevOrder
+Set K.GroupRef = Me.GroupRef
 For I = fromS To toS
 If IsObject(Me.item(I)) Then
-    Set k.item(I - fromS) = Me.item(I)
+    Set K.item(I - fromS) = Me.item(I)
 Else
-    k.item(I - fromS) = Me.item(I)
+    K.item(I - fromS) = Me.item(I)
 End If
 Next I
 
-k.arr = Me.arr
-k.IHaveGui = Me.IHaveGui
-k.IhaveClass = Me.IhaveClass
-k.Final = Me.Final
+K.arr = Me.arr
+K.IHaveGui = Me.IHaveGui
+K.IhaveClass = Me.IhaveClass
+K.Final = Me.Final
 End Sub
 
 Public Function UpperMonoLimit()
@@ -1522,11 +1522,11 @@ Friend Sub CopyVariantArray(ByRef A As Variant, ByRef b As Variant)
     CopyMemory ByVal VarPtr(A), ByVal VarPtr(b), 16
 End Sub
 Friend Sub SwapItem(curitem As Long, thisvariant)
-Static P
+Static p
 If myVarType(actualData, vbObject) Then
-P = actualData(curitem)
+p = actualData(curitem)
 actualData(curitem) = thisvariant
-thisvariant = P
+thisvariant = p
 Else
 SwapVariant actualData(curitem), thisvariant
 End If
@@ -1607,9 +1607,9 @@ End If
         If usehandler.objref.IsObj Then
             ItemType = Typename(usehandler.objref.ValueObj)
         Else
-            Dim P
-            P = usehandler.objref.Value
-            ItemType = VarTypeName(P)
+            Dim p
+            p = usehandler.objref.Value
+            ItemType = VarTypeName(p)
         End If
     Else
         ItemType = Typename(usehandler)
@@ -1642,9 +1642,9 @@ End If
         If usehandler.objref.IsObj Then
             ItemTypeNum = 9
         Else
-            Dim P
-            P = usehandler.objref.Value
-            ItemTypeNum = MemInt(VarPtr(P))
+            Dim p
+            p = usehandler.objref.Value
+            ItemTypeNum = MemInt(VarPtr(p))
         End If
     Else
         ItemTypeNum = 9
@@ -1925,7 +1925,7 @@ If Not GroupRef Is Nothing Then
         Dim usehandler As mHandler
         Set usehandler = GroupRef
         If usehandler.T1 = 1 Then
-            usehandler.objref.index = Abs(curitem + 100)
+            usehandler.objref.Index = Abs(curitem + 100)
             usehandler.objref.Done = True
             Set usehandler.objref.ValueObj = item
             Exit Property
@@ -2079,8 +2079,8 @@ Property Get IsEmpty() As Variant
 IsEmpty = dnum = 0
 End Property
 Function IsObj() As Boolean
-If index >= 0 And index <= maxitems1 Then
-If IsObject(actualData(index)) Then
+If Index >= 0 And Index <= maxitems1 Then
+If IsObject(actualData(Index)) Then
     IsObj = True
 End If
 End If
@@ -2138,25 +2138,25 @@ End If
 End If
 there1:
 End Function
-Function IsEnum(P As Variant) As Boolean
+Function IsEnum(p As Variant) As Boolean
 Dim usehandler As mHandler
-If index >= 0 And index <= maxitems1 Then
-If IsObject(actualData(index)) Then
-If Typename(actualData(index)) = mHdlr Then
-    Set usehandler = actualData(index)
+If Index >= 0 And Index <= maxitems1 Then
+If IsObject(actualData(Index)) Then
+If Typename(actualData(Index)) = mHdlr Then
+    Set usehandler = actualData(Index)
     IsEnum = usehandler.T1 = 4
      If IsEnum Then
         If myVarType(usehandler.index_cursor, vbString) Then
-            P = usehandler.index_cursor
+            p = usehandler.index_cursor
         Else
-            P = usehandler.index_cursor * usehandler.sign
+            p = usehandler.index_cursor * usehandler.sign
         End If
      End If
 End If
 End If
 End If
 End Function
-Function IsEnum2(curitem As Long, P As Variant) As Boolean
+Function IsEnum2(curitem As Long, p As Variant) As Boolean
 Dim usehandler As mHandler
 If curitem >= 0 And curitem <= maxitems1 Then
 If IsObject(actualData(curitem)) Then
@@ -2165,9 +2165,9 @@ If Typename(actualData(curitem)) = mHdlr Then
     IsEnum2 = usehandler.T1 = 4
      If IsEnum2 Then
         If myVarType(usehandler.index_cursor, vbString) Then
-            P = usehandler.index_cursor
+            p = usehandler.index_cursor
         Else
-            P = usehandler.index_cursor * usehandler.sign
+            p = usehandler.index_cursor * usehandler.sign
         End If
      End If
 End If
@@ -2507,7 +2507,7 @@ End Sub
 Private Sub InsertionSort10obj(ByVal iMin As Long, ByVal iMax As Long)
     Dim I As Long
     Dim j As Long
-    Dim j1 As Long, j0 As Long, k As Long, P1
+    Dim j1 As Long, j0 As Long, K As Long, P1
 
     I = iMin + 1
     iMax = iMax + 1
@@ -2535,17 +2535,17 @@ ex1:
         If Col(part) = 0 Then
         If item(j1) < item(j1 - sortmult) Then
            ' Debug.Print "insertion swap"
-            For k = j1 - sortoff To j1 - sortoff + sortmult - 1
+            For K = j1 - sortoff To j1 - sortoff + sortmult - 1
 '            SwapVariant actualData(k), actualData(k - sortmult)
             P1 = Empty
-            SwapVariant P1, actualData(k)
-            item(k) = actualData(k - sortmult)
-            item(k - sortmult) = P1
+            SwapVariant P1, actualData(K)
+            item(K) = actualData(K - sortmult)
+            item(K - sortmult) = P1
 
             
             
             
-            Next k
+            Next K
             j = j - 1
             If part <> 3 Then
                 j1 = j1 - sortoff - sortmult + Col(2)
@@ -2560,13 +2560,13 @@ ex1:
         Else
         If item(j1) > item(j1 - sortmult) Then
            ' Debug.Print "insertion swap"
-            For k = j1 - sortoff To j1 - sortoff + sortmult - 1
+            For K = j1 - sortoff To j1 - sortoff + sortmult - 1
             'SwapVariant actualData(k), actualData(k - sortmult)
             P1 = Empty
-            SwapVariant P1, actualData(k)
-            item(k) = actualData(k - sortmult)
-            item(k - sortmult) = P1
-            Next k
+            SwapVariant P1, actualData(K)
+            item(K) = actualData(K - sortmult)
+            item(K - sortmult) = P1
+            Next K
             j = j - 1
             If part <> 3 Then
                 j1 = j1 - sortoff - sortmult + Col(2)
@@ -2593,7 +2593,7 @@ End Sub
 Private Sub InsertionSort10(ByVal iMin As Long, ByVal iMax As Long)
     Dim I As Long
     Dim j As Long
-    Dim j1 As Long, j0 As Long, k As Long
+    Dim j1 As Long, j0 As Long, K As Long
 
     I = iMin + 1
     iMax = iMax + 1
@@ -2621,9 +2621,9 @@ ex1:
         If Col(part) = 0 Then
         If item(j1) < item(j1 - sortmult) Then
            ' Debug.Print "insertion swap"
-            For k = j1 - sortoff To j1 - sortoff + sortmult - 1
-            SwapVariant actualData(k), actualData(k - sortmult)
-            Next k
+            For K = j1 - sortoff To j1 - sortoff + sortmult - 1
+            SwapVariant actualData(K), actualData(K - sortmult)
+            Next K
             j = j - 1
             If part <> 3 Then
                 j1 = j1 - sortoff - sortmult + Col(2)
@@ -2638,9 +2638,9 @@ ex1:
         Else
         If item(j1) > item(j1 - sortmult) Then
            ' Debug.Print "insertion swap"
-            For k = j1 - sortoff To j1 - sortoff + sortmult - 1
-            SwapVariant actualData(k), actualData(k - sortmult)
-            Next k
+            For K = j1 - sortoff To j1 - sortoff + sortmult - 1
+            SwapVariant actualData(K), actualData(K - sortmult)
+            Next K
             j = j - 1
             If part <> 3 Then
                 j1 = j1 - sortoff - sortmult + Col(2)
@@ -2665,76 +2665,76 @@ ex1:
     Wend
 End Sub
 Private Sub Swap10(ByVal a1, ByVal A2)
-Static k As Long
+Static K As Long
 If a1 = A2 Then Exit Sub
 'Debug.Print "swap ", a1, A2
 a1 = a1 * sortmult
 A2 = A2 * sortmult
-For k = 0 To sortmult - 1
-SwapVariant actualData(a1 + k), actualData(A2 + k)
-Next k
+For K = 0 To sortmult - 1
+SwapVariant actualData(a1 + K), actualData(A2 + K)
+Next K
 End Sub
 Private Sub Swap10obj(ByVal a1, ByVal A2)
-Static k As Long
+Static K As Long
 Dim P1
 If a1 = A2 Then Exit Sub
 'Debug.Print "swap ", a1, A2
 a1 = a1 * sortmult
 A2 = A2 * sortmult
-For k = 0 To sortmult - 1
+For K = 0 To sortmult - 1
 P1 = Empty
-SwapVariant P1, actualData(a1 + k)
-item(a1 + k) = actualData(A2 + k)
-item(A2 + k) = P1
+SwapVariant P1, actualData(a1 + K)
+item(a1 + K) = actualData(A2 + K)
+item(A2 + K) = P1
 'SwapVariant actualData(a1 + k), actualData(A2 + k)
-Next k
+Next K
 End Sub
 Private Sub FeedPiv(ByVal a1)
-Static k As Long
+Static K As Long
 On Error Resume Next
 Dim ii As Variant
 Dim n As Byte
 'Debug.Print "feed piv "; a1
 a1 = a1 * sortmult
-For k = 0 To sortmult - 1
-    GetMem1 VarPtr(actualData(a1 + k)), n
+For K = 0 To sortmult - 1
+    GetMem1 VarPtr(actualData(a1 + K)), n
     If n = 20 Then
-       CopyMemory ByVal VarPtr(piv1(k)), ByVal VarPtr(actualData(a1 + k)), 16
+       CopyMemory ByVal VarPtr(piv1(K)), ByVal VarPtr(actualData(a1 + K)), 16
     Else
-        piv1(k) = actualData(a1 + k)
+        piv1(K) = actualData(a1 + K)
     End If
-Next k
+Next K
 End Sub
 
 Private Function Compare10(ByVal a1) As Long
-Static k As Long, ret As Long
+Static K As Long, ret As Long
 On Error Resume Next
 Dim ii As Variant, ii2 As Variant, ii3 As Variant
 Dim n As Byte, n1 As Byte, n2 As Byte
 a1 = a1 * sortmult
-For k = 2 To upart - 1 Step 2
+For K = 2 To upart - 1 Step 2
 n2 = 0
-GetMem1 VarPtr(actualData(a1 + Col(k))), n
+GetMem1 VarPtr(actualData(a1 + Col(K))), n
 If n = 20 Then
-    CopyMemory ByVal VarPtr(ii) + 8, ByVal VarPtr(actualData(a1 + Col(k))) + 8, 8
+    CopyMemory ByVal VarPtr(ii) + 8, ByVal VarPtr(actualData(a1 + Col(K))) + 8, 8
     PutMem2 VarPtr(ii), 20
-    GetMem1 VarPtr(piv1(Col(k))), n1
+    GetMem1 VarPtr(piv1(Col(K))), n1
     If n1 = 20 Then
-        CopyMemory ByVal VarPtr(ii2) + 8, ByVal VarPtr(piv1(Col(k))) + 8, 8
+        CopyMemory ByVal VarPtr(ii2) + 8, ByVal VarPtr(piv1(Col(K))) + 8, 8
         PutMem2 VarPtr(ii2), 20
         ret = ii = ii2
     Else
-        ret = ii = piv1(Col(k))
+        ret = ii = piv1(Col(K))
     End If
 Else
-    ret = actualData(a1 + Col(k)) = piv1(Col(k))
+    ret = actualData(a1 + Col(K)) = piv1(Col(K))
 End If
 
 If ret = 0 Then
     If n = 20 And n1 = 20 Then
-        GetMem1 VarPtr(piv1(Col(k + 1))), n2
+        GetMem1 VarPtr(piv1(Col(K + 1))), n2
         If n2 = 20 Then
-            CopyMemory ByVal VarPtr(ii3) + 8, ByVal VarPtr(piv1(Col(k + 1))) + 8, 8
+            CopyMemory ByVal VarPtr(ii3) + 8, ByVal VarPtr(piv1(Col(K + 1))) + 8, 8
             PutMem2 VarPtr(ii3), 20
             If ii < ii2 Then
                 If ii3 Then
@@ -2754,7 +2754,7 @@ If ret = 0 Then
             End If
         Else
             If ii < ii2 Then
-                If Col(k + 1) Then
+                If Col(K + 1) Then
                     Compare10 = -1
                 Else
                     Compare10 = 1
@@ -2762,7 +2762,7 @@ If ret = 0 Then
                 Exit Function
             Else
             
-                If Col(k + 1) Then
+                If Col(K + 1) Then
                     Compare10 = 1
                 Else
                     Compare10 = -1
@@ -2771,11 +2771,11 @@ If ret = 0 Then
             End If
         End If
     ElseIf n = 20 Then
-        GetMem1 VarPtr(piv1(Col(k + 1))), n2
+        GetMem1 VarPtr(piv1(Col(K + 1))), n2
         If n2 = 20 Then
-            CopyMemory ByVal VarPtr(ii3) + 8, ByVal VarPtr(piv1(Col(k + 1))) + 8, 8
+            CopyMemory ByVal VarPtr(ii3) + 8, ByVal VarPtr(piv1(Col(K + 1))) + 8, 8
             PutMem2 VarPtr(ii3), 20
-            If ii < piv1(Col(k)) Then
+            If ii < piv1(Col(K)) Then
                 If ii3 Then
                     Compare10 = -1
                 Else
@@ -2791,15 +2791,15 @@ If ret = 0 Then
                 Exit Function
             End If
         Else
-            If ii < piv1(Col(k)) Then
-                If Col(k + 1) Then
+            If ii < piv1(Col(K)) Then
+                If Col(K + 1) Then
                     Compare10 = -1
                 Else
                     Compare10 = 1
                 End If
                 Exit Function
             Else
-                If Col(k + 1) Then
+                If Col(K + 1) Then
                     Compare10 = 1
                 Else
                     Compare10 = -1
@@ -2808,15 +2808,15 @@ If ret = 0 Then
             End If
         End If
     Else
-        If actualData(a1 + Col(k)) < piv1(Col(k)) Then
-            If Col(k + 1) Then
+        If actualData(a1 + Col(K)) < piv1(Col(K)) Then
+            If Col(K + 1) Then
                 Compare10 = -1
             Else
                 Compare10 = 1
             End If
             Exit Function
         Else
-            If Col(k + 1) Then
+            If Col(K + 1) Then
                 Compare10 = 1
             Else
                 Compare10 = -1
@@ -2825,7 +2825,7 @@ If ret = 0 Then
         End If
     End If
 End If
-Next k
+Next K
 ' Compare10=0
 End Function
 Private Sub QuickSortItemsWithSameKey10obj(ByVal LB As Long, ByVal UB As Long)

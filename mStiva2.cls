@@ -12,10 +12,10 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
 Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
 ' a stack only for strings for group objects
 Private mstack As New Collection
@@ -26,11 +26,11 @@ Public Property Get count() As Long
 count = mstack.count
 End Property
 Function Copy() As mStiva2
-Dim i As Long
+Dim I As Long
 Set Copy = New mStiva2
-For i = Total To 1 Step -1
-Copy.PushVariant mstack.item(i)
-Next i
+For I = Total To 1 Step -1
+Copy.PushVariant mstack.item(I)
+Next I
 End Function
 Public Property Get IsDecimal() As Boolean
 Dim what, t As Byte
@@ -166,7 +166,7 @@ mstack.Remove where
 End Property
 Public Sub MergeBottom(A As mStiva2)
 If Me Is A Then Exit Sub
-Dim i As Long, aa As Variant
+Dim I As Long, aa As Variant
 If A.Total > 0 Then
 Do
 aa = A.StackPick(1)
@@ -175,26 +175,26 @@ Loop Until A.Total < 1
 End If
 End Sub
 Public Sub DataStrUn(A As String)
-Dim aa As Variant, i As Long, b As String
+Dim aa As Variant, I As Long, b As String
 b = Split(A)(0)
 aa = A
 If mstack.count = 0 Then
 mstack.Add aa
 Else
-For i = 1 To Total
-If Split(mstack.item(i))(0) = b Then
+For I = 1 To Total
+If Split(mstack.item(I))(0) = b Then
 
-mstack.Remove i
+mstack.Remove I
 If mstack.count = 0 Then
 mstack.Add aa
-ElseIf i = 1 Then
+ElseIf I = 1 Then
 mstack.Add aa, , 1
 Else
-mstack.Add aa, , , i - 1
+mstack.Add aa, , , I - 1
 End If
 Exit Sub
 End If
-Next i
+Next I
 mstack.Add aa
 End If
 End Sub
@@ -309,4 +309,19 @@ If mstack.count > 0 Then
     End If
 End If
 End Function
+Public Sub PushObj(RHS As Variant)
+If mstack.count = 0 Then
+mstack.Add RHS
+Else
+mstack.Add RHS, , 1
+End If
+End Sub
+Public Function IsEmpty() As Boolean
+IsEmpty = mstack.count = 0
+End Function
+Public Property Get PopStr() As String
+    On Error Resume Next
+    SwapString2Variant PopStr, mstack.item(1)
+    mstack.Remove 1
+End Property
 

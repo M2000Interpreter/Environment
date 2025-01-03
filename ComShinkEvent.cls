@@ -515,7 +515,7 @@ Public Sub fireevent(ByVal dispid As Long, ByVal params As Long)
     Dim refc() As Long
     vParams = pvGetParamArray2(params, NumVar, refc)
     On Error Resume Next
-    Debug.Print ">>"; strEvent
+    'Debug.Print ">>"; strEvent
     If Not CallEventFromCOM1(Me, strEvent, what$, NumVar, vParams, refc, delme, ItemIndex) Then
        MyEr "Problem With Event: " + strEvent, "Πρόβλημα με το γεγονός: " + strEvent
     End If
@@ -618,9 +618,9 @@ End Sub
 Public Function Attached() As Boolean
     Attached = blnAttached
 End Function
-Sub Process(VarProc As Long, a As Long, Ptr1 As Long, usestring As Boolean, stval$)
-    Dim t(0 To 8) As Integer, Zero, Ptr As Long, ItsVariantRef As Boolean
-    CpyMem ByVal VarPtr(t(0)), ByVal a, 16
+Sub Process(VarProc As Long, A As Long, Ptr1 As Long, usestring As Boolean, stval$)
+    Dim t(0 To 8) As Integer, zero, Ptr As Long, ItsVariantRef As Boolean
+    CpyMem ByVal VarPtr(t(0)), ByVal A, 16
 again:
     CpyMem Ptr, ByVal VarPtr(t(4)), 4
 
@@ -668,11 +668,11 @@ again:
                 End If
                 Exit Sub
             Else
-            CpyMem ByVal a, VarPtr(Zero), 16
+            CpyMem ByVal A, VarPtr(zero), 16
             End If
         Else
             Ptr1 = -Ptr1
-            CpyMem ByVal a, VarPtr(Zero), 16
+            CpyMem ByVal A, VarPtr(zero), 16
         End If
     End If
     CpyMem ByVal VarProc, ByVal VarPtr(t(0)), 16
@@ -685,37 +685,37 @@ Private Sub pvSetParamArray2(ByVal Ptr As Long, aParams() As Variant, ref() As L
     Dim lIdx        As Long
     Dim lPtr        As Long
     Dim lVarPtr     As Long
-    Dim IP          As Long
-    Dim Zero
+    Dim iP          As Long
+    Dim zero
     CpyMem tDPAR, ByVal Ptr, Len(tDPAR)
     lVarPtr = tDPAR.rgPointerToVariantArray
 
     For lIdx = 0 To tDPAR.cArgs - 1
-            IP = tDPAR.cArgs - lIdx
-            CpyMem iVarType, ByVal VarPtr(aParams(IP)), 2&
+            iP = tDPAR.cArgs - lIdx
+            CpyMem iVarType, ByVal VarPtr(aParams(iP)), 2&
             CpyMem lPtr, ByVal lVarPtr + (lIdx * 16&) + 8&, 4&
             iVarType = iVarType And &HBFFF&
-            If ref(IP) Then
-            lPtr = ref(IP)
+            If ref(iP) Then
+            lPtr = ref(iP)
             If iVarType = 12 Or lPtr < 0 Then
                 If lPtr < 0 Then
-                    CpyMem ByVal -lPtr, ByVal VarPtr(aParams(IP)), 16
+                    CpyMem ByVal -lPtr, ByVal VarPtr(aParams(iP)), 16
                 Else
-                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)), 16
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(iP)), 16
                 End If
             ElseIf iVarType = 14 Then
-                CpyMem ByVal lPtr + 2, ByVal VarPtr(aParams(IP)) + 2, 14
+                CpyMem ByVal lPtr + 2, ByVal VarPtr(aParams(iP)) + 2, 14
             Else
                 Select Case iVarType
                 Case vbDouble, vbCurrency, vbDate
-                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)) + 8, 8
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(iP)) + 8, 8
                 Case vbBoolean, vbInteger
-                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)) + 8, 2
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(iP)) + 8, 2
                 Case vbByte
-                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)) + 8, 1
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(iP)) + 8, 1
                 Case vbEmpty, vbNull
                 Case Else
-                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)) + 8, 4
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(iP)) + 8, 4
                 End Select
             End If
             If lPtr >= 0 Then
@@ -723,7 +723,7 @@ Private Sub pvSetParamArray2(ByVal Ptr As Long, aParams() As Variant, ref() As L
                    
             CpyMem ByVal lVarPtr + (lIdx * 16&), VarPtr(iVarType), 2
             End If
-            CpyMem aParams(IP), Zero, 16
+            CpyMem aParams(iP), zero, 16
 
             End If
     Next

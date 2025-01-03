@@ -1,8 +1,46 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 58 active-X
+Version 12 Revision 59 active-X
 
-Update of the BigInteger core functions, to use 1 byte per decimal digit, no 2 bytes (from original programmer Rebecca Gabriella). Also I change the way the string append digits, now done inplace of string (original program make new string for every digit). So now the library is fast enough for the purpose of M2000 Interpreter (for prototyping algorithms and as educational tool)
+Update of the BigInteger
+Many things about BigInteger.
+We can make arrays.
+We can place them in expressions
+Any other numeric type converted to biginteger if a biginteger exist in expression (biginteger has priority over decimal).
++-*/ div mod  (div and / work the same for bigintegers).
+
+ 
+1) ModPow()
+a=848093284092840932840386876876876876892u
+b=3432402938402820840923809880009089u
+c=10000000000000000u
+? modpow(a,b,c)
+2) Mod()  return the reminder.
+k=10203223230u
+a=k/4734u
+r=mod(a)
+? a*4734u+r
+? K, a, r
+3) Arrays/Declarations:
+c=121212u  ' so now c get literal bigInteger
+BigInteger a[10]=100, b=100
+Dim A(10, 30) as BigInteger
+
+4) Format$("{0:4:-40}", a) place decimal point so if a = 12345u we get 1.2345 in a field of 40 characters, right justification.
+
+5) Str$(c) return UTF16LE encoding string of the value of biginteger
+
+6) Using BigInteger(string, base) we can comvert from a base (2 to 36)
+
+7) Using With a, "outputbase" as a.base we can handle the output base. So a a.base=2 make the Print a to print a binary number.
+Also "characters"+a+"characters" can be done (automatic placed the toString value of bigInteger)
+8) We don't need to use ToString property because Print handle it.
+9) A=056u: A=100 (now numeric 100 convert to bigInteger)
+10) there is no ++ -- -= += *= /= (but some day....)
+11) Use compare function for a and b through:
+Method a,"compare", b as result
+Wait some days to find time to make the compare operators <,>,= etc.
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

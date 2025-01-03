@@ -56,22 +56,22 @@ Function ReadField(there As Long) As String
     ReadField = Fields(there)
 End Function
 Sub MergeField(st$)
-Dim b As String, i As Long
+Dim b As String, I As Long
 b = Split(st$)(0)
 If UBound(Fields) - 1 = 0 Then
-    i = UBound(Fields)
-    ReDim Preserve Fields(i + 1)
-    Fields(i) = st$
+    I = UBound(Fields)
+    ReDim Preserve Fields(I + 1)
+    Fields(I) = st$
 Else
-    For i = 1 To UBound(Fields) - 1
-        If Split(Fields(i))(0) = b Then
-            Fields(i) = st$
+    For I = 1 To UBound(Fields) - 1
+        If Split(Fields(I))(0) = b Then
+            Fields(I) = st$
             Exit Sub
         End If
-    Next i
-    i = UBound(Fields)
-    ReDim Preserve Fields(i + 1)
-    Fields(i) = st$
+    Next I
+    I = UBound(Fields)
+    ReDim Preserve Fields(I + 1)
+    Fields(I) = st$
 End If
 End Sub
 Property Get FieldsCount() As Long
@@ -103,18 +103,18 @@ Private Function TypeGroupNow(RHS) As Boolean
     Err.Clear
 End Function
 Sub mergeTypes(RHS As Collection)
-Dim extypes As Collection, k
+Dim extypes As Collection, K
 Set extypes = RHS
 If extypes Is Nothing Then Exit Sub
 If mytypes Is RHS Then
     Set mytypes = New Collection
 End If
-For Each k In extypes
-    PutIs = k
+For Each K In extypes
+    PutIs = K
 Next
 End Sub
 Function MatchTypes(RHS As Collection) As Boolean
-Dim extypes As Collection, k
+Dim extypes As Collection, K
 Set extypes = RHS
 If extypes Is Nothing Then Exit Function
 If mytypes Is Nothing Then Exit Function
@@ -123,8 +123,8 @@ If mytypes Is RHS Then
     Exit Function
 End If
 If mytypes.count * extypes.count = 0 Then Exit Function
-For Each k In extypes
-    If TypeGroupNow(k) Then MatchTypes = True: Exit Function
+For Each K In extypes
+    If TypeGroupNow(K) Then MatchTypes = True: Exit Function
 Next
 
 End Function
@@ -136,14 +136,14 @@ Set eventlist = RHS
 End Property
 Public Sub ResetEvents()
 If eventlist Is Nothing Then Exit Sub
-Dim i As Long
+Dim I As Long
 With eventlist
-For i = 0 To .count - 1
-    .Index = i
+For I = 0 To .count - 1
+    .Index = I
     .Done = True
     .Value = vbNullString
     .sValue = 0
-Next i
+Next I
 .Done = False
 End With
 
@@ -151,27 +151,27 @@ End Sub
 Public Sub FlushEvents()
 If eventlist Is Nothing Then Exit Sub
 Dim eventlist2 As New FastCollection
-Dim i As Long
+Dim I As Long
 With eventlist
-For i = 0 To .count - 1
-    .Index = i
+For I = 0 To .count - 1
+    .Index = I
     .Done = True
     eventlist2.AddKey .KeyToString, ""
-Next i
+Next I
 .Done = False
 End With
 Set eventlist = eventlist2
 End Sub
-Public Sub RegisterEvent(ByVal a$)
-a$ = myUcase(a$)
+Public Sub RegisterEvent(ByVal A$)
+A$ = myUcase(A$)
 If eventlist Is Nothing Then Set eventlist = New FastCollection
-If eventlist.ExistKey(a$) Then Exit Sub
-eventlist.AddKey a$, vbNullString
+If eventlist.ExistKey(A$) Then Exit Sub
+eventlist.AddKey A$, vbNullString
 End Sub
-Public Function EventFuncPos(a$, retName$, Pos As Long) As Boolean
+Public Function EventFuncPos(A$, retName$, Pos As Long) As Boolean
 If eventlist Is Nothing Then EventFuncPos = 0: Exit Function
 With eventlist
-If eventlist.ExistKey(a$) Then
+If eventlist.ExistKey(A$) Then
     retName$ = .Value
     If retName$ <> vbNullString Then Pos = .sValue: EventFuncPos = True
 End If
@@ -179,9 +179,9 @@ End With
 End Function
 
 Public Function PrepareSoros(ByRef v(), ByVal topname$) As mStiva2
-Dim i As Long, AllSoros As New mStiva2, s As String, vv As mStiva2
-For i = 1 To FieldsCount
-s = Fields(i)
+Dim I As Long, AllSoros As New mStiva2, s As String, vv As mStiva2
+For I = 1 To FieldsCount
+s = Fields(I)
 'Debug.Print fields(i), topname$, GroupName
 
 If Left$(s, 1) = "*" Then
@@ -206,9 +206,9 @@ Set PrepareSoros = AllSoros
 
 End Function
 Public Function PrepareSoros1(ByRef v(), ByVal topname$) As mStiva2
-Dim i As Long, AllSoros As New mStiva2, vv As mStiva2, s As String
-For i = 1 To FieldsCount
-s = Fields(i)
+Dim I As Long, AllSoros As New mStiva2, vv As mStiva2, s As String
+For I = 1 To FieldsCount
+s = Fields(I)
 If Left$(s, 1) = "*" Then
 AllSoros.DataStr "*" + topname$ + "." + Split(Mid$(s, 2))(0)
 
@@ -219,22 +219,22 @@ Else
 AllSoros.DataStr GroupName + Split(s)(0)
 End If
 Next
-Dim a() As String
+Dim A() As String
 If FuncRef$ <> "" Then
-a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
-If UBound(a()) > 0 Then
-For i = 1 To UBound(a())
-AllSoros.DataStr topname$ + "." + Split(a(i))(0)
-Next i
+A() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
+If UBound(A()) > 0 Then
+For I = 1 To UBound(A())
+AllSoros.DataStr topname$ + "." + Split(A(I))(0)
+Next I
 End If
 End If
 Set PrepareSoros1 = AllSoros
 
 End Function
 Public Function PrepareSorosToCompare(ByRef v()) As mStiva2
-Dim i As Long, AllSoros As New mStiva2, vv As mStiva2, s As String
-For i = 1 To FieldsCount
-    s = Fields(i)
+Dim I As Long, AllSoros As New mStiva2, vv As mStiva2, s As String
+For I = 1 To FieldsCount
+    s = Fields(I)
     If Left$(s, 1) = "*" Then
         AllSoros.DataStr "*" + Split(Mid$(s, 2))(0)
         If Not IsObject(v(val(Split(s)(1)))) Then Set v(val(Split(s)(1))) = New Group
@@ -244,29 +244,29 @@ For i = 1 To FieldsCount
         AllSoros.DataStr (Split(s)(0))
     End If
 Next
-Dim a() As String
+Dim A() As String
 If FuncRef$ <> "" Then
-a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
-If UBound(a()) > 0 Then
-For i = 1 To UBound(a())
-AllSoros.DataStr (Split(a(i))(0))
-Next i
+A() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
+If UBound(A()) > 0 Then
+For I = 1 To UBound(A())
+AllSoros.DataStr (Split(A(I))(0))
+Next I
 End If
 End If
 Set PrepareSorosToCompare = AllSoros
 End Function
 Public Function types() As String
-Dim i As Long, s$
-i = FieldsCount
+Dim I As Long, s$
+I = FieldsCount
 On Error Resume Next
-While i > 0
-If InStr(Fields(i), "( ") > 0 Then
+While I > 0
+If InStr(Fields(I), "( ") > 0 Then
 s$ = "A" + s$
 Else
 s$ = "V" + s$
 End If
 
-i = i - 1
+I = I - 1
 
 Wend
 types = s$
@@ -344,20 +344,20 @@ Public Sub EndFloat()
 FloatGroup = False
 bank = Empty
 End Sub
-Public Property Set LinkRef(a As Object)
+Public Property Set LinkRef(A As Object)
 If FloatGroup Then
-If Typename(a) <> "Group" Then
+If Typename(A) <> "Group" Then
 Exit Property
 End If
 mTeam = False
-Set LinkToGroup = a
-If a Is Nothing Then Exit Property
+Set LinkToGroup = A
+If A Is Nothing Then Exit Property
 'erase functions,,,
  bank(bank(1) * 2 + 3) = vbNullString
 mTeam = True
 Else
 ' only when is in an array as Float Group
-Set LinkToGroup = a
+Set LinkToGroup = A
 End If
 End Property
 Friend Property Get LinkGroup() As Group
@@ -487,9 +487,9 @@ HasUnary = False
 
 End Sub
 Public Property Get refcount1() As Long
-Dim m As Long
-m = GetRefCount(Me)
-If m > 3 Then refcount1 = m - 3 Else refcount1 = 0
+Dim M As Long
+M = GetRefCount(Me)
+If M > 3 Then refcount1 = M - 3 Else refcount1 = 0
 End Property
 Private Function GetRefCount(ByRef vvv) As Long
     If Not IsObject(vvv) Then Exit Function

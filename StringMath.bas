@@ -406,7 +406,7 @@ Public Function divide(sA As String, sb As String) As String
     If bBN Then sb = MidB$(sb, 2)
     bRN = (bAN <> bBN)
     If compare(sb, ChrB$(48)) = 0 Then
-        Err.Raise 11
+        DevZero
         Exit Function
     ElseIf compare(sA, ChrB$(48)) = 0 Then
         divide = ChrB$(48)
@@ -485,7 +485,7 @@ Public Function BigIntFromString(sIn As String, iBaseIn As Integer) As String
     Else
         bRN = False
     End If
-    sBS = CStr(iBaseIn)
+    sBS = StrConv(CStr(iBaseIn), vbFromUnicode)
     
     BigIntFromString = ChrB$(48)
     For iP = 1 To LenB(sIn)
@@ -493,7 +493,7 @@ Public Function BigIntFromString(sIn As String, iBaseIn As Integer) As String
         iV = InStrB(Alphabet, MidB$(sIn, iP, 1))
         If iV > 0 Then 'accumulate
             BigIntFromString = multiply(BigIntFromString, sBS)
-            BigIntFromString = Add(BigIntFromString, CStr(iV - 1))
+            BigIntFromString = Add(BigIntFromString, StrConv(CStr(iV - 1), vbFromUnicode))
         End If
     Next iP
     
@@ -527,13 +527,19 @@ Public Function BigIntToString(sIn As String, iBaseOut As Integer) As String
     Else
         bRN = False
     End If
-    sb = CStr(iBaseOut)
+    sb = StrConv(CStr(iBaseOut), vbFromUnicode)
     
     BigIntToString = ""
     On Error GoTo 100
+    Dim ivs As String
     Do While compare((sIn), ChrB$(48)) > 0
         sIn = divide(sIn, sb)
-        iV = CLng(LastModulus())
+        ivs = LastModulus()
+        iV = AscB(RightB$(ivs, 1)) - 48
+        If LenB(ivs) > 1 Then
+            iV = iV + (AscB(MidB$(ivs, LenB(ivs) - 1, 1)) - 48) * 10
+        End If
+        
         'locates appropriate alphabet character
         BigIntToString = MidB$(Alphabet, iV + 1, 1) + BigIntToString
     Loop
@@ -748,12 +754,14 @@ Public Function TestNumberOnBase(s$, b As Integer) As Boolean
     TestNumberOnBase = True
 End Function
 Public Function TestNumber(s$) As Boolean
-    Dim I As Long, lim As Long
+
+    Dim I As Long, lim As Long, W As Long
     lim = Len(s$)
     If lim = 0 Then Exit Function
     I = 1
     If Left$(s$, 1) = Chr$(45) Then I = I + 1: If lim = 1 Then Exit Function
     Do While I <= lim
+    
     If InStr("0123456789", Mid$(s$, I, 1)) = 0 Then Exit Function
     I = I + 1
     Loop

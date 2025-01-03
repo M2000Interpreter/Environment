@@ -256,13 +256,13 @@ If Not TypeOf bb Is mHandler Then
 StackItemTypeObjectType = "*[" + Typename(mh.objref) + "]"
 Else
 Set mh = bb
-If mh.t1 = 3 Or mh.t1 = 0 Then
+If mh.T1 = 3 Or mh.T1 = 0 Then
 StackItemTypeObjectType = "*[" + Typename(mh.objref) + "]"
-ElseIf mh.t1 = 1 Then
+ElseIf mh.T1 = 1 Then
 StackItemTypeObjectType = "*[Inventory]"
-ElseIf mh.t1 = 2 Then
+ElseIf mh.T1 = 2 Then
 StackItemTypeObjectType = "*[Buffer]"
-ElseIf mh.t1 = 4 Then
+ElseIf mh.T1 = 4 Then
 StackItemTypeObjectType = "*[Enum]"
 End If
 End If
@@ -633,19 +633,19 @@ Inc
 End Sub
 Public Sub MergeTop(A As mStiva)
 If Me Is A Then Exit Sub
-Dim i As Long, aa As VarItem
+Dim I As Long, aa As VarItem
 
 If A.Total > 0 Then
 Do
-i = A.Total
-Set aa = A.StackPick(i)
+I = A.Total
+Set aa = A.StackPick(I)
 If mstack.count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , 1  'push so first of a is first on mstack
 End If
 Inc
-Loop Until i <= 1
+Loop Until I <= 1
 End If
 End Sub
 
@@ -736,25 +736,25 @@ Function ExportArray(ByVal items As Long) As mArray
 If items > count Then items = count
 Set ExportArray = New mArray
 If items = 0 Then Exit Function
-Dim i As Long, aa As VarItem
+Dim I As Long, aa As VarItem
 With ExportArray
     .myarrbase = 0
     .PushDim (items)
     .PushEnd
-    .Arr = True
+    .arr = True
 
 
-For i = 1 To items
-Set aa = mstack.item(i)
+For I = 1 To items
+Set aa = mstack.item(I)
 Select Case aa.Typename
 Case "S"
-.item(i - 1) = aa.ItemStr
+.item(I - 1) = aa.ItemStr
 Case "N", "?", "L"
-.item(i - 1) = aa.ItemDouble
+.item(I - 1) = aa.ItemDouble
 Case Else
-Set .item(i - 1) = aa.ObjectRef
+Set .item(I - 1) = aa.ObjectRef
 End Select
-Next i
+Next I
 End With
 Set aa = Nothing
 drop items
@@ -763,7 +763,7 @@ End Function
 
 Public Sub MergeBottom(A As mStiva)
 If Me Is A Then Exit Sub
-Dim i As Long, aa As VarItem
+Dim I As Long, aa As VarItem
 If A.Total > 0 Then
 Do
 Set aa = A.StackPick(1)
@@ -827,11 +827,11 @@ End With
 Set myobject2 = mygroup2
 End Sub
 Function Copy() As mStiva
-Dim i As Long
+Dim I As Long
 Set Copy = New mStiva
-For i = Total To 1 Step -1
-Copy.PushStr Me.StackItem(i)
-Next i
+For I = Total To 1 Step -1
+Copy.PushStr Me.StackItem(I)
+Next I
 End Function
 Property Get Value() As Variant
 Dim aa As VarItem
@@ -853,6 +853,17 @@ If Index >= 0 And Index < mMany Then
     End If
 End If
 End Function
+Function IsObjAt(curitem As Long, peekvalue) As Boolean
+Dim aa As VarItem
+If Index >= 0 And Index < mMany Then
+    Set aa = mstack.item(Index + 1)
+    If aa.slot = 1 Then
+        Set peekvalue = aa.ObjectRef
+        IsObjAt = True
+    End If
+End If
+
+End Function
 Function IsEnum(p As Variant) As Boolean
 Dim aa As VarItem, usehandler As mHandler
 If Index >= 0 And Index < mMany Then
@@ -860,7 +871,7 @@ If Index >= 0 And Index < mMany Then
     If aa.slot = 1 Then
         If Typename(aa.mItem) = "mHandler" Then
             Set usehandler = aa.mItem
-            IsEnum = usehandler.t1 = 4
+            IsEnum = usehandler.T1 = 4
             If IsEnum Then
                 If myVarType(usehandler.index_cursor, vbString) Then
                     p = usehandler.index_cursor
@@ -873,26 +884,26 @@ If Index >= 0 And Index < mMany Then
 End If
 End Function
 Sub SplitStackTop(fromstiva As mHandler, item As Long)
-Dim aa As VarItem, i As Long
+Dim aa As VarItem, I As Long
 Dim thisstiva As mStiva
 Set thisstiva = fromstiva.objref
 If item > thisstiva.count Then item = thisstiva.count
-For i = 1 To item
+For I = 1 To item
     Set aa = thisstiva.StackPick(1)
         mstack.Add aa
         Inc
-Next i
+Next I
 End Sub
 Sub SplitStackBottom(fromstiva As mHandler, item As Long)
-Dim aa As VarItem, i As Long
+Dim aa As VarItem, I As Long
 Dim thisstiva As mStiva
 Set thisstiva = fromstiva.objref
 If item < 1 Then item = 1
-For i = item To thisstiva.count
+For I = item To thisstiva.count
     Set aa = thisstiva.StackPick(item)
         mstack.Add aa
         Inc
-Next i
+Next I
 End Sub
 
 
