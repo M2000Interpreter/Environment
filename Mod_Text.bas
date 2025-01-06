@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 59
+Global Const Revision = 60
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5534,6 +5534,45 @@ GetArr = FastSymbol(b$, ")")
 End If
 
 End Function
+Function IsExpBig(basestack As basetask, A$, r As Variant, Optional ByVal noand1 As Boolean = True, Optional flatobject As Boolean = False, Optional Comp As Boolean = True, Optional nostring As Boolean) As Boolean
+Dim par As Long, parin As Long
+If LastErNum = -2 Then LastErNum = 0
+If A$ = vbNullString Then Exit Function
+If Left$(A$, 2) = vbCrLf Then Exit Function
+IsExpBig = IsExpA(basestack, A$, r, par, noand1, (Comp), , nostring)
+again:
+If par > 0 Then
+If lookOne(A$, ",") Then
+'parin = par
+'Set basestack.lastobj = Nothing
+IsExpBig = GetArr(basestack, A$, r, "", 1)
+If LastErNum = -2 Then IsExpBig = False
+
+If IsExpBig Then
+par = par - 1
+
+If basestack.lastobj Is Nothing Then
+IsExpBig = IsExpA(basestack, A$, r, par, noand1, Comp, True)
+End If
+If par > 0 Then
+GoTo again
+End If
+End If
+End If
+End If
+If Not IsExpBig Then
+'If LastErNum1 = -1 Then IsExpBig = False: Exit Function
+If basestack.usestack Then
+IsExpBig = IsNumber(basestack, A$, r)
+End If
+End If
+If LastErNum = -2 Then IsExpBig = False
+While par > 0
+IsExpBig = FastSymbol(A$, ")")
+par = par - 1
+Wend
+If flatobject Then basestack.flatobject
+End Function
 Function IsExp(basestack As basetask, A$, r As Variant, Optional ByVal noand1 As Boolean = True, Optional flatobject As Boolean = False, Optional Comp As Boolean = True, Optional nostring As Boolean) As Boolean
 Dim par As Long, parin As Long
 If LastErNum = -2 Then LastErNum = 0
@@ -5542,41 +5581,45 @@ If Left$(A$, 2) = vbCrLf Then Exit Function
 IsExp = IsExpA(basestack, A$, r, par, noand1, (Comp), , nostring)
 again:
 If par > 0 Then
-If lookOne(A$, ",") Then
-'parin = par
-'Set basestack.lastobj = Nothing
-IsExp = GetArr(basestack, A$, r, "", 1)
-If LastErNum = -2 Then IsExp = False
-
-If IsExp Then
-par = par - 1
-
-If basestack.lastobj Is Nothing Then
-IsExp = IsExpA(basestack, A$, r, par, noand1, Comp, True)
-End If
-If par > 0 Then
-GoTo again
-End If
-End If
-End If
+    If lookOne(A$, ",") Then
+        IsExp = GetArr(basestack, A$, r, "", 1)
+        If LastErNum = -2 Then IsExp = False
+    
+        If IsExp Then
+            par = par - 1
+            If basestack.lastobj Is Nothing Then
+            IsExp = IsExpA(basestack, A$, r, par, noand1, Comp, True)
+            End If
+            If par > 0 Then
+            GoTo again
+            End If
+        End If
+    End If
 End If
 If Not IsExp Then
-'If LastErNum1 = -1 Then IsExp = False: Exit Function
-If basestack.usestack Then
-IsExp = IsNumber(basestack, A$, r)
-End If
+    If basestack.usestack Then
+        IsExp = IsNumber(basestack, A$, r)
+    End If
 End If
 If LastErNum = -2 Then IsExp = False
 While par > 0
-IsExp = FastSymbol(A$, ")")
-par = par - 1
+    IsExp = FastSymbol(A$, ")")
+    par = par - 1
 Wend
-If flatobject Then Set basestack.lastobj = Nothing
+If flatobject Then
+    If IsExp Then
+        IsExp = CheckBigInteger(basestack, r)
+    Else
+        Set basestack.lastobj = Nothing
+    End If
+End If
 End Function
 Function rightoperator(bstack As basetask, aa$, po As Variant, Optional onlyexp As Boolean) As Boolean
-Dim r As Variant, ac As Variant, MUL As Long, r1 As Variant, IntVal As Integer, IntVal2 As Integer
+Dim r As Variant, ac As Variant, MUL As Long, r1 As Variant, IntVal As Integer, IntVal2 As Integer, bi As BigInteger
+Dim cur As Long, park As Object, back As Object, rr
 r1 = 1
 MUL = 0
+onlyexp = False
 ''second  loop Logic...
 secodlooplogic:
 Do
@@ -5585,6 +5628,11 @@ Do
         Set bstack.lastobj = Nothing
         IntVal2 = 1
         If IsNumber(bstack, aa$, r, True, IntVal2) Then
+            If Not CheckBigInteger(bstack, r) Then
+                rightoperator = False
+                WrongType
+                Exit Function
+            End If
             If IntVal2 = 2 Then
                 r = -r
                 If Not rightoperator(bstack, aa$, r, True) Then
@@ -5659,7 +5707,12 @@ Do
                 End If
             End If
         ElseIf FastSymbol1(aa$, "(") Then
-            If IsExp(bstack, aa$, r, , True) Then
+            If IsExp(bstack, aa$, r, nostring:=True) Then
+                If Not CheckBigInteger(bstack, r) Then
+                    rightoperator = False
+                    WrongType
+                    Exit Function
+                End If
                 If r >= 1 And IntVal2 = 1 Then
                     po = po ^ r
                 Else
@@ -5725,26 +5778,102 @@ Do
                         po = CDbl(r1) / CDbl(po)
                     End If
                 End If
+            Case 1000
+                Set bi = bi.multiply(park)
+                If Typename(back) = Typename(park) Then
+                Set park = back
+                Set back = Nothing
+                Else
+                Set park = Nothing
+                End If
+              '  Set bstack.lastobj = BI
+                rightoperator = True
+            Case 1010
+                Set bi = bi.divide(park)
+                If Typename(back) = Typename(park) Then
+                Set park = back
+                Set back = Nothing
+                Else
+                Set park = Nothing
+                End If
+              '  Set bstack.lastobj = BI
+                rightoperator = True
+            Case 1020
+            Set bi = bi.Modulus(park)
+                If Typename(back) = Typename(park) Then
+                Set park = back
+                Set back = Nothing
+                Else
+                Set park = Nothing
+                End If
+               ' Set bstack.lastobj = BI
+                rightoperator = True
+
             End Select
             r1 = po
             MUL = 0
     ElseIf Not onlyexp Then
             If FastSymbol1(aa$, "*") Then
+            
                 If MUL = 0 Then
                     If IntVal < 0 Then po = -po
                 End If
-                IntVal = 1
+                cur = 1
                 Do
-                    If FastSymbol1(aa$, "-") Then
+                    If FastSymbol23(aa$, "-", cur, 1) Then
                         IntVal = -IntVal
-                    ElseIf Not FastSymbol1(aa$, "+") Then
+                    ElseIf Not FastSymbol23(aa$, "+", cur, 1) Then
                         Exit Do
                     End If
                 Loop
-                If logical(bstack, aa$, r, , True, , IntVal) Then
-                    MUL = 1
-                    r1 = po
-                    po = r
+                If Not bstack.lastobj Is Nothing Then
+                If TypeOf bstack.lastobj Is BigInteger Then
+                    Set bi = bstack.lastobj
+                End If
+                Set bstack.lastobj = Nothing
+                End If
+                If logical(bstack, aa$, r, , , , IntVal) Then
+                If Not bi Is Nothing Then
+jumpmult1:
+                    If bstack.lastobj Is Nothing Then
+                        Set bstack.lastobj = Module13.CreateBigInteger(CStr(Int(r)))
+                        r = 0
+                    End If
+                    If Not bstack.lastobj Is Nothing Then
+    
+                        If TypeOf bstack.lastobj Is BigInteger Then
+                            Set back = park
+                            Set park = bi
+jumpmult2:
+                            If IntVal < 0 Then
+                                Set bi = CopyBigInteger(bstack.lastobj)
+                                bi.negate
+                                IntVal = 1
+                            Else
+                                Set bi = bstack.lastobj
+                            End If
+                            MUL = 1000
+                        
+                        End If
+                    End If
+                Set bstack.lastobj = Nothing
+                
+                Else
+                If r = 0 Then
+                If Not bstack.lastobj Is Nothing Then
+                If Not park Is Nothing Then
+                Set back = park
+                ElseIf ac <> 0 Then
+                Set back = Module13.CreateBigInteger(CStr(Int(ac)))
+                End If
+                Set park = Module13.CreateBigInteger(CStr(Int(po)))
+                    GoTo jumpmult2
+                End If
+                End If
+                MUL = 1
+                End If
+                r1 = po
+                po = r
                 ElseIf FastSymbol1(aa$, "(") Then
                  If IntVal < 0 Then po = -po: IntVal = 0
                     If IsExp(bstack, aa$, r, , True) Then
@@ -5755,6 +5884,8 @@ Do
                             rightoperator = False
                             Exit Function
                         End If
+                        If Not bi Is Nothing Then GoTo jumpmult1
+                        Set bstack.lastobj = Nothing
                     Else
                         rightoperator = False
                         Exit Function
@@ -5772,18 +5903,75 @@ Do
                     If IntVal < 0 Then po = -po
                 End If
                 IntVal = 1
+                cur = 1
                 Do
-                    If FastSymbol1(aa$, "-") Then
+                    If FastSymbol23(aa$, "-", cur, 1) Then
                         IntVal = -IntVal
-                    ElseIf Not FastSymbol1(aa$, "+") Then
+                    ElseIf Not FastSymbol23(aa$, "+", cur, 1) Then
                         Exit Do
                     End If
                 Loop
-                 If logical(bstack, aa$, r, , True, , IntVal) Then
-                    MUL = 2
-                    r1 = po
-                    po = r
-                    IntVal = 0
+                If Not bstack.lastobj Is Nothing Then
+                If TypeOf bstack.lastobj Is BigInteger Then
+                    Set bi = bstack.lastobj
+                End If
+                Set bstack.lastobj = Nothing
+                End If
+                If logical(bstack, aa$, r, , , , IntVal) Then
+                If Not bi Is Nothing Then
+
+jumpdiv1:
+                If bstack.lastobj Is Nothing Then
+                    Set bstack.lastobj = Module13.CreateBigInteger(CStr(Int(r)))
+                    r = 0
+                End If
+                If Not bstack.lastobj Is Nothing Then
+
+                    If TypeOf bstack.lastobj Is BigInteger Then
+                    If MemInt(VarPtr(back)) = vbObject Then
+                    
+                    ' add
+                    End If
+                    Set back = park
+                    Set park = bi
+jumpdiv2:
+                    If IntVal < 0 Then
+                    Set bi = CopyBigInteger(bstack.lastobj)
+                    bi.negate
+                    IntVal = 1
+                    Else
+                    Set bi = CopyBigInteger(bstack.lastobj)
+                    End If
+                    Set rr = bi
+                    Set bi = park
+                    Set park = rr
+                    Set rr = Nothing
+                    If Not MUL = 1020 Then MUL = 1010
+                    
+                    Else
+                        Set bstack.lastobj = Nothing
+                    End If
+                Else
+                    Set bstack.lastobj = Nothing
+                End If
+                Else
+                If r = 0 Then
+                If Not bstack.lastobj Is Nothing Then
+                If Not park Is Nothing Then
+                Set back = park
+                ElseIf ac <> 0 Then
+                Set back = Module13.CreateBigInteger(CStr(Int(ac)))
+                End If
+                Set park = Module13.CreateBigInteger(CStr(Int(po)))
+                    GoTo jumpdiv2
+                End If
+                End If
+                MUL = 2
+                End If
+                r1 = po
+                po = r
+
+                   ' IntVal = 0
                 ElseIf FastSymbol1(aa$, "(") Then
                 If IntVal < 0 Then po = -po: IntVal = 0
                     If IsExp(bstack, aa$, r, , True) Then
@@ -5811,13 +5999,27 @@ Do
             Exit Do
         End If
 Loop
+If Not bi Is Nothing Then
+    If Not park Is Nothing Then
+        If TypeOf park Is BigInteger Then
+            Set bi = bi.Add(park)
+            po = 0
+        Else
+            WrongType
+            rightoperator = False
+            Exit Function
+        End If
+    End If
+
+Set bstack.lastobj = bi
+End If
 End Function
 '
 
 Function IsExpA(bstack As basetask, aa$, rr As Variant, parenthesis As Long, Optional ByVal noand As Boolean = True, Optional ByVal Comp As Boolean = True, Optional ByPass As Boolean = False, Optional nostring As Boolean) As Boolean
     Dim r As Variant, ac As Variant, po As Variant, MUL As Long, r1 As Variant, ut$, back As Variant
     Dim logic As Boolean, IntVal As Integer, IntVal2 As Integer, park As Object, objlist As mStiva2, rightlevel As Long, usehandler As mHandler
-    Dim cur As Long, BI As BigInteger
+    Dim cur As Long, bi As BigInteger
     Const leavespace = 1
     On Error Resume Next
     IsExpA = False
@@ -5952,7 +6154,7 @@ withoper:
 againoper:
                     If ss$ Like "[<>=]*" Then
                     
-                        If IsExp(bstack, aa$, r, False) Then
+                        If IsExpBig(bstack, aa$, r, False) Then
                             If bstack.lastobj Is Nothing Then
                                 If Not park Is Nothing Then
                                     If TypeOf park Is Group Then
@@ -6144,7 +6346,7 @@ comehere:
             Exit Function
         End If
         
-    ElseIf IsExp(bstack, aa$, r, False) Then
+    ElseIf IsExpBig(bstack, aa$, r, False) Then
         If Not ss$ Like "[<>=]*" Then FastSymbol1 aa$, ")"
 groupoperation:
             If Not (bstack.lastobj Is Nothing) And Not (park Is Nothing) Then
@@ -6220,20 +6422,21 @@ cont4567:
                 ElseIf TypeOf bstack.lastobj Is BigInteger Then
                     
 addmore:
-                    Set BI = bstack.lastobj
+                    Set bi = bstack.lastobj
                     If po = -1 Then
                       If IntVal <> 0 Then
                             IntVal = -IntVal
                             po = 0
                         Else
-                            Set BI = Nothing
-                            Set BI = CopyBigInteger(bstack.lastobj)
-                            BI.negate
+                            Set bi = Nothing
+                            Set bi = CopyBigInteger(bstack.lastobj)
+                            bi.negate
                          '   Set bstack.lastobj = BI
                             po = 0
                         End If
                     End If
                     Set bstack.lastobj = Nothing
+                    IsExpA = True
                     If FastSymbol(aa$, "+") Then
                         GoTo jumpplus
                     ElseIf FastSymbol(aa$, "-") Then
@@ -6244,14 +6447,23 @@ addmore:
                         End If
                         po = 0
                         GoTo jumpplus
+                    ElseIf FastSymbol(aa$, "**", , 2) Then
+                    GoTo jumppow
                     ElseIf FastSymbol(aa$, "*") Then
                     
                         GoTo jumpmult
                     ElseIf FastSymbol(aa$, "/") Then
-                    
                         GoTo jumpdiv
+                    ElseIf FastSymbol(aa$, "=") Then
+                        GoTo jumpequ
+                    ElseIf FastSymbol(aa$, "<") Then ' <=>, <>, <=, <
+                        GoTo jumpmax
+                    ElseIf FastSymbol(aa$, ">") Then ' >, >=
+                        GoTo jumpmin
+                    ElseIf FastSymbol(aa$, "^") Then
+                        GoTo jumppow
                     End If
-                    IsExpA = True
+                    
                     Exit Function
                 ' maybe is an error or not ???
                 End If
@@ -6342,14 +6554,15 @@ a1290456:
                 End If
                 MUL = 0
             ElseIf TypeOf bstack.lastobj Is BigInteger Then
-                Set BI = CopyBigInteger(bstack.lastobj)
-                If po < 0 Then BI.negate
+                Set bi = CopyBigInteger(bstack.lastobj)
+                If po < 0 Then bi.negate
                 Set bstack.lastobj = Nothing
                 'Set BI = Nothing
                 po = 0
             Else
                 If TypeOf bstack.lastobj Is Group Then GoTo again3
             End If
+      
             'MUL = 0
 cont111333:
         If MaybeIsSymbol(aa$, "Ii≈Â") Then
@@ -6519,7 +6732,7 @@ ElseIf parenthesis = 1 Then
     ElseIf FastSymbol1(aa$, "(") Then
         po = IntVal
         
-        If IsExp(bstack, aa$, r) Then
+        If IsExpBig(bstack, aa$, r) Then
             IsExpA = True
             If po = -1 Then
                 If Not bstack.lastobj Is Nothing Then
@@ -6575,7 +6788,15 @@ secodlooplogic:
         Do
         
         If Fast2Symbol(aa$, "**", 2, "^", 1) Then
-        
+jumppow:
+            If Not bi Is Nothing Then
+                If bi.Length < 27 Then
+                    po = CDec(bi.ToString)
+                    Set bi = Nothing
+                Else
+                    GoTo wrong
+                End If
+            End If
             Set bstack.lastobj = Nothing
             ' get from right number or expression
             If IntVal = 0 And po < 0 Then
@@ -6588,7 +6809,10 @@ secodlooplogic:
             
             
 
-            If IsNumber(bstack, aa$, r, True, IntVal2) Then
+            If IsNumber(bstack, aa$, r, False, IntVal2) Then
+                If Not CheckBigInteger(bstack, r) Then
+                    GoTo wrong
+                End If
             If IntVal2 = 2 Then
                 r = -r
                 If Not rightoperator(bstack, aa$, r, True) Then
@@ -6666,9 +6890,18 @@ secodlooplogic:
                     Else
                         po = Infinity()
                     End If
+                    Set park = Nothing
+                Else
+                    If Not park Is Nothing Then
+                        If TypeOf park Is BigInteger Then
+                            Set bi = park
+                            Set bi = bi.Add(Module13.CreateBigInteger(CStr(Int(po))))
+                            Set park = Nothing
+                        End If
+                    End If
                 End If
             ElseIf FastSymbol1(aa$, "(") Then
-                If IsExp(bstack, aa$, r, , True) Then
+                If IsExpBig(bstack, aa$, r, , True) Then
                     If r >= 1 And IntVal2 = 1 Then
                         po = po ^ r
                     Else
@@ -6909,9 +7142,8 @@ jumpmod50:
                     End If
                     If Abs(back) >= Abs(po) Then back = back - back
                     po = back
-            
             Case 1000
-                Set BI = BI.multiply(park)
+                Set bi = bi.multiply(park)
                 If Typename(back) = Typename(park) Then
                 Set park = back
                 Set back = Nothing
@@ -6921,7 +7153,7 @@ jumpmod50:
               '  Set bstack.lastobj = BI
                 IsExpA = True
             Case 1010
-                Set BI = BI.divide(park)
+                Set bi = bi.divide(park)
                 If Typename(back) = Typename(park) Then
                 Set park = back
                 Set back = Nothing
@@ -6930,8 +7162,28 @@ jumpmod50:
                 End If
               '  Set bstack.lastobj = BI
                 IsExpA = True
+            Case 1110
+                Set bi = bi.divideE(park)
+                If Typename(back) = Typename(park) Then
+                Set park = back
+                Set back = Nothing
+                Else
+                Set park = Nothing
+                End If
+              '  Set bstack.lastobj = BI
+                IsExpA = True
+            Case 1120
+                Set bi = bi.ModulusE(park)
+                If Typename(back) = Typename(park) Then
+                Set park = back
+                Set back = Nothing
+                Else
+                Set park = Nothing
+                End If
+               ' Set bstack.lastobj = BI
+                IsExpA = True
             Case 1020
-            Set BI = BI.Modulus(park)
+                Set bi = bi.Modulus(park)
                 If Typename(back) = Typename(park) Then
                 Set park = back
                 Set back = Nothing
@@ -6958,9 +7210,9 @@ jumpmult:
                     Exit Do
                 End If
             Loop
-            If logical(bstack, aa$, r, , , , IntVal) Then
+            If logical(bstack, aa$, r, , True, , IntVal) Then
     
-                If Not BI Is Nothing Then
+                If Not bi Is Nothing Then
 
 jumpmult1:
                     If bstack.lastobj Is Nothing Then
@@ -6971,14 +7223,14 @@ jumpmult1:
     
                         If TypeOf bstack.lastobj Is BigInteger Then
                             Set back = park
-                            Set park = BI
+                            Set park = bi
 jumpmult2:
                             If IntVal < 0 Then
-                                Set BI = CopyBigInteger(bstack.lastobj)
-                                BI.negate
+                                Set bi = CopyBigInteger(bstack.lastobj)
+                                bi.negate
                                 IntVal = 1
                             Else
-                                Set BI = bstack.lastobj
+                                Set bi = bstack.lastobj
                             End If
                             MUL = 1000
                         
@@ -7004,8 +7256,7 @@ jumpmult2:
                 po = r
             ElseIf FastSymbol1(aa$, "(") Then
              If IntVal < 0 Then po = -po: IntVal = 0
-                If IsExp(bstack, aa$, r) Then
-                    
+                If IsExpBig(bstack, aa$, r, , True) Then
                     MUL = 1
                     r1 = po
                     po = r
@@ -7013,7 +7264,7 @@ jumpmult2:
                         IsExpA = False
                         Exit Function
                     End If
-                    If Not BI Is Nothing Then GoTo jumpmult1
+                    If Not bi Is Nothing Then GoTo jumpmult1
                     Set bstack.lastobj = Nothing
                     Else
                     IsExpA = False
@@ -7028,7 +7279,7 @@ jumpmult2:
             Exit Do
         ElseIf FastSymbol1(aa$, "/") Then
 jumpdiv0:
-            If MUL = 0 Or MUL = 1020 Then
+            If MUL = 0 Then
                 If IntVal < 0 Then po = -po
             End If
 jumpdiv:
@@ -7041,8 +7292,8 @@ jumpdiv:
                     Exit Do
                 End If
             Loop
-             If logical(bstack, aa$, r, , , , IntVal) Then
-                If Not BI Is Nothing Then
+             If logical(bstack, aa$, r, , True, , IntVal) Then
+                If Not bi Is Nothing Then
 
 jumpdiv1:
                 If bstack.lastobj Is Nothing Then
@@ -7057,20 +7308,20 @@ jumpdiv1:
                     ' add
                     End If
                     Set back = park
-                    Set park = BI
+                    Set park = bi
 jumpdiv2:
                     If IntVal < 0 Then
-                    Set BI = CopyBigInteger(bstack.lastobj)
-                    BI.negate
+                    Set bi = CopyBigInteger(bstack.lastobj)
+                    bi.negate
                     IntVal = 1
                     Else
-                    Set BI = CopyBigInteger(bstack.lastobj)
+                    Set bi = CopyBigInteger(bstack.lastobj)
                     End If
-                    Set rr = BI
-                    Set BI = park
+                    Set rr = bi
+                    Set bi = park
                     Set park = rr
                     Set rr = Nothing
-                    If Not MUL = 1020 Then MUL = 1010
+                    MUL = 1010
                     
                     Else
                         Set bstack.lastobj = Nothing
@@ -7097,7 +7348,7 @@ jumpdiv2:
                ' IntVal = 0
             ElseIf FastSymbol1(aa$, "(") Then
             If IntVal < 0 Then po = -po: IntVal = 0
-                If IsExp(bstack, aa$, r) Then
+                If IsExpBig(bstack, aa$, r, , True) Then
                     MUL = 2
                     r1 = po
                     po = r
@@ -7105,7 +7356,7 @@ jumpdiv2:
                         IsExpA = False
                         Exit Function
                     End If
-                    If Not BI Is Nothing Then GoTo jumpdiv1
+                    If Not bi Is Nothing Then GoTo jumpdiv1
                     Set bstack.lastobj = Nothing
                 Else
                     IsExpA = False
@@ -7117,47 +7368,72 @@ jumpdiv2:
             End If
         ElseIf MaybeIsSymbol(aa$, "DMƒ’dm‰ı") Then
             If Fast2Label(aa$, "DIV", 3, "ƒ…¡", 3, 4) Then
-             If Not BI Is Nothing Then
-             GoTo jumpdiv0
-             End If
-             Set bstack.lastobj = Nothing
                 If FastSymbol1(aa$, "(") Then
-                    If IsExp(bstack, aa$, r, , True) Then
+                    If IsExpBig(bstack, aa$, r, , True, , True) Then
                         If Not FastSymbol1(aa$, ")") Then
                             IsExpA = False
                             Exit Function
                         End If
-                        If UseIntDiv Then  ' default +DIV switch, DIV/MOD has priority
-                            r1 = po
-                            po = r
-                            GoTo jumpDiv40
-                        Else
-                            r1 = po
-                            If Not rightoperator(bstack, aa$, r) Then ' 10 DIV 2*3 now is 10 DIV (2*3)
-                                IsExpA = False
-                                Exit Function
-                            End If
-                            po = r
-                            GoTo jumpDiv4
-                        End If
-                       
+                        GoTo adffjfj
                     Else
                         IsExpA = False
                         Exit Function
                     End If
-                ElseIf logical(bstack, aa$, r) Then
+                ElseIf logical(bstack, aa$, r, , True) Then
+adffjfj:
                     If UseIntDiv Then  ' also 10 DIV 2*3 now is (10 DIV 2)*3
+                        If Not bstack.lastobj Is Nothing Then
+                            MUL = 1010
+m23ds2:
+                            If TypeOf bstack.lastobj Is BigInteger Then
+                            If bi Is Nothing Then
+                            Set park = bstack.lastobj
+                            Set bi = Module13.CreateBigInteger(CStr(Int(po)))
+                            End If
+                            Set park = bstack.lastobj
+                            
+                            GoTo aaaa1221
+                            Else
+                            Set bstack.lastobj = Nothing
+                            End If
+                        ElseIf Not bi Is Nothing Then
+                            MUL = 1010  ' DIV
+                            Set park = Module13.CreateBigInteger(CStr(Int(r)))
+                            GoTo aaaa1221
+                        End If
                         'MUL = 40
                         r1 = po
                         po = r
                         GoTo jumpDiv40
+aaaa1221:
+                        
                     Else
                         MUL = 4
-                        ' right operator * / ^ **
                         r1 = po
                         If Not rightoperator(bstack, aa$, r) Then ' 10 DIV 2*3 now is 10 DIV (2*3)
                             IsExpA = False
                             Exit Function
+                        End If
+                        If Not bstack.lastobj Is Nothing Then
+                            MUL = 1010
+abdhdh5353:
+                            
+                            If TypeOf bstack.lastobj Is BigInteger Then
+                            If bi Is Nothing Then
+                            Set park = bstack.lastobj
+                            Set bi = Module13.CreateBigInteger(CStr(Int(po)))
+                            
+                            End If
+                            Set park = bstack.lastobj
+                            
+                            GoTo aaaa1221
+                            Else
+                            Set bstack.lastobj = Nothing
+                            End If
+                        ElseIf Not bi Is Nothing Then
+                            MUL = 1010
+                            Set park = Module13.CreateBigInteger(CStr(Int(r)))
+                            GoTo aaaa1221
                         End If
                         po = r
                         GoTo jumpDiv4
@@ -7169,32 +7445,28 @@ jumpdiv2:
             ElseIf Fast2Label(aa$, "DIV#", 4, "ƒ…¡#", 4, 5) Then
              Set bstack.lastobj = Nothing
                 If FastSymbol1(aa$, "(") Then
-                    If IsExp(bstack, aa$, r, , True) Then
+                    If IsExpBig(bstack, aa$, r, , True, , True) Then
                         If Not FastSymbol1(aa$, ")") Then
                             IsExpA = False
                             Exit Function
                         End If
-                        If UseIntDiv Then
-                            r1 = po
-                            po = r
-                            GoTo jumpdiv44
-                        Else
-                       '     MUL = 4
-                            r1 = po
-                            If Not rightoperator(bstack, aa$, r) Then ' 10 DIV 2*3 now is 10 DIV (2*3)
-                                IsExpA = False
-                                Exit Function
-                            End If
-                            po = r
-                            GoTo jumpdiv44
-                        End If
+                        GoTo a99449:
                     Else
                         IsExpA = False
                         Exit Function
                     End If
-                ElseIf logical(bstack, aa$, r) Then
+                ElseIf logical(bstack, aa$, r, , True) Then
+a99449:
                     If UseIntDiv Then  ' also 10 DIV 2*3 now is (10 DIV 2)*3
-                        'MUL = 40
+                        If Not bstack.lastobj Is Nothing Then
+                            MUL = 1110
+                            GoTo m23ds2
+                        ElseIf Not bi Is Nothing Then
+                            MUL = 1110
+                            Set park = Module13.CreateBigInteger(CStr(Int(r)))
+                            GoTo aaaa1221
+                        End If
+
                         r1 = po
                         po = r
                         GoTo jumpdiv44
@@ -7206,6 +7478,14 @@ jumpdiv2:
                             IsExpA = False
                             Exit Function
                         End If
+                        If Not bstack.lastobj Is Nothing Then
+                            MUL = 1110
+                            GoTo m23ds2
+                        ElseIf Not bi Is Nothing Then
+                            MUL = 1110
+                            Set park = Module13.CreateBigInteger(CStr(Int(r)))
+                            GoTo aaaa1221
+                        End If
                         po = r
                         GoTo jumpdiv44
                     End If
@@ -7215,40 +7495,32 @@ jumpdiv2:
                 End If
 
     ElseIf Fast3Label(aa$, "MOD", 3, "’–œÀœ…–œ", 8, "’–œÀ", 4, 9) Then
-            If Not BI Is Nothing Then
-             MUL = 1020
-             GoTo jumpdiv0
-             End If
-        Set bstack.lastobj = Nothing
+
+       
         If FastSymbol1(aa$, "(") Then
-            If IsExp(bstack, aa$, r, , True) Then
+            If IsExpBig(bstack, aa$, r, , True, , True) Then
                 If Not FastSymbol1(aa$, ")") Then
                     IsExpA = False
                     Exit Function
                 End If
-                If UseIntDiv Then
-                    MUL = 50
-                    r1 = po
-                    po = r
-                    GoTo jumpmod50
-                Else
-                    MUL = 5
-                    r1 = po
-                    If Not rightoperator(bstack, aa$, r) Then
-                        MissNumExpr
-                        IsExpA = False
-                        Exit Function
-                    End If
-                    po = r
-                    GoTo jumpmod5
-                End If
+                GoTo n3843
+                
             Else
                 MissNumExpr
                 IsExpA = False
                 Exit Function
             End If
         ElseIf logical(bstack, aa$, r, , True) Then
+n3843:
             If UseIntDiv Then
+                If Not bstack.lastobj Is Nothing Then
+                    MUL = 1020
+                    GoTo m23ds2
+                ElseIf Not bi Is Nothing Then
+                    MUL = 1020
+                    Set park = Module13.CreateBigInteger(CStr(Int(r)))
+                    GoTo aaaa1221
+                End If
                 MUL = 50
                 r1 = po
                 po = r
@@ -7260,6 +7532,14 @@ jumpdiv2:
                     IsExpA = False
                     Exit Function
                 End If
+                If Not bstack.lastobj Is Nothing Then
+                    MUL = 1020
+                    GoTo abdhdh5353
+                ElseIf Not bi Is Nothing Then
+                    MUL = 1020
+                    Set park = Module13.CreateBigInteger(CStr(Int(r)))
+                    GoTo aaaa1221
+                End If
                 po = r
                 GoTo jumpmod5
             End If
@@ -7269,17 +7549,8 @@ jumpdiv2:
             Exit Function
         End If
     ElseIf Fast3Label(aa$, "MOD#", 4, "’–œÀ#", 5, "’–œÀœ…–œ#", 9, 10) Then
-        If logical(bstack, aa$, r, , True) Then
-            MUL = 55
-            r1 = po
-            If Not rightoperator(bstack, aa$, r) Then
-                MissNumExpr
-                IsExpA = False
-                Exit Function
-            End If
-            po = r
-        ElseIf FastSymbol1(aa$, "(") Then
-            If IsExp(bstack, aa$, r, , True) Then
+        If FastSymbol1(aa$, "(") Then
+            If IsExpBig(bstack, aa$, r, , True, , True) Then
                 MUL = 55
                 r1 = po
                 If Not FastSymbol1(aa$, ")") Then
@@ -7292,6 +7563,14 @@ jumpdiv2:
                     IsExpA = False
                     Exit Function
                 End If
+                If Not bstack.lastobj Is Nothing Then
+                    MUL = 1120
+                    GoTo m23ds2
+                ElseIf Not bi Is Nothing Then
+                    MUL = 1120
+                    Set park = Module13.CreateBigInteger(CStr(Int(r)))
+                    GoTo aaaa1221
+                End If
                 po = r
 
             Else
@@ -7299,6 +7578,23 @@ jumpdiv2:
                 IsExpA = False
                 Exit Function
             End If
+        ElseIf logical(bstack, aa$, r, , True) Then
+            If Not bstack.lastobj Is Nothing Then
+                MUL = 1120
+                GoTo m23ds2
+            ElseIf Not bi Is Nothing Then
+                MUL = 1120
+                Set park = Module13.CreateBigInteger(CStr(Int(r)))
+                GoTo aaaa1221
+            End If
+            MUL = 55
+            r1 = po
+            If Not rightoperator(bstack, aa$, r) Then
+                MissNumExpr
+                IsExpA = False
+                Exit Function
+            End If
+            po = r
         Else
             MissNumExpr
             IsExpA = False
@@ -7314,7 +7610,7 @@ ElseIf MaybeIsSymbol(aa$, "A¡X «O·axÍÁoﬁπ") And noand Then
     '  good
       MUL = 3
         If priorityOr Then
-           If IsExp(bstack, aa$, r, , True) Then
+           If IsExpBig(bstack, aa$, r, , True, , True) Then
                 If ac <> 0 Then po = (ac + po)
                 If po <> 0 Then po = -1
                 If r <> 0 Then r = -1
@@ -7326,7 +7622,7 @@ ElseIf MaybeIsSymbol(aa$, "A¡X «O·axÍÁoﬁπ") And noand Then
                 Exit Function
             End If
         Else
-        If IsExp(bstack, aa$, r, False, True) Then
+        If IsExpBig(bstack, aa$, r, False, True, , True) Then
                 If ac <> 0 Then po = (ac + po)
                 If po <> 0 Then po = -1
                 If r <> 0 Then r = -1
@@ -7343,7 +7639,7 @@ ElseIf MaybeIsSymbol(aa$, "A¡X «O·axÍÁoﬁπ") And noand Then
     '  good
         MUL = 3
         If priorityOr Then
-            If IsExp(bstack, aa$, r, , True) Then
+            If IsExpBig(bstack, aa$, r, , True, , True) Then
                 If ac <> 0 Then po = (ac + po)
                 If po <> 0 Then po = -1
                 If r <> 0 Then r = -1
@@ -7355,7 +7651,7 @@ ElseIf MaybeIsSymbol(aa$, "A¡X «O·axÍÁoﬁπ") And noand Then
                 Exit Function
             End If
         Else
-            If IsExp(bstack, aa$, r, False, True) Then
+            If IsExpBig(bstack, aa$, r, False, True, , True) Then
                 If ac <> 0 Then po = (ac + po)
                 If po <> 0 Then po = -1
                 If r <> 0 Then r = -1
@@ -7371,7 +7667,7 @@ ElseIf MaybeIsSymbol(aa$, "A¡X «O·axÍÁoﬁπ") And noand Then
         Set bstack.lastobj = Nothing
 '  good
         MUL = 3
-        If IsExp(bstack, aa$, r, False, True) Then
+        If IsExpBig(bstack, aa$, r, False, True, , True) Then
             If ac <> 0 Then po = (ac + po)
             If po <> 0 Then po = -1
             If r <> 0 Then r = -1
@@ -7407,7 +7703,7 @@ ElseIf MaybeIsTwoSymbol(aa$, "->", 2) Then
 logic = True
 Exit Do
 ElseIf FastSymbol1(aa$, "-") Then
-            If Not BI Is Nothing Then
+            If Not bi Is Nothing Then
                 If IntVal <> 0 Then IntVal = -IntVal Else IntVal = -1
                 GoTo jumpplus
             End If
@@ -7424,9 +7720,9 @@ ElseIf FastSymbol1(aa$, "-") Then
                     Exit Do
                 End If
             Loop
-If logical(bstack, aa$, r, , , , IntVal) Then
+If logical(bstack, aa$, r, , True, , IntVal) Then
     If r = 0 Then
-        If Not BI Is Nothing Then
+        If Not bi Is Nothing Then
             If bstack.lastobj Is Nothing Then
                 Set bstack.lastobj = Module13.CreateBigInteger(CStr(Int(r)))
             End If
@@ -7435,20 +7731,17 @@ If logical(bstack, aa$, r, , , , IntVal) Then
             If TypeOf bstack.lastobj Is BigInteger Then
 cont33333434:
                 Set park = Module13.CreateBigInteger(CStr(Int(ac + po)))
-                Set BI = CopyBigInteger(bstack.lastobj)
+                Set bi = CopyBigInteger(bstack.lastobj)
                 Set bstack.lastobj = Nothing
                 If IntVal < 0 Then
-                    BI.negate
+                    bi.negate
                     IntVal = 1
                 End If
                 MUL = 0
                 IsExpA = True
                 GoTo cont11233
             Else
-wrong:
-                IsExpA = False
-                WrongType
-                Exit Function
+                Set bstack.lastobj = Nothing
             End If
         End If
     End If
@@ -7459,11 +7752,11 @@ wrong:
 cont11233:
  ElseIf FastSymbol1(aa$, "(") Then
     If IntVal < 0 Then r1 = -r1: IntVal = 1
-    If IsExp(bstack, aa$, r) Then
+    If IsExpBig(bstack, aa$, r, , True, , True) Then
     MUL = 1
     If ac = 0 Then ac = po Else ac = ac + po
         po = r
-    If Not BI Is Nothing Then
+    If Not bi Is Nothing Then
         If bstack.lastobj Is Nothing Then
             Set bstack.lastobj = Module13.CreateBigInteger(CStr(Int(r)))
         End If
@@ -7473,22 +7766,21 @@ cont11233:
     If Not bstack.lastobj Is Nothing Then
         If TypeOf bstack.lastobj Is BigInteger Then
 cont9494949:
-        If Not park Is Nothing Then
-            Set back = park
-        End If
-        Set park = Module13.CreateBigInteger(CStr(Int(ac)))
-        ac = 0
-        Set BI = CopyBigInteger(bstack.lastobj)
-        If r1 < 0 Then
-            r1 = 1
-            BI.negate
-        End If
-        Set bstack.lastobj = Nothing
-        MUL = 0
-        
-        GoTo cont2342324
+            If Not park Is Nothing Then
+                Set back = park
+            End If
+            Set park = Module13.CreateBigInteger(CStr(Int(ac)))
+            ac = 0
+            Set bi = CopyBigInteger(bstack.lastobj)
+            If r1 < 0 Then
+                r1 = 1
+                bi.negate
+            End If
+            Set bstack.lastobj = Nothing
+            MUL = 0
+            GoTo cont2342324
         Else
-        GoTo wrong
+            Set bstack.lastobj = Nothing
         End If
     End If
     End If
@@ -7520,9 +7812,9 @@ Do
         Exit Do
     End If
 Loop
-If logical(bstack, aa$, r, , , , IntVal, nostring) Then
+If logical(bstack, aa$, r, , True, , IntVal, nostring) Then
     
-    If Not BI Is Nothing Then
+    If Not bi Is Nothing Then
 
     If bstack.lastobj Is Nothing Then
         Set bstack.lastobj = Module13.CreateBigInteger(CStr(Int(r)))
@@ -7530,21 +7822,22 @@ If logical(bstack, aa$, r, , , , IntVal, nostring) Then
     End If
 jumpplus1:
     If TypeOf bstack.lastobj Is BigInteger Then
-    If Not BI Is Nothing Then
+    If Not bi Is Nothing Then
         If Not park Is Nothing Then
         If TypeOf park Is BigInteger Then
-            Set BI = BI.Add(park)
+            Set bi = bi.Add(park)
         Else
-            WrongType
-            IsExpA = False
-            Exit Function
+wrong:
+                IsExpA = False
+                WrongType
+                Exit Function
         End If
         End If
-        Set park = BI
-        Set BI = CopyBigInteger(bstack.lastobj)
+        Set park = bi
+        Set bi = CopyBigInteger(bstack.lastobj)
         
         If IntVal < 0 Then
-            BI.negate
+            bi.negate
             IntVal = 1
         End If
         Set bstack.lastobj = Nothing
@@ -7589,9 +7882,9 @@ jumpplus1:
                 If park Is Nothing Then
                     Set park = Module13.CreateBigInteger(CStr(Int(po)))
                 End If
-            Set BI = CopyBigInteger(bstack.lastobj)
+            Set bi = CopyBigInteger(bstack.lastobj)
             If IntVal < 0 Then
-                BI.negate
+                bi.negate
                 IntVal = 1
             End If
             MUL = 0
@@ -7620,9 +7913,9 @@ cont484848:
     End If
     ElseIf FastSymbol1(aa$, "(") Then
     
-    If IsExp(bstack, aa$, r, , nostring:=True) Then
+    If IsExpBig(bstack, aa$, r, , True, , True) Then
     
-    If Not BI Is Nothing Then
+    If Not bi Is Nothing Then
         If bstack.lastobj Is Nothing Then
             Set bstack.lastobj = Module13.CreateBigInteger(CStr(Int(r)))
         End If
@@ -7704,7 +7997,7 @@ If logical(bstack, aa$, r) Then
                 r1 = po
                 po = r
             ElseIf FastSymbol1(aa$, "(") Then
-                If IsExp(bstack, aa$, r) Then
+                If IsExpBig(bstack, aa$, r) Then
                     MUL = 1
                     r1 = po
                     po = r
@@ -7723,11 +8016,16 @@ ElseIf Comp And MaybeIsSymbol(aa$, "<=>") Then
 Set bstack.lastobj = Nothing
 If IntVal < 0 Then po = -po: IntVal = 1
 If FastSymbol1(aa$, "=") Then
+jumpequ:
     MUL = 3
     If Left$(aa$, 1) = "=" Then
         Mid$(aa$, 1, 1) = " "
-        If IsExp(bstack, aa$, r, False, True, False) Then
-            If r = 0 Then
+        If IsExpBig(bstack, aa$, r, False, True, False, True) Then  ' check string ==
+            If Not bi Is Nothing Then
+            GoTo jumpequ1
+            ElseIf Not bstack.lastobj Is Nothing Then
+            GoTo jumpequ2
+            ElseIf r = 0 Then
                 If ac <> 0 Then po = (ac + po)
                 If po = 0 Then
                     po = True
@@ -7742,42 +8040,103 @@ If FastSymbol1(aa$, "=") Then
             IsExpA = False
             Exit Function
         End If
-    ElseIf IsExp(bstack, aa$, r, False, True, False) Then
-        If ac = 0 Then
-            po = CBool(po = r)
-        Else
-            po = (ac + po) = r
+    ElseIf IsExpBig(bstack, aa$, r, False, True, False, True) Then ' check string
+        If Not bi Is Nothing Then
+jumpequ1:
+            If Not park Is Nothing Then
+
+                If TypeOf park Is BigInteger Then
+                    Set bi = bi.Add(park)
+                Else
+                    GoTo wrong
+                End If
+            End If
+            IsExpA = True
+            If bstack.lastobj Is Nothing Then
+                po = bi.compare(Module13.CreateBigInteger(CStr(Int(r)))) = 0
+            ElseIf TypeOf bstack.lastobj Is BigInteger Then
+                po = bi.compare(CopyBigInteger(bstack.lastobj)) = 0
+                Set bstack.lastobj = Nothing
+            Else
+                Set bstack.lastobj = Nothing
+            End If
+            Set bi = Nothing
             ac = 0
+        ElseIf Not bstack.lastobj Is Nothing Then
+jumpequ2:
+            If TypeOf bstack.lastobj Is BigInteger Then
+                Set bi = bstack.lastobj
+                If ac = 0 Then
+                    po = bi.compare(Module13.CreateBigInteger(CStr(Int(po)))) = 0
+                Else ' now r is the bi
+                    po = bi.compare(Module13.CreateBigInteger(CStr(Int(ac + po)))) = 0
+                    ac = 0
+                End If
+            Else
+                Set bstack.lastobj = Nothing
+            End If
+            Set bi = Nothing
+            Set bstack.lastobj = Nothing
+        Else
+            If ac = 0 Then
+                po = CBool(po = r)
+            Else
+                po = (ac + po) = r
+                ac = 0
+            End If
         End If
+        
     Else
         MissNumExpr
         IsExpA = False
         Exit Function
     End If
 ElseIf FastSymbol1(aa$, "<") Then
+jumpmax:
     MUL = 3
     If Left$(aa$, 1) = "=" Then
         Mid$(aa$, 1, 1) = " "
         If Left$(aa$, 2) = " >" Then
             Mid$(aa$, 2, 1) = " "
             MUL = 1  ' from 3
-            If IsExp(bstack, aa$, r, False, True, False) Then
-                If ac = 0 Then
-                    Select Case po
-                    Case Is < r
-                        po = -1
-                    Case Is = r
-                        po = 0
-                    Case Else
-                        po = 1
-                    End Select
-                    ac = 0
+            If IsExpBig(bstack, aa$, r, False, True, False, True) Then
+                If Not bi Is Nothing Then
+                     If Not park Is Nothing Then
+                         If TypeOf park Is BigInteger Then
+                             Set bi = bi.Add(park)
+                         Else
+                             GoTo wrong
+                         End If
+                     End If
+                     IsExpA = True
+                     If bstack.lastobj Is Nothing Then
+                         po = bi.compare(Module13.CreateBigInteger(CStr(Int(ac + r))))
+                     ElseIf TypeOf bstack.lastobj Is BigInteger Then
+                         po = bi.compare(CopyBigInteger(bstack.lastobj))
+                     Else
+                     Set bstack.lastobj = Nothing
+                     End If
+                     Set bi = Nothing
+                     Set bstack.lastobj = Nothing
+                     ac = 0
+                     r = 0
+                 ElseIf Not bstack.lastobj Is Nothing Then
+                     If TypeOf bstack.lastobj Is BigInteger Then
+                         Set bi = bstack.lastobj
+                       If ac = 0 Then
+                             po = -bi.compare(Module13.CreateBigInteger(CStr(Int(po))))
+                         Else ' now r is the bi
+                             po = -bi.compare(Module13.CreateBigInteger(CStr(Int(ac + po))))
+                             ac = 0
+                         End If
+                     Else
+                         Set bstack.lastobj = Nothing
+                     End If
+                     Set bi = Nothing
+                     Set bstack.lastobj = Nothing
+                     r = 0
                 Else
-                    ac = ac + po
-                    If Err.Number = 6 Then
-                        Err.Clear
-                        r = r - ac
-                        If Err.Number = 6 Then Err.Clear
+                    If ac = 0 Then
                         Select Case po
                         Case Is < r
                             po = -1
@@ -7786,17 +8145,33 @@ ElseIf FastSymbol1(aa$, "<") Then
                         Case Else
                             po = 1
                         End Select
-                    Else
-                        Select Case ac
-                        Case Is < r
-                            po = -1
-                        Case Is = r
-                            po = 0
-                        Case Else
-                            po = 1
-                        End Select
-                        
                         ac = 0
+                    Else
+                        ac = ac + po
+                        If Err.Number = 6 Then
+                            Err.Clear
+                            r = r - ac
+                            If Err.Number = 6 Then Err.Clear
+                            Select Case po
+                            Case Is < r
+                                po = -1
+                            Case Is = r
+                                po = 0
+                            Case Else
+                                po = 1
+                            End Select
+                        Else
+                            Select Case ac
+                            Case Is < r
+                                po = -1
+                            Case Is = r
+                                po = 0
+                            Case Else
+                                po = 1
+                            End Select
+                            
+                            ac = 0
+                        End If
                     End If
                  End If
              Else
@@ -7804,147 +8179,315 @@ ElseIf FastSymbol1(aa$, "<") Then
                 IsExpA = False
                 Exit Function
              End If
+        Else  ' <=
+            If IsExpBig(bstack, aa$, r, False, True, False, True) Then
+                If Not bi Is Nothing Then
+                    If Not park Is Nothing Then
+                        If TypeOf park Is BigInteger Then
+                            Set bi = bi.Add(park)
+                        Else
+                            GoTo wrong
+                        End If
+                    End If
+                    IsExpA = True
+                    If bstack.lastobj Is Nothing Then
+                        po = bi.compare(Module13.CreateBigInteger(CStr(Int(r)))) < 1
+                    ElseIf TypeOf bstack.lastobj Is BigInteger Then
+                        po = bi.compare(CopyBigInteger(bstack.lastobj)) < 1
+                        Set bstack.lastobj = Nothing
+                    Else
+                    Set bstack.lastobj = Nothing
+                    End If
+                    Set bi = Nothing
+                    ac = 0
+                ElseIf Not bstack.lastobj Is Nothing Then
+                    If TypeOf bstack.lastobj Is BigInteger Then
+                        Set bi = bstack.lastobj
+                        If ac = 0 Then
+                            po = bi.compare(Module13.CreateBigInteger(CStr(Int(po)))) > -1
+                        Else ' now r is the bi
+                            po = bi.compare(Module13.CreateBigInteger(CStr(Int(ac + po)))) > -1
+                            ac = 0
+                        End If
+                    Else
+                        Set bstack.lastobj = Nothing
+                    End If
+                    Set bi = Nothing
+                Else
+                    If ac = 0 Then
+                        po = po <= r
+                    Else
+                        ac = ac + po
+                        If Err.Number = 6 Then
+                            Err.Clear
+                            If ac + 0 Then
+                            If Err.Number = 6 Then
+                                po = ac <= r
+                            Else
+                                po = po <= r
+                            End If
+                            Else
+                                po = po <= r
+                            End If
+                        Else
+                            po = ac <= r
+                        End If
+                        
+                        ac = 0
+                    End If
+                End If
             Else
-            If IsExp(bstack, aa$, r, False, True, False) Then
+                IsExpA = False
+                Exit Function
+            End If
+        End If
+    ElseIf Left$(aa$, 1) = ">" Then   ' <>
+        Mid$(aa$, 1, 1) = " "
+        If IsExpBig(bstack, aa$, r, False, True, False, True) Then
+            If Not bi Is Nothing Then
+                If Not park Is Nothing Then
+                    If TypeOf park Is BigInteger Then
+                        Set bi = bi.Add(park)
+                    Else
+                        GoTo wrong
+                    End If
+                End If
+                IsExpA = True
+                If bstack.lastobj Is Nothing Then
+                    po = bi.compare(Module13.CreateBigInteger(CStr(Int(r)))) <> 0
+                ElseIf TypeOf bstack.lastobj Is BigInteger Then
+                    po = bi.compare(CopyBigInteger(bstack.lastobj)) <> 0
+                    Set bstack.lastobj = Nothing
+                Else
+                Set bstack.lastobj = Nothing
+                End If
+                Set bi = Nothing
+                ac = 0
+            ElseIf Not bstack.lastobj Is Nothing Then
+                If TypeOf bstack.lastobj Is BigInteger Then
+                    Set bi = bstack.lastobj
+                    If ac = 0 Then
+                        po = bi.compare(Module13.CreateBigInteger(CStr(Int(po)))) <> 0
+                    Else ' now r is the bi
+                        po = bi.compare(Module13.CreateBigInteger(CStr(Int(ac + po)))) <> 0
+                        ac = 0
+                    End If
+                Else
+                    Set bstack.lastobj = Nothing
+                End If
+                Set bi = Nothing
+            Else
                 If ac = 0 Then
-                    po = po <= r
+                    po = po <> r
                 Else
                     ac = ac + po
                     If Err.Number = 6 Then
                         Err.Clear
                         If ac + 0 Then
                         If Err.Number = 6 Then
-                            po = ac <= r
+                            po = ac <> r
                         Else
-                            po = po <= r
+                            po = po <> r
                         End If
                         Else
-                            po = po <= r
+                            po = po <> r
                         End If
                     Else
-                        po = ac <= r
+                        po = ac <> r
                     End If
                     
                     ac = 0
                 End If
-
-            Else
-                IsExpA = False
-                Exit Function
             End If
+        Else
+            MissNumExpr
+            IsExpA = False
+            Exit Function
         End If
-    ElseIf Left$(aa$, 1) = ">" Then
-        Mid$(aa$, 1, 1) = " "
-        If IsExp(bstack, aa$, r, False, True, False) Then
+    ElseIf IsExpBig(bstack, aa$, r, False, True, False, True) Then  ' <
+        If Not bi Is Nothing Then
+            If Not park Is Nothing Then
+                If TypeOf park Is BigInteger Then
+                    Set bi = bi.Add(park)
+                Else
+                    GoTo wrong
+                End If
+            End If
+            IsExpA = True
+            If bstack.lastobj Is Nothing Then
+                po = bi.compare(Module13.CreateBigInteger(CStr(Int(r)))) = -1
+            ElseIf TypeOf bstack.lastobj Is BigInteger Then
+                po = bi.compare(CopyBigInteger(bstack.lastobj)) = -1
+                Set bstack.lastobj = Nothing
+            Else
+            Set bstack.lastobj = Nothing
+            End If
+            Set bi = Nothing
+            ac = 0
+        ElseIf Not bstack.lastobj Is Nothing Then
+            If TypeOf bstack.lastobj Is BigInteger Then
+                Set bi = bstack.lastobj
+                If ac = 0 Then
+                    po = bi.compare(Module13.CreateBigInteger(CStr(Int(po)))) = 1
+                Else ' now r is the bi
+                    po = bi.compare(Module13.CreateBigInteger(CStr(Int(ac + po)))) = 1
+                    ac = 0
+                End If
+            Else
+                Set bstack.lastobj = Nothing
+            End If
+            Set bi = Nothing
+        Else
             If ac = 0 Then
-                po = po <> r
+                po = po < r
             Else
                 ac = ac + po
                 If Err.Number = 6 Then
                     Err.Clear
                     If ac + 0 Then
                     If Err.Number = 6 Then
-                        po = ac <> r
+                        po = ac < r
                     Else
-                        po = po <> r
+                        po = po < r
                     End If
                     Else
-                        po = po <> r
+                        po = po < r
                     End If
                 Else
-                    po = ac <> r
+                    po = ac < r
                 End If
                 
                 ac = 0
             End If
-
-        Else
-            MissNumExpr
-            IsExpA = False
-            Exit Function
-        End If
-    ElseIf IsExp(bstack, aa$, r, False, True, False) Then
-        If ac = 0 Then
-            po = po < r
-        Else
-            ac = ac + po
-            If Err.Number = 6 Then
-                Err.Clear
-                If ac + 0 Then
-                If Err.Number = 6 Then
-                    po = ac < r
-                Else
-                    po = po < r
-                End If
-                Else
-                    po = po < r
-                End If
-            Else
-                po = ac < r
-            End If
-            
-            ac = 0
         End If
     Else
         MissNumExpr
         IsExpA = False
         Exit Function
     End If
-ElseIf FastSymbol1(aa$, ">") Then
+ElseIf FastSymbol1(aa$, ">") Then  '>=, >
+jumpmin:
+   
     MUL = 3
     If Left$(aa$, 1) = "=" Then
         Mid$(aa$, 1, 1) = " "
-        If IsExp(bstack, aa$, r, False, True, False) Then
-            If ac = 0 Then
-                po = po >= r
-            Else
-                ac = ac + po
-                If Err.Number = 6 Then
-                    Err.Clear
-                    If ac + 0 Then
-                    If Err.Number = 6 Then
-                        po = ac >= r
+        If IsExpBig(bstack, aa$, r, False, True, False, True) Then
+            If Not bi Is Nothing Then
+                If Not park Is Nothing Then
+                    If TypeOf park Is BigInteger Then
+                        Set bi = bi.Add(park)
                     Else
-                        po = po >= r
+                        GoTo wrong
                     End If
-                    Else
-                        po = po >= r
+                End If
+                IsExpA = True
+                If bstack.lastobj Is Nothing Then
+                    po = bi.compare(Module13.CreateBigInteger(CStr(Int(r)))) > -1
+                ElseIf TypeOf bstack.lastobj Is BigInteger Then
+                    po = bi.compare(CopyBigInteger(bstack.lastobj)) > -1
+                    Set bstack.lastobj = Nothing
+                Else
+                Set bstack.lastobj = Nothing
+                End If
+                Set bi = Nothing
+                ac = 0
+            ElseIf Not bstack.lastobj Is Nothing Then
+                If TypeOf bstack.lastobj Is BigInteger Then
+                    Set bi = bstack.lastobj
+                    If ac = 0 Then
+                        po = bi.compare(Module13.CreateBigInteger(CStr(Int(po)))) < 1
+                    Else ' now r is the bi
+                        po = bi.compare(Module13.CreateBigInteger(CStr(Int(ac + po)))) < 1
+                        ac = 0
                     End If
                 Else
-                    po = ac >= r
+                    Set bstack.lastobj = Nothing
                 End If
-                
-                ac = 0
+                Set bi = Nothing
+            Else
+                If ac = 0 Then
+                    po = po >= r
+                Else
+                    ac = ac + po
+                    If Err.Number = 6 Then
+                        Err.Clear
+                        If ac + 0 Then
+                        If Err.Number = 6 Then
+                            po = ac >= r
+                        Else
+                            po = po >= r
+                        End If
+                        Else
+                            po = po >= r
+                        End If
+                    Else
+                        po = ac >= r
+                    End If
+                    
+                    ac = 0
+                End If
             End If
-
         Else
             MissNumExpr
             IsExpA = False
             Exit Function
         End If
-    ElseIf IsExp(bstack, aa$, r, False, True, False) Then
-            If ac = 0 Then
-                po = po > r
-            Else
-                ac = ac + po
-                If Err.Number = 6 Then
-                    Err.Clear
-                    If ac + 0 Then
-                    If Err.Number = 6 Then
-                        po = ac > r
+    ElseIf IsExpBig(bstack, aa$, r, False, True, False, True) Then
+            If Not bi Is Nothing Then
+                If Not park Is Nothing Then
+                    If TypeOf park Is BigInteger Then
+                        Set bi = bi.Add(park)
                     Else
-                        po = po > r
+                        GoTo wrong
                     End If
-                    Else
-                        po = po > r
+                End If
+                IsExpA = True
+                If bstack.lastobj Is Nothing Then
+                    po = bi.compare(Module13.CreateBigInteger(CStr(Int(r)))) = 1
+                ElseIf TypeOf bstack.lastobj Is BigInteger Then
+                    po = bi.compare(CopyBigInteger(bstack.lastobj)) = 1
+                    Set bstack.lastobj = Nothing
+                Else
+                Set bstack.lastobj = Nothing
+                End If
+                Set bi = Nothing
+                ac = 0
+            ElseIf Not bstack.lastobj Is Nothing Then
+                If TypeOf bstack.lastobj Is BigInteger Then
+                    Set bi = bstack.lastobj
+                    If ac = 0 Then
+                        po = bi.compare(Module13.CreateBigInteger(CStr(Int(po)))) = -1
+                    Else ' now r is the bi
+                        po = bi.compare(Module13.CreateBigInteger(CStr(Int(ac + po)))) = -1
+                        ac = 0
                     End If
                 Else
-                    po = ac > r
+                    Set bstack.lastobj = Nothing
                 End If
-                
-                ac = 0
+                Set bi = Nothing
+            Else
+                If ac = 0 Then
+                    po = po > r
+                Else
+                    ac = ac + po
+                    If Err.Number = 6 Then
+                        Err.Clear
+                        If ac + 0 Then
+                        If Err.Number = 6 Then
+                            po = ac > r
+                        Else
+                            po = po > r
+                        End If
+                        Else
+                            po = po > r
+                        End If
+                    Else
+                        po = ac > r
+                    End If
+                    
+                    ac = 0
+                End If
             End If
-
     Else
         MissNumExpr
         IsExpA = False
@@ -7984,11 +8527,11 @@ SwapVariant rr, ac
 Else
 rr = ac
 End If
-If Not BI Is Nothing Then
+If Not bi Is Nothing Then
     If Not park Is Nothing Then
         If TypeOf park Is BigInteger Then
             rr = 0
-            Set BI = BI.Add(park)
+            Set bi = bi.Add(park)
         Else
             WrongType
             IsExpA = False
@@ -7996,7 +8539,7 @@ If Not BI Is Nothing Then
         End If
     End If
 
-    Set bstack.lastobj = BI
+    Set bstack.lastobj = bi
 End If
     Do While parenthesis > 0
         If FastSymbol1(aa$, ")") Then
@@ -8007,7 +8550,20 @@ End If
     Loop
     Set park = Nothing
 End Function
-
+Function CheckBigInteger(bstack As basetask, r As Variant) As Boolean
+Dim bi As BigInteger
+If Not bstack.lastobj Is Nothing Then
+    Set bi = bstack.lastobj
+    Set bstack.lastobj = Nothing
+    If bi.Length < 27 Then
+         r = CDec(bi.ToString)
+    Else
+        Overflow
+        Exit Function
+    End If
+End If
+CheckBigInteger = True
+End Function
 Private Function MyTrimLi(s$, L As Long) As Long
 Dim I&
 Dim P2 As Long, P1 As Integer, p4 As Long
@@ -8137,7 +8693,7 @@ If MaybeIsSymbol3(A$, ".", sng&) Then
     Else
     ' we have an identifier with . like .x
         IsNumber = IsNumberNew(bstack, A$, r, flatobject)
-        If flatobject Then Set bstack.lastobj = Nothing
+        If flatobject Then bstack.flatobject
         Exit Function
     End If
     
@@ -8148,9 +8704,11 @@ I = AscW(Mid$(A$, sng&, 1))
 If I < 10 Or I > 63 Then
 ' HERE PROCESS UNARY SIGNS??
     IsNumber = IsNumberNew(bstack, A$, r, flatobject)
-    If flatobject Then
-     Set bstack.lastobj = Nothing
-     End If
+        If flatobject Then
+        If Not bstack.lastobj Is Nothing Then
+        If Not TypeOf bstack.lastobj Is BigInteger Then Set bstack.lastobj = Nothing
+        End If
+        End If
 
     Exit Function
 Else
@@ -8506,7 +9064,7 @@ cont123:
                     r = CDate(Abs(val(ig$ + DE$)))
                 Case Else
                     Mid$(A$, sng, 1) = " "
-                    sg = 1
+                    
                     r = 0
                     Set bstack.lastobj = Module13.CreateBigInteger(ig$)
                         Mid$(A$, 1, sng& - 1) = space$(sng& - 1)
@@ -9958,7 +10516,7 @@ On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, f
 IsNumberNew = False
 Exit Function
 fun116:
-    If IsExp(bstack, A$, p) Then
+    If IsExpBig(bstack, A$, p) Then
         If Not bstack.lastobj Is Nothing Then
             If TypeOf bstack.lastobj Is BigInteger Then
                 Set big = bstack.lastobj
@@ -9971,13 +10529,13 @@ fun116:
     Exit Function
 
 fun115:
-    If IsExp(bstack, A$, p) Then
+    If IsExpBig(bstack, A$, p) Then
         If Not bstack.lastobj Is Nothing Then
-            If TypeOf bstack.lastobj Is BigInteger Then
+            If TypeOf bstack.lastobj Is BigInteger Then  ' IT IS FOR NOW ALWAYS
             Set big = bstack.lastobj
             Set bstack.lastobj = Nothing
             If FastSymbol(A$, ",") Then
-                If IsExp(bstack, A$, p) Then
+                If IsExpBig(bstack, A$, p) Then
                     If Not bstack.lastobj Is Nothing Then
                         Set p = bstack.lastobj
                         If Not TypeOf p Is BigInteger Then WrongType: Exit Function
@@ -9987,7 +10545,7 @@ fun115:
                         Set p = Module13.CreateBigInteger(CStr(Int(p)))
                     End If
                     If FastSymbol(A$, ",") Then
-                        If IsExp(bstack, A$, pp) Then
+                        If IsExpBig(bstack, A$, pp) Then
                         If Not bstack.lastobj Is Nothing Then
                             Set pp = bstack.lastobj
                             If Not TypeOf pp Is BigInteger Then WrongType: Exit Function
@@ -10263,19 +10821,18 @@ fun2: ' "STACKITEM(", "‘…Ã«”Ÿ—œ’("
     If FastSymbol(A$, "#") Then GoTo comehere
     Exit Function
 fun3: ' "SGN(", "”«Ã("
-If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
-r = Sgn(MyRound(p, 28))
-
-
-
-
-
- IsNumberNew = FastSymbol(A$, ")", True)
- Else
- MissParam A$: IsNumberNew = False
+If IsExpBig(bstack, A$, p, flatobject:=True, nostring:=True) Then
+    If bstack.lastobj Is Nothing Then
+        r = Sgn(MyRound(p, 28))
+    Else
+        r = bstack.lastobj.bSgn()
+        Set bstack.lastobj = Nothing
+    End If
+    IsNumberNew = FastSymbol(A$, ")", True)
+Else
+    MissParam A$: IsNumberNew = False
 End If
 Exit Function
-
 fun4: ' "FRAC(", "ƒ≈ ("
 If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
 r = MyRound(Abs(Abs(p) - Int(Abs(p))), 13)
@@ -11168,11 +11725,11 @@ fun109: ' "BINARY.ADD(", "ƒ’¡ƒ… œ.–—œ”»≈”«(","ƒ’¡ƒ… œ.–—œ("
 fun114:
     If IsExp(bstack, A$, p) Then
         If MemInt(VarPtr(p)) = vbString Then
-        SwapString2Variant s$, p
-        GoTo FUN114A
+            SwapString2Variant s$, p
+            GoTo FUN114A
         End If
-            MissStringExpr
-            Exit Function
+        MissStringExpr
+        Exit Function
     ElseIf IsStrExp(bstack, A$, s$, False) Then
 FUN114A:
     p = 0
@@ -12449,7 +13006,7 @@ If Not TaskMaster Is Nothing Then TaskMaster.RestEnd1
 End Sub
 Function ProcLambda(bstack As basetask, rest$, Lang As Long) As Object
 ' no named functio- object
-Dim Body As New lambda, K As Long, n$, dummy As Variant, er As Boolean, pos1 As Long, p As Variant, s$
+Dim Body As New lambda, k As Long, n$, dummy As Variant, er As Boolean, pos1 As Long, p As Variant, s$
 Dim pppp As mArray, pppp2 As mArray, frm$, Find As basetask, rest1$
 Dim ppppL As iBoxArray, Ar As refArray
 ' need fixed param...with &
@@ -12461,17 +13018,17 @@ If Not FastSymbol(rest$, "->", , 2) Then
 If er Then Exit Function
 Do
     If Len(rest$) < 129 Then
-        K = IsPureLabel(rest$, n$)
+        k = IsPureLabel(rest$, n$)
     Else
         rest1$ = Left$(rest$, 128)
-        K = IsPureLabel(rest1$, n$)
+        k = IsPureLabel(rest1$, n$)
         If Len(rest1$) = 0 Then
-            K = IsPureLabel(rest$, n$)
+            k = IsPureLabel(rest$, n$)
         Else
             rest$ = Mid$(rest$, 129 - Len(rest1$))
         End If
     End If
-    If K = 0 Then
+    If k = 0 Then
         If frm$ <> "" Then Exit Function
         If FastSymbol(rest$, "(") Then
             er = True
@@ -12485,10 +13042,10 @@ Do
             Exit Function
         End If
     End If
-    If K > 4 Then If Not FastSymbol(rest$, ")") Then Exit Function
+    If k > 4 Then If Not FastSymbol(rest$, ")") Then Exit Function
     n$ = myUcase(n$, True)
     If FastSymbol(rest$, "=") Then
-        Select Case K
+        Select Case k
         Case 1
             If IsExp(bstack, rest$, p) Then
                 If Not bstack.lastobj Is Nothing Then
@@ -12567,7 +13124,7 @@ Do
         Case 8
         GoTo ER122
         End Select
-    ElseIf K < 5 Then
+    ElseIf k < 5 Then
     Dim novariant As Boolean
         If GetVar(bstack, n$, pos1, , , True, , novariant) Then
             If VarTypeName(var(pos1)) = "lambda" Then
@@ -12612,7 +13169,7 @@ Do
             Body.FeedNonLocal n$, dummy, False, var()
             dummy = Empty
         End If
-    ElseIf K < 8 Then
+    ElseIf k < 8 Then
         If neoGetArray(bstack, n$, ppppL) Then
             If TypeOf ppppL Is mArray Then
                 Set pppp = ppppL
@@ -12667,7 +13224,7 @@ getfunc:
     End If
     If Trim$(Body.Code) = vbNullString Then Exit Function
     If Not FastSymbol(rest$, "}") Then Exit Function
-    K = Len(rest$)
+    k = Len(rest$)
 Else
 GetLine:
 ' get one line only
@@ -12684,7 +13241,7 @@ GetLine:
     Else
         Body.Code = "=" + Left$(rest$, pos1 - 1)
     End If
-    K = Len(rest$)
+    k = Len(rest$)
     rest$ = Mid$(rest$, pos1)
 End If
 If bstack.OriginalCode < 0 Then
@@ -12693,15 +13250,15 @@ If bstack.OriginalCode < 0 Then
         If Find.OriginalCode > -1 Then Exit Do
         If TypeOf var(-Find.OriginalCode) Is Constant Then
             Set p = var(-Find.OriginalCode).Value
-            K = K + p.lastlen
+            k = k + p.lastlen
             Body.OriginalCode = p.OriginalCode
         Else
-            K = K + var(-Find.OriginalCode).lastlen
+            k = k + var(-Find.OriginalCode).lastlen
             Body.OriginalCode = var(-Find.OriginalCode).OriginalCode
         End If
         Set Find = Find.Parent
     Loop
-    Body.lastlen = K
+    Body.lastlen = k
 Else
     If Not bstack.Parent Is Nothing Then
     ' Left$(sbf(bstack.OriginalCode).sb, 10) = "'11001EDIT"
@@ -12711,16 +13268,16 @@ Else
     If Find.OriginalCode < 0 Then
         If TypeOf var(-Find.OriginalCode) Is Constant Then
             Set p = var(-Find.OriginalCode).Value
-            K = K + p.lastlen
+            k = k + p.lastlen
             Body.OriginalCode = p.OriginalCode
         Else
-            K = K + var(-Find.OriginalCode).lastlen
+            k = k + var(-Find.OriginalCode).lastlen
             Body.OriginalCode = var(-Find.OriginalCode).OriginalCode
         End If
         Set Find = Find.Parent
     ElseIf Left$(sbf(Find.OriginalCode).sb, 10) = "'11001EDIT" Then
         frm$ = Mid$(sbf(Find.OriginalCode).sb, 1, InStr(sbf(Find.OriginalCode).sb, vbCr))
-        K = K - val(Mid$(frm$, InStr(frm$, ",") + 1))
+        k = k - val(Mid$(frm$, InStr(frm$, ",") + 1))
         Body.OriginalCode = iRVAL(Find.originalname, 0)
         Set Find = Find.Parent
     Else
@@ -12729,11 +13286,11 @@ Else
     End If
     Wend
     If Body.OriginalCode = 0 Then Body.OriginalCode = bstack.OriginalCode
-    Body.lastlen = K
+    Body.lastlen = k
     Else
     If Left$(sbf(bstack.OriginalCode).sb, 10) = "'11001EDIT" Then
         frm$ = Mid$(sbf(bstack.OriginalCode).sb, 1, InStr(sbf(bstack.OriginalCode).sb, vbCr))
-        K = K - val(Mid$(frm$, InStr(frm$, ",") + 1))
+        k = k - val(Mid$(frm$, InStr(frm$, ",") + 1))
         Body.OriginalCode = iRVAL(bstack.originalname, 0)
         If Body.OriginalCode = 0 Then
         IsLabelOnly Mid$(frm$, 11), frm$
@@ -12744,7 +13301,7 @@ Else
     Else
     Body.OriginalCode = bstack.OriginalCode
     End If
-    Body.lastlen = K
+    Body.lastlen = k
     End If
     
 End If
@@ -18429,13 +18986,17 @@ ContInline:
                         GoTo errstat1
                     End If
                 Else
-                    If IsStrExp(bstack, b$, ss$) Then
+                    If IsStrExp(bstack, b$, ss$, False) Then
                         WaitShow = Len(b$)
                         bstack.addlen = 0
                         b$ = vbCrLf + ss$ + b$
                         If trace Then TestShowSub = b$
                         sss = Len(b$)
                         GoTo again1
+                    Else
+                        SyntaxError
+                        Execute = 0
+                        Exit Function
                     End If
                 End If
             Case "UPDATE", "≈–… ¡…—œ"
@@ -20651,6 +21212,9 @@ contNegLocal:
                 ElseIf IsLabelSymbolNew(b$, "ANTIKEIMENO", "OBJECT", Lang) Then
                     If Not MyAnyType(bstack, b$, Lang, True, vbObject) Then Execute = 0: Exit Function
                     GoTo loopcontinue
+                ElseIf IsLabelSymbolNew(b$, "Ã≈√¡Àœ”¡ ≈—¡…œ”", "BIGINTEGER", Lang) Then
+                    If Not MyAnyType(bstack, b$, Lang, True, vbObject, , New BigInteger) Then Execute = 0: Exit Function
+                    GoTo loopcontinue
                 End If
                     NewStat = True
                     End If
@@ -20722,6 +21286,10 @@ contNegGlobal:
                If Not ProcGroup(1, bstack, b$, Lang) Then Execute = 0: Exit Function
                ElseIf IsLabelSymbolNew(b$, "ANTIKEIMENO", "OBJECT", Lang) Then
                     If Not MyAnyType(bstack, b$, Lang, False, vbObject) Then Execute = 0: Exit Function
+                    GoTo loopcontinue
+               '
+               ElseIf IsLabelSymbolNew(b$, "Ã≈√¡Àœ”¡ ≈—¡…œ”", "BIGINTEGER", Lang) Then
+                    If Not MyAnyType(bstack, b$, Lang, False, vbObject, , New BigInteger) Then Execute = 0: Exit Function
                     GoTo loopcontinue
                ElseIf IsLabelSymbolNew(b$, "√≈√œÕœ”", "EVENT", Lang) Then
                 If lookOne(b$, "=") Then
@@ -22397,8 +22965,8 @@ Case "READ", "ƒ…¡¬¡”≈"
 Identifier = MyRead(1, basestack, rest$, Lang)
 Exit Function
 Case "DOUBLE"
-Dim K As Long
-K = MyTrimL(rest$): If K > 1 Then rest$ = Mid$(rest$, K)
+Dim k As Long
+k = MyTrimL(rest$): If k > 1 Then rest$ = Mid$(rest$, k)
 If CheckFreeExecute(rest$) Then
     SetDouble basestack.Owner
     Identifier = True
@@ -23626,7 +24194,7 @@ End Sub
 
 
 Function neoGetArray(bstack As basetask, ByVal nm$, ga As iBoxArray, Optional searchonly As Boolean = False, Optional ByVal useglobalname As Boolean = False, Optional useLocalOnly As Boolean = False, Optional rightexpression As Boolean, Optional feedback As Boolean, Optional fromthere As Long = 0) As Boolean
-Dim K As Long, myobject As Object
+Dim k As Long, myobject As Object
 Dim n$, hidden As Boolean
 nm$ = myUcase(nm$)
 If Len(nm$) = 0 Then SyntaxError: Exit Function
@@ -23648,7 +24216,7 @@ here12:
     If Len(bstack.UseGroupname) > 0 Then
     If Mid$(nm$, 6, 1) = ChrW(&HFFBF) Then
     n$ = bstack.UseGroupname + Mid$(nm$, 6)
-      If Not varhash.Find3(n$, K, feedback) Then
+      If Not varhash.Find3(n$, k, feedback) Then
  GoTo isagroupvalue
     ' varhash.Find3 Left$(n$, Len(n$) - 2), k, feedback
      
@@ -23656,12 +24224,12 @@ here12:
     Else
     n$ = bstack.UseGroupname + Mid$(nm$, 6)
     
-     If Not varhash.Find3(n$, K, feedback) Then
+     If Not varhash.Find3(n$, k, feedback) Then
      n$ = bstack.UseGroupname + ChrW(&HFFBF) + Mid$(nm$, 6)
-     varhash.Find3 n$, K, feedback
+     varhash.Find3 n$, k, feedback
      End If
      End If
-     If K = 0 Then
+     If k = 0 Then
      ' check for inventory
 
      n$ = bstack.UseGroupname + Mid$(nm$, 6)
@@ -23671,27 +24239,27 @@ isagroupvalue:
             Else
             n$ = Mid$(n$, 1, Len(n$) - 1)
             End If
-        If varhash.Find3(n$, K, feedback) Then
-            If MyIsObject(var(K)) Then
-            If var(K) Is Nothing Then
+        If varhash.Find3(n$, k, feedback) Then
+            If MyIsObject(var(k)) Then
+            If var(k) Is Nothing Then
                 Set ga = New ppppLight
                 Set ga.GroupRef = Nothing
                 ga.arr = False
                 neoGetArray = True
                
                 Exit Function
-            ElseIf TypeOf var(K) Is mHandler Then
+            ElseIf TypeOf var(k) Is mHandler Then
                 
-                If var(K).T1 < 3 Then
+                If var(k).T1 < 3 Then
                 Set ga = New ppppLight
-                Set ga.GroupRef = var(K)
+                Set ga.GroupRef = var(k)
                 ga.arr = False
                 neoGetArray = True
                 Exit Function
                 Else
-                K = 0
+                k = 0
                 End If
-            ElseIf TypeOf var(K) Is Group Then
+            ElseIf TypeOf var(k) Is Group Then
             GoTo checkGroup
             End If
             End If
@@ -23702,38 +24270,38 @@ isagroupvalue:
             Else
             n$ = Mid$(n$, 1, Len(n$) - 1)
             End If
-        If varhash.Find3(n$, K, feedback) Then
-            If TypeOf var(K) Is mHandler Then
-            If var(K).T1 < 3 Then
+        If varhash.Find3(n$, k, feedback) Then
+            If TypeOf var(k) Is mHandler Then
+            If var(k).T1 < 3 Then
                 Set ga = New ppppLight
-                Set ga.GroupRef = var(K)
+                Set ga.GroupRef = var(k)
                 ga.arr = False
                 neoGetArray = True
                  Exit Function
                 End If
             End If
-            K = -1
+            k = -1
         End If
      
      End If
     Else
     n$ = Mid$(nm$, 5)
-      If bstack.GetDot(n$, 1) Then varhash.Find3 here$ + "." + n$, K, feedback Else Exit Function
+      If bstack.GetDot(n$, 1) Then varhash.Find3 here$ + "." + n$, k, feedback Else Exit Function
     End If
 
-ElseIf varhash.Find(n$, K) = False Then
+ElseIf varhash.Find(n$, k) = False Then
 If useLocalOnly Then
 If Len(bstack.UseGroupname) > 0 Then
         If InStr(nm$, bstack.UseGroupname) = 1 Then
         n$ = bstack.UseGroupname + ChrW(&HFFBF) + Mid$(nm$, Len(bstack.UseGroupname) + 1)
-        varhash.Find3 n$, K, feedback
+        varhash.Find3 n$, k, feedback
         Else
         If n$ Like "*[$%](" Then
         n$ = Mid$(n$, 1, Len(n$) - 2)
         Else
         n$ = Mid$(n$, 1, Len(n$) - 1)
         End If
-        If varhash.Find3(n$, K, feedback) Then
+        If varhash.Find3(n$, k, feedback) Then
         GoTo contHandler
         End If
         
@@ -23744,22 +24312,22 @@ n$ = Mid$(n$, 1, Len(n$) - 2)
 Else
 n$ = Mid$(n$, 1, Len(n$) - 1)
 End If
-If varhash.Find3(n$, K, feedback) Then
+If varhash.Find3(n$, k, feedback) Then
 contHandler:
-    If TypeOf var(K) Is mHandler Then
-        If var(K).T1 < 3 Then
+    If TypeOf var(k) Is mHandler Then
+        If var(k).T1 < 3 Then
             Set ga = New ppppLight
-            Set ga.GroupRef = var(K)
+            Set ga.GroupRef = var(k)
             ga.arr = False
             neoGetArray = True
             Exit Function
         End If
-    ElseIf TypeOf var(K) Is Group Then
+    ElseIf TypeOf var(k) Is Group Then
 checkGroup:
     If rightexpression Then
-        If var(K).HasParametersSet Then
+        If var(k).HasParametersSet Then
              Set ga = New ppppLight
-                    Set ga.GroupRef = var(K)
+                    Set ga.GroupRef = var(k)
                     ga.arr = False
                     neoGetArray = True
                     Exit Function
@@ -23767,12 +24335,12 @@ checkGroup:
         
             Exit Function
             End If
-    ElseIf var(K).HasParameters Then
+    ElseIf var(k).HasParameters Then
             Set ga = New ppppLight
-                   Set ga.GroupRef = var(K)
+                   Set ga.GroupRef = var(k)
                    
                    If Not hidden Then
-                   ga.CodeName = var(K).FloatGroupName
+                   ga.CodeName = var(k).FloatGroupName
                    If Len(ga.CodeName) = 0 Then ga.CodeName = n$
                    Else
                    ga.CodeName = vbNullString
@@ -23786,7 +24354,7 @@ checkGroup:
     End If
 
     End If
-    K = -1
+    k = -1
 End If
 End If
 Else
@@ -23798,16 +24366,16 @@ Else
 
 ' check group or handler
 
-        If varhash.Find3(n$, K, feedback) Then
+        If varhash.Find3(n$, k, feedback) Then
 checkforglobal:
-            If TypeOf var(K) Is mHandler Then
-                If var(K).T1 < 3 Then
+            If TypeOf var(k) Is mHandler Then
+                If var(k).T1 < 3 Then
                         If rightexpression Then
                         Set ga = New mArray
                         Else
                         Set ga = New ppppLight
                         End If
-                        Set ga.GroupRef = var(K)
+                        Set ga.GroupRef = var(k)
 
                         ga.arr = False
                         
@@ -23817,46 +24385,46 @@ checkforglobal:
                         
                     End If
             Else
-                If MyIsObject(var(K)) Then
-                    If Typename(var(K)) = mGroup Then
+                If MyIsObject(var(k)) Then
+                    If Typename(var(k)) = mGroup Then
                     
 checkgrouphere:
-                        If var(K).HasParametersSet Then
+                        If var(k).HasParametersSet Then
                             ' process parameters
                             Set ga = New ppppLight
-                            Set ga.GroupRef = var(K)
+                            Set ga.GroupRef = var(k)
                             ga.arr = False
                             neoGetArray = True
                         If rightexpression Then Exit Function
-                        ElseIf var(K).HasParameters Then  ' this is for inventories
+                        ElseIf var(k).HasParameters Then  ' this is for inventories
                             Set ga = New mArray
-                            Set ga.GroupRef = var(K)
+                            Set ga.GroupRef = var(k)
                             ga.CodeName = n$
                             ga.arr = False
                             neoGetArray = True
                         End If
                         Exit Function
                     Else
-                        If varhash.Find(nm$, K) Then GoTo conthere
+                        If varhash.Find(nm$, k) Then GoTo conthere
                         Exit Function
                     End If
                 Else
-                    If varhash.Find(nm$, K) Then GoTo conthere
+                    If varhash.Find(nm$, k) Then GoTo conthere
                     Exit Function
                 End If
             End If
-            K = -1
+            k = -1
             n$ = bstack.GroupName + nm$
                 ' not a mhandler
         Else
         n$ = nm$
-        If Not varhash.Find3(n$, K, feedback) Then
+        If Not varhash.Find3(n$, k, feedback) Then
           If n$ Like "*[$%](" Then
             n$ = Mid$(n$, 1, Len(n$) - 2)
             Else
             n$ = Mid$(n$, 1, Len(n$) - 1)
             End If
-        If varhash.Find3(n$, K, feedback) Then GoTo checkforglobal
+        If varhash.Find3(n$, k, feedback) Then GoTo checkforglobal
       n$ = nm$
       End If
         End If
@@ -23865,12 +24433,12 @@ Else
 fromthere = 0
 End If
 conthere:
-If K <= 0 Then
+If k <= 0 Then
     
             If searchonly Then Exit Function
             If Not useLocalOnly Then
                         n$ = nm$
-                        varhash.Find3 n$, K, feedback
+                        varhash.Find3 n$, k, feedback
         Else
        
     If bstack.StaticCollection Is Nothing Then Exit Function
@@ -23894,14 +24462,14 @@ If K <= 0 Then
 End If
 
 
-If K > fromthere Then
-If myVarType(var(K), vbEmpty) Then
+If k > fromthere Then
+If myVarType(var(k), vbEmpty) Then
 Set ga = New mArray: neoGetArray = True
 Else
-If TypeOf var(K) Is iBoxArray Then
-    Set ga = var(K)
+If TypeOf var(k) Is iBoxArray Then
+    Set ga = var(k)
 Else
-    Set myobject = var(K)
+    Set myobject = var(k)
     If CheckIsmArray(myobject) Then
         Set ga = myobject
     Else
@@ -23915,23 +24483,23 @@ End If
 End If
   neoGetArray = True
            
-ElseIf K = 0 Then
+ElseIf k = 0 Then
  If n$ Like "*[$%](" Then
             n$ = Mid$(n$, 1, Len(n$) - 2)
             Else
             n$ = Mid$(n$, 1, Len(n$) - 1)
             End If
-        If varhash.Find(n$, K) Then
-            If TypeOf var(K) Is mHandler Then
-                If var(K).T1 < 3 Then
+        If varhash.Find(n$, k) Then
+            If TypeOf var(k) Is mHandler Then
+                If var(k).T1 < 3 Then
                     Set ga = New ppppLight
-                    Set ga.GroupRef = var(K)
+                    Set ga.GroupRef = var(k)
                     ga.arr = False
                     neoGetArray = True
                     Exit Function
                 End If
             End If
-            K = -1
+            k = -1
         End If
 
 
@@ -23941,20 +24509,20 @@ If n$ = vbNullString Then Exit Function
     If useLocalOnly Then Exit Function
     If Len(bstack.UseGroupname) > 0 Then
     n$ = bstack.UseGroupname + Mid$(nm$, 6)
-     If Not varhash.Find(n$, K) Then
+     If Not varhash.Find(n$, k) Then
      n$ = bstack.UseGroupname + ChrW(&HFFBF) + Mid$(nm$, 6)
-     varhash.Find n$, K
+     varhash.Find n$, k
      End If
     Else
     n$ = Mid$(nm$, 5)
-      If bstack.GetDot(n$, 1) Then varhash.Find here$ + "." + n$, K Else Exit Function
+      If bstack.GetDot(n$, 1) Then varhash.Find here$ + "." + n$, k Else Exit Function
     End If
 End If
-        If varhash.Find(n$, K) Then
-        If TypeOf var(K) Is mHandler Then
+        If varhash.Find(n$, k) Then
+        If TypeOf var(k) Is mHandler Then
         
         Set ga = New ppppLight
-        Set ga.GroupRef = var(K)
+        Set ga.GroupRef = var(k)
         ga.arr = False
         neoGetArray = True
         Exit Function
@@ -23965,7 +24533,7 @@ End If
 
 End Function
 Function neoGetArrayLinkOnly(bstack As basetask, ByVal nm$, link As Long, Optional useglobalname As Boolean = False, Optional useLocalOnly As Boolean = False) As Boolean
-Dim K As Long
+Dim k As Long
 Dim n$
 nm$ = myUcase(nm$)
 If Len(nm$) > 5 And False Then
@@ -23999,7 +24567,7 @@ End If
 End If
 End If
 
-If varhash.Find(n$, K) = False And Len(bstack.UseGroupname) > 0 Then
+If varhash.Find(n$, k) = False And Len(bstack.UseGroupname) > 0 Then
     If Left$(nm$, 5) = "¡’‘œ." Or Left$(nm$, 5) = "THIS." Then
         If useLocalOnly Then Exit Function
         If StripThis2(bstack.UseGroupname) = vbNullString Then
@@ -24007,17 +24575,17 @@ If varhash.Find(n$, K) = False And Len(bstack.UseGroupname) > 0 Then
         Else
             n$ = StripThis2(bstack.UseGroupname) + "." + Mid$(nm$, 6)
         End If
-        varhash.Find n$, K
+        varhash.Find n$, k
     End If
 End If
-If K = 0 Then
+If k = 0 Then
     If Not useLocalOnly Then
         n$ = myUcase(nm$)
-        varhash.Find n$, K
+        varhash.Find n$, k
     End If
 End If
-If K > 0 Then
-    link = K
+If k > 0 Then
+    link = k
     neoGetArrayLinkOnly = True
     
 End If
@@ -24025,18 +24593,18 @@ End If
 End Function
 
 Function CopyArrayItems(bstack As basetask, nm$) As String
-Dim K As Long
-If neoGetArrayLinkOnly(bstack, nm$, K) Then CopyArrayItems = CStr(K)
+Dim k As Long
+If neoGetArrayLinkOnly(bstack, nm$, k) Then CopyArrayItems = CStr(k)
 
 End Function
 
 Function CopyArrayItemsNoFormated(bstack As basetask, nm$) As Long
-Dim K As Long
-If varhash.Find(nm$, K) Then
-CopyArrayItemsNoFormated = K
-ElseIf varhash.Find(nm$, K) Then
-If TypeOf var(K) Is mHandler Then
-CopyArrayItemsNoFormated = -K
+Dim k As Long
+If varhash.Find(nm$, k) Then
+CopyArrayItemsNoFormated = k
+ElseIf varhash.Find(nm$, k) Then
+If TypeOf var(k) Is mHandler Then
+CopyArrayItemsNoFormated = -k
 End If
 End If
 End Function
@@ -24820,11 +25388,7 @@ If Not IsNumber(basestack, s$, D, flatobject, sg) Then
     Set basestack.lastobj = Nothing
     If LastErNum1 < 0 Then Exit Function
 Else
-'If flatobject Then Set basestack.lastobj = Nothing
-
-    If flatobject Then
-     Set basestack.lastobj = Nothing
-    End If
+    If flatobject Then basestack.flatobject
     logical = True
 End If
 Else
@@ -25484,15 +26048,15 @@ End If
 End Function
 Function BlockParamSq(s$) As String
 ' need to be open
-Dim I As Long, j As Long, K As Long
-K = 1
+Dim I As Long, j As Long, k As Long
+k = 1
 For I = 1 To Len(s$)
 Select Case AscW(Mid$(s$, I, 1))
 Case 91
-K = K + 1
+k = k + 1
 Case 93
-K = K - 1
-If j = 0 And K = 0 Then
+k = k - 1
+If j = 0 And k = 0 Then
     BlockParamSq = Left$(s$, I - 1)
     Exit For
 End If
@@ -26970,7 +27534,7 @@ CloseAllHandlers
 CloseAllConnections
 End Sub
 Function MakeitObjectGeneric(Number As Long) As Object
-Dim aa As New mHandler, K As Long
+Dim aa As New mHandler, k As Long
 aa.T1 = 3
 On Error GoTo there
 If Not MyIsObject(var(Number)) Then
@@ -26983,9 +27547,9 @@ Number = -1
 Else
 Do While TypeOf var(Number) Is mHandler
 If var(Number).indirect < 0 Then Exit Do
-If K > 20 Then MyEr "too many references", "ÔÎÎ›Ú ·Ì·ˆÔÒ›Ú": Exit Do
+If k > 20 Then MyEr "too many references", "ÔÎÎ›Ú ·Ì·ˆÔÒ›Ú": Exit Do
 Number = var(Number).indirect
-K = K + 1
+k = k + 1
 Loop
 End If
 there:
@@ -27165,17 +27729,25 @@ Else
 MoveStringToVariant s, var
 End If
 End Sub
-Function CheckVarOnlyNo(var As Variant, s As String) As Boolean
+Function CheckVarOnlyNo(var As Variant, s As String, Optional checktype As Boolean = True) As Boolean
 If VarTypeName(var) = doc Then
-If var.IsEmpty Then
-var.textDoc = s
-Else
-var.InsertDoc var.LastParagraph, var.TextParagraphLen(var.LastParagraph) + 1, s
-End If
+    If var.IsEmpty Then
+        var.textDoc = s
+    Else
+        var.InsertDoc var.LastParagraph, var.TextParagraphLen(var.LastParagraph) + 1, s
+    End If
 ElseIf MyIsObject(var) Then
-CheckVarOnlyNo = True
+    CheckVarOnlyNo = True  ' this is an error
 Else
-MoveStringToVariant s, var
+    If MemInt(VarPtr(var)) = vbString Then
+        MoveStringToVariant s, var
+    ElseIf checktype Then
+        WrongType
+        CheckVarOnlyNo = True  ' this is an error
+    Else
+        var = ""
+        MoveStringToVariant s, var
+    End If
 End If
 End Function
 
@@ -27246,7 +27818,7 @@ CleanStr = A$
 End Function
 Sub CallByObject(bstack As basetask, ret As Boolean, that As stdCallFunction)
 Dim Up As Long, getparam As Boolean, pp As Long
-Dim K As Long, p As Variant, Final(0 To 63) As Variant
+Dim k As Long, p As Variant, Final(0 To 63) As Variant
 Dim x1 As Long, what$, curtype As Long, s$, link$, rtype As Variant
 Dim thisref(0 To 63) As Long
 Dim usehandler As mHandler
@@ -27257,24 +27829,24 @@ getparam = True
 Else
 Up = that.count
 End If
-For K = 1 To Up
+For k = 1 To Up
        
-        If that.IsByRef(K - 1) Then
+        If that.IsByRef(k - 1) Then
             ' look for label..and check it
            If bstack.IsInStackString(what$) Then
                    
-                    If that.ReadType(K - 1) <= 4 Then
+                    If that.ReadType(k - 1) <= 4 Then
                             If GetGlobalVar(bstack.GroupName + what$, x1) Then
-                                    thisref(K - 1) = x1 ' so that is used to restore value
+                                    thisref(k - 1) = x1 ' so that is used to restore value
                                     If MyIsObject(var(x1)) Then
                                          ' THIS IS NOT GOOD
                                     
                                     Else
-                                        If that.ReadType(K - 1) = 2 Then
-                                         Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
+                                        If that.ReadType(k - 1) = 2 Then
+                                         Final(k - 1) = CLng(VarPtr(var(x1)) + 8)
                                          
                                         Else
-                                             Final(K - 1) = var(x1)
+                                             Final(k - 1) = var(x1)
                                             End If
                                              ' so if this is a long we place a variant long
                                            ' thisref(k - 1) = x1
@@ -27292,7 +27864,7 @@ For K = 1 To Up
             End If
         Else
         Dim ii As Long
-                Select Case that.ReadType(K - 1)
+                Select Case that.ReadType(k - 1)
                 Case 2
                    If Not bstack.IsInStackNumber(p) Then
                    
@@ -27314,60 +27886,60 @@ For K = 1 To Up
                     Else
                         Exit For
                     End If
-                    Final(K - 1) = ii
+                    Final(k - 1) = ii
                     Else
                     If VarType(p) = 20 Then
-                    Final(K - 1) = p
+                    Final(k - 1) = p
                     Else
-                    Final(K - 1) = CLng(p)
+                    Final(k - 1) = CLng(p)
                     End If
                    End If
                 Case 20
                 If Not bstack.IsInStackNumber(p) Then
-                   Final(K - 1) = p
+                   Final(k - 1) = p
                   End If
                 Case 1, 5
                         If Not bstack.IsInStackNumber(p) Then
                    
                     If Not bstack.IsInStackLong(ii) Then Exit For
-                    Final(K - 1) = ii
+                    Final(k - 1) = ii
                     Else
-                    Final(K - 1) = p
+                    Final(k - 1) = p
                     End If
                 Case 4, 7
                       If Not bstack.IsInStackNumber(p) Then
                    
                     If Not bstack.IsInStackLong(ii) Then Exit For
-                    Final(K - 1) = ii
+                    Final(k - 1) = ii
                     Else
-                    Final(K - 1) = MyRound(p)
+                    Final(k - 1) = MyRound(p)
                     End If
                 Case Else
                     If Not bstack.IsInStackString(s$) Then Exit For
-                    Final(K - 1) = s$
+                    Final(k - 1) = s$
                 End Select
         End If
-Next K
+Next k
 If getparam Then
 Do
 If bstack.IsInStackLong(pp) Then
-Final(K - 1) = pp
-K = K + 1
+Final(k - 1) = pp
+k = k + 1
 ElseIf bstack.IsInStackNumber(p) Then
-Final(K - 1) = p
-K = K + 1
+Final(k - 1) = p
+k = k + 1
 ElseIf bstack.IsInStackString(s$) Then
- Final(K - 1) = s$
-K = K + 1
+ Final(k - 1) = s$
+k = k + 1
 Else
 Exit Do
 End If
-Loop Until bstack.soros.IsEmpty Or K = 63
+Loop Until bstack.soros.IsEmpty Or k = 63
 
-Up = K - 1
+Up = k - 1
 End If
 
-If K > Up Then
+If k > Up Then
 'all is ok
 ' make your call
 If that.RetType = 0 Then
@@ -27415,15 +27987,15 @@ Else
 
 Exit Sub
 End If
-For K = 1 To that.count
-If that.IsByRef(K - 1) Then
+For k = 1 To that.count
+If that.IsByRef(k - 1) Then
 ' RESTORE VALUES...
-    If that.ReadType(K - 1) < 5 Then
-    If that.ReadType(K - 1) <> 2 Then var(thisref(K - 1)) = Final(K - 1)
+    If that.ReadType(k - 1) < 5 Then
+    If that.ReadType(k - 1) <> 2 Then var(thisref(k - 1)) = Final(k - 1)
     
     End If
 End If
-Next K
+Next k
 Exit Sub
 there:
 MyEr Err.Description, Err.Description
@@ -28613,24 +29185,24 @@ If myGroup.IamSuperClass Or myGroup.IamApointer Then
     Set bstack.lastobj = mg
     Exit Sub
 End If
-Dim K As Group, I As Long, j As Long, s$, w3 As Long, w1 As Integer
+Dim k As Group, I As Long, j As Long, s$, w3 As Long, w1 As Integer
 Dim b$(), vvl As Variant, delme As Document, myfirstArray As mArray, mySecondArray As mArray
 
-Set K = New Group
+Set k = New Group
 'Set k.Sorosref = myGroup.soros.Copy
-Dim BI As Long
-BI = 1
+Dim bi As Long
+bi = 1
 
 'i = myGroup.soros.Total
 I = myGroup.FieldsCount
-K.BeginFloat I + 2
-K.PokeItem 0, "Variables-Arrays"
-K.PokeItem 1, I
+k.BeginFloat I + 2
+k.PokeItem 0, "Variables-Arrays"
+k.PokeItem 1, I
 Dim usevariant As Boolean
 For j = 2 To I * 2 + 1 Step 2
 'Debug.Print k.soros.StackItem(BI), BI
 'Debug.Print myGroup.ReadField(BI), BI
-    b$() = Split(myGroup.ReadField(BI), " ")
+    b$() = Split(myGroup.ReadField(bi), " ")
     w3 = Abs(val(b$(1)))
     w1 = AscW(Right$(b$(0), 1))
     If w1 = 41 Then
@@ -28638,12 +29210,12 @@ For j = 2 To I * 2 + 1 Step 2
     End If
     If w1 <> 40 Then
         s$ = VarTypeName(var(w3))
-        K.PokeItem j, b$(0)
+        k.PokeItem j, b$(0)
         If s$ = doc Then 'preserve Documents
             MakeitObject vvl
             vvl.EmptyDoc
             vvl.textDoc = var(w3).textDoc
-            K.PokeItem j + 1, vvl
+            k.PokeItem j + 1, vvl
             Set vvl = Nothing
             vvl = Empty
         ElseIf s$ = mGroup Then
@@ -28651,16 +29223,16 @@ For j = 2 To I * 2 + 1 Step 2
             CopyGroup2 var(w3), bstack
             Set vvl = bstack.lastobj
             Set bstack.lastobj = Nothing
-            K.PokeItem j + 1, vvl
+            k.PokeItem j + 1, vvl
             Set vvl = Nothing
             vvl = Empty
         ElseIf s$ = mHdlr Then
             Set vvl = CopyHandlerObj(var(w3))
-            K.PokeItem j + 1, vvl
+            k.PokeItem j + 1, vvl
             Set vvl = Nothing
             vvl = Empty
         Else
-            K.PokeItem j + 1, var(w3)
+            k.PokeItem j + 1, var(w3)
         End If
     Else
         If w3 = 0 Then
@@ -28683,33 +29255,33 @@ For j = 2 To I * 2 + 1 Step 2
                 If MyIsObject(var(w3)) Then Set vvl = var(w3)
             End If
         End If
-        K.PokeItem j, b$(0) + ")"
-        K.PokeItem j + 1, vvl
+        k.PokeItem j, b$(0) + ")"
+        k.PokeItem j + 1, vvl
         Set vvl = Nothing
         vvl = Empty
     End If
-    BI = BI + 1
+    bi = bi + 1
 Next j
 With myGroup
-    K.PokeItem j, myGroup.LocalList
-    K.PokeItem j + 1, GetFunctionList(.FuncList)
-    K.oldFuncRef = vbNullString
-    K.HasStrValue = .HasStrValue
-    K.HasValue = .HasValue
-    K.HasSet = .HasSet
-    K.HasParameters = .HasParameters
-    K.HasParametersSet = .HasParametersSet
-    K.HasRemove = .HasRemove
-    Set K.SuperClassList = .SuperClassList
-    Set K.Events = .Events
-    K.highpriorityoper = .highpriorityoper
-    K.HasUnary = .HasUnary
-    K.PointerPtr = ObjPtr(mg)
-    K.ToDelete = True
+    k.PokeItem j, myGroup.LocalList
+    k.PokeItem j + 1, GetFunctionList(.FuncList)
+    k.oldFuncRef = vbNullString
+    k.HasStrValue = .HasStrValue
+    k.HasValue = .HasValue
+    k.HasSet = .HasSet
+    k.HasParameters = .HasParameters
+    k.HasParametersSet = .HasParametersSet
+    k.HasRemove = .HasRemove
+    Set k.SuperClassList = .SuperClassList
+    Set k.Events = .Events
+    k.highpriorityoper = .highpriorityoper
+    k.HasUnary = .HasUnary
+    k.PointerPtr = ObjPtr(mg)
+    k.ToDelete = True
     'Set k.mytypes = .mytypes
-    K.mergeTypes .mytypes
+    k.mergeTypes .mytypes
 End With
-Set bstack.lastobj = K
+Set bstack.lastobj = k
 End Sub
 Public Function CopyGroupObj(mg As Variant, Optional nofunc As Boolean = False) As Object
 Dim myGroup As Group
@@ -28730,46 +29302,46 @@ If myGroup.IamFloatGroup Then
     Exit Function
 
 End If
-Dim Name$, K As Group, I As Long, j As Long, s$, w3 As Long, w1 As Integer
+Dim Name$, k As Group, I As Long, j As Long, s$, w3 As Long, w1 As Integer
 Dim b$(), vvl As Variant
-Set K = New Group
+Set k = New Group
 'Set k.Sorosref = myGroup.soros.Copy
-Dim BI As Long
-BI = 1
+Dim bi As Long
+bi = 1
 I = myGroup.FieldsCount 'myGroup.soros.Total
-K.BeginFloat I + 2
-K.PokeItem 0, "Variables-Arrays"
-K.PokeItem 1, I
+k.BeginFloat I + 2
+k.PokeItem 0, "Variables-Arrays"
+k.PokeItem 1, I
 For j = 2 To I * 2 + 1 Step 2
-    b$() = Split(myGroup.ReadField(BI), " ")
+    b$() = Split(myGroup.ReadField(bi), " ")
     w3 = Abs(val(b$(1)))
     w1 = AscW(Right$(b$(0), 1))
     If w1 = 41 Then
         b$(0) = Left$(b$(0), Len(b$(0)) - 1)
     End If
     If w1 <> 40 Then
-        K.PokeItem j, b$(0)
+        k.PokeItem j, b$(0)
         s$ = VarTypeName(var(w3))
         If s$ = doc Then 'preserve Documents
             MakeitObject vvl
             vvl.EmptyDoc
             vvl.textDoc = var(w3).textDoc
-            K.PokeItem j + 1, vvl
+            k.PokeItem j + 1, vvl
             Set vvl = Nothing
             vvl = Empty
         ElseIf s$ = mGroup Then
             vvl = -1
             Set vvl = CopyGroupObj(var(w3))
-            K.PokeItem j + 1, vvl
+            k.PokeItem j + 1, vvl
             Set vvl = Nothing
             vvl = Empty
         ElseIf s$ = mHdlr Then
             Set vvl = CopyHandlerObj(var(w3))
-            K.PokeItem j + 1, vvl
+            k.PokeItem j + 1, vvl
             Set vvl = Nothing
             vvl = Empty
         Else
-            K.PokeItem j + 1, var(w3)
+            k.PokeItem j + 1, var(w3)
         End If
     Else
         If w3 = 0 Then
@@ -28779,44 +29351,44 @@ For j = 2 To I * 2 + 1 Step 2
             Else
                 Set vvl = var(w3)
             End If
-            K.PokeItem j, b$(0) + ")"
-            K.PokeItem j + 1, vvl
+            k.PokeItem j, b$(0) + ")"
+            k.PokeItem j + 1, vvl
             Set vvl = Nothing
             vvl = Empty
         End If
     End If
-    BI = BI + 1
+    bi = bi + 1
 Next j
 With myGroup
-    K.PokeItem j, myGroup.LocalList
+    k.PokeItem j, myGroup.LocalList
     If nofunc Then
     Else
         If ChangedFunctionList(.FuncList) Then
-            K.PokeItem j + 1, GetFunctionList(.FuncList)
+            k.PokeItem j + 1, GetFunctionList(.FuncList)
         Else
             If .oldFuncRef <> vbNullString Then
-                K.PokeItem j + 1, .oldFuncRef
-                K.oldFuncRef = vbNullString
+                k.PokeItem j + 1, .oldFuncRef
+                k.oldFuncRef = vbNullString
             Else
-                K.PokeItem j + 1, GetFunctionList(.FuncList)
+                k.PokeItem j + 1, GetFunctionList(.FuncList)
             End If
         End If
     End If
-    K.HasStrValue = .HasStrValue
-    K.HasValue = .HasValue
-    K.HasSet = .HasSet
-    K.HasParameters = .HasParameters
-    K.HasParametersSet = .HasParametersSet
-    K.HasRemove = .HasRemove
-    Set K.SuperClassList = .SuperClassList
-    Set K.Events = .Events
-    K.highpriorityoper = .highpriorityoper
-    K.HasUnary = .HasUnary
-    K.PointerPtr = ObjPtr(mg)
-    K.ToDelete = False
-    Set K.mytypes = .mytypes
+    k.HasStrValue = .HasStrValue
+    k.HasValue = .HasValue
+    k.HasSet = .HasSet
+    k.HasParameters = .HasParameters
+    k.HasParametersSet = .HasParametersSet
+    k.HasRemove = .HasRemove
+    Set k.SuperClassList = .SuperClassList
+    Set k.Events = .Events
+    k.highpriorityoper = .highpriorityoper
+    k.HasUnary = .HasUnary
+    k.PointerPtr = ObjPtr(mg)
+    k.ToDelete = False
+    Set k.mytypes = .mytypes
 End With
-Set CopyGroupObj = K
+Set CopyGroupObj = k
 End Function
 
 
@@ -28824,19 +29396,19 @@ End Function
 Public Function CopyGroup0Obj(mg As Variant, usethisk As Variant) As Object
 Dim myGroup As Group, grgroup As Group
 Set myGroup = mg
-Dim Name$, K As Group, BI As Long, j As Long, s$, w3 As Long, w1 As Integer
+Dim Name$, k As Group, bi As Long, j As Long, s$, w3 As Long, w1 As Integer
 Dim b$(), vvl As Variant
 If TypeOf usethisk Is Group Then
-    Set K = usethisk
+    Set k = usethisk
 Else
-    Set K = New Group
+    Set k = New Group
 End If
 
-BI = 1
-If Not K.IamFloatGroup Then Exit Function
-    K.PokeItem 0, "Variables-Arrays"
+bi = 1
+If Not k.IamFloatGroup Then Exit Function
+    k.PokeItem 0, "Variables-Arrays"
     For j = 2 To myGroup.FieldsCount * 2 + 1 Step 2
-        b$() = Split(myGroup.ReadField(BI), " ")
+        b$() = Split(myGroup.ReadField(bi), " ")
         w3 = Abs(val(b$(1)))
         w1 = AscW(Right$(b$(0), 1))
         If w1 = 41 Then
@@ -28847,17 +29419,17 @@ If Not K.IamFloatGroup Then Exit Function
             If s$ = doc Then 'preserve Documents
             ElseIf s$ = mGroup Then
                 vvl = -1
-                K.PeekItem j + 1, vvl
+                k.PeekItem j + 1, vvl
                 CopyGroup0Obj var(val(b$(1))), vvl
                 Set vvl = Nothing
                 vvl = Empty
             ElseIf s$ = mHdlr Then
                 Set vvl = CopyHandlerObj(var(w3))
-                K.PokeItem j + 1, vvl
+                k.PokeItem j + 1, vvl
                 Set vvl = Nothing
                 vvl = Empty
             Else
-                K.PokeItem j + 1, var(w3)
+                k.PokeItem j + 1, var(w3)
             End If
     Else
         If w3 = 0 Then
@@ -28867,33 +29439,33 @@ If Not K.IamFloatGroup Then Exit Function
             Else
                 Set vvl = var(w3)
             End If
-            K.PokeItem j, b$(0) + ")"
-            K.PokeItem j + 1, vvl
+            k.PokeItem j, b$(0) + ")"
+            k.PokeItem j + 1, vvl
             Set vvl = Nothing
             vvl = Empty
         End If
     End If
-    BI = BI + 1
+    bi = bi + 1
 Next j
-Set CopyGroup0Obj = K
+Set CopyGroup0Obj = k
 
 End Function
 Public Function CopyGroup1(mg As Variant, usethisk As Variant) As Object
 Dim myGroup As Group, grgroup As Group
 Set myGroup = mg
-Dim Name$, K As Group, j As Long, s$, v As Variant, w3 As Long, w1 As Integer
+Dim Name$, k As Group, j As Long, s$, v As Variant, w3 As Long, w1 As Integer
 Dim b$(), vvl As Variant
 If TypeOf usethisk Is Group Then
-    Set K = usethisk
+    Set k = usethisk
 Else
-    Set K = New Group
+    Set k = New Group
 End If
-Dim BI As Long
-BI = 1
-If Not K.IamFloatGroup Then Exit Function
-K.PokeItem 0, "Variables-Arrays"
+Dim bi As Long
+bi = 1
+If Not k.IamFloatGroup Then Exit Function
+k.PokeItem 0, "Variables-Arrays"
 For j = 2 To myGroup.FieldsCount * 2 + 1 Step 2
-    b$() = Split(myGroup.ReadField(BI), " ")
+    b$() = Split(myGroup.ReadField(bi), " ")
     w3 = Abs(val(b$(1)))
     w1 = AscW(Right$(b$(0), 1))
     If w1 = 41 Then
@@ -28904,17 +29476,17 @@ For j = 2 To myGroup.FieldsCount * 2 + 1 Step 2
         If s$ = doc Then 'preserve Documents
         ElseIf s$ = mGroup Then
             vvl = -1
-            K.PeekItem j + 1, vvl
+            k.PeekItem j + 1, vvl
             Set CopyGroup1 = CopyGroup1(var(w3), vvl)
             Set vvl = Nothing
             vvl = Empty
         ElseIf s$ = mHdlr Then
             Set vvl = CopyHandlerObj(var(w3))
-            K.PokeItem j + 1, vvl
+            k.PokeItem j + 1, vvl
             Set vvl = Nothing
             vvl = Empty
         Else
-            K.PokeItem j + 1, var(w3)
+            k.PokeItem j + 1, var(w3)
         End If
     Else
         If w3 = 0 Then
@@ -28925,15 +29497,15 @@ For j = 2 To myGroup.FieldsCount * 2 + 1 Step 2
             Else
                 Set vvl = var(w3)
             End If
-            K.PokeItem j, b$(0) + ")"
-            K.PokeItem j + 1, vvl
+            k.PokeItem j, b$(0) + ")"
+            k.PokeItem j + 1, vvl
             Set vvl = Nothing
             vvl = Empty
         End If
     End If
-    BI = BI + 1
+    bi = bi + 1
 Next j
-Set CopyGroup1 = K
+Set CopyGroup1 = k
 End Function
 Sub UnFloatGroup(bstack As basetask, what$, I As Long, myobject1 As Object, Optional Glob As Boolean = False, Optional Temp As Boolean = False, Optional MakeNew As Boolean)
 Dim ThisGroup As Group, myobject As Group, it As Long
@@ -29653,7 +30225,7 @@ End Sub
 Function ChangedFunctionList(ByVal s$) As Boolean
 ChangedFunctionList = True
 Exit Function
-Dim C$, K$(), Final As Long
+Dim C$, k$(), Final As Long
 Do While s$ <> "" And Not ChangedFunctionList
 If ISSTRINGA(s$, C$) Then ChangedFunctionList = sbf(Abs(val(Split(C$, " ")(1)))).Changed
 Loop
@@ -29662,32 +30234,32 @@ End Function
 
 
 Function GetFunctionList(ByVal s$) As String
-Dim C$, f$, K$(), qq$, Final As Long, tmp$, oldl As Long, mtrim As Long
+Dim C$, f$, k$(), qq$, Final As Long, tmp$, oldl As Long, mtrim As Long
 Dim final2 As Long
 While s$ <> ""
 If ISSTRINGA(s$, C$) Then
-K$() = Split(C$, " ")
-Final = val(K$(1))
+k$() = Split(C$, " ")
+Final = val(k$(1))
 If Not Right$(sbf(Abs(Final)).sb, 2) = vbCrLf Then
 qq$ = vbCrLf
 End If
 final2 = Final < 0
-If Right$(K$(0), 1) = ")" Then
-If UBound(K$) = 2 Then
-f$ = "Function " + Mid$(K$(0), 2, Len(K$(0)) - 3) + " {" + sbf(Abs(Final)).sb + qq$ + "}" + ChrW(&H1FFD) + ChrW(&H1FFD) + f$
+If Right$(k$(0), 1) = ")" Then
+If UBound(k$) = 2 Then
+f$ = "Function " + Mid$(k$(0), 2, Len(k$(0)) - 3) + " {" + sbf(Abs(Final)).sb + qq$ + "}" + ChrW(&H1FFD) + ChrW(&H1FFD) + f$
 
 Else
 If final2 Then
-f$ = "Function " + Mid$(K$(0), 2, Len(K$(0)) - 3) + " {" + sbf(Abs(Final)).sb + qq$ + "}" + ChrW(&H1FFD) + f$
+f$ = "Function " + Mid$(k$(0), 2, Len(k$(0)) - 3) + " {" + sbf(Abs(Final)).sb + qq$ + "}" + ChrW(&H1FFD) + f$
 Else
-f$ = "Function " + Mid$(K$(0), 2, Len(K$(0)) - 3) + " {" + sbf(Abs(Final)).sb + qq$ + "}" + f$
+f$ = "Function " + Mid$(k$(0), 2, Len(k$(0)) - 3) + " {" + sbf(Abs(Final)).sb + qq$ + "}" + f$
 End If
 End If
 Else
 If final2 Then
-f$ = "Module " + Mid$(K$(0), 2, Len(K$(0)) - 1) + " {" + sbf(Abs(Final)).sb + qq$ + "}" + ChrW(&H1FFD) + f$
+f$ = "Module " + Mid$(k$(0), 2, Len(k$(0)) - 1) + " {" + sbf(Abs(Final)).sb + qq$ + "}" + ChrW(&H1FFD) + f$
 Else
-f$ = "Module " + Mid$(K$(0), 2, Len(K$(0)) - 1) + " {" + sbf(Abs(Final)).sb + qq$ + "}" + f$
+f$ = "Module " + Mid$(k$(0), 2, Len(k$(0)) - 1) + " {" + sbf(Abs(Final)).sb + qq$ + "}" + f$
 End If
 End If
 End If
@@ -29696,11 +30268,11 @@ Wend
 GetFunctionList = f$
 End Function
 Sub ResetFunctionList(s$)
-Dim C$, K$(), Final As Long
+Dim C$, k$(), Final As Long
 While s$ <> ""
 If ISSTRINGA(s$, C$) Then
-K$() = Split(C$, " ")
-Final = val(K$(1))
+k$() = Split(C$, " ")
+Final = val(k$(1))
 With sbf(Abs(Final))
 .sb = vbNullString
 .sbc = 0
@@ -29825,7 +30397,7 @@ If ByPass Then GoTo bye
 'unique = False
 
 '
-Dim ss$, W$, I As Long, nm$, nt$, CM$, nt1$, j As Long, K As Long, dropit As Long
+Dim ss$, W$, I As Long, nm$, nt$, CM$, nt1$, j As Long, k As Long, dropit As Long
 Dim s() As String, eGroup As Group
 Set eGroup = var(vvv)
       With eGroup
@@ -33242,7 +33814,7 @@ Exit Function
 
 End If
 ''bstack.Look2Parent = False
-Dim j As Long, K, s1$, klm As Long
+Dim j As Long, k, s1$, klm As Long
 Set oldbstack = bstack.soros
 Set oldstatic = bstack.StaticCollection
 
@@ -33400,7 +33972,7 @@ uIndex = uIndex + 1
 F1$ = gui.modulename
 bstack.soros.DataObj gui
 
-Dim j As Long, K As Long, s1$, klm As Long, S2$
+Dim j As Long, k As Long, s1$, klm As Long, S2$
 Dim ohere$
 ohere$ = here$
 here$ = "EV" & I
@@ -33480,7 +34052,7 @@ If A Is Nothing Then GoTo conthere0
 I = A.VarIndex
 F1$ = gui.modulename
 Set oldbstack = bstack.soros
-Dim j As Long, K As Long, s1$, klm As Long, S2$
+Dim j As Long, k As Long, s1$, klm As Long, S2$
 Dim ohere$
 ohere$ = here$
 here$ = "EV" & I
@@ -33490,17 +34062,17 @@ If f$ <> "" Then
 Set bb = New mStiva
 Set bstack.Sorosref = bb
             PushStage bstack, False
-            For K = LBound(vrs()) To UBound(vrs()) - 1
-            If VarType(vrs(K)) = vbString Then
-            globalvarGroup "EV" & (I + K) & "$", vrs(K)
-            bb.DataStr here$ & ".EV" & (I + K) & "$"
+            For k = LBound(vrs()) To UBound(vrs()) - 1
+            If VarType(vrs(k)) = vbString Then
+            globalvarGroup "EV" & (I + k) & "$", vrs(k)
+            bb.DataStr here$ & ".EV" & (I + k) & "$"
             Else
-            globalvarGroup "EV" & (I + K), vrs(K)
-            bb.DataStr here$ & ".EV" & (I + K)
+            globalvarGroup "EV" & (I + k), vrs(k)
+            bb.DataStr here$ & ".EV" & (I + k)
             End If
             
             
-            Next K
+            Next k
             bb.DataObj gui
              
             FastPureLabel aString$, f$, , , , , False
@@ -33535,16 +34107,16 @@ Set bstack.Sorosref = bb
                 GoTo conthere
             End If
                   here$ = "EV" & I
-       For K = LBound(vrs()) To UBound(vrs()) - 1
-        If VarType(vrs(K)) = vbString Then
-            GetlocalVar "EV" & (I + K) & "$", j
-            vrs(K) = var(j)
+       For k = LBound(vrs()) To UBound(vrs()) - 1
+        If VarType(vrs(k)) = vbString Then
+            GetlocalVar "EV" & (I + k) & "$", j
+            vrs(k) = var(j)
         Else
-            GetlocalVar "EV" & (I + K), j
-             vrs(K) = var(j)
+            GetlocalVar "EV" & (I + k), j
+             vrs(k) = var(j)
             End If
            
-            Next K
+            Next k
             PopStage bstack
 
             bb.Flush
@@ -36858,7 +37430,7 @@ End Function
 
 Function ProcProto(bstack As basetask, rest$, Lang As Long) As Boolean
 ProcProto = True
-Dim s$, W$, v As Long
+Dim s$, W$, v As Long, hastype As Boolean
 If FastSymbol(rest$, "{") Then
 s$ = block(rest$)
 If Right$(s$, 1) = " " Then
@@ -36877,22 +37449,26 @@ Exit Function
 End If
 If FastSymbol(rest$, "}", True) Then
     If IsLabelSymbolNew(rest$, "Ÿ”", "AS", Lang) Then
-        If FastPureLabel(rest$, W$, , , True) = 3 Then
+        v = FastPureLabel(rest$, W$, , , True)
+        If v = 3 Or v = 1 Then
             W$ = myUcase(W$, True)
-            
-            If GetVar(bstack, W$, v, True) Then
+            If GetVar(bstack, W$, v, True, , , , hastype) Then
+                
             GoTo cont1
             ElseIf GetlocalVar(W$, v) Then
+            hastype = varhash.vType(varhash.Index)
 cont1:
-             If CheckVarOnlyNo(var(v), s$) Then
+            
+            If CheckVarOnlyNo(var(v), s$, hastype) Then
                 If VarTypeName(var(v)) = "Constant" Then
                     CantAssignValue
-                Else
+                ElseIf LastErNum = 0 Then
                     NoObjectAssign
                 End If
                 ProcProto = False
                 Exit Function
             End If
+            
             Else
             v = globalvar(W$, v, , True)
             var(v) = s$
@@ -39485,7 +40061,7 @@ End Function
 
 Function ProcClass(basestack As basetask, rest$, Lang As Long, super As Boolean) As Boolean
 Dim I As Long, ss$, y1 As Long, what$, W$, ohere$, w2$, subs As Long, snames As Long, s$, pre$
-Dim K As Long, M As Long, once As Boolean, Skipfirsttype As Boolean, wt$
+Dim k As Long, M As Long, once As Boolean, Skipfirsttype As Boolean, wt$
 If super Then
     subs = sb2used: snames = subHash.count:
     Dim r As Variant
@@ -39550,17 +40126,17 @@ againhere:
                                     GoTo conterror
                                  Else
          
-                                    K = InStr(sbf(I).sb, vbCrLf)
+                                    k = InStr(sbf(I).sb, vbCrLf)
                                     M = rinstr(sbf(I).sb, vbCrLf + vbCrLf)
-                                    If M > K And Len(sbf(I).sb) > M Then
-                                        s$ = Mid$(sbf(I).sb, K + 2, M - K)
-                                        K = InStr(s$, "{")
-                                        If K > 0 Then
+                                    If M > k And Len(sbf(I).sb) > M Then
+                                        s$ = Mid$(sbf(I).sb, k + 2, M - k)
+                                        k = InStr(s$, "{")
+                                        If k > 0 Then
                                         
                                         If Lang = 1 Then
-                                            pre$ = block(Mid$(s$, K + 1)) + vbCrLf + "Public:" + vbCrLf + pre$
+                                            pre$ = block(Mid$(s$, k + 1)) + vbCrLf + "Public:" + vbCrLf + pre$
                                         Else
-                                            pre$ = block(Mid$(s$, K + 1)) + vbCrLf + "ƒ«Ãœ”…œ:" + vbCrLf + pre$
+                                            pre$ = block(Mid$(s$, k + 1)) + vbCrLf + "ƒ«Ãœ”…œ:" + vbCrLf + pre$
                                         End If
                                         GoTo againhere
                                         Else
@@ -39634,17 +40210,17 @@ againhere1:
                                     GoTo conterror
                                  Else
 
-                                    K = InStr(sbf(I).sb, vbCrLf)
+                                    k = InStr(sbf(I).sb, vbCrLf)
                                     M = rinstr(sbf(I).sb, vbCrLf + vbCrLf)
-                                    If M > K And Len(sbf(I).sb) > M Then
-                                        s$ = Mid$(sbf(I).sb, K + 2, M - K)
-                                        K = InStr(s$, "{")
-                                        If K > 0 Then
+                                    If M > k And Len(sbf(I).sb) > M Then
+                                        s$ = Mid$(sbf(I).sb, k + 2, M - k)
+                                        k = InStr(s$, "{")
+                                        If k > 0 Then
                                         
                                         If Lang = 1 Then
-                                            pre$ = block(Mid$(s$, K + 1)) + vbCrLf + "Public:" + vbCrLf + pre$
+                                            pre$ = block(Mid$(s$, k + 1)) + vbCrLf + "Public:" + vbCrLf + pre$
                                         Else
-                                            pre$ = block(Mid$(s$, K + 1)) + vbCrLf + "ƒ«Ãœ”…œ:" + vbCrLf + pre$
+                                            pre$ = block(Mid$(s$, k + 1)) + vbCrLf + "ƒ«Ãœ”…œ:" + vbCrLf + pre$
                                         End If
                                         GoTo againhere1
                                         Else
@@ -39733,9 +40309,11 @@ rest$ = Mid$(rest$, Len(s$) + 1)
 If FastSymbol(rest$, ")", True) Then
 If FastSymbol(rest$, "=", True) Then
 ss$ = vbNullString
+Dim ch As String
 Do
 I = 1
-aheadstatus rest$, False, I
+ch = aheadstatus(rest$, False, I)
+If Len(ch) = 0 Then SyntaxError: ProcDef = False: Exit Function
 ss$ = ss$ + Left$(rest$, I - 1)
 rest$ = Mid$(rest$, I)
 If Not FastSymbol(rest$, ",") Then Exit Do
@@ -39788,19 +40366,30 @@ I = 0
     that = CByte(0)
     ElseIf IsLabelSymbolNew(what$, "«Ã≈—œÃ«Õ…¡", "DATE", Lang, I) Then
     that = CDate(0)
+    '"Ã≈√¡Àœ”¡ ≈—¡…œ”", "BIGINTEGER",
+    ElseIf IsLabelSymbolNew(what$, "Ã≈√¡Àœ”¡ ≈—¡…œ”", "BIGINTEGER", Lang, I) Then
+    Set that = New BigInteger
     Else
     ByPass = True
     that = 0#
     GoTo jumpnow
     End If
     notypes0 = Not notypes
+    If MyIsObject(that) Then
+    Set first = that
+    Else
     first = that
+    End If
     ByPass = True
     notdefone = True
     notdef = True
     y1 = IsLabel(basestack, rest$, what$)
 jumpnow:
+    If MyIsObject(that) Then
+    Set oldthat = that
+    Else
     oldthat = that
+    End If
     Do While y1 < 5
     
     If ByPass Then
@@ -39835,6 +40424,9 @@ jumpnow:
                 that = CByte(0)
             ElseIf IsLabelSymbolNew(rest$, "«Ã≈—œÃ«Õ…¡", "DATE", Lang, I) Then
                 that = CDate(0)
+            ElseIf IsLabelSymbolNew(rest$, "Ã≈√¡Àœ”¡ ≈—¡…œ”", "BIGINTEGER", Lang, I) Then
+                Set that = New BigInteger
+                
             ElseIf Not IsEnumAs(basestack, rest$, that) Then
                 ExpectedEnumType
                 Exit Function
@@ -39848,9 +40440,6 @@ jumpnow:
     If VarType(that) = vbEmpty Then
     that = 0#
     End If
-    End If
-    If VarType(that) = vbString Then
-    If y1 = 1 Then what$ = what$ + "$"
     End If
     
     If Not lcl Then If GetlocalVar(what$, I) Then MyEr "Variable " + what$ + " already defined", "’‹Ò˜ÂÈ ﬁ‰Á Á ÏÂÙ·‚ÎÁÙﬁ " + what$: ProcDef = False: Exit Function
@@ -39874,17 +40463,27 @@ jumpnow:
         p = that
     End If
     If Not MyIsNumeric(that) Then
+        If MyIsObject(first) Then
+        Set that = first
+        ElseIf Not MyIsObject(that) Then
         that = first
+        ElseIf FastSymbol(rest$, "=") Then
+        GoTo cont11112
+        End If
     End If
 
     If FastSymbol(rest$, "=") Then
-    If notypes Then
+    
+    If notypes Or VarType(first) = vbString Then
+    If VarType(that) = vbDate Then GoTo cont11112
     If ISSTRINGA(rest$, ps$) Then
+        
         p = vbNullString
         SwapString2Variant ps$, p
         GoTo cont1023
     End If
     End If
+cont11112:
     If MyIsNumeric(p) Then
     
         If Not IsNumberD2(rest$, p, notdef And Not notypes, True) Then
@@ -39892,17 +40491,32 @@ jumpnow:
                 If ISSTRINGA(rest$, ps$) Then
                     p = CDate(ps$)
                 Else
+                    ProcDef = False
+                    missNumber
+                    Exit Function
+                End If
+            ElseIf ByPass And Not notdef Then
+            If ISSTRINGA(rest$, ps$) Then
+                    p = vbNullString
+                    SwapString2Variant ps$, p
+                Else
+                    ProcDef = False
                     missNumber
                     Exit Function
                 End If
             Else
-            missNumber
-            Exit Function
+                ProcDef = False
+                missNumber
+                Exit Function
             End If
             
         End If
             On Error Resume Next
-            that = oldthat
+            If MyIsObject(oldthat) Then
+                Set that = oldthat
+            Else
+                that = oldthat
+             End If
         If Err.Number > 0 Then
             If Err.Number = 6 Then
                 OverflowValue CInt(VarType(that))
@@ -39912,15 +40526,39 @@ jumpnow:
     End If
 cont1023:
     Else
-    If Not ISSTRINGA(rest$, ps$) Then missNumber: Exit Function
-        p = ps$
+    If Typename(p) = "BigInteger" Then
+    If ISSTRINGA(rest$, ps$) Then
+        Set p = Module13.CreateBigInteger(ps$)
+    ElseIf Not IsNumberD2(rest$, p, notdef And Not notypes, True) Then
+    ProcDef = False
+    SyntaxError
+    Exit Function
+    Else
+        Set p = Module13.CreateBigInteger(CStr(Int(p)))
     End If
-   
+    Else
+        If Not ISSTRINGA(rest$, ps$) Then
+            If VarType(first) = vbString Then
+            MissString
+            Else
+            missNumber
+            End If
+            ProcDef = False
+            Exit Function
+        End If
+    p = ""
+    SwapString2Variant ps$, p
+    End If
+   End If
     End If
     If MyIsObject(p) Then
     Set var(I) = p
     p = vbEmpty
-    that = oldthat
+    If MyIsObject(oldthat) Then
+        Set that = oldthat
+    Else
+        that = oldthat
+    End If
     ElseIf y1 = 4 Then
         var(I) = MyRound(p)
     Else
@@ -39930,10 +40568,12 @@ cont1023:
     DropCommentOrLine rest$
     y1 = IsLabel(basestack, rest$, what$)
     If MyIsObject(that) Then
-    Set that = Nothing
-    that = first
+        Set that = Nothing
+    End If
+    If MyIsObject(first) Then
+        Set that = first
     Else
-    that = first
+        that = first
     End If
     Loop
 End If
@@ -39943,7 +40583,16 @@ SyntaxError
 ProcDef = False
 Exit Function
 End If
-
+If ProcDef Then
+If Len(rest$) > 0 Then
+If Not MaybeIsSymbol(rest$, b1234) Then
+If Trim(rest$) <> "" Then
+PlaceAcommaBefore
+ProcDef = False
+End If
+End If
+End If
+End If
 End Function
 Function CheckTwoVal(A, b, C)
 CheckTwoVal = A = b Or A = C
@@ -40132,7 +40781,7 @@ Set myobject = Nothing
 End Function
 
 Function MyDim(basestack As basetask, rest$, Lang As Long, Optional ByVal dNew As Boolean, Optional ByVal fromthere As Long = 0) As Boolean
-Dim par As Boolean, pppp As mArray, it As Long, K As Long, usehandler As mHandler
+Dim par As Boolean, pppp As mArray, it As Long, k As Long, usehandler As mHandler
 Dim p As Variant, W$, s$, X As Variant, I As Long, f As Long, Reverse As Boolean, ss$, uselocalbase As Boolean, usethisbase As Long
 Dim oldbase As Long, common As Boolean, rest1$, zeroitem As Object
 
@@ -40221,8 +40870,8 @@ ArrBase = usethisbase
     
     End If
     
-    K = MyTrimL(rest$)
-    If Mid$(rest$, K, 1) = ")" Then Mid$(rest$, K, 1) = ChrW(8)
+    k = MyTrimL(rest$)
+    If Mid$(rest$, k, 1) = ")" Then Mid$(rest$, k, 1) = ChrW(8)
    If neoGetArray(basestack, W$, pppp, True, , , , , fromthere) And Not par Then
     If Not pppp.arr Then
     conflictname
@@ -40875,22 +41524,22 @@ Sub refreshGui()
 End Sub
 
 Sub MouseShow(Yes As Boolean)
-Dim K As Long, b1 As Boolean
+Dim k As Long, b1 As Boolean
 If Yes Then
-K = ShowCursor(True)
-k1 = K = -1
-If K < 0 Then
-K = ShowCursor(True)
-Do While K < 0
-If K = -1 And k1 Then Exit Sub ' no mouse found
-K = ShowCursor(True)
+k = ShowCursor(True)
+k1 = k = -1
+If k < 0 Then
+k = ShowCursor(True)
+Do While k < 0
+If k = -1 And k1 Then Exit Sub ' no mouse found
+k = ShowCursor(True)
 Loop
 End If
 Else
 
-K = ShowCursor(False)
-Do While K >= 0
-K = ShowCursor(False)
+k = ShowCursor(False)
+Do While k >= 0
+k = ShowCursor(False)
 Loop
 End If
 End Sub
@@ -40930,7 +41579,7 @@ Set bstack.StaticCollection = evCom.StaticCollection.ValueObj
 End If
 End If
 Set oldbstack = bstack.soros
-Dim j As Long, K As Long, s1$, S2$
+Dim j As Long, k As Long, s1$, S2$
 Dim ohere$
 ohere$ = here$
 here$ = vbNullString
@@ -40942,41 +41591,41 @@ Set bstack.Sorosref = bb
             If ItemIndex > -1 Then
                 bb.DataVal CVar(ItemIndex)
             End If
-            For K = 1 To NumVar
+            For k = 1 To NumVar
             'If VariantIsRef(VarPtr(vrs(k))) Then
-            If ref(K) Then
-            Select Case VarType(vrs(K))
+            If ref(k) Then
+            Select Case VarType(vrs(k))
             Case vbString
-            globalvarGroup "EV" & (I + K) & "$", vrs(K)
-            bb.DataStr "EV" & (I + K) & "$"
+            globalvarGroup "EV" & (I + k) & "$", vrs(k)
+            bb.DataStr "EV" & (I + k) & "$"
             Case Is >= vbArray
             ' make it normal
-            globalvarGroup "EV" & (I + K) & "(", RetM2000array(vrs(K))
-            bb.DataStr "EV" & (I + K)
+            globalvarGroup "EV" & (I + k) & "(", RetM2000array(vrs(k))
+            bb.DataStr "EV" & (I + k)
             Case Else
-            globalvarGroup "EV" & (I + K), vrs(K)
-            bb.DataStr "EV" & (I + K)
+            globalvarGroup "EV" & (I + k), vrs(k)
+            bb.DataStr "EV" & (I + k)
             End Select
             Else
-            Select Case VarType(vrs(K))
+            Select Case VarType(vrs(k))
             Case vbString
-            bb.DataStr CStr(vrs(K))
+            bb.DataStr CStr(vrs(k))
             Case Is >= vbArray
             ' make it normal
-                Set ohelp = RetM2000array(vrs(K))
+                Set ohelp = RetM2000array(vrs(k))
                 bb.DataObj ohelp
                 Set ohelp = Nothing
             Case Else
-                If MyIsObject(vrs(K)) Then
-                    Set ohelp = vrs(K)
+                If MyIsObject(vrs(k)) Then
+                    Set ohelp = vrs(k)
                     bb.DataObj ohelp
                     Set ohelp = Nothing
                 Else
-                    bb.DataVal vrs(K)
+                    bb.DataVal vrs(k)
                 End If
             End Select
             End If
-            Next K
+            Next k
             '''bb.DataObj evCom
             '' last is the second name, the class name??
             bb.DataStr (what$)
@@ -40999,22 +41648,22 @@ Set bstack.Sorosref = bb
             End If
                   here$ = vbNullString
                   If NumVar > 0 Then
-       For K = LBound(vrs()) To UBound(vrs()) - 1 + LBound(vrs())
-       If ref(K) Then
-       Select Case VarType(vrs(K))
+       For k = LBound(vrs()) To UBound(vrs()) - 1 + LBound(vrs())
+       If ref(k) Then
+       Select Case VarType(vrs(k))
        Case vbString
-            varhash.Find2 "EV" & (I + K) & "$", j, True
-           vrs(K) = var(j)
+            varhash.Find2 "EV" & (I + k) & "$", j, True
+           vrs(k) = var(j)
 
        Case Is >= vbArray
-            varhash.Find2 "EV" & (I + K) & "(", j, True
-            RetComArray var(j), vrs(K)
+            varhash.Find2 "EV" & (I + k) & "(", j, True
+            RetComArray var(j), vrs(k)
         Case Else
-            varhash.Find2 "EV" & (I + K), j, True
-             vrs(K) = var(j)
+            varhash.Find2 "EV" & (I + k), j, True
+             vrs(k) = var(j)
             End Select
            End If
-            Next K
+            Next k
             End If
             PopStage bstack
 
@@ -41996,11 +42645,11 @@ Else
 End If
 End Function
 Private Function compareStr4(A$, b$) As Long   ' here is not byval as in fastcollection
-Dim I As Long, j As Long, a1$, b1$, P1 As Variant, P2 As Variant, n$, K As Long, k1 As Long
+Dim I As Long, j As Long, a1$, b1$, P1 As Variant, P2 As Variant, n$, k As Long, k1 As Long
 If CompareString(Clid, &H1000, StrPtr(A$), Len(A$), StrPtr(b$), Len(b$)) = 2 Then Exit Function
 n$ = "[-0-9.]"
-K = Sgn(Len(A$) - Len(b$))
-k1 = K
+k = Sgn(Len(A$) - Len(b$))
+k1 = k
 again:
 j = IIf(Len(A$) >= Len(b$), Len(b$), Len(A$))
 
@@ -42016,7 +42665,7 @@ For I = 1 To j
             If compareStr4 = 0 Then
                 If Len(a1$) * Len(b1$) <> 0 Then
                     If Len(n$) > 6 Then n$ = "[-0-9]"
-                    K = Sgn(Len(a1$) - Len(b1$))
+                    k = Sgn(Len(a1$) - Len(b1$))
                      
                     A$ = a1$
                     b$ = b1$
@@ -42024,7 +42673,7 @@ For I = 1 To j
                     GoTo again
                 End If
                 If Len(a1$) + Len(b1$) = 0 Then
-                    compareStr4 = K
+                    compareStr4 = k
                 Else
                     compareStr4 = Sgn(Len(a1$) - Len(b1$))
                 End If
@@ -42042,7 +42691,7 @@ For I = 1 To j
                 Case 1, 3
                 compareStr4 = -1
                 Case 2
-                If K > 0 Then
+                If k > 0 Then
                 compareStr4 = -1
                 Else
                 compareStr4 = 1
@@ -42063,7 +42712,7 @@ For I = 1 To j
                 Case 3
                 compareStr4 = 1
                 Case 1, 2
-                If K < 0 Then
+                If k < 0 Then
                 compareStr4 = 1
                 Else
                 compareStr4 = -1

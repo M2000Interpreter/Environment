@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 ' Basetask is a module task of M2000
 ' This is a utility soros for passing parammeters to functions
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Public LoadOnly As Boolean, NoRun As Boolean
 Public CheckUnReferenceGui As Long
 Public callx1 As Long, tpointer As Long
@@ -86,7 +86,11 @@ Public SkipClear As Long
 Public Prof As clsProfiler
 Public modfuncall As Boolean
 Public restpart$
-
+Public Sub flatobject()
+If Not lastobj Is Nothing Then
+        If Not TypeOf lastobj Is BigInteger Then Set lastobj = Nothing
+End If
+End Sub
 
 Public Sub SetSkip()
     SkipClear = SkipClear + 1
@@ -283,13 +287,13 @@ If Not StaticCollection.Find(Name$) Then Exit Function
                 If ss$ = "++" Then
                         If usehandler.index_start < usehandler.objref.count - 1 Then
                             usehandler.index_start = usehandler.index_start + 1
-                            usehandler.objref.index = usehandler.index_start
+                            usehandler.objref.Index = usehandler.index_start
                             usehandler.index_cursor = usehandler.objref.Value
                         End If
         ElseIf ss$ = "--" Then
                     If usehandler.index_start > 0 Then
                             usehandler.index_start = usehandler.index_start - 1
-                            usehandler.objref.index = usehandler.index_start
+                            usehandler.objref.Index = usehandler.index_start
                             usehandler.index_cursor = usehandler.objref.Value
                         End If
         ElseIf ss$ = "-!" Then
@@ -949,10 +953,10 @@ ElseIf parentSoros.count = 0 Then
 End If
 End Function
 Public Function IsAny(r As Variant) As Boolean
-Dim T As VarItem
+Dim t As VarItem
 If parentSoros.count > 0 Then
-    Set T = parentSoros.StackPick(1)
-    T.GrabItem r
+    Set t = parentSoros.StackPick(1)
+    t.GrabItem r
     IsAny = True
 End If
 End Function

@@ -10720,7 +10720,7 @@ Module CompilerExample {
 	Refresh
 	Print "Lexical Analyzer" : Refresh
 	lexical_analyzer
-	if not islet then exitr
+	if not islet then exit
 	Print "Syntax Analyzer" : Refresh
 	syntax_analyzer
 	if not islet then exit
@@ -45740,5 +45740,377 @@ i=each(sz)
 While i {
       Mandelbrot 250*twipsx,100*twipsy, array(i)
 }
+}
+MODULE PREP {//https://rosettacode.org/wiki/Compiler/Simple_file_inclusion_pre_processor
+GLOBAL DEFINITIONS=QUEUE, FILESYSTEM=LIST, PROCESSED=LIST
+FUNCTION PREPROCESSOR$(DISK AS LIST, FILENAME$, LOCALDEF AS BOOLEAN=FALSE) {
+	DIM A$()
+	DEF COM$,COMNAME$, CLAUSE$, VAL$, IFCTRL$, LINES$, ONE$
+	DEF LONG L, DEFNUM
+	DEF BOOLEAN PROCESSLINE=TRUE
+	DOCUMENT LINES$
+	IF NOT LOCALDEF THEN
+		IF EXIST(PROCESSED, FILENAME$) THEN  EXIT
+		APPEND PROCESSED, FILENAME$		
+	END IF
+	PRINT "PROCESS FILE:";FILENAME$
+	
+	DEFNUM=LEN(DEFINITIONS)
+	A$()=PIECE$(DISK$(FILENAME$), CHR$(13)+CHR$(10))
+	FOR I=0 TO LEN(A$())-1
+		COM$=LTRIM$(FILTER$(A$(I), CHR$(9)))
+		IF LEFT$(COM$,1)="#" THEN
+			COM$=TRIM$(MID$(COM$,2))
+			DO L=LEN(COM$): COM$=REPLACE$("  "," ", COM$):WHEN L<LEN(COM$)
+			IF INSTR(COM$," ")>0 THEN
+				COMNAME$=UCASE$(PIECE$(COM$," ")(0))
+				IF COMNAME$="DEFINE" THEN
+				 	CLAUSE$=UCASE$(PIECE$(COM$," ")(1))
+					IF NOT EXIST(DEFINITIONS,CLAUSE$) THEN
+						VAL$=""
+						TRY {VAL$=PIECE$(COM$," ")(2)}
+						APPEND DEFINITIONS, CLAUSE$:=VAL$
+						' PRINT "DEFINE ";CLAUSE$;" ";VAL$
+					END IF
+				ELSE.IF COMNAME$="IF" THEN
+					IF PROCESSLINE THEN
+						CLAUSE$=UCASE$(PIECE$(COM$," ")(1))
+						IF EXIST(DEFINITIONS,CLAUSE$) THEN
+							PUSH "SKIP ELSE"
+						ELSE
+							PUSH "DO ELSE"
+							PROCESSLINE=FALSE
+						END IF
+					ELSE
+						PUSH "SKIP"
+					END IF
+				ELSE.IF COMNAME$="IFNOT" THEN
+					IF PROCESSLINE THEN
+						CLAUSE$=UCASE$(PIECE$(COM$," ")(1))
+						IF NOT EXIST(DEFINITIONS,CLAUSE$) THEN
+							PUSH "SKIP ELSE"
+						ELSE
+							PUSH "DO ELSE"
+							PROCESSLINE=FALSE
+						END IF
+					ELSE
+						PUSH "SKIP"
+					END IF
+				ELSE.IF COMNAME$="ELSEIF" THEN
+					IF EMPTY THEN ERROR "NO #IF PROCESSED YET"
+					IF NOT STACKITEM$(1)="SKIP" THEN
+						PROCESSLINE=STACKITEM$(1)="DO ELSE"
+						IF PROCESSLINE THEN
+							DROP
+							CLAUSE$=UCASE$(PIECE$(COM$," ")(1))
+							IF EXIST(DEFINITIONS,CLAUSE$) THEN
+								PUSH "SKIP ELSE"
+							ELSE
+								PUSH "DO ELSE"
+								PROCESSLINE=FALSE
+							END IF
+						END IF
+					END IF
+				ELSE.IF COMNAME$="ELSEIFNOT" THEN
+					IF EMPTY THEN ERROR "NO #IF PROCESSED YET"
+					IF NOT STACKITEM$(1)="SKIP" THEN
+						PROCESSLINE=STACKITEM$(1)="DO ELSE"
+						IF PROCESSLINE THEN
+							DROP
+							CLAUSE$=UCASE$(PIECE$(COM$," ")(1))
+							IF NOT EXIST(DEFINITIONS,CLAUSE$) THEN
+								PUSH "SKIP ELSE"
+							ELSE
+								PUSH "DO ELSE"
+								PROCESSLINE=FALSE
+							END IF
+						END IF
+					END IF
+				ELSE.IF COMNAME$="INCLUDELOCAL" THEN
+					IF PROCESSLINE THEN
+						CLAUSE$=UCASE$(PIECE$(COM$," ")(1))
+						IF EXIST(DISK, CLAUSE$) THEN
+								LINES$<=PREPROCESSOR$(DISK, CLAUSE$, TRUE)
+						ELSE
+							ERROR "FILE "+CLAUSE$+" NOT FOUND"
+						END IF
+					END IF				
+				ELSE.IF COMNAME$="INCLUDE" THEN
+					IF PROCESSLINE THEN
+						CLAUSE$=UCASE$(PIECE$(COM$," ")(1))
+						IF EXIST(DISK, CLAUSE$) THEN
+								LINES$<=PREPROCESSOR$(DISK, CLAUSE$, LOCALDEF)
+						ELSE
+							ERROR "FILE "+CLAUSE$+" NOT FOUND"
+						END IF
+					END IF
+				END IF
+			ELSE.IF COM$="ELSE" THEN
+				IF EMPTY THEN ERROR "NO #IF PROCESSED YET"
+				IF NOT STACKITEM$(1)="SKIP" THEN
+					PROCESSLINE=STACKITEM$(1)="DO ELSE"
+				END IF
+			ELSE.IF COM$="ENDIF" THEN
+				IF EMPTY THEN 	ERROR "#ENDIF NOT PROCESSED"				
+				DROP
+				IF NOT EMPTY THEN
+					IF NOT STACKITEM$(1)="SKIP" THEN
+						PROCESSLINE=STACKITEM$(1)="DO ELSE"
+					END IF
+				ELSE
+					PROCESSLINE=TRUE
+				END IF
+			ELSE
+				ERROR "UNKNOWN DIRECTIVE:"+COM$
+			END IF
+		ELSE.IF LEFT$(COM$,1)="'" OR LEFT$(COM$,1)="/" THEN
+			' NOTHING IT IS A REMARK
+		ELSE.IF PROCESSLINE AND TRIM$(A$(I))>"" THEN
+			ONE$=A$(I)
+			E=EACH(DEFINITIONS)
+			WHILE E
+				REP$=EVAL$(E)
+				IF REP$<>"" THEN
+					CLAUSE$=EVAL$(E!)  ' THE KEY NAME
+				 	ONE$=REPLACE$(CLAUSE$, "#"+(E^)+"#", ONE$)
+				END IF
+			END WHILE
+			E=EACH(DEFINITIONS)
+			WHILE E
+				REP$=EVAL$(E)
+				IF REP$<>"" THEN
+				 	ONE$=REPLACE$("#"+(E^)+"#",REP$, ONE$)
+				END IF
+			END WHILE
+			LINES$<=ONE$+{
+			}
+		END IF
+	NEXT I
+	// DROP ALL NEW DEFINITIONS  
+	IF LOCALDEF THEN DROP DEFINITIONS LEN(DEFINITIONS)-DEFNUM
+	=LINES$
+}
+PROTOTYPE {
+#DEFINE BBB
+#DEFINE ALFA 1000
+} AS FILE1$
+PROTOTYPE {
+#IF AAA
+PRINT "AAA EXIST"
+#ELSEIF BBB
+PRINT "BBB EXIST", ALFA
+#ELSE
+PRINT "NONE OF AAA AND BBB EXIST"
+#ENDIF
+} AS FILE2$
+PROTOTYPE {
+#DEFINE FILE4
+#DEFINE FILEOTHER
+#DEFINE YES
+#IF YES
+	#IFNOT FILEOTHER
+		#INCLUDE FILE1
+	#ELSE
+		#IF FILE4
+			#INCLUDE FILE4
+		#ENDIF
+		#INCLUDELOCAL FILE5
+	#ENDIF
+#ENDIF
+#INCLUDE FILE2
+} AS FILE3$
+PROTOTYPE {
+#DEFINE AAA
+} AS FILE4$
+PROTOTYPE {
+#DEFINE BBB
+#DEFINE ALFA 5000
+#IF YES
+	#INCLUDE FILE2
+#ENDIF
+} AS FILE5$
+DEFINITIONS<=QUEUE
+FILESYSTEM<=LIST
+PROCESSED<=LIST
+APPEND FILESYSTEM, "FILE1":=FILE1$, "FILE2":=FILE2$, "FILE3":=FILE3$
+APPEND FILESYSTEM, "FILE4":=FILE4$, "FILE5":=FILE5$
+REPORT PREPROCESSOR$(FILESYSTEM, "FILE3")
+}
+MODULE PEANO {Module Peano_curve {
+Form 60, 32
+Cls 1, 0
+Const Center=2
+Report Center, "Peano curve"
+let factor=.9, k=3, wi=k^4
+let wi2=min.data(scale.x*factor, scale.y*factor), n=wi2/wi
+let (dx, dy)=((scale.x-wi2)/2, (scale.y-wi2)/2)
+dx+=k*1.2*twipsX
+dy+=k*1.2*twipsY
+move dx, dy
+pen 11 {
+      Peano(0,0,wi,0, 0)
+}
+Push Key$: Drop
+CLS 5, 0:Pen 14:Print "Press F3"
+sub Peano(x, y, lg, i1, i2)
+      if lg ==1  then 
+            draw to  x*n+dx , y*n+dy
+            return
+      end if
+      lg/=k
+      Peano(x+2*i1*lg, y+2*i1*lg, lg, i1, i2)
+      Peano(x+(i1-i2+1)*lg, y+(i1+i2)*lg, lg, i1, 1-i2)
+      Peano(x+lg, y+lg, lg, i1, 1-i2)
+      Peano(x+(i1+i2)*lg, y+(i1-i2+1)*lg, lg, 1-i1, 1-i2)
+      Peano(x+2*i2*lg, y+2*(1-i2)*lg, lg, i1, i2)
+      Peano(x+(1+i2-i1)*lg, y+(2-i1-i2)*lg, lg, i1, i2)
+      Peano(x+2*(1-i1)*lg, y+2*(1-i1)*lg, lg, i1, i2)
+      Peano(x+(2-i1-i2)*lg, y+(1+i2-i1)*lg, lg, 1-i1, i2)
+      Peano(x+2*(1-i2)*lg, y+2*i2*lg, lg, 1-i1, i2)      
+end sub
+}
+Peano_curve
+}
+MODULE THREEPOINT {Module ThreePoints {
+	Form 30, 18
+	cls 7, 0
+	pen 0
+	Report 2, {Curve that touches three points}
+	cls 15, 1
+	pen 0
+	class point {
+		x, y
+	class:
+		module point(.x, .y) {
+		}
+	}
+	boolean VMirror=true
+	sc=twipsX*3
+	h=scale.x/8 
+	if VMirror then
+		sc1=-twipsY*3
+		v=scale.y*7/8
+	else
+		sc1=twipsY*3
+		v=scale.y/8
+	end if
+	
+	DrawAxis()
+	DrawCurve(point(10,10), point(220,180), point(300,60))
+	Push Key$: Drop
+	CLS 5, 0:Pen 14:Print "Press F3"
+	sub DrawCurve(p1 as point, p2 as point, p3 as point)
+		local a, b, c
+		local long xi, y1, minX, maxX
+		QuadraticCurve(p1,p2,p3,&a,&b,&c)
+		minX=Min(p1.x,p2.x)
+		minX=Min(minX,p3.x)
+		maxX=Max(p1.x,p2.x)
+		maxX=Max(maxX,p3.x)
+		move minX*sc+h,v+@CalcY(a,b,c,minX)*sc1
+		FOR xi=minX TO maxX
+	        width 2 {draw To xi*sc+h, v+@CalcY(a,b,c,xi)*sc1}
+		next
+		DrawPoint(1, p1)
+		DrawPoint(2, p2)
+		DrawPoint(3, p3)
+	end sub
+	Sub DrawPoint(n, p as point)
+		move p.x*sc+h,v+p.y*sc1	
+		width 2 {circle fill 15, mode*sc/3, 1, 2}
+		Pen 0 {legend str$(n,""),"ARIAL BLACK", mode*sc/3/twipsX,0, 2}
+	End Sub
+	Function CalcY(a, b, c, x)
+	    =int(a*x^2+b*x+c)
+	End Function
+	sub QuadraticCurve(p1 as point, p2 as point, p3 as point,&a,&b,&c)
+		local X11=p1.x*p1.x, X22=p2.x*p2.x, X33=p3.x*p3.x
+		local m=p1.x-p2.x, n=p3.x-p2.x
+		IF SGN(m*n)=-1 THEN m=-m
+		a=(n*(p1.y-p2.y)+m*(p3.y-p2.y))/(n*(X11-X22)+m*(X33-X22))
+		b=((p3.y-p2.y)-(X33-X22)*a)/(p3.x-p2.x)
+		c=p1.y-a*X11-b*p1.x
+	end sub
+	Sub DrawAxis()
+		Local i
+		Move -20*sc+h, v
+		for i=0 to 340 step 20
+			draw To i*sc+h, v
+			if i<10 then continue for
+			draw 0, -sc1*8
+			step 0, sc1*8
+		next i
+		i-=10
+		draw To i*sc+h, v
+		Move h, v-10*sc1 
+		for i=0 to 240 step 20
+			draw To h, v+i*sc1
+			if i<10 then continue for
+			draw -sc*8, 0
+			step  sc*8, 0
+		next i
+		i-=10
+		draw To h, v+i*sc1
+	End Sub
+}
+ThreePoints
+}
+MODULE BIGINT {bold 0
+form 60, 44
+a=848093284092840932840386876876876876892u
+b=3432402938402820840923809880009089u
+c=10000000000000000u
+Print "a="+a
+Print "b="+b
+Print "c="+c
+Print "a power b modules c (modpow(a,b,c)) = ";modpow(a,b,c)
+
+c=10000000000000000u*50000000000000u-123456
+z=c-1
+Print "c="+c
+Print "z="+z
+Print "c=z+1 is ";c=z+1  ' true
+Print "c*-1 is ";c*-1
+c=c*-1
+Print "Sgn(c) is ";Sgn(c)
+Print "Abs(c) is ";Abs(c)
+Print "Len of digitis plus minus of c is ";Len(Str$(c))
+c=Abs(c)
+Print "Square integer root of c = ";sqrt(c)
+d=c mod# 23423984798324292834u
+c=-abs(c)
+Print "Negate c: ";c
+Print "c mod# 23423984798324292834u (Euclid  modulus) = d ="
+Print d
+dd=c div# 4545545454545454545u
+Print "c div# 4545545454545454545u (Euclid  division) = dd ="
+print dd
+Print "Modulus ";mod(dd)
+Print "dd*4545545454545454545u+mod(dd)=c is ";dd*4545545454545454545u+mod(dd)=c
+dd=c div 4545545454545454545u
+
+Print "c div 4545545454545454545u  = dd ="
+print dd
+Print "Modulus ";mod(dd)
+Print "dd*4545545454545454545u+mod(dd)=c is ";dd*4545545454545454545u+mod(dd)=c
+Print "Using fix decimal point (on rendering)"
+for i=1 to 10
+	print format$("{0:6}", c+i*1e6)
+next
+s=Str$(c+i*1e6)
+print len(s)
+v=Val(format$("{0:6}@", c+i*1e6))
+print Type$(v)
+print "v=";v
+v++
+print "v=";v
+print "Assign decimal to BigInteger - conversion like w euse int()"
+c=v
+?c, type$(c)
+print "Assign decimal to BigInteger using ceil()"
+c=ceil(v)
+print c, type$(c)
+bold 1
+Print "Press F3"
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

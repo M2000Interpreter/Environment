@@ -21,7 +21,7 @@ Property Get LastRemainder()
     LastRemainder = CVar(sLastRemainder)
 End Property
 
-Public Function compare(sA As String, sb As String) As Integer
+Public Function compare(sA As String, sb As String, Optional absfirst) As Integer
     'Parameters are string integers of any length, for example "-345...", "973..."
     'Returns an integer that represents one of three states
     'sA > sB returns 1, sA < sB returns -1, and sA = sB returns 0
@@ -32,10 +32,17 @@ Public Function compare(sA As String, sb As String) As Integer
     Dim I As Long, iA As Long, iB As Long
     
     'handle any early exits on basis of signs
+    
     bAN = (LeftB$(sA, 1) = ChrB$(45))
+    If Not IsMissing(absfirst) Then
+        If bAN Then
+            MidB$(sA, 1, 1) = ChrB$(48)
+            bAN = False
+        End If
+    End If
     bBN = (LeftB$(sb, 1) = ChrB$(45))
-    If bAN Then sA = MidB$(sA, 2)
-    If bBN Then sb = MidB$(sb, 2)
+    If bAN Then MidB$(sA, 1, 1) = ChrB$(48)
+    If bBN Then MidB$(sb, 1, 1) = ChrB$(48)
     If bAN And bBN Then
         bRN = True
     ElseIf bBN Then
@@ -448,9 +455,11 @@ Public Function divide(sA As String, sb As String) As String
     If divide <> ChrB$(48) And bRN Then
         divide = ChrB$(45) + divide
     End If
-    
-    sLastRemainder = s 'string integer remainder
-
+    If bAN Then
+        sLastRemainder = ChrB$(45) + s
+    Else
+        sLastRemainder = s 'string integer remainder
+    End If
 End Function
 
 Public Function LastModulus() As String
@@ -596,7 +605,7 @@ Function IntStrByExp(sA As String, sExp As String) As String
     End If
 
 End Function
-Function IsProbablyPrime(sA As String, K As Integer) As Boolean
+Function IsProbablyPrime(sA As String, k As Integer) As Boolean
     If LenB(sA) < 1 Then Exit Function
     If LeftB$(sA, 1) = ChrB$(45) Then
         MyEr "Negative Prime not exist", "Αρνητικός πρώτος δεν υπάρχει"
@@ -617,7 +626,7 @@ Function IsProbablyPrime(sA As String, K As Integer) As Boolean
     Dim A As String, X As String, I As Long, j As Long
     
     IsProbablyPrime = True
-    For I = 1 To K
+    For I = 1 To k
         
         Do
             A = SpaceB(LenB(sA))

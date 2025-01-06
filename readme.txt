@@ -1,45 +1,35 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 59 active-X
+Version 12 Revision 60 active-X
 
-Update of the BigInteger
-Many things about BigInteger.
-We can make arrays.
-We can place them in expressions
-Any other numeric type converted to biginteger if a biginteger exist in expression (biginteger has priority over decimal).
-+-*/ div mod  (div and / work the same for bigintegers).
+1. Modulus of -25u div -7u return -4
+This is same as M2000 and VB6. I adjust the Rebecca Gabriella's String Math Module to the same as of M2000 mod function. Also I made the Euclid div# and mod# to work with bigintegers.
+2. Function mod(a) return the last modulus who stored to a:
+We get all prints (? is alias for Print statement)
 
+biginteger a=-25u div 7
+? a=-3, mod(a)=-4
+? 7*a+mod(a)=-25
+? type$(a)="BigInteger"
+m=mod(a)
+? type$(m)="BigInteger"
+biginteger a=-25u div# 7
+? a=-4, mod(a)=3
+? 7*a+mod(a)=-25
+? type$(a)="BigInteger"
+m=mod(a)
+? type$(m)="BigInteger"
+
+3. Operators: <, >, >=, >=, <>, =, ==, <=> works now for BigInteger
+
+4. For now we can do 2u^3u (internal 2u turn to decimal, and 2u turn to decimal too, and then perform the power operation, which return type double). Use modpow(a,b,c) for a^b mod c function on BigInteger.
+
+5. Sqrt() now work for BigInteger (Return integer square).
+
+6. Sgn() and Abs() also works for BigInteger too.
+
+See BigInt example in info file.
  
-1) ModPow()
-a=848093284092840932840386876876876876892u
-b=3432402938402820840923809880009089u
-c=10000000000000000u
-? modpow(a,b,c)
-2) Mod()  return the reminder.
-k=10203223230u
-a=k/4734u
-r=mod(a)
-? a*4734u+r
-? K, a, r
-3) Arrays/Declarations:
-c=121212u  ' so now c get literal bigInteger
-BigInteger a[10]=100, b=100
-Dim A(10, 30) as BigInteger
-
-4) Format$("{0:4:-40}", a) place decimal point so if a = 12345u we get 1.2345 in a field of 40 characters, right justification.
-
-5) Str$(c) return UTF16LE encoding string of the value of biginteger
-
-6) Using BigInteger(string, base) we can comvert from a base (2 to 36)
-
-7) Using With a, "outputbase" as a.base we can handle the output base. So a a.base=2 make the Print a to print a binary number.
-Also "characters"+a+"characters" can be done (automatic placed the toString value of bigInteger)
-8) We don't need to use ToString property because Print handle it.
-9) A=056u: A=100 (now numeric 100 convert to bigInteger)
-10) there is no ++ -- -= += *= /= (but some day....)
-11) Use compare function for a and b through:
-Method a,"compare", b as result
-Wait some days to find time to make the compare operators <,>,= etc.
 
 
 George Karras, Kallithea Attikis, Greece.

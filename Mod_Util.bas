@@ -8498,7 +8498,7 @@ End If
 
 End Function
 Public Function ExtractName(f$, Optional simple As Boolean = False) As String
-Dim I As Long, j As Long, K$
+Dim I As Long, j As Long, k$
 If f$ = vbNullString Then Exit Function
 If simple Then
 j = SimplePointPos(f$)
@@ -8507,7 +8507,7 @@ j = PointPos(f$)
 If j > Len(f$) Then j = Len(f$)
 End If
 If Mid$(f$, j, 1) = "." Then
-K$ = ExtractType(f$, j, simple)
+k$ = ExtractType(f$, j, simple)
 Else
 j = Len(f$)
 End If
@@ -8517,7 +8517,7 @@ Case Is < " ", "\", "/", ":"
 Exit For
 End Select
 Next I
-If K$ = vbNullString Then
+If k$ = vbNullString Then
 If Mid$(f$, I + j - I, 1) = "." Then
 ExtractName = mylcasefILE(Mid$(f$, I + 1, j - I - 1))
 Else
@@ -8525,7 +8525,7 @@ ExtractName = mylcasefILE(Mid$(f$, I + 1, j - I))
 
 End If
 Else
-ExtractName = mylcasefILE(Mid$(f$, I + 1, j - I)) + K$
+ExtractName = mylcasefILE(Mid$(f$, I + 1, j - I)) + k$
 End If
 
 'ExtractName = mylcasefILE(Trim$(Mid$(f$, I + 1, j - I)))
@@ -8935,10 +8935,10 @@ resp = MyAnyType(bstack, rest$, Lang, Len(here$) > 0, vbBoolean, True)
 Set bstack = Nothing
 End Sub
 Sub NeoDate(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
-Dim bstack As basetask, K As Long
+Dim bstack As basetask, k As Long
 
 Set bstack = ObjFromPtr(basestackLP)
-K = MyTrimL(rest$): If K > 1 Then rest$ = Mid$(rest$, K)
+k = MyTrimL(rest$): If k > 1 Then rest$ = Mid$(rest$, k)
 If CheckFreeExecute(rest$) Then
     SetDouble bstack.Owner
     resp = True
@@ -8949,10 +8949,10 @@ Set bstack = Nothing
 
 End Sub
 Sub NeoDouble(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
-Dim bstack As basetask, K As Long
+Dim bstack As basetask, k As Long
 
 Set bstack = ObjFromPtr(basestackLP)
-K = MyTrimL(rest$): If K > 1 Then rest$ = Mid$(rest$, K)
+k = MyTrimL(rest$): If k > 1 Then rest$ = Mid$(rest$, k)
 If CheckFreeExecute(rest$) Then
     SetDouble bstack.Owner
     resp = True
@@ -9355,15 +9355,15 @@ If j - I >= dl - 1 Then
 End If
 End Function
 
-Function Fast2Symbol(A$, C$, K As Long, D$, L As Long) As Boolean
+Function Fast2Symbol(A$, C$, k As Long, D$, L As Long) As Boolean
 Dim I As Long, j As Long
 j = Len(A$)
 If j = 0 Then Exit Function
 I = MyTrimL(A$)
 If I > j Then Exit Function
-If j - I >= K - 1 Then
-    If InStr(C$, Mid$(A$, I, K)) > 0 Then
-    A$ = Mid$(A$, MyTrimLi(A$, I + K))
+If j - I >= k - 1 Then
+    If InStr(C$, Mid$(A$, I, k)) > 0 Then
+    A$ = Mid$(A$, MyTrimLi(A$, I + k))
     Fast2Symbol = True
     Exit Function
     End If
@@ -9804,328 +9804,233 @@ Function IsBinaryNeg(bstack As basetask, A$, r As Variant) As Boolean
     End If
 End Function
 Function IsBinaryOr(bstack As basetask, A$, r As Variant) As Boolean
-        Dim p As Variant
-     If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-        If FastSymbol(A$, ",") Then
+Dim p As Variant
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    If FastSymbol(A$, ",") Then
         If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
             r = uintnew1(signlong2(r) Or signlong2(p))
-         IsBinaryOr = FastSymbol(A$, ")", True)
-           Else
-                
-                MissParam A$
+            IsBinaryOr = FastSymbol(A$, ")", True)
+            Exit Function
         End If
-          Else
-                MissParam A$
-       End If
-         Else
-                MissParam A$
-       End If
+    End If
+End If
+MissParam A$
 End Function
 Function IsBinaryAdd(bstack As basetask, A$, r As Variant) As Boolean
-    Dim p As Variant
-    On Error Resume Next
-    If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-       ' If VarType(R) = vbDecimal Then R = CCur(Int(R / 4294967296@))
-            If FastSymbol(A$, ",") Then
-                If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
-        '            If VarType(p) = vbDecimal Then p = CCur(Int(p / 4294967296@))
-                    
-                    r = add32(r, p)
-                    'If Err.Number Then R = add32(Int(R / 4294967296@), p): Err.Clear
-                    While FastSymbol(A$, ",")
-                    If Not IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
-                    'If VarType(p) = vbDecimal Then p = CCur(Int(p / 4294967296@))
-                    r = add32(r, p)
-                    'If Err.Number Then R = add32(R, Int(p / 4294967296@)): Err.Clear
-                    Wend
-                    r = uintnew1(LowLong(cInt64(CDec(r))))
-                    IsBinaryAdd = FastSymbol(A$, ")", True)
-                Else
-                    
-                    MissParam A$
-                End If
-            Else
-                
-                MissParam A$
-            End If
-        Else
-            
-            MissParam A$
-       
-       End If
+Dim p As Variant
+On Error Resume Next
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    If FastSymbol(A$, ",") Then
+        If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
+            r = add32(r, p)
+            While FastSymbol(A$, ",")
+                If Not IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
+                r = add32(r, p)
+            Wend
+            r = uintnew1(LowLong(cInt64(CDec(r))))
+            IsBinaryAdd = FastSymbol(A$, ")", True)
+            Exit Function
+        End If
+    End If
+End If
+MissParam A$
 End Function
 Function IsBinaryAnd(bstack As basetask, A$, r As Variant) As Boolean
-    Dim p As Variant
-    If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-            If FastSymbol(A$, ",") Then
-                If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
-                    r = uintnew1(signlong2(r) And signlong2(p))
-                    
-                    IsBinaryAnd = FastSymbol(A$, ")", True)
-                Else
-                    
-                    MissParam A$
-                End If
-            Else
-                
-                MissParam A$
+Dim p As Variant
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+        If FastSymbol(A$, ",") Then
+            If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
+                r = uintnew1(signlong2(r) And signlong2(p))
+                IsBinaryAnd = FastSymbol(A$, ")", True)
+                Exit Function
             End If
-        Else
-            
-            MissParam A$
-       
-       End If
+        End If
+    End If
+MissParam A$
 End Function
 Function IsBinaryXor(bstack As basetask, A$, r As Variant) As Boolean
-    Dim p As Variant
-        If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-            If FastSymbol(A$, ",") Then
-                If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
-                    r = uintnew1(signlong2(r) Xor signlong2(p))
-                    
-                    IsBinaryXor = FastSymbol(A$, ")", True)
-                Else
-                    
-                    MissParam A$
-                End If
-            Else
-                
-                MissParam A$
-            End If
-        Else
-            
-            MissParam A$
-       
-       End If
+Dim p As Variant
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    If FastSymbol(A$, ",") Then
+        If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
+            r = uintnew1(signlong2(r) Xor signlong2(p))
+            IsBinaryXor = FastSymbol(A$, ")", True)
+            Exit Function
+        End If
+    End If
+End If
+MissParam A$
 End Function
 Function IsBinaryShift(bstack As basetask, A$, r As Variant) As Boolean
 Dim p As Variant
-   If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-  
-            If FastSymbol(A$, ",") Then
-                    If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
-                    If p > 31 Or p < -31 Then
-                         
-                         MyErMacro A$, "Shift from -31 to 31", "Ολίσθηση από -31 ως 31"
-                         IsBinaryShift = False: Exit Function
-                         Else
-                               If p > 0 Then
-                              
-                                 r = CCur((signlong(r) And signlong(Pow2minusOne(32 - p))) * Pow2(p))
-                              
-                              ElseIf p = 0 Then
-                                r = CCur(r)
-                              Else
-                                    
-                                 r = CCur(Int(CCur(r) / Pow2(-p)))
-                              End If
-                              
-                            IsBinaryShift = FastSymbol(A$, ")", True)
-                    Exit Function
-                         End If
-                    Else
-                          
-                        MissParam A$
-                    End If
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+     If FastSymbol(A$, ",") Then
+         If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
+            If p > 31 Or p < -31 Then
+                MyErMacro A$, "Shift from -31 to 31", "Ολίσθηση από -31 ως 31"
+                IsBinaryShift = False: Exit Function
             Else
-                
-                MissParam A$
+                If p > 0 Then
+                    r = CCur((signlong(r) And signlong(Pow2minusOne(32 - p))) * Pow2(p))
+                ElseIf p = 0 Then
+                    r = CCur(r)
+                Else
+                    r = CCur(Int(CCur(r) / Pow2(-p)))
+                End If
+                IsBinaryShift = FastSymbol(A$, ")", True)
+                Exit Function
             End If
-    Else
-            
-            MissParam A$
-   End If
-
+        End If
+    End If
+End If
+MissParam A$
 End Function
 Function IsBinaryRotate(bstack As basetask, A$, r As Variant) As Boolean
 Dim p As Variant
-        If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-             If FastSymbol(A$, ",") Then
-                 If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
-                        If p > 31 Or p < -31 Then
-                            
-                              MyErMacro A$, "Rotation from -31 to 31", "Περιστοφή από -31 ως 31"
-                             IsBinaryRotate = False: Exit Function
-                        Else
-                             If p > 0 Then
-                          
-                                 r = CCur((signlong(r) And signlong(Pow2minusOne(32 - p))) * Pow2(p) + Int(CCur(r) / Pow2(32 - p)))
-                             ElseIf p = 0 Then
-                                 r = CCur(r)
-                             Else
-                          
-                                 r = CCur((signlong(r) And signlong(Pow2minusOne(-p))) * Pow2(32 + p) + Int(CCur(r) / Pow2(-p)))
-                             End If
-                        End If
-                     
-                  Else
-                    
-                    MissParam A$
-                 End If
-             Else
-                
-                MissParam A$
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    If FastSymbol(A$, ",") Then
+        If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
+            If p > 31 Or p < -31 Then
+                MyErMacro A$, "Rotation from -31 to 31", "Περιστοφή από -31 ως 31"
+                IsBinaryRotate = False: Exit Function
+            Else
+                If p > 0 Then
+                    r = CCur((signlong(r) And signlong(Pow2minusOne(32 - p))) * Pow2(p) + Int(CCur(r) / Pow2(32 - p)))
+                ElseIf p = 0 Then
+                    r = CCur(r)
+                Else
+                    r = CCur((signlong(r) And signlong(Pow2minusOne(-p))) * Pow2(32 + p) + Int(CCur(r) / Pow2(-p)))
+                End If
+                IsBinaryRotate = FastSymbol(A$, ")", True)
+                Exit Function
             End If
-        IsBinaryRotate = FastSymbol(A$, ")", True)
-        Else
-            
-            MissParam A$
         End If
-End Function
-Function IsSin(bstack As basetask, A$, r As Variant) As Boolean
-   If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-       r = sIn(r * 1.74532925199433E-02)
-    ''r = Sgn(r) * Int(Abs(r) * 10000000000000#) / 10000000000000#
-    If Abs(r) < 0.00000000000001 Then r = 0#
-    
-    
-    
- IsSin = FastSymbol(A$, ")", True)
-    Else
-                
-                MissParam A$
-    
     End If
+End If
+MissParam A$
+End Function
+
+Function IsSin(bstack As basetask, A$, r As Variant) As Boolean
+If IsExpBig(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    r = sIn(r * 1.74532925199433E-02)
+    If Abs(r) < 0.00000000000001 Then r = 0#
+    IsSin = FastSymbol(A$, ")", True)
+Else
+    MissParam A$
+End If
 End Function
 Function IsAbs(bstack As basetask, A$, r As Variant) As Boolean
-If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-    r = Abs(r)
-    
-    
- IsAbs = FastSymbol(A$, ")", True)
+Dim bi As BigInteger
+If IsExpBig(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    If bstack.lastobj Is Nothing Then
+        r = Abs(r)
     Else
-                MissParam A$
+        Set bi = bstack.lastobj
+        Set bstack.lastobj = bi.bAbs()
     End If
+    IsAbs = FastSymbol(A$, ")", True)
+Else
+    MissParam A$
+End If
 End Function
 
 Function IsCos(bstack As basetask, A$, r As Variant) As Boolean
-  If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
     r = Cos(r * 1.74532925199433E-02)
     If Abs(r) < 0.00000000000001 Then r = 0#
-    'If Abs(R) < 1E-16 Then R = 0
-    
-    
-    
-  IsCos = FastSymbol(A$, ")", True)
-    Else
-                
-                MissParam A$
-    
-    End If
+    IsCos = FastSymbol(A$, ")", True)
+Else
+    MissParam A$
+End If
 End Function
 Function IsTan(bstack As basetask, A$, r As Variant) As Boolean
 If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-     
-     'If R = Int(R) Then
-     '   If R Mod 90 = 0 And R Mod 180 <> 0 Then
-     '   MyErMacro a$, "Wrong Tan Parameter", "Λάθος παράμετρος εφαπτομένης"
-     '  IsTan = False: Exit Function
-      '  End If
-      '  End If
     r = Sgn(r) * Tan(r * 1.74532925199433E-02)
-
-     If Abs(r) < 1E-16 Then r = 0
-     If Abs(r) < 1 And Abs(r) + 0.0000000000001 >= 1 Then r = Sgn(r)
-   
-    
-IsTan = FastSymbol(A$, ")", True)
-     Else
-                
-                MissParam A$
-    
-    End If
+    If Abs(r) < 1E-16 Then r = 0
+    If Abs(r) < 1 And Abs(r) + 0.0000000000001 >= 1 Then r = Sgn(r)
+    IsTan = FastSymbol(A$, ")", True)
+Else
+    MissParam A$
+End If
 End Function
 Function IsAtan(bstack As basetask, A$, r As Variant) As Boolean
- If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-     
-     r = Atn(r) * 180# / PI
-        
-IsAtan = FastSymbol(A$, ")", True)
-     Else
-                
-                MissParam A$
-    
-    End If
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    r = Atn(r) * 180# / PI
+    IsAtan = FastSymbol(A$, ")", True)
+Else
+    MissParam A$
+End If
 End Function
 Function IsLn(bstack As basetask, A$, r As Variant) As Boolean
-  If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
     If r <= 0 Then
-       MyErMacro A$, "Only > zero parameter", "Μόνο >0 παράμετρος"
+        MyErMacro A$, "Only > zero parameter", "Μόνο >0 παράμετρος"
         IsLn = False: Exit Function
     Else
-    r = Log(r)
-    
+        r = Log(r)
     End If
-    
- IsLn = FastSymbol(A$, ")", True)
-     Else
-                
-                MissParam A$
-    
-    End If
+    IsLn = FastSymbol(A$, ")", True)
+Else
+    MissParam A$
+End If
 End Function
 Function IsLog(bstack As basetask, A$, r As Variant) As Boolean
 If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-        If r <= 0 Then
-       MyErMacro A$, "Only > zero parameter", "Μόνο >0 παράμετρος"
+    If r <= 0 Then
+        MyErMacro A$, "Only > zero parameter", "Μόνο >0 παράμετρος"
         IsLog = False: Exit Function
     Else
-    r = Log(r) / 2.30258509299405
-    
+        r = Log(r) / 2.30258509299405
     End If
-   IsLog = FastSymbol(A$, ")", True)
-    Else
-                
-                MissParam A$
-    
-    End If
+    IsLog = FastSymbol(A$, ")", True)
+Else
+    MissParam A$
+End If
 End Function
 Function IsFreq(bstack As basetask, A$, r As Variant) As Boolean
 Dim p As Variant
-    If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-           If FastSymbol(A$, ",") Then
-                If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
-                    r = GetFrequency(CInt(r), CInt(p))
-                    
-                    IsFreq = FastSymbol(A$, ")", True)
-                    Else
-                
-                MissParam A$
-                End If
-            Else
-                
-                MissParam A$
-            End If
-     Else
-                
-                MissParam A$
-     End If
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    If FastSymbol(A$, ",") Then
+        If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
+            r = GetFrequency(CInt(r), CInt(p))
+            IsFreq = FastSymbol(A$, ")", True)
+        Else
+            MissParam A$
+        End If
+    Else
+        MissParam A$
+    End If
+Else
+    MissParam A$
+End If
 End Function
 Function IsSqrt(bstack As basetask, A$, r As Variant) As Boolean
-    If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
-    
-    If r < 0 Then
-    negsqrt A$
-    Exit Function
-   
-    End If
-  
-    r = Sqr(r)
-    
-    
-   IsSqrt = FastSymbol(A$, ")", True)
+Dim bi As BigInteger
+If IsExpBig(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    If bstack.lastobj Is Nothing Then
+        If r < 0 Then
+            negsqrt A$
+            Exit Function
+        End If
+        r = Sqr(r)
     Else
-                
-                MissParam A$
-    
+        Set bi = bstack.lastobj
+        If bi.bSgn < 0 Then
+            negsqrt A$
+            Exit Function
+        End If
+        Set bstack.lastobj = bi.IntSqr
     End If
+    IsSqrt = FastSymbol(A$, ")", True)
+Else
+    MissParam A$
+End If
 End Function
 Function GiveForm() As Form
 If Form1.Visible Then
-Set GiveForm = Form1
+    Set GiveForm = Form1
 Else
-Set GiveForm = Form3
+    Set GiveForm = Form3
 End If
 End Function
 Function IsNumberD(A$, D As Double) As Boolean
@@ -11341,15 +11246,20 @@ cont1:
                         Set bstack.lastobj = Nothing
                     End If
                     If myVarType(p, vbString) Then
-                    SwapString2Variant q$, p
-                    'GoTo fromboolean
+                        SwapString2Variant q$, p
+                    
                     End If
                     If MemInt(VarPtr(p)) = vbBoolean Then
-                    q$ = Format$(p, DefBooleanString)
-                    'GoTo fromboolean
+                        q$ = Format$(p, DefBooleanString)
+                    
                     End If
 again1:
                     pl2 = InStr(pl2, Final$, pat1$)
+                    If pl2 = 0 Then
+                        If Len(q$) > 0 And MemInt(VarPtr(p)) = vbString Then
+                        SwapString2Variant q$, p
+                        End If
+                    End If
 again11:
                     If pl2 > 0 Then
                     pl1 = InStr(pl2, Final$, "}")
@@ -11430,6 +11340,7 @@ cont5534:
                     If pl2 > 0 Then GoTo again11
                     If InStr(Final$, pat$) > 0 Then GoTo cont7747
                 Else
+                    
 cont7747:
                     Select Case MemInt(VarPtr(p))
                     Case vbLong, vbInteger, vbByte, 20
@@ -12930,7 +12841,7 @@ If IsExp(bstack, A$, p) Then
                     fMatrix = True
                     original = original + 1
                     Set bstack.lastobj = r
-                    GoTo abcdef
+                    GoTo ABCDEF
                 End If
                 End If
             End If
@@ -12942,7 +12853,7 @@ If IsExp(bstack, A$, p) Then
         fMatrix = False
         Exit Function
     End If
-abcdef:
+ABCDEF:
 Else
     MyEr "missing a lambda function", "λείπει μια λάμδα συνάρτηση"
     fMatrix = False
@@ -18669,6 +18580,8 @@ With players(prive)
                                 Set usegroup = Nothing
                             ElseIf TypeOf var(h&) Is PropReference Then
                                 s$ = s$ + "." + var(h&).ObjectType
+                            ElseIf TypeOf var(h&) Is BigInteger Then
+                                s$ = s$ + var(h&).Pack
                             Else
                                 s$ = s$ + "*" + VarTypeNameList(var(h&))
                             End If
@@ -19042,7 +18955,7 @@ End With
 End Sub
 Function ProcSave(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim pa$, W$, s$, Col As Long, prg$, x1 As Long, par As Boolean, I As Long, noUse As Long, lcl As Boolean
-Dim askme As Boolean, K As Long, M As Long
+Dim askme As Boolean, k As Long, M As Long
 If lckfrm <> 0 Then MyEr "Save is locked", "Η αποθήκευση είναι κλειδωμένη": rest$ = vbNullString: Exit Function
 lcl = IsLabelSymbolNew(rest$, "ΤΟΠΙΚΑ", "LOCAL", Lang) Or basestack.IamChild Or basestack.IamAnEvent
 
@@ -19083,10 +18996,10 @@ If x1 <> 0 Then
                                 If Not blockCheck(sbf(Col).sb, DialogLang, noUse, "Function " + s$ + "()" + vbCrLf) Then Exit Function
                                 If sbf(Col).IamAClass Then
 
-                                K = InStr(sbf(Col).sb, vbCrLf)
+                                k = InStr(sbf(Col).sb, vbCrLf)
                                 M = rinstr(sbf(Col).sb, vbCrLf + vbCrLf)
-                                K = InStr(K + 1, sbf(Col).sb, "{")
-                                prg$ = "CLASS " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, K + 3, M - K - 3) + vbCrLf + prg$
+                                k = InStr(k + 1, sbf(Col).sb, "{")
+                                prg$ = "CLASS " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, k + 3, M - k - 3) + vbCrLf + prg$
                                
                                
                                 Else
@@ -19100,10 +19013,10 @@ If x1 <> 0 Then
                         Else
                                 If Not blockCheck(sbf(Col).sb, DialogLang, noUse, "Συνάρτηση " + s$ + "()" + vbCrLf) Then Exit Function
                                 If sbf(Col).IamAClass Then
-                                K = InStr(sbf(Col).sb, vbCrLf)
+                                k = InStr(sbf(Col).sb, vbCrLf)
                                 M = rinstr(sbf(Col).sb, vbCrLf + vbCrLf)
-                                K = InStr(K + 1, sbf(Col).sb, "{")
-                                prg$ = "ΚΛΑΣΗ " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, K + 3, M - K - 3) + vbCrLf + prg$
+                                k = InStr(k + 1, sbf(Col).sb, "{")
+                                prg$ = "ΚΛΑΣΗ " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, k + 3, M - k - 3) + vbCrLf + prg$
                                 Else
                                 prg$ = s$ + " {" + sbf(Col).sb + "}" + vbCrLf + prg$
                                 If lcl Then
@@ -25691,7 +25604,7 @@ End If
     Else
       
        Set ObjectCatalog = New FastCollection
-       Dim cr As New cRegistry, first$, K As Long
+       Dim cr As New cRegistry, first$, k As Long
        Dim bFoundExeSect As Boolean, ss$, mmdir As New recDir
        '' some code here are copies from VbScriptEditor
        '' http://www.codeproject.com/Articles/19986/VbScript-Editor-With-Intellisense
@@ -26820,9 +26733,15 @@ ex1:
                                  Exit Function
                             End If
                         ElseIf thattype = vbObject Then
-                        Stop
-                        
-                           ' if typename(var(i))
+                            If TypeOf var(I) Is BigInteger Then
+                            If IsExp(basestack, rest$, p, , True) Then
+                             SwapString2Variant s$, CStr(Int(p))
+                            ElseIf Not IsStrExp(basestack, rest$, s$, False) Then
+                               SyntaxError
+                               GoTo ex1
+                            End If
+                            Set var(I) = Module13.CreateBigInteger(s$)
+                            End If
                         Else
                             MissNumExpr
                             MyAnyType = False
@@ -28149,14 +28068,14 @@ UserName = C$
 End Function
 Function IsDimension(bstack As basetask, A$, r As Variant) As Boolean
 Dim s$, pppp As mArray, ppppAny As iBoxArray, w1 As Long, p As Variant, anything As Object, pp As Variant, usehandler As mHandler
-Dim K As Long
-K = Abs(IsLabel(bstack, A$, s$))
+Dim k As Long
+k = Abs(IsLabel(bstack, A$, s$))
 Set bstack.lastobj = Nothing
-If K > 4 And K < 8 Then
+If k > 4 And k < 8 Then
 If neoGetArray(bstack, s$, ppppAny) Then
 If ppppAny.arr Then
 If FastSymbol(A$, ")") Then
-    If K = 6 Then
+    If k = 6 Then
         IsStrExp bstack, s$ + ")", s$
     Else
         IsNumber bstack, s$ + ")", p
@@ -28164,7 +28083,7 @@ If FastSymbol(A$, ")") Then
 Else
 bstack.tmpstr = s$ + Left$(A$, 1)
   BackPort A$
-    If K = 6 Then
+    If k = 6 Then
         IsStrExp bstack, A$, s$
     Else
         IsNumber bstack, A$, p
@@ -28815,18 +28734,18 @@ Else
 End If
 End Function
 Function createAnobject(bstack As basetask, b$) As Boolean
-Dim s$, s1$, K As Integer, ob
+Dim s$, s1$, k As Integer, ob
 Set ob = Nothing
 If IsStrExp(bstack, b$, s$) Then
-K = 1
+k = 1
 End If
 If FastSymbol(b$, ",") Then
     If IsStrExp(bstack, b$, s1$) Then
-    K = K + 10
+    k = k + 10
     End If
 End If
 If FastSymbol(b$, ")") Then
-    Select Case K
+    Select Case k
     Case 1
         GetitObject ob, s$
     Case 10
@@ -29343,7 +29262,7 @@ Dim I As Long
 I = evCom.VarIndex
 F1$ = evCom.modulename
 Set oldbstack = bstack.soros
-Dim j As Long, K As Long, s1$, S2$
+Dim j As Long, k As Long, s1$, S2$
 Dim ohere$
 ohere$ = here$
 here$ = vbNullString
@@ -29355,40 +29274,40 @@ Set bstack.Sorosref = bb
             If ItemIndex > -1 Then
                 bb.DataVal CVar(ItemIndex)
             End If
-            For K = 1 To NumVar
-            If VariantIsRef(VarPtr(vrs(K))) Then
-            Select Case VarType(vrs(K))
+            For k = 1 To NumVar
+            If VariantIsRef(VarPtr(vrs(k))) Then
+            Select Case VarType(vrs(k))
             Case vbString
-            globalvarGroup "EV" & (I + K) & "$", vrs(K)
-            bb.DataStr "EV" & (I + K) & "$"
+            globalvarGroup "EV" & (I + k) & "$", vrs(k)
+            bb.DataStr "EV" & (I + k) & "$"
             Case Is >= vbArray
             ' make it normal
-            globalvarGroup "EV" & (I + K) & "(", RetM2000array(vrs(K))
-            bb.DataStr "EV" & (I + K)
+            globalvarGroup "EV" & (I + k) & "(", RetM2000array(vrs(k))
+            bb.DataStr "EV" & (I + k)
             Case Else
-            globalvarGroup "EV" & (I + K), vrs(K)
-            bb.DataStr "EV" & (I + K)
+            globalvarGroup "EV" & (I + k), vrs(k)
+            bb.DataStr "EV" & (I + k)
             End Select
             Else
-            Select Case VarType(vrs(K))
+            Select Case VarType(vrs(k))
             Case vbString
-            bb.DataStr CStr(vrs(K))
+            bb.DataStr CStr(vrs(k))
             Case Is >= vbArray
             ' make it normal
-                Set ohelp = RetM2000array(vrs(K))
+                Set ohelp = RetM2000array(vrs(k))
                 bb.DataObj ohelp
                 Set ohelp = Nothing
             Case Else
-                If MyIsObject(vrs(K)) Then
-                    Set ohelp = vrs(K)
+                If MyIsObject(vrs(k)) Then
+                    Set ohelp = vrs(k)
                     bb.DataObj ohelp
                     Set ohelp = Nothing
                 Else
-                    bb.DataVal vrs(K)
+                    bb.DataVal vrs(k)
                 End If
             End Select
             End If
-            Next K
+            Next k
             '''bb.DataObj evCom
             '' last is the second name, the class name??
             bb.DataStr what$
@@ -29411,21 +29330,21 @@ Set bstack.Sorosref = bb
             End If
                   here$ = vbNullString
                   If NumVar > 0 Then
-       For K = LBound(vrs()) To UBound(vrs()) - 1
-       Select Case VarType(vrs(K))
+       For k = LBound(vrs()) To UBound(vrs()) - 1
+       Select Case VarType(vrs(k))
        Case vbString
-            GetlocalVar "EV" & (I + K) & "$", j
-            vrs(K) = var(j)
+            GetlocalVar "EV" & (I + k) & "$", j
+            vrs(k) = var(j)
        Case Is >= vbArray
-            GetlocalVar "EV" & (I + K) & "(", j
-            RetComArray var(j), vrs(K)
+            GetlocalVar "EV" & (I + k) & "(", j
+            RetComArray var(j), vrs(k)
        
         Case Else
-            GetlocalVar "EV" & (I + K), j
-             vrs(K) = var(j)
+            GetlocalVar "EV" & (I + k), j
+             vrs(k) = var(j)
             End Select
            
-            Next K
+            Next k
             End If
             PopStage bstack
 
