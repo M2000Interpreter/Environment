@@ -2167,7 +2167,7 @@ somethingelse:
                             DevZero
                             GoTo err000
                         End If
-                        If Not readvarvLong(var(v), ss$, p) Then
+                        If Not readvarvLong(v, ss$, p) Then
                             WrongOperator
                         End If
                     Else
@@ -4935,7 +4935,18 @@ st9993993:
                                         End If
                                         End If
                                         Ar.PlaceValue2UDT I, p, ss$, sp
+                                        Else
                                         
+                                        v = Ar(CVar(I), p)
+                                        If IsExp(bstack, b$, sp) Then
+                                            If Not readvarv(v, ss$, sp) Then
+                                                ExecuteVar = 0
+                                                Exit Function
+                                            End If
+                                            Ar(CVar(I), p) = v
+                                        End If
+                                   
+                                        '
                                         End If
                                         
                                         ElseIf ww = 5 Then

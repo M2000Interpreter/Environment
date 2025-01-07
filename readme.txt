@@ -1,44 +1,38 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 60 active-X
+Version 12 Revision 62 active-X
+1. Fixed an error from rev 58: long a = 100: a|div 1000: ? a ' normal 0 (I do a bad refactoring so this was 0 - only for long type variables), I found it when I run Magic4 module in Info.gsb.
 
-1. Fix error who prevent module compiler in info to work properly. (the bug came from pervious revision.
-2. Add Var or Variable or Variables to define variablew in a line.
-There are Static, Local, Global and Def and now there is Var.
-The difference is:
-- Local and Global always make new variables/arrays.
-- Static are variables bound to execution object, not to list of variables. Local variables and Static variables can't exist with the same name. Next execution from the same branch will find the variable preserving the value.
--Def raise error it variable/array exist. If not make local only
--Var make local variables, only if they didn't exist.
+2. Arrays with square brackets now have |Div |Mod |Div# |Mod# (I found that for these I did nothing until now).
 
-Some examples:
+3. Format$() fixed so the fault of reading the width for formating a boolean value on BTABLE module (previous revision 60 worked fine). Also this continue to what rev. 60 did, to display fix dot for BigInteger, to render like a real value with fix fractional part, with or without a total width for rendering.
 
-var a=100, b, c  ' b and c take 0 double type
-var d as integer=100, z as biginteger=13923913912739173912737127
-var m=d+z  ' m get the type from z because z has higher priority from imteger
-Print type$(m)="BigInteger"
-var k="hello", p$="George"
-var byte w[100], ww[20][40]=100
-print ww[0][2]=100
-ww[0][2]++
-print ww[0][2]=101
-var row0=ww[0]  ' get copy of row
-print row0[2]=101
-row0[2]++
-print row0[2]<>ww[0][2]
-' arrays with parenthesis are different from previous type
-' inside are flat (one dimension)
-var gg(2, 8) as long=10
-gg(1,3)=500
-List
-var gg(20, 8) ' zero only new items
-list
-gg(1,3)=500
-var gg(20, 8)=0 ' zero all items
-var p()  ' variant type can be zero item
-p()=(1,2,3)
-print p(1)=2
-list
+
+locale 1033
+' no need u at the end for var xx as biginteger=....
+var a as biginteger=93923809803980918919831083180312
+? a
+? format$("{0:10}", a)  ' without a 
+? format$("{0:10:-40}", a)  ' -40 width 40 chars Right Justify
+var b as long long=12123131231
+? format$("{0:20}", b)  '  for long long is width 20 left justify
+? format$("{0:-20}", b)  ' for long long is width 20 right justify
+var double c=23234.34232, d=1234.2234e-124, e=3.e45, f=100
+' change locale to 1032 to see the change of "dot" char
+? format$("{0:-20}", d)  ' 1.E-121 (NOT GOOD)  for double width 20 left justify
+' better:
+? format$("{0:3:-20}", d)  ' 1.234E-121  for double width 20 left justify
+' same as this:
+? format$("{0:-20}", str$(d,"0.000E+###"))  ' 1.234E-121  for double width 20 left justify
+? format$("{0:2:-20}", c)  ' 23234.34 for double width 20 right justify
+? format$("{0:2:-20}", e)  ' 3.00E+45  for double width 20 right justify
+? format$("{0:2:-20}", f)  ' 100.00 for double width 20 right justify
+' strings:
+? format$("{0:-20} {0:20} {1}", "stringA", "stringb")
+' format with only one string procsses specoal chars.
+print #-2, format$("hello\r\nSecond Line \u234")   ' u234 is 0x234
+print chrcode$(0x234)=format$("\u234")  ' true
+
 
 
 George Karras, Kallithea Attikis, Greece.

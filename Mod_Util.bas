@@ -11289,12 +11289,26 @@ again11:
                     P1 = 0
                     pl3 = val(Mid$(Final$, pl2 + Len(pat1$) + 1) + "}")
                     Else
-                    P1 = val("0" + Mid$(Final$, pl2 + Len(pat1$)))
+                '    P1 = val("0" + Mid$(Final$, pl2 + Len(pat1$)))
+                    If Mid$(Final$, pl2 + Len(pat1$), 1) = "-" Then
+                        P1 = val("-0" + Mid$(Final$, pl2 + Len(pat1$) + 1))
+                    Else
+                        P1 = val("0" + Mid$(Final$, pl2 + Len(pat1$)))
+                        
+                    End If
                     
                     pl3 = val(Mid$(Final$, pl2 + Len(pat1$) + Len(str$(P1))) + "}")
                     
-                        If P1 < 0 Then P1 = 13 '22
-                        p = MyRound(p, P1)
+                        If P1 < 0 Then
+                        If pl3 = 0 Then pl3 = P1
+                            P1 = 0
+                        ElseIf pl3 = 0 And Not insertdot Then
+                        If pl3 = 0 Then pl3 = P1
+                            P1 = 0
+                        End If
+                        
+                        
+                        
                     End If
                     If q$ = "" Then
                         Select Case MemInt(VarPtr(p))
@@ -11321,6 +11335,7 @@ cont2234:
                             End If
                         Case Else
 cont5534:
+                            p = MyRound(p, P1)
                             If P1 <> 0 Then
                                 pd$ = Format$(p, "0." + String$(P1, "0"))
                                 If Not NoUseDec Then
