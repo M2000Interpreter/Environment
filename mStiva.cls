@@ -610,7 +610,7 @@ End Sub
 Public Sub Begin(from As Long)
 BeginFrom = from
 End Sub
-Public Sub additem(ByRef A As String)
+Public Sub AddItem(ByRef A As String)
 Dim aa As VarItem
 Set aa = NewVarItem()
     aa.Typename = "S"

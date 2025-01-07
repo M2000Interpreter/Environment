@@ -45941,6 +45941,7 @@ Form 60, 32
 Cls 1, 0
 Const Center=2
 Report Center, "Peano curve"
+refresh
 let factor=.9, k=3, wi=k^4
 let wi2=min.data(scale.x*factor, scale.y*factor), n=wi2/wi
 let (dx, dy)=((scale.x-wi2)/2, (scale.y-wi2)/2)

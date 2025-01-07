@@ -605,7 +605,7 @@ Function IntStrByExp(sA As String, sExp As String) As String
     End If
 
 End Function
-Function IsProbablyPrime(sA As String, k As Integer) As Boolean
+Function IsProbablyPrime(sA As String, K As Integer) As Boolean
     If LenB(sA) < 1 Then Exit Function
     If LeftB$(sA, 1) = ChrB$(45) Then
         MyEr "Negative Prime not exist", "Αρνητικός πρώτος δεν υπάρχει"
@@ -626,7 +626,7 @@ Function IsProbablyPrime(sA As String, k As Integer) As Boolean
     Dim A As String, X As String, I As Long, j As Long
     
     IsProbablyPrime = True
-    For I = 1 To k
+    For I = 1 To K
         
         Do
             A = SpaceB(LenB(sA))
@@ -699,7 +699,7 @@ Public Function IntSqr(sA As String) As String
     Loop
     IntSqr = r
 End Function
-Private Function IsPrime(sA As String) As Boolean
+Public Function IsPrime(sA As String) As Boolean
     ' works but not used - use IsProbablyPrime()
     If LenB(sA) < 1 Then Exit Function
     If LeftB$(sA, 1) = ChrB$(45) Then

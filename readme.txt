@@ -2,34 +2,43 @@ M2000 Interpreter and Environment
 
 Version 12 Revision 60 active-X
 
-1. Modulus of -25u div -7u return -4
-This is same as M2000 and VB6. I adjust the Rebecca Gabriella's String Math Module to the same as of M2000 mod function. Also I made the Euclid div# and mod# to work with bigintegers.
-2. Function mod(a) return the last modulus who stored to a:
-We get all prints (? is alias for Print statement)
+1. Fix error who prevent module compiler in info to work properly. (the bug came from pervious revision.
+2. Add Var or Variable or Variables to define variablew in a line.
+There are Static, Local, Global and Def and now there is Var.
+The difference is:
+- Local and Global always make new variables/arrays.
+- Static are variables bound to execution object, not to list of variables. Local variables and Static variables can't exist with the same name. Next execution from the same branch will find the variable preserving the value.
+-Def raise error it variable/array exist. If not make local only
+-Var make local variables, only if they didn't exist.
 
-biginteger a=-25u div 7
-? a=-3, mod(a)=-4
-? 7*a+mod(a)=-25
-? type$(a)="BigInteger"
-m=mod(a)
-? type$(m)="BigInteger"
-biginteger a=-25u div# 7
-? a=-4, mod(a)=3
-? 7*a+mod(a)=-25
-? type$(a)="BigInteger"
-m=mod(a)
-? type$(m)="BigInteger"
+Some examples:
 
-3. Operators: <, >, >=, >=, <>, =, ==, <=> works now for BigInteger
-
-4. For now we can do 2u^3u (internal 2u turn to decimal, and 2u turn to decimal too, and then perform the power operation, which return type double). Use modpow(a,b,c) for a^b mod c function on BigInteger.
-
-5. Sqrt() now work for BigInteger (Return integer square).
-
-6. Sgn() and Abs() also works for BigInteger too.
-
-See BigInt example in info file.
- 
+var a=100, b, c  ' b and c take 0 double type
+var d as integer=100, z as biginteger=13923913912739173912737127
+var m=d+z  ' m get the type from z because z has higher priority from imteger
+Print type$(m)="BigInteger"
+var k="hello", p$="George"
+var byte w[100], ww[20][40]=100
+print ww[0][2]=100
+ww[0][2]++
+print ww[0][2]=101
+var row0=ww[0]  ' get copy of row
+print row0[2]=101
+row0[2]++
+print row0[2]<>ww[0][2]
+' arrays with parenthesis are different from previous type
+' inside are flat (one dimension)
+var gg(2, 8) as long=10
+gg(1,3)=500
+List
+var gg(20, 8) ' zero only new items
+list
+gg(1,3)=500
+var gg(20, 8)=0 ' zero all items
+var p()  ' variant type can be zero item
+p()=(1,2,3)
+print p(1)=2
+list
 
 
 George Karras, Kallithea Attikis, Greece.

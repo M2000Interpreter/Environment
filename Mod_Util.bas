@@ -8498,7 +8498,7 @@ End If
 
 End Function
 Public Function ExtractName(f$, Optional simple As Boolean = False) As String
-Dim I As Long, j As Long, k$
+Dim I As Long, j As Long, K$
 If f$ = vbNullString Then Exit Function
 If simple Then
 j = SimplePointPos(f$)
@@ -8507,7 +8507,7 @@ j = PointPos(f$)
 If j > Len(f$) Then j = Len(f$)
 End If
 If Mid$(f$, j, 1) = "." Then
-k$ = ExtractType(f$, j, simple)
+K$ = ExtractType(f$, j, simple)
 Else
 j = Len(f$)
 End If
@@ -8517,7 +8517,7 @@ Case Is < " ", "\", "/", ":"
 Exit For
 End Select
 Next I
-If k$ = vbNullString Then
+If K$ = vbNullString Then
 If Mid$(f$, I + j - I, 1) = "." Then
 ExtractName = mylcasefILE(Mid$(f$, I + 1, j - I - 1))
 Else
@@ -8525,7 +8525,7 @@ ExtractName = mylcasefILE(Mid$(f$, I + 1, j - I))
 
 End If
 Else
-ExtractName = mylcasefILE(Mid$(f$, I + 1, j - I)) + k$
+ExtractName = mylcasefILE(Mid$(f$, I + 1, j - I)) + K$
 End If
 
 'ExtractName = mylcasefILE(Trim$(Mid$(f$, I + 1, j - I)))
@@ -8935,10 +8935,10 @@ resp = MyAnyType(bstack, rest$, Lang, Len(here$) > 0, vbBoolean, True)
 Set bstack = Nothing
 End Sub
 Sub NeoDate(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
-Dim bstack As basetask, k As Long
+Dim bstack As basetask, K As Long
 
 Set bstack = ObjFromPtr(basestackLP)
-k = MyTrimL(rest$): If k > 1 Then rest$ = Mid$(rest$, k)
+K = MyTrimL(rest$): If K > 1 Then rest$ = Mid$(rest$, K)
 If CheckFreeExecute(rest$) Then
     SetDouble bstack.Owner
     resp = True
@@ -8949,10 +8949,10 @@ Set bstack = Nothing
 
 End Sub
 Sub NeoDouble(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
-Dim bstack As basetask, k As Long
+Dim bstack As basetask, K As Long
 
 Set bstack = ObjFromPtr(basestackLP)
-k = MyTrimL(rest$): If k > 1 Then rest$ = Mid$(rest$, k)
+K = MyTrimL(rest$): If K > 1 Then rest$ = Mid$(rest$, K)
 If CheckFreeExecute(rest$) Then
     SetDouble bstack.Owner
     resp = True
@@ -9355,15 +9355,15 @@ If j - I >= dl - 1 Then
 End If
 End Function
 
-Function Fast2Symbol(A$, C$, k As Long, D$, L As Long) As Boolean
+Function Fast2Symbol(A$, C$, K As Long, D$, L As Long) As Boolean
 Dim I As Long, j As Long
 j = Len(A$)
 If j = 0 Then Exit Function
 I = MyTrimL(A$)
 If I > j Then Exit Function
-If j - I >= k - 1 Then
-    If InStr(C$, Mid$(A$, I, k)) > 0 Then
-    A$ = Mid$(A$, MyTrimLi(A$, I + k))
+If j - I >= K - 1 Then
+    If InStr(C$, Mid$(A$, I, K)) > 0 Then
+    A$ = Mid$(A$, MyTrimLi(A$, I + K))
     Fast2Symbol = True
     Exit Function
     End If
@@ -9920,13 +9920,13 @@ Else
 End If
 End Function
 Function IsAbs(bstack As basetask, A$, r As Variant) As Boolean
-Dim bi As BigInteger
+Dim BI As BigInteger
 If IsExpBig(bstack, A$, r, flatobject:=True, nostring:=True) Then
     If bstack.lastobj Is Nothing Then
         r = Abs(r)
     Else
-        Set bi = bstack.lastobj
-        Set bstack.lastobj = bi.bAbs()
+        Set BI = bstack.lastobj
+        Set bstack.lastobj = BI.bAbs()
     End If
     IsAbs = FastSymbol(A$, ")", True)
 Else
@@ -10005,7 +10005,7 @@ Else
 End If
 End Function
 Function IsSqrt(bstack As basetask, A$, r As Variant) As Boolean
-Dim bi As BigInteger
+Dim BI As BigInteger
 If IsExpBig(bstack, A$, r, flatobject:=True, nostring:=True) Then
     If bstack.lastobj Is Nothing Then
         If r < 0 Then
@@ -10014,12 +10014,12 @@ If IsExpBig(bstack, A$, r, flatobject:=True, nostring:=True) Then
         End If
         r = Sqr(r)
     Else
-        Set bi = bstack.lastobj
-        If bi.bSgn < 0 Then
+        Set BI = bstack.lastobj
+        If BI.bSgn < 0 Then
             negsqrt A$
             Exit Function
         End If
-        Set bstack.lastobj = bi.IntSqr
+        Set bstack.lastobj = BI.IntSqr
     End If
     IsSqrt = FastSymbol(A$, ")", True)
 Else
@@ -10295,6 +10295,16 @@ here1234:
         GoTo conthere1
     ElseIf useRtypeOnly Then
         unsigned = True
+        If MyIsObject(r) Then
+        If TypeOf r Is BigInteger Then
+            Set r = Module13.CreateBigInteger(DE$)
+            DE$ = vbNullString
+            GoTo contfinal
+        Else
+        
+            Exit Function
+        End If
+        Else
         Select Case VarType(r)
         Case 20, vbDecimal
         ig$ = "&H" + Right$(DE$, 16)
@@ -10318,6 +10328,7 @@ here1234:
         GoTo conthere1
         
         End Select
+        End If
     End If
         If Len(DE$) > 8 Then
         
@@ -10460,6 +10471,8 @@ cont123:
         r = CDate(ig$ + DE$)
         sng = sng + 2
     Case Else
+
+        sng = sng + 1
         GoTo jump123
     End Select
     Case Else
@@ -10510,6 +10523,7 @@ conthere1:
         End If
 jump123:
          If DE$ <> vbNullString Then Mid$(DE$, 1, 1) = DefaultDec$
+         
         Select Case VarType(r)
         Case vbDecimal
         If Len(DE$) = 0 Then r = CDec(ig$) Else r = CDec(ig$ + DE$)
@@ -10546,9 +10560,17 @@ jump123:
         Case vbDate
         r = CDate(ig$ + DE$)
         Case Else
+        If MyIsObject(r) Then
+        r = ig$
+        Else
         r = CDbl(ig$ + DE$ + ex$)
+        End If
+        
+        
         End Select
         Else
+        
+        
         If DE$ <> vbNullString Then Mid$(DE$, 1, 1) = "."
         r = val(ig$ + DE$ + ex$)
         End If
@@ -16431,7 +16453,7 @@ Case 8
 x1 = -1
 'x1 = 1
 Mid$(b$, 1, 1) = " "
-x1 = ExecuteVar(1, 8, bstack, W$, b$, x1, 0&, False, False, 91, "", 0, "")
+x1 = ExecuteVar(1, 8, bstack, W$, b$, x1, 0&, False, False, 91, "", 0, "", False)
 If x1 <> 7 Then
 interpret = False
 b$ = ""
@@ -18695,6 +18717,9 @@ If Left$(mList.KeyToString, 2) <> "%_" Then
                                 s$ = s$ + "[" + usehandler.objref.EnumName + "] = " + hlp$
                             End If
             End Select
+        ElseIf TypeOf mList.ValueObj Is BigInteger Then
+      
+        s$ = s$ + mList.KeyToString + mList.ValueObj.Pack
         Else
             s$ = s$ + mList.KeyToString + " [" + Typename(mList.ValueObj) + "]"
         End If
@@ -18955,7 +18980,7 @@ End With
 End Sub
 Function ProcSave(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim pa$, W$, s$, Col As Long, prg$, x1 As Long, par As Boolean, I As Long, noUse As Long, lcl As Boolean
-Dim askme As Boolean, k As Long, M As Long
+Dim askme As Boolean, K As Long, M As Long
 If lckfrm <> 0 Then MyEr "Save is locked", "Η αποθήκευση είναι κλειδωμένη": rest$ = vbNullString: Exit Function
 lcl = IsLabelSymbolNew(rest$, "ΤΟΠΙΚΑ", "LOCAL", Lang) Or basestack.IamChild Or basestack.IamAnEvent
 
@@ -18996,10 +19021,10 @@ If x1 <> 0 Then
                                 If Not blockCheck(sbf(Col).sb, DialogLang, noUse, "Function " + s$ + "()" + vbCrLf) Then Exit Function
                                 If sbf(Col).IamAClass Then
 
-                                k = InStr(sbf(Col).sb, vbCrLf)
+                                K = InStr(sbf(Col).sb, vbCrLf)
                                 M = rinstr(sbf(Col).sb, vbCrLf + vbCrLf)
-                                k = InStr(k + 1, sbf(Col).sb, "{")
-                                prg$ = "CLASS " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, k + 3, M - k - 3) + vbCrLf + prg$
+                                K = InStr(K + 1, sbf(Col).sb, "{")
+                                prg$ = "CLASS " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, K + 3, M - K - 3) + vbCrLf + prg$
                                
                                
                                 Else
@@ -19013,10 +19038,10 @@ If x1 <> 0 Then
                         Else
                                 If Not blockCheck(sbf(Col).sb, DialogLang, noUse, "Συνάρτηση " + s$ + "()" + vbCrLf) Then Exit Function
                                 If sbf(Col).IamAClass Then
-                                k = InStr(sbf(Col).sb, vbCrLf)
+                                K = InStr(sbf(Col).sb, vbCrLf)
                                 M = rinstr(sbf(Col).sb, vbCrLf + vbCrLf)
-                                k = InStr(k + 1, sbf(Col).sb, "{")
-                                prg$ = "ΚΛΑΣΗ " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, k + 3, M - k - 3) + vbCrLf + prg$
+                                K = InStr(K + 1, sbf(Col).sb, "{")
+                                prg$ = "ΚΛΑΣΗ " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, K + 3, M - K - 3) + vbCrLf + prg$
                                 Else
                                 prg$ = s$ + " {" + sbf(Col).sb + "}" + vbCrLf + prg$
                                 If lcl Then
@@ -25604,7 +25629,7 @@ End If
     Else
       
        Set ObjectCatalog = New FastCollection
-       Dim cr As New cRegistry, first$, k As Long
+       Dim cr As New cRegistry, first$, K As Long
        Dim bFoundExeSect As Boolean, ss$, mmdir As New recDir
        '' some code here are copies from VbScriptEditor
        '' http://www.codeproject.com/Articles/19986/VbScript-Editor-With-Intellisense
@@ -28068,14 +28093,14 @@ UserName = C$
 End Function
 Function IsDimension(bstack As basetask, A$, r As Variant) As Boolean
 Dim s$, pppp As mArray, ppppAny As iBoxArray, w1 As Long, p As Variant, anything As Object, pp As Variant, usehandler As mHandler
-Dim k As Long
-k = Abs(IsLabel(bstack, A$, s$))
+Dim K As Long
+K = Abs(IsLabel(bstack, A$, s$))
 Set bstack.lastobj = Nothing
-If k > 4 And k < 8 Then
+If K > 4 And K < 8 Then
 If neoGetArray(bstack, s$, ppppAny) Then
 If ppppAny.arr Then
 If FastSymbol(A$, ")") Then
-    If k = 6 Then
+    If K = 6 Then
         IsStrExp bstack, s$ + ")", s$
     Else
         IsNumber bstack, s$ + ")", p
@@ -28083,7 +28108,7 @@ If FastSymbol(A$, ")") Then
 Else
 bstack.tmpstr = s$ + Left$(A$, 1)
   BackPort A$
-    If k = 6 Then
+    If K = 6 Then
         IsStrExp bstack, A$, s$
     Else
         IsNumber bstack, A$, p
@@ -28734,18 +28759,18 @@ Else
 End If
 End Function
 Function createAnobject(bstack As basetask, b$) As Boolean
-Dim s$, s1$, k As Integer, ob
+Dim s$, s1$, K As Integer, ob
 Set ob = Nothing
 If IsStrExp(bstack, b$, s$) Then
-k = 1
+K = 1
 End If
 If FastSymbol(b$, ",") Then
     If IsStrExp(bstack, b$, s1$) Then
-    k = k + 10
+    K = K + 10
     End If
 End If
 If FastSymbol(b$, ")") Then
-    Select Case k
+    Select Case K
     Case 1
         GetitObject ob, s$
     Case 10
@@ -28928,7 +28953,11 @@ aaaa1:
                             Set bstack.lastobj = Nothing
                             MyEr "only for pointers for float groups", "μόνο για δείκτες σε μη στατικά αντικείμενα"
                             Exit Function
+
                         End If
+                    ElseIf TypeOf bstack.lastobj Is BigInteger Then
+                    Set p = bstack.lastobj
+                        bstack.SetVarobJvalue W$, p
                     End If
                 Else
                     bstack.SetVar W$, p
@@ -28957,6 +28986,18 @@ aaaa1:
                     p = CByte(0)
                 ElseIf IsLabelSymbolNew(b$, "ΗΜΕΡΟΜΗΝΙΑ", "DATE", Lang) Then
                     p = CDate(0)
+                ElseIf IsLabelSymbolNew(b$, "ΜΕΓΑΛΟΣΑΚΕΡΑΙΟΣ", "BIGINTEGER", Lang) Then
+                    Set p = New BigInteger
+                    If FastSymbol(b$, "=") Then
+                        If Not IsNumberD2(b$, p, True, True) Then
+                           missNumber
+                                Exit Function
+                            
+                        End If
+                         Set p = Module13.CreateBigInteger(CStr(p))
+                    End If
+                    bstack.SetVarobJ W$, p
+                    GoTo aaa1
                 ElseIf IsEnumAs(bstack, b$, p, ok) Then
                     If ok Then
                         bstack.SetVarobJ W$, p
@@ -29091,6 +29132,14 @@ aaaa1:
                     If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                     End If
                     p = CByte(p)
+            ElseIf IsLabelSymbolNew(b$, "ΜΕΓΑΛΟΣΑΚΕΡΑΙΟΣ", "BIGINTEGER", Lang) Then
+                    If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+                    If MemInt(VarPtr(p)) = vbString Then
+                            Set p = Module13.CreateBigInteger(CStr(p))
+                        Else
+                            Set p = Module13.CreateBigInteger(CStr(Int(p)))
+                        End If
+                    
             Else
             MyEr "No type found", "δεν βρήκα τύπο"
             Exit Function
@@ -29262,7 +29311,7 @@ Dim I As Long
 I = evCom.VarIndex
 F1$ = evCom.modulename
 Set oldbstack = bstack.soros
-Dim j As Long, k As Long, s1$, S2$
+Dim j As Long, K As Long, s1$, S2$
 Dim ohere$
 ohere$ = here$
 here$ = vbNullString
@@ -29274,40 +29323,40 @@ Set bstack.Sorosref = bb
             If ItemIndex > -1 Then
                 bb.DataVal CVar(ItemIndex)
             End If
-            For k = 1 To NumVar
-            If VariantIsRef(VarPtr(vrs(k))) Then
-            Select Case VarType(vrs(k))
+            For K = 1 To NumVar
+            If VariantIsRef(VarPtr(vrs(K))) Then
+            Select Case VarType(vrs(K))
             Case vbString
-            globalvarGroup "EV" & (I + k) & "$", vrs(k)
-            bb.DataStr "EV" & (I + k) & "$"
+            globalvarGroup "EV" & (I + K) & "$", vrs(K)
+            bb.DataStr "EV" & (I + K) & "$"
             Case Is >= vbArray
             ' make it normal
-            globalvarGroup "EV" & (I + k) & "(", RetM2000array(vrs(k))
-            bb.DataStr "EV" & (I + k)
+            globalvarGroup "EV" & (I + K) & "(", RetM2000array(vrs(K))
+            bb.DataStr "EV" & (I + K)
             Case Else
-            globalvarGroup "EV" & (I + k), vrs(k)
-            bb.DataStr "EV" & (I + k)
+            globalvarGroup "EV" & (I + K), vrs(K)
+            bb.DataStr "EV" & (I + K)
             End Select
             Else
-            Select Case VarType(vrs(k))
+            Select Case VarType(vrs(K))
             Case vbString
-            bb.DataStr CStr(vrs(k))
+            bb.DataStr CStr(vrs(K))
             Case Is >= vbArray
             ' make it normal
-                Set ohelp = RetM2000array(vrs(k))
+                Set ohelp = RetM2000array(vrs(K))
                 bb.DataObj ohelp
                 Set ohelp = Nothing
             Case Else
-                If MyIsObject(vrs(k)) Then
-                    Set ohelp = vrs(k)
+                If MyIsObject(vrs(K)) Then
+                    Set ohelp = vrs(K)
                     bb.DataObj ohelp
                     Set ohelp = Nothing
                 Else
-                    bb.DataVal vrs(k)
+                    bb.DataVal vrs(K)
                 End If
             End Select
             End If
-            Next k
+            Next K
             '''bb.DataObj evCom
             '' last is the second name, the class name??
             bb.DataStr what$
@@ -29330,21 +29379,21 @@ Set bstack.Sorosref = bb
             End If
                   here$ = vbNullString
                   If NumVar > 0 Then
-       For k = LBound(vrs()) To UBound(vrs()) - 1
-       Select Case VarType(vrs(k))
+       For K = LBound(vrs()) To UBound(vrs()) - 1
+       Select Case VarType(vrs(K))
        Case vbString
-            GetlocalVar "EV" & (I + k) & "$", j
-            vrs(k) = var(j)
+            GetlocalVar "EV" & (I + K) & "$", j
+            vrs(K) = var(j)
        Case Is >= vbArray
-            GetlocalVar "EV" & (I + k) & "(", j
-            RetComArray var(j), vrs(k)
+            GetlocalVar "EV" & (I + K) & "(", j
+            RetComArray var(j), vrs(K)
        
         Case Else
-            GetlocalVar "EV" & (I + k), j
-             vrs(k) = var(j)
+            GetlocalVar "EV" & (I + K), j
+             vrs(K) = var(j)
             End Select
            
-            Next k
+            Next K
             End If
             PopStage bstack
 
@@ -33343,9 +33392,9 @@ foundit:
         If j > 4 Then
             
             Mid$(W$, Len(W$), 1) = " "
-            rest$ = Left$(f$, Len(f$) - 1) + rest$
+                rest$ = Left$(f$, Len(f$) - 1) + rest$
             Else
-            rest$ = f$ + rest$
+                rest$ = f$ + rest$
             End If
            
             
