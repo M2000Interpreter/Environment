@@ -67,7 +67,7 @@ Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nSize As Long, lpD
 Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
  Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
@@ -288,9 +288,9 @@ Public Property Get NoRun() As Boolean
 NoRun = mExecBloc
 End Property
 
-Public Function PutStringAtOffset(addr As Variant, AnyString As String) As Variant
+Public Function PutStringAtOffset(Addr As Variant, AnyString As String) As Variant
 Dim Offset
-Offset = uintnew(addr) - uintnew(mPtr)
+Offset = uintnew(Addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + 3 >= mitems * itemlen Then
         ErrorMes = 4
@@ -304,16 +304,16 @@ If ErrorMes = 0 And mitems > 0 Then
         .ItemCreator2 cUlng(Offset + 1), AnyString
         PutStringAtOffset = .StrPointer
         End If
-        .Done = False
+        .done = False
         End With
     End If
 Else
     PutStringAtOffset = 0  ' null
 End If
 End Function
-Public Function GetStringFromOffset(addr As Variant, AnyString As String) As Variant
+Public Function GetStringFromOffset(Addr As Variant, AnyString As String) As Variant
 Dim Offset
-Offset = uintnew(addr) - uintnew(mPtr)
+Offset = uintnew(Addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + 3 >= mitems * itemlen Then
         ErrorMes = 4
@@ -326,9 +326,9 @@ If ErrorMes = 0 And mitems > 0 Then
            GetStringFromOffset = .StrPointer
         Else
             AnyString = "Crash"
-            GetStringFromOffset = addr
+            GetStringFromOffset = Addr
         End If
-        .Done = False
+        .done = False
         End With
     End If
     
@@ -338,9 +338,9 @@ Else
 End If
 
 End Function
-Public Function GetData1(f As Long, addr, lengthInBytes As Long) As Boolean
+Public Function GetData1(f As Long, Addr, lengthInBytes As Long) As Boolean
 Dim Offset, place
-Offset = uintnew(addr) - uintnew(mPtr)
+Offset = uintnew(Addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + lengthInBytes - 1 >= mitems * itemlen Then
         ErrorMes = 4
@@ -353,7 +353,7 @@ If ErrorMes = 0 And mitems > 0 Then
         .cDims = 1
         .onebound(0).lLbound = 0
         .onebound(0).cElements = lengthInBytes
-        .pvData = addr
+        .pvData = Addr
     End With
         CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
 
@@ -372,15 +372,15 @@ there:
 End If
         
 End Function
-Public Function GetData(f As Long, ByVal addr, lengthInBytes As Long) As Boolean
+Public Function GetData(f As Long, ByVal Addr, lengthInBytes As Long) As Boolean
 Dim Offset, range
-range = uintnew(addr) - uintnew1(GetPtr(0))
+range = uintnew(Addr) - uintnew1(GetPtr(0))
 If range < 0 Or range >= mitems * itemlen Then
         ErrorMes = 4
         GetData = False
         Exit Function
 End If
-Offset = uintnew(addr) - uintnew(mPtr)
+Offset = uintnew(Addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + lengthInBytes - 1 >= (mitems * itemlen - range) Then
         ErrorMes = 4
@@ -390,7 +390,7 @@ If ErrorMes = 0 And mitems > 0 Then
         Dim FH As Long
         FH = Module10.ReadFileHandler(CLng(f))
         If FH = 0 Then Exit Function
-        Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(addr)
+        Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(Addr)
         GetData = True
         Exit Function
   End If
@@ -434,15 +434,15 @@ End Function
 
 
 
-Public Function putData(f As Long, addr, lengthInBytes As Long) As Boolean
+Public Function putData(f As Long, Addr, lengthInBytes As Long) As Boolean
 Dim Offset, place, range
-range = uintnew(addr) - uintnew1(GetPtr(0))
+range = uintnew(Addr) - uintnew1(GetPtr(0))
 If range < 0 Or range >= mitems * itemlen Then
         ErrorMes = 4
         putData = False
         Exit Function
 End If
-Offset = uintnew(addr) - uintnew(mPtr)
+Offset = uintnew(Addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + lengthInBytes - 1 >= mitems * itemlen Then
         ErrorMes = 4
@@ -455,7 +455,7 @@ If ErrorMes = 0 And mitems > 0 Then
         .cDims = 1
         .onebound(0).lLbound = 0
         .onebound(0).cElements = lengthInBytes
-        .pvData = addr
+        .pvData = Addr
     End With
         CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
         place = 1
@@ -680,7 +680,7 @@ Dim a1 As SAFEARRAY1D, A() As Byte, token As Long
     
     CopyMemory ByVal VarPtrArray(A), 0&, 4
 End Sub
-Function Copy(Optional R As Long = 0, Optional P As Long = 0) As Object
+Function Copy(Optional r As Long = 0, Optional p As Long = 0) As Object
 Dim aCopy As New MemBlock, BLen As Long, hMem As Long
 If mitems > 0 Then
     If mExecBloc Then
@@ -689,23 +689,23 @@ If mitems > 0 Then
         BLen = mBytes
     End If
     mitems = BLen \ itemlen
-    If R <> 0 Then
-        If R >= 0 And R < mitems Then
-            If P >= 1 Then
-                aCopy.Construct itemlen, CLng(P), , R = 0 And Not mExecBloc
-                If mitems > P Then
-                    P = mitems
+    If r <> 0 Then
+        If r >= 0 And r < mitems Then
+            If p >= 1 Then
+                aCopy.Construct itemlen, CLng(p), , r = 0 And Not mExecBloc
+                If mitems > p Then
+                    p = mitems
                 End If
-                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(R), itemlen * P
+                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), itemlen * p
             Else
            
                 aCopy.Construct itemlen, 1&, , Not mExecBloc
                 
-                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(R), itemlen
+                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), itemlen
             End If
         Else
             aCopy.Construct itemlen, 1&, , Not mExecBloc
-            CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(R), itemlen
+            CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), itemlen
         End If
     Else
     aCopy.Construct itemlen, mitems, , Not mExecBloc
@@ -908,20 +908,38 @@ If w2 <> -1 Then w2 = w2 / dv15
     Else
     aa.CreateFromPicture sp
     End If
-    Dim k As Object
-    Set k = New MemBlock
-    aa.SaveDibToMeMBlock k
+    Dim K As Object
+    Set K = New MemBlock
+    aa.SaveDibToMeMBlock K
     If rot <> 0 Then
         aa.ClearUp
-        aa.CreateFromPicture k.GetStdPicture(-1, -1, , rot)
-        Set k = New MemBlock
-        aa.SaveDibToMeMBlock k
+        aa.CreateFromPicture K.GetStdPicture(-1, -1, , rot)
+        Set K = New MemBlock
+        aa.SaveDibToMeMBlock K
         
     End If
     Dim Handler As New mHandler
     Handler.T1 = 2
-    Set Handler.objref = k
+    Set Handler.objref = K
     Set CreateFromPicture = Handler
     
 End Function
 
+Function CopyItem(ByVal that As Long, done As Boolean) As MemBlock
+    If BasicItem = vbString Or mSubtype > 0 Then
+        done = False
+        Exit Function
+    End If
+    that = GetPtr(that)
+    If ErrorMes = 0 Then
+        Set CopyItem = New MemBlock
+        CopyItem.Construct (itemlen), 1, , , (BasicItem)
+        Dim place As Long
+        CopyMemory ByVal CopyItem.GetPtr(0), ByVal that, itemlen
+        CopyItem.UseStruct = Me.UseStruct
+        If UseStruct Then
+            Set CopyItem.structref = Me.structref
+        End If
+        done = True
+    End If
+End Function

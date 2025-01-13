@@ -8495,12 +8495,14 @@ fib=Lambda K (x as decimal)-> {
       =Ret
 }
 Set Fast!
+profiler
 For i=1 to 2000 {
       N=Fib(i)
       Print i
       Print N.tostring$()
       Refresh
 }
+print timecount
 Set Fast
 }
 MODULE BN {Print "Arbitrary-precision multiplication"
@@ -21539,7 +21541,7 @@ MODULE USETHIS {try {
 	PEN 14
 	CLS,0
 	If Version<12 then Error "No proper M2000 version (must be >=12)"
-	If Version=12 and revision<45 then Error "No proper M2000 revision for version 4 (need revision >=38)"
+	If Version=12 and revision<45 then Error "No proper M2000 revision for version 4 (need revision >=63)"
 	Set Fast
 	Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 	dir user
@@ -40106,7 +40108,7 @@ refresh 40
 }
 MODULE FINDWORD {read W as string="*"
 if left$(w,1)="*" then
-	report {FindWord "Print"}
+	report {FindWord "Remove {"}
 	keyboard {FindWord "Remove {"}, 13
 else
 	print "search: ";w
@@ -43890,9 +43892,7 @@ public:
             }
       }
 }
-A=Vector(3,4,5)
-B=Vector(4,3,5)
-C=Vector(-5,-12,-13)
+Vector A(3,4,5), B(4,3,5), C(-5,-12,-13)
 Print "A=";A.toString$
 Print "B=";B.toString$
 Print "C=";C.toString$
@@ -46113,5 +46113,35 @@ c=ceil(v)
 print c, type$(c)
 bold 1
 Print "Press F3"
+}
+MODULE FB2 {Cls , 0
+Report {
+	Fibonacci sequence - using BigInteger (see FB using a Class bigNum)
+	
+	The Fibonacci sequence is a sequence   Fn   of natural numbers defined recursively: 
+				F0 = 0 
+				F1 = 1 
+				Fn = Fn-1 + Fn-2, if n>1 
+
+	We use BigInteger to get the first 2000 Fibonacci numbers.
+
+}
+K=List:=0:=0u, 1:=1u
+fib=Lambda K (x as long)-> {
+      If Exist(K, x) Then =Eval(K) :Exit
+      Ret=If(x>1->Lambda(x-1)+Lambda(x-2), biginteger(x))
+      Append K, x:=Ret
+      =Ret
+}
+Set Fast!
+profiler
+For i=1 to 2000 {
+      N=Fib(i)
+      Print i
+      Print str$(N)
+      Refresh
+}
+print timecount
+Set Fast
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

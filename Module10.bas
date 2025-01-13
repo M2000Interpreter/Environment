@@ -1336,16 +1336,22 @@ checkhereClass:
 checkplease2:
                 If Not sbf(v).IamAClass Then
                  WrongType
-                 ExecuteVar = 0
+                 Exec1 = 0: ExecuteVar = 11
                  Exit Function
                 End If
+cont12987:
                 If Not AddGroupFromClass(bstack, b$, W$, False, NewStat, temphere$) Then
-                ExecuteVar = 0
+                Exec1 = 0: ExecuteVar = 11
                  Exit Function
                 End If
             ElseIf GetSub(W$ + "$()", v) Then
             GoTo checkplease2
             Else
+                If comhash.Find2(W$, (0), v) Then
+                If v = 44 Then
+                    GoTo cont12987
+                End If
+                End If
                 v = globalvar(W$, p, , VarStat, temphere$)
             End If
                 If extreme Then GoTo NewCheck2 Else GoTo NewCheck
@@ -5960,7 +5966,16 @@ checkconstant:
                             ElseIf TypeOf usehandler.objref Is mStiva Then
                                 If Not Fast2Varl(rest$, "сыяос", 5, "STACK", 5, 5, ff) Then MyRead = False: MissType: Exit Function
                             ElseIf TypeOf usehandler.objref Is MemBlock Then
-                                If Not Fast2Varl(rest$, "диаяхяысг", 9, "BUFFER", 6, 9, ff) Then MyRead = False: MissType: Exit Function
+                                If Not Fast2Varl(rest$, "диаяхяысг", 9, "BUFFER", 6, 9, ff) Then
+                                    If FastPureLabel(rest$, s$, , True, , , , True) = 1 Then
+                                        If usehandler.objref.UseStruct Then
+                                            If usehandler.objref.structref.Tag = s$ Then
+                                                GoTo jumpref01
+                                            End If
+                                        End If
+                                    End If
+                                    MyRead = False: MissType: Exit Function
+                                End If
                             ElseIf usehandler.T1 = 4 Then
                                 If FastPureLabel(rest$, s$, , True, , , False) = 1 Then
                                 
@@ -6955,10 +6970,21 @@ existAs15:
                         ElseIf usehandler1.T1 = 2 Then
                             If Not Fast2Varl(rest$, "диаяхяысг", 9, "BUFFER", 6, 9, ff) Then
                                 If Not Fast2Varl(rest$, "атупос", 6, "VARIANT", 7, 7, ff) Then
+                                If FastPureLabel(rest$, s$, , True, , , , True) = 1 Then
+                                
+                                If usehandler1.objref.UseStruct Then
+                                If usehandler1.objref.structref.Tag = s$ Then
+                                
+                                GoTo t14
+                                
+                                End If
+                                End If
+                                End If
                                     WrongObject
                                     MyRead = False
                                     Exit Function
                                 Else
+                                
                                     GoTo jump0001233
                                 End If
                             End If

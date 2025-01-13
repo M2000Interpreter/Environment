@@ -1,37 +1,152 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 62 active-X
-1. Fixed an error from rev 58: long a = 100: a|div 1000: ? a ' normal 0 (I do a bad refactoring so this was 0 - only for long type variables), I found it when I run Magic4 module in Info.gsb.
+Version 12 Revision 63 active-X
+1. We can define user objects from classes using the compact format:
+nameofclass var1, var2
+or the standard format:
+var var1=nameofclass(), var2=nameofclass()
 
-2. Arrays with square brackets now have |Div |Mod |Div# |Mod# (I found that for these I did nothing until now).
+if we use constructor then this is the compact:
+nameofclass var1(1,2,3), var2(1,2,3)
+... and this is the standard format:
+var var1=nameofclass(1,2,3), var2=nameofclass(1,2,3)
 
-3. Format$() fixed so the fault of reading the width for formating a boolean value on BTABLE module (previous revision 60 worked fine). Also this continue to what rev. 60 did, to display fix dot for BigInteger, to render like a real value with fix fractional part, with or without a total width for rendering.
+Classes inside classes are local to class. Classes outside class definition is global.
+
+Look this example. We have a global class Alfa and a private class Alfa inside class Something. We can make a class Alfa from the global one using the proper "global" name from modules (members of class).
+If we change the .a<=.alfa(20, 30) with .a<=alfa(20, 30, 40)  we get the global class. So Beta has a with a.x, a.y and a.z members.
+
+So our class can use the private alfa without problems from global classes which some previous module make it. The same hold for public alfa in class Something.
+
+So the M2000 Interpreter allow objects to have same "type" but not same members. The scope distinguish each other.
+
+Previous revisions use the compact form inside classes only.
+
+if true then {
+	class alfa {
+		x, y, z
+	class:
+		module alfa (.x,.y, .z) {
+		}
+	}
+	alfa a(20, 30, 50)
+	Print a.x, a.y, a.z
+}
+
+Class Something {
+private:
+	class alfa {
+		x, y
+	class:
+		module alfa (.x,.y) {
+		}
+	}
+	alfa d(1, 2)  ' is the local one
+public:
+	group a
+	module dothat {
+		// use the global alfa
+		try ok {
+		alfa a(20, 30, 50)
+		Print a.x, a.y, a.z
+		? "ok........................."
+		}
+		if ok and not error then list else print error$
+	}	
+	module doit {
+		// use the private alfa
+		.alfa a(20, 30)
+		Print a.x, a.y, valid(a.z)=false
+		// list
+	}
+class:
+	module Something {
+		.a<=.alfa(20, 30)
+	}
+}
+Something Beta
+Beta.doit
+Beta.dothat
+Print beta.a.x, beta.a.y, valid(beta.a.z)=false
+delta=beta  ' delta get a copy of beta
+Print delta.a.x, delta.a.y, valid(delta.a.z)=false
+list
+
+2. Structures (work on progress)
+
+I would like to include the notation a|x for the equivalent eval(a,0!x) although the later cast to other types.
+Structures used for making buffers and using pointers for passing them to external functions. So a(4, y) is the real memory address of the 5th alfa item at offset y (which is 8). We can pass a number using Return a, 4!y:=-23.34e32, 3!k!50:=255 ' max value for byte, if we place a bigger no error raised, only one byte used, the lower one. 
+
+structure alfa {
+	x as double
+	y as double*5
+	k as byte*100
+	z as long	
+}
+// buffer clear a as alfa*10  same as alfa a[10]
+alfa a[10], b[100]
+Print a(4, y)-a(4,x) = 8 ' 8 bytes for a double value
+for i=0 to 99 
+	return a, 4!k!i:=i+1
+next
+print a[4]|k[1], " address="; a(4, k, 1)  ' value, memory address
+print a[4]|k[2], " address="; a(4, k, 2)  ' value, memory address
+print a[4]|k[15]
+byte a4k2= a[4]|k[2], a4k15= a[4]|k[15]
+return a, 4!k!2:=a4k15, 4!k!15:=a4k2
+print a[4]|k[2]
+print a[4]|k[15]
+k=a[4]  // get a copy of a[4] to k
+return a, 0:=eval$(k)
+print len(k)
+print k|k[2]
+print a[0]|k[2]
+list
+
+3. Enum now can be local/global and local shadowing local enum (in a sub).  Also Enum alfa here has a part beta, a previous defined enum. So we can define global, local (without using Local) and Local new (using Local statement).
 
 
-locale 1033
-' no need u at the end for var xx as biginteger=....
-var a as biginteger=93923809803980918919831083180312
-? a
-? format$("{0:10}", a)  ' without a 
-? format$("{0:10:-40}", a)  ' -40 width 40 chars Right Justify
-var b as long long=12123131231
-? format$("{0:20}", b)  '  for long long is width 20 left justify
-? format$("{0:-20}", b)  ' for long long is width 20 right justify
-var double c=23234.34232, d=1234.2234e-124, e=3.e45, f=100
-' change locale to 1032 to see the change of "dot" char
-? format$("{0:-20}", d)  ' 1.E-121 (NOT GOOD)  for double width 20 left justify
-' better:
-? format$("{0:3:-20}", d)  ' 1.234E-121  for double width 20 left justify
-' same as this:
-? format$("{0:-20}", str$(d,"0.000E+###"))  ' 1.234E-121  for double width 20 left justify
-? format$("{0:2:-20}", c)  ' 23234.34 for double width 20 right justify
-? format$("{0:2:-20}", e)  ' 3.00E+45  for double width 20 right justify
-? format$("{0:2:-20}", f)  ' 100.00 for double width 20 right justify
-' strings:
-? format$("{0:-20} {0:20} {1}", "stringA", "stringb")
-' format with only one string procsses specoal chars.
-print #-2, format$("hello\r\nSecond Line \u234")   ' u234 is 0x234
-print chrcode$(0x234)=format$("\u234")  ' true
+global enum beta {
+	kkk=2313
+	aaa=100123123
+	bbb=123213
+}	
+global enum alfa {
+	beta  ' add members of beta to alfa
+	epsilon=123123
+}
+module Inner {
+	enum beta {
+		kkk
+		aaa=100
+		bbb
+	}	
+	enum alfa {
+		beta  ' add members of beta to alfa
+		epsilon
+	}
+	kappa()
+	kappa(kkk)
+	other()
+	list
+	sub kappa(m as alfa=aaa)
+		Print m
+	end sub
+	sub other()
+	local enum beta {
+		kkk=33
+		aaa=100232
+		bbb=21
+	}	
+	local enum alfa {
+		beta  ' add members of beta to alfa
+		epsilon
+	}	
+	kappa()
+	kappa(kkk)
+	end sub	
+}
+Inner
 
 
 

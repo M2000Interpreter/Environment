@@ -66,15 +66,15 @@ Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Public Stable As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Private lastfind As String
 Private lasttype As Integer
 Private lastkey As String
 Private Hash() As Long
 Public Done As Boolean
 Public Index As Long
-Public StructLen As Long
+Public structLen As Long
 Private ParentIndex As Long
 Public NumericSort As Boolean
 Public IamBusy As Boolean
@@ -82,7 +82,9 @@ Public useclid As Long
 Private UseUcaseKeys As Boolean, Sorted As Boolean
 Private uScol() As Byte, useSCol As Boolean
 Private entrance As Long
+Public Tag As String
 Dim zeroitem As item, Piv As item, swapb(100) As Byte
+
 
 
 Private Sub Class_Initialize()
@@ -295,22 +297,22 @@ End If
 End Sub
 Public Sub Remove(RHS)
 If AllowSameKey Then Exit Sub
-Dim K As Long, k1 As Long, vvv As Variant, top1 As Long, ndx As Long, Parndx As Long
+Dim K As Long, k1 As Long, vvv As Variant, top1 As Long, nDx As Long, Parndx As Long
 If toplim < 0 Then Exit Sub
 top1 = toplim
-If Find2(RHS, Parndx, ndx) Then
+If Find2(RHS, Parndx, nDx) Then
         Sorted = False
         Done = True
-        Index = ndx
+        Index = nDx
         ' here we make a clean to pointers to PriveSpace, so we exclude the removing item
         If Parndx > -1 Then
             ' if we have a parent then just push to parent the Pleft pointer
             ' Pleft is always +1 (so Pleft 0 give -1 null for this context)
-            PriveSpace(Parndx).Pleft = PriveSpace(ndx).Pleft
+            PriveSpace(Parndx).Pleft = PriveSpace(nDx).Pleft
 
         Else
         ' so we have no parent, just out Pleft to Hash
-        Hash(PriveSpace(ndx).lastpos) = PriveSpace(ndx).Pleft
+        Hash(PriveSpace(nDx).lastpos) = PriveSpace(nDx).Pleft
 
         End If
         ' we don't have to see Hash() any more for RHS
@@ -319,21 +321,21 @@ If Find2(RHS, Parndx, ndx) Then
         ' We have to get change top1 to ndx, maybe we remove top1
         ' we can check this but it is faster to not check this (more often top1 isn't ndx)
         ' Using SwapVariant we can swap any kind of Variant, including objects (swaping pointers only)
-        If top1 = ndx Then
+        If top1 = nDx Then
         PriveSpace(top1) = new_item
         Else
         SwapVariant vvv, PriveSpace(top1).iValue
-        PriveSpace(ndx).iValue = -1 ' is good to pass a number - so we break any pointer to object
-        PriveSpace(ndx) = PriveSpace(top1) ' now we perform a copy (no objects included)
+        PriveSpace(nDx).iValue = -1 ' is good to pass a number - so we break any pointer to object
+        PriveSpace(nDx) = PriveSpace(top1) ' now we perform a copy (no objects included)
         PriveSpace(top1) = new_item
         ' so now we put back iValue (maybe is an object)
-        SwapVariant vvv, PriveSpace(ndx).iValue
+        SwapVariant vvv, PriveSpace(nDx).iValue
         End If
         ' here Lastpos is from previous PriveSpace(top1) which is PriveSpace(ndx)
-        K = Hash(PriveSpace(ndx).lastpos) - 1
+        K = Hash(PriveSpace(nDx).lastpos) - 1
         If K = top1 Then
             ' we have to give the new position to Hash()
-            Hash(PriveSpace(ndx).lastpos) = ndx + 1
+            Hash(PriveSpace(nDx).lastpos) = nDx + 1
         Else
          
          Do While K >= 0 And K <> top1 And K <> k1
@@ -343,7 +345,7 @@ If Find2(RHS, Parndx, ndx) Then
          If K = k1 Then
             Rehash
          ElseIf K = top1 Then
-            PriveSpace(k1).Pleft = ndx + 1
+            PriveSpace(k1).Pleft = nDx + 1
          End If
         End If
   
@@ -764,7 +766,7 @@ End If
 End If
 
 End Function
-Private Function Find2(RHS, Parndx As Long, ndx As Long) As Boolean
+Private Function Find2(RHS, Parndx As Long, nDx As Long) As Boolean
 Dim K As Long, Key As String, k1 As Long
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
@@ -773,7 +775,7 @@ K = Hash(HashFunc(Key)) - 1
 k1 = -2
 If K >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then Find2 = True: ndx = K: Exit Function
+    If PriveSpace(K).Key = Key Then Find2 = True: nDx = K: Exit Function
      Parndx = K
      k1 = K
      K = PriveSpace(K).Pleft - 1
@@ -784,7 +786,7 @@ K = Hash(HashFunc(Key)) - 1
 k1 = -2
 If K >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then Find2 = True: ndx = K: Exit Function
+    If PriveSpace(K).Key = Key Then Find2 = True: nDx = K: Exit Function
      Parndx = K
      k1 = K
      K = PriveSpace(K).Pleft - 1

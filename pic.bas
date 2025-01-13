@@ -3488,7 +3488,7 @@ End Function
 
 
 
-Static Function ValidNum(A$, final As Boolean, Optional cutdecimals As Boolean = False, Optional CheckType As Long = 0) As Boolean
+Static Function ValidNum(A$, Final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
 Dim r As Long
 Dim r1 As Long
 r1 = 1
@@ -3501,12 +3501,12 @@ r1 = 1
                             End If
               
 Dim v As Double, b$
-If final Then
+If Final Then
 r1 = IsNumberOnly(A$, r1, v, r, cutdecimals)
 
 r1 = (r1 And Len(A$) <= r) Or (A$ = vbNullString)
 If r1 Then
-Select Case CheckType
+Select Case checktype
 Case vbLong
 On Error Resume Next
     v = CLng(v)
@@ -4623,8 +4623,8 @@ Case "STOP", "диайопг"
 Case "DRAWING", "сведио"
     aHash.ItemCreator2 CStr(mycommands(I)), 0, 42
 Case "VAR", "VARIABLE", "VARIABLES", "летабкгтг", "летабкгтес"
-    aHash.ItemCreator2 CStr(mycommands(I)), 0, 43
-Case Else
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 43  ' 44 FOR CLASSES, 45 FOR CLASSES STRING NAME
+Case Else  ' MAYBE I MADE ONE FOR STRUCTURES
     aHash.ItemCreator CStr(mycommands(I)), 0
 End Select
 Next I

@@ -433,7 +433,7 @@ contHandler:
                             GoTo againtype
                         Else
                             wasarr = True
-                            GoTo checkit
+                            GoTo Checkit
                         End If
                     ElseIf IsStrExp(bstackstr, A$, s$, Len(bstackstr.tmpstr) = 0) Then
 ch1234:
@@ -442,7 +442,7 @@ ch1234:
                             Set vv = fastcol.ValueObj
                             GoTo againtype
                         Else
-                            If fastcol.StructLen > 0 Then GoTo checkit
+                            If fastcol.structLen > 0 Then GoTo Checkit
                                 r$ = Typename(fastcol.Value)
                             End If
                         Else
@@ -459,8 +459,8 @@ keynotexist:
    
                 Else
                     ' new
-checkit:
-                    If fastcol.StructLen > 0 Then
+Checkit:
+                    If fastcol.structLen > 0 Then
                                     Select Case fastcol.sValue
                                     Case Is < 0
                                         r$ = "String"
@@ -489,9 +489,18 @@ checkit:
                     End If
                 End If
             Case 2
-                r$ = "Buffer"
                 
-                
+                If Left$(A$, 1) = "|" Then
+                If TakeOffset(bstackstr, usehandler, A$, p) Then
+                    r$ = Typename(p)
+                Else
+                    
+                    Exit Function
+                End If
+                Else
+                    r$ = "Buffer"
+                    
+                End If
             Case 3
                 w1 = usehandler.indirect
                 If w1 > -1 And w1 <= var2used Then
@@ -4244,7 +4253,7 @@ Case 34
 Exit Do
 Case 13
 
-checkit:
+Checkit:
     If Not Lang Then
         b$ = sbname$ + "Problem in string in paragraph " & (countlines)
     Else
@@ -4261,7 +4270,7 @@ Loop
 If oldi <> I Then
 Else
 I = oldi + 1
-GoTo checkit
+GoTo Checkit
 End If
 
 Case 40
@@ -10978,10 +10987,10 @@ If BLen = 0 Then Exit Function
 End Function
 
 Public Function ideographs(C$) As Boolean
-Dim Code As Long
+Dim code As Long
 If C$ = vbNullString Then Exit Function
-Code = AscW(C$)  '
-ideographs = (Code And &H7FFF) >= &H4E00 Or (-Code > 24578) Or (Code >= &H3400& And Code <= &HEDBF&) Or (Code >= -1792 And Code <= -1281)
+code = AscW(C$)  '
+ideographs = (code And &H7FFF) >= &H4E00 Or (-code > 24578) Or (code >= &H3400& And code <= &HEDBF&) Or (code >= -1792 And code <= -1281)
 End Function
 Public Function nounder32(C$) As Boolean
 nounder32 = AscW(C$) > 31 Or AscW(C$) < 0
@@ -11772,7 +11781,7 @@ Else
 End If
         
 End Function
-Function ProcEnum(bstack As basetask, rest$, Optional Glob As Boolean = False) As Boolean
+Function ProcEnum(bstack As basetask, rest$, Optional Glob As Boolean = False, Optional alocal As Boolean = False) As Boolean
 Dim s$, w1$, v As Long, enumvalue As Variant, myenum As Enumeration, mh As mHandler, V1 As Long, I As Long
 Dim s1$, badd As Byte, lasttype, feed, w2$, usehandler As mHandler, myother As Enumeration
 Dim gr As Boolean, fromvar As Long, j As Long
@@ -11782,7 +11791,13 @@ lasttype = enumvalue
 badd = CByte(1)
 feed = enumvalue
 If FastPureLabel(rest$, w1$, , , , , , gr) = 1 Then
-    v = globalvar(myUcase(w1$, gr), v, , Glob)
+If Not (alocal Or Glob) Then
+If GetVar(bstack, myUcase(w1$, gr), j, , , True) Then
+                  MyEr "name " + w1$ + " exist", "το όνομα " + w1$ + " υπάρχει"
+                  Exit Function
+End If
+End If
+    v = globalvar(myUcase(w1$, gr), v, , (here$ = "") Or Glob)
     Set myenum = New Enumeration
     myenum.EnumName = w1$
 Else
@@ -11799,7 +11814,23 @@ If FastSymbol(rest$, "{") Then
             SetNextLine s$
         ElseIf FastPureLabel(s$, w1$, , , , , , gr) = 1 Then
             w2$ = myUcase(w1$, gr)
-            If GetVar(bstack, w2$, j, Glob) Then
+            If alocal Or Glob Then
+                If GetVar(bstack, w2$, j, Glob, , alocal) Then
+                If j <= fromvar Then
+                    If Typename(var(j)) = "mHandler" Then
+                        Set usehandler = var(j)
+                        If usehandler.T1 = 4 Then
+                            Set myother = usehandler.objref
+                            Set usehandler = Nothing
+                            If myUcase(myother.EnumName, True) = w2$ Then
+                                GoTo copyhere
+                            End If
+                        End If
+                    End If
+                End If
+                End If
+            ElseIf GetVar(bstack, w2$, j, , , True) Then
+check111:
                 If j <= fromvar Then
                     If Typename(var(j)) = "mHandler" Then
                         Set usehandler = var(j)
@@ -11808,6 +11839,7 @@ If FastSymbol(rest$, "{") Then
                             Set usehandler = Nothing
                             If myUcase(myother.EnumName, True) = w2$ Then
                                 ' just copy the names from other enum here
+copyhere:
                                 For j = 0 To myother.count - 1
                                     myother.Index = j
                                     If AssignTypeNumeric(enumvalue + badd, VarType(lasttype)) Then
@@ -11822,9 +11854,12 @@ If FastSymbol(rest$, "{") Then
                                 Next j
                                 ProcEnum = True
                                 GoTo conthere
+                            Else
+                            GoTo cont123344
                             End If
                         End If
                     End If
+                    
                   MyEr "name " + w1$ + " exist", "το όνομα " + w1$ + " υπάρχει"
                   If fromvar < varhash.count Then
                     varhash.ReduceHash fromvar, var()
@@ -11832,7 +11867,10 @@ If FastSymbol(rest$, "{") Then
                   ProcEnum = False
                   Exit Function
                 End If
+            ElseIf GetVar(bstack, w2$, j, True) Then
+                GoTo check111
             End If
+cont123344:
             If FastSymbol(s$, "=") Then
                 If IsExp(bstack, s$, enumvalue, , True) Then
                     feed = enumvalue
@@ -11867,7 +11905,7 @@ If FastSymbol(rest$, "{") Then
             mh.ReadOnly = True
             mh.index_cursor = feed
             mh.index_start = myenum.count - 1
-            V1 = globalvar(w1$, V1, , Glob)
+            V1 = globalvar(w1$, V1, , (here$ = "") Or Glob)
             Set var(V1) = mh
             ProcEnum = True
         Else
@@ -13528,7 +13566,7 @@ Dim aa As mHandler, bb As FastCollection, ah As String, p As Variant, s$, lastin
 Set aa = bstack.lastobj
 Set bstack.lastobj = Nothing
 Set bb = aa.objref
-If bb.StructLen > 0 Then
+If bb.structLen > 0 Then
 MyEr "Structure members are ReadOnly", "Τα μέλη της δομής είναι μόνο για ανάγνωση"
 Exit Function
 End If
@@ -14249,7 +14287,7 @@ If Not aa.objref Is Nothing Then
 If TypeOf aa.objref Is FastCollection Then
 Dim bb As FastCollection
 Set bb = aa.objref
-If bb.StructLen > 0 Then
+If bb.structLen > 0 Then
 MyEr "Structure members are ReadOnly", "Τα μέλη της δομής είναι μόνο για ανάγνωση"
 Exit Function
 End If
@@ -14581,7 +14619,7 @@ againtype:
                             GoTo againtype
                         Else
                             wasarr = True
-                            GoTo checkit
+                            GoTo Checkit
                         End If
                     ElseIf IsStrExp(bstackstr, A$, s$, Len(bstackstr.tmpstr) = 0) Then
                         If fastcol.IsObj Then
@@ -14590,7 +14628,7 @@ againtype:
                             Set v = fastcol.ValueObj
                             GoTo againtype
                         Else
-                        If fastcol.StructLen > 0 Then GoTo checkit
+                        If fastcol.structLen > 0 Then GoTo Checkit
                             r$ = Typename(fastcol.Value)
                         End If
                     Else
@@ -14603,8 +14641,8 @@ keynotexist:
                     End If
                 Else
                     ' new
-checkit:
-                    If fastcol.StructLen > 0 Then
+Checkit:
+                    If fastcol.structLen > 0 Then
                     FindItem = False
                     Exit Function
                     ElseIf wasarr Then
@@ -16585,7 +16623,7 @@ End If
             basestask.OriginalCode = -v
             basestask.FuncRec = subHash.LastKnown
 
-            frm$ = myl.Code$
+            frm$ = myl.code$
 PrepareLambda = True
 Exit Function
 1234
@@ -17167,7 +17205,7 @@ Public Function TraceThis(bstack As basetask, di As Object, b$, W$, SBB$) As Boo
             WaitShow = 0
             If bstack.OriginalCode < 0 Then
             lasttracecode = -bstack.OriginalCode
-                SBB$ = GetNextLine((var(-bstack.OriginalCode).Code$))
+                SBB$ = GetNextLine((var(-bstack.OriginalCode).code$))
             Else
             lasttracecode = bstack.OriginalCode
                 SBB$ = GetNextLine((sbf(Abs(bstack.OriginalCode)).sb))
@@ -17183,7 +17221,7 @@ Public Function TraceThis(bstack As basetask, di As Object, b$, W$, SBB$) As Boo
             Else
                 If bstack.OriginalCode <> 0 Then
                     If bstack.OriginalCode < 0 Then
-                        TestShowSub = var(-bstack.OriginalCode).Code$
+                        TestShowSub = var(-bstack.OriginalCode).code$
                     Else
                         TestShowSub = sbf(Abs(bstack.OriginalCode)).sb
                     End If
@@ -18538,8 +18576,10 @@ With players(prive)
                         Select Case usehandler.T1
                         Case 1
                             If usehandler.ReadOnly Then
-                                If usehandler.objref.StructLen > 0 Then
+                                If usehandler.objref.structLen > 0 Then
+
                                     s$ = s$ + "*[Structure]"
+                                    
                                 Else
                                     s$ = s$ + "*[Inventory/ReadOnly]"
                                 End If
@@ -18547,7 +18587,17 @@ With players(prive)
                                 s$ = s$ + "*[Inventory]"
                             End If
                         Case 2
-                            s$ = s$ + "*[Buffer]"
+                                If usehandler.objref.structref Is Nothing Then
+                                    s$ = s$ + "*[Buffer]"
+                                ElseIf usehandler.objref.structref.Tag <> "" Then
+                                    If usehandler.objref.items = 1 Then
+                                    s$ = s$ + "*[" + usehandler.objref.structref.Tag + "]"
+                                    Else
+                                    s$ = s$ + "*[" + usehandler.objref.structref.Tag + ":" & usehandler.objref.items & "]"
+                                    End If
+                                Else
+                                    s$ = s$ + "*[Buffer]"
+                                End If
                         Case 4
                             If myVarType(usehandler.index_cursor, vbString) Then
                             If Len(usehandler.index_cursor) > 3 * .mX Then
@@ -18702,7 +18752,7 @@ If Left$(mList.KeyToString, 2) <> "%_" Then
             Select Case usehandler.T1
             Case 1
                 If usehandler.ReadOnly Then
-                    If usehandler.objref.StructLen > 0 Then
+                    If usehandler.objref.structLen > 0 Then
                     s$ = s$ + mList.KeyToString + "*[Structure]"
                     Else
                     s$ = s$ + mList.KeyToString + "*[Inventory/ReadOnly]"
@@ -23545,7 +23595,7 @@ If HaltLevel > 0 Then rest$ = vbNullString: Exit Function
             If r = 0 Then
                 If UseMe Is Nothing Then Beep: newStart = True: Exit Function
                 If UseMe.IhaveExtForm Then
-                    rest$ = UseMe.Code + vbCrLf + "END"  ' mycoder.must()
+                    rest$ = UseMe.code + vbCrLf + "END"  ' mycoder.must()
                 End If
                 newStart = True
                 Exit Function
@@ -23957,8 +24007,8 @@ Else
 End If
 ProcFKey = True
 End Function
-Function placeme$(gre$, Eng$, Code As Long)
-If Code = 1 Then placeme$ = Eng$ Else placeme$ = gre$
+Function placeme$(gre$, Eng$, code As Long)
+If code = 1 Then placeme$ = Eng$ Else placeme$ = gre$
 End Function
 Function MyScan(basestack As basetask, rest$) As Boolean
 Dim p As Variant, Y As Double, s$
@@ -29440,24 +29490,26 @@ If basestack.priveflag Then what$ = ChrW(&HFFBF) + what$
                         If Not MyIsObject(var(I)) Then MakeitObjectInventory var(I)
                     Else
 makeitnow:
-                        I = globalvar(basestack.GroupName + what$, Empty, Glob)
+                        I = globalvar(basestack.GroupName + what$, Empty, , Glob)
                         MakeitObjectInventory var(I)
                         Set usehandler = var(I)
                         usehandler.objref.UcaseKeys = True
+                        usehandler.objref.Tag = what$
+                        comhash.ItemCreator2 what$, 0, 44
                     End If
                      Set usehandler = var(I)
 Set offsetlist = usehandler.objref
 ' so now we have the inventory
 Dim mm As Long
 If Fast2LabelNoNum(rest$, "APPEND", 6, "ΠΡΟΣΘΗΚΗ", 8, 8) Then
-    mm = offsetlist.StructLen
+    mm = offsetlist.structLen
 End If
 If FastSymbol(rest$, "{") Then
 
     
     If StructPage(basestack, rest$, Lang, mm, Offset, offsetlist, "") Then
     If offsetlist Is Nothing Then Exit Function
-    offsetlist.StructLen = Offset
+    offsetlist.structLen = Offset
     usehandler.ReadOnly = True
     makestruct = True
     End If
@@ -33357,7 +33409,11 @@ nm$ = vbNullString
 
 If Len(rest$) > 0 Then
 If Not MaybeIsSymbol(rest$, TT$) Then
-   If GetSub(bstack.GroupName + W$ + "()", j) Then
+   If GetSub(bstack.GroupName + ChrW(&HFFBF) + W$ + "()", j) Then
+    If Not sbf(j).IamAClass Then GoTo grerror
+    W$ = ChrW(&HFFBF) + W$
+    GoTo cont111
+   ElseIf GetSub(bstack.GroupName + W$ + "()", j) Then
    
         If Not sbf(j).IamAClass Then
 grerror:
@@ -33365,6 +33421,7 @@ grerror:
             ExecuteGroupStruct = 0
             Exit Function
         End If
+cont111:
         f$ = "=" + bstack.GroupName + W$ + "()"
         
         j = IsLabelA(here$, rest$, W$)
@@ -33550,6 +33607,9 @@ cont120345:
                                     End If
                                     p = Empty
                                     GoTo continuehere
+                                ElseIf usehandler.T1 = 1 And usehandler.ReadOnly Then
+                                ' is a struct
+                                Stop
                                 Else
                                     ExpectedEnumType
                                     Exit Function
