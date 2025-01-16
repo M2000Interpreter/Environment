@@ -304,7 +304,7 @@ If ErrorMes = 0 And mitems > 0 Then
         .ItemCreator2 cUlng(Offset + 1), AnyString
         PutStringAtOffset = .StrPointer
         End If
-        .done = False
+        .Done = False
         End With
     End If
 Else
@@ -328,7 +328,7 @@ If ErrorMes = 0 And mitems > 0 Then
             AnyString = "Crash"
             GetStringFromOffset = Addr
         End If
-        .done = False
+        .Done = False
         End With
     End If
     
@@ -925,9 +925,9 @@ If w2 <> -1 Then w2 = w2 / dv15
     
 End Function
 
-Function CopyItem(ByVal that As Long, done As Boolean) As MemBlock
+Function CopyItem(ByVal that As Long, Done As Boolean) As MemBlock
     If BasicItem = vbString Or mSubtype > 0 Then
-        done = False
+        Done = False
         Exit Function
     End If
     that = GetPtr(that)
@@ -940,6 +940,27 @@ Function CopyItem(ByVal that As Long, done As Boolean) As MemBlock
         If UseStruct Then
             Set CopyItem.structref = Me.structref
         End If
-        done = True
+        Done = True
+    End If
+End Function
+Function CopyItemString(ByVal that As Long, ByVal bytes As Long, Done As Boolean) As String
+    If BasicItem = vbString Or mSubtype > 0 Then
+        Done = False
+        Exit Function
+    End If
+    If bytes <= 0 Then bytes = itemlen
+    If ValidArea2(that, bytes) Then
+    that = GetPtr(that)
+    If ErrorMes = 0 Then
+        Dim place As Long
+        If bytes Mod 2 = 1 Then
+            CopyItemString = StrConv(String(bytes, Chr(0)), vbFromUnicode)
+        Else
+            CopyItemString = String$((bytes + 1) \ 2, Chr(0))
+        End If
+        
+        CopyMemory ByVal StrPtr(CopyItemString), ByVal that, bytes
+        Done = True
+    End If
     End If
 End Function

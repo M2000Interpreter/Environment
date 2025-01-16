@@ -1,152 +1,75 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 63 active-X
-1. We can define user objects from classes using the compact format:
-nameofclass var1, var2
-or the standard format:
-var var1=nameofclass(), var2=nameofclass()
-
-if we use constructor then this is the compact:
-nameofclass var1(1,2,3), var2(1,2,3)
-... and this is the standard format:
-var var1=nameofclass(1,2,3), var2=nameofclass(1,2,3)
-
-Classes inside classes are local to class. Classes outside class definition is global.
-
-Look this example. We have a global class Alfa and a private class Alfa inside class Something. We can make a class Alfa from the global one using the proper "global" name from modules (members of class).
-If we change the .a<=.alfa(20, 30) with .a<=alfa(20, 30, 40)  we get the global class. So Beta has a with a.x, a.y and a.z members.
-
-So our class can use the private alfa without problems from global classes which some previous module make it. The same hold for public alfa in class Something.
-
-So the M2000 Interpreter allow objects to have same "type" but not same members. The scope distinguish each other.
-
-Previous revisions use the compact form inside classes only.
-
-if true then {
-	class alfa {
-		x, y, z
-	class:
-		module alfa (.x,.y, .z) {
-		}
-	}
-	alfa a(20, 30, 50)
-	Print a.x, a.y, a.z
-}
-
-Class Something {
-private:
-	class alfa {
-		x, y
-	class:
-		module alfa (.x,.y) {
-		}
-	}
-	alfa d(1, 2)  ' is the local one
-public:
-	group a
-	module dothat {
-		// use the global alfa
-		try ok {
-		alfa a(20, 30, 50)
-		Print a.x, a.y, a.z
-		? "ok........................."
-		}
-		if ok and not error then list else print error$
-	}	
-	module doit {
-		// use the private alfa
-		.alfa a(20, 30)
-		Print a.x, a.y, valid(a.z)=false
-		// list
-	}
-class:
-	module Something {
-		.a<=.alfa(20, 30)
-	}
-}
-Something Beta
-Beta.doit
-Beta.dothat
-Print beta.a.x, beta.a.y, valid(beta.a.z)=false
-delta=beta  ' delta get a copy of beta
-Print delta.a.x, delta.a.y, valid(delta.a.z)=false
-list
-
-2. Structures (work on progress)
-
-I would like to include the notation a|x for the equivalent eval(a,0!x) although the later cast to other types.
-Structures used for making buffers and using pointers for passing them to external functions. So a(4, y) is the real memory address of the 5th alfa item at offset y (which is 8). We can pass a number using Return a, 4!y:=-23.34e32, 3!k!50:=255 ' max value for byte, if we place a bigger no error raised, only one byte used, the lower one. 
-
+Version 12 Revision 64 active-X
+1. More on Structures:
+==Test Program==
 structure alfa {
-	x as double
-	y as double*5
-	k as byte*100
-	z as long	
-}
-// buffer clear a as alfa*10  same as alfa a[10]
-alfa a[10], b[100]
-Print a(4, y)-a(4,x) = 8 ' 8 bytes for a double value
-for i=0 to 99 
-	return a, 4!k!i:=i+1
-next
-print a[4]|k[1], " address="; a(4, k, 1)  ' value, memory address
-print a[4]|k[2], " address="; a(4, k, 2)  ' value, memory address
-print a[4]|k[15]
-byte a4k2= a[4]|k[2], a4k15= a[4]|k[15]
-return a, 4!k!2:=a4k15, 4!k!15:=a4k2
-print a[4]|k[2]
-print a[4]|k[15]
-k=a[4]  // get a copy of a[4] to k
-return a, 0:=eval$(k)
-print len(k)
-print k|k[2]
-print a[0]|k[2]
-list
-
-3. Enum now can be local/global and local shadowing local enum (in a sub).  Also Enum alfa here has a part beta, a previous defined enum. So we can define global, local (without using Local) and Local new (using Local statement).
-
-
-global enum beta {
-	kkk=2313
-	aaa=100123123
-	bbb=123213
-}	
-global enum alfa {
-	beta  ' add members of beta to alfa
-	epsilon=123123
-}
-module Inner {
-	enum beta {
-		kkk
-		aaa=100
-		bbb
-	}	
-	enum alfa {
-		beta  ' add members of beta to alfa
-		epsilon
+	{ i as integer *50
 	}
-	kappa()
-	kappa(kkk)
-	other()
-	list
-	sub kappa(m as alfa=aaa)
-		Print m
-	end sub
-	sub other()
-	local enum beta {
-		kkk=33
-		aaa=100232
-		bbb=21
-	}	
-	local enum alfa {
-		beta  ' add members of beta to alfa
-		epsilon
-	}	
-	kappa()
-	kappa(kkk)
-	end sub	
+	x as byte *100
+	b as double
 }
-Inner
+alfa a[100]
+return a, 4!x!9:=1235 as integer, 4!i!10:=2334
+? a[4]|x[9]=211
+? a[4]|x[10]=4
+? 4*256+211=1235
+b=a[4]
+? b|i[10]
+a[4]|i[10]="hello"
+a|b=12312.12312
+? a|b
+locale 1033
+? "["+a|b+"]"="[12312.12312]"
+locale 1032
+? "["+a|b+"]"="[12312,12312]"
+locale 1033
+? "hello"=a[4]|i[10, 10]
+a[4]|i[0]="hello"
+? "hello"=a[4, 10]
+? a[4, 10]="hello" and a[4]|i[0, 10]="hello"
+
+==Another Example==
+structure beta {
+	k as byte *100
+}
+structure alfa {
+	z as integer*50
+	delta as beta*10
+}
+alfa m[30]
+beta mm
+m[0]|delta[3 as byte]=202
+? eval(m, 100+100*3 as byte)=202
+? m[0]|delta[3 as byte]=202
+mm[0]=m[0]|delta[3]
+? mm|k[0]=202
+? len(alfa)=1100
+
+2. A bug removed:
+The bug was on the reading of weak references at SUBS. The problem not happen to Module, because module has own name space. A sub has the modules name space. So when we call again ALFA() in ALFA() and push the weak reference of B as &B for reading as &A first the interpreter create A (shadowing all A) and then as the &A pop from stack of values, the weak reference attach to B, but which weak reference? The problem: Tho older revision get the newer A which refer to old B, so the new B also refer to old B (so non has the A value).
+To correct the problem: I mark the number of currently defined variables, before start to read the stack of values and then on a weak reference I get the variable which has index (at the variables list) less or equal to Mark. So when A created from B, the B get reference not from the last A (index>Mark) but from the previous one. The List is a hash table and all the "same" variables are in the same linked list. Modules not have this problem because its new call to same name a new namespace created so for that name space we didn't have weak references to have problem.
+
+===Test Program---
+MODULE ALFA (&A, &B, DEP) {
+	IF DEP<1 THEN EXIT
+	CALL ALFA &B, &A, DEP-1
+	B+=2*A
+}
+var M=3, A=10, B=5
+? A, B
+ALFA(&A, &B, M)
+? A=60, B=145
+var A=10, B=5
+? A, B
+CALL ALFA &A, &B, M
+? A=60, B=145
+SUB ALFA(&A, &B, DEP)
+	IF DEP<1 THEN EXIT SUB
+	ALFA(&B, &A, DEP-1)
+	B+=2*A
+END SUB
+
 
 
 
