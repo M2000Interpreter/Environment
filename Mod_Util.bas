@@ -11254,7 +11254,7 @@ End Function
 Function enthesi(bstack As basetask, rest$) As String
 'first is the string "label {0} other {1}
 Dim counter As Long, pat$, Final$, pat1$, pl1 As Long, pl2 As Long, pl3 As Long
-Dim q$, p As Variant, P1 As Integer, pd$, insertdot As Boolean
+Dim q$, p As Variant, P1 As Integer, pd$, insertdot As Boolean, threeparam As Boolean
 If IsExp(bstack, rest$, p, , True) Then
     If MemInt(VarPtr(p)) = vbString Then SwapString2Variant Final$, p: p = Empty: GoTo cont1
     MissStringExpr
@@ -11264,6 +11264,7 @@ If IsStrExp(bstack, rest$, Final$, False) Then
 cont1:
   If FastSymbol(rest$, ",") Then
     insertdot = False
+    threeparam = False
     Do
                 pl2 = 1
                     pat$ = "{" & (counter)
@@ -11307,10 +11308,16 @@ again11:
                         P1 = val("0" + Mid$(Final$, pl2 + Len(pat1$)))
                         
                     End If
-                    
-                    pl3 = val(Mid$(Final$, pl2 + Len(pat1$) + Len(str$(P1))) + "}")
+                    pl3 = pl2 + Len(pat1$) + Len(LTrim(str$(P1)))
+                    If Mid$(Final$, pl3, 1) = ":" Then
+                        pl3 = val(Mid$(Final$, pl2 + Len(pat1$) + 1 + Len(LTrim(str$(P1)))) + "}")
+                        threeparam = True
+                    Else
+                        pl3 = 0
+                    End If
                     
                         If P1 < 0 Then
+                        
                         If pl3 = 0 Then pl3 = P1
                             P1 = 0
                         ElseIf pl3 = 0 And Not insertdot Then
@@ -11333,7 +11340,13 @@ again11:
                                 GoTo cont2234
                             ElseIf InStr(pd$, "e") > 0 Then '' we can change e to greek å
 cont2234:
+                                If threeparam Then
                                 pd$ = Format$(p, "0." + String$(P1, "0") + "E+####")
+                                Else
+                                
+                                pd$ = Format$(p, "0." + String$(Abs(pl3) \ 4, "0") + "E+####")
+
+                                End If
                                 If Not NoUseDec Then
                                    If Not OverideDec Then
                                         pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_SDECIMAL), NowDec$)
@@ -11346,9 +11359,16 @@ cont2234:
                             End If
                         Case Else
 cont5534:
-                            p = MyRound(p, P1)
-                            If P1 <> 0 Then
-                                pd$ = Format$(p, "0." + String$(P1, "0"))
+                            
+                            If threeparam Then
+                                If P1 < 0 Then P1 = -P1
+                                If P1 > 28 Then P1 = 28
+                                p = MyRound(p, P1)
+                                If P1 = 0 Then
+                                    pd$ = Format$(p, "0")
+                                Else
+                                    pd$ = Format$(p, "0." + String$(P1, "0"))
+                                End If
                                 If Not NoUseDec Then
                                    If Not OverideDec Then
                                         pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_SDECIMAL), NowDec$)
@@ -26506,9 +26526,12 @@ makeitnow1:
                 If j = 8 Then
                 Dim rA As refArray
                 Set rA = New refArray
-                
+                Dim skipitems As Boolean
+                skipitems = False
                 If Not IsExp(basestack, rest$, p, flatobject:=True, nostring:=thattype <> vbString) Then
-                    MyAnyType = False: MissNumExpr: Exit Function
+                   ' MyAnyType = False: MissNumExpr: Exit Function
+                    p = 0&
+                    skipitems = True
                 End If
                 p = Abs(Int(p))
                 If Not FastSymbol1(rest$, "]") Then
@@ -26516,7 +26539,11 @@ makeitnow1:
                 End If
                 Set var(I) = rA
                 P1 = 0
-                If FastSymbol1(rest$, "[") Then
+                If skipitems Then
+                    rA.emtype = thattype
+                    'rA.DefArrayAt 0, thattype, CLng(p)
+                    rA.MarkTwoDimension = False
+                ElseIf FastSymbol1(rest$, "[") Then
                     If Not IsExp(basestack, rest$, P1, flatobject:=True, nostring:=thattype <> vbString) Then
                         MyAnyType = False: MissNumExpr: Exit Function
                     End If
@@ -32997,7 +33024,7 @@ BYPASS3:
                     If Not lcl Then
                         ThisGroup.FuncList = Chr$(1) & Chr$(2) & f$ & "() -" & (I) & Chr$(1) & ThisGroup.FuncList
                     Else
-                        ThisGroup.LocalList = ThisGroup.LocalList + vbCrLf + "Local Function " + f$ + "{" + sbf(I).sb + "}"
+                        ThisGroup.localList = ThisGroup.localList + vbCrLf + "Local Function " + f$ + "{" + sbf(I).sb + "}"
                     End If
                 End If
             Else
@@ -33014,7 +33041,7 @@ BYPASS3:
                     If Not lcl Then
                         ThisGroup.FuncList = Chr$(1) & Chr$(2) & f$ & "() " & (I) & s$ & Chr$(1) & ThisGroup.FuncList
                     Else
-                        ThisGroup.LocalList = ThisGroup.LocalList + vbCrLf + "Local Function " + f$ + "{" + sbf(I).sb + "}"
+                        ThisGroup.localList = ThisGroup.localList + vbCrLf + "Local Function " + f$ + "{" + sbf(I).sb + "}"
                     End If
                 End If
             End If
@@ -33205,13 +33232,13 @@ If Final Then
  If Not lcl Then
  ThisGroup.FuncList = Chr$(1) & Chr$(3) & f$ & " -" & (I) & Chr$(1) & ThisGroup.FuncList
  Else
-  ThisGroup.LocalList = ThisGroup.LocalList + vbCrLf + "Local Module " + f$ + "{" + sbf(I).sb + "}"
+  ThisGroup.localList = ThisGroup.localList + vbCrLf + "Local Module " + f$ + "{" + sbf(I).sb + "}"
  End If
 Else
  If Not lcl Then
  ThisGroup.FuncList = Chr$(1) & Chr$(3) & f$ & " " & (I) & Chr$(1) & ThisGroup.FuncList
  Else
-  ThisGroup.LocalList = ThisGroup.LocalList + vbCrLf + "Local Module " + f$ + "{" + sbf(I).sb + "}"
+  ThisGroup.localList = ThisGroup.localList + vbCrLf + "Local Module " + f$ + "{" + sbf(I).sb + "}"
  End If
  End If
 End If
@@ -33656,9 +33683,9 @@ cont120345:
                                     End If
                                     p = Empty
                                     GoTo continuehere
-                                ElseIf usehandler.T1 = 1 And usehandler.ReadOnly Then
+                              '  ElseIf usehandler.T1 = 1 And usehandler.ReadOnly Then
                                 ' is a struct
-                                Stop
+                              '  Stop
                                 Else
                                     ExpectedEnumType
                                     Exit Function

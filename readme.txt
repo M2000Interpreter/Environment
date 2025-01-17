@@ -1,76 +1,166 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 64 active-X
-1. More on Structures:
-==Test Program==
-structure alfa {
-	{ i as integer *50
-	}
-	x as byte *100
-	b as double
-}
-alfa a[100]
-return a, 4!x!9:=1235 as integer, 4!i!10:=2334
-? a[4]|x[9]=211
-? a[4]|x[10]=4
-? 4*256+211=1235
-b=a[4]
-? b|i[10]
-a[4]|i[10]="hello"
-a|b=12312.12312
-? a|b
-locale 1033
-? "["+a|b+"]"="[12312.12312]"
-locale 1032
-? "["+a|b+"]"="[12312,12312]"
-locale 1033
-? "hello"=a[4]|i[10, 10]
-a[4]|i[0]="hello"
-? "hello"=a[4, 10]
-? a[4, 10]="hello" and a[4]|i[0, 10]="hello"
+Version 12 Revision 65 active-X
+1. More for Structures:
+Now we can use the fields of multiple structures in structures
+Also we can get part of a struncture and copy back, easy.
+Rember structures used for buffers. Buffers are memory buffers attatch to an object "the Buffer". So we handle this object to read/write at memory buffer. We use buffers for binary files and for passing to c functions, or assembly code.
+Because buffer is an object we can place it in arrays or passing to functions or return from functions. Also we can make user objects who hold buffers.
+Also now we have bound check on arrays of fields. We can use unions to have access anywhere or we can use Eval$() which also can read from anywhere from a buffer. For all readings/writings there is another check at the level of offsets and sizes.
 
-==Another Example==
-structure beta {
-	k as byte *100
+==Example 1==
+structure zeta {
+	delta as integer * 10
 }
 structure alfa {
-	z as integer*50
-	delta as beta*10
+	kappa as double*10
+	beta as integer*5
+	epsilon as zeta * 10
 }
-alfa m[30]
-beta mm
-m[0]|delta[3 as byte]=202
-? eval(m, 100+100*3 as byte)=202
-? m[0]|delta[3 as byte]=202
-mm[0]=m[0]|delta[3]
-? mm|k[0]=202
-? len(alfa)=1100
+alfa k[10]
+Print len(alfa)
+k[2]|epsilon[1]|delta[2]=100
 
-2. A bug removed:
-The bug was on the reading of weak references at SUBS. The problem not happen to Module, because module has own name space. A sub has the modules name space. So when we call again ALFA() in ALFA() and push the weak reference of B as &B for reading as &A first the interpreter create A (shadowing all A) and then as the &A pop from stack of values, the weak reference attach to B, but which weak reference? The problem: Tho older revision get the newer A which refer to old B, so the new B also refer to old B (so non has the A value).
-To correct the problem: I mark the number of currently defined variables, before start to read the stack of values and then on a weak reference I get the variable which has index (at the variables list) less or equal to Mark. So when A created from B, the B get reference not from the last A (index>Mark) but from the previous one. The List is a hash table and all the "same" variables are in the same linked list. Modules not have this problem because its new call to same name a new namespace created so for that name space we didn't have weak references to have problem.
-
-===Test Program---
-MODULE ALFA (&A, &B, DEP) {
-	IF DEP<1 THEN EXIT
-	CALL ALFA &B, &A, DEP-1
-	B+=2*A
+Print k[2]|epsilon[1]|delta[2]
+k[2]|epsilon[5]=k[2]|epsilon[1]
+zeta m
+m[0]=k[2]|epsilon[5]
+m|delta[2]=m|delta[2]*3
+return m, 0!delta!4:=500
+m|delta[5]=600
+k[2]|epsilon[5]=m[0]
+for i=2 to 5
+print i, k[2]|epsilon[5]|delta[i]
+next
+list
+==Example 2==
+' long long here is Unsigned Long Long (has type Decimal, but values as unsigned long long)
+structure epsilon { 'this is union
+	{
+	betaLong as long*20
+	}	
+	beta as long long*10
 }
-var M=3, A=10, B=5
-? A, B
-ALFA(&A, &B, M)
-? A=60, B=145
-var A=10, B=5
-? A, B
-CALL ALFA &A, &B, M
-? A=60, B=145
-SUB ALFA(&A, &B, DEP)
-	IF DEP<1 THEN EXIT SUB
-	ALFA(&B, &A, DEP-1)
-	B+=2*A
-END SUB
+structure delta {
+	something as byte*100
+	beta as epsilon*10
+}
+buffer clear kappa as long long*5 ' no structure
+delta alfa 
+epsilon z
+? (z(0),alfa(0), kappa(0))#str$(" ")
+? len(z)=80
+alfa|beta[4]|beta[2]=300
+? alfa|beta[4]|beta[2]=300
+z=alfa|beta[]
+? z[4]|beta[2]=300
+? len(Z)=800
+zz=z[4]
+? zz|beta[2]=300
+? zz|betaLong[4]=300  ' low byte
+' kappa has no fields, just 10 long long
+old=kappa(0)
+'return kappa, 0:=zz|beta[0, 80] ' same pointer
+'return kappa, 0:=eval$(zz|beta[]) ' same pointer
+' kappa[0]=zz|beta[]  ' same pointer but not fit the new one
+? len(kappa)=40
+kappa=zz|beta[]  ' new pointer to k - expanded
+? len(kappa)=80
+Print Old+" "+(kappa(0))
+Print kappa[2]=300
+Print Eval(Kappa, 8*2 as long)=300 ' unsigned long low
+Print Eval(Kappa, 8*2+4 as long) =0 ' unsigned long High
+with delta, "done", true, "index", 1, "StructMany" as Many, "StructOffset" as Offset
+? Many=10, Offset=100
+Print "Only alfa has same address, all other changed"
+? (z(0),alfa(0), kappa(0))#str$(" ")
+list
 
+2. We can define arrays with parenthesis and types as empty arrays. (new from this revision)
+==Example 3==
+dim a() as long, b() as integer
+Print len(a()), len(b())
+dim a(10), b(5)
+Print len(a()), len(b())
+? type$(a(3)), type$(b(4))
 
+3.We can define arrays with square brackets and types as empty arrays. (new from this revision).
+==Example 4==
+long a[], b[]
+Print len(a)=0, len(b)=0
+a[10]=100
+b[4]=50
+z=b
+Print z is b = true
+Print len(a)=11, len(b)=5
+' change pointer to new empty arrays.
+long a[], b[]
+Print z is b = false
+Print len(a)=0, len(b)=0, len(z)=5
+Print z[4]=50
+List
+
+4. Fix the Format$() which now work as expected
+==example 5==
+a=1221.1212
+Print format$("{0}", a)
+Print format$("{0:-10}", a)
+Print format$("{0:-10}", ""+a) 
+Print format$("{0:10}", a)
+Print format$("{0:10}", ""+a)
+Print format$("{0:3:-10}", a) 
+Print format$("{0::-10}", a)
+Print format$("{0:3:10}", a)
+Print format$("{0::10}", a)
+5. Fix Inner While when the inner one uses multiple iterators.
+--Example 6==
+Module Iterators (f as long=-2) {
+	NameOfDay=("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
+	NameOfColor=Stack:="Red","Orange","Yellow","Green","Blue","Purple"
+	Positions=list:="first":=1,"fourth":=4,"fifth":=5
+	
+	Print #f, "All days:"
+	m=each(NameOfDay)
+	while m    ' ok
+		print #f, (m^+1)+". "+array$(m)
+	end while
+	Print #f
+	Print #f, "All colors:"
+	m=each(NameOfColor)
+	while m
+		print #f, (m^+1)+". "+StackItem$(m)
+	end while
+	Print #f
+	Print #f, "Print from positions from the first:"
+	a=each(Positions)
+	while a   
+		m=each(NameOfDay, eval(a))
+		n=each(NameOfColor, eval(a))
+		while m, n
+			Print #f, format$("{0:10} {1:10} {2:10}", eval$(a!), array$(m), stackitem$(n))
+			exit
+		end while
+	end while
+	Print #f
+	Print #f, "Print from positions from the last:"
+	a=each(Positions)
+	while a
+		m=each(NameOfDay, -eval(a))
+		n=each(NameOfColor, -eval(a))
+		while m, n
+			Print #f, format$("{0:10} {1:10} {2:10}", eval$(a!), array$(m), stackitem$(n))
+			exit
+		end while		
+	end while
+}
+open "" for wide output as #c
+Iterators c
+close #c
+exit
+open "output1.txt" for wide output as #c
+Iterators c
+close #c
+win dir$+"output1.txt"
 
 
 George Karras, Kallithea Attikis, Greece.

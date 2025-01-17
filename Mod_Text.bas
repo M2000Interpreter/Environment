@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 64
+Global Const Revision = 65
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -307,7 +307,9 @@ jumphere1:
                     If Abs(AscW(Mid$(A$, Pos, 1))) < 31 Then Exit Do
                     Pos = Pos + 1
                 Loop
-        
+            ElseIf W$ = "[" Then
+        Pos = Pos + 1
+        If Not BlockParam2s(A$, Pos) Then Exit Do
             ElseIf W$ = "(" Then
 again:
                 If part$ <> "" Then
@@ -584,7 +586,9 @@ Do While Pos <= Len(A$)
     If V1 = 34 Then
         If pos2 = 0 Then aheadstatusStr = True
         Exit Function
-
+    ElseIf W$ = "[" Then
+        Pos = Pos + 1
+        If Not BlockParam2s(A$, Pos) Then Exit Do
     ElseIf W$ = "(" Then
         
 again22:
@@ -1049,7 +1053,15 @@ again22:
        b$ = b$ + part$
        End If
         part$ = vbNullString
-        
+        ElseIf W$ = "[" Then
+            Pos = Pos + 1
+            If Not BlockParam2s(A$, Pos) Then Exit Do
+            If part$ = "N" Then
+            ElseIf part$ = "S" Then
+            Else
+            b$ = b$ + part$
+            part$ = "N"
+            End If
     ElseIf W$ = "{" Then
 
 Select Case Left$(Right$(b$, 2), 1)
@@ -1112,7 +1124,7 @@ Select Case Left$(Right$(b$, 2), 1)
                     If Mid$(A$, Pos + 1, 1) = "." Then Pos = Pos + 1
                     part$ = vbNullString
             End If
-        Case "+", "-", "|"
+        Case "+", "-" ', "|"
                     b$ = b$ + part$
                     If b$ = vbNullString Then
                     Else
@@ -1443,6 +1455,9 @@ Do While Pos <= lenA
         If Abs(AscW(Mid$(A$, Pos, 1))) < 31 Then Exit Do
         Pos = Pos + 1
         Loop
+    ElseIf W$ = "[" Then
+        Pos = Pos + 1
+        If Not BlockParam2s(A$, Pos) Then Exit Do
     ElseIf W$ = "(" Then
 again22:
       Pos = Pos + 1
@@ -1929,6 +1944,9 @@ Do While Pos <= Len(A$)
         If Abs(AscW(Mid$(A$, Pos, 1))) < 31 Then Exit Do
         Pos = Pos + 1
         Loop
+    ElseIf W$ = "[" Then
+        Pos = Pos + 1
+        If Not BlockParam2s(A$, Pos) Then Exit Do
     ElseIf W$ = "(" Then
 again22:
       Pos = Pos + 1
@@ -1988,6 +2006,9 @@ again22:
         ElseIf Mid$(A$, Pos + 1, 1) = "(" Then
         Pos = Pos + 1: GoTo again22
         End If
+    ElseIf W$ = "[" Then
+        Pos = Pos + 1
+        If Not BlockParam2s(A$, Pos) Then Exit Do
     ElseIf W$ = "{" Then
        If Pos <= Len(A$) Then
         'If Not blockStringAhead(a$, pos) Then Exit Do
@@ -2691,8 +2712,12 @@ Loop
 Pos = lenA + 2
 
 End Function
-Public Sub aheadstatusEND(A$, Pos As Long, Lang As Long, second1$, len1 As Long, second2$, len2 As Long, flag As Boolean, V1 As Long)
+Public Sub aheadstatusENDWHILE(A$, Pos As Long, Lang As Long, flag As Boolean, V1 As Long)
 Dim pos2 As Long, what$, W$, lenA As Long, level2 As Integer, CM As Integer
+Const second1$ = "ΕΝΩ"
+Const len1 As Long = 3
+Const second2$ = "WHILE"
+Const len2 As Long = 5
 flag = False
 CM = 1
 If A$ = vbNullString Then Exit Sub
@@ -2726,7 +2751,6 @@ again22:
     ElseIf W$ = "{" Then
        If Len(what$) > 0 Then what$ = vbNullString
        If Pos <= lenA Then
-        'If Not blockStringAhead(a$, pos) Then Exit Do
         Pos = blockLen2(A$, Pos + 1)
         If Pos = 0 Then Pos = lenA: Exit Do
         End If
@@ -2753,10 +2777,12 @@ again22:
                             ElseIf what$ = second1$ Then
                                 Pos = Pos - 1
                                 Do
+                                Do
                                     Pos = Pos + 1
                                     pos2 = Pos
                                     aheadstatusNew A$, Pos, flag
                                 Loop While flag And MaybeIsSymbol3(A$, ",", Pos)
+                                Loop Until Not MaybeIsSymbol3(A$, ",", Pos)
                                 If MaybeIsSymbol3(A$, "{", Pos) Then
                                     aheadstatusSTRUCT A$, Pos
                                 ElseIf MaybeIsSymbol3lot(A$, b1234, Pos) Then
@@ -2783,10 +2809,12 @@ again22:
                             ElseIf what$ = second2$ Then
                                 Pos = Pos - 1
                                 Do
+                                Do
                                     Pos = Pos + 1
                                     pos2 = Pos
                                     aheadstatusNew A$, Pos, flag
                                 Loop While flag And MaybeIsSymbol3(A$, ",", Pos)
+                                Loop Until Not MaybeIsSymbol3(A$, ",", Pos)
                                 If MaybeIsSymbol3(A$, "{", Pos) Then
                                     aheadstatusSTRUCT A$, Pos
                                 ElseIf MaybeIsSymbol3lot(A$, b1234, Pos) Then
@@ -6649,7 +6677,6 @@ syner:
                             End If
                         End If
                     ElseIf TypeOf r1 Is mHandler Then
-                    ' stop
                     Set usehandler = r1
                     If usehandler.T1 = 2 Then
                     If Fast2LabelNoNum(aa$, "TYPE", 4, "ΤΥΠΟΣ", 5, 5) Then
@@ -6670,7 +6697,14 @@ syner:
                         GoTo syner
                     End If
                     End If
+                    If FastSymbol(aa$, "(") Then
+                    If IsExp(bstack, aa$, r, , , False) Then
+                    If FastSymbol(aa$, ")") Then GoTo contHereHandler
+                    End If
+                    Else
                     If IsNumber(bstack, aa$, r) Then GoTo contHereHandler
+                    If IsExp(bstack, aa$, r, , , False) Then GoTo contHereHandler
+                    End If
                     IsExpA = False
                     Exit Function
                     
@@ -10343,6 +10377,7 @@ conthere123:
             ' this is ok for both buffer and inventory
             Set usehandler = var(VR)
             If usehandler.T1 = 2 Then
+                
                 If V1& = 8 Then
                 If IsExp(bstack, A$, pp, , flatobject:=True, nostring:=True) Then
                 
@@ -10353,7 +10388,18 @@ conthere123:
                 Mid$(A$, 1, 2) = "  "
                 GoTo cont8case
                 Else
+                
+                
                 Mid$(A$, 1, 1) = " "
+                    If usehandler.objref.structref Is Nothing Then
+                    
+                    If TakeOffset(bstack, usehandler, A$, r, pp) Then
+                    IsNumberNew = True
+                        
+                    End If
+                    
+                    Exit Function
+                    Else
                     Set pp = usehandler.objref.CopyItem(CLng(pp), par)
                     If par Then
                         Set usehandler = New mHandler
@@ -10364,6 +10410,7 @@ conthere123:
                     End If
                     r = 0
                     Set pp = Nothing
+                    End If
                     Exit Function
                 End If
                 ElseIf FastSymbol(A$, ",") Then
@@ -19656,7 +19703,7 @@ getanother:
                             End If
                         Else
                                 I = 1
-                                aheadstatusEND b$, I, Lang, "ΕΝΩ", 3, "WHILE", 5, ok, sss
+                                aheadstatusENDWHILE b$, I, Lang, ok, sss
                                If Not ok Then
                                    MissWhile
                                 Execute = 0
@@ -19674,7 +19721,7 @@ getanother:
                     Else
                         If Not FastSymbol(b$, "{") Then
                         I = 1
-                        aheadstatusEND b$, I, Lang, "ΕΝΩ", 3, "WHILE", 5, ok, sss
+                        aheadstatusENDWHILE b$, I, Lang, ok, sss
                         If ok Then
                             ss$ = Left$(b$, sss - 1) + space$(I - sss)
                             b$ = Mid$(b$, I)
@@ -24175,6 +24222,7 @@ Sub GlobalArr(bstack As basetask, Name$, rst$, items As Long, q As Long, Optiona
 Dim afto As New mArray, NewKey As Long, zeroitem As Object
 If rst$ = vbNullString And q = -1 Then
 ' Make an empty array
+rst$ = NLtrim(rst$)
 GoTo dummyarray
 End If
 
@@ -24184,12 +24232,13 @@ If DimLikeBasic And ArrBase = 0 Then onemore = 1: Reverse = True
 items = 1
 I = 0
 If FastSymbol(rst$, ChrW(8)) Then
+
+
 pbase = afto.myarrbase
-afto.RevOrder = Reverse
-afto.PushEnd
 I = 1
-GoTo dummyarray
+GoTo neojump1
 Else
+
     Do
         If IsExp(bstack, rst$, p, flatobject:=True, nostring:=True) Then
             pbase = afto.myarrbase
@@ -24221,6 +24270,7 @@ Else
 End If
 
 If aa And FastSymbol(rst$, ")") Then
+neojump1:
 afto.RevOrder = Reverse
 If Right$(Name$, 2) <> "$(" Then
     If Fast2VarNoTrim(rst$, "ΩΣ", 2, "AS", 2, 3, j) Then
@@ -24262,7 +24312,11 @@ If Right$(Name$, 2) <> "$(" Then
         End If
     End If
 End If
+If p < 0 Then
+
+End If
 afto.PushEnd
+
 If Not zeroitem Is Nothing Then
      afto.SerialItem CVar(zeroitem), 0, 3
 '    afto.Fillobj bstack
@@ -29491,7 +29545,7 @@ For j = 2 To I * 2 + 1 Step 2
     BI = BI + 1
 Next j
 With myGroup
-    K.PokeItem j, myGroup.LocalList
+    K.PokeItem j, myGroup.localList
     K.PokeItem j + 1, GetFunctionList(.FuncList)
     K.oldFuncRef = vbNullString
     K.HasStrValue = .HasStrValue
@@ -29588,7 +29642,7 @@ For j = 2 To I * 2 + 1 Step 2
     BI = BI + 1
 Next j
 With myGroup
-    K.PokeItem j, myGroup.LocalList
+    K.PokeItem j, myGroup.localList
     If nofunc Then
     Else
         If ChangedFunctionList(.FuncList) Then
@@ -30679,27 +30733,27 @@ Set eGroup = var(vvv)
                             Else
                              nm$ = Mid$(ss$, Len(W$) + 1)
                           
-                                If nt1$ <> nt$ Then .LocalList = .LocalList + vbCrLf: CM$ = vbNullString
+                                If nt1$ <> nt$ Then .localList = .localList + vbCrLf: CM$ = vbNullString
                            If I = OvarnameLen Then CM$ = "Local " Else CM$ = ", "
                            If nt$ = "Long" Then
                            If CM$ = "," Then nt1$ = vbNullString Else nt1$ = nt$ + " "
-                           .LocalList = .LocalList & CM$ & nt1$ & nm$ + "=" & var(j)
+                           .localList = .localList & CM$ & nt1$ & nm$ + "=" & var(j)
                            ElseIf nt$ = myArray Then
-                            .LocalList = .LocalList + vbCrLf + "local DIM " + dimString(nm$ + str$(j)) + vbCrLf
+                            .localList = .localList + vbCrLf + "local DIM " + dimString(nm$ + str$(j)) + vbCrLf
                            ElseIf nt$ = doc Then
                            If CM$ = "," Then nt1$ = vbNullString Else nt1$ = nt$ + " "
-                           .LocalList = .LocalList & CM$ & nt1$ & nm$ & "={" & (var(j)) & "}"
+                           .localList = .localList & CM$ & nt1$ & nm$ & "={" & (var(j)) & "}"
                            ElseIf InStr(nm$, "$") Then
-                                .LocalList = .LocalList & CM$ & nm$ & "={" & (var(j)) & "}"
+                                .localList = .localList & CM$ & nm$ & "={" & (var(j)) & "}"
                            Else
-                                .LocalList = .LocalList + CM$ + nm$ + "=" + str(var(j))
+                                .localList = .localList + CM$ + nm$ + "=" + str(var(j))
                             End If
                             nt1$ = nt$
                 End If
                 End If
             Next I
 
-            If lcl Then .LocalList = .LocalList + vbCrLf
+            If lcl Then .localList = .localList + vbCrLf
             End If
         
            
@@ -35216,7 +35270,7 @@ Between = (A >= b And A <= c) And Not A = exclude
 End If
 End Function
 Function StructPage(basestack As basetask, rest$, Lang As Long, ByVal Offset As Long, ByRef offset2 As Long, offsetlist As FastCollection, ByVal lasthead$) As Boolean
-Dim what$, offset1 As Long, I As Long, s$, b$, p As Variant, w2 As Long, maxOffset As Long, probeoffset As Long, usehandler As mHandler
+Dim what$, offset1 As Long, I As Long, s$, b$, p As Variant, w2 As Long, maxOffset As Long, probeoffset As Long, usehandler As mHandler, localList As FastCollection
 Dim itisSingle As Boolean, itisCur As Boolean
     b$ = NLtrim$(block(rest$))
     If Not FastSymbol(rest$, "}") Then Exit Function
@@ -35233,6 +35287,7 @@ cont567:
         Wend
     Loop Until Not NocharsInLine(b$) Or b$ = vbNullString
 again1:
+    Set localList = Nothing
     itisSingle = False
     itisCur = False
     If MaybeIsSymbol(b$, "/\'") Then
@@ -35342,8 +35397,9 @@ again1:
                                     If Not TypeOf basestack.lastobj Is mHandler Then GoTo comehere
                                     Set usehandler = basestack.lastobj
                                     If Not TypeOf usehandler.objref Is FastCollection Then GoTo comehere
-                                    If usehandler.objref.structLen = 0 Then GoTo comehere
-                                    offset1 = usehandler.objref.structLen
+                                    Set localList = usehandler.objref
+                                    If localList.structLen = 0 Then GoTo comehere
+                                    offset1 = localList.structLen
                                     Set usehandler = Nothing
                                     Set basestack.lastobj = Nothing
                                     Else
@@ -35403,7 +35459,8 @@ err222:
     End If
     
     'offsetlist.AddKey myUcase(lasthead$ + what$, True), CVar(offset)
-    offsetlist.AddKeyStruct myUcase(lasthead$ + what$, True), Offset, 1&, Nothing
+    If p <= 0 Then p = 1
+    offsetlist.AddKeyStruct myUcase(lasthead$ + what$, True), Offset, CLng(p), localList
     If offsetlist.Done Then offsetlist.sValue = w2
     If itisSingle Then offsetlist.KeyTypeValue = CInt(vbSingle): itisSingle = False
     If itisCur Then offsetlist.KeyTypeValue = CInt(vbCurrency): itisCur = False
@@ -42424,7 +42481,11 @@ conthere:
     
     End If
     If GetThisModuleName(mmm$) Then
+    If Left$(mmm$, 1) = "‹" Then
+    Form2.label1(0) = GetName$(mmm$)
+    Else
     Form2.label1(0) = mmm$
+    End If
     Else
     Form2.label1(0) = GetName$(mmm$)
      End If
@@ -42769,6 +42830,10 @@ If InStr(part$, ".") > 0 Then
     GoTo again
 End If
 End If
+ElseIf InStr(part$, "›") > 0 Then
+If Left$(part$, 1) = "‹" Then
+part$ = sbf(val(Mid$(part$, 2))).goodname + Mid$(part$, InStr(part$, "›") + 1)
+End If
 ElseIf iRVAL22(part$) > 0 Then
 If InStr(part$, "»«") = 0 Then
 GetName = vbNullString 'part$
@@ -42781,7 +42846,6 @@ part$ = sbf(val(Mid$(part$, 2))).goodname + Mid$(part$, InStr(part$, "›") + 1)
 End If
 GoTo again
 End If
-
 GetName = part$
 
 End Function
@@ -46628,6 +46692,9 @@ again22:
         ElseIf Mid$(A$, Pos + 1, 1) = "(" Then
             Pos = Pos + 1: GoTo again22
         End If
+    ElseIf V1 = 91 Then  ' "["
+        Pos = Pos + 1
+        If Not BlockParam2s(A$, Pos) Then Exit Do
     ElseIf V1 = 123 Then
         If Pos <= Len(A$) Then
             Pos = blockLen2(A$, Pos + 1)
@@ -53264,10 +53331,8 @@ If r < 1& Then r = 1&
                     Next I
                 End If
                 End If
-                
                     GoTo cont111
                 ElseIf useBuffer.structref.Tag = usehandler.objref.Tag Then
-                Stop
                     GoTo cont111
                 End If
             End If
@@ -53493,12 +53558,44 @@ Dim rB As Byte, ri As Integer, dn As Long, db As Double, ds As Single, w2 As Lon
 Dim itisSingle As Boolean, itisInt64 As Boolean, itisCur As Boolean
 Dim I As Long
 Set useBuffer = usehandler.objref
-If Not useBuffer.UseStruct Then Exit Function
+If Not useBuffer.UseStruct Then
+pp = useBuffer.ItemSize
+    If pp = 4 Then
+        itisSingle = useBuffer.WhatIsBasicItem = vbSingle
+    ElseIf pp = 8 Then
+        itisInt64 = useBuffer.WhatIsBasicItem = 20
+        itisCur = useBuffer.WhatIsBasicItem = vbCurrency
+    End If
+    p = (-OneLongLong And useBuffer.GetPtr(where))
+    w2 = MemLong(VarPtr(p) + 8)
+    If Not IsMissing(NewVal) Then
+    SwapVariant r, p
+    r = 0
+    If Not bstack.lastobj Is Nothing Then
+    If TypeOf bstack.lastobj Is mHandler Then
+        Set thisHandler = bstack.lastobj
+        If thisHandler.T1 = 2 Then
+        Set otherBuffer = thisHandler.objref
+        If useBuffer.ValidArea(w2, otherBuffer.SizeByte) Then
+            CopyBytes otherBuffer.SizeByte, w2, otherBuffer.GetPtr(0)
+            TakeOffset = True
+            Exit Function
+        Else
+           MyEr "this buffer not fit", "δεν χωράει στη διάρθρωση"
+           Exit Function
+        End If
+        End If
+    End If
+    End If
+    End If
+    GoTo contthere
+
+End If
 Set mylist = useBuffer.structref
 Dim W$, back$
 If Left$(b$, 1) = "|" Or IsMissing(NewVal) Then
 Mid$(b$, 1, 1) = " "
-
+jumpagain:
 I = IsLabelAnew("", b$, W$, (0&))
 If I = 1 Or I = 8 Then
 If mylist.Find(W$) Then
@@ -53508,7 +53605,9 @@ If mylist.Find(W$) Then
     ElseIf pp = 8 Then
         itisInt64 = mylist.sValue < 0
         itisCur = mylist.KeyTypeValue = vbCurrency
+        
     End If
+    If w2 = 0 Then
     With useBuffer
     
     If Not IsMissing(where) Then
@@ -53518,10 +53617,52 @@ If mylist.Find(W$) Then
     End If
     End With
     w2 = MemLong(VarPtr(p) + 8)
+    End If
     pp = Abs(pp)
     If I = 8 Then
+    
     Mid$(b$, 1, 1) = " "
-    If Not IsExp(bstack, b$, p, , True) Then Exit Function
+    
+    
+    If Not IsExp(bstack, b$, p, , True) Then
+     If Left$(b$, 1) = "]" Then
+        Mid$(b$, 1, 1) = " "
+        Set otherBuffer = New MemBlock
+
+        
+        If Not mylist.StructObj Is Nothing Then
+        ' WE HAVE A SUB STRUCT
+        otherBuffer.Construct pp, mylist.StructMany, , , CLng(r)
+        Set otherBuffer.structref = mylist.StructObj
+        otherBuffer.UseStruct = True
+        Else
+            If itisInt64 Then
+            r = 20
+        ElseIf itisCur Then
+            r = vbCurrency
+        ElseIf itisSingle Then
+            r = vbSingle
+        End If
+        End If
+        otherBuffer.Construct pp, mylist.StructMany, , , CLng(r)
+        CopyMemory ByVal otherBuffer.GetPtr(0), ByVal w2, pp * mylist.StructMany
+        r = 0
+        Set thisHandler = New mHandler
+        thisHandler.T1 = 2
+        Set thisHandler.objref = otherBuffer
+        Set bstack.lastobj = thisHandler
+        TakeOffset = True
+        
+    End If
+    Exit Function
+    End If
+    p = CLng(p)
+    If mylist.StructMany <= p Or p < 0 Then
+    MyEr "index out of limit for items of " + mylist.KeyToString, "ο δείκτης είναι εκτός ορίων για το " + mylist.KeyToString
+    TakeOffset = False
+    Exit Function
+    End If
+    
     p = w2 + (-OneLongLong And p) * pp
     w2 = MemLong(VarPtr(p) + 8)
     p = 0
@@ -53637,6 +53778,14 @@ looklastobj:
         Exit Function
     End If
     End If
+    End If
+    If FastSymbol(b$, "|") Then
+    If Not mylist.StructObj Is Nothing Then
+    Set mylist = mylist.StructObj
+    GoTo jumpagain
+    End If
+    SyntaxError
+    Exit Function
     End If
 contthere:
     With useBuffer

@@ -28,19 +28,25 @@ Private Type SAFEARRAY1D
 End Type
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
 Private mError As Long
-Private p As Variant
+Private p As Variant, emptytype As Integer
 Private ihavearray As Boolean, isok As Boolean
 Private Declare Function SafeArrayRedim Lib "oleaut32" (ByVal saPtr As Long, ByVal saBound As Long) As Long
 Private OneDimension As Boolean
 Public flat As Boolean
-Public Function GetUDTValue(ByVal there, ByVal p As Long, Name$, Optional ndx)
+Public Function GetUDTValue(ByVal there, ByVal p As Long, Name$, Optional nDx)
 On Error Resume Next
-If IsMissing(ndx) Then
+If IsMissing(nDx) Then
     SwapVariant GetUDTValue, Value(there, p, Name$)
 Else
-    SwapVariant GetUDTValue, Value(there, p, Name$, CLng(ndx))
+    SwapVariant GetUDTValue, Value(there, p, Name$, CLng(nDx))
 End If
 End Function
+Friend Property Get emtype() As Integer
+emtype = emptytype
+End Property
+Friend Property Let emtype(RHS As Integer)
+emptytype = RHS
+End Property
 Friend Sub CreateRef(ByVal A As Long)
     If flat Then
         VarByRef A, p
@@ -49,11 +55,11 @@ Friend Sub CreateRef(ByVal A As Long)
     End If
 End Sub
 Private Sub VarByRef(ByVal A As Long, ByRef b As Variant)
-Dim T(0 To 3) As Long
-   CopyMemory T(0), ByVal VarPtr(b), 16
-   T(0) = T(0) Or &H4000
-   T(2) = VarPtr(b) + 8
-   CopyMemory ByVal A, T(0), 16
+Dim t(0 To 3) As Long
+   CopyMemory t(0), ByVal VarPtr(b), 16
+   t(0) = t(0) Or &H4000
+   t(2) = VarPtr(b) + 8
+   CopyMemory ByVal A, t(0), 16
 End Sub
 Function NewRef(Optional ByRef RHS) As refArray
 Dim Z As New refArray
@@ -833,9 +839,48 @@ If ihavearray Then
             vtTypeString = VarTypeNameList(p(where))
         End If
     End If
+Else
+vtTypeString = VarTypeName(emptytype)
 End If
 End Property
-Property Get vtType(Optional where, Optional index) As Integer
+Private Function VarTypeName(nVarType As Integer) As String
+    Select Case nVarType
+        Case 0
+            VarTypeName = "CustomType"
+        Case 2
+            VarTypeName = "Integer"
+        Case 3, 10
+            VarTypeName = "Long"
+        Case 4
+            VarTypeName = "Single"
+        Case 5
+            VarTypeName = "Double"
+        Case 6
+            VarTypeName = "Currency"
+        Case 7
+            VarTypeName = "Date"
+        Case 8
+            VarTypeName = "String"
+        Case 9, 13
+            VarTypeName = "Object"
+        Case 11
+            VarTypeName = "Boolean"
+        Case 12, 1, 36
+            VarTypeName = "Variant"
+        Case 14
+            VarTypeName = "Decimal"
+        Case 17
+            VarTypeName = "Byte"
+        Case 20
+            VarTypeName = "Long Long"
+        Case 8192
+            VarTypeName = "Array"
+        Case Else
+        VarTypeName = "type" + Trim(str$(nVarType))
+            'Stop
+    End Select
+End Function
+Property Get vtType(Optional where, Optional Index) As Integer
 If ihavearray Then
     If isok Then
         If IsMissing(where) Or flat Then
@@ -859,15 +904,15 @@ If ihavearray Then
             vtType = -1
             Exit Property
             End If
-            If IsMissing(index) Then
+            If IsMissing(Index) Then
             If pp > 0 Then
                 vtType = MemInt(VarPtr(p(where))) - vbArray
             Else
                 vtType = MemInt(VarPtr(p(where))) ' not an array ??
             End If
-            ElseIf index >= 0 And index <= pp Then
+            ElseIf Index >= 0 And Index <= pp Then
             If pp > 0 Then
-                vtType = MemInt(VarPtr(p(where)(index)))
+                vtType = MemInt(VarPtr(p(where)(Index)))
                 If vtType And &H4000 Then
                     vtType = vtType - &H4000
                 End If
@@ -880,6 +925,9 @@ If ihavearray Then
             End If
         End If
     End If
+Else
+' emtype
+vtType = emptytype
 End If
 End Property
 Property Get MarkTwoDimension()
@@ -909,20 +957,20 @@ End Sub
 Friend Sub CopyVariantArray(ByRef A As Variant, ByRef b As Variant)
     CopyMemory ByVal VarPtr(A), ByVal VarPtr(b), 16
 End Sub
-Public Function putData(f As Long, ndx As Long, lengthInBytes As Long) As Boolean
-    Dim addr, mitems, itemlen
+Public Function putData(f As Long, nDx As Long, lengthInBytes As Long) As Boolean
+    Dim Addr, mitems, itemlen
     
     itemlen = MemInt(UnsignedAdd(MemLong(UnsignedAdd(VarPtr(p(0)), 8)), 4))
     mitems = Me.Elements(p(0))
-    If Not (ndx >= 0 And ndx < mitems) Then
+    If Not (nDx >= 0 And nDx < mitems) Then
         OutOfLimit
         GoTo there
     End If
     lengthInBytes = Abs(lengthInBytes)
-    If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - ndx) Then
-        lengthInBytes = itemlen * (mitems - ndx)
+    If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - nDx) Then
+        lengthInBytes = itemlen * (mitems - nDx)
     End If
-    addr = UnsignedAdd(Me.ArrPtr(0), itemlen * ndx)
+    Addr = UnsignedAdd(Me.ArrPtr(0), itemlen * nDx)
     
     On Error GoTo there
     Dim a1 As SAFEARRAY1D, A() As Byte
@@ -931,7 +979,7 @@ Public Function putData(f As Long, ndx As Long, lengthInBytes As Long) As Boolea
         .cDims = 1
         .onebound(0).lLbound = 0
         .onebound(0).cElements = lengthInBytes
-        .pvData = addr
+        .pvData = Addr
     End With
         CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
         On Error GoTo there1
@@ -946,25 +994,25 @@ there1:
         CopyMemory ByVal VarPtrArray(A), 0&, 4
 there:
 End Function
-Friend Function GetData(f As Long, ndx As Long, lengthInBytes As Long) As Boolean
-    Dim addr, mitems, itemlen
+Friend Function GetData(f As Long, nDx As Long, lengthInBytes As Long) As Boolean
+    Dim Addr, mitems, itemlen
     
     itemlen = MemInt(UnsignedAdd(MemLong(UnsignedAdd(VarPtr(p(0)), 8)), 4))
     mitems = Me.Elements(p(0))
-    If Not (ndx >= 0 And ndx < mitems) Then
+    If Not (nDx >= 0 And nDx < mitems) Then
         OutOfLimit
         GoTo there
     End If
     lengthInBytes = Abs(lengthInBytes)
-    If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - ndx) Then
-        lengthInBytes = itemlen * (mitems - ndx)
+    If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - nDx) Then
+        lengthInBytes = itemlen * (mitems - nDx)
     End If
-    addr = UnsignedAdd(Me.ArrPtr(0), itemlen * ndx)
+    Addr = UnsignedAdd(Me.ArrPtr(0), itemlen * nDx)
     On Error GoTo there
     Dim FH As Long
     FH = Module10.ReadFileHandler(CLng(f))
     If FH = 0 Then Exit Function
-    Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(addr)
+    Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(Addr)
     GetData = True
     Exit Function
 there:
@@ -1025,10 +1073,10 @@ Err.Clear
 MyEr "ο πίνακας δεν είναι τύπου ατυπος και απλός", "array not flat variant"
 End Function
 Sub SwapVariant(ByRef A As Variant, ByRef b As Variant)
-   Static T(0 To 3) As Long  ' 4 Longs * 4 bytes each = 16 bytes
-   MemCopy VarPtr(T(0)), ByVal VarPtr(A), 16
+   Static t(0 To 3) As Long  ' 4 Longs * 4 bytes each = 16 bytes
+   MemCopy VarPtr(t(0)), ByVal VarPtr(A), 16
    MemCopy VarPtr(A), VarPtr(b), 16
-   MemCopy VarPtr(b), VarPtr(T(0)), 16
+   MemCopy VarPtr(b), VarPtr(t(0)), 16
 End Sub
 Public Function cInt64(p)
     Static maxlonglong, limitlonglong, OneLongLong, OneBigLongLong

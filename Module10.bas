@@ -4796,6 +4796,7 @@ nRefArray:
                                 End If
                             ElseIf Ar.count(CVar(I)) = 0 Then
 count0:
+                                
                                 Ar.DefArrayAt I, Ar.vtType(0), CLng(p)
                                 ' if ar.vtType(0)=vbstring  ......... check for string
                                 Select Case ww
