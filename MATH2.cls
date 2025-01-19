@@ -14,7 +14,7 @@ Attribute VB_Exposed = True
 ' FROM THE TRICK VBFORUMS
 Private Declare Function GetMem2 Lib "msvbvm60" (pSrc As Any, pDst As Any) As Long
 Private Declare Function GetMem4 Lib "msvbvm60" (pSrc As Any, pDst As Any) As Long
-Private Declare Function ArrPtr Lib "msvbvm60" Alias "VarPtr" (arr() As Any) As Long
+Private Declare Function ArrPtr Lib "msvbvm60" Alias "VarPtr" (Arr() As Any) As Long
 'Public Type cxTest
 '    v   As Double
 '    S   As String
@@ -32,10 +32,10 @@ Public Type Matrix
     D() As Double
 End Type
 
-Private Const PI = 3.14159265358979
+Private Const Pi = 3.14159265358979
 Private Const E = 2.71828182845905
 
-Private Const PI2 = PI / 2
+Private Const PI2 = Pi / 2
 
 'Public Function TstCreate(v As Double, S As String, mSize As Long) As cxTest
 '    TstCreate.v = v
@@ -84,7 +84,7 @@ End Function
 
 ' // Cosecant of a real number
 Public Function Csc(ByVal Value As Double) As Double
-    Csc = 1 / Sin(Value)
+    Csc = 1 / sIn(Value)
 End Function
 
 ' // Cotangent of a real number
@@ -101,7 +101,7 @@ End Function
 
 ' // Arccosine of a real number
 Public Function Acos(ByVal Value As Double) As Double
-    If CSng(Value) = -1# Then Acos = PI: Exit Function
+    If CSng(Value) = -1# Then Acos = Pi: Exit Function
     If CSng(Value) = 1# Then Acos = 0: Exit Function
     Acos = Atn(-Value / Sqr(-Value * Value + 1)) + 2 * Atn(1)
 End Function
@@ -122,17 +122,17 @@ Public Function Atan2(ByVal Y As Double, ByVal X As Double) As Double
         If X >= Y Then
             Atan2 = Atn(Y / X)
         ElseIf X <= -Y Then
-            Atan2 = Atn(Y / X) + PI
+            Atan2 = Atn(Y / X) + Pi
         Else
-            Atan2 = PI / 2 - Atn(X / Y)
+            Atan2 = Pi / 2 - Atn(X / Y)
         End If
     Else
         If X >= -Y Then
             Atan2 = Atn(Y / X)
         ElseIf X <= Y Then
-            Atan2 = Atn(Y / X) - PI
+            Atan2 = Atn(Y / X) - Pi
         Else
-            Atan2 = -Atn(X / Y) - PI / 2
+            Atan2 = -Atn(X / Y) - Pi / 2
         End If
     End If
 End Function
@@ -266,7 +266,7 @@ End Function
 
 ' // Creating a new complex number by polar coordinates
 Public Function cxPolar(ByVal Magnitude As Double, ByVal Phase As Double) As cxComplex
-    cxPolar.r = Magnitude * Cos(Phase): cxPolar.I = Magnitude * Sin(Phase)
+    cxPolar.r = Magnitude * Cos(Phase): cxPolar.I = Magnitude * sIn(Phase)
 End Function
 
 ' // Return the additive inverse of a specified complex number
@@ -311,21 +311,25 @@ End Function
 Public Function cxDgr(Op As cxComplex, ByVal Degree As Long) As cxComplex
     Dim Md As Double, Ar As Double
     Md = cxMod(Op): Ar = cxArg(Op): Md = Md ^ Degree: Ar = Ar * Degree
-    cxDgr.r = Md * Cos(Ar): cxDgr.I = Md * Sin(Ar)
+    cxDgr.r = Md * Cos(Ar): cxDgr.I = Md * sIn(Ar)
 End Function
 
 ' // The square root of a complex number
 Public Function cxSqr(Op As cxComplex) As cxComplex
     Dim M As Double, A As Double
     M = Sqr(cxMod(Op)): A = cxArg(Op) / 2
-    cxSqr.r = M * Cos(A): cxSqr.I = M * Sin(A)
+    cxSqr.r = M * Cos(A): cxSqr.I = M * sIn(A)
 End Function
 
 ' // Module of a complex number
 Public Function cxMod(Op As cxComplex) As Double
     Dim R2 As Double, i2 As Double
+    On Error GoTo 100
     R2 = Op.r * Op.r: i2 = Op.I * Op.I
     cxMod = Sqr(R2 + i2)
+    Exit Function
+100 Overflow
+    Err.Clear
 End Function
 
 ' // Phase of a complex number
@@ -336,23 +340,23 @@ End Function
 ' // Argument of a complex number (equal phase)
 Public Function cxArg(Op As cxComplex) As Double
     If Op.I = 0 Then
-        If Op.r >= 0 Then cxArg = 0 Else cxArg = PI
+        If Op.r >= 0 Then cxArg = 0 Else cxArg = Pi
     ElseIf Op.r = 0 Then
         If Op.I >= 0 Then cxArg = PI2 Else cxArg = -PI2
     Else
         If Op.r > 0 Then
             cxArg = Atn(Op.I / Op.r)
         ElseIf Op.r < 0 And Op.I > 0 Then
-            cxArg = PI + Atn(Op.I / Op.r)
+            cxArg = Pi + Atn(Op.I / Op.r)
         ElseIf Op.r < 0 And Op.I < 0 Then
-            cxArg = -PI + Atn(Op.I / Op.r)
+            cxArg = -Pi + Atn(Op.I / Op.r)
         End If
     End If
 End Function
 
 ' // Returns the number e, raised to power by complex number
 Public Function cxExp(Op As cxComplex) As cxComplex
-    cxExp.r = EXP(Op.r) * Cos(Op.I): cxExp.I = EXP(Op.r) * Sin(Op.I)
+    cxExp.r = EXP(Op.r) * Cos(Op.I): cxExp.I = EXP(Op.r) * sIn(Op.I)
 End Function
 
 ' // Addition real number and complex number
@@ -480,27 +484,27 @@ End Function
 
 ' // Sine of a complex number
 Public Function cxSin(Op As cxComplex) As cxComplex
-    cxSin.r = Sin(Op.r) * Cosh(Op.I): cxSin.I = Cos(Op.r) * Sinh(Op.I)
+    cxSin.r = sIn(Op.r) * Cosh(Op.I): cxSin.I = Cos(Op.r) * Sinh(Op.I)
 End Function
  
 ' // Cosine of a complex number
 Public Function cxCos(Op As cxComplex) As cxComplex
-    cxCos.r = Cos(Op.r) * Cosh(Op.I): cxCos.I = -Sin(Op.r) * Sinh(Op.I)
+    cxCos.r = Cos(Op.r) * Cosh(Op.I): cxCos.I = -sIn(Op.r) * Sinh(Op.I)
 End Function
 
 ' // Tangent of a complex number
 Public Function cxTan(Op As cxComplex) As cxComplex
     Dim C2 As Double, S2 As Double
     C2 = Cos(Op.r): C2 = C2 * C2: S2 = Sinh(Op.I): S2 = S2 * S2
-    cxTan.r = (Sin(Op.r) * Cos(Op.r)) / (C2 + S2)
+    cxTan.r = (sIn(Op.r) * Cos(Op.r)) / (C2 + S2)
     cxTan.I = (Sinh(Op.I) * Cosh(Op.I)) / (C2 + S2)
 End Function
 
 ' // Cotangent of a complex number
 Public Function cxCtg(Op As cxComplex) As cxComplex
     Dim C2 As Double, S2 As Double
-    C2 = Sin(Op.r): C2 = C2 * C2: S2 = Sinh(Op.I): S2 = S2 * S2
-    cxCtg.r = (Sin(Op.r) * Cos(Op.r)) / (C2 + S2)
+    C2 = sIn(Op.r): C2 = C2 * C2: S2 = Sinh(Op.I): S2 = S2 * S2
+    cxCtg.r = (sIn(Op.r) * Cos(Op.r)) / (C2 + S2)
     cxCtg.I = -(Sinh(Op.I) * Cosh(Op.I)) / (C2 + S2)
 End Function
 
@@ -509,14 +513,14 @@ Public Function cxSec(Op As cxComplex) As cxComplex
     Dim C2 As Double, S2 As Double
     C2 = Cos(Op.r): C2 = C2 * C2: S2 = Sinh(Op.I): S2 = S2 * S2
     cxSec.r = (Cos(Op.r) * Cosh(Op.I)) / (C2 + S2)
-    cxSec.I = -(Sin(Op.r) * Sinh(Op.I)) / (C2 + S2)
+    cxSec.I = -(sIn(Op.r) * Sinh(Op.I)) / (C2 + S2)
 End Function
 
 ' // Cosecant of a complex number
 Public Function cxCsc(Op As cxComplex) As cxComplex
     Dim C2 As Double, S2 As Double
-    C2 = Sin(Op.r): C2 = C2 * C2: S2 = Sinh(Op.I): S2 = S2 * S2
-    cxCsc.r = (Sin(Op.r) * Cosh(Op.I)) / (C2 + S2)
+    C2 = sIn(Op.r): C2 = C2 * C2: S2 = Sinh(Op.I): S2 = S2 * S2
+    cxCsc.r = (sIn(Op.r) * Cosh(Op.I)) / (C2 + S2)
     cxCsc.I = (Cos(Op.r) * Sinh(Op.I)) / (C2 + S2)
 End Function
 
@@ -629,13 +633,13 @@ End Function
 
 ' // Creating a matrix
 Public Function mxCreate(ByVal Row As Long, ByVal Col As Long, ParamArray Y()) As Matrix
-    Dim p As Variant, C As Long
+    Dim p As Variant, c As Long
     If Row <= 0 Or Col <= 0 Then Exit Function
     If Row * Col < UBound(Y) + 1 Then Exit Function
     mxCreate.Row = Row: mxCreate.Col = Col
-    ReDim mxCreate.D(Row * Col - 1): C = 0
+    ReDim mxCreate.D(Row * Col - 1): c = 0
     For Each p In Y
-        mxCreate.D(C) = p: C = C + 1
+        mxCreate.D(c) = p: c = c + 1
     Next
 End Function
 

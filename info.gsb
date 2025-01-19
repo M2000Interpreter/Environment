@@ -21541,7 +21541,7 @@ MODULE USETHIS {try {
 	PEN 14
 	CLS,0
 	If Version<12 then Error "No proper M2000 version (must be >=12)"
-	If Version=12 and revision<45 then Error "No proper M2000 revision for version 4 (need revision >=63)"
+	If Version=12 and revision<45 then Error "No proper M2000 revision for version 4 (need revision >=66)"
 	Set Fast
 	Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 	dir user
@@ -46143,5 +46143,131 @@ For i=1 to 2000 {
 }
 print timecount
 Set Fast
+}
+MODULE ROOTS {// we place all functions for cx which we use on a global group
+// for this example not need to be global
+Global Group Cx {
+	declare m math2
+	function neg(a as cxComplex) {
+		method .m, "cxNeg", a as ret: =ret
+	}
+	function sqr(a as cxComplex) {
+		method .m, "cxSqr", a as ret: =ret
+	}
+	function sub(a as cxComplex, b as cxComplex) {
+		method .m, "cxSub", a, b as ret: =ret
+	}
+	function add(a as cxComplex, b as cxComplex) {
+		method .m, "cxAdd", a, b as ret:	=ret
+	}
+	function div(a as cxComplex, b as cxComplex) {
+		method .m, "cxDiv", a, b as ret: =ret
+	}
+	function divReal(a as cxComplex, b as double) {
+		method .m, "cxDivReal", a , b as ret: =ret
+	}
+	function complex(a as double, b as double=0) {
+		method .m, "cxNew", a, b as ret: =ret
+	}
+	// quad_discriminating_roots return a tuple (array) of three vaues:
+	// one string and two numeric (cxComplex is a UDT - a numeric variant for interpreter)
+	function quad_discriminating_roots(a1, b1, c1, entier=1e-5) {
+		var discriminant = b1*b1 - 4*a1*c1
+		var a=.complex(a1), b=.complex(b1), c=.complex(c1), d=.complex(discriminant)
+		var root1=.div(.divReal(.add(.neg(b), .sqr(d)), 2), a)
+		var root2=.div(.divReal(.sub(.neg(b), .sqr(d)), 2), a)
+		if abs(discriminant)<entier then
+			="real and equal", abs(root1|r), abs(root1|r)
+		else.if discriminant>0 then
+			="real", root1|r, root2|r
+		else
+			="complex", root1, root2
+		end if
+	}
+}
+' Using ! we send three values
+Disp(!cx.quad_discriminating_roots(3, 4, 4/3))
+Disp(!cx.quad_discriminating_roots(3, 2, -1))
+' Without using ! we send an array with all values
+Disp(cx.quad_discriminating_roots(3, 2, 1))
+Disp(cx.quad_discriminating_roots(1, -1e9, 1))
+Disp(cx.quad_discriminating_roots(1, -1e70, 1))
+Disp(cx.quad_discriminating_roots(1, -1e100, 1))
+Disp(cx.quad_discriminating_roots(1, -1e200, 1))
+Disp(cx.quad_discriminating_roots(1, -1e300, 1))
+sub disp()
+	// this is the way we can overload a sub
+	if match("SNN") then
+		// subs need to make new variables because they share
+		// scope with module which call them
+		read new s,a,b
+	else.if match("A") then
+		read new arg
+		// (x, y)=(100, 200)  where (100, 200) is a tulple
+		// so this is the same, arg is a tuple.
+		(s, a, b)=arg
+	end if
+	? $("0.0####"),field$(s, 14);
+	if type$(a)="cxComplex" then
+		? " (";a|r;if$(a|i<0->"-","+");abs(a|i);"i)";
+	else
+		? $(if$(abs(a>1e6)->"#.###e+###", "0.0####"));" ";a;
+	end if
+	if type$(b)="cxComplex" then
+		? " (";b|r;if$(b|i<0->"-","+");abs(b|i);"i)"
+	else
+		? $(if$(abs(b>1e6)->"#.###e+###", "0.0####"));" ";b
+	end if
+	Print $("")
+end sub
+
+}
+MODULE TAXICAB {module TaxiCab (f as long){
+	cls,0
+	Print Part "Taxicab numbers"
+	Print Under
+	profiler
+	var Cubes=list, 	Sums=list, 	Ret=list
+	var st=0, en=1200
+	st=@Proc(0, en)
+	sort ret as number
+	Display(1, 25)
+	Display(2000, 2006)
+	Print timecount
+	print "done"
+	end
+	sub Display(from, to)
+		local k=each(ret, from,to), s=""
+		while k
+			s= format$("{0:-6} {1:-12}",K^+1, val(eval$(k!)+"&&"))+eval$(k)
+		 	Print s : if f>-1 then print #f, s
+		end while
+	end sub
+	function Proc(ia, ib)
+		local i, cube as long long, s as long long
+		for i=ia to ib
+			if i mod 10=1 then print over $("#0.00"), "Working..";(i-ia)/ib*100;"%"
+			cube=i^3
+			Append Cubes, cube
+			k=each(cubes)
+			while k
+				s=cube+eval(k)
+				if not exist(Sums, s) then
+					append Sums,s:=(i)+"^3 + "+(k^)+"^3"
+				else.if not exist(Ret, s) then
+					append Ret, s:=" = "+(i)+"^3 + "+(k^)+"^3 = "+eval$(Sums)
+				end if
+			end while
+		next
+		print over $("#0.00"), "Working..";100;"%"
+		print
+		=i
+	end function
+}
+file2export="TaxiCabNumbers.txt"
+open file2export for wide output as #f
+TaxiCab f
+close #f
+win dir$+"TaxiCabNumbers.txt"
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

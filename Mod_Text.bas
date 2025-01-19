@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 65
+Global Const Revision = 66
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -8647,39 +8647,39 @@ If Not bstack.lastobj Is Nothing Then
 End If
 CheckBigInteger = True
 End Function
-Private Function MyTrimLi(s$, l As Long) As Long
+Private Function MyTrimLi(s$, L As Long) As Long
 Dim I&
 Dim P2 As Long, P1 As Integer, p4 As Long
- If l > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
- If l <= 0 Then MyTrimLi = 1: Exit Function
-  l = l - 1
+ If L > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
+ If L <= 0 Then MyTrimLi = 1: Exit Function
+  L = L - 1
   I = Len(s)
-  P2 = StrPtr(s) + l * 2:  p4 = P2 + I * 2
+  P2 = StrPtr(s) + L * 2:  p4 = P2 + I * 2
   For I = P2 To p4 Step 2
   GetMem2 I, P1
   Select Case P1
     Case 32, 160, 9
     Case Else
-     MyTrimLi = (I - P2) \ 2 + 1 + l
+     MyTrimLi = (I - P2) \ 2 + 1 + L
    Exit Function
   End Select
   Next I
  MyTrimLi = Len(s) + 1
 End Function
-Private Function MyTrimLi2(s$, l As Long) As Long
+Private Function MyTrimLi2(s$, L As Long) As Long
 Dim I&
 Dim P2 As Long, P1 As Integer, p4 As Long
- If l > Len(s) Then MyTrimLi2 = Len(s) + 1: Exit Function
- If l <= 0 Then MyTrimLi2 = 1: Exit Function
-  l = l - 1
+ If L > Len(s) Then MyTrimLi2 = Len(s) + 1: Exit Function
+ If L <= 0 Then MyTrimLi2 = 1: Exit Function
+  L = L - 1
   I = Len(s)
-  P2 = StrPtr(s) + l * 2:  p4 = P2 + I * 2
+  P2 = StrPtr(s) + L * 2:  p4 = P2 + I * 2
   For I = P2 To p4 Step 2
   GetMem2 I, P1
   Select Case P1
     Case 32, 160, 7, 9
     Case Else
-     MyTrimLi2 = (I - P2) \ 2 + 1 + l
+     MyTrimLi2 = (I - P2) \ 2 + 1 + L
    Exit Function
   End Select
   Next I
@@ -17188,15 +17188,15 @@ End If
 End Function
 
 
-Function IsSymbol(A$, c$, Optional l As Long = 1, Optional mis As Boolean = False) As Boolean
+Function IsSymbol(A$, c$, Optional L As Long = 1, Optional mis As Boolean = False) As Boolean
 Dim I As Long, j As Long
 j = Len(A$)
 If j = 0 Then Exit Function
 I = MyTrimL(A$)
 If I <= j Then
 
-If myUcase(Mid$(A$, I, l)) = c$ Then
-A$ = NLtrim$(Mid$(A$, l + I))
+If myUcase(Mid$(A$, I, L)) = c$ Then
+A$ = NLtrim$(Mid$(A$, L + I))
 IsSymbol = True
 
  Else
@@ -26815,11 +26815,11 @@ End If
 
 End Function
 Public Function MyTrimRStr(s$) As Long
-Dim I&, l As Long
+Dim I&, L As Long
 Dim P2 As Long, P1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimRStr = 1: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
+  L = Len(s): If L = 0 Then MyTrimRStr = 1: Exit Function
+  P2 = StrPtr(s): L = L - 1
+  p4 = P2 + L * 2
   For I = p4 To P2 Step -2
   GetMem2 I, P1
   Select Case P1
@@ -26829,14 +26829,14 @@ Dim P2 As Long, P1 As Integer, p4 As Long
    Exit Function
   End Select
   Next I
- MyTrimRStr = l + 2
+ MyTrimRStr = L + 2
 End Function
 Public Function MyTrimRNoCr(s$) As Long
-Dim I&, l As Long
+Dim I&, L As Long
 Dim P2 As Long, P1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimRNoCr = 1: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
+  L = Len(s): If L = 0 Then MyTrimRNoCr = 1: Exit Function
+  P2 = StrPtr(s): L = L - 1
+  p4 = P2 + L * 2
   For I = p4 To P2 Step -2
   GetMem2 I, P1
   Select Case P1
@@ -26846,7 +26846,7 @@ Dim P2 As Long, P1 As Integer, p4 As Long
    Exit Function
   End Select
   Next I
- MyTrimRNoCr = l + 2
+ MyTrimRNoCr = L + 2
 End Function
 Sub SetNextLine(c$)
 Dim I
@@ -28262,7 +28262,7 @@ here$ = "@"
 here$ = ohere$
 End Sub
 Public Sub ProcProperty(bstack As basetask, v(), vIndex As Long, FN$, rest$, language As Long, Optional hardlink As Boolean = False, Optional usethis As Long)
-Dim var1() As Variant, s$, r As Double, l As Long, NewRef As Long, many As Long, y1 As Boolean, x1 As Long, y2 As Boolean, Y3 As Long
+Dim var1() As Variant, s$, r As Double, L As Long, NewRef As Long, many As Long, y1 As Boolean, x1 As Long, y2 As Boolean, Y3 As Long
 Dim var2() As String, ss$, sp As Variant, indirect As Boolean, s1$, newvar As Boolean
 Dim vv As Object, handlerFLAG As Boolean, usehandler As mHandler
 Dim oo As Object, myVar As Variant
@@ -28352,15 +28352,15 @@ conthere:
             If TypeOf var(vIndex) Is GuiM2000 Then If UCase(FN$) = "VISIBLE" Then FN$ = "TrueVisible"
                                                             
             If FN$ = vbNullString Then
-                l = usethis
+                L = usethis
             ElseIf handlerFLAG Then
                 Set usehandler = vv
-                l = FindDISPID(usehandler.objref, FN$)
+                L = FindDISPID(usehandler.objref, FN$)
                 Set usehandler = Nothing
             Else
-                l = FindDISPID(vv, FN$)
+                L = FindDISPID(vv, FN$)
             End If
-            If l <> -1 Then
+            If L <> -1 Then
                 ' we have vv, fn$, l and we are looking for a label to make an object to that
                 y1 = IsLabelSymbolNew(rest$, "цемийо", "GLOBAL", language)
                 If Not y1 Then y2 = IsLabelSymbolNew(rest$, "мео", "NEW", language) Else y2 = False
@@ -28390,7 +28390,7 @@ jumpthere:
                                 NewRef = GlobalVarRefOnly(bstack.GroupName + s$)
                             End If
 contenum:
-                            If l = -4 Then
+                            If L = -4 Then
                                 ' get now object
                                 sp = vbEmpty
                                 If ReadPropObj(vv, -4, sp) Then
@@ -28413,13 +28413,13 @@ jumpheretoo:
                                             GoTo there
                                         End If
                                     End If
-                                    var(NewRef).ConstructObj oo, l
+                                    var(NewRef).ConstructObj oo, L
                                     Set oo = Nothing
                                 Else
                                     If vv Is var(vIndex) Then
-                                        var(NewRef).Construct vIndex, l, indirect    ' this is the link vindex is an index to var()
+                                        var(NewRef).Construct vIndex, L, indirect    ' this is the link vindex is an index to var()
                                     Else
-                                        var(NewRef).ConstructObj vv, l
+                                        var(NewRef).ConstructObj vv, L
                                     End If
                                 End If
                             End If
@@ -28446,10 +28446,10 @@ jumpheretoo:
                                             End If
                                         End With
                                     End If
-                                    myVar.ConstructObj oo, l
+                                    myVar.ConstructObj oo, L
                                     Set oo = Nothing
                                 Else
-                                    myVar.Construct vIndex, l   ' this is the link vindex is an index to var()
+                                    myVar.Construct vIndex, L   ' this is the link vindex is an index to var()
                                 End If
                                 Set myVar = Nothing
                             End With
@@ -28469,10 +28469,10 @@ contherenew:
                                 Set oo = usehandler.objref
                                 Set usehandler = Nothing
                             End If
-                            myVar.ConstructObj oo, l
+                            myVar.ConstructObj oo, L
                             Set oo = Nothing
                         Else
-                            myVar.Construct vIndex, l   ' this is the link vindex is an index to var()
+                            myVar.Construct vIndex, L   ' this is the link vindex is an index to var()
                         End If
                         myVar.UseIndex = True
                         pppp.PushProp myVar
@@ -28483,10 +28483,10 @@ contherenew:
             y1 = IsLabelSymbolNew(rest$, "цемийо", "GLOBAL", language)
             If Not y1 Then newvar = IsLabelSymbolNew(rest$, "мео", "NEW", language)
             Y3 = IsLabelSymbolNew(rest$, "лецецомота", "WITHEVENTS", language)
-            l = FindDISPID(vv, FN$)
+            L = FindDISPID(vv, FN$)
             FN$ = UCase(FN$)
             x1 = Abs(IsLabel(bstack, rest$, s$))
-            If ReadOneParameter(vv, l, s$, myVar) Then
+            If ReadOneParameter(vv, L, s$, myVar) Then
             
             GoTo jumpFromGet
             Else
@@ -28494,13 +28494,13 @@ contherenew:
         ElseIf IsLabelSymbolNew(rest$, "хесе", "SET", language) Then
         
             y1 = IsLabelSymbolNew(rest$, "цемийо", "GLOBAL", language)
-            l = FindDISPID(vv, FN$)
+            L = FindDISPID(vv, FN$)
             FN$ = UCase(FN$)
-            If l <> -1 Then
+            If L <> -1 Then
                 x1 = Abs(IsLabel(bstack, rest$, s$))
                 If x1 < 5 Then
                     If Not FastSymbol(rest$, "(") Then
-                        If Not ReadOneParameter(vv, l, s$, myVar) Then
+                        If Not ReadOneParameter(vv, L, s$, myVar) Then
                             If MyIsObject(myVar) Then
                                 If myVar Is Err Then
                                     Set errbag = New ErrorBag
@@ -28521,7 +28521,7 @@ contherenew:
 contindex:
             If IsExp(bstack, rest$, sp) Then
             Err.Clear
-            Set myVar = ReadOneIndexParameter(vv, l, s1$, sp, False)
+            Set myVar = ReadOneIndexParameter(vv, L, s1$, sp, False)
             If Err.Number Then
                 If MyIsObject(myVar) Then
                     If myVar Is Err Then
@@ -28532,7 +28532,7 @@ contindex:
                     End If
                 End If
                 Err.Clear
-                Set myVar = ReadOneIndexParameter(vv, l, s1$, sp, True)
+                Set myVar = ReadOneIndexParameter(vv, L, s1$, sp, True)
                 If MyIsObject(myVar) Then
                     If myVar Is Err Then
                         Set errbag = New ErrorBag
@@ -28546,7 +28546,7 @@ contindex:
         ElseIf IsStrExp(bstack, rest$, ss$) Then
             On Error Resume Next
             Err.Clear
-            Set myVar = ReadOneIndexParameter(vv, l, s1$, ss$, False)
+            Set myVar = ReadOneIndexParameter(vv, L, s1$, ss$, False)
             If Err.Number Then
                If MyIsObject(myVar) Then
                         If myVar Is Err Then
@@ -28557,7 +28557,7 @@ contindex:
                         End If
                     End If
                     Err.Clear
-                    Set myVar = ReadOneIndexParameter(vv, l, s1$, ss$, True)
+                    Set myVar = ReadOneIndexParameter(vv, L, s1$, ss$, True)
                     If MyIsObject(myVar) Then
                         If myVar Is Err Then
                             Set errbag = New ErrorBag
@@ -28630,7 +28630,7 @@ Set pppp = Nothing
 Set vv = Nothing
 End Sub
 Sub ProcMethod(bstack As basetask, v(), vIndex As Long, FN$, rest$, language As Long, ok As Boolean, groupok As Boolean, prive As Boolean)
-Dim var1() As Variant, s$, r As Double, l As Long, NewRef As Long, Glob As Boolean, newvar As Boolean
+Dim var1() As Variant, s$, r As Double, L As Long, NewRef As Long, Glob As Boolean, newvar As Boolean
 Dim vv As Object, result As Variant, retobject As Object, usehandler As mHandler, oUnk As stdole.IUnknown
 Dim namarg As Long, x1 As Long
 ok = True
@@ -28812,9 +28812,9 @@ Else
                     End If
                     bstack.soros.PushVal result
                     s$ = BlockParam(rest$)
-                    l = Len(s$)
+                    L = Len(s$)
                     MyRead 6, bstack, what$ + s$ + ")", language, what$, x1
-                    Mid$(rest$, 1, l) = space(l)
+                    Mid$(rest$, 1, L) = space(L)
                     FastSymbol rest$, ")", True
              Case 8
                     If newvar Then
@@ -28824,8 +28824,8 @@ Else
                     bstack.soros.PushVal result
 again1:
                     s$ = BlockParamSq(rest$)
-                    l = Len(s$)
-                    Mid$(rest$, 1, l) = space(l)
+                    L = Len(s$)
+                    Mid$(rest$, 1, L) = space(L)
                     FastSymbol rest$, "]", True
                     what$ = what$ + "[" + s$ + "]"
                     If FastSymbol(rest$, "[") Then GoTo again1
@@ -42194,7 +42194,7 @@ Function MyIsNumericPointer(v As Variant) As Boolean
 Dim n As Integer
 GetMem2 VarPtr(v), n
 If n < 8 Then MyIsNumericPointer = True: Exit Function
-MyIsNumericPointer = (n = 11) Or (n = 17) Or (n = 14)
+MyIsNumericPointer = (n = 11) Or (n = 17) Or (n = 14) Or (n = 36)
 End Function
 Function CheckInt64(v As Variant) As Boolean
 Dim n As Byte
@@ -42205,19 +42205,19 @@ Function MyIsNumeric(v As Variant) As Boolean
 Dim n As Byte
 GetMem1 VarPtr(v), n
 If n < 8 Then MyIsNumeric = True: Exit Function
-MyIsNumeric = (n = 11) Or (n = 17) Or (n = 14) Or (n = 20)
+MyIsNumeric = (n = 11) Or (n = 17) Or (n = 14) Or (n = 20) Or (n = 36)
 End Function
 Function MyIsNumeric2(v As Variant, n As Integer) As Boolean
 GetMem2 VarPtr(v), n
 If n < 8 Then MyIsNumeric2 = True: Exit Function
-MyIsNumeric2 = (n = 11) Or (n = 17) Or (n = 14) Or (n = 20)
+MyIsNumeric2 = (n = 11) Or (n = 17) Or (n = 14) Or (n = 20) ' no  Or (n = 36)
 End Function
 Function IsNumericPrint(v As Variant) As Boolean
 Dim n As Byte
 GetMem1 VarPtr(v), n
 If n = 0 Then Exit Function
 If n < 8 Then IsNumericPrint = True: Exit Function
-IsNumericPrint = (n = 11) Or (n = 17) Or (n = 14) Or (n = 20)
+IsNumericPrint = (n = 11) Or (n = 17) Or (n = 14) Or (n = 20) Or (n = 36)
 End Function
 Function MyIsUnknown(v As Variant) As Boolean
 Dim n As Byte
@@ -46472,15 +46472,15 @@ PutMem4 VarPtr(b$), I
 End Sub
 
 Function FastPureLabel(b$, A$, Optional Pos As Long = 1, Optional convert As Boolean, Optional retdot As Boolean, Optional countdot As Long, Optional trimit As Boolean = True, Optional gr As Boolean) As Long
-Dim I&, l As Long, one As Boolean, convat As Boolean, nospace As Boolean, pres As Long
+Dim I&, L As Long, one As Boolean, convat As Boolean, nospace As Boolean, pres As Long
 Dim P2 As Long, P1 As Integer, p4 As Long, counter As Long
     A$ = vbNullString
     countdot = 0
     gr = False
-    l = Len(b$): If l = 0 Then Exit Function
-    If Pos > l Then Exit Function
-    P2 = StrPtr(b$) + Pos * 2 - 2: l = l - 1
-    p4 = P2 + l * 2
+    L = Len(b$): If L = 0 Then Exit Function
+    If Pos > L Then Exit Function
+    P2 = StrPtr(b$) + Pos * 2 - 2: L = L - 1
+    p4 = P2 + L * 2
     For I = P2 To p4 Step 2
     GetMem2 I, P1
     Select Case P1
@@ -46598,11 +46598,11 @@ aName:
                                 GoTo conthere
                             Else
                                 counter = counter + 3
-                                l = I + 6
-                                For l = l To p4 Step 2
-                                    GetMem2 l, P1
+                                L = I + 6
+                                For L = L To p4 Step 2
+                                    GetMem2 L, P1
                                     If P1 = 64 Then counter = counter + 1 Else Exit For
-                                Next l
+                                Next L
                                 Exit For
                             End If
                         End If
@@ -49344,7 +49344,7 @@ If I > 1 Then
     If I > 1 Then A$ = Mid$(A$, I)
 End If
 End Function
-Function MaybeIsTwoSymbol(A$, c$, Optional l As Long = 2) As Boolean
+Function MaybeIsTwoSymbol(A$, c$, Optional L As Long = 2) As Boolean
 Dim I As Long
 If A$ = vbNullString Then Exit Function
 I = MyTrimL(A$)
@@ -49578,12 +49578,12 @@ s.PushVal -3  ' mark for IF
 End Sub
 
 Function lookOne(s, c$) As Boolean
-Dim I&, l As Long, cc As Integer
+Dim I&, L As Long, cc As Integer
 Dim P2 As Long, P1 As Integer
-  l = Len(s): If l = 0 Then Exit Function
-  P2 = StrPtr(s): l = l - 1: GetMem2 StrPtr(c$), cc
+  L = Len(s): If L = 0 Then Exit Function
+  P2 = StrPtr(s): L = L - 1: GetMem2 StrPtr(c$), cc
 
-  For I = P2 To P2 + l * 2 Step 2
+  For I = P2 To P2 + L * 2 Step 2
   GetMem2 I, P1
   Select Case P1
     Case 32, 160, 7, 9
@@ -49595,12 +49595,12 @@ Dim P2 As Long, P1 As Integer
   Next I
 End Function
 Function lookTwoSame(s, c$) As Boolean
-Dim I&, l As Long, cc As Integer, cc2 As Integer
+Dim I&, L As Long, cc As Integer, cc2 As Integer
 Dim P2 As Long, P1 As Integer, n As Integer
     If Len(c$) <> 1 Then Exit Function
-  l = Len(s): If l = 0 Then Exit Function
-  P2 = StrPtr(s): l = l - 1: GetMem2 StrPtr(c$), cc
-  For I = P2 To P2 + l * 2 Step 2
+  L = Len(s): If L = 0 Then Exit Function
+  P2 = StrPtr(s): L = L - 1: GetMem2 StrPtr(c$), cc
+  For I = P2 To P2 + L * 2 Step 2
   GetMem2 I, P1
   Select Case P1
     Case 32, 160, 7, 9
@@ -49776,11 +49776,11 @@ End If
 End Function
 
 Private Function MyTrimL(s$) As Long
-Dim I&, l As Long
+Dim I&, L As Long
 Dim P2 As Long, P1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimL = 1: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
+  L = Len(s): If L = 0 Then MyTrimL = 1: Exit Function
+  P2 = StrPtr(s): L = L - 1
+  p4 = P2 + L * 2
   For I = P2 To p4 Step 2
   GetMem2 I, P1
   Select Case P1
@@ -49790,7 +49790,7 @@ Dim P2 As Long, P1 As Integer, p4 As Long
    Exit Function
   End Select
   Next I
- MyTrimL = l + 2
+ MyTrimL = L + 2
 End Function
 Public Function RealLen(s$, Optional checkone As Boolean = False) As Long
 Dim I&, LL As Long, n As Long
@@ -49983,12 +49983,12 @@ there:
 If Not TaskMaster Is Nothing Then TaskMaster.RestEnd1
 End Sub
 Private Function lookB123(s As String, Optional ByVal Pos As Long = 1) As Boolean
-Dim I&, l As Long
+Dim I&, L As Long
 Dim P2 As Long, P1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then Exit Function
-  If Pos > l Then Exit Function
-  P2 = StrPtr(s) + (Pos - 1) * 2: l = l - 1
-  For I = P2 To P2 + l * 2 Step 2
+  L = Len(s): If L = 0 Then Exit Function
+  If Pos > L Then Exit Function
+  P2 = StrPtr(s) + (Pos - 1) * 2: L = L - 1
+  For I = P2 To P2 + L * 2 Step 2
   GetMem2 I, P1
   Select Case P1
     Case 32, 160, 7, 9
@@ -52978,11 +52978,11 @@ Public Function IsLabelDotSub(where$, A$, rrr$, r$, Lang As Long, Optional P1 As
     Dim rr&, one As Boolean, br As Integer, c$, firstdot$, gr As Boolean
     rrr$ = vbNullString
     r$ = vbNullString
-    Dim I&, l As Long, p3 As Integer
+    Dim I&, L As Long, p3 As Integer
     Dim P2 As Long, p4 As Long  '', excludesp As Long
-    l = Len(A$): If l = 0 Then IsLabelDotSub = 0: Lang = 1: Exit Function
-    P2 = StrPtr(A$): l = l - 1
-    p4 = P2 + l * 2
+    L = Len(A$): If L = 0 Then IsLabelDotSub = 0: Lang = 1: Exit Function
+    P2 = StrPtr(A$): L = L - 1
+    p4 = P2 + L * 2
     For I = P2 To p4 Step 2
         GetMem2 I, P1
         Select Case P1

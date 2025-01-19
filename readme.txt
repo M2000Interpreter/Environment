@@ -1,166 +1,108 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 65 active-X
-1. More for Structures:
-Now we can use the fields of multiple structures in structures
-Also we can get part of a struncture and copy back, easy.
-Rember structures used for buffers. Buffers are memory buffers attatch to an object "the Buffer". So we handle this object to read/write at memory buffer. We use buffers for binary files and for passing to c functions, or assembly code.
-Because buffer is an object we can place it in arrays or passing to functions or return from functions. Also we can make user objects who hold buffers.
-Also now we have bound check on arrays of fields. We can use unions to have access anywhere or we can use Eval$() which also can read from anywhere from a buffer. For all readings/writings there is another check at the level of offsets and sizes.
+Version 12 Revision 66 active-X
+1. A small bug prevent to read from stack of values the cxComplex number from a tuple. Now thid code run and return: cxComplex cxComplex
+==example==
+declare global m math2
+method m,"cxone" as one
+a=(one, one)
+what(!a)
 
-==Example 1==
-structure zeta {
-	delta as integer * 10
-}
-structure alfa {
-	kappa as double*10
-	beta as integer*5
-	epsilon as zeta * 10
-}
-alfa k[10]
-Print len(alfa)
-k[2]|epsilon[1]|delta[2]=100
+sub what(a, b)
+	? type$(a), type$(b)
+end sub
+2. Added modules on info.gsb file:
+ROOTS (using complex numbers to find Roots of Quadratic Equations)
+TAXICAB (find TaxiCab numbers and display 1th to 25th and 2000th to 20006th. This module make and sort more than 719000 items on a List object, need less than 6 minutes on an old Intel(R) Core(TM) i5-3470 CPU @ 3.20GHz)
+This is the code of TAXICAB (we call Taxicab inside Taxicab whithout a recursive call. Modules have to use Call NameOfModule to call itself. So the call using only the NAME call the local or global module (excluding this module if it is global). So we have the local TaxiCab so we call this one.
 
-Print k[2]|epsilon[1]|delta[2]
-k[2]|epsilon[5]=k[2]|epsilon[1]
-zeta m
-m[0]=k[2]|epsilon[5]
-m|delta[2]=m|delta[2]*3
-return m, 0!delta!4:=500
-m|delta[5]=600
-k[2]|epsilon[5]=m[0]
-for i=2 to 5
-print i, k[2]|epsilon[5]|delta[i]
-next
-list
-==Example 2==
-' long long here is Unsigned Long Long (has type Decimal, but values as unsigned long long)
-structure epsilon { 'this is union
-	{
-	betaLong as long*20
-	}	
-	beta as long long*10
-}
-structure delta {
-	something as byte*100
-	beta as epsilon*10
-}
-buffer clear kappa as long long*5 ' no structure
-delta alfa 
-epsilon z
-? (z(0),alfa(0), kappa(0))#str$(" ")
-? len(z)=80
-alfa|beta[4]|beta[2]=300
-? alfa|beta[4]|beta[2]=300
-z=alfa|beta[]
-? z[4]|beta[2]=300
-? len(Z)=800
-zz=z[4]
-? zz|beta[2]=300
-? zz|betaLong[4]=300  ' low byte
-' kappa has no fields, just 10 long long
-old=kappa(0)
-'return kappa, 0:=zz|beta[0, 80] ' same pointer
-'return kappa, 0:=eval$(zz|beta[]) ' same pointer
-' kappa[0]=zz|beta[]  ' same pointer but not fit the new one
-? len(kappa)=40
-kappa=zz|beta[]  ' new pointer to k - expanded
-? len(kappa)=80
-Print Old+" "+(kappa(0))
-Print kappa[2]=300
-Print Eval(Kappa, 8*2 as long)=300 ' unsigned long low
-Print Eval(Kappa, 8*2+4 as long) =0 ' unsigned long High
-with delta, "done", true, "index", 1, "StructMany" as Many, "StructOffset" as Offset
-? Many=10, Offset=100
-Print "Only alfa has same address, all other changed"
-? (z(0),alfa(0), kappa(0))#str$(" ")
-list
-
-2. We can define arrays with parenthesis and types as empty arrays. (new from this revision)
-==Example 3==
-dim a() as long, b() as integer
-Print len(a()), len(b())
-dim a(10), b(5)
-Print len(a()), len(b())
-? type$(a(3)), type$(b(4))
-
-3.We can define arrays with square brackets and types as empty arrays. (new from this revision).
-==Example 4==
-long a[], b[]
-Print len(a)=0, len(b)=0
-a[10]=100
-b[4]=50
-z=b
-Print z is b = true
-Print len(a)=11, len(b)=5
-' change pointer to new empty arrays.
-long a[], b[]
-Print z is b = false
-Print len(a)=0, len(b)=0, len(z)=5
-Print z[4]=50
-List
-
-4. Fix the Format$() which now work as expected
-==example 5==
-a=1221.1212
-Print format$("{0}", a)
-Print format$("{0:-10}", a)
-Print format$("{0:-10}", ""+a) 
-Print format$("{0:10}", a)
-Print format$("{0:10}", ""+a)
-Print format$("{0:3:-10}", a) 
-Print format$("{0::-10}", a)
-Print format$("{0:3:10}", a)
-Print format$("{0::10}", a)
-5. Fix Inner While when the inner one uses multiple iterators.
---Example 6==
-Module Iterators (f as long=-2) {
-	NameOfDay=("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
-	NameOfColor=Stack:="Red","Orange","Yellow","Green","Blue","Purple"
-	Positions=list:="first":=1,"fourth":=4,"fifth":=5
-	
-	Print #f, "All days:"
-	m=each(NameOfDay)
-	while m    ' ok
-		print #f, (m^+1)+". "+array$(m)
-	end while
-	Print #f
-	Print #f, "All colors:"
-	m=each(NameOfColor)
-	while m
-		print #f, (m^+1)+". "+StackItem$(m)
-	end while
-	Print #f
-	Print #f, "Print from positions from the first:"
-	a=each(Positions)
-	while a   
-		m=each(NameOfDay, eval(a))
-		n=each(NameOfColor, eval(a))
-		while m, n
-			Print #f, format$("{0:10} {1:10} {2:10}", eval$(a!), array$(m), stackitem$(n))
-			exit
+module TaxiCab (f as long){
+	cls,0
+	Print Part "Taxicab numbers"
+	Print Under
+	profiler
+	var Cubes=list, 	Sums=list, 	Ret=list
+	var st=0, en=1200
+	st=@Proc(0, en)
+	sort ret as number
+	Display(1, 25)
+	Display(2000, 2006)
+	Print timecount
+	print "done"
+	end
+	sub Display(from, to)
+		local k=each(ret, from,to), s=""
+		while k
+			s= format$("{0:-6} {1:-12}",K^+1, val(eval$(k!)+"&&"))+eval$(k)
+		 	Print s : if f>-1 then print #f, s
 		end while
-	end while
-	Print #f
-	Print #f, "Print from positions from the last:"
-	a=each(Positions)
-	while a
-		m=each(NameOfDay, -eval(a))
-		n=each(NameOfColor, -eval(a))
-		while m, n
-			Print #f, format$("{0:10} {1:10} {2:10}", eval$(a!), array$(m), stackitem$(n))
-			exit
-		end while		
-	end while
+	end sub
+	function Proc(ia, ib)
+		local i, cube as long long, s as long long
+		for i=ia to ib
+			if i mod 10=1 then print over $("#0.00"), "Working..";(i-ia)/ib*100;"%"
+			cube=i^3
+			Append Cubes, cube
+			k=each(cubes)
+			while k
+				s=cube+eval(k)
+				if not exist(Sums, s) then
+					append Sums,s:=(i)+"^3 + "+(k^)+"^3"
+				else.if not exist(Ret, s) then
+					append Ret, s:=" = "+(i)+"^3 + "+(k^)+"^3 = "+eval$(Sums)
+				end if
+			end while
+		next
+		print over $("#0.00"), "Working..";100;"%"
+		print
+		=i
+	end function
 }
-open "" for wide output as #c
-Iterators c
-close #c
-exit
-open "output1.txt" for wide output as #c
-Iterators c
-close #c
-win dir$+"output1.txt"
+file2export="TaxiCabNumbers.txt"
+open file2export for wide output as #f
+TaxiCab f
+close #f
+win dir$+"TaxiCabNumbers.txt"
+
+A taxiCab number the sum of at least two different set of cubes of numbers: So for 1279 we have the set 12 - 1 and the set 10 - 9. Here ^ used to display the power operator (M2000 use the ** and ^ as power operators).
+
+     1         1729 = 12^3 + 1^3 = 10^3 + 9^3
+     2         4104 = 16^3 + 2^3 = 15^3 + 9^3
+     3        13832 = 24^3 + 2^3 = 20^3 + 18^3
+     4        20683 = 27^3 + 10^3 = 24^3 + 19^3
+     5        32832 = 32^3 + 4^3 = 30^3 + 18^3
+     6        39312 = 34^3 + 2^3 = 33^3 + 15^3
+     7        40033 = 34^3 + 9^3 = 33^3 + 16^3
+     8        46683 = 36^3 + 3^3 = 30^3 + 27^3
+     9        64232 = 39^3 + 17^3 = 36^3 + 26^3
+    10        65728 = 40^3 + 12^3 = 33^3 + 31^3
+    11       110656 = 48^3 + 4^3 = 40^3 + 36^3
+    12       110808 = 48^3 + 6^3 = 45^3 + 27^3
+    13       134379 = 51^3 + 12^3 = 43^3 + 38^3
+    14       149389 = 53^3 + 8^3 = 50^3 + 29^3
+    15       165464 = 54^3 + 20^3 = 48^3 + 38^3
+    16       171288 = 55^3 + 17^3 = 54^3 + 24^3
+    17       195841 = 58^3 + 9^3 = 57^3 + 22^3
+    18       216027 = 60^3 + 3^3 = 59^3 + 22^3
+    19       216125 = 60^3 + 5^3 = 50^3 + 45^3
+    20       262656 = 64^3 + 8^3 = 60^3 + 36^3
+    21       314496 = 68^3 + 4^3 = 66^3 + 30^3
+    22       320264 = 68^3 + 18^3 = 66^3 + 32^3
+    23       327763 = 67^3 + 30^3 = 58^3 + 51^3
+    24       373464 = 72^3 + 6^3 = 60^3 + 54^3
+    25       402597 = 69^3 + 42^3 = 61^3 + 56^3
+  2000   1671816384 = 1168^3 + 428^3 = 944^3 + 940^3
+  2001   1672470592 = 1187^3 + 29^3 = 1124^3 + 632^3
+  2002   1673170856 = 1164^3 + 458^3 = 1034^3 + 828^3
+  2003   1675045225 = 1153^3 + 522^3 = 1081^3 + 744^3
+  2004   1675958167 = 1159^3 + 492^3 = 1096^3 + 711^3
+  2005   1676926719 = 1188^3 + 63^3 = 1095^3 + 714^3
+  2006   1677646971 = 1188^3 + 99^3 = 990^3 + 891^3
+
+
+You can measure a run using Profiler and Print TimeCount:
+Profiler:ModuleName:Print TimeCount
+The TaxiCab module use Profiler/Timecount so no need to use it external.
 
 
 George Karras, Kallithea Attikis, Greece.

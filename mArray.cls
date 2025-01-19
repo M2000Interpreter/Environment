@@ -41,7 +41,7 @@ Public GroupRef As Object
 'Private mGroupRef As Object
 Public CodeName As String
 Private oldmaxitems As Long
-Public arr As Boolean, Stable As Boolean
+Public Arr As Boolean, Stable As Boolean
 Public RevOrder As Boolean
 Public MyTypeToBe As Integer
 Private Type SAFEArrayPart
@@ -51,10 +51,10 @@ Private Type SAFEArrayPart
    cLocks                       As Long
    pvData                       As Long
    End Type
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
   Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" _
       (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
@@ -576,12 +576,12 @@ If Err Then
 End If
 PlaceValue2UDT = True
 End Function
-Public Function GetUDTValue(ByVal p As Long, Name$, Optional ndx)
+Public Function GetUDTValue(ByVal p As Long, Name$, Optional nDx)
 On Error Resume Next
-If IsMissing(ndx) Then
+If IsMissing(nDx) Then
 GetUDTValue = Module10.GetUDTValue(actualData(p), Name$)
 Else
-GetUDTValue = Module10.GetUDTValueArray(actualData(p), Name$, CLng(ndx))
+GetUDTValue = Module10.GetUDTValueArray(actualData(p), Name$, CLng(nDx))
 End If
 End Function
 Property Get Value() As Variant
@@ -611,7 +611,7 @@ End If
 End Property
 Public Sub PushProp(A As Variant)
 Set GroupRef = A
-arr = False
+Arr = False
 End Sub
 Friend Sub ExportArrayNow()
 If myVarType(actualData, vbObject) Then
@@ -902,7 +902,7 @@ If count > 0 Then
         K.item(0) = item(0)
     End If
 End If
-K.arr = True
+K.Arr = True
 Set M = K
 Set K = Nothing
 End Sub
@@ -912,7 +912,7 @@ Dim I As Long, obj As Object, obj2 As Object, spare As lambda
 If dnum > 0 Then
     K.StartResize: K.PushDim Me.count - 1: K.PushEnd
 Else
-    K.arr = True
+    K.Arr = True
     Set K.GroupRef = Me.GroupRef
     K.IHaveGui = Me.IHaveGui
     K.IhaveClass = Me.IhaveClass
@@ -958,7 +958,7 @@ If dnum > 0 Then
 ElseIf Not pppp1.IsEmpty Then
     Set pppp = pppp1
 End If
-pppp.arr = True
+pppp.Arr = True
 Set M = pppp
 Set pppp = Nothing
 Set pppp1 = Nothing
@@ -1049,7 +1049,7 @@ Else
     Next I
 '' new
 End If
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
 K.Final = Me.Final
@@ -1104,7 +1104,7 @@ For I = 0 To Me.UpperMonoLimit
 Next I
 End If
 '' new
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
 K.Final = Me.Final
@@ -1142,7 +1142,7 @@ For I = 0 To Me.UpperMonoLimit
 Next I
 End If
 '' new
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
 K.Final = Me.Final
@@ -1157,7 +1157,7 @@ K.StartResize
 K.PushEnd
 K.RevOrder = RevOrder
 Set K.GroupRef = Me.GroupRef
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
 K.Final = Me.Final
@@ -1205,7 +1205,7 @@ For I = fromS To toS
     End If
 Next I
 '' new
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
 K.Final = Me.Final
@@ -1235,7 +1235,7 @@ Else
 End If
 Next I
 
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
 K.Final = Me.Final
@@ -1427,7 +1427,7 @@ Else
     ReDim actualData(0)
 End If
 CodeName = GetAnyName$
-arr = True
+Arr = True
 limit(0) = 0
 Else
     If myVarType(actualData, vbObject) Then
@@ -1533,7 +1533,7 @@ End If
 End Sub
 Public Function IsStringItem(curitem As Long) As Variant
 Dim usehandler As mHandler, n As Byte
-If arr Then
+If Arr Then
 If myVarType(actualData, vbObject) Then
 IsStringItem = VarType(actualData(curitem)) = vbString
 
@@ -1572,7 +1572,7 @@ End If
 End Function
 Public Property Get ItemIsObject(curitem) As Boolean
 On Error GoTo there1
-If arr Then
+If Arr Then
     If maxitems1 >= curitem Then
         If MyIsObject(actualData(curitem)) Then
             ItemIsObject = Not actualData(curitem) Is Nothing
@@ -1588,7 +1588,7 @@ End Property
 Public Property Get ItemType(curitem) As String
 Dim Ar As refArray
 On Error GoTo there1
-If arr Then
+If Arr Then
     If maxitems1 >= curitem Then
         ItemType = VarTypeName(actualData(curitem))
     End If
@@ -1623,7 +1623,7 @@ there1:
 End Property
 Public Property Get ItemTypeNum(curitem) As Integer
 On Error GoTo there1
-If arr Then
+If Arr Then
     If maxitems1 >= curitem Then
         ItemTypeNum = MemInt(VarPtr(actualData(curitem)))
     End If
@@ -1657,7 +1657,7 @@ there1:
 
 End Property
 Friend Sub GetPorp(aProp As PropReference, curitem As Long)
-If arr Then
+If Arr Then
     Set aProp = actualData(curitem)
 Else
     Set aProp = GroupRef
@@ -1665,7 +1665,7 @@ End If
 End Sub
 Public Property Get item(curitem As Long) As Variant
 On Error GoTo there1
-If arr Then
+If Arr Then
     If maxitems1 >= curitem Then
         If ItemIsObject(curitem) Then
             If Typename(actualData(curitem)) = "PropReference" Then
@@ -1715,7 +1715,7 @@ there1:
 End Property
 Friend Property Get itemObject(curitem As Long) As Variant
 On Error GoTo there1
-If arr Then
+If Arr Then
     Set itemObject = actualData(curitem)
 Else
     If curitem = -2 Then
@@ -1744,7 +1744,7 @@ End Property
 Public Property Get itemnumeric(curitem As Long) As Variant
 On Error GoTo there1
 Dim usehandler As mHandler
-If arr Then
+If Arr Then
     If maxitems1 >= curitem Then
         If IsObject(actualData(curitem)) Then
             If Typename(actualData(curitem)) = "PropReference" Then
@@ -1876,7 +1876,7 @@ Public Property Let ItemStr(curitem As Long, item As String)
 Dim usehandler As mHandler
 On Error Resume Next
 If curitem < 0 Then
-If Not arr Then
+If Not Arr Then
 If curitem <> -2 Then
 Set usehandler = GroupRef
 If usehandler.T1 <> 1 Then Err.Raise 1010, , "Need an Inventory Object"
@@ -2088,7 +2088,7 @@ End Function
 Function IsObjAt(curitem As Long, peekvalue) As Boolean
 On Error GoTo there1
 peekvalue = Empty
-If arr Then
+If Arr Then
     If maxitems1 >= curitem Then
         If ItemIsObject(curitem) Then
             If Typename(actualData(curitem)) = "PropReference" Then
@@ -2184,7 +2184,7 @@ nmaxitems = 1
 nmaxitems1 = 0
 actualData = Array(Empty)
 CodeName = GetAnyName$
-arr = True
+Arr = True
 myarrbase = -ArrBase
 refArray = 0&
 End Sub
@@ -2212,7 +2212,7 @@ Dim n As Byte
 GetMem1 VarPtr(v), n
 If n < 2 Then Exit Function
 If n < 8 Then MyIsNumeric = True: Exit Function
-MyIsNumeric = (n = 11) Or (n = 17) Or (n = 14) Or (n = 20)
+MyIsNumeric = (n = 11) Or (n = 17) Or (n = 14) Or (n = 20) Or (n = 36)
 End Function
 Function MyIsObject(v As Variant) As Boolean
 Dim n As Byte
@@ -3009,11 +3009,11 @@ Public Function UnsignedAdd(ByVal lUnsignedPtr As Long, ByVal lSignedOffset As L
 End Function
 
 Private Property Let iBoxArray_Arr(ByVal RHS As Boolean)
-arr = RHS
+Arr = RHS
 End Property
 
 Private Property Get iBoxArray_Arr() As Boolean
-iBoxArray_Arr = arr
+iBoxArray_Arr = Arr
 End Property
 
 Private Property Let iBoxArray_arrname(ByVal RHS As String)
