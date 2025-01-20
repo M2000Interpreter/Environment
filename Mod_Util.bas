@@ -52,7 +52,8 @@ Private Declare Function GetTempFileNameW Lib "kernel32" _
      As Long
 Private Const UNIQUE_NAME = &H0&
 Public Pow2(33) As Currency, Pow2minusOne(33) As Currency
-
+Public nMath As New Math
+Public nMath2 As New MATH2
 Public Type Counters
     k1 As Currency
     RRCOUNTER As Currency
@@ -3420,11 +3421,11 @@ End With
 End Function
 
 Function StarSTR(ByVal sStr As String) As String
-Dim l As Long, s As Long
-l = Len(sStr)
+Dim L As Long, s As Long
+L = Len(sStr)
 sStr = RTrim$(sStr)
-s = l - Len(sStr)
-StarSTR = String$(l - s, "*") + String$(s, " ")
+s = L - Len(sStr)
+StarSTR = String$(L - s, "*") + String$(s, " ")
 
 End Function
 Function ProcBeep(bstack As basetask, rest$) As Boolean
@@ -3729,7 +3730,7 @@ End With
 iText = v$
 End With
 End Function
-Sub ScreenEditDOC(bstack As basetask, aaa As Variant, X&, Y&, x1&, y1&, Optional l As Long = 0, Optional usecol As Boolean = False, Optional Col As Long)
+Sub ScreenEditDOC(bstack As basetask, aaa As Variant, X&, Y&, x1&, y1&, Optional L As Long = 0, Optional usecol As Boolean = False, Optional Col As Long)
 On Error Resume Next
 Dim ot As Boolean, back As New Document, I As Long, D As Object
 Dim prive As basket
@@ -3852,11 +3853,11 @@ NOEDIT = False
 
 .Visible = True
 .SetFocus
-If l <> 0 Then
-    If l > 0 Then
-        If aaa.SizeCRLF < l Then l = aaa.SizeCRLF
+If L <> 0 Then
+    If L > 0 Then
+        If aaa.SizeCRLF < L Then L = aaa.SizeCRLF
         
-        .SelStart = l
+        .SelStart = L
         Else
         .SelStart = 0
     End If
@@ -3895,7 +3896,7 @@ contScreenEditThere1:
 Form1.StoreBookMarks
 TaskMaster.RestEnd1
 If Form1.TEXT1.Visible Then Form1.TEXT1.Visible = False
- l = Form1.TEXT1.LastSelStart
+ L = Form1.TEXT1.LastSelStart
 
 
 If D Is Form1 Then
@@ -3921,7 +3922,7 @@ escok = oldesc
 Set D = Nothing
 End With
 End Sub
-Sub ScreenEdit(bstack As basetask, A$, X&, Y&, x1&, y1&, Optional l As Long = 0, Optional changelinefeeds As Long = 0, Optional maxchar As Long = 0, Optional ExcludeThisLeft As Long = 0, Optional internal As Boolean = False)
+Sub ScreenEdit(bstack As basetask, A$, X&, Y&, x1&, y1&, Optional L As Long = 0, Optional changelinefeeds As Long = 0, Optional maxchar As Long = 0, Optional ExcludeThisLeft As Long = 0, Optional internal As Boolean = False)
 On Error Resume Next
 ' allways a$ enter with crlf,but exit with crlf or cr or lf depents from changelinefeeds
 Dim oldesc As Boolean, D As Object
@@ -3973,10 +3974,10 @@ End If
 If Len(A$) > maxchar Then
 A$ = Left$(A$, maxchar)
 End If
-If l = -1 Then
-l = Len(A$) + 1
+If L = -1 Then
+L = Len(A$) + 1
 Else
-l = 1
+L = 1
 End If
 
 .UsedAsTextBox = True
@@ -4102,14 +4103,14 @@ If Len(A$) < 100000 Then .Render
 Else
 .Render
 End If
-If l <> 0 Then
-    If l > 0 Then
-        If Len(A$) < l Then l = Len(A$) Else l = l - 1
+If L <> 0 Then
+    If L > 0 Then
+        If Len(A$) < L Then L = Len(A$) Else L = L - 1
         If .NumberOnly Then
         .SelStart = 0
-        .SelLength = l
+        .SelLength = L
         Else
-        .SelStart = l
+        .SelStart = L
         End If
         
                 Else
@@ -4118,7 +4119,7 @@ If l <> 0 Then
 Else
 If Len(A$) < .LastSelStart Then
 .SelStart = 1
-l = Len(A$)
+L = Len(A$)
 Else
     .SelStart = .LastSelStart
 End If
@@ -4161,7 +4162,7 @@ contScreenEditThere:
 TaskMaster.RestEnd1
 If Form1.TEXT1.Visible Then Form1.TEXT1.Visible = False
 
- l = Form1.TEXT1.LastSelStart + 1
+ L = Form1.TEXT1.LastSelStart + 1
 
 If bstack.toback Then
 D.lockme = False
@@ -9366,7 +9367,7 @@ If j - I >= dl - 1 Then
 End If
 End Function
 
-Function Fast2Symbol(A$, c$, K As Long, D$, l As Long) As Boolean
+Function Fast2Symbol(A$, c$, K As Long, D$, L As Long) As Boolean
 Dim I As Long, j As Long
 j = Len(A$)
 If j = 0 Then Exit Function
@@ -9380,9 +9381,9 @@ If j - I >= K - 1 Then
     End If
 End If
 'If j - i >= Len(d$) - 1 Then
-If j - I >= l - 1 Then
-    If InStr(D$, Mid$(A$, I, l)) > 0 Then
-    A$ = Mid$(A$, MyTrimLi(A$, I + l))
+If j - I >= L - 1 Then
+    If InStr(D$, Mid$(A$, I, L)) > 0 Then
+    A$ = Mid$(A$, MyTrimLi(A$, I + L))
     Fast2Symbol = True
     Exit Function
     End If
@@ -9413,11 +9414,11 @@ Function FastSymbol(A$, c$, Optional mis As Boolean = False, Optional cl As Long
     End If
 End Function
 Function FastSymbol1(s$, c$) As Boolean
-    Dim I&, l As Long, where As Long
+    Dim I&, L As Long, where As Long
     Dim P2 As Long, P1 As Integer, p4 As Long
-    l = Len(s$): If l = 0 Then Exit Function
-    P2 = StrPtr(s$): l = l - 1
-    p4 = P2 + l * 2
+    L = Len(s$): If L = 0 Then Exit Function
+    P2 = StrPtr(s$): L = L - 1
+    p4 = P2 + L * 2
     For I = P2 To p4 Step 2
         GetMem2 I, P1
         Select Case P1
@@ -9435,11 +9436,11 @@ Function FastSymbol1(s$, c$) As Boolean
     End If
 End Function
 Function FastSymbol23(s$, c$, st As Long, Optional Action As Integer) As Boolean
-    Dim I&, l As Long, where As Long
+    Dim I&, L As Long, where As Long
     Dim P2 As Long, P1 As Integer, p4 As Long
-    l = Len(s$): If l = 0 Then Exit Function
-    P2 = StrPtr(s$): l = l - 1
-    p4 = P2 + l * 2
+    L = Len(s$): If L = 0 Then Exit Function
+    P2 = StrPtr(s$): L = L - 1
+    p4 = P2 + L * 2
     For I = P2 + (st * 2 - 2) To p4 Step 2
         GetMem2 I, P1
         Select Case P1
@@ -9465,11 +9466,11 @@ Function FastSymbol23(s$, c$, st As Long, Optional Action As Integer) As Boolean
 End Function
 
 Function FastSymbol2(s$, c$) As Boolean
-Dim I&, l As Long, where As Long
+Dim I&, L As Long, where As Long
 Dim P2 As Long, P1 As Integer, p4 As Long
-  l = Len(s$): If l = 0 Then Exit Function
-  P2 = StrPtr(s$): l = l - 1
-  p4 = P2 + l * 2
+  L = Len(s$): If L = 0 Then Exit Function
+  P2 = StrPtr(s$): L = L - 1
+  p4 = P2 + L * 2
   For I = P2 To p4 Step 2
   GetMem2 I, P1
   Select Case P1
@@ -9495,13 +9496,13 @@ End Function
 
 
 Function lookA123(s) As Boolean
-Dim I&, l As Long
+Dim I&, L As Long
 Dim P2 As Long, P1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then Exit Function
-  P2 = StrPtr(s): l = l - 1
+  L = Len(s): If L = 0 Then Exit Function
+  P2 = StrPtr(s): L = L - 1
   GetMem2 P2, P1
   If P1 <> 58 Then Exit Function
-  For I = P2 + 2 To P2 + l * 2 Step 2
+  For I = P2 + 2 To P2 + L * 2 Step 2
   GetMem2 I, P1
   Select Case P1
     Case 32, 160, 7, 9
@@ -14609,13 +14610,13 @@ Function IsDataVal(bstack As basetask, A$, r As Variant) As Boolean
     End If
 
 End Function
-Function IsSymbolNoSpace(A$, c$, Optional l As Long = 1) As Boolean
+Function IsSymbolNoSpace(A$, c$, Optional L As Long = 1) As Boolean
 ' not for greek identifiers. see isStr1()
     Dim j As Long
     j = Len(A$)
     If j = 0 Then Exit Function
-    If UCase(Mid$(A$, 1, l)) = c$ Then
-        A$ = NLtrim$(Mid$(A$, l + 1))
+    If UCase(Mid$(A$, 1, L)) = c$ Then
+        A$ = NLtrim$(Mid$(A$, L + 1))
         
         IsSymbolNoSpace = True
     End If
@@ -21112,10 +21113,10 @@ ElseIf IsLabelSymbolNew(rest$, "сулпиестгс", "COMPRESSOR", Lang) Then
     Exit Function
 ElseIf IsLabelSymbolNew(rest$, "лахглатийа", "MATH", Lang) Then
     Y3 = False ' no withevents in declare
-    Set var(I) = New Math
+    Set var(I) = nMath
 ElseIf IsLabelSymbolNew(rest$, "лахглатийа2", "MATH2", Lang) Then
     Y3 = False ' no withevents in declare
-    Set var(I) = New MATH2
+    Set var(I) = nMath2
     
 ElseIf IsLabelSymbolNew(rest$, "стахлос", "SOCKET", Lang) Then
     If Ar = 0 Then
@@ -26710,13 +26711,13 @@ contGetStr0:
                 Select Case thattype
                 Case vbObject
                     If Not IsMissing(zeroitem) Then
-                    If TypeOf zeroitem Is BigInteger Then
-                    Set var(I) = New BigInteger
+                        If TypeOf zeroitem Is BigInteger Then
+                            Set var(I) = New BigInteger
+                        Else
+                            Set var(I) = zeroitem
+                        End If
                     Else
-                    Set var(I) = zeroitem
-                    End If
-                    Else
-                    Set var(I) = Nothing
+                         Set var(I) = Nothing
                     End If
                 Case vbInteger
                     var(I) = 0
@@ -26773,12 +26774,21 @@ jumphereObject:
                                     Set p = basestack.lastobj
                                 End If
                                 End If
-                                If TypeOf var(I) Is BigInteger Then
+                                If var(I) Is Nothing Then
+                                Set var(I) = p
+                                ElseIf TypeOf var(I) Is BigInteger Then
                                     If TypeOf p Is BigInteger Then
                                     Set var(I) = p
                                     Else
                                     WrongType
                                     GoTo ex1
+                                    End If
+                                ElseIf Not IsMissing(zeroitem) Then
+                                    If Typename(zeroitem) = Typename(var(I)) Then
+                                        Set var(I) = p
+                                    Else
+                                        WrongType
+                                        GoTo ex1
                                     End If
                                 Else
                                 Set var(I) = p
@@ -29860,12 +29870,12 @@ End Function
 
 
 Private Function lookB123(s) As Boolean
-Dim I&, l As Long
+Dim I&, L As Long
 Dim P2 As Long, P1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then Exit Function
-  P2 = StrPtr(s): l = l - 1
+  L = Len(s): If L = 0 Then Exit Function
+  P2 = StrPtr(s): L = L - 1
 
-  For I = P2 To P2 + l * 2 Step 2
+  For I = P2 To P2 + L * 2 Step 2
   GetMem2 I, P1
   Select Case P1
     Case 32, 160, 7, 9
@@ -29946,20 +29956,20 @@ IsSymbol3 = True
 End If
 End If
 End Function
-Public Function MyTrimLi(s$, l As Long) As Long
+Public Function MyTrimLi(s$, L As Long) As Long
 Dim I&
 Dim P2 As Long, P1 As Integer, p4 As Long
- If l > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
- If l <= 0 Then MyTrimLi = 1: Exit Function
-  l = l - 1
+ If L > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
+ If L <= 0 Then MyTrimLi = 1: Exit Function
+  L = L - 1
   I = Len(s)
-  P2 = StrPtr(s) + l * 2:  p4 = P2 + I * 2
+  P2 = StrPtr(s) + L * 2:  p4 = P2 + I * 2
   For I = P2 To p4 Step 2
   GetMem2 I, P1
   Select Case P1
     Case 32, 160, 9
     Case Else
-     MyTrimLi = (I - P2) \ 2 + 1 + l
+     MyTrimLi = (I - P2) \ 2 + 1 + L
    Exit Function
   End Select
   Next I
@@ -29967,11 +29977,11 @@ Dim P2 As Long, P1 As Integer, p4 As Long
 End Function
 
 Public Function MyTrimL(s$) As Long
-Dim I&, l As Long
+Dim I&, L As Long
 Dim P2 As Long, P1 As Integer, p4 As Long
-  l = Len(s): If l = 0 Then MyTrimL = 1: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
+  L = Len(s): If L = 0 Then MyTrimL = 1: Exit Function
+  P2 = StrPtr(s): L = L - 1
+  p4 = P2 + L * 2
   For I = P2 To p4 Step 2
   GetMem2 I, P1
   Select Case P1
@@ -29981,7 +29991,7 @@ Dim P2 As Long, P1 As Integer, p4 As Long
    Exit Function
   End Select
   Next I
- MyTrimL = l + 2
+ MyTrimL = L + 2
 End Function
 Function myLof2(I As Long) As Currency
     Dim FH As Long

@@ -46211,16 +46211,26 @@ sub disp()
 	if type$(a)="cxComplex" then
 		? " (";a|r;if$(a|i<0->"-","+");abs(a|i);"i)";
 	else
-		? $(if$(abs(a>1e6)->"#.###e+###", "0.0####"));" ";a;
+		if @TestInvalid(a) then
+			? " invalid";
+		else
+			? $(if$(abs(a>1e6)->"#.###e+###", "0.0####"));" ";a;
+		end if
 	end if
 	if type$(b)="cxComplex" then
 		? " (";b|r;if$(b|i<0->"-","+");abs(b|i);"i)"
 	else
-		? $(if$(abs(b>1e6)->"#.###e+###", "0.0####"));" ";b
+		if @TestInvalid(b) then
+			? " invalid"
+		else
+			? $(if$(abs(b>1e6)->"#.###e+###", "0.0####"));" ";b
+		end if
 	end if
 	Print $("")
 end sub
-
+Function TestInvalid()
+      =str$(Number, 1033) = "-1.#IND"
+End Function
 }
 MODULE TAXICAB {module TaxiCab (f as long){
 	cls,0
