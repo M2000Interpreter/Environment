@@ -320,10 +320,10 @@ Public Sub ComputeNow()
 stackshow MyBaseTask
 End Sub
 
-Private Sub compute_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub compute_KeyDown(keycode As Integer, shift As Integer)
 Dim excode As Long
-If KeyCode = 13 Then
-KeyCode = 0
+If keycode = 13 Then
+keycode = 0
     If Compute.Prompt = "? " Then
         gList3(2).BackColor = &H3B3B3B
         TestShowCode = False
@@ -342,7 +342,7 @@ KeyCode = 0
         End If
         
     End If
-ElseIf KeyCode = 8 Then
+ElseIf keycode = 8 Then
 If Compute = vbNullString Then
     If Compute.Prompt <> ">" Then
         Compute.Prompt = ">"
@@ -360,7 +360,7 @@ If Compute = vbNullString Then
         End If
     End If
     Compute.vartext = vbNullString
-KeyCode = 0
+keycode = 0
 Exit Sub
 End If
 End If
@@ -388,15 +388,15 @@ stolemodalid = 0
 End If
 End Sub
 
-Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = vbKeyTab And ((shift And &H2) = 2) Then
+Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
+If keycode = vbKeyTab And ((shift And &H2) = 2) Then
 choosenext
 Sleep 100
-KeyCode = 0
-ElseIf KeyCode = 27 Then
-KeyCode = 0
+keycode = 0
+ElseIf keycode = 27 Then
+keycode = 0
 Unload Me
-ElseIf KeyCode = 13 Then
+ElseIf keycode = 13 Then
 If Not EXECUTED Then
 If Not STq Then
 STbyST = True
@@ -406,7 +406,7 @@ End If
 End Sub
 
 Private Sub Form_Load()
-Dim I As Long
+Dim i As Long
 Busy = True
 height1 = 5280 * DYP / 15
 width1 = 7860 * DXP / 15
@@ -596,24 +596,24 @@ skip = True
 End If
 
 End Sub
-Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
-If gList2.DoubleClickCheck(Button, item, X, Y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
+Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
             Me.Visible = False
             Unload Me
 End If
 
 End Sub
 
-Public Property Let Label1prompt(ByVal Index As Long, ByVal RHS As String)
-Label(Index).Prompt = RHS
+Public Property Let Label1prompt(ByVal index As Long, ByVal RHS As String)
+Label(index).Prompt = RHS
 End Property
 
-Public Property Get label1(ByVal Index As Long) As String
-label1 = Label(Index)
+Public Property Get label1(ByVal index As Long) As String
+label1 = Label(index)
 End Property
 
-Public Property Let label1(ByVal Index As Long, ByVal RHS As String)
-Label(Index) = RHS
+Public Property Let label1(ByVal index As Long, ByVal RHS As String)
+Label(index) = RHS
 End Property
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
 Dim a As RECT, b As Long
@@ -660,46 +660,46 @@ doubleclick = 0
 
 End Sub
 
-Private Sub gList2_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub gList2_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 If Button <> 0 Then tracecounter = 100
 End Sub
 
-Private Sub gList2_MouseUp(X As Single, Y As Single)
+Private Sub gList2_MouseUp(x As Single, y As Single)
 tracecounter = 0
 End Sub
 
 
 
 
-Private Sub glist3_CheckGotFocus(Index As Integer)
-Dim s$, Z$
+Private Sub glist3_CheckGotFocus(index As Integer)
+Dim s$, z$
 gList4.SetFocus
 On Error GoTo there1
-If Index < 2 Then
+If index < 2 Then
 abt = False
 
 vH_title$ = vbNullString
-s$ = Label(Index)
-If Index = 1 Then
+s$ = Label(index)
+If index = 1 Then
    
-        Dim I As Long
+        Dim i As Long
         If MyBaseTask.ExistVar2(s$) Then
-            IsStr1 MyBaseTask, "Type$(" + s$ + ")", Z$
+            IsStr1 MyBaseTask, "Type$(" + s$ + ")", z$
             
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
-                sHelp "Static Variable", s$ & vbCrLf & "Type " + Z$, vH_x, vH_y
+                sHelp "Static Variable", s$ & vbCrLf & "Type " + z$, vH_x, vH_y
             Else
-                sHelp "Στατική Μεταβλητή", s$ & vbCrLf & "Τύπος " + Z$, vH_x, vH_y
+                sHelp "Στατική Μεταβλητή", s$ & vbCrLf & "Τύπος " + z$, vH_x, vH_y
             End If
         
-        ElseIf GetlocalVar(s$, I) Then
-            IsStr1 MyBaseTask, "Type$(" + s$ + ")", Z$
+        ElseIf GetlocalVar(s$, i) Then
+            IsStr1 MyBaseTask, "Type$(" + s$ + ")", z$
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
-                sHelp "Local Identifier", s$ & vbCrLf & "Type " + Z$, vH_x, vH_y
+                sHelp "Local Identifier", s$ & vbCrLf & "Type " + z$, vH_x, vH_y
             Else
-                sHelp "Τοπικό Αναγνωριστικό", s$ & vbCrLf & "Τύπος " + Z$, vH_x, vH_y
+                sHelp "Τοπικό Αναγνωριστικό", s$ & vbCrLf & "Τύπος " + z$, vH_x, vH_y
             End If
-        ElseIf GetGlobalVar(s$, I) Then
+        ElseIf GetGlobalVar(s$, i) Then
         If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
             sHelp "Global Identifier", s$, vH_x, vH_y
             
@@ -707,10 +707,10 @@ If Index = 1 Then
             sHelp "Γενικό Αναγνωριστικό", s$, vH_x, vH_y
             
             End If
-        ElseIf GetSub(s$, I) Then
+        ElseIf GetSub(s$, i) Then
             '
-            Z$ = Label(2)
-            If MaybeIsSymbol(Z$, "=") Then
+            z$ = Label(2)
+            If MaybeIsSymbol(z$, "=") Then
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
                 sHelp "New Identifier", s$, vH_x, vH_y
             Else
@@ -723,8 +723,8 @@ If Index = 1 Then
         ElseIf ismine(s$) Then
             fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128
         Else
-        Z$ = Label(2)
-        If MaybeIsSymbol(Z$, "=") Then
+        z$ = Label(2)
+        If MaybeIsSymbol(z$, "=") Then
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
                 sHelp "New Identifier", s$, vH_x, vH_y
             Else
@@ -744,11 +744,11 @@ sHelp s$, MyBaseTask.Process.CodeData, vH_x, vH_y
 vHelp
 End If
 Else
-If Index = 0 Then
-I = MyBaseTask.OriginalCode
+If index = 0 Then
+i = MyBaseTask.OriginalCode
 JUMPHERE:
 Dim aa As Long, aaa As String
-aa = I
+aa = i
 aaa = SBcode(aa)
 If Left$(aaa, 10) = "'11001EDIT" Then
 SetNextLine aaa
@@ -779,7 +779,7 @@ Case "?", "!", " ", ".", ":", Is >= "A", Chr$(10), """"
 End Select
 End If
 End If
-ElseIf Index = 2 Then
+ElseIf index = 2 Then
     GetPanelPos
     switchview = switchview + 1: If switchview > 2 Then switchview = 0
     TestShowCode = switchview = 1
@@ -804,7 +804,7 @@ End If
 there1:
 End Sub
 
-Private Sub gList3_Fkey(Index As Integer, a As Integer)
+Private Sub gList3_Fkey(index As Integer, a As Integer)
 generalFkey a
 End Sub
 
@@ -896,44 +896,44 @@ gList4.ShowMe
 
 
 End Sub
- Private Sub PrintItem(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_CENTER Or DT_VCENTER)
-    DrawText mHdc, StrPtr(c), -1, r, way
+ Private Sub PrintItem(mHdc As Long, c As String, R As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_CENTER Or DT_VCENTER)
+    DrawText mHdc, StrPtr(c), -1, R, way
     End Sub
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
 
 If Button = 1 Then
     
     If lastfactor = 0 Then lastfactor = 1
 
     If bordertop < 150 Then
-    If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
+    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
     dr = True
     tracecounter = 100
     MousePointer = vbSizeNWSE
-    lX = X
-    lY = Y
+    lX = x
+    lY = y
     End If
     
     Else
-    If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then
+    If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
     dr = True
     tracecounter = 100
     MousePointer = vbSizeNWSE
-    lX = X
-    lY = Y
+    lX = x
+    lY = y
     End If
     End If
 
 End If
 End Sub
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
+If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
  Else
- If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
+ If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
 End If
 If dr Then
 
@@ -941,12 +941,12 @@ If dr Then
 
 If bordertop < 150 Then
 
-        If Y < (Height - 150) Or Y > Height Then addy = (Y - lY)
-     If X < (Width - 150) Or X > Width Then addX = (X - lX)
+        If y < (Height - 150) Or y > Height Then addy = (y - lY)
+     If x < (Width - 150) Or x > Width Then addX = (x - lX)
      
 Else
-    If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
-        If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
+    If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
+        If x < (Width - borderleft) Or x > Width Then addX = (x - lX)
     End If
     
 
@@ -973,10 +973,10 @@ Else
 
         If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, Width
-        lX = X
+        lX = x
         
         Else
-        lX = X * lastfactor / factor
+        lX = x * lastfactor / factor
          ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
@@ -991,14 +991,14 @@ Else
         lY = lY * lastfactor / factor
         End If
         Else
-        lX = X
-        lY = Y
+        lX = x
+        lY = y
    
 End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
 
 If dr Then Me.MousePointer = 0
 tracecounter = 0
@@ -1055,8 +1055,8 @@ Sub ByeBye()
 Unload Me
 End Sub
 Public Sub ResetPanelPos()
-Dim I As Long
-For I = 0 To 2: para(I) = 0: Next I
+Dim i As Long
+For i = 0 To 2: para(i) = 0: Next i
 lastpanel = 0
 End Sub
 Public Sub paneltitle(ByVal that As Long)

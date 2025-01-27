@@ -302,11 +302,9 @@ End Function
 ' // Division of two complex numbers
 Public Function cxDiv(Op1 As cxComplex, Op2 As cxComplex) As cxComplex
     Dim R2 As Double, i2 As Double
-    On Error Resume Next
     R2 = Op2.r * Op2.r: i2 = Op2.I * Op2.I
     cxDiv.r = (Op1.r * Op2.r + Op1.I * Op2.I) / (R2 + i2)
     cxDiv.I = (Op1.I * Op2.r - Op1.r * Op2.I) / (R2 + i2)
-    If Err.Number > 0 Then Err.Clear: DevZero
 End Function
 
 ' // Exponentiation of a complex number
@@ -355,33 +353,7 @@ Public Function cxArg(Op As cxComplex) As Double
         End If
     End If
 End Function
-Public Function cxPow(Op1 As cxComplex, Op2 As cxComplex, Optional NumDigitsAfterDecimal = 20) As cxComplex
-If Op1.I = 0 And Op2.I = 0 Then
-    cxPow = cxNew(Op1.r ^ Op2.r, 0)
-Else
-    cxPow = cxExp(cxMul(cxlog(Op1), Op2))
-    End If
-    cxPow.r = Round(cxPow.r, NumDigitsAfterDecimal)
-   cxPow.I = Round(cxPow.I, NumDigitsAfterDecimal)
-End Function
-Public Function cxPowReal(Op1 As cxComplex, Op2 As Double, Optional NumDigitsAfterDecimal = 20) As cxComplex
-If Op1.I = 0 Then
-    cxPowReal = cxNew(Op1.r ^ Op2, 0)
-Else
-    cxPowReal = cxExp(cxMulReal(cxlog(Op1), Op2))
-    End If
-    cxPowReal.r = Round(cxPowReal.r, NumDigitsAfterDecimal)
-    cxPowReal.I = Round(cxPowReal.I, NumDigitsAfterDecimal)
-End Function
-Public Function cxPowRealComp(Op1 As Double, Op2 As cxComplex, Optional NumDigitsAfterDecimal = 20) As cxComplex
-    If Round(Op2.I, NumDigitsAfterDecimal) = 0 Then
-        cxPowRealComp = cxNew(Op1 ^ Op2.r, 0)
-    Else
-        cxPowRealComp = cxExp(cxMulReal(Op2, Log(Op1)))
-    End If
-   cxPowRealComp.r = Round(cxPowRealComp.r, NumDigitsAfterDecimal)
-   cxPowRealComp.I = Round(cxPowRealComp.I, NumDigitsAfterDecimal)
-End Function
+
 ' // Returns the number e, raised to power by complex number
 Public Function cxExp(Op As cxComplex) As cxComplex
     cxExp.r = EXP(Op.r) * Cos(Op.I): cxExp.I = EXP(Op.r) * sIn(Op.I)
@@ -496,10 +468,10 @@ Public Function cxConj(Op As cxComplex) As cxComplex
 End Function
 
 ' // The natural logarithm of a complex number
-Public Function cxlog(Op As cxComplex) As cxComplex
+Public Function cxLog(Op As cxComplex) As cxComplex
     Dim M As Double, A As Double
     M = cxMod(Op): A = cxArg(Op)
-    cxlog.r = Log(M): cxlog.I = A
+    cxLog.r = Log(M): cxLog.I = A
 End Function
 
 ' // The logarithm of a complex number by base X
@@ -554,24 +526,24 @@ End Function
 
 ' // Arcsine of a complex number
 Public Function cxAsin(Op As cxComplex) As cxComplex
-    cxAsin = cxMulImg(cxlog(cxAdd(cxMulImg(Op, 1), cxSqr(cxRealSub(1, cxMul(Op, Op))))), -1)
+    cxAsin = cxMulImg(cxLog(cxAdd(cxMulImg(Op, 1), cxSqr(cxRealSub(1, cxMul(Op, Op))))), -1)
 End Function
 
 ' // Arccosine of a complex number
 Public Function cxAcos(Op As cxComplex) As cxComplex
-    cxAcos = cxAddReal(cxMulImg(cxlog(cxAdd(cxMulImg(Op, 1), cxSqr(cxRealSub(1, cxMul(Op, Op))))), 1), PI2)
+    cxAcos = cxAddReal(cxMulImg(cxLog(cxAdd(cxMulImg(Op, 1), cxSqr(cxRealSub(1, cxMul(Op, Op))))), 1), PI2)
 End Function
 
 ' // Arctangent of a complex number
 Public Function cxAtan(Op As cxComplex) As cxComplex
     Dim Iz As cxComplex
     Iz = cxMulImg(Op, 1)
-    cxAtan = cxMulImg(cxSub(cxlog(cxRealSub(1, Iz)), cxlog(cxAddReal(Iz, 1))), 0.5)
+    cxAtan = cxMulImg(cxSub(cxLog(cxRealSub(1, Iz)), cxLog(cxAddReal(Iz, 1))), 0.5)
 End Function
 
 ' // Arccotangent of a complex number
 Public Function cxActg(Op As cxComplex) As cxComplex
-    cxActg = cxMulImg(cxSub(cxlog(cxDiv(cxSubImg(Op, 1), Op)), cxlog(cxDiv(cxAddImg(Op, 1), Op))), 0.5)
+    cxActg = cxMulImg(cxSub(cxLog(cxDiv(cxSubImg(Op, 1), Op)), cxLog(cxDiv(cxAddImg(Op, 1), Op))), 0.5)
 End Function
 
 ' // Arcsecant of a complex number
@@ -616,36 +588,36 @@ End Function
 
 ' // Hyperbolic arcsine of a complex number
 Public Function cxAsinh(Op As cxComplex) As cxComplex
-    cxAsinh = cxlog(cxAdd(Op, cxSqr(cxAddReal(cxMul(Op, Op), 1))))
+    cxAsinh = cxLog(cxAdd(Op, cxSqr(cxAddReal(cxMul(Op, Op), 1))))
 End Function
 
 ' // Hyperbolic arccosine of a complex number
 Public Function cxAcosh(Op As cxComplex) As cxComplex
-    cxAcosh = cxlog(cxAdd(Op, cxMul(cxSqr(cxAddReal(Op, 1)), cxSqr(cxSubReal(Op, 1)))))
+    cxAcosh = cxLog(cxAdd(Op, cxMul(cxSqr(cxAddReal(Op, 1)), cxSqr(cxSubReal(Op, 1)))))
 End Function
 
 ' // Hyperbolic arctangent of a complex number
 Public Function cxAtanh(Op As cxComplex) As cxComplex
-    cxAtanh = cxMulReal(cxlog(cxDiv(cxAddReal(Op, 1), cxRealSub(1, Op))), 0.5)
+    cxAtanh = cxMulReal(cxLog(cxDiv(cxAddReal(Op, 1), cxRealSub(1, Op))), 0.5)
 End Function
 
 ' // Hyperbolic arccotangent of a complex number
 Public Function cxActgh(Op As cxComplex) As cxComplex
-    cxActgh = cxMulReal(cxlog(cxDiv(cxAddReal(Op, 1), cxSubReal(Op, 1))), 0.5)
+    cxActgh = cxMulReal(cxLog(cxDiv(cxAddReal(Op, 1), cxSubReal(Op, 1))), 0.5)
 End Function
 
 ' // Hyperbolic arcsecant of a complex number
 Public Function cxAsech(Op As cxComplex) As cxComplex
-    Dim z As cxComplex
-    z = cxRealDiv(1, Op)
-    cxAsech = cxlog(cxAdd(z, cxSqr(cxAddReal(cxMul(z, z), 1))))
+    Dim Z As cxComplex
+    Z = cxRealDiv(1, Op)
+    cxAsech = cxLog(cxAdd(Z, cxSqr(cxAddReal(cxMul(Z, Z), 1))))
 End Function
 
 ' // Hyperbolic arccosecant of a complex number
 Public Function cxAcsch(Op As cxComplex) As cxComplex
-    Dim z As cxComplex
-    z = cxRealDiv(1, Op)
-    cxAcsch = cxlog(cxAdd(z, cxMul(cxSqr(cxAddReal(z, 1)), cxSqr(cxSubReal(z, 1)))))
+    Dim Z As cxComplex
+    Z = cxRealDiv(1, Op)
+    cxAcsch = cxLog(cxAdd(Z, cxMul(cxSqr(cxAddReal(Z, 1)), cxSqr(cxSubReal(Z, 1)))))
 End Function
 ' // Print matrix to immediate window
 Public Function PrintMtrx(Op As Matrix)

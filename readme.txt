@@ -1,13 +1,13 @@
 M2000 Interpreter and Environment
 
-Version 12 Revision 68 active-X
-Bug fixes and some operators works for complex numbers.
-1) Works with complex:
- Abs(), Log() (base 10), Ln(), Atan(), Tan(), Cos(), Sin(), Str$(), Round()
-2) + * / - ^ or ** for power
-3) = or == for equal
-4) Complex literals: (1,3i), (a,b i)  (need i with space or no space before if is number).
-5) we can mix numbers with complex numbers
+Version 12 Revision 66 active-X
+1. a=(100, 2i) make a cxComplex value a|r is the real value and a|i is the imaginary value.
+
+2. Select Case works with BigInteger.
+
+3. Remove a bug and now Evauator module run in Info.
+
+4. Fix the 1.#Int to get the right decimal point based on Locale (was ok only for immediate print of values, no throuh formated using Str$(p, "0.0###) or Print $("0.0###"), p.
 
 
 
