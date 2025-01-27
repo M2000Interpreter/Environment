@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 12
 Global Const VerMinor = 0
-Global Const Revision = 67
+Global Const Revision = 68
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -40546,6 +40546,7 @@ End Function
 Function ProcClass(basestack As basetask, rest$, Lang As Long, super As Boolean) As Boolean
 Dim I As Long, ss$, y1 As Long, what$, W$, ohere$, w2$, subs As Long, snames As Long, s$, pre$
 Dim K As Long, M As Long, once As Boolean, Skipfirsttype As Boolean, wt$
+Dim skipnew As Boolean
 If super Then
     subs = sb2used: snames = subHash.count:
     Dim r As Variant
@@ -40563,9 +40564,10 @@ Select Case IsLabelA("", rest$, W$)
 Case 1
 If comhash.Find2(W$, M, I) Then
 If M > 0 Then
-    MyEr "bad class name", "μη αποδεκτό όνομα κλάσης"
-    ProcClass = False
-Exit Function
+    skipnew = True
+    'MyEr "bad class name", "μη αποδεκτό όνομα κλάσης"
+    'ProcClass = False
+    'Exit Function
 End If
 End If
 againhere:
@@ -40609,7 +40611,7 @@ againhere:
                     ProcClass = True
                     sbf(basestack.IndexSub).IamAClass = True
                     y1 = basestack.IndexSub
-                    comhash.ItemCreator2 W$, 0, 44
+                    If Not (skipnew Or super) Then comhash.ItemCreator2 W$, 0, 44
                 End If
                 Skipfirsttype = False
          ElseIf IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
@@ -40803,6 +40805,7 @@ End If
 End If
 
 End Function
+
 Function ProcDef(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim I As Long, what$, y1 As Long, ss$, s$, p, ps$, first
 Dim notypes As Boolean, notypes0 As Boolean
