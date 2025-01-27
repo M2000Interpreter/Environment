@@ -152,35 +152,96 @@ Sub FileWriteBytes(FileH As Long, ByRef Buf1() As Byte)
     API_WriteFile FileH, bytes, Buf1()
 End Sub
 Private Function GetType(bstack As basetask, b$, p, v As Long, W$, Lang As Long, VarStat As Boolean, temphere$, noVarStat As Boolean) As Integer
-Dim ss$
+Dim ss$, skip As Boolean, checktype As Boolean
+    If noVarStat Then
+        If GetVar(bstack, W$, v, , , True, , checktype) Then
+           skip = True
+           On Error Resume Next
+        End If
+    End If
     If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", Lang) Then
-            If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            If FastSymbol(b$, "=") Then
+                If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            ElseIf skip Then
+                p = var(v)
+            End If
             p = CDec(p)
+            If Err.Number Then p = CDec(0)
     ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", Lang) Then
-            If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            If FastSymbol(b$, "=") Then
+            If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            
+            ElseIf skip Then
+                p = var(v)
+            End If
             p = CDbl(p)
+            If Err.Number Then p = CDbl(0)
     ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", Lang) Then
-            If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            If FastSymbol(b$, "=") Then
+            If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            
+            ElseIf skip Then
+                p = var(v)
+            End If
             p = CSng(p)
+            If Err.Number Then p = CSng(0)
     ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", Lang) Then
-            If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            If FastSymbol(b$, "=") Then
+            If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            
+            ElseIf skip Then
+                p = var(v)
+            End If
             p = CBool(p)
+            If Err.Number Then p = False
     ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", Lang) Then
         If IsLabelSymbolNew(b$, "лайяус", "LONG", Lang) Then
-            If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            If FastSymbol(b$, "=") Then
+            If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            
+            ElseIf skip Then
+                p = var(v)
+            End If
             p = cInt64(p)
+            If Err.Number Then p = cInt64(CDec(0))
         Else
-            If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            If FastSymbol(b$, "=") Then
+            If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            
+            ElseIf skip Then
+                p = var(v)
+            End If
             p = CLng(p)
+            If Err.Number Then p = CLng(0)
         End If
     ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", Lang) Then
-        If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+        If FastSymbol(b$, "=") Then
+        If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+        
+        ElseIf skip Then
+                p = var(v)
+        End If
         p = CInt(p)
+        If Err.Number Then p = CInt(0)
     ElseIf IsLabelSymbolNew(b$, "коцистийос", "CURRENCY", Lang) Then
-        If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+        If FastSymbol(b$, "=") Then
+        If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+        
+        ElseIf skip Then
+                p = var(v)
+        End If
         p = CCur(p)
     ElseIf IsLabelSymbolNew(b$, "цяалла", "STRING", Lang) Then
-        If FastSymbol(b$, "=") Then If Not ISSTRINGA(b$, ss$) Then MissString: Exit Function
+        If FastSymbol(b$, "=") Then
+        If Not ISSTRINGA(b$, ss$) Then MissString: Exit Function
+        
+        ElseIf skip Then
+               If MemInt(VarType(v)) = vbString Then
+                    ss$ = var(v)
+                Else
+                    ss$ = ""
+                End If
+        End If
         p = vbNullString
         SwapString2Variant ss$, p
     ElseIf IsLabelSymbolNew(b$, "атупос", "VARIANT", Lang) Then
@@ -199,24 +260,41 @@ Dim ss$
         If extreme Then GetType = 2 Else GetType = 1
         Exit Function
     ElseIf IsLabelSymbolNew(b$, "ьгжио", "BYTE", Lang) Then
-        If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+        If FastSymbol(b$, "=") Then
+        If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+        
+        ElseIf skip Then
+                p = var(v)
+        End If
         p = CByte(p)
+        If Err.Number Then p = CByte(0)
     ElseIf IsLabelSymbolNew(b$, "глеяолгмиа", "DATE", Lang) Then
         If FastSymbol(b$, "=") Then
             If Not IsNumberD2(b$, p) Then
                 If ISSTRINGA(b$, ss$) Then
                     p = vbNullString
                     SwapString2Variant ss$, p
+                    
+    
                 Else
                     missNumber
                     Exit Function
                 End If
+            Else
+                
+                
             End If
+        ElseIf skip Then
+            p = var(v)
         End If
         p = CDate(p)
+        If Err.Number Then p = CDate(0)
     ElseIf IsLabelSymbolNew(b$, "лецакосайеяаиос", "BIGINTEGER", Lang) Then
         Set p = New BigInteger
-        If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+        If FastSymbol(b$, "=") Then
+        If Not IsNumberD2(b$, p) Then missNumber: Exit Function
+            
+        End If
         If MemInt(VarPtr(p)) = vbString Then
             Set p = Module13.CreateBigInteger(CStr(p))
         End If
@@ -224,28 +302,37 @@ Dim ss$
             ExpectedEnumType
             Exit Function
     End If
-    Dim checktype  As Boolean
+
     If noVarStat Then
+    If skip Then GoTo there1
         If Not GetVar(bstack, W$, v, , , True, , checktype) Then
             v = globalvar(W$, p, , VarStat, temphere$)
         Else
+there1:
             If Not checktype Then
                 WrongType
                 Exit Function
             End If
             If MyIsObject(p) Then
+                If Not p Is Nothing Then
+                    If TypeOf p Is BigInteger Then
+                        Set var(v) = p
+                        GoTo abcd
+                    End If
+                End If
                 bstack.soros.PushObj p
+                If Not MyRead(5, bstack, W$, Lang, "") Then
+                    Exit Function
+                End If
             Else
-                bstack.soros.PushVal p
+                var(v) = p
             End If
-            If Not MyRead(5, bstack, W$, "", Lang) Then
-                Exit Function
-            End If
-            
         End If
     Else
         v = globalvar(W$, p, , VarStat, temphere$)
     End If
+abcd:
+    Err.Clear
     If extreme Then GetType = 2 Else GetType = 1
 End Function
 
@@ -1254,12 +1341,12 @@ Public Function URLEncodeEsc(cc As String, Optional space_as_plus As Boolean = F
 End Function
 Function DecodeEscape(c$, plus_as_space As Boolean) As String
 If plus_as_space Then c$ = Replace(c$, "+", " ")
-Dim A() As String, I As Long
-A() = Split(c$, "%")
-For I = 1 To UBound(A())
-A(I) = Chr(val("&h" + Left$(A(I), 2))) + Mid$(A(I), 3)
+Dim a() As String, I As Long
+a() = Split(c$, "%")
+For I = 1 To UBound(a())
+a(I) = Chr(val("&h" + Left$(a(I), 2))) + Mid$(a(I), 3)
 Next I
-DecodeEscape = utf8decode(StrConv(Join(A(), ""), vbFromUnicode))
+DecodeEscape = utf8decode(StrConv(Join(a(), ""), vbFromUnicode))
 
 End Function
 Sub ClearState1()
@@ -1456,10 +1543,8 @@ checkhereClass:
             If GetSub(W$ + "()", v) Then
 checkplease2:
                 If Not sbf(v).IamAClass Then
-                 WrongType
-                 Exec1 = 0: ExecuteVar = 11
-                 Exit Function
-                End If
+                    GoTo noisnotAclass
+                 End If
 cont12987:
                 If Not AddGroupFromClass(bstack, b$, W$, False, NewStat, temphere$) Then
                 Exec1 = 0: ExecuteVar = 11
@@ -1468,6 +1553,7 @@ cont12987:
             ElseIf GetSub(W$ + "$()", v) Then
             GoTo checkplease2
             Else
+noisnotAclass:
                 If comhash.Find2(W$, (0), v) Then
                 If v = 44 Then
                     GoTo cont12987
@@ -8609,6 +8695,16 @@ Private Sub Assign2(ss$, p)
 End Sub
 
 Public Function fixthis(p As Variant) As String
+    If TypeOf p Is cxComplex Then
+        If p.I = 0 Then
+            fixthis = fixthis(CVar(p.r))
+        ElseIf p.r = 0 Then
+            fixthis = "(" & fixthis(CVar(p.I)) & "i)"
+        Else
+        If p.I < 0 Then fixthis = "" Else fixthis = "+"
+        fixthis = "(" & fixthis(CVar(p.r)) & fixthis & fixthis(CVar(p.I)) & "i)"
+        End If
+    Else
         fixthis = LTrim$(str(p))
         If Left$(fixthis, 1) = "." Then
         fixthis = "0" + fixthis
@@ -8618,6 +8714,7 @@ Public Function fixthis(p As Variant) As String
         If InStr(fixthis, ".") > 0 Then
         If NoUseDec Then fixthis = Replace(fixthis, ".", NowDec$)
         End If
+    End If
 End Function
 
 Public Function IntSqrdEC(sA) As Variant
@@ -8648,7 +8745,7 @@ Public Function IntSqrdEC(sA) As Variant
     Loop
     IntSqrdEC = r
 End Function
-Function CopyBigInteger(p, Optional A) As BigInteger
+Function CopyBigInteger(p, Optional a) As BigInteger
     Dim check As BigInteger
     Set check = p
     If check.Unique Then
@@ -8656,8 +8753,8 @@ Function CopyBigInteger(p, Optional A) As BigInteger
     Exit Function
     End If
     Set CopyBigInteger = New BigInteger
-    If Not IsMissing(A) Then
-        CopyBigInteger.Load2 p, A
+    If Not IsMissing(a) Then
+        CopyBigInteger.Load2 p, a
     Else
         CopyBigInteger.Load2 p
     End If

@@ -47,19 +47,19 @@ End Property
 Friend Property Let emtype(RHS As Integer)
 emptytype = RHS
 End Property
-Friend Sub CreateRef(ByVal A As Long)
+Friend Sub CreateRef(ByVal a As Long)
     If flat Then
-        VarByRef A, p
+        VarByRef a, p
     Else
-        VarByRef A, p(0)
+        VarByRef a, p(0)
     End If
 End Sub
-Private Sub VarByRef(ByVal A As Long, ByRef b As Variant)
+Private Sub VarByRef(ByVal a As Long, ByRef b As Variant)
 Dim t(0 To 3) As Long
    CopyMemory t(0), ByVal VarPtr(b), 16
    t(0) = t(0) Or &H4000
    t(2) = VarPtr(b) + 8
-   CopyMemory ByVal A, t(0), 16
+   CopyMemory ByVal a, t(0), 16
 End Sub
 Function NewRef(Optional ByRef RHS) As refArray
 Dim Z As New refArray
@@ -954,8 +954,8 @@ Else
 DefArrayAt -1, thistype, 0
 End If
 End Sub
-Friend Sub CopyVariantArray(ByRef A As Variant, ByRef b As Variant)
-    CopyMemory ByVal VarPtr(A), ByVal VarPtr(b), 16
+Friend Sub CopyVariantArray(ByRef a As Variant, ByRef b As Variant)
+    CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
 End Sub
 Public Function putData(f As Long, nDx As Long, lengthInBytes As Long) As Boolean
     Dim Addr, mitems, itemlen
@@ -973,7 +973,7 @@ Public Function putData(f As Long, nDx As Long, lengthInBytes As Long) As Boolea
     Addr = UnsignedAdd(Me.ArrPtr(0), itemlen * nDx)
     
     On Error GoTo there
-    Dim a1 As SAFEARRAY1D, A() As Byte
+    Dim a1 As SAFEARRAY1D, a() As Byte
      With a1
         .cbElements = 1
         .cDims = 1
@@ -981,17 +981,17 @@ Public Function putData(f As Long, nDx As Long, lengthInBytes As Long) As Boolea
         .onebound(0).cElements = lengthInBytes
         .pvData = Addr
     End With
-        CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
+        CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
         On Error GoTo there1
         Dim FH As Long
         FH = Module10.ReadFileHandler(CLng(f))
-        Module10.FileWriteBytes FH, A()
+        Module10.FileWriteBytes FH, a()
         If Err.Number > 0 Then Exit Function
-        CopyMemory ByVal VarPtrArray(A), 0&, 4
+        CopyMemory ByVal VarPtrArray(a), 0&, 4
         putData = True
 Exit Function
 there1:
-        CopyMemory ByVal VarPtrArray(A), 0&, 4
+        CopyMemory ByVal VarPtrArray(a), 0&, 4
 there:
 End Function
 Friend Function GetData(f As Long, nDx As Long, lengthInBytes As Long) As Boolean
@@ -1034,7 +1034,7 @@ End Sub
 Public Function myVarType(Z, j As Integer) As Boolean
     myVarType = MemInt(VarPtr(Z)) = j
 End Function
-Public Function PlaceValue2UDT(ByVal K As Long, ByVal where As Long, ByVal Name$, v, Optional index1) As Boolean
+Public Function PlaceValue2UDT(ByVal k As Long, ByVal where As Long, ByVal Name$, v, Optional index1) As Boolean
 'If vtType(where) <> 12 Then Exit Function
 Dim vv, zero
 On Error GoTo 100
@@ -1049,11 +1049,11 @@ If ihavearray Then
                     Exit Function
         Else
                   If IsMissing(index1) Then
-                    Module10.PlaceValue2UDT p(K)(where), Name$, v
+                    Module10.PlaceValue2UDT p(k)(where), Name$, v
                   Else
                     If Right$(Name$, 1) = "(" Then
                     Name$ = Left$(Name$, Len(Name$) - 1)
-                    SwapVariant vv, GetUDTValue(K, where, Name$)
+                    SwapVariant vv, GetUDTValue(k, where, Name$)
                     If index1 < LBound(vv) Or index1 > UBound(vv) Then
                     errOutOfLimit
                     Exit Function
@@ -1072,15 +1072,15 @@ End If
 Err.Clear
 MyEr "ο πίνακας δεν είναι τύπου ατυπος και απλός", "array not flat variant"
 End Function
-Sub SwapVariant(ByRef A As Variant, ByRef b As Variant)
+Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
    Static t(0 To 3) As Long  ' 4 Longs * 4 bytes each = 16 bytes
-   MemCopy VarPtr(t(0)), ByVal VarPtr(A), 16
-   MemCopy VarPtr(A), VarPtr(b), 16
+   MemCopy VarPtr(t(0)), ByVal VarPtr(a), 16
+   MemCopy VarPtr(a), VarPtr(b), 16
    MemCopy VarPtr(b), VarPtr(t(0)), 16
 End Sub
 Public Function cInt64(p)
     Static maxlonglong, limitlonglong, OneLongLong, OneBigLongLong
-    Dim A, I As Integer
+    Dim a, I As Integer
     If MemInt(VarPtr(maxlonglong)) = 0 Then
         maxlonglong = CDec("18446744073709551616")
         limitlonglong = CDec("9223372036854775808")
@@ -1092,13 +1092,13 @@ Public Function cInt64(p)
     I = MemInt(VarPtr(p))
     Select Case I
     Case vbDecimal
-        A = Fix(p)
-        A = A - Int(A / maxlonglong) * maxlonglong
-        If A < -limitlonglong - 1 Then
-            While A <= -limitlonglong - 1: A = A + maxlonglong: Wend
+        a = Fix(p)
+        a = a - Int(a / maxlonglong) * maxlonglong
+        If a < -limitlonglong - 1 Then
+            While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
         End If
-        While A >= limitlonglong: A = A - maxlonglong: Wend
-        cInt64 = -OneLongLong And A
+        While a >= limitlonglong: a = a - maxlonglong: Wend
+        cInt64 = -OneLongLong And a
     Case 20
         cInt64 = p
     Case vbLong, vbInteger
@@ -1106,17 +1106,17 @@ Public Function cInt64(p)
     Case Else
         On Error GoTo er1
         
-        A = Fix(CDec(p))
-        If A > limitlonglong Or A <= -limitlonglong Then
-        A = A - Int(A / (maxlonglong)) * (maxlonglong)
-        If A <= -limitlonglong - 1 Then
-            While A <= -limitlonglong - 1: A = A + maxlonglong: Wend
+        a = Fix(CDec(p))
+        If a > limitlonglong Or a <= -limitlonglong Then
+        a = a - Int(a / (maxlonglong)) * (maxlonglong)
+        If a <= -limitlonglong - 1 Then
+            While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
         End If
-        While A >= limitlonglong: A = A - maxlonglong: Wend
+        While a >= limitlonglong: a = a - maxlonglong: Wend
         End If
-        cInt64 = -OneLongLong And A
+        cInt64 = -OneLongLong And a
         If I = vbString Then
-            If Left$(p, 1) = "&" And A < 0 Then
+            If Left$(p, 1) = "&" And a < 0 Then
             Select Case Len(p)
             Case 10
                 If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) > 0 Then
@@ -1137,13 +1137,24 @@ er1:
     cInt64 = OneLongLong - OneLongLong
 End Function
 Private Function fixthis(p As Variant) As String
-        fixthis = LTrim$(str(p))
-        If Left$(fixthis, 1) = "." Then
-        fixthis = "0" + fixthis
-        ElseIf Left$(fixthis, 2) = "-." Then
-        fixthis = "-0" + Mid$(fixthis, 2)
-        End If
-        If InStr(fixthis, ".") > 0 Then
-        If NoUseDec Then fixthis = Replace(fixthis, ".", NowDec$)
+        If TypeOf p Is cxComplex Then
+            If p.I = 0 Then
+                fixthis = fixthis(CVar(p.r))
+            ElseIf p.r = 0 Then
+                fixthis = "(" & fixthis(CVar(p.I)) & "i)"
+            Else
+            If p.I < 0 Then fixthis = "" Else fixthis = "+"
+            fixthis = "(" & fixthis(CVar(p.r)) & fixthis & fixthis(CVar(p.I)) & "i)"
+            End If
+        Else
+            fixthis = LTrim$(str(p))
+            If Left$(fixthis, 1) = "." Then
+            fixthis = "0" + fixthis
+            ElseIf Left$(fixthis, 2) = "-." Then
+            fixthis = "-0" + Mid$(fixthis, 2)
+            End If
+            If InStr(fixthis, ".") > 0 Then
+            If NoUseDec Then fixthis = Replace(fixthis, ".", NowDec$)
+            End If
         End If
 End Function
