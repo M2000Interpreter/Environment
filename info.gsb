@@ -247,12 +247,12 @@ MODULE D {\\ Identifiers in Greek language
             μετρητής=0
             Σωρός διπλό_λατινικό {
                   Αν κενό Τότε Έξοδος
-                  Διάβασε απ$, μη_έγγυροι_χαρακτήρες$,χαρακτ$
+                  Διάβασε απ$, μη_έγκυροι_χαρακτήρες$,χαρακτ$
                   ι=Θέση(λατ$,χαρακτ$)
                   Αν ι >0 Τότε
                         προσωρινή_τιμή$=Μεσ$(λατ$,ι+2)
                         λ=Μήκος(προσωρινή_τιμή$)
-                        Αν λ>0 Τότε Αν Μήκος(Φίλτρο$(προσωρινή_τιμή$, μη_έγγυροι_χαρακτήρες$))<>λ Τότε λατ$="A": Έξοδος
+                        Αν λ>0 Τότε Αν Μήκος(Φίλτρο$(προσωρινή_τιμή$, μη_έγκυροι_χαρακτήρες$))<>λ Τότε λατ$="A": Έξοδος
                         Αν Θέση(λατ$,Μεσ$(λατ$,ι,1))<ι Τότε λατ$="A": Έξοδος
                         insert ι, 2 λατ$=απ$ '  2 λέμε αλλα δίνουμε 1 χαρακτήρα και ο μεταφραστής θα βάλει ένα διάστημα 
                   Τέλος Αν
@@ -409,7 +409,7 @@ Report {
 }
 Link  alfa.b() to f()
 Report {
-	This is the function f() code (a reference to a function is actual the code of the function in a string in a block {}). We see two things. One is a line 11001edit which used when an error happen to display the line of the code, and the other is the weak reference of the actual group, which copied by the link statement (a link statement is actual two statements a Push and a Read). We can't assign a second reference.
+	This is the function f() code (a reference to a function is actual the code of the function in a string in a block {}). We see two things. One is a line 11001edit which used when an error happens to display the line of the code, and the other is the weak reference of the actual group, which copied by the link statement (a link statement is actual two statements a Push and a Read). We can't assign a second reference.
 }
 Pen 15 {Report 2,  &f()}
 Report  {
@@ -427,19 +427,19 @@ Print "f()=";f()
 Print "alfa.b()=";alfa.b()
 Print  "beta.b()=";beta.b()
 \\ we can test pointers
-\\ there is two type of pointers
-\\ 1. pointers to float groups (holded in containers or by pointers)
+\\ there are two types of pointers
+\\ 1. pointers to float groups (holds in containers or by pointers)
 \\ 2. pointer to named groups (using a weak reference)
 \\ this type has no use when referenced group get out of scope
 \\ but as all pointers can change value later
 \\ pointers can be null, using p->0 but they hold just an empty group
-\\ so never a pointer in M2000 has a real null value, but an "empty" one.
+\\ so, a pointer in M2000 never has a real null value, but an "empty" one.
 Report {
 	Reassign a lambda function in a float group -group handled by pointer(s) - no static linked
 	We use p->pointer((beta)), is the same as p->(beta)
 	Parenthesis used to make the beta a copy as a float group, so we get the pointer to that float group
-	Without Parentesis the pointer is a weak reference to beta, so if we pass the pointer as a return value the beta group deleted and the weak reference be invalid. Using the float group, we can move it (like a float object) any where. The float group destroyed when no pointer points to it.
-	So the copy we get has the last state of the object, where beta.x is 102.
+	Without Parentheses the pointer is a weak reference to beta, so if we pass the pointer as a return value the beta group deleted, and the weak reference be invalid. Using the float group, we can move it (like a float object) any where. The float group destroyed when no pointer points to it.
+	So, the copy we get has the last state of the object, where beta.x is 102.
 	We can use -> in place of = for a return value from a function, but we have to use (name_of_group) to return a float group not a reference.
 }
 \\ p->(beta) is the same as this:
@@ -478,8 +478,8 @@ a=lambda n, m (x)->{
 
 Print a(3)=306
 Print a(10)=1055
-\\ touple is an array, can have zero items (,)
-\\ or one ore more, and it is a reference type
+\\ tuple is an array, can have zero items (,)
+\\ or one or more, and it is a reference type
 z=(m,)
 Print Function("m")=100
 Link z to Z()
@@ -495,7 +495,7 @@ z(0)=lambda->300
 \\ so now lambda change because hold a closure to a reference
 Print a(10)=3055
 Print eval(z)(0)()=300
-\\ without using link we can get the first element in 0 posiiton, and ask for function
+\\ without using link we can get the first element in 0 position, and ask for function
 \\ this function has a life for the moment of call
 \\ interpreter just open the lambda object, invoke, and close again.
 a=lambda z (x) -> {
@@ -603,7 +603,7 @@ MODULE DD7 {module Checkit {
             }
             s$="     {"+{
             }+s1$+"     }"
-            \\ z^ is the iteraror's counter (z is an iterator of a, a touple - array in M2000)
+            \\ z^ is the iteraror's counter (z is an iterator of a, a tuple - array in M2000)
             if z^<len(a)-1 then s$=" ,"   ' append to document
             s$={
             }
@@ -688,13 +688,6 @@ MODULE DD8 {Module Pairs {
 Pairs
 }
 MODULE DD8GRNEW {\\ Like DD8 but better
-\\ Using Greek identifiers
-\\ we get the pairs and then short them
-\\ Also the first array X may have now spaces more than one (look second χ=(,,,,))
-\\ Now we can use negatives in second array so a ψ-=100 make some under zero.
-\\ For X we get always the lower value as the first value in X-axis.
-\\ For Y we make a first value according to the lower
-\\ also we can make narrow the graph changing the ΖουμΧ value (2 for half the width of console screen)
 Τμήμα Ζεύγη_Τιμών {
       Ομαλά όχι
       Σταθερές κέντρο=2, δεξιά=3, αριστερά=1, μπλε=1, γωνία=0, γραμμή_με_τελίτσες=3
@@ -833,7 +826,7 @@ MODULE DD8GRNEW {\\ Like DD8 but better
 Εικόνα Α
 Πρόχειρο Α
 }
-MODULE DD9 {Report {Execute a Clear statement to erase static variables from console. Static variables reduce a bit the speed of interpreter. Except for static varibales in threads, they erased when a thread erased}
+MODULE DD9 {Report {Execute a Clear statement to erase static variables from console. Static variables reduce a bit the speed of interpreter. Except for static variables in threads, they erased when a thread erased}
 
 a=10
 Module Checkit {
@@ -890,15 +883,15 @@ MODULE F2 {module checkit {
              OOP part2
              We make a class b1 which is a function which return a float group (nameless), but not a pointer to a group
              We make b as pointer of a float group (which made by b1() function)
-             Just for the example we call beta(), a subroutine, which expect a z idenifier whch not exist
-             So we catch this in a Try {} structure
+             Just for the example we call beta(), a subroutine, which expect a z identifier which not exist
+             So, we catch this in a Try {} structure
              Now we make Z as pointer of a new float group using z->b1()
              We call sub alfa() using a local b as a predefined pointer to a float group b1().
              If we didin't pass a group or we pass ?, we use b as the predefined
              If we have something else in stack we get error, so before that type of call we have to know what we have in stack or we can use ?
       }
-      flush ' we use alfa() with an optional parameter. if stack has wrong type then we get error
-      rem push 1  \\ this raise eror in alfa()
+      flush ' we use alfa() with an optional parameter. if stack has wrong type, then we get error
+      rem push 1  \\ this raise error in alfa()
       def long counter=0
       class b1 {
             x=10
@@ -1001,13 +994,13 @@ group alfa {
 }
 Report {
 	we make b as pointer to alfa (is a simple reference - is a pointer to a static object)
-	static object means named object, which exist until the get out of scope
+	static object means named object, which exist until they get out of scope
 	
-	We have three modules and we call them passing the pointer b
+	We have three modules, and we call them passing the pointer b
 	In each module we increase x value
 	
-	For first module we pass the b and read it as a group. So we get a new group as a copy
-	For second module we pass the b and read it as pointer so we get the change after the call (this is the default if a in module is a new variable)
+	For first module we pass the b and read it as a group. So, we get a new group as a copy
+	For second module we pass the b and read it as pointer, so we get the change after the call (this is the default if variable a in module is a new variable)
 	For third module we pass the pointer by reference s &b, so we get the change after the call
 	
 }
@@ -1055,7 +1048,7 @@ x=10
 }
 b->alfa
 \\ also here we can call like checkme ?  where ? means get the default value
-\\ but we have to provide the default value before the actual read
+\\ but we must provide the default value before the actual read
 \\ the last moduleget a group pointer by reference so we can't provide a default value
 checkme
 checkme b
@@ -1232,7 +1225,7 @@ Module checkit {
                   =lambda func (&line$, &res$)->{
                         if line$="" then exit
                         k=each(func)
-                        def p=0,ok as boolean
+                        def p=0,ok as Boolean
                         while k {
                               ok=false : p++ : f=array(k)
                               if not f(mid$(line$,p,1)) then exit
@@ -1253,7 +1246,7 @@ Module checkit {
                   func=Array([])
                   =lambda func (&line$, &res$)->{
                         k=each(func)
-                        def ok as boolean
+                        def ok as Boolean
                         while k {
                               f=array(k)
                               if f(&line$,&res$) then ok=true : exit
@@ -1263,7 +1256,7 @@ Module checkit {
       }
       repeated=Lambda (func)-> {
                   =lambda func (&line$, &res$)->{
-                        def ok as boolean, a$
+                        def ok as Boolean, a$
                         res$=""
                         do {
                               sec=len(line$)
@@ -1277,7 +1270,7 @@ Module checkit {
 
       oneAndoptional=lambda (func1, func2) -> {
             =lambda func1, func2 (&line$, &res$)->{
-                              def ok as boolean, a$
+                              def ok as Boolean, a$
                               res$=""
                               if not func1(&line$,&res$) then exit
                               if func2(&line$,&a$) then res$+=a$
@@ -1288,7 +1281,7 @@ Module checkit {
                   func=Array([])
                   =lambda func (&line$, &res$)->{
                         k=each(func)
-                        def p=0,ok as boolean, acc$
+                        def p=0,ok as Boolean, acc$
                         oldline$=line$
                         while k {
                               ok=false
@@ -1482,9 +1475,9 @@ Print c#pos(t) ' 1  means 2nd position
 Print c#pos(3->t) ' 6  means 7th position
 }
 MODULE R1 {Report {Reversing a string holding the right characters in order (not reversed)
-Using StrRev$() we get error in third exanple
+Using StrRev$() we get error in third example
 
-This happen because some characters displayed on top of others, so we have to keep the order.
+This happens because some characters are displayed on top of others, so we must keep the order.
 We use the len.Disp() to find these characters which must glue together.
 
 }
@@ -1511,18 +1504,18 @@ Report {This DispRev$("s⃝df̅")="f̅ds⃝" is true
 Print DispRev$("s⃝df̅")="f̅ds⃝", StrRev$("s⃝df̅")="f̅ds⃝"
 }
 MODULE W1 { Report {
-        This is an evolutionary Algorithm, where is a target string, a fitness function which return a number of how many charachters are at the right position, but no information returned for which character is in wrong position.
-        So we use a random solution as the start point
-        Then algorithm make small changes and produce a number of solutions, and get the better one using the fitness function
-        So the alogrithm produce always a same or better solution in each iteration.
-        Finally we get the solution with the maximum fitness, which means we get the target string.
+        This is an evolutionary Algorithm, where is a target string, a fitness function which return a number of how many characters are at the right position, but no information returned for which character is in wrong position.
+        So, we use a random solution as the start point
+        Then algorithm make small changes and produce several solutions, and get the better one using the fitness function
+        So, the alogrithm produces always a same or better solution in each iteration.
+        Finally, we get the solution with the maximum fitness, which means we get the target string.
         Without the algorithm we need to more than  1.18376868261619E+39 strings to check
-        Or Miliion of computational years.
-        Here the tools to find it are two major:
+        Or Millions of computational years.
+        Here the tools to find it are two majors:
               The small random changes
-              The choise of a better solution from a list of solutions
+              The choice of a better solution from a list of solutions
          And a minor to make it faster
-               After a level of fitness we use less changes (only one character), changing the starting lambda function with another. Lambda functions are first citizens in M2000.
+               After a level of fitness, we use less changes (only one character), changing the starting lambda function with another. Lambda functions are first citizens in M2000.
         
         From the code the statement Dim a$(1 to gen)<<mutate$(f$) place for each item in a$() a new solution from mutate$() providing a starting string
         
@@ -1533,7 +1526,7 @@ MODULE W1 { Report {
       \\ Using dynamic array, which expand if no fitness change,
       \\ and reduce to minimum when fitness changed
       \\ Abandon strings when fitness change
-      \\ Also lambda function Mutate$ change when topscore=10, to change only one character
+      \\ Also, lambda function Mutate$ change when topscore=10, to change only one character
       l$="ABCDEFGHIJKLMNOPQRSTUVWXYZ "
       randomstring$=lambda$ l$ ->{
             res$=""
@@ -1690,9 +1683,9 @@ Module FilterMapFold {
       \\ HasString()
       \\ used to find if an array has strings or numbers
       \\ looking first element
-      \\ because a is an iterator of array we have to copy first item
+      \\ because a is an iterator of array we must copy first item
       \\ in a fresh array, which is base 0 by default
-      \\ car(a) return first item as an array of one item
+      \\ car(a) returns first item as an array of one item
       \\ cdr(a) return all others as an array - not used here
       \\ (,) is the empty array - we can use Len() to check this
       HasString=Lambda (&a) ->{
@@ -1759,7 +1752,7 @@ Module FilterMapFold {
       \\ then optional get filter function
       \\ check if has string or number
       \\ then optional get mapfunction
-      \\ return a poinrer to a new array with results
+      \\ return a pointer to a new array with results
       \\ [ ] get all items from stack and return a stack object
       \\ Array([])  convert stack object to array
       FilterMap=lambda HasString (w)-> {
@@ -1786,18 +1779,18 @@ Module FilterMapFold {
       }
       \\ we can combine filters using filter()
       \\ we can have any number of lambda functions as parameters
-      \\ if any function return false then exit and return falsa
-      \\ so return true only if all functions return true
+      \\ if any function returns false then exit and return false
+      \\ so, return true only if all functions return true
       \\ here we use it with one parameter
       \\ s is a pointer to stack object
       \\ stack(s) is a stack object as copy of s
       \\ ! stack(s)  paste all items to current stack, the lambda stack
-      \\ so filter  return a lambda which works for any number and type of arguments
-      \\ we use T and F as boolean values - only for print statement
-      \\ because True and False are doubles, not boolean, but works nice in boolean expressions
-      \\ All comparisons return boolean.
+      \\ so, filter  return a lambda which works for any number and type of arguments
+      \\ we use T and F as Boolean values - only for print statement
+      \\ because True and False are doubles, not Boolean, but works nice in Boolean expressions
+      \\ All comparisons return Boolean.
       Function filter {
-            Def boolean T=True, F=False
+            Def Boolean T=True, F=False
             dim all() : all()=Array([]) : L=len(all())-1
             =lambda all(), L , F, T -> {
                 s=[] : =T
@@ -1840,18 +1833,18 @@ Module FilterMapFold {
       \\ so now we see some example of using these functions
       \\ b is a pointer to array
       b=(1,2,3,4,5,6,7,8)
-      \\ just  return a copy of b
+      \\ just return a copy of b
       Print FilterMap(b)
       \\ we make a lambda to be used to FilterFold
       \\ second parameter has to be passed by reference
-      \\  We can use FilterFolder with String Arrays or Number Arrays
-      \\ but we get number  as result (from FilterFolder$ we get string)
-      \\ so the reference here must be for a number
+      \\ We can use FilterFolder with String Arrays or Number Arrays
+      \\ but we get number as result (from FilterFolder$ we get string)
+      \\ so, the reference here must be for a number
       \\ the first parameter here is number because we have number array to fold
       mul=lambda (x, &p) -> {
             p*=x
       }
-      \\ using initial value 1  (default is 0, but here 0 isn't good)
+      \\ using initial value 1 (default is 0, but here 0 isn't good)
       Print FilterFold(b,,mul,1)
       \\ so now we use the same number array but for string result
       \\ we make a text with one to eight starts, like a triangle of stars
@@ -1868,10 +1861,10 @@ Module FilterMapFold {
       Sum=lambda (x, &total)->{
             total+=x
       }
-      \\ we leave empty the filter, we place the sum function. Initial value is 0 and this is nice here.
+      \\ we leave empty the filter; we place the sum function. The initial value is 0 and this is nice here.
       Print FilterFold(b, ,Sum)
       \\ We want now to get an array of all squares of even numbers in array
-      \\ so we want  the Even function as filter (return a boolean)
+      \\ so, we want the Even function as filter (return a Boolean)
       \\ and the square function which return squares
       Even=lambda (x)->x mod 2=0
       Square=lambda (x)->x**2
@@ -1884,21 +1877,21 @@ Module FilterMapFold {
             Read x
             =x**2
       }
-      \\ or better , using  Number  which pop a number from lambda's stack
+      \\ or better, using  Number  which pop a number from lambda's stack
       Square=lambda ->Number**2
       \\ so now we get an array with all values
       Print FilterMap(b, Even, Square)
       \\ We can get the sum too easy:
       Print FilterFold(FilterMap(b, Even, Square), , sum)
       \\ Warning
-      \\ Each( )can't work with expression, it need a pointer to array or an array like a()
-      \\ so we use c as a pointer to array
+      \\ Each() can't work with expression, it need a pointer to array or an array like a()
+      \\ so, we use c as a pointer to array
       c=FilterMap(Each(b 1 to 8), Even, Square)
       \\ we can see items and length
       Print c, len(c)
       \\ so now we can use each(c,1,2) to get the two first items
-      \\ and using FilterFold we get the sum ot those two items
-      Print FilterFold(each(c,1,2), , sum)
+      \\ and using FilterFold we get the sum of those two items
+      Print FilterFold(each(c,1,2),, sum)
       Stop
       \\ We can use two dimensional arrays, or more (maximum ten dimensions)
       \\ we can set different base (low bound) for each dimension
@@ -1932,13 +1925,13 @@ Module FilterMapFold {
       Print filterMap(a,,capitalize$)
       \\ now we get items with three letters capitalize
       Print filterMap(a,isThreeletters,capitalize$)
-      \\  We pass a composite filter using  filter()
+      \\ We pass a composite filter using  filter()
       \\ so now we want items with three letters and  have a "t" inside, and map to capitalize
       Print filterMap(a,filter(isThreeletters,HasAt), capitalize$)
-      \\  Here we get all items with three letters an apply combine map of two functions
+      \\ Here we get all items with three letters an apply combine map of two functions
       \\ last function applied last
       Print filterMap(a,isThreeletters, combine$(capitalize$, add123$))
-      \\  Here we get all items with three letters an apply combine map
+      \\ Here we get all items with three letters an apply combine map
       \\ last applied the addbrackets so we get [CAR123] [CAT123]
       Print filterMap(a,isThreeletters, combine$(capitalize$, add123$, addbrackets$))
       \\ So now we make a folding function
@@ -1947,19 +1940,19 @@ Module FilterMapFold {
             all$+=x$
       }
       \\ we get all items in a string without spaces
-      Print FilterFold$(a,,appendstring)
+      Print FilterFold$(a,, appendstring)
       \\ we use each with no coma using "to" and Start and End (1 and -1), in reverse
-      \\ so we get the items in a string in reverse order
+      \\ so, we get the items in a string in reverse order
       \\ reverse, we can use each(a, -1, 1)
       Print FilterFold$(each(a End to Start),,appendstring)
-      \ like this
+      \\ Like this
       Print FilterFold$(each(a,-1,1),,appendstring)
       \\ we can apply a filter
       Print FilterFold$(a,isThreeletters,appendstring)
       \\ or we can use the FilterMap() as a parameter for FilterFold$()
       Print FilterFold$(FilterMap(a,isThreeletters, combine$(capitalize$, addbrackets$)),,appendstring)
       \\ Another folding function, to get the total length, so we need number,
-      \\ so we use FilterFold and not FilterFold$
+      \\ so, we use FilterFold and not FilterFold$
       GetLength=lambda (x$, &all)-> {
             all+=len(x$)
       }
@@ -1979,11 +1972,11 @@ MODULE H1 {Form 80, 66
 Cursor tab(1)
 Report {
 	This is an example to show how the light events in a group can be used.
-	The theory about light events have some standards:
+	The theory about light events has some standards:
 		1,	A call to an Event can be done, although this maybe do not call anything id we don't have a service function to use it
-		2.	A servuce function has the same scope as the module we write to it. It is like we call a subroutine. But this call happen from another module, a group module. So the event call is a call BACK to module which we tie the group with DoEvents. The stack of values in event calls is new one, sp we can't a;ter the module's stack either in group module or in target module (where we tie the group with DoEvents)
-		3.	We can't use multicast call using the light events. We have to use Evemt Object which use a list of functions to call. Event Objects can alter the finction list. The light events can't alter the service funcitons, but we can alter a function as usual by defining another time using tthe same name.  This can't be happen from group module where we call the event.
-		4.	We can make float groups from a group which has light events and we tie it to a module. The internal code in M2000 make a list of weaj references to servixe functions and when we call en event check if the weak reference exist and call it or drop the call if not exist.
+		2.	A service function has the same scope as the module we write to it. It is like we call a subroutine. But this call happens from another module, a group module. So, the event call is a call BACK to module which we tie the group with DoEvents. The stack of values in event calls is new one, so we can't alter the module's stack either in group module or in target module (where we tie the group with DoEvents)
+		3.	We can't use multicast calls using the light events. We must use Event Object which use a list of functions to call. Event Objects can alter the function list. The light events can't alter the service functions, but we can alter a function as usual by defining another time using the same name.  This can't be happen from group module where we call the event.
+		4.	We can make float groups from a group which has light events and we tie it to a module. The internal code in M2000 makes a list of weak references to service functions and when we call an event  check if the weak reference exists and call it or drop the call if not exist.
 	Prees a key
 	}, width-tab(1)*2
 Print
@@ -1996,7 +1989,7 @@ Public:
       Enum Status { NotFound=404, MethodNotAllowed=405}
       Set {
             read x ' number or enum
-            \\ if number not exist in enum list Then we get an error
+            \\ if number does not exist in enum list Then we get an error
             Call event "trace", x
             Try ok {
                   .myvalue<=x
@@ -2053,7 +2046,7 @@ Print accHigh=1
 Print Type$(HttpStatus)="Group"
 Def InferType$(x)=Type$(x)
 Print InferType$(HttpStatus)="Status"
-\\ for enum types Status letter Case have to match the Case in definition
+\\ for enum types the Status letters case have to match the case in definition
 Module Checkit(a as Status) {
       Print type$(a) ' it is a enum type, not a group, so no events happen
       Print a
@@ -2108,7 +2101,7 @@ Try {
 }
 \\ now we can get the value from b
 Checkit eval(b)
-\\ no used & because  b is actual a reference to HttpStatus
+\\ no used & because b is actual a reference to HttpStatus
 \\ if we use & then we pass the reference of pointer, not the the reference of Httpstatus
 CheckThis b
 Dim a(2)
@@ -2123,8 +2116,8 @@ Print Type$(a(1))="Group", InferType$(Eval(a(1)))="Status"
 a(1)++ ' we get high limit, because a(1) has a float group (nameless), and event list inside is the original one.
 b++ ' now we get high limit because b and a(1) show the same nameless (or float) group
 }
-MODULE H2 {\\ The task is simple;
-\\ first we make a class function to produce a group with one variable and a value
+MODULE H2 {\\ The task is simple.
+\\ first, we make a class function to produce a group with one variable and a value
 \\ then we make p as a pointer to a float group produced from alfa()
 \\ then we use p=>x to get the x value, and eval(p) to get the group value
 
@@ -2133,8 +2126,8 @@ MODULE H2 {\\ The task is simple;
 \\ We use a function which get any group (pointer on not pointer) as m
 \\ then make a z and then we return z as group (using Group(), because without we get the value of z, if z has a value)
 
-\\ We make the same, but now we didn't use the function but we do something else.
-\\ First we have to use a fresh name, say m1, and read from stack as group, so if it is a pointer we get a group from the pointer
+\\ We make the same, but now we didn't use the function, but we do something else.
+\\ First, we have to use a fresh name, say m1, and read from stack as group, so if it is a pointer we get a group from the pointer
 \\ now we can append a Y variable, using Group {} or using m1=class1() 
 
 class alfa {
@@ -2176,7 +2169,7 @@ if rnd>.5 then
 else
 	Print "Using class"
 	class class1 {y=20}
-	\\ Let is like Push class1() : read m1
+	\\ Let is like Push class1(): read m1
 	\\ without Let we get error: property can't change (there isn't a set { } session in class alfa)
 	Let m1=class1()
 end if
@@ -2187,10 +2180,10 @@ list
 
 }
 MODULE H3 {\\ Like H2 but p is a special pointer, a reference to alfa
-\\ In h2 a pointer to a float group when deleted or change pointer decrement the pointers number inside the group. So when this number goes to zero (no pointer point to foat group) then the group deleted
-\\ the type of pointer we use here is a reference to a named group.. Internal the pointer holds only a weak reference so if no reference exist we get error when we try to use it
-\\ A named group deleted when the owner (the module or function or block with temporary definitions) end the execution. We can say that a named group is a static group, but the name static used for static variables a subset of variable types which can be used for each call in a module or function or thread with only one time intialization at the Static statement. See Help Static
-\\ Also a named group may use Light Events. Here the "p" event may have or not a Function alfa_p.
+\\ In h2 a pointer to a float group when deleted or change pointer decreases the pointers number inside the group. So, when this number goes to zero (no pointer points to float group) then the group deleted
+\\ the type of pointer we use here is a reference to a named group. Internal the pointer holds only a weak reference so if no reference exists, we get error when we try to use it
+\\ A named group deleted when the owner (the module or function or block with temporary definitions) ends the execution. We can say that a named group is a static group, but the name static used for static variables a subset of variable types which can be used for each call in a module or function or thread with only one-time initialization at the Static statement. See Help Static
+\\ Also, a named group may use Light Events. Here the "p" event may have or not a Function alfa_p.
 Print "Run this many times, to see all variants"
 counter=0
 group withevents alfa {
@@ -2282,7 +2275,7 @@ Module CheckIt {
       Form 66,40
       Cls 5
       Pen 14
-      \\ Ensure True/False for Print boolean (else -1/0)
+      \\ Ensure True/False for Print Boolean (else -1/0)
       \\ from m2000 console use statement Switches without Set.
       \\ use Monitor statement to see all switches.
       Set Switches "+SBL"
@@ -3543,9 +3536,9 @@ Cursor 0,0 : Print Under
 Cls , 1
 
 \\  ValidateValue(number, letter$)
-\\  return a lambda function with closures And signature lambda(letter$), returning boolean
+\\  return a lambda function with closures And signature lambda(letter$), returning Boolean
 \\  ValidateValue( number, number)
-\\  return a lambda function with closures And signature lambda(number), returning boolean
+\\  return a lambda function with closures And signature lambda(number), returning Boolean
 
 Function ValidateValue {
       IF match("NN") Then {
@@ -4744,7 +4737,7 @@ Layer 1 {
 	CLS 1 ,0   ' COLOR BLUE AND  RESET SPLIT SCREEN SETTING TO TOP LINE
 	MOVE 1500,1000
 	polygon 13, 1000,-500,300,1000, -2000, -500,0, -1000
-	PRINT "This is first line"    ' WE CAN'T SEE THE FOUR PRINTS 
+	PRINT "This is first line"    ' WE can't SEE THE FOUR PRINTS 
 	PRINT "This is second line"   'BECAUSE WE SET A HIGH REFRESH RATE
 	PRINT "This is third line"
 	PRINT "This is forth line"
@@ -5094,8 +5087,8 @@ For This {
 \\ Some variable for program. We can ue Def for a variable once, if we do that a second time the we get error.
 \\ always Def make local variables. We can set a type before for all non typed names after
 \\ or we can use as type and give a first value (not an expression here).
-\\ by defailt false is the va;ue for boolean type, so the =false not needed
-Def boolean LoadState=false,  old_status=false, lastword$, old_wrap=true
+\\ by defailt false is the va;ue for Boolean type, so the =false not needed
+Def Boolean LoadState=false,  old_status=false, lastword$, old_wrap=true
 
  \\ We need some properties with inexes, so we make these as arrays 
  \\ They look as arrays but they are objects (PropReference)
@@ -5108,13 +5101,13 @@ With Help1, "MenuEnabled" as Help1.Enabled()
 \\ we have to use Clear Name$ to erase the document's paragraphs.
 \\ Using = or <= for globals we append text to it
 Document BackUp$="\\Write something...", LoadFile$
-Def ok as boolean
+Def ok as Boolean
 Const nl$=chr$(13)+chr$(10)
 Pad.Text$=BackUp$
 Def what$, lastcommand$, mod2run$
 
 \\ function to retrieve info from help database, help2000.mdb in appdir$
-Def boolean HelpView
+Def Boolean HelpView
 
 
 if doc.par(aLL$)=0 then
@@ -5465,7 +5458,7 @@ Function CheckText(a as string) {
 			where=instr(eval$(z), str$(chr$(13)) as byte)
 			=where>0 and where<2000
 		else
-			boolean T=True
+			Boolean T=True
 			=T
 		end if
 	end if
@@ -6076,7 +6069,7 @@ MODULE FORM44 {Module TryIt {
 	      }
 	}
 	'goto aaa
-	boolean mine=false
+	Boolean mine=false
 	For i=0 to N-1 {
 	\\ Threads get current layer as starting layer
 	      Layer Form1(i) {
@@ -8875,7 +8868,7 @@ MODULE CO {Module Check {
             integer  c_width=256, c_height=256, y, x, dy, dx, dy2
             integer  cx=c_width/2, cy=c_height/2, jmpx
             double radius=If(cx<=cy->cx, cy), dist
-            boolean skip
+            Boolean skip
             c_width--
             c_height--
             dy=-cy
@@ -9631,7 +9624,7 @@ MODULE ICONS {function dummy {
 	Menu fill #F377FF, 7, 0
 	files ! + "screen*.bmp"
 	if menuitems=0 then exit
-	global ex=false, loadnow=1, preview =0, LockThere as boolean, menu1=0, press=0
+	global ex=false, loadnow=1, preview =0, LockThere as Boolean, menu1=0, press=0
 	Module Global globalmenu {
 	\\ unhide this to exit Menu if get a double click
 	\\	ex<=true  \\ we can use this to exit on double click or enter.
@@ -10091,7 +10084,7 @@ Module CompilerExample {
 		sub stmt(&op)
 			local t=(,)
 			if op=Identifier then
-				t=(line$)
+				t=(line$,)
 				getone(&op)
 				expected(Op_assign)
 				getone(&op) 
@@ -10511,7 +10504,7 @@ Module CompilerExample {
 			Module prts {Print #-2, format$(var$(number));:Refresh}
 			Module prti {Print #-2, str$(number, 0);:Refresh}
 			} as prolog$
-		Variable$=lambda$ (many, Name$, glob as boolean=false)->{
+		Variable$=lambda$ (many, Name$, glob as Boolean=false)->{
 			if many else exit
 			if glob then
 				="Global "+name$+"(0 to "+str$(many,0)+")"+{
@@ -12218,7 +12211,7 @@ MODULE MAZE2 {back {cls 0}
 Module Maze2 {
       \\ depth-first search
       While Inkey$<>"" {}  ' drop keys
-      Const View as boolean=True
+      Const View as Boolean=True
       Double tc
 
       Form 80,50
@@ -12317,7 +12310,7 @@ if module(infobasic) then keyboard "infobasic", 13
 }
 MODULE MAZE {MODULE  Maze {
       INTEGER W = 40, H = 20, X, Y, CX, CY, OX, OY, I
-      BOOLEAN DONE
+      Boolean DONE
       DIM MAZE(0 TO W, 0 TO  H) AS STRING
       FOR X = 0 TO W
           FOR Y = 0 TO H
@@ -12376,7 +12369,7 @@ MODULE MINESWEEPER {Module Minesweeper {
       Def com$, com_label$
       Def x, b_row, b_col, where, top_where
       Def rows=12, columns=8, swap_first%
-      Def boolean skiptest, end_game, cheat
+      Def Boolean skiptest, end_game, cheat
       Dim Board$(0 to rows+1, 0 to columns+1)="? "
       Def mines%, i%, j%, used%, acc%, n%, m%
       mines%=max.data(random(int(columns*rows*.1),int(columns*rows*.2)-1), 1)
@@ -12442,7 +12435,7 @@ MODULE MINESWEEPER {Module Minesweeper {
       }      
       End Sub
       Sub GameLoop()
-            Local com$, loopagain as boolean
+            Local com$, loopagain as Boolean
             PrintBoard()
             InputCommand()
             do 
@@ -12720,7 +12713,7 @@ MODULE CAL {\\ Calendar - for "REAL" programmers
 \\ USE COURIER NEW  (FONT "COURIER NEW")
 
 \\ CHANGE THE 
-GLOBAL CONST PRINT_IT AS BOOLEAN=true
+GLOBAL CONST PRINT_IT AS Boolean=true
 MODULE GLOBAL SNOOPY  {
 IF NOT PRINT_IT THEN CURSOR 0,ROW ELSE IF ROW>0 THEN PAGE 1
 
@@ -12958,7 +12951,7 @@ Module Checkit {
                   pred=k=>pred
                   succ=k=>succ
                   if pred is succ then {
-                        if .head is k else Error "Can't remove this node"
+                        if .head is k else Error "can't remove this node"
                         k=.RemoveHead()
                         clear k
                   } else {
@@ -13145,7 +13138,7 @@ Module Checkit {
 			pred=k=>pred
 			succ=k=>succ
 			If pred is succ then
-				If .head is k Else Error "Can't remove this node"
+				If .head is k Else Error "can't remove this node"
 				k=.RemoveHead()
 				Clear k
 			Else
@@ -13775,7 +13768,7 @@ MODULE PERMSTEP {Module StepByStep {
           if m=0 then Error "No items to make permutations"
           c=c1
           While m>1
-                c1=lambda c2=c,p=0, m=(,) (&f, a, clear as boolean=false) ->{
+                c1=lambda c2=c,p=0, m=(,) (&f, a, clear as Boolean=false) ->{
                       if clear then m=(,)
                       if len(m)=0 then m=a
                       =cons(car(m),c2(&f, cdr(m)))
@@ -13784,7 +13777,7 @@ MODULE PERMSTEP {Module StepByStep {
                 c=c1  
                 m--    
           End While
-          =lambda c, a (&f, clear as boolean=false) -> {
+          =lambda c, a (&f, clear as Boolean=false) -> {
                 =c(&f, a, clear)
           }
     }
@@ -14695,13 +14688,13 @@ Module Checkit {
 		
 		// return of this function is a lambda function
 		// all arrays are closures to this lambda
-		=lambda K(),K1(),TT, T,r(),r1(), s(), s1() (&message$, ansi as boolean=true, ansiid=1033)-> {
+		=lambda K(),K1(),TT, T,r(),r1(), s(), s1() (&message$, ansi as Boolean=true, ansiid=1033)-> {
 			set fast!
 			CURRENCY  h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE
 			CURRENCY  h3 = 0x10325476, h4 = 0xC3D2E1F0
 			LONG L, L1, blocks, acc, padding
 			INTEGER  i, j
-			BOOLEAN  f64=true
+			Boolean  f64=true
 			INTEGER oldid
 			if ansi then oldid=locale : locale ansiid
 			// we use a buffer of 64 bytes
@@ -15564,7 +15557,7 @@ Module BankerAlgo {
             }
             Print
       Exit Sub
-      Sub Status(Ok as boolean=False)
+      Sub Status(Ok as Boolean=False)
             Print "Total System Resources"
             PrintMax(System)
             Print "Available Resources in System"
@@ -15580,7 +15573,7 @@ Module BankerAlgo {
       End Sub
       Sub CheckNewState(&Ok)
             local M=Each(Processes), M1, count=len(Processes), alive(0 to count-1)=1
-            Local Z, Recource$, safe as boolean=false
+            Local Z, Recource$, safe as Boolean=false
             While count {
                   safe=false
                   While M {
@@ -16585,7 +16578,7 @@ end while
 MODULE LIBDIV {\\ use in console EDIT !4
 \\ so tab width change to 4 characters
 Function ProDiv$ {
-	Read a$, b$, pp=10, rd as boolean=false, maxd=-1, dp$="."
+	Read a$, b$, pp=10, rd as Boolean=false, maxd=-1, dp$="."
 	if pp<0 then error "decimal digits>=0 "
 	if rd then pp++
 	Let v$="", gg=len(b$), p=pp,  mm=0, d1=0, mm1=0, od1=-1
@@ -17672,7 +17665,7 @@ MODULE BOOK {Class Book {
       Final title$, des$, price, pback
       \\ we use a class part, which means a part that exist only at contruction time
 Class:
-      Module Book (a$, b$, c as decimal, d as boolean) {
+      Module Book (a$, b$, c as decimal, d as Boolean) {
       \\ we use fresh variables to catch a missin value
             .title$<=a$
             .des$<=b$
@@ -17840,7 +17833,7 @@ MODULE BOOK3 {Class Book {
       property title$ {value}
       property des$ {value}
       property price {value} =0@	\\ a decimal value
-      property pback {value} =1=1	\\ this is a boolean value, True is -1 double
+      property pback {value} =1=1	\\ this is a Boolean value, True is -1 double
       \\ we use a class part, which means a part that exist only at contruction time
 Class:
       Module Book (a$, b$, c, d) {
@@ -18986,7 +18979,7 @@ MODULE HTMLEDITOR {\\ task for the pupil:
 \\ default set true to Pad
 \\ need some work inside interpreter code
 Clear \\ Clear all variables/objects
-def setagain as boolean, hidetitle as boolean=True
+def setagain as Boolean, hidetitle as Boolean=True
 if file.name$("A.abc")="a.abc" then
 Set switches "+CASESENSITIVE"
 setagain=true
@@ -19561,7 +19554,7 @@ er$="general"
 valcurline=0
 valposline=0
 valm=Paragraph(valdoc$, 0) 
-def FindTag as boolean=True
+def FindTag as Boolean=True
 LastTag$=""
 FindEndComment=false
 def i,j,k
@@ -21760,9 +21753,9 @@ back {
 	Def BlackDisp$="♟♞♝♜♛♚", empty$="12345678", disp$
 	disp$=WhiteDisp$+BlackDisp$ 
 	Def White_♔_file, White_♔_rank, Black_♚_rank, Black_♚_file
-	Def boolean White_♔_no_roke, Black_♚_no_roke
-	Def boolean White_no_left_roke, Black_no_left_roke
-	Def boolean White_no_right_roke, Black_no_right_roke
+	Def Boolean White_♔_no_roke, Black_♚_no_roke
+	Def Boolean White_no_left_roke, Black_no_left_roke
+	Def Boolean White_no_right_roke, Black_no_right_roke
 	Def Halfmove_clock, Fullmove_number, threat, Clip$
 	Dim emptydisp$(1 to 8), BoardSq(1 to 8, 1 to 8)=(,)
 	Def en_passant_rank=0, en_passant_file=0
@@ -21775,9 +21768,9 @@ back {
 	Def flashtime=300
 	Dim PastGames$(1 to 200)
 	Def freeSlot=0, cur=0, ok=true, k$, condition$
-	Def double ip, jp, ip1, jp1, si, sj, getone as boolean
+	Def double ip, jp, ip1, jp1, si, sj, getone as Boolean
 	Def st, fig$, tr, mx, my, lx,ly, key=0, mmx,mmy, mmb
-	Def movelogic as boolean=false, mvx, mvy
+	Def movelogic as Boolean=false, mvx, mvy
 	sa=(,) : sb=each(sa)
 	Double
 	OldI=Italic
@@ -21794,7 +21787,7 @@ back {
 	Set Fast !
 	\\ calc based to height
 	HalfWidth=(scale.y*.65) div 16
-	def downlimit=0, White as boolean=True, fw
+	def downlimit=0, White as Boolean=True, fw
 	DrawEmptyBoard((scale.x/2-HalfWidth*8),upperlimit, HalfWidth, 15)
 	fw=HalfWidth*2-60
 	\\ hold
@@ -22205,9 +22198,9 @@ Sub DrawEmptyBoard(leftmargin, topmargin, squarewidth, labelcolor)
 end sub
 Sub MakeAmove( &ok, i, j, i1, j1)
 Local z=bold, p$, p1$ : bold 0
-Local t,t1, N=BoardSq(1,1)#val(0), again as boolean, playroke as boolean
+Local t,t1, N=BoardSq(1,1)#val(0), again as Boolean, playroke as Boolean
 ok=false
-Local rule=true, threat as boolean
+Local rule=true, threat as Boolean
 refresh 10000
 Pen 0 {
 	again=false
@@ -22446,7 +22439,7 @@ bold z
 refresh 10000
 end Sub
 
-Sub RedrawBoard(NoRefresh as boolean=False)
+Sub RedrawBoard(NoRefresh as Boolean=False)
 Local z=bold, p$ : bold 0
 Local t, N=BoardSq(1,1)#val(0)
 If NoRefresh Else refresh 10000
@@ -22622,7 +22615,7 @@ Sub CheckKing()
 		return t, 8:=p$
 		return t1, 8:=p1$
 end Sub
-Sub CheckThreat(White as boolean, c, c1, &Yes)
+Sub CheckThreat(White as Boolean, c, c1, &Yes)
 local i=1, i1=8, j=1, j1=8, k=c, k1=c1
 if white then
 	local oKin$="♚",hor$="♜♛", dia$="♝♛", Kni$="♞"
@@ -22822,7 +22815,7 @@ Method form1, "show"
 
 \\ we use mono for part structure. when a part executed the mono change to true,
 \\ so no other part with same variable can executed
-def boolean mono, allow=true
+def Boolean mono, allow=true
 Function but1.Blink {
       Read New face
       if allow<>0 and face then
@@ -23729,7 +23722,7 @@ label$(1)="Basic style Input for input a number", "Field Input - Work the INS ke
 Example=random(1, 5)
 Global messrow
 Escape Off
-Global STATE=0, EXITNOW as boolean=false
+Global STATE=0, EXITNOW as Boolean=false
 module global mayexit {
 	EXITNOW<=True
 	Try {field new 99: input End }
@@ -23992,7 +23985,7 @@ MODULE WRITEWITH {Report {
 
 // sep$=chr$(9)
 sep$=";"
-boolean noQuotes=true
+Boolean noQuotes=true
 Pen 11{Print "Ansi first"}
 Print "Export csv using tab as seperator, and dot for decimal char"
 open "testnochr34.csv" for output as k
@@ -24162,7 +24155,7 @@ Report TestSort$(final())+Display$(final())
 print "changes: "; many
 }
 MODULE KNIGHT {Function KnightTour$(StartW=1, StartH=1){
-	def boolean swapH, swapV=True
+	def Boolean swapH, swapV=True
 	if startW<=4  then swapH=true: StartW=8+1-StartW
 	if startH>4  then swapV=False: StartH=8+1-StartH
 	Let final=8*8, last=final-1, HighValue=final+1
@@ -24270,7 +24263,7 @@ Report ex$
 }
 MODULE KNIGHTEXP {module Experiment(StartW=1, StartH=1, &mmm){
 	Global ww=8, hh=8
-	def boolean swapH, swapV=True
+	def Boolean swapH, swapV=True
 	if startW<=ww div 2  then swapH=true: StartW=ww+1-StartW
 	if startH>hh div 2  then swapV=False: StartH=hh+1-StartH
 	Form 80, 32
@@ -25904,7 +25897,7 @@ Theory:
 	In a class/group the class definition can be public or private.
 Pracite:
 	We define a class with an inner class and a group defined from inner class, The inner group define operator "="  and when we place a same type group process the operator process the operator using the private variables from the other group (is a copy of the other group). If the type isn't the same return false.
-	We define false as boolean, because in M2000 true is double -1, and false is double 0, but all comparisons return boolean true and false. Any identtifier from M2000 vocabulary can be used localy in variables and modules definitions, except for those identifiers which used for flow control (like If, Repeat, While)
+	We define false as Boolean, because in M2000 true is double -1, and false is double 0, but all comparisons return Boolean true and false. Any identtifier from M2000 vocabulary can be used localy in variables and modules definitions, except for those identifiers which used for flow control (like If, Repeat, While)
 }
 class delta {
 	class zeta {
@@ -25912,7 +25905,7 @@ class delta {
 		x=10, y=50
 	public:
 		operator "=" {
-			def boolean false
+			def Boolean false
 			read other
 			if other is type zeta then
 				push .x=other.x and .y=other.y
@@ -25964,7 +25957,7 @@ public:
 class epsilon as prive {
 public:
 	operator final "=" {
-			def boolean false
+			def Boolean false
 			// convert other to group if not,  for sure
 			read other as group
 			if other is type prive then
@@ -26464,7 +26457,7 @@ Method Text1,"move", 3000, 2000, 8000, 900
 With Text1, "Prompt", "Name: ", "MaxCharLength", 30+6
 
 Declare Spinner TextBox Form Form1
-Def Alone as boolean
+Def Alone as Boolean
 //\ spinner values: ShowBar, MinValue , MaxValue , LargeValue.
 //Range include MinValue and MaxValue
 // So we have integers (sign long) but we can display it like a float
@@ -35243,7 +35236,7 @@ MODULE PHONEBOOTH {Form 80, 50
 Module CheckIt {
       Thread.Plan Concurrent
       Class mutex {
-            mylock as boolean=True
+            mylock as Boolean=True
             Function Lock {
                   if not .mylock then exit
                    .mylock<=False
@@ -35392,7 +35385,7 @@ buf1$=""
 function image1.keypress {
        if enabled then if not caret then caret=true
 	layer image1 {
-		LOCAL a$, onemore as boolean
+		LOCAL a$, onemore as Boolean
 		a$=KEY$
 		DO
 			if a$=chr$(8) then
@@ -35920,7 +35913,7 @@ A(0):=1,2,3,4,5,6,8,9,10,11
 Print Len(A())=10
 Function BinarySearch(&A(), aValue) {
 	def long mid, lo, hi
-	def boolean ok=False
+	def Boolean ok=False
 	let lo=0, hi=Len(A())-1
 	While lo<=hi
 		mid=(lo+hi)/2
@@ -35969,7 +35962,7 @@ Method form1, "NoTaskBar"
 With form1, "Title", "FKEY List", "previewKey", true
 Method form1, "TransparentTitle"
 def long k
-def boolean Busy
+def Boolean Busy
 
 after 10000 {
 	busy=true
@@ -36210,7 +36203,7 @@ dir user
 volume 50
 if resp="" then if module(InfoBasic) then InfoBasic
 }
-MODULE PRIORITY {Module OrdrerQueue (filename$, emptysecndqueue as boolean)  {
+MODULE PRIORITY {Module OrdrerQueue (filename$, emptysecndqueue as Boolean)  {
       // f=-2  or use empty filename for screen
       open filename$ for output as #f
       zz=list
@@ -36346,7 +36339,7 @@ function global g(priority, task$) {
 	// try to change -> to = to see the error
 	->obj(priority, task$)
 }
-Module PriorityQueueForGroups (emptysecndqueue as boolean) {
+Module PriorityQueueForGroups (emptysecndqueue as Boolean) {
       Flush  ' empty current stack
       Data g(3, "Clear drains"),g(4 ,"Feed cat"), g( 5 , "Make tea")
       Data g( 1 ,"Solve RC tasks")
@@ -36818,7 +36811,7 @@ MODULE TURING {Module CheckIt {
 				data it
 			end while
 		}
-		Module Run (steps as long, display as boolean) {
+		Module Run (steps as long, display as Boolean) {
 			if len(.rules)=0 then error "No rules found"
 			if .Initial_State$="" or .Terminating_state$="" or .Blank_Symbol$="" then
 				error "Reset the machine please"
@@ -37444,7 +37437,7 @@ currency cc=1.2345#
 print "cc", cc, type$(cc) // Currency
 decimal dd=1.2345@
 print "dd", dd, type$(dd) // Decimal
-boolean bb=True
+Boolean bb=True
 print "bb", bb, type$(bb) // Decimal
 list
 }
@@ -37585,10 +37578,10 @@ MODULE UNIVERSAL {Module Universal_QuickSort {
 	sub Enum(a)
 		if a=English then
 			print("Sort string enumarates (english version)")
-			Local num: Enum num {one="one",two="two", three="three",four="four", five="five"}
+			Local Enum num {one="one",two="two", three="three",four="four", five="five"}
 		else
 			print("Sort string enumarates (greek version)")
-			Local num: Enum num {one="ένα",two="δύο", three="τρία",four="τέσσερα", five="πέντε"}
+			Local Enum num {one="ένα",two="δύο", three="τρία",four="τέσσερα", five="πέντε"}
 		end if
 		Local a()
 		a()=(five, three, one, two, four)
@@ -40183,7 +40176,7 @@ Public:
 	}
 Class:
 	Module Complex {
-		Error "Can't define objects"
+		Error "can't define objects"
 	}
 }
 Class DoubleComplex as Complex {
@@ -40646,7 +40639,7 @@ global backColor=5, mypen=14
 cls backColor,0
 string keybuffer, outbuffer, lastchar, c, z, s
 // echo = false
-boolean query, querynumber, echo=true, blink=true, feed
+Boolean query, querynumber, echo=true, blink=true, feed
 integer p=pos, chars=0, limitInput=10
 
 // this thread blink the cursor at 4hz .
@@ -40767,7 +40760,7 @@ sub FlushOutBuffer()
 	query=false
 	while not len(outbuffer)=0: wait 10: end while
 end sub
-function getchar(use_text as boolean=false, maxchar as integer=10)
+function getchar(use_text as Boolean=false, maxchar as integer=10)
 	local integer k
 	limitInput=maxchar
 	if len(keybuffer)=0 then
@@ -40787,7 +40780,7 @@ function getchar(use_text as boolean=false, maxchar as integer=10)
 	 if k=13 then query=false
 	=chr$(k)
 end function
-function getchar_RETURN_AT_ENTER(use_text as boolean=false, maxchar as integer=10)
+function getchar_RETURN_AT_ENTER(use_text as Boolean=false, maxchar as integer=10)
 	local integer k
 	limitInput=maxchar
 	querynumber=not use_text
@@ -40833,7 +40826,7 @@ sub mycursorOnly(p)
 			 print over $(0), if$(blink and query->"_","")
 		end if
 end sub
-Sub CleanQuery(holdbuffer as boolean=false)
+Sub CleanQuery(holdbuffer as Boolean=false)
 	thread blinkit hold
 	mycursorOnly(p+chars)
 	if holdbuffer Else keybuffer=""
@@ -42024,7 +42017,7 @@ Module CheckEvaluator (Expr$) {
 					in$=Trim$(in$)
 					if Asc(in$)<>40 then
 						string ch="", num=""
-						boolean once=false
+						Boolean once=false
 						do
 							ch=left$(in$,1)
 							if once then
@@ -42228,7 +42221,7 @@ MODULE EVAL2 {module CheckEvaluator (Expr$){
 		}
 		Function GetNumber (&in as string) {
 			string ch, num
-			boolean once
+			Boolean once
 			Do
 				ch=left$(in,1)
 				if once then
@@ -42314,7 +42307,7 @@ module checkthis {
 	
 	Report "Another way without use of array, and without use of / and - operators"
 	class z {
-		boolean noStop=true
+		Boolean noStop=true
 		module generate(&k()) {
 			object q=stack:=1
 			call k(0)
@@ -42359,7 +42352,7 @@ MODULE OCTAL {Module CountInOctal {
 	private:
 		dim m() as byte
 	public:
-		Last as boolean
+		Last as Boolean
 		Value {
 			string s1
 			integer i
@@ -42490,7 +42483,7 @@ MODULE ZIGZAG {Module Lib1 {
 	Function Global MakeArray(n as integer=5) {
 		dim a(1 to n, 1 to n) as integer=0
 		integer i=1, j=1, z, t1=1
-		boolean ch=true
+		Boolean ch=true
 		for z=0 to n*n-1
 			if ch then a(i,j)=z else a(j,i)=z
 			j++
@@ -42735,7 +42728,7 @@ if ask("Delete file from disk ?","What to do", "*Yes","No")=1 then
 	dos "del "+quote$(dir$+filename), 200;
 end if
 }
-MODULE SPAGHETI {Module OldSort (w as boolean) {
+MODULE SPAGHETI {Module OldSort (w as Boolean) {
    function mxstrcmp(&Cmp$,  start1,end1, start2,end2) {
       end1+=1-start1
       end2+=1-start2
@@ -44342,8 +44335,8 @@ MODULE PASSMAKER {module SetUp{
 	flush
 	data not unsafe, a%, b%
 }
-module pass (safe as  boolean, a1 as integer, b1 as integer) {
-	dim a(0 to 4) as string,  b(1 to 4) as boolean
+module pass (safe as  Boolean, a1 as integer, b1 as integer) {
+	dim a(0 to 4) as string,  b(1 to 4) as Boolean
 	if safe then
 		a(1) := "346789",  "ABCDEFGHJKLMNPQRTUVWXY", "abcdefghijkmnopqrstuvwxyz"
 	else
@@ -44651,9 +44644,9 @@ module TrueTable {
 	print
 	print "Identifiers:", @(20), "NOT AND OR XOR TRUE FALSE"
 	print "Symbols:", @(20), "( )"
-	dim a(0 to N) as boolean
+	dim a(0 to N) as Boolean
 	a(N)=true
-	input "boolean expression: ";E$
+	input "Boolean expression: ";E$
 	E$=ucase$(E$)
 	P$=E$
 	E$=replace$("TRUE", "___", E$)
@@ -44856,7 +44849,7 @@ MODULE PERFECT {Module PerfectNumbers {
 	}
 	IsPrime=lambda -> {
 		Known1=List:=2@, 3@
-		boolean T=true, F
+		Boolean T=true, F
 		=lambda T,F,Known1 (x as decimal) -> {
 			=F
 			if exist(Known1, x) then =T : exit
@@ -45094,7 +45087,7 @@ MODULE MAGIC4 {module Four_is_magic {
 		lev()=("", "thousand", "million", "billion")
 		=lambda lows(), tens(), lev() (n as long) -> {
 			if n=0 then ="zero": exit
-			long i, tr : boolean t : string ret, prefix
+			long i, tr : Boolean t : string ret, prefix
 			if n < 0 then prefix= "negative ": n-! else prefix=""
 			while n>0 {push n mod 1000: n|div 1000}
 			t=stack.size>1
@@ -45155,10 +45148,10 @@ GetInput=lambda (s as string, min as integer, max as integer) -> {
 	until v%>=min and v%<=max
 	=v%
 }
-GetInputGuess=lambda (moves as integer, length as integer, max as integer, once as boolean) -> {
+GetInputGuess=lambda (moves as integer, length as integer, max as integer, once as Boolean) -> {
 	string k, s
 	integer j, oldi
-	boolean check[max]=false
+	Boolean check[max]=false
 	pen 15 {print str$(moves,"00")+". ";}
 	for i=1 to length
 		do
@@ -45187,9 +45180,9 @@ integer C=GetInput("number of colors", 2, 20)
 integer CL=GetInput("code length", 4, 10)
 integer mn=GetInput("maximum number of guesses", 7, 20)
 if c>=CL then
-	boolean rc=GetInput("colors may be repeated in the code", 0, 1)
+	Boolean rc=GetInput("colors may be repeated in the code", 0, 1)
 else
-	boolean rc=true
+	Boolean rc=true
 end if
 pen #00ff00
 Cls ,0
@@ -45198,7 +45191,7 @@ do
 	if rc then
 		for i=1 to cl: acc[i]=random(1, C): next
 	else
-		boolean color[C]
+		Boolean color[C]
 		for i=1 to cl
 			do
 				acc[i]=random(1, C)
@@ -45441,7 +45434,7 @@ MODULE DUTCH2 {function Dutch_national_flag_problem {
 	enum bands {red=1, white, blue}
 	s=red
 	check_in_order=lambda s, (a as array) ->{
-		boolean true=@true, false
+		Boolean true=@true, false
 		k=each(a)
 		m=s
 		Z=S
@@ -45504,7 +45497,7 @@ MODULE DUTCH2 {function Dutch_national_flag_problem {
 		until balls()#have(1) and balls()#have(2) and balls()#have(3)
 	until not check_in_order(balls())
 	Rem Sort balls()   ' we can sort using Sort statement
-	Rem boolean skip
+	Rem Boolean skip
 	Rem balls()=(1,1,3,3,1,1,1,2,1,1) : skip=true
 	Print "unsort:";balls()#str$(" ")
 	many=0
@@ -45531,7 +45524,7 @@ function Dutch_national_flag_problem {
 	enum bands {red=1, white, blue}
 	s=red
 	check_in_order=lambda s, (a as array) ->{
-		boolean true=@true, false
+		Boolean true=@true, false
 		k=each(a)
 		m=s
 		Z=S
@@ -45581,7 +45574,7 @@ function Dutch_national_flag_problem {
 		until balls()#have(1) and balls()#have(2) and balls()#have(3)
 	until not check_in_order(balls())
 	Rem Sort balls()   ' we can sort using Sort statement
-	Rem boolean skip
+	Rem Boolean skip
 	Rem balls()=(1,1,3,3,1,1,1,2,1,1) : skip=true
 	Print "unsort:";balls()#str$(" ")
 	many=0
@@ -45603,104 +45596,37 @@ print"GOOD"
 exit
 200 print "BAD"
 }
-MODULE CXCOMPLEX {declare global m math2
-method m,"cxone" as one
-method m,"cxzero" as zero
-function disp(a as cxComplex) {
-	string ret
-	vi=a|i
-	vr=a|r
-	if vi then
-		if vr then
-			if vi>0 then
-				if vi==1 then
-					ret="("+vr+"+i)"
-				else
-					ret="("+vr+"+"+vi+"i)"
-				end if
-			else
-				if vi==-1 then
-					ret="("+vr+"-i)"
-				else
-					ret="("+vr+""+vi+"i)"
-				end if
-			end if
-		else
-			if vi=1 then
-				ret="(i)"
-			else.if vi=-1 then
-				ret="(-i)"
-			else
-				ret="("+vi+"i)"
-			end if
-		end if
-	else
-		ret="("+vr+")"
-	end if
-	=ret
-}
-function complex(a, b) {
-	method m, "cxNew", a, b as ret
-	=ret
-}
-function inv(a) {
-	method m, "cxInv", a as ret
-	=ret
-}
-function mul(a, b) {
-	method m, "cxMul", a, b as ret
-	=ret
-}
-function div(a, b) {
-	method m, "cxDiv", a, b as ret
-	=ret
-}
-function add(a, b) {
-	method m, "cxAdd", a, b as ret
-	=ret
-}
-function sub(a, b) {
-	method m, "cxSub", a, b as ret
-	=ret
-}
-function exp(a, r=13) {
-	method m, "cxExp", a as ret
-	ret|r=round(ret|r, r)
-	ret|i=round(ret|i, r)
-	=ret
-}
-function Arg(a) {
-	method m, "cxArg", a as ret
-	=ret
-}
-function Cabs(a) {
-	method m, "cxMod", a as ret
-	=ret
-}
-A=complex(8, -3)
-? "A=";disp(A)
-? "     r=";Cabs(A);" θ=";Arg(A);" rad"
-B=inv(A)
-? "B=";disp(B)
-? "     r=";Cabs(B);" θ=";Arg(B);" rad"
-C=mul(A, B)
-? disp(A);"*";disp(B);"=";disp(C)
-D=div(one, B)
-? disp(one);"/";disp(B);"=";disp(D)
-E=div(A, A)
-? disp(A);"/";disp(A);"=";disp(E)
-F=add(A, A)
-? disp(A);"+";disp(A);"=";disp(F)
-G=sub(A, A)
-? disp(A);"-";disp(A);"=";disp(G)
-H=sub(zero, A)
-? "-";disp(A);"=";disp(H)
+MODULE CXCOMPLEX {one=(1,0i)
+A=(8, -3i)
+? "A=";A
+? "     r=";Abs(A);" θ=";Arg(A);" rad"
+B=one/A
+? "B=";B
+? "     r=";Abs(B);" θ=";Arg(B);" rad"
+? A;"*";B;"=";A*B
+? one;"/";B;"=";one/B
+? A;"/";A;"=";A/A
+? A;"+";A;"=";A+A
+? A;"-";A;"=";A-A
+? "-"+A+"=";-A
 ? "(round exp to 13th decimal)"
-I=add(exp(complex(0, pi)), one)
-? "e^(πi)+1=";disp(i)
+I=round(exp((0, pi i)),13)+1
+? "e^(πi)+1=";i
 ? "(without rounding)"
-I=add(exp(complex(0, pi), 20), one)
-? "e^(πi)+1=";disp(i)
+I=exp((0, pi i))+1
+? "e^(πi)+1=";i
+Print type$(i) = "Complex"
+Dim a(10) as Complex=(1,0i)
+Print (a(3)+a(3))^2=(4, 0i)
+Print (a(3)+a(3))^2=4
+
+Print cos(a)
+Print sin(a)
+Print atn(tan(a))
+Print tan(atn(a))
+Print Polar(abs(a), arg(a))=(8, -3)
+? str$(a ,"0.00")
+? str$((8,-3i) ,"0.00")
 }
 MODULE MANDELBROT {Module Mandelbrot(x=0&,y=0&,z=1&) {
       If z<1  then z=1
@@ -45743,11 +45669,11 @@ While i {
 }
 MODULE PREP {//https://rosettacode.org/wiki/Compiler/Simple_file_inclusion_pre_processor
 GLOBAL DEFINITIONS=QUEUE, FILESYSTEM=LIST, PROCESSED=LIST
-FUNCTION PREPROCESSOR$(DISK AS LIST, FILENAME$, LOCALDEF AS BOOLEAN=FALSE) {
+FUNCTION PREPROCESSOR$(DISK AS LIST, FILENAME$, LOCALDEF AS Boolean=FALSE) {
 	DIM A$()
 	DEF COM$,COMNAME$, CLAUSE$, VAL$, IFCTRL$, LINES$, ONE$
 	DEF LONG L, DEFNUM
-	DEF BOOLEAN PROCESSLINE=TRUE
+	DEF Boolean PROCESSLINE=TRUE
 	DOCUMENT LINES$
 	IF NOT LOCALDEF THEN
 		IF EXIST(PROCESSED, FILENAME$) THEN  EXIT
@@ -45985,7 +45911,7 @@ MODULE THREEPOINT {Module ThreePoints {
 		module point(.x, .y) {
 		}
 	}
-	boolean VMirror=true
+	Boolean VMirror=true
 	sc=twipsX*3
 	h=scale.x/8 
 	if VMirror then
@@ -46342,12 +46268,35 @@ MODULE ROOTS1 {Module Roots_of_Quadratic_Function {
 		Print #f, " (";aa;bb;")";
 	end sub
 	sub disp2(b)
-		local boolean k=b<>0 and (abs(b)<1e-6 or abs(b)>1e6)
+		local Boolean k=b<>0 and (abs(b)<1e-6 or abs(b)>1e6)
 		local res=if$(k-> str$(b,"Scientific"), ""+(round(b, n)))
 		if instr(res, "INF") then res="inf"
 		Print #f, " ";res;
 	end sub
 }
 Roots_of_Quadratic_Function
+}
+MODULE MAGICPOWER {? $("")
+? -(2,0i)^-(3,0i)^-(4,0i)=-0.991479137495678
+? -(2,0i)^-(3,0i)^-4=-0.991479137495678
+? -(2,0i)^-3^-(4,0i)=-0.991479137495678
+? -2^-(3,0i)^-(4,0i)=-0.991479137495678
+? -2^-(3,0i)^-4=-0.991479137495678
+? -2^-3^-(4,0i)=-0.991479137495678
+? -(2,0i)^-3^-4=-0.991479137495678
+? -2^-3^-4==-0.991479137495678
+? str$(polar(100, pi/4), "0.000")
+? str$(conjugate(polar(100, pi/4)), "0.000")
+? phase(polar(100, pi/4))==pi/4
+? arg(polar(100, pi/4))==pi/4
+? exp(Ln(polar(100, pi/4)))==polar(100, pi/4)
+? $("0.000"), cos(polar(2, pi/4)), sin(polar(2, pi/4))
+? $("")
+? mod(polar(2,pi/6))=2
+? abs(polar(2,pi/6))=2
+? mod((-4, -sqrt(2)i))=sqrt(18)
+? "modulus of 1-3i:";mod((1,-3i))
+? "is equal to sqrt(10):";sqrt(10)
+? "argument of 1-3i:";round(arg((1,-3i))*180/pi, 3);"°"
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

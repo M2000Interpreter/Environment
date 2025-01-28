@@ -20,7 +20,7 @@ Private Declare Function GetKeyboardState Lib "user32" (kbArray As KeyboardBytes
 Dim kbArray As KeyboardBytes
 Public fonttest As PictureBox
 Private Declare Function GetTextMetrics Lib "gdi32" _
-Alias "GetTextMetricsA" (ByVal hDC As Long, _
+Alias "GetTextMetricsA" (ByVal Hdc As Long, _
 lpMetrics As TEXTMETRIC) As Long
 Private Type TEXTMETRIC
 tmHeight As Long
@@ -108,7 +108,7 @@ Public Type TagSize
     cx As Long
     cy As Long
 End Type
-Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hDC As Long, lpAspectRatio As TagSize) As Long
+Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal Hdc As Long, lpAspectRatio As TagSize) As Long
 Declare Function CreateRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Declare Function CombineRgn Lib "gdi32" (ByVal hDestRgn As Long, ByVal hSrcRgn1 As Long, ByVal hSrcRgn2 As Long, ByVal nCombineMode As Long) As Long
 Public Declare Function SetWindowRgn Lib "user32" (ByVal hWnd As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
@@ -126,7 +126,7 @@ Public Const RGN_OR = 2
 '**********************************
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-Private Const PI = 3.14159265359
+Private Const Pi = 3.14159265359
 Private Type SAFEARRAYBOUND
     cElements As Long
     lLbound As Long
@@ -152,20 +152,20 @@ Type Bitmap
         bmBitsPixel As Integer
         bmBits As Long
 End Type
-Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
-Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hDC As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
-Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
-Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
+Declare Function StretchBlt Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal Hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Declare Function CreateCompatibleDC Lib "gdi32" (ByVal Hdc As Long) As Long
+Declare Function SelectObject Lib "gdi32" (ByVal Hdc As Long, ByVal hObject As Long) As Long
+Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) As Long
 Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 'Declare Function GetObject Lib "gdi32" Alias "GetObjectA" (ByVal hObject As Long, ByVal nCount As Long, lpObject As Any) As Long
-Declare Function GetPixel Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long) As Long
-Declare Function SetPixel Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long, ByVal crColor As Long) As Long
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
+Declare Function GetPixel Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long) As Long
+Declare Function SetPixel Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal crColor As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal Hdc As Long, ByVal nIndex As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function GetDesktopWindow Lib "user32" () As Long
-Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long) As Long
+Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal Hdc As Long) As Long
 Private Const BITSPIXEL = 12         '  Number of bits per pixel
 Private Declare Function RegisterClipboardFormat Lib "user32" Alias _
    "RegisterClipboardFormatA" (ByVal lpString As String) As Long
@@ -340,10 +340,10 @@ Public Function LowLong(ByVal p) As Long
     LowLong = MemLong(VarPtr(p) + 8)
 End Function
 Function Hex64$(A, Optional bytes = 8)
-    Dim p, P1, Z
-    Z = cInt64(A)
-    p = MemLong(VarPtr(Z) + 8)
-    P1 = MemLong(VarPtr(Z) + 12)
+    Dim p, P1, z
+    z = cInt64(A)
+    p = MemLong(VarPtr(z) + 8)
+    P1 = MemLong(VarPtr(z) + 12)
     Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
 End Function
 Public Function OneLongLong() As Variant
@@ -846,7 +846,7 @@ GetMem1 ppBa + 2, br
 Dim pw As Long, ph As Long
     piw = cDibbuffer0.Width
     pih = cDibbuffer0.Height
-    r = Atn(CSng(piw) / CSng(pih)) + PI / 2#
+    r = Atn(CSng(piw) / CSng(pih)) + Pi / 2#
      K = Fix(Abs((piw / Cos(r) / 2) * zoomfactor) + 0.5)
 
 Dim cDIBbuffer1 As Object
@@ -904,8 +904,8 @@ On Error Resume Next
     K = -myw / (2# * sIn(r))
     
 
-       x_step2 = CLng(Fix(Cos(Angle! + PI / 2) * pw))
-    y_step2 = CLng(Fix(sIn(Angle! + PI / 2) * ph))
+       x_step2 = CLng(Fix(Cos(Angle! + Pi / 2) * pw))
+    y_step2 = CLng(Fix(sIn(Angle! + Pi / 2) * ph))
 
     x_step = CLng(Fix(Cos(Angle!) * pw))
     y_step = CLng(Fix(sIn(Angle!) * ph))
@@ -1112,7 +1112,7 @@ End Sub
 
 Public Sub RotateDibNew(cDibbuffer0 As cDIBSection, Optional ByVal Angle! = 0, _
         Optional ByVal zoomfactor As Single = 1, Optional bckColor As Long = &HFFFFFF)
-Const PI = 3.14159!
+Const Pi = 3.14159!
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
 Dim K As Single, r As Single
 Dim br As Byte, bG As Byte, bbb As Byte, ppBa As Long
@@ -1143,7 +1143,7 @@ GetMem1 ppBa + 1, bG
 GetMem1 ppBa + 2, br
 piw = cDibbuffer0.Width
 pih = cDibbuffer0.Height
-r = Atn(piw / pih) + PI / 2!
+r = Atn(piw / pih) + Pi / 2!
 K = Abs((piw / Cos(r) / 2!) * zoomfactor)
 Dim cDIBbuffer1 As Object
 Set cDIBbuffer1 = New cDIBSection
@@ -1291,9 +1291,9 @@ If cDibbuffer0.create(myw, myh) Then
 On Error GoTo there
         With bstack.Owner
          If bstack.toprinter Then
-         cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+         cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
          Else
-        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
             End If
             BACKSPRITE = DIBtoSTR(cDibbuffer0)
         End With
@@ -1307,7 +1307,7 @@ End Function
 '
 Public Function RotateDib(bstack As basetask, cDibbuffer0 As cDIBSection, Optional ByVal Angle! = 0, Optional ByVal zoomfactor As Single = 100, _
     Optional bckColor As Long = -1, Optional nogetback As Boolean = False, Optional Alpha As Long = 100, Optional amask$ = vbNullString)
-    Const PI = 3.14159!
+    Const Pi = 3.14159!
      Dim b As Single
    b = CSng(CLng(Angle!) Mod 90 = 0)
 Angle! = -MyMod(Angle!, 360!) * 1.745329E-02!
@@ -1374,9 +1374,9 @@ On Error GoTo there
    
 With bstack.Owner
     If bstack.toprinter Then
-        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
     Else
-        cDibbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+        cDibbuffer0.LoadPictureBlt bstack.Owner.Hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
     End If
     If Not nogetback Then BACKSPRITE = DIBtoSTR(cDibbuffer0)
 End With
@@ -1540,7 +1540,7 @@ End Function
 
 Public Function RotateDib1(bstack As basetask, cDibbuffer0 As cDIBSection, Optional ByVal Angle! = 0, Optional ByVal zoomfactor As Single = 100, _
    Optional bckColor As Long = -1, Optional BACKx As Long, Optional BACKy As Long)
-   Const PI = 3.14159!
+   Const Pi = 3.14159!
    Dim b As Single
    
    b = CSng(Angle! Mod 90 = 0)
@@ -1574,9 +1574,9 @@ cDibbuffer0.Cls bckColor
 Else
         With bstack.Owner
         If bstack.toprinter Then
-        cDibbuffer0.LoadPictureBlt .hDC, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
+        cDibbuffer0.LoadPictureBlt .Hdc, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
         Else
-                      cDibbuffer0.LoadPictureBlt .hDC, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
+                      cDibbuffer0.LoadPictureBlt .Hdc, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
            End If
         End With
         End If
@@ -1700,7 +1700,7 @@ Sub Conv24(cDibbuffer0 As Object)
  Dim cDIBbuffer1 As Object
  Set cDIBbuffer1 = New cDIBSection
 Call cDIBbuffer1.create(cDibbuffer0.Width, cDibbuffer0.Height)
-cDIBbuffer1.LoadPictureBlt cDibbuffer0.hDC
+cDIBbuffer1.LoadPictureBlt cDibbuffer0.Hdc
 Set cDibbuffer0 = cDIBbuffer1
 Set cDIBbuffer1 = Nothing
 End Sub
@@ -1730,7 +1730,7 @@ Dim K As Single, r As Single, aa As Single
 aa = (CLng(Angle! * 100) Mod 36000) / 100
 
 Angle! = -Angle * 1.74532925199433E-02
-   r = Atn(piw / CSng(pih)) + PI / 2!
+   r = Atn(piw / CSng(pih)) + Pi / 2!
     K = piw / Cos(r)
     Dim myw As Long, myh As Long
  myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * sIn(Angle!))) * Size, 0)
@@ -2534,18 +2534,18 @@ Public Function HTML(sText As String, _
                   "EndHTML:bbbbbbbbbb" + vbCrLf + _
                   "StartFragment:cccccccccc" + vbCrLf + _
                   "EndFragment:dddddddddd" + vbCrLf
-    Dim A() As Byte, b() As Byte, C() As Byte
+    Dim A() As Byte, b() As Byte, c() As Byte
    '' sText = "<FONT FACE=Arial SIZE=1 COLOR=BLUE>" + sText + "</FONT>"
    
     A() = Utf16toUtf8(sContextStart & "<!--StartFragment -->")
     b() = Utf16toUtf8(sText)
-    C() = Utf16toUtf8("<!--EndFragment -->" & sContextEnd)
+    c() = Utf16toUtf8("<!--EndFragment -->" & sContextEnd)
    Dim sData As String, mdata As Long, eData As Long, fData As Long
 
    
     eData = UBound(A()) - LBound(A()) + 1
    mdata = UBound(b()) - LBound(b()) + 1
-   fData = UBound(C()) - LBound(C()) + 1
+   fData = UBound(c()) - LBound(c()) + 1
    m_sDescription = Replace(m_sDescription, "aaaaaaaaaa", Format(Len(m_sDescription), "0000000000"))
    m_sDescription = Replace(m_sDescription, "bbbbbbbbbb", Format(Len(m_sDescription) + eData + mdata + fData, "0000000000"))
    m_sDescription = Replace(m_sDescription, "cccccccccc", Format(Len(m_sDescription) + eData, "0000000000"))
@@ -2557,7 +2557,7 @@ Public Function HTML(sText As String, _
   CopyMemory all(0), M(0), Len(m_sDescription)
   CopyMemory all(Len(m_sDescription)), A(0), eData
   CopyMemory all(Len(m_sDescription) + eData), b(0), mdata
-  CopyMemory all(Len(m_sDescription) + eData + mdata), C(0), fData
+  CopyMemory all(Len(m_sDescription) + eData + mdata), c(0), fData
   HTML = all()
   
 End Function
@@ -3087,13 +3087,13 @@ Dim t(0 To 3) As Long
    CopyMemory ByVal A, t(0), 2
 End Sub
 Sub VarByRefClean(ByVal A As Long)
-Static Z As Variant
-CopyMemory ByVal A, Z, 16
+Static z As Variant
+CopyMemory ByVal A, z, 16
 End Sub
 Function VariantIsRef(ByVal A As Long) As Boolean
-Static Z As Integer
-   CopyMemory Z, ByVal A, 2
-   VariantIsRef = (Z And &H4000) = &H4000
+Static z As Integer
+   CopyMemory z, ByVal A, 2
+   VariantIsRef = (z And &H4000) = &H4000
 End Function
 Sub SwapVariantRef(ByVal A As Long, ByVal b As Long)
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
@@ -3243,22 +3243,22 @@ A$ = myUcase(A$, True)
 Select Case A$
 Case "@(", "$(", "~(", "?", "->", "[]"
 Case "ABOUT", "ABOUT$", "ABS(", "ADDRESSOF", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
-Case "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
+Case "ARG(", "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
 Case "BACK", "BACKGROUND", "BACKWARD(", "BANK(", "BASE", "BEEP", "BIGINTEGER", "BIGINTEGER(", "BINARY", "BINARY.ADD(", "BINARY.AND(", "BINARY.NEG(", "BINARY.NOT("
 Case "BINARY.OR(", "BINARY.ROTATE(", "BINARY.SHIFT(", "BINARY.XOR(", "BITMAPS", "BMP$(", "BOLD"
 Case "BOOLEAN", "BORDER", "BREAK", "BROWSER", "BROWSER$", "BUFFER", "BUFFER(", "BYTE", "CALL", "CASE", "CASCADE", "CAT", "CAR("
 Case "CDATE(", "CDR(", "CEIL(", "CENTER", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN"
 Case "CHR$(", "CHRCODE$(", "CHRCODE(", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLIPBOARD$", "CLIPBOARD.DRAWING", "CLIPBOARD.IMAGE", "CLIPBOARD.IMAGE$"
 Case "CLOSE", "CLS", "CODE", "CODEPAGE", "COLLIDE(", "COLOR", "COLOR(", "COLORS"
-Case "COLOUR(", "COM", "COMMAND", "COMMAND$", "COMMIT", "COMMON", "COMPARE(", "COMPRESS", "COMPUTER", "COMPUTER$", "CONCURRENT", "CONST", "CONS("
-Case "CONTINUE", "CONTROL$", "COPY", "COS(", "CTIME(", "CURRENCY", "CURSOR", "CURVE"
+Case "COLOUR(", "COM", "COMMAND", "COMMAND$", "COMMIT", "COMMON", "COMPARE(", "COMPRESS", "COMPUTER", "COMPUTER$", "CONCURRENT", "CONJUGATE(", "CONST", "CONS("
+Case "CONTINUE", "CONTROL$", "COPY", "COS(", "CTIME(", "CURRENCY", "CURSOR", "CURVE", "COMPLEX", "CXCOMPLEX"
 Case "DATA", "DATE", "DATE$(", "DATE(", "DATEFIELD", "DB.PROVIDER", "DB.USER", "DECIMAL", "DECLARE", "DEF", "DELETE"
 Case "DESCENDING", "DESKTOP", "DIM", "DIMENSION(", "DIR", "DIR$", "DIV", "DO"
 Case "DOC.LEN(", "DOC.PAR(", "DOC.UNIQUE.WORDS(", "DOC.WORDS(", "DOCUMENT", "DOS", "DOUBLE", "DOWN", "DRAW", "DRAWING"
 Case "DRAWINGS", "DRIVE$(", "DRIVE.SERIAL(", "DROP", "DRW$(", "DURATION", "EACH("
 Case "EDIT", "EDIT.DOC", "ELSE", "ELSE.IF", "EMPTY", "END", "END(", "ENUM", "ENUMERATION", "ENVELOPE$(", "EOF("
 Case "ERASE", "ERROR", "ERROR$", "ESCAPE", "EVAL(", "EVAL$(", "EVENT", "EVENTS", "EVERY", "EXCLUSIVE", "EXECUTE", "EXIST(", "EXIST.DIR("
-Case "EXIT", "EXPORT", "EXTERN", "FALSE", "FAST", "FIELD", "FIELD$(", "FILE$("
+Case "EXIT", "EXP(", "EXPORT", "EXTERN", "FALSE", "FAST", "FIELD", "FIELD$(", "FILE$("
 Case "FILE.APP$(", "FILE.NAME$(", "FILE.NAME.ONLY$(", "FILE.PATH$(", "FILE.STAMP(", "FILE.TITLE$(", "FILE.TYPE$(", "FILELEN(", "FILES"
 Case "FILL", "FILTER(", "FILTER$(", "FINAL", "FIND", "FKEY", "FLOODFILL", "FLOOR(", "FLUSH", "FOLD(", "FOLD$(", "FONT", "FONTNAME$", "FOR"
 Case "FORM", "FORMAT$(", "FORMLABEL", "FORWARD(", "FRAC(", "FRAME", "FREQUENCY(", "FROM", "FUNCTION", "FUNCTION$(", "FUNCTION("
@@ -3271,7 +3271,7 @@ Case "JOYPAD", "JOYPAD(", "JOYPAD.ANALOG.X(", "JOYPAD.ANALOG.Y(", "JOYPAD.DIRECT
 Case "KEYPRESS(", "LAMBDA", "LAMBDA(", "LAMBDA$", "LAMBDA$(", "LAN$", "LANDSCAPE", "LATIN", "LAYER", "LAZY$(", "LCASE$(", "LEFT$(", "LEFTPART$(", "LEGEND", "LEN"
 Case "LEN(", "LEN.DISP(", "LET", "LETTER$", "LIB", "LICENSE", "LINE", "LINESPACE", "LINK", "LIST", "LN("
 Case "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LOCALE$(", "LOCALE(", "LOG(", "LONG", "LOOP"
-Case "LOWORD(", "LOWWORD(", "LTRIM$(", "MAIN.TASK", "MAP(", "MARK", "MASTER", "MATCH(", "MAX(", "MAX.DATA$("
+Case "LOWORD(", "LOWWORD(", "LTRIM$(", "MAIN.TASK", "MAGNITUDE(", "MAP(", "MARK", "MASTER", "MATCH(", "MAX(", "MAX.DATA$("
 Case "MAX.DATA(", "MDB(", "MEDIA", "MEDIA.COUNTER", "MEMBER$(", "MEMBER.TYPE$(", "MEMO", "MEMORY", "MENU"
 Case "MENU$(", "MENU.VISIBLE", "MENUITEMS", "MERGE.DOC", "METHOD", "MID$(", "MIN(", "MIN.DATA$(", "MIN.DATA("
 Case "MOD", "MOD(", "MODE", "MODPOW(", "MODULE", "MODULE$", "MODULE(", "MODULES", "MODULE.NAME$", "MONITOR", "MONITORS", "MONITOR.STACK", "MONITOR.STACK.SIZE", "MOTION", "MOTION.W", "MOTION.WX"
@@ -3281,8 +3281,8 @@ Case "MOVIES", "MUSIC", "MUSIC.COUNTER", "NAME", "NEW", "NEXT"
 Case "NORMAL", "NOT", "NOTHAVE(", "NOTHING", "NOW", "NUMBER", "NULL", "OBJECT", "OFF", "OLE", "ON"
 Case "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPERATOR", "OPTIMIZATION", "OR", "ORDER", "ORDER(", "OSBIT", "OS$", "OUT", "OUTPUT"
 Case "OVER", "OVERWRITE", "PAGE", "PARAGRAPH$(", "PARAGRAPH(", "PARAGRAPH.INDEX(", "PARAM(", "PARAM$(", "PARAMETERS$", "PART", "PARENT", "PASSWORD"
-Case "PATH", "PATH$(", "PAUSE", "PEN", "PI", "PIECE$(", "PIPE", "PIPENAME$(", "PLATFORM$", "PLAY"
-Case "PLAYER", "PLAYSCORE", "POINT", "POINTER", "POINTER(", "POINT(", "POLYGON", "PORTRAIT", "POS", "POS(", "POS.X", "POS.Y", "PRINT"
+Case "PATH", "PATH$(", "PAUSE", "PEN", "PHASE(", "PI", "PIECE$(", "PIPE", "PIPENAME$(", "PLATFORM$", "PLAY"
+Case "PLAYER", "PLAYSCORE", "POINT", "POINTER", "POINTER(", "POINT(", "POLAR(", "POLYGON", "PORTRAIT", "POS", "POS(", "POS.X", "POS.Y", "PRINT"
 Case "PRINTER", "PRINTERNAME$", "PRINTING", "PRIVATE", "PROFILER", "PROPERTY", "PROPERTY(", "PROPERTY$(", "PROPERTIES", "PROPERTIES$", "PROTOTYPE", "PSET", "PUBLIC", "PUSH", "PUT", "QUEUE", "QUOTE$("
 Case "RANDOM", "RANDOM(", "READ", "READY(", "RECORDS(", "RECURSION.LIMIT", "REFER", "REFRESH", "RELEASE", "REM"
 Case "REMOVE", "REPEAT", "REPLACE$(", "REPORT", "REPORTLINES", "RESTART", "RETRIEVE", "RETURN", "REV(", "REVISION"
@@ -3319,7 +3319,7 @@ Case "дипка", "дипко", "дипкос", "дойилг", "дойилг(", "долг", "дяолеас", "дуадий
 Case "дуадийо.амти(", "дуадийо.амтистяожо(", "дуадийо.апо(", "дуадийо.г(", "дуадийо.йаи(", "дуадийо.окисхгсг(", "дуадийо.ови(", "дуадийо.пяосхесг(", "дуадийо.пяо(", "дуолиса(", "дысе"
 Case "еццяажес(", "еццяажо", "еццяажоу.кенеис(", "еццяажоу.лгйос(", "еццяажоу.ломадийес.кенеис(", "еццяажоу.пая(", "еццяаьило(", "ецйуяо(", "еий$("
 Case "еийома", "еийома(", "еийома.ь(", "еийома.ь.сглеиа(", "еийома.у(", "еийома.у.сглеиа(", "еийома.в(", "еийома.в.сглеиа(", "еийомес", "еийомидио", "еимая", "еимаи", "еимця"
-Case "еисацыцг", "еисацыцг$(", "еисацыцгс", "ейдосг", "ейтекесг", "ейтупысг", "ейтупысгс", "ейтупытгс", "ейтупытгс$", "ейжя(", "ейжя$("
+Case "еисацыцг", "еисацыцг$(", "еисацыцгс", "ейх(", "ейдосг", "ейтекесг", "ейтупысг", "ейтупысгс", "ейтупытгс", "ейтупытгс$", "ейжя(", "ейжя$("
 Case "ейжяасг(", "ейжяасг$(", "екецвос", "екецвос.сыяоу", "екецвос.лецехос.сыяоу", "еккгмийа", "емаомола$", "емхесг", "емйол$", "емйол(", "емтасг", "емтокг$"
 Case "емы", "емысе", "CONS(", "емысг.сеияас$(", "емысг(", "енацыцг", "енодос", "енытеяийг", "епам$(", "епамакабе", "епамекабе"
 Case "епамы", "епекене", "епекене.амтийеилемо", "епекене.цяаллатосеияа", "епекене.ояцамо", "епекене.вяыла", "епицяажг", "епийаияо", "епикене", "епикене.амтийеилемо", "епикене.цяаллатосеияа"
@@ -3336,20 +3336,20 @@ Case "йукисг", "йуяио", "йуяио.еяцо", "йыд(", "йыдийа", "йыдийосекида", "кабг", 
 Case "кабг.амакоцийо.в(", "кабг.йатеухумсг(", "кахос", "кахос$", "кахос.таимиас$", "калда", "калда(", "калда$", "калда$(", "катимийа", "кенеис", "киста", "коц("
 Case "коцийо", "коцийос", "коцистийо", "коцистийос", "коцос", "коцос$(", "кс$", "кж(", "лайяу", "лайяус", "ле", "лец(", "лец$(", "лецако("
 Case "лецако.сеияас$(", "лецако.сеияас(", "лецакосайеяаиос", "лецакосайеяаиос(", "лецецомота", "лецехос", "лецехос.сыяоу", "лецехос.у(", "лецехос.в(", "леходос", "лекос$(", "лекоус.тупос$("
-Case "лекыдиа", "леяос", "леяос(", "леяос$(", "лес$(", "лета", "летабкгтг", "летабкгтес", "летахесг", "летахесг(", "левяи", "лгдемийос", "лгйос", "лгйос(", "лгйос.елж("
-Case "лий(", "лий$(", "лийяо(", "лийяо.сеияас$(", "лийяо.сеияас(", "лийяос.йатакоцос$(", "лмглг", "ломадиаио", "ломадиаиос", "ломадийо", "лояжг$(", "лоусийг", "лоусийг.летягтгс", "лпип"
+Case "лекыдиа", "леяос", "леяос(", "леяос$(", "лес$(", "лета", "летабкгтг", "летабкгтес", "летахесг", "летахесг(", "летяо(", "левяи", "лгдемийос", "лгйос", "лгйос(", "лгйос.елж("
+Case "лицадийос", "лий(", "лий$(", "лийяо(", "лийяо.сеияас$(", "лийяо.сеияас(", "лийяос.йатакоцос$(", "лмглг", "ломадиаио", "ломадиаиос", "ломадийо", "лояжг$(", "лоусийг", "лоусийг.летягтгс", "лпип"
 Case "лпяоста(", "маи", "меа", "мео", "меои", "меос", "мгла", "мглата", "мглата$"
 Case "нейима", "одгциа", "одгцос$(", "охомг", "охомес", "олака", "ойм$(", "олада", "олада(", "олада$(", "олада.сумоко(", "омола", "омола.аявеиоу$("
-Case "омола.аявеиоу.ломо$(", "омола.тлглатос$", "омола.вягстг$", "ояифомтиа", "ояио.амадяолгс", "ояисе", "ояож(", "осо", "оуяа", "ови", "паифеижымг", "паийтгс", "паийтгс(", "паине", "пай(", "пай$(", "памта"
+Case "омола.аявеиоу.ломо$(", "омола.тлглатос$", "омола.вягстг$", "ояифомтиа", "ояио.амадяолгс", "ояисе", "ояисла(", "ояож(", "осо", "оуяа", "ови", "паифеижымг", "паийтгс", "паийтгс(", "паине", "пай(", "пай$(", "памта"
 Case "памы", "памылисо(", "паяацяажос$(", "паяацяажос(", "паяал(", "паяал$(", "паяахесг$(", "паяахуяо", "паяалетяои$", "паяе", "паяейаяе$"
 Case "паяелбокг", "патглемо(", "павос", "педиа", "педио", "педио$(", "пеф$(", "пема", "пеяи"
 Case "пеяи$", "пеяихыяио", "пета", "пи", "пимайас", "пимайас$(", "пимайас(", "пимайес", "писы("
-Case "пкациа", "пкаисио", "пкатос", "пкатос.сглеиоу", "пкатос.таимиас", "пкатжояла$", "пкгйтяокоцио", "покуцымо"
+Case "пкациа", "пкаисио", "пкатос", "пкатос.сглеиоу", "пкатос.таимиас", "пкатжояла$", "пкгйтяокоцио", "покийос(", "покуцымо"
 Case "пяос", "пяосаялоцгс", "пяосхесе.еццяажо", "пяосхгйг", "пяытотупо", "пяыто(", "пяосыяимо$", "пяовеияо", "пяовеияо$", "пяовеияо.еийома", "пяовеияо.еийома$", "пяовеияо.сведио", "яеула", "яифа("
 Case "яоутима", "яоутимас", "яухлисеис", "яыта$(", "яыта(", "саяысе", "сбгсе", "се"
 Case "сеияа", "сеияиайос.дисйоу(", "секида", "семаяио", "сгл", "сгл(", "сглади", "сглеио", "сглеио(", "сглеяа", "сйоупидиа", "стахеяг", "стахеяес", "статийг", "статийес"
 Case "стг", "стгкг", "стгкг(", "стгм", "сто", "стой", "стовои", "стовос", "стяоцц(", "суццяажеас"
-Case "суццяажг", "суцйяиме(", "суцйяоусг(", "суцвымеусе.еццяажо", "сулпиесг", "сулпкгяысг", "сум(", "сумаятгсг", "сумаятгсгс", "сумаятгсг$("
+Case "суццяажг", "суцйяиме(", "суцйяоусг(", "суцвымеусе.еццяажо", "суфуцгс(", "сулпиесг", "сулпкгяысг", "сум(", "сумаятгсг", "сумаятгсгс", "сумаятгсг$("
 Case "сумаятгсг(", "сумевисе", "сумхгла", "сус", "сусйеуг", "сусйеуг.пяобокгс$", "сустгла", "сувмотгта(", "свд$(", "сведио", "сведиа"
 Case "сведио.мглатым", "сыяос", "сыяос(", "сыяос$(", "сыяоутупос$(", "сысе", "сысе.еццяажо", "таимиа", "таимиа.летягтгс", "таимиес"
 Case "танг", "танг(", "танимолгсг", "танимолгсг(", "таутисг(", "таутовяомо", "текестг", "текестгс", "текийг", "текийо", "текийос", "текос", "текос(", "тек(", "тий", "титкос.аявеиоу$(", "тилг"
@@ -3357,7 +3357,7 @@ Case "тилг(", "тилг$(", "тилгсыяоу$(", "тилгсыяоу(", "типота", "титкос", "титкос
 Case "тон.еж(", "топийа", "топийес", "топийг", "топийо", "топийо$(", "топийо(", "топос$(", "топос.аявеиоу$("
 Case "тоте", "тяап(", "тупос", "тупос$(", "тупос.аявеиоу$(", "тупысе", "туваиос", "туваиос(", "тыяа", "у.сглеиа"
 Case "упаявеи(", "упаявеи.йатакоцос(", "упеяйкасг", "уплея(", "упо", "уподум(", "упойатакоцос", "упок", "упок(", "упокоцистг", "упокоцистгс$", "упокоипо"
-Case "уполмгла", "упыяа(", "уьгкос", "уьос", "уьос.сглеиоу", "уьос.таимиас", "жайекос$(", "жамеяо$(", "жаядиа", "жеяе"
+Case "уполмгла", "упыяа(", "уьгкос", "уьос", "уьос.сглеиоу", "уьос.таимиас", "жайекос$(", "жамеяо$(", "жаядиа", "жасг(", "жеяе"
 Case "жеяеписы", "жхимоуса", "жиктяо(", "жиктяо$(", "жомто", "жояла", "жояла$", "жоятос", "жоятысе", "жоятысе.еццяажо"
 Case "жяасг", "жымг", "жыто$(", "в.сглеиа", "вая$(", "ваяайтгяес", "ваяане", "ваяйыд$("
 Case "ваяйыд(", "вйж(", "вягсг", "вягстг", "вягстгс", "вягстым", "вяомос$(", "вяомос(", "вяыла", "вяыла(", "вяылата", "вяылатисе"
@@ -3415,12 +3415,12 @@ Else
             If InStr("EeеЕ", Mid$(A$, sng&, 1)) > 0 Then
             fr = fr + 1
                 DE$ = "."
-                GoTo cont1234
+                GoTo CONT1234
             End If
         End If
     Else
       sng = sng + 1
-cont1234:
+CONT1234:
         Do While sng <= Len(A$)
        
         Select Case Mid$(A$, sng, 1)
@@ -3992,7 +3992,7 @@ End Function
 Function IsLabelAnew(where$, A$, r$, Lang As Long) As Long
 ' for left side...no &
 
-Dim rr&, one As Boolean, C$, gr As Boolean
+Dim rr&, one As Boolean, c$, gr As Boolean
 r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
 Dim I&, L As Long, p3 As Integer
@@ -4296,14 +4296,14 @@ myfun() = Array("PARAM(", 1, "паяал(", 1, "STACKITEM(", 2, "тилгсыяоу(", 2, "SGN
 , "BACKWARD(", 49, "писы(", 49, "FORWARD(", 50, "лпяоста(", 50, "DOC.PAR(", 51, "еццяажоу.пая(", 51, "MAX.DATA(", 52, "лецако.сеияас(", 52, "MIN.DATA(", 53, "лийяо.сеияас(", 53 _
 , "MAX(", 54, "лецако(", 54, "MIN(", 55, "лийяо(", 55, "COMPARE(", 56, "суцйяиме(", 56, "DOC.UNIQUE.WORDS(", 57, "еццяажоу.ломадийес.кенеис(", 57, "DOC.WORDS(", 58, "еццяажоу.кенеис(", 58 _
 , "DOC.LEN(", 59, "еццяажоу.лгйос(", 59, "LEN.DISP(", 60, "лгйос.елж(", 60, "LEN(", 61, "лгйос(", 61, "SQRT(", 62, "яифа(", 62, "FREQUENCY(", 63, "сувмотгта(", 63 _
-, "LOG(", 64, "коц(", 64, "LN(", 65, "кж(", 65, "ATN(", 66, "тон.еж(", 66, "TAN(", 67, "ежап(", 67, "COS(", 68, "сум(", 68, "SIN(", 69, "гл(", 69, "ABS(", 70, "апок(", 70, "LOWORD(", 71, "LOWWORD(", 71, "йатылисо(", 71, "йахе(", 72, "EACH(", 73 _
+, "LOG(", 64, "коц(", 64, "LN(", 65, "кж(", 65, "ATN(", 66, "тон.еж(", 66, "TAN(", 67, "ежап(", 67, "COS(", 68, "сум(", 68, "SIN(", 69, "гл(", 69, "ABS(", 70, "апок(", 70, "летяо(", 70, "MAGNITUDE", 70, "LOWORD(", 71, "LOWWORD(", 71, "йатылисо(", 71, "йахе(", 72, "EACH(", 73 _
 , "HIWORD(", 74, "HIGHWORD(", 74, "памылисо(", 74, "BINARY.NEG(", 75, "дуадийо.амти(", 75, "дуадийо.амтистяожо(", 75, "BINARY.OR(", 76, "дуадийо.г(", 76 _
 , "BINARY.AND(", 77, "дуадийо.йаи(", 77, "BINARY.XOR(", 78, "дуадийо.апо(", 78, "HILOWWORD(", 79, "дуолиса(", 79, "BINARY.SHIFT(", 80, "дуадийо.окисхгсг(", 80 _
 , "BINARY.ROTATE(", 81, "дуадийг.пеяистяожг(", 81, "SINT(", 82, "айеяаио.дуадийо(", 82, "USGN(", 83, "дуадийо(", 83, "UINT(", 84, "дуадийо.айеяаио(", 84, "ROUND(", 85, "стяоцц(", 85 _
 , "INT(", 86, "ай(", 86, "SEEK(", 87, "летахесг(", 87, "EOF(", 88, "текос(", 88, "RANDOM(", 89, "туваиос(", 89, "CHRCODE(", 90, "ваяйыд(", 90, "ASC(", 91, "йыд(", 91 _
 , "GROUP(", 92, "олада(", 92, "TEST(", 93, "дойилг(", 93, "CONS(", 94, "емысг(", 94, "CAR(", 95, "пяыто(", 95, "CDR(", 96, "еполема(", 96, "сыяос(", 24, "STACK(", 24, "READY(", 97, "етоило(", 97, "PROPERTY(", 98, "идиотгта(", 98, "IF(", 99, "ам(", 99, "ORDER(", 100, "танг(", 100, "BANK(", 101, "тяап(", 101, "CEIL(", 102, "ояож(", 102, "FLOOR(", 86, "дапед(", 86, "еийома(", _
 103, "IMAGE(", 103, "BUFFER(", 104, "диаяхяысг(", 104, "BINARY.NOT(", 105, "дуадийо.ови(", 105, "POINTER(", 108, "деийтгс(", 108, "BINARY.ADD(", 109, "дуадийо.пяосхесг(", 109, "дуадийо.пяо(", 109, "HSL(", 110, "вйж(", 110, "PLAYER(", 111, "паийтгс(", 111, "GETOBJECT(", 112, "ANTIKEIMENO(", 112, "VARPTR(", 113, "диеухл(", 113, "BIGINTEGER(", 114, "лецакосайеяаиос(", 114 _
-, "MODPOW(", 115, "уподум(", 115, "MOD(", 116, "упок(", 116)
+, "MODPOW(", 115, "уподум(", 115, "MOD(", 116, "упок(", 116, "CONJUGATE(", 117, "суфуцгс(", 117, "ARG(", 118, "ояисла(", 118, "жасг(", 119, "PHASE(", 119, "POLAR(", 120, "покийос(", 120, "EXP(", 121, "ейх(", 121)
 If Not bhashbackup Is Nothing Then
 For I = 0 To UBound(myfun()) Step 2
     bhashbackup.ItemCreator CStr(myfun(I)), CLng(myfun(I + 1))
@@ -4317,7 +4317,7 @@ End Function
 
 Public Function allcommands(aHash As sbHash) As Boolean
 Dim mycommands(), I As Long
-mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "ASSERT", "BACK", "BACKGROUND", "BASE", "BEEP", "BIGINTEGER", "BINARY", "BITMAPS", "BOOLEAN", "BOLD", "BREAK", "BROWSER", "BUFFER", "BYTE", "CALL", "CASE", "CAT", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLOSE", "CLS", "CODEPAGE", "COLOR", "COMMIT", "COMPRESS", "CONST", "CONTINUE", "COPY", "CURRENCY", "CURSOR", "CURVE", "DATA", "DATE", "DB.PROVIDER", "DB.USER", "DECIMAL" _
+mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "ASSERT", "BACK", "BACKGROUND", "BASE", "BEEP", "BIGINTEGER", "BINARY", "BITMAPS", "BOOLEAN", "BOLD", "BREAK", "BROWSER", "BUFFER", "BYTE", "CALL", "CASE", "CAT", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLOSE", "CLS", "CODEPAGE", "COLOR", "COMPLEX", "COMMIT", "COMPRESS", "CONST", "CONTINUE", "COPY", "CURRENCY", "CURSOR", "CURVE", "DATA", "DATE", "DB.PROVIDER", "DB.USER", "DECIMAL" _
 , "DECLARE", "DEF", "DELETE", "DESKTOP", "DIM", "DIR", "DIV", "DO", "DOCUMENT", "DOS", "DOUBLE", "DRAW", "DRAWING", "DRAWINGS", "DROP", "DURATION", "EDIT", "EDIT.DOC", "ELSE", "ELSE.IF", "EMPTY", "END", "ENUM", "ENUMERATION", "ERASE", "ERROR", "ESCAPE", "EVENT", "EVERY", "EXECUTE", "EXIT", "EXPORT", "FAST", "FIELD", "FILES", "FILL", "FIND", "FKEY", "FLOODFILL", "FLUSH", "FONT", "FOR", "FORM", "FORMLABEL", "FRAME", "FUNCTION", "GET", "GLOBAL" _
 , "GOSUB", "GOTO", "GRADIENT", "GREEK", "GROUP", "HALT", "HEIGHT", "HELP", "HEX", "HIDE", "HOLD", "HTML", "ICON", "IF", "IMAGE", "INLINE", "INPUT", "INSERT", "INTEGER", "INVENTORY", "ITALIC", "JOYPAD", "KEYBOARD", "LATIN", "LAYER", "LEGEND", "LET", "LINE", "LINESPACE", "LINK", "LIST", "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LONG", "LOOP", "MAIN.TASK", "MARK", "MEDIA", "MENU", "MERGE.DOC", "METHOD", "MODE", "MODULE" _
 , "MODULES", "MONITOR", "MOTION", "MOTION.W", "MOUSE.ICON", "MOVE", "MOVIE", "MOVIES", "MUSIC", "NAME", "NEW", "NEXT", "NORMAL", "OBJECT", "ON", "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPTIMIZATION", "ORDER", "OVER", "OVERWRITE", "PAGE", "PART", "PATH", "PEN", "PIPE", "PLAY", "PLAYER", "PLAYER(", "POLYGON", "PRINT", "PRINTER", "PRINTING", "PROFILER", "PROPERTIES", "PROTOTYPE", "PSET", "PUSH", "PUT", "READ", "RECURSION.LIMIT" _
@@ -4329,7 +4329,7 @@ mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "ASSERT", "BACK",
 , "еисацыцг", "ейдосг", "ейтекесг", "ейтупысг", "ейтупытгс", "екецвос", "еккгмийа", "емхесг", "емтасг", "емы", "емысе", "енацыцг", "енодос", "епамакабе", "епамекабе", "епекене", "епекене.амтийеилемо", "епекене.цяаллатосеияа", "епекене.ояцамо", "епекене.вяыла", "епицяажг", "епийаияо", "епикене", "епикене.амтийеилемо", "епикене.цяаллатосеияа", "епикене.ояцамо", "епикене.вяыла", "епикоцес", "епикоцг", "епикоцгс" _
 , "епипедо", "епистяожг", "епижамеиа", "еполемо", "етийета.жоялас", "еуяесг", "глеяолгмиа", "гвоцяажгсг", "гвои", "гвос", "хесе", "хесг", "идиотгтес", "исвмг", "ивмос", "йахаяг", "йахаяо", "йахе", "йакесе", "йалпукг", "йаме", "йамомийа", "йат", "йатакоцои", "йатакоцос", "йатастасг", "йатавыягсг", "йеилемо", "йемг", "йимгсг", "йимгсг.п", "йкасг", "йкеиди", "йкеисе", "йомсока", "йяата", "йяатгсе", "йяуье" _
 , "йуйкийа", "йуйкос", "йукисг", "йуяио.еяцо", "кабг", "кахос", "катимийа", "кенеис", "киста", "коцийос", "коцистийос", "коцос", "лайяус", "ле", "лецакосайеяаиос", "леходос", "лекыдиа", "леяос", "лета", "летабкгтг" _
-, "летабкгтес", "летахесг", "лоусийг", "лпип", "мео", "мгла", "мглата", "нейима", "охомг", "олада", "олака", "омола", "ояио.амадяолгс", "ояисе", "паийтгс", "паине", "памы", "паяахуяо", "паяе", "паяелбокг", "павос", "педио", "пема", "пеяи" _
+, "летабкгтес", "летахесг", "лоусийг", "лпип", "лицадийос", "мео", "мгла", "мглата", "нейима", "охомг", "олада", "олака", "омола", "ояио.амадяолгс", "ояисе", "паийтгс", "паине", "памы", "паяахуяо", "паяе", "паяелбокг", "павос", "педио", "пема", "пеяи" _
 , "пеяихыяио", "пета", "пимайас", "пимайес", "пкациа", "пкаисио", "пкгйтяокоцио", "покуцымо", "пяос", "пяосхесе.еццяажо", "пяосхгйг", "пяытотупо", "пяовеияо", "яоутима", "яухлисеис", "с", "саяысе", "сбгсе", "сеияа", "секида", "семаяио", "сгл", "сглади", "стахеяг", "стахеяес", "статийг", "статийес", "стг", "стгм", "сто", "стой", "стовои", "стовос", "суццяажеас", "суццяажг", "суцвымеусе.еццяажо", "сулпиесг" _
 , "сумаятгсг", "сумевисе", "сус", "сустгла", "сведио", "сведиа", "сведио.мглатым", "сыяос", "сысе", "сысе.еццяажо", "таимиа", "таимиес", "танг", "танимолгсг", "текос", "титкос", "тлгла", "тлглата", "томос", "топийа", "топийес", "топийг", "топийо", "тоте", "тупос", "тупысе", "упеяйкасг", "упойатакоцос", "жаядиа", "жеяе", "жеяеписы", "жомто", "жояла", "жоятысе" _
 , "жоятысе.еццяажо", "жымг", "ваяайтгяес", "ваяане", "вягсг", "вягстг", "вягстгс", "вяыла", "вяылатисе", "ьгжио", "?")
@@ -4346,6 +4346,8 @@ Case "DOUBLE", "дипка", "дипкос"
     aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoDouble)
 Case "INTEGER", "айеяаиос"
     aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoInteger)
+Case "COMPLEX", "лицадийос"
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoComplex)
 Case "LONG", "лайяус"
     aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoLong)
 Case "SINGLE", "апкос"
@@ -4652,7 +4654,7 @@ If Err.Number > 0 Then aSize = 12: fonttest.Font.Size = aSize
 End Sub
 Public Function InternalLeadingSpace() As Long
 On Error Resume Next
-    GetTextMetrics fonttest.hDC, TM
+    GetTextMetrics fonttest.Hdc, TM
   With TM
 InternalLeadingSpace = (.tmInternalLeading = 0) Or Not (.tmInternalLeading > 0)
 End With
@@ -4660,7 +4662,7 @@ End Function
 Public Function AverCharSpace(DDD As Object, Optional breakchar) As Long
 On Error Resume Next
 Dim tmm As TEXTMETRIC
-    GetTextMetrics DDD.hDC, tmm
+    GetTextMetrics DDD.Hdc, tmm
   With tmm
 AverCharSpace = .tmAveCharWidth
 breakchar = .tmBreakChar

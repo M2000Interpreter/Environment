@@ -741,7 +741,7 @@ With ExportArray
     .myarrbase = 0
     .PushDim (items)
     .PushEnd
-    .arr = True
+    .Arr = True
 
 
 For I = 1 To items

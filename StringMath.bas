@@ -605,7 +605,7 @@ Function IntStrByExp(sA As String, sExp As String) As String
     End If
 
 End Function
-Function IsProbablyPrime(sA As String, K As Integer) As Boolean
+Function IsProbablyPrime(sA As String, k As Integer) As Boolean
     If LenB(sA) < 1 Then Exit Function
     If LeftB$(sA, 1) = ChrB$(45) Then
         MyEr "Negative Prime not exist", "Αρνητικός πρώτος δεν υπάρχει"
@@ -623,18 +623,18 @@ Function IsProbablyPrime(sA As String, K As Integer) As Boolean
         D = divide(D, ChrB$(50))
     Wend
     Z = LenB(sA)
-    Dim A As String, X As String, I As Long, j As Long
+    Dim a As String, X As String, I As Long, j As Long
     
     IsProbablyPrime = True
-    For I = 1 To K
+    For I = 1 To k
         
         Do
-            A = SpaceB(LenB(sA))
+            a = SpaceB(LenB(sA))
             For j = 1 To LenB(sA)
-                MidB$(A, j, 1) = ChrB$(47 + Int(10 * RndM(rndbase) + 1))
+                MidB$(a, j, 1) = ChrB$(47 + Int(10 * RndM(rndbase) + 1))
             Next
-        Loop Until compare(nn, A) = 1 And compare(A, ChrB$(49)) > -1
-        X = modpow(A, (D), (sA))
+        Loop Until compare(nn, a) = 1 And compare(a, ChrB$(49)) > -1
+        X = modpow(a, (D), (sA))
         If compare(X, ChrB$(49)) <> 0 Then ' continue
             If compare(X, nn) <> 0 Then ' continue
                 For j = 1 To s
@@ -826,4 +826,22 @@ Public Function TrimZeroU(s$) As String
     Loop
     Mid$(TrimZeroU, j, lim - I + 2) = Mid$(s$, I)
     TrimZeroU = RTrim$(TrimZeroU)
+End Function
+Function cxStabThree(FN$, a1, b1, c1) As Variant
+Static var1(2) As Variant, var2(0) As String
+var1(0) = a1
+var1(1) = b1
+var1(2) = c1
+cxStabThree = CallByNameFixParamArray(nMath2, FN$, 1, var1(), var2(), 3, Nothing, 0, False, Nothing)
+End Function
+Function cxStabTwo(FN$, a1, b1) As Variant
+Static var1(2) As Variant, var2(0) As String
+var1(0) = a1
+var1(1) = b1
+cxStabTwo = CallByNameFixParamArray(nMath2, FN$, 1, var1(), var2(), 2, Nothing, 0, False, Nothing)
+End Function
+Function cxStabOne(FN$, a1) As Variant
+Static var1(2) As Variant, var2(0) As String
+var1(0) = a1
+cxStabOne = CallByNameFixParamArray(nMath2, FN$, 1, var1(), var2(), 1, Nothing, 0, False, Nothing)
 End Function
