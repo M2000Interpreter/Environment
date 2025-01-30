@@ -1,15 +1,18 @@
 M2000 Interpreter and Environment
 
-Version 13 active-X
-This is the 13th version of M2000. 
+Version 13 revision 1 active-X
+Two things:
+1 If we place white backcolor and black forecolor now the drop down list on M2000 console (open using Menu statement) now change the colors enough for good work of the XOR at the menu item (which always display white as the "inverted" color).
+This work with any combination when A xor B equal 0xFFFFFF:
 
-Expression Evaluator is capable to use Complex numeric ang BigIntegers, among other types.
+This is the test program:
+PEN #dd00FF
+CLS #22FF00
 
-One small thing breaks the compatibility with previous versions: Parentheses over a string now return string. Previous versions return a single item array. So (“alfa”) was like (1,) as one item array. This change to (“alfa”,) now. There is a module in Info file called compiler which uses the old format, and now this is changed to new standard format.
-Earlier versions of M2000 uses two evaluators, the  logic/arithmetic evaluator and the string evaluator, and a string always had to return from the string evaluator. Because for the use of string variables without the postfix $ the evaluators expanded to do many things: So the arithmetic evaluator may find a string, and the string evaluator may find a number. The rule here is that string comes first. So, if we mix numbers and strings, we get strings.
-The new two types: Complex and BigInteger can be mixed with other numeric types. Complex after BigInteger raise error, but BigInteger after Complex convert BigInteger to double value. Complex can be used with all other numeric values. If we use BigInteger without using Complex type all other numeric values are converted to BigInteger. If a String is founded on expression then we get a string expression. Complex and BigInteger values converted to strings automatically (Complex use decimal point from the current Locale id). Operators like Div and Mod can’t be used with Complex (we get errors). We can use +, -, *, / and power ** or ^ and unary -/+. There are new functions Mod() (used from BigInteger for returning modulus from division and for Complex type which return the complex Modulus). There are other like Conjugate(), Phase(), Arg(), Abs() (like Mod()), Cos(), Sin(), Exp(), Tan(), Atn(), Str$() for convert to string using formatting string, Round() for rounding both imaginary and real values. We can read imaginary and real values using |, so for variable a, the a|r and the a|I are the two parts of complex number (they are doubles). These are read/write properties (internal is a UDT, user defined type from math2 class). There are more functions which we can use from this class. We can define arrays of complex types, and of BigInteger type. BigInteger internal is an object.
-There are examples of complex and BigInteger types in info file. (See about the setup of M2000 Interpreter)
+MENU "OK","AA","BB"
+? MENU
 
+2. Some changes for printing to printers (I found a fault but not on my computer so I expand a precious soloution for another part of specific print code). I would like to change a lot, so this is an entry change.
 
 
 
