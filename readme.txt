@@ -1,18 +1,90 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 1 active-X
-Two things:
-1 If we place white backcolor and black forecolor now the drop down list on M2000 console (open using Menu statement) now change the colors enough for good work of the XOR at the menu item (which always display white as the "inverted" color).
-This work with any combination when A xor B equal 0xFFFFFF:
+Version 13 revision 2 active-X
+1. Remove of stop commands...(used for debugging)
+2. Fix some bugs
+This bug comes from combined ccode to produce the Complex number using parentesis:
+k=((100,),("aaaa",),(3,))
+? k#val(1)#val$(0)="aaaa"
+3. Added some features
+Printer.Margins    ' reset margins
+Printer.Margins LeftInTwips
+Printer.Margins LeftInTwips, TopInTwips
+Because Lmargin shift page left, the Right margin computed from the original width of the page, so we have to add the left margin. This is the same for bottom margin. These two place a white strip to exclude printing area, they don't resize the page.
+Printer.Margins LeftInTwips, TopInTwips, RightInTwips
+Printer.Margins LeftInTwips, TopInTwips, RightInTwips, BottomInTwips
 
-This is the test program:
-PEN #dd00FF
-CLS #22FF00
+Dates based on locale. Str$() based on Locale 1033 always.
+Date and Complex now works fine using initial type/values
 
-MENU "OK","AA","BB"
-? MENU
+Test Code:
+DATE A=45000, B="27/10/1966"
+LIST
+CLEAR
+VAR DATE A=45000, B="27/10/1966"
+LIST
+CLEAR
+DEF DATE A=45000, B="27/10/1966"
+LIST
+CLEAR
+LOCAL DATE A=45000, B="27/10/1966"
+LIST
+CLEAR
+GLOBAL DATE A=45000, B="27/10/1966"
+LIST
+CLEAR
+VAR A AS DATE=45000, B AS DATE="27/10/1966"
+LIST
+CLEAR
+DEF A AS DATE=45000, B AS DATE="27/10/1966"
+LIST
+CLEAR
+LOCAL A AS DATE=45000, B AS DATE="27/10/1966"
+LIST
+CLEAR
+GLOBAL A AS DATE=45000, B AS DATE="27/10/1966"
+LIST
+CLEAR
+COMPLEX A = (1,-2I)
+LIST
+CLEAR
+VAR COMPLEX A = (1,-2I)
+LIST
+CLEAR
+DEF COMPLEX A = (1,-2I)
+LIST
+CLEAR
+LOCAL COMPLEX A = (1,-2I)
+LIST
+CLEAR
+GLOBAL COMPLEX A = (1,-2I)
+LIST
+CLEAR
+VAR A AS COMPLEX = (1,-2I)
+LIST
+CLEAR
+DEF A AS COMPLEX = (1,-2I)
+LIST
+CLEAR
+LOCAL A AS COMPLEX = (1,-2I)
+LIST
+CLEAR
+GLOBAL A AS COMPLEX = (1,-2I)
+LIST
+CLEAR
+LOCALE 1033
+ALFA(45000)
+BETA()
+LOCALE 1032  ' GREEK
+ALFA(45000)
+BETA()
 
-2. Some changes for printing to printers (I found a fault but not on my computer so I expand a precious soloution for another part of specific print code). I would like to change a lot, so this is an entry change.
+SUB BETA(A AS DATE=45000)
+	? A
+END SUB
+SUB ALFA(A AS DATE)
+	? A
+END SUB
 
 
 

@@ -1175,9 +1175,19 @@ Private Function fixthis(p As Variant) As String
             ElseIf p.r = 0 Then
                 fixthis = "(" & fixthis(CVar(p.i)) & "i)"
             Else
-            If p.i < 0 Then fixthis = "" Else fixthis = "+"
-            fixthis = "(" & fixthis(CVar(p.r)) & fixthis & fixthis(CVar(p.i)) & "i)"
+                If p.i < 0 Then fixthis = "" Else fixthis = "+"
+                If Abs(p.i) = 1 Then
+                    If p.i < 0 Then
+                        fixthis = "(" & fixthis(CVar(p.r)) & "-i)"
+                    Else
+                        fixthis = "(" & fixthis(CVar(p.r)) & "+i)"
+                    End If
+                Else
+                    fixthis = "(" & fixthis(CVar(p.r)) & fixthis & fixthis(CVar(p.i)) & "i)"
+                End If
             End If
+        ElseIf MemInt(VarPtr(p)) = vbDate Then
+            fixthis = FormatDateWithLocale(GetlocaleString2(&H1F, Clid), CDate(p), Clid)
         Else
             fixthis = LTrim$(str(p))
             If Left$(fixthis, 1) = "." Then

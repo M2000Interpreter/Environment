@@ -45,6 +45,12 @@ Else
     If Err Then
         Err.Clear
         Set m = NewObjectFromActivexDll(App.path + "\m2000.dll", "callback")
+        If Err Then
+        Err.Clear
+        Set m = NewObjectFromActivexDll(App.path + "\lib.bin", "callback")
+        
+        
+        End If
     End If
 End If
 If Err Then

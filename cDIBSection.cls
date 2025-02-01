@@ -1267,7 +1267,7 @@ sh = sh * m_logy
     Else
         zf = zf / 100#
         If Not FitToPic Then
-            StretchPicture p_hdc, Abs((sw - Width * zf) / 2), Abs((sh - Height * zf) / 2), Width * zf, Height * zf, , , , , , rtxy
+            StretchPicture p_hdc, Abs((sw + offsetX - Width * zf) / 2), Abs((sh + offsetY - Height * zf) / 2), Width * zf, Height * zf, , , , , , rtxy
         Else
             If sw / Width < sh / Height Then
                 zf = zf * sw / Width
@@ -1572,15 +1572,15 @@ End If
 Else
 maxcolors = 0
 End If
-Dim i As Long
+Dim I As Long
 If NeoUnicodeFile(f) Then
 Open GetDosPath(f) For Binary As mf
 Put #mf, , ff
 Put #mf, , m_tBI.bmiHeader
 If maxcolors > 0 Then
-For i = 0 To maxcolors - 1
-Put #mf, , m_tBI.bmiColors(i)
-Next i
+For I = 0 To maxcolors - 1
+Put #mf, , m_tBI.bmiColors(I)
+Next I
 End If
 Put #mf, , bDib()
 Close #mf
@@ -1655,7 +1655,7 @@ If Me.Height > 0 Then
 End If
 
 End Sub
-Public Sub Text(p$, X As Long, Y As Long, Optional s As Single = -1, Optional DE# = 0#, Optional Style As Long = 272, Optional mWidth As Long = -1, Optional expnd As Single = -1)
+Public Sub Text(P$, X As Long, Y As Long, Optional s As Single = -1, Optional DE# = 0#, Optional Style As Long = 272, Optional mWidth As Long = -1, Optional expnd As Single = -1)
 Dim old_brush As Long, old_pen As Long, my_brush As Long, my_pen As Long, rA As Long
 Dim f As LOGFONT, hPrevFont As Long, hFont As Long
 Dim fff As Long, dr1 As RECT
@@ -1715,7 +1715,7 @@ SetBkMode m_hDC, m_fonttransparent
 'old_brush = SelectObject(m_hDC, my_brush)
 SetTextColor m_hDC, m_BackColor
 
-DrawText m_hDC, StrPtr(p$), Len(p$), dr1, fff
+DrawText m_hDC, StrPtr(P$), Len(P$), dr1, fff
 'old_brush = SelectObject(m_hDC, old_brush)
 'DeleteObject my_brush
 'old_pen = SelectObject(m_hDC, old_pen)
@@ -1725,7 +1725,7 @@ hFont = SelectObject(m_hDC, hPrevFont)
 
 FreeHDC
 End Sub
-Public Sub TextW(p$, X As Long, Y As Long, x1 As Long, y1 As Long, Optional s As Single = -1, Optional DE# = 0#, Optional Style As Long = 272)
+Public Sub TextW(P$, X As Long, Y As Long, x1 As Long, y1 As Long, Optional s As Single = -1, Optional DE# = 0#, Optional Style As Long = 272)
 Dim old_brush As Long, old_pen As Long, my_brush As Long, my_pen As Long, rA As Long
 Dim f As LOGFONT, hPrevFont As Long, hFont As Long
 Dim fff As Long, dr1 As RECT, expnd As Long
@@ -1776,7 +1776,7 @@ SetBkMode m_hDC, m_fonttransparent
 'my_brush = CreateSolidBrush(m_backcolor)
 'old_brush = SelectObject(m_hDC, my_brush)
 SetTextColor m_hDC, m_BackColor
-DrawText m_hDC, p$, Len(p$), dr1, fff
+DrawText m_hDC, P$, Len(P$), dr1, fff
 'old_brush = SelectObject(m_hDC, old_brush)
 'DeleteObject my_brush
 'old_pen = SelectObject(m_hDC, old_pen)
@@ -1819,12 +1819,12 @@ FreeHDC
 End Sub
 Public Sub Grami(x1 As Long, y1 As Long, x2 As Long, y2 As Long, w1 As Long, mycolor As Variant)
 Dim old_brush As Long, my_brush As Long, m_color As Long
-Dim old_pen As Long, my_pen As Long, p As POINTAPI
+Dim old_pen As Long, my_pen As Long, P As POINTAPI
 ' line
 m_color = getRGB(mycolor)
 needHDC
 
-MoveToEx m_hDC, x1, y1, p
+MoveToEx m_hDC, x1, y1, P
 my_pen = CreatePen(PS_SOLID, w1, m_color)
 old_pen = SelectObject(m_hDC, my_pen)
 ''''''''''''''''''''''''''''''''''''''''''
