@@ -122,7 +122,7 @@ End Sub
 
 
 Public Sub feedlabels(that As Object, EditTextWord As Boolean)
-Dim k As Long
+Dim K As Long
 Set myobject = that
 
 With gList1
@@ -163,47 +163,47 @@ If Typename(myobject) <> "GuiEditBox" Then
 .AddSep
 .additemFast "Έξοδος χωρίς αλλαγές shift F12"
 Else
-k = 4
+K = 4
 End If
 .AddSep
 .additemFast "Αναζήτησε πάνω F2"
-.menuEnabled(10 - k) = that.Form1supEnabled
+.menuEnabled(10 - K) = that.Form1supEnabled
 .additemFast "Αναζήτησε κάτω F3"
-.menuEnabled(11 - k) = that.Form1sdnEnabled
+.menuEnabled(11 - K) = that.Form1sdnEnabled
 .additemFast "Κάνε το ίδιο παντού F4"
-.menuEnabled(12 - k) = that.Form1mscatEnabled
+.menuEnabled(12 - K) = that.Form1mscatEnabled
 .additemFast "Αλλαγή λέξης F5"
-.menuEnabled(13 - k) = that.Form1rthisEnabled
+.menuEnabled(13 - K) = that.Form1rthisEnabled
 .AddSep
 .additemFast "Αναδίπλωση λέξεων F1"
 
-.MenuItem 16 - k, True, False, Not that.nowrap, "warp"
+.MenuItem 16 - K, True, False, Not that.nowrap, "warp"
 .additemFast "Μεταφορά Κειμένου"
-.MenuItem 17 - k, True, False, that.glistN.DragEnabled, "drag"
-If k = 0 Then
+.MenuItem 17 - K, True, False, that.glistN.DragEnabled, "drag"
+If K = 0 Then
 .additemFast "Χρώμα/Σύμπτυξη Γλώσσας F11"
 Else
 .additemFast "Χρώμα F11"
 End If
-.MenuItem 18 - k, True, False, shortlang, "short"
+.MenuItem 18 - K, True, False, shortlang, "short"
 .additemFast "Εμφάνιση Παραγράφων F10"
-.MenuItem 19 - k, True, False, that.showparagraph, "para"
+.MenuItem 19 - K, True, False, that.showparagraph, "para"
 .additemFast "Μέτρηση λέξεων F9"
 .AddSep
 .additemFast "Βοήθεια ctrl+F1"
 If Not EditTextWord Then
-If k = 0 Then
+If K = 0 Then
 .HeadLine = "Μ2000 Συντάκτης"
 .AddSep
 .additemFast "Τμήματα/Συναρτήσεις F12"
-.menuEnabled(23 - k) = SubsExist()
+.menuEnabled(23 - K) = SubsExist()
 ttl$(1) = "Εισαγωγή Αρχείου"
 
 .additemFast ttl$(1)
-.menuEnabled(24 - k) = True
+.menuEnabled(24 - K) = True
 ttl$(2) = "Εισαγωγή Πόρου"
 .additemFast ttl$(2)
-.menuEnabled(25 - k) = True
+.menuEnabled(25 - K) = True
 
 End If
 End If
@@ -235,45 +235,45 @@ If Typename(myobject) <> "GuiEditBox" Then
 .additemFast "Discard Changes shift F12"
 .AddSep
 Else
-k = 4
+K = 4
 End If
 .additemFast "Search up F2"
-.menuEnabled(10 - k) = that.Form1supEnabled
+.menuEnabled(10 - K) = that.Form1supEnabled
 .additemFast "Search down F3"
-.menuEnabled(11 - k) = that.Form1sdnEnabled
+.menuEnabled(11 - K) = that.Form1sdnEnabled
 .additemFast "Make same all F4"
-.menuEnabled(12 - k) = that.Form1mscatEnabled
+.menuEnabled(12 - K) = that.Form1mscatEnabled
 .additemFast "Replace word F5"
-.menuEnabled(13 - k) = that.Form1rthisEnabled
+.menuEnabled(13 - K) = that.Form1rthisEnabled
 .AddSep
 .additemFast "Word Wrap F1"
-.MenuItem 16 - k, True, False, Not that.nowrap, "warp"
+.MenuItem 16 - K, True, False, Not that.nowrap, "warp"
 .additemFast "Drag Enabled"
-.MenuItem 17 - k, True, False, that.glistN.DragEnabled, "drag"
-If k = 0 Then
+.MenuItem 17 - K, True, False, that.glistN.DragEnabled, "drag"
+If K = 0 Then
 .additemFast "Color/Short Language F11"
 Else
 .additemFast "Color F11"
 End If
-.MenuItem 18 - k, True, False, shortlang, "short"
+.MenuItem 18 - K, True, False, shortlang, "short"
 .additemFast "Paragraph Mark F10"
-.MenuItem 19 - k, True, False, that.showparagraph, "para"
+.MenuItem 19 - K, True, False, that.showparagraph, "para"
 .additemFast "Word count F9"
 .AddSep
 .additemFast "Help ctrl+F1"
 If Not EditTextWord Then
-If k = 0 Then
+If K = 0 Then
 .HeadLine = "Μ2000 Editor"
 .AddSep
 .additemFast "Modules/Functions F12"
-.menuEnabled(23 - k) = SubsExist()
+.menuEnabled(23 - K) = SubsExist()
 ttl$(1) = "Insert File"
 .additemFast ttl$(1)
-.menuEnabled(24 - k) = True
+.menuEnabled(24 - K) = True
 ttl$(2) = "Load Resource"
 .additemFast ttl$(2)
 
-.menuEnabled(25 - k) = True
+.menuEnabled(25 - K) = True
 
 End If
 End If
@@ -281,16 +281,12 @@ End If
 End With
 End If
 If Pouplastfactor = 0 Then Pouplastfactor = 1
- Pouplastfactor = ScaleDialogFix(helpSizeDialog)
-If ExpandWidth And False Then
-If PopUpLastWidth = 0 Then PopUpLastWidth = -1
-Else
+Pouplastfactor = ScaleDialogFix(helpSizeDialog)
 PopUpLastWidth = -1
-End If
 If ExpandWidth Then
-If PopUpLastWidth = 0 Then PopUpLastWidth = -1
+    If PopUpLastWidth = 0 Then PopUpLastWidth = -1
 Else
-PopUpLastWidth = -1
+    PopUpLastWidth = -1
 End If
 ScaleDialog Pouplastfactor, PopUpLastWidth
 gList1.ListIndex = 0
@@ -321,7 +317,7 @@ If Button = 1 Then
     If bordertop < 150 Then
     If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
     dr = True
-    mousepointer = vbSizeNWSE
+    MousePointer = vbSizeNWSE
     lX = X
     lY = Y
     End If
@@ -329,7 +325,7 @@ If Button = 1 Then
     Else
     If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then
     dr = True
-    mousepointer = vbSizeNWSE
+    MousePointer = vbSizeNWSE
     lX = X
     lY = Y
     End If
@@ -342,9 +338,9 @@ Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
  Else
- If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
 End If
 If dr Then
 
@@ -412,7 +408,7 @@ End Sub
 
 Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 
-If dr Then Me.mousepointer = 0
+If dr Then Me.MousePointer = 0
 dr = False
 End Sub
 
@@ -451,7 +447,7 @@ Private Sub glist1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, By
 If item = -1 Then
 
 Else
-gList1.mousepointer = 1
+gList1.MousePointer = 1
 If gokeyboard Then Exit Sub
 If gList1.ListSep(item) Then Exit Sub
 gList1.EditFlag = False
@@ -465,13 +461,13 @@ lastitem = item
 End If
 End Sub
 
-Private Sub gList1_KeyDown(keycode As Integer, shift As Integer)
+Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
 gokeyboard = True
-If keycode = vbKeyEscape Then Unload Me: Exit Sub
+If KeyCode = vbKeyEscape Then Unload Me: Exit Sub
 
 If gList1.ListIndex = -1 Then gList1.ListindexPrivateUse = lastitem
 
-If ((keycode >= vbKey0 And keycode <= vbKey9) Or (keycode >= vbKeyNumpad0 And keycode <= vbKeyNumpad9)) And gList1.EditFlag = False And gList1.ListIndex = 0 Then
+If ((KeyCode >= vbKey0 And KeyCode <= vbKey9) Or (KeyCode >= vbKeyNumpad0 And KeyCode <= vbKeyNumpad9)) And gList1.EditFlag = False And gList1.ListIndex = 0 Then
                         lastitem = 0
                     gList1.PromptLineIdent = Len(part1)
                     gList1.list(0) = vbNullString
@@ -479,10 +475,10 @@ If ((keycode >= vbKey0 And keycode <= vbKey9) Or (keycode >= vbKeyNumpad0 And ke
                     gList1.EditFlag = True
 
 ElseIf gList1.ListIndex = 0 And gList1.EditFlag = True Then
-        If keycode = vbKeyDown Or keycode = vbKeyReturn And gList1.EditFlag = True Then
+        If KeyCode = vbKeyDown Or KeyCode = vbKeyReturn And gList1.EditFlag = True Then
         gList1.EditFlag = False
         lastitem = 0
-        keycode = 0
+        KeyCode = 0
         DoCommand 1
         gList1.ListindexPrivateUse = 0
         gList1.ShowMe2
@@ -546,9 +542,9 @@ Private Sub gList1_selected2(item As Long)
 
 End Sub
 Private Sub DoCommand(item As Long)
-Dim k As Long, l As Long
+Dim K As Long, L As Long
 Dim b As basetask, fname$, files() As String, reader As Document, neo$, s$, noinp As Double
-If Typename(myobject) = "GuiEditBox" Then k = 4: l = 100
+If Typename(myobject) = "GuiEditBox" Then K = 4: L = 100
 Select Case item - 1
 Case -2
 Exit Sub
@@ -568,70 +564,70 @@ Exit Sub
 End With
 End If
 Case 2
-If k = 0 Then
+If K = 0 Then
     Form1.mn1sub
 Else
     myobject.mn1sub
 End If
 Case 3
-If k = 0 Then
+If K = 0 Then
     Form1.mn2sub
 Else
     myobject.mn2sub
 End If
 Case 4
-If k = 0 Then
+If K = 0 Then
     Form1.mn3sub
 Else
     myobject.mn3sub
 End If
-Case 6 - l
+Case 6 - L
     Form1.mn4sub
-Case 8 - l
+Case 8 - L
     Form1.mn5sub
-Case 10 - k
-If k = 0 Then
+Case 10 - K
+If K = 0 Then
     Form1.supsub
 Else
     myobject.supsub
 End If
-Case 11 - k
-If k = 0 Then
+Case 11 - K
+If K = 0 Then
     Form1.sdnSub
 Else
     myobject.sdnSub
 End If
-Case 12 - k
-If k = 0 Then
+Case 12 - K
+If K = 0 Then
     Form1.mscatsub
 Else
     myobject.mscatsub
 End If
-Case 13 - k
-If k = 0 Then
+Case 13 - K
+If K = 0 Then
     Form1.rthissub
 Else
     myobject.rthissub
 End If
-Case 15 - k
-gList1.ListSelectedNoRadioCare(17 - k) = Not gList1.ListChecked(17 - k)
-If k = 0 Then
+Case 15 - K
+gList1.ListSelectedNoRadioCare(17 - K) = Not gList1.ListChecked(17 - K)
+If K = 0 Then
 Form1.wordwrapsub
 Else
 myobject.wordwrapsub
 End If
-Case 16 - k
-gList1.ListSelectedNoRadioCare(18 - k) = Not gList1.ListChecked(18 - k)
+Case 16 - K
+gList1.ListSelectedNoRadioCare(18 - K) = Not gList1.ListChecked(18 - K)
 myobject.glistN.DragEnabled = Not myobject.glistN.DragEnabled
-Case 21 - k
-If k = 0 Then
+Case 21 - K
+If K = 0 Then
     Form1.helpmeSub
 Else
     myobject.helpmeSub
 End If
-Case 23 - l
+Case 23 - L
 showmodules
-Case 24 - l
+Case 24 - L
 Set b = New basetask
 Set b.Owner = LASTActiveForm
 If b.Owner Is Nothing Then Set b.Owner = Form1
@@ -641,12 +637,12 @@ Set reader = New Document
 If fname$ <> "" Then
 If ReturnListOfFiles <> "" Then
     files() = Split(ReturnListOfFiles, "#")
-    For k = 0 To UBound(files())
-    Form1.TEXT1.PasteText "\\$ " + files(k)
+    For K = 0 To UBound(files())
+    Form1.TEXT1.PasteText "\\$ " + files(K)
     Set reader = New Document
-    reader.ReadUnicodeOrANSI files(k), True
+    reader.ReadUnicodeOrANSI files(K), True
     Form1.TEXT1.PasteText reader.textDoc
-    Next k
+    Next K
 Else
     Form1.TEXT1.PasteText "\\$ " + fname$
     reader.ReadUnicodeOrANSI fname$, True, , True
@@ -694,27 +690,27 @@ Else
 End If
     If ReturnListOfFiles <> "" Then
         files() = Split(ReturnListOfFiles, "#")
-        For k = 0 To UBound(files())
-        Form1.TEXT1.PasteText "\\$ " + files(k)
+        For K = 0 To UBound(files())
+        Form1.TEXT1.PasteText "\\$ " + files(K)
         If pagio$ = "GREEK" Then
             Form1.TEXT1.PasteText "Δυαδικό {"
-            Form1.TEXT1.PasteText FileToEncode64(files(k), 6)
+            Form1.TEXT1.PasteText FileToEncode64(files(K), 6)
             If s$ = ")" Then
-            Form1.TEXT1.PasteText "} Ως " + neo$ + CStr(k) + s$
+            Form1.TEXT1.PasteText "} Ως " + neo$ + CStr(K) + s$
             Else
-            Form1.TEXT1.PasteText "} Ως " + neo$ + CStr(k + 1) + s$
+            Form1.TEXT1.PasteText "} Ως " + neo$ + CStr(K + 1) + s$
             End If
         Else
             Form1.TEXT1.PasteText "Binary {"
-            Form1.TEXT1.PasteText FileToEncode64(files(k), 6)
+            Form1.TEXT1.PasteText FileToEncode64(files(K), 6)
             If s$ = ")" Then
-            Form1.TEXT1.PasteText "} As " + neo$ + CStr(k) + s$
+            Form1.TEXT1.PasteText "} As " + neo$ + CStr(K) + s$
             Else
-            Form1.TEXT1.PasteText "} As " + neo$ + CStr(k + 1) + s$
+            Form1.TEXT1.PasteText "} As " + neo$ + CStr(K + 1) + s$
             End If
         End If
         
-        Next k
+        Next K
     Else
         Form1.TEXT1.PasteText "\\$ " + fname$
         If pagio$ = "GREEK" Then
@@ -751,8 +747,8 @@ Form1.TEXT1.glistN.enabled = True
 Form1.TEXT1.ManualInform
 
 Unload Me
-Case 17 - k
-If k = 0 Then
+Case 17 - K
+If K = 0 Then
 With myobject
 shortlang = Not shortlang
 .ManualInform
@@ -763,12 +759,12 @@ shortlang = Not shortlang
 .NoColor = shortlang
 End With
 End If
-Case 18 - k
+Case 18 - K
 With myobject
 .showparagraph = Not .showparagraph
 .Render
 End With
-Case 19 - k
+Case 19 - K
 With myobject
 If .glistN.lines > 1 Then
 If UserCodePage = 1253 Then
@@ -789,7 +785,7 @@ factor = gList1.FontSize / 11.25 / dv15 * 15
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
-Dim h As Long, i As Long
+Dim h As Long, I As Long
 Pouplastfactor = factor
 gList1.LeftMarginPixels = 30 * factor
 setupxy = 20 * factor

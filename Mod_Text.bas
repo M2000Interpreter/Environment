@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 2
+Global Const Revision = 3
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3624,11 +3624,11 @@ Sub processAcAndPo(ac, po)
     If TypeOf ac Is cxComplex Then
         If MemInt(VarPtr(po)) = 36 Then
             If Not TypeOf po Is cxComplex Then Exit Sub
-            ac = cxStabTwo("cxAdd", ac, po)
+            ac = nMath2.cxAddVar(ac, po)
         ElseIf myVarType(po, vbString) Then
             ac = fixthis(ac) + po
         Else
-            ac = cxStabTwo("cxAddREAL", ac, po)
+            ac = nMath2.cxAddRealVar(ac, po)
         End If
     ElseIf ac = 0 Then
         If myVarType(po, vbString) Then
@@ -3638,7 +3638,7 @@ Sub processAcAndPo(ac, po)
         End If
     Else
         If TypeOf po Is cxComplex Then
-            ac = cxStabTwo("cxAddREAL", po, ac)
+            ac = nMath2.cxAddRealVar(po, ac)
         Else
             ac = ac + po
         End If
@@ -3670,11 +3670,11 @@ Sub processAcAndPoSimple(ac, po)
     If TypeOf ac Is cxComplex Then
         If MemInt(VarPtr(po)) = 36 Then
             If Not TypeOf po Is cxComplex Then Exit Sub
-            po = cxStabTwo("cxAdd", ac, po)
+            po = nMath2.cxAddVar(ac, po)
         ElseIf myVarType(po, vbString) Then
             po = fixthis(ac) + po
         Else
-            po = cxStabTwo("cxAddREAL", ac, po)
+            po = nMath2.cxAddRealVar(ac, po)
         End If
     ElseIf ac <> 0 Then
         If myVarType(po, vbString) Then
@@ -6013,12 +6013,16 @@ Do
             End If
 CONTaaabbcc:
             If IntVal2 = 2 Or IntVal2 = -1 Then
-                If IntVal2 = 2 Then r = -r
+                If Not TypeOf r Is cxComplex Then
+                    If IntVal2 = 2 Then r = -r
+                End If
                 If Not rightoperator(bstack, aa$, r, True) Then
                   rightoperator = False
                   Exit Function
                 End If
-                If IntVal2 = 2 Then r = -r
+                If Not TypeOf r Is cxComplex Then
+                    If IntVal2 = 2 Then r = -r
+                End If
             End If
             If TypeOf r Is cxComplex Then
             If IntVal2 = -1 Then
@@ -6027,16 +6031,16 @@ CONTaaabbcc:
                 IntVal2 = 0
             End If
             If TypeOf po Is cxComplex Then
-                po = cxStabTwo("cxPow", po, r)
+                po = nMath2.cxPowVar(po, r)
                 rightoperator = True
                 Exit Function
             Else
-                po = cxStabTwo("cxPowRealComp", po, r)
+                po = nMath2.cxPowRealCompVar(po, r)
                 rightoperator = True
                 Exit Function
             End If
             ElseIf TypeOf po Is cxComplex Then
-                po = cxStabTwo("cxPowReal", po, r)
+                po = nMath2.cxPowRealVar(po, r)
                 rightoperator = True
                 Exit Function
             End If
@@ -7300,7 +7304,7 @@ cont1122:
                               If IntVal2 = -1 Or IntVal2 = 2 Then
                               If TypeOf r Is cxComplex Then
                                 r.r = -r.r
-                                r.u = -r.I
+                                r.I = -r.I
                                 
                               Else
                                 r = -r
@@ -7316,20 +7320,24 @@ cont1122:
                     End If
 CONT1234:
                     If Not TypeOf r Is cxComplex Then
-                        po = cxStabTwo("cxPowReal", po, r)
+                        If Not TypeOf po Is cxComplex Then
+                        ' never pass from here???
+                        po = po ^ r
+                        Else
+                        po = nMath2.cxPowRealVar(po, r)
+                        End If
                     ElseIf Not TypeOf po Is cxComplex Then
                         If IntVal = 2 Then po = -po
                         If po < 0 Then
                         ' problem
                         End If
-                        po = cxStabTwo("cxPowRealComp", po, r)
+                        po = nMath2.cxPowRealCompVar(po, r)
                         If IntVal = 2 Then
                         IntVal = 0
                         r1 = -1
                         End If
                     Else
-                    
-                        po = cxStabTwo("cxPow", po, r)
+                        po = nMath2.cxPowVar(po, r)
                     End If
                     MUL = 1
                     GoTo contpow2
@@ -7353,12 +7361,16 @@ CONT1234:
 conta123b:
                 
                 If IntVal2 = 2 Or IntVal2 = -1 Then
-                   If IntVal2 = 2 Then r = -r
+                    If Not TypeOf r Is cxComplex Then
+                        If IntVal2 = 2 Then r = -r
+                    End If
                     If Not rightoperator(bstack, aa$, r, True) Then
                       IsExpA = False
                       Exit Function
                     End If
-                    If IntVal2 = 2 Then r = -r
+                    If Not TypeOf r Is cxComplex Then
+                        If IntVal2 = 2 Then r = -r
+                    End If
                 ElseIf IntVal2 = 10 Then
                     If Not rightoperator(bstack, aa$, r, True) Then
                       IsExpA = False
@@ -7463,7 +7475,7 @@ contpow2:
                         GoTo conta123b
                     End If
                     If TypeOf r Is cxComplex Then
-                        po = cxStabTwo("cxPowRealComp", po, r)
+                        po = nMath2.cxPowRealCompVar(po, r)
                         r = 1
                         IntVal = 1
                     ElseIf r >= 1 And IntVal2 = 1 Then
@@ -7524,19 +7536,19 @@ contpow2:
                     
                         If IntVal < 0 Then r1.r = -r1.r: r1.I = -r1.I
                         IntVal = 0
-                        po = cxStabTwo("cxMul", po, r1)
+                        po = nMath2.cxMulVar(po, r1)
                         r1 = 1
                     Else
                         If IntVal < 0 Then r1 = -r1
                         IntVal = 0
                         If r1 <> 1 Then
-                        po = cxStabTwo("cxMulReal", po, r1)
+                        po = nMath2.cxMulRealVar(po, r1)
                         End If
                     End If
                 ElseIf TypeOf r1 Is cxComplex Then
                     If IntVal < 0 Then r1.r = -r1.r: r1.I = -r1.I
                         IntVal = 0
-                        po = cxStabTwo("cxMulReal", r1, po)
+                        po = nMath2.cxMulRealVar(r1, po)
                 Else
                 If IntVal < 0 Then r1 = -r1
                 IntVal = 0
@@ -7551,20 +7563,20 @@ contpow2:
                 If Not TypeOf po Is cxComplex Then Exit Function
                     If TypeOf r1 Is cxComplex Then
                         
-                        po = cxStabTwo("cxDiv", r1, po)
+                        po = nMath2.cxDivVar(r1, po)
                         If LastErNum <> 0 Then
                         IsExpA = False
                         Exit Function
                         End If
                     Else
-                    po = cxStabTwo("cxDivReal", po, r1)
+                    po = nMath2.cxDivRealVar(po, r1)
                         If LastErNum <> 0 Then
                         IsExpA = False
                         Exit Function
                         End If
                     End If
                 ElseIf TypeOf r1 Is cxComplex Then
-                    po = cxStabTwo("cxRealDiv", po, r1)
+                    po = nMath2.cxRealDivVar(po, r1)
                         If LastErNum <> 0 Then
                         IsExpA = False
                         Exit Function
@@ -7755,7 +7767,7 @@ jumpmod50:
                     If Abs(back) >= Abs(po) Then back = back - back
                     po = back
             Case 600
-                po = cxStabTwo("cxAdd", po, r)
+                po = nMath2.cxAddVar(po, r)
                 IsExpA = True
             Case 1000
                 Set BI = BI.multiply(park)
@@ -8798,9 +8810,9 @@ jumpequ:
                 If Not TypeOf r Is cxComplex Then WrongType: IsExpA = False: Exit Function
 ju12:
                     If ac = 0 Then
-                        po = cxStabThree("cxEq", po, r, 10)
+                        po = nMath2.cxEqVar3(po, r, 10)
                     Else
-                        po = cxStabThree("cxEq", cxStabTwo("cxAdd", ac, po), r, 10) '(ac + po) = r
+                        po = nMath2.cxEqComVar3(nMath2.cxAddVar(ac, po), r, 10)     '(ac + po) = r
                         ac = 0
                     End If
                 Else
@@ -8822,13 +8834,6 @@ ju12:
             IsExpA = False
             Exit Function
         End If
-   ' ElseIf lookOne(aa$, "(") Then
-   '     getcom = False
-   '     If logical(bstack, aa$, r, -1, True, getcom, , True) Then      ' check string
-   '         GoTo jumpeq10
-   '     Else
-   '         GoTo expMisNum
-   '     End If
     ElseIf IsExpBig(bstack, aa$, r, False, True, False) Then    ' check string
 jumpeq10:
         If Not BI Is Nothing Then
@@ -8873,20 +8878,20 @@ jumpequ2:
                 If MemInt(VarPtr(r)) = 36 Then
                     If Not TypeOf r Is cxComplex Then Exit Function
                     If TypeOf ac Is cxComplex Then
-                        po = cxStabTwo("cxEq", cxStabTwo("cxAdd", ac, po), r)
+                        po = nMath2.cxEqComVar(nMath2.cxAddVar(ac, po), r)
                     ElseIf ac = 0 Then
-                        po = cxStabTwo("cxEq", po, r)
+                        po = nMath2.cxEqVar(po, r)
                     ElseIf Not TypeOf ac Is cxComplex Then
-                        po = cxStabTwo("cxEq", cxStabTwo("cxAdd", nMath2.cxNew(CDbl(ac), 0#), po), r)
+                        po = nMath2.cxEqComVar(nMath2.cxAddVar(nMath2.cxNew(CDbl(ac), 0#), po), r)
                     End If
                     ac = 0
                 Else
                     If ac = 0 Then
-                        po = cxStabTwo("cxEq", po, nMath2.cxNew(r, 0))
+                        po = nMath2.cxEqComVar(nMath2.cxNew(r, 0), po)
                     ElseIf Not TypeOf ac Is cxComplex Then
-                        po = cxStabTwo("cxEq", cxStabTwo("cxAdd", nMath2.cxNew(CDbl(ac), 0#), po), nMath2.cxNew(r, 0))
+                        po = nMath2.cxEq(nMath2.cxAddVar(nMath2.cxNew(CDbl(ac), 0#), po), nMath2.cxNew(r, 0))
                     Else
-                        po = cxStabTwo("cxEq", cxStabTwo("cxAdd", ac, po), nMath2.cxNew(r, 0))
+                        po = nMath2.cxEq(nMath2.cxAddVar(ac, po), nMath2.cxNew(r, 0))
                     End If
                     ac = 0
                 End If
@@ -9319,9 +9324,9 @@ Loop
 If TypeOf ac Is cxComplex Then
     If MemInt(VarPtr(po)) = 36 Then
         If Not TypeOf po Is cxComplex Then Exit Function
-        ac = cxStabTwo("cxAdd", ac, po)
+        ac = nMath2.cxAddVar(ac, po)
     Else
-        ac = cxStabTwo("cxAddREAL", ac, po)
+        ac = nMath2.cxAddRealVar(ac, po)
     End If
     ElseIf ac = 0 Then
         If myVarType(po, vbString) Then
@@ -9331,7 +9336,7 @@ If TypeOf ac Is cxComplex Then
         End If
 Else
 If TypeOf po Is cxComplex Then
-    ac = cxStabTwo("cxAddREAL", po, ac)
+    ac = nMath2.cxAddRealVar(po, ac)
 Else
     ac = ac + po
 End If
@@ -11451,7 +11456,7 @@ End If
 'Select Case v$
 
 findthird:
-On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96, fun97, fun98, fun99, fun100, fun101, fun102, fun103, fun104, fun105, fun106, fun107, fun108, fun109, fun110, fun111, fun112, fun113, fun114, fun115, fun116, fun117, fun118, fun119, fun120, fun121
+On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96, fun97, fun98, fun99, fun100, fun101, fun102, fun103, fun104, fun105, fun106, fun107, fun108, fun109, fun110, fun111, fun112, fun113, fun114, fun115, fun116, fun117, fun118, fun119, fun120, fun121, fun122, fun123, fun121, fun124, fun125
 IsNumberNew = False
 Exit Function
 fun116:
@@ -11463,7 +11468,7 @@ fun116:
                 r = 0
             End If
         ElseIf TypeOf p Is cxComplex Then
-        r = cxStabOne("cxMod", p)
+        r = nMath2.cxModVar(p)
             
         End If
     End If
@@ -12560,14 +12565,26 @@ fun65:  ' "LN(", "кж("
 fun66: ' "ATN(", "тон.еж("
     IsNumberNew = IsAtan(bstack, A$, r)
     Exit Function
+fun125: ' "RATN(", "гтон.еж("
+    IsNumberNew = IsAtanRad(bstack, A$, r)
+    Exit Function
 fun67:  ' "TAN(", "ежап("
-  IsNumberNew = IsTan(bstack, A$, r)
+    IsNumberNew = IsTan(bstack, A$, r)
+    Exit Function
+fun124:  ' "RTAN(", "аежап("
+    IsNumberNew = IsTanRad(bstack, A$, r)
     Exit Function
 fun68:  ' "COS(", "сум("
     IsNumberNew = IsCos(bstack, A$, r)
     Exit Function
+fun122:  ' "RCOS(", "асум("
+    IsNumberNew = IsCosRad(bstack, A$, r)
+    Exit Function
 fun69:  ' "SIN(", "гл("
     IsNumberNew = IsSin(bstack, A$, r)
+    Exit Function
+fun123:  ' "RSIN(", "агл("
+    IsNumberNew = IsSinRad(bstack, A$, r)
     Exit Function
 fun70:  ' "ABS(", "апок("
 IsNumberNew = IsAbs(bstack, A$, r)
@@ -12699,15 +12716,15 @@ FUN114A:
     End If
     Exit Function
 fun117:
-IsNumberNew = isCompFun(bstack, A$, r, "cxConj")
+IsNumberNew = isConj(bstack, A$, r)
 Exit Function
     
 fun118:
-IsNumberNew = isCompFun(bstack, A$, r, "cxArg")
+IsNumberNew = isArg(bstack, A$, r)
 Exit Function
 
 fun119:
-IsNumberNew = isCompFun(bstack, A$, r, "cxPhase")
+IsNumberNew = isPhase(bstack, A$, r)
 Exit Function
 fun120:
 IsNumberNew = isPolar(bstack, A$, r)
@@ -25662,25 +25679,6 @@ Function neoGetArrayLinkOnly(bstack As basetask, ByVal nm$, link As Long, Option
 Dim K As Long
 Dim n$
 nm$ = myUcase(nm$)
-If Len(nm$) > 5 And False Then
-           ' not used any more
-                If Left$(nm$, 5) = "THIS." Then
-               
-                    n$ = StripThis2(here$)
-                    If n$ <> "" Then n$ = n$ + "." + bstack.GroupName + Mid$(nm$, 6) Else n$ = here$ + "." + nm$
-                ElseIf Left$(nm$, 5) = "ауто." Then
-           
-                    n$ = StripThis2(here$)
-                    If n$ <> "" Then n$ = n$ + "." + bstack.GroupName + Mid$(nm$, 6) Else n$ = here$ + "." + nm$
-                Else
-                If useglobalname Then
-                    n$ = nm$
-                    Else
-                    n$ = here$ + "." + bstack.GroupName + nm$
-                    End If
-                End If
-
-Else
 If useglobalname Then
 n$ = nm$
 Else
@@ -25689,7 +25687,6 @@ n$ = nm$
 Else
 
 n$ = here$ + "." + bstack.GroupName + nm$
-End If
 End If
 End If
 
@@ -46717,23 +46714,55 @@ If Not FastSymbol(A$, ",") Then GoTo a112
 If Not IsExp(bstack, A$, theta, , True) Then GoTo a112
     On Error GoTo 100
     isPolar = FastSymbol(A$, ")")
-    r = cxStabTwo("cxPolar", ro, theta)
+    r = nMath2.cxPolar(ro, theta)
 Exit Function
 100 WrongType
 isPolar = False
 End Function
-Private Function isCompFun(bstack As basetask, A$, r As Variant, fun$) As Boolean
+Private Function isConj(bstack As basetask, A$, r As Variant) As Boolean
 If Not IsExp(bstack, A$, r, , True) Then
     MissNumExpr
     Exit Function
 End If
 If TypeOf r Is cxComplex Then
-   r = cxStabOne(fun$, r)
+    Dim rr As cxComplex
+    rr = r
+    r = nMath2.cxConj(rr)
 Else
   WrongType
   Exit Function
 End If
-isCompFun = FastSymbol(A$, ")")
+isConj = FastSymbol(A$, ")")
+End Function
+Private Function isArg(bstack As basetask, A$, r As Variant) As Boolean
+If Not IsExp(bstack, A$, r, , True) Then
+    MissNumExpr
+    Exit Function
+End If
+If TypeOf r Is cxComplex Then
+    Dim rr As cxComplex
+    rr = r
+    r = nMath2.cxArg(rr)
+Else
+  WrongType
+  Exit Function
+End If
+isArg = FastSymbol(A$, ")")
+End Function
+Private Function isPhase(bstack As basetask, A$, r As Variant) As Boolean
+If Not IsExp(bstack, A$, r, , True) Then
+    MissNumExpr
+    Exit Function
+End If
+If TypeOf r Is cxComplex Then
+    Dim rr As cxComplex
+    rr = r
+    r = nMath2.cxPhase(rr)
+Else
+  WrongType
+  Exit Function
+End If
+isPhase = FastSymbol(A$, ")")
 End Function
 Private Function isExpFun(bstack As basetask, A$, r As Variant) As Boolean
 If Not IsExp(bstack, A$, r, , True) Then
@@ -46741,7 +46770,9 @@ If Not IsExp(bstack, A$, r, , True) Then
     Exit Function
 End If
 If TypeOf r Is cxComplex Then
-   r = cxStabOne("cxExp", r)
+    Dim rr As cxComplex
+    rr = r
+    r = nMath2.cxExp(rr)
 Else
     r = EXP(CDbl(r))
 End If

@@ -590,33 +590,17 @@ Public Function ReadOneParameter(pobjTarget As Object, dispid As Long, ERrR$, Va
 
     ' WE HAVE DISPIP
 
-    If lngRet = 0 And False Then
-       ' wrong
-      
-                ReDim varArr(0 To 0)
-                varArr(0) = True
-                With params
-                    .cArgs = 1
-                    .rgPointerToVariantArray = VarPtr(varArr(0))
-                                    Dim aa As Long
-        
-                aa = DISPID_VALUE
-                .cNamedArgs = 1
-                .rgPointerToDISPIDNamedArgs = VarPtr(aa)
-                End With
+       ' Invoke method/property
+    Err.Clear
+    On Error Resume Next
+    lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
+    If Err > 0 Then
+        If MyIsObject(VarRet) Then
+            If VarRet Is Err Then Exit Function
         End If
-
-        ' Invoke method/property
-        Err.Clear
-       On Error Resume Next
-        lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
-If Err > 0 Then
-If MyIsObject(VarRet) Then
-    If VarRet Is Err Then Exit Function
-End If
-If ERrR$ = "" Then ERrR$ = Err.Description
-Exit Function
-Else
+        If ERrR$ = "" Then ERrR$ = Err.Description
+        Exit Function
+    Else
         If lngRet <> 0 Then
             If lngRet = DISP_E_EXCEPTION Then
              ERrR$ = str$(Excep.wCode)
@@ -625,19 +609,10 @@ Else
             End If
             Exit Function
         End If
-  End If
-    On Error Resume Next
-
+    End If
     Set IDsp = Nothing
-   'If IsObject(VarRet) Then
-
-    'Set ReadOneParameter = VarRet
-    'Else
-    'ReadOneParameter = VarRet
-    'End If
-ReadOneParameter = Err = 0
-  ''  If Err.Number <> 0 Then ReadOneParameter = varRet
-Err.Clear
+    ReadOneParameter = Err = 0
+    Err.Clear
 End Function
 Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR$, ThisIndex As Variant, Optional useset As Boolean = False, Optional ByPass As Boolean) As Variant
     
@@ -664,18 +639,18 @@ Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR
 
     ' Get IDispatch from object
     Set IDsp = pobjTarget
-    Dim aa As Long, i As Integer, k As Integer
+    Dim aa As Long, I As Integer, K As Integer
     aa = DISPID_VALUE
     ' WE HAVE DISPIP
     If VarType(ThisIndex) = 8204 Then
                  ReDim varArr(0 To UBound(ThisIndex))
-                 k = 0
-                 For i = UBound(ThisIndex) - 1 To 0 Step -1
-                    varArr(k) = ThisIndex(i)
-                    k = k + 1
+                 K = 0
+                 For I = UBound(ThisIndex) - 1 To 0 Step -1
+                    varArr(K) = ThisIndex(I)
+                    K = K + 1
                  Next
                 With params
-                    .cArgs = k
+                    .cArgs = K
                     .rgPointerToVariantArray = VarPtr(varArr(0))
                     
                     .cNamedArgs = 0
@@ -817,18 +792,18 @@ Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, val1, E
     Set IDsp = pobjTarget
 
     ' WE HAVE DISPIP
-    Dim aa As Long, i As Integer, k As Integer
+    Dim aa As Long, I As Integer, K As Integer
     aa = DISPID_PROPERTYPUT
         If VarType(ThisIndex) = 8204 Then
                  ReDim varArr(0 To UBound(ThisIndex) + 1)
-                 k = 1
-                 For i = UBound(ThisIndex) - 1 To 0 Step -1
-                    varArr(k) = ThisIndex(i)
-                    k = k + 1
+                 K = 1
+                 For I = UBound(ThisIndex) - 1 To 0 Step -1
+                    varArr(K) = ThisIndex(I)
+                    K = K + 1
                  Next
                  varArr(0) = val1
                 With params
-                    .cArgs = k
+                    .cArgs = K
                     .rgPointerToVariantArray = VarPtr(varArr(0))
                     .cNamedArgs = 1
                      .rgPointerToDISPIDNamedArgs = VarPtr(aa)

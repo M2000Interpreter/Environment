@@ -45624,7 +45624,7 @@ Print cos(a)
 Print sin(a)
 Print atn(tan(a))
 Print tan(atn(a))
-Print Polar(abs(a), arg(a))=(8, -3)
+Print Polar(abs(a), arg(a))=(8, -3i)
 ? str$(a ,"0.00")
 ? str$((8,-3i) ,"0.00")
 }

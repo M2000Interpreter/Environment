@@ -57,7 +57,7 @@ Attribute VB_Exposed = False
 Option Explicit
 Public WithEvents label1 As TextViewer, previewKey As Boolean
 Attribute label1.VB_VarHelpID = -1
-Private l As Long
+Private L As Long
 Private t As Long
 Private mt As Integer
 Private back$
@@ -82,8 +82,8 @@ End Sub
 
 
 
-Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
-If keycode = vbKeyF12 And ((Not mHelp) Or trace) Then
+Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
+If KeyCode = vbKeyF12 And ((Not mHelp) Or trace) Then
 showmodules
 End If
 End Sub
@@ -125,8 +125,6 @@ label1.glistN.FloatList = True
 label1.glistN.MoveParent = True
 With label1.glistN
 If FeedbackExec$ = vbNullString Or Not abt Then
-'.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "!", "'", ";", "=", ">", "<", """", " ", "+", "-", "/", "*", "^")
-'.WordCharRight = ConCat(":", "{", "}", "[", "]", ",", , "!", ";", "'", "=", ">", "<", """", " ", "+", "-", "/", "*", "^")
 .WordCharRightButIncluded = ChrW(160) + "("
 .WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", "@", Chr$(9), "#", "%", "&", "$")
 .WordCharRight = ConCat(":", "{", "}", "[", "]", ",", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", Chr$(9), "#")
@@ -142,23 +140,14 @@ End If
 End With
 
 mt = DXP
-''Set HelpStack.Owner = Me
-''SetTrans Me, 200, &HFFFFFF
 If Helplastfactor = 0 Then Helplastfactor = 1
- Helplastfactor = ScaleDialogFix(helpSizeDialog)
-If ExpandWidth And False Then
-If HelpLastWidth = 0 Then HelpLastWidth = -1
-Else
+Helplastfactor = ScaleDialogFix(helpSizeDialog)
 HelpLastWidth = -1
-End If
 If ExpandWidth Then
 If HelpLastWidth = 0 Then HelpLastWidth = -1
 Else
 HelpLastWidth = -1
 End If
-''Me.FontSize = Int((VirtualScreenheight() - 1) / DYP / 70 + 0.5)
-''Label1.FontSize = Me.FontSize
-''setupxy = Me.FontSize * 20 / 15 * DYP / 15 + 4
 
 End Sub
 Public Sub moveMe()
@@ -174,40 +163,40 @@ End If
 End If
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 
 If Button = 1 Then
     
     If Helplastfactor = 0 Then Helplastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then
+    If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
     dr = True
     MousePointer = vbSizeNWSE
     lX = X
-    lY = y
+    lY = Y
     End If
     
     Else
-    If (X > Width - borderleft And X < Width) Or (y > Height - bordertop) Then  ' (y > Height - bordertop And y < Height) And
+    If (X > Width - borderleft And X < Width) Or (Y > Height - bordertop) Then  ' (y > Height - bordertop And y < Height) And
     dr = True
     MousePointer = vbSizeNWSE
     lX = X
-    lY = y
+    lY = Y
     End If
     End If
 
 End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
+If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (X > Width - borderleft And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
+ If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
 End If
 If dr Then
 
@@ -215,11 +204,11 @@ If dr Then
 
 If bordertop < 150 Then
 
-        If y < (Height - 150) Or y > Height Then addy = (y - lY)
+        If Y < (Height - 150) Or Y > Height Then addy = (Y - lY)
      If X < (Width - 150) Or X > Width Then addX = (X - lX)
      
 Else
-    If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
+    If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
         If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
     End If
     
@@ -267,13 +256,13 @@ Else
         End If
         Else
         lX = X
-        lY = y
+        lY = Y
    
 End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 
 If dr Then Me.MousePointer = 0
 dr = False
@@ -318,9 +307,9 @@ helpSizeDialog = 1
 Form4Loaded = False
 End Sub
 
-Private Sub glist1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
+Private Sub glist1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 If item = -1 Then
-If gList1.DoubleClickCheck(Button, item, X, y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor, -1) Then
+If gList1.DoubleClickCheck(Button, item, X, Y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor, -1) Then
             HelpLastWidth = -1
             Unload Me
 End If
@@ -338,19 +327,19 @@ gList1.EditFlag = False
 End If
 End Sub
 
-Private Sub gList1_KeyDown(keycode As Integer, shift As Integer)
+Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
 If shift <> 0 Then
 If label1.SelectionColor = rgb(255, 64, 128) Then label1.SelectionColor = 0
 label1.NoMark = False
 label1.EditDoc = True
 End If
-Select Case keycode
+Select Case KeyCode
 Case vbKeyDelete, vbKeyBack, vbKeyReturn, vbKeySpace
 
 gList1.EditFlag = False
 If mHelp Or abt Then
-MKEY$ = MKEY$ & ChrW$(keycode)
-keycode = 0
+MKEY$ = MKEY$ & ChrW$(KeyCode)
+KeyCode = 0
 End If
 End Select
 If mHelp Or abt Then shift = 0
@@ -366,15 +355,15 @@ flagmarkout = False: Exit Sub
 End If
 End Sub
 
-Private Sub gList1_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub gList1_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 flagmarkout = True
 If mHelp Then
 shift = 0
 End If
 End Sub
 
-Private Sub gList1_MouseUp(X As Single, y As Single)
-If gList1.DoubleClickArea(X, y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor) Then
+Private Sub gList1_MouseUp(X As Single, Y As Single)
+If gList1.DoubleClickArea(X, Y, gList1.WidthPixels - 10 * Helplastfactor, 10 * Helplastfactor, 8 * Helplastfactor) Then
             HelpLastWidth = -1
             Unload Me
             End If
@@ -481,7 +470,7 @@ factor = gList1.FontSize / 14.25 / dv15 * 15
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
-Dim H As Long, i As Long
+Dim h As Long, I As Long
 Helplastfactor = factor
 setupxy = 20 * factor
 bordertop = 10 * dv15 * factor

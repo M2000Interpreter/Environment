@@ -471,7 +471,7 @@ Public Function Modulus(sA As String, sb As String) As String
     Modulus = sLastRemainder
 End Function
 
-Public Function BigIntFromString(sIn As String, iBaseIn As Integer) As String
+Public Function BigIntFromString(Sin As String, iBaseIn As Integer) As String
     'Returns base10 integer string from sIn of different base (iBaseIn).
     'Example for sIn = "1A" and iBaseIn = 16, returns the base10 result 26.
     'Credit to Rebecca Gabriella's String Math Module with added edits
@@ -482,24 +482,24 @@ Public Function BigIntFromString(sIn As String, iBaseIn As Integer) As String
     Dim iP As Long, iV As Long
     
     'test for empty parameters
-    If LenB(sIn) = 0 Or iBaseIn = 0 Then
+    If LenB(Sin) = 0 Or iBaseIn = 0 Then
         MyEr "Bad parameter in BigIntFromString", "Προβληματικοί παράμετροι στη BigIntFromString"
         Exit Function
     End If
         
     'handle negative signs
-    If LeftB$(sIn, 1) = ChrB$(45) Then
+    If LeftB$(Sin, 1) = ChrB$(45) Then
         bRN = True
-        sIn = MidB$(sIn, 2)
+        Sin = MidB$(Sin, 2)
     Else
         bRN = False
     End If
     sBS = StrConv(CStr(iBaseIn), vbFromUnicode)
     
     BigIntFromString = ChrB$(48)
-    For iP = 1 To LenB(sIn)
+    For iP = 1 To LenB(Sin)
         'use constant list position and base for conversion
-        iV = InStrB(Alphabet, MidB$(sIn, iP, 1))
+        iV = InStrB(Alphabet, MidB$(Sin, iP, 1))
         If iV > 0 Then 'accumulate
             BigIntFromString = multiply(BigIntFromString, sBS)
             BigIntFromString = Add(BigIntFromString, StrConv(CStr(iV - 1), vbFromUnicode))
@@ -513,7 +513,7 @@ Public Function BigIntFromString(sIn As String, iBaseIn As Integer) As String
 
 End Function
 
-Public Function BigIntToString(sIn As String, iBaseOut As Integer) As String
+Public Function BigIntToString(Sin As String, iBaseOut As Integer) As String
     'Returns integer string of specified iBaseOut (iBaseOut) from base10 (sIn) integer string.
     'Example for sIn = "26" and iBaseOut = 16, returns the output "1A".
     'Credit to Rebecca Gabriella'sIn String Math Module with added edits
@@ -524,15 +524,15 @@ Public Function BigIntToString(sIn As String, iBaseOut As Integer) As String
     Dim iV As Long
     
     'test for empty parameters
-    If LenB(sIn) = 0 Or iBaseOut = 0 Then
+    If LenB(Sin) = 0 Or iBaseOut = 0 Then
         MyEr "Bad parameter in BigIntToString", "Προβληματικοί παράμετροι στη BigIntToString"
         Exit Function
     End If
     
     'handle negative signs
-    If LeftB$(sIn, 1) = ChrB$(45) Then
+    If LeftB$(Sin, 1) = ChrB$(45) Then
         bRN = True
-        sIn = MidB$(sIn, 2)
+        Sin = MidB$(Sin, 2)
     Else
         bRN = False
     End If
@@ -541,8 +541,8 @@ Public Function BigIntToString(sIn As String, iBaseOut As Integer) As String
     BigIntToString = ""
     On Error GoTo 100
     Dim ivs As String
-    Do While compare((sIn), ChrB$(48)) > 0
-        sIn = divide(sIn, sb)
+    Do While compare((Sin), ChrB$(48)) > 0
+        Sin = divide(Sin, sb)
         ivs = LastModulus()
         iV = AscB(RightB$(ivs, 1)) - 48
         If LenB(ivs) > 1 Then
@@ -605,7 +605,7 @@ Function IntStrByExp(sA As String, sExp As String) As String
     End If
 
 End Function
-Function IsProbablyPrime(sA As String, k As Integer) As Boolean
+Function IsProbablyPrime(sA As String, K As Integer) As Boolean
     If LenB(sA) < 1 Then Exit Function
     If LeftB$(sA, 1) = ChrB$(45) Then
         MyEr "Negative Prime not exist", "Αρνητικός πρώτος δεν υπάρχει"
@@ -615,26 +615,26 @@ Function IsProbablyPrime(sA As String, k As Integer) As Boolean
     If val(RightB$(sA, 1)) Mod 2 = 0 Then Exit Function
     If sA = ChrB$(49) Then Exit Function
     
-    Dim nn As String, D As String, s As Long, Z As Long
+    Dim nn As String, D As String, s As Long, z As Long
     nn = subtract(sA, ChrB$(49))
     D = nn
     While compare(Modulus((D), ChrB$(50)), ChrB$(48)) = 0
         s = s + 1
         D = divide(D, ChrB$(50))
     Wend
-    Z = LenB(sA)
-    Dim a As String, X As String, I As Long, j As Long
+    z = LenB(sA)
+    Dim A As String, X As String, I As Long, j As Long
     
     IsProbablyPrime = True
-    For I = 1 To k
+    For I = 1 To K
         
         Do
-            a = SpaceB(LenB(sA))
+            A = SpaceB(LenB(sA))
             For j = 1 To LenB(sA)
-                MidB$(a, j, 1) = ChrB$(47 + Int(10 * RndM(rndbase) + 1))
+                MidB$(A, j, 1) = ChrB$(47 + Int(10 * RndM(rndbase) + 1))
             Next
-        Loop Until compare(nn, a) = 1 And compare(a, ChrB$(49)) > -1
-        X = modpow(a, (D), (sA))
+        Loop Until compare(nn, A) = 1 And compare(A, ChrB$(49)) > -1
+        X = modpow(A, (D), (sA))
         If compare(X, ChrB$(49)) <> 0 Then ' continue
             If compare(X, nn) <> 0 Then ' continue
                 For j = 1 To s
@@ -679,9 +679,9 @@ Public Function IntSqr(sA As String) As String
         MyEr "Zero or negative paramter for integer Square Root", "Μηδενική ή Αρνητική παράμετρος για ακέραια τετραγωνική ρίζα"
         Exit Function
     End If
-    Dim q As String, r As String, t As String, Z As String, minusone As String
+    Dim q As String, r As String, t As String, z As String, minusone As String
     minusone = ChrB$(45) + ChrB$(49)
-    Z = sA
+    z = sA
     r = ChrB$(48)
     q = ChrB$(49)
     Do
@@ -690,10 +690,10 @@ Public Function IntSqr(sA As String) As String
     Do
         If compare((q), ChrB$(49)) < 1 Then Exit Do
         q = divide(q, ChrB$(52))
-        t = subtract(subtract((Z), (r)), (q))
+        t = subtract(subtract((z), (r)), (q))
         r = divide(r, ChrB$(50))
         If compare((t), (minusone)) > -1 Then
-            SwapStrings Z, t
+            SwapStrings z, t
             r = Add(r, (q))
         End If
     Loop
@@ -834,14 +834,26 @@ var1(1) = b1
 var1(2) = c1
 cxStabThree = CallByNameFixParamArray(nMath2, FN$, 1, var1(), var2(), 3, Nothing, 0, False, Nothing)
 End Function
-Function cxStabTwo(FN$, a1, b1) As Variant
-Static var1(2) As Variant, var2(0) As String
-var1(0) = a1
-var1(1) = b1
-cxStabTwo = CallByNameFixParamArray(nMath2, FN$, 1, var1(), var2(), 2, Nothing, 0, False, Nothing)
-End Function
-Function cxStabOne(FN$, a1) As Variant
-Static var1(2) As Variant, var2(0) As String
-var1(0) = a1
-cxStabOne = CallByNameFixParamArray(nMath2, FN$, 1, var1(), var2(), 1, Nothing, 0, False, Nothing)
-End Function
+'Function cxStabTwo(FN$, a1, b1) As Variant
+'Static var1(2) As Variant, var2(0) As String
+'If VariantIsRef(VarPtr(a1)) Then
+'    VarByRef VarPtr(var1(0)), a1
+'Else
+'    var1(0) = a1
+'End If
+'If VariantIsRef(VarPtr(b1)) Then
+'    VarByRef VarPtr(var1(1)), b1
+'Else
+'    var1(1) = b1
+'End If
+'cxStabTwo = CallByNameFixParamArray(nMath2, FN$, 1, var1(), var2(), 2, Nothing, 0, False, Nothing)
+'End Function
+'Function cxStabOne(FN$, a1) As Variant
+'Static var1(2) As Variant, var2(0) As String
+'If VariantIsRef(VarPtr(a1)) Then
+'    VarByRef VarPtr(var1(0)), a1
+'Else
+'    var1(0) = a1
+'End If
+'cxStabOne = CallByNameFixParamArray(nMath2, FN$, 1, var1(), var2(), 1, Nothing, 0, False, Nothing)
+'End Function

@@ -2350,7 +2350,7 @@ textmetrics.Y = 0
 sumy = sumy + textmetrics.Y
 If maxx < textmetrics.X Then maxx = textmetrics.X
 Loop
-nTextY = Int(Abs(maxx * dv15 * sIn(Degree)) + Abs(sumy * dv15 * Cos(Degree)))
+nTextY = Int(Abs(maxx * dv15 * Sin(Degree)) + Abs(sumy * dv15 * Cos(Degree)))
   hFont = SelectObject(DDD.Hdc, hPrevFont)
   DeleteObject hFont
 If ExtraWidth <> 0 Then SetTextCharacterExtra DDD.Hdc, 0
@@ -2423,7 +2423,7 @@ sumy = sumy + textmetrics.Y
 If maxx < textmetrics.X Then maxx = textmetrics.X
 Loop
 
-nText = Int(Abs(maxx * dv15 * Cos(Degree)) + Abs(sumy * dv15 * sIn(Degree)))
+nText = Int(Abs(maxx * dv15 * Cos(Degree)) + Abs(sumy * dv15 * Sin(Degree)))
 
   hFont = SelectObject(DDD.Hdc, hPrevFont)
   DeleteObject hFont
@@ -2709,7 +2709,7 @@ DEGR = (Degree) * 180# / Pi
 
 TT = ExtraWidth \ 2
 icy = CLng(Cos(Degree) * icH)
-icx = CLng(sIn(Degree) * icH)
+icx = CLng(Sin(Degree) * icH)
 
 With players(GetCode(DDD))
 If JUSTIFY < 0 Then
@@ -2732,7 +2732,7 @@ End If
 End With
 If TT > 0 Then
 X = X + (Cos(Degree) * TT * dv15)
-Y = Y - (sIn(Degree) * TT * dv15)
+Y = Y - (Sin(Degree) * TT * dv15)
 End If
 what$ = Replace$(what, vbCrLf, vbCr) + vbCr
 Dim textmetrics As POINTAPI
@@ -2750,13 +2750,13 @@ GetTextExtentPoint32 DDD.Hdc, StrPtr(fline$), Len(fline$), textmetrics
 X = X + icx
 Y = Y + icy
 If JUSTIFY = 1 Then
-    DDD.currentX = X - Int((textmetrics.X * Cos(Degree) + textmetrics.Y * sIn(Degree)) * dv15)
-    DDD.currentY = Y + Int((textmetrics.X * sIn(Degree) - textmetrics.Y * Cos(Degree)) * dv15)
+    DDD.currentX = X - Int((textmetrics.X * Cos(Degree) + textmetrics.Y * Sin(Degree)) * dv15)
+    DDD.currentY = Y + Int((textmetrics.X * Sin(Degree) - textmetrics.Y * Cos(Degree)) * dv15)
 ElseIf JUSTIFY = 2 Then
 'If tt <> 0 Then textmetrics.X = textmetrics.X - tt * 1.5
 
-     DDD.currentX = X - Int((textmetrics.X * Cos(Degree) + textmetrics.Y * sIn(Degree)) * dv15) \ 2
-    DDD.currentY = Y + Int((textmetrics.X * sIn(Degree) - textmetrics.Y * Cos(Degree)) * dv15) \ 2
+     DDD.currentX = X - Int((textmetrics.X * Cos(Degree) + textmetrics.Y * Sin(Degree)) * dv15) \ 2
+    DDD.currentY = Y + Int((textmetrics.X * Sin(Degree) - textmetrics.Y * Cos(Degree)) * dv15) \ 2
 Else
 
     DDD.currentX = X
@@ -4003,7 +4003,7 @@ If Form1.EditTextWord Then
 .glistN.WordCharLeftButIncluded = vbNullString
 
 Else
-.glistN.WordCharLeft = ConCat(".", ":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", "@", Chr$(9), "#", "%", "&")
+.glistN.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", "@", Chr$(9), "#", "%", "&")
 .glistN.WordCharRight = ConCat(".", ":", "{", "}", "[", "]", ",", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", Chr$(9), "#")
 .glistN.WordCharRightButIncluded = "(" ' so aaa(sdd) give aaa( as word
 .glistN.WordCharLeftButIncluded = "#"
@@ -9946,13 +9946,30 @@ If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
 End If
 MissParam A$
 End Function
+Function IsSinRad(bstack As basetask, A$, r As Variant) As Boolean
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    If TypeOf r Is cxComplex Then
+        Dim rr As cxComplex
+        rr = r
+        r = nMath2.cxSin(rr)
+    Else
+        r = Sin(r)
+        'If Abs(r) < 0.00000000000001 Then r = 0#
+    End If
+    IsSinRad = FastSymbol(A$, ")", True)
 
+Else
+    MissParam A$
+End If
+End Function
 Function IsSin(bstack As basetask, A$, r As Variant) As Boolean
 If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
     If TypeOf r Is cxComplex Then
-        r = cxStabOne("cxSin", r)
+        Dim rr As cxComplex
+        rr = r
+        r = nMath2.cxSin(rr)
     Else
-        r = sIn(r * 1.74532925199433E-02)
+        r = Sin(r * 1.74532925199433E-02)
         If Abs(r) < 0.00000000000001 Then r = 0#
     End If
     IsSin = FastSymbol(A$, ")", True)
@@ -9966,9 +9983,11 @@ Dim BI As BigInteger
 If IsExpBig(bstack, A$, r, flatobject:=True, nostring:=True) Then
     If bstack.lastobj Is Nothing Then
         If TypeOf r Is cxComplex Then
-        r = cxStabOne("cxABS", r)
+            Dim rr As cxComplex
+            rr = r
+            r = nMath2.cxAbs(rr)
         Else
-        r = Abs(r)
+            r = Abs(r)
         End If
     Else
         Set BI = bstack.lastobj
@@ -9980,10 +9999,29 @@ Else
 End If
 End Function
 
-Function IsCos(bstack As basetask, A$, r As Variant) As Boolean
+Function IsCosRad(bstack As basetask, A$, r As Variant) As Boolean
+
 If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
     If TypeOf r Is cxComplex Then
-        r = cxStabOne("cxCos", r)
+        Dim rr As cxComplex
+        rr = r
+        r = nMath2.cxCos(rr)
+    Else
+    r = Cos(r)
+    'If Abs(r) < 0.00000000000001 Then r = 0#
+    End If
+    IsCosRad = FastSymbol(A$, ")", True)
+Else
+    MissParam A$
+End If
+End Function
+Function IsCos(bstack As basetask, A$, r As Variant) As Boolean
+
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    If TypeOf r Is cxComplex Then
+        Dim rr As cxComplex
+        rr = r
+        r = nMath2.cxCos(rr)
     Else
     r = Cos(r * 1.74532925199433E-02)
     If Abs(r) < 0.00000000000001 Then r = 0#
@@ -9992,11 +10030,30 @@ If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
 Else
     MissParam A$
 End If
+
+End Function
+Function IsTanRad(bstack As basetask, A$, r As Variant) As Boolean
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    If TypeOf r Is cxComplex Then
+        Dim rr As cxComplex
+        rr = r
+        r = nMath2.cxTan(rr)
+    Else
+    r = Sgn(r) * Tan(r)
+    If Abs(r) < 1E-16 Then r = 0
+    If Abs(r) < 1 And Abs(r) + 0.0000000000001 >= 1 Then r = Sgn(r)
+    End If
+    IsTanRad = FastSymbol(A$, ")", True)
+Else
+    MissParam A$
+End If
 End Function
 Function IsTan(bstack As basetask, A$, r As Variant) As Boolean
 If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
     If TypeOf r Is cxComplex Then
-        r = cxStabOne("cxTan", r)
+        Dim rr As cxComplex
+        rr = r
+        r = nMath2.cxTan(rr)
     Else
     r = Sgn(r) * Tan(r * 1.74532925199433E-02)
     If Abs(r) < 1E-16 Then r = 0
@@ -10007,10 +10064,26 @@ Else
     MissParam A$
 End If
 End Function
+Function IsAtanRad(bstack As basetask, A$, r As Variant) As Boolean
+If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
+    If TypeOf r Is cxComplex Then
+        Dim rr As cxComplex
+        rr = r
+        r = nMath2.cxAtan(rr)
+    Else
+        r = Atn(r)
+    End If
+    IsAtanRad = FastSymbol(A$, ")", True)
+Else
+    MissParam A$
+End If
+End Function
 Function IsAtan(bstack As basetask, A$, r As Variant) As Boolean
 If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
     If TypeOf r Is cxComplex Then
-        r = cxStabOne("cxAtan", r)
+        Dim rr As cxComplex
+        rr = r
+        r = nMath2.cxAtan(rr)
     Else
         r = Atn(r) * 180# / Pi
     End If
@@ -10022,7 +10095,9 @@ End Function
 Function IsLn(bstack As basetask, A$, r As Variant) As Boolean
 If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
     If TypeOf r Is cxComplex Then
-        r = cxStabOne("cxLog", r)
+        Dim rr As cxComplex
+        rr = r
+        r = nMath2.cxlog(rr)
     Else
         If r <= 0 Then
             MyErMacro A$, "Only > zero parameter", "Μόνο >0 παράμετρος"
@@ -10039,7 +10114,9 @@ End Function
 Function IsLog(bstack As basetask, A$, r As Variant) As Boolean
 If IsExp(bstack, A$, r, flatobject:=True, nostring:=True) Then
     If TypeOf r Is cxComplex Then
-        r = cxStabTwo("cxLogX", r, 10#)
+        Dim rr As cxComplex
+        rr = r
+        r = nMath2.cxLogX(rr, 10#)
     Else
     If r <= 0 Then
         MyErMacro A$, "Only > zero parameter", "Μόνο >0 παράμετρος"
@@ -10075,7 +10152,9 @@ Dim BI As BigInteger
 If IsExpBig(bstack, A$, r, flatobject:=True, nostring:=True) Then
         If bstack.lastobj Is Nothing Then
         If TypeOf r Is cxComplex Then
-            r = cxStabOne("cxSqr", r)
+            Dim rr As cxComplex
+            rr = r
+            r = nMath2.cxSqr(rr)
         Else
             If r < 0 Then
                 negsqrt A$
@@ -12230,19 +12309,19 @@ p = pppp.item(w3)
 If IsObject(res) Then
 If TypeOf p Is cxComplex Then
     Set BI = res
-    res = cxStabTwo("cxAdd", nMath2.cxNew(CDbl(BI.ToString), 0), p)
+    res = nMath2.cxAddComVar(nMath2.cxNew(CDbl(BI.ToString), 0), p)
 Else
     Set res = res.Add(CreateBigInteger(CStr(Int(p))))
 End If
 
 ElseIf TypeOf p Is cxComplex Then
     If TypeOf res Is cxComplex Then
-        res = cxStabTwo("cxAdd", res, p)
+        res = nMath2.cxAddVar(res, p)
     Else
-        res = cxStabTwo("cxAdd", nMath2.cxNew(res, 0#), p)
+        res = nMath2.cxAddComVar(nMath2.cxNew(res, 0#), p)
     End If
 ElseIf TypeOf res Is cxComplex Then
-res = cxStabTwo("cxAddreal", res, p)
+res = nMath2.cxAddRealVar(res, p)
 Else
 res = res + p
 End If
@@ -12255,7 +12334,7 @@ Set p = pppp.itemObject(w3)
 If TypeOf p Is BigInteger Then
 If TypeOf res Is cxComplex Then
     Set BI = p
-    res = cxStabTwo("cxAddreal", res, CDec(BI.ToString))
+    res = nMath2.cxAddRealVar(res, CDbl(BI.ToString))
 ElseIf IsObject(res) Then
     Set BI = p
     Set res = res.Add(BI)
@@ -21888,7 +21967,7 @@ If par Then
 sX = X / PI2
 sX = (sX - Fix(sX)) * PI2
 .XGRAPH = .XGRAPH + Cos(sX) * p
-.YGRAPH = .YGRAPH - sIn(sX) * p
+.YGRAPH = .YGRAPH - Sin(sX) * p
 Else
 .XGRAPH = .XGRAPH + CLng(X)
 .YGRAPH = .YGRAPH + CLng(p)
@@ -31978,7 +32057,7 @@ If Not FastSymbol(rest$, ",") Then SyntaxError: ProcPoly = False: Set Scr = Noth
             sX = X / PI2
             sX = (sX - Fix(sX)) * PI2
             .XGRAPH = .XGRAPH + Cos(sX) * p
-            .YGRAPH = .YGRAPH - sIn(sX) * p
+            .YGRAPH = .YGRAPH - Sin(sX) * p
         Else
             .XGRAPH = .XGRAPH + CLng(X)
             .YGRAPH = .YGRAPH + CLng(p)
@@ -32135,7 +32214,7 @@ If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then sY = p Else ProcD
 sX = sX / PI2
 sX = (sX - Fix(sX)) * PI2
 x1 = Cos(sX) * sY
-y1 = -sIn(sX) * sY
+y1 = -Sin(sX) * sY
 Else
 If IsExp(bstack, rest$, p) Then x1 = p
 If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y1 = p
@@ -32194,7 +32273,7 @@ If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then sY = p Else ProcS
 sX = sX / PI2
 sX = (sX - Fix(sX)) * PI2
 .XGRAPH = .XGRAPH + Cos(sX) * sY
-.YGRAPH = .YGRAPH - sIn(sX) * sY
+.YGRAPH = .YGRAPH - Sin(sX) * sY
 Else
 If IsExp(bstack, rest$, p) Then .XGRAPH = .XGRAPH + p
 If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then .YGRAPH = .YGRAPH + p Else ProcStep = False: MissNumExpr: Exit Function

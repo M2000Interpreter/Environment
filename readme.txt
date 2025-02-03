@@ -1,100 +1,21 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 2 active-X
-1. Remove of stop commands...(used for debugging)
-2. Fix some bugs
-This bug comes from combined ccode to produce the Complex number using parentesis:
-k=((100,),("aaaa",),(3,))
-? k#val(1)#val$(0)="aaaa"
-3. Added some features
-Printer.Margins    ' reset margins
-Printer.Margins LeftInTwips
-Printer.Margins LeftInTwips, TopInTwips
-Because Lmargin shift page left, the Right margin computed from the original width of the page, so we have to add the left margin. This is the same for bottom margin. These two place a white strip to exclude printing area, they don't resize the page.
-Printer.Margins LeftInTwips, TopInTwips, RightInTwips
-Printer.Margins LeftInTwips, TopInTwips, RightInTwips, BottomInTwips
-
-Dates based on locale. Str$() based on Locale 1033 always.
-Date and Complex now works fine using initial type/values
-
-Test Code:
-DATE A=45000, B="27/10/1966"
-LIST
-CLEAR
-VAR DATE A=45000, B="27/10/1966"
-LIST
-CLEAR
-DEF DATE A=45000, B="27/10/1966"
-LIST
-CLEAR
-LOCAL DATE A=45000, B="27/10/1966"
-LIST
-CLEAR
-GLOBAL DATE A=45000, B="27/10/1966"
-LIST
-CLEAR
-VAR A AS DATE=45000, B AS DATE="27/10/1966"
-LIST
-CLEAR
-DEF A AS DATE=45000, B AS DATE="27/10/1966"
-LIST
-CLEAR
-LOCAL A AS DATE=45000, B AS DATE="27/10/1966"
-LIST
-CLEAR
-GLOBAL A AS DATE=45000, B AS DATE="27/10/1966"
-LIST
-CLEAR
-COMPLEX A = (1,-2I)
-LIST
-CLEAR
-VAR COMPLEX A = (1,-2I)
-LIST
-CLEAR
-DEF COMPLEX A = (1,-2I)
-LIST
-CLEAR
-LOCAL COMPLEX A = (1,-2I)
-LIST
-CLEAR
-GLOBAL COMPLEX A = (1,-2I)
-LIST
-CLEAR
-VAR A AS COMPLEX = (1,-2I)
-LIST
-CLEAR
-DEF A AS COMPLEX = (1,-2I)
-LIST
-CLEAR
-LOCAL A AS COMPLEX = (1,-2I)
-LIST
-CLEAR
-GLOBAL A AS COMPLEX = (1,-2I)
-LIST
-CLEAR
-LOCALE 1033
-ALFA(45000)
-BETA()
-LOCALE 1032  ' GREEK
-ALFA(45000)
-BETA()
-
-SUB BETA(A AS DATE=45000)
-	? A
-END SUB
-SUB ALFA(A AS DATE)
-	? A
-END SUB
-
-
+Version 13 revision 3 active-X
+1. Optimizations for complex numbers
+2. rCos(), rSin(), rTan(), rAtn() for radians.
+3. Help file Updated
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
 
-The first time you run the interpreter do this in M2000 console:
+The first time Windows make some work behind the scene so the M200 console slow down. So type END and open it again.
+
+To get the INFO file, from M2000 console do these:
 dir appdir$
 load info
 then press F1 to save info.gsb to M2000 user directory
+
+You can also execute statement Settings to change font/language/colors and size of console letters.
 
 Read wiki at Github for compiling M2000 from source.
 

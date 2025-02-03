@@ -901,15 +901,15 @@ On Error Resume Next
     pws = pw
     phs = ph
     r = Atn(CSng(myw) / CSng(myh))
-    K = -myw / (2# * sIn(r))
+    K = -myw / (2# * Sin(r))
     
 
        x_step2 = CLng(Fix(Cos(Angle! + Pi / 2) * pw))
-    y_step2 = CLng(Fix(sIn(Angle! + Pi / 2) * ph))
+    y_step2 = CLng(Fix(Sin(Angle! + Pi / 2) * ph))
 
     x_step = CLng(Fix(Cos(Angle!) * pw))
-    y_step = CLng(Fix(sIn(Angle!) * ph))
-  image_x = CLng(Fix(pw / 2 - Fix(K * sIn(Angle! - r)))) * pw
+    y_step = CLng(Fix(Sin(Angle!) * ph))
+  image_x = CLng(Fix(pw / 2 - Fix(K * Sin(Angle! - r)))) * pw
    image_y = CLng(Fix(ph / 2 + Fix(K * Cos(Angle! - r)))) * ph
 Dim pw1out As Long, ph1out As Long, pwOut As Long, phOut As Long, much As Single
 ''Dim cw1 As Long, ch1 As Long, outf As Single, fadex As Long, fadey As Long, outf1 As Single, outf2 As Single
@@ -1187,7 +1187,7 @@ If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
     ph = cDIBbuffer1.Height
 
     r = Atn(CSng(myw) / CSng(myh))
-    K = -CSng(myw) / (2! * sIn(r))
+    K = -CSng(myw) / (2! * Sin(r))
   
     Const pidicv2 = 1.570795!
     pw1 = pw + 1
@@ -1195,17 +1195,17 @@ If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
    
     pws = pw1 * zoomfactor
     phs = ph1 * zoomfactor
-    image_x = ((pws - zoomfactor - b) / 2 - (K * sIn(Angle! - r))) * pw
+    image_x = ((pws - zoomfactor - b) / 2 - (K * Sin(Angle! - r))) * pw
     image_y = ((phs - zoomfactor - b) / 2 + (K * Cos(Angle! - r))) * ph
     image_x = image_x - MyMod(image_x, CSng(dv15))
     image_y = image_y - MyMod(image_y, CSng(dv15))
    
 
     x_step2 = Cos(Angle! + pidicv2) * pw
-    y_step2 = sIn(Angle! + pidicv2) * ph
+    y_step2 = Sin(Angle! + pidicv2) * ph
     
     x_step = Cos(Angle!) * pw
-    y_step = sIn(Angle!) * ph
+    y_step = Sin(Angle!) * ph
     
     pws = pws + 1
     phs = phs + 1
@@ -1254,8 +1254,8 @@ If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long
   
-myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * sIn(Angle!))) * zoomfactor, 0) + 4
-myh = Round((Abs(piw * sIn(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0) + 4
+myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * zoomfactor, 0) + 4
+myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0) + 4
 Dim prive As basket
 prive = players(GetCode(bstack.Owner))
 Dim cDibbuffer0 As New cDIBSection
@@ -1282,8 +1282,8 @@ If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long
   
-myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * sIn(Angle!))) * zoomfactor, 0) + 4
-myh = Round((Abs(piw * sIn(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0) + 4
+myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * zoomfactor, 0) + 4
+myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0) + 4
 Dim prive As basket
 prive = players(GetCode(bstack.Owner))
 Dim cDibbuffer0 As New cDIBSection
@@ -1363,8 +1363,8 @@ GetMem1 ppBa + 2, br
     pih = cDibbuffer0.Height
  Set cDIBbuffer1 = cDibbuffer0 'New cDIBSection
  Set cDibbuffer0 = New cDIBSection
-myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * sIn(Angle!))) * zoomfactor, 0)
-myh = Round((Abs(piw * sIn(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0)
+myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * zoomfactor, 0)
+myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0)
 cDibbuffer0.ClearUp
 Dim prive As basket
 prive = players(GetCode(bstack.Owner))
@@ -1426,14 +1426,14 @@ Dim tSA2 As SAFEARRAY2D
     phs = ph * zoomfactor
     
     r = Atn(CSng(myw) / CSng(myh))
-    K = -CSng(myw) / (2! * sIn(r))
+    K = -CSng(myw) / (2! * Sin(r))
     
     x_step = Cos(Angle!) * pw
-    y_step = sIn(Angle!) * ph
+    y_step = Sin(Angle!) * ph
 
     x_step2 = Cos(Angle! + pidicv2) * pw
-    y_step2 = sIn(Angle! + pidicv2) * ph
-  image_x = ((pws - b) / 2 - (K * sIn(Angle! - r))) * pw
+    y_step2 = Sin(Angle! + pidicv2) * ph
+  image_x = ((pws - b) / 2 - (K * Sin(Angle! - r))) * pw
    image_y = ((phs - b) / 2 + (K * Cos(Angle! - r))) * ph
       image_x = image_x - MyMod(image_x, CSng(dv15))
    image_y = image_y - MyMod(image_y, CSng(dv15))
@@ -1563,8 +1563,8 @@ cDIBbuffer1.LoadPictureBlt cDibbuffer0.HDC1
 cDibbuffer0.FreeHDC
   
  
-myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * sIn(Angle!))) * zoomfactor, 0)
-myh = Round((Abs(piw * sIn(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0)
+myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * zoomfactor, 0)
+myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0)
 
 cDibbuffer0.ClearUp
 If cDibbuffer0.create(myw, myh) Then
@@ -1621,7 +1621,7 @@ Dim tSA2 As SAFEARRAY2D
      pw = piw
     ph = pih
     r = Atn(CSng(myw) / CSng(myh))
-    K = -myw / (2! * sIn(r))
+    K = -myw / (2! * Sin(r))
   
     Dim pw1 As Long, ph1 As Long
     
@@ -1632,15 +1632,15 @@ Dim tSA2 As SAFEARRAY2D
    
          pws = pw1 * zoomfactor
     phs = ph1 * zoomfactor
-  image_x = ((pws - zoomfactor - b) / 2 - (K * sIn(Angle! - r))) * pw
+  image_x = ((pws - zoomfactor - b) / 2 - (K * Sin(Angle! - r))) * pw
    image_y = ((phs - zoomfactor - b) / 2 + (K * Cos(Angle! - r))) * ph
    image_x = image_x - MyMod(image_x, CSng(dv15))
    image_y = image_y - MyMod(image_y, CSng(dv15))
    x_step2 = Cos(Angle! + pidicv2) * pw
-    y_step2 = sIn(Angle! + pidicv2) * ph
+    y_step2 = Sin(Angle! + pidicv2) * ph
 
     x_step = Cos(Angle!) * pw
-    y_step = sIn(Angle!) * ph
+    y_step = Sin(Angle!) * ph
   pws = pws + 1
   phs = phs + 1
     pw1 = pw - 1
@@ -1733,21 +1733,21 @@ Angle! = -Angle * 1.74532925199433E-02
    r = Atn(piw / CSng(pih)) + Pi / 2!
     K = piw / Cos(r)
     Dim myw As Long, myh As Long
- myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * sIn(Angle!))) * Size, 0)
-myh = Round((Abs(piw * sIn(Angle!)) + Abs(pih * Cos(Angle!))) * Size, 0)
+ myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * Size, 0)
+myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * Size, 0)
 hRgn = ScaleRegion(hRgn, Size)
 
 
     Dim uXF As XFORM
     Dim D2R As Single, rData() As Byte, rSize As Long
     uXF.eM11 = Cos(Angle!)
-    uXF.eM12 = sIn(Angle!)
-    uXF.eM21 = -sIn(Angle!)
+    uXF.eM12 = Sin(Angle!)
+    uXF.eM21 = -Sin(Angle!)
     uXF.eM22 = Cos(Angle!)
 K = Abs(K)
 
 uXF.eDx = Round(K * Cos(Angle! - r) / 2! + K / 2!, 0)
-uXF.eDy = Round(K * sIn(Angle! - r) / 2! + K / 2!, 0)
+uXF.eDy = Round(K * Sin(Angle! - r) / 2! + K / 2!, 0)
 
 
     rSize = GetRegionData(hRgn, rSize, ByVal 0&)
@@ -2505,10 +2505,10 @@ Public Function SetTextData( _
     Dim hMem As Long, lPtr As Long
     Dim lSize As Long
     lSize = LenB(sText)
-    hMem = GlobalAlloc(0, lSize + 2)
+    hMem = GlobalAlloc(0, lSize + 4)
     If (hMem > 0) Then
         lPtr = GlobalLock(hMem)
-        CopyMemory ByVal lPtr, ByVal StrPtr(sText), lSize + 1
+        CopyMemory ByVal lPtr, ByVal StrPtr(sText), lSize + 2
         GlobalUnlock hMem
         If (OpenClipboard(Form1.hWnd) <> 0) Then
             If EmptyClipboard Then
@@ -2585,9 +2585,9 @@ If CBool(OpenClipboard(Form1.hWnd)) Then
                 lSize = LenB(stext2)
                 If lSize > 0 Then
                     lFormatId = 13
-                    hMem = GlobalAlloc(0, lSize + 2)
+                    hMem = GlobalAlloc(0, lSize + 4)
                     lPtr = GlobalLock(hMem)
-                    CopyMemory ByVal lPtr, ByVal StrPtr(stext2), lSize + 1
+                    CopyMemory ByVal lPtr, ByVal StrPtr(stext2), lSize + 2
                     GlobalUnlock hMem
                     If SetClipboardData(lFormatId, hMem) = 0 Then
                         GlobalFree hMem
@@ -3284,7 +3284,7 @@ Case "OVER", "OVERWRITE", "PAGE", "PARAGRAPH$(", "PARAGRAPH(", "PARAGRAPH.INDEX(
 Case "PATH", "PATH$(", "PAUSE", "PEN", "PHASE(", "PI", "PIECE$(", "PIPE", "PIPENAME$(", "PLATFORM$", "PLAY"
 Case "PLAYER", "PLAYSCORE", "POINT", "POINTER", "POINTER(", "POINT(", "POLAR(", "POLYGON", "PORTRAIT", "POS", "POS(", "POS.X", "POS.Y", "PRINT"
 Case "PRINTER", "PRINTER.MARGINS", "PRINTERNAME$", "PRINTING", "PRIVATE", "PROFILER", "PROPERTY", "PROPERTY(", "PROPERTY$(", "PROPERTIES", "PROPERTIES$", "PROTOTYPE", "PSET", "PUBLIC", "PUSH", "PUT", "QUEUE", "QUOTE$("
-Case "RANDOM", "RANDOM(", "READ", "READY(", "RECORDS(", "RECURSION.LIMIT", "REFER", "REFRESH", "RELEASE", "REM"
+Case "RCOS(", "RSIN(", "RTAN(", "RANDOM", "RANDOM(", "RATN(", "READ", "READY(", "RECORDS(", "RECURSION.LIMIT", "REFER", "REFRESH", "RELEASE", "REM"
 Case "REMOVE", "REPEAT", "REPLACE$(", "REPORT", "REPORTLINES", "RESTART", "RETRIEVE", "RETURN", "REV(", "REVISION"
 Case "RIGHT", "RIGHT$(", "RIGHTPART$(", "RINSTR(", "RND", "ROUND(", "ROW", "RTRIM$(", "SAVE", "SAVE.AS", "SAVE.DOC", "SCALE.X"
 Case "SCALE.Y", "SCAN", "SCORE", "SCREEN.PIXELS", "SCREEN.X", "SCREEN.Y", "SCRIPT", "SCROLL", "SEARCH"
@@ -3302,12 +3302,12 @@ Case "UP", "UPDATABLE", "UPDATE", "USE", "USER", "USERS", "USER.NAME$", "USGN("
 Case "VAL(", "VAL$(", "VALID(", "VALUE", "VALUE(", "VAR", "VALUE$", "VARIABLE", "VARIABLES", "VARIANT", "VARPTR(", "VERSION", "VIEW", "VOID", "VOLUME"
 Case "WAIT", "WCHAR", "WEAK", "WEAK$(", "WHILE", "WHEN", "WIDE", "WIDTH", "WIN", "WINDOW"
 Case "WITH", "WITHEVENTS", "WORDS", "WRITABLE(", "WRITE", "WRITER", "X.TWIPS", "XOR", "Y.TWIPS", "адеиас", "аниысг", "апеияо", "апой.ая$(", "апой.де$("
-Case "адеиасе", "ахя(", "ай(", "айеяаио.дуадийо(", "айеяаио", "айеяаиос", "акт", "акгхес", "акгхгс", "аккацг", "аккацг$("
+Case "адеиасе", "аежап(", "агл(", "ахя(", "ай(", "айеяаио.дуадийо(", "айеяаио", "айеяаиос", "акт", "акгхес", "акгхгс", "аккацг", "аккацг$("
 Case "аккане", "аккиыс", "аккиыс.ам", "ам", "ам(", "амап(", "амап$(", "ам$(", "амт(", "амтийеилемо", "ама", "амафгтгсг", "амахеыягсг", "амайтгсг", "амакоцио"
 Case "амакоцио$", "амакусг.охомгс", "амакусг.у", "амакусг.ь", "амакусг.в", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье"
 Case "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "амтийеилемо(", "амы", "аниа", "аниа(", "аниа$", "аниа(", "апая", "апаяихлгсг", "апедысе"
 Case "апко", "апкос", "апо", "апохгйеусг.ыс", "апой$(", "апойопг", "апойкеистийа", "апок(", "аяца", "аяихло", "аяихлос", "аяихлос.паяацяажоу("
-Case "аяис$(", "аяистеяолеяос$(", "аявеиа", "аявеио", "аявеио$(", "аявеиоу.лгйос(", "аявеиоу.сталпа(", "аявг", "аявг(", "атупо", "атупос", "аукос"
+Case "аяис$(", "аяистеяолеяос$(", "аявеиа", "аявеио", "аявеио$(", "аявеиоу.лгйос(", "аявеиоу.сталпа(", "аявг", "аявг(", "асум(", "атон.еж(", "атупо", "атупос", "аукос"
 Case "аукос$(", "аукоу", "ауноуса", "ауто", "ажаияесг", "ажгсе", "баке", "баке.адеиа$(", "басг"
 Case "басг(", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг", "бгла", "богхеиа", "цецомос", "цецомота", "целисе", "целисла"
 Case "цемийес", "цемийг", "цемийо", "циа", "цомийо", "цяалла", "цяалла$", "цяаллатосеияа", "цяаллатосеияа$", "цяаллесамажояас", "цяаллг"
@@ -4303,7 +4303,7 @@ myfun() = Array("PARAM(", 1, "паяал(", 1, "STACKITEM(", 2, "тилгсыяоу(", 2, "SGN
 , "INT(", 86, "ай(", 86, "SEEK(", 87, "летахесг(", 87, "EOF(", 88, "текос(", 88, "RANDOM(", 89, "туваиос(", 89, "CHRCODE(", 90, "ваяйыд(", 90, "ASC(", 91, "йыд(", 91 _
 , "GROUP(", 92, "олада(", 92, "TEST(", 93, "дойилг(", 93, "CONS(", 94, "емысг(", 94, "CAR(", 95, "пяыто(", 95, "CDR(", 96, "еполема(", 96, "сыяос(", 24, "STACK(", 24, "READY(", 97, "етоило(", 97, "PROPERTY(", 98, "идиотгта(", 98, "IF(", 99, "ам(", 99, "ORDER(", 100, "танг(", 100, "BANK(", 101, "тяап(", 101, "CEIL(", 102, "ояож(", 102, "FLOOR(", 86, "дапед(", 86, "еийома(", _
 103, "IMAGE(", 103, "BUFFER(", 104, "диаяхяысг(", 104, "BINARY.NOT(", 105, "дуадийо.ови(", 105, "POINTER(", 108, "деийтгс(", 108, "BINARY.ADD(", 109, "дуадийо.пяосхесг(", 109, "дуадийо.пяо(", 109, "HSL(", 110, "вйж(", 110, "PLAYER(", 111, "паийтгс(", 111, "GETOBJECT(", 112, "ANTIKEIMENO(", 112, "VARPTR(", 113, "диеухл(", 113, "BIGINTEGER(", 114, "лецакосайеяаиос(", 114 _
-, "MODPOW(", 115, "уподум(", 115, "MOD(", 116, "упок(", 116, "CONJUGATE(", 117, "суфуцгс(", 117, "ARG(", 118, "ояисла(", 118, "жасг(", 119, "PHASE(", 119, "POLAR(", 120, "покийос(", 120, "EXP(", 121, "ейх(", 121)
+, "MODPOW(", 115, "уподум(", 115, "MOD(", 116, "упок(", 116, "CONJUGATE(", 117, "суфуцгс(", 117, "ARG(", 118, "ояисла(", 118, "жасг(", 119, "PHASE(", 119, "POLAR(", 120, "покийос(", 120, "EXP(", 121, "ейх(", 121, "RCOS(", 122, "асум(", 122, "RSIN(", 123, "агл(", 123, "RTAN(", 124, "аежап(", 124, "RATN(", 125, "атон.еж(", 125)
 If Not bhashbackup Is Nothing Then
 For I = 0 To UBound(myfun()) Step 2
     bhashbackup.ItemCreator CStr(myfun(I)), CLng(myfun(I + 1))
