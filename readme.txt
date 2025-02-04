@@ -1,9 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 3 active-X
-1. Optimizations for complex numbers
-2. rCos(), rSin(), rTan(), rAtn() for radians.
-3. Help file Updated
+Version 13 revision 4 active-X
+Now we can send emf page. We can send bitmap (600 dpi), this is the old way. The new way can send multiple emf in a page. defining scale and position.
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

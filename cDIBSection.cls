@@ -16,6 +16,7 @@ Public emfSizeFactor
 Private Const DT_NOPREFIX = &H800
 Private Const DT_EXTERNALLEADING = &H200
 Private Const DT_INTERNAL = &H1000
+Private Declare Function SetGraphicsMode Lib "gdi32" (ByVal Hdc As Long, ByVal iMode As Long) As Long
 Private Declare Function SetTextColor Lib "gdi32" (ByVal Hdc As Long, ByVal crColor As Long) As Long
 Private Declare Function DrawState Lib "user32" Alias "DrawStateA" _
         (ByVal Hdc As Long, _
@@ -86,7 +87,7 @@ End Type
 Private Declare Function FillRect Lib "user32" (ByVal Hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Private Declare Function GdiFlush Lib "gdi32" () As Long
 Private SD As String
-
+Private SkipPage As Boolean
 Private Type BITMAPFILEHEADER
         bfType As Integer
         bfSize As Long
@@ -335,6 +336,109 @@ Private Const DSS_MONO = &H80
 Private Const DSS_RIGHT = &H8000
 Private Declare Function DrawIconEx Lib "user32" (ByVal Hdc As Long, ByVal xLeft As Long, ByVal yTop As Long, ByVal hIcon As Long, ByVal cxWidth As Long, ByVal cyWidth As Long, ByVal istepIfAniCur As Long, ByVal hbrFlickerFreeDraw As Long, ByVal diFlags As Long) As Long
 Private OpenPrinter As Boolean
+Private Function HM2Pix(ByVal Value As Double, ByVal lDpi As Long) As Long
+    HM2Pix = Int(Value * lDpi / 2540 + 0.5)
+End Function
+Friend Sub RenderStdPicture(bstack As basetask, pPicture As Object, advance As Long, type1 As Boolean, ByVal szx As Single, ByVal szy As Single)
+Dim my_brush As Long
+Const copiesNUM As Long = 1
+Const GM_ADVANCED = 2
+Const GM_COMPATIBLE = 1
+On Error GoTo 100
+    If Not OpenPrinter Then
+       CopiesCount copiesNUM, MyDM()
+       MakePrinterhDC Printer, pname
+       OpenPrinter = p_hdc <> 0
+    End If
+    If p_hdc <> 0 Then
+    
+    If Not SkipPage Then
+   m_PrinterhBmpOld = SelectObject(p_hdc, m_hDIb)
+   StartPage p_hdc
+   End If
+   Else
+    Beep
+    Exit Sub
+   End If
+   
+    If OpenPrinter Then
+    SkipPage = True
+  '  pic.Render p_hdc
+    If pPicture.Type = 4 Then
+    'Stop
+    Dim kkx As RECT
+    SetGraphicsMode p_hdc, GM_ADVANCED
+    If type1 Then
+        kkx.Left = PLM / dv15
+        kkx.top = PTM / dv15
+        kkx.Right = pw * szx + PLM / dv15
+        kkx.Bottom = ph * szy + PTM / dv15
+        
+        PlayEnhMetaFile p_hdc, pPicture.Handle, kkx
+        
+    Else
+        kkx.Left = PLM / dv15
+        kkx.top = PTM / dv15
+        'kkx.Right = HM2Pix(pw * szx, 2381) + PLM / dv15
+        'kkx.Bottom = HM2Pix(ph * szy, 2381) + PTM / dv15
+        kkx.Right = pw * szx * 0.935 + PLM / dv15
+        kkx.Bottom = ph * szy * 0.935 + PTM / dv15
+        PlayEnhMetaFile p_hdc, pPicture.Handle, kkx
+        If PRM > 0 Or PBM > 0 Then
+        my_brush = CreateSolidBrush(16777215)
+        kkx.Left = PLM / dv15
+        kkx.top = PTM / dv15
+        kkx.Right = pw + PLM / dv15
+        kkx.Bottom = ph + PTM / dv15
+
+    End If
+        If PRM > 0 Then
+            If kkx.Right - PRM / dv15 < 0 Then
+                FillRect p_hdc, kkx, my_brush
+            Else
+                kkx.Left = kkx.Right - PRM / dv15
+                FillRect p_hdc, kkx, my_brush
+            End If
+        End If
+        If PBM > 0 Then
+            kkx.Left = PLM / dv15
+            If kkx.Bottom - PBM / dv15 < 0 Then
+                FillRect p_hdc, kkx, my_brush
+            Else
+                kkx.top = kkx.Bottom - PBM / dv15
+                FillRect p_hdc, kkx, my_brush
+            End If
+        End If
+        DeleteObject my_brush
+        End If
+        SetGraphicsMode p_hdc, GM_COMPATIBLE
+        
+    
+    Else
+        pPicture.Render p_hdc, 0, 0, HM2Pix(pw, pwox), HM2Pix(ph, phoy), 0, 0, pPicture.Width, pPicture.Height, (0)
+    End If
+    If Not SkipPage Then
+    If p_hdc <> 0 Then
+    EndPage p_hdc
+    SelectObject p_hdc, m_PrinterhBmpOld
+    End If
+    m_PrinterhBmpOld = 0
+    CopiesCount (1), MyDM()
+    Select Case advance
+    Case 1
+     Portrait bstack
+    Case 2
+     Landscape bstack
+    Case Else
+    'EndPrint
+    End Select
+    End If
+    End If
+    Exit Sub
+100
+    Debug.Print Err.Description
+    Err.Clear
+End Sub
 Public Property Get PrinterHdc() As Long
 PrinterHdc = p_hdc
 p_hdc = 0
@@ -1163,8 +1267,22 @@ Public Sub ResetPageDM()
  
  End If
 End Sub
+Public Sub EjectPage()
+If SkipPage Then
+    SkipPage = False
+    If p_hdc <> 0 Then
+        EndPage p_hdc
+        SelectObject p_hdc, m_PrinterhBmpOld
+        End If
+        m_PrinterhBmpOld = 0
+        CopiesCount (1), MyDM()
+    End If
+
+End Sub
+
 Property Get PrinterOn()
     PrinterOn = OpenPrinter
+
 End Property
 Public Sub ThumbnailPaintPrinter(copiesNUM As Long, Optional ByVal zf As Single = -1, Optional ByVal FitToPic As Boolean = True, Optional CROP As Boolean = False, Optional over As Boolean = False, Optional ByVal fr As Long = 0, Optional ByVal offsetX As Long = 0, Optional ByVal offsetY As Long, Optional ByVal Border As Long = 0, Optional ByVal rtxy As Double = 1#, Optional pname As String = "Another Page")
    Dim oldSc As Long, Dummy1 As Boolean, Dummy2 As Boolean, sw As Long, sh As Long
@@ -1174,6 +1292,7 @@ Public Sub ThumbnailPaintPrinter(copiesNUM As Long, Optional ByVal zf As Single 
    
      Dim A As Single
    '  Exit Sub
+   If SkipPage Then Exit Sub
 If Not OpenPrinter Then
    CopiesCount copiesNUM, MyDM()
    MakePrinterhDC Printer, pname
@@ -1655,7 +1774,7 @@ If Me.Height > 0 Then
 End If
 
 End Sub
-Public Sub Text(P$, X As Long, Y As Long, Optional s As Single = -1, Optional DE# = 0#, Optional Style As Long = 272, Optional mWidth As Long = -1, Optional expnd As Single = -1)
+Public Sub Text(p$, X As Long, Y As Long, Optional s As Single = -1, Optional DE# = 0#, Optional Style As Long = 272, Optional mWidth As Long = -1, Optional expnd As Single = -1)
 Dim old_brush As Long, old_pen As Long, my_brush As Long, my_pen As Long, rA As Long
 Dim f As LOGFONT, hPrevFont As Long, hFont As Long
 Dim fff As Long, dr1 As RECT
@@ -1670,7 +1789,7 @@ Dim Degree As Double
 Degree = DE# * 1.74532925199433E-02
 icx = (s * -20) / 15
   icy = CLng(Cos(Degree + Pi) * icx)
-    icx = CLng(sIn(Degree + Pi) * icx)
+    icx = CLng(Sin(Degree + Pi) * icx)
 'If degree <> 0 Then
 Degree = (Degree) * 180# / Pi
   f.lfEscapement = CLng(10 * Degree)
@@ -1715,7 +1834,7 @@ SetBkMode m_hDC, m_fonttransparent
 'old_brush = SelectObject(m_hDC, my_brush)
 SetTextColor m_hDC, m_BackColor
 
-DrawText m_hDC, StrPtr(P$), Len(P$), dr1, fff
+DrawText m_hDC, StrPtr(p$), Len(p$), dr1, fff
 'old_brush = SelectObject(m_hDC, old_brush)
 'DeleteObject my_brush
 'old_pen = SelectObject(m_hDC, old_pen)
@@ -1725,7 +1844,7 @@ hFont = SelectObject(m_hDC, hPrevFont)
 
 FreeHDC
 End Sub
-Public Sub TextW(P$, X As Long, Y As Long, x1 As Long, y1 As Long, Optional s As Single = -1, Optional DE# = 0#, Optional Style As Long = 272)
+Public Sub TextW(p$, X As Long, Y As Long, x1 As Long, y1 As Long, Optional s As Single = -1, Optional DE# = 0#, Optional Style As Long = 272)
 Dim old_brush As Long, old_pen As Long, my_brush As Long, my_pen As Long, rA As Long
 Dim f As LOGFONT, hPrevFont As Long, hFont As Long
 Dim fff As Long, dr1 As RECT, expnd As Long
@@ -1740,7 +1859,7 @@ Dim Degree As Double
 Degree = DE# * 1.74532925199433E-02
 icx = (s * -20) / 15
   icy = CLng(Cos(Degree + Pi) * icx)
-    icx = CLng(sIn(Degree + Pi) * icx)
+    icx = CLng(Sin(Degree + Pi) * icx)
 'If degree <> 0 Then
 Degree = (Degree) * 180# / Pi
   f.lfEscapement = CLng(10 * Degree)
@@ -1776,7 +1895,7 @@ SetBkMode m_hDC, m_fonttransparent
 'my_brush = CreateSolidBrush(m_backcolor)
 'old_brush = SelectObject(m_hDC, my_brush)
 SetTextColor m_hDC, m_BackColor
-DrawText m_hDC, P$, Len(P$), dr1, fff
+DrawText m_hDC, p$, Len(p$), dr1, fff
 'old_brush = SelectObject(m_hDC, old_brush)
 'DeleteObject my_brush
 'old_pen = SelectObject(m_hDC, old_pen)
@@ -1819,12 +1938,12 @@ FreeHDC
 End Sub
 Public Sub Grami(x1 As Long, y1 As Long, x2 As Long, y2 As Long, w1 As Long, mycolor As Variant)
 Dim old_brush As Long, my_brush As Long, m_color As Long
-Dim old_pen As Long, my_pen As Long, P As POINTAPI
+Dim old_pen As Long, my_pen As Long, p As POINTAPI
 ' line
 m_color = getRGB(mycolor)
 needHDC
 
-MoveToEx m_hDC, x1, y1, P
+MoveToEx m_hDC, x1, y1, p
 my_pen = CreatePen(PS_SOLID, w1, m_color)
 old_pen = SelectObject(m_hDC, my_pen)
 ''''''''''''''''''''''''''''''''''''''''''

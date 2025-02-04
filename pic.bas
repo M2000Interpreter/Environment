@@ -2503,12 +2503,20 @@ Public Function SetTextData( _
     ' use strptr and lenb
 
     Dim hMem As Long, lPtr As Long
-    Dim lSize As Long
-    lSize = LenB(sText)
-    hMem = GlobalAlloc(0, lSize + 4)
-    If (hMem > 0) Then
+    Dim lSize As Long, placeSize As Long
+    
+        lSize = LenB(sText)
+        If lSize = 0 Then Exit Function
+        If lSize Mod 2 = 1 Then
+        placeSize = lSize + 1
+        Else
+        placeSize = lSize
+        End If
+        hMem = GlobalAlloc(0, placeSize)
+        If (hMem > 0) Then
         lPtr = GlobalLock(hMem)
-        CopyMemory ByVal lPtr, ByVal StrPtr(sText), lSize + 2
+        CopyMemory ByVal lPtr, ByVal StrPtr(String$(placeSize \ 2, Chr$(0))), placeSize
+        CopyMemory ByVal lPtr, ByVal StrPtr(sText), lSize
         GlobalUnlock hMem
         If (OpenClipboard(Form1.hWnd) <> 0) Then
             If EmptyClipboard Then
@@ -3280,7 +3288,7 @@ Case "MOUSE.Y", "MOUSEA.X", "MOUSEA.Y", "MOVE", "MOVIE", "MOVIE.COUNTER", "MOVIE
 Case "MOVIES", "MUSIC", "MUSIC.COUNTER", "NAME", "NEW", "NEXT"
 Case "NORMAL", "NOT", "NOTHAVE(", "NOTHING", "NOW", "NUMBER", "NULL", "OBJECT", "OFF", "OLE", "ON"
 Case "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPERATOR", "OPTIMIZATION", "OR", "ORDER", "ORDER(", "OSBIT", "OS$", "OUT", "OUTPUT"
-Case "OVER", "OVERWRITE", "PAGE", "PARAGRAPH$(", "PARAGRAPH(", "PARAGRAPH.INDEX(", "PARAM(", "PARAM$(", "PARAMETERS$", "PART", "PARENT", "PASSWORD"
+Case "OVER", "OVERWRITE", "PAGE", "PAGE.HEIGHT", "PAGE.WIDTH", "PARAGRAPH$(", "PARAGRAPH(", "PARAGRAPH.INDEX(", "PARAM(", "PARAM$(", "PARAMETERS$", "PART", "PARENT", "PASSWORD"
 Case "PATH", "PATH$(", "PAUSE", "PEN", "PHASE(", "PI", "PIECE$(", "PIPE", "PIPENAME$(", "PLATFORM$", "PLAY"
 Case "PLAYER", "PLAYSCORE", "POINT", "POINTER", "POINTER(", "POINT(", "POLAR(", "POLYGON", "PORTRAIT", "POS", "POS(", "POS.X", "POS.Y", "PRINT"
 Case "PRINTER", "PRINTER.MARGINS", "PRINTERNAME$", "PRINTING", "PRIVATE", "PROFILER", "PROPERTY", "PROPERTY(", "PROPERTY$(", "PROPERTIES", "PROPERTIES$", "PROTOTYPE", "PSET", "PUBLIC", "PUSH", "PUT", "QUEUE", "QUOTE$("
@@ -3344,7 +3352,7 @@ Case "омола.аявеиоу.ломо$(", "омола.тлглатос$", "омола.вягстг$", "ояифомтиа", "о
 Case "памы", "памылисо(", "паяацяажос$(", "паяацяажос(", "паяал(", "паяал$(", "паяахесг$(", "паяахуяо", "паяалетяои$", "паяе", "паяейаяе$"
 Case "паяелбокг", "патглемо(", "павос", "педиа", "педио", "педио$(", "пеф$(", "пема", "пеяи"
 Case "пеяи$", "пеяихыяио", "пета", "пи", "пимайас", "пимайас$(", "пимайас(", "пимайес", "писы("
-Case "пкациа", "пкаисио", "пкатос", "пкатос.сглеиоу", "пкатос.таимиас", "пкатжояла$", "пкгйтяокоцио", "покийос(", "покуцымо"
+Case "пкациа", "пкаисио", "пкатос", "пкатос.секидас", "пкатос.сглеиоу", "пкатос.таимиас", "пкатжояла$", "пкгйтяокоцио", "покийос(", "покуцымо"
 Case "пяос", "пяосаялоцгс", "пяосхесе.еццяажо", "пяосхгйг", "пяытотупо", "пяыто(", "пяосыяимо$", "пяовеияо", "пяовеияо$", "пяовеияо.еийома", "пяовеияо.еийома$", "пяовеияо.сведио", "яеула", "яифа("
 Case "яоутима", "яоутимас", "яухлисеис", "яыта$(", "яыта(", "саяысе", "сбгсе", "се"
 Case "сеияа", "сеияиайос.дисйоу(", "секида", "семаяио", "сгл", "сгл(", "сглади", "сглеио", "сглеио(", "сглеяа", "сйоупидиа", "стахеяг", "стахеяес", "статийг", "статийес"
@@ -3357,7 +3365,7 @@ Case "тилг(", "тилг$(", "тилгсыяоу$(", "тилгсыяоу(", "типота", "титкос", "титкос
 Case "тон.еж(", "топийа", "топийес", "топийг", "топийо", "топийо$(", "топийо(", "топос$(", "топос.аявеиоу$("
 Case "тоте", "тяап(", "тупос", "тупос$(", "тупос.аявеиоу$(", "тупысе", "туваиос", "туваиос(", "тыяа", "у.сглеиа"
 Case "упаявеи(", "упаявеи.йатакоцос(", "упеяйкасг", "уплея(", "упо", "уподум(", "упойатакоцос", "упок", "упок(", "упокоцистг", "упокоцистгс$", "упокоипо"
-Case "уполмгла", "упыяа(", "уьгкос", "уьос", "уьос.сглеиоу", "уьос.таимиас", "жайекос$(", "жамеяо$(", "жаядиа", "жасг(", "жеяе"
+Case "уполмгла", "упыяа(", "уьгкос", "уьос", "уьос.секидас", "уьос.сглеиоу", "уьос.таимиас", "жайекос$(", "жамеяо$(", "жаядиа", "жасг(", "жеяе"
 Case "жеяеписы", "жхимоуса", "жиктяо(", "жиктяо$(", "жомто", "жояла", "жояла$", "жоятос", "жоятысе", "жоятысе.еццяажо"
 Case "жяасг", "жымг", "жыто$(", "в.сглеиа", "вая$(", "ваяайтгяес", "ваяане", "ваяйыд$("
 Case "ваяйыд(", "вйж(", "вягсг", "вягстг", "вягстгс", "вягстым", "вяомос$(", "вяомос(", "вяыла", "вяыла(", "вяылата", "вяылатисе"
@@ -4274,7 +4282,7 @@ myid() = Array("THIS", 1, "ауто", 1, "RND", 2, "туваиос", 2, "PEN", 3, "пема", 3
 , "TICK", 73, "тий", 73, "TODAY", 74, "сглеяа", 74, "NOW", 75, "тыяа", 75, "MENU.VISIBLE", 76, "епикоцес.жамеяес", 76, "MENUITEMS", 77, "епикоцес", 77 _
 , "MENU", 78, "епикоцг", 78, "NUMBER", 79, "аяихлос", 79, "тилг", 79, "LAMBDA", 80, "калда", 81, "GROUP", 83, "олада", 83, "ARRAY", 84, "пимайас", 84, "[]", 85 _
 , "сыяос", 86, "STACK", 86, "ISWINE", 87, "SHOW", 88, "охомг", 88, "OSBIT", 89, "WINDOW", 90, "сусйеуг", 90, "MONITOR.STACK", 91, "екецвос.сыяоу", 91, "MONITOR.STACK.SIZE", 92, "екецвос.лецехос.сыяоу", 92, "?", 93, "диаяхяысг", 94, "BUFFER", 94, "йатастасг", 95, "INVENTORY", 95, "LIST", 96, "киста", 96, "QUEUE", 97, "оуяа", 97, "INFINITY", 82, "апеияо", 82, "еккгмийа", 98, "GREEK", 98 _
-, "INTERNET", 99, "диадийтуо", 99, "CLIPBOARD.IMAGE", 100, "пяовеияо.еийома", 100, "CLIPBOARD.DRAWING", 101, "пяовеияо.сведио", 101, "MONITORS", 102, "охомес", 102, "DOS", 103, "йомсока", 103, "SOUNDREC.LEVEL", 104, "гвоцяажгсгс.епипедо", 104, "ADDRESSOF", 105, "диеухумсгапо", 105, "пкатос.таимиас", 106, "MOVIE.WIDTH", 106, "уьос.таимиас", 107, "MOVIE.HEIGHT", 107)
+, "INTERNET", 99, "диадийтуо", 99, "CLIPBOARD.IMAGE", 100, "пяовеияо.еийома", 100, "CLIPBOARD.DRAWING", 101, "пяовеияо.сведио", 101, "MONITORS", 102, "охомес", 102, "DOS", 103, "йомсока", 103, "SOUNDREC.LEVEL", 104, "гвоцяажгсгс.епипедо", 104, "ADDRESSOF", 105, "диеухумсгапо", 105, "пкатос.таимиас", 106, "MOVIE.WIDTH", 106, "уьос.таимиас", 107, "MOVIE.HEIGHT", 107, "PAGE.WIDTH", 108, "пкатос.секидас", 108, "PAGE.HEIGHT", 109, "уьос.секидас", 109)
 If Not ahashbackup Is Nothing Then
 For I = 0 To UBound(myid()) Step 2
     ahashbackup.ItemCreator CStr(myid(I)), CLng(myid(I + 1))

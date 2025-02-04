@@ -12707,16 +12707,27 @@ MODULE HTTP {Module CheckIt  {
 Report 2, "Using the Microsoft.XMLHTTP with threads - see Down4 where we use an internal object for download with events. Use space bar or mouse click to advance the scroll"
 CheckIt
 }
-MODULE CAL {\\ Calendar - for "REAL" programmers
+MODULE CAL {FUNCTION PDFPRINTER$ {
+	MENU
+	PRINTER +
+	IF MENUITEMS=0 THEN ERROR "No printer found"
+	LONG I, PR
+	FOR I=1 TO MENUITEMS
+		IF INSTR(UCASE$(MENU$(I)), "MICROSOFT PRINT TO PDF")=1 THEN PR=I: EXIT FOR
+	NEXT
+	IF PR=0 THEN PR=1
+	=MENU$(PR)
+}
+GLOBAL PR$=PDFPRINTER$()
+\\ Calendar - FOR "REAL" programmers
 \\ All statements in UPPERCASE
-\\ Output to 132 characters console - as a line printer
+\\ Output TO 132 characters console - as a line printer
 \\ USE COURIER NEW  (FONT "COURIER NEW")
 
 \\ CHANGE THE 
 GLOBAL CONST PRINT_IT AS Boolean=true
-MODULE GLOBAL SNOOPY  {
-IF NOT PRINT_IT THEN CURSOR 0,ROW ELSE IF ROW>0 THEN PAGE 1
-
+MODULE GLOBAL SNOOPY {
+ IF NOT PRINT_IT THEN CURSOR 0,ROW 
 IF  PRINT_IT THEN FONT "COURIER NEW" : FORM 133, 68
 PRINT $(,8)
 PRINT #-2, {
@@ -12765,11 +12776,13 @@ PRINT #-2, {
 				  ====* 	*     X 	      \  \   )XXXXX
 			     =========**********       XXXXXXXXXXXXXXXXXXXXXX
 
+
 }
 }
 MODULE CALENDAR (YEAR, LOCALEID) {
       LOCALE LOCALEID
-      IF NOT PRINT_IT THEN CURSOR 0,HEIGHT-1  ' LAST LINE, SO EACH NEW LINE SCROLL ALL LINES UP
+      IF NOT PRINT_IT THEN CURSOR 0,HEIGHT-1
+      ' LAST LINE, SO EACH NEW LINE SCROLL ALL LINES UP
       SNOOPY
       
       PRINT UNDER  ' PRINT UNDERLINE
@@ -12818,14 +12831,21 @@ MODULE CALENDAR (YEAR, LOCALEID) {
             PRINT
             IF PRINT_IT ELSE REFRESH 1000 
             NEXT M
-      NEXT J     
+      NEXT J
+      REM IF PRINT_IT THEN IF NOT ROW=0 THEN PAGE 1
 }
 WHILE INKEY$<>"" :  END WHILE
-IF PRINT_IT THEN PRINTING ON ELSE REFRESH 1000
+IF PRINT_IT THEN
+	PRINTER 12, PR$
+	PRINTER.MARGINS 9000/2.54*0.4, 0, 9000/2.54*0.4*2 
+	PRINTING ON
+ELSE
+	REFRESH 1000
+END IF
 FONT "COURIER NEW"
 PEN 0
 CLS 15, 0
-if MODULE(fixmode) THEN
+IF MODULE(fixmode) THEN
 fixmode 132,68
 ELSE
 FORM 132,68
@@ -12837,7 +12857,7 @@ CALENDAR 1966, 1032 ' GREEK
 GOSUB WAITKEY_OR_MOUSE
 I=VAL(DATE$(TODAY,LOCALE, "yyyy"))
 FOR I=I TO I+5
-CALENDAR I, 1033  ' ENGLISH
+CALENDAR I, 1033
 GOSUB WAITKEY_OR_MOUSE
 NEXT I
 IF PRINT_IT THEN PRINTING OFF ELSE REFRESH 50
@@ -12866,6 +12886,7 @@ REM NOT USED
 FUNCTION TITLE$(A$)
       =UCASE$(LEFT$(A$,1))+LCASE$(MID$(A$, 2))
 END FUNCTION
+
 }
 MODULE LINKED_LIST {\\ This example use pointers to groups.
 \\ Class Node
@@ -46298,5 +46319,211 @@ MODULE MAGICPOWER {? $("")
 ? "modulus of 1-3i:";mod((1,-3i))
 ? "is equal to sqrt(10):";sqrt(10)
 ? "argument of 1-3i:";round(arg((1,-3i))*180/pi, 3);"°"
+}
+MODULE COUNTER1 {Const Center=2
+pen 0
+cls 15, 0
+rem ? 15;" twips per dot *";600;" dot per inch ="; 15*600;" twips per inch"
+pr$=@PdfPrinter()
+//set the printer output
+printer 12, pr$
+
+//We can use  printer { } or printing on at the start and printing off at the end
+
+
+printer {
+	A4.width=8.27  ' inches
+	' twipsX is twips per dot
+	dpi=round(Scale.x/A4.width/twipsX,0)
+	cmPerInch=2.54
+	a=twipsX*dpi /cmPerInch ' twips per cm
+	lm=(scale.x-5*4*a)/2
+	wx=4*a
+	wh=3*a
+	s=1
+	sz=20
+	last=10	
+	pen 0	
+	for kk=1 to last
+				for j=0 to 8
+				for i=0 to 4
+				move lm+wx*i, lm+wh*j
+					pen 0 {
+						width 8 {
+							polygon 15, wx, 0, 0, wh, -wx, 0, 0, -wh
+						}
+					}
+					step wx/2, wh/2
+					pen 0 {
+						// size 20 (converted to actual 20*6.125)
+						legend str$(s,"0000"), "ARIAL BLACK", 20,0,2
+					}
+				s++
+				next
+			next
+	LAYER {Print over $(4), "Page "+kk
+	}
+	' Legend ..... Center means center to point both axes
+	 'so if we want 1.8 centimeters start the legend we have to add half size
+	move scale.x/2, scale.y-1.8*a + size.y("Pg", "Arial", 12)/2
+	Legend  "Page "+kk+"/"+Last, "Arial", 12, 0, Center
+	if kk<last then page 1
+	next
+}
+print
+function PdfPrinter()
+	menu
+	printer +
+	if menuitems=0 then Error "No printer found"
+	local i, pr
+	for i=1 to menuitems
+		if instr(menu$(i), "Microsoft Print to PDF")=1 then Pr=i: exit for
+	next
+	if pr=0 then pr=1
+	=menu$(pr)
+end function
+
+}
+MODULE TSTPRINT {module testone {
+Print PrinterName$
+'Print PAGE.WIDTH/2.54*1440, PAGE.HEIGHT/2.54*1440
+'Print page.width/page.height
+'Print (PAGE.WIDTH/2.54*1440)/ (PAGE.HEIGHT/2.54*1440)
+mx=page.width/2.54*96*twipsx*3
+my=round(mx*2/sqrt(2),0)
+mx=round(mx,0)
+Print mx, my
+Print mx/my
+
+
+Printing On
+i=0
+last=3
+
+for k=1 to Last {
+	DRAWING mx, my{'
+		mode 10*3
+		pen 0
+		move 2000,2000
+		draw to scale.x-2000, scale.y-2000
+		move scale.x-2000,2000
+		draw to 2000, scale.y-2000
+		move 0,0
+		draw to scale.x, scale.y
+		move scale.x,0
+		draw to 0, scale.y
+		for i=i to i+Height-1: Print i: next
+		z=mode
+	} AS A
+	printer.margins
+	Page drawing a, 1/2, 1/2
+	printer.margins scale.x/2
+	Page drawing a, 1/2, 1/2
+	printer.margins 0,scale.y/2
+	Page drawing a, 1/2, 1/2
+	printer.margins scale.x/2,scale.y/2
+	Page drawing a, 1/2, 1/2	
+	if k<Last then Page 1
+}
+layer {
+	Print IMAGE.X(A)
+	Print IMAGE.Y(A)
+	Print z
+	refresh
+}
+Printing off
+}
+module testtwo  {
+Print PrinterName$
+mx=page.width/2.54*96*twipsx
+my=round(mx*2/sqrt(2),0)
+mx=round(mx,0)
+Printing On
+i=0
+last=3
+for k=1 to Last {
+	DRAWING mx, my {
+		mode 10
+		pen 0
+		move 0,0
+		draw to  0, scale.y
+		move scale.x,0
+		draw to  scale.x, scale.y
+		move 0,0
+		draw to scale.x, scale.y
+		move scale.x,0
+		draw to 0, scale.y
+		for i=i to i+Height-1: Print i: next
+		z=mode
+	} AS A
+	printer.margins
+	Page drawing a, 1/2, 1/2
+	printer.margins scale.x/2
+	Page drawing a, 1/2, 1/2
+	printer.margins 0,scale.y/2
+	Page drawing a, 1/2, 1/2
+	printer.margins scale.x/2,scale.y/2
+	Page drawing a, 1/2, 1/2	
+	if k<Last then Page 1
+}
+layer {
+	Print IMAGE.X(A)
+	Print IMAGE.Y(A)
+	Print z
+	refresh
+}
+Printing off	
+}
+module testthree {
+print PrinterName$
+mx=page.width/2.54*96*twipsx
+my=round(mx*2/sqrt(2),0)
+mx=round(mx,0)
+
+Printing On
+i=0
+last=3
+
+for k=1 to Last {
+	DRAWING {'
+		mode 10*scale.x/mx
+		pen 15
+		move 0,0
+		draw to scale.x, scale.y
+		move scale.x,0
+		draw to 0, scale.y
+		pen 0
+		move 0,0
+		draw to  0, scale.y
+		move 2000,2000
+		draw to scale.x-2000, scale.y-2000
+		move scale.x-2000,2000
+		draw to 2000, scale.y-2000
+		for i=i to i+Height-1: Print i: next
+		z=mode
+	} AS A
+	printer.margins
+	Page drawing a, 1/2, 1/2
+	printer.margins scale.x/2
+	Page drawing a, 1/2, 1/2
+	printer.margins 0,scale.y/2
+	Page drawing a, 1/2, 1/2
+	printer.margins scale.x/2,scale.y/2
+	Page drawing a, 1/2, 1/2	
+	if k<Last then Page 1
+}
+layer {
+	Print IMAGE.X(A)
+	Print IMAGE.Y(A)
+	Print z
+	refresh
+}
+Printing off	
+}
+printer ?  'choose
+printer !  'change properties
+testone
+testtwo
+testthree
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

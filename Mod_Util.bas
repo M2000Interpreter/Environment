@@ -24186,18 +24186,56 @@ If PBM - PTM > 0 Then
 oprinter.square 0, oprinter.Height - (PBM - PTM) / szFactor * mydpi / 1440, oprinter.Width, oprinter.Height, "FFFFFF"
 End If
 oprinter.ThumbnailPaintPrinter 1, 100 * prFactor, False, True, True, , CLng(PLM / szFactor * mydpi / 1440), CLng(PTM / szFactor * mydpi / 1440), , , pagetitle
-'oprinter.ClearBits Form1.PrinterDocument1.BackColor
-'oprinter.needHDC
-'Set Form1.PrinterDocument1 = hDCToPicture(oprinter.HDC1, 0, 0, oprinter.Width, oprinter.Height)
 Form1.PrinterDocument1.Line (0, 0)-(Form1.PrinterDocument1.ScaleWidth, Form1.PrinterDocument1.ScaleHeight), &HFFFFFF, BF
-'oprinter.FreeHDC
-
 Form1.PrinterDocument1.Refresh
 Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(Int(psw / pwox * mydpi + 0.5), 3, 1), Form1.ScaleY(Int(psh / phoy * mydpi + 0.5), 3, 1))
-
-
 End If
 End Sub
+Sub printEMFpage(emf As StdPicture)
+Dim pagetitle As String
+On Error Resume Next
+If oprinter.Height = 0 Then
+getfirstpage
+
+Else
+pnum = pnum + 1
+With players(-2)
+.curpos = 0
+.currow = 0
+.lastprint = False
+.XGRAPH = 0
+.YGRAPH = 0
+End With
+With Form1.PrinterDocument1
+.currentX = 0
+.currentY = 0
+End With
+oprinter.CopyPicturePrinter Form1.PrinterDocument1
+oprinter.GetDpi mydpi, mydpi
+If Not ttl Or Not UseMe Is Nothing Then
+pagetitle = Form1.CaptionW + str$(pnum)
+ElseIf Form3.CaptionW <> "" Then
+pagetitle = Form3.CaptionW + str$(pnum)
+End If
+If pagetitle = "" Then
+pagetitle = "M2000 printing" + str$(pnum)
+End If
+If PRM - PLM > 0 Then
+'oprinter.square oprinter.Width - (PRM - PLM) / szFactor * mydpi / 1440, 0, oprinter.Width, oprinter.Height, "FFFFFF"
+End If
+If PBM - PTM > 0 Then
+'oprinter.square 0, oprinter.Height - (PBM - PTM) / szFactor * mydpi / 1440, oprinter.Width, oprinter.Height, "FFFFFF"
+End If
+'oprinter.ThumbnailPaintPrinter 1, 100 * prFactor, False, True, True, , CLng(PLM / szFactor * mydpi / 1440), CLng(PTM / szFactor * mydpi / 1440), , , pagetitle
+
+
+
+Form1.PrinterDocument1.Line (0, 0)-(Form1.PrinterDocument1.ScaleWidth, Form1.PrinterDocument1.ScaleHeight), &HFFFFFF, BF
+Form1.PrinterDocument1.Refresh
+Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(Int(psw / pwox * mydpi + 0.5), 3, 1), Form1.ScaleY(Int(psh / phoy * mydpi + 0.5), 3, 1))
+End If
+End Sub
+
 Sub getenddoc()
 On Error Resume Next
 Dim pagetitle As String
@@ -24826,7 +24864,7 @@ Else
     cursize = Form1.DIS.FontSize
 End If
 szFactor = mydpi * dv15 / 1440#
-
+oprinter.EjectPage
 If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) > 1 Then
     If oprinter.PrinterOn Then
         ChangeNowOrientationPortrait
@@ -24901,7 +24939,7 @@ Else
     cursize = Form1.DIS.FontSize
 End If
 szFactor = mydpi * dv15 / 1440#
-
+oprinter.EjectPage
 If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) < 1 Then
     If oprinter.PrinterOn Then
         ChangeNowOrientationLandscape
@@ -30592,11 +30630,16 @@ End Function
 
 Function ProcPrinting(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim xp As Printer, Scr As Object
+Static fromthere As Long
 Set Scr = basestack.Owner
-  ProcPrinting = True
- If ThereIsAPrinter = False Then Exit Function
+If ThereIsAPrinter = False Then Exit Function
 If IsLabelSymbolNew(rest$, "Õ¡…", "ON", Lang) And pname <> "" And Not basestack.toprinter Then
+                            If Not basestack.BackOwner Is Nothing Then
+                                MyEr "missing Printing Off", "˜‹ËÁÍÂ Á ≈ ‘’–Ÿ”« œ◊…"
+                                Exit Function
+                            End If
                             basestack.toprinter = True
+                            Set basestack.BackOwner = Scr
                             For Each xp In Printers
                             If xp.DeviceName = pname And xp.Port = Port Then Set Printer = xp
                             Next xp
@@ -30624,37 +30667,98 @@ If IsLabelSymbolNew(rest$, "Õ¡…", "ON", Lang) And pname <> "" And Not basestack.
                             Printer.currentX = 0
                             Printer.currentY = 0
 ElseIf IsLabelSymbolNew(rest$, "œ◊…", "OFF", Lang) And basestack.toprinter Then
+                    If basestack.BackOwner Is Nothing Then
+                        MyEr "missing Printing On", "˜‹ËÁÍÂ Á ≈ ‘’–Ÿ”« Õ¡…"
+                        Exit Function
+                    End If
                     getenddoc
-                    Set Scr = Form1.DIS
+                    Set Scr = basestack.BackOwner
+                    Set basestack.BackOwner = Nothing
                     basestack.toprinter = False
                     SetNormal Scr
-                    
+                    Set basestack.Owner = Scr
 ElseIf IsLabelSymbolNew(rest$, "ƒ…≈ œÿ≈", "BREAK", Lang) And basestack.toprinter Then
+                    If basestack.BackOwner Is Nothing Then
+                        MyEr "missing Printing On", "˜‹ËÁÍÂ Á ≈ ‘’–Ÿ”« Õ¡…"
+                        Exit Function
+                    End If
                     pnum = 0
                     oprinter.ClearUp
                     Form1.PrinterDocument1.Picture = LoadPicture("")
-                    Set Scr = Form1.DIS
+                    Set Scr = basestack.BackOwner
+                    Set basestack.BackOwner = Nothing
                     basestack.toprinter = False
                     SetNormal Scr
-                    Else
+                    Set basestack.Owner = Scr
+            Else
                     ProcPrinting = False
-                    End If
-Exit Function
+                    Exit Function
+            End If
+            ProcPrinting = True
+            
 End Function
 
 Function ProcPage(basestack As basetask, rest$, Lang As Long) As Boolean
-ProcPage = True
-Dim Scr As Object, X As Double, skip As Boolean
+
+Dim Scr As Object, X As Double, skip As Boolean, mDrawing As MemBlock, usehandler As mHandler
+Dim alfa As StdPicture, sz1, sz2
 Set Scr = basestack.Owner
-If basestack.toprinter Then getnextpage: skip = True
-If IsLabelSymbolNew(rest$, " ¡»≈‘«", "PORTRAIT", Lang) Then
-    Portrait basestack
-ElseIf IsLabelSymbolNew(rest$, "œ—…∆œÕ‘…¡", "LANDSCAPE", Lang) Then
-    Landscape basestack
-ElseIf IsNumber(basestack, rest$, X) Then
-    If X = 1 Then Portrait basestack Else Landscape basestack
-ElseIf Not skip Then
-    ClearScr Scr, mycolor(PaperOne)
+If IsLabelSymbolNew(rest$, "”◊≈ƒ…œ", "DRAWING", Lang) Then
+    If basestack.toprinter Then
+        If IsExp(basestack, rest$, X, nostring:=True) Then
+            If basestack.lastobj Is Nothing Then GoTo missdr
+            If Not TypeOf basestack.lastobj Is mHandler Then GoTo missdr
+            Set usehandler = basestack.lastobj
+            Set basestack.lastobj = Nothing
+            If Not usehandler.T1 = 2 Then GoTo missdr
+            Set mDrawing = usehandler.objref
+            If Not FastSymbol(rest$, ",") Then
+                sz1 = 1
+                sz2 = 1
+            ElseIf Not IsExp(basestack, rest$, sz1, nostring:=True) Then
+                MissNumExpr
+                Exit Function
+            ElseIf Not FastSymbol(rest$, ",") Then
+                sz2 = 1
+            ElseIf Not IsExp(basestack, rest$, sz2, nostring:=True) Then
+                MissNumExpr
+                Exit Function
+            End If
+            
+            
+            If Not mDrawing.IsEmf Then
+                
+                Set alfa = mDrawing.GetStdPicture()
+                oprinter.RenderStdPicture basestack, alfa, 0, mDrawing.type1, sz1, sz2
+                
+            
+            ElseIf Not mDrawing.IsWmf Then
+                Set alfa = mDrawing.GetStdPicture()
+                oprinter.RenderStdPicture basestack, alfa, 0, mDrawing.type1, sz1, sz2
+            Else
+            GoTo missdr
+            End If
+            ProcPage = True
+        Else
+missdr:
+            Set basestack.lastobj = Nothing
+            MyEr "missing drawing", "‰ÂÌ ‚ÒﬁÍ· Û˜›‰ÈÔ"
+        End If
+    Else
+        MyEr "place drawing inside a printer block", "‚‹ÎÂ ÙÔ Û˜›‰ÈÔ ÛÂ ›Ì· ÏÎÔÍ „È· ÙÔÌ ÂÍÙı˘Ùﬁ"
+    End If
+Else
+    ProcPage = True
+    If basestack.toprinter Then getnextpage: skip = True
+    If IsLabelSymbolNew(rest$, " ¡»≈‘«", "PORTRAIT", Lang) Then
+        Portrait basestack
+    ElseIf IsLabelSymbolNew(rest$, "œ—…∆œÕ‘…¡", "LANDSCAPE", Lang) Then
+        Landscape basestack
+    ElseIf IsExp(basestack, rest$, X, , True, , True, True) Then
+        If X = 1 Then Portrait basestack Else Landscape basestack
+    ElseIf Not skip Then
+        ClearScr Scr, mycolor(PaperOne)
+    End If
 End If
 Set Scr = Nothing
 End Function

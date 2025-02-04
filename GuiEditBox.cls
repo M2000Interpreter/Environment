@@ -2108,12 +2108,20 @@ Private Function SetTextData( _
     ) As Boolean
     If lFormatId = 0 Then Exit Function
     Dim hMem As Long, lPtr As Long
-    Dim lSize As Long
+    Dim lSize As Long, placeSize As Long
+    
         lSize = LenB(sText)
-    hMem = GlobalAlloc(0, lSize + 4)
-If (hMem > 0) Then
+        If lSize = 0 Then Exit Function
+        If lSize Mod 2 = 1 Then
+        placeSize = lSize + 1
+        Else
+        placeSize = lSize
+        End If
+        hMem = GlobalAlloc(0, placeSize)
+        If (hMem > 0) Then
         lPtr = GlobalLock(hMem)
-        CopyMemory ByVal lPtr, ByVal StrPtr(sText), lSize + 2
+        CopyMemory ByVal lPtr, ByVal StrPtr(String$(placeSize \ 2, Chr$(0))), placeSize
+        CopyMemory ByVal lPtr, ByVal StrPtr(sText), lSize
         GlobalUnlock hMem
        If (OpenClipboard(Form1.hWnd) <> 0) Then
      SetClipboardData lFormatId, hMem

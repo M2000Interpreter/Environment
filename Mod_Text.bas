@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 3
+Global Const Revision = 4
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5949,7 +5949,7 @@ If LastErNum = -2 Then IsExpBig = False
     Wend
     If flatobject Then basestack.flatobject
 End Function
-Function IsExp(basestack As basetask, A$, r As Variant, Optional ByVal noand1 As Boolean = True, Optional flatobject As Boolean = False, Optional Comp As Boolean = True, Optional nostring As Boolean) As Boolean
+Function IsExp(basestack As basetask, A$, r As Variant, Optional ByVal noand1 As Boolean = True, Optional flatobject As Boolean = False, Optional Comp As Boolean = True, Optional nostring As Boolean, Optional purenumber As Boolean) As Boolean
 Dim par As Long, parin As Long, conthere As Boolean
 If LastErNum = -2 Then LastErNum = 0
 If A$ = vbNullString Then Exit Function
@@ -5990,8 +5990,12 @@ If flatobject Then
     Else
         Set basestack.lastobj = Nothing
     End If
+    If purenumber Then
+        If Not IsNumeric(r) Then missNumber: IsExp = False
+    End If
 End If
 End Function
+
 Function rightoperator(bstack As basetask, aa$, po As Variant, Optional onlyexp As Boolean) As Boolean
 Dim r As Variant, ac As Variant, MUL As Long, r1 As Variant, IntVal As Integer, IntVal2 As Integer, BI As BigInteger
 Dim cur As Long, park As Object, back As Object, rr, getcom As Boolean
@@ -10027,10 +10031,25 @@ Else
     If w1 < 0 Then GoTo LOOKFORVARNUM
 End If
 findsecond:
-On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89, num90, num91, num92, num93, num94, num95, num96, num97, num98, num99, num100, num101, num102, num103, num104, num105, num106, num107
+On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89, num90, num91, num92, num93, num94, num95, num96, num97, num98, num99, num100, num101, num102, num103, num104, num105, num106, num107, num108, num109
 IsNumberNew = 0
 InternalError
 Exit Function
+num109:
+    If mydpi = 0 Then
+       Portrait bstack
+    End If
+    r = Round(ph / phoy * 2.54, 0)
+    IsNumberNew = True
+    Exit Function
+num108:
+    If mydpi = 0 Then
+       Portrait bstack
+    End If
+    r = Round(pw / pwox * 2.54, 0)
+    
+    IsNumberNew = True
+    Exit Function
 num107:
         
     r = MediaPlayer1.Height * Screen.TwipsPerPixelY
@@ -19443,7 +19462,7 @@ againfor948:
                             If bstack.ExistVar(W$) Then
                                 x2 = -1
                                 x1 = nd&
-                                If IsExp(bstack, b$, p) Then
+                                If IsExp(bstack, b$, p, , True, , True, True) Then
                                     If nd& = 4 Then p = MyRound(p) Else p = MyRound(p, 28)
                                     bstack.SetVar W$, p
                                     GoTo eos
@@ -19454,12 +19473,13 @@ againfor948:
                             Else
 cont10456:
                                 x1 = Abs(GetlocalVar(W$, x2)) * x1
+                                
                             End If
                         ElseIf FastSymbol(b$, "<=", , 2) Then
                             x1 = Abs(GetVar(bstack, W$, x2, True)) * x1
                         End If
                         If x1 Then
-                            If IsExp(bstack, b$, p) Then
+                            If IsExp(bstack, b$, p, , True, , True, True) Then
                                 If VarType(var(x2)) <> VarType(p) Then
                                     On Error Resume Next
                                     Select Case VarType(var(x2))
@@ -19481,6 +19501,10 @@ cont10456:
                                         p = CByte(p)
                                     Case vbDate
                                         p = CDate(p)
+                                    Case vbObject
+                                        MissingnumVar
+                                        Execute = 0
+                                        Exit Function
                                     Case Else
                                         p = Int(p)
                                     End Select
@@ -19497,7 +19521,7 @@ cont10456:
                                 End If
                             End If
                             
-                        ElseIf IsExp(bstack, b$, p) Then
+                        ElseIf IsExp(bstack, b$, p, , True, , True, True) Then
                             If nd& > 1 Then p = MyRound(p)
                             x2 = globalvar(W$, p, , VarStat, temphere$)
                             x1 = nd&
@@ -19508,7 +19532,7 @@ cont10456:
 eos:
                         If IsLabelSymbolNew(b$, "≈Ÿ”", "TO", Lang) Then
                             
-                            If IsExp(bstack, b$, sp) Then
+                            If IsExp(bstack, b$, sp, , True, , True, True) Then
                             If VarType(sp) <> VarType(p) Then
                                     On Error Resume Next
                                     Select Case VarType(p)
@@ -19564,7 +19588,7 @@ eos:
                             End If
                             If IsLabelSymbolNew(b$, "¡Õ¡", "STEP", Lang) Then
                                 If VarType(p) = vbSingle Then st = CSng(1)
-                                If IsExp(bstack, b$, st) Then
+                                If IsExp(bstack, b$, st, , True, , True, True) Then
                                     If VarType(p) = vbSingle Then
                                         st = CSng(st)
                                     End If
@@ -20134,6 +20158,7 @@ contDraw:
                         TraceStore bstack, nd&, b$, 0
                         Mid$(b$, 1, 1) = " "
                         x2 = Len(b$)
+                        ' second type
                         If Not MakeEmf(bstack, b$, Lang, ss$) Then
                         
                             Execute = 0: b$ = ss$ + space$(x2): Exit Function
@@ -22527,7 +22552,7 @@ parsecommand:
     
     If Not Identifier(bstack, W$, b$, iscom, Lang) Then
     
-    If NERR Then NOEXECUTION = True
+        If NERR Then NOEXECUTION = True
 conthere111:
         If LastErNum1 = -1 And bstack.IamThread Then Execute = 1 Else Execute = 0
         Exit Function
@@ -22750,6 +22775,7 @@ If Err.Number = 6 Then
     Execute = 0
     OverflowValue
 ElseIf Err.Number = 450 Then
+jwrong:
     Execute = 0
     WrongOperator
 End If
@@ -32135,7 +32161,8 @@ bNo = GetCode(Scr)
 prive = players(bNo)
 oldprintFlag = basestack.toprinter
 If oldprintFlag Then basestack.toprinter = False
-Dim www As Long, hhh As Long
+Dim www As Long, hhh As Long, type1 As Boolean
+type1 = (ww = 0) And (hh = 0)
 www = ww
 hhh = hh
 mDC.create prive.mypen, www, hhh
@@ -32164,10 +32191,8 @@ If TaskMaster.Processing Or TaskMaster.QueueCount <> 0 Then
  TaskMaster.StopProcess
 End If
 End If
-  '  OldGDILines = GDILines
-  '  GDILines = True
-            Call executeblock(it, basestack, rest$, False, once, , True)
-   ' GDILines = OldGDILines
+
+    Call executeblock(it, basestack, rest$, False, once, , True)
     If it = 2 Then
         If rest$ = "" Then
             If once Then rest$ = ": Break": If trace Then WaitShow = 2: TestShowSub = vbNullString
@@ -32189,7 +32214,7 @@ End If
     MyEr "Problem in drawing", "–Ò¸‚ÎÁÏ· ÛÙÔ Û˜›‰ÈÔ"
     
     End If
-        Set ExecuteEmfBlock = mDC.getEmfObj()
+        Set ExecuteEmfBlock = mDC.getEmfObj(type1)
 If oldprintFlag Then basestack.toprinter = True
         If Not TaskMaster Is Nothing Then
             If TaskMaster.Processing Or TaskMaster.QueueCount <> 0 Then
@@ -46517,7 +46542,7 @@ w1 = Abs(IsLabel(bstack, A$, s$))
                                 var(w1).BackMove = True
                                 Else
                                 var(w1).BackMove = False
-                                var(w1).Advance dn
+                                var(w1).advance dn
                                 End If
                                  r = Not var(w1).IsEmpty
                                  '    r = var(w1).ParagraphOrder(dn)          ''
@@ -46563,7 +46588,7 @@ w1 = Abs(IsLabel(bstack, A$, s$))
                                 pppp.item(w2).BackMove = True
                                 Else
                               pppp.item(w2).BackMove = False
-                                 pppp.item(w2).Advance dn
+                                 pppp.item(w2).advance dn
                                 End If
                                 r = Not pppp.item(w2).IsEmpty
                                 '' r = pppp.item(w2).ParagraphOrder(dn)
@@ -52487,7 +52512,7 @@ fstr32: ' "PARAGRAPH$(", "–¡—¡√—¡÷œ”$("
                                          If var(w1).BackMove Then
                                         var(w3) = var(w1).BackStep(dd)
                                         Else
-                                        var(w3) = var(w1).Advance(dd)
+                                        var(w3) = var(w1).advance(dd)
                                         End If
                                  
                                         
@@ -52506,7 +52531,7 @@ fstr32: ' "PARAGRAPH$(", "–¡—¡√—¡÷œ”$("
                                             If var(w1).BackMove Then
                                             var(w3) = var(w1).BackStep(dd)
                                             Else
-                                            var(w3) = var(w1).Advance(dd)
+                                            var(w3) = var(w1).advance(dd)
                                             End If
                                             
                                                 r$ = Mid$(var(w1).TextParagraph(CLng(p)), CLng(pp))
@@ -52526,7 +52551,7 @@ fstr32: ' "PARAGRAPH$(", "–¡—¡√—¡÷œ”$("
                                             If var(w1).BackMove Then
                                             var(w3) = var(w1).BackStep(dd)
                                             Else
-                                            var(w3) = var(w1).Advance(dd)
+                                            var(w3) = var(w1).advance(dd)
                                             End If
                                                 r$ = var(w1).TextParagraph(CLng(p))
                                     Else
@@ -52582,7 +52607,7 @@ fstr32: ' "PARAGRAPH$(", "–¡—¡√—¡÷œ”$("
                                                 If ppppL.item(w2).BackMove Then
                                                 var(w3) = ppppL.item(w2).BackStep(dd)
                                                 Else
-                                                var(w3) = ppppL.item(w2).Advance(dd)
+                                                var(w3) = ppppL.item(w2).advance(dd)
                                                 End If
                                                 r$ = ppppL.item(w2).RemoveDocParaIndex(CLng(p))
                                         Else
@@ -52599,7 +52624,7 @@ fstr32: ' "PARAGRAPH$(", "–¡—¡√—¡÷œ”$("
                                             If ppppL.item(w2).BackMove Then
                                             var(w3) = ppppL.item(w2).BackStep(dd)
                                             Else
-                                            var(w3) = ppppL.item(w2).Advance(dd)
+                                            var(w3) = ppppL.item(w2).advance(dd)
                                             End If
                                         r$ = Mid$(ppppL.item(w2).TextParagraph(CLng(p)), CLng(pp))
                                     Else
@@ -52617,7 +52642,7 @@ fstr32: ' "PARAGRAPH$(", "–¡—¡√—¡÷œ”$("
                                             If ppppL.item(w2).BackMove Then
                                             var(w3) = ppppL.item(w2).BackStep(dd)
                                             Else
-                                            var(w3) = ppppL.item(w2).Advance(dd)
+                                            var(w3) = ppppL.item(w2).advance(dd)
                                             End If
                                 r$ = ppppL.item(w2).TextParagraph(CLng(p))
                                             Else

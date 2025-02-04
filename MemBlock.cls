@@ -22,6 +22,7 @@ Public UseStruct As Boolean
 Private mExecBloc As Boolean
 Private Strings As LongHash
 Private BasicItem As Integer
+Private mType1 As Boolean
 Private Type METAFILEPICT
     mm As Long
     xExt As Long
@@ -85,6 +86,9 @@ Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As L
 
 
 Const CF_ENHMETAFILE = 14
+
+
+
 Sub Construct(ByteLen As Long, Optional Times As Long = 1, Optional clearme As Long = 0, Optional executable As Boolean = False, Optional thatbasicitem As Integer)
 If mitems <> 0 Then
 If mitems <> Times Or mBytes <> ByteLen * Times Then
@@ -615,7 +619,7 @@ Public Function DrawImageToHdc(where As Object, Optional X As Long = 0&, Optiona
         .pvData = Me.GetPtr(0)
     End With
    CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
-   DrawImageToHdc = DrawImageFromBuffer(A(), where.hDC, X, Y, (Width), (Height))
+   DrawImageToHdc = DrawImageFromBuffer(A(), where.Hdc, X, Y, (Width), (Height))
    CopyMemory ByVal VarPtrArray(A), 0&, 4
  
 End Function
@@ -873,7 +877,7 @@ Exit Function
 End If
     On Error Resume Next
     zz.mm = 1
-    getEmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.hDC, zz)
+    getEmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.Hdc, zz)
 End Function
 
 Public Sub SentWmfToClipBoard()
@@ -964,3 +968,11 @@ Function CopyItemString(ByVal that As Long, ByVal bytes As Long, Done As Boolean
     End If
     End If
 End Function
+
+Friend Property Get type1() As Variant
+type1 = mType1
+End Property
+
+Friend Property Let type1(ByVal vNewValue As Variant)
+    mType1 = CBool(vNewValue)
+End Property

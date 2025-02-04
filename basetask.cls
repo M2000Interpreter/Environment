@@ -40,6 +40,7 @@ Public priveflag As Boolean, uniflag As Boolean
 Private parentSoros As mStiva ' reference to parent..stiva
 Private MyParent As basetask  'reference to parent
 Private myOwner As Object
+Public BackOwner As Object
 Private mtoback As Boolean
 Private mtoprinter As Boolean
 Private mitalic As Boolean   ' todo
@@ -279,7 +280,7 @@ If Not StaticCollection.Find(Name$) Then Exit Function
         If usehandler.T1 = 3 Then
             Dim mm As mArray
             Set mm = usehandler.objref
-            If mm.arr Then
+            If mm.Arr Then
                 mm.Compute0 p, ss$
             End If
             Set mm = Nothing

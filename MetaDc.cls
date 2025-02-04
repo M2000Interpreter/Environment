@@ -24,7 +24,7 @@ cy As Long
 End Type
 Private Type ENHMETAHEADER  ' 88
 iType As Long
-nsize As Long
+nSize As Long
 rclBounds As RECT
 rclFrame As RECT
 dSignature As Long
@@ -64,29 +64,29 @@ Private mHeader As ENHMETAHEADER
 Private Declare Function CreateHatchBrush Lib "gdi32" (ByVal nIndex As Long, ByVal crColor As Long) As Long
 Private Declare Function CreatePen Lib "gdi32.dll" (ByVal fnPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
 Private Declare Function CreateEnhMetaFile Lib "gdi32" Alias "CreateEnhMetaFileW" (ByVal hdcRef As Long, ByVal lpFileName As Long, ByVal lpRect As Long, ByVal lpDescription As Long) As Long
-Private Declare Function CloseEnhMetaFile Lib "gdi32" (ByVal hDC As Long) As Long
+Private Declare Function CloseEnhMetaFile Lib "gdi32" (ByVal Hdc As Long) As Long
 Private Declare Function OleCreatePictureIndirect Lib "olepro32.dll" (lpPictDesc As PICTDESC, riid As Any, ByVal fPictureOwnsHandle As Long, ipic As IPicture) As Long
 Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
-Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nsize As Long, lpvData As Any) As Long
+Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As Long
 Private Declare Function DeleteMetaFile Lib "gdi32" (ByVal hmf As Long) As Long
-Private Declare Function SetBkColor Lib "gdi32" (ByVal hDC As Long, ByVal crColor As Long) As Long
-Private Declare Function LineTo Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long) As Long
-Private Declare Function MoveToEx Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal y As Long, lpPoint As Any) As Long
-Private Declare Function Rectangle Lib "gdi32.dll" (ByVal hDC As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
+Private Declare Function SetBkColor Lib "gdi32" (ByVal Hdc As Long, ByVal crColor As Long) As Long
+Private Declare Function LineTo Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long) As Long
+Private Declare Function MoveToEx Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long, lpPoint As Any) As Long
+Private Declare Function Rectangle Lib "gdi32.dll" (ByVal Hdc As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Private Declare Function GetStockObject Lib "gdi32.dll" (ByVal nIndex As Long) As Long
-Private Declare Function PlayEnhMetaFile Lib "gdi32" (ByVal hDC As Long, ByVal hEmf As Long, lpRect As Any) As Long
-Private Declare Function SetGraphicsMode Lib "gdi32" (ByVal hDC As Long, ByVal iMode As Long) As Long
-Private Declare Function GetGraphicsMode Lib "gdi32" (ByVal hDC As Long) As Long
-Private Declare Function SetMapMode Lib "gdi32" (ByVal hDC As Long, ByVal nMapMode As Long) As Long
-Private Declare Function GetMapMode Lib "gdi32" (ByVal hDC As Long) As Long
+Private Declare Function PlayEnhMetaFile Lib "gdi32" (ByVal Hdc As Long, ByVal hEmf As Long, lpRect As Any) As Long
+Private Declare Function SetGraphicsMode Lib "gdi32" (ByVal Hdc As Long, ByVal iMode As Long) As Long
+Private Declare Function GetGraphicsMode Lib "gdi32" (ByVal Hdc As Long) As Long
+Private Declare Function SetMapMode Lib "gdi32" (ByVal Hdc As Long, ByVal nMapMode As Long) As Long
+Private Declare Function GetMapMode Lib "gdi32" (ByVal Hdc As Long) As Long
 Private Declare Function SetWinMetaFileBits Lib "gdi32" (ByVal cbBuffer As Long, lpbBuffer As Byte, ByVal hdcRef As Long, lpmfp As Any) As Long
-Private Declare Function GetMetaFileBitsEx Lib "gdi32" (ByVal hmf As Long, ByVal nsize As Long, lpvData As Any) As Long
-Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nsize As Long, lpData As Byte) As Long
+Private Declare Function GetMetaFileBitsEx Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
+Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nSize As Long, lpData As Byte) As Long
 
 
-Private Declare Function SetROP2 Lib "gdi32" (ByVal hDC As Long, ByVal nDrawMode As Long) As Long
+Private Declare Function SetROP2 Lib "gdi32" (ByVal Hdc As Long, ByVal nDrawMode As Long) As Long
 
 
 
@@ -95,14 +95,14 @@ Private Const MM_LOENGLISH = 4
 
  Private Type POINTAPI
     X As Long
-    y As Long
+    Y As Long
 End Type
 Dim pm As POINTAPI
 
 Dim boundrect As RECT
-Private Declare Function FillRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Private Declare Function FillRect Lib "user32" (ByVal Hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Private Type PICTDESC
-    size                As Long
+    Size                As Long
     Type                As Long
     hBmpOrIcon          As Long
     hPal                As Long
@@ -135,10 +135,10 @@ Private Type XFORM
         eDy As Single
 End Type
 
- Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) _
+ Private Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) _
           As Long
-Private Declare Function GetWorldTransform Lib "gdi32" (ByVal hDC As Long, lpXform As XFORM) As Long
-Private Declare Function SetWorldTransform Lib "gdi32" (ByVal hDC As Long, lpXform As XFORM) As Long
+Private Declare Function GetWorldTransform Lib "gdi32" (ByVal Hdc As Long, lpXform As XFORM) As Long
+Private Declare Function SetWorldTransform Lib "gdi32" (ByVal Hdc As Long, lpXform As XFORM) As Long
 
 Private Const GM_ADVANCED = 2
 Private Const GM_COMPATIBLE = 1
@@ -150,8 +150,8 @@ Public Property Get Name() As String
     Name = "Emf"
 End Property
 
-Public Property Get hDC() As Long
-    hDC = m_hDC
+Public Property Get Hdc() As Long
+    Hdc = m_hDC
 End Property
 
 Public Property Get status() As Boolean
@@ -171,6 +171,7 @@ Public Sub create(pen As Long, fakeWidth As Long, fakeHeight As Long)
     Dim dib As cDIBSection
     If onetime Then Exit Sub
     onetime = True
+    On Error GoTo 1000
     Set dib = New cDIBSection
     If Not dib.create32(100, 100) Then Exit Sub
     m_width = fakeWidth
@@ -207,9 +208,13 @@ Public Sub create(pen As Long, fakeWidth As Long, fakeHeight As Long)
         m_Status = True
         If Not m_font Is Nothing Then FixFontProp
      End If
-     
+     Exit Sub
+1000
+    Err.Clear
+    MyEr "to big drawing", "πολύ μεγάλο σχέδιο"
+    onetime = False
 End Sub
-Public Function getEmfObj() As Object
+Public Function getEmfObj(what As Boolean) As Object
 Dim aPic As MemBlock
 Dim bytes As Long
 Dim emfP As StdPicture
@@ -222,6 +227,7 @@ If bytes Then
     Call GetEnhMetaFileBits(emfP.Handle, bytes, ByVal aPic.GetBytePtr(0))
     aPic.SubType = 2 ' emf
 End If
+aPic.type1 = what
 Set getEmfObj = aPic
 End Function
 Private Sub Cleanup()
@@ -245,7 +251,7 @@ Private Function pvMetaToPicture() As IPicture
     
     '--- fill struct
     With uDesc
-        .size = Len(uDesc)
+        .Size = Len(uDesc)
         .Type = vbPicTypeEMetafile
         .hBmpOrIcon = CloseEnhMetaFile(m_hDC)
     End With
@@ -305,7 +311,7 @@ End Property
 Public Property Let FontSize(fsize As Variant)
 If fsize < 1 Then fsize = 1
     m_fontsize = fsize
-    m_font.size = fsize
+    m_font.Size = fsize
 End Property
 
 Public Property Get Transparent() As Variant
@@ -322,7 +328,7 @@ End Property
 Private Sub FixFontProp()
 With m_font
 m_fontname = .Name
-m_fontsize = .size
+m_fontsize = .Size
 If m_hFntOld <> 0 Then SelectObject m_hDC, m_hFntOld
 Dim MyFont As IFont
 Set MyFont = m_font
@@ -620,7 +626,7 @@ Public Property Let FontTransparent(ByVal RHS As Boolean)
 ' do nothing
 m_fonttransparent = RHS
 End Property
-Public Sub PlayEmfInside(picthis As StdPicture, X As Long, y As Long, Optional Width As Long = -1, Optional Height As Long = -1, Optional rot As Single, Optional Xs As Long, Optional Ys As Long)
+Public Sub PlayEmfInside(picthis As StdPicture, X As Long, Y As Long, Optional Width As Long = -1, Optional Height As Long = -1, Optional rot As Single, Optional Xs As Long, Optional Ys As Long)
     Dim kkx As RECT, oMap As Long
     Dim myXForm As XFORM
     
@@ -651,7 +657,7 @@ Public Sub PlayEmfInside(picthis As StdPicture, X As Long, y As Long, Optional W
     Dim kkx1 As Long, kky1 As Long
     kkx1 = Round((Width) / dv15)
     kky1 = Round((Height) / dv15)
-    myXForm = buildXForm(X, y, rot, kkx1, kky1)
+    myXForm = buildXForm(X, Y, rot, kkx1, kky1)
     kkx.Left = Xs - kkx1 / 2
     kkx.top = Ys - kky1 / 2
     kkx.Right = Xs + kkx1 / 2
@@ -672,7 +678,7 @@ Public Sub PlayEmfInside(picthis As StdPicture, X As Long, y As Long, Optional W
     
     
 End Sub
-Public Sub PlayWmfInside(picthis As StdPicture, X As Long, y As Long, Optional Width As Long = -1, Optional Height As Long = -1, Optional rot As Single, Optional Xs As Long, Optional Ys As Long)
+Public Sub PlayWmfInside(picthis As StdPicture, X As Long, Y As Long, Optional Width As Long = -1, Optional Height As Long = -1, Optional rot As Single, Optional Xs As Long, Optional Ys As Long)
   Dim pHandle As Long
     
     Dim kkx As RECT, oMap As Long
@@ -705,7 +711,7 @@ Public Sub PlayWmfInside(picthis As StdPicture, X As Long, y As Long, Optional W
     Dim kkx1 As Long, kky1 As Long
     kkx1 = Round((Width) / dv15)
     kky1 = Round((Height) / dv15)
-    myXForm = buildXForm(X, y, rot, kkx1, kky1)
+    myXForm = buildXForm(X, Y, rot, kkx1, kky1)
     kkx.Left = Xs - kkx1 / 2
     kkx.top = Ys - kky1 / 2
     kkx.Right = Xs + kkx1 / 2
@@ -726,14 +732,14 @@ Public Sub PlayWmfInside(picthis As StdPicture, X As Long, y As Long, Optional W
     
     DeleteMetaFile pHandle
 End Sub
-Private Sub PlayEmfInsideSimple(picthis As StdPicture, X As Long, y As Long, Optional Width As Long = -1, Optional Height As Long = -1)
+Private Sub PlayEmfInsideSimple(picthis As StdPicture, X As Long, Y As Long, Optional Width As Long = -1, Optional Height As Long = -1)
     Dim kkx As RECT
 
       
     kkx.Left = X
-    kkx.top = y
+    kkx.top = Y
     kkx.Right = Width + X
-    kkx.Bottom = Height + y
+    kkx.Bottom = Height + Y
    kkx.Right = kkx.Right * 1.00166666666667
   kkx.Bottom = kkx.Bottom * 1.00333333333333
     SetGraphicsMode m_hDC, GM_ADVANCED
@@ -742,7 +748,7 @@ SetGraphicsMode m_hDC, GM_COMPATIBLE
     
     
 End Sub
-Private Sub PlayWmfInsideSimple(picthis As StdPicture, X As Long, y As Long, Optional Width As Long = -1, Optional Height As Long = -1)
+Private Sub PlayWmfInsideSimple(picthis As StdPicture, X As Long, Y As Long, Optional Width As Long = -1, Optional Height As Long = -1)
 
     Dim pHandle As Long
      pHandle = getEmfFromWmf(picthis, Width * dv15, Height * dv15)
@@ -750,9 +756,9 @@ Private Sub PlayWmfInsideSimple(picthis As StdPicture, X As Long, y As Long, Opt
 
       
     kkx.Left = X
-    kkx.top = y
+    kkx.top = Y
     kkx.Right = Width + X
-    kkx.Bottom = Height + y
+    kkx.Bottom = Height + Y
    kkx.Right = kkx.Right * 1.00166666666667
   kkx.Bottom = kkx.Bottom * 1.00333333333333
     SetGraphicsMode m_hDC, GM_ADVANCED
@@ -762,16 +768,16 @@ SetGraphicsMode m_hDC, GM_COMPATIBLE
     DeleteMetaFile pHandle
 End Sub
 Private Function buildXForm(ByVal x0 As Long, ByVal y0 As Long, ByVal q As Single, piw As Long, pih As Long) As XFORM
-    Dim R As Single, k As Single
+    Dim r As Single, K As Single
     q = -(CLng(q * 100) Mod 36000) * 1.74532925199433E-04
 
-        R = Atn(piw / CSng(pih)) + Pi / 2!
-        k = piw / Cos(R) / 2
+        r = Atn(piw / CSng(pih)) + Pi / 2!
+        K = piw / Cos(r) / 2
         buildXForm.eM11 = Round(Cos(q), 4)
         buildXForm.eM12 = Round(Sin(q), 4)
         buildXForm.eM21 = Round(-Sin(q), 4)
         buildXForm.eM22 = Round(Cos(q), 4)
-        k = Abs(k)
+        K = Abs(K)
         buildXForm.eDx = x0 'Round((k - k * Cos(q - R)) / 2!, 0)
         buildXForm.eDy = y0 'Round((k - k * Sin(q - R)) / 2!, 0)
        
@@ -835,11 +841,11 @@ If m_Status Then
 End If
 
 End Property
-Private Function getEmfFromWmf(Wmf As StdPicture, W As Long, H As Long) As Long
+Private Function getEmfFromWmf(Wmf As StdPicture, W As Long, h As Long) As Long
  Dim zz As METAFILEPICT
  Dim bb As wmfPlaceableFileHeader
   zz.xExt = W '* dv15
- zz.yExt = H '* dv15
+ zz.yExt = h '* dv15
  
  Dim bytes As Long
 Dim Buffer() As Byte
@@ -853,7 +859,7 @@ Exit Function
 End If
     On Error Resume Next
     zz.mm = 1
-    getEmfFromWmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.hDC, zz)
+    getEmfFromWmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.Hdc, zz)
 End Function
 
 Public Property Get Tag() As Variant
