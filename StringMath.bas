@@ -15,6 +15,7 @@ Private Type PartialDivideInfo
 End Type
 
 Private sLastRemainder As String
+Global ZeroBig As New BigInteger
 ' Alphabet moved to Module1 as variable, now has an Ansi format(1 byte per letter/digit)
 'Private Const Alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 Property Get LastRemainder()
@@ -29,7 +30,7 @@ Public Function compare(sA As String, sb As String, Optional absfirst) As Intege
     'https://cosxoverx.livejournal.com/47220.html
     
     Dim bAN As Boolean, bBN As Boolean, bRN As Boolean
-    Dim I As Long, iA As Long, iB As Long
+    Dim i As Long, iA As Long, iB As Long
     
     'handle any early exits on basis of signs
     
@@ -81,9 +82,9 @@ Public Function compare(sA As String, sb As String, Optional absfirst) As Intege
     Else 'unless they are the same length
         compare = 0
         'then check each digit by digit
-        For I = 1 To LenB(sA)
-            iA = AscB(MidB$(sA, I, 1))
-            iB = AscB(MidB$(sb, I, 1))
+        For i = 1 To LenB(sA)
+            iA = AscB(MidB$(sA, i, 1))
+            iB = AscB(MidB$(sb, i, 1))
             If iA < iB Then
                 compare = -1
                 Exit For
@@ -92,7 +93,7 @@ Public Function compare(sA As String, sb As String, Optional absfirst) As Intege
                 Exit For
             Else 'defaults zero
             End If
-        Next I
+        Next i
     End If
     
     'decide about any negative signs
@@ -623,18 +624,18 @@ Function IsProbablyPrime(sA As String, K As Integer) As Boolean
         D = divide(D, ChrB$(50))
     Wend
     z = LenB(sA)
-    Dim A As String, X As String, I As Long, j As Long
+    Dim a As String, X As String, i As Long, j As Long
     
     IsProbablyPrime = True
-    For I = 1 To K
+    For i = 1 To K
         
         Do
-            A = SpaceB(LenB(sA))
+            a = SpaceB(LenB(sA))
             For j = 1 To LenB(sA)
-                MidB$(A, j, 1) = ChrB$(47 + Int(10 * RndM(rndbase) + 1))
+                MidB$(a, j, 1) = ChrB$(47 + Int(10 * RndM(rndbase) + 1))
             Next
-        Loop Until compare(nn, A) = 1 And compare(A, ChrB$(49)) > -1
-        X = modpow(A, (D), (sA))
+        Loop Until compare(nn, a) = 1 And compare(a, ChrB$(49)) > -1
+        X = modpow(a, (D), (sA))
         If compare(X, ChrB$(49)) <> 0 Then ' continue
             If compare(X, nn) <> 0 Then ' continue
                 For j = 1 To s
@@ -749,59 +750,59 @@ Public Function CreateBigInteger(s$, Optional basenum) As BigInteger
     End If
 End Function
 Public Function TestNumberOnBase(s$, b As Integer) As Boolean
-    Dim I As Long, lim As Long, ss As String
+    Dim i As Long, lim As Long, ss As String
     Const Alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     ss = Mid$(Alphabet, 1, b)
     lim = Len(s$)
     If lim = 0 Then Exit Function
-    I = 1
-    If Left$(s$, 1) = Chr$(45) Then I = I + 1: If lim = 1 Then Exit Function
-    Do While I <= lim
-    If InStr(ss, Mid$(s$, I, 1)) = 0 Then Exit Function
-    I = I + 1
+    i = 1
+    If Left$(s$, 1) = Chr$(45) Then i = i + 1: If lim = 1 Then Exit Function
+    Do While i <= lim
+    If InStr(ss, Mid$(s$, i, 1)) = 0 Then Exit Function
+    i = i + 1
     Loop
     TestNumberOnBase = True
 End Function
 Public Function TestNumber(s$) As Boolean
 
-    Dim I As Long, lim As Long, W As Long
+    Dim i As Long, lim As Long, W As Long
     lim = Len(s$)
     If lim = 0 Then Exit Function
-    I = 1
-    If Left$(s$, 1) = Chr$(45) Then I = I + 1: If lim = 1 Then Exit Function
-    Do While I <= lim
+    i = 1
+    If Left$(s$, 1) = Chr$(45) Then i = i + 1: If lim = 1 Then Exit Function
+    Do While i <= lim
     
-    If InStr("0123456789", Mid$(s$, I, 1)) = 0 Then Exit Function
-    I = I + 1
+    If InStr("0123456789", Mid$(s$, i, 1)) = 0 Then Exit Function
+    i = i + 1
     Loop
     TestNumber = True
 End Function
 Public Function TrimZero(s$) As String
-    Dim I As Long, j As Long, lim As Long
+    Dim i As Long, j As Long, lim As Long
     lim = LenB(s$)
     If lim = 0 Then Exit Function
     j = 1
     TrimZero = SpaceB(LenB(s$))
     If LeftB$(s$, j) = ChrB$(45) Then MidB$(TrimZero, j, 1) = ChrB$(45): j = j + 1
-    I = j
+    i = j
     lim = lim - 1
-    Do While I <= lim
-        If MidB$(s$, I, 1) <> ChrB$(48) Then Exit Do
-        I = I + 1
+    Do While i <= lim
+        If MidB$(s$, i, 1) <> ChrB$(48) Then Exit Do
+        i = i + 1
     Loop
-    MidB$(TrimZero, j, lim - I + 2) = MidB$(s$, I)
+    MidB$(TrimZero, j, lim - i + 2) = MidB$(s$, i)
     TrimZero = RtrimB(TrimZero)
 End Function
 Public Function RtrimB(s$) As String
-    Dim I As Long, j As Long
+    Dim i As Long, j As Long
     j = LenB(s$)
     If j = 0 Then Exit Function
-    For I = j To 1 Step -1
-        If MidB$(s$, I, 1) <> ChrB$(32) Then Exit For
+    For i = j To 1 Step -1
+        If MidB$(s$, i, 1) <> ChrB$(32) Then Exit For
     Next
-    If I = j Then RtrimB = s$: Exit Function
-    If I < 1 Then RtrimB = "": Exit Function
-    RtrimB = LeftB$(s$, I)
+    If i = j Then RtrimB = s$: Exit Function
+    If i < 1 Then RtrimB = "": Exit Function
+    RtrimB = LeftB$(s$, i)
 End Function
 Public Function SpaceB(n As Long) As String
 If n = 1 Then
@@ -812,19 +813,19 @@ End If
 End Function
 
 Public Function TrimZeroU(s$) As String
-    Dim I As Long, j As Long, lim As Long
+    Dim i As Long, j As Long, lim As Long
     lim = LenB(s$)
     If lim = 0 Then Exit Function
     j = 1
     TrimZeroU = space(Len(s$))
     If Left$(s$, j) = "-" Then Mid$(TrimZeroU, j, 1) = "-": j = j + 1
-    I = j
+    i = j
     lim = lim - 1
-    Do While I <= lim
-    If Mid$(s$, I, 1) <> ChrB$(48) Then Exit Do
-    I = I + 1
+    Do While i <= lim
+    If Mid$(s$, i, 1) <> ChrB$(48) Then Exit Do
+    i = i + 1
     Loop
-    Mid$(TrimZeroU, j, lim - I + 2) = Mid$(s$, I)
+    Mid$(TrimZeroU, j, lim - i + 2) = Mid$(s$, i)
     TrimZeroU = RTrim$(TrimZeroU)
 End Function
 Function cxStabThree(FN$, a1, b1, c1) As Variant

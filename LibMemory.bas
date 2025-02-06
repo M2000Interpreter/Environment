@@ -808,24 +808,24 @@ End Sub
 Private Sub FixByValElements(ByRef Arr() As Variant _
                            , ByRef rmArr As REMOTE_MEMORY _
                            , ByRef vtArr As Variant)
-    Dim i As Long
+    Dim I As Long
     Dim v As Variant
     Dim vtIndex As Long: vtIndex = 0
     Dim vt As VbVarType
     '
     vtArr = vbArray + vbInteger
-    For i = 0 To UBound(Arr)
+    For I = 0 To UBound(Arr)
         vt = rmArr.memValue(vtIndex)
         If (vt And VT_BYREF) = 0 Then
             If (vt And vbArray) = vbArray Or vt = vbObject Or vt = vbString _
             Or vt = vbDataObject Or vt = vbUserDefinedType Then
-                If vt = vbObject Then Set v = Arr(i) Else v = Arr(i)
+                If vt = vbObject Then Set v = Arr(I) Else v = Arr(I)
                 rmArr.memValue(vtIndex) = vbEmpty 'Avoid deallocation
-                If vt = vbObject Then Set Arr(i) = v Else Arr(i) = v
+                If vt = vbObject Then Set Arr(I) = v Else Arr(I) = v
             End If
         End If
         vtIndex = vtIndex + VT_SPACING
-    Next i
+    Next I
     vtArr = vbEmpty
 End Sub
 
@@ -884,7 +884,10 @@ Public Function EmptyArray(ByVal numberOfDimensions As Long _
     Case vbCurrency, vbDecimal, vbDouble, vbSingle, vbDate 'Decimal-point
     Case vbBoolean, vbString, vbObject, vbDataObject, vbVariant 'Other
     Case Else
-        If vType = 200 Then
+        If vType = 201 Then
+        vType = vbObject
+        originalType = 201
+        ElseIf vType = 200 Then
         vType = vbVariant
         originalType = 200
         Else
@@ -901,7 +904,7 @@ Public Function EmptyArray(ByVal numberOfDimensions As Long _
     #End If
     Const FADF_HAVEVARTYPE As Long = &H80
     Const fFeaturesHi As Long = FADF_HAVEVARTYPE * &H10000
-    Dim i As Long
+    Dim I As Long
     '
     If Not rm.isInitialized Then
         InitRemoteMemory rm
@@ -910,19 +913,21 @@ Public Function EmptyArray(ByVal numberOfDimensions As Long _
         rm.memValue = VarPtr(fakeSafeArray(0)) 'The fake ArrPtr
         '
         'Set 'cElements' to 1 for each SAFEARRAYBOUND
-        For i = safeArraySize To UBound(fakeSafeArray, 1) Step 2
-            fakeSafeArray(i) = 1
-        Next i
+        For I = safeArraySize To UBound(fakeSafeArray, 1) Step 2
+            fakeSafeArray(I) = 1
+        Next I
     End If
     fakeSafeArray(0) = fFeaturesHi + numberOfDimensions 'cDims and fFeatures
-    i = safeArraySize + (numberOfDimensions - 1) * 2 'Highest dimension position
+    I = safeArraySize + (numberOfDimensions - 1) * 2 'Highest dimension position
     '
-    fakeSafeArray(i) = 0 'Highest dimension must have 0 'cElements'
+    fakeSafeArray(I) = 0 'Highest dimension must have 0 'cElements'
     If originalType = 200 Then
         rm.memValue = nMath2.cxZero
+    ElseIf originalType = 201 Then
+        Set rm.memValue = Module13.CreateBigInteger("0")
     End If
     RemoteAssign rm, VarPtr(fakeSafeArray(0)), rm.remoteVT, vbArray + vType, EmptyArray, rm.memValue
-    fakeSafeArray(i) = 1
+    fakeSafeArray(I) = 1
 End Function
 
 

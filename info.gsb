@@ -45617,7 +45617,7 @@ print"GOOD"
 exit
 200 print "BAD"
 }
-MODULE CXCOMPLEX {one=(1,0i)
+MODULE ICOMPLEX {one=(1,0i)
 A=(8, -3i)
 ? "A=";A
 ? "     r=";Abs(A);" θ=";Arg(A);" rad"
