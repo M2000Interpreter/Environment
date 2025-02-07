@@ -12707,7 +12707,8 @@ MODULE HTTP {Module CheckIt  {
 Report 2, "Using the Microsoft.XMLHTTP with threads - see Down4 where we use an internal object for download with events. Use space bar or mouse click to advance the scroll"
 CheckIt
 }
-MODULE CAL {FUNCTION PDFPRINTER$ {
+MODULE CAL {TITLE "WAIT..", 0
+FUNCTION PDFPRINTER$ {
 	MENU
 	PRINTER +
 	IF MENUITEMS=0 THEN ERROR "No printer found"
@@ -12776,10 +12777,10 @@ PRINT #-2, {
 				  ====* 	*     X 	      \  \   )XXXXX
 			     =========**********       XXXXXXXXXXXXXXXXXXXXXX
 
-
 }
 }
 MODULE CALENDAR (YEAR, LOCALEID) {
+	IF PRINT_IT THEN IF NOT ROW=0 THEN PAGE 1
       LOCALE LOCALEID
       IF NOT PRINT_IT THEN CURSOR 0,HEIGHT-1
       ' LAST LINE, SO EACH NEW LINE SCROLL ALL LINES UP
@@ -12832,7 +12833,6 @@ MODULE CALENDAR (YEAR, LOCALEID) {
             IF PRINT_IT ELSE REFRESH 1000 
             NEXT M
       NEXT J
-      REM IF PRINT_IT THEN IF NOT ROW=0 THEN PAGE 1
 }
 WHILE INKEY$<>"" :  END WHILE
 IF PRINT_IT THEN
@@ -12862,6 +12862,7 @@ GOSUB WAITKEY_OR_MOUSE
 NEXT I
 IF PRINT_IT THEN PRINTING OFF ELSE REFRESH 50
 CLEAR  ' CLEAR VARIABLES FROM THIS MODULE
+TITLE "INFO"
 KEYBOARD "INFO"+CHR$(13)
 END
 WAITKEY_OR_MOUSE:
@@ -14150,16 +14151,20 @@ MODULE STIME {print str$(now,"long time"), time$(now)
 }
 MODULE SDATE {Print str$(today, "yyyy-mm-dd")
 Print str$(today, "dddd, mmm, dd, yyyy")
-Print Date$(today, 1033, "dddd, MMM, dd, yyyy")
-Print Date$(today, 1036, "dddd, MMM dd, yyyy")
+Print str$(today, "long date")
+Print str$(today, "short date")
+Print Date$(today, 1033, "long date")
+Print Date$(today, 1036, "long date")
 Print Date$(today, 1047, "dddd, MMM dd, yyyy")
 Print Date$(today, 1048, "dddd, MMM dd, yyyy")
 Module Checkit(locale_id, Locale_out) {
+      string nl={
+      }
       Enum zones {HAST=-10, HADT,PST, MST, CST, EST, AST, NST=-3.5, UTC=0, WET=0, GMT=0, BST=1,IST=1, CET=1, EET, MSK,MSD}
       INP$="March 7 2009 7:30pm EST"
       dim a$()
       a$()=Piece$(INP$," ")
-      date1=date(leftpart$(INP$, a$(3)), locale_id)
+      date date1=date(leftpart$(INP$, a$(3)), locale_id)
       zone=UTC
       Try {
             zone=Eval(a#val$(4))
@@ -14167,19 +14172,21 @@ Module Checkit(locale_id, Locale_out) {
       date0=date1+time(a$(3))
       Document doc$="Input date:"+{
       }
-      doc$= Date$(date0 , Locale_out, "MMMM d, yyyy ")+" "+Lcase$(Time$(date0,1033, "hh:mmtt"))+" "+eval$(zone)+{
-      }+"12 hours later:"+{
-      }
+     '  doc$ =  Date$(date0 , Locale_out, "MMMM d, yyyy ")+" "
+      doc$ =  Date$(date0 , Locale_out, "long date")+" "
+      doc$ = Lcase$(Time$(date0,Locale_out, "long time"))+" "+eval$(zone)+nl+"12 hours later:"+nl
       m=each(zones)
       while m {
             date2=date1+ctime(time(a$(3)),12+eval(m)-zone,frac(eval(m)-zone)*60,0)      
-            doc$=Date$(date2 , Locale_out, "MMMM d, yyyy ")+Lcase$(Time$(date2,1033, "hh:mmtt"))+" "+eval$(m)+{
-            }
+            'doc$=Date$(date2 , Locale_out, "MMMM d, yyyy ")+" "
+            doc$=Date$(date2 , Locale_out, "long date")+" "
+            doc$=Lcase$(Time$(date2,Locale_out, "long time"))+" "+eval$(m)+nl
       }
       Report Doc$
       Clipboard Doc$
 }
-Checkit 1033, 1036
+Checkit 1033, 1033
+Checkit 1033, 1047
 Checkit 1033, 1032
 }
 MODULE ENV {Module CheckIt {

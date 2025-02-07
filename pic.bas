@@ -2508,14 +2508,14 @@ Public Function SetTextData( _
         lSize = LenB(sText)
         If lSize = 0 Then Exit Function
         If lSize Mod 2 = 1 Then
-        placeSize = lSize + 1
+        placeSize = lSize '+ 1
         Else
         placeSize = lSize
         End If
-        hMem = GlobalAlloc(0, placeSize)
+        hMem = GlobalAlloc(0, placeSize + 2)
         If (hMem > 0) Then
         lPtr = GlobalLock(hMem)
-        CopyMemory ByVal lPtr, ByVal StrPtr(String$(placeSize \ 2, Chr$(0))), placeSize
+        CopyMemory ByVal lPtr, ByVal StrPtr(String$(placeSize \ 2 + 1, Chr$(0))), placeSize + 2
         CopyMemory ByVal lPtr, ByVal StrPtr(sText), lSize
         GlobalUnlock hMem
         If (OpenClipboard(Form1.hWnd) <> 0) Then
@@ -2714,7 +2714,15 @@ If (OpenClipboard(Form1.hWnd) <> 0) Then
                 sr1 = Left$(sr, Len(sr1))
                 GetTextData = Left$(sr1, Len(sr1))
         Else
+                If Len(sr) - 1 = Len(sr1) Then
+                    If bData(LenB(sr1)) > 0 Then
+                        GetTextData = LeftB$(sr, LenB(sr1) + 1)
+                    Else
+                        GetTextData = Left$(sr, Len(sr1))
+                    End If
+                Else
                     GetTextData = Left$(sr, Len(sr1))
+                End If
         End If
         End If
 End If

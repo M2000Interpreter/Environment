@@ -329,7 +329,6 @@ If (OpenClipboard(Form1.hWnd) <> 0) Then
         Else
             GetTextData = Myleft$(sr, Len(sr1))
         End If
-
     End If
 
 End If
@@ -2117,10 +2116,10 @@ Private Function SetTextData( _
         Else
         placeSize = lSize
         End If
-        hMem = GlobalAlloc(0, placeSize)
+        hMem = GlobalAlloc(0, placeSize + 2)
         If (hMem > 0) Then
         lPtr = GlobalLock(hMem)
-        CopyMemory ByVal lPtr, ByVal StrPtr(String$(placeSize \ 2, Chr$(0))), placeSize
+        CopyMemory ByVal lPtr, ByVal StrPtr(String$(placeSize \ 2 + 1, Chr$(0))), placeSize + 2
         CopyMemory ByVal lPtr, ByVal StrPtr(sText), lSize
         GlobalUnlock hMem
        If (OpenClipboard(Form1.hWnd) <> 0) Then
