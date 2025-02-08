@@ -36873,6 +36873,8 @@ MODULE TURING {Module CheckIt {
 			Pen 12 {showstack()}
 			print "tape length: ";stack.size : flush
 			Refresh
+			pen 10 {Print "Press a key"}
+			push key$: drop
 			sub showstack()
 				local d$=format$("{0:-5} {1::-5} ", curState$, .head) 
 				local i: for i=1 to min.data(stack.size, 60): d$+=.symbols#val$(stackitem(i)):Next
@@ -41329,48 +41331,7 @@ normal
 Report {Demonstrate how to define a type that behaves like an integer but has a lowest valid value of 1 and a highest valid value of 10. Include all bounds checking you need to write, or explain how the compiler or interpreter creates those bounds checks for you.
 
 }
-Report {            Class typeA {
-            Private:
-                  mval as currency 
-            Public:
-                  Property min {value}=-1
-                  Property max {value}=0
-                  Operator "++" {
-                        if .mval=.[max] then Error "Number bigger than Max Value"
-                        .mval++
-                  }
-                  Operator "--" {
-                        if .mval=.[min] then Error "Number lower than Min Value"
-                        .mval--
-                  }
-                  Operator "+=" (x){
-                        if .mval>.[max]+x then Error "Number bigger than Max Value"
-                        .mval+=x
-                  }
-                  Operator "-=" (x) {
-                        if .mval<.[min]-x then Error "Number lower than Min Value"
-                        .mval-=x
-                  }
-                  Value {
-                    =.mval
-                  }
-                  Set (x) {
-                        if x>.[max] then Error "Number bigger than Max Value"
-                        if x<.[min] then Error "Number lower than Min Value"
-                        currency .mval<=int(x)
-                  }
-            Class:
-                  Module typeA (.[min], .[max]) {
-                      .mval<=.[min]
-                  }
-            }
-
-
-}
-
-Module CheckDataType {
-      Print "Example"
-      Module CheckThis {
+prototype {
             Class typeA {
             Private:
                   mval as currency 
@@ -41406,6 +41367,14 @@ Module CheckDataType {
                       .mval<=.[min]
                   }
             }
+
+
+} as code$
+report code$
+inline code$
+Module CheckDataType {
+      Print "Example"
+      Module CheckThis {
             K=typeA(1, 10)
             K=5
             Def TypeExp$(x)=Type$(x)
@@ -46098,39 +46067,46 @@ For i=1 to 2000 {
 print timecount
 Set Fast
 }
-MODULE ROOTS {// we place all functions for cx which we use on a global group
+MODULE ROOTS {
+// we place all functions for cx which we use on a global group
 // for this example not need to be global
+// Not good, see roots1
+
 Global Group Cx {
 	declare m math2
-	function neg(a as cxComplex) {
+	function neg(a as Complex) {
 		method .m, "cxNeg", a as ret: =ret
 	}
-	function sqr(a as cxComplex) {
+	function sqr(a as Complex) {
 		method .m, "cxSqr", a as ret: =ret
 	}
-	function sub(a as cxComplex, b as cxComplex) {
+	function sub(a as Complex, b as Complex) {
 		method .m, "cxSub", a, b as ret: =ret
 	}
-	function add(a as cxComplex, b as cxComplex) {
+	function add(a as Complex, b as Complex) {
 		method .m, "cxAdd", a, b as ret:	=ret
 	}
-	function div(a as cxComplex, b as cxComplex) {
+	function div(a as Complex, b as Complex) {
 		method .m, "cxDiv", a, b as ret: =ret
 	}
-	function divReal(a as cxComplex, b as double) {
+	function divReal(a as Complex, b as double) {
 		method .m, "cxDivReal", a , b as ret: =ret
 	}
 	function complex(a as double, b as double=0) {
 		method .m, "cxNew", a, b as ret: =ret
 	}
 	// quad_discriminating_roots return a tuple (array) of three vaues:
-	// one string and two numeric (cxComplex is a UDT - a numeric variant for interpreter)
+	// one string and two numeric (Complex is a UDT - a numeric variant for interpreter)
 	function quad_discriminating_roots(a1, b1, c1, entier=1e-5) {
-		var discriminant = b1*b1 - 4*a1*c1
-		var a=.complex(a1), b=.complex(b1), c=.complex(c1), d=.complex(discriminant)
-		var root1=.div(.divReal(.add(.neg(b), .sqr(d)), 2), a)
-		var root2=.div(.divReal(.sub(.neg(b), .sqr(d)), 2), a)
-		if abs(discriminant)<entier then
+		TRY ok {
+			var discriminant = b1*b1 - 4*a1*c1
+			var a=.complex(a1), b=.complex(b1), c=.complex(c1), d=.complex(discriminant)
+			var root1=.div(.divReal(.add(.neg(b), .sqr(d)), 2), a)
+			var root2=.div(.divReal(.sub(.neg(b), .sqr(d)), 2), a)
+		}
+		if error or not ok then
+			="real",infinity, 0
+		else.if abs(discriminant)<entier then
 			="real and equal", root1|r, root1|r
 		else.if discriminant>0 then
 			="real", root1|r, root2|r
@@ -46159,23 +46135,26 @@ sub disp()
 		read new arg
 		// (x, y)=(100, 200)  where (100, 200) is a tulple
 		// so this is the same, arg is a tuple.
-		(s, a, b)=arg
+		push ! arg
+		read new b,a,s
 	end if
 	? $("0.0####"),field$(s, 14);
-	if type$(a)="cxComplex" then
+	if type$(a)="Complex" then
 		? " (";a|r;if$(a|i<0->"-","+");abs(a|i);"i)";
 	else
 		if @TestInvalid(a) then
-			? " invalid";
+			? " inf 0", $(""),,
+			exit sub
 		else
 			? $(if$(abs(a>1e6)->"#.###e+###", "0.0####"));" ";a;
 		end if
 	end if
-	if type$(b)="cxComplex" then
+	if type$(b)="Complex" then
 		? " (";b|r;if$(b|i<0->"-","+");abs(b|i);"i)"
 	else
 		if @TestInvalid(b) then
-			? " invalid"
+			? " inf", $(""), 0
+			exit sub		
 		else
 			? $(if$(abs(b>1e6)->"#.###e+###", "0.0####"));" ";b
 		end if
@@ -46183,7 +46162,7 @@ sub disp()
 	Print $("")
 end sub
 Function TestInvalid()
-      =str$(Number, 1033) = "-1.#IND"
+         =number=infinity
 End Function
 }
 MODULE TAXICAB {module TaxiCab (f as long){
@@ -46276,8 +46255,8 @@ MODULE ROOTS1 {Module Roots_of_Quadratic_Function {
 	sub disp(arg as array)
 		(s, a, b, n)=arg
 		Print #f, field$(s, 12);
-		if type$(a)="cxComplex" then disp1(a) else disp2(a)
-		if type$(b)="cxComplex" then disp1(b) else	disp2(b)
+		if type$(a)="Complex" then disp1(a) else disp2(a)
+		if type$(b)="Complex" then disp1(b) else	disp2(b)
 		Print #f
 	end sub
 	sub disp1(a)
@@ -46532,5 +46511,225 @@ printer !  'change properties
 testone
 testtwo
 testthree
+}
+MODULE EVENTNEW {// http://www.tutok.sk/fastgl/callback.html
+// Version 13 - Rev >=7
+// Older revisions:
+// At addCall and removeCall
+// Change Read &f() to Set Read New &f()
+// So we make a temporary global f().
+// Old code saved the namespace of local function to event function list as key
+// so when we going to delete function, from another module (another namespace)...
+// the function couldn't deleted from list.
+
+Cls 5
+pen 14
+class CDPlayer {
+	timesplayed
+	function play(action_id as string) {
+		.timesplayed++
+		pen 15 {print "Play CD ("+.timesplayed+" times)", action_id}
+	}
+	function stop(action_id as string) {
+		pen 15 {print "Stop CD", action_id}
+	}
+}
+
+class button {
+private:
+	string guiname
+	event p {
+		read action_id as string
+		function {
+			if .quite then exit
+			pen 14 {
+				print "click "+.guiname+" action: "; ~(15);action_id
+			}
+		}
+	}
+public:
+	boolean quite=false
+	final code=int(rnd*1000)
+	function click(action_id as string="no specific action") {
+		call event .p, action_id
+	}
+	module addCall {
+		read &f()
+		event .p new f()
+	}
+	module removeCall {
+		read &f()
+		event .p drop f()
+		event .p release			
+	}
+class:
+	module button (.guiname){
+		while not empty {
+			.addCall
+		}
+	}	
+}
+function wow(action_id) {
+	pen 15 {print "wow!!", action_id}
+}
+
+
+CDPlayer cd
+Button playButton("playButton", &wow())
+playButton.addCall &CD.play()
+Button stopButton("stopButton", &CD.stop())
+Button wowButton("wowButton",&wow())
+call playButton.click()
+call stopButton.click() 
+call wowButton.click("final")
+pen 15 {print "add/remove example"}
+playButton.removeCall &CD.play()
+call playButton.click("1")
+playButton.removeCall &wow()
+call playButton.click("2")
+playButton.addCall &CD.play()
+call playButton.click("3")
+
+' now z is a pointer to actual playButton, but as a weak reference
+Z->playButton
+Inner(z)
+' now z is a pointer to a copy of playButton
+Z->(playButton)
+Inner(z)
+	
+Sub Inner(p as *button)
+	for p {  // we can't use call p=>click("ok too")
+		call .click("ok")
+		call this.click("ok this")
+	}
+	local ret=p=>click("ok too") 
+end sub
+}
+MODULE FUNCTOR {form 80, 40
+Pen 15 {Report "Check value of a group, as a named value, or as a pointer to object, or pointer as weak reference"}
+module check_this {
+	class alfa {
+		double x=100, y=20
+		remove {
+			Print "delete alfa with values:"; eval$(this)
+		}
+		value {
+			="("+.x+"),("+.y+")"
+		}
+	class:
+		module alfa (.x, .y) {
+			Print "new object of class alfa:",.x, .y
+		}
+	}
+	k=10
+	alfa beta(, 30), delta(200), epsilon
+	Print beta, delta, epsilon
+	m->(alfa(40, -10))
+	
+	Print eval(m) ' this execute the value part
+	Print m=>x
+	for m {
+		Print "inside a for object Block"
+		Print .x, .y,"",eval(this)
+		.x++
+		Print m=>x=this.x
+		this.x++
+		Print m=>x=this.x
+	}
+	Print "delete old object here"
+	'm=>remove
+	m->epsilon  ' we change pointer - then old one call remove part
+	Print "new object is a weak reference of epsilon:";eval(m)
+	epsilon.x++
+	Print m=>x=epsilon.x' true
+	m=pointer()  ' this is the null pointer (null is type of null)
+	Print m is type Null  ' true
+	m->0  ' this is the same as m=pointer()
+	Print m is type Null  ' true
+}
+check_this
+pen 15 {Report "Now we make the value of alfa type object to get a parameter (in a new module)"}
+module check_this_too {
+	class alfa {
+		double x=100, y=20
+		remove {
+			Print "delete alfa with values:"; eval$(this, 100)
+		}
+		value (a) {
+			="("+.x+"),("+.y+") and this parameter "+a
+		}
+	class:
+		module alfa (.x, .y) {
+			Print "new object of class alfa:",.x, .y
+		}
+	}
+	k=10
+	alfa beta(, 30), delta(200), epsilon
+	Print beta(1)
+	Print delta(2)
+	Print epsilon(3)
+	m->(alfa(40, -10))
+	Print eval(m, 4) ' this execute the value part
+	Print m=>x
+	for m {
+		Print "inside a for object Block"
+		Print .x, .y,"", eval(this, 5)
+//		Print .x, .y, eval$(this, 5)		
+		.x++
+		Print m=>x=this.x
+		this.x++
+		Print m=>x=this.x
+	}
+	Print "delete old object here"
+	m->epsilon  ' we change pointer - then old one call remove part
+	Print "new object is a weak reference of epsilon:";eval(m, 6)
+	epsilon.x++
+	Print m=>x=epsilon.x' true
+	m=pointer()  ' this is the null pointer (null is type of null)
+	Print m is type Null  ' true
+	m->0  ' this is the same as m=pointer()
+	Print m is type Null  ' true
+}
+check_this_too
+}
+MODULE COMPARE_LIST {Module CheckIt {
+      Function Equal(Strings){
+            k=Each(Strings, 2, -1)
+            a$=Array$(Strings, 0)
+            =True
+            While k {
+                  =False
+                  if a$<>array$(k) then exit
+                  =True
+            }
+      }
+      Function LessThan(Strings){
+            =True
+            if len(Strings)<2 then exit
+            k=Each(Strings, 2)
+            a$=Array$(Strings, 0)
+            While k {
+                  =False
+                  if a$>=array$(k) then exit
+                  a$=array$(k)
+                  =True
+            }
+      }
+      
+      Print Equal(("alfa","alfa","alfa", "alfa"))=True
+      Print Equal(("alfa",))=True
+      Dim A$(10)="alfa"
+      Print Equal(A$())=True
+      Print Equal(("alfa1","alfa2","alfa3", "alfa4"))=False
+      
+      Print LessThan(("alfa1","alfa2","alfa3", "alfa4"))=True
+      Print LessThan(("alfa1",))=true
+      alfa$=Lambda$ k=1 ->{=String$("*", k) : k++}
+      Dim A$(20)<<alfa$()
+      Print LessThan(A$())=True
+      A$(5)=""
+      Print LessThan(A$())=False
+}
+Checkit
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

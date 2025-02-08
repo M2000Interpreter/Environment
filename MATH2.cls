@@ -337,6 +337,7 @@ End Function
 
 ' // The square root of a complex number
 Public Function cxSqr(Op As cxComplex) As cxComplex
+On Error Resume Next
     Dim M As Double, A As Double
     M = Sqr(cxMod(Op)): A = cxArg(Op) / 2
     cxSqr.r = M * Cos(A): cxSqr.I = M * Sin(A)
@@ -614,16 +615,20 @@ Public Function cxEqComVar3(Op1 As cxComplex, Op2, ByVal NumDigitsAfterDecimal A
 End Function
 Public Function cxEqComVar(Op1 As cxComplex, Op2) As Boolean
         Dim z As Double
+        On Error GoTo 1000
         z = Op1.r + Op2.r
         If z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.I - Op2.I) < 0.00000000000001 Then cxEqComVar = True
         Else
             If Abs(Op1.r - Op2.r) < 0.00000000000001 And Abs(Op1.I - Op2.I) < 0.00000000000001 Then cxEqComVar = True
         End If
+        Exit Function
+1000         Overflow
 End Function
 ' // Return absolute value of a complex number
 ' // correction: https://learn.microsoft.com/en-us/dotnet/api/system.numerics.complex.abs?view=net-9.0
 Public Function cxAbs(Op As cxComplex) As Double
+    On Error GoTo 1000
     If Op.I = 0 Then
         cxAbs = Op.r
     ElseIf Op.r > Op.I Then
@@ -631,6 +636,9 @@ Public Function cxAbs(Op As cxComplex) As Double
     ElseIf Op.r <= Op.I Then
         cxAbs = Op.I * Sqr(1 + (Op.r * Op.r) / (Op.I * Op.I))
     End If
+    Exit Function
+1000
+    cxAbs = Infinity
 End Function
 
 ' // Return complex conjugate of complex number

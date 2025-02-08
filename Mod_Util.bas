@@ -28631,13 +28631,14 @@ Originalusername = GetStrUntil("\", ss$)
 End If
 End Function
 Public Function UserName()
-Dim A$, b$, C$
-A$ = GetSpecialfolder(0)
-While A$ <> ""
-C$ = b$
-b$ = GetStrUntil("\", A$)
-Wend
-UserName = C$
+'Dim A$, b$, C$
+'A$ = GetSpecialfolder(0)
+'While A$ <> ""
+'C$ = b$
+'b$ = GetStrUntil("\", A$)
+'Wend
+'UserName = C$
+UserName = OsInfo.UserName
 End Function
 Function IsDimension(bstack As basetask, A$, r As Variant) As Boolean
 Dim s$, pppp As mArray, ppppAny As iBoxArray, w1 As Long, p As Variant, anything As Object, pp As Variant, usehandler As mHandler

@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 6
+Global Const Revision = 7
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -4262,7 +4262,11 @@ jmp2000:
                 LinkGroup bstack, W$, var(I)
                 makegroup bstack, W$, I
             End If
+           If safegroup.HasStrValue And Not Right$(W$, 1) = "$" Then
+            bstack.tmpstr = W$ + "$" + Left$(b$, 1)
+           Else
             bstack.tmpstr = W$ + Left$(b$, 1)
+           End If
             BackPort b$
             If IsStr1(bstack, b$, bb$) Then
                 bstack.LastValue = bb$
@@ -7558,7 +7562,11 @@ contpow2:
                 IntVal = 0
                 po = r1 * po
                 If Err.Number = 6 Then
+                    Err.Clear
                     po = CDbl(r1) * CDbl(po)
+                    If Err.Number = 6 Then
+                    po = Infinity
+                    End If
                     Err.Clear
                 End If
                 End If
@@ -14583,6 +14591,15 @@ conthere1:
                     With bstack.lastpointer
                         If .lasthere = vbNullString Then
                             If .GroupName <> "" Then
+                            If Right$(.GroupName, 1) = "." Then
+                                If isstrparam Then
+                                    r$ = Left$(.GroupName, Len(.GroupName) - 1) + "$"
+                                    rr& = 3
+                                Else
+                                    r$ = Left$(.GroupName, Len(.GroupName) - 1)
+                                    rr& = 1
+                                End If
+                            Else
                                 If isstrparam Then
                                     r$ = .GroupName + "$"
                                     rr& = 3
@@ -14590,18 +14607,29 @@ conthere1:
                                     r$ = .GroupName
                                     rr& = 1
                                 End If
+                            End If
                             Else
                             ' why ?
                                Exit Function
                             End If
                         Else
                             If .GroupName <> "" Then
+                                If .lasthere <> here$ Then
                                 If isstrparam Then
                                     r$ = .lasthere + "." + .GroupName + "$"
                                     rr& = 3
                                 Else
                                     r$ = .lasthere + "." + .GroupName
                                     rr& = 1
+                                End If
+                                Else
+                                If isstrparam Then
+                                    r$ = .GroupName + "$"
+                                    rr& = 3
+                                Else
+                                    r$ = .GroupName
+                                    rr& = 1
+                                End If
                                 End If
                             Else
                                 If isstrparam Then
@@ -14618,12 +14646,16 @@ conthere1:
                     If Mid$(A$, 2, 1) = "." Then
                         A$ = Mid$(A$, 2)
                     Else
+                        If Right$(r$, 1) = "." Then
+                            r$ = Left$(r$, Len(r$) - 1)
+                        End If
                         If Mid$(A$, 2, 2) = "$'" Then
                             rr& = 3
                             A$ = Mid$(A$, 2)
                         ElseIf Mid$(A$, 2, 1) = "'" Then
                             A$ = Mid$(A$, 2)
                         Else
+
                             Mid$(A$, 1, 1) = "("  ' parameter for value for pointers for groups using in Eval() and Eval$()
                         End If
                     End If
@@ -34945,6 +34977,11 @@ ElseIf IsLabelSymbolNew(rest$, "Õ≈œ", "NEW", Lang) Then
                 ProcEvent = False: Exit Function
             Else
                 lastname$ = subHash.LastKnown
+                If Len(here$) > 0 Then
+                    If Left$(lastname$, Len(here$)) = here$ Then
+                        lastname$ = Mid$(lastname$, Len(here$) + 2)
+                    End If
+                End If
             End If
             rest$ = Mid$(rest$, dd)
         Else
@@ -34971,7 +35008,12 @@ ElseIf IsLabelSymbolNew(rest$, "–≈‘¡", "DROP", Lang) Then
               If Not IsString(bstack, (ss$), s$) Then
                   ProcEvent = False: Exit Function
               Else
-                  lastname$ = subHash.LastKnown
+                lastname$ = subHash.LastKnown
+                If Len(here$) > 0 Then
+                    If Left$(lastname$, Len(here$)) = here$ Then
+                        lastname$ = Mid$(lastname$, Len(here$) + 2)
+                    End If
+                End If
               End If
               rest$ = Mid$(rest$, dd)
         Else
@@ -45472,9 +45514,20 @@ reentry1:
                 Else
                     If IsGroupOnly.HasParameters Then
                         If Mid$(A$, w1 - Len(s$) + 1, Len(s$)) <> ")" Then
+                            A$ = Mid$(A$, w1 + 1 - Len(s$))
                             ri = False
-                            If Mid$(A$, w1, 1) = "," Then Mid$(A$, w1 - Len(s$) + 1, Len(s$)) = "(" + space$(Len(s$) - 1): ri = True
+                            If Mid$(A$, 1, 1) = "," Then
+                                If IsGroupOnly.HasStrValue Then
+                                    Mid$(A$, 1, 1) = Chr$(1)
+                                Else
+                                    Mid$(A$, 1, 1) = Chr$(0)
+                                End If
+                                ri = True
+                            End If
+                            Set bstack.lastpointer = IsGroupOnly
                             If IsGroupOnly.HasStrValue And Left$(t$, 1) <> "N" Then
+                            
+                            
                             If IsStr1(bstack, A$, ss$) Then
                                 If ri Then
                                     IsEval = IsExp(bstack, ss$, r)
@@ -45881,8 +45934,17 @@ getgroup2:
             Set pppp.item(0) = bstack.lastpointer
             Set bstack.lastpointer = Nothing
             If pppp.item(0).link.HasParameters Then
+            
+           
+            If pppp.item(0).link.HasStrValue Then
+              '  Set pppp.item(0) = pppp.item(0).link
+               Mid$(A$, 1, 1) = "("
+               'FastSymbol A$, ","
+            IsEval = SpeedGroup(bstack, pppp, "VAL$", "", A$, 0) = 1
+            Else
             FastSymbol A$, ","
             IsEval = SpeedGroup(bstack, pppp, "VAL", "", A$, 0) = 1
+            End If
             r = bstack.LastValue
              Exit Function
             Else
@@ -45894,14 +45956,33 @@ getgroup2:
                 Exit Function
             Else
             'Set bstack.lastpointer = bstack.lastobj
+            If Not bstack.lastpointer.HasValue Then
+             If Not bstack.lastpointer.link Is Nothing Then
+                Set bstack.lastpointer = bstack.lastpointer.link
+             '   Set bstack.lastobj = Nothing
+             End If
+            End If
+            
+            
             If lookOne(A$, ",") Then
+            If bstack.lastpointer.HasStrValue Then
+            Mid$(A$, 1, 1) = Chr(1)
+                If IsStr1(bstack, A$, s$) Then
+                    r = ""
+                    SwapString2Variant s$, r
+                    IsEval = True
+                    Exit Function
+                End If
+            Else
             Mid$(A$, 1, 1) = Chr(0)
-            If IsNumber(bstack, A$, r) Then
+            
+                If IsNumber(bstack, A$, r) Then
             
                        IsEval = True
                        
                        Exit Function
-                       End If
+                    End If
+            End If
             Else
             If IsNumber(bstack, Chr$(0) + "'", r) Then
                 GoTo conthere
@@ -47191,7 +47272,25 @@ Dim w1 As Long, s$, p
 
 w1 = Abs(IsLabel(bstack, A$, s$))
 If w1 = 1 Or w1 = 3 Then
+        If w1 = 1 And Len(s$) = 4 Then
+            If s$ = "THIS" Then
+                bstack.GetDotNew s$, 1
+                
+                If bstack.tpointer > 0 Then
+                    w1 = bstack.tpointer
+                    Debug.Print var(w1).GroupName
+                    GoTo contGe
+                End If
+            ElseIf s$ = "¡’‘œ" Then
+                bstack.GetDotNew s$, 1
+                If bstack.tpointer > 0 Then
+                    w1 = bstack.tpointer
+                    GoTo contGe
+                End If
+            End If
+        End If
         If Not GetVar(bstack, s$, w1) Then Exit Function
+contGe:
         If Not VarTypeName(var(w1)) = mGroup Then Exit Function
         If var(w1).IamApointer Then
                 Set bstack.lastobj = var(w1)
@@ -51590,7 +51689,6 @@ fstr1: '"FORMAT$(", "Ãœ—÷«$("
     Exit Function
 fstr2: '"EVAL$(", "≈ ÷—$(", "≈ ÷—¡”«$("
     strFunctions = mEval(q$, bstackstr, A$, r$)
-        
     Exit Function
 fstr3: ' "STACKTYPE$(", "”Ÿ—œ’‘’–œ”$("
     w3 = 1
@@ -53531,9 +53629,58 @@ fstr60: '"STR$(", "√—¡÷«$("
                             GoTo contstrhere
                         End If
                         r$ = FormatDateWithLocale(GetlocaleString2(&H1F, pp), CDate(p), pp)
+                
                 Else
                 If CheckInt64(p) Then
                     r$ = CStr(p)
+                ElseIf MemInt(VarPtr(p)) = 36 Then
+                    If TypeOf p Is cxComplex Then
+                    
+                    r$ = LTrim$(str(p.I))
+                        If Left$(r$, 1) = "." Then
+                            If AscW(q$) = 46 Then
+                                r$ = "0" + r$
+                            Else
+                                r$ = "0" + Replace(r$, ".", q$)
+                            End If
+                        ElseIf Left$(r$, 2) = "-." Then
+                            If AscW(q$) = 46 Then
+                                r$ = "-0" + Mid$(r$, 2)
+                            Else
+                                r$ = "-0" + Replace(Mid$(r$, 2), ".", q$)
+                            End If
+                        ElseIf AscW(q$) <> 46 Then
+                            If InStr(r$, ".") > 1 Then
+                                r$ = Replace(r$, ".", q$)
+                            End If
+                        End If
+                        q2$ = r$
+                        r$ = LTrim$(str(p.I))
+                        If Left$(r$, 1) = "." Then
+                            If AscW(q$) = 46 Then
+                                r$ = "0" + r$
+                            Else
+                                r$ = "0" + Replace(r$, ".", q$)
+                            End If
+                        ElseIf Left$(r$, 2) = "-." Then
+                            If AscW(q$) = 46 Then
+                                r$ = "-0" + Mid$(r$, 2)
+                            Else
+                                r$ = "-0" + Replace(Mid$(r$, 2), ".", q$)
+                            End If
+                        ElseIf AscW(q$) <> 46 Then
+                            If InStr(r$, ".") > 1 Then
+                                r$ = Replace(r$, ".", q$)
+                            End If
+                        End If
+                        If Left$(q2$, 1) <> "-" Then
+                        r$ = "(" + r$ + "+" + q2$ + "i)"
+                        Else
+                        r$ = "(" + r$ + q2$ + "i)"
+                        End If
+                    Else
+                        r$ = ""
+                    End If
                 Else
                     r$ = LTrim$(str$(p))
                     Select Case VarType(p)
@@ -53836,7 +53983,7 @@ fstr65:
 End Function
 Function mEval(ByVal q$, bstackstr As basetask, A$, r$) As Boolean
     Dim myGroup As Group, usehandler As mHandler, w2 As Long, w3 As Long
-    Dim p, pp, dd As Long, anything As Object, s$, pppp As mArray
+    Dim p, pp, dd As Long, anything As Object, s$, pppp As ppppLight, oldremove As Boolean
     If IsExp(bstackstr, A$, p) Then
     If MemInt(VarPtr(p)) = vbString Then
         If bstackstr.lastobj Is Nothing Then
@@ -54053,35 +54200,104 @@ Function mEval(ByVal q$, bstackstr As basetask, A$, r$) As Boolean
 ElseIf Not bstackstr.lastpointer Is Nothing Then
 getgroup:
 If TypeOf bstackstr.lastobj Is Group Then
-            If Not bstackstr.lastpointer.IamApointer Then Set bstackstr.lastpointer = bstackstr.lastobj
+
+            Set myGroup = bstackstr.lastpointer
+
+            If Not myGroup.IamApointer Then
+                Set myGroup = bstackstr.lastobj
+                If Not myGroup.link Is Nothing Then
+                    Set myGroup = myGroup.link
+                End If
+            End If
+            
+            If myGroup.IamFloatGroup Then
             Set bstackstr.lastobj = Nothing
-            If bstackstr.lastpointer.link.IamFloatGroup Then
-                Set pppp = New mArray
+            Set bstackstr.lastpointer = Nothing
+                Set pppp = New ppppLight
                 pppp.PushDim 1
                 pppp.PushEnd
                 pppp.Arr = True
-                Set pppp.item(0) = bstackstr.lastpointer
-                Set bstackstr.lastpointer = Nothing
-                If pppp.item(0).link.HasParameters Then Mid$(A$, 1, 1) = "("
-                    mEval = SpeedGroup(bstackstr, pppp, "VAL$", "", A$, 0) = 1
-                    r$ = bstackstr.LastValue
-                    If Not pppp.item(0).link.HasParameters Then mEval = FastSymbol(A$, ")", True)
+                
+                Set pppp.item(0) = myGroup
+                
+entry100:
+                    If myGroup.HasParameters Then Mid$(A$, 1, 1) = "("
+                    oldremove = myGroup.HasRemove
+                    myGroup.HasRemove = False
+                    
+                    If myGroup.HasStrValue Then
+                        mEval = SpeedGroup(bstackstr, pppp, "VAL$", "", A$, 0) = 1
+                        myGroup.HasRemove = oldremove
+                        r$ = bstackstr.LastValue
+                    ElseIf myGroup.HasValue Then
+                        mEval = SpeedGroup(bstackstr, pppp, "VAL", "", A$, 0) = 1
+                        myGroup.HasRemove = oldremove
+                        SwapVariant p, bstackstr.LastValue
+                        If MemInt(VarPtr(p)) = vbString Then
+                            SwapString2Variant r$, p
+                        Else
+                            r$ = fixthis(p)
+                        End If
+                        If Not myGroup.HasParameters Then mEval = FastSymbol(A$, ")", True) And mEval
                         Exit Function
                     Else
+                        mEval = False
+                        Exit Function
+                    End If
+                    
+                    If Not myGroup.HasParameters Then mEval = FastSymbol(A$, ")", True) And mEval
+                        Exit Function
+                    Else
+                        
                         If lookOne(A$, ",") Then
+                        
+                        If myGroup.HasStrValue Then
                             Mid$(A$, 1, 1) = Chr(1)
                             If IsStr1(bstackstr, A$, r$) Then
-                                mEval = True  '??? something wrong??
+                                mEval = True
                                 Exit Function
                             End If
-                        ElseIf IsStr1(bstackstr, Chr$(0) + "$'", r$) Then
-                            mEval = FastSymbol(A$, ")", True)
-                            Set anything = Nothing
+                        Else
+                        Mid$(A$, 1, 1) = Chr(0)
+                            If IsNumber(bstackstr, A$, r) Then
+                                mEval = True
+                                Exit Function
+                            End If
+                            
+                        End If
+                        Else
+                            If myGroup.HasStrValue Then
+                                If IsStr1(bstackstr, Chr$(0) + "$'", r$) Then
+                                        mEval = FastSymbol(A$, ")", True)
+                                        Set anything = Nothing
+                                        Exit Function
+                                End If
+                            Else
+                                    If IsNumber(bstackstr, Chr$(0) + "'", r) Then
+                                        mEval = FastSymbol(A$, ")", True)
+                                    
+                                    End If
+                            
+                            
+                            
                             Exit Function
+                            End If
                         End If
                     End If
                 End If
+            ElseIf TypeOf bstackstr.lastobj Is Group Then
+                Set pppp = New ppppLight
+                pppp.PushDim 1
+                pppp.PushEnd
+                pppp.Arr = True
+                Set myGroup = bstackstr.lastobj
+                Set pppp.item(0) = bstackstr.lastobj
+                Set bstackstr.lastobj = Nothing
+                GoTo entry100
+            
             End If
+        
+        
             MissParam A$
         Else
             dd = 1
@@ -54092,7 +54308,7 @@ If TypeOf bstackstr.lastobj Is Group Then
         If myGroup Is Nothing Then
         ElseIf Not myGroup.IamApointer Then
                 A$ = Mid$(A$, dd)
-                Set pppp = New mArray
+                Set pppp = New ppppLight
                 pppp.PushDim 1
                 pppp.PushEnd
                 pppp.Arr = True
