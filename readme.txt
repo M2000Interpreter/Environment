@@ -1,11 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 7 active-X
-1. The user.name$ return the actual user name of the user of OS, or the M2000 user if we set active one. (Previous the actual user name conflict with OneDrive because the name was extracted from folder name, but now extracted from an OS function, GetUserName from advapi32.dll).
-2. Eval$() and Eval() for pointers of groups which return values.
-3. Event object add/drop funtion now work fine from different modules.
-4. Fix the Roots example in Info (because of changes on overflow on complex expressions)
-5. There are three more modules in Info. The FUNCTOR show the Eval$()/Eval() and the EVENTNEW show the Event object, and COMPARE_LIST.
+Version 13 revision 8 active-X
+A small fix.
  
 
 
