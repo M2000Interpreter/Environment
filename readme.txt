@@ -1,9 +1,45 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 8 active-X
-A small fix.
- 
+Version 13 revision 9 active-X
+1. A small fix. Now module C run as expected.
 
+2.  Const for Groups, BigIntegers, Tuple
+Also using the class CopyArray() we can place a group which has value, so  when we use the constant the object return a copy of the internal saved array (tuple). When a group return a value (has Value part) then the const sub system execute the value before pass the value (so const never pass a group which have a value, but the group's value.
+
+
+const a=(1,2i)
+const b=12&
+const c=lambda (x)->x**2
+const d=12129371897398173981739871128371237821u
+const e=exp(1)
+class CopyArray {
+	m
+	value {
+		=cons(.m)
+	}
+class:
+	module CopyArray(a as array) {
+		.m<=cons(a)
+	}
+}
+const f=CopyArray((1,2,3,4))
+Print a=(1,2i), a|r=1, a|i=2
+Print d*100
+Print e
+Print f#sum()
+z=f  // pointers to arrays
+z1=f
+print z is z1 ' false: in't same
+Print z 
+Print z1
+return z, 2:=100
+' we can change z items, but no f items
+Print f#val(2)=3, z#val(2)=100
+try {	' return find f is a group so can't go further and raise error
+	return f, 2:=100
+}
+Print Error$  ' Wrong Use of Return
+list
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

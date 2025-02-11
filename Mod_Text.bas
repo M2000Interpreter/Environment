@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 8
+Global Const Revision = 9
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -11306,13 +11306,40 @@ cont8case:
             Set usehandler = Nothing
         ElseIf v$ = "Constant" Then
             If var(VR).flag Then
-                If VarTypeName(var(VR).Value) = "lambda" Then
+                Set R = var(VR).Value
+                If R Is Nothing Then
+                ElseIf TypeOf R Is lambda Then
                     CopyLambda var(VR).Value, bstack
                     R = 0
+                ElseIf TypeOf R Is BigInteger Then
+                    Set bstack.lastobj = R
+                ElseIf TypeOf R Is Group Then
+                    If R.HasValue Or R.HasStrValue Then
+                        Set bstack.lastobj = R
+                        R = 0
+                        GoTo again1001
+                    Else
+                        Set bstack.lastobj = R
+                    End If
+                Else
+                    Set bstack.lastobj = Nothing
+                    WrongObject
+                    R = 0
                 End If
+            
             Else
                 R = var(VR)
-                
+                If Left$(A$, 1) = "|" Then
+                    If MemInt(VarPtr(R)) = 36 Then
+                        p = 0
+                        SwapVariant p, R
+                        GoTo contUDT1
+                    Else
+                        SyntaxError
+                        IsNumberNew = False
+                        Exit Function
+                    End If
+                End If
             End If
         Else
             Set bstack.lastobj = var(VR) 'MakeitObjectGeneric(VR)
@@ -18399,7 +18426,7 @@ End If
 End Function
 
 Function ConstNew(bstack As basetask, b$, W$, makeallglobal As Boolean, Lang As Long) As Boolean
-Dim p As Variant, ii As Long, ss$, what As Long, vType As Boolean
+Dim p As Variant, ii As Long, ss$, what As Long, vType As Boolean, gr As Group, w2 As Long, ohere$
     Dim cv As Constant
     Do
     what = IsLabel(bstack, b$, W$)
@@ -18511,6 +18538,37 @@ makelambda:
             Else
             GlobalSub here$ + "." + W$ + "()", "", , , ii
             End If
+            ElseIf Typename(bstack.lastobj) = "Group" Then
+                Set cv = New Constant
+                Set gr = bstack.lastobj
+                If gr.IamApointer Then
+                    Set gr = gr.link
+                    If gr Is NullGroup Then
+                        Set gr = New Group
+                        gr.BeginFloat 0
+                        gr.EndFloat
+                    cv.DefineOnce gr
+                        
+                    ElseIf gr.IamFloatGroup Then
+                    cv.DefineOnce gr
+                    Else
+                           ohere$ = here$
+                    here$ = gr.lasthere
+                    If GetVar(bstack, gr.GroupName, w2, , , True) Then
+                        CopyGroup2 gr, bstack
+                    End If
+                    here$ = ohere$
+                    End If
+                Else
+                cv.DefineOnce gr
+                End If
+                Set bstack.lastobj = Nothing
+                ii = globalvar(W$, p, , makeallglobal)
+            ElseIf Typename(bstack.lastobj) = "BigInteger" Then
+            Set cv = New Constant
+            Set p = CopyBigInteger(bstack.lastobj)
+            cv.DefineOnce p
+            ii = globalvar(W$, p, , makeallglobal)
             Else
             Set bstack.lastobj = Nothing
             Set cv = New Constant
@@ -45312,7 +45370,7 @@ Dim s$, w1 As Long, ow1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp A
                         
                         Exit Function
                     End If
-            ElseIf w3 > 5 And w3 < 8 Then
+            ElseIf w3 >= 5 And w3 < 8 Then
                     If neoGetArray(bstack, s1$, pppp1) Then
                         If Not NeoGetArrayItem(pppp1, bstack, s1$, w2, A$) Then Exit Function
                         If pppp.ItemTypeNum(w1) = vbString And w3 = 6 Then

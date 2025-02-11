@@ -131,6 +131,7 @@ MODULE GEORGE {Binary {
       ABuc/dDHrlRlzyUqes1o3urp6q3rbU+BlUqPllQi7SSV2ldWSSsvzP/Z
 } As A
 
+
 Gradient 13,5
 ImgRenderX=scale.x div 2
 For ImgRenderX=ImgRenderX to ImgRenderX/4 STEP 150
@@ -139,14 +140,22 @@ For ImgRenderX=ImgRenderX to ImgRenderX/4 STEP 150
 	move LeftMargin, TopMargin
 	Image A, ImgRenderX
 Next
-cursor 12, height-2
-Writer
+drawing {
+	mode 6
+	writer
+} as w
+cursor 0, height-2
+move !
+n=scale.x/image.x(w)*.9
+MOVE (scale.x-image.x(w)*n)/2, scale.y-image.y(w)*n*1.5
+image w, image.x(w)*n
 Escape Off
 while mouse=0 and inkey$=""
 	refresh
 End While
 Escape On
-cls 
+cls
+clear 
 if module(infobasic) then infobasic
 }
 MODULE B {\\ m is an auto array (a tuple)
@@ -293,11 +302,18 @@ class beta {
             b as long*4
             c as alfa1*3
       }
-      buffer delta as alfa*3
+      buffer clear delta as alfa*3
 }
 beta=beta()
 Print "Offset b in structure alfa"
 Print beta.alfa("b")
+beta.delta|b[0]=100
+Print eval(beta.delta, 0!b!0)=beta.delta|b[0]
+beta.delta|c[1]|a[2]=12345
+Print beta.delta|c[1]|a[2]
+offset=beta.alfa("c")+len(beta.alfa1)*(1)+beta.alfa1("a")+(2)*4
+? "offset for beta.delta|c[1]|a[2] is ";offset
+Print eval(beta.delta, offset as long)=12345
 list
 }
 MODULE DD1 {local group alfa {
@@ -12066,8 +12082,8 @@ Module OOP {
         Print title$;
         =PrintAnum
     }
-    Tree=>preorder printnum("preorder:  ")
-    Tree=>inorder printnum("inorder:   ")
+    Tree=>preorder printnum("preorder:    ")
+    Tree=>inorder printnum("inorder:     ")
     Tree=>postorder printnum("postorder:   ")
     Tree=>level_order printnum("level-order: ")
     Print
@@ -46732,4 +46748,4 @@ MODULE COMPARE_LIST {Module CheckIt {
 }
 Checkit
 }
-UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
+UseThis : InfoBasic : C1: ShowKeys: Pen 15 {Print "Press F3 now"}
