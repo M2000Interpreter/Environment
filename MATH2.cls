@@ -21,7 +21,7 @@ Private Declare Function ArrPtr Lib "msvbvm60" Alias "VarPtr" (Arr() As Any) As 
 '    K() As String
 'End Type
 
-Public Type cxComplex
+Public Type Complex
     r   As Double
     I   As Double
 End Type
@@ -246,73 +246,73 @@ End Function
 '+=====================================================================================================================================+
 
 ' // R = 1, I = 0
-Public Function cxOne() As cxComplex
+Public Function cxOne() As Complex
     cxOne.r = 1
 End Function
 
 ' // R = 0, I = 1
-Public Function cxImgOne() As cxComplex
+Public Function cxImgOne() As Complex
     cxOne.I = 1
 End Function
 
 ' // R = 0, I = 0
-Public Function cxZero() As cxComplex
+Public Function cxZero() As Complex
 End Function
 
 ' // Creating a new complex number
-Public Function cxNew(ByVal Real As Double, ByVal Imaginary As Double) As cxComplex
+Public Function cxNew(ByVal Real As Double, ByVal Imaginary As Double) As Complex
     cxNew.r = Real: cxNew.I = Imaginary
 End Function
 
 ' // Creating a new complex number by polar coordinates
-Public Function cxPolar(ByVal Magnitude As Double, ByVal Phase As Double) As cxComplex
+Public Function cxPolar(ByVal Magnitude As Double, ByVal Phase As Double) As Complex
     cxPolar.r = Magnitude * Cos(Phase): cxPolar.I = Magnitude * Sin(Phase)
 End Function
 
 ' // Return the additive inverse of a specified complex number
-Public Function cxNeg(Op As cxComplex) As cxComplex
+Public Function cxNeg(Op As Complex) As Complex
     cxNeg.r = -Op.r: cxNeg.I = -Op.I
 End Function
 
 ' // Return the inverse value of a complex number
-Public Function cxInv(Op As cxComplex) As cxComplex
+Public Function cxInv(Op As Complex) As Complex
     Dim Ab2 As Double
     Ab2 = Op.r * Op.r + Op.I * Op.I
     cxInv.r = Op.r / Ab2: cxInv.I = -Op.I / Ab2
 End Function
 
 ' // Addition of two complex numbers
-Public Function cxAddVar(Op1, Op2) As cxComplex
+Public Function cxAddVar(Op1, Op2) As Complex
     cxAddVar.r = Op1.r + Op2.r
     cxAddVar.I = Op1.I + Op2.I
 End Function
 
-Public Function cxAddComVar(Op1 As cxComplex, Op2) As cxComplex
+Public Function cxAddComVar(Op1 As Complex, Op2) As Complex
     cxAddComVar.r = Op1.r + Op2.r
     cxAddComVar.I = Op1.I + Op2.I
 End Function
-Public Function cxAdd(Op1 As cxComplex, Op2 As cxComplex) As cxComplex
+Public Function cxAdd(Op1 As Complex, Op2 As Complex) As Complex
     cxAdd.r = Op1.r + Op2.r
     cxAdd.I = Op1.I + Op2.I
 End Function
 
 ' // Subtraction of two complex numbers
-Public Function cxSub(Op1 As cxComplex, Op2 As cxComplex) As cxComplex
+Public Function cxSub(Op1 As Complex, Op2 As Complex) As Complex
     cxSub.r = Op1.r - Op2.r
     cxSub.I = Op1.I - Op2.I
 End Function
 
 ' // Multiplication of two complex numbers
-Public Function cxMul(Op1 As cxComplex, Op2 As cxComplex) As cxComplex
+Public Function cxMul(Op1 As Complex, Op2 As Complex) As Complex
     cxMul.r = Op1.r * Op2.r - Op1.I * Op2.I
     cxMul.I = Op1.r * Op2.I + Op1.I * Op2.r
 End Function
-Public Function cxMulVar(Op1, Op2) As cxComplex
+Public Function cxMulVar(Op1, Op2) As Complex
     cxMulVar.r = Op1.r * Op2.r - Op1.I * Op2.I
     cxMulVar.I = Op1.r * Op2.I + Op1.I * Op2.r
 End Function
 ' // Division of two complex numbers
-Public Function cxDiv(Op1 As cxComplex, Op2 As cxComplex) As cxComplex
+Public Function cxDiv(Op1 As Complex, Op2 As Complex) As Complex
     Dim R2 As Double, i2 As Double
     On Error Resume Next
     R2 = Op2.r * Op2.r: i2 = Op2.I * Op2.I
@@ -320,7 +320,7 @@ Public Function cxDiv(Op1 As cxComplex, Op2 As cxComplex) As cxComplex
     cxDiv.I = (Op1.I * Op2.r - Op1.r * Op2.I) / (R2 + i2)
     If Err.Number > 0 Then Err.Clear: DevZero
 End Function
-Public Function cxDivVar(Op1, Op2) As cxComplex
+Public Function cxDivVar(Op1, Op2) As Complex
     Dim R2 As Double, i2 As Double
     On Error Resume Next
     R2 = Op2.r * Op2.r: i2 = Op2.I * Op2.I
@@ -329,22 +329,22 @@ Public Function cxDivVar(Op1, Op2) As cxComplex
     If Err.Number > 0 Then Err.Clear: DevZero
 End Function
 ' // Exponentiation of a complex number
-Public Function cxDgr(Op As cxComplex, ByVal Degree As Long) As cxComplex
+Public Function cxDgr(Op As Complex, ByVal Degree As Long) As Complex
     Dim Md As Double, Ar As Double
     Md = cxMod(Op): Ar = cxArg(Op): Md = Md ^ Degree: Ar = Ar * Degree
     cxDgr.r = Md * Cos(Ar): cxDgr.I = Md * Sin(Ar)
 End Function
 
 ' // The square root of a complex number
-Public Function cxSqr(Op As cxComplex) As cxComplex
+Public Function cxSqr(Op As Complex) As Complex
 On Error Resume Next
-    Dim M As Double, A As Double
-    M = Sqr(cxMod(Op)): A = cxArg(Op) / 2
-    cxSqr.r = M * Cos(A): cxSqr.I = M * Sin(A)
+    Dim m As Double, a As Double
+    m = Sqr(cxMod(Op)): a = cxArg(Op) / 2
+    cxSqr.r = m * Cos(a): cxSqr.I = m * Sin(a)
 End Function
 
 ' // Module of a complex number
-Public Function cxMod(Op As cxComplex) As Double
+Public Function cxMod(Op As Complex) As Double
     Dim R2 As Double, i2 As Double
     On Error GoTo 100
     R2 = Op.r * Op.r: i2 = Op.I * Op.I
@@ -363,12 +363,12 @@ Public Function cxModVar(Op) As Double
     Err.Clear
 End Function
 ' // Phase of a complex number
-Public Function cxPhase(Op As cxComplex) As Double
+Public Function cxPhase(Op As Complex) As Double
     cxPhase = Atan2(Op.I, Op.r)
 End Function
 
 ' // Argument of a complex number (equal phase)
-Public Function cxArg(Op As cxComplex) As Double
+Public Function cxArg(Op As Complex) As Double
     If Op.I = 0 Then
         If Op.r >= 0 Then cxArg = 0 Else cxArg = Pi
     ElseIf Op.r = 0 Then
@@ -398,7 +398,7 @@ Public Function cxArgVar(Op) As Double
         End If
     End If
 End Function
-Public Function cxPow(Op1 As cxComplex, Op2 As cxComplex, Optional NumDigitsAfterDecimal = 20) As cxComplex
+Public Function cxPow(Op1 As Complex, Op2 As Complex, Optional NumDigitsAfterDecimal = 20) As Complex
 If Op1.I = 0 And Op2.I = 0 Then
     cxPow = cxNew(Op1.r ^ Op2.r, 0)
 Else
@@ -409,7 +409,7 @@ Else
    cxPow.I = Round(cxPow.I, NumDigitsAfterDecimal)
    End If
 End Function
-Public Function cxPowVar(Op1, Op2) As cxComplex
+Public Function cxPowVar(Op1, Op2) As Complex
     If Op1.I = 0 And Op2.I = 0 Then
         cxPowVar = cxNew(Op1.r ^ Op2.r, 0)
     Else
@@ -417,7 +417,7 @@ Public Function cxPowVar(Op1, Op2) As cxComplex
     End If
 
 End Function
-Public Function cxPowRealVar(Op1, ByVal Op2 As Double) As cxComplex
+Public Function cxPowRealVar(Op1, ByVal Op2 As Double) As Complex
 On Error GoTo 100
     If Op1.I = 0 Then
         cxPowRealVar = cxNew(Op1.r ^ Op2, 0)
@@ -426,7 +426,7 @@ On Error GoTo 100
     End If
 100
 End Function
-Public Function cxPowReal(Op1 As cxComplex, Op2 As Double, Optional NumDigitsAfterDecimal = 20) As cxComplex
+Public Function cxPowReal(Op1 As Complex, Op2 As Double, Optional NumDigitsAfterDecimal = 20) As Complex
 On Error GoTo 100
 If Op1.I = 0 Then
     cxPowReal = cxNew(Op1.r ^ Op2, 0)
@@ -439,7 +439,7 @@ Else
     End If
 100
 End Function
-Public Function cxPowRealComp(Op1 As Double, Op2 As cxComplex, Optional NumDigitsAfterDecimal = 20) As cxComplex
+Public Function cxPowRealComp(Op1 As Double, Op2 As Complex, Optional NumDigitsAfterDecimal = 20) As Complex
     If Round(Op2.I, NumDigitsAfterDecimal) = 0 Then
         cxPowRealComp = cxNew(Op1 ^ Op2.r, 0)
     Else
@@ -450,7 +450,7 @@ Public Function cxPowRealComp(Op1 As Double, Op2 As cxComplex, Optional NumDigit
    cxPowRealComp.I = Round(cxPowRealComp.I, NumDigitsAfterDecimal)
    End If
 End Function
-Public Function cxPowRealCompVar(ByVal Op1 As Double, Op2) As cxComplex
+Public Function cxPowRealCompVar(ByVal Op1 As Double, Op2) As Complex
     If Round(Op2.I, NumDigitsAfterDecimal) = 0 Then
         cxPowRealCompVar = cxNew(Op1 ^ Op2.r, 0)
     Else
@@ -458,50 +458,50 @@ Public Function cxPowRealCompVar(ByVal Op1 As Double, Op2) As cxComplex
     End If
 End Function
 ' // Returns the number e, raised to power by complex number
-Public Function cxExp(Op As cxComplex) As cxComplex
+Public Function cxExp(Op As Complex) As Complex
     On Error Resume Next
     cxExp.r = EXP(Op.r) * Cos(Op.I): cxExp.I = EXP(Op.r) * Sin(Op.I)
     If Err.Number = 6 Then Overflow
 End Function
 ' // Addition real number and complex number
-Public Function cxAddRealVar(Op1, ByVal Op2 As Double) As cxComplex
+Public Function cxAddRealVar(Op1, ByVal Op2 As Double) As Complex
     cxAddRealVar.r = Op1.r + Op2
     cxAddRealVar.I = Op1.I
 End Function
-Public Function cxAddReal(Op1 As cxComplex, ByVal Op2 As Double) As cxComplex
+Public Function cxAddReal(Op1 As Complex, ByVal Op2 As Double) As Complex
     cxAddReal.r = Op1.r + Op2
     cxAddReal.I = Op1.I
 End Function
 
 ' // Subtraction from complex number a real number
-Public Function cxSubReal(Op1 As cxComplex, ByVal Op2 As Double) As cxComplex
+Public Function cxSubReal(Op1 As Complex, ByVal Op2 As Double) As Complex
     cxSubReal.r = Op1.r - Op2
     cxSubReal.I = Op1.I
 End Function
 
 ' // Subtraction from real number a complex number
-Public Function cxRealSub(ByVal Op1 As Double, Op2 As cxComplex) As cxComplex
+Public Function cxRealSub(ByVal Op1 As Double, Op2 As Complex) As Complex
     cxRealSub.r = Op1 - Op2.r
     cxRealSub.I = -Op2.I
 End Function
 
 ' // Multiplication complex number on a real number
-Public Function cxMulReal(Op1 As cxComplex, ByVal Op2 As Double) As cxComplex
+Public Function cxMulReal(Op1 As Complex, ByVal Op2 As Double) As Complex
     cxMulReal.r = Op1.r * Op2
     cxMulReal.I = Op1.I * Op2
 End Function
-Public Function cxMulRealVar(Op1, ByVal Op2 As Double) As cxComplex
+Public Function cxMulRealVar(Op1, ByVal Op2 As Double) As Complex
     cxMulRealVar.r = Op1.r * Op2
     cxMulRealVar.I = Op1.I * Op2
 End Function
 ' // Division a complex number on a real number
-Public Function cxDivReal(Op1 As cxComplex, ByVal Op2 As Double) As cxComplex
+Public Function cxDivReal(Op1 As Complex, ByVal Op2 As Double) As Complex
     Dim R2 As Double
     R2 = Op2 * Op2
     cxDivReal.r = (Op1.r * Op2) / R2
     cxDivReal.I = (Op1.I * Op2) / R2
 End Function
-Public Function cxDivRealVar(Op1, ByVal Op2 As Double) As cxComplex
+Public Function cxDivRealVar(Op1, ByVal Op2 As Double) As Complex
     Dim R2 As Double
     R2 = Op2 * Op2
     cxDivRealVar.r = (Op1.r * Op2) / R2
@@ -509,44 +509,44 @@ Public Function cxDivRealVar(Op1, ByVal Op2 As Double) As cxComplex
 End Function
 
 ' // Division a real number on a complex number
-Public Function cxRealDiv(ByVal Op1 As Double, Op2 As cxComplex) As cxComplex
+Public Function cxRealDiv(ByVal Op1 As Double, Op2 As Complex) As Complex
     Dim R2 As Double, i2 As Double
     R2 = Op2.r * Op2.r: i2 = Op2.I * Op2.I
     cxRealDiv.r = (Op1 * Op2.r) / (R2 + i2)
     cxRealDiv.I = (-Op1 * Op2.I) / (R2 + i2)
 End Function
-Public Function cxRealDivVar(ByVal Op1 As Double, Op2) As cxComplex
+Public Function cxRealDivVar(ByVal Op1 As Double, Op2) As Complex
     Dim R2 As Double, i2 As Double
     R2 = Op2.r * Op2.r: i2 = Op2.I * Op2.I
     cxRealDivVar.r = (Op1 * Op2.r) / (R2 + i2)
     cxRealDivVar.I = (-Op1 * Op2.I) / (R2 + i2)
 End Function
 ' // Addition of a complex number and imaginary part
-Public Function cxAddImg(Op1 As cxComplex, ByVal Op2 As Double) As cxComplex
+Public Function cxAddImg(Op1 As Complex, ByVal Op2 As Double) As Complex
     cxAddImg.r = Op1.r
     cxAddImg.I = Op1.I + Op2
 End Function
 
 ' // Subtraction from a complex number a imaginary part
-Public Function cxSubImg(Op1 As cxComplex, Op2 As Double) As cxComplex
+Public Function cxSubImg(Op1 As Complex, Op2 As Double) As Complex
     cxSubImg.r = Op1.r
     cxSubImg.I = Op1.I - Op2
 End Function
 
 ' // Subtraction from imaginary part a complex number
-Public Function cxImgSub(ByVal Op1 As Double, Op2 As cxComplex) As cxComplex
+Public Function cxImgSub(ByVal Op1 As Double, Op2 As Complex) As Complex
     cxImgSub.r = -Op2.r
     cxImgSub.I = Op1 - Op2.I
 End Function
 
 ' // Multiplication complex number on a imaginary part
-Public Function cxMulImg(Op1 As cxComplex, ByVal Op2 As Double) As cxComplex
+Public Function cxMulImg(Op1 As Complex, ByVal Op2 As Double) As Complex
     cxMulImg.r = -Op1.I * Op2
     cxMulImg.I = Op1.r * Op2
 End Function
 
 ' // Division a complex number on a imaginary part
-Public Function cxDivImg(Op1 As cxComplex, ByVal Op2 As Double) As cxComplex
+Public Function cxDivImg(Op1 As Complex, ByVal Op2 As Double) As Complex
     Dim i2 As Double
     i2 = Op2 * Op2
     cxDivImg.r = (Op1.I * Op2) / i2
@@ -554,7 +554,7 @@ Public Function cxDivImg(Op1 As cxComplex, ByVal Op2 As Double) As cxComplex
 End Function
 
 ' // Division imaginary part on a complex number
-Public Function cxImgDiv(ByVal Op1 As Double, Op2 As cxComplex) As cxComplex
+Public Function cxImgDiv(ByVal Op1 As Double, Op2 As Complex) As Complex
     Dim R2 As Double, i2 As Double
     R2 = Op2.r * Op2.r: i2 = Op2.I * Op2.I
     cxImgDiv.r = (Op1 * Op2.I) / (R2 + i2)
@@ -562,19 +562,19 @@ Public Function cxImgDiv(ByVal Op1 As Double, Op2 As cxComplex) As cxComplex
 End Function
 
 ' // Return true if complex number is equal
-Public Function cxEq(Op1 As cxComplex, Op2 As cxComplex, _
+Public Function cxEq(Op1 As Complex, Op2 As Complex, _
                 Optional NumDigitsAfterDecimal As Long = -1) As Boolean
-        Dim z As Double
+        Dim Z As Double
     If NumDigitsAfterDecimal = -1 Then
-        z = Op1.r + Op2.r
-        If z > 10000000000# Then
+        Z = Op1.r + Op2.r
+        If Z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.I - Op2.I) < 0.00000000000001 Then cxEq = True
         Else
         If Abs(Op1.r - Op2.r) < 0.00000000000001 And Abs(Op1.I - Op2.I) < 0.00000000000001 Then cxEq = True
         End If
     Else
-        z = Op1.r + Op2.r
-        If z > 10000000000# Then
+        Z = Op1.r + Op2.r
+        If Z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.I - Op2.I) < 0.00000000000001 Then cxEq = True
         Else
         If Round(Op1.r, NumDigitsAfterDecimal) = Round(Op2.r, NumDigitsAfterDecimal) And _
@@ -583,41 +583,41 @@ Public Function cxEq(Op1 As cxComplex, Op2 As cxComplex, _
     End If
 End Function
 Public Function cxEqVar(Op1, Op2) As Boolean
-        Dim z As Double
-        z = Op1.r + Op2.r
-        If z > 10000000000# Then
+        Dim Z As Double
+        Z = Op1.r + Op2.r
+        If Z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.I - Op2.I) < 0.00000000000001 Then cxEqVar = True
         Else
             If Abs(Op1.r - Op2.r) < 0.00000000000001 And Abs(Op1.I - Op2.I) < 0.00000000000001 Then cxEqVar = True
         End If
 End Function
 Public Function cxEqVar3(Op1, Op2, ByVal NumDigitsAfterDecimal As Long) As Boolean
-        Dim z As Double
-        z = Op1.r + Op2.r
-        z = Op1.r + Op2.r
-        If z > 10000000000# Then
+        Dim Z As Double
+        Z = Op1.r + Op2.r
+        Z = Op1.r + Op2.r
+        If Z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.I - Op2.I) < 0.00000000000001 Then cxEqVar3 = True
         Else
         If Round(Op1.r, NumDigitsAfterDecimal) = Round(Op2.r, NumDigitsAfterDecimal) And _
            Round(Op1.I, NumDigitsAfterDecimal) = Round(Op2.I, NumDigitsAfterDecimal) Then cxEqVar3 = True
         End If
 End Function
-Public Function cxEqComVar3(Op1 As cxComplex, Op2, ByVal NumDigitsAfterDecimal As Long) As Boolean
-        Dim z As Double
-        z = Op1.r + Op2.r
-        z = Op1.r + Op2.r
-        If z > 10000000000# Then
+Public Function cxEqComVar3(Op1 As Complex, Op2, ByVal NumDigitsAfterDecimal As Long) As Boolean
+        Dim Z As Double
+        Z = Op1.r + Op2.r
+        Z = Op1.r + Op2.r
+        If Z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.I - Op2.I) < 0.00000000000001 Then cxEqComVar3 = True
         Else
         If Round(Op1.r, NumDigitsAfterDecimal) = Round(Op2.r, NumDigitsAfterDecimal) And _
            Round(Op1.I, NumDigitsAfterDecimal) = Round(Op2.I, NumDigitsAfterDecimal) Then cxEqComVar3 = True
         End If
 End Function
-Public Function cxEqComVar(Op1 As cxComplex, Op2) As Boolean
-        Dim z As Double
+Public Function cxEqComVar(Op1 As Complex, Op2) As Boolean
+        Dim Z As Double
         On Error GoTo 1000
-        z = Op1.r + Op2.r
-        If z > 10000000000# Then
+        Z = Op1.r + Op2.r
+        If Z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.I - Op2.I) < 0.00000000000001 Then cxEqComVar = True
         Else
             If Abs(Op1.r - Op2.r) < 0.00000000000001 And Abs(Op1.I - Op2.I) < 0.00000000000001 Then cxEqComVar = True
@@ -627,7 +627,7 @@ Public Function cxEqComVar(Op1 As cxComplex, Op2) As Boolean
 End Function
 ' // Return absolute value of a complex number
 ' // correction: https://learn.microsoft.com/en-us/dotnet/api/system.numerics.complex.abs?view=net-9.0
-Public Function cxAbs(Op As cxComplex) As Double
+Public Function cxAbs(Op As Complex) As Double
     On Error GoTo 1000
     If Op.I = 0 Then
         cxAbs = Op.r
@@ -642,47 +642,47 @@ Public Function cxAbs(Op As cxComplex) As Double
 End Function
 
 ' // Return complex conjugate of complex number
-Public Function cxConj(Op As cxComplex) As cxComplex
+Public Function cxConj(Op As Complex) As Complex
     cxConj.r = Op.r
     cxConj.I = -Op.I
 End Function
 
 ' // The natural logarithm of a complex number
-Public Function cxlog(Op As cxComplex) As cxComplex
-    Dim M As Double, A As Double
-    M = cxMod(Op): A = cxArg(Op)
-    cxlog.r = Log(M): cxlog.I = A
+Public Function cxlog(Op As Complex) As Complex
+    Dim m As Double, a As Double
+    m = cxMod(Op): a = cxArg(Op)
+    cxlog.r = Log(m): cxlog.I = a
 End Function
-Public Function cxlogVar(Op) As cxComplex
-    Dim M As Double, A As Double
-    M = cxModVar(Op): A = cxArgVar(Op)
-    cxlogVar.r = Log(M): cxlogVar.I = A
+Public Function cxlogVar(Op) As Complex
+    Dim m As Double, a As Double
+    m = cxModVar(Op): a = cxArgVar(Op)
+    cxlogVar.r = Log(m): cxlogVar.I = a
 End Function
 ' // The logarithm of a complex number by base X
-Public Function cxLogX(Op As cxComplex, ByVal Base As Double) As cxComplex
-    Dim M As Double, A As Double, Nc As cxComplex
-    M = cxMod(Op): A = cxArg(Op): Nc.r = Log(Base)
-    cxLogX.r = Log(M): cxLogX.I = A
+Public Function cxLogX(Op As Complex, ByVal Base As Double) As Complex
+    Dim m As Double, a As Double, Nc As Complex
+    m = cxMod(Op): a = cxArg(Op): Nc.r = Log(Base)
+    cxLogX.r = Log(m): cxLogX.I = a
     cxLogX = cxDiv(cxLogX, Nc)
 End Function
 
 ' // Sine of a complex number
-Public Function cxSin(Op As cxComplex) As cxComplex
+Public Function cxSin(Op As Complex) As Complex
     cxSin.r = Sin(Op.r) * Cosh(Op.I): cxSin.I = Cos(Op.r) * Sinh(Op.I)
 End Function
 ' // Cosine of a complex number
-Public Function cxCos(Op As cxComplex) As cxComplex
+Public Function cxCos(Op As Complex) As Complex
     cxCos.r = Cos(Op.r) * Cosh(Op.I): cxCos.I = -Sin(Op.r) * Sinh(Op.I)
 End Function
 ' // Tangent of a complex number
-Public Function cxTan(Op As cxComplex) As cxComplex
+Public Function cxTan(Op As Complex) As Complex
     Dim C2 As Double, S2 As Double
     C2 = Cos(Op.r): C2 = C2 * C2: S2 = Sinh(Op.I): S2 = S2 * S2
     cxTan.r = (Sin(Op.r) * Cos(Op.r)) / (C2 + S2)
     cxTan.I = (Sinh(Op.I) * Cosh(Op.I)) / (C2 + S2)
 End Function
 ' // Cotangent of a complex number
-Public Function cxCtg(Op As cxComplex) As cxComplex
+Public Function cxCtg(Op As Complex) As Complex
     Dim C2 As Double, S2 As Double
     C2 = Sin(Op.r): C2 = C2 * C2: S2 = Sinh(Op.I): S2 = S2 * S2
     cxCtg.r = (Sin(Op.r) * Cos(Op.r)) / (C2 + S2)
@@ -690,7 +690,7 @@ Public Function cxCtg(Op As cxComplex) As cxComplex
 End Function
 
 ' // Secant of a complex number
-Public Function cxSec(Op As cxComplex) As cxComplex
+Public Function cxSec(Op As Complex) As Complex
     Dim C2 As Double, S2 As Double
     C2 = Cos(Op.r): C2 = C2 * C2: S2 = Sinh(Op.I): S2 = S2 * S2
     cxSec.r = (Cos(Op.r) * Cosh(Op.I)) / (C2 + S2)
@@ -698,7 +698,7 @@ Public Function cxSec(Op As cxComplex) As cxComplex
 End Function
 
 ' // Cosecant of a complex number
-Public Function cxCsc(Op As cxComplex) As cxComplex
+Public Function cxCsc(Op As Complex) As Complex
     Dim C2 As Double, S2 As Double
     C2 = Sin(Op.r): C2 = C2 * C2: S2 = Sinh(Op.I): S2 = S2 * S2
     cxCsc.r = (Sin(Op.r) * Cosh(Op.I)) / (C2 + S2)
@@ -706,99 +706,99 @@ Public Function cxCsc(Op As cxComplex) As cxComplex
 End Function
 
 ' // Arcsine of a complex number
-Public Function cxAsin(Op As cxComplex) As cxComplex
+Public Function cxAsin(Op As Complex) As Complex
     cxAsin = cxMulImg(cxlog(cxAdd(cxMulImg(Op, 1), cxSqr(cxRealSub(1, cxMul(Op, Op))))), -1)
 End Function
 
 ' // Arccosine of a complex number
-Public Function cxAcos(Op As cxComplex) As cxComplex
+Public Function cxAcos(Op As Complex) As Complex
     cxAcos = cxAddReal(cxMulImg(cxlog(cxAdd(cxMulImg(Op, 1), cxSqr(cxRealSub(1, cxMul(Op, Op))))), 1), PI2)
 End Function
 
 ' // Arctangent of a complex number
-Public Function cxAtan(Op As cxComplex) As cxComplex
-    Dim Iz As cxComplex
+Public Function cxAtan(Op As Complex) As Complex
+    Dim Iz As Complex
     Iz = cxMulImg(Op, 1)
     cxAtan = cxMulImg(cxSub(cxlog(cxRealSub(1, Iz)), cxlog(cxAddReal(Iz, 1))), 0.5)
 End Function
 
 ' // Arccotangent of a complex number
-Public Function cxActg(Op As cxComplex) As cxComplex
+Public Function cxActg(Op As Complex) As Complex
     cxActg = cxMulImg(cxSub(cxlog(cxDiv(cxSubImg(Op, 1), Op)), cxlog(cxDiv(cxAddImg(Op, 1), Op))), 0.5)
 End Function
 
 ' // Arcsecant of a complex number
-Public Function cxAsec(Op As cxComplex) As cxComplex
+Public Function cxAsec(Op As Complex) As Complex
     cxAsec = cxAcos(cxDgr(Op, -1))
 End Function
 
 ' // Arccosecant of a complex number
-Public Function cxAcsc(Op As cxComplex) As cxComplex
+Public Function cxAcsc(Op As Complex) As Complex
     cxAcsc = cxAsin(cxDgr(Op, -1))
 End Function
 
 ' // Hyperbolic sine of a complex number
-Public Function cxSinh(Op As cxComplex) As cxComplex
+Public Function cxSinh(Op As Complex) As Complex
     cxSinh = cxMulImg(cxSin(cxMulImg(Op, 1)), -1)
 End Function
 
 ' // Hyperbolic cosine of a complex number
-Public Function cxCosh(Op As cxComplex) As cxComplex
+Public Function cxCosh(Op As Complex) As Complex
     cxCosh = cxCos(cxMulImg(Op, 1))
 End Function
 
 ' // Hyperbolic tangent of a complex number
-Public Function cxTanh(Op As cxComplex) As cxComplex
+Public Function cxTanh(Op As Complex) As Complex
     cxTanh = cxMulImg(cxTan(cxMulImg(Op, 1)), -1)
 End Function
 
 ' // Hyperbolic cotangent of a complex number
-Public Function cxCtgh(Op As cxComplex) As cxComplex
+Public Function cxCtgh(Op As Complex) As Complex
     cxCtgh = cxRealDiv(1, cxTanh(Op))
 End Function
 
 ' // Hyperbolic secant of a complex number
-Public Function cxSech(Op As cxComplex) As cxComplex
+Public Function cxSech(Op As Complex) As Complex
     cxSech = cxRealDiv(1, cxCosh(Op))
 End Function
 
 ' // Hyperbolic cosecant of a complex number
-Public Function cxCsch(Op As cxComplex) As cxComplex
+Public Function cxCsch(Op As Complex) As Complex
     cxCsch = cxRealDiv(1, cxSinh(Op))
 End Function
 
 ' // Hyperbolic arcsine of a complex number
-Public Function cxAsinh(Op As cxComplex) As cxComplex
+Public Function cxAsinh(Op As Complex) As Complex
     cxAsinh = cxlog(cxAdd(Op, cxSqr(cxAddReal(cxMul(Op, Op), 1))))
 End Function
 
 ' // Hyperbolic arccosine of a complex number
-Public Function cxAcosh(Op As cxComplex) As cxComplex
+Public Function cxAcosh(Op As Complex) As Complex
     cxAcosh = cxlog(cxAdd(Op, cxMul(cxSqr(cxAddReal(Op, 1)), cxSqr(cxSubReal(Op, 1)))))
 End Function
 
 ' // Hyperbolic arctangent of a complex number
-Public Function cxAtanh(Op As cxComplex) As cxComplex
+Public Function cxAtanh(Op As Complex) As Complex
     cxAtanh = cxMulReal(cxlog(cxDiv(cxAddReal(Op, 1), cxRealSub(1, Op))), 0.5)
 End Function
 
 ' // Hyperbolic arccotangent of a complex number
-Public Function cxActgh(Op As cxComplex) As cxComplex
+Public Function cxActgh(Op As Complex) As Complex
     cxActgh = cxMulReal(cxlog(cxDiv(cxAddReal(Op, 1), cxSubReal(Op, 1))), 0.5)
 End Function
 
 ' // Hyperbolic arcsecant of a complex number
-Public Function cxAsech(Op As cxComplex) As cxComplex
-    Dim z As cxComplex
-    z = cxRealDiv(1, Op)
-    cxAsech = cxlog(cxAdd(z, cxSqr(cxAddReal(cxMul(z, z), 1))))
+Public Function cxAsech(Op As Complex) As Complex
+    Dim Z As Complex
+    Z = cxRealDiv(1, Op)
+    cxAsech = cxlog(cxAdd(Z, cxSqr(cxAddReal(cxMul(Z, Z), 1))))
 End Function
 
 ' // Hyperbolic arccosecant of a complex number
-Public Function cxAcsch(Op As cxComplex) As cxComplex
-    Dim z As cxComplex
-    z = cxRealDiv(1, Op)
-    cxAcsch = cxlog(cxAdd(z, cxMul(cxSqr(cxAddReal(z, 1)), cxSqr(cxSubReal(z, 1)))))
+Public Function cxAcsch(Op As Complex) As Complex
+    Dim Z As Complex
+    Z = cxRealDiv(1, Op)
+    cxAcsch = cxlog(cxAdd(Z, cxMul(cxSqr(cxAddReal(Z, 1)), cxSqr(cxSubReal(Z, 1)))))
 End Function
 ' // Print matrix to immediate window
 Public Function PrintMtrx(Op As Matrix)
@@ -814,13 +814,13 @@ End Function
 
 ' // Creating a matrix
 Public Function mxCreate(ByVal Row As Long, ByVal Col As Long, ParamArray Y()) As Matrix
-    Dim p As Variant, C As Long
+    Dim p As Variant, c As Long
     If Row <= 0 Or Col <= 0 Then Exit Function
     If Row * Col < UBound(Y) + 1 Then Exit Function
     mxCreate.Row = Row: mxCreate.Col = Col
-    ReDim mxCreate.D(Row * Col - 1): C = 0
+    ReDim mxCreate.D(Row * Col - 1): c = 0
     For Each p In Y
-        mxCreate.D(C) = p: C = C + 1
+        mxCreate.D(c) = p: c = c + 1
     Next
 End Function
 

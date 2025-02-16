@@ -637,8 +637,9 @@ MODULE DD8 {Module Pairs {
       Const center=2, right=3, left=1, blue=1, angle=0, dotline=3
       Const size9pt=9, size11pt=11
       Cls ,0 ' use current background color, set split screen from line 0
-      Cursor 0,3
-      Report center, "Coordinate pairs"
+ '     Cursor 0,3
+'      Report center, "Coordinate pairs"
+      BigTitle(ucase$("Coordinate pairs"), 1, 75)
       x = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
       y = (2.7, 2.8, 31.4, 38.1, 58.0, 76.2, 100.5, 130.0, 149.3, 180.0)
       dx=scale.x/2/len(x)
@@ -700,6 +701,24 @@ MODULE DD8 {Module Pairs {
       Copy scale.x, scale.y to Screenshot$
       Clipboard Screenshot$
       a$=key$
+      sub BigTitle(this$, there, percent)
+		local w, n
+		mm=width
+		w=scale.x
+		drawing  {
+			Linespace 0
+			mode 8
+			pen #FFEEFf
+			bold 0
+			legend chr$(160)+this$+chr$(160),"Lucida Handwriting",  8,0,3,1,-20
+
+		} as w
+		cursor 0, there
+		move !
+		n=scale.x/image.x(w)*percent/100
+		step (scale.x-image.x(w)*n)/2
+		image w, image.x(w)*n
+	end sub
 }
 Pairs
 }
@@ -6575,7 +6594,7 @@ combine=lambda  -> {
 ? "["+a#filter(even)#map(add2)#fold$(fold2, "")+"]"
 a=(,)
 z=a#filter(even,(0,))#map(add2)
-Print z, type$(z)
+Print z, type$(z)  ' Was mArray, it is tuple from 13 version
 a=(1,2,3,4,5)
 ? a#map(add2, square)
 ? "["+a#map(add2, square)#fold$(fold2, "")+"]"
@@ -20148,10 +20167,15 @@ If Menu>0 Then {
                   Report HelpText$
                   Menu
                   Print @(40);"Choose ";
-                  Menu "Edit Description","Change Group","Pick another","End"
+                  Menu "Edit Description","Change Group","Pick another","Delete","End"
                   Cls #edca85,3
                   Pen #3c1414
-                  If Menu=4 Then Exit
+                  If Menu=5 Then Exit
+                  if Menu=4 Then
+                          if ask("Delete this word "+EnglishName$)=1 then
+                               Delete "HELP2000", "COMMANDS", "ENGLISH", EnglishName$
+                           end if
+                  end if
                   If Menu=3 Then Here = True : Exit
                   If Menu=2 Then {
                         ChangeGroup(EnglishName$)
@@ -46748,4 +46772,318 @@ MODULE COMPARE_LIST {Module CheckIt {
 }
 Checkit
 }
-UseThis : InfoBasic : C1: ShowKeys: Pen 15 {Print "Press F3 now"}
+MODULE CIPHER {module Bifid_cipher (f, code$) {
+	n=sqrt(len(code$))
+	print #f,"  ";
+	for i=1 to n
+		print #f, i+" ";
+	next
+	print #f
+	for i=0 to n-1
+		Print #f, (i+1)+" "+STR$(mid$(code$,1+i*n, n),STRING$("@ ", 5))
+	next
+	tables=lambda (a$)->{
+		n=sqrt(len(a$))
+		a=list
+		for i=1 to len(a$)
+			append a,  mid$(a$,i, 1):=((i-1) mod n+1, (i-1) div n+1 )
+		next
+		b=list
+		m=each(a)
+		while m
+			z=eval(m)
+			append b, z#val$(1)+z#val$(0):=eval$(m!)
+		end while
+		=a, b
+	}(code$)
+	encode= lambda (a, b)->{
+		=lambda a,b (mess as string) -> { 
+			document code$
+			for n=1 to 0
+				for i=1 to len(mess)
+					q=mid$(mess, i,1)
+					if not exist(a, q) then
+						if q="J" then q="I" else q="A"
+					end if
+					code$=a(q)#val$(n)
+				next
+			next
+			document final$
+			for i=1 to len(code$) step 2
+				final$=b$(mid$(code$, i, 2))
+			next
+			= final$
+		}
+	}(!tables)
+	decode= lambda (a, b)->{
+		=lambda a,b (final as string) -> {
+			document code$, mess$
+			for i=1 to len(final)
+				q=a(mid$(final, i, 1))
+				code$=q#val$(1)+q#val$(0)
+			next
+			offset=len(code$) div 2
+			for i=1 to offset
+				mess$=b$(mid$(code$,i,1)+mid$(code$,i+offset,1))
+			next
+			= mess$
+		}
+	}(!tables)
+	Print #f, encode("ATTACKATDAWN")
+	Print #f, decode(encode("ATTACKATDAWN"))="ATTACKATDAWN"
+	Print #f, encode(ucase$(filter$("The invasion will start on the first of January", " ")))
+	Print #f, decode(encode(ucase$(filter$("The invasion will start on the first of January", " "))))
+}
+open "" for output as #a
+Bifid_cipher a, "ABCDEFGHIKLMNOPQRSTUVWXYZ"
+Bifid_cipher a, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+Bifid_cipher a, "BGWKZQPNDSIOAXEFCLUMTHYVR"
+close #a
+open "out.txt" for output as #a
+Bifid_cipher a, "ABCDEFGHIKLMNOPQRSTUVWXYZ"
+Bifid_cipher a, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+Bifid_cipher a, "BGWKZQPNDSIOAXEFCLUMTHYVR"
+close #a
+win "out.txt"
+}
+MODULE DRAGON {Module Checkit {
+	escape off
+      def  double angle, d45, d90, change=5000
+      const sr2 as double= .70710676237
+      Cls 0
+      Pen 14
+      \\ move console full screen to second monitor
+      Window 12, 1
+      \\ reduce size (tv as second monitor cut pixels from edges)
+      Window 12, scale.x*.9, scale.y*.9;
+      \\ opacity 100%, but for 0 (black is 100%, and we can hit anything under console window)
+      Desktop 255, 0
+      \\ M2000 console can divide screen to characters/lines with automatic line space
+      Form 60, 30
+      \\ cut the border from window
+      Form
+      \\ scale.x and scale.y in twips
+      \\ all graphic/console commands works for printer also (except for Input)
+      Move scale.x/2,scale.y/10
+      \\ outline graphics, here outline text
+      \\ legend text$, font, size, angle, justify(2 for center), quality (non zero for antialiasing, works for angle 0), letter spacing.
+      Color  {
+                  Legend "DRAGON CURVE", "Courier",SCALE.Y/200,0,2, 1, SCALE.X/50
+      }
+      angle=0
+      d45=pi/4
+      d90=pi/2
+      Move scale.x/3, scale.y*2/3
+      bck=point
+      \\ twipsx is width in twips of pixel. twipsy are height in twips of a pixel 
+      \\ so we use length:twips.x*scale.x/40  or scale.x/40 pixels.
+      \\ use % for integer - we can omit these, and we get integer by automatic conversion (overflow raise error)
+      dragon(twipsx*scale.x/40,14%, 1)
+      Pen 14
+      a$=key$
+      Cls 5
+      \\ set opacity to 100%
+      Desktop 255
+      escape on
+      End
+      \\ Subs are private to this module
+      \\ Subs have same scope as module
+      Sub turn(rand as double)
+            angle+=rand
+      End Sub
+      \\ angle is absolute, length is relative
+      Sub forward(length as double)
+            Draw Angle angle, length
+      End Sub
+      Sub dragon(length as double, split as integer, d as double)
+            If split=0 then {
+                  forward(length)
+            } else {
+                  Gosub turn(d*d45)
+                  \\ we can omit Gosub
+                  dragon(length*sr2,split-1,1)
+                  turn(-d*d90)
+                  dragon(length*sr2,split-1,-1)
+                  turn(d*d45) 
+                  change--
+                  If change else {
+                        push 0: do {drop: push random(11,15) : over } until number<>pen: pen number
+                        change=5000
+                  }
+            }
+      End Sub     
+}
+Checkit
+}
+MODULE TRANS {Module Matrix_Transposition {
+	dim a(3,4) as long, b()
+	a(0,0)=1,2,3,4
+	a(1,0)=5,6,7,8
+	a(2,0)=9,10,11,12
+	open "out.txt" for output as #f
+	showarray("a()", &a())
+	b()=@transpose(a())
+	showarray("transpose to", &b())
+	dim a(3,1)
+	a(0,0)=1,2,3
+	showarray("a()", &a())
+	b()=@transpose(a())
+	showarray("transpose to", &b())
+	
+	// Using arrays with square brackets:
+	long a[2][0]
+	// second dimension adjust also from items (for each sub array)
+	a[0][0]=1,2,3,4
+	a[1][0]=5,6,7,8
+	a[2][0]=9,10,11,12
+	showarray2("a[][]", a)
+	// transpose has to know the type to define the new one
+	b=@transposeLong(a)
+	showarray2("transpose to", b)
+	long c[2][0]
+	c[0][0]=1
+	c[1][0]=2
+	c[2][0]=3
+	showarray2("c[]", c)
+	b=@transposeLong(c)
+	showarray2("transpose to", b)
+	' we can use Variant type as return type
+	d=@transposeAny(b)
+	showarray2("transpose to", d)
+	close #f
+	win "out.txt"  ' open out.txt from default application for *.txt files
+	
+	sub showarray(title$, &a())
+		print #f, title$+": (";
+		local boolean z=dimension(a(),1,1)=0
+		for i=0 to dimension(a(),1,1)
+			if i>0 then print #f, ", ";
+			print #f, "(";
+			if dimension(a(),2,1)>1 then
+				for j=0 to dimension(a(),2,1)-1
+					print #f, a(i, j)+", ";
+				next
+				print #f, a(i, j)+")";
+			else
+				print #f, a(i, 0)+",)";
+			end if
+		next
+		if z then print #f, ",)" else print #f, ")"
+	end sub
+	sub showarray2(title$, a as *Long)
+		' handle with one or zero sub arrays
+		print #f, title$+": [";
+		for i=0 to len(a)-1
+			if i>0 then print #f, ", ";
+			if valid(len(a[i])) then
+				print #f, "[";
+				if len(a[i])>1 then
+					for j=0 to len(a[i])-2
+						print #f, a[i][j]+", ";
+					next
+				else
+					j=0
+				end if
+				print #f, a[i][j]+"]";
+			else
+				print #f, a[i];
+			end if
+		next
+		print #f, "]"
+	end sub
+	function transposeLong(a as *long)
+		Local long R=Len(a)-1 ' upper bound dim 1
+		Local long L=len(a[0])-1 ' upper bound dim 2
+		local long b[L][R]
+		for i=0 to L
+			for j=0 to R
+				b[i][j]=a[j][i]
+			next
+		next
+		=b
+	End Function
+	function transposeAny(a)
+		if not valid(a[0][0]) then Error "Wrong Type"
+		Local long R=Len(a)-1 ' upper bound dim 1
+		Local long L=len(a[0])-1 ' upper bound dim 2
+		local Variant b[L][R]
+		for i=0 to L
+			for j=0 to R
+				b[i][j]=a[j][i]
+			next
+		next
+		=b
+	End Function
+	function transpose(a as array)
+		// we use a as pointer to array
+		// if we use transpose(a()) we get a copy on a()
+		// so we make one copy only
+		// copy a to a()
+		Local a()
+		a()=a
+		push &a
+		Read new &b()
+		Local long R=dimension(a(),1,1) ' upper bound dim 1
+		Local long L=dimension(a(),2,1) ' upper bound dim 2
+		' this is a redim, and preserve the array type also
+		Dim a(L+1,R+1)
+		for i=0 to L
+			for j=0 to R
+				a(i,j)=b(j, i)
+			next
+		next
+		=a()
+	End Function
+}
+Matrix_Transposition
+}
+MODULE VER13 {a=(1,2,3,4)
+Print type$(a)="tuple"
+link a to a()  ' a and a() point to same data site
+Print type$(a())="tuple"
+dim b()
+b()=a  ' this is a copy from tuple to mArray
+Print type$(b())="mArray"
+b(2)+=100
+' the a() interface works for copy | the a=b() just alter the pointer.
+a()=b()  ' this is a copy from mArray to tuple
+Print type$(a())="tuple"
+Print a(2)=103
+Print a#val(2)=103   ' a is a pointer to tuple
+b=b()
+Print type$(b)="mArray"
+a=b  ' this can be done
+print a is b  ' true
+print type$(a)="mArray"
+Print type$(a())="mArray"
+k=car(b())
+print type$(k)="tuple"
+k1=cdr(b())
+print type$(k1)="tuple"
+k2=cons(b(), (1,2,3,4), (5,6,7))
+print type$(k2)="tuple"
+k2=cons((1,2,3,4),b(), (5,6,7))
+print type$(k2)="tuple"
+k3=b()#slice(0, 1)
+print type$(k3)="mArray"
+k4=b()#rev()
+print type$(k4)="mArray"
+
+function alfa(x) {
+	dim a(x) as biginteger=100
+	=a()
+}
+
+w=alfa(20)
+Print type$(w)="mArray",  len(w)=20
+big1=w#val(4)
+Print  type$(big1)
+q=cons(w) ' copy as tuple ' but now we have long type
+? len(q)
+exit
+Print type$(q)
+
+big=q#val(3)
+? type$(big)
+}
+UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

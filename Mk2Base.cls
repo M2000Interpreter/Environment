@@ -64,9 +64,9 @@ Dim slen As Long
   If slen Then GetBStrFromPtr = space$(slen) Else Exit Function
    RtlMoveMemory ByVal StrPtr(GetBStrFromPtr), ByVal lpSrc, slen * 2
 End Function
-Private Function GetGUIDstr(g As GUID) As String
+Private Function GetGUIDstr(G As GUID) As String
 Dim ret As Long, here As Long
-ret = StringFromCLSID(g, here)
+ret = StringFromCLSID(G, here)
 If ret Then Exit Function
 GetGUIDstr = GetBStrFromPtr(here)
 CoTaskMemFree here
@@ -82,8 +82,8 @@ Friend Sub OpenBase_(aName$)
 ' We can open a new, so the indexes can be none
 End Sub
 Friend Function AddTables_(ParamList As mStiva2) As Boolean
-Dim i As Integer, Tablename, pppp As mArray, fieldlist As FastCollection
-Dim m As GUID, originalname As String
+Dim i As Integer, Tablename, pppp As tuple, fieldlist As FastCollection
+Dim M As GUID, originalname As String
 Dim goodlist As New mStiva2
 Do While ParamList.count > 0
     originalname = ParamList.PopVal
@@ -98,12 +98,12 @@ Do While ParamList.count > 0
 Loop
 
 Do While goodlist.count > 0
-    Set pppp = New mArray
+    Set pppp = New tuple
     pppp.PushDim (30), (0)  ' 30 items, of anytype, we have many spare items
     pppp.PushEnd
-    MakeGuid m, LenB(m)
+    MakeGuid M, LenB(M)
     ' 0 the GUID
-    pppp.item(0) = GetGUIDstr(m)
+    pppp.item(0) = GetGUIDstr(M)
     Set fieldlist = New FastCollection
     fieldlist.AllowAnyKey
     Set pppp.item(1) = fieldlist ' the fields collection
@@ -155,8 +155,8 @@ Loop
 RemoveTables_ = True
 End Function
 Friend Function AddFields_(ParamList As mStiva2) As Boolean
-Dim Tablename, fieldname, pppp As mArray, fieldlist As FastCollection, fl As String, ma As mArray
-Dim originalname As String, i As Long, acc As Long, pppp1 As mArray, pppp2 As mArray, j As Long
+Dim Tablename, fieldname, pppp As tuple, fieldlist As FastCollection, fl As String, ma As tuple
+Dim originalname As String, i As Long, acc As Long, pppp1 As tuple, pppp2 As tuple, j As Long
 Dim fieldtype As Long
 If ParamList.count > 0 Then Tablename = ParamList.PopVal
 If Tablename = vbNullString Then Exit Function
@@ -179,7 +179,7 @@ If BaseTable.Find(Tablename) Then
      End If
     fieldlist.sValue = 0  ' delete old field
     End If
-    Set ma = New mArray
+    Set ma = New tuple
     ma.PushDim (10), (0)  ' 10 items
     ma.PushEnd
     ma.item(0) = originalname
@@ -215,7 +215,7 @@ If BaseTable.Find(Tablename) Then
     End If
     Next i
     If acc > 0 Then
-    Set pppp1 = New mArray
+    Set pppp1 = New tuple
     pppp1.PushDim (acc), (0)
     pppp1.PushEnd
 
@@ -227,7 +227,7 @@ If BaseTable.Find(Tablename) Then
     Next i
     End If
     Set pppp.item(17) = pppp1  ' fields indexes
-    Set pppp2 = New mArray
+    Set pppp2 = New tuple
     pppp2.PushDim (fieldlist.count), (0)
     pppp2.PushEnd
     Set pppp.item(18) = pppp2  ' accumulator
@@ -246,9 +246,9 @@ Friend Sub RemoveFields_(ParamList As mStiva2)
 
 End Sub
 Friend Function AddIndexes_(ParamList As mStiva2) As Boolean
-Dim Tablename, fieldname, pppp As mArray, fieldlist As FastCollection, fl As String
+Dim Tablename, fieldname, pppp As tuple, fieldlist As FastCollection, fl As String
 Dim indexField As FastCollection, i As Long, fieldindex As Long, IndexList As FastCollection
-Dim originalname As String, vv, ordertype As Long, Temp As mArray
+Dim originalname As String, vv, ordertype As Long, Temp As tuple
 Dim ord()
 If ParamList.count > 0 Then Tablename = ParamList.PopVal
 If Tablename = vbNullString Then Exit Function
@@ -312,7 +312,7 @@ If BaseTable.Find(Tablename) Then
             End If
             If ordertype < 0 Then ordertype = 0
             If ordertype > 3 Then ordertype = 3
-            indexField.AddKey fl, originalname + " " + LTrim(Str$(ordertype))
+            indexField.AddKey fl, originalname + " " + LTrim(str$(ordertype))
             indexField.sValue = fieldlist.Index
             ord(i) = ordertype
             i = i + 1
@@ -380,15 +380,15 @@ Property Get tables() As Object
 Set tables = BaseTable
 End Property
 Sub ReIndexTable(Tablename As String)
-Dim pppp As mArray
+Dim pppp As tuple
 If BaseTable.ExistKey(myUcase(Tablename, True)) Then
     Set pppp = BaseTable.ValueObj
     ReIndex pppp
 End If
 End Sub
-Friend Sub ReIndex(pppp As mArray)
+Friend Sub ReIndex(pppp As tuple)
 Dim RecordList As FastCollection, IndexList As FastCollection, indexField As FastCollection
-Dim i&, j&, allkey$, acc As mArray, b() As Byte
+Dim i&, j&, allkey$, acc As tuple, b() As Byte
 Set RecordList = pppp.item(2)
 Set indexField = pppp.item(3)
 Set IndexList = pppp.item(4)
@@ -435,7 +435,7 @@ If IndexList.count > 0 Then
 End If
 End Sub
 Property Get LastRead(ByVal Tablename As String) As Variant
-Dim pppp As mArray
+Dim pppp As tuple
 Tablename = myUcase(Tablename, True)
 If BaseTable.ExistKey(Tablename) Then
 Set pppp = BaseTable.ValueObj

@@ -62,10 +62,10 @@ Friend Sub Load(v As String, b As Integer)
     SwapStrings val, v
     outbase = b
 End Sub
-Friend Sub Load2(A, Optional o, Optional re)
+Friend Sub Load2(a, Optional o, Optional re)
     Dim aa As BigInteger, bb As BigInteger
-    If VarType(A) = vbString Then
-        SwapString2Variant val, A
+    If VarType(a) = vbString Then
+        SwapString2Variant val, a
         If IsMissing(o) Then
             outbase = 10
         Else
@@ -77,7 +77,7 @@ Friend Sub Load2(A, Optional o, Optional re)
                 SwapString2Variant cReminder, re
             End If
     Else
-        Set aa = A
+        Set aa = a
         SwapStrings val, aa.Value
         If IsMissing(re) Then
         SwapString2Variant cReminder, aa.Reminder
@@ -131,7 +131,7 @@ Function divide(v As BigInteger) As BigInteger
     divide.Load2 Module13.divide(Value, v.Value), CVar(Me), CVar(Module13.LastRemainder)
 End Function
 Function divideE(v As BigInteger) As BigInteger
-    Dim s$, p$, M$, k As Integer
+    Dim s$, p$, m$, K As Integer
  ' ? Module13.CreateBigInteger("-25").ModulusE(Module13.CreateBigInteger("-7")).ToString
     p$ = v.Value
     If LeftB$(p$, 1) = ChrB$(45) Then MidB$(p$, 1, 1) = ChrB$(48)
@@ -146,10 +146,10 @@ Function divideE(v As BigInteger) As BigInteger
     End If
     If LeftB$(s$, 1) = ChrB$(45) Then MidB$(s$, 1, 1) = ChrB$(48)
     If Module13.compare((s$), p$) > -1 Then s$ = ChrB$(48)
-    M$ = s$
+    m$ = s$
     s$ = Module13.divide(Module13.subtract(Value, s$), v.Value)
     Set divideE = New BigInteger
-    divideE.Load2 CVar(s$), CVar(Me), CVar(M$)
+    divideE.Load2 CVar(s$), CVar(Me), CVar(m$)
 End Function
 Function multiply(v As BigInteger) As BigInteger
     Set multiply = New BigInteger
@@ -160,7 +160,7 @@ Function Modulus(v As BigInteger) As BigInteger
     Modulus.Load Module13.Modulus(Value, v.Value), outbase
 End Function
 Function ModulusE(v As BigInteger) As BigInteger
-    Dim s$, p$, k As Integer
+    Dim s$, p$, K As Integer
  ' ? Module13.CreateBigInteger("-25").ModulusE(Module13.CreateBigInteger("-7")).ToString
     p$ = v.Value
     If LeftB$(p$, 1) = ChrB$(45) Then MidB$(p$, 1, 1) = ChrB$(48)
@@ -182,24 +182,24 @@ Function intpower(v As BigInteger) As BigInteger
     Set intpower = New BigInteger
     intpower.Load Module13.IntStrByExp(Value, v.Value), outbase
 End Function
-Function modpow(v As BigInteger, M As BigInteger) As BigInteger
+Function modpow(v As BigInteger, m As BigInteger) As BigInteger
     Set modpow = New BigInteger
-    modpow.Load Module13.modpow(Value, v.Value, M.Value), outbase
+    modpow.Load Module13.modpow(Value, v.Value, m.Value), outbase
 End Function
 Friend Function modpow1(vv, mm) As BigInteger
-    Dim v As BigInteger, M As BigInteger
+    Dim v As BigInteger, m As BigInteger
     Set v = vv
-    Set M = mm
+    Set m = mm
     Set modpow1 = New BigInteger
-    modpow1.Load Module13.modpow(Value, v.Value, M.Value), outbase
+    modpow1.Load Module13.modpow(Value, v.Value, m.Value), outbase
 End Function
 Function IntSqr() As BigInteger
     Set IntSqr = New BigInteger
     IntSqr.Load Module13.IntSqr(Value), outbase
 End Function
 
-Function IsProbablyPrime(k As Integer) As Boolean
-    IsProbablyPrime = Module13.IsProbablyPrime(Value, k)
+Function IsProbablyPrime(K As Integer) As Boolean
+    IsProbablyPrime = Module13.IsProbablyPrime(Value, K)
 End Function
 Function bAbs() As BigInteger
     Set bAbs = New BigInteger
@@ -222,7 +222,9 @@ End Function
 Function compare(v As BigInteger) As Integer
     compare = Module13.compare(Value, v.Value)
 End Function
-
+Function Copy() As Object ' for refarray
+Set Copy = Me
+End Function
 Private Sub Class_Initialize()
 val = ChrB$(48)
 cReminder = ChrB$(48)

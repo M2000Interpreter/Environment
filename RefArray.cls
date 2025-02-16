@@ -47,126 +47,136 @@ End Property
 Friend Property Let emtype(RHS As Integer)
 emptytype = RHS
 End Property
-Friend Sub CreateRef(ByVal A As Long)
+Friend Sub CreateRef(ByVal a As Long)
     If flat Then
-        VarByRef A, p
+        VarByRef a, p
     Else
-        VarByRef A, p(0)
+        VarByRef a, p(0)
     End If
 End Sub
-Private Sub VarByRef(ByVal A As Long, ByRef b As Variant)
+Private Sub VarByRef(ByVal a As Long, ByRef b As Variant)
 Dim t(0 To 3) As Long
    CopyMemory t(0), ByVal VarPtr(b), 16
    t(0) = t(0) Or &H4000
    t(2) = VarPtr(b) + 8
-   CopyMemory ByVal A, t(0), 16
+   CopyMemory ByVal a, t(0), 16
 End Sub
 Function NewRef(Optional ByRef RHS) As refArray
-Dim z As New refArray
-If Not IsMissing(RHS) Then z.writevalue = RHS
-z.flat = flat
-Set NewRef = z
+Dim Z As New refArray
+If Not IsMissing(RHS) Then Z.writevalue = RHS
+Z.flat = flat
+Set NewRef = Z
 End Function
 Friend Sub UnFlat()
-Dim z, z1
+Dim Z, z1
 If flat Then
-    z = p
+    Z = p
     ResetToType vbVariant, 0
-    CopyVariantArray p(0), z
-    CopyVariantArray z, z1
+    CopyVariantArray p(0), Z
+    CopyVariantArray Z, z1
   
 End If
 
 End Sub
 Property Get Copy() As refArray
-Dim z As New refArray, pp
+Dim Z As New refArray, pp, gr As Group
 If isok Then
-        Dim I As Long, j As Long, M, rA As refArray
+        Dim i As Long, j As Long, m, rA As refArray
         If flat Then
-            z.writevalue = p
-            z.flat = flat
+            Z.writevalue = p
+            Z.flat = flat
             If VarType(p) = vbArray + vbObject Then
-                For I = UBound(p) To 0 Step -1
-                    If Not p(I) Is Nothing Then
-                        If TypeOf p(I) Is refArray Then
-                            Set M = p(I).Copy()
-                            z(I) = M
+                For i = UBound(p) To 0 Step -1
+                    If Not p(i) Is Nothing Then
+                        If TypeOf p(i) Is refArray Then
+                            Set m = p(i).Copy()
+                            Z(i) = m
                         Else
-                            Set M = p(I)
+                            Set m = p(i)
                             On Error GoTo 123
-                            Set M = p(I).Copy()
-                            z(I) = M
+                            Set m = p(i).Copy()
+                            Z(i) = m
 123
+                            If Err Then
+                                If IsObjGroup(m) Then
+                                    Z(i) = CVar(CopyGroupObj(m))
+                                Else
+                                    Z(i) = m
+                                End If
+                            End If
                             Err.Clear
-                            Set M = Nothing
+                            Set m = Nothing
                         End If
                     End If
-                Next I
+                Next i
             End If
-            Set Copy = z
+            Set Copy = Z
             Exit Property
         End If
 Dim ppp As Object
-    For I = UBound(p) To 0 Step -1
-        If IsObject(p(I)) Then
-        Set ppp = p(I)
+    For i = UBound(p) To 0 Step -1
+        If IsObject(p(i)) Then
+        Set ppp = p(i)
             If ppp Is Nothing Then
-                z(I) = CVar(Nothing)
-            ElseIf TypeOf p(I) Is refArray Then
-                Set rA = p(I)
+                Z(i) = CVar(Nothing)
+            ElseIf TypeOf p(i) Is refArray Then
+                Set rA = p(i)
                 If rA.MarkTwoDimension Then
                     Set rA = rA.Copy
                     rA.MarkTwoDimension = True
-                     z(I) = CVar(rA)
+                     Z(i) = CVar(rA)
                 Else
-                   z(I) = CVar(rA.Copy)
+                    Z(i) = CVar(rA.Copy)
                 End If
-                
             End If
         Else
-            pp = p(I)
+            pp = p(i)
             j = Elements(pp)
             If VarType(pp) = vbVariant + vbArray Then
-            If j > 0 Then
-                For j = j - 1 To 0 Step -1
-                
-                    If IsObject(pp(j)) Then
-                        
-                        Set M = pp(j)
-                        On Error Resume Next
-                        Set M = pp(j).Copy()
-                        Err.Clear
-                        z(j) = M
-                        Set M = Nothing
-                    End If
-                Next j
-            End If
-            ElseIf VarType(pp) = vbArray + vbObject Then
-            If j > 0 Then
-                For j = j - 1 To 0 Step -1
-                
-                   
-                        Set M = pp(j)
-                        If Not M Is Nothing Then
-                        On Error Resume Next
-                        Set M = M.Copy()
-                        Err.Clear
-                        Set ppp = M
-                         Set z(j) = ppp
+                If j > 0 Then
+                    For j = j - 1 To 0 Step -1
+                        If IsObject(pp(j)) Then
+                            Set m = pp(j)
+                            On Error Resume Next
+                            Set m = pp(j).Copy()
+                            Err.Clear
+                            If IsObjGroup(m) Then
+                                Z(i) = CVar(CopyGroupObj(m))
+                            Else
+                                Z(i) = m
+                            End If
+                            Set m = Nothing
                         End If
-                        Set M = Nothing
-                   
-                Next j
+                    Next j
+                End If
+            ElseIf VarType(pp) = vbArray + vbObject Then
+                If j > 0 Then
+                    For j = j - 1 To 0 Step -1
+                        Set m = pp(j)
+                        If Not m Is Nothing Then
+                            On Error Resume Next
+                            Set m = m.Copy()
+                            Err.Clear
+                            Set ppp = m
+                            If IsObjGroup(m) Then
+                                Set Z(i) = CopyGroupObj(m)
+                            Else
+                                Set Z(j) = ppp
+                            End If
+                        End If
+                        Set m = Nothing
+                    Next j
+                End If
             End If
-            End If
-            z(I) = pp
+            Z(i) = pp
         End If
-    Next I
+    Next i
 Else
-    z.writevalue = p
+    Z.writevalue = p
 End If
-z.MarkTwoDimension = Not OneDimension
-Set Copy = z
+Z.MarkTwoDimension = Not OneDimension
+Z.emtype = emtype
+Set Copy = Z
 End Property
 Property Let writevalue(ByRef RHS)
 If IsObject(RHS) Then
@@ -291,19 +301,19 @@ entry1:
         End If
     ElseIf what >= 0 Then
         If Elements(p(where)) < what + 1 Then
-        Dim I As Long
-            I = Elements(p(where))
+        Dim i As Long
+            i = Elements(p(where))
             Dim ThisPtr As Long, PadDim As SAFEARRAYBOUND
             PadDim.cElements = what + 1
             ThisPtr = MemLong(UnsignedAdd(VarPtr(p(where)), 8))
             If SafeArrayRedim(ByVal ThisPtr, VarPtr(PadDim)) <> 0& Then Err.Raise 5
             If Me.emtype = 200 Then
-            For I = I To what - 1
-                p(where)(I) = nMath2.cxZero
+            For i = i To what - 1
+                p(where)(i) = nMath2.cxZero
             Next
             ElseIf Me.emtype = 201 Then
-            For I = I To what - 1
-               Set p(where)(I) = ZeroBig
+            For i = i To what - 1
+               Set p(where)(i) = ZeroBig
             Next
             End If
         End If
@@ -350,7 +360,7 @@ entry1:
             If Me.emtype = 200 Then
                 If MemInt(VarPtr(that)) <> 36 Then
                     p(where)(what) = nMath2.cxNew(CDbl(that), 0#)
-                ElseIf TypeOf that Is cxComplex Then
+                ElseIf TypeOf that Is Complex Then
                      p(where)(what) = that
                 Else
                     WrongType
@@ -516,24 +526,24 @@ Property Get AssignError()
     AssignError = mError
     mError = 0
 End Property
-Property Get count(Optional M)
-count = 0&
+Property Get Count(Optional m)
+Count = 0&
 If isok Then
-    If IsMissing(M) Then
-        count = Elements(p)
+    If IsMissing(m) Then
+        Count = Elements(p)
     
     ElseIf myVarType(p, vbObject) Then
         If p Is Nothing Then
         ElseIf TypeOf p Is refArray Then
-            If M >= 0 And M <= p.count Then
+            If m >= 0 And m <= p.Count Then
                 On Error Resume Next
-                count = p.count(M)
+                Count = p.Count(m)
                 Err.Clear
             End If
         End If
-    ElseIf M >= 0 And M <= UBound(p) Then
+    ElseIf m >= 0 And m <= UBound(p) Then
         On Error Resume Next
-        count = UBound(p(M)) + 1
+        Count = UBound(p(m)) + 1
         Err.Clear
     End If
 End If
@@ -606,11 +616,11 @@ Public Function Elements2(vArray As Variant) As Long
         lPtr = MemLong(lPtr)
     End If
     If lPtr <> 0 Then
-        Dim I As Long, p As Long
+        Dim i As Long, p As Long
         p = 1
-        For I = 1 To MemInt(lPtr)
-            p = p * MemLong(UnsignedAdd(lPtr, 8 + I * 8))
-        Next I
+        For i = 1 To MemInt(lPtr)
+            p = p * MemLong(UnsignedAdd(lPtr, 8 + i * 8))
+        Next i
         Elements2 = p
     End If
     End If
@@ -620,7 +630,7 @@ Public Function UnsignedAdd(ByVal lUnsignedPtr As Long, ByVal lSignedOffset As L
     UnsignedAdd = ((lUnsignedPtr Xor &H80000000) + lSignedOffset) Xor &H80000000
 End Function
 Public Sub DefArrayAt(where, Arrtype, Optional Size As Long = 10, Optional Size1 As Long, Optional Size2 As Long)
-Dim I As Long
+Dim i As Long
 If Size < 0 Then Size = 0
 If ihavearray Then
     If isok Then
@@ -650,9 +660,9 @@ If where = -1 Then
     pp = LibMemory.EmptyArray(1, Arrtype)
     ReDim pp(Size)
     If Arrtype = 200 Then
-        For I = 0 To Size
-         pp(I) = nMath2.cxZero
-        Next I
+        For i = 0 To Size
+         pp(i) = nMath2.cxZero
+        Next i
     'ElseIf Arrtype = 201 Then
      '   For I = 0 To Size
      '    pp(I) = ZeroBig
@@ -668,13 +678,13 @@ Else
         ReDim pp(Size)
         If Arrtype = 200 Then
        
-        For I = 0 To Size
-         pp(I) = nMath2.cxZero
-        Next I
+        For i = 0 To Size
+         pp(i) = nMath2.cxZero
+        Next i
         ElseIf Arrtype = 201 Then
-        For I = 0 To Size
-         Set pp(I) = ZeroBig
-        Next I
+        For i = 0 To Size
+         Set pp(i) = ZeroBig
+        Next i
         End If
     ElseIf Size2 <= 0 Then
         pp = LibMemory.EmptyArray(2, Arrtype)
@@ -739,8 +749,8 @@ Public Function tuple(ParamArray v())
     If Elements(p) > 0 Then
         tuple = p
     Else
-        Dim z() As Variant
-        tuple = z()
+        Dim Z() As Variant
+        tuple = Z()
     End If
 End Function
 Property Get Hash(item As Long, Optional what As Long = -1, Optional ByVal Size As Long = 4) As Long
@@ -847,7 +857,7 @@ Public Function ArrayDesc(vArray As Variant, str As String) As String
             lPtr = MemLong(lPtr)
         End If
         If lPtr <> 0 Then
-            Dim I As Long, p As String, aType As String
+            Dim i As Long, p As String, aType As String
             Select Case MemInt(VarPtr(vArray)) And &HFFF
             Case 2
                 aType = "Integer"
@@ -882,9 +892,9 @@ Public Function ArrayDesc(vArray As Variant, str As String) As String
             Case 36
                 aType = Typename(vArray)
             End Select
-            For I = 1 To MemInt(lPtr)
-                p = p & "[" & MemLong(UnsignedAdd(lPtr, 8 + I * 8)) & "]"
-            Next I
+            For i = 1 To MemInt(lPtr)
+                p = p & "[" & MemLong(UnsignedAdd(lPtr, 8 + i * 8)) & "]"
+            Next i
             ArrayDesc = aType & str & p
             Exit Function
         End If
@@ -1025,8 +1035,8 @@ Else
 DefArrayAt -1, thistype, 0
 End If
 End Sub
-Friend Sub CopyVariantArray(ByRef A As Variant, ByRef b As Variant)
-    CopyMemory ByVal VarPtr(A), ByVal VarPtr(b), 16
+Friend Sub CopyVariantArray(ByRef a As Variant, ByRef b As Variant)
+    CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
 End Sub
 Public Function putData(f As Long, ndx As Long, lengthInBytes As Long) As Boolean
     Dim Addr, mitems, itemlen
@@ -1044,7 +1054,7 @@ Public Function putData(f As Long, ndx As Long, lengthInBytes As Long) As Boolea
     Addr = UnsignedAdd(Me.ArrPtr(0), itemlen * ndx)
     
     On Error GoTo there
-    Dim a1 As SAFEARRAY1D, A() As Byte
+    Dim a1 As SAFEARRAY1D, a() As Byte
      With a1
         .cbElements = 1
         .cDims = 1
@@ -1052,17 +1062,17 @@ Public Function putData(f As Long, ndx As Long, lengthInBytes As Long) As Boolea
         .onebound(0).cElements = lengthInBytes
         .pvData = Addr
     End With
-        CopyMemory ByVal VarPtrArray(A()), VarPtr(a1), 4
+        CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
         On Error GoTo there1
         Dim FH As Long
         FH = Module10.ReadFileHandler(CLng(f))
-        Module10.FileWriteBytes FH, A()
+        Module10.FileWriteBytes FH, a()
         If Err.Number > 0 Then Exit Function
-        CopyMemory ByVal VarPtrArray(A), 0&, 4
+        CopyMemory ByVal VarPtrArray(a), 0&, 4
         putData = True
 Exit Function
 there1:
-        CopyMemory ByVal VarPtrArray(A), 0&, 4
+        CopyMemory ByVal VarPtrArray(a), 0&, 4
 there:
 End Function
 Friend Function GetData(f As Long, ndx As Long, lengthInBytes As Long) As Boolean
@@ -1102,9 +1112,9 @@ Public Sub RedimForFlat(Size As Long)
         
         ReDim Preserve p(Size)
         If Me.emtype = 201 Then
-            Dim I As Long
-            For I = oldelemets + 1 To Elements(p) - 1
-                Set p(I) = ZeroBig
+            Dim i As Long
+            For i = oldelemets + 1 To Elements(p) - 1
+                Set p(i) = ZeroBig
             Next
         End If
     Else
@@ -1114,8 +1124,8 @@ Public Sub RedimForFlat(Size As Long)
     End If
     End If
 End Sub
-Public Function myVarType(z, j As Integer) As Boolean
-    myVarType = MemInt(VarPtr(z)) = j
+Public Function myVarType(Z, j As Integer) As Boolean
+    myVarType = MemInt(VarPtr(Z)) = j
 End Function
 Public Function PlaceValue2UDT(ByVal K As Long, ByVal where As Long, ByVal Name$, v, Optional index1) As Boolean
 'If vtType(where) <> 12 Then Exit Function
@@ -1155,15 +1165,15 @@ End If
 Err.Clear
 MyEr "ο πίνακας δεν είναι τύπου ατυπος και απλός", "array not flat variant"
 End Function
-Sub SwapVariant(ByRef A As Variant, ByRef b As Variant)
+Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
    Static t(0 To 3) As Long  ' 4 Longs * 4 bytes each = 16 bytes
-   MemCopy VarPtr(t(0)), ByVal VarPtr(A), 16
-   MemCopy VarPtr(A), VarPtr(b), 16
+   MemCopy VarPtr(t(0)), ByVal VarPtr(a), 16
+   MemCopy VarPtr(a), VarPtr(b), 16
    MemCopy VarPtr(b), VarPtr(t(0)), 16
 End Sub
 Public Function cInt64(p)
     Static maxlonglong, limitlonglong, OneLongLong, OneBigLongLong
-    Dim A, I As Integer
+    Dim a, i As Integer
     If MemInt(VarPtr(maxlonglong)) = 0 Then
         maxlonglong = CDec("18446744073709551616")
         limitlonglong = CDec("9223372036854775808")
@@ -1172,16 +1182,16 @@ Public Function cInt64(p)
         MemInt(VarPtr(OneBigLongLong)) = 20
         MemByte(VarPtr(OneBigLongLong) + 12) = 1
     End If
-    I = MemInt(VarPtr(p))
-    Select Case I
+    i = MemInt(VarPtr(p))
+    Select Case i
     Case vbDecimal
-        A = Fix(p)
-        A = A - Int(A / maxlonglong) * maxlonglong
-        If A < -limitlonglong - 1 Then
-            While A <= -limitlonglong - 1: A = A + maxlonglong: Wend
+        a = Fix(p)
+        a = a - Int(a / maxlonglong) * maxlonglong
+        If a < -limitlonglong - 1 Then
+            While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
         End If
-        While A >= limitlonglong: A = A - maxlonglong: Wend
-        cInt64 = -OneLongLong And A
+        While a >= limitlonglong: a = a - maxlonglong: Wend
+        cInt64 = -OneLongLong And a
     Case 20
         cInt64 = p
     Case vbLong, vbInteger
@@ -1189,17 +1199,17 @@ Public Function cInt64(p)
     Case Else
         On Error GoTo er1
         
-        A = Fix(CDec(p))
-        If A > limitlonglong Or A <= -limitlonglong Then
-        A = A - Int(A / (maxlonglong)) * (maxlonglong)
-        If A <= -limitlonglong - 1 Then
-            While A <= -limitlonglong - 1: A = A + maxlonglong: Wend
+        a = Fix(CDec(p))
+        If a > limitlonglong Or a <= -limitlonglong Then
+        a = a - Int(a / (maxlonglong)) * (maxlonglong)
+        If a <= -limitlonglong - 1 Then
+            While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
         End If
-        While A >= limitlonglong: A = A - maxlonglong: Wend
+        While a >= limitlonglong: a = a - maxlonglong: Wend
         End If
-        cInt64 = -OneLongLong And A
-        If I = vbString Then
-            If Left$(p, 1) = "&" And A < 0 Then
+        cInt64 = -OneLongLong And a
+        If i = vbString Then
+            If Left$(p, 1) = "&" And a < 0 Then
             Select Case Len(p)
             Case 10
                 If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) > 0 Then
@@ -1220,21 +1230,21 @@ er1:
     cInt64 = OneLongLong - OneLongLong
 End Function
 Private Function fixthis(p As Variant) As String
-        If TypeOf p Is cxComplex Then
-            If p.I = 0 Then
+        If TypeOf p Is Complex Then
+            If p.i = 0 Then
                 fixthis = fixthis(CVar(p.r))
             ElseIf p.r = 0 Then
-                fixthis = "(" & fixthis(CVar(p.I)) & "i)"
+                fixthis = "(" & fixthis(CVar(p.i)) & "i)"
             Else
-                If p.I < 0 Then fixthis = "" Else fixthis = "+"
-                If Abs(p.I) = 1 Then
-                    If p.I < 0 Then
+                If p.i < 0 Then fixthis = "" Else fixthis = "+"
+                If Abs(p.i) = 1 Then
+                    If p.i < 0 Then
                         fixthis = "(" & fixthis(CVar(p.r)) & "-i)"
                     Else
                         fixthis = "(" & fixthis(CVar(p.r)) & "+i)"
                     End If
                 Else
-                    fixthis = "(" & fixthis(CVar(p.r)) & fixthis & fixthis(CVar(p.I)) & "i)"
+                    fixthis = "(" & fixthis(CVar(p.r)) & fixthis & fixthis(CVar(p.i)) & "i)"
                 End If
             End If
         ElseIf MemInt(VarPtr(p)) = vbDate Then

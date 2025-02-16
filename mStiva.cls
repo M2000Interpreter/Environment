@@ -22,7 +22,7 @@ Public Index As Long
 ' so each item is a multiple of three
 
 Public Function IsEmpty() As Boolean
-IsEmpty = mstack.count = 0
+IsEmpty = mstack.Count = 0
 End Function
 Public Property Get StackItem(where As Long) As Variant
 Dim aa As VarItem
@@ -37,7 +37,7 @@ On Error Resume Next
 If where > 1 Then
 Set aa = mstack.item(1)
 mstack.Remove 1
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , , where - 1
@@ -51,7 +51,7 @@ On Error Resume Next
 If where > 1 Then
 Set aa = mstack.item(where)
 mstack.Remove where
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , 1
@@ -91,7 +91,7 @@ Else
         End Select
     Set work = Nothing
 End If
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , 1
@@ -155,7 +155,7 @@ For many = many To 1 Step -1
             End Select
             Set work = Nothing
         End If
-        If mstack.count = 0 Then
+        If mstack.Count = 0 Then
             mstack.Add aa
         Else
             mstack.Add aa, , 1
@@ -201,7 +201,7 @@ If Source.Total >= many Then
         End Select
         Set work = Nothing
         End If
-        If mstack.count = 0 Then
+        If mstack.Count = 0 Then
             mstack.Add aa
         Else
             mstack.Add aa, , 1
@@ -213,12 +213,12 @@ If Source.Total >= many Then
 Next many
 End Sub
 Public Property Get StackPick(where As Long) As VarItem
-Dim A As VarItem
+Dim a As VarItem
 dec
-Set A = mstack.item(where)
+Set a = mstack.item(where)
 mstack.Remove where
 
-Set StackPick = A
+Set StackPick = a
 End Property
 Public Property Get StackPickRef(where As Long) As VarItem
 Set StackPickRef = mstack.item(where)
@@ -237,6 +237,19 @@ StackItemType = aa.Typename
 Exit Property
 mess:
 MyEr "offset out of limits", "Δείκτης εκτός ορίων"
+End Property
+Public Property Get StackItemTypeiBoxArray(where As Long) As Boolean
+Dim aa As VarItem, bb As Object
+On Error Resume Next
+Set aa = mstack.item(where)
+If aa.Typename = "*" Then
+Set bb = aa.ObjectRef
+If TypeOf bb Is mHandler Then
+    StackItemTypeiBoxArray = CheckAnyArray(bb)
+ElseIf TypeOf bb Is iBoxArray Then
+    StackItemTypeiBoxArray = True
+End If
+End If
 End Property
 Public Property Get StackItemTypeObjectType(where As Long) As String
 Dim aa As VarItem, bb As Object, mh As mHandler
@@ -291,8 +304,8 @@ Public Property Get Total() As Long
 If mMany < 0 Then mMany = 0
 Total = mMany
 End Property
-Public Property Get count() As Long
-count = mMany
+Public Property Get Count() As Long
+Count = mMany
 End Property
 Private Sub Inc()
 mMany = mMany + 1
@@ -319,7 +332,7 @@ Next num
 End Sub
 Public Sub Flush()
 Dim num As Long, aa As VarItem
-For num = 1 To mstack.count
+For num = 1 To mstack.Count
 dec
   Set aa = mstack(1)
    mstack.Remove 1
@@ -333,7 +346,7 @@ Public Sub PushUndefine()
 Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = "?"
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , 1
@@ -341,17 +354,17 @@ End If
 Inc
 End Sub
 
-Public Sub PushVal(A As Variant)
+Public Sub PushVal(a As Variant)
 Dim aa As VarItem
 Set aa = NewVarItem()
-If MemInt(VarPtr(A)) = vbString Then
+If MemInt(VarPtr(a)) = vbString Then
 aa.Typename = "S"
-aa.ItemDouble = A
+aa.ItemDouble = a
 Else
 aa.Typename = "N"
-aa.ItemDouble = A
+aa.ItemDouble = a
 End If
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , 1
@@ -363,19 +376,19 @@ Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = ">"
 aa.ItemDouble = 0
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , 1
 End If
 Inc
 End Sub
-Public Sub PushValLong(A As Variant)
+Public Sub PushValLong(a As Variant)
 Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = "L"
-aa.ItemVariant = A
-If mstack.count = 0 Then
+aa.ItemVariant = a
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , 1
@@ -389,7 +402,7 @@ Set aa = NewVarItem()
 aa.Typename = "*"  'something
 Set aa.ObjectRef = RHS
 Set RHS = Nothing
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , 1
@@ -397,7 +410,7 @@ End If
 Inc
 End Sub
 Public Sub PushObjVarItem(RHS As Object)
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add RHS
 Else
 mstack.Add RHS, , 1
@@ -419,24 +432,24 @@ Public Property Get objref(where As Long) As Object
 On Error Resume Next
 Set objref = mstack.item(where).ObjectRef
 End Property
-Public Sub PushStr(ByRef A As String)
+Public Sub PushStr(ByRef a As String)
 Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = "S"
-aa.ItemStr = A
-If mstack.count = 0 Then
+aa.ItemStr = a
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , 1
 End If
 Inc
 End Sub
-Public Sub PushStrVariant(ByRef A As Variant)
+Public Sub PushStrVariant(ByRef a As Variant)
 Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = "S"
-aa.ItemStrVar = A
-If mstack.count = 0 Then
+aa.ItemStrVar = a
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , 1
@@ -445,7 +458,7 @@ Inc
 End Sub
 Public Function LookNull() As Boolean
 On Error Resume Next
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 LookNull = False
 Else
 LookNull = mstack.item(1).NoValue
@@ -454,7 +467,7 @@ End If
 End Function
 Public Function PopType() As String
 On Error Resume Next
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 PopType = vbNullString
 Else
 
@@ -539,23 +552,23 @@ aa.Recycle
 
 
 End Property
-Public Sub DataValLong(A As Variant)
+Public Sub DataValLong(a As Variant)
 Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = "L"
-aa.ItemVariant = A
+aa.ItemVariant = a
 mstack.Add aa
 Inc
 End Sub
-Public Sub DataVal(A As Variant)
+Public Sub DataVal(a As Variant)
 Dim aa As VarItem
 Set aa = NewVarItem()
-If MemInt(VarPtr(A)) = vbString Then
+If MemInt(VarPtr(a)) = vbString Then
 aa.Typename = "S"
-aa.ItemDouble = A
+aa.ItemDouble = a
 Else
 aa.Typename = "N"
-aa.ItemVariant = A
+aa.ItemVariant = a
 End If
 mstack.Add aa
 Inc
@@ -568,20 +581,20 @@ aa.ItemDouble = 0
 mstack.Add aa
 Inc
 End Sub
-Public Sub DataStrVariant(ByRef A As Variant)
+Public Sub DataStrVariant(ByRef a As Variant)
 Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = "S"
-aa.ItemStrVar = A
+aa.ItemStrVar = a
 mstack.Add aa
 Inc
 End Sub
 
-Public Sub DataStr(ByRef A As String)
+Public Sub DataStr(ByRef a As String)
 Dim aa As VarItem
 Set aa = NewVarItem()
 aa.Typename = "S"
-aa.ItemStr = A$
+aa.ItemStr = a$
 mstack.Add aa
 Inc
 End Sub
@@ -610,15 +623,15 @@ End Sub
 Public Sub Begin(from As Long)
 BeginFrom = from
 End Sub
-Public Sub AddItem(ByRef A As String)
+Public Sub AddItem(ByRef a As String)
 Dim aa As VarItem
 Set aa = NewVarItem()
     aa.Typename = "S"
-    aa.ItemStr = A$
-    If mstack.count = 0 Then
+    aa.ItemStr = a$
+    If mstack.Count = 0 Then
         BeginFrom = 1
         mstack.Add aa
-    ElseIf BeginFrom > mstack.count Then
+    ElseIf BeginFrom > mstack.Count Then
         mstack.Add aa
     Else
         If BeginFrom = 1 Then
@@ -631,32 +644,33 @@ Set aa = NewVarItem()
 
 Inc
 End Sub
-Public Sub MergeTop(A As mStiva)
-If Me Is A Then Exit Sub
-Dim I As Long, aa As VarItem
+Public Sub MergeTop(a As mStiva)
+If Me Is a Then Exit Sub
+Dim i As Long, aa As VarItem
 
-If A.Total > 0 Then
+If a.Total > 0 Then
 Do
-I = A.Total
-Set aa = A.StackPick(I)
-If mstack.count = 0 Then
+i = a.Total
+Set aa = a.StackPick(i)
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , 1  'push so first of a is first on mstack
 End If
 Inc
-Loop Until I <= 1
+Loop Until i <= 1
 End If
 End Sub
 
-Public Sub MergeBottomCopyArray(A As mArray)
-If A.count = 0 Then Exit Sub
+Public Sub MergeBottomCopyArray(a As iBoxArray)
+If a.Count = 0 Then Exit Sub
 Dim x1 As Long, vvl As Variant, aa As Object
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
- For x1 = 0 To A.count - 1
+Dim myTuple As tuple, mySecondTuple As tuple
+ For x1 = 0 To a.Count - 1
                                         
-                    If A.MyIsObject(A.item(x1)) Then
-                    Set vvl = A.item(x1)
+                    If a.MyIsObject(a.item(x1)) Then
+                    Set vvl = a.item(x1)
                     If Typename(vvl) = "Group" Then
                         Set subgroup = vvl
                         CopyGroupObj subgroup, sub2
@@ -670,6 +684,13 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                         Set myArray = Nothing
                         Set vvl = mySecondArray
                         Set mySecondArray = Nothing
+                    ElseIf Typename(vvl) = "tuple" Then
+                        Set myTuple = vvl
+                        Set mySecondTuple = New tuple
+                        myTuple.CopyArray mySecondTuple
+                        Set myTuple = Nothing
+                        Set vvl = mySecondTuple
+                        Set mySecondTuple = Nothing
                     ElseIf Typename(vvl) = "VarItem" Then
                             DataOptional
                             GoTo here
@@ -680,11 +701,11 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                         Set vvl = Nothing
                         Set aa = Nothing
                     Else
-                        If A.MyIsNumeric(A.item(x1)) Then
+                        If a.MyIsNumeric(a.item(x1)) Then
                         
-                            DataVal A.item(x1)
+                            DataVal a.item(x1)
                         Else
-                            DataStr A.item(x1)
+                            DataStr a.item(x1)
                         End If
                      End If
 here:
@@ -692,14 +713,14 @@ here:
 
 
 End Sub
-Public Sub MergeTopCopyArray(A As mArray)
-If A.count = 0 Then Exit Sub
+Public Sub MergeTopCopyArray(a As iBoxArray)
+If a.Count = 0 Then Exit Sub
 Dim x1 As Long, vvl As Variant, aa As Object
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
- For x1 = 0 To A.count - 1
+ For x1 = 0 To a.Count - 1
                                         
-                    If A.MyIsObject(A.item(x1)) Then
-                    Set vvl = A.item(x1)
+                    If a.MyIsObject(a.item(x1)) Then
+                    Set vvl = a.item(x1)
                     If Typename(vvl) = "Group" Then
                         Set subgroup = vvl
                         CopyGroupObj subgroup, sub2
@@ -720,10 +741,10 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                         Set vvl = Nothing
                         Set aa = Nothing
                     Else
-                        If A.MyIsNumeric(A.item(x1)) Then
-                            PushVal A.item(x1)
+                        If a.MyIsNumeric(a.item(x1)) Then
+                            PushVal a.item(x1)
                         Else
-                            PushStr A.item(x1)
+                            PushStr a.item(x1)
                         End If
                      End If
     
@@ -733,43 +754,43 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
 End Sub
 Function ExportArray(ByVal items As Long) As mArray
 
-If items > count Then items = count
+If items > Count Then items = Count
 Set ExportArray = New mArray
 If items = 0 Then Exit Function
-Dim I As Long, aa As VarItem
+Dim i As Long, aa As VarItem
 With ExportArray
     .myarrbase = 0
     .PushDim (items)
     .PushEnd
-    .Arr = True
+    .arr = True
 
 
-For I = 1 To items
-Set aa = mstack.item(I)
+For i = 1 To items
+Set aa = mstack.item(i)
 Select Case aa.Typename
 Case "S"
-.item(I - 1) = aa.ItemStr
+.item(i - 1) = aa.ItemStr
 Case "N", "?", "L"
-.item(I - 1) = aa.ItemDouble
+.item(i - 1) = aa.ItemDouble
 Case Else
-Set .item(I - 1) = aa.ObjectRef
+Set .item(i - 1) = aa.ObjectRef
 End Select
-Next I
+Next i
 End With
 Set aa = Nothing
 drop items
 
 End Function
 
-Public Sub MergeBottom(A As mStiva)
-If Me Is A Then Exit Sub
-Dim I As Long, aa As VarItem
-If A.Total > 0 Then
+Public Sub MergeBottom(a As mStiva)
+If Me Is a Then Exit Sub
+Dim i As Long, aa As VarItem
+If a.Total > 0 Then
 Do
-Set aa = A.StackPick(1)
+Set aa = a.StackPick(1)
 mstack.Add aa
 Inc
-Loop Until A.Total < 1
+Loop Until a.Total < 1
 End If
 End Sub
 
@@ -827,11 +848,11 @@ End With
 Set myobject2 = mygroup2
 End Sub
 Function Copy() As mStiva
-Dim I As Long
+Dim i As Long
 Set Copy = New mStiva
-For I = Total To 1 Step -1
-Copy.PushStr Me.StackItem(I)
-Next I
+For i = Total To 1 Step -1
+Copy.PushStr Me.StackItem(i)
+Next i
 End Function
 Property Get Value() As Variant
 Dim aa As VarItem
@@ -884,26 +905,26 @@ If Index >= 0 And Index < mMany Then
 End If
 End Function
 Sub SplitStackTop(fromstiva As mHandler, item As Long)
-Dim aa As VarItem, I As Long
+Dim aa As VarItem, i As Long
 Dim thisstiva As mStiva
 Set thisstiva = fromstiva.objref
-If item > thisstiva.count Then item = thisstiva.count
-For I = 1 To item
+If item > thisstiva.Count Then item = thisstiva.Count
+For i = 1 To item
     Set aa = thisstiva.StackPick(1)
         mstack.Add aa
         Inc
-Next I
+Next i
 End Sub
 Sub SplitStackBottom(fromstiva As mHandler, item As Long)
-Dim aa As VarItem, I As Long
+Dim aa As VarItem, i As Long
 Dim thisstiva As mStiva
 Set thisstiva = fromstiva.objref
 If item < 1 Then item = 1
-For I = item To thisstiva.count
+For i = item To thisstiva.Count
     Set aa = thisstiva.StackPick(item)
         mstack.Add aa
         Inc
-Next I
+Next i
 End Sub
 
 

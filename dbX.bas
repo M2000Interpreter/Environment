@@ -490,7 +490,7 @@ isdir = lookfirst
 End Function
 Public Sub fHelp(bstack As basetask, D$, Optional Eng As Boolean = False)
 Static a As Long, aa As Long, where As Long, there As Long, no_par As Long, dum As Long
-Dim SQL$, b$, p$, c$, gp$, r As Double, bb As Long, I As Long
+Dim SQL$, b$, p$, c$, gp$, r As Double, bb As Long, i As Long
 Dim CD As String, doriginal$, monitor As Long, rr$
 D$ = Replace(D$, " ", ChrW(160))
 On Error GoTo E5
@@ -524,11 +524,11 @@ Else
 End If
 vHelp Not Form4.Visible
 Exit Sub
-ElseIf GetSub(D$, I) Then
+ElseIf GetSub(D$, i) Then
 GoTo conthere
-ElseIf GetlocalSubExtra(D$, I) Or D$ = here$ Then
+ElseIf GetlocalSubExtra(D$, i) Or D$ = here$ Then
 conthere:
-If D$ = here$ Then I = bstack.OriginalCode
+If D$ = here$ Then i = bstack.OriginalCode
 If vH_title$ <> "" Then
 b$ = "<| " + vH_title$ + vbCrLf + vbCrLf
 Else
@@ -546,12 +546,12 @@ If Eng Then c$ = "[Module]" Else c$ = "[Function]"
 End If
 
 Dim ss$
-    ss$ = GetNextLine((SBcode(I)))
+    ss$ = GetNextLine((SBcode(i)))
     If Left$(ss$, 10) = "'11001EDIT" Then
     
-    ss$ = Mid$(SBcode(I), Len(ss$) + 3)
+    ss$ = Mid$(SBcode(i), Len(ss$) + 3)
     Else
-     ss$ = SBcode(I)
+     ss$ = SBcode(i)
      End If
         sHelp D$, c$ + "  " + b$ + ss$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
     
@@ -600,7 +600,7 @@ If bstack.IsNumber(r) Then
 If bstack.IsNumber(r) Then
 If bstack.IsString(c$) Then
 ' nothing
-checkit:
+Checkit:
 
         If Right$(gp$, 1) = "(" Then gp$ = gp$ + ")": p$ = p$ + ")"
         
@@ -716,8 +716,8 @@ DBUser = extDBUser
 DBUserPassword = extDBUserPassword
 Err.Clear
 End Sub
-Public Function inames(I As Long, Lang As Long) As String
-If (I And &H3) <> 1 Then
+Public Function inames(i As Long, Lang As Long) As String
+If (i And &H3) <> 1 Then
 Select Case Lang
 Case 1
 
@@ -736,8 +736,8 @@ End Select
 End If
 
 End Function
-Public Function fnames(I As Long, Lang As Long) As String
-Select Case I
+Public Function fnames(i As Long, Lang As Long) As String
+Select Case i
 Case 1  '.........11
     Select Case Lang
     Case 1
@@ -833,7 +833,7 @@ Case 12 '...........................202
      fnames = "ΥΠΟΜΝΗΜΑ"
     End Select
 Case Else
-fnames = Trim$(str$(I))
+fnames = Trim$(str$(i))
 End Select
 End Function
 
@@ -898,8 +898,8 @@ NewBase = True
 End If
 End Function
 Public Function TABLENAMES_mk2(Base As String, bstackstr As basetask, r$, Lang As Long) As Boolean
-Dim vv, tables As FastCollection, stac1 As New mStiva, pppp As mArray, I As Long
-Dim mb As Mk2Base, Tablename As String, fieldlist As FastCollection, ma As mArray, j As Long
+Dim vv, tables As FastCollection, stac1 As New mStiva, pppp As iBoxArray, i As Long
+Dim mb As Mk2Base, Tablename As String, fieldlist As FastCollection, ma As tuple, j As Long
 Dim indexField As FastCollection, Fields As Long
 If getone(Base, vv) Then
 Set mb = vv
@@ -921,8 +921,8 @@ If FastSymbol(r$, ",") Then
     Set pppp = tables.ValueObj
     
     Set fieldlist = pppp.item(1)
-    For I = 0 To fieldlist.count - 1
-        fieldlist.Index = I
+    For i = 0 To fieldlist.count - 1
+        fieldlist.Index = i
         fieldlist.Done = True
         If fieldlist.sValue = -1 Then
             Fields = Fields + 1
@@ -934,7 +934,7 @@ If FastSymbol(r$, ",") Then
             fieldlist.Done = False
         
         End If
-    Next I
+    Next i
     Set indexField = pppp.item(3)
     
     If indexField.count > 0 Then
@@ -953,8 +953,8 @@ If FastSymbol(r$, ",") Then
 stac1.PushVal indexField.count
 stac1.PushVal Fields
 Else
-For I = 0 To tables.count - 1
-tables.Index = I
+For i = 0 To tables.count - 1
+tables.Index = i
 tables.Done = True
 If tables.sValue = 0 Then
 Set pppp = tables.ValueObj
@@ -963,7 +963,7 @@ Set pppp = tables.ValueObj
     stac1.DataVal pppp.item(3).count
 End If
 tables.Done = False
-Next I
+Next i
 stac1.PushVal stac1.count \ 2
 End If
 
@@ -1068,7 +1068,7 @@ End If
         PushOne Base, myBase
     End If
   Dim cat, TBL, rs
-     Dim I As Long, j As Long, K As Long, KB As Boolean
+     Dim i As Long, j As Long, K As Long, KB As Boolean
   
            Set rs = CreateObject("ADODB.Recordset")
         Set TBL = CreateObject("ADOX.TABLE")
@@ -1091,7 +1091,7 @@ End If
                        If TBL.indexes.count > 0 Then
                                          For j = 0 To TBL.indexes.count - 1
                                                    With TBL.indexes(j)
-                                                   If (.unique = False) And (.indexnulls = 0) Then
+                                                   If (.Unique = False) And (.indexnulls = 0) Then
                                                         KB = True
                                                   Exit For
              '
@@ -1118,7 +1118,7 @@ End If
                                         If TBL.indexes.count > 0 Then
                                          For j = 0 To TBL.indexes.count - 1
                                                    With TBL.indexes(j)
-                                                   If (.unique = False) And (.indexnulls = 0) Then
+                                                   If (.Unique = False) And (.indexnulls = 0) Then
                                                    vindx = True
                                                    Exit For
                                                        End If
@@ -1133,8 +1133,8 @@ End If
                                             Else
                                             stac1.DataVal CDbl(0)
                                         End If
-                     For I = 0 To rs.Fields.count - 1
-                     With rs.Fields(I)
+                     For i = 0 To rs.Fields.count - 1
+                     With rs.Fields(i)
                              stac1.DataStr .Name
                              If .Type = 203 And .DEFINEDSIZE >= 536870910# Then
                              
@@ -1174,13 +1174,13 @@ End If
                                         
                              End If
                      End With
-                     Next I
+                     Next i
                      rs.Close
                      If vindx Then
                     If TBL.indexes.count > 0 Then
                              For j = 0 To TBL.indexes.count - 1
                           With TBL.indexes(j)
-                          If (.unique = False) And (.indexnulls = 0) Then
+                          If (.Unique = False) And (.indexnulls = 0) Then
                           stac1.DataVal CDbl(.Columns.count)
                           For K = 0 To .Columns.count - 1
                             stac1.DataStr .Columns(K).Name
@@ -1218,9 +1218,9 @@ g102:
 End Function
 
 Public Function append_table(bstackstr As basetask, Base As String, r$, ed As Boolean, Optional Lang As Long = -1) As Boolean
-Dim table$, I&, par$, ok As Boolean, TT, t As Double, j&, vv, p_acc As mArray, acc As mArray
+Dim table$, i&, par$, ok As Boolean, TT, t As Double, j&, vv, p_acc As tuple, acc As tuple
 Dim gindex As Long
-Dim mb As Mk2Base, tables As FastCollection, pppp As mArray, Temp As mArray, fieldlist As FastCollection
+Dim mb As Mk2Base, tables As FastCollection, pppp As tuple, Temp As tuple, fieldlist As FastCollection
 Dim indexField As FastCollection, allkey$, prevkey$
 
  ok = False
@@ -1277,46 +1277,46 @@ Set p_acc = pppp.item(18)
 p_acc.CopyArray acc
 End If
 Set p_acc = pppp.item(17)
-I& = 0
+i& = 0
 Set fieldlist = pppp.item(1)
 Do
 TT = 0
-fieldlist.Index = p_acc.item(I&)
+fieldlist.Index = p_acc.item(i&)
 fieldlist.Done = True
 Set Temp = fieldlist.ValueObj
 
 If FastSymbol(r$, ",") Then
-If I& = 0 And Temp.item(4) Then
+If i& = 0 And Temp.item(4) Then
     If Not ed Then
-        acc.item(p_acc.item(I&)) = Temp.item(5)
+        acc.item(p_acc.item(i&)) = Temp.item(5)
         Temp.item(5) = Temp.item(5) + 1
     End If
 End If
 ElseIf IsStrExp(bstackstr, r$, par$, False) Then
-    If I& = 0 And Temp.item(4) Then
+    If i& = 0 And Temp.item(4) Then
         If Not ed Then
-            acc.item(p_acc.item(I&)) = Temp.item(4)
+            acc.item(p_acc.item(i&)) = Temp.item(4)
             Temp.item(4) = Temp.item(4) + 1
         End If
     ElseIf Temp.item(2) > 0 Then
-        acc.item(p_acc.item(I&)) = RealLeft(par$, Temp.item(2))
+        acc.item(p_acc.item(i&)) = RealLeft(par$, Temp.item(2))
     Else
-        acc.item(p_acc.item(I&)) = par$
+        acc.item(p_acc.item(i&)) = par$
     End If
     If Not FastSymbol(r$, ",") Then Exit Do
 ElseIf IsExp(bstackstr, r$, TT, False) Then
-    If I& = 0 And Temp.item(4) Then
+    If i& = 0 And Temp.item(4) Then
         If Not ed Then
-            acc.item(p_acc.item(I&)) = Temp.item(4)
+            acc.item(p_acc.item(i&)) = Temp.item(4)
             Temp.item(4) = Temp.item(4) + 1
         End If
     Else
-        acc.item(p_acc.item(I&)) = TT
+        acc.item(p_acc.item(i&)) = TT
     End If
     If Not FastSymbol(r$, ",") Then Exit Do
 End If
-I& = I& + 1
-Loop Until I& = p_acc.count
+i& = i& + 1
+Loop Until i& = p_acc.count
 ' now we append to table, without checking the keys (its a fault)
 Set tables = pppp.item(2)
 Set indexField = pppp.item(3)
@@ -1498,24 +1498,24 @@ End If
 Else
 rec.AddNew
 End If
-I& = 0
+i& = 0
 While FastSymbol(r$, ",")
 If ed Then
     While FastSymbol(r$, ",")
-    I& = I& + 1
+    i& = i& + 1
     Wend
 End If
 If IsStrExp(bstackstr, r$, par$) Then
-    rec.Fields(I&) = par$
+    rec.Fields(i&) = par$
 ElseIf IsExp(bstackstr, r$, t) Then
     If VarType(t) = vbString Then
-    rec.Fields(I&) = t
+    rec.Fields(i&) = t
     Else
-    rec.Fields(I&) = CStr(t)   '??? convert to a standard format
+    rec.Fields(i&) = CStr(t)   '??? convert to a standard format
     End If
 End If
 
-I& = I& + 1
+i& = i& + 1
 Wend
 Err.Clear
 rec.UpdateBatch  ' update be an updatebatch
@@ -1529,9 +1529,9 @@ End If
 End Function
 Public Sub getrow(bstackstr As basetask, r$, Optional ERL As Boolean = True, Optional Search$ = " = ", Optional Lang As Long = 0, Optional IamHelpFile As Boolean = False)
 Dim stat As Long
-Dim Base As String, table$, from As Long, first$, Second$, ok As Boolean, fr As Double, stac1$, p, I&
-Dim mb As Mk2Base, tables As FastCollection, pppp As mArray, Temp As mArray, fieldlist As FastCollection, ii As Long, pppp1 As mArray
-Dim vv, IndexList As FastCollection, many As Long, topi As Long, temp2 As mArray, ret As Boolean
+Dim Base As String, table$, from As Long, first$, Second$, ok As Boolean, fr As Double, stac1$, p, i&
+Dim mb As Mk2Base, tables As FastCollection, pppp As tuple, Temp As tuple, fieldlist As FastCollection, ii As Long, pppp1 As tuple
+Dim vv, IndexList As FastCollection, many As Long, topi As Long, temp2 As tuple, ret As Boolean
 Dim LastRead As Long
 ok = False
 If IsStrExp(bstackstr, r$, Base, False) Then
@@ -1592,7 +1592,7 @@ If IsStrExp(bstackstr, r$, Base, False) Then
                     Set fieldlist = pppp.item(1)
                     If fieldlist.ExistKey(myUcase(first$, True)) Then
                         If fieldlist.sValue <> -1 Then GoTo aError
-                        I& = fieldlist.Index
+                        i& = fieldlist.Index
                         ii = 0
                         topi = tables.count
                         many = 0
@@ -1605,8 +1605,8 @@ If IsStrExp(bstackstr, r$, Base, False) Then
                             tables.Done = True
                             If tables.sValue = 0 Then
                                 Set Temp = tables.ValueObj
-                                If Temp.count > I& Then
-                                If Temp.CompareItem(I&, p, Search$, ret) Then
+                                If Temp.count > i& Then
+                                If Temp.CompareItem(i&, p, Search$, ret) Then
                                     If ret Then
                                         from = from - 1
                                         If temp2 Is Nothing Then Set temp2 = Temp: LastRead = ii
@@ -1628,8 +1628,8 @@ If IsStrExp(bstackstr, r$, Base, False) Then
                             tables.Done = True
                             If tables.sValue = 0 Then
                                 Set Temp = tables.ValueObj
-                                If Temp.count > I& Then
-                                If Temp.CompareItem(I&, p, Search$, ret) Then
+                                If Temp.count > i& Then
+                                If Temp.CompareItem(i&, p, Search$, ret) Then
                                 
                                     If ret Then
                                         from = from - 1
@@ -1923,10 +1923,10 @@ If from >= 0 Then
   End If
 End If
 
-    For I& = rec.Fields.count - 1 To 0 Step -1
+    For i& = rec.Fields.count - 1 To 0 Step -1
     On Error Resume Next
     Err.Clear
-    stat = rec.Fields(I&).status
+    stat = rec.Fields(i&).status
     If Err Then
         Err.Clear
          
@@ -1934,36 +1934,36 @@ End If
         bstackstr.soros.PushUndefine
         GoTo contNext
     End If
-   Select Case rec.Fields(I&).Type
+   Select Case rec.Fields(i&).Type
 Case 1, 2, 3, 4, 5, 6
 
-    If myIsNull(rec.Fields(I&)) Then
+    If myIsNull(rec.Fields(i&)) Then
         bstackstr.soros.PushUndefine
     Else
-    stat = rec.Fields(I&).status
+    stat = rec.Fields(i&).status
     If stat = 2 Then
     bstackstr.soros.PushUndefine
     Else
-        bstackstr.soros.PushVal CDbl(rec.Fields(I&))
+        bstackstr.soros.PushVal CDbl(rec.Fields(i&))
         End If
     End If
 Case 7
-If myIsNull(rec.Fields(I&)) Then
+If myIsNull(rec.Fields(i&)) Then
     
      bstackstr.soros.PushStr ""
  Else
   
-   bstackstr.soros.PushStr CStr(CDate(rec.Fields(I&)))
+   bstackstr.soros.PushStr CStr(CDate(rec.Fields(i&)))
   End If
 
 
 Case 130, 8, 203, 202
-If myIsNull(rec.Fields(I&)) Then
+If myIsNull(rec.Fields(i&)) Then
     
      bstackstr.soros.PushStr ""
  Else
   
-   bstackstr.soros.PushStrVariant rec.Fields(I&)
+   bstackstr.soros.PushStrVariant rec.Fields(i&)
   End If
 Case 11, 12 ' this is the binary field so we can save unicode there
    Case Else
@@ -1971,7 +1971,7 @@ Case 11, 12 ' this is the binary field so we can save unicode there
    bstackstr.soros.PushStr "?"
  End Select
 contNext:
-   Next I&
+   Next i&
    End If
    
    bstackstr.soros.PushVal CDbl(ii)
@@ -1994,7 +1994,7 @@ On Error Resume Next
 End Sub
 
 Public Sub GetNames(bstackstr As basetask, r$, bv As Object, Lang)
-Dim Base As String, table$, from As Long, many As Long, ok As Boolean, fr As Double, stac1$, I&
+Dim Base As String, table$, from As Long, many As Long, ok As Boolean, fr As Double, stac1$, i&
 ok = False
 Dim vv
 If IsStrExp(bstackstr, r$, Base, False) Then
@@ -2146,10 +2146,10 @@ If many + from - 1 > ii Then many = ii - from + 1
 bstackstr.soros.PushVal CDbl(ii)
 ''''''''''''''''' stack$(BASESTACK) = " " + Trim$(Str$(II)) + stack$(BASESTACK)
 
-    For I& = 1 To many
+    For i& = 1 To many
     bv.additemFast CStr(rec.Fields(0))   ' USING gList
     
-    If I& < many Then rec.MoveNext
+    If i& < many Then rec.MoveNext
     Next
   End If
 rec.Close
@@ -2229,14 +2229,14 @@ If Err.Number > 0 Then Err.Clear: myBase.errors.Clear
 com2execute = Replace(com2execute, Chr(9), " ")
 com2execute = Replace(com2execute, vbCrLf, "")
 com2execute = Replace(com2execute, ";", vbCrLf)
-Dim commands() As String, I As Long, mm As mStiva, aa As Object
+Dim commands() As String, i As Long, mm As mStiva, aa As Object
 commands() = Split(com2execute + vbCrLf, vbCrLf)
 Set mm = New mStiva
-For I = LBound(commands()) To UBound(commands())
+For i = LBound(commands()) To UBound(commands())
 
-    If Len(MyTrim(commands(I))) > 0 Then
+    If Len(MyTrim(commands(i))) > 0 Then
         ProcTask2 bstackstr  'to allow threads to run at background.
-        Set rs = myBase.Execute(commands(I))
+        Set rs = myBase.Execute(commands(i))
         If Typename(rs) = "Recordset" Then
             If rs.Fields.count > 0 Then
                 Set aa = rs
@@ -2247,13 +2247,13 @@ For I = LBound(commands()) To UBound(commands())
         End If
         If myBase.errors.count <> 0 Then Exit For
     End If
-Next I
+Next i
 
 If mm.Total > 0 Then bstackstr.soros.MergeTop mm
 If myBase.errors.count <> 0 Then
-    For I = 0 To myBase.errors.count - 1
-        erdesc$ = erdesc$ + myBase.errors(I)
-    Next I
+    For i = 0 To myBase.errors.count - 1
+        erdesc$ = erdesc$ + myBase.errors(i)
+    Next i
         MyEr "Can't execute command:" + erdesc$, "Δεν μπορώ να εκτελέσω την εντολή:" + erdesc$
     myBase.errors.Clear
 End If
@@ -2264,8 +2264,8 @@ End Sub
 
 
 Public Function MyOrder(bstackstr As basetask, r$, Lang As Long) As Boolean
-Dim Base As String, Tablename As String, fs As String, I&, o As Double, ok As Boolean
-Dim pppp As mArray
+Dim Base As String, Tablename As String, fs As String, i&, o As Double, ok As Boolean
+Dim pppp As tuple
 ok = False
 Dim mb As Mk2Base, vv, tables As FastCollection, param As mStiva2
 If Not IsStrExp(bstackstr, r$, Base, False) Then
@@ -2472,7 +2472,7 @@ MyOrder = True
 End Function
 Public Function NewTable(bstackstr As basetask, r$, Lang As Long) As Boolean
 'BASE As String, tablename As String, ParamArray flds()
-Dim Base As String, Tablename As String, fs As String, I&, n As Double, L As Double, ok As Boolean
+Dim Base As String, Tablename As String, fs As String, i&, n As Double, l As Double, ok As Boolean
 Dim vv, mb As Mk2Base, param As mStiva2, oldl As Double
 ok = False
 
@@ -2519,13 +2519,13 @@ Else
     If Not FastSymbol(r$, ",", True) Then
     Exit Function
     End If
-    If Not IsExp(bstackstr, r$, L) Then
+    If Not IsExp(bstackstr, r$, l) Then
     MissNumExpr
     Exit Function
     End If
     param.DataStr fs
     param.DataVal n
-    param.DataVal L
+    param.DataVal l
     Loop Until Not FastSymbol(r$, ",")
     param.PushVal Tablename
     NewTable = mb.AddFields_(param)
@@ -2641,25 +2641,25 @@ End If
                                         If IsExp(bstackstr, r$, n) Then
                                 
                                             If FastSymbol(r$, ",") Then
-                                                If IsExp(bstackstr, r$, L) Then
-                                                If n = 1 Then n = 11: L = 0
-                                                If n = 2 Then n = 16: L = 0
-                                                If n = 3 Then n = 2: L = 0
+                                                If IsExp(bstackstr, r$, l) Then
+                                                If n = 1 Then n = 11: l = 0
+                                                If n = 2 Then n = 16: l = 0
+                                                If n = 3 Then n = 2: l = 0
                                                 If n = 4 Then
-                                                oldl = L
-                                                n = 3: L = 0
+                                                oldl = l
+                                                n = 3: l = 0
                                                 End If
-                                                If n = 5 Then n = 6: L = 0
-                                                If n = 6 Then n = 4: L = 0
-                                                If n = 7 Then n = 5: L = 0
-                                                If n = 8 Then n = 7: L = 0
+                                                If n = 5 Then n = 6: l = 0
+                                                If n = 6 Then n = 4: l = 0
+                                                If n = 7 Then n = 5: l = 0
+                                                If n = 8 Then n = 7: l = 0
                                                 If n = 9 Then n = 128
                                                 If n = 10 Then n = 202
-                                                If n = 12 Then n = 203: L = 0
-                                                If n = 16 Then n = 14: L = 0
-                                                    If L <> 0 Then
+                                                If n = 12 Then n = 203: l = 0
+                                                If n = 16 Then n = 14: l = 0
+                                                    If l <> 0 Then
                                                 
-                                                     .Append fs, n, L
+                                                     .Append fs, n, l
                                            
                                                     Else
                                                      .Append fs, n
@@ -2796,7 +2796,7 @@ End If
 End If
 Dim aa As FastCollection
 Set aa = usehandler.objref
-If aa.StructLen > 0 Then
+If aa.structLen > 0 Then
 MyEr "Structure members are ReadOnly", "Τα μέλη της δομής είναι μόνο για ανάγνωση"
 Exit Function
 End If
@@ -2985,11 +2985,11 @@ Dim v As Variant, bb As Boolean
 On Error Resume Next
 If Not Init Then Exit Sub
 If conCollection.count > 0 Then
-Dim I As Long
+Dim i As Long
 Err.Clear
-For I = conCollection.count - 1 To 0 Step -1
+For i = conCollection.count - 1 To 0 Step -1
 On Error Resume Next
-conCollection.Index = I
+conCollection.Index = i
 If conCollection.IsObj Then
 If TypeOf conCollection.ValueObj Is Mk2Base Then
 ' do nothing just throw
@@ -3018,7 +3018,7 @@ End If
 conCollection.Remove conCollection.KeyToString
 Err.Clear
 
-Next I
+Next i
 Set conCollection = New FastCollection
 End If
 Err.Clear

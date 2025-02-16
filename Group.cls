@@ -56,22 +56,22 @@ Function ReadField(there As Long) As String
     ReadField = Fields(there)
 End Function
 Sub MergeField(st$)
-Dim b As String, I As Long
+Dim b As String, i As Long
 b = Split(st$)(0)
 If UBound(Fields) - 1 = 0 Then
-    I = UBound(Fields)
-    ReDim Preserve Fields(I + 1)
-    Fields(I) = st$
+    i = UBound(Fields)
+    ReDim Preserve Fields(i + 1)
+    Fields(i) = st$
 Else
-    For I = 1 To UBound(Fields) - 1
-        If Split(Fields(I))(0) = b Then
-            Fields(I) = st$
+    For i = 1 To UBound(Fields) - 1
+        If Split(Fields(i))(0) = b Then
+            Fields(i) = st$
             Exit Sub
         End If
-    Next I
-    I = UBound(Fields)
-    ReDim Preserve Fields(I + 1)
-    Fields(I) = st$
+    Next i
+    i = UBound(Fields)
+    ReDim Preserve Fields(i + 1)
+    Fields(i) = st$
 End If
 End Sub
 Property Get FieldsCount() As Long
@@ -136,14 +136,14 @@ Set eventlist = RHS
 End Property
 Public Sub ResetEvents()
 If eventlist Is Nothing Then Exit Sub
-Dim I As Long
+Dim i As Long
 With eventlist
-For I = 0 To .count - 1
-    .Index = I
+For i = 0 To .count - 1
+    .Index = i
     .Done = True
     .Value = vbNullString
     .sValue = 0
-Next I
+Next i
 .Done = False
 End With
 
@@ -151,27 +151,27 @@ End Sub
 Public Sub FlushEvents()
 If eventlist Is Nothing Then Exit Sub
 Dim eventlist2 As New FastCollection
-Dim I As Long
+Dim i As Long
 With eventlist
-For I = 0 To .count - 1
-    .Index = I
+For i = 0 To .count - 1
+    .Index = i
     .Done = True
     eventlist2.AddKey .KeyToString, ""
-Next I
+Next i
 .Done = False
 End With
 Set eventlist = eventlist2
 End Sub
-Public Sub RegisterEvent(ByVal A$)
-A$ = myUcase(A$)
+Public Sub RegisterEvent(ByVal a$)
+a$ = myUcase(a$)
 If eventlist Is Nothing Then Set eventlist = New FastCollection
-If eventlist.ExistKey(A$) Then Exit Sub
-eventlist.AddKey A$, vbNullString
+If eventlist.ExistKey(a$) Then Exit Sub
+eventlist.AddKey a$, vbNullString
 End Sub
-Public Function EventFuncPos(A$, retName$, Pos As Long) As Boolean
+Public Function EventFuncPos(a$, retName$, Pos As Long) As Boolean
 If eventlist Is Nothing Then EventFuncPos = 0: Exit Function
 With eventlist
-If eventlist.ExistKey(A$) Then
+If eventlist.ExistKey(a$) Then
     retName$ = .Value
     If retName$ <> vbNullString Then Pos = .sValue: EventFuncPos = True
 End If
@@ -179,9 +179,9 @@ End With
 End Function
 
 Public Function PrepareSoros(ByRef v(), ByVal topname$) As mStiva2
-Dim I As Long, AllSoros As New mStiva2, s As String, vv As mStiva2
-For I = 1 To FieldsCount
-s = Fields(I)
+Dim i As Long, AllSoros As New mStiva2, s As String, vv As mStiva2
+For i = 1 To FieldsCount
+s = Fields(i)
 'Debug.Print fields(i), topname$, GroupName
 
 If Left$(s, 1) = "*" Then
@@ -206,9 +206,9 @@ Set PrepareSoros = AllSoros
 
 End Function
 Public Function PrepareSoros1(ByRef v(), ByVal topname$) As mStiva2
-Dim I As Long, AllSoros As New mStiva2, vv As mStiva2, s As String
-For I = 1 To FieldsCount
-s = Fields(I)
+Dim i As Long, AllSoros As New mStiva2, vv As mStiva2, s As String
+For i = 1 To FieldsCount
+s = Fields(i)
 If Left$(s, 1) = "*" Then
 AllSoros.DataStr "*" + topname$ + "." + Split(Mid$(s, 2))(0)
 
@@ -219,22 +219,22 @@ Else
 AllSoros.DataStr GroupName + Split(s)(0)
 End If
 Next
-Dim A() As String
+Dim a() As String
 If FuncRef$ <> "" Then
-A() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
-If UBound(A()) > 0 Then
-For I = 1 To UBound(A())
-AllSoros.DataStr topname$ + "." + Split(A(I))(0)
-Next I
+a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
+If UBound(a()) > 0 Then
+For i = 1 To UBound(a())
+AllSoros.DataStr topname$ + "." + Split(a(i))(0)
+Next i
 End If
 End If
 Set PrepareSoros1 = AllSoros
 
 End Function
 Public Function PrepareSorosToCompare(ByRef v()) As mStiva2
-Dim I As Long, AllSoros As New mStiva2, vv As mStiva2, s As String
-For I = 1 To FieldsCount
-    s = Fields(I)
+Dim i As Long, AllSoros As New mStiva2, vv As mStiva2, s As String
+For i = 1 To FieldsCount
+    s = Fields(i)
     If Left$(s, 1) = "*" Then
         AllSoros.DataStr "*" + Split(Mid$(s, 2))(0)
         If Not IsObject(v(val(Split(s)(1)))) Then Set v(val(Split(s)(1))) = New Group
@@ -244,29 +244,29 @@ For I = 1 To FieldsCount
         AllSoros.DataStr (Split(s)(0))
     End If
 Next
-Dim A() As String
+Dim a() As String
 If FuncRef$ <> "" Then
-A() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
-If UBound(A()) > 0 Then
-For I = 1 To UBound(A())
-AllSoros.DataStr (Split(A(I))(0))
-Next I
+a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
+If UBound(a()) > 0 Then
+For i = 1 To UBound(a())
+AllSoros.DataStr (Split(a(i))(0))
+Next i
 End If
 End If
 Set PrepareSorosToCompare = AllSoros
 End Function
 Public Function types() As String
-Dim I As Long, s$
-I = FieldsCount
+Dim i As Long, s$
+i = FieldsCount
 On Error Resume Next
-While I > 0
-If InStr(Fields(I), "( ") > 0 Then
+While i > 0
+If InStr(Fields(i), "( ") > 0 Then
 s$ = "A" + s$
 Else
 s$ = "V" + s$
 End If
 
-I = I - 1
+i = i - 1
 
 Wend
 types = s$
@@ -344,20 +344,36 @@ Public Sub EndFloat()
 FloatGroup = False
 bank = Empty
 End Sub
-Public Property Set LinkRef(A As Object)
+Public Property Set LinkRefPointer(a As Object)
 If FloatGroup Then
-If Typename(A) <> "Group" Then
+If Typename(a) <> "Group" Then
 Exit Property
 End If
 mTeam = False
-Set LinkToGroup = A
-If A Is Nothing Then Exit Property
+Set LinkToGroup = a
+If a Is Nothing Then Exit Property
+'
+bank(bank(1) * 2 + 3) = vbNullString
+'mTeam = True
+Else
+' only when is in an array as Float Group
+Set LinkToGroup = a
+End If
+End Property
+Public Property Set LinkRef(a As Object)
+If FloatGroup Then
+If Typename(a) <> "Group" Then
+Exit Property
+End If
+mTeam = False
+Set LinkToGroup = a
+If a Is Nothing Then Exit Property
 'erase functions,,,
  bank(bank(1) * 2 + 3) = vbNullString
 mTeam = True
 Else
 ' only when is in an array as Float Group
-Set LinkToGroup = A
+Set LinkToGroup = a
 End If
 End Property
 Friend Property Get LinkGroup() As Group
@@ -387,11 +403,11 @@ FuncRef$ = vNewValue
 End Property
 
 
-Public Property Get LocalList() As String
-LocalList = LocalRef$
+Public Property Get localList() As String
+localList = LocalRef$
 End Property
 
-Public Property Let LocalList(vNewValue As String)
+Public Property Let localList(vNewValue As String)
 LocalRef$ = vNewValue
 End Property
 

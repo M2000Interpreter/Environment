@@ -1,45 +1,110 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 9 active-X
-1. A small fix. Now module C run as expected.
+Version 13 revision 10 active-X
+This is the real 13 version.
+1. The array (1,2,3,4) now has type tuple, not mArray.The reason for the change: mArray hold arrays for dimensions, so tuple is an one dimension (or none) array. 
 
-2.  Const for Groups, BigIntegers, Tuple
-Also using the class CopyArray() we can place a group which has value, so  when we use the constant the object return a copy of the internal saved array (tuple). When a group return a value (has Value part) then the const sub system execute the value before pass the value (so const never pass a group which have a value, but the group's value.
+Tuple has the same functionality for operators: a=(1,2,3): a++ ' add one to each item.
+Also Tule use #functions. The Sort function works slighty different for tuple: The bigInteger is traited as string value (mArray show it as an object, and abandon the #sort() command). Tuple has no columns sort (only mArray at 2 dimensions).
+The Car(), Cdr() and Cons() return tuple
+A tuple class is lighter than the mArray class.
+
+a=(1,2,3,4)
+Print type$(a)="tuple"
+link a to a()  ' a and a() point to same data site
+Print type$(a())="tuple"
+dim b()
+b()=a  ' this is a copy from tuple to mArray
+Print type$(b())="mArray"
+b(2)+=100
+' the a() interface works for copy | the a=b() just alter the pointer.
+a()=b()  ' this is a copy from mArray to tuple
+Print type$(a())="tuple"
+Print a(2)=103
+Print a#val(2)=103   ' a is a pointer to tuple
+b=b()
+Print type$(b)="mArray"
+a=b  ' this can be done
+print a is b  ' true
+print type$(a)="mArray"
+Print type$(a())="mArray"
+k=car(b())
+print type$(k)="tuple"
+k1=cdr(b())
+print type$(k1)="tuple"
+k2=cons(b(), (1,2,3,4), (5,6,7))
+print type$(k2)="tuple"
+k2=cons((1,2,3,4),b(), (5,6,7))
+print type$(k2)="tuple"
+k3=b()#slice(0, 1)
+print type$(k3)="mArray"
+k4=b()#rev()
+print type$(k4)="mArray"
 
 
-const a=(1,2i)
-const b=12&
-const c=lambda (x)->x**2
-const d=12129371897398173981739871128371237821u
-const e=exp(1)
-class CopyArray {
-	m
-	value {
-		=cons(.m)
-	}
-class:
-	module CopyArray(a as array) {
-		.m<=cons(a)
-	}
+2. Two more functions for tuple and mArray: The #mat() perform operators on array items (for numeric values, including biginteger). For the example, tuple a has five items, we add 100 for each and we place the values in a string. The original's tuple values not changed.
+
+a=(1,2,3,4,5)
+? a#mat("+=", 100)#str$()="101 102 103 104 105"
+
+The #expanse() redim the array (not the original, but the product). So in the last line the tuple "a" has zero items, then we get a copy and we give an expanse of 100 items, and then we assign a value 1 for each, and last we get the sum of items.
+a=(,)
+? a#expanse(100)#mat("=", 1)#sum()=100
+
+
+3. Lists. Before this revision used the statement Return obj, key:=value [, key1:=value1]
+Now added a new one (so it is like we use sparse arrays):
+a=list
+// append to list using this form:
+a(10)=30
+a(3)=5
+a("hello")="Hello"
+a(3)++
+a("hello")+=" World"
+print  a(3)=6
+print a("hello")="Hello World"
+if exist(a, "hello") then print eval$(a)="Hello World"
+Print eval(a, 0)=10  ' first index is 0, we get the numeric key
+Print eval$(a, 2)="hello" ' we get the string key
+// export keys
+Print array(a!)#str$(", ")="10, 3, hello"
+// export values
+Print array(a)#str$(", ")="30, 6, Hello World"
+// sort on tuple
+Print array(a)#sort()#str$(", ")="6, 30, Hello World"
+// sort on list object
+sort a as number  ' by default is: as text
+Print array(a)#str$(", ")="6, 30, Hello World"
+
+
+4. Structures fixed - now works as expected.
+structure alfa {
+           structure beta {
+                  low as integer
+                  high as integer
+            }  
+            structure delta {
+                  low as byte
+                  middle1 as byte
+                  middle2 as byte
+                  high as byte
+            }   
+            value as long
 }
-const f=CopyArray((1,2,3,4))
-Print a=(1,2i), a|r=1, a|i=2
-Print d*100
-Print e
-Print f#sum()
-z=f  // pointers to arrays
-z1=f
-print z is z1 ' false: in't same
-Print z 
-Print z1
-return z, 2:=100
-' we can change z items, but no f items
-Print f#val(2)=3, z#val(2)=100
-try {	' return find f is a group so can't go further and raise error
-	return f, 2:=100
-}
-Print Error$  ' Wrong Use of Return
-list
+Print Len(alfa)=4  ' we have a union of three parts: beta, delta, value
+buffer clear alfa1 as alfa*10, alfa2 as alfa
+Return alfa1,0!delta.high:=0xFF  ' old way
+Print alfa1[0]|delta.high=0xFF ' True
+Print alfa1[0]|beta.high=0xFF00 ' True
+Print alfa1[0]|value=0xFF000000 ' True
+alfa1[0]|delta.high=alfa1[0]|delta.high-1
+Print alfa1[0]|value=0xFE000000 ' True
+alfa2[0]|value=0xFFFFAAAA
+alfa2[0]|delta.low=alfa1[0]|delta.high
+Print alfa2[0]|value=0xFFFFAAFE ' True
+
+
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

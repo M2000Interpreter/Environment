@@ -338,9 +338,9 @@ Public Sub drop(RHS)
 'If Not AllowSameKey Then Exit Sub
 RHS = RHS - 1
 If (toplim - RHS) >= 0 And (RHS >= 0) Then
-Dim I As Long
-For I = toplim To RHS Step -1
-       With PriveSpace(I)
+Dim i As Long
+For i = toplim To RHS Step -1
+       With PriveSpace(i)
         If .Pleft > 0 Then
             Hash(.lastpos) = .Pleft
             .Pleft = 0
@@ -352,7 +352,7 @@ For I = toplim To RHS Step -1
         End With
 toplim = RHS - 1
   ReduceHash toplim
-Next I
+Next i
 Else
    MaxSpace = 5
     ReDim PriveSpace(MaxSpace) As item, Hash(MaxSpace * 2 + 3)
@@ -364,22 +364,22 @@ End If
 End Sub
 Public Sub Remove(RHS)
 If AllowSameKey Then Exit Sub
-Dim K As Long, k1 As Long, vvv As Variant, top1 As Long, nDx As Long, Parndx As Long
+Dim K As Long, k1 As Long, vvv As Variant, top1 As Long, ndx As Long, Parndx As Long
 If toplim < 0 Then Exit Sub
 top1 = toplim
-If Find2(RHS, Parndx, nDx) Then
+If Find2(RHS, Parndx, ndx) Then
         Sorted = False
         Done = True
-        Index = nDx
+        Index = ndx
         ' here we make a clean to pointers to PriveSpace, so we exclude the removing item
         If Parndx > -1 Then
             ' if we have a parent then just push to parent the Pleft pointer
             ' Pleft is always +1 (so Pleft 0 give -1 null for this context)
-            PriveSpace(Parndx).Pleft = PriveSpace(nDx).Pleft
+            PriveSpace(Parndx).Pleft = PriveSpace(ndx).Pleft
 
         Else
         ' so we have no parent, just out Pleft to Hash
-        Hash(PriveSpace(nDx).lastpos) = PriveSpace(nDx).Pleft
+        Hash(PriveSpace(ndx).lastpos) = PriveSpace(ndx).Pleft
 
         End If
         ' we don't have to see Hash() any more for RHS
@@ -388,21 +388,21 @@ If Find2(RHS, Parndx, nDx) Then
         ' We have to get change top1 to ndx, maybe we remove top1
         ' we can check this but it is faster to not check this (more often top1 isn't ndx)
         ' Using SwapVariant we can swap any kind of Variant, including objects (swaping pointers only)
-        If top1 = nDx Then
+        If top1 = ndx Then
         PriveSpace(top1) = new_item
         Else
         SwapVariant vvv, PriveSpace(top1).iValue
-        PriveSpace(nDx).iValue = -1 ' is good to pass a number - so we break any pointer to object
-        PriveSpace(nDx) = PriveSpace(top1) ' now we perform a copy (no objects included)
+        PriveSpace(ndx).iValue = -1 ' is good to pass a number - so we break any pointer to object
+        PriveSpace(ndx) = PriveSpace(top1) ' now we perform a copy (no objects included)
         PriveSpace(top1) = new_item
         ' so now we put back iValue (maybe is an object)
-        SwapVariant vvv, PriveSpace(nDx).iValue
+        SwapVariant vvv, PriveSpace(ndx).iValue
         End If
         ' here Lastpos is from previous PriveSpace(top1) which is PriveSpace(ndx)
-        K = Hash(PriveSpace(nDx).lastpos) - 1
+        K = Hash(PriveSpace(ndx).lastpos) - 1
         If K = top1 Then
             ' we have to give the new position to Hash()
-            Hash(PriveSpace(nDx).lastpos) = nDx + 1
+            Hash(PriveSpace(ndx).lastpos) = ndx + 1
         Else
          
          Do While K >= 0 And K <> top1 And K <> k1
@@ -412,7 +412,7 @@ If Find2(RHS, Parndx, nDx) Then
          If K = k1 Then
             Rehash
          ElseIf K = top1 Then
-            PriveSpace(k1).Pleft = nDx + 1
+            PriveSpace(k1).Pleft = ndx + 1
          End If
         End If
   
@@ -430,7 +430,7 @@ If Index = -1 Then
 ItemCreator lastkey, RHS
 
 Else
-    PriveSpace(Index).iValue = RHS
+    SwapVariant PriveSpace(Index).iValue, RHS
 End If
 Done = True
 End Property
@@ -581,21 +581,21 @@ Private Sub ExpandHash()
     Rehash
 End Sub
 Private Sub Rehash()
-    Dim I As Long
+    Dim i As Long
     ReDim Hash(hashlen) As Long
-    For I = 0 To toplim
-           place HashFunc2(I), I
+    For i = 0 To toplim
+           place HashFunc2(i), i
         
-    Next I
+    Next i
 End Sub
 Private Function CheckHash() As Boolean
-    Dim I As Long
-    For I = 0 To toplim
-        If PriveSpace(I).Pleft > 0 Then
-        If PriveSpace(PriveSpace(I).Pleft - 1).Key = vbNullString Then Exit Function
-        If I = (PriveSpace(I).Pleft - 1) Then Exit Function
+    Dim i As Long
+    For i = 0 To toplim
+        If PriveSpace(i).Pleft > 0 Then
+        If PriveSpace(PriveSpace(i).Pleft - 1).Key = vbNullString Then Exit Function
+        If i = (PriveSpace(i).Pleft - 1) Then Exit Function
         End If
-    Next I
+    Next i
     CheckHash = True
 End Function
 
@@ -841,7 +841,7 @@ End If
 End If
 
 End Function
-Private Function Find2(RHS, Parndx As Long, nDx As Long) As Boolean
+Private Function Find2(RHS, Parndx As Long, ndx As Long) As Boolean
 Dim K As Long, Key As String, k1 As Long
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
@@ -850,7 +850,7 @@ K = Hash(HashFunc(Key)) - 1
 k1 = -2
 If K >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then Find2 = True: nDx = K: Exit Function
+    If PriveSpace(K).Key = Key Then Find2 = True: ndx = K: Exit Function
      Parndx = K
      k1 = K
      K = PriveSpace(K).Pleft - 1
@@ -861,7 +861,7 @@ K = Hash(HashFunc(Key)) - 1
 k1 = -2
 If K >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then Find2 = True: nDx = K: Exit Function
+    If PriveSpace(K).Key = Key Then Find2 = True: ndx = K: Exit Function
      Parndx = K
      k1 = K
      K = PriveSpace(K).Pleft - 1
@@ -978,13 +978,13 @@ End If
 End Function
 
 Private Sub ItemCreator(Key As String, nValue As Variant)
-Dim A As Long, kk As Long
+Dim a As Long, kk As Long
 Done = False
 Sorted = False
 kk = HD(Key)
 If Not AllowSameKey Then If ExistKey2(Key, kk) Then Exit Sub  ' done is false
-A = Malloc()
-With PriveSpace(A)
+a = Malloc()
+With PriveSpace(a)
     .Key = Key
     If IsObject(nValue) Then
     Set .iValue = nValue
@@ -994,39 +994,39 @@ With PriveSpace(A)
     .firsthash = kk
 End With
 
-place HashFunc1(kk), A
+place HashFunc1(kk), a
 
-Index = A
+Index = a
 Done = True
 End Sub
 Friend Sub ItemCreator2(Key As String, nValue As Long, dvalue As Long)
-Dim A As Long, kk As Long
+Dim a As Long, kk As Long
 Done = False
 Sorted = False
 kk = HD(Key)
 ' without check
 'If Not AllowSameKey Then If ExistKey2(Key, kk) Then Exit Sub  ' done is false
-A = Malloc()
-With PriveSpace(A)
+a = Malloc()
+With PriveSpace(a)
     .Key = Key
     .iValue = nValue
     .sValue = dvalue
     .firsthash = kk
 End With
-place HashFunc1(kk), A
+place HashFunc1(kk), a
 Index = -1
 End Sub
 Property Get Percent()
 Percent = 100 * count / hashlen
 End Property
-Private Sub place(ByVal b, ByVal A)
+Private Sub place(ByVal b, ByVal a)
     Dim K As Long
     K = Hash(b)
-    If Not K = A + 1 Then
-         Hash(b) = A + 1
-         PriveSpace(A).Pleft = K
+    If Not K = a + 1 Then
+         Hash(b) = a + 1
+         PriveSpace(a).Pleft = K
     End If
-    PriveSpace(A).lastpos = b
+    PriveSpace(a).lastpos = b
 End Sub
 Private Function HashFunc2(where As Long)
 HashFunc2 = PriveSpace(where).firsthash Mod hashlen
@@ -1034,15 +1034,15 @@ End Function
 Private Function HashFunc1(nkey As Long)
 HashFunc1 = nkey Mod hashlen
 End Function
-Private Function HashFunc(A$)
-HashFunc = HD(A$) Mod hashlen
+Private Function HashFunc(a$)
+HashFunc = HD(a$) Mod hashlen
 End Function
 
 
-Private Sub SwapVariant(ByRef A As Variant, ByRef b As Variant)
+Private Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
    Dim t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory t(0), ByVal VarPtr(A), 16
-   CopyMemory ByVal VarPtr(A), ByVal VarPtr(b), 16
+   CopyMemory t(0), ByVal VarPtr(a), 16
+   CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
    CopyMemory ByVal VarPtr(b), t(0), 16
 End Sub
 ' only for tests
@@ -1408,16 +1408,16 @@ AllowSameKey = True
 Stable = True
 End Function
 
-Function compareStr4(A$, ByVal b$) As Long
+Function compareStr4(a$, ByVal b$) As Long
 If useSCol Then
-compareStr4 = compareStr444(A$, b$)
+compareStr4 = compareStr444(a$, b$)
 Else
-compareStr4 = compareStr44((A$), (b$))
+compareStr4 = compareStr44((a$), (b$))
 End If
 End Function
-Private Function compareStr444(A$, b$) As Long
+Private Function compareStr444(a$, b$) As Long
 Dim aa() As String, bb() As String, part As Long, ret As Long
-aa = Split(A$, zero$)
+aa = Split(a$, zero$)
 bb = Split(b$, zero$)
 again:
 If uScol(part) < 2 Then
@@ -1433,20 +1433,20 @@ End If
 If (uScol(part) And 1) = 1 Then compareStr444 = -ret Else compareStr444 = ret
 
 End Function
-Private Function compareStr44(A$, b$) As Long
-Dim I As Long, j As Long, a1$, b1$, P1 As Variant, P2 As Variant, n$, K As Long, k1 As Long
-If CompareString(useclid, &H1000, StrPtr(A$), Len(A$), StrPtr(b$), Len(b$)) = 2 Then Exit Function
+Private Function compareStr44(a$, b$) As Long
+Dim i As Long, j As Long, a1$, b1$, P1 As Variant, P2 As Variant, n$, K As Long, k1 As Long
+If CompareString(useclid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$)) = 2 Then Exit Function
 n$ = "[-0-9.]"
-K = Sgn(Len(A$) - Len(b$))
+K = Sgn(Len(a$) - Len(b$))
 k1 = K
 again:
-j = IIf(Len(A$) >= Len(b$), Len(b$), Len(A$))
+j = IIf(Len(a$) >= Len(b$), Len(b$), Len(a$))
 
-For I = 1 To j
+For i = 1 To j
 
-    If Mid$(A$, I, 1) Like n$ Then
-    a1$ = Mid$(A$, I)
-    b1$ = Mid$(b$, I)
+    If Mid$(a$, i, 1) Like n$ Then
+    a1$ = Mid$(a$, i)
+    b1$ = Mid$(b$, i)
         IsNumberD2 a1$, P1
         If IsNumberD2(b1$, P2) Then
             compareStr44 = Sgn(MyRound(P1, 8) - MyRound(P2, 8))
@@ -1455,7 +1455,7 @@ For I = 1 To j
                     If Len(n$) > 6 Then n$ = "[-0-9]"
                     K = Sgn(Len(a1$) - Len(b1$))
                      
-                    A$ = a1$
+                    a$ = a1$
                     b$ = b1$
                    
                     GoTo again
@@ -1469,13 +1469,13 @@ For I = 1 To j
             End If
             Exit Function
         Else
-        A$ = Mid$(A$, I)
-    b$ = Mid$(b$, I)
-    IsNumberD2 A$, P1
+        a$ = Mid$(a$, i)
+    b$ = Mid$(b$, i)
+    IsNumberD2 a$, P1
        
-          If Len(A$) > 0 Then
+          If Len(a$) > 0 Then
        
-            Select Case CompareString(useclid, &H1000, StrPtr(A$), Len(A$), StrPtr(b$), Len(b$))
+            Select Case CompareString(useclid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
                 Case 1, 3
                 compareStr44 = -1
                 Case 2
@@ -1490,13 +1490,13 @@ For I = 1 To j
         End If
         End If
         Exit Function
-    ElseIf Mid$(b$, I, 1) Like n$ Then
-    A$ = Mid$(A$, I)
-    b$ = Mid$(b$, I)
+    ElseIf Mid$(b$, i, 1) Like n$ Then
+    a$ = Mid$(a$, i)
+    b$ = Mid$(b$, i)
     IsNumberD2 b$, P1
     If Len(b$) > 0 Then
        
-            Select Case CompareString(useclid, &H1000, StrPtr(A$), Len(A$), StrPtr(b$), Len(b$))
+            Select Case CompareString(useclid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
                 Case 3
                 compareStr44 = 1
                 Case 1, 2
@@ -1513,43 +1513,43 @@ For I = 1 To j
         End If
         Exit Function
     End If
-    compareStr44 = -2 + CompareString(useclid, 0, StrPtr(A$) + I * 2 - 2, 1, StrPtr(b$) + I * 2 - 2, 1)
+    compareStr44 = -2 + CompareString(useclid, 0, StrPtr(a$) + i * 2 - 2, 1, StrPtr(b$) + i * 2 - 2, 1)
     If compareStr44 <> 0 Then
     Exit Function
     End If
-Next I
-compareStr44 = Sgn(Len(A$) - Len(b$))
+Next i
+compareStr44 = Sgn(Len(a$) - Len(b$))
 If compareStr44 = 0 Then compareStr44 = k1
 End Function
 
-Function CompareStr2(A$, b$, what As Long) As Long
+Function CompareStr2(a$, b$, what As Long) As Long
 On Error GoTo comperr
 Select Case what
 Case 1 To 2
-CompareStr2 = StrComp(A$, b$, what)
+CompareStr2 = StrComp(a$, b$, what)
 Case Else
 If useclid = 0 Then
-CompareStr2 = StrComp(A$, b$)
+CompareStr2 = StrComp(a$, b$)
 Else
 ' we cant use something that give "equal" keys
-CompareStr2 = -2 + CompareString(useclid, &H1000, StrPtr(A$), Len(A$), StrPtr(b$), Len(b$))
+CompareStr2 = -2 + CompareString(useclid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
 End If
 End Select
 Exit Function
 comperr:
-CompareStr2 = -2 + CompareString(0, 0, StrPtr(A$), Len(A$), StrPtr(b$), Len(b$))
+CompareStr2 = -2 + CompareString(0, 0, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
 End Function
 
 Public Property Get IsQueue() As Variant
 IsQueue = AllowSameKey
 End Property
 Private Sub InsertionSort(Arr() As item, ByVal iMin As Long, ByVal iMax As Long, Optional what As Long = -1)
-    Dim I As Long
+    Dim i As Long
     Dim j As Long
-    I = iMin + 1
+    i = iMin + 1
     iMax = iMax + 1
-    While I < iMax
-        j = I
+    While i < iMax
+        j = i
         Do While j > iMin
         If compareStr4(Arr(j).Key, Arr(j - 1).Key) = what Then
             SwapItem VarPtr(Arr(j)), VarPtr(Arr(j - 1))
@@ -1558,16 +1558,16 @@ Private Sub InsertionSort(Arr() As item, ByVal iMin As Long, ByVal iMax As Long,
             Exit Do
         End If
         Loop
-        I = I + 1
+        i = i + 1
     Wend
 End Sub
 Private Sub InsertionSort1(Arr() As item, ByVal iMin As Long, ByVal iMax As Long, Optional what As Long = -1)
-    Dim I As Long
+    Dim i As Long
     Dim j As Long
-    I = iMin + 1
+    i = iMin + 1
     iMax = iMax + 1
-    While I < iMax
-        j = I
+    While i < iMax
+        j = i
         Do While j > iMin
         If CompareStr2(Arr(j).Key, Arr(j - 1).Key, mSortstyle) = what Then
             SwapItem VarPtr(Arr(j)), VarPtr(Arr(j - 1))
@@ -1576,7 +1576,7 @@ Private Sub InsertionSort1(Arr() As item, ByVal iMin As Long, ByVal iMax As Long
             Exit Do
         End If
         Loop
-        I = I + 1
+        i = i + 1
     Wend
 End Sub
 Public Property Get KeyToString3(there As Long) As String
@@ -1585,13 +1585,13 @@ Public Property Get KeyToString3(there As Long) As String
 
 End Property
 
-Private Function IsNumberD2(A$, D As Variant) As Boolean
+Private Function IsNumberD2(a$, D As Variant) As Boolean
 ' for inline stacitems
 If VarType(D) = vbEmpty Then D = 0#
 Dim a1 As Long
-If A$ <> "" Then
-For a1 = 1 To Len(A$) + 1
-Select Case Mid$(A$, a1, 1)
+If a$ <> "" Then
+For a1 = 1 To Len(a$) + 1
+Select Case Mid$(a$, a1, 1)
 Case " ", ChrW(160), vbTab
 If a1 > 1 Then Exit For
 Case Is = Chr(2)
@@ -1599,9 +1599,9 @@ If a1 = 1 Then Exit Function
 Exit For
 End Select
 Next a1
-If a1 > Len(A$) Then a1 = Len(A$) + 1
-    If IsNumberOnly(A$, 1, D, a1) Then
-        A$ = Mid$(A$, a1)
+If a1 > Len(a$) Then a1 = Len(a$) + 1
+    If IsNumberOnly(a$, 1, D, a1) Then
+        a$ = Mid$(a$, a1)
         IsNumberD2 = True
     Else
     IsNumberD2 = False
@@ -1611,15 +1611,15 @@ Else
 End If
 
 End Function
-Private Function IsNumberOnly(A$, fr As Long, r As Variant, lr As Long) As Boolean
+Private Function IsNumberOnly(a$, fr As Long, r As Variant, lr As Long) As Boolean
 Dim sg As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
 ' ti kanei to e$
-If A$ = vbNullString Then IsNumberOnly = False: Exit Function
+If a$ = vbNullString Then IsNumberOnly = False: Exit Function
 sg = 1
 sng = fr - 1
-    Do While sng < Len(A$)
+    Do While sng < Len(a$)
     sng = sng + 1
-    Select Case Mid$(A$, sng, 1)
+    Select Case Mid$(a$, sng, 1)
     Case " ", "+"
     Case "-"
     sg = -sg
@@ -1627,24 +1627,24 @@ sng = fr - 1
     Exit Do
     End Select
     Loop
-n$ = Mid$(A$, sng)
+n$ = Mid$(a$, sng)
 
-If val("0" + Mid$(A$, sng, 1)) = 0 And Left(Mid$(A$, sng, 1), sng) <> "0" And Left(Mid$(A$, sng, 1), sng) <> "." Then
+If val("0" + Mid$(a$, sng, 1)) = 0 And Left(Mid$(a$, sng, 1), sng) <> "0" And Left(Mid$(a$, sng, 1), sng) <> "." Then
 IsNumberOnly = False
 
 Else
 'compute ig$
-    If Mid$(A$, sng, 1) = "." Then
+    If Mid$(a$, sng, 1) = "." Then
     ' no long part
     ig$ = "0"
     DE$ = "."
 
     Else
-    Do While sng <= Len(A$)
+    Do While sng <= Len(a$)
         
-        Select Case Mid$(A$, sng, 1)
+        Select Case Mid$(a$, sng, 1)
         Case "0" To "9"
-        ig$ = ig$ + Mid$(A$, sng, 1)
+        ig$ = ig$ + Mid$(a$, sng, 1)
         Case "."
         DE$ = "."
         Exit Do
@@ -1656,9 +1656,9 @@ Else
     End If
     ' compute decimal part
     If Len(DE$) = 0 Then
-    If Len(A$) > sng& Then
-    If InStr("EeÅå", Mid$(A$, sng&, 1)) > 0 Then
-    If InStr("1234567890+-", Mid$(A$, sng& + 1, 1)) > 0 Then
+    If Len(a$) > sng& Then
+    If InStr("EeÅå", Mid$(a$, sng&, 1)) > 0 Then
+    If InStr("1234567890+-", Mid$(a$, sng& + 1, 1)) > 0 Then
        ' fr = fr + 1
         DE$ = "."
         
@@ -1669,18 +1669,18 @@ Else
     Else
       sng = sng + 1
 cont123:
-        Do While sng <= Len(A$)
+        Do While sng <= Len(a$)
        
-        Select Case Mid$(A$, sng, 1)
+        Select Case Mid$(a$, sng, 1)
         Case " "
         If Not (sg1 And Len(ex$) = 1) Then
         Exit Do
         End If
         Case "0" To "9"
         If sg1 Then
-        ex$ = ex$ + Mid$(A$, sng, 1)
+        ex$ = ex$ + Mid$(a$, sng, 1)
         Else
-        DE$ = DE$ + Mid$(A$, sng, 1)
+        DE$ = DE$ + Mid$(a$, sng, 1)
         End If
         Case "E", "e", "Å", "å"
                If ex$ = vbNullString Then
@@ -1694,7 +1694,7 @@ cont123:
         
         Case "+", "-"
         If sg1 And Len(ex$) = 1 Then
-         ex$ = ex$ + Mid$(A$, sng, 1)
+         ex$ = ex$ + Mid$(a$, sng, 1)
         Else
         Exit Do
         End If
@@ -1737,38 +1737,38 @@ cont123:
     End If
 End If
 End Function
-Public Sub FeedSCol(ParamArray A())
-If UBound(A) >= 0 Then
-If Typename(A(0)) = "Variant()" Then
-A() = A(0)
+Public Sub FeedSCol(ParamArray a())
+If UBound(a) >= 0 Then
+If Typename(a(0)) = "Variant()" Then
+a() = a(0)
 
 End If
 End If
-ReDim uScol(UBound(A) + 1)
-Dim I As Long
-For I = 0 To UBound(A)
-Select Case A(I)
+ReDim uScol(UBound(a) + 1)
+Dim i As Long
+For i = 0 To UBound(a)
+Select Case a(i)
 Case 1, 2, 3
 
-uScol(I) = A(I)
+uScol(i) = a(i)
 Case Else
-uScol(I) = 0
+uScol(i) = 0
 End Select
-Next I
+Next i
 useSCol = True
 NumericSort = True
 End Sub
-Public Sub FeedSCol2(A())
-ReDim uScol(UBound(A) + 1)
-Dim I As Long
-For I = 0 To UBound(A)
-Select Case A(I)
+Public Sub FeedSCol2(a())
+ReDim uScol(UBound(a) + 1)
+Dim i As Long
+For i = 0 To UBound(a)
+Select Case a(i)
 Case 1, 2, 3
-uScol(I) = A(I)
+uScol(i) = a(i)
 Case Else
-uScol(I) = 0
+uScol(i) = 0
 End Select
-Next I
+Next i
 useSCol = True
 NumericSort = True
 End Sub
@@ -1777,8 +1777,8 @@ useSCol = False
 NumericSort = False
 End Sub
 
-Friend Sub FeedSCol3(A() As Byte)
-uScol() = A()
+Friend Sub FeedSCol3(a() As Byte)
+uScol() = a()
 useSCol = True
 NumericSort = True
 End Sub
@@ -1786,25 +1786,25 @@ Friend Function ExportScol3() As Byte()
 ExportScol3 = uScol()
 End Function
 
-Public Function MakeCompKey(ParamArray A()) As String
-Dim ret$, I As Long
-ret$ = Normalize(A(0))
-For I = 1 To UBound(A)
-ret$ = ret$ + Chr$(1) + Normalize(A(I))
-Next I
+Public Function MakeCompKey(ParamArray a()) As String
+Dim ret$, i As Long
+ret$ = Normalize(a(0))
+For i = 1 To UBound(a)
+ret$ = ret$ + Chr$(1) + Normalize(a(i))
+Next i
 MakeCompKey = ret$
 End Function
-Private Sub LoadItem(A As Long, b As Long)
-If A = b Then Exit Sub
-CopyMemory ByVal A, ByVal b, LenB(Piv)
+Private Sub LoadItem(a As Long, b As Long)
+If a = b Then Exit Sub
+CopyMemory ByVal a, ByVal b, LenB(Piv)
 End Sub
-Private Sub SwapItem(ByVal A As Long, ByVal b As Long)
-If A = b Then Exit Sub
-CopyMemory ByVal VarPtr(swapb(0)), ByVal A, LenB(Piv)
-CopyMemory ByVal A, ByVal b, LenB(Piv)
+Private Sub SwapItem(ByVal a As Long, ByVal b As Long)
+If a = b Then Exit Sub
+CopyMemory ByVal VarPtr(swapb(0)), ByVal a, LenB(Piv)
+CopyMemory ByVal a, ByVal b, LenB(Piv)
 CopyMemory ByVal b, ByVal VarPtr(swapb(0)), LenB(Piv)
 End Sub
-Public Function SearchKeyPart(A$) As Boolean
+Public Function SearchKeyPart(a$) As Boolean
 ' need to have a sorted list
 If Sorted Then
 IamBusy = True
@@ -1817,4 +1817,39 @@ IamBusy = False
 Else
 ' inventory not sorted
 End If
+End Function
+Public Function ExportKeys() As Object
+Dim a As New tuple, i As Long
+a.PushDim count
+a.PushEnd
+a.Arr = True
+Done = True
+For i = 0 To count - 1
+Index = i
+If KeyTypeValue <> vbString Then
+a.item(i) = KeyToNumber
+Else
+a.item(i) = KeyToString
+End If
+
+Next
+Done = False
+Set ExportKeys = a
+End Function
+Public Function ExportValues() As Object
+Dim a As New tuple, i As Long
+a.PushDim count
+a.PushEnd
+a.Arr = True
+Done = True
+For i = 0 To count - 1
+    Index = i
+    If IsObj Then
+        Set a.item(i) = ValueObj
+    Else
+        a.item(i) = Value
+    End If
+Next
+Done = False
+Set ExportValues = a
 End Function
