@@ -42,7 +42,7 @@ Public GroupRef As Object
 ' only for check
 Public CodeName As String
 Private oldmaxitems As Long
-Public arr As Boolean, Stable As Boolean
+Public Arr As Boolean, Stable As Boolean
 Public RevOrder As Boolean
 Public MyTypeToBe As Integer
 Private Type SAFEArrayPart
@@ -79,7 +79,11 @@ Private Type SAFEARRAY1D
     lLbound As Long
 End Type
 ' no second sort allowed per array
-
+Private Type ValueCarrier
+    val As Variant
+    obj As BigInteger
+    typ As Integer
+End Type
 Public Index As Long, Final As Boolean, refgroup As Object, grouperror As Boolean
 Public refArray As Variant, StrArray As Boolean, IsByValue As Boolean
 Public Sub Compute0(p As Variant, ss$)
@@ -518,6 +522,17 @@ Do While v <= Me.UpperMonoLimit
                 WrongOperator
                 Exit Do
             End Select
+        ElseIf n = vbString Then
+            If MemInt(VarPtr(p)) <> vbString Then
+                p = fixthis(p)
+            End If
+            Select Case ss$
+                Case "="
+                    actualData(v) = p
+                    GoTo conthere
+                Case "+="
+                    actualData(v) = actualData(v) + p
+            End Select
         End If
     If rd Then If n = vbDouble Then actualData(v) = MyRound(actualData(v), 13)
 conthere:
@@ -684,9 +699,9 @@ Else
 End If
 End If
 End Property
-Public Sub PushProp(a As Variant)
-Set GroupRef = a
-arr = False
+Public Sub PushProp(A As Variant)
+Set GroupRef = A
+Arr = False
 End Sub
 Friend Sub ExportArrayNow()
 If myVarType(actualData, vbObject) Then
@@ -735,13 +750,13 @@ Friend Sub FixArray()
 '
 End Sub
 Friend Sub LoadTuple(Ar As Variant)
-Dim Z As Long, i As Long
+Dim z As Long, i As Long
 actualData = Ar
 If Count <> UBound(actualData) - LBound(actualData) + 1 Then
 i = Count
 maxitems1 = UBound(actualData) - LBound(actualData)
 maxitems = maxitems1 + 1
-Z = 1
+z = 1
 dnum = 1
 End If
 '
@@ -835,7 +850,7 @@ If Count > 0 Then
         K.item(0) = item(0)
     End If
 End If
-K.arr = True
+K.Arr = True
 Set m = K
 Set K = Nothing
 End Sub
@@ -845,7 +860,7 @@ Dim i As Long, obj As Object, obj2 As Object, spare As lambda
 If dnum > 0 Then
     K.StartResize: K.PushDim Me.Count - 1: K.PushEnd
 Else
-    K.arr = True
+    K.Arr = True
     Set K.GroupRef = Me.GroupRef
     K.IHaveGui = Me.IHaveGui
     K.IhaveClass = Me.IhaveClass
@@ -896,7 +911,7 @@ If dnum > 0 Then
 ElseIf Not pppp1.IsEmpty Then
     Set pppp = pppp1
 End If
-pppp.arr = True
+pppp.Arr = True
 pppp.Final = False
 Set m = pppp
 Set pppp = Nothing
@@ -983,7 +998,7 @@ Else
     Next i
 '' new
 End If
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
 K.Final = Me.Final
@@ -1038,7 +1053,7 @@ Else
     Next i
 '' new
 End If
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = False 'Me.IhaveClass
 K.Final = Me.Final
@@ -1092,7 +1107,7 @@ For i = 0 To Me.UpperMonoLimit
 Next i
 End If
 '' new
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = False 'Me.IhaveClass
 K.Final = Me.Final
@@ -1128,7 +1143,7 @@ For i = 0 To Me.UpperMonoLimit
 Next i
 End If
 '' new
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
 K.Final = Me.Final
@@ -1143,7 +1158,7 @@ K.StartResize
 K.PushEnd
 K.RevOrder = RevOrder
 Set K.GroupRef = Nothing
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = False
 K.Final = Me.Final
@@ -1191,7 +1206,7 @@ For i = fromS To toS
     End If
 Next i
 '' new
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = False 'Me.IhaveClass
 K.Final = Me.Final
@@ -1221,7 +1236,7 @@ Else
 End If
 Next i
 
-K.arr = Me.arr
+K.Arr = Me.Arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
 K.Final = Me.Final
@@ -1248,9 +1263,9 @@ End If
 nmaxitems1 = nmaxitems - 1
 End Sub
 Public Sub PushEnd(Optional thisarr)
-Dim Z As Variant
+Dim z As Variant
 Dim mX As Long
-CopyMemory ByVal VarPtr(refArray), Z, 16
+CopyMemory ByVal VarPtr(refArray), z, 16
 On Error GoTo there11
 If ndnum = 0 Then
     dnum = 0
@@ -1292,16 +1307,23 @@ Else
         Else
         If myVarType(actualData, vbObject) Then
             Set Ar = actualData
+            mX = Ar.Count
             Ar.RedimForFlat maxitems1
+            
+            If MyTypeToBe = 201 Then
+                For i = mX To maxitems
+                    actualData(i) = CVar(ZeroBig)
+                Next
+            End If
         Else
             mX = UBound(actualData)
             
-                ReDim Preserve actualData(maxitems1)
-        If MyTypeToBe = 200 Then
-         For i = mX To maxitems1
-          actualData(i) = nMath2.cxZero
-         Next
-        End If
+            ReDim Preserve actualData(maxitems1)
+            If MyTypeToBe = 200 Then
+                For i = mX To maxitems1
+                    actualData(i) = nMath2.cxZero
+                Next
+            End If
         End If
         End If
     End If
@@ -1391,7 +1413,7 @@ Else
     ReDim actualData(0)
 End If
 CodeName = GetAnyName$
-arr = True
+Arr = True
 maxitems = 0
 Else
     If myVarType(actualData, vbObject) Then
@@ -1462,14 +1484,14 @@ End Function
 Public Property Get itemPtr(curitem As Long) As Long
 itemPtr = VarPtr(actualData(curitem))
 End Property
-Friend Sub CopyVariantArray(ByRef a As Variant, ByRef b As Variant)
-    CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
+Friend Sub CopyVariantArray(ByRef A As Variant, ByRef b As Variant)
+    CopyMemory ByVal VarPtr(A), ByVal VarPtr(b), 16
 End Sub
 Friend Sub SwapItem(curitem As Long, thisvariant)
 Static p
 If myVarType(actualData, vbObject) Then
 p = actualData(curitem)
-actualData(curitem) = thisvariant
+actualData(curitem) = CVar(thisvariant)
 thisvariant = p
 Else
 SwapVariant actualData(curitem), thisvariant
@@ -1477,7 +1499,7 @@ End If
 End Sub
 Public Function IsStringItem(curitem As Long) As Variant
 Dim usehandler As mHandler, n As Byte
-If arr Then
+If Arr Then
 If myVarType(actualData, vbObject) Then
 IsStringItem = VarType(actualData(curitem)) = vbString
 
@@ -1516,7 +1538,7 @@ End If
 End Function
 Public Property Get ItemIsObject(curitem) As Boolean
 On Error GoTo there1
-If arr Then
+If Arr Then
     If maxitems1 >= curitem Then
         If MyIsObject(actualData(curitem)) Then
             ItemIsObject = Not actualData(curitem) Is Nothing
@@ -1532,7 +1554,7 @@ End Property
 Public Property Get ItemType(curitem) As String
 Dim Ar As refArray
 On Error GoTo there1
-If arr Then
+If Arr Then
     If maxitems1 >= curitem Then
         ItemType = VarTypeName(actualData(curitem))
     End If
@@ -1567,7 +1589,7 @@ If Left$(ItemType, 2) = "cx" Then ItemType = Mid$(ItemType, 3)
 End Property
 Public Property Get ItemTypeNum(curitem) As Integer
 On Error GoTo there1
-If arr Then
+If Arr Then
     If maxitems1 >= curitem Then
         ItemTypeNum = MemInt(VarPtr(actualData(curitem)))
     End If
@@ -1601,7 +1623,7 @@ there1:
 
 End Property
 Friend Sub GetPorp(aProp As PropReference, curitem As Long)
-If arr Then
+If Arr Then
     Set aProp = actualData(curitem)
 Else
     Set aProp = GroupRef
@@ -1609,7 +1631,7 @@ End If
 End Sub
 Public Property Get item(curitem As Long) As Variant
 On Error GoTo there1
-If arr Then
+If Arr Then
     If maxitems1 >= curitem Then
         If ItemIsObject(curitem) Then
             If Typename(actualData(curitem)) = "PropReference" Then
@@ -1657,73 +1679,125 @@ End If
 there1:
 
 End Property
-Private Property Get itemBig(curitem As Long) As Variant
-On Error GoTo there1
+Private Function TestItemBigLess(A As ValueCarrier, b As ValueCarrier) As Boolean
 Dim BI As BigInteger
-If arr Then
+On Error GoTo there
+If A.typ = b.typ Then
+    If A.typ = 0 Then
+        If A.val < b.val Then TestItemBigLess = True
+    Else
+        TestItemBigLess = A.obj.compare(b.obj) = -1
+    End If
+ElseIf A.typ = 0 Then
+    If VarType(A.val) = vbString Then
+        TestItemBigLess = False
+    Else
+        Set BI = Module13.CreateBigInteger(Format$(Int(A.val), "0"))
+        TestItemBigLess = BI.compare(b.obj) = -1
+    End If
+Else
+    If VarType(b.val) = vbString Then
+        TestItemBigLess = True
+    Else
+        Set BI = Module13.CreateBigInteger(Format$(Int(b.val), "0"))
+        TestItemBigLess = A.obj.compare(BI) = -1
+    End If
+End If
+there:
+
+End Function
+Private Function TestItemBigMore(A As ValueCarrier, b As ValueCarrier) As Boolean
+On Error GoTo there
+Dim BI As BigInteger
+If A.typ = b.typ Then
+    If A.typ = 0 Then
+        If A.val > b.val Then TestItemBigMore = True
+    Else
+        TestItemBigMore = A.obj.compare(b.obj) = 1
+    End If
+ElseIf A.typ = 0 Then
+    If VarType(A.val) = vbString Then
+        TestItemBigMore = True
+    Else
+        Set BI = Module13.CreateBigInteger(Format$(Int(A.val), "0"))
+        TestItemBigMore = BI.compare(b.obj) = 1
+    End If
+Else
+    If VarType(b.val) = vbString Then
+        TestItemBigMore = False
+    Else
+        Set BI = Module13.CreateBigInteger(Format$(Int(b.val), "0"))
+        TestItemBigMore = A.obj.compare(BI) = 1
+    End If
+End If
+there:
+End Function
+
+Private Property Get itemBig(curitem As Long) As ValueCarrier
+On Error GoTo there
+Dim p
+If Arr Then
     If maxitems1 >= curitem Then
         If ItemIsObject(curitem) Then
             If actualData(curitem) Is Nothing Then
-                itemBig = 0
+                itemBig.val = ""
             ElseIf TypeOf actualData(curitem) Is PropReference Then
-                itemBig = actualData(curitem).Value
-            ElseIf TypeOf actualData(curitem) Is BigInteger Then
-                Set BI = actualData(curitem)
-                itemBig = BI.ToString
-            End If
-        Else
-                If myVarType(actualData, vbObject) Then
-                    itemBig = ""
-                    'itemBig = actualData(curitem)
-                ElseIf VarType(actualData(curitem)) = 20 Then
-                
-                    CopyMemory ByVal VarPtr(itemBig) + 8, ByVal VarPtr(actualData(curitem)) + 8, 8
-                    PutMem2 VarPtr(itemBig), 20
-                Else
-                    itemBig = actualData(curitem)
+                SwapVariant itemBig.val, actualData(curitem).Value
+                If MemInt(VarPtr(itemBig.val)) = vbObject Then
+                   itemBig.val = ""
                 End If
-        End If
-        Exit Property
-    End If
-Else
-If curitem = -2 Then
-Set itemBig = GroupRef
-ElseIf curitem < 0 Then
-If Not TypeOf GroupRef Is mHandler Then GoTo e1245
-Dim usehandler As mHandler
-Set usehandler = GroupRef
-If usehandler.T1 <> 1 Then
-e1245:
-    Err.Raise 5010, , "Need an Inventory Object"
-End If
-    If usehandler.objref.Done Then
-        If usehandler.objref.IsObj Then
-            Dim myobject As Object
-            Set myobject = usehandler.objref.ValueObj
-            If myobject Is Nothing Then
-            ElseIf TypeOf myobject Is PropReference Then
-                itemBig = myobject.Value
             ElseIf TypeOf actualData(curitem) Is BigInteger Then
-                Set BI = myobject
-                itemBig = BI.ToString
+                Set itemBig.obj = actualData(curitem)
+                itemBig.typ = 1
             End If
         Else
-            itemBig = usehandler.objref.Value
+            If myVarType(actualData, vbObject) Then
+                p = actualData(curitem)
+                Select Case VarType(p)
+                Case vbObject
+                If Not p Is Nothing Then
+                    If TypeOf p Is BigInteger Then
+                        Set itemBig.obj = p
+                        itemBig.typ = 1
+                    ElseIf TypeOf p Is PropReference Then
+                        SwapVariant p, actualData(curitem).Value
+                        If MemInt(VarPtr(itemBig.val)) = vbObject Then
+                           itemBig.val = ""
+                        End If
+                    Else
+                        itemBig.val = ""
+                    End If
+                Else
+                    itemBig.val = ""
+                End If
+                Case 20
+                    CopyMemory ByVal VarPtr(itemBig.val) + 8, ByVal VarPtr(p) + 8, 8
+                    PutMem2 VarPtr(itemBig.val), 20
+                Case 36
+                    itemBig.val = ""
+                Case Else
+                    itemBig.val = p
+                End Select
+            Else
+                Select Case VarType(actualData(curitem))
+                Case 20
+                    CopyMemory ByVal VarPtr(itemBig.val) + 8, ByVal VarPtr(actualData(curitem)) + 8, 8
+                    PutMem2 VarPtr(itemBig.val), 20
+                Case 36
+                    itemBig.val = ""
+                Case Else
+                    itemBig.val = actualData(curitem)
+                End Select
+            End If
         End If
-    Else
-        Set itemBig = usehandler
     End If
-
 End If
-'End If
-End If
-there1:
-
+there:
 End Property
 
 Friend Property Get itemObject(curitem As Long) As Variant
 On Error GoTo there1
-If arr Then
+If Arr Then
     Set itemObject = actualData(curitem)
 Else
     If curitem = -2 Then
@@ -1752,7 +1826,7 @@ End Property
 Public Property Get itemnumeric(curitem As Long) As Variant
 On Error GoTo there1
 Dim usehandler As mHandler
-If arr Then
+If Arr Then
     If maxitems1 >= curitem Then
         If IsObject(actualData(curitem)) Then
             If Typename(actualData(curitem)) = "PropReference" Then
@@ -1898,7 +1972,7 @@ Public Property Let ItemStr(curitem As Long, item As String)
 Dim usehandler As mHandler
 On Error Resume Next
 If curitem < 0 Then
-If Not arr Then
+If Not Arr Then
 If curitem <> -2 Then
 Set usehandler = GroupRef
 If usehandler.T1 <> 1 Then Err.Raise 1010, , "Need an Inventory Object"
@@ -1995,8 +2069,8 @@ For i = 0 To maxitems - 1
 actualData(i) = item
 Next i
 ElseIf myVarType(item, vbEmpty) Then
-Dim Z As Variant
-CopyMemory ByVal VarPtr(refArray), Z, 16
+Dim z As Variant
+CopyMemory ByVal VarPtr(refArray), z, 16
 If myVarType(actualData, vbObject) Then
     actualData.RedimForFlat maxitems
 Else
@@ -2122,7 +2196,7 @@ End Function
 Function IsObjAt(curitem As Long, peekvalue) As Boolean
 On Error GoTo there1
 peekvalue = Empty
-If arr Then
+If Arr Then
     If maxitems1 >= curitem Then
         If ItemIsObject(curitem) Then
             If Typename(actualData(curitem)) = "PropReference" Then
@@ -2218,14 +2292,14 @@ nmaxitems = 1
 nmaxitems1 = 0
 actualData = Array(Empty)
 CodeName = GetAnyName$
-arr = True
+Arr = True
 myarrbase = -ArrBase
 refArray = 0&
 End Sub
 
 Private Sub Class_Terminate()
-Dim Z As Variant
-CopyMemory ByVal VarPtr(refArray), Z, 16
+Dim z As Variant
+CopyMemory ByVal VarPtr(refArray), z, 16
 Set GroupRef = Nothing
 If Elements(actualData) > 0 Then
 If myVarType(actualData, vbObject) Then
@@ -2264,7 +2338,7 @@ Private Sub InsertionSort1(ByVal iMin As Long, ByVal iMax As Long)
     While i < iMax
         j = i
         Do While j > iMin
-        If itemBig(j) < itemBig(j - 1) Then
+        If TestItemBigLess(itemBig(j), itemBig(j - 1)) Then
             SwapVariant actualData(j), actualData(j - 1)
             j = j - 1
         Else
@@ -2282,11 +2356,11 @@ Private Sub InsertionSort1NSW(ByVal iMin As Long, ByVal iMax As Long)
     While i < iMax
         j = i
         Do While j > iMin
-        If itemBig(j) < itemBig(j - 1) Then
+        If TestItemBigLess(itemBig(j), itemBig(j - 1)) Then
             P1 = Empty
-             SwapVariant P1, actualData(j - 1)
-             itemBig(j - 1) = actualData(j)
-             itemBig(j) = P1
+            SwapVariant P1, actualData(j - 1)
+            item(j - 1) = CVar(actualData(j))
+            item(j) = P1
             j = j - 1
         Else
             Exit Do
@@ -2294,7 +2368,6 @@ Private Sub InsertionSort1NSW(ByVal iMin As Long, ByVal iMax As Long)
         Loop
         i = i + 1
     Wend
-    P1 = Empty
 End Sub
 Private Sub InsertionSort(ByVal iMin As Long, ByVal iMax As Long)
     Dim i As Long
@@ -2304,7 +2377,7 @@ Private Sub InsertionSort(ByVal iMin As Long, ByVal iMax As Long)
     While i < iMax
         j = i
         Do While j > iMin
-        If itemBig(j) > itemBig(j - 1) Then
+        If TestItemBigMore(itemBig(j), itemBig(j - 1)) Then
             SwapVariant actualData(j), actualData(j - 1)
             j = j - 1
         Else
@@ -2322,8 +2395,11 @@ Private Sub InsertionSortNSW(ByVal iMin As Long, ByVal iMax As Long)
     While i < iMax
         j = i
         Do While j > iMin
-        If itemBig(j) > itemBig(j - 1) Then
-            SwapVariant actualData(j), actualData(j - 1)
+        If TestItemBigMore(itemBig(j), itemBig(j - 1)) Then
+             P1 = Empty
+             SwapVariant P1, actualData(j - 1)
+             item(j - 1) = CVar(actualData(j))
+             item(j) = P1
             j = j - 1
         Else
             Exit Do
@@ -2331,133 +2407,152 @@ Private Sub InsertionSortNSW(ByVal iMin As Long, ByVal iMax As Long)
         Loop
         i = i + 1
     Wend
-    P1 = Empty
 End Sub
 
 Private Sub QuickSortItemsWithSameKey(ByVal LB As Long, ByVal UB As Long)
-Dim M1 As Long, M2 As Long, Piv
-  If UB - LB = 1 Then
-     M1 = LB
-
-     If itemBig(M1) > itemBig(UB) Then SwapVariant actualData(M1), actualData(UB)
-     Exit Sub
-  ElseIf UB - LB < 7 Then
-  InsertionSort1 LB, UB
-  Exit Sub
-  
-  Else
-    M1 = (LB + UB) \ 2
-   Piv = itemBig(M1)
-   
-           M1 = LB
-   Do While itemBig(M1) < Piv: M1 = M1 + 1: Loop
-    End If
-  
-  M2 = UB
-  Do
-    Do While itemBig(M2) > Piv: M2 = M2 - 1: Loop
-    If M1 <= M2 Then
-      If M1 <> M2 Then SwapVariant actualData(M1), actualData(M2)
-      M1 = M1 + 1
-      M2 = M2 - 1
-    End If
-    If M1 > M2 Then Exit Do
-    Do While itemBig(M1) < Piv: M1 = M1 + 1: Loop
-  Loop
-  If LB < M2 Then QuickSortItemsWithSameKey LB, M2
-  If M1 < UB Then QuickSortItemsWithSameKey M1, UB
-End Sub
-Private Sub QuickSortItemsWithSameKeyO(ByVal LB As Long, ByVal UB As Long)
-Dim M1 As Long, M2 As Long, P1, Piv
-
-    If UB - LB = 1 Then
-        M1 = LB
-        If itemBig(M1) > itemBig(UB) Then SwapVariant actualData(M1), actualData(UB)
-        Exit Sub
-    ElseIf UB - LB < 7 Then
-        InsertionSort1NSW LB, UB
-        Exit Sub
+    Dim M1 As Long, M2 As Long, Piv As ValueCarrier
+    If UB - LB < 7 Then
+        If UB - LB = 1 Then
+            M1 = LB
+            If TestItemBigMore(itemBig(M1), itemBig(UB)) Then SwapVariant actualData(M1), actualData(UB)
+            Exit Sub
+        Else
+            InsertionSort1 LB, UB
+            Exit Sub
+        End If
     Else
         M1 = (LB + UB) \ 2
         Piv = itemBig(M1)
-     
         M1 = LB
-        Do While itemBig(M1) < Piv: M1 = M1 + 1: Loop
+        Do While TestItemBigLess(itemBig(M1), Piv): M1 = M1 + 1: Loop
     End If
-    
     M2 = UB
     Do
-        Do While itemBig(M2) > Piv: M2 = M2 - 1: Loop
+        Do While TestItemBigMore(itemBig(M2), Piv): M2 = M2 - 1: Loop
         If M1 <= M2 Then
             If M1 <> M2 Then SwapVariant actualData(M1), actualData(M2)
             M1 = M1 + 1
             M2 = M2 - 1
         End If
         If M1 > M2 Then Exit Do
-        Do While itemBig(M1) < Piv: M1 = M1 + 1: Loop
+        Do While TestItemBigLess(itemBig(M1), Piv): M1 = M1 + 1: Loop
+    Loop
+    If LB < M2 Then QuickSortItemsWithSameKey LB, M2
+    If M1 < UB Then QuickSortItemsWithSameKey M1, UB
+End Sub
+Private Sub QuickSortItemsWithSameKeyO(ByVal LB As Long, ByVal UB As Long)
+Dim M1 As Long, M2 As Long, P1, Piv As ValueCarrier
+    If UB - LB < 7 Then
+        If UB - LB = 1 Then
+            M1 = LB
+            If TestItemBigMore(itemBig(M1), itemBig(UB)) Then
+                 P1 = Empty
+                 SwapVariant P1, actualData(M1)
+                 item(M1) = CVar(actualData(UB))
+                 
+                 item(UB) = P1
+            End If
+            Exit Sub
+        Else
+            InsertionSort1NSW LB, UB
+            Exit Sub
+        End If
+    Else
+        M1 = (LB + UB) \ 2
+        Piv = itemBig(M1)
+     
+        M1 = LB
+        Do While TestItemBigLess(itemBig(M1), Piv): M1 = M1 + 1: Loop
+    End If
+    
+    M2 = UB
+    Do
+        Do While TestItemBigMore(itemBig(M2), Piv): M2 = M2 - 1: Loop
+        If M1 <= M2 Then
+            If M1 <> M2 Then
+                P1 = Empty
+                SwapVariant P1, actualData(M1)
+                item(M1) = CVar(actualData(M2))
+                item(M2) = P1
+            End If
+            M1 = M1 + 1
+            M2 = M2 - 1
+        End If
+        If M1 > M2 Then Exit Do
+        Do While TestItemBigLess(itemBig(M1), Piv): M1 = M1 + 1: Loop
     Loop
     If LB < M2 Then QuickSortItemsWithSameKeyO LB, M2
     If M1 < UB Then QuickSortItemsWithSameKeyO M1, UB
 End Sub
 
 Private Sub QuickSortItemsRevWithSameKey(ByVal LB As Long, ByVal UB As Long)
-Dim M1 As Long, M2 As Long, Piv
-  If UB - LB = 1 Then
-     M1 = LB
-
-     If itemBig(M1) < itemBig(UB) Then SwapVariant actualData(M1), actualData(UB)
-     Exit Sub
-  ElseIf UB - LB < 7 Then
-  InsertionSort LB, UB
-  Exit Sub
-  
-  Else
-    M1 = (LB + UB) \ 2
-   Piv = itemBig(M1)
-   
-           M1 = LB
-   Do While itemBig(M1) > Piv: M1 = M1 + 1: Loop
-  End If
-  
-  M2 = UB
-  Do
-    Do While itemBig(M2) < Piv: M2 = M2 - 1: Loop
-    If M1 <= M2 Then
-      If M1 <> M2 Then SwapVariant actualData(M1), actualData(M2)
-      M1 = M1 + 1
-      M2 = M2 - 1
-    End If
-    If M1 > M2 Then Exit Do
-    Do While itemBig(M1) > Piv: M1 = M1 + 1: Loop
-  Loop
-  If LB < M2 Then QuickSortItemsRevWithSameKey LB, M2
-  If M1 < UB Then QuickSortItemsRevWithSameKey M1, UB
-End Sub
-Private Sub QuickSortItemsRevWithSameKeyO(ByVal LB As Long, ByVal UB As Long)
-Dim M1 As Long, M2 As Long, P1, Piv
-    If UB - LB = 1 Then
-        M1 = LB
-        If itemBig(M1) < itemBig(UB) Then SwapVariant actualData(M1), actualData(UB)
-        Exit Sub
-    ElseIf UB - LB < 7 Then
-        InsertionSortNSW LB, UB
-        Exit Sub
+Dim M1 As Long, M2 As Long, Piv As ValueCarrier
+    If UB - LB < 7 Then
+        If UB - LB = 1 Then
+              M1 = LB
+              If TestItemBigMore(itemBig(M1), itemBig(UB)) Then SwapVariant actualData(M1), actualData(UB)
+              Exit Sub
+        Else
+              InsertionSort LB, UB
+              Exit Sub
+        End If
     Else
         M1 = (LB + UB) \ 2
         Piv = itemBig(M1)
         M1 = LB
-        Do While itemBig(M1) > Piv: M1 = M1 + 1: Loop
-    End If
-    M2 = UB
-    Do
-        Do While itemBig(M2) < Piv: M2 = M2 - 1: Loop
+        Do While TestItemBigMore(itemBig(M1), Piv): M1 = M1 + 1: Loop
+  End If
+  M2 = UB
+  Do
+        Do While TestItemBigLess(itemBig(M2), Piv): M2 = M2 - 1: Loop
         If M1 <= M2 Then
             If M1 <> M2 Then SwapVariant actualData(M1), actualData(M2)
             M1 = M1 + 1
             M2 = M2 - 1
         End If
         If M1 > M2 Then Exit Do
-        Do While itemBig(M1) > Piv: M1 = M1 + 1: Loop
+        Do While TestItemBigMore(itemBig(M1), Piv): M1 = M1 + 1: Loop
+  Loop
+  If LB < M2 Then QuickSortItemsRevWithSameKey LB, M2
+  If M1 < UB Then QuickSortItemsRevWithSameKey M1, UB
+End Sub
+Private Sub QuickSortItemsRevWithSameKeyO(ByVal LB As Long, ByVal UB As Long)
+Dim M1 As Long, M2 As Long, P1, Piv As ValueCarrier
+    If UB - LB < 7 Then
+        If UB - LB = 1 Then
+            M1 = LB
+            If TestItemBigLess(itemBig(M1), itemBig(UB)) Then
+                P1 = Empty
+                SwapVariant P1, actualData(M1)
+                item(M1) = CVar(actualData(UB)) ' using cvar we handle objects too
+                item(UB) = P1
+            End If
+            Exit Sub
+        Else
+            InsertionSortNSW LB, UB
+            Exit Sub
+        End If
+    Else
+        M1 = (LB + UB) \ 2
+        Piv = itemBig(M1)
+        M1 = LB
+        Do While TestItemBigMore(itemBig(M1), Piv): M1 = M1 + 1: Loop
+    End If
+    M2 = UB
+    Do
+        Do While TestItemBigLess(itemBig(M2), Piv): M2 = M2 - 1: Loop
+        If M1 <= M2 Then
+            If M1 <> M2 Then
+                P1 = Empty
+                SwapVariant P1, actualData(M1)
+                item(M1) = CVar(actualData(M2))
+                item(M2) = P1
+            End If
+            M1 = M1 + 1
+            M2 = M2 - 1
+        End If
+        If M1 > M2 Then Exit Do
+        Do While TestItemBigMore(itemBig(M1), Piv): M1 = M1 + 1: Loop
     Loop
     If LB < M2 Then QuickSortItemsRevWithSameKeyO LB, M2
     If M1 < UB Then QuickSortItemsRevWithSameKeyO M1, UB
@@ -2536,18 +2631,18 @@ Public Function UnsignedAdd(ByVal lUnsignedPtr As Long, ByVal lSignedOffset As L
 End Function
 
 Private Sub iBoxArray_AppendArray(K As iBoxArray)
-Dim Z As tuple
-If Not K Is Nothing Then If TypeOf K Is tuple Then Set Z = K
-AppendArray Z
-Set K = Z
+Dim z As tuple
+If Not K Is Nothing Then If TypeOf K Is tuple Then Set z = K
+AppendArray z
+Set K = z
 End Sub
 
 Private Property Let iBoxArray_Arr(ByVal RHS As Boolean)
-    arr = RHS
+    Arr = RHS
 End Property
 
 Private Property Get iBoxArray_Arr() As Boolean
-    iBoxArray_Arr = arr
+    iBoxArray_Arr = Arr
 End Property
 
 Private Property Let iBoxArray_arrname(ByVal RHS As String)
@@ -2583,38 +2678,38 @@ Private Property Get iBoxArray_common() As Boolean
 End Property
 
 Private Sub iBoxArray_CopyArray(K As iBoxArray)
-Dim Z As tuple
-If Not K Is Nothing Then If TypeOf K Is tuple Then Set Z = K
-CopyArray Z
-Set K = Z
+Dim z As tuple
+If Not K Is Nothing Then If TypeOf K Is tuple Then Set z = K
+CopyArray z
+Set K = z
 End Sub
 
 Private Sub iBoxArray_CopyArrayRev(K As iBoxArray)
-Dim Z As tuple
-If Not K Is Nothing Then If TypeOf K Is tuple Then Set Z = K
-CopyArrayRev Z
-Set K = Z
+Dim z As tuple
+If Not K Is Nothing Then If TypeOf K Is tuple Then Set z = K
+CopyArrayRev z
+Set K = z
 End Sub
 
 Private Sub iBoxArray_CopyArrayRevFast(K As iBoxArray)
-Dim Z As tuple
-If Not K Is Nothing Then If TypeOf K Is tuple Then Set Z = K
-CopyArrayRevFast Z
-Set K = Z
+Dim z As tuple
+If Not K Is Nothing Then If TypeOf K Is tuple Then Set z = K
+CopyArrayRevFast z
+Set K = z
 End Sub
 
 Private Sub iBoxArray_CopyArraySlice(K As iBoxArray, fromS As Long, toS As Long)
-Dim Z As tuple
-If Not K Is Nothing Then If TypeOf K Is tuple Then Set Z = K
-CopyArraySlice Z, fromS, toS
-Set K = Z
+Dim z As tuple
+If Not K Is Nothing Then If TypeOf K Is tuple Then Set z = K
+CopyArraySlice z, fromS, toS
+Set K = z
 End Sub
 
 Private Sub iBoxArray_CopyArraySliceFast(K As iBoxArray, fromS As Long, toS As Long)
-Dim Z As tuple
-If Not K Is Nothing Then If TypeOf K Is tuple Then Set Z = K
-iBoxArray_CopyArraySliceFast Z, fromS, toS
-Set K = Z
+Dim z As tuple
+If Not K Is Nothing Then If TypeOf K Is tuple Then Set z = K
+iBoxArray_CopyArraySliceFast z, fromS, toS
+Set K = z
 End Sub
 
 Private Property Get iBoxArray_count() As Long
@@ -2770,8 +2865,8 @@ Private Sub iBoxArray_PushEnd(Optional thisarr As Variant)
     End If
 End Sub
 
-Private Sub iBoxArray_PushProp(a As Variant)
-PushProp a
+Private Sub iBoxArray_PushProp(A As Variant)
+PushProp A
 End Sub
 
 Private Property Set iBoxArray_refgroup(ByVal RHS As Object)

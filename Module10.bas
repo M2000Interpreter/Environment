@@ -22,7 +22,7 @@ Private Enum CALLINGCONVENTION_ENUM
   CC_MPWCDECL
   CC_MPWPASCAL
 End Enum
-Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
+Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (Arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
 Private Declare Function SafeArrayGetDim Lib "OleAut32.dll" (ByVal Ptr As Long) As Long
 Private Declare Function vbaVarLateMemSt Lib "msvbvm60" _
                          Alias "__vbaVarLateMemSt" ( _
@@ -1551,14 +1551,14 @@ Public Function URLEncodeEsc(cc As String, Optional space_as_plus As Boolean = F
         URLEncodeEsc = Join(res, "")
     End If
 End Function
-Function DecodeEscape(c$, plus_as_space As Boolean) As String
-If plus_as_space Then c$ = Replace(c$, "+", " ")
-Dim a() As String, i As Long
-a() = Split(c$, "%")
-For i = 1 To UBound(a())
-a(i) = Chr(val("&h" + Left$(a(i), 2))) + Mid$(a(i), 3)
+Function DecodeEscape(C$, plus_as_space As Boolean) As String
+If plus_as_space Then C$ = Replace(C$, "+", " ")
+Dim A() As String, i As Long
+A() = Split(C$, "%")
+For i = 1 To UBound(A())
+A(i) = Chr(val("&h" + Left$(A(i), 2))) + Mid$(A(i), 3)
 Next i
-DecodeEscape = utf8decode(StrConv(Join(a(), ""), vbFromUnicode))
+DecodeEscape = utf8decode(StrConv(Join(A(), ""), vbFromUnicode))
 
 End Function
 Sub ClearState1()
@@ -2854,6 +2854,10 @@ NotArray1:
                             Set usehandler = Nothing
                             Set myobject = Nothing
                             Set bstack.lastobj = Nothing
+                        ElseIf IsStrExp(bstack, b$, sw$) Then
+                            p = ""
+                            SwapString2Variant sw$, p
+                            myobject.Compute2 p, ss$
                         Else
                         
                             myobject.Compute3 ss$
@@ -3887,7 +3891,7 @@ againarray:
         If ppppAny Is Nothing Then
             GoTo err000
         End If
-        If Not ppppAny.arr Then
+        If Not ppppAny.Arr Then
             If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , True, idx) Then GoTo errorarr
         ElseIf FastSymbol(b$, ")") Then
             
@@ -3923,7 +3927,7 @@ againarray:
                     Else
                         Set pppp1 = New mArray: pppp1.PushDim (1): pppp1.PushEnd
                         pppp1.SerialItem 0, 2, 9
-                        pppp1.arr = True
+                        pppp1.Arr = True
                         If bstack.lastobj Is Nothing Then
                             pppp1.item(0) = p
                         Else
@@ -3958,7 +3962,7 @@ here66678:
 '*********************************************
     With ppppAny
         If ppppAny.Final Then CantAssignValue: GoTo err000
-        If Not .arr Then
+        If Not .Arr Then
             If v = -2 Then GoTo con123
             If IsGroup(.item(v)) Then GoTo a1297654
             If .IsObj Then
@@ -4102,7 +4106,7 @@ a1297654:
     End With
     With ppppAny
         If FastSymbol(b$, ":=", , 2) Then
-            If Not .arr Then GoTo NotArray1
+            If Not .Arr Then GoTo NotArray1
     ' new on rev 20
 contassignhere:
             If GetData(bstack, b$, myobject) Then
@@ -4413,7 +4417,7 @@ again12569:
                 Set bstack.lastobj = Nothing
                 Set bstack.lastpointer = Nothing
                 If extreme Then GoTo NewCheck2 Else GoTo NewCheck
-            ElseIf Not ppppAny.arr Then
+            ElseIf Not ppppAny.Arr Then
                 Set ppppAny.item(v) = bstack.lastobj
                 If extreme Then GoTo NewCheck2 Else GoTo NewCheck
             End If
@@ -4431,7 +4435,7 @@ again12569:
             Else
                 If Not bstack.lastobj Is Nothing Then
                     If TypeOf bstack.lastobj Is iBoxArray Then
-                        If bstack.lastobj.arr Then
+                        If bstack.lastobj.Arr Then
                             Set ppppAny.item(v) = CopyArray(bstack.lastobj)
                         Else
                             Set ppppAny.item(v) = bstack.lastobj
@@ -4466,7 +4470,7 @@ again12569:
         
         Set bstack.lastobj = Nothing
      Else
-        If ppppAny.arr Then
+        If ppppAny.Arr Then
             If IsArrayGroup(ppppAny, v) Then
 here12500:
                 If ppppAny.item(v).IamApointer Then
@@ -4505,7 +4509,7 @@ here65654:
             myProp.PushIndexes idx
             myProp.Value = p
             Set myProp = Nothing
-        ElseIf Not ppppAny.arr Then
+        ElseIf Not ppppAny.Arr Then
              If IsmHandler(ppppAny.GroupRef) Then
              
              Set usehandler = ppppAny.GroupRef
@@ -4582,7 +4586,7 @@ MakeArray bstack, W$, 6, b$, ppppAny, NewStat, VarStat
         sss = Len(b$): ExecuteVar = 4: Exit Function
 End If
 If neoGetArray(bstack, W$, ppppAny, , , , True) Then
-    If Not ppppAny.arr Then
+    If Not ppppAny.Arr Then
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , , idx) Then GoTo err000
 GoTo there12567
 ElseIf FastSymbol(b$, ")") Then
@@ -4661,7 +4665,7 @@ ElseIf FastSymbol(b$, ")") Then
                 Else
             Set pppp1 = New mArray: pppp1.PushDim (1): pppp1.PushEnd
             pppp1.SerialItem 0, 2, 9
-            pppp1.arr = True
+            pppp1.Arr = True
             If bstack.lastobj Is Nothing Then
                 pppp1.item(0) = vbNullString
             Else
@@ -4684,7 +4688,7 @@ againstrarr:
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
 there12567:
-    If ppppAny.arr Then
+    If ppppAny.Arr Then
         If IsArrayArray(ppppAny, v) Then
             If FastSymbol(b$, "(") Then
                 Set ppppAny = ppppAny.item(v)
@@ -4727,7 +4731,7 @@ checkpar:
         If Not TypeOf ppppAny Is mArray Then
             GoTo WrongObj
         End If
-        If ppppAny.arr Then
+        If ppppAny.Arr Then
             If FastSymbol(b$, ":=", , 2) Then GoTo contassignhere
         End If
         If IsOperator(b$, "+=", 2) Then
@@ -4833,7 +4837,7 @@ jmp1112:
     If Not MyIsObject(ppppAny.item(v)) Then
     
     If TypeOf ppppAny Is mArray Then
-        If ppppAny.arr Then
+        If ppppAny.Arr Then
         
         If ppppAny.Count = 0 Then
             ppppAny.GroupRef.Value = ss$
@@ -4841,7 +4845,7 @@ jmp1112:
             ppppAny.ItemStr(v) = ss$
         Else
             If IsobjArray(bstack.lastobj) Then
-                If bstack.lastobj.arr Then
+                If bstack.lastobj.Arr Then
                     Set ppppAny.item(v) = CopyArray(bstack.lastobj)
                 Else
                     Set ppppAny.item(v) = bstack.lastobj.GroupRef
@@ -5545,7 +5549,7 @@ If neoGetArray(bstack, W$, ppppAny) Then
 againintarr:
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
-If IsArrayArray(ppppAny, v) And ppppAny.arr Then
+If IsArrayArray(ppppAny, v) And ppppAny.Arr Then
 If FastSymbol(b$, "(") Then
 Set ppppAny = ppppAny.item(v)
 GoTo againintarr
@@ -5630,7 +5634,7 @@ End If
     If Not IsExp(bstack, b$, p) Then MissNumExpr: GoTo err000
     If Not bstack.lastobj Is Nothing Then
         If IsobjArray(bstack.lastobj) Then
-            If bstack.lastobj.arr Then
+            If bstack.lastobj.Arr Then
                 Set ppppAny.item(v) = CopyArray(bstack.lastobj)
             Else
                 Set ppppAny.item(v) = bstack.lastobj
@@ -6118,7 +6122,7 @@ Case 5, 7
                     Set ppppl.item(it) = myobject
                     Set myobject = Nothing
                 ElseIf TypeOf myobject Is iBoxArray Then
-                    If myobject.arr Then
+                    If myobject.Arr Then
                         Set ppppl.item(it) = CopyArray(myobject)
                     Else
                         Set ppppl.item(it) = myobject
@@ -6186,7 +6190,7 @@ Case 6
                     Set ppppl.item(it) = myobject
                     Set myobject = Nothing
                 ElseIf TypeOf myobject Is iBoxArray Then
-                    If myobject.arr Then
+                    If myobject.Arr Then
                         Set ppppl.item(it) = CopyArray(myobject)
                     Else
                         Set ppppl.item(it) = myobject
@@ -8808,7 +8812,7 @@ a39439494:
                         MyRead = True
                         GoTo loopcont123
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.arr Then
+                        If myobject.Arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -8905,7 +8909,7 @@ a39439494:
                         Set ppppl.item(it) = myobject
                         Set myobject = Nothing
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.arr Then
+                        If myobject.Arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -9216,8 +9220,8 @@ Public Function IntSqrdEC(sA) As Variant
         OverflowValue vbDecimal
         Exit Function
     End If
-    Dim q, r, t, Z
-    Z = CDec(sA)
+    Dim q, r, t, z
+    z = CDec(sA)
     r = CDec("0")
     q = CDec("1")
     Do
@@ -9226,16 +9230,16 @@ Public Function IntSqrdEC(sA) As Variant
     Do
         If q <= 1 Then Exit Do
         q = Int(q / 4&)
-        t = Z - r - q
+        t = z - r - q
         r = Int(r / 2)
         If t >= -1 Then
-            Z = t
+            z = t
             r = r + q
         End If
     Loop
     IntSqrdEC = r
 End Function
-Function CopyBigInteger(p, Optional a) As BigInteger
+Function CopyBigInteger(p, Optional A) As BigInteger
     Dim check As BigInteger
     Set check = p
     If check.Unique Then
@@ -9243,8 +9247,8 @@ Function CopyBigInteger(p, Optional a) As BigInteger
     Exit Function
     End If
     Set CopyBigInteger = New BigInteger
-    If Not IsMissing(a) Then
-        CopyBigInteger.Load2 p, a
+    If Not IsMissing(A) Then
+        CopyBigInteger.Load2 p, A
     Else
         CopyBigInteger.Load2 p
     End If
