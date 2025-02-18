@@ -313,11 +313,18 @@ Dim ss$, skip As Boolean, checktype As Boolean
     ElseIf IsLabelSymbolNew(b$, "лецакосайеяаиос", "BIGINTEGER", Lang) Then
         Set p = New BigInteger
         If FastSymbol(b$, "=") Then
-        If Not IsNumberD2(b$, p) Then missNumber: Exit Function
-            
-        End If
-        If MemInt(VarPtr(p)) = vbString Then
-            Set p = Module13.CreateBigInteger(CStr(p))
+            If ISSTRINGA(b$, ss$) Then
+                Set p = Module13.CreateBigInteger(ss$)
+            ElseIf Not IsNumberD2(b$, p, True, True) Then
+                missNumber
+                Exit Function
+            Else
+                If MemInt(VarPtr(p)) = vbString Then
+                    Set p = Module13.CreateBigInteger(CStr(p))
+                Else
+                    Set p = Module13.CreateBigInteger(Format(Int(p), "0"))
+                End If
+            End If
         End If
     ElseIf Not IsEnumAs(bstack, b$, p) Then
             ExpectedEnumType
@@ -458,7 +465,7 @@ ElseIf ss$ = "*=" Then
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.multiply(Module13.CreateBigInteger(CStr(Int(p))))
+            Set BI = BI.multiply(Module13.CreateBigInteger(Format$(Int(p), "0")))
         End If
      End If
 ElseIf ss$ = "/=" Then
@@ -473,7 +480,7 @@ contdiv:
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.divide(Module13.CreateBigInteger(CStr(Int(p))))
+            Set BI = BI.divide(Module13.CreateBigInteger(Format$(Int(p), "0")))
         End If
     End If
 
@@ -488,7 +495,7 @@ ElseIf ss$ = "+=" Then
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.Add(Module13.CreateBigInteger(CStr(Int(p))))
+            Set BI = BI.Add(Module13.CreateBigInteger(Format$(Int(p), "0")))
         End If
     End If
 ElseIf ss$ = "-=" Then
@@ -501,7 +508,7 @@ ElseIf ss$ = "-=" Then
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.subtract(Module13.CreateBigInteger(CStr(Int(p))))
+            Set BI = BI.subtract(Module13.CreateBigInteger(Format$(Int(p), "0")))
         End If
     End If
 Else
@@ -516,7 +523,7 @@ Else
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.Modulus(Module13.CreateBigInteger(CStr(Int(p))))
+            Set BI = BI.Modulus(Module13.CreateBigInteger(Format$(Int(p), "0")))
         End If
     End If
     Case "DIV", "диа"
@@ -551,7 +558,7 @@ Case 4
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.Add(Module13.CreateBigInteger(CStr(Int(p))))
+            Set BI = BI.Add(Module13.CreateBigInteger(Format$(Int(p), "0")))
         End If
 Case 5
         If Not bstack.lastobj Is Nothing Then
@@ -562,7 +569,7 @@ Case 5
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.subtract(Module13.CreateBigInteger(CStr(Int(p))))
+            Set BI = BI.subtract(Module13.CreateBigInteger(Format$(Int(p), "0")))
         End If
 Case 6
        If Not bstack.lastobj Is Nothing Then
@@ -574,7 +581,7 @@ Case 6
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.multiply(Module13.CreateBigInteger(CStr(Int(p))))
+            Set BI = BI.multiply(Module13.CreateBigInteger(Format$(Int(p), "0")))
         End If
 Case 7
         If Not bstack.lastobj Is Nothing Then
@@ -586,7 +593,7 @@ Case 7
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.divide(Module13.CreateBigInteger(CStr(Int(p))))
+            Set BI = BI.divide(Module13.CreateBigInteger(Format$(Int(p), "0")))
         End If
 Case 8
         If Not bstack.lastobj Is Nothing Then
@@ -597,7 +604,7 @@ Case 8
                 GoTo WrongObj
             End If
         Else
-            Set BI = Module13.CreateBigInteger(CStr(Int(p)))
+            Set BI = Module13.CreateBigInteger(Format$(Int(p), "0"))
         End If
 Case Else
     WrongOperator
@@ -1553,12 +1560,12 @@ Public Function URLEncodeEsc(cc As String, Optional space_as_plus As Boolean = F
 End Function
 Function DecodeEscape(C$, plus_as_space As Boolean) As String
 If plus_as_space Then C$ = Replace(C$, "+", " ")
-Dim A() As String, i As Long
-A() = Split(C$, "%")
-For i = 1 To UBound(A())
-A(i) = Chr(val("&h" + Left$(A(i), 2))) + Mid$(A(i), 3)
+Dim a() As String, i As Long
+a() = Split(C$, "%")
+For i = 1 To UBound(a())
+a(i) = Chr(val("&h" + Left$(a(i), 2))) + Mid$(a(i), 3)
 Next i
-DecodeEscape = utf8decode(StrConv(Join(A(), ""), vbFromUnicode))
+DecodeEscape = utf8decode(StrConv(Join(a(), ""), vbFromUnicode))
 
 End Function
 Sub ClearState1()
@@ -2366,7 +2373,7 @@ misnum:                     MissNumExpr
                                 If TypeOf var(v) Is BigInteger Then
                                     On Error GoTo C12313
                                     If MyIsNumeric(p) Then
-                                        Set var(v) = Module13.CreateBigInteger(CStr(Int(p)))
+                                        Set var(v) = Module13.CreateBigInteger(Format$(Int(p), "0"))
                                     Else
                                         Set var(v) = Module13.CreateBigInteger(CStr(p))
                                     End If
@@ -3965,10 +3972,10 @@ here66678:
         If Not .Arr Then
             If v = -2 Then GoTo con123
             If IsGroup(.item(v)) Then GoTo a1297654
-            If .IsObj Then
+            If .isObj Then
             If IsmHandler(.GroupRef) Then
             Set usehandler = .GroupRef
-            If usehandler.objref.IsObj Then
+            If usehandler.objref.isObj Then
             Set usehandler = Nothing
             Set myobject = .item(v)
             If Not myobject Is Nothing Then
@@ -5282,7 +5289,7 @@ takeitnow:
                                             p = p + 1
                                             
                                             If bstack.lastobj Is Nothing Then
-                                            Set sp = Module13.CreateBigInteger(CStr(Int(sp)))
+                                            Set sp = Module13.CreateBigInteger(Format$(Int(sp), "0"))
                                             ElseIf TypeOf bstack.lastobj Is BigInteger Then
                                             Set sp = bstack.lastobj
                                             Set bstack.lastobj = Nothing
@@ -7737,6 +7744,26 @@ checkTypeagain:
                         MyRead = False
                         Exit Function
                     End If
+                ElseIf FastSymbol(rest$, "=") Then
+                    If TypeOf myobject Is BigInteger Then
+                        Set p = New BigInteger
+                        If IsNumberD2(rest$, p, True) Then
+                            If VarType(p) = vbString Then
+                                If LCase(Left$(rest$, 1)) <> "u" Then
+                                    WrongType
+                                    Exit Function
+                                End If
+                                Mid$(rest$, 1, 1) = " "
+                            Else
+                                WrongType
+                                Exit Function
+                            End If
+      
+                        Else
+                            SyntaxError
+                            Exit Function
+                        End If
+                    End If
                 End If
 contsethere:
                     Set var(i) = myobject
@@ -7836,7 +7863,8 @@ conthereEnum:
                         ihavetype = False
                     Case "лецакосайеяаиос", "BIGINTEGER"
                         If FastSymbol(rest$, "=") Then optlocal = Not useoptionals: useoptionals = True: If Not IsNumberD2(rest$, (p)) Then missNumber: Exit Function
-                        Set p = Module13.CreateBigInteger(CStr(CDec(p)))
+                        
+                        Set p = Module13.CreateBigInteger(Format$(Int(p), "0"))
                     Case "ьгжио", "BYTE"
                         If FastSymbol(rest$, "=") Then optlocal = Not useoptionals: useoptionals = True: If Not IsNumberD2(rest$, (p)) Then missNumber: Exit Function
                         p = CByte(p)
@@ -7875,7 +7903,9 @@ messnotype:
                         End If
                     End Select
                 ElseIf FastSymbol(rest$, "=") Then
-                    If Not IsNumberD2(rest$, (p)) Then
+                    Dim pp
+                    Set pp = ZeroBig
+                    If Not IsNumberD2(rest$, pp, True) Then
                         If IsEnumLabelOnly(bstack, rest$) Then
                             Set usehandler = bstack.lastobj
                             Set bstack.lastobj = Nothing
@@ -7886,6 +7916,72 @@ messnotype:
                         Else
                             missNumber
                             Exit Function
+                        End If
+                    Else
+                    If Len(rest$) > 0 Then
+                        If MemInt(VarPtr(p)) = vbString Then
+                            WrongType
+                            Exit Function
+                        End If
+                        Select Case Left$(rest$, 1)
+                        Case "&"
+                        If Left$(rest$, 2) = "&&" Then
+                            If MemInt(VarPtr(p)) <> 20 Then
+                            p = cInt64(p)
+                            End If
+                            Mid$(rest$, 1, 2) = "  "
+                        Else
+                            If MemInt(VarPtr(p)) <> vbLong Then
+                                p = CLng(p)
+                            End If
+                            Mid$(rest$, 1, 1) = " "
+                        End If
+                        Case "u", "U"
+                            Select Case Mid$(rest$, 2, 1)
+                            Case "D", "d"
+                                    If MemInt(VarPtr(p)) <> vbDate Then
+                                    p = CDate(p)
+                                    End If
+                                    Mid$(rest$, 1, 1) = " "
+                            Case "B", "b"
+                                    If MemInt(VarPtr(p)) <> vbByte Then
+                                    p = CByte(p)
+                                    End If
+                                    Mid$(rest$, 1, 1) = " "
+                            Case Else
+                            ' it is biginteger
+                            Set p = Module13.CreateBigInteger(Format$(Int(p), "0"))
+                            Mid$(rest$, 1, 1) = " "
+
+                            End Select
+                            
+                            
+                        Case "~"
+                            If MemInt(VarPtr(p)) <> vbSingle Then
+                                p = CSng(p)
+                            End If
+                            Mid$(rest$, 1, 1) = " "
+                        Case "#"
+                            If MemInt(VarPtr(p)) <> vbCurrency Then
+                                p = CCur(p)
+                            End If
+                            Mid$(rest$, 1, 1) = " "
+                        Case "@"
+                            If MemInt(VarPtr(p)) <> vbDecimal Then
+                                p = CDec(p)
+                            End If
+                            Mid$(rest$, 1, 1) = " "
+                        Case "%"
+                            If MemInt(VarPtr(p)) <> vbInteger Then
+                                p = CInt(p)
+                            End If
+                            Mid$(rest$, 1, 1) = " "
+                        Case Else
+                            If MemInt(VarPtr(p)) <> vbDouble Then
+                                p = CDbl(p)
+                            End If
+                            Mid$(rest$, 1, 1) = " "
+                        End Select
                         End If
                     End If
                 ElseIf lookOne(rest$, "|") Then
@@ -8248,8 +8344,14 @@ islist:
                                         useoptionals = False
                                         If FastSymbol(rest$, "=") Then
                                             Set p = New BigInteger
-                                            If IsNumberD2(rest$, p, True, True) Then
+                                            If ISSTRINGA(rest$, ss$) Then
+                                                Set p = Module13.CreateBigInteger(ss$)
+                                            ElseIf IsNumberD2(rest$, p, True, True) Then
+                                                If MemInt(VarPtr(p)) = vbString Then
                                                 Set p = Module13.CreateBigInteger(CStr(p))
+                                                Else
+                                                Set p = Module13.CreateBigInteger(Format$(Int(p), "0"))
+                                                End If
                                             Else
                                                 missNumber
                                                 Exit Function
@@ -9239,7 +9341,7 @@ Public Function IntSqrdEC(sA) As Variant
     Loop
     IntSqrdEC = r
 End Function
-Function CopyBigInteger(p, Optional A) As BigInteger
+Function CopyBigInteger(p, Optional a) As BigInteger
     Dim check As BigInteger
     Set check = p
     If check.Unique Then
@@ -9247,8 +9349,8 @@ Function CopyBigInteger(p, Optional A) As BigInteger
     Exit Function
     End If
     Set CopyBigInteger = New BigInteger
-    If Not IsMissing(A) Then
-        CopyBigInteger.Load2 p, A
+    If Not IsMissing(a) Then
+        CopyBigInteger.Load2 p, a
     Else
         CopyBigInteger.Load2 p
     End If

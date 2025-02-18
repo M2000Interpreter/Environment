@@ -1,47 +1,11 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 11 active-X
-1. Sort for tuple now work fine for Biginteger:
-function prepareArray {
-	dim a(4) as BIGINTEGER=-32u
-	a(0)=120u
-	a(1)=15u
-	=a()   ' this is mArray type
-}
-// cons()  comes form lisp, but here add a list of arrays or and tuple and return a tuple.
-for this { // this is a block for temporary definitions
-	a=cons(prepareArray())#expanse(10)
-	print type$(a)="tuple"
-	return a, 2:=23244u
-	def type(x)=type$(x)
-	Print type(a#val(0))
-	Print a#sort()
-}
-// so now we have no variables
-for this {
-	a=prepareArray()
-	print type$(a)="mArray"
-	return a, 2:=23244u
-	def type(x)=type$(x)
-	Print type(a#val(0))
-	try ok {
-		Print a#sort()
-	}
-	If error or not ok Then Print Error$
-	// this say: Invalid item for sorting. I found object
-	// BigInteger is an object.
-}
-
-
-2. #MAT() fixed for string values:
-a=(,)
-a=a#expanse(120)#mat("=", "Hello")#mat("+=", " World")
-aa=each(A)
-while aa
-	print format$("{0:-3}",aa^);")"+array(aa)
-	aa=each(A, aa^+10)  ' this is the Step 10
-end while
-
+Version 13 revision 12 active-X
+1. Input statement now can used for BigIntegers (for console input)
+2. Numbers including BigNumbers can use undersocre on code (now fixed for all situations).
+3. I put the new formula for converting numbers to BigIntegers (based of the formula used in sort for tuples). The new formula use this VB6 functions: format(int(p),"0") so with this we expand the exponent e.g 1.e30 is 1000000000000000000000000000000, so now we can convert it to biginteger (previous was Cstr(Int(p)) and the 1.e30 converted to "1.e30" which can't convert to biginteger.
+This is the equivalent function of M2000 (which internal call format())
+Print str$(1e30, "0")="1000000000000000000000000000000"
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

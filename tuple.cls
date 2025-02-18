@@ -408,7 +408,7 @@ Do While v <= Me.UpperMonoLimit
         If TypeOf actualData(v) Is BigInteger Then
             Set BI = actualData(v)
             If BI2 Is Nothing Then
-                Set BI2 = Module13.CreateBigInteger(CStr(Int(p)))
+                Set BI2 = Module13.CreateBigInteger(Format$(Int(p), "0"))
             End If
             bigintOperations CVar(BI2), BI, ss$
             If ctype Then

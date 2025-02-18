@@ -47038,24 +47038,24 @@ MODULE TRANS {Module Matrix_Transposition {
 Matrix_Transposition
 }
 MODULE VER13 {a=(1,2,3,4)
-Print type$(a)="tuple"
+print type$(a)="tuple"
 link a to a()  ' a and a() point to same data site
-Print type$(a())="tuple"
+print type$(a())="tuple"
 dim b()
 b()=a  ' this is a copy from tuple to mArray
-Print type$(b())="mArray"
+print type$(b())="mArray"
 b(2)+=100
 ' the a() interface works for copy | the a=b() just alter the pointer.
 a()=b()  ' this is a copy from mArray to tuple
-Print type$(a())="tuple"
-Print a(2)=103
-Print a#val(2)=103   ' a is a pointer to tuple
+print type$(a())="tuple"
+print a(2)=103
+print a#val(2)=103   ' a is a pointer to tuple
 b=b()
-Print type$(b)="mArray"
+print type$(b)="mArray"
 a=b  ' this can be done
 print a is b  ' true
 print type$(a)="mArray"
-Print type$(a())="mArray"
+print type$(a())="mArray"
 k=car(b())
 print type$(k)="tuple"
 k1=cdr(b())
@@ -47075,15 +47075,13 @@ function alfa(x) {
 }
 
 w=alfa(20)
-Print type$(w)="mArray",  len(w)=20
+print type$(w)="mArray",  len(w)=20
 big1=w#val(4)
-Print  type$(big1)
+print  type$(big1)="BigInteger"
 q=cons(w) ' copy as tuple ' but now we have long type
-? len(q)
-exit
-Print type$(q)
-
+print len(q)=20
+print type$(q)="tuple"
 big=q#val(3)
-? type$(big)
+print type$(big)="BigInteger"
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

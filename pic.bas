@@ -339,11 +339,11 @@ Public Function LowLong(ByVal p) As Long
     If Not myVarType(p, 20) Then p = cInt64(p)
     LowLong = MemLong(VarPtr(p) + 8)
 End Function
-Function Hex64$(a, Optional bytes = 8)
-    Dim p, P1, Z
-    Z = cInt64(a)
-    p = MemLong(VarPtr(Z) + 8)
-    P1 = MemLong(VarPtr(Z) + 12)
+Function Hex64$(A, Optional bytes = 8)
+    Dim p, P1, z
+    z = cInt64(A)
+    p = MemLong(VarPtr(z) + 8)
+    P1 = MemLong(VarPtr(z) + 12)
     Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
 End Function
 Public Function OneLongLong() As Variant
@@ -370,18 +370,18 @@ Public Function MaskLowLongLong() As Variant
     End If
     MaskLowLongLong = p
 End Function
-Public Function Signed(a) As Long
+Public Function Signed(A) As Long
     Dim p
-    p = Fix(CDec(a))
+    p = Fix(CDec(A))
     Signed = MemLong(VarPtr(p) + 8)
 End Function
-Public Function UnsignedSub(a As Long, b As Long)
+Public Function UnsignedSub(A As Long, b As Long)
     Static ua, UB
     If ua = Empty Then
         MemInt(VarPtr(ua)) = 20
         MemInt(VarPtr(UB)) = 20
     End If
-    MemLong(VarPtr(ua) + 8) = a
+    MemLong(VarPtr(ua) + 8) = A
     MemLong(VarPtr(UB) + 8) = b
     ua = ua - UB
     UnsignedSub = MemLong(VarPtr(ua) + 8)
@@ -389,7 +389,7 @@ End Function
 
 Public Function cInt64(p)
     Static maxlonglong, limitlonglong, OneLongLong, OneBigLongLong
-    Dim a, i As Integer
+    Dim A, i As Integer
     If MemInt(VarPtr(maxlonglong)) = 0 Then
         maxlonglong = CDec("18446744073709551616")
         limitlonglong = CDec("9223372036854775808")
@@ -401,13 +401,13 @@ Public Function cInt64(p)
     i = MemInt(VarPtr(p))
     Select Case i
     Case vbDecimal
-        a = Fix(p)
-        a = a - Int(a / maxlonglong) * maxlonglong
-        If a < -limitlonglong - 1 Then
-            While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
+        A = Fix(p)
+        A = A - Int(A / maxlonglong) * maxlonglong
+        If A < -limitlonglong - 1 Then
+            While A <= -limitlonglong - 1: A = A + maxlonglong: Wend
         End If
-        While a >= limitlonglong: a = a - maxlonglong: Wend
-        cInt64 = -OneLongLong And a
+        While A >= limitlonglong: A = A - maxlonglong: Wend
+        cInt64 = -OneLongLong And A
     Case 20
         cInt64 = p
     Case vbLong, vbInteger
@@ -415,17 +415,17 @@ Public Function cInt64(p)
     Case Else
         On Error GoTo er1
         
-        a = Fix(CDec(p))
-        If a > limitlonglong Or a <= -limitlonglong Then
-        a = a - Int(a / (maxlonglong)) * (maxlonglong)
-        If a <= -limitlonglong - 1 Then
-            While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
+        A = Fix(CDec(p))
+        If A > limitlonglong Or A <= -limitlonglong Then
+        A = A - Int(A / (maxlonglong)) * (maxlonglong)
+        If A <= -limitlonglong - 1 Then
+            While A <= -limitlonglong - 1: A = A + maxlonglong: Wend
         End If
-        While a >= limitlonglong: a = a - maxlonglong: Wend
+        While A >= limitlonglong: A = A - maxlonglong: Wend
         End If
-        cInt64 = -OneLongLong And a
+        cInt64 = -OneLongLong And A
         If i = vbString Then
-            If Left$(p, 1) = "&" And a < 0 Then
+            If Left$(p, 1) = "&" And A < 0 Then
             Select Case Len(p)
             Case 10
                 If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) > 0 Then
@@ -445,40 +445,40 @@ Public Function cInt64(p)
 er1:
     cInt64 = OneLongLong - OneLongLong
 End Function
-Public Sub PlaceIcon(a As StdPicture)
+Public Sub PlaceIcon(A As StdPicture)
 On Error Resume Next
 If UseMe Is Nothing Then Exit Sub
-UseMe.GetIcon a
+UseMe.GetIcon A
 End Sub
-Public Sub PlaceCaption(ByVal a$)
+Public Sub PlaceCaption(ByVal A$)
 Dim m As Callback, f As Form
 On Error Resume Next
 Set f = Screen.ActiveForm
 If UseMe Is Nothing Then Exit Sub
     If Not UseMe.IamVisible Then
-        If Len(a$) = 0 Then a$ = "M2000" Else Set f = Nothing
-        Form1.CaptionW = a$
+        If Len(A$) = 0 Then A$ = "M2000" Else Set f = Nothing
+        Form1.CaptionW = A$
         If UseMe.IhaveExtForm Then
-        UseMe.SetExtCaption a$
+        UseMe.SetExtCaption A$
         Else
         
             Form3.Timer1.Interval = 30
             Form3.Timer1.enabled = True
-            Form3.CaptionWsilent = a$
-            Form3.CaptionW = a$
+            Form3.CaptionWsilent = A$
+            Form3.CaptionW = A$
             Form1.CaptionW = vbNullString
             Form3.WindowState = 0
         End If
 Else
-    If a$ = vbNullString Then
-        If UseMe.IhaveExtForm Then UseMe.SetExtCaption a$
+    If A$ = vbNullString Then
+        If UseMe.IhaveExtForm Then UseMe.SetExtCaption A$
         Form1.CaptionW = vbNullString
         Form1.Visible = False
     Else
         If UseMe.IhaveExtForm Then
-            UseMe.SetExtCaption a$
+            UseMe.SetExtCaption A$
         End If
-        Form1.CaptionW = a$
+        Form1.CaptionW = A$
        
         
         If f Is Form1 Then
@@ -655,30 +655,30 @@ Function check_mem() As Long
 '
 ' Implemantation of string bitmaps
 ' Width - Heigth - DATA
-Public Function cDib(a, mdib As cDIBSection) As Boolean
+Public Function cDib(A, mdib As cDIBSection) As Boolean
 On Error GoTo e1111
 cDib = False
-If Len(a) >= 12 Then
+If Len(A) >= 12 Then
 ' read magicNo, witdh, height
-If Left$(a, 4) = "cDIB" Then
+If Left$(A, 4) = "cDIB" Then
 Dim W As Long, h As Long
-W = val("&H" & Mid$(a, 5, 4))
-h = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+W = val("&H" & Mid$(A, 5, 4))
+h = val("&H" & Mid$(A, 9, 4))
+If Len(A) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 mdib.ClearUp
 
 If mdib.create(W, h) Then
-If Len(a) * 2 < mdib.BytesPerScanLine * h + 24 Then Exit Function
-CopyMemory ByVal mdib.DIBSectionBitsPtr, ByVal StrPtr(a) + 24, mdib.BytesPerScanLine * h
+If Len(A) * 2 < mdib.BytesPerScanLine * h + 24 Then Exit Function
+CopyMemory ByVal mdib.DIBSectionBitsPtr, ByVal StrPtr(A) + 24, mdib.BytesPerScanLine * h
 cDib = True
 End If
 End If
 End If
 e1111:
 End Function
-Function CDib2Pic(a) As StdPicture
+Function CDib2Pic(A) As StdPicture
 Dim aa As New cDIBSection, emptypic As New StdPicture
-If cDib(a, aa) Then
+If cDib(A, aa) Then
     Set CDib2Pic = aa.Picture()
 Else
     Set CDib2Pic = emptypic
@@ -728,60 +728,60 @@ GetDIBPixel = -1# * bpl
 'GetDIBPixel = -(rgb(0) * 256# * 256# + rgb(1) * 256# + rgb(2))
 End If
 End Function
-Public Function cDIBwidth1(a) As Long
+Public Function cDIBwidth1(A) As Long
 Dim W As Long, h As Long
 cDIBwidth1 = -1
 
-W = val("&H" & Mid$(a, 5, 4))
-h = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+W = val("&H" & Mid$(A, 5, 4))
+h = val("&H" & Mid$(A, 9, 4))
+If Len(A) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 cDIBwidth1 = W
 End Function
-Public Function cDIBwidth(a) As Long
+Public Function cDIBwidth(A) As Long
 Dim W As Long, h As Long
 cDIBwidth = -1
-If Len(a) >= 12 Then
-If Left$(a, 4) = "cDIB" Then
-W = val("&H" & Mid$(a, 5, 4))
-h = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+If Len(A) >= 12 Then
+If Left$(A, 4) = "cDIB" Then
+W = val("&H" & Mid$(A, 5, 4))
+h = val("&H" & Mid$(A, 9, 4))
+If Len(A) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 cDIBwidth = W
 End If
 End If
 End Function
-Public Function cDIBheight1(a) As Long
+Public Function cDIBheight1(A) As Long
 Dim W As Long, h As Long
 cDIBheight1 = -1
-W = val("&H" & Mid$(a, 5, 4))
-h = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+W = val("&H" & Mid$(A, 5, 4))
+h = val("&H" & Mid$(A, 9, 4))
+If Len(A) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 cDIBheight1 = h
 End Function
-Public Function cDIBheight(a) As Long
+Public Function cDIBheight(A) As Long
 Dim W As Long, h As Long
 cDIBheight = -1
-If Len(a) >= 12 Then
-If Left$(a, 4) = "cDIB" Then
-W = val("&H" & Mid$(a, 5, 4))
-h = val("&H" & Mid$(a, 9, 4))
-If Len(a) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+If Len(A) >= 12 Then
+If Left$(A, 4) = "cDIB" Then
+W = val("&H" & Mid$(A, 5, 4))
+h = val("&H" & Mid$(A, 9, 4))
+If Len(A) * 2 < ((W * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 cDIBheight = h
 End If
 End If
 End Function
 
 Public Function ARRAYtoStr(ffff() As Byte) As String
-Dim a As String, j As Long
+Dim A As String, j As Long
 For j = 1 To UBound(ffff())
-a = a + ChrW(ffff(j))
+A = A + ChrW(ffff(j))
 Next j
-ARRAYtoStr = a
+ARRAYtoStr = A
 End Function
-Public Sub LoadArray(ffff() As Byte, a As String)
+Public Sub LoadArray(ffff() As Byte, A As String)
 Dim j As Long
-ReDim ffff(1 To Len(a)) As Byte
+ReDim ffff(1 To Len(A)) As Byte
 For j = 1 To UBound(ffff())
-ffff(j) = CByte(AscW(Mid$(a, j, 1)) And &HFF)
+ffff(j) = CByte(AscW(Mid$(A, j, 1)) And &HFF)
 Next j
 
 End Sub
@@ -795,12 +795,12 @@ GetTag$ = ss$
 End Function
 
 Public Function DIBtoSTR(mdib As cDIBSection) As String
-Dim a As String
+Dim A As String
 If mdib.Width > 0 Then
-a = String$(mdib.BytesPerScanLine * mdib.Height \ 2 + 12, Chr(0))
-Mid$(a, 1, 12) = "cDIB" + Right$("0000" + Hex$(mdib.Width), 4) + Right$("0000" + Hex$(mdib.Height), 4)
-CopyMemory ByVal StrPtr(a) + 24, ByVal mdib.DIBSectionBitsPtr, mdib.BytesPerScanLine * mdib.Height
-DIBtoSTR = a
+A = String$(mdib.BytesPerScanLine * mdib.Height \ 2 + 12, Chr(0))
+Mid$(A, 1, 12) = "cDIB" + Right$("0000" + Hex$(mdib.Width), 4) + Right$("0000" + Hex$(mdib.Height), 4)
+CopyMemory ByVal StrPtr(A) + 24, ByVal mdib.DIBSectionBitsPtr, mdib.BytesPerScanLine * mdib.Height
+DIBtoSTR = A
 End If
 End Function
 Public Function DpiScrX() As Long
@@ -827,7 +827,7 @@ If cDibbuffer0.hDib = 0 Then Exit Function
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim a As Single, b As Single, K As Single, r As Single
+Dim A As Single, b As Single, K As Single, r As Single
 Dim br As Byte, bG As Byte, bbb As Byte ', ba$
 Dim BR1 As Byte, BG1 As Byte, bbb1 As Byte, ppBa As Long
 BR1 = 255 * ((100 - Alpha) / 100#)
@@ -2542,18 +2542,18 @@ Public Function HTML(sText As String, _
                   "EndHTML:bbbbbbbbbb" + vbCrLf + _
                   "StartFragment:cccccccccc" + vbCrLf + _
                   "EndFragment:dddddddddd" + vbCrLf
-    Dim a() As Byte, b() As Byte, c() As Byte
+    Dim A() As Byte, b() As Byte, C() As Byte
    '' sText = "<FONT FACE=Arial SIZE=1 COLOR=BLUE>" + sText + "</FONT>"
    
-    a() = Utf16toUtf8(sContextStart & "<!--StartFragment -->")
+    A() = Utf16toUtf8(sContextStart & "<!--StartFragment -->")
     b() = Utf16toUtf8(sText)
-    c() = Utf16toUtf8("<!--EndFragment -->" & sContextEnd)
+    C() = Utf16toUtf8("<!--EndFragment -->" & sContextEnd)
    Dim sData As String, mdata As Long, eData As Long, fData As Long
 
    
-    eData = UBound(a()) - LBound(a()) + 1
+    eData = UBound(A()) - LBound(A()) + 1
    mdata = UBound(b()) - LBound(b()) + 1
-   fData = UBound(c()) - LBound(c()) + 1
+   fData = UBound(C()) - LBound(C()) + 1
    m_sDescription = Replace(m_sDescription, "aaaaaaaaaa", Format(Len(m_sDescription), "0000000000"))
    m_sDescription = Replace(m_sDescription, "bbbbbbbbbb", Format(Len(m_sDescription) + eData + mdata + fData, "0000000000"))
    m_sDescription = Replace(m_sDescription, "cccccccccc", Format(Len(m_sDescription) + eData, "0000000000"))
@@ -2563,9 +2563,9 @@ Public Function HTML(sText As String, _
   
   m() = Utf16toUtf8(m_sDescription)
   CopyMemory all(0), m(0), Len(m_sDescription)
-  CopyMemory all(Len(m_sDescription)), a(0), eData
+  CopyMemory all(Len(m_sDescription)), A(0), eData
   CopyMemory all(Len(m_sDescription) + eData), b(0), mdata
-  CopyMemory all(Len(m_sDescription) + eData + mdata), c(0), fData
+  CopyMemory all(Len(m_sDescription) + eData + mdata), C(0), fData
   HTML = all()
   
 End Function
@@ -2851,7 +2851,7 @@ End If
 
 End Function
 
-Public Function MsgBoxN(a$, Optional v As Variant = 5, Optional b$) As Long
+Public Function MsgBoxN(A$, Optional v As Variant = 5, Optional b$) As Long
 AskInput = False
 If ASKINUSE Then
 
@@ -2875,7 +2875,7 @@ End If
         AskCancel$ = vbNullString
         End If
         
-        AskText$ = a$ + "..?" + vbCrLf
+        AskText$ = A$ + "..?" + vbCrLf
     Else
              If v = vbRetryCancel Then
         AskOk$ = "епамакгьг"
@@ -2889,7 +2889,7 @@ End If
         AskCancel$ = vbNullString
         AskOk$ = "емтанеи"
         End If
-        AskText$ = a$ + "..;" + vbCrLf
+        AskText$ = A$ + "..;" + vbCrLf
     End If
 
     resp = Form1.NeoASK(Basestack1)
@@ -2904,7 +2904,7 @@ End If
     MsgBoxN = 1
     End If
 End Function
-Public Function InputBoxN(a$, b$, vv$, thisresp As Double) As String
+Public Function InputBoxN(A$, b$, vv$, thisresp As Double) As String
 Dim resp As Double
 If ASKINUSE Then
 
@@ -2912,7 +2912,7 @@ Exit Function
 End If
      DialogSetupLang DialogLang
 
-    AskText$ = a$
+    AskText$ = A$
     AskTitle$ = b$
     AskInput = True
     AskStrInput$ = Trim$(vv$)
@@ -2923,7 +2923,7 @@ End If
           AskInput = False
           thisresp = resp
 End Function
-Public Function ask(a$, Optional retry As Boolean = False) As Double
+Public Function ask(A$, Optional retry As Boolean = False) As Double
 'If Form3.Visible Then
 'If Form3.WindowState = 1 Then
 'Form3.Timer1.enabled = False
@@ -2931,16 +2931,16 @@ Public Function ask(a$, Optional retry As Boolean = False) As Double
 'Form3.WindowState = 0
 If retry Then
     If Form1.Visible Then
-    ask = MsgBoxN(a$, vbRetryCancel + vbQuestion + vbSystemModal, MesTitle$)
+    ask = MsgBoxN(A$, vbRetryCancel + vbQuestion + vbSystemModal, MesTitle$)
     Else
-    ask = MsgBoxN(a$, vbRetryCancel + vbQuestion + vbSystemModal, MesTitle$)
+    ask = MsgBoxN(A$, vbRetryCancel + vbQuestion + vbSystemModal, MesTitle$)
     End If
 
 Else
     If Form1.Visible Then
-    ask = MsgBoxN(a$, vbOKCancel + vbQuestion + vbSystemModal, MesTitle$)
+    ask = MsgBoxN(A$, vbOKCancel + vbQuestion + vbSystemModal, MesTitle$)
     Else
-    ask = MsgBoxN(a$, vbOKCancel + vbQuestion + vbSystemModal, MesTitle$)
+    ask = MsgBoxN(A$, vbOKCancel + vbQuestion + vbSystemModal, MesTitle$)
     End If
 End If
 'Form3.WindowState = 1
@@ -2951,15 +2951,15 @@ End If
 'End If
 'ask = MsgBoxN(a$, vbOKCancel + vbQuestion + vbSystemModal, MesTitle$)
 End Function
-Public Function SpellUnicode(a$)
+Public Function SpellUnicode(A$)
 ' use spellunicode to get numbers
 ' and make a ListenUnicode...with numbers for input text
 Dim b$, i As Long
-For i = 1 To Len(a$) - 1
-b$ = b$ & CStr(AscW(Mid$(a$, i, 1))) & ","
+For i = 1 To Len(A$) - 1
+b$ = b$ & CStr(AscW(Mid$(A$, i, 1))) & ","
 Next i
-SpellUnicode = b$ & CStr(AscW(Right$(a$, 1)))
-SpellUnicode = b$ & CStr(AscW(Right$(a$, 1)))
+SpellUnicode = b$ & CStr(AscW(Right$(A$, 1)))
+SpellUnicode = b$ & CStr(AscW(Right$(A$, 1)))
 End Function
 Public Function ListenUnicode(ParamArray aa() As Variant) As String
 Dim all$, i As Long
@@ -2968,32 +2968,32 @@ For i = 0 To UBound(aa)
 Next i
 ListenUnicode = all$
 End Function
-Function Convert2(a$, localeid As Long) As String  ' to feed textboxes
+Function Convert2(A$, localeid As Long) As String  ' to feed textboxes
 Dim b$, i&
-If a$ <> "" Then
-For i& = 1 To Len(a$)
-b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(a$, i, 1) + Chr$(0), 128, localeid), 1))), 64, 1033), 1)
+If A$ <> "" Then
+For i& = 1 To Len(A$)
+b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(A$, i, 1) + Chr$(0), 128, localeid), 1))), 64, 1033), 1)
 
 Next i&
 Convert2 = b$
 End If
 End Function
-Function Convert3(a$, localeid As Long) As String  ' to feed textboxes
+Function Convert3(A$, localeid As Long) As String  ' to feed textboxes
 Dim b$, i&
-If a$ <> "" Then
+If A$ <> "" Then
 If localeid = 0 Then localeid = Clid
-For i& = 1 To Len(a$)
-b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(a$, i, 1) + Chr$(0), 128, 1033), 1))), 64, localeid), 1)
+For i& = 1 To Len(A$)
+b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(A$, i, 1) + Chr$(0), 128, 1033), 1))), 64, localeid), 1)
 
 Next i&
 Convert3 = b$
 End If
 End Function
-Function Convert2Ansi(a$, localeid As Long) As String
+Function Convert2Ansi(A$, localeid As Long) As String
 Dim b$, i&
-If a$ <> "" Then
-For i& = 1 To Len(a$)
-    b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(a$, i, 1) + Chr$(0), 128, localeid), 1))), 64, LCID_DEF), 1)
+If A$ <> "" Then
+For i& = 1 To Len(A$)
+    b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(A$, i, 1) + Chr$(0), 128, localeid), 1))), 64, LCID_DEF), 1)
 Next i&
 Convert2Ansi = b$
 End If
@@ -3014,36 +3014,36 @@ Function GetCharSet(CodePage As Long)
         GetCharSet = cp.ciCharset
     End If
 End Function
-Sub SwapStringVariant(ByRef b As Variant, ByRef a As Variant)
+Sub SwapStringVariant(ByRef b As Variant, ByRef A As Variant)
    Static t As Long ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory ByVal VarPtr(t), ByVal VarPtr(a) + 8, 4
-   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(b) + 8, 4
+   CopyMemory ByVal VarPtr(t), ByVal VarPtr(A) + 8, 4
+   CopyMemory ByVal VarPtr(A) + 8, ByVal VarPtr(b) + 8, 4
    CopyMemory ByVal VarPtr(b) + 8, ByVal VarPtr(t), 4
 End Sub
-Sub SwapString2Variant(ByRef s$, ByRef a As Variant)
+Sub SwapString2Variant(ByRef s$, ByRef A As Variant)
    Static t As Long ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory ByVal VarPtr(t), ByVal VarPtr(a) + 8, 4
-   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(s$), 4
+   CopyMemory ByVal VarPtr(t), ByVal VarPtr(A) + 8, 4
+   CopyMemory ByVal VarPtr(A) + 8, ByVal VarPtr(s$), 4
    CopyMemory ByVal VarPtr(s$), ByVal VarPtr(t), 4
 End Sub
-Sub SwapString2VariantPointer(ByRef s$, ByVal a As Long)
+Sub SwapString2VariantPointer(ByRef s$, ByVal A As Long)
    Static t As Long ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory ByVal VarPtr(t), ByVal a + 8, 4
-   CopyMemory ByVal a + 8, ByVal VarPtr(s$), 4
+   CopyMemory ByVal VarPtr(t), ByVal A + 8, 4
+   CopyMemory ByVal A + 8, ByVal VarPtr(s$), 4
    CopyMemory ByVal VarPtr(s$), ByVal VarPtr(t), 4
 End Sub
-Sub MoveStringToVariant(ByRef s$, ByRef a As Variant)
+Sub MoveStringToVariant(ByRef s$, ByRef A As Variant)
    Static t As Long ' 4 Longs * 4 bytes each = 16 bytes
-   a = vbNullString
-   CopyMemory ByVal VarPtr(t), ByVal VarPtr(a) + 8, 4
-   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(s$), 4
+   A = vbNullString
+   CopyMemory ByVal VarPtr(t), ByVal VarPtr(A) + 8, 4
+   CopyMemory ByVal VarPtr(A) + 8, ByVal VarPtr(s$), 4
    CopyMemory ByVal VarPtr(s$), ByVal VarPtr(t), 4
 End Sub
 Sub EmptyVariant(ByVal b As Long)
-   Dim a As Variant
+   Dim A As Variant
    Static t(3) As Long
-   CopyMemory t(0), ByVal VarPtr(a), 16
-   CopyMemory ByVal VarPtr(a), ByVal b, 16
+   CopyMemory t(0), ByVal VarPtr(A), 16
+   CopyMemory ByVal VarPtr(A), ByVal b, 16
    CopyMemory ByVal b, t(0), 16
 End Sub
 Function IsOptional(ByRef v) As Boolean
@@ -3070,19 +3070,19 @@ myIsNull = p = 1
 End Function
 
 ' VarByRef VarPtr(var2(items)), var(i)
-Sub VarByRefVariant(ByVal a As Long, ByRef b As Variant)
+Sub VarByRefVariant(ByVal A As Long, ByRef b As Variant)
     Dim t(0 To 3) As Long
   
    t(0) = vbVariant Or &H4000
    t(2) = VarPtr(b)
-   CopyMemory ByVal a, t(0), 16
+   CopyMemory ByVal A, t(0), 16
 End Sub
-Sub VarByRef(ByVal a As Long, ByRef b As Variant)
+Sub VarByRef(ByVal A As Long, ByRef b As Variant)
 Dim t(0 To 3) As Long
    CopyMemory t(0), ByVal VarPtr(b), 16
    t(0) = t(0) Or &H4000
    t(2) = VarPtr(b) + 8
-   CopyMemory ByVal a, t(0), 16
+   CopyMemory ByVal A, t(0), 16
 End Sub
 Sub ArrByRef(ByVal b As Long)
 Dim t(1) As Long
@@ -3090,68 +3090,68 @@ Dim t(1) As Long
    t(0) = t(0) Or &H4000
    CopyMemory ByVal VarPtr(b), t(0), 4
 End Sub
-Sub VarByRefDecimal(ByVal a As Long, ByRef b As Variant)
+Sub VarByRefDecimal(ByVal A As Long, ByRef b As Variant)
 Dim t(0 To 3) As Long
    CopyMemory t(0), ByVal VarPtr(b), 2
    t(0) = t(0) Or &H4000
    t(2) = VarPtr(b)
-   CopyMemory ByVal a, t(0), 16
+   CopyMemory ByVal A, t(0), 16
 End Sub
-Sub VarByRefCleanRef2(ByVal a As Long)
+Sub VarByRefCleanRef2(ByVal A As Long)
 Dim t(0 To 3) As Long
-   CopyMemory t(0), ByVal a, 2
+   CopyMemory t(0), ByVal A, 2
    t(0) = t(0) And &HFFFFBFFF
-   CopyMemory ByVal a, t(0), 2
+   CopyMemory ByVal A, t(0), 2
 End Sub
-Sub VarByRefCleanRef(ByRef a As Long)
+Sub VarByRefCleanRef(ByRef A As Long)
 Dim t(0 To 3) As Long
-   CopyMemory t(0), ByVal VarPtr(a), 2
+   CopyMemory t(0), ByVal VarPtr(A), 2
    t(0) = t(0) And &HFFFFBFFF
-   CopyMemory ByVal a, t(0), 2
+   CopyMemory ByVal A, t(0), 2
 End Sub
-Sub VarByRefClean(ByVal a As Long)
-Static Z As Variant
-CopyMemory ByVal a, Z, 16
+Sub VarByRefClean(ByVal A As Long)
+Static z As Variant
+CopyMemory ByVal A, z, 16
 End Sub
-Function VariantIsRef(ByVal a As Long) As Boolean
-Static Z As Integer
-   CopyMemory Z, ByVal a, 2
-   VariantIsRef = (Z And &H4000) = &H4000
+Function VariantIsRef(ByVal A As Long) As Boolean
+Static z As Integer
+   CopyMemory z, ByVal A, 2
+   VariantIsRef = (z And &H4000) = &H4000
 End Function
-Sub SwapVariantRef(ByVal a As Long, ByVal b As Long)
+Sub SwapVariantRef(ByVal A As Long, ByVal b As Long)
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
    
   ' If VariantIsRef(a) Then
   Dim from As Long, em
-   from = MemLong(a + 8)
+   from = MemLong(A + 8)
    CopyMemory ByVal VarPtr(t(0)), ByVal from, 16
-   CopyMemory ByVal a, ByVal em, 16
+   CopyMemory ByVal A, ByVal em, 16
    CopyMemory ByVal b, VarPtr(t(0)), 16
   ' End If
 End Sub
-Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
+Sub SwapVariant(ByRef A As Variant, ByRef b As Variant)
    Static t(0 To 3) As Long  ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory t(0), ByVal VarPtr(a), 16
-   CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
+   CopyMemory t(0), ByVal VarPtr(A), 16
+   CopyMemory ByVal VarPtr(A), ByVal VarPtr(b), 16
    CopyMemory ByVal VarPtr(b), t(0), 16
 End Sub
-Sub SwapVariant2(ByRef a As Variant, ByRef b As iBoxArray, i As Long)
+Sub SwapVariant2(ByRef A As Variant, ByRef b As iBoxArray, i As Long)
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory t(0), ByVal VarPtr(a), 16
-   CopyMemory ByVal VarPtr(a), ByVal b.itemPtr(i), 16
+   CopyMemory t(0), ByVal VarPtr(A), 16
+   CopyMemory ByVal VarPtr(A), ByVal b.itemPtr(i), 16
    CopyMemory ByVal b.itemPtr(i), t(0), 16
 End Sub
-Sub SwapVariant3(ByRef a As mArray, K As Long, ByRef b As iBoxArray, i As Long)
+Sub SwapVariant3(ByRef A As mArray, K As Long, ByRef b As iBoxArray, i As Long)
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory t(0), ByVal a.itemPtr(K), 16
-   CopyMemory ByVal a.itemPtr(K), ByVal b.itemPtr(i), 16
+   CopyMemory t(0), ByVal A.itemPtr(K), 16
+   CopyMemory ByVal A.itemPtr(K), ByVal b.itemPtr(i), 16
    CopyMemory ByVal b.itemPtr(i), t(0), 16
 End Sub
 Sub EmptyVariantArrayItem(ByRef b As iBoxArray, i As Long)
-   Dim a As Variant
+   Dim A As Variant
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory t(0), ByVal VarPtr(a), 16
-   CopyMemory ByVal VarPtr(a), ByVal b.itemPtr(i), 16
+   CopyMemory t(0), ByVal VarPtr(A), 16
+   CopyMemory ByVal VarPtr(A), ByVal b.itemPtr(i), 16
    CopyMemory ByVal b.itemPtr(i), t(0), 16
 End Sub
 Private Function c_CreatePartialRegion(rgnRects() As RECT, ByVal lIndex As Long, ByVal uIndex As Long, ByVal leftOffset As Long, ByVal cx As Long, Optional ByVal xFrmPtr As Long) As Long
@@ -3186,32 +3186,32 @@ Private Function c_CreatePartialRegion(rgnRects() As RECT, ByVal lIndex As Long,
 
 End Function
 
-Function FoundLocaleId(a$) As Long
-If Convert3(Convert2(a$, 1032), 1032) = a$ Then
+Function FoundLocaleId(A$) As Long
+If Convert3(Convert2(A$, 1032), 1032) = A$ Then
     FoundLocaleId = 1032
-ElseIf Convert3(Convert2(a$, 1033), 1033) = a$ Then
+ElseIf Convert3(Convert2(A$, 1033), 1033) = A$ Then
     FoundLocaleId = 1033
-ElseIf Convert3(Convert2(a$, Clid), Clid) = a$ Then
+ElseIf Convert3(Convert2(A$, Clid), Clid) = A$ Then
  FoundLocaleId = Clid
 End If
 End Function
-Function FoundSpecificLocaleId(a$, this As Long) As Long
-If Convert3(Convert2(a$, this), this) = a$ Then FoundSpecificLocaleId = True
+Function FoundSpecificLocaleId(A$, this As Long) As Long
+If Convert3(Convert2(A$, this), this) = A$ Then FoundSpecificLocaleId = True
 End Function
-Function ismine1(ByVal a$) As Boolean  '  START A BLOCK
+Function ismine1(ByVal A$) As Boolean  '  START A BLOCK
 ismine1 = True
-a$ = myUcase(a$, True)
-Select Case a$
+A$ = myUcase(A$, True)
+Select Case A$
 Case "PART", "LIB", "PROTOTYPE"
 Case "леяос", "пяытотупо"
 Case Else
 ismine1 = False
 End Select
 End Function
-Function ismine2(ByVal a$) As Boolean  ' CAN START A BLOCK OR DO SOMETHING
+Function ismine2(ByVal A$) As Boolean  ' CAN START A BLOCK OR DO SOMETHING
 ismine2 = True
-a$ = myUcase(a$, True)
-Select Case a$
+A$ = myUcase(A$, True)
+Select Case A$
 Case "ABOUT", "AFTER", "BACK", "BACKGROUND", "CLASS", "COLOR", "DECLARE", "DRAWING", "ELSE", "ENUM", "ENUMERATION", "EVENT", "EVERY", "GLOBAL", "FOR", "FKEY", "FUNCTION", "GROUP", "INVENTORY", "LAYER", "LOCAL", "MAIN.TASK", "MODULE", "OPERATOR", "PATH", "PEN", "PROPERTY", "PRINTER", "PRINTING", "REMOVE", "SET", "STACK", "START", "STRUCTURE", "TASK.MAIN", "THEN", "THREAD", "TRY", "WIDTH", "VAR", "VARIABLE", "VARIABLES", "VALUE", "WHILE"
 Case "аявг", "аккиыс", "аниа", "аниа(", "апая", "апаяихлгсг", "цецомос", "цемийо", "цемийг", "цемийес", "циа", "дес", "диацяажг", "долг", "ейтупытгс", "ейтупысг", "емы", "епипедо", "хесе", "хесе(", "идиотгтес", "ивмос", "идиотгта", "йахе", "йатастасг", "йкасг", "йкеиди", "йуяио.еяцо", "лета", "мгла", "олада", "ояисе", "павос", "пема", "пеяи", "пеяихыяио", "сумаятгсг", "сыяос", "текестгс", "тлгла", "топийа", "топийг", "топийес", "тоте", "вяыла"
 Case "CONST", "стахеяг", "стахеяес", "сведио", "SUPERCLASS", "упеяйкасг", "DO", "REPEAT", "епамекабе", "епамакабе", "летабкгтг", "летабкгтес"
@@ -3220,39 +3220,39 @@ Case Else
 ismine2 = False
 End Select
 End Function
-Function ismine22(ByVal a$) As Boolean  ' CAN START A BLOCK AFTER AN EXPRESSION, WE CAN PASS STRING BLOCK IN EXPRESSION
+Function ismine22(ByVal A$) As Boolean  ' CAN START A BLOCK AFTER AN EXPRESSION, WE CAN PASS STRING BLOCK IN EXPRESSION
 ismine22 = True
-a$ = myUcase(a$, True)
-Select Case a$
+A$ = myUcase(A$, True)
+Select Case A$
 Case "FOR", "WHILE", "циа", "емы"
 Case Else
 ismine22 = False
 End Select
 End Function
-Function ismine33(ByVal a$) As Boolean  '
+Function ismine33(ByVal A$) As Boolean  '
 ismine33 = True
-a$ = myUcase(a$, True)
-Select Case a$
+A$ = myUcase(A$, True)
+Select Case A$
 Case "CASE", "ле"
 Case Else
 ismine33 = False
 End Select
 End Function
 
-Function ismine5(ByVal a$) As Boolean  '  make
+Function ismine5(ByVal A$) As Boolean  '  make
 ismine5 = True
-a$ = myUcase(a$, True)
-Select Case a$
+A$ = myUcase(A$, True)
+Select Case A$
 Case "GLOBAL", "цемийо", "цемийг", "цемийес"
 Case Else
 ismine5 = False
 End Select
 End Function
 
-Function ismine3(ByVal a$) As Boolean  ' CAN START A NEW COMMAND, PROBLEM WITH ELSE
+Function ismine3(ByVal A$) As Boolean  ' CAN START A NEW COMMAND, PROBLEM WITH ELSE
 ismine3 = True
-a$ = myUcase(a$, True)
-Select Case a$
+A$ = myUcase(A$, True)
+Select Case A$
 Case "ELSE", "THEN"
 Case "аккиыс", "тоте"
 Case Else
@@ -3260,10 +3260,10 @@ ismine3 = False
 End Select
 End Function
 
-Function ismine(ByVal a$) As Boolean
+Function ismine(ByVal A$) As Boolean
 ismine = True
-a$ = myUcase(a$, True)
-Select Case a$
+A$ = myUcase(A$, True)
+Select Case A$
 Case "@(", "$(", "~(", "?", "->", "[]"
 Case "ABOUT", "ABOUT$", "ABS(", "ADDRESSOF", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
 Case "ARG(", "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
@@ -3389,15 +3389,15 @@ Case Else
 ismine = False
 End Select
 End Function
-Private Function IsNumberQuery(a$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
+Private Function IsNumberQuery(A$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
 Dim sg As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$, rr As Double
 ' ti kanei to e$
-If a$ = vbNullString Then IsNumberQuery = False: Exit Function
+If A$ = vbNullString Then IsNumberQuery = False: Exit Function
 sg = 1
 sng = fr - 1
-    Do While sng < Len(a$)
+    Do While sng < Len(A$)
     sng = sng + 1
-    Select Case Mid$(a$, sng, 1)
+    Select Case Mid$(A$, sng, 1)
     Case " ", "+" ', ChrW(160)
     Case "-"
     sg = -sg
@@ -3405,24 +3405,24 @@ sng = fr - 1
     Exit Do
     End Select
     Loop
-n$ = Mid$(a$, sng)
+n$ = Mid$(A$, sng)
 
-If val("0" & Mid$(a$, sng, 1)) = 0 And Left(Mid$(a$, sng, 1), sng) <> "0" And Left(Mid$(a$, sng, 1), sng) <> "." Then
+If val("0" & Mid$(A$, sng, 1)) = 0 And Left(Mid$(A$, sng, 1), sng) <> "0" And Left(Mid$(A$, sng, 1), sng) <> "." Then
 IsNumberQuery = False
 
 Else
 'compute ig$
-    If Mid$(a$, sng, 1) = "." And Not skipdecimals Then
+    If Mid$(A$, sng, 1) = "." And Not skipdecimals Then
     ' no long part
     ig$ = "0"
     DE$ = "."
 
     Else
-    Do While sng <= Len(a$)
+    Do While sng <= Len(A$)
         
-        Select Case Mid$(a$, sng, 1)
+        Select Case Mid$(A$, sng, 1)
         Case "0" To "9"
-        ig$ = ig$ & Mid$(a$, sng, 1)
+        ig$ = ig$ & Mid$(A$, sng, 1)
         Case "."
         If skipdecimals Then IsNumberQuery = False: Exit Function
         DE$ = "."
@@ -3434,8 +3434,8 @@ Else
     Loop
     End If
     If Len(DE$) = 0 Then
-        If Len(a$) >= sng& Then
-            If InStr("EeеЕ", Mid$(a$, sng&, 1)) > 0 Then
+        If Len(A$) >= sng& Then
+            If InStr("EeеЕ", Mid$(A$, sng&, 1)) > 0 Then
             fr = fr + 1
                 DE$ = "."
                 GoTo CONT1234
@@ -3444,18 +3444,18 @@ Else
     Else
       sng = sng + 1
 CONT1234:
-        Do While sng <= Len(a$)
+        Do While sng <= Len(A$)
        
-        Select Case Mid$(a$, sng, 1)
+        Select Case Mid$(A$, sng, 1)
         Case " " ', ChrW(160)
         If Not (sg1 And Len(ex$) = 1) Then
         Exit Do
         End If
         Case "0" To "9"
         If sg1 Then
-        ex$ = ex$ & Mid$(a$, sng, 1)
+        ex$ = ex$ & Mid$(A$, sng, 1)
         Else
-        DE$ = DE$ & Mid$(a$, sng, 1)
+        DE$ = DE$ & Mid$(A$, sng, 1)
         End If
         Case "E", "e", "е", "Е" ' ************check it
              If ex$ = vbNullString Then
@@ -3468,7 +3468,7 @@ CONT1234:
         
         Case "+", "-"
         If sg1 And Len(ex$) = 1 Then
-         ex$ = ex$ & Mid$(a$, sng, 1)
+         ex$ = ex$ & Mid$(A$, sng, 1)
         Else
         Exit Do
         End If
@@ -3511,23 +3511,26 @@ End Function
 
 
 
-Static Function ValidNum(a$, Final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
+Static Function ValidNum(A$, Final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
 Dim r As Long
 Dim r1 As Long
 r1 = 1
            If Not NoUseDec Then
                                 If OverideDec Then
-                                    a$ = Replace(a$, NowDec$, ".")
+                                    A$ = Replace(A$, NowDec$, ".")
                                  End If
                             Else
-                                a$ = Replace(a$, QueryDecString, ".")
+                                A$ = Replace(A$, QueryDecString, ".")
                             End If
               
 Dim v As Double, b$
 If Final Then
-r1 = IsNumberOnly(a$, r1, v, r, cutdecimals)
-
-r1 = (r1 And Len(a$) <= r) Or (a$ = vbNullString)
+If checktype > 0 Then
+r1 = IsNumberOnly(A$, r1, v, r, cutdecimals)
+Else
+r = Len(A$)
+End If
+r1 = (r1 And Len(A$) <= r) Or (A$ = vbNullString)
 If r1 Then
 Select Case checktype
 Case vbLong
@@ -3552,21 +3555,21 @@ End Select
 
 End If
 Else
-If (a$ = "-") Or a$ = vbNullString Then
+If (A$ = "-") Or A$ = vbNullString Then
 r1 = True
 Else
- r1 = IsNumberQuery(a$, r1, v, r, cutdecimals)
-    If a$ <> "" Then
+ r1 = IsNumberQuery(A$, r1, v, r, cutdecimals)
+    If A$ <> "" Then
          If r < 2 Then
-                r1 = Not (r <= Len(a$))
-                a$ = vbNullString
+                r1 = Not (r <= Len(A$))
+                A$ = vbNullString
         Else
-                r1 = r1 And Not r <= Len(a$)
-                a$ = Mid$(a$, 1, r - 1)
+                r1 = r1 And Not r <= Len(A$)
+                A$ = Mid$(A$, 1, r - 1)
         End If
         If cutdecimals Then
-        If InStr(a$, "e") > 0 Or InStr(a$, "E") > 0 Then
-        a$ = Replace(a$, "e", ""): a$ = Replace(a$, "E", "")
+        If InStr(A$, "e") > 0 Or InStr(A$, "E") > 0 Then
+        A$ = Replace(A$, "e", ""): A$ = Replace(A$, "E", "")
         r1 = False
         End If
         End If
@@ -3575,23 +3578,23 @@ Else
  End If
   If Not NoUseDec Then
                                 If OverideDec Then
-                                    a$ = Replace(a$, ".", NowDec$)
+                                    A$ = Replace(A$, ".", NowDec$)
                                  End If
                             Else
-                                a$ = Replace(a$, ".", QueryDecString)
+                                A$ = Replace(A$, ".", QueryDecString)
                             End If
 ValidNum = r1
 End Function
 
-Function ValidNumberOnly(a$, r As Variant, skipdec As Boolean) As Boolean
+Function ValidNumberOnly(A$, r As Variant, skipdec As Boolean) As Boolean
 If VarType(r) = vbString Then
     r = CVar(0)
 Else
     r = r - r
 End If
-ValidNumberOnly = IsNumberOnly(a$, (1), r, (0), skipdec)
+ValidNumberOnly = IsNumberOnly(A$, (1), r, (0), skipdec)
 End Function
-Function ValidNumberOnlyClean(a$, r As Variant, skipdec As Boolean) As Long
+Function ValidNumberOnlyClean(A$, r As Variant, skipdec As Boolean) As Long
 On Error Resume Next
 If VarType(r) = vbString Then
     r = CVar(0)
@@ -3600,22 +3603,22 @@ Else
 End If
 Dim fr As Long, lr As Long
 fr = 1
-If IsNumberOnly(a$, fr, r, lr, skipdec) Then
+If IsNumberOnly(A$, fr, r, lr, skipdec) Then
 ValidNumberOnlyClean = lr
 Else
 ValidNumberOnlyClean = -1
 End If
 
 End Function
-Private Function IsNumberOnly(a$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
+Private Function IsNumberOnly(A$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
 Dim sg As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
 ' ti kanei to e$
-If a$ = vbNullString Then IsNumberOnly = False: Exit Function
+If A$ = vbNullString Then IsNumberOnly = False: Exit Function
 sg = 1
 sng = fr - 1
-    Do While sng < Len(a$)
+    Do While sng < Len(A$)
     sng = sng + 1
-    Select Case Mid$(a$, sng, 1)
+    Select Case Mid$(A$, sng, 1)
     Case " ", "+"
     Case "-"
     sg = -sg
@@ -3623,24 +3626,24 @@ sng = fr - 1
     Exit Do
     End Select
     Loop
-n$ = Mid$(a$, sng)
+n$ = Mid$(A$, sng)
 
-If val("0" & Mid$(a$, sng, 1)) = 0 And Left(Mid$(a$, sng, 1), sng) <> "0" And Left(Mid$(a$, sng, 1), sng) <> "." Then
+If val("0" & Mid$(A$, sng, 1)) = 0 And Left(Mid$(A$, sng, 1), sng) <> "0" And Left(Mid$(A$, sng, 1), sng) <> "." Then
 IsNumberOnly = False
 
 Else
 'compute ig$
-    If Mid$(a$, sng, 1) = "." And Not skipdecimals Then
+    If Mid$(A$, sng, 1) = "." And Not skipdecimals Then
     ' no long part
     ig$ = "0"
     DE$ = "."
 
     Else
-    Do While sng <= Len(a$)
+    Do While sng <= Len(A$)
         
-        Select Case Mid$(a$, sng, 1)
+        Select Case Mid$(A$, sng, 1)
         Case "0" To "9"
-        ig$ = ig$ & Mid$(a$, sng, 1)
+        ig$ = ig$ & Mid$(A$, sng, 1)
         Case "."
         If skipdecimals Then Exit Do
         DE$ = "."
@@ -3654,9 +3657,9 @@ Else
     ' compute decimal part
     If Len(DE$) = 0 Then
     If Not skipdecimals Then
-    If Len(a$) > sng& Then
-    If InStr("EeеЕ", Mid$(a$, sng&, 1)) > 0 Then
-    If InStr("1234567890+-", Mid$(a$, sng& + 1, 1)) > 0 Then
+    If Len(A$) > sng& Then
+    If InStr("EeеЕ", Mid$(A$, sng&, 1)) > 0 Then
+    If InStr("1234567890+-", Mid$(A$, sng& + 1, 1)) > 0 Then
         DE$ = "."
         GoTo cont123
     End If
@@ -3667,18 +3670,18 @@ Else
       
       sng = sng + 1
 cont123:
-        Do While sng <= Len(a$)
+        Do While sng <= Len(A$)
        
-        Select Case Mid$(a$, sng, 1)
+        Select Case Mid$(A$, sng, 1)
         Case " "
         If Not (sg1 And Len(ex$) = 1) Then
         Exit Do
         End If
         Case "0" To "9"
         If sg1 Then
-        ex$ = ex$ & Mid$(a$, sng, 1)
+        ex$ = ex$ & Mid$(A$, sng, 1)
         Else
-        DE$ = DE$ & Mid$(a$, sng, 1)
+        DE$ = DE$ & Mid$(A$, sng, 1)
         End If
         Case "E", "e", "е", "Е"  ' ************check it
         If skipdecimals Then Exit Do
@@ -3693,7 +3696,7 @@ cont123:
         
         Case "+", "-"
         If sg1 And Len(ex$) = 1 Then
-             ex$ = ex$ & Mid$(a$, sng, 1)
+             ex$ = ex$ & Mid$(A$, sng, 1)
         Else
         Exit Do
         End If
@@ -4012,17 +4015,17 @@ l = LenB(s): If l = 0 Then Exit Function
   If P2 > p4 Then MyTrimB = vbNullString Else MyTrimB = MidB$(s$, (P2 - p22) + 1, (p4 - P2) + 1)
  
 End Function
-Function IsLabelAnew(where$, a$, r$, Lang As Long) As Long
+Function IsLabelAnew(where$, A$, r$, Lang As Long) As Long
 ' for left side...no &
 
-Dim rr&, one As Boolean, c$, gr As Boolean
+Dim rr&, one As Boolean, C$, gr As Boolean
 r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
 Dim i&, l As Long, p3 As Integer
 Dim P2 As Long, P1 As Integer, p4 As Long
-l = Len(a$): If l = 0 Then IsLabelAnew = 0: Lang = 1: Exit Function
+l = Len(A$): If l = 0 Then IsLabelAnew = 0: Lang = 1: Exit Function
 
-P2 = StrPtr(a$): l = l - 1
+P2 = StrPtr(A$): l = l - 1
   p4 = P2 + l * 2
   For i = P2 To p4 Step 2
   GetMem2 i, P1
@@ -4034,7 +4037,7 @@ P2 = StrPtr(a$): l = l - 1
     If p3 = 10 Then
     IsLabelAnew = 1234
     If i + 6 > p4 Then
-    a$ = vbNullString
+    A$ = vbNullString
     Else
     i = i + 4
     Do While i < p4
@@ -4048,13 +4051,13 @@ P2 = StrPtr(a$): l = l - 1
     i = i + 4
     End If
     Loop
-    a$ = Mid$(a$, (i + 2 - P2) \ 2)
+    A$ = Mid$(A$, (i + 2 - P2) \ 2)
     End If
     Else
-    If i > P2 Then a$ = Mid$(a$, (i - 2 - P2) \ 2)
+    If i > P2 Then A$ = Mid$(A$, (i - 2 - P2) \ 2)
     End If
     Else
-    If i > P2 Then a$ = Mid$(a$, (i - 2 - P2) \ 2)
+    If i > P2 Then A$ = Mid$(A$, (i - 2 - P2) \ 2)
     End If
     
     Lang = 1
@@ -4065,7 +4068,7 @@ P2 = StrPtr(a$): l = l - 1
    Exit For
   End Select
   Next i
-    If i > p4 Then a$ = vbNullString: IsLabelAnew = 0: Exit Function
+    If i > p4 Then A$ = vbNullString: IsLabelAnew = 0: Exit Function
   For i = i To p4 Step 2
   GetMem2 i, P1
   If P1 < 256 Then
@@ -4076,7 +4079,7 @@ P2 = StrPtr(a$): l = l - 1
                 where$ = r$
                 r$ = vbNullString
             Else
-              IsLabelAnew = 0: a$ = Mid$(a$, (i - P2) \ 2): Exit Function
+              IsLabelAnew = 0: A$ = Mid$(A$, (i - P2) \ 2): Exit Function
             End If
         Case 63 '"?"
         If r$ = vbNullString Then
@@ -4085,7 +4088,7 @@ P2 = StrPtr(a$): l = l - 1
         Else
             i = i + 2
         End If
-        a$ = Mid$(a$, (i - P2) \ 2)
+        A$ = Mid$(A$, (i - P2) \ 2)
         IsLabelAnew = 1
         Lang = -1
               
@@ -4212,7 +4215,7 @@ i1233:
 
 
     Next i
-  If i > p4 Then a$ = vbNullString Else If (i + 2 - P2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - P2) \ 2)
+  If i > p4 Then A$ = vbNullString Else If (i + 2 - P2) \ 2 > 1 Then A$ = Mid$(A$, (i + 2 - P2) \ 2)
        r$ = myUcase(r$, gr)
        Lang = 1 + CLng(gr)
 
@@ -4220,11 +4223,11 @@ i1233:
 
 
 End Function
-Public Function NLtrim$(a$)
-If Len(a$) > 0 Then NLtrim$ = Mid$(a$, MyTrimL(a$))
+Public Function NLtrim$(A$)
+If Len(A$) > 0 Then NLtrim$ = Mid$(A$, MyTrimL(A$))
 End Function
-Public Function NLTrim2$(a$)
-If Len(a$) > 0 Then NLTrim2$ = Mid$(a$, MyTrimL2(a$))
+Public Function NLTrim2$(A$)
+If Len(A$) > 0 Then NLTrim2$ = Mid$(A$, MyTrimL2(A$))
 End Function
 Public Function StringId(aHash As idHash, bHash As idHash, Optional ahashbackup As idHash, Optional bhashbackup As idHash) As Boolean
 Dim myid(), i As Long
@@ -4715,9 +4718,9 @@ End If
 Next i
 zHash.Sort
 End Sub
-Public Function HD(a$) As Long
+Public Function HD(A$) As Long
 Dim ret As Long
-ret = HashData(StrPtr(a$), LenB(a$), VarPtr(HD), 4)
+ret = HashData(StrPtr(A$), LenB(A$), VarPtr(HD), 4)
 HD = HD And &H7FFFFFFF
 If HD = 0 Then HD = 1
 End Function
@@ -4816,20 +4819,20 @@ Public Function Keyboards(what) As String
    Keyboards = GetlocaleString2(94&, what)
 End Function
 
-Sub GetQrCode(basestack As basetask, a$, ab$)
+Sub GetQrCode(basestack As basetask, A$, ab$)
 Dim ErrLevel As Long, X As Variant, QRcolor As Long, sq As Boolean
 sq = True
 On Error Resume Next
-If FastSymbol(a$, ",") Then
-    If IsExp(basestack, a$, X, , True) Then
+If FastSymbol(A$, ",") Then
+    If IsExp(basestack, A$, X, , True) Then
         QRcolor = mycolor(X)
     End If
 Else
     GoTo step2
 End If
 
-If FastSymbol(a$, ",") Then
-    If IsExp(basestack, a$, X, , True) Then
+If FastSymbol(A$, ",") Then
+    If IsExp(basestack, A$, X, , True) Then
         If X = 1 Then
             ErrLevel = 1
         ElseIf X = 2 Then
@@ -4838,8 +4841,8 @@ If FastSymbol(a$, ",") Then
             ErrLevel = 3
         End If
     End If
-    If FastSymbol(a$, ",") Then
-    If IsExp(basestack, a$, X, , True) Then
+    If FastSymbol(A$, ",") Then
+    If IsExp(basestack, A$, X, , True) Then
         If X = 0 Then sq = False
     End If
 End If
@@ -4865,6 +4868,6 @@ If bytes Then
 End If
 End Sub
 Sub testA()
-Dim a As New tuple
-Debug.Print Typename(a)
+Dim A As New tuple
+Debug.Print Typename(A)
 End Sub
