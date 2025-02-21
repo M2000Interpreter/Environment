@@ -1,11 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 12 active-X
-1. Input statement now can used for BigIntegers (for console input)
-2. Numbers including BigNumbers can use undersocre on code (now fixed for all situations).
-3. I put the new formula for converting numbers to BigIntegers (based of the formula used in sort for tuples). The new formula use this VB6 functions: format(int(p),"0") so with this we expand the exponent e.g 1.e30 is 1000000000000000000000000000000, so now we can convert it to biginteger (previous was Cstr(Int(p)) and the 1.e30 converted to "1.e30" which can't convert to biginteger.
-This is the equivalent function of M2000 (which internal call format())
-Print str$(1e30, "0")="1000000000000000000000000000000"
+Version 13 revision 13 active-X
+1. Help path$() now works without raising error (was an error from the right parenthesis, because help expectd path$( only, now works with or without right parenthesis).
+2. Test Form has a line where we can print something if the prompt is ? or we can execute statement if has prompt > (these prompts tongle when we press backspace, erasing the input line). Now when we send a statement that statement's error now dropped (so we didn't produce errors at the return of execution from the test form).
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
