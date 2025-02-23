@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 13
+Global Const Revision = 14
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -28389,7 +28389,7 @@ contlabel1:
                         bstack.tmpstr = v$ + Left$(rst$, 1)
                         ppp$ = Left$(rst$, 1)
                         BackPort rst$
-                        If IsNumber(bstack, rst$, p) Then
+                        If IsNumberNew(bstack, rst$, p, False) Then
                             If Not bstack.lastpointer Is Nothing Then
                                 If bstack.lastpointer.IamApointer Then
                                     Set pp.GroupRef = bstack.lastpointer
@@ -33739,7 +33739,11 @@ Dim p As Variant, s$
                                 Set basestack.lastpointer = Nothing
                                 Set basestack.lastobj = Nothing
                             ElseIf Not basestack.lastobj Is Nothing Then
-                                ps.DataObj basestack.lastobj
+                                If TypeOf basestack.lastobj Is VarItem Then
+                                    ps.DataOptional
+                                Else
+                                    ps.DataObj basestack.lastobj
+                                End If
                                 Set basestack.lastobj = Nothing
                             Else
                                 If myVarType(p, vbString) Then
@@ -33756,12 +33760,19 @@ Dim p As Variant, s$
                                 Set basestack.lastpointer = Nothing
                                 Set basestack.lastobj = Nothing
                             ElseIf Not basestack.lastobj Is Nothing Then
-                                ps.DataObj basestack.lastobj
+                                If TypeOf basestack.lastobj Is VarItem Then
+                                    ps.DataOptional
+                                Else
+                                    ps.DataObj basestack.lastobj
+                                End If
                                 Set basestack.lastobj = Nothing
                             Else
                                 ps.DataStr s$
                             End If
-
+                    ElseIf lookOne(rest$, ",") Then
+                        ps.DataOptional
+                    ElseIf lookOne(rest$, ")") Then
+                        ps.DataOptional
                     Else
                     
                             Exit Do
@@ -37598,8 +37609,8 @@ End If
 End Function
 Function MyInput(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim i As Long, p As Variant, pp As Variant, s$, ss$, what$, f As Long, x1 As Long, Y As Double, X As Double
-Dim frm$, par As Boolean, pppp As iBoxArray, prive As Long, it As Long, W$, mystack As mStiva, integ As Boolean
-Dim rpos As Long, rrow As Long
+Dim frm$, par As Boolean, pppp As iBoxArray, prive As Long, it As Long, W$, mystack As mStiva, integ As Boolean, noexp As Boolean
+Dim rpos As Long, rrow As Long, ex$, Final$, ok As Boolean, pppp1 As ppppLight
 If IsLabelSymbolNew(rest$, "Ã≈", "WITH", Lang) Then
     If IsExp(bstack, rest$, p, , True) Then
         If MemInt(VarPtr(p)) = vbString Then
@@ -37688,14 +37699,26 @@ If FastSymbol(rest$, "!") Then
             x1 = 29
         End If
         Form1.ShadowMarks = True
+        
+
         If Y < 1 And x1 = 0 Then Y = 1
         If GetVar(bstack, what$, i) Then
+            Select Case VarType(var(i))
+            Case vbBoolean, vbByte, vbLong, vbInteger, 20
+            integ = True: noexp = True
+            f = 4
+            Case vbDecimal, vbCurrency
+                noexp = True
+            End Select
+        
+        
             If VarType(var(i)) = 20 Then
                 s$ = CStr(var(i))
             ElseIf VarType(var(i)) = vbString Then
                 s$ = LTrim$(var(i))
             ElseIf VarTypeName(var(i)) = "BigInteger" Then
                 s$ = var(i).ToString
+                Set p = var(i)
                 f = 4
                 x1 = 1000
                 GoTo cont43244
@@ -37703,7 +37726,6 @@ If FastSymbol(rest$, "!") Then
                 s$ = LTrim$(str(var(i)))
             End If
                     '????????????????
-            If VarType(var(i)) = vbLong Or VarType(var(i)) = vbInteger Or VarType(var(i)) = 20 Then f = 4
             If VarType(var(i)) = vbBoolean Then f = 4: x1 = 1: s$ = LTrim$(str(Abs(CLng(var(i)))))
             If Not NoUseDec Then
                 If OverideDec Then
@@ -37733,10 +37755,14 @@ cont43244:
             Else
                 s$ = Replace(s$, QueryDecString, ".")
             End If
+            
             ValidNumberOnly s$, p, f = 4
+            
             Select Case VarType(var(i))
             Case 20
                var(i) = cInt64(p)
+            Case vbByte
+                var(i) = CByte(p)
             Case vbInteger
                var(i) = CInt(p)
             Case vbLong
@@ -37751,6 +37777,7 @@ cont43244:
                var(i) = CDec(p)
             Case vbBoolean
                var(i) = CBool(p)
+               
             Case Else
                var(i) = p
             End Select
@@ -37897,6 +37924,7 @@ comehere:
         If VarType(var(i)) = vbBoolean Then
             f = 7: x1 = 1: s$ = LTrim$(str(Abs(CLng(pppp.itemnumeric(it)))))
         End If
+        
         Do
             s$ = iText(bstack, s$, (X), (Y), "", x1, True, f = 7)
         Loop Until ValidNum(s$, True, f = 7, VarType(p))
@@ -38020,32 +38048,81 @@ End If
 If (Left$(Typename(bstack.Owner), 3) = "Gui") And Not par Then oxiforforms: Fkey = 0: Exit Function
 If (TypeOf bstack.Owner Is MetaDc) And Not par Then oxiforMetaFiles: Exit Function
 MyInput = False
+
+
+
 Do
+    ex$ = ""
+    Final$ = ""
+    x1 = 256
+    integ = False
     Select Case Abs(IsLabel(bstack, rest$, what$))
     Case 1
         If GetVar(bstack, what$, i) Then
-            If VarType(var(i)) = vbLong Or VarType(var(i)) = vbInteger Or VarType(var(i)) = 20 Then integ = True
             If Not MyIsNumeric(var(i)) Then
                 If MyIsObject(var(i)) Then
                     If Not var(i) Is Nothing Then
                         If TypeOf var(i) Is BigInteger Then
                             x1 = 1000
+                            If FastSymbol(rest$, "=") Then
+                                If Not IsNumberCheck(rest$, p) Then
+                                    SyntaxError
+                                    Exit Function
+                                End If
+                            End If
                             Set p = var(i)
                             integ = True
+                            noexp = True
                             GoTo there1112
-                            End If
+                        ElseIf TypeOf var(i) Is Group Then
+                            p = 0#
+                            GoTo checktypehere
+                        ElseIf Not TypeOf var(i) Is Document Then
+                            WrongType
+                            Exit Function
                         End If
                     End If
-                    GoTo jumpthere
+                End If
+                GoTo jumpthere
+            Else
+                Select Case VarType(var(i))
+                Case vbBoolean, vbByte, vbLong, vbInteger, 20
+                    integ = True: noexp = True
+                Case vbDecimal, vbCurrency
+                    noexp = True
+                End Select
+            End If
+            p = var(i)
+            If FastSymbol(rest$, "=") Then
+                If IsNumberCheck(rest$, (p)) Then
+                    
+                Else
+                    SyntaxError
+                    Exit Function
                 End If
             End If
-            If FastSymbol(rest$, "=") Then
-                IsNumberCheck rest$, p
-            Else
-            ' p = 0#
-                p = var(i)
-            End If
-            If p <> 0 Then p = p - p
+        Else
+checktypehere:
+                If FastSymbol(rest$, "=") Then
+                        If IsNumberCheck(rest$, p) Then
+                            Select Case VarType(p)
+                            Case vbBoolean, vbByte, vbLong, vbInteger, 20
+                                integ = True: noexp = True
+                            Case vbDecimal, vbCurrency
+                                noexp = True
+                            Case vbObject
+                                integ = True
+                                noexp = True
+                                GoTo there1112
+                            End Select
+                  
+                        Else
+                            SyntaxError
+                            Exit Function
+                        End If
+                End If
+        End If
+        If p <> 0 Then p = p - p
 there1112:
             If par Then
                 If uni(f) Then
@@ -38056,7 +38133,10 @@ there1112:
             Else
                 prive = GetCode(bstack.Owner)
                 ss$ = ""
-            
+                If frm$ <> "" Then
+                ' here add one
+                PlainBaSket bstack.Owner, players(prive), frm$, , , 0
+                End If
                 If players(prive).lastprint Then
                     LCTbasket bstack.Owner, players(prive), players(prive).currow, players(prive).curpos
                     players(prive).lastprint = False
@@ -38066,49 +38146,61 @@ there1112:
                     rpos = GetRealPos(bstack.Owner)
                     rrow = GetRealRow(bstack.Owner)
                 End If
+                If MaybeIsSymbol2(rest$, ",;", i) Then
+                    If Mid$(rest$, i, 1) = "," Then
+                        Final$ = ", "
+                        ex$ = "," + vbCr
+                    ElseIf Mid$(rest$, i + 1, 1) = """" Then
+                        FastSymbol rest$, ";"
+                        If ISSTRINGA(rest$, Final$) Then
+                            If MaybeIsSymbol2(rest$, ",;", i) Then
+                            If Trim$(Final$) = "" Then
+                                If Len(Final$) = 0 Then Final$ = " "
+                                ex$ = " " + vbCr
+                            Else
+                                ex$ = Left$(LTrim$(Final$), 1) + vbCr
+                            End If
+                            Else
+                            ex$ = vbCr
+                            End If
+                        Else
+                            SyntaxError
+                            Exit Function
+                        End If
+                    End If
+                Else
+                Final$ = ""
+                ex$ = vbCr
+                End If
+                ss$ = ""
+again112:
                 Do
                     If Len(ss$) > 0 Then
+                        ss$ = ss$ + Final$
                         If ((rpos + Len(ss$)) \ players(prive).mX) + rrow > players(prive).mY - 1 Then
                             rrow = players(prive).mY - ((rpos + Len(ss$)) \ players(prive).mX) - 1
                         End If
                         LCTbasket bstack.Owner, players(prive), rrow, rpos
+                        bstack.Owner.FontTransparent = False
                         PlainBaSket bstack.Owner, players(prive), space$(Len(ss$)), , , 0, True
+                        bstack.Owner.FontTransparent = True
                         LCTbasket bstack.Owner, players(prive), rrow, rpos
                         Beep
                     Else
                         LCTbasket bstack.Owner, players(prive), rrow, rpos
                     End If
                     If integ Then
-                        W$ = QUERY(bstack, frm$, s$, 256, False, IIf(lookOne(rest$, ","), "," + vbCr, vbCr), "+*/!.@#$|\{}[]'~`%^&()=_:;", True)
-                        integ = False
+                        W$ = QUERY(bstack, "", s$, x1, False, ex$, "+*/!.@#$|\{}[]'~`%^&()=_:;eEÂ≈", True, Final$)
                     Else
-                        W$ = QUERY(bstack, frm$, s$, 256, False, IIf(lookOne(rest$, ","), "," + vbCr, vbCr), "+*/!@#$|\{}[]'~`%^&()=_:;", True)
+                        If noexp Then
+                        W$ = QUERY(bstack, "", s$, x1, False, ex$, "+*/!@#$|\{}[]'~`%^&()=_:;eEÂ≈", True, Final$)
+                        Else
+                        W$ = QUERY(bstack, "", s$, 256, False, IIf(lookOne(rest$, ","), "," + vbCr, vbCr), "+*/!@#$|\{}[]'~`%^&()=_:;", True, Final$)
+                        End If
                     End If
                     ss$ = s$
-                    'GoTo a3432232
-                    'Select Case VarType(var(i))
-                    'Case vbLong
-                    '    ss$ = s$ + "&"
-                    'Case vbCurrency
-                    '    ss$ = s$ + "#"
-                    'Case vbDecimal
-                    '    ss$ = s$ + "@"
-                    'Case vbSingle
-                    '    ss$ = s$ + "~"
-                    'Case vbInteger
-                    '    ss$ = s$ + "%"
-                    'Case vbByte
-                    '    ss$ = s$ + "ub"
-                    'Case vbDate
-                    '    ss$ = s$ + "ud"
-                    'Case 20
-                    '    ss$ = s$ + "&&"
-                    'Case vbObject
-                    'GoTo v1231231323
-                    'End Select
-'a3432232:
-                Loop While Not ValidNum(s$, True, f = 4, VarType(var(i)) + (x1 = 1000) * 500)
-v1231231323:
+                Loop While Not ValidNum(s$, True, f = 4, VarType(p) + (x1 = 1000) * 500)
+
                     If LenB(Trim(s$)) = 0 Then ErrNum: MyInput = False: Fkey = 0: Exit Function
                 End If
                 If GetVar(bstack, what$, i) Then
@@ -38145,9 +38237,21 @@ v1231231323:
 cont445487:
                                 bstack.soros.PushVal pp
                                 Set bstack.lastobj = Nothing
+                                PushErrStage bstack
+                                
                                 NeoCall2 bstack, what$ + "." + ChrW(&H1FFF) + ":=()", MyInput
+                                PopErrStage bstack
                                 Set bstack.Sorosref = mystack
                                 Set mystack = Nothing
+                                If LastErNum <> 0 Then
+                                LastErNum = 0
+                                LastErNum1 = 0
+                                If LastErName <> "" Then LastErName = Chr(0) + LastErName
+                                If LastErNameGR <> "" Then LastErNameGR = Chr(0) + LastErNameGR
+                                GoTo again112
+                                End If
+                                
+                                
                             Else
                                 BadGroupHandle
                                 MyInput = False
@@ -38219,6 +38323,7 @@ cont445487:
                         End Select
                         If IsNumberCheck(s$, p) Then bstack.SetVar what$, pp
                     Else
+                    
                         Select Case VarType(pp)
                                 Case vbLong
                                     s$ = s$ + "&"
@@ -38236,8 +38341,8 @@ cont445487:
                                     s$ = s$ + "ud"
                                 Case 20
                                     s$ = s$ + "&&"
-                                Case vbObject
-                                    If VarTypeName(var(i)) = "BigInteger" Then
+                                Case vbObject, vbEmpty
+                                    If VarTypeName(p) = "BigInteger" Then
                                         s$ = s$ + "u"
                                     End If
                                 End Select
@@ -38251,7 +38356,8 @@ cont87887454587:
                     End If
                 End If
                 MyInput = True
-        Case 3
+
+Case 3
 jumpthere:
             If par Then
                 If uni(f) Then
@@ -38261,6 +38367,31 @@ jumpthere:
                 End If
                 If inpcsvuseescape Then s$ = EscapeStrToString(s$)
             Else
+            If MaybeIsSymbol2(rest$, ",;", i) Then
+                    If Mid$(rest$, i, 1) = "," Then
+                        Final$ = ", "
+                        ex$ = "," + vbCr
+                    ElseIf Mid$(rest$, i + 1, 1) = """" Then
+                        FastSymbol rest$, ";"
+                        If ISSTRINGA(rest$, Final$) Then
+                            If MaybeIsSymbol2(rest$, ",;", i) Then
+                            If Trim$(Final$) = "" Then
+                                If Len(Final$) = 0 Then Final$ = " "
+                                ex$ = " " + vbCr
+                            Else
+                                ex$ = Left$(LTrim$(Final$), 1) + vbCr
+                            End If
+                            Else
+                            ex$ = vbCr
+                            End If
+                        Else
+                            SyntaxError
+                            Exit Function
+                        End If
+                    End If
+                Else
+                ex$ = vbCr
+                End If
                 prive = GetCode(bstack.Owner)
                 If players(prive).lastprint Then
                     LCTbasket bstack.Owner, players(prive), players(prive).currow, players(prive).curpos
@@ -38323,7 +38454,7 @@ jumpthere:
                     LCTbasket bstack.Owner, players(prive), players(prive).currow, players(prive).curpos
                     players(prive).lastprint = False
                 End If
-                W$ = QUERY(bstack, frm$, s$, 256, False, IIf(lookOne(rest$, ","), "," + vbCr, vbCr), "+*/!.@#$|\{}[]'~`%^&()=_:;", True)
+                W$ = QUERY(bstack, frm$, s$, 256, False, IIf(lookOne(rest$, ","), "," + vbCr, vbCr), "+*/!.@#$|\{}[]'~`%^&()=_:;eEÂ≈", True)
                 If LenB(Trim(s$)) = 0 Then ErrNum: MyInput = False:    Fkey = 0: Exit Function
             End If
             If GetVar(bstack, what$, i) Then
@@ -38424,16 +38555,131 @@ cont878874545871:
             MyInput = True
         Case 5
             If neoGetArray(bstack, what$, pppp) Then
-                If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then Fkey = 0: Exit Function
+                If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$, , , , True) Then Fkey = 0: Exit Function
             Else
                 MyEr "No such array", "ƒÂÌ ı‹Ò˜ÂÈ Ù›ÙÔÈÔÚ ﬂÌ·Í·Ú"
                 Fkey = 0:  Exit Function
             End If
-            If pppp.IsStringItem(it) Then
-                GoTo jumpthere4
+            
+            If Not pppp.Arr Then
+            If pppp.GroupRef Is Nothing Then
+                InternalError
+                Exit Function
+            ElseIf it = -2 Then
+            Set mystack = bstack.soros
+            Set bstack.Sorosref = New mStiva
+            PushParamStraight bstack, rest$
+            If Not FastSymbol(rest$, ")") Then
+                SyntaxError
+                Exit Function
             End If
-            If FastSymbol(rest$, "=") Then IsNumberCheck rest$, p Else p = 0#
-            MyInput = True
+            p = 0#
+            GoTo cont2232322
+            ElseIf pppp.IsObjAt(it, p) Then
+            GoTo aaa2332
+            'ElseIf it < -2 Then
+            
+            'Set mystack = bstack.soros
+            'Set bstack.Sorosref = New mStiva
+            'If FastSymbol(rest$, ")") Then
+            'PushParamStraight bstack, rest$
+           ' If Not FastSymbol(rest$, ")") Then
+           '     SyntaxError
+           '     Exit Function
+           ' End If
+            'End If
+            End If
+            p = 0#
+            ElseIf pppp.IsObjAt(it, p) Then
+aaa2332:
+            If p Is Nothing Then
+                Set p = ZeroBig
+            ElseIf TypeOf p Is BigInteger Then
+            
+                If FastSymbol(rest$, "=") Then
+                    IsNumberCheck rest$, (0)
+                End If
+                
+                GoTo cont1333
+            ElseIf TypeOf p Is Group Then
+                Set mystack = bstack.soros
+                Set bstack.Sorosref = New mStiva
+                If FastSymbol(rest$, "(") Then
+                PushParamStraight bstack, rest$
+                If Not FastSymbol(rest$, ")") Then
+                    SyntaxError
+                    Exit Function
+                End If
+                End If
+                p = 0#
+                GoTo cont2232322
+            End If
+            
+            Else
+            If pppp.IsStringItem(it) Then GoTo jumpthere4
+            End If
+            
+cont2232322:
+            If FastSymbol(rest$, "=") Then
+                
+                IsNumberCheck rest$, p
+                Select Case VarType(p)
+                Case vbBoolean, vbByte, vbLong, vbInteger, 20
+                    integ = True: noexp = True
+                Case vbDecimal, vbCurrency
+                    noexp = True
+                Case vbObject
+                    
+                    If p Is Nothing Then
+                    integ = True: noexp = True
+                    Set p = ZeroBig
+                    ElseIf Not TypeOf p Is BigInteger Then
+                        WrongType
+                        Exit Function
+                    End If
+                    integ = True: noexp = True
+                End Select
+                    
+            ElseIf it > -2 Then
+                Select Case pppp.ItemTypeNum(it)
+                Case vbBoolean, vbByte, vbLong, vbInteger, 20
+                    integ = True: noexp = True
+                    p = pppp.item(it)
+                Case vbDecimal, vbCurrency
+                    noexp = True
+                    p = pppp.item(it)
+                Case vbObject
+                    If pppp.itemObject(it) Is Nothing Then
+                        integ = True: noexp = True
+                        Set p = ZeroBig
+                    ElseIf Not TypeOf pppp.itemObject(it) Is BigInteger Then
+                        If TypeOf pppp.itemObject(it) Is Document Then
+                            GoTo jumpthere4
+                        ElseIf TypeOf pppp.itemObject(it) Is Group Then
+                            GoTo cont1333
+                        End If
+                        WrongType
+                        Exit Function
+                    End If
+                    integ = True: noexp = True
+                    Set p = ZeroBig
+                Case Else
+                    
+                    If pppp.ItemIsObject(it) Then
+                    p = 0#
+                    Else
+                    p = pppp.item(it)
+                    If VarType(p) = vbString Then
+                        GoTo jumpthere4
+                    End If
+                    End If
+                    
+                End Select
+            Else
+            p = 0#
+            End If
+cont1333:
+            'MyInput = True
             If par Then
                 If uni(f) Then
                     getUniRealComma f, s$
@@ -38442,70 +38688,175 @@ cont878874545871:
                 End If
             Else
                 prive = GetCode(bstack.Owner)
+                ss$ = ""
+                If frm$ <> "" Then
+                PlainBaSket bstack.Owner, players(prive), frm$, , , 0
+                End If
                 If players(prive).lastprint Then
                     LCTbasket bstack.Owner, players(prive), players(prive).currow, players(prive).curpos
                     players(prive).lastprint = False
+                    rpos = players(prive).currow
+                    rrow = players(prive).curpos
+                Else
+                    rpos = GetRealPos(bstack.Owner)
+                    rrow = GetRealRow(bstack.Owner)
                 End If
-                W$ = QUERY(bstack, frm$, s$, 256, False, IIf(lookOne(rest$, ","), "," + vbCr, vbCr), "+*/!@#$|\{}[]'~`%^&()=_:;", True)
+                If MaybeIsSymbol2(rest$, ",;", i) Then
+                    If Mid$(rest$, i, 1) = "," Then
+                        Final$ = ","
+                        ex$ = "," + vbCr
+                    ElseIf Mid$(rest$, i + 1, 1) = """" Then
+                        FastSymbol rest$, ";"
+                        If ISSTRINGA(rest$, Final$) Then
+                            If MaybeIsSymbol2(rest$, ",;", i) Then
+                            If Trim$(Final$) = "" Then
+                                If Len(Final$) = 0 Then Final$ = " "
+                                ex$ = " " + vbCr
+                            Else
+                                ex$ = Left$(LTrim$(Final$), 1) + vbCr
+                            End If
+                            Else
+                            ex$ = vbCr
+                            End If
+                        Else
+                            SyntaxError
+                            Exit Function
+                        End If
+                    End If
+                Else
+                Final$ = ""
+                ex$ = vbCr
+                End If
+                ss$ = ""
+again112a:
+                Do
+                    If Len(ss$) > 0 Then
+                        ss$ = ss$ + Final$
+                        If ((rpos + Len(ss$)) \ players(prive).mX) + rrow > players(prive).mY - 1 Then
+                            rrow = players(prive).mY - ((rpos + Len(ss$)) \ players(prive).mX) - 1
+                        End If
+                        LCTbasket bstack.Owner, players(prive), rrow, rpos
+                        bstack.Owner.FontTransparent = False
+                        PlainBaSket bstack.Owner, players(prive), space$(Len(ss$)), , , 0, True
+                        bstack.Owner.FontTransparent = True
+                        LCTbasket bstack.Owner, players(prive), rrow, rpos
+                        Beep
+                    Else
+                        LCTbasket bstack.Owner, players(prive), rrow, rpos
+                    End If
+                                
+                    If integ Then
+                        W$ = QUERY(bstack, "", s$, 256, False, ex$, "+*/!.@#$|\{}[]'~`%^&()=_:;eEÂ≈", True, Final$)
+                    Else
+                        If noexp Then
+                        W$ = QUERY(bstack, "", s$, 256, False, ex$, "+*/!@#$|\{}[]'~`%^&()=_:;eEÂ≈", True, Final$)
+                        Else
+                        W$ = QUERY(bstack, "", s$, 256, False, ex$, "+*/!@#$|\{}[]'~`%^&()=_:;", True, Final$)
+                        End If
+                    End If
+            
+                
                 If LenB(Trim(s$)) = 0 Then ErrNum: MyInput = False: Fkey = 0: Exit Function
+            
+            ss$ = s$
+            Loop While Not ValidNum(s$, True, f = 4, VarType(p) + (x1 = 1000) * 500)
+            If LenB(Trim(s$)) = 0 Then ErrNum: MyInput = False: Fkey = 0: Exit Function
             End If
-            
-            
-            If pppp.IsObjAt(it, p) Then
-                If FastSymbol(rest$, "=") Then
-                    IsNumberCheck rest$, 0#
-                End If
-                If Not p Is Nothing Then
-                    If TypeOf p Is BigInteger Then
-                        Set pppp.item(it) = Module13.CreateBigInteger(s$)
+                                    
+            Select Case VarType(p)
+            Case vbLong
+                s$ = s$ + "&"
+            Case vbCurrency
+                s$ = s$ + "#"
+            Case vbDecimal
+                s$ = s$ + "@"
+            Case vbSingle
+                s$ = s$ + "~"
+            Case vbInteger
+                s$ = s$ + "%"
+            Case vbByte
+                s$ = s$ + "ub"
+            Case vbDate
+                s$ = s$ + "ud"
+            Case 20
+                s$ = s$ + "&&"
+            Case vbObject
+                If TypeOf p Is BigInteger Then
+                    If it <> -2 Then
+                    Set pppp.item(it) = Module13.CreateBigInteger(s$)
                         GoTo cont723948238749
                     End If
                 End If
-            ElseIf FastSymbol(rest$, "=") Then
-                IsNumberCheck rest$, p
+            End Select
+            If it <> -2 And mystack Is Nothing Then
+                If par Then
+                    If Not IsNumberCheck(s$, pp, inpcsvDec$) Then pp = p
+                Else
+                    If Not IsNumberCheck(s$, pp) Then pp = p
+                End If
+                pppp.item(it) = pp
             Else
-                p = pppp.item(it)
-            End If
-            p = p - p
-                    Select Case VarType(p)
-                    Case vbLong
-                        s$ = s$ + "&"
-                    Case vbCurrency
-                        s$ = s$ + "#"
-                    Case vbDecimal
-                        s$ = s$ + "@"
-                    Case vbSingle
-                        s$ = s$ + "~"
-                    Case vbInteger
-                        s$ = s$ + "%"
-                    Case vbByte
-                            s$ = s$ + "ub"
-                        Case vbDate
-                            s$ = s$ + "ud"
-                        Case 20
-                            s$ = s$ + "&&"
-                        Case Else
-                                If VarTypeName(var(i)) = "BigInteger" Then
-                                    s$ = s$ + "u"
-                                End If
-                    End Select
-            If par Then
-                If Not IsNumberCheck(s$, pp, inpcsvDec$) Then pp = p
+            If IsObject(p) Then
+                bstack.soros.DataObj p
             Else
-                If Not IsNumberCheck(s$, pp) Then pp = p
+                If par Then
+                    If Not IsNumberCheck(s$, pp, inpcsvDec$) Then pp = p
+                Else
+                    If Not IsNumberCheck(s$, pp) Then pp = p
+                End If
+            
+                bstack.soros.DataVal pp
             End If
-            pppp.item(it) = pp
+            If pppp.Arr Then
+            
+                If SpeedGroup(bstack, pppp, "@READ2", "", "", it) = 0 Then
+                    Set bstack.Sorosref = mystack
+                    Exit Function
+                End If
+           ElseIf TypeOf pppp.GroupRef Is mHandler Then
+           
+                    Set pppp1 = New ppppLight
+                    pppp1.Arr = False
+                    Set pppp1.GroupRef = pppp.item(it)
+                    
+                    If SpeedGroup(bstack, pppp1, "@READ2", "", "", -2&) = 0 Then
+                    Set bstack.Sorosref = mystack
+                    Exit Function
+                    End If
+                    Set pppp.item(it) = pppp1.GroupRef
+                    Set pppp1 = Nothing
+               
+               
+            ElseIf pppp.GroupRef.IamFloatGroup Then
+                If SpeedGroup(bstack, pppp, "@READ2", "", "", it) = 0 Then
+                    Set bstack.Sorosref = mystack
+                    Exit Function
+                End If
+            Else
+            
+                NeoCall2 bstack, Left$(what$, Len(what$) - 1) + "." + ChrW(&H1FFF) + ":=()", ok
+                If Not ok Then
+                    Set bstack.Sorosref = mystack
+                    Exit Function
+                Else
+                    Set bstack.Sorosref = mystack
+                End If
+            End If
+            Set bstack.Sorosref = mystack
+            
+            End If
 cont723948238749:
             MyInput = True
-        Case 6
+Case 6
             If neoGetArray(bstack, what$, pppp) Then
                 If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then Fkey = 0: Exit Function
             Else
                 MyEr "No such array", "ƒÂÌ ı‹Ò˜ÂÈ Ù›ÙÔÈÔÚ ﬂÌ·Í·Ú"
                 Fkey = 0: Exit Function
             End If
+            
+            
 jumpthere4:
-            MyInput = True
             If par Then
                 If uni(f) Then
                     getUniStringComma f, s$, inpcleanstrings
@@ -38565,7 +38916,7 @@ jumpthere4:
                     LCTbasket bstack.Owner, players(prive), players(prive).currow, players(prive).curpos
                     players(prive).lastprint = False
                 End If
-                W$ = QUERY(bstack, frm$, s$, 256, False, IIf(lookOne(rest$, ","), "," + vbCr, vbCr), "+*/!@#$|\{}[.]'~`%^&()=_:;", True)
+                W$ = QUERY(bstack, frm$, s$, 256, False, IIf(lookOne(rest$, ","), "," + vbCr, vbCr), "+*/!@#$|\{}[.]'~`%^&()=_:;eEÂ≈", True)
                 If LenB(Trim(s$)) = 0 Then ErrNum: MyInput = False: Fkey = 0: Exit Function
             End If
             If FastSymbol(rest$, "=") Then IsNumberCheck rest$, p Else p = pppp.item(it)
@@ -38606,9 +38957,13 @@ jumpthere4:
         ElseIf FastSymbol(rest$, ";") Then
             If Not par Then
                 W$ = ";"
-                frm$ = " "
+               If Len(ex$) = 1 Then frm$ = " " Else frm$ = ""
             End If
         Else
+                If Final$ <> "" Then
+                ' here add one
+                PlainBaSket bstack.Owner, players(prive), Final$, , , 0
+                End If
             If Not par Then If Not W$ = ";" Then crNew bstack, players(prive)
             W$ = vbNullString
             Fkey = 0: Exit Function
@@ -53121,7 +53476,32 @@ check999100:
     End If
     Exit Function
 fstr31: '"TYPE$(", "‘’–œ”$("
+    If lookOne(A$, "(") Then
+ch1245:
+    If IsExp(bstackstr, A$, p) Then
+        If Not bstackstr.lastobj Is Nothing Then
+            Set p = bstackstr.lastobj
+        End If
+        CheckItemType bstackstr, p, "", r$
+        
+    ElseIf IsStrExp(bstackstr, A$, s$) Then
+        If bstackstr.lastobj Is Nothing Then
+            r$ = Typename$(s$)
+        Else
+            Set p = bstackstr.lastobj
+            CheckItemType bstackstr, p, "", r$
+        End If
+    Else
+        SyntaxError
+        Exit Function
+    End If
+        strFunctions = FastSymbol(A$, ")")
+    
+    Else
+    s$ = aheadstatus(A$, False, (1))
+    If InStr(s$, "o") > 0 Or InStr(s$, "NN") > 0 Then GoTo ch1245
     dd = Abs(IsLabel(bstackstr, A$, s$))
+    If dd = 0 Then GoTo ch1245
     If dd > 4 And dd < 8 Then
     
         If neoGetArray(bstackstr, s$, ppppl) Then
@@ -53173,7 +53553,10 @@ cont111:
             If r$ = "VarItem" Then r$ = "Optional"
             strFunctions = FastSymbol(A$, ")")
         Else
-            Nosuchvariable s$
+         bstackstr.tmpstr = s$ + Left$(A$, 1)
+        BackPort A$
+        GoTo ch1245
+           ' Nosuchvariable s$
         End If
     ElseIf dd > 0 Then
         If GetVar(bstackstr, s$, w3) Then
@@ -53245,6 +53628,7 @@ contaaaa:
         strFunctions = FastSymbol(A$, ")")
     Else
         SyntaxError
+    End If
     End If
     Exit Function
 fstr32: ' "PARAGRAPH$(", "–¡—¡√—¡÷œ”$("

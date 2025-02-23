@@ -791,34 +791,34 @@ End Function
 
 
 Public Property Get uni(RHS) As Long
-Dim h
+Dim H
 If InUseHandlers.ExistKey(RHS) Then
-    h = InUseHandlers.Value
-    uni = h(3)
+    H = InUseHandlers.Value
+    uni = H(3)
 End If
 End Property
 
 Public Property Get Fstep(RHS) As Long
-Dim h
+Dim H
 If InUseHandlers.ExistKey(RHS) Then
-    h = InUseHandlers.Value
-    Fstep = h(2)
+    H = InUseHandlers.Value
+    Fstep = H(2)
 End If
 End Property
 Public Property Get Fkind(RHS) As Ftypes
-Dim h
+Dim H
 If InUseHandlers.ExistKey(RHS) Then
-    h = InUseHandlers.Value
-    Fkind = h(1)
+    H = InUseHandlers.Value
+    Fkind = H(1)
 End If
 End Property
 Public Property Let FileSeek(RHS, vvv)
-Dim h, where, ret As Currency, LowLong As Long, HighLong As Long
+Dim H, where, ret As Currency, LowLong As Long, HighLong As Long
 Dim FileError As Long
 ret = CCur(Int(vvv)) - 1
 If InUseHandlers.ExistKey(RHS) Then
-    h = InUseHandlers.Value
-    where = h(0)
+    H = InUseHandlers.Value
+    where = H(0)
     Size2Long ret, LowLong, HighLong
     LowLong = SetFilePointer(where, LowLong, HighLong, FILE_BEGIN)
     FileError = GetLastError()
@@ -830,11 +830,11 @@ Else
 End If
 End Property
 Public Property Get FileSeek(RHS) As Variant
-Dim h, where, ret As Currency, LowLong As Long, HighLong As Long
+Dim H, where, ret As Currency, LowLong As Long, HighLong As Long
 FileSeek = ret
 If InUseHandlers.ExistKey(RHS) Then
-    h = InUseHandlers.Value
-    where = h(0)
+    H = InUseHandlers.Value
+    where = H(0)
     LowLong = 0
     HighLong = 0
     LowLong = SetFilePointer(where, LowLong, HighLong, FILE_CURRENT)
@@ -883,11 +883,11 @@ Dim fsize As Currency
 End Property
 
 Public Property Get FileEOF(RHS) As Boolean
-Dim h, where, ret As Currency, LowLong As Long, HighLong As Long
+Dim H, where, ret As Currency, LowLong As Long, HighLong As Long
 Dim fsize As Currency
 If InUseHandlers.ExistKey(RHS) Then
-    h = InUseHandlers.Value
-    where = h(0)
+    H = InUseHandlers.Value
+    where = H(0)
     LowLong = SetFilePointer(where, LowLong, HighLong, FILE_BEGIN)
     If LowLong = INVALID_SET_FILE_POINTER Then
         MyEr "Can't read the seek value on Eof() function", "Δεν μπορώ να διαβάσω τη τιμή μετάθεσης στη συνάρτηση Μετάθεση()"
@@ -921,8 +921,8 @@ Else
 End If
 End Function
 'internal use
-Public Function ReadFileHandler(h&) As Variant
-If InUseHandlers.Find(CVar(h&)) Then
+Public Function ReadFileHandler(H&) As Variant
+If InUseHandlers.Find(CVar(H&)) Then
     ReadFileHandler = InUseHandlers.sValue
 Else
     MyEr "No such file handler", "Δεν υπάρχει τέτοιο χειριστής αρχείου"
@@ -930,29 +930,29 @@ End If
 End Function
 ' internal use  You have to close file first
 Public Sub CloseHandler(RHS)
-Dim h&, Ar() As Variant
+Dim H&, Ar() As Variant
 On Error Resume Next
 If InUseHandlers.ExistKey(RHS) Then
-    h& = CLng(InUseHandlers.sValue)
-    API_CloseFile h&
-    h& = InUseHandlers.KeyToNumber
+    H& = CLng(InUseHandlers.sValue)
+    API_CloseFile H&
+    H& = InUseHandlers.KeyToNumber
     InUseHandlers.RemoveWithNoFind
-    FreeUseHandlers.AddKey CVar(h&)
+    FreeUseHandlers.AddKey CVar(H&)
 Else
     ' no error... (I am thinking about it)
 End If
 
 End Sub
 Public Sub CloseAllHandlers()
-Dim h&
+Dim H&
 On Error Resume Next
 Do While InUseHandlers.Count > 0
     InUseHandlers.ToEnd
-    h& = CLng(InUseHandlers.sValue)
-    API_CloseFile h&
-    h& = InUseHandlers.KeyToNumber
+    H& = CLng(InUseHandlers.sValue)
+    API_CloseFile H&
+    H& = InUseHandlers.KeyToNumber
     InUseHandlers.RemoveWithNoFind
-    FreeUseHandlers.AddKey CVar(h&)
+    FreeUseHandlers.AddKey CVar(H&)
 Loop
 End Sub
 Function myFileLen(ByVal FileName As String) As Currency
@@ -1558,14 +1558,14 @@ Public Function URLEncodeEsc(cc As String, Optional space_as_plus As Boolean = F
         URLEncodeEsc = Join(res, "")
     End If
 End Function
-Function DecodeEscape(C$, plus_as_space As Boolean) As String
-If plus_as_space Then C$ = Replace(C$, "+", " ")
-Dim a() As String, i As Long
-a() = Split(C$, "%")
-For i = 1 To UBound(a())
-a(i) = Chr(val("&h" + Left$(a(i), 2))) + Mid$(a(i), 3)
+Function DecodeEscape(c$, plus_as_space As Boolean) As String
+If plus_as_space Then c$ = Replace(c$, "+", " ")
+Dim A() As String, i As Long
+A() = Split(c$, "%")
+For i = 1 To UBound(A())
+A(i) = Chr(val("&h" + Left$(A(i), 2))) + Mid$(A(i), 3)
 Next i
-DecodeEscape = utf8decode(StrConv(Join(a(), ""), vbFromUnicode))
+DecodeEscape = utf8decode(StrConv(Join(A(), ""), vbFromUnicode))
 
 End Function
 Sub ClearState1()
@@ -3972,10 +3972,10 @@ here66678:
         If Not .Arr Then
             If v = -2 Then GoTo con123
             If IsGroup(.item(v)) Then GoTo a1297654
-            If .isObj Then
+            If .IsObj Then
             If IsmHandler(.GroupRef) Then
             Set usehandler = .GroupRef
-            If usehandler.objref.isObj Then
+            If usehandler.objref.IsObj Then
             Set usehandler = Nothing
             Set myobject = .item(v)
             If Not myobject Is Nothing Then
@@ -4352,6 +4352,7 @@ again12568:
                 Set bstack.lastobj = Nothing
             End If
             Exec1 = SpeedGroup(bstack, ppppAny, "@READ2", "", b$, v)
+            Set bstack.Sorosref = myobject  ' error - all revisions before
             If Exec1 = 0 Then GoTo err000
             If extreme Then GoTo NewCheck2 Else GoTo NewCheck
         End If
@@ -4789,6 +4790,7 @@ checkpar:
             End If
             
             Exec1 = SpeedGroup(bstack, ppppAny, "@READ2", "", b$, v)
+            Set bstack.Sorosref = myobject  ' error - all revisions before
             If extreme Then GoTo NewCheck2 Else GoTo NewCheck
         End If
    ElseIf FastSymbol(b$, "->", , 2) Then
@@ -6090,11 +6092,13 @@ Case 5, 7
         MyRead = globalArrByPointer(bs, bstack, what$, flag2, allowglobals): If Not MyRead Then SyntaxError: Exit Function
     Else
         If neoGetArray(bstack, what$, ppppl) And Not flag2 Then
-            If Not NeoGetArrayItem(ppppl, bs, what$, it, rest$) Then Exit Function
+            If Not NeoGetArrayItem(ppppl, bs, what$, it, rest$, , , , True) Then Exit Function
         Else
             Exit Function
         End If
-        If IsOperator(rest$, ".") Then
+        If it = -2 Then
+        
+        ElseIf IsOperator(rest$, ".") Then
             If Not ppppl.ItemType(it) = mGroup Then
                 MyEr "Expected group", "Περίμενα ομάδα"
                 MyRead = False: Exit Function
@@ -9341,7 +9345,7 @@ Public Function IntSqrdEC(sA) As Variant
     Loop
     IntSqrdEC = r
 End Function
-Function CopyBigInteger(p, Optional a) As BigInteger
+Function CopyBigInteger(p, Optional A) As BigInteger
     Dim check As BigInteger
     Set check = p
     If check.Unique Then
@@ -9349,8 +9353,8 @@ Function CopyBigInteger(p, Optional a) As BigInteger
     Exit Function
     End If
     Set CopyBigInteger = New BigInteger
-    If Not IsMissing(a) Then
-        CopyBigInteger.Load2 p, a
+    If Not IsMissing(A) Then
+        CopyBigInteger.Load2 p, A
     Else
         CopyBigInteger.Load2 p
     End If
