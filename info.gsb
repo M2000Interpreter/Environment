@@ -11211,332 +11211,330 @@ Dim A(10)
 A(3)=zz()
 A(3).bb
 }
-MODULE OOP1 {// events without using Event objects
-// We use weak reference to register events in eventhandler
-// if A is a variable a &A is a string contain the actuall name of A, and this is a weak reference
-// Normally when we do a Read &B the read instruction get the string as a name for  a variable  and check if exist as variable
-// so Read make references from weak references
-// M2000 has also the pointer. A pointer is different from the reference, because has nothing to do with name of entities
-// For example  a=(1,2,3,4) set a as a pointer to array. Passing by value a we pass the object by a pointer.
-// We can pass &a so if we change the array inside a module or funcion, then we get the change back
-// A weak reference can be stored as string, and maybe later be invalid, if the storage, an array, passed back as return value,
-// or pushed to stack of values, and the module where we defined the refered entitites, terminate, and clear all own variables.
-
-//for this example we make "static" groups (as named the user objects in M2000).
-//The word static used for static variables which stay in every call of a module or function, from the same execution object.
-// (perhaps a thread which is a separate execution object call a module with specific for the thread static variables)
-// Here we don't use threads. We have one loop, which call one function of the EventHandler, the observe()
-// if this functions return true then the loop exit, and the program terminate
-
-
-//we have three classes (they are global functions, which construct groups)
-// The mouseListene and the keylistener, and the EventHandler
-// Inside EventListener we have one more class (this isn't global)
-// The Widdget class
-// This class has the state for an event, and used from button function, a member of EventHandler
-// So with this EventHandler we can make buttons, with a name. The function button() return a Group
-// So for the example we make three buttons to three named groups, B1, B2 and B3
-// Each widget has a weak reference to EventHandler and a name, when constructed,
-// but has no listeners.
-// Also the listeners have to link to EventHandler, and this is the work of EventList() function
-// The Eventlist() is a member of EventHandler and get a listener class, and return a handler
-// To register an event we have to use register method passing the handler and the weak reference and a  button (widget)
-// So buttons and handlers are entities from EventHandler
-// The actual events are not part of the EventHandler. They are inside the listeners classes.
-// Each listener has a contruction member (same name as the class name),
-// a register member to add more widgets to same listener,
-// and the  CheckEvent(), which return true if event happen.
-
-//The EventHandler pass &this  as own weak reference to each new wigdet.
-//The Listeners added to an array inside the EventHandler with a list of weak references to widgets.
-//The observe() function cehck all stored listeners, calling the CheckEcent() on listener.
-// if an event happen then all subscribers (all widgets) get a call in callback()  function with the name of the event
-// each widget then using the weak refrence to EventHandler do a query passig an id, an iinfo string (what$) and a reference of it
-// The query method (module in M2000) use id and what$ to display information, and use reference to read the caption of widget
-// perhaps the caption may change, so we can't stored this in listener's list in EventHandler.
-
-// So from observe(), pressing 1 or 2 keys or mouse key, we can call  one or more  widget's callback(),
-// which all  call back the query method, which the later read the widget caption.
-// B1 listen 1 and 2 keys, B2 listen 1 key, B3 listen a mouse key (right key)
-
-
-
-Module OOP {
-	Set Fast
-	cls 1, 0
-	pen 14
-	report 2, "Event Listener"
-	report "Use keys 1, 2 and mouse left, and for exit mouse right"
-	cls, 2
-	class mouselistener {
-	      name$="MousePress",  yourkey,  auto
-	      dim ref$()
-	      module mouselistener {
-	            read .yourkey
-	            .name$<=format$("{0}({1})",.name$,.yourkey)
-	      }
-	      module register {
-	            .auto++
-	            dim .ref$(.auto)
-	            read .ref$(.auto-1)   // weak reference
-	      }
-	      function CheckEvent {
-	            =Mouse=.yourkey
-	      }
+MODULE OOP1 {Module OOP {
+	FORM 80,40 : CLS 1, 0 : PEN 14
+	example`s_title="Event Listener"
+	REPORT 2, example`s_title
+	REPORT "Use keys 1, 2 and mouse left, and for exit mouse right" 
+	CLS, 2
+	CLASS Service {
+	PRIVATE:
+		INTEGER auto, yourkey
+	PUBLIC:	
+		name$,
+		DIM ref$()
+		MODULE FINAL register {
+			.auto++
+			DIM .ref$(.auto)
+			READ .ref$(.auto-1) 
+		}
+		FUNCTION CheckEvent {
+			ERROR "not ready yet"
+		}
+		FUNCTION FINAL auto {
+			=.auto-1
+		}
 	}
-	class keylistener {
-	      name$="KeyPress", yourkey, auto
-	      dim ref$()
-	      module keylistener {
-	            read .yourkey
-	            .name$<=format$("{0}({1})",.name$,.yourkey)
-	      }
-	      module register {
-	            .auto++
-	            dim .ref$(.auto)
-	            read .ref$(.auto-1)   // weak reference
-	      }
-	      function CheckEvent {
-	            =keypress(.yourkey)
-	      }
-	}
-	class EventHandler {
-	      auto, autoevents, EnableEvents
-	      Dim Events()
-	      class widget {
-	            // in classes we can define variables without value
-	            ref$  // weak reference
-	            id, caption$, Enabled=True
-	            module linkme {
-	                  read .ref$
-	            }
-	            module widget {  // this is used as construction function, but is a module
-	                  read .id
-	                  read .caption$
-	            }
-	            function Callback {
-	                  read some$
-	                  push .ref$ : read &ref  // this is the link
-	                  =ref.query(.id, some$, &this)
-	            }
-	      }
-	      function button {    // this is the button construction
-	         .auto++
-	         read txt$
-	         makeme =.widget(.auto,txt$)  
-	         makeme.linkme &this
-	         =makeme   // we make a group a floating group to export
-	      }
-	      function EventList {
-	            handle=.autoevents  // we execute some commands..
-	            .autoevents++
-	            dim .Events(.autoevents)
-	            read .Events(handle)   // .. and then we can read function parameter
-	            =handle
-	      }
-	      module register {
-	           read handler, ref$
-	            .Events(handler).register  ref$
-	      }
-	     function observe {
-	     if not .EnableEvents then =true : exit
-	           print "observe for events"
-	           for i=0 to .autoevents-1 {
-	                 for .Events(i) {
-	                        if  .checkevent() then {
-	                              for j=0 to .auto-1 {
-	                                    for this {     // we use a for this {} to make temporary variables
-	                                                           // because we can't relink a link.  so we make a fresh here
-	//              the link statement to this:    push  .ref$(j) : read &Link
-	                                          link weak .ref$(j) to &link
-	                                          call link.callback(.name$)
-	                                     }
-	                                }
-	                        }
-	                 }
-	           }
-	     }
-	      function query {
-	            read id, what$, &nicesmallgroup
-	            print under "Inside EventHandler";
-	            print under
-	            print  part "I get a query from a widget object ";id
-	            print
-	            print part "Say:";what$
-	            print
-	            for nicesmallgroup {
-	                  Print part "I get the caption:";.caption$
-	                  print
-	                  =0
-	            }
-	      }
-	}
-	EventHandler=EventHandler()  // create handler
-	B1=EventHandler.button("Button1")  // create subjects
-	B2=EventHandler.button("Button2") 
-	B3=EventHandler.button("Button3") 
 	
-	for EventHandler {
-	      PressKeyOne=.Eventlist(keylistener(49))
-	      .Register  PressKeyOne, &B1  //register event to subject
-	      .Register  PressKeyOne, &B2 
-	      .Register .Eventlist(keylistener(50)) , &B1 
-	      .Register .Eventlist(Mouselistener(1)) , &B3 
-	      .EnableEvents=True  
+	CLASS Service_MouseKey AS Service {
+		FUNCTION CheckEvent {
+			=MOUSE=.yourkey
+		}
+	CLASS:
+		MODULE Service_MouseKey (val) {
+			.yourkey <= INT(val)
+			.name$ <= FORMAT$("MOUSE ({1})", TYPE$(val), EVAL$(val))
+		}
 	}
-	every 150 {
-	      if EventHandler.observe() then exit
-	      if mouse=2 then exit
+	CLASS Service_Button AS Service {
+		FUNCTION CheckEvent {
+			=KEYPRESS(.yourkey)
+		}
+	CLASS:	
+		MODULE Service_Button (val){
+			.yourkey <= INT(val)
+			.name$ <= FORMAT$("{0}({1})", TYPE$(val), EVAL$(val))
+		}
+	}
+	CLASS EventHandler {
+	PRIVATE:
+		INTEGER auto, auto_event
+		DIM Events()
+		CLASS widget {
+		ΓΕΓΟΝΟΣ "DoSomething"
+		PRIVATE:
+			ref$, id, caption$
+		 PUBLIC:
+		 	BOOLEAN Enabled=True
+			MODULE Linkeme {
+				READ .ref$
+			}
+			MODULE widget { 
+				READ .id
+				READ .caption$
+			}
+			FUNCTION caption$() {
+				=.caption$
+			}
+			FUNCTION CallBack() {
+				READ some$
+				LINK WEAK .ref$  TO ref
+				CALL ref.Query(.id, some$, &THIS)
+				CALL EVENT "DoSomething", .caption$, some$
+			}
+		}
+	PUBLIC:     
+		BOOLEAN EnableEvents
+		FUNCTION button() {   
+			.auto++
+			READ some$
+			makeme =.widget(.auto, some$)  
+			makeme.Linkeme &THIS
+			=makeme
+		}
+		FUNCTION Event_List() {
+			handler=.auto_event 
+			.auto_event++
+			DIM .Events(.auto_event)
+			READ .Events(handler)
+			=handler
+		}
+		MODULE register {
+			READ handler, ref$
+			.Events(handler).register  ref$
+		}
+		FUNCTION Observe(tag) {
+			IF NOT .EnableEvents THEN = True : EXIT
+			INTEGER w, q
+			PRINT tag
+			FOR w=0 TO .auto_event-1 {
+				FOR .Events(w) {
+					IF  .CheckEvent() THEN {
+						FOR q=0 TO .auto() {
+							FOR THIS {
+								LINK WEAK .ref$(q) TO linkTo
+								IF linkTo.Enabled THEN {
+									CALL linkTo.CallBack(.name$)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		FUNCTION Query {
+			READ id, some$, &widget		
+			PEN 15 {
+				PRINT "===EventHandler==="
+				PRINT "Query from widget: #"; id
+				PRINT "States:"; some$
+				FOR widget {
+					PRINT "Caption: ";.caption$()
+				}
+			}
+		}
+	}
+	EventHandler=EventHandler()
+	GROUP WITHEVENTS b1=EventHandler.button("Button 1")
+	GROUP WITHEVENTS b2=EventHandler.button("Button 2") 
+	GROUP WITHEVENTS b3=EventHandler.button("Button 3") 
+	MODULE Process {
+		READ NEW that, andthat
+		PEN 11 {
+			PRINT example`s_title+"|Process for ";that; " from "; andthat
+		}
+	}
+	FUNCTION β1_DoSomething{
+		CALL LOCAL Process
+	}
+	FUNCTION β2_DoSomething {
+		CALL LOCAL Process
+	}
+	FUNCTION β3_DoSomething {
+		b2.Enabled~
+		CALL LOCAL Process
+	}
+	ENUM ΚΟΜΒΙΟ {ONE=49, TWO}
+	ENUM ΚΟΜΒΙΟ_ΔΕΙΚΤΗ {LEFT=1, RIGHT}
+	FOR EventHandler {
+		PressKeyOne=.Event_List(Service_Button(ONE))
+		.register  PressKeyOne, WEAK$(b1)
+		.register  PressKeyOne, WEAK$(b2)
+		.register .Event_List(Service_Button(TWO)), WEAK$(b2) 
+		.register .Event_List(Service_MouseKey(LEFT)), WEAK$(b3)
+		.EnableEvents=True  
+	}
+	Μ="Observe for events..."
+	EVERY 1000/10 {
+		IF EventHandler.Observe(Μ) THEN EXIT
+		IF MOUSE=2 THEN EXIT
 	} 
 }
 OOP
 Keyboard "info"+chr$(13)
 }
-MODULE OOP1GR {
-Φορμα 80,40
-Οθόνη 1, 0
-Πένα 14
-Αναφορά 2, "Χειριστής Γεγονότων"
-Αναφορά "Χρησιμοποίησε πλήκρα 1, 2 και Δείκτης (ποντίκι) Αριστερά, και για έξοδο Δείκτης Δεξιά"
-Οθόνη, 2
-Κλάση Υπηρεσία_Δείκτη {
-Ιδιωτικό:
-      αθροιστής,  το_κουμπί_μου
-Δημόσιο:      
-      όνομα$="Πλήκτρο_Δείκτη"
-      Πίνακας αναφ$()
-      Τμήμα Υπηρεσία_Δείκτη {
-            Διάβασε .το_κουμπί_μου
-            .όνομα$<=μορφή$("{0}({1})", .όνομα$, .το_κουμπί_μου)
-      }
-      Τμήμα καταχώρησε {
-            .αθροιστής++
-            Πίνακας .αναφ$(.αθροιστής)
-            Διάβασε .αναφ$(.αθροιστής-1) 
-      }
-      Συνάρτηση Επιβεβαίωση {
-            =Δείκτης=.το_κουμπί_μου
-      }
-      Συνάρτηση αθροιστής {
-            =.αθροιστής-1
-      }
+MODULE OOP1GR {ΤΜΗΜΑ OOP {	
+ΦΟΡΜΑ 80,40 : ΟΘΟΝΗ 1, 0 : ΠΕΝΑ 14
+τιτλος_παραδείγματος="Χειριστής Γεγονότων"
+ΑΝΑΦΟΡΑ 2, τιτλος_παραδείγματος
+ΑΝΑΦΟΡΑ "Χρησιμοποίησε πλήκτρα 1, 2 και ΔΕΙΚΤΗΣ (ποντίκι) Αριστερά, και ΓΙΑ έξοδο ΔΕΙΚΤΗΣ Δεξιά" 
+ΟΘΟΝΗ, 2
+ΚΛΑΣΗ Υπηρεσία {
+ΙΔΙΩΤΙΚΟ:
+	ΑΚΕΡΑΙΟΣ αθροιστής, το_κουμπί_μου
+ΔΗΜΟΣΙΟ:	
+	όνομα$,
+	ΠΙΝΑΚΑΣ αναφ$()
+	ΤΜΗΜΑ ΤΕΛΙΚΟ καταχώρησε {
+		.αθροιστής++
+		ΠΙΝΑΚΑΣ .αναφ$(.αθροιστής)
+		ΔΙΑΒΑΣΕ .αναφ$(.αθροιστής-1) 
+	}
+	ΣΥΝΑΡΤΗΣΗ Επιβεβαίωση {
+		ΛΑΘΟΣ "Πρέπει να οριστεί από την υποκλάση"
+	}
+	ΣΥΝΑΡΤΗΣΗ ΤΕΛΙΚΗ αθροιστής {
+		=.αθροιστής-1
+	}
 }
-Κλάση Υπηρεσία_Πλήκτρου {
-Ιδιωτικό:
-      αθροιστής,  το_κουμπί_μου
-Δημόσιο:      
-      όνομα$="Πλήκτρο",
-      Πίνακας αναφ$()
-      Τμήμα Υπηρεσία_Πλήκτρου {
-            Διάβασε .το_κουμπί_μου
-            .όνομα$<=μορφή$("{0}({1})", .όνομα$, .το_κουμπί_μου)
-      }
-      Τμήμα καταχώρησε {
-            .αθροιστής++
-            Πίνακας .αναφ$(.αθροιστής)
-            Διάβασε .αναφ$(.αθροιστής-1) 
-      }
-      Συνάρτηση Επιβεβαίωση {
-            =Πατημένο(.το_κουμπί_μου)
-      }
-      Συνάρτηση αθροιστής {
-            =.αθροιστής-1
-      }
-}
-Κλάση Χειριστής_Γεγονότων {
-Ιδιωτικό:
-      αθροιστής, αθροιστής_γεγονότων
-      Πίνακας Γεγονότα()      
-      Κλάση Στοιχείο_Ελέγχου {
-      Ιδιωτικό:
-            αναφ$, 
-            αναγνωριστικό, ονομασία$, Επιτρέπεται=Αληθής
-       Δημόσιο:
-            Τμήμα Σύνδεσε {
-                  Διάβασε .αναφ$
-            }
-            Τμήμα Στοιχείο_Ελέγχου { 
-                  Διάβασε .αναγνωριστικό
-                  Διάβασε .ονομασία$
-            }
-            Συνάρτηση Ονομασία$ {
-                  =.ονομασία$
-            }
-            Συνάρτηση Κάλεσε_Πίσω {
-                  Διάβασε περιγραφή$
-                  Ένωσε Ισχνή .αναφ$  Στη αναφ 
-                  =αναφ.Ερώτημα(.αναγνωριστικό, περιγραφή$, &Αυτό)
-            }
-      }
-Δημόσιο:     
-      Επιτρέπω_Γεγονότα 
-      Συνάρτηση Στοιχείο_Πλήκτρο {   
-         .αθροιστής++
-         Διάβασε περιγραφή$
-         φτιάξε_με =.Στοιχείο_Ελέγχου(.αθροιστής,περιγραφή$)  
-         φτιάξε_με.Σύνδεσε &Αυτό
-         =φτιάξε_με
-      }
-      Συνάρτηση Λίστα_Γεγονότων {
-            χειριστής=.αθροιστής_γεγονότων 
-            .αθροιστής_γεγονότων++
-            Πίνακας .Γεγονότα(.αθροιστής_γεγονότων)
-            Διάβασε .Γεγονότα(χειριστής)
-            =χειριστής
-      }
-      Τμήμα καταχώρησε {
-           Διάβασε χειριστής, αναφ$
-            .Γεγονότα(χειριστής).καταχώρησε  αναφ$
-      }
-     Συνάρτηση Παρατήρησε {
-     Αν Δεν .Επιτρέπω_Γεγονότα Τότε =Αληθής : Έξοδος
-     Τύπωσε "Παρατηρώ για Γεγονότα"
-           Για ν=0 Έως .αθροιστής_γεγονότων-1 {
-                 Για .Γεγονότα(ν) {
-                        Αν  .Επιβεβαίωση() Τότε {
-                              Για μ=0 Έως .αθροιστής() {
-                                    Για Αυτό {
-                                          Ένωσε Ισχνή .αναφ$(μ) στη Σύνδεση
-                                          Κάλεσε Σύνδεση.Κάλεσε_Πίσω(.όνομα$)
-                                     }
-                                }
-                        }
-                 }
-           }
-     }
-      Συνάρτηση Ερώτημα {
-            Διάβασε αναγνωριστικό, περιγραφή$, &Στοιχείο_Ελέγχου
-            Τύπωσε υπό "Μέσα στο Χειριστής_Γεγονότων";
-            Τύπωσε υπό
-            Τύπωσε  μέρος "Έλαβα ένα ερώτημα από το Στοιχείο_Ελέγχου με αριθμό "; αναγνωριστικό
-            Τύπωσε
-            Τύπωσε μέρος "Λέει:"; περιγραφή$
-            Τύπωσε
-            Για Στοιχείο_Ελέγχου {
-                  Τύπωσε μέρος "Πήρα αυτή την ονομασία:";.ονομασία$()
-                  Τύπωσε
-                  =0
-            }          
-      }
-}
-Χειριστής_Γεγονότων=Χειριστής_Γεγονότων()  \\ δημιουργούμε τον χειριστή
-β1=Χειριστής_Γεγονότων.Στοιχείο_Πλήκτρο("Πλήκτρο 1")  \\ δημιουργούμε υποκείμενα
-β2=Χειριστής_Γεγονότων.Στοιχείο_Πλήκτρο("Πλήκτρο 2") 
-β3=Χειριστής_Γεγονότων.Στοιχείο_Πλήκτρο("Πλήκτρο 3") 
 
-Για Χειριστής_Γεγονότων {
-      Πάτα_πλήκτρο_ένα=.Λίστα_Γεγονότων(Υπηρεσία_Πλήκτρου(49))
-      .καταχώρησε  Πάτα_πλήκτρο_ένα, ισχνη$(β1)  \\καταχώρησε γεγονός στο υποκείμενο
-      .καταχώρησε  Πάτα_πλήκτρο_ένα, ισχνη$(β2)
-      .καταχώρησε .Λίστα_Γεγονότων(Υπηρεσία_Πλήκτρου(50)) , ισχνή$(β1) 
-      .καταχώρησε  .Λίστα_Γεγονότων(Υπηρεσία_Δείκτη(1)) , ισχνη$(β3)
-      .Επιτρέπω_Γεγονότα=Αληθής  
+ΚΛΑΣΗ Υπηρεσία_Δείκτη ΩΣ Υπηρεσία {
+	ΣΥΝΑΡΤΗΣΗ Επιβεβαίωση {
+		=ΔΕΙΚΤΗΣ=.το_κουμπί_μου
+	}
+ΚΛΑΣΗ:
+	ΤΜΗΜΑ Υπηρεσία_Δείκτη (τι) {
+		στη .το_κουμπί_μου=τι		
+		.όνομα$<=ΜΟΡΦΗ$("ΔΕΙΚΤΗΣ ({1})", ΤΥΠΟΣ$(τι), ΕΚΦΡ$(τι))
+	}
 }
-Κάθε 150 {
-      Αν Χειριστής_Γεγονότων.Παρατήρησε() Τότε Έξοδος
-      Αν Δείκτης=2 Τότε Έξοδος
-} 
-
+ΚΛΑΣΗ Υπηρεσία_Πλήκτρου ΩΣ Υπηρεσία {
+	ΣΥΝΑΡΤΗΣΗ Επιβεβαίωση {
+		=ΠΑΤΗΜΕΝΟ(.το_κουμπί_μου)
+	}
+ΚΛΑΣΗ:	
+	ΤΜΗΜΑ Υπηρεσία_Πλήκτρου (τι){
+		.το_κουμπί_μου <= ΑΚ(τι)
+		.όνομα$<=ΜΟΡΦΗ$("{0}({1})", ΤΥΠΟΣ$(τι), ΕΚΦΡ$(τι))
+	}
+}
+ΚΛΑΣΗ Χειριστής_Γεγονότων {
+ΙΔΙΩΤΙΚΟ:
+	ΑΚΕΡΑΙΟΣ αθροιστής, αθροιστής_γεγονότων
+	ΠΙΝΑΚΑΣ Γεγονότα()
+	ΚΛΑΣΗ Στοιχείο_Ελέγχου {
+	ΓΕΓΟΝΟΣ "ΚάνεΚάτι"
+	ΙΔΙΩΤΙΚΟ:
+		αναφ$, αναγνωριστικό, ονομασία$
+	 ΔΗΜΟΣΙΟ:
+	 	ΛΟΓΙΚΟΣ Επιτρέπεται=ΑΛΗΘΗΣ
+		ΤΜΗΜΑ Σύνδεσε {
+			ΔΙΑΒΑΣΕ .αναφ$
+		}
+		ΤΜΗΜΑ Στοιχείο_Ελέγχου { 
+			ΔΙΑΒΑΣΕ .αναγνωριστικό
+			ΔΙΑΒΑΣΕ .ονομασία$
+		}
+		ΣΥΝΑΡΤΗΣΗ Ονομασία$ {
+			=.ονομασία$
+		}
+		ΣΥΝΑΡΤΗΣΗ Κάλεσε_Πίσω {
+			ΔΙΑΒΑΣΕ περιγραφή$
+			ΕΝΩΣΕ ΙΣΧΝΗ .αναφ$  ΣΤΗ αναφ
+			ΚΑΛΕΣΕ αναφ.Ερώτημα(.αναγνωριστικό, περιγραφή$, &ΑΥΤΟ)
+			ΚΑΛΕΣΕ ΓΕΓΟΝΟΣ "ΚάνεΚάτι", .ονομασία$, περιγραφή$
+		}
+	}
+ΔΗΜΟΣΙΟ:     
+	ΛΟΓΙΚΟΣ Επιτρέπω_Γεγονότα
+	ΣΥΝΑΡΤΗΣΗ Στοιχείο_Πλήκτρο {   
+		.αθροιστής++
+		ΔΙΑΒΑΣΕ περιγραφή$
+		φτιάξε_με =.Στοιχείο_Ελέγχου(.αθροιστής, περιγραφή$)  
+		φτιάξε_με.Σύνδεσε &ΑΥΤΟ
+		=φτιάξε_με
+	}
+	ΣΥΝΑΡΤΗΣΗ Λίστα_Γεγονότων {
+		χειριστής=.αθροιστής_γεγονότων 
+		.αθροιστής_γεγονότων++
+		ΠΙΝΑΚΑΣ .Γεγονότα(.αθροιστής_γεγονότων)
+		ΔΙΑΒΑΣΕ .Γεγονότα(χειριστής)
+		=χειριστής
+	}
+	ΤΜΗΜΑ καταχώρησε {
+		ΔΙΑΒΑΣΕ χειριστής, αναφ$
+		.Γεγονότα(χειριστής).καταχώρησε  αναφ$
+	}
+	ΣΥΝΑΡΤΗΣΗ Παρατήρησε(π1) {
+		ΑΝ Δεν .Επιτρέπω_Γεγονότα ΤΟΤΕ =ΑΛΗΘΗΣ : ΕΞΟΔΟΣ
+		ΑΚΕΡΑΙΟΣ ν, κ
+		ΤΥΠΩΣΕ π1
+		ΓΙΑ ν=0 ΕΩΣ .αθροιστής_γεγονότων-1 {
+			ΓΙΑ .Γεγονότα(ν) {
+				ΑΝ  .Επιβεβαίωση() ΤΟΤΕ {
+					ΓΙΑ κ=0 ΕΩΣ .αθροιστής() {
+						ΓΙΑ ΑΥΤΟ {
+							ΕΝΩΣΕ ΙΣΧΝΗ .αναφ$(κ) ΣΤΗ Σύνδεση
+							Αν Σύνδεση.Επιτρέπεται τότε {
+								ΚΑΛΕΣΕ Σύνδεση.Κάλεσε_Πίσω(.όνομα$)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	ΣΥΝΑΡΤΗΣΗ Ερώτημα {
+		ΔΙΑΒΑΣΕ αναγνωριστικό, περιγραφή$, &Στοιχείο_Ελέγχου		
+		ΠΕΝΑ 15 {
+			ΤΥΠΩΣΕ "===Χειριστής_Γεγονότων==="
+			ΤΥΠΩΣΕ "Ερώτημα από Στοιχείο_Ελέγχου: #"; αναγνωριστικό
+			ΤΥΠΩΣΕ "Δηλώνει:"; περιγραφή$
+			ΓΙΑ Στοιχείο_Ελέγχου {
+				ΤΥΠΩΣΕ "Στοιχείο: ";.ονομασία$()
+			}
+		}
+	}
+}
+Χειριστής_Γεγονότων=Χειριστής_Γεγονότων()
+ΟΜΑΔΑ ΜΕΓΕΓΟΝΟΤΑ β1=Χειριστής_Γεγονότων.Στοιχείο_Πλήκτρο("Πλήκτρο 1")
+ΟΜΑΔΑ ΜΕΓΕΓΟΝΟΤΑ β2=Χειριστής_Γεγονότων.Στοιχείο_Πλήκτρο("Πλήκτρο 2") 
+ΟΜΑΔΑ ΜΕΓΕΓΟΝΟΤΑ β3=Χειριστής_Γεγονότων.Στοιχείο_Πλήκτρο("Πλήκτρο 3") 
+ΤΜΗΜΑ ΕΠΕΞΕΡΓΑΣΙΑ {
+	ΔΙΑΒΑΣΕ ΝΕΟ εκείνο, ετούτο
+	ΠΕΝΑ 11 {
+		ΤΥΠΩΣΕ τιτλος_παραδείγματος+"|Ενέργεια για ";εκείνο; " από "; ετούτο
+	}
+}
+ΣΥΝΑΡΤΗΣΗ β1_ΚάνεΚάτι{
+	ΚΑΛΕΣΕ ΤΟΠΙΚΑ ΕΠΕΞΕΡΓΑΣΙΑ
+}
+ΣΥΝΑΡΤΗΣΗ β2_ΚάνεΚάτι {
+	ΚΑΛΕΣΕ ΤΟΠΙΚΑ ΕΠΕΞΕΡΓΑΣΙΑ
+}
+ΣΥΝΑΡΤΗΣΗ β3_ΚάνεΚάτι {
+	β2.Επιτρέπεται~ ' κάθε φορά αλλάζει τη κατάσταση!	
+	ΚΑΛΕΣΕ ΤΟΠΙΚΑ ΕΠΕΞΕΡΓΑΣΙΑ
+}
+ΑΠΑΡΙΘΜΗΣΗ ΚΟΜΒΙΟ {ΕΝΑ=49, ΔΥΟ}
+ΑΠΑΡΙΘΜΗΣΗ ΚΟΜΒΙΟ_ΔΕΙΚΤΗ {ΑΡΙΣΤΕΡΟ=1, ΔΕΞΙΟ}
+ΓΙΑ Χειριστής_Γεγονότων {
+	Πάτα_πλήκτρο_ένα=.Λίστα_Γεγονότων(Υπηρεσία_Πλήκτρου(ΕΝΑ))
+	.καταχώρησε  Πάτα_πλήκτρο_ένα, ΙΣΧΝΗ$(β1)
+	.καταχώρησε  Πάτα_πλήκτρο_ένα, ΙΣΧΝΗ$(β2)
+	.καταχώρησε .Λίστα_Γεγονότων(Υπηρεσία_Πλήκτρου(ΔΥΟ)), ΙΣΧΝΗ$(β2) 
+	.καταχώρησε .Λίστα_Γεγονότων(Υπηρεσία_Δείκτη(ΑΡΙΣΤΕΡΟ)), ΙΣΧΝΗ$(β3)
+	.Επιτρέπω_Γεγονότα=ΑΛΗΘΗΣ  
+}
+Μ="Παρατηρώ για Γεγονότα"
+// Κάθε 1/10 του δευτερολέπτου
+ΚΑΘΕ 1000/10 {
+	ΑΝ Χειριστής_Γεγονότων.Παρατήρησε(Μ) ΤΟΤΕ ΕΞΟΔΟΣ
+	ΑΝ ΔΕΙΚΤΗΣ=2 ΤΟΤΕ ΕΞΟΔΟΣ
+}
+}
+OOP
+ΠΛΗΚΤΡΟΛΟΓΙΟ "info"+ΧΑΡ$(13)
 }
 MODULE OOP2 {\\ LIKE OOP1
 \\ MOUSELISENER IS A CLASS WICH USE NOW CLASS LISTENER
@@ -13482,7 +13480,7 @@ MODULE LINKED_LIST2 {
             ΜΜ++
             π=π=>πίσω
       } Μέχρι π Είναι Κανένα
-      Τύπωσε "εντάει, τώρα βρές το τρίτο και διέγραψέ το"
+      Τύπωσε "εντάξει, τώρα βρές το τρίτο και διέγραψέ το"
       μ1=Λ.Κόμβος_Κεφαλής
       Ι=1 
       δεικτ1=3

@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 14
+Global Const Revision = 15
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7109,11 +7109,11 @@ syner:
                     End If
                     If FastSymbol(aa$, "(") Then
                     If IsExp(bstack, aa$, r, , , False) Then
-                    If FastSymbol(aa$, ")") Then GoTo contHereHandler
+                    If FastSymbol(aa$, ")") Then GoTo conthereHandler
                     End If
                     Else
-                    If IsNumber(bstack, aa$, r) Then GoTo contHereHandler
-                    If IsExp(bstack, aa$, r, , , False) Then GoTo contHereHandler
+                    If IsNumber(bstack, aa$, r) Then GoTo conthereHandler
+                    If IsExp(bstack, aa$, r, , , False) Then GoTo conthereHandler
                     End If
                     IsExpA = False
                     Exit Function
@@ -7132,7 +7132,7 @@ syner:
                         Set r = Nothing
                         Set usehandler = Nothing
                     ElseIf IsNumber(bstack, aa$, r) Then
-contHereHandler:
+conthereHandler:
                         Set bstack.lastpointer = Nothing
                         If bstack.lastobj Is Nothing Then
                             NoObjectFound
@@ -16974,6 +16974,7 @@ comehere:
 CONThereUDT:
                             Set usehandler = var(w1)
                             If Not usehandler.objref Is Nothing Then
+conthereHandler:
                                 If TypeOf usehandler.objref Is Enumeration Then
                                     If myVarType(usehandler.index_cursor, vbString) Then
                                         r$ = usehandler.index_cursor
@@ -17790,6 +17791,10 @@ againlambda:
                                 End If
                             End If
                         End If
+                    ElseIf IsObjmHandler(bstackstr.lastobj) Then
+
+                    Set usehandler = bstackstr.lastobj
+                    GoTo conthereHandler
                     End If
                     IsStr1 = True
                     Exit Function
