@@ -7905,7 +7905,7 @@ messnotype:
                             p = CCur(p)
                         Case vbDecimal
                             p = CDec(p)
-                        Case "%"
+                        Case vbInteger
                             p = CInt(p)
                         Case Else
                             p = CDbl(p)
