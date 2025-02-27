@@ -7858,8 +7858,9 @@ messnotype:
                     End Select
                 ElseIf FastSymbol(rest$, "=") Then
                     Dim pp
-                    Set pp = ZeroBig
-                    If Not IsNumberD2(rest$, pp, True) Then
+                   ' Set pp = ZeroBig
+                    If Not IsNumberD2(rest$, pp) Then
+                    'If Not IsNumberD2(rest$, (p)) Then
                         If IsEnumLabelOnly(bstack, rest$) Then
                             Set usehandler = bstack.lastobj
                             Set bstack.lastobj = Nothing
@@ -7877,64 +7878,37 @@ messnotype:
                             WrongType
                             Exit Function
                         End If
-                        Select Case Left$(rest$, 1)
-                        Case "&"
-                        If Left$(rest$, 2) = "&&" Then
-                            If MemInt(VarPtr(p)) <> 20 Then
+                        Select Case MemInt(VarPtr(pp))
+                        Case 20
                             p = cInt64(p)
-                            End If
-                            Mid$(rest$, 1, 2) = "  "
-                        Else
-                            If MemInt(VarPtr(p)) <> vbLong Then
-                                p = CLng(p)
-                            End If
-                            Mid$(rest$, 1, 1) = " "
-                        End If
-                        Case "u", "U"
-                            Select Case Mid$(rest$, 2, 1)
-                            Case "D", "d"
-                                    If MemInt(VarPtr(p)) <> vbDate Then
-                                    p = CDate(p)
+                        Case vbLong
+                            p = CLng(p)
+                        Case vbDate
+                            p = CDate(p)
+                        Case vbObject
+                            If MemInt(VarPtr(p)) = vbObject Then
+                                If Not p Is Nothing Then
+                                    If Not TypeOf p Is BigInteger Then
+                                    
+                                        WrongType
+                                        Exit Function
                                     End If
-                                    Mid$(rest$, 1, 1) = " "
-                            Case "B", "b"
-                                    If MemInt(VarPtr(p)) <> vbByte Then
-                                    p = CByte(p)
-                                    End If
-                                    Mid$(rest$, 1, 1) = " "
-                            Case Else
-                            ' it is biginteger
-                            Set p = Module13.CreateBigInteger(Format$(Int(p), "0"))
-                            Mid$(rest$, 1, 1) = " "
-
-                            End Select
-                            
-                            
-                        Case "~"
-                            If MemInt(VarPtr(p)) <> vbSingle Then
-                                p = CSng(p)
+                                End If
+                            Else
+                                Set p = Module13.CreateBigInteger(Format$(Int(p), "0"))
                             End If
-                            Mid$(rest$, 1, 1) = " "
-                        Case "#"
-                            If MemInt(VarPtr(p)) <> vbCurrency Then
-                                p = CCur(p)
-                            End If
-                            Mid$(rest$, 1, 1) = " "
-                        Case "@"
-                            If MemInt(VarPtr(p)) <> vbDecimal Then
-                                p = CDec(p)
-                            End If
-                            Mid$(rest$, 1, 1) = " "
+                        Case vbByte
+                            p = CByte(p)
+                        Case vbSingle
+                            p = CSng(p)
+                        Case vbCurrency
+                            p = CCur(p)
+                        Case vbDecimal
+                            p = CDec(p)
                         Case "%"
-                            If MemInt(VarPtr(p)) <> vbInteger Then
-                                p = CInt(p)
-                            End If
-                            Mid$(rest$, 1, 1) = " "
+                            p = CInt(p)
                         Case Else
-                            If MemInt(VarPtr(p)) <> vbDouble Then
-                                p = CDbl(p)
-                            End If
-                            Mid$(rest$, 1, 1) = " "
+                            p = CDbl(p)
                         End Select
                         End If
                     End If

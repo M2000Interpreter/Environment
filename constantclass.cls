@@ -13,7 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
 Dim mValue As Variant
-Public mflag As Integer
+Private mflag As Integer, mSubCall As Integer
 Public Property Get Value() As Variant
 Attribute Value.VB_UserMemId = 0
 If flag Then
@@ -36,7 +36,11 @@ End Property
 Public Property Get vType() As Boolean
     vType = (mflag And 2) <> 0
 End Property
-Public Sub DefineOnce(RHS, Optional ByVal vType)
+Public Property Get SUBPord() As Boolean
+    SUBPord = mSubCall
+End Property
+Public Sub DefineOnce(RHS, Optional ByVal vType, Optional fromsubcall As Boolean)
+mSubCall = fromsubcall
 If myVarType(mValue, vbEmpty) Then
 If MyIsObject(RHS) Then
     mflag = mflag Or 1

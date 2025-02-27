@@ -49,8 +49,8 @@ End Sub
 Friend Sub CopyTo(a As mHandler)
 If IamEnum Then Set a = Me: Exit Sub
 Set a = New mHandler
-a.t1 = t1
-If t1 = 1 Then a.ReadOnly = ReadOnly
+a.T1 = T1
+If T1 = 1 Then a.ReadOnly = ReadOnly
 a.indirect = indirect
 a.index_start = index_start
 a.index_End = index_End
@@ -74,18 +74,18 @@ If IsObject(index_cursor) Then Set mObjRef = index_cursor: index_cursor = vbEmpt
 End If
 End Sub
 Friend Function CreateFromPicture(b As Long, w1 As Long, w2 As Long, w3 As Long) As Object
-If t1 = 2 Then
+If T1 = 2 Then
 Dim mm As MemBlock
 Set mm = mObjRef
 Set CreateFromPicture = mm.CreateFromPicture(b, w1, w2, w3)
 End If
 End Function
 
-Property Get t1() As Variant
-t1 = mt1
+Property Get T1() As Variant
+T1 = mt1
 End Property
 
-Friend Property Let t1(ByVal RHS As Variant)
+Friend Property Let T1(ByVal RHS As Variant)
 mt1 = RHS
 End Property
 
