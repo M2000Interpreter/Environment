@@ -1,6 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 15 active-X
+Version 13 revision 17 active-X
 1. Now an unknown function using as # function for tuple raise error.
 a=(1,2,3,4)
 Print a#eof(12)  ' raise error, not calling eof() (which exist but not as #eof().
