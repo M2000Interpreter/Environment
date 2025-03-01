@@ -1,12 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 17 active-X
-1. Now an unknown function using as # function for tuple raise error.
-a=(1,2,3,4)
-Print a#eof(12)  ' raise error, not calling eof() (which exist but not as #eof().
-
-2. Greek Labels for the three different views of Control Form.
-(Captions for buttons was ok, but the title of main textbox on control form was only English)
+Version 13 revision 18 active-X
+1. ENGLISH now as LATIN change keyboard and messages from Greek to English.
+2. Also a tweak for Settings for Language and another for Test form.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

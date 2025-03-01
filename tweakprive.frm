@@ -786,13 +786,16 @@ tbPen.enabled = True
         cc.ValueType = REG_SZ
 
         combo2.AddItem "GREEK"
-        combo2.AddItem "LATIN"
+        combo2.AddItem "ENGLISH"
         
         
         
          If cc.Value = vbNullString Then
         cc.Value = "GREEK"
         
+        End If
+        If cc.Value = "LATIN" Then
+            cc.Value = "ENGLISH"
         End If
         combo2.Text = cc.Value
         If combo2.Text = "GREEK" Then
@@ -1211,9 +1214,9 @@ End If
 
 DIS.addpixels = (tbLineSpacing.Value * 2 \ dv15)
 If InStr(myUnicode.Caption, "Unicode") = 0 Then
-    DIS = Convert2Ansi("Test " & vbCrLf & "Latin" & vbCrLf + ListenUnicode(917, 955, 955, 951, 957, 953, 954, 940), IIf(DIS.charset = 161, 1032, 1033))
+    DIS = Convert2Ansi("Test " & vbCrLf & "English" & vbCrLf + ListenUnicode(917, 955, 955, 951, 957, 953, 954, 940), IIf(DIS.charset = 161, 1032, 1033))
 Else
-    DIS = "Test " & vbCrLf & "Latin" & vbCrLf + ListenUnicode(917, 955, 955, 951, 957, 953, 954, 940)
+    DIS = "Test " & vbCrLf & "English" & vbCrLf + ListenUnicode(917, 955, 955, 951, 957, 953, 954, 940)
 End If
 DIS.ShowMe2
 

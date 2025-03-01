@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 17
+Global Const Revision = 18
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5627,7 +5627,7 @@ basickey = "Software\M2000v" & VerMajor & "\" + Mid$(App.path, rinstr(App.path, 
 ' by default
 'AddTwipsTop = 4 * Screen.TwipsPerPixelY
 casesensitive = False
-pagio$ = "LATIN"
+pagio$ = "ENGLISH"
 pagiohtml$ = "DARK"
 REFRESHRATE = 40
 SizeDialog = 1
@@ -24852,7 +24852,7 @@ Case "SCORE", "жымг"
 Case "TARGETS", "стовои"
     Identifier = ProcTargets(basestack, rest$, Lang)
     Exit Function
-Case "LATIN", "катимийа"
+Case "LATIN", "катимийа", "ENGLISH", "аццкийа"
     LATIN basestack '****************************************************************
     Exit Function
 Case "GREEK", "еккгмийа"

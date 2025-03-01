@@ -211,7 +211,7 @@ Dim doubleclick As Long
 Dim para(2) As Long, pospara(2) As Long, selpresrv(2) As Long
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim EXECUTED As Boolean
-Dim stolemodalid As Variant, padtitle As String
+Dim stolemodalid As Variant
 Public Sub generalFkey(A As Integer)
 Dim monitor As Long, titl$, once As Boolean
 If once Then Exit Sub
@@ -416,7 +416,7 @@ LastWidth = -1
 HelpLastWidth = -1
 PopUpLastWidth = -1
 setupxy = 20
-padtitle = "F4 - Copy to help form | F1 clear error log"
+
 lastfactor = ScaleDialogFix(SizeDialog)
 ScaleDialog lastfactor, LastWidth
 gList4.NoCaretShow = True
@@ -1064,14 +1064,14 @@ Dim oldlength As Long
 If pagio$ = "GREEK" Then
     Select Case that
     Case 0
-        testpad.Title = "Σωρός & Μεταβλητές | F4 = αντιγραφή στη φόρμα βοήθειας"
+        testpad.Title = "Σωρός & Μεταβλητές | F4 = αντιγραφή στη βοήθεια"
         testpad.ReplaceTitle = " "
     Case 1
         
-        testpad.Title = "Θέαση Κώδικα | F4  = αντιγραφή στη φόρμα βοήθειας"
+        testpad.Title = "Θέαση Κώδικα | F4  = αντιγραφή στη βοήθεια"
         testpad.ReplaceTitle = " "
     Case 2
-        testpad.Title = "Καταγραφή Λαθών | F1 - clear | F4 = αντιγραφή στη φόρμα βοήθειας"
+        testpad.Title = "Καταγραφή Λαθών | F1 - Καθαρό | F4 = αντιγραφή στη βοήθεια"
         testpad.ReplaceTitle = " "
     End Select
 Else

@@ -6086,9 +6086,9 @@ If s$ <> "" Then
                 If Not fornow Then
                     cc.ValueKey = "COMMAND"
                     cc.ValueType = REG_SZ
-                    cc.Value = "LATIN"
+                    cc.Value = "ENGLISH"
                 End If
-                pagio$ = "LATIN"
+                pagio$ = "ENGLISH"
             ElseIf D$ = "DARK" Then
                 If Not fornow Then
                      cc.ValueKey = "HTML"
@@ -18737,7 +18737,7 @@ r$ = Stack.StackItem(i)
     al$ = al$ + Chr(34) + r$ + Chr(34)
     End If
  ElseIf Stack.StackItemType(i) = ">" Then
-   If pagio$ = "LATIN" Then
+   If pagio$ = "ENGLISH" Then
     al$ = al$ + "[Optional] "
     Else
     al$ = al$ + "[Προαιρετικό] "
@@ -25411,7 +25411,7 @@ If bstack.tolayer > 0 Then
    ' .List2.Font.CharSet = bstack.myCharSet
     End If
 End With
-pagio$ = "LATIN"
+pagio$ = "ENGLISH"
 Clid = 1033
 DefBooleanString = ";\T\r\u\e;\F\a\l\s\e"
 DialogSetupLang 1
