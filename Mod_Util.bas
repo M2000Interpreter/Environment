@@ -12965,7 +12965,7 @@ Set usehandler = New mHandler
 usehandler.T1 = 3
 Set usehandler.objref = pppp
 Set bstack.lastobj = usehandler
-Case "END", "ΤΕΛ"
+Case "END", "ΤΕΛ", "ΤΕΛΟΣ"
 retresonly = True
 GoTo cont1111
 Case "START", "ΑΡΧΗ"
@@ -13711,6 +13711,8 @@ there:
             res = res = -1
         End If
     End If
+Case Else
+MyErMacro A$, "Unknown function #" + Left$(Pad$, cut) + ")", "’γνωστη συνάρτηση #" + Left$(Pad$, cut) + ")"
 End Select
 fMatrix = FastSymbol(A$, ")")
 If Not multi Then Exit Do

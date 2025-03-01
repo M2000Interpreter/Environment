@@ -454,7 +454,7 @@ Dim Mysize As Single
 Dim setupxy As Single
 Dim lX As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
-Dim a$
+Dim A$
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long, itemwidth3 As Long, itemwidth2 As Long
 Dim height1 As Long, width1 As Long
@@ -496,40 +496,40 @@ DIS.TabStop = False
 gList2.TabStop = False
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 
 If Button = 1 Then
     
     If lastfactor = 0 Then lastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then
+    If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
     dr = True
     MousePointer = vbSizeNWSE
     lX = X
-    lY = y
+    lY = Y
     End If
     
     Else
-    If (y > Height - bordertop And y < Height) And (X > Width - borderleft And X < Width) Then
+    If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then
     dr = True
     MousePointer = vbSizeNWSE
     lX = X
-    lY = y
+    lY = Y
     End If
     End If
 
 End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
+If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (X > Width - borderleft And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
+ If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then MousePointer = vbSizeNWSE Else If Not (dr Or drmove) Then MousePointer = 0
 End If
 If dr Then
 
@@ -537,11 +537,11 @@ If dr Then
 
 If bordertop < 150 Then
 
-        If y < (Height - 150) Or y > Height Then addy = (y - lY)
+        If Y < (Height - 150) Or Y > Height Then addy = (Y - lY)
      If X < (Width - 150) Or X > Width Then addX = (X - lX)
      
 Else
-    If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
+    If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
         If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
     End If
     
@@ -589,13 +589,13 @@ Else
         End If
         Else
         lX = X
-        lY = y
+        lY = Y
    
 End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 
 If dr Then Me.MousePointer = 0
 dr = False
@@ -785,8 +785,8 @@ tbPen.enabled = True
         cc.ValueKey = "COMMAND"
         cc.ValueType = REG_SZ
 
-        combo2.additem "GREEK"
-        combo2.additem "LATIN"
+        combo2.AddItem "GREEK"
+        combo2.AddItem "LATIN"
         
         
         
@@ -800,8 +800,8 @@ tbPen.enabled = True
 Else
 DIS.Font.charset = 0
 End If
-     combo3.additem "BRIGHT"
-        combo3.additem "DARK"
+     combo3.AddItem "BRIGHT"
+        combo3.AddItem "DARK"
         cc.ValueKey = "HTML"
         cc.ValueType = REG_SZ
         If cc.Value = vbNullString Then
@@ -864,7 +864,7 @@ Private Sub Form_Load1()
 Dim CD As String, dummy As Long, q$
 
 
-Dim i, a$
+Dim i, A$
 DIS.NoCaretShow = True
 DIS.LeftMarginPixels = 10
   
@@ -949,7 +949,7 @@ gList11.restrictLines = 6
 gList11.CenterText = True
 gList11.VerticalCenterText = True
 
-gList11.Text = "Warning: There is no " & vbCrLf & "warning about this " & vbCrLf & "software except that" & vbCrLf & "is given AS-IS" & vbCrLf & vbCrLf & "George Karras 1999-2022 ©"
+gList11.Text = "Warning: There is no " & vbCrLf & "warning about this " & vbCrLf & "software except that" & vbCrLf & "is given AS-IS" & vbCrLf & vbCrLf & "George Karras 1999-2025 ©"
 
 height1 = 6450 * DYP / 15
 width1 = 9900 * DXP / 15
@@ -965,7 +965,7 @@ gList2.CapColor = rgb(255, 160, 0)
 gList2.FloatList = True
 gList2.MoveParent = True
 Form1.AutoRedraw = True
-a$ = ListenUnicode(915, 953, 974, 961, 947, 959, 962, 32, 922, 945, 961, 961, 940, 962)
+A$ = ListenUnicode(915, 953, 974, 961, 947, 959, 962, 32, 922, 945, 961, 961, 940, 962)
 lastfactor = ScaleDialogFix(SizeDialog)
 ScaleDialog lastfactor, LastWidth
 gList2.HeadLine = vbNullString
@@ -1088,20 +1088,20 @@ MyFill
 
 
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim a As RECT, b As Long
+Dim A As RECT, b As Long
 b = 2
-CopyFromLParamToRect a, thatRect
-a.Left = b
-a.Right = setupxy - b
-a.top = b
-a.Bottom = setupxy - b
-FillThere thathDC, VarPtr(a), 0
+CopyFromLParamToRect A, thatRect
+A.Left = b
+A.Right = setupxy - b
+A.top = b
+A.Bottom = setupxy - b
+FillThere thathDC, VarPtr(A), 0
 b = 5
-a.Left = b
-a.Right = setupxy - b
-a.top = b
-a.Bottom = setupxy - b
-FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
+A.Left = b
+A.Right = setupxy - b
+A.top = b
+A.Bottom = setupxy - b
+FillThere thathDC, VarPtr(A), rgb(255, 160, 0)
 
 
 End Sub
@@ -1113,9 +1113,9 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 Private Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim a As RECT
-CopyFromLParamToRect a, thatRect
-FillBack thathDC, a, thatbgcolor
+Dim A As RECT
+CopyFromLParamToRect A, thatRect
+FillBack thathDC, A, thatbgcolor
 End Sub
 
 
@@ -1151,8 +1151,8 @@ skip = True
 End If
 End Sub
 
-Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
-If gList2.DoubleClickCheck(Button, item, X, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
+Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
+If gList2.DoubleClickCheck(Button, item, X, Y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
                       ShutMe
 End If
 End Sub
@@ -1164,7 +1164,7 @@ Private Sub glist3_LostFocus()
 playall
 End Sub
 
-Private Sub glist3_ScrollSelected(item As Long, y As Long)
+Private Sub glist3_ScrollSelected(item As Long, Y As Long)
 playall
 End Sub
 
@@ -1191,19 +1191,19 @@ Dim b$
 If combo2.ListText <> "" Then b$ = combo2.ListText Else b$ = combo2.Text
 DIS.Font.Italic = False
 If b$ = "GREEK" Then
-DIS.Font.size = tbSize.Value
+DIS.Font.Size = tbSize.Value
 DIS.Font.charset = 161
 DIS.Font.Name = c$
 DIS.Font.Italic = False
-DIS.Font.size = tbSize.Value
+DIS.Font.Size = tbSize.Value
 DIS.Font.charset = 161
 DIS.Font.Name = c$
 Else
-DIS.Font.size = tbSize.Value
+DIS.Font.Size = tbSize.Value
 DIS.Font.charset = 0
 DIS.Font.Name = c$
 DIS.Font.Italic = False
-DIS.Font.size = tbSize.Value
+DIS.Font.Size = tbSize.Value
 DIS.Font.charset = 0
 DIS.Font.Name = c$
 
@@ -1251,25 +1251,25 @@ tbLineSpacing = CStr(ThisValue)
 End Sub
 
 Private Sub TBLineSpacing_ValidString(ThatString As String, setpos As Long)
-Dim a As Long, k As String
+Dim A As Long, K As String
 On Error Resume Next
-k = tbLineSpacing
+K = tbLineSpacing
 If ThatString = vbNullString Then ThatString = "0"
-a = CLng(ThatString)
+A = CLng(ThatString)
 
 If Err.Number > 0 Then
 tbLineSpacing.Value = CLng(tbLineSpacing)
-ThatString = k: setpos = 1: tbLineSpacing.ResetPan
+ThatString = K: setpos = 1: tbLineSpacing.ResetPan
 Exit Sub
 End If
-tbLineSpacing.Value = a
-a = tbLineSpacing.Value  ' cut max or min
+tbLineSpacing.Value = A
+A = tbLineSpacing.Value  ' cut max or min
 
-DIS.addpixels = (a * 2 \ dv15)
+DIS.addpixels = (A * 2 \ dv15)
 DIS.ShowMe2
 'TBLineSpacing.Info = "This is info box" + vbCrLf + "X = " + CStr(a)
-ThatString = CStr(a)
-If a = 0 Then setpos = 2: tbLineSpacing.ResetPan
+ThatString = CStr(A)
+If A = 0 Then setpos = 2: tbLineSpacing.ResetPan
 End Sub
 
 
@@ -1279,26 +1279,26 @@ tbPaper = CStr(ThisValue)
 End Sub
 
 Private Sub tbPaper_ValidString(ThatString As String, setpos As Long)
-Dim a As Long, k As String
+Dim A As Long, K As String
 On Error Resume Next
-k = tbPaper
+K = tbPaper
 If ThatString = vbNullString Then ThatString = "0"
-a = CLng(ThatString)
-If a = CLng(tbPen) Or Err.Number > 0 Then
+A = CLng(ThatString)
+If A = CLng(tbPen) Or Err.Number > 0 Then
 
 ''tbPaper.Value = CLNG(tbPaper)
-ThatString = k: setpos = 1: tbPaper.ResetPan
-If Abs(tbPaper.Value - CLng(k)) > 2 Then tbPaper.Value = CLng(k)
+ThatString = K: setpos = 1: tbPaper.ResetPan
+If Abs(tbPaper.Value - CLng(K)) > 2 Then tbPaper.Value = CLng(K)
 Exit Sub
 End If
-tbPaper.Value = a
-a = tbPaper.Value  ' cut max or min
-tbPaper.Value = a
-DIS.BackColor = mycolor(a)
+tbPaper.Value = A
+A = tbPaper.Value  ' cut max or min
+tbPaper.Value = A
+DIS.BackColor = mycolor(A)
 DIS.ShowMe2
 'tbPaper.Info = "This is info box" + vbCrLf + "X = " + CStr(a)
-ThatString = CStr(a)
-If a = 0 Then setpos = 2: tbPaper.ResetPan
+ThatString = CStr(A)
+If A = 0 Then setpos = 2: tbPaper.ResetPan
 End Sub
 
 Private Sub tbPen_SpinnerValue(ThisValue As Long)
@@ -1306,52 +1306,52 @@ tbPen = CStr(ThisValue)
 End Sub
 
 Private Sub tbpen_ValidString(ThatString As String, setpos As Long)
-Dim a As Long, k As String
+Dim A As Long, K As String
 On Error Resume Next
-k = tbPen
+K = tbPen
 If ThatString = vbNullString Then ThatString = "0"
-a = CLng(ThatString)
-If a = CLng(tbPaper) Or Err.Number > 0 Then
-ThatString = k: setpos = 1: tbPen.ResetPan
-If Abs(tbPen.Value - CLng(k)) > 2 Then tbPen.Value = CLng(k)
+A = CLng(ThatString)
+If A = CLng(tbPaper) Or Err.Number > 0 Then
+ThatString = K: setpos = 1: tbPen.ResetPan
+If Abs(tbPen.Value - CLng(K)) > 2 Then tbPen.Value = CLng(K)
 Exit Sub
 End If
-tbPen.Value = a
-a = tbPen.Value  ' cut max or min
-tbPen.Value = a
-DIS.ForeColor = mycolor(a)
+tbPen.Value = A
+A = tbPen.Value  ' cut max or min
+tbPen.Value = A
+DIS.ForeColor = mycolor(A)
 DIS.ShowMe2
 'tbpen.Info = "This is info box" + vbCrLf + "X = " + CStr(a)
-ThatString = CStr(a)
-If a = 0 Then setpos = 2: tbPen.ResetPan
+ThatString = CStr(A)
+If A = 0 Then setpos = 2: tbPen.ResetPan
 End Sub
 Private Sub tbsize_SpinnerValue(ThisValue As Long)
 tbSize = CStr(ThisValue)
 End Sub
 
 Private Sub tbsize_ValidString(ThatString As String, setpos As Long)
-Dim a As Long, k As String
+Dim A As Long, K As String
 On Error Resume Next
-k = tbSize
+K = tbSize
 If ThatString = vbNullString Then Exit Sub  'special here
-a = CLng(ThatString)
+A = CLng(ThatString)
 
 If Err.Number > 0 Then
 tbSize.Value = CLng(tbSize)
-ThatString = k: setpos = 1: tbSize.ResetPan
+ThatString = K: setpos = 1: tbSize.ResetPan
 Exit Sub
 End If
 
-tbSize.Value = a
-If a <> tbSize.Value And a <= 2 And a > 0 Then
+tbSize.Value = A
+If A <> tbSize.Value And A <= 2 And A > 0 Then
 Exit Sub
 End If
-a = tbSize.Value  ' cut max or min
+A = tbSize.Value  ' cut max or min
 
-DIS.FontSize = CLng(a)
+DIS.FontSize = CLng(A)
 playall
-ThatString = CStr(a)
-If a = 0 Then setpos = 2: tbSize.ResetPan
+ThatString = CStr(A)
+If A = 0 Then setpos = 2: tbSize.ResetPan
 End Sub
 Public Sub hookme(this As gList)
 Set LastGlist = this
