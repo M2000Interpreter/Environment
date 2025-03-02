@@ -64,29 +64,29 @@ Private mHeader As ENHMETAHEADER
 Private Declare Function CreateHatchBrush Lib "gdi32" (ByVal nIndex As Long, ByVal crColor As Long) As Long
 Private Declare Function CreatePen Lib "gdi32.dll" (ByVal fnPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
 Private Declare Function CreateEnhMetaFile Lib "gdi32" Alias "CreateEnhMetaFileW" (ByVal hdcRef As Long, ByVal lpFileName As Long, ByVal lpRect As Long, ByVal lpDescription As Long) As Long
-Private Declare Function CloseEnhMetaFile Lib "gdi32" (ByVal Hdc As Long) As Long
+Private Declare Function CloseEnhMetaFile Lib "gdi32" (ByVal hDC As Long) As Long
 Private Declare Function OleCreatePictureIndirect Lib "olepro32.dll" (lpPictDesc As PICTDESC, riid As Any, ByVal fPictureOwnsHandle As Long, ipic As IPicture) As Long
 Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As Long
 Private Declare Function DeleteMetaFile Lib "gdi32" (ByVal hmf As Long) As Long
-Private Declare Function SetBkColor Lib "gdi32" (ByVal Hdc As Long, ByVal crColor As Long) As Long
-Private Declare Function LineTo Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long) As Long
-Private Declare Function MoveToEx Lib "gdi32" (ByVal Hdc As Long, ByVal X As Long, ByVal Y As Long, lpPoint As Any) As Long
-Private Declare Function Rectangle Lib "gdi32.dll" (ByVal Hdc As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
+Private Declare Function SetBkColor Lib "gdi32" (ByVal hDC As Long, ByVal crColor As Long) As Long
+Private Declare Function LineTo Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long) As Long
+Private Declare Function MoveToEx Lib "gdi32" (ByVal hDC As Long, ByVal X As Long, ByVal Y As Long, lpPoint As Any) As Long
+Private Declare Function Rectangle Lib "gdi32.dll" (ByVal hDC As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Private Declare Function GetStockObject Lib "gdi32.dll" (ByVal nIndex As Long) As Long
-Private Declare Function PlayEnhMetaFile Lib "gdi32" (ByVal Hdc As Long, ByVal hEmf As Long, lpRect As Any) As Long
-Private Declare Function SetGraphicsMode Lib "gdi32" (ByVal Hdc As Long, ByVal iMode As Long) As Long
-Private Declare Function GetGraphicsMode Lib "gdi32" (ByVal Hdc As Long) As Long
-Private Declare Function SetMapMode Lib "gdi32" (ByVal Hdc As Long, ByVal nMapMode As Long) As Long
-Private Declare Function GetMapMode Lib "gdi32" (ByVal Hdc As Long) As Long
+Private Declare Function PlayEnhMetaFile Lib "gdi32" (ByVal hDC As Long, ByVal hEmf As Long, lpRect As Any) As Long
+Private Declare Function SetGraphicsMode Lib "gdi32" (ByVal hDC As Long, ByVal iMode As Long) As Long
+Private Declare Function GetGraphicsMode Lib "gdi32" (ByVal hDC As Long) As Long
+Private Declare Function SetMapMode Lib "gdi32" (ByVal hDC As Long, ByVal nMapMode As Long) As Long
+Private Declare Function GetMapMode Lib "gdi32" (ByVal hDC As Long) As Long
 Private Declare Function SetWinMetaFileBits Lib "gdi32" (ByVal cbBuffer As Long, lpbBuffer As Byte, ByVal hdcRef As Long, lpmfp As Any) As Long
 Private Declare Function GetMetaFileBitsEx Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nSize As Long, lpData As Byte) As Long
 
 
-Private Declare Function SetROP2 Lib "gdi32" (ByVal Hdc As Long, ByVal nDrawMode As Long) As Long
+Private Declare Function SetROP2 Lib "gdi32" (ByVal hDC As Long, ByVal nDrawMode As Long) As Long
 
 
 
@@ -100,7 +100,7 @@ End Type
 Dim pm As POINTAPI
 
 Dim boundrect As RECT
-Private Declare Function FillRect Lib "user32" (ByVal Hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Private Declare Function FillRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Private Type PICTDESC
     Size                As Long
     Type                As Long
@@ -135,10 +135,10 @@ Private Type XFORM
         eDy As Single
 End Type
 
- Private Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) _
+ Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) _
           As Long
-Private Declare Function GetWorldTransform Lib "gdi32" (ByVal Hdc As Long, lpXform As XFORM) As Long
-Private Declare Function SetWorldTransform Lib "gdi32" (ByVal Hdc As Long, lpXform As XFORM) As Long
+Private Declare Function GetWorldTransform Lib "gdi32" (ByVal hDC As Long, lpXform As XFORM) As Long
+Private Declare Function SetWorldTransform Lib "gdi32" (ByVal hDC As Long, lpXform As XFORM) As Long
 
 Private Const GM_ADVANCED = 2
 Private Const GM_COMPATIBLE = 1
@@ -150,8 +150,8 @@ Public Property Get Name() As String
     Name = "Emf"
 End Property
 
-Public Property Get Hdc() As Long
-    Hdc = m_hDC
+Public Property Get hDC() As Long
+    hDC = m_hDC
 End Property
 
 Public Property Get status() As Boolean
@@ -841,11 +841,11 @@ If m_Status Then
 End If
 
 End Property
-Private Function getEmfFromWmf(Wmf As StdPicture, W As Long, h As Long) As Long
+Private Function getEmfFromWmf(Wmf As StdPicture, W As Long, H As Long) As Long
  Dim zz As METAFILEPICT
  Dim bb As wmfPlaceableFileHeader
   zz.xExt = W '* dv15
- zz.yExt = h '* dv15
+ zz.yExt = H '* dv15
  
  Dim bytes As Long
 Dim Buffer() As Byte
@@ -859,7 +859,7 @@ Exit Function
 End If
     On Error Resume Next
     zz.mm = 1
-    getEmfFromWmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.Hdc, zz)
+    getEmfFromWmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.hDC, zz)
 End Function
 
 Public Property Get Tag() As Variant

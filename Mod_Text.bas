@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 18
+Global Const Revision = 19
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7021,6 +7021,11 @@ a1290456:
 cont111333:
         If MaybeIsSymbol(aa$, "Ii≈Â") Then
             If Fast2LabelNoNum(aa$, "IS", 2, "≈…Õ¡…", 5, 5) Then
+            If Fast2LabelNoNum(aa$, "NOT", 3, "œ◊…", 3, 4) Then
+                IntVal2 = -1
+            Else
+                IntVal2 = 0
+            End If
                 Set r1 = bstack.lastobj
                 If r1 Is Nothing Then
                     NoObjectFound
@@ -7053,6 +7058,8 @@ cont111333:
                                 IsExpA = True
                                 ac = 0
                                 r = r1.TypeGroup(ut$)
+                                If IntVal2 < 0 Then r = Not r
+                                IntVal2 = 0
                                 r1 = 1
                                 MUL = 0
                                 GoTo LeaveIt
@@ -7089,7 +7096,7 @@ syner:
                     ElseIf TypeOf r1 Is mHandler Then
                     Set usehandler = r1
                     If usehandler.T1 = 2 Then
-                    If Fast2LabelNoNum(aa$, "TYPE", 4, "‘’–œ”", 5, 5) Then
+                        If Fast2LabelNoNum(aa$, "TYPE", 4, "‘’–œ”", 5, 5) Then
                             If FastPureLabel(aa$, ut$, , True, , , , True) Then
                             If usehandler.objref.UseStruct Then
                            
@@ -7098,6 +7105,8 @@ syner:
                                 IsExpA = True
                                 ac = 0
                                 r = True
+                                If IntVal2 < 0 Then r = Not r
+                                IntVal2 = 0
                                 r1 = 1
                                 MUL = 0
                                 GoTo LeaveIt
@@ -7106,6 +7115,9 @@ syner:
                             End If
                         GoTo syner
                     End If
+                    ElseIf Fast2LabelNoNum(aa$, "TYPE", 4, "‘’–œ”", 5, 5) Then
+                        MyEr "No operator TYPE for this object", "ƒÂÌ ÎÂÈÙÔıÒ„Âﬂ Ô ÙÂÎÂÛÙﬁÚ ‘’–œ” „È· ·ıÙ¸ ÙÔ ·ÌÙÈÍÂﬂÏÂÌÔ"
+                        Exit Function
                     End If
                     If FastSymbol(aa$, "(") Then
                     If IsExp(bstack, aa$, r, , , False) Then
@@ -7174,6 +7186,8 @@ conthereHandler:
                     Else
                         r = CBool(r1 Is r)
                     End If
+                    If IntVal2 < 0 Then r = Not r
+                    IntVal2 = 0
                     r1 = 1
                 End If
             End If
@@ -10072,7 +10086,7 @@ Else
     If w1 < 0 Then GoTo LOOKFORVARNUM
 End If
 findsecond:
-On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89, num90, num91, num92, num93, num94, num95, num96, num97, num98, num99, num100, num101, num102, num103, num104, num105, num106, num107, num108, num109, num110
+On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89, num90, num91, num92, num93, num94, num95, num96, num97, num98, num99, num100, num101, num102, num103, num104, num105, num106, num107, num108, num109, num110, num111
 IsNumberNew = 0
 InternalError
 Exit Function
@@ -10110,6 +10124,14 @@ IsNumberNew = False
     If findAddress(bstack, A$, r) Then
     IsNumberNew = True
     End If
+    Exit Function
+num111: '"SOUNDREC"
+    If sRec Is Nothing Then
+        r = -1
+    Else
+        r = sRec.getLengthInMS
+    End If
+    IsNumberNew = True
     Exit Function
 num104:
 If sRec Is Nothing Then

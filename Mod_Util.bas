@@ -27627,7 +27627,17 @@ Dim LRec As RecordMci
         Set LRec = sRec
         If Not LRec.HaveMic Then GoTo noMic
         LRec.Rec_Initialize
-        If IsStrExp(basestack, rest$, s$) Then LRec.FileName = s$
+        
+        If IsStrExp(basestack, rest$, s$) Then
+            LRec.FileName = s$
+        ElseIf IsExp(basestack, rest$, p) Then
+            If MemInt(VarPtr(p)) = vbString Then
+            SwapString2Variant s$, p
+            LRec.FileName = s$
+            End If
+        ElseIf IsStrExp(basestack, rest$, s$, False) Then
+            LRec.FileName = s$
+        End If
         If FastSymbol(rest$, ",") Then
             If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
                 If IsLabelSymbolLatin(rest$, "STEREO") Then
@@ -27704,7 +27714,10 @@ Dim LRec As RecordMci
         Else
             LRec.Save
         End If
-    ElseIf IsLabelSymbolNewExp(rest$, "йкеисе", "END", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "йкеисе", "CLOSE", Lang, ss$) Then
+        Set sRec = Nothing
+        Set LRec = Nothing
+    ElseIf IsLabelSymbolNewExp(rest$, "текос", "END", Lang, ss$) Then
         Set sRec = Nothing
         Set LRec = Nothing
     End If
@@ -31210,23 +31223,30 @@ End Function
 Function ProcSound(bstack As basetask, rest$) As Boolean
 Dim s$, ss, H As mHandler, m As MemBlock
 If IsStrExp(bstack, rest$, s$) Then
-PlaySoundNew s$
-ProcSound = True
+    PlaySoundNew s$
+    ProcSound = True
 ElseIf IsExp(bstack, rest$, ss) Then
-If Not bstack.lastobj Is Nothing Then
-If TypeOf bstack.lastobj Is mHandler Then
-    Set H = bstack.lastobj
-    If H.T1 = 2 Then
-        Set m = H.objref
-        PlaySoundNew2 m.GetPtr(0)
-        ProcSound = True
-    Else
-        WrongObject
-    End If
-End If
-    Set bstack.lastobj = Nothing
-End If
 
+    If Not bstack.lastobj Is Nothing Then
+        If TypeOf bstack.lastobj Is mHandler Then
+            Set H = bstack.lastobj
+            If H.T1 = 2 Then
+                Set m = H.objref
+                PlaySoundNew2 m.GetPtr(0)
+                ProcSound = True
+            Else
+                WrongObject
+            End If
+        End If
+        Set bstack.lastobj = Nothing
+    ElseIf MemInt(VarPtr(ss)) = vbString Then
+        SwapString2Variant s$, ss
+        PlaySoundNew s$
+        ProcSound = True
+    End If
+ElseIf IsStrExp(bstack, rest$, s$, False) Then
+    PlaySoundNew s$
+    ProcSound = True
 End If
 
 End Function

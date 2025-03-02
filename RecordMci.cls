@@ -49,8 +49,13 @@ Private bt As Long
 Private ch As Long
 Private Terminate0 As String
 Private Terminate1 As String
- Private mFilename  As String ' Used to store our file
- Public Property Let FileName(n As String)
+Private mFilename  As String ' Used to store our file
+Public Property Let FileName(n As String)
+Dim ss$
+ss$ = ExtractPath(n, True)
+If ss$ = "" Then
+    n = mcd & ExtractName(n)
+End If
 mFilename = n
 End Property
 Public Property Get FileName() As String

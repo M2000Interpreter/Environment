@@ -1,8 +1,13 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 18 active-X
-1. ENGLISH now as LATIN change keyboard and messages from Greek to English.
-2. Also a tweak for Settings for Language and another for Test form.
+Version 13 revision 19 active-X
+1. Addition to operator IS TYPE the operator IS NOT TYPE
+
+2. Addition to operator IS the operator IS NOT    
+
+3. User Forms: when we hide the form's minimize button, we get disabled the minimize label on contol menu. When the minimize button hide we have also hidden title at task bar. We can use this for modal forms as dialogs over another form.
+
+4. SOUNDREC as readonly variable return msec of recorded sound 
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
