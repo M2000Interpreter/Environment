@@ -1,13 +1,20 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 19 active-X
-1. Addition to operator IS TYPE the operator IS NOT TYPE
+Version 13 revision 20 active-X
 
-2. Addition to operator IS the operator IS NOT    
-
-3. User Forms: when we hide the form's minimize button, we get disabled the minimize label on contol menu. When the minimize button hide we have also hidden title at task bar. We can use this for modal forms as dialogs over another form.
-
-4. SOUNDREC as readonly variable return msec of recorded sound 
+a FIX for EMF files.
+On a Windows 11 laptop I found that the reference device - as stored in emf- has a bug from the OS, so I do my own calculation and now the emf has the size I want. The reference device cx/cy values used for adjusting the size, so my image before get a 1.75 bigger size, so my drawing drawing smaller at the top left corner. This happen when I choose to declare a bounding rectangle. The bounding rectangle saved ok on the original header but not on the emf file header (although the original header also included in the emf file).
+So the fix in vb6 was:
+' copy of the header to mheader
+CopyMemory ByVal VarPtr(mHeader.iType), ByVal aPic.GetBytePtr(0), 88
+If boundrect.Bottom > 0 Then
+' then if we have a boundrect we get the pixels (which are ok)
+' and calculate the milliimeters which aren't ok (fort Windows 10 are slight different, but for Windows 11 on a laptop with 1920X1080 screen was very bad)
+mHeader.szlMillimeters.cx = mHeader.szlDevice.cx * 15 / 1440 * 25.4
+mHeader.szlMillimeters.cy = mHeader.szlDevice.cy * 15 / 1440 * 25.4
+' restore the bytes...on memory buffer
+CopyMemory ByVal aPic.GetBytePtr(0), ByVal VarPtr(mHeader.iType), 88
+End If
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

@@ -227,6 +227,13 @@ If bytes Then
     Call GetEnhMetaFileBits(emfP.Handle, bytes, ByVal aPic.GetBytePtr(0))
     aPic.SubType = 2 ' emf
 End If
+CopyMemory ByVal VarPtr(mHeader.iType), ByVal aPic.GetBytePtr(0), 88
+If boundrect.Bottom > 0 Then
+mHeader.szlMillimeters.cx = -Int(-mHeader.szlDevice.cx * 15 / 1440 * 25.4)
+mHeader.szlMillimeters.cy = -Int(-mHeader.szlDevice.cy * 15 / 1440 * 25.4)
+CopyMemory ByVal aPic.GetBytePtr(0), ByVal VarPtr(mHeader.iType), 88
+
+End If
 aPic.type1 = what
 Set getEmfObj = aPic
 End Function
