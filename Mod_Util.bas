@@ -15167,7 +15167,7 @@ Function interpret(bstack As basetask, b$, Optional ByPass As Boolean) As Boolea
 Dim di As Object, myobject As Object, I As Long, x1 As Long, ok As Boolean, sp As Variant
 Dim usehandler As mHandler, usehandler2 As mHandler
 Set di = bstack.Owner
-Dim prive As basket, cb As CodeBlock
+Dim prive As basket
 'b$ = Trim$(b$)
 Dim W$, ww#, LLL As Long, sss As Long, v As Long, p As Variant, ss$, sw$, ohere$
 Dim pppp As iBoxArray, ppppl As iBoxArray, i1 As Long, Lang As Long
@@ -15184,14 +15184,7 @@ Do While Len(b$) <> LLL
 If LastErNum <> 0 Then Exit Do
 LLL = Len(b$)
 
-If FastSymbol(b$, ".") Then
-' run in codeblock
-            Set cb = New CodeBlock
-            cb.Construct b$
-            cb.ExportStr bstack
-            cb.codeline (0)
-            
-ElseIf FastSymbol(b$, "{") Then
+If FastSymbol(b$, "{") Then
 If Not interpret(bstack, block(b$)) Then interpret = False: here$ = ohere$: GoTo there1
 If FastSymbol(b$, "}") Then
 sss = Len(b$)
@@ -29373,13 +29366,15 @@ Locale:
     Else
     DefBooleanString = ";\T\r\u\e;\F\a\l\s\e"
     End If
+    
+    
     OverideDec = False
     NowDec$ = GetlocaleString(LOCALE_SDECIMAL)
     NowThou$ = GetlocaleString(LOCALE_STHOUSAND)
     mNoUseDec = True
     NoUseDec = GetDeflocaleString(LOCALE_SDECIMAL) = NowDec$
-    
-    OverideDec = NowDec$ <> "."
+     OverideDec = Not NoUseDec
+  '  OverideDec = NowDec$ <> "."
     p = GetCodePage(CLng(p))
     GoTo CHR222
     ElseIf IsStrExp(basestack, rest$, s$) Then

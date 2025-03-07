@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 21
+Global Const Revision = 22
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -734,10 +734,13 @@ jumphere1:
                 If Mid$(a$, Pos + 1, 1) = ")" Then Pos = Pos + 2: GoTo conthere
             End If
         ElseIf Right$(b$, 1) = "a" Then
+        
             b$ = Left$(b$, Len(b$) - 1)
             part$ = vbNullString
+         If Pos > 1 Then If Mid$(a$, Pos - 1, 1) = " " Then Exit Do
+
         Else
-            part$ = "N"
+            If Right$(b$, 1) <> "S" Then part$ = "N" Else part$ = "a"
         End If
 again22:
         Pos = Pos + 1
@@ -824,15 +827,41 @@ If Pos <= Len(a$) Then
                     If Mid$(a$, Pos + 1, 1) = "." Then Pos = Pos + 1
                     part$ = vbNullString
             End If
-        Case "+", "-"  ' ,"|"
-                    b$ = b$ + part$
-                    If b$ = vbNullString Then
-                    Else
-                    
-                part$ = "o"
+            
+        Case "-"
+            If Mid$(a$, Pos, 2) = "->" Then
+            Pos = Pos + 2
+            Do While Pos <= Len(a$)
+            Select Case AscW(Mid$(a$, Pos, 1))
+            Case 32, 9, 160
+                Pos = Pos + 1
+            Case Else
+                Exit Do
+            End Select
+            Loop
+            If Mid$(a$, Pos, 1) = "{" Then
+             '   Pos = Pos + 1
+                If Pos <= Len(a$) Then
+                    If Not blockStringAhead(a$, Pos) Then Exit Do
+                Else
+                    Exit Do
                 End If
-         Case "/"
-            If Mid$(a$, Pos + 1, 1) = "/" Then Exit Do
+            Else
+            Exit Do
+
+            End If
+
+            Else
+            
+            b$ = b$ + part$
+            If Len(b$) > 0 Then part$ = "o"
+            End If
+        Case "+"
+           b$ = b$ + part$
+           If Len(b$) > 0 Then part$ = "o"
+           
+        Case "/"
+           If Mid$(a$, Pos + 1, 1) = "/" Then Exit Do
             If part$ <> "o" Then
             b$ = b$ + part$
             End If
@@ -927,14 +956,11 @@ If Pos <= Len(a$) Then
                 End If
             End If
 there1:
-                If b$ + part$ <> "" Then
-               
-               b$ = Replace(b$ + part$, "a", "")
+            If b$ + part$ <> "" Then
+                b$ = Replace(b$ + part$, "a", "")
                 part$ = vbNullString
-               
                 If Left$(b$, Len(b$) - 1) <> "l" Then part$ = "l": Exit Do
-                
-                Else
+            Else
                 Exit Do
                 End If
 
@@ -945,10 +971,8 @@ CONT1212:
         If part$ = "N" Then
         ElseIf part$ = "S" Then
         Else
-        
-     b$ = b$ + part$
-     part$ = "N"
-
+        b$ = b$ + part$
+        part$ = "N"
             End If
         End Select
         End If
@@ -27109,6 +27133,11 @@ If AscW(s$) = 8 Then
 If IsString(basestack, s$, b$) Then
 s$ = NLtrim$(s$)
 If Len(s$) > 0 Then
+While par > 0 And lookOne(s$, ")")
+FastSymbol s$, ")"
+par = par - 1
+Wend
+
 If InStr("<=>~", Left$(s$, 1)) > 0 Then
 GoTo conthere
 End If
@@ -27128,7 +27157,10 @@ If nostring Then If myVarType(D, vbString) Then GoTo jumpnostr1
 s$ = NLtrim$(s$)
 Exit Function
 Else
-If Left$(ah, 2) = "SN" Then Exit Function
+If Left$(ah, 2) = "SN" Then
+If Left$(ah, 3) = "SNl" Then GoTo 123456
+    Exit Function
+End If
 nostring = False
 End If
 On Error Resume Next
@@ -32990,7 +33022,7 @@ End Function
 
 Function ProcEdit(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim s$, x1 As Long, y1 As Long, o As Long, frm$, I As Long, par As Boolean, p As Variant
-Dim Scr As Object, ss$, prev$, bb As CodeBlock
+Dim Scr As Object, ss$, prev$
 ProcEdit = True
 If FastSymbol(rest$, "!") Then
 If FastSymbol(rest$, "!") Then SHOWCODE = Not SHOWCODE
@@ -33183,11 +33215,6 @@ jump11:
             prev$ = sbf(x1).sb
             ScreenEdit basestack, prev$, 0, .mysplit, .mX - 1, .mY - 1, sbf(x1).sbc, , , , True
             End With
-            If SHOWCODE Then
-            Set bb = New CodeBlock
-            bb.Construct (sbf(x1).sb)
-            bb.ExportStr basestack
-            End If
             If prev$ <> sbf(x1).sb Then
             Set sbf(x1).subs = Nothing
             sbf(x1).sb = prev$

@@ -1,52 +1,17 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 21 active-X
-1. Fix how names print for list of modules and variables.
-You can check List statement for variables and modules ? for modules/functions.
-2. Fix for list/queue/stack which use := for subs
-(break from Version 13 Revision 17).
-2.1 
-alfa(list:=1,2,3)
-sub alfa(a as list)
-	? a
-end sub
+Version 13 revision 22 active-X
+Last fix.
+The lambda$ break from version 12 revision 50
+Because the second form (lambda vs lambda$) used, which had no problem. Before some versions, a string expression had only strings literals or and string functions with $ suffix like Mid$(). The last versions can use string variables and functions without $ suffix (but a name with $ suffix is different with the same name without the $ suffix).
 
-2.2
-a=list := 1,2,3,4,5
-beta(a,"string", 1)
-sub beta(o as list, v1 as variant, v2 as double)
-	? o
-end sub
-
-3. Added AS BIGINTEGER for CONST. Added AS CONST for parameters:
-CONST P AS BIGINTEGER=-1232312323423423423334234U
-ALFA1(P)
-ALFA2(P)
-SUB ALFA1(K AS BIGINTEGER)
-	? K
-	? TYPE$(K)="BigInteger"	
-END SUB
-SUB ALFA2(K AS CONST)
-	? K
-	? TYPE$(K)="Constant"
-END SUB
-4. Now we can make also CONST tuples
-CONST P=(1,2,3,4)
-This is read only.
-CONST P=(1,2,3,4)
-CONST A=P#MAT("+=", 500)
-PRINT A#SUM()=2010
-PRINT TYPE$(P)="Constant"
-PRINT TYPE$(A)="Constant"
-Z=P
-PRINT TYPE$(Z)="tuple"
-PRINT Z IS P=FALSE
-Z++
-PRINT Z#SUM()
-PRINT P#VAL(3)=4
-PRINT A#VAL(3)=504
-PRINT Z#VAL(3)=5
-5. EVALUATOR module in info.gsb now run as expected.
+Dim A$(3)
+A$(1)=lambda$ (a$,wd)->field$(a$, wd)
+? "["+A$(1)("hello", 10)+"]"
+link A$() to A()
+' this works on revision 21
+A(2)=lambda (a$,wd)->field$(a$, wd)
+? "["+(A(2)("hello", 10))+"]"
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

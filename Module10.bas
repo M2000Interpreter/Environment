@@ -4802,7 +4802,7 @@ checkpar:
         GoTo err000
     End If
 Else
-    If IsExp(bstack, b$, p, nostring:=False) Then
+    If IsExp(bstack, b$, p) Then
         Assign ss$, p
         GoTo jmp1112
     ElseIf Not IsStrExp(bstack, b$, ss$, False) Then

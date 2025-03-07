@@ -19026,7 +19026,7 @@ Method NotePad,"Show" , 1
 Declare Control1 Nothing 
 Declare Pad Nothing
 Declare NotePad Nothing 
-Latin
+English
 If Module(Info) Then
 	Title "Info"
 	keyboard "INFOBasic"+chr$(13)
@@ -23308,7 +23308,7 @@ MODULE SIMPLETXT {Παλιό.Τοπικό=Τοπικό
       Επίπεδο Φόρμα1 {
             Τιμ1=Τιμ1+1  \\ δεν δουλεύει το Τιμ1++ γιατί είναι αντικείμενο και όχι μεταβλητή
             Οθόνη  #606060
-            Τύπωσε Τιμ1, Τιμ2, " Ctrl+F1"
+            Τύπωσε  Μορφή$(" {0:3} | {1} | Ctrl+F1", Τιμ1, Τιμ2)
             Τύπωσε Πάνω $(9), Τιμ3$
             Ανανέωση
             Μέθοδος Κειμ1, "Show"
@@ -23378,7 +23378,7 @@ Function Form1.Click {
             Cls  #606060
 rem            Print Part $(0), Value1, Value2 , " Ctrl+F1"
 rem            Print
-            Print format$(" {0:3:} | {1} | Ctrl+F1", Value1, Value2)
+            Print format$(" {0:3} | {1} | Ctrl+F1", Value1, Value2)
             Print Over $(9), Value3$
             Refresh
             Method text1, "Show"
@@ -23683,7 +23683,7 @@ Refresh 5000
 \\ Here we use Locale value in Time$()
 \\ Locale is a statement and a read only value
 
-\\ Greek and Latin statements used for message;s language
+\\ Greek and English statements used for message;s language
 \\ Greek also is a read only variable to read the status for message's language
 If Greek Then
       m$="Πάτα ένα πλήκτρο στο πληκτρολόγιο για τερματισμό - Πάτα τα πλήκτρα του ποντικιού για να αλλάξεις ταχύτητα στο μήνυμα - "
@@ -25984,7 +25984,7 @@ class delta {
 }
 delta=delta()
 Print delta is type delta
-Report { should be: True or Αληθές - if you use GREEK statement, Use LATIN to change it to True}
+Report { should be: True or Αληθές - if you use GREEK statement, Use ENG;ISH to change it to True}
 Print delta.One=delta.Two
 Report { delta.One=delta.Two   -  should be: True}
 Print delta.one=delta
@@ -41954,6 +41954,7 @@ R1= N1 mod#  D1
 ? Q1*D1+R1
 }
 MODULE EVALUATOR {form 96, 82
+
 Module CheckEvaluator (Expr$) {
 	function rpn_to_infix$(a$) {
 		def m=0
@@ -42049,30 +42050,29 @@ Module CheckEvaluator (Expr$) {
 						exit
 					end if
 				always
-					in$=Trim$(in$)
-					if Asc(in$)<>40 then
-						string ch="", num=""
-						Boolean once=false
-						do
-							ch=left$(in$,1)
-							if once then
-								if instr("0123456789", ch)>0  else exit
-							else
-								if instr(".0123456789", ch)>0  else exit
-								if ch="." then once=true
-							end if
-							num+=ch
-							in$=Mid$(in$, 2)
-						until len(in$)=0
-						if num="." then Error "missing number"
-						if len(num)=0 then =stack: exit
-						data val(num)
-					else
+				in$=Trim$(in$)
+				if Asc(in$)<>40 then
+					string ch="", num=""
+					Boolean once=false
+					do
+						ch=left$(in$,1)
+						if once then
+							if instr("0123456789", ch)>0  else exit
+						else
+							if instr(".0123456789", ch)>0  else exit
+							if ch="." then once=true
+						end if
+						num+=ch
 						in$=Mid$(in$, 2)
-						Ast()
-						in$=Mid$(in$, 2)
-					end if
-
+					until len(in$)=0
+					if num="." then Error "missing number"
+					if len(num)=0 then =stack: exit
+					data val(num)
+				else
+					in$=Mid$(in$, 2)
+					Ast()
+					in$=Mid$(in$, 2)
+				end if
 				m++
 				in$=Trim$(in$)
 				oper$=left$(in$,1)
@@ -42093,14 +42093,17 @@ Module CheckEvaluator (Expr$) {
 		end sub
 	}
 	Pen 15 {
+		oldlocale=locale
 		Pen 12 {print "input expression:";}
 		Pen 14 {print Expr$}
 		print "Result through eval$:";
 		pen 10 {print eval(Expr$)}
 		mres=Ast(&Expr$)
 		print "computed RPN    :";array(stack(mres))#str$()
+		locale 1033
 		MM$=rpn_to_infix$(array(stack(mres))#str$())
 		print "cumputed INFIX  :";rpn_to_infix$(array(stack(mres))#str$())
+		locale oldlocale
 		print "Using Eval$() on infix:";eval(MM$)
 		pen 11 {
 			Print "Compute RPN value:";
@@ -47115,5 +47118,24 @@ MODULE POLYSPIRAL {ΤΜΗΜΑ ΠΟΛΥΣΠΕΙΡΑ {
 }
 ΠΟΛΥΣΠΕΙΡΑ
 ΠΕΝΑ 14
+}
+MODULE NCONST {CONST P=(1,2,3,4)
+CONST A=P#MAT("+=", 500)
+PRINT A#SUM()=2010
+PRINT TYPE$(P)="Constant"
+PRINT TYPE$(A)="Constant"
+Z=P
+PRINT TYPE$(Z)="tuple"
+PRINT Z IS P=FALSE
+Z++
+PRINT Z#SUM()
+PRINT P#VAL(3)=4
+PRINT A#VAL(3)=504
+PRINT Z#VAL(3)=5
+}
+MODULE BIGINPUT {dim a(10)
+input "a=", a(2)=0u, a(3)=0&&
+? type$(a(2)), a(2)
+? type$(a(3)), a(3)
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
