@@ -3565,3 +3565,10 @@ End Function
 Private Sub iBoxArray_StartResize()
 StartResize
 End Sub
+Friend Property Get Unique() As Boolean
+    Dim obj As IUnknown, GetRefCount As Long
+    Set obj = Me
+    CopyMemory GetRefCount, ByVal (ObjPtr(obj)) + 4, 4
+    If GetRefCount > 4 Then Exit Property
+    Unique = True
+End Property

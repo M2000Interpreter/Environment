@@ -2920,3 +2920,10 @@ End Property
 Private Function iBoxArray_IsEnum(p As Variant) As Boolean
     iBoxArray_IsEnum = IsEnum(p)
 End Function
+Friend Property Get Unique() As Boolean
+    Dim obj As IUnknown, GetRefCount As Long
+    Set obj = Me
+    CopyMemory GetRefCount, ByVal (ObjPtr(obj)) + 4, 4
+    If GetRefCount > 4 Then Exit Property
+    Unique = True
+End Property

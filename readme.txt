@@ -1,20 +1,52 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 20 active-X
+Version 13 revision 21 active-X
+1. Fix how names print for list of modules and variables.
+You can check List statement for variables and modules ? for modules/functions.
+2. Fix for list/queue/stack which use := for subs
+(break from Version 13 Revision 17).
+2.1 
+alfa(list:=1,2,3)
+sub alfa(a as list)
+	? a
+end sub
 
-a FIX for EMF files.
-On a Windows 11 laptop I found that the reference device - as stored in emf- has a bug from the OS, so I do my own calculation and now the emf has the size I want. The reference device cx/cy values used for adjusting the size, so my image before get a 1.75 bigger size, so my drawing drawing smaller at the top left corner. This happen when I choose to declare a bounding rectangle. The bounding rectangle saved ok on the original header but not on the emf file header (although the original header also included in the emf file).
-So the fix in vb6 was:
-' copy of the header to mheader
-CopyMemory ByVal VarPtr(mHeader.iType), ByVal aPic.GetBytePtr(0), 88
-If boundrect.Bottom > 0 Then
-' then if we have a boundrect we get the pixels (which are ok)
-' and calculate the milliimeters which aren't ok (fort Windows 10 are slight different, but for Windows 11 on a laptop with 1920X1080 screen was very bad)
-mHeader.szlMillimeters.cx = mHeader.szlDevice.cx * 15 / 1440 * 25.4
-mHeader.szlMillimeters.cy = mHeader.szlDevice.cy * 15 / 1440 * 25.4
-' restore the bytes...on memory buffer
-CopyMemory ByVal aPic.GetBytePtr(0), ByVal VarPtr(mHeader.iType), 88
-End If
+2.2
+a=list := 1,2,3,4,5
+beta(a,"string", 1)
+sub beta(o as list, v1 as variant, v2 as double)
+	? o
+end sub
+
+3. Added AS BIGINTEGER for CONST. Added AS CONST for parameters:
+CONST P AS BIGINTEGER=-1232312323423423423334234U
+ALFA1(P)
+ALFA2(P)
+SUB ALFA1(K AS BIGINTEGER)
+	? K
+	? TYPE$(K)="BigInteger"	
+END SUB
+SUB ALFA2(K AS CONST)
+	? K
+	? TYPE$(K)="Constant"
+END SUB
+4. Now we can make also CONST tuples
+CONST P=(1,2,3,4)
+This is read only.
+CONST P=(1,2,3,4)
+CONST A=P#MAT("+=", 500)
+PRINT A#SUM()=2010
+PRINT TYPE$(P)="Constant"
+PRINT TYPE$(A)="Constant"
+Z=P
+PRINT TYPE$(Z)="tuple"
+PRINT Z IS P=FALSE
+Z++
+PRINT Z#SUM()
+PRINT P#VAL(3)=4
+PRINT A#VAL(3)=504
+PRINT Z#VAL(3)=5
+5. EVALUATOR module in info.gsb now run as expected.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

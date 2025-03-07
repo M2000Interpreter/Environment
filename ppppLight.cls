@@ -13,7 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Implements iBoxArray
 Option Explicit
-Public refgroup As Object, GroupRef As Object, arr As Boolean, IhaveClass As Boolean, CodeName As String
+Public refgroup As Object, GroupRef As Object, Arr As Boolean, IhaveClass As Boolean, CodeName As String
 Public Final As Boolean, common As Boolean, myarrbase As Long
 Private ndnum As Long, dnum As Long
 Private actualData As Variant
@@ -21,7 +21,7 @@ Public Property Set item(curitem As Long, item As Variant)
     Set iBoxArray_Item(curitem) = item
 End Property
 Public Function itemnumeric(curitem As Long) As Variant
-If Not arr Then
+If Not Arr Then
     If curitem = -2 Then
     
     ElseIf curitem < 0 Then
@@ -49,9 +49,9 @@ End Sub
 Public Sub PushEnd(Optional thisarr As Variant)
 dnum = ndnum
 End Sub
-Public Sub PushProp(a As Variant)
-Set GroupRef = a
-arr = False
+Public Sub PushProp(A As Variant)
+Set GroupRef = A
+Arr = False
 End Sub
 Public Function IsObjAt(curitem As Long, peekvalue As Variant) As Boolean
     IsObjAt = iBoxArray_IsObjAt(curitem, peekvalue)
@@ -88,11 +88,11 @@ Private Sub iBoxArray_AppendArray(K As iBoxArray)
 End Sub
 
 Private Property Let iBoxArray_Arr(ByVal RHS As Boolean)
-arr = RHS
+Arr = RHS
 End Property
 
 Private Property Get iBoxArray_Arr() As Boolean
-iBoxArray_Arr = arr
+iBoxArray_Arr = Arr
 End Property
 
 Private Property Let iBoxArray_arrname(ByVal RHS As String)
@@ -242,7 +242,7 @@ End If
         Set peekvalue = usehandler
     End If
 Else
-    If Not arr Then
+    If Not Arr Then
     Set peekvalue = GroupRef
     Else
     Set peekvalue = actualData
@@ -327,7 +327,7 @@ End If
         Set iBoxArray_Item = usehandler
     End If
 Else
-    If Not arr Then
+    If Not Arr Then
     Set iBoxArray_Item = GroupRef
     Else
     If IsObject(actualData) Then
@@ -348,7 +348,7 @@ SwapVariant iBoxArray_itemnumeric, itemnumeric(curitem)
 End Function
 
 Private Property Get iBoxArray_itemObject(curitem As Long) As Variant
-If arr Then
+If Arr Then
     
     If MyIsObject(actualData) Then
         Set iBoxArray_itemObject = actualData
@@ -360,8 +360,8 @@ End If
 End Property
 
 Private Property Get iBoxArray_itemPtr(curitem As Long) As Long
-Static a
-iBoxArray_itemPtr = VarPtr(a)
+Static A
+iBoxArray_itemPtr = VarPtr(A)
 End Property
 
 Private Property Let iBoxArray_ItemStr(curitem As Long, RHS As String)
@@ -370,7 +370,7 @@ End Property
 
 Private Property Get iBoxArray_ItemType(curitem As Variant) As String
 On Error GoTo there1
-If arr Then
+If Arr Then
    
         iBoxArray_ItemType = VarTypeName(actualData)
    
@@ -450,8 +450,8 @@ Private Sub iBoxArray_PushEnd(Optional thisarr As Variant)
 dnum = ndnum
 End Sub
 
-Private Sub iBoxArray_PushProp(a As Variant)
-PushProp a
+Private Sub iBoxArray_PushProp(A As Variant)
+PushProp A
 End Sub
 
 Private Property Set iBoxArray_refgroup(ByVal RHS As Object)
@@ -502,4 +502,11 @@ End Function
 
 Private Property Get iBoxArray_value() As Variant
 
+End Property
+Friend Property Get Unique() As Boolean
+    Dim obj As IUnknown, GetRefCount As Long
+    Set obj = Me
+    CopyMemory GetRefCount, ByVal (ObjPtr(obj)) + 4, 4
+    If GetRefCount > 4 Then Exit Property
+    Unique = True
 End Property

@@ -46,18 +46,39 @@ If Not objref Is Nothing Then
 Set objref = Nothing
 End If
 End Sub
-Friend Sub CopyTo(a As mHandler)
-If IamEnum Then Set a = Me: Exit Sub
-Set a = New mHandler
-a.T1 = T1
-If T1 = 1 Then a.ReadOnly = ReadOnly
-a.indirect = indirect
-a.index_start = index_start
-a.index_End = index_End
-a.index_cursor = index_cursor
-a.UseIterator = UseIterator
-a.sign = sign
-Set a.objref = mObjRef
+Friend Sub CopyTo(A As mHandler)
+If IamEnum Then Set A = Me: Exit Sub
+Set A = New mHandler
+A.T1 = T1
+If T1 = 1 Then
+    A.ReadOnly = ReadOnly
+    Set A.objref = mObjRef
+ElseIf T1 = 3 Then
+    If ReadOnly Then
+    Dim mAr As mArray, mtu As tuple
+           If TypeOf objref Is mArray Then
+                    Set mAr = New mArray
+                    objref.CopyArray mAr
+                    Set A.objref = mAr
+            ElseIf TypeOf objref Is tuple Then
+                    Set mtu = New tuple
+                    objref.CopyArray mtu
+                    Set A.objref = mtu
+            Else
+                Set A.objref = mObjRef
+            End If
+    Else
+        Set A.objref = mObjRef
+    End If
+Else
+    Set A.objref = mObjRef
+End If
+A.indirect = indirect
+A.index_start = index_start
+A.index_End = index_End
+A.index_cursor = index_cursor
+A.UseIterator = UseIterator
+A.sign = sign
 End Sub
 Friend Function Iterate()
         Iterate = GetNext(ObjPtr(oEnum), index_cursor)

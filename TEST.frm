@@ -212,19 +212,19 @@ Dim para(2) As Long, pospara(2) As Long, selpresrv(2) As Long
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim EXECUTED As Boolean
 Dim stolemodalid As Variant
-Public Sub generalFkey(A As Integer)
+Public Sub generalFkey(a As Integer)
 Dim monitor As Long, titl$, once As Boolean
 If once Then Exit Sub
 once = True
-Debug.Print "OK", A
-If A = 2 Then
+Debug.Print "OK", a
+If a = 2 Then
 gList0.SetFocus
-ElseIf A = 3 Then
+ElseIf a = 3 Then
 glist3_CheckGotFocus 2
-ElseIf A = 5 Then
+ElseIf a = 5 Then
 gList4.ListIndex = 0
 gList4_Selected2 0
-ElseIf A = 6 Then
+ElseIf a = 6 Then
 stoponerror = True
 If pagio$ = "GREEK" Then
 gList4.list(1) = "Στο Λάθος F6"
@@ -235,7 +235,7 @@ End If
 
 gList4.ListIndex = 1
 gList4_Selected2 1
-ElseIf A = 7 Then
+ElseIf a = 7 Then
 If pagio$ = "GREEK" Then
 gList4.list(1) = "Αργή Ροή F7"
 Else
@@ -244,14 +244,14 @@ End If
 stoponerror = False
 gList4.ListIndex = 1
 gList4_Selected2 1
-ElseIf A = 8 Then
+ElseIf a = 8 Then
 gList4.ListIndex = 2
 gList4_Selected2 2
 ElseIf switchview = 2 Then
-    If A = 1 Then
+    If a = 1 Then
         Errorlog.EmptyDoc
         stackshow MyBaseTask
-    ElseIf A = 4 Then
+    ElseIf a = 4 Then
         If pagio$ = "GREEK" Then titl$ = "Καταγραφικό Λαθών" Else titl$ = "Error Log"
         GoSub findwindow
         sHelp titl$, Errorlog.textDoc, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
@@ -259,7 +259,7 @@ ElseIf switchview = 2 Then
         Form4.label1.SelStartSilent = testpad.SelStart
         vHelp
     End If
-ElseIf A = 4 Then
+ElseIf a = 4 Then
     GoSub findwindow
     sHelp gList2.HeadLine, testpad.Text, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
     If TestShowCode Then
@@ -406,7 +406,7 @@ End If
 End Sub
 
 Private Sub Form_Load()
-Dim i As Long
+Dim I As Long
 Busy = True
 height1 = 5280 * DYP / 15
 width1 = 7860 * DXP / 15
@@ -563,8 +563,8 @@ End Sub
 
 
 
-Private Sub gList0_Fkey(A As Integer)
-generalFkey A
+Private Sub gList0_Fkey(a As Integer)
+generalFkey a
 End Sub
 
 
@@ -582,9 +582,9 @@ GetPanelPos
 End Sub
 
 
-Private Sub gList1_Fkey(A As Integer)
+Private Sub gList1_Fkey(a As Integer)
 
-generalFkey A
+generalFkey a
 End Sub
 
 Private Sub gList2_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
@@ -616,28 +616,28 @@ Public Property Let label1(ByVal Index As Long, ByVal RHS As String)
 Label(Index) = RHS
 End Property
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT, b As Long
+Dim a As RECT, b As Long
 b = 2
-CopyFromLParamToRect A, thatRect
-A.Left = b
-A.Right = setupxy - b
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), 0
+CopyFromLParamToRect a, thatRect
+a.Left = b
+a.Right = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), 0
 b = 5
-A.Left = b
-A.Right = setupxy - b
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), rgb(255, 160, 0)
+a.Left = b
+a.Right = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
 
 End Sub
 
 Private Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT
-CopyFromLParamToRect A, thatRect
-FillBack thathDC, A, thatbgcolor
+Dim a As RECT
+CopyFromLParamToRect a, thatRect
+FillBack thathDC, a, thatbgcolor
 End Sub
 Private Sub FillBack(thathDC As Long, there As RECT, bgcolor As Long)
 ' create brush
@@ -647,8 +647,8 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 
-Private Sub gList2_Fkey(A As Integer)
-generalFkey A
+Private Sub gList2_Fkey(a As Integer)
+generalFkey a
 End Sub
 
 Private Sub gList2_GotFocus()
@@ -672,7 +672,7 @@ End Sub
 
 
 Private Sub glist3_CheckGotFocus(Index As Integer)
-Dim s$, z$
+Dim s$, Z$
 gList4.SetFocus
 On Error GoTo there1
 If Index < 2 Then
@@ -682,24 +682,24 @@ vH_title$ = vbNullString
 s$ = Label(Index)
 If Index = 1 Then
    
-        Dim i As Long
+        Dim I As Long
         If MyBaseTask.ExistVar2(s$) Then
-            IsStr1 MyBaseTask, "Type$(" + s$ + ")", z$
+            IsStr1 MyBaseTask, "Type$(" + s$ + ")", Z$
             
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
-                sHelp "Static Variable", s$ & vbCrLf & "Type " + z$, vH_x, vH_y
+                sHelp "Static Variable", s$ & vbCrLf & "Type " + Z$, vH_x, vH_y
             Else
-                sHelp "Στατική Μεταβλητή", s$ & vbCrLf & "Τύπος " + z$, vH_x, vH_y
+                sHelp "Στατική Μεταβλητή", s$ & vbCrLf & "Τύπος " + Z$, vH_x, vH_y
             End If
         
-        ElseIf GetlocalVar(s$, i) Then
-            IsStr1 MyBaseTask, "Type$(" + s$ + ")", z$
+        ElseIf GetlocalVar(s$, I) Then
+            IsStr1 MyBaseTask, "Type$(" + s$ + ")", Z$
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
-                sHelp "Local Identifier", s$ & vbCrLf & "Type " + z$, vH_x, vH_y
+                sHelp "Local Identifier", s$ & vbCrLf & "Type " + Z$, vH_x, vH_y
             Else
-                sHelp "Τοπικό Αναγνωριστικό", s$ & vbCrLf & "Τύπος " + z$, vH_x, vH_y
+                sHelp "Τοπικό Αναγνωριστικό", s$ & vbCrLf & "Τύπος " + Z$, vH_x, vH_y
             End If
-        ElseIf GetGlobalVar(s$, i) Then
+        ElseIf GetGlobalVar(s$, I) Then
         If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
             sHelp "Global Identifier", s$, vH_x, vH_y
             
@@ -707,10 +707,10 @@ If Index = 1 Then
             sHelp "Γενικό Αναγνωριστικό", s$, vH_x, vH_y
             
             End If
-        ElseIf GetSub(s$, i) Then
+        ElseIf GetSub(s$, I) Then
             '
-            z$ = Label(2)
-            If MaybeIsSymbol(z$, "=") Then
+            Z$ = Label(2)
+            If MaybeIsSymbol(Z$, "=") Then
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
                 sHelp "New Identifier", s$, vH_x, vH_y
             Else
@@ -723,8 +723,8 @@ If Index = 1 Then
         ElseIf ismine(s$) Then
             fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128
         Else
-        z$ = Label(2)
-        If MaybeIsSymbol(z$, "=") Then
+        Z$ = Label(2)
+        If MaybeIsSymbol(Z$, "=") Then
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
                 sHelp "New Identifier", s$, vH_x, vH_y
             Else
@@ -745,10 +745,10 @@ vHelp
 End If
 Else
 If Index = 0 Then
-i = MyBaseTask.OriginalCode
+I = MyBaseTask.OriginalCode
 JUMPHERE:
 Dim aa As Long, aaa As String
-aa = i
+aa = I
 aaa = SBcode(aa)
 If Left$(aaa, 10) = "'11001EDIT" Then
 SetNextLine aaa
@@ -804,16 +804,16 @@ End If
 there1:
 End Sub
 
-Private Sub gList3_Fkey(Index As Integer, A As Integer)
-generalFkey A
+Private Sub gList3_Fkey(Index As Integer, a As Integer)
+generalFkey a
 End Sub
 
 Private Sub gList4_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
-Dim A As RECT, b As RECT
-CopyFromLParamToRect A, thisrect
+Dim a As RECT, b As RECT
+CopyFromLParamToRect a, thisrect
 CopyFromLParamToRect b, thisrect
-A.Left = A.Left + 1 * lastfactor
-A.Right = gList4.WidthPixels
+a.Left = a.Left + 1 * lastfactor
+a.Right = gList4.WidthPixels
 b.Right = gList4.WidthPixels
  If item = gList4.ListIndex Then
    If EXECUTED Then
@@ -836,17 +836,17 @@ b.Right = gList4.WidthPixels
     FillBack thisHDC, b, 0
     End If
     If item = gList4.ListIndex Then
-  A.Left = A.Left + 1 * lastfactor + gList4.PanPosPixels
+  a.Left = a.Left + 1 * lastfactor + gList4.PanPosPixels
   gList4.ForeColor = rgb(128, 0, 128)
   End If
    
    
-   PrintItem thisHDC, gList4.list(item), A
+   PrintItem thisHDC, gList4.list(item), a
     skip = True
 End Sub
  
-Private Sub gList4_Fkey(A As Integer)
-generalFkey A
+Private Sub gList4_Fkey(a As Integer)
+generalFkey a
 End Sub
 
 Private Sub gList4_PanLeftRight(direction As Boolean)
@@ -1055,8 +1055,8 @@ Sub ByeBye()
 Unload Me
 End Sub
 Public Sub ResetPanelPos()
-Dim i As Long
-For i = 0 To 2: para(i) = 0: Next i
+Dim I As Long
+For I = 0 To 2: para(I) = 0: Next I
 lastpanel = 0
 End Sub
 Public Sub paneltitle(ByVal that As Long)
@@ -1091,6 +1091,7 @@ End If
 End Sub
 
 Public Sub GetPanelPos(Optional ByVal that As Long = -1)
+On Error Resume Next
 Select Case that
 Case 0 To 2
     
@@ -1105,6 +1106,7 @@ Case -1
 End Select
 End Sub
 Public Sub SetPanelPos(ByVal that As Long)
+On Error GoTo 100
 Select Case that
 Case 0 To 2
     lastpanel = that
@@ -1118,5 +1120,6 @@ Case 0 To 2
         .glistN.ShowMe
     End With
 End Select
+100
 End Sub
 
