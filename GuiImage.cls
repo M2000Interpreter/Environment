@@ -37,7 +37,7 @@ Const WM_CHAR = &H102
 Const WM_KEYLAST = &H108
 Private Type POINTAPI
     X As Long
-    y As Long
+    Y As Long
 End Type
 Private Type Msg
     hWnd As Long
@@ -62,12 +62,12 @@ Friend Sub Construct(there As GuiM2000, Name$)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
+Friend Sub ConstructArray(there As GuiM2000, Name$, I As Long)
  Set Callback = there
  On Error Resume Next
  ctrlName = GetTag$
  Set pbox = there.Controls.Add("vb.picturebox", ctrlName)
- mIndex = i
+ mIndex = I
  there.AddGuiControl Me, CVar(ctrlName)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
@@ -106,13 +106,13 @@ Public Sub deconstruct()
 Set Callback = Nothing
 Set pbox = Nothing
 End Sub
-Public Sub move(X, y, Optional W, Optional H)
+Public Sub move(X, Y, Optional W, Optional H)
 If IsMissing(W) Then
-pbox.move CLng(X), CLng(y), 0, 0
+pbox.move CLng(X), CLng(Y), 0, 0
 ElseIf IsMissing(H) Then
-pbox.move CLng(X), CLng(y), CLng(W), 0
+pbox.move CLng(X), CLng(Y), CLng(W), 0
 Else
-pbox.move CLng(X), CLng(y), CLng(W), CLng(H)
+pbox.move CLng(X), CLng(Y), CLng(W), CLng(H)
 End If
 End Sub
 
@@ -169,7 +169,7 @@ End Property
 Private Sub pbox_Click()
     If Not enabled Then Exit Sub
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".Click(" + Str(mIndex) + ")"
+        Callback.Callback mesCtrlName + ".Click(" + str(mIndex) + ")"
     Else
       Callback.Callback mesCtrlName + ".Click()"
     End If
@@ -177,7 +177,7 @@ End Sub
 
 Private Sub pbox_GotFocus()
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".GotFocus(" + Str(mIndex) + ")"
+        Callback.Callback mesCtrlName + ".GotFocus(" + str(mIndex) + ")"
     Else
         Callback.Callback mesCtrlName + ".GotFocus()"
     End If
@@ -187,82 +187,89 @@ ShowCaret = ShowCaret
 If ShowCaret Then Module2.ShowCaret pbox.hWnd
 End Sub
 
-Private Sub pbox_KeyDown(keycode As Integer, shift As Integer)
+Private Sub pbox_KeyDown(KeyCode As Integer, shift As Integer)
+
 If BypassKey Then
-GetKeY2 keycode, shift
-keycode = 0: shift = 0: Exit Sub
+GetKeY2 KeyCode, shift
+KeyCode = 0: shift = 0: Exit Sub
 End If
 lastshift = shift
 Dim VR(2)
-VR(0) = keycode
+VR(0) = KeyCode
 VR(1) = shift
 If mIndex >= 0 Then
-Callback.CallbackNow mesCtrlName + ".KeyDown(" + Str(mIndex) + ")", VR()
+Callback.CallbackNow mesCtrlName + ".KeyDown(" + str(mIndex) + ")", VR()
 Else
 Callback.CallbackNow mesCtrlName + ".KeyDown()", VR()
 End If
-keycode = VR(0)
+KeyCode = VR(0)
 shift = VR(1)
 
-If keycode = 27 And NoEscapeKey Then
-keycode = 0
+If KeyCode = 27 And NoEscapeKey Then
+KeyCode = 0
 Exit Sub
 End If
 If Arrows2Tab Then
-    If keycode = vbKeyLeft Or (keycode = vbKeyUp And Arrows2Tab) Then
+    If KeyCode = vbKeyLeft Or (KeyCode = vbKeyUp And Arrows2Tab) Then
         If Typename(pbox.Parent) = "GuiM2000" Then
             ChooseNextLeft pbox, pbox.Parent
         End If
-        keycode = 0
+        KeyCode = 0
         Exit Sub
-    ElseIf keycode = vbKeyRight Or (keycode = vbKeyDown And Arrows2Tab) Then
+    ElseIf KeyCode = vbKeyRight Or (KeyCode = vbKeyDown And Arrows2Tab) Then
         If Typename(pbox.Parent) = "GuiM2000" Then
             ChooseNextRight pbox, pbox.Parent
         End If
-        keycode = 0
+        KeyCode = 0
         Exit Sub
     End If
 End If
-If keycode = vbKeyTab Then  'And Not EditFlagSpecial
+If KeyCode = vbKeyTab Then  'And Not EditFlagSpecial
     If shift = 1 Then
         choosenext
-        keycode = 0
+        KeyCode = 0
         Exit Sub
     End If
-ElseIf keycode = vbKeyF4 Then
+ElseIf KeyCode = vbKeyF4 Then
 If shift = 4 Then
 On Error Resume Next
 If pbox.Parent.Name = "GuiM2000" Or pbox.Parent.Name = "Form2" Or pbox.Parent.Name = "Form4" Then
 With pbox.Parent
 .ByeBye
 End With
-keycode = 0
+KeyCode = 0
 Exit Sub
 End If
 End If
 End If
-If DropKey Then keycode = 0: Exit Sub
-Dim i&
+
+If DropKey Then
+KeyCode = 0: Exit Sub
+Else
+If KeyCode <> 0 Then GetKeY2 KeyCode, shift
+If KeyCode = 0 Then Exit Sub
+End If
+Dim I&
 If shift = 4 Then
-If keycode = 18 Then
+If KeyCode = 18 Then
 If mynum$ = vbNullString Then mynum$ = "0"
-keycode = 0
+KeyCode = 0
 Exit Sub
 Else
-If keycode <> 0 Then GetKeY2 keycode, shift
+If KeyCode <> 0 Then GetKeY2 KeyCode, shift
 End If
-Select Case keycode
+Select Case KeyCode
 Case vbKeyAdd, vbKeyInsert
 mynum$ = "&h"
 Case vbKey0 To vbKey9
-mynum$ = mynum$ + Chr$(keycode - vbKey0 + 48)
+mynum$ = mynum$ + Chr$(KeyCode - vbKey0 + 48)
 LastNumX = True
 Case vbKeyNumpad0 To vbKeyNumpad9
 LastNumX = False
-mynum$ = mynum$ + Chr$(keycode - vbKeyNumpad0 + 48)
+mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 48)
 Case vbKeyA To vbKeyF
 If Left$(mynum$, 1) = "&" Then
-mynum$ = mynum$ + Chr$(keycode - vbKeyNumpad0 + 65)
+mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 65)
 LastNumX = True
 Else
 mynum$ = vbNullString
@@ -274,11 +281,11 @@ Exit Sub
 End If
 
 mynum$ = vbNullString
-If shift <> 0 And keycode = 0 Then Exit Sub
+If shift <> 0 And KeyCode = 0 Then Exit Sub
 End Sub
 Private Sub EnterOnly()
 If mIndex >= 0 Then
-    Callback.Callback mesCtrlName + ".Enter(" + Str(mIndex) + ")"
+    Callback.Callback mesCtrlName + ".Enter(" + str(mIndex) + ")"
 Else
     Callback.Callback mesCtrlName + ".Enter()"
 End If
@@ -321,78 +328,78 @@ fin:
     KeyAscii = 0
 End Sub
 
-Private Sub pbox_KeyUp(keycode As Integer, shift As Integer)
+Private Sub pbox_KeyUp(KeyCode As Integer, shift As Integer)
 On Error GoTo fin
 'If PrevLocale <> GetLocale Then RaiseEvent Maybelanguage
-If BypassKey Then keycode = 0: shift = 0: Exit Sub
-Dim i As Long, k As Integer
+If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
+Dim I As Long, K As Integer
 
 lastshift = shift
-If keycode = 18 Then
+If KeyCode = 18 Then
 
-ElseIf keycode = 112 And (shift And 2) = 2 Then
-keycode = 0
+ElseIf KeyCode = 112 And (shift And 2) = 2 Then
+KeyCode = 0
 shift = 0
 CtrlPlusF1
 Exit Sub
-ElseIf keycode >= vbKeyF1 And keycode <= vbKeyF12 Then
-    k = ((keycode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
-    Fkey k
-    If k = 0 Then keycode = 0: shift = 0
-ElseIf keycode = 16 And shift <> 0 Then
+ElseIf KeyCode >= vbKeyF1 And KeyCode <= vbKeyF12 Then
+    K = ((KeyCode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
+    Fkey K
+    If K = 0 Then KeyCode = 0: shift = 0
+ElseIf KeyCode = 16 And shift <> 0 Then
   '  RaiseEvent Maybelanguage
-ElseIf keycode = vbKeyV Then
+ElseIf KeyCode = vbKeyV Then
 Exit Sub
 Else
-If keycode = 27 And NoEscapeKey Then
-keycode = 0
+If KeyCode = 27 And NoEscapeKey Then
+KeyCode = 0
 Else
 'RaiseEvent RefreshOnly
 End If
 End If
-If DropKey Then keycode = 0: UKEY$ = vbNullString: Exit Sub
-i = -1
+If DropKey Then KeyCode = 0: UKEY$ = vbNullString: Exit Sub
+I = -1
 If shift <> 4 And mynum$ <> "" Then
 On Error Resume Next
 If Left$(mynum$, 1) = "0" Then
-i = val(mynum$)
+I = val(mynum$)
 Else
-i = val(mynum$)
+I = val(mynum$)
 End If
 mynum$ = vbNullString
-If i > 32 Then
-If i >= &H10000 And i <= &H10FFFF Then
-i = i - &H10000
-UKEY$ = ChrW(UINT(i \ &H400& + &HD800&)) + ChrW(UINT((i And &H3FF&) + &HDC00&))
+If I > 32 Then
+If I >= &H10000 And I <= &H10FFFF Then
+I = I - &H10000
+UKEY$ = ChrW(UINT(I \ &H400& + &HD800&)) + ChrW(UINT((I And &H3FF&) + &HDC00&))
 Else
-UKEY$ = ChrW(i)
+UKEY$ = ChrW(I)
 End If
 'If LastNumX Then pbox_KeyPress 44
 Exit Sub
 End If
-i = -1
+I = -1
 Else
-i = GetLastKeyPressed
+I = GetLastKeyPressed
 End If
 
- If i <> -1 And i <> 94 Then
- If i = 13 Then
+ If I <> -1 And I <> 94 Then
+ If I = 13 Then
  UKEY$ = vbNullString
  Else
- UKEY$ = ChrW(i)
+ UKEY$ = ChrW(I)
  End If
  Else
 UKEY$ = vbNullString
  End If
     Dim VR(2)
-    VR(0) = keycode
+    VR(0) = KeyCode
     VR(1) = shift
     If mIndex >= 0 Then
-    Callback.CallbackNow mesCtrlName + ".KeyUp(" + Str(mIndex) + ")", VR()
+    Callback.CallbackNow mesCtrlName + ".KeyUp(" + str(mIndex) + ")", VR()
     Else
     Callback.CallbackNow mesCtrlName + ".KeyUp()", VR()
     End If
-    keycode = VR(0)
+    KeyCode = VR(0)
     shift = VR(1)
 
 fin:
@@ -406,7 +413,7 @@ If pbox.TabStop And enabled And Visible Then
     Callback.LastActive = ctrlName
 End If
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".LostFocus(" + Str(mIndex) + ")"
+        Callback.Callback mesCtrlName + ".LostFocus(" + str(mIndex) + ")"
     Else
         Callback.Callback mesCtrlName + ".LostFocus()"
     End If
@@ -415,7 +422,7 @@ preserveINK$ = INK$
 INK$ = ""
 End Sub
 
-Private Sub pbox_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub pbox_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim bstack As basetask, oldHere$
 If Not enabled Then Exit Sub
 If Not Relax Then
@@ -423,7 +430,7 @@ Relax = True
 Dim sel&
 
 If Button > 0 And Targets Then
-    sel& = ScanTarget(q(), CLng(X), CLng(y), prive)
+    sel& = ScanTarget(q(), CLng(X), CLng(Y), prive)
     If sel& >= 0 Then
         If Button = 1 Then
             Select Case q(sel&).id Mod 100
@@ -439,9 +446,9 @@ If Button > 0 And Targets Then
             Case Else
             
             If mIndex > -1 Then
-                Callback.Callback mesCtrlName + ".Target" + "(" + CStr(Index) + "," + Str(sel& + prive * 10000) + ")"
+                Callback.Callback mesCtrlName + ".Target" + "(" + CStr(Index) + "," + str(sel& + prive * 10000) + ")"
             Else
-                Callback.Callback mesCtrlName + ".Target" + "(" + Str(sel& + prive * 10000) + ")"
+                Callback.Callback mesCtrlName + ".Target" + "(" + str(sel& + prive * 10000) + ")"
             End If
 
             End Select
@@ -457,33 +464,33 @@ End If
 
 
 If mIndex > -1 Then
-    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(y) + ")"
+    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 Else
-    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(y) + ")"
+    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 End If
 Relax = False
 End If
 End Sub
-Private Sub pbox_MouseUp(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub pbox_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Not enabled Then Exit Sub
 If Not Relax Then
 Relax = True
 If mIndex > -1 Then
-Callback.Callback mesCtrlName + ".MouseUp(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(y) + ")"
+Callback.Callback mesCtrlName + ".MouseUp(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 Else
-Callback.Callback mesCtrlName + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(y) + ")"
+Callback.Callback mesCtrlName + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 End If
 Relax = False
 End If
 End Sub
-Private Sub pbox_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub pbox_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Not enabled Then Exit Sub
 If Not Relax Then
 Relax = True
 If mIndex > -1 Then
-Callback.Callback mesCtrlName + ".MouseMove(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(y) + ")"
+Callback.Callback mesCtrlName + ".MouseMove(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 Else
-Callback.Callback mesCtrlName + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(y) + ")"
+Callback.Callback mesCtrlName + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 End If
 Relax = False
 End If
@@ -492,7 +499,7 @@ End Sub
 Private Sub pbox_DblClick()
     If Not enabled Then Exit Sub
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".DblClick(" + Str(mIndex) + ")"
+        Callback.Callback mesCtrlName + ".DblClick(" + str(mIndex) + ")"
     Else
         Callback.Callback mesCtrlName + ".DblClick()"
     End If
@@ -507,7 +514,7 @@ Dim VR(2)
 VR(0) = Width
 VR(1) = Height
     If mIndex >= 0 Then
-        Callback.CallbackNow mesCtrlName + ".Resize(" + Str(mIndex) + "," + Str(mIndex) + ")", VR()
+        Callback.CallbackNow mesCtrlName + ".Resize(" + str(mIndex) + "," + str(mIndex) + ")", VR()
     Else
         Callback.CallbackNow mesCtrlName + ".Resize()", VR()
     End If
@@ -526,7 +533,7 @@ Public Sub DisAllTargets()
 DisableTargets q(), prive
 End Sub
 Friend Sub RenderTarget(bstack As basetask, rest$, Lang As Long, tHandle As Variant)
-Dim p, W$, X, y As Long
+Dim p, W$, X, Y As Long
 If tHandle \ 10000 <> prive Then
     MyEr "target not for this image", "ï óôü÷ïò äåí åßíáé ãéá áõôÞ ôçí åéêüíá"
     Exit Sub
@@ -535,56 +542,56 @@ p = tHandle Mod 10000
 If p >= 0 And p < UBound(q()) Then
     While FastSymbol(rest$, ",")
         X = Empty
-        y = 0
-        If IsLabelSymbolNew(rest$, "ÖÑÁÓÇ", "TEXT", Lang, y) Then
+        Y = 0
+        If IsLabelSymbolNew(rest$, "ÖÑÁÓÇ", "TEXT", Lang, Y) Then
             If IsStrExp(bstack, rest$, W$) Then
                 q(p).Tag = W$
             Else
                 GoTo skipcommand
             End If
-        ElseIf IsLabelSymbolNew(rest$, "ÐÅÍÁ", "PEN", Lang, y) Then
+        ElseIf IsLabelSymbolNew(rest$, "ÐÅÍÁ", "PEN", Lang, Y) Then
             If IsExp(bstack, rest$, X, , True) Then
                 q(p).pen = X
             Else
                 GoTo skipcommand
             End If
-        ElseIf IsLabelSymbolNew(rest$, "ÖÏÍÔÏ", "BACK", Lang, y) Then
+        ElseIf IsLabelSymbolNew(rest$, "ÖÏÍÔÏ", "BACK", Lang, Y) Then
             If IsExp(bstack, rest$, X, , True) Then
                 q(p).back = X
             Else
                 GoTo skipcommand
             End If
-        ElseIf IsLabelSymbolNew(rest$, "ÐËÁÉÓÉÏ", "BORDER", Lang, y) Then
+        ElseIf IsLabelSymbolNew(rest$, "ÐËÁÉÓÉÏ", "BORDER", Lang, Y) Then
             If IsExp(bstack, rest$, X, , True) Then
                 q(p).fore = X
             Else
                 GoTo skipcommand
             End If
-        ElseIf IsLabelSymbolNew(rest$, "ÏÄÇÃÉÁ", "COMMAND", Lang, y) Then
+        ElseIf IsLabelSymbolNew(rest$, "ÏÄÇÃÉÁ", "COMMAND", Lang, Y) Then
             If IsStrExp(bstack, rest$, W$) Then
                 q(p).Comm = W$
             Else
                 GoTo skipcommand
             End If
-        ElseIf IsLabelSymbolNew(rest$, "ÔÉÌÇ", "VALUE", Lang, y) Then
+        ElseIf IsLabelSymbolNew(rest$, "ÔÉÌÇ", "VALUE", Lang, Y) Then
             If IsExp(bstack, rest$, X, , True) Then
                 q(p).topval = Int(X * 100)
             Else
                 GoTo skipcommand
             End If
-        ElseIf IsLabelSymbolNew(rest$, "ÂÁÓÇ", "BASE", Lang, y) Then
+        ElseIf IsLabelSymbolNew(rest$, "ÂÁÓÇ", "BASE", Lang, Y) Then
             If IsExp(bstack, rest$, X, , True) Then
                 q(p).botval = Int(X * 100)
             Else
                 GoTo skipcommand
             End If
-        ElseIf IsLabelSymbolNew(rest$, "×ÑÙÌÁ", "COLOR", Lang, y) Then
+        ElseIf IsLabelSymbolNew(rest$, "×ÑÙÌÁ", "COLOR", Lang, Y) Then
             If IsExp(bstack, rest$, X, , True) Then
                 q(p).barC = X
             Else
                 GoTo skipcommand
             End If
-        ElseIf IsLabelSymbolNew(rest$, "ÌÅÃÅÈÏÓ", "SIZE", Lang, y) Then
+        ElseIf IsLabelSymbolNew(rest$, "ÌÅÃÅÈÏÓ", "SIZE", Lang, Y) Then
             If IsExp(bstack, rest$, X, , True) Then
                 If X > 100 Then X = 100
                 If X < -100 Then X = -100
@@ -593,13 +600,13 @@ If p >= 0 And p < UBound(q()) Then
                 GoTo skipcommand
             End If
 ' "ÊÁÈÅÔÇ", "PORTRAIT"
-        ElseIf IsLabelSymbolNew(rest$, "ÊÁÈÅÔÇ", "PORTRAIT", Lang, y) Then
+        ElseIf IsLabelSymbolNew(rest$, "ÊÁÈÅÔÇ", "PORTRAIT", Lang, Y) Then
             If IsExp(bstack, rest$, X, , True) Then
                 q(p).Vertical = Int(X) <> 0
             Else
                 GoTo skipcommand
             End If
-        ElseIf IsLabelSymbolNew(rest$, "ÅÉÊÏÍÁ", "IMAGE", Lang, y) Then
+        ElseIf IsLabelSymbolNew(rest$, "ÅÉÊÏÍÁ", "IMAGE", Lang, Y) Then
             If IsExp(bstack, rest$, X) Then
                 If bstack.lastobj Is Nothing Then
                     Set q(p).drawimage = Nothing
@@ -607,7 +614,7 @@ If p >= 0 And p < UBound(q()) Then
                     Dim usehandler As mHandler
                     Set usehandler = bstack.lastobj
                     Set bstack.lastobj = Nothing
-                    If usehandler.t1 = 2 Then
+                    If usehandler.T1 = 2 Then
                         Set q(p).drawimage = usehandler.objref
                         Else
                         GoTo err123
@@ -695,18 +702,18 @@ Else
 End If
 End Function
 Function GetLocale() As Long
-    Dim R&
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
-      GetLocale = val("&H" + Right(Hex(R), 4))
+    Dim r&
+      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
+      GetLocale = val("&H" + Right(Hex(r), 4))
 End Function
 Function GetKeY(ascii As Integer) As String
     Dim Buffer As String, ret As Long
 
     Buffer = String$(514, 0)
-    Dim R&
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
-      R = val("&H" + Right(Hex(R), 4))
-    ret = GetLocaleInfo(R, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
+    Dim r&
+      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
+      r = val("&H" + Right(Hex(r), 4))
+    ret = GetLocaleInfo(r, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
     If ret > 0 Then
         GetKeY = ChrW$(AscW(StrConv(ChrW$(ascii Mod 256), 64, CLng(val("&h" + Left$(Buffer, ret - 1))))))
     Else
@@ -765,16 +772,16 @@ Property Get ShowCaret() As Boolean
     End If
 End Property
 
-Private Sub Fkey(A As Integer)
-If A > 1000 Then
-Callback.SendFKEY A - 1000
+Private Sub Fkey(a As Integer)
+If a > 1000 Then
+Callback.SendFKEY a - 1000
 Else
-Callback.SendFKEY A
+Callback.SendFKEY a
 End If
 End Sub
 Private Sub CtrlPlusF1()
   If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".About(" + Str(mIndex) + ")"
+   Callback.Callback mesCtrlName + ".About(" + str(mIndex) + ")"
    Else
       Callback.Callback mesCtrlName + ".About()"
       End If
@@ -790,30 +797,30 @@ DestroyCaret
 Callback.Controls(ctrlName).SetFocus
 
 End Sub
-Public Sub AccKey(A, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
-If MyIsNumeric(A) Then
-A = CLng(A)
-If A < 0 Then Exit Sub
-If A > 499 Then Exit Sub
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
 Else
-A = UCase(A)
-Select Case A
+a = UCase(a)
+Select Case a
 Case "F1" To "F9"
-A = 611 + val(Mid(A, 2))
+a = 611 + val(Mid(a, 2))
 Case Else
-A = AscW(A)
-If A > 126 Then A = 0
+a = AscW(a)
+If a > 126 Then a = 0
 End Select
 End If
 If Opcode < 0 Then Opcode = 0
-If A = 0 Then Exit Sub
-A = A - 1000 * shift - 10000 * ctrl - 100000 * alt
-Callback.RegisterAcc A, ctrlName, Opcode
+If a = 0 Then Exit Sub
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
-Friend Sub TakeKey(keycode As Integer, shift As Integer)
-    pbox_KeyDown keycode, shift
-If keycode <> 0 Then
-    pbox_KeyUp keycode, shift
+Friend Sub TakeKey(KeyCode As Integer, shift As Integer)
+    pbox_KeyDown KeyCode, shift
+If KeyCode <> 0 Then
+    pbox_KeyUp KeyCode, shift
 End If
 End Sub
 Public Sub MaskColor(ByVal trV, Optional ByVal rr As Long, Optional ref As Boolean = True)

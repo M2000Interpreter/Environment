@@ -21328,7 +21328,7 @@ ElseIf IsLabelSymbolNew(rest$, "киста", "LISTBOX", Lang) Then
                 Set aa6 = var(I)
                 With aa6
                     .Construct alfa, what$
-                    .move 0, 2000, 6000, 600
+                    '.move 0, 2000, 6000, 600
                     If Not alfa0 Is Nothing Then
                         .move 0, 0, 6000, 600
                         Set alfa.Controls(.ctrlName).Container = alfa0.pbox
@@ -21387,11 +21387,16 @@ ElseIf IsLabelSymbolNew(rest$, "еийома", "IMAGE", Lang) Then
             If Ar = 0 Then
                 CreateFormObject var(I), 8
                 Set alfa = bstack.lastobjIndirect(var())
+                Set alfa0 = GetContainer(bstack, rest$, Lang)
                 Set bstack.lastobj = Nothing
                 Set aa8 = var(I)
                 With aa8
                     .Construct alfa, what$
-                    .move 0, 2000, 6000, 600
+                    If Not alfa0 Is Nothing Then
+                        Set alfa.Controls(.ctrlName).Container = alfa0.pbox
+                    Else
+                        .move 0, 2000, 6000, 600
+                    End If
                     .SetUp
                     .Text = what$
                 End With
@@ -21400,6 +21405,7 @@ ElseIf IsLabelSymbolNew(rest$, "еийома", "IMAGE", Lang) Then
                 If neoGetArray(bstack, oName$ + "(", pppp, , CBool(Glob)) Then
                     what$ = Left$(what$, Len(oName$))
                     Set alfa = bstack.lastobjIndirect(var())
+                    Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     For I = 0 To Ar - 1
                         CreateFormObject aVar, 7
@@ -21407,7 +21413,12 @@ ElseIf IsLabelSymbolNew(rest$, "еийома", "IMAGE", Lang) Then
                         Set aa8 = aVar
                         With aa8
                             .ConstructArray alfa, what$, I
-                            .move 0, 2000, 6000, 600
+                            If Not alfa0 Is Nothing Then
+                                .move 0, 0, 6000, 600
+                                Set alfa.Controls(.ctrlName).Container = alfa0.pbox
+                            Else
+                                .move 0, 2000, 6000, 600
+                            End If
                             .SetUp
                             .Text = what$ & "(" & (I) & ")"
                         End With

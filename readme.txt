@@ -1,17 +1,11 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 22 active-X
-Last fix.
-The lambda$ break from version 12 revision 50
-Because the second form (lambda vs lambda$) used, which had no problem. Before some versions, a string expression had only strings literals or and string functions with $ suffix like Mid$(). The last versions can use string variables and functions without $ suffix (but a name with $ suffix is different with the same name without the $ suffix).
+Version 13 revision 23 active-X
+Two upgrades for Image control
+1. Image control now can be inside another image control.
+2. Image control process accelerator keys when we use it as frame for controls.
 
-Dim A$(3)
-A$(1)=lambda$ (a$,wd)->field$(a$, wd)
-? "["+A$(1)("hello", 10)+"]"
-link A$() to A()
-' this works on revision 21
-A(2)=lambda (a$,wd)->field$(a$, wd)
-? "["+(A(2)("hello", 10))+"]"
+Upgraded the buttonsonframe module in info.gsb (we use there the two upgrades for image control)
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
