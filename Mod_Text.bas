@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 23
+Global Const Revision = 24
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -32356,9 +32356,9 @@ untest:
             .gList2.HeadLine = "Control"
             End If
             If TestShowCode And here$ <> "" Then
-                Form2.glist3(2).BackColor = &H606060
+                Form2.gList3(2).BackColor = &H606060
             Else
-                Form2.glist3(2).BackColor = &H3B3B3B
+                Form2.gList3(2).BackColor = &H3B3B3B
             End If
             .label1(0) = vbNullString
             .label1(1) = vbNullString
@@ -32423,7 +32423,7 @@ bb1:
      If Not bypassST Then TestShowCode = True
     End With
     If TestShowCode And here$ <> "" Then
-        Form2.glist3(2).BackColor = &H606060
+        Form2.gList3(2).BackColor = &H606060
         If Len(TestShowSub) >= WaitShow And WaitShow > 0 Then
             TestShowStart = rinstr(TestShowSub, Mid$(rest$, 2)) - 1
     Else

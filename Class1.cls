@@ -18,9 +18,7 @@ Attribute doit.VB_UserMemId = 0
 Dim test
 Dim link$
 
-If ExistResource Then
-    link$ = "{dir " + Chr$(34) + App.path + Chr$(34) + " : icon 0: start 0}"
-ElseIf Dir(App.path + "\" + App.ExeName + ".gsb") <> "" Then
+If Dir(App.path + "\" + App.ExeName + ".gsb") <> "" Then
     link$ = "{dir " + Chr$(34) + App.path + Chr$(34) + " : load " & App.ExeName & "}"
 End If
 Set f = New Form1
@@ -94,14 +92,6 @@ Else
 End If
 End Sub
 
-Public Property Get ExistResource() As Boolean
-    Const RT_RCDATA                 As Long = 10&
-    On Error Resume Next
-    Dim resp$
-    resp$ = LoadResData(101&, RT_RCDATA)
-    ExistResource = Len(resp$) > 0
-    Err.Clear
-End Property
 Private Sub Class_Initialize()
 Set f = Nothing
 'If m Is Nothing Then Exit Sub

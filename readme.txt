@@ -1,11 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 23 active-X
-Two upgrades for Image control
-1. Image control now can be inside another image control.
-2. Image control process accelerator keys when we use it as frame for controls.
+Version 13 revision 24 active-X
 
-Upgraded the buttonsonframe module in info.gsb (we use there the two upgrades for image control)
+A bug removed, now Down4 run as expected.
+The problem was an com objects reading array of properties, with $ suffix (when then name of array changed to not include suffix $ all was ok)
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

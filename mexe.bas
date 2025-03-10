@@ -44,6 +44,7 @@ Private Type PictDesc
 End Type
 Private Declare Function OleCreatePictureIndirect Lib "olepro32.dll" (lpPictDesc As PictDesc, riid As Any, ByVal fPictureOwnsHandle As Long, iPic As IPicture) As Long
 Public MyIcon As StdPicture
+Dim mcIEFeatures As New cIEFeatures
 Public Function HandleToStdPicture(ByVal hImage As Long, ByVal imgType As Long) As IPicture
 
     ' function creates a stdPicture object from an image handle (bitmap or icon)
@@ -86,7 +87,7 @@ Sub Main()
 Dim mIcons As Long, there As String, iconHandler As Long
 dv15 = 1440 / DpiScrX
 DisableProcessWindowsGhosting
-  With New cIEFeatures
+  With mcIEFeatures
      .FEATURE_BROWSER_EMULATION = Int(Val(.InstalledVersion)) 'use the most recent pre-installed IE-engine on the current system
      .FEATURE_96DPI_PIXEL = 1   'ensure DPI-awareness
      .FEATURE_GPU_RENDERING = 0 'not needed for this simple control (when at 1, it's misbehaving with "System-Enhanced" DPI-scaling in Win10)

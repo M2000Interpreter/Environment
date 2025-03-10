@@ -31,14 +31,14 @@ a.NoPublic objref, mineHere$
 Set CopyOfMe = a
 End Property
 Property Let ShowGui(RHS As Boolean)
-If Forms.count = 0 Then Exit Property
+If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
 If Form1.top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).top
 Else
 If Form1.WindowState = 0 Then
-If Not (QRY Or GFQRY Or Forms.count > 5) Then Form1.Visible = False
+If Not (QRY Or GFQRY Or Forms.Count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
@@ -54,18 +54,18 @@ Public Sub CallGlobal(modulename$, ParamArray a())
 If status <> 0 Then Exit Sub
 Dim ohere$
 ohere$ = here$
-Dim i As Long, ms As New mStiva, ar As mArray, j As Long
+Dim I As Long, ms As New mStiva, Ar As mArray, j As Long
 Dim manydim As Long, maxitems As Long, probe As Long, v() As Variant, probelow As Long
 Dim oldsoros As mStiva
 Set oldsoros = objref.soros
 Set objref.Sorosref = ms
-For i = 0 To UBound(a())
-Select Case VarType(a(i))
+For I = 0 To UBound(a())
+Select Case VarType(a(I))
 Case Is >= vbArray
 ' only with error control
-If Typename(a(i)) = "Variant()" Then
-Set ar = New mArray
-v() = a(i)
+If Typename(a(I)) = "Variant()" Then
+Set Ar = New mArray
+v() = a(I)
 On Error Resume Next
 For j = 1 To 60
     probe = UBound(v, j)
@@ -79,13 +79,13 @@ For j = 1 To manydim
     probe = UBound(v, j)
     If Err Then Exit For
     probelow = LBound(v, j)
-    ar.PushDim probe - probelow + 1
+    Ar.PushDim probe - probelow + 1
 Next j
-ar.PushEnd
+Ar.PushEnd
 'ar.RevOrder = True
-ar.CopySerialize v()
-ms.DataObj ar
-Set ar = Nothing
+Ar.CopySerialize v()
+ms.DataObj Ar
+Set Ar = Nothing
 Erase v()
 Else
 ms.DataValLong 0
@@ -93,11 +93,11 @@ End If
 Case vbEmpty
 ms.DataValLong 0
 Case vbVariant, vbString
-ms.DataStr CStr(a(i))
+ms.DataStr CStr(a(I))
 Case Else
-ms.DataVal CDbl(a(i))
+ms.DataVal CDbl(a(I))
 End Select
-Next i
+Next I
 PushStage objref, 0
 Set ms = Nothing
 here$ = vbNullString
@@ -189,7 +189,7 @@ ohere$ = here$
 here$ = full$
 
 
-Dim i As Long, ms As New mStiva, ar As mArray, j As Long
+Dim I As Long, ms As New mStiva, Ar As mArray, j As Long
 Dim manydim As Long, maxitems As Long, probe As Long, v() As Variant, probelow As Long
 Dim IhaveSignature As Boolean, sign$, sign2$, dummy$, look As Long
 If reghash.Find(myUcase(modulename$, True)) Then
@@ -203,14 +203,14 @@ Set oldsoros = objref.soros
 Set objref.Sorosref = ms
 
 
-For i = 0 To UBound(a())
+For I = 0 To UBound(a())
 
-Select Case VarType(a(i))
+Select Case VarType(a(I))
 Case Is >= vbArray
 ' only with error control
-If Typename(a(i)) = "Variant()" Then
-Set ar = New mArray
-v() = a(i)
+If Typename(a(I)) = "Variant()" Then
+Set Ar = New mArray
+v() = a(I)
 On Error Resume Next
 For j = 1 To 60
     probe = UBound(v, j)
@@ -223,12 +223,12 @@ For j = manydim To 1 Step -1
     probe = UBound(v, j)
     If Err Then Exit For
     probelow = LBound(v, j)
-    ar.PushDim probe - probelow + 1
+    Ar.PushDim probe - probelow + 1
 Next j
-ar.PushEnd
-ar.RevOrder = True
+Ar.PushEnd
+Ar.RevOrder = True
 
-ar.CopySerialize v()
+Ar.CopySerialize v()
 ''
 If IhaveSignature Then
 look = IsLabelOnly(sign$, dummy$)
@@ -237,15 +237,15 @@ look = IsLabelOnly(sign$, dummy$)
 look = globalvarGroup("b" & (var2used) & "." & dummy$, True) ' perhaps this is a fault, why is true??
 ElseIf look > 4 Then
 FastSymbol sign, ")", True
-ms.DataObj ar
+ms.DataObj Ar
 Else
 SyntaxError
 GoTo there
 End If
 Else
-ms.DataObj ar
+ms.DataObj Ar
 End If
-Set ar = Nothing
+Set Ar = Nothing
 Erase v()
 Else
 ms.DataValLong 0
@@ -255,13 +255,13 @@ End If
 Case vbEmpty
 ms.DataValLong 0
 Case vbVariant, vbString
-ms.DataStr CStr(a(i))
+ms.DataStr CStr(a(I))
 Case Else
 
-ms.DataVal CDbl(a(i))
+ms.DataVal CDbl(a(I))
 
 End Select
-Next i
+Next I
 PushStage objref, 0
 objref.soros.MergeTop ms
 
@@ -472,18 +472,18 @@ End Sub
 Public Function SpellUnicode(a$)
 ' use spellunicode to get numbers
 ' and make a ListenUnicode...with numbers for input text
-Dim b$, i As Long
-For i = 1 To Len(a$) - 1
-b$ = b$ & CStr(AscW(Mid$(a$, i, 1))) & ","
-Next i
+Dim b$, I As Long
+For I = 1 To Len(a$) - 1
+b$ = b$ & CStr(AscW(Mid$(a$, I, 1))) & ","
+Next I
 SpellUnicode = b$ & CStr(AscW(Right$(a$, 1)))
 SpellUnicode = b$ & CStr(AscW(Right$(a$, 1)))
 End Function
 Public Function ListenUnicode(ParamArray aa() As Variant) As String
-Dim all$, i As Long
-For i = 0 To UBound(aa)
-    all$ = all$ & ChrW(aa(i))
-Next i
+Dim all$, I As Long
+For I = 0 To UBound(aa)
+    all$ = all$ & ChrW(aa(I))
+Next I
 ListenUnicode = all$
 End Function
 Private Sub Class_Terminate()
@@ -504,15 +504,4 @@ End Sub
 
 Public Function FileHandler(Fhandler, Optional fway = 1, Optional Fstep = 1, Optional uinc = 1) As Variant
 FileHandler = BigFileHandler(CLng(Fhandler), CLng(fway), CLng(Fstep), CLng(uinc))
-End Function
-Public Function CopyExe(NewName$, Optional useHelp) As Boolean
-    If UseMe Is Nothing Then
-    MyEr "You have to use the standard M2000.exe", "Πρέπει να χρησιμοποιήσεις το M2000.exe"
-    Exit Function
-    End If
-    If IsMissing(useHelp) Then
-        CopyExe = CopyM2000Exe(NewName$)
-    Else
-        CopyExe = CopyM2000Exe(NewName$, useHelp)
-    End If
 End Function

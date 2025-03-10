@@ -40944,8 +40944,7 @@ Sub CleanQuery(holdbuffer as Boolean=false)
 	lastchar=""
 end sub
 }
-MODULE ROSETTA {// Need version 12, revision 8  and up
-linespace 0
+MODULE ROSETTA {linespace 0
 form 80
  ' just make the dummy event place, because event functions clear the "event hidden variable"
 declare withevents alfa
@@ -40958,7 +40957,7 @@ Layer Form1 {Gradient 11, #7777aa}
 method wb, "move", 1000, 1000, 12000, 10000
 with wb, "silent", true, "object" set wb1, "visible" as visible
 with wb,"RegisterAsBrowser", true
-method wb,"Navigate2", "https://rosettacode.org"
+method wb,"Navigate2", "https://en.wikipedia.org/wiki/Wiki"
 with wb1, "readystate" as readystate
 
 function wb.TitleChange {
