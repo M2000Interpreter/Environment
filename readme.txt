@@ -1,9 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 24 active-X
+Version 13 revision 25 active-X
 
-A bug removed, now Down4 run as expected.
-The problem was an com objects reading array of properties, with $ suffix (when then name of array changed to not include suffix $ all was ok)
+fix greek term for OBJECT (from english letters to greek letters).
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

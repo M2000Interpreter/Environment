@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 24
+Global Const Revision = 25
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -22831,7 +22831,7 @@ contNegLocal:
                 ElseIf IsLabelSymbolNew(b$, "глеяолгмиа", "DATE", Lang) Then
                     If Not MyAnyType(bstack, b$, Lang, True, vbDate) Then Execute = 0: Exit Function
                     GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "ANTIKEIMENO", "OBJECT", Lang) Then
+                ElseIf IsLabelSymbolNew(b$, "амтийеилемо", "OBJECT", Lang) Then
                     If Not MyAnyType(bstack, b$, Lang, True, vbObject) Then Execute = 0: Exit Function
                     GoTo loopcontinue
                 ElseIf IsLabelSymbolNew(b$, "лецакосайеяаиос", "BIGINTEGER", Lang) Then
@@ -22925,7 +22925,7 @@ contNegGlobal:
                     ' group can't be used as variable because exist read only variable
                     ' which pop group from stack
                If Not ProcGroup(1, bstack, b$, Lang) Then Execute = 0: Exit Function
-               ElseIf IsLabelSymbolNew(b$, "ANTIKEIMENO", "OBJECT", Lang) Then
+               ElseIf IsLabelSymbolNew(b$, "амтийеилемо", "OBJECT", Lang) Then
                     If Not MyAnyType(bstack, b$, Lang, False, vbObject) Then Execute = 0: Exit Function
                     GoTo loopcontinue
                '
@@ -56337,7 +56337,7 @@ ElseIf IsLabelSymbolNew(b$, "ьгжио", "BYTE", Lang) Then
 If Not MyAnyType(bstack, b$, Lang, here$ = "", vbByte, True) Then Exit Function
 ElseIf IsLabelSymbolNew(b$, "глеяолгмиа", "DATE", Lang) Then
 If Not MyAnyType(bstack, b$, Lang, here$ = "", vbDate, True) Then Exit Function
-ElseIf IsLabelSymbolNew(b$, "ANTIKEIMENO", "OBJECT", Lang) Then
+ElseIf IsLabelSymbolNew(b$, "амтийеилемо", "OBJECT", Lang) Then
 If Not MyAnyType(bstack, b$, Lang, here$ = "", vbObject, True) Then Exit Function
 ElseIf IsLabelSymbolNew(b$, "лецакосайеяаиос", "BIGINTEGER", Lang) Then
 If Not MyAnyType(bstack, b$, Lang, here$ = "", vbObject, True, New BigInteger) Then Exit Function
