@@ -64,14 +64,16 @@ End Sub
 
 Private Sub mycontrol_ObjectEvent(Info As EventInfo)
 Dim Values(), m As Long, uk1 As Object
-If Info.EventParameters.count > 0 Then
-ReDim Values(0 To Info.EventParameters.count)
+If Info.EventParameters.Count > 0 Then
+ReDim Values(0 To Info.EventParameters.Count)
 Dim evinf As EventParameter
 m = 0
+Dim AA
 For Each evinf In Info.EventParameters
 Err.Clear
 On Error Resume Next
-    If IsObject(evinf.Value) Then
+    AA = CVar(evinf.Value)
+    If MyIsObject(AA) Then
         Set Values(m) = evinf.Value
     Else
         Values(m) = evinf.Value

@@ -245,8 +245,8 @@ Const WM_KEYFIRST = &H100
 Const WM_CHAR = &H102
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
 End Type
  Private Type Msg
     hWnd As Long
@@ -326,7 +326,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub DIS_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
+Private Sub DIS_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -348,7 +348,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub dSprite_OLEDragOver(Index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
+Private Sub dSprite_OLEDragOver(Index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -433,7 +433,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub Form_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
+Private Sub Form_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -554,7 +554,7 @@ If KeyAscii = 9 Then KeyAscii = 0: Exit Sub
 If KeyAscii = 13 Then KeyAscii = 0: Exit Sub
 End Sub
 
-Private Sub gList1_OutPopUp(X As Single, Y As Single, myButton As Integer)
+Private Sub gList1_OutPopUp(x As Single, y As Single, myButton As Integer)
 Dim i As Long
 
 If Not gList1.enabled Then Exit Sub
@@ -571,7 +571,7 @@ i = .SelLength
 End With
 UNhookMe
 MyPopUp.feedlabels TEXT1, EditTextWord
-MyPopUp.Up X + gList1.Left, Y + gList1.top
+MyPopUp.Up x + gList1.Left, y + gList1.top
 myButton = 0
 End Sub
 
@@ -658,7 +658,7 @@ End If
 End Select
 End Sub
 
-Private Sub List1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
+Private Sub List1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 If item = -1 Then
 
 Else
@@ -1033,7 +1033,7 @@ End If
 
 End Sub
 
-Private Sub DIS_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub DIS_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
 If Not NoAction Then
 NoAction = True
 
@@ -1041,7 +1041,7 @@ If Button > 0 And Targets Then
 
 If Button = 1 Then
 Dim sel&
-    sel& = ScanTarget(q(), CLng(X), CLng(Y), 0)
+    sel& = ScanTarget(q(), CLng(x), CLng(y), 0)
     If sel& >= 0 Then
         Select Case q(sel&).id Mod 100
         Case Is < 10
@@ -1075,7 +1075,7 @@ End Sub
 
 
 
-Private Sub dSprite_MouseDown(Index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub dSprite_MouseDown(Index As Integer, Button As Integer, shift As Integer, x As Single, y As Single)
 Dim p As Long, u2 As Long
 If lockme Then Exit Sub
 If Not NoAction Then
@@ -1087,7 +1087,7 @@ With players(p)
 
         If Button > 0 And Targets Then
 
-        sel& = ScanTarget(q(), CLng(X), CLng(Y), Index)
+        sel& = ScanTarget(q(), CLng(x), CLng(y), Index)
             If sel& >= 0 Then
                 If Button = 1 Then
                 Select Case q(sel&).id Mod 100
@@ -1638,13 +1638,13 @@ End Sub
 
 
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
 If NoAction Then Exit Sub
 NoAction = True
 Dim sel&
 
 If Button > 0 And Targets Then
-sel& = ScanTarget(q(), CLng(X), CLng(Y), -1)
+sel& = ScanTarget(q(), CLng(x), CLng(y), -1)
 
 If sel& >= 0 Then
 
@@ -2602,7 +2602,7 @@ Sleep 1
 If Form1.Visible Then Form1.Refresh
 End Sub
 Private Sub Prepare(basestack As basetask, ByVal Nb As String)
-Dim G As Long, iC As Long
+Dim g As Long, iC As Long
 Dim VP As String, vv As String, CM$, b As String
 If needset Then
 Nb = StrConv(Nb, vbUnicode)
@@ -2613,8 +2613,8 @@ Else
 b = Nb
 b = Replace(b, Chr(0), "")
 End If
-G = InStr(b, "?")
-If G > 0 Then b = Mid$(b, G + 1) Else Exit Sub
+g = InStr(b, "?")
+If g > 0 Then b = Mid$(b, g + 1) Else Exit Sub
 If b <> "" Then
 Do While Parameters(b, VP, vv)
 CM$ = VP & "$=" & """" + vv + """"
@@ -2625,55 +2625,41 @@ MyDoEvents
 End If
 End Sub
 Public Sub IEUP(ThisFile As String)
-Static once As Boolean
-If once Then Exit Sub
-once = True
-If ThisFile = vbNullString Then
-
-If exWnd <> 0 Then
- Set HTML = Nothing
-MyDoEvents
-homepage$ = vbNullString
-'view1.TabStop = False
-    nnn$ = "bye bye"
-    exWnd = 0
+    Static once As Boolean
+    If once Then Exit Sub
+    once = True
+    If ThisFile = vbNullString Then
     
+    If exWnd <> 0 Then
+        Set HTML = Nothing
+        MyDoEvents
+        homepage$ = vbNullString
+        nnn$ = "bye bye"
+        exWnd = 0
     End If
-If view1.Visible Then
-MyDoEvents
-
-view1.Navigate "about:blank"
-Sleep 50
-view1.Visible = False
-
- End If
- once = False
+    If view1.Visible Then
+        MyDoEvents
+        view1.Navigate "about:blank"
+        Sleep 50
+        view1.Visible = False
+    End If
+    once = False
     Exit Sub
 End If
-   
-
-
 On Error Resume Next
-'tf2$ = THISFILE
 needset = False
 Dim MSD As String
 MSD = App.path
 AddDirSep MSD
-'View1.TabStop = True
-
 If Form1.Visible = False Then Form1.Visible = True: Sleep 400
 view1.Visible = True
-
 lookfirst = True
 look1 = False
-
-
-
 If IESizeX = 0 Or IESizeY < 100 Then
-IEX = 0
-IEY = 0
-IESizeX = Me.ScaleWidth
-IESizeY = Me.ScaleHeight
+    IEX = 0
+    IEY = 0
+    IESizeX = Me.ScaleWidth
+    IESizeY = Me.ScaleHeight
 End If
 If (IESizeX - IEX) > Me.ScaleWidth Then IESizeX = Me.ScaleWidth - IEX
 If (IESizeY - IEY) > Me.ScaleHeight Then IESizeY = Me.ScaleHeight - IEY
@@ -2687,31 +2673,25 @@ On Error Resume Next
     .Height = IESizeY
     .Refresh
     .Refresh2
-
 End With
 Else
-view1.move IEX, IEY, IESizeX, IESizeY
-If IsWine Then
-Sleep 1
-view1.move IEX, IEY
-Sleep 1
-view1.move IEX, IEY, IESizeX - 1, IESizeY - 1
+    view1.move IEX, IEY, IESizeX, IESizeY
+    If IsWine Then
+        Sleep 1
+        view1.move IEX, IEY
+        Sleep 1
+        view1.move IEX, IEY, IESizeX - 1, IESizeY - 1
+    End If
 End If
-End If
-
-
-
-view1.RegisterAsBrowser = True
-   If homepage$ = vbNullString Then homepage$ = ThisFile$
-   exWnd = 1
-view1.Navigate ThisFile$
-
+    view1.RegisterAsBrowser = True
+    If homepage$ = vbNullString Then homepage$ = ThisFile$
+    exWnd = 1
+    view1.Navigate ThisFile$
 Do
-view1.Visible = True
-MyDoEvents2 Me
-Sleep 5
+    view1.Visible = True
+    MyDoEvents2 Me
+    Sleep 5
 Loop Until view1.Visible Or MOUT
-
 If Not MOUT Then
 'view1.setfoucs
 Me.KeyPreview = False
@@ -3365,7 +3345,7 @@ TEXT1.mDoc.ColorEvent = Not TEXT1.NoColor
 
 End Sub
 Private Sub mywait11(bstack As basetask, ByVal pp)
-Dim p As Boolean, E As Boolean
+Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents
@@ -3375,7 +3355,7 @@ Else
 Err.Clear
 p = bstack.Process.Done
 If Err.Number = 0 Then
-E = True
+e = True
 If p <> 0 Then
 Exit Sub
 End If
@@ -3396,7 +3376,7 @@ Else
         ' SleepWait 1
         MyDoEvents
         End If
-If E Then
+If e Then
 p = bstack.Process.Done
 If Err.Number = 0 Then
 If p <> 0 Then
@@ -3507,20 +3487,20 @@ End If
     MyDoEvents
     End If
    
-    Dim mycode As Double, oldcodeid As Double, X As Form
+    Dim mycode As Double, oldcodeid As Double, x As Form
     mycode = Rnd * 12312314
     oldcodeid = Modalid
-    For Each X In Forms
-        If X.Name = "GuiM2000" Then
-            Set XX = X
+    For Each x In Forms
+        If x.Name = "GuiM2000" Then
+            Set XX = x
             If XX.Enablecontrol Then
                 If XX.Modal = 0 Then XX.Modal = mycode
                 XX.Enablecontrol = False
             End If
         End If
         Set XX = Nothing
-    Next X
-    Set X = Nothing
+    Next x
+    Set x = Nothing
 If INFOONLY Then
 NeoMsgBox.command1.SetFocus
 End If
@@ -3559,9 +3539,9 @@ BLOCKkey = False
 AskTitle$ = vbNullString
 Dim z As Form
 Set z = Nothing
-For Each X In Forms
-    If X.Name = "GuiM2000" Then
-        Set XX = X
+For Each x In Forms
+    If x.Name = "GuiM2000" Then
+        Set XX = x
         If Not XX.Enablecontrol Then
         XX.TestModal mycode
         End If
@@ -3569,8 +3549,8 @@ For Each X In Forms
         'End If
         Set XX = Nothing
     End If
-Next X
-Set X = Nothing
+Next x
+Set x = Nothing
 If Not zz Is Nothing Then Set z = zz
 On Error Resume Next
 If Typename(z) = "GuiM2000" Then
@@ -3623,7 +3603,7 @@ ask = NeoASK(bstack)
 End Function
 
 Sub mywait(bstack As basetask, pp As Double, Optional SLEEPSHORT As Boolean = False)
-Dim p As Boolean, E As Boolean
+Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents1 Form1
@@ -3633,7 +3613,7 @@ Else
 Err.Clear
 p = bstack.Process.Done
 If Err.Number = 0 Then
-E = True
+e = True
 If p <> 0 Then
 Exit Sub
 End If
@@ -3655,7 +3635,7 @@ Do
         MyDoEvents0 Me
         End If
 If SLEEPSHORT Then Sleep 1
-If E Then
+If e Then
 p = bstack.Process.Done
 If Err.Number = 0 Then
 If p <> 0 Then

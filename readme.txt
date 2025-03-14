@@ -1,8 +1,34 @@
 M2000 Interpreter and Environment
 
-Version 13 revision 25 active-X
+Version 13 revision 26 active-X
 
-fix greek term for OBJECT (from english letters to greek letters).
+1. List com to A ' export ProgID/CLSID for objects
+2. Enum with comments as memebers of Groups (added use of comments)
+3. DropList from control box on user form, now can
+
+DECLARE Form1 FORM
+METHOD Form1, "MakeInfo", -10
+METHOD Form1, "MenuItem", "First", TRUE, idD:=500, acc:="A", ctrl:=TRUE
+METHOD Form1, "MenuItem", ""
+METHOD Form1, "MenuItem", "Second", TRUE, IdD:=1000, acc:="F1"
+WITH Form1, "id" AS Who()
+FUNCTION Form1.infoClick(NEW V) {
+	SELECT CASE VAL(Who(V))
+	CASE 500
+		ΤΥΠΩΣΕ "ΠΡΩΤΟ", V
+	CASE 1000
+		ΤΥΠΩΣΕ "ΔΕΥΤΕΡΟ", V
+	END SELECT
+	REFRESH
+}
+FUNCTION Form1.MouseDown {
+	READ NEW key, shift, x, y
+	IF key=2 AND shift=0 THEN		
+		METHOD Form1, "OpenInfoAt",x, y	
+	END IF
+}
+METHOD Form1,"SHOW" , 1
+DECLARE Form1 NOTHING
 
 
 George Karras, Kallithea Attikis, Greece.
