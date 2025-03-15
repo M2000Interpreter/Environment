@@ -1,35 +1,36 @@
 M2000 Interpreter and Environment
+1. FIX THE INPUT STATEMENT FOR GREEK SETTINGS (NOW INPUT FOR DECIMAL NUMBERS WORK FINE.
+WE PRESS 12.12 AND WE SEE 12,12 AND THAT RETURN TO 12.12 AND INSERT TO A
+This was broken from revision 17 
+There was no problem for locale 1033 (Default English)
+The Locale 1032 statememt set the Greek Locale, for M2000 the keyboard key "." return "," at the Input process for Input statement.
 
-Version 13 revision 26 active-X
+LOCALE 1032 
+KEYBOARD "12.12", 13
+INPUT A
+PRINT A=12.12
 
-1. List com to A ' export ProgID/CLSID for objects
-2. Enum with comments as memebers of Groups (added use of comments)
-3. DropList from control box on user form, now can
+The other input variants have no problem:
 
-DECLARE Form1 FORM
-METHOD Form1, "MakeInfo", -10
-METHOD Form1, "MenuItem", "First", TRUE, idD:=500, acc:="A", ctrl:=TRUE
-METHOD Form1, "MenuItem", ""
-METHOD Form1, "MenuItem", "Second", TRUE, IdD:=1000, acc:="F1"
-WITH Form1, "id" AS Who()
-FUNCTION Form1.infoClick(NEW V) {
-	SELECT CASE VAL(Who(V))
-	CASE 500
-		ΤΥΠΩΣΕ "ΠΡΩΤΟ", V
-	CASE 1000
-		ΤΥΠΩΣΕ "ΔΕΥΤΕΡΟ", V
-	END SELECT
-	REFRESH
-}
-FUNCTION Form1.MouseDown {
-	READ NEW key, shift, x, y
-	IF key=2 AND shift=0 THEN		
-		METHOD Form1, "OpenInfoAt",x, y	
-	END IF
-}
-METHOD Form1,"SHOW" , 1
-DECLARE Form1 NOTHING
+LOCALE 1032
+A=12.12
+' THIS INPUT VARIANT NOT USE THE SAME KEYBOARD BUFFER
+' THIS USE A CONTROL OVER THE CONSOLE TO MIMIC THAT IS THE CONSOLE
+' WE CAN'T PASS KEYS USING KEYBOARD STATEMENT BUT WE CAN STOP THE INPUT
+' AFTER MAKE A THREAD WHICH START 200msec after and STOP the input.
+' IF WE GIVE MORE TIME (2000 FOR 2 SECONDS) WE CAN CHANGE THE VALUE.
+AFTER 200 {INPUT END}
+INPUT ! A, 10  ' 10 IS THE WITDH IN CHARACTERS FOR THE CONTROL
+PRINT A
+PRINT A=12.12
 
+For User forms the input control for numbers also have no problem.
+
+
+2. FIX FOR FORMLABEL STATEMENT - ALSO THE HELP FILE UPDATED FOR FORMLABEL.
+
+
+Version 13 revision 27 active-X
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

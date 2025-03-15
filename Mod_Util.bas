@@ -5191,7 +5191,9 @@ If RealLen(A$) = 1 Or Len(A$) = 1 Or (RealLen(A$) = 0 And Len(A$) = 1 And Len(s$
    If Len(A$) = 1 Then
     If InStr(endchars, A$) > 0 Then
      If A$ = vbCr Then
+        
         If A$ <> Left$(endchars, 1) Then
+            
             A$ = Left$(endchars, 1)
             If checknumber And Len(s$) = 0 Then
                 s$ = "0": PlainBaSket dq, prive, "0", , , 0
@@ -5199,13 +5201,20 @@ If RealLen(A$) = 1 Or Len(A$) = 1 Or (RealLen(A$) = 0 And Len(A$) = 1 And Len(s$
                 LCTCB dq, prive, 0
             End If
         Else
+           
+            oldLCTCB dq, prive, 0
             If checknumber And Len(s$) = 0 Then
                 s$ = "0": PlainBaSket dq, prive, "0", , , 0
-                oldLCTCB dq, prive, 0
-                LCTCB dq, prive, 0
+                A$ = ""
             End If
-            LCTCB dq, prive, -1: DestroyCaret
-            oldLCTCB dq, prive, 0
+            If realend <> "" Then
+                If Len(s$) = 0 Then realend = " " + realend
+                PlainBaSket dq, prive, realend, , , 0
+                realend = ""
+                A$ = ""
+            End If
+            If Len(A$) > 0 Then LCTCB dq, prive, 0
+             LCTCB dq, prive, -1: DestroyCaret
             Exit Do
         End If
         Else
@@ -5220,7 +5229,7 @@ If RealLen(A$) = 1 Or Len(A$) = 1 Or (RealLen(A$) = 0 And Len(A$) = 1 And Len(s$
     If Asc(A$) = 27 And (escok Or Not checknumber) Then
         
       LCTCB dq, prive, -1: DestroyCaret
- oldLCTCB dq, prive, 0
+    oldLCTCB dq, prive, 0
     s$ = vbNullString
     A$ = ""
     INK$ = ""
@@ -5335,6 +5344,7 @@ cont12345:
             End If
     End If
 End If
+
 If InStr(endchars, A$) > 0 Then
     If A$ >= " " Then
         If realend <> "" Then
@@ -9405,6 +9415,136 @@ If j - i >= dl - 1 Then
         End If
         A$ = Mid$(A$, MyTrimLi(A$, i + dl))
         Fast2LabelNoNum = True
+    End If
+End If
+End Function
+Function Fast2LabelNoNumNoTrim(A$, c$, cl As Long, D$, dl As Long, ahead&, i As Long) As Boolean
+Dim Pad$, j As Long
+j = Len(A$)
+If j = 0 Then Exit Function
+If i > j Then Exit Function
+Pad$ = myUcase(Mid$(A$, i, ahead& + 1)) + " "
+If j - i >= cl - 1 Then
+    If InStr(c$, Left$(Pad$, cl)) > 0 Then
+        If Len(Pad$) > cl Then
+            Select Case AscW(Mid$(Pad$, cl + 1, 1))
+            Case Is < 36, 39, 47, 59, 92, 123, 160
+            Case Else
+                Exit Function
+            End Select
+        End If
+        A$ = Mid$(A$, MyTrimLi(A$, i + cl))
+        Fast2LabelNoNumNoTrim = True
+        Exit Function
+    End If
+End If
+If j - i >= dl - 1 Then
+    If InStr(D$, Left$(Pad$, dl)) > 0 Then
+        If Len(Pad$) > dl Then
+            Select Case AscW(Mid$(Pad$, dl + 1, 1))
+            Case Is < 36, 39, 47, 59, 92, 123, 160
+            Case Else
+                Exit Function
+            End Select
+        End If
+        A$ = Mid$(A$, MyTrimLi(A$, i + dl))
+        Fast2LabelNoNumNoTrim = True
+    End If
+End If
+End Function
+
+Function Fast3LabelNoNum(A$, c$, cl As Long, D$, dl As Long, f$, fl As Long, ahead&) As Boolean
+Dim i As Long, Pad$, j As Long
+j = Len(A$)
+If j = 0 Then Exit Function
+i = MyTrimL(A$)
+If i > j Then Exit Function
+Pad$ = myUcase(Mid$(A$, i, ahead& + 1)) + " "
+If j - i >= cl - 1 Then
+    If InStr(c$, Left$(Pad$, cl)) > 0 Then
+        If Len(Pad$) > cl Then
+            Select Case AscW(Mid$(Pad$, cl + 1, 1))
+            Case Is < 36, 39, 47, 59, 92, 123, 160
+            Case Else
+                Exit Function
+            End Select
+        End If
+        A$ = Mid$(A$, MyTrimLi(A$, i + cl))
+        Fast3LabelNoNum = True
+        Exit Function
+    End If
+End If
+If j - i >= dl - 1 Then
+    If InStr(D$, Left$(Pad$, dl)) > 0 Then
+        If Len(Pad$) > dl Then
+            Select Case AscW(Mid$(Pad$, dl + 1, 1))
+            Case Is < 36, 39, 47, 59, 92, 123, 160
+            Case Else
+                Exit Function
+            End Select
+        End If
+        A$ = Mid$(A$, MyTrimLi(A$, i + dl))
+        Fast3LabelNoNum = True
+    End If
+End If
+If j - i >= fl - 1 Then
+    If InStr(f$, Left$(Pad$, fl)) > 0 Then
+        If Len(Pad$) > fl Then
+            Select Case AscW(Mid$(Pad$, fl + 1, 1))
+            Case Is < 36, 39, 47, 59, 92, 123, 160
+            Case Else
+                Exit Function
+            End Select
+        End If
+        A$ = Mid$(A$, MyTrimLi(A$, i + fl))
+        Fast3LabelNoNum = True
+    End If
+End If
+End Function
+Function Fast3LabelNoNumNoTrim(A$, c$, cl As Long, D$, dl As Long, f$, fl As Long, ahead&, i As Long) As Boolean
+Dim Pad$, j As Long
+j = Len(A$)
+If j = 0 Then Exit Function
+If i > j Then Exit Function
+Pad$ = myUcase(Mid$(A$, i, ahead& + 1)) + " "
+If j - i >= cl - 1 Then
+    If InStr(c$, Left$(Pad$, cl)) > 0 Then
+        If Len(Pad$) > cl Then
+            Select Case AscW(Mid$(Pad$, cl + 1, 1))
+            Case Is < 36, 39, 47, 59, 92, 123, 160
+            Case Else
+                Exit Function
+            End Select
+        End If
+        A$ = Mid$(A$, MyTrimLi(A$, i + cl))
+        Fast3LabelNoNumNoTrim = True
+        Exit Function
+    End If
+End If
+If j - i >= dl - 1 Then
+    If InStr(D$, Left$(Pad$, dl)) > 0 Then
+        If Len(Pad$) > dl Then
+            Select Case AscW(Mid$(Pad$, dl + 1, 1))
+            Case Is < 36, 39, 47, 59, 92, 123, 160
+            Case Else
+                Exit Function
+            End Select
+        End If
+        A$ = Mid$(A$, MyTrimLi(A$, i + dl))
+        Fast3LabelNoNumNoTrim = True
+    End If
+End If
+If j - i >= fl - 1 Then
+    If InStr(f$, Left$(Pad$, fl)) > 0 Then
+        If Len(Pad$) > fl Then
+            Select Case AscW(Mid$(Pad$, fl + 1, 1))
+            Case Is < 36, 39, 47, 59, 92, 123, 160
+            Case Else
+                Exit Function
+            End Select
+        End If
+        A$ = Mid$(A$, MyTrimLi(A$, i + fl))
+        Fast3LabelNoNumNoTrim = True
     End If
 End If
 End Function
