@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 27
+Global Const Revision = 28
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -34195,7 +34195,7 @@ If len1 = 1 Then
 End If
 ' No we have something better
 'Set aCopy = New Document
-
+Dim Count As Integer
 With aCopy
     .EmptyDoc
     .textDocFast = A$
@@ -34206,9 +34206,12 @@ With aCopy
     End If
     .LCID = 1032
 paliedo:
+    Count = Count + 1
+    
     there = 0
     Curs = 0
     Do
+        If Count > 3 Then Exit Do
         If .FindIdentifier(ww$(0), False, there, Curs) Then
             ss$ = Left$(aCopy.TextParagraph(there), Curs - 1)
             IsNumberLabel ss$, Dump$
@@ -34229,13 +34232,14 @@ paliedo:
                 End If
             End If
         Else
-            If ww$(0) = "—œ’‘…Õ¡" Then
-                ww$(0) = "—œ’‘∫Õ¡"
-                GoTo paliedo
-            ElseIf ww$(0) = "”’Õ¡—‘«”«" Then
-                ww$(0) = "”’Õ¢—‘«”«"
-                GoTo paliedo
-            End If
+            Select Case ww$(0)
+            Case "—œ’‘…Õ¡": ww$(0) = "—œ’‘∫Õ¡": GoTo paliedo
+            Case "”’Õ¡—‘«”«": ww$(0) = "”’Õ¢—‘«”«": GoTo paliedo
+            Case "FUNCTION": ww$(0) = "”’Õ¡—‘«”«": GoTo paliedo
+            Case "”’Õ¢—‘«”«": ww$(0) = "FUNCTION": GoTo paliedo
+            Case "—œ’‘∫Õ¡": ww$(0) = "SUB": GoTo paliedo
+            Case "SUB": ww$(0) = "—œ’‘…Õ¡": GoTo paliedo
+            End Select
             Exit Do
         End If
     Loop

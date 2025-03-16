@@ -25411,7 +25411,7 @@ Function form1.Target {
 }
 Layer form1 {
 	window 12, 12000, 8000
-	form 32, 20
+	form 36, 23
 	motion.w;  ' center window
 	cls #333333, 0
 	cursor 4, 4
@@ -25423,18 +25423,18 @@ Layer form1 {
 	target B,"?", 10, 2, 5,15, 115, "press me too"
 	move 1000,800
 	FormLabel "This is a Label Using form's Font/size "
-	move 6000,3000
-	Pen #444444 {
+	move 5000,3000
+	Pen #A4A444 {
 		width 2 {
 			color 5, 0 {
-				FormLabel "This is a Label", "Arial Black", 26,0,60
+				FormLabel "This is a Label", "Arial Black", MODE*2,0,60
 			}
 		}
 	}
-	move 6000, 2400
-	FormLabel "This is a Label", "Times", 16, 0, 150
-	move 6000,3000
-	Legend "This is a Label", "Times", 16, pi/2, 1, 1, 150
+	move 5000, 2200
+	FormLabel "This is a Label", "Times", MODE*1.2, 2, 150
+	move 5000, 3000
+	Legend "This is a Label", "Times", MODE, pi/2, 1, 1, 150
 	
 }
 Method form1,"show",1
@@ -40951,12 +40951,15 @@ declare withevents alfa
 declare Form1 form
 with form1, "Title" as Form1.Title$
 declare wb type "shell.explorer.2" form Form1
-//print type$(wb)
+
+print type$(wb)
+
 method Form1,"move", 1000, 1000, 14000, 12000
 Layer Form1 {Gradient 11, #7777aa}
 method wb, "move", 1000, 1000, 12000, 10000
-with wb, "silent", true, "object" set wb1, "visible" as visible
-with wb,"RegisterAsBrowser", true
+with wb, "silent", false, "object" set wb1, "visible" as visible
+
+'with wb,"RegisterAsBrowser", true
 method wb,"Navigate2", "https://en.wikipedia.org/wiki/Wiki"
 with wb1, "readystate" as readystate
 
@@ -40976,11 +40979,33 @@ function alfa_ondblclick {
 function alfa_onkeydown {
 	read new a, b
 	local object pa, ev1
-	local keycode
+	local keycode, OK AS BOOLEAN
 	// if you press backspace the pa is invalid so we catch the error here
 	try {
-		with alfa, "parentWindow" set pa
-		with pa, "event" set ev1
+'		with wb, "document" get withevents alfa
+			? "enter...0"
+		? type$(alfa)
+		ok=false
+		try {
+			with alfa, "parentWindow" SET  pa
+			ok=true
+		}
+		try {
+			if not ok then with alfa, "parent" SET  pa
+		}
+			? "enter...0...1"
+		OK=FALSE
+		TRY  {
+			? "enter..."
+			? TYPE$(pa),"OK"
+			? "enter...2"
+			with pa, "event" GET ev1
+			? "ok..."
+			OK=TRUE
+		}
+		IF NOT OK THEN PRINT TYPE$(EV1): EXIT else print
+		PRINT TYPE$(EV1)
+		IF TYPE$(EV1)="Nothing" then exit
 		with ev1, "keycode" get keycode
 		print "this is the key:", keycode
 	}
@@ -40994,6 +41019,7 @@ function wb.BeforeNavigate2 {
 // we get the document each time a Document Complete
 // and we make a new event sink object
 function wb.DocumentComplete {
+	clear alfa
 	with wb, "document" get withevents alfa
 	Pen 11 {print "DocumentComplete"}
 	refresh
@@ -41005,7 +41031,7 @@ function form1.click {
 	refresh
 }
 method Form1 "show", 1
-
+declare wb Nothing
 declare Form1 nothing
 
 }
@@ -47176,5 +47202,27 @@ MODULE BIGINPUT {dim a(10)
 input "a=", a(2)=0u, a(3)=0&&
 ? type$(a(2)), a(2)
 ? type$(a(3)), a(3)
+}
+MODULE CHANGETRUE {GLOBAL CONST TRUE=1=1, FALSE=1=0
+MODULE  INTERNAL {
+	OLD_LOCALE=LOCALE
+	PRINT "CURRENT LOCALE:";OLD_LOCALE
+	LOCALE {;"YES";"NO"}
+	PRINT TRUE, TYPE$(TRUE)="Constant", TYPE$((TRUE))="Boolean", FALSE
+	LOCALE ""
+	LOCALE 1033 'ENGLISH ' BY DEFAULT INTERPRETER USE WORDS TRUE/FALSE
+	PRINT "CURRENT LOCALE:";LOCALE
+	PRINT TRUE, TYPE$(TRUE)="Constant", TYPE$((TRUE))="Boolean", FALSE
+	LOCALE 1032 'GREEK  ' INTERPRETER KNOWS GREEK WORDS
+	PRINT "CURRENT LOCALE:";LOCALE
+	PRINT TRUE, TYPE$(TRUE)="Constant", TYPE$((TRUE))="Boolean", FALSE
+	LOCALE 1038 'HUNGARIAN  ' BY DEFAULT INTERPRETER USE WORDS TRUE/FALSE
+	PRINT "CURRENT LOCALE:";LOCALE;" CHANGE BOOLEAN WORDS TO "+{{;"IGAZ";"HAMIS"}}
+	LOCALE {;"IGAZ";"HAMIS"}
+	PRINT TRUE, TYPE$(TRUE)="Constant", TYPE$((TRUE))="Boolean", FALSE
+	LOCALE ""
+	LOCALE OLD_LOCALE
+}
+INTERNAL
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

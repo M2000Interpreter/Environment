@@ -1,36 +1,55 @@
 M2000 Interpreter and Environment
-1. FIX THE INPUT STATEMENT FOR GREEK SETTINGS (NOW INPUT FOR DECIMAL NUMBERS WORK FINE.
-WE PRESS 12.12 AND WE SEE 12,12 AND THAT RETURN TO 12.12 AND INSERT TO A
-This was broken from revision 17 
-There was no problem for locale 1033 (Default English)
-The Locale 1032 statememt set the Greek Locale, for M2000 the keyboard key "." return "," at the Input process for Input statement.
+Version 13 revision 28 active-X
 
-LOCALE 1032 
-KEYBOARD "12.12", 13
-INPUT A
-PRINT A=12.12
+This was not an error but a lack of design:
 
-The other input variants have no problem:
+To call a sub or a simple function before revision 28 the language for the definition at the first search was inferenced from the language of the name (checking the first letter). That works but some time you want to use f5 in editor to change names, so change a Greek name to an English one you will expect that code run as before, but not if the name you just replace is a sub's or simple function's name, because you have to alter the definition according to specific language of its identifier. So now this isn't a problem anymore. You can mix Greek/English.
 
-LOCALE 1032
-A=12.12
-' THIS INPUT VARIANT NOT USE THE SAME KEYBOARD BUFFER
-' THIS USE A CONTROL OVER THE CONSOLE TO MIMIC THAT IS THE CONSOLE
-' WE CAN'T PASS KEYS USING KEYBOARD STATEMENT BUT WE CAN STOP THE INPUT
-' AFTER MAKE A THREAD WHICH START 200msec after and STOP the input.
-' IF WE GIVE MORE TIME (2000 FOR 2 SECONDS) WE CAN CHANGE THE VALUE.
-AFTER 200 {INPUT END}
-INPUT ! A, 10  ' 10 IS THE WITDH IN CHARACTERS FOR THE CONTROL
-PRINT A
-PRINT A=12.12
+After first search, the actual position recorded for subsequent call.
 
-For User forms the input control for numbers also have no problem.
+For modules/functions/lambda functions this was not a problem because the definition statement must be interpreted before the call. See here module testme {} is the definition and after this the testme is the call.
 
 
-2. FIX FOR FORMLABEL STATEMENT - ALSO THE HELP FILE UPDATED FOR FORMLABEL.
+MODULE TESTME {
+	ΑΛΦΑ()
+	IF VERSION>13 OR (VERSION=13 AND REVISION>27) THEN ALFA()
+	IF VERSION>13 OR (VERSION=13 AND REVISION>27) THEN ΑΛΦΑ1()
+	ALFA1()
+	? @ΑΛΦΑ()
+	IF VERSION>13 OR (VERSION=13 AND REVISION>27) THEN ? @ALFA()
+	IF VERSION>13 OR (VERSION=13 AND REVISION>27) THEN ? @ΑΛΦΑ1()
+	? @ALFA1()
+	
+	' ΡΟΥΤΙΝΑ/ΡΟΥΤΊΝΑ/ΣΥΝΑΡΤΗΣΗ/ΣΥΝΆΡΤΗΣΗ/SUB/FUNCTION ALIAS END ..
+	' IF ENCOUNTERED AS NEXT STATEMENT BY INTERPRETER.
+	ΡΟΥΤΙΝΑ ΑΛΦΑ()
+		? 100
+	ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+	ΡΟΥΤΙΝΑ ALFA()  ' NOT FOUND <28 GREEK/ENGLISH
+		? 100
+	ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+	SUB ΑΛΦΑ1()  ' NOT FOUND <28 ENGLISH/GREEK
+		? 100
+	END SUB
+	SUB ALFA1()
+		? 100
+	END SUB
+	ΣΥΝΑΡΤΗΣΗ ΑΛΦΑ()
+		=101
+	ΤΕΛΟΣ ΣΥΝΑΡΤΗΣΗΣ
+	ΣΥΝΑΡΤΗΣΗ ALFA()  ' NOT FOUND <28 GREEK/ENGLISH
+		=101
+	ΤΕΛΟΣ ΣΥΝΑΡΤΗΣΗΣ
+	FUNCTION ΑΛΦΑ1()  ' NOT FOUND <28 ENGLISH/GREEK
+		=101
+	END FUNCTION
+	FUNCTION ALFA1()
+		=101
+	END FUNCTION
+}
+TESTME
 
 
-Version 13 revision 27 active-X
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
