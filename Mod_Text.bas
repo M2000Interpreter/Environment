@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 28
+Global Const Revision = 29
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -50990,6 +50990,8 @@ Public Function exeSelect(ExecuteLong, once As Boolean, bstack As basetask, b$, 
 Dim ok As Boolean, x1 As Long, y1 As Long, sp As Variant, st As Variant, sw$, slct As Long, ss$
 Dim x2 As Long, y2 As Long, p As Variant, W$, dum As Boolean, i As Long, nd&, lbl$, usehandler As mHandler
 Dim checkenum As Boolean, enumindex As Long, EnumName As String, that As BigInteger
+Dim Pos As Long
+                
 exeSelect = True
 x1 = 0 ' mode numbers using p, sp and st
 If IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang) Then
@@ -51026,8 +51028,10 @@ secondentry:
             If NocharsInLine(b$) Then Exit Do
             IsNumberLabel b$, lbl$
             If IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang) Then  ' WE HAVE CASE
+            Pos = 0
 jumphere1:
-                If IsLabelSymbolNew(b$, "¡ÀÀ…Ÿ”", "ELSE", Lang) Then GoTo case1else
+            If IsLabelSymbolNew(b$, "¡ÀÀ…Ÿ”", "ELSE", Lang) Then GoTo case1else
+            
                 If ok Then
                     ExpectedEndSelect
                     ExecuteLong = 0
@@ -51202,7 +51206,15 @@ CONT1234:
                             End If
                         ElseIf Not checkenum Then
                             
-                            If Not that Is Nothing Then Set p = that Else p = sp
+                            If Not that Is Nothing Then
+                                Set p = that
+                            Else
+                                If x1 = 2 Then
+                                    p = sw$
+                                Else
+                                    p = sp
+                                End If
+                            End If
                             If IsHalfLogic(bstack, b$, p) Then
                                 If p <> 0 Or slct = -1 Then
                                     If slct = 1 Then slct = 0
@@ -51221,7 +51233,18 @@ selslct0:
                                 b$ = Mid$(b$, 3)
                                 ExecuteLong = 0: Exit Function
                             End If
-                            SetNextLine b$
+                                    While DropCommentOrLine(b$, False)
+                                    IsNumberLabel b$, lbl$
+                                    Wend
+                                While IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang)
+                                    While DropCommentOrLine(b$, False)
+                                    IsNumberLabel b$, lbl$
+                                    Wend
+                                    'SetNextLine b$
+                                  '  IsNumberLabel b$, lbl$
+                                Wend
+                            
+                            
 conthere:
                             If FastSymbol(b$, "{") Then  ' block
                                 ss$ = block(b$)
@@ -51239,6 +51262,7 @@ conthere:
                                             ExecuteLong = 0: Exit Function
                                         End If
                                     End If
+                                    Pos = -100
                                 Else
                                     If i = 0 Then
                                         b$ = ss$ + b$
@@ -51260,16 +51284,35 @@ conthere:
                                 i = 1
                                 IsNumberLabel b$, lbl$
                                 While IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang)
-                                    SetNextLine b$
+                                    While DropCommentOrLine(b$, False)
                                     IsNumberLabel b$, lbl$
+                                    Wend
+                                    'SetNextLine b$
+                                  '  IsNumberLabel b$, lbl$
                                 Wend
                                 ' #4 call one command
+
+checknext:
                                 If lookOne(b$, "{") Then
                                     GoTo conthere
                                 End If
+
+                                i = 1
                                 once = True
-                                ss$ = GetNextLine(b$) + vbCrLf + "'"
+                                While DropCommentOrLine(b$, False)
+                                IsNumberLabel b$, lbl$
+                                Wend
+                                Pos = 1
+                                aheadstatusANY b$, Pos
+                                If Pos <= 1 Then
+                                    ss$ = GetNextLine(b$) + vbCrLf + "'"
+                                Else
+                                    ss$ = Mid$(b$, 1, Pos - 1) + vbCrLf + "'"
+                                    b$ = Mid$(b$, Pos)
+                                End If
                                 TraceStore bstack, nd&, b$, 3
+                                
+                                
                                 Call executeblock(i, bstack, ss$, once, dum, True, True)
                                 bstack.addlen = nd&
                                 If i = 0 Then
@@ -51302,29 +51345,50 @@ conthere:
                                 ElseIf i = 5 Then
                                     ExecuteLong = 2
                                     exeSelect = False
+                                Else
+                                    dum = True
                                 End If
                             End If
+                                                        
+                            
                             Exit Do
                         End If
 contLoop:
                     Loop While FastSymbol(b$, ",")
                 End If
+                                
+                
                 SetNextLine b$
-                If Left$(b$, 2) = vbCrLf Then
-                    ExpectedCaseorElseorEnd
-                    ExecuteLong = 0
-                    Exit Function
-                End If
+                While DropCommentOrLine(b$, False)
+                IsNumberLabel b$, lbl$
+                Wend
+                'If Left$(b$, 2) = vbCrLf Then
+                'ExpectedCaseorElseorEnd
+                '    ExecuteLong = 0
+                '    Exit Function
+                'End If
                 ' drop case
                 IsNumberLabel b$, lbl$
                 If IsLabelSymbolNew(b$, "Ã≈", "CASE", Lang) Then
+                    dum = False
+                    Pos = 0
                     GoTo jumphere1
                 ElseIf IsLabelSymbolNew(b$, "¡ÀÀ…Ÿ”", "ELSE", Lang) Then
+                    dum = False
+                    Pos = 0
                     GoTo jumphere2
                 ElseIf IsLabelSymbolNew(b$, "‘≈Àœ”", "END", Lang) Then
+                    dum = False
                     GoTo jumphere3
                 Else
+                    
                     If FastSymbol(b$, "{") Then
+                        If Pos = -100 Or dum Then
+er100:
+                            MyEr "to many blocks for Select Case", "ÔÎÎ‹ ÏÎÔÍ ÛÙÁÌ ≈ﬂÎÂÓÂ ÃÂ"
+                            exeSelect = False
+                            Exit Function
+                        End If
                         If slct >= 0 Then
                             ss$ = block(b$) + "}"
                             b$ = NLtrim$(Mid$(b$, 2))
@@ -51361,13 +51425,21 @@ contLoop:
                                 End If
                             End If
                         End If
+                        Pos = -100
                         SetNextLine b$
                     ElseIf slct < 0 Then
                         dum = True
                         i = 1
                         ' #8 call one command inside Case (Break) ok
                         once = True
-                        ss$ = GetNextLine(b$) + vbCrLf + "'"
+                        Pos = 1
+                        aheadstatusANY b$, Pos
+                        If Pos <= 1 Then
+                            ss$ = GetNextLine(b$) + vbCrLf + "'"
+                        Else
+                            ss$ = Mid$(b$, 1, Pos - 1) + vbCrLf + "'"
+                            b$ = Mid$(b$, Pos)
+                        End If
                         TraceStore bstack, nd&, b$, 3
                         Call executeblock(i, bstack, ss$, once, dum, True, True)
                         bstack.addlen = nd&
@@ -51404,6 +51476,8 @@ contLoop:
                         End If
                         SetNextLine b$
                     Else
+                        If dum Then IsNumberLabel b$, lbl$: GoTo checknext
+                        
                         SetNextLine b$
                     End If
                 End If
@@ -51419,6 +51493,9 @@ case1else:
                     ok = True
                 End If
                 SetNextLine b$
+                While DropCommentOrLine(b$, False)
+                IsNumberLabel b$, lbl$
+                Wend
                 If FastSymbol(b$, "{") Then
                     ss$ = block(b$)
                     If slct > 0 Then
@@ -51461,12 +51538,19 @@ case1else:
                 Else
                     If slct > 0 Then
                         dum = True
+again1123:
                         i = 1
                         ' #10 call one command inside ELSE
                         once = True
-                        dum = True
                         'TraceStore bstack, nd&, b$, 0
-                        ss$ = GetNextLine(b$) + vbCrLf + "'"
+                        Pos = 1
+                        aheadstatusANY b$, Pos
+                        If Pos <= 1 Then
+                            ss$ = GetNextLine(b$) + vbCrLf + "'"
+                        Else
+                            ss$ = Mid$(b$, 1, Pos - 1) + vbCrLf + "'"
+                            b$ = Mid$(b$, Pos)
+                        End If
                         TraceStore bstack, nd&, b$, 3
                         Call executeblock(i, bstack, ss$, once, dum, True, True)
                         TraceRestore bstack, nd&
@@ -51501,6 +51585,14 @@ case1else:
                         ElseIf i = 5 Then
                             ExecuteLong = 2
                             exeSelect = False
+                        Else
+                            SetNextLine b$
+                            If IsLabelSymbolNew(b$, "‘≈Àœ”", "END", Lang) Then
+                            slct = 0
+                            GoTo jumphere3
+                            Else
+                            GoTo again1123
+                            End If
                         End If
                     End If
                 End If
@@ -51517,13 +51609,35 @@ jumphere3:
                     Exit Function
                 End If
             Else
-                If ok Then
-                    ExpectedEndSelect2
+                'If ok Then
+                    
+                
+                '    ExpectedEndSelect2
+                '     ExecuteLong = 0
+                '     Exit Function
+                'Else
+                While DropCommentOrLine(b$, False)
+                    IsNumberLabel b$, lbl$
+                Wend
+                If lookOne(b$, "{") Then
+                If Pos = -100 Then
+                    GoTo er100
                 Else
-                    ExpectedCaseorElseorEnd2
+                    Pos = -100
                 End If
-                ExecuteLong = 0
-                Exit Function
+                Else
+                Pos = 1
+                aheadstatusANY b$, Pos
+                Mid$(b$, 1, 1) = "'"
+                While DropCommentOrLine(b$, False)
+                    IsNumberLabel b$, lbl$
+                Wend
+                End If
+                
+                '    ExpectedCaseorElseorEnd2
+                'End If
+               ' ExecuteLong = 0
+               ' Exit Function
             End If
         Loop
         If slct > 0 Then

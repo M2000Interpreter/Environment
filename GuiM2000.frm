@@ -45,14 +45,22 @@ Begin VB.Form GuiM2000
       TabStop         =   0   'False
       Top             =   0
       Width           =   9180
-      _extentx        =   16193
-      _extenty        =   873
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "GuiM2000.frx":000C
-      backcolor       =   3881787
-      forecolor       =   16777215
-      capcolor        =   16777215
+      _ExtentX        =   16193
+      _ExtentY        =   873
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   14.25
+         Charset         =   161
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Backcolor       =   3881787
+      ForeColor       =   16777215
+      CapColor        =   16777215
    End
 End
 Attribute VB_Name = "GuiM2000"
@@ -366,15 +374,30 @@ If RHS = False Then UnHook hWnd
 If Len(mMyName$) = 0 Then Exit Property
 If mEnabled = False And RHS = True Then Me.enabled = True
 mEnabled = RHS
-
+On Error Resume Next
 Dim W As Object
 If Controls.Count > 0 Then
 For Each W In Me.Controls
 If W Is gList2 Then
+
 gList2.enabled = RHS
 gList2.MousePointer = 0
 ElseIf W.Visible Then
+Dim typ
+typ = W.enabled
+If Err.Number Then Err.Clear: typ = 100 Else typ = 99
+If typ = 100 Then
+    typ = W.object.enabled
+    If Err.Number Then Err.Clear: typ = 100 Else typ = 99
+    If typ = 100 Then
+        ' no enabled property ???
+    Else
+        W.object.enabled = RHS
+    End If
+Else
 W.enabled = RHS
+End If
+
 If TypeOf W Is gList Then
 W.TabStop = W.TabStopSoft
 W.BypassKey = Not RHS
@@ -466,16 +489,35 @@ If OneTime2 Then Exit Sub
 OneTime2 = True
 End If
 
-If Controls.Count > 0 Then
+
+If Controls.Count > 0 And False Then
 For Each W In Controls
 On Error Resume Next
-If TypeOf W Is VBControlExtender Then
-W.Visible = True
+If W.enabled Then W.Visible = True
+If Err.Number Then Err.Clear: W.Visible = True
+
+Next W
+End If
+
+If Controls.Count > 0 And True Then
+For Each W In Controls
+On Error Resume Next
+Dim typ
+typ = W.enabled
+If Err.Number Then Err.Clear: typ = 100 Else typ = 99
+
+If typ = 100 Then
+    typ = W.object.enabled
+    If Err.Number Then Err.Clear: typ = 100 Else typ = 99
+    If typ = 100 Then
+        W.Visible = True
+    Else
+        If W.object.enabled Then W.Visible = True
+    End If
 Else
 If W.enabled Then W.Visible = True
 End If
 If Err.Number Then Err.Clear: W.Visible = True
-
 Next W
 End If
 
@@ -1697,14 +1739,14 @@ Property Get TitleHeight() As Variant
 TitleHeight = gList2.Height
 End Property
 Public Sub FontAttr(ThisFontName, Optional ThisMode = -1, Optional ThisBold = True)
-Dim AA As New StdFont
+Dim aa As New StdFont
 If ThisFontName <> "" Then
 
-AA.Name = ThisFontName
+aa.Name = ThisFontName
 
-If ThisMode > 7 Then AA.Size = ThisMode Else AA = 7
-AA.bold = ThisBold
-Set gList2.Font = AA
+If ThisMode > 7 Then aa.Size = ThisMode Else aa = 7
+aa.bold = ThisBold
+Set gList2.Font = aa
 gList2.Height = gList2.HeadlineHeightTwips
 lastfactor = gList2.HeadlineHeight / 30
 setupxy = 20 * lastfactor
@@ -2932,10 +2974,10 @@ If Not acclist Is Nothing Then
                 If todo > 500 Then todo = todo - 500
                 Dim A As Control
                 Set A = Controls(acclist.Value)
-                Dim AA As gList, bb As GuiImage
+                Dim aa As gList, bb As GuiImage
                 If TypeOf A Is gList Then
-                    Set AA = A
-                    AA.TakeKey CInt(todo), shift + ctrl + alt
+                    Set aa = A
+                    aa.TakeKey CInt(todo), shift + ctrl + alt
                 ElseIf TypeOf A Is VB.PictureBox Then
                     Set bb = GuiControls(acclist.Value)
                     bb.TakeKey CInt(todo), shift + ctrl + alt
