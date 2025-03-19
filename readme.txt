@@ -1,44 +1,43 @@
 M2000 Interpreter and Environment
-Version 13 revision 29 active-X
+Version 13 revision 30 active-X
 
-1. Fix select case for strings.
-2. Update Select case. Now we can use multiline strings literals. Before this release between two case statements we may have a line (using : to seperate statements) or a block. Now we can use more lines but not for loops or nested select cases, we have to use block of statements.
+Continue the work of revision 29 on select case
+This example for case 4 we get
+1.
+2.
+3. 
+First "select" find case 4. But we have Break.
+A break in the block on a block of a case means continue execute all cases until one block of a case execute Continue.
+So "select" execute case 5 and case 6 which have continue, so skip case 7 (case else always if one case match the case)
+A Break or a Continue or an Exit not using in a block on a case, goes to block which the select/end select exist..
+So for this example if we place a REM before Continuw we get also the case 7
+If we place a REM before break in case 4 we get only the 1. and no other case
+if we place a second block or a statement and then a block we get error. After case we may have lines or a block. If you have lines but not in a block do not place loops For/While/Do. Place these on blocks only. The if statement can be used as one line statement or multilines using blocks: If then { multiline block } else { multiline block} etc.
 
-We get the second case...
-select case {aa
-}
-case "k" to "z"
-	print "no"
-case >{a
-}
-	print "ok"
-	print "------------"
+select case 4
+case 1
+	? "not this"
+case 2
+	{
+		' nothing
+	}
+case 4
+	{
+		? "1."
+		break
+	}
+case 5
+	? "2."
+case 6
+	{
+		? "3."
+		continue
+	}
+case 7
+	? "not this too (1)"
 case else
-	print "line1"
-	print "line2"
+	? "not this too (2)"
 end select
-
-previous (from version 10):
-a$={aa
-}
-z$={a
-}
-select case a$
-case "k" to "z"
-	print "no"
-case >z$   ' two statements in one line
-	print "ok": print "------------"
-case else
-{ ' or using a block. Also here we may have nested select/case
-	print "line1"
-	print "line2"
-}
-end select
-
-3. Update GuiM20000 form. I have a mistake from revision 26, which not use enable property, so all controls get visible=true (which is not true for every case). So now fixed.
-4. English and the same for Greek language now are coloured as a statement (I have forgot to fix this).
-
-
 
 
 George Karras, Kallithea Attikis, Greece.

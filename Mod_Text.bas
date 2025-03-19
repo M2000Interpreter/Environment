@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 29
+Global Const Revision = 30
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -51357,7 +51357,7 @@ contLoop:
                     Loop While FastSymbol(b$, ",")
                 End If
                                 
-                
+againcont:
                 SetNextLine b$
                 While DropCommentOrLine(b$, False)
                 IsNumberLabel b$, lbl$
@@ -51382,8 +51382,9 @@ contLoop:
                     GoTo jumphere3
                 Else
                     
+                    
                     If FastSymbol(b$, "{") Then
-                        If Pos = -100 Or dum Then
+                        If Pos = -100 Or (dum And Not slct = 0) Then
 er100:
                             MyEr "to many blocks for Select Case", "πολλά μπλοκ στην Επίλεξε Με"
                             exeSelect = False
@@ -51421,7 +51422,15 @@ er100:
                                     End If
                                 ElseIf i = 3 Then
                                     If Len(ss$) > 0 Then b$ = ss$
-                                    If dum = True And b$ <> "" Then slct = 0
+                                    If dum And b$ <> "" Then
+                                    
+                                    slct = 0
+                                    Pos = 1
+                                    
+                                    GoTo againcont
+                                    End If
+                               
+                                    
                                 End If
                             End If
                         End If
@@ -51473,6 +51482,8 @@ er100:
                         ElseIf i = 5 Then
                             ExecuteLong = 2
                             exeSelect = False
+                        Else
+                        If i = 1 Then GoTo againcont
                         End If
                         SetNextLine b$
                     Else
@@ -51620,6 +51631,7 @@ jumphere3:
                     IsNumberLabel b$, lbl$
                 Wend
                 If lookOne(b$, "{") Then
+                
                 If Pos = -100 Then
                     GoTo er100
                 Else
