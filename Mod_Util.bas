@@ -26132,16 +26132,40 @@ ProcField = True
         If Not IsExp(bstack, rest$, p) Then Exit Function
         p = MyRound(p)
         End If
+        
         If Not IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then Exit Function
+        Dim checkme As Boolean
         Select Case Abs(IsLabel(bstack, rest$, what$))
-        Case 3
+        Case 3, 1
             par = False
-            If Not GetVar(bstack, what$, it) Then it = globalvar(what$, String$(CLng(p), 32))
-            s$ = var(it)
-        Case 6
-                 par = True
+            If Not GetVar(bstack, what$, it, , , , , checkme) Then
+                it = globalvar(what$, String$(CLng(p), 32))
+                s$ = var(it)
+            Else
+                If checkme Then
+                    If MemInt(VarPtr(var(it))) <> vbString Then
+                        MissingStrVar
+                        ProcField = False
+                        Exit Function
+                    Else
+                    s$ = var(it)
+                    End If
+                ElseIf MemInt(VarPtr(var(it))) <> vbString Then
+                s$ = fixthis(var(it))
+                Else
+                    s$ = var(it)
+                End If
+            End If
+            
+        Case 6, 5
+                par = True
                 If neoGetArray(bstack, what$, pppp) Then If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then Exit Function
+                On Error GoTo 450
+                If pppp.IsStringItem(it) Then
                 s$ = pppp.item(it)
+                Else
+                s$ = fixthis(pppp.item(it))
+                End If
         Case Else
         Exit Function
         End Select
@@ -26170,6 +26194,9 @@ ProcField = True
         End If
         Exit Function
 End With
+Exit Function
+450 MissString
+ProcField = False
 End Function
 
 Function ProcList(basestack As basetask, rest$, Lang As Long) As Boolean

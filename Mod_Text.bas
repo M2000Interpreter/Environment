@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 30
+Global Const Revision = 31
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -37910,7 +37910,7 @@ End Function
 Function MyInput(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim i As Long, p As Variant, pp As Variant, s$, ss$, what$, f As Long, x1 As Long, y As Double, x As Double
 Dim frm$, par As Boolean, pppp As iBoxArray, prive As Long, it As Long, W$, mystack As mStiva, integ As Boolean, noexp As Boolean
-Dim rpos As Long, rrow As Long, ex$, Final$, ok As Boolean, pppp1 As ppppLight, sp$
+Dim rpos As Long, rrow As Long, ex$, Final$, ok As Boolean, pppp1 As ppppLight, sp$, ppp
 If IsLabelSymbolNew(rest$, "ле", "WITH", Lang) Then
     If IsExp(bstack, rest$, p, , True) Then
         If MemInt(VarPtr(p)) = vbString Then
@@ -38173,7 +38173,17 @@ comehere:
                     If Not IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then MissPar: Exit Function
                     p = MyRound(p)
                 Else
+                    
+                    If Not IsExp(bstack, rest$, ppp, flatobject:=True) Then
                     If Not IsStrExp(bstack, rest$, frm$) Then MissPar: Exit Function
+                    Else
+                        If MemInt(VarPtr(ppp)) = vbString Then
+                            SwapString2Variant frm$, ppp
+                        Else
+                            MissPar
+                            Exit Function
+                        End If
+                    End If
                     If FastSymbol(rest$, ",") Then GoTo comehere
                 End If
             Else
@@ -38286,24 +38296,43 @@ jumpthere3:
                     MissSymbol "="
                     Exit Function
                 End If
-            ElseIf Not IsExp(bstack, rest$, y) Then
+            End If
+        ElseIf Not IsExp(bstack, rest$, y) Then
                 MissPar
                 Exit Function
             Else
+            p = -1
                 If FastSymbol(rest$, ",") Then
+                If FastSymbol(rest$, ",") Then
+comehere1:
+                    If Not IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then MissPar: Exit Function
+                    p = MyRound(p)
+                Else
+
+                    If Not IsExp(bstack, rest$, ppp, flatobject:=True) Then
                     If Not IsStrExp(bstack, rest$, frm$) Then MissPar: Exit Function
+                    Else
+                        If MemInt(VarPtr(ppp)) = vbString Then
+                            SwapString2Variant frm$, ppp
+                        Else
+                            MissPar
+                            Exit Function
+                        End If
+                    End If
+                End If
+                If FastSymbol(rest$, ",") Then GoTo comehere1
                 Else
                     If Len(CStr(pppp.item(it))) > 0 Then x1 = -Len(CStr(pppp.item(it)))
                 End If
             End If
-        End If
+
         Form1.ShadowMarks = True
         ' look here to change it with values from Edit !
         Form1.TEXT1.TabWidth = ReportTabWidth
         Form1.TabControl = ReportTabWidth
         If y < 1 And x1 = 0 Then y = 1
         If VarType(pppp.item(it)) = vbString Then
-            s$ = iText(bstack, LTrim$(pppp.item(it)), (x), (y), frm$, x1)
+            s$ = iText(bstack, LTrim$(pppp.item(it)), (x), (y), frm$, x1, , , (p))
         Else
             s$ = iText(bstack, LTrim$(str(pppp.item(it))), (x), (y), frm$, x1)
         End If
