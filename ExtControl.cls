@@ -68,12 +68,12 @@ If Info.EventParameters.Count > 0 Then
 ReDim Values(0 To Info.EventParameters.Count)
 Dim evinf As EventParameter
 m = 0
-Dim AA
+Dim aa
 For Each evinf In Info.EventParameters
 Err.Clear
 On Error Resume Next
-    AA = CVar(evinf.Value)
-    If MyIsObject(AA) Then
+    aa = CVar(evinf.Value)
+    If MyIsObject(aa) Then
         Set Values(m) = evinf.Value
     Else
         Values(m) = evinf.Value

@@ -1,9 +1,8 @@
 M2000 Interpreter and Environment
-Version 13 revision 31 active-X
-1. fix a mistake on validmove event of list control when the list is member of an array of lists.
-2. fix UseNoMove Method  (mistake with greek letters inside name UseNoMove)
-3. FIELD νος works also with string variable without suffix $.
-4. fix INPUT ! for text input on Array Items.
+Version 13 revision 32 active-X
+1. fix a mistake for function VAL() with negative values with exponent part.
+2. Some fine tuning for M2000 Editor and EditBox control when we click on parts of names with multiple parts separeted with dot (like aaa.bb.ccc.dd)
+3. Change the M2000.exe to start the M2000.dll if found in the same folder, if there is no file with name M2000.vbp in the same folder, or no M2000.dll then m2000.exe expect the m2000.dll exist as a COM object on registry of Windows.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

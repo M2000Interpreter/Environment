@@ -25,37 +25,25 @@ Set f = New Form1
 f.Move VirtualScreenWidth() + 2000, VirtualScreenHeight() + 2000
 
 On Error Resume Next
-
-If link$ <> "" Then
-    Set m = NewObjectFromActivexDll(App.path + "\m2000.dll", "callback")
-    If Err Then
-    Err.Clear
-    
-    Set m = NewObjectFromActivexDll(App.path + "\lib.bin", "callback")
-        If Err Then
-            Err.Clear
-            GoTo 1000
-        End If
-    End If
-Else
-1000
-    Set m = CreateObject("M2000.callback")
-    If Err Then
-        Err.Clear
+If Dir(App.path + "\M2000.vbp") <> "" Then
+Set m = CreateObject("M2000.callback")
+If Not Err Then GoTo 1000
+End If
         Set m = NewObjectFromActivexDll(App.path + "\m2000.dll", "callback")
         If Err Then
-        Err.Clear
-        Set m = NewObjectFromActivexDll(App.path + "\lib.bin", "callback")
-        
-        
+            Err.Clear
+            Set m = NewObjectFromActivexDll(App.path + "\lib.bin", "callback")
+            If Err Then
+                Err.Clear
+                Set m = CreateObject("M2000.callback")
+            End If
         End If
-    End If
-End If
 If Err Then
     MsgBox "Install M2000.dll first", vbCritical
     Unload f
 Exit Sub
 End If
+1000
 ' check for old m2000.dll
 test = m.WindowState
 If Err Then
