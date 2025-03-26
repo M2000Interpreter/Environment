@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 32
+Global Const Revision = 33
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -13334,6 +13334,7 @@ contgroup2:
 contlambdahere:
                         w3 = 0
                         'Set ppppL = pppp
+                        
                         Select Case ppppl.ItemType(w2)
                         Case "lambda"
 contlambdahere2:
@@ -13465,6 +13466,14 @@ cont100203030:
                             Set bstack.lastobj = Nothing
                             Set usehandler = Nothing
                             GoTo contreadprop2
+                        Case "ppppLight"
+                            Set bstack.lastobj = Nothing
+                        Set usehandler = Nothing
+                        w3 = 0
+                        Set ppppl = ppppl.item(w2)
+                        
+                            GoTo contreadprop2
+                         
                         End Select
                         Set bstack.lastobj = Nothing
                         Set usehandler = Nothing
@@ -17807,7 +17816,7 @@ againlambda:
                 Set ppppl.GroupRef = bstackstr.lastobj
                 Set bstackstr.lastobj = Nothing
                 GoTo contStrArr
-            ElseIf pppp.ItemType(w2) = myArray Then
+            ElseIf ppppl.ItemType(w2) = myArray Then
                 Set ppppl = ppppl.item(w2)
                 GoTo contStrArr
             ElseIf ppppl.ItemType(w2) = mGroup Then
@@ -17824,6 +17833,9 @@ againlambda:
                  Set ppppl.GroupRef = anything
                  Set anything = Nothing
                  ppppl.Arr = False
+                 GoTo contreadprop
+            ElseIf ppppl.ItemType(w2) = "ppppLight" Then
+                Set ppppl = ppppl.item(w2)
                  GoTo contreadprop
             End If
         ElseIf ppppl.ItemType(w2) = mGroup Then
@@ -28768,6 +28780,11 @@ toohigh:
 CheckThis:
         ppp$ = VarTypeName(pp.item(Offset))
         If ppp$ = myArray Then
+            FastSymbol rst$, "("
+            Set pp = pp.item(Offset)
+            NeoGetArrayItem = False
+            GoTo again123
+        ElseIf ppp$ = "ppppLight" Then
             FastSymbol rst$, "("
             Set pp = pp.item(Offset)
             NeoGetArrayItem = False
@@ -54052,6 +54069,8 @@ cont111:
                             r$ = myArray
                         ElseIf TypeOf ppppl Is tuple Then
                             r$ = "tuple"
+                        ElseIf TypeOf ppppl Is ppppLight Then
+                            r$ = Typename(ppppl.GroupRef)
                         Else
                             r$ = "iBoxArray"
                         End If

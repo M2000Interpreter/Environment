@@ -32,11 +32,11 @@ End Property
 Public Property Set item(curitem As Long, vNewValue As Variant)
 
 End Property
-Public Property Get arr() As Boolean
+Public Property Get Arr() As Boolean
 
 End Property
 
-Public Property Let arr(ByVal vNewValue As Boolean)
+Public Property Let Arr(ByVal vNewValue As Boolean)
 
 End Property
 

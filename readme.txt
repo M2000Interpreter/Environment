@@ -1,8 +1,61 @@
 M2000 Interpreter and Environment
-Version 13 revision 32 active-X
-1. fix a mistake for function VAL() with negative values with exponent part.
-2. Some fine tuning for M2000 Editor and EditBox control when we click on parts of names with multiple parts separeted with dot (like aaa.bb.ccc.dd)
-3. Change the M2000.exe to start the M2000.dll if found in the same folder, if there is no file with name M2000.vbp in the same folder, or no M2000.dll then m2000.exe expect the m2000.dll exist as a COM object on registry of Windows.
+Version 13 revision 33 active-X
+Fix an old program which uses properties of com objects with indexes saved to arrays and inventories.
+
+This is an example which was ok for version 8.9 (2017) but not for later versions until now.
+// Using Inventories (lists)
+declare form1 form
+declare list1(3) combobox form form1
+inventory controls, Enabled
+For i=0 to 2 {
+      Method list1(i), "move", 2000,1200+i*800, 5000,600
+      with list1(i),"MenuStyle", True, "MenuWidth", 3000,  "MenuEnabled" as new list1_enabled()
+      with list1(i),"label", "Menu"+str$(i), "list" as new list$()
+      Method list1(i), "MenuItem","Command 1",True
+      Method list1(i), "MenuItem","Command 2",false
+      Method list1(i), "MenuItem","Command 3",True
+      Append controls, i:=list$()
+      Append Enabled, i:=list1_enabled()
+      controls$(i)(0)="ok"+str$(i)
+      Print type$(Enabled(i)()), type$(controls$(i)())
+      if i=1 then Enabled(i)(1)=true
+      Print list$(0), "ok", controls$(i)(0), Enabled(i)(1)
+}
+method form1, "show",1
+declare list1() nothing
+declare form1 nothing
+
+This is an example which work until version 11:
+// using tuple
+declare form1 form
+declare list1(3) combobox form form1
+controls=(,)
+Enabled=(,)
+link controls, Enabled to controls$(), Enabled()
+For i=0 to 2 {
+      Method list1(i), "move", 2000,1200+i*800, 5000,600
+      with list1(i),"MenuStyle", True, "MenuWidth", 3000,  "MenuEnabled" as new list1_enabled()
+      with list1(i),"label", "Menu"+str$(i), "list" as new list$(), "MenuGroup","group_a"
+      Method list1(i), "MenuItem","Command 1",True
+      Method list1(i), "MenuItem","Command 2",false
+      Method list1(i), "MenuItem","Command 3",True
+      Append controls, (list$(),)
+      Append Enabled, (list1_enabled(),)
+      Print Type$(list1_enabled())
+      controls$(i)(0)="ok"+str$(i)
+      Print type$(Enabled(i)()), type$(controls$(i)())
+      if i=1 then Enabled(i)(1)=true
+      Print list$(0), "ok", controls$(i)(0), Enabled(i)(1)
+}
+method form1, "show",1
+declare list1() nothing
+declare form1 nothing
+
+
+
+
+
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

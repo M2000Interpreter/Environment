@@ -479,8 +479,15 @@ Checkit:
                                         r$ = "Structure"
                                     End Select
                     ElseIf wasarr Then
+                    If fastcol.IsObj Then
+                    If Typename(fastcol.ValueObj) = "ppppLight" Then
+                        r$ = Typename(fastcol.ValueObj.GroupRef)
+                    Else
+                    r$ = Typename(fastcol.ValueObj)
+                    End If
+                    Else
                     r$ = Typename(fastcol.Value)
-                    
+                    End If
                     ElseIf FastSymbol(a$, "!") Then
                         If fastcol.IsQueue Then
                             r$ = "Queue"
@@ -488,7 +495,13 @@ Checkit:
                             r$ = "List"
                         End If
                     Else
+                    If Typename(fastcol.ValueObj) = "ppppLight" Then
+                        FastSymbol a$, ")"
+                        r$ = Typename(fastcol.ValueObj.GroupRef)
+                    Else
+                    
                         r$ = "Inventory"
+                    End If
                     End If
                 End If
             Case 2
@@ -586,6 +599,17 @@ contarr1:
             ElseIf FastSymbol(a$, ")(", , 2) Then
           GoTo contarr1
             Else
+            If vv Is Nothing Then
+            ElseIf TypeOf vv Is ppppLight Then
+            If Left$(a$, 1) = "(" Then
+                Mid$(a$, 1, 1) = " "
+                If Not FastSymbol(a$, ")") Then
+                    Stop
+                End If
+            End If
+            Set ppppl = vv
+            Set vv = ppppl.GroupRef
+            End If
             r$ = Typename(vv)
             End If
         ElseIf Typename(vv) = "lambda" Then
@@ -14921,6 +14945,14 @@ If Left$(ah, 1) = "N" Or InStr(ah, "l") > 0 Then
     bb.Index = lastindex
     If Not bstack.lastobj Is Nothing Then
     If IsobjArray(bstack.lastobj) Then
+ If TypeOf bstack.lastobj Is ppppLight Then
+        Set pppp = bstack.lastobj
+        If pppp.Arr = False Then
+            Set bb.ValueObj = pppp
+            Set pppp = Nothing
+            GoTo cont2
+        End If
+        End If
         Set pppp = New tuple
         bstack.lastobj.CopyArray pppp
         Set bb.ValueObj = pppp
@@ -14929,6 +14961,7 @@ If Left$(ah, 1) = "N" Or InStr(ah, "l") > 0 Then
     Else
       Set bb.ValueObj = bstack.lastobj
     End If
+cont2:
         Set bstack.lastobj = Nothing
         If TypeOf bb.ValueObj Is Group Then
         bb.ValueObj.ToDelete = False
@@ -14945,15 +14978,25 @@ ElseIf Left$(ah, 1) = "S" Then
     bb.Index = lastindex
     If Not bstack.lastobj Is Nothing Then
     If IsobjArray(bstack.lastobj) Then
+        If TypeOf bstack.lastobj Is ppppLight Then
+        Set pppp = bstack.lastobj
+        If pppp.Arr = False Then
+            Set bb.ValueObj = pppp
+            Set pppp = Nothing
+            GoTo cont1
+        End If
+        End If
         Set pppp = New tuple
         bstack.lastobj.CopyArray pppp
         Set bb.ValueObj = pppp
         Set pppp = Nothing
+        
     Else
     
         Set bb.ValueObj = bstack.lastobj
         
     End If
+cont1:
         Set bstack.lastobj = Nothing
              If TypeOf bb.ValueObj Is Group Then
         bb.ValueObj.ToDelete = False
