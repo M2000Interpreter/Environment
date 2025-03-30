@@ -22358,7 +22358,7 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
             If IsExp(bstack, rest$, X, , True) Then
                 On Error Resume Next
                 X = Int(X)
-                If X >= 0 Or X <= 6 Then
+                If X >= 0 And X <= 6 Then
                     Scr.DrawStyle = X
                     If Err Then X = 0: Scr.DrawStyle = Int(X)
                     Scr.DrawWidth = p
@@ -22447,6 +22447,8 @@ Dim mGDILines As Boolean
 '    mGDILines = Not TypeOf scr Is MetaDc
 'End If
 Dim trans As Long
+Dim skiplast As Boolean
+skiplast = FastSymbol(rest$, ";")
 trans = .mypentrans
 If .IamEmf Then
 
@@ -22458,21 +22460,30 @@ Else
 
 End If
 Dim pencol As Long, bstyle As Long, Col As Long
-If .pathfillstyle = 1 And .IamEmf Then mGDILines = False
+'If .pathfillstyle = 1 And .IamEmf Then mGDILines = False
 If mGDILines Then
     pencol = .mypen
     If .pathgdi > 0 Then
         Col = .pathcolor: bstyle = .pathfillstyle
         M2000Pen trans, Col
-      
+        If .pathfillstyle = 1 Or True Then
+            M2000Pen trans, pencol
+        Else
          If trans < 255 And bstyle = 5 Then M2000Pen trans, pencol Else M2000Pen 255, pencol
+        End If
+        If skiplast Then
+        DrawBezierGdi Scr.hDC, pencol, Col, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 1)
+        Else
         If x1 + 4 >= f Then f = f + 4: ReDim Preserve PLG(f)
         PLG(x1 + 1) = PLG(0)
         PLG(x1 + 2) = PLG(0)
         PLG(x1 + 3) = PLG(0)
         PLG(x1 + 4) = PLG(0)
         DrawBezierGdi Scr.hDC, pencol, Col, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 4)
+        End If
     Else
+        
+        M2000Pen trans, pencol
         DrawBezierGdi Scr.hDC, pencol, 0, 1, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 1)
     End If
 Else
@@ -25196,7 +25207,7 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
                 ' what for 2 and 3 values
                 EndPath bstack.Owner.hDC
         
-                bstack.Owner.FillStyle = Int(X) Mod 8
+                bstack.Owner.FillStyle = Abs(Int(X)) Mod 8
                 bstack.Owner.FillColor = mycolor(Col)
                 Col = p ' from  6.3 change
                 If par Then bstack.Owner.DrawMode = 7
@@ -25238,6 +25249,7 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
         End If
     Exit Function
     Else
+        X = 1
         If FastSymbol(rest$, "{") Then
             ss$ = block(rest$)
             TraceStore bstack, nd&, rest$, 0
@@ -25255,12 +25267,12 @@ contthere:
             If FastSymbol(rest$, "}") Then
 contthere2:
                 If FastSymbol(rest$, ";") Then Region = True
-                
+                players(prive).pathgdi = players(prive).pathgdi + 1
                 oldpathfillstyle = players(prive).pathfillstyle
                 oldpathcolor = players(prive).pathcolor
                 
                 players(prive).pathcolor = mycolor(Col)
-                players(prive).pathfillstyle = Int(X) Mod 8
+                players(prive).pathfillstyle = Abs(Int(X)) Mod 8
                 BeginPath bstack.Owner.hDC
                 'If (par Or region) And GDILines Then OldGDILines = True: players(prive).NoGDI = True
                 If (par Or Region) Then players(prive).NoGDI = True: If GDILines Then OldGDILines = True
@@ -32005,6 +32017,8 @@ Set Scr = bstack.Owner
 Scr.currentX = .XGRAPH
 Scr.currentY = .YGRAPH
 If x1 <= 0 Or Y < 0.001 Then Exit Function
+Dim skiplast As Boolean
+skiplast = FastSymbol(rest$, ";")
 Dim mGDILines As Boolean
 If .IamEmf Then
    mGDILines = Not .NoGDI And Not ((Scr.DrawStyle > 0 And Scr.DrawWidth = 1) And Not Scr.DrawStyle)
@@ -32065,7 +32079,8 @@ If par Then
             If sY = 0 Then sY = PI2
             If mGDILines Then
             ' revision 30, version 9.3 fixed
-            If Not par Then M2000Pen trans, Col Else M2000Pen 255, Col
+          '  If Not par Then M2000Pen trans, Col Else M2000Pen 255, Col
+          M2000Pen trans, Col
             Col2 = .pathcolor
             M2000Pen trans, Col2
             If Y > 1 Then
@@ -32074,8 +32089,12 @@ If par Then
                 Else
                 Col2 = mycolor(X)
                     M2000Pen trans, Col2
-                
+                If Not skiplast Then
                     DrawArcPieGdi Scr.hDC, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / Y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / Y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
+                    Else
+                    DrawArcPieGdi Scr.hDC, Col2, Col2, vbSolid, Scr.DrawWidth, 5, Scr.ScaleX(.XGRAPH - x1 / Y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / Y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
+                    DrawArcPieGdi Scr.hDC, Col, Col2, 1, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / Y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / Y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
+                    End If
                 End If
             Else
                 If .pathgdi > 0 Then
@@ -32083,7 +32102,14 @@ If par Then
                 Else
                     Col2 = mycolor(X)
                     M2000Pen trans, Col2
+                    If Not skiplast Then
+                    
                     DrawArcPieGdi Scr.hDC, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * Y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * Y, 1, 3), -sX, -sY
+                    Else
+                    
+                    DrawArcPieGdi Scr.hDC, Col2, Col2, vbSolid, Scr.DrawWidth, 5, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * Y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * Y, 1, 3), -sX, -sY
+                    DrawArcPieGdi Scr.hDC, Col, Col2, 1, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * Y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * Y, 1, 3), -sX, -sY
+                    End If
                 End If
             End If
         Else
@@ -32108,7 +32134,7 @@ If par Then
             Else
                 Col2 = 0
             End If
-            If sX = sY Or Abs(sX - sY) + 0.0001 > PI2 Then
+         If sX = sY Or Abs(sX - sY) + 0.0001 > PI2 Then
             If Y > 1 Then
             If .pathgdi > 0 Then
                     DrawEllipseGdi Scr.hDC, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / Y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / Y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
@@ -32125,15 +32151,33 @@ If par Then
         Else
             If Y > 1 Then
                 If .pathgdi > 0 Then
+                    If Not skiplast Then
                     DrawArcPieGdi Scr.hDC, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / Y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / Y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
-                Else
+                    Else
+                    DrawArcPieGdi Scr.hDC, Col2, Col2, .pathfillstyle, Scr.DrawWidth, 5, Scr.ScaleX(.XGRAPH - x1 / Y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / Y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
                     DrawArcPieGdi Scr.hDC, Col, Col2, 1, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / Y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / Y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
+                    End If
+                Else
+                    If skiplast Then
+                        DrawArcPieGdi Scr.hDC, Col, Col2, 1, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / Y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / Y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
+                    Else
+                        DrawArcPieGdi Scr.hDC, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / Y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / Y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
+                    End If
                 End If
             Else
                 If .pathgdi > 0 Then
+                    If Not skiplast Then
                     DrawArcPieGdi Scr.hDC, Col, Col2, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * Y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * Y, 1, 3), -sX, -sY
+                    Else
+                    DrawArcPieGdi Scr.hDC, Col2, Col2, .pathfillstyle, Scr.DrawWidth, 5, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * Y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * Y, 1, 3), -sX, -sY
+                    DrawArcPieGdi Scr.hDC, Col, Col2, 1, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * Y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * Y, 1, 3), -sX, -sY
+                    End If
                 Else
+                    If skiplast Then
+                    DrawArcPieGdi Scr.hDC, Col, Col2, 1, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * Y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * Y, 1, 3), -sX, -sY
+                    Else
                     DrawArcPieGdi Scr.hDC, Col, Col2, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * Y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * Y, 1, 3), -sX, -sY
+                    End If
                 End If
             End If
         End If
@@ -32707,6 +32751,19 @@ Dim Scr As Object, x1 As Long, y1 As Long, p As Variant, ss$, it As Long, nd&, o
 ProcPen = True
 Set Scr = basestack.Owner
 If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
+Dim mytr As Variant
+    If FastSymbol(rest$, ",") Then
+    If Not IsExp(basestack, rest$, mytr, flatobject:=True, nostring:=True) Then
+        MissNumExpr
+        ProcPen = False
+        Exit Function
+    End If
+    mytr = Abs(mytr)
+    If mytr > 255 Then mytr = 255
+    Else
+    mytr = -1
+    End If
+conthere:
     If FastSymbol(rest$, "{") Then
         ss$ = block(rest$)
         TraceStore basestack, nd&, rest$, 0
@@ -32714,13 +32771,17 @@ If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
         
          y1 = GetCode(Scr)
             x1 = players(y1).mypen
+           Dim z1 As Long
+           z1 = players(y1).mypentrans
            
             players(y1).mypen = CLng(mycolor(p))
+            If mytr >= 0 Then players(y1).mypentrans = CLng(mytr)
             TextColor Scr, players(y1).mypen
             
             Call executeblock(it, basestack, ss$, False, once, , True)
             TraceRestore basestack, nd&
             players(y1).mypen = x1
+            players(y1).mypentrans = z1
             TextColor Scr, x1
                 If it = 2 Then
                 If ss$ = "" Then
@@ -32738,17 +32799,8 @@ If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
     Dim mp As Long
             mp = CLng(mycolor(p))
          With players(GetCode(Scr))
-                        p = .mypentrans
-            If FastSymbol(rest$, ",") Then
-                If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
-                p = Abs(p): If p > 255 Then p = 255
-                
-                End If
-            
-            End If
-     
        .mypen = mp
-       .mypentrans = CLng(p)
+       If mytr >= 0 Then .mypentrans = CLng(mytr)
        End With
         
         TextColor Scr, mp
@@ -32757,9 +32809,17 @@ Else
     If FastSymbol(rest$, ",") Then
      If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
                 p = Abs(p): If p > 255 Then p = 255
-                players(GetCode(Scr)).mypentrans = CLng(p)
-                ProcPen = True
-                Exit Function
+                If lookOne(rest$, "{") Then
+                    mytr = p
+                    y1 = GetCode(Scr)
+                    p = players(y1).mypen
+                    GoTo conthere
+                Else
+                    players(GetCode(Scr)).mypentrans = CLng(p)
+                    ProcPen = True
+                
+                    Exit Function
+                End If
          End If
     End If
     ProcPen = False
@@ -32833,23 +32893,16 @@ End If
 
 x1 = x1 + 1
 Loop Until Not FastSymbol(rest$, ",")
+Dim skiplast As Boolean
+skiplast = FastSymbol(rest$, ";")
+
 x1 = x1 - 1
+If Not skiplast Then
 PLG(x1) = PLG(0)
+End If
 Dim mGDILines As Boolean
-'If GDILines And Not (scr.DrawWidth < 2 And TypeOf scr Is MetaDc) Then
-
-'End If
-
-'If Not TypeOf scr Is MetaDc Then
-' use .IamEmf
-    'If GDILines Or .mypentrans < 255 Then
-     '   mGDILines = Not .NoGDI
-    'Else
-     '   mGDILines = scr.DrawStyle <> 5 And scr.DrawWidth > 1
-    'End If
     
 If .IamEmf Then
-   'mGDILines = Not .NoGDI And Not (scr.DrawStyle > 0 And scr.DrawWidth = 1)
    mGDILines = Not .NoGDI And Not ((Scr.DrawStyle > 0 And Scr.DrawWidth = 1) And Not Scr.DrawStyle)
 ElseIf GDILines Or (trans < 255) Then
     mGDILines = Not .NoGDI
@@ -32860,16 +32913,21 @@ End If
     
 'End If
 Dim pencol As Long, bstyle As Long
-If .pathfillstyle = 1 And .IamEmf Then mGDILines = False
+'If .pathfillstyle = 1 And .IamEmf Then mGDILines = False
 
 If mGDILines Then
 pencol = .mypen
 
     If .pathgdi > 0 Then Col = .pathcolor: bstyle = .pathfillstyle Else bstyle = Scr.FillStyle
     M2000Pen trans, Col
- If trans < 255 And bstyle = 5 Then M2000Pen trans, pencol Else M2000Pen 255, pencol
+ 
+ 'If .pathfillstyle = 1 Then
+    M2000Pen trans, pencol
     DrawPolygonGdi Scr.hDC, pencol, Col, bstyle, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 1)
-    
+ 'Else
+ 'If trans < 255 And bstyle = 5 Then M2000Pen trans, pencol Else M2000Pen 255, pencol
+  '  DrawPolygonGdi Scr.hDC, pencol, Col, bstyle, Scr.DrawWidth, Scr.DrawStyle, PLG(), CLng(x1 + 1)
+'End If
 
 Else
 If Polygon(Scr.hDC, PLG(0), x1) = 0 Then
