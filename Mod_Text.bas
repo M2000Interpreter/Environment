@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 34
+Global Const Revision = 35
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -11960,7 +11960,7 @@ fun2: ' "STACKITEM(", "‘…Ã«”Ÿ—œ’("
 fun3: ' "SGN(", "”«Ã("
 If IsExpBig(bstack, a$, p, flatobject:=True, nostring:=True) Then
     If bstack.lastobj Is Nothing Then
-        r = MyRound(p, 28)
+        r = Sgn(MyRound(p, 28))
     Else
         r = bstack.lastobj.bSgn()
         Set bstack.lastobj = Nothing
