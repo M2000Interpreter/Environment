@@ -9,7 +9,6 @@ Private Const mProp = "PropReference"
 Private Const mHdlr = "mHandler"
 Private Const mGroup = "Group"
 Private ExecBaseStack As basetask, ExecHere$
-Public SHOWCODE As Boolean
 Public doslast As Double
 Dim FontList As FastCollection
 Public PLM, PTM, PRM, PBM

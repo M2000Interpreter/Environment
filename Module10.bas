@@ -10,20 +10,8 @@ Private Type PeekArrayType
     Ptr         As Long
     Reserved    As Currency
 End Type
-Private Declare Function DispCallFunc Lib "oleaut32" (ByVal pvInstance As Long, ByVal offsetinVft As Long, ByVal callconv As Long, ByVal retTYP As Integer, ByVal paCNT As Long, ByRef paTypes As Integer, ByRef paValues As Long, ByRef RETVAR As Variant) As Long
-Private Enum CALLINGCONVENTION_ENUM
-  cc_fastcall
-  CC_CDECL
-  CC_PASCAL
-  CC_MACPASCAL
-  CC_STDCALL
-  CC_FPFASTCALL
-  CC_SYSCALL
-  CC_MPWCDECL
-  CC_MPWPASCAL
-End Enum
 Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (Arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
-Private Declare Function SafeArrayGetDim Lib "OleAut32.dll" (ByVal Ptr As Long) As Long
+Private Declare Function SafeArrayGetDim Lib "oleaut32.dll" (ByVal Ptr As Long) As Long
 Private Declare Function vbaVarLateMemSt Lib "msvbvm60" _
                          Alias "__vbaVarLateMemSt" ( _
                          ByRef vDst As Variant, _

@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 36
+Global Const Revision = 37
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -33055,7 +33055,6 @@ Dim s$, x1 As Long, y1 As Long, o As Long, frm$, i As Long, par As Boolean, p As
 Dim Scr As Object, ss$, prev$
 ProcEdit = True
 If FastSymbol(rest$, "!") Then
-If FastSymbol(rest$, "!") Then SHOWCODE = Not SHOWCODE
 If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
 EditTabWidth = Abs(p)
 
@@ -33215,7 +33214,11 @@ jump11:
              GetSub frm$, x1
              
             If x1 = 0 Then
-            If y1 > 3 Then frm$ = frm$ + ")"
+            If y1 > 3 Then
+            frm$ = frm$ + ")"
+            If FastSymbol(rest$, ")") Then
+            End If
+            End If
             GetSubFullName s$, ss$
             If ss$ <> Mid$(frm$, Len(ss$) - Len(s$) + 1) Then
                 Check2SaveModules = True
