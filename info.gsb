@@ -27440,6 +27440,7 @@ Pen 15 {
 	Print "Demo: Using a console program from M2000, using WScript.Shell "
 	Print "Press Esc to exit, or write Exit and press enter"
 }
+title "M2000", 0
 cls, 2
 Declare GetForegroundWindow Lib "user32.GetForegroundWindow"
 Declare ShowWindow Lib "user32.ShowWindow" {long hwnd, long nCmdShow}
@@ -27455,12 +27456,13 @@ With StdOut, "AtEndOfStream" as AtEndOfStream
 Method StdIn, "WriteLine" , "cd c:\"
 Method StdIn, "WriteLine" , "dir"
 Method StdIn, "WriteLine" ," "
-wait 200
+wait 1000
 \\ we have to minimize the window
 t=GetForegroundWindow()
 t1=ShowWindow(t, SW_MINIMIZE)
 a$=""
 p$=""
+title "M2000"
 Every 10 {
 	Method StdOut, "ReadLine" as strText$
 	p$=filter$(strText$, cl$)
@@ -41339,7 +41341,7 @@ Module Life {
 	Const Mx=20, My=10
 	Dim A(0 to Mx+1, 0 to My+1)=0
 	Flush
- 	Data (2,2),(2,3),(3,3),(4,3),(5,4),(,3,4),(5,3),(6,2),(8,5),(5,8)
+ 	Data (2,2),(2,3),(3,3),(4,3),(5,4),(3,4),(5,3),(6,2),(8,5),(5,8)
 /	Data (5,3)
 /	Data (5,4)
 /	Data (5,5)
