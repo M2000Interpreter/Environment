@@ -62,12 +62,12 @@ Friend Sub Construct(there As GuiM2000, Name$)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Friend Sub ConstructArray(there As GuiM2000, Name$, I As Long)
+Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  Set Callback = there
  On Error Resume Next
  ctrlName = GetTag$
  Set pbox = there.Controls.Add("vb.picturebox", ctrlName)
- mIndex = I
+ mIndex = i
  there.AddGuiControl Me, CVar(ctrlName)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
@@ -96,7 +96,7 @@ mtext = RHS
 pbox.Cls
 pbox.currentX = 0
 pbox.currentY = 0
-pbox.Print mtext
+MyPrint pbox, mtext
 pbox.Refresh
 End Property
 Public Property Get Text() As String
@@ -249,7 +249,7 @@ Else
 If KeyCode <> 0 Then GetKeY2 KeyCode, shift
 If KeyCode = 0 Then Exit Sub
 End If
-Dim I&
+Dim i&
 If shift = 4 Then
 If KeyCode = 18 Then
 If mynum$ = vbNullString Then mynum$ = "0"
@@ -332,7 +332,7 @@ Private Sub pbox_KeyUp(KeyCode As Integer, shift As Integer)
 On Error GoTo fin
 'If PrevLocale <> GetLocale Then RaiseEvent Maybelanguage
 If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
-Dim I As Long, K As Integer
+Dim i As Long, K As Integer
 
 lastshift = shift
 If KeyCode = 18 Then
@@ -358,35 +358,35 @@ Else
 End If
 End If
 If DropKey Then KeyCode = 0: UKEY$ = vbNullString: Exit Sub
-I = -1
+i = -1
 If shift <> 4 And mynum$ <> "" Then
 On Error Resume Next
 If Left$(mynum$, 1) = "0" Then
-I = val(mynum$)
+i = val(mynum$)
 Else
-I = val(mynum$)
+i = val(mynum$)
 End If
 mynum$ = vbNullString
-If I > 32 Then
-If I >= &H10000 And I <= &H10FFFF Then
-I = I - &H10000
-UKEY$ = ChrW(UINT(I \ &H400& + &HD800&)) + ChrW(UINT((I And &H3FF&) + &HDC00&))
+If i > 32 Then
+If i >= &H10000 And i <= &H10FFFF Then
+i = i - &H10000
+UKEY$ = ChrW(UINT(i \ &H400& + &HD800&)) + ChrW(UINT((i And &H3FF&) + &HDC00&))
 Else
-UKEY$ = ChrW(I)
+UKEY$ = ChrW(i)
 End If
 'If LastNumX Then pbox_KeyPress 44
 Exit Sub
 End If
-I = -1
+i = -1
 Else
-I = GetLastKeyPressed
+i = GetLastKeyPressed
 End If
 
- If I <> -1 And I <> 94 Then
- If I = 13 Then
+ If i <> -1 And i <> 94 Then
+ If i = 13 Then
  UKEY$ = vbNullString
  Else
- UKEY$ = ChrW(I)
+ UKEY$ = ChrW(i)
  End If
  Else
 UKEY$ = vbNullString
