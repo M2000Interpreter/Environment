@@ -78,8 +78,8 @@ Private Declare Function DrawState Lib "user32" Alias "DrawStateA" _
         ByVal lpDrawStateProc As Long, _
         ByVal lParam As Long, _
         ByVal wParam As Long, _
-        ByVal x As Long, _
-        ByVal y As Long, _
+        ByVal X As Long, _
+        ByVal Y As Long, _
         ByVal cx As Long, _
         ByVal cy As Long, _
         ByVal fuFlags As Long) As Long
@@ -171,7 +171,7 @@ Public Sub DisAllTargets()
 DisableTargets q(), prive
 End Sub
 Friend Sub RenderTarget(bstack As basetask, rest$, Lang As Long, tHandle As Variant)
-Dim p, W$, x, y As Long
+Dim p, W$, X, Y As Long
 If tHandle \ 10000 <> prive Then
 MyEr "target not for this form", "Ô ÛÙ¸˜ÔÚ ‰ÂÌ ÂﬂÌ·È „È· ·ıÙﬁ ÙÁ ˆ¸ÒÏ·"
 Exit Sub
@@ -181,35 +181,35 @@ If p >= 0 And p < UBound(q()) Then
      
               '
 While FastSymbol(rest$, ",")
-x = Empty
-y = 0
-If IsLabelSymbolNew(rest$, "÷—¡”«", "TEXT", Lang, y) Then
+X = Empty
+Y = 0
+If IsLabelSymbolNew(rest$, "÷—¡”«", "TEXT", Lang, Y) Then
 If IsStrExp(bstack, rest$, W$) Then q(p).Tag = W$
-ElseIf IsLabelSymbolNew(rest$, "–≈Õ¡", "PEN", Lang, y) Then
-If IsExp(bstack, rest$, x, , True) Then q(p).pen = x
-ElseIf IsLabelSymbolNew(rest$, "÷œÕ‘œ", "BACK", Lang, y) Then
-If IsExp(bstack, rest$, x, , True) Then q(p).back = x
-ElseIf IsLabelSymbolNew(rest$, "–À¡…”…œ", "BORDER", Lang, y) Then
-If IsExp(bstack, rest$, x, , True) Then q(p).fore = x
-ElseIf IsLabelSymbolNew(rest$, "œƒ«√…¡", "COMMAND", Lang, y) Then
+ElseIf IsLabelSymbolNew(rest$, "–≈Õ¡", "PEN", Lang, Y) Then
+If IsExp(bstack, rest$, X, , True) Then q(p).pen = X
+ElseIf IsLabelSymbolNew(rest$, "÷œÕ‘œ", "BACK", Lang, Y) Then
+If IsExp(bstack, rest$, X, , True) Then q(p).back = X
+ElseIf IsLabelSymbolNew(rest$, "–À¡…”…œ", "BORDER", Lang, Y) Then
+If IsExp(bstack, rest$, X, , True) Then q(p).fore = X
+ElseIf IsLabelSymbolNew(rest$, "œƒ«√…¡", "COMMAND", Lang, Y) Then
 If IsStrExp(bstack, rest$, W$) Then q(p).Comm = W$
-ElseIf IsLabelSymbolNew(rest$, "‘…Ã«", "VALUE", Lang, y) Then
-If IsExp(bstack, rest$, x, , True) Then q(p).topval = Int(x * 100)
-ElseIf IsLabelSymbolNew(rest$, "¬¡”«", "BASE", Lang, y) Then
-If IsExp(bstack, rest$, x, , True) Then q(p).botval = Int(x * 100):
-ElseIf IsLabelSymbolNew(rest$, "◊—ŸÃ¡", "COLOR", Lang, y) Then
-If IsExp(bstack, rest$, x, , True) Then q(p).barC = x
-ElseIf IsLabelSymbolNew(rest$, "Ã≈√≈»œ”", "SIZE", Lang, y) Then
-If IsExp(bstack, rest$, x, , True) Then
-If x > 100 Then x = 100
-If x < -100 Then x = -100
-q(p).imagesize = Int(x)
+ElseIf IsLabelSymbolNew(rest$, "‘…Ã«", "VALUE", Lang, Y) Then
+If IsExp(bstack, rest$, X, , True) Then q(p).topval = Int(X * 100)
+ElseIf IsLabelSymbolNew(rest$, "¬¡”«", "BASE", Lang, Y) Then
+If IsExp(bstack, rest$, X, , True) Then q(p).botval = Int(X * 100):
+ElseIf IsLabelSymbolNew(rest$, "◊—ŸÃ¡", "COLOR", Lang, Y) Then
+If IsExp(bstack, rest$, X, , True) Then q(p).barC = X
+ElseIf IsLabelSymbolNew(rest$, "Ã≈√≈»œ”", "SIZE", Lang, Y) Then
+If IsExp(bstack, rest$, X, , True) Then
+If X > 100 Then X = 100
+If X < -100 Then X = -100
+q(p).imagesize = Int(X)
 End If
 ' " ¡»≈‘«", "PORTRAIT"
-ElseIf IsLabelSymbolNew(rest$, " ¡»≈‘«", "PORTRAIT", Lang, y) Then
-    If IsExp(bstack, rest$, x, , True) Then q(p).Vertical = Int(x) <> 0
-ElseIf IsLabelSymbolNew(rest$, "≈… œÕ¡", "IMAGE", Lang, y) Then
-If IsExp(bstack, rest$, x) Then
+ElseIf IsLabelSymbolNew(rest$, " ¡»≈‘«", "PORTRAIT", Lang, Y) Then
+    If IsExp(bstack, rest$, X, , True) Then q(p).Vertical = Int(X) <> 0
+ElseIf IsLabelSymbolNew(rest$, "≈… œÕ¡", "IMAGE", Lang, Y) Then
+If IsExp(bstack, rest$, X) Then
     If bstack.lastobj Is Nothing Then
     Set q(p).drawimage = Nothing
     ElseIf TypeOf bstack.lastobj Is mHandler Then
@@ -499,7 +499,7 @@ If Err.Number Then Err.Clear: W.Visible = True
 Next W
 End If
 
-If Controls.Count > 0 And True Then
+If Controls.Count > 0 Then
 For Each W In Controls
 On Error Resume Next
 Dim typ
@@ -776,7 +776,7 @@ UnHook hWnd
 End If
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim bstack As basetask, oldHere$
 
 
@@ -789,7 +789,7 @@ Relax = True
 Dim sel&
 
 If Button > 0 And Targets Then
-    sel& = ScanTarget(q(), CLng(x), CLng(y), prive)
+    sel& = ScanTarget(q(), CLng(X), CLng(Y), prive)
     If sel& >= 0 Then
         If Button = 1 Then
 
@@ -825,9 +825,9 @@ End If
 
 
 If mIndex > -1 Then
-    Callback mMyName$ + ".MouseDown(" + str(Index) + "," + str(Button) + "," + str(shift) + "," + str(x) + "," + str(y) + ")"
+    Callback mMyName$ + ".MouseDown(" + str(Index) + "," + str(Button) + "," + str(shift) + "," + str(X) + "," + str(Y) + ")"
 Else
-    Callback mMyName$ + ".MouseDown(" + str(Button) + "," + str(shift) + "," + str(x) + "," + str(y) + ")"
+    Callback mMyName$ + ".MouseDown(" + str(Button) + "," + str(shift) + "," + str(X) + "," + str(Y) + ")"
 End If
 
 
@@ -836,7 +836,7 @@ Relax = False
 End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
     If Not m_oCtlCancelMode Is Nothing Then
         m_oCtlCancelMode.CancelMode
         Set m_oCtlCancelMode = Nothing
@@ -846,24 +846,24 @@ If Not Relax Then
 Relax = True
 
 If mIndex > -1 Then
-Callback mMyName$ + ".MouseMove(" + str(Index) + "," + str(Button) + "," + str(shift) + "," + str(x) + "," + str(y) + ")"
+Callback mMyName$ + ".MouseMove(" + str(Index) + "," + str(Button) + "," + str(shift) + "," + str(X) + "," + str(Y) + ")"
 Else
-Callback mMyName$ + ".MouseMove(" + str(Button) + "," + str(shift) + "," + str(x) + "," + str(y) + ")"
+Callback mMyName$ + ".MouseMove(" + str(Button) + "," + str(shift) + "," + str(X) + "," + str(Y) + ")"
 End If
 Relax = False
 End If
 
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Not Relax Then
 
 Relax = True
 
 If mIndex > -1 Then
-Callback mMyName$ + ".MouseUp(" + str(Index) + "," + str(Button) + "," + str(shift) + "," + str(x) + "," + str(y) + ")"
+Callback mMyName$ + ".MouseUp(" + str(Index) + "," + str(Button) + "," + str(shift) + "," + str(X) + "," + str(Y) + ")"
 Else
-Callback mMyName$ + ".MouseUp(" + str(Button) + "," + str(shift) + "," + str(x) + "," + str(y) + ")"
+Callback mMyName$ + ".MouseUp(" + str(Button) + "," + str(shift) + "," + str(X) + "," + str(Y) + ")"
 End If
 Relax = False
 End If
@@ -908,16 +908,16 @@ End If
 End Sub
 
 
-Private Sub gList2_AccKey(m As Long)
-AccProces m
+Private Sub gList2_AccKey(M As Long)
+AccProces M
 End Sub
 
-Private Sub gList2_ValidMove(x As Single, y As Single)
+Private Sub gList2_ValidMove(X As Single, Y As Single)
 
             If mIndex > -1 Then
-                Callback mMyName$ + ".MoveTo(" + str(Index) + "," + str(x) + "," + str(y) + ")"
+                Callback mMyName$ + ".MoveTo(" + str(Index) + "," + str(X) + "," + str(Y) + ")"
             Else
-                Callback mMyName$ + ".MoveTo(" + str(x) + "," + str(y) + ")"
+                Callback mMyName$ + ".MoveTo(" + str(X) + "," + str(Y) + ")"
             End If
 End Sub
 
@@ -925,8 +925,8 @@ Private Sub gList2_WindowKey(VbKeyThis As Integer)
 ProcessWinKey VbKeyThis
 End Sub
 
-Private Sub gListN_AccKey(m As Long)
-AccProces m
+Private Sub gListN_AccKey(M As Long)
+AccProces M
 End Sub
 Private Sub gList2_BlinkNow(Face As Boolean)
 If mTimes > 0 Then
@@ -1000,11 +1000,11 @@ End Sub
 
 Private Sub gList2_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 If item = -1 Then
-Dim m As Long
-m = gList2.CapColor
-If gList2.BlinkON Or Not gList2.NoHeaderBackground Then FillThere thisHDC, thisrect, m
-FillThereMyVersionTrans thisHDC, thisrect, m, UseReverse
-If mSizable And mShowMaximize Then FillThereMyVersion3Trans thisHDC, thisrect, m, 0, UseReverse Else minimPos = 0
+Dim M As Long
+M = gList2.CapColor
+If gList2.BlinkON Or Not gList2.NoHeaderBackground Then FillThere thisHDC, thisrect, M
+FillThereMyVersionTrans thisHDC, thisrect, M, UseReverse
+If mSizable And mShowMaximize Then FillThereMyVersion3Trans thisHDC, thisrect, M, 0, UseReverse Else minimPos = 0
 If drawminimized Then FillThereMyVersion2 thisHDC, thisrect, minimPos, UseReverse
 If UseInfo Then FillThereMyVersion4 thisHDC, thisrect, infopos, UseReverse
 If mIcon Then
@@ -1037,7 +1037,7 @@ Else
 PopUpPos Pad, 0, gList2.Height / 2, gList2.Height / 2
 End If
 End Sub
-Public Sub OpenInfoAT(x, y)
+Public Sub OpenInfoAT(X, Y)
 Dim gl As Long, thisLastControl As String
 
 gl = glistN.listcount
@@ -1055,34 +1055,34 @@ glistN.FreeMouse = True
 glistN.ShowBar = False
 glistN.PanPos = 0
 glistN.NoWheel = True
-Me.PopUp Pad, x, y
+Me.PopUp Pad, X, Y
 End Sub
-Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 On Error Resume Next ' for set focus
 Dim v As Long
 If Button <> 1 Then Exit Sub
 ByPassColor = True
 If UseReverse Then
 If UseInfo Then
-If gList2.SingleClickCheck(Button, item, x, y, setupxy * (1 + 2 * infopos) / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
+If gList2.SingleClickCheck(Button, item, X, Y, setupxy * (1 + 2 * infopos) / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
         If NoEventInfo Then
             OpenInfo
         Else
             If mIndex > -1 Then
-                Callback mMyName$ + ".Info(" + str(Index) + "," + str(x) + "," + str(y) + ")"
+                Callback mMyName$ + ".Info(" + str(Index) + "," + str(X) + "," + str(Y) + ")"
             Else
-                Callback mMyName$ + ".Info(" + str(x) + "," + str(y) + ")"
+                Callback mMyName$ + ".Info(" + str(X) + "," + str(Y) + ")"
             End If
         End If
    Exit Sub
 End If
 End If
-If gList2.DoubleClickCheck(Button, item, x, y, gList2.WidthPixels - setupxy / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
+If gList2.DoubleClickCheck(Button, item, X, Y, gList2.WidthPixels - setupxy / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
     ByeBye
     Exit Sub
 End If
 If mSizable And mShowMaximize Then
-    If gList2.SingleClickCheck(Button, item, x, y, gList2.WidthPixels - setupxy * 3 / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
+    If gList2.SingleClickCheck(Button, item, X, Y, gList2.WidthPixels - setupxy * 3 / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
         If IhaveLastPos Then
             On Error Resume Next
             With ScrInfo(FindMonitorFromMouse)
@@ -1165,7 +1165,7 @@ If mSizable And mShowMaximize Then
 End If
 If Not IsWine And drawminimized Then
     If Not MyForm3 Is Nothing Then
-        If gList2.SingleClickCheck(Button, item, x, y, gList2.WidthPixels - setupxy * (3 + 2 * minimPos) / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
+        If gList2.SingleClickCheck(Button, item, X, Y, gList2.WidthPixels - setupxy * (3 + 2 * minimPos) / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
             VisibleOldState = Visible
             Visible = False
             MinimizeON
@@ -1175,25 +1175,25 @@ If Not IsWine And drawminimized Then
 End If
 Else
 If UseInfo Then
-If gList2.SingleClickCheck(Button, item, x, y, gList2.WidthPixels - setupxy * (1 + 2 * infopos) / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
+If gList2.SingleClickCheck(Button, item, X, Y, gList2.WidthPixels - setupxy * (1 + 2 * infopos) / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
         If NoEventInfo Then
             OpenInfo
         Else
             If mIndex > -1 Then
-                Callback mMyName$ + ".Info(" + str(Index) + "," + str(x) + "," + str(y) + ")"
+                Callback mMyName$ + ".Info(" + str(Index) + "," + str(X) + "," + str(Y) + ")"
             Else
-                Callback mMyName$ + ".Info(" + str(x) + "," + str(y) + ")"
+                Callback mMyName$ + ".Info(" + str(X) + "," + str(Y) + ")"
             End If
         End If
     Exit Sub
 End If
 End If
-If gList2.DoubleClickCheck(Button, item, x, y, setupxy / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
+If gList2.DoubleClickCheck(Button, item, X, Y, setupxy / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
     ByeBye
     Exit Sub
 End If
 If mSizable And mShowMaximize Then
-    If gList2.SingleClickCheck(Button, item, x, y, setupxy * 3 / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
+    If gList2.SingleClickCheck(Button, item, X, Y, setupxy * 3 / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
         If IhaveLastPos Then
             On Error Resume Next
             With ScrInfo(FindMonitorFromMouse)
@@ -1266,7 +1266,7 @@ If mSizable And mShowMaximize Then
 End If
 If Not IsWine And drawminimized Then
     If Not MyForm3 Is Nothing Then
-        If gList2.SingleClickCheck(Button, item, x, y, setupxy * (3 + 2 * minimPos) / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
+        If gList2.SingleClickCheck(Button, item, X, Y, setupxy * (3 + 2 * minimPos) / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
             VisibleOldState = Visible
             Visible = False
             MinimizeON
@@ -1392,173 +1392,173 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 Private Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT
-CopyFromLParamToRect A, thatRect
+Dim a As RECT
+CopyFromLParamToRect a, thatRect
 
-FillBack thathDC, A, thatbgcolor
+FillBack thathDC, a, thatbgcolor
 End Sub
 Private Sub FillThereMyVersionTrans(thathDC As Long, thatRect As Long, thatbgcolor As Long, Reverse As Boolean)
-Dim A As RECT, b As Long, aline As RECT
+Dim a As RECT, b As Long, aline As RECT
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
-CopyFromLParamToRect A, thatRect
+CopyFromLParamToRect a, thatRect
 If Reverse Then
-    A.Left = A.Right - setupxy + b
-    A.Right = A.Right - b
+    a.Left = a.Right - setupxy + b
+    a.Right = a.Right - b
 Else
-    A.Left = b
-    A.Right = setupxy - b
+    a.Left = b
+    a.Right = setupxy - b
 End If
-A.top = b
-A.Bottom = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
 If b < 1 Then b = 1 Else b = b * 2 - 1
-aline = A
-aline.Left = A.Right - b
+aline = a
+aline.Left = a.Right - b
 FillThere thathDC, VarPtr(aline), mIconColor
-aline = A
-aline.Right = A.Left + b
+aline = a
+aline.Right = a.Left + b
 FillThere thathDC, VarPtr(aline), mIconColor
 
-aline = A
-aline.Bottom = A.top + b
+aline = a
+aline.Bottom = a.top + b
 FillThere thathDC, VarPtr(aline), mIconColor
-aline = A
-aline.top = A.Bottom - b
+aline = a
+aline.top = a.Bottom - b
 FillThere thathDC, VarPtr(aline), mIconColor
 End Sub
 Private Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long, Reverse As Boolean)
-Dim A As RECT, b As Long
+Dim a As RECT, b As Long
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
-CopyFromLParamToRect A, thatRect
+CopyFromLParamToRect a, thatRect
 If Reverse Then
-    A.Left = A.Right - setupxy + b
-    A.Right = A.Right - b
+    a.Left = a.Right - setupxy + b
+    a.Right = a.Right - b
 Else
-    A.Left = b
-    A.Right = setupxy - b
+    a.Left = b
+    a.Right = setupxy - b
 End If
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), mIconColor
-CopyFromLParamToRect A, thatRect
+a.top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), mIconColor
+CopyFromLParamToRect a, thatRect
 b = 5 * lastfactor
 If Reverse Then
-    A.Left = A.Right - setupxy + b
-    A.Right = A.Right - b
+    a.Left = a.Right - setupxy + b
+    a.Right = a.Right - b
 Else
-    A.Left = b
-    A.Right = setupxy - b
+    a.Left = b
+    a.Right = setupxy - b
 End If
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), thatbgcolor
+a.top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), thatbgcolor
 End Sub
 Private Sub FillThereMyVersion2(thathDC As Long, thatRect As Long, butPos As Long, Reverse As Boolean)
-Dim A As RECT, b As Long, c As Long
+Dim a As RECT, b As Long, c As Long
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
 c = setupxy * (butPos)
-CopyFromLParamToRect A, thatRect
+CopyFromLParamToRect a, thatRect
 If Reverse Then
-    A.Left = A.Right - (c + setupxy * 2) + b
-    A.Right = A.Right - b - c - setupxy
+    a.Left = a.Right - (c + setupxy * 2) + b
+    a.Right = a.Right - b - c - setupxy
 
 Else
-    A.Left = b + c + setupxy
-    A.Right = setupxy - 2 * b + A.Left
+    a.Left = b + c + setupxy
+    a.Right = setupxy - 2 * b + a.Left
 End If
-A.Bottom = setupxy - b
+a.Bottom = setupxy - b
 b = 5 * lastfactor
 
 If 5 * lastfactor < 1 Then
-A.top = A.Bottom - 1
+a.top = a.Bottom - 1
 Else
-A.top = setupxy - b
+a.top = setupxy - b
 End If
-FillThere thathDC, VarPtr(A), mIconColor
+FillThere thathDC, VarPtr(a), mIconColor
 End Sub
 Private Sub FillThereMyVersion3Trans(thathDC As Long, thatRect As Long, thatbgcolor As Long, butPos As Long, Reverse As Boolean)
-Dim A As RECT, b As Long, c As Long
+Dim a As RECT, b As Long, c As Long
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
 c = setupxy * butPos
-CopyFromLParamToRect A, thatRect
+CopyFromLParamToRect a, thatRect
 If Reverse Then
-    A.Left = A.Right - (c + setupxy * 2) + b
-    A.Right = A.Right - b - c - setupxy
+    a.Left = a.Right - (c + setupxy * 2) + b
+    a.Right = a.Right - b - c - setupxy
 Else
-    A.Left = b + c + setupxy
-    A.Right = setupxy - 2 * b + A.Left
+    a.Left = b + c + setupxy
+    a.Right = setupxy - 2 * b + a.Left
 End If
-A.top = 3 * b
-A.Bottom = setupxy - b
+a.top = 3 * b
+a.Bottom = setupxy - b
 Dim aline As RECT
 If b < 2 Then b = 2 Else b = b * 2 - 1
-aline = A
-aline.Left = A.Right - b
+aline = a
+aline.Left = a.Right - b
 FillThere thathDC, VarPtr(aline), mIconColor
-aline = A
-aline.Right = A.Left + b
+aline = a
+aline.Right = a.Left + b
 FillThere thathDC, VarPtr(aline), mIconColor
 
-aline = A
-aline.Bottom = A.top + b
+aline = a
+aline.Bottom = a.top + b
 FillThere thathDC, VarPtr(aline), mIconColor
-aline = A
-aline.Bottom = A.Bottom - b * 2
-aline.top = A.Bottom - b
+aline = a
+aline.Bottom = a.Bottom - b * 2
+aline.top = a.Bottom - b
 FillThere thathDC, VarPtr(aline), mIconColor
 End Sub
 Private Sub FillThereMyVersion3(thathDC As Long, thatRect As Long, thatbgcolor As Long, butPos As Long, Reverse As Boolean)
-Dim A As RECT, b As Long, c As Long
+Dim a As RECT, b As Long, c As Long
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
 c = setupxy * butPos
-CopyFromLParamToRect A, thatRect
+CopyFromLParamToRect a, thatRect
 If Reverse Then
-    A.Left = A.Right - (c + setupxy * 2) + b
-    A.Right = A.Right - b - c - setupxy
+    a.Left = a.Right - (c + setupxy * 2) + b
+    a.Right = a.Right - b - c - setupxy
 Else
-    A.Left = b + c + setupxy
-    A.Right = setupxy - 2 * b + A.Left
+    a.Left = b + c + setupxy
+    a.Right = setupxy - 2 * b + a.Left
 End If
-A.top = 3 * b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), mIconColor
-CopyFromLParamToRect A, thatRect
+a.top = 3 * b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), mIconColor
+CopyFromLParamToRect a, thatRect
 b = 5 * lastfactor
 If b < 2 Then b = 2
 If Reverse Then
-    A.Left = A.Right - (c + setupxy * 2) + b
-    A.Right = A.Right - b - c - setupxy
+    a.Left = a.Right - (c + setupxy * 2) + b
+    a.Right = a.Right - b - c - setupxy
 
 Else
-    A.Left = b + c + setupxy
-    A.Right = setupxy - 2 * b + A.Left
+    a.Left = b + c + setupxy
+    a.Right = setupxy - 2 * b + a.Left
 End If
 
 
-A.top = 4 * b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), thatbgcolor
-A.Bottom = A.top - b
+a.top = 4 * b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), thatbgcolor
+a.Bottom = a.top - b
 b = 2 * lastfactor
 If b < 2 Then b = 2
-A.Bottom = A.Bottom - b - b / 2
+a.Bottom = a.Bottom - b - b / 2
 
-A.top = 4 * b + b / 2
-FillThere thathDC, VarPtr(A), thatbgcolor
+a.top = 4 * b + b / 2
+FillThere thathDC, VarPtr(a), thatbgcolor
 
 
 End Sub
 Private Sub FillThereMyVersion4(thathDC As Long, thatRect As Long, butPos As Long, Reverse As Boolean)
-Dim A As RECT, b As Long, c As Long
+Dim a As RECT, b As Long, c As Long
 Dim color1 As Long
 color1 = mIconColor
 If Not moveMe And Not ByPassColor Then
@@ -1571,31 +1571,31 @@ End If
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
-CopyFromLParamToRect A, thatRect
+CopyFromLParamToRect a, thatRect
 If Reverse Then
 c = setupxy * (butPos - 1)
-A.Left = b + c + setupxy
-A.Right = setupxy - 2 * b + A.Left
+a.Left = b + c + setupxy
+a.Right = setupxy - 2 * b + a.Left
 Else
 c = setupxy * butPos
-A.Left = A.Right - (c + setupxy) + b
- A.Right = A.Right - b - c
+a.Left = a.Right - (c + setupxy) + b
+ a.Right = a.Right - b - c
 End If
-A.Bottom = setupxy - b
+a.Bottom = setupxy - b
 b = 5 * lastfactor
 
 If 5 * lastfactor < 1 Then
-A.top = A.Bottom - 1
+a.top = a.Bottom - 1
 Else
-A.top = setupxy - b
+a.top = setupxy - b
 End If
-FillThere thathDC, VarPtr(A), color1
-A.top = A.top - b
-A.Bottom = A.Bottom - b
-FillThere thathDC, VarPtr(A), color1
-A.top = A.top - b
-A.Bottom = A.Bottom - b
-FillThere thathDC, VarPtr(A), color1
+FillThere thathDC, VarPtr(a), color1
+a.top = a.top - b
+a.Bottom = a.Bottom - b
+FillThere thathDC, VarPtr(a), color1
+a.top = a.top - b
+a.Bottom = a.Bottom - b
+FillThere thathDC, VarPtr(a), color1
 
 End Sub
 Public Property Get Title() As Variant
@@ -1774,20 +1774,20 @@ End Property
 Public Property Get CtrlFontBold()
     CtrlFontBold = CtrlFont.bold
 End Property
-Friend Sub SendFKEY(A As Integer)
+Friend Sub SendFKEY(a As Integer)
 
  If mIndex >= 0 Then
-      Callback mMyName$ + ".Fkey(" + str(mIndex) + "," + str(A) + ")"
+      Callback mMyName$ + ".Fkey(" + str(mIndex) + "," + str(a) + ")"
    Else
-      Callback mMyName$ + ".Fkey(" + str(A) + ")"
+      Callback mMyName$ + ".Fkey(" + str(a) + ")"
       End If
 End Sub
 
-Private Sub gList2_Fkey(A As Integer)
-If A > 1000 Then
-SendFKEY A - 1000
+Private Sub gList2_Fkey(a As Integer)
+If a > 1000 Then
+SendFKEY a - 1000
 Else
-SendFKEY A
+SendFKEY a
 End If
 End Sub
 
@@ -1885,11 +1885,11 @@ gList2.MousePointer = 1
 End Sub
 
 
-Private Sub gList2_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub gList2_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Button <> 0 Then RestoreBlibkStatus: moveMe = False: sizeMe = False
 End Sub
 
-Private Sub gList2_MouseUp(x As Single, y As Single)
+Private Sub gList2_MouseUp(X As Single, Y As Single)
 RestoreBlibkStatus
 moveMe = False
 sizeMe = False
@@ -1905,9 +1905,9 @@ End If
             If Controls(LastActive).enabled Then
                 If Controls(LastActive).Visible Then
                     If Not UseReverse Then
-                        gList2.DoubleClickArea x, y, setupxy / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1
+                        gList2.DoubleClickArea X, Y, setupxy / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1
                     Else
-                        gList2.DoubleClickArea x, y, gList2.WidthPixels - setupxy / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1
+                        gList2.DoubleClickArea X, Y, gList2.WidthPixels - setupxy / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1
                     End If
                     Controls(LastActive).SetFocus
                 End If
@@ -1924,7 +1924,7 @@ End Sub
 Private Sub gList2_RefreshDesktop()
 If Form1.Visible Then Form1.Refresh: If Form1.DIS.Visible Then Form1.DIS.Refresh
 End Sub
-Public Sub PopUp(vv As Variant, ByVal x As Variant, ByVal y As Variant)
+Public Sub PopUp(vv As Variant, ByVal X As Variant, ByVal Y As Variant)
 Dim that As GuiM2000
 If MyIsObject(vv) Then
 If vv Is Nothing Then Exit Sub
@@ -1936,22 +1936,22 @@ Dim var1() As Variant, retobject As Object, hmonitor As Long
 ReDim var1(0 To 1)
 Dim var2() As String
 ReDim var2(0 To 0)
-hmonitor = FindMonitorFromPixel(x, y) ' FindFormSScreen(Me)
-x = x + Left
-y = y + top
+hmonitor = FindMonitorFromPixel(X, Y) ' FindFormSScreen(Me)
+X = X + Left
+Y = Y + top
 If that.Visible Then
 If Not that.enabled Then Exit Sub
 End If
-If x + that.Width > ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left Then
-If y + that.Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
+If X + that.Width > ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left Then
+If Y + that.Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
 that.move ScrInfo(hmonitor).Width - that.Width + ScrInfo(hmonitor).Left, ScrInfo(hmonitor).Height - that.Height + ScrInfo(hmonitor).top
 Else
-that.move ScrInfo(hmonitor).Width - that.Width + ScrInfo(hmonitor).Left, y + ScrInfo(hmonitor).top
+that.move ScrInfo(hmonitor).Width - that.Width + ScrInfo(hmonitor).Left, Y + ScrInfo(hmonitor).top
 End If
-ElseIf y + that.Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
-that.move x, ScrInfo(hmonitor).Height - that.Height + ScrInfo(hmonitor).top
+ElseIf Y + that.Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
+that.move X, ScrInfo(hmonitor).Height - that.Height + ScrInfo(hmonitor).top
 Else
-that.move x, y
+that.move X, Y
 End If
 var1(1) = 1
 Set var1(0) = Me
@@ -1963,30 +1963,30 @@ Set var1(0) = Nothing
 MyDoEvents
 
 End Sub
-Friend Sub PopUpPos(vv As Variant, ByVal x As Variant, ByVal y As Variant, ByVal y1 As Variant)
+Friend Sub PopUpPos(vv As Variant, ByVal X As Variant, ByVal Y As Variant, ByVal y1 As Variant)
 Dim that As GuiM2000, hmonitor As Long
 
-x = x + Left
-y = y + top + y1
+X = X + Left
+Y = Y + top + y1
 
 'hmonitor = FindFormSScreen(Me)
-hmonitor = FindMonitorFromPixel(x, y)
+hmonitor = FindMonitorFromPixel(X, Y)
 
 Set that = vv
 If Me Is that Then Exit Sub
 If that.Visible Then
 If Not that.enabled Then Exit Sub
 End If
-If x + that.Width > ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left Then
-If y + that.Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
-that.move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - that.Width, y - that.Height - y1 ' + ScrInfo(hmonitor).top
+If X + that.Width > ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left Then
+If Y + that.Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
+that.move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - that.Width, Y - that.Height - y1 ' + ScrInfo(hmonitor).top
 Else
-that.move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - that.Width, y '+ ScrInfo(hmonitor).top
+that.move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - that.Width, Y '+ ScrInfo(hmonitor).top
 End If
-ElseIf y + that.Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
-that.move x, y - that.Height - y1
+ElseIf Y + that.Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).top Then
+that.move X, Y - that.Height - y1
 Else
-that.move x, y
+that.move X, Y
 End If
 that.ShowmeALL
 PopupOn = True
@@ -1999,8 +1999,8 @@ Set LastGlist = this
 End Sub
 
 
-Private Sub gList2_PreviewKeyboardUnicode(A As String)
-SpreadKey A
+Private Sub gList2_PreviewKeyboardUnicode(a As String)
+SpreadKey a
 End Sub
 
 Private Sub glistN_CheckGotFocus()
@@ -2021,7 +2021,7 @@ If Not moveMe Then
                 End If
 End Sub
 
-Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 If item = -1 Then
 
 Else
@@ -2035,11 +2035,11 @@ lastitem = item
 End If
 End Sub
 
-Private Sub glistN_Fkey(A As Integer)
-If A > 1000 Then
-SendFKEY A - 1000
+Private Sub glistN_Fkey(a As Integer)
+If a > 1000 Then
+SendFKEY a - 1000
 Else
-SendFKEY A
+SendFKEY a
 End If
 End Sub
 
@@ -2068,47 +2068,47 @@ If mQuit Or Not Visible Then Yes = True
 MyDoEvents1 Me
 End Sub
 
-Private Sub ResizeMark_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub ResizeMark_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
     If Relax Then Exit Sub
     If Sizable Then
-        x = x + ResizeMark.Left
-        y = y + ResizeMark.top
+        X = X + ResizeMark.Left
+        Y = Y + ResizeMark.top
         dr = Button = 1
         ResizeMark.MousePointer = vbSizeNWSE
-        lX = x
-        lY = y
+        lX = X
+        lY = Y
         If dr Then Relax = False
     Else
         ResizeMark.MousePointer = 0
     End If
 End Sub
 
-Private Sub ResizeMark_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub ResizeMark_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Sizable And Not dr Then
-    x = x + ResizeMark.Left
-    y = y + ResizeMark.top
+    X = X + ResizeMark.Left
+    Y = Y + ResizeMark.top
     dr = Button = 1
     ResizeMark.MousePointer = vbSizeNWSE
-    lX = x
-    lY = y
+    lX = X
+    lY = Y
 End If
 End Sub
 
-Private Sub ResizeMark_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub ResizeMark_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim addy As Single, addX As Single, v As Long
 If Not Relax Then
-    x = x + ResizeMark.Left
-    y = y + ResizeMark.top
+    X = X + ResizeMark.Left
+    Y = Y + ResizeMark.top
     If Button = 0 Then If dr Then Me.MousePointer = 0: dr = False: Relax = False: Exit Sub
     Relax = True
     If dr Then
-         If y < (Height - 150) Or y >= Height Then addy = (y - lY) Else addy = 0 ' dv15 * 5
-         If x < (Width - 150) Or x >= Width Then addX = (x - lX) Else addX = 0 'dv15 * 5
+         If Y < (Height - 150) Or Y >= Height Then addy = (Y - lY) Else addy = 0 ' dv15 * 5
+         If X < (Width - 150) Or X >= Width Then addX = (X - lX) Else addX = 0 'dv15 * 5
          If addy = 0 And addX = 0 Then Relax = False: Exit Sub
          If Width + addX >= 1800 And Width + addX < VirtualScreenWidth() Then
              If Height + addy >= 1800 And Height + addy < VirtualScreenHeight() Then
-                lX = x
-                lY = y
+                lX = X
+                lY = Y
                 move Left, top, Width + addX, Height + addy
                 IhaveLastPos = False
                 If mIndex > -1 Then
@@ -2129,11 +2129,11 @@ If Not Relax Then
         Exit Sub
     Else
         If Sizable Then
-            If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
+            If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
                     dr = Button = 1
                     ResizeMark.MousePointer = vbSizeNWSE
-                    lX = x
-                    lY = y
+                    lX = X
+                    lY = Y
                     If dr Then Relax = False: Exit Sub
             Else
                 ResizeMark.MousePointer = 0
@@ -2304,13 +2304,13 @@ Private Sub PrintItem(mHdc As Long, c As String, r As RECT, Optional way As Long
     DrawText mHdc, StrPtr(c), -1, r, way
 End Sub
 Private Sub gListN_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
-Dim A As RECT, ofg As Long
+Dim a As RECT, ofg As Long
 If acckeys Is Nothing Then Exit Sub
 If acckeys.ExistKey(item) Then
-CopyFromLParamToRect A, thisrect
+CopyFromLParamToRect a, thisrect
 ofg = glistN.ForeColor
 SetTextColor thisHDC, rgb(128, 128, 64)
-PrintItem thisHDC, acckeys.Value + " ", A
+PrintItem thisHDC, acckeys.Value + " ", a
 SetTextColor thisHDC, ofg
 End If
 End Sub
@@ -2390,14 +2390,14 @@ End If
 End Sub
 
 
-Public Sub AddItem(A$)
+Public Sub AddItem(a$)
 If Not NoEventInfo Then Exit Sub
-glistN.additemFast A$
+glistN.additemFast a$
 End Sub
 
-Public Sub additemFast(A$)
+Public Sub additemFast(a$)
 If Not NoEventInfo Then Exit Sub
-glistN.additemFast A$
+glistN.additemFast a$
 End Sub
 Public Property Get MenuWidth() As Long
 MenuWidth = mMenuWidth
@@ -2425,12 +2425,12 @@ On Error Resume Next
 If item < 0 Then Exit Sub
 glistN.Removeitem item
 End Sub
-Public Sub Insert(item, A$)
+Public Sub Insert(item, a$)
 If Not NoEventInfo Then Exit Sub
 On Error Resume Next
 glistN.ListindexPrivateUse = item
 If glistN.ListIndex > -1 Then
-glistN.additemAtListIndex A$
+glistN.additemAtListIndex a$
 End If
 End Sub
 Public Sub MenuItemAtListIndex(Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional IdD)
@@ -2446,14 +2446,14 @@ glistN.MenuItem item, checked, radiobutton, firstate, str(IdD)
 End If
 glistN.menuEnabled(CLng(item - 1)) = enabledthis
 End Sub
-Public Sub MenuItem(A$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional ByVal IdD, Optional ByVal acc, Optional ByVal shift, Optional ByVal ctrl, Optional ByVal alt, Optional legend)
+Public Sub MenuItem(a$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional ByVal IdD, Optional ByVal acc, Optional ByVal shift, Optional ByVal ctrl, Optional ByVal alt, Optional legend)
 If Not NoEventInfo Then Exit Sub
 Dim item, disp$
-If Not A$ = vbNullString Then
-glistN.additemFast A$
+If Not a$ = vbNullString Then
+glistN.additemFast a$
 End If
 item = glistN.listcount
-If A$ = vbNullString Then
+If a$ = vbNullString Then
 glistN.AddSep
 Else
 If IsMissing(IdD) Then
@@ -2508,16 +2508,16 @@ Property Get id(item As Long) As String
 '
 id = glistN.id(item)
 End Property
-Public Sub MenuRadio(A$, Optional enabledthis As Boolean = True, Optional firstate As Boolean = False, Optional IdD)
+Public Sub MenuRadio(a$, Optional enabledthis As Boolean = True, Optional firstate As Boolean = False, Optional IdD)
 If Not NoEventInfo Then Exit Sub
 Dim item, checked As Boolean
 checked = False
 
-If Not A$ = vbNullString Then
-glistN.additemFast A$
+If Not a$ = vbNullString Then
+glistN.additemFast a$
 End If
 item = glistN.listcount
-If A$ = vbNullString Then
+If a$ = vbNullString Then
 glistN.AddSep
 Else
 If IsMissing(IdD) Then
@@ -2750,7 +2750,7 @@ End If
 End If
 DeleteObject my_brush
 End Sub
-Public Function GetPicture(ByVal s$, Optional Size, Optional ColorDepth, Optional x, Optional y) As StdPicture
+Public Function GetPicture(ByVal s$, Optional Size, Optional ColorDepth, Optional X, Optional Y) As StdPicture
 Dim where$
 On Error Resume Next
 where$ = CFname(s$)
@@ -2759,20 +2759,20 @@ If LenB(where$) = 0 Then
 Else
 where$ = GetDosPath(where$)
 If LenB(where$) = 0 Then Set GetPicture = LoadPicture(""): Exit Function
-If IsMissing(Size) And IsMissing(ColorDepth) And IsMissing(x) And IsMissing(y) Then
+If IsMissing(Size) And IsMissing(ColorDepth) And IsMissing(X) And IsMissing(Y) Then
 Set GetPicture = LoadPicture(where$)
-ElseIf IsMissing(ColorDepth) And IsMissing(x) And IsMissing(y) Then
+ElseIf IsMissing(ColorDepth) And IsMissing(X) And IsMissing(Y) Then
 Set GetPicture = LoadPicture(where$, Size)
-ElseIf IsMissing(x) And IsMissing(y) Then
+ElseIf IsMissing(X) And IsMissing(Y) Then
 Set GetPicture = LoadPicture(where$, Size, ColorDepth)
-ElseIf IsMissing(y) Then
-Set GetPicture = LoadPicture(where$, Size, ColorDepth, x)
+ElseIf IsMissing(Y) Then
+Set GetPicture = LoadPicture(where$, Size, ColorDepth, X)
 Else
-Set GetPicture = LoadPicture(where$, Size, ColorDepth, x, y)
+Set GetPicture = LoadPicture(where$, Size, ColorDepth, X, Y)
 End If
 End If
 End Function
-Public Sub ReloadIcon(ByVal s$, Optional Size, Optional ColorDepth, Optional x, Optional y)
+Public Sub ReloadIcon(ByVal s$, Optional Size, Optional ColorDepth, Optional X, Optional Y)
 Dim where$
 On Error Resume Next
 where$ = CFname(s$)
@@ -2786,16 +2786,16 @@ If LenB(where$) = 0 Then
 Else
 where$ = GetDosPath(where$)
     If LenB(where$) = 0 Then Exit Sub
-If IsMissing(Size) And IsMissing(ColorDepth) And IsMissing(x) And IsMissing(y) Then
+If IsMissing(Size) And IsMissing(ColorDepth) And IsMissing(X) And IsMissing(Y) Then
 Set icon = LoadPicture(where$)
-ElseIf IsMissing(ColorDepth) And IsMissing(x) And IsMissing(y) Then
+ElseIf IsMissing(ColorDepth) And IsMissing(X) And IsMissing(Y) Then
 Set icon = LoadPicture(where$, Size)
-ElseIf IsMissing(x) And IsMissing(y) Then
+ElseIf IsMissing(X) And IsMissing(Y) Then
 Set icon = LoadPicture(where$, Size, ColorDepth)
-ElseIf IsMissing(y) Then
-Set icon = LoadPicture(where$, Size, ColorDepth, x)
+ElseIf IsMissing(Y) Then
+Set icon = LoadPicture(where$, Size, ColorDepth, X)
 Else
-Set icon = LoadPicture(where$, Size, ColorDepth, x, y)
+Set icon = LoadPicture(where$, Size, ColorDepth, X, Y)
 End If
 End If
 If MyForm3 Is Nothing Then Exit Sub
@@ -2837,12 +2837,12 @@ Case 3
  glistN.menuEnabled(3) = True: glistN.menuEnabled(4) = False
  End Select
 End Sub
-Sub InsertMenuItem(A$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional IdD)
+Sub InsertMenuItem(a$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional IdD)
 If Not NoEventInfo Then Exit Sub
 Dim item
-glistN.additemAtListIndex A$
+glistN.additemAtListIndex a$
 item = glistN.ListIndex
-If A$ = vbNullString Then
+If a$ = vbNullString Then
 glistN.ListSep(item - 1) = True
 Else
 If IsMissing(IdD) Then
@@ -2879,11 +2879,11 @@ Property Let TitleIconColor(RHS As Long)
 End Property
 
 Sub TransparentTitle()
-Dim x  As Long, y As Long
+Dim X  As Long, Y As Long
 gList2.NoHeaderBackground = True
 gList2.BackStyle = 1
-gList2.GetLeftTop x, y
-gList2.RepaintFromOut Me.Image, x, y
+gList2.GetLeftTop X, Y
+gList2.RepaintFromOut Me.Image, X, Y
 gList2.ShowMe
 RefreshList = RefreshList + 1
 End Sub
@@ -2910,18 +2910,18 @@ End Property
 Friend Property Let modulename(ByVal RHS As String)
 PRmodulename$ = RHS
 End Property
-Friend Sub RegisterAcc(m, ControlName$, Optional Opcode As Long = 0)
+Friend Sub RegisterAcc(M, ControlName$, Optional Opcode As Long = 0)
 If acclist Is Nothing Then Set acclist = New FastCollection
-If acclist.ExistKey(m) Then acclist.RemoveWithNoFind
-acclist.AddKey m, ControlName$
+If acclist.ExistKey(M) Then acclist.RemoveWithNoFind
+acclist.AddKey M, ControlName$
 acclist.sValue = Opcode
 End Sub
-Friend Sub AccProces(m As Long)
+Friend Sub AccProces(M As Long)
 Dim todo As Long
 Dim shift As Long, ctrl As Long, alt As Long
 On Error Resume Next
 If Not acclist Is Nothing Then
-    If acclist.ExistKey(m) Then
+    If acclist.ExistKey(M) Then
         If acclist.Value = "" Then
             ' todo is negative
                 Dim item
@@ -2972,18 +2972,18 @@ If Not acclist Is Nothing Then
                 
                 todo = todo Mod 1000
                 If todo > 500 Then todo = todo - 500
-                Dim A As Control
-                Set A = Controls(acclist.Value)
+                Dim a As Control
+                Set a = Controls(acclist.Value)
                 Dim aa As gList, bb As GuiImage
-                If TypeOf A Is gList Then
-                    Set aa = A
+                If TypeOf a Is gList Then
+                    Set aa = a
                     aa.TakeKey CInt(todo), shift + ctrl + alt
-                ElseIf TypeOf A Is VB.PictureBox Then
+                ElseIf TypeOf a Is VB.PictureBox Then
                     Set bb = GuiControls(acclist.Value)
                     bb.TakeKey CInt(todo), shift + ctrl + alt
                 End If
             End If
-            m = 0
+            M = 0
             Exit Sub
         Else
         'Debug.Print "NOT ENABLED"
@@ -2993,44 +2993,44 @@ If Not acclist Is Nothing Then
     End If
 End If
 End Sub
-Public Sub AccKey(A, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
-If MyIsNumeric(A) Then
-A = CLng(A)
-If A < 0 Then Exit Sub
-If A > 499 Then Exit Sub
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
 Else
-A = UCase(A)
-Select Case A
+a = UCase(a)
+Select Case a
 Case "F1" To "F9"
-A = 611 + val(Mid(A, 2))
+a = 611 + val(Mid(a, 2))
 Case Else
-A = AscW(A)
-If A > 126 Then A = 0
+a = AscW(a)
+If a > 126 Then a = 0
 End Select
 End If
-If A = 0 Then Exit Sub
-A = A - 1000 * shift - 10000 * ctrl - 100000 * alt
-RegisterAcc A, "gList2", Opcode
+If a = 0 Then Exit Sub
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+RegisterAcc a, "gList2", Opcode
 End Sub
-Public Sub SendScanCode(A, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean)
+Public Sub SendScanCode(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean)
 ' send only scancodes if a<500 or a-500 for a>500 with extend option. F4 is 615 (500+115)
-If MyIsNumeric(A) Then
-A = CLng(A)
-If A < 0 Then Exit Sub
-If A > 754 Then Exit Sub
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 754 Then Exit Sub
 Else
-A = UCase(A)
-Select Case A
+a = UCase(a)
+Select Case a
 Case "F1" To "F9"
-A = 611 + val(Mid(A, 2))
+a = 611 + val(Mid(a, 2))
 Case Else
-A = AscW(A)
-If A > 254 Then A = 0
+a = AscW(a)
+If a > 254 Then a = 0
 End Select
 End If
-If A = 0 Then Exit Sub
-SendAKey A, shift, ctrl, alt
+If a = 0 Then Exit Sub
+SendAKey a, shift, ctrl, alt
 End Sub
 Property Get CapsLock() As Boolean
     CapsLock = CapsLockOn()

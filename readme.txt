@@ -1,8 +1,10 @@
 M2000 Interpreter and Environment
-Version 13 revision 37 active-X
-1. Fix: Edit A() as B() (rename a function from M2000 CLI)
-2. Adding ucChartBar user control
-3. Addition of some properties for ucChartArea
+Version 13 revision 38 active-X
+
+Update for ucchartArea, ucchartBar, ucPieChart controls
+
+
+
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
 

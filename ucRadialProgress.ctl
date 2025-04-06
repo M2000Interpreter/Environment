@@ -19,18 +19,17 @@ Option Explicit 'simple, minimal (DPI-aware) implementation of a "pure GDI-based
 
 Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC&, ByVal nIndex&) As Long
 Private Declare Function SetStretchBltMode Lib "gdi32" (ByVal hDC&, ByVal nStretchMode&) As Long
-Private Declare Function StretchBlt Lib "gdi32" (ByVal hDC&, ByVal x&, ByVal y&, ByVal nWidth&, ByVal nHeight&, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
-Private Declare Function MoveTo Lib "gdi32" Alias "MoveToEx" (ByVal hDC&, ByVal x&, ByVal y&, Optional ByVal lpPoint As Long) As Long
-Private Declare Function LineTo Lib "gdi32" (ByVal hDC&, ByVal x&, ByVal y&) As Long
-Private Declare Function TextOutW Lib "gdi32" (ByVal hDC&, ByVal x&, ByVal y&, ByVal lpString&, ByVal nCount&) As Long
+Private Declare Function StretchBlt Lib "gdi32" (ByVal hDC&, ByVal X&, ByVal Y&, ByVal nWidth&, ByVal nHeight&, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Private Declare Function MoveTo Lib "gdi32" Alias "MoveToEx" (ByVal hDC&, ByVal X&, ByVal Y&, Optional ByVal lpPoint As Long) As Long
+Private Declare Function LineTo Lib "gdi32" (ByVal hDC&, ByVal X&, ByVal Y&) As Long
+Private Declare Function TextOutW Lib "gdi32" (ByVal hDC&, ByVal X&, ByVal Y&, ByVal lpString&, ByVal nCount&) As Long
 
 Private mPercVal#, mBB As VB.PictureBox, NumElm&, GapRatio!, InnerRadiusPerc!, TopColor&, BottomColor&
 
 Private Sub UserControl_Initialize()
-  ClipBehavior = 0: BackStyle = 0: FillStyle = 1: ScaleMode = vbPixels 'ensure transparent behaviour
-  
+  ClipBehavior = 0: BackStyle = 0: FillStyle = 1 'ensure transparent behaviour
   NumElm = 20: GapRatio = 0.15: InnerRadiusPerc = 0.75 'initialize a few internal "math-vars"
-  TopColor = &HAA00&: BottomColor = vbWhite: FontName = "Arial" 'plus a few "formatting-vars"
+  TopColor = &HAA00&: BottomColor = 0 ' vbWhite: FontName = "Arial" 'plus a few "formatting-vars"
 End Sub
 
 Public Sub ChangeDefaults(NumElements, StripeTopColor, Optional ByVal ElementGapRatio# = 0.15, Optional ByVal InnerRadiusRatio# = 0.75, Optional StripeBottomColor, Optional FontName, Optional TextColor)
@@ -53,29 +52,38 @@ Public Sub Refresh()
   UserControl.Refresh
 End Sub
 
-Private Sub UserControl_HitTest(x As Single, y As Single, HitResult As Integer)
+Private Sub UserControl_HitTest(X As Single, Y As Single, HitResult As Integer)
   If UserControl.enabled Then HitResult = vbHitResultHit
 End Sub
-
+Property Get enabled() As Boolean
+    enabled = UserControl.enabled
+End Property
+Property Let enabled(ByVal bValue As Boolean)
+    If UserControl.enabled <> bValue Then
+        UserControl.enabled = bValue
+    End If
+    PropertyChanged
+End Property
 Private Sub UserControl_Show()
   If Not (Ambient.UserMode And mBB Is Nothing) Then Exit Sub
-  Set mBB = Parent.Controls.Add("VB.PictureBox", "mBB" & ObjPtr(Me))
-      mBB.BorderStyle = 0: mBB.AutoRedraw = True: mBB.ScaleMode = vbPixels
+    Set mBB = Parent.Controls.Add("VB.PictureBox", "HIDE_" & ObjPtr(Me))
+    mBB.BorderStyle = 0: mBB.AutoRedraw = True: mBB.ScaleMode = vbPixels: mBB.enabled = False
+    mBB.Visible = False
+      
 End Sub
 
 Private Sub UserControl_Paint()
 Const D2R# = 1.74532925199433E-02, sc& = 6
 Static a&, Cs#, Sn#, x1&(720), y1&(720), x2&(720), y2&(720) 'statics, to avoid re-allocs
-
+ ScaleMode = vbPixels
   Dim cx#: cx = ScaleWidth / 2
   Dim cy#: cy = ScaleHeight / 2
   Dim r1#: r1 = IIf(cx < cy, cx, cy) - GetDeviceCaps(hDC, 88) / 96
-  Dim r2#: r2 = r1 * InnerRadiusPerc
+  Dim R2#: R2 = r1 * InnerRadiusPerc
   Dim sL$: sL = Format$(mPercVal, "0%")
   
-  FontSize = r2 * 0.4 / (GetDeviceCaps(hDC, 88) / 96)
+  FontSize = R2 * 0.4 / (GetDeviceCaps(hDC, 88) / 96)
   TextOutW hDC, cx - TextWidth(sL) * 0.48, cy - TextHeight(sL) * 0.5, StrPtr(sL), Len(sL)
- 
   If mBB Is Nothing Then Circle (cx, cy), r1 - 1, TopColor: Exit Sub
   If mBB.Width <> ScaleX(cx * 2 * sc, 3, Parent.ScaleMode) Or mBB.Height <> ScaleY(cy * 2 * sc, 3, Parent.ScaleMode) Then _
      mBB.move 0, 0, ScaleX(cx * 2 * sc, 3, Parent.ScaleMode), ScaleY(cy * 2 * sc, 3, Parent.ScaleMode)
@@ -86,7 +94,7 @@ Static a&, Cs#, Sn#, x1&(720), y1&(720), x2&(720), y2&(720) 'statics, to avoid r
         Cs = Cos((a / 2 - 90 + GapRatio * 180 / NumElm) * D2R)
         Sn = Sin((a / 2 - 90 + GapRatio * 180 / NumElm) * D2R)
         x1(a) = sc * (cx + r1 * Cs): y1(a) = sc * (cy + r1 * Sn)
-        x2(a) = sc * (cx + r2 * Cs): y2(a) = sc * (cy + r2 * Sn)
+        x2(a) = sc * (cx + R2 * Cs): y2(a) = sc * (cy + R2 * Sn)
     Next
 
     mBB.ForeColor = TopColor 'first draw the circular strip up to the current Perc-Value

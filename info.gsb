@@ -37074,7 +37074,11 @@ MODULE UCCHART {function newCollection {
 flush
 
 declare FORM1 form
-declare Chart type "M2000.ucChartArea" form FORM1
+if random(1, 2)=2  then
+	declare Chart type "M2000.ucChartArea" form FORM1
+else
+	declare Chart type "M2000.ucChartBar" form FORM1
+end if
 Method FORM1,"move", 1000, 1000, 14000, 12000
 Layer Form1 {Gradient 11, #7777aa}
 With Chart,"BackColorOpacity", 0, "title", "Chart Example", "LinesCurve", true

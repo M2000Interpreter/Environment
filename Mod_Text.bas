@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 37
+Global Const Revision = 38
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -48601,7 +48601,7 @@ If w1 = 1 Or w1 = 3 Then
                 
                 If bstack.tpointer > 0 Then
                     w1 = bstack.tpointer
-                    Debug.Print var(w1).GroupName
+                    'Debug.Print var(w1).GroupName
                     GoTo contGe
                 End If
             ElseIf s$ = "ауто" Then

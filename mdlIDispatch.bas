@@ -29,6 +29,7 @@ Enum cbnCallTypes
 End Enum
 ' Maybe need this http://support2.microsoft.com/kb/2870467/
 'To update oleaut32
+Public Declare Function SetParent Lib "user32" (ByVal hWndChild As Long, ByVal hWndNewParent As Long) As Long
 Private Declare Sub VariantCopy Lib "OleAut32.dll" (ByRef pvargDest As Variant, ByRef pvargSrc As Variant)
 Private KnownProp As FastCollection
 Private Init As Boolean
@@ -44,7 +45,7 @@ Public Function FindDISPID(pobjTarget As Object, ByVal pstrProcName As Variant) 
     FindDISPID = -1
     If pobjTarget Is Nothing Then Exit Function
 
-    Dim A$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
+    Dim a$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
     ReDim myptr(0 To 0)
     myptr(0) = StrPtr(pstrProcName)
     
@@ -337,7 +338,8 @@ conthere:
                     End If
                     Set myform = pobjTarget
                     MoveFormToOtherMonitorOnly myform, center2mouse
-                    pobjTarget.Refresh
+                    Set myform = Nothing
+                   ' pobjTarget.Refresh
                     Dim handlepopup As Boolean
                     If Not Screen.ActiveForm Is Nothing Then
                         If TypeOf Screen.ActiveForm Is GuiM2000 Then
@@ -387,7 +389,9 @@ conthere:
                         Set mm = X
                         ' If x.Modal = 0 Then
                         mm.TestModal mycodeid
+                        If Not mm Is pobjTarget Then
                         If mm.Enablecontrol Then Set z = X
+                        End If
                         Set mm = Nothing
                         'End If
                     End If
@@ -397,7 +401,8 @@ conthere:
                     Set mm = z
                     If mm.Modal = Modalid Then
                 
-                    Else
+                    ElseIf Not mm Is pobjTarget Then
+                    
                         mm.ShowmeALL
                         If mm.Visible Then mm.SetFocus
                     End If
@@ -639,14 +644,14 @@ Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR
 
     ' Get IDispatch from object
     Set IDsp = pobjTarget
-    Dim aa As Long, I As Integer, K As Integer
+    Dim aa As Long, i As Integer, K As Integer
     aa = DISPID_VALUE
     ' WE HAVE DISPIP
     If VarType(ThisIndex) = 8204 Then
                  ReDim varArr(0 To UBound(ThisIndex))
                  K = 0
-                 For I = UBound(ThisIndex) - 1 To 0 Step -1
-                    varArr(K) = ThisIndex(I)
+                 For i = UBound(ThisIndex) - 1 To 0 Step -1
+                    varArr(K) = ThisIndex(i)
                     K = K + 1
                  Next
                 With params
@@ -792,13 +797,13 @@ Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, val1, E
     Set IDsp = pobjTarget
 
     ' WE HAVE DISPIP
-    Dim aa As Long, I As Integer, K As Integer
+    Dim aa As Long, i As Integer, K As Integer
     aa = DISPID_PROPERTYPUT
         If VarType(ThisIndex) = 8204 Then
                  ReDim varArr(0 To UBound(ThisIndex) + 1)
                  K = 1
-                 For I = UBound(ThisIndex) - 1 To 0 Step -1
-                    varArr(K) = ThisIndex(I)
+                 For i = UBound(ThisIndex) - 1 To 0 Step -1
+                    varArr(K) = ThisIndex(i)
                     K = K + 1
                  Next
                  varArr(0) = val1

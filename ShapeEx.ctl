@@ -78,9 +78,9 @@ Private Type XFORM
     eDy As Single
 End Type
 
-Private Declare Function SetGraphicsMode Lib "gdi32" (ByVal hdc As Long, ByVal iMode As Long) As Long
-Private Declare Function SetWorldTransform Lib "gdi32" (ByVal hdc As Long, lpXform As XFORM) As Long
-Private Declare Function ModifyWorldTransform Lib "gdi32" (ByVal hdc As Long, lpXform As XFORM, ByVal iMode As Long) As Long
+Private Declare Function SetGraphicsMode Lib "gdi32" (ByVal hDC As Long, ByVal iMode As Long) As Long
+Private Declare Function SetWorldTransform Lib "gdi32" (ByVal hDC As Long, lpXform As XFORM) As Long
+Private Declare Function ModifyWorldTransform Lib "gdi32" (ByVal hDC As Long, lpXform As XFORM, ByVal iMode As Long) As Long
 Private Const MWT_IDENTITY = 1
 Private Const MWT_LEFTMULTIPLY = 2
 'Private Const MWT_RIGHTMULTIPLY = 3
@@ -93,10 +93,10 @@ Private Const Pi = 3.14159265358979
 Private Const WM_USER As Long = &H400
 Private Const WM_INVALIDATE As Long = WM_USER + 11 ' custom message
 
-Private Declare Function GetClipRgn Lib "gdi32" (ByVal hdc As Long, ByVal hRgn As Long) As Long
+Private Declare Function GetClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function GetRgnBox Lib "gdi32" (ByVal hRgn As Long, lpRect As RECT) As Long
 Private Declare Function CreateRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
-Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hdc As Long, ByVal hRgn As Long) As Long
+Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Private Declare Function InvalidateRectAsNull Lib "user32" Alias "InvalidateRect" (ByVal hWnd As Long, ByVal lpRect As Long, ByVal bErase As Long) As Long
 'Private Declare Function GetUpdateRect Lib "user32" (ByVal hWnd As Long, lpRect As RECT, ByVal bErase As Long) As Long
@@ -111,21 +111,15 @@ Private Type RECT
     Bottom As Long
 End Type
 
-Private Type GDIPlusStartupInput
-    GdiPlusVersion                      As Long
-    DebugEventCallback                  As Long
-    SuppressBackgroundThread            As Long
-    SuppressExternalCodecs              As Long
-End Type
  
 Private Type POINTL
     X As Long
     Y As Long
 End Type
 
-Private Declare Function GdipCreateFromHDC Lib "gdiplus" (ByVal hdc As Long, ByRef graphics As Long) As Long
+Private Declare Function GdipCreateFromHDC Lib "gdiplus" (ByVal hDC As Long, ByRef graphics As Long) As Long
 Private Declare Function GdipDeleteGraphics Lib "gdiplus" (ByVal graphics As Long) As Long
-Private Declare Function GdiplusStartup Lib "gdiplus" (ByRef token As Long, ByRef lpInput As GDIPlusStartupInput, Optional ByRef lpOutput As Any) As Long
+Private Declare Function GdiplusStartup Lib "gdiplus" (hToken As Long, pInputBuf As Any, Optional ByVal pOutputBuf As Long = 0) As Long
 Private Declare Function GdiplusShutdown Lib "gdiplus" (ByVal token As Long) As Long
 Private Declare Function GdipSetSmoothingMode Lib "GdiPlus.dll" (ByVal mGraphics As Long, ByVal mSmoothingMode As Long) As Long
 Private Declare Function GdipDeleteBrush Lib "GdiPlus.dll" (ByVal mBrush As Long) As Long
@@ -301,15 +295,21 @@ Private mStyle3D As SEStyle3DConstants
 Private mStyle3DEffect As SEStyle3DEffectConstants
 Private mUseSubclassing As SESubclassingConstants
 
-Private mGdipToken As Long
-Private mContainerHwnd As Long
 Private mAttached As Boolean
 Private mShiftPutAutomatically As Single
 Private mCurvingFactor2 As Single
 Private mUserMode As Boolean
 Private mSubclassed As Boolean
 Private mDrawingOutsideUC As Boolean
-
+Property Get enabled() As Boolean
+    enabled = UserControl.enabled
+End Property
+Property Let enabled(ByVal bValue As Boolean)
+    If UserControl.enabled <> bValue Then
+        UserControl.enabled = bValue
+    End If
+    PropertyChanged
+End Property
 Private Sub tmrPainting_Timer()
     tmrPainting.enabled = False
 End Sub
@@ -360,7 +360,6 @@ Private Sub UserControl_InitProperties()
     mUseSubclassing = mdef_UseSubclassing
     
     On Error Resume Next
-    mContainerHwnd = UserControl.ContainerHwnd
     mUserMode = Ambient.UserMode
     On Error GoTo 0
     SetCurvingFactor2
@@ -404,8 +403,8 @@ Private Sub UserControl_Paint()
     Dim iAuxExpand As Long
     
     If (mRotationDegrees > 0) Or (mFlipped <> seFlippedNo) Then
-        iGMPrev = SetGraphicsMode(UserControl.hdc, GM_ADVANCED)
-        ModifyWorldTransform UserControl.hdc, mtx1, MWT_IDENTITY
+        iGMPrev = SetGraphicsMode(UserControl.hDC, GM_ADVANCED)
+        ModifyWorldTransform UserControl.hDC, mtx1, MWT_IDENTITY
         If mRotationDegrees = 0 Then
             c = 1
             s = 0
@@ -486,7 +485,7 @@ Private Sub UserControl_Paint()
     
     mDrawingOutsideUC = False
     hRgn = CreateRectRgn(0, 0, 0, 0)
-    If GetClipRgn(UserControl.hdc, hRgn) = 0& Then  ' hDc is one passed to Paint
+    If GetClipRgn(UserControl.hDC, hRgn) = 0& Then  ' hDc is one passed to Paint
         DeleteObject hRgn: hRgn = 0
     Else
         GetRgnBox hRgn, rgnRect             ' get its bounds & adjust our region accordingly (i.e.,expand 1 pixel)
@@ -495,11 +494,11 @@ Private Sub UserControl_Paint()
         If (iExpandForPen <> 0) Or (iExpandOutsideForAngle <> 0) Or (iExpandOutsideForFigure <> 0) Or sTheLastTimeWasExpanded Then
             hRgnExpand = CreateRectRgn(rgnRect.Left - iExpandForPen - iExpandOutsideForAngle - iExpandOutsideForFigure, rgnRect.top - iExpandForPen - iExpandOutsideForAngle - iExpandOutsideForFigure, rgnRect.Right + iExpandForPen + iExpandOutsideForAngle + iExpandOutsideForFigure, rgnRect.Bottom + iExpandForPen + iExpandOutsideForAngle + iExpandOutsideForFigure)
         
-            SelectClipRgn UserControl.hdc, hRgnExpand
+            SelectClipRgn UserControl.hDC, hRgnExpand
             DeleteObject hRgnExpand
             If Not tmrPainting.enabled Then
-                If (mContainerHwnd <> 0) And mSubclassed Then
-                    PostMessage mContainerHwnd, WM_INVALIDATE, 0&, 0&
+                If (UserControl.ContainerHwnd <> 0) And mSubclassed Then
+                    PostMessage UserControl.ContainerHwnd, WM_INVALIDATE, 0&, 0&
                 End If
             End If
             mDrawingOutsideUC = True
@@ -510,17 +509,17 @@ Private Sub UserControl_Paint()
     tmrPainting.enabled = True
     
     If (mRotationDegrees > 0) Or (mFlipped <> seFlippedNo) Then
-        SetWorldTransform UserControl.hdc, mtx1
-        ModifyWorldTransform UserControl.hdc, mtx2, MWT_LEFTMULTIPLY
+        SetWorldTransform UserControl.hDC, mtx1
+        ModifyWorldTransform UserControl.hDC, mtx2, MWT_LEFTMULTIPLY
     End If
     
     Draw
     
-    If hRgnExpand <> 0 Then SelectClipRgn UserControl.hdc, hRgn  ' restore original clip region
+    If hRgnExpand <> 0 Then SelectClipRgn UserControl.hDC, hRgn  ' restore original clip region
     If hRgn <> 0 Then DeleteObject hRgn
     
     If (mRotationDegrees > 0) Or (mFlipped <> seFlippedNo) Then
-        SetGraphicsMode UserControl.hdc, iGMPrev
+        SetGraphicsMode UserControl.hDC, iGMPrev
     End If
 End Sub
 
@@ -552,7 +551,6 @@ Private Sub UserControl_ReadProperties(PropBag As PropertyBag)
     Set UserControl.MouseIcon = mMouseIcon
     
     On Error Resume Next
-    mContainerHwnd = UserControl.ContainerHwnd
     mUserMode = Ambient.UserMode
     On Error GoTo 0
     SetCurvingFactor2
@@ -561,11 +559,8 @@ End Sub
 
 Private Sub UserControl_Terminate()
     pvUnsubclass
-    If mGdipToken <> 0 Then
-        TerminateGDI
-    End If
-    
-    If (mBorderWidth > 1) Or (mRotationDegrees > 0) Then InvalidateRectAsNull mContainerHwnd, 0&, 1& ' paint the container when the control is deleted if the BorderWidth is greater than 1 or the control is rotated (if it painted outside its bounds)
+   On Error Resume Next
+    If (mBorderWidth > 1) Or (mRotationDegrees > 0) Then InvalidateRectAsNull UserControl.ContainerHwnd, 0&, 1& ' paint the container when the control is deleted if the BorderWidth is greater than 1 or the control is rotated (if it painted outside its bounds)
 End Sub
 
 Private Sub UserControl_WriteProperties(PropBag As PropertyBag)
@@ -793,8 +788,8 @@ Public Property Let RotationDegrees(ByVal nValue As Single)
             mRotationDegrees = nValue
             Me.Refresh
             If mDrawingOutsideUC Then
-                If (mContainerHwnd <> 0) And mSubclassed Then
-                    PostMessage mContainerHwnd, WM_INVALIDATE, 0&, 0&
+                If (UserControl.ContainerHwnd <> 0) And mSubclassed Then
+                    PostMessage UserControl.ContainerHwnd, WM_INVALIDATE, 0&, 0&
                 End If
             End If
             PropertyChanged "RotationDegrees"
@@ -818,8 +813,8 @@ Public Property Let Opacity(ByVal nValue As Single)
             mOpacity = nValue
             Me.Refresh
             If mDrawingOutsideUC Then
-                If (mContainerHwnd <> 0) And mSubclassed Then
-                    PostMessage mContainerHwnd, WM_INVALIDATE, 0&, 0&
+                If (UserControl.ContainerHwnd <> 0) And mSubclassed Then
+                    PostMessage UserControl.ContainerHwnd, WM_INVALIDATE, 0&, 0&
                 End If
             End If
             PropertyChanged "Opacity"
@@ -868,8 +863,8 @@ Public Property Let CurvingFactor(ByVal nValue As Integer)
         SetCurvingFactor2
         Me.Refresh
         If mDrawingOutsideUC Then
-            If (mContainerHwnd <> 0) And mSubclassed Then
-                PostMessage mContainerHwnd, WM_INVALIDATE, 0&, 0&
+            If (UserControl.ContainerHwnd <> 0) And mSubclassed Then
+                PostMessage UserControl.ContainerHwnd, WM_INVALIDATE, 0&, 0&
             End If
         End If
         PropertyChanged "CurvingFactor"
@@ -967,19 +962,19 @@ Public Property Let UseSubclassing(ByVal nValue As SESubclassingConstants)
             pvSubclass
             If mSubclassed Then
                 If mDrawingOutsideUC Then
-                    If (mContainerHwnd <> 0) And mSubclassed Then
-                        PostMessage mContainerHwnd, WM_INVALIDATE, 0&, 0&
+                    If (UserControl.ContainerHwnd <> 0) And mSubclassed Then
+                        PostMessage UserControl.ContainerHwnd, WM_INVALIDATE, 0&, 0&
                     End If
                 End If
             Else
-                If mContainerHwnd <> 0 Then
-                    PeekMessage iMessage, mContainerHwnd, WM_INVALIDATE, WM_INVALIDATE, PM_REMOVE  ' remove posted message, if any
+                If UserControl.ContainerHwnd <> 0 Then
+                    PeekMessage iMessage, UserControl.ContainerHwnd, WM_INVALIDATE, WM_INVALIDATE, PM_REMOVE  ' remove posted message, if any
                 End If
             End If
         Else
             If mSubclassed Then pvUnsubclass
-            If mContainerHwnd <> 0 Then
-                PeekMessage iMessage, mContainerHwnd, WM_INVALIDATE, WM_INVALIDATE, PM_REMOVE  ' remove posted message, if any
+            If UserControl.ContainerHwnd <> 0 Then
+                PeekMessage iMessage, UserControl.ContainerHwnd, WM_INVALIDATE, WM_INVALIDATE, PM_REMOVE  ' remove posted message, if any
             End If
         End If
         PropertyChanged "UseSubclassing"
@@ -1015,8 +1010,7 @@ Private Sub Draw()
     Dim iShift As Long
     Dim iHalfBorderWidth As Long
     
-    If mGdipToken = 0 Then InitGDI
-    If GdipCreateFromHDC(UserControl.hdc, iGraphics) = 0 Then
+    If GdipCreateFromHDC(UserControl.hDC, iGraphics) = 0 Then
         
         If mFillStyle = seFSSolid Then
             iFilled = True
@@ -2646,15 +2640,13 @@ Private Function ConvertColor(nColor As Long, nOpacity As Single) As Long
 End Function
 
 Private Sub InitGDI()
-    Dim GdipStartupInput As GDIPlusStartupInput
-    GdipStartupInput.GdiPlusVersion = 1&
-    Call GdiplusStartup(mGdipToken, GdipStartupInput, ByVal 0)
+    Dim aInput(0 To 3)  As Long
+    If GetModuleHandle("gdiplus") = 0 Then
+        aInput(0) = 1
+        Call GdiplusStartup(0, aInput(0))
+    End If
 End Sub
 
-Private Sub TerminateGDI()
-    Call GdiplusShutdown(mGdipToken)
-    mGdipToken = 0
-End Sub
 
 Private Property Get SmoothingMode() As Long
     If mQuality = seQualityHigh Then
@@ -2673,7 +2665,7 @@ End Property
 Private Sub pvSubclass()
     Dim iDo As Boolean
     
-    If mContainerHwnd <> 0 Then
+    If UserControl.ContainerHwnd <> 0 Then
         If mUseSubclassing = seSCYes Then
            iDo = True
         ElseIf mUseSubclassing = seSCNotInIDE Then
@@ -2686,7 +2678,7 @@ Private Sub pvSubclass()
             End If
         End If
         If iDo Then
-            Set m_pSubclass = InitSubclassingThunk(mContainerHwnd, InitAddressOfMethod().SubclassProc(0, 0, 0, 0, 0))
+            Set m_pSubclass = InitSubclassingThunk(UserControl.ContainerHwnd, InitAddressOfMethod().SubclassProc(0, 0, 0, 0, 0))
             mSubclassed = True
         End If
     End If

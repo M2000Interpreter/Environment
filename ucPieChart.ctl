@@ -113,10 +113,10 @@ Private Declare Function GdipFillPie Lib "GdiPlus.dll" (ByVal mGraphics As Long,
 Private Declare Function GdipAddPathArcI Lib "GdiPlus.dll" (ByVal mPath As Long, ByVal mX As Long, ByVal mY As Long, ByVal mWidth As Long, ByVal mHeight As Long, ByVal mStartAngle As Single, ByVal mSweepAngle As Single) As Long
 
 
-Private Declare Function GdipIsVisiblePathPoint Lib "gdiplus" (ByVal path As Long, ByVal X As Single, ByVal y As Single, ByVal graphics As Long, result As Long) As Long
-Private Declare Function GdipAddPathPie Lib "gdiplus" (ByVal path As Long, ByVal X As Single, ByVal y As Single, ByVal Width As Single, ByVal Height As Single, ByVal startAngle As Single, ByVal sweepAngle As Single) As Long
+Private Declare Function GdipIsVisiblePathPoint Lib "gdiplus" (ByVal path As Long, ByVal X As Single, ByVal Y As Single, ByVal graphics As Long, result As Long) As Long
+Private Declare Function GdipAddPathPie Lib "gdiplus" (ByVal path As Long, ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single, ByVal startAngle As Single, ByVal sweepAngle As Single) As Long
 Private Declare Function GdipAddPathLine Lib "gdiplus" (ByVal path As Long, ByVal x1 As Single, ByVal y1 As Single, ByVal x2 As Single, ByVal y2 As Single) As Long
-Private Declare Function GdipAddPathArc Lib "gdiplus" (ByVal path As Long, ByVal X As Single, ByVal y As Single, ByVal Width As Single, ByVal Height As Single, ByVal startAngle As Single, ByVal sweepAngle As Single) As Long
+Private Declare Function GdipAddPathArc Lib "gdiplus" (ByVal path As Long, ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single, ByVal startAngle As Single, ByVal sweepAngle As Single) As Long
 Private Declare Function GdipGetPathLastPoint Lib "gdiplus" (ByVal path As Long, lastPoint As POINTF) As Long
 Private Declare Function GdipClosePathFigure Lib "GdiPlus.dll" (ByVal mPath As Long) As Long
 
@@ -158,12 +158,12 @@ End Enum
 
 Private Type POINTL
     X As Long
-    y As Long
+    Y As Long
 End Type
 
 Private Type POINTF
     X As Single
-    y As Single
+    Y As Single
 End Type
 
 Private Type SIZEF
@@ -268,12 +268,12 @@ Private Const LOGPIXELSY                As Long = 90
 Private Const SmoothingModeAntiAlias    As Long = 4
 Private Const GDIP_OK                   As Long = &H0
 
-Public Event ItemClick(index As Long)
+Public Event ItemClick(Index As Long)
 Public Event Click()
 Public Event DblClick()
-Public Event MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
-Public Event MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
-Public Event MouseUp(Button As Integer, shift As Integer, X As Single, y As Single)
+Public Event MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
+Public Event MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
+Public Event MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 'Public Event PrePaint(hdc As Long)
 'Public Event PostPaint(ByVal hdc As Long)
 'Public Event KeyPress(KeyAscii As Integer)
@@ -305,7 +305,6 @@ Public Enum LabelsPositions
     LP_TwoColumns
 End Enum
 
-Dim c_lhWnd As Long
 Dim nScale As Single
 
 Dim m_Title As String
@@ -358,7 +357,6 @@ Dim HotItem As Long
 Dim m_PT As POINTL
 Dim m_Left As Long
 Dim m_Top As Long
-Dim GdipToken As Long
 
 Public Property Get Image(Optional ByVal Width As Long, Optional ByVal Height As Long) As IPicture
     Dim lDC As Long
@@ -409,31 +407,31 @@ Public Property Get Image(Optional ByVal Width As Long, Optional ByVal Height As
     
 End Property
 
-Public Sub GetCenterPie(X As Single, y As Single)
+Public Sub GetCenterPie(X As Single, Y As Single)
     X = m_CenterCircle.X
-    y = m_CenterCircle.y
+    Y = m_CenterCircle.Y
 End Sub
 
-Public Property Get count() As Long
-    count = ItemsCount
+Public Property Get Count() As Long
+    Count = ItemsCount
 End Property
 
-Public Property Let Special(index As Long, Value As Boolean)
-    m_Item(index).Special = Value
+Public Property Let Special(Index As Long, Value As Boolean)
+    m_Item(Index).Special = Value
     Me.Refresh
 End Property
 
-Public Property Get Special(index As Long) As Boolean
-    Special = m_Item(index).Special
+Public Property Get Special(Index As Long) As Boolean
+    Special = m_Item(Index).Special
 End Property
 
-Public Property Let ItemColor(index As Long, Value As OLE_COLOR)
-    m_Item(index).ItemColor = Value
+Public Property Let ItemColor(Index As Long, Value As OLE_COLOR)
+    m_Item(Index).ItemColor = Value
     Me.Refresh
 End Property
 
-Public Property Get ItemColor(index As Long) As OLE_COLOR
-    ItemColor = m_Item(index).ItemColor
+Public Property Get ItemColor(Index As Long) As OLE_COLOR
+    ItemColor = m_Item(Index).ItemColor
 End Property
 
 Public Sub Clear()
@@ -479,7 +477,7 @@ End Property
 Public Property Set TitleFont(New_Font As StdFont)
     With m_TitleFont
         .Name = New_Font.Name
-        .size = New_Font.size
+        .Size = New_Font.Size
         .bold = New_Font.bold
         .Italic = New_Font.Italic
         .Underline = New_Font.Underline
@@ -544,7 +542,7 @@ End Property
 Public Property Set Font(New_Font As StdFont)
     With UserControl.Font
         .Name = New_Font.Name
-        .size = New_Font.size
+        .Size = New_Font.Size
         .bold = New_Font.bold
         .Italic = New_Font.Italic
         .Underline = New_Font.Underline
@@ -725,16 +723,16 @@ Private Sub tmrMOUSEOVER_Timer()
     Dim RECT As RectL
   
     GetCursorPos pt
-    ScreenToClient c_lhWnd, pt
+    ScreenToClient UserControl.ContainerHwnd, pt
  
     With RECT
         .Left = m_PT.X - (m_Left - ScaleX(Extender.Left, vbContainerSize, UserControl.ScaleMode))
-        .top = m_PT.y - (m_Top - ScaleY(Extender.top, vbContainerSize, UserControl.ScaleMode))
+        .top = m_PT.Y - (m_Top - ScaleY(Extender.top, vbContainerSize, UserControl.ScaleMode))
         .Width = UserControl.ScaleWidth
         .Height = UserControl.ScaleHeight
     End With
 
-    If PtInRectL(RECT, pt.X, pt.y) = 0 Then
+    If PtInRectL(RECT, pt.X, pt.Y) = 0 Then
         'mHotBar = -1
         HotItem = -1
         tmrMOUSEOVER.Interval = 0
@@ -744,8 +742,6 @@ Private Sub tmrMOUSEOVER_Timer()
 End Sub
 
 Private Sub UserControl_ReadProperties(PropBag As PropertyBag)
-    c_lhWnd = UserControl.ContainerHwnd
-
     With PropBag
         m_Title = .ReadProperty("Title", Ambient.DisplayName)
         m_BackColor = .ReadProperty("BackColor", vbWhite)
@@ -778,7 +774,7 @@ Private Sub UserControl_ReadProperties(PropBag As PropertyBag)
         m_BorderRound = .ReadProperty("BorderRound", 0)
     End With
         
-    If Not Ambient.UserMode Then Call Example
+   '1 If Not Ambient.UserMode Then Call Example
 End Sub
 
 Private Sub UserControl_Terminate()
@@ -786,7 +782,6 @@ Private Sub UserControl_Terminate()
     For i = 0 To ItemsCount - 1
         GdipDeletePath m_Item(i).hPath
     Next
-    Call GdiplusShutdown(GdipToken)
 End Sub
 
 Private Sub UserControl_WriteProperties(PropBag As PropertyBag)
@@ -840,7 +835,7 @@ Private Sub UserControl_InitProperties()
     m_LegendAlign = LA_RIGHT
     m_LegendVisible = True
     m_TitleFont.Name = UserControl.Font.Name
-    m_TitleFont.size = UserControl.Font.size + 8
+    m_TitleFont.Size = UserControl.Font.Size + 8
     m_DonutWidth = 50!
     m_SeparatorLine = True
     m_SeparatorLineWidth = 2!
@@ -849,11 +844,10 @@ Private Sub UserControl_InitProperties()
     m_LabelsPositions = LP_Inside
     m_LabelsFormats = "{P}%"
     m_BorderRound = 0
-    
-    c_lhWnd = UserControl.ContainerHwnd
+
 
     
-    If Not Ambient.UserMode Then Call Example
+  '  If Not Ambient.UserMode Then Call Example
 End Sub
 
 
@@ -882,7 +876,7 @@ Private Function GetTextSize(ByVal hGraphics As Long, ByVal Text As String, ByVa
         
 
     hDC = GetDC(0&)
-    lFontSize = MulDiv(oFont.size, GetDeviceCaps(hDC, LOGPIXELSY), 72)
+    lFontSize = MulDiv(oFont.Size, GetDeviceCaps(hDC, LOGPIXELSY), 72)
     ReleaseDC 0&, hDC
 
     layoutRect.Width = Width * nScale: layoutRect.Height = Height * nScale
@@ -902,7 +896,7 @@ Private Function GetTextSize(ByVal hGraphics As Long, ByVal Text As String, ByVa
 End Function
 
 
-Private Function DrawText(ByVal hGraphics As Long, ByVal Text As String, ByVal X As Long, ByVal y As Long, ByVal Width As Long, ByVal Height As Long, ByVal oFont As StdFont, ByVal ForeColor As Long, Optional HAlign As CaptionAlignmentH, Optional VAlign As CaptionAlignmentV, Optional bWordWrap As Boolean) As Long
+Private Function DrawText(ByVal hGraphics As Long, ByVal Text As String, ByVal X As Long, ByVal Y As Long, ByVal Width As Long, ByVal Height As Long, ByVal oFont As StdFont, ByVal ForeColor As Long, Optional HAlign As CaptionAlignmentH, Optional VAlign As CaptionAlignmentV, Optional bWordWrap As Boolean) As Long
     Dim hBrush As Long
     Dim hFontFamily As Long
     Dim hFormat As Long
@@ -932,10 +926,10 @@ Private Function DrawText(ByVal hGraphics As Long, ByVal Text As String, ByVal X
         
 
     hDC = GetDC(0&)
-    lFontSize = MulDiv(oFont.size, GetDeviceCaps(hDC, LOGPIXELSY), 72)
+    lFontSize = MulDiv(oFont.Size, GetDeviceCaps(hDC, LOGPIXELSY), 72)
     ReleaseDC 0&, hDC
 
-    layoutRect.Left = X: layoutRect.top = y
+    layoutRect.Left = X: layoutRect.top = Y
     layoutRect.Width = Width: layoutRect.Height = Height
 
     If GdipCreateSolidFill(ForeColor, hBrush) = GDIP_OK Then
@@ -965,17 +959,17 @@ Public Function GetWindowsDPI() As Double
     End If
 End Function
 
-Private Sub UserControl_HitTest(X As Single, y As Single, HitResult As Integer)
-    If UserControl.Enabled Then
+Private Sub UserControl_HitTest(X As Single, Y As Single, HitResult As Integer)
+    If UserControl.enabled Then
         HitResult = vbHitResultHit
         If Ambient.UserMode Then
             Dim pt As POINTL
 
             If tmrMOUSEOVER.Interval = 0 Then
                 GetCursorPos pt
-                ScreenToClient c_lhWnd, pt
+                ScreenToClient UserControl.ContainerHwnd, pt
                 m_PT.X = pt.X - X
-                m_PT.y = pt.y - y
+                m_PT.Y = pt.Y - Y
     
                 m_Left = ScaleX(Extender.Left, vbContainerSize, UserControl.ScaleMode)
                 m_Top = ScaleY(Extender.top, vbContainerSize, UserControl.ScaleMode)
@@ -990,17 +984,14 @@ Private Sub UserControl_HitTest(X As Single, y As Single, HitResult As Integer)
 End Sub
 
 Private Sub UserControl_Initialize()
-    Dim GdipStartupInput As GDIPlusStartupInput
-    GdipStartupInput.GdiPlusVersion = 1&
-    Call GdiplusStartup(GdipToken, GdipStartupInput, ByVal 0)
     HotItem = -1
     nScale = GetWindowsDPI
     Set m_TitleFont = New StdFont
 End Sub
 
 
-Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, X As Single, y As Single)
-    RaiseEvent MouseUp(Button, shift, X, y)
+Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
+    RaiseEvent MouseUp(Button, shift, X, Y)
     
     Dim i As Long
     Dim lResult As Long
@@ -1010,7 +1001,7 @@ Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, X As Single
     For i = 0 To ItemsCount - 1
 
         lResult = 0
-        Call GdipIsVisiblePathPoint(m_Item(i).hPath, X, y, 0&, lResult)
+        Call GdipIsVisiblePathPoint(m_Item(i).hPath, X, Y, 0&, lResult)
     
         If lResult Then
             If i = HotItem Then
@@ -1021,17 +1012,17 @@ Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, X As Single
     
     Next
 End Sub
-Private Sub UserControl_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
-    RaiseEvent MouseDown(Button, shift, X, y)
+Private Sub UserControl_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
+    RaiseEvent MouseDown(Button, shift, X, Y)
 End Sub
-Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
     Dim i As Long
     Dim lResult As Long
-    RaiseEvent MouseMove(Button, shift, X, y)
+    RaiseEvent MouseMove(Button, shift, X, Y)
     If Button <> 0 Then Exit Sub
     For i = 0 To ItemsCount - 1
 
-        If PtInRectL(m_Item(i).LegendRect, X, y) Then
+        If PtInRectL(m_Item(i).LegendRect, X, Y) Then
             If i <> HotItem Then
                 HotItem = i
                 Me.Refresh
@@ -1040,7 +1031,7 @@ Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, X As Sing
         End If
     
         lResult = 0
-        Call GdipIsVisiblePathPoint(m_Item(i).hPath, X, y, 0&, lResult)
+        Call GdipIsVisiblePathPoint(m_Item(i).hPath, X, Y, 0&, lResult)
     
         If lResult Then
             If i <> HotItem Then
@@ -1059,9 +1050,9 @@ Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, X As Sing
 
 End Sub
 
-Private Function PtInRectL(RECT As RectL, ByVal X As Single, ByVal y As Single) As Boolean
+Private Function PtInRectL(RECT As RectL, ByVal X As Single, ByVal Y As Single) As Boolean
     With RECT
-        If X >= .Left And X <= .Left + .Width And y >= .top And y <= .top + .Height Then
+        If X >= .Left And X <= .Left + .Width And Y >= .top And Y <= .top + .Height Then
             PtInRectL = True
         End If
     End With
@@ -1166,7 +1157,7 @@ Private Sub Draw(hDC As Long, ScaleWidth As Long, ScaleHeight As Long)
     Dim SafePercent As Single
     Dim Min As Single, LastAngle As Single, Angle As Single, Total  As Single
     Dim DonutSize As Single
-    Dim r1 As Single, r2 As Single, R3 As Single
+    Dim r1 As Single, R2 As Single, R3 As Single
     Dim cx As Single, cy   As Single
     Dim Left As Single, top As Single
     Dim Percent As Single
@@ -1327,7 +1318,7 @@ Private Sub Draw(hDC As Long, ScaleWidth As Long, ScaleHeight As Long)
     XX = MarginLeft + mWidth / 2 - Min / 2
     YY = TopHeader + mHeight / 2 - Min / 2
     m_CenterCircle.X = MarginLeft + mWidth / 2
-    m_CenterCircle.y = TopHeader + mHeight / 2
+    m_CenterCircle.Y = TopHeader + mHeight / 2
     r1 = Min / 2
     
 '    If m_SeparatorLine Then
@@ -1343,9 +1334,9 @@ Private Sub Draw(hDC As Long, ScaleWidth As Long, ScaleHeight As Long)
 
  '*1
         If m_Item(i).Special Then
-            r2 = PT16 / 1.5
-            Left = XX + (r2 * Cos((LastAngle + Angle / 2) * PItoRAD))
-            top = YY + (r2 * Sin((LastAngle + Angle / 2) * PItoRAD))
+            R2 = PT16 / 1.5
+            Left = XX + (R2 * Cos((LastAngle + Angle / 2) * PItoRAD))
+            top = YY + (R2 * Sin((LastAngle + Angle / 2) * PItoRAD))
         Else
             Left = XX
             top = YY
@@ -1368,10 +1359,10 @@ Private Sub Draw(hDC As Long, ScaleWidth As Long, ScaleHeight As Long)
         End If
         If m_FillGradient Then
             With RectL
-                .Left = MarginLeft - r2
-                .top = TopHeader - r2
-                .Width = mWidth + r2 * 2
-                .Height = mHeight + r2 * 2
+                .Left = MarginLeft - R2
+                .top = TopHeader - R2
+                .Width = mWidth + R2 * 2
+                .Height = mHeight + R2 * 2
             End With
             GdipCreateLineBrushFromRectWithAngleI RectL, lColor, RGBtoARGB(vbWhite, 100), 180 + LastAngle + Angle / 2, 0, WrapModeTile, hBrush
         Else
@@ -1381,13 +1372,13 @@ Private Sub Draw(hDC As Long, ScaleWidth As Long, ScaleHeight As Long)
         GdipDeleteBrush hBrush
         
         r1 = Min / 2
-        r2 = m_Item(i).TextWidth / 2
+        R2 = m_Item(i).TextWidth / 2
         R3 = m_Item(i).TextHeight / 2
     
         cx = XX + Min / 2 + TextWidth
         cy = YY + Min / 2 + TextHeight
         
-        Left = cx + ((r1 - r2) * Cos((LastAngle + Angle / 2) * PItoRAD)) - r2
+        Left = cx + ((r1 - R2) * Cos((LastAngle + Angle / 2) * PItoRAD)) - R2
         top = cy + ((r1 - R3) * Sin((LastAngle + Angle / 2) * PItoRAD)) - R3
         'DrawText hGraphics, m_Item(i).ItemName, Left, Top, R2 * 2, R3 * 2, UserControl.Font, lForeColor, cCenter, cMiddle
         LastAngle = LastAngle + Angle '+ 2
@@ -1408,7 +1399,7 @@ Private Sub Draw(hDC As Long, ScaleWidth As Long, ScaleHeight As Long)
             GdipSetPenEndCap hPen, &H2
             
             r1 = (Min + mPenWidth / 2) / 2
-            r2 = (Min - mPenWidth / 2) / 2 - DonutSize
+            R2 = (Min - mPenWidth / 2) / 2 - DonutSize
     
             cx = XX + Min / 2
             cy = YY + Min / 2
@@ -1417,8 +1408,8 @@ Private Sub Draw(hDC As Long, ScaleWidth As Long, ScaleHeight As Long)
             top = cy + (r1 * Sin((LastAngle) * PItoRAD))
             
             If m_ChartStyle = CS_DONUT Then
-                cx = cx + (r2 * Cos((LastAngle) * PItoRAD))
-                cy = cy + (r2 * Sin((LastAngle) * PItoRAD))
+                cx = cx + (R2 * Cos((LastAngle) * PItoRAD))
+                cy = cy + (R2 * Sin((LastAngle) * PItoRAD))
             Else
                 'GdipDrawEllipseI hGraphics, hPen, XX, YY, Min, Min
             End If
@@ -1436,7 +1427,7 @@ Private Sub Draw(hDC As Long, ScaleWidth As Long, ScaleHeight As Long)
             If DonutSize > TextHeight Then TextHeight = DonutSize
         End If
         
-        r2 = TextWidth / 2
+        R2 = TextWidth / 2
         R3 = TextHeight / 2
         Displacement = IIf(m_Item(i).Special, PT16 / 1.5, 0)
         
@@ -1446,10 +1437,10 @@ Private Sub Draw(hDC As Long, ScaleWidth As Long, ScaleHeight As Long)
         a = LastAngle + Angle / 2
         
         If m_LabelsPositions = LP_Inside Then
-            Left = cx + ((r1 - r2 + Displacement) * Cos(a * PItoRAD)) - r2
+            Left = cx + ((r1 - R2 + Displacement) * Cos(a * PItoRAD)) - R2
             top = cy + ((r1 - R3 + Displacement) * Sin(a * PItoRAD)) - R3
         Else
-            Left = cx + ((r1 + r2 + Displacement) * Cos(a * PItoRAD)) - r2
+            Left = cx + ((r1 + R2 + Displacement) * Cos(a * PItoRAD)) - R2
             top = cy + ((r1 + R3 + Displacement) * Sin(a * PItoRAD)) - R3
         End If
         If m_LabelsVisible Then
@@ -1660,7 +1651,7 @@ Private Sub ShowToolTips(hGraphics As Long)
         With RECTF
             GdipGetPathLastPoint m_Item(HotItem).hPath, pt
             .Left = pt.X
-            .top = pt.y
+            .top = pt.Y
             .Width = SZ.Width + TM * 2
             .Height = SZ.Height + TM * 2
             
@@ -1746,9 +1737,13 @@ Private Function IsDarkColor(ByVal color As Long) As Boolean
 
 End Function
 
-Private Sub Example()
-    Me.AddItem "Juan", 70, vbRed
-    Me.AddItem "Adan", 20, vbGreen
-    Me.AddItem "Pedro", 10, vbBlue
-End Sub
+Property Get enabled() As Boolean
+    enabled = UserControl.enabled
+End Property
 
+Property Let enabled(ByVal bValue As Boolean)
+    If UserControl.enabled <> bValue Then
+        UserControl.enabled = bValue
+    End If
+    PropertyChanged
+End Property

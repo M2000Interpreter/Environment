@@ -14,7 +14,7 @@ Begin VB.UserControl ctxWinsock
       BackStyle       =   0  'Transparent
       BeginProperty Font 
          Name            =   "Segoe UI"
-         Size            =   7.8
+         Size            =   7.5
          Charset         =   204
          Weight          =   700
          Underline       =   0   'False
@@ -235,7 +235,7 @@ Private m_oRequestSocket        As cTlsSocket
 
 Private Sub PrintError(sFunction As String)
     #If ImplUseDebugLog Then
-        DebugLog MODULE_NAME, sFunction & "(" & Erl & ")", Err.Description & " &H" & Hex$(Err.Number), vbLogEventTypeError
+        debugLog MODULE_NAME, sFunction & "(" & ERL & ")", Err.Description & " &H" & Hex$(Err.Number), vbLogEventTypeError
     #Else
         Debug.Print "Critical error: " & Err.Description & " [" & MODULE_NAME & "." & sFunction & "]"
     #End If
@@ -324,8 +324,8 @@ Property Get SocketHandle() As Long
     SocketHandle = pvSocket.SocketHandle
 End Property
 
-Property Get State() As UcsStateConstants
-    State = m_eState
+Property Get state() As UcsStateConstants
+    state = m_eState
 End Property
 
 Private Property Let pvState(ByVal eValue As UcsStateConstants)
@@ -371,7 +371,7 @@ Private Property Get pvSocket() As cTlsSocket
     Else
         If m_oSocket Is Nothing Then
             Set m_oSocket = New cTlsSocket
-            m_oSocket.Create SocketType:=(m_eProtocol And 1)
+            m_oSocket.create SocketType:=(m_eProtocol And 1)
         End If
         Set pvSocket = m_oSocket
     End If
@@ -412,7 +412,7 @@ End Sub
 
 Public Sub Close_()
     On Error GoTo EH
-    If State <> sckClosed Then
+    If state <> sckClosed Then
         If Not m_oSocket Is Nothing Then
             pvState = sckClosing
             m_oSocket.Close_
@@ -484,13 +484,13 @@ EH:
     pvSetError LastError:=Err, RaiseError:=True
 End Sub
 
-Public Sub PeekData(data As Variant, Optional ByVal type_ As Long, Optional ByVal maxLen As Long = -1)
+Public Sub PeekData(Data As Variant, Optional ByVal type_ As Long, Optional ByVal maxLen As Long = -1)
     Dim baBuffer()      As Byte
     Dim lIdx            As Long
     
     On Error GoTo EH
     If type_ = 0 Then
-        type_ = VarType(data)
+        type_ = VarType(Data)
     End If
     Select Case type_
     Case vbString, vbByte + vbArray
@@ -508,9 +508,9 @@ Public Sub PeekData(data As Variant, Optional ByVal type_ As Long, Optional ByVa
     End If
     Select Case type_
     Case vbString
-        data = pvSocket.FromTextArray(baBuffer, ucsScpAcp)
+        Data = pvSocket.FromTextArray(baBuffer, ucsScpAcp)
     Case vbByte + vbArray
-        data = baBuffer
+        Data = baBuffer
     End Select
     If UBound(m_baRecvBuffer) >= 0 And UBound(baBuffer) >= 0 Then
         lIdx = UBound(m_baRecvBuffer) + 1
@@ -524,13 +524,13 @@ EH:
     pvSetError LastError:=Err, RaiseError:=True
 End Sub
 
-Public Sub GetData(data As Variant, Optional ByVal type_ As Long, Optional ByVal maxLen As Long = -1)
+Public Sub GetData(Data As Variant, Optional ByVal type_ As Long, Optional ByVal maxLen As Long = -1)
     Dim lIdx            As Long
     Dim baBuffer()      As Byte
     
     On Error GoTo EH
     If type_ = 0 Then
-        type_ = VarType(data)
+        type_ = VarType(Data)
     End If
     Select Case type_
     Case vbString, vbByte + vbArray
@@ -568,37 +568,37 @@ Public Sub GetData(data As Variant, Optional ByVal type_ As Long, Optional ByVal
     End If
     Select Case type_
     Case vbString
-        data = pvSocket.FromTextArray(baBuffer, ucsScpAcp)
+        Data = pvSocket.FromTextArray(baBuffer, ucsScpAcp)
     Case vbByte + vbArray
-        data = baBuffer
+        Data = baBuffer
     End Select
     Exit Sub
 EH:
     pvSetError LastError:=Err, RaiseError:=True
 End Sub
 
-Public Sub SendData(data As Variant)
+Public Sub SendData(Data As Variant)
     Dim baAppend()      As Byte
     Dim lPos            As Long
     
     On Error GoTo EH
     If UBound(m_baSendBuffer) < 0 Then
-        Select Case VarType(data)
+        Select Case VarType(Data)
         Case vbString
-            m_baSendBuffer = pvSocket.ToTextArray(CStr(data), ucsScpAcp)
+            m_baSendBuffer = pvSocket.ToTextArray(CStr(Data), ucsScpAcp)
         Case vbByte + vbArray
-            m_baSendBuffer = data
+            m_baSendBuffer = Data
         Case Else
-            ErrRaise vbObjectError, , "Unsupported data type: " & TypeName(data)
+            ErrRaise vbObjectError, , "Unsupported data type: " & Typename(Data)
         End Select
     Else
-        Select Case VarType(data)
+        Select Case VarType(Data)
         Case vbString
-            baAppend = pvSocket.ToTextArray(CStr(data), ucsScpAcp)
+            baAppend = pvSocket.ToTextArray(CStr(Data), ucsScpAcp)
         Case vbByte + vbArray
-            baAppend = data
+            baAppend = Data
         Case Else
-            ErrRaise vbObjectError, , "Unsupported data type: " & TypeName(data)
+            ErrRaise vbObjectError, , "Unsupported data type: " & Typename(Data)
         End Select
         If UBound(baAppend) >= 0 Then
             lPos = UBound(m_baSendBuffer) + 1
@@ -748,7 +748,7 @@ Private Sub UserControl_Resize()
     '--- note: skip error handler not to clear Err object
     Width = ScaleX(32, vbPixels)
     Height = ScaleX(32, vbPixels)
-    labLogo.Move 0, (ScaleHeight - labLogo.Height) / 2, ScaleWidth
+    labLogo.move 0, (ScaleHeight - labLogo.Height) / 2, ScaleWidth
 End Sub
 
 Private Sub UserControl_InitProperties()
@@ -803,3 +803,8 @@ Private Sub UserControl_Initialize()
     m_baRecvBuffer = vbNullString
     m_baSendBuffer = vbNullString
 End Sub
+Property Get enabled() As Boolean
+    enabled = False
+End Property
+Property Let enabled(ByVal bValue As Boolean)
+End Property
