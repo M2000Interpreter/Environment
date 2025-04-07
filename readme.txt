@@ -1,9 +1,10 @@
 M2000 Interpreter and Environment
-Version 13 revision 39 active-X
+Version 13 revision 40 active-X
 
-Image control text property now display name of image control using unicode.
-
-
+1. Fix a problem with module MULSH from INFO file. This has to do with a change on Array() function before some two-three revisions.
+2. Check a lot of modules in INFO file.
+3. Fix Font statement to read string variables without suffix $ on name.
+4. Addition/Changes for some modules in INFO file.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

@@ -2810,7 +2810,7 @@ MODULE PEND {Module Pendulum {
             if sgn(accold)<>sgn(ACCEL) then lasttimecount=timecount: Profiler
             accold=ACCEL
       } as M interval cc
-      Main.Task 1000/250 {
+      Main.Task 1000/24 {
             Pendulum(THETA)
             if KeyPress(32) Then Exit
       }
@@ -4849,7 +4849,7 @@ TASK.MAIN 20 {
             // PART USE $(4) (PROPORTIONAL TEXT), AND WRITE ONLY IN ONE LINE WITH NO WRAP
             PRINT PART $(0),@(0,0),"SPACE BAR TO FIRE OR KEY 1 TO QUIT"
 
-            PRINT PART @(0,1),STR$(NOW,"HH:MM:SS"), e1z   //, $(0),format$("({0},{1})", sX, sY)
+            PRINT PART @(0,1),now, e1z   //, $(0),format$("({0},{1})", sX, sY)
             
             GOSUB basicpart
             IF enemy1 THEN {
@@ -5679,7 +5679,12 @@ end if
 }
 MODULE INFOBASIC {Italic 0
 Bold 1
-if fontname$<>"Verdana" then font "Verdana"
+if val(piece$(os$+" 1"," ")(1))>9 then
+	Font "Segoe UI"
+else
+	Font "Verdana"
+end if
+
 Set Edit !4   ' 4 chars fpr tabs in edit
 \\
 \\ Press Esc to exit this editor - look the context drop down menu too (ctrl+F10 also open context dropdown menu)
@@ -5810,7 +5815,11 @@ Print "Done"
 
 }
 MODULE M2000_EDITOR_INFORMATION {\\if width<>80 and height<>66 then window 10, window : form !80,66
-font "verdana"
+if val(piece$(os$+" 1"," ")(1))>9 then
+	Font "Segoe UI"
+else
+	Font "Verdana"
+end if
 form ! 80, 66
 thread.plan sequential   ' can run as concurrent too
 linespace twipsY*2
@@ -5830,7 +5839,7 @@ Pen 0 {
 	Report " Internal M2000 Editor"
 	Pen 5{
 		cursor 0, row-1
-		Report 1, "George Karras 2022-2023"
+		Report 1, "George Karras 1999-2025"
 	}
 }
 cls backcolor, row
@@ -6145,9 +6154,9 @@ MODULE FORM44 {Module TryIt {
 	            \\ or we can let the Main Task erase it at the exit 
 	      }
 	}
-	
+	// Str$(Now,"hh:mm:ss")  is same as now+""  (convet date to string))
 	Thread {     
-	      PrintAndRefresh(Str$(Now,"hh:mm:ss"))
+	      PrintAndRefresh(now+"")
 	} As Inform Interval 1000
 	\\ Inform is the Thread Handler, we don't use it here
 	aaa:
@@ -6809,7 +6818,7 @@ Layer Alfa {
 			release
 			Print @(3,3); format$("{0:2:-7}",tm)
 			Cursor 0,height-1
-			Print Part $(5,Width/4), counter1, counter2,internal, $(7),Str$(Now , "hh:mm:ss" )
+			Print Part $(5,Width/4), counter1, counter2,internal, $(7),now 'Str$(Now , "hh:mm:ss" )
 		}
 		Part {
 			Part {
@@ -13718,6 +13727,7 @@ checkit
 MODULE RFL {\\ read a file line by line
 Module checkit {
       \\ prepare a file
+      Pen 11 {Print "UTF-16LE enocde text file File with BOM"}
       document a$
       a$={First Line
             Second line
@@ -13741,10 +13751,10 @@ Module checkit {
       Open "checkthis.txt" For Wide Input as #F
             Seek#F, Index(2)
             Line Input #F, b$
-            Print b$  ' print second line
+            Pen 15 {Print b$} ' print second line
       Close #f
       \\ prepare Ansi file
-      Print "Ansi File"
+      Pen 11 {Print "Ansi File (LcID=1033)"}
       Save.Doc a$, "checkthis.txt",  1033  ' we use specific locale
       Flush \\ flush the stack to get indexes
       oldlocale=locale
@@ -13765,7 +13775,7 @@ Module checkit {
       Open "checkthis.txt" For Input as #F
             Seek#F, Index(2)
             Line Input #F, b$
-            Print b$  ' print second line
+            Pen 15 {Print b$}  ' print second line
       Close #f
       locale oldlocale
 }
@@ -14180,7 +14190,11 @@ Checkit
 Refresh
 Set Fast
 }
-MODULE STIME {print str$(now,"long time"), time$(now)
+MODULE STIME {print str$(now,"long time"), time$(now), now
+print time$(now, 1032, "long time")
+print time$(now, 1033, "long time")
+print time$(now, 1033, "long time")
+print Time$(now, 1033+Greek, "hh:mm:ss tt")
 }
 MODULE SDATE {Print str$(today, "yyyy-mm-dd")
 Print str$(today, "dddd, mmm, dd, yyyy")
@@ -14495,11 +14509,11 @@ Module CheckIt {
             For i=1 to n : Data i*n : Next i
             =Array([])   ' copy stack in an array, and return a pointer
       }
-      i=Each(A())
+      ia=Each(A())
       Print "  |";
-      while i {
-            Print Format$("{0:0:-4}",i^+1);
-            A(i^+1)=Mult(i^+1)
+      while ia {
+            Print Format$("{0:0:-4}",ia^+1);
+            A(ia^+1)=Mult(ia^+1)
       }
       Print
       Print "--+"+string$("-",4*12)
@@ -14523,11 +14537,11 @@ Module CheckIt2 {
             For i=1 to n : Data i*n : Next i
             =Array([])   ' copy stack in an array, and return a pointer
       }
-      i=Each(A())
+      ia=Each(A())
       Print "  |";
-      while i {
-            Print Format$("{0:0:-4}",i^+1);
-            A(i^+1)=Mult(i^+1)
+      while ia {
+            Print Format$("{0:0:-4}",ia^+1);
+            A(ia^+1)=Mult(ia^+1)
       }
       Print
       Print "--+"+string$("-",4*12)
@@ -14553,11 +14567,11 @@ Module CheckIt3 {
             For i=0% to n-1 : m(i)=(i+1)*n : Next
             =M()
       }
-      i=Each(A())
+      ia=Each(A())
       Print "  |";
-      while i {
-            Print Format$("{0:0:-4}",i^+1);
-            A(i^+1)=Mult(i^+1)
+      while ia {
+            Print Format$("{0:0:-4}",ia^+1);
+            A(ia^+1)=Mult(ia^+1)
       }
       Print
       Print "--+"+string$("-",4*12)
@@ -16361,7 +16375,7 @@ Thread {
 
 Thread {
 Pen 7 {
-      Cursor 0,0 : Print Part $(6,8),@(Width -8), ~(Pen,#555555),Str$(Now,"hh:mm:ss")
+      Cursor 0,0 : Print Part $(6,8),@(Width -8), ~(Pen,#555555),now 'Str$(Now,"hh:mm:ss")
 }
 } As tt Interval 1000
 Thread {
@@ -21595,12 +21609,16 @@ MODULE USETHIS {try {
 	linespace 0
 	window mode, window
 	back {gradient 5, 5}
-	Font "Verdana"
+	if val(piece$(os$+" 1"," ")(1))>9 then
+		Font "Segoe UI"
+	else
+		Font "Verdana"
+	end if
 	Bold 1
 	PEN 14
 	CLS,0
-	If Version<12 then Error "No proper M2000 version (must be >=12)"
-	If Version=12 and revision<45 then Error "No proper M2000 revision for version 4 (need revision >=66)"
+	If Version<13 then Error "No proper M2000 version (must be >=13)"
+	If Version=13 and revision<39 then Error "No proper M2000 revision for version 13 (need revision >=39)"
 	Set Fast
 	Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 	dir user
@@ -27186,7 +27204,7 @@ try  {
 				move giftX, giftY
 				circle fill 4, 300,1, 4
 			end if
-			Print @(width-8);Str$(Now,"hh:mm:ss")
+			Print @(width-8);now 'Str$(Now,"hh:mm:ss")
 			Cursor 0, 2
 			Print "Time Left:"; bomb div 1000;if$(pause$=" "->" paused","")
 			if giftonce then if bomb<Random(10000, 30000) then giftonce=false: gift=true
@@ -35111,8 +35129,9 @@ Thread {
       cc++
       If form1.visible Then counter$=Format$("{0}", cc)
 } As counter Interval 100
+// now retrun this str$(now,"hh:mm:ss")
 Main.Task 50 {
-      If Again Then If form2.visible Then form2.caption$="Hello There 2 ["+str$(now,"hh:mm:ss")+"]"
+      If Again Then If form2.visible Then form2.caption$="Hello There 2 ["+now+"]"
   
       If form1.visible Or form2.visible Else Exit
       Print "WAIT........"
@@ -35201,23 +35220,30 @@ MODULE ΑΘΡΟΙΣΜΑ {Αδειασε
 Οθόνη 5 : Φορμα 80,50 : Πένα 14
 \\ ετοιμασία πίνακα
 Πίνακας Α()
-αν τυχαίος(1,2)=1 τότε
+Αν τυχαίος(1,2)=1 Τότε
 	Α() = ( 1, 1, 1,  3, 3, 3, 4, 1, 2, 5, 7)
 	Μακρύς σκοπός=τυχαίος(1,3)*5+τυχαίος(1,3)-2
 Αλλιώς
 	Α() =(1, 3, 4, 6, 5, 4,12, 13, 7,8, 20, 17)
 	Μακρύς σκοπός=τυχαίος(1,5)*5+τυχαίος(1,5)-3
-τέλος αν
+Τέλος Αν
 μεγ=Μήκος(Α())
 μεγ1=μεγ-1
 \\ μεταβλητές
 
 Μακρύς συνολο, μισό=μεγ Δια 2
 \\Ετοιμασία Εξαγωγής
+Αν ΕΛΛΗΝΙΚΑ Τότε
 Έγγραφο Α$={Αποτελέσματα:
 Σύνολο: }+Α()#γραφη$(", ")+{
-Σκοπός:}+γραφη$(Σκοπός)+{
+Σκοπός ΑΘΡΟΙΣΜΑ =}+γραφη$(Σκοπός)+{
 }
+Αλλιώς
+Έγγραφο Α$={Results:
+Set: }+Α()#γραφη$(", ")+{
+Target SUM =}+γραφη$(Σκοπός)+{
+}
+Τέλος Αν
 \\ κύρια επανάληψη
 Λογικός ενα_ακόμα
 Λιστ1=Λίστα
@@ -35232,47 +35258,23 @@ MODULE ΑΘΡΟΙΣΜΑ {Αδειασε
             ενα_ακόμα=Αληθές
       Τέλος Αν
 Επόμενο
-Αν ενα_ακόμα τότε ΒάλεΤελευταίο()
-Τύπωσε "Πάτα Esc"
+Αν ενα_ακόμα Τότε ΒάλεΤελευταίο()
+Αν ΕΛΛΗΝΙΚΑ Τότε Τύπωσε "Πάτα Esc" Αλλιώς Τύπωσε "Press Esc"
 Τύπωσε Φόρτος
 Οθόνη, 2
 Διόρθωσε Α$ \\ ανοίγει τον διορθωτή Για να συμπληρώσουμε κάτι
 Πρόχειρο Α$ \\ εξαγωγή στο πρόχειρο
-Σώσε.Έγγραφο Α$, "Αποτελέσματα.txt"
+
+Σώσε.Έγγραφο Α$, Αν$(ΕΛΛΗΝΙΚΑ=ΑΛΗΘΕΣ->"Αποτελέσματα.txt", "Results.txt")
 Αναφορά Α$ \\ στην οθόνη
-Αν τμήμα(info) Τότε Τυπωσε "πάτα F3"
-\\ εδώ τερματίζει ο διερμηνευτής.
+Αν τμήμα(info) Τότε
+Αν ΕΛΛΗΝΙΚΑ Τότε 	Τυπωσε "πάτα F3" Αλλιώς Τυπωσε "Press F3"
+Τέλος Αν
+Τέλος
 Ρουτίνα πάρε_ένα(χ, ν, άσε_τόσα)
     Τοπικές κ=1, σουμα, κκ, μμ, Προχ$
     μμ=χ
     Σωρός Νέος {
-        \\ ανοίγουμε ένα σωρό τιμών
-        \\ βάζουμε τιμές με την βάλε και θα τις πάρουμε σε έναν πίνακα
-        \\ η [] γυρίζει αντικείμενο τύπου Σωρός, από το τρέχον Σωρό τιμών
-        \\ ενώ αφήνει κενό τρέχον σωρό
-        \\ η Πίνακας([]) γυρνάει πίνακα με τις τιμές από το αντικείμενο []
-        \\ κάνουμε ταξινόμηση και δημιουργούμε ένα αλφαριθμητικό με κόμμα και διάστημα
-        \\ μεταξύ των αριθμών.
-        \\ μετά κοιτάμε αν το έχουμε ήδη στη λίστα λιστ1 και αν δεν το έχουμε τότε
-        \\ με την εντολή Προσθήκη το βάζουμε.
-        \\ Η λίστ1 είναι Hash Table, και βρίσκει ένα αλφαριθμητικό σε χρόνο μηδέν!
-        \\ Τα Hash Tables έχουν Ο(1) στην εισαγωγή, διαγραφή και αναζήτηση.
-        \\ Στη διαγραφή δεν κρατάει τη σειρά (βάζει το τελευταίο σε αυτό που διαγράφει, εκτός αν είναι το τελευταίο)
-        \\ Στην εισαγωγή βάζει στο τέλος, αν χρειάζεται χώρο πιάνει το διπλό από τον τρέχον.
-        // Ουσιαστικά ένα HashTable έχει δυο πίνακες, έναν για να βρίσκει άμεσα τη θέση του κλειδιού
-        // και έναν για να βάζει τα στοιχεία (όλο το κλειδί, και ίσως και δεδομένα για το κλειδί)
-        // εδώ δεν βάζουμε δεδομένα για το κλειδί, μας ενδιαφέρει το κλειδί μόνο.
-        // Η αναζήτηση γίνεται αφού βγει ένας 32bit αριθμός από το κλειδί. Αυτός ο αριθμός δείχνει σε ποια θέση είναι
-        // τα δεδομένα μας. Επειδή γίνεται να έχουνε δυο διαφορετικά κλειδιά να δώσουν τον ίδιο κωδικό, πάντα κοιτάμε
-        // το κλειδί που είναι γραμμένο στα δεδομένα. Αν δεν είναι αυτό που θέλουμε έχουμε σύγκρουση!
-        // Για τις συγκρούσης έχουμε δείκτη που δείχνει στο επόμενο με ίδιο κωδικό Hash. Λόγω μεγέθους του πίνακα HASH,
-        // σπάνια έχουμε συγκρούσεις. Όταν έχουμε μεγάλωμα της λίστας θα έχουμε ένα μικρό πέναλντι για να αυξηθούν οι πίνακες
-        // και να γίνει ReHash. Το οποίο γίνεται γρήγορα γιατί στα Data κρατάμε και το κλειδί και το Hash κωδικό, τον αρχικό.
-        // ο τελικός είναι ο αρχικός mod το μέγεθος του πίνακα hash table. Στο υπολογισμένο σημείο μπαίνει ο δείκτης που δείχνει
-        // στο πρώτο στοιχείο με ίδιο κωδικό Hash. Αν στη προσθήκη τον βρούμε κενό, τότε βάζουμε άμεσα στο δείκτη στο στοιχείο μας.
-        // Αν το βρούμε πιασμένο, τότε ελέγχουμε διαδοχικά τις "συγκρούσεις". Αν βρούμε το ίδιο κλειδί τότε παράγουμε λάθος, γιατί
-        // εξ ορισμού δεν δεχόμαστε ίδιο κλειδί!
-        // Εκτός από τη λίστα έχουμε και την ουρά, μια ειδική λίστα που δέχεται ίδια κλειδιά, και δουλεύει με hash table!
         Ενώ ν>0
             χ=(μεγ+χ) Υπολ μεγ
             Αν Α(χ)<=ν Τότε ν-=Α(χ):σουμα+=Α(χ):Βαλε Α(χ)
@@ -35289,9 +35291,9 @@ MODULE ΑΘΡΟΙΣΜΑ {Αδειασε
                     Α$ =Γραφή$(σύνολο, "000")+". "+Προχ$+{
                     }
                     Προσθήκη Λιστ1, Προχ$
-                τέλος αν
-            τελος αν
-        τέλος αν
+                Τέλος Αν
+            Τέλος Αν
+        Τέλος Αν
     }
 Τέλος Ρουτίνας
 Ρουτίνα ΒάλεΤελευταίο()
@@ -35299,6 +35301,9 @@ MODULE ΑΘΡΟΙΣΜΑ {Αδειασε
     Α$ =Γραφή$(σύνολο, "000")+". "+σκοπός+{
     }
 Τέλος Ρουτίνας
+}
+MODULE SUM1 {
+ΑΘΡΟΙΣΜΑ
 }
 MODULE PHONEBOOTH {Form 80, 50
 Module CheckIt {
@@ -41601,7 +41606,7 @@ module Archimedean_spiral {
 		move 0,0
 		cursor 0,0:Report 1, "Archimedean Spiral"
 		cursor 0,height-1:Print Part $(6, width),~(#ff5522), "Press Space Bar"
-		Print Part $(7, width), time$(now, locale, "Short Time")
+		Print Part $(7, width), now    ' time$(now, locale, "Short Time")
 	end sub
 }
 Archimedean_spiral
@@ -47230,5 +47235,49 @@ MODULE  INTERNAL {
 	LOCALE OLD_LOCALE
 }
 INTERNAL
+}
+MODULE REVERSESTR {// because we didn't give FORM, we may change the logical Height/Width based on new font.
+move !   'set graphic cursor according to character cursor 
+oldfont=fontname$
+font "Calibri"
+cursor !   ' set character cursor according to  graphic cursor
+
+Module ReverseString {
+	a$="as⃝df̅"
+	
+	Print a$
+	Report a$
+	Print Len(a$), len.disp(a$)
+	
+	Let i=1, j=Len(a$)
+	z$=String$(" ",j)
+	j++
+	do
+		k$=mid$(a$, i, 1)
+		if i<len(a$) then
+			while len.disp(k$+mid$(a$, i+1,1)) =len.disp(k$)
+				k$+=mid$(a$, i+1,1)
+				i++ 
+				if i>len(a$) then exit
+				j--
+			end while
+			j--
+			insert j, len(k$) Z$=K$
+		else
+			j--
+			Insert j,1 z$=k$
+		end if
+		if i>=len(a$) then exit
+		i++
+	Always
+	Print len(z$), len.disp(z$)
+	Print z$="f̅ds⃝a"
+	Print z$
+	Report z$
+}
+ReverseString
+move !
+font oldfont
+cursor !
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
