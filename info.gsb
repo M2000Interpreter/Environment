@@ -5706,7 +5706,17 @@ BackGround {
 }
 Window 12, Window 
 BackGround {cls,0 }
-form 100;
+
+if  scale.x/scale.y<1.5 then
+	form 12*8;
+	
+	linespace 30
+else
+form 12*8;	
+	Window mode*.9, Window
+	linespace 0
+end if
+form width;
 linespace 15
 backcolor=5   'point
 oldpen=14  ' pen
@@ -47237,6 +47247,7 @@ MODULE  INTERNAL {
 INTERNAL
 }
 MODULE REVERSESTR {// because we didn't give FORM, we may change the logical Height/Width based on new font.
+print
 move !   'set graphic cursor according to character cursor 
 oldfont=fontname$
 font "Calibri"
@@ -47274,6 +47285,7 @@ Module ReverseString {
 	Print z$="f̅ds⃝a"
 	Print z$
 	Report z$
+	Print
 }
 ReverseString
 move !
