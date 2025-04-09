@@ -35767,17 +35767,17 @@ function form1.click {
 	visible=k
 }
 Thread {
-	layer Form1 {
-//		Refresh 1000
-		move random(3000), random(3000)
-		draw random(8000), random(8000), random(11,15)
-		method Image1, "CopyBack"
-		layer image1{
-			change a, border 15
-			change b, border 15		
+	try {
+		layer Form1 {
+			move random(3000), random(3000)
+			draw random(8000), random(8000), random(11,15)
+			method Image1, "CopyBack"
+			layer image1{
+				change a, border 15
+				change b, border 15		
+			}
+			method form1, "RefreshAll"
 		}
-		method form1, "RefreshAll"
-//		refresh
 	}
 	Layer {
 		print timecount

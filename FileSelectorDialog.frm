@@ -147,7 +147,7 @@ Private Sub Form_Activate()
         Hook hWnd, Nothing
     End If
     If LastActive <> "" Then
-        If Controls(LastActive).Enabled Then
+        If Controls(LastActive).enabled Then
             If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
         End If
     End If
@@ -236,7 +236,7 @@ With gList1
 .additemFast "με διπλό κλικ στη λίστα"
 .menuEnabled(21) = False
 .AddSep
-.additemFast "Γιώργος Καρράς 2014"
+.additemFast "Γιώργος Καρράς 2014-2025"
 .menuEnabled(23) = False
 
 oldLeftMarginPixels = .LeftMarginPixels + 10
@@ -287,7 +287,7 @@ With gList1
 .additemFast "or double click the file list"
 .menuEnabled(21) = False
 .AddSep
-.additemFast "George Karras 2014-2020"
+.additemFast "George Karras 2014-2025"
 .menuEnabled(23) = False
 
 oldLeftMarginPixels = .LeftMarginPixels + 10
@@ -359,42 +359,42 @@ UnHook hWnd
 End If
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Button = 1 Then
 
 If lastfactor = 0 Then lastfactor = 1
 
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then
+If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
 dr = True
 MousePointer = vbSizeNWSE
 Lx = X
-lY = y
+lY = Y
 End If
 
 Else
-If (y > Height - bordertop And y < Height) And (X > Width - borderleft And X < Width) Then
+If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then
 dr = True
 MousePointer = vbSizeNWSE
 Lx = X
-lY = y
+lY = Y
 End If
 
 End If
 End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (X > Width - 150 And X < Width) Then MousePointer = vbSizeNWSE Else MousePointer = 0
+If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then MousePointer = vbSizeNWSE Else MousePointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (X > Width - borderleft And X < Width) Then MousePointer = vbSizeNWSE Else MousePointer = 0
+ If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then MousePointer = vbSizeNWSE Else MousePointer = 0
 End If
 If dr Then
-    If y < (Height - bordertop) Or y > Height Then addy = (y - lY)
+    If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
     If X < (Width - borderleft) Or X > Width Then addX = (X - Lx)
     
    If Not ExpandWidth Then addX = 0
@@ -449,13 +449,13 @@ If dr Then
         End If
         Else
         Lx = X
-        lY = y
+        lY = Y
    
 End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 If dr Then Me.MousePointer = 0
 dr = False
 End Sub
@@ -463,17 +463,17 @@ End Sub
 Private Sub Form_Unload(Cancel As Integer)
 UNhookMe
 DestroyCaret
-Dim i As Long, filetosave As String
+Dim I As Long, filetosave As String
 If mySelector.mselChecked Then
 ReturnListOfFiles = vbNullString
 With mySelector
-For i = 0 To .Mydir.listcount - 1
+For I = 0 To .Mydir.listcount - 1
 ' prepare list for files
-If .Mydir.ReadMark(i) Then
+If .Mydir.ReadMark(I) Then
     If .recnowchecked Then
- filetosave = .Mydir.FindFolder(i) + .Mydir.list(i)
+ filetosave = .Mydir.FindFolder(I) + .Mydir.list(I)
     Else
-    filetosave = .Mydir.path + .Mydir.list(i)
+    filetosave = .Mydir.path + .Mydir.list(I)
     End If
 If ReturnListOfFiles = vbNullString Then
 ReturnListOfFiles = filetosave
@@ -481,7 +481,7 @@ Else
 ReturnListOfFiles = ReturnListOfFiles + "#" + filetosave
 End If
 End If
-Next i
+Next I
 End With
 ElseIf FolderOnly Then
 If ReturnFile <> "" Then
@@ -512,13 +512,13 @@ Private Sub gList1_CtrlPlusF1()
 FlipList
 End Sub
 
-Private Sub glist1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
+Private Sub glist1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 
 Static doubleclick As Long
 
 If mySelector.IamBusy Then Exit Sub
 If item = -1 Then
-    If Button = 1 And X > gList1.WidthPixels - setupxy And y < setupxy Then
+    If Button = 1 And X > gList1.WidthPixels - setupxy And Y < setupxy Then
     doubleclick = doubleclick + 1
       If doubleclick > 1 Then
       doubleclick = 0
@@ -594,7 +594,7 @@ End Sub
 
 
 
-Private Sub gList1_ScrollSelected(item As Long, y As Long)
+Private Sub gList1_ScrollSelected(item As Long, Y As Long)
 ShearchList = vbNullString
 End Sub
 
@@ -669,8 +669,8 @@ Set LastGlist = Nothing
 If Err.Number > 0 Then gList1.NoWheel = True
 End Sub
 
-Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
-If gList2.DoubleClickCheck(Button, item, X, y, CLng(setupxy) / 2, CLng(setupxy) / 2, CLng(setupxy) / 2, -1) Then
+Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
+If gList2.DoubleClickCheck(Button, item, X, Y, CLng(setupxy) / 2, CLng(setupxy) / 2, CLng(setupxy) / 2, -1) Then
                       mySelector.AbordAll
                       Unload Me
 End If
@@ -695,12 +695,12 @@ End Sub
 
 
 
-Private Sub gList2_MouseUp(X As Single, y As Single)
+Private Sub gList2_MouseUp(X As Single, Y As Single)
             If mySelector.myDir2 Is Nothing Then Exit Sub
             If LastActive <> "" Then
-            If Controls(LastActive).Enabled Then
+            If Controls(LastActive).enabled Then
             If Controls(LastActive).Visible Then
-                If Not gList2.DoubleClickArea(X, y, setupxy / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1) Then
+                If Not gList2.DoubleClickArea(X, Y, setupxy / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1) Then
                 Controls(LastActive).SetFocus
                 Else
                  mySelector.AbordAll
@@ -716,7 +716,7 @@ Private Sub gList2_Selected2(item As Long)
         If LastActive = "" Then
             LastActive = gList1.Name
         Else
-            If Controls(LastActive).Enabled Then
+            If Controls(LastActive).enabled Then
                 If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
             End If
         End If
@@ -730,7 +730,7 @@ LastActive = gList3.Name
 End Sub
 
 
-Private Sub glist3_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
+Private Sub glist3_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 If gList3.EditFlag Then Exit Sub
     If gList3.list(0) = vbNullString Then
     gList3.BackColor = &H808080
@@ -813,7 +813,7 @@ here:
 DestroyCaret
 If TEXT1 <> "" Then
 gList3.EditFlag = False
-gList3.Enabled = False
+gList3.enabled = False
 glist3_PanLeftRight True
 End If
 KeyCode = 0
@@ -864,9 +864,9 @@ TEXT1 = mySelector.Mydir.CleanName(TEXT1.Text)
     End If
 
 mySelector.AbordAll
-gList1.Enabled = False
-gList2.Enabled = False
-TEXT1.Enabled = False
+gList1.enabled = False
+gList2.enabled = False
+TEXT1.enabled = False
 Unload Me
 Else
 Beep
@@ -972,7 +972,7 @@ Else
 Dim aImage As StdPicture, sc As Single
 Static ihave As Boolean
 If ihave Then Exit Sub
-mySelector.glistN.Enabled = False
+mySelector.glistN.enabled = False
 ' read ratio
  Line (0, 0)-(ScaleWidth - dv15, ScaleHeight - dv15), Me.BackColor, BF
 
@@ -992,7 +992,7 @@ Err.Clear
         Set LoadApicture = aPic
 Refresh
 TEXT1 = mySelector.Mydir.list(mySelector.glistN.ListIndex)
-mySelector.glistN.Enabled = True
+mySelector.glistN.enabled = True
 
 ihave = False
 End If
@@ -1042,30 +1042,30 @@ mySelector.FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 End Sub
 Sub PlaceSettings()
 ' using global var settings
-Dim a() As String, i As Long, j As Long
+Dim a() As String, I As Long, j As Long
 a() = Split(Settings, ",")
-For i = 0 To gList1.listcount - 1
-gList1.ListSelectedNoRadioCare(i) = False
-Next i
-For i = LBound(a()) To UBound(a())
-If gList1.GetMenuId(a(i), j) Then
+For I = 0 To gList1.listcount - 1
+gList1.ListSelectedNoRadioCare(I) = False
+Next I
+For I = LBound(a()) To UBound(a())
+If gList1.GetMenuId(a(I), j) Then
 gList1.ListSelectedNoRadioCare(j) = True
 End If
-Next i
+Next I
 End Sub
 Function ReadSettings() As Boolean
 ' using global var settings
 ' we have to read at NostateDir=true
-Dim a() As String, i As Long, j As Long
+Dim a() As String, I As Long, j As Long
 a() = Split(Settings, ",")
 ' reset some flags
 gList1.StickBar = False
 mySelector.mselChecked = False
 multifileselection = False
 ExpandWidth = False
-For i = LBound(a()) To UBound(a())
+For I = LBound(a()) To UBound(a())
 j = 0
-Do While gList1.Id(j) <> a(i)
+Do While gList1.id(j) <> a(I)
 j = j + 1
 If j >= gList1.listcount Then Exit Do
 Loop
@@ -1106,16 +1106,16 @@ ExpandWidth = True
 End Select
 
 
-Next i
+Next I
 End Function
 
 Sub GetSettings()
-Dim s As String, i As Long
-For i = 0 To gList1.listcount - 1
-If gList1.ListSelected(i) = True Then
-If s = vbNullString Then s = gList1.Id(i) Else s = s + "," + gList1.Id(i)
+Dim s As String, I As Long
+For I = 0 To gList1.listcount - 1
+If gList1.ListSelected(I) = True Then
+If s = vbNullString Then s = gList1.id(I) Else s = s + "," + gList1.id(I)
 End If
-Next i
+Next I
 Settings = s
 End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
