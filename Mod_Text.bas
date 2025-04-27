@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 42
+Global Const Revision = 43
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -44374,6 +44374,7 @@ End Function
 Function iter(bstack As basetask, rest$, Lang As Long) As Boolean
 ' each( array or inventory, start: 1 by default, or -1 for end of list,  end: -1 to end (optional), or we can set it)
     Dim pppp As iBoxArray, w1 As Long, s$, num As Long, st As Variant, en As Variant, usehandler As mHandler, usehandler1 As mHandler
+    Dim va As Variant
     
     w1 = Abs(IsLabel(bstack, rest$, s$))
     If w1 > 4 Then
@@ -44433,10 +44434,9 @@ Function iter(bstack As basetask, rest$, Lang As Long) As Boolean
         ElseIf var(w1) Is Nothing Then
             GoTo err11
         End If
-        
-         If TypeOf var(w1) Is mHandler Then
+        If TypeOf var(w1) Is mHandler Then
+            Set va = var(w1)
 conthere111:
-         
             If Not IsSymbol(rest$, ",") Then
                 st = 1: en = -1
                 If IsLabelSymbolNew(rest$, "ΑΡΧΗ", "START", Lang) Then
@@ -44473,28 +44473,34 @@ conthere111:
                 End If
                 Set usehandler = New mHandler
                 Set bstack.lastobj = usehandler
-                Set usehandler1 = var(w1)
+                Set usehandler1 = va
                 usehandler.t1 = usehandler1.t1
                 GoTo con12345
             End If
             
-        If Not TypeOf var(w1) Is mHandler Then
-        On Error GoTo there1
-          If Not TypeOf var(w1).objref Is iBoxArray Then
+        If Not TypeOf va Is mHandler Then
+            On Error GoTo there1
+            If Not TypeOf var(w1).objref Is iBoxArray Then
 err11:
-           Set bstack.lastobj = Nothing
-           MyEr "Not proper object for iterator", "Δεν είναι σωστό αντικείμενο για επανάληψη"
-           Exit Function
-           End If
+                Set bstack.lastobj = Nothing
+                MyEr "Not proper object for iterator", "Δεν είναι σωστό αντικείμενο για επανάληψη"
+                Exit Function
+            End If
           End If
 there1:
           Err.Clear
           
            Set bstack.lastobj = New mHandler
 con12345:
-            PlaceIteratorData bstack, var(w1), st, en
+            PlaceIteratorData bstack, va, st, en
             iter = True
         End If
+    ElseIf Not bstack.StaticCollection Is Nothing Then
+    If bstack.ExistVar(s$, iter) Then
+        
+        bstack.ReadVar s$, va
+        GoTo conthere111
+    End If
     End If
 
 

@@ -119,7 +119,7 @@ End With
 
 End Sub
 Public Sub CopyStrip2(bst As basetask)
-Dim i As Long
+Dim I As Long
 With bst
 Set .Owner = Owner
 .StaticInUse = StaticInUse
@@ -127,9 +127,9 @@ Set .Owner = Owner
 Set .StaticCollection = StaticCollection
 Set .Sorosref = soros
 .DropNdot 20
-For i = 1 To curdotcol
-.MoveNameDot dotcol(i)
-Next i
+For I = 1 To curdotcol
+.MoveNameDot dotcol(I)
+Next I
 .DropRetStack
 .UseGroupname = UseGroupname
 .GroupName = GroupName
@@ -251,7 +251,7 @@ Public Sub SetVarobJvalue(ByVal Name$, var As Variant)
         StaticCollection.Value = var
     ElseIf TypeOf myobject Is mHandler Then
     Set usehandler = myobject
-    If usehandler.T1 = 4 Then
+    If usehandler.t1 = 4 Then
         Dim ok As Boolean
         Set var = usehandler.objref.SearchValue(var, ok)
         If ok Then
@@ -277,7 +277,7 @@ If Not StaticCollection.Find(Name$) Then Exit Function
   If .IsObj Then
     If Typename(.ValueObj) = "mHandler" Then
     Set usehandler = .ValueObj
-        If usehandler.T1 = 3 Then
+        If usehandler.t1 = 3 Then
             Dim mm As iBoxArray, mm1 As tuple, mm2 As mArray
             Set mm = usehandler.objref
             If mm.Arr Then
@@ -293,7 +293,7 @@ If Not StaticCollection.Find(Name$) Then Exit Function
             End If
             
             Set mm = Nothing
-        ElseIf usehandler.T1 = 4 Then
+        ElseIf usehandler.t1 = 4 Then
                 If ss$ = "++" Then
                         If usehandler.index_start < usehandler.objref.Count - 1 Then
                             usehandler.index_start = usehandler.index_start + 1
@@ -403,12 +403,12 @@ End If
             End With
    AlterVar = True
 End Function
-Static Function MyRound(A As Variant, Optional ByVal i As Integer = 0)
+Static Function MyRound(a As Variant, Optional ByVal I As Integer = 0)
 Dim c As Variant, j As VbVarType
 Dim n(1 To 28) As Single, D(1 To 28) As Double, cur(1 To 28) As Currency, dec(1 To 28) As Variant
 Dim sg(-1 To 1) As Single, sg4(-1 To 1) As Double, sg8(-1 To 1) As Currency
-j = VarType(A)
-If j < vbSingle Then MyRound = A: Exit Function
+j = VarType(a)
+If j < vbSingle Then MyRound = a: Exit Function
 On Error GoTo there
 If n(1) = 0 Then
     sg(-1) = CSng(-0.5)
@@ -443,50 +443,50 @@ If n(1) = 0 Then
         dec(c) = CDec(10 ^ c)
     Next c
 End If
-    If i = 0 Then
-        MyRound = Sgn(A) * Int(Abs(A) + 0.5)
+    If I = 0 Then
+        MyRound = Sgn(a) * Int(Abs(a) + 0.5)
         Exit Function
     Else
-        c = Fix(A)
+        c = Fix(a)
         Select Case j
         Case vbSingle
-            If n(i) > 0 Then
-                c = sg(Sgn(A))
-                MyRound = Fix(A * n(i) + c) / n(i)
+            If n(I) > 0 Then
+                c = sg(Sgn(a))
+                MyRound = Fix(a * n(I) + c) / n(I)
             Else
-                MyRound = A
+                MyRound = a
             End If
             Exit Function
         Case vbDouble
-            c = sg4(Sgn(A))
+            c = sg4(Sgn(a))
  
-            If D(i) > 0 Then
-                MyRound = Fix(A * D(i) + c) / D(i)
+            If D(I) > 0 Then
+                MyRound = Fix(a * D(I) + c) / D(I)
             Else
-                MyRound = A
+                MyRound = a
             End If
             Exit Function
         Case vbCurrency
-            If cur(i) > 0 Then
-                c = sg8(Sgn(A))
-                MyRound = Fix(A) + Fix((A - Fix(A)) * cur(i) + c) / cur(i)
+            If cur(I) > 0 Then
+                c = sg8(Sgn(a))
+                MyRound = Fix(a) + Fix((a - Fix(a)) * cur(I) + c) / cur(I)
             Else
-                MyRound = A
+                MyRound = a
             End If
             Exit Function
         Case vbDecimal
-            c = sg8(Sgn(A))
-            MyRound = Fix(A) + Fix((A - Fix(A)) * dec(i) + c) / dec(i)
+            c = sg8(Sgn(a))
+            MyRound = Fix(a) + Fix((a - Fix(a)) * dec(I) + c) / dec(I)
             Exit Function
         Case Else
-            MyRound = A
+            MyRound = a
             Exit Function
         End Select
     End If
 there:
 Err.Clear
-MyRound = A
-If i < 0 Or i > 28 Then MyEr "Round Place exit range 0 to 28", "Η θέση στρογγυλοποίησης εκτός περιοχής από 0 έως 28"
+MyRound = a
+If I < 0 Or I > 28 Then MyEr "Round Place exit range 0 to 28", "Η θέση στρογγυλοποίησης εκτός περιοχής από 0 έως 28"
 End Function
 
 Public Function ExistVar(ByVal Name$, Optional IsObj As Boolean = False) As Boolean
@@ -499,7 +499,7 @@ Public Function ExistVar2(ByVal Name$) As Boolean
         ExistVar2 = StaticCollection.ExistKey(Name$)
 End Function
 Public Sub ReadVar(ByVal Name$, var As Variant)
-    Dim i As Long, vv As Variant
+    Dim I As Long, vv As Variant
     If StaticCollection Is Nothing Then Exit Sub
     With StaticCollection
         If .Find(Name$) Then
@@ -514,7 +514,7 @@ Public Sub ReadVar(ByVal Name$, var As Variant)
     End With
 End Sub
 Public Sub ReadStaticCol(ByVal Name$, var As Variant)
-    Dim i As Long, vv As Variant
+    Dim I As Long, vv As Variant
     If StaticCollection Is Nothing Then
     Set var = Nothing
     Exit Sub
@@ -530,7 +530,7 @@ Public Sub ReadStaticCol(ByVal Name$, var As Variant)
     End With
 End Sub
 Public Sub ReadStaticCol2(Name$, var As Variant)
-    Dim i As Long, vv As Variant
+    Dim I As Long, vv As Variant
     If StaticCollection Is Nothing Then
     Set var = Nothing
     Exit Sub
@@ -554,35 +554,35 @@ Else
 End If
 End Sub
 
-Public Sub MoveNameDot(A$)
-If A$ = vbNullString Then Exit Sub
+Public Sub MoveNameDot(a$)
+If a$ = vbNullString Then Exit Sub
 If curdotcol < dotcolmax Then
     curdotcol = curdotcol + 1
-     dotcol(curdotcol) = A$
+     dotcol(curdotcol) = a$
 Else
     MyEr "Max count for dot names", "Μέγιστος αριθμός τελείας"
 End If
 End Sub
-Public Function GetDotNew(A$, dotnum&, Optional Clear As Boolean = False) As Boolean
-If Look2Parent Then GetDotNew = Parent.GetDotNew(A$, dotnum&): Exit Function
+Public Function GetDotNew(a$, dotnum&, Optional Clear As Boolean = False) As Boolean
+If Look2Parent Then GetDotNew = Parent.GetDotNew(a$, dotnum&): Exit Function
 
 If curdotcol = 0 Then
 If Len(UseGroupname) > 0 Then
-    If Right(A$, 1) = "(" Then
-        If AscW(Left$(A$, 1)) > 255 Then
+    If Right(a$, 1) = "(" Then
+        If AscW(Left$(a$, 1)) > 255 Then
        
-        A$ = "ΑΥΤΟ." + A$
+        a$ = "ΑΥΤΟ." + a$
        Else
-        A$ = "THIS." + A$
+        a$ = "THIS." + a$
        End If
-    ElseIf Len(A$) = 0 Then
+    ElseIf Len(a$) = 0 Then
        If tpointer > 0 Then
-           A$ = var(tpointer).Patch + "."
+           a$ = var(tpointer).Patch + "."
        Else
-           A$ = "THIS"
+           a$ = "THIS"
        End If
     Else
-       A$ = UseGroupname + A$
+       a$ = UseGroupname + a$
     End If
  
  End If
@@ -595,45 +595,45 @@ If UseGroupname = vbNullString Then
 Else
 
             
-            A$ = UseGroupname + A$
+            a$ = UseGroupname + a$
  End If
 Else
 
   If dotcol(dotnum) = "THIS" Then
     If Len(UseGroupname) > 0 Then
-      A$ = UseGroupname + A$
+      a$ = UseGroupname + a$
     Else
-    A$ = "THIS." + A$
+    a$ = "THIS." + a$
     End If
   Else
-  If Len(A$) = 4 Then
-  If A$ = "THIS" Then
-    A$ = dotcol(dotnum)
+  If Len(a$) = 4 Then
+  If a$ = "THIS" Then
+    a$ = dotcol(dotnum)
     GoTo aaa
-  ElseIf A$ = "ΑΥΤΟ" Then
-    A$ = dotcol(dotnum)
+  ElseIf a$ = "ΑΥΤΟ" Then
+    a$ = dotcol(dotnum)
     GoTo aaa
   End If
   End If
   If Left$(dotcol(dotnum), 1) = "*" And Not Clear Then
-    A$ = Mid$(dotcol(dotnum), 2) + "." + A$
+    a$ = Mid$(dotcol(dotnum), 2) + "." + a$
   Else
 
-    A$ = dotcol(dotnum) + "." + A$
+    a$ = dotcol(dotnum) + "." + a$
 
     End If
     
-If Left$(A$, 1) = "." Then
-A$ = Me.UseGroupname + Mid$(A$, 2)
+If Left$(a$, 1) = "." Then
+a$ = Me.UseGroupname + Mid$(a$, 2)
 GoTo aaa
 End If
     End If
-    If AscW(A$) = 46 Then
+    If AscW(a$) = 46 Then
     dotnum = 1
-    While AscW(Mid$(A$, dotnum + 1) + " ") = 46
+    While AscW(Mid$(a$, dotnum + 1) + " ") = 46
      dotnum = dotnum + 1
     Wend
-    A$ = Mid$(A$, dotnum + 1)
+    a$ = Mid$(a$, dotnum + 1)
     dotnum = dotnum + 1
     GoTo newrun
     End If
@@ -646,19 +646,19 @@ aaa:
 'End If
 End Function
 
-Public Function GetDot(A$, st&) As Boolean
-Dim i&
-If curdotcol = 0 Then A$ = Mid$(A$, 2): Exit Function
-Do While Mid$(A$, st&, 1) = " "
+Public Function GetDot(a$, st&) As Boolean
+Dim I&
+If curdotcol = 0 Then a$ = Mid$(a$, 2): Exit Function
+Do While Mid$(a$, st&, 1) = " "
 st& = st& + 1
-If st& > Len(A$) Then Exit Function
+If st& > Len(a$) Then Exit Function
 Loop
 
-For i& = st& + 1 To Len(A$)
-If Mid$(A$, i&, 1) <> "." Then i& = i& + 1: Exit For
-Next i&
-i& = i& - 2
-If st& > 1 Then A$ = Left$(A$, st& - 1) + dotcol(i& - st& + 1) + Mid$(A$, i&) Else Exit Function
+For I& = st& + 1 To Len(a$)
+If Mid$(a$, I&, 1) <> "." Then I& = I& + 1: Exit For
+Next I&
+I& = I& - 2
+If st& > 1 Then a$ = Left$(a$, st& - 1) + dotcol(I& - st& + 1) + Mid$(a$, I&) Else Exit Function
 If Not Err Then GetDot = True
 End Function
 
@@ -729,8 +729,8 @@ Public Property Get Parent() As basetask
 Set Parent = MyParent
 
 End Property
-Public Property Set Sorosref(A As mStiva)
-Set parentSoros = A
+Public Property Set Sorosref(a As mStiva)
+Set parentSoros = a
 End Property
 Public Property Get RetStackTotal() As Long
 If RetSoros Is Nothing Then
@@ -756,8 +756,8 @@ Set parentSoros = New mStiva
 End If
 Set soros = parentSoros
 End Property
-Public Property Set Owner(A As Object)
-Set myOwner = A
+Public Property Set Owner(a As Object)
+Set myOwner = a
 End Property
 Public Property Get Owner() As Object
 If mtoprinter Then
@@ -785,12 +785,12 @@ Public Sub EndRun()
 ' μόνο από το Myprocess.tick
 myRun = False
 End Sub
-Public Property Set Process(A As TaskInterface)
-If mprocess Is A Then
+Public Property Set Process(a As TaskInterface)
+If mprocess Is a Then
 Set mprocess = Nothing
 mprocessOk = True
 Else
-Set mprocess = A
+Set mprocess = a
 
 mprocessOk = True
 End If
@@ -802,12 +802,12 @@ Private Sub checkialive()
 If threadsnames Is Nothing Then Set threadsnames = New ThreadsClass
 End Sub
 
-Public Property Set LinkThread(Threadid As Long, A As TaskInterface)
+Public Property Set LinkThread(Threadid As Long, a As TaskInterface)
 Dim aa As mThreadref
 checkialive
 If threadsnames.Find(Threadid) Then
 Set aa = threadsnames.ValueObj
-Set aa.thread = A
+Set aa.thread = a
 End If
 End Property
 
@@ -860,7 +860,7 @@ End Function
 Public Function ThreadsStr(Optional ByVal Lang As Long = 0)
 '' use threadsnames
 
-Dim aa As mThreadref, A$
+Dim aa As mThreadref, a$
 If threadsnames Is Nothing Then Exit Function
 
 If threadsnames.Count > 0 Then
@@ -870,12 +870,12 @@ While threadsnames.Done
 Set aa = threadsnames.ValueObj
 If Left$(aa.VarName, 1) = "_" Then
 If Lang = 0 Then
-A$ = A$ + "ΕΣΩΤΕΡΙΚΟ ΝΗΜΑ "
+a$ = a$ + "ΕΣΩΤΕΡΙΚΟ ΝΗΜΑ "
 Else
-A$ = A$ + "INTERNAL THREAD "
+a$ = a$ + "INTERNAL THREAD "
 End If
 Else
-A$ = A$ + aa.VarName + str$(aa.id) + " "
+a$ = a$ + aa.VarName + str$(aa.id) + " "
 End If
 threadsnames.NextIndex
 Wend
@@ -884,12 +884,12 @@ Set aa = Nothing
 End If
 If Me.IamChild Then
 If Not Me.Parent Is Nothing Then
-ThreadsStr = Trim$(A$ & Me.Parent.ThreadsStr(Lang))
+ThreadsStr = Trim$(a$ & Me.Parent.ThreadsStr(Lang))
 Else
 ThreadsStr = vbNullString
 End If
 Else
-ThreadsStr = Trim$(A$)
+ThreadsStr = Trim$(a$)
 End If
 End Function
 Public Function ThreadsNumber() As Long
@@ -1043,20 +1043,20 @@ r = CLng(v)
 RetSoros.drop 1
 End If
 End Function
-Public Sub PushSecondThird(A As Long, b As Long)
-    RetStack.PushSecondThird A, b
+Public Sub PushSecondThird(a As Long, b As Long)
+    RetStack.PushSecondThird a, b
 End Sub
-Public Function isPop3Long(A As Long, b As Long) As Long
-    isPop3Long = RetStack.isPop3Long(A, b)
+Public Function isPop3Long(a As Long, b As Long) As Long
+    isPop3Long = RetStack.isPop3Long(a, b)
 End Function
-Public Function Pop3Long(A As Long, b As Long) As Long
-    Pop3Long = RetStack.Pop3Long(A, b)
+Public Function Pop3Long(a As Long, b As Long) As Long
+    Pop3Long = RetStack.Pop3Long(a, b)
 End Function
 Public Function IsDecimal() As Boolean
     IsDecimal = RetStack.IsDecimal
 End Function
-Public Sub RetStackDrop(A As Long)
-    RetStack.drop A
+Public Sub RetStackDrop(a As Long)
+    RetStack.drop a
 End Sub
 Public Sub Flush()
 If Not RetStack Is Nothing Then RetStack.Flush
