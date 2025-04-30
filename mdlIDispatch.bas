@@ -303,7 +303,7 @@ conthere:
                     Else
                         pobjTarget.Modal = mycodeid
                    End If
-                   Dim X As Form, z As Form, zz As Form
+                   Dim X As Form, Z As Form, zz As Form
                    Set zz = Screen.ActiveForm
                    If zz.Name = "Form3" Then
                    Set zz = zz.lastform
@@ -383,22 +383,22 @@ conthere:
                 Else
                     Modalid = mycodeid
                 End If
-                Set z = Nothing
+                Set Z = Nothing
                 For Each X In Forms
                     If X.Name = "GuiM2000" Then
                         Set mm = X
                         ' If x.Modal = 0 Then
                         mm.TestModal mycodeid
                         If Not mm Is pobjTarget Then
-                        If mm.Enablecontrol Then Set z = X
+                        If mm.Enablecontrol Then Set Z = X
                         End If
                         Set mm = Nothing
                         'End If
                     End If
                 Next X
-                If Not zz Is Nothing Then Set z = zz
-                If Typename(z) = "GuiM2000" Then
-                    Set mm = z
+                If Not zz Is Nothing Then Set Z = zz
+                If Typename(Z) = "GuiM2000" Then
+                    Set mm = Z
                     If mm.Modal = Modalid Then
                 
                     ElseIf Not mm Is pobjTarget Then
@@ -406,10 +406,10 @@ conthere:
                         mm.ShowmeALL
                         If mm.Visible Then mm.SetFocus
                     End If
-                    Set z = Nothing
+                    Set Z = Nothing
                     Set mm = Nothing
-                ElseIf Not z Is Nothing Then
-                    If z.Visible Then z.SetFocus
+                ElseIf Not Z Is Nothing Then
+                    If Z.Visible Then Z.SetFocus
                 End If
                 Modalid = oldmoldid
             End If
@@ -644,28 +644,35 @@ Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR
 
     ' Get IDispatch from object
     Set IDsp = pobjTarget
-    Dim aa As Long, i As Integer, K As Integer
+    Dim aa As Long, I As Integer, K As Integer
     aa = DISPID_VALUE
     ' WE HAVE DISPIP
     If VarType(ThisIndex) = 8204 Then
-                 ReDim varArr(0 To UBound(ThisIndex))
-                 K = 0
-                 For i = UBound(ThisIndex) - 1 To 0 Step -1
-                    varArr(K) = ThisIndex(i)
+                ReDim varArr(0 To UBound(ThisIndex))
+                K = 0
+                For I = UBound(ThisIndex) - 1 To 0 Step -1
+                    If MemInt(VarPtr(ThisIndex(I))) = 9 Then
+                        Set varArr(K) = ThisIndex(I)
+                    Else
+                        varArr(K) = ThisIndex(I)
+                    End If
                     K = K + 1
-                 Next
+                Next
                 With params
                     .cArgs = K
                     .rgPointerToVariantArray = VarPtr(varArr(0))
                     
                     .cNamedArgs = 0
                      .rgPointerToDISPIDNamedArgs = VarPtr(aa)
-               End With
+                End With
                
     Else
-                 ReDim varArr(0 To 0)
-                varArr(0) = ThisIndex
-                
+                ReDim varArr(0 To 0)
+                If MemInt(VarPtr(ThisIndex)) = 9 Then
+                    Set varArr(0) = ThisIndex
+                Else
+                    varArr(0) = ThisIndex
+                End If
                 With params
                     .cArgs = 1
                     .rgPointerToVariantArray = VarPtr(varArr(0))
@@ -743,7 +750,11 @@ Public Sub ChangeOneParameter(pobjTarget As Object, dispid As Long, val1, ERrR$)
        
       
                 ReDim varArr(0 To 0)
+                If MemInt(VarPtr(val1)) = 9 Then
+                Set varArr(0) = val1
+                Else
                 varArr(0) = val1
+                End If
                 With params
                     .cArgs = 1
                     .rgPointerToVariantArray = VarPtr(varArr(0))
@@ -797,13 +808,17 @@ Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, val1, E
     Set IDsp = pobjTarget
 
     ' WE HAVE DISPIP
-    Dim aa As Long, i As Integer, K As Integer
+    Dim aa As Long, I As Integer, K As Integer
     aa = DISPID_PROPERTYPUT
         If VarType(ThisIndex) = 8204 Then
                  ReDim varArr(0 To UBound(ThisIndex) + 1)
                  K = 1
-                 For i = UBound(ThisIndex) - 1 To 0 Step -1
-                    varArr(K) = ThisIndex(i)
+                 For I = UBound(ThisIndex) - 1 To 0 Step -1
+                    If MemInt(VarPtr(ThisIndex(I))) = 9 Then
+                        Set varArr(K) = ThisIndex(I)
+                    Else
+                        varArr(K) = ThisIndex(I)
+                    End If
                     K = K + 1
                  Next
                  varArr(0) = val1
@@ -817,8 +832,16 @@ Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, val1, E
        
       Else
                 ReDim varArr(0 To 1)
-                varArr(1) = ThisIndex
-                varArr(0) = val1
+                If MemInt(VarPtr(ThisIndex)) = 9 Then
+                    Set varArr(1) = ThisIndex
+                Else
+                    varArr(1) = ThisIndex
+                End If
+                If MemInt(VarPtr(val1)) = 9 Then
+                    Set varArr(0) = val1
+                Else
+                    varArr(0) = val1
+                End If
                 With params
                     .cArgs = 2
                     .rgPointerToVariantArray = VarPtr(varArr(0))

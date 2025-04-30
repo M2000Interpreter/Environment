@@ -46,7 +46,7 @@ If HasHandlers Then Err.Raise "Only Handlers Support"
 Dim akey
 If MyIsNumeric(bkey) Then bkey = CLng(bkey)
 If VarType(bkey) <> vbLong And VarType(bkey) <> vbString Then Err.Raise 5
-    If mem.count = 0 Then
+    If mem.Count = 0 Then
         If datasize = 0 Then datasize = 10: lastDataSize = datasize: hashmod = CLng(datasize * 1.5)
         If hashsize = 0 Then hashsize = 1
         Select Case hashsize
@@ -77,9 +77,9 @@ If VarType(bkey) <> vbLong And VarType(bkey) <> vbString Then Err.Raise 5
         End If
         nextVal = -1
     ElseIf datasize = 0 Then
-        datasize = mem.count(Pleft)
+        datasize = mem.Count(Pleft)
         lastDataSize = datasize
-        hashmod = mem.count(HashArray)
+        hashmod = mem.Count(HashArray)
         hashsize = mem(HashSizeStore)
         nextVal = mem(nextValStore)
     End If
@@ -131,16 +131,16 @@ If VarType(bkey) <> vbLong And VarType(bkey) <> vbString Then Err.Raise 5
         pv = pv Mod hashmod
     End Select
     If pv = 0 Then pv = 1
-    Dim k
-    k = mem(HashArray, pv)
-    If Not k = nextVal + 1 Then
+    Dim K
+    K = mem(HashArray, pv)
+    If Not K = nextVal + 1 Then
         mem(HashArray, pv) = nextVal + 1
-        mem(Pleft, nextVal) = k
+        mem(Pleft, nextVal) = K
         Add = nextVal
     End If
 End Function
 Function AddHandler(akey As String) As Long
-    If mem.count = 0 Then
+    If mem.Count = 0 Then
         HasHandlers = True
         If datasize = 0 Then datasize = 10: lastDataSize = datasize: hashmod = CLng(datasize * 1.5)
         If hashsize = 0 Then hashsize = 1
@@ -165,8 +165,8 @@ Function AddHandler(akey As String) As Long
         HasHandlers = True
         mem(DataArray) = Empty
         lastDataSize = datasize
-        datasize = mem.count(Pleft)
-        hashmod = mem.count(HashArray)
+        datasize = mem.Count(Pleft)
+        hashmod = mem.Count(HashArray)
         hashsize = mem(HashSizeStore)
         nextVal = mem(nextValStore)
     Else
@@ -213,11 +213,11 @@ Function AddHandler(akey As String) As Long
         pv = pv Mod hashmod
     End Select
     'If pV = 0 Then pV = 1
-    Dim k
-    k = mem(HashArray, pv)
-    If Not k = nextVal + 1 Then
+    Dim K
+    K = mem(HashArray, pv)
+    If Not K = nextVal + 1 Then
         mem(HashArray, pv) = nextVal + 1
-        mem(Pleft, nextVal) = k
+        mem(Pleft, nextVal) = K
         AddHandler = nextVal
     End If
 End Function
@@ -227,9 +227,9 @@ Function Find(bkey, Optional v, Optional where, Optional queue) As Boolean
     Dim findfirst As Boolean
     findfirst = True
     If datasize = 0 Then
-        datasize = mem.count(Pleft)
+        datasize = mem.Count(Pleft)
         lastDataSize = datasize
-        hashmod = mem.count(HashArray)
+        hashmod = mem.Count(HashArray)
         hashsize = mem(HashSizeStore)
         nextVal = mem(nextValStore)
     End If
@@ -251,7 +251,7 @@ Function Find(bkey, Optional v, Optional where, Optional queue) As Boolean
         akey = bkey
     End If
     
-    Dim k As Long
+    Dim K As Long
     If findfirst Then
         
         
@@ -270,46 +270,59 @@ Function Find(bkey, Optional v, Optional where, Optional queue) As Boolean
             pv = pv Mod hashmod
         End Select
         If pv = 0 Then pv = 1
-        k = mem(HashArray, pv)
-        If k = 0 Then Exit Function
-        k = k - 1
+        K = mem(HashArray, pv)
+        If K = 0 Then Exit Function
+        K = K - 1
        
-        If mem.CompareStrEq(keyArray, k, akey) Then
-            If Not IsMissing(v) Then v = mem(DataArray, k)
-            If Not IsMissing(where) Then where = k
-            If Not IsMissing(queue) Then queue = mem(Pleft, k)
+        If mem.CompareStrEq(keyArray, K, akey) Then
+        
+            If Not IsMissing(v) Then
+                If mem.vtType(DataArray, K) = 9 Then
+                    Set v = mem.Value(DataArray, K)
+                Else
+                    v = mem(DataArray, K)
+                End If
+            End If
+            If Not IsMissing(where) Then where = K
+            If Not IsMissing(queue) Then queue = mem(Pleft, K)
             Find = True
         Else
             
-            k = mem(Pleft, k) - 1
+            K = mem(Pleft, K) - 1
 jump1:
-            Do While k >= 0
-                If mem.CompareStrEq(keyArray, k, akey) Then
-                    If Not IsMissing(v) Then v = mem(DataArray, k)
-                    If Not IsMissing(where) Then where = k
-                    If Not IsMissing(queue) Then queue = mem(Pleft, k)
+            Do While K >= 0
+                If mem.CompareStrEq(keyArray, K, akey) Then
+                    If Not IsMissing(v) Then
+                        If mem.vtType(DataArray, K) = 9 Then
+                            Set v = mem.Value(DataArray, K)
+                        Else
+                            v = mem(DataArray, K)
+                        End If
+                    End If
+                    If Not IsMissing(where) Then where = K
+                    If Not IsMissing(queue) Then queue = mem(Pleft, K)
                     Find = True
                     Exit Function
                 End If
                 queue = Empty
-                k = mem(Pleft, k) - 1
+                K = mem(Pleft, K) - 1
             Loop
         End If
     Else
-    k = CLng(queue) - 1
+    K = CLng(queue) - 1
     GoTo jump1
     End If
 End Function
 Function FindHandler(akey As String, hashcode As Long, Handler As Long) As Boolean
         If datasize = 0 Then
-            datasize = mem.count(Pleft)
+            datasize = mem.Count(Pleft)
             lastDataSize = datasize
-            hashmod = mem.count(HashArray)
+            hashmod = mem.Count(HashArray)
             hashsize = mem(HashSizeStore)
             nextVal = mem(nextValStore)
         End If
 
-        Dim k As Long
+        Dim K As Long
         Dim pv As Long, pv1 As Integer, pv2 As Byte
         pv = HashkEY(akey, hashsize)
         Select Case hashsize
@@ -324,13 +337,13 @@ Function FindHandler(akey As String, hashcode As Long, Handler As Long) As Boole
             pv = pv Mod hashmod
         End Select
         If pv = 0 Then pv = 1
-        k = mem(HashArray, pv)
-        If k = 0 Then Exit Function
-        k = k - 1
+        K = mem(HashArray, pv)
+        If K = 0 Then Exit Function
+        K = K - 1
         
-        If mem.CompareStrEq(keyArray, k, akey) Then
-            Handler = k
-            hashcode = mem(FirstKey, k)
+        If mem.CompareStrEq(keyArray, K, akey) Then
+            Handler = K
+            hashcode = mem(FirstKey, K)
             FindHandler = True
             Exit Function
         End If
@@ -342,16 +355,28 @@ End Property
 Property Get Values()
     Values = mem(DataArray)
 End Property
+Property Set Value(ByVal where As Long, RHS)
+    If HasHandlers Then Exit Property
+    If where < 0 Or where > mem.Count(DataArray) Then Exit Property
+    mem(DataArray, where) = RHS
+End Property
 Property Let Value(ByVal where As Long, RHS)
     If HasHandlers Then Exit Property
-    If where < 0 Or where > mem.count(DataArray) Then Exit Property
+    If where < 0 Or where > mem.Count(DataArray) Then Exit Property
     mem(DataArray, where) = RHS
 End Property
 Property Get Value(ByVal where As Long)
 Attribute Value.VB_UserMemId = 0
+    Dim ret
+     
     If Not HasHandlers Then
-        If where < 0 Or where > mem.count(DataArray) Then Exit Property
-        Value = mem(DataArray, where)
+        If where < 0 Or where > mem.Count(DataArray) Then Exit Property
+        If mem.vtType(DataArray, where) = 9 Then
+            Set ret = mem.Value(DataArray, where)
+            SwapVariant ret, Value
+        Else
+            Value = mem(DataArray, where)
+        End If
     Else
         If where < 0 Or where > nextVal Then Value = False Else Value = True
     End If
@@ -411,7 +436,7 @@ Property Let KeyNoReHash(ByVal where As Long, bkey)
     End Select
 End Property
 Property Get Key(ByVal where As Long)
-    If where < 0 Or where > mem.count(DataArray) Then Exit Property
+    If where < 0 Or where > mem.Count(DataArray) Then Exit Property
     Key = mem(keyArray, where)
 End Property
 Friend Property Set PlaceRefArray(that As refArray)
@@ -432,15 +457,15 @@ Property Get HashkEY(Key$, Optional ByVal Size As Long = 4) As Long
             HashData StrPtr(Key$), LenB(Key$), VarPtr(HashkEY), Size
         End If
 End Property
-Property Get count()
+Property Get Count()
     If datasize = 0 Then
-        datasize = mem.count(Pleft)
+        datasize = mem.Count(Pleft)
         lastDataSize = datasize
-        hashmod = mem.count(HashArray)
+        hashmod = mem.Count(HashArray)
         hashsize = mem(HashSizeStore)
         nextVal = mem(nextValStore) = nextVal
     End If
-    count = nextVal + 1
+    Count = nextVal + 1
 
 End Property
 Sub Clear()
@@ -455,11 +480,11 @@ If Len(akey) = 2 Then
 End If
 End Function
 Property Get KeyNum(ByVal where As Long) As Long
-    If where < 0 Or where > mem.count(DataArray) Then Exit Property
+    If where < 0 Or where > mem.Count(DataArray) Then Exit Property
     KeyNum = KeyNumeric(mem(keyArray, where))
 End Property
 Property Get KeyNum2(where As Long) As Long
-    If where < 0 Or where > mem.count(DataArray) Then Exit Property
+    If where < 0 Or where > mem.Count(DataArray) Then Exit Property
     KeyNum2 = KeyNumeric(mem(keyArray, where)) And &HFFFF&
 End Property
 Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
@@ -475,18 +500,20 @@ Private Sub ReHashByte()
         mem(Pleft, datasize) = CByte(0)
         mem(keyArray, datasize) = ""
     End If
-    If Not HasHandlers Then mem(DataArray, datasize) = mem(DataArray, 0)
+    If Not HasHandlers Then
+        mem(DataArray, datasize) = mem(DataArray, 0)
+    End If
     hashmod = CLng(datasize * 1.5)
     mem.DefArrayAt HashArray, vbByte, hashmod
-    Dim pv As Long, k As Byte, i As Byte
-    For i = 0 To count - 1
-    pv = mem(FirstKey, i) Mod hashmod
-    k = mem(HashArray, pv)
+    Dim pv As Long, K As Byte, I As Byte
+    For I = 0 To Count - 1
+    pv = mem(FirstKey, I) Mod hashmod
+    K = mem(HashArray, pv)
     'If Not k = i + 1 Then
-        mem(HashArray, pv) = i + 1
-        mem(Pleft, i) = k
+        mem(HashArray, pv) = I + 1
+        mem(Pleft, I) = K
     'End If
-Next i
+Next I
 End Sub
 Private Sub ReHashInteger()
     mem(HashArray) = Empty
@@ -495,18 +522,20 @@ Private Sub ReHashInteger()
         mem(Pleft, datasize) = 0
         mem(keyArray, datasize) = ""
     End If
-    If Not HasHandlers Then mem(DataArray, datasize) = mem(DataArray, 0)
+    If Not HasHandlers Then
+        mem(DataArray, datasize) = mem(DataArray, 0)
+    End If
     hashmod = CLng(datasize * 1.5)
     mem.DefArrayAt HashArray, vbInteger, hashmod
-    Dim pv As Long, k As Integer, i As Integer
-    For i = 0 To count - 1
-    pv = mem(FirstKey, i) Mod hashmod
-    k = mem(HashArray, pv)
+    Dim pv As Long, K As Integer, I As Integer
+    For I = 0 To Count - 1
+    pv = mem(FirstKey, I) Mod hashmod
+    K = mem(HashArray, pv)
     'If Not k = i + 1 Then
-    mem(HashArray, pv) = i + 1
-    mem(Pleft, i) = k
+    mem(HashArray, pv) = I + 1
+    mem(Pleft, I) = K
     'End If
-Next i
+Next I
 End Sub
 Private Sub ReHashLong()
     mem(HashArray) = Empty
@@ -517,19 +546,21 @@ Private Sub ReHashLong()
     End If
     hashmod = CLng(datasize * 1.5)
     mem.DefArrayAt HashArray, vbLong, hashmod
-    If Not HasHandlers Then mem(DataArray, datasize) = mem(DataArray, 0)
-    Dim pv As Long, k As Long, i As Long
-    For i = 0 To count - 1
-    pv = mem(FirstKey, i) Mod hashmod
-    k = mem(HashArray, pv)
+    If Not HasHandlers Then
+        mem(DataArray, datasize) = mem(DataArray, 0)
+    End If
+    Dim pv As Long, K As Long, I As Long
+    For I = 0 To Count - 1
+    pv = mem(FirstKey, I) Mod hashmod
+    K = mem(HashArray, pv)
     'If Not k = i + 1 Then  ' these was for security..
-    mem(HashArray, pv) = i + 1
-    mem(Pleft, i) = k
+    mem(HashArray, pv) = I + 1
+    mem(Pleft, I) = K
     'End If
-Next i
+Next I
 End Sub
 Private Sub ReHash2()
-    Dim pv As Long, k As Integer, i As Integer
+    Dim pv As Long, K As Integer, I As Integer
     Dim pv1 As Integer
     hashsize = 2
     mem(HashSizeStore) = hashsize
@@ -541,22 +572,24 @@ Private Sub ReHash2()
     mem.DefArrayAt FirstKey, vbInteger, datasize
     mem.DefArrayAt HashArray, vbInteger, hashmod
     mem(keyArray, datasize) = ""
-    If Not HasHandlers Then mem(DataArray, datasize) = mem(DataArray, 0)
-    For i = 0 To count - 1
-        p = mem.Hash(keyArray, CLng(i), hashsize)
+    If Not HasHandlers Then
+        mem(DataArray, datasize) = mem(DataArray, 0)
+    End If
+    For I = 0 To Count - 1
+        p = mem.Hash(keyArray, CLng(I), hashsize)
         pv1 = MemInt(VarPtr(p)) And &H7FFF
         
-        mem(FirstKey, i) = pv1
+        mem(FirstKey, I) = pv1
         pv = pv1 Mod hashmod
-        k = mem(HashArray, pv)
+        K = mem(HashArray, pv)
         'If Not k = i + 1 Then
-        mem(HashArray, pv) = i + 1
-        mem(Pleft, i) = k
+        mem(HashArray, pv) = I + 1
+        mem(Pleft, I) = K
         'End If
-    Next i
+    Next I
 End Sub
 Private Sub ReHash4()
-    Dim pv As Long, k As Long, i As Long
+    Dim pv As Long, K As Long, I As Long
     Dim pv2 As Long
     hashsize = 4
     mem(HashSizeStore) = hashsize
@@ -568,21 +601,23 @@ Private Sub ReHash4()
     mem.DefArrayAt FirstKey, vbLong, datasize
     mem.DefArrayAt HashArray, vbLong, hashmod
     mem(keyArray, datasize) = ""
-    If Not HasHandlers Then mem(DataArray, datasize) = mem(DataArray, 0)
-    For i = 0 To count - 1
-        pv2 = mem.Hash(keyArray, i, hashsize)
+    If Not HasHandlers Then
+        mem(DataArray, datasize) = mem(DataArray, 0)
+    End If
+    For I = 0 To Count - 1
+        pv2 = mem.Hash(keyArray, I, hashsize)
         pv2 = pv2 And &H7FFFFFFF
-        mem(FirstKey, i) = pv2
+        mem(FirstKey, I) = pv2
         pv = pv2 Mod hashmod
-        k = mem(HashArray, pv)
+        K = mem(HashArray, pv)
         'If Not k = i + 1 Then
-        mem(HashArray, pv) = i + 1
-        mem(Pleft, i) = k
+        mem(HashArray, pv) = I + 1
+        mem(Pleft, I) = K
         'End If
-    Next i
+    Next I
 End Sub
 Sub Rehash()
-If count > 0 Then
+If Count > 0 Then
     Select Case hashsize
     Case 1
         ReHashByte
@@ -597,26 +632,26 @@ Function Initialized(p) As Boolean
     Initialized = mem.Elements(p) > 0
 End Function
 Sub SwapStrings(a$, b$)
-    Dim i As Long, j As Long
-    i = MemLong(VarPtr(a$))
+    Dim I As Long, j As Long
+    I = MemLong(VarPtr(a$))
     j = MemLong(VarPtr(b$))
     MemLong(VarPtr(a$)) = j
-    MemLong(VarPtr(b$)) = i
+    MemLong(VarPtr(b$)) = I
 End Sub
 Public Function create(ParamArray v()) As HashList
-    Dim hl As New HashList, i As Long
+    Dim hl As New HashList, I As Long
     Dim pp() As Variant
     pp = v
     If mem.Elements(pp) > 0 Then
-        For i = 0 To mem.Elements(pp) - 1
-            hl.Add CVar(pp(i)), i + 1, vbVariant
-        Next i
+        For I = 0 To mem.Elements(pp) - 1
+            hl.Add CVar(pp(I)), I + 1, vbVariant
+        Next I
     End If
     Set create = hl
 End Function
 Public Function cInt64(p)
     Static maxlonglong, limitlonglong, OneLongLong, OneBigLongLong
-    Dim a, i As Integer
+    Dim a, I As Integer
     If MemInt(VarPtr(maxlonglong)) = 0 Then
         maxlonglong = CDec("18446744073709551616")
         limitlonglong = CDec("9223372036854775808")
@@ -625,8 +660,8 @@ Public Function cInt64(p)
         MemInt(VarPtr(OneBigLongLong)) = 20
         MemByte(VarPtr(OneBigLongLong) + 12) = 1
     End If
-    i = MemInt(VarPtr(p))
-    Select Case i
+    I = MemInt(VarPtr(p))
+    Select Case I
     Case vbDecimal
         a = Fix(p)
         a = a - Int(a / maxlonglong) * maxlonglong
@@ -651,7 +686,7 @@ Public Function cInt64(p)
         While a >= limitlonglong: a = a - maxlonglong: Wend
         End If
         cInt64 = -OneLongLong And a
-        If i = vbString Then
+        If I = vbString Then
             If Left$(p, 1) = "&" And a < 0 Then
             Select Case Len(p)
             Case 10

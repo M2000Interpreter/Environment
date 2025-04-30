@@ -37462,6 +37462,8 @@ normal
 hash=NewHashList()
 method hash, "prepare", 2000
 method hash, "add",12345678912345678900123456@, 100&, vbVariant as where
+method hash, "add",123456789123456789001234568876454873658436873465873465u, 103& as where
+method hash, "add", (10,3i), 123& as where1
 with hash, "count" as hash.count, "value" as hash$(), "value" as hash(), "key" as Hash.key$(), "KeyNoReHash" as Hash.KeyNoRehash()
 with hash, "KeyNum" as KeyNum()
 decimal z= hash(where)
@@ -37472,7 +37474,7 @@ zz$=hash$(where)
 print type$(zz$), zz$
 print hash.count
 for i=0 to hash.count-1
-	print format$("{0:-30} - {1}",hash$(i), KeyNum(i))
+	print format$("{0:-60} - {1}", hash$(i), KeyNum(i))
 next i
 variant vv
 // call hash.find using named parameter v
@@ -37488,7 +37490,7 @@ method hash,"rehash"
 Pen 11 {
 Print "change key and then rehash the list"
 for i=0 to hash.count-1
-	print format$("{0::-30} - {1}",hash(i), KeyNum(i))
+	print format$("{0::-60} - {1}",hash(i), KeyNum(i))
 next i
 }
 double
@@ -37497,11 +37499,11 @@ normal
 hash=NewHashList()
 method hash, "prepare", 2000
 // now the first add method define the type (we didn't use the third parameter)
-method hash, "add",12345678912345678900123456@, "one" as where
+method hash, "add",1234567891234567834569732@, "one"  as where
 method hash, "add",123.456789123@, "two" as where
 method hash, "add",12345678@, "three" as where
 for i=0 to hash.count-1
-	print format$("{0::-30} - {1} ", hash(i), Hash.key$(i)) 
+	print format$("{0::-60} - {1} ", hash(i), Hash.key$(i)) 
 next i
 for j=1 to 10
 	if j>4 then
@@ -37514,7 +37516,7 @@ for j=1 to 10
 			print Hash.key$(m)
 		}
 		for i=0 to hash.count-1
-			print format$("{0::-30} - {1} ", hash(i), Hash.key$(i)) 
+			print format$("{0::-60} - {1} ", hash(i), Hash.key$(i)) 
 		next i
 		end if
 	end if
@@ -47172,6 +47174,7 @@ big=q#val(3)
 print type$(big)="BigInteger"
 }
 MODULE POLYSPIRAL {ΤΜΗΜΑ ΠΟΛΥΣΠΕΙΡΑ {
+	ΟΜΑΛΑ ΟΧΙ
 	ΦΟΡΜΑ 60, 25
 	ΟΘΟΝΗ #220055, 0
 	ΜΕΤΑΒΛΗΤΕΣ ΑΥΞΗΣΗ = 0, χ=ΚΛΙΜΑΞ.Χ / 2, ψ=ΚΛΙΜΑΞ.Ψ / 2
@@ -47185,7 +47188,7 @@ MODULE POLYSPIRAL {ΤΜΗΜΑ ΠΟΛΥΣΠΕΙΡΑ {
 		ΑΝΑΦΟΡΑ ΑΝ$(ΕΛΛΗΝΙΚΑ=ΑΛΗΘΕΣ->"ΠΟΛΥΣΠΕΙΡΑ ΣΕ ΚΙΝΗΣΗ","POLYSPIRAL ANIMATION")
 	}
 	ΚΡΑΤΗΣΕ
-	ΚΑΘΕ 1000/15 {
+	ΚΑΘΕ 1000/30 {
 		ΑΦΗΣΕ
 		ΑΥΞΗΣΗ+=0.00248
 		ΘΕΣΗ χ, ψ

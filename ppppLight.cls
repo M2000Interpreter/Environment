@@ -49,8 +49,8 @@ End Sub
 Public Sub PushEnd(Optional thisarr As Variant)
 dnum = ndnum
 End Sub
-Public Sub PushProp(A As Variant)
-Set GroupRef = A
+Public Sub PushProp(a As Variant)
+Set GroupRef = a
 Arr = False
 End Sub
 Public Function IsObjAt(curitem As Long, peekvalue As Variant) As Boolean
@@ -63,7 +63,7 @@ On Error Resume Next
 Set usehandler = GroupRef
 If Err.Number Then InternalError: Exit Function
 On Error GoTo 0
-If usehandler.T1 <> 1 Then Err.Raise 1010, , "Need an Inventory Object"
+If usehandler.t1 <> 1 Then Err.Raise 1010, , "Need an Inventory Object"
 If usehandler.objref.Done Then
     If usehandler.objref.IsObj Then
         
@@ -211,7 +211,7 @@ Private Function iBoxArray_isObj() As Boolean
 If Not TypeOf GroupRef Is mHandler Then GoTo e1245
 Dim usehandler As mHandler
 Set usehandler = GroupRef
-If usehandler.T1 <> 1 Then
+If usehandler.t1 <> 1 Then
 e1245:
     Err.Raise 5010, , "Need an Inventory Object"
     Exit Function
@@ -227,7 +227,7 @@ ElseIf curitem < 0 Then
     If Not TypeOf GroupRef Is mHandler Then GoTo e1245
 Dim usehandler As mHandler
 Set usehandler = GroupRef
-If usehandler.T1 <> 1 Then
+If usehandler.t1 <> 1 Then
 e1245:
     Err.Raise 5010, , "Need an Inventory Object"
 End If
@@ -266,7 +266,7 @@ If Not GroupRef Is Nothing Then
     If TypeOf GroupRef Is mHandler Then
         Dim usehandler As mHandler
         Set usehandler = GroupRef
-        If usehandler.T1 = 1 Then
+        If usehandler.t1 = 1 Then
             usehandler.objref.Index = Abs(curitem + 100)
             usehandler.objref.Done = True
             Set usehandler.objref.ValueObj = item
@@ -313,7 +313,7 @@ ElseIf curitem < 0 Then
     If Not TypeOf GroupRef Is mHandler Then GoTo e1245
 Dim usehandler As mHandler
 Set usehandler = GroupRef
-If usehandler.T1 <> 1 Then
+If usehandler.t1 <> 1 Then
 e1245:
     Err.Raise 5010, , "Need an Inventory Object"
 End If
@@ -360,8 +360,8 @@ End If
 End Property
 
 Private Property Get iBoxArray_itemPtr(curitem As Long) As Long
-Static A
-iBoxArray_itemPtr = VarPtr(A)
+Static a
+iBoxArray_itemPtr = VarPtr(a)
 End Property
 
 Private Property Let iBoxArray_ItemStr(curitem As Long, RHS As String)
@@ -385,7 +385,7 @@ If Not TypeOf GroupRef Is mHandler Then GoTo e1245
 a123:
 Dim usehandler As mHandler
 Set usehandler = GroupRef
-If usehandler.T1 <> 1 Then
+If usehandler.t1 <> 1 Then
 e1245:
    iBoxArray_ItemType = Typename(GroupRef)
    Exit Function
@@ -410,7 +410,21 @@ there1:
 End Property
 
 Private Property Get iBoxArray_ItemTypeNum(curitem As Variant) As Integer
-
+If Not Arr Then
+    If curitem = -2 Then
+    
+    ElseIf curitem < 0 Then
+        Dim usehandler As mHandler
+        Set usehandler = GroupRef
+        If usehandler.objref.Done Then
+            If usehandler.objref.IsObj Then
+            iBoxArray_ItemTypeNum = 9
+            Else
+               iBoxArray_ItemTypeNum = MemInt(VarPtr(usehandler.objref.Value))
+            End If
+        End If
+    End If
+End If
 End Property
 
 Private Function iBoxArray_MyIsNumeric(v As Variant) As Boolean
@@ -430,7 +444,32 @@ Private Sub iBoxArray_Neg(v As Long)
 End Sub
 
 Private Function iBoxArray_PlaceValue2UDT(p As Long, Name As String, v As Variant) As Boolean
-'
+On Error Resume Next
+If Not Arr Then
+    If p = -2 Then
+    
+    ElseIf p < 0 Then
+        Dim usehandler As mHandler
+        Set usehandler = GroupRef
+        If usehandler.objref.Done Then
+            If usehandler.objref.IsObj Then
+                iBoxArray_PlaceValue2UDT = False
+                
+            Else
+            usehandler.objref.PlaceValue2UDT Name$, v
+                
+                If Err Then
+                    MyEr Err.Description, Err.Description
+                    Err.Clear
+                    Exit Function
+                End If
+                iBoxArray_PlaceValue2UDT = True
+
+            End If
+        End If
+    End If
+End If
+
 End Function
 
 Private Function iBoxArray_PlaceValue2UDTArray(p As Long, Name As String, v As Variant, Index As Long) As Boolean
@@ -450,8 +489,8 @@ Private Sub iBoxArray_PushEnd(Optional thisarr As Variant)
 dnum = ndnum
 End Sub
 
-Private Sub iBoxArray_PushProp(A As Variant)
-PushProp A
+Private Sub iBoxArray_PushProp(a As Variant)
+PushProp a
 End Sub
 
 Private Property Set iBoxArray_refgroup(ByVal RHS As Object)
