@@ -46,9 +46,12 @@ Sub Add2Field(st$)
     Dim there As Long
     On Error Resume Next
     there = UBound(Fields)
-    If Err Then Err.Clear: there = 0
+    If Err Then
+        Err.Clear
+        there = 0
+        Fields = LibMemory.EmptyArray(1, vbString)
+    End If
     ReDim Preserve Fields(there + 1)
-   ' SwapStrings st$,
     Fields(there) = st$
     st$ = vbNullString
 End Sub
@@ -122,7 +125,7 @@ If mytypes Is RHS Then
     MatchTypes = True
     Exit Function
 End If
-If mytypes.count * extypes.count = 0 Then Exit Function
+If mytypes.Count * extypes.Count = 0 Then Exit Function
 For Each K In extypes
     If TypeGroupNow(K) Then MatchTypes = True: Exit Function
 Next
@@ -138,7 +141,7 @@ Public Sub ResetEvents()
 If eventlist Is Nothing Then Exit Sub
 Dim i As Long
 With eventlist
-For i = 0 To .count - 1
+For i = 0 To .Count - 1
     .Index = i
     .Done = True
     .Value = vbNullString
@@ -153,7 +156,7 @@ If eventlist Is Nothing Then Exit Sub
 Dim eventlist2 As New FastCollection
 Dim i As Long
 With eventlist
-For i = 0 To .count - 1
+For i = 0 To .Count - 1
     .Index = i
     .Done = True
     eventlist2.AddKey .KeyToString, ""
@@ -327,7 +330,7 @@ End Sub
 Public Sub BeginFloat(Total As Long)
 FloatGroup = True
  bank = LibMemory.EmptyArray(1, vbVariant)
- ReDim bank(Total * 2 - 1)
+ If Total > 0 Then ReDim bank(Total * 2 - 1)
 'bank.grouperror = True
 'bank.PushDim Total * 2
 'bank.PushEnd

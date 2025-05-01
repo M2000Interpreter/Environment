@@ -1,14 +1,82 @@
 M2000 Interpreter and Environment
-Version 13 revision 44 active-X
+Version 13 revision 45 active-X
+
+1. Optimizations
+
+2. We can put groups in arrays of objects of type RefArray. We can call methods using dot or => (always we put a pointer)
 
 
-1. Now we can change value r or i of a complex number in a list.
-a=list
-a(100)=(10, 3i)
-a(100)|r=1000
-Print a(100)|r, a(100)|i
-2. See at info then HashList object. Now we can put Biginteger and Complex numbers.
+Example:
+I Use for Tree an array of objects (nodes) (the eertree example in info use inventory, a map list). We can do that because all indexes is 0,1,2... like array indexes. 
 
+eertree= lambda (s as string)
+	->{
+		Class Node {
+			inventory myedges
+			long length, suffix=0
+			Function edges(s as string) {
+				=-1 : if exist(.myedges, s) then =eval(.myedges)
+			}
+			Module edges_append (a as string, where as long) {
+				Append .myedges, a:=where
+			}
+			Class:
+			Module Node(.length) {
+				Read ? .suffix, .myedges
+			}
+		}	
+		object Tree[100]
+		' we can give 1, Tree[1] and this type add items as we set index above upper limit
+		Tree[0]=Node(0,1)
+		Tree[1]=Node(-1,1)
+		k=0
+		suffix=0
+		for i=0 to len(s)-1
+			d=mid$(s,i+1,1)
+			n=suffix
+			Do
+				k=Tree[n].length
+				b=i-k-1
+				if b>=0 then if mid$(s,b+1,1)=d Then exit
+				n =Tree[n].suffix  
+			Always
+			e=Tree[n].edges(d)
+			if e>=0 then suffix=e :continue
+			suffix=len(Tree)
+			Tree[len(Tree)]=Node(k+2)
+			Tree[n].edges_append d, suffix
+			If tree[suffix].length=1 then tree[suffix].suffix=0: continue
+			Do
+				n=Tree[n].suffix
+				b=i-Tree[n].length-1
+				if b>0 Then If  mid$(s, b+1,1)=d then exit
+			Always
+			e=Tree[n].edges(d)
+			if e>=0 then tree[suffix].suffix=e
+		next
+		=tree
+	}
+children=lambda (s as array, Tree,  n, root as string="")
+	-> {
+	recur(n, root)
+	=s
+	sub recur(n, root)
+		local Long L=Len(Tree[n].myEdges), i, c, nxt
+		local	String d, p	
+		if L=0 then exit sub
+		do	c=Tree[n].myEdges
+			d=Eval$(c, i)  ' read keys at position i
+			nxt=c(i!)   '  read value using position 
+			p = if(n=1 -> d, d+root+d)
+			append s, (p,)
+			recur(nxt, p)
+			i++
+		when i<L
+	end sub
+	}
+Palindromes=lambda children (Tree as *Object[])->"("+quote$(children(children((,), Tree, 0), Tree, 1)#str$({", "}))+")"
+Print Palindromes(eertree("987654321eertree12345678954321eertree12345eertree"))
+Print Palindromes(eertree("banana"))
 
 
 George Karras, Kallithea Attikis, Greece.

@@ -42,7 +42,7 @@ Public GroupRef As Object
 'Private mGroupRef As Object
 Public CodeName As String
 Private oldmaxitems As Long
-Public Arr As Boolean, Stable As Boolean
+Public arr As Boolean, Stable As Boolean
 Public RevOrder As Boolean
 Public MyTypeToBe As Integer
 Private Type SAFEArrayPart
@@ -661,12 +661,12 @@ If Err Then
 End If
 PlaceValue2UDT = True
 End Function
-Public Function GetUDTValue(p As Long, Name$, Optional ndx)
+Public Function GetUDTValue(p As Long, Name$, Optional nDx)
 On Error Resume Next
-If IsMissing(ndx) Then
+If IsMissing(nDx) Then
 GetUDTValue = Module10.GetUDTValue(actualData(p), Name$)
 Else
-GetUDTValue = Module10.GetUDTValueArray(actualData(p), Name$, CLng(ndx))
+GetUDTValue = Module10.GetUDTValueArray(actualData(p), Name$, CLng(nDx))
 End If
 End Function
 Property Get Value() As Variant
@@ -696,7 +696,7 @@ End If
 End Property
 Public Sub PushProp(a As Variant)
 Set GroupRef = a
-Arr = False
+arr = False
 End Sub
 Friend Sub ExportArrayNow()
 If myVarType(actualData, vbObject) Then
@@ -721,17 +721,17 @@ End Sub
 Friend Function ExportStrArray() As String()
 If myVarType(actualData, vbObject) Then Exit Function
 If VarType(actualData) <> vbArray + vbVariant Then Exit Function
-Dim I As Long
+Dim i As Long
 Dim n As Byte, s$, m_base As Long, r1 As Long, where As Long
 
 ReDim strAr(maxitems) As String
-For I = 0 To maxitems - 1
-GetMem1 VarPtr(actualData(I)), n
+For i = 0 To maxitems - 1
+GetMem1 VarPtr(actualData(i)), n
 If n = 8 Then
-strAr(I) = actualData(I)
+strAr(i) = actualData(i)
 Else
 End If
-Next I
+Next i
 ExportStrArray = strAr
 End Function
 Private Function makeonedim(items As Long) As Variant()
@@ -739,7 +739,7 @@ ReDim makeonedim(0 To items - 1)
 End Function
 
 Friend Sub FeedFromSrings(Carrier As Variant)
-Dim a() As String, I As Long
+Dim a() As String, i As Long
 If myVarType(actualData, vbObject) Then Exit Sub
 If VarType(actualData) <> vbArray + vbVariant Then Exit Sub
 a() = Carrier
@@ -786,10 +786,10 @@ MyEr "wrong array dimensions", "λάθος διαστάσεις πίνακα"
 Else
 actualData = makeonedim(sum)
 ii = LBound(a)
-For I = LBound(actualData, 1) To UBound(actualData, 1)
-actualData(I) = a(ii)
+For i = LBound(actualData, 1) To UBound(actualData, 1)
+actualData(i) = a(ii)
 ii = ii + 1
-Next I
+Next i
 PushEnd
 End If
 End Sub
@@ -869,25 +869,25 @@ End If
 '
 
 End Sub
-Friend Sub LoadTuple(Ar As Variant)
-Dim Z As Long, I As Long
-actualData = Ar
+Friend Sub LoadTuple(ar As Variant)
+Dim z As Long, i As Long
+actualData = ar
 If Count <> UBound(actualData) - LBound(actualData) + 1 Then
-I = Count
+i = Count
 maxitems1 = UBound(actualData) - LBound(actualData)
 maxitems = maxitems1 + 1
-Z = 1
+z = 1
 
 If dnum > 1 Then
 
-  Z = I \ limit(dnum - 1)
+  z = i \ limit(dnum - 1)
 
-   If maxitems Mod Z <> 0 Then
-  maxitems = maxitems + Z - maxitems Mod Z
+   If maxitems Mod z <> 0 Then
+  maxitems = maxitems + z - maxitems Mod z
   maxitems1 = maxitems - 1
   ReDim Preserve actualData(maxitems1)
   End If
-  limit(dnum - 1) = maxitems \ Z
+  limit(dnum - 1) = maxitems \ z
 
 Else
 dnum = 1
@@ -945,9 +945,9 @@ r1 = SafeArrayUnaccessData(ByVal m_base)
 R2 = SafeArrayUnlock(m_base_0)
 r1 = SafeArrayUnlock(m_base)
 End Sub
-Public Sub Car(m As Object)
+Public Sub Car(M As Object)
 Dim K As New tuple, usehandler As mHandler, s$
-Dim I As Long, obj As Object, obj2 As Object, spare As lambda
+Dim i As Long, obj As Object, obj2 As Object, spare As lambda
 If Count > 0 Then
     K.PushDim 1: K.PushEnd: K.SerialItem actualData(0), 0, 1
     If ItemIsObject(0) Then
@@ -967,16 +967,16 @@ If Count > 0 Then
             Set spare = Nothing
         Case mHdlr
                 Set usehandler = item(0)
-                If usehandler.T1 = 3 Then
-                    Set m = usehandler
+                If usehandler.t1 = 3 Then
+                    Set M = usehandler
                     Set K = Nothing
                     Exit Sub
                 End If
         Case mArr, mTuple
                 Set usehandler = New mHandler
-                usehandler.T1 = 3
+                usehandler.t1 = 3
                 Set usehandler.objref = item(0)
-                Set m = usehandler
+                Set M = usehandler
                 Set K = Nothing
                 Exit Sub
         Case Else
@@ -986,60 +986,60 @@ If Count > 0 Then
         K.item(0) = item(0)
     End If
 End If
-K.Arr = True
-Set m = K
+K.arr = True
+Set M = K
 Set K = Nothing
 End Sub
-Public Sub Cdr(m As Object)
+Public Sub Cdr(M As Object)
 Dim K As New tuple
-Dim I As Long, obj As Object, obj2 As Object, spare As lambda
+Dim i As Long, obj As Object, obj2 As Object, spare As lambda
 If dnum > 0 Then
     K.StartResize: K.PushDim Me.Count - 1: K.PushEnd
 Else
-    K.Arr = True
+    K.arr = True
     Set K.GroupRef = Me.GroupRef
     K.IHaveGui = Me.IHaveGui
     K.IhaveClass = Me.IhaveClass
-    Set m = K
+    Set M = K
     Exit Sub
 End If
 K.myarrbase = myarrbase
 K.RevOrder = False
-For I = 1 To Me.UpperMonoLimit
-    If IsObject(Me.item(I)) Then
-        Select Case Typename(Me.item(I))
+For i = 1 To Me.UpperMonoLimit
+    If IsObject(Me.item(i)) Then
+        Select Case Typename(Me.item(i))
         Case mgrp
-            Set obj = Me.item(I)
+            Set obj = Me.item(i)
             CopyGroupObj obj, obj2
-            Set K.item(I - 1) = obj2
+            Set K.item(i - 1) = obj2
             Set obj2 = Nothing
         Case mlmbd
             Dim actualdata1()
-            With Me.item(I)
+            With Me.item(i)
                 .CopyTo spare, actualdata1()
             End With
-            Set K.item(I - 1) = spare
+            Set K.item(i - 1) = spare
             Set spare = Nothing
         Case Else
-            Set K.item(I - 1) = Me.item(I)
+            Set K.item(i - 1) = Me.item(i)
         End Select
     Else
-        K.item(I - 1) = Me.item(I)
+        K.item(i - 1) = Me.item(i)
     End If
-Next I
+Next i
 ' why not in CAR ???
 Set K.GroupRef = Me.GroupRef
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
-Set m = K
+Set M = K
 End Sub
-Public Sub processAppend(m As Object)
+Public Sub processAppend(M As Object)
 Dim pppp As New mArray, pppp1 As mArray, tttt As tuple
-If TypeOf m Is tuple Then
-    Set tttt = m
+If TypeOf M Is tuple Then
+    Set tttt = M
     tttt.CopyTuple2Array pppp1
 Else
-    Set pppp1 = m
+    Set pppp1 = M
 End If
 If dnum > 0 Then
     Me.CopyArray pppp
@@ -1047,9 +1047,9 @@ If dnum > 0 Then
 ElseIf Not pppp1.IsEmpty Then
     Set pppp = pppp1
 End If
-pppp.Arr = True
+pppp.arr = True
 pppp.Final = False
-Set m = pppp
+Set M = pppp
 Set pppp = Nothing
 Set pppp1 = Nothing
 End Sub
@@ -1060,27 +1060,27 @@ If K.Count = 0 Then
     Me.CopyArray K
     Exit Sub
 End If
-Dim v As Variant, I As Long, obj As Object, obj2 As Object
+Dim v As Variant, i As Long, obj As Object, obj2 As Object
 Dim fromhere As Long
 fromhere = K.UpperMonoLimit + 1
 K.SerialItem v, Me.Count + K.Count, 10
 K.myarrbase = myarrbase
 K.RevOrder = RevOrder
-For I = 0 To Me.UpperMonoLimit
-    If IsObject(Me.item(I)) Then
-        Select Case Typename(Me.item(I))
+For i = 0 To Me.UpperMonoLimit
+    If IsObject(Me.item(i)) Then
+        Select Case Typename(Me.item(i))
         Case mgrp
-            Set obj = Me.item(I)
+            Set obj = Me.item(i)
             CopyGroupObj obj, obj2
-            Set K.item(I + fromhere) = obj2
+            Set K.item(i + fromhere) = obj2
             Set obj2 = Nothing
         Case Else
-            Set K.item(I + fromhere) = Me.item(I)
+            Set K.item(i + fromhere) = Me.item(i)
         End Select
     Else
-        K.item(I + fromhere) = Me.item(I)
+        K.item(i + fromhere) = Me.item(i)
     End If
-Next I
+Next i
 '' new
 Set K.GroupRef = Me.GroupRef
 K.IHaveGui = Me.IHaveGui
@@ -1094,14 +1094,14 @@ Public Sub CopyArray(K As mArray)
 
 If K Is Me Then Exit Sub
 If K Is Nothing Then Set K = New mArray
-Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda, gr As Group, linkthis As Boolean
+Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda, gr As Group, linkthis As Boolean
 K.MyTypeToBe = MyTypeToBe
 K.myarrbase = myarrbase
 K.RevOrder = False
 K.StartResize
-For I = 0 To dnum - 1
-    K.PushDim limit(I), limBase(I)
-Next I
+For i = 0 To dnum - 1
+    K.PushDim limit(i), limBase(i)
+Next i
 
 If myVarType(actualData, vbObject) And MyTypeToBe <> vbVariant Then
     K.PushEnd CVar(actualData.Copy)
@@ -1118,33 +1118,33 @@ Else
             Set gr = Nothing
         End If
     End If
-    For I = 0 To Me.UpperMonoLimit
-        If myVarType(Me.item(I), vbObject) Then
-            Select Case Typename(Me.item(I))
+    For i = 0 To Me.UpperMonoLimit
+        If myVarType(Me.item(i), vbObject) Then
+            Select Case Typename(Me.item(i))
             Case mgrp
-                Set obj = Me.item(I)
+                Set obj = Me.item(i)
                 CopyGroupObj obj, obj2, linkthis
-                Set K.item(I) = obj2
+                Set K.item(i) = obj2
                 Set obj2 = Nothing
             Case mlmbd
                 Dim actualdata1()
-                With Me.item(I)
+                With Me.item(i)
                 .CopyTo spare, actualdata1()
                 End With
-                Set K.item(I) = spare
+                Set K.item(i) = spare
                 Set spare = Nothing
             Case "RefArray"
-                Set K.item(I) = Me.item(I).Copy()
+                Set K.item(i) = Me.item(i).Copy()
             Case Else
-                Set K.item(I) = Me.item(I)
+                Set K.item(i) = Me.item(i)
             End Select
         Else
-            K.item(I) = Me.item(I)
+            K.item(i) = Me.item(i)
         End If
-    Next I
+    Next i
 '' new
 End If
-K.Arr = Me.Arr
+K.arr = Me.arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = linkthis
 K.Final = Me.Final
@@ -1153,7 +1153,7 @@ End Sub
 Public Sub CopyArray2tuple(K As tuple)
 'copy this to k
 If K Is Nothing Then Set K = New tuple
-Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda
+Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 K.MyTypeToBe = MyTypeToBe
 ' no use, we do the redim in PushEnd
 'k.SerialItem v, Me.UpperMonoLimit, 8
@@ -1171,33 +1171,33 @@ Else
     K.PushEnd
     K.RevOrder = RevOrder
     ' Set K.GroupRef = Me.GroupRef
-    For I = 0 To Me.UpperMonoLimit
-        If myVarType(Me.item(I), vbObject) Then
-            Select Case Typename(Me.item(I))
+    For i = 0 To Me.UpperMonoLimit
+        If myVarType(Me.item(i), vbObject) Then
+            Select Case Typename(Me.item(i))
             Case mgrp
-                Set obj = Me.item(I)
+                Set obj = Me.item(i)
                 CopyGroupObj obj, obj2
-                Set K.item(I) = obj2
+                Set K.item(i) = obj2
                 Set obj2 = Nothing
             Case mlmbd
                 Dim actualdata1()
-                With Me.item(I)
+                With Me.item(i)
                 .CopyTo spare, actualdata1()
                 End With
-                Set K.item(I) = spare
+                Set K.item(i) = spare
                 Set spare = Nothing
             Case "RefArray"
-                Set K.item(I) = Me.item(I).Copy()
+                Set K.item(i) = Me.item(i).Copy()
             Case Else
-                Set K.item(I) = Me.item(I)
+                Set K.item(i) = Me.item(i)
             End Select
         Else
-            K.item(I) = Me.item(I)
+            K.item(i) = Me.item(i)
         End If
-    Next I
+    Next i
 '' new
 End If
-K.Arr = Me.Arr
+K.arr = Me.arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = False
 K.Final = Me.Final
@@ -1206,62 +1206,62 @@ End Sub
 Public Sub CopyArrayRev(K As mArray)
 'copy this to k
 If K Is Me Then Exit Sub
-Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda, gr As Group, linkthis As Boolean
+Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda, gr As Group, linkthis As Boolean
 Dim mm As Long, M1 As Long
 If K Is Nothing Then Set K = New mArray
 K.MyTypeToBe = MyTypeToBe
 K.myarrbase = myarrbase
 K.RevOrder = False
 K.StartResize
-For I = 0 To dnum - 1
-    K.PushDim limit(I), limBase(I)
-Next I
+For i = 0 To dnum - 1
+    K.PushDim limit(i), limBase(i)
+Next i
 K.PushEnd
 K.RevOrder = RevOrder
 Set K.GroupRef = Me.GroupRef
 mm = Me.UpperMonoLimit
 If myVarType(actualData, vbObject) And MyTypeToBe <> vbVariant Then
-    For I = 0 To Me.UpperMonoLimit
-        M1 = mm - I
-        K.item(I) = Me.item(M1)
-    Next I
+    For i = 0 To Me.UpperMonoLimit
+        M1 = mm - i
+        K.item(i) = Me.item(M1)
+    Next i
 Else
 If Me.UpperMonoLimit >= 0 Then
-        If IsGroup(Me.item(mm - I)) Then
-            Set gr = Me.item(mm - I)
+        If IsGroup(Me.item(mm - i)) Then
+            Set gr = Me.item(mm - i)
             linkthis = gr.IamTeam And Not GroupRef Is Nothing
             If linkthis Then Set K.GroupRef = Me.GroupRef
             Set gr = Nothing
         End If
     End If
-For I = 0 To Me.UpperMonoLimit
-    M1 = mm - I
+For i = 0 To Me.UpperMonoLimit
+    M1 = mm - i
     If myVarType(Me.item(M1), vbObject) Then
         Select Case Typename(Me.item(M1))
         Case mgrp
-            Set obj = Me.item(I)
+            Set obj = Me.item(i)
             CopyGroupObj obj, obj2, linkthis
-            Set K.item(I) = obj2
+            Set K.item(i) = obj2
             Set obj2 = Nothing
         Case mlmbd
             Dim actualdata1()
             With Me.item(M1)
                 .CopyTo spare, actualdata1()
             End With
-            Set K.item(I) = spare
+            Set K.item(i) = spare
             Set spare = Nothing
         Case "RefArray"
-            Set K.item(I) = Me.item(I).Copy()
+            Set K.item(i) = Me.item(i).Copy()
         Case Else
-            Set K.item(I) = Me.item(M1)
+            Set K.item(i) = Me.item(M1)
         End Select
     Else
-        K.item(I) = Me.item(M1)
+        K.item(i) = Me.item(M1)
     End If
-Next I
+Next i
 End If
 '' new
-K.Arr = Me.Arr
+K.arr = Me.arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
 K.Final = Me.Final
@@ -1269,37 +1269,37 @@ End Sub
 Public Sub CopyArrayRevFast(K As mArray)
 'copy this to k
 If K Is Me Then Exit Sub
-Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda
+Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 Dim mm As Long, M1 As Long
 K.MyTypeToBe = MyTypeToBe
 'k.SerialItem v, Me.UpperMonoLimit, 8
 K.myarrbase = myarrbase
 K.RevOrder = False
 K.StartResize
-For I = 0 To dnum - 1
-    K.PushDim limit(I), limBase(I)
-Next I
+For i = 0 To dnum - 1
+    K.PushDim limit(i), limBase(i)
+Next i
 K.PushEnd
 K.RevOrder = RevOrder
 Set K.GroupRef = Me.GroupRef
 mm = Me.UpperMonoLimit
 If myVarType(actualData, vbObject) And MyTypeToBe <> vbVariant Then
-For I = 0 To Me.UpperMonoLimit
-    M1 = mm - I
-    K.item(I) = actualData(M1)
-Next I
+For i = 0 To Me.UpperMonoLimit
+    M1 = mm - i
+    K.item(i) = actualData(M1)
+Next i
 Else
-For I = 0 To Me.UpperMonoLimit
-    M1 = mm - I
+For i = 0 To Me.UpperMonoLimit
+    M1 = mm - i
     If myVarType(Me.item(M1), vbObject) Then
-        Set K.item(I) = Me.item(M1)
+        Set K.item(i) = Me.item(M1)
     Else
-        K.item(I) = Me.item(M1)
+        K.item(i) = Me.item(M1)
     End If
-Next I
+Next i
 End If
 '' new
-K.Arr = Me.Arr
+K.arr = Me.arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
 K.Final = Me.Final
@@ -1314,7 +1314,7 @@ K.StartResize
 K.PushEnd
 K.RevOrder = RevOrder
 Set K.GroupRef = Nothing
-K.Arr = Me.Arr
+K.arr = Me.arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = False
 K.Final = Me.Final
@@ -1325,14 +1325,14 @@ Public Sub CopyArraySlice(K As mArray, fromS As Long, toS As Long)
 ' make one dimemsion only
 If K Is Me Then Exit Sub
 If K Is Nothing Then Set K = New mArray
-Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda, gr As Group, linkthis As Boolean
+Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda, gr As Group, linkthis As Boolean
 K.MyTypeToBe = MyTypeToBe
 K.myarrbase = myarrbase
 K.RevOrder = False
 K.StartResize
-For I = 0 To 0
+For i = 0 To 0
     K.PushDim toS - fromS + 1, 0
-Next I
+Next i
 K.PushEnd
 K.RevOrder = RevOrder
 If Me.UpperMonoLimit >= 0 Then
@@ -1343,32 +1343,32 @@ If Me.UpperMonoLimit >= 0 Then
             Set gr = Nothing
         End If
     End If
-For I = fromS To toS
-    If IsObject(Me.item(I)) Then
-        Select Case Typename(Me.item(I))
+For i = fromS To toS
+    If IsObject(Me.item(i)) Then
+        Select Case Typename(Me.item(i))
         Case mgrp
-            Set obj = Me.item(I)
+            Set obj = Me.item(i)
             CopyGroupObj obj, obj2, linkthis
-            Set K.item(I - fromS) = obj2
+            Set K.item(i - fromS) = obj2
             Set obj2 = Nothing
         Case mlmbd
             Dim actualdata1()
-            With Me.item(I)
+            With Me.item(i)
             .CopyTo spare, actualdata1()
             End With
-            Set K.item(I - fromS) = spare
+            Set K.item(i - fromS) = spare
             Set spare = Nothing
         Case "RefArray"
-            Set K.item(I - fromS) = Me.item(I).Copy()
+            Set K.item(i - fromS) = Me.item(i).Copy()
         Case Else
-            Set K.item(I - fromS) = Me.item(I)
+            Set K.item(i - fromS) = Me.item(i)
         End Select
     Else
-        K.item(I - fromS) = Me.item(I)
+        K.item(i - fromS) = Me.item(i)
     End If
-Next I
+Next i
 '' new
-K.Arr = Me.Arr
+K.arr = Me.arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = linkthis
 K.Final = Me.Final
@@ -1378,26 +1378,26 @@ Public Sub CopyArraySliceFast(K As mArray, fromS As Long, toS As Long)
 ' make one dimemsion only
 If K Is Me Then Exit Sub
 If K Is Nothing Then Set K = New mArray
-Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda
+Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 K.MyTypeToBe = MyTypeToBe
 K.myarrbase = myarrbase
 K.RevOrder = False
 K.StartResize
-For I = 0 To 0
+For i = 0 To 0
     K.PushDim toS - fromS + 1, 0
-Next I
+Next i
 K.PushEnd
 K.RevOrder = RevOrder
 Set K.GroupRef = Me.GroupRef
-For I = fromS To toS
-If IsObject(Me.item(I)) Then
-    Set K.item(I - fromS) = Me.item(I)
+For i = fromS To toS
+If IsObject(Me.item(i)) Then
+    Set K.item(i - fromS) = Me.item(i)
 Else
-    K.item(I - fromS) = Me.item(I)
+    K.item(i - fromS) = Me.item(i)
 End If
-Next I
+Next i
 
-K.Arr = Me.Arr
+K.arr = Me.arr
 K.IHaveGui = Me.IHaveGui
 K.IhaveClass = Me.IhaveClass
 K.Final = Me.Final
@@ -1429,9 +1429,9 @@ End If
 nmaxitems1 = nmaxitems - 1
 End Sub
 Public Sub PushEnd(Optional thisarr)
-Dim Z As Variant
+Dim z As Variant
 Dim mX As Long
-CopyMemory ByVal VarPtr(refArray), Z, 16
+CopyMemory ByVal VarPtr(refArray), z, 16
 On Error GoTo there11
 If ndnum = 0 Then
     dnum = 0
@@ -1443,10 +1443,10 @@ If ndnum = 0 Then
         ReDim actualData(maxitems1)
     End If
 Else
-    Dim I As Long
-    For I = 0 To 9
-        limit(I) = nlimit(I): limBase(I) = nLimbase(I)
-    Next I
+    Dim i As Long
+    For i = 0 To 9
+        limit(i) = nlimit(i): limBase(i) = nLimbase(i)
+    Next i
     dnum = ndnum
     Dim isnew As Boolean
     isnew = maxitems = 1
@@ -1454,13 +1454,13 @@ Else
     maxitems1 = nmaxitems1
     If nmaxitems1 < 0 Then
         If isnew And Not MyTypeToBe = vbVariant Then
-            Dim Ar As refArray
-            Set Ar = New refArray
-            Ar.ResetToType MyTypeToBe, 1
-            Set actualData = Ar
+            Dim ar As refArray
+            Set ar = New refArray
+            ar.ResetToType MyTypeToBe, 1
+            Set actualData = ar
         ElseIf myVarType(actualData, vbObject) Then
-            Set Ar = actualData
-            Ar.RedimForFlat 1
+            Set ar = actualData
+            ar.RedimForFlat 1
         Else
             ReDim actualData(1)
         End If
@@ -1469,42 +1469,42 @@ Else
             Set actualData = thisarr
         ElseIf isnew And Not MyTypeToBe = vbVariant And Not MyTypeToBe = 200 Then
           '  Dim aR As refArray
-            Set Ar = New refArray
-            Ar.ResetToType MyTypeToBe, maxitems1
-            Set actualData = Ar
+            Set ar = New refArray
+            ar.ResetToType MyTypeToBe, maxitems1
+            Set actualData = ar
         ElseIf myVarType(actualData, vbObject) Then
-            Set Ar = actualData
-            Ar.RedimForFlat maxitems1
+            Set ar = actualData
+            ar.RedimForFlat maxitems1
         Else
             mX = UBound(actualData)
             ReDim Preserve actualData(maxitems1)
             If MyTypeToBe = 200 Then
-                For I = mX To maxitems1
-                    actualData(I) = nMath2.cxZero
+                For i = mX To maxitems1
+                    actualData(i) = nMath2.cxZero
                 Next
             End If
         End If
     End If
     
     mX = maxitems
-    I = 0
-    If limit(I) > 0 Then
+    i = 0
+    If limit(i) > 0 Then
         If RevOrder Then
             Dim revlimit(), revlimbase()
             ReDim revlimit(UBound(limit())), revlimbase(UBound(limit()))
-            For I = 0 To dnum - 1
-                revlimit(I) = limit(dnum - I - 1)
-                revlimbase(I) = limBase(dnum - I - 1)
-            Next I
-            For I = 0 To dnum - 1
-                limit(I) = revlimit(I)
-                limBase(I) = revlimbase(I)
-            Next I
+            For i = 0 To dnum - 1
+                revlimit(i) = limit(dnum - i - 1)
+                revlimbase(i) = limBase(dnum - i - 1)
+            Next i
+            For i = 0 To dnum - 1
+                limit(i) = revlimit(i)
+                limBase(i) = revlimbase(i)
+            Next i
         End If
-        For I = 0 To dnum - 1
-            dtable(I) = mX \ limit(I)
-            mX = dtable(I)
-        Next I
+        For i = 0 To dnum - 1
+            dtable(i) = mX \ limit(i)
+            mX = dtable(i)
+        Next i
     Else
         GoTo there11
     End If
@@ -1515,18 +1515,18 @@ dnum = 0
 maxitems = 1
 maxitems1 = 0
     If myVarType(actualData, vbObject) Then
-        Set Ar = actualData
-        Ar.RedimForFlat maxitems
+        Set ar = actualData
+        ar.RedimForFlat maxitems
         If MyTypeToBe = 201 Then
-            For I = mX To maxitems
-                actualData(I) = CVar(ZeroBig)
+            For i = mX To maxitems
+                actualData(i) = CVar(ZeroBig)
             Next
         End If
     Else
         ReDim actualData(maxitems)
                    If MyTypeToBe = 200 Then
-                For I = mX To maxitems1
-                    actualData(I) = nMath2.cxZero
+                For i = mX To maxitems1
+                    actualData(i) = nMath2.cxZero
                 Next
             End If
     End If
@@ -1600,7 +1600,7 @@ Else
     ReDim actualData(0)
 End If
 CodeName = GetAnyName$
-Arr = True
+arr = True
 limit(0) = 0
 Else
     If myVarType(actualData, vbObject) Then
@@ -1652,15 +1652,15 @@ End If
 SerialItem = True
 
 End Function
-Friend Sub SupportRefArray(Ar As refArray)
-Set Ar = Ar.Copy()
-If Ar.Count = 1 Then
-    MyTypeToBe = Ar.vtType(0)
-    PushDim Ar.Count(0)
-    Ar.Value = Ar.Value(0)
-    Ar.flat = True
+Friend Sub SupportRefArray(ar As refArray)
+Set ar = ar.Copy()
+If ar.Count = 1 Then
+    MyTypeToBe = ar.vtType(0)
+    PushDim ar.Count(0)
+    ar.Value = ar.Value(0)
+    ar.flat = True
     
-    PushEnd Ar
+    PushEnd ar
    
 Else
     MyEr "RefArray has more dimensions than one", "Ο RefArray έχει περισσότερες διαστάσεις από μια"
@@ -1706,7 +1706,7 @@ End If
 End Sub
 Public Function IsStringItem(curitem As Long) As Variant
 Dim usehandler As mHandler, n As Byte
-If Arr Then
+If arr Then
 If myVarType(actualData, vbObject) Then
 IsStringItem = VarType(actualData(curitem)) = vbString
 
@@ -1716,7 +1716,7 @@ If n = 9 Then
     If Not actualData(curitem) Is Nothing Then
         If TypeOf actualData(curitem) Is mHandler Then
             Set usehandler = actualData(curitem)
-            If usehandler.T1 = 4 Then
+            If usehandler.t1 = 4 Then
                 If myVarType(usehandler.index_cursor, vbString) Then
                     IsStringItem = True
                     Exit Function
@@ -1733,7 +1733,7 @@ On Error Resume Next
 Set usehandler = GroupRef
 If Err.Number Then InternalError: Exit Function
 On Error GoTo 0
-If usehandler.T1 <> 1 Then Err.Raise 1010, , "Need an Inventory Object"
+If usehandler.t1 <> 1 Then Err.Raise 1010, , "Need an Inventory Object"
 If usehandler.objref.Done Then
     If usehandler.objref.IsObj Then
         
@@ -1745,7 +1745,7 @@ End If
 End Function
 Public Property Get ItemIsObject(curitem) As Boolean
 On Error GoTo there1
-If Arr Then
+If arr Then
     If maxitems1 >= curitem Then
         If MyIsObject(actualData(curitem)) Then
             ItemIsObject = Not actualData(curitem) Is Nothing
@@ -1759,9 +1759,9 @@ there1:
 End Property
 
 Public Property Get ItemType(curitem) As String
-Dim Ar As refArray
+Dim ar As refArray
 On Error GoTo there1
-If Arr Then
+If arr Then
     If maxitems1 >= curitem Then
         ItemType = VarTypeName(actualData(curitem))
     End If
@@ -1772,7 +1772,7 @@ ElseIf curitem < 0 Then
 If Not TypeOf GroupRef Is mHandler Then GoTo e1245
 Dim usehandler As mHandler
 Set usehandler = GroupRef
-If usehandler.T1 <> 1 Then
+If usehandler.t1 <> 1 Then
 e1245:
    ItemType = Typename(GroupRef)
 End If
@@ -1796,7 +1796,7 @@ If Left$(ItemType, 2) = "cx" Then ItemType = Mid$(ItemType, 3)
 End Property
 Public Property Get ItemTypeNum(curitem) As Integer
 On Error GoTo there1
-If Arr Then
+If arr Then
     If maxitems1 >= curitem Then
         ItemTypeNum = MemInt(VarPtr(actualData(curitem)))
     End If
@@ -1807,7 +1807,7 @@ ElseIf curitem < 0 Then
 If Not TypeOf GroupRef Is mHandler Then GoTo e1245
 Dim usehandler As mHandler
 Set usehandler = GroupRef
-If usehandler.T1 <> 1 Then
+If usehandler.t1 <> 1 Then
 e1245:
    ItemTypeNum = 9
 End If
@@ -1830,7 +1830,7 @@ there1:
 
 End Property
 Public Sub GetPorp(aProp As PropReference, curitem As Long)
-If Arr Then
+If arr Then
     Set aProp = actualData(curitem)
 Else
     Set aProp = GroupRef
@@ -1838,7 +1838,7 @@ End If
 End Sub
 Public Property Get item(curitem As Long) As Variant
 On Error GoTo there1
-If Arr Then
+If arr Then
     If maxitems1 >= curitem Then
         If ItemIsObject(curitem) Then
             If Typename(actualData(curitem)) = "PropReference" Then
@@ -1866,7 +1866,7 @@ ElseIf curitem < 0 Then
 If Not TypeOf GroupRef Is mHandler Then GoTo e1245
 Dim usehandler As mHandler
 Set usehandler = GroupRef
-If usehandler.T1 <> 1 Then
+If usehandler.t1 <> 1 Then
 e1245:
     Err.Raise 5010, , "Need an Inventory Object"
 End If
@@ -1888,7 +1888,7 @@ there1:
 End Property
 Friend Property Get itemObject(curitem As Long) As Variant
 On Error GoTo there1
-If Arr Then
+If arr Then
     Set itemObject = actualData(curitem)
 Else
     If curitem = -2 Then
@@ -1897,7 +1897,7 @@ Else
         If Not TypeOf GroupRef Is mHandler Then GoTo e1245
         Dim usehandler As mHandler
         Set usehandler = GroupRef
-        If usehandler.T1 <> 1 Then
+        If usehandler.t1 <> 1 Then
 e1245:
             Err.Raise 5010, , "Need an Inventory Object"
         End If
@@ -1917,14 +1917,14 @@ End Property
 Public Property Get itemnumeric(curitem As Long) As Variant
 On Error GoTo there1
 Dim usehandler As mHandler
-If Arr Then
+If arr Then
     If maxitems1 >= curitem Then
         If IsObject(actualData(curitem)) Then
             If Typename(actualData(curitem)) = "PropReference" Then
                 itemnumeric = actualData(curitem).Value
             ElseIf Typename(actualData(curitem)) = mHdlr Then
                 Set usehandler = actualData(curitem)
-                If usehandler.T1 = 4 Then
+                If usehandler.t1 = 4 Then
                 If myVarType(usehandler.index_cursor, vbString) Then
                     itemnumeric = usehandler.index_cursor
                 Else
@@ -1974,7 +1974,7 @@ there1:
 End Property
 
 Public Property Let item(curitem As Long, item As Variant)
-Dim usehandler As mHandler, Ar As refArray
+Dim usehandler As mHandler, ar As refArray
 On Error Resume Next
 If curitem < 0 Then
 If curitem <> -2 Then
@@ -2000,12 +2000,12 @@ Else
 CantAssignValue
 End If
 ElseIf myVarType(actualData, vbObject) Then
-    Set Ar = actualData
-    Ar(curitem) = item
-    Select Case Ar.AssignError
+    Set ar = actualData
+    ar(curitem) = item
+    Select Case ar.AssignError
     Case 0
     Case 6
-        OverflowValue Ar.vtType(curitem)
+        OverflowValue ar.vtType(curitem)
     Case 5020
         missNumber
     Case 5030
@@ -2043,7 +2043,7 @@ If Not MyIsObject(item) Then
         actualData(curitem) = item
     ElseIf TypeOf actualData(curitem) Is mHandler Then
         Set usehandler = actualData(curitem)
-        If usehandler.T1 = 4 Then
+        If usehandler.t1 = 4 Then
         ' just throw the enum variable and place the numeber.
             actualData(curitem) = item
         End If
@@ -2063,10 +2063,10 @@ Public Property Let ItemStr(curitem As Long, item As String)
 Dim usehandler As mHandler
 On Error Resume Next
 If curitem < 0 Then
-If Not Arr Then
+If Not arr Then
 If curitem <> -2 Then
 Set usehandler = GroupRef
-If usehandler.T1 <> 1 Then Err.Raise 1010, , "Need an Inventory Object"
+If usehandler.t1 <> 1 Then Err.Raise 1010, , "Need an Inventory Object"
 If usehandler.objref.Done Then
     If usehandler.objref.IsString Then
         usehandler.objref.Value = item
@@ -2112,7 +2112,7 @@ If Not GroupRef Is Nothing Then
     If TypeOf GroupRef Is mHandler Then
         Dim usehandler As mHandler
         Set usehandler = GroupRef
-        If usehandler.T1 = 1 Then
+        If usehandler.t1 = 1 Then
             usehandler.objref.Index = Abs(curitem + 100)
             usehandler.objref.Done = True
             Set usehandler.objref.ValueObj = item
@@ -2147,21 +2147,29 @@ End Property
 Private Sub Fill(item As Variant)
 Dim aa As Object
 If dnum > 0 Then
-Dim I As Long
+Dim i As Long
 If IhaveClass Then
-For I = 0 To maxitems - 1
-CopyGroupObj GroupRef, aa, True
-aa.ToDelete = False
-Set actualData(I) = aa
-Next I
+If myVarType(actualData, vbObject) Then
+    For i = 0 To maxitems - 1
+        CopyGroupObj GroupRef, aa, True
+        aa.ToDelete = False
+        actualData(i) = CVar(aa)
+    Next i
+Else
+    For i = 0 To maxitems - 1
+        CopyGroupObj GroupRef, aa, True
+        aa.ToDelete = False
+        Set actualData(i) = aa
+    Next i
+End If
 Else
 If CheckInt64(item) Then
-For I = 0 To maxitems - 1
-actualData(I) = item
-Next I
+For i = 0 To maxitems - 1
+actualData(i) = item
+Next i
 ElseIf myVarType(item, vbEmpty) Then
-Dim Z As Variant
-CopyMemory ByVal VarPtr(refArray), Z, 16
+Dim z As Variant
+CopyMemory ByVal VarPtr(refArray), z, 16
 If myVarType(actualData, vbObject) Then
     actualData.RedimForFlat maxitems
 Else
@@ -2172,31 +2180,60 @@ End If
 ''maxitems = 0
 
 Else
-For I = 0 To maxitems - 1
-actualData(I) = item
-Next I
+If MyIsObject(item) Then
+If myVarType(actualData, vbObject) Then
+    For i = 0 To maxitems - 1
+        actualData(i) = CVar(item)
+    Next i
+Else
+    For i = 0 To maxitems - 1
+        Set actualData(i) = item
+    Next i
+End If
+
+
+Else
+
+For i = 0 To maxitems - 1
+actualData(i) = item
+Next i
+End If
 End If
 End If
 End If
 End Sub
 Public Sub Fillobj(bstack As basetask)
-Dim obj As Variant, I As Long
+Dim obj As Variant, i As Long
 Set obj = bstack.lastobj
     Set bstack.lastobj = Nothing
-For I = 0 To maxitems - 1
-Set actualData(I) = obj
-Next I
+    If myVarType(actualData, vbObject) Then
+        For i = 0 To maxitems - 1
+            actualData(i) = CVar(obj)
+        Next i
+    Else
+        For i = 0 To maxitems - 1
+            Set actualData(i) = obj
+        Next i
+    End If
 Set obj = Nothing
 End Sub
 Public Sub FillLambda(bstack As basetask)
-Dim obj As Variant, I As Long
+Dim obj As Variant, i As Long
 Set obj = bstack.lastobj
     Set bstack.lastobj = Nothing
-For I = 0 To maxitems - 1
+If myVarType(actualData, vbObject) Then
+For i = 0 To maxitems - 1
+    CopyLambda obj, bstack
+    actualData(i) = CVar(bstack.lastobj)
+    Set bstack.lastobj = Nothing
+Next i
+Else
+For i = 0 To maxitems - 1
  CopyLambda obj, bstack
-Set actualData(I) = bstack.lastobj
+Set actualData(i) = bstack.lastobj
 Set bstack.lastobj = Nothing
-Next I
+Next i
+End If
 Set obj = Nothing
 End Sub
 Sub MakeitObject2(var As Variant)
@@ -2289,7 +2326,7 @@ End Function
 Function IsObjAt(curitem As Long, peekvalue) As Boolean
 On Error GoTo there1
 peekvalue = Empty
-If Arr Then
+If arr Then
     If maxitems1 >= curitem Then
         If ItemIsObject(curitem) Then
             If Typename(actualData(curitem)) = "PropReference" Then
@@ -2319,7 +2356,7 @@ ElseIf curitem < 0 Then
 If Not TypeOf GroupRef Is mHandler Then GoTo e1245
 Dim usehandler As mHandler
 Set usehandler = GroupRef
-If usehandler.T1 <> 1 Then
+If usehandler.t1 <> 1 Then
 e1245:
     Err.Raise 5010, , "Need an Inventory Object"
 End If
@@ -2345,7 +2382,7 @@ If Index >= 0 And Index <= maxitems1 Then
 If IsObject(actualData(Index)) Then
 If Typename(actualData(Index)) = mHdlr Then
     Set usehandler = actualData(Index)
-    IsEnum = usehandler.T1 = 4
+    IsEnum = usehandler.t1 = 4
      If IsEnum Then
         If myVarType(usehandler.index_cursor, vbString) Then
             p = usehandler.index_cursor
@@ -2363,7 +2400,7 @@ If curitem >= 0 And curitem <= maxitems1 Then
 If IsObject(actualData(curitem)) Then
 If Typename(actualData(curitem)) = mHdlr Then
     Set usehandler = actualData(curitem)
-    IsEnum2 = usehandler.T1 = 4
+    IsEnum2 = usehandler.t1 = 4
      If IsEnum2 Then
         If myVarType(usehandler.index_cursor, vbString) Then
             p = usehandler.index_cursor
@@ -2385,14 +2422,14 @@ nmaxitems = 1
 nmaxitems1 = 0
 actualData = Array(Empty)
 CodeName = GetAnyName$
-Arr = True
+arr = True
 myarrbase = -ArrBase
 refArray = 0&
 End Sub
 
 Private Sub Class_Terminate()
-Dim Z As Variant
-CopyMemory ByVal VarPtr(refArray), Z, 16
+Dim z As Variant
+CopyMemory ByVal VarPtr(refArray), z, 16
 Set GroupRef = Nothing
 If Elements(actualData) > 0 Then
 If myVarType(actualData, vbObject) Then
@@ -2424,12 +2461,12 @@ Function GetCopy() As Variant()
 GetCopy = actualData
 End Function
 Private Sub InsertionSort1(ByVal iMin As Long, ByVal iMax As Long)
-    Dim I As Long
+    Dim i As Long
     Dim j As Long
-    I = iMin + 1
+    i = iMin + 1
     iMax = iMax + 1
-    While I < iMax
-        j = I
+    While i < iMax
+        j = i
         Do While j > iMin
         If item(j) < item(j - 1) Then
             SwapVariant actualData(j), actualData(j - 1)
@@ -2438,38 +2475,38 @@ Private Sub InsertionSort1(ByVal iMin As Long, ByVal iMax As Long)
             Exit Do
         End If
         Loop
-        I = I + 1
+        i = i + 1
     Wend
 End Sub
 Private Sub InsertionSort1NSW(ByVal iMin As Long, ByVal iMax As Long)
-    Dim I As Long, P1
+    Dim i As Long, p1
     Dim j As Long
-    I = iMin + 1
+    i = iMin + 1
     iMax = iMax + 1
-    While I < iMax
-        j = I
+    While i < iMax
+        j = i
         Do While j > iMin
         If item(j) < item(j - 1) Then
-            P1 = Empty
-             SwapVariant P1, actualData(j - 1)
+            p1 = Empty
+             SwapVariant p1, actualData(j - 1)
              item(j - 1) = actualData(j)
-             item(j) = P1
+             item(j) = p1
             j = j - 1
         Else
             Exit Do
         End If
         Loop
-        I = I + 1
+        i = i + 1
     Wend
-    P1 = Empty
+    p1 = Empty
 End Sub
 Private Sub InsertionSort(ByVal iMin As Long, ByVal iMax As Long)
-    Dim I As Long
+    Dim i As Long
     Dim j As Long
-    I = iMin + 1
+    i = iMin + 1
     iMax = iMax + 1
-    While I < iMax
-        j = I
+    While i < iMax
+        j = i
         Do While j > iMin
         If item(j) > item(j - 1) Then
             SwapVariant actualData(j), actualData(j - 1)
@@ -2478,30 +2515,30 @@ Private Sub InsertionSort(ByVal iMin As Long, ByVal iMax As Long)
             Exit Do
         End If
         Loop
-        I = I + 1
+        i = i + 1
     Wend
 End Sub
 Private Sub InsertionSortNSW(ByVal iMin As Long, ByVal iMax As Long)
-    Dim I As Long, P1
+    Dim i As Long, p1
     Dim j As Long
-    I = iMin + 1
+    i = iMin + 1
     iMax = iMax + 1
-    While I < iMax
-        j = I
+    While i < iMax
+        j = i
         Do While j > iMin
         If item(j) > item(j - 1) Then
-             P1 = Empty
-             SwapVariant P1, actualData(j - 1)
+             p1 = Empty
+             SwapVariant p1, actualData(j - 1)
              item(j - 1) = actualData(j)
-             item(j) = P1
+             item(j) = p1
             j = j - 1
         Else
             Exit Do
         End If
         Loop
-        I = I + 1
+        i = i + 1
     Wend
-    P1 = Empty
+    p1 = Empty
 End Sub
 
 Private Sub QuickSortItemsWithSameKey(ByVal LB As Long, ByVal UB As Long)
@@ -2536,15 +2573,15 @@ Private Sub QuickSortItemsWithSameKey(ByVal LB As Long, ByVal UB As Long)
     If M1 < UB Then QuickSortItemsWithSameKey M1, UB
 End Sub
 Private Sub QuickSortItemsWithSameKeyO(ByVal LB As Long, ByVal UB As Long)
-    Dim M1 As Long, M2 As Long, P1
+    Dim M1 As Long, M2 As Long, p1
     If UB - LB < 7 Then
         If UB - LB = 1 Then
             M1 = LB
             If item(M1) > item(UB) Then
-                P1 = Empty
-                SwapVariant P1, actualData(M1)
+                p1 = Empty
+                SwapVariant p1, actualData(M1)
                 item(M1) = actualData(UB)
-                item(UB) = P1
+                item(UB) = p1
             End If
             Exit Sub
         Else
@@ -2562,10 +2599,10 @@ Private Sub QuickSortItemsWithSameKeyO(ByVal LB As Long, ByVal UB As Long)
         Do While item(M2) > Piv: M2 = M2 - 1: Loop
         If M1 <= M2 Then
             If M1 <> M2 Then
-                P1 = Empty
-                SwapVariant P1, actualData(M1)
+                p1 = Empty
+                SwapVariant p1, actualData(M1)
                 item(M1) = actualData(M2)
-                item(M2) = P1
+                item(M2) = p1
             End If
             M1 = M1 + 1
             M2 = M2 - 1
@@ -2612,15 +2649,15 @@ Private Sub QuickSortItemsRevWithSameKeyO(ByVal LB As Long, ByVal UB As Long)
 ' this can't be used with items of type objects. unless we do the same as in tuple class
 ' we have to change the item(M1) = actualData(UB) witn item(M1) = var(actualData(UB))
 ' and we have to provide a function for test < and another for test >
-    Dim M1 As Long, M2 As Long, P1
+    Dim M1 As Long, M2 As Long, p1
     If UB - LB < 7 Then
         If UB - LB = 1 Then
             M1 = LB
             If item(M1) < item(UB) Then
-                   P1 = Empty
-                   SwapVariant P1, actualData(M1)
+                   p1 = Empty
+                   SwapVariant p1, actualData(M1)
                    item(M1) = actualData(UB)
-                   item(UB) = P1
+                   item(UB) = p1
             End If
             Exit Sub
         Else
@@ -2638,10 +2675,10 @@ Private Sub QuickSortItemsRevWithSameKeyO(ByVal LB As Long, ByVal UB As Long)
         Do While item(M2) < Piv: M2 = M2 - 1: Loop
         If M1 <= M2 Then
             If M1 <> M2 Then
-                P1 = Empty
-                SwapVariant P1, actualData(M1)
+                p1 = Empty
+                SwapVariant p1, actualData(M1)
                 item(M1) = actualData(M2)
-                item(M2) = P1
+                item(M2) = p1
             End If
             M1 = M1 + 1
             M2 = M2 - 1
@@ -2653,7 +2690,7 @@ Private Sub QuickSortItemsRevWithSameKeyO(ByVal LB As Long, ByVal UB As Long)
     If M1 < UB Then QuickSortItemsRevWithSameKeyO M1, UB
 End Sub
 Public Sub SortTuple(Optional Low As Long = -1, Optional high As Long = -1)
-Dim I As Long, n As Integer
+Dim i As Long, n As Integer
 If dnum < 1 Then Exit Sub
 If Count > 0 Then
 If high = -1 Then high = Count - 1
@@ -2661,14 +2698,14 @@ If high > Count - 1 Then high = Count - 1
 If Low = -1 Then Low = 0
 If Low >= high Then Exit Sub
 
-For I = Low To high
-GetMem2 VarPtr(actualData(I)), n
+For i = Low To high
+GetMem2 VarPtr(actualData(i)), n
 n = n And &H7FF
 If (n > 8 Or n < 2) And Not (n = 14 Or n = 20 Or n = 17) Then
 MyEr "Invalid item for sorting, I found " + VarTypeNameList(n), "Αδύνατη η ταξινόμηση, βρήκα τυπο " + VarTypeNameList(n)
 Exit Sub
 End If
-Next I
+Next i
 If MyIsObject(actualData) Then
     QuickSortItemsWithSameKeyO Low, high
 Else
@@ -2721,7 +2758,7 @@ Private Function VarTypeNameList(n As Integer) As String
 End Function
 
 Public Sub SortDesTuple(Optional Low As Long = -1, Optional high As Long = -1)
-Dim I As Long, n As Byte
+Dim i As Long, n As Byte
 If dnum < 1 Then Exit Sub
 If Count > 0 Then
 If high = -1 Then high = Count - 1
@@ -2729,10 +2766,10 @@ If high > Count - 1 Then high = Count - 1
 If Low = -1 Then Low = 0
 If Low >= high Then Exit Sub
 
-For I = Low To high
-GetMem1 VarPtr(actualData(I)), n
+For i = Low To high
+GetMem1 VarPtr(actualData(i)), n
 If (n > 8 Or n < 2) And Not (n = 14 Or n = 20) Then Exit Sub
-Next I
+Next i
 If MyIsObject(actualData) Then
 QuickSortItemsRevWithSameKeyO Low, high
 Else
@@ -2741,15 +2778,15 @@ End If
 End If
 End Sub
 Private Sub InsertionSort10obj(ByVal iMin As Long, ByVal iMax As Long)
-    Dim I As Long
+    Dim i As Long
     Dim j As Long
-    Dim j1 As Long, j0 As Long, K As Long, P1
+    Dim j1 As Long, j0 As Long, K As Long, p1
 
-    I = iMin + 1
+    i = iMin + 1
     iMax = iMax + 1
-    j0 = I * sortmult
-    While I < iMax
-        j = I
+    j0 = i * sortmult
+    While i < iMax
+        j = i
         j1 = j0 + sortoff
         Do While j > iMin
         ''Debug.Print "insertion compare"
@@ -2773,10 +2810,10 @@ ex1:
            ' Debug.Print "insertion swap"
             For K = j1 - sortoff To j1 - sortoff + sortmult - 1
 '            SwapVariant actualData(k), actualData(k - sortmult)
-            P1 = Empty
-            SwapVariant P1, actualData(K)
+            p1 = Empty
+            SwapVariant p1, actualData(K)
             item(K) = actualData(K - sortmult)
-            item(K - sortmult) = P1
+            item(K - sortmult) = p1
 
             
             
@@ -2798,10 +2835,10 @@ ex1:
            ' Debug.Print "insertion swap"
             For K = j1 - sortoff To j1 - sortoff + sortmult - 1
             'SwapVariant actualData(k), actualData(k - sortmult)
-            P1 = Empty
-            SwapVariant P1, actualData(K)
+            p1 = Empty
+            SwapVariant p1, actualData(K)
             item(K) = actualData(K - sortmult)
-            item(K - sortmult) = P1
+            item(K - sortmult) = p1
             Next K
             j = j - 1
             If part <> 3 Then
@@ -2822,20 +2859,20 @@ ex1:
         part = 3
         sortoff = Col(2)
         End If
-        I = I + 1
+        i = i + 1
         j0 = j0 + sortmult
     Wend
 End Sub
 Private Sub InsertionSort10(ByVal iMin As Long, ByVal iMax As Long)
-    Dim I As Long
+    Dim i As Long
     Dim j As Long
     Dim j1 As Long, j0 As Long, K As Long
 
-    I = iMin + 1
+    i = iMin + 1
     iMax = iMax + 1
-    j0 = I * sortmult
-    While I < iMax
-        j = I
+    j0 = i * sortmult
+    While i < iMax
+        j = i
         j1 = j0 + sortoff
         Do While j > iMin
         ''Debug.Print "insertion compare"
@@ -2896,7 +2933,7 @@ ex1:
         part = 3
         sortoff = Col(2)
         End If
-        I = I + 1
+        i = i + 1
         j0 = j0 + sortmult
     Wend
 End Sub
@@ -2912,16 +2949,16 @@ Next K
 End Sub
 Private Sub Swap10obj(ByVal a1, ByVal A2)
 Static K As Long
-Dim P1
+Dim p1
 If a1 = A2 Then Exit Sub
 'Debug.Print "swap ", a1, A2
 a1 = a1 * sortmult
 A2 = A2 * sortmult
 For K = 0 To sortmult - 1
-P1 = Empty
-SwapVariant P1, actualData(a1 + K)
+p1 = Empty
+SwapVariant p1, actualData(a1 + K)
 item(a1 + K) = actualData(A2 + K)
-item(A2 + K) = P1
+item(A2 + K) = p1
 'SwapVariant actualData(a1 + k), actualData(A2 + k)
 Next K
 End Sub
@@ -3127,8 +3164,8 @@ Dim usehandler As mHandler
 If dnum <> 2 Then Exit Sub
 Dim mbase2 As Long
 
-Dim I As Long, pppp As mArray
-GetDnum 1, I, mbase2
+Dim i As Long, pppp As mArray
+GetDnum 1, i, mbase2
 If UBound(col0()) = 0 Then
 If CheckInt64(col0(0)) Then
 ' typename has problem with 20
@@ -3136,7 +3173,7 @@ ElseIf VarTypeName(col0(0)) = "Variant()" Then
     col0() = col0(0)
 ElseIf VarTypeName(col0(0)) = mHdlr Then
     Set usehandler = col0(0)
-    If usehandler.T1 = 3 Then
+    If usehandler.t1 = 3 Then
         Set pppp = usehandler.objref
         Set usehandler = Nothing
         pppp.ExportArrayNow
@@ -3181,11 +3218,11 @@ If Col(1) > Count \ sortmult - 1 Then Col(1) = Count \ sortmult - 1
 If Col(0) < 0 Then Col(0) = 0
 If Col(0) >= Col(1) Then Exit Sub
 
-For I = LBound(Col) + 2 To UBound(Col) - 1 Step 2
-Col(I) = Col(I) + mbase2
-If Col(I) < 0 Or Col(I) >= sortmult Then Exit Sub
+For i = LBound(Col) + 2 To UBound(Col) - 1 Step 2
+Col(i) = Col(i) + mbase2
+If Col(i) < 0 Or Col(i) >= sortmult Then Exit Sub
 'If col(i + 1) <> 0 Then col(i + 1) = 1
-Next I
+Next i
 
 End If
 sortoff = Col(2)
@@ -3209,11 +3246,11 @@ End If
 ReDim piv1(1)
 End Sub
 Property Get ArrPtr() As Long  ' 32 bit address
-Dim Ar As refArray
+Dim ar As refArray
 If myVarType(actualData, vbObject) Then
     If actualData.Count > 0 Then
-        Set Ar = actualData
-        ArrPtr = Ar.ArrPtr
+        Set ar = actualData
+        ArrPtr = ar.ArrPtr
     End If
 ElseIf Elements(actualData) > 0 Then
     ArrPtr = VarPtr(actualData(0))
@@ -3245,18 +3282,18 @@ Public Function UnsignedAdd(ByVal lUnsignedPtr As Long, ByVal lSignedOffset As L
 End Function
 
 Private Sub iBoxArray_AppendArray(K As iBoxArray)
-Dim m As mArray
-If Not K Is Nothing Then If TypeOf K Is mArray Then Set m = K
-AppendArray m
+Dim M As mArray
+If Not K Is Nothing Then If TypeOf K Is mArray Then Set M = K
+AppendArray M
 
 End Sub
 
 Private Property Let iBoxArray_Arr(ByVal RHS As Boolean)
-Arr = RHS
+arr = RHS
 End Property
 
 Private Property Get iBoxArray_Arr() As Boolean
-iBoxArray_Arr = Arr
+iBoxArray_Arr = arr
 End Property
 
 Private Property Let iBoxArray_arrname(ByVal RHS As String)
@@ -3307,38 +3344,38 @@ iBoxArray_common = common
 End Property
 
 Private Sub iBoxArray_CopyArray(K As iBoxArray)
-Dim m As mArray
-If Not K Is Nothing Then If TypeOf K Is mArray Then Set m = K
-CopyArray m
-Set K = m
+Dim M As mArray
+If Not K Is Nothing Then If TypeOf K Is mArray Then Set M = K
+CopyArray M
+Set K = M
 End Sub
 
 Private Sub iBoxArray_CopyArrayRev(K As iBoxArray)
-Dim m As mArray
-If Not K Is Nothing Then If TypeOf K Is mArray Then Set m = K
-CopyArrayRev m
-Set K = m
+Dim M As mArray
+If Not K Is Nothing Then If TypeOf K Is mArray Then Set M = K
+CopyArrayRev M
+Set K = M
 End Sub
 
 Private Sub iBoxArray_CopyArrayRevFast(K As iBoxArray)
-Dim m As mArray
-If Not K Is Nothing Then If TypeOf K Is mArray Then Set m = K
-CopyArrayRevFast m
-Set K = m
+Dim M As mArray
+If Not K Is Nothing Then If TypeOf K Is mArray Then Set M = K
+CopyArrayRevFast M
+Set K = M
 End Sub
 
 Private Sub iBoxArray_CopyArraySlice(K As iBoxArray, fromS As Long, toS As Long)
-Dim m As mArray
-If Not K Is Nothing Then If TypeOf K Is mArray Then Set m = K
-CopyArraySlice m, fromS, toS
-Set K = m
+Dim M As mArray
+If Not K Is Nothing Then If TypeOf K Is mArray Then Set M = K
+CopyArraySlice M, fromS, toS
+Set K = M
 End Sub
 
 Private Sub iBoxArray_CopyArraySliceFast(K As iBoxArray, fromS As Long, toS As Long)
-Dim m As mArray
-If Not K Is Nothing Then If TypeOf K Is mArray Then Set m = K
-CopyArraySliceFast m, fromS, toS
-Set K = m
+Dim M As mArray
+If Not K Is Nothing Then If TypeOf K Is mArray Then Set M = K
+CopyArraySliceFast M, fromS, toS
+Set K = M
 End Sub
 
 Private Property Get iBoxArray_count() As Long
@@ -3365,11 +3402,11 @@ Private Sub iBoxArray_GetPorp(aProp As PropReference, curitem As Long)
     GetPorp aProp, curitem
 End Sub
 
-Private Function iBoxArray_GetUDTValue(ByVal p As Long, Name As String, Optional ndx As Variant) As Variant
-If IsMissing(ndx) Then
+Private Function iBoxArray_GetUDTValue(ByVal p As Long, Name As String, Optional nDx As Variant) As Variant
+If IsMissing(nDx) Then
     iBoxArray_GetUDTValue = GetUDTValue(p, Name)
 Else
-    iBoxArray_GetUDTValue = GetUDTValue(p, Name, ndx)
+    iBoxArray_GetUDTValue = GetUDTValue(p, Name, nDx)
 End If
 End Function
 
@@ -3496,8 +3533,8 @@ Private Function iBoxArray_PlaceValue2UDTArray(p As Long, Name As String, v As V
 iBoxArray_PlaceValue2UDTArray = PlaceValue2UDTArray(p, Name, v, Index)
 End Function
 
-Private Sub iBoxArray_processAppend(m As Object)
-    processAppend m
+Private Sub iBoxArray_processAppend(M As Object)
+    processAppend M
 End Sub
 
 Private Sub iBoxArray_PushDim(nDim As Long, Optional limBase As Variant)

@@ -2958,7 +2958,8 @@ AlfaByRef(&a)
 
 Print a=Cat  ' true
 Print "a value by name:";@Name$(a)
-\\ k is integer type
+integer k
+list
 For k=Dog to Cat
       Print "k value by name:";@Name$(k), type$(k)
 Next
@@ -40983,7 +40984,7 @@ method wb, "move", 1000, 1000, 12000, 10000
 with wb, "silent", false, "object" set wb1, "visible" as visible
 
 'with wb,"RegisterAsBrowser", true
-method wb,"Navigate2", "https://en.wikipedia.org/wiki/Wiki"
+method wb,"Navigate2", "http://www.google.com"
 with wb1, "readystate" as readystate
 
 function wb.TitleChange {
@@ -47294,5 +47295,19 @@ ReverseString
 move !
 font oldfont
 cursor !
+}
+MODULE JENSEN {Module Jensen`s_Device {
+      double i=0
+      Function Sum (&a, lo, hi, &f()) {
+            double temp=0
+            For a= lo to hi {
+                  temp+=f()
+            }
+            =temp
+      }
+      Print Sum(&i, 1, 100, Lazy$(1/i))==5.1873775176392  ' true
+      Print i=101 ' true
+}
+Jensen`s_Device
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
