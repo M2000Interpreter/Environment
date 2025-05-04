@@ -1,82 +1,65 @@
 M2000 Interpreter and Environment
-Version 13 revision 45 active-X
+Version 13 revision 46 active-X
 
-1. Optimizations
-
-2. We can put groups in arrays of objects of type RefArray. We can call methods using dot or => (always we put a pointer)
+1. Now M2000 environment can use fonts with break char different from space, like Segoe UI which have char 13 and not space (char 32). Now the Report statement works nice with Segoe and left and right justification (the problem was on both). Also tab characters can be inserted and used with the full justification.
 
 
-Example:
-I Use for Tree an array of objects (nodes) (the eertree example in info use inventory, a map list). We can do that because all indexes is 0,1,2... like array indexes. 
+2. A new class for creating Various Barcodes from https://github.com/wqweto/ClipBar
+Also I make Image to utilize the Picture object. see details in the following example:
 
-eertree= lambda (s as string)
-	->{
-		Class Node {
-			inventory myedges
-			long length, suffix=0
-			Function edges(s as string) {
-				=-1 : if exist(.myedges, s) then =eval(.myedges)
-			}
-			Module edges_append (a as string, where as long) {
-				Append .myedges, a:=where
-			}
-			Class:
-			Module Node(.length) {
-				Read ? .suffix, .myedges
-			}
-		}	
-		object Tree[100]
-		' we can give 1, Tree[1] and this type add items as we set index above upper limit
-		Tree[0]=Node(0,1)
-		Tree[1]=Node(-1,1)
-		k=0
-		suffix=0
-		for i=0 to len(s)-1
-			d=mid$(s,i+1,1)
-			n=suffix
-			Do
-				k=Tree[n].length
-				b=i-k-1
-				if b>=0 then if mid$(s,b+1,1)=d Then exit
-				n =Tree[n].suffix  
-			Always
-			e=Tree[n].edges(d)
-			if e>=0 then suffix=e :continue
-			suffix=len(Tree)
-			Tree[len(Tree)]=Node(k+2)
-			Tree[n].edges_append d, suffix
-			If tree[suffix].length=1 then tree[suffix].suffix=0: continue
-			Do
-				n=Tree[n].suffix
-				b=i-Tree[n].length-1
-				if b>0 Then If  mid$(s, b+1,1)=d then exit
-			Always
-			e=Tree[n].edges(d)
-			if e>=0 then tree[suffix].suffix=e
-		next
-		=tree
+CLS,0
+declare bar "m2000.cBarcode"
+print type$(bar)
+Enum UcsBarCodeTypeEnum {
+	ucsBctAuto = 0
+	ucsBctEan13
+	ucsBctEan8
+	ucsBctEan128
+	ucsBctUpcA
+	ucsBctUpcE
+}
+Long ink_bleed_in_percents=10
+boolean true=1=1, false=1=0
+method bar, "init", ink_bleed_in_percents,  bHangSeparators:= TRUE, bShowDigits:=TRUE as ok
+method bar, "GetBarCode", "123456789012:12345",  1 as Pic
+With Pic, "Width" as pic.width, "Height" as pic.height
+move  5000, 6000
+' Pic is a Picture object
+mem$=""
+' Now Image can render Pic to string
+Image Pic, 7500  to mem$
+? image.x(mem$)=7500
+rem	? len(mem$)
+' so now we place a bitmap
+image mem$			 ', 7500
+' We can render Picture as emf directly
+Step 0, -4000
+Image Pic, 7500*1.2
+' We can make a file in memory using Drawing.
+' We can make another emf where we draw the picture
+drawing {
+	image Pic, 3000
+} as Mem
+? len(Mem)
+step -3000, 7000
+'  we can rotate the image now
+image Mem, 10000, ,-90
+
+3. Remove a Bug in Select Case
+The MG module in info now run as expected.
+The problem begins some revisions before this one. When a case match and another case wait after a comma and a block was under the case, then this block never run.
+Now work fine.
+
+select case 2
+case 2, 3
+	{
+	print "ok"
 	}
-children=lambda (s as array, Tree,  n, root as string="")
-	-> {
-	recur(n, root)
-	=s
-	sub recur(n, root)
-		local Long L=Len(Tree[n].myEdges), i, c, nxt
-		local	String d, p	
-		if L=0 then exit sub
-		do	c=Tree[n].myEdges
-			d=Eval$(c, i)  ' read keys at position i
-			nxt=c(i!)   '  read value using position 
-			p = if(n=1 -> d, d+root+d)
-			append s, (p,)
-			recur(nxt, p)
-			i++
-		when i<L
-	end sub
-	}
-Palindromes=lambda children (Tree as *Object[])->"("+quote$(children(children((,), Tree, 0), Tree, 1)#str$({", "}))+")"
-Print Palindromes(eertree("987654321eertree12345678954321eertree12345eertree"))
-Print Palindromes(eertree("banana"))
+end select
+
+4. DD8 module updated (load INFO from appdir$ after the installation of this revision).
+
+
 
 
 George Karras, Kallithea Attikis, Greece.

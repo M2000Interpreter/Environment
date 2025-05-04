@@ -20,12 +20,12 @@ Dim Init As Boolean
 Dim IamMethod  As Boolean
 Dim hardlink As Object, useobj As Boolean
 Private mLastObj As Object
-Public Arr As Boolean
+Public arr As Boolean
 Dim oEnum As IUnknown
 Private IndexList As mIndexes
 Private IndexNew As Boolean
-Function isObj()
-    isObj = useobj
+Function IsObj()
+    IsObj = useobj
 End Function
 Property Get ObjectType() As String
 On Error Resume Next
@@ -63,7 +63,7 @@ End Property
 Public Sub clearlastobject()
 Set mLastObj = Nothing
 End Sub
-Public Property Get value() As Variant
+Public Property Get Value() As Variant
 Dim v
 Dim RETVAR As Variant, retvar2, obj As Object
 Dim check As Boolean
@@ -71,20 +71,20 @@ Set mLastObj = Nothing
 If Init Then
 If UseIndex Then
 If Not IndexNew Then
- value = 0
+ Value = 0
 Set mLastObj = Me
 Exit Property
 ElseIf useobj Then
     IndexNew = False
-    value = ReadPropIndexObj(hardlink, vtref, mIndex)
+    Value = ReadPropIndexObj(hardlink, vtref, mIndex)
 Else
     IndexNew = False
-    value = ReadPropIndex(ObjectRef, vtref, mIndex, check, RETVAR)
+    Value = ReadPropIndex(ObjectRef, vtref, mIndex, check, RETVAR)
     If check And IsObject(RETVAR) Then
     On Error Resume Next
     Set obj = RETVAR
     If ReadOneParameter(obj, (0), vbNullString, retvar2) Then
-        value = retvar2
+        Value = retvar2
        Else
           Set mLastObj = RETVAR
     End If
@@ -98,27 +98,27 @@ Else
 If useobj Then
 If ReadPropObj(hardlink, vtref, RETVAR) Then
 If IsObject(RETVAR) Then
- value = 0
+ Value = 0
           Set mLastObj = RETVAR
 
 Else
-value = RETVAR
+Value = RETVAR
 End If
 End If
 Else
  If ReadProp(ObjectRef, vtref, RETVAR) Then
  If IsObject(RETVAR) Then
-         value = 0
+         Value = 0
           Set mLastObj = RETVAR
 
 Else
 On Error Resume Next
 If TypeOf RETVAR Is IUnknown Then
-value = 0
+Value = 0
 Set mLastObj = RETVAR: Exit Property
 End If
 Err.Clear
-value = RETVAR
+Value = RETVAR
 End If
  End If
  End If
@@ -129,7 +129,7 @@ Else
 End If
 'If Not IsObject(Value) Then Debug.Print Value
 End Property
-Public Property Let value(vNewValue As Variant)
+Public Property Let Value(vNewValue As Variant)
 If Init Then
 If Not UseIndex Then
 If useobj Then
@@ -209,7 +209,7 @@ If idx Is Nothing Then Exit Sub
 IndexNew = True
 UseIndex = True
 If IndexList Is Nothing Then
-    If idx.count = 1 Then
+    If idx.Count = 1 Then
        idx.Dump 0, mIndex
     Else
     idx.GetArr mIndex

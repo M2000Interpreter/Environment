@@ -215,7 +215,7 @@ End Enum
 
 Public Type fncinf
     Name                    As String
-    Addr                    As Long
+    addr                    As Long
     params                  As Integer
 End Type
 
@@ -325,7 +325,7 @@ Public Function GetAllCoclasses( _
     Dim typeLib As IUnknown
     Dim typeInf As IUnknown
     Dim ret     As Long
-    Dim count   As Long
+    Dim Count   As Long
     Dim Index   As Long
     Dim pAttr   As Long
     Dim tKind   As Long
@@ -337,15 +337,15 @@ Public Function GetAllCoclasses( _
         Exit Function
     End If
     
-    count = ITypeLib_GetTypeInfoCount(typeLib)
+    Count = ITypeLib_GetTypeInfoCount(typeLib)
     countCoClass = 0
     
-    If count > 0 Then
+    If Count > 0 Then
     
-        ReDim listOfClsid(count - 1)
-        ReDim listOfNames(count - 1)
+        ReDim listOfClsid(Count - 1)
+        ReDim listOfNames(Count - 1)
         
-        For Index = 0 To count - 1
+        For Index = 0 To Count - 1
         
             ret = ITypeLib_GetTypeInfo(typeLib, Index, typeInf)
                         
@@ -415,13 +415,13 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
     Dim ppFuncDesc As Long, fncdsc As FUNCDESC, cFuncs As Long
     Dim ppVarDesc As Long, vardsc As VARDESC
     Dim ParamDesc As TPARAMDESC, hlp As Long, pRefType As Long
-    Dim TypeDesc As TTYPEDESC, retval$
+    Dim TypeDesc As TTYPEDESC, RetVal$
     Dim ret As Long, pctinfo As Long, ppTInfo As Long, typeInf As IUnknown
     Dim pAttr   As Long
     Dim tKind   As Long
     Set IDsp = obj
     Dim cFncs As Long, CVars As Long, ttt$
-    Dim I As Long
+    Dim i As Long
     Dim j As Long
     Dim strNames() As String, strName As String, aName As String ', count As Long
     Dim acc As Long, CTX As Long
@@ -500,7 +500,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
                 ret = ITypeInfo_GetNames(typeInf, fncdsc.memid, strNames(), fncdsc.cParams + 1, cFncs)
                 If Not ret Then
                     strName = strName + "("
-                    For I = 1 To hlp
+                    For i = 1 To hlp
                         If IsBadCodePtr(acc) = 0 Then
                             CopyBytes Len(ParamDesc), VarPtr(ParamDesc), ByVal acc + 8
                             CopyBytes Len(TypeDesc), VarPtr(TypeDesc), ByVal acc
@@ -508,30 +508,30 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
                         End If
                         acc = acc + 16
                         ttt$ = ""
-                        retval$ = ""
-                        If strNames(I) = "" Then strNames(I) = "Value"
+                        RetVal$ = ""
+                        If strNames(i) = "" Then strNames(i) = "Value"
                         If (ParamDesc.wParamFlags And PARAMFLAG_FRETVAL) = &H8 Then
-                            retval$ = " as " + stringifyTypeDesc(TypeDesc, typeInf)
+                            RetVal$ = " as " + stringifyTypeDesc(TypeDesc, typeInf)
                         Else
                             If (ParamDesc.wParamFlags And PARAMFLAG_FIN) = &H1 Then ttt$ = "in "
                             If (ParamDesc.wParamFlags And PARAMFLAG_FOUT) = &H2 Then ttt$ = ttt$ + "out "
-                            If I > (hlp - fncdsc.cParamsOpt) And fncdsc.cParamsOpt <> 0 Then
-                                strName = strName + "[" + ttt$ + strNames(I) + " " + stringifyTypeDesc(TypeDesc, typeInf) + "]"
+                            If i > (hlp - fncdsc.cParamsOpt) And fncdsc.cParamsOpt <> 0 Then
+                                strName = strName + "[" + ttt$ + strNames(i) + " " + stringifyTypeDesc(TypeDesc, typeInf) + "]"
                             Else
                                 If fncdsc.cParamsOpt = 0 And (ParamDesc.wParamFlags And PARAMFLAG_FOPT) > 0 Then
-                                    strName = strName + "[" + ttt$ + strNames(I) + " " + stringifyTypeDesc(TypeDesc, typeInf) + "]"
+                                    strName = strName + "[" + ttt$ + strNames(i) + " " + stringifyTypeDesc(TypeDesc, typeInf) + "]"
                                 Else
-                                    strName = strName + ttt$ + strNames(I) + " " + stringifyTypeDesc(TypeDesc, typeInf)
+                                    strName = strName + ttt$ + strNames(i) + " " + stringifyTypeDesc(TypeDesc, typeInf)
                                 End If
                             End If
-                            If I < hlp Then strName = strName + ", "
+                            If i < hlp Then strName = strName + ", "
                         End If
-                    Next I
+                    Next i
                     strName = strName + ")"
                 End If
             End If
             
-            If retval$ = "" Then
+            If RetVal$ = "" Then
                 If fncdsc.elemdesc.vt = 24 Then
                     mList.Value = strName
                 Else
@@ -539,7 +539,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
                     mList.Value = strName + " as " + stringifyTypeDesc(TypeDesc, typeInf)
                 End If
             Else
-                mList.Value = strName + retval$
+                mList.Value = strName + RetVal$
             End If
             ITypeInfo_ReleaseFuncDesc typeInf, ppFuncDesc
         Next j
@@ -550,85 +550,6 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
     Set IDsp = Nothing
     GetAllMembers = True
 End Function
-Public Function GetAllMembersOld(mList As FastCollection, obj As Object _
-               ) As Boolean
- Dim IDsp        As IDispatch.IDispatchM2000
- Dim riid        As IDispatch.IID
-Dim params      As IDispatch.DISPPARAMS
-Dim Excep       As IDispatch.EXCEPINFO
-Dim mAttr As TYPEATTR
-Set mList = New FastCollection
-Dim ppFuncDesc As Long, fncdsc As FUNCDESC, cFuncs As Long
- 'Dim aaa As IDispatch.EXCEPINFO
- Dim ret As Long, pctinfo As Long, ppTInfo As Long, typeInf As IUnknown
-     Dim pAttr   As Long
-    Dim tKind   As Long
- Set IDsp = obj
- Dim cFncs           As Long
-    Dim I As Long
-
-
-  ret = IDsp.GetTypeInfo(ByVal 0, ByVal 0, ppTInfo)
-    Set typeInf = ResolveObjPtrNoRef(ppTInfo)
-     ITypeInfo_GetTypeAttr typeInf, pAttr
-    memcpy mAttr, ByVal pAttr, Len(mAttr)
-   
-       If TKIND_DISPATCH = mAttr.typekind Then
-         cFuncs = mAttr.cFuncs '' mAttr.cVars
-
-    Dim listOfNames() As String, strNames() As String, strName As String
-    ReDim listOfNames(1) As String
-    Dim j As Long
-    For j = 0 To mAttr.cFuncs - 1
-    ITypeInfo_GetFuncDesc typeInf, j, ppFuncDesc
-    CpyMem fncdsc, ByVal ppFuncDesc, Len(fncdsc)
-    ITypeInfo_ReleaseFuncDesc typeInf, ppFuncDesc
-     ret = ITypeInfo_GetDocumentation(typeInf, fncdsc.memid, listOfNames(0), vbNullString, 0&, vbNullString)
-     strName = listOfNames(0)
-     
-           mList.AddKey UCase(strName), ""
-        Select Case fncdsc.invkind
-            Case INVOKE_FUNC:
-                strName = "Function " + strName
-            Case INVOKE_PROPERTY_GET:
-                strName = "Property Get " + strName
-            Case INVOKE_PROPERTY_PUT:
-                strName = "Property Let " + strName
-            Case INVOKE_PROPERTY_PUTREF:
-                strName = "Property Set " + strName
-        End Select
-        mList.ToEnd  ' move to last
-    
-        If fncdsc.cParams > 0 Then
-        cFncs = 0
-        ReDim strNames(fncdsc.cParams + 1) As String
-        ret = ITypeInfo_GetDocumentation(typeInf, fncdsc.memid, listOfNames(0), vbNullString, 0&, vbNullString)
-        ret = ITypeInfo_GetNames(typeInf, fncdsc.memid, strNames(), 1 + fncdsc.cParams, cFncs)
-        If Not ret Then
-         strName = strName + "("
-            For I = 1 To fncdsc.cParams
-            strName = strName + strNames(I)
-            If I < fncdsc.cParams Then strName = strName + ", "
-            Next I
-        strName = strName + ")"
-        End If
-        End If
-    
-        mList.Value = strName
-    
-    
-    Next j
-    End If
-   
- 
- ITypeInfo_ReleaseTypeAttr typeInf, pAttr
- 
-   Set typeInf = Nothing
-    Set IDsp = Nothing
-
-End Function
-
-
 ' // Create IDispach implementation described in type library.
 ' // not used
 Public Function CreateIDispatch( _

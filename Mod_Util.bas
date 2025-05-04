@@ -791,7 +791,7 @@ End If
 MEXIT:
 End Function
 
-Public Function MOUSEX(Optional Offset As Long = 0) As Long
+Public Function MOUSEX(Optional offset As Long = 0) As Long
 Static X As Long
 On Error GoTo MOUSEX
 Dim tp As POINTAPI
@@ -799,13 +799,13 @@ MOUSEX = X
 If Not Screen.ActiveForm Is Nothing Then
 If GetForegroundWindow = Screen.ActiveForm.hWnd Then
    GetCursorPos tp
-   X = tp.X * dv15 - Offset
+   X = tp.X * dv15 - offset
   MOUSEX = X
   End If
 End If
 MOUSEX:
 End Function
-Public Function MOUSEY(Optional Offset As Long = 0) As Long
+Public Function MOUSEY(Optional offset As Long = 0) As Long
 Static Y As Long
 On Error GoTo MOUSEY
 Dim tp As POINTAPI
@@ -813,7 +813,7 @@ MOUSEY = Y
 If Not Screen.ActiveForm Is Nothing Then
 If GetForegroundWindow = Screen.ActiveForm.hWnd Then
    GetCursorPos tp
-   Y = tp.Y * dv15 - Offset
+   Y = tp.Y * dv15 - offset
    MOUSEY = Y
   End If
 End If
@@ -11006,13 +11006,17 @@ If a1 > Len(a$) Then a1 = Len(a$) + 1
     ElseIf MaybeIsSymbol(a$, "ΑαΨψTtFf") Then
         If Fast3Varl(a$, "ΑΛΗΘΕΣ", 6, "ΑΛΗΘΗΣ", 6, "TRUE", 4, 6) Then
             If VarType(D) = vbBoolean Then
-            D = True
+                D = True
             Else
-            D = D - 1
+                D = -1
             End If
             IsNumberD2 = True
         ElseIf Fast3Varl(a$, "ΨΕΥΔΕΣ", 6, "ΨΕΥΔΗΣ", 6, "FALSE", 5, 6) Then
-            
+            If VarType(D) = vbBoolean Then
+                D = False
+            Else
+                D = 0
+            End If
             IsNumberD2 = True
         Else
             IsNumberD2 = False
@@ -28429,6 +28433,11 @@ ElseIf IsExp(bstack, rest$, p) Then
                 Set bstack.lastobj = Nothing
                 GoTo cont1
             End If
+        ElseIf TypeOf bstack.lastobj Is StdPicture Then
+            Set aPic = bstack.lastobj
+            Set bstack.lastobj = Nothing
+          
+            GoTo cont1
         End If
     End If
     Set usehandler = Nothing
@@ -28480,6 +28489,7 @@ cont1:
         End If
     ElseIf IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
         If CFname(s$) <> "" Or ihavepic Or Not aPic Is Nothing Then
+cont11123:
             Select Case Abs(IsLabel(bstack, rest$, W$))
             Case 3
                 If GetVar(bstack, W$, it) Then
@@ -28508,7 +28518,23 @@ cont1:
                             End If
                         End If
                         photo.ClearUp
-                        photo.CreateFromPicture aPic, cback
+                        If aPic.Type = 4 And mem Is Nothing Then
+                            If x1 <> 0 And y1 <> 0 Then
+                                x1 = x1 / 10 * 2 / 3 + 1
+                                y1 = y1 / 10 * 2 / 3 + 1
+                                photo.CreateFromPicture aPic, cback, x1, y1
+                                photo.emfSizeFactor = x1 / aPic.Width
+                            Else
+                                If aPic.Width > 10000 Or aPic.Height > 10000 Then
+                                    photo.CreateFromPicture aPic, cback, 10000, CLng(10000# * (aPic.Height / aPic.Width))
+                                Else
+                                    photo.CreateFromPicture aPic, cback
+                                End If
+                            End If
+                        Else
+                            photo.CreateFromPicture aPic, cback
+                        End If
+                        
 1010
                         photo.GetDpi 96, 96
                         If photo.Width = 0 Then
@@ -28538,12 +28564,16 @@ cont1:
                     If photo.Width > 0 Then
                     If Not (Abs(y1) = photo.Width And Abs(x1) = photo.Height) Then
                         If photo.BitmapType = 4 Then
+                        
+                        
                             Set aPic = photo.Picture()
-                            p = Sqr(y1 * x1 / (photo.Width * photo.Height))
+                            If photo.emfSizeFactor = 1 Then
+                            p = Sqr(y1 / aPic.Height * (x1 / aPic.Width))
                             photo.ClearUp
                             photo.emfSizeFactor = p
                             photo.CreateFromPicture aPic, cback
                             photo.GetDpi 96, 96
+                            End If
                         End If
                         Set photo = photo.Resample(Abs(y1), Abs(x1))
                         
@@ -28622,6 +28652,10 @@ cont1:
                 Else
                      ProcImage = False: MissingArray W$: Exit Function
                 End If
+            Case Else
+                MyEr "not string variable using $", "λείπει αλφαριθμητικό με $ στο όνομα"
+                ProcImage = False
+                Exit Function
             End Select
         Else
             MyEr "missing file, or image in string or in buffer", "λείπει αρχείο ή εικόνα σε αλφαριθμητικό ή σε διάρθρωση μνήμης"
@@ -28677,7 +28711,28 @@ cont4:
 ElseIf mem Is Nothing Then
     If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then x1 = p
     If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y1 = p Else ProcImage = False: MissNumExpr: Exit Function
-    SImage bstack.Owner, x1, y1, s$
+    If s$ = "" And Not aPic Is Nothing Then
+        Dim d2 As Object
+        Dim ppp As Picture
+        Set ppp = aPic
+        Set d2 = bstack.Owner
+        With players(GetCode(d2))
+        If x1 = 0 Then
+                x1 = d2.ScaleX(ppp.Width, vbHimetric, vbTwips)
+                If y1 = 0 Then y1 = ppp.Height * (d2.ScaleX(ppp.Width, vbHimetric, vbTwips) / ppp.Width)
+        Else
+            If y1 = 0 Then y1 = ppp.Height * (x1 / ppp.Width)
+        End If
+        If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
+        
+        GoTo cont11123
+        End If
+                
+            d2.PaintPicture ppp, .XGRAPH, .YGRAPH, x1, y1
+        End With
+    Else
+        SImage bstack.Owner, x1, y1, s$
+    End If
 Else
     Dim d1 As Object, maybeerror As Boolean
     Set d1 = bstack.Owner
@@ -30665,7 +30720,7 @@ trace = tr
 'escok = olescok
 End Function
 Function makestruct(basestack As basetask, rest$, Lang As Long, Glob As Boolean, alocal As Boolean) As Boolean
-Dim what$, Offset As Long, offset1 As Long, offsetlist As FastCollection, i As Long, s$, b$, p As Variant, w2 As Long
+Dim what$, offset As Long, offset1 As Long, offsetlist As FastCollection, i As Long, s$, b$, p As Variant, w2 As Long
 ' struct is an inventory of offsets
 Dim usehandler As mHandler
 If Abs(IsLabel(basestack, rest$, what$)) = 1 Then  ' WE HAVE A NAME
@@ -30695,9 +30750,9 @@ End If
 If FastSymbol(rest$, "{") Then
 
     
-    If StructPage(basestack, rest$, Lang, mm, Offset, offsetlist, "") Then
+    If StructPage(basestack, rest$, Lang, mm, offset, offsetlist, "") Then
     If offsetlist Is Nothing Then Exit Function
-    offsetlist.structLen = Offset
+    offsetlist.structLen = offset
     usehandler.ReadOnly = True
     makestruct = True
     End If

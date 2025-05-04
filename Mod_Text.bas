@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 45
+Global Const Revision = 46
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5660,9 +5660,9 @@ helpSizeDialog = 1
 Settings = "time,normal,push"
 With ScrInfo(Console)
 selectorLastX = .Height / 4 + .Left
-selectorLastY = .Width / 4 + .top
+selectorLastY = .Width / 4 + .Top
 AskLastX = .Height / 4 + .Left
-AskLastY = .Width / 4 + .top
+AskLastY = .Width / 4 + .Top
 End With
 sb2used = 0
 ReDim sbf(500) As modfun
@@ -10477,7 +10477,7 @@ With bstack
 If .toprinter Then
     r = 0
 Else
-    r = .Owner.top
+    r = .Owner.Top
     End If
     
     End With
@@ -10491,7 +10491,7 @@ num40: ' "MOTION.XW", " …Õ«”«.◊–", "MOTION.WX", " …Õ«”«.–◊"
     IsNumberNew = True
     Exit Function
 num41: ' "MOTION.YW", " …Õ«”«.’–", "MOTION.WY", " …Õ«”«.–’"
-    r = Form1.top
+    r = Form1.Top
     
     IsNumberNew = True
     Exit Function
@@ -10544,9 +10544,9 @@ If .toprinter Then
 
 r = Form1.PrinterDocument1.currentY
 ElseIf .toback Then
-r = MOUSEY(Form1.top)
+r = MOUSEY(Form1.Top)
 Else
-r = MOUSEY(Form1.top + bstack.Owner.top)
+r = MOUSEY(Form1.Top + bstack.Owner.Top)
 End If
 End With
        
@@ -10561,7 +10561,7 @@ num47: ' "MOUSEA.X", "ƒ≈… ‘«”¡.◊"
     Exit Function
 num48: ' "MOUSEA.Y", "ƒ≈… ‘«”¡.’"
  
-    r = MOUSEY(Form1.top)
+    r = MOUSEY(Form1.Top)
    
        
     IsNumberNew = True
@@ -32623,13 +32623,13 @@ where = FindFormSScreen(myform)
         If Not IsExp(bstack, rest$, Y) Then procMotionW = False: Exit Function
         Else
         
-        Y = myform.top
+        Y = myform.Top
     End If
     If FastSymbol(rest$, ";") Then
     X = ((ScrInfo(where).Width - 1) - myform.Width) / 2 + ScrInfo(where).Left
-    Y = ((ScrInfo(where).Height - 1) - myform.Height) / 2 + ScrInfo(where).top
+    Y = ((ScrInfo(where).Height - 1) - myform.Height) / 2 + ScrInfo(where).Top
     If X < ScrInfo(where).Left Then X = ScrInfo(where).Left
-    If Y < ScrInfo(where).top Then Y = ScrInfo(where).top
+    If Y < ScrInfo(where).Top Then Y = ScrInfo(where).Top
     End If
     
 myform.move X, Y
@@ -32662,19 +32662,19 @@ If Form1.WindowState = 0 Then
         If Not IsExp(bstack, rest$, Y) Then procMotionW = False: Exit Function
         Else
         
-        Y = Form1.top
+        Y = Form1.Top
     End If
     
     If FastSymbol(rest$, ";") Then
     X = ((ScrInfo(Console).Width - 1) - Form1.Width) / 2 + ScrInfo(Console).Left
-    Y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).top
+    Y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).Top
     End If
 ' LETS MOVE
 
 If IsWine And Form1.Width = ScrInfo(Console).Width Then Form1.Width = ScrInfo(Console).Width - dv15
-If Form1.top > VirtualScreenHeight() - 100 Then Form1.top = ScrInfo(Console).top
+If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
 If IsWine Then
-If X = ScrInfo(Console).Left And Y = ScrInfo(Console).top Then
+If X = ScrInfo(Console).Left And Y = ScrInfo(Console).Top Then
 Form1.move X, Y
 'If form5iamloaded Then Form5.RestorePos
 Sleep 10
@@ -32685,10 +32685,10 @@ Form1.move X, Y
 Console = FindFormSScreen(Form1)
     If FastSymbol(rest$, ";") Then
     X = ((ScrInfo(Console).Width - 1) - Form1.Width) / 2 + ScrInfo(Console).Left
-    Y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).top
+    Y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).Top
     If X < ScrInfo(where).Left Then X = ScrInfo(where).Left
-    If Y < ScrInfo(where).top Then Y = ScrInfo(where).top
-    If Form1.top > VirtualScreenHeight() - 100 Then Form1.top = ScrInfo(Console).top
+    If Y < ScrInfo(where).Top Then Y = ScrInfo(where).Top
+    If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
     Form1.move X, Y
     End If
 Form1.Up
@@ -51371,7 +51371,9 @@ CONT1234:
                             End If
                         End If
                         If slct = 0 Then
+                        
 selslct0:
+                            SetNextLine b$
                             If Left$(b$, 4) = vbCrLf + vbCrLf Then
                                 ExpectedCaseorElseorEnd
                                 b$ = Mid$(b$, 3)

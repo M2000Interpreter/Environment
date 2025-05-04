@@ -303,7 +303,7 @@ conthere:
                     Else
                         pobjTarget.Modal = mycodeid
                    End If
-                   Dim X As Form, Z As Form, zz As Form
+                   Dim X As Form, z As Form, zz As Form
                    Set zz = Screen.ActiveForm
                    If zz.Name = "Form3" Then
                    Set zz = zz.lastform
@@ -383,22 +383,22 @@ conthere:
                 Else
                     Modalid = mycodeid
                 End If
-                Set Z = Nothing
+                Set z = Nothing
                 For Each X In Forms
                     If X.Name = "GuiM2000" Then
                         Set mm = X
                         ' If x.Modal = 0 Then
                         mm.TestModal mycodeid
                         If Not mm Is pobjTarget Then
-                        If mm.Enablecontrol Then Set Z = X
+                        If mm.Enablecontrol Then Set z = X
                         End If
                         Set mm = Nothing
                         'End If
                     End If
                 Next X
-                If Not zz Is Nothing Then Set Z = zz
-                If Typename(Z) = "GuiM2000" Then
-                    Set mm = Z
+                If Not zz Is Nothing Then Set z = zz
+                If Typename(z) = "GuiM2000" Then
+                    Set mm = z
                     If mm.Modal = Modalid Then
                 
                     ElseIf Not mm Is pobjTarget Then
@@ -406,10 +406,10 @@ conthere:
                         mm.ShowmeALL
                         If mm.Visible Then mm.SetFocus
                     End If
-                    Set Z = Nothing
+                    Set z = Nothing
                     Set mm = Nothing
-                ElseIf Not Z Is Nothing Then
-                    If Z.Visible Then Z.SetFocus
+                ElseIf Not z Is Nothing Then
+                    If z.Visible Then z.SetFocus
                 End If
                 Modalid = oldmoldid
             End If
@@ -644,17 +644,17 @@ Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR
 
     ' Get IDispatch from object
     Set IDsp = pobjTarget
-    Dim aa As Long, I As Integer, K As Integer
+    Dim aa As Long, i As Integer, K As Integer
     aa = DISPID_VALUE
     ' WE HAVE DISPIP
     If VarType(ThisIndex) = 8204 Then
                 ReDim varArr(0 To UBound(ThisIndex))
                 K = 0
-                For I = UBound(ThisIndex) - 1 To 0 Step -1
-                    If MemInt(VarPtr(ThisIndex(I))) = 9 Then
-                        Set varArr(K) = ThisIndex(I)
+                For i = UBound(ThisIndex) - 1 To 0 Step -1
+                    If MemInt(VarPtr(ThisIndex(i))) = 9 Then
+                        Set varArr(K) = ThisIndex(i)
                     Else
-                        varArr(K) = ThisIndex(I)
+                        varArr(K) = ThisIndex(i)
                     End If
                     K = K + 1
                 Next
@@ -808,16 +808,16 @@ Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, val1, E
     Set IDsp = pobjTarget
 
     ' WE HAVE DISPIP
-    Dim aa As Long, I As Integer, K As Integer
+    Dim aa As Long, i As Integer, K As Integer
     aa = DISPID_PROPERTYPUT
         If VarType(ThisIndex) = 8204 Then
                  ReDim varArr(0 To UBound(ThisIndex) + 1)
                  K = 1
-                 For I = UBound(ThisIndex) - 1 To 0 Step -1
-                    If MemInt(VarPtr(ThisIndex(I))) = 9 Then
-                        Set varArr(K) = ThisIndex(I)
+                 For i = UBound(ThisIndex) - 1 To 0 Step -1
+                    If MemInt(VarPtr(ThisIndex(i))) = 9 Then
+                        Set varArr(K) = ThisIndex(i)
                     Else
-                        varArr(K) = ThisIndex(I)
+                        varArr(K) = ThisIndex(i)
                     End If
                     K = K + 1
                  Next

@@ -91,7 +91,7 @@ Private Type POINTL
 End Type
 Private Type RECT
     Left As Long
-    Top As Long
+    top As Long
     Right As Long
     Bottom As Long
 End Type
@@ -163,7 +163,7 @@ Call ResetPrinter(gp, Td)
 Call ClosePrinter(gp)
 End Sub
 Function CreateBitmapPicture(ByVal hBmp As Long, ByVal hPal As Long) As Picture
-    Dim R As Long, pic As PicBmp, ipic As IPicture, IID_IDispatch As GUID
+    Dim r As Long, pic As PicBmp, ipic As IPicture, IID_IDispatch As GUID
 
     'Fill GUID info
     With IID_IDispatch
@@ -181,13 +181,13 @@ Function CreateBitmapPicture(ByVal hBmp As Long, ByVal hPal As Long) As Picture
     End With
 
     'Create the picture
-    R = OleCreatePictureIndirect(pic, IID_IDispatch, 1, ipic)
+    r = OleCreatePictureIndirect(pic, IID_IDispatch, 1, ipic)
 
     'Return the new picture
     Set CreateBitmapPicture = ipic
 End Function
 Function hDCToPicture(ByVal hdcSrc As Long, ByVal LeftSrc As Long, ByVal TopSrc As Long, ByVal widthSrc As Long, ByVal heightSrc As Long) As Picture
-    Dim hDCMemory As Long, hBmp As Long, hBmpPrev As Long, R As Long
+    Dim hDCMemory As Long, hBmp As Long, hBmpPrev As Long, r As Long
     Dim hPal As Long, hPalPrev As Long, RasterCapsScrn As Long, HasPaletteScrn As Long
     Dim PaletteSizeScrn As Long, LogPal As LOGPALETTE
 
@@ -211,17 +211,17 @@ Function hDCToPicture(ByVal hdcSrc As Long, ByVal LeftSrc As Long, ByVal TopSrc 
         'Number of palette entries
         LogPal.palNumEntries = 256
         'Retrieve the system palette entries
-        R = GetSystemPaletteEntries(hdcSrc, 0, 256, LogPal.palPalEntry(0))
+        r = GetSystemPaletteEntries(hdcSrc, 0, 256, LogPal.palPalEntry(0))
         'Create the palette
         hPal = CreatePalette(LogPal)
         'Select the palette
         hPalPrev = SelectPalette(hDCMemory, hPal, 0)
         'Realize the palette
-        R = RealizePalette(hDCMemory)
+        r = RealizePalette(hDCMemory)
     End If
 
     'Copy the source image to our compatible device context
-    R = BitBlt(hDCMemory, 0, 0, widthSrc, heightSrc, hdcSrc, LeftSrc, TopSrc, vbSrcCopy)
+    r = BitBlt(hDCMemory, 0, 0, widthSrc, heightSrc, hdcSrc, LeftSrc, TopSrc, vbSrcCopy)
 
     'Restore the old bitmap
     hBmp = SelectObject(hDCMemory, hBmpPrev)
@@ -232,7 +232,7 @@ Function hDCToPicture(ByVal hdcSrc As Long, ByVal LeftSrc As Long, ByVal TopSrc 
     End If
 
     'Delete our memory DC
-    R = DeleteDC(hDCMemory)
+    r = DeleteDC(hDCMemory)
 
     Set hDCToPicture = CreateBitmapPicture(hBmp, hPal)
 End Function
@@ -289,21 +289,21 @@ Function DriveSerial(ByVal path$) As Long
 End Function
 
 Function WeCanWrite(ByVal path$) As Boolean
-Dim SecondTry As Boolean, PP$
+Dim SecondTry As Boolean, pp$
 On Error GoTo wecant
-PP$ = ExtractPath(path$, , True)
-PP$ = GetDosPath(PP$)
-If PP$ = vbNullString Then
+pp$ = ExtractPath(path$, , True)
+pp$ = GetDosPath(pp$)
+If pp$ = vbNullString Then
 MyEr "Not writable device " & path$, "Δεν μπορώ να γράψω στη συσκευή " & path$
 Exit Function
 End If
-PP$ = PathStrip2root(path$)
+pp$ = PathStrip2root(path$)
 
 
-    Select Case GetDriveType(PP$)
+    Select Case GetDriveType(pp$)
 
         Case 2, 3, 4, 6
-          WeCanWrite = Not GetAttr(PP$) = vbReadOnly
+          WeCanWrite = Not GetAttr(pp$) = vbReadOnly
         Case 5
            WeCanWrite = False
     End Select
@@ -323,7 +323,7 @@ Dim o As Object
 If Typename(sapi) = "Nothing" Then Set sapi = CreateObject("sapi.spvoice")
 If Typename(sapi) = "Nothing" Then VoiceName = vbNullString: Exit Function
 D = Int(D)
-If sapi.getvoices().count >= D And D > 0 Then
+If sapi.getvoices().Count >= D And D > 0 Then
 For Each o In sapi.getvoices
 D = D - 1
 If D = 0 Then VoiceName = o.GetDescription: Exit For
@@ -334,19 +334,19 @@ Public Function NumVoices() As Long
 On Error Resume Next
 If Typename(sapi) = "Nothing" Then Set sapi = CreateObject("sapi.spvoice")
 If Typename(sapi) = "Nothing" Then NumVoices = -1: Exit Function
-If sapi.getvoices().count > 0 Then
-NumVoices = sapi.getvoices().count
+If sapi.getvoices().Count > 0 Then
+NumVoices = sapi.getvoices().Count
 End If
 End Function
-Public Sub SPEeCH(ByVal A$, Optional BOY As Boolean = False, Optional ByVal vNumber As Long = -1)
+Public Sub SPEeCH(ByVal a$, Optional BOY As Boolean = False, Optional ByVal vNumber As Long = -1)
 Static lastvoice As Long
 If vNumber = -1 Then vNumber = lastvoice
 On Error Resume Next
 If vNumber = 0 Then vNumber = 1
 If Typename(sapi) = "Nothing" Then Set sapi = CreateObject("sapi.spvoice")
 If Typename(sapi) = "Nothing" Then Beep: Exit Sub
-If sapi.getvoices().count > 0 Then
-If sapi.getvoices().count < vNumber Or sapi.getvoices().count < 1 Then vNumber = 1
+If sapi.getvoices().Count > 0 Then
+If sapi.getvoices().Count < vNumber Or sapi.getvoices().Count < 1 Then vNumber = 1
  With sapi
          Set .Voice = .getvoices.item(vNumber - 1)
        If BOY Then
@@ -354,13 +354,13 @@ If sapi.getvoices().count < vNumber Or sapi.getvoices().count < 1 Then vNumber =
         
          .rate = 2
        ' boy
-         .Speak "<pitch absmiddle='25'>" & A$
+         .Speak "<pitch absmiddle='25'>" & a$
          Else
          
          'man
        .rate = 1
        .volume = IIf(vol = 0, 0, 50 + vol \ 2)
-         .Speak "<pitch absmiddle='-5'>" & A$
+         .Speak "<pitch absmiddle='-5'>" & a$
          End If
        End With
        lastvoice = vNumber
@@ -383,6 +383,8 @@ para(1) = vbNullString
 Else
 para() = Split(what, vbCrLf)
 End If
+Dim bchar As Byte
+i = AverCharSpace(DDD, bchar)
 With mybasket
 ' from old code here
     tParam.iTabLength = .ReportTab
@@ -442,6 +444,7 @@ If Len(para(lastPara)) = 0 Then lastPara = lastPara - 1
     
         buf$ = vbNullString
 nextline:
+        
         If NOEXECUTION Then Exit For
         n = MyTextWidth(DDD, para(i))
         If n > wi Then
@@ -504,7 +507,7 @@ last:
         If Not scrollme Then
         If Not nopr Then
     
-            MyPrintNew DDD, mybasket.uMineLineSpace, buf$, , nowait     ';   '************************************************************************************
+            MyPrintNew DDD, mybasket.uMineLineSpace, buf$, , nowait
     
             res = DDD.currentX
                     If Trim$(buf$) = vbNullString Then
@@ -523,7 +526,15 @@ last:
         If frmt > 0 Then
                 If Not nopr Then fullPlainWhere DDD, mybasket, buf$, w2, frmt, nowait, nonewline
         ElseIf frmt = 0 Then
-        If Not nopr Then fullPlainWhere DDD, mybasket, buf$, w2, 3, nowait, nonewline
+        If Not nopr Then
+        '****************
+        If bchar = 13 Then
+            wwPlain bstack, mybasket, buf$, w2, 100000, True, , 3, , (0)
+        Else
+            fullPlainWhere DDD, mybasket, buf$, w2, 3, nowait, nonewline
+        End If
+        End If
+        
         Else
                 If Not nopr Then fullPlain DDD, mybasket, buf$, w2, nowait, nonewline  'DDD.Width ' w2
         End If
@@ -534,7 +545,7 @@ last:
         End If
              End If
                 If isAcolumn Then Exit Sub
-                'If UBound(para) = i Then Exit For
+                
         If skip < 0 Or scrollme Then
 JUMPHERE:
             lCount = lCount + 1
@@ -619,10 +630,11 @@ para(1) = vbNullString
 Else
 para() = Split(what, vbCrLf)
 End If
+Dim bchar As Byte
 With mybasket
 ' from old code here
     tParam.iTabLength = .ReportTab
-    tabw = .ReportTab * AverCharSpace(DDD)
+    tabw = .ReportTab * AverCharSpace(DDD, bchar)
     PX = .curpos
     PY = .currow
     If Not nosettext Then
@@ -722,6 +734,8 @@ nextline:
                         End If
                 para(i) = LTrim(Mid$(para(i), st1 + 1))
             End If
+            
+                 
              skip = skip - 1
              If skip < 0 Then
                  If Len(para(i)) = 0 Then GoTo last
@@ -729,13 +743,12 @@ nextline:
                  INTD = 0
 
                  Extra = 0
-
                  Select Case frmt
                  Case 0
                  INTD = TextWidth(DDD, space$(MyTrimL3Len(buf$)))
-                            If INTD > 0 Then
-                 buf$ = Mid$(buf$, MyTrimL3Len(buf$) + 1)
-                 DDD.currentX = DDD.currentX + INTD
+                 If INTD > 0 Then
+                    buf$ = Mid$(buf$, MyTrimL3Len(buf$) + 1)
+                    DDD.currentX = DDD.currentX + INTD
                  End If
                  buf$ = RTrim(buf$)
                  lasttab = rinstr(buf$, vbTab)
@@ -743,19 +756,67 @@ nextline:
                  Extra = LowWord(TabbedTextOut(DDD.hDC, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), lasttab, 1, tabw, DDD.currentX \ DXP))
                  buf$ = Mid$(buf$, lasttab + 1)
                  DDD.currentX = DDD.currentX + Extra * DXP
-                              
+                 Else
+                 INTD = 0
                  End If
+                 
+                 
+                 
+                 If bchar = 13 Then
+                 olda = SetTextAlign(DDD.hDC, 0)  'TA_RTLREADING)
+                 cuts = Len(buf$) - Len(Replace$(buf$, " ", ""))
+                 Dim part$
+                 Dim part1$
+                 part$ = Replace$(buf$, " ", Chr$(bchar))
+                 
+                 Extra = wi \ DXP - INTD \ DXP - Extra - LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(part$), Len(part$), 1, tabw))
+                 
+                 Dim p As Long
+                 Dim cc As Long
+                 
+                 Dim Extra1 As Long
+                 SetTextJustification DDD.hDC, 0, 0
+                 cc = DDD.currentX \ DXP
+                 If cuts > 0 Then
+                  Extra1 = Extra \ cuts
+                  For p = 1 To cuts
+                    part$ = Left$(buf$, InStr(buf$, " ") - 1)
+                    If part$ = "" Then
+                        buf$ = Mid$(buf$, 2)
+                    Else
+                         buf$ = Mid$(buf$, Len(part$) + 2)
+                        part$ = part$ + Chr$(bchar)
+                        INTD = LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(part$), Len(part$), 1, tabw))
+                        TextOut DDD.hDC, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(part$), Len(part$)
+                        DDD.currentX = DDD.currentX + INTD * DXP
+                       
+                    End If
+                    If Extra - Extra1 < Extra1 Then Extra1 = Extra
+                    DDD.currentX = DDD.currentX + Extra1 * DXP
+                    Extra = Extra - Extra1
+                    
+                   
+                 Next
+                 If Extra > 0 Then DDD.currentX = DDD.currentX + Extra * dv15
+                 End If
+                 SetTextJustification DDD.hDC, 0, 0
+                 INTD = MyTextWidth(DDD, buf$)
+                 TextOut DDD.hDC, (wi - INTD) \ DXP, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$)
+                 
+                 Else
                  olda = SetTextAlign(DDD.hDC, 0) 'TA_RTLREADING)
                  cuts = Len(buf$) - Len(Replace$(buf$, " ", ""))
-                 
+                 If bchar <> 32 Then buf$ = Replace$(buf$, " ", ChrW$(bchar))
                  Extra = wi \ DXP - INTD \ DXP - Extra - LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(buf$), Len(buf$), 1, tabw))
                  
-                 SetTextJustification DDD.hDC, Extra, cuts
                  
-                '
+                 Debug.Print SetTextJustification(DDD.hDC, Extra, cuts)
+                 
+             
                  TextOut DDD.hDC, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$)
-                 
+                  
                  SetTextJustification DDD.hDC, 0, 0
+                 End If
                  olda = SetTextAlign(DDD.hDC, olda)
                  Case 1
                  buf$ = RTrim(buf$)
@@ -935,5 +996,30 @@ Public Sub DisableMidi()
   End If
 End Sub
 
+Public Function InitStdFont() As StdFont
+    Set InitStdFont = New StdFont
+End Function
+
+Public Function IsOnlyDigits(sText As String) As Boolean
+    If LenB(sText) <> 0 Then
+        IsOnlyDigits = Not (sText Like "*[!0-9]*")
+    End If
+End Function
+Public Function C_Str(v As Variant) As String
+    On Error Resume Next
+    C_Str = CStr(v)
+    On Error GoTo 0
+End Function
+Public Function At(Data As Variant, ByVal Index As Long, Optional Default As String) As String
+    On Error GoTo EH
+    At = Default
+    If IsArray(Data) Then
+        If LBound(Data) <= Index And Index <= UBound(Data) Then
+            At = C_Str(Data(Index))
+        End If
+    End If
+    Exit Function
+EH:
+End Function
 
 

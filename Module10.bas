@@ -8991,7 +8991,7 @@ A038340:
                                     End If
                                 End If
                             ElseIf FastSymbol(rest$, "=") Then
-                                If Not IsNumberD2(rest$, p) Then
+                                If Not IsNumberD2fix(rest$, p) Then
                                     If ISSTRINGA(rest$, ss$) Then
                                         p = ss$
                                         GoTo optOk

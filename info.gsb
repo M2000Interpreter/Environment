@@ -415,10 +415,10 @@ function alfa.b {
 }
 Modules ?
 Print "alfa.b()=";alfa.b()
-
 Report {
-	 References for functions are strings with code. We get  {CALL EXTERN 3}A.ALFA, but is not the actual hard link. The actual code is in lambda object. 3 is the actual "slot" or index in a var(), an array of variants inside M2000 code where all the variables and this object exist.
+	 References for functions are strings with code. We get  {CALL EXTERN 3'´}DD3.ALFA. but is not the actual hard link. The actual code is in lambda object. 3 is the actual "slot" or index in a var(), an array of variants inside M2000 code where all the variables and this object exist. (These two characterd '´used internal)
 }
+CLIPBOARD &ALFA.B()
 pen 15 {Report 2,  &alfa.b()}
 Report {
 	We can make a link of alfa.b() to f() (only for new identifiers). The reference has the same weak reference to the name of group. So we can make a reference if the group has a name (is not keep it by a pointer, or exist in an array or other object like stacks and inventories)
@@ -632,76 +632,83 @@ MODULE DD7 {module Checkit {
 Checkit
 }
 MODULE DD8 {Module Pairs {
-      \\ using Gdi+ antialiasing (not work with Wine in Linux, but we get no error)
-      smooth on
-      Const center=2, right=3, left=1, blue=1, angle=0, dotline=3
-      Const size9pt=9, size11pt=11
-      Cls ,0 ' use current background color, set split screen from line 0
- '     Cursor 0,3
-'      Report center, "Coordinate pairs"
-      BigTitle(ucase$("Coordinate pairs"), 1, 75)
-      x = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
-      y = (2.7, 2.8, 31.4, 38.1, 58.0, 76.2, 100.5, 130.0, 149.3, 180.0)
-      dx=scale.x/2/len(x)
-      dy=dx 'ratio 1:1
-      graH=dy*len(x)
-      Basex=scale.x/4
-      Basey=(scale.y+graH)/2
-      Move Basex, Basey
-      \\ draw use relative coordinates
-      Draw 0,-graH
-      \\ Step just move graphic cursor
-      Step 0, graH
-      Draw scale.x/2, 0
-      Step -scale.x/2, 0
-      \\ scX is 1, not used
-      max=Y#max()
-      \\ Auto scale for Y, using 0 for start of axis Y
-      scY=-graH/((max+5^log(max) ) div 100)/100
-      \\ make vertical axis using dots with numbers center per dx
-      j=1
-      For i=basex+dx to basex+dx*x#max() Step dx
-            Move i, basey
-            Step 0, twipsy*10
-            Legend format$("{0}",array(x,j)), "courier", size9pt, angle, center
-            Width 1, dotline { draw 0, -graH-twipsy*10,7}
-            j++
-      Next i
-      \\ the same for horizontal axis
-      HalfTextHeight=Size.y("1","courier", size9pt)/2
-      For i=basey-dy to basey-dy*x#max() step dy
-            Move basex, i
-            Step -twipsx*10
-            Width 1, dotline { draw scale.x/2+twipsx*10,,7}
-            Move basex-100, i+HalfTextHeight
-            Legend format$("{0}",(i-basey)/scY), "courier", size9pt, angle, left
-      Next i
-      ex=each(x) : ey=each(y)
-     \\ start from first point. We use Draw to for absolute coordinates
-      Move array(x,0)*dx+Basex, array(y,0)*scy+Basey
-      While ex, ey {
-            Width 2 {
-                  Draw to array(ex)*dx+Basex, array(ey)*scy+Basey, blue
-            }
-      }
-      \\ second pass for marks and labels
-      ex=each(x) : ey=each(y)
-      While ex, ey {
-            Move array(ex)*dx+Basex, array(ey)*scy+Basey
-            Step -75, -75
-            Pen 12 {draw 150: draw 0,150 : draw -150 : draw 0,-150}
-            Pen 13 {
-                  Step 200, -200
-                  Legend format$("({0}-{1})",array(ex),array(ey) ), "courier bold", size11pt, angle, right
-            }
-      }
-      \\ screenshot to clipboard
-      Screenshot$=""
-      Move 0,0
-      Copy scale.x, scale.y to Screenshot$
-      Clipboard Screenshot$
-      a$=key$
-      sub BigTitle(this$, there, percent)
+	\\ using Gdi+ antialiasing (not work with Wine in Linux, but we get no error)
+	smooth on
+	Const center=2, right=3, left=1, blue=1, angle=0, dotline=3
+	Const size9pt=9, size11pt=11
+	Cls ,0 ' use current background color, set split screen from line 0
+	'Cursor 0,3
+	'Report center, "Coordinate pairs"
+	BigTitle(ucase$("Coordinate pairs"), 1, 65)
+	x = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11, 12)
+	y = (2.7, 2.8, 31.4, 38.1, 58.0, 76.2, 100.5, 130.0, 149.3, 90.0, 129.0, 95.0, 2*10^random(1, 3)+1)
+	sm=y#sum()/y#max()
+	max=Y#max()+sm ' ((Y#max()+sm) div sm)*sm
+	graH=scale.y*0.5
+	
+	dx=(scale.x*.6)/len(x)
+	\\ Auto scale for Y, using 0 for start of axis Y
+	single scY=-graH/max
+	max=Y#max()
+	zz=1
+	do
+		zz++
+		DY= CEIL(zz^log(max)/10)*10*SCY
+	until abs(dy)>400
+	parts=graH div dy-1	
+	Basex=(scale.x-len(x)*dx)/2
+	Basey=Scale.y*3/4
+	Move Basex, Basey
+	\\ draw use relative coordinates
+	Draw 0,-dy*PARTS+dy/3
+	\\ Step just move graphic cursor
+	Move Basex, Basey
+	Draw dx*len(x), 0
+	\\ scX is 1, not used
+	\\ make vertical axis using dots with numbers center per dx
+	For j=0 to len(x)-1
+		Move j*dx+basex , basey
+		Step 0, twipsy*10
+		Legend format$("{0}",array(x,j)), "courier", size9pt, angle, center
+		if j>0 then Width 1, dotline { draw 0, -dy*PARTS+dy/3,7}
+	Next j
+	\\ the same for horizontal axis
+	HalfTextHeight=Size.y("1","courier", size9pt)/2
+	j=0
+	For i= 0 to -parts
+		Move basex, i*dy+basey
+		Step -twipsx*10
+		Width 1, dotline {draw dx*len(x),,7}
+		Move basex-100, i*dy+basey+HalfTextHeight
+		Legend format$("{0:0:-}",(i*dy)/scy), "courier", size9pt, angle, left
+	Next i
+	
+	ex=each(x) : ey=each(y)
+		\\ start from first point. We use Draw to for absolute coordinates
+	Move array(x,0)*dx+Basex, array(y,0)*scy+Basey
+	While ex, ey {
+		Width 2 {
+			Draw to array(ex)*dx+Basex, array(ey)*scy+Basey, blue
+		}
+	}
+\\ second pass for marks and labels
+ex=each(x) : ey=each(y)
+While ex, ey {
+	Move array(ex)*dx+Basex, array(ey)*scy+Basey
+	Step -75, -75
+	Pen 12 {draw 150: draw 0,150 : draw -150 : draw 0,-150}
+	Pen #ffaacC {
+		Step 200, -200
+		Legend format$("({0}-{1})",array(ex),array(ey) ), "courier bold", size11pt, angle, right
+	}
+}
+\\ screenshot to clipboard
+Screenshot$=""
+Move 0,0
+Copy scale.x, scale.y to Screenshot$
+Clipboard Screenshot$
+a$=key$
+	sub BigTitle(this$, there, percent)
 		local w, n
 		mm=width
 		w=scale.x
@@ -710,8 +717,7 @@ MODULE DD8 {Module Pairs {
 			mode 8
 			pen #FFEEFf
 			bold 0
-			legend chr$(160)+this$+chr$(160),"Lucida Handwriting",  8,0,3,1,-20
-
+			legend chr$(160)+this$+chr$(160),"Segoe Script",  8,0,3,1,-20
 		} as w
 		cursor 0, there
 		move !
@@ -737,10 +743,16 @@ MODULE DD8GRNEW {\\ Like DD8 but better
 Σημ    χ=(1,2,3,4,5,6,9,10, 15,19)
 Σημ      χ+=10  \\ αύξηση κατά 10
 Σημ      χ*=3   \\ πολλαπλασιασμός επί 3, άρα το τελευταίο ειναι στο 29*3=87
+      	χ = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11, 12)
+
       Σειρά ! χ
       ψ= (2.7, 2.8, 31.4, 38.1, 58.0, 76.2, 100.5, 130.0, 149.3, 180.0)
+      
+	ψ = (2.7, 2.8, 31.4, 38.1, 58.0, 76.2, 100.5, 130.0, 149.3, 90.0, 129.0, 95.0, 2*10^random(1, 3)+1)
+
 Σημ      ψ-=100
 Σημ      ψ*=40
+    τόσα=μήκος(Χ)
       μέγιστο=ψ#μεγ()
       ελάχιστο=ψ#μικ()
       Σειρα ! ψ
@@ -749,7 +761,7 @@ MODULE DD8GRNEW {\\ Like DD8 but better
       Μ=Μέγεθος.Σωρού δια 2
       Για ι=0 εως Μ-1 : ΦέρεΠίσω Μ+ι : Επόμενο
       \\ Μαζεύουμε τα ζεύγη στα Α(ι,0) κα Α(ι,1)
-      Πίνακας Βάση 0,  Α(10,2)
+      Πίνακας Βάση 0,  Α(τόσα,2)
       Μ--
       Για ι=0 εως Μ: Διάβασε Α(ι,0), Α(ι,1) : Επόμενο
       \\ Τώρα τα ταξινομούμε ώστε να είμαστε σίγουροι ότι
@@ -844,7 +856,7 @@ MODULE DD8GRNEW {\\ Like DD8 but better
                   Χάραξε -150
                   Χάραξε 0,-Ύψος.Σημείου*10
             }
-            Πένα 13 {
+            Πένα #ffaacC {
                   Βήμα Πλάτος.σημείου*13, -Ύψος.Σημείου*13
                   Επιγραφή μορφή$("{0}|{1}", Α(ι,0), Α(ι,1) ), "courier bold", μέγεθος_11pt, γωνία, δεξιά
             }
@@ -5729,11 +5741,11 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 58 for M2000 Interpreter version 12, revision 45 and above"
+	Report " A collection of modules for tests version 60 for M2000 Interpreter version 13, revision 46 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
-		Report 1, "George Karras 2023-2024"
+		Report 1, "George Karras 1999-2025"
 	}
 }
 cls backcolor, row
@@ -11374,8 +11386,8 @@ MODULE OOP1 {Module OOP {
 		b2.Enabled~
 		CALL LOCAL Process
 	}
-	ENUM ΚΟΜΒΙΟ {ONE=49, TWO}
-	ENUM ΚΟΜΒΙΟ_ΔΕΙΚΤΗ {LEFT=1, RIGHT}
+	ENUM BUTTON  {ONE=49, TWO}
+	ENUM MOUSE_BUTTON {LEFT=1, RIGHT}
 	FOR EventHandler {
 		PressKeyOne=.Event_List(Service_Button(ONE))
 		.register  PressKeyOne, WEAK$(b1)
@@ -32810,7 +32822,7 @@ Pen ,255
 finale=True
 ShowAllicon()
 Show
-back {cls 11,0 : refresh 50}
+back {cls 0,0 : refresh 50}
 wait 200
 if IsHide then ShowAllicon()
 Player 1 hide
@@ -47309,5 +47321,62 @@ MODULE JENSEN {Module Jensen`s_Device {
       Print i=101 ' true
 }
 Jensen`s_Device
+}
+MODULE BARCODE {CLS,0
+report 2,  "BARCODE"
+declare bar "m2000.cBarcode"
+rem print type$(bar)
+Enum UcsBarCodeTypeEnum {
+	ucsBctAuto = 0
+	ucsBctEan13
+	ucsBctEan8
+	ucsBctEan128
+	ucsBctUpcA
+	ucsBctUpcE
+}
+Long ink_bleed_in_percents=10
+boolean true=1=1, false=1=0
+method bar, "init", ink_bleed_in_percents,  bHangSeparators:= TRUE, bShowDigits:=TRUE as ok
+method bar, "GetBarCode", "123456789012:12345",  ucsBctEan13 as Pic
+With Pic, "Width" as pic.width, "Height" as pic.height
+move  5000, 6000
+// Pic is a Picture object
+mem$=""
+// Now Image can render Pic to string
+Image Pic, 7500  to mem$
+rem ? image.x(mem$)=7500
+rem	? len(mem$)
+// so now we place a bitmap
+image mem$			 ', 7500
+// We can render Picture as emf directly
+Step 0, -4000
+Image Pic, 7500*1.2
+// We can make a file in memory using Drawing.
+// We can make another emf where we draw the picture
+drawing {
+	image Pic, 3000
+} as Mem
+rem ? len(Mem)
+step -3000, 7000
+// we can rotate the image now
+image Mem, 10000, ,-90
+sub BigTitle(this$, there, percent)
+	local w, n
+	mm=width
+	w=scale.x
+	drawing  {
+		Linespace 0
+		mode 8
+		pen #FFEEFf
+		bold 0
+		legend chr$(160)+this$+chr$(160),"Lucida Handwriting",  8,0,3,1,-20
+
+	} as w
+	cursor 0, there
+	move !
+	n=scale.x/image.x(w)*percent/100
+	step (scale.x-image.x(w)*n)/2
+	image w, image.x(w)*n
+end sub
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
