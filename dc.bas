@@ -529,7 +529,7 @@ last:
         If Not nopr Then
         '****************
         If bchar = 13 Then
-            wwPlain bstack, mybasket, buf$, w2, 100000, True, , 3, , (0)
+            wwPlain bstack, mybasket, buf$, w2, 100000, nowait, , 3, , (0), , , nonewline
         Else
             fullPlainWhere DDD, mybasket, buf$, w2, 3, nowait, nonewline
         End If

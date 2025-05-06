@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 46
+Global Const Revision = 47
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5660,9 +5660,9 @@ helpSizeDialog = 1
 Settings = "time,normal,push"
 With ScrInfo(Console)
 selectorLastX = .Height / 4 + .Left
-selectorLastY = .Width / 4 + .Top
+selectorLastY = .Width / 4 + .top
 AskLastX = .Height / 4 + .Left
-AskLastY = .Width / 4 + .Top
+AskLastY = .Width / 4 + .top
 End With
 sb2used = 0
 ReDim sbf(500) As modfun
@@ -10477,7 +10477,7 @@ With bstack
 If .toprinter Then
     r = 0
 Else
-    r = .Owner.Top
+    r = .Owner.top
     End If
     
     End With
@@ -10491,7 +10491,7 @@ num40: ' "MOTION.XW", "ΚΙΝΗΣΗ.ΧΠ", "MOTION.WX", "ΚΙΝΗΣΗ.ΠΧ"
     IsNumberNew = True
     Exit Function
 num41: ' "MOTION.YW", "ΚΙΝΗΣΗ.ΥΠ", "MOTION.WY", "ΚΙΝΗΣΗ.ΠΥ"
-    r = Form1.Top
+    r = Form1.top
     
     IsNumberNew = True
     Exit Function
@@ -10544,9 +10544,9 @@ If .toprinter Then
 
 r = Form1.PrinterDocument1.currentY
 ElseIf .toback Then
-r = MOUSEY(Form1.Top)
+r = MOUSEY(Form1.top)
 Else
-r = MOUSEY(Form1.Top + bstack.Owner.Top)
+r = MOUSEY(Form1.top + bstack.Owner.top)
 End If
 End With
        
@@ -10561,7 +10561,7 @@ num47: ' "MOUSEA.X", "ΔΕΙΚΤΗΣΑ.Χ"
     Exit Function
 num48: ' "MOUSEA.Y", "ΔΕΙΚΤΗΣΑ.Υ"
  
-    r = MOUSEY(Form1.Top)
+    r = MOUSEY(Form1.top)
    
        
     IsNumberNew = True
@@ -28646,7 +28646,7 @@ End If
 End If
 End Function
 
-Function NeoGetArrayItem(pp As iBoxArray, bstack As basetask, v$, Offset As Long, rst$, Optional noObject As Boolean = False, Optional closepar As Boolean = True, Optional fromstr As Boolean, Optional rightexpr As Boolean = False, Optional idx As mIndexes) As Boolean
+Function NeoGetArrayItem(pp As iBoxArray, bstack As basetask, v$, offset As Long, rst$, Optional noObject As Boolean = False, Optional closepar As Boolean = True, Optional fromstr As Boolean, Optional rightexpr As Boolean = False, Optional idx As mIndexes) As Boolean
 If pp Is Nothing Then
     MyEr "Internal Error: NeoGetArrayItem", "εσωτερικό λάθος: NeoGetArrayItem": Exit Function
 End If
@@ -28677,10 +28677,10 @@ If Not pp.arr Then
                         Exit Function
                         Else
                             .AddKey p
-                            Offset = -.Index - 100
+                            offset = -.Index - 100
                         End If
                     Else
-                        Offset = -.Index - 100
+                        offset = -.Index - 100
                     End If
                 Else
                     p = MyRound(p)
@@ -28691,7 +28691,7 @@ If Not pp.arr Then
                             .Index = Int(p)
                         End If
                         .Index = p
-                        Offset = -.Index - 100
+                        offset = -.Index - 100
                         .Done = True
                     Else
                         MyEr "Index out of limits", "Δείκτης εκτός ορίων"
@@ -28717,10 +28717,10 @@ contlabel1:
                     Exit Function
                     Else
                         .AddKey ppp$
-                        Offset = -.Index - 100
+                        offset = -.Index - 100
                     End If
                 Else
-                    Offset = -.Index - 100
+                    offset = -.Index - 100
                 End If
                 If Typename(.ValueObj) = mGroup Then
                     If .ValueObj.HasParametersSet Or .ValueObj.HasParameters Then
@@ -28763,7 +28763,7 @@ contlabel1:
                 End If
             End If
         End If
-        Offset = -2
+        offset = -2
         NeoGetArrayItem = True
         Exit Function
     Else
@@ -28798,7 +28798,7 @@ conthere:
                 ElseIf p < 0 Then
                     GoTo toolow
                 Else
-                    Offset = p
+                    offset = p
                     NeoGetArrayItem = True
                 End If
             End If
@@ -28806,7 +28806,7 @@ conthere:
         Set pppp = pp
         If pppp.SerialItem((0), dd, 5) Then
             dd = dd - 1
-            Offset = 0
+            offset = 0
             If dd < 0 Then If VarTypeName(pppp.GroupRef) = mProp Then GoTo contprop
             Do While dn <= dd
                 pppp.GetDnum dn, w3, lim
@@ -28823,7 +28823,7 @@ conthere:
 toolow:
                         MyEr "index too low for array " + v$ + sp$, "χαμηλός δείκτης στο πίνακα " + v$ + sp$: Exit Function
                     End If
-                    If pppp.PushOffset(Offset, dn, CLng(p)) Then
+                    If pppp.PushOffset(offset, dn, CLng(p)) Then
                         NeoGetArrayItem = True
                     Else
 toohigh:
@@ -28842,20 +28842,20 @@ toohigh:
     End If
     If lookOne(rst, "(") Then
 CheckThis:
-        ppp$ = VarTypeName(pp.item(Offset))
+        ppp$ = VarTypeName(pp.item(offset))
         If ppp$ = myArray Then
             FastSymbol rst$, "("
-            Set pp = pp.item(Offset)
+            Set pp = pp.item(offset)
             NeoGetArrayItem = False
             GoTo again123
         ElseIf ppp$ = "ppppLight" Then
             FastSymbol rst$, "("
-            Set pp = pp.item(Offset)
+            Set pp = pp.item(offset)
             NeoGetArrayItem = False
             GoTo again123
         ElseIf ppp$ = mHdlr Then
             FastSymbol rst$, "("
-            Set usehandler = pp.item(Offset)
+            Set usehandler = pp.item(offset)
             If usehandler.t1 = 3 Then
                 Set pp = usehandler.objref
                 Set usehandler = Nothing
@@ -28867,7 +28867,7 @@ CheckThis:
             p = vbEmpty
             NeoGetArrayItem = pp.arr
             GoTo again123
-        ElseIf VarTypeName(pp.item(Offset)) = mGroup Then
+        ElseIf VarTypeName(pp.item(offset)) = mGroup Then
             NeoGetArrayItem = True
         End If
 End If
@@ -29829,6 +29829,219 @@ Else
 
 Exit Sub
 End If
+For K = 1 To that.Count
+If that.IsByRef(K - 1) Then
+' RESTORE VALUES...
+    If that.ReadType(K - 1) < 5 Then
+    If that.ReadType(K - 1) <> 2 Then var(thisref(K - 1)) = Final(K - 1)
+    
+    End If
+End If
+Next K
+Exit Sub
+there:
+MyEr Err.Description, Err.Description
+Err.Clear
+End Sub
+
+
+Sub CallByObject1(bstack As basetask, ret As Boolean, that As stdCallFunction)
+Dim Up As Long, getparam As Boolean, pp As Long
+Dim K As Long, p As Variant, Final(0 To 63) As Variant
+Dim x1 As Long, what$, curtype As Long, s$, link$, rtype As Variant
+Dim thisref(0 To 63) As Long
+Dim usehandler As mHandler
+Dim myobj As stdole.IUnknown
+Dim myobjinterface As stdole.IUnknown
+On Error Resume Next
+Set myobj = bstack.soros.PopObj
+If Err Then
+    MyEr "expected object as fist parameter", "περίμενα αντικείμενο ως πρώτο όρισμα"
+    Exit Sub
+End If
+
+If that.ReadType(that.Count - 1) = -100 Then
+    Up = that.Count - 1
+    getparam = True
+Else
+    Up = that.Count
+End If
+For K = 1 To Up
+        If that.IsByRef(K - 1) Then
+            ' look for label..and check it
+           If bstack.IsInStackString(what$) Then
+                If that.ReadType(K - 1) <= 4 Then
+                    If GetGlobalVar(bstack.GroupName + what$, x1) Then
+                        thisref(K - 1) = x1 ' so that is used to restore value
+                        If MyIsObject(var(x1)) Then
+                                 ' THIS IS NOT GOOD
+                        Else
+                            If that.ReadType(K - 1) = 2 Then
+                                Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
+                            Else
+                                Final(K - 1) = var(x1)
+                            End If
+                        End If
+                    Else
+                            ' no such variable
+                    End If
+                Else
+                    ' error no array yet
+                End If
+            Else
+                ' type mismatch
+                ' exit - error
+            End If
+        Else
+        Dim ii As Long
+            Select Case that.ReadType(K - 1)
+            Case 2
+                If Not bstack.IsInStackNumber(p) Then
+                    If Not bstack.IsInStackLong(ii) Then
+                        If bstack.soros.StackItemTypeIsObject(1) Then
+                            If bstack.soros.StackItemTypeObjectType(1) = "*[Enumeration]" Then
+                                Set usehandler = bstack.soros.PopObj
+                                If MyIsNumeric(usehandler.index_cursor) Then
+                                    ii = usehandler.index_cursor * usehandler.sign
+                                Else
+                                    Exit For
+                                End If
+                            Else
+                                Exit For
+                            End If
+                        Else
+                            Exit For
+                        End If
+                    Else
+                        Exit For
+                    End If
+                    Final(K - 1) = ii
+                    Else
+                    If VarType(p) = 20 Then
+                    Final(K - 1) = p
+                    Else
+                    Final(K - 1) = CLng(p)
+                    End If
+                   End If
+                Case 20
+                If Not bstack.IsInStackNumber(p) Then
+                   Final(K - 1) = p
+                  End If
+                Case 1, 5
+                        If Not bstack.IsInStackNumber(p) Then
+                   
+                    If Not bstack.IsInStackLong(ii) Then Exit For
+                    Final(K - 1) = ii
+                    Else
+                    Final(K - 1) = p
+                    End If
+                Case 4, 7
+                    If Not bstack.IsInStackNumber(p) Then
+                   
+                    If Not bstack.IsInStackLong(ii) Then Exit For
+                    Final(K - 1) = ii
+                    Else
+                    Final(K - 1) = MyRound(p)
+                    End If
+                Case Else
+                    If Not bstack.IsInStackString(s$) Then Exit For
+                    Final(K - 1) = s$
+                End Select
+        End If
+cont111:
+Next K
+If getparam Then
+Do
+If bstack.IsInStackLong(pp) Then
+Final(K - 1) = pp
+K = K + 1
+ElseIf bstack.IsInStackNumber(p) Then
+Final(K - 1) = p
+K = K + 1
+ElseIf bstack.IsInStackString(s$) Then
+ Final(K - 1) = s$
+K = K + 1
+Else
+Exit Do
+End If
+Loop Until bstack.soros.IsEmpty Or K = 63
+Up = K - 1
+End If
+
+If K > Up Then
+'all is ok
+' make your call
+If that.RetType = 0 Then
+rtype = vbLong
+Else
+rtype = that.RetType
+End If
+If that.IsInterfaceCall Then
+If that.GetInterface(myobj, myobjinterface) Then
+
+Select Case rtype
+Case 9, 13
+Set rtype = Fast_obj_stdCallW(myobjinterface, that.Funcoffset, rtype, Final(), Up)
+If ret Then
+    bstack.soros.PushObj rtype   ' FEEDBACK TO STACK
+End If
+Case Else
+rtype = Fast_obj_stdCallW(myobjinterface, that.Funcoffset, rtype, Final(), Up)
+If ret Then
+    If that.RetType = 0 Then
+        bstack.soros.PushVal rtype    ' FEEDBACK TO STACK
+    Else
+        bstack.soros.PushStr GetBStrFromPtr(x1)
+    End If
+End If
+End Select
+
+
+
+GoTo cont_here
+End If
+Exit Sub
+ElseIf that.CallAddr = 0 Then
+If Left$(that.func, 1) = "#" Then
+that.CallAddr = GetFuncPtrOrd(that.LIB, that.func)
+Else
+that.CallAddr = GetFuncPtr(that.LIB, that.func)
+End If
+End If
+If (that.CallAddr And &H7FFFFFFF) < 65536 Then Exit Sub
+On Error GoTo there
+Select Case rtype
+Case 9, 13
+If that.CallType = 0 Then
+Set rtype = Fast_stdCallW(that.CallAddr, rtype, Final(), Up)
+Else
+Set rtype = Fast_cdeclCallW(that.CallAddr, rtype, Final(), Up)
+End If
+If ret Then
+    bstack.soros.PushObj rtype   ' FEEDBACK TO STACK
+End If
+Case Else
+If that.CallType = 0 Then
+rtype = Fast_stdCallW(that.CallAddr, rtype, Final(), Up)
+Else
+rtype = Fast_cdeclCallW(that.CallAddr, rtype, Final(), Up)
+End If
+If ret Then
+    If that.RetType = 0 Then
+        bstack.soros.PushVal rtype    ' FEEDBACK TO STACK
+    Else
+        bstack.soros.PushStr GetBStrFromPtr(x1)
+    End If
+End If
+End Select
+Else
+'error message
+
+
+Exit Sub
+End If
+cont_here:
+
 For K = 1 To that.Count
 If that.IsByRef(K - 1) Then
 ' RESTORE VALUES...
@@ -32623,13 +32836,13 @@ where = FindFormSScreen(myform)
         If Not IsExp(bstack, rest$, Y) Then procMotionW = False: Exit Function
         Else
         
-        Y = myform.Top
+        Y = myform.top
     End If
     If FastSymbol(rest$, ";") Then
     X = ((ScrInfo(where).Width - 1) - myform.Width) / 2 + ScrInfo(where).Left
-    Y = ((ScrInfo(where).Height - 1) - myform.Height) / 2 + ScrInfo(where).Top
+    Y = ((ScrInfo(where).Height - 1) - myform.Height) / 2 + ScrInfo(where).top
     If X < ScrInfo(where).Left Then X = ScrInfo(where).Left
-    If Y < ScrInfo(where).Top Then Y = ScrInfo(where).Top
+    If Y < ScrInfo(where).top Then Y = ScrInfo(where).top
     End If
     
 myform.move X, Y
@@ -32662,19 +32875,19 @@ If Form1.WindowState = 0 Then
         If Not IsExp(bstack, rest$, Y) Then procMotionW = False: Exit Function
         Else
         
-        Y = Form1.Top
+        Y = Form1.top
     End If
     
     If FastSymbol(rest$, ";") Then
     X = ((ScrInfo(Console).Width - 1) - Form1.Width) / 2 + ScrInfo(Console).Left
-    Y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).Top
+    Y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).top
     End If
 ' LETS MOVE
 
 If IsWine And Form1.Width = ScrInfo(Console).Width Then Form1.Width = ScrInfo(Console).Width - dv15
-If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
+If Form1.top > VirtualScreenHeight() - 100 Then Form1.top = ScrInfo(Console).top
 If IsWine Then
-If X = ScrInfo(Console).Left And Y = ScrInfo(Console).Top Then
+If X = ScrInfo(Console).Left And Y = ScrInfo(Console).top Then
 Form1.move X, Y
 'If form5iamloaded Then Form5.RestorePos
 Sleep 10
@@ -32685,10 +32898,10 @@ Form1.move X, Y
 Console = FindFormSScreen(Form1)
     If FastSymbol(rest$, ";") Then
     X = ((ScrInfo(Console).Width - 1) - Form1.Width) / 2 + ScrInfo(Console).Left
-    Y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).Top
+    Y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).top
     If X < ScrInfo(where).Left Then X = ScrInfo(where).Left
-    If Y < ScrInfo(where).Top Then Y = ScrInfo(where).Top
-    If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
+    If Y < ScrInfo(where).top Then Y = ScrInfo(where).top
+    If Form1.top > VirtualScreenHeight() - 100 Then Form1.top = ScrInfo(Console).top
     Form1.move X, Y
     End If
 Form1.Up
@@ -36301,7 +36514,11 @@ End If
                     Set usethis = var(i)
                     On Error Resume Next
                     Err.Clear
+                    If usethis.IsInterfaceCall Then
+                    CallByObject1 basestack, Not par, usethis
+                    Else
                     CallByObject basestack, Not par, usethis
+                    End If
                     Set basestack = Nothing
                     If Err.Number <> 0 Then
                         MyEr Err.Description, Err.Description
@@ -36958,7 +37175,7 @@ Else
 Between = (a >= b And a <= c) And Not a = exclude
 End If
 End Function
-Function StructPage(basestack As basetask, rest$, Lang As Long, ByVal Offset As Long, ByRef offset2 As Long, offsetlist As FastCollection, ByVal lasthead$) As Boolean
+Function StructPage(basestack As basetask, rest$, Lang As Long, ByVal offset As Long, ByRef offset2 As Long, offsetlist As FastCollection, ByVal lasthead$) As Boolean
 Dim what$, offset1 As Long, i As Long, s$, b$, p As Variant, w2 As Long, maxOffset As Long, probeoffset As Long, usehandler As mHandler, localList As FastCollection
 Dim itisSingle As Boolean, itisCur As Boolean
     b$ = NLtrim$(block(rest$))
@@ -36991,7 +37208,7 @@ again1:
     ElseIf FastSymbol(b$, "{") Then
     ' IS A NEW PAGE
     probeoffset = 0
-    If StructPage(basestack, b$, Lang, Offset, probeoffset, offsetlist, lasthead$) Then
+    If StructPage(basestack, b$, Lang, offset, probeoffset, offsetlist, lasthead$) Then
         If probeoffset > maxOffset Then maxOffset = probeoffset
         FastSymbol b$, ","
         ' leave offset as is
@@ -37013,17 +37230,17 @@ again1:
         Exit Function
         End If
 
-        If StructPage(basestack, b$, Lang, Offset, probeoffset, offsetlist, lasthead$ + what$ + ".") Then
+        If StructPage(basestack, b$, Lang, offset, probeoffset, offsetlist, lasthead$ + what$ + ".") Then
             If FastSymbol(b$, "*") Then
                 p = 1&
                 If Not IsExp(basestack, b$, p) Then MissNumExpr: Exit Function
                 p = MyRound(p)
-                If p * (probeoffset - Offset) + Offset > &H1FFFFFFF Then ' half gigabyte for struct (is very big too)
+                If p * (probeoffset - offset) + offset > &H1FFFFFFF Then ' half gigabyte for struct (is very big too)
                     GoTo err111
                 ElseIf p <= 0 Then
                     GoTo err222
                 End If
-                probeoffset = p * (probeoffset - Offset) + Offset
+                probeoffset = p * (probeoffset - offset) + offset
             End If
             
             
@@ -37031,12 +37248,12 @@ again1:
 
             ' leave offset as is
     
-            offsetlist.AddKeyStruct myUcase(lasthead$ + what$, True), Offset, 1&, Nothing
+            offsetlist.AddKeyStruct myUcase(lasthead$ + what$, True), offset, 1&, Nothing
             'offsetlist.AddKeyS myUcase(lasthead$ + what$, True), offset ', 1&, Nothing
             If offsetlist.Done Then
-            offsetlist.sValue = probeoffset - Offset
+            offsetlist.sValue = probeoffset - offset
             If FastSymbol(b$, ";") Then
-            Offset = probeoffset
+            offset = probeoffset
             End If
             ' keytype not used for strucrures except for single values
             ' so Eval() can read single from 4 bytes
@@ -37127,7 +37344,7 @@ comehere:
             Exit Function
         Else
             p = MyRound(p)
-            If p * Abs(offset1) + Offset > &H1FFFFFFF Then  ' half gigabyte for struct (is very big too)
+            If p * Abs(offset1) + offset > &H1FFFFFFF Then  ' half gigabyte for struct (is very big too)
 err111:
                 MyEr "Too big size for struct", "Μεγάλο μέγεθος για δομή"
                 Exit Function
@@ -37149,11 +37366,11 @@ err222:
     
     'offsetlist.AddKey myUcase(lasthead$ + what$, True), CVar(offset)
     If p <= 0 Then p = 1
-    offsetlist.AddKeyStruct myUcase(lasthead$ + what$, True), Offset, CLng(p), localList
+    offsetlist.AddKeyStruct myUcase(lasthead$ + what$, True), offset, CLng(p), localList
     If offsetlist.Done Then offsetlist.sValue = w2
     If itisSingle Then offsetlist.KeyTypeValue = CInt(vbSingle): itisSingle = False
     If itisCur Then offsetlist.KeyTypeValue = CInt(vbCurrency): itisCur = False
-    Offset = Offset + Abs(offset1)
+    offset = offset + Abs(offset1)
     If FastSymbol(b$, ",") Then
     If NocharsInLine(b$) Or b$ = vbNullString Then
     GoTo cont147
@@ -37171,16 +37388,16 @@ cont147:
     If MaybeIsSymbol(b$, "{") Then GoTo a192929
     Loop Until Not Between(FastPureLabel(b$, what$), 1, 3, 2)
 a192929:
-    If maxOffset < Offset Then
-        offset2 = Offset
+    If maxOffset < offset Then
+        offset2 = offset
     Else
         offset2 = maxOffset
     End If
     StructPage = True
     GoTo again1
    End If
-    If maxOffset < Offset Then
-    offset2 = Offset
+    If maxOffset < offset Then
+    offset2 = offset
     Else
     offset2 = maxOffset
     End If
@@ -43695,12 +43912,12 @@ w1112:
                                 Set pppp.GroupRef = Nothing
                                 pppp.IhaveClass = False
                                 If basestack.lastobj.IamSuperClass Then
-                                    Dim MyObj As Object
-                                    pppp.CopyGroupObj basestack.lastobj.SuperClassList, MyObj
+                                    Dim myobj As Object
+                                    pppp.CopyGroupObj basestack.lastobj.SuperClassList, myobj
                                     
-                                    Set MyObj.SuperClassList = basestack.lastobj.SuperClassList
-                                    Set pppp.item(i) = MyObj
-                                    Set MyObj = Nothing
+                                    Set myobj.SuperClassList = basestack.lastobj.SuperClassList
+                                    Set pppp.item(i) = myobj
+                                    Set myobj = Nothing
                                 Else
                                     Set pppp.item(i) = basestack.lastobj
                                     pppp.item(i).ToDelete = False
@@ -48366,7 +48583,7 @@ End If
 Exit Function
 End Function
 Public Function GetPointer(bstack As basetask, a$) As Boolean
-Dim w1 As Long, s$, ppppl As iBoxArray, w2 As Long, p, nbstack As basetask, MyObj As Object, i As Long
+Dim w1 As Long, s$, ppppl As iBoxArray, w2 As Long, p, nbstack As basetask, myobj As Object, i As Long
 Dim Glob As Boolean, rempar As Long, waspointer As Boolean, usehandler As mHandler
 If MaybeIsSymbol(a$, ")") Then
 p = 0
@@ -48388,8 +48605,8 @@ cont11:
                             PushStage bstack, False
                         
                                 i = globalvarGroup("_1", 0, , True)
-                                Set MyObj = var(w1)
-                                UnFloatGroup bstack, "_1", i, MyObj, True
+                                Set myobj = var(w1)
+                                UnFloatGroup bstack, "_1", i, myobj, True
                                 
                             Set p = CopyGroupObj(var(i))
                             PopStage bstack
@@ -48431,8 +48648,8 @@ cont11:
                             If p.IamSuperClass Then
                                 PushStage bstack, False
                                 i = globalvarGroup("_1", 0, , True)
-                                Set MyObj = p
-                                UnFloatGroup bstack, "_1", i, MyObj, True
+                                Set myobj = p
+                                UnFloatGroup bstack, "_1", i, myobj, True
                                 Set p = CopyGroupObj(var(i))
                                 PopStage bstack
                             End If
@@ -48494,8 +48711,8 @@ conthere:
                     Set bstack.lastpointer = p
                 Else
                     If p.IamTeam Or Not p.link Is Nothing Then
-                        bstack.soros.CopyGroupObj ppppl.item(w2), MyObj
-                        Set p = MyObj
+                        bstack.soros.CopyGroupObj ppppl.item(w2), myobj
+                        Set p = myobj
                     End If
                 
                     MakeGroupPointer bstack, p
@@ -48581,8 +48798,8 @@ getgroup:
                             If p.IamSuperClass Then
                                 PushStage bstack, False
                                 i = globalvarGroup("_1", 0, , True)
-                                Set MyObj = p
-                                UnFloatGroup bstack, "_1", i, MyObj, True
+                                Set myobj = p
+                                UnFloatGroup bstack, "_1", i, myobj, True
                                 Set p = CopyGroupObj(var(i))
                                 PopStage bstack
                             ElseIf p.IamApointer Then
@@ -48613,12 +48830,12 @@ jmp1478:
                     s$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1)
                     If GetVar(bstack, s$, w1) Then
                         If IsBadCodePtr(var(w1).PointerPtr) = 0 Then
-                        ObjSetAddRef MyObj, var(w1).PointerPtr
-                        Set p = MyObj
+                        ObjSetAddRef myobj, var(w1).PointerPtr
+                        Set p = myobj
                                 p.link.lasthere = var(w1).lasthere
                                 p.link.LastOpen = var(w1).LastOpen
-                                Set bstack.lastobj = MyObj
-                                Set bstack.lastpointer = MyObj
+                                Set bstack.lastobj = myobj
+                                Set bstack.lastpointer = myobj
                                 GetPointer = True
                             GoTo exitHere
                         End If
@@ -52207,12 +52424,12 @@ Dim p As Variant, X As Variant, i As Long, f As Long, s$, ss$
                                                      Set pppp.GroupRef = Nothing
                                                      pppp.IhaveClass = False
                                                      If basestack.lastobj.IamSuperClass Then
-                                                    Dim MyObj As Object
-                                          pppp.CopyGroupObj basestack.lastobj.SuperClassList, MyObj
+                                                    Dim myobj As Object
+                                          pppp.CopyGroupObj basestack.lastobj.SuperClassList, myobj
                         
-                                              Set MyObj.SuperClassList = basestack.lastobj.SuperClassList
-                                              Set pppp.item(i) = MyObj
-                                              Set MyObj = Nothing
+                                              Set myobj.SuperClassList = basestack.lastobj.SuperClassList
+                                              Set pppp.item(i) = myobj
+                                              Set myobj = Nothing
                                              
                                                Else
                                                   

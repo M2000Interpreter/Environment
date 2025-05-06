@@ -57,7 +57,7 @@ Dim v(), HRes As Long, i As Long
         stdCallW = vbEmpty
  End If
 End Function
-Public Function Fast_stdCallW(ByVal Addr As Long, ByVal RetType As Variant, p() As Variant, j As Long)
+Public Function Fast_stdCallW(ByVal addr As Long, ByVal RetType As Variant, p() As Variant, j As Long)
 Dim v(), HRes As Long, i As Long
  
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
@@ -73,7 +73,7 @@ Dim v(), HRes As Long, i As Long
     
   Next i
 
-  HRes = DispCallFunc(0, Addr, CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), Fast_stdCallW)
+  HRes = DispCallFunc(0, addr, CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), Fast_stdCallW)
 
   If HRes Then Err.Raise HRes
 ' p() = v()
@@ -81,7 +81,30 @@ Dim v(), HRes As Long, i As Long
     Fast_stdCallW = vbEmpty
  End If
 End Function
+Public Function Fast_obj_stdCallW(obj As stdole.IUnknown, ByVal addroffset As Long, ByVal RetType As Variant, p() As Variant, j As Long)
+Dim v(), HRes As Long, i As Long
+ 
+  v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
+  For i = 0 To j - 1 ''UBound(V)
+    If VarType(p(i)) = vbString Then
+    v(i) = CLng(StrPtr(p(i)))
+    vPtr(i) = VarPtr(v(i))
+    vType(i) = vbString
+    Else
+    vType(i) = VarType(v(i))
+    vPtr(i) = VarPtr(v(i))
+    End If
+    
+  Next i
 
+  HRes = DispCallFunc(ObjPtr(obj), addroffset, CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), Fast_obj_stdCallW)
+
+  If HRes Then Err.Raise HRes
+' p() = v()
+ If VarType(Fast_obj_stdCallW) = vbNull Then
+    Fast_obj_stdCallW = vbEmpty
+ End If
+End Function
 Public Function cdeclCallW(sDLL As String, sFunc As String, ByVal RetType As Variant, p() As Variant, j As Long)
 Dim i As Long, pFunc As Long, v(), HRes As Long
  
@@ -102,7 +125,7 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
   End If
 End Function
 
-Public Function Fast_cdeclCallW(ByVal Addr, ByVal RetType As Variant, p() As Variant, j As Long)
+Public Function Fast_cdeclCallW(ByVal addr, ByVal RetType As Variant, p() As Variant, j As Long)
 Dim i As Long, pFunc As Long, v(), HRes As Long
  
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
@@ -112,7 +135,7 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
     vPtr(i) = VarPtr(v(i))
   Next i
 
-  HRes = DispCallFunc(0, Addr, CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), Fast_cdeclCallW)
+  HRes = DispCallFunc(0, addr, CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), Fast_cdeclCallW)
 
   If HRes Then Err.Raise HRes
   If VarType(Fast_cdeclCallW) = vbNull Then
@@ -190,9 +213,17 @@ End Function
 Public Sub RemoveDll(ByVal sLib As String, Optional noErr As Boolean)
 Dim v As Long, s As String
 s = ExtractPath(sLib)
-If s = "" Then sLib = mcd + sLib
+If s = "" Then s = mcd + sLib
 If LibHdls.Find(sLib) Then
     If FreeLibrary(LibHdls.Value) <> 0 Then
+        LibHdls.RemoveWithNoFind
+    Else
+    v = GetLastError()
+    If Not noErr Then MyEr "η βιβλιοθήκη δεν μπορεί να αφαιρεθεί, κωδικός λάθους:(" & v & ")", "dll not removes, error code:(" & v & ")"
+    
+    End If
+ElseIf LibHdls.Find(s) Then
+If FreeLibrary(LibHdls.Value) <> 0 Then
         LibHdls.RemoveWithNoFind
     Else
     v = GetLastError()

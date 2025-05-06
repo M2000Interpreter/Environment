@@ -21,24 +21,84 @@ Dim t() As Long
 Dim paramnum As Long
 Public FreeHere As Boolean
 Public CallAddr As Long
+Public IsInterfaceCall As Boolean
+Private riid As IDispatch.IID
+Private funcAddrOffset As Long
+Private Declare Function CLSIDFromString Lib "ole32.dll" ( _
+                         ByVal lpszCLSID As Long, _
+                         ByRef Clsid As IDispatch.IID) As Long
+Private Declare Function DispCallFunc Lib "oleaut32" ( _
+                         ByVal pvInstance As Any, _
+                         ByVal oVft As Long, _
+                         ByVal cc As Integer, _
+                         ByVal vtReturn As Integer, _
+                         ByVal cActuals As Long, _
+                         ByRef prgVt As Any, _
+                         ByRef prgpVarg As Any, _
+                         ByRef pvargResult As Variant) As Long
+Property Get Funcoffset() As Long
+Funcoffset = funcAddrOffset
+End Property
+Public Function FixInterface(s As String, thisfunc As Long) As Boolean
+    Dim hRet As Long
+    IsInterfaceCall = False
+    hRet = CLSIDFromString(StrPtr(s), riid)
+    If hRet Then Exit Function
+    FixInterface = True
+    IsInterfaceCall = True
+    funcAddrOffset = thisfunc * 4  ' 32 bit
+    CallAddr = 0
+End Function
+
+Public Function GetInterface(myobject As stdole.IUnknown, ByRef retobject As stdole.IUnknown) As Boolean
+    Const CC_STDCALL          As Long = 4
+    If IsInterfaceCall Then
+    Dim params(2)   As Variant
+    Dim types(2)    As Integer
+    Dim list(2)     As Long
+    Dim resultCall  As Long
+    Dim pIndex      As Long
+    Dim pReturn     As Variant
+    Dim pSomething
+    params(0) = VarPtr(riid)
+    params(1) = VarPtr(retobject)
+    For pIndex = 0 To 1
+        list(pIndex) = VarPtr(params(pIndex)):  types(pIndex) = VarType(params(pIndex))
+    Next
+        resultCall = DispCallFunc(ObjPtr(myobject), &H0&, CC_STDCALL, vbLong, 2, types(0), list(0), pReturn)
+        If resultCall < 0 Then Exit Function
+        If pReturn = &H80004002 Then
+            MyEr "interface not supported", "Η διεπαφή δεν υποστηρίζεται"
+            Exit Function
+        ElseIf pReturn = &H80070057 Then
+            MyEr "wrong argument", "λάθος τύπος ορίσματος"
+            Exit Function
+        End If
+    End If
+    GetInterface = True
+End Function
+
 Public Sub CallThis(ByVal vNewValue As String, ParamList As String, Lang As Long)
-Dim l As Long, check$, m As Long
-l = InStr(vNewValue, ".")
-If l <> 0 Then
-mLib = Left$(vNewValue, l - 1)
-mFunction = Mid$(vNewValue, l + 1)
-Else
-mLib = vNewValue
-mFunction = vbNullString ' what about that??
-End If
-mConctruct = ParamList
-If InStr(vNewValue, ".dll") > 0 Then
-mLib = mLib + ".dll"
-End If
-If LCase(mFunction) Like "dll.*" Then
-mFunction = Mid$(mFunction, 5)
-ElseIf LCase(mFunction) Like "dll*" Then
-mFunction = Mid$(mFunction, 4)
+Dim l As Long, check$, M As Long
+If Not Me.IsInterfaceCall Then
+    l = InStr(vNewValue, ".")
+    If l <> 0 Then
+    mLib = Left$(vNewValue, l - 1)
+    mFunction = Mid$(vNewValue, l + 1)
+    Else
+    mLib = vNewValue
+    mFunction = vbNullString ' what about that??
+    End If
+    
+    mConctruct = ParamList
+    If InStr(vNewValue, ".dll") > 0 Then
+    mLib = mLib + ".dll"
+    End If
+    If LCase(mFunction) Like "dll.*" Then
+    mFunction = Mid$(mFunction, 5)
+    ElseIf LCase(mFunction) Like "dll*" Then
+    mFunction = Mid$(mFunction, 4)
+    End If
 End If
 Do While ParamList <> ""
 
@@ -47,22 +107,22 @@ Do While ParamList <> ""
  If FastSymbol(ParamList, "&") Then l = 16 Else l = 0
  If IsPureLabel(ParamList, check$) = 1 Then
  'OK
- m = 2
+ M = 2
  Else
  ParamList = "error"
  Exit Sub
  End If
  Else
   If FastSymbol(ParamList, "&") Then l = 16 Else l = 0
- m = IsPureLabel(ParamList, check$)
- If m = 0 Then
+ M = IsPureLabel(ParamList, check$)
+ If M = 0 Then
  If FastSymbol(ParamList, "...", , 3) Then
  PushType -100  ' Paramarray
  Exit Do
  End If
  End If
  End If
-PushType m + l   'above 16 is byref
+PushType M + l   'above 16 is byref
 If IsArrayItem(paramnum) Then
 If Not FastSymbol(ParamList, ")") Then Exit Do
 End If
@@ -156,6 +216,10 @@ End If
 End If
 End Sub
 Public Function GetAddress() As Long
+If IsInterfaceCall Then
+    MyEr "Not for Interfaces", "Όχι για διεπαφές"
+    Exit Function
+End If
 If Me.CallAddr = 0 Then
 If Left$(func, 1) = "#" Then
     CallAddr = Fcall.GetFuncPtrOrd(LIB, func)
