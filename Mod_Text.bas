@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 47
+Global Const Revision = 48
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5767,7 +5767,7 @@ l_complete = False
 ResetTokenFinal  ' sure for GDI release token
 End Sub
 Function GetArr(bstack As basetask, b$, p As Variant, s$, skip As Long, lookCompOrTuple As Boolean) As Boolean
-    Dim pppp As tuple, x1 As Long, usehandler As mHandler, r, that As BigInteger
+    Dim pppp As tuple, x1 As Long, useHandler As mHandler, r, that As BigInteger
     Dim obj1 As Object, val1 As Variant
     
     x1 = 1
@@ -5951,11 +5951,11 @@ CONTaabb:
     Loop
     p = 0
 cont111:
-    Set usehandler = New mHandler
-    Set bstack.lastobj = usehandler
-    usehandler.t1 = 3
-    Set usehandler.objref = pppp
-    Set usehandler = Nothing
+    Set useHandler = New mHandler
+    Set bstack.lastobj = useHandler
+    useHandler.t1 = 3
+    Set useHandler.objref = pppp
+    Set useHandler = Nothing
     If FastSymbol(b$, ")#", , 2) Then
         GetArr = ExpMatrix(bstack, b$, p)
         If GetArr Then
@@ -6489,7 +6489,7 @@ End Function
 
 Function IsExpA(bstack As basetask, aa$, rr As Variant, parenthesis As Long, Optional ByVal noand As Boolean = True, Optional ByVal Comp As Boolean = True, Optional ByPass As Boolean = False, Optional nostring As Boolean) As Boolean
     Dim r As Variant, ac As Variant, po As Variant, MUL As Long, r1 As Variant, ut$, back As Variant
-    Dim logic As Boolean, IntVal As Integer, IntVal2 As Integer, park As Object, objlist As mStiva2, rightlevel As Long, usehandler As mHandler
+    Dim logic As Boolean, IntVal As Integer, IntVal2 As Integer, park As Object, objlist As mStiva2, rightlevel As Long, useHandler As mHandler
     Dim cur As Long, BI As BigInteger, getcom As Boolean
     Const leavespace = 1
     On Error Resume Next
@@ -6571,19 +6571,19 @@ again2:
         If Not bstack.lastobj Is Nothing Then
             If IntVal = -1 Then po = -1: IntVal = 0
             If TypeOf bstack.lastobj Is mHandler Then
-                Set usehandler = bstack.lastobj
-                If usehandler.t1 = 4 Then
-                    If myVarType(usehandler.index_cursor, vbString) Then
+                Set useHandler = bstack.lastobj
+                If useHandler.t1 = 4 Then
+                    If myVarType(useHandler.index_cursor, vbString) Then
                         If nostring Then
                             MissNumExpr
                             IsExpA = False
                             Exit Function
                         Else
-                            r = usehandler.index_cursor: Set bstack.LastEnum = usehandler.objref
+                            r = useHandler.index_cursor: Set bstack.LastEnum = useHandler.objref
                         End If
                     Else
-                        r = usehandler.index_cursor * usehandler.sign: Set bstack.LastEnum = usehandler.objref
-                        If po < 0 Then r = -r: po = -po: usehandler.sign = -usehandler.sign
+                        r = useHandler.index_cursor * useHandler.sign: Set bstack.LastEnum = useHandler.objref
+                        If po < 0 Then r = -r: po = -po: useHandler.sign = -useHandler.sign
                 End If
                     
                 End If
@@ -7120,14 +7120,14 @@ syner:
                             End If
                         End If
                     ElseIf TypeOf r1 Is mHandler Then
-                    Set usehandler = r1
-                    If usehandler.t1 = 2 Then
+                    Set useHandler = r1
+                    If useHandler.t1 = 2 Then
                         If Fast2LabelNoNum(aa$, "TYPE", 4, "ΤΥΠΟΣ", 5, 5) Then
                             If FastPureLabel(aa$, ut$, , True, , , , True) Then
-                            If usehandler.objref.UseStruct Then
+                            If useHandler.objref.UseStruct Then
                            
-                            If usehandler.objref.structref.Tag = ut$ Then
-                                Set usehandler = Nothing
+                            If useHandler.objref.structref.Tag = ut$ Then
+                                Set useHandler = Nothing
                                 IsExpA = True
                                 ac = 0
                                 r = True
@@ -7159,16 +7159,16 @@ syner:
                     ElseIf Fast2LabelNoNum(aa$, "NOTHING", 7, "ΤΙΠΟΤΑ", 6, 7) Then
                         If TypeOf r1 Is mHandler Then
                             If CheckLastHandlerVariant(r1) Then
-                                Set usehandler = r1
-                                If usehandler.indirect > 0 Then
-                                    Set r1 = var(usehandler.indirect)
+                                Set useHandler = r1
+                                If useHandler.indirect > 0 Then
+                                    Set r1 = var(useHandler.indirect)
                                 Else
-                                    Set r1 = usehandler.objref
+                                    Set r1 = useHandler.objref
                                 End If
                             End If
                         End If
                         Set r = Nothing
-                        Set usehandler = Nothing
+                        Set useHandler = Nothing
                     ElseIf IsNumber(bstack, aa$, r) Then
 conthereHandler:
                         Set bstack.lastpointer = Nothing
@@ -7181,25 +7181,25 @@ conthereHandler:
                             Set bstack.lastobj = Nothing
                             If TypeOf r1 Is mHandler Then
                                 If CheckLastHandlerVariant(r1) Then
-                                    Set usehandler = r1
-                                    If usehandler.indirect > 0 Then
-                                        Set r1 = var(usehandler.indirect)
+                                    Set useHandler = r1
+                                    If useHandler.indirect > 0 Then
+                                        Set r1 = var(useHandler.indirect)
                                     Else
-                                        Set r1 = usehandler.objref
+                                        Set r1 = useHandler.objref
                                     End If
                                 End If
                             End If
                             If TypeOf r Is mHandler Then
                                 If CheckLastHandlerVariant(r) Then
-                                    Set usehandler = r
-                                    If usehandler.indirect > 0 Then
-                                        Set r = var(usehandler.indirect)
+                                    Set useHandler = r
+                                    If useHandler.indirect > 0 Then
+                                        Set r = var(useHandler.indirect)
                                     Else
-                                        Set r = usehandler.objref
+                                        Set r = useHandler.objref
                                     End If
                                 End If
                             End If
-                        Set usehandler = Nothing
+                        Set useHandler = Nothing
                     End If
                     IsExpA = True
                     ac = 0
@@ -10031,7 +10031,7 @@ End Function
 
 Function IsNumberNew(bstack As basetask, a$, r As Variant, flatobject) As Boolean
 Dim VR As Long, v$, V1&, w1 As Long, w2 As Long, p As Variant, s1$, dd As Long, dn As Long, w3 As Long
-Dim pp As Variant, pppp As mArray, ppppl As iBoxArray, nbstack As basetask, usehandler As mHandler, usebackup As Boolean
+Dim pp As Variant, pppp As mArray, ppppl As iBoxArray, nbstack As basetask, useHandler As mHandler, usebackup As Boolean
 Dim anything As Object, n$, useFast As FastCollection, userGroup As Group, useProp As PropReference, gr As Boolean, big As BigInteger
 Dim sg1 As Boolean, s$, par As Boolean, tu As tuple, rA As refArray
 r = 0#
@@ -10783,12 +10783,12 @@ num78: ' "MENU", "ΕΠΙΛΟΓΗ"
     
     Exit Function
 num85: ' "[]"
- Set usehandler = New mHandler
-    usehandler.t1 = 3
-    Set usehandler.objref = New mStiva
-     usehandler.objref.MergeBottom bstack.soros
+ Set useHandler = New mHandler
+    useHandler.t1 = 3
+    Set useHandler.objref = New mStiva
+     useHandler.objref.MergeBottom bstack.soros
     '  Set bstack.Sorosref = New mStiva
-    Set bstack.lastobj = usehandler
+    Set bstack.lastobj = useHandler
     r = 0
     IsNumberNew = True
     Exit Function
@@ -10827,9 +10827,9 @@ num941:
     ElseIf bstack.soros.StackItemType(1) = "*" Then
         Set bstack.lastobj = bstack.soros.PopObj
         If TypeOf bstack.lastobj Is mHandler Then
-            Set usehandler = bstack.lastobj
-            If usehandler.t1 <> w1 Then
-                Set usehandler = Nothing
+            Set useHandler = bstack.lastobj
+            If useHandler.t1 <> w1 Then
+                Set useHandler = Nothing
 pushback:
                 bstack.soros.PushObj bstack.lastobj
                 Set bstack.lastobj = Nothing
@@ -10880,18 +10880,18 @@ num79: ' "NUMBER", "ΑΡΙΘΜΟΣ", "ΤΙΜΗ"
         If bstack.soros.Count > 0 Then
             If bstack.soros.IsObj Then
                 If TypeOf bstack.soros.objref(1) Is mHandler Then
-                    Set usehandler = bstack.soros.objref(1)
-                    If usehandler.t1 = 4 Then
-                        If myVarType(usehandler.index_cursor, vbString) Then
-                            r = usehandler.index_cursor
+                    Set useHandler = bstack.soros.objref(1)
+                    If useHandler.t1 = 4 Then
+                        If myVarType(useHandler.index_cursor, vbString) Then
+                            r = useHandler.index_cursor
                         Else
-                            r = usehandler.index_cursor * usehandler.sign
+                            r = useHandler.index_cursor * useHandler.sign
                           End If
                         bstack.soros.drop 1
                         IsNumberNew = True
                         Exit Function
-                    ElseIf usehandler.UseIterator Then
-                        r = usehandler.index_cursor
+                    ElseIf useHandler.UseIterator Then
+                        r = useHandler.index_cursor
                         bstack.soros.drop 1
                         IsNumberNew = True
                         Exit Function
@@ -11046,11 +11046,11 @@ contUDT1:
                         Else
                         If Not bstack.lastobj Is Nothing Then
                             If TypeOf bstack.lastobj Is mHandler Then
-                                Set usehandler = bstack.lastobj
+                                Set useHandler = bstack.lastobj
                                 Set bstack.lastobj = Nothing
                                If Not nbstack Is Nothing Then Set nbstack.lastobj = Nothing
-                                If usehandler.t1 = 2 Then
-                               If TakeOffset(bstack, usehandler, a$, r) Then
+                                If useHandler.t1 = 2 Then
+                               If TakeOffset(bstack, useHandler, a$, r) Then
                                 IsNumberNew = True
                                     Exit Function
                                 End If
@@ -11291,8 +11291,8 @@ conthere123:
             r = 0
         ElseIf TypeOf var(VR) Is mHandler Then
             ' this is ok for both buffer and inventory
-            Set usehandler = var(VR)
-            If usehandler.t1 = 2 Then
+            Set useHandler = var(VR)
+            If useHandler.t1 = 2 Then
                 
                 If V1& = 8 Then
                 If IsExp(bstack, a$, pp, , flatobject:=True, nostring:=True) Then
@@ -11307,21 +11307,21 @@ conthere123:
                 If Left$(a$, 2) = "]!" Then SyntaxError: Exit Function
                 
                 Mid$(a$, 1, 1) = " "
-                    If usehandler.objref.structref Is Nothing Then
+                    If useHandler.objref.structref Is Nothing Then
                     
-                    If TakeOffset(bstack, usehandler, a$, r, pp) Then
+                    If TakeOffset(bstack, useHandler, a$, r, pp) Then
                     IsNumberNew = True
                         
                     End If
                     
                     Exit Function
                     Else
-                    Set pp = usehandler.objref.CopyItem(CLng(pp), par)
+                    Set pp = useHandler.objref.CopyItem(CLng(pp), par)
                     If par Then
-                        Set usehandler = New mHandler
-                        Set usehandler.objref = pp
-                        usehandler.t1 = 2
-                        Set bstack.lastobj = usehandler
+                        Set useHandler = New mHandler
+                        Set useHandler.objref = pp
+                        useHandler.t1 = 2
+                        Set bstack.lastobj = useHandler
                         IsNumberNew = True
                     End If
                     r = 0
@@ -11332,7 +11332,7 @@ conthere123:
                 ElseIf FastSymbol(a$, ",") Then
                     If IsExp(bstack, a$, p, , flatobject:=True, nostring:=True) Then
                         If FastSymbol(a$, "]") Then
-                            s1$ = usehandler.objref.CopyItemString(CLng(pp), CLng(p), par)
+                            s1$ = useHandler.objref.CopyItemString(CLng(pp), CLng(p), par)
                             r = ""
                             SwapString2Variant s1$, r
                             IsNumberNew = True
@@ -11349,7 +11349,7 @@ conthere123:
                 If Left$(a$, 1) = "|" Then
 cont8case:
                 Set p = var(VR)
-                If TakeOffset(bstack, usehandler, a$, r, pp) Then
+                If TakeOffset(bstack, useHandler, a$, r, pp) Then
                 Else
                     SyntaxError
                     Exit Function
@@ -11359,11 +11359,11 @@ cont8case:
                 r = 0
                 End If
             Else
-                If Not usehandler.UseIterator Then
+                If Not useHandler.UseIterator Then
                     Set nbstack = Nothing  ' ???
                     If FastSymbol1(a$, "#") Then
-                        If Not usehandler.t1 = 3 Then WrongObject: Exit Function
-                        If Not fMatrix(bstack, a$, usehandler, r) Then
+                        If Not useHandler.t1 = 3 Then WrongObject: Exit Function
+                        If Not fMatrix(bstack, a$, useHandler, r) Then
                             Exit Function
                         End If
                         If lookOne(a$, ".") Then
@@ -11378,22 +11378,37 @@ cont8case:
                             End If
                         End If
                     ElseIf flatobject Then
-                        If usehandler.t1 = 4 Then
-                            r = usehandler.index_cursor
+                        If useHandler.t1 = 4 Then
+                            r = useHandler.index_cursor
                             
                         Else
                             r = 0
                         End If
                     Else
-                        CopyHandler var(VR), bstack
+                        If useHandler.t1 = 4 And FastSymbol(a$, "|") Then
+                            If FastPureLabel(a$, s1$, , , , , , gr) = 1 Then
+                                s1$ = myUcase(s1$, gr)
+                                r = useHandler.objref.SearchSimple(s1$, gr)
+                                If Not gr Then GoTo a11212121
+                            Else
+a11212121:
+                                SyntaxError
+                                IsNumberNew = False
+                                Exit Function
+                            End If
+                            
+                        Else
+                            CopyHandler var(VR), bstack
                         r = 0
+                        End If
+                        
                     End If
                 ElseIf FastSymbol(a$, "^") Then
-                    r = usehandler.index_cursor
+                    r = useHandler.index_cursor
                     
                 ElseIf FastSymbol1(a$, "#") Then
                     Set nbstack = Nothing '???
-                    IsNumberNew = fMatrix(bstack, a$, usehandler, r)
+                    IsNumberNew = fMatrix(bstack, a$, useHandler, r)
                     If MyIsObject(r) Then r = 0#
                     
                 Else
@@ -11401,7 +11416,7 @@ cont8case:
                     r = 0
                 End If
             End If
-            Set usehandler = Nothing
+            Set useHandler = Nothing
         ElseIf TypeOf var(VR) Is Constant Then
             If var(VR).flag Then
                 Set r = var(VR).Value
@@ -11423,10 +11438,10 @@ cont8case:
                     
                     If lookOne(a$, "#") Then
                         If IsmHandler(r) Then
-                           Set usehandler = r
+                           Set useHandler = r
                            r = 0
                            FastSymbol a$, "#"
-                            If Not fMatrix(bstack, a$, usehandler, r) Then
+                            If Not fMatrix(bstack, a$, useHandler, r) Then
                                 Exit Function
                             End If
                         Else
@@ -11456,10 +11471,10 @@ cont8case:
             End If
         ElseIf TypeOf var(VR) Is tuple Then
              If FastSymbol1(a$, "#") Then
-                Set usehandler = New mHandler
-                usehandler.t1 = 3
-                Set usehandler.objref = var(VR)
-                If Not fMatrix(bstack, a$, usehandler, r) Then
+                Set useHandler = New mHandler
+                useHandler.t1 = 3
+                Set useHandler.objref = var(VR)
+                If Not fMatrix(bstack, a$, useHandler, r) Then
                     Exit Function
                 End If
             Else
@@ -11468,10 +11483,10 @@ cont8case:
             End If
         ElseIf TypeOf var(VR) Is mArray Then
             If FastSymbol1(a$, "#") Then
-                Set usehandler = New mHandler
-                usehandler.t1 = 3
-                Set usehandler.objref = var(VR)
-                If Not fMatrix(bstack, a$, usehandler, r) Then
+                Set useHandler = New mHandler
+                useHandler.t1 = 3
+                Set useHandler.objref = var(VR)
+                If Not fMatrix(bstack, a$, useHandler, r) Then
                     Exit Function
                 End If
             Else
@@ -11520,6 +11535,10 @@ cont8case:
             ' make it an refarray???
             r = var(VR)
         Case Else
+            If MyIsUnknown(var(VR)) Then
+            Set bstack.lastobj = var(VR)
+            
+            End If
             r = 0
         End Select
     End If
@@ -11554,13 +11573,13 @@ Else
         r = bstack.LastEnum.SearchSimple(v$, par)
         
         If par Then
-            Set usehandler = New mHandler
-            Set usehandler.objref = bstack.LastEnum
-            usehandler.t1 = 4
-            usehandler.ReadOnly = True
-            usehandler.index_cursor = r
-            usehandler.index_start = bstack.LastEnum.Index
-            Set bstack.lastobj = usehandler
+            Set useHandler = New mHandler
+            Set useHandler.objref = bstack.LastEnum
+            useHandler.t1 = 4
+            useHandler.ReadOnly = True
+            useHandler.index_cursor = r
+            useHandler.index_start = bstack.LastEnum.Index
+            Set bstack.lastobj = useHandler
             IsNumberNew = True
             Exit Function
         End If
@@ -11857,36 +11876,36 @@ ElseIf IsExp(bstack, a$, p) Then
     If bstack.lastobj Is Nothing Then
         ExpectedObjInline a$
     ElseIf TypeOf bstack.lastobj Is mHandler Then
-        Set usehandler = bstack.lastobj
+        Set useHandler = bstack.lastobj
         Set bstack.lastobj = Nothing
-        If usehandler.indirect >= 0 Then
-            If MyIsObject(var(usehandler.indirect)) Then
-                dd = usehandler.indirect
-                Set usehandler = New mHandler
+        If useHandler.indirect >= 0 Then
+            If MyIsObject(var(useHandler.indirect)) Then
+                dd = useHandler.indirect
+                Set useHandler = New mHandler
                 On Error Resume Next
                 'Err.Clear
                 ' maybe we want the typelib
                 If FastSymbol(a$, ",") Then
                 
                 End If
-                Set usehandler.objref = MakeATypeLib(var(dd))
+                Set useHandler.objref = MakeATypeLib(var(dd))
 
                 If Err Then
                    Err.Clear
                    Set bstack.lastobj = Nothing
                    cantreadlib a$
                     Else
-                   usehandler.t1 = 1
-                    Set bstack.lastobj = usehandler
+                   useHandler.t1 = 1
+                    Set bstack.lastobj = useHandler
                 End If
                 
                 On Error GoTo 0
-                Set usehandler = Nothing
+                Set useHandler = Nothing
             Else
             ExpectedObjInline a$
             End If
             Else
-            If usehandler.IamEnum Then Set anything = usehandler.objref: GoTo contparamhere
+            If useHandler.IamEnum Then Set anything = useHandler.objref: GoTo contparamhere
         End If
     ElseIf TypeOf bstack.lastobj Is PropReference Then
         Set useProp = bstack.lastobj
@@ -11894,22 +11913,22 @@ ElseIf IsExp(bstack, a$, p) Then
             r = useProp.Value
             Set anything = useProp.lastobjfinal
 contparamhere:
-            Set usehandler = New mHandler
+            Set useHandler = New mHandler
                 On Error Resume Next
                 'Err.Clear
                 ' maybe we want the typelib
                 If FastSymbol(a$, ",") Then
                 
                 End If
-                Set usehandler.objref = MakeATypeLib(anything)
+                Set useHandler.objref = MakeATypeLib(anything)
 
                 If Err Then
                     Err.Clear
                     Set bstack.lastobj = Nothing
                     cantreadlib a$
                 Else
-                    usehandler.t1 = 1
-                    Set bstack.lastobj = usehandler
+                    useHandler.t1 = 1
+                    Set bstack.lastobj = useHandler
                 End If
                 On Error GoTo 0
          Else
@@ -11917,20 +11936,20 @@ contparamhere:
         End If
     Else
             Set anything = bstack.lastobj
-            Set usehandler = New mHandler
+            Set useHandler = New mHandler
             On Error Resume Next
             If FastSymbol(a$, ",") Then
             
             End If
-            Set usehandler.objref = MakeATypeLib(anything)
+            Set useHandler.objref = MakeATypeLib(anything)
 
             If Err Then
                 Err.Clear
                 Set bstack.lastobj = Nothing
                 cantreadlib a$
             Else
-                usehandler.t1 = 1
-                Set bstack.lastobj = usehandler
+                useHandler.t1 = 1
+                Set bstack.lastobj = useHandler
             End If
             On Error GoTo 0
         End If
@@ -12431,19 +12450,19 @@ j243423:
         w1 = Abs(Asc(v$) < 128)
         If IsLabelSymbolNew(a$, "ΩΣ", "AS", w1) Then
             If IsLabelSymbolNew(a$, "ΔΕΚΑΕΞ", "HEX", w1) Then
-                Set usehandler = New mHandler
-                usehandler.t1 = 2
-                Set usehandler.objref = DecodeHEXtoMemBloc(s$, par)
+                Set useHandler = New mHandler
+                useHandler.t1 = 2
+                Set useHandler.objref = DecodeHEXtoMemBloc(s$, par)
             ElseIf Not IsSymbol(a$, "DECODE64", 8) Then
                 MyEr "Only Decode64 supported", "Μόνο το Decode64 υποστηρίζεται"
                 Exit Function
             Else
-                Set usehandler = New mHandler
-                usehandler.t1 = 2
-                Set usehandler.objref = Decode64toMemBloc(s$, par)
+                Set useHandler = New mHandler
+                useHandler.t1 = 2
+                Set useHandler.objref = Decode64toMemBloc(s$, par)
             End If
             If par Then
-                Set bstack.lastobj = usehandler
+                Set bstack.lastobj = useHandler
                 IsNumberNew = FastSymbol(a$, ")", True)
                 Exit Function
             Else
@@ -12452,17 +12471,17 @@ j243423:
                 Exit Function
             End If
         ElseIf CFname(s$) <> "" Then
-            Set usehandler = New mHandler
-            usehandler.t1 = 2
+            Set useHandler = New mHandler
+            useHandler.t1 = 2
             If FastSymbol(a$, ",") Then
                 If Not IsExp(bstack, a$, p) Then
                     MissNumExpr
                     Exit Function
                 End If
             End If
-            Set usehandler.objref = File2newMemblock(s$, r, p)
+            Set useHandler.objref = File2newMemblock(s$, r, p)
             If r = 0# Then
-                Set bstack.lastobj = usehandler
+                Set bstack.lastobj = useHandler
                 IsNumberNew = FastSymbol(a$, ")", True)
                 Exit Function
             End If
@@ -12478,9 +12497,9 @@ contbuf1:
         p = 0#
         If Not bstack.lastobj Is Nothing Then
             If TypeOf bstack.lastobj Is mHandler Then
-                Set usehandler = bstack.lastobj
+                Set useHandler = bstack.lastobj
                 Set bstack.lastobj = Nothing
-                If usehandler.t1 = 2 Then
+                If useHandler.t1 = 2 Then
                     If FastSymbol(a$, ",") Then
                         IsExp bstack, a$, r
                         If FastSymbol(a$, ",") Then
@@ -12491,8 +12510,8 @@ contbuf1:
                         End If
                     End If
                 
-                     Set usehandler.objref = usehandler.objref.Copy(r, p)
-                    Set bstack.lastobj = usehandler
+                     Set useHandler.objref = useHandler.objref.Copy(r, p)
+                    Set bstack.lastobj = useHandler
                     IsNumberNew = FastSymbol(a$, ")", True)
                     Exit Function
                 End If
@@ -12512,12 +12531,12 @@ IsNumberNew = False
     If IsStrExp(bstack, a$, s$) Then
 j1222:
         If Left$(s$, 4) = "cDIB" And Len(s$) > 12 Then
-            Set usehandler = New mHandler
-            usehandler.t1 = 2
+            Set useHandler = New mHandler
+            useHandler.t1 = 2
         
-            Set usehandler.objref = SaveStr2MemBlock(s$, r)
+            Set useHandler.objref = SaveStr2MemBlock(s$, r)
             If r = 0 Then
-                Set bstack.lastobj = usehandler
+                Set bstack.lastobj = useHandler
                 IsNumberNew = FastSymbol(a$, ")", True)
                 r = 0#
                 Exit Function
@@ -12540,13 +12559,13 @@ j1222:
         End If
         If Not bstack.lastobj Is Nothing Then
             If TypeOf bstack.lastobj Is mHandler Then
-                Set usehandler = bstack.lastobj
+                Set useHandler = bstack.lastobj
                 Set bstack.lastobj = Nothing
-                If usehandler.t1 = 2 Then
-                If usehandler.objref.IsEmf Or usehandler.objref.IsWmf Then
+                If useHandler.t1 = 2 Then
+                If useHandler.objref.IsEmf Or useHandler.objref.IsWmf Then
                   ' WRONG BUFFER
                 Else
-                    If usehandler.objref.ReadImageSizeX(r) Then
+                    If useHandler.objref.ReadImageSizeX(r) Then
                         r = 0
                         dd = 0
                         w1 = -1
@@ -12599,9 +12618,9 @@ j1222:
                     Else
                         p = &HFFFFFF
                     End If
-                    Set bstack.lastobj = usehandler.CreateFromPicture(dd, w1, w2, w3)
+                    Set bstack.lastobj = useHandler.CreateFromPicture(dd, w1, w2, w3)
                     End If
-                          Set usehandler = Nothing
+                          Set useHandler = Nothing
                           IsNumberNew = FastSymbol(a$, ")", True)
                       Exit Function
                   End If
@@ -13174,29 +13193,29 @@ contAr2L:
                 End If
             ElseIf Typename(ppppl.GroupRef) = mHdlr Then
                 '' here the poke as alfa(3).value or Αλφα(3).τιμή
-                Set usehandler = ppppl.GroupRef
+                Set useHandler = ppppl.GroupRef
                 a$ = Mid$(a$, w3 + 1)
-                If usehandler.indirect >= 0 Then
+                If useHandler.indirect >= 0 Then
                     MyErMacro a$, "Not implemented yet", "Δεν εχει ακόμα υλοποιηθεί αυτό"
                     Exit Function
                 End If
                 If Left$(a$, 1) = "." Then
                 ' LOOK FOR GROUP
-                    w2 = -usehandler.objref.Index - 2
+                    w2 = -useHandler.objref.Index - 2
                     GoTo contgroup
                 ElseIf FastSymbol(a$, "(") Then
-                    w2 = -usehandler.objref.Index - 2
-                    Set usehandler = Nothing
+                    w2 = -useHandler.objref.Index - 2
+                    Set useHandler = Nothing
                     GoTo contlambdahere
                 Else
                     Set bstack.lastobj = ppppl
-                    If usehandler.t1 = 2 Then
-                        r = usehandler.objref.GetPtr(0)
+                    If useHandler.t1 = 2 Then
+                        r = useHandler.objref.GetPtr(0)
                     Else
-                        r = usehandler.objref.Done
+                        r = useHandler.objref.Done
                     End If
                 End If
-                Set usehandler = Nothing
+                Set useHandler = Nothing
             ElseIf IsObjProp(ppppl.GroupRef) Then
                 Set bstack.lastobj = ppppl
                 a$ = Mid$(a$, w3 + 1)
@@ -13208,11 +13227,11 @@ contAr2L:
             a$ = Mid$(a$, w3 + 1)
             r = 0
             If FastSymbol1(a$, "#") Then
-                Set usehandler = New mHandler
-                usehandler.t1 = 3
-                Set usehandler.objref = ppppl
+                Set useHandler = New mHandler
+                useHandler.t1 = 3
+                Set useHandler.objref = ppppl
                 Set nbstack = Nothing
-                Set bstack.lastobj = usehandler
+                Set bstack.lastobj = useHandler
                 GoTo comehere
             End If
             If TypeOf ppppl Is mArray Then
@@ -13380,32 +13399,32 @@ againlambda:
                                         GoTo contAr2
                                     ElseIf TypeOf bstack.lastobj Is mHandler Then
                                         
-                                        Set usehandler = bstack.lastobj
-                                        If usehandler.t1 = 3 Then
+                                        Set useHandler = bstack.lastobj
+                                        If useHandler.t1 = 3 Then
                                             PopStage bstack
-                                            Set anything = usehandler
+                                            Set anything = useHandler
                                             If CheckAnyArray(anything) Then
                                                 Set ppppl = anything
                                             Else
                                                 Set ppppl = New ppppLight
                                                 ppppl.arr = False
-                                                Set ppppl.GroupRef = usehandler
+                                                Set ppppl.GroupRef = useHandler
                                             End If
                                             Set anything = Nothing
 
-                                        ElseIf usehandler.t1 = 1 Then
+                                        ElseIf useHandler.t1 = 1 Then
                                             PopStage bstack
                                             Set ppppl = New ppppLight
                                             ppppl.arr = False
-                                            Set ppppl.GroupRef = usehandler
+                                            Set ppppl.GroupRef = useHandler
                                             w2 = -2
                                             GoTo contrightpar
                                         Else
                                             Set ppppl = New ppppLight
                                             ppppl.arr = False
-                                            Set ppppl.GroupRef = usehandler
+                                            Set ppppl.GroupRef = useHandler
                                         End If
-                                        Set usehandler = Nothing
+                                        Set useHandler = Nothing
                                         GoTo contAr2
                                     
                                     ElseIf TypeOf bstack.lastobj Is Group Then
@@ -13452,37 +13471,37 @@ cont100203030:
                             GoTo contAr2
                         Case mHdlr
                             Set bstack.lastobj = ppppl.item(w2)
-                            Set usehandler = bstack.lastobj
-                            If usehandler.t1 = 3 Then
-                                Set anything = usehandler
+                            Set useHandler = bstack.lastobj
+                            If useHandler.t1 = 3 Then
+                                Set anything = useHandler
                                 If CheckAnyArray(anything) Then
                                     Set ppppl = anything
                                 Else
                                     Set ppppl = New ppppLight
                                     ppppl.arr = False
-                                    Set ppppl.GroupRef = usehandler
+                                    Set ppppl.GroupRef = useHandler
                                 End If
                             Else
                                 If w2 <> -2 Then
                                 Set ppppl = New ppppLight
                                 ppppl.arr = False
-                                Set ppppl.GroupRef = usehandler
+                                Set ppppl.GroupRef = useHandler
                                 End If
                             End If
                             Set anything = Nothing
                             Set bstack.lastobj = Nothing
-                            Set usehandler = Nothing
+                            Set useHandler = Nothing
                             w3 = 0
                             GoTo contAr2
                         Case mProp
                             ppppl.GetPorp useProp, w2
                             w3 = 0
                             Set bstack.lastobj = Nothing
-                            Set usehandler = Nothing
+                            Set useHandler = Nothing
                             GoTo contreadprop2
                         Case "ppppLight"
                             Set bstack.lastobj = Nothing
-                        Set usehandler = Nothing
+                        Set useHandler = Nothing
                         w3 = 0
                         Set ppppl = ppppl.item(w2)
                         
@@ -13490,7 +13509,7 @@ cont100203030:
                          
                         End Select
                         Set bstack.lastobj = Nothing
-                        Set usehandler = Nothing
+                        Set useHandler = Nothing
                         w3 = 0
                         'Set ppppL = pppp
                         GoTo contAr2
@@ -13502,9 +13521,9 @@ cont100203030:
 comehere:
                                 If Not bstack.lastobj Is Nothing Then
                                     If TypeOf bstack.lastobj Is mHandler Then
-                                        Set usehandler = bstack.lastobj
+                                        Set useHandler = bstack.lastobj
                                         Set bstack.lastobj = Nothing
-                                        IsNumberNew = fMatrix(bstack, a$, usehandler, r)
+                                        IsNumberNew = fMatrix(bstack, a$, useHandler, r)
                                         If Left$(a$, 1) = "." And Not bstack.lastobj Is Nothing Then
                                         If TypeOf bstack.lastobj Is Group Then
                                         GoTo cont100203030
@@ -13512,18 +13531,18 @@ comehere:
                                         End If
                                         ElseIf bstack.lastobj Is Nothing Then
                                         ElseIf Not TypeOf bstack.lastobj Is mHandler And Not bstack.lastobj Is Nothing Then
-                                        Set bstack.lastobj = usehandler
-                                        Set usehandler = Nothing
+                                        Set bstack.lastobj = useHandler
+                                        Set useHandler = Nothing
                                         End If
                                         If MyIsObject(r) Then r = 0#
                                         
                                         Exit Function
                                     ElseIf IsobjArray(bstack.lastobj) Then
-                                        Set usehandler = New mHandler
-                                        usehandler.t1 = 3
-                                        Set usehandler.objref = bstack.lastobj
+                                        Set useHandler = New mHandler
+                                        useHandler.t1 = 3
+                                        Set useHandler.objref = bstack.lastobj
                                         Set bstack.lastobj = Nothing
-                                        IsNumberNew = fMatrix(bstack, a$, usehandler, r)
+                                        IsNumberNew = fMatrix(bstack, a$, useHandler, r)
                                         If Left$(a$, 1) = "." And Not bstack.lastobj Is Nothing Then
                                             If TypeOf bstack.lastobj Is Group Then GoTo cont100203030
                                         End If
@@ -13589,14 +13608,14 @@ comehere:
                 Else
 contrightpar:
                     If Typename(ppppl.GroupRef) = mHdlr Then
-                        Set usehandler = ppppl.GroupRef
+                        Set useHandler = ppppl.GroupRef
                         If IsExp(bstack, a$, p, flatobject:=True) Then
-                            If usehandler.t1 = 2 Then ' OK for Buffer
+                            If useHandler.t1 = 2 Then ' OK for Buffer
                                 If MemInt(VarPtr(p)) = vbString Then
                                 ' no good goto this
                                 GoTo syntax1
                                 End If
-                                With usehandler.objref
+                                With useHandler.objref
                                 If FastSymbol(a$, "!") Then
                                   
                                         r = .GetBytePtr(p)
@@ -13639,15 +13658,15 @@ syntax1:
                                 IsNumberNew = FastSymbol(a$, ")") And .status = 0
                             End With
                             Exit Function
-                        ElseIf usehandler.t1 = 3 Then
+                        ElseIf useHandler.t1 = 3 Then
                             Set bstack.lastobj = Nothing
-                            Set anything = usehandler
+                            Set anything = useHandler
                             If CheckLastHandler(anything) Then
-                                Set usehandler = anything
-                                If TypeOf usehandler.objref Is iBoxArray Then
+                                Set useHandler = anything
+                                If TypeOf useHandler.objref Is iBoxArray Then
                                     
-                                    Set ppppl = usehandler.objref
-                                    Set usehandler = Nothing
+                                    Set ppppl = useHandler.objref
+                                    Set useHandler = Nothing
                                     w2 = CLng(p)
                                     If ppppl.Count > w2 And w2 >= 0 Then
                                         ppppl.Index = w2
@@ -13664,7 +13683,7 @@ syntax1:
                                 Else
                                     SyntaxError
                                 End If
-                                Set usehandler = Nothing
+                                Set useHandler = Nothing
                             Else
                                 MyEr "???", "???"
                             End If
@@ -13682,18 +13701,18 @@ syntax1:
                             End If
                          GoTo contlabel
                         End If
-                        If TypeOf usehandler.objref Is mHandler Then
-                            Set usehandler = usehandler.objref
-                            If usehandler.indirect = -1 Then
-                                Set anything = usehandler.objref
-                                Set usehandler = New mHandler
-                                Set ppppl.GroupRef = usehandler
-                                Set usehandler.objref = anything
+                        If TypeOf useHandler.objref Is mHandler Then
+                            Set useHandler = useHandler.objref
+                            If useHandler.indirect = -1 Then
+                                Set anything = useHandler.objref
+                                Set useHandler = New mHandler
+                                Set ppppl.GroupRef = useHandler
+                                Set useHandler.objref = anything
                                 Set anything = Nothing
                                 Set bstack.lastobj = Nothing
                             End If
                         End If
-                        With usehandler.objref
+                        With useHandler.objref
                             p = MyRound(p)
                             If Abs(p) < .Count Then
                                 If p < 0 Then
@@ -13740,7 +13759,7 @@ syntax1:
                                         r = 0
                                     End If
                                 Else
-                                    Set bstack.lastobj = usehandler.objref.ValueObj
+                                    Set bstack.lastobj = useHandler.objref.ValueObj
                                     r = 0
                                 End If
                                 Exit Function
@@ -13752,19 +13771,19 @@ syntax1:
                     ElseIf IsStrExp(bstack, a$, s$) Then
                         w3 = 0
 contlabel:
-                        Set usehandler = ppppl.GroupRef
-                        If usehandler.t1 = 1 Then
-                            If Typename(usehandler.objref) <> "FastCollection" Then
-                                If usehandler.indirect = -1 Then
-                                    Set usehandler = usehandler.objref
-                                    Set useFast = usehandler.objref
-                                    Set usehandler = ppppl.GroupRef
-                                    Set usehandler.objref = useFast
+                        Set useHandler = ppppl.GroupRef
+                        If useHandler.t1 = 1 Then
+                            If Typename(useHandler.objref) <> "FastCollection" Then
+                                If useHandler.indirect = -1 Then
+                                    Set useHandler = useHandler.objref
+                                    Set useFast = useHandler.objref
+                                    Set useHandler = ppppl.GroupRef
+                                    Set useHandler.objref = useFast
                                 Else
                                     GoTo inv100
                                 End If
                             Else
-                                Set useFast = usehandler.objref
+                                Set useFast = useHandler.objref
                             End If
                         Else
 inv100:                     Expected "Inventory", "Κατάσταση"
@@ -13787,11 +13806,11 @@ inv100:                     Expected "Inventory", "Κατάσταση"
                                             w3 = 0
                                             GoTo contAr2
                                         ElseIf TypeOf .ValueObj Is mHandler Then
-                                            Set usehandler = .ValueObj
-                                            If usehandler.t1 = 3 Then
-                                                Set ppppl = usehandler.objref
+                                            Set useHandler = .ValueObj
+                                            If useHandler.t1 = 3 Then
+                                                Set ppppl = useHandler.objref
                                             Else
-                                                Set ppppl.GroupRef = usehandler
+                                                Set ppppl.GroupRef = useHandler
                                             End If
                                             w3 = 0
                                             GoTo contAr2
@@ -13825,9 +13844,9 @@ inv100:                     Expected "Inventory", "Κατάσταση"
                                         If FastSymbol1(a$, "#") Then
                                             If Not bstack.lastobj Is Nothing Then
                                                 If Typename(bstack.lastobj) = mHdlr Then
-                                                    Set usehandler = bstack.lastobj
+                                                    Set useHandler = bstack.lastobj
                                                     Set bstack.lastobj = Nothing
-                                                    IsNumberNew = fMatrix(bstack, a$, usehandler, r)
+                                                    IsNumberNew = fMatrix(bstack, a$, useHandler, r)
                                                     If MyIsObject(r) Then r = 0#
                                                     
                                                     Exit Function
@@ -14223,7 +14242,7 @@ Function ProcLambda(bstack As basetask, rest$, Lang As Long) As Object
 ' no named functio- object
 Dim Body As New lambda, K As Long, n$, dummy As Variant, er As Boolean, pos1 As Long, p As Variant, s$
 Dim pppp As iBoxArray, pppp2 As iBoxArray, frm$, Find As basetask, rest1$
-Dim ppppl As iBoxArray, ar As refArray, usehandler As mHandler
+Dim ppppl As iBoxArray, ar As refArray, useHandler As mHandler
 ' need fixed param...with &
 again1:
 ClearStr rest$
@@ -14318,9 +14337,9 @@ again11:
                         Set pppp = Nothing
                         Body.FeedNonLocal n$, dummy, False, var()
                     ElseIf IsObjmHandler(bstack.lastobj) Then
-                        Set usehandler = bstack.lastobj
-                        If usehandler.t1 = 3 Then
-                            Set bstack.lastobj = usehandler.objref
+                        Set useHandler = bstack.lastobj
+                        If useHandler.t1 = 3 Then
+                            Set bstack.lastobj = useHandler.objref
                             GoTo again11
                         Else
                             WrongObject
@@ -14351,9 +14370,9 @@ again22:
                         Set dummy = Nothing
                         Set pppp = Nothing
                     ElseIf IsObjmHandler(bstack.lastobj) Then
-                        Set usehandler = bstack.lastobj
-                        If usehandler.t1 = 3 Then
-                            Set bstack.lastobj = usehandler.objref
+                        Set useHandler = bstack.lastobj
+                        If useHandler.t1 = 3 Then
+                            Set bstack.lastobj = useHandler.objref
                             GoTo again22
                         Else
                             WrongObject
@@ -16770,7 +16789,7 @@ Dim W As Long
 End Sub
 Function IsStr1(bstackstr As basetask, a$, r$) As Boolean
 Dim nbstack As basetask, n$
-Dim p As Variant, pp As Variant, pppp As mArray, ppppl As iBoxArray, usehandler As mHandler, rA As refArray
+Dim p As Variant, pp As Variant, pppp As mArray, ppppl As iBoxArray, useHandler As mHandler, rA As refArray
 Dim q$, W As Long, w1 As Long, w2 As Long, s$, par As Boolean, usebackup As Boolean
 Dim q1$, q2$, w3 As Long, dn As Long, dd As Long, bs As basetask, sg1 As Boolean
 Dim anything As Object, gr As Boolean
@@ -17022,8 +17041,8 @@ there12345:
                             p = 0
 contMem2Str:
                             
-                            Set usehandler = var(w1)
-                            r$ = usehandler.objref.CopyItemString(pp, p, par)
+                            Set useHandler = var(w1)
+                            r$ = useHandler.objref.CopyItemString(pp, p, par)
                             IsStr1 = par
                             Exit Function
                         End If
@@ -17078,22 +17097,22 @@ comehere:
                         Else
                             pp = 0&
 CONThereUDT:
-                            Set usehandler = var(w1)
-                            If Not usehandler.objref Is Nothing Then
+                            Set useHandler = var(w1)
+                            If Not useHandler.objref Is Nothing Then
 conthereHandler:
-                                If TypeOf usehandler.objref Is Enumeration Then
-                                    If myVarType(usehandler.index_cursor, vbString) Then
-                                        r$ = usehandler.index_cursor
+                                If TypeOf useHandler.objref Is Enumeration Then
+                                    If myVarType(useHandler.index_cursor, vbString) Then
+                                        r$ = useHandler.index_cursor
                                         IsStr1 = True
                                         Exit Function
                                     Else
-                                        If MyIsNumeric(usehandler.index_cursor) Then
-                                        If CheckInt64(usehandler.index_cursor) Then
-                                            r$ = CStr(usehandler.index_cursor)
+                                        If MyIsNumeric(useHandler.index_cursor) Then
+                                        If CheckInt64(useHandler.index_cursor) Then
+                                            r$ = CStr(useHandler.index_cursor)
                                         ElseIf myVarType(var(w1), vbBoolean) Then
                                             r$ = Format$(var(w1), DefBooleanString)
                                         Else
-                                            r$ = fixthis(usehandler.index_cursor)
+                                            r$ = fixthis(useHandler.index_cursor)
                                         End If
                                         IsStr1 = True
                                         End If
@@ -17101,7 +17120,7 @@ conthereHandler:
                                     End If
                                 Else
                                 p = 0
-                                If TakeOffset(bstackstr, usehandler, a$, p, pp) Then
+                                If TakeOffset(bstackstr, useHandler, a$, p, pp) Then
                                     GoTo CONT1234s
                                 End If
                                 IsStr1 = False
@@ -17416,21 +17435,21 @@ cont1002001:
                             Exit Function
                         Else
                         Set anything = ppppl.item(W)
-                        Set usehandler = anything
-                        If usehandler.t1 = 3 Then
-                        Set ppppl = usehandler.objref
-                        Set usehandler = Nothing
+                        Set useHandler = anything
+                        If useHandler.t1 = 3 Then
+                        Set ppppl = useHandler.objref
+                        Set useHandler = Nothing
                         GoTo enterthis
                         End If
-                        Set usehandler = Nothing
+                        Set useHandler = Nothing
                         End If
                         ElseIf IsobjAndArray(ppppl.item(W)) And InStr(q$, "$") = 0 Then
                             If FastSymbol(a$, "#") Then
                                 p = vbNullString
-                                Set usehandler = New mHandler
-                                Set usehandler.objref = ppppl.item(W)
+                                Set useHandler = New mHandler
+                                Set useHandler.objref = ppppl.item(W)
                                     
-                                IsStr1 = fMatrix(bstackstr, a$, usehandler, p)
+                                IsStr1 = fMatrix(bstackstr, a$, useHandler, p)
 jump1:
                                 If Left$(a$, 1) = "." And Not bstackstr.lastobj Is Nothing Then
                                     If TypeOf bstackstr.lastobj Is Group Then
@@ -17456,9 +17475,9 @@ jump1:
                             ElseIf FastSymbol(a$, "#") Then
                                     
                                 If TypeOf bstackstr.lastobj Is mHandler Then
-                                    Set usehandler = bstackstr.lastobj
+                                    Set useHandler = bstackstr.lastobj
                                     Set bstackstr.lastobj = Nothing
-                                    IsStr1 = fMatrix(bstackstr, a$, usehandler, p)
+                                    IsStr1 = fMatrix(bstackstr, a$, useHandler, p)
                                     GoTo jump1
                                 End If
                             ElseIf bstackstr.lastobj Is Nothing Then
@@ -17510,11 +17529,11 @@ groupstrvalue:
                         End If
                            Set anything = ppppl.item(W)
                             If CheckLastHandler(anything) Then
-                                Set usehandler = anything
-                                If usehandler.t1 = 3 Then
-                                    If TypeOf usehandler.objref Is iBoxArray Then
-                                        Set ppppl = usehandler.objref
-                                        Set usehandler = Nothing
+                                Set useHandler = anything
+                                If useHandler.t1 = 3 Then
+                                    If TypeOf useHandler.objref Is iBoxArray Then
+                                        Set ppppl = useHandler.objref
+                                        Set useHandler = Nothing
                                     Else
                                         Exit Function
                                     End If
@@ -17523,18 +17542,18 @@ groupstrvalue:
                                     ppppl.arr = False
                                     Set ppppl.GroupRef = anything
                                 End If
-                                Set usehandler = Nothing
+                                Set useHandler = Nothing
                                 If NeoGetArrayItem(ppppl, bstackstr, q$, W, a$) Then
                                     GoTo enteragain
                                 Else
                                     If Not ppppl Is Nothing Then
                                         If W < 0 Then
-                                        Set usehandler = ppppl.item(W)
-                                        If Typename(usehandler.objref) = myArray Then
-                                            Set ppppl = usehandler.objref
+                                        Set useHandler = ppppl.item(W)
+                                        If Typename(useHandler.objref) = myArray Then
+                                            Set ppppl = useHandler.objref
                                             
                                         End If
-                                        Set usehandler = Nothing
+                                        Set useHandler = Nothing
                                         GoTo enterthis
                                     End If
                                 End If
@@ -17908,7 +17927,7 @@ againlambda:
                         End If
                     ElseIf IsObjmHandler(bstackstr.lastobj) Then
 
-                    Set usehandler = bstackstr.lastobj
+                    Set useHandler = bstackstr.lastobj
                     GoTo conthereHandler
                     End If
                     IsStr1 = True
@@ -17938,11 +17957,11 @@ Else
 contrightstrpar:
 
     If Typename(ppppl.GroupRef) = mHdlr Then
-        Set usehandler = ppppl.GroupRef
-        If usehandler.t1 <> 1 Then
-            If usehandler.t1 = 3 Then
-                Set ppppl = usehandler.objref
-                Set usehandler = Nothing
+        Set useHandler = ppppl.GroupRef
+        If useHandler.t1 <> 1 Then
+            If useHandler.t1 = 3 Then
+                Set ppppl = useHandler.objref
+                Set useHandler = Nothing
                 GoTo contStrArr
             Else
                 SyntaxError
@@ -17951,13 +17970,13 @@ contrightstrpar:
             End If
         End If
     ' only for Inventory
-        If Not TypeOf usehandler.objref Is FastCollection Then
-            Set ppppl.GroupRef = usehandler.objref
-            Set usehandler = Nothing
+        If Not TypeOf useHandler.objref Is FastCollection Then
+            Set ppppl.GroupRef = useHandler.objref
+            Set useHandler = Nothing
             GoTo contrightstrpar
         End If
        ' Set usehandler = pppp.GroupRef
-        With usehandler.objref
+        With useHandler.objref
             If IsExp(bstackstr, a$, p, , True) Then
                 If MemInt(VarPtr(p)) = vbString Then r$ = p: GoTo str00012344
                 If MemInt(VarPtr(p)) = vbBoolean Then p = CLng(p)
@@ -18000,8 +18019,8 @@ str00012344:
                     ElseIf TypeOf .ValueObj Is Document Then
                         r$ = .ValueObj.textDoc
                     ElseIf TypeOf .ValueObj Is Group Then
-                        Set usehandler = ppppl.GroupRef
-                        Set anything = usehandler.objref
+                        Set useHandler = ppppl.GroupRef
+                        Set anything = useHandler.objref
                         dd = anything.Index
                         Set ppppl = New ppppLight: ppppl.PushDim (1): ppppl.PushEnd: ppppl.arr = True
                         Set pppp.item(0) = .ValueObj
@@ -19115,7 +19134,7 @@ End Sub
 Function Execute(bstack As basetask, b$, once As Boolean, Optional linebyline As Boolean, Optional loopthis As Boolean = False, Optional noblock As Boolean = True, Optional restartmodule As Boolean, Optional onlyone As Boolean = False) As Long
 Dim di As Object, nchr As Integer
 Set di = bstack.Owner
-Dim myobject As Object, usehandler As mHandler, usehandler1 As mHandler
+Dim myobject As Object, useHandler As mHandler, usehandler1 As mHandler
 If checkbreak(bstack, b$, once) Then GoTo enterbreak
 Dim pppp As mArray, ppppl As iBoxArray, bb$, ec$, i As Long, jump As Boolean, slct As Long, sp As Variant, sw$, ok As Boolean, IFCTRL As Long
 'If linebyline Then
@@ -19408,9 +19427,9 @@ again4:
                                 ElseIf TypeOf bstack.lastobj Is mHandler Then
                                     If CheckAnyArray(bstack.lastobj) Then
                                     
-                                      Set usehandler = bstack.lastobj
+                                      Set useHandler = bstack.lastobj
                                       
-                                        Set ppppl = usehandler.objref
+                                        Set ppppl = useHandler.objref
 wehavearray:
                                         Set bstack.lastobj = Nothing
                                         Set myobject = bstack.soros
@@ -20916,10 +20935,10 @@ CONDwhen:
                                 If Not bstack.lastobj Is Nothing Then
                                 If TypeOf bstack.lastobj Is mHandler Then
                                 
-                                Set usehandler = bstack.lastobj
+                                Set useHandler = bstack.lastobj
                                 Set bstack.lastobj = Nothing
                                 
-                                    With usehandler
+                                    With useHandler
                                             If .UseIterator Then
                                                 i = .indirect
                                                 If i < 0 Then
@@ -20951,7 +20970,7 @@ CONDwhen:
                                             End If
                                         
                                         End With
-                                        Set usehandler = Nothing
+                                        Set useHandler = Nothing
                                     End If
                                   End If
                                 W$ = Left$(W$, Len(W$) - Len(b$))
@@ -20985,9 +21004,9 @@ CONDwhen:
                                     
                                     If Not bstack.lastobj Is Nothing Then
                                         If TypeOf bstack.lastobj Is mHandler Then
-                                        Set usehandler = bstack.lastobj
+                                        Set useHandler = bstack.lastobj
                                         Set bstack.lastobj = Nothing
-                                        With usehandler
+                                        With useHandler
                                             If .UseIterator Then
                                                 i = .indirect
                                                 If i < 0 Then
@@ -21018,7 +21037,7 @@ CONDwhen:
                                                 p = Not p
                                             End If
                                          End With
-                                         Set usehandler = Nothing
+                                         Set useHandler = Nothing
                                         End If
                                     End If
                                     If nchr Then p = p = 0
@@ -21102,9 +21121,9 @@ again112:
 getanother:
                             If Not bstack.lastobj Is Nothing Then
                             If TypeOf bstack.lastobj Is mHandler Then
-                            Set usehandler = bstack.lastobj
+                            Set useHandler = bstack.lastobj
                             Set bstack.lastobj = Nothing
-                            With usehandler
+                            With useHandler
                             If .UseIterator Then
                                 i = .indirect
                                 If i < 0 Then
@@ -21135,7 +21154,7 @@ getanother:
                             End If
                             Set bstack.lastobj = Nothing
                         End With
-                        Set usehandler = Nothing
+                        Set useHandler = Nothing
                     End If
                 End If
                 st = st And p
@@ -21259,9 +21278,9 @@ another1:
                                 IsExp bstack, W$, p
                                                            If Not bstack.lastobj Is Nothing Then
                             If TypeOf bstack.lastobj Is mHandler Then
-                            Set usehandler = bstack.lastobj
+                            Set useHandler = bstack.lastobj
                             Set bstack.lastobj = Nothing
-                            With usehandler
+                            With useHandler
                                             If .UseIterator Then
                                                 i = .indirect
                                                 If i < 0 Then
@@ -21290,7 +21309,7 @@ another1:
                                                 p = .Iterate()
                                             End If
                                         End With
-                                        Set usehandler = Nothing
+                                        Set useHandler = Nothing
                                         End If
                                     End If
                                
@@ -27118,7 +27137,7 @@ End Function
 
 
 Function logical(basestack As basetask, s$, D As Variant, Optional par As Long = 0, Optional flatobject As Boolean = False, Optional ByPass As Boolean = False, Optional sg As Integer = 1, Optional ByVal nostring As Boolean) As Boolean
-Dim b$, S2$, S3$, usehandler As mHandler
+Dim b$, S2$, S3$, useHandler As mHandler
 Dim ah As String
 again11:
 If ByPass Then
@@ -27484,11 +27503,11 @@ SwapString2Variant b$, D
 GoTo conthere
 ElseIf Not basestack.lastobj Is Nothing Then
 If TypeOf basestack.lastobj Is mHandler Then
-Set usehandler = basestack.lastobj
-If usehandler.t1 = 4 Then
-If myVarType(usehandler.index_cursor, vbString) Then
+Set useHandler = basestack.lastobj
+If useHandler.t1 = 4 Then
+If myVarType(useHandler.index_cursor, vbString) Then
     If nostring Then GoTo jumpnostr1
-    b$ = usehandler.index_cursor
+    b$ = useHandler.index_cursor
     Set basestack.lastobj = Nothing
     GoTo conthere
 End If
@@ -27503,7 +27522,7 @@ End If
 End Function
 
 Function logicalSelect(basestack As basetask, s$, D As Variant, Optional par As Long = 0, Optional flatobject As Boolean = False, Optional ByPass As Boolean = False, Optional sg As Integer = 1, Optional ByVal nostring As Boolean) As Boolean
-Dim b$, S2$, S3$, usehandler As mHandler, getcom As Boolean
+Dim b$, S2$, S3$, useHandler As mHandler, getcom As Boolean
 Dim ah As String, i As Long
 
 For i = 1 To Len(s$)
@@ -27798,11 +27817,11 @@ End If
     GoTo conthere
 ElseIf Not basestack.lastobj Is Nothing Then
     If TypeOf basestack.lastobj Is mHandler Then
-    Set usehandler = basestack.lastobj
-    If usehandler.t1 = 4 Then
-    If myVarType(usehandler.index_cursor, vbString) Then
+    Set useHandler = basestack.lastobj
+    If useHandler.t1 = 4 Then
+    If myVarType(useHandler.index_cursor, vbString) Then
         If nostring Then GoTo jumpnostr1
-        b$ = usehandler.index_cursor
+        b$ = useHandler.index_cursor
         Set basestack.lastobj = Nothing
         GoTo conthere
     End If
@@ -28651,7 +28670,7 @@ If pp Is Nothing Then
     MyEr "Internal Error: NeoGetArrayItem", "εσωτερικό λάθος: NeoGetArrayItem": Exit Function
 End If
 If noObject And pp.IhaveClass Then Exit Function
-Dim dn As Long, dd As Long, w3 As Long, sp$, lim As Long, usehandler As mHandler, usehandler1 As mHandler
+Dim dn As Long, dd As Long, w3 As Long, sp$, lim As Long, useHandler As mHandler, usehandler1 As mHandler
 Dim p As Variant, pppp As mArray, mylist As FastCollection
 If Len(v$) > 0 Then sp$ = ")"
 again123:
@@ -28660,13 +28679,13 @@ dn = 0
 If Not pp.arr Then
     Dim ppp$
     If TypeOf pp.GroupRef Is mHandler Then
-        Set usehandler = pp.GroupRef
-        If usehandler.t1 <> 1 Then Expected "Inventory", "Κατάσταση": Exit Function
-        If TypeOf usehandler.objref Is mHandler Then
-            Set usehandler1 = usehandler.objref
-            Set usehandler.objref = usehandler1.objref
+        Set useHandler = pp.GroupRef
+        If useHandler.t1 <> 1 Then Expected "Inventory", "Κατάσταση": Exit Function
+        If TypeOf useHandler.objref Is mHandler Then
+            Set usehandler1 = useHandler.objref
+            Set useHandler.objref = usehandler1.objref
         End If
-        Set mylist = usehandler.objref
+        Set mylist = useHandler.objref
         If IsExp(bstack, rst$, p) Then
             With mylist
                 If Not FastSymbol(rst$, "!") Then
@@ -28855,14 +28874,14 @@ CheckThis:
             GoTo again123
         ElseIf ppp$ = mHdlr Then
             FastSymbol rst$, "("
-            Set usehandler = pp.item(offset)
-            If usehandler.t1 = 3 Then
-                Set pp = usehandler.objref
-                Set usehandler = Nothing
+            Set useHandler = pp.item(offset)
+            If useHandler.t1 = 3 Then
+                Set pp = useHandler.objref
+                Set useHandler = Nothing
             Else
                 Set pp = New ppppLight
                 pp.arr = False
-                Set pp.GroupRef = usehandler
+                Set pp.GroupRef = useHandler
             End If
             p = vbEmpty
             NeoGetArrayItem = pp.arr
@@ -28895,7 +28914,7 @@ If once Then Exit Sub
 End Sub
 
 Public Function VALIDATEmStiva(bs As basetask, p$, s$) As Boolean
-Dim st As mStiva, ss$, sw$, j As Long, anything As Object, usehandler As mHandler
+Dim st As mStiva, ss$, sw$, j As Long, anything As Object, useHandler As mHandler
 
 Set st = bs.soros
 Dim i As Long, r$
@@ -28921,9 +28940,9 @@ If j <> 62 Then
     Case 73, 105, 922, 954
         If j <> 42 Then Exit Function
         If VarTypeName$(st.StackItem(i)) = mHdlr Then
-            Set usehandler = st.StackItem(i)
-            If usehandler.t1 = 3 Then
-                Set anything = usehandler.objref
+            Set useHandler = st.StackItem(i)
+            If useHandler.t1 = 3 Then
+                Set anything = useHandler.objref
                 If CheckDeepAny(anything) Then
                     If VarTypeName$(anything) = "FastCollection" Then
                         If anything.structLen <> 0 Then Exit Function
@@ -28933,19 +28952,19 @@ If j <> 62 Then
                 Else
                     Exit Function
                 End If
-            ElseIf usehandler.t1 <> 1 Then
+            ElseIf useHandler.t1 <> 1 Then
                 Exit Function
             End If
         Else
             Exit Function
         End If
-        Set usehandler = Nothing
+        Set useHandler = Nothing
     Case 67, 99, 931, 963
         If j <> 42 Then Exit Function
         If VarTypeName$(st.StackItem(i)) = mHdlr Then
-            Set usehandler = st.StackItem(i)
-            If usehandler.t1 = 3 Then
-                Set anything = usehandler.objref
+            Set useHandler = st.StackItem(i)
+            If useHandler.t1 = 3 Then
+                Set anything = useHandler.objref
                 If CheckDeepAny(anything) Then
                     If VarTypeName$(anything) = "mStiva" Then
                     Else
@@ -28960,13 +28979,13 @@ If j <> 62 Then
         Else
             Exit Function
         End If
-        Set usehandler = Nothing
+        Set useHandler = Nothing
     Case 925, 957, 913, 945, 78, 110 '' number  - use spellunicode to make it
         If j = 42 Then
             If VarTypeName(st.StackItem(i)) = mHdlr Then
-                Set usehandler = st.StackItem(i)
-                If usehandler.t1 <> 4 Then Exit Function
-                Set usehandler = Nothing
+                Set useHandler = st.StackItem(i)
+                If useHandler.t1 <> 4 Then Exit Function
+                Set useHandler = Nothing
             Else
                 Exit Function
             End If
@@ -28982,9 +29001,9 @@ If j <> 62 Then
         If j = 42 Then j = AscW(Mid$(Typename(st.StackItem(i)), 2))
         If j <> 65 Then
             If IsmHandler(st.StackItem(i)) Then
-                Set usehandler = st.StackItem(i)
-                If usehandler.t1 = 3 Then
-                    Set anything = usehandler.objref
+                Set useHandler = st.StackItem(i)
+                If useHandler.t1 = 3 Then
+                    Set anything = useHandler.objref
                     If CheckDeepAny(anything) Then
                         If IsobjArray(anything) Then
                         
@@ -28997,7 +29016,7 @@ If j <> 62 Then
                 Else
                     Exit Function
                 End If
-                Set usehandler = Nothing
+                Set useHandler = Nothing
             ElseIf IsobjAndArray(st.StackItem(i)) Then
             
             Else
@@ -29035,22 +29054,22 @@ checkagain:
             If sw$ = "lambda" Then ss$ = "F"
             If sw$ = "mStiva" Then ss$ = "C"
             If sw$ = "mHandler" Then
-                Set usehandler = st.StackItem(i)
+                Set useHandler = st.StackItem(i)
 ch2:
-                Select Case usehandler.t1
+                Select Case useHandler.t1
                 Case 1
                 ss$ = "I"
                 Case 2
                 ss$ = "B"
                 Case 3
-                Set anything = usehandler.objref
+                Set anything = useHandler.objref
                 If CheckDeepAny(anything) Then
                     sw$ = Typename(anything)
-                    If sw$ = "mHandler" Then Set usehandler = anything: GoTo ch2
-                    Set usehandler = Nothing
+                    If sw$ = "mHandler" Then Set useHandler = anything: GoTo ch2
+                    Set useHandler = Nothing
                     GoTo checkagain
                 End If
-                Set usehandler = Nothing
+                Set useHandler = Nothing
                 ss$ = "U"   ' "Undefined"
                 Case 4
                 ss$ = "N"
@@ -29403,13 +29422,13 @@ Set MakeitObjectGeneric = aa
 End Function
 
 Sub PlaceIteratorData(bstack As basetask, anything As Variant, st, en)
-Dim usehandler As mHandler, usehandler1 As mHandler
-Set usehandler = bstack.lastobj
+Dim useHandler As mHandler, usehandler1 As mHandler
+Set useHandler = bstack.lastobj
 If MyIsObject(anything) Then
 Set usehandler1 = anything
-Set usehandler.objref = usehandler1.objref
+Set useHandler.objref = usehandler1.objref
 End If
-With usehandler.objref
+With useHandler.objref
     If st < 0 Then st = .Count + st Else st = st - 1
     If en < 0 Then en = .Count + en Else en = en - 1
     If st < 0 Then st = 0: en = -2 '0
@@ -29418,7 +29437,7 @@ With usehandler.objref
     If en >= .Count Then en = -1 ' .count - 1
     
 End With
-With usehandler
+With useHandler
     .t1 = 3
      .indirect = -1
     .index_start = st
@@ -29427,16 +29446,16 @@ With usehandler
     .UseIterator = True
 End With
 If MyIsObject(anything) Then
-    If TypeOf usehandler.objref Is FastCollection Then
-        usehandler.t1 = 1
-        Set usehandler.objref = anything
-    ElseIf TypeOf usehandler.objref Is Enumeration Then
-        Set usehandler.objref = New mHandler
-        Set usehandler = usehandler.objref
+    If TypeOf useHandler.objref Is FastCollection Then
+        useHandler.t1 = 1
+        Set useHandler.objref = anything
+    ElseIf TypeOf useHandler.objref Is Enumeration Then
+        Set useHandler.objref = New mHandler
+        Set useHandler = useHandler.objref
         Set usehandler1 = anything
-        Set usehandler.objref = usehandler1.objref
-        usehandler.t1 = 4
-        usehandler.index_cursor = st
+        Set useHandler.objref = usehandler1.objref
+        useHandler.t1 = 4
+        useHandler.index_cursor = st
     End If
 End If
 
@@ -29663,7 +29682,7 @@ Dim Up As Long, getparam As Boolean, pp As Long
 Dim K As Long, p As Variant, Final(0 To 63) As Variant
 Dim x1 As Long, what$, curtype As Long, s$, link$, rtype As Variant
 Dim thisref(0 To 63) As Long
-Dim usehandler As mHandler
+Dim useHandler As mHandler
 
 If that.ReadType(that.Count - 1) = -100 Then
 Up = that.Count - 1
@@ -29676,23 +29695,19 @@ For K = 1 To Up
         If that.IsByRef(K - 1) Then
             ' look for label..and check it
            If bstack.IsInStackString(what$) Then
-                   
                     If that.ReadType(K - 1) <= 4 Then
                             If GetGlobalVar(bstack.GroupName + what$, x1) Then
-                                    thisref(K - 1) = x1 ' so that is used to restore value
-                                    If MyIsObject(var(x1)) Then
-                                         ' THIS IS NOT GOOD
-                                    
-                                    Else
-                                        If that.ReadType(K - 1) = 2 Then
-                                         Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
-                                         
-                                        Else
-                                             Final(K - 1) = var(x1)
-                                            End If
-                                             ' so if this is a long we place a variant long
-                                           ' thisref(k - 1) = x1
-                                     End If
+                                thisref(K - 1) = x1 ' so that is used to restore value
+                                If that.ReadType(K - 1) = 2 Then
+                                    Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
+                                ElseIf MyIsObject(var(x1)) Then
+                                    Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
+                                ElseIf MyIsUnknown(var(x1)) Then
+                                    Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
+                                Else
+                                    Final(K - 1) = var(x1)
+                                End If
+
                             Else
                             ' no such variable
                             End If
@@ -29711,19 +29726,29 @@ For K = 1 To Up
                    If Not bstack.IsInStackNumber(p) Then
                    
                     If Not bstack.IsInStackLong(ii) Then
+                        
                         If bstack.soros.StackItemTypeIsObject(1) Then
                             If bstack.soros.StackItemTypeObjectType(1) = "*[Enumeration]" Then
-                                Set usehandler = bstack.soros.PopObj
-                                If MyIsNumeric(usehandler.index_cursor) Then
-                                    ii = usehandler.index_cursor * usehandler.sign
+                                Set useHandler = bstack.soros.PopObj
+                                If MyIsNumeric(useHandler.index_cursor) Then
+                                    ii = useHandler.index_cursor * useHandler.sign
                                 Else
                                     Exit For
                                 End If
                             Else
                                 Exit For
                             End If
-                        Else
-                            Exit For
+                        ElseIf bstack.IsInStackNumber(p) Then
+                            If MemInt(VarPtr(p)) = vbCurrency Then
+                                ' FOR ULONG WE CAN PASS CURRENCY
+                                If p < 0 Then
+                                    MyEr "Only zero or positive number", "Μόνο μηδέν ή θετικό αριθμό"
+                                Else
+                                    Final(K - 1) = CLng(signlong(p))
+                                End If
+                            Else
+                                Exit For
+                            End If
                         End If
                     Else
                         Exit For
@@ -29850,10 +29875,16 @@ Dim Up As Long, getparam As Boolean, pp As Long
 Dim K As Long, p As Variant, Final(0 To 63) As Variant
 Dim x1 As Long, what$, curtype As Long, s$, link$, rtype As Variant
 Dim thisref(0 To 63) As Long
-Dim usehandler As mHandler
+Dim useHandler As mHandler
 Dim myobj As stdole.IUnknown
 Dim myobjinterface As stdole.IUnknown
 On Error Resume Next
+Dim vv As Variant
+If Not bstack.soros.IsObj Then
+    MyEr "Missing object", "Δεν βρήκα αντικείμενο"
+    Exit Sub
+
+End If
 Set myobj = bstack.soros.PopObj
 If Err Then
     MyEr "expected object as fist parameter", "περίμενα αντικείμενο ως πρώτο όρισμα"
@@ -29873,15 +29904,16 @@ For K = 1 To Up
                 If that.ReadType(K - 1) <= 4 Then
                     If GetGlobalVar(bstack.GroupName + what$, x1) Then
                         thisref(K - 1) = x1 ' so that is used to restore value
-                        If MyIsObject(var(x1)) Then
-                                 ' THIS IS NOT GOOD
+                        If that.ReadType(K - 1) = 2 Then
+                            Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
+                        ElseIf MyIsObject(var(x1)) Then
+                            Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
+                        ElseIf MyIsUnknown(var(x1)) Then
+                            Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
                         Else
-                            If that.ReadType(K - 1) = 2 Then
-                                Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
-                            Else
-                                Final(K - 1) = var(x1)
-                            End If
+                            Final(K - 1) = var(x1)
                         End If
+
                     Else
                             ' no such variable
                     End If
@@ -29900,11 +29932,22 @@ For K = 1 To Up
                     If Not bstack.IsInStackLong(ii) Then
                         If bstack.soros.StackItemTypeIsObject(1) Then
                             If bstack.soros.StackItemTypeObjectType(1) = "*[Enumeration]" Then
-                                Set usehandler = bstack.soros.PopObj
-                                If MyIsNumeric(usehandler.index_cursor) Then
-                                    ii = usehandler.index_cursor * usehandler.sign
+                                Set useHandler = bstack.soros.PopObj
+                                If MyIsNumeric(useHandler.index_cursor) Then
+                                    ii = useHandler.index_cursor * useHandler.sign
                                 Else
                                     Exit For
+                                End If
+                            Else
+                                Exit For
+                            End If
+                        ElseIf bstack.IsInStackNumber(p) Then
+                            If MemInt(VarPtr(p)) = vbCurrency Then
+                                ' FOR ULONG WE CAN PASS CURRENCY
+                                If p < 0 Then
+                                    MyEr "Only zero or positive number", "Μόνο μηδέν ή θετικό αριθμό"
+                                Else
+                                    Final(K - 1) = CLng(signlong(p))
                                 End If
                             Else
                                 Exit For
@@ -29929,9 +29972,12 @@ For K = 1 To Up
                   End If
                 Case 1, 5
                         If Not bstack.IsInStackNumber(p) Then
-                   
+                    If Not bstack.soros.IsObj Then
                     If Not bstack.IsInStackLong(ii) Then Exit For
                     Final(K - 1) = ii
+                    Else
+                    Set Final(K - 1) = bstack.soros.PopObj
+                    End If
                     Else
                     Final(K - 1) = p
                     End If
@@ -30046,7 +30092,13 @@ For K = 1 To that.Count
 If that.IsByRef(K - 1) Then
 ' RESTORE VALUES...
     If that.ReadType(K - 1) < 5 Then
-    If that.ReadType(K - 1) <> 2 Then var(thisref(K - 1)) = Final(K - 1)
+    If that.ReadType(K - 1) <> 2 Then
+    x1 = MemInt(VarPtr(var(thisref(K - 1))))
+    If x1 = 9 Or x1 = 13 Then
+    Else
+        var(thisref(K - 1)) = Final(K - 1)
+    End If
+    End If
     
     End If
 End If
@@ -30068,22 +30120,22 @@ End Sub
 Public Sub ProcProperty(bstack As basetask, v(), vIndex As Long, FN$, rest$, language As Long, Optional hardlink As Boolean = False, Optional usethis As Long)
 Dim var1() As Variant, s$, r As Double, l As Long, NewRef As Long, many As Long, y1 As Boolean, x1 As Long, y2 As Boolean, Y3 As Long
 Dim var2() As String, ss$, sp As Variant, indirect As Boolean, s1$, newvar As Boolean
-Dim vv As Object, handlerFLAG As Boolean, usehandler As mHandler
+Dim vv As Object, handlerFLAG As Boolean, useHandler As mHandler
 Dim oo As Object, myVar As Variant
 Set vv = v(vIndex)
 Dim pppp As iBoxArray
 
 If TypeOf vv Is mHandler Then
-    Set usehandler = vv
-    If usehandler.indirect >= 0 Then
-        vIndex = usehandler.indirect
-        Set vv = var(usehandler.indirect)
+    Set useHandler = vv
+    If useHandler.indirect >= 0 Then
+        vIndex = useHandler.indirect
+        Set vv = var(useHandler.indirect)
     Else
-        If usehandler.UseIterator Then
-        ElseIf usehandler.IamEnum Then
+        If useHandler.UseIterator Then
+        ElseIf useHandler.IamEnum Then
             handlerFLAG = True
         Else
-            Set vv = usehandler.objref
+            Set vv = useHandler.objref
         End If
     End If
     indirect = True
@@ -30129,8 +30181,8 @@ conthere:
                 Else
                     Set var1(0) = bstack.lastobj
                     If TypeOf var1(0) Is mHandler Then
-                        Set usehandler = var1(0)
-                        If usehandler.t1 = 4 Then GoTo conthere
+                        Set useHandler = var1(0)
+                        If useHandler.t1 = 4 Then GoTo conthere
                     End If
                     Set bstack.lastobj = Nothing
                     CallByNameFixParamArray vv, FN$, VbSet, var1(), var2(), 1
@@ -30158,9 +30210,9 @@ conthere:
             If FN$ = vbNullString Then
                 l = usethis
             ElseIf handlerFLAG Then
-                Set usehandler = vv
-                l = FindDISPID(usehandler.objref, FN$)
-                Set usehandler = Nothing
+                Set useHandler = vv
+                l = FindDISPID(useHandler.objref, FN$)
+                Set useHandler = Nothing
             Else
                 l = FindDISPID(vv, FN$)
             End If
@@ -30198,10 +30250,10 @@ contenum:
                                 ' get now object
                                 sp = vbEmpty
                                 If ReadPropObj(vv, -4, sp) Then
-                                    Set usehandler = New mHandler
-                                    Set var(NewRef) = usehandler
-                                    usehandler.ConstructEnumerator sp
-                                    Set usehandler = Nothing
+                                    Set useHandler = New mHandler
+                                    Set var(NewRef) = useHandler
+                                    useHandler.ConstructEnumerator sp
+                                    Set useHandler = Nothing
                                 Else
                                     NoEnumerator
                                 End If
@@ -30211,9 +30263,9 @@ jumpheretoo:
                                 If hardlink Then
                                     Set oo = v(vIndex)
                                     If TypeOf oo Is mHandler Then
-                                        Set usehandler = oo
-                                        Set oo = usehandler.objref
-                                        If usehandler.t1 <> 1 Then
+                                        Set useHandler = oo
+                                        Set oo = useHandler.objref
+                                        If useHandler.t1 <> 1 Then
                                             GoTo there
                                         End If
                                     End If
@@ -30240,8 +30292,8 @@ jumpheretoo:
                                 If hardlink Then
                                     Set oo = v(vIndex)
                                     If TypeOf oo Is mHandler Then
-                                        Set usehandler = oo
-                                        With usehandler
+                                        Set useHandler = oo
+                                        With useHandler
                                             If .indirect < 0 Then
                                                 Set oo = .objref
                                                         '  Else
@@ -30257,7 +30309,7 @@ jumpheretoo:
                                 End If
                                 Set myVar = Nothing
                             End With
-                            Set usehandler = Nothing
+                            Set useHandler = Nothing
                         End If
                     ElseIf FastSymbol(rest$, ")") Then
 
@@ -30269,9 +30321,9 @@ contherenew:
                         If hardlink Then
                             Set oo = v(vIndex)
                             If TypeOf oo Is mHandler Then
-                                Set usehandler = oo
-                                Set oo = usehandler.objref
-                                Set usehandler = Nothing
+                                Set useHandler = oo
+                                Set oo = useHandler.objref
+                                Set useHandler = Nothing
                             End If
                             myVar.ConstructObj oo, l
                             Set oo = Nothing
@@ -30435,28 +30487,28 @@ Set vv = Nothing
 End Sub
 Sub ProcMethod(bstack As basetask, v(), vIndex As Long, FN$, rest$, language As Long, ok As Boolean, groupok As Boolean, prive As Boolean)
 Dim var1() As Variant, s$, r As Double, l As Long, NewRef As Long, Glob As Boolean, newvar As Boolean
-Dim vv As Object, result As Variant, retobject As Object, usehandler As mHandler, oUnk As stdole.IUnknown
+Dim vv As Object, result As Variant, retobject As Object, useHandler As mHandler, oUnk As stdole.IUnknown
 Dim namarg As Long, x1 As Long
 ok = True
 Set vv = v(vIndex)
 If TypeOf vv Is mHandler Then
-Set usehandler = vv
-If usehandler.indirect >= 0 Then
+Set useHandler = vv
+If useHandler.indirect >= 0 Then
 
-vIndex = usehandler.indirect
-If var2used < usehandler.indirect Then
+vIndex = useHandler.indirect
+If var2used < useHandler.indirect Then
 MyEr "weak reference  out of scope", "η αναφορά είναι εκτός σκοπού"
 ok = False
 Exit Sub
 End If
 
-Set vv = var(usehandler.indirect)
+Set vv = var(useHandler.indirect)
 
 Else
-Set vv = usehandler.objref
+Set vv = useHandler.objref
 End If
 End If
-Set usehandler = Nothing
+Set useHandler = Nothing
 If vv Is Nothing Then Exit Sub
 If TypeOf vv Is ExtControl Then
 Set vv = vv.Value
@@ -30644,7 +30696,7 @@ End Sub
 Sub RealMeth(bstack As basetask, rest$, var2() As Variant, var3() As String, NoNameditems As Long, namedargument As Long, ok As Boolean)
 '  testmeth "122,&beta,121,alfa:=a+4, beta:=122"
 Dim s$
-Dim mm As mArray, usehandler As mHandler
+Dim mm As mArray, useHandler As mHandler
 Dim trap As Long, ss$, p As Variant, items As Long, ref As Boolean, i As Long, z As Variant, c As Long
 ok = True
 Do
@@ -30677,15 +30729,15 @@ Case "S"
 again2:
                 If MyIsObject(var(i)) Then
                     If TypeOf var(i) Is mHandler Then
-                        Set usehandler = var(i)
-                        If usehandler.indirect <> -1 Then
-                            i = usehandler.indirect
+                        Set useHandler = var(i)
+                        If useHandler.indirect <> -1 Then
+                            i = useHandler.indirect
                             c = c + 1
-                            If c < 20 Then Set usehandler = Nothing: GoTo again2 Else InternalError: Exit Sub
+                            If c < 20 Then Set useHandler = Nothing: GoTo again2 Else InternalError: Exit Sub
                         End If
-                        If usehandler.t1 = 3 Then
-                            If IsobjmArray(usehandler.objref) Then
-                                Set mm = usehandler.objref
+                        If useHandler.t1 = 3 Then
+                            If IsobjmArray(useHandler.objref) Then
+                                Set mm = useHandler.objref
                                 mm.ExportStringArrayNow
                                 mm.refArray = vbNullString
                                 Set var2(items) = mm
@@ -30698,7 +30750,7 @@ again2:
                         Else
                             VarByRef VarPtr(var2(items)), var(i)
                         End If
-                        Set usehandler = Nothing
+                        Set useHandler = Nothing
                     ElseIf TypeOf var(i) Is mArray Then
                             Set mm = var(i)
                             mm.ExportStringArrayNow
@@ -30773,15 +30825,15 @@ again3:
                 VarByRefVariant VarPtr(var2(items)), var(i)
                 ElseIf MyIsObject(var(i)) Then
                         If TypeOf var(i) Is mHandler Then
-                            Set usehandler = var(i)
-                            If usehandler.indirect <> -1 Then
+                            Set useHandler = var(i)
+                            If useHandler.indirect <> -1 Then
                                 i = var(i).indirect
                                 c = c + 1
-                                If c < 20 Then Set usehandler = Nothing: GoTo again3 Else InternalError: Exit Sub
+                                If c < 20 Then Set useHandler = Nothing: GoTo again3 Else InternalError: Exit Sub
                             End If
-                            If usehandler.t1 = 3 Then
-                                If IsobjmArray(usehandler.objref) Then
-                                    Set mm = usehandler.objref
+                            If useHandler.t1 = 3 Then
+                                If IsobjmArray(useHandler.objref) Then
+                                    Set mm = useHandler.objref
                                     mm.ExportArrayNow
                                     Set var2(items) = mm
                                     Set mm = Nothing
@@ -30790,13 +30842,13 @@ again3:
                                     ok = False
                                     Exit Sub
                                 End If
-                            ElseIf usehandler.t1 = 4 Then
+                            ElseIf useHandler.t1 = 4 Then
                                ' usehandler.sign * usehandler.index_cursor
-                                  var2(items) = usehandler.sign * usehandler.index_cursor
+                                  var2(items) = useHandler.sign * useHandler.index_cursor
                             Else
                                 VarByRef VarPtr(var2(items)), var(i)
                             End If
-                            Set usehandler = Nothing
+                            Set useHandler = Nothing
                         ElseIf TypeOf var(i) Is mArray Then
                             Set mm = var(i)
                             mm.ExportArrayNow
@@ -30820,13 +30872,13 @@ again3:
                              var2(items) = p
                         Else
                         If TypeOf bstack.lastobj Is mHandler Then
-                            Set usehandler = bstack.lastobj
+                            Set useHandler = bstack.lastobj
 
-                            If usehandler.t1 = 4 Then
+                            If useHandler.t1 = 4 Then
                                 var2(items) = p
-                            ElseIf usehandler.t1 = 3 Then
-                                If IsobjmArray(usehandler.objref) Then
-                                    Set mm = usehandler.objref
+                            ElseIf useHandler.t1 = 3 Then
+                                If IsobjmArray(useHandler.objref) Then
+                                    Set mm = useHandler.objref
                                     Set var2(items) = mm
                                     Set mm = Nothing
                                 Else
@@ -30882,7 +30934,7 @@ End Sub
 
 
 Function ReadProp(fromIndex As Long, ByVal propIndex As Long, RETVAR As Variant) As Boolean
-Dim o As Object, er$, usehandler As mHandler
+Dim o As Object, er$, useHandler As mHandler
 On Error GoTo there
 Set o = var(fromIndex)
 If o Is Nothing Then
@@ -30890,13 +30942,13 @@ If o Is Nothing Then
 Exit Function
 End If
 If TypeOf o Is mHandler Then
-0   Set usehandler = o
+0   Set useHandler = o
 propIndex = -propIndex
-If usehandler.UseIterator Then
+If useHandler.UseIterator Then
 Else
-Set o = usehandler.objref
+Set o = useHandler.objref
 End If
-Set usehandler = Nothing
+Set useHandler = Nothing
 End If
 If o Is Nothing Then Exit Function
 If TypeOf o Is ExtControl Then
@@ -30922,15 +30974,15 @@ BadGetProp
 End If
 End Function
 Function ReadPropIndex(fromIndex As Long, ByVal propIndex As Long, myIndex As Variant, Optional maybeObject As Boolean, Optional retObj) As Variant
-Dim o As Object, er$, check As Boolean, usehandler As mHandler
+Dim o As Object, er$, check As Boolean, useHandler As mHandler
 On Error GoTo there
 Set o = var(fromIndex)
 If o Is Nothing Then Exit Function
 If TypeOf o Is mHandler Then
 propIndex = -propIndex
-Set usehandler = o
-Set o = usehandler.objref
-Set usehandler = Nothing
+Set useHandler = o
+Set o = useHandler.objref
+Set useHandler = Nothing
 End If
 er$ = vbNullString
 check = True
@@ -30954,17 +31006,17 @@ BadGetProp
 End If
 End Function
 Sub WriteProp(fromIndex As Long, ByVal propIndex As Long, Anyval As Variant)
-Dim o As Object, er$, usehandler As mHandler
+Dim o As Object, er$, useHandler As mHandler
 Set o = var(fromIndex)
 If o Is Nothing Then Exit Sub
 If TypeOf o Is mHandler Then
 propIndex = -propIndex
-Set usehandler = o
-If usehandler.UseIterator Then
+Set useHandler = o
+If useHandler.UseIterator Then
 Else
-Set o = usehandler.objref
+Set o = useHandler.objref
 End If
-Set usehandler = Nothing
+Set useHandler = Nothing
 End If
 'ChangeOneIndexParameter
 If TypeOf o Is ExtControl Then
@@ -30976,14 +31028,14 @@ BadLetProp
 End If
 End Sub
 Sub WritePropIndex(fromIndex As Long, ByVal propIndex As Long, Anyval As Variant, myIndex)
-Dim o As Object, er$, usehandler As mHandler
+Dim o As Object, er$, useHandler As mHandler
 Set o = var(fromIndex)
 If o Is Nothing Then Exit Sub
 If TypeOf o Is mHandler Then
 propIndex = -propIndex
-Set usehandler = o
-Set o = usehandler.objref
-Set usehandler = Nothing
+Set useHandler = o
+Set o = useHandler.objref
+Set useHandler = Nothing
 End If
 If TypeOf o Is ExtControl Then
 Set o = o.Value
@@ -34028,7 +34080,7 @@ End Function
 Private Function PushParamSUB(basestack As basetask, rest$) As Boolean
     PushParamSUB = True
 
-    Dim ps As mStiva, p As Variant, s$, usehandler As mHandler, usestiva As mStiva
+    Dim ps As mStiva, p As Variant, s$, useHandler As mHandler, usestiva As mStiva
     Dim what As Integer, W$, u1 As Long, flag As Boolean
     Set ps = New mStiva
     
@@ -34041,18 +34093,18 @@ Private Function PushParamSUB(basestack As basetask, rest$) As Boolean
                 If basestack.lastobj Is Nothing Then
                    ps.DataValLong p
                 ElseIf TypeOf basestack.lastobj Is mHandler Then
-                    Set usehandler = basestack.lastobj
-                    If TypeOf usehandler.objref Is mStiva Then
-                        ps.MergeBottom usehandler.objref
-                    ElseIf TypeOf usehandler.objref Is iBoxArray Then
-                     ps.MergeBottomCopyArray usehandler.objref
+                    Set useHandler = basestack.lastobj
+                    If TypeOf useHandler.objref Is mStiva Then
+                        ps.MergeBottom useHandler.objref
+                    ElseIf TypeOf useHandler.objref Is iBoxArray Then
+                     ps.MergeBottomCopyArray useHandler.objref
                         Else
                             PushParamSUB = False
                             MyEr "Expected Stack Object after !", "Περίμενα αντικείμενο τύπου Σωρού μετά το !"
                             Set basestack.lastobj = Nothing
                             Exit Function
                     End If
-                    Set usehandler.objref = Nothing
+                    Set useHandler.objref = Nothing
                 ElseIf TypeOf basestack.lastobj Is iBoxArray Then
                      ps.MergeBottomCopyArray basestack.lastobj
                 End If
@@ -34147,7 +34199,7 @@ nextparam:
 End Function
 Private Function PushParamGeneralV7(basestack As basetask, rest$, ps As mStiva) As Boolean
 PushParamGeneralV7 = True
-Dim p As Variant, s$, usehandler As mHandler, usestiva As mStiva
+Dim p As Variant, s$, useHandler As mHandler, usestiva As mStiva
 Dim ParentStack As basetask
 Set ParentStack = basestack.Parent
 Set ParentStack.lastobj = Nothing
@@ -34159,11 +34211,11 @@ Set ParentStack.lastobj = Nothing
                     If ParentStack.lastobj Is Nothing Then
                         ps.DataValLong p
                     ElseIf TypeOf ParentStack.lastobj Is mHandler Then
-                        Set usehandler = ParentStack.lastobj
-                        If TypeOf usehandler.objref Is mStiva Then
-                            ps.MergeBottom usehandler.objref
-                        ElseIf TypeOf usehandler.objref Is iBoxArray Then
-                            ps.MergeBottomCopyArray usehandler.objref
+                        Set useHandler = ParentStack.lastobj
+                        If TypeOf useHandler.objref Is mStiva Then
+                            ps.MergeBottom useHandler.objref
+                        ElseIf TypeOf useHandler.objref Is iBoxArray Then
+                            ps.MergeBottomCopyArray useHandler.objref
                         Else
                             PushParamGeneralV7 = False
                             MyEr "Expected Stack Object after !", "Περίμενα αντικείμενο τύπου Σωρού μετά το !"
@@ -34171,7 +34223,7 @@ Set ParentStack.lastobj = Nothing
                             ParentStack.modfuncall = False
                             Exit Function
                         End If
-                        Set usehandler.objref = Nothing
+                        Set useHandler.objref = Nothing
                     ElseIf TypeOf ParentStack.lastobj Is iBoxArray Then
                           ps.MergeBottomCopyArray ParentStack.lastobj
                     End If
@@ -34235,7 +34287,7 @@ End Function
 Function PushParamGeneral(basestack As basetask, rest$, Optional ByVal temphere$) As Boolean
 PushParamGeneral = True
 
-Dim ps As mStiva, p As Variant, s$, ok As Long, usehandler As mHandler, usestiva As mStiva
+Dim ps As mStiva, p As Variant, s$, ok As Long, useHandler As mHandler, usestiva As mStiva
     Set ps = New mStiva
     Set basestack.lastobj = Nothing
     Do
@@ -34261,18 +34313,18 @@ Dim ps As mStiva, p As Variant, s$, ok As Long, usehandler As mHandler, usestiva
                 If basestack.lastobj Is Nothing Then
                    ps.DataValLong p
                 ElseIf TypeOf basestack.lastobj Is mHandler Then
-                    Set usehandler = basestack.lastobj
-                    If TypeOf usehandler.objref Is mStiva Then
-                        ps.MergeBottom usehandler.objref
-                    ElseIf TypeOf usehandler.objref Is iBoxArray Then
-                        ps.MergeBottomCopyArray usehandler.objref
+                    Set useHandler = basestack.lastobj
+                    If TypeOf useHandler.objref Is mStiva Then
+                        ps.MergeBottom useHandler.objref
+                    ElseIf TypeOf useHandler.objref Is iBoxArray Then
+                        ps.MergeBottomCopyArray useHandler.objref
                     Else
                         PushParamGeneral = False: basestack.modfuncall = False
                         MyEr "Expected Stack Object after !", "Περίμενα αντικείμενο τύπου Σωρού μετά το !"
                         Set basestack.lastobj = Nothing
                         Exit Function
                     End If
-                    Set usehandler.objref = Nothing
+                    Set useHandler.objref = Nothing
                 ElseIf TypeOf basestack.lastobj Is iBoxArray Then
                     ps.MergeBottomCopyArray basestack.lastobj
                 End If
@@ -35136,7 +35188,7 @@ Function StockValues(bstack As basetask, b$, Lang As Long) As Boolean
 ' Stock A[$|%| ]()  keep  N,  B[$|%| ]()
 ' Stock A[$|%| ]()  sweep  N [,  value ]   fill a copy of value to n items or empty slots
 Dim W$, pppp As mArray, ppppAny As iBoxArray, v As Long, VN As Long, i As Long, what$, pppp1 As mArray, V1 As Long
-Dim bs As New basetask, p As Variant, p1 As Variant, soros As mStiva, ww$, ss$, usehandler As mHandler
+Dim bs As New basetask, p As Variant, p1 As Variant, soros As mStiva, ww$, ss$, useHandler As mHandler
 Dim useType As Boolean, vt As Integer
 i = Abs(IsLabel(bstack, b$, what$))
 If i > 4 And i < 8 Then
@@ -35230,10 +35282,10 @@ againhere:
                                 bs.soros.Copy2TopItem 1
                                 If TypeOf pppp.itemObject(v) Is mArray Then
                                     If pppp.item(v).arr Then
-                                        Set usehandler = New mHandler
-                                        Set var(i) = usehandler
-                                        usehandler.t1 = 3
-                                        Set usehandler.objref = bs.soros.PopObj
+                                        Set useHandler = New mHandler
+                                        Set var(i) = useHandler
+                                        useHandler.t1 = 3
+                                        Set useHandler.objref = bs.soros.PopObj
                                     Else
                                         Set var(i) = bs.soros.PopObj
                                     End If
@@ -37176,7 +37228,7 @@ Between = (a >= b And a <= c) And Not a = exclude
 End If
 End Function
 Function StructPage(basestack As basetask, rest$, Lang As Long, ByVal offset As Long, ByRef offset2 As Long, offsetlist As FastCollection, ByVal lasthead$) As Boolean
-Dim what$, offset1 As Long, i As Long, s$, b$, p As Variant, w2 As Long, maxOffset As Long, probeoffset As Long, usehandler As mHandler, localList As FastCollection
+Dim what$, offset1 As Long, i As Long, s$, b$, p As Variant, w2 As Long, maxOffset As Long, probeoffset As Long, useHandler As mHandler, localList As FastCollection
 Dim itisSingle As Boolean, itisCur As Boolean
     b$ = NLtrim$(block(rest$))
     If Not FastSymbol(rest$, "}") Then Exit Function
@@ -37301,12 +37353,12 @@ again1:
                                 If IsExp(basestack, basestack.GroupName + s$, p) Then
                                     If basestack.lastobj Is Nothing Then GoTo comehere
                                     If Not TypeOf basestack.lastobj Is mHandler Then GoTo comehere
-                                    Set usehandler = basestack.lastobj
-                                    If Not TypeOf usehandler.objref Is FastCollection Then GoTo comehere
-                                    Set localList = usehandler.objref
+                                    Set useHandler = basestack.lastobj
+                                    If Not TypeOf useHandler.objref Is FastCollection Then GoTo comehere
+                                    Set localList = useHandler.objref
                                     If localList.structLen = 0 Then GoTo comehere
                                     offset1 = localList.structLen
-                                    Set usehandler = Nothing
+                                    Set useHandler = Nothing
                                     Set basestack.lastobj = Nothing
                                     Else
                                     GoTo comehere
@@ -37315,12 +37367,12 @@ again1:
                                 If IsExp(basestack, s$, p) Then
                                     If basestack.lastobj Is Nothing Then GoTo comehere
                                     If Not TypeOf basestack.lastobj Is mHandler Then GoTo comehere
-                                    Set usehandler = basestack.lastobj
-                                    If Not TypeOf usehandler.objref Is FastCollection Then GoTo comehere
-                                    If usehandler.objref.structLen = 0 Then GoTo comehere
-                                offset1 = usehandler.objref.structLen
+                                    Set useHandler = basestack.lastobj
+                                    If Not TypeOf useHandler.objref Is FastCollection Then GoTo comehere
+                                    If useHandler.objref.structLen = 0 Then GoTo comehere
+                                offset1 = useHandler.objref.structLen
                                     Set basestack.lastobj = Nothing
-                                    Set usehandler = Nothing
+                                    Set useHandler = Nothing
                                     Else
                                     GoTo comehere
                                 End If
@@ -37690,7 +37742,7 @@ Exit Function
 there:
 End Function
 Function MyPush(bstack As basetask, rest$) As Boolean
-Dim s$, p As Variant, usehandler As mHandler
+Dim s$, p As Variant, useHandler As mHandler
 MyPush = True
 Do
     If FastSymbol(rest$, "!") Then
@@ -37698,11 +37750,11 @@ Do
             If bstack.lastobj Is Nothing Then
                 bstack.soros.PushValLong CLng(p)
             ElseIf TypeOf bstack.lastobj Is mHandler Then
-                Set usehandler = bstack.lastobj
-                If TypeOf usehandler.objref Is mStiva Then
-                    bstack.soros.MergeTop usehandler.objref
-                ElseIf TypeOf usehandler.objref Is iBoxArray Then
-                    bstack.soros.MergeTopCopyArray usehandler.objref
+                Set useHandler = bstack.lastobj
+                If TypeOf useHandler.objref Is mStiva Then
+                    bstack.soros.MergeTop useHandler.objref
+                ElseIf TypeOf useHandler.objref Is iBoxArray Then
+                    bstack.soros.MergeTopCopyArray useHandler.objref
                 Else
 myp123:
                     MyPush = False
@@ -37711,7 +37763,7 @@ myp123:
                     Exit Function
                 End If
                 Set bstack.lastobj = Nothing
-                Set usehandler = Nothing
+                Set useHandler = Nothing
             ElseIf TypeOf bstack.lastobj Is iBoxArray Then
                 bstack.soros.MergeTopCopyArray bstack.lastobj
                 Set bstack.lastobj = Nothing
@@ -37760,7 +37812,7 @@ myp123:
 Loop
 End Function
 Function MyData(bstack As basetask, rest$) As Boolean
-Dim s$, p As Variant, usehandler As mHandler
+Dim s$, p As Variant, useHandler As mHandler
 MyData = True
 Do
     If FastSymbol(rest$, "!") Then
@@ -37768,11 +37820,11 @@ Do
             If bstack.lastobj Is Nothing Then
                 bstack.soros.DataValLong p
             ElseIf TypeOf bstack.lastobj Is mHandler Then
-                Set usehandler = bstack.lastobj
-                If TypeOf usehandler.objref Is mStiva Then
-                    bstack.soros.MergeBottom usehandler.objref
-                ElseIf TypeOf usehandler.objref Is iBoxArray Then
-                    bstack.soros.MergeBottomCopyArray usehandler.objref
+                Set useHandler = bstack.lastobj
+                If TypeOf useHandler.objref Is mStiva Then
+                    bstack.soros.MergeBottom useHandler.objref
+                ElseIf TypeOf useHandler.objref Is iBoxArray Then
+                    bstack.soros.MergeBottomCopyArray useHandler.objref
                 Else
 myd123:
                     MyData = False
@@ -37780,7 +37832,7 @@ myd123:
                     Set bstack.lastobj = Nothing
                     Exit Function
                 End If
-                Set usehandler = Nothing
+                Set useHandler = Nothing
             ElseIf TypeOf bstack.lastobj Is iBoxArray Then
                 bstack.soros.MergeBottomCopyArray bstack.lastobj
             Else
@@ -37830,7 +37882,7 @@ Loop
 End Function
 Function MyClear(bstack As basetask, rest$) As Boolean
 Dim curbstack As basetask, i As Long, y1 As Long, what$, it As Long, pppp As iBoxArray, myobject As mStiva
-Dim usehandler As mHandler
+Dim useHandler As mHandler
 MyClear = True
 Do
     y1 = Abs(IsLabel(bstack, rest$, what$))
@@ -37864,37 +37916,37 @@ Do
                         End If
                     End If
                 ElseIf Typename(var(i)) = mHdlr Then
-                    Set usehandler = var(i)
-                    If usehandler.t1 = 1 Then
-                        If usehandler.ReadOnly Then
+                    Set useHandler = var(i)
+                    If useHandler.t1 = 1 Then
+                        If useHandler.ReadOnly Then
                             ReadOnly
                             MyClear = False
                             Exit Function
                         End If
-                        If usehandler.UseIterator Then
+                        If useHandler.UseIterator Then
                             ReadOnly
                             MyClear = False
                             Exit Function
                         End If
-                        If usehandler.objref.IsQueue Then
+                        If useHandler.objref.IsQueue Then
                             Set var(i) = Nothing
                             MakeitObjectInventory var(i), True
                         Else
                             Set var(i) = Nothing
                             MakeitObjectInventory var(i)
                         End If
-                    ElseIf usehandler.t1 = 2 Then
-                        Set usehandler = New mHandler
-                        Set var(i) = usehandler
-                        usehandler.t1 = 2
-                        Set usehandler.objref = New MemBlock
-                    ElseIf usehandler.UseIterator Then
+                    ElseIf useHandler.t1 = 2 Then
+                        Set useHandler = New mHandler
+                        Set var(i) = useHandler
+                        useHandler.t1 = 2
+                        Set useHandler.objref = New MemBlock
+                    ElseIf useHandler.UseIterator Then
                         Set var(i) = Nothing
                         var(i) = 0&
-                    ElseIf Typename$(usehandler.objref) = myArray Then
-                        Set usehandler.objref = New mArray
-                    ElseIf Typename$(usehandler.objref) = "mStiva" Then
-                         Set usehandler.objref = New mStiva
+                    ElseIf Typename$(useHandler.objref) = myArray Then
+                        Set useHandler.objref = New mArray
+                    ElseIf Typename$(useHandler.objref) = "mStiva" Then
+                         Set useHandler.objref = New mStiva
                     End If
                 Else
                      var(i) = Empty
@@ -40312,7 +40364,7 @@ End Function
 Function ProcBuffer(bstack As basetask, rest$, Lang As Long, Optional alocal As Boolean) As Boolean
 ProcBuffer = True
 Dim s$, what$, i As Long, p As Variant, pp As Long, par As Long, what2$, Runnable As Boolean, itisSingle As Boolean, itisCur As Boolean
-Dim usehandler As mHandler, useBuffer As MemBlock
+Dim useHandler As mHandler, useBuffer As MemBlock
 If IsLabelSymbolNew(rest$, "ΚΩΔΙΚΑ", "CODE", Lang) Then Runnable = True
 If IsLabelSymbolNew(rest$, "ΚΕΝΗ", "CLEAR", Lang) Then par = &H8
 
@@ -40330,16 +40382,16 @@ makeitnow:
                         MakeitObjectBuffer var(i)
                     End If
                     If TypeOf var(i) Is mHandler Then
-                        Set usehandler = var(i)
-                        If TypeOf usehandler.objref Is MemBlock Then GoTo contok
+                        Set useHandler = var(i)
+                        If TypeOf useHandler.objref Is MemBlock Then GoTo contok
                     
                     End If
                         Expected "Buffer", "Διάρθρωση μνήμης"
                         Exit Function
                     
 contok:
-                    Set usehandler = var(i)
-                    Set useBuffer = usehandler.objref
+                    Set useHandler = var(i)
+                    Set useBuffer = useHandler.objref
                     ' GET TYPE OF  BUFFER
                     ' Char (1 byte) String (2 bytes)  Long (4 Bytes)
                     pp = 1
@@ -40371,28 +40423,28 @@ contok:
                         If IsExp(bstack, bstack.GroupName + what2$, p) Then
                                 If bstack.lastobj Is Nothing Then GoTo comehere
                                 If Not TypeOf bstack.lastobj Is mHandler Then GoTo comehere
-                                Set usehandler = bstack.lastobj
-                                If Not TypeOf usehandler.objref Is FastCollection Then GoTo comehere
-                                If usehandler.objref.structLen = 0 Then GoTo comehere
-                               pp = usehandler.objref.structLen
-                               Set useBuffer.structref = usehandler.objref
+                                Set useHandler = bstack.lastobj
+                                If Not TypeOf useHandler.objref Is FastCollection Then GoTo comehere
+                                If useHandler.objref.structLen = 0 Then GoTo comehere
+                               pp = useHandler.objref.structLen
+                               Set useBuffer.structref = useHandler.objref
                                useBuffer.UseStruct = True
                                Set bstack.lastobj = Nothing
-                               Set usehandler = Nothing
+                               Set useHandler = Nothing
                         End If
                         
                         Else
                             If IsExp(bstack, what2$, p) Then
                                 If bstack.lastobj Is Nothing Then GoTo comehere
                                 If Not TypeOf bstack.lastobj Is mHandler Then GoTo comehere
-                                Set usehandler = bstack.lastobj
-                                If Not TypeOf usehandler.objref Is FastCollection Then GoTo comehere
-                                If usehandler.objref.structLen = 0 Then GoTo comehere
-                               pp = usehandler.objref.structLen
-                               Set useBuffer.structref = usehandler.objref
+                                Set useHandler = bstack.lastobj
+                                If Not TypeOf useHandler.objref Is FastCollection Then GoTo comehere
+                                If useHandler.objref.structLen = 0 Then GoTo comehere
+                               pp = useHandler.objref.structLen
+                               Set useBuffer.structref = useHandler.objref
                                useBuffer.UseStruct = True
                                Set bstack.lastobj = Nothing
-                               Set usehandler = Nothing
+                               Set useHandler = Nothing
                         End If
                         End If
                         Else
@@ -40456,7 +40508,7 @@ comehere:
 End Function
 Function ProcInventory(bstack As basetask, rest$, Lang As Long, Optional alocal As Boolean) As Boolean
 ProcInventory = True
-Dim s$, what$, i As Long, p As Variant, queue As Boolean, serr As Boolean, usehandler As mHandler
+Dim s$, what$, i As Long, p As Variant, queue As Boolean, serr As Boolean, useHandler As mHandler
     queue = IsLabelSymbolNew(rest$, "ΟΥΡΑ", "QUEUE", Lang)
      Do While Abs(IsLabel(bstack, rest$, what$)) = 1
      serr = False
@@ -40474,10 +40526,10 @@ conthere:
              Else
                 If MyIsObject(var(i)) Then
                 If TypeOf var(i) Is mHandler Then
-                Set usehandler = var(i)
-                    If usehandler.t1 = 1 Then
-                        If Not usehandler.objref Is Nothing Then
-                            usehandler.objref.drop 0
+                Set useHandler = var(i)
+                    If useHandler.t1 = 1 Then
+                        If Not useHandler.objref Is Nothing Then
+                            useHandler.objref.drop 0
                         End If
                     End If
                     End If
@@ -40506,13 +40558,13 @@ lookglobal:
             
             If MyIsObject(var(i)) Then
                 If TypeOf var(i) Is mHandler Then
-                 Set usehandler = var(i)
-                    If usehandler.t1 = 1 Then
-                        If Not usehandler.objref Is Nothing Then
-                            usehandler.objref.drop 0
+                 Set useHandler = var(i)
+                    If useHandler.t1 = 1 Then
+                        If Not useHandler.objref Is Nothing Then
+                            useHandler.objref.drop 0
                         End If
                     End If
-                Set usehandler = Nothing
+                Set useHandler = Nothing
                 End If
             End If
              GoTo makeitnow1
@@ -40529,9 +40581,9 @@ there12:
                         Set bstack.lastobj = var(i)
                         ' new addition we can change an inventory to a queue inventory
                         ' but not the other way
-                        Set usehandler = bstack.lastobj
-                       If queue Then usehandler.objref.AllowAnyKey
-                       Set usehandler = Nothing
+                        Set useHandler = bstack.lastobj
+                       If queue Then useHandler.objref.AllowAnyKey
+                       Set useHandler = Nothing
                        serr = True
                         ProcInventory = AddInventory(bstack, rest$, serr)
                         If serr Then Exit Function
@@ -40866,7 +40918,7 @@ End Function
 
 Function ProcStack(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim ss$, frm$, ps As mStiva, it As Long, X As Variant, x0 As Double, s$, once As Boolean, prive As Long
-Dim x1 As Long, pa$, what$, i As Long, pppp As iBoxArray, f As Long, myobject As Object, nd&, usehandler As mHandler
+Dim x1 As Long, pa$, what$, i As Long, pppp As iBoxArray, f As Long, myobject As Object, nd&, useHandler As mHandler
 ProcStack = True
    If IsLabelSymbolNew(rest$, "ΝΕΟΣ", "NEW", Lang) Then
    If FastSymbol(rest$, "{") Then
@@ -40916,13 +40968,13 @@ If bstack.lastobj Is Nothing Then
     'SyntaxError
 Else
 If TypeOf bstack.lastobj Is mHandler Then
-    Set usehandler = bstack.lastobj
-    If TypeOf usehandler.objref Is iBoxArray Then
-        bstack.soros.MergeBottomCopyArray usehandler.objref
-    ElseIf TypeOf usehandler.objref Is mStiva Then
-        bstack.soros.MergeBottom usehandler.objref
+    Set useHandler = bstack.lastobj
+    If TypeOf useHandler.objref Is iBoxArray Then
+        bstack.soros.MergeBottomCopyArray useHandler.objref
+    ElseIf TypeOf useHandler.objref Is mStiva Then
+        bstack.soros.MergeBottom useHandler.objref
     End If
-    Set usehandler = Nothing
+    Set useHandler = Nothing
 ElseIf TypeOf bstack.lastobj Is iBoxArray Then
     bstack.soros.MergeBottomCopyArray bstack.lastobj
 End If
@@ -41218,11 +41270,11 @@ End If
         Set myobject = .StackItem(i)
         If Not myobject Is Nothing Then
             If TypeOf myobject Is mHandler Then
-                Set usehandler = myobject
-                If usehandler.indirect > -1 Then
-                    If MyIsObject(var(usehandler.indirect)) Then
-                        If usehandler.indirect <= var2used Then
-                            s$ = s$ + "*[" + VarTypeName(var(usehandler.indirect)) + "]"
+                Set useHandler = myobject
+                If useHandler.indirect > -1 Then
+                    If MyIsObject(var(useHandler.indirect)) Then
+                        If useHandler.indirect <= var2used Then
+                            s$ = s$ + "*[" + VarTypeName(var(useHandler.indirect)) + "]"
                         Else
                             s$ = s$ + "*[Error]"
                         End If
@@ -41230,13 +41282,13 @@ End If
                         s$ = s$ + "*[Nothing]"
                     End If
                 Else
-                    Select Case usehandler.t1
+                    Select Case useHandler.t1
                     Case 1
                         s$ = s$ + "*[Inventory]"
                     Case 2
                         s$ = s$ + "*[Buffer]"
                     Case Else
-                        s$ = s$ + "*[" + Typename(usehandler.objref) + "]"
+                        s$ = s$ + "*[" + Typename(useHandler.objref) + "]"
                     End Select
                 End If
             Else
@@ -41246,7 +41298,7 @@ End If
         s$ = s$ + "*[Nothing]"
         End If
     End Select
-    Set usehandler = Nothing
+    Set useHandler = Nothing
     Loop
     
     Set myobject = Nothing
@@ -41264,7 +41316,7 @@ End If
 End Function
 
 Function ProcDrop(basestack As basetask, rest$, Lang As Long) As Boolean
-Dim X As Double, usehandler As mHandler, tmp As FastCollection
+Dim X As Double, useHandler As mHandler, tmp As FastCollection
 
 If Not IsExp(basestack, rest$, X) Then
 
@@ -41272,15 +41324,15 @@ X = 1
 Else
 If Not basestack.lastobj Is Nothing Then
 If TypeOf basestack.lastobj Is mHandler Then
-Set usehandler = basestack.lastobj
-    If usehandler.ReadOnly Then
+Set useHandler = basestack.lastobj
+    If useHandler.ReadOnly Then
         ReadOnly
         ProcDrop = False
         Exit Function
     End If
-    If usehandler.t1 <> 1 Then OnlyForInventory: Exit Function
-    If TypeOf usehandler.objref Is FastCollection Then
-        Set tmp = usehandler.objref
+    If useHandler.t1 <> 1 Then OnlyForInventory: Exit Function
+    If TypeOf useHandler.objref Is FastCollection Then
+        Set tmp = useHandler.objref
         If IsLabelSymbolNew(rest$, "ΕΩΣ", "TO", Lang) Then
             If IsExp(basestack, rest$, X) Then
                 tmp.drop X + 1
@@ -41591,7 +41643,7 @@ Err.Clear
 End Function
 Function ProcGet(basestack As basetask, rest$) As Boolean
 Dim pppp As iBoxArray, it As Long, what$, p As Variant, f As Variant, par As Boolean, s$, arr As Boolean
-Dim flag As Boolean, usehandler As mHandler, pp As Variant, RF As refArray
+Dim flag As Boolean, useHandler As mHandler, pp As Variant, RF As refArray
 IsSymbol3 rest$, "#"
 
 If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
@@ -41607,7 +41659,7 @@ If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
                     ReadOnly
                     GoTo ex123
                 End If
-            Set usehandler = var(it)
+            Set useHandler = var(it)
             flag = True
             ElseIf myVarType(var(it), vbObject) Then
             If Not var(it) Is Nothing Then
@@ -41630,12 +41682,12 @@ If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
                 If Not FastSymbol(rest$, ")") Then GoTo ex123
                 If Not VarTypeName(var(it)) = mHdlr Then GoTo ex123
                 
-                Set usehandler = var(it)
-                If usehandler.t1 <> 2 Then
+                Set useHandler = var(it)
+                If useHandler.t1 <> 2 Then
                     MissType
                     GoTo ex123
                 End If
-                If usehandler.ReadOnly Then
+                If useHandler.ReadOnly Then
                     ReadOnly
                     GoTo ex123
                 End If
@@ -41703,13 +41755,13 @@ err11:
             End If
         End If
         If flag Then
-            If usehandler.t1 = 1 Then
+            If useHandler.t1 = 1 Then
                 MissType
                 GoTo ex123
             End If
             Dim buf As MemBlock
             Dim aa() As Byte
-            Set buf = usehandler.objref
+            Set buf = useHandler.objref
             With buf
                 ' pp is offset
                 If Fstep(f) = 1 Then
@@ -41804,7 +41856,7 @@ ok112:
 ProcGet = True
 ex123:
 Set pppp = Nothing
-Set usehandler = Nothing
+Set useHandler = Nothing
 Set basestack.lastobj = Nothing
 End Function
 Function ProcPipe(basestack As basetask, rest$) As Boolean
@@ -42455,7 +42507,7 @@ End If
 End Function
 Function MyPut(basestack As basetask, rest$) As Boolean
 Dim s$, f As Long, p As Variant, i As Long, pp As Variant, it As Long, flag As Boolean, arr As Boolean
-Dim usehandler As mHandler, what$, RF As refArray
+Dim useHandler As mHandler, what$, RF As refArray
 MyPut = False
  IsSymbol3 rest$, "#"
 If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
@@ -42474,7 +42526,7 @@ Select Case IsLabel(basestack, rest$, what$)
                 ReadOnly
                 GoTo ex123
             End If
-            Set usehandler = var(it)
+            Set useHandler = var(it)
         ElseIf myVarType(var(it), vbObject) Then
             If Not var(it) Is Nothing Then
                 If TypeOf var(it) Is refArray Then
@@ -42502,7 +42554,7 @@ Select Case IsLabel(basestack, rest$, what$)
                         ReadOnly
                                 GoTo ex123
                         End If
-        Set usehandler = var(it)
+        Set useHandler = var(it)
         flag = True
     Else
     basestack.tmpstr = what$ + "(" + Left$(rest$, 1)
@@ -42582,7 +42634,7 @@ End If
 If flag Then
 Dim buf As MemBlock
 Dim aa() As Byte
-Set buf = usehandler.objref
+Set buf = useHandler.objref
 
 With buf
 If Fstep(f) = 1 Then
@@ -42672,7 +42724,7 @@ ok112:
 MyPut = True
 End If
 ex123:
-Set usehandler = Nothing
+Set useHandler = Nothing
 Set basestack.lastobj = Nothing
 End Function
 
@@ -43653,7 +43705,7 @@ Set myobject = Nothing
 End Function
 
 Function MyDim(basestack As basetask, rest$, Lang As Long, Optional ByVal dNew As Boolean, Optional ByVal fromthere As Long = 0) As Boolean
-Dim par As Boolean, pppp As mArray, it As Long, K As Long, usehandler As mHandler
+Dim par As Boolean, pppp As mArray, it As Long, K As Long, useHandler As mHandler
 Dim p As Variant, W$, s$, X As Variant, i As Long, f As Long, Reverse As Boolean, ss$, uselocalbase As Boolean, usethisbase As Long
 Dim oldbase As Long, common As Boolean, rest1$, zeroitem As Object, tstArray As iBoxArray
 
@@ -43832,9 +43884,9 @@ enter1234:
                         ElseIf IsObjLambda(basestack.lastobj) Then
                             pppp.FillLambda basestack
                         ElseIf IsObjmHandler(basestack.lastobj) Then
-                            Set usehandler = basestack.lastobj
-                            If usehandler.t1 = 4 Then pppp.Fillobj basestack Else Set basestack.lastobj = Nothing
-                            Set usehandler = Nothing
+                            Set useHandler = basestack.lastobj
+                            If useHandler.t1 = 4 Then pppp.Fillobj basestack Else Set basestack.lastobj = Nothing
+                            Set useHandler = Nothing
                         Else
                             Set basestack.lastobj = Nothing
                             If Not zeroitem Is Nothing Then GoTo cont95959
@@ -44645,7 +44697,7 @@ FindPrevOriginal = curparent.OriginalCode
 End Function
 Function iter(bstack As basetask, rest$, Lang As Long) As Boolean
 ' each( array or inventory, start: 1 by default, or -1 for end of list,  end: -1 to end (optional), or we can set it)
-    Dim pppp As iBoxArray, w1 As Long, s$, num As Long, st As Variant, en As Variant, usehandler As mHandler, usehandler1 As mHandler
+    Dim pppp As iBoxArray, w1 As Long, s$, num As Long, st As Variant, en As Variant, useHandler As mHandler, usehandler1 As mHandler
     Dim va As Variant
     
     w1 = Abs(IsLabel(bstack, rest$, s$))
@@ -44689,10 +44741,10 @@ Function iter(bstack As basetask, rest$, Lang As Long) As Boolean
                 End If
             End If
           
-            Set usehandler = New mHandler
+            Set useHandler = New mHandler
             
-           Set usehandler.objref = pppp
-           Set bstack.lastobj = usehandler
+           Set useHandler.objref = pppp
+           Set bstack.lastobj = useHandler
             PlaceIteratorData bstack, var(0), st, en
             iter = True
             Exit Function
@@ -44743,10 +44795,10 @@ conthere111:
                     MissNumExpr
                     Exit Function
                 End If
-                Set usehandler = New mHandler
-                Set bstack.lastobj = usehandler
+                Set useHandler = New mHandler
+                Set bstack.lastobj = useHandler
                 Set usehandler1 = va
-                usehandler.t1 = usehandler1.t1
+                useHandler.t1 = usehandler1.t1
                 GoTo con12345
             End If
             
@@ -45222,16 +45274,16 @@ End Function
 
 Function ProcessIf(flag As Variant, bstack As basetask, rest$, r As Variant) As Boolean
 
-Dim Mode As Boolean, usehandler As mHandler
+Dim Mode As Boolean, useHandler As mHandler
 Mode = flag < 1
 If bstack.lastobj Is Nothing Then
 flag = Int(Abs(flag > 0) * (flag - 1) - (flag <= 0) * (flag + 1) + 1)
 Else
 If TypeOf bstack.lastobj Is mHandler Then
-Set usehandler = bstack.lastobj
-If usehandler.t1 = 4 Then
+Set useHandler = bstack.lastobj
+If useHandler.t1 = 4 Then
 Set bstack.lastobj = Nothing
-Set usehandler = Nothing
+Set useHandler = Nothing
 flag = Int(Abs(flag > 0) * (flag - 1) - (flag <= 0) * (flag + 1) + 1)
 End If
 Else
@@ -45445,7 +45497,7 @@ GetName = part$
 
 End Function
 Sub FeedArray(pppp As iBoxArray, v As Long, fromthis As Object, Optional convert As Boolean = False)
-Dim mm As mStiva, myobject As Object, p As Variant, usehandler As mHandler
+Dim mm As mStiva, myobject As Object, p As Variant, useHandler As mHandler
 Set mm = fromthis
 Do While Not mm.IsEmpty
 If v >= pppp.Count Then Exit Do
@@ -45488,10 +45540,10 @@ ElseIf mm.StackItemTypeIsObject(1) Then
                        If TypeOf myobject Is mHandler Then
                            Set pppp.item(v) = myobject
                        Else
-                        Set usehandler = New mHandler
-                           Set pppp.item(v) = usehandler
-                           usehandler.t1 = p
-                           Set usehandler.objref = myobject
+                        Set useHandler = New mHandler
+                           Set pppp.item(v) = useHandler
+                           useHandler.t1 = p
+                           Set useHandler.objref = myobject
                        End If
                        
                    End If
@@ -45822,7 +45874,7 @@ ElseIf IsExp(bstack, a$, r, , True) Then
 
 End Function
 Private Function IsArrayFun(bstack As basetask, a$, r As Variant) As Boolean
-Dim s$, w1 As Long, pppp As iBoxArray, anything As Object, p As Variant, ms As mStiva, usehandler As mHandler, RF As refArray
+Dim s$, w1 As Long, pppp As iBoxArray, anything As Object, p As Variant, ms As mStiva, useHandler As mHandler, RF As refArray
 If IsStrExp(bstack, a$, s$) Then
         If bstack.lastobj Is Nothing Then
             If Right$("!!" + s$, 2) = "()" Then
@@ -45891,23 +45943,23 @@ checkIterator:
     ElseIf IsExp(bstack, a$, p, nostring:=True) Then
         If Not bstack.lastobj Is Nothing Then
             If TypeOf bstack.lastobj Is mHandler Then
-                Set usehandler = bstack.lastobj
-                If usehandler.indirect >= 0 Then
-                    Set pppp = var(usehandler.indirect)
-                    If usehandler.UseIterator Then
-                    pppp.Index = usehandler.index_cursor
+                Set useHandler = bstack.lastobj
+                If useHandler.indirect >= 0 Then
+                    Set pppp = var(useHandler.indirect)
+                    If useHandler.UseIterator Then
+                    pppp.Index = useHandler.index_cursor
                     End If
                     GoTo check123678
-                ElseIf IsobjArray(usehandler.objref) Then
-                    Set pppp = usehandler.objref
-                    If usehandler.UseIterator Then
-                    pppp.Index = usehandler.index_cursor
+                ElseIf IsobjArray(useHandler.objref) Then
+                    Set pppp = useHandler.objref
+                    If useHandler.UseIterator Then
+                    pppp.Index = useHandler.index_cursor
                     End If
-                    If usehandler.UseIterator Then
+                    If useHandler.UseIterator Then
                     If Not pppp.arr Then NotArray: Exit Function
                     If FastSymbol(a$, ",") Then
                         Set bstack.lastobj = Nothing
-                        Set usehandler = Nothing
+                        Set useHandler = Nothing
                         IsArrayFun = IsExp(bstack, a$, r, , True)
                         IsArrayFun = FastSymbol(a$, ")", True)
                         w1 = r
@@ -45920,10 +45972,10 @@ checkIterator:
                     Else
                     GoTo check123678
                     End If
-                ElseIf TypeOf usehandler.objref Is mStiva Then
-                    Set ms = usehandler.objref
+                ElseIf TypeOf useHandler.objref Is mStiva Then
+                    Set ms = useHandler.objref
                     Set bstack.lastobj = Nothing
-                    Set usehandler = Nothing
+                    Set useHandler = Nothing
                     If FastSymbol(a$, ",") Then
                     If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
                         Set bstack.lastobj = ms.ExportArray(CLng(MyRound(p)))
@@ -45939,13 +45991,13 @@ checkIterator:
                     Set ms = Nothing
                     IsArrayFun = FastSymbol(a$, ")", True)
                     Exit Function
-                ElseIf TypeOf usehandler.objref Is FastCollection Then
+                ElseIf TypeOf useHandler.objref Is FastCollection Then
                     If FastSymbol(a$, "!") Then
-                    Set bstack.lastobj = usehandler.objref.ExportKeys
+                    Set bstack.lastobj = useHandler.objref.ExportKeys
                     Else
-                    Set bstack.lastobj = usehandler.objref.ExportValues
+                    Set bstack.lastobj = useHandler.objref.ExportValues
                     End If
-                    Set usehandler = Nothing
+                    Set useHandler = Nothing
                     IsArrayFun = FastSymbol(a$, ")", True)
                     Exit Function
                 Else
@@ -45976,17 +46028,17 @@ checkIterator:
     End If
 End Function
 Private Function IsStackObj(v$, bstack As basetask, a$, r As Variant) As Boolean
-Dim anything As Object, anything2 As Object, p As Variant, usehandler As mHandler, ms As mStiva
-    Set usehandler = New mHandler
-    Set anything = usehandler
-    usehandler.t1 = 3
+Dim anything As Object, anything2 As Object, p As Variant, useHandler As mHandler, ms As mStiva
+    Set useHandler = New mHandler
+    Set anything = useHandler
+    useHandler.t1 = 3
     
     If FastSymbol(a$, ":=", , 2) Then
         
         If Not GetData(bstack, a$, anything2) Then
             Exit Function
         End If
-        Set usehandler.objref = anything2
+        Set useHandler.objref = anything2
         Set anything2 = Nothing
     ElseIf IsLabelSymbolNew(a$, "ΚΑΤΩ", "DOWN", Abs(AscW(v$) = 83)) Then
     
@@ -45994,17 +46046,17 @@ Dim anything As Object, anything2 As Object, p As Variant, usehandler As mHandle
             If Not bstack.lastobj Is Nothing Then
                 Set anything2 = bstack.lastobj
                 If TypeOf anything2 Is mHandler Then
-                    Set usehandler = anything2
-                    If usehandler.t1 = 3 Then
-                        If Not usehandler.objref Is Nothing Then
-                            If TypeOf usehandler.objref Is mStiva Then
+                    Set useHandler = anything2
+                    If useHandler.t1 = 3 Then
+                        If Not useHandler.objref Is Nothing Then
+                            If TypeOf useHandler.objref Is mStiva Then
                                 Set ms = New mStiva
                                 FastSymbol a$, ","
                                 If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
                                     ms.SplitStackBottom anything2, CLng(Fix(p))
                                 End If
-                                Set usehandler = anything
-                                Set usehandler.objref = ms
+                                Set useHandler = anything
+                                Set useHandler.objref = ms
                                 GoTo normalexit
                             End If
                         End If
@@ -46018,17 +46070,17 @@ Dim anything As Object, anything2 As Object, p As Variant, usehandler As mHandle
             If Not bstack.lastobj Is Nothing Then
                 Set anything2 = bstack.lastobj
                 If TypeOf anything2 Is mHandler Then
-                    Set usehandler = anything2
-                    If usehandler.t1 = 3 Then
-                        If Not usehandler.objref Is Nothing Then
-                            If TypeOf usehandler.objref Is mStiva Then
+                    Set useHandler = anything2
+                    If useHandler.t1 = 3 Then
+                        If Not useHandler.objref Is Nothing Then
+                            If TypeOf useHandler.objref Is mStiva Then
                                 Set ms = New mStiva
                                 FastSymbol a$, ","
                                 If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
                                     ms.SplitStackTop anything2, CLng(Fix(p))
                                 End If
-                                Set usehandler = anything
-                                Set usehandler.objref = ms
+                                Set useHandler = anything
+                                Set useHandler.objref = ms
                                 GoTo normalexit
                             End If
                         End If
@@ -46038,7 +46090,7 @@ Dim anything As Object, anything2 As Object, p As Variant, usehandler As mHandle
         End If
         NoStackObjectFound a$
     Else
-        Set usehandler.objref = New mStiva
+        Set useHandler.objref = New mStiva
     End If
 normalexit:
     Set bstack.lastobj = anything
@@ -46047,19 +46099,19 @@ normalexit:
 
 End Function
 Private Function IsStack(bstack As basetask, a$, r As Variant) As Boolean
-Dim anything As Object, pppp As iBoxArray, p As Variant, anything2 As Object, usehandler As mHandler, usestiva As mStiva
+Dim anything As Object, pppp As iBoxArray, p As Variant, anything2 As Object, useHandler As mHandler, usestiva As mStiva
 If IsExp(bstack, a$, r) Then
     If CheckStackObj(bstack, anything) Then
             If TypeOf anything Is iBoxArray Then
                 Set pppp = anything
                 Set usestiva = New mStiva
                 usestiva.MergeBottomCopyArray pppp
-                Set usehandler = New mHandler
-                Set bstack.lastobj = usehandler
-                usehandler.t1 = 3
-                Set usehandler.objref = usestiva
+                Set useHandler = New mHandler
+                Set bstack.lastobj = useHandler
+                useHandler.t1 = 3
+                Set useHandler.objref = usestiva
                 Set usestiva = Nothing
-                Set usehandler = Nothing
+                Set useHandler = Nothing
                 IsStack = FastSymbol(a$, ")", True)
                 Exit Function
             End If
@@ -46096,12 +46148,12 @@ stack129481:
                 Set usestiva = anything
                 Set anything = usestiva.CopyMe()
             End If
-            Set usehandler = New mHandler
-            usehandler.t1 = 3
-            Set usehandler.objref = anything
-            Set bstack.lastobj = usehandler
+            Set useHandler = New mHandler
+            useHandler.t1 = 3
+            Set useHandler.objref = anything
+            Set bstack.lastobj = useHandler
             Set anything = Nothing
-            Set usehandler = Nothing
+            Set useHandler = Nothing
             Set usestiva = Nothing
         Else
 stack12948:
@@ -46238,125 +46290,112 @@ End If
     End If
 End Function
 Private Function IsSint(bstack As basetask, a$, r As Variant) As Boolean
-Dim p As Variant, rB As Byte, ri As Integer, dn As Long, rd As Double, usehandler As mHandler
+Dim p As Variant, rB As Byte, ri As Integer, dn As Long, rd As Double, useHandler As mHandler
 p = 4
- If IsExp(bstack, a$, r) Then
- If Not bstack.lastobj Is Nothing Then
-If Not TypeOf bstack.lastobj Is mHandler Then: Exit Function
-Set usehandler = bstack.lastobj
- With usehandler
-    If .t1 = 4 Then Set bstack.lastobj = Nothing: GoTo conthere
-    If .t1 <> 2 Then GoTo err1256
-    If Not TypeOf .objref Is MemBlock Then GoTo err1256
-    If Not FastSymbol(a$, ",") Then GoTo err1256
-    If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then GoTo err1256
-
+If IsExp(bstack, a$, r) Then
+    If Not bstack.lastobj Is Nothing Then
+        If Not TypeOf bstack.lastobj Is mHandler Then: Exit Function
+        Set useHandler = bstack.lastobj
+        With useHandler
+            If .t1 = 4 Then Set bstack.lastobj = Nothing: GoTo conthere
+            If .t1 <> 2 Then GoTo err1256
+            If Not TypeOf .objref Is MemBlock Then GoTo err1256
+            If Not FastSymbol(a$, ",") Then GoTo err1256
+            If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then GoTo err1256
             Select Case .objref.ItemSize
             Case 1
                 If .objref.ValidArea2(p, 1) Then
-                GetMem1 .objref.GetPtr(p), rB
-                r = CInt(cUbyte(rB))
-                   Else
+                    GetMem1 .objref.GetPtr(p), rB
+                    r = CInt(cUbyte(rB))
+                Else
                     GoTo err1256
                 End If
             Case 2
                 If .objref.ValidArea2(p, 2) Then
-                GetMem2 .objref.GetPtr(p), ri
+                    GetMem2 .objref.GetPtr(p), ri
                     r = ri
-   
                 Else
                     GoTo err1256
                 End If
             Case 8
                 If .objref.ValidArea2(p, 8) Then
-                GetMem8 .objref.GetPtr(p), rd
-                r = rd
+                    GetMem8 .objref.GetPtr(p), rd
+                    r = rd
                 Else
                     GoTo err1256
                 End If
             Case 4
                 If .objref.ValidArea2(p, 4) Then
-                GetMem4 .objref.GetPtr(p), dn
-                r = dn
-                
-            Else
+                    GetMem4 .objref.GetPtr(p), dn
+                    r = dn
+                Else
 err1256:
-                Set bstack.lastobj = Nothing
-                Set usehandler = Nothing
-                MyErMacro a$, "Wrong Size-Position for reading buffer", "Λάθος Μέγεθος-θέση, για διάβασμα Διάρθρωσης"
-                
-                Exit Function
+                    Set bstack.lastobj = Nothing
+                    Set useHandler = Nothing
+                    MyErMacro a$, "Wrong Size-Position for reading buffer", "Λάθος Μέγεθος-θέση, για διάβασμα Διάρθρωσης"
+                    Exit Function
                 End If
             End Select
-            
- End With
- Set bstack.lastobj = Nothing
- Set usehandler = Nothing
-  IsSint = FastSymbol(a$, ")", True)
-    Exit Function
- End If
+        End With
+        Set bstack.lastobj = Nothing
+        Set useHandler = Nothing
+        IsSint = FastSymbol(a$, ")", True)
+        Exit Function
+    End If
 conthere:
- If FastSymbol(a$, ",") Then
- If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
- If p = 4 Then GoTo contsint1
- 
- On Error Resume Next
-    If r < 0 Then
-    
-      MyErMacro a$, "Unsigned Integer can't be negative", "Ο χωρίς πρόσημο ακέραιος δεν μπορεί να είναι αρνητικός"
-   
-    Exit Function
-    End If
-    If p = 8 Then
-        r = SignInt64(r)
-    ElseIf p = 2 Then
-        r = cUint(signlong(r))
+    If FastSymbol(a$, ",") Then
+        If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            If p = 4 Then GoTo contsint1
+            On Error Resume Next
+            If r < 0 Then
+                MyErMacro a$, "Unsigned Integer can't be negative", "Ο χωρίς πρόσημο ακέραιος δεν μπορεί να είναι αρνητικός"
+                Exit Function
+            End If
+            If p = 8 Then
+                r = SignInt64(r)
+            ElseIf p = 2 Then
+                r = cUint(signlong(r))
+            Else
+                r = cUbyte(signlong(r))
+            End If
+            If Err.Number > 0 Then
+                If p <= 4 Then
+                    Err.Clear
+                    r = SignInt64(r)
+                End If
+                If Err.Number > 0 Then
+                    Unsignlongfailed a$
+                    IsSint = False
+                    Exit Function
+                End If
+            End If
+            On Error GoTo 0
+            IsSint = FastSymbol(a$, ")", True)
+            Exit Function
+        End If
     Else
-        r = cUbyte(signlong(r))
-    End If
-    If Err.Number > 0 Then
-    If p <= 4 Then
-        Err.Clear
-        r = SignInt64(r)
-    End If
-    If Err.Number > 0 Then
-     Unsignlongfailed a$
-    IsSint = False
-    Exit Function
-    End If
-    End If
-    On Error GoTo 0
-  IsSint = FastSymbol(a$, ")", True)
-    Exit Function
-    
- End If
- Else
 contsint1:
-    On Error Resume Next
-    If r < 0 Then
-        Unsignlongnegative a$
-    Exit Function
-    End If
-    r = signlong(r)
-    If Err.Number > 0 Then
-     Err.Clear
-        r = SignInt64(r)
-    If Err.Number > 0 Then
-    
-    
-    Unsignlongfailed a$
-
-    IsSint = False
-    Exit Function
-    End If
-    End If
-    End If
-    On Error GoTo 0
-  IsSint = FastSymbol(a$, ")", True)
-    Exit Function
-      Else
-                    
-                MissParam a$
+        On Error Resume Next
+        If r < 0 Then
+            Unsignlongnegative a$
+            Exit Function
+        End If
+        r = signlong(r)
+            If Err.Number > 0 Then
+                Err.Clear
+                r = SignInt64(r)
+                If Err.Number > 0 Then
+                    Unsignlongfailed a$
+                    IsSint = False
+                    Exit Function
+                End If
+            End If
+        End If
+        On Error GoTo 0
+        IsSint = FastSymbol(a$, ")", True)
+        Exit Function
+    Else
+        MissParam a$
     End If
 End Function
 Private Function IsUsgn(bstack As basetask, a$, r As Variant) As Boolean
@@ -46415,19 +46454,19 @@ IsHIWORD = FastSymbol(a$, ")", True)
     End If
 End Function
 Private Function IsLen(bstack As basetask, a$, r As Variant) As Boolean
-Dim anything As Object, p As Variant, s$, usehandler As mHandler, rA As refArray
+Dim anything As Object, p As Variant, s$, useHandler As mHandler, rA As refArray
     If IsExp(bstack, a$, p) Then
 len1234:
         If bstack.lastobj Is Nothing Then GoTo bypass1
         If TypeOf bstack.lastobj Is mHandler Then
-            Set usehandler = bstack.lastobj
-            While Typename$(usehandler.objref) = mHdlr
-            Set usehandler = bstack.lastobj
-            Set bstack.lastobj = usehandler.objref
+            Set useHandler = bstack.lastobj
+            While Typename$(useHandler.objref) = mHdlr
+            Set useHandler = bstack.lastobj
+            Set bstack.lastobj = useHandler.objref
             Wend
             
             Set bstack.lastobj = Nothing
-            With usehandler
+            With useHandler
                 If .indirect < 0 Then
                 
                     If .t1 = 1 Then
@@ -46444,11 +46483,11 @@ len1234:
                         Exit Function
                     ElseIf .t1 = 3 Then
                         ' if CheckDeepAny
-                        Set anything = usehandler
+                        Set anything = useHandler
                         If CheckDeepAny(anything) Then
                             If Typename(anything) = mHdlr Then
-                                Set usehandler = anything
-                                r = usehandler.objref.Count
+                                Set useHandler = anything
+                                r = useHandler.objref.Count
                             Else
                                 r = anything.Count
                             End If
@@ -46462,7 +46501,7 @@ len1234:
                         IsLen = FastSymbol(a$, ")", True)
                         Exit Function
                     ElseIf .t1 = 4 Then
-                        r = usehandler.index_start
+                        r = useHandler.index_start
                         IsLen = FastSymbol(a$, ")", True)
                         Exit Function
                     End If
@@ -46528,15 +46567,15 @@ bypass1:
 
 End Function
 Private Function IsLenDisp(bstack As basetask, a$, r As Variant) As Boolean
-Dim p As Variant, s$, usehandler As mHandler
+Dim p As Variant, s$, useHandler As mHandler
 
     If IsExp(bstack, a$, p) Then
     If Typename(bstack.lastobj) = mHdlr Then
     ' check this please
-    Set usehandler = bstack.lastobj
-    If usehandler.t1 = 4 Then wronguseofenum a$: Exit Function
+    Set useHandler = bstack.lastobj
+    If useHandler.t1 = 4 Then wronguseofenum a$: Exit Function
     
-    With usehandler
+    With useHandler
     If .indirect < 0 Then
     If TypeOf .objref Is FastCollection Then
         r = .objref.Count
@@ -47084,7 +47123,7 @@ End Function
 Private Function IsEval(v$, bstack As basetask, a$, r As Variant) As Boolean
 Dim p As Variant, anything As Object, w3 As Long, w2 As Long, w1 As Long, pp As Variant, rB As Byte, ri As Integer, dn As Long, s$, ss$
 Dim db As Double, pppp As iBoxArray, IsGroupOnly As Group, ReadAsSingle As Boolean, ReadInt64 As Boolean, ds As Single
-Dim ThisGroup As Group, t$, usehandler As mHandler, usehandler1 As mHandler, ReadAsCurrency As Boolean
+Dim ThisGroup As Group, t$, useHandler As mHandler, usehandler1 As mHandler, ReadAsCurrency As Boolean
 w1 = 1
 t$ = aheadstatus(a$, False, w1)
 s$ = Left$(a$, w1)
@@ -47205,13 +47244,13 @@ handlehandlers:
         s$ = vbNullString
         If Typename(bstack.lastobj) = mHdlr Then
             Set anything = bstack.lastobj
-            Set usehandler = bstack.lastobj
-            If usehandler.IamEnum Then
-                     r = usehandler.index_cursor
+            Set useHandler = bstack.lastobj
+            If useHandler.IamEnum Then
+                     r = useHandler.index_cursor
                      
-                     If usehandler.t1 = 0 Then
-                     If IsObject(usehandler.objref) Then
-                     Set bstack.lastobj = usehandler.objref
+                     If useHandler.t1 = 0 Then
+                     If IsObject(useHandler.objref) Then
+                     Set bstack.lastobj = useHandler.objref
                      Else
                       Set bstack.lastobj = Nothing
                      End If
@@ -47226,8 +47265,8 @@ handlehandlers:
                      IsEval = False
                      Exit Function
             End If
-            Set usehandler = anything
-            With usehandler
+            Set useHandler = anything
+            With useHandler
                 If .t1 = 1 Then
                         If FastSymbol(a$, ",") Then
                         If IsExp(bstack, a$, pp, flatobject:=True, nostring:=True) Then
@@ -47255,7 +47294,7 @@ handlehandlers:
                             Set bstack.lastobj = Nothing
                         Else
                             If .objref.IsObj Then
-                                r = rValue(bstack, usehandler.objref.ValueObj)
+                                r = rValue(bstack, useHandler.objref.ValueObj)
                                 
                                 '' bstack.lastobj is .objref.ValueObj
                                 
@@ -47476,19 +47515,19 @@ errortext1:
             ElseIf .t1 = 4 Then
                 Set usehandler1 = New mHandler
                 If w3 = -1 Then
-                    usehandler1.index_cursor = usehandler.index_cursor
-                    Set usehandler1.objref = usehandler.objref
-                    usehandler1.index_start = usehandler.index_start
-                    usehandler1.sign = usehandler.sign
+                    usehandler1.index_cursor = useHandler.index_cursor
+                    Set usehandler1.objref = useHandler.objref
+                    usehandler1.index_start = useHandler.index_start
+                    usehandler1.sign = useHandler.sign
                     If myVarType(usehandler1.index_cursor, vbString) Then
                         r = usehandler1.index_cursor
                     Else
                         r = usehandler1.index_cursor * usehandler1.sign
                     End If
                 Else
-                    usehandler1.index_cursor = usehandler.objref.Value
-                    Set usehandler1.objref = usehandler.objref
-                    usehandler1.index_start = usehandler.objref.Index
+                    usehandler1.index_cursor = useHandler.objref.Value
+                    Set usehandler1.objref = useHandler.objref
+                    usehandler1.index_start = useHandler.objref.Index
                     r = usehandler1.index_cursor
                 End If
                 usehandler1.t1 = 4
@@ -47504,7 +47543,7 @@ there1234459:
             End If
             Set anything = Nothing
         End With
-        Set usehandler = Nothing
+        Set useHandler = Nothing
     ElseIf Not bstack.lastpointer Is Nothing Then
 getgroup:
             If Not bstack.lastpointer.IamApointer Then Set bstack.lastpointer = bstack.lastobj
@@ -48584,7 +48623,7 @@ Exit Function
 End Function
 Public Function GetPointer(bstack As basetask, a$) As Boolean
 Dim w1 As Long, s$, ppppl As iBoxArray, w2 As Long, p, nbstack As basetask, myobj As Object, i As Long
-Dim Glob As Boolean, rempar As Long, waspointer As Boolean, usehandler As mHandler
+Dim Glob As Boolean, rempar As Long, waspointer As Boolean, useHandler As mHandler
 If MaybeIsSymbol(a$, ")") Then
 p = 0
 GoTo checkagain
@@ -48699,11 +48738,11 @@ cont11:
     End If
     Set p = var(w1)
 again99:
-        Set usehandler = Nothing
+        Set useHandler = Nothing
         If GetArrayReference(bstack, a$, s$ + ")", p, ppppl, w2) Then
             
 conthere:
-            Set usehandler = Nothing
+            Set useHandler = Nothing
             If ppppl.ItemType(w2) = mGroup Then
                 Set p = ppppl.item(w2)
                 If p.IamApointer Then
@@ -48725,8 +48764,8 @@ conthere:
                     Set p = ppppl.item(w2)
                     If Left$(a$, 1) = "(" Then
                         Mid$(a$, 1, 1) = " "
-                        Set usehandler = p
-                        With usehandler
+                        Set useHandler = p
+                        With useHandler
                             If Not .objref Is Nothing Then
                             
                             If TypeOf .objref Is iBoxArray Then Set ppppl = .objref: Set p = ppppl: GoTo again99
@@ -49102,7 +49141,7 @@ a13415:
     End If
 End Function
 Private Function IsCar(bstack As basetask, a$, r As Variant) As Boolean
-    Dim anything As Object, pppp As iBoxArray, s$, usehandler As mHandler
+    Dim anything As Object, pppp As iBoxArray, s$, useHandler As mHandler
     Dim pppp0 As mArray, mTuple As tuple
     If IsExp(bstack, a$, r) Then
 car1023:
@@ -49122,11 +49161,11 @@ car1023:
             End If
             On Error Resume Next
             Set pppp = anything
-            Set usehandler = New mHandler
-            usehandler.t1 = 3
-            Set usehandler.objref = pppp
-            Set anything = usehandler
-            Set usehandler = Nothing
+            Set useHandler = New mHandler
+            useHandler.t1 = 3
+            Set useHandler.objref = pppp
+            Set anything = useHandler
+            Set useHandler = Nothing
             
             Set bstack.lastobj = anything
             Set pppp = Nothing
@@ -49146,7 +49185,7 @@ car1023:
 
 End Function
 Private Function IsCdr(bstack As basetask, a$, r As Variant) As Boolean
-Dim anything As Object, pppp As iBoxArray, s$, usehandler As mHandler
+Dim anything As Object, pppp As iBoxArray, s$, useHandler As mHandler
 Dim pppp0 As mArray, mTuple As tuple
     If IsExp(bstack, a$, r) Then
 cdr1022:
@@ -49166,13 +49205,13 @@ cdr1022:
             End If
             On Error Resume Next
             Set pppp = anything
-            Set usehandler = New mHandler
-            usehandler.t1 = 3
-            Set usehandler.objref = pppp
-            Set bstack.lastobj = usehandler
+            Set useHandler = New mHandler
+            useHandler.t1 = 3
+            Set useHandler.objref = pppp
+            Set bstack.lastobj = useHandler
             Set pppp = Nothing
             Set anything = Nothing
-            Set usehandler = Nothing
+            Set useHandler = Nothing
         ElseIf IsStrExp(bstack, a$, s$, False) Then
         GoTo cdr1022
         Else
@@ -49684,7 +49723,7 @@ Dim Scr As Object, oldcol As Long, oldFTEXT As Long, oldFTXT As String, oldpen A
 Dim par As Boolean, i As Long, f As Long, p As Variant, w4 As Boolean, pn&, s$, dlen As Long
 Dim o As Long, w3 As Long, x1 As Long, y1 As Long, X As Double, ColOffset As Long, anyBigInteger As BigInteger
 Dim work As Boolean, work2 As Long, skiplast As Boolean, ss$, ls As Long, myobject As Object, counter As Long, Counterend As Long, countDir As Long
-Dim bck$, clearline As Boolean, ihavecoma As Boolean, isboolean As Boolean, usehandler As mHandler
+Dim bck$, clearline As Boolean, ihavecoma As Boolean, isboolean As Boolean, useHandler As mHandler
 Set Scr = basestack.Owner
 Dim rest$, where As Long, Final As Boolean
 
@@ -50237,23 +50276,23 @@ takeone:
                 GoTo takeone
                 ElseIf IsObjmHandler(basestack.lastobj) Then
                     Set myobject = basestack.lastobj
-                    Set usehandler = myobject
+                    Set useHandler = myobject
                     Set basestack.lastobj = Nothing
                     With myobject
-                    If usehandler.UseIterator Then
-                        If TypeOf usehandler.objref Is Enumeration Then
-                        p = usehandler.objref.Value
-                        Set usehandler = Nothing
+                    If useHandler.UseIterator Then
+                        If TypeOf useHandler.objref Is Enumeration Then
+                        p = useHandler.objref.Value
+                        Set useHandler = Nothing
                         Set myobject = Nothing
                         GoTo isanumber
                         Else
-                        Counterend = usehandler.index_End
+                        Counterend = useHandler.index_End
                         If Counterend = -1 Then
-                        Set usehandler = Nothing
+                        Set useHandler = Nothing
                         Set myobject = Nothing
                         GoTo isAstring
                         Else
-                        counter = usehandler.index_start
+                        counter = useHandler.index_start
                         If counter <= Counterend Then countDir = 1 Else countDir = -1
                         End If
                         End If
@@ -50261,9 +50300,9 @@ takeone:
                         Counterend = -1
                         counter = 0
                         countDir = 1
-                       If usehandler.t1 = 4 Then
+                       If useHandler.t1 = 4 Then
                        
-                            Set usehandler = Nothing
+                            Set useHandler = Nothing
                             Set myobject = Nothing
                             If MemInt(VarPtr(p)) = vbString Then
                             s$ = p
@@ -50271,13 +50310,13 @@ takeone:
                             Else
                                 GoTo isanumber
                             End If
-                        ElseIf usehandler.t1 = 2 Then
+                        ElseIf useHandler.t1 = 2 Then
                             p = 0
-                            Set usehandler = Nothing
+                            Set useHandler = Nothing
                             GoTo isanumber
                         ElseIf Not CheckIsmArrayOrStackOrCollection(myobject) Then
                             Set myobject = Nothing
-                            Set usehandler = Nothing
+                            Set useHandler = Nothing
                         Else
                                 SwapStrings rest$, bck$
                                 GoTo takeone
@@ -50289,25 +50328,25 @@ takeone:
                     NoProperObject
                     rest$ = bck$: RevisionPrint = False: GoTo exit2
                     End If
-                    Set usehandler = myobject
-                    If Typename(usehandler.objref) = "FastCollection" Then
-                             Set myobject = usehandler.objref
+                    Set useHandler = myobject
+                    If Typename(useHandler.objref) = "FastCollection" Then
+                             Set myobject = useHandler.objref
                              SwapStrings rest$, bck$
                         GoTo takeone
-                    ElseIf Typename(usehandler.objref) = "mStiva" Then
-                        Set myobject = usehandler.objref
+                    ElseIf Typename(useHandler.objref) = "mStiva" Then
+                        Set myobject = useHandler.objref
                         SwapStrings rest$, bck$
                         GoTo takeone
 
-                    ElseIf Typename(usehandler.objref) = myArray Then
-                        If usehandler.objref.arr Then
-                            Set myobject = usehandler.objref
+                    ElseIf Typename(useHandler.objref) = myArray Then
+                        If useHandler.objref.arr Then
+                            Set myobject = useHandler.objref
                             SwapStrings rest$, bck$
                         GoTo takeone
                         End If
-                   ElseIf Typename(usehandler.objref) = "Enumeration" Then
+                   ElseIf Typename(useHandler.objref) = "Enumeration" Then
                  
-                            Set myobject = usehandler.objref
+                            Set myobject = useHandler.objref
                  
                             SwapStrings rest$, bck$
                        GoTo takeone
@@ -50482,8 +50521,10 @@ End If
                 s$ = CStr(p)
              Case vbString
                 s$ = LTrim$(p)
-             Case 9, 13
+             Case 9
                 s$ = "*" + Typename$(p)
+             Case 13
+                s$ = "*Unknown"
              Case Else
                 s$ = fixthis(p)
              End Select
@@ -51152,11 +51193,11 @@ End Function
 
 
 Public Function CheckStackObj(bstack As basetask, anything As Object, Optional counter As Long) As Boolean
-Dim usehandler As mHandler
+Dim useHandler As mHandler
 If TypeOf bstack.lastobj Is mHandler Then
-        Set usehandler = bstack.lastobj
-        If usehandler.t1 <> 3 Then Exit Function
-        counter = usehandler.index_cursor + 1
+        Set useHandler = bstack.lastobj
+        If useHandler.t1 <> 3 Then Exit Function
+        counter = useHandler.index_cursor + 1
         Set anything = bstack.lastobj
         Set bstack.lastobj = Nothing
         If CheckDeepAny(anything) Then CheckStackObj = True
@@ -51165,7 +51206,7 @@ End If
 End Function
 
 Function IsEnumLabelOnly(bstack As basetask, b$) As Boolean
-Dim usehandler0 As mHandler, usehandler As mHandler, ss$, i As Long, that, once As Boolean
+Dim usehandler0 As mHandler, useHandler As mHandler, ss$, i As Long, that, once As Boolean
     If lookOne(b$, ".") Then
         If IsNumber(bstack, b$, that) Then
             If Not bstack.lastobj Is Nothing Then
@@ -51183,13 +51224,13 @@ Dim usehandler0 As mHandler, usehandler As mHandler, ss$, i As Long, that, once 
 conthere1012:
                 If usehandler0.t1 = 4 Then
                         
-                        Set usehandler = New mHandler
-                        usehandler.t1 = 4
-                        Set usehandler.objref = usehandler0.objref
-                        usehandler.index_start = usehandler0.index_start
-                        usehandler.index_cursor = usehandler0.index_cursor
-                        usehandler.sign = 1
-                        Set bstack.lastobj = usehandler
+                        Set useHandler = New mHandler
+                        useHandler.t1 = 4
+                        Set useHandler.objref = usehandler0.objref
+                        useHandler.index_start = usehandler0.index_start
+                        useHandler.index_cursor = usehandler0.index_cursor
+                        useHandler.sign = 1
+                        Set bstack.lastobj = useHandler
                         IsEnumLabelOnly = True
                         Exit Function
                 End If
@@ -51201,7 +51242,7 @@ End Function
 Function IsEnumAs(bstack As basetask, b$, p, Optional initval As Boolean, Optional part$) As Boolean
 initval = False
 
-Dim usehandler0 As mHandler, usehandler As mHandler, ss$, i As Long, that, once As Boolean
+Dim usehandler0 As mHandler, useHandler As mHandler, ss$, i As Long, that, once As Boolean
     If lookOne(b$, ".") Then
         If IsNumber(bstack, b$, that) Then
             If bstack.lastobj Is Nothing Then GoTo aa2
@@ -51220,17 +51261,17 @@ backhere:
                     Set usehandler0 = var(i)
 conthere1001:
                     If usehandler0.t1 = 4 And usehandler0.IamEnum = False Then
-                        Set usehandler = New mHandler
-                        usehandler.t1 = 4
-                        Set usehandler.objref = usehandler0.objref
-                        usehandler.index_start = 0
-                        usehandler.index_cursor = usehandler0.objref.ZeroValue
+                        Set useHandler = New mHandler
+                        useHandler.t1 = 4
+                        Set useHandler.objref = usehandler0.objref
+                        useHandler.index_start = 0
+                        useHandler.index_cursor = usehandler0.objref.ZeroValue
                         If p < 0 Then
-                            usehandler.sign = -1
+                            useHandler.sign = -1
                         Else
-                            usehandler.sign = 1
+                            useHandler.sign = 1
                         End If
-                        Set p = usehandler
+                        Set p = useHandler
                         If Len(part$) = 0 Then
                             If FastSymbol(b$, "=") Then
                                 If lookOne(b$, ".") Then
@@ -51249,22 +51290,22 @@ conthere1001:
                                             Set usehandler0 = var(i)
 conthere1012:
                                             If usehandler0.t1 = 4 Then
-                                                If usehandler0.objref.EnumName = usehandler.objref.EnumName Then
+                                                If usehandler0.objref.EnumName = useHandler.objref.EnumName Then
                                                     initval = True
-                                                    usehandler.index_start = usehandler0.index_start
-                                                    usehandler.index_cursor = usehandler0.index_cursor
-                                                    usehandler.sign = 1
+                                                    useHandler.index_start = usehandler0.index_start
+                                                    useHandler.index_cursor = usehandler0.index_cursor
+                                                    useHandler.sign = 1
                                                     IsEnumAs = True
                                                     Exit Function
                                                 Else
                                                     usehandler0.CopyTo usehandler0
-                                                    If usehandler.objref.ExistFromOther2(usehandler0) Then
-                                                        Set usehandler0.objref = usehandler.objref
-                                                        usehandler0.index_start = usehandler.objref.Index
+                                                    If useHandler.objref.ExistFromOther2(usehandler0) Then
+                                                        Set usehandler0.objref = useHandler.objref
+                                                        usehandler0.index_start = useHandler.objref.Index
                                                         initval = True
-                                                        Set usehandler = usehandler0
-                                                        usehandler.sign = 1
-                                                        Set p = usehandler
+                                                        Set useHandler = usehandler0
+                                                        useHandler.sign = 1
+                                                        Set p = useHandler
                                                         IsEnumAs = True
                                                         Exit Function
                                                     End If
@@ -51296,23 +51337,23 @@ checknow:
                                         Set usehandler0 = var(i)
 conthere1002:
                                         If usehandler0.t1 = 4 Then
-                                            If usehandler0.objref.EnumName = usehandler.objref.EnumName Then
+                                            If usehandler0.objref.EnumName = useHandler.objref.EnumName Then
                                                 initval = True
-                                                usehandler.index_start = usehandler0.index_start
-                                                usehandler.index_cursor = usehandler0.index_cursor
-                                                usehandler.sign = 1
+                                                useHandler.index_start = usehandler0.index_start
+                                                useHandler.index_cursor = usehandler0.index_cursor
+                                                useHandler.sign = 1
                                                 initval = True
                                                 IsEnumAs = True
                                                 Exit Function
                                             Else
                                                 usehandler0.CopyTo usehandler0
-                                                If usehandler.objref.ExistFromOther2(usehandler0) Then
-                                                    Set usehandler0.objref = usehandler.objref
-                                                    usehandler0.index_start = usehandler.objref.Index
+                                                If useHandler.objref.ExistFromOther2(usehandler0) Then
+                                                    Set usehandler0.objref = useHandler.objref
+                                                    usehandler0.index_start = useHandler.objref.Index
                                                     initval = True
-                                                    Set usehandler = usehandler0
-                                                    usehandler.sign = 1
-                                                    Set p = usehandler
+                                                    Set useHandler = usehandler0
+                                                    useHandler.sign = 1
+                                                    Set p = useHandler
                                                     IsEnumAs = True
                                                     Exit Function
                                                 End If
@@ -51349,7 +51390,7 @@ End Function
 
 Public Function exeSelect(ExecuteLong, once As Boolean, bstack As basetask, b$, v As Long, Lang As Long) As Boolean
 Dim ok As Boolean, x1 As Long, y1 As Long, sp As Variant, st As Variant, sw$, slct As Long, ss$
-Dim x2 As Long, y2 As Long, p As Variant, W$, dum As Boolean, i As Long, nd&, lbl$, usehandler As mHandler
+Dim x2 As Long, y2 As Long, p As Variant, W$, dum As Boolean, i As Long, nd&, lbl$, useHandler As mHandler
 Dim checkenum As Boolean, enumindex As Long, EnumName As String, that As BigInteger
 Dim Pos As Long
                 
@@ -51446,12 +51487,12 @@ jumphere1:
                                 ElseIf checkenum Then
                                     If bstack.lastobj Is Nothing Then GoTo cont00123
                                     If Not TypeOf bstack.lastobj Is mHandler Then GoTo err001101
-                                    Set usehandler = bstack.lastobj
+                                    Set useHandler = bstack.lastobj
                                     Set bstack.lastobj = Nothing
-                                    If usehandler.t1 <> 4 Then GoTo err001101
-                                    usehandler.objref.Index = usehandler.index_start
-                                    If EnumName = usehandler.objref.KeyToString() Or slct = -1 Then
-                                        Set usehandler = Nothing
+                                    If useHandler.t1 <> 4 Then GoTo err001101
+                                    useHandler.objref.Index = useHandler.index_start
+                                    If EnumName = useHandler.objref.KeyToString() Or slct = -1 Then
+                                        Set useHandler = Nothing
                                         If slct = 1 Then slct = 0: GoTo selslct0
                                         GoTo contLoop
                                     End If
@@ -52027,10 +52068,10 @@ here12002:
     If IsExp(bstack, b$, sp) Then
         If bstack.lastobj Is Nothing Then GoTo err001101
         If Not TypeOf bstack.lastobj Is mHandler Then GoTo err001101
-        Set usehandler = bstack.lastobj
+        Set useHandler = bstack.lastobj
         Set bstack.lastobj = Nothing
-        If usehandler.t1 <> 4 Then GoTo err001101
-        sp = usehandler.index_cursor
+        If useHandler.t1 <> 4 Then GoTo err001101
+        sp = useHandler.index_cursor
         
         If myVarType(sp, vbString) Then
             sw$ = sp
@@ -52039,11 +52080,11 @@ here12002:
              x1 = 1
         End If
         
-        enumindex = usehandler.index_start
-        usehandler.objref.Index = enumindex
-        EnumName = usehandler.objref.KeyToString()
+        enumindex = useHandler.index_start
+        useHandler.objref.Index = enumindex
+        EnumName = useHandler.objref.KeyToString()
         checkenum = True
-        Set usehandler = Nothing
+        Set useHandler = Nothing
         
         GoTo secondentry
     End If
@@ -52086,19 +52127,19 @@ End If
 End Function
 
 Function GetArrayReference(bstack As basetask, a$, v$, pp, result As iBoxArray, Index As Long) As Boolean
-Dim dn As Long, dd As Long, p, w3, w2 As Long, ppppl As iBoxArray, pppp As mArray, usehandler As mHandler
+Dim dn As Long, dd As Long, p, w3, w2 As Long, ppppl As iBoxArray, pppp As mArray, useHandler As mHandler
 If pp Is Nothing Then Exit Function
 If Not TypeOf pp Is iBoxArray Then
 If TypeOf pp Is mHandler Then
-Set usehandler = pp
-With usehandler
+Set useHandler = pp
+With useHandler
 If .t1 = 3 Then If Not .objref Is Nothing Then If TypeOf .objref Is iBoxArray Then Set pp = .objref: GoTo cont
 End With
 End If
 Exit Function
 End If
 cont:
-Set usehandler = Nothing
+Set useHandler = Nothing
 Set ppppl = pp
 
 If ppppl.arr Then
@@ -52846,7 +52887,7 @@ End If
 
 End Function
 Public Function CheckIsmArray(obj As Object) As Boolean
-Dim oldobj As Object, usehandler As mHandler
+Dim oldobj As Object, useHandler As mHandler
 If obj Is Nothing Then Exit Function
 Set oldobj = obj
 
@@ -52854,14 +52895,14 @@ Dim kk As Long
 again:
 If kk > 20 Then Set obj = oldobj: Exit Function
 If TypeOf obj Is mHandler Then
-Set usehandler = obj
-    If usehandler.t1 = 3 Then
-        If usehandler.indirect >= 0 And usehandler.indirect <= var2used Then
-                Set obj = var(usehandler.indirect)
+Set useHandler = obj
+    If useHandler.t1 = 3 Then
+        If useHandler.indirect >= 0 And useHandler.indirect <= var2used Then
+                Set obj = var(useHandler.indirect)
                 kk = kk + 1
                 GoTo again
         Else
-                Set obj = usehandler.objref
+                Set obj = useHandler.objref
         End If
 
     End If
@@ -52873,7 +52914,7 @@ End If
 Set obj = oldobj
 End Function
 Public Function CheckIsmStiva(obj As Object) As Boolean
-Dim oldobj As Object, usehandler As mHandler
+Dim oldobj As Object, useHandler As mHandler
 If obj Is Nothing Then Exit Function
 Set oldobj = obj
 
@@ -52881,14 +52922,14 @@ Dim kk As Long
 again:
 If kk > 20 Then Set obj = oldobj: Exit Function
 If TypeOf obj Is mHandler Then
-Set usehandler = obj
-    If usehandler.t1 = 3 Then
-        If usehandler.indirect >= 0 And usehandler.indirect <= var2used Then
-                Set obj = var(usehandler.indirect)
+Set useHandler = obj
+    If useHandler.t1 = 3 Then
+        If useHandler.indirect >= 0 And useHandler.indirect <= var2used Then
+                Set obj = var(useHandler.indirect)
                 kk = kk + 1
                 GoTo again
         Else
-                Set obj = usehandler.objref
+                Set obj = useHandler.objref
         End If
 
     End If
@@ -52900,7 +52941,7 @@ End If
 Set obj = oldobj
 End Function
 Public Function CheckIsmArrayOrStackOrCollection(obj As Object) As Boolean
-Dim oldobj As Object, usehandler As mHandler
+Dim oldobj As Object, useHandler As mHandler
 If obj Is Nothing Then Exit Function
 Set oldobj = obj
 
@@ -52908,14 +52949,14 @@ Dim kk As Long
 again:
 If kk > 20 Then Set obj = oldobj: Exit Function
 If TypeOf obj Is mHandler Then
-Set usehandler = obj
-    If usehandler.t1 <> 2 Then
-        If usehandler.indirect >= 0 And usehandler.indirect <= var2used Then
-                Set obj = var(usehandler.indirect)
+Set useHandler = obj
+    If useHandler.t1 <> 2 Then
+        If useHandler.indirect >= 0 And useHandler.indirect <= var2used Then
+                Set obj = var(useHandler.indirect)
                 kk = kk + 1
                 GoTo again
         Else
-                Set obj = usehandler.objref
+                Set obj = useHandler.objref
         End If
    
     End If
@@ -52945,7 +52986,7 @@ End If
 Set obj = oldobj
 End Function
 Public Function CheckAnyArray(obj As Object) As Boolean
-Dim oldobj As Object, usehandler As mHandler
+Dim oldobj As Object, useHandler As mHandler
 If obj Is Nothing Then Exit Function
 Set oldobj = obj
 
@@ -52953,14 +52994,14 @@ Dim kk As Long
 again:
 If kk > 20 Then Set obj = oldobj: Exit Function
 If TypeOf obj Is mHandler Then
-Set usehandler = obj
-    If usehandler.t1 = 3 Then
-        If usehandler.indirect >= 0 And usehandler.indirect <= var2used Then
-                Set obj = var(usehandler.indirect)
+Set useHandler = obj
+    If useHandler.t1 = 3 Then
+        If useHandler.indirect >= 0 And useHandler.indirect <= var2used Then
+                Set obj = var(useHandler.indirect)
                 kk = kk + 1
                 GoTo again
         Else
-                Set obj = usehandler.objref
+                Set obj = useHandler.objref
         End If
 
     End If
@@ -52984,7 +53025,7 @@ End If
 Set obj = oldobj
 End Function
 Public Function CheckDeepAny(obj As Object) As Boolean
-Dim oldobj As Object, usehandler As mHandler
+Dim oldobj As Object, useHandler As mHandler
 If obj Is Nothing Then Exit Function
 Set oldobj = obj
 
@@ -52992,14 +53033,14 @@ Dim kk As Long
 again:
 If kk > 20 Then Set obj = oldobj: Exit Function
 If TypeOf obj Is mHandler Then
-Set usehandler = obj
-    If usehandler.t1 = 3 Then
-        If usehandler.indirect >= 0 And usehandler.indirect <= var2used Then
-                Set obj = var(usehandler.indirect)
+Set useHandler = obj
+    If useHandler.t1 = 3 Then
+        If useHandler.indirect >= 0 And useHandler.indirect <= var2used Then
+                Set obj = var(useHandler.indirect)
                 kk = kk + 1
                 GoTo again
         Else
-                Set obj = usehandler.objref
+                Set obj = useHandler.objref
         End If
 
     End If
@@ -53130,7 +53171,7 @@ Select Case n And &H7FF
             ret = "String"
         Case 10
             ret = "Error"
-        Case 9, 13
+        Case 9
             ret = Typename(v)
             If ret = "FastCollection" Then
                 If v.IsQueue Then ret = "Queue" Else ret = "List"
@@ -53139,6 +53180,8 @@ Select Case n And &H7FF
             ret = "Boolean"
         Case 12, 1
             ret = "Variant"
+        Case 12
+            ret = "Unknown"
         Case 14
             ret = "Decimal"
         Case 17
@@ -53182,12 +53225,14 @@ Public Function ArrayDesc(vArray As Variant) As String
                 aType = "Date"
             Case 8
                 aType = "String"
-            Case 9, 13  '   VT_DISPATCH = 9, VT_UNKNOWN = 13
+            Case 9 '   VT_DISPATCH = 9, VT_UNKNOWN = 13
                 aType = "Object"
             Case 11
                 aType = "Boolean"
             Case 12, 1
                 aType = "Variant"
+            Case 13
+                aType = "Unknown"
             Case 14
                 aType = "Decimal"
             Case 17 ' VT_UI1 = 17
@@ -53238,12 +53283,14 @@ Public Function ArrayDescBare(vArray As Variant) As String
                 aType = "Date"
             Case 8
                 aType = "String"
-            Case 9, 13  '   VT_DISPATCH = 9, VT_UNKNOWN = 13
+            Case 9  '   VT_DISPATCH = 9, VT_UNKNOWN = 13
                 aType = "Object"
             Case 11
                 aType = "Boolean"
             Case 12, 1
                 aType = "Variant"
+            Case 13
+                aType = "Unknown"
             Case 14
                 aType = "Decimal"
             Case 17 ' VT_UI1 = 17
@@ -53543,7 +53590,7 @@ lit31: ' "LAMBDA$"
     End If
 End Function
 Function strFunctions(w2 As Long, q$, bstackstr As basetask, a$, r$) As Boolean
-Dim p As Variant, pp As Variant, ms As mStiva2, usehandler As mHandler
+Dim p As Variant, pp As Variant, ms As mStiva2, useHandler As mHandler
 Dim s$, par As Boolean, ms1 As mStiva, ppppl As iBoxArray
 Dim q1$, q2$, w1 As Long, w3 As Long, dd As Long
 Dim anything As Object
@@ -53597,23 +53644,23 @@ backitem1:
             CheckDeepAny anything
             r$ = Typename$(anything)
             If r$ = mHdlr Then
-                Set usehandler = anything
-                Select Case usehandler.t1
+                Set useHandler = anything
+                Select Case useHandler.t1
                 Case 1
                     r$ = "Inventory"
                 Case 2
                     r$ = "Buffer"
                 Case 3
-                    w3 = usehandler.indirect
+                    w3 = useHandler.indirect
                     If w3 > -1 And w3 <= var2used Then
                         r$ = VarTypeName(var(w3))
                     Else
-                        r$ = Typename(usehandler.objref)
+                        r$ = Typename(useHandler.objref)
                     End If
                 Case Else
-                    r$ = Typename(usehandler.objref)
+                    r$ = Typename(useHandler.objref)
                 End Select
-                Set usehandler = Nothing
+                Set useHandler = Nothing
             End If
             strFunctions = FastSymbol(a$, ")", True)
         ElseIf ms1.StackItemType(w3) = "?" Then
@@ -54011,14 +54058,14 @@ fstr16: '"MEMBER.TYPE$(", "ΜΕΛΟΥΣ.ΤΥΠΟΣ$("
                 
                     r$ = VarTypeName(var(w3))
                 If r$ = mHdlr Then
-                        Set usehandler = var(w3)
-                       Select Case usehandler.t1
+                        Set useHandler = var(w3)
+                       Select Case useHandler.t1
                        Case 1
                            r$ = "Inventory"
                        Case 2
                            r$ = "Buffer"
                        Case Else
-                         r$ = Typename(usehandler.objref)
+                         r$ = Typename(useHandler.objref)
                        End Select
                      End If
                     End If
@@ -54280,18 +54327,18 @@ check999100:
         If VarType(p) = vbString Then q1$ = p: GoTo isStr0021
         If Not bstackstr.lastobj Is Nothing Then
             If TypeOf bstackstr.lastobj Is mHandler Then
-            Set usehandler = bstackstr.lastobj
+            Set useHandler = bstackstr.lastobj
             
-                If usehandler.indirect >= 0 Then
-               If IsobjArray(var(usehandler.indirect)) Then
-                    Set ppppl = var(usehandler.indirect)
+                If useHandler.indirect >= 0 Then
+               If IsobjArray(var(useHandler.indirect)) Then
+                    Set ppppl = var(useHandler.indirect)
                     GoTo check1236789
                     Else
      
                     End If
                     
-                ElseIf IsobjArray(usehandler.objref) Then
-                    Set ppppl = usehandler.objref
+                ElseIf IsobjArray(useHandler.objref) Then
+                    Set ppppl = useHandler.objref
                     If bstackstr.lastobj.UseIterator Then
                         If Not ppppl.arr Then NotArray: Exit Function
                         If FastSymbol(a$, ",") Then
@@ -54307,8 +54354,8 @@ check999100:
                     Else
                         GoTo check1236789
                     End If
-                ElseIf TypeOf usehandler.objref Is mStiva Then
-                Set ms1 = usehandler.objref
+                ElseIf TypeOf useHandler.objref Is mStiva Then
+                Set ms1 = useHandler.objref
                 Set bstackstr.lastobj = Nothing
                     If FastSymbol(a$, ",") Then
                     If IsExp(bstackstr, a$, p, flatobject:=True, nostring:=True) Then
@@ -54459,8 +54506,8 @@ cont111:
                         SyntaxError
                     End If
                 ElseIf Typename(var(w3)) = "mHandler" Then
-                    Set usehandler = var(w3)
-                    If usehandler.t1 = 2 Then
+                    Set useHandler = var(w3)
+                    If useHandler.t1 = 2 Then
                     w1 = 1
                    If BlockParam2s(a$, w1) Then
                    a$ = Mid$(a$, w1 + 1)
@@ -54795,12 +54842,12 @@ fstr39: '"MENU$(", "ΕΠΙΛΟΓΗ$(", "ΕΠΙΛΟΓΕΣ$("
     For w2 = 0 To Form1.List1.listcount - 1
     ppppl.item(w2) = Form1.List1.list(w2)
     Next w2
-               Set usehandler = New mHandler
-                usehandler.t1 = 3
-                Set usehandler.objref = ppppl
-                Set bstackstr.lastobj = usehandler
+               Set useHandler = New mHandler
+                useHandler.t1 = 3
+                Set useHandler.objref = ppppl
+                Set bstackstr.lastobj = useHandler
                 Set ppppl = Nothing
-                Set usehandler = Nothing
+                Set useHandler = Nothing
                 r$ = vbNullString
                 strFunctions = True
     End If
@@ -55501,10 +55548,10 @@ fstr60: '"STR$(", "ΓΡΑΦΗ$("
             End If
         ElseIf TypeOf bstackstr.lastobj Is mHandler Then
         p = 0
-        Set usehandler = bstackstr.lastobj
-        If usehandler.t1 = 4 Then p = usehandler.index_cursor
+        Set useHandler = bstackstr.lastobj
+        If useHandler.t1 = 4 Then p = useHandler.index_cursor
         Set bstackstr.lastobj = Nothing
-        Set usehandler = Nothing
+        Set useHandler = Nothing
         ElseIf TypeOf bstackstr.lastobj Is BigInteger Then
             r$ = bstackstr.lastobj.ToString
             Set bstackstr.lastobj = Nothing
@@ -55902,7 +55949,7 @@ fstr65:
 
 End Function
 Function mEval(ByVal q$, bstackstr As basetask, a$, r$) As Boolean
-    Dim myGroup As Group, usehandler As mHandler, w2 As Long, w3 As Long
+    Dim myGroup As Group, useHandler As mHandler, w2 As Long, w3 As Long
     Dim p, pp, dd As Long, anything As Object, s$, pppp As ppppLight, oldremove As Boolean
     If IsExp(bstackstr, a$, p) Then
     If MemInt(VarPtr(p)) = vbString Then
@@ -55914,10 +55961,10 @@ Function mEval(ByVal q$, bstackstr As basetask, a$, r$) As Boolean
     If bstackstr.lastobj Is Nothing Then Exit Function
     If TypeOf bstackstr.lastobj Is mHandler Then
     
-        Set usehandler = bstackstr.lastobj
-        Set anything = usehandler
-        If usehandler.IamEnum Then
-            r$ = usehandler.index_cursor
+        Set useHandler = bstackstr.lastobj
+        Set anything = useHandler
+        If useHandler.IamEnum Then
+            r$ = useHandler.index_cursor
             Set bstackstr.lastobj = Nothing
             mEval = FastSymbol(a$, ")", True)
             Exit Function
@@ -55926,8 +55973,8 @@ Function mEval(ByVal q$, bstackstr As basetask, a$, r$) As Boolean
             mEval = False
             Exit Function
         End If
-        Set usehandler = anything
-        With usehandler
+        Set useHandler = anything
+        With useHandler
             If .t1 = 1 Then
                 If FastSymbol(a$, ",") Then
                     If IsExp(bstackstr, a$, p, flatobject:=True, nostring:=True) Then
@@ -55958,7 +56005,7 @@ Function mEval(ByVal q$, bstackstr As basetask, a$, r$) As Boolean
                         Set bstackstr.lastobj = Nothing
                     Else
                         If .objref.IsObj Then
-                            rValue bstackstr, usehandler.objref.ValueObj
+                            rValue bstackstr, useHandler.objref.ValueObj
                             r$ = vbNullString
                         Else
                             Set bstackstr.lastobj = Nothing
@@ -56608,7 +56655,7 @@ Private Function fixthis(p As Variant) As String
 End Function
 Function AddGroupFromClass(bstack As basetask, rest$, className$, isglobal As Boolean, islocal As Boolean, ohere$) As Boolean
 Dim i As Long, W$, v As Long, useType As Boolean, r, part$, ret As Boolean, exist As Boolean, ww$, ss$
-Dim isStruct As Boolean, useBuffer As MemBlock, usehandler As mHandler, usehandlerBuffer As mHandler, j As Long
+Dim isStruct As Boolean, useBuffer As MemBlock, useHandler As mHandler, usehandlerBuffer As mHandler, j As Long
 
 Dim structLen As Long
 If GetVar3(bstack, bstack.GroupName + className$, v) Then
@@ -56622,11 +56669,11 @@ ElseIf GetVar3(bstack, bstack.GroupName + className$, v) Then
         If Not bstack.lastobj Is Nothing Then
 Checkit:
         If TypeOf bstack.lastobj Is mHandler Then
-            Set usehandler = bstack.lastobj
+            Set useHandler = bstack.lastobj
             Set bstack.lastobj = Nothing
-            If usehandler.t1 = 1 And usehandler.ReadOnly Then
-            If TypeOf usehandler.objref Is FastCollection Then
-                If Not usehandler.objref.structLen = 0 Then
+            If useHandler.t1 = 1 And useHandler.ReadOnly Then
+            If TypeOf useHandler.objref Is FastCollection Then
+                If Not useHandler.objref.structLen = 0 Then
                     isStruct = True
                 Else
                     MyEr "Zero Length Structure", "Μηδενικού Μήκους Δομή"
@@ -56674,7 +56721,7 @@ If r < 1& Then r = 1&
                 Set useBuffer = usehandlerBuffer.objref
                 If useBuffer.structref Is Nothing Then
                     
-                ElseIf useBuffer.structref Is usehandler.objref Then
+                ElseIf useBuffer.structref Is useHandler.objref Then
                 v = useBuffer.items
                 If v <> r Then
                 
@@ -56693,7 +56740,7 @@ If r < 1& Then r = 1&
                 End If
                 End If
                     GoTo cont111
-                ElseIf useBuffer.structref.Tag = usehandler.objref.Tag Then
+                ElseIf useBuffer.structref.Tag = useHandler.objref.Tag Then
                     GoTo cont111
                 End If
             End If
@@ -56707,8 +56754,8 @@ CONTGLO:
         MakeitObjectBuffer var(i)
         Set usehandlerBuffer = var(i)
         Set useBuffer = usehandlerBuffer.objref
-        v = usehandler.objref.structLen
-        Set useBuffer.structref = usehandler.objref
+        v = useHandler.objref.structLen
+        Set useBuffer.structref = useHandler.objref
         useBuffer.UseStruct = True
         Set usehandlerBuffer = Nothing
         useBuffer.ClearError
@@ -56925,17 +56972,17 @@ chektype1 = 2
 End If
 
 End Function
-Function TakeOffset(bstack As basetask, usehandler As mHandler, b$, r, Optional where, Optional NewVal) As Boolean
+Function TakeOffset(bstack As basetask, useHandler As mHandler, b$, r, Optional where, Optional NewVal) As Boolean
 ' just throw offsets
 Dim thisHandler As mHandler, useBuffer As MemBlock, otherBuffer As MemBlock, mylist As FastCollection, pp As Long, p As Variant
 Dim rB As Byte, ri As Integer, dn As Long, db As Double, ds As Single, w2 As Long, s$
 Dim itisSingle As Boolean, itisInt64 As Boolean, itisCur As Boolean
 Dim i As Long
-If usehandler.t1 <> 2 Then
+If useHandler.t1 <> 2 Then
 WrongType
 Exit Function
 End If
-Set useBuffer = usehandler.objref
+Set useBuffer = useHandler.objref
 If Not useBuffer.UseStruct Then
 pp = useBuffer.ItemSize
     If pp = 4 Then
@@ -56947,8 +56994,10 @@ pp = useBuffer.ItemSize
     p = (-OneLongLong And useBuffer.GetPtr(where))
     w2 = MemLong(VarPtr(p) + 8)
     If Not IsMissing(NewVal) Then
+
     SwapVariant r, p
     r = 0
+
     If Not bstack.lastobj Is Nothing Then
     If TypeOf bstack.lastobj Is mHandler Then
         Set thisHandler = bstack.lastobj
@@ -56964,6 +57013,11 @@ pp = useBuffer.ItemSize
         End If
         End If
     End If
+    Else
+        If MemInt(VarPtr(p)) = vbString Then
+        SwapVariant r, p
+        p = 0
+        End If
     End If
     End If
     GoTo contthere
@@ -57396,7 +57450,7 @@ Private Function IsObjmHandler(v As Object) As Boolean
     End If
 End Function
 Private Function GetPPPP(tstArray As iBoxArray, pppp As mArray) As Boolean
-        Dim usehandler As mHandler, myTuple As tuple
+        Dim useHandler As mHandler, myTuple As tuple
         If Not tstArray Is Nothing Then
         If Not tstArray.arr Then Exit Function
         If TypeOf tstArray Is mArray Then
@@ -57404,12 +57458,12 @@ Private Function GetPPPP(tstArray As iBoxArray, pppp As mArray) As Boolean
         Else
             If varhash.lastNDX > 0 Then
                 If IsmHandler(var(varhash.lastNDX)) Then
-                    Set usehandler = var(varhash.lastNDX)
-                    If usehandler.t1 = 3 Then
+                    Set useHandler = var(varhash.lastNDX)
+                    If useHandler.t1 = 3 Then
                         Set myTuple = tstArray
                         Set pppp = New mArray
                         myTuple.CopyTuple2Array pppp
-                        Set usehandler.objref = pppp
+                        Set useHandler.objref = pppp
                         GoTo contArrayOnly1
                     End If
                 End If
@@ -57421,3 +57475,5 @@ contArrayOnly1:
     GetPPPP = True
     End If
 End Function
+
+

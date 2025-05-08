@@ -102,33 +102,32 @@ If Not Me.IsInterfaceCall Then
 End If
 Do While ParamList <> ""
 
- If IsLabelSymbolNew(ParamList, "Ã¡ —’”", "LONG", Lang) Then
- IsLabelSymbolNew ParamList, "Ã¡ —’”", "LONG", Lang
- If FastSymbol(ParamList, "&") Then l = 16 Else l = 0
- If IsPureLabel(ParamList, check$) = 1 Then
- 'OK
- M = 2
- Else
- ParamList = "error"
- Exit Sub
- End If
- Else
-  If FastSymbol(ParamList, "&") Then l = 16 Else l = 0
- M = IsPureLabel(ParamList, check$)
- If M = 0 Then
- If FastSymbol(ParamList, "...", , 3) Then
- PushType -100  ' Paramarray
- Exit Do
- End If
- End If
- End If
-PushType M + l   'above 16 is byref
-If IsArrayItem(paramnum) Then
-If Not FastSymbol(ParamList, ")") Then Exit Do
-End If
-If Not FastSymbol(ParamList, ",") Then Exit Do
-If check$ = vbNullString Then Exit Do
-If paramnum = 63 Then Exit Do
+    If IsLabelSymbolNew(ParamList, "Ã¡ —’”", "LONG", Lang) Then
+        IsLabelSymbolNew ParamList, "Ã¡ —’”", "LONG", Lang
+        If FastSymbol(ParamList, "&") Then l = 16 Else l = 0
+        If IsPureLabel(ParamList, check$) = 1 Then
+            M = 2
+        Else
+            ParamList = "error"
+            Exit Sub
+        End If
+    Else
+        If FastSymbol(ParamList, "&") Then l = 16 Else l = 0
+            M = IsPureLabel(ParamList, check$)
+            If M = 0 Then
+                If FastSymbol(ParamList, "...", , 3) Then
+                PushType -100  ' Paramarray
+                Exit Do
+            End If
+        End If
+    End If
+    PushType M + l   'above 16 is byref
+    If IsArrayItem(paramnum) Then
+        If Not FastSymbol(ParamList, ")") Then Exit Do
+    End If
+    If Not FastSymbol(ParamList, ",") Then Exit Do
+    If check$ = vbNullString Then Exit Do
+    If paramnum = 63 Then Exit Do
 Loop
 ParamList = Trim$(ParamList)   ' if we have somethig then that is an error
 End Sub

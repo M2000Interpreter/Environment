@@ -38,14 +38,14 @@ Friend Sub NoPublic(bstack As basetask, where$)
 End Sub
 Friend Sub GetIcon(a As StdPicture)
 On Error Resume Next
-Dim k As StdPicture
+Dim K As StdPicture
 If IhaveExtForm Then
 ExtForm.GetIcon PackData(a)
 End If
 End Sub
 Friend Function GetAppIcon() As StdPicture
 On Error Resume Next
-Dim k As StdPicture
+Dim K As StdPicture
 If IhaveExtForm Then
 Set GetAppIcon = UnPackData(ExtForm.GetAppIcon)
 End If
@@ -145,7 +145,7 @@ NERR = True: NOEXECUTION = True
 ExTarget = True: INK$ = Chr(27): UKEY$ = Chr$(27)
 If Cancel = -100 Then Exit Sub
 Set Form3AppIcon = LoadPicture("")
-For i = Forms.count - 1 To 0 Step -1
+For i = Forms.Count - 1 To 0 Step -1
 Set f = Forms(i)
 Set f.icon = LoadPicture("")
 If TypeOf f Is GuiM2000 Then
@@ -200,14 +200,14 @@ MyDoEvents
     exWnd = 0
 
     End If
-For i = Forms.count - 1 To 0 Step -1
+For i = Forms.Count - 1 To 0 Step -1
 Set f = Forms(i)
 Unload f
 Next i
 Set f = Nothing
 
 If Not ExtForm Is Nothing Then
-
+On Error Resume Next
 ExtForm.Shutdown
 
 Set ExtForm = Nothing
@@ -230,11 +230,11 @@ If Not Form3AppIcon Is Nothing Then
 End If
 pid = GetCurrentProcessId()
 If strTemp = vbNullString Then strTemp = GetTempPathgg()
-Dim m As Long
+Dim M As Long
 mylogfile$ = strTemp + LTrim$(str$(pid)) + ".M2000"
-m = 1
-Open mylogfile$ For Output As #m
-Close #m
+M = 1
+Open mylogfile$ For Output As #M
+Close #M
 tempList2delete = Sput(mylogfile$) + tempList2delete
 
 hTimer = SetTimer(0&, 0&, 2000, AddressOf RunMe)
@@ -345,14 +345,14 @@ For i = UBound(var()) To 0 Step -1: var(i) = 0&: Next i
 Finished = True
 End Sub
 Property Let ShowGui(RHS As Boolean)
-If Forms.count = 0 Then Exit Property
+If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
 If Form1.top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).top
 Else
 If Form1.WindowState = 0 Then
-If Not (Forms.count > 5) Then Form1.Visible = False
+If Not (Forms.Count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
@@ -562,8 +562,8 @@ For i = -2 To 1000
     players(i) = Zero
     Prefresh(i) = zerocounter
 Next i
-If Forms.count > 0 Then
-For i = Forms.count - 1 To 0
+If Forms.Count > 0 Then
+For i = Forms.Count - 1 To 0
 Set Forms(i).icon = LoadPicture("")
 Unload Forms(i)
 Next i

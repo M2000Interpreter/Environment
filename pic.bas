@@ -129,7 +129,7 @@ Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
 Private Const Pi = 3.14159265359
 Private Type SAFEARRAYBOUND
     cElements As Long
-    lLbound As Long
+    lLBound As Long
 End Type
 Private Type SAFEARRAY2D
     cDims As Integer
@@ -823,7 +823,7 @@ Public Function RotateMaskDib(cDibbuffer0 As cDIBSection, Optional ByVal Angle! 
     Dim ang As Long
     ang = CLng(Angle!)
 Angle! = -(CLng(Angle!) Mod 360) * 1.745329E-02!
-If cDibbuffer0.hDib = 0 Then Exit Function
+If cDibbuffer0.hDIb = 0 Then Exit Function
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
@@ -875,9 +875,9 @@ On Error Resume Next
     With tSA1
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = cDibbuffer0.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = cDibbuffer0.BytesPerScanLine()
         .pvData = cDibbuffer0.DIBSectionBitsPtr
     End With
@@ -995,9 +995,9 @@ Dim tSA As SAFEARRAY2D
     With tSA
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = backdib.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = backdib.BytesPerScanLine()
         .pvData = backdib.DIBSectionBitsPtr
     End With
@@ -1008,9 +1008,9 @@ Dim tSA1 As SAFEARRAY2D
     With tSA1
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = maskdib.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = maskdib.BytesPerScanLine()
         .pvData = maskdib.DIBSectionBitsPtr
     End With
@@ -1021,9 +1021,9 @@ Dim tSA2 As SAFEARRAY2D
     With tSA2
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = frontdib.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = frontdib.BytesPerScanLine()
         .pvData = frontdib.DIBSectionBitsPtr
     End With
@@ -1133,7 +1133,7 @@ Dim b As Single
 b = CSng(Angle! Mod 90 = 0)
 Angle! = -MyMod(Angle!, 360!) * 1.745329E-02!
 On Error Resume Next
-If cDibbuffer0.hDib = 0 Then Exit Sub
+If cDibbuffer0.hDIb = 0 Then Exit Sub
 If zoomfactor <= 0.01! Then zoomfactor = 0.01!
 
 
@@ -1162,9 +1162,9 @@ If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
     With tSA
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = cDIBbuffer1.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = cDIBbuffer1.BytesPerScanLine()
         .pvData = cDIBbuffer1.DIBSectionBitsPtr
     End With
@@ -1174,9 +1174,9 @@ If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
     With tSA1
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = cDibbuffer0.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = cDibbuffer0.BytesPerScanLine()
         .pvData = cDibbuffer0.DIBSectionBitsPtr
     End With
@@ -1392,9 +1392,9 @@ Dim tSA2 As SAFEARRAY2D
     With tSA
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = cDIBbuffer1.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = cDIBbuffer1.BytesPerScanLine()
         .pvData = cDIBbuffer1.DIBSectionBitsPtr
     End With
@@ -1402,9 +1402,9 @@ Dim tSA2 As SAFEARRAY2D
     With tSA1
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = cDibbuffer0.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = cDibbuffer0.BytesPerScanLine()
         .pvData = cDibbuffer0.DIBSectionBitsPtr
     End With
@@ -1443,9 +1443,9 @@ Dim tSA2 As SAFEARRAY2D
                    With tSA2
                    .cbElements = 1
                    .cDims = 2
-                   .Bounds(0).lLbound = 0
+                   .Bounds(0).lLBound = 0
                    .Bounds(0).cElements = cDIBbuffer2.Height
-                   .Bounds(1).lLbound = 0
+                   .Bounds(1).lLBound = 0
                    .Bounds(1).cElements = cDIBbuffer2.BytesPerScanLine()
                    .pvData = cDIBbuffer2.DIBSectionBitsPtr
                    End With
@@ -1591,9 +1591,9 @@ Dim tSA2 As SAFEARRAY2D
     With tSA
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = cDIBbuffer1.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = cDIBbuffer1.BytesPerScanLine()
         .pvData = cDIBbuffer1.DIBSectionBitsPtr
     End With
@@ -1601,9 +1601,9 @@ Dim tSA2 As SAFEARRAY2D
     With tSA1
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = cDibbuffer0.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = cDibbuffer0.BytesPerScanLine()
         .pvData = cDibbuffer0.DIBSectionBitsPtr
     End With
@@ -1875,15 +1875,15 @@ If K = 0 Then Exit Function
 With Form1.dSprite(K)
 it = val("0" & .Tag)
 x1 = .Left + .Width * (100 - Percent) / 200 - players(it).HotSpotX
-y1 = .Top + .Height * (100 - Percent) / 200 - players(it).HotSpotY
+y1 = .top + .Height * (100 - Percent) / 200 - players(it).HotSpotY
 x2 = .Left + .Width * (1 - (100 - Percent) / 200) - players(it).HotSpotX
-y2 = .Top + .Height * (1 - (100 - Percent) / 200) - players(it).HotSpotY
+y2 = .top + .Height * (1 - (100 - Percent) / 200) - players(it).HotSpotY
 End With
 For i = Priority - 1 To 1 Step -1
 K = FindSpriteByTag(i)
 If K <> 0 Then
     With Form1.dSprite(K)
-        If (x2 < .Left + .Width / 4) Or (x1 >= .Left + .Width * 3 / 4) Or (y2 <= .Top + .Height / 4) Or (y1 > .Top + .Height * 3 / 4) Then
+        If (x2 < .Left + .Width / 4) Or (x1 >= .Left + .Width * 3 / 4) Or (y2 <= .top + .Height / 4) Or (y1 > .top + .Height * 3 / 4) Then
         Else
         suma = suma + 2 ^ (i - 1)
         End If
@@ -1920,7 +1920,7 @@ Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, K As Long
 K = FindSpriteByTag(Priority)
 If K = 0 Then Exit Function
 x1 = Form1.dSprite(K).Left + Form1.dSprite(K).Width * (100 - Percent) / 200
-y1 = Form1.dSprite(K).Top + Form1.dSprite(K).Height * (100 - Percent) / 200
+y1 = Form1.dSprite(K).top + Form1.dSprite(K).Height * (100 - Percent) / 200
 x2 = x1 + Form1.dSprite(K).Width * (1 - 2 * (100 - Percent) / 200)
 y2 = y1 + Form1.dSprite(K).Height * (1 - 2 * (100 - Percent) / 200)
 If x2 < nx1 Or x1 >= nx2 Or y2 <= ny1 Or y1 > ny2 Then
@@ -1967,7 +1967,7 @@ Function PosSpriteY(aPrior As Long) As Long ' before take from priority the orig
 Dim K As Long
 K = FindSpriteByTag(aPrior)
 If K < 1 Or K > PobjNum Then Exit Function
- PosSpriteY = Form1.dSprite(K).Top
+ PosSpriteY = Form1.dSprite(K).top
 End Function
 
 Sub PosSprite(aPrior As Long, ByVal X As Long, ByVal Y As Long) ' ' before take from priority the original sprite
@@ -2124,7 +2124,7 @@ With Form1.dSprite(s)
 .Picture = photo.Picture(SZ)
 .Left = .Left + players(s).X - .Width / 2
 players(s).X = .Width / 2
-.Top = .Top + players(s).Y - .Height / 2
+.top = .top + players(s).Y - .Height / 2
 players(s).Y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, True)
 ''''''''''''''''''''''''UpdateWindow .hwnd
@@ -2174,9 +2174,9 @@ Dim tSA As SAFEARRAY2D
     With tSA
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = picSource.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = picSource.BytesPerScanLine()
         .pvData = picSource.DIBSectionBitsPtr
     End With
@@ -2269,9 +2269,9 @@ Dim tSA As SAFEARRAY2D
     With tSA
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = picSource.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = picSource.BytesPerScanLine()
         .pvData = picSource.DIBSectionBitsPtr
     End With
@@ -2772,7 +2772,7 @@ If IsClipboardFormatAvailable(CF_ENHMETAFILE) Then
 End Function
 Public Function GetImageDIB() As mHandler
 Dim hMem As Long
-Dim hDib As Long
+Dim hDIb As Long
 Dim mypic As New cDIBSection
 Dim aPic As MemBlock
 Dim Carrier As New mHandler
@@ -2782,11 +2782,11 @@ Dim okb As Boolean
         
         hMem = GetClipboardData(CF_DIB)
         If hMem <> 0 Then
-           hDib = GlobalLock(hMem)
+           hDIb = GlobalLock(hMem)
            mypic.ClearUp
-           okb = mypic.CreateFromDIB(hDib)
+           okb = mypic.CreateFromDIB(hDIb)
            If Not okb Then
-                hDib = GlobalUnlock(hMem)
+                hDIb = GlobalUnlock(hMem)
                 CloseClipboard
                 If Clipboard.GetFormat(2) Then
                     mypic.CreateFromPicture Clipboard.GetData(2)
@@ -2795,7 +2795,7 @@ Dim okb As Boolean
            End If
            If okb Then
                 If mypic.dpix = 0 Then mypic.GetDpi 96, 96
-                    If mypic.Height > 0 And mypic.hDib <> 0 Then
+                    If mypic.Height > 0 And mypic.hDIb <> 0 Then
                          mypic.SaveDibToMeMBlock aPic
                          aPic.SubType = 1 ' bitmap
                     End If
@@ -2818,7 +2818,7 @@ End If
 
 End Function
 Public Function GetImage() As String
-Dim hMem As Long, hDib As Long
+Dim hMem As Long, hDIb As Long
 Dim mypic As New cDIBSection
 Const CF_DIB = 8
 Dim okb As Boolean
@@ -2826,11 +2826,11 @@ Dim okb As Boolean
 If (OpenClipboard(Form1.hWnd) <> 0) Then
     hMem = GetClipboardData(CF_DIB)
     If hMem <> 0 Then
-        hDib = GlobalLock(hMem)
+        hDIb = GlobalLock(hMem)
         mypic.ClearUp
-        okb = mypic.CreateFromDIB(hDib)
+        okb = mypic.CreateFromDIB(hDIb)
         If Not okb Then
-            hDib = GlobalUnlock(hMem)
+            hDIb = GlobalUnlock(hMem)
             CloseClipboard
             If Clipboard.GetFormat(2) Then
                 mypic.CreateFromPicture Clipboard.GetData(2)
@@ -2840,7 +2840,7 @@ If (OpenClipboard(Form1.hWnd) <> 0) Then
         If okb Then
             If mypic.bitsPerPixel <> 24 Then Conv24 mypic
             If mypic.dpix = 0 Then mypic.GetDpi 96, 96
-            If mypic.Height > 0 And mypic.hDib <> 0 Then
+            If mypic.Height > 0 And mypic.hDIb <> 0 Then
                 GetImage = DIBtoSTR(mypic)
             End If
         End If
@@ -3169,14 +3169,14 @@ Private Function c_CreatePartialRegion(rgnRects() As RECT, ByVal lIndex As Long,
     ' cheat a little & use rectangles to store the header
     With rgnRects(lIndex - 2&) ' bytes 0-15
         .Left = 32                      ' length of region header in bytes
-        .Top = 1                        ' required cannot be anything else
+        .top = 1                        ' required cannot be anything else
         .Right = uIndex - lIndex + 1&   ' number of rectangles for the region
         .Bottom = .Right * 16&          ' byte size used by the rectangles;
     End With                            ' ^^ can be zero & Windows will calculate
     
     With rgnRects(lIndex - 1&) ' bytes 16-31 bounding rectangle identification
         .Left = leftOffset                  ' left
-        .Top = rgnRects(lIndex).Top         ' top
+        .top = rgnRects(lIndex).top         ' top
         .Right = leftOffset + cx            ' right
         .Bottom = rgnRects(uIndex).Bottom   ' bottom
     End With
@@ -3212,8 +3212,8 @@ Function ismine2(ByVal a$) As Boolean  ' CAN START A BLOCK OR DO SOMETHING
 ismine2 = True
 a$ = myUcase(a$, True)
 Select Case a$
-Case "ABOUT", "AFTER", "BACK", "BACKGROUND", "CLASS", "COLOR", "DECLARE", "DRAWING", "ELSE", "ENUM", "ENUMERATION", "EVENT", "EVERY", "GLOBAL", "FOR", "FKEY", "FUNCTION", "GROUP", "INVENTORY", "LAYER", "LOCAL", "MAIN.TASK", "MODULE", "OPERATOR", "PATH", "PEN", "PROPERTY", "PRINTER", "PRINTING", "REMOVE", "SET", "STACK", "START", "STRUCTURE", "TASK.MAIN", "THEN", "THREAD", "TRY", "WIDTH", "VAR", "VARIABLE", "VARIABLES", "VALUE", "WHILE"
-Case "аявг", "аккиыс", "аниа", "аниа(", "апая", "апаяихлгсг", "цецомос", "цемийо", "цемийг", "цемийес", "циа", "дес", "диацяажг", "долг", "ейтупытгс", "ейтупысг", "емы", "епипедо", "хесе", "хесе(", "идиотгтес", "ивмос", "идиотгта", "йахе", "йатастасг", "йкасг", "йкеиди", "йуяио.еяцо", "лета", "мгла", "олада", "ояисе", "павос", "пема", "пеяи", "пеяихыяио", "сумаятгсг", "сыяос", "текестгс", "тлгла", "топийа", "топийг", "топийес", "тоте", "вяыла"
+Case "ABOUT", "AFTER", "BACK", "BACKGROUND", "CLASS", "COLOR", "DECLARE", "DRAWING", "ELSE", "ENUM", "ENUMERATION", "EVENT", "EVERY", "GLOBAL", "FOR", "FKEY", "FUNCTION", "GROUP", "INVENTORY", "INTERFACE", "LAYER", "LOCAL", "MAIN.TASK", "MODULE", "OPERATOR", "PATH", "PEN", "PROPERTY", "PRINTER", "PRINTING", "REMOVE", "SET", "STACK", "START", "STRUCTURE", "TASK.MAIN", "THEN", "THREAD", "TRY", "WIDTH", "VAR", "VARIABLE", "VARIABLES", "VALUE", "WHILE"
+Case "аявг", "аккиыс", "аниа", "аниа(", "апая", "апаяихлгсг", "цецомос", "цемийо", "цемийг", "цемийес", "циа", "дес", "диацяажг", "диепажг", "долг", "ейтупытгс", "ейтупысг", "емы", "епипедо", "хесе", "хесе(", "идиотгтес", "ивмос", "идиотгта", "йахе", "йатастасг", "йкасг", "йкеиди", "йуяио.еяцо", "лета", "мгла", "олада", "ояисе", "павос", "пема", "пеяи", "пеяихыяио", "сумаятгсг", "сыяос", "текестгс", "тлгла", "топийа", "топийг", "топийес", "тоте", "вяыла"
 Case "CONST", "стахеяг", "стахеяес", "сведио", "SUPERCLASS", "упеяйкасг", "DO", "REPEAT", "епамекабе", "епамакабе", "летабкгтг", "летабкгтес"
 Case "->"
 Case Else
@@ -4356,13 +4356,13 @@ Public Function allcommands(aHash As sbHash) As Boolean
 Dim mycommands(), i As Long
 mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "ASSERT", "BACK", "BACKGROUND", "BASE", "BEEP", "BIGINTEGER", "BINARY", "BITMAPS", "BOOLEAN", "BOLD", "BREAK", "BROWSER", "BUFFER", "BYTE", "CALL", "CASE", "CAT", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLOSE", "CLS", "CODEPAGE", "COLOR", "COMPLEX", "COMMIT", "COMPRESS", "CONST", "CONTINUE", "COPY", "CURRENCY", "CURSOR", "CURVE", "DATA", "DATE", "DB.PROVIDER", "DB.USER", "DECIMAL" _
 , "DECLARE", "DEF", "DELETE", "DESKTOP", "DIM", "DIR", "DIV", "DO", "DOCUMENT", "DOS", "DOUBLE", "DRAW", "DRAWING", "DRAWINGS", "DROP", "DURATION", "EDIT", "EDIT.DOC", "ELSE", "ELSE.IF", "EMPTY", "END", "ENGLISH", "ENUM", "ENUMERATION", "ERASE", "ERROR", "ESCAPE", "EVENT", "EVERY", "EXECUTE", "EXIT", "EXPORT", "FAST", "FIELD", "FILES", "FILL", "FIND", "FKEY", "FLOODFILL", "FLUSH", "FONT", "FOR", "FORM", "FORMLABEL", "FRAME", "FUNCTION", "GET", "GLOBAL" _
-, "GOSUB", "GOTO", "GRADIENT", "GREEK", "GROUP", "HALT", "HEIGHT", "HELP", "HEX", "HIDE", "HOLD", "HTML", "ICON", "IF", "IMAGE", "INLINE", "INPUT", "INSERT", "INTEGER", "INVENTORY", "ITALIC", "JOYPAD", "KEYBOARD", "LATIN", "LAYER", "LEGEND", "LET", "LINE", "LINESPACE", "LINK", "LIST", "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LONG", "LOOP", "MAIN.TASK", "MARK", "MEDIA", "MENU", "MERGE.DOC", "METHOD", "MODE", "MODULE" _
+, "GOSUB", "GOTO", "GRADIENT", "GREEK", "GROUP", "HALT", "HEIGHT", "HELP", "HEX", "HIDE", "HOLD", "HTML", "ICON", "IF", "IMAGE", "INLINE", "INPUT", "INSERT", "INTEGER", "INVENTORY", "ITALIC", "INTERFACE", "JOYPAD", "KEYBOARD", "LATIN", "LAYER", "LEGEND", "LET", "LINE", "LINESPACE", "LINK", "LIST", "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LONG", "LOOP", "MAIN.TASK", "MARK", "MEDIA", "MENU", "MERGE.DOC", "METHOD", "MODE", "MODULE" _
 , "MODULES", "MONITOR", "MOTION", "MOTION.W", "MOUSE.ICON", "MOVE", "MOVIE", "MOVIES", "MUSIC", "NAME", "NEW", "NEXT", "NORMAL", "OBJECT", "ON", "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPTIMIZATION", "ORDER", "OVER", "OVERWRITE", "PAGE", "PART", "PATH", "PEN", "PIPE", "PLAY", "PLAYER", "PLAYER(", "POLYGON", "PRINT", "PRINTER", "PRINTER.MARGINS", "PRINTING", "PROFILER", "PROPERTIES", "PROTOTYPE", "PSET", "PUSH", "PUT", "READ", "RECURSION.LIMIT" _
 , "REFER", "REFRESH", "RELEASE", "REM", "REMOVE", "REPEAT", "REPORT", "RESTART", "RETRIEVE", "RETURN", "SAVE", "SAVE.AS", "SAVE.DOC", "SCAN", "SCORE", "SCREEN.PIXELS", "SCRIPT", "SCROLL", "SEARCH", "SEEK", "SELECT", "SET", "SETTINGS", "SHIFT", "SHIFTBACK", "SHOW", "SINGLE", "SLOW", "SMOOTH", "SORT", "SOUND", "SOUNDREC", "SOUNDS", "SPEECH", "SPLIT", "SPRITE", "STACK", "START", "STATIC", "STEP", "STOCK", "STOP", "STRING", "STRUCTURE" _
 , "SUB", "SUBDIR", "SUPERCLASS", "SWAP", "SWEEP", "SWITCHES", "TAB", "TABLE", "TARGET", "TARGETS", "TASK.MAIN", "TEST", "TEXT", "THEN", "THREAD", "THREAD.PLAN", "THREADS", "TITLE", "TONE", "TRY", "TUNE", "UPDATE", "USE", "USER", "VAR", "VARIABLE", "VARIABLES" _
 , "VARIANT", "VERSION", "VIEW", "VOLUME", "WAIT", "WHILE", "WIDTH", "WIN", "WINDOW", "WITH", "WORDS", "WRITE", "WRITER", "аццкийа", "адеиасе", "айеяаиос", "акт", "аккацг", "аккане", "аккиыс", "аккиыс.ам", "ам", "амафгтгсг" _
 , "амахеыягсг", "амайтгсг", "амакоцио", "амакусг.охомгс", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье", "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "амтийеилемо", "аниысг", "апая", "апаяихлгсг", "апедысе", "апкос", "апо", "апохгйеусг.ыс", "апойопг", "аяца", "аяихлос", "аявеиа", "аявеио", "аявг", "атупос", "аукос", "ауноуса", "ажаияесг", "ажгсе", "баке", "басг", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг" _
-, "бгла", "богхеиа", "цецомос", "целисе", "цемийес", "цемийг", "цемийо", "циа", "цяалла", "цяаллатосеияа", "цяаллг", "цяаье", "цягцояа", "деийтг.лояжг", "деине", "дейаен", "дес", "диабасе", "диацяажг", "диайопг", "диайоптес", "диалесоу", "диаяхяысг", "диаяйеиа", "диастиво", "диажамеиа", "диажамо", "диажуцг", "диайопг", "диейоье", "диояхысе", "дипка", "дипкос", "дойилг", "долг", "дяолеас", "дуадийо", "дысе", "еццяажо", "еийома", "еийомес", "еийомидио" _
+, "бгла", "богхеиа", "цецомос", "целисе", "цемийес", "цемийг", "цемийо", "циа", "цяалла", "цяаллатосеияа", "цяаллг", "цяаье", "цягцояа", "деийтг.лояжг", "деине", "дейаен", "дес", "диабасе", "диацяажг", "диайопг", "диайоптес", "диалесоу", "диаяхяысг", "диаяйеиа", "диастиво", "диажамеиа", "диажамо", "диажуцг", "диайопг", "диейоье", "диепажг", "диояхысе", "дипка", "дипкос", "дойилг", "долг", "дяолеас", "дуадийо", "дысе", "еццяажо", "еийома", "еийомес", "еийомидио" _
 , "еисацыцг", "ейдосг", "ейтекесг", "ейтупысг", "ейтупытгс", "екецвос", "еккгмийа", "емхесг", "емтасг", "емы", "емысе", "енацыцг", "енодос", "епамакабе", "епамекабе", "епекене", "епекене.амтийеилемо", "епекене.цяаллатосеияа", "епекене.ояцамо", "епекене.вяыла", "епицяажг", "епийаияо", "епикене", "епикене.амтийеилемо", "епикене.цяаллатосеияа", "епикене.ояцамо", "епикене.вяыла", "епикоцес", "епикоцг", "епикоцгс" _
 , "епипедо", "епистяожг", "епижамеиа", "еполемо", "етийета.жоялас", "еуяесг", "глеяолгмиа", "гвоцяажгсг", "гвои", "гвос", "хесе", "хесг", "идиотгтес", "исвмг", "ивмос", "йахаяг", "йахаяо", "йахе", "йакесе", "йалпукг", "йаме", "йамомийа", "йат", "йатакоцои", "йатакоцос", "йатастасг", "йатавыягсг", "йеилемо", "йемг", "йимгсг", "йимгсг.п", "йкасг", "йкеиди", "йкеисе", "йомсока", "йяата", "йяатгсе", "йяуье" _
 , "йуйкийа", "йуйкос", "йукисг", "йуяио.еяцо", "кабг", "кахос", "катимийа", "кенеис", "киста", "коцийос", "коцистийос", "коцос", "лайяус", "ле", "лецакосайеяаиос", "леходос", "лекыдиа", "леяос", "лета", "летабкгтг" _
@@ -4579,6 +4579,9 @@ Case "DROP", "пета"
 aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDrop)
 Case "апаяихлгсг", "апая", "ENUMERATION", "ENUM"
 aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoEnum)
+Case "диепажг", "INTERFACE"
+aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoInterface)
+
 Case "DESKTOP", "епижамеиа"
 aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDesktop)
 Case "вяылатисе", "PSET"

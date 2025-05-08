@@ -181,7 +181,7 @@ Private Type TARRAYDESC
 End Type
 Private Type SAFEARRAYBOUND
     cElements               As Long
-    lLbound                 As Long
+    lLBound                 As Long
 End Type
 
 Public Enum VARKIND

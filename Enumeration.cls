@@ -12,15 +12,21 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
+Private Declare Function CLSIDFromString Lib "ole32.dll" ( _
+                         ByVal lpszCLSID As Long, _
+                         ByRef Clsid As GUID) As Long
 Public EnumName As String
+Private iGUID As GUID
+Public LastGUIDstr As String
 Private Type item
     Key As String
     KeyUCase As String
     iValue As Variant
+    Pad As String
 End Type
 Public Done As Boolean
 Public Index As Long
-Private PriveSpace() As item
+Private PriveSpace() As item, mInterface As Boolean
 Dim MaxSpace As Long
 Dim toplim As Long
 Private Sub Class_Initialize()
@@ -37,6 +43,29 @@ Else
     
 End If
 End Property
+Property Get PadValue() As String
+Done = False
+If Index = -1 Then
+Else
+    Done = True
+    PadValue = PriveSpace(Index).Pad
+End If
+End Property
+
+Property Let Guidonce(s As String)
+If toplim = -1 Then
+    mInterface = CLSIDFromString(StrPtr(s), iGUID) = 0
+    If mInterface Then
+        LastGUIDstr = s
+    End If
+End If
+End Property
+Property Get IsInterface() As Boolean
+    IsInterface = mInterface
+End Property
+Property Get GuidAddr() As Long
+    GuidAddr = VarPtr(iGUID)
+End Property
 
 Private Function Malloc() As Long
     If toplim + 1 >= MaxSpace Then
@@ -46,8 +75,8 @@ Private Function Malloc() As Long
     toplim = toplim + 1
     Malloc = toplim
 End Function
-Property Get count()
-    count = toplim + 1
+Property Get Count()
+    Count = toplim + 1
 End Property
 Property Get ZeroValue()
 If toplim >= 0 Then ZeroValue = PriveSpace(0).iValue
@@ -58,12 +87,22 @@ Property Get IsEmpty()
 End Property
 
 Public Sub addone(Key As String, nValue As Variant)
-Dim A As Long
-A = Malloc()
-With PriveSpace(A)
+Dim a As Long
+a = Malloc()
+With PriveSpace(a)
     .Key = Key
     .KeyUCase = myUcase(Key, True)
     .iValue = nValue
+End With
+End Sub
+Public Sub addone1(Key As String, nValue As Variant, pd$)
+Dim a As Long
+a = Malloc()
+With PriveSpace(a)
+    .Key = Key
+    .KeyUCase = myUcase(Key, True)
+    .iValue = nValue
+    .Pad = pd$
 End With
 End Sub
 Function ExistFromOther(RHS) As Boolean
@@ -72,14 +111,14 @@ For i = 0 To toplim
 If RHS = PriveSpace(i).iValue Then ExistFromOther = True: Exit Function
 Next i
 End Function
-Function ExistFromOther2(usehandler As mHandler) As Boolean
+Function ExistFromOther2(useHandler As mHandler) As Boolean
 Dim other As Enumeration
-Set other = usehandler.objref
-other.Index = usehandler.index_start
+Set other = useHandler.objref
+other.Index = useHandler.index_start
 Dim s$, i As Long
 s$ = other.KeyToString
 For i = 0 To toplim
-If s$ = PriveSpace(i).Key Then ExistFromOther2 = True: usehandler.index_start = i: Exit For
+If s$ = PriveSpace(i).Key Then ExistFromOther2 = True: useHandler.index_start = i: Exit For
 Next i
 
 End Function

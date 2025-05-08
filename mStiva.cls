@@ -269,13 +269,13 @@ If Not TypeOf bb Is mHandler Then
 StackItemTypeObjectType = "*[" + Typename(mh.objref) + "]"
 Else
 Set mh = bb
-If mh.T1 = 3 Or mh.T1 = 0 Then
+If mh.t1 = 3 Or mh.t1 = 0 Then
 StackItemTypeObjectType = "*[" + Typename(mh.objref) + "]"
-ElseIf mh.T1 = 1 Then
+ElseIf mh.t1 = 1 Then
 StackItemTypeObjectType = "*[Inventory]"
-ElseIf mh.T1 = 2 Then
+ElseIf mh.t1 = 2 Then
 StackItemTypeObjectType = "*[Buffer]"
-ElseIf mh.T1 = 4 Then
+ElseIf mh.t1 = 4 Then
 StackItemTypeObjectType = "*[Enum]"
 End If
 End If
@@ -290,7 +290,7 @@ Set bb = Nothing
 End Select
 End Property
 Public Property Get StackItemTypeIsObject(where As Long) As Boolean
-Dim aa As VarItem, bb As Object
+Dim aa As VarItem
 On Error Resume Next
 
 Set aa = mstack.item(where)
@@ -762,7 +762,7 @@ With ExportArray
     .myarrbase = 0
     .PushDim (items)
     .PushEnd
-    .Arr = True
+    .arr = True
 
 
 For i = 1 To items
@@ -892,7 +892,7 @@ If Index >= 0 And Index < mMany Then
     If aa.slot = 1 Then
         If Typename(aa.mItem) = "mHandler" Then
             Set usehandler = aa.mItem
-            IsEnum = usehandler.T1 = 4
+            IsEnum = usehandler.t1 = 4
             If IsEnum Then
                 If myVarType(usehandler.index_cursor, vbString) Then
                     p = usehandler.index_cursor
