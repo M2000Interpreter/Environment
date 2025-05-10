@@ -1612,12 +1612,12 @@ Public Function URLEncodeEsc(cc As String, Optional space_as_plus As Boolean = F
 End Function
 Function DecodeEscape(c$, plus_as_space As Boolean) As String
 If plus_as_space Then c$ = Replace(c$, "+", " ")
-Dim a() As String, i As Long
-a() = Split(c$, "%")
-For i = 1 To UBound(a())
-a(i) = Chr(val("&h" + Left$(a(i), 2))) + Mid$(a(i), 3)
+Dim A() As String, i As Long
+A() = Split(c$, "%")
+For i = 1 To UBound(A())
+A(i) = Chr(val("&h" + Left$(A(i), 2))) + Mid$(A(i), 3)
 Next i
-DecodeEscape = utf8decode(StrConv(Join(a(), ""), vbFromUnicode))
+DecodeEscape = utf8decode(StrConv(Join(A(), ""), vbFromUnicode))
 
 End Function
 Sub ClearState1()
@@ -9867,22 +9867,22 @@ Public Function fixthis(p As Variant) As String
     End If
 End Function
 
-Public Function IntSqrdEC(sA) As Variant
-    sA = Int(sA)
-    If sA = 0 Or sA < 0 Then
+Public Function IntSqrdEC(SA) As Variant
+    SA = Int(SA)
+    If SA = 0 Or SA < 0 Then
         MyEr "Zero or negative paramter for integer Square Root", "Μηδενική ή Αρνητική παράμετρος για ακέραια τετραγωνική ρίζα"
         Exit Function
-    ElseIf sA > CDec("9903520314283042199192993792") Then
+    ElseIf SA > CDec("9903520314283042199192993792") Then
         OverflowValue vbDecimal
         Exit Function
     End If
     Dim q, r, t, z
-    z = CDec(sA)
+    z = CDec(SA)
     r = CDec("0")
     q = CDec("1")
     Do
     q = q * 4
-    Loop Until q > sA
+    Loop Until q > SA
     Do
         If q <= 1 Then Exit Do
         q = Int(q / 4&)
@@ -9895,7 +9895,7 @@ Public Function IntSqrdEC(sA) As Variant
     Loop
     IntSqrdEC = r
 End Function
-Function CopyBigInteger(p, Optional a) As BigInteger
+Function CopyBigInteger(p, Optional A) As BigInteger
     Dim check As BigInteger
     Set check = p
     If check.Unique Then
@@ -9903,8 +9903,8 @@ Function CopyBigInteger(p, Optional a) As BigInteger
     Exit Function
     End If
     Set CopyBigInteger = New BigInteger
-    If Not IsMissing(a) Then
-        CopyBigInteger.Load2 p, a
+    If Not IsMissing(A) Then
+        CopyBigInteger.Load2 p, A
     Else
         CopyBigInteger.Load2 p
     End If
@@ -10031,4 +10031,260 @@ ss$ = "TUPLE"
 End Select
 End If
 End Sub
+Sub CallByObject1(bstack As basetask, ret As Boolean, that As stdCallFunction)
+Dim Up As Long, getparam As Boolean, pp As Long
+Dim k As Long, p As Variant, Final(0 To 63) As Variant
+Dim x1 As Long, what$, curtype As Long, s$, link$, rtype As Variant
+Dim thisref(0 To 63) As Long
+Dim useHandler As mHandler
+Dim myobj As stdole.IUnknown
+Dim myobjinterface As stdole.IUnknown
+On Error Resume Next
+Dim vv As Variant
+If Not bstack.soros.IsObj Then
+    MyEr "Missing object", "Δεν βρήκα αντικείμενο"
+    Exit Sub
+
+End If
+Set myobj = bstack.soros.PopObj
+If Err Then
+    MyEr "expected object as fist parameter", "περίμενα αντικείμενο ως πρώτο όρισμα"
+    Exit Sub
+End If
+
+If that.ReadType(that.Count - 1) = -100 Then
+    Up = that.Count - 1
+    getparam = True
+Else
+    Up = that.Count
+End If
+For k = 1 To Up
+        If that.IsByRef(k - 1) Then
+            ' look for label..and check it
+           If bstack.IsInStackString(what$) Then
+                If that.ReadType(k - 1) <= 4 Then
+                    If GetGlobalVar(bstack.GroupName + what$, x1) Then
+                        thisref(k - 1) = x1 ' so that is used to restore value
+                        If that.ReadType(k - 1) = 2 Then
+                            Final(k - 1) = CLng(VarPtr(var(x1)) + 8)
+                        ElseIf MyIsObject(var(x1)) Then
+                            Final(k - 1) = CLng(VarPtr(var(x1)) + 8)
+                        ElseIf MyIsUnknown(var(x1)) Then
+                            Final(k - 1) = CLng(VarPtr(var(x1)) + 8)
+                        Else
+                            Final(k - 1) = var(x1)
+                        End If
+
+                    Else
+                            ' no such variable
+                    End If
+                    ElseIf that.ReadType(k - 1) = 64 Then
+                        If GetGlobalVar(bstack.GroupName + what$, x1) Then
+                            If MemInt(VarPtr(var(x1))) = vbDouble Then
+                                Final(k - 1) = CLng(VarPtr(var(x1)) + 8)
+                            Else
+                                WrongType
+                                Exit Sub
+                            End If
+                        End If
+                End If
+            Else
+                ' type mismatch
+                ' exit - error
+            End If
+        Else
+        Dim ii As Long
+            Select Case that.ReadType(k - 1)
+            Case 2
+                If Not bstack.IsInStackNumber(p) Then
+                    If Not bstack.IsInStackLong(ii) Then
+                        If bstack.soros.StackItemTypeIsObject(1) Then
+                            If bstack.soros.StackItemTypeObjectType(1) = "*[Enumeration]" Then
+                                Set useHandler = bstack.soros.PopObj
+                                If MyIsNumeric(useHandler.index_cursor) Then
+                                    ii = useHandler.index_cursor * useHandler.sign
+                                Else
+                                    Exit For
+                                End If
+                            Else
+                                Exit For
+                            End If
+                        ElseIf bstack.IsInStackNumber(p) Then
+                            If MemInt(VarPtr(p)) = vbCurrency Then
+                                ' FOR ULONG WE CAN PASS CURRENCY
+                                If p < 0 Then
+                                    MyEr "Only zero or positive number", "Μόνο μηδέν ή θετικό αριθμό"
+                                Else
+                                    Final(k - 1) = CLng(signlong(p))
+                                End If
+                            Else
+                                Exit For
+                            End If
+                        Else
+                            Exit For
+                        End If
+                    Else
+                        Exit For
+                    End If
+                    Final(k - 1) = ii
+                    Else
+                    If VarType(p) = 20 Then
+                    Final(k - 1) = p
+                    Else
+                    Final(k - 1) = CLng(p)
+                    End If
+                   End If
+                Case 20
+                    If Not bstack.IsInStackNumber(p) Then
+                        If Not bstack.IsInStackLong(ii) Then Exit For
+                        Final(k - 1) = cInt64(CVar(ii))
+                    Else
+                        Final(k - 1) = cInt64(p)
+                    End If
+                Case 1, 5
+                        If Not bstack.IsInStackNumber(p) Then
+                    If Not bstack.soros.IsObj Then
+                    If Not bstack.IsInStackLong(ii) Then Exit For
+                    Final(k - 1) = ii
+                    Else
+                    Set Final(k - 1) = bstack.soros.PopObj
+                    End If
+                    Else
+                    Final(k - 1) = p
+                    End If
+                Case 4, 7
+                    If Not bstack.IsInStackNumber(p) Then
+                   
+                    If Not bstack.IsInStackLong(ii) Then Exit For
+                    Final(k - 1) = ii
+                    Else
+                    Final(k - 1) = MyRound(p)
+                    End If
+                Case 64
+                    If Not bstack.IsInStackNumber(p) Then
+                        If Not bstack.IsInStackLong(ii) Then Exit For
+                        Final(k - 1) = CDbl(ii)
+                    Else
+                        Final(k - 1) = CDbl(p)
+                    End If
+                Case Else
+                    If Not bstack.IsInStackString(s$) Then Exit For
+                    Final(k - 1) = s$
+                End Select
+        End If
+cont111:
+Next k
+If getparam Then
+Do
+If bstack.IsInStackLong(pp) Then
+Final(k - 1) = pp
+k = k + 1
+ElseIf bstack.IsInStackNumber(p) Then
+Final(k - 1) = p
+k = k + 1
+ElseIf bstack.IsInStackString(s$) Then
+ Final(k - 1) = s$
+k = k + 1
+Else
+Exit Do
+End If
+Loop Until bstack.soros.IsEmpty Or k = 63
+Up = k - 1
+End If
+
+If k > Up Then
+'all is ok
+' make your call
+If that.RetType = 0 Then
+rtype = vbLong
+Else
+rtype = that.RetType
+End If
+If that.IsInterfaceCall Then
+If that.GetInterface(myobj, myobjinterface) Then
+
+Select Case rtype
+Case 9, 13
+Set rtype = Fast_obj_stdCallW(myobjinterface, that.Funcoffset, rtype, Final(), Up)
+If ret Then
+    bstack.soros.PushObj rtype   ' FEEDBACK TO STACK
+End If
+Case Else
+rtype = Fast_obj_stdCallW(myobjinterface, that.Funcoffset, rtype, Final(), Up)
+If ret Then
+    If that.RetType <> vbString Then
+        bstack.soros.PushVal rtype    ' FEEDBACK TO STACK
+    Else
+        bstack.soros.PushStr GetBStrFromPtr(x1)
+    End If
+End If
+End Select
+
+
+
+GoTo cont_here
+End If
+Exit Sub
+ElseIf that.CallAddr = 0 Then
+If Left$(that.func, 1) = "#" Then
+that.CallAddr = GetFuncPtrOrd(that.LIB, that.func)
+Else
+that.CallAddr = GetFuncPtr(that.LIB, that.func)
+End If
+End If
+If (that.CallAddr And &H7FFFFFFF) < 65536 Then Exit Sub
+On Error GoTo there
+Select Case rtype
+Case 9, 13
+If that.CallType = 0 Then
+Set rtype = Fast_stdCallW(that.CallAddr, rtype, Final(), Up)
+Else
+Set rtype = Fast_cdeclCallW(that.CallAddr, rtype, Final(), Up)
+End If
+If ret Then
+    bstack.soros.PushObj rtype   ' FEEDBACK TO STACK
+End If
+Case Else
+If that.CallType = 0 Then
+rtype = Fast_stdCallW(that.CallAddr, rtype, Final(), Up)
+Else
+rtype = Fast_cdeclCallW(that.CallAddr, rtype, Final(), Up)
+End If
+If ret Then
+    If that.RetType <> vbString Then
+        bstack.soros.PushVal rtype    ' FEEDBACK TO STACK
+    Else
+        bstack.soros.PushStr GetBStrFromPtr(x1)
+    End If
+End If
+End Select
+Else
+'error message
+
+
+Exit Sub
+End If
+cont_here:
+
+For k = 1 To that.Count
+If that.IsByRef(k - 1) Then
+' RESTORE VALUES...
+    If that.ReadType(k - 1) < 5 Then
+    If that.ReadType(k - 1) <> 2 Then
+    x1 = MemInt(VarPtr(var(thisref(k - 1))))
+    If x1 = 9 Or x1 = 13 Then
+    Else
+        var(thisref(k - 1)) = Final(k - 1)
+    End If
+    End If
+    
+    End If
+End If
+Next k
+Exit Sub
+there:
+MyEr Err.Description, Err.Description
+Err.Clear
+End Sub
+
 

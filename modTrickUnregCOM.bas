@@ -452,7 +452,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
         Exit Function
     End If
     If (mAttr.wTypeFlags And TYPEFLAG_FDUAL) Then
-        If mAttr.typekind <> TKIND_DISPATCH Then
+        If (mAttr.typekind And TKIND_DISPATCH) = 0 Then
             ITypeInfo_GetRefTypeOfImplType typeInf, -1, pRefType
             ITypeInfo_ReleaseTypeAttr typeInf, pAttr
             ITypeInfo_GetRefTypeInfo typeInf, pRefType, ppTInfo
@@ -462,7 +462,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
         End If
     End If
 
-    If TKIND_DISPATCH = mAttr.typekind Then
+    If (TKIND_DISPATCH And mAttr.typekind) > 0 Then
     
         cFuncs = mAttr.cFuncs '' mAttr.cVars
 

@@ -35412,6 +35412,7 @@ Method Image1, "CurveMask", 0, 25
 enabled=true
 caret=true
 layer image1 {
+	font "verdana"
 	form 20, 10
 	motion 1000,1000
 	CLS 4,0 : PEN 15
@@ -40996,7 +40997,7 @@ method wb, "move", 1000, 1000, 12000, 10000
 with wb, "silent", false, "object" set wb1, "visible" as visible
 
 'with wb,"RegisterAsBrowser", true
-method wb,"Navigate2", "http://www.google.com"
+method wb,"Navigate2", "https://en.wikipedia.org/wiki/Hello"
 with wb1, "readystate" as readystate
 
 function wb.TitleChange {
@@ -47378,5 +47379,254 @@ sub BigTitle(this$, there, percent)
 	step (scale.x-image.x(w)*n)/2
 	image w, image.x(w)*n
 end sub
+}
+MODULE UNICODE {cls,0
+Δ=1
+Δ++
+Print Δ
+ᾩ=3
+Print  ᾩ**2=ᾩ^2,  ᾩ^2-1=8
+Τύπωσε ᾩ**2=ᾩ^2,  ᾩ^2-1=8  ' this is Print statement too
+Print ᾡ=3
+जावास्क्रिप्ट=100
+जावास्क्रिप्ट++
+Print "जावास्क्रिप्ट=";जावास्क्रिप्ट
+ĦĔĽĻŎ$="hello"
+Print ĦĔĽĻŎ$+ħĕľļŏ$="hellohello"
+〱〱〱〱$="too less"
+Print Left$(〱〱〱〱$, 3)="too"
+Print
+
+c͓͈̃͂̋̈̆̽h̥̪͕ͣ͛̊aͨͣ̍͞ơ̱͔̖͖̑̽ș̻̥ͬ̃̈ͩ =100  : Print "c͓͈̃͂̋̈̆̽h̥̪͕ͣ͛̊aͨͣ̍͞ơ̱͔̖͖̑̽ș̻̥ͬ̃̈ͩ ="; c͓͈̃͂̋̈̆̽h̥̪͕ͣ͛̊aͨͣ̍͞ơ̱͔̖͖̑̽ș̻̥ͬ̃̈ͩ
+
+print
+}
+MODULE SQLITE3 {IF VERSION<13 THEN EXIT
+IF REVISION<49 THEN EXIT
+WINDOW 6, WINDOW
+FORM 60
+LOCALE 1033
+DIR USER
+IF NOT EXIST("sqlite3.dll") THEN
+	PRINT "FILE sqlite3.dll NOT FOUND - START DOWNLOAD FROM INTERNET"
+	CONST BINDF_GETNEWESTVERSION = 0x10&
+	STRING ZIPFILE="https://www.sqlite.org/2025/sqlite-dll-win-x86-3490200.zip"
+	DECLARE URLDownloadToFile LIB "urlmon.URLDownloadToFileW" {
+		LONG p, szUrl$, sxFname$, LONG dwRrvd, LONG cback
+	}
+	STRING tempZIP=TEMPNAME$  // this file erased automatic when we exit M2000.
+	IF URLDownloadToFile(0,ZIPFILE, tempZIP, BINDF_GETNEWESTVERSION, 0)=0 THEN
+		PRINT "ZIP FILE LOADED"
+		DECLARE zip COMPRESSOR
+		METHOD zip, "openZip", tempZIP
+		METHOD zip, "ExtractToPath", DIR$
+		PRINT "ZIP FILE EXTRACTED TO:";DIR$
+	END IF
+	REMOVE "urlmon"  ' unload library
+END IF
+IF NOT EXIST("sqlite3.dll") THEN EXIT
+IF EXIST("check.db") THEN
+	DOS "del "+DIR$+"check.db", 300;
+	IF EXIST("check.db") ELSE PRINT "OLD FILE DELETED"
+END IF
+CONST SQLITE_OK AS LONG = 0
+CONST SQLITE_STATIC AS LONG = 0, SQLITE_TRANSIENT AS LONG =-1
+CONST SQLITE_ROW AS LONG = 100, SQLITE_DONE AS LONG = 101
+CONST RET_STATUS=3
+ENUM Types {
+	 dbl=1,
+	 int,
+	 int64,
+	 txt
+}
+DECLARE sqlite3_libversion_number LIB c DIR$+"sqlite3.sqlite3_libversion_number" {} AS LONG
+DECLARE sqlite3_libversion LIB c DIR$+"sqlite3.sqlite3_libversion" {} AS LONG
+DECLARE sqlite3_open16  LIB c DIR$+"sqlite3.sqlite3_open16" {
+	Filename$, LONG &handler
+	} AS RET_STATUS
+DECLARE sqlite3_close_v2 LIB c DIR$+"sqlite3.sqlite3_close_v2" { LONG handler}
+DECLARE sqlite3_prepare16_v2  LIB c DIR$+"sqlite3.sqlite3_prepare16_v2" {
+	LONG handler, LONG bufferPtr, LONG Byte_size,
+	LONG &handlerStatement, LONG &pNotUsed
+	} AS RET_STATUS
+DECLARE sqlite3_step LIB c DIR$+"sqlite3.sqlite3_step" {
+	LONG handlerStatement
+	} AS RET_STATUS
+DECLARE sqlite3_reset LIB c DIR$+"sqlite3.sqlite3_reset" {
+	LONG handlerStatement
+	} AS RET_STATUS
+DECLARE sqlite3_finalize LIB c DIR$+"sqlite3.sqlite3_finalize" {
+	LONG handlerStatement
+	} AS RET_STATUS
+DECLARE sqlite3_bind_value LIB c DIR$+"sqlite3.sqlite3_bind_value" {
+	LONG handlerStatement, LONG Nth, LONG ValueHandler
+	} AS RET_STATUS
+DECLARE sqlite3_value_double LIB c DIR$+"sqlite3.sqlite3_value_double" {
+	LONG ValueHandler
+	} AS DOUBLE
+DECLARE sqlite3_column_double LIB c DIR$+"sqlite3.sqlite3_column_double" {
+	LONG handlerStatement, LONG Nth
+	} AS DOUBLE
+DECLARE sqlite3_column_int64 LIB c DIR$+"sqlite3.sqlite3_column_int64" {
+	LONG handlerStatement, LONG Nth
+	} AS LONG LONG
+DECLARE sqlite3_column_bytes16  LIB c DIR$+"sqlite3.sqlite3_column_bytes16" {
+	LONG handlerStatement, LONG Nth
+	} AS LONG
+DECLARE sqlite3_column_text16  LIB c DIR$+"sqlite3.sqlite3_column_text16" {
+	LONG handlerStatement, LONG Nth
+	} AS LONG
+DECLARE sqlite3_column_int LIB c DIR$+"sqlite3.sqlite3_column_int" {
+	LONG handlerStatement, LONG Nth
+	} AS LONG
+DECLARE sqlite3_bind_double LIB c DIR$+"sqlite3.sqlite3_bind_double" {
+	LONG handlerStatement, LONG Nth, Dbl
+	} AS RET_STATUS
+DECLARE sqlite3_bind_text16 LIB c DIR$+"sqlite3.sqlite3_bind_text16" {
+	LONG handlerStatement, LONG Nth, a$, LONG len_bytes, SQLITE_TRANSIENT
+	} AS RET_STATUS
+DECLARE sqlite3_bind_text LIB c DIR$+"sqlite3.sqlite3_bind_text" {
+	LONG handlerStatement, LONG Nth, a$, LONG len_bytes, SQLITE_TRANSIENT
+	} AS RET_STATUS
+DECLARE sqlite3_bind_int64  LIB c DIR$+"sqlite3.sqlite3_bind_int64" {
+	LONG handlerStatement, LONG Nth, int64
+	} AS RET_STATUS
+DECLARE sqlite3_bind_int  LIB c DIR$+"sqlite3.sqlite3_bind_int" {
+	LONG handlerStatement, LONG Nth,  LONG int
+	} AS RET_STATUS
+
+ret= sqlite3_libversion_number()
+PRINT "SQLITE VERSION = ";(ret div 1000000)+"."+((ret mod 1000000) div 1000)+"."+(ret mod 1000)
+rem {// press enter key just after rem to use these lines
+	BUFFER readthis AS BYTE*80
+	copyfromthere=sqlite3_libversion()
+	METHOD readthis, "FillDataFromMem", copyfromthere
+	PRINT "Version=";LEFTPART$(CHR$(EVALl$(readthis)), CHR$(0))
+}
+LONG db, where, compiled_statement, compiled_statement
+create$={
+	CREATE TABLE COMPANY(
+	ID 			INT64 PRIMARY KEY NOT NULL,
+	NAME 		TEXT NOT NULL,
+	AGE 			INT64 NOT NULL,
+	ADDRESS  	CHAR(50),
+	SALARY  		REAL
+	);
+}
+insertRow$={
+	INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY) VALUES (?1, ?2, ?3, ?4, ?5);
+}
+ReadRows$={
+	SELECT * FROM COMPANY ORDER BY NAME
+}
+ret=sqlite3_open16(DIR$+"check.db", &db)
+BUFFER preparemem AS integer*10000  ' for 10000 characters
+compiled_statement=@process(db, preparemem, create$)
+IF compiled_statement<>0 THEN
+	ret=sqlite3_step(compiled_statement)
+	IF ret=SQLITE_DONE THEN PRINT "TABLE CREATED"
+	ret=sqlite3_finalize(compiled_statement)
+END IF
+compiled_statement=@process(db, preparemem,insertRow$)
+IF compiled_statement<>0 THEN
+	FLUSH
+	Data 1,"Paul", 32, "California", 20000.45
+	Data 2, "Allen", 25, "Texas", 15000.00
+	Data 3, "Teddy", 23, "Norway", 20000.00
+	Data 4, "Mark", 25, "Rich-Mond ", 65000.50
+	Data 5, "David", 27, "Texas", 85000.00
+	Data 6, "Kim", 22, "South-Hall", 45000.00
+	rowTypes=(int64, txt, int, txt, dbl)
+	WHILE @bind_stack(compiled_statement, rowTypes)
+		ret=sqlite3_step(compiled_statement)
+		IF ret=SQLITE_DONE ELSE CANCEL=TRUE: EXIT
+		IF EMPTY THEN EXIT
+		ret=sqlite3_reset(compiled_statement)
+	END WHILE
+	ret=sqlite3_finalize(compiled_statement)
+END IF
+IF VALID(CANCEL) THEN GOTO 100
+PRINT "DATA INSERTED TO DATABASE AT TABLE COMPANY"
+compiled_statement=@process(db, preparemem, ReadRows$)
+IF compiled_statement<>0 THEN
+	ret=SQLITE_ROW
+	rows_counter=0
+	WHILE ret=SQLITE_ROW
+		ret=sqlite3_step(compiled_statement)
+		IF ret=SQLITE_ROW THEN rows_counter++
+	END WHILE
+	PRINT "FOUND NUMBER OF ROWS = ";rows_counter
+	ret=sqlite3_reset(compiled_statement)
+	ret=SQLITE_ROW
+	// WORKS WITH VARIANTSOR WITH SPECIFIC TYPES
+	// THESE ARE THE VARIABLES FILLING FROM DATABASE
+	REM	VARIANT var0, var1, var2, var3, var4
+	REM
+		DOUBLE  var4 : LONG var2 : LONG LONG var0 :STRING var1, var3
+	STRING headers="{0:8}|{1:10}|{2:3}|{3:20}|{4:10}"
+	STRING rowformat="{0:-8}|{1:10}|{2:-3}|{3:20}|{4:2:-10}"
+	STRING bar="{0:8}+{1:10}+{2:3}+{3:20}+{4:10}"
+	// FROM HERE WE RENDER THE TABLE COMPANY
+	PRINT FORMAT$(headers, "ID", "NAMES","AGE", "ADDRESS", "SALARY")
+	S=STRING$("-",WIDTH)
+	PRINT PART $(0), FORMAT$(bar, S, S, S, S, S )
+	PRINT
+	WHILE ret=SQLITE_ROW
+		ret=sqlite3_step(compiled_statement)
+		IF ret=SQLITE_ROW THEN
+			// THIS IS ZERO BASED INDEX FOR COLUMNS
+			var0=sqlite3_column_int64(compiled_statement, 0&)
+			var1=@sqlite_column_string(compiled_statement, 1&)
+			var2=sqlite3_column_int(compiled_statement, 2&)
+			var3=@sqlite_column_string(compiled_statement, 3&)
+			var4=sqlite3_column_double(compiled_statement, 4&)
+			PRINT FORMAT$(rowformat, var0, var1, var2,  var3,  var4)
+		END IF
+	END WHILE
+	PRINT PART $(0), FORMAT$(bar, S, S, S, S, S )
+	ret=sqlite3_finalize(compiled_statement)
+END IF
+100 ret=sqlite3_close_v2(db)
+REMOVE "sqlite3"  ' unload library
+PRINT ret=SQLITE_OK
+FUNCTION sqlite_column_string(stmt AS LONG, icol AS LONG)
+	LOCAL buffer_size=sqlite3_column_bytes16(stmt, icol)
+	LOCAL buf : BUFFER buf AS BYTE*buffer_size
+	METHOD buf, "FillDataFromMem", sqlite3_column_text16(stmt, icol)
+	=EVAL$(buf)
+END FUNCTION
+FUNCTION process(this_db, prep, a$)
+	prep[0]=a$
+	LOCAL LONG z=len(a$)*2, ret, compiled_statement
+	LOCAL LONG where=prep(0), where0, last=z+where
+	DO	where0=where
+		z=last-where
+		ret=sqlite3_prepare16_v2(this_db, where0, z, &compiled_statement, &where)
+	UNTIL ret=0 or z=last-where
+	IF ret=0 THEN =compiled_statement
+END FUNCTION
+FUNCTION bind_stack(that_stmt, Rtypes)
+	IF STACK.SIZE<LEN(Rtypes) THEN FLUSH : =FALSE: EXIT FUNCTION
+	LOCAL int64val AS  LONG LONG, dbl1 AS DOUBLE, int1 AS LONG
+	LOCAL m=EACH(Rtypes), ret AS LONG
+	// BINDING USE BASE ONE FOR INDEX
+	WHILE m
+		SELECT CASE array(m)
+		CASE txt
+			READ a$
+			ret+=sqlite3_bind_text16(that_stmt, m^+1, a$, len(a$)*2, SQLITE_TRANSIENT)
+		CASE dbl
+			READ dbl1
+			ret+=sqlite3_bind_double(that_stmt, m^+1, dbl1)
+		CASE int64
+			READ int64val
+			ret+=sqlite3_bind_int64(that_stmt, m^+1, int64val)
+		CASE int
+			READ int1
+			ret+=sqlite3_bind_int(that_stmt, m^+1, int1)
+		END SELECT
+	END WHILE
+	=ret=SQLITE_OK
+END FUNCTION
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

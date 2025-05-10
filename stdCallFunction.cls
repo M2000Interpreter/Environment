@@ -111,6 +111,14 @@ Do While ParamList <> ""
             ParamList = "error"
             Exit Sub
         End If
+    ElseIf IsLabelSymbolNew(ParamList, "дипкос", "DOUBLE", Lang) Then
+        If FastSymbol(ParamList, "&") Then l = 16 Else l = 0
+        If IsPureLabel(ParamList, check$) = 1 Then
+            M = 64
+        Else
+            ParamList = "error"
+            Exit Sub
+        End If
     Else
         If FastSymbol(ParamList, "&") Then l = 16 Else l = 0
             M = IsPureLabel(ParamList, check$)
@@ -144,29 +152,32 @@ If there < 0 Then Exit Function
 If t(there) < 0 Then
 ReadType = t(there)
 Else
-ReadType = (t(there) And &HF)
+ReadType = (t(there) And &HFFEF)
 End If
 End Function
 
 Public Function IsArrayItem(there As Long) As Boolean
-IsArrayItem = (t(there) And &HF) > 4
+Dim a As Long
+a = (t(there) And &HFFEF)
+' 5 and 7
+IsArrayItem = (a < 8 And a > 4)
 End Function
 Public Function checktype(there As Long, ByVal thistype As Long) As Boolean
 Select Case thistype
 Case 1, 4, 5, 7
-thistype = 1
+thistype = 1  ' AS IS
 Case Else
-thistype = 2
+thistype = 2 ' BY POINTER
 End Select
-Select Case (t(there) And &HF)
+Select Case (t(there) And &HFFEF)
 Case 1, 4, 5, 7
-checktype = thistype = 1
+checktype = thistype = 1 ' AS IS
 Case Else
-checktype = thistype = 2
+checktype = thistype = 2 ' BY POINTER
 End Select
 End Function
 Public Function IsByRef(there As Long) As Boolean
-IsByRef = (t(there) And &HF0) <> 0
+IsByRef = (t(there) And &H10) <> 0
 End Function
 
 

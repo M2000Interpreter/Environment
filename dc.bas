@@ -773,7 +773,6 @@ nextline:
                  
                  Dim p As Long
                  Dim cc As Long
-                 
                  Dim Extra1 As Long
                  SetTextJustification DDD.hDC, 0, 0
                  cc = DDD.currentX \ DXP
@@ -800,8 +799,8 @@ nextline:
                  If Extra > 0 Then DDD.currentX = DDD.currentX + Extra * dv15
                  End If
                  SetTextJustification DDD.hDC, 0, 0
-                 INTD = MyTextWidth(DDD, buf$)
-                 TextOut DDD.hDC, (wi - INTD) \ DXP, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$)
+
+                 TextOut DDD.hDC, (wi - MyTextWidth(DDD, buf$)) \ DXP + cc, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$)
                  
                  Else
                  olda = SetTextAlign(DDD.hDC, 0) 'TA_RTLREADING)
