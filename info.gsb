@@ -5706,6 +5706,7 @@ Set Edit !4   ' 4 chars fpr tabs in edit
 refresh 10000
 cls 0,0
 \\ window show again
+linespace 0
 window 6, window
 refresh 10000
 linespace 0
@@ -5717,20 +5718,25 @@ BackGround {
 	sx=scale.x
 	sy=scale.y
 }
-Window 12, Window 
+
+Window 12, Window
 BackGround {cls,0 }
 
-if  scale.x/scale.y<1.5 then
+if  sx/sy<1.5 then
+  	Window 12, Window	
 	form 12*8;
-	
-	linespace 30
 else
-form 12*8;	
+	Window 12, sx, sy;  ' for seqoe ui 	
+	form 12*8;
 	Window mode*.9, Window
 	linespace 0
 end if
 form width;
+
 linespace 15
+k=height
+if k<51 then form width, 51
+
 backcolor=5   'point
 oldpen=14  ' pen
 Pen 0 {
@@ -47402,7 +47408,7 @@ c͓͈̃͂̋̈̆̽h̥̪͕ͣ͛̊aͨͣ̍͞ơ̱͔̖͖̑̽ș̻̥ͬ̃̈ͩ =100  : Prin
 print
 }
 MODULE SQLITE3 {IF VERSION<13 THEN EXIT
-IF REVISION<49 THEN EXIT
+IF VERSION=13 THEN IF REVISION<49 THEN EXIT
 WINDOW 6, WINDOW
 FORM 60
 LOCALE 1033

@@ -2,7 +2,7 @@ Attribute VB_Name = "Module1"
 ' Author: George Karras, Kallithea Attikis, Greece
 ' Some code are work of others, and included using info when possible.
 ' Licensed under the GNU GENERAL PUBLIC LICENSE,  Version 3, 29 June 2007
-' Before loading the code in VB6 IDE, change editor's text to a Greek font.
+' Before loading the code in VB6 IDE, change editor's text to a Greek font.4
 ' Also to run greek commands from IDE you have to turn suFunction Mypport for Non Unicode Programs to Greek Language
 ' Local References: File idispatch.tlb
 ' First run this, and then you have to execute M2000.exe to call it, using a second IDE with the mexe.vbp, or just run M2000.exe
@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 49
+Global Const Revision = 50
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -32762,12 +32762,12 @@ End Function
 Function procLineSpace(bstack As basetask, rest$) As Boolean
 Dim X As Double
 procLineSpace = True
-If IsExp(bstack, rest$, X) Then
+If IsExp(bstack, rest$, X, , True) Then
 
     If CLng(X) < 0 Or CLng(X) > 60 * dv15 Then
     OutOfLimit
     Else
-    X = (X \ 30) * 60
+    X = (X \ 15) * 30
     X = CLng(X) / 2
     
    SetText bstack.Owner, CLng(X)

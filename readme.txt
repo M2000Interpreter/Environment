@@ -1,10 +1,8 @@
 M2000 Interpreter and Environment
-Version 13 revision 49 active-X
+Version 13 revision 50 active-X
 
-1. Final fix for fonts which have break character number 13 (like Seqoe UI). Now we can give full justification (left and right) using a left margin and a length (so this is like a right margin).
-
-2. Expand DECLARE for using C and return values like LONG LONG and DOUBLE (8bytes). There is a new module SQLITE3, a demo for the use of SQLITE3, download from internet, unzip it, and use of c functions directly from M2000. We make a database with one table, we insert rows and we read the table and display it. Last we unload the library (sqlite3.dll). (See the info.gsb file for the new code).
-
+1. Linespace can get values like 15 (3 pixels) (was 6 pixels before)
+2. fix infobasic in info.gsb (exist in setup file)
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
