@@ -1613,7 +1613,7 @@ End Function
 Function DecodeEscape(c$, plus_as_space As Boolean) As String
 If plus_as_space Then c$ = Replace(c$, "+", " ")
 Dim A() As String, i As Long
-A() = Split(c$, "%")
+A() = split(c$, "%")
 For i = 1 To UBound(A())
 A(i) = Chr(val("&h" + Left$(A(i), 2))) + Mid$(A(i), 3)
 Next i
@@ -2702,10 +2702,10 @@ NewCheck2:
     End If
 End Function
 Public Function ExecuteVar(Exec1 As Long, ByVal jumpto As Long, bstack As basetask, W$, b$, v As Long, Lang As Long, VarStat As Boolean, NewStat As Boolean, nchr As Integer, ss$, sss As Long, temphere$, noVarStat As Boolean) As Long
-Dim i As Long, p As Variant, myobject As Object, ok As Boolean, sw$, sp As Variant, useType As Boolean
+Dim i As Long, p As Variant, pp As Variant, myobject As Object, ok As Boolean, sw$, sp As Variant, useType As Boolean
 Dim lasttype As Integer, pppp1 As mArray, isglobal As Boolean, useHandler As mHandler, usehandler1 As mHandler, idx As mIndexes, myProp As PropReference
 Dim newid As Boolean, ar As refArray, ww As Integer, BI As BigInteger, mylist As FastCollection
-Dim ppppAny As iBoxArray, pppp2 As iBoxArray, mTuple As tuple
+Dim ppppAny As iBoxArray, pppp2 As iBoxArray, mTuple As tuple, userGroup As Group
 Const b12345 = vbCr + "'\/:}"
 If jumpto = 9 Then GoTo Case8new
 p = CheckThis(bstack, W$, b$, v, Lang)
@@ -2842,7 +2842,7 @@ entry100101:
             Case "/=": ww = 7
             Case "<="
                 Mid$(b$, 1, 2) = "  "
-                If Not IsExp(bstack, b$, sp, , flatobject:=True) Then
+                If Not IsExp(bstack, b$, sp) Then
                     If IsStrExp(bstack, b$, sw$, False) Then
                         sp = sw$
                     Else
@@ -2907,21 +2907,47 @@ entry00022:
                 
                 If myVarType(ar(sp, p), vbObject) Then
                 
-                Set p = ar(sp, p)
-                If p Is Nothing Then
+                Set pp = ar(sp, p)
+                If pp Is Nothing Then
                     NoOperatorForThatObject "=>"
-                ElseIf TypeOf p Is Group Then
-                    If p.link Is Nothing Then
-                        NoOperatorForThatObject "=>"
+                ElseIf TypeOf pp Is Group Then
+                    If pp.link Is Nothing Then
+                                Set userGroup = pp
+                                Set pp = Nothing
+                                
+                                    If Not userGroup.IamApointer Then
+                                        If userGroup.refcount1 > 2 Then
+                                            Set myobject = Nothing
+                                            CopyGroupObjRef userGroup, myobject
+                                        Else
+                                            Set myobject = userGroup
+                                        End If
+                                    Else
+                                    Set myobject = userGroup
+                                    End If
+                                    Dim pp1 As ppppLight
+                                    Set pp1 = New ppppLight
+                                    pp1.arr = False
+                                    Set pp1.GroupRef = myobject
+                                  
+                                    
+                                    
+'                        NoOperatorForThatObject "."
+                        If SpeedGroup(bstack, pp1, "", "RefArray", b$, -2&) = 1 Then
+                         ar(sp, p) = CVar(pp1.GroupRef)
+                        GoTo NewCheck
+                        Else
+                        GoTo err000
+                        End If
                         
-                    ElseIf p.link.IamFloatGroup Then
+                    ElseIf pp.link.IamFloatGroup Then
                         ExecuteVar = 10
                         If ww = 2 Then
                         Mid$(b$, 1, 2) = ChrW(7) + ChrW(3)
                         Else
                         Mid$(b$, 1, 2) = ChrW(7)
                         End If
-                        Set bstack.lastpointer = p
+                        Set bstack.lastpointer = pp
                         Exit Function
                     Else
                         ExecuteVar = 9
@@ -2930,7 +2956,7 @@ entry00022:
                         Else
                         Mid$(b$, 1, 1) = Chr$(3) '+ Chr$(0) ' cause we have two chars
                         End If
-                        Set bstack.lastpointer = p
+                        Set bstack.lastpointer = pp
                         Exit Function
                     End If
                 Else
@@ -3066,16 +3092,18 @@ takeitnow:
                                         GoTo err000
                                         End If
                                         ElseIf TypeOf bstack.lastobj Is Group Then
-                                                Set sp = bstack.lastobj
-                                                If Not sp.IamApointer Then
+                                            ' use a[1]=pointer(groupvar)
+                                            
+                                               ' Set sp = bstack.lastobj
+                                               ' If Not sp.IamApointer Then
                                                 
-                                                Set bstack.lastobj = Nothing
-                                                Set bstack.lastpointer = Nothing
-                                                MakeGroupPointer bstack, sp
-                                                sp = 0
-                                                Else
-                                                Set sp = Nothing
-                                                End If
+                                               ' Set bstack.lastobj = Nothing
+                                               ' Set bstack.lastpointer = Nothing
+                                               ' MakeGroupPointer bstack, sp
+                                               ' sp = 0
+                                               ' Else
+                                               ' Set sp = Nothing
+                                               ' End If
                                         ElseIf TypeOf bstack.lastobj Is BigInteger Then
                                             If ar.emtype = 201 Then
                                                 GoTo is201
@@ -3143,6 +3171,7 @@ is201:
                                         p = p + 1
                                         Loop
                                     Else
+                                    On Error GoTo WrongOp
                                     Select Case ww
                                     Case -100
                                     
@@ -3333,6 +3362,9 @@ SyntaxError
 GoTo err000
 notypevarV:
 noType Typename(var(v))
+GoTo err000
+WrongOp:
+WrongOperator
 GoTo err000
 WrongObj:
 WrongObject
@@ -6776,9 +6808,9 @@ If par Then
                         For x1 = 1 To .Total
                             s$ = .StackItem(x1) & " "
                             If Left$(s$, 1) = "*" Then '' we have a group
-                                s$ = Split(Mid$(s$, 2))(0)
+                                s$ = split(Mid$(s$, 2))(0)
                             Else
-                                s$ = Split(s$)(0)
+                                s$ = split(s$)(0)
                             End If
                             If Right$(s$, 2) = "()" Then
                                 ps.DataStr Left$(s$, Len(s$) - 2)
@@ -9909,6 +9941,84 @@ Function CopyBigInteger(p, Optional A) As BigInteger
         CopyBigInteger.Load2 p
     End If
 End Function
+Sub CopyGroupObjRef(myobject1 As Object, myobject2 As Object, Optional LinkToMe As Boolean = False)
+Dim s$, vvl As Variant, x1 As Long
+Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
+Dim myTuple As tuple, mySecondTuple As tuple
+Dim mygroup2 As New Group
+Dim myobject As Group
+Const mHdlr = "mHandler"
+Const mgrp = "Group"
+Const mlmbd = "lambda"
+Const mArr = "mArray"
+Const mTuple = "tuple"
+Set myobject = myobject1
+If myobject.IamApointer Then
+    Set myobject2 = myobject
+    Exit Sub
+End If
+With myobject
+    If .IamFloatGroup Then
+        .PeekItem 1, vvl
+        mygroup2.BeginFloat vvl + 2
+        For x1 = 0 To vvl * 2 + 2
+            .PeekItem x1, vvl
+            s$ = VarTypeName(vvl)
+            Select Case s$
+            Case mgrp
+                Set subgroup = vvl
+                CopyGroupObjRef subgroup, sub2
+                Set subgroup = Nothing
+                Set vvl = sub2
+                Set sub2 = Nothing
+            Case mArr
+                If Not vvl.common Then
+                    Set myArray = vvl
+                    Set mySecondArray = New mArray
+                    myArray.CopyArray mySecondArray
+                    Set myArray = Nothing
+                    Set vvl = mySecondArray
+                    Set mySecondArray = Nothing
+                End If
+            Case mTuple
+                If Not vvl.common Then
+                    Set myTuple = vvl
+                    Set mySecondTuple = New tuple
+                    myTuple.CopyArray mySecondTuple
+                    Set myTuple = Nothing
+                    Set vvl = mySecondTuple
+                    Set mySecondTuple = Nothing
+                End If
+            End Select
+            mygroup2.PokeItem x1, vvl
+        Next x1
+        mygroup2.HasStrValue = myobject.HasStrValue
+        mygroup2.HasValue = myobject.HasValue
+        mygroup2.HasSet = myobject.HasSet
+        mygroup2.HasParameters = myobject.HasParameters
+        mygroup2.HasParametersSet = myobject.HasParametersSet
+        Set mygroup2.SuperClassList = myobject.SuperClassList
+        mygroup2.HasRemove = myobject.HasRemove
+        'If Not GroupRef Is Nothing Then
+        If LinkToMe Then
+            Set mygroup2.LinkRef = myobject
+            mygroup2.link.ToDelete = True
+        Else
+            .PeekItem x1, vvl
+            mygroup2.PokeItem x1, vvl
+            
+        End If
+        Set mygroup2.Events = .Events
+        mygroup2.highpriorityoper = .highpriorityoper
+        mygroup2.HasUnary = .HasUnary
+        mygroup2.ToDelete = False
+        Set mygroup2.mytypes = .mytypes
+    End If
+End With
+Set myobject2 = mygroup2
+End Sub
+
+
 Private Function fixAr(ar As refArray, p, v) As Boolean
     Dim pppp As mArray, tttt As tuple
     If TypeOf p Is mArray Then

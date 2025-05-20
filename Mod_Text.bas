@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 13
 Global Const VerMinor = 0
-Global Const Revision = 50
+Global Const Revision = 51
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -4148,7 +4148,11 @@ Dim mm As mStiva2, tempRef As Object
 If Prefix = "VAL" Then
 ' we stand as right value...
     If pppp Is Nothing Then GoTo fastexit
+    If InStr(W$, "(") Then
     ec$ = W$ + ")"
+    Else
+    ec$ = W$
+    End If
     If v >= 0 Then
         W$ = pppp.CodeName & (v)
     Else
@@ -5475,9 +5479,9 @@ If Len(W$) < 2 Then Exit Sub
 If AscW(W$) = 65 Then
 On Error Resume Next
 Err.Clear
-Set pppp = var(Split(Mid$(W$, 2))(0))   ''  "A...16charRef....ItemNo"
+Set pppp = var(split(Mid$(W$, 2))(0))   ''  "A...16charRef....ItemNo"
 If Err.Number > 0 Then Exit Sub
-it = val(Split(Mid$(W$, 2))(1))
+it = val(split(Mid$(W$, 2))(1))
 If pppp.ItemType(it) = doc Then
 pppp.item(it).textDoc = v$  ' no checked yet
 Else
@@ -11245,6 +11249,17 @@ conthere123:
                                 Set nbstack = bstack
                                 Set nbstack.lastobj = rA((0), p)
                                 p = 0
+                                If IsGroup(nbstack.lastobj) Then
+                                    Set userGroup = nbstack.lastobj
+                                    If Not userGroup.IamApointer Then
+                                        If userGroup.refcount1 > 2 Then
+                                        Set anything = Nothing
+                                        CopyGroupObjRef userGroup, anything
+                                        rA((0), p) = CVar(anything)
+                                        Set nbstack.lastobj = anything
+                                        End If
+                                    End If
+                                End If
                                 GoTo goodjump
                             Else
                                 If rA.vtType(0, p) = vbUserDefinedType Then
@@ -13118,8 +13133,11 @@ goodjump:
             ElseIf TypeOf bstack.lastobj Is Group Then
 jumpgroup001:
                 Set userGroup = anything
+                
                 Set nbstack = Nothing
                 Set bstack.lastobj = anything
+                
+                
                 If Not (userGroup.HasValue And Not userGroup.HasParameters) Then
                     Mid$(A$, 1, 1) = "."
                 End If
@@ -13344,6 +13362,7 @@ contgroup:
 
                 ElseIf Left$(A$, 1) = "(" Then
 contgroup3:
+
                     IsNumberNew = SpeedGroup(bstack, ppppl, "VAL", v$, A$, w2) = 1
                             r = bstack.LastValue
 
@@ -14044,7 +14063,9 @@ finishnum:
             Else
 skiperror:
             IsNumberNew = False
+  
             If FindNameForGroup(bstack, v$) Then
+                
                 UnknownMethod1 A$, v$
             Else
                 If Len(v$) > 5 Then
@@ -24160,7 +24181,7 @@ RepPara = True
                         If x1 = 1 Then If Not myVarType(var(i), vbString) Then MissingStrVar: RepPara = False: Exit Function
                         If FastSymbol(rest$, ",") Then
                             If IsStrExp(basestack, rest$, ss$, False) Then
-                                  aa = Split(var(i), ss$)
+                                  aa = split(var(i), ss$)
                                     Do While FastSymbol(rest$, ",")
                                         RepPara = True
                                         If IsExp(basestack, rest$, p, flatobject:=True) Then
@@ -24212,7 +24233,7 @@ RepPara = True
                         End If
                         If FastSymbol(rest$, ",") Then
                             If IsStrExp(basestack, rest$, ss$) Then
-                                  aa = Split(pppp.item(i), ss$)
+                                  aa = split(pppp.item(i), ss$)
                                     Do While FastSymbol(rest$, ",")
                                         RepPara = True
                                         If IsExp(basestack, rest$, p, flatobject:=True) Then
@@ -25621,14 +25642,14 @@ here$ = Left$(Name$, Len(Name$) - 1)
 Dim iamvariant As Boolean
 For i = 1 To q.FieldsCount
     aa$ = q.ReadField(i)
-    v = Abs(Split(aa$)(1))
+    v = Abs(split(aa$)(1))
     Vlist = True
     If MyIsObject(var(v)) Then
         Select Case Typename(var(v))
         Case mGroup
             Set ThisGroup = var(v)
             With ThisGroup
-                ss$ = Split(aa$)(0)
+                ss$ = split(aa$)(0)
                 If Left$(ss$, 1) = "#" Then iamvariant = True: ss$ = Mid$(ss$, 2) Else iamvariant = False
                 If Left$(ss$, 1) = "*" Then
                     ss$ = Mid$(ss$, 2)
@@ -25703,7 +25724,7 @@ For i = 1 To q.FieldsCount
             End With
         Case "lambda"
 IsLambda:
-            ss$ = Split(aa$)(0)
+            ss$ = split(aa$)(0)
             If Left$(ss$, 1) = "#" Then iamvariant = True: ss$ = Mid$(ss$, 2) Else iamvariant = False
             If UnhidePrivate And AscW(ss$) = -65 Then
             ss$ = Mid$(ss$, 2)
@@ -25721,7 +25742,7 @@ IsLambda:
         End Select
     Else
 cont123:
-        ss$ = Split(aa$)(0)
+        ss$ = split(aa$)(0)
         If Left$(ss$, 1) = "#" Then iamvariant = True: ss$ = Mid$(ss$, 2) Else iamvariant = False
         varhash.ItemCreator Name$ + ss$, v, True, , Not iamvariant
 
@@ -25744,14 +25765,14 @@ Else
 subname$ = Replace(Replace(FList, Chr$(3), Name$), Chr$(2), Name$)
 End If
 
-s() = Split(subname$, Chr$(1))
+s() = split(subname$, Chr$(1))
 For i = LBound(s$()) + 1 To UBound(s$())
 If s(i) <> "" Then
-mm = val(Split(s(i))(1))
+mm = val(split(s(i))(1))
 
 als = AllocSub()
 sbf(als) = sbf(Abs(mm))
-ss$ = Split(s(i))(0)
+ss$ = split(s(i))(0)
  subHash.ItemCreator ss$, als, True
 
  
@@ -31179,7 +31200,7 @@ k.PokeItem 0, "Variables-Arrays"
 k.PokeItem 1, i
 Dim usevariant As Boolean
 For j = 2 To i * 2 + 1 Step 2
-    b$() = Split(myGroup.ReadField(BI), " ")
+    b$() = split(myGroup.ReadField(BI), " ")
     w3 = Abs(val(b$(1)))
     w1 = AscW(Right$(b$(0), 1))
     If w1 = 41 Then
@@ -31290,7 +31311,7 @@ k.BeginFloat i + 2
 k.PokeItem 0, "Variables-Arrays"
 k.PokeItem 1, i
 For j = 2 To i * 2 + 1 Step 2
-    b$() = Split(myGroup.ReadField(BI), " ")
+    b$() = split(myGroup.ReadField(BI), " ")
     w3 = Abs(val(b$(1)))
     w1 = AscW(Right$(b$(0), 1))
     If w1 = 41 Then
@@ -31388,7 +31409,7 @@ BI = 1
 If Not k.IamFloatGroup Then Exit Function
     k.PokeItem 0, "Variables-Arrays"
     For j = 2 To myGroup.FieldsCount * 2 + 1 Step 2
-        b$() = Split(myGroup.ReadField(BI), " ")
+        b$() = split(myGroup.ReadField(BI), " ")
         w3 = Abs(val(b$(1)))
         w1 = AscW(Right$(b$(0), 1))
         If w1 = 41 Then
@@ -31445,7 +31466,7 @@ BI = 1
 If Not k.IamFloatGroup Then Exit Function
 k.PokeItem 0, "Variables-Arrays"
 For j = 2 To myGroup.FieldsCount * 2 + 1 Step 2
-    b$() = Split(myGroup.ReadField(BI), " ")
+    b$() = split(myGroup.ReadField(BI), " ")
     w3 = Abs(val(b$(1)))
     w1 = AscW(Right$(b$(0), 1))
     If w1 = 41 Then
@@ -32208,7 +32229,7 @@ ChangedFunctionList = True
 Exit Function
 Dim c$, k$(), Final As Long
 Do While s$ <> "" And Not ChangedFunctionList
-If ISSTRINGA(s$, c$) Then ChangedFunctionList = sbf(Abs(val(Split(c$, " ")(1)))).Changed
+If ISSTRINGA(s$, c$) Then ChangedFunctionList = sbf(Abs(val(split(c$, " ")(1)))).Changed
 Loop
 
 End Function
@@ -32219,7 +32240,7 @@ Dim c$, f$, k$(), qq$, Final As Long, tmp$, oldl As Long, mtrim As Long
 Dim final2 As Long
 While s$ <> ""
 If ISSTRINGA(s$, c$) Then
-k$() = Split(c$, " ")
+k$() = split(c$, " ")
 Final = val(k$(1))
 If Not Right$(sbf(Abs(Final)).sb, 2) = vbCrLf Then
 qq$ = vbCrLf
@@ -32252,7 +32273,7 @@ Sub ResetFunctionList(s$)
 Dim c$, k$(), Final As Long
 While s$ <> ""
 If ISSTRINGA(s$, c$) Then
-k$() = Split(c$, " ")
+k$() = split(c$, " ")
 Final = val(k$(1))
 With sbf(Abs(Final))
 .sb = vbNullString
@@ -32344,7 +32365,7 @@ End Function
 Function dimString(typo$) As String
 Dim pppp As mArray, pp, i As Long, p, lim As Long
 Dim b$(), vl$
-b$() = Split(typo$, " ")
+b$() = split(typo$, " ")
 
 Set pppp = var(val(b$(1)))
       pppp.SerialItem pp, CLng(p), 5
@@ -32468,7 +32489,7 @@ Function FindNameForGroup(bstack As basetask, W$) As Boolean
 Dim ss() As String, w2 As Long
   If InStr(W$, ChrW(&H1FFF)) > 0 Then
         If InStr(W$, ".") > 0 Then
-        ss() = Split(W$, ".")
+        ss() = split(W$, ".")
             If GetVar(bstack, ss(0), w2) Then
                 If VarTypeName(var(w2)) = mGroup Then
                    If var(w2).FloatGroupName <> "" Then ss(0) = var(w2).FloatGroupName: FindNameForGroup = True
@@ -33788,8 +33809,8 @@ therebad:
                         i = sbf(S3).subs.Value
                         x1 = S3
                     Else
-                        i = val(Split(sbf(S3).subs.Value)(0))
-                        x1 = val(Split(sbf(S3).subs.Value)(1))
+                        i = val(split(sbf(S3).subs.Value)(0))
+                        x1 = val(split(sbf(S3).subs.Value)(1))
                     End If
                    
                 Else
@@ -34247,7 +34268,7 @@ Function searchsub(ByVal where As Long, W$, Final As Long, site As Long, Code$, 
 Static aCopy As New Document
 Dim EndPoint As Long
 Dim ww$(), vv()
-ww$() = Split(W$)
+ww$() = split(W$)
 If where = 0 Or W$ = "" Then
 Exit Function
 Else
@@ -45161,7 +45182,7 @@ If Not FastSymbol(rest$, ")") Then ProcessIfStr = False
 End Function
 Function GETarrayFROMstr(A$, b$) As mHandler
 Dim pppp As tuple, aa() As String
-aa = Split(A$, b$)
+aa = split(A$, b$)
 Set pppp = New tuple
 If UBound(aa) = -1 Then
 
@@ -53824,8 +53845,8 @@ fstr16: '"MEMBER.TYPE$(", "лекоус.тупос$("
                 End If
                 s$ = ms.StackItem(CLng(p))
                 If Left$(s$, 1) = "*" Then s$ = Mid$(s$, 2)
-                q1$ = Split(s$)(1)
-                s$ = Split(s$)(0)
+                q1$ = split(s$)(1)
+                s$ = split(s$)(0)
                 If Right$(s$, 1) = "(" Then
                     If here$ = vbNullString Or var(dd).IamGlobal Then
                     If varhash.ExistKey(s$) Then
@@ -53918,7 +53939,7 @@ fstr17: ' "MEMBER$(", "лекос$("
                 End If
                  s$ = ms.StackItem(CLng(p))
                 If Left$(s$, 1) = "*" Then s$ = Mid$(s$, 2)
-                         r$ = Split(s$)(0)
+                         r$ = split(s$)(0)
                  If InStr(r$, ChrW(&HFFBF)) > 0 Then r$ = Replace$(r$, ChrW(&HFFBF), "")
                 Else
                 MissNumExpr
@@ -56489,7 +56510,9 @@ Do
 exist = False
 useType = False
 'I = IsLabelA(here$, rest$, W$)
-i = IsLabelAnew("", rest$, W$, (0&))
+j = -1
+i = IsLabelAnew("", rest$, W$, j)
+If (i <> 8 Or isStruct) And j > 0 Then rest$ = Mid$(rest$, j)
 If Len(rest$) = 0 Then
 If i = 0 Then SyntaxError: Exit Function
 End If
@@ -56577,6 +56600,8 @@ part$ = className$ + "("
 ElseIf i = 6 Then
 W$ = Left$(W$, Len(W$) - 2)
 part$ = className$ + "$("
+ElseIf i = 8 Then
+part$ = className$ + "()"
 Else
 SyntaxError
 AddGroupFromClass = False
@@ -56586,7 +56611,9 @@ End If
     If isglobal Or islocal Then
         GoTo CONTGLO1
     ElseIf GetVar(bstack, bstack.GroupName + W$, v, True, , , ww$, useType) Then
-    If Typename(var(v)) <> "Group" Then
+    If i = 8 Then
+        GoTo A112233
+    ElseIf Typename(var(v)) <> "Group" Then
         WrongType
         AddGroupFromClass = False
         Exit Function
@@ -56603,8 +56630,19 @@ End If
     exist = True
 Else
 CONTGLO1:
-If i = 1 Then
-    v = globalvar(bstack.GroupName + W$, 0, , here$ = "", , True)
+    If i = 1 Then
+        v = globalvar(bstack.GroupName + W$, 0, , here$ = "", , True)
+    ElseIf i = 8 Then
+A112233:
+        If IsExp(bstack, part$, r) Then
+            Set r = bstack.lastobj
+            Set bstack.lastobj = Nothing
+            If Not MyAnyType(bstack, rest$, (0&), islocal, 9, Not (islocal Or isglobal), r) Then
+                WrongType
+                Exit Function
+            End If
+            GoTo loophere
+        End If
     Else
     v = globalvar(bstack.GroupName + W$, 0, , here$ = "", , True)
     'ret = globalvar(bstack.GroupName + W$, (v), True, here$ = "", , True)

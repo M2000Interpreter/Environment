@@ -923,8 +923,8 @@ LastErNum1 = 0
 LastErName = vbNullString
 LastErNameGR = vbNullString
 Else
-er$ = Split(er$, ChrW(&H1FFF))(0)
-ergr$ = Split(ergr$, ChrW(&H1FFF))(0)
+er$ = split(er$, ChrW(&H1FFF))(0)
+ergr$ = split(ergr$, ChrW(&H1FFF))(0)
 If rinstr(er$, " ") = 0 Then
 LastErNum = 1001
 Else
@@ -1852,7 +1852,7 @@ Dim rTop As Long, rBottom As Long
 Dim lenw&, realR&, realstop&, r1 As Long, WHAT1$, ff As Long, LL$(), must As Long
 If processcr Then
     If Len(what$) = 0 Then Exit Sub
-    LL$() = Split(what, vbLf)
+    LL$() = split(what, vbLf)
     what = LL$(0)
     ff = 0
 End If
@@ -7268,7 +7268,7 @@ End Function
 Function Tcase(s$) As String
 Dim A() As String, i As Long
 If s$ = vbNullString Then Exit Function
-A() = Split(s$, " ")
+A() = split(s$, " ")
 For i = 0 To UBound(A())
 A(i) = myUcase(Left$(A(i), 1), True) + Mid$(myLcase(A(i)), 2)
 Next i
@@ -8329,13 +8329,13 @@ If b$ = vbNullString Then MergeOperators = A$: Exit Function
 If A$ = b$ Then MergeOperators = A$: Exit Function
 Dim br() As String, i As Long
 If Len(A$) > Len(b$) Then
-br() = Split("[]" + b$ + "[]", "][")
+br() = split("[]" + b$ + "[]", "][")
 For i = 1 To UBound(br) - 1
 If InStr(A$, "[" + br(i) + "]") = 0 Then A$ = A$ + "[" + br(i) + "]"
 Next i
 MergeOperators = A$
 Else
-br() = Split("[]" + A$ + "[]", "][")
+br() = split("[]" + A$ + "[]", "][")
 For i = 1 To UBound(br) - 1
 If InStr(b$, "[" + br(i) + "]") = 0 Then b$ = b$ + "[" + br(i) + "]"
 Next i
@@ -8524,7 +8524,7 @@ Else
 ExtractPath = ExpEnvirStr(ExtractPath)
 End If
 Dim ccc() As String, c$
-ccc() = Split(ExtractPath, "\..")
+ccc() = split(ExtractPath, "\..")
 If UBound(ccc()) > LBound(ccc()) Then
 c$ = vbNullString
 For i = LBound(ccc()) To UBound(ccc()) - 1
@@ -24255,12 +24255,12 @@ If pa$ <> "" Then
     If InStrRev(s$, ") ") > 0 Then
     ss$ = FixName(Left$(s$, InStrRev(s$, ")")))
         If SecureNames Then
-            A() = Split(ss$, "»")
+            A() = split(ss$, "»")
             If UBound(A()) = 1 Then
                 A(0) = GetName(A(0))
                 s$ = Join(A(), ".")
             End If
-            aa() = Split(ss$, "›.")
+            aa() = split(ss$, "›.")
             If UBound(aa()) = 1 Then
             aa(0) = sbf(val(Mid$(aa(0), 2))).goodname
             ss$ = Join(aa(), ".")
@@ -24283,12 +24283,12 @@ If pa$ <> "" Then
     ElseIf InStrRev(s$, " ") > 0 Then
     ss$ = FixName(Left$(s$, InStrRev(s$, " ") - 1))
     If SecureNames Then
-            A() = Split(ss$, "».")
+            A() = split(ss$, "».")
             If UBound(A()) = 1 Then
                 A(0) = GetName(A(0))
                 s$ = Join(A(), ".")
             End If
-            aa() = Split(ss$, "›.")
+            aa() = split(ss$, "›.")
             If UBound(aa()) = 1 Then
             aa(0) = sbf(val(Mid$(aa(0), 2))).goodname
             ss$ = Join(aa(), ".")
@@ -24396,14 +24396,14 @@ End Function
 Function FixName(s$) As String
 Dim A() As String
 If SecureNames Then
-A() = Split(s$, "».")
+A() = split(s$, "».")
 If UBound(A()) = 1 Then
 Dim part$
 part$ = GetName(A(0) + "»")
 Dim last$
 last$ = A(1)
 
-A() = Split(part$, "«")
+A() = split(part$, "«")
 If UBound(A()) >= 1 Then
 part$ = A(0)
 If last$ <> "" Then
@@ -26966,9 +26966,9 @@ If x1 <> 0 Then
     oldclid = Clid
     Clid = 1032
     ss$ = ReadUnicodeOrANSI(s$, True)
-    ss$ = Join(Split(ss$, vbCrLf), vbLf)
+    ss$ = Join(split(ss$, vbCrLf), vbLf)
     ss$ = Replace(ss$, vbCr, vbLf)
-    ss$ = Join(Split(ss$, vbLf), vbCrLf)
+    ss$ = Join(split(ss$, vbLf), vbCrLf)
     Clid = oldclid
     If ss$ <> "" Then
    If par1 Then
@@ -27467,7 +27467,7 @@ End If
 End If
 If InStr(W$, "|") > 0 Then
     If InStr(W$, "(*.") > 0 Then
-        aaa() = Split(W$, "(*.")
+        aaa() = split(W$, "(*.")
         W$ = vbNullString
         If UBound(aaa()) > LBound(aaa()) Then
             W$ = "|"
@@ -27476,7 +27476,7 @@ If InStr(W$, "|") > 0 Then
             Next x1
         End If
     Else
-        aaa() = Split(W$, "|")
+        aaa() = split(W$, "|")
         W$ = vbNullString
         If UBound(aaa()) > LBound(aaa()) Then
             W$ = "|"
@@ -27490,7 +27490,7 @@ End If
     If OpenDialog(basestack, frm$, s$, ss$, W$, Not par, dum) Then
      If multifileselection Then
         If ReturnListOfFiles <> "" Then
-                aaa() = Split(ReturnListOfFiles, "#")
+                aaa() = split(ReturnListOfFiles, "#")
                 If UBound(aaa()) > LBound(aaa()) Then
             
                         For x1 = UBound(aaa()) To LBound(aaa()) + 1 Step -1
@@ -28006,6 +28006,7 @@ makeitnow1:
                             Set basestack.lastobj = Nothing
                         End If
                         End If
+feedOneDim1:
                         For i = i To 0 Step -1
                         For p1 = j To 0 Step -1
                             rA(p1, i) = p
@@ -28043,7 +28044,14 @@ contGetStr:
                                 MyAnyType = False
                                  Exit Function
                         End If
+                    ElseIf Not IsMissing(zeroitem) Then
+                        If MyIsObject(zeroitem) Then
+                        j = CLng(p)
                         
+                        Set p = zeroitem
+                            GoTo feedOneDim1
+                        End If
+                    
                     
                     End If
                     
@@ -28133,6 +28141,7 @@ contGetStr0:
                                     End If
                              Next i
                             Else
+feedOneDim:
                              For i = CLng(p) To 0 Step -1
                                     rA(0, i) = CVar(basestack.lastobj)
                                    p1 = rA.AssignError
@@ -28146,6 +28155,11 @@ contGetStr0:
                             End If
                         Else
                         
+                        End If
+                    ElseIf Not IsMissing(zeroitem) Then
+                        If MyIsObject(zeroitem) Then
+                        Set basestack.lastobj = zeroitem
+                            GoTo feedOneDim
                         End If
                     End If
                 End If
@@ -32354,9 +32368,9 @@ Else
 End If
 If InStr(W$, "|") > 0 Then
 If InStr(W$, "(*.") > 0 Then
-aaa() = Split(W$, "(*.")
+aaa() = split(W$, "(*.")
 Else
-aaa() = Split(W$, "|")
+aaa() = split(W$, "|")
 End If
 W$ = vbNullString
 If UBound(aaa()) > LBound(aaa()) Then
@@ -32370,7 +32384,7 @@ End If
     ' push to stack
     If multifileselection Then
     If ReturnListOfFiles <> "" Then
-    aaa() = Split(ReturnListOfFiles, "#")
+    aaa() = split(ReturnListOfFiles, "#")
     If UBound(aaa()) > LBound(aaa()) Then
 
 For x1 = UBound(aaa()) To LBound(aaa()) + 1 Step -1
@@ -34055,7 +34069,7 @@ Function ExecuteGroupStruct(bstack As basetask, ohere$, vvv As Long, rest$, ByVa
 Dim W$, w1$, p As Variant, H, v As Long, s$, ss$, b$, i As Long, lcl As Boolean, j As Long, nm$, x1 As Long, y1 As Long, frm$, skip As Boolean
 Dim uni As Boolean, prv As Boolean, stripstack1 As New basetask, hlp As String, vl As String, NoRec As Boolean, Final As Boolean
 Dim highpriority As Boolean, ThisGroup As Group, RightAssociative As Boolean, removebypass As Boolean, c As Constant
-Dim useHandler As mHandler, usehandler2 As mHandler, it As Long, classfun As Boolean, zeroitem As Object
+Dim useHandler As mHandler, usehandler2 As mHandler, it As Long, classfun As Boolean, zeroitem As Object, k As Long
 
 Const TT$ = "=-+*/<!,{" + vbCr
 If Trim$(rest$) = vbNullString Then
@@ -35258,9 +35272,22 @@ grerror:
         End If
 cont111:
         f$ = "=" + bstack.GroupName + W$ + "()"
-        
-        j = IsLabelA(here$, rest$, W$)
-        
+        k = -1
+        j = IsLabelAnew(here$, rest$, W$, k)
+        If j = 8 Then
+        If IsExp(bstack, Mid$(f$, 2), p) Then
+                Set p = bstack.lastobj
+                Set bstack.lastobj = Nothing
+                bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
+                ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, 9, Not (alocal Or Glob), p))
+                bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
+            Else
+                WrongType
+                Exit Function
+            End If
+            GoTo continuehere
+        Else
+            rest$ = Mid$(rest$, k)
             If (j And 3) = 0 Then Exit Do
             
             If j And 7 = 3 Then W$ = Replace(W$, "$", "")
@@ -35269,17 +35296,15 @@ cont111:
                 If prv Then W$ = ChrW(&HFFBF) + W$
             End If
             If j > 4 Then
-            
-            Mid$(W$, Len(W$), 1) = " "
-            rest$ = Left$(f$, Len(f$) - 1) + rest$
+                Mid$(W$, Len(W$), 1) = " "
+                rest$ = Left$(f$, Len(f$) - 1) + rest$
             Else
-            rest$ = f$ + rest$
+                rest$ = f$ + rest$
             End If
-           
-            
             W$ = RTrim(W$)
             nm$ = W$
             Set stripstack1 = bstack
+        End If
             ''
     ElseIf GetSub(W$ + "()", j) Then
         If Not sbf(j).IamAClass Then
@@ -35287,7 +35312,23 @@ cont111:
         End If
         f$ = "=" + W$ + "()"
 foundit:
-        j = IsLabelA(here$, rest$, W$)
+        k = -1
+        j = IsLabelAnew(here$, rest$, W$, k)
+        If j <> 8 Then
+        rest$ = Mid$(rest$, k)
+        Else
+            If IsExp(bstack, Mid$(f$, 2), p) Then
+                Set p = bstack.lastobj
+                Set bstack.lastobj = Nothing
+                bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
+                ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, 9, Not (alocal Or Glob), p))
+                bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
+            Else
+                WrongType
+                Exit Function
+            End If
+            GoTo continuehere
+        End If
         If (j And 3) = 0 Then Exit Do
 
         If j And 7 = 3 Then W$ = Replace(W$, "$", "")

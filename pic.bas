@@ -4028,13 +4028,13 @@ End Function
 Function IsLabelAnew(where$, A$, r$, Lang As Long) As Long
 ' for left side...no &
 
-Dim rr&, one As Boolean, c$, gr As Boolean
+Dim rr&, one As Boolean, c$, gr As Boolean, split As Boolean
 r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
 Dim i&, l As Long, p3 As Integer
 Dim p2 As Long, p1 As Integer, p4 As Long
 l = Len(A$): If l = 0 Then IsLabelAnew = 0: Lang = 1: Exit Function
-
+split = Lang > -1
 p2 = StrPtr(A$): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
@@ -4225,10 +4225,15 @@ i1233:
 
 
     Next i
-  If i > p4 Then A$ = vbNullString Else If (i + 2 - p2) \ 2 > 1 Then A$ = Mid$(A$, (i + 2 - p2) \ 2)
-       r$ = myUcase(r$, gr)
-       Lang = 1 + CLng(gr)
-
+    If split Then
+        If i > p4 Then A$ = vbNullString Else If (i + 2 - p2) \ 2 > 1 Then A$ = Mid$(A$, (i + 2 - p2) \ 2)
+        r$ = myUcase(r$, gr)
+        Lang = 1 + CLng(gr)
+    Else
+        Lang = 0
+        If i > p4 Then Lang = Len(A$) + 1 Else If (i + 2 - p2) \ 2 > 1 Then Lang = (i + 2 - p2) \ 2
+        r$ = myUcase(r$, gr)
+    End If
     IsLabelAnew = rr&
 
 
