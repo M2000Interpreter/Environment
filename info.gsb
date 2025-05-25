@@ -5747,7 +5747,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 60 for M2000 Interpreter version 13, revision 46 and above"
+	Report " A collection of modules for tests version 61 for M2000 Interpreter version 14, revision 0 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -12778,11 +12778,12 @@ MODULE HTTP {Module CheckIt  {
 Report 2, "Using the Microsoft.XMLHTTP with threads - see Down4 where we use an internal object for download with events. Use space bar or mouse click to advance the scroll"
 CheckIt
 }
-MODULE CAL {TITLE "WAIT..", 0
+MODULE CAL {PRINTER.QUALITY 3  ' 0 TO 3
+TITLE "WAIT..", 0
 FUNCTION PDFPRINTER$ {
 	MENU
 	PRINTER +
-	IF MENUITEMS=0 THEN ERROR "No printer found"
+	IF MENUITEMS=0 THEN ERROR "No PRINTER found"
 	LONG I, PR
 	FOR I=1 TO MENUITEMS
 		IF INSTR(UCASE$(MENU$(I)), "MICROSOFT PRINT TO PDF")=1 THEN PR=I: EXIT FOR
@@ -12793,14 +12794,14 @@ FUNCTION PDFPRINTER$ {
 GLOBAL PR$=PDFPRINTER$()
 \\ Calendar - FOR "REAL" programmers
 \\ All statements in UPPERCASE
-\\ Output TO 132 characters console - as a line printer
+\\ Output TO 132 characters console - as a line PRINTER
 \\ USE COURIER NEW  (FONT "COURIER NEW")
 
 \\ CHANGE THE 
-GLOBAL CONST PRINT_IT AS Boolean=true
+GLOBAL CONST PRINT_IT AS BOOLEAN=TRUE
 MODULE GLOBAL SNOOPY {
- IF NOT PRINT_IT THEN CURSOR 0,ROW 
-IF  PRINT_IT THEN FONT "COURIER NEW" : FORM 133, 68
+IF NOT PRINT_IT THEN CURSOR 0,ROW 
+'IF  PRINT_IT THEN FONT "COURIER NEW" : FORM 132, 68
 PRINT $(,8)
 PRINT #-2, {
 					   XXXX
@@ -12851,14 +12852,14 @@ PRINT #-2, {
 }
 }
 MODULE CALENDAR (YEAR, LOCALEID) {
-	IF PRINT_IT THEN IF NOT ROW=0 THEN PAGE 1
+     IF PRINT_IT THEN IF NOT ROW=0 THEN PAGE 1
       LOCALE LOCALEID
       IF NOT PRINT_IT THEN CURSOR 0,HEIGHT-1
       ' LAST LINE, SO EACH NEW LINE SCROLL ALL LINES UP
       SNOOPY
       
       PRINT UNDER  ' PRINT UNDERLINE
-      PRINT OVER $(2), YEAR
+      IF NOT PRINT_IT THEN  PRINT OVER $(2), YEAR ELSE PRINT PART $(2, WIDTH), YEAR
       PRINT
       FOR J=0 TO 1
             PRINT
@@ -12906,35 +12907,51 @@ MODULE CALENDAR (YEAR, LOCALEID) {
       NEXT J
 }
 WHILE INKEY$<>"" :  END WHILE
+DEF PR_DPI()=ABS(18 - PRINTER.QUALITY * 5) * 30& + 60&
 IF PRINT_IT THEN
 	PRINTER 12, PR$
-	PRINTER.MARGINS 9000/2.54*0.4, 0, 9000/2.54*0.4*2 
 	PRINTING ON
+	FONT "COURIER NEW"
+	FORM 132, 68
+	SELECT CASE PRINTER.QUALITY	
+	CASE 0
+		PRINTER.MARGINS 600*2
+	CASE 2
+		PRINTER.MARGINS 600*2.1
+	CASE 1
+		PRINTER.MARGINS 600
+	CASE 3
+		PRINTER.MARGINS 600*1.5
+	END SELECT
+	PEN 0
 ELSE
 	REFRESH 1000
+	FONT "COURIER NEW"
+	PEN 0
+	CLS 15, 0
+	IF MODULE(fixmode) THEN
+		fixmode 132,68
+		SHOW
+	ELSE
+		FORM 132,68
+	END IF
 END IF
-FONT "COURIER NEW"
+
 PEN 0
-CLS 15, 0
-IF MODULE(fixmode) THEN
-fixmode 132,68
-ELSE
-FORM 132,68
-END IF
-MODE=MODE*.8
-
-
 CALENDAR 1966, 1032 ' GREEK
 GOSUB WAITKEY_OR_MOUSE
-I=VAL(DATE$(TODAY,LOCALE, "yyyy"))
-FOR I=I TO I+5
-CALENDAR I, 1033
-GOSUB WAITKEY_OR_MOUSE
-NEXT I
+{
+	I=VAL(DATE$(TODAY,LOCALE, "yyyy"))
+	FOR I=I TO I+5
+	CALENDAR I, 1033
+	GOSUB WAITKEY_OR_MOUSE
+	NEXT I
+}
+
 IF PRINT_IT THEN PRINTING OFF ELSE REFRESH 50
 CLEAR  ' CLEAR VARIABLES FROM THIS MODULE
 TITLE "INFO"
-KEYBOARD "INFO"+CHR$(13)
+'KEYBOARD "INFO"+CHR$(13)
 END
 WAITKEY_OR_MOUSE:
 IF PRINT_IT THEN RETURN
@@ -14497,6 +14514,7 @@ Print printername$
 Printer !
 
 if ask("Is printer on","Printing Test","Yes","No")=1 then
+? "ok"
 	set slow
 	\\ use PAGE 1 for new page Portrait or leave it to produce new page if more lines needed.
 	\\  PAGE 0 set page to Landscape
@@ -21646,8 +21664,8 @@ MODULE USETHIS {try {
 	Bold 1
 	PEN 14
 	CLS,0
-	If Version<13 then Error "No proper M2000 version (must be >=13)"
-	If Version=13 and revision<39 then Error "No proper M2000 revision for version 13 (need revision >=39)"
+	If Version<14 then Error "No proper M2000 version (must be >=14)"
+//	If Version=13 and revision<51 then Error "No proper M2000 revision for version 13 (need revision >=51)"
 	Set Fast
 	Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 	dir user

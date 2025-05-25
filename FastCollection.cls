@@ -71,8 +71,8 @@ Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Public Stable As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private lastfind As String
 Private lasttype As Integer
 Private lastkey As String
@@ -159,11 +159,12 @@ Public Sub AddKey(RHS, Optional aValue As Variant)
         End If
     Else
         Value = aValue
+        
     End If
     If Index >= 0 Then
         PriveSpace(Index).KeyType = lasttype
     Else
-        PriveSpace(Index).KeyType = 0 ' invalid
+'        PriveSpace(Index).KeyType = 0 ' invalid
     End If
 
 End Sub
@@ -221,7 +222,7 @@ Friend Sub AddKeyStruct(RHS, offset As Long, manyitems As Long, obj As Object)
         If Index >= 0 Then
         PriveSpace(Index).KeyType = lasttype
         Else
-        PriveSpace(Index).KeyType = 0 ' invalid
+       ' PriveSpace(Index).KeyType = 0 ' invalid
         End If
     End If
 
@@ -288,7 +289,7 @@ End Sub
 Public Sub RemoveWithNoFind()
 'If AllowSameKey Then Exit Sub
 Dim new_item As item
-Dim K As Long, k1 As Long, vvv As Variant, top1 As Long
+Dim k As Long, k1 As Long, vvv As Variant, top1 As Long
 If toplim < 0 Then Exit Sub
 top1 = toplim
 If Done Then
@@ -310,18 +311,18 @@ Sorted = False
             PriveSpace(top1) = new_item
             SwapVariant vvv, PriveSpace(Index).iValue
         End If
-        K = Hash(PriveSpace(Index).lastpos) - 1
-        If K = top1 Then
+        k = Hash(PriveSpace(Index).lastpos) - 1
+        If k = top1 Then
             ' we have to give the new position to Hash()
             Hash(PriveSpace(Index).lastpos) = Index + 1
         Else
-            Do While K >= 0 And K <> top1 And K <> k1
-                   k1 = K
-                   K = PriveSpace(K).Pleft - 1
+            Do While k >= 0 And k <> top1 And k <> k1
+                   k1 = k
+                   k = PriveSpace(k).Pleft - 1
             Loop
-            If K = k1 Then
+            If k = k1 Then
                Rehash
-            ElseIf K = top1 Then
+            ElseIf k = top1 Then
                PriveSpace(k1).Pleft = Index + 1
             End If
         End If
@@ -365,7 +366,7 @@ End If
 End Sub
 Public Sub Remove(RHS)
 If AllowSameKey Then Exit Sub
-Dim K As Long, k1 As Long, vvv As Variant, top1 As Long, nDx As Long, Parndx As Long
+Dim k As Long, k1 As Long, vvv As Variant, top1 As Long, nDx As Long, Parndx As Long
 If toplim < 0 Then Exit Sub
 top1 = toplim
 If Find2(RHS, Parndx, nDx) Then
@@ -400,19 +401,19 @@ If Find2(RHS, Parndx, nDx) Then
         SwapVariant vvv, PriveSpace(nDx).iValue
         End If
         ' here Lastpos is from previous PriveSpace(top1) which is PriveSpace(ndx)
-        K = Hash(PriveSpace(nDx).lastpos) - 1
-        If K = top1 Then
+        k = Hash(PriveSpace(nDx).lastpos) - 1
+        If k = top1 Then
             ' we have to give the new position to Hash()
             Hash(PriveSpace(nDx).lastpos) = nDx + 1
         Else
          
-         Do While K >= 0 And K <> top1 And K <> k1
-                k1 = K
-                K = PriveSpace(K).Pleft - 1
+         Do While k >= 0 And k <> top1 And k <> k1
+                k1 = k
+                k = PriveSpace(k).Pleft - 1
          Loop
-         If K = k1 Then
+         If k = k1 Then
             Rehash
-         ElseIf K = top1 Then
+         ElseIf k = top1 Then
             PriveSpace(k1).Pleft = nDx + 1
          End If
         End If
@@ -650,7 +651,7 @@ End Function
 Function ChangeKey(key1, Key2)
 If AllowSameKey Then Exit Function
     Dim Key As String, NewKey As String
-    Dim K As Long
+    Dim k As Long
     If key1 = Key2 Then ChangeKey = True
     Key = Normalize(key1)
     If Len(Key) = 0 Then Exit Function
@@ -659,12 +660,12 @@ If AllowSameKey Then Exit Function
     NewKey = Normalize(Key2)
     If Len(NewKey) = 0 Then Exit Function
     
-    K = Hash(HashFunc(Key)) - 1
-    If K >= 0 Then
+    k = Hash(HashFunc(Key)) - 1
+    If k >= 0 Then
     Do
-            If PriveSpace(K).Key = Key Then
-                PriveSpace(K).Key = NewKey
-                PriveSpace(K).firsthash = HD(NewKey)
+            If PriveSpace(k).Key = Key Then
+                PriveSpace(k).Key = NewKey
+                PriveSpace(k).firsthash = HD(NewKey)
                 ReDim Hash(MaxSpace * 2 + 3)
                 hashlen = MaxSpace * 2 + 3
                 Rehash
@@ -672,39 +673,39 @@ If AllowSameKey Then Exit Function
                 Sorted = False
                 Exit Function
             End If
-            K = PriveSpace(K).Pleft - 1
-    Loop Until K < 0
+            k = PriveSpace(k).Pleft - 1
+    Loop Until k < 0
     End If
 End Function
 Sub swap(key1, Key2)
-Dim K As Long, c As item
+Dim k As Long, c As item
 If Find(key1) Then
-K = Index
+k = Index
 If Find(Key2) Then
 
-    c = PriveSpace(K): PriveSpace(K) = PriveSpace(Index): PriveSpace(Index) = c
-    Index = K
+    c = PriveSpace(k): PriveSpace(k) = PriveSpace(Index): PriveSpace(Index) = c
+    Index = k
     Rehash
     Sorted = False
 End If
 End If
 End Sub
 Sub SwapValues(key1, Key2)
-Dim K As Long
+Dim k As Long
 If Find(key1) Then
-K = Index
+k = Index
 If Find(Key2) Then
-    SwapVariant PriveSpace(K).iValue, PriveSpace(Index).iValue
+    SwapVariant PriveSpace(k).iValue, PriveSpace(Index).iValue
 End If
 End If
 End Sub
 Sub SwapNext(key1)
-Dim K As Long
+Dim k As Long
 On Error Resume Next
 If Done Then
-    K = Index
+    k = Index
     If Find(key1) Then
-        SwapVariant PriveSpace(K).iValue, PriveSpace(Index).iValue
+        SwapVariant PriveSpace(k).iValue, PriveSpace(Index).iValue
     End If
 End If
 End Sub
@@ -757,17 +758,17 @@ End If
 End If
 End Function
 Function IsEnum(p As Variant) As Boolean
-Dim usehandler As mHandler
+Dim useHandler As mHandler
 If Index = -1 Then
 ElseIf IsObject(PriveSpace(Index).iValue) Then
 If VarTypeName(PriveSpace(Index).iValue) = "mHandler" Then
-    Set usehandler = PriveSpace(Index).iValue
-    IsEnum = usehandler.t1 = 4
+    Set useHandler = PriveSpace(Index).iValue
+    IsEnum = useHandler.t1 = 4
     If IsEnum Then
-        If myVarType(usehandler.index_cursor, vbString) Then
-            p = usehandler.index_cursor
+        If myVarType(useHandler.index_cursor, vbString) Then
+            p = useHandler.index_cursor
         Else
-            p = usehandler.index_cursor * usehandler.sign
+            p = useHandler.index_cursor * useHandler.sign
         End If
     End If
 End If
@@ -775,100 +776,100 @@ End If
 End Function
 
 Function Find(RHS) As Boolean
-Dim K As Long, Key As String, k1 As Long
+Dim k As Long, Key As String, k1 As Long
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 ParentIndex = -1
 Done = False
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then Find = True: lastfind = Key: Index = K: Done = True: Exit Function
-     ParentIndex = K
-     k1 = K
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0 Or k1 = K
-If k1 = K Then
+    If PriveSpace(k).Key = Key Then Find = True: lastfind = Key: Index = k: Done = True: Exit Function
+     ParentIndex = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k1 = k
+If k1 = k Then
 Rehash
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
 ParentIndex = -1
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then Find = True: lastfind = Key: Index = K: Done = True: Exit Function
-     ParentIndex = K
-     k1 = K
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0 Or K = k1
+    If PriveSpace(k).Key = Key Then Find = True: lastfind = Key: Index = k: Done = True: Exit Function
+     ParentIndex = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k = k1
 End If
 End If
 End If
 
 End Function
 Function FindOne(RHS, num) As Boolean
-Dim K As Long, Key As String, k1 As Long
+Dim k As Long, Key As String, k1 As Long
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 ParentIndex = -1
 Done = False
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then
+    If PriveSpace(k).Key = Key Then
         num = num + 1
-        If num = 0 Then FindOne = True: lastfind = Key: Index = K: Done = True: Exit Function
+        If num = 0 Then FindOne = True: lastfind = Key: Index = k: Done = True: Exit Function
     End If
-     ParentIndex = K
-     k1 = K
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0 Or k1 = K
-If k1 = K Then
+     ParentIndex = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k1 = k
+If k1 = k Then
 Rehash
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
 ParentIndex = -1
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then
+    If PriveSpace(k).Key = Key Then
       num = num + 1
-        If num = 0 Then FindOne = True: lastfind = Key: Index = K: Done = True: Exit Function
+        If num = 0 Then FindOne = True: lastfind = Key: Index = k: Done = True: Exit Function
     End If
-     ParentIndex = K
-     k1 = K
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0 Or K = k1
+     ParentIndex = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k = k1
 End If
 End If
 End If
 
 End Function
 Private Function Find2(RHS, Parndx As Long, nDx As Long) As Boolean
-Dim K As Long, Key As String, k1 As Long
+Dim k As Long, Key As String, k1 As Long
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 Parndx = -1
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then Find2 = True: nDx = K: Exit Function
-     Parndx = K
-     k1 = K
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0 Or k1 = K
-If k1 = K Then
+    If PriveSpace(k).Key = Key Then Find2 = True: nDx = k: Exit Function
+     Parndx = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k1 = k
+If k1 = k Then
 Parndx = -1
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then Find2 = True: nDx = K: Exit Function
-     Parndx = K
-     k1 = K
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0 Or k1 = K
+    If PriveSpace(k).Key = Key Then Find2 = True: nDx = k: Exit Function
+     Parndx = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k1 = k
 End If
 End If
 End If
@@ -876,104 +877,104 @@ End Function
 
 Function ExistKey0(RHS) As Boolean
 If AllowSameKey Then Exit Function
-Dim K As Long, Key As String, k1 As Long
+Dim k As Long, Key As String, k1 As Long
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
     Do
-        If PriveSpace(K).Key = Key Then ExistKey0 = True: Index = K: Exit Function
-        k1 = K
-        K = PriveSpace(K).Pleft - 1
-    Loop Until K < 0 Or k1 = K
-    If K = k1 Then
+        If PriveSpace(k).Key = Key Then ExistKey0 = True: Index = k: Exit Function
+        k1 = k
+        k = PriveSpace(k).Pleft - 1
+    Loop Until k < 0 Or k1 = k
+    If k = k1 Then
         Rehash
-        K = Hash(HashFunc(Key)) - 1
+        k = Hash(HashFunc(Key)) - 1
         k1 = -2
-        If K >= 0 Then
+        If k >= 0 Then
         Do
-            If PriveSpace(K).Key = Key Then ExistKey0 = True: Index = K: Exit Function
-            k1 = K
-            K = PriveSpace(K).Pleft - 1
-        Loop Until K < 0 Or k1 = K
+            If PriveSpace(k).Key = Key Then ExistKey0 = True: Index = k: Exit Function
+            k1 = k
+            k = PriveSpace(k).Pleft - 1
+        Loop Until k < 0 Or k1 = k
         End If
     End If
 End If
 End Function
 Function ExistKey(RHS) As Boolean
-Dim K As Long, k1 As Long, Key As String
+Dim k As Long, k1 As Long, Key As String
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
     Do
-        If PriveSpace(K).Key = Key Then ExistKey = True: Index = K: Exit Function
-        k1 = K
-        K = PriveSpace(K).Pleft - 1
+        If PriveSpace(k).Key = Key Then ExistKey = True: Index = k: Exit Function
+        k1 = k
+        k = PriveSpace(k).Pleft - 1
         
-    Loop Until K < 0 Or K = k1
-    If K = k1 Then
+    Loop Until k < 0 Or k = k1
+    If k = k1 Then
         Rehash
-        K = Hash(HashFunc(Key)) - 1
-        If K >= 0 Then
+        k = Hash(HashFunc(Key)) - 1
+        If k >= 0 Then
         Do
-            If PriveSpace(K).Key = Key Then ExistKey = True: Index = K: Exit Function
-            k1 = K
-            K = PriveSpace(K).Pleft - 1
-        Loop Until K < 0 Or K = k1
+            If PriveSpace(k).Key = Key Then ExistKey = True: Index = k: Exit Function
+            k1 = k
+            k = PriveSpace(k).Pleft - 1
+        Loop Until k < 0 Or k = k1
         End If
     End If
 End If
 End Function
 Function ExistKey3(RHS) As Boolean
-Dim K As Long, k1 As Long, Key As String
+Dim k As Long, k1 As Long, Key As String
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 k1 = -2
-K = Hash(HashFunc(Key)) - 1
-If K >= 0 Then
+k = Hash(HashFunc(Key)) - 1
+If k >= 0 Then
     Do
-        If PriveSpace(K).Key = Key Then ExistKey3 = True: Exit Function
-        k1 = K
-        K = PriveSpace(K).Pleft - 1
-    Loop Until K < 0 Or K = k1
-    If K = k1 Then
+        If PriveSpace(k).Key = Key Then ExistKey3 = True: Exit Function
+        k1 = k
+        k = PriveSpace(k).Pleft - 1
+    Loop Until k < 0 Or k = k1
+    If k = k1 Then
         Rehash
-        K = Hash(HashFunc(Key)) - 1
-        If K >= 0 Then
+        k = Hash(HashFunc(Key)) - 1
+        If k >= 0 Then
             Do
-                If PriveSpace(K).Key = Key Then ExistKey3 = True: Exit Function
-                k1 = K
-                K = PriveSpace(K).Pleft - 1
-            Loop Until K < 0 Or K = k1
+                If PriveSpace(k).Key = Key Then ExistKey3 = True: Exit Function
+                k1 = k
+                k = PriveSpace(k).Pleft - 1
+            Loop Until k < 0 Or k = k1
         End If
     End If
 End If
 End Function
 
 Private Function ExistKey2(Key As String, nkey As Long) As Boolean
-Dim K As Long, k1 As Long
+Dim k As Long, k1 As Long
 If Len(Key) = 0 Then ExistKey2 = True: Exit Function
-K = Hash(HashFunc1(nkey)) - 1
+k = Hash(HashFunc1(nkey)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
     Do
-        If PriveSpace(K).Key = Key Then ExistKey2 = True: Exit Function
-        k1 = K
-        K = PriveSpace(K).Pleft - 1
-    Loop Until K < 0 Or K = k1
-    If K = k1 Then
+        If PriveSpace(k).Key = Key Then ExistKey2 = True: Exit Function
+        k1 = k
+        k = PriveSpace(k).Pleft - 1
+    Loop Until k < 0 Or k = k1
+    If k = k1 Then
         Rehash
-        K = Hash(HashFunc(Key)) - 1
-        If K >= 0 Then
+        k = Hash(HashFunc(Key)) - 1
+        If k >= 0 Then
         Do
-            If PriveSpace(K).Key = Key Then ExistKey2 = True: Exit Function
-            k1 = K
-            K = PriveSpace(K).Pleft - 1
+            If PriveSpace(k).Key = Key Then ExistKey2 = True: Exit Function
+            k1 = k
+            k = PriveSpace(k).Pleft - 1
             
-        Loop Until K < 0 Or K = k1
+        Loop Until k < 0 Or k = k1
         End If
     End If
 
@@ -1023,11 +1024,11 @@ Property Get Percent()
 Percent = 100 * Count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
-    Dim K As Long
-    K = Hash(b)
-    If Not K = a + 1 Then
+    Dim k As Long
+    k = Hash(b)
+    If Not k = a + 1 Then
          Hash(b) = a + 1
-         PriveSpace(a).Pleft = K
+         PriveSpace(a).Pleft = k
     End If
     PriveSpace(a).lastpos = b
 End Sub
@@ -1420,8 +1421,8 @@ End If
 End Function
 Private Function compareStr444(a$, b$) As Long
 Dim aa() As String, bb() As String, part As Long, ret As Long
-aa = Split(a$, Zero$)
-bb = Split(b$, Zero$)
+aa = split(a$, Zero$)
+bb = split(b$, Zero$)
 again:
 If uScol(part) < 2 Then
 ret = CompareStr2(aa(part), bb(part), mSortstyle)
@@ -1437,11 +1438,11 @@ If (uScol(part) And 1) = 1 Then compareStr444 = -ret Else compareStr444 = ret
 
 End Function
 Private Function compareStr44(a$, b$) As Long
-Dim i As Long, j As Long, a1$, b1$, p1 As Variant, p2 As Variant, n$, K As Long, k1 As Long
+Dim i As Long, j As Long, a1$, b1$, p1 As Variant, p2 As Variant, n$, k As Long, k1 As Long
 If CompareString(useclid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$)) = 2 Then Exit Function
 n$ = "[-0-9.]"
-K = Sgn(Len(a$) - Len(b$))
-k1 = K
+k = Sgn(Len(a$) - Len(b$))
+k1 = k
 again:
 j = IIf(Len(a$) >= Len(b$), Len(b$), Len(a$))
 
@@ -1456,7 +1457,7 @@ For i = 1 To j
             If compareStr44 = 0 Then
                 If Len(a1$) * Len(b1$) <> 0 Then
                     If Len(n$) > 6 Then n$ = "[-0-9]"
-                    K = Sgn(Len(a1$) - Len(b1$))
+                    k = Sgn(Len(a1$) - Len(b1$))
                      
                     a$ = a1$
                     b$ = b1$
@@ -1464,7 +1465,7 @@ For i = 1 To j
                     GoTo again
                 End If
                 If Len(a1$) + Len(b1$) = 0 Then
-                    compareStr44 = K
+                    compareStr44 = k
                 Else
                     compareStr44 = Sgn(Len(a1$) - Len(b1$))
                 End If
@@ -1482,7 +1483,7 @@ For i = 1 To j
                 Case 1, 3
                 compareStr44 = -1
                 Case 2
-                If K > 0 Then
+                If k > 0 Then
                 compareStr44 = -1
                 Else
                 compareStr44 = 1
@@ -1503,7 +1504,7 @@ For i = 1 To j
                 Case 3
                 compareStr44 = 1
                 Case 1, 2
-                If K < 0 Then
+                If k < 0 Then
                 compareStr44 = 1
                 Else
                 compareStr44 = -1

@@ -96,8 +96,8 @@ Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, By
 Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As Long
 
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
 ' GDI Functions
 Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
 Private Declare Sub OleCreatePictureIndirect2 Lib "OleAut32.dll" Alias "OleCreatePictureIndirect" _
@@ -867,21 +867,31 @@ End If
        If ax < 0 Then ax = 0
        If ay < 0 Then ay = 0
        If ax > ay Then ay = ax Else ax = ay
+    
+     
     End With
     ax1 = ax * Size
     ay1 = ay * SizeY
     
         End If
-    GdipCreateFromHDC Scr.hDC, graphics
-    GdipTranslateWorldTransform graphics, Scr.ScaleX(x1, 1, 3), Scr.ScaleY(y1, 1, 3), 1  '
+        GdipCreateFromHDC Scr.hDC, graphics
+    If Scr Is Form1.PrinterDocument1 Then
+    GdipTranslateWorldTransform graphics, Scr.ScaleX(x1, 0, 3), Scr.ScaleY(y1, 0, 3), 1
     
+    Else
+        
+    
+    GdipTranslateWorldTransform graphics, Scr.ScaleX(x1, 1, 3), Scr.ScaleY(y1, 1, 3), 1
+    End If
 
     GdipRotateWorldTransform graphics, Angle!, 1
   
     With players(GetCode(Scr))
-    
+    If Scr Is Form1.PrinterDocument1 Then
+    GdipTranslateWorldTransform graphics, Scr.ScaleX(.XGRAPH, 0, 3), Scr.ScaleY(.YGRAPH, 0, 3), 1
+    Else
     GdipTranslateWorldTransform graphics, Scr.ScaleX(.XGRAPH, 1, 3), Scr.ScaleY(.YGRAPH, 1, 3), 1
-
+    End If
     
     GdipSetInterpolationMode graphics, InterpolationModeHighQualityBicubic
     GdipSetPixelOffsetMode graphics, 0  '-4 * (bitmap = True)
@@ -957,7 +967,11 @@ zoomfactor = zoomfactor / 100#
     GdipSetPixelOffsetMode graphics, 0
     GdipRotateWorldTransform graphics, Angle!, 1
     With players(GetCode(Scr))
+     If Scr Is Form1.PrinterDocument1 Then
+     GdipTranslateWorldTransform graphics, Scr.ScaleX(.XGRAPH, 0, 3), Scr.ScaleY(.YGRAPH, 0, 3), 1
+     Else
      GdipTranslateWorldTransform graphics, Scr.ScaleX(.XGRAPH, 1, 3), Scr.ScaleY(.YGRAPH, 1, 3), 1
+     End If
     End With
     GdipDrawImageRectRectI graphics, Img, -Width \ 2, -Height \ 2, Width, Height, mleft, mtop, orWidth, orHeight, UnitPixel, m_Attr
       'GdipDrawImageRectRectI graphics, img, -Width / 2, -Height / 2, Width, Height, mleft, 1 + mtop, orWidth, orHeight, UnitPixel, m_Attr
@@ -1336,10 +1350,10 @@ Public Function DrawSpriteFromBuffer(bstack As basetask, ResData() As Byte, sprt
             
             If sprt Then GetBackSprite bstack, Width * 2, Height, Angle!, zoomfactor
             If IsEmf Then
-            Dim K
-            K = GetEmfBoubdsPixels(ResData)
+            Dim k
+            k = GetEmfBoubdsPixels(ResData)
             Const v = 26.4583333333333    '26.3245
-            gdipResizeToXY bstack, Img, Angle!, zoomfactor!, blend!, BackColor, K(6) / v, K(7) / v
+            gdipResizeToXY bstack, Img, Angle!, zoomfactor!, blend!, BackColor, k(6) / v, k(7) / v
             Else
             gdipResizeToXY bstack, Img, Angle!, zoomfactor!, blend!, BackColor
             End If
