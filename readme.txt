@@ -1,5 +1,5 @@
 M2000 Interpreter and Environment
-Version 14 -001 active-X
+Version 14 -002 active-X
 
 A lot of changes for using print/printing functions with four qualities.
 

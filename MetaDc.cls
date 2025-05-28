@@ -221,10 +221,10 @@ Dim emfP As StdPicture
 Set emfP = Me.getEmf
 If emfP Is Nothing Then Exit Function
 Set aPic = New MemBlock
-bytes = GetEnhMetaFileBits(emfP.Handle, bytes, ByVal 0)
+bytes = GetEnhMetaFileBits(emfP.handle, bytes, ByVal 0)
 If bytes Then
     aPic.Construct 1, bytes
-    Call GetEnhMetaFileBits(emfP.Handle, bytes, ByVal aPic.GetBytePtr(0))
+    Call GetEnhMetaFileBits(emfP.handle, bytes, ByVal aPic.GetBytePtr(0))
     aPic.SubType = 2 ' emf
 End If
 CopyMemory ByVal VarPtr(mHeader.iType), ByVal aPic.GetBytePtr(0), 88
@@ -674,7 +674,7 @@ Public Sub PlayEmfInside(picthis As StdPicture, X As Long, Y As Long, Optional W
     SetWorldTransform m_hDC, myXForm
       kkx.Right = kkx.Right * 1.00166666666667
   kkx.Bottom = kkx.Bottom * 1.00333333333333
-    PlayEnhMetaFile m_hDC, picthis.Handle, kkx
+    PlayEnhMetaFile m_hDC, picthis.handle, kkx
     End If
     
     SetWorldTransform m_hDC, gOldWorld
@@ -750,7 +750,7 @@ Private Sub PlayEmfInsideSimple(picthis As StdPicture, X As Long, Y As Long, Opt
    kkx.Right = kkx.Right * 1.00166666666667
   kkx.Bottom = kkx.Bottom * 1.00333333333333
     SetGraphicsMode m_hDC, GM_ADVANCED
-    PlayEnhMetaFile m_hDC, picthis.Handle, kkx
+    PlayEnhMetaFile m_hDC, picthis.handle, kkx
 SetGraphicsMode m_hDC, GM_COMPATIBLE
     
     
@@ -775,16 +775,16 @@ SetGraphicsMode m_hDC, GM_COMPATIBLE
     DeleteMetaFile pHandle
 End Sub
 Private Function buildXForm(ByVal x0 As Long, ByVal y0 As Long, ByVal q As Single, piw As Long, pih As Long) As XFORM
-    Dim r As Single, K As Single
+    Dim r As Single, k As Single
     q = -(CLng(q * 100) Mod 36000) * 1.74532925199433E-04
 
         r = Atn(piw / CSng(pih)) + Pi / 2!
-        K = piw / Cos(r) / 2
+        k = piw / Cos(r) / 2
         buildXForm.eM11 = Round(Cos(q), 4)
         buildXForm.eM12 = Round(Sin(q), 4)
         buildXForm.eM21 = Round(-Sin(q), 4)
         buildXForm.eM22 = Round(Cos(q), 4)
-        K = Abs(K)
+        k = Abs(k)
         buildXForm.eDx = x0 'Round((k - k * Cos(q - R)) / 2!, 0)
         buildXForm.eDy = y0 'Round((k - k * Sin(q - R)) / 2!, 0)
        
@@ -856,10 +856,10 @@ Private Function getEmfFromWmf(Wmf As StdPicture, W As Long, H As Long) As Long
  
  Dim bytes As Long
 Dim Buffer() As Byte
-   bytes = GetMetaFileBitsEx(Wmf.Handle, bytes, ByVal 0&)
+   bytes = GetMetaFileBitsEx(Wmf.handle, bytes, ByVal 0&)
  If bytes Then
 ReDim Buffer(1 To bytes) As Byte
-Call GetMetaFileBitsEx(Wmf.Handle, bytes, Buffer(1))
+Call GetMetaFileBitsEx(Wmf.handle, bytes, Buffer(1))
 Else
 
 Exit Function
@@ -877,3 +877,11 @@ Public Property Let Tag(ByVal RHS As Variant)
 ' nothing
 End Property
 
+
+Public Property Get ScaleMode() As Integer
+ScaleMode = 1
+End Property
+
+Public Property Let ScaleMode(ByVal vNewValue As Integer)
+'do nothing
+End Property

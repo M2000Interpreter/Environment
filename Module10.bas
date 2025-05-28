@@ -25,7 +25,7 @@ Private Declare Function vbaVarLateMemCallLdRf CDecl Lib "msvbvm60" _
                          ByVal cArgs As Long, _
                          ByVal vArgs As Long) As Long
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
 Private Const E_POINTER As Long = &H80004003
 Private Const S_OK As Long = 0
 Private Const INTERNET_MAX_URL_LENGTH As Long = 2083
@@ -1612,12 +1612,12 @@ Public Function URLEncodeEsc(cc As String, Optional space_as_plus As Boolean = F
 End Function
 Function DecodeEscape(c$, plus_as_space As Boolean) As String
 If plus_as_space Then c$ = Replace(c$, "+", " ")
-Dim A() As String, i As Long
-A() = split(c$, "%")
-For i = 1 To UBound(A())
-A(i) = Chr(val("&h" + Left$(A(i), 2))) + Mid$(A(i), 3)
+Dim a() As String, i As Long
+a() = split(c$, "%")
+For i = 1 To UBound(a())
+a(i) = Chr(val("&h" + Left$(a(i), 2))) + Mid$(a(i), 3)
 Next i
-DecodeEscape = utf8decode(StrConv(Join(A(), ""), vbFromUnicode))
+DecodeEscape = utf8decode(StrConv(Join(a(), ""), vbFromUnicode))
 
 End Function
 Sub ClearState1()
@@ -7009,7 +7009,14 @@ checkconstant:
                                 ElseIf TypeOf var(i) Is mHandler Then
                                     Set useHandler = var(i)
                                     If TypeOf useHandler.objref Is mArray Then
+                                    
                                         If Not Fast2Varl(rest$, "пимайас", 7, "ARRAY", 5, 7, ff) Then MyRead = False: MissType: Exit Function
+                                        
+                                    ElseIf TypeOf useHandler.objref Is tuple Then
+                                        If Not Fast2Varl(rest$, "пимайас", 7, "ARRAY", 5, 7, ff) Then
+                                        ElseIf Not Fast2Varl(rest$, "пкеиада", 7, "TUPLE", 5, 7, ff) Then
+                                        MyRead = False: MissType: Exit Function
+                                        End If
                                     ElseIf TypeOf useHandler.objref Is FastCollection Then
                                         If Not Fast2Varl(rest$, "йатастасг", 9, "INVENTORY", 9, 9, ff) Then
                                              If Not Fast2Varl(rest$, "киста", 5, "LIST", 4, 5, ff) Then
@@ -7072,6 +7079,8 @@ checkconstant:
                                     GoTo jumpref02
                                 End If
                                 GoTo checkconstant
+                            ElseIf TypeOf var(i) Is mArray Then
+                                If Not Fast2Varl(rest$, "пимайас", 7, "ARRAY", 5, 7, ff) Then MyRead = False: MissType: Exit Function
                             ElseIf TypeOf var(i) Is refArray Then
                         If FastSymbol(rest$, "*") Then
                             If IsLabel(bstack, rest$, ss$) = 0 Then
@@ -7102,6 +7111,7 @@ checkconstant:
                         End If
                     ElseIf TypeOf var(i) Is BigInteger Then
                         If Not Fast2Varl(rest$, "лецакосайеяаиос", 15, "BIGINTEGER", 10, 15, ff) Then MyRead = False: MissType: Exit Function
+                    
                     Else
                     p = IsLabel(bstack, rest$, (what$)) ' just throw any name
                 End If
@@ -8037,6 +8047,14 @@ existAs15:
                                     Set myobject = useHandler
                                     Set useHandler = Nothing
                                     Set usehandler1 = Nothing
+                                ElseIf Fast2Varl(rest$, "пкеиада", 7, "TUPLE", 5, 7, ff) Then
+                                    If Not CheckAnyArray(myobject) Then GoTo er103
+                                    Set useHandler = New mHandler
+                                    Set useHandler.objref = myobject
+                                    useHandler.t1 = 3
+                                    Set myobject = useHandler
+                                    Set useHandler = Nothing
+                                    Set usehandler1 = Nothing
                                 ElseIf Fast2Varl(rest$, "сыяос", 5, "STACK", 5, 5, ff) Then
                                     If Not CheckIsmStiva(myobject) Then GoTo er103
                                     Set useHandler = New mHandler
@@ -8165,7 +8183,14 @@ contNoObject:
                        If Fast2VarNoTrim(rest$, "ыс", 2, "AS", 2, 3, ff) Then
 existAs16:
                             If Fast2Varl(rest$, "атупос", 6, "VARIANT", 7, 7, ff) Then
-                            
+                            ElseIf Fast2Varl(rest$, "пкеиада", 7, "TUPLE", 5, 7, ff) Then
+                            If Not TypeOf myobject Is tuple Then
+                                If Not TypeOf myobject Is mArray Then
+                                  WrongObject
+                                Exit Function
+                                End If
+                            Set myobject = getTupleFromMArray(myobject)
+                            End If
                             ElseIf Not Fast2Varl(rest$, "пимайас", 7, "ARRAY", 5, 7, ff) Then
                                 WrongObject
                                 Exit Function
@@ -9927,7 +9952,7 @@ Public Function IntSqrdEC(SA) As Variant
     Loop
     IntSqrdEC = r
 End Function
-Function CopyBigInteger(p, Optional A) As BigInteger
+Function CopyBigInteger(p, Optional a) As BigInteger
     Dim check As BigInteger
     Set check = p
     If check.Unique Then
@@ -9935,8 +9960,8 @@ Function CopyBigInteger(p, Optional A) As BigInteger
     Exit Function
     End If
     Set CopyBigInteger = New BigInteger
-    If Not IsMissing(A) Then
-        CopyBigInteger.Load2 p, A
+    If Not IsMissing(a) Then
+        CopyBigInteger.Load2 p, a
     Else
         CopyBigInteger.Load2 p
     End If
@@ -10397,4 +10422,10 @@ MyEr Err.Description, Err.Description
 Err.Clear
 End Sub
 
+Private Function getTupleFromMArray(that As Object) As Object
+Dim aa As mArray, bb As tuple
+Set aa = that
+aa.CopyArray2tuple bb
+Set getTupleFromMArray = bb
+End Function
 

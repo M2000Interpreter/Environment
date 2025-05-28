@@ -452,9 +452,9 @@ Dim myCancel As myButton
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim Mysize As Single
 Dim setupxy As Single
-Dim lX As Long, lY As Long, dr As Boolean, drmove As Boolean
+Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
-Dim A$
+Dim a$
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long, itemwidth3 As Long, itemwidth2 As Long
 Dim height1 As Long, width1 As Long
@@ -506,7 +506,7 @@ If Button = 1 Then
     If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
     dr = True
     MousePointer = vbSizeNWSE
-    lX = X
+    Lx = X
     lY = Y
     End If
     
@@ -514,7 +514,7 @@ If Button = 1 Then
     If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then
     dr = True
     MousePointer = vbSizeNWSE
-    lX = X
+    Lx = X
     lY = Y
     End If
     End If
@@ -538,11 +538,11 @@ If dr Then
 If bordertop < 150 Then
 
         If Y < (Height - 150) Or Y > Height Then addy = (Y - lY)
-     If X < (Width - 150) Or X > Width Then addX = (X - lX)
+     If X < (Width - 150) Or X > Width Then addX = (X - Lx)
      
 Else
     If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
-        If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
+        If X < (Width - borderleft) Or X > Width Then addX = (X - Lx)
     End If
     
 
@@ -569,10 +569,10 @@ Else
 
         If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, Width
-        lX = X
+        Lx = X
         
         Else
-        lX = X * lastfactor / factor
+        Lx = X * lastfactor / factor
          ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
@@ -588,7 +588,7 @@ Else
         lY = lY * lastfactor / factor
         End If
         Else
-        lX = X
+        Lx = X
         lY = Y
    
 End If
@@ -867,7 +867,7 @@ Private Sub Form_Load1()
 Dim CD As String, dummy As Long, q$
 
 
-Dim i, A$
+Dim i, a$
 DIS.NoCaretShow = True
 DIS.LeftMarginPixels = 10
   
@@ -968,7 +968,7 @@ gList2.CapColor = rgb(255, 160, 0)
 gList2.FloatList = True
 gList2.MoveParent = True
 Form1.AutoRedraw = True
-A$ = ListenUnicode(915, 953, 974, 961, 947, 959, 962, 32, 922, 945, 961, 961, 940, 962)
+a$ = ListenUnicode(915, 953, 974, 961, 947, 959, 962, 32, 922, 945, 961, 961, 940, 962)
 lastfactor = ScaleDialogFix(SizeDialog)
 ScaleDialog lastfactor, LastWidth
 gList2.HeadLine = vbNullString
@@ -1091,20 +1091,20 @@ MyFill
 
 
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT, b As Long
+Dim a As RECT, b As Long
 b = 2
-CopyFromLParamToRect A, thatRect
-A.Left = b
-A.Right = setupxy - b
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), 0
+CopyFromLParamToRect a, thatRect
+a.Left = b
+a.Right = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), 0
 b = 5
-A.Left = b
-A.Right = setupxy - b
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), rgb(255, 160, 0)
+a.Left = b
+a.Right = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
 
 End Sub
@@ -1116,9 +1116,9 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 Private Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT
-CopyFromLParamToRect A, thatRect
-FillBack thathDC, A, thatbgcolor
+Dim a As RECT
+CopyFromLParamToRect a, thatRect
+FillBack thathDC, a, thatbgcolor
 End Sub
 
 
@@ -1196,11 +1196,21 @@ DIS.Font.Italic = False
 If b$ = "GREEK" Then
 DIS.Font.Size = tbSize.Value
 DIS.Font.charset = 161
+
 DIS.Font.Name = c$
+If DIS.Font.Name <> c$ Then
+DIS.Font.charset = 0
+DIS.Font.Name = c$
+DIS.Font.Italic = False
+DIS.Font.Size = tbSize.Value
+DIS.Font.charset = 0
+DIS.Font.Name = c$
+Else
 DIS.Font.Italic = False
 DIS.Font.Size = tbSize.Value
 DIS.Font.charset = 161
 DIS.Font.Name = c$
+End If
 Else
 DIS.Font.Size = tbSize.Value
 DIS.Font.charset = 0
@@ -1254,25 +1264,25 @@ tbLineSpacing = CStr(ThisValue)
 End Sub
 
 Private Sub TBLineSpacing_ValidString(ThatString As String, setpos As Long)
-Dim A As Long, K As String
+Dim a As Long, k As String
 On Error Resume Next
-K = tbLineSpacing
+k = tbLineSpacing
 If ThatString = vbNullString Then ThatString = "0"
-A = CLng(ThatString)
+a = CLng(ThatString)
 
 If Err.Number > 0 Then
 tbLineSpacing.Value = CLng(tbLineSpacing)
-ThatString = K: setpos = 1: tbLineSpacing.ResetPan
+ThatString = k: setpos = 1: tbLineSpacing.ResetPan
 Exit Sub
 End If
-tbLineSpacing.Value = A
-A = tbLineSpacing.Value  ' cut max or min
+tbLineSpacing.Value = a
+a = tbLineSpacing.Value  ' cut max or min
 
-DIS.addpixels = (A * 2 \ dv15)
+DIS.addpixels = (a * 2 \ dv15)
 DIS.ShowMe2
 'TBLineSpacing.Info = "This is info box" + vbCrLf + "X = " + CStr(a)
-ThatString = CStr(A)
-If A = 0 Then setpos = 2: tbLineSpacing.ResetPan
+ThatString = CStr(a)
+If a = 0 Then setpos = 2: tbLineSpacing.ResetPan
 End Sub
 
 
@@ -1282,26 +1292,26 @@ tbPaper = CStr(ThisValue)
 End Sub
 
 Private Sub tbPaper_ValidString(ThatString As String, setpos As Long)
-Dim A As Long, K As String
+Dim a As Long, k As String
 On Error Resume Next
-K = tbPaper
+k = tbPaper
 If ThatString = vbNullString Then ThatString = "0"
-A = CLng(ThatString)
-If A = CLng(tbPen) Or Err.Number > 0 Then
+a = CLng(ThatString)
+If a = CLng(tbPen) Or Err.Number > 0 Then
 
 ''tbPaper.Value = CLNG(tbPaper)
-ThatString = K: setpos = 1: tbPaper.ResetPan
-If Abs(tbPaper.Value - CLng(K)) > 2 Then tbPaper.Value = CLng(K)
+ThatString = k: setpos = 1: tbPaper.ResetPan
+If Abs(tbPaper.Value - CLng(k)) > 2 Then tbPaper.Value = CLng(k)
 Exit Sub
 End If
-tbPaper.Value = A
-A = tbPaper.Value  ' cut max or min
-tbPaper.Value = A
-DIS.BackColor = mycolor(A)
+tbPaper.Value = a
+a = tbPaper.Value  ' cut max or min
+tbPaper.Value = a
+DIS.BackColor = mycolor(a)
 DIS.ShowMe2
 'tbPaper.Info = "This is info box" + vbCrLf + "X = " + CStr(a)
-ThatString = CStr(A)
-If A = 0 Then setpos = 2: tbPaper.ResetPan
+ThatString = CStr(a)
+If a = 0 Then setpos = 2: tbPaper.ResetPan
 End Sub
 
 Private Sub tbPen_SpinnerValue(ThisValue As Long)
@@ -1309,52 +1319,52 @@ tbPen = CStr(ThisValue)
 End Sub
 
 Private Sub tbpen_ValidString(ThatString As String, setpos As Long)
-Dim A As Long, K As String
+Dim a As Long, k As String
 On Error Resume Next
-K = tbPen
+k = tbPen
 If ThatString = vbNullString Then ThatString = "0"
-A = CLng(ThatString)
-If A = CLng(tbPaper) Or Err.Number > 0 Then
-ThatString = K: setpos = 1: tbPen.ResetPan
-If Abs(tbPen.Value - CLng(K)) > 2 Then tbPen.Value = CLng(K)
+a = CLng(ThatString)
+If a = CLng(tbPaper) Or Err.Number > 0 Then
+ThatString = k: setpos = 1: tbPen.ResetPan
+If Abs(tbPen.Value - CLng(k)) > 2 Then tbPen.Value = CLng(k)
 Exit Sub
 End If
-tbPen.Value = A
-A = tbPen.Value  ' cut max or min
-tbPen.Value = A
-DIS.ForeColor = mycolor(A)
+tbPen.Value = a
+a = tbPen.Value  ' cut max or min
+tbPen.Value = a
+DIS.ForeColor = mycolor(a)
 DIS.ShowMe2
 'tbpen.Info = "This is info box" + vbCrLf + "X = " + CStr(a)
-ThatString = CStr(A)
-If A = 0 Then setpos = 2: tbPen.ResetPan
+ThatString = CStr(a)
+If a = 0 Then setpos = 2: tbPen.ResetPan
 End Sub
 Private Sub tbsize_SpinnerValue(ThisValue As Long)
 tbSize = CStr(ThisValue)
 End Sub
 
 Private Sub tbsize_ValidString(ThatString As String, setpos As Long)
-Dim A As Long, K As String
+Dim a As Long, k As String
 On Error Resume Next
-K = tbSize
+k = tbSize
 If ThatString = vbNullString Then Exit Sub  'special here
-A = CLng(ThatString)
+a = CLng(ThatString)
 
 If Err.Number > 0 Then
 tbSize.Value = CLng(tbSize)
-ThatString = K: setpos = 1: tbSize.ResetPan
+ThatString = k: setpos = 1: tbSize.ResetPan
 Exit Sub
 End If
 
-tbSize.Value = A
-If A <> tbSize.Value And A <= 2 And A > 0 Then
+tbSize.Value = a
+If a <> tbSize.Value And a <= 2 And a > 0 Then
 Exit Sub
 End If
-A = tbSize.Value  ' cut max or min
+a = tbSize.Value  ' cut max or min
 
-DIS.FontSize = CLng(A)
+DIS.FontSize = CLng(a)
 playall
-ThatString = CStr(A)
-If A = 0 Then setpos = 2: tbSize.ResetPan
+ThatString = CStr(a)
+If a = 0 Then setpos = 2: tbSize.ResetPan
 End Sub
 Public Sub hookme(this As gList)
 Set LastGlist = this

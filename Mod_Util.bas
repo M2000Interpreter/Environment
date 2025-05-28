@@ -602,8 +602,9 @@ contarr1:
             ElseIf TypeOf vv Is ppppLight Then
             If Left$(a$, 1) = "(" Then
                 Mid$(a$, 1, 1) = " "
-                If Not FastSymbol(a$, ")") Then
-                    Stop
+                If Not FastSymbol(a$, ")", True) Then
+                    CheckItemType = False
+                    Exit Function
                 End If
             End If
             Set ppppl = vv
@@ -1257,7 +1258,11 @@ With mb
 Dim oldf As Integer
 oldf = dqq.FillStyle
 dqq.FillStyle = vbFSTransparent
-dqq.Line (.curpos * .Xt - DXP, .currow * .Yt - DYP)-(x1& * .Xt - DXP + .Xt, y1& * .Yt + .Yt - DYP), mycolor(c), B
+If dqq Is Form1.PrinterDocument1 Then
+    dqq.Line ((.curpos * .Xt - DXP) * prFactor, (.currow * .Yt - DYP) * prFactor)-((x1& * .Xt - DXP + .Xt) * prFactor, (y1& * .Yt + .Yt - DYP) * prFactor), mycolor(c), B
+Else
+    dqq.Line (.curpos * .Xt - DXP, .currow * .Yt - DYP)-(x1& * .Xt - DXP + .Xt, y1& * .Yt + .Yt - DYP), mycolor(c), B
+End If
 dqq.FillStyle = oldf
 End If
 End With
@@ -1316,6 +1321,8 @@ Sub BoxColorNew(dqq As Object, mb As basket, x1&, y1&, c As Long)
 With mb
 If TypeOf dqq Is MetaDc Then
 dqq.Line2 .curpos * .Xt, .currow * .Yt, x1& * .Xt + .Xt - 2& * DXP, y1& * .Yt + .Yt - 2& * DYP, mycolor(c), True, True
+ElseIf dqq Is Form1.PrinterDocument1 Then
+dqq.Line (Form1.PrinterDocument1.ScaleX(.curpos * .Xt, 1, 0), Form1.PrinterDocument1.ScaleY(.currow * .Yt, 1, 0))-(Form1.PrinterDocument1.ScaleX(x1& * .Xt + .Xt - 2& * DXP, 1, 0), Form1.PrinterDocument1.ScaleY(y1& * .Yt + .Yt - 2& * DYP, 1, 0)), mycolor(c), BF
 Else
 dqq.Line (.curpos * .Xt, .currow * .Yt)-(x1& * .Xt + .Xt - 2& * DXP, y1& * .Yt + .Yt - 2& * DYP), mycolor(c), BF
 End If
@@ -2886,9 +2893,14 @@ ElseIf PY >= .mY Then
         PX = 0
         getnextpage
     End If
+    
+'ElseIf bstack.toprinter Then
+'    Form1.PrinterDocument1.currentX = PX * .Xt
+'    Form1.PrinterDocument1.currentY = PY * .Yt
 End If
 .curpos = PX
 .currow = PY
+
 
 End With
 End Sub
@@ -4838,12 +4850,22 @@ End Sub
 
 Public Sub FrameText(dd As Object, ByVal Size As Single, X As Long, Y As Long, cc As Long, Optional myCut As Boolean = False)
 Dim i As Long, mymul As Long
-
 If dd Is Form1.PrinterDocument1 Then
-' check this please
-dd.Width = X
-dd.Height = Y
+If X <> dd.Width Or Y <> dd.Height Then
+' crop
+If oprinter Is Nothing Then Set oprinter = New cDIBSection Else oprinter.ClearUp
+If oprinter.create(Form1.PrinterDocument1.ScaleX(X, 1, 3), Form1.PrinterDocument1.ScaleY(Y, 1, 3)) Then
+oprinter.CopyPicturePrinter Form1.PrinterDocument1
+oprinter.GetDpi mydpi, mydpi
+oprinter.needHDC
+Set Form1.PrinterDocument1 = hDCToPicture(oprinter.HDC1, 0, 0, oprinter.Width, oprinter.Height)
+oprinter.FreeHDC
+End If
+'dd.Width = X
+'dd.Height = Y
+End If
 Pr_Back dd, Size
+
 Exit Sub
 End If
 
@@ -23251,78 +23273,71 @@ useArray:
             End If
     Exit Function
     ElseIf y1 = 5 Then
-            If neoGetArray(basestack, s$, ppppl) Then
-                
-                If ppppl.arr Then
+        If neoGetArray(basestack, s$, ppppl) Then
+            If ppppl.arr Then
                 If FastSymbol(rest$, ")") Then
-                If TypeOf ppppl.itemObject(i) Is tuple Then
-                    GoTo usetuple
-                Else
-                    Set pppp = ppppl
-                    GoTo useArray
+                    If TypeOf ppppl Is tuple Then
+                        GoTo usetuple
+                    Else
+                        Set pppp = ppppl
+                        GoTo useArray
+                    End If
                 End If
+            End If
+            If Not NeoGetArrayItem(ppppl, basestack, s$, i, rest$) Then Exit Function
+            If Not ppppl.IsStringItem(i) Or ppppl.itemnumeric(i) Then
+                If ppppl.ItemIsObject(i) Then
+                    If Not ppppl.item(i) Is Nothing Then
+                        If TypeOf ppppl.itemObject(i) Is mHandler Then
+                            Set uHandler = ppppl.item(i)
+                            GoTo useHandler
+                        ElseIf TypeOf ppppl.itemObject(i) Is mArray Then
+                            Set pppp = ppppl.item(i)
+                            GoTo useArray
+                        ElseIf TypeOf ppppl.itemObject(i) Is mArray Then
+                            Set ppppl = ppppl.item(i)
+                            GoTo usetuple
+                        End If
+                    End If
                 End If
-                End If
-                 If Not NeoGetArrayItem(ppppl, basestack, s$, i, rest$) Then Exit Function
-                 If ppppl.IsStringItem(i) Or ppppl.itemnumeric(i) Then
-                 MissingArrayOrInventory
-                 Exit Function
-                 End If
-                 If ppppl.item(i) Is Nothing Then
-                 MissingArrayOrInventory
-                 Exit Function
-                 End If
-                 If TypeOf ppppl.itemObject(i) Is mHandler Then
-                    Set uHandler = ppppl.item(i)
-                    GoTo useHandler
-                 ElseIf TypeOf ppppl.itemObject(i) Is mArray Then
-                    Set pppp = ppppl.item(i)
-                    GoTo useArray
-                 ElseIf TypeOf ppppl.itemObject(i) Is mArray Then
-                    Set ppppl = ppppl.item(i)
-                    GoTo usetuple
-                 End If
-                End If
-                MissingArrayOrInventory
-                Exit Function
+            End If
+        End If
+        MissingArrayOrInventory
+        Exit Function
                 
     ElseIf y1 = 6 Then
-                If neoGetArray(basestack, s$, ppppl) Then
-                
-                If ppppl.arr Then
+        If neoGetArray(basestack, s$, ppppl) Then
+            If ppppl.arr Then
                 If FastSymbol(rest$, ")") Then
-                If TypeOf ppppl.itemObject(i) Is tuple Then
-                    GoTo usetuple
-                Else
-                    Set pppp = ppppl
-                    GoTo useArray
+                    If TypeOf ppppl Is tuple Then
+                        GoTo usetuple
+                    Else
+                        Set pppp = ppppl
+                        GoTo useArray
+                    End If
                 End If
+            End If
+            If Not NeoGetArrayItem(ppppl, basestack, s$, i, rest$) Then Exit Function
+            If Not ppppl.IsStringItem(i) Or ppppl.itemnumeric(i) Then
+                If ppppl.ItemIsObject(i) Then
+                   If Not ppppl.item(i) Is Nothing Then
+                       If TypeOf ppppl.itemObject(i) Is mHandler Then
+                          Set uHandler = ppppl.item(i)
+                          GoTo useHandler
+                       ElseIf TypeOf pppp.itemObject(i) Is mArray Then
+                          Set pppp = pppp.item(i)
+                          GoTo useArray
+                       ElseIf TypeOf ppppl.itemObject(i) Is tuple Then
+                          Set ppppl = ppppl.item(i)
+                          GoTo usetuple
+                       End If
+                   End If
                 End If
-                End If
-                
-                 If Not NeoGetArrayItem(ppppl, basestack, s$, i, rest$) Then Exit Function
-                 If ppppl.IsStringItem(i) Or ppppl.itemnumeric(i) Then
-                 MissingDocOrArrayOrInventory
-                 Exit Function
-                 End If
-                 If ppppl.item(i) Is Nothing Then
-                 MissingDocOrArrayOrInventory
-                 Exit Function
-                 End If
-                 If TypeOf ppppl.itemObject(i) Is mHandler Then
-                    Set uHandler = ppppl.item(i)
-                    GoTo useHandler
-                 ElseIf TypeOf pppp.itemObject(i) Is mArray Then
-                    Set pppp = pppp.item(i)
-                    GoTo useArray
-                 ElseIf TypeOf ppppl.itemObject(i) Is tuple Then
-                    Set ppppl = ppppl.item(i)
-                    GoTo usetuple
-                 End If
-                Else
-                MissingDoc
-                Exit Function
-                End If
+            End If
+        End If
+        MissingDocOrArrayOrInventory
+        Exit Function
+                        
     End If
     If FastSymbol(rest$, ",") Then
         If Not IsExp(basestack, rest$, sX) Then    ' FROM
@@ -23788,10 +23803,9 @@ Function GetRealRow(dq As Object) As Long
 Dim mybasket As basket
 mybasket = players(GetCode(dq))
 If mybasket.lastprint Then
-GetXYb dq, mybasket, mybasket.curpos, mybasket.currow
+    GetXYb dq, mybasket, mybasket.curpos, mybasket.currow
 End If
-
- GetRealRow = mybasket.currow
+GetRealRow = mybasket.currow
 End Function
 
 Function GetRealPos(dq As Object) As Long
@@ -23800,6 +23814,7 @@ mybasket = players(GetCode(dq))
 If mybasket.lastprint Then
 oldx = dq.currentX
 dq.currentX = dq.currentX + mybasket.Xt - dv15
+
 GetXYb dq, mybasket, mybasket.curpos, mybasket.currow
 dq.currentX = oldx
 End If
@@ -25187,7 +25202,7 @@ On Error Resume Next
 ' DC FROM PRINTER
 'oprinter.EndPrint
 oprinter.ClearUp
-If oprinter.create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
+If oprinter.create(Int(psw / pwox * mydpi - 0.5), Int(psh / phoy * mydpi - 0.5)) Then
 Form1.PrinterDocument1.BackColor = QBColor(15)
 oprinter.WhiteBits
 oprinter.GetDpi mydpi, mydpi
@@ -25204,9 +25219,7 @@ End If
 szFactor = mydpi * dv15 / 1440#
 On Error Resume Next
 Form1.PrinterDocument1.Refresh
-'Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(Int(psw / pwox * mydpi + 0.5), 3, 1), Form1.ScaleY(Int(psh / phoy * mydpi + 0.5), 3, 1))
-Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(psw, 3, 1), Form1.ScaleY(psh, 3, 1))
-
+Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(psw - 1, 3, 1), Form1.ScaleY(psh - 1, 3, 1))
 pnum = 0
 
 End If
@@ -25241,20 +25254,19 @@ If pagetitle = "" Then
 pagetitle = "M2000 printing" + str$(pnum)
 End If
 If PRM - PLM > 0 Then
-oprinter.square oprinter.Width - (PRM - PLM) * prFactor / dv15, 0, oprinter.Width, oprinter.Height, "FF00FF"
+oprinter.square oprinter.Width - (PRM - PLM) * prFactor / dv15, 0, oprinter.Width, oprinter.Height, "FFffFF"
 End If
 If PBM - PTM > 0 Then
-oprinter.square 0, oprinter.Height - (PBM - PTM) * prFactor / dv15, oprinter.Width, oprinter.Height, "FF00FF"
+oprinter.square 0, oprinter.Height - (PBM - PTM) * prFactor / dv15, oprinter.Width, oprinter.Height, "FFffFF"
 End If
 oprinter.ThumbnailPaintPrinter 1, 100 * prFactor, False, True, True, , CLng(PLM * prFactor / dv15), CLng(PTM * prFactor / dv15), , , pagetitle
-'Form1.PrinterDocument1.Line (0, 0)-(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)), &HFFFFFF, BF
+'Form1.PrinterDocument1.Line (0, 0)-(Int(psw / pwox * mydpi - 0.5), Int(psh / phoy * mydpi - 0.5)), &HFFFFFF, BF
 oprinter.ClearBits &HFFFFFF
 Form1.PrinterDocument1.currentX = 0
 Form1.PrinterDocument1.currentY = 0
 
 oprinter.PaintPicture Form1.PrinterDocument1.hDC
-Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(psw, 3, 1), Form1.ScaleY(psh, 3, 1))
-'Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(Int(psw / pwox * mydpi + 0.5), 3, 1), Form1.ScaleY(Int(psh / phoy * mydpi + 0.5), 3, 1))
+Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(psw - 1, 3, 1), Form1.ScaleY(psh - 1, 3, 1))
 End If
 End Sub
 Sub printEMFpage(emf As StdPicture)
@@ -25290,7 +25302,6 @@ End If
 Form1.PrinterDocument1.Line (0, 0)-(Form1.PrinterDocument1.ScaleWidth, Form1.PrinterDocument1.ScaleHeight), &HFFFFFF, BF
 Form1.PrinterDocument1.Refresh
 
-'Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(Int(psw / pwox * mydpi + 0.5), 3, 1), Form1.ScaleY(Int(psh / phoy * mydpi + 0.5), 3, 1))
 End If
 End Sub
 
@@ -25301,6 +25312,7 @@ pnum = pnum + 1
 If prFactor = 0 Then prFactor = 1
 Form1.Refresh
 oprinter.CopyPicturePrinter Form1.PrinterDocument1
+
 Form1.PrinterDocument1.Picture = LoadPicture("")
 If Not ttl Or Not UseMe Is Nothing Then
 pagetitle = Form1.CaptionW + str$(pnum)
@@ -25311,10 +25323,10 @@ If pagetitle = "" Then
 pagetitle = "M2000 printing" + str$(pnum)
 End If
 If PRM - PLM > 0 Then
-oprinter.square oprinter.Width - (PRM - PLM) * prFactor / dv15, 0, oprinter.Width, oprinter.Height, "FF00FF"
+oprinter.square oprinter.Width - (PRM - PLM) * prFactor / dv15, 0, oprinter.Width, oprinter.Height, "FFFFFF"
 End If
 If PBM - PTM > 0 Then
-oprinter.square 0, oprinter.Height - (PBM - PTM) * prFactor / dv15, oprinter.Width, oprinter.Height, "FF00FF"
+oprinter.square 0, oprinter.Height - (PBM - PTM) * prFactor / dv15, oprinter.Width, oprinter.Height, "FFFFFF"
 End If
 'oprinter.ThumbnailPaintPrinter 1, 100 * prFactor, False, True, True, , , , , , pagetitle
 oprinter.ThumbnailPaintPrinter 1, 100 * prFactor, False, True, True, , CLng(PLM * prFactor / dv15), CLng(PTM * prFactor / dv15), , , pagetitle
@@ -25973,7 +25985,7 @@ Else
 End If
 szFactor = mydpi * dv15 / 1440#
 oprinter.EjectPage
-If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) > 1 Then
+If Int(psw / pwox * mydpi - 0.5) / Int(psh / phoy * mydpi - 0.5) > 1 Then
     If oprinter.PrinterOn Then
         ChangeNowOrientationPortrait
         oprinter.ResetPageDM
@@ -25982,6 +25994,15 @@ If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) > 1 Then
     Else
         ChangeOrientation dummy, Printer.DeviceName, MyDM()
         SwapPrinterDim pw, ph, psw, psh, pwox, phoy
+        
+        ' rotatepage
+        oprinter.LoadPictureStretchBlt Form1.PrinterDocument1.hDC
+        RotateDib90 oprinter
+        oprinter.needHDC
+        
+        Set Form1.PrinterDocument1 = hDCToPicture(oprinter.HDC1, 0, 0, oprinter.Width, oprinter.Height)
+        Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(psw - 1, 3, 1), Form1.ScaleY(psh - 1, 3, 1))
+        oprinter.FreeHDC
         Exit Sub
     End If
     
@@ -25993,7 +26014,7 @@ End If
 contnow:
 Dim thisprinter As New cDIBSection
 
-If thisprinter.create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
+If thisprinter.create(Int(psw / pwox * mydpi - 0.5), Int(psh / phoy * mydpi - 0.5)) Then
     thisprinter.ClearBits Form1.PrinterDocument1.BackColor
     
     thisprinter.GetDpi mydpi, mydpi
@@ -26010,8 +26031,7 @@ If thisprinter.create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.
     szFactor = mydpi * dv15 / 1440#
     On Error Resume Next
     Form1.Refresh
-    Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(psw, 3, 1), Form1.ScaleY(psh, 3, 1))
- '   Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(Int(psw / pwox * mydpi + 0.5), 3, 1), Form1.ScaleY(Int(psh / phoy * mydpi + 0.5), 3, 1))
+    Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(psw - 1, 3, 1), Form1.ScaleY(psh - 1, 3, 1))
     thisprinter.CopyPrinter oprinter.PrinterHdc
     Set oprinter = thisprinter
 ElseIf try1 < 2 Then
@@ -26056,7 +26076,7 @@ Else
 End If
 szFactor = mydpi * dv15 / 1440#
 oprinter.EjectPage
-If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) < 1 Then
+If Int(psw / pwox * mydpi - 0.5) / Int(psh / phoy * mydpi - 0.5) < 1 Then
     If oprinter.PrinterOn Then
         ChangeNowOrientationLandscape
         oprinter.ResetPageDM
@@ -26065,6 +26085,14 @@ If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) < 1 Then
     Else
         ChangeOrientation dummy, Printer.DeviceName, MyDM()
         SwapPrinterDim pw, ph, psw, psh, pwox, phoy
+        ' rotatepage
+        oprinter.LoadPictureStretchBlt Form1.PrinterDocument1.hDC
+        RotateDib270 oprinter
+        oprinter.needHDC
+        
+        Set Form1.PrinterDocument1 = hDCToPicture(oprinter.HDC1, 0, 0, oprinter.Width, oprinter.Height)
+        Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(psw - 1, 3, 1), Form1.ScaleY(psh - 1, 3, 1))
+        oprinter.FreeHDC
         Exit Sub
     End If
 Else
@@ -26076,7 +26104,7 @@ End If
 contnow:
 Dim thisprinter As New cDIBSection
 
-If thisprinter.create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
+If thisprinter.create(Int(psw / pwox * mydpi - 0.5), Int(psh / phoy * mydpi - 0.5)) Then
     thisprinter.ClearBits Form1.PrinterDocument1.BackColor
     thisprinter.GetDpi mydpi, mydpi
     thisprinter.needHDC
@@ -26093,8 +26121,7 @@ If thisprinter.create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.
     szFactor = mydpi * dv15 / 1440#
     On Error Resume Next
     Form1.Refresh
-    Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(psw, 3, 1), Form1.ScaleY(psh, 3, 1))
- '   Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(Int(psw / pwox * (mydpi) + 0.5), 3, 1), Form1.ScaleY(Int(psh / phoy * mydpi + 0.5), 3, 1))
+    Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(psw - 1, 3, 1), Form1.ScaleY(psh - 1, 3, 1))
     thisprinter.CopyPrinter oprinter.PrinterHdc
     Set oprinter = thisprinter
 ElseIf try1 < 2 Then
@@ -26197,12 +26224,21 @@ OverideDec = Not NoUseDec
 NowDec$ = ","
 NowThou$ = "."
 End If
+Dim nfontname As String
 With Form1
-   bstack.myCharSet = 161
+nfontname = .DIS.FontName
+.DIS.Font.charset = 161
+If .DIS.FontName <> nfontname Then
+    .DIS.Font.charset = 0
+    .DIS.FontName = nfontname
+    bstack.myCharSet = 0
+ Else
+    bstack.myCharSet = 161
+ End If
 If bstack.tolayer > 0 Then
-    .dSprite(bstack.tolayer).Font.charset = 161
+    .dSprite(bstack.tolayer).Font.charset = bstack.myCharSet
     ElseIf bstack.toback Then
-    .Font.charset = 161
+    .Font.charset = bstack.myCharSet
     Else
     .DIS.Font.charset = bstack.myCharSet
     .TEXT1.Font.charset = bstack.myCharSet
@@ -26215,7 +26251,7 @@ Clid = 1032
 DefBooleanString = ";Αληθές;Ψευδές"
 DialogSetupLang 0
 With players(GetCode(bstack.Owner))
-.charset = 161
+.charset = bstack.myCharSet
 End With
 End Sub
 Sub LATIN(bstack As basetask)
@@ -27516,10 +27552,16 @@ jump1:
         End If
     
         If LCase(bstack.Owner.Font.Name) <> LCase(s$) Then
-        
-            bstack.Owner.Font.Name = MyFont
-            bstack.Owner.Font.charset = bstack.myCharSet
+            bstack.Owner.Font.charset = 0
+            bstack.Owner.Font.Name = s$
+      
+            If LCase(bstack.Owner.Font.Name) <> LCase(s$) Then
+                bstack.Owner.Font.Name = MyFont
+                bstack.Owner.Font.charset = bstack.myCharSet
+            End If
         End If
+        players(prive).charset = bstack.Owner.Font.charset
+        
     ElseIf IsExp(bstack, rest$, p, , True) Then
         If MemInt(VarPtr(p)) = vbString Then
             SwapString2Variant s$, p
@@ -27531,6 +27573,7 @@ jump1:
         GoTo jump1
     Else
         s$ = Form1.DIS.FontName
+        players(prive).charset = Form1.DIS.Font.charset
     End If
         StoreFont bstack.Owner.Font.Name, players(prive).SZ, bstack.Owner.Font.charset
         players(prive).FontName = bstack.Owner.Font.Name
@@ -29386,7 +29429,7 @@ If MaybeIsSymbol(rest$, ",") Then GoTo renderthere
         With players(GetCode(d1))
             'If FastSymbol(rest$, ",") Then MyEr "Not for bitmap", "όχι για εικόνα σημείων": ProcImage = False: Exit Function
             
-            mem.DrawImageToHdc d1, .XGRAPH \ dv15, .YGRAPH \ dv15, x1, y1
+            mem.DrawImageToHdc d1, d1.ScaleX(.XGRAPH, scNow, 3), d1.ScaleY(.YGRAPH, scNow, 3), x1, y1
         End With
     End If
 End If
@@ -33699,7 +33742,7 @@ Else
 End If
 Dim scNow As Integer
 Set Scr = bstack.Owner
-
+scNow = Scr.ScaleMode
 Scr.currentX = .XGRAPH
 Scr.currentY = .YGRAPH
 

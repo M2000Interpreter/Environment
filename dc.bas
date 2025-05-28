@@ -381,7 +381,7 @@ If what = vbNullString Then
 ReDim para(1)
 para(1) = vbNullString
 Else
-para() = Split(what, vbCrLf)
+para() = split(what, vbCrLf)
 End If
 Dim bchar As Byte
 i = AverCharSpace(DDD, bchar)
@@ -528,7 +528,7 @@ last:
         ElseIf frmt = 0 Then
         If Not nopr Then
         '****************
-        If bchar = 13 Then
+        If bchar <> 32 Then
             wwPlain bstack, mybasket, buf$, w2, 100000, nowait, , 3, , (0), , , nonewline
         Else
             fullPlainWhere DDD, mybasket, buf$, w2, 3, nowait, nonewline
@@ -619,6 +619,8 @@ Dim nopage As Boolean
 Dim buf$, b$, npy As Long, lCount As Long, SCRnum2stop As Long
 Dim nopr As Boolean, nohi As Long, w2 As Long, lastPara As Long
 Dim dv2x15 As Long, Extra As Long, cuts As Long, tabw As Long, olda As Long, lasttab As Long, INTD As Long
+Dim cc As Long
+
 dv2x15 = dv15 * 2
 Dim meta As Boolean
 meta = TypeOf bstack.Owner Is MetaDc
@@ -628,13 +630,14 @@ If what = vbNullString Then
 ReDim para(1)
 para(1) = vbNullString
 Else
-para() = Split(what, vbCrLf)
+para() = split(what, vbCrLf)
 End If
 Dim bchar As Byte
 With mybasket
 ' from old code here
     tParam.iTabLength = .ReportTab
     tabw = .ReportTab * AverCharSpace(DDD, bchar)
+'    If bchar = 2 Then bchar = 0
     PX = .curpos
     PY = .currow
     If Not nosettext Then
@@ -745,7 +748,8 @@ nextline:
                  Extra = 0
                  Select Case frmt
                  Case 0
-                 INTD = TextWidth(DDD, space$(MyTrimL3Len(buf$)))
+                  INTD = TextWidth(DDD, space$(MyTrimL3Len(buf$)))
+                  cc = DDD.currentX \ DXP
                  If INTD > 0 Then
                     buf$ = Mid$(buf$, MyTrimL3Len(buf$) + 1)
                     DDD.currentX = DDD.currentX + INTD
@@ -753,29 +757,31 @@ nextline:
                  buf$ = RTrim(buf$)
                  lasttab = rinstr(buf$, vbTab)
                  If lasttab > 0 Then
-                 Extra = LowWord(TabbedTextOut(DDD.hDC, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), lasttab, 1, tabw, DDD.currentX \ DXP))
-                 buf$ = Mid$(buf$, lasttab + 1)
-                 DDD.currentX = DDD.currentX + Extra * DXP
-                 Else
-                 INTD = 0
+                    Extra = LowWord(TabbedTextOut(DDD.hDC, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), lasttab, 1, tabw, DDD.currentX \ DXP))
+                    buf$ = Mid$(buf$, lasttab + 1)
+                    DDD.currentX = DDD.currentX + Extra * DXP
                  End If
                  
                  
                  
-                 If bchar = 13 Then
+                 If bchar <> 32 Then
                  olda = SetTextAlign(DDD.hDC, 0)  'TA_RTLREADING)
                  cuts = Len(buf$) - Len(Replace$(buf$, " ", ""))
                  Dim part$
                  Dim part1$
+                 If bchar <> 2 Then
                  part$ = Replace$(buf$, " ", Chr$(bchar))
+                 Else
+                 part$ = Replace$(buf$, " ", Chr$(0))
+                 End If
                  
-                 Extra = wi \ DXP - INTD \ DXP - Extra - LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(part$), Len(part$), 1, tabw))
+                 Extra = (wi - INTD) \ DXP - Extra - LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(part$), Len(part$), 1, tabw))
                  
                  Dim p As Long
-                 Dim cc As Long
+               
                  Dim Extra1 As Long
                  SetTextJustification DDD.hDC, 0, 0
-                 cc = DDD.currentX \ DXP
+                 
                  If cuts > 0 Then
                   Extra1 = Extra \ cuts
                   For p = 1 To cuts
@@ -784,35 +790,54 @@ nextline:
                         buf$ = Mid$(buf$, 2)
                     Else
                          buf$ = Mid$(buf$, Len(part$) + 2)
+                        If bchar = 2 Then
+                        part$ = part$ + Chr$(0)
+                        Else
                         part$ = part$ + Chr$(bchar)
+                        End If
                         INTD = LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(part$), Len(part$), 1, tabw))
                         TextOut DDD.hDC, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(part$), Len(part$)
                         DDD.currentX = DDD.currentX + INTD * DXP
                        
                     End If
                     If Extra - Extra1 < Extra1 Then Extra1 = Extra
+                   ' If Not meta Then
                     DDD.currentX = DDD.currentX + Extra1 * DXP
                     Extra = Extra - Extra1
+                    'Else
+                    'DDD.currentX = DDD.currentX + Extra1 * 0.8 * DXP
+                    'Extra = Extra - Extra1 * 0.8
+                    'End If
+                    
                     
                    
                  Next
                  If Extra > 0 Then DDD.currentX = DDD.currentX + Extra * dv15
                  End If
                  SetTextJustification DDD.hDC, 0, 0
-
                  TextOut DDD.hDC, (wi - MyTextWidth(DDD, buf$)) \ DXP + cc, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$)
-                 
                  Else
                  olda = SetTextAlign(DDD.hDC, 0) 'TA_RTLREADING)
                  cuts = Len(buf$) - Len(Replace$(buf$, " ", ""))
-                 If bchar <> 32 Then buf$ = Replace$(buf$, " ", ChrW$(bchar))
-                 Extra = wi \ DXP - INTD \ DXP - Extra - LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(buf$), Len(buf$), 1, tabw))
+                 If bchar <> 32 Then
+                 If bchar = 2 Then
+                 buf$ = Replace$(buf$, " ", ChrW$(0))
+                 Else
+                 buf$ = Replace$(buf$, " ", ChrW$(bchar))
+                 End If
+                 End If
+                 Extra = (wi - INTD) \ DXP - Extra - LowWord(GetTabbedTextExtent(DDD.hDC, StrPtr(buf$), Len(buf$), 1, tabw))
                  
                  
-                 Debug.Print SetTextJustification(DDD.hDC, Extra, cuts)
+              '   Debug.Print
+                  SetTextJustification DDD.hDC, Extra, cuts
                  
              
+                ' If Not meta Then
                  TextOut DDD.hDC, DDD.currentX \ DXP, DDD.currentY \ DXP, StrPtr(buf$), Len(buf$)
+                ' Else
+                ' Debug.Print ">>" + buf$
+                ' End If
                   
                  SetTextJustification DDD.hDC, 0, 0
                  End If
