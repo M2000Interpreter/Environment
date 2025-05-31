@@ -47912,39 +47912,22 @@ INTERFACE ITypeInfo, "{00020401-0000-0000-C000-000000000046}" {
 	ReleaseFuncDesc
 	ReleaseVarDesc
 }
-K=List:=1,2,3,4
 object Ptr
 buffer clear riid AS LONG*4
 return riid, 0:=0x0002_0400, 1:=0,  2:=0xc0, 3:=0x4600_0000
-buffer clear myobj 
-print Idispatch.QueryInterface(K, riid(0), varptr(Ptr))=S_OK
-print type$(Ptr)="Inventory"  ' this is a FastCollection inside an mHandler object
-try { Method Ptr, "objref" set Ptr2} ' we can't use objref because use FRIEND in class description.
-print len(Ptr)=4
-print Ptr is K  = true
-object ptr1
-	declare newList "m2000.FastCollection"
-	ptr=newlist
-rem {
-
-	? type$(newList)
-	print Idispatch.QueryInterface(newList, riid(0), varptr(Ptr))=S_OK
-	ptr1=newlist
-}
-? newlist is ptr, "??"
-append ptr, 1,2,3
-? len(ptr), type$(ptr)
-with ptr, "count" as count, "value" as ptr.value
-append ptr, "ok"
+declare newList "m2000.FastCollection"
+method newlist, "AddKey", "Hello", 1234&&  ' long long
+method newlist, "AddKey", 100, "Bravo"
+variant zz
+with newlist, "count" as count, "value" as zz
 ? count
-
-' need to get Ptr using specific riid
-'LIST
-'MODULES print
-'ptr=(1,2,3)
+method newlist, "find", "Hello" as ok
+if ok then ? zz, type$(zz)
+method newlist, "find", 100  as ok
+if ok then ? zz, type$(zz)
 object oTypeInfo
 LONG ppTypeAttr
-hex Idispatch.GetTypeInfo(Ptr, 0&, 0&, &oTypeInfo)
+hex Idispatch.GetTypeInfo(newList, 0&, 0&, &oTypeInfo)
 ret11= iTypeInfo.GetTypeAttr(oTypeInfo, VarPtr(ppTypeAttr))
 hex ret11
 const TKIND_DISPATCH=4&
@@ -47998,5 +47981,184 @@ sub IDLfromString(riid as buffer, st$)
 		riid|b[i]=val("0x"+p$)
 	next
 end sub
+}
+MODULE INTER1 {GLOBAL ENUM HRESULT {
+	S_OK						= 0&  ' long type
+	S_FALSE						= 1&
+	E_NOTIMPL					= &H80004001& ' long type hexadecimal signed
+	E_NOINTERFACE				= &H80004002&
+	E_POINTER					= &H80004003&
+	E_ABORT						= &H80004004&
+	E_FAIL						= &H80004005&
+	E_ACCESSDENIED				= &H80070005&
+	E_HANDLE					= &H80070006&
+	E_OUTOFMEMORY				= &H8007000E&
+	E_INVALIDARG					= &H80070057&
+	E_UNEXPECTED				= &H8000FFFF&
+	
+	DISP_E_MEMBERNOTFOUND		= &H80020003&
+	DISP_E_UNKNOWNNAME		= &H80020006&
+	DISP_E_NONAMEDARGS			= &H80020007&
+	DISP_E_EXCEPTION				= &H80020009&
+	DISP_E_BADINDEX				= &H8002000B&
+}
+class ALFA {
+private:
+	STRUCTURE RIID {
+		p				AS LONG        
+		i				AS INTEGER * 2
+		b				AS BYTE * 8
+	}
+	STRUCTURE TYPEATTR {  
+			RIID ;			' FLAT
+			// USING ; tLCID offset is 16, else is 0,
+			// so without ";" we make union, which is wrong for this
+			tLCID			AS LONG
+			dwReserved		AS LONG
+			memidConstructor	AS LONG
+			memidDestructor	AS LONG
+			pstrSchema		AS LONG
+			cbSizeInstance		AS LONG
+			typekind			AS LONG
+			cFuncs			AS INTEGER
+			CVars			AS INTEGER
+			cImplTypes		AS INTEGER
+			cbSizeVft			AS INTEGER
+			cbAlignment		AS INTEGER
+			wTypeFlags		AS INTEGER
+			wMajorVerNum	AS INTEGER
+			wMinorVerNum	AS INTEGER
+			tdescAlias		AS LONG
+			idldescType		AS LONG
+	}
+public:
+	DECLARE LCID Lib "kernel32.GetSystemDefaultLCID" { } AS LONG
+	INTERFACE IUnknown, "{00000000-0000-0000-C000-000000000046}" {
+		QueryInterface : {LONG riid, LONG myptr}
+		AddRef
+		Release
+	}
+	INTERFACE Idispatch, "{00020400-0000-0000-C000-000000000046}" {
+		IUnknown
+		GetTypeInfoCount
+		GetTypeInfo : {LONG iTInfo, LONG lcid, LONG ITypeInfo }
+		GetIDsOfNames
+		Invoke
+	}
+	INTERFACE ITypeInfo, "{00020401-0000-0000-C000-000000000046}" {
+		IUnknown
+		GetTypeAttr : {LONG &ppTypeAttr}   ' change from example inter. We use by reference
+		GetTypeComp
+		GetFuncDesc
+		GetVarDesc
+		GetNames : {LONG memid, LONG PTRrgBstrNames, LONG cMaxNames, LONG &pcNames}
+		GetRefTypeOfImplType
+		GetImplTypeFlags
+		GetIDsOfNames
+		Invoke
+		GetDocumentation
+		GetDllEntry
+		GetRefTypeInfo
+		AddressOfMember
+		CreateInstance
+		GetMops
+		GetContainingTypeLib`
+		ReleaseTypeAttr : {LONG pTypeAttr}  ' void
+		ReleaseFuncDesc
+		ReleaseVarDesc
+	}
+	FUNCTION new.Attr {
+		VAR ret as .TYPEATTR
+		=ret
+	}
+	FUNCTION getClassId(iid as riid) {
+		VAR i, last$=hex$(iid|b[0],1)+hex$(iid|b[1],1)+"-"
+		for i=2 to 7:last$+=hex$(iid|b[i],1):next
+		="{"+hex$(iid|p)+"-"+hex$(iid|i[0],2)+"-"+hex$(iid|i[1],2)+"-"+last$+"}"	
+	}
+	PROPERTY NEW.RIID {
+		VALUE {
+			CLEAR  ' CLEAR VALUE  (M2000 EXPECT VALUR AS RETURN VALUE))
+			LINK PARENT RIID TO RIID
+			VAR  VALUE AS RIID
+		}
+	}
+	FUNCTION IDLfromString(st$) {
+		//VAR riid as RIID   .. same as:
+		riid=.New.RIID
+		st$=filter$(st$,"{}")
+		VAR i, p$=leftpart$(st$, "-"): st$=rightpart$(st$,"-")
+		riid|p=val("0x"+p$)
+		p$=leftpart$(st$, "-"): st$=rightpart$(st$,"-")
+		riid|i[0]=val("0x"+p$)
+		p$=leftpart$(st$, "-"): st$=rightpart$(st$,"-")
+		riid|i[1]=val("0x"+p$)
+		p$=left$(st$,2): st$=mid$(st$,3)
+		riid|b[0]=val("0x"+p$)
+		p$=left$(st$,2): st$=mid$(st$,4)
+		riid|b[1]=val("0x"+p$)
+		for i=2 to 7
+			p$=left$(st$,2): st$=mid$(st$,3)
+			riid|b[i]=val("0x"+p$)
+		next
+		=riid
+	}
+}
+Z->ALFA()
+copyAttr=Z=>new.Attr()
+LONG LCID_DEF=Z=>LCID()
+DECLARE k "m2000.fastcollection"
+OBJECT Ptr
+riid=z=>IDLfromString("{00020400-0000-0000-C000-000000000046}")
+IF Z=>IUnknown.QueryInterface(k, riid(0), varptr(ptr))=S_OK then
+	PRINT type$(ptr)
+	PRINT "ptr is k  = "; ptr is k
+	DIM ret(10) as object
+	PRINT z=>Idispatch.GetTypeInfo(ptr, 0&, LCID_DEF, varptr(ret(0)))
+	PRINT type$(ret(0))
+	LONG ppTypeAttr
+	// so new we didn't pass varptr(ppTypeAttr)
+	// we change the signature to pass by reference
+	// but hte actual signature of this function is a pointer to long.
+	// so passing by refernece, M2000 pass the Varptr of  ppTypeAttr
+	// we can't pass now Varptr(ppTypeAttr) because exprect the by reference data
+	// &ppTypeAttr is actually a string, which have the full name of the variable.
+	ret11= z=>iTypeInfo.GetTypeAttr(ret(0), &ppTypeAttr)
+	HEX ret11
+	IF ret11=S_OK THEN
+		PRINT "ok", ppTypeAttr
+		METHOD copyAttr, "FillDataFromMem", ppTypeAttr
+		PRINT "ok"
+		PRINT "cFuncs = "+ copyAttr|cFuncs
+		PRINT "typekind =" + copyAttr|typekind
+		FOR z {
+			'  copyAttr|riid[] return buffer of type RIID
+			PRINT .getClassId(copyAttr|riid[])
+			'  copyAttr|riid return string as copy of copyAttr|riid
+			' the getClassId expect a riid type of buffer
+			' so now make a buffer placing the bytes.
+			' this is a type of casting (sending bytes in a string)
+			PRINT .getClassId(copyAttr|riid)
+			call void  .iTypeInfo.ReleaseTypeAttr(ret(0), ppTypeAttr)
+		}
+		PRINT "released ok"
+	ELSE
+		try {
+		 	VAR ret1 AS HRESULT
+		 	ret1=ret11
+		 	PRINT "fault, result: ";EVAL$(ret1)
+		}
+	END IF
+END IF
+' last, we can get the address of an external function
+' but not for that functions of interfaces
+' actual these functions hold only the offset, and the RIID, so before we make a call, 
+' M2000 ask for the specific  RIID and then get the vtable, adding the known offset and make the call
+' so without providing the actual object of the specific type, we didn't know the addres of the function.
+PRINT z=>lcid   ' the addres of the function. We can use it from machine code.
+try ok  {
+	PRINT z=>IUnknown.QueryInterface
+}
+IF NOT ok OR ERROR THEN PRINT ERROR$
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

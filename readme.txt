@@ -1,5 +1,5 @@
 M2000 Interpreter and Environment
-Version 14 revision 0 active-X
+Version 14 revision 0 (updated - info file) active-X
 
 1. Interfaces as part of classes
 2. Structures as types (see inter1 example in info file)
@@ -27,6 +27,8 @@ install ca.crt as root certificate (optional).
 
 http://georgekarras.blogspot.gr/
 
+https://rosettacode.miraheze.org/wiki/M2000_Interpreter (544 tasks)
+Old (not working rosettacode.org)
 https://rosettacode.org/wiki/Category:M2000_Interpreter (544 tasks)
 
 Code/Exe files can be found here: 
