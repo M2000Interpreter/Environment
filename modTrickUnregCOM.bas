@@ -415,7 +415,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
     Dim ppFuncDesc As Long, fncdsc As FUNCDESC, cFuncs As Long
     Dim ppVarDesc As Long, vardsc As VARDESC
     Dim ParamDesc As TPARAMDESC, hlp As Long, pRefType As Long
-    Dim TypeDesc As TTYPEDESC, RetVal$
+    Dim TypeDesc As TTYPEDESC, retval$
     Dim ret As Long, pctinfo As Long, ppTInfo As Long, typeInf As IUnknown
     Dim pAttr   As Long
     Dim tKind   As Long
@@ -508,10 +508,10 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
                         End If
                         acc = acc + 16
                         ttt$ = ""
-                        RetVal$ = ""
+                        retval$ = ""
                         If strNames(i) = "" Then strNames(i) = "Value"
                         If (ParamDesc.wParamFlags And PARAMFLAG_FRETVAL) = &H8 Then
-                            RetVal$ = " as " + stringifyTypeDesc(TypeDesc, typeInf)
+                            retval$ = " as " + stringifyTypeDesc(TypeDesc, typeInf)
                         Else
                             If (ParamDesc.wParamFlags And PARAMFLAG_FIN) = &H1 Then ttt$ = "in "
                             If (ParamDesc.wParamFlags And PARAMFLAG_FOUT) = &H2 Then ttt$ = ttt$ + "out "
@@ -531,7 +531,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
                 End If
             End If
             
-            If RetVal$ = "" Then
+            If retval$ = "" Then
                 If fncdsc.elemdesc.vt = 24 Then
                     mList.Value = strName
                 Else
@@ -539,7 +539,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
                     mList.Value = strName + " as " + stringifyTypeDesc(TypeDesc, typeInf)
                 End If
             Else
-                mList.Value = strName + RetVal$
+                mList.Value = strName + retval$
             End If
             ITypeInfo_ReleaseFuncDesc typeInf, ppFuncDesc
         Next j

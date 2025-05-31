@@ -57,7 +57,7 @@ Public Type Container
     offset As Long  ' old ivalue
     items As Long
 End Type
-Private Type item
+Private Type item  ' if you add change swapb (check with lenb() function)
     Key As String
     KeyType As Integer
     iValue As Variant
@@ -88,7 +88,7 @@ Private UseUcaseKeys As Boolean, Sorted As Boolean
 Private uScol() As Byte, useSCol As Boolean
 Private entrance As Long
 Public Tag As String
-Dim zeroitem As item, Piv As item, swapb(100) As Byte
+Dim zeroitem As item, Piv As item, swapb(40) As Byte
 
 
 
@@ -105,6 +105,17 @@ Public Sub ResetGui()
     hashlen = MaxSpace * 2 + 3
     toplim = -1
     mSortstyle = vbTextCompare
+End Sub
+Friend Sub MakeSpace(ThatSpace As Long, thatStyle As VbCompareMethod)
+    MaxSpace = ThatSpace
+    ReDim PriveSpace(MaxSpace) As item
+    toplim = -1
+    mSortstyle = thatStyle
+End Sub
+Friend Sub AddMoreSpace(ThatSpace As Long, thatStyle As VbCompareMethod)
+    MaxSpace = MaxSpace + ThatSpace
+    ReDim Preserve PriveSpace(MaxSpace) As item
+    mSortstyle = thatStyle
 End Sub
 Public Sub SetBinaryCompare()
 mSortstyle = vbBinaryCompare
@@ -580,7 +591,7 @@ ElseIf IsObject(PriveSpace(Index).iValue) Then
 End If
 
 End Property
-Private Sub ExpandHash()
+Friend Sub ExpandHash()
     hashlen = MaxSpace * 2 + 3
     Rehash
 End Sub
@@ -1863,4 +1874,56 @@ If Done Then
         Module10.PlaceValue2UDT PriveSpace(Index).iValue, Name$, v
     End If
 End If
+End Sub
+Friend Sub AddFive(a As Long, Key As String, KeyType As Integer, iValue As Variant, sValue As Long, firsthash)
+    With PriveSpace(a)
+    .Key = Key
+    If IsObject(iValue) Then
+    Set .iValue = iValue
+    Else
+    .iValue = iValue
+    End If
+    .sValue = sValue
+    .firsthash = firsthash
+    End With
+    toplim = toplim + 1
+End Sub
+Friend Sub CopyCollection(this As FastCollection)
+    Set this = New FastCollection
+    Dim c As Long, D As Long
+    D = 0
+    c = Count
+    this.MakeSpace MaxSpace, mSortstyle
+    While c > D
+        With PriveSpace(D)
+            this.AddFive D, .Key, .KeyType, .iValue, .sValue, .firsthash
+        End With
+        D = D + 1
+    Wend
+    this.ExpandHash
+    ' do not forget to fix Tag outside
+    this.structLen = structLen
+End Sub
+Friend Sub MergeCollection(this As FastCollection, offset As Long, lasthead$)
+'   we place our data to This collection
+    Dim D As Long, c As Long, b As Long
+    
+    D = this.Count
+    c = Count
+    this.AddMoreSpace c, mSortstyle
+    
+    While b < c
+        With PriveSpace(b)
+            If Not IsNumeric(.iValue) Then
+                Dim a As Container
+                a = .iValue
+                a.offset = offset + a.offset
+                this.AddFive D + b, lasthead$ + .Key, .KeyType, a, .sValue, .firsthash
+            Else
+                this.AddFive D + b, .Key, lasthead$ + .KeyType, offset + .iValue, .sValue, .firsthash
+            End If
+        End With
+        b = b + 1
+    Wend
+    this.ExpandHash
 End Sub

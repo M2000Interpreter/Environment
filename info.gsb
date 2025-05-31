@@ -47717,4 +47717,286 @@ case else
 	? "Nothing"
 end select
 }
+MODULE EXCEL1 {try {
+	IF EXIST("MyTest.xlsx") THEN
+		DOS "DEL "+QUOTE$(DIR$+"MyTest.xlsx"), 500;
+	END IF
+}
+IF EXIST("MyTest.xlsx") THEN
+	PRINT "CLOSE EXCEL FILE..."
+	BREAK
+END IF
+DECLARE ExcelSheet "Excel.Sheet"
+WITH ExcelSheet, "Application" set ExcelSheet.Application
+WITH ExcelSheet.Application, "cells" as cells()
+WITH ExcelSheet.Application, "ActiveSheet" as ActiveSheet
+WITH ActiveSheet, "name", "MySheet1"
+WITH ActiveSheet, "Columns" set Columns ("A:C")
+
+' row, line
+cells(1,1)="Hello there"
+s1=cells(1,1)
+print s1, TYPE$(s1)="String"
+cells(1,2)=TODAY  ' date type
+cells(1,3)=NOW  ' date type
+PRINT cells(1,2), TYPE$((cells(1,2)))="Date" ' need enclosed parenthesis, without these return the object under cells
+cells(2,1)=100.3
+cells(3, 1)=200.5
+cells(4, 1)="=Sum(A2:A3)"  ' type
+cells(2,2)=1234&   ' we place a long type 32 bit, but converted to Double
+PRINT cells(4,1)=300.8 ' executed immediate
+PRINT TYPE$((cells(4,1)))="Double"
+PRINT TYPE$((cells(2,2)))="Double"  ' this is the proof of conversion to Double
+REM PRINT TYPE$(ExcelSheet.Application)
+' GIVE AN AUTOFIT FOR THESE COLUMNS:
+WITH ActiveSheet, "Columns" set Columns ("A:C")
+METHOD Columns, "AutoFit"
+' or specify width - 20 chars of mean width
+REM WITH Columns, "ColumnWidth", 20
+	
+
+METHOD ExcelSheet, "SaveAs", dir$+"MyTest.xlsx", 51 ' 51 with no macro
+DECLARE ExcelSheet NOTHING
+TRY {
+	WIN  DIR$+"MyTest.xlsx"
+}
+}
+MODULE EXCEL2 {IF NOT  EXIST("MyTest.xlsx") THEN
+	PRINT "Execute EXCEL1 first"
+	BREAK
+END IF
+BOOLEAN CANOPEN=FALSE
+TRY {
+	OPEN DIR$+"MyTest.xlsx" FOR APPEND AS #F
+	CANOPEN=NOT ERROR
+	CLOSE#F
+}
+IF NOT CANOPEN THEN PRINT "CLOSE FILE MyTest.xlsx": EXIT
+
+DECLARE ExcelSheet.Application "Excel.Application"
+With ExcelSheet.Application, "Workbooks" as WorkBooks
+With ExcelSheet.Application, "ActiveWorkbook" as ActiveWorkbook
+//? type$(WorkBooks)
+METHOD WorkBooks, "Open", dir$+"MyTest.xlsx"
+WITH ExcelSheet.Application, "cells" as cells()
+WITH ExcelSheet.Application, "ActiveSheet" as ActiveSheet
+WITH ActiveSheet, "name" as Sheet.Name$
+WITH ActiveSheet, "Columns" set Columns ("A:E")
+WITH ActiveSheet, "Range"  set  Range ("D1:D4")
+WITH Range, "Value" as Range.Value, "Value" as Range.Value$
+PRINT  Sheet.Name$
+Range.Value$="Approved"
+WITH ActiveSheet, "Range"  set  Range ("E1:E4")
+Range.Value=TODAY
+cells(4,3)=NOW
+METHOD Columns, "AutoFit"
+' TO NOT OPEN THE "OVERWRITE ALERT"
+' FIRST WE SAVE USING NEW NEAME ...001
+METHOD ActiveSheet, "SaveAs", dir$+"MyTest001.xlsx", 51, CreateBackup:=TRUE ' 51 with no macro
+METHOD ActiveWorkbook, "Close", SaveChanges:=FALSE
+METHOD ExcelSheet.Application, "Quit"
+DECLARE ExcelSheet.Application NOTHING
+WAIT 300
+' THEN AFTER CLOSSING THE WORKBOOK USING SAVECHANGES=FALESE
+IF EXIST("MyTest.xlsx") THEN {
+	// GIVE 500ms to do it
+	DOS "DEL "+dir$+"MyTest.xlsx", 500;
+}
+' so now we rename the files (on current directory DIR$)
+NAME "MyTest001.xlsx" AS "MyTest.xlsx"
+WAIT 100  ' give 100ms time to system to finish.
+TRY {
+	WIN  DIR$+"MyTest.xlsx"
+}
+}
+MODULE INTER {GLOBAL ENUM HRESULT {
+	S_OK						= 0&  ' long type
+	S_FALSE						=1&
+	E_NOTIMPL					= &H80004001& ' long type hexadecimal signed
+	E_NOINTERFACE				= &H80004002&
+	E_POINTER					= &H80004003&
+	E_ABORT						= &H80004004&
+	E_FAIL						= &H80004005&
+	E_ACCESSDENIED				= &H80070005&
+	E_HANDLE					= &H80070006&
+	E_OUTOFMEMORY				= &H8007000E&
+	E_INVALIDARG					= &H80070057&
+	E_UNEXPECTED				= &H8000FFFF&
+	
+	DISP_E_MEMBERNOTFOUND		= &H80020003&
+	DISP_E_UNKNOWNNAME		= &H80020006&
+	DISP_E_NONAMEDARGS			= &H80020007&
+	DISP_E_EXCEPTION				= &H80020009&
+	DISP_E_BADINDEX				= &H8002000B&
+}
+STRUCTURE IID {
+	p				AS LONG        
+	i				AS INTEGER * 2
+	b				AS BYTE * 8
+}
+STRUCTURE TYPEATTR {
+	// using ; for structures or block (unnamed structure) advance the offset
+	// without ; we get union (so IID without ; make offset tLCID  zero like IID)
+	IID ;				' flat merge RIID structure  we can't use *items ' use name as RIID*items
+	// we can't use ; for single items (which have AS type)
+	tLCID			AS LONG
+	dwReserved		AS LONG
+	memidConstructor	AS LONG
+	memidDestructor	AS LONG
+	pstrSchema		AS LONG
+	cbSizeInstance		AS LONG
+	typekind			AS LONG
+	cFuncs			AS INTEGER
+	CVars			AS INTEGER
+	cImplTypes		AS INTEGER
+	cbSizeVft			AS INTEGER
+	cbAlignment		AS INTEGER
+	wTypeFlags		AS INTEGER
+	wMajorVerNum	AS INTEGER
+	wMinorVerNum	AS INTEGER
+	tdescAlias		AS LONG
+	idldescType		AS LONG
+}
+STRUCTURE TELEMDESC1 {
+	pTypeDesc		AS LONG
+	vt				AS INTEGER
+	align0			AS INTEGER
+	pPARAMDESCEX	AS LONG
+	wParamFlags		AS INTEGER
+}
+STRUCTURE FUNCDESC {
+	memid			AS LONG
+	lprgscode			AS LONG
+	lprgelemdescParam	AS LONG
+	funcking			AS LONG
+	invkind			AS LONG
+	callconv			AS LONG
+	cParams			AS INTEGER
+	cParamsOpt		AS INTEGER
+	oVft				AS INTEGER
+	cScodes			AS INTEGER
+	elemdesc			AS TELEMDESC1 ' Contains the return type of the function
+	wFuncFlags		AS INTEGER  ' function flags
+}
+INTERFACE IUnknown, "{00000000-0000-0000-C000-000000000046}" {
+	QueryInterface : {LONG riid, LONG myptr}
+	AddRef
+	Release
+}
+INTERFACE Idispatch, "{00020400-0000-0000-C000-000000000046}" {
+	IUnknown
+	GetTypeInfoCount
+	GetTypeInfo : {LONG iTInfo, LONG lcid, LONG &ITypeInfo }
+	GetIDsOfNames
+	Invoke
+}
+INTERFACE ITypeInfo, "{00020401-0000-0000-C000-000000000046}" {
+	IUnknown
+	GetTypeAttr : {LONG ppTypeAttr}
+	GetTypeComp
+	GetFuncDesc
+	GetVarDesc
+	GetNames : {LONG memid, LONG PTRrgBstrNames, LONG cMaxNames, LONG &pcNames}
+	GetRefTypeOfImplType
+	GetImplTypeFlags
+	GetIDsOfNames
+	Invoke
+	GetDocumentation
+	GetDllEntry
+	GetRefTypeInfo
+	AddressOfMember
+	CreateInstance
+	GetMops
+	GetContainingTypeLib
+	ReleaseTypeAttr : {LONG pTypeAttr}  ' void
+	ReleaseFuncDesc
+	ReleaseVarDesc
+}
+K=List:=1,2,3,4
+object Ptr
+buffer clear riid AS LONG*4
+return riid, 0:=0x0002_0400, 1:=0,  2:=0xc0, 3:=0x4600_0000
+buffer clear myobj 
+print Idispatch.QueryInterface(K, riid(0), varptr(Ptr))=S_OK
+print type$(Ptr)="Inventory"  ' this is a FastCollection inside an mHandler object
+try { Method Ptr, "objref" set Ptr2} ' we can't use objref because use FRIEND in class description.
+print len(Ptr)=4
+print Ptr is K  = true
+object ptr1
+	declare newList "m2000.FastCollection"
+	ptr=newlist
+rem {
+
+	? type$(newList)
+	print Idispatch.QueryInterface(newList, riid(0), varptr(Ptr))=S_OK
+	ptr1=newlist
+}
+? newlist is ptr, "??"
+append ptr, 1,2,3
+? len(ptr), type$(ptr)
+with ptr, "count" as count, "value" as ptr.value
+append ptr, "ok"
+? count
+
+' need to get Ptr using specific riid
+'LIST
+'MODULES print
+'ptr=(1,2,3)
+object oTypeInfo
+LONG ppTypeAttr
+hex Idispatch.GetTypeInfo(Ptr, 0&, 0&, &oTypeInfo)
+ret11= iTypeInfo.GetTypeAttr(oTypeInfo, VarPtr(ppTypeAttr))
+hex ret11
+const TKIND_DISPATCH=4&
+if ret11=0 then
+	print "ok", ppTypeAttr
+	' peek a LONG
+	buffer tKind AS LONG
+	method tKind, "FillDataFromMem", ppTypeAttr + &h28
+	select case tkind[0]
+	case TKIND_DISPATCH
+		print "TKIND_DISPATCH"
+	case else
+		print "something else"
+	end select
+	' peek all the STRUCTURE
+	buffer tAttr AS TYPEATTR
+	method tAttr, "FillDataFromMem", ppTypeAttr
+	print tAttr[0]|typekind=TKIND_DISPATCH
+	' same AS
+	print tAttr|typekind=TKIND_DISPATCH
+	print "cFuncs = "; tAttr|cFuncs
+	print "CVars = "; tAttr|CVars
+	print "cImplTypes = "; tAttr|cImplTypes  ' how many interfaces exits
+	print "Version = "; tAttr|wMajorVerNum; "."; tAttr|wMinorVerNum
+	print "riid = ";@getClassId(tAttr)
+	m$=@getClassId(tAttr)
+	call void  iTypeInfo.ReleaseTypeAttr(oTypeInfo, ppTypeAttr)
+	print "released ok"
+
+end if
+function getClassId(riid as buffer)
+	local i, last$=hex$(riid|b[0],1)+hex$(riid|b[1],1)+"-"
+	for i=2 to 7:last$+=hex$(riid|b[i],1):next
+	="{"+hex$(riid|p)+"-"+hex$(riid|i[0],2)+"-"+hex$(riid|i[1],2)+"-"+last$+"}"	
+end function
+' place to buffer at first bytes, using p, i, b as in TYPEATTR
+sub IDLfromString(riid as buffer, st$)
+	st$=filter$(st$,"{}")
+	local i, p$=leftpart$(st$, "-"): st$=rightpart$(st$,"-")
+	riid|p=val("0x"+p$)
+	p$=leftpart$(st$, "-"): st$=rightpart$(st$,"-")
+	riid|i[0]=val("0x"+p$)
+	p$=leftpart$(st$, "-"): st$=rightpart$(st$,"-")
+	riid|i[1]=val("0x"+p$)
+	p$=left$(st$,2): st$=mid$(st$,3)
+	riid|b[0]=val("0x"+p$)
+	p$=left$(st$,2): st$=mid$(st$,4)
+	riid|b[1]=val("0x"+p$)
+	for i=2 to 7
+		p$=left$(st$,2): st$=mid$(st$,3)
+		riid|b[i]=val("0x"+p$)
+	next
+end sub
+}
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

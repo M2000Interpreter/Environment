@@ -68,7 +68,7 @@ Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nSize As Long, lpD
 Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
  Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
@@ -912,19 +912,19 @@ If w2 <> -1 Then w2 = w2 / dv15
     Else
     aa.CreateFromPicture sp
     End If
-    Dim K As Object
-    Set K = New MemBlock
-    aa.SaveDibToMeMBlock K
+    Dim k As Object
+    Set k = New MemBlock
+    aa.SaveDibToMeMBlock k
     If rot <> 0 Then
         aa.ClearUp
-        aa.CreateFromPicture K.GetStdPicture(-1, -1, , rot)
-        Set K = New MemBlock
-        aa.SaveDibToMeMBlock K
+        aa.CreateFromPicture k.GetStdPicture(-1, -1, , rot)
+        Set k = New MemBlock
+        aa.SaveDibToMeMBlock k
         
     End If
     Dim Handler As New mHandler
     Handler.t1 = 2
-    Set Handler.objref = K
+    Set Handler.objref = k
     Set CreateFromPicture = Handler
     
 End Function

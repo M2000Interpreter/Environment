@@ -37,16 +37,16 @@ Private Const lCID_INSTALLED = 1
 Private Declare Function timeGetTime Lib "winmm.dll" () As Long
 Private Declare Function timeGetTime1 Lib "kernel32.dll" Alias "GetTickCount" () As Long
 Public Declare Function IsValidCodePage Lib "kernel32" (ByVal CodePage As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
-Public Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
-Private Declare Sub GetMemS Lib "msvbvm60" Alias "GetMem4" (ByVal addr As Long, retval As Single)
-Private Declare Sub GetMem8 Lib "msvbvm60" (ByVal addr As Long, retval As Double)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
-Public Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub PutMemS Lib "msvbvm60" Alias "PutMem4" (ByVal addr As Long, ByVal NewVal As Single)
-Private Declare Sub PutMem8 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Double)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
+Public Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub GetMemS Lib "msvbvm60" Alias "GetMem4" (ByVal Addr As Long, retval As Single)
+Private Declare Sub GetMem8 Lib "msvbvm60" (ByVal Addr As Long, retval As Double)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
+Public Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMemS Lib "msvbvm60" Alias "PutMem4" (ByVal Addr As Long, ByVal NewVal As Single)
+Private Declare Sub PutMem8 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Double)
 Private Declare Function CopyBytes Lib "msvbvm60.dll" Alias "__vbaCopyBytes" (ByVal ByteLen As Long, ByVal Destination As Long, ByVal Source As Long) As Long
 Private Declare Function ObjSetAddRef Lib "msvbvm60.dll" Alias "__vbaObjSetAddref" (ByRef objDest As Object, ByVal pObject As Long) As Long
 Public Declare Function IsBadCodePtr Lib "kernel32" (ByVal lpfn As Long) As Long
@@ -2896,7 +2896,7 @@ Pos = lenA + 2
 
 End Sub
 Function ChangeValuesMem(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim aa As mHandler, ah As String, p As Variant, s$, addr As Long, pp As Variant, what$, r As Double
+Dim aa As mHandler, ah As String, p As Variant, s$, Addr As Long, pp As Variant, what$, r As Double
 Dim bb1 As MemBlock, w2 As Variant, rs As Single, itisSingle As Boolean, itisInt64 As Boolean, itisCur As Boolean
 Set aa = bstack.lastobj
 Set bstack.lastobj = Nothing
@@ -2981,7 +2981,7 @@ Set bb1 = aa.objref
                         
                           GoTo err30
                     End If
-                    addr = CLng(Fix(p))
+                    Addr = CLng(Fix(p))
                 
                     
                 Else
@@ -3000,13 +3000,13 @@ Set bb1 = aa.objref
                             s$ = p
                             GoTo q1239877
                         End If
-                        If addr = 0 Then
+                        If Addr = 0 Then
                             
                 
                             GoTo err30
                         Else
                                 ' this ia a part to poke some data to buffer
-                            If addr = 0 Then
+                            If Addr = 0 Then
                                 
                         
                                 GoTo err30
@@ -3042,38 +3042,38 @@ Set bb1 = aa.objref
                                 Select Case Abs(pp)
                                 Case 1
                                     ChangeValuesMem = True
-                                    PutMem1 addr, CByte(LowWord(signlong(p)) And &HFF)
+                                    PutMem1 Addr, CByte(LowWord(signlong(p)) And &HFF)
                                Case 2
-                                   If bb1.ValidArea(addr, 2) Then
+                                   If bb1.ValidArea(Addr, 2) Then
                                         ChangeValuesMem = True
-                                        PutMem2 addr, cUint(LowWord(signlong(p)))
+                                        PutMem2 Addr, cUint(LowWord(signlong(p)))
                                     Else
                                         GoTo err10
                                         
                                     End If
                                 Case 4
-                                    If bb1.ValidArea(addr, 4) Then
+                                    If bb1.ValidArea(Addr, 4) Then
                                         ChangeValuesMem = True
                                         If itisSingle Then
                                             rs = CSng(p)
-                                            PutMemS addr, rs
+                                            PutMemS Addr, rs
                                         Else
-                                            PutMem4 addr, signlong(p)
+                                            PutMem4 Addr, signlong(p)
                                         End If
                                     Else
                                         GoTo err10
                                         
                                    End If
                                 Case 8
-                                   If bb1.ValidArea(addr, 8) Then
+                                   If bb1.ValidArea(Addr, 8) Then
                                         ChangeValuesMem = True
                                         If itisCur Then
-                                        MemCur(addr) = CCur(p)
+                                        MemCur(Addr) = CCur(p)
                                         ElseIf itisInt64 Or pp < 0 Then
                                         p = cInt64(p)
-                                        CopyMemory ByVal addr, ByVal VarPtr(p) + 8, 8
+                                        CopyMemory ByVal Addr, ByVal VarPtr(p) + 8, 8
                                         Else
-                                        PutMem8 addr, p
+                                        PutMem8 Addr, p
                                         End If
                                    Else
                                         GoTo err10
@@ -3107,7 +3107,7 @@ q1239877:
                             GoTo there
                             
                         Else
-                                If addr = 0 Then
+                                If Addr = 0 Then
                                     
                                     GoTo err30
                                 Else
@@ -3115,15 +3115,15 @@ q1239877:
                             Err.Clear
                             On Error Resume Next
                           If pp < 0 Or bb1.WhatIsBasicItem = vbString Then
-                          If bb1.ValidArea(addr, 4) Then
+                          If bb1.ValidArea(Addr, 4) Then
                           ChangeValuesMem = True
-                            PutMem4 addr, CLng(bb1.PutStringAtOffset(addr, s$))
+                            PutMem4 Addr, CLng(bb1.PutStringAtOffset(Addr, s$))
                           End If
                           Else
                       
-                           If bb1.ValidArea(addr, LenB(s$)) Then
+                           If bb1.ValidArea(Addr, LenB(s$)) Then
                            ChangeValuesMem = True
-                           CopyBytes LenB(s$), addr, StrPtr(s$)
+                           CopyBytes LenB(s$), Addr, StrPtr(s$)
                      
                            Else
                             GoTo err10
@@ -4283,7 +4283,7 @@ conthere0001:
         End If
     Else
     SpeedGroup = -1
-    MyEr "No Property/member found", "Δεν βρήκα ιδιότητα/μελος"
+    If Not LastErNum1 = -1 Then MyEr "No Property/member found", "Δεν βρήκα ιδιότητα/μελος"
     End If
     Set bstack.lastobj = Nothing
     GoTo fastexit
@@ -6049,7 +6049,7 @@ If flatobject Then
         Set basestack.lastobj = Nothing
     End If
     If purenumber Then
-        If Not IsNumeric(r) Then missNumber: IsExp = False
+        If Not MyIsNumeric(r) Then missNumber: IsExp = False
     End If
 End If
 End Function
@@ -7130,7 +7130,7 @@ syner:
                             If FastPureLabel(aa$, ut$, , True, , , , True) Then
                             If useHandler.objref.UseStruct Then
                            
-                            If useHandler.objref.structref.Tag = ut$ Then
+                            If useHandler.objref.structref.tag = ut$ Then
                                 Set useHandler = Nothing
                                 IsExpA = True
                                 ac = 0
@@ -11107,8 +11107,12 @@ contUDT1:
                             Set ppppl = BoxGroupVar(var(VR))
                             Mid$(a$, 1, 2) = "." + Chr(3)
                             IsNumberNew = SpeedGroup(bstack, ppppl, "VAL", "", a$, (0)) = 1
+                            If Not IsNumberNew Then
+                            r = 0
+                            Else
                             r = bstack.LastValue
-                            
+                            End If
+                            Exit Function
                         Else
                             Mid(a$, 1, 2) = Chr$(0) + "."
                             Set bstack.lastpointer = userGroup
@@ -11615,7 +11619,8 @@ Else
         UnknownProperty1 a$, v$
     Else
         If LenB(v$) = 0 Then v$ = s1$
-        If GetSub(v$ + "()", V1&) Then
+        
+        If GetSub(myUcase(v$, True) + "()", V1&) Then
             If Right$(sbf(V1&).sb, 1) = ChrW(&H1FFD) Then
                 V1& = val(Mid$(sbf(V1&).sb, InStr(sbf(V1&).sb, "CALL EXTERN ") + 12))
                 If var2used >= V1& Then
@@ -11628,6 +11633,30 @@ Else
                         End If
                     End If
                 End If
+            ElseIf InStr(sbf(V1&).sb, ChrW(&H1FFD)) > 0 Then
+                w1 = sbf(V1&).tpointer
+                If w1 > 0 Then
+                    For w3 = 1 To var(w1).FieldsCount
+                    v$ = var(w1).ReadField(w3)
+                    If InStr(sbf(V1&).sb, "EXTERN ." + Mid$(split(v$, " ")(0), 2)) > 0 Then
+                        w1 = val(split(v$, " ")(1))
+                        If TypeOf var(w1) Is stdCallFunction Then
+                        If var(w1).IsInterfaceCall Then
+                            MyEr "not for calling interfaces", "όχι για κλήσεις διεπαφών"
+                        Else
+                            r = CVar(var(w1).GetAddress)
+                            IsLabel bstack, a$, v$
+                            IsNumberNew = True
+                        End If
+                        Exit Function
+                        End If
+                    End If
+                    Next
+                End If
+                r = 0
+                IsLabel bstack, a$, v$
+                IsNumberNew = True
+                Exit Function
             End If
         End If
         UnknownVariable1 a$, v$
@@ -12178,7 +12207,7 @@ BLOCKkey = False
 Exit Function
 fun11: ' "ΤΜΗΜΑ(", "MODULE("
     If FastSymbol(a$, ")") Then
-        r = uintnew1(addr(AddressOf Module2.ExtCall))
+        r = uintnew1(Addr(AddressOf Module2.ExtCall))
         
         IsNumberNew = True
     Else
@@ -19057,7 +19086,7 @@ Function ConstNewParam(bstack As basetask, b$, W$) As Boolean
                 Exit Function
             Else
                 p = CVar(ss$)
-                GoTo cont11
+                GoTo CONT11
             End If
         End If
 here:
@@ -19143,7 +19172,7 @@ makelambda:
     Case 3
 
             If Not IsStrExp(bstack, b$, ss$, False) Then MissStringExpr: Exit Function
-cont11:
+CONT11:
             If Not bstack.lastobj Is Nothing Then GoTo makelambda
             Set bstack.lastobj = Nothing
             Set cv = New Constant
@@ -22978,6 +23007,9 @@ contNegLocal:
                 If Not ProcEnum(bstack, b$, , True) Then Execute = 0: Exit Function
 
                 GoTo loopcontinue
+                ElseIf IsLabelSymbolNew(b$, "ΔΙΕΠΑΦΗ", "INTERFACE", Lang) Then
+                    If Not ProcInter(bstack, b$, Lang, , True) Then Execute = 0: Exit Function
+                    GoTo loopcontinue
                 ElseIf IsLabelSymbolNew(b$, "ΔΟΜΗ", "STRUCTURE", Lang) Then
 
                 If Not makestruct(bstack, b$, Lang, False, True) Then Execute = 0: Exit Function
@@ -23122,6 +23154,9 @@ contNegGlobal:
                 If Not makestruct(bstack, b$, Lang, True, False) Then Execute = 0: Exit Function
 
                 GoTo loopcontinue
+                ElseIf IsLabelSymbolNew(b$, "ΔΙΕΠΑΦΗ", "INTERFACE", Lang) Then
+                    If Not ProcInter(bstack, b$, Lang, True) Then Execute = 0: Exit Function
+                    GoTo loopcontinue
                 Else
                 GoTo CONT12212
                 
@@ -24515,8 +24550,11 @@ Function IdentifierGroup(basestack As basetask, what$, rest$, Lang As Long, aloc
         Exit Function
     Case "ΑΠΑΡΙΘΜΗΣΗ", "ΑΠΑΡ", "ENUMERATION", "ENUM"
 
-    IdentifierGroup = ProcEnumGroup(basestack, rest$, LenB(here$) = 0)
-    
+        IdentifierGroup = ProcEnum(basestack, rest$, LenB(here$) = 0, alocal)
+        Exit Function
+    Case "ΔΙΕΠΑΦΗ", "INTERFACE"
+        IdentifierGroup = ProcInter(basestack, rest$, Lang, LenB(here$) = 0, alocal)
+        Exit Function
     Exit Function
     End Select
 End Function
@@ -25166,7 +25204,7 @@ Case "OPEN", "ΑΝΟΙΞΕ"
 Case "NAME", "ΟΝΟΜΑ"
     Identifier = ProcName(basestack, rest$, Lang)
     Exit Function
-Case "WITH", "ΜΕ"
+Case "WITH", "ΜΕ", "ΜΕ.ΑΝΤΙΚΕΙΜΕΝΟ"
     Identifier = MyWith(basestack, rest$, Lang)
     Exit Function
 Case "METHOD", "ΜΕΘΟΔΟΣ"
@@ -25213,6 +25251,9 @@ Case "PROTOTYPE", "ΠΡΩΤΟΤΥΠΟ"
     Exit Function
 Case "ΑΠΑΡΙΘΜΗΣΗ", "ΑΠΑΡ", "ENUMERATION", "ENUM"
     Identifier = ProcEnum(basestack, rest$, LenB(here$) = 0)
+    Exit Function
+Case "ΔΙΕΠΑΦΗ", "INTERFACE"
+    Identifier = ProcInter(basestack, rest$, Lang, LenB(here$) = 0)
     Exit Function
 Case "ΟΡΙΑ.ΕΚΤΥΠΩΤΗ", "ΟΡΙΑ.ΕΚΤΥΠΩΣΗΣ", "PRINTER.MARGINS"
     Identifier = ProcMargins(basestack, rest$)
@@ -28485,7 +28526,7 @@ End Sub
 
 Sub RTarget(DDD As Object, tar As target)
 ' RENDER TARGET
-Dim xl&, yl&, b As Long, f As Long, Tag$, id&
+Dim xl&, yl&, b As Long, f As Long, tag$, id&
 Dim X&, Y&, ox&, oy&
 Dim prive As basket, D As Object
 Dim c2&, V1&, V2&, vert&, mem As MemBlock
@@ -28494,7 +28535,7 @@ Set D = DDD.Owner
 prive = players(GetCode(D))
 With tar
 id& = .id
-Tag$ = .Tag
+tag$ = .tag
 X& = .Lx
 Y& = .lY
 xl& = .tx + 1
@@ -28606,8 +28647,8 @@ If c2& <> &H81000000 Then
 End If
 If id& < 100 Then
     half = 0
-    Tag$ = Left$(Tag$, xl& - X&)
-    If Tag$ <> "" Then
+    tag$ = Left$(tag$, xl& - X&)
+    If tag$ <> "" Then
     '1
     Select Case id& Mod 10
     Case 4, 5, 6
@@ -28620,9 +28661,9 @@ If id& < 100 Then
     Select Case id& Mod 10
     Case 2, 5, 8
    
-    X& = (xl& + X& - Len(Tag$)) \ 2
+    X& = (xl& + X& - Len(tag$)) \ 2
     Case 3, 6, 9
-    X& = xl& - Len(Tag$)
+    X& = xl& - Len(tag$)
     
     Case Else
     End Select
@@ -28630,11 +28671,11 @@ If id& < 100 Then
     LCTbasket dd, prive, Y&, X&
     dd.FontTransparent = True
     dd.ForeColor = mycolor(prive.mypen)
-       PlainBaSket dd, prive, Tag$, True, True
+       PlainBaSket dd, prive, tag$, True, True
     End If
     End If
 Else
-        If Tag$ <> "" Then
+        If tag$ <> "" Then
     id& = id& Mod 100
     Select Case id& Mod 10
     Case 4, 5, 6
@@ -28665,10 +28706,10 @@ Else
     
     If Not D Is dd Then
     Set DDD.Owner = dd
-    wwPlain2 DDD, prive, Tag$, xl& - X&, 10000, , True, f, , , True
+    wwPlain2 DDD, prive, tag$, xl& - X&, 10000, , True, f, , , True
     Set DDD.Owner = D
     Else
-    wwPlain2 DDD, prive, Tag$, xl& - X&, 10000, , True, f, , , True
+    wwPlain2 DDD, prive, tag$, xl& - X&, 10000, , True, f, , , True
     End If
     End If
 End If
@@ -32719,7 +32760,7 @@ where = FindFormSScreen(myform)
     End If
     
 myform.move X, Y
-ElseIf val("0" + bstack.Owner.Tag) > 32 Then
+ElseIf val("0" + bstack.Owner.tag) > 32 Then
 Set Scr = bstack.Owner.Parent
 If Scr Is Nothing Then Exit Function
 While Not TypeOf Scr Is GuiM2000
@@ -33047,7 +33088,7 @@ If basestack.lastobj Is Nothing Then
                     If TypeOf scr1 Is GuiM2000 Then
                     ElseIf TypeOf scr1 Is GuiImage Then
                         Set scr1 = Scr.pbox
-                        scr1.Tag = CLng(p)
+                        scr1.tag = CLng(p)
                     End If
                     If p = 0 Then
                         Set scr1 = Nothing
@@ -33063,7 +33104,7 @@ If basestack.lastobj Is Nothing Then
             If TypeOf scr1 Is GuiM2000 Then
             ElseIf TypeOf scr1 Is GuiImage Then
                 Set scr1 = scr1.pbox
-                scr1.Tag = CLng(p)
+                scr1.tag = CLng(p)
             End If
             If p = 0 Then
                 Set scr1 = Nothing
@@ -35518,7 +35559,7 @@ Dim u As Long
         If dq.Name = "dSprite" Then
             GetCode = dq.Index
         Else
-            GetCode = CLng("0" & dq.Tag)
+            GetCode = CLng("0" & dq.tag)
         End If
     End If
 End Function
@@ -36383,8 +36424,16 @@ End If
     If IsLabelSymbolNewExp(rest$, "ΚΕΝΗ", "VOID", Lang, ss$) Then par = True
     If IsLabelSymbolNewExp(rest$, "ΕΞΩΤΕΡΙΚΗ", "EXTERN", Lang, ss$) Then
         basestack.nokillvars = False
-        If IsExp(basestack, rest$, p) Then
+        If FastSymbol(rest$, ".") Then
+            i = FastPureLabel(rest$, ss$)
+            If GetVar(basestack, "THIS." + myUcase(ss$, True), i) Then 'ChrW(&HFFBF) +
+                GoTo CONT11
+            End If
+                resp = False
+            Exit Sub
+        ElseIf IsExp(basestack, rest$, p) Then
             i = CLng(p)
+CONT11:
             If i >= 0 Or i <= p Then
                 If Not MyIsObject(var(i)) Then
                 InternalError
@@ -37087,8 +37136,13 @@ again1:
     ' IS A NEW PAGE
     probeoffset = 0
     If StructPage(basestack, b$, Lang, offset, probeoffset, offsetlist, lasthead$) Then
+            If FastSymbol(b$, ";") Then
+            offset = probeoffset
+            Else
+                FastSymbol b$, ","
+            End If
         If probeoffset > maxOffset Then maxOffset = probeoffset
-        FastSymbol b$, ","
+        
         ' leave offset as is
     GoTo cont567
     Else
@@ -37212,7 +37266,74 @@ comehere:
                                    End If
     
     Else
-        offset1 = 2
+        ' check here
+            If GetVar3(basestack, basestack.GroupName + myUcase(what$, True), i) Then
+foundit:
+                If IsmHandler(var(i)) Then
+                    Set useHandler = var(i)
+                    If useHandler.t1 = 1 Then
+        
+                        Set localList = useHandler.objref
+                        For i = 0 To Len(localList.Count - 1)
+                            If offsetlist.Find(myUcase(lasthead$ + localList.KeyToString3(i), True)) Then
+                                    MyEr "double name is same struct", "διπλή εισαγωγή ονόματος"
+                                    StructPage = False
+                                    Set offsetlist = Nothing
+                                    Exit Function
+                            End If
+                        Next
+                        
+                        localList.MergeCollection offsetlist, offset, myUcase(lasthead$, True)
+                        
+                        
+                        
+                        offset1 = localList.structLen
+                        
+                        offsetlist.AddKeyStruct myUcase(lasthead$ + what$, True), offset, 1&, localList
+                        Set localList = Nothing
+                            If maxOffset < offset + offset1 Then
+                            
+                                offset2 = offset + offset1
+                            Else
+                                offset2 = maxOffset
+                            End If
+                                If FastSymbol(b$, ";") Then
+                                   offset = offset + offset1
+                                  
+                                    
+                                Else
+                            
+                                    FastSymbol b$, ","
+                                End If
+                        If offset2 > maxOffset Then maxOffset = offset2
+                        If offsetlist.Done Then
+                        offsetlist.sValue = offset1
+                        
+                        End If
+                        'If offsetlist.Done Then
+                        '    offsetlist.sValue = probeoffset - offset
+                        '    If FastSymbol(b$, ";") Then
+                        '        offset = probeoffset
+                        '    Else
+                              '  While FastSymbol(b$, ",")
+                              '  Wend
+                        '    End If
+                       ' End If
+                        
+                        
+                        GoTo cont567
+                    Else
+                        offset1 = 2
+                    End If
+                Else
+                    offset1 = 2
+                End If
+            '  ChrW(&HFFBF) +
+            ElseIf GetVar3(basestack, basestack.GroupName + ChrW(&HFFBF) + myUcase(what$, True), i) Then
+            GoTo foundit
+            Else
+                offset1 = 2
+            End If
         End If
         w2 = offset1  ' negative offset for strings
         p = 1
@@ -38407,7 +38528,7 @@ comehere:
         If neoGetArray(bstack, what$, pppp) Then
             If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then Exit Function
         Else
-            MyEr "No such Array", "Δεν υπάρχει τέτοιος πίνακας"
+            NosuchArray
             Exit Function
         End If
         If pppp.IsStringItem(it) Then
@@ -38472,7 +38593,7 @@ comehere:
                 Exit Function
             End If
         Else
-            MyEr "No such Array", "Δεν υπάρχει τέτοιος πίνακας"
+            NosuchArray
             Exit Function
         End If
 jumpthere3:
@@ -39117,7 +39238,7 @@ cont878874545871:
             If neoGetArray(bstack, what$, pppp) Then
                 If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$, , , , True) Then Fkey = 0: Exit Function
             Else
-                MyEr "No such array", "Δεν υπάρχει τέτοιος πίνακας"
+                NosuchArray
                 Fkey = 0:  Exit Function
             End If
             
@@ -39412,7 +39533,7 @@ Case 6
             If neoGetArray(bstack, what$, pppp) Then
                 If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then Fkey = 0: Exit Function
             Else
-                MyEr "No such array", "Δεν υπάρχει τέτοιος πίνακας"
+                NosuchArray
                 Fkey = 0: Exit Function
             End If
             
@@ -39462,7 +39583,7 @@ jumpthere4:
             If neoGetArray(bstack, what$, pppp) Then
                 If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then Fkey = 0: Exit Function
             Else
-                MyEr "No such array", "Δεν υπάρχει τέτοιος πίνακας"
+                NosuchArray
                 Exit Function
             End If
             If par Then
@@ -40122,7 +40243,7 @@ If Left$(Typename(bstack.Owner), 3) = "Gui" Then oxiforforms: Exit Function
 If TypeOf bstack.Owner Is MetaDc Then oxiforMetaFiles: Exit Function
 If TypeOf bstack.Owner Is VB.PictureBox Then
 On Error GoTo ttt
-If CLng("0" & bstack.Owner.Tag) > 33 Then
+If CLng("0" & bstack.Owner.tag) > 33 Then
 oxiforImages: Exit Function
 End If
 End If
@@ -43172,7 +43293,7 @@ jumpnow:
     End If
     End If
     
-    If Not lcl Then If GetlocalVar(what$, i) Then MyEr "Variable " + what$ + " already defined", "Υπάρχει ήδη η μεταβλητή " + what$: ProcDef = False: Exit Function
+    If Not lcl Then If GetlocalVar(what$, i) Then VariableExist what$: ProcDef = False: Exit Function
     i = AllocVar()
     If y1 = 3 Then
     that = vbNullString
@@ -44670,43 +44791,46 @@ Next i
 End If
 End Function
 Function MyIsNumericPointer(v As Variant) As Boolean
-Dim n As Integer
-GetMem2 VarPtr(v), n
-If n < 8 Then MyIsNumericPointer = True: Exit Function
-MyIsNumericPointer = (n = 11) Or (n = 17) Or (n = 14) Or (n = 36)
+    Select Case MemInt(VarPtr(v))
+    Case Is < 8, 11, 17, 14, 20, 36
+        MyIsNumericPointer = True
+    End Select
 End Function
 Function CheckInt64(v As Variant) As Boolean
-Dim n As Byte
-GetMem1 VarPtr(v), n
-CheckInt64 = n = 20
+    CheckInt64 = MemByte(VarPtr(v)) = 20
 End Function
 Function MyIsNumeric(v As Variant) As Boolean
-Dim n As Byte
-GetMem1 VarPtr(v), n
-If n < 8 Then MyIsNumeric = True: Exit Function
-MyIsNumeric = (n = 11) Or (n = 17) Or (n = 14) Or (n = 20) Or (n = 36)
+    Select Case MemByte(VarPtr(v))
+    Case Is < 8, 11, 17, 14, 20, 36
+        MyIsNumeric = True
+    End Select
+End Function
+Function MyIsPureNumeric(v As Variant) As Boolean
+    Select Case MemByte(VarPtr(v))
+    Case Is < 8, 11, 17, 14, 20
+        MyIsPureNumeric = True
+    End Select
 End Function
 Function MyIsNumeric2(v As Variant, n As Integer) As Boolean
-GetMem2 VarPtr(v), n
-If n < 8 Then MyIsNumeric2 = True: Exit Function
-MyIsNumeric2 = (n = 11) Or (n = 17) Or (n = 14) Or (n = 20) ' no  Or (n = 36)
+    n = MemInt(VarPtr(v))
+    Select Case n
+    Case Is < 8, 11, 17, 14, 20
+        MyIsNumeric2 = True
+    End Select
 End Function
 Function IsNumericPrint(v As Variant) As Boolean
-Dim n As Byte
-GetMem1 VarPtr(v), n
-If n = 0 Then Exit Function
-If n < 8 Then IsNumericPrint = True: Exit Function
-IsNumericPrint = (n = 11) Or (n = 17) Or (n = 14) Or (n = 20) Or (n = 36)
+    Select Case MemByte(VarPtr(v))
+    Case 0
+        ' nothing
+    Case Is < 8, 11, 17, 14, 20, 36
+        IsNumericPrint = True
+    End Select
 End Function
 Function MyIsUnknown(v As Variant) As Boolean
-Dim n As Byte
-GetMem1 VarPtr(v), n
-MyIsUnknown = n = 13
+    MyIsUnknown = MemByte(VarPtr(v)) = 13
 End Function
 Function MyIsObject(v As Variant) As Boolean
-Dim n As Byte
-GetMem1 VarPtr(v), n
-MyIsObject = n = 9
+    MyIsObject = MemByte(VarPtr(v)) = 9
 End Function
 Function MyVal(v As Variant) As Variant
 On Error GoTo there1245
@@ -46330,6 +46454,9 @@ len1234:
                         Exit Function
                     ElseIf .t1 = 0 Then
                         r = 0
+                            On Error Resume Next
+                            r = .objref.Count
+                            On Error GoTo 0
                         IsLen = FastSymbol(a$, ")", True)
                         Exit Function
                     ElseIf .t1 = 4 Then
@@ -48465,7 +48592,7 @@ w1 = Abs(IsLabel(bstack, a$, s$))
 
 If w1 = 1 Or w1 = 3 Then
     w2 = w1
-cont11:
+CONT11:
     If Not GetVar(bstack, s$, w1, , , , , , Glob) Then GoTo jmp1478
     If Not VarTypeName(var(w1)) = mGroup Then GoTo jmp1478
     If var(w1).IamApointer Then
@@ -51044,6 +51171,40 @@ conthere1002:
                             IsEnumAs = True
                             Exit Function
                         End If
+                    ElseIf usehandler0.t1 = 1 And usehandler0.ReadOnly Then
+                        Dim aa As MemBlock
+                        Set aa = New MemBlock
+                        If MemInt(VarPtr(p)) = vbString Then
+                            SwapString2Variant ss$, p
+                            p = LenB(ss$) \ usehandler0.objref.structLen
+                            If p < 0 Then p = 1
+                            aa.Construct usehandler0.objref.structLen, CLng(p), 8&, False, 1
+                            aa.UseStruct = True
+                            p = (-OneLongLong And aa.GetPtr(0&))
+                            i = MemLong(VarPtr(p) + 8)
+                            If aa.ValidArea(i, CVar(LenB(ss$))) Then
+                                CopyMemory ByVal i, ByVal StrPtr(ss$), LenB(ss$)
+                            End If
+                        Else
+                            If FastSymbol(b$, "*") Then
+                                If Not IsExp(bstack, b$, p, True, True, , , True) Then
+                                    MissNumExpr
+                                    Exit Function
+                                End If
+                            Else
+                                p = 1
+                            End If
+                            aa.Construct usehandler0.objref.structLen, CLng(p), 8&, False, 1
+                            aa.UseStruct = True
+                        End If
+                        Set aa.structref = usehandler0.objref
+                        Set usehandler0 = New mHandler
+                        Set usehandler0.objref = aa
+                        usehandler0.t1 = 2
+                        Set p = usehandler0
+                        initval = True
+                        IsEnumAs = True
+                        Exit Function
                     End If
                 End If
             End If
@@ -52809,11 +52970,11 @@ Sub StaticWork(basestack As basetask, mystack As basetask, ByVal where$)
         If MyIsObject(vvv) Then Set mystack.StaticCollection = vvv
     End If
 End Sub
-Private Function addr(ByVal p As Long) As Long
+Private Function Addr(ByVal p As Long) As Long
     'If m_bInIDE Then
     '    addr = CLNG(add32(uintnew1(p), 12@))
     'Else
-        addr = p
+        Addr = p
     'End If
 End Function
 
@@ -56415,7 +56576,7 @@ If r < 1& Then r = 1&
                 End If
                 End If
                     GoTo cont111
-                ElseIf useBuffer.structref.Tag = useHandler.objref.Tag Then
+                ElseIf useBuffer.structref.tag = useHandler.objref.tag Then
                     GoTo cont111
                 End If
             End If
@@ -56668,12 +56829,16 @@ Dim thisHandler As mHandler, useBuffer As MemBlock, otherBuffer As MemBlock, myl
 Dim rB As Byte, ri As Integer, dn As Long, db As Double, ds As Single, w2 As Long, s$
 Dim itisSingle As Boolean, itisInt64 As Boolean, itisCur As Boolean
 Dim i As Long
+
 If useHandler.t1 <> 2 Then
 WrongType
 Exit Function
 End If
 Set useBuffer = useHandler.objref
 If Not useBuffer.UseStruct Then
+If Left$(b$, 1) = "|" Then
+    MyEr "this buffer has no struct attached", "αυτή η διάρθρωση δεν έχει δομή ενσωματωμένη"
+End If
 pp = useBuffer.ItemSize
     If pp = 4 Then
         itisSingle = useBuffer.WhatIsBasicItem = vbSingle
@@ -56757,22 +56922,33 @@ If mylist.Find(W$) Then
         
         If Not mylist.StructObj Is Nothing Then
         ' WE HAVE A SUB STRUCT
-        otherBuffer.Construct pp, mylist.StructMany, , , CLng(r)
-        Set otherBuffer.structref = mylist.StructObj
-        otherBuffer.UseStruct = True
+            otherBuffer.Construct pp, mylist.StructMany, , , CLng(r)
+'            Set otherBuffer.structref = mylist.StructObj
+'            otherBuffer.UseStruct = True
         Else
             If itisInt64 Then
-            r = 20
-        ElseIf itisCur Then
-            r = vbCurrency
-        ElseIf itisSingle Then
-            r = vbSingle
+                r = 20
+            ElseIf itisCur Then
+                r = vbCurrency
+            ElseIf itisSingle Then
+                r = vbSingle
+            Else
+                            
+            End If
+            otherBuffer.Construct pp, mylist.StructMany, , , CLng(r)
         End If
-        End If
-        otherBuffer.Construct pp, mylist.StructMany, , , CLng(r)
+       
         CopyMemory ByVal otherBuffer.GetPtr(0), ByVal w2, pp * mylist.StructMany
+        Dim mylist1 As FastCollection
+        'mylist.CopyCollection mylist1
+        If Not mylist.StructObj Is Nothing Then
+        Set otherBuffer.structref = mylist.StructObj
+        otherBuffer.UseStruct = True
+        End If
         r = 0
         Set thisHandler = New mHandler
+        otherBuffer.UseStruct = True
+        
         thisHandler.t1 = 2
         Set thisHandler.objref = otherBuffer
         Set bstack.lastobj = thisHandler

@@ -1,11 +1,11 @@
 M2000 Interpreter and Environment
-Version 14 -002 active-X
+Version 14 revision 0 active-X
 
-A lot of changes for using print/printing functions with four qualities.
+1. Interfaces as part of classes
+2. Structures as types (see inter1 example in info file)
+3. Check Ver14 module, which show various Printing options (new)
 
-WORK IN PROGRESS
-
-
+ 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
 

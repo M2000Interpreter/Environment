@@ -362,6 +362,7 @@ Dim ss$, skip As Boolean, checktype As Boolean
             End If
         End If
     ElseIf Not IsEnumAs(bstack, b$, p) Then
+    
             ExpectedEnumType
             Exit Function
     End If
@@ -1665,6 +1666,21 @@ MyEr "Can't assign pointer to named group", "Δεν μπορώ να βάλω δείκτη σε επώνυμη
 End Sub
 Public Sub MissingPointer()
 MyEr "No Pointer Found", "Δεν βρήκα δείκτη"
+End Sub
+Public Sub BadEnumName()
+MyEr "No proper name for enumeration", "μη κανονικό όνομα για απαρίθμηση"
+End Sub
+Public Sub NoSuchAttr(a$)
+    MyEr "No such attribute " + a$, "Δεν υπάρχει τέτοια ιδιότητα " + a$
+End Sub
+Public Sub NosuchArray()
+MyEr "No such array", "Δεν υπάρχει τέτοιος πίνακας"
+End Sub
+Public Sub VariableExist(a$)
+ MyEr "Variable " + a$ + " already defined", "Υπάρχει ήδη η μεταβλητή " + a$
+End Sub
+Public Sub nameexist(a$)
+MyEr "name " + a$ + " exist", "το όνομα " + a$ + " υπάρχει"
 End Sub
 Public Sub ManyDots()
     MyEr "too many dots", "πολλές τελείες"
@@ -7659,6 +7675,14 @@ existAs04:
                                         Else
                                             GoTo er103
                                         End If
+                                    ElseIf useHandler.t1 = 2 Then
+                                    If Not Fast2Varl(s$, "ΔΙΑΡΘΡΩΣΗ", 9, "BUFFER", 6, 9, ff) Then
+                                        If Not useHandler.objref.UseStruct Then
+                                        WrongObject
+                                        ElseIf Not useHandler.objref.structref.Tag = s$ Then
+                                        WrongObject
+                                        End If
+                                    End If
                                     ElseIf useHandler.t1 = 4 Then
                                         WrongObject
                                     Else
@@ -8639,6 +8663,19 @@ there18274:
                             CantAssignValue
                         ElseIf TypeOf var(i) Is mHandler Then
                             Set useHandler = var(i)
+                            If useHandler.t1 = 2 Then
+                                If p Is Nothing Then GoTo er103
+                                If Not TypeOf p Is mHandler Then
+                                        GoTo er103
+                                End If
+                                Set usehandler1 = p
+                                If Not usehandler1.t1 = 2 Then
+                                    GoTo er103
+                                End If
+                                ok = True
+                                Set myobject = p
+                                Set p = Nothing
+                            Else
                             If useHandler.t1 <> 4 Then GoTo er104
                             If MyIsObject(p) Then
                                 If p Is Nothing Then GoTo er103
@@ -8658,6 +8695,7 @@ there18274:
                                 End If
                             Else
                                 Set myobject = useHandler.objref.SearchValue(p, ok)
+                            End If
                             End If
                             Set usehandler1 = Nothing
                                 If ok Then
@@ -9124,6 +9162,7 @@ existAs05:
                                     GoTo er110
                                 ElseIf ok Then
                                     Set useHandler = p
+                                    If useHandler.t1 = 4 Then
                                     Set useHandler = useHandler.objref.SearchValue(CVar(s$), ok)
                                     If ok Then
                                         Set p = useHandler
@@ -9131,6 +9170,9 @@ existAs05:
                                     Else
                                         Expected "enumeration", "απαρίθμηση"
                                         Exit Function
+                                    End If
+                                    Else
+                                        Set useHandler = Nothing
                                     End If
                                     GoTo contenumok
                                 End If
@@ -10423,9 +10465,9 @@ Err.Clear
 End Sub
 
 Private Function getTupleFromMArray(that As Object) As Object
-Dim aa As mArray, bb As tuple
+Dim aa As mArray, BB As tuple
 Set aa = that
-aa.CopyArray2tuple bb
-Set getTupleFromMArray = bb
+aa.CopyArray2tuple BB
+Set getTupleFromMArray = BB
 End Function
 

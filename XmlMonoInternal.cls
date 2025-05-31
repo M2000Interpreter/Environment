@@ -84,7 +84,7 @@ Private Function unpacktext(t1 As Variant) As String
 End Function
 Private Sub convertNumericEntities(a$)
 Dim b() As String, i As Long, j As Long
-b = Split(a$, "&#")
+b = split(a$, "&#")
 If UBound(b) <= 0 Then Exit Sub
 For i = 1 To UBound(b)
 j = InStr(b(i), ";")
@@ -112,7 +112,7 @@ If IsArray(node) Then
     Set ProcessBag = New Collection
     ProcessBag.Add node
     Else
-    ProcessBag.Add node, , , ProcessBag.count
+    ProcessBag.Add node, , , ProcessBag.Count
     End If
 Else
     MyEr "Not a valid node", "Δεν υπάρχει κόμβος"
@@ -196,7 +196,7 @@ ElseIf (node(3) And &H1) Then
         Set root(2) = c
     Else
         Set c = root(2)
-        c.Add p, , , c.count
+        c.Add p, , , c.Count
     End If
 Else
     MyEr "No childs for this node, only attributes", "όχι παιδιά για αυτόν τον κόμβο, μόνο ιδιότητες"
@@ -213,7 +213,7 @@ Public Sub AppendChildObj(p As XmlMonoInternal)
         Set root(2) = c
     Else
         Set c = root(2)
-        c.Add p, , , c.count
+        c.Add p, , , c.Count
     End If
 End Sub
 Property Get FirstChild() As XmlMonoInternal
@@ -227,7 +227,7 @@ ElseIf (root(3) And 1) Then
     Else
         Set c = val
         Set FirstChild = c.item(1)
-        thelast = achild = c.count - 1
+        thelast = achild = c.Count - 1
         achild = 0
     End If
 Else
@@ -244,7 +244,7 @@ ElseIf (root(3) And 1) Then
         MyEr "I have't childs yet", "δεν έχω παιδιά ακόμα"
     Else
         Set c = val
-        achild = c.count - 1
+        achild = c.Count - 1
         thelast = True
         Set lastchild = c.item(achild + 1)
     End If
@@ -264,10 +264,10 @@ ElseIf (root(3) And 1) Then
         Set c = val
         
         achild = achild + 1
-        If achild > c.count - 1 Then
+        If achild > c.Count - 1 Then
             MyEr "No more childs", "Δεν υπάρχουν άλλα παιδιά"
         Else
-            thelast = achild = c.count - 1
+            thelast = achild = c.Count - 1
             Set Nextchild = c(achild + 1)
         End If
     End If
@@ -286,7 +286,7 @@ ElseIf (root(3) And 1) Then
     Else
         Set c = val
 
-        If p < 0 Or p > c.count - 1 Then
+        If p < 0 Or p > c.Count - 1 Then
             MyEr "index fault", "δείκτης εκτός ορίων"
         Else
             Set Anychild = c(p + 1)
@@ -308,7 +308,7 @@ ElseIf (root(3) And 1) Then
     Else
         Set c = val
         Dim i As Long
-        For i = 1 To c.count
+        For i = 1 To c.Count
         Set aXml = c(i)
         If aXml.Tag = Tag$ Then Set ScanForTag = aXml: ok = True: Exit Function
         Next i
@@ -382,7 +382,7 @@ Friend Function deep(Tag$, child As XmlMonoInternal, guard As Long) As Boolean
     Else
         Set c = val
         Dim i As Long
-        For i = 1 To c.count
+        For i = 1 To c.Count
         Set aXml = c(i)
         If aXml.beautify = guard Then Exit Function ' safety
         If aXml.Tag = Tag$ Then Set child = aXml: deep = True: Exit Function
@@ -404,13 +404,13 @@ Friend Sub adddeep(Tag$, bag As Collection, Optional many = -1)
     Else
         Set c = val
         Dim i As Long
-        For i = 1 To c.count
+        For i = 1 To c.Count
         Set aXml = c(i)
             If aXml.Tag = Tag$ Then
-                If bag.count = 0 Then
+                If bag.Count = 0 Then
                     bag.Add aXml
                 Else
-                    bag.Add aXml, , , bag.count
+                    bag.Add aXml, , , bag.Count
                 End If
                 If many > 0 Then many = many - 1
                 If many = 0 Then Exit Sub
@@ -434,15 +434,15 @@ Friend Sub adddeepexport(Tag$, bag As Collection, Optional many = -1)
     Else
         Set c = val
         Dim i As Long
-        For i = 1 To c.count
+        For i = 1 To c.Count
         Set aXml = c(i)
             If aXml.Tag = Tag$ Then
                 Set bXml = New XmlMono
                 bXml.createTree aXml
-                If bag.count = 0 Then
+                If bag.Count = 0 Then
                     bag.Add bXml
                 Else
-                    bag.Add bXml, , , bag.count
+                    bag.Add bXml, , , bag.Count
                 End If
                 If many > 0 Then many = many - 1
                 If many = 0 Then Exit Sub
@@ -498,7 +498,7 @@ ElseIf (root(3) And 1) Then
     Else
         Set c = val
 
-        ChildCount = c.count
+        ChildCount = c.Count
       
     End If
 Else
@@ -560,12 +560,12 @@ Property Get Tag() As String
     End If
 End Property
 Private Function AnyNodeAttr(node) As String
-    Dim c As Collection, m() As String, i As Long
+    Dim c As Collection, M() As String, i As Long
         If Not node(1) Is Nothing Then
             Set c = node(1)
-            m() = Split(node(5))
-            For i = 1 To c.count
-                AnyNodeAttr = AnyNodeAttr + " " + m(i) + "=" + c(m(i))
+            M() = split(node(5))
+            For i = 1 To c.Count
+                AnyNodeAttr = AnyNodeAttr + " " + M(i) + "=" + c(M(i))
             Next i
         End If
 End Function
@@ -587,7 +587,7 @@ End If
         If beautify > 0 Then id$ = space(beautify)
         Xml = id$
         If Not ProcessBag Is Nothing Then
-        For i = 1 To ProcessBag.count
+        For i = 1 To ProcessBag.Count
         p = ProcessBag(i)
         If p(1) Is Nothing And Left$(p(0), 1) = "!" Then
         Xml = Xml + "<" + p(5)
@@ -605,7 +605,7 @@ End If
             If Not root(2) Is Nothing Then
                     Set c = root(2)
                     If beautify Then Xml = Xml + vbCrLf
-                    For i = 1 To c.count
+                    For i = 1 To c.Count
                     Set D = c(i)
                     If D Is guard Then Set D = Nothing: Exit Property
                     D.skip = skip
@@ -617,7 +617,7 @@ End If
                          Xml = Xml + D.Xml(guard)
                     End If
                     If guard Is Nothing Then Set root(2) = Nothing ' weave untik top
-                    If Len(D.status) > 0 Then status = "<" + root(0) + " child='" + Trim$(Str$(i)) + "'>" + D.status + "</" + root(0) + ">": GoTo 1000
+                    If Len(D.status) > 0 Then status = "<" + root(0) + " child='" + Trim$(str$(i)) + "'>" + D.status + "</" + root(0) + ">": GoTo 1000
                     Next i
                     Xml = Xml + id$
             Else
@@ -636,11 +636,11 @@ Property Get attr(t$) As String
         MyEr "node not inserted yet", "δεν έχει εισαχθεί κόμβος"
     Else
         Dim c As Collection
-        If root(1) Is Nothing Then MyEr "No such attribute", "Δεν υπάρχει τέτοια ιδιότητα": Exit Property
+        If root(1) Is Nothing Then NoSuchAttr t$: Exit Property
         Set c = root(1)
         On Error Resume Next
         attr = unpackattrib(c.item(t$))
-        If Err.Number > 0 Then Err.Clear: MyEr "No such attribute", "Δεν υπάρχει τέτοια ιδιότητα"
+        If Err.Number > 0 Then Err.Clear: NoSuchAttr t$
     End If
 End Property
 Property Let attr(t$, RHS As String)
@@ -648,12 +648,12 @@ Property Let attr(t$, RHS As String)
         MyEr "node not inserted yet", "δεν έχει εισαχθεί κόμβος"
     Else
         Dim c As Collection
-        If root(1) Is Nothing Then MyEr "No such attribute", "Δεν υπάρχει τέτοια ιδιότητα": Exit Property
+        If root(1) Is Nothing Then NoSuchAttr t$: Exit Property
         Set c = root(1)
         On Error Resume Next
         c.Remove t$
         c.Add CVar(packattrib(RHS, InStr(RHS, "'") > 0)), t$
-        If Err.Number > 0 Then Err.Clear: MyEr "No such attribute", "Δεν υπάρχει τέτοια ιδιότητα"
+        If Err.Number > 0 Then Err.Clear: NoSuchAttr t$
     End If
 End Property
 Function AttrExist(t$, Optional attr As String) As Boolean
@@ -661,7 +661,7 @@ Function AttrExist(t$, Optional attr As String) As Boolean
         MyEr "node not inserted yet", "δεν έχει εισαχθεί κόμβος"
     Else
         Dim c As Collection
-        If root(1) Is Nothing Then MyEr "No such attribute", "Δεν υπάρχει τέτοια ιδιότητα": Exit Function
+        If root(1) Is Nothing Then NoSuchAttr t$: Exit Function
         Set c = root(1)
         On Error Resume Next
         attr = unpackattrib(c.item(t$))
@@ -669,7 +669,7 @@ Function AttrExist(t$, Optional attr As String) As Boolean
     End If
 End Function
 Function AlterProcessAttr(id, t$, NewValue As String, Optional OldValue As String) As Boolean
-If ProcessBag.count < id Or id < 1 Then MyEr "index fault", "δείκτης εκτός ορίων": Exit Function
+If ProcessBag.Count < id Or id < 1 Then MyEr "index fault", "δείκτης εκτός ορίων": Exit Function
 Dim node, i As Long, c As Collection
 node = ProcessBag.item(id)
 If Typename(node(1)) = "Nothing" Then
@@ -679,26 +679,26 @@ If Typename(node(1)) = "Nothing" Then
 Else
 On Error GoTo er1
 Set c = node(1)
-If c.count = 0 Then GoTo er1
+If c.Count = 0 Then GoTo er1
 OldValue = c(t$)
 c.Remove t$
 c.Add CVar(NewValue), t$
 End If
 Exit Function
 er1:
-MyEr "No such attribute", "Δεν υπάρχει τέτοια ιδιότητα"
+NoSuchAttr t$
 End Function
 Property Get CountProcess() As Long
     If ProcessBag Is Nothing Then
         CountProcess = 0
     Else
-        CountProcess = ProcessBag.count
+        CountProcess = ProcessBag.Count
     End If
 End Property
 Property Get ProcessInstruction(i As Long) As Variant()
 If ProcessBag Is Nothing Then
     MyEr "there are no instructions in this node", "δεν υπάρχουν οδηγίες σε αυτόν το κόμβο"
-ElseIf i < 0 Or i >= ProcessBag.count Then
+ElseIf i < 0 Or i >= ProcessBag.Count Then
     MyEr "index fault", "δείκτης εκτός ορίων"
 Else
     ProcessInstruction = ProcessBag.item(i)
@@ -1090,8 +1090,8 @@ ElseIf (root(3) And &H1) Then
     Else
         Set c = root(2)
         c.Remove achild + 1
-        If achild >= c.count Then achild = achild - 1
-        If c.count = 0 Then Set root(2) = Nothing: achild = -1
+        If achild >= c.Count Then achild = achild - 1
+        If c.Count = 0 Then Set root(2) = Nothing: achild = -1
     End If
 Else
     MyEr "No childs for this node, only attributes", "όχι παιδιά για αυτόν τον κόμβο, μόνο ιδιότητες"
@@ -1119,18 +1119,18 @@ Sub RemoveProcess()
     Set ProcessBag = Nothing
 End Sub
 Friend Sub SetNumericCharacterEntities(RHS)
-    Dim m As XmlMonoInternal
+    Dim M As XmlMonoInternal
     ' lastchild
     Dim mLast As XmlMonoInternal
     NumericCharacterEntities = CBool(RHS)
     If Not Me.HasNode Then Exit Sub
     If Me.ChildCount = 0 Then Exit Sub
     Set mLast = lastchild
-    Set m = FirstChild
-    While Not m Is Nothing
-        m.SetNumericCharacterEntities RHS
-        If Not m Is mLast Then Set m = Nextchild Else Set m = Nothing
+    Set M = FirstChild
+    While Not M Is Nothing
+        M.SetNumericCharacterEntities RHS
+        If Not M Is mLast Then Set M = Nextchild Else Set M = Nothing
     Wend
-    Set m = FirstChild
+    Set M = FirstChild
 End Sub
 
