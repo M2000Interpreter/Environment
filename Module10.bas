@@ -24,8 +24,8 @@ Private Declare Function vbaVarLateMemCallLdRf CDecl Lib "msvbvm60" _
                          ByVal sName As Long, _
                          ByVal cArgs As Long, _
                          ByVal vArgs As Long) As Long
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
 Private Const E_POINTER As Long = &H80004003
 Private Const S_OK As Long = 0
 Private Const INTERNET_MAX_URL_LENGTH As Long = 2083
@@ -1072,13 +1072,13 @@ ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
 ret = ReadFile(FileNumber, Data(0), BlockSize, SizeRead, 0&)
 BlockSize = SizeRead
 End Sub
-Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal addr As Long)
+Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal Addr As Long)
 Dim PosL As Long
 Dim PosH As Long
 Dim SizeRead As Long
 Dim ret As Long
 ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
-ret = ReadFile(FileNumber, ByVal addr, BlockSize, SizeRead, 0&)
+ret = ReadFile(FileNumber, ByVal Addr, BlockSize, SizeRead, 0&)
 End Sub
 
 Public Sub API_CloseFile(ByVal FileNumber As Long)
@@ -2518,6 +2518,8 @@ ElseIf Not IsExp(bstack, b$, p) Then
     End If
 End If
 If Not bstack.lastobj Is Nothing Then
+EguFirst:
+
     If IsObjGroup(bstack.lastobj) Then
         If bstack.lastobj.IamApointer Or Not ppppAny.arr Then
             If IsObjProp(ppppAny.GroupRef) Then
@@ -2653,15 +2655,7 @@ here65654:
                     SwapString2Variant ss$, p
                 End If
                 If Not bstack.lastobj Is Nothing Then
-                    If ppppAny.IhaveClass Then
-                        Set myobject = ppppAny.bareteamgroup()
-                        ProcessOper bstack, myobject, "''", 0, 1
-                        Set ppppAny.item(v) = bstack.lastobj
-                        Set myobject = Nothing
-                        Set bstack.lastobj = Nothing
-                        Set ppppAny.item(v) = bstack.lastobj
-                    End If
-                    Set bstack.lastobj = Nothing
+                    GoTo EguFirst
                 Else
                     ppppAny.item(v) = p
                 End If
@@ -10465,9 +10459,9 @@ Err.Clear
 End Sub
 
 Private Function getTupleFromMArray(that As Object) As Object
-Dim aa As mArray, BB As tuple
+Dim aa As mArray, bb As tuple
 Set aa = that
-aa.CopyArray2tuple BB
-Set getTupleFromMArray = BB
+aa.CopyArray2tuple bb
+Set getTupleFromMArray = bb
 End Function
 

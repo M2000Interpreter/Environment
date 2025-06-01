@@ -47217,7 +47217,7 @@ MODULE POLYSPIRAL {ΤΜΗΜΑ ΠΟΛΥΣΠΕΙΡΑ {
 	ΦΟΡΜΑ 60, 25
 	ΟΘΟΝΗ #220055, 0
 	ΜΕΤΑΒΛΗΤΕΣ ΑΥΞΗΣΗ = 0, χ=ΚΛΙΜΑΞ.Χ / 2, ψ=ΚΛΙΜΑΞ.Ψ / 2
-	ΜΕΤΑΒΛΗΤΕΣ ΜΗΚΟΣ, ΓΩΝΙΑ, ΑΥΞΗΣΗ
+	ΜΕΤΑΒΛΗΤΕΣ ΜΗΚΟΣ, ΓΩΝΙΑ
 	ΑΝΑΝΕΩΣΗ 1000
 	ΦΟΝΤΟ 0, #330066
 	ΠΕΝΑ 15 {
@@ -47758,7 +47758,11 @@ REM WITH Columns, "ColumnWidth", 20
 METHOD ExcelSheet, "SaveAs", dir$+"MyTest.xlsx", 51 ' 51 with no macro
 DECLARE ExcelSheet NOTHING
 TRY {
-	WIN  DIR$+"MyTest.xlsx"
+	IF FILE.APP$("xlsx")="" THEN
+		WIN  EXCEL, DIR$+"MyTest.xlsx"
+	ELSE
+		WIN  DIR$+"MyTest.xlsx"
+	END IF
 }
 }
 MODULE EXCEL2 {IF NOT  EXIST("MyTest.xlsx") THEN
@@ -47806,7 +47810,11 @@ IF EXIST("MyTest.xlsx") THEN {
 NAME "MyTest001.xlsx" AS "MyTest.xlsx"
 WAIT 100  ' give 100ms time to system to finish.
 TRY {
-	WIN  DIR$+"MyTest.xlsx"
+	IF FILE.APP$("xlsx")="" THEN
+		WIN  "EXCEL", DIR$+"MyTest.xlsx"
+	ELSE
+		WIN  DIR$+"MyTest.xlsx"
+	END IF
 }
 }
 MODULE INTER {GLOBAL ENUM HRESULT {
@@ -48160,5 +48168,54 @@ try ok  {
 	PRINT z=>IUnknown.QueryInterface
 }
 IF NOT ok OR ERROR THEN PRINT ERROR$
+}
+MODULE SPOTIFY {static once as boolean, thatname$
+if not match("N") then
+print "spotufy 0 for mute"
+print  "spotify 1 to up volume"
+print  "spotify -1 to down volume"
+print  "spotify 2 next"
+print "spotify -2 stop"
+break
+end if
+Read what
+Declare BringWindowToTop   lib "user32.BringWindowToTop" {long A} as long
+Declare GetTopWindow  lib "user32.GetTopWindow" {long A} as long
+Declare GetWindowText  lib "user32.GetWindowTextW" {long A, long b, long c} as long
+Declare FindWindow Lib "user32.FindWindowW" { long a, Long b} as long
+Declare SendMessage Lib "user32.SendMessageW" {Long  hWnd,  Long  wMsg, Long wParam, Long lParam}  As Long
+Declare PostMessage Lib "user32.PostMessageW" {Long  hWnd,  Long  wMsg, Long wParam, Long lParam}  As Long
+Buffer clear alfa as integer * 1000
+if thatname$<>"" then
+	alfa[0]=thatname$
+else
+	alfa[0]="MSCTFIME UI"
+end if
+z=FindWindow(0, alfa(0))
+if z=0 then
+	WIN "SPOTIFY://"
+	if not once then once=true: wait 2000 else wait 200
+	hw=GetTopWindow(0&)
+	n=GetWindowText(hw, alfa(0), 500)
+	if n=0 then break
+	thatname$=eval$(alfa,0, n*2)
+	z=FindWindow(0, alfa(0))
+end if
+if z<>0 then
+	if what=0 then
+		ret=SendMessage(z, 0x0319&, 0&, 524288&)  // mute
+	else.if what=-1 then
+		ret= SendMessage(z, 0x0319&, 0&, 589824&)
+	else.if what=1 then
+		ret= SendMessage(z, 0x0319&, 0&, 655360&)
+	else.if what=-2 then
+		ret= SendMessage(z, 0x0319&, 0&, 851968&)
+	else
+		ret= SendMessage(z, 0x0319&, 0&, 720896&)
+	end if
+else
+	WIN "SPOTIFY://"
+end if
+
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

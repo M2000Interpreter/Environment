@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 0
+Global Const Revision = 1
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7130,7 +7130,7 @@ syner:
                             If FastPureLabel(aa$, ut$, , True, , , , True) Then
                             If useHandler.objref.UseStruct Then
                            
-                            If useHandler.objref.structref.tag = ut$ Then
+                            If useHandler.objref.structref.Tag = ut$ Then
                                 Set useHandler = Nothing
                                 IsExpA = True
                                 ac = 0
@@ -19423,7 +19423,7 @@ entry1:
 
         one = True
         iscom = True
-        Select Case IsLabelDotSub(temphere$, b$, W$, ss$, Lang, nchr)
+        Select Case IsLabelDotSub(temphere$, b$, W$, ss$, (Lang), nchr)
         Case 0
             one = False
             VarStat = False
@@ -23021,7 +23021,7 @@ contNegLocal:
                     sss = Len(b$)
                     LLL = sss
                 iscom = True
-                    Select Case IsLabelDotSub(temphere$, b$, W$, ss$, Lang, nchr)
+                    Select Case IsLabelDotSub(temphere$, b$, W$, ss$, (Lang), nchr)
                     Case 1234, 0
                     GoTo errstat
                     Case 1
@@ -23172,7 +23172,7 @@ CONT12212:
                 
                     LLL = sss
                 iscom = True
-                    Select Case IsLabelDotSub(temphere$, b$, W$, ss$, Lang, nchr)
+                    Select Case IsLabelDotSub(temphere$, b$, W$, ss$, (Lang), nchr)
                     Case 1234, 0
                     GoTo errstat
                     Case 1
@@ -28526,7 +28526,7 @@ End Sub
 
 Sub RTarget(DDD As Object, tar As target)
 ' RENDER TARGET
-Dim xl&, yl&, b As Long, f As Long, tag$, id&
+Dim xl&, yl&, b As Long, f As Long, Tag$, id&
 Dim X&, Y&, ox&, oy&
 Dim prive As basket, D As Object
 Dim c2&, V1&, V2&, vert&, mem As MemBlock
@@ -28535,7 +28535,7 @@ Set D = DDD.Owner
 prive = players(GetCode(D))
 With tar
 id& = .id
-tag$ = .tag
+Tag$ = .Tag
 X& = .Lx
 Y& = .lY
 xl& = .tx + 1
@@ -28647,8 +28647,8 @@ If c2& <> &H81000000 Then
 End If
 If id& < 100 Then
     half = 0
-    tag$ = Left$(tag$, xl& - X&)
-    If tag$ <> "" Then
+    Tag$ = Left$(Tag$, xl& - X&)
+    If Tag$ <> "" Then
     '1
     Select Case id& Mod 10
     Case 4, 5, 6
@@ -28661,9 +28661,9 @@ If id& < 100 Then
     Select Case id& Mod 10
     Case 2, 5, 8
    
-    X& = (xl& + X& - Len(tag$)) \ 2
+    X& = (xl& + X& - Len(Tag$)) \ 2
     Case 3, 6, 9
-    X& = xl& - Len(tag$)
+    X& = xl& - Len(Tag$)
     
     Case Else
     End Select
@@ -28671,11 +28671,11 @@ If id& < 100 Then
     LCTbasket dd, prive, Y&, X&
     dd.FontTransparent = True
     dd.ForeColor = mycolor(prive.mypen)
-       PlainBaSket dd, prive, tag$, True, True
+       PlainBaSket dd, prive, Tag$, True, True
     End If
     End If
 Else
-        If tag$ <> "" Then
+        If Tag$ <> "" Then
     id& = id& Mod 100
     Select Case id& Mod 10
     Case 4, 5, 6
@@ -28706,10 +28706,10 @@ Else
     
     If Not D Is dd Then
     Set DDD.Owner = dd
-    wwPlain2 DDD, prive, tag$, xl& - X&, 10000, , True, f, , , True
+    wwPlain2 DDD, prive, Tag$, xl& - X&, 10000, , True, f, , , True
     Set DDD.Owner = D
     Else
-    wwPlain2 DDD, prive, tag$, xl& - X&, 10000, , True, f, , , True
+    wwPlain2 DDD, prive, Tag$, xl& - X&, 10000, , True, f, , , True
     End If
     End If
 End If
@@ -32760,7 +32760,7 @@ where = FindFormSScreen(myform)
     End If
     
 myform.move X, Y
-ElseIf val("0" + bstack.Owner.tag) > 32 Then
+ElseIf val("0" + bstack.Owner.Tag) > 32 Then
 Set Scr = bstack.Owner.Parent
 If Scr Is Nothing Then Exit Function
 While Not TypeOf Scr Is GuiM2000
@@ -33088,7 +33088,7 @@ If basestack.lastobj Is Nothing Then
                     If TypeOf scr1 Is GuiM2000 Then
                     ElseIf TypeOf scr1 Is GuiImage Then
                         Set scr1 = Scr.pbox
-                        scr1.tag = CLng(p)
+                        scr1.Tag = CLng(p)
                     End If
                     If p = 0 Then
                         Set scr1 = Nothing
@@ -33104,7 +33104,7 @@ If basestack.lastobj Is Nothing Then
             If TypeOf scr1 Is GuiM2000 Then
             ElseIf TypeOf scr1 Is GuiImage Then
                 Set scr1 = scr1.pbox
-                scr1.tag = CLng(p)
+                scr1.Tag = CLng(p)
             End If
             If p = 0 Then
                 Set scr1 = Nothing
@@ -35559,7 +35559,7 @@ Dim u As Long
         If dq.Name = "dSprite" Then
             GetCode = dq.Index
         Else
-            GetCode = CLng("0" & dq.tag)
+            GetCode = CLng("0" & dq.Tag)
         End If
     End If
 End Function
@@ -40243,7 +40243,7 @@ If Left$(Typename(bstack.Owner), 3) = "Gui" Then oxiforforms: Exit Function
 If TypeOf bstack.Owner Is MetaDc Then oxiforMetaFiles: Exit Function
 If TypeOf bstack.Owner Is VB.PictureBox Then
 On Error GoTo ttt
-If CLng("0" & bstack.Owner.tag) > 33 Then
+If CLng("0" & bstack.Owner.Tag) > 33 Then
 oxiforImages: Exit Function
 End If
 End If
@@ -56576,7 +56576,7 @@ If r < 1& Then r = 1&
                 End If
                 End If
                     GoTo cont111
-                ElseIf useBuffer.structref.tag = useHandler.objref.tag Then
+                ElseIf useBuffer.structref.Tag = useHandler.objref.Tag Then
                     GoTo cont111
                 End If
             End If

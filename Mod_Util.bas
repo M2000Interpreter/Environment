@@ -291,7 +291,7 @@ Public INK$, MINK$
 Public MKEY$
 Public Type target
     Comm As String
-    tag As String ' specified by id
+    Tag As String ' specified by id
     id As Long ' function id
     ' THIS IS POINTS AT CHARACTER RESOLUTION
     SZ As Single
@@ -4620,7 +4620,7 @@ End If
 .Visible = True
 .ZOrder 0
 NOEDIT = False
-.tag = a$
+.Tag = a$
 
 If a$ = vbNullString Then
     drop = mouse
@@ -11983,7 +11983,7 @@ For i& = iu& To id&
  If j(i&).layer = myl Then j(i&).Enable = False
 Next i&
 End Sub
-Function BoxTarget(DSTACK As basetask, ByVal xl&, ByVal yl&, ByVal b As Long, ByVal f As Long, ByVal tag$, ByVal id&, ByVal COM$, XXT&, YYT&, LineSpace&) As target
+Function BoxTarget(DSTACK As basetask, ByVal xl&, ByVal yl&, ByVal b As Long, ByVal f As Long, ByVal Tag$, ByVal id&, ByVal COM$, XXT&, YYT&, LineSpace&) As target
 Dim X&, Y&, D As Object
 Dim half As Long
 Set D = DSTACK.Owner
@@ -12002,7 +12002,7 @@ With BoxTarget
 .SZ = prive.SZ
 .Comm = COM$
 .id = id&
-.tag = tag$
+.Tag = Tag$
 .Lx = X&
 .lY = Y&
 .tx = xl& - 1
@@ -12032,8 +12032,8 @@ End With
 If f <> &H81000000 Then BoxBigNew D, prive, xl& - 1, yl&, f
 If b <> &H81000000 Then BoxColorNew D, prive, xl& - 1, yl&, b
 If id& < 100 Then
-    tag$ = Left$(tag$, xl& - X&)
-    If tag$ <> "" Then
+    Tag$ = Left$(Tag$, xl& - X&)
+    If Tag$ <> "" Then
     
     Select Case id& Mod 10
     Case 4, 5, 6
@@ -12044,9 +12044,9 @@ If id& < 100 Then
     End Select
     Select Case id& Mod 10
     Case 2, 5, 8
-    X& = (xl& + X& - Len(tag$)) \ 2
+    X& = (xl& + X& - Len(Tag$)) \ 2
     Case 3, 6, 9
-    X& = xl& - Len(tag$)
+    X& = xl& - Len(Tag$)
     Case Else
     End Select
     If (id& Mod 10) > 0 Then
@@ -12055,12 +12055,12 @@ If id& < 100 Then
         If half > 0 Then
     D.currentY = D.currentY + prive.Yt \ 2
     End If
-    PlainBaSket D, prive, tag$, True, True
+    PlainBaSket D, prive, Tag$, True, True
     LCTbasket D, prive, BoxTarget.lY, BoxTarget.Lx
     End If
     End If
 Else
-    If tag$ <> "" Then
+    If Tag$ <> "" Then
     id& = id& Mod 100
     Select Case id& Mod 10
     Case 4, 5, 6
@@ -12087,7 +12087,7 @@ Else
     If half > 0 Then
     D.currentY = D.currentY + prive.Yt \ 2
     End If
-    wwPlain2 DSTACK, prive, tag$, xl& - X&, 10000, , True, f, , , True
+    wwPlain2 DSTACK, prive, Tag$, xl& - X&, 10000, , True, f, , , True
     LCTbasket D, prive, BoxTarget.lY, BoxTarget.Lx
     End If
 End If
@@ -14796,7 +14796,7 @@ Dim V1 As Long
         oxiforMetaFiles
         Exit Sub
     End If
-    notglobal = val("0" + di.tag) > 32 Or TypeOf di Is GuiM2000
+    notglobal = val("0" + di.Tag) > 32 Or TypeOf di Is GuiM2000
      If Abs(IsLabel(bstack, b$, W$)) = 1 Then
          If Not GetVar(bstack, W$, v) Then
              v = globalvar(W$, 0#, , VarStat, temphere$)
@@ -18285,6 +18285,7 @@ If IsExp(basestack, rest$, p) Then
     
         If IsExp(basestack, rest$, sX) Then
         wishY = sX
+again001:
        mAddTwipsTop = 0  ' find a new one
        players(basketcode).MineLineSpace = 0
        players(basketcode).uMineLineSpace = 0
@@ -18357,24 +18358,30 @@ Loop
 End If
 
 End If
-
+again002:
 If Scr.Name = "DIS" Then
 If Not adjustlinespace Then If Scr.Height * reduce >= Form1.Height * reduce - dv15 Then mAddTwipsTop = dv15 * (((Scr.Height * reduce - sX * w4) / sX / 2) \ dv15)
 End If
 nForm basestack, (X), w3, w4, mAddTwipsTop
 SZ = CSng(X)
-'If mmx < scr.Width Then
 mmx = Scr.Width * reduce
-
-
-'If mmx < scr.Width Then
 mmy = Scr.Height * reduce
 If adjustlinespace Then
 If Scr.Name = "DIS" Then
 mAddTwipsTop = dv15 * (((Form1.Height * reduce - sX * w4) / sX / 2) \ dv15)
-
 Else
 mAddTwipsTop = dv15 * (((Scr.Height * reduce - sX * w4) / sX / 2) \ dv15)
+End If
+If mAddTwipsTop < 0 Then
+    mAddTwipsTop = 0
+    X = X * 0.9
+    If X > 2 Then
+        If wishY > 0 Then
+            sX = wishY
+            GoTo again001
+        End If
+    GoTo again002
+    End If
 End If
 sX = CLng(sX * (w4 + mAddTwipsTop * 2))
 Else
@@ -19484,11 +19491,11 @@ With players(prive)
                         Case 2
                                 If useHandler.objref.structref Is Nothing Then
                                     s$ = s$ + "*[Buffer]"
-                                ElseIf useHandler.objref.structref.tag <> "" Then
+                                ElseIf useHandler.objref.structref.Tag <> "" Then
                                     If useHandler.objref.items = 1 Then
-                                    s$ = s$ + "*[" + useHandler.objref.structref.tag + "]"
+                                    s$ = s$ + "*[" + useHandler.objref.structref.Tag + "]"
                                     Else
-                                    s$ = s$ + "*[" + useHandler.objref.structref.tag + ":" & useHandler.objref.items & "]"
+                                    s$ = s$ + "*[" + useHandler.objref.structref.Tag + ":" & useHandler.objref.items & "]"
                                     End If
                                 Else
                                     s$ = s$ + "*[Buffer]"
@@ -19975,7 +19982,7 @@ With players(GetCode(Scr))
     
     ElseIf Scr.Name = "dSprite" Then
         DisableTargets q(), val(Scr.Index)
-    ElseIf val("0" + Scr.tag) > 32 Then
+    ElseIf val("0" + Scr.Tag) > 32 Then
         Scr.ClearTargets
     End If
     End If
@@ -21092,12 +21099,13 @@ fornew:
                     i = globalvar(bstack.GroupName + ChrW(&HFFBF) + W$, s$, , y1 = True)
                 Else
                     i = globalvar(bstack.GroupName + W$, s$, , y1 = True)
+                    W$ = Mid$(W$, 2)
                 End If
             Else
             i = AllocVar()
             End If
             Set stdFunc = New stdCallFunction
-            If IsLabelSymbolNew(rest$, "Ÿ”", "AS", Lang) Then
+               If IsLabelSymbolNew(rest$, "Ÿ”", "AS", Lang) Then
                 s1$ = ""
                 If IsLabelSymbolNewExp(rest$, "Ã¡ —’”", "LONG", Lang, s1$) Then
                     If IsLabelSymbolNewExp(Mid$(rest$, Len(s1$) + 1, 100), "Ã¡ —’”", "LONG", Lang, s1$) Then
@@ -21115,9 +21123,32 @@ fornew:
                     stdFunc.RetType = CLng(vbCurrency)
                 ElseIf IsLabelSymbolNewExp(rest$, "«Ã≈—œÃ«Õ…¡", "DATE", Lang, s1$) Then
                     stdFunc.RetType = CLng(vbDate)
+                ElseIf IsLabelSymbolNewExp(rest$, "Àœ√… œ”", "BOOLEAN", Lang, s1$) Then
+                    stdFunc.RetType = CLng(vbBoolean)
+                ElseIf IsLabelSymbolNewExp(rest$, "¡ ≈—¡…œ”", "INTEGER", Lang, s1$) Then
+                    stdFunc.RetType = CLng(vbInteger)
                 ElseIf IsLabelSymbolNewExp(rest$, "¡‘’–œ”", "VARIANT", Lang, s1$) Then
                     stdFunc.RetType = CLng(vbVariant)
                 Else
+                    If groupok And s1$ <> "" Then
+                        If GetVar(bstack, bstack.GroupName + s1$, i, True) Then
+                        s1$ = here$
+                        here$ = here$ + "." + Left$(bstack.GroupName, Len(bstack.GroupName) - 1)
+                        If IsExp(bstack, rest$, p) Then
+                            stdFunc.RetType = CLng(p)
+                        Else
+                            BadObjectDecl
+                            MyDeclare = False
+                            Set stdFunc = Nothing
+                            Exit Function
+                        End If
+                        here$ = s1$
+                        Else
+                            GoTo cont123
+                        End If
+
+                    Else
+cont123:
                     If Not IsExp(bstack, rest$, p) Then
                         BadObjectDecl
                         MyDeclare = False
@@ -21125,6 +21156,7 @@ fornew:
                         Exit Function
                     Else
                         stdFunc.RetType = CLng(p)
+                    End If
                     End If
                 End If
             Else
@@ -21143,6 +21175,7 @@ entry10:
             Set var(i) = stdFunc
             s$ = W$
             If groupok Then
+'            If Left$(s$, 1) = ChrW(&HFFBF) Then Mid$(s$, 1, 1) = " ": W$ = s$
                 If x1 = 3 Then
                     rest$ = vbCrLf & "FUNCTION FINAL " & s$ & "() {" + vbCrLf + "CALL EXTERN ." & W$ & " : = LETTER$'" & ChrW(&H1FFD) & vbCrLf & "}" & vbCrLf & rest$
                 Else
@@ -21308,6 +21341,7 @@ a333:
                             i = globalvar(bstack.GroupName + ChrW(&HFFBF) + W$, s$, , y1 = True)
                         Else
                             i = globalvar(bstack.GroupName + W$, s$, , y1 = True)
+                            W$ = Mid$(W$, 2)
                         End If
                     Else
                         i = AllocVar()
@@ -21332,6 +21366,10 @@ a333:
                             stdFunc.RetType = CLng(vbCurrency)
                         ElseIf IsLabelSymbolNewExp(rest$, "«Ã≈—œÃ«Õ…¡", "DATE", Lang, s1$) Then
                             stdFunc.RetType = CLng(vbDate)
+                        ElseIf IsLabelSymbolNewExp(rest$, "Àœ√… œ”", "BOOLEAN", Lang, s1$) Then
+                            stdFunc.RetType = CLng(vbBoolean)
+                        ElseIf IsLabelSymbolNewExp(rest$, "¡ ≈—¡…œ”", "INTEGER", Lang, s1$) Then
+                            stdFunc.RetType = CLng(vbInteger)
                         ElseIf IsLabelSymbolNewExp(rest$, "¡‘’–œ”", "VARIANT", Lang, s1$) Then
                             stdFunc.RetType = CLng(vbVariant)
                         Else
@@ -23866,7 +23904,7 @@ again101:
                         
             End If
             SetTextSZ Scr, .SZ
-    ElseIf TypeOf Scr Is VB.PictureBox And CLng("0" & Scr.tag) > 33 Then
+    ElseIf TypeOf Scr Is VB.PictureBox And CLng("0" & Scr.Tag) > 33 Then
             Set Scr.Picture = LoadPicture("")
             If FastSymbol(rest$, ";") Then 'CENTER
                         FrameText Scr, .SZ, x1, y1, .Paper, True
@@ -30358,7 +30396,7 @@ If FastSymbol(rest$, ",") Then If Not IsStrExp(bstack, rest$, W$) Then Exit Func
 olamazi
 If TypeOf bstack.Owner Is GuiM2000 Then
 Set Scr = bstack.Owner
-ElseIf val("0" + bstack.Owner.tag) > 32 Then
+ElseIf val("0" + bstack.Owner.Tag) > 32 Then
 Set Scr = bstack.Owner.Parent
 If Scr Is Nothing Then Exit Function
 While Not TypeOf Scr Is GuiM2000
@@ -31282,9 +31320,9 @@ End Function
 Function makestruct(basestack As basetask, rest$, Lang As Long, Glob As Boolean, alocal As Boolean) As Boolean
 Dim what$, offset As Long, offset1 As Long, offsetlist As FastCollection, i As Long, s$, b$, p As Variant, w2 As Long
 ' struct is an inventory of offsets
-Dim useHandler As mHandler, tag$
+Dim useHandler As mHandler, Tag$
 If Abs(IsLabel(basestack, rest$, what$)) = 1 Then  ' WE HAVE A NAME
-tag$ = what$
+Tag$ = what$
 If basestack.priveflag Then what$ = ChrW(&HFFBF) + what$
           If alocal Or Glob Then
           GoTo makeitnow
@@ -31298,7 +31336,7 @@ makeitnow:
                         MakeitObjectInventory var(i)
                         Set useHandler = var(i)
                         useHandler.objref.UcaseKeys = True
-                        useHandler.objref.tag = tag$
+                        useHandler.objref.Tag = Tag$
                         comhash.ItemCreator2 what$, 0, 44
                     End If
                      Set useHandler = var(i)
@@ -31309,7 +31347,7 @@ If Fast2LabelNoNum(rest$, "APPEND", 6, "–—œ”»« «", 8, 8) Then
     offsetlist.CopyCollection oo
     Set useHandler.objref = oo
     Set offsetlist = oo
-    oo.tag = tag$
+    oo.Tag = Tag$
     mm = offsetlist.structLen
     
 End If
@@ -31484,7 +31522,7 @@ If IsExp(bstack, rest$, p) Then
     ElseIf TypeOf bstack.Owner Is GuiM2000 Then
         Set GuiForm = bstack.Owner
         GuiForm.RenderTarget bstack, rest$, Lang, p
-    ElseIf val("0" + bstack.Owner.tag) > 32 Then
+    ElseIf val("0" + bstack.Owner.Tag) > 32 Then
         If GetVar(bstack, players(GetCode(bstack.Owner)).ControlName, V1) Then
             Set GuiImg = var(V1)
             GuiImg.RenderTarget bstack, rest$, Lang, p
@@ -31497,7 +31535,7 @@ If IsExp(bstack, rest$, p) Then
                 X = Empty
                 If IsLabelSymbolNewExp(rest$, "÷—¡”«", "TEXT", Lang, ss$) Then
                     If IsStrExp(bstack, rest$, W$) Then
-                        q(p).tag = W$
+                        q(p).Tag = W$
                     Else
                         GoTo skipcommand
                     End If
@@ -31897,7 +31935,7 @@ Function ProcTargets(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim GuiForm As GuiM2000, GuiImg As GuiImage, V1 As Long
 If TypeOf bstack.Owner Is GuiM2000 Then
 Set GuiForm = bstack.Owner
-ElseIf val("0" + bstack.Owner.tag) > 32 Then
+ElseIf val("0" + bstack.Owner.Tag) > 32 Then
     If GetVar(bstack, players(GetCode(bstack.Owner)).ControlName, V1) Then
         Set GuiImg = var(V1)
     Else
@@ -32325,7 +32363,7 @@ Else
                     End With
                     For i = 1 To PobjNum
                     
-                    With players(val("0" & Form1.dSprite(i).tag))
+                    With players(val("0" & Form1.dSprite(i).Tag))
                         If Form1.dSprite(i).MouseIcon = Form1.Picture2.MouseIcon And Not .HideIcon Then
                         Form1.dSprite(i).MousePointer = .LastIcon
                        Set Form1.dSprite(i).MouseIcon = .LastIconPic
@@ -33105,7 +33143,7 @@ End If
                                     If p < Form1.List1.listcount Then Form1.List1.ListIndex = CLng(p)
                                 End If
                         End If
-                        frm$ = Form1.List1.tag
+                        frm$ = Form1.List1.Tag
                 End If
                 GoTo ekei
         End If
@@ -33186,7 +33224,7 @@ If FastSymbol(rest$, "@") Then
 
     If Not IsStrExp(bstack, rest$, s$) Then
   bstack.Owner.TabStop = False
-    Form1.List1.tag = vbNullString
+    Form1.List1.Tag = vbNullString
     Form1.List1.HeadLine = vbNullString: Form1.KeyPreview = True: Exit Function
     End If
     
@@ -34234,6 +34272,23 @@ there100:
     ClearSpace rest$
 there12345:
     If NocharsInLine(rest$) Then Exit Do
+    If FastSymbol(rest$, "{") Then
+      i = blockLen(rest$)
+            If i > 0 Then
+                W$ = Mid$(rest$, 1, i)
+                s$ = bstack.GroupName
+                bstack.GroupName = ""
+                Execute bstack, W$, False
+                bstack.GroupName = s$
+                Mid$(rest$, 1, i) = space$(i)
+                OvarnameLen = varhash.Count + 1 ' new way
+                GoTo there100
+            Else
+                MissString
+                ExecuteGroupStruct = 0
+                Exit Function
+            End If
+    End If
     v = IsLabelA(here$, rest$, W$)
     If v = 0 Then Exit Do
     Select Case W$
@@ -34466,7 +34521,7 @@ there12345:
         bstack.uniflag = uni
         bstack.finalFlag = Final
      
-        If Not MyDeclare(bstack, rest$, Lang, True, prv) Then   ' stripstack1
+        If Not MyDeclare(bstack, rest$, -(Left$(W$, 1) = "D"), True, prv) Then ' stripstack1
            LogGroup bstack, vvv, ohere$, OvarnameLen, lcl, NoRec, uni
             bstack.priveflag = False
             bstack.uniflag = False
@@ -34474,15 +34529,15 @@ there12345:
             ExecuteGroupStruct = 0
             Exit Function
         End If
-            stripstack1.priveflag = False
-            stripstack1.uniflag = False
-            stripstack1.finalFlag = False
+            stripstack1.priveflag = prv
+            stripstack1.uniflag = uni
+            stripstack1.finalFlag = Final
          '   LogGroup bstack, vvv, ohere$, OvarnameLen, lcl, NoRec, False 'uni
     Case "METHOD", "Ã≈»œƒœ”"
     bstack.priveflag = prv
     bstack.uniflag = uni
     bstack.finalFlag = Final
-    If Not MyMethod(bstack, rest$, Lang, True, prv) Then
+    If Not MyMethod(bstack, rest$, -(Left$(W$, 1) = "M"), True, prv) Then
         bstack.priveflag = False
         bstack.uniflag = False
         bstack.finalFlag = False
@@ -34494,7 +34549,7 @@ there12345:
     stripstack1.finalFlag = False
 
     Case "SET", "»≈”≈"
-        Final = IsLabelSymbolNew(rest$, "‘≈À… œ", "FINAL", Lang)
+        Final = IsLabelSymbolNew(rest$, "‘≈À… œ", "FINAL", -(Left$(W$, 1) = "S"))
         If FastSymbol(rest$, "(") Then
             If varhash.Find(here$ + "." + Left$(ThisGroup.GroupName, Len(ThisGroup.GroupName) - 1) + "(", i) Then
                 MyEr "Array with same name", "–ﬂÌ·Í·Ú ÏÂ ﬂ‰ÈÔ ¸ÌÔÏ·"
@@ -34519,7 +34574,7 @@ there12345:
         W$ = "&"
         GoTo funcoperator
     Case "VALUE", "¡Œ…¡"
-        Final = IsLabelSymbolNew(rest$, "‘≈À… «", "FINAL", Lang)
+        Final = IsLabelSymbolNew(rest$, "‘≈À… «", "FINAL", -(Left$(W$, 1) = "V"))
         If Final Then
             If FastSymbol(rest$, "(") Then GoTo contthere1
             GoTo contthere22
@@ -34573,18 +34628,18 @@ contthere22:
             ExecuteGroupStruct = 0
             Exit Function
         End If
-        Final = IsLabelSymbolNew(rest$, "‘≈À… œ”", "FINAL", Lang)
+        Final = IsLabelSymbolNew(rest$, "‘≈À… œ”", "FINAL", -(Left$(W$, 1) = "O"))
         x1 = 1
         If Not ISSTRINGA(rest$, f$) Then
-            If IsLabelSymbolNew(rest$, "’ÿ«Àœ”", "HIGH", Lang) Then
+            If IsLabelSymbolNew(rest$, "’ÿ«Àœ”", "HIGH", -(Left$(W$, 1) = "O")) Then
                 highpriority = True
                 If Not ISSTRINGA(rest$, f$) Then GoTo error0001
                 If Len(f$) > 2 Or Len(f$) = 0 Or Not MaybeIsSymbol(f$, "/*-+=~^&|<>") Then GoTo error0001
-            ElseIf IsLabelSymbolNew(rest$, "ƒ≈Œ…œ”", "RIGHT", Lang) Then
+            ElseIf IsLabelSymbolNew(rest$, "ƒ≈Œ…œ”", "RIGHT", -(Left$(W$, 1) = "O")) Then
                 RightAssociative = True
                 If Not ISSTRINGA(rest$, f$) Then GoTo error0001
                 If Len(f$) > 2 Or Len(f$) = 0 Or Not MaybeIsSymbol(f$, "/*-+=~^&|<>") Then GoTo error0001
-            ElseIf IsLabelSymbolNew(rest$, "ÃœÕ¡ƒ…¡…œ”", "UNARY", Lang) Then
+            ElseIf IsLabelSymbolNew(rest$, "ÃœÕ¡ƒ…¡…œ”", "UNARY", -(Left$(W$, 1) = "O")) Then
                 f$ = "-:"
                 ThisGroup.HasUnary = True
             ElseIf Not ISSTRINGA(rest$, f$) Then
@@ -34633,7 +34688,7 @@ error0001:
             uni = False
             prv = False
             GoTo there100
-        ElseIf IsLabelSymbolNew(rest$, "√≈Õ… «", "GLOBAL", Lang) Then
+        ElseIf IsLabelSymbolNew(rest$, "√≈Õ… «", "GLOBAL", -(Left$(W$, 1) = "C")) Then
             MyEr "GLOBAL can't be used in a CLASS", "« ÍÎ‹ÛÁ ÛÙÁÌ ÔÏ‹‰· ‰ÂÌ ÏÔÒÂﬂ Ì· ÂﬂÌ·È „ÂÌÈÍﬁ"
             ExecuteGroupStruct = 0
             Exit Function
@@ -34645,11 +34700,11 @@ error0001:
         classfun = True
         j = 0
         frm$ = vbNullString
-            If IsLabelSymbolNew(rest$, "‘’–œ”", "TYPE", Lang) Then
+            If IsLabelSymbolNew(rest$, "‘’–œ”", "TYPE", -(Left$(W$, 1) = "C")) Then
                 MyEr "Use here a Group not a Class", "◊ÒÁÛÈÏÔÔﬂÁÛÂ ÏÈ· œÏ‹‰· Í·È ¸˜È ÏÈ·  Î‹ÛÁ"
                 ExecuteGroupStruct = 0
                 Exit Function
-            ElseIf IsLabelSymbolNew(rest$, "Ÿ”", "AS", Lang) Then
+            ElseIf IsLabelSymbolNew(rest$, "Ÿ”", "AS", -(Left$(W$, 1) = "C")) Then
             it = x1
 Subclass:
                 j = IsLabelA("", rest$, w1$)
@@ -34677,7 +34732,7 @@ Subclass:
                     End If
                 End If
 checkagainsub:
-               If IsLabelSymbolNew(rest$, "Ÿ”", "AS", Lang) Then GoTo Subclass
+               If IsLabelSymbolNew(rest$, "Ÿ”", "AS", -(Left$(W$, 1) = "C")) Then GoTo Subclass
             Else
                 MyEr "class " + w1$ + " not found", "‰ÂÌ ‚Ò›ËÁÍÂ Á ÍÎ‹ÛÁ " + w1$
                 ExecuteGroupStruct = 0
@@ -34741,7 +34796,7 @@ checkagainsub:
                 End If
                 f$ = f$ + W$ + nm$ + vbCrLf
             Loop
-            If IsLabelSymbolNew(rest$, "‘’–œ”", "TYPE", Lang) Then
+            If IsLabelSymbolNew(rest$, "‘’–œ”", "TYPE", -(Left$(W$, 1) = "C")) Then
                  MyEr "Use here a Group not a Class", "◊ÒÁÛÈÏÔÔﬂÁÛÂ ÏÈ· œÏ‹‰· Í·È ¸˜È ÏÈ·  Î‹ÛÁ"
                 ExecuteGroupStruct = 0
                 Exit Function
@@ -34774,12 +34829,12 @@ checkagainsub:
         End If
         SetNextLine rest$: GoTo there100
     Case "FUNCTION", "”’Õ¡—‘«”«"
-        If IsLabelSymbolNew(rest$, "√≈Õ… «", "GLOBAL", Lang) Then
+        If IsLabelSymbolNew(rest$, "√≈Õ… «", "GLOBAL", -(Left$(W$, 1) = "F")) Then
             MyEr "GLOBAL can't be used in a Group", "« ÛıÌ‹ÒÙÁÛÁ ÛÙÁÌ ÔÏ‹‰· ‰ÂÌ ÏÔÒÂﬂ Ì· ÂﬂÌ·È „ÂÌÈÍﬁ"
             ExecuteGroupStruct = 0
             Exit Function
         End If
-        Final = IsLabelSymbolNew(rest$, "‘≈À… «", "FINAL", Lang)
+        Final = IsLabelSymbolNew(rest$, "‘≈À… «", "FINAL", -(Left$(W$, 1) = "F"))
 classcontclass:
         x1 = Abs(IsLabelF(rest$, f$))
         If prv Then f$ = ChrW(&HFFBF) + f$
@@ -34901,9 +34956,7 @@ funcoperator:
                 End If
             End If
         End If
-  
-BYPASS3:
-        ExecuteGroupStruct = Abs(IdentifierGroup(bstack, W$, rest$, Lang, alocal, addlen))
+        ExecuteGroupStruct = Abs(IdentifierGroup(bstack, W$, rest$, -(Left$(W$, 1) = "F"), alocal, addlen))
         If ExecuteGroupStruct = 0 Then Exit Function
         If GetSub(bstack.GroupName + f$ + "()", i) Then
             If sbf(i).locked Then Final = True
@@ -34949,12 +35002,12 @@ BYPASS3:
      
 
 Case "MODULE", "‘Ã«Ã¡"
-    If IsLabelSymbolNew(rest$, "√≈Õ… «", "GLOBAL", Lang) Then
+    If IsLabelSymbolNew(rest$, "√≈Õ… «", "GLOBAL", -(Left$(W$, 1) = "M")) Then
         MyEr "GLOBAL can't be used in a Group", "« ÛıÌ‹ÒÙÁÛÁ ÛÙÁÌ ÔÏ‹‰· ‰ÂÌ ÏÔÒÂﬂ Ì· ÂﬂÌ·È „ÂÌÈÍﬁ"
         ExecuteGroupStruct = 0
         Exit Function
     End If
-    Final = IsLabelSymbolNew(rest$, "‘≈À… œ", "FINAL", Lang)
+    Final = IsLabelSymbolNew(rest$, "‘≈À… œ", "FINAL", -(Left$(W$, 1) = "M"))
     x1 = Abs(IsLabelF(rest$, f$))
     If prv Then f$ = ChrW(&HFFBF) + f$
     If x1 <> 0 Then
@@ -34990,15 +35043,8 @@ Case "MODULE", "‘Ã«Ã¡"
                         End If
                         GoTo continuehere22 'there12345
                     End If
-
-
- 
-    Rem never happen
-     Rem   MyEr "group struct error2", "ÒÔ‚ÎÁÏ· ÛÙÁ ‰ÔÏﬁ2"
-     Rem    ExecuteGroupStruct = 0: Exit Function
-
-   End If
-  End If
+                End If
+            End If
   Else
   ' we don't have it
   End If
@@ -35066,10 +35112,6 @@ abc123:
        
       End If
       
-    ''  b$ = "{" '+ b$ + "-" + LTrim(Str$(addlen))
-    
-        
-   ' rest$ = b$ + hlp$ + rest$
    rest$ = "{" + hlp$ + rest$
 Else
     ss$ = rest$
@@ -35110,8 +35152,7 @@ Else
   
   rest$ = f$ + " " + rest$
   End If
-BYPASS4:
- ExecuteGroupStruct = Abs(IdentifierGroup(bstack, W$, rest$, Lang, alocal Or Glob, addlen))
+ ExecuteGroupStruct = Abs(IdentifierGroup(bstack, W$, rest$, -(Left$(W$, 1) = "M"), alocal Or Glob, addlen))
   If GetSub(bstack.GroupName + f$, i) Then
   If sbf(i).locked Then Final = True
   If Final Then sbf(i).locked = True
@@ -35147,7 +35188,7 @@ Case "STRUCTURE", "ƒœÃ«"
 bstack.priveflag = prv
 bstack.uniflag = uni
 bstack.finalFlag = Final
- If Not makestruct(bstack, rest$, Lang, Glob Or here$ = "", alocal) Then ExecuteGroupStruct = 0: Exit Function
+ If Not makestruct(bstack, rest$, -(Left$(W$, 1) = "S"), Glob Or here$ = "", alocal) Then ExecuteGroupStruct = 0: Exit Function
    bstack.priveflag = False
   bstack.uniflag = False
   bstack.finalFlag = False
@@ -35175,7 +35216,7 @@ Else
 bstack.priveflag = prv
 bstack.uniflag = uni
 bstack.finalFlag = Final
-   ExecuteGroupStruct = Abs(IdentifierGroup(bstack, W$, rest$, Lang, alocal, addlen))
+   ExecuteGroupStruct = Abs(IdentifierGroup(bstack, W$, rest$, -(Left$(W$, 1) = "E"), alocal, addlen))
   bstack.priveflag = False
   bstack.uniflag = False
   bstack.finalFlag = False
@@ -35187,7 +35228,7 @@ bstack.priveflag = prv
 bstack.uniflag = uni
 bstack.finalFlag = Final
 
-ExecuteGroupStruct = Abs(MyDim(bstack, rest$, Lang, Glob Or alocal, OarrnameLen))
+ExecuteGroupStruct = Abs(MyDim(bstack, rest$, -(Left$(W$, 1) = "D"), Glob Or alocal, OarrnameLen))
 
   bstack.priveflag = False
   bstack.uniflag = False
@@ -35208,7 +35249,7 @@ If Final Then
      End If
      If prv Then W$ = ChrW(&HFFBF) + W$
       If x1 = 1 Then
-                         If IsLabelSymbolNew(rest$, "‘’–œ”", "TYPE", Lang) Then
+                         If IsLabelSymbolNew(rest$, "‘’–œ”", "TYPE", -(Left$(W$, 1) = "G")) Then
                                             If IsStrExp(bstack, rest$, ss$) Then
                                             frm$ = bstack.GroupName
                                             prepareGroup bstack, W$, y1, Glob, Len(hlp) > 0, alocal
@@ -35216,7 +35257,7 @@ If Final Then
                                             LogGroup bstack, vvv, ohere$, OvarnameLen, lcl, NoRec, uni
                                             
                                             bstack.priveflag = prv
-                                             ExecuteGroupStruct = Abs(ExecuteGroupStruct(bstack, bstack.GroupName + W$, y1, ss$, 0, Lang, Glob, alocal))
+                                             ExecuteGroupStruct = Abs(ExecuteGroupStruct(bstack, bstack.GroupName + W$, y1, ss$, 0, -(Left$(W$, 1) = "G"), Glob, alocal))
                                             bstack.priveflag = False
                                                 OvarnameLen = varhash.Count + 1 'Len(VarName$) + 1   'we record ...
                                           
@@ -35242,7 +35283,7 @@ contvvv:
                                             s$ = block(rest$)
                                             addlen = addlen - Len(s$)
                
-                                        If Not Abs(ExecuteGroupStruct(bstack, bstack.GroupName + W$, y1, s$, addlen, Lang, Glob, alocal)) = 0 Then
+                                        If Not Abs(ExecuteGroupStruct(bstack, bstack.GroupName + W$, y1, s$, addlen, -(Left$(W$, 1) = "G"), Glob, alocal)) = 0 Then
                                             ExecuteGroupStruct = FastSymbol(rest$, "}")
                                         End If
                                             OvarnameLen = varhash.Count + 1  'we record ...
@@ -35272,79 +35313,79 @@ Exit Function
 
 Case "INTEGER", "¡ ≈—¡…œ”"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbInteger, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "I"), alocal, vbInteger, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "DOUBLE", "ƒ…–Àœ”"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbDouble, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "D"), alocal, vbDouble, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "SINGLE", "¡–Àœ”"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbSingle, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "S"), alocal, vbSingle, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "BOOLEAN", "Àœ√… œ”"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbBoolean, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "B"), alocal, vbBoolean, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "DECIMAL", "¡—…»Ãœ”"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbDecimal, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "D"), alocal, vbDecimal, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "BIGINTEGER", "Ã≈√¡Àœ”¡ ≈—¡…œ”"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbObject, Not (alocal Or Glob), New BigInteger))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "B"), alocal, vbObject, Not (alocal Or Glob), New BigInteger))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "CURRENCY", "Àœ√…”‘… œ”"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbCurrency, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "L"), alocal, vbCurrency, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "LONG", "Ã¡ —’”"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbLong, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "L"), alocal, vbLong, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "STRING", "√—¡ÃÃ¡"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbString, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "S"), alocal, vbString, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "VARIANT", "¡‘’–œ”"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbVariant, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "V"), alocal, vbVariant, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "OBJECT", "¡Õ‘… ≈…Ã≈Õœ"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbObject, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "O"), alocal, vbObject, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "BYTE", "ÿ«÷…œ"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbByte, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "B"), alocal, vbByte, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "DATE", "«Ã≈—œÃ«Õ…¡"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, vbDate, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "D"), alocal, vbDate, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case "COMPLEX", "Ã…√¡ƒ… œ”"
         bstack.priveflag = prv: bstack.uniflag = uni: bstack.finalFlag = Final
-        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, Lang, alocal, 200, Not (alocal Or Glob)))
+        ExecuteGroupStruct = Abs(MyAnyType(bstack, rest$, -(Left$(W$, 1) = "C"), alocal, 200, Not (alocal Or Glob)))
         bstack.priveflag = False:  bstack.uniflag = False:  bstack.finalFlag = False
         If ExecuteGroupStruct = 0 Then Exit Function
 Case " ¡‘¡”‘¡”«", "INVENTORY"
         bstack.priveflag = prv
         bstack.uniflag = uni
         bstack.finalFlag = Final
-    ExecuteGroupStruct = Abs(ProcInventory(bstack, rest$, Lang, alocal))
+    ExecuteGroupStruct = Abs(ProcInventory(bstack, rest$, -(Left$(W$, 1) = "I"), alocal))
   bstack.priveflag = False
   bstack.uniflag = False
   bstack.finalFlag = False
@@ -35353,7 +35394,7 @@ Case "ƒ…¡—»—Ÿ”«", "BUFFER"
         bstack.priveflag = prv
         bstack.uniflag = uni
         bstack.finalFlag = Final
-    ExecuteGroupStruct = Abs(ProcBuffer(bstack, rest$, Lang, alocal))
+    ExecuteGroupStruct = Abs(ProcBuffer(bstack, rest$, -(Left$(W$, 1) = "B"), alocal))
   bstack.priveflag = False
   bstack.uniflag = False
   bstack.finalFlag = False
@@ -35362,7 +35403,7 @@ Case "DOCUMENT", "≈√√—¡÷œ"
         bstack.priveflag = prv
         bstack.uniflag = uni
         bstack.finalFlag = Final
-    ExecuteGroupStruct = Abs(MyDocument(bstack, rest$, Lang, alocal))
+    ExecuteGroupStruct = Abs(MyDocument(bstack, rest$, -(Left$(W$, 1) = "D"), alocal))
   bstack.priveflag = False
   bstack.uniflag = False
   bstack.finalFlag = False
@@ -35380,7 +35421,7 @@ Case "ƒ…≈–¡÷«", "INTERFACE"
         bstack.priveflag = prv
         bstack.uniflag = uni
         bstack.finalFlag = Final
-  ExecuteGroupStruct = Abs(ProcInter(bstack, rest$, Lang, LenB(here$) = 0, alocal, True))
+  ExecuteGroupStruct = Abs(ProcInter(bstack, rest$, -(Left$(W$, 1) = "I"), LenB(here$) = 0, alocal, True))
   bstack.priveflag = False
   bstack.uniflag = False
   bstack.finalFlag = False
@@ -35520,6 +35561,7 @@ Select Case v
 Case 1
     p = 0#
     If IsLabelSymbolNew(rest$, "Ÿ”", "AS", Lang) Then
+contCase1:
     skip = True
             If IsLabelSymbolNew(rest$, "¡—…»Ãœ”", "DECIMAL", Lang) Then
                 p = CDec(0)
@@ -35719,6 +35761,10 @@ cont1290:
                 Set p = zeroitem
                 Set zeroitem = Nothing
             End If
+        ElseIf IsLabelSymbolNew(rest$, "Ÿ”", "AS", 1 - Lang) Then
+        Lang = 1 - Lang
+        GoTo contCase1
+        
         End If
 there:
         If Glob Then
