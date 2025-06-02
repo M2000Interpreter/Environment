@@ -4851,6 +4851,8 @@ ElseIf nchr > 31 Then
                 End If
                 GoTo err000
             End If
+        ElseIf Not MaybeIsSymbol(b$, "=~|") And Not MaybeIsSymbol(Mid$(b$, i + 1, 1), "*-+=~^|<>!") Then
+            Exit Function
         ElseIf varhash.Find2(here$ + "." + myUcase(W$), v, useType) Then
 fromthis:
             If FastOperator(b$, "=", i) Then

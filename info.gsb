@@ -21748,7 +21748,7 @@ for i=0 to len(d())-1
 next i
 Method d(0), "DownloadFile", "https://en.wikipedia.org/wiki/Wikipedia:Random", dir$+"sample.html"
 Method d(2), "DownloadFile","https://dl.unicontsoft.com/upload/pix/ss_vbyoga_flex_container.gif", dir$+"this.gif"
-Method d(1),"DownloadFile", "https://rosettacode.org/wiki/Rosetta_Code", dir$+"rosetta.html"
+Method d(1),"DownloadFile","https://sdl-forum.org/languages/sdl.php", dir$+"SDL.html"
 Method d(3), "DownloadFile","https://github.com/M2000Interpreter", dir$+"gitM2000.html"
 
 cursor 0, m
@@ -21788,7 +21788,7 @@ print over $(4),"live connections:";w
 cursor 0,m
 If exist("sample.html") then Print "sample.html - ";Filelen("sample.html")
 If exist("this.gif") then Print "this.gif - ";Filelen("this.gif")
-If exist("rosetta.html") then Print "rosetta.html - ";Filelen("rosetta.html")
+If exist("SDL.html") then Print "SDL.html - ";Filelen("SDL.html")
 If exist("gitM2000.html") then Print "gitM2000.html - ";Filelen("gitM2000.html")
 print "done"
 declare d() nothing
@@ -47246,6 +47246,44 @@ MODULE POLYSPIRAL {ΤΜΗΜΑ ΠΟΛΥΣΠΕΙΡΑ {
 }
 ΠΟΛΥΣΠΕΙΡΑ
 ΠΕΝΑ 14
+
+rem {
+	module polyspiral {
+		smooth off
+		form 60, 25
+		cls #220055, 0
+		var inc = 0, x=scale.x / 2, y=scale.y / 2
+		var length, angle
+		refresh 1000
+		gradient 0, #330066
+		pen 15 {
+			italic 1
+			pen 14 {report "M2000 Interpreter"}
+			italic 0 
+			report "POLYSPIRAL ANIMATION"
+		}
+		hold
+		every 1000/30 {
+			release
+			inc+=0.00248
+			move x, y
+			length = TWIPSx*20
+			angle = inc		
+			for ν=1 to 150
+				pen #FF0055
+				width 2 {draw angle angle, length}
+				length+=TWIPSx*5
+				angle+=inc
+			next
+			if keyPress(32) then exit
+			refresh 1000
+		}
+		refresh 25
+	}
+	polyspiral
+	pen 14
+
+}
 }
 MODULE NCONST {CONST P=(1,2,3,4)
 CONST A=P#MAT("+=", 500)
@@ -48168,54 +48206,5 @@ try ok  {
 	PRINT z=>IUnknown.QueryInterface
 }
 IF NOT ok OR ERROR THEN PRINT ERROR$
-}
-MODULE SPOTIFY {static once as boolean, thatname$
-if not match("N") then
-print "spotufy 0 for mute"
-print  "spotify 1 to up volume"
-print  "spotify -1 to down volume"
-print  "spotify 2 next"
-print "spotify -2 stop"
-break
-end if
-Read what
-Declare BringWindowToTop   lib "user32.BringWindowToTop" {long A} as long
-Declare GetTopWindow  lib "user32.GetTopWindow" {long A} as long
-Declare GetWindowText  lib "user32.GetWindowTextW" {long A, long b, long c} as long
-Declare FindWindow Lib "user32.FindWindowW" { long a, Long b} as long
-Declare SendMessage Lib "user32.SendMessageW" {Long  hWnd,  Long  wMsg, Long wParam, Long lParam}  As Long
-Declare PostMessage Lib "user32.PostMessageW" {Long  hWnd,  Long  wMsg, Long wParam, Long lParam}  As Long
-Buffer clear alfa as integer * 1000
-if thatname$<>"" then
-	alfa[0]=thatname$
-else
-	alfa[0]="MSCTFIME UI"
-end if
-z=FindWindow(0, alfa(0))
-if z=0 then
-	WIN "SPOTIFY://"
-	if not once then once=true: wait 2000 else wait 200
-	hw=GetTopWindow(0&)
-	n=GetWindowText(hw, alfa(0), 500)
-	if n=0 then break
-	thatname$=eval$(alfa,0, n*2)
-	z=FindWindow(0, alfa(0))
-end if
-if z<>0 then
-	if what=0 then
-		ret=SendMessage(z, 0x0319&, 0&, 524288&)  // mute
-	else.if what=-1 then
-		ret= SendMessage(z, 0x0319&, 0&, 589824&)
-	else.if what=1 then
-		ret= SendMessage(z, 0x0319&, 0&, 655360&)
-	else.if what=-2 then
-		ret= SendMessage(z, 0x0319&, 0&, 851968&)
-	else
-		ret= SendMessage(z, 0x0319&, 0&, 720896&)
-	end if
-else
-	WIN "SPOTIFY://"
-end if
-
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

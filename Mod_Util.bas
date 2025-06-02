@@ -15725,6 +15725,10 @@ Case 1
   If v <> 0 Then GoTo PROCESSCOMMAND
   End If
     ss$ = vbNullString
+    'If Left$(b$, 1) = " " Then
+        
+    '    GoTo PROCESSCOMMAND
+    'Else
     If MaybeIsSymbol(b$, "/*-+=~^|<>") Then
         If FastOperator(b$, "<=", i, 2, False) Then
         ' LOOK GLOBAL
@@ -15743,6 +15747,8 @@ Case 1
             GoTo there1
         End If
         ' do something here
+        ElseIf Not MaybeIsSymbol(b$, "=~|") And Not MaybeIsSymbol(Mid$(b$, i + 1, 1), "*-+=~^|<>!") Then
+            GoTo PROCESSCOMMAND
         ElseIf varhash.Find(myUcase(W$), v) Then
         ' CHECK VAR
             If FastOperator(b$, "=", i) Then
@@ -16327,6 +16333,8 @@ checkobject1:
                 GoTo assignvalue
             ElseIf GetVar(bstack, W$, v, True) Then
                 GoTo somethingelse
+            Else
+                GoTo PROCESSCOMMAND
             End If
         ElseIf FastOperator(b$, "=", i) Then ' MAKE A NEW ONE IF FOUND =
 jumpiflocal:
