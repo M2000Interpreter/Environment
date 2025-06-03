@@ -2102,14 +2102,18 @@ a1297654:
                             GoTo err000
                         End If
                     Else
-                        NullObject
-                        GoTo err000
+                        If Not .arr And Not (.myarrbase = 9 Or .MyTypeToBe = 13) Then
+                            NullObject
+                            Exit Function
+                        End If
+                        GoTo contEmptyObject
                     End If
                     Set myobject = Nothing
                 End If
             End If
         'End With
         'With ppppAny
+contEmptyObject:
             If FastSymbol(b$, ":=", , 2) Then
                 If Not .arr Then GoTo NotArray1
     ' new on rev 20

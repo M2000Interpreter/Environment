@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 2
+Global Const Revision = 3
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -20877,7 +20877,7 @@ contPart:
 
 
                     x2 = Len(b$)
-                    TraceStore bstack, nd&, b$, 0
+                    TraceStore bstack, nd&, b$, bstack.addlen + 1
                     b$ = Mid$(b$, 2)
                     If IsLabelSymbolNew(b$, "ыс", "AS", Lang) Then
           ' search for variable name only
@@ -20897,7 +20897,7 @@ contPart:
                                 ok = False
                                 Execute = 1
                                 Call executeblock(Execute, bstack, ss$, (once), ok, , True)
-                                bstack.addlen = nd&
+                                bstack.addlen = nd& + 1
                                 If Execute = 0 Then b$ = ss$ + space$(x2): Exit Function
                                 
                                 var(v) = False
@@ -21518,6 +21518,7 @@ contTask:
                     sp = GetTaskId + 20000
                     Set bs = New basetask
                     Set bs.Parent = bstack
+                    bs.addlen = Len(b$) + bstack.addlen + 1
                     bstack.PushThread CLng(sp), "_multi"
                     sThreadInternal bs, sp, 10, ss$, -1&, here$, True
                     TaskMaster.Message CLng(sp), 3, CLng(uintnew(p))
@@ -32599,6 +32600,7 @@ With Form2
 If .Busy Then
     Do
         Sleep 10
+        If Form2.Visible = False Then .Busy = False  ' new addition ver 14
     Loop Until Not .Busy
 End If
 End With
@@ -37521,10 +37523,13 @@ Loop Until Not FastSymbol(rest$, ",")
 End Function
 Function MyThread(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim frm$, ss$, what$, i As Long, p As Variant, X As Double, par As Boolean, bs As basetask
+Dim addlen As Long
 MyThread = True
 If FastSymbol(rest$, "{") Then
     frm$ = NLtrim$(block(rest$))
+    addlen = Len(rest$)
     If FastSymbol(rest$, "}") Then
+       
         par = False
         If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
         Else
@@ -37542,6 +37547,7 @@ If FastSymbol(rest$, "{") Then
             End If
             Set bs = New basetask   ' bs is the basetask of the thread but thread process class arn't constructed yet
             Set bs.Parent = bstack  ' link to current basestask
+            bs.addlen = addlen + bstack.addlen + 1
             bstack.PushThread CLng(p), what$  'push thread id and Ifier to threads collection in current basetask
             sThreadInternal bs, p, 0, frm$, -1&, here$, False ' thread construction - also we have a connection to
             Set bs = Nothing

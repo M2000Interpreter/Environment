@@ -1,10 +1,8 @@
 M2000 Interpreter and Environment
-Version 14 revision 2 (updated - info file) active-X
+Version 14 revision 3 (updated - info file) active-X
 
-Fixing a bad error: from a combination of situations..
-Also remove the Spotify module, because sometimes not work as I want. I have more work about it.
-
-
+1.Fix TEST function to display code for THREADS properly
+2.Some additional fixings
  
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

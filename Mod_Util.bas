@@ -15686,6 +15686,7 @@ End If
         Do
         If di.Visible Then di.Refresh
         ProcTask2 bstack
+        If Not Form2.Visible Then STEXIT = True
         Loop Until STbyST Or STq Or STEXIT Or NOEXECUTION Or myexit(bstack)
             If Not STEXIT Then
         If Not STq Then
@@ -18142,7 +18143,19 @@ Public Function TraceThis(bstack As basetask, di As Object, b$, W$, SBB$) As Boo
             End If
    
         End If
-        If bstack.addlen Then
+        If bstack.IamThread Then
+        TestShowStart = Len(TestShowSub) - bstack.addlen - Len(b$)
+        If TestShowStart > Len(W$) And TestShowStart < Len(TestShowSub) Then
+        'If bstack.addlen = 0 Then
+        
+        'Else
+            TestShowStart = InStr(TestShowStart - Len(W$) * 1.5, TestShowSub, W$) + Len(W$)
+        'End If
+        Else
+            TestShowStart = rinstr(TestShowSub, b$)
+        End If
+        
+        ElseIf bstack.addlen Then
             If Len(TestShowSub) - bstack.addlen - Len(b$) > 0 Then
                 TestShowStart = Len(TestShowSub) - bstack.addlen - Len(b$) + 1
             Else
