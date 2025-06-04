@@ -1,8 +1,7 @@
 M2000 Interpreter and Environment
-Version 14 revision 3 (updated - info file) active-X
+Version 14 revision 4 (updated - info file) active-X
 
-1.Fix TEST function to display code for THREADS properly
-2.Some additional fixings
+Fix statmenet FLOOFILL COLOR ... the varant of FLOODFILL which change the color at the point which we address the statement. This was broken from Version 14, rev 0 through 3.
  
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

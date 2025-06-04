@@ -48207,4 +48207,689 @@ try ok  {
 }
 IF NOT ok OR ERROR THEN PRINT ERROR$
 }
+MODULE RUBIK {ΔΥΑΔΙΚΟ {
+      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
+      PQAAAAgAAAA8AAAACAAAAD4AAAAYAAAAAAAAAAAAAAD//////////yUAAAAMAAAA
+      BQAAgCgAAAAMAAAAAgAAADsAAAAIAAAAGwAAABAAAAAkBgAAYAEAADYAAAAQAAAA
+      SgcAAN8BAAA2AAAAEAAAADsGAABpAgAANgAAABAAAAAUBQAA3wEAAD0AAAAIAAAA
+      PAAAAAgAAABAAAAAGAAAAAAAAAAAAAAA//////////8lAAAADAAAAAgAAIAnAAAA
+      GAAAAAIAAAAAAAAA////AAYAAAAlAAAADAAAAAIAAAAlAAAADAAAAAgAAIA7AAAA
+      CAAAABsAAAAQAAAAgAcAAPgBAAA2AAAAEAAAAL4IAACBAgAANgAAABAAAACxBwAA
+      FwMAADYAAAAQAAAAcQYAAIECAAA9AAAACAAAADwAAAAIAAAAPgAAABgAAAAAAAAA
+      AAAAAP//////////JQAAAAwAAAAFAACAKAAAAAwAAAACAAAAOwAAAAgAAAAbAAAA
+      EAAAAIAHAAD4AQAANgAAABAAAAC+CAAAgQIAADYAAAAQAAAAsQcAABcDAAA2AAAA
+      EAAAAHEGAACBAgAAPQAAAAgAAAA8AAAACAAAAEAAAAAYAAAAAAAAAAAAAAD/////
+      /////yUAAAAMAAAACAAAgCcAAAAYAAAAAgAAAAAAAAD/oQAABgAAACUAAAAMAAAA
+      AgAAACUAAAAMAAAACAAAgDsAAAAIAAAAGwAAABAAAACgAwAAYAEAADYAAAAQAAAA
+      sAQAAN8BAAA2AAAAEAAAAIkDAABpAgAANgAAABAAAAB6AgAA3wEAAD0AAAAIAAAA
+      PAAAAAgAAAA+AAAAGAAAAAAAAAAAAAAA//////////8lAAAADAAAAAUAAIAoAAAA
+      DAAAAAIAAAA7AAAACAAAABsAAAAQAAAAoAMAAGABAAA2AAAAEAAAALAEAADfAQAA
+      NgAAABAAAACJAwAAaQIAADYAAAAQAAAAegIAAN8BAAA9AAAACAAAADwAAAAIAAAA
+      QAAAABgAAAAAAAAAAAAAAP//////////JQAAAAwAAAAIAACAJwAAABgAAAACAAAA
+      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
+} ΩΣ Κύβος
+ΓύρναΔεξιά = list := 1:=3, 2:=6, 3:=9, 4:=2, 5:=5, 6:=8, 7:=1, 8:=4, 9:=7
+ΓύρναΑριστερά =list :=  1:=7, 2:=4, 3:=1, 4:=8, 5:=5, 6:=2, 7:=9, 8:=6, 9:=3
+ΑΠΑΡΙΘΜΗΣΗ Χρώματα_Κύβου {
+	Πορτοκαλί=#ffa100
+	Πράσινο=#00d800
+	Κόκκινο=#ee0000	
+	Μπλε=#0000f2
+	Κίτρινο=#fefe00
+	Άσπρο=#ffffff
+}
+Επίπεδο0=0
+ΠΙΝΑΚΑΣ α(1 ΕΩΣ 9, 1 ΕΩΣ 6) ΩΣ ΜΑΚΡΥΣ
+ΜΕΤΑΒΛΗΤΗ κ1 ΩΣ Χρώματα_Κύβου=Πορτοκαλί, Εμφάνισε=ΨΕΥΔΗΣ
+ΜΕΤΑΒΛΗΤΗ ΑΚΕΡΑΙΟΣ Επιφ_Ανω, Επιφ_Αριστερά, Επιφ_Δεξιά, Επιφ_Κάτω, Επιφ_ΑριστεράΠίσω, Επιφ_ΔεξιάΠίσω
+ΜΕΤΑΒΛΗΤΗ ΑΚΕΡΑΙΟΣ ΠΑΛΙΟ=0
+Φτιάξε_Πλευρές()
+ΤΙΤΛΟΣ "",0
+ΟΡΙΣΕ Φόρμα1 ΦΟΡΜΑ
+ΜΕ Φόρμα1, "Title" ΩΣ Τίτλος$
+ΜΕΘΟΔΟΣ Φόρμα1, "TransparentTitle"
+ΕΠΙΠΕΔΟ Φόρμα1 {
+	Παράθυρο 10, 18000,12000; 
+	ΟΘΟΝΗ, 0
+	ΦΟΝΤΟ 5, 1
+	ΠΕΝΑ 0
+	ΔΡΟΜΕΑΣ 0,2
+	ΘΕΣΗ !
+	υ1=ΘΕΣΗ.Υ     
+	Παρ1=(ΑΚ(ΜΙΚΡΟ.ΣΕΙΡΑΣ(ΚΛΙΜΑΞ.Χ, ΚΛΙΜΑΞ.Ψ)*.8) ΔΙΑ 100)*100
+	παρ2=10*Παρ1/16000
+	Παρ3=300*Παρ1/16000
+	Τυπ1=42.75*Παρ1/16000
+	χ=(ΚΛΙΜΑΞ.Χ-Παρ1) ΔΙΑ 2
+	y=(ΚΛΙΜΑΞ.Ψ-Παρ1) ΔΙΑ 2
+	ΔΡΟΜΕΑΣ 0, ΥΨΟΣ-3
+	ΠΕΝΑ 15 {
+		ΑΝ ΕΛΛΗΝΙΚΑ ΤΟΤΕ 
+			ΑΝΑΦΟΡΑ 2, "Με βελάκια περιστρέφουμε το κύβο, Πατημένο ένα από τα A,B,C και με τα αριστρό/δεξιό βελάκι περιστρέφουμε οριζόντια, Ομοίως με D,E,F,G,H,I και άνω/κάτω βελάκι αλλάζουμε κάθετα, Με ένα από τα 1,2,3,4,5 επιλέγουμε επίπεδο. Με διάστημα τερματίζει το πρόγραμμα. Με 0 ολοκληρώνεται ο κύβος"
+		ΑΛΛΙΩΣ
+			ΑΝΑΦΟΡΑ 2, "Arrows rotate cube. For slices: pressing A,B,C and left/right arrow rotation horizontal, pressing D,E,F,G,H,I and up/down arrow for vertical rotation. Choose level 1,2,3,4,5. Terminate program using Space Bar. Choose 0 to restore cube to finish position"
+		ΤΕΛΟΣ ΑΝ
+	}
+	Βάλε_Ετικέτες()
+	Σχεδίασε_Κύβο()	
+	ΑΝΑΝΕΩΣΗ
+	ΝΗΜΑ {
+		ΑΝ ΠΑΤΗΜΕΝΟ(0x25) ΤΟΤΕ
+			ΑΝ ΠΑΤΗΜΕΝΟ(0x43) ΤΟΤΕ
+				Επ1(4, 1)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x42) ΤΟΤΕ
+				Επ1(4, 2)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x41) ΤΟΤΕ
+				Επ1(4, 3)
+			ΑΛΛΙΩΣ
+				Οριζόντια()
+			ΤΕΛΟΣ ΑΝ
+		ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x27) ΤΟΤΕ
+			ΑΝ ΠΑΤΗΜΕΝΟ(0x43) ΤΟΤΕ
+				Επ1(2, 1)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x42) ΤΟΤΕ
+				Επ1(2, 2)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x41) ΤΟΤΕ
+				Επ1(2, 3)
+			ΑΛΛΙΩΣ
+				Οριζόντια():Οριζόντια():Οριζόντια()
+			ΤΕΛΟΣ ΑΝ
+		ΤΕΛΟΣ ΑΝ
+		ΑΝ ΠΑΤΗΜΕΝΟ(0x26) ΤΟΤΕ
+			ΑΝ ΠΑΤΗΜΕΝΟ(0x44) ΤΟΤΕ
+				Επ2(4, 1)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x45) ΤΟΤΕ
+				Επ2(4, 2)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x46) ΤΟΤΕ
+				Επ2(4, 3)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x49) ΤΟΤΕ
+				Επ3(4, 1)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x48) ΤΟΤΕ
+				Επ3(4, 2)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x47) ΤΟΤΕ
+				Επ3(4, 3)
+			ΑΛΛΙΩΣ
+				Κάθετα()
+			ΤΕΛΟΣ ΑΝ
+		ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x28) ΤΟΤΕ		
+			ΑΝ ΠΑΤΗΜΕΝΟ(0x44) ΤΟΤΕ
+				Επ2(2, 1)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x45) ΤΟΤΕ
+				Επ2(2, 2)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x46) ΤΟΤΕ
+				Επ2(2, 3)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x49) ΤΟΤΕ
+				Επ3(2, 1)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x48) ΤΟΤΕ
+				Επ3(2, 2)
+			ΑΛΛΙΩΣ.ΑΝ ΠΑΤΗΜΕΝΟ(0x47) ΤΟΤΕ
+				Επ3(2, 3)
+			ΑΛΛΙΩΣ
+				Κάθετα():Κάθετα():Κάθετα()
+			ΤΕΛΟΣ ΑΝ
+		ΤΕΛΟΣ ΑΝ
+		ΑΝ ΠΑΤΗΜΕΝΟ(32) ΤΟΤΕ ΜΕΘΟΔΟΣ Φόρμα1, "ByeBye"
+		ΑΝ ΠΑΤΗΜΕΝΟ(0x30) ΤΟΤΕ Φτιάξε_Πλευρές():Επίπεδο0=0
+		ΑΝ ΠΑΤΗΜΕΝΟ(0x35) ΤΟΤΕ Μπέρδεψε(5)
+		ΑΝ ΠΑΤΗΜΕΝΟ(0x34) ΤΟΤΕ Μπέρδεψε(4)
+		ΑΝ ΠΑΤΗΜΕΝΟ(0x33) ΤΟΤΕ Μπέρδεψε(3)
+		ΑΝ ΠΑΤΗΜΕΝΟ(0x32) ΤΟΤΕ Μπέρδεψε(2)
+		ΑΝ ΠΑΤΗΜΕΝΟ(0x31) ΤΟΤΕ Μπέρδεψε(1)
+		
+		ΘΕΣΗ 0,0
+		ΔΡΟΜΕΑΣ 0,0
+		ΑΝ Εμφάνισε ΤΟΤΕ Σχεδίασε_Κύβο(): Εμφάνισε=ΨΕΥΔΗΣ
+	} ΩΣ ΠΑΙΧΝΙΔΙ ΚΑΘΕ 1000/5 
+	ΑΝ Εμφάνισε ΤΟΤΕ Σχεδίασε_Κύβο(): Εμφάνισε=ΨΕΥΔΗΣ
+	ΠΕΝΑ 14
+}
+ΜΕΘΟΔΟΣ Φόρμα1, "Show", 1
+ΝΗΜΑΤΑ ΣΒΗΣΕ
+ΑΝΑΜΟΝΗ 200
+ΤΙΤΛΟΣ "Rubik", 1
+ΑΝ ΤΜΗΜΑ(INFO) ΑΛΛΙΩΣ ΤΕΛΟΣ
+ΤΙΤΛΟΣ "INFO"
+ΡΟΥΤΙΝΑ Σχεδίασε_Κύβο()
+	ΑΝΑΝΕΩΣΗ 1000
+	ΤΟΠΙΚΗ	λ=1	
+	ΘΕΣΗ χ,y
+	ΕΙΚΟΝΑ Κύβος, Παρ1
+	ΠΑΧΟΣ παρ2 {
+		ΘΕΣΗ  Παρ1/4+χ, Παρ1/4+y
+		γεμισεΚουτί0(7, Επιφ_Ανω)		
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7, Παρ1/7
+		γεμισεΚουτί0(8, Επιφ_Ανω)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7, Παρ1/6.8
+		γεμισεΚουτί0(9, Επιφ_Ανω)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7, -Παρ1/7
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7,-Παρ1/6.8
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7-ΠΙ/3.2, Παρ1/8
+		γεμισεΚουτί0(4, Επιφ_Ανω)		
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7, Παρ1/6.7
+		γεμισεΚουτί0(5, Επιφ_Ανω)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7, Παρ1/6.5
+		γεμισεΚουτί0(6, Επιφ_Ανω)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7, -Παρ1/6.7
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7,-Παρ1/6.5		
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7-ΠΙ/3.2, Παρ1/7
+		γεμισεΚουτί0(1, Επιφ_Ανω)	
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7, Παρ1/6.3
+		γεμισεΚουτί0(2, Επιφ_Ανω)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7, Παρ1/6.1
+		γεμισεΚουτί0(3, Επιφ_Ανω)
+		'--------------------------------
+		ΘΕΣΗ  Παρ1/4+χ, Παρ1/4+y
+		ΒΗΜΑ -Παρ1/10, Παρ1/10
+		γεμισεΚουτί2(3, Επιφ_Αριστερά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7-ΠΙ/3.1, Παρ1/6.5
+		γεμισεΚουτί2(2, Επιφ_Αριστερά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7-ΠΙ/3.2, Παρ1/6.4
+		γεμισεΚουτί2(1, Επιφ_Αριστερά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7-ΠΙ/3.1, -Παρ1/6.5
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7-ΠΙ/3.2, -Παρ1/6.4
+		ΒΗΜΑ ΓΩΝΙΑ -ΠΙ/2+ΠΙ/64, Παρ1/6
+		γεμισεΚουτί2(6, Επιφ_Αριστερά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7-ΠΙ/3.1, Παρ1/6.5
+		γεμισεΚουτί2(5, Επιφ_Αριστερά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7-ΠΙ/3.2, Παρ1/6.4
+		γεμισεΚουτί2(4, Επιφ_Αριστερά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7-ΠΙ/3.1, -Παρ1/6.5
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7-ΠΙ/3.2, -Παρ1/6.4
+		ΒΗΜΑ ΓΩΝΙΑ -ΠΙ/2+ΠΙ/64, Παρ1/6
+		γεμισεΚουτί2(9, Επιφ_Αριστερά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7-ΠΙ/3.1, Παρ1/6.5
+		γεμισεΚουτί2(8, Επιφ_Αριστερά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/7-ΠΙ/3.2, Παρ1/6.4
+		γεμισεΚουτί2(7, Επιφ_Αριστερά)
+		'--------------------------------
+		ΘΕΣΗ  Παρ1+χ, Παρ1/4+y
+		ΒΗΜΑ -Παρ1/8, Παρ1/16+Παρ1/32
+		λ=1
+		γεμισεΚουτί(&λ, Επιφ_Δεξιά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/4-ΠΙ/11, -Παρ1/6.5
+		γεμισεΚουτί(&λ, Επιφ_Δεξιά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/4-ΠΙ/11, -Παρ1/6.5
+		γεμισεΚουτί(&λ, Επιφ_Δεξιά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/4-ΠΙ/11, Παρ1/6.5
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/4-ΠΙ/11, Παρ1/6.5
+		ΒΗΜΑ ΓΩΝΙΑ -ΠΙ/2-ΠΙ/32, Παρ1/6
+		γεμισεΚουτί(&λ, Επιφ_Δεξιά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/4-ΠΙ/11, -Παρ1/6.5
+		γεμισεΚουτί(&λ, Επιφ_Δεξιά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/4-ΠΙ/11, -Παρ1/6.5
+		γεμισεΚουτί(&λ, Επιφ_Δεξιά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/4-ΠΙ/11, Παρ1/6.5
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/4-ΠΙ/11, Παρ1/6.5
+		ΒΗΜΑ ΓΩΝΙΑ -ΠΙ/2-ΠΙ/32, Παρ1/6
+		γεμισεΚουτί(&λ, Επιφ_Δεξιά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/4-ΠΙ/11, -Παρ1/6.5
+		γεμισεΚουτί(&λ, Επιφ_Δεξιά)
+		ΒΗΜΑ ΓΩΝΙΑ ΠΙ/4-ΠΙ/11, -Παρ1/6.5
+		γεμισεΚουτί(&λ, Επιφ_Δεξιά)
+	}
+	ΔΡΟΜΕΑΣ 0,0
+	ΘΕΣΗ 0,0
+	ΑΝ @ΈλεγχοςΟλοκλήρωσης() ΤΟΤΕ
+		ΒΑΨΕ ΚΛΙΜΑΞ.Χ, υ1,#3355aa
+		Τίτλος$=ΑΝ$(ΕΛΛΗΝΙΚΑ=ΑΛΗΘΕΣ->"Rubik Παζλ -  Ολοκληρώθηκε", "RUBIK PUZZLE EMULATOR")
+		ΑΝ ΠΑΛΙΟ=1 ΤΟΤΕ ΜΠΙΠ
+		ΠΑΛΙΟ=0
+	ΑΛΛΙΩΣ
+		ΒΑΨΕ ΚΛΙΜΑΞ.Χ, υ1,2
+		Τίτλος$=ΑΝ$(ΕΛΛΗΝΙΚΑ=ΑΛΗΘΕΣ->"Rubik Παζλ - Επίπεδο: ", "RUBIK PUZZLE EMULATOR - LEVEL: ")+Επίπεδο0
+		ΠΑΛΙΟ=1
+	ΤΕΛΟΣ ΑΝ
+	ΑΝΑΝΕΩΣΗ 25
+ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+ΡΟΥΤΙΝΑ Κάθετα()
+	ΤΟΠΙΚΗ τ(1 ΕΩΣ 9) ΩΣ ΜΑΚΡΥΣ, β(1 ΕΩΣ  9)  ΩΣ ΜΑΚΡΥΣ, ι
+	ΓΙΑ ι=1 ΕΩΣ  9
+		τ(ι)=α(ΓύρναΑριστερά(ι), Επιφ_ΑριστεράΠίσω)
+		β(ι)=α(ΓύρναΔεξιά(ι), Επιφ_Δεξιά)	
+	ΕΠΟΜΕΝΟ ι
+	ΓΙΑ ι=1 ΕΩΣ  9
+		α(ι, Επιφ_ΑριστεράΠίσω)=τ(ι)
+		α(ι, Επιφ_Δεξιά)=β(ι)	
+	ΕΠΟΜΕΝΟ ι
+	ΑΔΕΙΑΣΕ
+	ΣΕΙΡΑ Επιφ_Αριστερά, Επιφ_Ανω, Επιφ_ΔεξιάΠίσω, Επιφ_Κάτω
+	ΔΙΑΒΑΣΕ Επιφ_Ανω, Επιφ_ΔεξιάΠίσω, Επιφ_Κάτω, Επιφ_Αριστερά
+	ΓΙΑ ι=1 ΕΩΣ  9
+		τ(ι)=α(ΓύρναΔεξιά(ΓύρναΔεξιά(ι)), Επιφ_ΔεξιάΠίσω)
+		β(ι)=α(ΓύρναΔεξιά(ΓύρναΔεξιά(ι)), Επιφ_Κάτω)		
+	ΕΠΟΜΕΝΟ ι
+	ΓΙΑ ι=1 ΕΩΣ  9
+		α(ι, Επιφ_ΔεξιάΠίσω)=τ(ι)
+		α(ι, Επιφ_Κάτω)=β(ι)
+	ΕΠΟΜΕΝΟ ι
+	Εμφάνισε=ΑΛΗΘΕΣ
+ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+ΡΟΥΤΙΝΑ Επ1(ρ=4, επ=1)
+	ΤΟΠΙΚΗ τ(1 ΕΩΣ 9) ΩΣ ΜΑΚΡΥΣ, v(1 ΕΩΣ 3, 1 ΕΩΣ 4) ΩΣ ΜΑΚΡΥΣ, ι, κ
+	ΤΟΠΙΚΗ vv=list:= 1:=Επιφ_ΑριστεράΠίσω, 2:=Επιφ_Αριστερά, 3:=Επιφ_Δεξιά, 4:=Επιφ_ΔεξιάΠίσω, 5:=Επιφ_ΑριστεράΠίσω
+	ΑΝ ρ=4 ΤΟΤΕ
+		ΑΝ επ=1 ΤΟΤΕ	
+			ΓΙΑ ι=1 ΕΩΣ  9
+				τ(ι)=α(ΓύρναΔεξιά(ι), Επιφ_Ανω)
+			ΕΠΟΜΕΝΟ ι
+			ΓΙΑ ι=1 ΕΩΣ  9
+				α(ι, Επιφ_Ανω)=τ(ι)
+			ΕΠΟΜΕΝΟ ι
+		ΑΛΛΙΩΣ.ΑΝ επ=3 ΤΟΤΕ	
+			ΓΙΑ ι=1 ΕΩΣ  9
+				τ(ι)=α(ΓύρναΑριστερά(ι), Επιφ_Κάτω)
+			ΕΠΟΜΕΝΟ ι
+			ΓΙΑ ι=1 ΕΩΣ  9
+				α(ι, Επιφ_Κάτω)=τ(ι)
+			ΕΠΟΜΕΝΟ ι
+		ΤΕΛΟΣ ΑΝ
+	ΑΛΛΙΩΣ
+		ΑΝ επ=1 ΤΟΤΕ
+			ΓΙΑ ι=1 ΕΩΣ  9
+				τ(ι)=α(ΓύρναΑριστερά(ι), Επιφ_Ανω)
+			ΕΠΟΜΕΝΟ ι
+			ΓΙΑ ι=1 ΕΩΣ  9
+				α(ι, Επιφ_Ανω)=τ(ι)
+			ΕΠΟΜΕΝΟ ι
+		ΑΛΛΙΩΣ.ΑΝ επ=3 ΤΟΤΕ	
+			ΓΙΑ ι=1 ΕΩΣ  9
+				τ(ι)=α(ΓύρναΔεξιά(ι), Επιφ_Κάτω)
+			ΕΠΟΜΕΝΟ ι
+			ΓΙΑ ι=1 ΕΩΣ  9
+				α(ι, Επιφ_Κάτω)=τ(ι)
+			ΕΠΟΜΕΝΟ ι	
+		ΤΕΛΟΣ ΑΝ
+	ΤΕΛΟΣ ΑΝ	
+	ΤΟΠΙΚΗ θ=(επ-1)*3
+	ΓΙΑ ι=1 ΕΩΣ 4
+		ΓΙΑ κ=1 ΕΩΣ 3
+			v(κ, ι)=α(κ+θ, vv((ι+ρ) mod 4 + 1))
+		ΕΠΟΜΕΝΟ κ
+	ΕΠΟΜΕΝΟ ι
+	ΓΙΑ ι=1 ΕΩΣ 4
+		ΓΙΑ κ=1 ΕΩΣ 3
+			α(κ+θ,vv(ι))=v(κ, ι)
+ 		ΕΠΟΜΕΝΟ κ
+	ΕΠΟΜΕΝΟ ι
+	Εμφάνισε=ΑΛΗΘΕΣ
+ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+ΡΟΥΤΙΝΑ Επ2(ρ=4, επ=1)
+	ΤΟΠΙΚΗ τ(1 ΕΩΣ 9) ΩΣ ΜΑΚΡΥΣ, ι
+	ΑΝ ρ=4 ΤΟΤΕ
+		ΑΝ επ=1 ΤΟΤΕ	
+			ΓΙΑ ι=1 ΕΩΣ  9
+				τ(ι)=α(ΓύρναΑριστερά(ι), Επιφ_Αριστερά)
+			ΕΠΟΜΕΝΟ ι
+			ΓΙΑ ι=1 ΕΩΣ  9
+				α(ι, Επιφ_Αριστερά)=τ(ι)
+			ΕΠΟΜΕΝΟ ι
+		ΑΛΛΙΩΣ.ΑΝ επ=3 ΤΟΤΕ
+			ΓΙΑ ι=1 ΕΩΣ  9
+				τ(ι)=α(ΓύρναΔεξιά(ι), Επιφ_ΔεξιάΠίσω)
+			ΕΠΟΜΕΝΟ ι
+			ΓΙΑ ι=1 ΕΩΣ  9
+				α(ι, Επιφ_ΔεξιάΠίσω)=τ(ι)
+			ΕΠΟΜΕΝΟ ι
+		ΤΕΛΟΣ ΑΝ
+	ΑΛΛΙΩΣ
+		ΑΝ επ=1 ΤΟΤΕ	
+			ΓΙΑ ι=1 ΕΩΣ  9
+				τ(ι)=α(ΓύρναΔεξιά(ι), Επιφ_Αριστερά)
+			ΕΠΟΜΕΝΟ ι
+			ΓΙΑ ι=1 ΕΩΣ  9
+				α(ι, Επιφ_Αριστερά)=τ(ι)
+			ΕΠΟΜΕΝΟ ι
+		ΑΛΛΙΩΣ.ΑΝ επ=3 ΤΟΤΕ
+			ΓΙΑ ι=1 ΕΩΣ  9
+				τ(ι)=α(ΓύρναΑριστερά(ι), Επιφ_ΔεξιάΠίσω)
+			ΕΠΟΜΕΝΟ ι
+			ΓΙΑ ι=1 ΕΩΣ  9
+				α(ι, Επιφ_ΔεξιάΠίσω)=τ(ι)
+			ΕΠΟΜΕΝΟ ι
+		ΤΕΛΟΣ ΑΝ
+	ΤΕΛΟΣ ΑΝ
+	ΑΔΕΙΑΣΕ
+	ΤΟΠΙΚΗ θ=(επ-1)*3, θ1=επ-1
+	ΣΕΙΡΑ α(3-θ1, Επιφ_Δεξιά), α(6-θ1, Επιφ_Δεξιά), α(9-θ1, Επιφ_Δεξιά)
+ 	ΣΕΙΡΑ α(7-θ, Επιφ_Ανω), α(8-θ,  Επιφ_Ανω), α(9-θ,  Επιφ_Ανω)	
+	ΣΕΙΡΑ α(7+θ1, Επιφ_ΑριστεράΠίσω), α(4+θ1, Επιφ_ΑριστεράΠίσω), α(1+θ1, Επιφ_ΑριστεράΠίσω)
+ 	ΣΕΙΡΑ α(1+θ, Επιφ_Κάτω), α(2+θ, Επιφ_Κάτω), α(3+θ, Επιφ_Κάτω) 
+ 	ΑΝ ρ=2 ΤΟΤΕ
+		ΔΙΑΒΑΣΕ α(1+θ, Επιφ_Κάτω), α(2+θ, Επιφ_Κάτω), α(3+θ, Επιφ_Κάτω)
+		ΔΙΑΒΑΣΕ α(9-θ1, Επιφ_Δεξιά), α(6-θ1, Επιφ_Δεξιά), α(3-θ1, Επιφ_Δεξιά)
+		ΔΙΑΒΑΣΕ α(9-θ, Επιφ_Ανω), α(8-θ,  Επιφ_Ανω), α(7-θ,  Επιφ_Ανω)
+		ΔΙΑΒΑΣΕ α(7+θ1, Επιφ_ΑριστεράΠίσω), α(4+θ1, Επιφ_ΑριστεράΠίσω), α(1+θ1, Επιφ_ΑριστεράΠίσω)		
+	ΑΛΛΙΩΣ
+		ΔΙΑΒΑΣΕ α(9-θ, Επιφ_Ανω), α(8-θ,  Επιφ_Ανω), α(7-θ,  Επιφ_Ανω)
+		ΔΙΑΒΑΣΕ α(1+θ1, Επιφ_ΑριστεράΠίσω), α(4+θ1, Επιφ_ΑριστεράΠίσω), α(7+θ1, Επιφ_ΑριστεράΠίσω)		
+		ΔΙΑΒΑΣΕ α(1+θ, Επιφ_Κάτω), α(2+θ, Επιφ_Κάτω), α(3+θ, Επιφ_Κάτω)
+		ΔΙΑΒΑΣΕ α(3-θ1, Επιφ_Δεξιά), α(6-θ1, Επιφ_Δεξιά), α(9-θ1, Επιφ_Δεξιά)
+	ΤΕΛΟΣ ΑΝ
+	Εμφάνισε=ΑΛΗΘΕΣ
+ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+ΡΟΥΤΙΝΑ Επ3(ρ=4, επ=1)
+	ΤΟΠΙΚΗ τ(1 ΕΩΣ 9) ΩΣ ΜΑΚΡΥΣ, ι
+	ΑΝ ρ=2 ΤΟΤΕ
+		ΑΝ επ=1 ΤΟΤΕ	
+			ΓΙΑ ι=1 ΕΩΣ  9
+				τ(ι)=α(ΓύρναΑριστερά(ι), Επιφ_Δεξιά)
+			ΕΠΟΜΕΝΟ ι
+			ΓΙΑ ι=1 ΕΩΣ  9
+				α(ι, Επιφ_Δεξιά)=τ(ι)
+			ΕΠΟΜΕΝΟ ι
+		ΑΛΛΙΩΣ.ΑΝ επ=3 ΤΟΤΕ
+			ΓΙΑ ι=1 ΕΩΣ  9
+				τ(ι)=α(ΓύρναΔεξιά(ι), Επιφ_ΑριστεράΠίσω)
+			ΕΠΟΜΕΝΟ ι
+			ΓΙΑ ι=1 ΕΩΣ  9
+				α(ι, Επιφ_ΑριστεράΠίσω)=τ(ι)
+			ΕΠΟΜΕΝΟ ι
+		ΤΕΛΟΣ ΑΝ
+	ΑΛΛΙΩΣ
+		ΑΝ επ=1 ΤΟΤΕ	
+			ΓΙΑ ι=1 ΕΩΣ  9
+				τ(ι)=α(ΓύρναΔεξιά(ι), Επιφ_Δεξιά)
+			ΕΠΟΜΕΝΟ ι
+			ΓΙΑ ι=1 ΕΩΣ  9
+				α(ι, Επιφ_Δεξιά)=τ(ι)
+			ΕΠΟΜΕΝΟ ι
+		ΑΛΛΙΩΣ.ΑΝ επ=3 ΤΟΤΕ
+			ΓΙΑ ι=1 ΕΩΣ  9
+				τ(ι)=α(ΓύρναΑριστερά(ι), Επιφ_ΑριστεράΠίσω)
+			ΕΠΟΜΕΝΟ ι
+			ΓΙΑ ι=1 ΕΩΣ  9
+				α(ι, Επιφ_ΑριστεράΠίσω)=τ(ι)
+			ΕΠΟΜΕΝΟ ι
+		ΤΕΛΟΣ ΑΝ
+	ΤΕΛΟΣ ΑΝ
+	ΑΔΕΙΑΣΕ
+	ΤΟΠΙΚΗ θ1=επ-1
+	ΣΕΙΡΑ α(7+θ1, Επιφ_Ανω), α(4+θ1, Επιφ_Ανω), α(1+θ1, Επιφ_Ανω)
+	ΣΕΙΡΑ α(3-θ1, Επιφ_ΔεξιάΠίσω), α(6-θ1, Επιφ_ΔεξιάΠίσω), α(9-θ1, Επιφ_ΔεξιάΠίσω)
+	ΣΕΙΡΑ α(1+θ1, Επιφ_Κάτω), α(4+θ1, Επιφ_Κάτω), α(7+θ1, Επιφ_Κάτω)
+	ΣΕΙΡΑ α(1+θ1, Επιφ_Αριστερά), α(4+θ1, Επιφ_Αριστερά), α(7+θ1, Επιφ_Αριστερά)
+	ΑΝ ρ=2 ΤΟΤΕ
+		ΔΙΑΒΑΣΕ α(7+θ1, Επιφ_Αριστερά), α(4+θ1, Επιφ_Αριστερά), α(1+θ1, Επιφ_Αριστερά)
+		ΔΙΑΒΑΣΕ α(7+θ1, Επιφ_Ανω), α(4+θ1, Επιφ_Ανω), α(1+θ1, Επιφ_Ανω)
+		ΔΙΑΒΑΣΕ α(9-θ1, Επιφ_ΔεξιάΠίσω), α(6-θ1, Επιφ_ΔεξιάΠίσω), α(3-θ1, Επιφ_ΔεξιάΠίσω)
+		ΔΙΑΒΑΣΕ α(1+θ1, Επιφ_Κάτω), α(4+θ1, Επιφ_Κάτω), α(7+θ1, Επιφ_Κάτω)
+	ΑΛΛΙΩΣ
+		ΔΙΑΒΑΣΕ α(3-θ1, Επιφ_ΔεξιάΠίσω), α(6-θ1, Επιφ_ΔεξιάΠίσω), α(9-θ1, Επιφ_ΔεξιάΠίσω)
+		ΔΙΑΒΑΣΕ α(7+θ1, Επιφ_Κάτω), α(4+θ1, Επιφ_Κάτω), α(1+θ1, Επιφ_Κάτω)
+		ΔΙΑΒΑΣΕ α(1+θ1, Επιφ_Αριστερά), α(4+θ1, Επιφ_Αριστερά), α(7+θ1, Επιφ_Αριστερά)
+		ΔΙΑΒΑΣΕ α(1+θ1, Επιφ_Ανω), α(4+θ1, Επιφ_Ανω), α(7+θ1, Επιφ_Ανω)
+	ΤΕΛΟΣ ΑΝ
+	Εμφάνισε=ΑΛΗΘΕΣ
+ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+ΡΟΥΤΙΝΑ Οριζόντια()
+	ΤΟΠΙΚΗ τ(1 ΕΩΣ 9) ΩΣ ΜΑΚΡΥΣ, β(1 ΕΩΣ  9)  ΩΣ ΜΑΚΡΥΣ, ι
+	ΓΙΑ ι=1 ΕΩΣ  9
+		τ(ι)=α(ΓύρναΔεξιά(ι), Επιφ_Ανω)
+		β(ι)=α(ΓύρναΑριστερά(ι), Επιφ_Κάτω)	
+	ΕΠΟΜΕΝΟ ι
+	ΓΙΑ ι=1 ΕΩΣ  9
+		α(ι, Επιφ_Ανω)=τ(ι)
+		α(ι, Επιφ_Κάτω)=β(ι)	
+	ΕΠΟΜΕΝΟ ι
+	ΑΔΕΙΑΣΕ
+	ΣΕΙΡΑ Επιφ_Αριστερά, Επιφ_Δεξιά, Επιφ_ΔεξιάΠίσω, Επιφ_ΑριστεράΠίσω
+	ΔΙΑΒΑΣΕ Επιφ_ΑριστεράΠίσω, Επιφ_Αριστερά, Επιφ_Δεξιά, Επιφ_ΔεξιάΠίσω
+	Εμφάνισε=ΑΛΗΘΕΣ
+ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+ΡΟΥΤΙΝΑ γεμισεΚουτί0(ζ,χ)
+		ΓΕΜΙΣΕ ΧΡΩΜΑ , ,α(ΓύρναΑριστερά(ζ),χ)
+ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+ΡΟΥΤΙΝΑ γεμισεΚουτί(&ζ,χ)
+	ΓΕΜΙΣΕ ΧΡΩΜΑ , ,α(ζ,χ)
+	ζ++
+ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+ΡΟΥΤΙΝΑ γεμισεΚουτί2(ζ, χ)
+	ΓΕΜΙΣΕ ΧΡΩΜΑ , ,α(ζ, χ)
+ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+ΡΟΥΤΙΝΑ Βάλε_Ετικέτες()
+	ΘΕΣΗ  Παρ1/4+χ, Παρ1/4+y
+	ΒΗΜΑ-Παρ1/8, -Παρ1/8
+	ΠΕΝΑ 11 {ΕΤΙΚΕΤΑ.ΦΟΡΜΑΣ "D",,Τυπ1}
+	ΒΗΜΑ ΓΩΝΙΑ ΠΙ/8, Παρ1/7
+	ΠΕΝΑ 11 {ΕΤΙΚΕΤΑ.ΦΟΡΜΑΣ "E",,Τυπ1}
+	ΒΗΜΑ ΓΩΝΙΑ ΠΙ/8, Παρ1/7
+	ΠΕΝΑ 11 {ΕΤΙΚΕΤΑ.ΦΟΡΜΑΣ "F",,Τυπ1}
+	ΒΗΜΑ ΓΩΝΙΑ 0, Παρ1/8+Παρ1/16
+	ΠΕΝΑ 11 {ΕΤΙΚΕΤΑ.ΦΟΡΜΑΣ "G",,Τυπ1}
+	ΒΗΜΑ ΓΩΝΙΑ -ΠΙ/8.2+ΠΙ, -Παρ1/7
+	ΠΕΝΑ 11 {ΕΤΙΚΕΤΑ.ΦΟΡΜΑΣ "H",,Τυπ1}
+	ΒΗΜΑ ΓΩΝΙΑ -ΠΙ/8.2+ΠΙ, -Παρ1/7
+	ΠΕΝΑ 11 {ΕΤΙΚΕΤΑ.ΦΟΡΜΑΣ "I",,Τυπ1}	
+	ΘΕΣΗ  Παρ1/4+χ, Παρ1/4+y
+	ΒΗΜΑ -Παρ1/4+Παρ1/32, Παρ1/20
+	ΠΕΝΑ 11 {ΕΤΙΚΕΤΑ.ΦΟΡΜΑΣ "C",,Τυπ1}
+	ΒΗΜΑ Παρ1/128+Παρ1/256, Παρ1/7
+	ΠΕΝΑ 11 {ΕΤΙΚΕΤΑ.ΦΟΡΜΑΣ "B",,Τυπ1}
+	ΒΗΜΑ Παρ1/128+Παρ1/256, Παρ1/7
+	ΠΕΝΑ 11 {ΕΤΙΚΕΤΑ.ΦΟΡΜΑΣ "A",,Τυπ1}
+ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+ΣΥΝΑΡΤΗΣΗ ΈλεγχοςΟλοκλήρωσης()
+	ΤΟΠΙΚΗ ι, κ, λ
+	ΓΙΑ ι=1 ΕΩΣ 6
+		λ=α(1, ι)
+		ΓΙΑ κ=2 ΕΩΣ 9
+			ΑΝ α(κ,ι)<>λ ΤΟΤΕ =ΨΕΥΔΗΣ : ΕΞΟΔΟΣ ΣΥΝΑΡΤΗΣΗΣ
+		ΕΠΟΜΕΝΟ
+	ΕΠΟΜΕΝΟ
+	=ΑΛΗΘΕΣ
+ΤΕΛΟΣ ΣΥΝΑΡΤΗΣΗΣ
+ΡΟΥΤΙΝΑ Μπέρδεψε(φορές ΩΣ ΜΑΚΡΥΣ)
+	Φτιάξε_Πλευρές()
+	ΤΟΠΙΚΗ ι
+	ΓΙΑ ι=1 ΕΩΣ 5*φορές
+		ΕΠΙΛΕΞΕ ΜΕ ΤΥΧΑΙΟΣ(1, 3)
+		ΜΕ 1
+			Επ1(ΤΥΧΑΙΟΣ(1,2)*2, ΤΥΧΑΙΟΣ(1,3))
+		ΜΕ 2
+			Επ2(ΤΥΧΑΙΟΣ(1,2)*2, ΤΥΧΑΙΟΣ(1,3))
+		ΜΕ 3
+			Επ3(ΤΥΧΑΙΟΣ(1,2)*2, ΤΥΧΑΙΟΣ(1,3))
+		ΤΕΛΟΣ ΕΠΙΛΟΓΗΣ		
+	ΕΠΟΜΕΝΟ
+	Επίπεδο0=φορές
+	Εμφάνισε=ΑΛΗΘΕΣ
+ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+ΡΟΥΤΙΝΑ Φτιάξε_Πλευρές()
+	ΤΟΠΙΚΗ κ1=Πορτοκαλί, ι
+	Επιφ_Ανω=6
+	Επιφ_Αριστερά=2
+	Επιφ_Δεξιά=3
+	Επιφ_Κάτω=5
+	Επιφ_ΑριστεράΠίσω=1
+	Επιφ_ΔεξιάΠίσω=4
+	ΓΙΑ ι=1 ΕΩΣ 6
+		ΓΙΑ κ=1 ΕΩΣ 9
+			α(κ,ι)=κ1
+		ΕΠΟΜΕΝΟ
+		κ1++
+	ΕΠΟΜΕΝΟ
+	Εμφάνισε=ΑΛΗΘΕΣ
+ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+
+}
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
