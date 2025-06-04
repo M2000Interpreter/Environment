@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 Version 14 revision 4 (updated - info file) active-X
 
-Fix statmenet FLOOFILL COLOR ... the varant of FLOODFILL which change the color at the point which we address the statement. This was broken from Version 14, rev 0 through 3.
+Fix statement FLOODFILL COLOR ... the variant of FLOODFILL which change the color at the point which we address the statement. This was broken from Version 14, rev 0 through 3.
  
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
