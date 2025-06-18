@@ -19948,8 +19948,16 @@ final$="|"
 Push hBase
 end sub
 }
-MODULE EXPORTHELP {\\ prepare the groups of help database
-
+MODULE EXPORTHELP {if not exist(appdir$+"HELP2000.mdb") then {
+      Report {You have to place in appdir$ the HELP2000.mdb
+            Also you may have to install Access2007 runtime
+            download from here:
+            https://github.com/M2000Interpreter/Environment/blob/main/help2000.mdb
+      }
+      break
+}
+\\ prepare the groups of help database
+DB.Provider "Microsoft.Jet.OLEDB.4.0"
 Print "Greek or English Help File:(G/E)"
 Select Case Ucase$(Key$)
 case "G", "Γ"
@@ -20024,6 +20032,7 @@ dir user
 if Gr then fname$="Γενικά.doc" else fname$="General.doc"
 save.doc out$, fname$
 win dir$+fname$   
+DB.Provider ""
 end
 dat:
 Data 24
@@ -20140,7 +20149,8 @@ Win Quote$(Dir$+FL$)
 MODULE CHANGEHELP {if not exist(appdir$+"HELP2000.mdb") then {
       Report {You have to place in appdir$ the HELP2000.mdb
             Also you may install Access2007 runtime
-            After edit the help file, use Swicth "+mdb" to use mdb file for help
+            download from here:
+            https://github.com/M2000Interpreter/Environment/blob/main/help2000.mdb
       }
       break
 }
@@ -20148,7 +20158,8 @@ Base 0  \\ for arrays
 Font "Arial"
 menu fill 1,11,0
 menu frame
-DB.Provider ""  \\ reset
+DB.Provider "Microsoft.Jet.OLEDB.4.0"
+// DB.Provider ""  \\ reset
 Window 12, window
 refresh
 Bold 1 : Form 70, 32
@@ -20276,6 +20287,8 @@ If Ucase$(Key$)="Y" Then CreateGeneral()
 Dir OldDir$
 Print "Compress (Y/N) ?"
 If Ucase$(Key$)="Y" Then Compress()
+DB.Provider ""
+Print "You can execute MakeHelp now"
 End
 Sub ChangeGroup(descr2match$)
       Stack New {
@@ -20454,9 +20467,11 @@ MODULE MAKEHELP {
 if not exist(appdir$+"HELP2000.mdb") then {
 	Report {You have to place in appdir$ the HELP2000.mdb
 		Also you may install Access2007 runtime
-		After edit the help file, use Swicth "-mdb" to use dat file for help
+		download from here:
+		https://github.com/M2000Interpreter/Environment/blob/main/help2000.mdb
+		After edit the help file, use Swicth "-mdb" to use dat file for help (not need because it is -mdb by default)
 		To use a new dat file you have to exit  m2000.exe, and start again, becaue the first time we use help with dat file interpreter load it.
-		You can place the Help2000.mdb in USER file. Deletet appdir$+ before "HELP2000.mdb"
+		You can place the Help2000.mdb in USER file. Delete appdir$+ before "HELP2000.mdb"
 		Don't forget after edit this module to exit and press F1 to save info to USER directory
 	}
 	break
@@ -20464,6 +20479,8 @@ if not exist(appdir$+"HELP2000.mdb") then {
 pen 14 : cls 5
 flush
 \\DIR APPDIR$ \\  from installation folder use this
+DB.Provider "Microsoft.Jet.OLEDB.4.0"
+
 Retrieve  APPDIR$+"HELP2000","GROUP", 1,"",""
 Read many
 Flush
@@ -20542,6 +20559,7 @@ Try {
 	save.doc all$,"help2000utf8.dat", 2   ' utf-8
 }
 dir user
+DB.Provider ""
 }
 MODULE SNAKE {Αν Τοπικό=1032 ή Ελληνικά Τότε {
       Αν Ρώτα( "Κράτα πατημένο το διάστημα πριν τελειώσει το παιχνίδι για άμεσο τερματισμό","Παιχνίδι Φιδάκι","*Ξεκινάω","Όχι τώρα")<>1 τότε Διέκοψε

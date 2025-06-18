@@ -289,14 +289,14 @@ Function DriveSerial(ByVal path$) As Long
 End Function
 
 Function WeCanWrite(ByVal path$) As Boolean
-Dim SecondTry As Boolean, pp$
+Dim pp$
 On Error GoTo wecant
 pp$ = ExtractPath(path$, , True)
-pp$ = GetDosPath(pp$)
-If pp$ = vbNullString Then
-MyEr "Not writable device " & path$, "Δεν μπορώ να γράψω στη συσκευή " & path$
-Exit Function
-End If
+'pp$ = GetDosPath(pp$)
+'If pp$ = vbNullString Then
+'MyEr "Not writable device " & path$, "Δεν μπορώ να γράψω στη συσκευή " & path$
+'Exit Function
+'End If
 pp$ = PathStrip2root(path$)
 
 
@@ -338,7 +338,7 @@ If sapi.getvoices().Count > 0 Then
 NumVoices = sapi.getvoices().Count
 End If
 End Function
-Public Sub SPEeCH(ByVal a$, Optional BOY As Boolean = False, Optional ByVal vNumber As Long = -1)
+Public Sub SPEeCH(ByVal A$, Optional BOY As Boolean = False, Optional ByVal vNumber As Long = -1)
 Static lastvoice As Long
 If vNumber = -1 Then vNumber = lastvoice
 On Error Resume Next
@@ -354,13 +354,13 @@ If sapi.getvoices().Count < vNumber Or sapi.getvoices().Count < 1 Then vNumber =
         
          .rate = 2
        ' boy
-         .Speak "<pitch absmiddle='25'>" & a$
+         .Speak "<pitch absmiddle='25'>" & A$
          Else
          
          'man
        .rate = 1
        .volume = IIf(vol = 0, 0, 50 + vol \ 2)
-         .Speak "<pitch absmiddle='-5'>" & a$
+         .Speak "<pitch absmiddle='-5'>" & A$
          End If
        End With
        lastvoice = vNumber
@@ -369,7 +369,7 @@ End Sub
 Public Sub wwPlain2(bstack As basetask, mybasket As basket, ByVal what As String, ByVal wi As Long, ByVal Hi As Long, Optional scrollme As Boolean = False, Optional nosettext As Boolean = False, Optional frmt As Long = 0, Optional ByVal skip As Long = 0, Optional res As Long, Optional isAcolumn As Boolean = False, Optional collectit As Boolean = False, Optional nonewline As Boolean)
 Dim DDD As Object, mDoc As Object, para() As String, i As Long
 Dim n As Long, st As Long, st1 As Long, st0 As Long, W As Integer
-Dim PX As Long, PY As Long, nowait As Boolean
+Dim px As Long, PY As Long, nowait As Boolean
 Dim nopage As Boolean
 Dim buf$, b$, npy As Long, lCount As Long, SCRnum2stop As Long
 Dim nopr As Boolean, nohi As Long, w2 As Long, lastPara As Long
@@ -388,17 +388,17 @@ i = AverCharSpace(DDD, bchar)
 With mybasket
 ' from old code here
     tParam.iTabLength = .ReportTab
-    PX = .curpos
+    px = .curpos
     PY = .currow
     If Not nosettext Then
-        If PX >= .mX Then
+        If px >= .mX Then
             nowait = True
-            PX = 0
+            px = 0
         End If
     End If
-    If PX > .mX Then nowait = True
+    If px > .mX Then nowait = True
     If wi = 0 Then
-        If nowait Then wi = .Xt * (.mX - PX) Else wi = .mX * .Xt
+        If nowait Then wi = .Xt * (.mX - px) Else wi = .mX * .Xt
     Else
         If wi <= .mX Then wi = wi * .Xt
     End If
@@ -417,7 +417,7 @@ With mybasket
             crNew bstack, mybasket
             PY = .currow
         End If
-             LCTbasket DDD, mybasket, PY, PX
+             LCTbasket DDD, mybasket, PY, px
         End If
         DDD.currentX = DDD.currentX + dv2x15
         If Not scrollme Then
@@ -595,7 +595,7 @@ JUMPHERE:
               
         End If
       End If
-If Not nopr Then LCTbasket DDD, mybasket, npy, PX: DDD.currentX = DDD.currentX + dv2x15
+If Not nopr Then LCTbasket DDD, mybasket, npy, px: DDD.currentX = DDD.currentX + dv2x15
 If skip < 0 Then Hi = Hi - 1
 If Hi < 0 Then Exit For
 continue:
@@ -614,7 +614,7 @@ Public Sub wwPlain(bstack As basetask, mybasket As basket, ByVal what As String,
 
 Dim DDD As Object, mDoc As Object, para() As String, i As Long
 Dim n As Long, st As Long, st1 As Long, st0 As Long, W As Integer
-Dim PX As Long, PY As Long, nowait As Boolean
+Dim px As Long, PY As Long, nowait As Boolean
 Dim nopage As Boolean
 Dim buf$, b$, npy As Long, lCount As Long, SCRnum2stop As Long
 Dim nopr As Boolean, nohi As Long, w2 As Long, lastPara As Long
@@ -638,17 +638,17 @@ With mybasket
     tParam.iTabLength = .ReportTab
     tabw = .ReportTab * AverCharSpace(DDD, bchar)
 '    If bchar = 2 Then bchar = 0
-    PX = .curpos
+    px = .curpos
     PY = .currow
     If Not nosettext Then
-        If PX >= .mX Then
+        If px >= .mX Then
             nowait = True
-            PX = 0
+            px = 0
         End If
     End If
-    If PX > .mX Then nowait = True
+    If px > .mX Then nowait = True
     If wi = 0 Then
-        If nowait Then wi = .Xt * (.mX - PX) Else wi = .mX * .Xt
+        If nowait Then wi = .Xt * (.mX - px) Else wi = .mX * .Xt
     Else
         If wi <= .mX Then wi = wi * .Xt
     End If
@@ -667,7 +667,7 @@ With mybasket
             crNew bstack, mybasket
             PY = .currow
         End If
-             LCTbasket DDD, mybasket, PY, PX
+             LCTbasket DDD, mybasket, PY, px
         End If
         DDD.currentX = DDD.currentX + dv2x15
         If Not scrollme Then
@@ -979,7 +979,7 @@ JUMPHERE:
                 End If
                 End If
             End If
-If Not nopr Then LCTbasket DDD, mybasket, npy, PX: DDD.currentX = DDD.currentX + dv2x15
+If Not nopr Then LCTbasket DDD, mybasket, npy, px: DDD.currentX = DDD.currentX + dv2x15
 If skip < 0 Then Hi = Hi - 1
 If Hi < 0 Then Exit For
 continue:

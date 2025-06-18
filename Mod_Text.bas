@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 4
+Global Const Revision = 5
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -12053,11 +12053,15 @@ End If
 Exit Function
 fun4: ' "FRAC(", "дей("
 If IsExp(bstack, A$, p, flatobject:=True, nostring:=True) Then
-r = MyRound(Abs(Abs(p) - Int(Abs(p))), 13)
-
-
-
- IsNumberNew = FastSymbol(A$, ")", True)
+    p = Abs(p)
+    If Left(A$, 1) = "!" Then
+        Mid$(A$, 1, 1) = " "
+        r = Abs(p - Int(p))
+        IsNumberNew = True
+    Else
+        r = MyRound(Abs(p - Int(p)), 13)
+    End If
+IsNumberNew = FastSymbol(A$, ")", True)
  Else
 MissParam A$: IsNumberNew = False
 End If

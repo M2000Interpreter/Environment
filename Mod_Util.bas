@@ -21057,6 +21057,7 @@ fornew:
         If y1 = 100 Then y1 = 0
         par = Fast2LabelNoNum(rest$, "C", 1, "", 0, 1)
         If IsStrExp(bstack, rest$, pa$, False) Then
+            dum = False
             If FastSymbol(rest$, "{") Then
                 ss$ = ""
                 s$ = ""
@@ -21066,8 +21067,18 @@ fornew:
                             ss$ = ss$ + ","
                             s$ = vbNullString
                         End If
+                    ElseIf FastSymbol(rest$, "...", , 3) Then
+                            ss$ = ss$ + " ..."
+                            s$ = ""
+                            If MaybeIsSymbol(rest$, "'\/") Then
+                                GetNextLine rest$
+                                SetNextLine rest$
+                            End If
+                            dum = True
                     ElseIf FastSymbol(rest$, "}") Then
                         s$ = vbNullString
+                        Exit Do
+                    ElseIf dum Then
                         Exit Do
                     Else
                         i = s$ <> vbNullString
@@ -21095,17 +21106,13 @@ fornew:
                                 ss$ = ss$ + s$ + ","
                                 End If
                                 s$ = vbNullString
+                            
                             ElseIf i Then
                                 ss$ = ss$ + " " + s$
                             Else
                                 ss$ = ss$ + s$
                             End If
                         End Select
-                        If FastSymbol(rest$, "...", , 3) Then
-                            ss$ = ss$ + " ..."
-                            s$ = ""
-                            Exit Do
-                        End If
                     End If
                 Loop
             End If
@@ -21298,6 +21305,7 @@ a23232:
                 If IsExp(bstack, rest$, p, , True) Then
 a333:
                 '************************************************
+                    dum = False
                     If FastSymbol(rest$, "{") Then
                         ss$ = ""
                         s$ = ""
@@ -21307,8 +21315,18 @@ a333:
                                     ss$ = ss$ + ","
                                     s$ = vbNullString
                                 End If
+                            ElseIf FastSymbol(rest$, "...", , 3) Then
+                                ss$ = ss$ + " ..."
+                                s$ = ""
+                                If MaybeIsSymbol(rest$, "'\/") Then
+                                    GetNextLine rest$
+                                    SetNextLine rest$
+                                End If
+                                dum = True
                             ElseIf FastSymbol(rest$, "}") Then
                                 s$ = vbNullString
+                                Exit Do
+                            ElseIf dum Then
                                 Exit Do
                             Else
                                 i = s$ <> vbNullString
@@ -21344,11 +21362,6 @@ a333:
                                         ss$ = ss$ + s$
                                     End If
                                 End Select
-                                If FastSymbol(rest$, "...", , 3) Then
-                                    ss$ = ss$ + " ..."
-                                    s$ = ""
-                                    Exit Do
-                                End If
                             End If
                         Loop
                     End If
