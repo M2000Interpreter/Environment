@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 5
+Global Const Revision = 6
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -16249,6 +16249,53 @@ Function IsLabelSYMB33(A$, r$, chars As Long) As Boolean ' ok
     Loop
     r$ = Mid$(A$, mb + 1, LB - mb)
     IsLabelSYMB33 = rr&
+    If rr& <> 0 Then
+        chars = LB + 1
+    End If
+End Function
+Function IsLabelSYMB33N(A$, r$, chars As Long) As Boolean ' ok
+    Dim rr&, c$, LB As Long, mb As Long, LLB As Long
+    LLB = Len(A$)
+    r$ = vbNullString
+    If LLB = 0 Then IsLabelSYMB33N = 0: Exit Function
+    mb = 0
+    LB = 1
+    Do While LB <= LLB
+        c$ = Mid$(A$, LB, 1)
+        If AscW(c$) < 256 Then
+            Select Case AscW(c$)
+            Case 32, 160, 9
+                If LB - mb > 1 Then
+                    LB = LB - 1
+                    Exit Do
+                Else
+                    mb = LB
+                End If
+            Case 46 '"."
+                If LB > mb Then
+                    rr& = 1
+                Else
+                    IsLabelSYMB33N = 0
+                    Exit Function
+                End If
+            Case 65 To 90, 97 To 122 ' "A" To "Z", "a" To "z"
+                rr& = 1 'is an identifier or floating point variable
+            Case 48 To 57
+              If rr& <> 1 Then
+                LB = LB - 1
+                Exit Do
+              End If
+            Case Else
+                LB = LB - 1
+                Exit Do
+            End Select
+        Else
+            rr& = 1 'is an identifier or floating point variable
+        End If
+        LB = LB + 1
+    Loop
+    r$ = Mid$(A$, mb + 1, LB - mb)
+    IsLabelSYMB33N = rr&
     If rr& <> 0 Then
         chars = LB + 1
     End If
@@ -40965,7 +41012,7 @@ End If
 Exit Function
 Else
 i = 0
-If IsLabelSYMB33(rest$, what$, i) Then
+If IsLabelSYMB33N(rest$, what$, i) Then
     If Mid$(rest$, i, 2) = "$(" Then
         x1 = 6
         what$ = myUcase(what$, True) + "$("
