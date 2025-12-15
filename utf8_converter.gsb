@@ -1,0 +1,23 @@
+﻿ΤΜΗΜΑ ΓΕΝΙΚΟ A {Const NoBomUtf8crlf = -2&
+Document tmp$
+Dir Appdir$
+Report Dir$
+Try {Subdir UTF8}
+Dir UTF8
+Dest$ = dir$
+Dir Appdir$
+Files "BAS|CLS|FRM"
+Menu
+Files + "BAS|CLS|FRM"
+If MenuItems>0 then
+	For i=1 to MenuItems
+		Clear tmp$
+		Load.Doc tmp$, dir$+menu$(i), 1032
+		Save.Doc tmp$, Dest$+menu$(i)+".utf8.txt", NoBomUtf8crlf
+		Print Over $(0, 8),@(0), Int(i/MenuItems*100), "%"
+	Next
+End If
+Print
+Dir User
+Report  Dir$
+}
