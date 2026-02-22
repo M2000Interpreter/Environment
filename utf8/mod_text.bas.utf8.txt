@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 6
+Global Const Revision = 7
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3487,7 +3487,7 @@ If Fast2Label(aa$, "OR", 2, "Η", 1, 2) Then
         If IsExp(bstack, aa$, r, False, True) Then
             If po <> 0 Then po = -1
             If r <> 0 Then r = -1
-            po = po And r
+            po = CBool(po) And CBool(r)
             GoTo again2
         Else
             MissLogicalExpr
@@ -21275,7 +21275,7 @@ getanother:
                         Set useHandler = Nothing
                     End If
                 End If
-                st = st And p
+                st = st And CBool(p)
                 If FastSymbol(W$, ",") Then
                     If IsExp(bstack, W$, p) Then
                         If Not bstack.lastobj Is Nothing Then GoTo getanother
@@ -21431,7 +21431,7 @@ another1:
                                         End If
                                     End If
                                
-                                st = st And p
+                                st = st And CBool(p)
                                 If FastSymbol(W$, ",") Then GoTo another1
                             Loop Until st = 0 Or NOEXECUTION
                  ' addition in 8.9 rev 33

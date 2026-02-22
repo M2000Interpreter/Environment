@@ -26636,12 +26636,12 @@ cont154:
         If y1 = 3 Then
             If GetVar(basestack, s$, i) Then
                 If VarTypeName(var(i)) = doc Then
-                         If x1 = -5 Then
-                    If var(i).ListLoadedType <> 0 Then
-                    x1 = var(i).ListLoadedType
-                    Else
-                    x1 = 2
-                    End If
+                    If x1 = -5 Then
+                            If var(i).ListLoadedType <> 0 Then
+                            x1 = var(i).ListLoadedType
+                            Else
+                            x1 = 2
+                            End If
                     End If
                     If CanKillFile(ss$) Then
                     If x1 = 0 And p <> 0 Then
@@ -30175,11 +30175,11 @@ End If
 End Function
 
 Function ProcLoadDoc(entrypoint As Long, basestack As basetask, rest$) As Boolean
-Dim dum As Boolean, pppp As iBoxArray, s$, i As Long, x1 As Long, y1 As Long, frm$, ss$
-Dim p As Variant
-ProcLoadDoc = True
-If entrypoint = 1 Then dum = True
-      y1 = Abs(IsLabel(basestack, rest$, s$))
+    Dim dum As Boolean, pppp As iBoxArray, s$, i As Long, x1 As Long, y1 As Long, frm$, ss$
+    Dim p As Variant
+    ProcLoadDoc = True
+    If entrypoint = 1 Then dum = True
+    y1 = Abs(IsLabel(basestack, rest$, s$))
 
         If y1 = 6 Then
                 If neoGetArray(basestack, s$, pppp) Then
@@ -30218,50 +30218,47 @@ If entrypoint = 1 Then dum = True
     MissPar
     Exit Function
     End If
-    
-   
-        If y1 = 3 Then
-            If GetVar(basestack, s$, i) Then
-                If VarTypeName(var(i)) = doc Then
-
+    If y1 = 3 Then
+        If GetVar(basestack, s$, i) Then
+            If VarTypeName(var(i)) = doc Then
                 x1 = 2
                 On Error Resume Next
                 If FastSymbol(rest$, ",") Then
-                
-                If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
-                var(i).LCID = CLng(p)
+                    If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
+                        If p < 0 Or p < 1024 Then
+                            var(i).ListLoadedType = Int(Abs(p)) Mod 10
+                        Else
+                            var(i).LCID = CLng(p)
+                        End If
+                    End If
                 End If
-                End If
-            If basestack.Owner.Name = "GuiM2000" Then
-                Set basestack.Owner.mDoc = var(i)
-                var(i).ReadUnicodeOrANSI ss$, dum, x1
-                Set basestack.Owner.mDoc = Nothing
-            Else
-                var(i).ReadUnicodeOrANSI ss$, dum, x1
+                If basestack.Owner.Name = "GuiM2000" Then
+                    Set basestack.Owner.mDoc = var(i)
+                    var(i).ReadUnicodeOrANSI ss$, dum, x1
+                    Set basestack.Owner.mDoc = Nothing
+                Else
+                    var(i).ReadUnicodeOrANSI ss$, dum, x1
                 End If
                 If Err.Number > 0 Then Err.Clear: Exit Function
-                 var(i).ListLoadedType = x1
-                 Exit Function
-                Else
-                    MissingDoc
-                    
-                End If
+                var(i).ListLoadedType = x1
+                Exit Function
             Else
-                   MissFuncParameterStringVar
-                    
+                MissingDoc
+                
             End If
-        ElseIf y1 = 6 Then
-                    If pppp.ItemType(i) = doc Then
-                                    x1 = 2
-                pppp.item(i).ReadUnicodeOrANSI ss$, dum, x1
-                 pppp.item(i).ListLoadedType = x1
-                    
-                        Else
-                         MissingDoc
-                         
-                        End If
+        Else
+            MissFuncParameterStringVar
+        End If
+    ElseIf y1 = 6 Then
+        If pppp.ItemType(i) = doc Then
+            x1 = 2
+            pppp.item(i).ReadUnicodeOrANSI ss$, dum, x1
+            pppp.item(i).ListLoadedType = x1
+        Else
+            MissingDoc
+        End If
     Else
-                MissPar
+        MissPar
     End If
 End Function
 
@@ -31395,7 +31392,7 @@ Set offsetlist = Nothing
 End If
 End Function
 Function ProcKeyboard(basestack As basetask, rest$, Lang As Long) As Boolean
-Dim par As Boolean, s$, p As Variant, w3 As Long, G As gList
+Dim par As Boolean, s$, p As Variant, w3 As Long, g As gList
 Dim alt, shift, ctrl, again As Boolean
 On Error Resume Next
 If IsLabelSymbolNew(rest$, "жоятысе", "LOAD", Lang) Then

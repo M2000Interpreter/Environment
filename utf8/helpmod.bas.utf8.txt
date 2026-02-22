@@ -33,7 +33,7 @@ Public Declare Function SetBkMode Lib "gdi32" (ByVal hDC As Long, ByVal nBkMode 
 Public Declare Function DrawFrameControl Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal un1 As Long, ByVal un2 As Long) As Long
 Public Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal hDC As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
 Public Declare Function SetRect Lib "user32" (lpRect As RECT, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
-Public Declare Function OffsetRect Lib "user32" (lpRect As RECT, ByVal X As Long, ByVal y As Long) As Long
+Public Declare Function OffsetRect Lib "user32" (lpRect As RECT, ByVal X As Long, ByVal Y As Long) As Long
 
 Public Const DT_BOTTOM As Long = &H8&
 Public Const DT_CALCRECT As Long = &H400&
@@ -200,11 +200,11 @@ If many = 0 Then
 getIP = "127.0.0.1"
 Else
 For i = 0 To many - 1
-If l(i).GatewayIP <> "0.0.0.0" Then getIP = l(i).IP: Exit For
+If l(i).GatewayIP <> "0.0.0.0" Then getIP = l(i).iP: Exit For
 Next i
 If myVarType(getIP, vbEmpty) Then
 For i = 0 To many - 1
-If l(i).IP <> "0.0.0.0" Then getIP = l(i).IP: Exit For
+If l(i).iP <> "0.0.0.0" Then getIP = l(i).iP: Exit For
 Next i
 End If
 If myVarType(getIP, vbEmpty) Then getIP = "127.0.0.1"
@@ -226,12 +226,19 @@ Public Function Connected() As Boolean
 With New cTlsClient
     .NoError = True
     .SetTimeouts 100, 300, 200, 300
-     Connected = .Connect("142.250.187.100", 80)
+    ' problem with 142.250.187.100 sometime
+    If .Connect("142.250.187.100", 80) Then
+        Connected = True
+    ElseIf .Connect("142.250.187.10", 80) Then
+        Connected = True
+    ElseIf .Connect("142.250.187.0", 80) Then
+        Connected = True
+    End If
 End With
 End Function
 Public Function GetExternalIP() As String
 Static lastresp As String, stamp
-Dim m As clsHttpsRequest
+Dim M As clsHttpsRequest
 If Not Connected Then
     GetExternalIP = "127.0.0.1"
         stamp = Empty
@@ -242,12 +249,12 @@ Else
     Else
 there:
         stamp = CDec(Now + time)
-        Set m = New clsHttpsRequest
-        If m.HttpsRequest("https://ifconfig.co/ip") Then
-            lastresp = m.BodyFistLine
+        Set M = New clsHttpsRequest
+        If M.HttpsRequest("https://ifconfig.co/ip") Then
+            lastresp = M.BodyFistLine
             GetExternalIP = lastresp
-        ElseIf m.HttpsRequest("http://myip.dfbgaming.com") Then
-            lastresp = m.BodyFistLine
+        ElseIf M.HttpsRequest("http://myip.dfbgaming.com") Then
+            lastresp = M.BodyFistLine
             GetExternalIP = lastresp
         Else
             lastresp = "127.0.0.1"

@@ -1,10 +1,10 @@
 ﻿ΤΜΗΜΑ ΓΕΝΙΚΟ A {Const NoBomUtf8crlf = -2&
-Document tmp$
-Dir Appdir$
+Document tmp$, check$
+backdir$=Dir$
 Report Dir$
 Try {Subdir UTF8}
 Dir UTF8
-Dest$ = dir$
+Dest$ = Dir$
 Dir Appdir$
 Files "BAS|CLS|FRM"
 Menu
@@ -12,12 +12,31 @@ Files + "BAS|CLS|FRM"
 If MenuItems>0 then
 	For i=1 to MenuItems
 		Clear tmp$
-		Load.Doc tmp$, dir$+menu$(i), 1032
-		Save.Doc tmp$, Dest$+menu$(i)+".utf8.txt", NoBomUtf8crlf
-		Print Over $(0, 8),@(0), Int(i/MenuItems*100), "%"
+		Load.Doc tmp$, Dir$+menu$(i), 1032
+		if exist(Dest$+menu$(i)+".utf8.txt") then
+			load.doc check$, Dest$+menu$(i)+".utf8.txt", NoBomUtf8crlf
+			// this is the same without using load.doc, but use twice the  memory of document
+			// clear check$
+			// check$=string$(eval$(buffer(Dest$+menu$(i)+".utf8.txt")) as Utf8dec)
+			if len(check$)+2 = len(tmp$) then
+				if instr(tmp$, check$)=1 then
+					check$={
+					}
+				end if
+			end if
+			if check$<>tmp$ then
+				Save.Doc tmp$, Dest$+menu$(i)+".utf8.txt", NoBomUtf8crlf
+				Print Over $(0, 8),@(0), Int(i/MenuItems*100), "% -  Change file: ";menu$(i)
+			else
+				Print Over $(0, 8),@(0), Int(i/MenuItems*100), "%"
+			end if
+		else
+			Save.Doc tmp$, Dest$+menu$(i)+".utf8.txt", NoBomUtf8crlf
+			Print Over $(0, 8),@(0), Int(i/MenuItems*100), "%"
+		end if
 	Next
 End If
 Print
-Dir User
+Dir backdir$
 Report  Dir$
 }
