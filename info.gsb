@@ -5748,7 +5748,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 61 for M2000 Interpreter version 14, revision 0 and above"
+	Report " A collection of modules for tests version 62 for M2000 Interpreter version 14, revision 8 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -36984,7 +36984,7 @@ MODULE TURING {Module CheckIt {
 				data it
 			end while
 		}
-		Module Run (steps as long, display as Boolean) {
+		Module Run (steps as long, display as boolean) {
 			if len(.rules)=0 then error "No rules found"
 			if .Initial_State$="" or .Terminating_state$="" or .Blank_Symbol$="" then
 				error "Reset the machine please"
@@ -37018,10 +37018,8 @@ MODULE TURING {Module CheckIt {
 			Pen 12 {showstack()}
 			print "tape length: ";stack.size : flush
 			Refresh
-			pen 10 {Print "Press a key"}
-			push key$: drop
 			sub showstack()
-				local d$=format$("{0:-5} {1::-5} ", curState$, .head) 
+				local d$=format$("{0:-5} {1::-5} ", curState$, .head)
 				local i: for i=1 to min.data(stack.size, 60): d$+=.symbols#val$(stackitem(i)):Next
 				print d$
 			end sub
@@ -37037,7 +37035,7 @@ MODULE TURING {Module CheckIt {
 		.AddRule "q0", "B", "1", "stay", "qf"
 		.tape  "1", "1", "1"
 		.Run 100, true
-	}
+	}	
 	Turing2=Machine()
 	For Turing2 {
 		.init "Three-state busy beaver"
@@ -37049,7 +37047,6 @@ MODULE TURING {Module CheckIt {
 		.AddRule "c", "0", "1", "left", "b", 	"c", "1", "1", "stay", "halt"
 		.Run 1000, true
 	}
-	
 	For Turing1 {
 		.init "Sorter"
 		.States "A","B","C","D","E","X"
@@ -37067,7 +37064,6 @@ MODULE TURING {Module CheckIt {
 	}
 	Turing1.tape "b","b","b","a","b","a","b","a","a","a","b","b","a"
 	Turing1.Run 1000, false
-	
 	Turing3=Machine()
 	for Turing3 {
 		.init "5-state, 2-symbol probable Busy Beaver machine from Wikipedia"
@@ -37080,11 +37076,12 @@ MODULE TURING {Module CheckIt {
 		.AddRule "D", "0", "1", "left", "A",	"D", "1", "1", "left", "D"
 		.AddRule "E", "0", "1", "stay", "H", 	"E", "1", "0", "left", "A"
 		profiler
-		.Run 470, false //000000, false
+		.Run 4700, false //000000, false
 		Print round(timecount/1000,2);"s"    // estimated 12.5 hours for 47000000 steps
 	}
 }
 CheckIt
+
 }
 MODULE PYT {def long long total, prim, maxPeri=100,p
 while maxPeri <= 100000&&
@@ -45403,7 +45400,7 @@ do
 Until ucase$(key$)<>"Y"
 if module(infobasic) then keyboard "infobasic", 13
 }
-MODULE COMPLEX {Class Complex {
+MODULE COMPLEX1 {Class Complex {
 private:	
 	double vr, vi
 public:	
@@ -47506,10 +47503,6 @@ IF NOT EXIST("sqlite3.dll") THEN
 	REMOVE "urlmon"  ' unload library
 END IF
 IF NOT EXIST("sqlite3.dll") THEN EXIT
-IF EXIST("check.db") THEN
-	DOS "del "+DIR$+"check.db", 300;
-	IF EXIST("check.db") ELSE PRINT "OLD FILE DELETED"
-END IF
 CONST SQLITE_OK AS LONG = 0
 CONST SQLITE_STATIC AS LONG = 0, SQLITE_TRANSIENT AS LONG =-1
 CONST SQLITE_ROW AS LONG = 100, SQLITE_DONE AS LONG = 101
@@ -47589,7 +47582,7 @@ create$={
 	CREATE TABLE COMPANY(
 	ID 			INT64 PRIMARY KEY NOT NULL,
 	NAME 		TEXT NOT NULL,
-	AGE 			INT64 NOT NULL,
+	AGE 			INT NOT NULL,
 	ADDRESS  	CHAR(50),
 	SALARY  		REAL
 	);
@@ -47597,11 +47590,21 @@ create$={
 insertRow$={
 	INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY) VALUES (?1, ?2, ?3, ?4, ?5);
 }
+ReadFieldNamesAndTypes$={
+	PRAGMA TABLE_INFO(COMPANY)
+}
 ReadRows$={
 	SELECT * FROM COMPANY ORDER BY NAME
 }
-ret=sqlite3_open16(DIR$+"check.db", &db)
-BUFFER preparemem AS integer*10000  ' for 10000 characters
+Input "Use Disk (D) or Memory (M):";DM$
+if Left$(Ucase$(DM$))="D" then
+	if exist("check.db") then dos "del "+quote$(DIR$+"check.db");
+	ret=sqlite3_open16(DIR$+"check.db", &db)
+else
+	ret=sqlite3_open16(":memory:", &db)
+end if
+
+BUFFER preparemem AS INTEGER*10000  ' for 10000 characters
 compiled_statement=@process(db, preparemem, create$)
 IF compiled_statement<>0 THEN
 	ret=sqlite3_step(compiled_statement)
@@ -47628,6 +47631,28 @@ IF compiled_statement<>0 THEN
 END IF
 IF VALID(CANCEL) THEN GOTO 100
 PRINT "DATA INSERTED TO DATABASE AT TABLE COMPANY"
+VARIANT var0, var1, var2, var3, var4
+compiled_statement=@process(db, preparemem, ReadFieldNamesAndTypes$)
+IF compiled_statement<>0 THEN
+	ret=SQLITE_ROW
+	rows_counter=0
+	FLUSH
+	WHILE ret=SQLITE_ROW
+		ret=sqlite3_step(compiled_statement)
+		IF ret=SQLITE_ROW THEN
+			rows_counter++
+			var0=@sqlite_column_string(compiled_statement, 0&)
+			var1=@sqlite_column_string(compiled_statement, 1&)
+			var2=@sqlite_column_string(compiled_statement, 2&)
+			' 1 not null 0 can be null
+			var3=@sqlite_column_string(compiled_statement, 3&)
+			? var0, var1, var2, var3
+		END IF
+	END WHILE
+	PRINT "FOUND NUMBER OF FIELDS = ";rows_counter
+	ret=sqlite3_finalize(compiled_statement)
+END IF
+
 compiled_statement=@process(db, preparemem, ReadRows$)
 IF compiled_statement<>0 THEN
 	ret=SQLITE_ROW
@@ -47639,11 +47664,8 @@ IF compiled_statement<>0 THEN
 	PRINT "FOUND NUMBER OF ROWS = ";rows_counter
 	ret=sqlite3_reset(compiled_statement)
 	ret=SQLITE_ROW
-	// WORKS WITH VARIANTSOR WITH SPECIFIC TYPES
+	// WORKS WITH VARIANTS OR WITH SPECIFIC TYPES
 	// THESE ARE THE VARIABLES FILLING FROM DATABASE
-	REM	VARIANT var0, var1, var2, var3, var4
-	REM
-		DOUBLE  var4 : LONG var2 : LONG LONG var0 :STRING var1, var3
 	STRING headers="{0:8}|{1:10}|{2:3}|{3:20}|{4:10}"
 	STRING rowformat="{0:-8}|{1:10}|{2:-3}|{3:20}|{4:2:-10}"
 	STRING bar="{0:8}+{1:10}+{2:3}+{3:20}+{4:10}"
@@ -47678,7 +47700,7 @@ FUNCTION sqlite_column_string(stmt AS LONG, icol AS LONG)
 END FUNCTION
 FUNCTION process(this_db, prep, a$)
 	prep[0]=a$
-	LOCAL LONG z=len(a$)*2, ret, compiled_statement
+	LOCAL LONG z=LEN(a$)*2, ret, compiled_statement
 	LOCAL LONG where=prep(0), where0, last=z+where
 	DO	where0=where
 		z=last-where
@@ -47695,7 +47717,7 @@ FUNCTION bind_stack(that_stmt, Rtypes)
 		SELECT CASE array(m)
 		CASE txt
 			READ a$
-			ret+=sqlite3_bind_text16(that_stmt, m^+1, a$, len(a$)*2, SQLITE_TRANSIENT)
+			ret+=sqlite3_bind_text16(that_stmt, m^+1, a$, LEN(a$)*2, SQLITE_TRANSIENT)
 		CASE dbl
 			READ dbl1
 			ret+=sqlite3_bind_double(that_stmt, m^+1, dbl1)
@@ -47709,6 +47731,7 @@ FUNCTION bind_stack(that_stmt, Rtypes)
 	END WHILE
 	=ret=SQLITE_OK
 END FUNCTION
+
 }
 MODULE VER14 {module one_page_rastrer {
 	PRINTER.QUALITY 3
@@ -48908,6 +48931,496 @@ MODULE RUBIK {ΔΥΑΔΙΚΟ {
 	ΕΠΟΜΕΝΟ
 	Εμφάνισε=ΑΛΗΘΕΣ
 ΤΕΛΟΣ ΡΟΥΤΙΝΑΣ
+
+}
+MODULE MATRIX {Class MatrixWorks {
+private:
+	declare m math2
+public:
+	function final matrix2x2 {
+		method .m,"mxCreate", 2, 2,number, number, number, number as ret
+		=ret
+	}
+	function final matrix3x3 {
+		method .m,"mxCreate", 3, 3, number, number, number, number, number, number, number, number, number as ret
+		=ret
+	}
+	function final matrixNxM(n as long, m as long) {
+		if n<1 or m<1 then Error "Only positive numbers"
+		if stack.size<>n*m then Error "Missiing values"
+		method .m,"mxNull", n,m as ret
+		for i=0 to n*m-1: ret|d(i)=number:next
+		=ret
+	}	
+	function final DeterminantSquareMatrix(a as Matrix){
+		method .m, "mxDtm", a as ret:=ret
+	}
+	function final MultiplyMatrix(a as Matrix, b as Matrix){
+		method .m, "mxMul", a, b as ret : =ret
+	}
+	function final AddMatrix(a as Matrix, b as Matrix){
+		method .m, "mxAdd", a, b as ret : =ret
+	}
+	function final SubMatrix(a as Matrix, b as Matrix){
+		method .m, "mxSub", a, b as ret : =ret
+	}
+	function final MultiiplyMatrixReal(a as Matrix, b as double){
+		method .m, "mxMulReal", a, b as ret : =ret
+	}
+	function final TransposeMatrix(a as Matrix){
+		method .m, "mxTrans", a as ret : =ret
+	}
+	function final InverseMatrix(a as Matrix){
+		method .m, "mxInv", a as ret : =ret
+	}
+	function final identityMatrix(a as long){
+		method .m, "mxIdt", a as ret : =ret
+	}
+	function final NullMatrix(r as long, c as long){
+		method .m, "mxNull", r, c as ret : =ret
+	}
+	Module ViewMatrix (a as Matrix) {
+		print" type: ";a|col;" x "; a|row
+		local k
+		local i=a|col
+		local j=a|row
+		for k=0 to i*j-1
+			print Round(a|d(k), 3),:J--:if J=0 then ?:J=I
+		next
+		if not empty then print : restart
+	}
+}
+flush
+MW=MatrixWorks()
+print "q"
+q=MW.matrix2x2(1,2,3,4)
+MW.ViewMatrix q
+Print "Determinant of q";
+dm=MW.DeterminantSquareMatrix(q)
+Print " = ";dm
+print "z = q x q"
+z=MW.MultiplyMatrix(q,q)
+MW.ViewMatrix z
+Print "gg"
+qq=MW.MatrixNxM(4,4, 1,0,2,-1,3,0,0,5,2,1,4,-3,1,0,5,0)
+MW.ViewMatrix qq
+Print "Determinant of qq";
+qqdm=MW.DeterminantSquareMatrix(qq)
+
+Print " = ";qqdm
+print "m"
+'m=matrix3x3(4,-1,3,5,2,1,-2,7,0)
+'m=matrix3x3(1,2,3,7,4,5,6,8,9)
+m=MW.matrix3x3(6,1,1,4,-2,5,2,8,7)
+MW.ViewMatrix m
+Print "Determinant of m";
+dm=MW.DeterminantSquareMatrix(m)
+Print " = ";dm
+if dm<>0 then
+Print "Inverse Matrix of m and "
+z=MW.InverseMatrix(m)
+Print "inverse Matrix of Inverse Matrix of m"
+g=MW.InverseMatrix(z)
+MW.ViewMatrix z, g   ' two Matrixes display
+Print "g =  m x inverse Matrix of m"
+g=MW.MultiplyMatrix(z, g)
+MW.ViewMatrix g
+end if
+}
+MODULE SERVER1 {cls #222222,0
+Print "Server1"
+Print "Press Esc to shutdown the Server"
+cls 5,2
+binary {
+      iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACWklEQVR4AZRT3UtT
+      YRj/vYcxWLhd5LQb1xY00i6aUwfhVLof1U1RhC6vRPpYV5G4VqcivLCvgeCfYFNk
+      fUAX3djHpdsomJs5dqYQRRcmtBuX67w9zzt2AgvC8T7v+/y+nr2cs2nY9Vn+uHok
+      UzSSVMVMoVxTVTSKhJOs7bLDGqDrupYtlnXYbHlIGaPqJLNdlZSdhGOssYe9xKtl
+      DYicjc5KidtCCJtS/rGxxp7IuehsU1YDlgvGiBByrEn+7xRSjuUowz5taUnaBOR9
+      BnspkzKc1VoOGCdM0/ToiUnELo1jITWHn7XaX7NqxM0/nVMePREHZzirCYFQvV5H
+      xTCwtfUdL56lcffOLVSrVWsI9/f0BF4+TytPxSiDM5zVBMR+u92OQLDHCmxUKphJ
+      PqYHL1XNPHmEjfV1Sw/29IIznNXI8pWVkegoWlqc3KoqrOTxIZdFLptBobCiON6c
+      TheGL45yC85q2NFeEZJt7e2YiCfQ2uom2Fil0hpKa58agHbWbsRvwu1uI0R5ymp9
+      xw6tSiDNjNfnw9T0A5y/MIzwwBD6BwYRHhxCmE7mpqYfwuv1sRWc4az6HfzaMa/R
+      dTZZcTj2IXLyFMYvX0FHhwcez0HqryrO4XCwhcJykzMM1IDjAf9nCHmGiG0qtd6/
+      ewujXIZBT5x7RTa2bfaqDGE1gE6EuvxvIMzTdDX1/pxOJxYXUlicT8HlcrGFvhlV
+      9iivYvDnz8S4r8v/GpD9Aih002u9PjEJrkB3EMyx1vCwu1HWDRoQCB09nP/xTeuV
+      0oxT4AsX98yx1vQ1z98AAAD//zbMFRIAAAAGSURBVAMA8iAJqkWBAh0AAAAASUVO
+      RK5CYII=
+} as favicon
+locale 1033
+Flush
+Escape Off
+declare withevents Serversck SOCKET
+// Method Serversck, "StartTls"  ' not working yet
+Method Serversck, "create", SocketPort:=5080, SocketAddress:="localhost" as Ok
+// ? ok
+Method Serversck, "Listen" as ok
+// ? ok
+String sAddr
+Long lPort
+Method Serversck, "GetSockName", &sAddr, &lPort as ok
+If Ok Then
+	? "Address:";sAddr
+	? "Port:";lPort
+end if
+After 2000 {
+	browser "http://127.0.0.1:5080"
+}
+After 1500 {
+	win "http://127.0.0.1:5080"
+}
+Function Serversck_OnError {
+	stack
+}
+max_connections=100
+connections=0
+declare withevents c(max_connections) Socket
+ret=stack
+long id=0
+Boolean Use_Favicon = true
+Function Serversck_OnAccept {
+	local ok as boolean
+	if len(ret)>0 then
+		stack ret {
+			read new id
+		}
+		method Serversck, "Accept", c(id) as ok
+		if ok then print "New User "+id:connections++
+	else.if id<max_connections then
+         		method Serversck, "Accept", c(id) as ok
+                    If ok then
+            		print "New User "+id
+            		id++
+            		connections++
+            	end if
+        else
+		declare local c socket
+		method Serversck, "Accept", c as ok
+		if ok then
+			resp$={HTTP/1.1 503 Service Unavailable
+			Retry-After: 3600
+			Content-Type: text/html
+			Content-Length: #
+			Connection: keep-alive
+			
+			}
+			txt$={<html>
+			<head><title>503 Service Unavailable</title></head>
+			<body>
+			<h1>Service Unavailable</h1>
+			<p>The server is currently unable to handle the request due to a temporary overload.</p>
+			</body>
+			</html>
+			}
+			resp$=replace$( "#", str$(Len(string$(txt$ as UTF8enc))*2,""), resp$)+{
+			}+txt$
+			// print #-2, resp$
+			method c, "SendText", resp$ as new ok
+			? ok
+			method c,"close_"
+		end if
+	end if
+	
+}
+// modules called from event service fucntions
+module alfa (new s$) {
+	local txt$={<html>
+		<head><title>Bravo @</title>
+		<style>div {text-align: center;}</style>
+		</head>
+		<body>
+		<h1>Renspose to @</h1>
+		<p>bla bla bla</p>
+		<div><button type="button"  onclick="location.href='/'">Go Back</button></div>
+		</body>
+		</html>
+		}
+	txt$=replace$( "@", s$, txt$)
+	resp$=replace$( "#", str$(Len(string$(txt$ as UTF8enc))*2,""), resp$)+{
+	}+txt$
+	method c(id), "Sendtext",  resp$  as new ok
+	? ">>>>>>>>>>>>> ok"
+}
+module mainpage {
+	local txt$={<!DOCTYPE html>
+	<html>
+	<body>
+	<head>
+		<title>M2000 Html Server1</title>
+		<style>
+		div {text-align: center;}
+		</style>
+	</head>		
+	<h1>My First Heading</h1>
+	<p>My first paragraph.</p>
+	<p>Ελληνικά γράμματα</p>
+	<search>
+	<form>
+		<input name="something" id="something" placeholder="Search Server1">
+	</form>
+	</search>
+	<div>
+	<svg width="100" height="100">
+	<circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
+	Sorry, your browser does not support inline SVG.
+	</svg>
+	</div>
+	<div><button type="button"  onclick="location.href='/alfa.html'">Click Me!</button></div>
+	###
+	</body>
+	</html>
+	}
+	txt$=replace$("###",date$(today,  "long Date")+", "+time$(now,"Long Time"), txt$)
+	local resp$={HTTP/1.1 200 OK
+	Cache-Control: no-store
+	Content-Type: text/html; charset=UTF-8
+	Content-Length: #
+	Connection: keep-alive
+	
+	}
+	resp$=replace$( "#", str$(Len(string$(txt$ as UTF8enc))*2,""), resp$)+{
+	}+txt$
+	//print #-2, resp$
+	method c(id), "SendText", resp$ as new ok
+	? ok
+}
+function c_OnReceive (new id){
+	Print "OnReceive "+id
+	method c(id), "ReceiveText"  as new txt$
+	Print #-2,  txt$
+	if left$(txt$, 14) = "GET / HTTP/1.1" then
+		call local mainpage
+	else.if Ucase$(left$(txt$, 16)) = "GET /?SOMETHING=" then
+		local search$=string$(filter$(leftpart$(mid$(txt$, 17), " "), "@") as URLdec +)
+		local resp$={HTTP/1.1 200 OK
+			Content-Type: text/html; charset=UTF-8
+			Content-Length: #
+			Location: http://127.0.0.1:5080/alfa.html
+			
+			}
+		call local alfa, search$
+	else.if UCASE$(left$(txt$, 15)) = "GET /ALFA.HTML " then
+		local resp$={HTTP/1.1 200 OK
+			Cache-Control: no-store
+			Content-Type: text/html; charset=UTF-8
+			Content-Length: #
+			Connection: keep-alive
+			
+			}
+		call local alfa, "You"
+	else.if UCASE$(left$(txt$, 25)) = "GET /FAVICON.ICO HTTP/1.1" then
+		if  Use_Favicon then
+			Print "Favicon..."
+			local resp$={HTTP/1.1 201 OK
+				Content-Type: image/png
+				Content-Length: #
+				Cache-Control: public, max-age=31536000
+				
+				}
+			resp$=replace$( "#", str$(Len( favicon),""), resp$)
+			method c(id), "Sendtext",  resp$  as new ok
+			method c(id), "Send", favicon(0), len(favicon) as new total_send
+			? total_send, Len(favicon)
+			? "connections = ";connections
+		else
+			local resp$={
+			HTTP/1.1 204 No Content
+			Cache-Control: public, max-age=31536000
+			
+			}
+			method c(id), "Sendtext",  resp$  as new ok
+		end if
+	end if
+}
+function c_OnClose(new id) {
+	method c(id), "Close_"
+	stack ret {push id}
+	Print "close "+id
+	connections--
+	Print "opened connections: ";connections
+	Print Ret
+	refresh
+}
+function c_OnError(new id, erNum, mask) {
+	Print "Error "+id
+	Hex erNum
+	method c(id), "GetErrorDescription",erNum  as new ret$
+	Print "Description: "; ret$
+	Print "Mask "+mask
+}
+do
+	if keypress(27) then exit
+	refresh
+	wait 100
+always
+declare Serversck nothing
+Escape on
+Browser ""
+}
+MODULE FFT {' print $("0.000", 16)   ' #1 (use #1, #2, #3 for 4 decimals for printing numbers )
+locale 1033
+open "output.txt" for wide output as #F
+complex buf[7], out[7]
+buf[0]|r = 1: buf[1]|r = 1: buf[2]|r = 1: buf[3] = (1, 0i)
+showArr(buf, "Input")
+FFT(out, buf, 0, 1, 8)
+ShowArr(out, "Output")
+' print $("") ' #2
+close #F
+print #-2, eval$(buffer(dir$+"output.txt"))
+Sub ShowArr(m, mes as string)
+	local n, mx=len(m)
+	print #F, mes;": (real imag abs)"
+	while n<mx
+		' print m[n]  ' #3
+		' round(number) round to 13th decimal, is same as round(exp, 13)
+		' modulus of complex number Mod(complex)
+		print #F, format$("{0:0:-10} {1:-10} {2:-12}",m[n]|r, round(m[n]|i, 4)+"", round(mod(m[n]), 8)+"")
+		n++
+	end while
+End Sub
+Sub FFT()
+	Shift 5
+	Read New N as long
+	FFT1()		
+End Sub
+' FFT1() use N always
+Sub  FFT1(buf as *Complex[], out as *Complex[], begin as Long, stp as Long)
+	If stp < N Then
+		FFT1(out, buf, begin, 2 * stp)
+		FFT1(out, buf, begin + stp, 2 * stp)
+		Local i as long, t as complex
+		for i=0 to N-1 step 2*stp
+			t = Polar(1, -pi* i / N) * out[begin + i + stp]
+			buf[begin + i  div 2] = out[begin + i] + t
+			buf[begin + (i + N)  div 2] = out[begin + i] - t
+		next
+	End If
+End Sub
+
+
+}
+MODULE SIMPSON {module Lyness`s_Adaptive_Simpson`s_Rule{
+	simpson_rule = lambda
+		(&f(), a, fa, b, fb)
+		->{
+			m = (a + b) / 2
+			fm = f(m)
+			h = b - a
+			= m, fm, (h / 6) * (fa + 4*fm + fb)
+		}
+	recursive_simpson = lambda
+		simpson_rule
+		(&f(), a, fa, b, fb, tol, whole, m, fm, depth)
+		->{
+			(lm, flm, left)  = simpson_rule(&f(), a, fa, m, fm)
+			(rm, frm, right) = simpson_rule(&f(), m, fm, b, fb)
+			delta = left + right - whole
+			tolA = tol / 2
+			if depth <= 0 or tolA == tol or abs(delta) <= 15 * tol then
+				= left + right + (delta / 15)
+			else
+				= lambda(&f(), a, fa, m, fm, tolA, left , lm, flm, depth - 1) + lambda(&f(), m, fm, b, fb, tolA, right, rm, frm, depth - 1)
+			end if
+		}
+	quad_asr = lambda
+		simpson_rule,
+		recursive_simpson
+		(&f(), a, b, tol, depth)
+		->{
+			fa = f(a)
+			fb = f(b)
+			(m, fm, whole) = simpson_rule(&f(), a, fa, b, fb)
+			=recursive_simpson(&f(), a, fa, b, fb, tol, whole, m, fm, depth)
+		}
+	function mySin(x) {
+		=rSin(x)
+	}
+	a = 0
+	b = 1
+	sinx = quad_asr(&mySin(), a, b, 1e-09, 100)
+	Print format$("Simpson's integration of sine from {0} to {1} = {2:12:-14}", a, b, sinx)
+}
+Lyness`s_Adaptive_Simpson`s_Rule
+
+}
+MODULE TEACHER {Escape Off
+Const proportional = 4, terminal_style = 0
+Volume 100
+Form 60
+Pen 14
+Cls #ff2000
+Print $(proportional),
+Double
+Print "English Lesson 1"
+Normal
+Cls 5, row
+Refresh
+For i=1 to Speech {
+      Print "Voice "+i+": "+Speech$(i)
+}
+if instr(Speech$(1),"Zina")=0 then
+	Const male=2, female=1
+else
+	Const male=1, female=2
+end if
+Const on=1, off=0
+Flush
+Data ("George","Athens", male, false)
+Data ("Alexander", "Marusi", male, true)
+Data ("Katerina", "Marusi", female, true)
+database=array([])
+
+If Speech<2 Then Print "I need two voices at least": Goto exit1
+Speech {<silence msec="500"/>}  ' start engine and pause for half second.
+do
+	Italic on : Pen #AAAA00 {Print "Hold Esc to Exit"}: Italic off
+	a=database#Val(Random(0,2))
+	Say("Teacher","Hi; What"+If$(Random(1,2)->"'s", " is")+" your name?", 2)
+	Say(a#Val$(0),"Hello; My name is "+a#Val$(0)+".", a#Val(2), a#Val(3))
+	If Keypress(27) Then Exit 	
+	Say("Teacher","Where are you from, "+a#Val$(0)+"?", 2)
+	Say(a#Val$(0),"I"+If$(Random(1,2)->"'m", " am")+" from "+@emph$(a#Val$(1))+".", a#Val(2), a#Val(3))
+	If Keypress(27) Then Exit
+Always
+Pen #AAbb77 {
+	Say("Teacher","That's it for today. "+@emph$("Goodbye."), 2)
+}
+exit1:
+Print $(terminal_style),
+While Keypress(27) {Wait 10}
+Escape on
+End
+Function emph$(a$)
+	="<emph>"+a$+"</emph>"
+End Function
+Function clear$(a$)
+	Local b=1, c
+	Do
+		b=Instr(a$, "<", b)
+		If b>0 Then
+			c=Instr(a$, ">", b+1)
+			If c>0 Then
+				Insert b, c-b+1 a$=""
+			Else
+				b=0
+			End If
+		Else
+			b=0
+		End If
+	When b>0
+	=a$
+End Function
+Sub Say(who$, that$, gender as integer, teen as boolean=false)
+	Print who$+": "+@clear$(that$)
+	Refresh
+	If teen Then
+		Speech ";"+that$!, gender
+	Else
+		Speech ";"+that$, gender
+	End If
+End Sub
 
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

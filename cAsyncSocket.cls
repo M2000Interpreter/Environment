@@ -198,7 +198,7 @@ Private Declare Function FormatMessage Lib "kernel32" Alias "FormatMessageW" (By
 Private Declare Function PostMessage Lib "user32" Alias "PostMessageW" (ByVal hWnd As Long, ByVal wMsg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
 Private Declare Function WideCharToMultiByte Lib "kernel32" (ByVal CodePage As Long, ByVal dwFlags As Long, ByVal lpWideCharStr As Long, ByVal cchWideChar As Long, lpMultiByteStr As Any, ByVal cchMultiByte As Long, ByVal lpDefaultChar As Long, ByVal lpUsedDefaultChar As Long) As Long
 Private Declare Function MultiByteToWideChar Lib "kernel32" (ByVal CodePage As Long, ByVal dwFlags As Long, lpMultiByteStr As Any, ByVal cchMultiByte As Long, ByVal lpWideCharStr As Long, ByVal cchWideChar As Long) As Long
-Private Declare Function CreateWindowEx Lib "user32" Alias "CreateWindowExW" (ByVal dwExStyle As Long, ByVal lpClassName As Long, ByVal lpWindowName As Long, ByVal dwStyle As Long, ByVal lX As Long, ByVal lY As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hWndParent As Long, ByVal hMenu As Long, ByVal hInstance As Long, lpParam As Any) As Long
+Private Declare Function CreateWindowEx Lib "user32" Alias "CreateWindowExW" (ByVal dwExStyle As Long, ByVal lpClassName As Long, ByVal lpWindowName As Long, ByVal dwStyle As Long, ByVal Lx As Long, ByVal lY As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hWndParent As Long, ByVal hMenu As Long, ByVal hInstance As Long, lpParam As Any) As Long
 Private Declare Function SetWindowLong Lib "user32" Alias "SetWindowLongW" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 Private Declare Function vbaObjSetAddref Lib "msvbvm60" Alias "__vbaObjSetAddref" (oDest As Any, ByVal lSrcPtr As Long) As Long
 Private Declare Function GetCurrentProcessId Lib "kernel32" () As Long
@@ -225,10 +225,10 @@ Private Declare Function ws_getpeername Lib "ws2_32" Alias "getpeername" (ByVal 
 Private Declare Function ws_getsockname Lib "ws2_32" Alias "getsockname" (ByVal s As Long, ByRef Name As SOCKADDR_IN, ByRef namelen As Long) As Long
 Private Declare Function ws_shutdown Lib "ws2_32" Alias "shutdown" (ByVal s As Long, ByVal How As Long) As Long
 Private Declare Function ws_listen Lib "ws2_32" Alias "listen" (ByVal s As Long, ByVal backlog As Long) As Long
-Private Declare Function ws_accept Lib "ws2_32" Alias "accept" (ByVal s As Long, Addr As Any, addrlen As Any) As Long
+Private Declare Function ws_accept Lib "ws2_32" Alias "accept" (ByVal s As Long, addr As Any, addrlen As Any) As Long
 Private Declare Function ws_ioctlsocket Lib "ws2_32" Alias "ioctlsocket" (ByVal s As Long, ByVal cmd As Long, argp As Long) As Long
-Private Declare Function ws_getsockopt Lib "ws2_32" Alias "getsockopt" (ByVal s As Long, ByVal level As Long, ByVal optname As Long, optval As Any, optlen As Long) As Long
-Private Declare Function ws_setsockopt Lib "ws2_32" Alias "setsockopt" (ByVal s As Long, ByVal level As Long, ByVal optname As Long, optval As Any, ByVal optlen As Long) As Long
+Private Declare Function ws_getsockopt Lib "ws2_32" Alias "getsockopt" (ByVal s As Long, ByVal Level As Long, ByVal optname As Long, optval As Any, optlen As Long) As Long
+Private Declare Function ws_setsockopt Lib "ws2_32" Alias "setsockopt" (ByVal s As Long, ByVal Level As Long, ByVal optname As Long, optval As Any, ByVal optlen As Long) As Long
 Private Declare Function ws_inet_addr Lib "ws2_32" Alias "inet_addr" (ByVal cp As String) As Long
 Private Declare Function ws_gethostbyname Lib "ws2_32" Alias "gethostbyname" (ByVal host_name As String) As Long
 Private Declare Function ws_gethostname Lib "ws2_32" Alias "gethostname" (ByVal host_name As String, ByVal namelen As Long) As Long
@@ -348,7 +348,7 @@ Private m_uWindowState()        As UcsHelperWindowStateType
 #End If
 
 Private Type UcsAsyncGetHostByNameType
-    Handle              As Long
+    handle              As Long
     Port                As Long
     Buffer(0 To MAXGETHOSTSTRUCT) As Byte
 End Type
@@ -359,14 +359,14 @@ Private Type UcsHelperWindowStateType
     Cleanup             As IUnknown
     SocketPtr()         As Long
     Pos                 As Long
-    count               As Long
+    Count               As Long
 End Type
 
 '=========================================================================
 ' Error handling
 '=========================================================================
-Sub debugLog(q As String, b As String, c As String, d As Long)
-MsgBox q & vbCrLf & b & vbCrLf & c & vbCrLf & d, vbCritical, "Look"
+Sub debugLog(q As String, b As String, c As String, D As Long)
+MsgBox q & vbCrLf & b & vbCrLf & c & vbCrLf & D, vbCritical, "Look"
 End Sub
 Private Sub PrintError(sFunction As String)
     #If ImplUseDebugLog Then
@@ -392,13 +392,13 @@ Friend Property Get LastError() As VBA.ErrObject
     End With
 End Property
 
-Public Property Get SockOpt(ByVal OptionName As UcsAsyncSocketOptionNameEnum, Optional ByVal level As UcsAsyncSocketOptionLevelEnum = ucsSolSocket) As Long
-    Call ws_getsockopt(m_hSocket, level, OptionName, SockOpt, LenB(SockOpt))
+Public Property Get SockOpt(ByVal OptionName As UcsAsyncSocketOptionNameEnum, Optional ByVal Level As UcsAsyncSocketOptionLevelEnum = ucsSolSocket) As Long
+    Call ws_getsockopt(m_hSocket, Level, OptionName, SockOpt, LenB(SockOpt))
     m_lLastError = Err.LastDllError
 End Property
 
-Public Property Let SockOpt(ByVal OptionName As UcsAsyncSocketOptionNameEnum, Optional ByVal level As UcsAsyncSocketOptionLevelEnum = ucsSolSocket, ByVal Value As Long)
-    Call ws_setsockopt(m_hSocket, level, OptionName, Value, LenB(Value))
+Public Property Let SockOpt(ByVal OptionName As UcsAsyncSocketOptionNameEnum, Optional ByVal Level As UcsAsyncSocketOptionLevelEnum = ucsSolSocket, ByVal Value As Long)
+    Call ws_setsockopt(m_hSocket, Level, OptionName, Value, LenB(Value))
     m_lLastError = Err.LastDllError
 End Property
 
@@ -442,7 +442,7 @@ End Property
 
 Private Property Get pvResolveHandle() As Long
     If Peek(ArrPtr(m_uGetHostByName)) <> 0 Then
-        pvResolveHandle = m_uGetHostByName(0).Handle
+        pvResolveHandle = m_uGetHostByName(0).handle
     End If
 End Property
 
@@ -681,10 +681,10 @@ End Function
 
 Public Sub Close_()
     Const FUNC_NAME     As String = "Close_"
-    
+    Debug.Print "Close cAsync"
     On Error GoTo EH
     If pvResolveHandle <> 0 Then
-        Call WSACancelAsyncRequest(m_uGetHostByName(0).Handle)
+        Call WSACancelAsyncRequest(m_uGetHostByName(0).handle)
         Erase m_uGetHostByName
     End If
     If m_hSocket <> INVALID_SOCKET Then
@@ -708,8 +708,8 @@ Public Function Connect(HostAddress As String, ByVal HostPort As Long) As Boolea
         ReDim m_uGetHostByName(0 To 0) As UcsAsyncGetHostByNameType
         m_uGetHostByName(0).Port = HostPort
         '--- note: concat "" to prevent passing NULL for HostAddress
-        m_uGetHostByName(0).Handle = WSAAsyncGetHostByName(m_oHelperWindow.frMessageHWnd, WM_SOCKET_RESOLVE, HostAddress & "", m_uGetHostByName(0).Buffer(0), MAXGETHOSTSTRUCT)
-        If m_uGetHostByName(0).Handle = 0 Then
+        m_uGetHostByName(0).handle = WSAAsyncGetHostByName(m_oHelperWindow.frMessageHWnd, WM_SOCKET_RESOLVE, HostAddress & "", m_uGetHostByName(0).Buffer(0), MAXGETHOSTSTRUCT)
+        If m_uGetHostByName(0).handle = 0 Then
             m_lLastError = Err.LastDllError
             Erase m_uGetHostByName
             GoTo QH
@@ -1720,7 +1720,7 @@ Public Function SyncWaitForEvent( _
 QH:
     m_bBlocking = bBlocking
     If Not m_cMsgQueue Is Nothing Then
-        If m_cMsgQueue.count > 0 Then
+        If m_cMsgQueue.Count > 0 Then
             Call PostMessage(hWnd, WM_SOCKET_NOTIFY + m_lIndex, INVALID_SOCKET, 0)
         End If
     End If
@@ -1739,7 +1739,7 @@ Public Sub SyncProcessMsgQueue()
     
     On Error GoTo EH
     If Not m_cMsgQueue Is Nothing Then
-        Do While m_cMsgQueue.count > 0
+        Do While m_cMsgQueue.Count > 0
             vElem = m_cMsgQueue.item(1)
             m_cMsgQueue.Remove 1
             Select Case vElem(0)
@@ -1775,7 +1775,7 @@ Friend Function frAddSocket(Socket As cAsyncSocket, Index As Long) As Boolean
             Exit Function
         End If
         lSize = UBound(.SocketPtr) + 1
-        If .count >= lSize Then
+        If .Count >= lSize Then
             lSize = 2 * lSize
             If lSize > MAX_SOCKETS Then
                 lSize = MAX_SOCKETS
@@ -1788,7 +1788,7 @@ Friend Function frAddSocket(Socket As cAsyncSocket, Index As Long) As Boolean
                 '--- note: weak reference
                 .SocketPtr(Index) = ObjPtr(Socket)
                 .Pos = Index + 1
-                .count = .count + 1
+                .Count = .Count + 1
                 '--- success
                 frAddSocket = True
                 Exit Function
@@ -1815,7 +1815,7 @@ Friend Function frRemoveSocket(Socket As cAsyncSocket, Index As Long) As Boolean
             Debug.Assert .SocketPtr(Index) = ObjPtr(Socket)
             .SocketPtr(Index) = 0
             Index = -1
-            .count = .count - 1
+            .Count = .Count - 1
         End If
         '--- success
         frRemoveSocket = True

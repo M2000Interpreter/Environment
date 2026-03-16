@@ -625,12 +625,12 @@ Public Property Get SniRequested() As String
     SniRequested = m_uCtx.SniRequested
 End Property
 
-Public Property Get SockOpt(ByVal OptionName As UcsAsyncSocketOptionNameEnum, Optional ByVal level As UcsAsyncSocketOptionLevelEnum = ucsSolSocket) As Long
-    SockOpt = m_oSocket.SockOpt(OptionName, level)
+Public Property Get SockOpt(ByVal OptionName As UcsAsyncSocketOptionNameEnum, Optional ByVal Level As UcsAsyncSocketOptionLevelEnum = ucsSolSocket) As Long
+    SockOpt = m_oSocket.SockOpt(OptionName, Level)
 End Property
 
-Public Property Let SockOpt(ByVal OptionName As UcsAsyncSocketOptionNameEnum, Optional ByVal level As UcsAsyncSocketOptionLevelEnum = ucsSolSocket, ByVal Value As Long)
-    m_oSocket.SockOpt(OptionName, level) = Value
+Public Property Let SockOpt(ByVal OptionName As UcsAsyncSocketOptionNameEnum, Optional ByVal Level As UcsAsyncSocketOptionLevelEnum = ucsSolSocket, ByVal Value As Long)
+    m_oSocket.SockOpt(OptionName, Level) = Value
 End Property
 
 Public Property Get CallbackWeakRef() As Object
@@ -681,7 +681,7 @@ Public Function InitServerTls( _
         If pvPkiPkcs12ImportCertificates(CertFile, Password, cCerts, cPrivKey) Then
             GoTo StartTls
         End If
-        If pvPkiPemImportCertificates(Split(CertFile, "|"), Password, cCerts, cPrivKey) Then
+        If pvPkiPemImportCertificates(split(CertFile, "|"), Password, cCerts, cPrivKey) Then
             GoTo StartTls
         End If
         pvSetLastError vbObjectError, MODULE_NAME & "." & FUNC_NAME, ERR_NO_CERTIFICATE
@@ -1055,6 +1055,7 @@ Public Function GetErrorDescription(ByVal ErrorCode As Long) As String
 End Function
 
 Public Sub Close_()
+    Debug.Print "Close cTlsSocket"
     If m_bUseTls Then
         If TlsIsReady(m_uCtx) And Not TlsIsShutdown(m_uCtx) Then
             If Not pvHandleShutdown() Then
@@ -1974,7 +1975,7 @@ Public Function ImportPemCertificates(CertFile As String, Optional Password As S
     Dim cPrivKey        As Collection
 
     pvSetLastError
-    If pvPkiPemImportCertificates(Split(CertFile, "|"), Password, cCerts, cPrivKey) Then
+    If pvPkiPemImportCertificates(split(CertFile, "|"), Password, cCerts, cPrivKey) Then
         Set LocalCertificates = cCerts
         Set LocalPrivateKey = cPrivKey
         '--- success
@@ -2590,7 +2591,7 @@ Private Function pvPkiCertValidate(ByVal sHostName As String, cCerts As Collecti
             sApiSource = "CertAddEncodedCertificateToStore"
             GoTo QH
         End If
-        If SearchCollection(cStatuses, lIdx, RetVal:=baCert) Then
+        If SearchCollection(cStatuses, lIdx, retval:=baCert) Then
             If pvArraySize(baCert) > 0 Then
                 uProp.cbData = pvArraySize(baCert)
                 uProp.pbData = VarPtr(baCert(0))
@@ -2803,7 +2804,7 @@ EH:
 End Function
 
 #If ImplTlsServer Then
-Private Function pvPkiPemGetTextPortions(sContents As String, sBoundary As String, Optional RetVal As Collection) As Collection
+Private Function pvPkiPemGetTextPortions(sContents As String, sBoundary As String, Optional retval As Collection) As Collection
     Dim vSplit          As Variant
     Dim lIdx            As Long
     Dim lJdx            As Long
@@ -2812,10 +2813,10 @@ Private Function pvPkiPemGetTextPortions(sContents As String, sBoundary As Strin
     Dim lSize           As Long
     Dim sPortion        As String
     
-    If RetVal Is Nothing Then
-        Set RetVal = New Collection
+    If retval Is Nothing Then
+        Set retval = New Collection
     End If
-    vSplit = Split(Replace(sContents, vbCr, vbNullString), vbLf)
+    vSplit = split(Replace(sContents, vbCr, vbNullString), vbLf)
     For lIdx = 0 To UBound(vSplit)
         If Not bInside Then
             If InStr(vSplit(lIdx), "-----BEGIN " & sBoundary & "-----") > 0 Then
@@ -2833,8 +2834,8 @@ Private Function pvPkiPemGetTextPortions(sContents As String, sBoundary As Strin
                         lSize = lSize + Len(vSplit(lJdx))
                     End If
                 Next
-                If Not SearchCollection(RetVal, sPortion) Then
-                    RetVal.Add FromBase64Array(sPortion), sPortion
+                If Not SearchCollection(retval, sPortion) Then
+                    retval.Add FromBase64Array(sPortion), sPortion
                 End If
                 bInside = False
             ElseIf InStr(vSplit(lIdx), ":") = 0 Then
@@ -2842,7 +2843,7 @@ Private Function pvPkiPemGetTextPortions(sContents As String, sBoundary As Strin
             End If
         End If
     Next
-    Set pvPkiPemGetTextPortions = RetVal
+    Set pvPkiPemGetTextPortions = retval
 End Function
 #End If
 
@@ -2913,10 +2914,10 @@ Private Function pvPkiAppendCertContext(ByVal pCertContext As Long, cCerts As Co
         cCerts.Add baBuffer
     End If
     If pvPkiExportPrivateKey(pCertContext, DeleteKeyset, cPrivKey) Then
-        If cCerts.count > 1 Then
+        If cCerts.Count > 1 Then
             '--- move certificate w/ private key to the beginning of the collection
-            baBuffer = cCerts.item(cCerts.count)
-            cCerts.Remove cCerts.count
+            baBuffer = cCerts.item(cCerts.Count)
+            cCerts.Remove cCerts.Count
             cCerts.Add baBuffer, Before:=1
         End If
         '--- success
@@ -3559,7 +3560,7 @@ End Function
 
 Private Function pvCollectionCount(oCol As Collection) As Long
     If Not oCol Is Nothing Then
-        pvCollectionCount = oCol.count
+        pvCollectionCount = oCol.Count
     End If
 End Function
 

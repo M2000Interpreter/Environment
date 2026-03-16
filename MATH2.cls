@@ -338,9 +338,9 @@ End Function
 ' // The square root of a complex number
 Public Function cxSqr(Op As Complex) As Complex
 On Error Resume Next
-    Dim M As Double, a As Double
-    M = Sqr(cxMod(Op)): a = cxArg(Op) / 2
-    cxSqr.r = M * Cos(a): cxSqr.i = M * Sin(a)
+    Dim M As Double, A As Double
+    M = Sqr(cxMod(Op)): A = cxArg(Op) / 2
+    cxSqr.r = M * Cos(A): cxSqr.i = M * Sin(A)
 End Function
 
 ' // Module of a complex number
@@ -649,20 +649,20 @@ End Function
 
 ' // The natural logarithm of a complex number
 Public Function cxlog(Op As Complex) As Complex
-    Dim M As Double, a As Double
-    M = cxMod(Op): a = cxArg(Op)
-    cxlog.r = Log(M): cxlog.i = a
+    Dim M As Double, A As Double
+    M = cxMod(Op): A = cxArg(Op)
+    cxlog.r = Log(M): cxlog.i = A
 End Function
 Public Function cxlogVar(Op) As Complex
-    Dim M As Double, a As Double
-    M = cxModVar(Op): a = cxArgVar(Op)
-    cxlogVar.r = Log(M): cxlogVar.i = a
+    Dim M As Double, A As Double
+    M = cxModVar(Op): A = cxArgVar(Op)
+    cxlogVar.r = Log(M): cxlogVar.i = A
 End Function
 ' // The logarithm of a complex number by base X
 Public Function cxLogX(Op As Complex, ByVal Base As Double) As Complex
-    Dim M As Double, a As Double, Nc As Complex
-    M = cxMod(Op): a = cxArg(Op): Nc.r = Log(Base)
-    cxLogX.r = Log(M): cxLogX.i = a
+    Dim M As Double, A As Double, Nc As Complex
+    M = cxMod(Op): A = cxArg(Op): Nc.r = Log(Base)
+    cxLogX.r = Log(M): cxLogX.i = A
     cxLogX = cxDiv(cxLogX, Nc)
 End Function
 
@@ -831,11 +831,11 @@ Public Function mxNull(ByVal Row As Long, ByVal Col As Long) As Matrix
 End Function
 
 ' // Creating the identity matrix
-Public Function mxIdt(ByVal Size As Long) As Matrix
+Public Function mxIdt(ByVal size As Long) As Matrix
     Dim ij As Long
-    If Size <= 0 Then Exit Function
-    ReDim mxIdt.D(Size * Size - 1): mxIdt.Col = Size: mxIdt.Row = Size
-    For ij = 0 To Size - 1: mxIdt.D(ij + (ij * Size)) = 1: Next
+    If size <= 0 Then Exit Function
+    ReDim mxIdt.D(size * size - 1): mxIdt.Col = size: mxIdt.Row = size
+    For ij = 0 To size - 1: mxIdt.D(ij + (ij * size)) = 1: Next
 End Function
 
 ' // Transpose matrix
@@ -878,7 +878,7 @@ End Function
 
 ' // Multiplication of a two matrix
 Public Function mxMul(Op1 As Matrix, Op2 As Matrix) As Matrix
-    Dim p As Long, i As Long, j As Long, K As Long, iM As Long, i1 As Long, i2 As Long
+    Dim p As Long, i As Long, j As Long, k As Long, iM As Long, i1 As Long, i2 As Long
     GetMem4 ByVal ArrPtr(Op1.D), p: If p = 0 Then Exit Function
     GetMem4 ByVal ArrPtr(Op2.D), p: If p = 0 Then Exit Function
     If Op1.Col <> Op2.Row Then Exit Function
@@ -886,8 +886,8 @@ Public Function mxMul(Op1 As Matrix, Op2 As Matrix) As Matrix
     For i = 0 To Op1.Row - 1
         For j = 0 To Op2.Col - 1
         i2 = j
-        For K = 0 To Op1.Col - 1
-            mxMul.D(iM) = mxMul.D(iM) + Op1.D(i1 + K) * Op2.D(i2)
+        For k = 0 To Op1.Col - 1
+            mxMul.D(iM) = mxMul.D(iM) + Op1.D(i1 + k) * Op2.D(i2)
             i2 = i2 + Op2.Col
         Next
         iM = iM + 1
@@ -901,14 +901,135 @@ Public Function mxDtm(Op As Matrix) As Double
     Dim p1 As Long, p2 As Long, ij1 As Long, ij2 As Long, Ct As Long, l As Long, t1 As Double, t2 As Double
     GetMem4 ByVal ArrPtr(Op.D), p1: If p1 = 0 Then Exit Function
     If Op.Col <> Op.Row Then Exit Function
-    p2 = Op.Col - 1: ij1 = 0: ij2 = p2: Ct = Op.Col * Op.Row: p1 = Op.Col + 1
-    For K = 0 To Op.Col - 1
-        t1 = Op.D(ij1): t2 = Op.D(ij2)
-        For l = 1 To Op.Col - 1
-            ij1 = (ij1 + p1) Mod Ct: ij2 = (ij2 + p2) Mod Ct
-            t1 = t1 * Op.D(ij1): t2 = t2 * Op.D(ij2)
-        Next
-        mxDtm = mxDtm + t1 - t2: ij1 = (ij1 + p1) Mod Ct: ij2 = (ij2 + p2) Mod Ct
-    Next
+    mxDtm = Determinant(Op)
+End Function
+' Function to compute determinant using Gaussian Elimination
+Private Function Determinant(z As Matrix) As Double
+    Dim N As Integer, i As Integer, j As Integer, k As Integer
+    Dim pivot As Integer, maxRow As Integer
+    Dim factor As Double, det As Double, temp As Double
+    Dim size As Integer
+    size = z.Row
+    det = 1
+    
+    ' Create a working copy to avoid modifying the original
+    Dim mat() As Double, q As Integer
+    
+    ReDim mat(0 To size - 1, 0 To size - 1)
+    For i = 0 To size - 1
+        For j = 0 To size - 1
+            mat(i, j) = z.D(q): q = q + 1
+        Next j
+    Next i
+
+    For i = 0 To size - 1
+        ' Pivot selection
+        maxRow = i
+        For j = i + 1 To size - 1
+            If Abs(mat(j, i)) > Abs(mat(maxRow, i)) Then maxRow = j
+        Next j
+        
+        ' Swap rows
+        If maxRow <> i Then
+            For k = 0 To size - 1
+                temp = mat(i, k)
+                mat(i, k) = mat(maxRow, k)
+                mat(maxRow, k) = temp
+            Next k
+            det = det * -1 ' Swapping rows changes sign
+        End If
+        
+        If Abs(mat(i, i)) < 0.0000000001 Then
+            Determinant = 0 ' Singular matrix
+            Exit Function
+        End If
+        
+        det = det * mat(i, i)
+        
+        ' Elimination
+        For j = i + 1 To size - 1
+            factor = mat(j, i) / mat(i, i)
+            For k = i + 1 To size - 1
+                mat(j, k) = mat(j, k) - factor * mat(i, k)
+            Next k
+        Next j
+    Next i
+    
+    Determinant = det
+End Function
+Public Function mxInv(z As Matrix) As Matrix
+    Dim i As Long, j As Long, k As Long, N As Long, q As Integer
+    Dim temp As Double
+    Dim pivot As Double
+    Dim Aug() As Double
+    N = z.Row
+    ' Augmented matrix: [A | I]
+    ReDim Aug(1 To N, 1 To 2 * N)
+    ReDim Inv(1 To N, 1 To N)
+    
+    ' Build augmented matrix
+    For i = 1 To N
+        For j = 1 To N
+            Aug(i, j) = z.D(q): q = q + 1
+        Next j
+        For j = 1 To N
+            If i = j Then
+                Aug(i, N + j) = 1#
+            Else
+                Aug(i, N + j) = 0#
+            End If
+        Next j
+    Next i
+    
+    ' Gauss-Jordan elimination
+    For i = 1 To N
+        
+        ' Find pivot
+        pivot = Aug(i, i)
+        
+        ' If pivot is zero, try to swap with a lower row
+        If Abs(pivot) < 0.0000000001 Then
+            For k = i + 1 To N
+                If Abs(Aug(k, i)) > 0.0000000001 Then
+                    For j = 1 To 2 * N
+                        temp = Aug(i, j)
+                        Aug(i, j) = Aug(k, j)
+                        Aug(k, j) = temp
+                    Next j
+                    pivot = Aug(i, i)
+                    Exit For
+                End If
+            Next k
+        End If
+        
+        ' Still zero -> matrix is singular
+        If Abs(pivot) < 0.0000000001 Then
+            MatrixInverse = Empty
+            Exit Function
+        End If
+        
+        ' Normalize pivot row
+        For j = 1 To 2 * N
+            Aug(i, j) = Aug(i, j) / pivot
+        Next j
+        
+        ' Eliminate other rows
+        For k = 1 To N
+            If k <> i Then
+                temp = Aug(k, i)
+                For j = 1 To 2 * N
+                    Aug(k, j) = Aug(k, j) - temp * Aug(i, j)
+                Next j
+            End If
+        Next k
+    Next i
+    mxInv = mxNull(N, N)
+    ' Extract inverse matrix
+    q = 0
+    For i = 1 To N
+        For j = 1 To N
+            mxInv.D(q) = Aug(i, N + j): q = q + 1
+        Next j
+    Next i
 End Function
 

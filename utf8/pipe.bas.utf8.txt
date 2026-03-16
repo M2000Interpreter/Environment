@@ -294,14 +294,14 @@ End Function
 Public Function GetTimeZoneInfo() As String
 
 Dim TZI As TIME_ZONE_INFORMATION ' receives information on the time zone
-Dim RetVal As Long ' return value
-Dim C As Long ' counter variable needed to display time zone name
+Dim retval As Long ' return value
+Dim c As Long ' counter variable needed to display time zone name
 
-    RetVal = GetTimeZoneInformation(TZI) ' read information on the computer's selected time zone
+    retval = GetTimeZoneInformation(TZI) ' read information on the computer's selected time zone
      If zones.ExistKey(Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")) Then
      ' do nothing. now zone$ has set the index field to standard name.
      End If
-    If RetVal = 2 Then
+    If retval = 2 Then
     GetTimeZoneInfo = Replace(StrConv(TZI.DaylightName, vbFromUnicode), Chr(0), "")
     Else
     GetTimeZoneInfo = Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")
@@ -367,13 +367,13 @@ Public Function PathMakeDirs(ByVal Pathd As String) As Boolean
    End Function
  
 Function PurifyPath(sPath$) As String
-Dim A$(), I
+Dim A$(), i
 If sPath$ = vbNullString Then Exit Function
-A$() = Split(sPath, "\")
-If isdir(A$(LBound(A$()))) Then I = I + 1
-For I = LBound(A$()) + I To UBound(A$())
-A$(I) = PurifyName(A$(I))
-Next I
+A$() = split(sPath, "\")
+If isdir(A$(LBound(A$()))) Then i = i + 1
+For i = LBound(A$()) + i To UBound(A$())
+A$(i) = PurifyName(A$(i))
+Next i
 If LBound(A()) = UBound(A()) Then
 PurifyPath = A$(UBound(A$()))
 Else
@@ -383,18 +383,18 @@ End Function
 Public Function PurifyName(sStr As String) As String
 Dim noValidcharList
 noValidcharList = "*?\<>:/|" + Chr$(34)
-Dim A$, I As Long, ddt As Boolean, j As Long
+Dim A$, i As Long, ddt As Boolean, j As Long
 If Len(sStr) > 0 Then
 A$ = space$(Len(sStr))
 j = 1
-For I = 1 To Len(sStr)
-If InStr(noValidcharList, Mid$(sStr, I, 1)) = 0 Then
-Mid$(A$, j, 1) = Mid$(sStr, I, 1)
+For i = 1 To Len(sStr)
+If InStr(noValidcharList, Mid$(sStr, i, 1)) = 0 Then
+Mid$(A$, j, 1) = Mid$(sStr, i, 1)
 Else
 Mid$(A$, j, 1) = "-"
 End If
 j = j + 1
-Next I
+Next i
 A$ = Left$(A$, j - 1)
 End If
 PurifyName = A$
@@ -537,14 +537,14 @@ End Function
 Public Function GetDosPath(LongPath As String) As String
 
 Dim s As String
-Dim I As Long
+Dim i As Long
 Dim PathLength As Long
 If Len(LongPath) = 0 Then Exit Function
-        I = Len(LongPath) * 2 + 2
+        i = Len(LongPath) * 2 + 2
 
         s = String(1024, 0)
 
-        PathLength = GetShortPathName(StrPtr(LongPath), StrPtr(s), I)
+        PathLength = GetShortPathName(StrPtr(LongPath), StrPtr(s), i)
 
         GetDosPath = Left$(s, PathLength)
 
@@ -622,7 +622,7 @@ Dim st&, pa&, po&
 st& = 1
 Dim word$(), it As Long, Max As Long, Line$, ok As Boolean, Min As Long
 simple$ = simple$ + "|"
-word$() = Split(simple$, "|")
+word$() = split(simple$, "|")
 
 
 Max = UBound(word$()) - 1
@@ -688,13 +688,13 @@ Public Function DecodeHEX(sString As String, ok As Boolean) As String
     sString = Replace(sString, "_", "")
     sString = Replace(sString, ",", "")
     If Len(sString) < 2 Or (Len(sString) Mod 2) = 1 Then Exit Function
-    Dim bOut() As Byte, lPos As Long, sOut As String, hx$, I As Long
+    Dim bOut() As Byte, lPos As Long, sOut As String, hx$, i As Long
     hx$ = "&H00"
     ReDim bOut(LenB(sString) \ 2)
-    For I = 1 To Len(sString) Step 2
-        Mid$(hx$, 3, 2) = Mid$(sString, I, 2)
+    For i = 1 To Len(sString) Step 2
+        Mid$(hx$, 3, 2) = Mid$(sString, i, 2)
         bOut(lPos) = hx$: lPos = lPos + 1:
-    Next I
+    Next i
 cont1:
     If lPos Mod 2 = 1 Then
         sOut = StrConv(String$(lPos, Chr(0)), vbFromUnicode)
@@ -732,7 +732,7 @@ Public Function Decode64(sString As String, ok As Boolean) As String
             Case 61
             lChar3 = lChar: GoTo finish
             Exit Do
-            Case 10, 13, 32
+            Case 10, 13, 32, 9
             lChar = lChar + 1
             If lChar > ubnd Then lChar3 = lChar: GoTo finish
             Case Else
@@ -750,7 +750,7 @@ Public Function Decode64(sString As String, ok As Boolean) As String
             Exit Do
             Case 61
             lChar3 = lchar1: GoTo finish
-            Case 10, 13, 32
+            Case 10, 13, 32, 9
             lchar1 = lchar1 + 1
             If lchar1 > ubnd Then lChar3 = lchar1: GoTo finish
             Case Else
@@ -767,7 +767,7 @@ Public Function Decode64(sString As String, ok As Boolean) As String
             Case 61
            lChar3 = lChar2: GoTo finish
             Exit Do
-            Case 10, 13, 32
+            Case 10, 13, 32, 9
             lChar2 = lChar2 + 1
             If lChar2 > ubnd Then lChar3 = lChar2: GoTo finish
             Case Else
@@ -785,7 +785,7 @@ Public Function Decode64(sString As String, ok As Boolean) As String
             Exit Do
             Case 61
             GoTo finish
-            Case 10, 13, 32
+            Case 10, 13, 32, 9
             lChar3 = lChar3 + 1
             If lChar3 > ubnd Then GoTo finish
             Case Else
@@ -808,16 +808,16 @@ finish:
     If Not ok Then
     iPad = 0
     
-    Dim Offset As Long
-        Do While lChar3 + Offset <= ubnd
-        Select Case bIn(lChar3 + Offset)
+    Dim offset As Long
+        Do While lChar3 + offset <= ubnd
+        Select Case bIn(lChar3 + offset)
             Case 10, 13, 32
-            If iPad > 0 Then Offset = 0: Exit Do
-            Offset = Offset + 1
+            If iPad > 0 Then offset = 0: Exit Do
+            offset = offset + 1
             
             Case 61
             iPad = iPad + 1
-            Offset = Offset + 1
+            offset = offset + 1
             Case Else
              If lChar2 = 0 Then GoTo Error1
                 
@@ -830,7 +830,7 @@ finish:
                 End If
               End If
             
-             Offset = 0
+             offset = 0
             
             Exit Do
          
@@ -951,18 +951,18 @@ End Function
 
 '
 Public Function FileToEncode64(f$, leftmargin As Long) As String
-Dim I As Long, fl As Long
+Dim i As Long, fl As Long
 
 fl = FileLen(GetDosPath(f$))
 If fl = 0 Then Exit Function
-    I = FreeFile
-    Open GetDosPath(f$) For Binary Access Read As I
+    i = FreeFile
+    Open GetDosPath(f$) For Binary Access Read As i
     Dim bOut() As Byte, bIn() As Byte
     Dim lChar As Long, lTrip As Long, iPad As Integer, lLen As Long, lTemp As Long, lPos As Long, lOutSize As Long
     iPad = (3 - FileLen(GetDosPath(f$)) Mod 3) Mod 3                          'See if the length is divisible by 3
     ReDim bIn(0 To fl - 1)
-    Get #I, , bIn()
-    Close I
+    Get #i, , bIn()
+    Close i
     ReDim Preserve bIn(0 To fl - 1 + iPad)
     lLen = ((UBound(bIn) + 1) \ 3) * 4                  'Length of resulting string.
     ' set to 60 wchar for each line break

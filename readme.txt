@@ -1,32 +1,21 @@
 M2000 Interpreter and Environment
-Version 14 revision 7 active-X
+Version 14 revision 8 active-X
 
-The read only variable internet call a function which use the 142.250.187.100:80 to check internet connection. But for some reason this ip not repsonsed.
-So I put two more. This fix also fix the read only variable internet$ which return the ip of the current pc from outside (which also check the same function for checking the internet connection).
+1) Fix IsNum and Number read only variables.
+push 12312312u   ' we push to stack a BigInteger (is an object)
+Print isnum  ' fixed - now return true
+long long z
+z=number*100  ' now number pop the BigInteger
+list ' see the variables
+2) Fixed the Binary block (which have BASE64 bytes). The problem was the tabs. So if we place the Binary block and move it by placing tabs at the same lines as the data old code raising error at converting to bytes. Now fixed, character 9 is white space now for this statement
+So now this work (there are tabs before the code
+	BINARY {
+		kwOVA5kDkQMgAKcDkQOhA5ED
+	}  AS A$
+	PRINT A$
+3) The Matrix type of variable (exist on Math2 object), now has a library Matrix in info file. Math library now has upgraded Determinant function and a new function Inverse Matrix.
 
-We can write M2000 code for the old Internet read only variable:
-// the CLIENT object is the cTlsClient object (cTlsClient1.cls)
-FUNCTION check_internet {
-	DECLARE CLIENT CLIENT
-	WITH CLIENT, "NoError", TRUE
-	METHOD CLIENT, "SetTimeouts", 100, 300, 200, 300
-	// change 100 to 0 or 10
-	METHOD CLIENT, "Connect","142.250.187.100", 80 AS CONNECT
-	=CONNECT
-}
-We can write M2000 code for internet$
-
-// HTTPS.REQUEST is object clsHttpsRequest (HttpsRequest.cls)
-FUNCTION  get_ip$ {	
-	DECLARE HttpsRequest HTTPS.REQUEST
-	WITH HttpsRequest,"BodyFistLine" AS RESP$
-	METHOD  HttpsRequest, "HttpsRequest", "HTTPS://ifconfig.co/ip" AS OK
-	IF OK THEN =RESP$
-}
-PRINT get_ip$()
-
-
-
+4) Update/Insert new Modules on Info file. Matrix, Server1 (we make an Http Server), FFT (fast fourier transform), Simpson (Simpson Rule, a numerical integration technique), Teacher (A speech program for English Language).
 
  
 George Karras, Kallithea Attikis, Greece.
