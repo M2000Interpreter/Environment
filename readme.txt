@@ -1,21 +1,49 @@
 M2000 Interpreter and Environment
-Version 14 revision 8 active-X
+Version 14 revision 9 active-X
 
-1) Fix IsNum and Number read only variables.
-push 12312312u   ' we push to stack a BigInteger (is an object)
-Print isnum  ' fixed - now return true
-long long z
-z=number*100  ' now number pop the BigInteger
-list ' see the variables
-2) Fixed the Binary block (which have BASE64 bytes). The problem was the tabs. So if we place the Binary block and move it by placing tabs at the same lines as the data old code raising error at converting to bytes. Now fixed, character 9 is white space now for this statement
-So now this work (there are tabs before the code
-	BINARY {
-		kwOVA5kDkQMgAKcDkQOhA5ED
-	}  AS A$
-	PRINT A$
-3) The Matrix type of variable (exist on Math2 object), now has a library Matrix in info file. Math library now has upgraded Determinant function and a new function Inverse Matrix.
+1) BASIC statement to make the current module/function to use BASIC specific style:
+1.1 DATA, READ and RESTORE as of BBC BASIC
+	WE CAN USE STANDARD READ USING @READ
+FROM PAGE 122 OF BBC MICRO MANUAL (LINE 0 ADDED FOR M2000)
+  0 BASIC
+  5 REPEAT
+ 10 PRINT "GIVE THE MONTH AS A NUMBER"
+ 20   INPUT M
+ 30   UNTIL M>0 AND M<13
+ 40 FOR X=1 TO M
+ 50   READ A$
+ 60   NEXT X
+ 70 PRINT "THE MONTH IS ";A$
+100 DATA JANUARY, FEBRUARY, MARCH, APRIL
+110 DATA MAY, JUNE, JULY, AUGUST, SEPTEMBER
+120 DATA OCTOMBER, NOVEMBER, DECEMBER	
 
-4) Update/Insert new Modules on Info file. Matrix, Server1 (we make an Http Server), FFT (fast fourier transform), Simpson (Simpson Rule, a numerical integration technique), Teacher (A speech program for English Language).
+
+DATA may have a list of literals (1, 3&, 2~ and all the symbols)
+
+2) Advanced OpenGl support.
+
+3) Exclude a user control for server. We can use M2000 code with objects to do the same job.
+
+4)Now we can make properties for objects which can shadow names from original read only variables (we can continue read these by using the @ before the name for current module/function, or we can use it as is from other modules/functions (so the version in the example stay as the original in a call to an inner module). The idea is to make modules/functions without conflicts with M2000 reserved names.
+
+? version=14
+version=100
+? version=100, @version=14
+Module Inner {
+	Print version=14
+}
+inner
+
+5) Some minor tunings...for speed.
+
+1.2 DIMENSION OF ARRRAYS PLUS ONE (A(4) HAS 5 ITEMS)
+1.3 FOR NEXT SAME AS BASIC. SO NOW WE CAN SKIP THE FOR NEXT IF WE HAVE NO LOOP BASED ON STEP AND START END END VALUES.
+	FOR I=10 TO 1
+	' SKIP THE STRUCTURE BECAUSE I>1
+	' NUT BY DEFAULT M2000'S "FOR" GOES FROM 10 TO 1
+	NEXT I
+
 
  
 George Karras, Kallithea Attikis, Greece.

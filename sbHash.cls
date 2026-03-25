@@ -25,10 +25,11 @@ Private PriveSpace() As item
 Public MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Private lastfind As String
 Private Hash() As Long
 Public Index As Long
+
 Private Sub Class_Initialize()
     MaxSpace = 10
     ReDim PriveSpace(MaxSpace) As item, Hash(MaxSpace * 2 + 3)
@@ -43,24 +44,24 @@ End Sub
 
 Private Sub ExpandHash()
 
-    Dim i As Long
+    Dim I As Long
     hashlen = hashlen * 2 + 3
     
     ReDim Hash(hashlen) As Long
-    For i = 0 To toplim
-    place HashFunc2(i), i
-    Next i
+    For I = 0 To toplim
+    place HashFunc2(I), I
+    Next I
 End Sub
 Friend Sub Expand(NewMaxSpace As Long)
            MaxSpace = NewMaxSpace
            ReDim Preserve PriveSpace(MaxSpace) As item
            If MaxSpace > hashlen Then ExpandHash
 End Sub
-Friend Sub ReduceHash(newTop As Long, v() As modfun)
-    Dim i As Long, m As modfun
+Friend Sub ReduceHash2(newTop As Long)
+    Dim I As Long, M As modfun
     If toplim < newTop Then Exit Sub
-    For i = toplim To newTop Step -1
-       With PriveSpace(i)
+    For I = toplim To newTop Step -1
+       With PriveSpace(I)
         
     
         If .Pleft > 0 Then
@@ -71,24 +72,12 @@ Friend Sub ReduceHash(newTop As Long, v() As modfun)
             Hash(.lastpos) = 0
             .Key = vbNullString
         End If
-        If .KeyType = 0 And .nDx >= 0 Then
-                v(.nDx) = m
-            'v(.ndx).sb = vbNullString
-            'v(.ndx).sbc = 0
-            'v(.ndx).sbgroup = vbNullString
-            'v(.ndx).goodname = vbNullString
-            'v(.ndx).locked = False
-            'v(.ndx).tpointer = 0
-            'v(.ndx).IamAClass = False
-            'v(.ndx).IamAClass = False
-            'Set v(.ndx).subs = Nothing
-        End If
         .KeyType = 0
         .nDx = -1
             
         End With
 
-    Next i
+    Next I
     If newTop <= 50 Then
             If MaxSpace > 50 Then
                         MaxSpace = 50
@@ -98,9 +87,9 @@ Friend Sub ReduceHash(newTop As Long, v() As modfun)
                            hashlen = MaxSpace * 2 + 3
                          '  reHash...
                          toplim = newTop - 1
-                        For i = 0 To toplim
-                            place HashFunc2(i), i
-                        Next i
+                        For I = 0 To toplim
+                            place HashFunc2(I), I
+                        Next I
                 Else
                 toplim = newTop - 1
             End If
@@ -116,15 +105,76 @@ Friend Sub ReduceHash(newTop As Long, v() As modfun)
                
              '  reHash...
              toplim = newTop - 1
-            For i = 0 To toplim
-                place HashFunc2(i), i
-            Next i
+            For I = 0 To toplim
+                place HashFunc2(I), I
+            Next I
         
             Else
  toplim = newTop - 1
     End If
    End If
 End Sub
+Friend Sub ReduceHash(newTop As Long, v() As modfun)
+    Dim I As Long, M As modfun
+    If toplim < newTop Then Exit Sub
+    For I = toplim To newTop Step -1
+       With PriveSpace(I)
+        
+    
+        If .Pleft > 0 Then
+            Hash(.lastpos) = .Pleft
+            .Key = vbNullString
+            .Pleft = 0
+        Else
+            Hash(.lastpos) = 0
+            .Key = vbNullString
+        End If
+        If .KeyType = 0 And .nDx >= 0 Then
+                v(.nDx) = M
+        End If
+        .KeyType = 0
+        .nDx = -1
+            
+        End With
+
+    Next I
+    If newTop <= 50 Then
+            If MaxSpace > 50 Then
+                        MaxSpace = 50
+                         ReDim Preserve PriveSpace(MaxSpace) As item
+                                            
+                            ReDim Hash(MaxSpace * 2 + 3)
+                           hashlen = MaxSpace * 2 + 3
+                         '  reHash...
+                         toplim = newTop - 1
+                        For I = 0 To toplim
+                            place HashFunc2(I), I
+                        Next I
+                Else
+                toplim = newTop - 1
+            End If
+            
+    Else
+            If MaxSpace - newTop + 1 > 2 * newTop + 2 Then
+            
+                MaxSpace = 2 * (newTop + 1) + 1
+                
+                ReDim Preserve PriveSpace(MaxSpace) As item
+                hashlen = MaxSpace * 2 + 3
+                ReDim Hash(hashlen)
+               
+             '  reHash...
+             toplim = newTop - 1
+            For I = 0 To toplim
+                place HashFunc2(I), I
+            Next I
+        
+            Else
+ toplim = newTop - 1
+    End If
+   End If
+End Sub
+
 Function RenameKey(Key As String, NewKey As String)
 Dim k As Long
 
@@ -223,11 +273,11 @@ End Function
 
 
 Friend Sub ItemCreator(Key As String, num As Long, Optional isRef As Boolean = False)
-Dim A As Long
-A = Malloc()
+Dim a As Long
+a = Malloc()
 If Left$(Key, 1) = "." Then Err.Raise 5
-place HashFunc(Key), A
-With PriveSpace(A)
+place HashFunc(Key), a
+With PriveSpace(a)
     .nDx = num
     If isRef Then
         .KeyType = 1
@@ -239,10 +289,10 @@ With PriveSpace(A)
 End With
 End Sub
 Friend Sub ItemCreatorNoSwap(Key As String, num As Long, Optional isRef As Boolean = False)
-Dim A As Long
-A = Malloc()
-place HashFunc(Key), A
-With PriveSpace(A)
+Dim a As Long
+a = Malloc()
+place HashFunc(Key), a
+With PriveSpace(a)
     .nDx = num
     If isRef Then
         .KeyType = 1
@@ -258,10 +308,10 @@ End With
 End Sub
 Friend Sub ItemCreator2(Key As String, num As Long, internal As Long)
 '' used with KeyType as Long not a flag
-Dim A As Long
-A = Malloc()
-place HashFunc(Key), A
-With PriveSpace(A)
+Dim a As Long
+a = Malloc()
+place HashFunc(Key), a
+With PriveSpace(a)
     .nDx = num
     .KeyType = internal
     .firsthash = HD(Key)
@@ -272,44 +322,44 @@ End Sub
 Property Get Percent()
 Percent = count / hashlen
 End Property
-Private Sub place(ByVal b, ByVal A)
+Private Sub place(ByVal b, ByVal a)
     Dim k As Long
     k = Hash(b)
-    If Not Hash(b) = A + 1 Then
-         Hash(b) = A + 1
-         PriveSpace(A).Pleft = k
+    If Not Hash(b) = a + 1 Then
+         Hash(b) = a + 1
+         PriveSpace(a).Pleft = k
     End If
-    PriveSpace(A).lastpos = b
+    PriveSpace(a).lastpos = b
 End Sub
 
 Private Function HashFunc2(where As Long)
 HashFunc2 = PriveSpace(where).firsthash Mod hashlen
 End Function
 
-Private Function HashFunc(A$)
-HashFunc = HD(A$) Mod hashlen
+Private Function HashFunc(a$)
+HashFunc = HD(a$) Mod hashlen
 End Function
 
 Function Show() As String
-Dim i As Long
-For i = 0 To toplim
-If InStr(PriveSpace(i).Key, ChrW(&H1FFF)) = 0 And InStr(PriveSpace(i).Key, ChrW(&HFFBF)) = 0 Then
-Show = Chr(1) + PriveSpace(i).Key + str$(PriveSpace(i).nDx) + Chr(1) + Show
+Dim I As Long
+For I = 0 To toplim
+If InStr(PriveSpace(I).Key, ChrW(&H1FFF)) = 0 And InStr(PriveSpace(I).Key, ChrW(&HFFBF)) = 0 Then
+Show = Chr(1) + PriveSpace(I).Key + str$(PriveSpace(I).nDx) + Chr(1) + Show
 End If
-Next i
+Next I
 End Function
 Function ShowRev() As String
-Dim i As Long
+Dim I As Long
 If toplim > UBound(PriveSpace()) Then
 toplim = UBound(PriveSpace()) - 1
 InternalError
 Else
-For i = 0 To toplim
+For I = 0 To toplim
 ' remove if to take hidden functions
-If InStr(PriveSpace(i).Key, ChrW(&H1FFF)) = 0 And InStr(PriveSpace(i).Key, ChrW(&HFFBF)) = 0 Then
-ShowRev = ShowRev + Chr(1) + PriveSpace(i).Key + str$(PriveSpace(i).nDx) + Chr(1)
+If InStr(PriveSpace(I).Key, ChrW(&H1FFF)) = 0 And InStr(PriveSpace(I).Key, ChrW(&HFFBF)) = 0 Then
+ShowRev = ShowRev + Chr(1) + PriveSpace(I).Key + str$(PriveSpace(I).nDx) + Chr(1)
 End If
-Next i
+Next I
 End If
 End Function
 
