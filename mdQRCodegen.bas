@@ -46,7 +46,7 @@ Public Enum QRCodegenMode
 End Enum
 
 Public Type QRCodegenSegment
-    Mode            As QRCodegenMode
+    mode            As QRCodegenMode
     NumChars        As Long
     Data()          As Byte
     BitLength       As Long
@@ -96,13 +96,13 @@ Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As LongPtr) A
 Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As LongPtr) As Long
 Private Declare Function CreateDIBSection Lib "gdi32" (ByVal hDC As LongPtr, lpBitsInfo As Any, ByVal wUsage As Long, lpBits As LongPtr, ByVal hSection As LongPtr, ByVal dwOffset As Long) As LongPtr
 Private Declare Function SetStretchBltMode Lib "gdi32" (ByVal hDC As LongPtr, ByVal nStretchMode As Long) As Long
-Private Declare Function StretchBlt Lib "gdi32" (ByVal hDC As LongPtr, ByVal X As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hdcSrc As LongPtr, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Private Declare Function StretchBlt Lib "gdi32" (ByVal hDC As LongPtr, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hdcSrc As LongPtr, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
 Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As LongPtr, ByVal nIndex As Long) As Long
 Private Declare Function PolyPolygon Lib "gdi32" (ByVal hDC As LongPtr, lpPoint As Any, lpPolyCounts As Any, ByVal nCount As Long) As Long
 #End If
 
 Private Type POINTAPI
-    X                   As Long
+    x                   As Long
     y                   As Long
 End Type
 
@@ -114,7 +114,7 @@ Private Type RECT
 End Type
 
 Private Type PICTDESC
-    size                As Long
+    Size                As Long
     Type                As Long
     hBmpOrIcon          As LongPtr
     hPal                As LongPtr
@@ -174,11 +174,11 @@ Public Function QRCodegenBarcode(TextOrByteArray As Variant, _
             Optional ByVal Ecl As QRCodegenEcc = QRCodegenEcc_LOW, _
             Optional ByVal MinVersion As Long = VERSION_MIN, _
             Optional ByVal MaxVersion As Long = VERSION_MAX, _
-            Optional ByVal Mask As QRCodegenMask = QRCodegenMask_AUTO, _
+            Optional ByVal mask As QRCodegenMask = QRCodegenMask_AUTO, _
             Optional ByVal BoostEcl As Boolean = True) As StdPicture
     Dim baQrCode()      As Byte
     
-    If QRCodegenEncode(TextOrByteArray, baQrCode, Ecl, MinVersion, MaxVersion, Mask, BoostEcl) Then
+    If QRCodegenEncode(TextOrByteArray, baQrCode, Ecl, MinVersion, MaxVersion, mask, BoostEcl) Then
         Set QRCodegenBarcode = QRCodegenConvertToPicture(baQrCode, ForeColor, ModuleSize, SquareModules)
     End If
 End Function
@@ -187,7 +187,7 @@ Public Function QRCodegenEncode(TextOrByteArray As Variant, baQrCode() As Byte, 
             Optional ByVal Ecl As QRCodegenEcc = QRCodegenEcc_LOW, _
             Optional ByVal MinVersion As Long = VERSION_MIN, _
             Optional ByVal MaxVersion As Long = VERSION_MAX, _
-            Optional ByVal Mask As QRCodegenMask = QRCodegenMask_AUTO, _
+            Optional ByVal mask As QRCodegenMask = QRCodegenMask_AUTO, _
             Optional ByVal BoostEcl As Boolean = True) As Boolean
     Dim baData()        As Byte
     Dim lDataLen        As Long
@@ -232,7 +232,7 @@ Public Function QRCodegenEncode(TextOrByteArray As Variant, baQrCode() As Byte, 
             uSegments(0) = QRCodegenMakeBytes(baData)
         End If
     End If
-    QRCodegenEncode = QRCodegenEncodeSegments(uSegments, baQrCode, Ecl, MinVersion, MaxVersion, Mask, BoostEcl)
+    QRCodegenEncode = QRCodegenEncodeSegments(uSegments, baQrCode, Ecl, MinVersion, MaxVersion, mask, BoostEcl)
     Exit Function
 QH:
     ReDim baQrCode(0 To 0) As Byte
@@ -242,7 +242,7 @@ Public Function QRCodegenEncodeSegments(uSegments() As QRCodegenSegment, baQrCod
             Optional ByVal Ecl As QRCodegenEcc = QRCodegenEcc_LOW, _
             Optional ByVal MinVersion As Long = VERSION_MIN, _
             Optional ByVal MaxVersion As Long = VERSION_MAX, _
-            Optional ByVal Mask As QRCodegenMask = QRCodegenMask_AUTO, _
+            Optional ByVal mask As QRCodegenMask = QRCodegenMask_AUTO, _
             Optional ByVal BoostEcl As Boolean = True) As Boolean
     Dim lVersion        As Long
     Dim lDataUsedBits   As Long
@@ -283,8 +283,8 @@ Public Function QRCodegenEncodeSegments(uSegments() As QRCodegenSegment, baQrCod
     ReDim baQrCode(0 To pvGetBufferLenForVersion(lVersion) - 1) As Byte
     For lIdx = 0 To UBound(uSegments)
         With uSegments(lIdx)
-            pvAppendBitsToBuffer .Mode, 4, baQrCode, lBitLen
-            pvAppendBitsToBuffer .NumChars, pvNumCharCountBits(.Mode, lVersion), baQrCode, lBitLen
+            pvAppendBitsToBuffer .mode, 4, baQrCode, lBitLen
+            pvAppendBitsToBuffer .NumChars, pvNumCharCountBits(.mode, lVersion), baQrCode, lBitLen
             For lJdx = 0 To .BitLength - 1
                 lBit = -((.Data(lJdx \ 8) And LNG_POW2(7 - (lJdx And 7))) <> 0)
                 pvAppendBitsToBuffer lBit, 1, baQrCode, lBitLen
@@ -316,22 +316,22 @@ Public Function QRCodegenEncodeSegments(uSegments() As QRCodegenSegment, baQrCod
     pvDrawLightFunctionModules lVersion, baQrCode
     pvInitializeFunctionModules lVersion, baTemp
     '--- Do masking
-    If Mask = QRCodegenMask_AUTO Then
+    If mask = QRCodegenMask_AUTO Then
         lMinPenalty = LONG_MAX
         For lIdx = QRCodegenMask_0 To QRCodegenMask_7
             pvApplyMask baTemp, baQrCode, lIdx
             pvDrawFormatBits Ecl, lIdx, baQrCode
             lPenalty = pvGetPenaltyScore(baQrCode)
             If lPenalty < lMinPenalty Then
-                Mask = lIdx
+                mask = lIdx
                 lMinPenalty = lPenalty
             End If
             pvApplyMask baTemp, baQrCode, lIdx '--- Undoes the mask due to XOR
         Next
     End If
-    Debug.Assert QRCodegenMask_0 <= Mask And Mask <= QRCodegenMask_7
-    pvApplyMask baTemp, baQrCode, Mask
-    pvDrawFormatBits Ecl, Mask, baQrCode
+    Debug.Assert QRCodegenMask_0 <= mask And mask <= QRCodegenMask_7
+    pvApplyMask baTemp, baQrCode, mask
+    pvDrawFormatBits Ecl, mask, baQrCode
     '--- success
     QRCodegenEncodeSegments = True
 QH:
@@ -379,7 +379,7 @@ Public Function QRCodegenConvertToPicture(baQrCode() As Byte, _
         hPrevPen = 0
     End If
     With uDesc
-        .size = LenB(uDesc)
+        .Size = LenB(uDesc)
         .Type = vbPicTypeEMetafile
         .hBmpOrIcon = CloseEnhMetaFile(hDC)
     End With
@@ -418,6 +418,63 @@ EH:
     vErr = Array(Err.Number, Err.Source, Err.Description)
     Resume QH
 End Function
+
+'
+Public Sub GetDataFromImage(ByVal pPicture As IPicture, baOutput() As Byte, Optional ByVal NewWidth As Long, Optional ByVal NewHeight As Long)
+    Const IDX_QUERYINTERFACE As Long = 0
+    Const IDX_SAVE          As Long = 6
+    Const IDX_SEEK          As Long = 5
+    Const IDX_READ          As Long = 3
+    Const STREAM_SEEK_SET   As Long = 0
+    Const STREAM_SEEK_END   As Long = 2
+    Dim pStream         As stdole.IUnknown
+    Dim pPersist        As stdole.IUnknown
+    Dim cSize           As Currency
+    
+    Dim hResult         As Long
+
+    If pPicture Is Nothing Then
+        baOutput = vbNullString
+        GoTo QH
+    End If
+    If NewWidth > 0 And NewHeight > 0 Then
+        '--- super sample to 4x4 for cheap anti-aliasing
+        Set pPicture = QRCodegenResizePicture(pPicture, NewWidth * 4, NewHeight * 4)
+        Set pPicture = QRCodegenResizePicture(pPicture, NewWidth, NewHeight)
+    End If
+    Set pStream = SHCreateMemStream(ByVal 0, 0)
+    If IID_IPersistStream(0) = 0 Then
+        IID_IPersistStream(0) = &H109: IID_IPersistStream(2) = &HC0: IID_IPersistStream(3) = &H46000000
+    End If
+    hResult = DispCallByVtbl(pPicture, IDX_QUERYINTERFACE, VarPtr(IID_IPersistStream(0)), VarPtr(pPersist))
+    If hResult < 0 Then
+        Err.Raise hResult, "IUnknown.QueryInterface"
+    End If
+    hResult = DispCallByVtbl(pPersist, IDX_SAVE, pStream, True)
+    If hResult < 0 Then
+        Err.Raise hResult, "IPersistStream.Save"
+    End If
+    hResult = DispCallByVtbl(pStream, IDX_SEEK, 0@, STREAM_SEEK_END, VarPtr(cSize))
+    If hResult < 0 Then
+        Err.Raise hResult, "IStream.Seek(STREAM_SEEK_END)"
+    End If
+    If cSize <= 8 Then
+        baOutput = vbNullString
+        GoTo QH
+    End If
+    ReDim baOutput(0 To cSize * 10000@ - 9) As Byte
+    hResult = DispCallByVtbl(pStream, IDX_SEEK, 0.0008@, STREAM_SEEK_SET, VarPtr(cSize))
+    If hResult < 0 Then
+        Err.Raise hResult, "IStream.Seek(STREAM_SEEK_SET)"
+    End If
+    hResult = DispCallByVtbl(pStream, IDX_READ, VarPtr(baOutput(0)), UBound(baOutput) + 1, VarPtr(cSize))
+    If hResult < 0 Then
+        Err.Raise hResult, "IStream.Read"
+    End If
+QH:
+    
+End Sub
+
 
 Public Function QRCodegenConvertToData(ByVal pPicture As IPicture, Optional ByVal NewWidth As Long, Optional ByVal NewHeight As Long) As Byte()
     Const IDX_QUERYINTERFACE As Long = 0
@@ -487,7 +544,7 @@ Public Function QRCodegenResizePicture(pPicture As IPicture, ByVal NewWidth As L
     Const vbSrcCopy       As Long = &HCC0020
     Dim hDC             As LongPtr
     Dim uHdr            As BITMAPINFOHEADER
-    Dim hDib            As LongPtr
+    Dim hDIb            As LongPtr
     Dim hPrevDib        As LongPtr
     Dim hSrcDC          As LongPtr
     Dim hSrcPrevBmp     As LongPtr
@@ -506,11 +563,11 @@ Public Function QRCodegenResizePicture(pPicture As IPicture, ByVal NewWidth As L
         .biHeight = -NewHeight
         .biSizeImage = (4 * NewWidth) * NewHeight
     End With
-    hDib = CreateDIBSection(hDC, uHdr, DIB_RGB_COLORS, 0, 0, 0)
-    hPrevDib = SelectObject(hDC, hDib)
+    hDIb = CreateDIBSection(hDC, uHdr, DIB_RGB_COLORS, 0, 0, 0)
+    hPrevDib = SelectObject(hDC, hDIb)
     If pPicture.Type = vbPicTypeBitmap Then
         hSrcDC = CreateCompatibleDC(0)
-        hSrcPrevBmp = SelectObject(hSrcDC, pPicture.Handle)
+        hSrcPrevBmp = SelectObject(hSrcDC, pPicture.handle)
         Call StretchBlt(hDC, 0, 0, NewWidth, NewHeight, hSrcDC, 0, 0, _
             HM2Pix(pPicture.Width, GetDeviceCaps(hDC, LOGPIXELSX)), _
             HM2Pix(pPicture.Height, GetDeviceCaps(hDC, LOGPIXELSY)), vbSrcCopy)
@@ -520,9 +577,9 @@ Public Function QRCodegenResizePicture(pPicture As IPicture, ByVal NewWidth As L
     Call SelectObject(hDC, hPrevDib)
     hPrevDib = 0
     With uDesc
-        .size = LenB(uDesc)
+        .Size = LenB(uDesc)
         .Type = vbPicTypeBitmap
-        .hBmpOrIcon = hDib
+        .hBmpOrIcon = hDIb
     End With
     If IID_IPicture(0) = 0 Then
         IID_IPicture(0) = &H7BF80980: IID_IPicture(1) = &H101ABF32: IID_IPicture(2) = &HAA00BB8B: IID_IPicture(3) = &HAB0C3000
@@ -532,7 +589,7 @@ Public Function QRCodegenResizePicture(pPicture As IPicture, ByVal NewWidth As L
         Err.Raise hResult, "OleCreatePictureIndirect"
     End If
     '--- not to destroy DIB, it's already owned by returned StdPicture
-    hDib = 0
+    hDIb = 0
 QH:
     If hSrcPrevBmp <> 0 Then
         Call SelectObject(hSrcDC, hSrcPrevBmp)
@@ -550,9 +607,9 @@ QH:
         Call DeleteDC(hDC)
         hDC = 0
     End If
-    If hDib <> 0 Then
-        Call DeleteObject(hDib)
-        hDib = 0
+    If hDIb <> 0 Then
+        Call DeleteObject(hDIb)
+        hDIb = 0
     End If
     If IsArray(vErr) Then
         On Error GoTo 0
@@ -634,8 +691,8 @@ End Function
 
 Public Function QRCodegenMakeBytes(baData() As Byte) As QRCodegenSegment
     With QRCodegenMakeBytes
-        .Mode = QRCodegenMode_BYTE
-        .BitLength = pvCalcSegmentBitLength(.Mode, UBound(baData) + 1)
+        .mode = QRCodegenMode_BYTE
+        .BitLength = pvCalcSegmentBitLength(.mode, UBound(baData) + 1)
         Debug.Assert .BitLength <> -1
         .NumChars = UBound(baData) + 1
         .Data = baData
@@ -652,8 +709,8 @@ Public Function QRCodegenMakeNumeric(sDigits As String) As QRCodegenSegment
     
     With QRCodegenMakeNumeric
         lLen = Len(sDigits)
-        .Mode = QRCodegenMode_NUMERIC
-        lBitLen = pvCalcSegmentBitLength(.Mode, lLen)
+        .mode = QRCodegenMode_NUMERIC
+        lBitLen = pvCalcSegmentBitLength(.mode, lLen)
         Debug.Assert lBitLen <> -1
         ReDim .Data(0 To (lBitLen + 7) \ 8 - 1) As Byte
         .NumChars = lLen
@@ -685,8 +742,8 @@ Public Function QRCodegenMakeAlphanumeric(sText As String) As QRCodegenSegment
     
     With QRCodegenMakeAlphanumeric
         lLen = Len(sText)
-        .Mode = QRCodegenMode_ALPHANUMERIC
-        lBitLen = pvCalcSegmentBitLength(.Mode, lLen)
+        .mode = QRCodegenMode_ALPHANUMERIC
+        lBitLen = pvCalcSegmentBitLength(.mode, lLen)
         Debug.Assert lBitLen <> -1
         ReDim .Data(0 To (lBitLen + 7) \ 8 - 1) As Byte
         .NumChars = lLen
@@ -710,7 +767,7 @@ End Function
 
 Public Function QRCodegenMakeEci(ByVal lAssignVal As Long) As QRCodegenSegment
     With QRCodegenMakeEci
-        .Mode = QRCodegenMode_ECI
+        .mode = QRCodegenMode_ECI
         ReDim .Data(0 To 2) As Byte
         If lAssignVal < 0 Then
             Debug.Assert False
@@ -743,14 +800,14 @@ Private Sub pvInit()
         LNG_POW2(lIdx) = LNG_POW2(lIdx - 1) * 2
     Next
     LNG_POW2(31) = &H80000000
-    vSplit = Split("-1| 7|10|15|20|26|18|20|24|30|18|20|24|26|30|22|24|28|30|28|28|28|28|30|30|26|28|30|30|30|30|30|30|30|30|30|30|30|30|30|30|" & _
+    vSplit = split("-1| 7|10|15|20|26|18|20|24|30|18|20|24|26|30|22|24|28|30|28|28|28|28|30|30|26|28|30|30|30|30|30|30|30|30|30|30|30|30|30|30|" & _
                    "-1|10|16|26|18|24|16|18|22|22|26|30|22|22|24|24|28|28|26|26|26|26|28|28|28|28|28|28|28|28|28|28|28|28|28|28|28|28|28|28|28|" & _
                    "-1|13|22|18|26|18|24|18|22|20|24|28|26|24|20|30|24|28|28|26|30|28|30|30|30|30|28|30|30|30|30|30|30|30|30|30|30|30|30|30|30|" & _
                    "-1|17|28|22|16|22|28|26|26|24|28|24|28|22|24|24|30|28|28|26|28|30|24|30|30|30|30|30|30|30|30|30|30|30|30|30|30|30|30|30|30", "|")
     For lIdx = 0 To UBound(vSplit)
         ECC_CODEWORDS_PER_BLOCK(lIdx \ 41, lIdx Mod 41) = vSplit(lIdx)
     Next
-    vSplit = Split("-1|1|1|1|1|1|2|2|2|2|4| 4| 4| 4| 4| 6| 6| 6| 6| 7| 8| 8| 9| 9|10|12|12|12|13|14|15|16|17|18|19|19|20|21|22|24|25|" & _
+    vSplit = split("-1|1|1|1|1|1|2|2|2|2|4| 4| 4| 4| 4| 6| 6| 6| 6| 7| 8| 8| 9| 9|10|12|12|12|13|14|15|16|17|18|19|19|20|21|22|24|25|" & _
                    "-1|1|1|1|2|2|4|4|4|5|5| 5| 8| 9| 9|10|10|11|13|14|16|17|17|18|20|21|23|25|26|28|29|31|33|35|37|38|40|43|45|47|49|" & _
                    "-1|1|1|2|2|4|4|6|6|8|8| 8|10|12|16|12|17|16|18|21|20|23|23|25|27|29|34|34|35|38|40|43|45|48|51|53|56|59|62|65|68|" & _
                    "-1|1|1|2|4|4|4|5|6|8|8|11|11|16|16|18|16|19|21|25|25|25|34|30|32|35|37|40|42|45|48|51|54|57|60|63|66|70|74|77|81", "|")
@@ -784,7 +841,7 @@ Private Function pvGetTotalBits(uSegments() As QRCodegenSegment, ByVal lVersion 
     Dim lCcBits         As Long
     
     For lIdx = 0 To UBound(uSegments)
-        lCcBits = pvNumCharCountBits(uSegments(lIdx).Mode, lVersion)
+        lCcBits = pvNumCharCountBits(uSegments(lIdx).mode, lVersion)
         Debug.Assert 0 <= lCcBits And lCcBits <= 16
         If uSegments(lIdx).NumChars >= LNG_POW2(lCcBits) Then
             pvGetTotalBits = -1
@@ -1684,7 +1741,7 @@ Private Sub pvAppendRightTurn(uPoints() As POINTAPI, lTotalPts As Long, ByVal Lx
     Dim lTempX          As Long
     Dim lTempY          As Long
     
-    lPrevX = uPoints(lTotalPts - 1).X
+    lPrevX = uPoints(lTotalPts - 1).x
     lPrevY = uPoints(lTotalPts - 1).y
     If lPrevX < Lx And lPrevY < lY Then
         lCenterX = lPrevX
@@ -1721,7 +1778,7 @@ Private Sub pvAppendLeftTurn(uPoints() As POINTAPI, lTotalPts As Long, ByVal Lx 
     Dim lTempX          As Long
     Dim lTempY          As Long
     
-    lPrevX = uPoints(lTotalPts - 1).X
+    lPrevX = uPoints(lTotalPts - 1).x
     lPrevY = uPoints(lTotalPts - 1).y
     If lPrevX < Lx And lPrevY < lY Then
         lCenterX = Lx
@@ -1753,7 +1810,7 @@ Private Sub pvAppendLineTo(uPoints() As POINTAPI, lTotalPts As Long, ByVal Lx As
         ReDim Preserve uPoints(0 To 2 * UBound(uPoints)) As POINTAPI
     End If
     With uPoints(lTotalPts)
-        .X = Lx
+        .x = Lx
         .y = lY
     End With
     lTotalPts = lTotalPts + 1
