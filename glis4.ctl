@@ -120,13 +120,13 @@ Private Type itemlist
 End Type
 Private ehat$, JoinLines As Long
 Private fast As Boolean
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal Hdc As Long, ByVal iCapabilitiy As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal iCapabilitiy As Long) As Long
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
 
 Private Declare Function GdiFlush Lib "gdi32" () As Long
 Private Declare Function SetWindowRgn Lib "user32" (ByVal hWnd As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
-Private Declare Function SetBkColor Lib "gdi32" (ByVal Hdc As Long, ByVal crColor As Long) As Long
+Private Declare Function SetBkColor Lib "gdi32" (ByVal hDC As Long, ByVal crColor As Long) As Long
 Private Declare Function CreateHatchBrush Lib "gdi32" (ByVal nIndex As Long, ByVal crColor As Long) As Long
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private Declare Function DestroyCaret Lib "user32" () As Long
@@ -134,22 +134,22 @@ Private Declare Function CreateCaret Lib "user32" (ByVal hWnd As Long, ByVal hBi
 Private Declare Function ShowCaret Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function SetCaretPos Lib "user32" (ByVal X As Long, ByVal Y As Long) As Long
 Private Declare Function HideCaret Lib "user32" (ByVal hWnd As Long) As Long
-Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal Hdc As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
-Private Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal Hdc As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
-Private Declare Function FillRect Lib "user32" (ByVal Hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
-Private Declare Function FrameRect Lib "user32" (ByVal Hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Private Declare Function DrawTextEx Lib "user32" Alias "DrawTextExW" (ByVal hDC As Long, ByVal lpsz As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long, ByVal lpDrawTextParams As Long) As Long
+Private Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal hDC As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
+Private Declare Function FillRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Private Declare Function FrameRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Private Declare Function CreateRoundRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal Y3 As Long) As Long
 Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT) As Long
-Private Declare Function SelectClipRgn Lib "gdi32" (ByVal Hdc As Long, ByVal hRgn As Long) As Long
+Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 
 
 Private Declare Function CreateSolidBrush Lib "gdi32" (ByVal crColor As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Private Declare Function Ellipse Lib "gdi32" (ByVal Hdc As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
+Private Declare Function Ellipse Lib "gdi32" (ByVal hDC As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Private Declare Function CreatePen Lib "gdi32" (ByVal nPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
-Private Declare Function SelectObject Lib "gdi32" (ByVal Hdc As Long, ByVal hObject As Long) As Long
+Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 
 Private Const PS_NULL = 5
 Private Const PS_SOLID = 0
@@ -455,7 +455,7 @@ Private Type TEXTMETRICW
         tmCharSet As Byte
 End Type
 Private TM As TEXTMETRICW
-Private Declare Function GetTextMetrics Lib "gdi32" Alias "GetTextMetricsW" (ByVal Hdc As Long, lpMetrics As TEXTMETRICW) As Long
+Private Declare Function GetTextMetrics Lib "gdi32" Alias "GetTextMetricsW" (ByVal hDC As Long, lpMetrics As TEXTMETRICW) As Long
 Private LastNumX As Boolean
 Public Function GetLastKeyPressed() As Long
 Dim Message As Msg
@@ -856,7 +856,7 @@ Public Property Get TabStopSoft() As Boolean
     TabStopSoft = mTabStop
 End Property
 Public Property Get AveCharWith() As Long
-GetTextMetrics UserControl.Hdc, TM
+GetTextMetrics UserControl.hDC, TM
 AveCharWith = TM.tmAveCharWidth
 End Property
 Public Property Get Font() As Font
@@ -869,7 +869,7 @@ End Function
 Public Property Set Font(New_Font As Font)
     Set m_font = New_Font
     Set UserControl.Font = m_font
-    GetTextMetrics UserControl.Hdc, TM
+    GetTextMetrics UserControl.hDC, TM
     If restrictLines > 0 Then
         myt = (UserControl.ScaleHeight - mHeadlineHeightTwips) / restrictLines
         mytPixels = myt / scrTwips
@@ -882,7 +882,7 @@ Public Property Set Font(New_Font As Font)
     PropertyChanged "Font"
 End Property
 Public Sub CalcNewFont()
-GetTextMetrics UserControl.Hdc, TM
+GetTextMetrics UserControl.hDC, TM
 If restrictLines > 0 Then
 myt = (UserControl.ScaleHeight - mHeadlineHeightTwips) / restrictLines
 mytPixels = myt / scrTwips
@@ -914,7 +914,7 @@ Public Property Let FontSize(New_FontSize As Single)
      Else
 m_font.Size = New_FontSize
 End If
-GetTextMetrics UserControl.Hdc, TM
+GetTextMetrics UserControl.hDC, TM
 If restrictLines > 0 Then
 myt = (UserControl.ScaleHeight - mHeadlineHeightTwips) / restrictLines
 mytPixels = CLng(myt / scrTwips)
@@ -1039,13 +1039,19 @@ Else
             End If
             RaiseEvent PreviewKeyboardUnicode(Chr$(13))
         ElseIf KeyAscii = 27 Then  ' can be used if not enabled...to quit
-            KeyAscii = 0
+            
+            
             If Not NoEscapeKey Then
+                KeyAscii = 0
                 SELECTEDITEM = -1
                 secreset = False
                 RaiseEvent Selected2(-2)
             ElseIf Not LeaveonChoose Then
+                GetKeY2 KeyAscii, lastshift
+                If Not KeyAscii = 0 Then
                 RaiseEvent PreviewKeyboardUnicode(Chr$(27))
+                KeyAscii = 0
+                End If
             End If
         Else
             If myEnabled Then
@@ -1369,7 +1375,7 @@ Buffer = 100
 Set m_font = UserControl.Font
 ReDim mList(0 To Buffer)
 Dim I As Long
-scrTwips = 1440# / GetDeviceCaps(UserControl.Hdc, LOGPIXELSX)
+scrTwips = 1440# / GetDeviceCaps(UserControl.hDC, LOGPIXELSX)
 dragslow = 1
 DrawWidth = 1
 DrawStyle = 0
@@ -2086,7 +2092,7 @@ Private Sub UserControl_KeyUp(KeyCode As Integer, shift As Integer)
 On Error GoTo fin
 If PrevLocale <> GetLocale Then RaiseEvent Maybelanguage
 If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
-Dim I As Long, K As Integer
+Dim I As Long, k As Integer
 
 lastshift = shift
 
@@ -2098,9 +2104,9 @@ shift = 0
 RaiseEvent CtrlPlusF1
 Exit Sub
 ElseIf KeyCode >= vbKeyF1 And KeyCode <= vbKeyF12 Then
-    K = ((KeyCode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
-    RaiseEvent Fkey(K)
-    If K = 0 Then KeyCode = 0: shift = 0
+    k = ((KeyCode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
+    RaiseEvent Fkey(k)
+    If k = 0 Then KeyCode = 0: shift = 0
 ElseIf KeyCode = 16 And shift <> 0 Then
   '  RaiseEvent Maybelanguage
 ElseIf KeyCode = vbKeyV Then
@@ -2189,10 +2195,10 @@ If MousePointer = vbSizeWE And (Button And 3) > 0 And Not useFloatList And Not U
         mParts(AdjustColumn) = (CLng(X - scrTwips) \ scrTwips - AdjustColumnSum)
         End If
         TwipsCurTab = 0
-        Dim K As Integer
-        For K = 1 To mCurTab - 1
-        TwipsCurTab = TwipsCurTab + mParts(K) * scrTwips
-        Next K
+        Dim k As Integer
+        For k = 1 To mCurTab - 1
+        TwipsCurTab = TwipsCurTab + mParts(k) * scrTwips
+        Next k
         If mParts(AdjustColumn) < 1 Then mParts(AdjustColumn) = 1: MousePointer = 1
     Else
      MousePointer = 1
@@ -2279,7 +2285,7 @@ If FloatList And UseHeaderOnly And Button <> 0 Then
         Exit Sub
 End If
 If DropKey Then Exit Sub
-Dim osel As Long, tListcount As Long, YYT As Long, oldbutton As Integer, K As Integer, sum As Long
+Dim osel As Long, tListcount As Long, YYT As Long, oldbutton As Integer, k As Integer, sum As Long
 If missMouseClick Then Exit Sub
 If Abs(PX - X) <= 60 And Abs(PY - Y) <= 60 Then Exit Sub
 PX = X
@@ -2299,20 +2305,20 @@ If Button = 0 Then
     If Not nopointerchange Then
         If mTabs > 1 And AdjustColumns And Not useFloatList Then
             osel = CLng(X)
-            For K = 1 To mTabs
-                sum = sum + mParts(K)
-            Next K
-            For K = mTabs To 1 Step -1
-                If mParts(K) > 0 Then
+            For k = 1 To mTabs
+                sum = sum + mParts(k)
+            Next k
+            For k = mTabs To 1 Step -1
+                If mParts(k) > 0 Then
                     If Abs(osel - sum * scrTwips - scrTwips) <= scrTwips * 2 Then
                         MousePointer = vbSizeWE
-                        AdjustColumnSum = sum - mParts(K)
-                        AdjustColumn = K
+                        AdjustColumnSum = sum - mParts(k)
+                        AdjustColumn = k
                         GoTo ok_i_found
                     End If
-                sum = sum - mParts(K)
+                sum = sum - mParts(k)
                 End If
-            Next K
+            Next k
             If MousePointer < 2 Or (MousePointer = vbSizeWE And Not useFloatList) Then MousePointer = 1
 ok_i_found:
             osel = 0
@@ -2338,9 +2344,9 @@ If MousePointer = vbSizeWE And (Button And 3) > 0 And Not useFloatList And Not U
         mParts(AdjustColumn) = (CLng(X - scrTwips) \ scrTwips - AdjustColumnSum)
         End If
         TwipsCurTab = 0
-        For K = 1 To mCurTab - 1
-        TwipsCurTab = TwipsCurTab + mParts(K) * scrTwips
-        Next K
+        For k = 1 To mCurTab - 1
+        TwipsCurTab = TwipsCurTab + mParts(k) * scrTwips
+        Next k
         If mParts(AdjustColumn) < 1 Then mParts(AdjustColumn) = 1: MousePointer = 1
     Else
      MousePointer = 1
@@ -4046,7 +4052,7 @@ If listcount = 0 And HeadLine = vbNullString Then
     Repaint
     Exit Sub
 End If
-Dim I As Long, j As Long, G$, nr As RECT, fg As Long, hnr As RECT, skipme As Boolean, nfg As Long, tmprows As Long
+Dim I As Long, j As Long, g$, nr As RECT, fg As Long, hnr As RECT, skipme As Boolean, nfg As Long, tmprows As Long
 If MultiSelect And LeftMarginPixels < mytPixels Then LeftMarginPixels = mytPixels
 If Not headeronly Then Repaint
 mEditFlag1 = mEditFlag
@@ -4059,9 +4065,9 @@ nr.Right = Width / scrTwips
 hnr.Right = Width / scrTwips
 If mHeadline <> "" Then
     nr.Bottom = HeadlineHeight
-    RaiseEvent ExposeRect(-1, VarPtr(nr), UserControl.Hdc, skipme)
+    RaiseEvent ExposeRect(-1, VarPtr(nr), UserControl.hDC, skipme)
     nr.Bottom = HeadlineHeight
-    CalcRectHeader UserControl.Hdc, mHeadline, hnr, DT_CENTER
+    CalcRectHeader UserControl.hDC, mHeadline, hnr, DT_CENTER
     If Not skipme Then
         If hnr.Bottom < HeadLineHeightMinimum Then
             hnr.Bottom = HeadLineHeightMinimum
@@ -4072,13 +4078,13 @@ If mHeadline <> "" Then
             nr.Bottom = mHeadlineHeight
         End If
         End If
-        If Not NoHeaderBackground Then FillBack UserControl.Hdc, nr, CapColor
+        If Not NoHeaderBackground Then FillBack UserControl.hDC, nr, CapColor
     End If
     hnr.top = (nr.Bottom - hnr.Bottom) \ 2
     hnr.Bottom = nr.Bottom - hnr.top
     hnr.Left = 0
     hnr.Right = nr.Right
-    PrintLineControlHeader UserControl.Hdc, mHeadline, hnr, DT_CENTER
+    PrintLineControlHeader UserControl.hDC, mHeadline, hnr, DT_CENTER
     If headeronly Then
         Refresh
         Exit Sub
@@ -4189,8 +4195,8 @@ If listcount > 0 Then
             onemore = 1
         End If
     End If
-    Dim K As Integer, onr As Long, sum As Long, hRgn As Long, ii As Long
-    K = 1
+    Dim k As Integer, onr As Long, sum As Long, hRgn As Long, ii As Long
+    k = 1
     For ii = 0 To TopRows - 1
         I = ii
         If I = SELECTEDITEM - 1 Then
@@ -4198,7 +4204,7 @@ If listcount > 0 Then
         End If
         onr = nr.Right
         
-        RaiseEvent ExposeRect(I, VarPtr(nr), UserControl.Hdc, skipme)
+        RaiseEvent ExposeRect(I, VarPtr(nr), UserControl.hDC, skipme)
         
         If Not skipme Then
                 Do While Me.ListJoin(ii + 1)
@@ -4217,14 +4223,14 @@ If listcount > 0 Then
                 
                 RaiseEvent SpecialColor(nfg)
                 If mTabs > 1 Then
-                    For K = 1 To mTabs
+                    For k = 1 To mTabs
                     
-                     If mParts(K) > 0 Then
-                        mEditFlag1 = CBool(PropAtColumnNum(I, K, "Edit"))
-                        mcenter = CBool(PropAtColumnNum(I, K, "CenterText"))
-                        mwraptext = CBool(PropAtColumnNum(I, K, "WrapText"))
-                        mVcenter = CBool(PropAtColumnNum(I, K, "VerticalCenterText"))
-                        If (NarrowSelect And mCurTab = K) Or Not NarrowSelect Then
+                     If mParts(k) > 0 Then
+                        mEditFlag1 = CBool(PropAtColumnNum(I, k, "Edit"))
+                        mcenter = CBool(PropAtColumnNum(I, k, "CenterText"))
+                        mwraptext = CBool(PropAtColumnNum(I, k, "WrapText"))
+                        mVcenter = CBool(PropAtColumnNum(I, k, "VerticalCenterText"))
+                        If (NarrowSelect And mCurTab = k) Or Not NarrowSelect Then
                             nfg = fg
                             If nfg <> fg Then Me.ForeColor = nfg
                             If mEditFlag1 Then
@@ -4237,33 +4243,33 @@ If listcount > 0 Then
                                 End If
                             End If
                         End If
-                        nr.Right = nr.Left + mParts(K) - 1
+                        nr.Right = nr.Left + mParts(k) - 1
                         nr.Right = nr.Right + 1
                         nr.Bottom = nr.Bottom + 1
                         hRgn = CreateRectRgnIndirect(nr)
                         nr.Right = nr.Right - 1
                         nr.Bottom = nr.Bottom - 1
-                        SelectClipRgn UserControl.Hdc, hRgn
-                        RaiseEvent ExposeRectCol(I, K, VarPtr(nr), UserControl.Hdc, skipme)
+                        SelectClipRgn UserControl.hDC, hRgn
+                        RaiseEvent ExposeRectCol(I, k, VarPtr(nr), UserControl.hDC, skipme)
                         If Not skipme Then
                             If mwraptext Then
                                 hnr = nr
-                                s1 = listAtColumn(I, K)
+                                s1 = listAtColumn(I, k)
                                 LineAddTopOffsetPixels s1, hnr
-                                PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
+                                PrintLineControlSinglePrivate UserControl.hDC, s1, hnr, mwraptext, mcenter, mVcenter
                             Else
                                 hnr = nr
-                                If mEditFlag1 And K = mCurTab Then hnr.Bottom = nr.top + mytPixels + 1
-                                PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(I, K), hnr, mwraptext, mcenter, mVcenter
+                                If mEditFlag1 And k = mCurTab Then hnr.Bottom = nr.top + mytPixels + 1
+                                PrintLineControlSinglePrivate UserControl.hDC, listAtColumn(I, k), hnr, mwraptext, mcenter, mVcenter
                             End If
                         End If
-                        SelectClipRgn UserControl.Hdc, &H0
+                        SelectClipRgn UserControl.hDC, &H0
                         DeleteObject hRgn
                         nr.Left = nr.Right + 1
                         Me.ForeColor = fg
                         If nr.Left >= onr Then Exit For
                      End If
-                    Next K
+                    Next k
                 Else
                     If nfg <> fg Then Me.ForeColor = nfg
                     If mEditFlag1 Then
@@ -4276,9 +4282,9 @@ If listcount > 0 Then
                         End If
                     End If
                     If (MultiSelect Or ListMenu(I)) And itemcount > 0 Then
-                        MyMark UserControl.Hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I, True
+                        MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I, True
                     End If
-                    PrintLineControlSingle UserControl.Hdc, list(I), nr
+                    PrintLineControlSingle UserControl.hDC, list(I), nr
                 End If
                 Me.ForeColor = fg
             Else
@@ -4287,48 +4293,48 @@ If listcount > 0 Then
                    hnr.Right = nr.Right
                    hnr.top = nr.top + mytPixels \ 2
                    hnr.Bottom = hnr.top + 1
-                   FillBack UserControl.Hdc, hnr, ForeColor
+                   FillBack UserControl.hDC, hnr, ForeColor
                 Else
                     If (MultiSelect Or ListMenu(I)) And itemcount > 0 Then
-                        MyMark UserControl.Hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I
+                        MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I
                     End If
                     If ListSep(I) Then
                         ForeColor = dcolor
                     End If
                     If mTabs > 1 Then
-                        For K = 1 To mTabs
-                            If mParts(K) > 0 Then
-                            mcenter = CBool(PropAtColumnNum(I, K, "CenterText"))
-                            mwraptext = CBool(PropAtColumnNum(I, K, "WrapText"))
-                            mVcenter = CBool(PropAtColumnNum(I, K, "VerticalCenterText"))
-                            nr.Right = nr.Left + mParts(K) - 1
+                        For k = 1 To mTabs
+                            If mParts(k) > 0 Then
+                            mcenter = CBool(PropAtColumnNum(I, k, "CenterText"))
+                            mwraptext = CBool(PropAtColumnNum(I, k, "WrapText"))
+                            mVcenter = CBool(PropAtColumnNum(I, k, "VerticalCenterText"))
+                            nr.Right = nr.Left + mParts(k) - 1
                             nr.Right = nr.Right + 1
                             nr.Bottom = nr.Bottom + 1
                             hRgn = CreateRectRgnIndirect(nr)
                             nr.Right = nr.Right - 1
                             nr.Bottom = nr.Bottom - 1
-                            SelectClipRgn UserControl.Hdc, hRgn
-                            RaiseEvent ExposeRectCol(I, K, VarPtr(nr), UserControl.Hdc, skipme)
+                            SelectClipRgn UserControl.hDC, hRgn
+                            RaiseEvent ExposeRectCol(I, k, VarPtr(nr), UserControl.hDC, skipme)
                             If Not skipme Then
                                 If mwraptext Then
                                     hnr = nr
-                                    s1 = listAtColumn(I, K)
+                                    s1 = listAtColumn(I, k)
                                     LineAddTopOffsetPixels s1, hnr
-                                    PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
+                                    PrintLineControlSinglePrivate UserControl.hDC, s1, hnr, mwraptext, mcenter, mVcenter
                                 Else
-                                    PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(I, K), nr, mwraptext, mcenter, mVcenter
+                                    PrintLineControlSinglePrivate UserControl.hDC, listAtColumn(I, k), nr, mwraptext, mcenter, mVcenter
                                 End If
                             End If
-                            SelectClipRgn UserControl.Hdc, &H0
+                            SelectClipRgn UserControl.hDC, &H0
                             DeleteObject hRgn
                             nr.Left = nr.Right + 1
                             If nr.Left >= onr Then Exit For
                             End If
-                        Next K
+                        Next k
                         
                         nr.Right = onr
                     Else
-                        PrintLineControlSingle UserControl.Hdc, list(I), nr
+                        PrintLineControlSingle UserControl.hDC, list(I), nr
                     End If
                         
                     End If
@@ -4344,11 +4350,11 @@ If listcount > 0 Then
         ForeColor = fg
     
     Next ii
-    K = 1
+    k = 1
     For ii = topitem To j + onemore
         I = ii
         onr = nr.Right
-        RaiseEvent ExposeRect(I, VarPtr(nr), UserControl.Hdc, skipme)
+        RaiseEvent ExposeRect(I, VarPtr(nr), UserControl.hDC, skipme)
         If Not skipme Then
             Do While Me.ListJoin(ii + 1)
                 ii = ii + 1
@@ -4365,13 +4371,13 @@ If listcount > 0 Then
                 
                 RaiseEvent SpecialColor(nfg)
                 If mTabs > 1 Then
-                    For K = 1 To mTabs
-                     If mParts(K) > 0 Then
-                        mEditFlag1 = CBool(PropAtColumnNum(I, K, "Edit"))
-                        mcenter = CBool(PropAtColumnNum(I, K, "CenterText"))
-                        mwraptext = CBool(PropAtColumnNum(I, K, "WrapText"))
-                        mVcenter = CBool(PropAtColumnNum(I, K, "VerticalCenterText"))
-                        If (NarrowSelect And mCurTab = K) Or Not NarrowSelect Then
+                    For k = 1 To mTabs
+                     If mParts(k) > 0 Then
+                        mEditFlag1 = CBool(PropAtColumnNum(I, k, "Edit"))
+                        mcenter = CBool(PropAtColumnNum(I, k, "CenterText"))
+                        mwraptext = CBool(PropAtColumnNum(I, k, "WrapText"))
+                        mVcenter = CBool(PropAtColumnNum(I, k, "VerticalCenterText"))
+                        If (NarrowSelect And mCurTab = k) Or Not NarrowSelect Then
                             nfg = fg
                             If nfg <> fg Then Me.ForeColor = nfg
                             If mEditFlag1 Then
@@ -4384,32 +4390,32 @@ If listcount > 0 Then
                                 End If
                             End If
                         End If
-                        nr.Right = nr.Left + mParts(K)
+                        nr.Right = nr.Left + mParts(k)
                         nr.Bottom = nr.Bottom + 1
                         hRgn = CreateRectRgnIndirect(nr)
                         nr.Right = nr.Right - 1
                         nr.Bottom = nr.Bottom - 1
-                        SelectClipRgn UserControl.Hdc, hRgn
-                        RaiseEvent ExposeRectCol(I, K, VarPtr(nr), UserControl.Hdc, skipme)
+                        SelectClipRgn UserControl.hDC, hRgn
+                        RaiseEvent ExposeRectCol(I, k, VarPtr(nr), UserControl.hDC, skipme)
                         If Not skipme Then
                             If mwraptext Then
                                 hnr = nr
-                                s1 = listAtColumn(I, K)
+                                s1 = listAtColumn(I, k)
                                 LineAddTopOffsetPixels s1, hnr
-                                PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
+                                PrintLineControlSinglePrivate UserControl.hDC, s1, hnr, mwraptext, mcenter, mVcenter
                             Else
                                 hnr = nr
-                                If mEditFlag1 And K = mCurTab Then hnr.Bottom = nr.top + mytPixels + 1
-                                PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(I, K), hnr, mwraptext, mcenter, mVcenter
+                                If mEditFlag1 And k = mCurTab Then hnr.Bottom = nr.top + mytPixels + 1
+                                PrintLineControlSinglePrivate UserControl.hDC, listAtColumn(I, k), hnr, mwraptext, mcenter, mVcenter
                             End If
                         End If
-                        SelectClipRgn UserControl.Hdc, &H0
+                        SelectClipRgn UserControl.hDC, &H0
                         DeleteObject hRgn
                         nr.Left = nr.Right + 1
                         Me.ForeColor = fg
                         If nr.Left >= onr Then Exit For
                      End If
-                    Next K
+                    Next k
                 Else
                     If nfg <> fg Then Me.ForeColor = nfg
                     If mEditFlag1 Then
@@ -4422,9 +4428,9 @@ If listcount > 0 Then
                         End If
                     End If
                     If (MultiSelect Or ListMenu(I)) And itemcount > 0 Then
-                        MyMark UserControl.Hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I, True
+                        MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I, True
                     End If
-                    PrintLineControlSingle UserControl.Hdc, list(I), nr
+                    PrintLineControlSingle UserControl.hDC, list(I), nr
                 End If
                 Me.ForeColor = fg
             Else
@@ -4433,46 +4439,46 @@ If listcount > 0 Then
                    hnr.Right = nr.Right
                    hnr.top = nr.top + mytPixels \ 2
                    hnr.Bottom = hnr.top + 1
-                   FillBack UserControl.Hdc, hnr, ForeColor
+                   FillBack UserControl.hDC, hnr, ForeColor
                 Else
                     If (MultiSelect Or ListMenu(I)) And itemcount > 0 Then
-                        MyMark UserControl.Hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I
+                        MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I
                     End If
                     If ListSep(I) Then
                         ForeColor = dcolor
                     End If
                     If mTabs > 1 Then
-                        For K = 1 To mTabs
-                            If mParts(K) > 0 Then
-                                mcenter = CBool(PropAtColumnNum(I, K, "CenterText"))
-                                mwraptext = CBool(PropAtColumnNum(I, K, "WrapText"))
-                                mVcenter = CBool(PropAtColumnNum(I, K, "VerticalCenterText"))
-                                nr.Right = nr.Left + mParts(K)
+                        For k = 1 To mTabs
+                            If mParts(k) > 0 Then
+                                mcenter = CBool(PropAtColumnNum(I, k, "CenterText"))
+                                mwraptext = CBool(PropAtColumnNum(I, k, "WrapText"))
+                                mVcenter = CBool(PropAtColumnNum(I, k, "VerticalCenterText"))
+                                nr.Right = nr.Left + mParts(k)
                                 nr.Bottom = nr.Bottom + 1
                                 hRgn = CreateRectRgnIndirect(nr)
                                 nr.Right = nr.Right - 1
                                 nr.Bottom = nr.Bottom - 1
-                                SelectClipRgn UserControl.Hdc, hRgn
-                                RaiseEvent ExposeRectCol(I, K, VarPtr(nr), UserControl.Hdc, skipme)
+                                SelectClipRgn UserControl.hDC, hRgn
+                                RaiseEvent ExposeRectCol(I, k, VarPtr(nr), UserControl.hDC, skipme)
                                 If Not skipme Then
                                     If mwraptext Then
                                         hnr = nr
-                                        s1 = listAtColumn(I, K)
+                                        s1 = listAtColumn(I, k)
                                         LineAddTopOffsetPixels s1, hnr
-                                        PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
+                                        PrintLineControlSinglePrivate UserControl.hDC, s1, hnr, mwraptext, mcenter, mVcenter
                                     Else
-                                        PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(I, K), nr, mwraptext, mcenter, mVcenter
+                                        PrintLineControlSinglePrivate UserControl.hDC, listAtColumn(I, k), nr, mwraptext, mcenter, mVcenter
                                     End If
                                 End If
-                                SelectClipRgn UserControl.Hdc, &H0
+                                SelectClipRgn UserControl.hDC, &H0
                                 DeleteObject hRgn
                                 nr.Left = nr.Right + 1
                                 If nr.Left >= onr Then Exit For
                             End If
-                        Next K
+                        Next k
                         nr.Right = onr
                     Else
-                        PrintLineControlSingle UserControl.Hdc, list(I), nr
+                        PrintLineControlSingle UserControl.hDC, list(I), nr
                     End If
                 End If
             End If
@@ -4524,7 +4530,7 @@ If listcount > 0 Then
                     Else
                         If mTabs = 1 Then
                             skipme = False
-                            RaiseEvent GetRealX1(UserControl.Hdc, SelStart, list(SELECTEDITEM - 1), REALX, skipme)
+                            RaiseEvent GetRealX1(UserControl.hDC, SelStart, list(SELECTEDITEM - 1), REALX, skipme)
                             If skipme Then
                                 skipme = False
                                 REALX = (REALX + LeftMarginPixels) * scrTwips
@@ -4534,7 +4540,7 @@ If listcount > 0 Then
                             RealX2 = scrollme + REALX
                         Else
                             skipme = False
-                            RaiseEvent GetRealX1(UserControl.Hdc, SelStart, listAtColumn(SELECTEDITEM - 1, mCurTab), REALX, skipme)
+                            RaiseEvent GetRealX1(UserControl.hDC, SelStart, listAtColumn(SELECTEDITEM - 1, mCurTab), REALX, skipme)
                             If skipme Then
                                 skipme = False
                                 REALX = (REALX + LeftMarginPixels) * scrTwips + TwipsCurTab
@@ -4625,7 +4631,7 @@ If Grid Then
                 hnr.top = 0
                 hnr.Bottom = Me.HeightPixels
                 onemore = CreateSolidBrush(Me.BackColor)
-                FrameRect UserControl.Hdc, hnr, onemore
+                FrameRect UserControl.hDC, hnr, onemore
                 DeleteObject onemore
             End If
 RepaintScrollBar
@@ -4656,9 +4662,9 @@ nr.Right = Width / scrTwips
 hnr.Right = Width / scrTwips
 If mHeadline <> "" Then
     nr.Bottom = HeadlineHeight
-    RaiseEvent ExposeRect(-1, VarPtr(nr), UserControl.Hdc, skipme)
+    RaiseEvent ExposeRect(-1, VarPtr(nr), UserControl.hDC, skipme)
     nr.Bottom = HeadlineHeight
-    CalcRectHeader UserControl.Hdc, mHeadline, hnr, DT_CENTER
+    CalcRectHeader UserControl.hDC, mHeadline, hnr, DT_CENTER
     If Not skipme Then
         If Not blockheight Then
             If mHeadlineHeight <> hnr.Bottom Then
@@ -4666,14 +4672,14 @@ If mHeadline <> "" Then
                 nr.Bottom = mHeadlineHeight
             End If
         End If
-        If Not NoHeaderBackground Then FillBack UserControl.Hdc, nr, CapColor
+        If Not NoHeaderBackground Then FillBack UserControl.hDC, nr, CapColor
         
     End If
     hnr.top = (nr.Bottom - hnr.Bottom) \ 2
     hnr.Bottom = nr.Bottom - hnr.top
     hnr.Left = 0
     hnr.Right = nr.Right
-    PrintLineControlHeader UserControl.Hdc, mHeadline, hnr, DT_CENTER
+    PrintLineControlHeader UserControl.hDC, mHeadline, hnr, DT_CENTER
     nr.top = nr.Bottom
     nr.Bottom = nr.top + mytPixels + 1
 End If
@@ -4719,14 +4725,14 @@ Else
             onemore = 1
         End If
     End If
-    Dim K As Integer, onr As Long, sum As Long, hRgn As Long, ont As Long
+    Dim k As Integer, onr As Long, sum As Long, hRgn As Long, ont As Long
     For ii = 0 To TopRows - 1
         I = ii
         currentX = scrollme
         currentY = 0
         onr = nr.Right
         ont = nr.top
-        RaiseEvent ExposeRect(I, VarPtr(nr), UserControl.Hdc, skipme)
+        RaiseEvent ExposeRect(I, VarPtr(nr), UserControl.hDC, skipme)
         If I = SELECTEDITEM - 1 Then
             tmprows = topitem - TopRows
         End If
@@ -4744,45 +4750,45 @@ Else
                 End If
                 If mTabs > 1 Then
                     nr.Left = LeftMarginPixels
-                    For K = 1 To mCurTab - 1
-                        nr.Left = nr.Left + mParts(K)
-                    Next K
+                    For k = 1 To mCurTab - 1
+                        nr.Left = nr.Left + mParts(k)
+                    Next k
                     mEditFlag1 = CBool(PropAtColumnNum(I, mCurTab, "EDIT"))
                     mcenter = CBool(PropAtColumnNum(I, mCurTab, "CenterText"))
                     mwraptext = CBool(PropAtColumnNum(I, mCurTab, "WrapText"))
                     mVcenter = CBool(PropAtColumnNum(I, mCurTab, "VerticalCenterText"))
-                    K = mCurTab
-                    nr.Right = nr.Left + mParts(K) - 1
+                    k = mCurTab
+                    nr.Right = nr.Left + mParts(k) - 1
                     hnr = nr
                     nr.Left = nr.Left + scrollme / scrTwips
                     hnr.Right = nr.Right + 1
                     hnr.Bottom = nr.Bottom + 1
                     hRgn = CreateRectRgnIndirect(hnr)
-                    SelectClipRgn UserControl.Hdc, hRgn
-                    RaiseEvent ExposeRectCol(I, K, VarPtr(nr), UserControl.Hdc, skipme)
+                    SelectClipRgn UserControl.hDC, hRgn
+                    RaiseEvent ExposeRectCol(I, k, VarPtr(nr), UserControl.hDC, skipme)
                     If Not skipme Then
                         If mwraptext And Not mEditFlag1 Then
                             hnr = nr
-                            s1 = listAtColumn(I, K)
+                            s1 = listAtColumn(I, k)
                             LineAddTopOffsetPixels s1, hnr
-                            PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
+                            PrintLineControlSinglePrivate UserControl.hDC, s1, hnr, mwraptext, mcenter, mVcenter
                         Else
                             hnr = nr
                             If mEditFlag1 Then hnr.Bottom = nr.top + mytPixels + 1
-                            PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(I, K), hnr, False, mcenter, mVcenter
+                            PrintLineControlSinglePrivate UserControl.hDC, listAtColumn(I, k), hnr, False, mcenter, mVcenter
                         End If
                     End If
-                    SelectClipRgn UserControl.Hdc, &H0
+                    SelectClipRgn UserControl.hDC, &H0
                     DeleteObject hRgn
                     nr.Right = onr
                     sum = LeftMarginPixels
                     nr.Left = sum
-                    For K = 1 To mTabs
-                        If mParts(K) > 0 Then
-                            mcenter = CBool(PropAtColumnNum(I, K, "CenterText"))
-                            mwraptext = CBool(PropAtColumnNum(I, K, "WrapText"))
-                            mVcenter = CBool(PropAtColumnNum(I, K, "VerticalCenterText"))
-                            If (NarrowSelect And mCurTab = K) Or Not NarrowSelect Then
+                    For k = 1 To mTabs
+                        If mParts(k) > 0 Then
+                            mcenter = CBool(PropAtColumnNum(I, k, "CenterText"))
+                            mwraptext = CBool(PropAtColumnNum(I, k, "WrapText"))
+                            mVcenter = CBool(PropAtColumnNum(I, k, "VerticalCenterText"))
+                            If (NarrowSelect And mCurTab = k) Or Not NarrowSelect Then
                                 nfg = fg
                                 If nfg1 <> nfg Then nfg = nfg1
                                 If nfg <> fg Then Me.ForeColor = nfg
@@ -4796,42 +4802,42 @@ Else
                                     End If
                                 End If
                             End If
-                            nr.Right = nr.Left + mParts(K)
-                            If K <> mCurTab Then
-                                nr.Right = nr.Left + mParts(K) - 1
+                            nr.Right = nr.Left + mParts(k)
+                            If k <> mCurTab Then
+                                nr.Right = nr.Left + mParts(k) - 1
                                 nr.Right = nr.Right + 1
                                 nr.Bottom = nr.Bottom + 1
                                 hRgn = CreateRectRgnIndirect(nr)
                                 nr.Right = nr.Right - 1
                                 nr.Bottom = nr.Bottom - 1
-                                SelectClipRgn UserControl.Hdc, hRgn
-                                RaiseEvent ExposeRectCol(I, K, VarPtr(nr), UserControl.Hdc, skipme)
+                                SelectClipRgn UserControl.hDC, hRgn
+                                RaiseEvent ExposeRectCol(I, k, VarPtr(nr), UserControl.hDC, skipme)
                                 If Not skipme Then
                                     If mwraptext Then
                                         hnr = nr
-                                        s1 = listAtColumn(I, K)
+                                        s1 = listAtColumn(I, k)
                                         LineAddTopOffsetPixels s1, hnr
-                                        PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
+                                        PrintLineControlSinglePrivate UserControl.hDC, s1, hnr, mwraptext, mcenter, mVcenter
                                     Else
-                                        PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(I, K), nr, mwraptext, mcenter, mVcenter
+                                        PrintLineControlSinglePrivate UserControl.hDC, listAtColumn(I, k), nr, mwraptext, mcenter, mVcenter
                                     End If
                                 End If
-                                SelectClipRgn UserControl.Hdc, &H0
+                                SelectClipRgn UserControl.hDC, &H0
                                 DeleteObject hRgn
                             End If
-                            sum = sum + mParts(K)
+                            sum = sum + mParts(k)
                             nr.Left = sum  ' nr.Right + 1
                             ForeColor = fg
                             If nr.Left >= onr Then Exit For
                         End If
-                    Next K
+                    Next k
                 Else
                     nfg = nfg1
                     If nfg <> fg Then Me.ForeColor = nfg
                     If (MultiSelect Or ListMenu(I)) And itemcount > 0 Then
-                        MyMark UserControl.Hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I, True
+                        MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I, True
                     End If
-                    PrintLineControlSingle UserControl.Hdc, list(I), nr
+                    PrintLineControlSingle UserControl.hDC, list(I), nr
                 End If
                 If nfg = fg Then Me.ForeColor = fg
             Else
@@ -4843,10 +4849,10 @@ Else
                     hnr.Right = nr.Right
                     hnr.top = nr.top + mytPixels \ 2
                     hnr.Bottom = hnr.top + 1
-                    FillBack UserControl.Hdc, hnr, ForeColor
+                    FillBack UserControl.hDC, hnr, ForeColor
                 Else
                     If (MultiSelect Or ListMenu(I)) And itemcount > 0 Then
-                        MyMark UserControl.Hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I
+                        MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I
                     End If
                     If ListSep(I) Then
                         ForeColor = dcolor
@@ -4861,13 +4867,13 @@ Else
                         sum = LeftMarginPixels
                         nr.Left = sum
                         currentX = scrollme
-                        For K = 1 To mTabs
-                            If mParts(K) > 0 Then
+                        For k = 1 To mTabs
+                            If mParts(k) > 0 Then
                             mEditFlag1 = CBool(PropAtColumnNum(I, mCurTab, "EDIT"))
-                            mcenter = CBool(PropAtColumnNum(I, K, "CenterText"))
-                            mwraptext = CBool(PropAtColumnNum(I, K, "WrapText"))
-                            mVcenter = CBool(PropAtColumnNum(I, K, "VerticalCenterText"))
-                            nr.Right = nr.Left + mParts(K) - 1
+                            mcenter = CBool(PropAtColumnNum(I, k, "CenterText"))
+                            mwraptext = CBool(PropAtColumnNum(I, k, "WrapText"))
+                            mVcenter = CBool(PropAtColumnNum(I, k, "VerticalCenterText"))
+                            nr.Right = nr.Left + mParts(k) - 1
                             nr.Right = nr.Right + 1
                             nr.Bottom = nr.Bottom + 1
                             hnr = nr
@@ -4875,27 +4881,27 @@ Else
                             hRgn = CreateRectRgnIndirect(hnr)
                             nr.Right = nr.Right - 1
                             nr.Bottom = nr.Bottom - 1
-                            SelectClipRgn UserControl.Hdc, hRgn
-                            RaiseEvent ExposeRectCol(I, K, VarPtr(nr), UserControl.Hdc, skipme)
+                            SelectClipRgn UserControl.hDC, hRgn
+                            RaiseEvent ExposeRectCol(I, k, VarPtr(nr), UserControl.hDC, skipme)
                             If Not skipme Then
                                 If mwraptext Then
                                     hnr = nr
-                                    s1 = listAtColumn(I, K)
+                                    s1 = listAtColumn(I, k)
                                     LineAddTopOffsetPixels s1, hnr
-                                    PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
+                                    PrintLineControlSinglePrivate UserControl.hDC, s1, hnr, mwraptext, mcenter, mVcenter
                                 Else
-                                    PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(I, K), nr, mwraptext, mcenter, mVcenter
+                                    PrintLineControlSinglePrivate UserControl.hDC, listAtColumn(I, k), nr, mwraptext, mcenter, mVcenter
                                 End If
                             End If
-                            SelectClipRgn UserControl.Hdc, &H0
+                            SelectClipRgn UserControl.hDC, &H0
                             DeleteObject hRgn
-                            sum = sum + mParts(K)
+                            sum = sum + mParts(k)
                             nr.Left = sum ' nr.Right + 1
                             If nr.Left >= onr Then Exit For
                             End If
-                        Next K
+                        Next k
                     Else
-                        PrintLineControlSingle UserControl.Hdc, list(I), nr
+                        PrintLineControlSingle UserControl.hDC, list(I), nr
                     End If
                 End If
             End If
@@ -4919,7 +4925,7 @@ Else
         currentY = 0
         onr = nr.Right
         ont = nr.top
-        RaiseEvent ExposeRect(I, VarPtr(nr), UserControl.Hdc, skipme)
+        RaiseEvent ExposeRect(I, VarPtr(nr), UserControl.hDC, skipme)
         If Not skipme Then
                 If Me.ListJoin(I) Then
                     Do While Me.ListJoin(I)
@@ -4940,47 +4946,47 @@ Else
                 End If
                 If mTabs > 1 Then
                     nr.Left = LeftMarginPixels
-                    For K = 1 To mCurTab - 1
-                        nr.Left = nr.Left + mParts(K)
-                    Next K
-                    K = mCurTab
+                    For k = 1 To mCurTab - 1
+                        nr.Left = nr.Left + mParts(k)
+                    Next k
+                    k = mCurTab
                     mEditFlag1 = CBool(PropAtColumnNum(I, mCurTab, "EDIT"))
                     mcenter = CBool(PropAtColumnNum(I, mCurTab, "CenterText"))
                     mwraptext = CBool(PropAtColumnNum(I, mCurTab, "WrapText"))
                     mVcenter = CBool(PropAtColumnNum(I, mCurTab, "VerticalCenterText"))
-                    nr.Right = nr.Left + mParts(K) - 1
+                    nr.Right = nr.Left + mParts(k) - 1
                     hnr = nr
                     nr.Left = nr.Left + scrollme / scrTwips
                     hnr.Right = nr.Right + 1
                     hnr.Bottom = nr.Bottom + 1
                     hnr.top = ont
                     hRgn = CreateRectRgnIndirect(hnr)
-                    SelectClipRgn UserControl.Hdc, hRgn
-                    RaiseEvent ExposeRectCol(I, K, VarPtr(nr), UserControl.Hdc, skipme)
+                    SelectClipRgn UserControl.hDC, hRgn
+                    RaiseEvent ExposeRectCol(I, k, VarPtr(nr), UserControl.hDC, skipme)
                     If Not skipme Then
                         If mwraptext And Not mEditFlag1 Then
                             hnr = nr
-                            s1 = listAtColumn(I, K)
+                            s1 = listAtColumn(I, k)
                             LineAddTopOffsetPixels s1, hnr
-                            PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
+                            PrintLineControlSinglePrivate UserControl.hDC, s1, hnr, mwraptext, mcenter, mVcenter
                         Else
                             hnr = nr
                             If mEditFlag1 Then hnr.Bottom = nr.top + mytPixels + 1
-                            PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(I, K), hnr, False, mcenter, mVcenter
+                            PrintLineControlSinglePrivate UserControl.hDC, listAtColumn(I, k), hnr, False, mcenter, mVcenter
                         End If
                     End If
-                    SelectClipRgn UserControl.Hdc, &H0
+                    SelectClipRgn UserControl.hDC, &H0
                     DeleteObject hRgn
                     nr.Right = onr
                     sum = LeftMarginPixels
                     nr.Left = sum
-                    For K = 1 To mTabs
-                        If mParts(K) > 0 Then
+                    For k = 1 To mTabs
+                        If mParts(k) > 0 Then
                             mEditFlag1 = CBool(PropAtColumnNum(I, mCurTab, "EDIT"))
-                            mcenter = CBool(PropAtColumnNum(I, K, "CenterText"))
-                            mwraptext = CBool(PropAtColumnNum(I, K, "WrapText"))
-                            mVcenter = CBool(PropAtColumnNum(I, K, "VerticalCenterText"))
-                            If (NarrowSelect And mCurTab = K) Or Not NarrowSelect Then
+                            mcenter = CBool(PropAtColumnNum(I, k, "CenterText"))
+                            mwraptext = CBool(PropAtColumnNum(I, k, "WrapText"))
+                            mVcenter = CBool(PropAtColumnNum(I, k, "VerticalCenterText"))
+                            If (NarrowSelect And mCurTab = k) Or Not NarrowSelect Then
                                 nfg = fg
                                 If nfg1 <> nfg Then nfg = nfg1
                                 If nfg <> fg Then Me.ForeColor = nfg
@@ -4994,9 +5000,9 @@ Else
                                     End If
                                 End If
                             End If
-                            nr.Right = nr.Left + mParts(K)
-                            If K <> mCurTab Then
-                                nr.Right = nr.Left + mParts(K) - 1
+                            nr.Right = nr.Left + mParts(k)
+                            If k <> mCurTab Then
+                                nr.Right = nr.Left + mParts(k) - 1
                                 nr.Right = nr.Right + 1
                                 nr.Bottom = nr.Bottom + 1
                                 hnr = nr
@@ -5004,36 +5010,36 @@ Else
                                 hRgn = CreateRectRgnIndirect(hnr)
                                 nr.Right = nr.Right - 1
                                 nr.Bottom = nr.Bottom - 1
-                                SelectClipRgn UserControl.Hdc, hRgn
-                                RaiseEvent ExposeRectCol(I, K, VarPtr(nr), UserControl.Hdc, skipme)
+                                SelectClipRgn UserControl.hDC, hRgn
+                                RaiseEvent ExposeRectCol(I, k, VarPtr(nr), UserControl.hDC, skipme)
                                 If Not skipme Then
                                     If mwraptext Then
                                         hnr = nr
-                                        s1 = listAtColumn(I, K)
+                                        s1 = listAtColumn(I, k)
                                         LineAddTopOffsetPixels s1, hnr
-                                        PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
+                                        PrintLineControlSinglePrivate UserControl.hDC, s1, hnr, mwraptext, mcenter, mVcenter
                                     Else
-                                        PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(I, K), nr, mwraptext, mcenter, mVcenter
+                                        PrintLineControlSinglePrivate UserControl.hDC, listAtColumn(I, k), nr, mwraptext, mcenter, mVcenter
                                     End If
                                 End If
-                                SelectClipRgn UserControl.Hdc, &H0
+                                SelectClipRgn UserControl.hDC, &H0
                                 DeleteObject hRgn
                             End If
-                            sum = sum + mParts(K)
+                            sum = sum + mParts(k)
                             nr.Left = sum  ' nr.Right + 1
                             ForeColor = fg
                             If nr.Left >= onr Then Exit For
                         End If
-                    Next K
+                    Next k
                 Else
                 nfg = nfg1
                 If nfg <> fg Then Me.ForeColor = nfg
                 
                 
                 If (MultiSelect Or ListMenu(I)) And itemcount > 0 Then
-                    MyMark UserControl.Hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I, True
+                    MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I, True
                 End If
-                    PrintLineControlSingle UserControl.Hdc, list(I), nr
+                    PrintLineControlSingle UserControl.hDC, list(I), nr
                 End If
                 If nfg = fg Then Me.ForeColor = fg
             Else
@@ -5045,10 +5051,10 @@ Else
                     hnr.Right = nr.Right
                     hnr.top = nr.top + mytPixels \ 2
                     hnr.Bottom = hnr.top + 1
-                    FillBack UserControl.Hdc, hnr, ForeColor
+                    FillBack UserControl.hDC, hnr, ForeColor
                 Else
                     If (MultiSelect Or ListMenu(I)) And itemcount > 0 Then
-                        MyMark UserControl.Hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I
+                        MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, I
                     End If
                     If ListSep(I) Then
                         ForeColor = dcolor
@@ -5063,12 +5069,12 @@ Else
                         sum = LeftMarginPixels
                         nr.Left = sum
                         currentX = scrollme
-                        For K = 1 To mTabs
-                            If mParts(K) > 0 Then
-                            mcenter = CBool(PropAtColumnNum(I, K, "CenterText"))
-                            mwraptext = CBool(PropAtColumnNum(I, K, "WrapText"))
-                            mVcenter = CBool(PropAtColumnNum(I, K, "VerticalCenterText"))
-                            nr.Right = nr.Left + mParts(K) - 1
+                        For k = 1 To mTabs
+                            If mParts(k) > 0 Then
+                            mcenter = CBool(PropAtColumnNum(I, k, "CenterText"))
+                            mwraptext = CBool(PropAtColumnNum(I, k, "WrapText"))
+                            mVcenter = CBool(PropAtColumnNum(I, k, "VerticalCenterText"))
+                            nr.Right = nr.Left + mParts(k) - 1
                             nr.Right = nr.Right + 1
                             nr.Bottom = nr.Bottom + 1
                             hnr = nr
@@ -5076,27 +5082,27 @@ Else
                             hRgn = CreateRectRgnIndirect(hnr)
                             nr.Right = nr.Right - 1
                             nr.Bottom = nr.Bottom - 1
-                            SelectClipRgn UserControl.Hdc, hRgn
-                            RaiseEvent ExposeRectCol(I, K, VarPtr(nr), UserControl.Hdc, skipme)
+                            SelectClipRgn UserControl.hDC, hRgn
+                            RaiseEvent ExposeRectCol(I, k, VarPtr(nr), UserControl.hDC, skipme)
                             If Not skipme Then
                                 If mwraptext Then
                                     hnr = nr
-                                    s1 = listAtColumn(I, K)
+                                    s1 = listAtColumn(I, k)
                                     LineAddTopOffsetPixels s1, hnr
-                                    PrintLineControlSinglePrivate UserControl.Hdc, s1, hnr, mwraptext, mcenter, mVcenter
+                                    PrintLineControlSinglePrivate UserControl.hDC, s1, hnr, mwraptext, mcenter, mVcenter
                                 Else
-                                    PrintLineControlSinglePrivate UserControl.Hdc, listAtColumn(I, K), nr, mwraptext, mcenter, mVcenter
+                                    PrintLineControlSinglePrivate UserControl.hDC, listAtColumn(I, k), nr, mwraptext, mcenter, mVcenter
                                 End If
                             End If
-                            SelectClipRgn UserControl.Hdc, &H0
+                            SelectClipRgn UserControl.hDC, &H0
                             DeleteObject hRgn
-                            sum = sum + mParts(K)
+                            sum = sum + mParts(k)
                             nr.Left = sum ' nr.Right + 1
                             If nr.Left >= onr Then Exit For
                             End If
-                        Next K
+                        Next k
                     Else
-                        PrintLineControlSingle UserControl.Hdc, list(I), nr
+                        PrintLineControlSingle UserControl.hDC, list(I), nr
                     End If
                 End If
             End If
@@ -5159,7 +5165,7 @@ Else
                 Else
                     If mTabs = 1 Then
                         skipme = False
-                        RaiseEvent GetRealX1(UserControl.Hdc, SelStart, list(SELECTEDITEM - 1), REALX, skipme)
+                        RaiseEvent GetRealX1(UserControl.hDC, SelStart, list(SELECTEDITEM - 1), REALX, skipme)
                         If skipme Then
                             skipme = False
                             REALX = (REALX + LeftMarginPixels) * scrTwips
@@ -5169,7 +5175,7 @@ Else
                         RealX2 = scrollme + REALX
                     Else
                         skipme = False
-                        RaiseEvent GetRealX1(UserControl.Hdc, SelStart, listAtColumn(SELECTEDITEM - 1, mCurTab), REALX, skipme)
+                        RaiseEvent GetRealX1(UserControl.hDC, SelStart, listAtColumn(SELECTEDITEM - 1, mCurTab), REALX, skipme)
                         If skipme Then
                             skipme = False
                             REALX = (REALX + LeftMarginPixels) * scrTwips + TwipsCurTab
@@ -5287,7 +5293,7 @@ End If
                 hnr.top = 0
                 hnr.Bottom = Me.HeightPixels
                 onemore = CreateSolidBrush(Me.BackColor)
-                FrameRect UserControl.Hdc, hnr, onemore
+                FrameRect UserControl.hDC, hnr, onemore
                 DeleteObject onemore
             End If
 
@@ -5355,7 +5361,7 @@ On Error GoTo th1
 
 If Extender.Parent Is Nothing Then Exit Sub
 
-If Extender.Parent.Picture.Handle <> 0 And BackStyle = 1 Then
+If Extender.Parent.Picture.handle <> 0 And BackStyle = 1 Then
 
 If Me.BorderStyle = 1 Then
 currentY = 0
@@ -5373,7 +5379,7 @@ ElseIf BackStyle = 1 Then
 Dim mmo As PictureBox
 RaiseEvent GetBackPicture(mmo)
 If Not mmo Is Nothing Then
-If mmo.Picture.Handle <> 0 Then
+If mmo.Picture.handle <> 0 Then
     UserControl.PaintPicture mmo.Picture, 0, 0, , , Extender.Left, Extender.top
     If Me.BorderStyle = 1 Then
     currentY = 0
@@ -5415,7 +5421,7 @@ If BackStyle = 1 Then
             Set pp = UserControl.Parent
         End If
         On Error GoTo th1
-        If pp.Picture.Handle <> 0 Then
+        If pp.Picture.handle <> 0 Then
             If Me.BorderStyle = 1 Then
                 UserControl.PaintPicture pp.Picture, scrTwips, scrTwips, Width - 2 * scrTwips, Height - 2 * scrTwips, Extender.Left, Extender.top, Width - 2 * scrTwips, Height - 2 * scrTwips
                 hnr.Left = 0
@@ -5423,7 +5429,7 @@ If BackStyle = 1 Then
                 hnr.top = 0
                 hnr.Bottom = Me.HeightPixels
                 br = CreateSolidBrush(Me.BackColor)
-                FrameRect UserControl.Hdc, hnr, br
+                FrameRect UserControl.hDC, hnr, br
                 DeleteObject br
             Else
                 UserControl.PaintPicture pp.Picture, 0, 0, , , Extender.Left, Extender.top
@@ -5436,7 +5442,7 @@ If BackStyle = 1 Then
                 hnr.top = 0
                 hnr.Bottom = Me.HeightPixels
                 br = CreateSolidBrush(Me.BackColor)
-                FrameRect UserControl.Hdc, hnr, br
+                FrameRect UserControl.hDC, hnr, br
                 DeleteObject br
                 
             Else
@@ -5447,7 +5453,7 @@ If BackStyle = 1 Then
         Dim mmo As Object  ' MUST BE A FORM OR A PICTURE BOX
         RaiseEvent GetBackPicture(mmo)
         If Not mmo Is Nothing Then
-            If mmo.Image.Handle <> 0 Then
+            If mmo.Image.handle <> 0 Then
                 UserControl.PaintPicture mmo.Image, 0, 0, , , Extender.Left - mmo.Left, Extender.top - mmo.top
                 If Me.BorderStyle = 1 Then
                         UserControl.PaintPicture UserControl.Parent.Picture, scrTwips, scrTwips, Width - 2 * scrTwips, Height - 2 * scrTwips, Extender.Left, Extender.top, Width - 2 * scrTwips, Height - 2 * scrTwips
@@ -5456,7 +5462,7 @@ If BackStyle = 1 Then
                         hnr.top = 0
                         hnr.Bottom = Me.HeightPixels
                         br = CreateSolidBrush(Me.BackColor)
-                        FrameRect UserControl.Hdc, hnr, br
+                        FrameRect UserControl.hDC, hnr, br
                         DeleteObject br
                 End If
             End If
@@ -5518,7 +5524,7 @@ Public Function UserControlTextWidthPixels(A$) As Long
 Dim nr As RECT
 If Len(A$) > 0 Then
 
-CalcRect UserControl.Hdc, A$, nr
+CalcRect UserControl.hDC, A$, nr
 UserControlTextWidthPixels = nr.Right
 End If
 End Function
@@ -5526,28 +5532,28 @@ Public Sub UserControlTextMetricsPixels(A$, tw As Long, th As Long)
 Dim nr As RECT
 If Len(A$) > 0 Then
 
-CalcRect UserControl.Hdc, A$, nr
+CalcRect UserControl.hDC, A$, nr
 tw = nr.Right
 th = nr.Bottom
 End If
 End Sub
 Public Function UserControlTextWidth(A$) As Long
 Dim nr As RECT
-CalcRect UserControl.Hdc, A$, nr
+CalcRect UserControl.hDC, A$, nr
 UserControlTextWidth = nr.Right * scrTwips
 End Function
 Public Function UserControlTextWidth2(A$, ByVal n As Long) As Long
 Dim nr As RECT
 n = n - 1
 If n > 0 Then
-CalcRect UserControl.Hdc, Left$(A$, n), nr
+CalcRect UserControl.hDC, Left$(A$, n), nr
 UserControlTextWidth2 = nr.Right * scrTwips
 End If
 End Function
 Private Function UserControlTextHeight() As Long
 Dim nr As RECT
 If overrideTextHeight = 0 Then
-CalcRect1 UserControl.Hdc, "fj", nr
+CalcRect1 UserControl.hDC, "fj", nr
 UserControlTextHeight = nr.Bottom * scrTwips
 Exit Function
 End If
@@ -5557,14 +5563,14 @@ End Function
 Private Function UserControlTextHeightPixels() As Long
 Dim nr As RECT
 If overrideTextHeight = 0 Then
-CalcRect1 UserControl.Hdc, "fj", nr
+CalcRect1 UserControl.hDC, "fj", nr
 UserControlTextHeightPixels = nr.Bottom
 Exit Function
 End If
 UserControlTextHeightPixels = overrideTextHeight / scrTwips
 
 End Function
-Private Sub PrintLineControlSinglePrivate(mHdc As Long, ByVal C As String, r As RECT, WrapText1 As Boolean, CenterText1 As Boolean, VerticalCenterText1 As Boolean)
+Private Sub PrintLineControlSinglePrivate(mHdc As Long, ByVal c As String, r As RECT, WrapText1 As Boolean, CenterText1 As Boolean, VerticalCenterText1 As Boolean)
 ' this is our basic print routine
 Dim that As Long, cc As String, fg As Long
 If CenterText1 Then that = DT_CENTER
@@ -5572,27 +5578,27 @@ If VerticalCenterText1 Then that = that Or DT_VCENTER
 If WrapText1 Then
     'c = c + space(4)  ' 4 additional characters for DT_MODIFYSTRING
     'DrawTextEx mHdc, StrPtr(c), -1, R, DT_WORDBREAK Or DT_NOPREFIX Or DT_MODIFYSTRING Or DT_PATH_ELLIPSIS Or that, VarPtr(tParam)
-    DrawTextEx mHdc, StrPtr(C), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or that, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or that, VarPtr(tParam)
 Else
     If LastLinePart <> "" Then
         If FadeLastLinePart > 0 Then
-            cc = C + LastLinePart
+            cc = c + LastLinePart
             fg = Me.ForeColor
             Me.ForeColor = FadeLastLinePart
             DrawText mHdc, StrPtr(cc), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS
             Me.ForeColor = fg
-            DrawTextEx mHdc, StrPtr(C), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
+            DrawTextEx mHdc, StrPtr(c), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
         Else
-            cc = C + LastLinePart
+            cc = c + LastLinePart
             DrawTextEx mHdc, StrPtr(cc), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
         End If
     Else
-        DrawTextEx mHdc, StrPtr(C), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+        DrawTextEx mHdc, StrPtr(c), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
     End If
 End If
     
 End Sub
-Private Sub PrintLineControlSingle(mHdc As Long, ByVal C As String, r As RECT)
+Private Sub PrintLineControlSingle(mHdc As Long, ByVal c As String, r As RECT)
 ' this is our basic print routine
 Dim that As Long, cc As String, fg As Long
 If CenterText Then that = DT_CENTER
@@ -5602,75 +5608,75 @@ If WrapText Then
  '   c = c + space(4)  ' 4 additional characters for DT_MODIFYSTRING  '' Or DT_MODIFYSTRING Or DT_PATH_ELLIPSIS
   '  DrawTextEx mHdc, StrPtr(c), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or that, VarPtr(tParam)
 'Else
-    DrawTextEx mHdc, StrPtr(C), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or that, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or that, VarPtr(tParam)
 'End If
 Else
     If LastLinePart <> "" Then
         If FadeLastLinePart > 0 Then
-            cc = C + LastLinePart
+            cc = c + LastLinePart
             fg = Me.ForeColor
             Me.ForeColor = FadeLastLinePart
             DrawText mHdc, StrPtr(cc), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS
             Me.ForeColor = fg
-            DrawTextEx mHdc, StrPtr(C), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
+            DrawTextEx mHdc, StrPtr(c), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
         Else
-            cc = C + LastLinePart
+            cc = c + LastLinePart
             DrawTextEx mHdc, StrPtr(cc), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
         End If
     Else
-        DrawTextEx mHdc, StrPtr(C), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+        DrawTextEx mHdc, StrPtr(c), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
     End If
 End If
     
 End Sub
-Private Sub PrintLineControlSingleNoWrap(mHdc As Long, ByVal C As String, r As RECT)
+Private Sub PrintLineControlSingleNoWrap(mHdc As Long, ByVal c As String, r As RECT)
 ' this is our basic print routine
 Dim that As Long, cc As String, fg As Long
 If CenterText Then that = DT_CENTER
 If VerticalCenterText Then that = that Or DT_VCENTER
 If LastLinePart <> "" Then
     If FadeLastLinePart > 0 Then
-    cc = C + LastLinePart
+    cc = c + LastLinePart
     fg = Me.ForeColor
     Me.ForeColor = FadeLastLinePart
    DrawText mHdc, StrPtr(cc), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS
    Me.ForeColor = fg
-   DrawTextEx mHdc, StrPtr(C), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
+   DrawTextEx mHdc, StrPtr(c), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
     
     Else
-    cc = C + LastLinePart
+    cc = c + LastLinePart
    DrawTextEx mHdc, StrPtr(cc), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS, VarPtr(tParam)
    End If
 Else
 
-    DrawTextEx mHdc, StrPtr(C), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
     End If
     
 End Sub
 
-Private Sub PrintLineControlHeader(mHdc As Long, C As String, r As RECT, Optional that As Long = 0)
+Private Sub PrintLineControlHeader(mHdc As Long, c As String, r As RECT, Optional that As Long = 0)
 ' this is our basic print routine
-DrawTextEx mHdc, StrPtr(C), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+DrawTextEx mHdc, StrPtr(c), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 
     
 End Sub
-  Private Sub CalcRectHeader(mHdc As Long, C As String, r As RECT, Optional that As Long = 0)
+  Private Sub CalcRectHeader(mHdc As Long, c As String, r As RECT, Optional that As Long = 0)
 r.top = 0
 r.Left = 0
 If r.Right = 0 Then r.Right = UserControl.Width / scrTwips
-DrawTextEx mHdc, StrPtr(C), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP Or that, VarPtr(tParam)
+DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP Or that, VarPtr(tParam)
 End Sub
-Private Sub PrintLineControl(mHdc As Long, C As String, r As RECT)
-    DrawTextEx mHdc, StrPtr(C), -1, r, DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS, VarPtr(tParam)
+Private Sub PrintLineControl(mHdc As Long, c As String, r As RECT)
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS, VarPtr(tParam)
 
 End Sub
-Private Sub PrintLinePixels(dd As Object, C As String)
+Private Sub PrintLinePixels(dd As Object, c As String)
 Dim r As RECT    ' print to a picturebox as label
 r.Right = dd.ScaleWidth
 r.Bottom = dd.ScaleHeight
-DrawTextEx dd.Hdc, StrPtr(C), -1, r, DT_NOPREFIX Or DT_WORDBREAK Or DT_EXPANDTABS, VarPtr(tParam)
+DrawTextEx dd.hDC, StrPtr(c), -1, r, DT_NOPREFIX Or DT_WORDBREAK Or DT_EXPANDTABS, VarPtr(tParam)
 End Sub
-Private Sub CalcRect(mHdc As Long, C As String, r As RECT)
+Private Sub CalcRect(mHdc As Long, c As String, r As RECT)
 r.top = 0
 r.Left = 0
 Dim that As Long
@@ -5678,21 +5684,21 @@ If CenterText Then that = DT_CENTER
 If VerticalCenterText Then that = that Or DT_VCENTER
 If WrapText Then
     If r.Right = 0 Then r.Right = UserControl.Width / scrTwips
-    DrawTextEx mHdc, StrPtr(C), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 Else
-    DrawTextEx mHdc, StrPtr(C), -1, r, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 End If
 
 End Sub
-Private Sub CalcRect1(mHdc As Long, C As String, r As RECT)
+Private Sub CalcRect1(mHdc As Long, c As String, r As RECT)
 r.top = 0
 r.Left = 0
 
 If WrapText Then
     If r.Right = 0 Then r.Right = UserControl.Width / scrTwips - LeftMarginPixels
-    DrawTextEx mHdc, StrPtr(C), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 Else
-    DrawTextEx mHdc, StrPtr(C), -1, r, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    DrawTextEx mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
 End If
 
 End Sub
@@ -5716,7 +5722,7 @@ End Function
 Public Sub RepaintFromOut(parentpic As StdPicture, Myleft As Long, mytop As Long)
 On Error GoTo th1
 
-If parentpic.Handle <> 0 Then
+If parentpic.handle <> 0 Then
 UserControl.PaintPicture parentpic, 0, 0, , , Myleft, mytop
 Else
 th1:
@@ -6524,7 +6530,7 @@ Else
 addlength = -1
 mark1 = probeX \ scrTwips
 st1 = Len(s$) + 1
-RaiseEvent rtl(UserControl.Hdc, where, st1, mark1, mark2, addlength)
+RaiseEvent rtl(UserControl.hDC, where, st1, mark1, mark2, addlength)
 If addlength >= 0 Then
 
 
@@ -6570,7 +6576,7 @@ End If
 addlength = -1
 mark1 = probeX \ scrTwips
 st1 = st1 + 1
-RaiseEvent rtl(UserControl.Hdc, where, st1, mark1, mark2, addlength)
+RaiseEvent rtl(UserControl.hDC, where, st1, mark1, mark2, addlength)
 If addlength >= 0 Then
 
 
@@ -6588,7 +6594,7 @@ If st1 + 1 >= mark2 Then
 st1 = mark1 - 1
 
 realpos = UserControlTextWidth2(s$, st1)
-RaiseEvent rtl(UserControl.Hdc, where, st1, mark1, mark2, addlength)
+RaiseEvent rtl(UserControl.hDC, where, st1, mark1, mark2, addlength)
 
 Else
 W = UserControlTextWidth2(s$, mark2)
@@ -6605,7 +6611,7 @@ st1 = st1 + 1
 Wend
 st1 = mark1 + st1 - 1
 st0 = st1 + 2
-RaiseEvent rtl(UserControl.Hdc, where, st0, mark1, mark2, addlength)
+RaiseEvent rtl(UserControl.hDC, where, st0, mark1, mark2, addlength)
 If st0 <> st1 + 2 Then
 st1 = st0 - 2
 End If
@@ -6653,14 +6659,14 @@ Public Function Pixels2Twips(pixels As Long) As Long
 Pixels2Twips = pixels * scrTwips
 End Function
 Public Function BreakLine(Data As String, datanext As String, Optional thatTwipsPreserveRight As Long = -1, Optional aSpace$ = " ") As Boolean
-Dim I As Long, K As Long, M As Long
+Dim I As Long, k As Long, M As Long
 If thatTwipsPreserveRight = -1 Then
 M = widthtwips
 Else
 M = widthtwips - thatTwipsPreserveRight
 End If
 ''If aSpace$ <> "" Then m = m - UserControlTextWidth(aSpace$)
-REALCURb Data, M, K, I, True
+REALCURb Data, M, k, I, True
 datanext = Mid$(Data, 1, I)
 Data = Mid$(Data, I + 1)
 
@@ -6908,7 +6914,7 @@ A.Left = A.Left + offsetX
 A.top = A.top + offsetY
 fg = ForeColor
 ForeColor = thiscolor
-    DrawText UserControl.Hdc, StrPtr(aa$), -1, A, DT_NOPREFIX Or DT_NOCLIP
+    DrawText UserControl.hDC, StrPtr(aa$), -1, A, DT_NOPREFIX Or DT_NOCLIP
     ForeColor = fg
 End Sub
 Public Property Get FontBold() As Boolean
@@ -7011,14 +7017,14 @@ Private Sub FindRealCursor(ByVal tothere As Long)
 ' No center text
 tothere = tothere - 1
 If tothere = ListIndex Then Exit Sub
-Dim thatwidth As Long, C$, Dummy1 As Long
+Dim thatwidth As Long, c$, Dummy1 As Long
 If SelStart < 1 Then
-C$ = list(ListIndex)
+c$ = list(ListIndex)
 Else
-C$ = Left$(list(ListIndex), SelStart - 1)
+c$ = Left$(list(ListIndex), SelStart - 1)
 End If
 
-thatwidth = UserControlTextWidth(C$) + LeftMarginPixels * scrTwips
+thatwidth = UserControlTextWidth(c$) + LeftMarginPixels * scrTwips
 ''If mSelstart > Len(c$) Then Exit Sub
 Dim where As Long, oldmselstart As Long
 oldmselstart = mSelstart
@@ -7212,10 +7218,10 @@ End Sub
 Public Function LineTopOffsetPixels()
 Dim nr As RECT, A$
 A$ = "fg"
-CalcRect1 UserControl.Hdc, A$, nr
+CalcRect1 UserControl.hDC, A$, nr
 LineTopOffsetPixels = (mytPixels - nr.Bottom) / 2
 End Function
-Private Sub LineAddTopOffsetPixels(C, nr As RECT)
+Private Sub LineAddTopOffsetPixels(c, nr As RECT)
 Dim r As RECT
 '' only in  WrapText
     r = nr
@@ -7223,7 +7229,7 @@ Dim r As RECT
     r.Left = 0
     r.Right = nr.Right - nr.Left
     r.Bottom = nr.Bottom - nr.top
-    DrawTextEx UserControl.Hdc, StrPtr(C), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
+    DrawTextEx UserControl.hDC, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_EXPANDTABS Or DT_TABSTOP, VarPtr(tParam)
     r.top = (nr.Bottom - nr.top - r.Bottom) / 2
     nr.top = nr.top + r.top
      
@@ -7253,19 +7259,19 @@ End With
 
     
     If BarHatch <> -1 Then
-    SetBkColor UserControl.Hdc, BarColor
+    SetBkColor UserControl.hDC, BarColor
         my_brush = CreateHatchBrush(BarHatch, BarHatchColor)
     Else
         my_brush = CreateSolidBrush(BarColor)
     End If
 
-  FillRect UserControl.Hdc, th, my_brush
+  FillRect UserControl.hDC, th, my_brush
  Else
   my_brush = CreateSolidBrush(BarColor)
-  FillRect UserControl.Hdc, th, my_brush
+  FillRect UserControl.hDC, th, my_brush
 End If
 
-If BarHatch <> -1 Then FrameRect UserControl.Hdc, th, br2
+If BarHatch <> -1 Then FrameRect UserControl.hDC, th, br2
 
   DeleteObject my_brush
   DeleteObject br2
@@ -7364,16 +7370,16 @@ Sub DestCaret()
 End Sub
 Private Function MyTrimL(s$) As Long
 Dim I&, L As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, p1 As Integer, p4 As Long
   L = Len(s): If L = 0 Then MyTrimL = 1: Exit Function
-  P2 = StrPtr(s): L = L - 1
-  p4 = P2 + L * 2
-  For I = P2 To p4 Step 2
-  GetMem2 I, P1
-  Select Case P1
+  p2 = StrPtr(s): L = L - 1
+  p4 = p2 + L * 2
+  For I = p2 To p4 Step 2
+  GetMem2 I, p1
+  Select Case p1
     Case 32, 160, 9
     Case Else
-     MyTrimL = (I - P2) \ 2 + 1
+     MyTrimL = (I - p2) \ 2 + 1
    Exit Function
   End Select
   Next I
@@ -7477,7 +7483,7 @@ CopyMemory TempUserControl, ObjPtr(UserControl), 4
 Set TopUserControl = TempUserControl
 CopyMemory TempUserControl, 0&, 4
 With TopUserControl
-If .ParentControls.count > 0 Then
+If .ParentControls.Count > 0 Then
     Dim OldParentControlsType As VBRUN.ParentControlsType
     OldParentControlsType = .ParentControls.ParentControlsType
     .ParentControls.ParentControlsType = vbExtender
@@ -7489,7 +7495,7 @@ If .ParentControls.count > 0 Then
         Dim TempParentControlsType As VBRUN.ParentControlsType
         Do
             With TopUserControl
-            If .ParentControls.count = 0 Then Exit Do
+            If .ParentControls.Count = 0 Then Exit Do
             TempParentControlsType = .ParentControls.ParentControlsType
             .ParentControls.ParentControlsType = vbExtender
             If TypeOf .ParentControls(0) Is VB.VBControlExtender Then
@@ -7601,12 +7607,12 @@ abc1:
     
 End Sub
 
-Sub SwapListItems(T1 As Long, T2 As Long)
-    If T1 = T2 Then Exit Sub
+Sub SwapListItems(t1 As Long, t2 As Long)
+    If t1 = t2 Then Exit Sub
     Dim emp As itemlist
-    emp = mList(T1)
-    mList(T1) = mList(T2)
-    mList(T2) = emp
+    emp = mList(t1)
+    mList(t1) = mList(t2)
+    mList(t2) = emp
 End Sub
 Friend Function compact(ByVal fr As Long, ByVal ed As Long) As Long
     Dim I As Long, many As Long, pc As Long
@@ -7632,21 +7638,21 @@ Friend Function compact(ByVal fr As Long, ByVal ed As Long) As Long
     compact = many
 End Function
 Friend Sub Expand(ByVal fr As Long, ByVal ed As Long, many As Long)
-    Dim em As itemlist, pc As Long, I As Long, h As Integer, j As Long, mm As Long
+    Dim em As itemlist, pc As Long, I As Long, H As Integer, j As Long, MM As Long
     em.Flags = joinpRevline
     
     pc = fr + many
-    mm = many
+    MM = many
     For I = fr To ed
         mList(I) = mList(pc)
-        h = mList(I).morerows
-        For j = I + 1 To I + h
+        H = mList(I).morerows
+        For j = I + 1 To I + H
             mList(j) = em
-            mm = mm - 1
+            MM = MM - 1
         Next j
-        I = I + h
+        I = I + H
         pc = pc + 1
-        If mm = 0 Then Exit For
+        If MM = 0 Then Exit For
     Next I
 End Sub
 Public Sub InsertColumn(where As Long, colWidthTwips As Long, many)

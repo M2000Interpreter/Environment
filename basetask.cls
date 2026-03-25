@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 ' Basetask is a module task of M2000
 ' This is a utility soros for passing parammeters to functions
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Public LoadOnly As Boolean, NoRun As Boolean
 Public CheckUnReferenceGui As Long
 Public callx1 As Long, tpointer As Long
@@ -86,7 +86,11 @@ Public numnumlimit As Long
 Public SkipClear As Long
 Public Prof As clsProfiler
 Public modfuncall As Boolean
-Public restpart$
+Public restpart$, datasearch$
+Public BasicSwitch As Boolean
+Public Sub SwapData(s$)
+    SwapStrings s$, datasearch$
+End Sub
 Public Sub flatobject()
 If Not lastobj Is Nothing Then
         If Not TypeOf lastobj Is BigInteger Then Set lastobj = Nothing
@@ -240,7 +244,7 @@ Public Sub SetVarobJvalue(ByVal Name$, var As Variant)
     If Not StaticCollection.Find(Name$) Then
     StaticCollection.AddKey Name$
     End If
-    Dim myobject As Object, usehandler As mHandler
+    Dim myobject As Object, useHandler As mHandler
     
     If MyIsObject(var) Then
       Set StaticCollection.ValueObj = var
@@ -250,10 +254,10 @@ Public Sub SetVarobJvalue(ByVal Name$, var As Variant)
     If TypeOf myobject Is Group Then
         StaticCollection.Value = var
     ElseIf TypeOf myobject Is mHandler Then
-    Set usehandler = myobject
-    If usehandler.t1 = 4 Then
+    Set useHandler = myobject
+    If useHandler.t1 = 4 Then
         Dim ok As Boolean
-        Set var = usehandler.objref.SearchValue(var, ok)
+        Set var = useHandler.objref.SearchValue(var, ok)
         If ok Then
             Set StaticCollection.ValueObj = var
         Else
@@ -270,44 +274,44 @@ Public Sub SetVarobJvalue(ByVal Name$, var As Variant)
 End Sub
 
 Function AlterVar(ByVal Name$, p As Variant, ss$, inttype As Boolean) As Boolean
-Dim sp As Variant, usehandler As mHandler
+Dim sp As Variant, useHandler As mHandler
 If Not StaticCollection.Find(Name$) Then Exit Function
 
   With StaticCollection
   If .IsObj Then
     If Typename(.ValueObj) = "mHandler" Then
-    Set usehandler = .ValueObj
-        If usehandler.t1 = 3 Then
-            Dim mm As iBoxArray, mm1 As tuple, mm2 As mArray
-            Set mm = usehandler.objref
-            If mm.Arr Then
-            If TypeOf mm Is mArray Then
-                Set mm2 = mm
+    Set useHandler = .ValueObj
+        If useHandler.t1 = 3 Then
+            Dim MM As iBoxArray, mm1 As tuple, mm2 As mArray
+            Set MM = useHandler.objref
+            If MM.Arr Then
+            If TypeOf MM Is mArray Then
+                Set mm2 = MM
                 mm2.Compute0 p, ss$
                 Set mm2 = Nothing
-            ElseIf TypeOf mm Is tuple Then
-                Set mm1 = mm
+            ElseIf TypeOf MM Is tuple Then
+                Set mm1 = MM
                 mm1.Compute0 p, ss$
                 Set mm1 = Nothing
             End If
             End If
             
-            Set mm = Nothing
-        ElseIf usehandler.t1 = 4 Then
+            Set MM = Nothing
+        ElseIf useHandler.t1 = 4 Then
                 If ss$ = "++" Then
-                        If usehandler.index_start < usehandler.objref.Count - 1 Then
-                            usehandler.index_start = usehandler.index_start + 1
-                            usehandler.objref.Index = usehandler.index_start
-                            usehandler.index_cursor = usehandler.objref.Value
+                        If useHandler.index_start < useHandler.objref.Count - 1 Then
+                            useHandler.index_start = useHandler.index_start + 1
+                            useHandler.objref.Index = useHandler.index_start
+                            useHandler.index_cursor = useHandler.objref.Value
                         End If
         ElseIf ss$ = "--" Then
-                    If usehandler.index_start > 0 Then
-                            usehandler.index_start = usehandler.index_start - 1
-                            usehandler.objref.Index = usehandler.index_start
-                            usehandler.index_cursor = usehandler.objref.Value
+                    If useHandler.index_start > 0 Then
+                            useHandler.index_start = useHandler.index_start - 1
+                            useHandler.objref.Index = useHandler.index_start
+                            useHandler.index_cursor = useHandler.objref.Value
                         End If
         ElseIf ss$ = "-!" Then
-                        usehandler.sign = -usehandler.sign
+                        useHandler.sign = -useHandler.sign
                         Else
                         NoOperatorForThatObject ss$
         
@@ -1083,9 +1087,9 @@ End If
 
 
 End Function
-Public Function IsInStackLong(L As Long) As Boolean
+Public Function IsInStackLong(l As Long) As Boolean
 If soros.PopType = "L" Then
-    L = CLng(soros.PopValLong)
+    l = CLng(soros.PopValLong)
     IsInStackLong = True
 End If
 End Function
@@ -1149,11 +1153,11 @@ mIamAnEvent = vNewValue
 End Property
 
 Friend Function lastobjIndirect(var()) As Variant
-Dim usehandler As mHandler
+Dim useHandler As mHandler
 If lastobj Is Nothing Then
 ElseIf TypeOf lastobj Is mHandler Then
-Set usehandler = lastobj
-With usehandler
+Set useHandler = lastobj
+With useHandler
 Select Case .indirect
     Case 0 To var2used
         On Error Resume Next
