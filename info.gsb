@@ -48080,12 +48080,12 @@ MODULE INTER1 {GLOBAL ENUM HRESULT {
 	E_ACCESSDENIED				= &H80070005&
 	E_HANDLE					= &H80070006&
 	E_OUTOFMEMORY				= &H8007000E&
-	E_INVALIDARG					= &H80070057&
+	E_INVALIDARG				= &H80070057&
 	E_UNEXPECTED				= &H8000FFFF&
 	
 	DISP_E_MEMBERNOTFOUND		= &H80020003&
 	DISP_E_UNKNOWNNAME		= &H80020006&
-	DISP_E_NONAMEDARGS			= &H80020007&
+	DISP_E_NONAMEDARGS		= &H80020007&
 	DISP_E_EXCEPTION				= &H80020009&
 	DISP_E_BADINDEX				= &H8002000B&
 }
@@ -48149,7 +48149,7 @@ public:
 		AddressOfMember
 		CreateInstance
 		GetMops
-		GetContainingTypeLib`
+		GetContainingTypeLib
 		ReleaseTypeAttr : {LONG pTypeAttr}  ' void
 		ReleaseFuncDesc
 		ReleaseVarDesc
@@ -48165,7 +48165,7 @@ public:
 	}
 	PROPERTY NEW.RIID {
 		VALUE {
-			CLEAR  ' CLEAR VALUE  (M2000 EXPECT VALUR AS RETURN VALUE))
+			CLEAR  ' CLEAR VALUE  (M2000 EXPECT VALUE AS RETURN VALUE))
 			LINK PARENT RIID TO RIID
 			VAR  VALUE AS RIID
 		}
@@ -48194,7 +48194,7 @@ public:
 Z->ALFA()
 copyAttr=Z=>new.Attr()
 LONG LCID_DEF=Z=>LCID()
-DECLARE k "m2000.fastcollection"
+DECLARE k "Scripting.Dictionary"
 OBJECT Ptr
 riid=z=>IDLfromString("{00020400-0000-0000-C000-000000000046}")
 IF Z=>IUnknown.QueryInterface(k, riid(0), varptr(ptr))=S_OK then
@@ -48204,11 +48204,11 @@ IF Z=>IUnknown.QueryInterface(k, riid(0), varptr(ptr))=S_OK then
 	PRINT z=>Idispatch.GetTypeInfo(ptr, 0&, LCID_DEF, varptr(ret(0)))
 	PRINT type$(ret(0))
 	LONG ppTypeAttr
-	// so new we didn't pass varptr(ppTypeAttr)
+	// we don't pass varptr(ppTypeAttr)
 	// we change the signature to pass by reference
-	// but hte actual signature of this function is a pointer to long.
+	// but the actual signature of this function is a pointer to long.
 	// so passing by refernece, M2000 pass the Varptr of  ppTypeAttr
-	// we can't pass now Varptr(ppTypeAttr) because exprect the by reference data
+	// we can't pass now Varptr(ppTypeAttr) because expect the by reference data
 	// &ppTypeAttr is actually a string, which have the full name of the variable.
 	ret11= z=>iTypeInfo.GetTypeAttr(ret(0), &ppTypeAttr)
 	HEX ret11
@@ -48241,7 +48241,7 @@ END IF
 ' but not for that functions of interfaces
 ' actual these functions hold only the offset, and the RIID, so before we make a call, 
 ' M2000 ask for the specific  RIID and then get the vtable, adding the known offset and make the call
-' so without providing the actual object of the specific type, we didn't know the addres of the function.
+' so without providing the actual object of the specific type, we didn't know the address of the function.
 PRINT z=>lcid   ' the addres of the function. We can use it from machine code.
 try ok  {
 	PRINT z=>IUnknown.QueryInterface
