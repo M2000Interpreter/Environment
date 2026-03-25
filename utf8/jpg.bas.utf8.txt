@@ -25,15 +25,15 @@ Public Sub SaveBmp(sFile As String, ByVal Scr As Object)
             photo.SaveDib sFile
        
 End Sub
-Public Function DecodeHEXtoMemBloc(ByVal a$, ok As Boolean, Optional forcode As Boolean = False) As Object
+Public Function DecodeHEXtoMemBloc(ByVal A$, ok As Boolean, Optional forcode As Boolean = False) As Object
     Dim mem As New MemBlock, BLen As Long
-    a$ = DecodeHEX(a$, ok)
-    If ok And LenB(a$) > 0 Then
-        BLen = LenB(a$)
+    A$ = DecodeHEX(A$, ok)
+    If ok And LenB(A$) > 0 Then
+        BLen = LenB(A$)
         mem.Construct 1, BLen, , forcode
-        CopyBytes BLen, mem.GetPtr(0), StrPtr(a$)
+        CopyBytes BLen, mem.GetPtr(0), StrPtr(A$)
         Set DecodeHEXtoMemBloc = mem
-    ElseIf Len(a$) = 0 Then
+    ElseIf Len(A$) = 0 Then
         ok = False
         MyEr "Empty String to make buffer", "Αδειο αλφαριθμητικό για να φτιάξω διάρθρωση"
     Else
@@ -41,15 +41,15 @@ Public Function DecodeHEXtoMemBloc(ByVal a$, ok As Boolean, Optional forcode As 
     End If
     
 End Function
-Public Function Decode64toMemBloc(ByVal a$, ok As Boolean, Optional forcode As Boolean = False) As Object
+Public Function Decode64toMemBloc(ByVal A$, ok As Boolean, Optional forcode As Boolean = False) As Object
     Dim mem As New MemBlock, BLen As Long
-    a$ = Decode64(a$, ok)
-    If ok And LenB(a$) > 0 Then
-        BLen = LenB(a$)
+    A$ = Decode64(A$, ok)
+    If ok And LenB(A$) > 0 Then
+        BLen = LenB(A$)
         mem.Construct 1, BLen, , forcode
-        CopyBytes BLen, mem.GetPtr(0), StrPtr(a$)
+        CopyBytes BLen, mem.GetPtr(0), StrPtr(A$)
         Set Decode64toMemBloc = mem
-    ElseIf Len(a$) = 0 Then
+    ElseIf Len(A$) = 0 Then
         ok = False
         MyEr "Empty String to make buffer", "Αδειο αλφαριθμητικό για να φτιάξω διάρθρωση"
     Else
@@ -57,9 +57,9 @@ Public Function Decode64toMemBloc(ByVal a$, ok As Boolean, Optional forcode As B
     End If
     
 End Function
-Public Function File2newMemblock(FileName As String, R, p) As Object
-    Dim mem As New MemBlock, BLen As Long, i As Long
-    R = -1#
+Public Function File2newMemblock(FileName As String, r, p) As Object
+    Dim mem As New MemBlock, BLen As Long, I As Long
+    r = -1#
     FileName = CFname(FileName)
     If FileName <> "" Then
      
@@ -67,14 +67,14 @@ Public Function File2newMemblock(FileName As String, R, p) As Object
     BLen = FileLen(GetDosPath(FileName))
     If BLen Then
     mem.Construct 1, BLen, , CBool(p)
-    i = FreeFile
+    I = FreeFile
     On Error Resume Next
 
-    Open GetDosPath(FileName) For Binary Access Read As i
+    Open GetDosPath(FileName) For Binary Access Read As I
 
-    If Err.Number > 0 Then MyEr Err.Description, Err.Description: Close i: Exit Function
-    If mem.GetData1(i, mem.GetPtr(0), BLen) Then
-    R = 0#
+    If Err.Number > 0 Then MyEr Err.Description, Err.Description: Close I: Exit Function
+    If mem.GetData1(I, mem.GetPtr(0), BLen) Then
+    r = 0#
     Set File2newMemblock = mem
     If Not mem.IsWmf Then
     If Not mem.IsEmf Then
@@ -91,20 +91,20 @@ Public Function File2newMemblock(FileName As String, R, p) As Object
     End If
     End If
     End If
-    Close i
+    Close I
     End If
     End If
 End Function
 
-Public Function SaveStr2MemBlock(a, R) As Object
+Public Function SaveStr2MemBlock(A, r) As Object
 Dim aa As New cDIBSection
-R = -1#
-If cDib(a, aa) Then
+r = -1#
+If cDib(A, aa) Then
     aa.GetDpi 96, 96
     If Not aa.SaveDibToMeMBlock(SaveStr2MemBlock) Then
     MyEr "Can't save to buffer", "Δεν μπορώ να σώσω στη διάρθρωση"
     Else
-    R = 0#
+    r = 0#
     End If
 End If
 End Function
@@ -129,23 +129,23 @@ j.SaveFile sFile
 End With
    End Function
 
-Public Sub CheckOrientation(a As cDIBSection, f As String)
+Public Sub CheckOrientation(A As cDIBSection, f As String)
     If LCase(ExtractType(f, (0))) = "jpg" Then
         Dim qw As New ExifRead
         qw.Load f
         Select Case qw.Tag(Orientation)
         Case 3
-          RotateDib180 a
+          RotateDib180 A
         Case 8
-          RotateDib90 a
+          RotateDib90 A
         Case 6
-          RotateDib270 a
+          RotateDib270 A
         End Select
     End If
 End Sub
 Public Function RotateDib90(cDibbuffer0 As cDIBSection, Optional MEDOEV As Boolean = False)
 Dim piw As Long, pih As Long
-If cDibbuffer0.hDib = 0 Then Exit Function
+If cDibbuffer0.hDIb = 0 Then Exit Function
    piw = cDibbuffer0.Width
    pih = cDibbuffer0.Height
       If piw = 0 Then Exit Function
@@ -155,7 +155,7 @@ If cDIBbuffer1.create(pih, piw) Then
 
 cDIBbuffer1.GetDpiDIB cDibbuffer0
 Dim bDib() As Byte, bDib1() As Byte
-Dim X As Long, y As Long
+Dim X As Long, Y As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
 On Error Resume Next
@@ -187,29 +187,29 @@ ttt = 1 + 100000 / piw
 
 myx = 0
 If MEDOEV Then
-  For y = pih - 1 To 0 Step -1
+  For Y = pih - 1 To 0 Step -1
     oldx = 0
     TTC = TTC - 1
     If TTC = 0 Then DoEvents: TTC = ttt
         For X = 0 To piw - 1
-                        bDib1(myx, X) = bDib(oldx, y)
-                        bDib1(myx + 1, X) = bDib(oldx + 1, y)
-                        bDib1(myx + 2, X) = bDib(oldx + 2, y)
+                        bDib1(myx, X) = bDib(oldx, Y)
+                        bDib1(myx + 1, X) = bDib(oldx + 1, Y)
+                        bDib1(myx + 2, X) = bDib(oldx + 2, Y)
                         oldx = oldx + 3
        Next X
        myx = myx + 3
-    Next y
+    Next Y
 Else
-  For y = pih - 1 To 0 Step -1
+  For Y = pih - 1 To 0 Step -1
     oldx = 0
         For X = 0 To piw - 1
-                        bDib1(myx, X) = bDib(oldx, y)
-                        bDib1(myx + 1, X) = bDib(oldx + 1, y)
-                        bDib1(myx + 2, X) = bDib(oldx + 2, y)
+                        bDib1(myx, X) = bDib(oldx, Y)
+                        bDib1(myx + 1, X) = bDib(oldx + 1, Y)
+                        bDib1(myx + 2, X) = bDib(oldx + 2, Y)
                         oldx = oldx + 3
        Next X
        myx = myx + 3
-    Next y
+    Next Y
     End If
 
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
@@ -233,7 +233,7 @@ If cDIBbuffer1.create(pih, piw) Then
 cDIBbuffer1.GetDpiDIB cDibbuffer0
 cDIBbuffer1.Cls
 Dim bDib() As Byte, bDib1() As Byte
-Dim X As Long, y As Long
+Dim X As Long, Y As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
 On Error Resume Next
@@ -264,29 +264,29 @@ Dim ttt As Long, TTC As Long
 
 ttt = 1 + 100000 / piw
 If MEDOEV Then
-    For y = pih - 1 To 0 Step -1
+    For Y = pih - 1 To 0 Step -1
     oldx = piw * 3 - 3
       TTC = TTC - 1
     If TTC = 0 Then DoEvents: TTC = ttt
         For X = 0 To piw - 1
-                        bDib1(myx, X) = bDib(oldx, y)
-                        bDib1(myx + 1, X) = bDib(oldx + 1, y)
-                        bDib1(myx + 2, X) = bDib(oldx + 2, y)
+                        bDib1(myx, X) = bDib(oldx, Y)
+                        bDib1(myx + 1, X) = bDib(oldx + 1, Y)
+                        bDib1(myx + 2, X) = bDib(oldx + 2, Y)
                         oldx = oldx - 3
        Next X
        myx = myx - 3
-    Next y
+    Next Y
        Else
-        For y = pih - 1 To 0 Step -1
+        For Y = pih - 1 To 0 Step -1
     oldx = piw * 3 - 3
         For X = 0 To piw - 1
-                        bDib1(myx, X) = bDib(oldx, y)
-                        bDib1(myx + 1, X) = bDib(oldx + 1, y)
-                        bDib1(myx + 2, X) = bDib(oldx + 2, y)
+                        bDib1(myx, X) = bDib(oldx, Y)
+                        bDib1(myx + 1, X) = bDib(oldx + 1, Y)
+                        bDib1(myx + 2, X) = bDib(oldx + 2, Y)
                         oldx = oldx - 3
        Next X
        myx = myx - 3
-    Next y
+    Next Y
     End If
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
     CopyMemory ByVal VarPtrArray(bDib1), 0&, 4
@@ -301,7 +301,7 @@ Public Function RotateDib180(cDibbuffer0 As cDIBSection, Optional MEDOEV As Bool
 ' MEDOEV if true then with doevents
 Dim piw As Long, pih As Long
 
-If cDibbuffer0.hDib = 0 Then Exit Function
+If cDibbuffer0.hDIb = 0 Then Exit Function
    piw = cDibbuffer0.Width
    pih = cDibbuffer0.Height
       If piw = 0 Then Exit Function
@@ -310,7 +310,7 @@ If cDibbuffer0.hDib = 0 Then Exit Function
  cDIBbuffer1.GetDpiDIB cDibbuffer0
 
 Dim bDib() As Byte, bDib1() As Byte
-Dim X As Long, y As Long
+Dim X As Long, Y As Long
 Dim tSA As SAFEARRAY2D
 Dim tSA1 As SAFEARRAY2D
 On Error Resume Next
@@ -342,35 +342,35 @@ Dim ttt As Long, TTC As Long
 
 ttt = 1 + 100000 / piw
 If MEDOEV Then
-    For y = 0 To pih - 1
+    For Y = 0 To pih - 1
   myx = oldx - 3
   oldx = 0
       TTC = TTC - 1
     If TTC = 0 Then DoEvents: TTC = ttt
         For X = 0 To piw - 1
-                        bDib1(myx, oldy) = bDib(oldx, y)
-                        bDib1(myx + 1, oldy) = bDib(oldx + 1, y)
-                        bDib1(myx + 2, oldy) = bDib(oldx + 2, y)
+                        bDib1(myx, oldy) = bDib(oldx, Y)
+                        bDib1(myx + 1, oldy) = bDib(oldx + 1, Y)
+                        bDib1(myx + 2, oldy) = bDib(oldx + 2, Y)
                         myx = myx - 3
                         oldx = oldx + 3
        Next X
        oldy = oldy - 1
        myx = myx + 3
-    Next y
+    Next Y
 Else
-    For y = 0 To pih - 1
+    For Y = 0 To pih - 1
   myx = oldx - 3
   oldx = 0
         For X = 0 To piw - 1
-                        bDib1(myx, oldy) = bDib(oldx, y)
-                        bDib1(myx + 1, oldy) = bDib(oldx + 1, y)
-                        bDib1(myx + 2, oldy) = bDib(oldx + 2, y)
+                        bDib1(myx, oldy) = bDib(oldx, Y)
+                        bDib1(myx + 1, oldy) = bDib(oldx + 1, Y)
+                        bDib1(myx + 2, oldy) = bDib(oldx + 2, Y)
                         myx = myx - 3
                         oldx = oldx + 3
        Next X
        oldy = oldy - 1
        myx = myx + 3
-    Next y
+    Next Y
     End If
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
     CopyMemory ByVal VarPtrArray(bDib1), 0&, 4
@@ -378,4 +378,70 @@ cDibbuffer0.CreateFromPicture cDIBbuffer1.Picture
 cDibbuffer0.GetDpiDIB cDIBbuffer1
     End If
 End Function
-
+Public Sub noUseOpenGL()
+MyEr "Can't handle OpenGl now", "Δεν μπορώ να χειριστώ την OpenGl τώρα"
+End Sub
+Public Sub noUseOpenGL_atlayer()
+MyEr "Can't handle OpenGl on this layer", "Δεν μπορώ να χειριστώ την OpenGl σε αυτό το επίπεδο"
+End Sub
+' OpenGL integration - I small step
+Function PrepareLayer(thislayer As VB.PictureBox) As Boolean
+Dim what As Object, parent1 As VB.PictureBox, parent2 As Form
+If Not thislayer Is Nothing Then
+    If nOpenGl.Ready Then
+        nOpenGl.StopOpenGL
+    End If
+    If nOpenGl.Ready Then
+        noUseOpenGL
+        Exit Function
+    End If
+    Set what = thislayer.Parent
+    If what Is Nothing Then
+            noUseOpenGL
+            Exit Function
+    ElseIf TypeOf what Is VB.PictureBox Then
+        thislayer.AutoRedraw = False  ' this is basic for opengl
+        
+        Set parent1 = what
+        With parent1
+        'thislayer.move .Left, .top, .width, .height
+        .ScaleMode = vbPixels
+        End With
+        With nOpenGl
+        If .Start(thislayer, parent1) Then
+            .SetBackgroundColor 0!, 0!, 0!
+            Call .SetBackgroundPictureUnder(parent1, thislayer.Left, thislayer.top)
+        
+            parent1.ScaleMode = vbTwips
+        Else
+            thislayer.AutoRedraw = True
+            parent1.ScaleMode = vbTwips
+            noUseOpenGL
+            Exit Function
+        End If
+        End With
+    Else
+        thislayer.AutoRedraw = False  ' this is basic for opengl
+        ' found if guiM2000 ........
+        
+        Set parent2 = what
+        With parent2
+       ' thislayer.move 0, 0 ', .width, .height
+        '.ScaleMode = vbPixels
+        End With
+        With nOpenGl
+        If .Start(thislayer, thislayer) Then
+            .SetBackgroundColor 0!, 0!, 0!
+            Call .SetBackgroundPictureUnder(parent2, thislayer.Left, thislayer.top)
+            parent2.ScaleMode = vbTwips
+        Else
+            thislayer.AutoRedraw = True
+            parent2.ScaleMode = vbTwips
+            noUseOpenGL
+            Exit Function
+        End If
+        End With
+    End If
+End If
+PrepareLayer = True
+End Function

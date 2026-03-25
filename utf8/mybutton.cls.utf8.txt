@@ -12,7 +12,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
-Dim WithEvents glistN As gList
+Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Dim mCaptext As String
 Dim mIndex As Long
@@ -27,7 +27,7 @@ With glistN
 .CenterText = True
 .VerticalCenterText = True
 .Text = mCaptext
-.backcolor = rgb(200, 120, 60)
+.BackColor = rgb(200, 120, 60)
 '.bypassfirstClick = True
 ''.FontSize = 12
 .enabled = True
@@ -46,21 +46,21 @@ Set mCallback = Nothing
 End Sub
 
 Private Sub glistN_CheckGotFocus()
-glistN.backcolor = rgb(100, 200, 160)
+glistN.BackColor = rgb(100, 200, 160)
 glistN.ShowMe
 glistN.PrepareClick
 End Sub
 
 Private Sub glistN_CheckLostFocus()
 If Me.enabled Then
-glistN.backcolor = rgb(200, 120, 60)
+glistN.BackColor = rgb(200, 120, 60)
 glistN.PanPos = 0
 glistN.ShowMe
 glistN.DblClick
 End If
 End Sub
 
-Private Sub glistN_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub glistN_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Button <> 0 Then glistN.PrepareClick
 End Sub
 

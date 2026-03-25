@@ -36,16 +36,16 @@ Friend Sub NoPublic(bstack As basetask, where$)
         Set objref.Owner = bstack.Owner
         mineHere$ = where$
 End Sub
-Friend Sub GetIcon(a As StdPicture)
+Friend Sub GetIcon(A As StdPicture)
 On Error Resume Next
-Dim K As StdPicture
+Dim k As StdPicture
 If IhaveExtForm Then
-ExtForm.GetIcon PackData(a)
+ExtForm.GetIcon PackData(A)
 End If
 End Sub
 Friend Function GetAppIcon() As StdPicture
 On Error Resume Next
-Dim K As StdPicture
+Dim k As StdPicture
 If IhaveExtForm Then
 Set GetAppIcon = UnPackData(ExtForm.GetAppIcon)
 End If
@@ -76,16 +76,16 @@ End Function
 Property Get IhaveExtForm() As Boolean
 IhaveExtForm = Not ExtForm Is Nothing
 End Property
-Public Sub SetExtCaption(a$)
+Public Sub SetExtCaption(A$)
 On Error Resume Next
 If ExtForm Is Nothing Then Exit Sub
-If LenB(a$) = 0 Then
+If LenB(A$) = 0 Then
 Hide
 Form1.CaptionW = ExtForm.CaptionW
 Else
 Show
-lasttitle = a$
-ExtForm.CaptionW = a$
+lasttitle = A$
+ExtForm.CaptionW = A$
 End If
 End Sub
 Public Sub GetForm(f As Object)
@@ -144,8 +144,14 @@ Dim f As Form, i As Long, F1 As GuiM2000, nook As Long
 NERR = True: NOEXECUTION = True
 ExTarget = True: INK$ = Chr(27): UKEY$ = Chr$(27)
 If Cancel = -100 Then Exit Sub
+If Not nOpenGl Is Nothing Then
+If nOpenGl.Ready Then
+    nOpenGl.StopOpenGL
+End If
+End If
+
 Set Form3AppIcon = LoadPicture("")
-For i = Forms.Count - 1 To 0 Step -1
+For i = Forms.count - 1 To 0 Step -1
 Set f = Forms(i)
 Set f.icon = LoadPicture("")
 If TypeOf f Is GuiM2000 Then
@@ -200,7 +206,7 @@ MyDoEvents
     exWnd = 0
 
     End If
-For i = Forms.Count - 1 To 0 Step -1
+For i = Forms.count - 1 To 0 Step -1
 Set f = Forms(i)
 Unload f
 Next i
@@ -283,7 +289,7 @@ If Left$(cLine, 1) Like "[+-]" Then
 Dim ss$
 para$ = ""
 While Left$(cLine, 1) Like "[+-]"
-ss$ = Split(cLine, " ")(0)
+ss$ = split(cLine, " ")(0)
 cLine = LTrim$(Mid$(cLine, Len(ss$) + 1))
 para$ = para$ + ss$ + " "
 Wend
@@ -299,7 +305,7 @@ If ss$ = "" And para$ = "" Then
 s$ = LTrim(s$)
 If Left$(s$, 1) Like "[+-]" Then
 While Left$(s$, 1) Like "[+-]"
-ss$ = Split(s$, " ")(0)
+ss$ = split(s$, " ")(0)
 s$ = LTrim$(Mid$(s$, Len(ss$) + 1))
 para$ = para$ + ss$ + " "
 Wend
@@ -345,14 +351,14 @@ For i = UBound(var()) To 0 Step -1: var(i) = 0&: Next i
 Finished = True
 End Sub
 Property Let ShowGui(RHS As Boolean)
-If Forms.Count = 0 Then Exit Property
+If Forms.count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
 If Form1.top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).top
 Else
 If Form1.WindowState = 0 Then
-If Not (Forms.Count > 5) Then Form1.Visible = False
+If Not (Forms.count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
@@ -546,6 +552,9 @@ End Sub
 Private Sub Class_Terminate()
 On Error Resume Next
 Dim Zero As basket, i As Long, zerocounter As Counters
+If nOpenGl.Ready Then
+    nOpenGl.StopOpenGL
+End If
 StopTimer
 If objref Is Nothing Then
 GoTo JUMPHERE
@@ -562,8 +571,8 @@ For i = -2 To 1000
     players(i) = Zero
     Prefresh(i) = zerocounter
 Next i
-If Forms.Count > 0 Then
-For i = Forms.Count - 1 To 0
+If Forms.count > 0 Then
+For i = Forms.count - 1 To 0
 Set Forms(i).icon = LoadPicture("")
 Unload Forms(i)
 Next i
@@ -643,20 +652,20 @@ End Property
 Public Property Get MayQuit() As Boolean
 MayQuit = Not Check2Save
 End Property
-Public Sub GetMess(a$)
+Public Sub GetMess(A$)
     If Not ExtForm Is Nothing Then
-        ExtForm.GetMessNow a$
+        ExtForm.GetMessNow A$
     End If
 End Sub
-Public Sub GetMessOneChar(a$)
+Public Sub GetMessOneChar(A$)
     If Not ExtForm Is Nothing Then
-        ExtForm.GetMessNow a$
+        ExtForm.GetMessNow A$
     End If
 End Sub
-Public Sub SendMess(a$)
+Public Sub SendMess(A$)
     If Not ExtForm Is Nothing Then
     On Error Resume Next
-        ExtForm.SendMessNow a$
+        ExtForm.SendMessNow A$
         If Err Then
         Me.Shutdown True
         

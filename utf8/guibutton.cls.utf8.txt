@@ -13,7 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 Implements IControlIndex
-Dim WithEvents glistN As gList
+Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Dim mCaptext As String
 Public ctrlName As String
@@ -41,24 +41,24 @@ Friend Sub Construct(there As GuiM2000, Name$)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
+Friend Sub ConstructArray(there As GuiM2000, Name$, I As Long)
  Set Callback = there
  On Error Resume Next
  ctrlName = GetTag$
  Set glistN = there.Controls.Add("m2000.glist", ctrlName)
- mIndex = i
+ mIndex = I
  there.AddGuiControl Me
  glistN.Dynamic
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Public Sub move(X, y, Optional W, Optional H)
+Public Sub move(X, Y, Optional W, Optional H)
 If IsMissing(W) Then
-glistN.MoveTwips CLng(X), CLng(y), 0, 0
+glistN.MoveTwips CLng(X), CLng(Y), 0, 0
 ElseIf IsMissing(H) Then
-glistN.MoveTwips CLng(X), CLng(y), CLng(W), 0
+glistN.MoveTwips CLng(X), CLng(Y), CLng(W), 0
 Else
-glistN.MoveTwips CLng(X), CLng(y), CLng(W), CLng(H)
+glistN.MoveTwips CLng(X), CLng(Y), CLng(W), CLng(H)
 End If
 End Sub
 Public Sub deconstruct()
@@ -119,9 +119,9 @@ On Error GoTo ex1
     If mTimes > 0 Then mTimes = mTimes - 1: If mTimes = 0 Then glistN.BlinkON = False
     If Not glistN.BlinkON Then Face = True
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".Blink(" + Str(mIndex) + "," + Str(Face) + ")"
+        Callback.Callback mesCtrlName + ".Blink(" + str(mIndex) + "," + str(Face) + ")"
     Else
-        Callback.Callback mesCtrlName + ".Blink(" + Str(Face) + ")"
+        Callback.Callback mesCtrlName + ".Blink(" + str(Face) + ")"
     End If
     
     If Not glistN.BlinkON Then
@@ -149,7 +149,7 @@ End If
 If Me.enabled Then
 If glistN.BackStyle = 1 Then
   If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".GotFocus(" + Str(mIndex) + ")"
+   Callback.Callback mesCtrlName + ".GotFocus(" + str(mIndex) + ")"
    Else
       Callback.Callback mesCtrlName + ".GotFocus()"
       End If
@@ -166,7 +166,7 @@ If Me.enabled Then
 Callback.LastActive = ctrlName
 If glistN.BackStyle = 1 Then
   If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".LostFocus(" + Str(mIndex) + ")"
+   Callback.Callback mesCtrlName + ".LostFocus(" + str(mIndex) + ")"
    Else
       Callback.Callback mesCtrlName + ".LostFocus()"
       End If
@@ -180,13 +180,13 @@ End Sub
 
 Private Sub glistN_CtrlPlusF1()
   If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".About(" + Str(mIndex) + ")"
+   Callback.Callback mesCtrlName + ".About(" + str(mIndex) + ")"
    Else
       Callback.Callback mesCtrlName + ".About()"
       End If
 End Sub
 
-Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal y As Long)
+Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 glistN.ShowMe
 End Sub
 
@@ -194,7 +194,7 @@ Private Sub glistN_PanLeftRight(direction As Boolean)
 
  
    If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".Click(" + Str(mIndex) + ")"
+   Callback.Callback mesCtrlName + ".Click(" + str(mIndex) + ")"
    Else
       Callback.Callback mesCtrlName + ".Click()"
       End If
@@ -208,13 +208,13 @@ End Sub
 Private Sub glistN_Selected(item As Long)
 If Not SkipFirstClick Then
  If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".ClickOnce(" + Str(mIndex) + ")"
+   Callback.Callback mesCtrlName + ".ClickOnce(" + str(mIndex) + ")"
    Else
       Callback.Callback mesCtrlName + ".ClickOnce()"
       End If
 Else
  If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".Click(" + Str(mIndex) + ")"
+   Callback.Callback mesCtrlName + ".Click(" + str(mIndex) + ")"
    Else
       Callback.Callback mesCtrlName + ".Click()"
       End If
@@ -224,7 +224,7 @@ End Sub
 Private Sub glistN_Selected2(item As Long)
 If item >= 0 Then
    If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".Click(" + Str(mIndex) + ")"
+   Callback.Callback mesCtrlName + ".Click(" + str(mIndex) + ")"
    Else
       Callback.Callback mesCtrlName + ".Click()"
       End If
@@ -363,10 +363,10 @@ Public Property Get Blink()
 Blink = glistN.BlinkTime
 End Property
 Sub Transparent()
-Dim X  As Long, y As Long
+Dim X  As Long, Y As Long
 glistN.BackStyle = 1
-glistN.GetLeftTop X, y
-glistN.RepaintFromOut Callback.Image, X, y
+glistN.GetLeftTop X, Y
+glistN.RepaintFromOut Callback.Image, X, Y
 glistN.ShowMe
 Callback.RefreshList = Callback.RefreshList + 1
 End Sub
@@ -440,8 +440,8 @@ If A = 0 Then Exit Sub
 A = A - 1000 * shift - 10000 * ctrl - 100000 * alt
 Callback.RegisterAcc A, ctrlName, Opcode
 End Sub
-Private Sub gListN_AccKey(m As Long)
-Callback.AccProces m
+Private Sub gListN_AccKey(M As Long)
+Callback.AccProces M
 End Sub
 Property Let Visible(ByVal RHS As Boolean)
     If Not glistN Is Nothing Then
