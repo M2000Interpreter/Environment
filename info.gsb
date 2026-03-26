@@ -20237,7 +20237,10 @@ If Menu>0 Then {
                   If Menu=5 Then Exit
                   if Menu=4 Then
                           if ask("Delete this word "+EnglishName$)=1 then
-                               Delete "HELP2000", "COMMANDS", "ENGLISH", EnglishName$
+                               try ok  {Delete "HELP2000", "COMMANDS", "ENGLISH", EnglishName$}
+                               try ok {if not ok then Delete "HELP2000", "COMMANDS", "GREEK", EnglishName$
+                               if not ok then beep "problem??"
+                               }
                            end if
                   end if
                   If Menu=3 Then Here = True : Exit
@@ -23080,7 +23083,7 @@ N=Deep(10)
 Print @(tab(2)), timecount, "/total"
 Set Fast
 }
-MODULE BASIC {
+MODULE BASIC1 {
 \\ this is a style like BASIC
 \\ we use line numbers
 \\ we have two types of subroutines
@@ -37257,7 +37260,7 @@ With z,"ButtonTextFlags" as ButtonTextFlags()
 for i=0 to 14
 	
 	Method Button(i), "move", 1000,1000+630*i, 4000, 600
-	With Button(i), "Style", i+1, "ManualFocus",true, "AnimationDuration", 1.2~, "AutoRedraw",True,
+	With Button(i), "Style", i+1, "ManualFocus",true, "AnimationDuration", 1.2~, "AutoRedraw",True
 		With Button(i+15),  "ButtonTextFlags", ucsBstNormal @ ucsBflHorRight
 	z=Button(i)
 	ButtonTextFlags(ucsBstPressed)=2^random(1, 6)
@@ -49422,5 +49425,538 @@ Sub Say(who$, that$, gender as integer, teen as boolean=false)
 	End If
 End Sub
 
+}
+MODULE OPENGL {'window mode, 12000, 8000;
+function getImage() {
+	binary {
+	      /9j/4AAQSkZJRgABAQAAAQABAAD//gAMTTIwMDAgVXNlcv/+AHtKUEVHIEVuY29k
+	      ZXIgQ2xhc3MNCldyaXR0ZW4gYnkgSm9obiBLb3JlandhIDxrb3JlandhQHRpYWMu
+	      bmV0Pg0KVmlzdWFsIEJhc2ljIHNvdXJjZWNvZGUgYXZhaWxhYmxlIGF0IHBsYW5l
+	      dHNvdXJjZWNvZGUuY29t/9sAQwANCQoMCggNDAsMDw4NEBQgFRQSEhQoHB4YIC8p
+	      MTAuKS0sNDpKPzQ3RjgsLUBYQUZMT1NUUzI+W2FaUGBKUVNQ/9sAQwEODw8UERQm
+	      FRUmUDUtNVBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQ
+	      UFBQUFBQUFBQ/8AAEQgAtAC0AwERAAIRAQMRAf/EABsAAQADAQEBAQAAAAAAAAAA
+	      AAAFBgcEAQMC/8QASBAAAQMCBQEEBgUICAUFAAAAAQIDEQAEBQYSITFBBxMiURQy
+	      YXGBkSNCUrHwFRYzNlNikrIXJCVUdJSh0jRVZYOzcoKk0eL/xAAZAQEBAQEBAQAA
+	      AAAAAAAAAAAAAwIEAQX/xAAlEQEAAgIDAAIDAAMBAQAAAAAAAQIDERIhMSJBEzJR
+	      QlJhI3H/2gAMAwEAAhEDEQA/ALZXW+YUCgUCgUCgUCgUCgUCgUCgUCgUCgUCgUCg
+	      UCgUCgUCgUCgUCgUCgUe6KGijwoFAoFAoFAoFAoFAoKxjWd8Pw5QbtNN87PiDa4Q
+	      kRPrQQeent4qdrxHi9MMz3Kt/nPmnEvprFlYaT4T6Na60zzyQrfcdfKscrSt+PHH
+	      rz8kZ1/a3v8AnR/vpxuc8b9OZkzVhLil4g0VIkt/T28I1exSYng9YpytHrzhjt4s
+	      eC53w/EVFu702Ds+EOLlChE+tAA46+zmtxeJSthmPFnqiGnji0NNqccUlCEgqUpR
+	      gADkk0menupnqFTxrPdlZ62sPT6Y8JGvhtJ3HPKt442IPNSm8L1wzP7K+i/zdj6S
+	      bY3CWVEuJLQDKNjEBe0xPEnj2VndrK6x0e/mPjt9/WLu4ZD6/WD7ylL22EkAjged
+	      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
+	} as image.jpg
+	=image.jpg
+}
+img$=""
+' from compact form we make 
+image getImage() to img$
+
+locale 1033
+cls,0
+escape off
+back{ cls 0
+}
+declare form1 form
+method form1, "move", 0,0, 12000, 6600
+gColor=color(256*0.2, 256*0.6, 256*0.9)
+Layer form1 {
+	cls 15
+	font "consolas"
+	window mode, scale.x, scale.y;
+	gradient gColor
+	hold  ' push the background to store (we use restore to bring back the background)
+	form1.scaleX=scale.x
+	form2.scaleY=scale.y
+}
+
+method form1, "MakeInfo", -10
+method form1,"MenuItem","About",  IdD:=1000
+method form1,"MenuItem",""
+long tag1=2, tag2
+method form1,"MenuItem","Stop Cube",  IdD:=500
+method form1,"MenuItem","Rotate Cube", false, IdD:=600
+tag2=tag1+2
+method form1,"MenuItem","UTC time", checked:=true, firstate:=true, IdD:=800
+method form1,"MenuItem","Transparent Back", checked:=true, firstate:=true, IdD:=850
+method form1,"MenuItem","Clear Background", IdD:=900
+method form1,"MenuItem",""
+method form1,"MenuItem","Close", IdD:=2000
+
+With form1, "titleheight" as titleheight, "id" as Id(), "MenuEnabled" as MenuEnabled(), "ListSelected" as Checked()
+long ret
+module EnableRotation {
+	MenuEnabled(tag1)=false
+	MenuEnabled(tag1+1)=true
+}
+module DisableRotation {
+	MenuEnabled(tag1+1)=false
+	MenuEnabled(tag1)=true
+}
+boolean clearplease
+Function Form1.infoclick(new it) {
+	select case val(id(it))
+	case 500
+		if  pushbutton then call local scenedrive
+	case 600
+		if  pushbutton else call local scenedrive
+	case 800
+		call local form1.click()
+	case 850
+		Checked(tag2+1)=not Checked(tag2+1)
+		call local opacity
+	case 900
+		clearplease=true
+	case 1000
+		{after 100 {ret=ask("Hello", "Help", "Ok", "")}
+		}
+	case 2000
+		method form1,"CloseNow"
+	end select
+}
+Function Form1.InfoChecked(new it) {
+	if val(id(it)) =800 then
+		if checked(it) and locale<>1033 then
+			call local form1.click()
+		else.if not checked(it) and locale=1033 then
+			call local form1.click()		
+		end if
+	else.if val(id(it)) =850 then
+		call local opacity
+	end if
+}
+module opacity {
+	if Checked(tag2+1) then method form1, "Opacity", 180 else method form1, "Opacity", 255
+
+
+}
+declare image1 image form form1
+declare InpAngleX TEXTBOX form form1
+declare InpAngleY TEXTBOX form form1
+declare InpAngleZ TEXTBOX form form1
+' see ninebuttons
+declare button1 TYPE "M2000.CTXNINEBUTTON" form form1
+Enum UcsNineButtonStyleEnum {
+	ucsBtyNone =1
+	ucsBtyButtonDefault
+	ucsBtyButtonGreen
+	ucsBtyButtonRed
+	ucsBtyButtonTurnGreen
+	ucsBtyButtonTurnRed
+	ucsBtyFlatPrimary
+	ucsBtyFlatSecondary
+	ucsBtyFlatSuccess
+	ucsBtyFlatDanger
+	ucsBtyFlatWarning
+	ucsBtyFlatInfo
+	ucsBtyFlatLight
+	ucsBtyFlatDark
+	ucsBtyOutlinePrimary
+	ucsBtyOutlineSecondary
+	ucsBtyOutlineSuccess
+	ucsBtyOutlineDanger
+	ucsBtyOutlineWarning
+	ucsBtyOutlineInfo
+	ucsBtyOutlineLight
+	ucsBtyOutlineDark
+	ucsBtyCardDefault
+	ucsBtyCardPrimary
+	ucsBtyCardSuccess
+	ucsBtyCardOrange
+	ucsBtyCardDanger
+	ucsBtyCardWarning
+	ucsBtyCardPurple
+	ucsBtyCardFocus
+}
+With Button1, "Style", ucsBtyOutlineWarning, "ManualFocus",true, "AnimationDuration", 1.2~, "AutoRedraw",True
+method form1, "NoTaskBar"  ' no minimized button
+method InpAngleX, "Colors", 1,14, 1, 15
+method InpAngley, "Colors", 1,14, 1,15
+method InpAngleZ, "Colors", 1,14, 1, 15
+method image1, "move", 0, titleheight, 8000, 6000-titleheight
+z=8000+((form1.scaleX-8000)-3600) div 2
+
+method InpAngleX, "move", z, titleheight*2, 3600, 900
+method InpAngleY, "move", z, titleheight*5, 3600, 900
+method InpAngleZ, "move", z, titleheight*8, 3600, 900
+method Button1, "move", z, titleheight*10.2, 3600, 900
+With button1, "caption" as bCaption$
+bCaption$="Check this"
+f$="CONSOLAS"
+method InpAngleX, "FontAttr", f$, 26
+method InpAngley, "FontAttr",  f$, 26
+method InpAngleZ, "FontAttr",  f$, 26
+method form1, "AccKey",  "Q",alt:=true, opcode:=100615*2  ' altQ send alt+F4
+method form1, "AccKey",  chr$(27), opcode:=100615*2  ' space send alt+F4
+method InpAngleX, "Transparent"
+method InpAngley, "Transparent"
+method InpAngleZ, "Transparent"
+method InpAngleX, "spinner", true, -3600, 3600, 20
+method InpAngley, "spinner", true, -3600, 3600, 20
+method InpAngleZ, "spinner", true, -3600, 3600, 20
+With InpAngleX, "prompt", "X: ", "Value" as angleX, "VarText" as spX$, "ThisKind2","°"
+With InpAngleY, "prompt", "Y: ", "Value" as angleY, "VarText" as spY$, "ThisKind2","°"
+With InpAngleZ, "prompt", "Z: ", "Value" as angleZ, "VarText" as spZ$,"ThisKind2","°"
+method InpAngleX, "AccKey",  "X", opcode:=1
+method InpAngleY, "AccKey",  "Y", opcode:=1
+method InpAngleZ, "AccKey",  "Z", opcode:=1
+method Form1, "AccKey",  chr$(13), opcode:=1
+
+With image1, "TabStop", false, "Default", true
+With form1, "visible" as visible, "blink", 300, "blinktimes", 12, "NoFocus" as ReadNoFocus
+Boolean Free
+
+
+Layer Image1 {
+	cls color(256*0.2, 256*0.6, 256*0.9)	
+	declare og opengl
+	With og, "Ready" as Ready
+}
+method og, "ReStartGL", Textures2d:=2
+'method og, "SetLoadPicture", dir$+"myjpg.jpg", number:=1
+method og, "SetLoadPicture", img$, number:=1
+img$=""  'get memory back
+? type$(og)
+angleX=13.4~
+angleY=21.4~
+angleZ=0~
+Single PosGreek=2.6
+d=-1~
+Print "OpenGl ready", ready
+if not ready then exit
+Layer form1 {
+	refresh 25
+	release
+}
+function button1.click {
+	free~
+	if free then bCaption$="status: free rotation" else bCaption$="status: no free rotation"
+}
+function form1.unload {
+	threads erase
+}
+function form1.click {
+	locale 2065-locale
+	spX$	=dec1$(angleX)
+	spY$	=dec1$(angleY)
+	spZ$	=dec1$(angleZ)
+	Checked(tag2)=locale=1033
+}
+function form1.blink {
+	flush
+	if scene_run>0 then thread scene_run interval 30
+}
+scene_run=0
+pushbutton=true
+def dec1$()=str$((number mod 3600)/10,"#0.0")
+' this is for ValidString
+module clearInput {
+	local o$
+	o$=filter$(v$, "-1234567890"+locale$(14))
+	if o$<>"" then 	v$=filter$(v$, o$)
+}
+module commonKeyDown {
+	if  pushbutton then call local scenedrive	
+}
+module commonValid (new &AngleN) {	
+	try {
+		local single alfa
+		alfa=val(v$, locale$(14))*10:angleN=alfa mod 3600~:alfa=angleN
+	}
+	if valid(alfa) then v$=dec1$(alfa) else where=1000
+}
+' XXXXXXXXXXXXXXXX
+function InpAngleX.keydown {call local commonKeydown}
+function InpAngleX.click {
+	if pushbutton then call local scenedrive
+}
+function InpAngleX.SpinnerValue(new v) {spX$=dec1$(v)}
+function InpAngleX.ValidString(new &v$, &where) {
+	call local clearInput
+	call local commonValid, &angleX
+}
+'YYYYYYYYYYYYYYYYYYYY
+function InpAngleY.keydown {call local commonKeydown}
+function InpAngleY.click {
+	if pushbutton then call local scenedrive
+}
+function InpAngleY.SpinnerValue(new v) {spY$=dec1$(v)}
+function InpAngleY.ValidString(new &v$, &where) {
+	call local clearInput		
+	call local commonValid, &angleY
+}
+'zzzzzzzzzzzzzzzzzzz
+function InpAngleZ.keydown {call local commonKeydown}
+function InpAngleZ.click {
+	if pushbutton then call local scenedrive
+}
+function InpAngleZ.SpinnerValue(new v) {spZ$=dec1$(v)}
+function InpAngleZ.ValidString(new &v$, &where) {	
+	call local clearInput	
+	call local commonValid, &angleZ
+}
+spX$	=dec1$(angleX)
+spY$	=dec1$(angleY)
+spZ$	=dec1$(angleZ)
+boolean skiponce
+function image1.click {
+	if skiponce then skiponce=false else call local scenedrive
+}
+function Form1.enter {
+	skiponce=true
+	call local scenedrive	
+}
+function image1.gotfocus {
+	exit
+	skiponce=true
+	call local scenedrive	
+}
+function image1.LostFocus {
+	exit
+	skiponce=false
+	pushbutton=true
+	call local scenedrive		
+}
+boolean OnlyTitleMove 
+module scenedrive {
+	pushbutton~
+	if pushbutton then
+		if scene_run>0 then OnlyTitleMove=false: thread scene_run restart: call local DisableRotation
+	else
+		if scene_run>0 then thread scene_run hold: OnlyTitleMove=true: call local EnableRotation
+	end if
+}
+thread {
+	Layer form1 {
+		if clearplease then Gradient gColor:clearplease~ else release
+		cursor 0, height-1
+		move random(scale.x), random(scale.y): draw to random(scale.x), random(scale.y), random(0,7)
+		hold
+		print part @(width-27), $(0,9),format$("{0:1:-8}°{1:1:-8}°{2:1:-8}°",angleX/10~,angleY/10~, angleZ/10~)
+		print part time$(if(locale=1032->now, time("UTC")), locale, "hh:mm:ss tt ");if$(locale=1032->time$(),"UTC"); " press Esc to quit"
+		rem print part time$(time("UTC"), locale, "hh:mm:ss tt");" UTC"
+		refresh 2000
+	}
+} as clock interval 60
+module resetSceneState {
+	angleX = 0~
+	angleY = 0~
+	angleZ = 0~
+	
+	method og "SetCameraPosition",  0~, 0~, -10~
+	method og "SetCameraRotation", 0~, 0~, 0~
+}
+method og "ClearLights"
+method og "SetAmbient", 0.18~, 0.18~, 0.22~, 1~
+method og "AddPointLight",  0~, 5~, 6~, 0.55~, 0.55~, 0.55~, 0~, 0~, 0~, 0.8~, 0.8~, 0.8~, 1~, 0.03~, 0~ 
+method og "AddSpotLight", -8~, 6~, 8~, 1~, -0.6~, -1~, 25~, 12~, 1~, 0.85~, 0.7~, 0~, 0~, 0~, 1~, 1~, 1~, 1~, 0.02~, 0~
+method og "AddSpotLight",  8~, 5~, 7~, -1~, -0.5~, -1~,  22~, 18~,  0.6~, 0.7~, 1~,  0~, 0~, 0~, 1~, 1~, 1~, 1~, 0.025~, 0~    
+method og "ApplyLights"
+
+module sceneone {
+	method og, "SetBackgroundColor", 0.2, 0.6, 0.9			
+	method og, "SetBackgroundPictureUnder", form1, 0, titleheight
+	method og, "BeginSceneEx"
+	method og, "LightingOn"
+	method og, "DrawBackgroundFullScreen", -25~
+	method og, "DrawCube", angleX/10~,angleY/10~, angleZ/10~,0~, 0~, 0~, 4~
+	method og, "DrawImage", number:=1, width:=10, height:=10,  x:=0, y:=0, z:=-3 , angleX:=-30, angleY:=angleY/5~
+	method og, "DrawHudlineX20", 0,"first line", 1,1,1
+	method og, "DrawText3D", PosGreek, 3.2~, 1~, 0.28~, "VB6 - Ελληνικά", 1~, 1~, 1~, 0~, 0~, 0~
+	method og, "DrawText3D", -2.6~, -3.2~, 1~, 0.28~, "OpenGL Κείμενο", 1~, 0.8~, 0.2~, 0~, 0~, 0~
+	method og, "EndScene"
+}
+module titlemove {
+	PosGreek+=0.2*d
+	if PosGreek<-4.6 then d-! else.if PosGreek>2.6 then d-!
+} 
+thread  {
+	static once as boolean
+	if ReadNoFocus and not free then
+		if once else
+			one=true
+			call local sceneone
+			call local sceneone			
+		end if
+		method og, "Present"
+	else
+		once=false
+		if OnlyTitleMove then call local titlemove
+		call local sceneone
+	end if
+'	Layer form1 {refresh 25}
+
+}  as scene interval 30
+Boolean bpass
+thread  {
+	if free then bpass=false else bpass=ReadNoFocus
+	if bpass else
+		call local titlemove
+		spX$	=dec1$(angleX+12~)
+		spY$	=dec1$(angleY+18~)
+		spZ$	=dec1$(angleZ)
+		call local sceneone
+	end if
+}  as scene_run hold
+cls
+gradient 1, 5
+move scale.x/2, scale.y/2
+circle fill 4, scale.y/3
+If ask("Hide the M2000 Console","Cube3d", "*Yes", "No")=1 then title "Cube3d", 0
+method form1, "show"
+call local resetSceneState
+method form1, "Opacity", 180
+
+method form1, "show", 1
+title "M2000", 1
+
+threads erase
+declare form1 nothing
+escape on
+
+}
+MODULE BBC {// BASED FROM PAGE 122 OF BBC MICRO MANUAL (LINE 0 ADDED FOR M2000)
+    0 BASIC
+  1 RESTORE 100	
+  5 REPEAT
+ 10 PRINT "GIVE THE MONTH AS A NUMBER"
+ 20   INPUT M
+ 30   UNTIL M>0 AND M<13
+ 40 FOR X=1 TO M
+ 50   READ A$
+ 60   NEXT X
+ 70 PRINT "THE MONTH IS ";A$
+ 80 DATA "OTHER STUFF", 1234, SOMETHING ELSE
+100 DATA JANUARY, FEBRUARY, MARCH, APRIL
+110 DATA MAY, JUNE, JULY, AUGUST, SEPTEMBER
+120 DATA OCTOMBER, NOVEMBER, DECEMBER
+130 RESTORE 80
+140 READ Α$, Β, Γ$
+150 PRINT Α$, Β, Γ$
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
