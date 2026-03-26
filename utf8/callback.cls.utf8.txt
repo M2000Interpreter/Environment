@@ -36,16 +36,16 @@ Friend Sub NoPublic(bstack As basetask, where$)
         Set objref.Owner = bstack.Owner
         mineHere$ = where$
 End Sub
-Friend Sub GetIcon(A As StdPicture)
+Friend Sub GetIcon(a As StdPicture)
 On Error Resume Next
-Dim k As StdPicture
+Dim K As StdPicture
 If IhaveExtForm Then
-ExtForm.GetIcon PackData(A)
+ExtForm.GetIcon PackData(a)
 End If
 End Sub
 Friend Function GetAppIcon() As StdPicture
 On Error Resume Next
-Dim k As StdPicture
+Dim K As StdPicture
 If IhaveExtForm Then
 Set GetAppIcon = UnPackData(ExtForm.GetAppIcon)
 End If
@@ -76,16 +76,16 @@ End Function
 Property Get IhaveExtForm() As Boolean
 IhaveExtForm = Not ExtForm Is Nothing
 End Property
-Public Sub SetExtCaption(A$)
+Public Sub SetExtCaption(a$)
 On Error Resume Next
 If ExtForm Is Nothing Then Exit Sub
-If LenB(A$) = 0 Then
+If LenB(a$) = 0 Then
 Hide
 Form1.CaptionW = ExtForm.CaptionW
 Else
 Show
-lasttitle = A$
-ExtForm.CaptionW = A$
+lasttitle = a$
+ExtForm.CaptionW = a$
 End If
 End Sub
 Public Sub GetForm(f As Object)
@@ -139,7 +139,7 @@ End If
 End If
 If Cancel < 1 Then
 If Not MayQuit Then Cancel = -1: Exit Sub
-Dim f As Form, i As Long, F1 As GuiM2000, nook As Long
+Dim f As Form, I As Long, F1 As GuiM2000, nook As Long
 
 NERR = True: NOEXECUTION = True
 ExTarget = True: INK$ = Chr(27): UKEY$ = Chr$(27)
@@ -151,8 +151,8 @@ End If
 End If
 
 Set Form3AppIcon = LoadPicture("")
-For i = Forms.count - 1 To 0 Step -1
-Set f = Forms(i)
+For I = Forms.count - 1 To 0 Step -1
+Set f = Forms(I)
 Set f.icon = LoadPicture("")
 If TypeOf f Is GuiM2000 Then
     Set F1 = f
@@ -177,7 +177,7 @@ If TypeOf f Is GuiM2000 Then
 
 End If
 If nook Then Cancel = True: Exit For
-Next i
+Next I
 
 Set f = Nothing
 If Not nook Then Cancel = False
@@ -206,10 +206,11 @@ MyDoEvents
     exWnd = 0
 
     End If
-For i = Forms.count - 1 To 0 Step -1
-Set f = Forms(i)
+On Error Resume Next
+For I = Forms.count - 1 To 0 Step -1
+Set f = Forms(I)
 Unload f
-Next i
+Next I
 Set f = Nothing
 
 If Not ExtForm Is Nothing Then
@@ -346,8 +347,8 @@ DoEvents
 Sleep 5
 End If
 On Error Resume Next
-Dim i As Long
-For i = UBound(var()) To 0 Step -1: var(i) = 0&: Next i
+Dim I As Long
+For I = UBound(var()) To 0 Step -1: var(I) = 0&: Next I
 Finished = True
 End Sub
 Property Let ShowGui(RHS As Boolean)
@@ -355,7 +356,7 @@ If Forms.count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
-If Form1.top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).top
+If Form1.Top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).Top
 Else
 If Form1.WindowState = 0 Then
 If Not (Forms.count > 5) Then Form1.Visible = False
@@ -551,7 +552,7 @@ End Sub
 
 Private Sub Class_Terminate()
 On Error Resume Next
-Dim Zero As basket, i As Long, zerocounter As Counters
+Dim Zero As basket, I As Long, zerocounter As Counters
 If nOpenGl.Ready Then
     nOpenGl.StopOpenGL
 End If
@@ -567,15 +568,15 @@ JUMPHERE:
 globalstack.Flush
 TerminateM2000
 terminatefinal
-For i = -2 To 1000
-    players(i) = Zero
-    Prefresh(i) = zerocounter
-Next i
+For I = -2 To 1000
+    players(I) = Zero
+    Prefresh(I) = zerocounter
+Next I
 If Forms.count > 0 Then
-For i = Forms.count - 1 To 0
-Set Forms(i).icon = LoadPicture("")
-Unload Forms(i)
-Next i
+For I = Forms.count - 1 To 0
+Set Forms(I).icon = LoadPicture("")
+Unload Forms(I)
+Next I
 End If
 ReleaseMem
 l_complete = False
@@ -652,20 +653,20 @@ End Property
 Public Property Get MayQuit() As Boolean
 MayQuit = Not Check2Save
 End Property
-Public Sub GetMess(A$)
+Public Sub GetMess(a$)
     If Not ExtForm Is Nothing Then
-        ExtForm.GetMessNow A$
+        ExtForm.GetMessNow a$
     End If
 End Sub
-Public Sub GetMessOneChar(A$)
+Public Sub GetMessOneChar(a$)
     If Not ExtForm Is Nothing Then
-        ExtForm.GetMessNow A$
+        ExtForm.GetMessNow a$
     End If
 End Sub
-Public Sub SendMess(A$)
+Public Sub SendMess(a$)
     If Not ExtForm Is Nothing Then
     On Error Resume Next
-        ExtForm.SendMessNow A$
+        ExtForm.SendMessNow a$
         If Err Then
         Me.Shutdown True
         

@@ -63,8 +63,8 @@ Private Type PIXELFORMATDESCRIPTOR
 End Type
 
 Private Type POINTFLOAT
-    X As Single
-    Y As Single
+    x As Single
+    y As Single
 End Type
 
 Private Type GLYPHMETRICSFLOAT
@@ -151,7 +151,7 @@ Private Declare Function wglCreateContext Lib "opengl32.dll" (ByVal hDC As Long)
 Private Declare Function wglDeleteContext Lib "opengl32.dll" (ByVal hglrc As Long) As Long
 Private Declare Function wglMakeCurrent Lib "opengl32.dll" (ByVal hDC As Long, ByVal hglrc As Long) As Long
 
-Private Declare Sub glMultMatrixfAPI Lib "opengl32.dll" Alias "glMultMatrixf" (ByRef M As Single)
+Private Declare Sub glMultMatrixfAPI Lib "opengl32.dll" Alias "glMultMatrixf" (ByRef m As Single)
 
 Private Declare Function wglUseFontOutlinesW Lib "opengl32.dll" ( _
     ByVal hDC As Long, _
@@ -228,21 +228,21 @@ Private Const FF_DONTCARE = 0
 '========================================
 Private Declare Sub glClearColorAPI Lib "opengl32.dll" Alias "glClearColor" (ByVal red As Single, ByVal green As Single, ByVal blue As Single, ByVal alpha As Single)
 Private Declare Sub glClearAPI Lib "opengl32.dll" Alias "glClear" (ByVal mask As Long)
-Private Declare Sub glViewportAPI Lib "opengl32.dll" Alias "glViewport" (ByVal X As Long, ByVal Y As Long, ByVal Width As Long, ByVal Height As Long)
+Private Declare Sub glViewportAPI Lib "opengl32.dll" Alias "glViewport" (ByVal x As Long, ByVal y As Long, ByVal Width As Long, ByVal Height As Long)
 Private Declare Sub glMatrixModeAPI Lib "opengl32.dll" Alias "glMatrixMode" (ByVal mode As Long)
 Private Declare Sub glLoadIdentityAPI Lib "opengl32.dll" Alias "glLoadIdentity" ()
-Private Declare Sub glRotatefAPI Lib "opengl32.dll" Alias "glRotatef" (ByVal Angle As Single, ByVal X As Single, ByVal Y As Single, ByVal z As Single)
-Private Declare Sub glTranslatefAPI Lib "opengl32.dll" Alias "glTranslatef" (ByVal X As Single, ByVal Y As Single, ByVal z As Single)
+Private Declare Sub glRotatefAPI Lib "opengl32.dll" Alias "glRotatef" (ByVal Angle As Single, ByVal x As Single, ByVal y As Single, ByVal z As Single)
+Private Declare Sub glTranslatefAPI Lib "opengl32.dll" Alias "glTranslatef" (ByVal x As Single, ByVal y As Single, ByVal z As Single)
 Private Declare Sub glBeginAPI Lib "opengl32.dll" Alias "glBegin" (ByVal mode As Long)
 Private Declare Sub glEndAPI Lib "opengl32.dll" Alias "glEnd" ()
-Private Declare Sub glVertex3fAPI Lib "opengl32.dll" Alias "glVertex3f" (ByVal X As Single, ByVal Y As Single, ByVal z As Single)
+Private Declare Sub glVertex3fAPI Lib "opengl32.dll" Alias "glVertex3f" (ByVal x As Single, ByVal y As Single, ByVal z As Single)
 Private Declare Sub glColor3fAPI Lib "opengl32.dll" Alias "glColor3f" (ByVal red As Single, ByVal green As Single, ByVal blue As Single)
 Private Declare Sub glEnableAPI Lib "opengl32.dll" Alias "glEnable" (ByVal cap As Long)
 Private Declare Sub glDisableAPI Lib "opengl32.dll" Alias "glDisable" (ByVal cap As Long)
 Private Declare Sub glShadeModelAPI Lib "opengl32.dll" Alias "glShadeModel" (ByVal mode As Long)
 Private Declare Sub glPushMatrixAPI Lib "opengl32.dll" Alias "glPushMatrix" ()
 Private Declare Sub glPopMatrixAPI Lib "opengl32.dll" Alias "glPopMatrix" ()
-Private Declare Sub glScalefAPI Lib "opengl32.dll" Alias "glScalef" (ByVal X As Single, ByVal Y As Single, ByVal z As Single)
+Private Declare Sub glScalefAPI Lib "opengl32.dll" Alias "glScalef" (ByVal x As Single, ByVal y As Single, ByVal z As Single)
 Private Declare Sub glPushAttribAPI Lib "opengl32.dll" Alias "glPushAttrib" (ByVal mask As Long)
 Private Declare Sub glPopAttribAPI Lib "opengl32.dll" Alias "glPopAttrib" ()
 Private Declare Sub glCallListAPI Lib "opengl32.dll" Alias "glCallList" (ByVal list As Long)
@@ -260,7 +260,7 @@ Private Declare Sub glDeleteTexturesAPI Lib "opengl32.dll" Alias "glDeleteTextur
 Private Declare Sub glTexCoord2fAPI Lib "opengl32.dll" Alias "glTexCoord2f" (ByVal s As Single, ByVal t As Single)
 Private Declare Sub glPixelStoreiAPI Lib "opengl32.dll" Alias "glPixelStorei" (ByVal pname As Long, ByVal param As Long)
 
-Private Declare Sub glNormal3fAPI Lib "opengl32.dll" Alias "glNormal3f" (ByVal X As Single, ByVal Y As Single, ByVal z As Single)
+Private Declare Sub glNormal3fAPI Lib "opengl32.dll" Alias "glNormal3f" (ByVal x As Single, ByVal y As Single, ByVal z As Single)
 Private Declare Sub glLightfvAPI Lib "opengl32.dll" Alias "glLightfv" (ByVal light As Long, ByVal pname As Long, ByRef params As Single)
 Private Declare Sub glLightfAPI Lib "opengl32.dll" Alias "glLightf" (ByVal light As Long, ByVal pname As Long, ByVal param As Single)
 Private Declare Sub glColorMaterialAPI Lib "opengl32.dll" Alias "glColorMaterial" (ByVal face As Long, ByVal mode As Long)
@@ -287,7 +287,8 @@ Private mGreekHUD As FONT_RANGE
 
 Private m_FontRefHeight As Single
 
-Private m_BackTexture As Long
+Private m_BackTexture() As Long, Textures_state As Integer
+
 Private m_BackReady As Boolean
 
 Private m_ViewWidthPixels As Long
@@ -321,12 +322,13 @@ Private m_RightY As Single
 Private m_RightZ As Single
 
 Private m_dib1 As cDIBSection, m_file As String
+
 Private m_bytes() As Byte
 
 '========================================
 ' Public API
 '========================================
-Public Function Start(ByVal pic As Object, ByVal scratchPic As Object, Optional ByVal FaceName As String = "Arial", Optional ByVal FontHeight As Long = -36) As Boolean
+Friend Function Start(ByVal pic As Object, ByVal scratchPic As Object, Optional ByVal FaceName As String = "Arial", Optional ByVal FontHeight As Long = -36) As Boolean
     Set m_Pic = pic
     Set m_Scratch = scratchPic
     m_ratio = 1
@@ -343,23 +345,37 @@ Public Function Start(ByVal pic As Object, ByVal scratchPic As Object, Optional 
     m_CamRotX = 0!
     m_CamRotY = 0!
     m_CamRotZ = 0!
-
+    If Textures_state < 2 Then
+        ReDim m_BackTexture(0)
+    Else
+        glDeleteTexturesAPI UBound(m_BackTexture) + 1, m_BackTexture(0)
+    End If
+    
+    glGenTexturesAPI UBound(m_BackTexture) + 1, m_BackTexture(0)
+    Textures_state = 2 ' ready to be used
     m_Ready = True
     Start = True
 End Function
-Public Function ReStartGL(Optional ByVal FaceName As String = "Arial", Optional ByVal FontHeight As Long = -36) As Boolean
-    
-    If m_Ready Then
-        Me.StopOpenGL
-    End If
+Public Function ReStartGL(Optional ByVal FaceName As String = "Arial", Optional ByVal FontHeight As Long = -36, Optional Textures2d As Long = 1) As Boolean
     m_ratio = 1
     m_FOVY = 45#
-
-    If InitOpenGL() = False Then Exit Function
     Resize m_Pic.ScaleWidth / m_Pic.ScaleHeight
     If BuildUnicodeFonts(FaceName, FontHeight) = False Then Exit Function
+    ResetCameraBasis
+    InitLightingDefaults
 
-    m_Ready = True
+    m_CamPosX = 0!
+    m_CamPosY = 0!
+    m_CamPosZ = -10!
+    m_CamRotX = 0!
+    m_CamRotY = 0!
+    m_CamRotZ = 0!
+    If Textures_state > 1 Then
+        glDeleteTexturesAPI UBound(m_BackTexture) + 1, m_BackTexture(0)
+    End If
+    ReDim m_BackTexture(Textures2d - 1)
+    glGenTexturesAPI Textures2d, m_BackTexture(0)
+    Textures_state = 2
     ReStartGL = True
 End Function
 
@@ -431,19 +447,19 @@ Public Sub BeginSceneEx()
 End Sub
 
 Public Sub BeginSceneEx1()
-    Dim M(0 To 15) As Single
+    Dim m(0 To 15) As Single
 
     glClearAPI GL_COLOR_BUFFER_BIT Or GL_DEPTH_BUFFER_BIT
     glMatrixModeAPI GL_MODELVIEW
     glLoadIdentityAPI
 
     ' View rotation matrix from camera basis
-    M(0) = -m_RightX:   M(4) = -m_RightY:   M(8) = -m_RightZ:    M(12) = 0!
-    M(1) = m_UpX:      M(5) = m_UpY:      M(9) = m_UpZ:       M(13) = 0!
-    M(2) = m_ForwardX: M(6) = m_ForwardY: M(10) = m_ForwardZ: M(14) = 0!
-    M(3) = 0!:         M(7) = 0!:         M(11) = 0!:         M(15) = 1!
+    m(0) = -m_RightX:   m(4) = -m_RightY:   m(8) = -m_RightZ:    m(12) = 0!
+    m(1) = m_UpX:      m(5) = m_UpY:      m(9) = m_UpZ:       m(13) = 0!
+    m(2) = m_ForwardX: m(6) = m_ForwardY: m(10) = m_ForwardZ: m(14) = 0!
+    m(3) = 0!:         m(7) = 0!:         m(11) = 0!:         m(15) = 1!
 
-    glMultMatrixfAPI M(0)
+    glMultMatrixfAPI m(0)
     glTranslatefAPI m_CamPosX, m_CamPosY, m_CamPosZ
 End Sub
 
@@ -476,9 +492,9 @@ Public Sub ResetCameraBasis()
     m_RightZ = 0!
 End Sub
 
-Public Sub SetCameraPosition(ByVal X As Single, ByVal Y As Single, ByVal z As Single)
-    m_CamPosX = X
-    m_CamPosY = Y
+Public Sub SetCameraPosition(ByVal x As Single, ByVal y As Single, ByVal z As Single)
+    m_CamPosX = x
+    m_CamPosY = y
     m_CamPosZ = z
 End Sub
 
@@ -796,16 +812,16 @@ Public Sub EndPrimitive()
     glEndAPI
 End Sub
 
-Public Sub Vertex3f(ByVal X As Single, ByVal Y As Single, ByVal z As Single)
-    glVertex3fAPI X, Y, z
+Public Sub Vertex3f(ByVal x As Single, ByVal y As Single, ByVal z As Single)
+    glVertex3fAPI x, y, z
 End Sub
 
-Public Sub Rotatef(ByVal Angle As Single, ByVal X As Single, ByVal Y As Single, ByVal z As Single)
-    glRotatefAPI Angle, X, Y, z
+Public Sub Rotatef(ByVal Angle As Single, ByVal x As Single, ByVal y As Single, ByVal z As Single)
+    glRotatefAPI Angle, x, y, z
 End Sub
 
-Public Sub Translatef(ByVal X As Single, ByVal Y As Single, ByVal z As Single)
-    glTranslatefAPI X, Y, z
+Public Sub Translatef(ByVal x As Single, ByVal y As Single, ByVal z As Single)
+    glTranslatefAPI x, y, z
 End Sub
 
 Public Sub PushMatrix()
@@ -816,8 +832,8 @@ Public Sub PopMatrix()
     glPopMatrixAPI
 End Sub
 
-Public Sub Scalef(ByVal X As Single, ByVal Y As Single, ByVal z As Single)
-    glScalefAPI X, Y, z
+Public Sub Scalef(ByVal x As Single, ByVal y As Single, ByVal z As Single)
+    glScalefAPI x, y, z
 End Sub
 
 Public Sub LoadIdentity()
@@ -862,7 +878,7 @@ End Function
 '========================================
 ' 3D text - one public API, internal mode selection
 '========================================
-Public Sub DrawText3D(ByVal X As Single, ByVal Y As Single, ByVal z As Single, _
+Public Sub DrawText3D(ByVal x As Single, ByVal y As Single, ByVal z As Single, _
                       ByVal textScale As Single, _
                       ByVal sText As String, _
                       Optional ByVal red As Single = 1!, _
@@ -870,15 +886,15 @@ Public Sub DrawText3D(ByVal X As Single, ByVal Y As Single, ByVal z As Single, _
                       Optional ByVal blue As Single = 1!, _
                       Optional ByVal angleX As Single = 0!, _
                       Optional ByVal angleY As Single = 0!, _
-                      Optional ByVal AngleZ As Single = 0!)
+                      Optional ByVal angleZ As Single = 0!)
     If m_LightingEnabled Then
-        DrawText3DLitInternal X, Y, z, textScale, sText, red, green, blue, angleX, angleY, AngleZ
+        DrawText3DLitInternal x, y, z, textScale, sText, red, green, blue, angleX, angleY, angleZ
     Else
-        DrawText3DTwoToneInternal X, Y, z, textScale, sText, red, green, blue, 0.6!, 0.06!, angleX, angleY, AngleZ
+        DrawText3DTwoToneInternal x, y, z, textScale, sText, red, green, blue, 0.6!, 0.06!, angleX, angleY, angleZ
     End If
 End Sub
 
-Public Sub DrawText3DEx(ByVal X As Single, ByVal Y As Single, ByVal z As Single, _
+Public Sub DrawText3DEx(ByVal x As Single, ByVal y As Single, ByVal z As Single, _
                         ByVal sx As Single, ByVal sy As Single, ByVal SZ As Single, _
                         ByVal sText As String, _
                         Optional ByVal red As Single = 1!, _
@@ -889,9 +905,9 @@ Public Sub DrawText3DEx(ByVal X As Single, ByVal Y As Single, ByVal z As Single,
     If sy < s Then s = sy
     If SZ < s Then s = SZ
 
-    DrawText3D X, Y, z, s, sText, red, green, blue, 0!, 0!, 0!
+    DrawText3D x, y, z, s, sText, red, green, blue, 0!, 0!, 0!
 End Sub
-Private Sub DrawText3DLitInternal(ByVal X As Single, ByVal Y As Single, ByVal z As Single, _
+Private Sub DrawText3DLitInternal(ByVal x As Single, ByVal y As Single, ByVal z As Single, _
                          ByVal textScale As Single, _
                          ByVal sText As String, _
                          Optional ByVal red As Single = 1!, _
@@ -899,15 +915,15 @@ Private Sub DrawText3DLitInternal(ByVal X As Single, ByVal Y As Single, ByVal z 
                          Optional ByVal blue As Single = 1!, _
                          Optional ByVal angleX As Single = 0!, _
                          Optional ByVal angleY As Single = 0!, _
-                         Optional ByVal AngleZ As Single = 0!)
+                         Optional ByVal angleZ As Single = 0!)
     'DrawUnlitBegin
 
     glPushMatrixAPI
-    glTranslatefAPI X, Y, z
+    glTranslatefAPI x, y, z
 
     If angleX <> 0! Then glRotatefAPI angleX, 1!, 0!, 0!
     If angleY <> 0! Then glRotatefAPI angleY, 0!, 1!, 0!
-    If AngleZ <> 0! Then glRotatefAPI AngleZ, 0!, 0!, 1!
+    If angleZ <> 0! Then glRotatefAPI angleZ, 0!, 0!, 1!
 
     glColor3fAPI red, green, blue
     glScalefAPI textScale, textScale, textScale
@@ -916,7 +932,7 @@ Private Sub DrawText3DLitInternal(ByVal X As Single, ByVal Y As Single, ByVal z 
 
     'DrawUnlitEnd
 End Sub
-Private Sub DrawText3DTwoToneInternal(ByVal X As Single, ByVal Y As Single, ByVal z As Single, _
+Private Sub DrawText3DTwoToneInternal(ByVal x As Single, ByVal y As Single, ByVal z As Single, _
                              ByVal textScale As Single, _
                              ByVal sText As String, _
                              ByVal frontR As Single, ByVal frontG As Single, ByVal frontB As Single, _
@@ -924,7 +940,7 @@ Private Sub DrawText3DTwoToneInternal(ByVal X As Single, ByVal Y As Single, ByVa
                              Optional ByVal depthOffset As Single = 0.06!, _
                              Optional ByVal angleX As Single = 0!, _
                              Optional ByVal angleY As Single = 0!, _
-                             Optional ByVal AngleZ As Single = 0!)
+                             Optional ByVal angleZ As Single = 0!)
     Dim sideR As Single
     Dim sideG As Single
     Dim sideB As Single
@@ -936,11 +952,11 @@ Private Sub DrawText3DTwoToneInternal(ByVal X As Single, ByVal Y As Single, ByVa
     DrawUnlitBegin
 
     glPushMatrixAPI
-    glTranslatefAPI X, Y, z
+    glTranslatefAPI x, y, z
 
     If angleX <> 0! Then glRotatefAPI angleX, 1!, 0!, 0!
     If angleY <> 0! Then glRotatefAPI angleY, 0!, 1!, 0!
-    If AngleZ <> 0! Then glRotatefAPI AngleZ, 0!, 0!, 1!
+    If angleZ <> 0! Then glRotatefAPI angleZ, 0!, 0!, 1!
 
     glPushMatrixAPI
     glTranslatefAPI 0!, 0!, -depthOffset
@@ -973,7 +989,7 @@ Public Sub DrawHUDlineX20(lineno As Long, ThatText$, _
         
 End Sub
 
-Public Sub DrawHUDText(ByVal X As Single, ByVal Y As Single, ByVal z As Single, _
+Public Sub DrawHUDText(ByVal x As Single, ByVal y As Single, ByVal z As Single, _
                        ByVal percentOfPictureHeight As Single, _
                        ByVal sText As String, _
                        Optional ByVal red As Single = 1!, _
@@ -990,7 +1006,7 @@ Public Sub DrawHUDText(ByVal X As Single, ByVal Y As Single, ByVal z As Single, 
 
     glPushMatrixAPI
     glLoadIdentityAPI
-    glTranslatefAPI X, Y, z
+    glTranslatefAPI x, y, z
     glColor3fAPI red, green, blue
     glScalefAPI textScale, textScale, textScale
     PrintHUDTextUnicodeInternal sText
@@ -1084,14 +1100,17 @@ End Sub
 Public Function SetBackgroundPictureUnder(pic As Object, Optional pic_x As Single = 0, Optional pic_y As Single = 0) As Boolean
     Dim W As Long
     Dim H As Long
-    Dim X As Long
-    Dim Y As Long
+    Dim x As Long
+    Dim y As Long
     Dim c As Long
     Dim m_bytes() As Byte
     Dim p As Long, px As Long, py As Long, pw As Long, ph As Long
     Dim dib1 As cDIBSection
     m_BackReady = False
-    
+    If Textures_state < 2 Then
+        MyEr "Abnormal use of SetBackgroundPictureUnder", "Κακή χρήση της SetBackgroundPictureUnder"
+        Exit Function
+    End If
     If pic Is Nothing Then Exit Function
     If m_Pic Is Nothing Then Exit Function
     m_file = ""
@@ -1146,16 +1165,17 @@ Public Function SetBackgroundPictureUnder(pic As Object, Optional pic_x As Singl
         
      Next
     CopyMemory ByVal VarPtrArray(bt), 0&, 4
-    If m_BackTexture = 0 Then
-        glGenTexturesAPI 1, m_BackTexture
-    End If
+    
+        
+    
 
-    glBindTextureAPI GL_TEXTURE_2D, m_BackTexture
+    glBindTextureAPI GL_TEXTURE_2D, m_BackTexture(0)
     glTexParameteriAPI GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR
     glTexParameteriAPI GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR
 
     glPixelStoreiAPI GL_UNPACK_ALIGNMENT, 1
-
+    'W must be >=1024 pixels??
+    'format: GL_RED, GL_RG, GL_RGB, GL_BGR, GL_RGBA, GL_BGRA, GL_RED_INTEGER, GL_RG_INTEGER, GL_RGB_INTEGER, GL_BGR_INTEGER, GL_RGBA_INTEGER, GL_BGRA_INTEGER, GL_STENCIL_INDEX, GL_DEPTH_COMPONENT, GL_DEPTH_STENCIL.
     glTexImage2DAPI GL_TEXTURE_2D, 0, GL_RGB, W, H, 0, GL_RGB, GL_UNSIGNED_BYTE, VarPtr(m_bytes(0))
     
     m_BackReady = True
@@ -1164,15 +1184,26 @@ End Function
 
 '
 Public Function SetBackgroundLoadPicture(Optional File As String = "", Optional UseBackColor As Boolean = False, Optional ThatColor As Long) As Boolean
+    SetBackgroundLoadPicture = SetLoadPicture(File, UseBackColor, ThatColor, 0)
+End Function
+Public Function SetLoadPicture(Optional File As String = "", Optional UseBackColor As Boolean = False, Optional ThatColor As Long, Optional number As Long = 0) As Boolean
     Dim W As Long
     Dim H As Long
-    Dim X As Long
-    Dim Y As Long
+    Dim x As Long
+    Dim y As Long
     Dim c As Long
     Dim p As Long
     Dim ii As Long, I As Long, TT As Long
     
-    m_BackReady = False
+    If number = 0 Then m_BackReady = False
+    If Textures_state < 2 Then
+        MyEr "Abnormal use of SetLoadPicture", "Κακή χρήση της SetLoadPicture"
+        Exit Function
+    End If
+    If number < LBound(m_BackTexture) Or number > UBound(m_BackTexture) Then
+        MyEr "Wrong texture number in SetLoadPicture", "λάθος αριθμός υφής στην SetLoadPicture"
+        Exit Function
+    End If
     If File = vbNullString Then
         If Not m_dib1 Is Nothing Then m_file = "": Set m_dib1 = Nothing
         Exit Function
@@ -1220,62 +1251,73 @@ cont1:
             
          Next
         CopyMemory ByVal VarPtrArray(bt), 0&, 4
-        If m_BackTexture = 0 Then
-            glGenTexturesAPI 1, m_BackTexture
-        End If
+
     Else
         W = m_dib1.Width
         H = m_dib1.Height
     End If
-    glBindTextureAPI GL_TEXTURE_2D, m_BackTexture
+    glBindTextureAPI GL_TEXTURE_2D, m_BackTexture(number)
     glTexParameteriAPI GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR
     glTexParameteriAPI GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR
 
     glPixelStoreiAPI GL_UNPACK_ALIGNMENT, 1
-
     glTexImage2DAPI GL_TEXTURE_2D, 0, GL_RGB, W, H, 0, GL_RGB, GL_UNSIGNED_BYTE, VarPtr(m_bytes(0))
     
-    m_BackReady = True
+    If number = 0 Then m_BackReady = True
 
-    SetBackgroundLoadPicture = True
+    SetLoadPicture = True
 End Function
-Public Function SetBackgroundPicture(pic As Object) As Boolean
+Public Function SetBackgroundPicture(pic As Object, Optional number As Long = 0) As Boolean
+SetBackgroundPicture = SetPicture(pic, 0)
+End Function
+
+Public Function SetPicture(pic As Object, Optional number As Long = 0, Optional ImageType As Long = GL_RGB) As Boolean
     Dim W As Long
     Dim H As Long
-    Dim X As Long
-    Dim Y As Long
+    Dim x As Long
+    Dim y As Long
     Dim c As Long
     Dim bytes() As Byte
     Dim p As Long
     Dim dib1 As cDIBSection
-    m_BackReady = False
-    
+    If number = 0 Then m_BackReady = False
+    If Textures_state < 2 Then
+        MyEr "Abnormal use of SetPicture", "Κακή χρήση της SetPicture"
+        Exit Function
+    End If
+    If number < LBound(m_BackTexture) Or number > UBound(m_BackTexture) Then
+        MyEr "Wrong texture number in SetPicture", "λάθος αριθμός υφής στην SetPicture"
+        Exit Function
+    End If
     If pic Is Nothing Then Exit Function
     Set dib1 = New cDIBSection
-    If pic.ScaleMode = 1 Then
-    If Not dib1.create(pic.ScaleWidth / DXP, pic.ScaleHeight / DYP) Then Exit Function
-    ElseIf pic.ScaleMode = 3 Then
-    If Not dib1.create(pic.ScaleWidth, pic.ScaleHeight) Then Exit Function
+    If ImageType = GL_RGB Then
+        If pic.ScaleMode = 1 Then
+        If Not dib1.create(pic.ScaleWidth / DXP, pic.ScaleHeight / DYP) Then Exit Function
+        ElseIf pic.ScaleMode = 3 Then
+        If Not dib1.create(pic.ScaleWidth, pic.ScaleHeight) Then Exit Function
+        End If
+        dib1.LoadPictureBlt pic.hDC
+        W = dib1.Width
+        H = dib1.Height
     End If
-    dib1.LoadPictureBlt pic.hDC
-    W = dib1.Width
-    H = dib1.Height
-
-    If W <= 0 Or H <= 0 Then Exit Function
-    ReDim bytes(0 To (W * H * 3) - 1) As Byte
-    Dim tSA As SAFEARRAY2D
-
-    Dim bt() As Byte
-       With tSA
-        .cbElements = 1
-        .cDims = 2
-        .Bounds(0).lLbound = 0
-        .Bounds(0).cElements = dib1.Height
-        .Bounds(1).lLbound = 0
-        .Bounds(1).cElements = dib1.BytesPerScanLine()
-        .pvData = dib1.DIBSectionBitsPtr
-    End With
-    CopyMemory ByVal VarPtrArray(bt()), VarPtr(tSA), 4
+    If ImageType = GL_RGB Then
+        If W <= 0 Or H <= 0 Then Exit Function
+        
+        ReDim bytes(0 To (W * H * 3) - 1) As Byte
+        Dim tSA As SAFEARRAY2D
+    
+        Dim bt() As Byte
+           With tSA
+            .cbElements = 1
+            .cDims = 2
+            .Bounds(0).lLbound = 0
+            .Bounds(0).cElements = dib1.Height
+            .Bounds(1).lLbound = 0
+            .Bounds(1).cElements = dib1.BytesPerScanLine()
+            .pvData = dib1.DIBSectionBitsPtr
+        End With
+        CopyMemory ByVal VarPtrArray(bt()), VarPtr(tSA), 4
     
     Dim ii As Long, I As Long, TT As Long
     
@@ -1289,29 +1331,79 @@ Public Function SetBackgroundPicture(pic As Object) As Boolean
         
      Next
     CopyMemory ByVal VarPtrArray(bt), 0&, 4
-    If m_BackTexture = 0 Then
-        glGenTexturesAPI 1, m_BackTexture
+    Else
+        MyEr "Not supported type in SetPicture", "Δεν υποστηρίζεται ο τύπος στην SetPicture"
+        Exit Function
     End If
 
-    glBindTextureAPI GL_TEXTURE_2D, m_BackTexture
+    glBindTextureAPI GL_TEXTURE_2D, m_BackTexture(number)
     glTexParameteriAPI GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR
     glTexParameteriAPI GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR
 
     glPixelStoreiAPI GL_UNPACK_ALIGNMENT, 1
 
-    glTexImage2DAPI GL_TEXTURE_2D, 0, GL_RGB, W, H, 0, GL_RGB, GL_UNSIGNED_BYTE, VarPtr(bytes(0))
+    glTexImage2DAPI GL_TEXTURE_2D, 0, ImageType, W, H, 0, ImageType, GL_UNSIGNED_BYTE, VarPtr(bytes(0))
     
-    m_BackReady = True
-    SetBackgroundPicture = True
+    If number = 0 Then m_BackReady = True
+    SetPicture = True
 End Function
+Public Sub DrawImage(Optional number As Long = 0, Optional ByVal Width As Single = 20!, Optional ByVal Height As Single = 15!, Optional ByVal angleX As Single, Optional ByVal angleY As Single, Optional ByVal angleZ As Single, Optional ByVal x As Single = -30!, Optional ByVal y As Single = 0!, Optional ByVal z As Single = -30!)
+    If Textures_state < 2 Then
+        MyEr "Abnormal use of DrawImage", "Κακή χρήση της DrawImage"
+        Exit Sub
+    End If
+    If number < LBound(m_BackTexture) Or number > UBound(m_BackTexture) Then
+        MyEr "Wrong texture number in DrawImage", "λάθος αριθμός υφής στην DrawImage"
+        Exit Sub
+    End If
+    'glDisableAPI GL_LIGHTING
+    glPushMatrixAPI
+    
+    'glDisableAPI GL_DEPTH_TEST
+    glEnableAPI GL_TEXTURE_2D
+    glBindTextureAPI GL_TEXTURE_2D, m_BackTexture(number)
+
+    glColor3fAPI 1!, 1!, 1!
+    glTranslatefAPI x, y, z
+    
+    If angleX <> 0! Then glRotatefAPI angleX, 1!, 0!, 0!
+    If angleY <> 0! Then glRotatefAPI angleY, 0!, 1!, 0!
+    If angleZ <> 0! Then glRotatefAPI angleZ, 0!, 0!, 1!
+    
+    
+    glBeginAPI GL_QUADS
+
+    glTexCoord2fAPI 0!, 0!
+    glVertex3fAPI -Width / 2!, -Height / 2!, 0!
+
+    glTexCoord2fAPI 1!, 0!
+    glVertex3fAPI Width / 2!, -Height / 2!, 0!
+
+    glTexCoord2fAPI 1!, 1!
+    glVertex3fAPI Width / 2!, Height / 2!, 0!
+
+    glTexCoord2fAPI 0!, 1!
+    glVertex3fAPI -Width / 2!, Height / 2!, 0!
+
+    glEndAPI
+
+    glDisableAPI GL_TEXTURE_2D
+    'glEnableAPI GL_DEPTH_TEST
+
+    glPopMatrixAPI
+    'If m_LightingEnabled Then glEnableAPI GL_LIGHTING
+End Sub
 Public Sub DrawBackgroundImage(Optional ByVal Width As Single = 20!, Optional ByVal Height As Single = 15!, Optional ByVal z As Single = -30!)
     If m_BackReady = False Then Exit Sub
-
+    If Textures_state < 2 Then
+        MyEr "Abnormal use of DrawBackgroundImage", "Κακή χρήση της DrawBackgroundImage"
+        Exit Sub
+    End If
     glPushMatrixAPI
 
     glDisableAPI GL_DEPTH_TEST
     glEnableAPI GL_TEXTURE_2D
-    glBindTextureAPI GL_TEXTURE_2D, m_BackTexture
+    glBindTextureAPI GL_TEXTURE_2D, m_BackTexture(0)
 
     glColor3fAPI 1!, 1!, 1!
     glTranslatefAPI 0!, 0!, z
@@ -1341,6 +1433,10 @@ Public Sub DrawBackgroundFullScreen(Optional ByVal z As Single = -25!)
     Dim dist As Double, aspect As Double, halfH As Double, halfW As Double, fovRad As Double
 
     If Not m_BackReady Then Exit Sub
+    If Textures_state < 2 Then
+        MyEr "Abnormal use of DrawBackgroundFullScreen", "Κακή χρήση της DrawBackgroundFullScreen"
+        Exit Sub
+    End If
     If m_ViewHeightPixels = 0 Then Exit Sub
 
     dist = Abs(CDbl(z))
@@ -1358,7 +1454,7 @@ Public Sub DrawBackgroundFullScreen(Optional ByVal z As Single = -25!)
     glLoadIdentityAPI
     glDisableAPI GL_DEPTH_TEST
     glEnableAPI GL_TEXTURE_2D
-    glBindTextureAPI GL_TEXTURE_2D, m_BackTexture
+    glBindTextureAPI GL_TEXTURE_2D, m_BackTexture(0)
 
     glColor3fAPI 1!, 1!, 1!
     glTranslatefAPI 0!, 0!, z
@@ -1455,7 +1551,7 @@ Public Sub DrawColoredQuad(ByVal red As Single, ByVal green As Single, ByVal blu
     glEndAPI
 End Sub
 
-Public Sub DrawCube(ByVal angleX As Single, ByVal angleY As Single, ByVal AngleZ As Single, _
+Public Sub DrawCube(ByVal angleX As Single, ByVal angleY As Single, ByVal angleZ As Single, _
                     Optional ByVal posX As Single = 0!, _
                     Optional ByVal posY As Single = 0!, _
                     Optional ByVal posZ As Single = 0!, _
@@ -1467,7 +1563,7 @@ Public Sub DrawCube(ByVal angleX As Single, ByVal angleY As Single, ByVal AngleZ
     glTranslatefAPI posX, posY, posZ
     glRotatefAPI angleX, 1!, 0!, 0!
     glRotatefAPI angleY, 0!, 1!, 0!
-    glRotatefAPI AngleZ, 0!, 0!, 1!
+    glRotatefAPI angleZ, 0!, 0!, 1!
 
     DrawColoredQuad 1!, 0!, 0!, -H, -H, H, H, -H, H, H, H, H, -H, H, H
     DrawColoredQuad 0!, 1!, 0!, -H, -H, -H, -H, H, -H, H, H, -H, H, -H, -H
@@ -1483,7 +1579,7 @@ Public Sub DrawPyramid(ByVal posX As Single, ByVal posY As Single, ByVal posZ As
                        ByVal baseSize As Single, ByVal Height As Single, _
                        Optional ByVal angleX As Single = 0!, _
                        Optional ByVal angleY As Single = 0!, _
-                       Optional ByVal AngleZ As Single = 0!)
+                       Optional ByVal angleZ As Single = 0!)
     Dim H As Single, yBase As Single, yTop As Single
 
     H = baseSize / 2!
@@ -1495,7 +1591,7 @@ Public Sub DrawPyramid(ByVal posX As Single, ByVal posY As Single, ByVal posZ As
 
     If angleX <> 0! Then glRotatefAPI angleX, 1!, 0!, 0!
     If angleY <> 0! Then glRotatefAPI angleY, 0!, 1!, 0!
-    If AngleZ <> 0! Then glRotatefAPI AngleZ, 0!, 0!, 1!
+    If angleZ <> 0! Then glRotatefAPI angleZ, 0!, 0!, 1!
 
     glBeginAPI GL_TRIANGLES
 
@@ -1527,20 +1623,20 @@ Public Sub DrawSphere(ByVal posX As Single, ByVal posY As Single, ByVal posZ As 
                       Optional ByVal stacks As Long = 16, _
                       Optional ByVal angleX As Single = 0!, _
                       Optional ByVal angleY As Single = 0!, _
-                      Optional ByVal AngleZ As Single = 0!)
+                      Optional ByVal angleZ As Single = 0!)
     Dim I As Long, j As Long
     Dim lat0 As Double, lat1 As Double
     Dim z0 As Double, z1 As Double
     Dim zr0 As Double, zr1 As Double
     Dim lng As Double
-    Dim X As Double, Y As Double
+    Dim x As Double, y As Double
 
     glPushMatrixAPI
     glTranslatefAPI posX, posY, posZ
 
     If angleX <> 0! Then glRotatefAPI angleX, 1!, 0!, 0!
     If angleY <> 0! Then glRotatefAPI angleY, 0!, 1!, 0!
-    If AngleZ <> 0! Then glRotatefAPI AngleZ, 0!, 0!, 1!
+    If angleZ <> 0! Then glRotatefAPI angleZ, 0!, 0!, 1!
 
     For I = 0 To stacks - 1
         lat0 = PiValue() * (-0.5 + CDbl(I) / CDbl(stacks))
@@ -1552,13 +1648,13 @@ Public Sub DrawSphere(ByVal posX As Single, ByVal posY As Single, ByVal posZ As 
         glBeginAPI GL_QUAD_STRIP
         For j = 0 To slices
             lng = 2# * PiValue() * CDbl(j) / CDbl(slices)
-            X = Cos(lng): Y = Sin(lng)
+            x = Cos(lng): y = Sin(lng)
 
-            glNormal3fAPI CSng(X * zr0), CSng(Y * zr0), CSng(z0)
-            glVertex3fAPI CSng(radius * X * zr0), CSng(radius * Y * zr0), CSng(radius * z0)
+            glNormal3fAPI CSng(x * zr0), CSng(y * zr0), CSng(z0)
+            glVertex3fAPI CSng(radius * x * zr0), CSng(radius * y * zr0), CSng(radius * z0)
 
-            glNormal3fAPI CSng(X * zr1), CSng(Y * zr1), CSng(z1)
-            glVertex3fAPI CSng(radius * X * zr1), CSng(radius * Y * zr1), CSng(radius * z1)
+            glNormal3fAPI CSng(x * zr1), CSng(y * zr1), CSng(z1)
+            glVertex3fAPI CSng(radius * x * zr1), CSng(radius * y * zr1), CSng(radius * z1)
         Next j
         glEndAPI
     Next I
@@ -1571,7 +1667,7 @@ Public Sub DrawCylinder(ByVal posX As Single, ByVal posY As Single, ByVal posZ A
                         Optional ByVal slices As Long = 24, _
                         Optional ByVal angleX As Single = 0!, _
                         Optional ByVal angleY As Single = 0!, _
-                        Optional ByVal AngleZ As Single = 0!)
+                        Optional ByVal angleZ As Single = 0!)
     Dim I As Long, a0 As Double, x0 As Double, y0 As Double, H As Single
 
     H = Height / 2!
@@ -1581,7 +1677,7 @@ Public Sub DrawCylinder(ByVal posX As Single, ByVal posY As Single, ByVal posZ A
 
     If angleX <> 0! Then glRotatefAPI angleX, 1!, 0!, 0!
     If angleY <> 0! Then glRotatefAPI angleY, 0!, 1!, 0!
-    If AngleZ <> 0! Then glRotatefAPI AngleZ, 0!, 0!, 1!
+    If angleZ <> 0! Then glRotatefAPI angleZ, 0!, 0!, 1!
 
     glBeginAPI GL_QUAD_STRIP
     For I = 0 To slices
@@ -1621,7 +1717,7 @@ Public Sub DrawCone(ByVal posX As Single, ByVal posY As Single, ByVal posZ As Si
                     Optional ByVal slices As Long = 24, _
                     Optional ByVal angleX As Single = 0!, _
                     Optional ByVal angleY As Single = 0!, _
-                    Optional ByVal AngleZ As Single = 0!)
+                    Optional ByVal angleZ As Single = 0!)
     Dim I As Long, a0 As Double, a1 As Double
     Dim x0 As Double, y0 As Double, x1 As Double, y1 As Double
     Dim H As Single
@@ -1633,7 +1729,7 @@ Public Sub DrawCone(ByVal posX As Single, ByVal posY As Single, ByVal posZ As Si
 
     If angleX <> 0! Then glRotatefAPI angleX, 1!, 0!, 0!
     If angleY <> 0! Then glRotatefAPI angleY, 0!, 1!, 0!
-    If AngleZ <> 0! Then glRotatefAPI AngleZ, 0!, 0!, 1!
+    If angleZ <> 0! Then glRotatefAPI angleZ, 0!, 0!, 1!
 
     glBeginAPI GL_TRIANGLES
     For I = 0 To slices - 1
@@ -1669,13 +1765,13 @@ Public Sub DrawTorus(ByVal posX As Single, ByVal posY As Single, ByVal posZ As S
                      Optional ByVal minorSteps As Long = 16, _
                      Optional ByVal angleX As Single = 0!, _
                      Optional ByVal angleY As Single = 0!, _
-                     Optional ByVal AngleZ As Single = 0!)
+                     Optional ByVal angleZ As Single = 0!)
     Dim I As Long, j As Long
     Dim a0 As Double, a1 As Double, b As Double
     Dim cosA0 As Double, sinA0 As Double, cosA1 As Double, sinA1 As Double
     Dim cosB As Double, sinB As Double
     Dim R As Double
-    Dim X As Double, Y As Double, z As Double
+    Dim x As Double, y As Double, z As Double
     Dim nx As Double, ny As Double, nz As Double
 
     glPushMatrixAPI
@@ -1683,7 +1779,7 @@ Public Sub DrawTorus(ByVal posX As Single, ByVal posY As Single, ByVal posZ As S
 
     If angleX <> 0! Then glRotatefAPI angleX, 1!, 0!, 0!
     If angleY <> 0! Then glRotatefAPI angleY, 0!, 1!, 0!
-    If AngleZ <> 0! Then glRotatefAPI AngleZ, 0!, 0!, 1!
+    If angleZ <> 0! Then glRotatefAPI angleZ, 0!, 0!, 1!
 
     For I = 0 To majorSteps - 1
         a0 = 2# * PiValue() * CDbl(I) / CDbl(majorSteps)
@@ -1698,15 +1794,15 @@ Public Sub DrawTorus(ByVal posX As Single, ByVal posY As Single, ByVal posZ As S
             cosB = Cos(b): sinB = Sin(b)
             R = majorRadius + minorRadius * cosB
 
-            X = cosA0 * R: Y = sinA0 * R: z = minorRadius * sinB
+            x = cosA0 * R: y = sinA0 * R: z = minorRadius * sinB
             nx = cosA0 * cosB: ny = sinA0 * cosB: nz = sinB
             glNormal3fAPI CSng(nx), CSng(ny), CSng(nz)
-            glVertex3fAPI CSng(X), CSng(Y), CSng(z)
+            glVertex3fAPI CSng(x), CSng(y), CSng(z)
 
-            X = cosA1 * R: Y = sinA1 * R
+            x = cosA1 * R: y = sinA1 * R
             nx = cosA1 * cosB: ny = sinA1 * cosB
             glNormal3fAPI CSng(nx), CSng(ny), CSng(nz)
-            glVertex3fAPI CSng(X), CSng(Y), CSng(z)
+            glVertex3fAPI CSng(x), CSng(y), CSng(z)
         Next j
         glEndAPI
     Next I
@@ -1725,13 +1821,10 @@ Public Sub ClearOpenGL()
             wglMakeCurrent m_Pic.hDC, m_hRC
         End If
     End If
-
-    If m_BackTexture <> 0 Then
-        glDeleteTexturesAPI 1, m_BackTexture
-        m_BackTexture = 0
-        m_BackReady = False
+    If UBound(m_BackTexture) > 1 Then
+        glDeleteTexturesAPI UBound(m_BackTexture) + 1, m_BackTexture(0)
     End If
-
+    m_BackReady = False
     If mLatin.listBase <> 0 Then glDeleteListsAPI mLatin.listBase, mLatin.CharCount
     If mGreek.listBase <> 0 Then glDeleteListsAPI mGreek.listBase, mGreek.CharCount
     If mLatinHUD.listBase <> 0 Then glDeleteListsAPI mLatinHUD.listBase, mLatinHUD.CharCount
@@ -1771,12 +1864,10 @@ Friend Sub StopOpenGL()
         End If
     End If
 
-    If m_BackTexture <> 0 Then
-        glDeleteTexturesAPI 1, m_BackTexture
-        m_BackTexture = 0
-        m_BackReady = False
+    If Textures_state > 1 Then
+        glDeleteTexturesAPI UBound(m_BackTexture) + 1, m_BackTexture(0)
     End If
-
+    m_BackReady = False
     If mLatin.listBase <> 0 Then glDeleteListsAPI mLatin.listBase, mLatin.CharCount
     If mGreek.listBase <> 0 Then glDeleteListsAPI mGreek.listBase, mGreek.CharCount
     If mLatinHUD.listBase <> 0 Then glDeleteListsAPI mLatinHUD.listBase, mLatinHUD.CharCount
@@ -1815,7 +1906,7 @@ End Sub
 Public Property Get SpriteLayer(id As Long) As Object
     On Error Resume Next
     Set SpriteLayer = Form1.dSprite(id)
-    If Err.Number Then
+    If Err.number Then
         MyEr "Bad layer number", "Λάθος αριθμός επιπέδου"
     End If
 End Property
@@ -2066,13 +2157,13 @@ Public Sub RotateVectorAroundAxis(ByRef vx As Single, ByRef vy As Single, ByRef 
 End Sub
 
 
-Public Sub Normalize3(ByRef X As Single, ByRef Y As Single, ByRef z As Single)
+Public Sub Normalize3(ByRef x As Single, ByRef y As Single, ByRef z As Single)
     Dim l As Double
 
-    l = Sqr(CDbl(X) * X + CDbl(Y) * Y + CDbl(z) * z)
+    l = Sqr(CDbl(x) * x + CDbl(y) * y + CDbl(z) * z)
     If l > 0# Then
-        X = CSng(X / l)
-        Y = CSng(Y / l)
+        x = CSng(x / l)
+        y = CSng(y / l)
         z = CSng(z / l)
     End If
 End Sub
@@ -2089,19 +2180,19 @@ Public Function Dot3(ByVal ax As Single, ByVal ay As Single, ByVal az As Single,
                       ByVal bx As Single, ByVal by As Single, ByVal bz As Single) As Single
     Dot3 = ax * bx + ay * by + az * bz
 End Function
-Public Function Atan2(ByVal Y As Double, ByVal X As Double) As Double
-    If X > 0# Then
-        Atan2 = Atn(Y / X)
-    ElseIf X < 0# Then
-        If Y >= 0# Then
-            Atan2 = Atn(Y / X) + PiValue()
+Public Function Atan2(ByVal y As Double, ByVal x As Double) As Double
+    If x > 0# Then
+        Atan2 = Atn(y / x)
+    ElseIf x < 0# Then
+        If y >= 0# Then
+            Atan2 = Atn(y / x) + PiValue()
         Else
-            Atan2 = Atn(Y / X) - PiValue()
+            Atan2 = Atn(y / x) - PiValue()
         End If
     Else
-        If Y > 0# Then
+        If y > 0# Then
             Atan2 = PiValue() / 2#
-        ElseIf Y < 0# Then
+        ElseIf y < 0# Then
             Atan2 = -PiValue() / 2#
         Else
             Atan2 = 0#
@@ -2124,6 +2215,11 @@ End Function
 Private Function PiValue() As Double
     PiValue = 3.14159265358979
 End Function
+
+Private Sub Class_Initialize()
+ReDim m_BackTexture(0)
+Textures_state = 1 ' can be used
+End Sub
 
 Private Sub Class_Terminate()
     ' χωρίς OpenGL calls εδώ

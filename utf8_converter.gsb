@@ -24,7 +24,7 @@ If MenuItems>0 then
 					}
 				end if
 			end if
-			if check$<>tmp$ then
+			if ucase$(check$)<>ucase$(tmp$) then
 				Save.Doc tmp$, Dest$+menu$(i)+".utf8.txt", NoBomUtf8crlf
 				Print Over $(0, 8),@(0), Int(i/MenuItems*100), "% -  Change file: ";menu$(i)
 			else
