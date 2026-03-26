@@ -1,51 +1,144 @@
 M2000 Interpreter and Environment
-Version 14 revision 9 active-X
+Version 14 revision 10 active-X
 
-1) BASIC statement to make the current module/function to use BASIC specific style:
-1.1 DATA, READ and RESTORE as of BBC BASIC
-	WE CAN USE STANDARD READ USING @READ
-FROM PAGE 122 OF BBC MICRO MANUAL (LINE 0 ADDED FOR M2000)
-  0 BASIC
-  5 REPEAT
- 10 PRINT "GIVE THE MONTH AS A NUMBER"
- 20   INPUT M
- 30   UNTIL M>0 AND M<13
- 40 FOR X=1 TO M
- 50   READ A$
- 60   NEXT X
- 70 PRINT "THE MONTH IS ";A$
-100 DATA JANUARY, FEBRUARY, MARCH, APRIL
-110 DATA MAY, JUNE, JULY, AUGUST, SEPTEMBER
-120 DATA OCTOMBER, NOVEMBER, DECEMBER	
+1)BigInteger issues:
+1.1 str$(2u,"") now return 2 (before an empty string).
+1.2 str$(1212313u, "#,###") not supporeted so we get the number (no error raised).
+1.3 Problem on expression evaluator:
+' problem for <10 revision. Now the two parts are equal.
+var a=1000234, b=34450
+?  (a+1)*b
+biginteger z=a, zz=b, one=1
+? z, one
+?  (z+one)'*zz
+?  (one+z)'*zz
+? zz* (z+one)'*zz
+?  zz*(one+z)'*zz
+? (z+one)*zz, "???"
+? (one+z)*zz
+? (z-one)*zz, "???"
+? (one-z)*zz, "good"
+? (-z*one-one)*zz, "???-"
+? (-one*z-one)*zz
+? (z*one-one)*zz, "???+"
+? (one*z-one)*zz
+?  z*zz+one*zz
+?  one*zz+z*zz
+clear
+var a=1000234, b=34450
+? "----------long long no problem----------------"
+?  (a+1)*b
+long long z=a, zz=b, one=1
+? z, one
+?  (z+one)'*zz
+?  (one+z)'*zz
+? zz* (z+one)'*zz
+?  zz*(one+z)'*zz
+? (z+one)*zz, "???"
+? (one+z)*zz
+? (z-one)*zz, "???"
+? (one-z)*zz, "good"
+? (-z*one-one)*zz, "???-"
+? (-one*z-one)*zz
+? (z*one-one)*zz, "???+"
+? (one*z-one)*zz
+?  z*zz+one*zz
+?  one*zz+z*zz
 
 
-DATA may have a list of literals (1, 3&, 2~ and all the symbols)
 
-2) Advanced OpenGl support.
+2) Advanced OpenGl support - now can load images/textures2d more than background.
 
-3) Exclude a user control for server. We can use M2000 code with objects to do the same job.
+3) Report statement has a hold function waiting user input a key or a mouse click when print 3/4 of output lines (except on printer and when run in a thread or an event service function). So now if the output is not visible then no hold happen. Also this works for Users Forms when the form wait for user input (only mouse) we can move the window without the holding function restart printing. Also if we minimize the form then automatic restrart printing.
 
-4)Now we can make properties for objects which can shadow names from original read only variables (we can continue read these by using the @ before the name for current module/function, or we can use it as is from other modules/functions (so the version in the example stay as the original in a call to an inner module). The idea is to make modules/functions without conflicts with M2000 reserved names.
-
-? version=14
-version=100
-? version=100, @version=14
-Module Inner {
-	Print version=14
+// Example on form:
+document a$
+for i=1 to 1000
+a$=str$(i,"0000")+" "+string$(chrcode$(random(65, 90)), random(10, 30))+{
 }
-inner
+next
+a$=string$(chrcode$(random(65, 90)), random(10, 30))
+declare form1 form
+declare image1 Image Form Form1
+with form1, "visible" as visible, "titleheight" as th, "width" as w, "height" as h
+method image1, "move", 0, th, w,  h-th
+once=false
+function image1.click {
+	if once then exit
+	once=true
+	layer image1 {
+		report a$
+		cls
+	}
+	after 200 {
+		try {once=false}
+	}
+}
+method form1, "show", 1
+wait 500
+threads erase
+declare Form1 Nothing
 
-5) Some minor tunings...for speed.
 
-1.2 DIMENSION OF ARRRAYS PLUS ONE (A(4) HAS 5 ITEMS)
-1.3 FOR NEXT SAME AS BASIC. SO NOW WE CAN SKIP THE FOR NEXT IF WE HAVE NO LOOP BASED ON STEP AND START END END VALUES.
-	FOR I=10 TO 1
-	' SKIP THE STRUCTURE BECAUSE I>1
-	' NUT BY DEFAULT M2000'S "FOR" GOES FROM 10 TO 1
-	NEXT I
-
-
+//example printing on M2000 console's background (we hide foreground)
+// try to minimize the console, (you have to do this from the context menu from the taskbar, on Windows 10 and 11 you have to press Esc when the a popup menu first pop, and then you get a small window where on the title bar you do a right mouse click to open the context menu).
+document a$
+for i=1 to 1000
+a$=str$(i,"0000")+" "+string$(chrcode$(random(65, 90)), random(10, 30))+{
+}
+next
+a$=string$(chrcode$(random(65, 90)), random(10, 30))
+HIDE
+k=10
+BACK {
+	report A$
+	cls
+	k-- : if k=0 then exit
+	if not keypress(32) then loop
+}
+SHOW
  
+
+//example printing on M2000 console
+// try to minimize the console (you have to do this from the context menu from the taskbar).
+document a$
+for i=1 to 1000
+a$=str$(i,"0000")+" "+string$(chrcode$(random(65, 90)), random(10, 30))+{
+}
+next
+a$=string$(chrcode$(random(65, 90)), random(10, 30))
+k=10
+' just remove HIDE/SHOW and BACK from the previus example
+{
+	report A$
+	cls
+	k-- : if k=0 then exit
+	if not keypress(32) then loop
+}
+
+//Also we can use one of 32 layers above console's layer:
+document a$
+for i=1 to 1000
+a$=str$(i,"0000")+" "+string$(chrcode$(random(65, 90)), random(10, 30))+{
+}
+next
+a$=string$(chrcode$(random(65, 90)), random(10, 30))
+k=10
+layer 1 {
+	window 15, 10000,8000;
+	show
+}
+Layer 1 {
+	report A$
+	cls
+	k-- : if k=0 then exit
+	if not keypress(32) then loop
+}
+Layer 1 {hide}
+
+4)Fix the BASIC/DATA/RESTORE for Greek language (BASIC always in English,is the name of the language).
+
+
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
 
