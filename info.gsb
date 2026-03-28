@@ -49693,7 +49693,7 @@ Enum UcsNineButtonStyleEnum {
 	ucsBtyCardPurple
 	ucsBtyCardFocus
 }
-With Button1, "Style", ucsBtyOutlineWarning, "ManualFocus",true, "AnimationDuration", 1.2~, "AutoRedraw",True
+With Button1, "Style", ucsBtyOutlineWarning, "ManualFocus",true, "AnimationDuration", 1.2~, "AutoRedraw",True, "TabStop", true
 method form1, "NoTaskBar"  ' no minimized button
 method InpAngleX, "Colors", 1,14, 1, 15
 method InpAngley, "Colors", 1,14, 1,15
