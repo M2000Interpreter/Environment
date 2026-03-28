@@ -232,7 +232,7 @@ Private Declare Function GdipScaleWorldTransform Lib "gdiplus" (ByVal hGraphics 
 
 Private Type RECTF
    Left                 As Single
-   top                  As Single
+   Top                  As Single
    Right                As Single
    Bottom               As Single
 End Type
@@ -267,10 +267,10 @@ Private Type BITMAPINFOHEADER
 End Type
 
 Private Type UcsRgbQuad
-    R                   As Byte
+    r                   As Byte
     G                   As Byte
     b                   As Byte
-    A                   As Byte
+    a                   As Byte
 End Type
 
 Private Type ICONINFO
@@ -1188,7 +1188,7 @@ Private Function pvPrepareBitmap(ByVal eState As UcsNineButtonStateEnum, hFocusB
                 lOffset = .TextOffsetX * -((eState And ucsBstHoverPressed) = ucsBstHoverPressed)
                 uRect.Left = lLeft + lOffset
                 lOffset = .TextOffsetY * -((eState And ucsBstHoverPressed) = ucsBstHoverPressed)
-                uRect.top = lTop + lOffset
+                uRect.Top = lTop + lOffset
                 uRect.Right = lWidth
                 uRect.Bottom = lHeight
                 If .ShadowOffsetX <> 0 Or .ShadowOffsetY <> 0 Or .ImagePatch Is Nothing Then
@@ -1199,12 +1199,12 @@ Private Function pvPrepareBitmap(ByVal eState As UcsNineButtonStateEnum, hFocusB
                         GoTo QH
                     End If
                     uRect.Left = uRect.Left + .ShadowOffsetX
-                    uRect.top = uRect.top + .ShadowOffsetY
+                    uRect.Top = uRect.Top + .ShadowOffsetY
                     If GdipDrawString(hGraphics, StrPtr(sCaption), -1, hFont, uRect, hStringFormat, hShadowBrush) <> 0 Then
                         GoTo QH
                     End If
                     uRect.Left = uRect.Left - .ShadowOffsetX
-                    uRect.top = uRect.top - .ShadowOffsetY
+                    uRect.Top = uRect.Top - .ShadowOffsetY
                 End If
                 If GdipDrawString(hGraphics, StrPtr(sCaption), -1, hFont, uRect, hStringFormat, hBrush) <> 0 Then
                     GoTo QH
@@ -1542,16 +1542,16 @@ Private Function pvTranslateColor(ByVal clrValue As OLE_COLOR, Optional ByVal Al
     Dim lTemp           As Long
     
     Call OleTranslateColor(clrValue, 0, VarPtr(uQuad))
-    lTemp = uQuad.R
-    uQuad.R = uQuad.b
+    lTemp = uQuad.r
+    uQuad.r = uQuad.b
     uQuad.b = lTemp
     lTemp = Alpha * &HFF
     If lTemp > 255 Then
-        uQuad.A = 255
+        uQuad.a = 255
     ElseIf lTemp < 0 Then
-        uQuad.A = 0
+        uQuad.a = 0
     Else
-        uQuad.A = lTemp
+        uQuad.a = lTemp
     End If
     Call CopyMemory(pvTranslateColor, uQuad, 4)
 End Function
@@ -1579,8 +1579,8 @@ Private Function pvHitTest(ByVal X As Single, ByVal Y As Single) As HitResultCon
     If GdipBitmapGetPixel(m_hBitmap, X, Y, uQuad) <> 0 Then
         GoTo QH
     End If
-    If uQuad.A < 255 Then
-        If uQuad.A > 0 Then
+    If uQuad.a < 255 Then
+        If uQuad.a > 0 Then
             pvHitTest = vbHitResultTransparent
         Else
             pvHitTest = vbHitResultOutside

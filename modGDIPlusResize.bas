@@ -64,7 +64,7 @@ End Type
 
 Private Type PWMFRect16
     Left   As Integer
-    top    As Integer
+    Top    As Integer
     Right  As Integer
     Bottom As Integer
 End Type
@@ -96,7 +96,7 @@ Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, By
 Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As Long
 
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
 Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
 ' GDI Functions
 Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
@@ -713,7 +713,7 @@ Private Sub gdipResize(Img As Long, hDC As Long, Width As Long, Height As Long)
     Dim DestHeight As Long      ' Destination image Height
         GdipCreateFromHDC hDC, graphics
         GdipSetInterpolationMode graphics, 0
-
+        GdipSetPixelOffsetMode graphics, 1
         GdipDrawImageRectI graphics, Img, 0, 0, Width, Height
 
     GdipDeleteGraphics graphics
@@ -1057,47 +1057,39 @@ Public Function LoadImageFromBuffer2(ResData() As Byte, Optional Width As Long =
     Dim Img As Long
     Dim hBitmap As Long
     Dim iType As Long
-    ' Ressource in ByteArray speichern
+    Call CreateStreamOnHGlobal(VarPtr(ResData(0)), False, Stream)
     
-    ' Stream erzeugen
-    Call CreateStreamOnHGlobal(VarPtr(ResData(0)), _
-    False, Stream)
-    
-    ' ist ein Stream vorhanden
     If Not (Stream Is Nothing) Then
         
-        ' GDI+ Bitmapobjekt vom Stream erstellen
-        If GdiPlusExec(GdipLoadImageFromStream( _
-        Stream, Img)) = ok Then
-                    If FlipOrRotate <> 0 Then
-            If GdipGetImageType(Img, iType) = ok Then
+        If GdiPlusExec(GdipLoadImageFromStream(Stream, Img)) = ok Then
+            If FlipOrRotate <> 0 Then
+                If GdipGetImageType(Img, iType) = ok Then
                     If iType = 1 Then
-                    If GdipImageRotateFlip(Img, (FlipOrRotate)) = ok Then FlipOrRotate = 0
+                        If GdipImageRotateFlip(Img, (FlipOrRotate)) = ok Then FlipOrRotate = 0
                     End If
-            End If
-        End If
-            
-                  If Width = -1 Or Height = -1 Then
-                   ' GetImageDimension img, Width, Height
-                     GdipGetImageWidth Img, Width
-                     GdipGetImageHeight Img, Height
-                
                 End If
-                 ' Initialise the hDC
-                  InitDC hDC, hBitmap, BackColor, Width, Height
-
-                ' Resize the picture
-                gdipResize Img, hDC, Width, Height
-                GdipDisposeImage Img
+            End If
+            Dim Ix As Long, Iy As Long
+            GdipGetImageWidth Img, Ix
+            GdipGetImageHeight Img, Iy
+            If Width < 1 Then Width = Ix
     
-    ' Get the bitmap back
-    GetBitmap hDC, hBitmap
-
-    ' Create the picture
-    Set LoadImageFromBuffer2 = gCreatePicture(hBitmap)
+            If Height < 1 Then Height = Iy
             
-             'GdipDisposeImage Img
             
+            ' Initialise the hDC
+            InitDC hDC, hBitmap, BackColor, Width, Height
+            
+            ' Resize the picture
+            gdipResizeToXYsimple Img, hDC, 0, 0, Width, Height, 0, 0, Ix - 1, Iy - 1
+            '                gdipResize Img, hDC, Width, Height
+            GdipDisposeImage Img
+            
+            ' Get the bitmap back
+            GetBitmap hDC, hBitmap
+            
+            ' Create the picture
+            Set LoadImageFromBuffer2 = gCreatePicture(hBitmap)
         End If
     End If
     
@@ -1136,9 +1128,9 @@ Dim mWidth As Long, mHeight As Long
                 GdipGetMetafileHeaderFromMetafile Img, MetafileHeader1
                 If MetafileHeader1.mfOrigHeader.muEmfHeader.dSignature = 1179469088 Then
                 mleft = MetafileHeader1.mfOrigHeader.muEmfHeader.rclBounds.Left
-                mtop = MetafileHeader1.mfOrigHeader.muEmfHeader.rclBounds.top
+                mtop = MetafileHeader1.mfOrigHeader.muEmfHeader.rclBounds.Top
                 mWidth = MetafileHeader1.mfOrigHeader.muEmfHeader.rclBounds.Right - MetafileHeader1.mfOrigHeader.muEmfHeader.rclBounds.Left + 1
-                mHeight = MetafileHeader1.mfOrigHeader.muEmfHeader.rclBounds.Bottom - MetafileHeader1.mfOrigHeader.muEmfHeader.rclBounds.top + 1
+                mHeight = MetafileHeader1.mfOrigHeader.muEmfHeader.rclBounds.Bottom - MetafileHeader1.mfOrigHeader.muEmfHeader.rclBounds.Top + 1
                 Else
                 
                 mWidth = MetafileHeader1.mfBoundsWidth
@@ -1306,7 +1298,7 @@ Private Sub GetImageDimension(Img As Long, Width As Long, Height As Long, Option
              btop = MetafileHeader1.mfBoundsY
              
                 mleft = MetafileHeader1.mfOrigHeader.muEmfHeader.rclBounds.Left
-                mtop = MetafileHeader1.mfOrigHeader.muEmfHeader.rclBounds.top
+                mtop = MetafileHeader1.mfOrigHeader.muEmfHeader.rclBounds.Top
                 Height = bHeight
                 Width = bWidth
                 mtop = btop
@@ -1350,10 +1342,10 @@ Public Function DrawSpriteFromBuffer(bstack As basetask, ResData() As Byte, sprt
             
             If sprt Then GetBackSprite bstack, Width * 2, Height, Angle!, zoomfactor
             If IsEmf Then
-            Dim k
-            k = GetEmfBoubdsPixels(ResData)
+            Dim K
+            K = GetEmfBoubdsPixels(ResData)
             Const v = 26.4583333333333    '26.3245
-            gdipResizeToXY bstack, Img, Angle!, zoomfactor!, blend!, BackColor, k(6) / v, k(7) / v
+            gdipResizeToXY bstack, Img, Angle!, zoomfactor!, blend!, BackColor, K(6) / v, K(7) / v
             Else
             gdipResizeToXY bstack, Img, Angle!, zoomfactor!, blend!, BackColor
             End If
