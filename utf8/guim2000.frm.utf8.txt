@@ -218,7 +218,7 @@ If IsExp(bstack, rest$, X) Then
         Dim usehandler As mHandler
         Set usehandler = bstack.lastobj
         Set bstack.lastobj = Nothing
-        If usehandler.t1 = 2 Then
+        If usehandler.T1 = 2 Then
         Set q(p).drawimage = usehandler.objref
         Else
         GoTo err123
@@ -303,14 +303,14 @@ End If
 End Sub
 Friend Sub RemoveGuiControl(thisKey)
    Dim that1 As Object
-   Dim I As Long
+   Dim i As Long
    On Error Resume Next
    For Each that1 In GuiControls
         If that1.ctrlName = thisKey Then
-        GuiControls.Remove I
+        GuiControls.Remove i
         Exit For
         End If
-        I = I + 1
+        i = i + 1
    Next that1
    If LCase(LastActive) = LCase(thisKey) Then LastActive = ""
    Controls.Remove thisKey
@@ -378,7 +378,7 @@ If mEnabled = False And RHS = True Then Me.enabled = True
 mEnabled = RHS
 On Error Resume Next
 Dim W As Object
-If Controls.count > 0 Then
+If Controls.Count > 0 Then
 For Each W In Me.Controls
 If W Is gList2 Then
 
@@ -492,7 +492,7 @@ OneTime2 = True
 End If
 
 
-If Controls.count > 0 And False Then
+If Controls.Count > 0 And False Then
 For Each W In Controls
 On Error Resume Next
 If W.enabled Then W.Visible = True
@@ -501,7 +501,7 @@ If Err.Number Then Err.Clear: W.Visible = True
 Next W
 End If
 
-If Controls.count > 0 Then
+If Controls.Count > 0 Then
 For Each W In Controls
 On Error Resume Next
 Dim typ
@@ -529,7 +529,7 @@ End Sub
 
 Public Sub RefreshALL()
 Dim W As Object ', g As gList
-If Controls.count > 0 Then
+If Controls.Count > 0 Then
 For Each W In Controls
 If W.Visible Then
     If TypeOf W Is gList Then W.ShowMe2
@@ -748,7 +748,7 @@ On Error Resume Next
 If Me.Visible Then
 If ActiveControl Is Nothing Then
 Dim W As Object
-    If Controls.count > 0 Then
+    If Controls.Count > 0 Then
     For Each W In Controls
     If W.Visible Then
     If TypeOf W Is gList Then
@@ -933,28 +933,28 @@ End Sub
 Private Sub gListN_AccKey(M As Long)
 AccProces M
 End Sub
-Private Sub gList2_BlinkNow(face As Boolean)
+Private Sub gList2_BlinkNow(Face As Boolean)
 If mTimes > 0 Then
     mTimes = mTimes - 1
     If mTimes = 0 Then
     gList2.BlinkON = False: gList2.CapColor = mBarColor
     If Stored Then RestoreBlibkStatus
     Else
-        state face
+        state Face
     End If
 Else
-    state face
+    state Face
 End If
 gList2.ShowMe
 If Stored Then Exit Sub
   If mIndex >= 0 Then
-   Callback mMyName$ + ".Blink(" + str(Index) + "," + str(face) + ")"
+   Callback mMyName$ + ".Blink(" + str(Index) + "," + str(Face) + ")"
    Else
-      Callback mMyName$ + ".Blink(" + str(face) + ")"
+      Callback mMyName$ + ".Blink(" + str(Face) + ")"
       End If
 End Sub
-Public Sub state(face As Boolean)
-    If face Then
+Public Sub state(Face As Boolean)
+    If Face Then
         gList2.CapColor = rgb(255, 160, 0)
     Else
         gList2.CapColor = rgb(128, 80, 0)
@@ -1355,7 +1355,7 @@ End With
 gList2.FloatLimitTop = VirtualScreenHeight() - 600
 gList2.FloatLimitLeft = VirtualScreenWidth() - 450
 Dim mm As Long
-mm = Forms.count
+mm = Forms.Count
 With ScrInfo(Console)
     If (.Left + .Width / 16 + mm * dv15 * 10) > .Width * 7 / 8 Or (.Top + .Height / 16 + mm * dv15 * 10) > .Height * 7 / 8 Then
     move .Left, .Top
@@ -1380,7 +1380,7 @@ prive = 0
 
 End If
 Dim W As Object
-If GuiControls.count > 0 Then
+If GuiControls.Count > 0 Then
 For Each W In GuiControls
     W.deconstruct
 Next W
@@ -2309,8 +2309,8 @@ End If
   
 End If
 End Sub
-Private Sub PrintItem(mHdc As Long, c As String, R As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_RIGHT Or DT_VCENTER)
-    DrawText mHdc, StrPtr(c), -1, R, way
+Private Sub PrintItem(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_RIGHT Or DT_VCENTER)
+    DrawText mHdc, StrPtr(c), -1, r, way
 End Sub
 Private Sub gListN_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Dim a As RECT, ofg As Long

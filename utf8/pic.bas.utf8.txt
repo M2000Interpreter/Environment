@@ -340,11 +340,11 @@ Public Function LowLong(ByVal p) As Long
     LowLong = MemLong(VarPtr(p) + 8)
 End Function
 Function Hex64$(a, Optional bytes = 8)
-    Dim p, p1, z
+    Dim p, P1, z
     z = cInt64(a)
     p = MemLong(VarPtr(z) + 8)
-    p1 = MemLong(VarPtr(z) + 12)
-    Hex64$ = Right$(Right$("0000000" + Hex$(p1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
+    P1 = MemLong(VarPtr(z) + 12)
+    Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
 End Function
 Public Function OneLongLong() As Variant
     Static p
@@ -826,7 +826,7 @@ Public Function RotateMaskDib(cDibbuffer0 As cDIBSection, Optional ByVal Angle! 
     Dim ang As Long
     ang = CLng(Angle!)
 Angle! = -(CLng(Angle!) Mod 360) * 1.745329E-02!
-If cDibbuffer0.hDib = 0 Then Exit Function
+If cDibbuffer0.hDIb = 0 Then Exit Function
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
@@ -1136,7 +1136,7 @@ Dim b As Single
 b = CSng(Angle! Mod 90 = 0)
 Angle! = -MyMod(Angle!, 360!) * 1.745329E-02!
 On Error Resume Next
-If cDibbuffer0.hDib = 0 Then Exit Sub
+If cDibbuffer0.hDIb = 0 Then Exit Sub
 If zoomfactor <= 0.01! Then zoomfactor = 0.01!
 
 
@@ -2140,10 +2140,10 @@ PobjNum = PobjNum + 1
 End Sub
 Sub ClrSprites()
 On Error Resume Next
-Dim i As Long, zero As basket, zerocounter As Counters
+Dim i As Long, Zero As basket, zerocounter As Counters
 If PobjNum > 0 Then
 For i = PobjNum To 1 Step -1
-        players(i) = zero
+        players(i) = Zero
         Prefresh(i) = zerocounter
         PobjNum = i
 If Form1.dSprite.Count > PobjNum Then Unload Form1.dSprite(PobjNum)
@@ -2766,7 +2766,7 @@ If IsClipboardFormatAvailable(CF_ENHMETAFILE) Then
 End Function
 Public Function GetImageDIB() As mHandler
 Dim hMem As Long
-Dim hDib As Long
+Dim hDIb As Long
 Dim mypic As New cDIBSection
 Dim aPic As MemBlock
 Dim Carrier As New mHandler
@@ -2776,11 +2776,11 @@ Dim okb As Boolean
         
         hMem = GetClipboardData(CF_DIB)
         If hMem <> 0 Then
-           hDib = GlobalLock(hMem)
+           hDIb = GlobalLock(hMem)
            mypic.ClearUp
-           okb = mypic.CreateFromDIB(hDib)
+           okb = mypic.CreateFromDIB(hDIb)
            If Not okb Then
-                hDib = GlobalUnlock(hMem)
+                hDIb = GlobalUnlock(hMem)
                 CloseClipboard
                 If Clipboard.GetFormat(2) Then
                     mypic.CreateFromPicture Clipboard.GetData(2)
@@ -2789,7 +2789,7 @@ Dim okb As Boolean
            End If
            If okb Then
                 If mypic.dpix = 0 Then mypic.GetDpi 96, 96
-                    If mypic.Height > 0 And mypic.hDib <> 0 Then
+                    If mypic.Height > 0 And mypic.hDIb <> 0 Then
                          mypic.SaveDibToMeMBlock aPic
                          aPic.SubType = 1 ' bitmap
                     End If
@@ -2812,7 +2812,7 @@ End If
 
 End Function
 Public Function GetImage() As String
-Dim hMem As Long, hDib As Long
+Dim hMem As Long, hDIb As Long
 Dim mypic As New cDIBSection
 Const CF_DIB = 8
 Dim okb As Boolean
@@ -2820,11 +2820,11 @@ Dim okb As Boolean
 If (OpenClipboard(Form1.hWnd) <> 0) Then
     hMem = GetClipboardData(CF_DIB)
     If hMem <> 0 Then
-        hDib = GlobalLock(hMem)
+        hDIb = GlobalLock(hMem)
         mypic.ClearUp
-        okb = mypic.CreateFromDIB(hDib)
+        okb = mypic.CreateFromDIB(hDIb)
         If Not okb Then
-            hDib = GlobalUnlock(hMem)
+            hDIb = GlobalUnlock(hMem)
             CloseClipboard
             If Clipboard.GetFormat(2) Then
                 mypic.CreateFromPicture Clipboard.GetData(2)
@@ -2834,7 +2834,7 @@ If (OpenClipboard(Form1.hWnd) <> 0) Then
         If okb Then
             If mypic.bitsPerPixel <> 24 Then Conv24 mypic
             If mypic.dpix = 0 Then mypic.GetDpi 96, 96
-            If mypic.Height > 0 And mypic.hDib <> 0 Then
+            If mypic.Height > 0 And mypic.hDIb <> 0 Then
                 GetImage = DIBtoSTR(mypic)
             End If
         End If
@@ -3753,13 +3753,13 @@ End Function
 
 Public Function MyTrimL3Len(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL3Len = 0: Exit Function
   p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 7
     Case Else
      
@@ -3770,13 +3770,13 @@ Dim p2 As Long, p1 As Integer, p4 As Long
 End Function
 Public Function MyTrimL2(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL2 = 1: Exit Function
   p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 7
     Case Else
      MyTrimL2 = (i - p2) \ 2 + 1
@@ -3788,13 +3788,13 @@ End Function
 
 Public Function MyTrimR(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimR = 1: Exit Function
   p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      MyTrimR = (i - p2) \ 2 + 1
@@ -3807,13 +3807,13 @@ End Function
 
 Public Function MyTrimL2NoTab(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
   p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      MyTrimL2NoTab = (i - p2) \ 2 + 1
@@ -3825,7 +3825,7 @@ End Function
 
 Public Function MyTrimRfrom(s$, st As Long, ByVal en As Long) As Long
 Dim i&
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   If st > Len(s$) Then MyTrimRfrom = en: Exit Function
   If en > Len(s$) Then MyTrimRfrom = en: Exit Function
   If en <= st Then MyTrimRfrom = en: Exit Function
@@ -3833,8 +3833,8 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   p2 = StrPtr(s) + (st - 1) * 2: en = en - 1
   p4 = p2 + (en - st) * 2
   For i = p4 To p2 Step -2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 9
     Case Else
      ' MyTrimRfrom = en + 1
@@ -3846,15 +3846,15 @@ Dim p2 As Long, p1 As Integer, p4 As Long
 End Function
 Public Function MyTrimCR(s$) As String
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = Len(s): If l = 0 Then Exit Function
 
   p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 10, 13
     Case Else
      Exit For
@@ -3862,8 +3862,8 @@ l = Len(s): If l = 0 Then Exit Function
   Next i
   p4 = i
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 10, 13
     Case Else
      
@@ -3877,15 +3877,15 @@ End Function
 
 Public Function MyTrim(s$) As String
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = Len(s): If l = 0 Then Exit Function
 
   p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      Exit For
@@ -3893,8 +3893,8 @@ l = Len(s): If l = 0 Then Exit Function
   Next i
   p4 = i
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      
@@ -3907,15 +3907,15 @@ l = Len(s): If l = 0 Then Exit Function
 End Function
 Public Function MyTrimLW(s$) As String
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = Len(s): If l = 0 Then Exit Function
 
   p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      
@@ -3928,15 +3928,15 @@ l = Len(s): If l = 0 Then Exit Function
 End Function
 Public Function MyTrimRW(s$) As String
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = Len(s): If l = 0 Then Exit Function
 
   p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      Exit For
@@ -3949,15 +3949,15 @@ End Function
 
 Public Function MyTrimRB(s$) As String
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = LenB(s): If l = 0 Then Exit Function
 
   p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l
   For i = p4 To p2 Step -1
-  GetMem1 i, p1
-  Select Case p1
+  GetMem1 i, P1
+  Select Case P1
     Case 32
     Case Else
    Exit For
@@ -3969,15 +3969,15 @@ l = LenB(s): If l = 0 Then Exit Function
 End Function
 Public Function MyTrimLB(s$) As String
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = LenB(s): If l = 0 Then Exit Function
 
   p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l
   For i = p2 To p4 Step 1
-  GetMem1 i, p1
-  Select Case p1
+  GetMem1 i, P1
+  Select Case P1
     Case 32
     Case Else
   
@@ -3990,15 +3990,15 @@ l = LenB(s): If l = 0 Then Exit Function
 End Function
 Public Function MyTrimB(s$) As String
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = LenB(s): If l = 0 Then Exit Function
 
   p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l
   For i = p4 To p2 Step -1
-  GetMem1 i, p1
-  Select Case p1
+  GetMem1 i, P1
+  Select Case P1
     Case 32
     Case Else
   
@@ -4007,8 +4007,8 @@ l = LenB(s): If l = 0 Then Exit Function
   Next i
   p4 = i
   For i = p2 To p4 Step 1
-  GetMem1 i, p1
-  Select Case p1
+  GetMem1 i, P1
+  Select Case P1
     Case 32
     Case Else
 
@@ -4026,14 +4026,14 @@ Dim rr&, one As Boolean, c$, gr As Boolean, split As Boolean
 r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
 Dim i&, l As Long, p3 As Integer
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
 l = Len(a$): If l = 0 Then IsLabelAnew = 0: Lang = 1: Exit Function
 split = Lang > -1
 p2 = StrPtr(a$): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 13
     
     If i < p4 Then
@@ -4046,12 +4046,12 @@ p2 = StrPtr(a$): l = l - 1
     i = i + 4
     Do While i < p4
 
-    GetMem2 i, p1
-    If p1 = 32 Or p1 = 160 Then
+    GetMem2 i, P1
+    If P1 = 32 Or P1 = 160 Then
     i = i + 2
     Else
     GetMem2 i + 2, p3
-    If p1 <> 13 And p3 <> 10 Then Exit Do
+    If P1 <> 13 And p3 <> 10 Then Exit Do
     i = i + 4
     End If
     Loop
@@ -4074,12 +4074,12 @@ p2 = StrPtr(a$): l = l - 1
   Next i
     If i > p4 Then a$ = vbNullString: IsLabelAnew = 0: Exit Function
   For i = i To p4 Step 2
-  GetMem2 i, p1
-  If p1 < 256 Then
-  Select Case p1
+  GetMem2 i, P1
+  If P1 < 256 Then
+  Select Case P1
         Case 64  '"@"
             If i < p4 And r$ <> "" Then
-                GetMem2 i + 2, p1
+                GetMem2 i + 2, P1
                 where$ = r$
                 r$ = vbNullString
             Else
@@ -4102,18 +4102,18 @@ p2 = StrPtr(a$): l = l - 1
             If one Then
                 Exit For
             ElseIf r$ <> "" And i < p4 Then
-                GetMem2 i + 2, p1
-                If ChrW(p1) = "." Or ChrW(p1) = " " Then
-                If ChrW(p1) = "." And i + 2 < p4 Then
-                    GetMem2 i + 4, p1
-                    If ChrW(p1) = " " Then i = i + 4: Exit For
+                GetMem2 i + 2, P1
+                If ChrW(P1) = "." Or ChrW(P1) = " " Then
+                If ChrW(P1) = "." And i + 2 < p4 Then
+                    GetMem2 i + 4, P1
+                    If ChrW(P1) = " " Then i = i + 4: Exit For
                 Else
                     i = i + 2
                    Exit For
                 End If
             End If
-                GetMem2 i, p1
-                r$ = r$ & ChrW(p1)
+                GetMem2 i, P1
+                r$ = r$ & ChrW(P1)
                 rr& = 1
             End If
       Case 38 ' "&"
@@ -4124,7 +4124,7 @@ p2 = StrPtr(a$): l = l - 1
             Exit For
     Case 91
         If r$ = vbNullString Then
-                r$ = ChrW(p1)
+                r$ = ChrW(P1)
                 rr& = 1
         Else
                 If Left$(r$, 1) <> "[" Then rr& = 8: Exit For
@@ -4137,7 +4137,7 @@ p2 = StrPtr(a$): l = l - 1
 
             Exit For
             ElseIf r$ <> "" Then
-            r$ = r$ & ChrW(p1)
+            r$ = r$ & ChrW(P1)
             '' A$ = Mid$(A$, 2)
             rr& = 1 'is an identifier or floating point variable
             Else
@@ -4147,7 +4147,7 @@ p2 = StrPtr(a$): l = l - 1
             If one Then
             Exit For
             Else
-            r$ = r$ & ChrW(p1)
+            r$ = r$ & ChrW(P1)
             rr& = 1 'is an identifier or floating point variable
             End If
         Case 36 ' "$"
@@ -4155,7 +4155,7 @@ p2 = StrPtr(a$): l = l - 1
             If r$ <> "" Then
             one = True
             rr& = 3 ' is string variable
-            r$ = r$ & ChrW(p1)
+            r$ = r$ & ChrW(P1)
             Else
             Exit For
             End If
@@ -4164,7 +4164,7 @@ p2 = StrPtr(a$): l = l - 1
             If r$ <> "" Then
             one = True
             rr& = 4 ' is long variable
-            r$ = r$ & ChrW(p1)
+            r$ = r$ & ChrW(P1)
             Else
             Exit For
             End If
@@ -4172,9 +4172,9 @@ p2 = StrPtr(a$): l = l - 1
         Case 40 ' "("
             If r$ <> "" Then
             If i + 4 <= p4 Then
-                GetMem2 i + 2, p1
+                GetMem2 i + 2, P1
                 GetMem2 i + 2, p3
-                If ChrW(p1) + ChrW(p3) = ")@" Then
+                If ChrW(P1) + ChrW(p3) = ")@" Then
                     r$ = r$ & "()."
                     i = i + 4
                 Else
@@ -4192,8 +4192,8 @@ i1233:
                                        Case Else
                                        Exit For
                                        End Select
-                     GetMem2 i, p1
-                                        r$ = r$ & ChrW(p1)
+                     GetMem2 i, P1
+                                        r$ = r$ & ChrW(P1)
                                         i = i + 2
                                       ' A$ = Mid$(A$, 2)
                                    Exit For
@@ -4212,7 +4212,7 @@ i1233:
               Exit For
               Else
               gr = True
-              r$ = r$ & ChrW(p1)
+              r$ = r$ & ChrW(P1)
               rr& = 1 'is an identifier or floating point variable
               End If
     End If
@@ -4761,7 +4761,6 @@ M.Reset
 End If
 M.ShowGui = False
 Debug.Print "ok"
-ResetTokenFinal
 End Sub
 Function ProcWriter(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim prive As Long
@@ -4875,10 +4874,10 @@ Dim emfP As StdPicture
 Set emfP = QRCodegenBarcode(ab$, QRcolor, , sq, ErrLevel)
 If emfP Is Nothing Then Exit Sub
 Set aPic = New MemBlock
-bytes = GetEnhMetaFileBits(emfP.Handle, bytes, ByVal 0)
+bytes = GetEnhMetaFileBits(emfP.handle, bytes, ByVal 0)
 If bytes Then
     aPic.Construct 1, bytes
-    Call GetEnhMetaFileBits(emfP.Handle, bytes, ByVal aPic.GetBytePtr(0))
+    Call GetEnhMetaFileBits(emfP.handle, bytes, ByVal aPic.GetBytePtr(0))
     aPic.SubType = 2 ' emf
     Set usehandler = New mHandler
     usehandler.t1 = 2

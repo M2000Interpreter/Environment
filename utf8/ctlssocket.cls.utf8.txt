@@ -543,7 +543,14 @@ Public Property Get LastError() As VBA.ErrObject
             ElseIf m_oSocket.HasPendingEvent Then
                 .Number = 0
             Else
-                Set LastError = m_oSocket.LastError
+                If Typename(m_oSocket) = "Empty" Then
+                
+                ElseIf m_oSocket Is Nothing Then
+
+                Else
+                On Error Resume Next
+                    Set LastError = m_oSocket.LastError
+                End If
             End If
         End If
     End With
@@ -2591,7 +2598,7 @@ Private Function pvPkiCertValidate(ByVal sHostName As String, cCerts As Collecti
             sApiSource = "CertAddEncodedCertificateToStore"
             GoTo QH
         End If
-        If SearchCollection(cStatuses, lIdx, retval:=baCert) Then
+        If SearchCollection(cStatuses, lIdx, RetVal:=baCert) Then
             If pvArraySize(baCert) > 0 Then
                 uProp.cbData = pvArraySize(baCert)
                 uProp.pbData = VarPtr(baCert(0))
@@ -2804,7 +2811,7 @@ EH:
 End Function
 
 #If ImplTlsServer Then
-Private Function pvPkiPemGetTextPortions(sContents As String, sBoundary As String, Optional retval As Collection) As Collection
+Private Function pvPkiPemGetTextPortions(sContents As String, sBoundary As String, Optional RetVal As Collection) As Collection
     Dim vSplit          As Variant
     Dim lIdx            As Long
     Dim lJdx            As Long
@@ -2813,8 +2820,8 @@ Private Function pvPkiPemGetTextPortions(sContents As String, sBoundary As Strin
     Dim lSize           As Long
     Dim sPortion        As String
     
-    If retval Is Nothing Then
-        Set retval = New Collection
+    If RetVal Is Nothing Then
+        Set RetVal = New Collection
     End If
     vSplit = split(Replace(sContents, vbCr, vbNullString), vbLf)
     For lIdx = 0 To UBound(vSplit)
@@ -2834,8 +2841,8 @@ Private Function pvPkiPemGetTextPortions(sContents As String, sBoundary As Strin
                         lSize = lSize + Len(vSplit(lJdx))
                     End If
                 Next
-                If Not SearchCollection(retval, sPortion) Then
-                    retval.Add FromBase64Array(sPortion), sPortion
+                If Not SearchCollection(RetVal, sPortion) Then
+                    RetVal.Add FromBase64Array(sPortion), sPortion
                 End If
                 bInside = False
             ElseIf InStr(vSplit(lIdx), ":") = 0 Then
@@ -2843,7 +2850,7 @@ Private Function pvPkiPemGetTextPortions(sContents As String, sBoundary As Strin
             End If
         End If
     Next
-    Set pvPkiPemGetTextPortions = retval
+    Set pvPkiPemGetTextPortions = RetVal
 End Function
 #End If
 
