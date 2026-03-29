@@ -49031,26 +49031,43 @@ MW.ViewMatrix g
 end if
 }
 MODULE SERVER1 {cls #222222,0
-Print "Server1"
+rem{
+	binary {
+	      iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACWklEQVR4AZRT3UtT
+	      YRj/vYcxWLhd5LQb1xY00i6aUwfhVLof1U1RhC6vRPpYV5G4VqcivLCvgeCfYFNk
+	      fUAX3djHpdsomJs5dqYQRRcmtBuX67w9zzt2AgvC8T7v+/y+nr2cs2nY9Vn+uHok
+	      UzSSVMVMoVxTVTSKhJOs7bLDGqDrupYtlnXYbHlIGaPqJLNdlZSdhGOssYe9xKtl
+	      DYicjc5KidtCCJtS/rGxxp7IuehsU1YDlgvGiBByrEn+7xRSjuUowz5taUnaBOR9
+	      BnspkzKc1VoOGCdM0/ToiUnELo1jITWHn7XaX7NqxM0/nVMePREHZzirCYFQvV5H
+	      xTCwtfUdL56lcffOLVSrVWsI9/f0BF4+TytPxSiDM5zVBMR+u92OQLDHCmxUKphJ
+	      PqYHL1XNPHmEjfV1Sw/29IIznNXI8pWVkegoWlqc3KoqrOTxIZdFLptBobCiON6c
+	      TheGL45yC85q2NFeEZJt7e2YiCfQ2uom2Fil0hpKa58agHbWbsRvwu1uI0R5ymp9
+	      xw6tSiDNjNfnw9T0A5y/MIzwwBD6BwYRHhxCmE7mpqYfwuv1sRWc4az6HfzaMa/R
+	      dTZZcTj2IXLyFMYvX0FHhwcez0HqryrO4XCwhcJykzMM1IDjAf9nCHmGiG0qtd6/
+	      ewujXIZBT5x7RTa2bfaqDGE1gE6EuvxvIMzTdDX1/pxOJxYXUlicT8HlcrGFvhlV
+	      9iivYvDnz8S4r8v/GpD9Aih002u9PjEJrkB3EMyx1vCwu1HWDRoQCB09nP/xTeuV
+	      0oxT4AsX98yx1vQ1z98AAAD//zbMFRIAAAAGSURBVAMA8iAJqkWBAh0AAAAASUVO
+	      RK5CYII=
+	} as favicon
+}
+// from revision 12 we can make own PNG
+// When a EMF produce a PNG then the non writting pixels are transparent 100%.
+Function OurPNG {
+	drawing twipsX*16, twipsY*16 {
+		move twipsX*7, twipsY*7
+		pen 0
+		circle fill #ffaa22, twipsX*7
+	} as b
+	=image(b as PNG)
+}
+favicon=OurPNG()
+gradient 1,5,0
+move 0, 0
+image favicon
+Print "  Server1"
 Print "Press Esc to shutdown the Server"
 cls 5,2
-binary {
-      iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACWklEQVR4AZRT3UtT
-      YRj/vYcxWLhd5LQb1xY00i6aUwfhVLof1U1RhC6vRPpYV5G4VqcivLCvgeCfYFNk
-      fUAX3djHpdsomJs5dqYQRRcmtBuX67w9zzt2AgvC8T7v+/y+nr2cs2nY9Vn+uHok
-      UzSSVMVMoVxTVTSKhJOs7bLDGqDrupYtlnXYbHlIGaPqJLNdlZSdhGOssYe9xKtl
-      DYicjc5KidtCCJtS/rGxxp7IuehsU1YDlgvGiBByrEn+7xRSjuUowz5taUnaBOR9
-      BnspkzKc1VoOGCdM0/ToiUnELo1jITWHn7XaX7NqxM0/nVMePREHZzirCYFQvV5H
-      xTCwtfUdL56lcffOLVSrVWsI9/f0BF4+TytPxSiDM5zVBMR+u92OQLDHCmxUKphJ
-      PqYHL1XNPHmEjfV1Sw/29IIznNXI8pWVkegoWlqc3KoqrOTxIZdFLptBobCiON6c
-      TheGL45yC85q2NFeEZJt7e2YiCfQ2uom2Fil0hpKa58agHbWbsRvwu1uI0R5ymp9
-      xw6tSiDNjNfnw9T0A5y/MIzwwBD6BwYRHhxCmE7mpqYfwuv1sRWc4az6HfzaMa/R
-      dTZZcTj2IXLyFMYvX0FHhwcez0HqryrO4XCwhcJykzMM1IDjAf9nCHmGiG0qtd6/
-      ewujXIZBT5x7RTa2bfaqDGE1gE6EuvxvIMzTdDX1/pxOJxYXUlicT8HlcrGFvhlV
-      9iivYvDnz8S4r8v/GpD9Aih002u9PjEJrkB3EMyx1vCwu1HWDRoQCB09nP/xTeuV
-      0oxT4AsX98yx1vQ1z98AAAD//zbMFRIAAAAGSURBVAMA8iAJqkWBAh0AAAAASUVO
-      RK5CYII=
-} as favicon
+
 locale 1033
 Flush
 Escape Off
@@ -49108,7 +49125,7 @@ Function Serversck_OnAccept {
 			Connection: keep-alive
 			
 			}
-			txt$={<html>
+			txt$={<!DOCTYPE html><html>
 			<head><title>503 Service Unavailable</title></head>
 			<body>
 			<h1>Service Unavailable</h1>
@@ -49128,7 +49145,7 @@ Function Serversck_OnAccept {
 }
 // modules called from event service fucntions
 module alfa (new s$) {
-	local txt$={<html>
+	local txt$={<!DOCTYPE html><html>
 		<head><title>Bravo @</title>
 		<style>div {text-align: center;}</style>
 		</head>
@@ -49226,6 +49243,8 @@ function c_OnReceive (new id){
 			method c(id), "Send", favicon(0), len(favicon) as new total_send
 			? total_send, Len(favicon)
 			? "connections = ";connections
+			move !
+			image favicon
 		else
 			local resp$={
 			HTTP/1.1 204 No Content
