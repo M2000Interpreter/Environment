@@ -524,8 +524,74 @@ there1:
    
  
 End Function
+Public Function SaveBufferToFile(FileName As String) As Boolean
+    Dim a1 As SAFEARRAY1D, a() As Byte, mm As MemBlock, obj As Object, mf As Integer
+        With a1
+        .cbElements = 1
+        .cDims = 1
+        .onebound(0).lLbound = 0
+        .onebound(0).cElements = Me.SizeByte
+        .pvData = Me.GetPtr(0)
+        End With
+        CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
+        
+        Dim i As Long
+        mf = FreeFile
+        If NeoUnicodeFile(FileName) Then
+        Open GetDosPath(FileName) For Binary As mf
+        Put #mf, , a()
+        Close #mf
+        CopyMemory ByVal VarPtrArray(a), 0&, 4
+        SaveBufferToFile = True
+        End If
+End Function
+Friend Function RenderToPng(ByRef ok As Boolean) As MemBlock
+    Dim a1 As SAFEARRAY1D, a() As Byte, obj As Object
+    If Me.IsPng Then
+        Set RenderToPng = Me.Copy
+    Else
+        With a1
+            .cbElements = 1
+            .cDims = 1
+            .onebound(0).lLbound = 0
+            .onebound(0).cElements = Me.SizeByte
+            .pvData = Me.GetPtr(0)
+        End With
+        CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
+        Set RenderToPng = PngImageFromBuffer(a())
+        CopyMemory ByVal VarPtrArray(a), 0&, 4
+        If RenderToPng Is Nothing Then Exit Function
+        
+    End If
+    ok = True
+End Function
+
+
+Friend Function GetPNGBuffer(ByRef ThisBuffer As mHandler) As Boolean
+    Dim a1 As SAFEARRAY1D, a() As Byte, mm As MemBlock, obj As Object
+    If Me.IsPng Then
+        Set mm = Me.Copy
+    Else
+        With a1
+            .cbElements = 1
+            .cDims = 1
+            .onebound(0).lLbound = 0
+            .onebound(0).cElements = Me.SizeByte
+            .pvData = Me.GetPtr(0)
+        End With
+        CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
+        Set obj = PngImageFromBuffer(a())
+        CopyMemory ByVal VarPtrArray(a), 0&, 4
+        If obj Is Nothing Then Exit Function
+        Set mm = obj
+    End If
+    Set ThisBuffer = New mHandler
+    ThisBuffer.t1 = 2
+    Set ThisBuffer.objref = mm
+    GetPNGBuffer = True
+End Function
 Public Function GetStdPicture(Optional Width As Long = -1, Optional Height As Long = -1, Optional ByVal BackColor As Long = vbWhite, Optional FlipOrRotate As Long = 0, Optional Bitmap As Boolean = False) As IPicture
-   Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
+   Dim a1 As SAFEARRAY1D, a() As Byte
      With a1
         .cbElements = 1
         .cDims = 1
@@ -761,7 +827,7 @@ Public Sub SentToClipBoard(Optional pWidth As Long = -1, Optional ByVal pHeight 
         MyEr "Not a proper picture to send it to clipboard", "Δεν είναι μια σωστή εικόνα για να τη στείλω στο πρόχειρο"
         Exit Sub
     End If
-    If mm.Handle <> 0 Then
+    If mm.handle <> 0 Then
         If (OpenClipboard(Form1.hWnd) <> 0) Then
            If EmptyClipboard Then
                 If mm.Type = 2 Then
@@ -770,9 +836,9 @@ Public Sub SentToClipBoard(Optional pWidth As Long = -1, Optional ByVal pHeight 
                         DeleteEnhMetaFile hEmf
                     End If
                 ElseIf mm.Type = 4 Then
-                    SetClipboardData 14, mm.Handle
+                    SetClipboardData 14, mm.handle
                 Else
-                    SetClipboardData 2, mm.Handle
+                    SetClipboardData 2, mm.handle
                 End If
             End If
             CloseClipboard
@@ -867,10 +933,10 @@ Private Function getEmf(Wmf As StdPicture) As Long
  
  Dim bytes As Long
 Dim Buffer() As Byte
-   bytes = GetMetaFileBitsEx(Wmf.Handle, bytes, ByVal 0&)
+   bytes = GetMetaFileBitsEx(Wmf.handle, bytes, ByVal 0&)
  If bytes Then
 ReDim Buffer(1 To bytes) As Byte
-Call GetMetaFileBitsEx(Wmf.Handle, bytes, Buffer(1))
+Call GetMetaFileBitsEx(Wmf.handle, bytes, Buffer(1))
 Else
 
 Exit Function

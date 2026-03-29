@@ -14,7 +14,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Private Type RECT
         Left As Long
-        top As Long
+        Top As Long
         Right As Long
         Bottom As Long
 End Type
@@ -47,7 +47,7 @@ Private Type METAFILEPICT
 End Type
 Private Type PWMFRect16
     Left   As Integer
-    top    As Integer
+    Top    As Integer
     Right  As Integer
     Bottom As Integer
 End Type
@@ -181,7 +181,7 @@ Public Sub create(pen As Long, fakeWidth As Long, fakeHeight As Long)
     m_width = (m_width \ dv15) * dv15
     m_height = (m_height \ dv15) * dv15
     boundrect.Left = 0
-    boundrect.top = 0
+    boundrect.Top = 0
     boundrect.Right = (m_width - dv15) * (2540 / 1440)
     boundrect.Bottom = (m_height - dv15) * (2540 / 1440)
     fakeWidth = boundrect.Right * 1440 / 2540
@@ -238,7 +238,7 @@ aPic.type1 = what
 Set getEmfObj = aPic
 End Function
 Private Sub Cleanup()
-Dim retval As Long
+Dim RetVal As Long
     If m_hFntOld <> 0 Then SelectObject m_hDC, m_hFntOld
     If hOldPen <> 0 Then SelectObject m_hDC, hOldPen: DeleteObject m_hpen
     If m_brushOld Then SelectObject m_hDC, m_brushOld: DeleteObject m_brush
@@ -392,11 +392,11 @@ Public Property Let prive(ByVal RHS As Long)
 m_prive = RHS
 End Property
 
-Public Property Get top() As Long
-top = m_Top
+Public Property Get Top() As Long
+Top = m_Top
 End Property
 
-Public Property Let top(ByVal RHS As Long)
+Public Property Let Top(ByVal RHS As Long)
 m_Top = RHS
 End Property
 
@@ -494,11 +494,11 @@ End Property
 
 Public Property Let DrawWidth(ByVal RHS As Long)
 m_DrawWidth = RHS
-Dim retval As Long
+Dim RetVal As Long
 If m_Status Then
 If m_hDC Then
-If hOldPen <> 0 Then retval = SelectObject(m_hDC, hOldPen)
-If m_hpen <> 0 Then retval = DeleteObject(m_hpen)
+If hOldPen <> 0 Then RetVal = SelectObject(m_hDC, hOldPen)
+If m_hpen <> 0 Then RetVal = DeleteObject(m_hpen)
 m_hpen = CreatePen(m_DrawStyle, m_DrawWidth, m_pen)
 hOldPen = SelectObject(m_hDC, m_hpen)
 End If
@@ -577,7 +577,7 @@ Call SetBkMode(m_hDC, 0)
 If FillBack Then
 linepen = CreateSolidBrush(RGBcolor)
 rp.Left = x1 \ dv15
-rp.top = y1 \ dv15
+rp.Top = y1 \ dv15
 rp.Right = Int(x2 / dv15 + 0.5)
 rp.Bottom = Int(y2 / dv15 + 0.5) + 1
 FillRect m_hDC, rp, linepen
@@ -586,7 +586,7 @@ If DrawBlock Then GoTo cont123
 ElseIf DrawBlock Then
 'linepen = CreateSolidBrush(RGBcolor)
 rp.Left = x1 \ dv15
-rp.top = y1 \ dv15
+rp.Top = y1 \ dv15
 rp.Right = Int(x2 / dv15 + 0.5)
 rp.Bottom = Int(y2 / dv15 + 0.5) + 1
 cont123:
@@ -597,14 +597,14 @@ oldpen = SelectObject(m_hDC, linepen)
 'nowold = SelectObject(m_hDC, hollow)
 'Rectangle m_hDC, rp.Left, rp.top, rp.Right - 1, rp.Bottom - 1
 'SelectObject m_hDC, nowold
-MoveToEx m_hDC, rp.Left, rp.top, ByVal 0
-LineTo m_hDC, rp.Right, rp.top
+MoveToEx m_hDC, rp.Left, rp.Top, ByVal 0
+LineTo m_hDC, rp.Right, rp.Top
 'MoveToEx m_hDC, x1 \ dv15, y1 \ dv15, ByVal 0
 LineTo m_hDC, rp.Right, rp.Bottom
 'MoveToEx m_hDC, x1 \ dv15, y1 \ dv15, ByVal 0
 LineTo m_hDC, rp.Left, rp.Bottom
 'MoveToEx m_hDC, x1 \ dv15, y1 \ dv15, ByVal 0
-LineTo m_hDC, rp.Left, rp.top
+LineTo m_hDC, rp.Left, rp.Top
 
 
 
@@ -666,7 +666,7 @@ Public Sub PlayEmfInside(picthis As StdPicture, X As Long, Y As Long, Optional W
     kky1 = Round((Height) / dv15)
     myXForm = buildXForm(X, Y, rot, kkx1, kky1)
     kkx.Left = Xs - kkx1 / 2
-    kkx.top = Ys - kky1 / 2
+    kkx.Top = Ys - kky1 / 2
     kkx.Right = Xs + kkx1 / 2
     kkx.Bottom = Ys + kky1 / 2
     
@@ -720,7 +720,7 @@ Public Sub PlayWmfInside(picthis As StdPicture, X As Long, Y As Long, Optional W
     kky1 = Round((Height) / dv15)
     myXForm = buildXForm(X, Y, rot, kkx1, kky1)
     kkx.Left = Xs - kkx1 / 2
-    kkx.top = Ys - kky1 / 2
+    kkx.Top = Ys - kky1 / 2
     kkx.Right = Xs + kkx1 / 2
     kkx.Bottom = Ys + kky1 / 2
     
@@ -744,7 +744,7 @@ Private Sub PlayEmfInsideSimple(picthis As StdPicture, X As Long, Y As Long, Opt
 
       
     kkx.Left = X
-    kkx.top = Y
+    kkx.Top = Y
     kkx.Right = Width + X
     kkx.Bottom = Height + Y
    kkx.Right = kkx.Right * 1.00166666666667
@@ -763,7 +763,7 @@ Private Sub PlayWmfInsideSimple(picthis As StdPicture, X As Long, Y As Long, Opt
 
       
     kkx.Left = X
-    kkx.top = Y
+    kkx.Top = Y
     kkx.Right = Width + X
     kkx.Bottom = Height + Y
    kkx.Right = kkx.Right * 1.00166666666667
@@ -775,16 +775,16 @@ SetGraphicsMode m_hDC, GM_COMPATIBLE
     DeleteMetaFile pHandle
 End Sub
 Private Function buildXForm(ByVal x0 As Long, ByVal y0 As Long, ByVal q As Single, piw As Long, pih As Long) As XFORM
-    Dim r As Single, k As Single
+    Dim r As Single, K As Single
     q = -(CLng(q * 100) Mod 36000) * 1.74532925199433E-04
 
         r = Atn(piw / CSng(pih)) + Pi / 2!
-        k = piw / Cos(r) / 2
+        K = piw / Cos(r) / 2
         buildXForm.eM11 = Round(Cos(q), 4)
         buildXForm.eM12 = Round(Sin(q), 4)
         buildXForm.eM21 = Round(-Sin(q), 4)
         buildXForm.eM22 = Round(Cos(q), 4)
-        k = Abs(k)
+        K = Abs(K)
         buildXForm.eDx = x0 'Round((k - k * Cos(q - R)) / 2!, 0)
         buildXForm.eDy = y0 'Round((k - k * Sin(q - R)) / 2!, 0)
        

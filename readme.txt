@@ -1,13 +1,11 @@
 M2000 Interpreter and Environment
-Version 14 revision 11 active-X
+Version 14 revision 12 active-X
 
-1) FORMALABEL variant using ! for non antialiasing text rendering. See help FormLabel
-2) IMAGE() now works for a bitmap in a string using the same as for PNG except the transparent color. See help Image()
-also fixed on the resize to not leave a line in right and potom edge.
-3)Report now has another clause: SCROLL for the specific variants who use selected lines to display. So without Scroll we get the lines only which we see without scroll (same in a loop). Using Scroll we get the same like the Report without limit lines (the standard Report). So the SCROLL enable the scroll hold system for page view.
-4)fixed in OpenGl the problem with background not alignment as excpected (removed a multiplication 1.01 which alter the size of the texture)
-
-
+1) Now we can make PNG file in a buffer ->
+if B is another image in a buffer or is a string with dib data. If the image B is a metafile then then PNG has transparecy 100% on those pixels which not used by the metafile.
+A=IMAGE(B as PNG)
+2) fix an error in PSET for metafiles.
+3) minor details
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
