@@ -46,39 +46,39 @@ If Not objref Is Nothing Then
 Set objref = Nothing
 End If
 End Sub
-Friend Sub CopyTo(A As mHandler)
-If IamEnum Then Set A = Me: Exit Sub
-Set A = New mHandler
-A.T1 = T1
+Friend Sub CopyTo(a As mHandler)
+If IamEnum Then Set a = Me: Exit Sub
+Set a = New mHandler
+a.T1 = T1
 If T1 = 1 Then
-    A.ReadOnly = ReadOnly
-    Set A.objref = mObjRef
+    a.ReadOnly = ReadOnly
+    Set a.objref = mObjRef
 ElseIf T1 = 3 Then
     If ReadOnly Then
     Dim mAr As mArray, mtu As tuple
            If TypeOf objref Is mArray Then
                     Set mAr = New mArray
                     objref.CopyArray mAr
-                    Set A.objref = mAr
+                    Set a.objref = mAr
             ElseIf TypeOf objref Is tuple Then
                     Set mtu = New tuple
                     objref.CopyArray mtu
-                    Set A.objref = mtu
+                    Set a.objref = mtu
             Else
-                Set A.objref = mObjRef
+                Set a.objref = mObjRef
             End If
     Else
-        Set A.objref = mObjRef
+        Set a.objref = mObjRef
     End If
 Else
-    Set A.objref = mObjRef
+    Set a.objref = mObjRef
 End If
-A.indirect = indirect
-A.index_start = index_start
-A.index_End = index_End
-A.index_cursor = index_cursor
-A.UseIterator = UseIterator
-A.sign = sign
+a.indirect = indirect
+a.index_start = index_start
+a.index_End = index_End
+a.index_cursor = index_cursor
+a.UseIterator = UseIterator
+a.sign = sign
 End Sub
 Friend Function Iterate()
         Iterate = GetNext(ObjPtr(oEnum), index_cursor)
@@ -101,11 +101,19 @@ Set mm = mObjRef
 Set CreateFromPicture = mm.CreateFromPicture(b, w1, w2, w3)
 End If
 End Function
-
+' GetPNGBuffer
+Friend Property Get CreatePng() As Object
+If T1 = 2 Then
+    Dim mm As MemBlock, res As mHandler
+    Set mm = mObjRef
+    If mm.GetPNGBuffer(res) Then
+        Set CreatePng = res
+    End If
+End If
+End Property
 Property Get T1() As Variant
 T1 = mt1
 End Property
-
 Friend Property Let T1(ByVal RHS As Variant)
 mt1 = RHS
 End Property

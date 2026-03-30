@@ -212,6 +212,14 @@ Private Sub pvInit(Url As String, LocalFileName As Variant, ByVal StreamFlags As
         Set m_pFileStream = LocalFileName
     Else
         m_sLocalFileName = LocalFileName
+        If Left$(m_sLocalFileName, 2) <> "\\" Then
+            m_sLocalFileName = "\\?\" + m_sLocalFileName
+        End If
+        If Not NeoUnicodeFile(m_sLocalFileName) Then
+                    On Error GoTo 0
+                    Err.Raise vbObjectError, , "can't use the filename"
+        End If
+        
         m_lStreamFlags = StreamFlags
         hResult = SHCreateStreamOnFile(StrPtr(m_sLocalFileName), m_lStreamFlags, m_pFileStream)
         If hResult < 0 Then
@@ -272,7 +280,7 @@ Private Function pvRecvHeaders(baBuffer() As Byte) As Boolean
     sHeaders = m_oSocket.FromTextArray(m_baFileBuffer, ucsScpAcp) & m_oSocket.FromTextArray(baBuffer, ucsScpAcp)
     lPos = InStr(sHeaders, STR_DELIM)
     If lPos > 0 Then
-        vSplit = Split(Left$(sHeaders, lPos), vbCrLf)
+        vSplit = split(Left$(sHeaders, lPos), vbCrLf)
         Select Case CLng(val(Mid$(vSplit(0), 10, 3)))
         Case 200 To 299
 TryDownload:
@@ -440,7 +448,7 @@ Private Function pvSendComplete(baBuffer() As Byte) As Boolean
     sHeaders = m_oSocket.FromTextArray(baBuffer, ucsScpAcp)
     lPos = InStr(sHeaders, STR_DELIM)
     If lPos > 0 Then
-        vSplit = Split(Left$(sHeaders, lPos), vbCrLf)
+        vSplit = split(Left$(sHeaders, lPos), vbCrLf)
         Select Case CLng(val(Mid$(vSplit(0), 10, 3)))
         Case 200 To 299, 300 To 399
             m_sBody = Mid$(sHeaders, lPos + Len(STR_DELIM))
@@ -489,7 +497,7 @@ Private Function pvParseUrl(sUrl As String, uParsed As UcsParsedUrl, Optional De
     With CreateObject("VBScript.RegExp")
         .Pattern = "^(?:(?:(.+?):)?//)?(?:(?:([^:]*?):)?([^@]*)@)?([A-Za-z0-9\-\.]+)?(:[0-9]+)?(/[^?#]*?)?(\?[^#]*?)?(#.*)?$"
         With .Execute(sUrl)
-            If .count > 0 Then
+            If .Count > 0 Then
                 With .item(0).SubMatches
                     uParsed.Protocol = IIf(LenB(.item(0)) = 0, DefProtocol, .item(0))
                     uParsed.User = .item(1)
@@ -547,7 +555,7 @@ Private Function IStream_Write(pStm As IUnknown, baBuffer() As Byte, Optional By
     End If
 End Function
 
-Private Function DispCallByVtbl(pUnk As IUnknown, ByVal lIndex As Long, ParamArray A() As Variant) As Variant
+Private Function DispCallByVtbl(pUnk As IUnknown, ByVal lIndex As Long, ParamArray a() As Variant) As Variant
     Const CC_STDCALL    As Long = 4
     Dim lIdx            As Long
     Dim vParam()        As Variant
@@ -555,7 +563,7 @@ Private Function DispCallByVtbl(pUnk As IUnknown, ByVal lIndex As Long, ParamArr
     Dim vPtr(0 To 63)   As Long
     Dim hResult         As Long
     
-    vParam = A
+    vParam = a
     For lIdx = 0 To UBound(vParam)
         vType(lIdx) = VarType(vParam(lIdx))
         vPtr(lIdx) = VarPtr(vParam(lIdx))
