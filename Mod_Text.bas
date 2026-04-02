@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 12
+Global Const Revision = 13
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5705,7 +5705,7 @@ TimeZones zones
 Set TaskMaster = New TaskMaster
 TaskMaster.Interval = 5
 beeperBEAT = 300
-MediaPlayer1.filename = vbNullString
+MediaPlayer1.FileName = vbNullString
 defFontname = "Verdana"
 my_system = OperatingPlatform
 vol = 50
@@ -55383,29 +55383,44 @@ contstrhere:
             End If
         Else
         
-            If MemInt(VarPtr(p)) = vbBoolean Then
+            Select Case MemInt(VarPtr(p))
+            Case vbBoolean
                 If ShowBooleanAsString Then
                     r$ = format$(p, ";\T\r\u\e;\F\a\l\s\e")
                 Else
                     r$ = CStr(p * 1)
                 End If
-            
-            
-
-            ElseIf MemInt(VarPtr(p)) = vbDate Then
+            Case vbEmpty
+                r$ = vbNullString
+            Case vbDate
                 If p <= 1 Then
                 r$ = FormatTimeWithLocale("HH:mm:ss", CDate(p), 1033&)
                 Else
                 r$ = FormatDateWithLocale(GetlocaleString2(&H1F, 1033&), CDate(p), 1033&)
                 End If
-            Else
+            Case Else
+                
                 If TypeOf p Is Complex Then
-                    If p.i >= 0 Then r$ = "+"
-                    r$ = "(" + LTrim$(str(p.r)) + "," + r$ + LTrim$(str(p.i)) + "i)"
+                   If p.i = 0 Then
+                       r$ = fixthis(CVar(p.r))
+                   ElseIf p.r = 0 Then
+                       r$ = "(" & LTrim$(str$(p.i)) & "i)"
+                   Else
+                       If p.i < 0 Then r$ = "" Else r$ = "+"
+                       If Abs(p.i) = 1 Then
+                           If p.i < 0 Then
+                               r$ = "(" & LTrim$(str$(p.r)) & "-i)"
+                           Else
+                               r$ = "(" & LTrim$(str$(p.r)) & "+i)"
+                           End If
+                       Else
+                           r$ = "(" & LTrim$(str$(p.r)) & r$ & fixthis(CVar(p.i)) & "i)"
+                       End If
+                   End If
                 Else
                     r$ = str(p)
                 End If
-            End If
+            End Select
         End If
         
         If Not FastSymbol(a$, ")") Then strFunctions = False: Exit Function
@@ -56236,7 +56251,7 @@ Private Sub Assign(ss$, p)
             ss$ = fixthis(p)
         End Select
 End Sub
-Private Function fixthis(p As Variant) As String
+Private Function fixthis(p As Variant) As String  '!!!
         If TypeOf p Is Complex Then
             If p.i = 0 Then
                 fixthis = fixthis(CVar(p.r))
@@ -56254,28 +56269,33 @@ Private Function fixthis(p As Variant) As String
                     fixthis = "(" & fixthis(CVar(p.r)) & fixthis & fixthis(CVar(p.i)) & "i)"
                 End If
             End If
-        ElseIf MemInt(VarPtr(p)) = vbDate Then
-            If p <= 1 Then
-                fixthis = FormatTimeWithLocale("HH:mm:ss", CDate(p), Clid)
-            Else
-                fixthis = FormatDateWithLocale(GetlocaleString2(&H1F, Clid), CDate(p), Clid)
-            End If
-        ElseIf MemInt(VarPtr(p)) = vbBoolean Then
-                If ShowBooleanAsString Then
-                    fixthis = format$(p, ";\T\r\u\e;\F\a\l\s\e")
-                Else
-                    fixthis = CStr(p * 1)
-                End If
         Else
-            fixthis = LTrim$(str(p))
-            If Left$(fixthis, 1) = "." Then
-            fixthis = "0" + fixthis
-            ElseIf Left$(fixthis, 2) = "-." Then
-            fixthis = "-0" + Mid$(fixthis, 2)
+        Select Case MemInt(VarPtr(p))
+            Case vbDate
+                If p <= 1 Then
+                    fixthis = FormatTimeWithLocale("HH:mm:ss", CDate(p), Clid)
+                Else
+                    fixthis = FormatDateWithLocale(GetlocaleString2(&H1F, Clid), CDate(p), Clid)
+                End If
+            Case vbBoolean
+            If ShowBooleanAsString Then
+                fixthis = format$(p, ";\T\r\u\e;\F\a\l\s\e")
+            Else
+                fixthis = CStr(p * 1)
             End If
-            If InStr(fixthis, ".") > 0 Then
-            If NoUseDec Then fixthis = Replace(fixthis, ".", NowDec$)
-            End If
+            Case vbEmpty
+                fixthis = vbNullString
+            Case Else
+                fixthis = LTrim$(str(p))
+                If Left$(fixthis, 1) = "." Then
+                fixthis = "0" + fixthis
+                ElseIf Left$(fixthis, 2) = "-." Then
+                fixthis = "-0" + Mid$(fixthis, 2)
+                End If
+                If InStr(fixthis, ".") > 0 Then
+                If NoUseDec Then fixthis = Replace(fixthis, ".", NowDec$)
+                End If
+            End Select
         End If
 End Function
 Function AddGroupFromClass(bstack As basetask, rest$, className$, isglobal As Boolean, islocal As Boolean, ohere$) As Boolean

@@ -1,11 +1,8 @@
 M2000 Interpreter and Environment
-Version 14 revision 12 active-X
+Version 14 revision 13 active-X
 
-1) Now we can make PNG file in a buffer ->
-if B is another image in a buffer or is a string with dib data. If the image B is a metafile then then PNG has transparecy 100% on those pixels which not used by the metafile.
-A=IMAGE(B as PNG)
-2) fix an error in PSET for metafiles.
-3) minor details
+One fault. An empty type was converted to string as "0" not as "" (empty string). We may get empty type from COM objects.
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
