@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 13
+Global Const Revision = 14
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -19605,7 +19605,7 @@ tragain:
                      
                      
                      
-                    GoTo tragain
+                    If trace Then GoTo tragain
                    
                     End If
                 End If
@@ -48707,7 +48707,11 @@ Dim s$, W As Long
     If s$ = vbNullString Then
         r = CInt(-1)
     Else
-        W = AscW(s$)
+        If LenB(s$) = 1 Then
+            W = MemByte(StrPtr(s$))
+        Else
+            W = AscW(s$)
+        End If
         If W > -10241 And W < -9216 Then
             If Len(s$) > 1 Then
             r = CCur((&H10000 + (UINT(W) - &HD800&) * &H400 + UINT(AscW(Mid$(s$, 2, 1))) - &HDC00&))
@@ -54689,11 +54693,17 @@ fstr44: '"STRING$(", "ΕΠΑΝ$("
                             r$ = Mid$(r$, 2, dd - 2)
                         End If
                     End If
+
                 Else
                     SyntaxError
                     strFunctions = False
                     Exit Function
                 End If
+            ElseIf IsSymbolNoSpace(a$, "WIDE2BYTES", 10) Then
+                ' CONVERT STRING TO BYTES (NEED VALUES TO BE 0 TO 255 FOR EACH WCHAR)
+                    r$ = FixStr2Bytes(q$)
+            ElseIf IsSymbolNoSpace(a$, "BYTES2WIDE", 10) Then
+                    r$ = FixBytes2String(q$)
             Else
                 SyntaxError
                 strFunctions = False

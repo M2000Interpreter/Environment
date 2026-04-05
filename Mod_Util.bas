@@ -2069,8 +2069,9 @@ With mybasket
                 If W >= 0 And W < 32 Then
                     GoTo CHECK100
                 End If
+                GoTo checkcombine
                 'R = R + 1
-                GoTo cont0
+                '' GoTo cont0
             ElseIf (A2(r) And 254) = 2 And (a1(r) And &H8000) <> 0 Then
                 mark1 = r + 1
                 If processcr Then

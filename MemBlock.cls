@@ -435,9 +435,6 @@ there:
         
 
 End Function
-
-
-
 Public Function putData(f As Long, addr, lengthInBytes As Long) As Boolean
 Dim Offset, place, range
 range = uintnew(addr) - uintnew1(GetPtr(0))

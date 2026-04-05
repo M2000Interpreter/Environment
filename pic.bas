@@ -775,8 +775,11 @@ End Function
 
 Public Function ARRAYtoStr(ffff() As Byte) As String
 Dim a As String, j As Long
+' This missing first byte at ffff(0)
+' it is for base 1 array.
+a = space(UBound(ffff))
 For j = 1 To UBound(ffff())
-a = a + ChrW(ffff(j))
+Mid$(a, j, 1) = ChrW(ffff(j))
 Next j
 ARRAYtoStr = a
 End Function
