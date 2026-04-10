@@ -218,7 +218,7 @@ If IsExp(bstack, rest$, X) Then
         Dim usehandler As mHandler
         Set usehandler = bstack.lastobj
         Set bstack.lastobj = Nothing
-        If usehandler.T1 = 2 Then
+        If usehandler.t1 = 2 Then
         Set q(p).drawimage = usehandler.objref
         Else
         GoTo err123
@@ -840,6 +840,7 @@ End If
 End Sub
 
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
+DestroyToolTip
 Scrollok = Button <> 0
     If Not m_oCtlCancelMode Is Nothing Then
         m_oCtlCancelMode.CancelMode
@@ -1366,7 +1367,9 @@ End With
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
+DestroyToolTip
 UNhookMe
+
 Dim clearbasket As basket
 Quit = True
 Set myEvent = Nothing

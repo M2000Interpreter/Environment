@@ -61,6 +61,7 @@ End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
 On Error Resume Next
+DestroyToolTip
 Set LastGlist = Nothing
 Set LastGlist2 = Nothing
 form5iamloaded = False '
@@ -121,7 +122,7 @@ INK$ = INK$ & GetKeY(KeyAscii)
 End Sub
 Public Sub RestoreSizePos()
 ' calling from form1
-Me.move Form1.Left, Form1.top, Form1.Width, Form1.Height
+Me.move Form1.Left, Form1.Top, Form1.Width, Form1.Height
 End Sub
 Public Sub RestorePos()
 ' calling from form1
@@ -130,10 +131,10 @@ End Sub
  Function GetKeY(ascii As Integer) As String
     Dim Buffer As String, ret As Long
     Buffer = String$(514, 0)
-    Dim R&, k&
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
-      R = val("&H" & Right(Hex(R), 4))
-    ret = GetLocaleInfo(R, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
+    Dim r&, K&
+      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
+      r = val("&H" & Right(Hex(r), 4))
+    ret = GetLocaleInfo(r, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
     If ret > 0 Then
         GetKeY = ChrW$(AscW(StrConv(ChrW$(ascii Mod 256), 64, CLng(val("&h" + Left$(Buffer, ret - 1))))))
     Else

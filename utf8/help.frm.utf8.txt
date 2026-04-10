@@ -57,7 +57,7 @@ Attribute VB_Exposed = False
 Option Explicit
 Public WithEvents label1 As TextViewer, previewKey As Boolean
 Attribute label1.VB_VarHelpID = -1
-Private L As Long
+Private l As Long
 Private t As Long
 Private mt As Integer
 Private back$
@@ -82,8 +82,8 @@ End Sub
 
 
 
-Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
-If KeyCode = vbKeyF12 And ((Not mHelp) Or trace) Then
+Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
+If keycode = vbKeyF12 And ((Not mHelp) Or trace) Then
 showmodules
 End If
 End Sub
@@ -278,28 +278,30 @@ Private Sub Form_Terminate()
 ''''Set HelpStack.Owner = Nothing
 End Sub
 
-Private Sub ffhelp(A$)
-If A$ = "ΓΕΝΙΚΑ" Then A$ = "ΟΛΑ"
-If A$ = "GENERAL" Then A$ = "ALL"
-If Left$(A$, 1) = "#" Then
-If Mid$(A$, 2) < "Α" Then
-fHelp Basestack1, A$, True
+Private Sub ffhelp(a$)
+If a$ = "ΓΕΝΙΚΑ" Then a$ = "ΟΛΑ"
+If a$ = "GENERAL" Then a$ = "ALL"
+
+If Left$(a$, 1) = "#" Then
+If Mid$(a$, 2) < "Α" Then
+fHelp Basestack1, a$, True
 Else
-fHelp Basestack1, A$
+fHelp Basestack1, a$
 End If
 
 Else
 
-If Left$(A$, 1) < "Α" Then
-fHelp Basestack1, A$, True
+If Left$(a$, 1) < "Α" Then
+fHelp Basestack1, a$, True
 Else
-fHelp Basestack1, A$
+fHelp Basestack1, a$
 End If
 End If
 End Sub
 
 
 Private Sub Form_Unload(Cancel As Integer)
+DestroyToolTip
 label1.Dereference  ' to ensure that no reference hold objects..
 Set label1 = Nothing
 Helplastfactor = 1
@@ -319,27 +321,27 @@ End If
 End Sub
 
 
-Private Sub glist1_getpair(A As String, b As String)
+Private Sub glist1_getpair(a As String, b As String)
 If mHelp Or abt Then
 gList1.EditFlag = False
-    MKEY$ = MKEY$ & A
-    A = vbNullString
+    MKEY$ = MKEY$ & a
+    a = vbNullString
 End If
 End Sub
 
-Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub gList1_KeyDown(keycode As Integer, shift As Integer)
 If shift <> 0 Then
 If label1.SelectionColor = rgb(255, 64, 128) Then label1.SelectionColor = 0
 label1.NoMark = False
 label1.EditDoc = True
 End If
-Select Case KeyCode
+Select Case keycode
 Case vbKeyDelete, vbKeyBack, vbKeyReturn, vbKeySpace
 
 gList1.EditFlag = False
 If mHelp Or abt Then
-MKEY$ = MKEY$ & ChrW$(KeyCode)
-KeyCode = 0
+MKEY$ = MKEY$ & ChrW$(keycode)
+keycode = 0
 End If
 End Select
 If mHelp Or abt Then shift = 0
@@ -409,45 +411,45 @@ ThisWord = vbNullString
 
 End Sub
 Public Sub FillThereMyVersion2(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT, b As Long
+Dim a As RECT, b As Long
 b = setupxy / 3
 
-CopyFromLParamToRect A, thatRect
-A.Right = A.Right - b
-A.Left = A.Right - setupxy - b
-A.top = b
-A.Bottom = b + setupxy / 5
-FillThere thathDC, VarPtr(A), thatbgcolor
-A.top = b + setupxy / 5 + setupxy / 10
-A.Bottom = b + setupxy \ 2
-FillThere thathDC, VarPtr(A), thatbgcolor
-A.top = b + 2 * (setupxy / 5 + setupxy / 10)
-A.Bottom = A.top + setupxy / 5
-FillThere thathDC, VarPtr(A), thatbgcolor
+CopyFromLParamToRect a, thatRect
+a.Right = a.Right - b
+a.Left = a.Right - setupxy - b
+a.Top = b
+a.Bottom = b + setupxy / 5
+FillThere thathDC, VarPtr(a), thatbgcolor
+a.Top = b + setupxy / 5 + setupxy / 10
+a.Bottom = b + setupxy \ 2
+FillThere thathDC, VarPtr(a), thatbgcolor
+a.Top = b + 2 * (setupxy / 5 + setupxy / 10)
+a.Bottom = a.Top + setupxy / 5
+FillThere thathDC, VarPtr(a), thatbgcolor
 
 End Sub
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT, b As Long
+Dim a As RECT, b As Long
 b = 2
-CopyFromLParamToRect A, thatRect
-A.Left = A.Right - b
-A.Right = A.Right - setupxy + b
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), gList1.dcolor
+CopyFromLParamToRect a, thatRect
+a.Left = a.Right - b
+a.Right = a.Right - setupxy + b
+a.Top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), gList1.dcolor
 b = 5
-A.Left = A.Left - 3
-A.Right = A.Right + 3
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), gList1.CapColor
+a.Left = a.Left - 3
+a.Right = a.Right + 3
+a.Top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), gList1.CapColor
 
 
 End Sub
 Public Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT
-CopyFromLParamToRect A, thatRect
-FillBack thathDC, A, thatbgcolor
+Dim a As RECT
+CopyFromLParamToRect a, thatRect
+FillBack thathDC, a, thatbgcolor
 End Sub
 Private Sub FillBack(thathDC As Long, there As RECT, bgcolor As Long)
 ' create brush
@@ -470,7 +472,7 @@ factor = gList1.FontSize / 14.25 / dv15 * 15
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
-Dim h As Long, I As Long
+Dim H As Long, i As Long
 Helplastfactor = factor
 setupxy = 20 * factor
 bordertop = 10 * dv15 * factor
@@ -485,12 +487,12 @@ allwidth = NewWidth  ''vH_x * factor
 allheight = vH_y * factor
 itemWidth = allwidth - 2 * borderleft
 Dim kk As Long
-If Left < MinMonitorLeft Or top < MinMonitorTop Then
+If Left < MinMonitorLeft Or Top < MinMonitorTop Then
 kk = 0
 Else
 kk = 1
 End If
-myform Me, Left * kk, top * kk, allwidth, allheight, True, factor
+myform Me, Left * kk, Top * kk, allwidth, allheight, True, factor
 
   
 gList1.addpixels = 4 * factor
