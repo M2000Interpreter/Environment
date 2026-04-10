@@ -169,7 +169,7 @@ Private Declare Function RegDeleteValue Lib "advapi32.dll" Alias "RegDeleteValue
 ' Other declares:
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-Private Declare Function ExpandEnvironmentStrings Lib "kernel32" Alias "ExpandEnvironmentStringsA" (ByVal lpSrc As String, ByVal lpDst As String, ByVal nsize As Long) As Long
+Private Declare Function ExpandEnvironmentStrings Lib "kernel32" Alias "ExpandEnvironmentStringsA" (ByVal lpSrc As String, ByVal lpDst As String, ByVal nSize As Long) As Long
 
 
 Public Enum ERegistryClassConstants
@@ -304,7 +304,7 @@ Dim hKey As Long
     ' Catch REG_BINARY and anything else
     Case Else
         Dim abData() As Byte
-        ReDim abData(cdata)
+        ReDim abData(cdata - 1)
         e = RegQueryValueExByte(hKey, m_sValueKey, 0&, _
                                 ordType, abData(0), cdata)
         vValue = abData
@@ -681,7 +681,7 @@ Private Function ExpandEnvStr(sData As String) As String
     c = ExpandEnvironmentStrings(sData, s, c)
     ExpandEnvStr = s
 End Function
-Public Property Let Temp(ByVal vNewValue As Variant)
+Public Property Let temp(ByVal vNewValue As Variant)
 mTemp = CBool(vNewValue)
 End Property
 

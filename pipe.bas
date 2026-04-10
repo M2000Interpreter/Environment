@@ -226,7 +226,7 @@ Private Declare Function VariantTimeToSystemTime Lib "OleAut32.dll" ( _
     ByVal vTime As Date, _
     ByRef lpSystemTime As SYSTEMTIME _
 ) As Long
-Private Declare Function GetTimeZoneInformation Lib "kernel32.dll" (lpTimeZoneInformation As TIME_ZONE_INFORMATION) As Long
+Private Declare Function GetTimeZoneInformation Lib "kernel32.dll" (ByVal lpTimeZoneInformation As Long) As Long
   
 Private Declare Function CreateDirectory Lib "kernel32" Alias "CreateDirectoryW" (ByVal lpszPath As Long, ByVal lpSA As Long) As Long
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
@@ -292,36 +292,41 @@ Public Function FormatDateWithLocale(ByRef the_sFormat As String, the_datDate As
 
 End Function
 Public Function GetTimeZoneInfo() As String
-
-Dim TZI As TIME_ZONE_INFORMATION ' receives information on the time zone
 Dim RetVal As Long ' return value
-Dim c As Long ' counter variable needed to display time zone name
-
-    RetVal = GetTimeZoneInformation(TZI) ' read information on the computer's selected time zone
-     If zones.ExistKey(Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")) Then
+Dim my As New MemBlock
+Const DaylightName = 80&
+Const StandardName = 4&
+my.Construct 172  ' 172 bytes
+    RetVal = GetTimeZoneInformation(ByVal my.GetBytePtr(0))  ' read information on the computer's selected time zone
+'     If zones.ExistKey(Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")) Then
      ' do nothing. now zone$ has set the index field to standard name.
-     End If
+'     End If
+    GetTimeZoneInfo = space$(64)
+        
     If RetVal = 2 Then
-    GetTimeZoneInfo = Replace(StrConv(TZI.DaylightName, vbFromUnicode), Chr(0), "")
+    MemCopy StrPtr(GetTimeZoneInfo), my.GetBytePtr(DaylightName), 64
+  
     Else
-    GetTimeZoneInfo = Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")
+    MemCopy StrPtr(GetTimeZoneInfo), my.GetBytePtr(StandardName), 64
     End If
-    
+    GetTimeZoneInfo = Replace(GetTimeZoneInfo, ChrW(0), "")
 End Function
 Public Function GetUTCDate() As Date
-    Dim tzTime As TIME_ZONE_INFORMATION
+    Dim my As New MemBlock
+    Const Bias = 0&
+    Const StandardBias = 84&
+    Const DaylightBias = 168&
+    my.Construct 172  ' 172 bytes
     Dim lngUTCTime As Long
      
-    lngUTCTime = GetTimeZoneInformation(tzTime)
-    GetUTCDate = DateAdd("n", tzTime.Bias + tzTime.DaylightBias, Now)
+    lngUTCTime = GetTimeZoneInformation(ByVal my.GetBytePtr(0))
+    If lngUTCTime = 2 Then
+        GetUTCDate = DateAdd("n", MemLong(my.GetBytePtr(Bias)) + MemLong(my.GetBytePtr(DaylightBias)), Now)
+    Else
+        GetUTCDate = DateAdd("n", MemLong(my.GetBytePtr(Bias)) + MemLong(my.GetBytePtr(StandardBias)), Now)
+    End If
 End Function
-Public Function GetUTCTime() As Date
-    Dim tzTime As TIME_ZONE_INFORMATION
-    Dim lngUTCTime As Long
-     
-    lngUTCTime = GetTimeZoneInformation(tzTime)
-    GetUTCTime = DateAdd("n", tzTime.Bias + tzTime.DaylightBias, Now)
-End Function
+
 Public Sub SetUp64()
     Dim lTemp As Long
     For lTemp = 0 To 63                                 'Fill the translation table.
