@@ -41,9 +41,9 @@ Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
 End Property
 
-Private Sub gListN_AccKey(m As Long)
+Private Sub gListN_AccKey(M As Long)
 If mMenuStyle Then
-    Callback.AccProces m
+    Callback.AccProces M
 End If
 End Sub
 
@@ -82,8 +82,8 @@ End With
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
- Friend Sub ConstructArray(there As GuiM2000, Name$, I As Long)
- mIndex = I
+ Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
+ mIndex = i
  Set Callback = there
  Dim PadGui As GuiM2000
  Set PadGui = New GuiM2000
@@ -121,7 +121,7 @@ ElseIf IsMissing(H) Then
 Else
 .glistN.MoveTwips CLng(X), CLng(Y), CLng(W), CLng(H)
 End If
-Pad.move Pad.Left, Pad.top, .glistN.widthtwips, .glistN.HeightTwips * 5
+Pad.move Pad.Left, Pad.Top, .glistN.widthtwips, .glistN.HeightTwips * 5
 End With
 glistN.restrictLines = 5
 glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
@@ -169,8 +169,8 @@ End Property
 Public Property Get ListText()
 ListText = glistN.ListValue
 End Property
-Public Property Let Label(A$)
-Textbox.Prompt = A$ + " " + ChrW(&H25BC) & " "
+Public Property Let Label(a$)
+Textbox.Prompt = a$ + " " + ChrW(&H25BC) & " "
 Textbox.glistN.ShowMe
 End Property
 
@@ -192,13 +192,13 @@ End Sub
     DrawText mHdc, StrPtr(c), -1, r, way
     End Sub
 Private Sub gListN_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
-Dim A As RECT, ofg As Long
+Dim a As RECT, ofg As Long
 If acckeys Is Nothing Then Exit Sub
 If acckeys.ExistKey(item) Then
-CopyFromLParamToRect A, thisrect
+CopyFromLParamToRect a, thisrect
 ofg = glistN.ForeColor
 SetTextColor thisHDC, rgb(128, 128, 64)
-PrintItem thisHDC, acckeys.Value + " ", A
+PrintItem thisHDC, acckeys.Value + " ", a
 SetTextColor thisHDC, ofg
 End If
 End Sub
@@ -383,8 +383,8 @@ glistN.GiveSoftFocus
 
 End Sub
 
-Private Sub Textbox_AccKey(m As Long)
-Callback.AccProces m
+Private Sub Textbox_AccKey(M As Long)
+Callback.AccProces M
 End Sub
 
 Private Sub Textbox_CascadeSelect(item As Long)
@@ -439,8 +439,8 @@ Textbox.SetFocus
 ShowMenu
 End Sub
 
-Private Sub Textbox_Fkey(A As Integer)
-Callback.SendFKEY A
+Private Sub Textbox_Fkey(a As Integer)
+Callback.SendFKEY a
 End Sub
 
 Private Sub textbox_KeyDown(KeyCode As Integer, shift As Integer)
@@ -579,9 +579,9 @@ glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
     End If
 
     If mMenuWidth <> 0 Then
-    Callback.PopUpPos Pad, Left, top, Callback.Controls(ctrlName).Height
+    Callback.PopUpPos Pad, Left, Top, Callback.Controls(ctrlName).Height
     Else
-Callback.PopUpPos Pad, Left + Callback.Controls(ctrlName).Width - Pad.Width, top, Callback.Controls(ctrlName).Height
+Callback.PopUpPos Pad, Left + Callback.Controls(ctrlName).Width - Pad.Width, Top, Callback.Controls(ctrlName).Height
 End If
 If Not mMenuStyle Then If Textbox.glistN.TabStopSoft Then Callback.LastActive = ctrlName
 
@@ -608,8 +608,8 @@ End If
 
 
 End Sub
-Function Myleft$(A As Variant, Pos As Variant)
-Myleft$ = Mid$(A, 1, Pos)
+Function Myleft$(a As Variant, Pos As Variant)
+Myleft$ = Mid$(a, 1, Pos)
 End Function
 
 Private Sub TextBox_KeyPress(KeyAscii As Integer)
@@ -792,9 +792,9 @@ glistN.ShowBar = False
     End If
 'Hook Pad.hWnd, glistN
     If mMenuWidth <> 0 Then
-    Callback.PopUpPos Pad, Left, top, Callback.Controls(ctrlName).Height
+    Callback.PopUpPos Pad, Left, Top, Callback.Controls(ctrlName).Height
     Else
-Callback.PopUpPos Pad, Left + Callback.Controls(ctrlName).Width - Pad.Width, top, Callback.Controls(ctrlName).Height
+Callback.PopUpPos Pad, Left + Callback.Controls(ctrlName).Width - Pad.Width, Top, Callback.Controls(ctrlName).Height
 End If
 Button = 0
 Textbox.glistN.DropKey = False
@@ -803,9 +803,9 @@ Iam = Not Pad.Visible
 End If
 
 End Sub
-Private Sub glistN_SyncKeyboardUnicode(A As String)
+Private Sub glistN_SyncKeyboardUnicode(a As String)
 Static f As Long
-f = glistN.FindItemStartWidth(A, Not NoCaseSensitive, f + 1)
+f = glistN.FindItemStartWidth(a, Not NoCaseSensitive, f + 1)
 If f >= 0 Then
 glistN.ScrollTo f - glistN.lines / 2, f + 1
     If mIndex >= 0 Then
@@ -818,12 +818,12 @@ f = -1
 End If
 End Sub
 
-Private Sub Textbox_PreviewKeyboardUnicode(A As String)
-Callback.SpreadKey A
+Private Sub Textbox_PreviewKeyboardUnicode(a As String)
+Callback.SpreadKey a
 End Sub
 
 Private Sub TextBox_ValidString(ThatString As String, setpos As Long)
-Dim L As Boolean
+Dim l As Boolean
 If Not AutoComplete Then Exit Sub
 Dim f As Long
 Iam = True
@@ -850,12 +850,12 @@ glistN.ShowMe
 
 Else
 If UseOnlyTheList Then
-L = Textbox.glistN.enabled
+l = Textbox.glistN.enabled
 Textbox.glistN.enabled = False
 Textbox.glistN.LastLinePart = Textbox.vartext + Textbox.glistN.LastLinePart
 ThatString = vbNullString
 setpos = 0
-Textbox.glistN.enabled = L
+Textbox.glistN.enabled = l
 Else
 Textbox.glistN.LastLinePart = vbNullString
 End If
@@ -889,25 +889,25 @@ End If
 End If
 Textbox.locked = RHS
 End Property
-Public Sub AddItem(A$)
-glistN.additemFast A$
-Text = A$
+Public Sub AddItem(a$)
+glistN.additemFast a$
+Text = a$
 End Sub
 
-Public Sub additemFast(A$)
-glistN.additemFast A$
+Public Sub additemFast(a$)
+glistN.additemFast a$
 End Sub
-Public Sub MenuItem(A$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional ByVal id, Optional ByVal acc, Optional ByVal shift, Optional ByVal ctrl, Optional ByVal alt, Optional legend)
+Public Sub MenuItem(a$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional ByVal id, Optional ByVal acc, Optional ByVal shift, Optional ByVal ctrl, Optional ByVal alt, Optional legend)
 Dim item, disp$
 If Not mMenuStyle Then
     MenuStyle = True
 End If
 
-If Not A$ = vbNullString Then
-glistN.additemFast A$
+If Not a$ = vbNullString Then
+glistN.additemFast a$
 End If
 item = glistN.listcount
-If A$ = vbNullString Then
+If a$ = vbNullString Then
 glistN.AddSep
 Exit Sub
 Else
@@ -957,17 +957,17 @@ If acckeys.ExistKey(item - 1) Then acckeys.Value = disp$ Else acckeys.AddKey ite
 
 End If
 End Sub
-Public Sub MenuRadio(A$, Optional enabledthis As Boolean = True, Optional firstate As Boolean = False, Optional ByVal id, Optional ByVal acc, Optional ByVal shift, Optional ByVal ctrl, Optional ByVal alt, Optional legend)
+Public Sub MenuRadio(a$, Optional enabledthis As Boolean = True, Optional firstate As Boolean = False, Optional ByVal id, Optional ByVal acc, Optional ByVal shift, Optional ByVal ctrl, Optional ByVal alt, Optional legend)
 Dim item, checked As Boolean, disp$
 checked = False
 If Not mMenuStyle Then
     MenuStyle = True
 End If
-If Not A$ = vbNullString Then
-glistN.additemFast A$
+If Not a$ = vbNullString Then
+glistN.additemFast a$
 End If
 item = glistN.listcount
-If A$ = vbNullString Then
+If a$ = vbNullString Then
 glistN.AddSep
 Exit Sub
 Else
@@ -1156,22 +1156,22 @@ End Property
 Public Property Let Left(ByVal RHS As Variant)
 Callback.Controls(ctrlName).Left = RHS
 End Property
-Public Property Get top() As Variant
-top = Callback.Controls(ctrlName).top
+Public Property Get Top() As Variant
+Top = Callback.Controls(ctrlName).Top
 End Property
-Public Property Let top(ByVal RHS As Variant)
-Callback.Controls(ctrlName).top = RHS
+Public Property Let Top(ByVal RHS As Variant)
+Callback.Controls(ctrlName).Top = RHS
 End Property
 Public Sub Sort(Optional SkipChar As Long = 1)
 If glistN.listcount < 2 Then Exit Sub
-Dim doc As Document, m As Long
+Dim doc As Document, M As Long
 Set doc = New Document
 doc.textDocFast = glistN.Text
-m = glistN.ListIndex
+M = glistN.ListIndex
 If SkipChar < 1 Then SkipChar = 1
 doc.SortDoc SkipChar, 1, glistN.listcount
 glistN.Text = doc.textDoc
-If m > 0 Then glistN.ListindexPrivateUse = m
+If M > 0 Then glistN.ListindexPrivateUse = M
 glistN.ShowMe2
 Set doc = Nothing
 End Sub
@@ -1252,11 +1252,11 @@ On Error Resume Next
 If item < 0 Then Exit Sub
 glistN.Removeitem item
 End Sub
-Public Sub Insert(item, A$)
+Public Sub Insert(item, a$)
 On Error Resume Next
 glistN.ListindexPrivateUse = item
 If glistN.ListIndex > -1 Then
-glistN.additemAtListIndex A$
+glistN.additemAtListIndex a$
 End If
 End Sub
 Public Sub MenuItemAtListIndex(Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional IdD)
@@ -1331,37 +1331,37 @@ On Error Resume Next
 glistN.addpixels = CLng(vNewValue / dv15)
 If Err.Number > 0 Then Exit Property
 End Property
-Private Sub glistN_Fkey(A As Integer)
-If A > 1000 Then
-Callback.SendFKEY A - 1000
+Private Sub glistN_Fkey(a As Integer)
+If a > 1000 Then
+Callback.SendFKEY a - 1000
 Else
-Callback.SendFKEY A
+Callback.SendFKEY a
 End If
 End Sub
 Private Sub OneClick()
 On Error Resume Next
 If SkipFirstClick Then glistN.PrepareClick
 End Sub
-Public Sub AccKey(A, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
-If MyIsNumeric(A) Then
-A = CLng(A)
-If A < 0 Then Exit Sub
-If A > 499 Then Exit Sub
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
 Else
-A = UCase(A)
-Select Case A
+a = UCase(a)
+Select Case a
 Case "F1" To "F9"
-A = 611 + val(Mid(A, 2))
+a = 611 + val(Mid(a, 2))
 Case Else
-A = AscW(A)
-If A > 126 Then A = 0
+a = AscW(a)
+If a > 126 Then a = 0
 End Select
 End If
 If Opcode < 0 Then Opcode = 0
-If A = 0 Then Exit Sub
-A = A - 1000 * shift - 10000 * ctrl - 100000 * alt
-Callback.RegisterAcc A, ctrlName, Opcode
+If a = 0 Then Exit Sub
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
 
 Public Property Get WrapText() As Long
@@ -1393,7 +1393,15 @@ Property Get Visible() As Boolean
         End If
     End If
 End Property
+Public Property Get ToolTip() As String
+If Textbox Is Nothing Then Exit Property
+ToolTip = Textbox.ToolTip
+End Property
 
+Public Property Let ToolTip(ByVal vNewValue As String)
+If Textbox Is Nothing Then Exit Property
+Textbox.ToolTip = vNewValue
+End Property
 Private Sub Textbox_WindowKey(VbKeyThis As Integer)
     Callback.ProcessWinKey VbKeyThis
 End Sub

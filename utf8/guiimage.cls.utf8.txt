@@ -47,6 +47,7 @@ Private Type Msg
     time As Long
     pt As POINTAPI
 End Type
+Private mtooltip As String
 Private mynum$, lastshift As Integer
 Public BypassKey As Boolean
 
@@ -63,12 +64,12 @@ Friend Sub Construct(there As GuiM2000, Name$)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Friend Sub ConstructArray(there As GuiM2000, Name$, I As Long)
+Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  Set Callback = there
  On Error Resume Next
  ctrlName = GetTag$
  Set pbox = there.Controls.Add("vb.picturebox", ctrlName)
- mIndex = I
+ mIndex = i
  there.AddGuiControl Me, CVar(ctrlName)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
@@ -258,7 +259,7 @@ Else
 If KeyCode <> 0 Then GetKeY2 KeyCode, shift
 If KeyCode = 0 Then Exit Sub
 End If
-Dim I&
+Dim i&
 If shift = 4 Then
 If KeyCode = 18 Then
 If mynum$ = vbNullString Then mynum$ = "0"
@@ -278,7 +279,7 @@ LastNumX = False
 mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 48)
 Case vbKeyA To vbKeyF
 If Left$(mynum$, 1) = "&" Then
-mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 65)
+mynum$ = mynum$ + Chr$(KeyCode)
 LastNumX = True
 Else
 mynum$ = vbNullString
@@ -341,7 +342,7 @@ Private Sub pbox_KeyUp(KeyCode As Integer, shift As Integer)
 On Error GoTo fin
 'If PrevLocale <> GetLocale Then RaiseEvent Maybelanguage
 If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
-Dim I As Long, K As Integer
+Dim i As Long, K As Integer
 
 lastshift = shift
 If KeyCode = 18 Then
@@ -367,35 +368,35 @@ Else
 End If
 End If
 If DropKey Then KeyCode = 0: UKEY$ = vbNullString: Exit Sub
-I = -1
+i = -1
 If shift <> 4 And mynum$ <> "" Then
 On Error Resume Next
 If Left$(mynum$, 1) = "0" Then
-I = val(mynum$)
+i = val(mynum$)
 Else
-I = val(mynum$)
+i = val(mynum$)
 End If
 mynum$ = vbNullString
-If I > 32 Then
-If I >= &H10000 And I <= &H10FFFF Then
-I = I - &H10000
-UKEY$ = ChrW(UINT(I \ &H400& + &HD800&)) + ChrW(UINT((I And &H3FF&) + &HDC00&))
+If i > 32 Then
+If i >= &H10000 And i <= &H10FFFF Then
+i = i - &H10000
+UKEY$ = ChrW(UINT(i \ &H400& + &HD800&)) + ChrW(UINT((i And &H3FF&) + &HDC00&))
 Else
-UKEY$ = ChrW(I)
+UKEY$ = ChrW(i)
 End If
 'If LastNumX Then pbox_KeyPress 44
 Exit Sub
 End If
-I = -1
+i = -1
 Else
-I = GetLastKeyPressed
+i = GetLastKeyPressed
 End If
 
- If I <> -1 And I <> 94 Then
- If I = 13 Then
+ If i <> -1 And i <> 94 Then
+ If i = 13 Then
  UKEY$ = vbNullString
  Else
- UKEY$ = ChrW(I)
+ UKEY$ = ChrW(i)
  End If
  Else
 UKEY$ = vbNullString
@@ -495,6 +496,7 @@ End Sub
 Private Sub pbox_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Not enabled Then Exit Sub
 If Not Relax Then
+CheckToolTip
 Relax = True
 If mIndex > -1 Then
 Callback.Callback mesCtrlName + ".MouseMove(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
@@ -711,18 +713,18 @@ Else
 End If
 End Function
 Function GetLocale() As Long
-    Dim R&
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
-      GetLocale = val("&H" + Right(Hex(R), 4))
+    Dim r&
+      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
+      GetLocale = val("&H" + Right(Hex(r), 4))
 End Function
 Function GetKeY(ascii As Integer) As String
     Dim Buffer As String, ret As Long
 
     Buffer = String$(514, 0)
-    Dim R&
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
-      R = val("&H" + Right(Hex(R), 4))
-    ret = GetLocaleInfo(R, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
+    Dim r&
+      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
+      r = val("&H" + Right(Hex(r), 4))
+    ret = GetLocaleInfo(r, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
     If ret > 0 Then
         GetKeY = ChrW$(AscW(StrConv(ChrW$(ascii Mod 256), 64, CLng(val("&h" + Left$(Buffer, ret - 1))))))
     Else
@@ -867,6 +869,26 @@ Else
     pbox.ZOrder t
 End If
 End Sub
+Private Sub CheckToolTip()
+    Dim PropToolTipTitle As String, RHS As String
+    If mtooltip = "" Then Exit Sub
+    RHS = mtooltip
+    
+    PropToolTipTitle = GetStrUntil(vbCrLf, RHS)
+    
+    If RHS = "" Then RHS = mtooltip
+    If RHS = "" Then RHS = "?"
+    If Not CreateToolTip(pbox.hWnd, RHS, , PropToolTipTitle, , , , True) Then
+        pbox.ToolTipText = mtooltip
+    End If
+End Sub
+Public Property Let ToolTip(ByVal RHS As String)
+    mtooltip = RHS
+    DestroyToolTip
+End Property
+Public Property Get ToolTip() As String
+    ToolTip = mtooltip
+End Property
 Public Property Let IControlIndex_Index(ByVal RHS As Long)
 mIndex = RHS
 End Property

@@ -25,6 +25,7 @@ Private mesCtrlName As String
 Dim mIndex As Long, mStayOpen As Boolean
 Dim Callback As GuiM2000
 Public SkipFirstClick As Boolean
+Private mtooltip As String
 Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, shadowcol As Long
 
 '' for every GuiSomething
@@ -43,7 +44,7 @@ mIndex = RHS
 End Property
 Private Sub glistN_CtrlPlusF1()
   If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".About(" + Str(mIndex) + ")"
+   Callback.Callback mesCtrlName + ".About(" + str(mIndex) + ")"
    Else
       Callback.Callback mesCtrlName + ".About()"
       End If
@@ -85,13 +86,13 @@ Public Property Let enabled(ByVal RHS As Long)
 If glistN Is Nothing Then Exit Property
 glistN.enabled = RHS
 End Property
-Public Sub move(X, y, Optional W, Optional H)
+Public Sub move(X, Y, Optional W, Optional H)
 If IsMissing(W) Then
-glistN.MoveTwips CLng(X), CLng(y), 0, 0
+glistN.MoveTwips CLng(X), CLng(Y), 0, 0
 ElseIf IsMissing(H) Then
-glistN.MoveTwips CLng(X), CLng(y), CLng(W), 0
+glistN.MoveTwips CLng(X), CLng(Y), CLng(W), 0
 Else
-glistN.MoveTwips CLng(X), CLng(y), CLng(W), CLng(H)
+glistN.MoveTwips CLng(X), CLng(Y), CLng(W), CLng(H)
 End If
 End Sub
 Public Sub deconstruct()
@@ -192,9 +193,9 @@ Private Sub glistN_MenuChecked(item As Long)
 ' RaiseEvent Changed(glistN.ListSelected(0))
 If item >= 0 Then
   If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".Changed(" + Str(mIndex) + "," + Str(glistN.ListSelected(0)) + ")"
+   Callback.Callback mesCtrlName + ".Changed(" + str(mIndex) + "," + str(glistN.ListSelected(0)) + ")"
    Else
-      Callback.Callback mesCtrlName + ".Changed(" + Str(glistN.ListSelected(0)) + ")"
+      Callback.Callback mesCtrlName + ".Changed(" + str(glistN.ListSelected(0)) + ")"
       End If
     
 End If
@@ -225,31 +226,32 @@ aa.bold = ThisBold
 Set glistN.Font = aa
 End If
 End Sub
+
 Private Sub glistN_OnResize()
 glistN.LeftMarginPixels = glistN.HeightPixels
 End Sub
 
 Private Sub glistN_PanLeftRight(direction As Boolean)
   If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".Click(" + Str(mIndex) + "," + Str(checked) + ")"
+   Callback.Callback mesCtrlName + ".Click(" + str(mIndex) + "," + str(checked) + ")"
    Else
-      Callback.Callback mesCtrlName + ".Click(" + Str(checked) + ")"
+      Callback.Callback mesCtrlName + ".Click(" + str(checked) + ")"
       End If
 End Sub
 
 Private Sub glistN_Selected2(item As Long)
   If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".Click(" + Str(mIndex) + "," + Str(checked) + ")"
+   Callback.Callback mesCtrlName + ".Click(" + str(mIndex) + "," + str(checked) + ")"
    Else
-      Callback.Callback mesCtrlName + ".Click(" + Str(checked) + ")"
+      Callback.Callback mesCtrlName + ".Click(" + str(checked) + ")"
       End If
       OneClick
 End Sub
-Public Property Get top() As Variant
-top = Callback.Controls(ctrlName).top
+Public Property Get Top() As Variant
+Top = Callback.Controls(ctrlName).Top
 End Property
-Public Property Let top(ByVal RHS As Variant)
-Callback.Controls(ctrlName).top = RHS
+Public Property Let Top(ByVal RHS As Variant)
+Callback.Controls(ctrlName).Top = RHS
 End Property
 Public Property Get Left() As Variant
 Left = Callback.Controls(ctrlName).Left
@@ -291,38 +293,38 @@ glistN.icon = RHS
 
 End Property
 
-Private Sub glistN_PreviewKeyboardUnicode(A As String)
-Callback.SpreadKey A
+Private Sub glistN_PreviewKeyboardUnicode(a As String)
+Callback.SpreadKey a
 End Sub
-Private Sub glistN_Fkey(A As Integer)
-If A > 1000 Then
-Callback.SendFKEY A - 1000
+Private Sub glistN_Fkey(a As Integer)
+If a > 1000 Then
+Callback.SendFKEY a - 1000
 Else
-Callback.SendFKEY A
+Callback.SendFKEY a
 End If
 End Sub
-Public Sub AccKey(A, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
-If MyIsNumeric(A) Then
-A = CLng(A)
-If A < 0 Then Exit Sub
-If A > 499 Then Exit Sub
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
 Else
-A = UCase(A)
-Select Case A
+a = UCase(a)
+Select Case a
 Case "F1" To "F9"
-A = 611 + val(Mid(A, 2))
+a = 611 + val(Mid(a, 2))
 Case Else
-A = AscW(A)
-If A > 126 Then A = 0
+a = AscW(a)
+If a > 126 Then a = 0
 End Select
 End If
 If Opcode < 0 Then Opcode = 0
-If A = 0 Then Exit Sub
-A = A - 1000 * shift - 10000 * ctrl - 100000 * alt
-Callback.RegisterAcc A, ctrlName, Opcode
+If a = 0 Then Exit Sub
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
-Private Sub gListN_AccKey(m As Long)
-Callback.AccProces m
+Private Sub gListN_AccKey(M As Long)
+Callback.AccProces M
 End Sub
 Sub Colors(white1, Optional dimm21, Optional dimm11, Optional dimm33)
 On Error Resume Next
@@ -352,7 +354,15 @@ Property Get Visible() As Boolean
         Visible = glistN.Visible
     End If
 End Property
+Public Property Get ToolTip() As String
+If glistN Is Nothing Then Exit Property
+ToolTip = glistN.ToolTip
+End Property
 
+Public Property Let ToolTip(ByVal vNewValue As String)
+If glistN Is Nothing Then Exit Property
+glistN.ToolTip = vNewValue
+End Property
 Private Sub glistN_WindowKey(VbKeyThis As Integer)
 Callback.ProcessWinKey VbKeyThis
 End Sub

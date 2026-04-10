@@ -118,7 +118,7 @@ Private Type myImage
     Image As StdPicture
     Height As Long
     Width As Long
-    top As Long
+    Top As Long
     Left As Long
 End Type
 Private ShearchList As String
@@ -128,7 +128,7 @@ Dim nopreview As Boolean
 Dim oldLeftMarginPixels As Long
 Dim firstpath As Long
 Dim setupxy As Single
-Dim Lx As Long, lY As Long, dr As Boolean
+Dim lX As Long, lY As Long, dr As Boolean
 Dim scrTwips As Long
 Dim bordertop As Long, borderleft As Long
 Dim allwidth As Long, itemWidth As Long
@@ -368,7 +368,7 @@ If bordertop < 150 Then
 If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
 dr = True
 MousePointer = vbSizeNWSE
-Lx = X
+lX = X
 lY = Y
 End If
 
@@ -376,7 +376,7 @@ Else
 If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then
 dr = True
 MousePointer = vbSizeNWSE
-Lx = X
+lX = X
 lY = Y
 End If
 
@@ -395,7 +395,7 @@ If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then Mo
 End If
 If dr Then
     If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
-    If X < (Width - borderleft) Or X > Width Then addX = (X - Lx)
+    If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
     
    If Not ExpandWidth Then addX = 0
         If lastfactor = 0 Then lastfactor = 1
@@ -426,10 +426,10 @@ If dr Then
 
         If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, DialogPreview, Width
-        Lx = X
+        lX = X
         
         Else
-        Lx = X * lastfactor / factor
+        lX = X * lastfactor / factor
          ScaleDialog lastfactor, DialogPreview, (Width + addX) * lastfactor / factor
          End If
 
@@ -448,7 +448,7 @@ If dr Then
         'End If
         End If
         Else
-        Lx = X
+        lX = X
         lY = Y
    
 End If
@@ -462,18 +462,19 @@ End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
 UNhookMe
+DestroyToolTip
 DestroyCaret
-Dim I As Long, filetosave As String
+Dim i As Long, filetosave As String
 If mySelector.mselChecked Then
 ReturnListOfFiles = vbNullString
 With mySelector
-For I = 0 To .Mydir.listcount - 1
+For i = 0 To .Mydir.listcount - 1
 ' prepare list for files
-If .Mydir.ReadMark(I) Then
+If .Mydir.ReadMark(i) Then
     If .recnowchecked Then
- filetosave = .Mydir.FindFolder(I) + .Mydir.list(I)
+ filetosave = .Mydir.FindFolder(i) + .Mydir.list(i)
     Else
-    filetosave = .Mydir.path + .Mydir.list(I)
+    filetosave = .Mydir.path + .Mydir.list(i)
     End If
 If ReturnListOfFiles = vbNullString Then
 ReturnListOfFiles = filetosave
@@ -481,7 +482,7 @@ Else
 ReturnListOfFiles = ReturnListOfFiles + "#" + filetosave
 End If
 End If
-Next I
+Next i
 End With
 ElseIf FolderOnly Then
 If ReturnFile <> "" Then
@@ -493,7 +494,7 @@ Set Image1.Image = Nothing
 Image1.Width = 0
 
 selectorLastX = Left
-selectorLastY = top
+selectorLastY = Top
 Sleep 200
 loadfileiamloaded = False
 End Sub
@@ -1014,10 +1015,10 @@ b = CLng(Rnd * 3) + setupxy / 3
 
 CopyFromLParamToRect a, thatRect
 a.Left = a.Right - setupxy
-a.top = b
+a.Top = b
 a.Bottom = b + setupxy / 5
 mySelector.FillThere thathDC, VarPtr(a), thatbgcolor
-a.top = b + setupxy / 5 + setupxy / 10
+a.Top = b + setupxy / 5 + setupxy / 10
 a.Bottom = b + setupxy \ 2
 mySelector.FillThere thathDC, VarPtr(a), thatbgcolor
 
@@ -1028,13 +1029,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 mySelector.FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 mySelector.FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -1042,30 +1043,30 @@ mySelector.FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 End Sub
 Sub PlaceSettings()
 ' using global var settings
-Dim a() As String, I As Long, j As Long
-a() = Split(Settings, ",")
-For I = 0 To gList1.listcount - 1
-gList1.ListSelectedNoRadioCare(I) = False
-Next I
-For I = LBound(a()) To UBound(a())
-If gList1.GetMenuId(a(I), j) Then
+Dim a() As String, i As Long, j As Long
+a() = split(Settings, ",")
+For i = 0 To gList1.listcount - 1
+gList1.ListSelectedNoRadioCare(i) = False
+Next i
+For i = LBound(a()) To UBound(a())
+If gList1.GetMenuId(a(i), j) Then
 gList1.ListSelectedNoRadioCare(j) = True
 End If
-Next I
+Next i
 End Sub
 Function ReadSettings() As Boolean
 ' using global var settings
 ' we have to read at NostateDir=true
-Dim a() As String, I As Long, j As Long
-a() = Split(Settings, ",")
+Dim a() As String, i As Long, j As Long
+a() = split(Settings, ",")
 ' reset some flags
 gList1.StickBar = False
 mySelector.mselChecked = False
 multifileselection = False
 ExpandWidth = False
-For I = LBound(a()) To UBound(a())
+For i = LBound(a()) To UBound(a())
 j = 0
-Do While gList1.id(j) <> a(I)
+Do While gList1.id(j) <> a(i)
 j = j + 1
 If j >= gList1.listcount Then Exit Do
 Loop
@@ -1106,16 +1107,16 @@ ExpandWidth = True
 End Select
 
 
-Next I
+Next i
 End Function
 
 Sub GetSettings()
-Dim s As String, I As Long
-For I = 0 To gList1.listcount - 1
-If gList1.ListSelected(I) = True Then
-If s = vbNullString Then s = gList1.id(I) Else s = s + "," + gList1.id(I)
+Dim s As String, i As Long
+For i = 0 To gList1.listcount - 1
+If gList1.ListSelected(i) = True Then
+If s = vbNullString Then s = gList1.id(i) Else s = s + "," + gList1.id(i)
 End If
-Next I
+Next i
 Settings = s
 End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
@@ -1180,7 +1181,7 @@ allheight = bordertop + heightTop + bordertop + heightSelector + bordertop + Hei
 
 End If
 
-move Left, top, allwidth, allheight
+move Left, Top, allwidth, allheight
 gList2.move borderleft, bordertop, itemWidth, heightTop
 gList1.move borderleft, 2 * bordertop + heightTop, itemWidth, heightSelector
 gList3.move borderleft, allheight - HeightBottom - bordertop, itemWidth, HeightBottom
