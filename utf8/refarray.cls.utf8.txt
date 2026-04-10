@@ -1047,7 +1047,7 @@ Friend Sub CopyVariantArray(ByRef a As Variant, ByRef b As Variant)
     CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
 End Sub
 Public Function putData(f As Long, ndx As Long, lengthInBytes As Long) As Boolean
-    Dim addr, mitems, itemlen
+    Dim Addr, mitems, itemlen
     
     itemlen = MemInt(UnsignedAdd(MemLong(UnsignedAdd(VarPtr(p(0)), 8)), 4))
     mitems = Me.Elements(p(0))
@@ -1059,7 +1059,7 @@ Public Function putData(f As Long, ndx As Long, lengthInBytes As Long) As Boolea
     If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - ndx) Then
         lengthInBytes = itemlen * (mitems - ndx)
     End If
-    addr = UnsignedAdd(Me.ArrPtr(0), itemlen * ndx)
+    Addr = UnsignedAdd(Me.ArrPtr(0), itemlen * ndx)
     
     On Error GoTo there
     Dim a1 As SAFEARRAY1D, a() As Byte
@@ -1068,7 +1068,7 @@ Public Function putData(f As Long, ndx As Long, lengthInBytes As Long) As Boolea
         .cDims = 1
         .onebound(0).lLbound = 0
         .onebound(0).cElements = lengthInBytes
-        .pvData = addr
+        .pvData = Addr
     End With
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
         On Error GoTo there1
@@ -1084,7 +1084,7 @@ there1:
 there:
 End Function
 Friend Function GetData(f As Long, ndx As Long, lengthInBytes As Long) As Boolean
-    Dim addr, mitems, itemlen
+    Dim Addr, mitems, itemlen
     
     itemlen = MemInt(UnsignedAdd(MemLong(UnsignedAdd(VarPtr(p(0)), 8)), 4))
     mitems = Me.Elements(p(0))
@@ -1096,12 +1096,12 @@ Friend Function GetData(f As Long, ndx As Long, lengthInBytes As Long) As Boolea
     If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - ndx) Then
         lengthInBytes = itemlen * (mitems - ndx)
     End If
-    addr = UnsignedAdd(Me.ArrPtr(0), itemlen * ndx)
+    Addr = UnsignedAdd(Me.ArrPtr(0), itemlen * ndx)
     On Error GoTo there
     Dim FH As Long
     FH = Module10.ReadFileHandler(CLng(f))
     If FH = 0 Then Exit Function
-    Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(addr)
+    Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(Addr)
     GetData = True
     Exit Function
 there:
@@ -1171,7 +1171,7 @@ If ihavearray Then
 End If
 100
 Err.Clear
-MyEr "ο πίνακας δεν είναι τύπου ατυπος και απλός", "array not flat variant"
+MyEr "array not flat variant", "ο πίνακας δεν είναι τύπου ατυπος και απλός"
 End Function
 Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
    Static t(0 To 3) As Long  ' 4 Longs * 4 bytes each = 16 bytes

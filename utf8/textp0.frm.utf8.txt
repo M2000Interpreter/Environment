@@ -387,41 +387,41 @@ If Not lockme Then If QRY Or GFQRY Then Form1.KeyPreview = True
 End Sub
 
 Private Sub Form_KeyUp(KeyCode As Integer, shift As Integer)
-Dim I As Long
+Dim i As Long
  If List1.LeaveonChoose Then Exit Sub
 clickMe = -1
-I = -1
+i = -1
 If KeyCode = vbKeyV Then
 Exit Sub
 End If
 If shift <> 4 And mynum$ <> "" Then
 On Error Resume Next
 If Left$(mynum$, 1) = "0" Then
-I = val(mynum$)
+i = val(mynum$)
 Else
-I = val(mynum$)
+i = val(mynum$)
 End If
 mynum$ = vbNullString
-If I > 32 Then
+If i > 32 Then
 
-If I >= &H10000 And I <= &H10FFFF Then
-I = I - &H10000
-UKEY$ = ChrW(UINT(I \ &H400& + &HD800&)) + ChrW(UINT((I And &H3FF&) + &HDC00&))
+If i >= &H10000 And i <= &H10FFFF Then
+i = i - &H10000
+UKEY$ = ChrW(UINT(i \ &H400& + &HD800&)) + ChrW(UINT((i And &H3FF&) + &HDC00&))
 Else
-UKEY$ = ChrW(I)
+UKEY$ = ChrW(i)
 End If
 If LastNumX Then Form_KeyPress 44
 Refresh
 Exit Sub
 End If
 Else
-I = GetLastKeyPressed
+i = GetLastKeyPressed
 End If
 
- If I <> -1 And I <> 94 Then
-    UKEY$ = ChrW(I)
+ If i <> -1 And i <> 94 Then
+    UKEY$ = ChrW(i)
  Else
- If I <> -1 Then UKEY$ = vbNullString
+ If i <> -1 Then UKEY$ = vbNullString
  End If
 
 End Sub
@@ -448,17 +448,17 @@ If Me.WindowState <> 0 Then WindowState = 0: Exit Sub
 End Sub
 
 Private Sub gList1_ChangeListItem(item As Long, content As String)
-Dim I As Long
+Dim i As Long
 
 If nochange Then
 nochange = True
 With TEXT1
-I = .SelLength
-.Form1mn1Enabled = I > 0
-.Form1mn2Enabled = I > 0
+i = .SelLength
+.Form1mn1Enabled = i > 0
+.Form1mn2Enabled = i > 0
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
-.Form1sdnEnabled = I > 0 And (.Length - .SelStart) > I
-.Form1supEnabled = I > 0 And .SelStart > I
+.Form1sdnEnabled = i > 0 And (.Length - .SelStart) > i
+.Form1supEnabled = i > 0 And .SelStart > i
 .Form1mscatEnabled = .Form1sdnEnabled Or .Form1supEnabled
 .Form1rthisEnabled = .Form1mscatEnabled
 End With
@@ -467,16 +467,16 @@ End If
 End Sub
 
 Private Sub gList1_ChangeSelStart(thisselstart As Long)
-Dim I As Long
+Dim i As Long
 
 If gList1.enabled Then
 With TEXT1
-I = .SelLength
-.Form1mn1Enabled = I > 0
-.Form1mn2Enabled = I > 0
+i = .SelLength
+.Form1mn1Enabled = i > 0
+.Form1mn2Enabled = i > 0
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
-.Form1sdnEnabled = I > 0 And (.Length - .SelStart) > I
-.Form1supEnabled = I > 0 And .SelStart > I
+.Form1sdnEnabled = i > 0 And (.Length - .SelStart) > i
+.Form1supEnabled = i > 0 And .SelStart > i
 .Form1mscatEnabled = .Form1sdnEnabled Or .Form1supEnabled
 .Form1rthisEnabled = .Form1mscatEnabled
 End With
@@ -489,17 +489,17 @@ Set pic = Point2Me
 End Sub
 
 Private Sub gList1_HeaderSelected(Button As Integer)
-Dim I As Long
+Dim i As Long
 
 If Not gList1.enabled Then Exit Sub
 With TEXT1
 If .UsedAsTextBox Then Exit Sub
-I = .SelLength
-.Form1mn1Enabled = I > 0
-.Form1mn2Enabled = I > 0
+i = .SelLength
+.Form1mn1Enabled = i > 0
+.Form1mn2Enabled = i > 0
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
-.Form1sdnEnabled = I > 0 And (.Length - .SelStart) > .SelLength
-.Form1supEnabled = I > 0 And .SelStart > .SelLength
+.Form1sdnEnabled = i > 0 And (.Length - .SelStart) > .SelLength
+.Form1supEnabled = i > 0 And .SelStart > .SelLength
 .Form1mscatEnabled = .Form1sdnEnabled Or .Form1supEnabled
 .Form1rthisEnabled = .Form1mscatEnabled
 End With
@@ -536,14 +536,14 @@ Private Sub glist1_MarkOut()
 Pack1
 End Sub
 Public Sub Pack1()
-Dim I As Long
+Dim i As Long
 With TEXT1
-I = .SelLength
-.Form1mn1Enabled = I > 0
-.Form1mn2Enabled = I > 0
+i = .SelLength
+.Form1mn1Enabled = i > 0
+.Form1mn2Enabled = i > 0
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
-.Form1sdnEnabled = I > 0 And (.Length - .SelStart) > I
-.Form1supEnabled = I > 0 And .SelStart > I
+.Form1sdnEnabled = i > 0 And (.Length - .SelStart) > i
+.Form1supEnabled = i > 0 And .SelStart > i
 .Form1mscatEnabled = .Form1sdnEnabled Or .Form1supEnabled
 .Form1rthisEnabled = .Form1mscatEnabled
 End With
@@ -555,17 +555,17 @@ If KeyAscii = 13 Then KeyAscii = 0: Exit Sub
 End Sub
 
 Private Sub gList1_OutPopUp(X As Single, Y As Single, myButton As Integer)
-Dim I As Long
+Dim i As Long
 
 If Not gList1.enabled Then Exit Sub
 With TEXT1
 If .UsedAsTextBox Then Exit Sub
-I = .SelLength
-.Form1mn1Enabled = I > 0
-.Form1mn2Enabled = I > 0
+i = .SelLength
+.Form1mn1Enabled = i > 0
+.Form1mn2Enabled = i > 0
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
-.Form1sdnEnabled = I > 0 And (.Length - .SelStart) > .SelLength
-.Form1supEnabled = I > 0 And .SelStart > .SelLength
+.Form1sdnEnabled = i > 0 And (.Length - .SelStart) > .SelLength
+.Form1supEnabled = i > 0 And .SelStart > .SelLength
 .Form1mscatEnabled = .Form1sdnEnabled Or .Form1supEnabled
 .Form1rthisEnabled = .Form1mscatEnabled
 End With
@@ -1112,7 +1112,7 @@ End Sub
 
 
 Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
-Dim I As Long
+Dim i As Long
 Form1.Font.charset = GetCharSet(GetCodePage(GetLCIDFromKeyboard))
 
 Static ctrl As Boolean, noentrance As Boolean
@@ -1183,7 +1183,7 @@ mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 48)
 LastNumX = False
 Case vbKeyA To vbKeyF
 If Left$(mynum$, 1) = "&" Then
-mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 65)
+mynum$ = mynum$ + Chr$(KeyCode)
 LastNumX = True
 Else
 mynum$ = vbNullString
@@ -1199,6 +1199,11 @@ mynum$ = vbNullString
 
 
 Select Case KeyCode
+Case vbKey3
+If ctrl And shift = 2 Then
+INK$ = INK$ & ChrW$(&H266D)
+KeyCode = 0
+End If
 Case vbKeyE, vbKeyD
 If ctrl And (shift And &H2) = 2 Then
 If QRY Then
@@ -1337,11 +1342,11 @@ End If
 End If
 End If
 Case vbKeyPause  '(this is the break key!!!!!'
-If Forms.count > 5 Then KeyCode = 0: Exit Sub
+If Forms.Count > 5 Then KeyCode = 0: Exit Sub
 If Not TaskMaster Is Nothing Then If TaskMaster.QueueCount > 0 Then KeyCode = 0: Exit Sub
 If QRY Or GFQRY Then
 If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
-I = MOUT
+i = MOUT
 If ASKINUSE Then
 If BreakMe Then Exit Sub
 Unload NeoMsgBox: ASKINUSE = False: Exit Sub
@@ -1349,7 +1354,7 @@ End If
 BreakMe = True
 If MsgBoxN(BreakMes, vbYesNo, MesTitle$) <> vbNo Then
 Check2SaveModules = False
-MOUT = I
+MOUT = i
 
 extreme = False
 If AVIRUN Then AVI.GETLOST
@@ -1453,8 +1458,8 @@ End Select
 ctrl = False
  If List1.LeaveonChoose Then Exit Sub
  If KeyCode = 91 Then Exit Sub
-I = GetLastKeyPressed
- If I <> -1 And I <> 94 Then UKEY$ = ChrW(I) Else If I <> -1 Then UKEY$ = vbNullString
+i = GetLastKeyPressed
+ If i <> -1 And i <> 94 Then UKEY$ = ChrW(i) Else If i <> -1 Then UKEY$ = vbNullString
  If List1.Visible Then
  Else
 KeyCode = 0
@@ -1628,11 +1633,11 @@ Switches para$  ' ,TRUE CHECK THIS
 111:
 
   On Error Resume Next
-  Dim I As Long
+  Dim i As Long
   
-      For I = 0 To Controls.count - 1
-     If Typename(Controls(I)) <> "Menu" Then Controls(I).TabStop = False
-      Next I
+      For i = 0 To Controls.Count - 1
+     If Typename(Controls(i)) <> "Menu" Then Controls(i).TabStop = False
+      Next i
 End Sub
 
 
@@ -1751,7 +1756,7 @@ Basestack1.myCharSet = 0
 Basestack1.Owner.move 0, 0, ScaleWidth, ScaleHeight
 
 If NoAction Then Exit Sub
-Dim dummy As Boolean, I
+Dim dummy As Boolean, i
 NOEXECUTION = False
 '
 myBreak Basestack1
@@ -2014,6 +2019,7 @@ End Sub
 
 
 Private Sub Form_Unload(Cancel As Integer)
+    DestroyToolTip
     If DisStack Is Nothing Then Exit Sub
     Set DisStack.Owner = Nothing
      Set DisStack = Nothing
@@ -2108,7 +2114,7 @@ If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
                 Form1.SetFocus
             End If
             End If
-            If Forms.count > 5 Then KeyCode = 0: Exit Sub
+            If Forms.Count > 5 Then KeyCode = 0: Exit Sub
             If Not TaskMaster Is Nothing Then If TaskMaster.QueueCount > 0 Then KeyCode = 0: Exit Sub
             If BreakMe Then noentrance = False: Exit Sub
             If ASKINUSE Then
@@ -2701,19 +2707,19 @@ End Sub
 
 
 Private Function Parameters(a As String, b As String, c As String) As Boolean
-Dim I, ch As Boolean, vl As Boolean, chs$, all$, many As Long
+Dim i, ch As Boolean, vl As Boolean, chs$, all$, many As Long
 b = vbNullString
 c = vbNullString
 
 'parameters = False
 ch = False
 vl = False
-Do While I < Len(a)
-I = I + 1
-Select Case Mid$(a, I, 1)
+Do While i < Len(a)
+i = i + 1
+Select Case Mid$(a, i, 1)
 Case "%"
-If Mid$(a, I + 1, 1) = "u" Then
-I = I + 1
+If Mid$(a, i + 1, 1) = "u" Then
+i = i + 1
 'we have four bytes
 many = 6
 Else
@@ -2742,7 +2748,7 @@ Exit Do
 End If
 Case Else
 If ch = True Then
-chs$ = chs$ & Mid$(a, I, 1)
+chs$ = chs$ & Mid$(a, i, 1)
 If Len(chs$) = many Then
 If many = 4 Then
 chs$ = Chr(Int(chs$))
@@ -2757,14 +2763,14 @@ b = b + chs$
 End If
 End If
 ElseIf vl = False Then
-b = b + Mid$(a, I, 1)
+b = b + Mid$(a, i, 1)
 Else
-c = c + Mid$(a, I, 1)
+c = c + Mid$(a, i, 1)
 End If
 End Select
 Loop
 If c <> "" Then Parameters = True
-a = Mid$(a, I + 1)
+a = Mid$(a, i + 1)
 End Function
 
 
@@ -3177,10 +3183,10 @@ End Sub
 Function GetKeY(ascii As Integer) As String
     Dim Buffer As String, ret As Long
     Buffer = String$(514, 0)
-    Dim R&, K&
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
-      R = CLng(val("&H" & Right(Hex(R), 4)))
-    ret = GetLocaleInfo(R, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
+    Dim r&, K&
+      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
+      r = CLng(val("&H" & Right(Hex(r), 4)))
+    ret = GetLocaleInfo(r, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
     If ret > 0 Then
         GetKeY = ChrW$(AscW(StrConv(ChrW$(ascii Mod 256), 64, CLng(val("&h" + Left$(Buffer, ret - 1))))))
     Else
@@ -3188,11 +3194,11 @@ Function GetKeY(ascii As Integer) As String
     End If
 End Function
 Public Function GetLCIDFromKeyboard() As Long
-    Dim Buffer As String, ret&, R&
+    Dim Buffer As String, ret&, r&
     Buffer = String$(514, 0)
-      R = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
-      R = val("&H" & Right(Hex(R), 4))
-        ret = GetLocaleInfo(R, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
+      r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
+      r = val("&H" & Right(Hex(r), 4))
+        ret = GetLocaleInfo(r, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
     GetLCIDFromKeyboard = CLng(val("&h" + Left$(Buffer, ret - 1)))
 End Function
 Sub MarkSoftButton(para As Long, pospara As Long)
@@ -3291,9 +3297,9 @@ Public Sub hookme(this As gList)
 Set LastGlist = this
 End Sub
 Public Function mybreak1() As Boolean
-Dim I As Long
+Dim i As Long
 If Form4Loaded Then If Form4.Visible Then Form4.Visible = False
-I = MOUT
+i = MOUT
 If ASKINUSE Then
 If BreakMe Then Exit Function
 Unload NeoMsgBox: ASKINUSE = False: Exit Function
@@ -3479,7 +3485,7 @@ If IsWine Then
         Exit Function
     End If
 Else
-If Forms.count < 6 Then SleepWaitEdit bstack, 30
+If Forms.Count < 6 Then SleepWaitEdit bstack, 30
 End If
 If AskInput Then
 NeoMsgBox.gList3.SetFocus
