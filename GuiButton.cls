@@ -41,12 +41,12 @@ Friend Sub Construct(there As GuiM2000, Name$)
  there.Controls(ctrlName).TabStop = True
  mesCtrlName = Name$
 End Sub
-Friend Sub ConstructArray(there As GuiM2000, Name$, I As Long)
+Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  Set Callback = there
  On Error Resume Next
  ctrlName = GetTag$
  Set glistN = there.Controls.Add("m2000.glist", ctrlName)
- mIndex = I
+ mIndex = i
  there.AddGuiControl Me
  glistN.Dynamic
  there.Controls(ctrlName).TabStop = True
@@ -312,12 +312,12 @@ End Sub
 Public Sub Curve(RHS As Single)
 glistN.Curve False, RHS
 End Sub
-Public Property Get top() As Variant
+Public Property Get Top() As Variant
 'top = Callback.Controls(ctrlName).top
-top = glistN.TopTwips
+Top = glistN.TopTwips
 End Property
-Public Property Let top(ByVal RHS As Variant)
-Callback.Controls(ctrlName).top = RHS
+Public Property Let Top(ByVal RHS As Variant)
+Callback.Controls(ctrlName).Top = RHS
 End Property
 Public Property Get Left() As Variant
 Left = Callback.Controls(ctrlName).Left
@@ -409,36 +409,36 @@ Public Property Let icon(RHS)
 glistN.icon = RHS
 End Property
 
-Private Sub glistN_PreviewKeyboardUnicode(A As String)
-Callback.SpreadKey A
+Private Sub glistN_PreviewKeyboardUnicode(a As String)
+Callback.SpreadKey a
 End Sub
-Private Sub glistN_Fkey(A As Integer)
-If A > 1000 Then
-Callback.SendFKEY A - 1000
+Private Sub glistN_Fkey(a As Integer)
+If a > 1000 Then
+Callback.SendFKEY a - 1000
 Else
-Callback.SendFKEY A
+Callback.SendFKEY a
 End If
 End Sub
-Public Sub AccKey(A, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
-If MyIsNumeric(A) Then
-A = CLng(A)
-If A < 0 Then Exit Sub
-If A > 499 Then Exit Sub
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
 Else
-A = UCase(A)
-Select Case A
+a = UCase(a)
+Select Case a
 Case "F1" To "F9"
-A = 611 + val(Mid(A, 2))
+a = 611 + val(Mid(a, 2))
 Case Else
-A = AscW(A)
-If A > 126 Then A = 0
+a = AscW(a)
+If a > 126 Then a = 0
 End Select
 End If
 If Opcode < 0 Then Opcode = 0
-If A = 0 Then Exit Sub
-A = A - 1000 * shift - 10000 * ctrl - 100000 * alt
-Callback.RegisterAcc A, ctrlName, Opcode
+If a = 0 Then Exit Sub
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
 Private Sub gListN_AccKey(M As Long)
 Callback.AccProces M
@@ -453,6 +453,8 @@ Property Get Visible() As Boolean
         Visible = glistN.Visible
     End If
 End Property
+
+
 Private Sub glistN_WindowKey(VbKeyThis As Integer)
 Callback.ProcessWinKey VbKeyThis
 End Sub
@@ -471,3 +473,13 @@ mIndex = -1
 Set Callback = Nothing
 End Sub
 
+
+Public Property Get ToolTip() As String
+If glistN Is Nothing Then Exit Property
+ToolTip = glistN.ToolTip
+End Property
+
+Public Property Let ToolTip(ByVal vNewValue As String)
+If glistN Is Nothing Then Exit Property
+glistN.ToolTip = vNewValue
+End Property

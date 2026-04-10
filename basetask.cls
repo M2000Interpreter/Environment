@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 ' Basetask is a module task of M2000
 ' This is a utility soros for passing parammeters to functions
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Public LoadOnly As Boolean, NoRun As Boolean
 Public CheckUnReferenceGui As Long
 Public callx1 As Long, tpointer As Long
@@ -123,7 +123,7 @@ End With
 
 End Sub
 Public Sub CopyStrip2(bst As basetask)
-Dim I As Long
+Dim i As Long
 With bst
 Set .Owner = Owner
 .StaticInUse = StaticInUse
@@ -131,9 +131,9 @@ Set .Owner = Owner
 Set .StaticCollection = StaticCollection
 Set .Sorosref = soros
 .DropNdot 20
-For I = 1 To curdotcol
-.MoveNameDot dotcol(I)
-Next I
+For i = 1 To curdotcol
+.MoveNameDot dotcol(i)
+Next i
 .DropRetStack
 .UseGroupname = UseGroupname
 .GroupName = GroupName
@@ -244,7 +244,7 @@ Public Sub SetVarobJvalue(ByVal Name$, var As Variant)
     If Not StaticCollection.Find(Name$) Then
     StaticCollection.AddKey Name$
     End If
-    Dim myobject As Object, useHandler As mHandler
+    Dim myobject As Object, usehandler As mHandler
     
     If MyIsObject(var) Then
       Set StaticCollection.ValueObj = var
@@ -254,10 +254,10 @@ Public Sub SetVarobJvalue(ByVal Name$, var As Variant)
     If TypeOf myobject Is Group Then
         StaticCollection.Value = var
     ElseIf TypeOf myobject Is mHandler Then
-    Set useHandler = myobject
-    If useHandler.t1 = 4 Then
+    Set usehandler = myobject
+    If usehandler.t1 = 4 Then
         Dim ok As Boolean
-        Set var = useHandler.objref.SearchValue(var, ok)
+        Set var = usehandler.objref.SearchValue(var, ok)
         If ok Then
             Set StaticCollection.ValueObj = var
         Else
@@ -274,44 +274,44 @@ Public Sub SetVarobJvalue(ByVal Name$, var As Variant)
 End Sub
 
 Function AlterVar(ByVal Name$, p As Variant, ss$, inttype As Boolean) As Boolean
-Dim sp As Variant, useHandler As mHandler
+Dim sp As Variant, usehandler As mHandler
 If Not StaticCollection.Find(Name$) Then Exit Function
 
   With StaticCollection
   If .IsObj Then
     If Typename(.ValueObj) = "mHandler" Then
-    Set useHandler = .ValueObj
-        If useHandler.t1 = 3 Then
-            Dim MM As iBoxArray, mm1 As tuple, mm2 As mArray
-            Set MM = useHandler.objref
-            If MM.Arr Then
-            If TypeOf MM Is mArray Then
-                Set mm2 = MM
+    Set usehandler = .ValueObj
+        If usehandler.t1 = 3 Then
+            Dim mm As iBoxArray, mm1 As tuple, mm2 As mArray
+            Set mm = usehandler.objref
+            If mm.arr Then
+            If TypeOf mm Is mArray Then
+                Set mm2 = mm
                 mm2.Compute0 p, ss$
                 Set mm2 = Nothing
-            ElseIf TypeOf MM Is tuple Then
-                Set mm1 = MM
+            ElseIf TypeOf mm Is tuple Then
+                Set mm1 = mm
                 mm1.Compute0 p, ss$
                 Set mm1 = Nothing
             End If
             End If
             
-            Set MM = Nothing
-        ElseIf useHandler.t1 = 4 Then
+            Set mm = Nothing
+        ElseIf usehandler.t1 = 4 Then
                 If ss$ = "++" Then
-                        If useHandler.index_start < useHandler.objref.Count - 1 Then
-                            useHandler.index_start = useHandler.index_start + 1
-                            useHandler.objref.Index = useHandler.index_start
-                            useHandler.index_cursor = useHandler.objref.Value
+                        If usehandler.index_start < usehandler.objref.Count - 1 Then
+                            usehandler.index_start = usehandler.index_start + 1
+                            usehandler.objref.Index = usehandler.index_start
+                            usehandler.index_cursor = usehandler.objref.Value
                         End If
         ElseIf ss$ = "--" Then
-                    If useHandler.index_start > 0 Then
-                            useHandler.index_start = useHandler.index_start - 1
-                            useHandler.objref.Index = useHandler.index_start
-                            useHandler.index_cursor = useHandler.objref.Value
+                    If usehandler.index_start > 0 Then
+                            usehandler.index_start = usehandler.index_start - 1
+                            usehandler.objref.Index = usehandler.index_start
+                            usehandler.index_cursor = usehandler.objref.Value
                         End If
         ElseIf ss$ = "-!" Then
-                        useHandler.sign = -useHandler.sign
+                        usehandler.sign = -usehandler.sign
                         Else
                         NoOperatorForThatObject ss$
         
@@ -407,7 +407,7 @@ End If
             End With
    AlterVar = True
 End Function
-Static Function MyRound(a As Variant, Optional ByVal I As Integer = 0)
+Static Function MyRound(a As Variant, Optional ByVal i As Integer = 0)
 Dim c As Variant, j As VbVarType
 Dim n(1 To 28) As Single, D(1 To 28) As Double, cur(1 To 28) As Currency, dec(1 To 28) As Variant
 Dim sg(-1 To 1) As Single, sg4(-1 To 1) As Double, sg8(-1 To 1) As Currency
@@ -447,16 +447,16 @@ If n(1) = 0 Then
         dec(c) = CDec(10 ^ c)
     Next c
 End If
-    If I = 0 Then
+    If i = 0 Then
         MyRound = Sgn(a) * Int(Abs(a) + 0.5)
         Exit Function
     Else
         c = Fix(a)
         Select Case j
         Case vbSingle
-            If n(I) > 0 Then
+            If n(i) > 0 Then
                 c = sg(Sgn(a))
-                MyRound = Fix(a * n(I) + c) / n(I)
+                MyRound = Fix(a * n(i) + c) / n(i)
             Else
                 MyRound = a
             End If
@@ -464,23 +464,23 @@ End If
         Case vbDouble
             c = sg4(Sgn(a))
  
-            If D(I) > 0 Then
-                MyRound = Fix(a * D(I) + c) / D(I)
+            If D(i) > 0 Then
+                MyRound = Fix(a * D(i) + c) / D(i)
             Else
                 MyRound = a
             End If
             Exit Function
         Case vbCurrency
-            If cur(I) > 0 Then
+            If cur(i) > 0 Then
                 c = sg8(Sgn(a))
-                MyRound = Fix(a) + Fix((a - Fix(a)) * cur(I) + c) / cur(I)
+                MyRound = Fix(a) + Fix((a - Fix(a)) * cur(i) + c) / cur(i)
             Else
                 MyRound = a
             End If
             Exit Function
         Case vbDecimal
             c = sg8(Sgn(a))
-            MyRound = Fix(a) + Fix((a - Fix(a)) * dec(I) + c) / dec(I)
+            MyRound = Fix(a) + Fix((a - Fix(a)) * dec(i) + c) / dec(i)
             Exit Function
         Case Else
             MyRound = a
@@ -490,7 +490,7 @@ End If
 there:
 Err.Clear
 MyRound = a
-If I < 0 Or I > 28 Then MyEr "Round Place exit range 0 to 28", "Η θέση στρογγυλοποίησης εκτός περιοχής από 0 έως 28"
+If i < 0 Or i > 28 Then MyEr "Round Place exit range 0 to 28", "Η θέση στρογγυλοποίησης εκτός περιοχής από 0 έως 28"
 End Function
 
 Public Function ExistVar(ByVal Name$, Optional IsObj As Boolean = False) As Boolean
@@ -503,7 +503,7 @@ Public Function ExistVar2(ByVal Name$) As Boolean
         ExistVar2 = StaticCollection.ExistKey(Name$)
 End Function
 Public Sub ReadVar(ByVal Name$, var As Variant)
-    Dim I As Long, vv As Variant
+    Dim i As Long, vv As Variant
     If StaticCollection Is Nothing Then Exit Sub
     With StaticCollection
         If .Find(Name$) Then
@@ -518,7 +518,7 @@ Public Sub ReadVar(ByVal Name$, var As Variant)
     End With
 End Sub
 Public Sub ReadStaticCol(ByVal Name$, var As Variant)
-    Dim I As Long, vv As Variant
+    Dim i As Long, vv As Variant
     If StaticCollection Is Nothing Then
     Set var = Nothing
     Exit Sub
@@ -534,7 +534,7 @@ Public Sub ReadStaticCol(ByVal Name$, var As Variant)
     End With
 End Sub
 Public Sub ReadStaticCol2(Name$, var As Variant)
-    Dim I As Long, vv As Variant
+    Dim i As Long, vv As Variant
     If StaticCollection Is Nothing Then
     Set var = Nothing
     Exit Sub
@@ -651,18 +651,18 @@ aaa:
 End Function
 
 Public Function GetDot(a$, st&) As Boolean
-Dim I&
+Dim i&
 If curdotcol = 0 Then a$ = Mid$(a$, 2): Exit Function
 Do While Mid$(a$, st&, 1) = " "
 st& = st& + 1
 If st& > Len(a$) Then Exit Function
 Loop
 
-For I& = st& + 1 To Len(a$)
-If Mid$(a$, I&, 1) <> "." Then I& = I& + 1: Exit For
-Next I&
-I& = I& - 2
-If st& > 1 Then a$ = Left$(a$, st& - 1) + dotcol(I& - st& + 1) + Mid$(a$, I&) Else Exit Function
+For i& = st& + 1 To Len(a$)
+If Mid$(a$, i&, 1) <> "." Then i& = i& + 1: Exit For
+Next i&
+i& = i& - 2
+If st& > 1 Then a$ = Left$(a$, st& - 1) + dotcol(i& - st& + 1) + Mid$(a$, i&) Else Exit Function
 If Not Err Then GetDot = True
 End Function
 
@@ -1153,11 +1153,11 @@ mIamAnEvent = vNewValue
 End Property
 
 Friend Function lastobjIndirect(var()) As Variant
-Dim useHandler As mHandler
+Dim usehandler As mHandler
 If lastobj Is Nothing Then
 ElseIf TypeOf lastobj Is mHandler Then
-Set useHandler = lastobj
-With useHandler
+Set usehandler = lastobj
+With usehandler
 Select Case .indirect
     Case 0 To var2used
         On Error Resume Next

@@ -99,6 +99,8 @@ Private Declare Function GetDriveType Lib "kernel32" Alias "GetDriveTypeA" (ByVa
 Private Declare Function GetVolumeInformation Lib "kernel32" Alias "GetVolumeInformationA" (ByVal lpRootPathName As String, ByVal lpVolumeNameBuffer As String, ByVal nVolumeNameSize As Long, lpVolumeSerialNumber As Long, lpMaximumComponentLength As Long, lpFileSystemFlags As Long, ByVal lpFileSystemNameBuffer As String, ByVal nFileSystemNameSize As Long) As Long
 'Private Const MAX_PATH As Long = 1024
 Private Const MAX_PATH_UNICODE As Long = 260 * 2 - 1
+Public MusicBoxNote(1 To 16) As Long, MusicBoxState(1 To 16) As Boolean
+Public MusicBoxVolume(1 To 16) As Long, MusicBoxValue(1 To 16) As Long
 
 Private Declare Function GetLongPathName Lib "kernel32" _
    Alias "GetLongPathNameW" _
@@ -373,7 +375,7 @@ Dim px As Long, py As Long, nowait As Boolean
 Dim nopage As Boolean
 Dim buf$, b$, npy As Long, lCount As Long, SCRnum2stop As Long
 Dim nopr As Boolean, nohi As Long, w2 As Long, lastPara As Long
-Dim dv2x15 As Long
+Dim dv2x15 As Long, correction As Boolean
 dv2x15 = dv15 * 2
 If collectit Then Set mDoc = New Document
 Set DDD = bstack.Owner
@@ -404,6 +406,7 @@ With mybasket
     End If
     
     wi = wi - CLng(dv2x15)
+    correction = True
     If wi <= 0 Then Exit Sub
     If Hi < 0 Then
         Hi = -Hi - 2
@@ -528,6 +531,7 @@ last:
         ElseIf frmt = 0 Then
         If Not nopr Then
         '****************
+        If correction Then w2 = w2 + CLng(dv2x15)
         If bchar <> 32 Then
             wwPlain bstack, mybasket, buf$, w2, 100000, nowait, , 3, , (0), , , nonewline
         Else

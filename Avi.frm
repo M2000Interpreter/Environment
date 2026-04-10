@@ -46,7 +46,7 @@ If CLICK_COUNT < 2 Then
 If Height > 30 Then
 If Not UseAviXY Then
 SetWindowPos Me.hWnd, HWND_TOPMOST, Me.Left / dv15, _
-                        Me.top / dv15, Me.Width / dv15, _
+                        Me.Top / dv15, Me.Width / dv15, _
                         Me.Height / dv15, SWP_NOACTIVATE Or SWP_SHOWWINDOW
 Else
 
@@ -71,8 +71,8 @@ End Sub
 
 
 
-Private Sub Form_KeyDown(keycode As Integer, Shift As Integer)
-keycode = 0
+Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
+KeyCode = 0
 If Form1.Visible Then
 If Form1.TEXT1.Visible Then
 Form1.TEXT1.SetFocus
@@ -99,7 +99,7 @@ MediaPlayer1.hideMovie
 MediaPlayer1.FileName = avifile
 Timer1.enabled = False
 Interval = MediaPlayer1.Length
-hmonitor = FindMonitorFromPixel(Form1.Left, Form1.top)
+hmonitor = FindMonitorFromPixel(Form1.Left, Form1.Top)
 
 If MediaPlayer1.Error = 0 Then
 
@@ -121,7 +121,7 @@ If UseAviSize And MediaPlayer1.Height > 2 Then
         End If
         If aviX = 0 And aviY = 0 Then
             aviX = ((ScrInfo(Console).Width - 1) * 0.99 - AviSizeX) / 2 + ScrInfo(Console).Left
-            aviY = ((ScrInfo(Console).Height - 1) * 0.99 - AviSizeY) / 2 + ScrInfo(Console).top
+            aviY = ((ScrInfo(Console).Height - 1) * 0.99 - AviSizeY) / 2 + ScrInfo(Console).Top
         End If
 
 End If
@@ -142,7 +142,7 @@ MediaPlayer1.openMovieWindow AVI.hWnd, "child"
 
 
 Else
-Me.move Left, top, ScaleX(MediaPlayer1.Width, vbPixels, vbTwips), ScaleY(MediaPlayer1.Height, vbPixels, vbTwips)
+Me.move Left, Top, ScaleX(MediaPlayer1.Width, vbPixels, vbTwips), ScaleY(MediaPlayer1.Height, vbPixels, vbTwips)
 
 MediaPlayer1.minimizeMovie
 MediaPlayer1.openMovie
@@ -156,7 +156,7 @@ Height = 0
 Else
 
 If Not UseAviXY Then
-Me.move ((ScrInfo(Console).Width - 1) - Width) / 2 + ScrInfo(Console).Left, ((ScrInfo(Console).Height - 1) - Height) / 2 + ScrInfo(Console).top
+Me.move ((ScrInfo(Console).Width - 1) - Width) / 2 + ScrInfo(Console).Left, ((ScrInfo(Console).Height - 1) - Height) / 2 + ScrInfo(Console).Top
 End If
 End If
 
@@ -186,7 +186,7 @@ End Sub
 
 
 
-Private Sub Form_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 If (Button And 1) = 1 Then If MediaPlayer1.isMoviePlaying Then GETLOST
 End Sub
 

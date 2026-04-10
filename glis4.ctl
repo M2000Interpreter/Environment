@@ -85,7 +85,7 @@ Private Type Myshape
     Width As Long
     Height As Long
 End Type
-
+Private Declare Function GetDoubleClickTime Lib "user32.dll" () As Long
 Private mynum$, dragslow As Long, lastshift As Integer, HandleOverride As Boolean
 Private lastEditFlag As Boolean, SkipReadEditflag As Boolean
 Public BypassKey As Boolean, AdjustColumns As Boolean
@@ -149,7 +149,7 @@ Private Declare Function Ellipse Lib "gdi32" (ByVal hDC As Long, ByVal x1 As Lon
 Private Declare Function CreatePen Lib "gdi32" (ByVal nPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 
 Private Const PS_NULL = 5
 Private Const PS_SOLID = 0
@@ -337,7 +337,7 @@ Dim mVertical As Boolean
 
 Dim OurDraw As Boolean, GetOpenValue As Long
 Dim lastX As Single, LastY As Single
-
+Private mtooltip As String
 Private mjumptothemousemode As Boolean
 Private mpercent As Single
 Private BarWidth As Long
@@ -851,7 +851,27 @@ Public Property Let TabStopSoft(ByVal RHS As Boolean)
     mTabStop = RHS
     TabStop = RHS
 End Property
-
+Private Sub CheckToolTip()
+    Dim PropToolTipTitle As String, RHS As String
+    If mtooltip = "" Then Exit Sub
+    
+    RHS = mtooltip
+    
+    PropToolTipTitle = GetStrUntil(vbCrLf, RHS)
+    
+    If RHS = "" Then RHS = mtooltip
+    If RHS = "" Then RHS = "?"
+    If Not CreateToolTip(hWnd, RHS, , PropToolTipTitle, , , , True) Then
+        Extender.ToolTipText = Left$(mtooltip, 80)
+    End If
+End Sub
+Public Property Let ToolTip(ByVal RHS As String)
+    mtooltip = RHS
+    DestroyToolTip
+End Property
+Public Property Get ToolTip() As String
+    ToolTip = mtooltip
+End Property
 Public Property Get TabStopSoft() As Boolean
     TabStopSoft = mTabStop
 End Property
@@ -2278,6 +2298,7 @@ there:
 End Sub
 
 Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
+CheckToolTip
 On Error GoTo there
 If FloatList And UseHeaderOnly And Button <> 0 Then
         missMouseClick = False
@@ -6076,7 +6097,7 @@ LastNumX = False
 mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 48)
 Case vbKeyA To vbKeyF
 If Left$(mynum$, 1) = "&" Then
-mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 65)
+mynum$ = mynum$ + Chr$(KeyCode)
 LastNumX = True
 Else
 mynum$ = vbNullString
@@ -7293,14 +7314,17 @@ If item = itemline Then
         FloatList = False
         If Button = 1 Then
             doubleclick = doubleclick + 1 + preservedoubleclick
+            If doubleclick = 1 Then Debug.Print "FIRST"
             preservedoubleclick = 0
             If doubleclick = 1 Then
-                timestamp1 = Timer
+                timestamp1 = ProfErr.MARKTWO
             ElseIf doubleclick > 1 Then
-                If (timestamp1 + 1.5) < Timer Then
+                Debug.Print ProfErr.MARKTWO - timestamp1
+                If (timestamp1 + GetDoubleClickTime + 500) < ProfErr.MARKTWO Then
                     doubleclick = 1
-                    timestamp1 = Timer
+                    timestamp1 = ProfErr.MARKTWO
                 Else
+                    Debug.Print "OK"
                     timestamp1 = Timer + 100
                     DoubleClickCheck = True: Exit Function
                 End If
@@ -7370,13 +7394,13 @@ Sub DestCaret()
 End Sub
 Private Function MyTrimL(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL = 1: Exit Function
   p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 9
     Case Else
      MyTrimL = (i - p2) \ 2 + 1
