@@ -5748,7 +5748,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 62 for M2000 Interpreter version 14, revision 8 and above"
+	Report " A collection of modules for tests version 62 for M2000 Interpreter version 14, revision 15 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -6271,6 +6271,11 @@ Layer Simple {
 }
 \\ now put a ListBox
 Declare Listbox1 Listbox Form Simple
+tooltip$={This is the title
+- This is the text for tooltio
+- Another paragraph
+}
+with listbox1, "tooltip", tooltip$
 Method Listbox1, "move", 1000,1000,6000,4200
 //Method Listbox1, "SetBarStyle", 11
 Method Listbox1, "SetBarStyle", color(50, 100,  200), 3
@@ -10928,6 +10933,7 @@ Module FadeInScreen2 (&Paint(), tempo) {
 }
 }
 MODULE PP {function dummy {
+	cls 0, 0
 	ro=row
 	p
 	cls 5, row-1
@@ -20333,9 +20339,8 @@ Sub Compress()
       Dir User
 End Sub
 Sub CreateGeneral()
-\\ this module exist only in until this sub exit
+\\ this module exist only until this sub exit
 Module CreateGeneral {
-
 \* For each group we get a field in General Group
 \* Use module mg to create grouporder
 \\ flush
@@ -20422,13 +20427,16 @@ Execute "HELP2000", "DELETE FROM COMMANDS WHERE GROUPNUM =22;"
             For j=1 To mywords {
                   Retrieve  "HELP2000", "SELECT * FROM COMMANDS WHERE GROUPNUM ="+Str$(No(i))+" ORDER BY [ENGLISH]",j,"",""        
                   Read mywords
-                  Read GreekName$, HelpText$, EnglishName$, groupnumFrom     
+                  Read GreekName$, HelpText$, EnglishName$, groupnumFrom
+                  if right$(EnglishName$,1)="(" then EnglishName$+=")"
                   If mywords=j Then {EnglishInfo$= EnglishName$ } Else  EnglishInfo$= EnglishName$+", "
                   Retrieve  "HELP2000", "SELECT * FROM COMMANDS WHERE GROUPNUM ="+Str$(No(i))+" ORDER BY [DESCRIPTION]",j,"",""
                   Read mywords
-                  Read GreekName$, HelpText$, EnglishName$, groupnumFrom     
+                  Read GreekName$, HelpText$, EnglishName$, groupnumFrom
+                  if right$(GreekName$,1)="(" then GreekName$+=")"
                   If mywords=j Then {GreekInfo$= GreekName$} Else GreekInfo$= GreekName$+", "                
             }
+            
          AllGreek$=GreekInfo$+{
          
          }
@@ -20453,8 +20461,10 @@ Execute "HELP2000", "DELETE FROM COMMANDS WHERE GROUPNUM =22;"
       __<ENG>__
       } + AllEnglish$
          Append "HELP2000",  "COMMANDS",  "ΟΛΑ",  AllGreek$,"ALL", 22
+         set switches "+mdb"
          Help All
 Print "DONE"
+Print "Reminder: Help Switch to database now | for the current interpreter"
 clear
 Flush
 Dir User
@@ -20563,6 +20573,8 @@ Try {
 }
 dir user
 DB.Provider ""
+Set Switches "-MDB"
+Print "Reminder: Help Switch to plain file now  | for the current interpreter"
 }
 MODULE SNAKE {Αν Τοπικό=1032 ή Ελληνικά Τότε {
       Αν Ρώτα( "Κράτα πατημένο το διάστημα πριν τελειώσει το παιχνίδι για άμεσο τερματισμό","Παιχνίδι Φιδάκι","*Ξεκινάω","Όχι τώρα")<>1 τότε Διέκοψε
@@ -21679,8 +21691,8 @@ MODULE USETHIS {try {
 	Bold 1
 	PEN 14
 	CLS,0
-	If Version<14 then Error "No proper M2000 version (must be >=14)"
-//	If Version=13 and revision<51 then Error "No proper M2000 revision for version 13 (need revision >=51)"
+	If Version<14  then Error "No proper M2000 version (must be >=14)"
+	If Version=14 and revision<15  then Error "No proper M2000 revision for version 14"	
 	Set Fast
 	Title "Info",1   ' open a window in task bar with name info (If  you run Demo, at the exit you get no window in task bar, so we can restore it)
 	dir user
@@ -36777,7 +36789,8 @@ method form1 "move",1000,1000,10000, 5300
 method frame1 "move", 600,600, 10000-2*600, 4000
 method frame1controls "move", 60, 600,10000-2*660, 3200
 layer frame1controls {
-	cls 1
+	// cls 1
+	gradient 1,0
 }
 method frame2 "move", 600,600, 10000-2*600, 4000
 integer lastindex=-1
@@ -36787,8 +36800,16 @@ next
 for i=3 to 5
 	declare button1() over
 	method button1(i), "move", 4600, 200+1000*(i-3), 3000, 600
+	method button1(i), "curve", 0.3
 next
 max=5
+crlf={
+}
+for i=0 to 5
+with button1(i), "tooltip", "M2000"+crlf+"This is a tooltip for button "+i
+next
+with frame1, "tooltip", "click me please"
+with frame2, "tooltip", "do not click me :)"
 with frame1, "visible" as visible, "tabstop", false
 with frame2, "visible" as visible2, "tabstop", false
 with frame1controls, "visible" as visible3, "tabstop", false
@@ -36859,6 +36880,7 @@ function frame1controls.click {
 		call local restroreFocus()
 	}
 	if lastindex<>-1 then
+		with frame1controls, "tooltip",""
 		declare button1() remove lastindex
 		lastindex=-1
 	end if
@@ -36876,12 +36898,7 @@ function frame1.click {
 		if not visible3 then visible3=true: restart
 		call local restroreFocus()
 	}
-	if lastindex<>-1 then
-		declare button1() remove lastindex
-		lastindex=-1
-	end if
 	refresh
-
 }
 function frame2.GotFocus {
 	if not visible3 then exit sub
@@ -36923,6 +36940,9 @@ function form1.click {
 }
 function button1.click( new index) {
 	with button1(index), "caption" as new cap$
+	// index may not be the same if we delete something from the middle
+	with frame1controls, "tooltip", "clickme to erase "+cap$
+	rem with frame1, "tooltip", "clickme to erase "+cap$
 	lastindex=index
 	print "("+index +") "+ cap$
 	refresh
@@ -37194,6 +37214,8 @@ METHOD FORM1 "SHOW", 1
 declare FORM1 NOTHING
 }
 MODULE NINEBUTTONS {// updated (now form has some code to support better this buttons - see the hovet function)
+// THESE ARE THE FAMUS NINE PATCH BUTTONS
+
 Enum UcsNineButtonStateEnum {
     ucsBstNormal = 0
     ucsBstHover = 1
@@ -37266,8 +37288,13 @@ for i=0 to 14
 	ButtonTextFlags(ucsBstPressed)=2^random(1, 6)
 	Method Button(i+15), "move", 6000,1000+630*i, 4000, 600
 	With Button(i+15), "Style", i+16, "ButtonTextFlags", ucsBstNormal @ ucsBflHorRight
+	With Button(i), "tooltip", "hello from "+i
+	With Button(i+15), "tooltip", "hello from "+(i	+15)
 Next i
 Layer Form1 {Gradient 11, #7777aa}
+function Button.GetHwnd(new Index, &A) {
+	layer Form1 {A=Hwnd}
+}
 function form1.click {
 	layer form1 {
 		Gradient random(7,14), #7777aa
@@ -37282,124 +37309,137 @@ method FORM1 "SHOW", 1
 
 declare FORM1 nothing
 }
-MODULE SHAPEEX {Enum seShapeConstants {
-	seShapeRectangle = 0
-	seShapeSquare
-	seShapeOval
-	seShapeCircle
-	seShapeRoundedRectangle
-	seShapeRoundedSquare
-	seShapeTriangleEquilateral
-	seShapeTriangleIsosceles
-	seShapeTriangleScalene
-	seShapeTriangleRight
-	seShapeRhombus
-	seShapeKite
-	seShapeDiamond
-	seShapeTrapezoid
-	seShapeParalellogram
-	seShapeSemicircle
-	seShapeRegularPolygon
-	seShapeStar
-	seShapeJaggedStar
-	seShapeHeart
-	seShapeArrow
-	seShapeCrescent
-	seShapeDrop
-	seShapeEgg
-	seShapeLocation
-	seShapeSpeaker
-	seShapeCloud
-	seShapeTalk
-	seShapeShield
-	seShapePie = 29
+MODULE SHAPEEX {ENUM SESHAPECONSTANTS {
+	SESHAPERECTANGLE = 0
+	SESHAPESQUARE
+	SESHAPEOVAL
+	SESHAPECIRCLE
+	SESHAPEROUNDEDRECTANGLE
+	SESHAPEROUNDEDSQUARE
+	SESHAPETRIANGLEEQUILATERAL
+	SESHAPETRIANGLEISOSCELES
+	SESHAPETRIANGLESCALENE
+	SESHAPETRIANGLERIGHT
+	SESHAPERHOMBUS
+	SESHAPEKITE
+	SESHAPEDIAMOND
+	SESHAPETRAPEZOID
+	SESHAPEPARALELLOGRAM
+	SESHAPESEMICIRCLE
+	SESHAPEREGULARPOLYGON
+	SESHAPESTAR
+	SESHAPEJAGGEDSTAR
+	SESHAPEHEART
+	SESHAPEARROW
+	SESHAPECRESCENT
+	SESHAPEDROP
+	SESHAPEEGG
+	SESHAPELOCATION
+	SESHAPESPEAKER
+	SESHAPECLOUD
+	SESHAPETALK
+	SESHAPESHIELD
+	SESHAPEPIE = 29
 }
 
-Enum seBackStyleConstants {
-	seTransparent = 0
-	seOpaque
+ENUM SEBACKSTYLECONSTANTS {
+	SETRANSPARENT = 0
+	SEOPAQUE
 }
 
 
-Enum seFillStyle2Constants {
-	seFSSolid   =0
-	seFSTransparent
+ENUM SEFILLSTYLE2CONSTANTS {
+	SEFSSOLID   =0
+	SEFSTRANSPARENT
    
 }
-Enum BorderStyleConstants {
-	BSTransparent=0
-	BSSolid = 1
-	BSDash = 2
-	BSDot = 3
-	BSDashDot = 4
-	BSDashDotDo = 5
-	BSInsideSolid = 6
+ENUM BORDERSTYLECONSTANTS {
+	BSTRANSPARENT=0
+	BSSOLID = 1
+	BSDASH = 2
+	BSDOT = 3
+	BSDASHDOT = 4
+	BSDASHDOTDO = 5
+	BSINSIDESOLID = 6
 }
 
 
-Enum seQualityConstants {
-   seQualityLow = 0
-   seQualityHigh
+ENUM SEQUALITYCONSTANTS {
+   SEQUALITYLOW = 0
+   SEQUALITYHIGH
 }
 
-Enum SEStyle3DConstants {
-    seStyle3DNone = 0
-    seStyle3DLight = 1
-    seStyle3DShadow = 2
-    seStyle3DBoth = 3
+ENUM SESTYLE3DCONSTANTS {
+    SESTYLE3DNONE = 0
+    SESTYLE3DLIGHT = 1
+    SESTYLE3DSHADOW = 2
+    SESTYLE3DBOTH = 3
 }
 
-Enum SEStyle3DEffectConstants {
-    seStyle3EffectAuto = 0
-    seStyle3EffectDiffuse = 1
-    seStyle3EffectGem = 2
+ENUM SESTYLE3DEFFECTCONSTANTS {
+    SESTYLE3EFFECTAUTO = 0
+    SESTYLE3EFFECTDIFFUSE = 1
+    SESTYLE3EFFECTGEM = 2
 }
 
-Enum SEFlippedConstants {
-    seFlippedNo = 0
-    seFlippedHorizontally = 1
-    seFlippedVertically = 2
-    seFlippedBoth = 3
+ENUM SEFLIPPEDCONSTANTS {
+    SEFLIPPEDNO = 0
+    SEFLIPPEDHORIZONTALLY = 1
+    SEFLIPPEDVERTICALLY = 2
+    SEFLIPPEDBOTH = 3
 }
 
 
 
 DIM X(28), Y(28)
-for i=0 to 27 step 4 : X(i)=1000:X(i+1)=4000:X(i+2)=7000:X(i+3)=10000:Next
-for i=0 to 3
-	 Y(i)=0:Y(i+4)=2000:Y(i+8)=4000: Y(i+12)=6000:Y(i+16)=8000:Y(i+20)=10000:Y(i+24)=12000 
-Next
-z=Y()
-z*=0.85
-z+=1200
-z=X()
-z+=1000
+FOR I=0 TO 27 STEP 4 : X(I)=1000:X(I+1)=4000:X(I+2)=7000:X(I+3)=10000:NEXT
+FOR I=0 TO 3
+	 Y(I)=0:Y(I+4)=2000:Y(I+8)=4000: Y(I+12)=6000:Y(I+16)=8000:Y(I+20)=10000:Y(I+24)=12000 
+NEXT
+Z=Y()
+Z*=0.85
+Z+=1200
+Z=X()
+Z+=1000
 DECLARE FORM1 FORM
-DECLARE Button(28) TYPE "M2000.ShapeEx" FORM FORM1
-Method FORM1,"move", 1000, 1000, 14000, 14000
-def rc()=color(random(255),random(255),random(255))
-for i=0 to 27
-	Method Button(i), "move",x(i),y(i), 900, 1200
-	With Button(i), "Style", i+1, "Clickable",true, "Shape", i, "Quality",seQualityHigh
-	With Button(i),  "Style3DEffect", seStyle3EffectDiffuse,"Style3D",seStyle3DBoth
-	With Button(i),"BorderColor", 15,  "BorderWidth", 4, "FillStyle", seFSSolid, "Fillcolor", rc()
-	With Button(i),"Shift", random(0,1)*30, "CurvingFactor", 5, "Vertices", 7, "BorderStyle", BSDot
-	Next i
-Layer Form1 {Gradient 11, #7777aa}
-function form1.click {
-	layer form1 {
-		Gradient random(7,14), #7777aa
-		refresh
+DECLARE BUTTON(28) TYPE "M2000.SHAPEEX" FORM FORM1
+METHOD FORM1,"MOVE", 1000, 1000, 14000, 14000
+DEF RC()=COLOR(RANDOM(255),RANDOM(255),RANDOM(255))
+NL={
+}
+FOR I=0 TO 27
+	METHOD BUTTON(I), "MOVE",X(I),Y(I), 900, 1200
+	WITH BUTTON(I), "STYLE", I+1, "CLICKABLE",TRUE, "SHAPE", I, "QUALITY",SEQUALITYHIGH
+	WITH BUTTON(I),  "STYLE3DEFFECT", SESTYLE3EFFECTDIFFUSE,"STYLE3D",SESTYLE3DBOTH
+	WITH BUTTON(I),"BORDERCOLOR", 15,  "BORDERWIDTH", 4, "FILLSTYLE", SEFSSOLID, "FILLCOLOR", RC()
+	WITH BUTTON(I),"SHIFT", RANDOM(0,1)*30, "CURVINGFACTOR", 5, "VERTICES", 7, "BORDERSTYLE", BSDOT, "TOOLTIP", "TITLE"+NL+"CHECK THIS "+I
+	NEXT I
+LAYER FORM1 {GRADIENT 11, #7777AA
+THREAD {
+MOVE RANDOM(SCALE.X), RANDOM(SCALE.Y): DRAW TO RANDOM(SCALE.X), RANDOM(SCALE.Y), RANDOM(0,7)
+} AS ANY INTERVAL 100
+}
+
+FUNCTION BUTTON.GETHWND(NEW INDEX, &A) {
+	LAYER FORM1 {A=HWND}  ' SO WE GET HWND OF FORM1
+}
+FUNCTION FORM1.CLICK {
+	LAYER FORM1 {
+		GRADIENT RANDOM(7,14), #7777AA
+		REFRESH
 	}
 }
-function Button.click(index) {
-	with Button(index), "RotationDegrees" as A, "FillStyle" as B
-	A=A+5  // you can't use A++ because A is an object
+FUNCTION BUTTON.CLICK(NEW INDEX) {
+	WITH BUTTON(INDEX), "ROTATIONDEGREES" AS A, "FILLSTYLE" AS B
+	A=A+5  // YOU CAN'T USE A++ BECAUSE A IS AN OBJECT
 	B=1-B
-	Print "Click "; index
-	refresh
+	PRINT "CLICK "; INDEX
+	REFRESH
 }
+
 METHOD FORM1 "SHOW", 1
+THREADS ERASE
+WAIT 100
 
 DECLARE FORM1 NOTHING
 }
@@ -42832,32 +42872,57 @@ MODULE DOT {Module dot_product {
 }
 Module dot_product
 }
-MODULE STRLEN {module  String_length {
+MODULE STRLEN {REM { // old program
+	module  String_length {
+		A$=format$("J\u0332o\u0332s\u0332e\u0301\u0332")
+		Print Len(A$) = 9  ' true Utf-16LE
+		Print Len.Disp(A$) = 4 \\ display length
+		Buffer Clear Mem as Byte*100
+		\\ Write at memory at offset 0 or address Mem(0)
+		Return Mem, 0:=A$
+		Print Eval$(Mem, 0, 18)
+		For i=0 to 17 step 2
+		      \\ print hex value and character
+		      Hex Eval(Mem, i as integer), ChrCode$(Eval(Mem, i as integer))
+		Next i
+		Document B$=A$
+		\\ encode to utf-8 with BOM (3 bytes 0xEF,0xBB,0xBF)
+		Save.Doc B$, "Checklen.doc", 2
+		Print Filelen("Checklen.doc")=17
+		\\ So length is 14 bytes + 3 the BOM
+		Mem=Buffer("Checklen.doc")
+		Print len(Mem)=17 // len works for buffers too - unit byte
+		// version 12 can handle strings without suffix $
+		C=eval$(mem, 3, 14) // from 4th byte get 14 bytes in a string
+		Print len(C)*2=14 ' bytes   // len()) for strings return double type of words (can return 0.5)
+		C=string$(C as utf8dec) ' decode bytes from utf8 to utf16LE
+		Print len(C)=9, C=A$, Len.Disp(C)=4
+		Print C
+		Report 2, C  // proportional print on console - for text center justified rendering (2 - center)
+	}
+	String_length
+}
+
+
+module  String_length {
 	A$=format$("J\u0332o\u0332s\u0332e\u0301\u0332")
 	Print Len(A$) = 9  ' true Utf-16LE
 	Print Len.Disp(A$) = 4 \\ display length
 	Buffer Clear Mem as Byte*100
-	\\ Write at memory at offset 0 or address Mem(0)
-	Return Mem, 0:=A$
-	Print Eval$(Mem, 0, 18)
-	For i=0 to 17 step 2
-	      \\ print hex value and character
-	      Hex Eval(Mem, i as integer), ChrCode$(Eval(Mem, i as integer))
+	Buffer  Mem2 as Integer*50
+	Mem[0]=A$
+	Print Eval$(Mem, 0, 18)  ' 18 bytes from Mem[0] as a string
+	Mem2[0]=Mem
+	For i=0 to 8
+	      Hex Mem2[i], ChrCode$(Mem2[i])
 	Next i
-	Document B$=A$
-	\\ encode to utf-8 with BOM (3 bytes 0xEF,0xBB,0xBF)
-	Save.Doc B$, "Checklen.doc", 2
-	Print Filelen("Checklen.doc")=17
-	\\ So length is 14 bytes + 3 the BOM
-	Mem=Buffer("Checklen.doc")
-	Print len(Mem)=17 // len works for buffers too - unit byte
-	// version 12 can handle strings without suffix $
-	C=eval$(mem, 3, 14) // from 4th byte get 14 bytes in a string
-	Print len(C)*2=14 ' bytes   // len()) for strings return double type of words (can return 0.5)
-	C=string$(C as utf8dec) ' decode bytes from utf8 to utf16LE
-	Print len(C)=9, C=A$, Len.Disp(C)=4
-	Print C
-	Report 2, C  // proportional print on console - for text center justified rendering (2 - center)
+	// Check as UTF8 (UTFEnc and UTF8Dec are selections for string$())
+	Print len(string$(A$ as UTF8Enc))*2=14 ' bytes
+	Locale 1033
+	// to ANSI and back tp UTF16LE
+	Print chr$(str$(A$))="J_o_s_e´_"
+	Print A$;POS=4  '  J̲o̲s̲é̲True
+	Print String$(A$ as Json)="J\u0332o\u0332s\u0332e\u0301\u0332"
 }
 String_length
 }
@@ -43210,7 +43275,7 @@ Module StarTrek {
 	226 PRINT"                    THE USS ENTERPRISE --- NCC-1701"
 	227  CLS #226622, ROW: PEN #00FF00: BOLD 0
 	260 REM CLEAR 600
-	261 SET SWITCHES "+DIM +FOR"
+	261 BASIC ' new statement for M2000
 	270 Z$="                         "
 	330 DIM G(8,8),C(9,2),K(3,3),N(3),Z(8,8),D(8)
 	370 T=INT(RND(1)*20+20)*100:T0=T:T9=25+INT(RND(1)*10):D0=0:E=3000:E0=E
@@ -43478,7 +43543,7 @@ Module StarTrek {
 	6290 PRINT:PRINT:IF B9=0THEN 6360
 	6310 PRINT"THE FEDERATION IS IN NEED OF A NEW STARSHIP COMMANDER"
 	6320 PRINT"FOR A SIMILAR MISSION -- IF THERE IS A VOLUNTEER,"
-	6330 INPUT"LET HIM STEP FORWARD AND ENTER 'AYE':";A$:IF A$="AYE" THEN 10
+	6330 INPUT"LET HIM STEP FORWARD AND ENTER 'AYE':";A$:IF UCASE$(A$)="AYE" THEN 10
 	6360 IF OLD_BOLD THEN BOLD 1 ELSE BOLD 0
 	6365 END
 	6370 PRINT"CONGRULATION, CAPTAIN!  THEN LAST KLINGON BATTLE CRUISER"
@@ -43639,7 +43704,7 @@ Module StarTrek {
 	9370 END FUNCTION
 }
 try {startrek}
-Set switches "-dim -for"
+//Set switches "-dim -for"
 IF MODULE(INFO) THEN KEYBOARD "INFO"+CHR$(13)
 }
 MODULE LONGP {Module LongPrimes {
@@ -45805,36 +45870,39 @@ Print Polar(abs(a), arg(a))=(8, -3i)
 ? str$((8,-3i) ,"0.00")
 }
 MODULE MANDELBROT {Module Mandelbrot(x=0&,y=0&,z=1&) {
-      If z<1  then z=1
-      If z>16 then z=16
-      Const iXmax=32*z
-      Const iYmax=26*z
-      Def single Cx, Cy, CxMin=-2.05, CxMax=0.85, CyMin=-1.2,  CyMax=1.2
-      Const PixelWidth=(CxMax-CxMin)/iXmax, iXm=(iXmax-1)*PixelWidth
-      Const PixelHeight=(CyMax-CyMin)/iYmax,Ph2=PixelHeight/2
-      Const Iteration=25
-      Const EscRadious=2.5, ER2=EscRadious**2
-      Def single preview
-      preview=iXmax*twipsX*(z/16)
-      Def long yp, xp, dx, dy, dx1, dy1
-      Let dx=twipsx*(16/z), dx1=dx-1
-      Let dy=twipsy*(16/z), dy1=dy-1
-      yp=y
-      For iY=0 to (iYmax-1)*PixelHeight step PixelHeight {
-            Cy=CyMin+iY
-            xp=x
-            if abs(Cy)<Ph2 Then Cy=0
-            For iX=0 to iXm Step PixelWidth {
-                  Let  Cx=CxMin+iX,Zx=0,Zy=0,Zx2=Zx**2,Zy2=Zy**2
-                  For It=Iteration to 1 {Let Zy=2*Zx*Zy+Cy,Zx=Zx2-Zy2+Cx,Zx2=Zx**2,Zy2=Zy**2 :if Zx2+Zy2>ER2 Then exit
-                  }
-                  if it>13 then {it-=13} else.if it=0 then SetPixel(xp,yp,0): xp+=dx : continue
-                  it*=10:SetPixel(xp,yp,color(it, it,255)) :xp+=dx
-            } : yp+=dy
-      }
-      Sub SetPixel()
-            move number, number: fill  dx1, dy1, number
-      End Sub
+    If z<1  then z=1
+    If z>16 then z=16
+    Const iXmax=32*z
+    Const iYmax=26*z
+    Def single Cx, Cy, CxMin=-2.05, CxMax=0.85, CyMin=-1.2,  CyMax=1.2
+    Const PixelWidth=(CxMax-CxMin)/iXmax, iXm=(iXmax-1)*PixelWidth
+    Const PixelHeight=(CyMax-CyMin)/iYmax,Ph2=PixelHeight/2
+    Const Iteration=25
+    Const EscRadious=2.5, ER2=EscRadious**2
+    Def single preview
+    preview=iXmax*twipsX*(z/16)
+    Def long yp, xp, dx, dy, dx1, dy1
+    Let dx=twipsx*(16/z), dx1=dx-1
+    Let dy=twipsy*(16/z), dy1=dy-1
+     d=dx/twipsX
+    yp=y
+    iXm1 = iXm-PixelHeight*(z-1)/16
+    iYmax1=iYmax-PixelHeight*(z-1)/32
+    
+    WIDTH  8/Z {
+	For iY=0 to (iYmax1-1)*PixelHeight step PixelHeight {
+    		Cy=CyMin+iY
+    		xp=x
+    		if abs(Cy)<Ph2 Then Cy=0
+    		For iX=0 to iXm1 step PixelWidth {
+    			Let  Cx=CxMin+iX,Zx=0,Zy=0,Zx2=Zx**2,Zy2=Zy**2
+    			For It=Iteration to 1 {Let Zy=2*Zx*Zy+Cy,Zx=Zx2-Zy2+Cx,Zx2=Zx**2,Zy2=Zy**2 :if Zx2+Zy2>ER2 Then exit
+    		}
+    		if it>13 then {it-=13} else.if it=0 then pset ! 0,xp,yp: xp+=dx : continue
+    		it*=10:PSET ! color(it, it,255), xp,yp :xp+=dx
+    		} : yp+=dy
+            	}
+	}
 }
 Cls 1,0
 sz=(1,2,4,8,16)
@@ -49630,10 +49698,12 @@ method form1,"MenuItem","Close", IdD:=2000
 With form1, "titleheight" as titleheight, "id" as Id(), "MenuEnabled" as MenuEnabled(), "ListSelected" as Checked()
 long ret
 module EnableRotation {
+	ToolTip$="Click to Start"
 	MenuEnabled(tag1)=false
 	MenuEnabled(tag1+1)=true
 }
 module DisableRotation {
+	ToolTip$="Click to Stop"
 	MenuEnabled(tag1+1)=false
 	MenuEnabled(tag1)=true
 }
@@ -49745,8 +49815,8 @@ method InpAngleX, "AccKey",  "X", opcode:=1
 method InpAngleY, "AccKey",  "Y", opcode:=1
 method InpAngleZ, "AccKey",  "Z", opcode:=1
 method Form1, "AccKey",  chr$(13), opcode:=1
-
-With image1, "TabStop", false, "Default", true
+With image1, "TabStop", false, "Default", true, "ToolTip" as ToolTip$
+ToolTip$="Click to Stop"
 With form1, "visible" as visible, "blink", 300, "blinktimes", 12, "NoFocus" as ReadNoFocus
 Boolean Free
 
@@ -49844,7 +49914,11 @@ spY$	=dec1$(angleY)
 spZ$	=dec1$(angleZ)
 boolean skiponce
 function image1.click {
-	if skiponce then skiponce=false else call local scenedrive
+	if skiponce then
+		skiponce=false
+	else
+		call local scenedrive
+	end if
 }
 function Form1.enter {
 	skiponce=true
@@ -49977,5 +50051,325 @@ MODULE BBC {// BASED FROM PAGE 122 OF BBC MICRO MANUAL (LINE 0 ADDED FOR M2000)
 130 RESTORE 80
 140 READ Α$, Β, Γ$
 150 PRINT Α$, Β, Γ$
+}
+MODULE SCALE {MODULE AQUARIUS {
+	BASIC
+	// SOUND() waas a statement for Aquarius Basic
+	// https://rosettacode.org/wiki/Musical_scale#Aquarius_BASIC
+	FOR I=1 TO 8
+		READ F
+		P=285*200/F
+		SOUND(F, P)
+	NEXT
+	
+	SUB SOUND(A, B)
+		TONE B, A
+		PRINT B, A
+	END SUB
+	DATA 262, 294, 330, 349, 392, 440, 494, 523
+}
+volume 20
+AQUARIUS
+
+TUNE 200, "C3DEFGAC4"
+VOLUME 80
+PLAY 0
+SCORE  1,100, "C3DEFGAC4"
+SCORE  2,150, "C3DEFGAC4"
+SCORE  3, 50, "C4v64 @2D @2ev127 @2f @2g @2a @2b @2c5"
+PLAY 1, 5,2, 10, 3, 22
+IF RANDOM(1,2)=1 THEN
+	PRINT "PRESS SPACE BAR TO STOP OR PRESS A TO PLAY SCORE 1 AGAIN"
+	WHILE NOT KEYPRESS(32)  AND PLAYSCORE{
+		WAIT 1
+		PRINT OVER $(0,8), PLAYNOTE(1),PLAYNOTE(2), PLAYNOTE(3),  PLAYNOW(1),PLAYNOW(2), PLAYNOW(3), PLAYVALUE(1),PLAYVALUE(2), PLAYVALUE(3), PLAYVOLUME(1),PLAYVOLUME(2), PLAYVOLUME(3)
+		PRINT
+		If KEYPRESS(65) THEN SCORE  1, 200, "C3DEFGAC4":PLAY 1, 5
+	}
+	PLAY 0
+END IF
+}
+MODULE KILLTHEM {Declare GetCurrentProcessId Lib "kernel32.GetCurrentProcessId" As Long
+// this is our ProcessId
+ourPID=GetCurrentProcessId()
+// get current directrory
+m$=dir$
+// set TEMP folder as current folder
+dir temporary$
+// empty menu array
+menu
+// using + we send filenames to menu$() array
+files + "m2000"
+if menuitems>0 else menu: exit
+// We get a copy (menu$() is not an array is a function)
+// when we use it without parameter return a an array
+a=menu$()
+menu
+k=each(a)
+while k
+	if array(k)<>ourPID then
+		Print "Erase "+array$(k)
+		// now we kill the PID and erase the (pid).M2000
+		dos "taskkill /F /PID "+array$(k);
+		wait 100
+		dos "del "+quote$(dir$+array$(k)+".m2000");
+	end if
+end while
+// delete all tmp files which are not locked
+// because one tmp file produced by the VB6 dll, and we didn't now which are
+dos "del  /A:-R "+quote$(temporary$+"*.tmp");
+dir m$
+
+
+}
+MODULE FINITE_STATE {Rem {
+	FINITE STATE MASCHINE
+	Machine Up
+	State: ready
+		1.deposit
+		2.quit
+		3.select
+		4.refund
+		5.remove
+	Choose :1
+	State: waiting
+	Choose :3
+	State: dispense
+	Choose :5
+	State: ready
+	Choose :1
+	State: waiting
+	Choose :4
+	State: refunding
+	State: ready
+	Choose :2
+	State: exit
+}
+Module FSM {
+	flush
+	Function Logging(New t as string, NewLine as boolean=true, terminal as boolean=true) {
+		' this called only using Call Local (like it is part of the calling module)
+		If terminal Then If NewLine then Print t else Print t;
+		If F>0 then
+			if NewLine then Print #F, t else Print #F, t;
+		end if 
+	}
+	CLASS FSM {
+	Events "log"
+	Private:
+		String ResetState
+		StateList=List
+		TransitionList=List 
+	Public:
+		Property CurState {
+			value
+		}=""
+		Module AddState (State as string) {
+			State=filter$(State, ";")
+			If not Exist(.StateList, State) then Append .StateList, State
+		}
+		Module AddTransition (State as string, Transition as string, StateTo as string) {
+			State=filter$(State, ";")
+			StateTo=filter$(StateTo, ";")
+			Transition=filter$(Transition, ";")
+			If State="" or StateTo="" then Error "Need State from -> State to"
+			If not Exist(.StateList, State) Then Error "State (from) ";State;" not defined"
+			If not Exist(.StateList, StateTo) Then Error "State (to) ";StateTo;" not defined"
+			If not Exist(.TransitionList, State+";"+Transition) then
+			 	Append .TransitionList, State+";"+Transition:=StateTo
+			else
+				Error "Transtition can't changed"
+			End if
+		}
+		Module SetResetState  (State as string){
+			State=filter$(State, ";")
+			If not Exist(.StateList, State) then Error "State not defined yet"
+			.ResetState<=State
+		}
+		Module Reset {
+			Call Event "Log", "Machine Up"
+			.[CurState]<=.ResetState
+		}
+		Module ShowState {
+			Call Event "Log" "State: "+.[CurState]
+		}
+		Function Action(Transition as string) {
+			Transition=filter$(Transition, ";")
+			=false
+			If Exist(.TransitionList, .[CurState]+";"+Transition) then
+				=True
+				do
+		 			.[CurState]<=Eval$(.TransitionList)
+		 			.ShowState
+				when Exist(.TransitionList, .[CurState]+";")
+			End if		
+		}
+	}
+	
+	Group WithEvents Model=FSM()
+	Function Model_Log (new that) {
+		Call Local Logging(that)
+	}
+	Long i, F
+	Open "Output.txt" for wide output as #F	
+	Call Local Logging("FINITE STATE MASCHINE")
+	Gosub GetData
+	do
+		read thisstate
+		if thisstate="" then exit
+		Model.AddState thisstate
+	always
+	Choice=list
+	N=1
+	do
+		read st1, tr1, st2
+		if st1="" then exit
+		pen 11 {Display(1)}
+		Model.AddTransition st1, tr1, st2
+		If tr1<>"" Then if not exist(Choice, tr1) then Append Choice, N:=tr1:N++
+	always
+	Model.SetResetState   ' value is on stack of values already
+	Model.Reset
+	Model.ShowState
+	Options()
+	do
+		Call Local Logging("Choose :", false)
+		Input "", I
+		Call Local Logging(""+I, ,false)
+		If I<0 or I>Len(Choice) then continue
+		if I=0 then
+			Options()
+		else.if Model.Action(Choice(I)) else
+			Call Local Logging("Bad choice "+I)
+			print "Cheat Mode:"
+			Gosub GetData2
+			do
+				read st1, tr1, st2
+				if st1=Model.CurState and tr1<>"" then
+					pen 15 {Display(0)}
+				end if
+			Until st1=""
+			flush
+			i=0
+			Model.ShowState
+		end if
+	Until I=2
+	Close #f
+	Win "Notepad", dir$+"Output.txt"
+	End
+	Sub Display(how)
+		local b=if$(tr1=""->"to an implicit transition", tr1)
+		Print Part st1;" → ";b;" → ";st2
+		if how=1 then Print Under else Print
+	End Sub
+	Sub Options()
+		local one =each(Choice)
+		while one
+			Call Local Logging("  "+eval$(one!)+"."+eval$(one))
+		end while
+	End Sub
+GetData:
+	Flush
+	Data "ready", "waiting", "exit","dispense","refunding", ""
+GetData2:	
+	Data "ready" , "deposit","waiting"
+	Data "ready", "quit", "exit"
+	Data "waiting","select","dispense"
+	Data "waiting","refund","refunding"
+	Data "dispense", "remove", "ready"
+	Data "refunding","","ready"
+	data "","",""
+	data "ready"
+	Return
+}
+FSM
+}
+MODULE MUSIC_NOTES {VOLUME 40
+// MP="D♭DE♭EFG♭GA♭AB♭B"
+// CTRL 3 -> ♭
+// OR  HOLD ALT THEN PRESS +266D  THEN RELEASE ALT
+NOTES=("C", "C#", "D","D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" )
+MP="D♭DD#EFG♭GG#AA#B"
+SCORE  1, 100, "C0"+MP+"C1"+MP+"C2"+MP+"C3"+MP+"C4"+MP+"C5"+MP+"C6"+MP+"C7"+MP+"C8"+MP+"C9"+MP
+PLAY 1, 5
+PRINT "MIDI NOTES IN BACKGROUND MUSIC THREADS"
+PRINT "PRESS SPACE BAR TO STOP"
+M=-1
+WAIT 50
+WHILE NOT KEYPRESS(32)  AND PLAYNOW(1) {
+	N=PLAYNOTE(1)
+	IF M<>N  AND N>-1  THEN
+		PRINT PART @((N MOD 12)*7-3), $(0,6), N,  "|";~(11);NOTES#VAL$(N MOD 12)+(N DIV 12) :M=N
+		IF (N+1) MOD 12 = 0 THEN PRINT
+	END IF
+	WAIT 0
+}
+PLAY 0
+PRINT
+PRINT "Done" 
+}
+MODULE TIMESTAMP {ZONES=TIME()
+REM {
+	N=EACH(ZONES)
+	WHILE N
+		MENU + EVAL$(N!)
+	END WHILE
+	MENU !
+	IF MENU>0 THEN PRINT MENU$(MENU): CLIPBOARD MENU$(MENU)
+}
+
+TIMESTAMP=LAMBDA -> {
+	DECLARE INFO INFORMATION
+	WITH INFO, "TIMEUP" AS T1
+	Z=TIME("UTC")*86400000
+	=LAMBDA INFO,N=T1-Z (W=0)->{
+		WITH INFO, "TIMEUP" AS T
+		LONG S=T-N+W*3600000, M=S DIV 60000, H =S DIV 3600000
+		S-=M*60000: M-=H*60
+		=STR$((H MOD 24)*10000+M*100+S/1000,"00:00:00.000")
+		}
+}()
+STOPTIMER=LAMBDA (FINISH=100)-> {
+	DECLARE INFO INFORMATION
+	WITH INFO, "TIMEUP" AS T1
+	=LAMBDA INFO,N=T1+FINISH (&OK)->{
+		WITH INFO, "TIMEUP" AS T
+		LONG S=N-T
+		LONG M=S DIV 60000, H =S DIV 3600000
+		IF S<0 THEN S=0:M=0:H=0:OK=TRUE
+		S-=M*60000: M-=H*60
+		=STR$((H MOD 24)*10000+M*100+S/1000,"00:00:00.000")
+		}
+}(30000)
+BOOLEAN EXIT_NOW
+ESCAPE OFF
+LOCALE 1033
+PRINT $(4)
+N=HEIGHT-ROW
+WHILE N<4
+	SCROLL UP
+	N++
+END WHILE
+CURSOR 0,HEIGHT-N
+DOUBLE
+TRY {
+	PRINT PART "*LOCAL TIME ZONE: ";TIME$() ;" UTC";STR$(ZONES(TIME$()), "+#0")
+	ITALIC 1	
+	PEN 0{WIDTH 8{COLOR  {PRINT PART $(7, WIDTH),"PRESS SPACE TO EXIT"}}}
+	PEN 15{PRINT PART $(7, WIDTH),"PRESS SPACE TO EXIT"}
+	ITALIC 0
+	PRINT
+	PRINT PART $(6, 10),"UTC TIME", "TIME COUNT", "LOCAL TIME*", $(6, 20), "LOCAL TIME FROM READ ONLY:  NOW"
+	PRINT UNDER
+	EVERY 1000/30 {
+		PRINT OVER $(6, 10), TIMESTAMP(), STOPTIMER(&EXIT_NOW), TIMESTAMP(ZONES(TIME$())), $(6, 20), NOW
+		IF KEYPRESS(32) OR EXIT_NOW THEN EXIT
+	}
+	PRINT $(0),
+}
+NORMAL
+PRINT
+PRINT
+ESCAPE ON
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
