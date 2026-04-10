@@ -139,7 +139,7 @@ End If
 End If
 If Cancel < 1 Then
 If Not MayQuit Then Cancel = -1: Exit Sub
-Dim f As Form, I As Long, F1 As GuiM2000, nook As Long
+Dim f As Form, i As Long, F1 As GuiM2000, nook As Long
 
 NERR = True: NOEXECUTION = True
 ExTarget = True: INK$ = Chr(27): UKEY$ = Chr$(27)
@@ -151,8 +151,8 @@ End If
 End If
 
 Set Form3AppIcon = LoadPicture("")
-For I = Forms.count - 1 To 0 Step -1
-Set f = Forms(I)
+For i = Forms.Count - 1 To 0 Step -1
+Set f = Forms(i)
 Set f.icon = LoadPicture("")
 If TypeOf f Is GuiM2000 Then
     Set F1 = f
@@ -177,7 +177,7 @@ If TypeOf f Is GuiM2000 Then
 
 End If
 If nook Then Cancel = True: Exit For
-Next I
+Next i
 
 Set f = Nothing
 If Not nook Then Cancel = False
@@ -207,10 +207,10 @@ MyDoEvents
 
     End If
 On Error Resume Next
-For I = Forms.count - 1 To 0 Step -1
-Set f = Forms(I)
+For i = Forms.Count - 1 To 0 Step -1
+Set f = Forms(i)
 Unload f
-Next I
+Next i
 Set f = Nothing
 
 If Not ExtForm Is Nothing Then
@@ -347,19 +347,19 @@ DoEvents
 Sleep 5
 End If
 On Error Resume Next
-Dim I As Long
-For I = UBound(var()) To 0 Step -1: var(I) = 0&: Next I
+Dim i As Long
+For i = UBound(var()) To 0 Step -1: var(i) = 0&: Next i
 Finished = True
 End Sub
 Property Let ShowGui(RHS As Boolean)
-If Forms.count = 0 Then Exit Property
+If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
 If Form1.Top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).Top
 Else
 If Form1.WindowState = 0 Then
-If Not (Forms.count > 5) Then Form1.Visible = False
+If Not (Forms.Count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
@@ -548,11 +548,12 @@ timeBeginPeriod 1
         Set objref = New basetask
         Set objref.Owner = Form1.DIS
         mineHere$ = vbNullString 'HERE$
+        ProfErr.MARKONE
 End Sub
 
 Private Sub Class_Terminate()
 On Error Resume Next
-Dim Zero As basket, I As Long, zerocounter As Counters
+Dim Zero As basket, i As Long, zerocounter As Counters
 If nOpenGl.Ready Then
     nOpenGl.StopOpenGL
 End If
@@ -568,15 +569,15 @@ JUMPHERE:
 globalstack.Flush
 TerminateM2000
 terminatefinal
-For I = -2 To 1000
-    players(I) = Zero
-    Prefresh(I) = zerocounter
-Next I
-If Forms.count > 0 Then
-For I = Forms.count - 1 To 0
-Set Forms(I).icon = LoadPicture("")
-Unload Forms(I)
-Next I
+For i = -2 To 1000
+    players(i) = Zero
+    Prefresh(i) = zerocounter
+Next i
+If Forms.Count > 0 Then
+For i = Forms.Count - 1 To 0
+Set Forms(i).icon = LoadPicture("")
+Unload Forms(i)
+Next i
 End If
 ReleaseMem
 l_complete = False

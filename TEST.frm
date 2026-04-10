@@ -253,14 +253,14 @@ ElseIf switchview = 2 Then
         stackshow MyBaseTask
     ElseIf a = 4 Then
         If pagio$ = "GREEK" Then titl$ = "Καταγραφικό Λαθών" Else titl$ = "Error Log"
-        GoSub findwindow
+        GoSub FindWindow
         sHelp titl$, Errorlog.textDoc, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
         If Not Form4.Visible Then vHelp True
         Form4.label1.SelStartSilent = testpad.SelStart
         vHelp
     End If
 ElseIf a = 4 Then
-    GoSub findwindow
+    GoSub FindWindow
     sHelp gList2.HeadLine, testpad.Text, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
     If TestShowCode Then
         If Not Form4.Visible Then vHelp True
@@ -278,7 +278,7 @@ ElseIf a = 4 Then
 End If
 once = False
 Exit Sub
-findwindow:
+FindWindow:
     If Not Form4.Visible Then
         monitor = FindFormSScreen(Form1)
     Else
@@ -406,7 +406,7 @@ End If
 End Sub
 
 Private Sub Form_Load()
-Dim I As Long
+Dim i As Long
 Busy = True
 height1 = 5280 * DYP / 15
 width1 = 7860 * DXP / 15
@@ -552,6 +552,7 @@ End If
 
 End Sub
 Private Sub Form_Unload(Cancel As Integer)
+DestroyToolTip
 If Busy Then Cancel = True: Exit Sub
 testpad.Dereference
 Compute.Dereference
@@ -621,13 +622,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -672,7 +673,7 @@ End Sub
 
 
 Private Sub glist3_CheckGotFocus(Index As Integer)
-Dim s$, Z$
+Dim s$, z$
 gList4.SetFocus
 On Error GoTo there1
 If Index < 2 Then
@@ -682,24 +683,24 @@ vH_title$ = vbNullString
 s$ = Label(Index)
 If Index = 1 Then
    
-        Dim I As Long
+        Dim i As Long
         If MyBaseTask.ExistVar2(s$) Then
-            IsStr1 MyBaseTask, "Type$(" + s$ + ")", Z$
+            IsStr1 MyBaseTask, "Type$(" + s$ + ")", z$
             
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
-                sHelp "Static Variable", s$ & vbCrLf & "Type " + Z$, vH_x, vH_y
+                sHelp "Static Variable", s$ & vbCrLf & "Type " + z$, vH_x, vH_y
             Else
-                sHelp "Στατική Μεταβλητή", s$ & vbCrLf & "Τύπος " + Z$, vH_x, vH_y
+                sHelp "Στατική Μεταβλητή", s$ & vbCrLf & "Τύπος " + z$, vH_x, vH_y
             End If
         
-        ElseIf GetlocalVar(s$, I) Then
-            IsStr1 MyBaseTask, "Type$(" + s$ + ")", Z$
+        ElseIf GetlocalVar(s$, i) Then
+            IsStr1 MyBaseTask, "Type$(" + s$ + ")", z$
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
-                sHelp "Local Identifier", s$ & vbCrLf & "Type " + Z$, vH_x, vH_y
+                sHelp "Local Identifier", s$ & vbCrLf & "Type " + z$, vH_x, vH_y
             Else
-                sHelp "Τοπικό Αναγνωριστικό", s$ & vbCrLf & "Τύπος " + Z$, vH_x, vH_y
+                sHelp "Τοπικό Αναγνωριστικό", s$ & vbCrLf & "Τύπος " + z$, vH_x, vH_y
             End If
-        ElseIf GetGlobalVar(s$, I) Then
+        ElseIf GetGlobalVar(s$, i) Then
         If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
             sHelp "Global Identifier", s$, vH_x, vH_y
             
@@ -707,10 +708,10 @@ If Index = 1 Then
             sHelp "Γενικό Αναγνωριστικό", s$, vH_x, vH_y
             
             End If
-        ElseIf GetSub(s$, I) Then
+        ElseIf GetSub(s$, i) Then
             '
-            Z$ = Label(2)
-            If MaybeIsSymbol(Z$, "=") Then
+            z$ = Label(2)
+            If MaybeIsSymbol(z$, "=") Then
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
                 sHelp "New Identifier", s$, vH_x, vH_y
             Else
@@ -723,8 +724,8 @@ If Index = 1 Then
         ElseIf ismine(s$) Then
             fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128
         Else
-        Z$ = Label(2)
-        If MaybeIsSymbol(Z$, "=") Then
+        z$ = Label(2)
+        If MaybeIsSymbol(z$, "=") Then
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
                 sHelp "New Identifier", s$, vH_x, vH_y
             Else
@@ -745,10 +746,10 @@ vHelp
 End If
 Else
 If Index = 0 Then
-I = MyBaseTask.OriginalCode
+i = MyBaseTask.OriginalCode
 JUMPHERE:
 Dim aa As Long, aaa As String
-aa = I
+aa = i
 aaa = SBcode(aa)
 If Left$(aaa, 10) = "'11001EDIT" Then
 SetNextLine aaa
@@ -824,7 +825,7 @@ b.Right = gList4.WidthPixels
              End If
              'EXECUTED = False
               SetTextColor thisHDC, 0
-              b.top = b.Bottom - 1 * lastfactor
+              b.Top = b.Bottom - 1 * lastfactor
        
             FillBack thisHDC, b, &H777777
            
@@ -832,7 +833,7 @@ b.Right = gList4.WidthPixels
           
           
     SetTextColor thisHDC, gList4.ForeColor
-    b.top = b.Bottom - 1
+    b.Top = b.Bottom - 1
     FillBack thisHDC, b, 0
     End If
     If item = gList4.ListIndex Then
@@ -1016,7 +1017,7 @@ allheight = height1 * factor
 itemWidth = allwidth - 2 * borderleft
 itemwidth3 = itemWidth * 2 / 5
 itemwidth2 = itemWidth * 3 / 5 - borderleft
-move Left, top, allwidth, allheight
+move Left, Top, allwidth, allheight
 FontTransparent = False  ' clear background  or false to write over
 gList2.move borderleft, bordertop, itemWidth, bordertop * 3
 gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
@@ -1055,8 +1056,8 @@ Sub ByeBye()
 Unload Me
 End Sub
 Public Sub ResetPanelPos()
-Dim I As Long
-For I = 0 To 2: para(I) = 0: Next I
+Dim i As Long
+For i = 0 To 2: para(i) = 0: Next i
 lastpanel = 0
 End Sub
 Public Sub paneltitle(ByVal that As Long)
