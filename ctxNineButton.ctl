@@ -65,6 +65,7 @@ Event OLEDragOver(Data As Object, Effect As Long, Button As Integer, shift As In
 Event OLEGiveFeedback(Effect As Long, DefaultCursors As Boolean)
 Event OLESetData(Data As Object, DataFormat As Integer)
 Event OLEStartDrag(Data As Object, AllowedEffects As Long)
+Event GetHwnd(ByRef ValidHwnd As Long)
 
 '=========================================================================
 ' Public enums
@@ -493,7 +494,7 @@ Private Enum UcsNineButtonResIndex
     ucsIdxCardPurple
     ucsIdxCardFocus
 End Enum
-
+Private mtooltip As String, mHwnd As Long
 '=========================================================================
 ' Error handling
 '=========================================================================
@@ -683,6 +684,33 @@ End Property
 Property Let OLEDropMode(ByVal eValue As UcsNineButtonOleDropMode)
     UserControl.OLEDropMode = eValue
     PropertyChanged
+End Property
+Private Sub CheckToolTip()
+    Dim PropToolTipTitle As String, RHS As String
+    If mtooltip = "" Then Exit Sub
+    If mHwnd = 0 Then RaiseEvent GetHwnd(mHwnd)
+    If mHwnd = 0 Then Exit Sub
+    
+    RHS = mtooltip
+    
+    PropToolTipTitle = GetStrUntil(vbCrLf, RHS)
+    
+    If RHS = "" Then RHS = mtooltip
+    If RHS = "" Then RHS = "?"
+    If Not CreateToolTip(mHwnd, RHS, , PropToolTipTitle, , , , True) Then
+        Extender.ToolTipText = Left$(mtooltip, 80)
+    Else
+        Extender.ToolTipText = ""
+    End If
+End Sub
+Public Property Let ToolTip(ByVal RHS As String)
+    mtooltip = RHS
+    DestroyToolTip
+    Extender.ToolTipText = Left$(mtooltip, 80)
+    mHwnd = 0
+End Property
+Public Property Get ToolTip() As String
+    ToolTip = mtooltip
 End Property
 
 '== run-time =============================================================
@@ -1400,7 +1428,7 @@ Private Function pvPreparePicture(oPicture As StdPicture, ByVal clrMask As OLE_C
     Dim uInfo           As ICONINFO
     Dim baColorBits()   As Byte
     Dim bHasAlpha       As Boolean
-    Dim hDib            As Long
+    Dim hDIb            As Long
     Dim lpBits          As Long
     Dim hPrevDib        As Long
     Dim lIdx            As Long
@@ -1466,11 +1494,11 @@ Private Function pvPreparePicture(oPicture As StdPicture, ByVal clrMask As OLE_C
                         End If
                     End If
                 Else
-                    hDib = CreateDIBSection(hMemDC, uHdr, DIB_RGB_COLORS, lpBits, 0, 0)
-                    If hDib = 0 Then
+                    hDIb = CreateDIBSection(hMemDC, uHdr, DIB_RGB_COLORS, lpBits, 0, 0)
+                    If hDIb = 0 Then
                         GoTo QH
                     End If
-                    hPrevDib = SelectObject(hMemDC, hDib)
+                    hPrevDib = SelectObject(hMemDC, hDIb)
                     pvRenderPicture oPicture, hMemDC, 0, 0, lWidth, lHeight, 0, oPicture.Height, oPicture.Width, -oPicture.Height
                     If GdipCreateBitmapFromScan0(lWidth, lHeight, 4 * lWidth, PixelFormat32bppARGB, lpBits, hTempBitmap) <> 0 Then
                         GoTo QH
@@ -1515,9 +1543,9 @@ QH:
         Call SelectObject(hMemDC, hPrevDib)
         hPrevDib = 0
     End If
-    If hDib <> 0 Then
-        Call DeleteObject(hDib)
-        hDib = 0
+    If hDIb <> 0 Then
+        Call DeleteObject(hDIb)
+        hDIb = 0
     End If
     If uInfo.hbmColor <> 0 Then
         Call DeleteObject(uInfo.hbmColor)
@@ -2164,7 +2192,7 @@ EH:
     Resume QH
 End Function
 
-Private Function pvCreateDib(ByVal hMemDC As Long, ByVal lWidth As Long, ByVal lHeight As Long, hDib As Long) As Boolean
+Private Function pvCreateDib(ByVal hMemDC As Long, ByVal lWidth As Long, ByVal lHeight As Long, hDIb As Long) As Boolean
     Const FUNC_NAME     As String = "pvCreateDib"
     Dim uHdr            As BITMAPINFOHEADER
     Dim lpBits          As Long
@@ -2178,8 +2206,8 @@ Private Function pvCreateDib(ByVal hMemDC As Long, ByVal lWidth As Long, ByVal l
         .biHeight = -lHeight
         .biSizeImage = 4 * lWidth * lHeight
     End With
-    hDib = CreateDIBSection(hMemDC, uHdr, DIB_RGB_COLORS, lpBits, 0, 0)
-    If hDib = 0 Then
+    hDIb = CreateDIBSection(hMemDC, uHdr, DIB_RGB_COLORS, lpBits, 0, 0)
+    If hDIb = 0 Then
         GoTo QH
     End If
     '--- success
@@ -2376,7 +2404,7 @@ End Sub
 
 Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
     Const FUNC_NAME     As String = "UserControl_MouseMove"
-    
+    CheckToolTip
     On Error GoTo EH
     RaiseEvent MouseMove(Button, shift, ScaleX(X, ScaleMode, m_eContainerScaleMode), ScaleY(Y, ScaleMode, m_eContainerScaleMode))
     If Button = -1 Then

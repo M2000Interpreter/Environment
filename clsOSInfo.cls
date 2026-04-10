@@ -195,8 +195,8 @@ Private Declare Function NtOpenSymbolicLinkObject Lib "ntdll.dll" (LinkHandle As
 'Private Declare Function NtOpenDirectoryObject Lib "ntdll.dll" (DirectoryHandle As Long, ByVal DesiredAccess As Long, ObjectAttributes As OBJECT_ATTRIBUTES) As Long
 Private Declare Function NtClose Lib "ntdll.dll" (ByVal Handle As Long) As Long
 'Private Declare Function IsOS Lib "Shlwapi.dll" Alias "#437" (ByVal dwOS As Long) As Long
-Private Declare Function GetUserName Lib "advapi32.dll" Alias "GetUserNameW" (ByVal lpBuffer As Long, nsize As Long) As Long
-Private Declare Function GetComputerName Lib "kernel32.dll" Alias "GetComputerNameW" (ByVal lpBuffer As Long, nsize As Long) As Long
+Private Declare Function GetUserName Lib "advapi32.dll" Alias "GetUserNameW" (ByVal lpBuffer As Long, nSize As Long) As Long
+Private Declare Function GetComputerName Lib "kernel32.dll" Alias "GetComputerNameW" (ByVal lpBuffer As Long, nSize As Long) As Long
 Private Declare Function lstrlen Lib "kernel32.dll" Alias "lstrlenW" (ByVal lpString As Long) As Long
 
 Private Const MAX_PATH                  As Long = 260&
@@ -341,13 +341,13 @@ Private Sub Class_Initialize()
         Set colOS = oWMI.ExecQuery("Select * from Win32_OperatingSystem")
         
         For Each oOS In colOS
-            Pos = InStr(oOS.version, ".")
+            Pos = InStr(oOS.Version, ".")
             If Pos = 0 Then
-                osi.dwMajorVersion = CLng(oOS.version)
+                osi.dwMajorVersion = CLng(oOS.Version)
                 osi.dwMinorVersion = 0
                 osi.dwBuildNumber = 0
             Else
-                Ver = Split(oOS.version, ".")
+                Ver = split(oOS.Version, ".")
                 If UBound(Ver) = 1 Then
                     osi.dwMajorVersion = CLng(Ver(0))
                     osi.dwMinorVersion = CLng(Ver(1))
@@ -1794,5 +1794,7 @@ End Sub
 Property Get CapsLock() As Boolean
     CapsLock = CapsLockOn()
 End Property
-
+Property Get TimeUp() As Double
+    TimeUp = ProfErr.MARKTWO
+End Property
 

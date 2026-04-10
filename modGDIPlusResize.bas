@@ -101,8 +101,8 @@ Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, By
 Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As Long
 
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
 ' GDI Functions
 Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
 Private Declare Sub OleCreatePictureIndirect2 Lib "OleAut32.dll" Alias "OleCreatePictureIndirect" _
@@ -287,7 +287,7 @@ Private Declare Function GdipSaveImageToStream Lib "gdiplus" (ByVal Image As Lon
 Private Declare Function GdipLoadImageFromStream Lib "gdiplus" _
     (ByVal Stream As Any, ByRef Image As Long) As status
 Private Declare Function GdipCreateHBITMAPFromBitmap Lib "gdiplus" _
-    (ByVal bitmap As Long, ByRef hbmReturn As Long, _
+    (ByVal Bitmap As Long, ByRef hbmReturn As Long, _
     ByVal Background As Long) As status
 ' GDI and GDI+ constants
 Private Const PLANES = 14            '  Number of planes
@@ -735,7 +735,7 @@ End Sub
 Private Function MyMod(r1 As Single, po As Single) As Single
 MyMod = r1 - Fix(r1 / po) * po
 End Function
-Private Sub gdipResizeRotate(Scr As Object, Img As Long, Angle!, x1 As Long, y1 As Long, Width As Long, Height As Long, Optional mleft As Long = 0, Optional mtop As Long = 0, Optional bitmap As Boolean = False)
+Private Sub gdipResizeRotate(Scr As Object, Img As Long, Angle!, x1 As Long, y1 As Long, Width As Long, Height As Long, Optional mleft As Long = 0, Optional mtop As Long = 0, Optional Bitmap As Boolean = False)
     Dim clrMatrix(0 To 4, 0 To 4) As Single, Img2 As Long
     Dim hDC As Long, DestX As Long, DestY As Long, aType As PictureTypeConstants
     
@@ -785,7 +785,7 @@ Private Sub gdipResizeRotate(Scr As Object, Img As Long, Angle!, x1 As Long, y1 
            Height = Height / dv15
            
         End If
-    bitmap = True
+    Bitmap = True
      Else
         If orWidth = 0 Or orHeight = 0 Then
         orWidth = bWidth
@@ -849,14 +849,14 @@ Private Sub gdipResizeRotate(Scr As Object, Img As Long, Angle!, x1 As Long, y1 
             bLeft1 = bleft * SizeY
         End If
 
-            bitmap = False
+            Bitmap = False
      End If
     If orWidth = 0 Or orHeight = 0 Then Exit Sub
     
     If Width = 0 Or Height = 0 Then Exit Sub
     On Error Resume Next
       Dim ax As Long, ay As Long, ax1 As Long, ay1 As Long
-       If Not bitmap Then
+       If Not Bitmap Then
             With players(GetCode(Scr))
             If Angle >= 179.8 And Angle < 180.2 Then
                 Angle! = 180.21
@@ -898,7 +898,7 @@ Private Sub gdipResizeRotate(Scr As Object, Img As Long, Angle!, x1 As Long, y1 
     
     GdipSetInterpolationMode graphics, InterpolationModeHighQualityBicubic
     GdipSetPixelOffsetMode graphics, 0  '-4 * (bitmap = True)
-    If bitmap Then
+    If Bitmap Then
     '  GetImageDimension img, orWidth, orHeight
     GdipDrawImageRectRectI graphics, Img, -Width \ 2, -Height \ 2, Width, Height, mleft, mtop, orWidth, orHeight, UnitPixel, m_Attr
     Else
@@ -967,7 +967,7 @@ zoomfactor = zoomfactor / 100#
     Dim bWidth As Long, bHeight As Long, Size As Single, bleft As Long, btop As Long
     Dim bWidth1 As Long, bHeight1 As Long, bLeft1 As Long, bTop1 As Long, SizeY As Single
     
-    Dim shiftX As Long, shiftY As Long, swap As Long, bitmap As Boolean
+    Dim shiftX As Long, shiftY As Long, swap As Long, Bitmap As Boolean
     Dim ax As Long, ay As Long, ax1 As Long, ay1 As Long
  
     GetImageDimension Img, orWidth, orHeight, bleft, btop, bWidth, bHeight, shiftX, shiftY
@@ -1007,7 +1007,7 @@ zoomfactor = zoomfactor / 100#
     
         
     Else
-        bitmap = True
+        Bitmap = True
     Height = orHeight * zoomfactor
     Width = orWidth * zoomfactor
     End If
@@ -1024,7 +1024,7 @@ zoomfactor = zoomfactor / 100#
      GdipTranslateWorldTransform graphics, Scr.ScaleX(.XGRAPH, 1, 3), Scr.ScaleY(.YGRAPH, 1, 3), 1
      End If
     End With
-    If bitmap Then
+    If Bitmap Then
         GdipDrawImageRectRectI graphics, Img, -Width \ 2, -Height \ 2, Width, Height, mleft, mtop, orWidth, orHeight, UnitPixel, m_Attr
     Else
          GdipDrawImageRectRectI graphics, Img, -bWidth1 \ 2 - ax1, -bHeight1 \ 2 - ay1, bWidth1 + ax1 * 2, bHeight1 + ay1 * 2, bleft - ax, btop - ay, bWidth + ax * 2, bHeight + ay * 2, UnitPixel, m_Attr
@@ -1132,11 +1132,11 @@ Public Function LoadImageFromBuffer2(ResData() As Byte, Optional Width As Long =
             
             
             ' Initialise the hDC
-            InitDC hDC, hBitmap, BackColor, Width, Height
+            InitDC hDC, hBitmap, BackColor, Width - 2, Height - 2
             
             ' Resize the picture
-            gdipResizeToXYsimple Img, hDC, 0, 0, Width, Height, 0, 0, iX - 1, iY - 1
-            '                gdipResize Img, hDC, Width, Height
+          ' gdipResizeToXYsimple Img, hDC, 0, 0, Width, Height, 0, 0, iX - 1, iY - 1
+                         gdipResize Img, hDC, Width, Height
             GdipDisposeImage Img
             
             ' Get the bitmap back
