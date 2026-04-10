@@ -313,6 +313,15 @@ End Property
 Public Property Let Visible(ByVal RHS As Boolean)
 glistN.Visible = RHS
 End Property
+Public Property Get ToolTip() As String
+If glistN Is Nothing Then Exit Property
+ToolTip = glistN.ToolTip
+End Property
+
+Public Property Let ToolTip(ByVal vNewValue As String)
+If glistN Is Nothing Then Exit Property
+glistN.ToolTip = vNewValue
+End Property
 Public Sub SetFocus()
 On Error Resume Next
 glistN.SetFocus

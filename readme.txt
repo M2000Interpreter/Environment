@@ -1,59 +1,22 @@
 M2000 Interpreter and Environment
-Version 14 revision 14 active-X
+Version 14 revision 15 active-X
+Many Improvements
 
-1) BUG removed: In Trace code with Test form, you place the STOP statement in the Bottom textbox, and the execution move to console like cli, but in the running code, and you close the Test Form, at the exit the form not exist and by a mistake the system return to trace without the form, and this return the error "Object variable or With Block  variable not set" which is an error from VB6. This error not hang the M2000 Interpreter. Fixed.
-2) BUG removed: In print if we have some wrong encoding text (from binary data) happen sometime to find a wrong character which cannot pring (no data to handle the print) and stop advance to next character. Fixed
-3) Using
-	str$(wide_string_encoding) return narrow_string_encoding based on locale
-		and 
-	chr$(narrow_string_encoding) return wide_string_encoding based on locale
-   
-sometime think that these can be used for binary date, to get the ASCII equivalent, and letter to cut the string as a part and then return that part to binary data from wide to narrow bytes. But this isn't true. The chr$() get the binary data, for example 10 bytes and produce 20 bytes with 10 characters mapping the locale. So for some numbers the mapping return the same number. The problem is with the other numbers which turn to something else. If we make the data using the STR$() with same locale we have no problem. although the actual converted to wide data would be not the same with the pure data which have the same number as wide (2 bytes) and as narrow (1 byte) encoding.
-	So I write two encoders, one WIDE2BYTES and another BYTES2WIDE for using with STRING$() function which have many decoders/encoders.
+I am working on the Greek Manual and then I have to rewrote the English one. I think AI can help for this.
 
-This is an example of using BYTES2WIDE in STRING$() instead of CHR$() an prove why we get wrong data using the later:
+- ctrl 1 turn to upper case the caps lock, (not tongle, hust set upper case, if we mark text then text turn to upper case, with undo).
+- ctrl 2 turn to lower case the caps lock, (not tongle, hust set lower case, if we mark text then text turn to lower case, with undo).
 
-buffer b as byte*256
-for i=0 to 255:b[i]=i:next
-locale 1032
-z=chr$(eval$(b))
-faults=0
-for i=0 to 255
-	if b[i]<>chrcode(mid$(z,i+1,1)) then
-	 	// Print "Error "+i, b[i], chrcode(mid$(z,i+1,1)), mid$(z,i+1,1)
-	 	faults++
-	 end if
-next i
-Print "faults = ";faults  // 93 for locale 1032
+- ALt + Hex_digits now handle big numbers for codes above 5535 (for surrogates). Also work nice the input line at M2000 console.
 
-locale 1033
-z=chr$(eval$(b))
-faults=0
-for i=0 to 255
-	if b[i]<>chrcode(mid$(z,i+1,1)) then
-	 	// Print "Error "+i, b[i], chrcode(mid$(z,i+1,1)), mid$(z,i+1,1)
-	 	faults++
-	 end if
-next i
-Print "faults = ";faults  // 27 for locale 1033
+- ToolTip for all M2000 Controls (Unicode with title), and for Nine Patch buttons (CTXNINEBUTTON) and ShapeEx control. There are four without ToolTip, three of them have internal system for tooltips on set of data (UCPIECHART, UCCHARTAREA, UCCHARTBAR) plus one UCRADIALPROGRESS which has label for showing the type. 
 
-z=String$(eval$(b) as BYTES2WIDE)   // and reverse WIDE2BYTES
-faults=0
-for i=0 to 255
-	if b[i]<>chrcode(mid$(z,i+1,1)) then
-	 	faults++
-	 end if
-next i
-Print "faults = ";faults   /// 0 faults
-GoodWideData=Z
-// This is the real problem:
-// This return True, because each function of str$() and chr$() use the same locale.
-Print Eval$(b)=str$(chr$(Eval$(b)))
-// But the intermediate result, the WideData are not the same as the GoodWideData:
-Print GoodWideData = chr$(Eval$(b))   ' false
-// so if we get binary data and want to expnad them to Wide char for farher processing
-// we have to use the new decoder/encoder of String$() statement
+- PLAYVALUE(), PLAYNOTE(), PLAYVOLUME(), PLAYNOW() for the 16 voices of sound card, which return the current value of note (1 for 1/1 of base duration, to 6, for 1/32 of the hole note duration - (1-1/1, 2-1/2, 3-1/4, 4-1/8, 5-1/16, 6-1/32). PLAYNOTE() return -1 for pause or 0 to 119 for 120 notes, starting from C (10 octaves). PLAYVOLUME() return current volume for specific voice, from 0 to 127. PLAYNOW() return true if not finished yet. For the music score I found a bug for pauses and time delays, so now works perfect. Also I add the flat notes using the symbol ♭ which now we can insert using ctrl + 3 (same for # but Shift + 3).
 
+- IMAGE statement improved for quality
+- New LIST ERRORS (see HELP ERROR) for watching the errors (and those you never see like some which you hide using the Try { } block. Errors now stamped with time from the running period of current interpreter.
+
+- PSET now works with Width N { } using either circle as point or square using PSET ! or PSET!! (with one ! we print the square using center the current x and y, but the other one !! use the defined square as part of the screen, so the current x and y point to some point in that square
 
 
 

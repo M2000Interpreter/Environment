@@ -106,7 +106,7 @@ Private Declare Function InflateRect Lib "user32" (lpRect As RECT, ByVal X As Lo
 
 Private Type RECT
     Left As Long
-    top As Long
+    Top As Long
     Right As Long
     Bottom As Long
 End Type
@@ -173,7 +173,7 @@ Event MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 Attribute MouseMove.VB_UserMemId = -606
 Event MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 Attribute MouseUp.VB_UserMemId = -604
-
+Event GetHwnd(ByRef ValidHwnd As Long)
 Public Enum SEShapeConstants
     seShapeRectangle = vbShapeRectangle ' 0
     seShapeSquare = vbShapeSquare ' 1
@@ -295,6 +295,8 @@ Private mStyle3D As SEStyle3DConstants
 Private mStyle3DEffect As SEStyle3DEffectConstants
 Private mUseSubclassing As SESubclassingConstants
 
+
+Private mtooltip As String, mHwnd As Long
 Private mAttached As Boolean
 Private mShiftPutAutomatically As Single
 Private mCurvingFactor2 As Single
@@ -379,6 +381,7 @@ Private Sub UserControl_MouseDown(Button As Integer, shift As Integer, X As Sing
 End Sub
 
 Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
+    CheckToolTip
     RaiseEvent MouseMove(Button, shift, X, Y)
 End Sub
 
@@ -492,7 +495,7 @@ Private Sub UserControl_Paint()
         'Debug.Print "Rect: "; rgnRect.Left, rgnRect.Top, rgnRect.Right, rgnRect.Bottom
         
         If (iExpandForPen <> 0) Or (iExpandOutsideForAngle <> 0) Or (iExpandOutsideForFigure <> 0) Or sTheLastTimeWasExpanded Then
-            hRgnExpand = CreateRectRgn(rgnRect.Left - iExpandForPen - iExpandOutsideForAngle - iExpandOutsideForFigure, rgnRect.top - iExpandForPen - iExpandOutsideForAngle - iExpandOutsideForFigure, rgnRect.Right + iExpandForPen + iExpandOutsideForAngle + iExpandOutsideForFigure, rgnRect.Bottom + iExpandForPen + iExpandOutsideForAngle + iExpandOutsideForFigure)
+            hRgnExpand = CreateRectRgn(rgnRect.Left - iExpandForPen - iExpandOutsideForAngle - iExpandOutsideForFigure, rgnRect.Top - iExpandForPen - iExpandOutsideForAngle - iExpandOutsideForFigure, rgnRect.Right + iExpandForPen + iExpandOutsideForAngle + iExpandOutsideForFigure, rgnRect.Bottom + iExpandForPen + iExpandOutsideForAngle + iExpandOutsideForFigure)
         
             SelectClipRgn UserControl.hDC, hRgnExpand
             DeleteObject hRgnExpand
@@ -751,7 +754,33 @@ Public Property Let Clickable(ByVal nValue As Boolean)
         PropertyChanged "Clickable"
     End If
 End Property
-
+Private Sub CheckToolTip()
+    Dim PropToolTipTitle As String, RHS As String
+    If mtooltip = "" Then Exit Sub
+    If mHwnd = 0 Then RaiseEvent GetHwnd(mHwnd)
+    If mHwnd = 0 Then Exit Sub
+    
+    RHS = mtooltip
+    
+    PropToolTipTitle = GetStrUntil(vbCrLf, RHS)
+    
+    If RHS = "" Then RHS = mtooltip
+    If RHS = "" Then RHS = "?"
+    If Not CreateToolTip(mHwnd, RHS, , PropToolTipTitle, , , , True) Then
+        Extender.ToolTipText = Left$(mtooltip, 80)
+    Else
+        Extender.ToolTipText = ""
+    End If
+End Sub
+Public Property Let ToolTip(ByVal RHS As String)
+    mtooltip = RHS
+    DestroyToolTip
+    Extender.ToolTipText = Left$(mtooltip, 80)
+    mHwnd = 0
+End Property
+Public Property Get ToolTip() As String
+    ToolTip = mtooltip
+End Property
 
 Public Property Get Quality() As SEQualityConstants
 Attribute Quality.VB_ProcData.VB_Invoke_Property = ";Apariencia"
@@ -2260,7 +2289,7 @@ Private Sub FillPolygon(ByVal nGraphics As Long, ByVal nColor As Long, Points() 
         If iStyle3DEffect = seStyle3EffectDiffuse Then
             GdipCreatePath 0&, iPath
             iRect = ScaleRect(GetPointsLRect(Points), Sqr(2) * (1 + Abs(mCurvingFactor) / 400))
-            GdipAddPathEllipseI iPath, iRect.Left, iRect.top, iRect.Right - iRect.Left, iRect.Bottom - iRect.top
+            GdipAddPathEllipseI iPath, iRect.Left, iRect.Top, iRect.Right - iRect.Left, iRect.Bottom - iRect.Top
             iRet = GdipCreatePathGradientFromPath(iPath, hBrush)
         Else
             ReDim iPoints(UBound(Points))
@@ -2345,7 +2374,7 @@ Private Sub FillClosedCurve(ByVal nGraphics As Long, ByVal nColor As Long, Point
         If iStyle3DEffect = seStyle3EffectDiffuse Then
             GdipCreatePath 0&, iPath
             iRect = ScaleRect(GetPointsLRect(Points), Sqr(2) * (1 + Abs(mCurvingFactor) / 400))
-            GdipAddPathEllipseI iPath, iRect.Left, iRect.top, iRect.Right - iRect.Left, iRect.Bottom - iRect.top
+            GdipAddPathEllipseI iPath, iRect.Left, iRect.Top, iRect.Right - iRect.Left, iRect.Bottom - iRect.Top
             iRet = GdipCreatePathGradientFromPath(iPath, hBrush)
         Else
             iPoints = ExpandPointsL(Points, 0.05)
@@ -2484,7 +2513,7 @@ Private Sub FillRoundRect(ByVal nGraphics As Long, ByVal nColor As Long, ByVal X
         If iStyle3DEffect = seStyle3EffectDiffuse Then
             GdipCreatePath 0&, iPath
             iRect = ScaleRect(GetPointsLRect(iPoints), Sqr(2) * (1 + Abs(mCurvingFactor) / 400))
-            GdipAddPathEllipseI iPath, iRect.Left, iRect.top, iRect.Right - iRect.Left, iRect.Bottom - iRect.top
+            GdipAddPathEllipseI iPath, iRect.Left, iRect.Top, iRect.Right - iRect.Left, iRect.Bottom - iRect.Top
             iRet = GdipCreatePathGradientFromPath(iPath, hBrush)
         Else
             If mCurvingFactor <> 0 Then
@@ -2575,7 +2604,7 @@ Private Sub FillSemicircle(ByVal nGraphics As Long, ByVal nColor As Long, ByVal 
         If iStyle3DEffect = seStyle3EffectDiffuse Then
             GdipCreatePath 0&, iPath
             iRect = ScaleRect(GetPointsLRect(iPoints), Sqr(2) * (1 + Abs(mCurvingFactor) / 400))
-            GdipAddPathEllipseI iPath, iRect.Left, iRect.top, iRect.Right - iRect.Left, iRect.Bottom - iRect.top
+            GdipAddPathEllipseI iPath, iRect.Left, iRect.Top, iRect.Right - iRect.Left, iRect.Bottom - iRect.Top
             iRet = GdipCreatePathGradientFromPath(iPath, hBrush)
         Else
             If mCurvingFactor <> 0 Then
@@ -2669,12 +2698,12 @@ Private Sub pvSubclass()
         If mUseSubclassing = seSCYes Then
            iDo = True
         ElseIf mUseSubclassing = seSCNotInIDE Then
-            iDo = Not InIDE
+            iDo = Not inIDE
         ElseIf mUseSubclassing = seSCNotInIDEDesignTime Then
             If mUserMode Then
                 iDo = True
             Else
-                iDo = Not InIDE
+                iDo = Not inIDE
             End If
         End If
         If iDo Then
@@ -2684,7 +2713,7 @@ Private Sub pvSubclass()
     End If
 End Sub
 
-Private Function InIDE() As Boolean
+Private Function inIDE() As Boolean
     Static sValue As Long
     
     If sValue = 0 Then
@@ -2698,7 +2727,7 @@ Private Function InIDE() As Boolean
         End If
         Err.Clear
     End If
-    InIDE = (sValue = 1)
+    inIDE = (sValue = 1)
 End Function
 
 Private Sub pvUnsubclass()
@@ -2819,19 +2848,19 @@ Private Function ExpandPointsL(nPoints() As POINTL, nExpand As Single) As POINTL
     Dim iCenterY As Long
     Dim iRet() As POINTL
     
-    iRect.top = 0
+    iRect.Top = 0
     iRect.Bottom = 0
     iRect.Left = UserControl.ScaleWidth * 2
-    iRect.top = UserControl.ScaleHeight * 2
+    iRect.Top = UserControl.ScaleHeight * 2
     iCount = UBound(nPoints) + 1
     For c = 0 To iCount - 1
         If nPoints(c).X < iRect.Left Then iRect.Left = nPoints(c).X
         If nPoints(c).X > iRect.Right Then iRect.Right = nPoints(c).X
-        If nPoints(c).Y < iRect.top Then iRect.top = nPoints(c).Y
+        If nPoints(c).Y < iRect.Top Then iRect.Top = nPoints(c).Y
         If nPoints(c).Y > iRect.Bottom Then iRect.Bottom = nPoints(c).Y
     Next
     iCenterX = (iRect.Left + iRect.Right) / 2
-    iCenterY = (iRect.top + iRect.Bottom) / 2
+    iCenterY = (iRect.Top + iRect.Bottom) / 2
     ReDim iRet(iCount - 1)
     For c = 0 To iCount - 1
         If nPoints(c).X > iCenterX Then
@@ -2857,15 +2886,15 @@ Private Function GetPointsLRect(nPoints() As POINTL) As RECT
     Dim c As Long
     Dim iRect As RECT
     
-    iRect.top = 0
+    iRect.Top = 0
     iRect.Bottom = 0
     iRect.Left = UserControl.ScaleWidth * 2
-    iRect.top = UserControl.ScaleHeight * 2
+    iRect.Top = UserControl.ScaleHeight * 2
     iCount = UBound(nPoints) + 1
     For c = 0 To iCount - 1
         If nPoints(c).X < iRect.Left Then iRect.Left = nPoints(c).X
         If nPoints(c).X > iRect.Right Then iRect.Right = nPoints(c).X
-        If nPoints(c).Y < iRect.top Then iRect.top = nPoints(c).Y
+        If nPoints(c).Y < iRect.Top Then iRect.Top = nPoints(c).Y
         If nPoints(c).Y > iRect.Bottom Then iRect.Bottom = nPoints(c).Y
     Next
     GetPointsLRect = iRect
@@ -2877,7 +2906,7 @@ Private Function ScaleRect(nRect As RECT, ByVal nScale As Single) As RECT
     nScale = (nScale - 1) / 2
     
     iRect = nRect
-    InflateRect iRect, (nRect.Right - nRect.Left) * nScale, (nRect.Bottom - nRect.top) * nScale
+    InflateRect iRect, (nRect.Right - nRect.Left) * nScale, (nRect.Bottom - nRect.Top) * nScale
     ScaleRect = iRect
 End Function
 
@@ -2935,7 +2964,7 @@ Private Sub FillPie(ByVal nGraphics As Long, ByVal nColor As Long, ByVal X As Lo
         If iStyle3DEffect = seStyle3EffectDiffuse Then
             GdipCreatePath 0&, iPath
             iRect = ScaleRect(GetPointsLRect(iPoints), Sqr(2) * (1 + Abs(mCurvingFactor) / 400))
-            GdipAddPathEllipseI iPath, iRect.Left, iRect.top, iRect.Right - iRect.Left, iRect.Bottom - iRect.top
+            GdipAddPathEllipseI iPath, iRect.Left, iRect.Top, iRect.Right - iRect.Left, iRect.Bottom - iRect.Top
             iRet = GdipCreatePathGradientFromPath(iPath, hBrush)
         Else
             If mCurvingFactor <> 0 Then

@@ -34,7 +34,10 @@ TaskMaster.MusicTaskNum = TaskMaster.MusicTaskNum - 1
 If mNote > 0 Then
  midimsg = &H80 + (mNote * &H100) + Channel
  midiOutShortMsg hmidi, midimsg
- End If
+End If
+ MusicBoxNote(Channel + 1) = mNote
+MusicBoxValue(Channel + 1) = -1
+MusicBoxState(Channel + 1) = False
 End Sub
 
 Private Property Get TaskInterface_Process() As basetask
@@ -87,10 +90,10 @@ On Error GoTo poulos
     On Error Resume Next
    jobnameID = CLng(Values(0)) ' this is the channel name
    instrum = CLng(Values(1))
-Channel = jobnameID - 1
-volume = 127
+    Channel = jobnameID - 1
+    volume = 127
     m_duration = 0&
-    
+    MusicBoxState(Channel + 1) = True
     If Err.Number > 0 Then
       On Error GoTo 0
 
@@ -120,7 +123,7 @@ If mNote > 0 Then
     If PlayTuneMIDI(voices(Channel), octava, lNote, BE, volume) And Not mute Then
     If volume > 127 Then volume = 127
     If volume < 1 Then volume = 1
-    If lNote = 24 Then
+    If lNote = 24 Or mute Then
     
     mNote = -1
     Else
@@ -130,11 +133,16 @@ If mNote > 0 Then
     If BE < 1 Then BE = 1
     If BE > 6 Then BE = 6
         m_now = timeGetTime
-        m_duration = Signed(BEATS(Channel) / 2# ^ (BE - 1))
+        MusicBoxValue(Channel + 1) = 2# ^ (BE - 1)
+        m_duration = Signed(BEATS(Channel) / MusicBoxValue(Channel + 1))
    If mNote <> -1 Then
     mNote = GetNote(octava, lNote \ 2)
+        MusicBoxNote(Channel + 1) = mNote
+        MusicBoxVolume(Channel + 1) = volume
       midimsg = &H90 + (mNote * &H100) + (volume * &H10000) + Channel
     midiOutShortMsg hmidi, midimsg
+    Else
+        MusicBoxNote(Channel + 1) = -1 ' pause
     End If
     
     Else
