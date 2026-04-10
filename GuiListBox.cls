@@ -61,14 +61,14 @@ If Not glistN Is Nothing Then glistN.Shutdown
 Set Callback = Nothing
 Set glistN = Nothing
 End Sub
-Public Sub move(x, y, Optional W, Optional H)
+Public Sub move(X, Y, Optional W, Optional H)
 glistN.HideBarAsap
 If IsMissing(W) Then
-glistN.MoveTwips CLng(x), CLng(y), 0, 0
+glistN.MoveTwips CLng(X), CLng(Y), 0, 0
 ElseIf IsMissing(H) Then
-glistN.MoveTwips CLng(x), CLng(y), CLng(W), 0
+glistN.MoveTwips CLng(X), CLng(Y), CLng(W), 0
 Else
-glistN.MoveTwips CLng(x), CLng(y), CLng(W), CLng(H)
+glistN.MoveTwips CLng(X), CLng(Y), CLng(W), CLng(H)
 End If
 If mHeaderOnly Then
     If glistN.HeadLine = "" Then glistN.HeadLine = " "
@@ -132,7 +132,7 @@ End With
 
 End Sub
 
-Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 Dim oldtab As Long, where As Long, oldscroll As Long
 
 
@@ -141,7 +141,7 @@ ElseIf maychange And Button = 0 Then
 oldtab = glistN.Column
 oldscroll = glistN.PanPos
 glistN.PanPos = 0
-glistN.REALCUR item, CSng(x * dv15), (0), where
+glistN.REALCUR item, CSng(X * dv15), (0), where
 If lastitem = item And oldtab = glistN.Column Then
 glistN.PanPos = oldscroll
 Exit Sub
@@ -172,29 +172,29 @@ Private Sub glistN_KeyDownAfter(KeyCode As Integer, shift As Integer)
 If mHeaderOnly Then KeyCode = 0: shift = 0
 End Sub
 
-Private Sub glistN_MouseMove(myButton As Integer, shift As Integer, x As Single, y As Single)
+Private Sub glistN_MouseMove(myButton As Integer, shift As Integer, X As Single, Y As Single)
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".MouseMove(" + str(mIndex) + "," + str(x) + "," + str(y) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
+        Callback.Callback mesCtrlName + ".MouseMove(" + str(mIndex) + "," + str(X) + "," + str(Y) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
     Else
-        Callback.Callback mesCtrlName + ".MouseMove(" + str(x) + "," + str(y) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
+        Callback.Callback mesCtrlName + ".MouseMove(" + str(X) + "," + str(Y) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
     End If
 
 End Sub
 
-Private Sub glistN_MouseUp(x As Single, y As Single)
+Private Sub glistN_MouseUp(X As Single, Y As Single)
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".MouseUp(" + str(mIndex) + "," + str(x) + "," + str(y) + ")"
+        Callback.Callback mesCtrlName + ".MouseUp(" + str(mIndex) + "," + str(X) + "," + str(Y) + ")"
     Else
-        Callback.Callback mesCtrlName + ".MouseUp(" + str(x) + "," + str(y) + ")"
+        Callback.Callback mesCtrlName + ".MouseUp(" + str(X) + "," + str(Y) + ")"
     End If
 End Sub
 
-Private Sub glistN_OutPopUp(x As Single, y As Single, myButton As Integer)
+Private Sub glistN_OutPopUp(X As Single, Y As Single, myButton As Integer)
 If (myButton And &H2) = 2 Then
     If mIndex >= 0 Then
-        Callback.Callback mesCtrlName + ".PopUp(" + str(mIndex) + "," + str(x + Callback.Controls(ctrlName).Left) + "," + str(y + Callback.Controls(ctrlName).top) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
+        Callback.Callback mesCtrlName + ".PopUp(" + str(mIndex) + "," + str(X + Callback.Controls(ctrlName).Left) + "," + str(Y + Callback.Controls(ctrlName).Top) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
     Else
-        Callback.Callback mesCtrlName + ".PopUp(" + str(x + Callback.Controls(ctrlName).Left) + "," + str(y + Callback.Controls(ctrlName).top) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
+        Callback.Callback mesCtrlName + ".PopUp(" + str(X + Callback.Controls(ctrlName).Left) + "," + str(Y + Callback.Controls(ctrlName).Top) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
     End If
 End If
 End Sub
@@ -444,9 +444,9 @@ End If
 If KeyCode = vbKeyF10 And shift <> 0 Then
 KeyCode = 0
 If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".PopUp(" + str(mIndex) + "," + str(MOUSEX(Callback.Left)) + "," + str(MOUSEY(Callback.top)) + "," + str(2) + "," + str(glistN.ListIndex + 1) + ")"
+   Callback.Callback mesCtrlName + ".PopUp(" + str(mIndex) + "," + str(MOUSEX(Callback.Left)) + "," + str(MOUSEY(Callback.Top)) + "," + str(2) + "," + str(glistN.ListIndex + 1) + ")"
    Else
-      Callback.Callback mesCtrlName + ".PopUp(" + str(MOUSEX(Callback.Left)) + "," + str(MOUSEY(Callback.top)) + "," + str(2) + "," + str(glistN.ListIndex + 1) + ")"
+      Callback.Callback mesCtrlName + ".PopUp(" + str(MOUSEX(Callback.Left)) + "," + str(MOUSEY(Callback.Top)) + "," + str(2) + "," + str(glistN.ListIndex + 1) + ")"
       End If
       OneClick
 Exit Sub
@@ -506,7 +506,7 @@ Private Sub glistN_ScrollMove(item As Long)
       glistN.DblClick
 End Sub
 
-Private Sub glistN_ScrollSelected(item As Long, y As Long)
+Private Sub glistN_ScrollSelected(item As Long, Y As Long)
    If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Scroll(" + str(mIndex) + "," + str(item) + ")"
    Else
@@ -991,36 +991,36 @@ Public Sub SetBarStyle(bColor As Long, Optional bHatch As Long, Optional BHatchC
     glistN.BarHatch = bHatch
     glistN.BarHatchColor = BHatchColor
 End Sub
-Private Sub glistN_PreviewKeyboardUnicode(A As String)
-Callback.SpreadKey A
+Private Sub glistN_PreviewKeyboardUnicode(a As String)
+Callback.SpreadKey a
 End Sub
 Private Sub OneClick()
 On Error Resume Next
 If SkipFirstClick Then glistN.PrepareClick
 End Sub
-Public Sub AccKey(A, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
-If MyIsNumeric(A) Then
-A = CLng(A)
-If A < 0 Then Exit Sub
-If A > 499 Then Exit Sub
+If MyIsNumeric(a) Then
+a = CLng(a)
+If a < 0 Then Exit Sub
+If a > 499 Then Exit Sub
 Else
-A = UCase(A)
-Select Case A
+a = UCase(a)
+Select Case a
 Case "F1" To "F9"
-A = 611 + val(Mid(A, 2))
+a = 611 + val(Mid(a, 2))
 Case Else
-A = AscW(A)
-If A > 126 Then A = 0
+a = AscW(a)
+If a > 126 Then a = 0
 End Select
 End If
 If Opcode < 0 Then Opcode = 0
-If A = 0 Then Exit Sub
-A = A - 1000 * shift - 10000 * ctrl - 100000 * alt
-Callback.RegisterAcc A, ctrlName, Opcode
+If a = 0 Then Exit Sub
+a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
+Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
-Private Sub gListN_AccKey(m As Long)
-Callback.AccProces m
+Private Sub gListN_AccKey(M As Long)
+Callback.AccProces M
 End Sub
 Public Sub SetGrid(ByVal RHS, Optional ByVal Fcol)
 If glistN Is Nothing Then Exit Sub
@@ -1085,6 +1085,15 @@ Property Get Visible() As Boolean
         Visible = glistN.Visible
     End If
 End Property
+Public Property Get ToolTip() As String
+If glistN Is Nothing Then Exit Property
+ToolTip = glistN.ToolTip
+End Property
+
+Public Property Let ToolTip(ByVal vNewValue As String)
+If glistN Is Nothing Then Exit Property
+glistN.ToolTip = vNewValue
+End Property
 Private Sub glistN_RTL(thisHDC As Long, item As Long, where As Long, mark10 As Long, mark20 As Long, Offset As Long)
 If glistN.Columns > 1 Then
 Offset = RealX1(thisHDC, where, glistN.listAtColumn(item, glistN.Column), where, mark10)
@@ -1112,8 +1121,8 @@ Dim dummy As RECT, r As RECT, tabw As Long, Offset As Long, hRgn As Long, estX A
 tabw = tParam.iTabLength * glistN.AveCharWith
 glistN.UserControlTextMetricsPixels that$, r.Right, r.Bottom
 dummy = r
-dummy.top = glistN.HeadlineHeightTwips + 1
-dummy.Bottom = dummy.top + r.Bottom
+dummy.Top = glistN.HeadlineHeightTwips + 1
+dummy.Bottom = dummy.Top + r.Bottom
 r = dummy
 Offset = 0
 estX = 0
@@ -1154,7 +1163,7 @@ End If
 For i = 0 To items&
     c = ww$(i)
     r.Left = Offset
-    rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
+    rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
     If Len(c) >= ExtSelStart - estX Or (found > 0 And rleftacc > found) Then
             If Not Len(c) >= ExtSelStart - estX Then
             ExtSelStart = Len(c) + estX
@@ -1175,7 +1184,7 @@ For i = 0 To items&
             If found > 0 Then
                 rx1 = Offset
                 If mark1 > 1 Then
-                    Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), mark1 - 1, 1, tabw, 0))
+                    Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), mark1 - 1, 1, tabw, 0))
                 End If
                 c = Mid$(ww(i), mark1, mark2 - mark1 + 1)
                 If nrtl Then
@@ -1183,7 +1192,7 @@ For i = 0 To items&
                     M2 = M2 - mark1 + 1
                     If M2 - M1 > 0 Then Mid$(c, M1, M2 - M1 + 1) = StrReverse(Mid$(c, M1, M2 - M1 + 1))
                 End If
-                If found > Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c$), 1, tabw, 0)) Then
+                If found > Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c$), 1, tabw, 0)) Then
                         nValue = mark1 + estX
                         Exit For
                     Else
@@ -1199,7 +1208,7 @@ For i = 0 To items&
             If nValue <= 0 Then nValue = 1
             If mark1 > 1 Then
             
-            rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), mark2, 1, tabw, 0))
+            rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), mark2, 1, tabw, 0))
             If found > 0 Then
             If rx1 <= found Then
             nValue = mark1 + estX
@@ -1208,7 +1217,7 @@ For i = 0 To items&
             End If
 
             End If
-            RealX1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), mark1 - 1, 1, tabw, 0))
+            RealX1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), mark1 - 1, 1, tabw, 0))
             
             End If
             Exit For
@@ -1218,7 +1227,7 @@ For i = 0 To items&
         End If
         ElseIf mark1 <> 0 And mark2 <> 0 And nValue = mark2 + 1 Then
         If found > 0 Then
-         rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), mark2, 1, tabw, 0))
+         rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), mark2, 1, tabw, 0))
         If found > rx1 Then
          nValue = mark1 + estX
             RealX1 = rx1
@@ -1234,14 +1243,14 @@ For i = 0 To items&
 here1:
             If mark1 > 1 Then
                 
-                Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), mark1 - 1, 1, tabw, 0))
+                Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), mark1 - 1, 1, tabw, 0))
             End If
             If mark1 = nValue And found > 0 Then
 
             If Offset > found Then
             j = mark1 - 2
             If j >= 1 Then
-            Do While found < r.Left + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), j, 1, tabw, 0))
+            Do While found < r.Left + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), j, 1, tabw, 0))
             j = j - 1
             If j = 0 Then j = 1: Exit Do
             Loop
@@ -1270,10 +1279,10 @@ here1:
             If nValue = mark2 + 1 Then
             If found > 0 Then
             For j = mark2 - mark1 + 1 To 1 Step -1
-            If found > Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), j, 1, tabw, 0)) Then
+            If found > Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), j, 1, tabw, 0)) Then
             
             If j > 1 Then
-            If LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), j, 1, tabw, 0)) > LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), j - 1, 1, tabw, 0)) < 0 Then
+            If LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), j, 1, tabw, 0)) > LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), j - 1, 1, tabw, 0)) < 0 Then
             
                         nValue = mark2 - (j) + estX
 
@@ -1315,9 +1324,9 @@ here1:
             
             Else
 conthere:
-            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
+            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
              If nValue > mark1 Then
-                rx1 = rleftacc - 1 - LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), nValue - mark1, 1, tabw, 0))
+                rx1 = rleftacc - 1 - LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), nValue - mark1, 1, tabw, 0))
             Else
                 rx1 = rleftacc - 1
             End If
@@ -1328,7 +1337,7 @@ conthere:
                 original = nValue
                 For j = nValue To mark2
 
-                rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), j - mark1 + 1, 1, tabw, 0))
+                rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), j - mark1 + 1, 1, tabw, 0))
 
                     
                     original = original + 1
@@ -1371,7 +1380,7 @@ conthere:
                   original = nValue
                   For j = nValue - 1 To mark1 + 1 Step -1
                 
-                      rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), j - mark1, 1, tabw, 0))
+                      rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), j - mark1, 1, tabw, 0))
                       If found <= rx1 Then Exit For
                       original = j
                       
@@ -1433,7 +1442,7 @@ rx1 = 0
         Else ' NO RTL
 nortl:
             c = Myleft$(c, ExtSelStart - estX - 1)
-            rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
+            rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
             If found > 0 Then
                 If found < rx1 Then
                     nValue = ExtSelStart - 1
@@ -1452,7 +1461,7 @@ nortl:
                         Else
                        ' nValue = Len(c) + estX
                         End If
-                        rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
+                        rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
                     End If
                     RealX1 = rx1
                     Exit For
@@ -1482,17 +1491,17 @@ nortl:
                 If Len(c) = 0 Then
                     rleftacc = Offset
                 ElseIf nrtl And M2 = mark2 Then
-                rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
+                rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
                   c = ww(i)
                   
                If M2 - M1 > 0 Then c = Mid$(c, M1, M2 - M1 + 1)
-                 rleftacc = rleftacc + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
+                 rleftacc = rleftacc + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
                 nValue = M1 - 1
             Else
-                 rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
+                 rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
                 End If
             ElseIf found > 0 Then
-            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), nValue, 1, tabw, 0))
+            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), nValue, 1, tabw, 0))
         If rleftacc < found Then
         nValue = original
 
@@ -1686,8 +1695,8 @@ End If
 
 
 End Sub
-Private Function Myleft$(A As String, Pos As Long)
-If Pos < 1 Then Myleft$ = vbNullString Else Myleft$ = Mid$(A, 1, Pos)
+Private Function Myleft$(a As String, Pos As Long)
+If Pos < 1 Then Myleft$ = vbNullString Else Myleft$ = Mid$(a, 1, Pos)
 End Function
 Sub UseMove()
     If glistN Is Nothing Then Exit Sub
@@ -1724,18 +1733,18 @@ Sub UseVerMove()
     End If
 End Sub
 
-Private Sub glistN_ValidMove(x As Single, y As Single)
+Private Sub glistN_ValidMove(X As Single, Y As Single)
 Dim VR(2)
-VR(0) = x
-VR(1) = y
+VR(0) = X
+VR(1) = Y
    If mIndex >= 0 Then
    
    Callback.CallbackNow mesCtrlName + ".ValidMove(" + str(mIndex) + ")", VR()
    Else
       Callback.CallbackNow mesCtrlName + ".ValidMove()", VR()
       End If
-x = VR(0)
-y = VR(1)
+X = VR(0)
+Y = VR(1)
 End Sub
 Property Let MoveParent(ByVal RHS As Boolean)
 If Not glistN Is Nothing Then glistN.MoveParent = RHS
@@ -1772,9 +1781,9 @@ End Property
 Property Get headeronly() As Boolean
     headeronly = mHeaderOnly
 End Property
-Property Get top() As Single
+Property Get Top() As Single
     On Error Resume Next
-    top = Callback.Controls(ctrlName).top
+    Top = Callback.Controls(ctrlName).Top
 End Property
 Property Get Left() As Single
     On Error Resume Next
@@ -1794,37 +1803,37 @@ Property Let TitleBackColor(ByVal RHS As Long)
     End If
 End Property
 Private Sub glistN_AddSelStart(val As Long, shift As Integer)
-Dim W As Long, A$, L As Long, b$
+Dim W As Long, a$, l As Long, b$
 Const sP1 = ",+-*/=<>^!.&[]{}()^;""" + "'!"
 Dim sp As String: sp = " " + ChrW(9) + ChrW(160)
 Dim sP2 As String: sP2 = sP1 + sp
 If glistN.SelStart > 0 Then
 If Columns > 1 Then
-A$ = Mid$(listAtColumn(ListIndex, Column), glistN.SelStart)
+a$ = Mid$(listAtColumn(ListIndex, Column), glistN.SelStart)
 Else
-A$ = Mid$(list(ListIndex), glistN.SelStart)
+a$ = Mid$(list(ListIndex), glistN.SelStart)
 End If
-    If Len(A$) > 0 Then
-        W = AscW(A$)
+    If Len(a$) > 0 Then
+        W = AscW(a$)
         If (shift And 2) = 2 Then
-            L = Len(A$)
+            l = Len(a$)
             val = 1
-            If L < 2 Then Exit Sub
-                b$ = Mid$(A$, val, 1)
+            If l < 2 Then Exit Sub
+                b$ = Mid$(a$, val, 1)
                 If InStr(sP1, b$) = 0 Then
-                Do While val < L And InStr(sp, b$) > 0
+                Do While val < l And InStr(sp, b$) > 0
                     val = val + 1
-                    b$ = Mid$(A$, val, 1)
+                    b$ = Mid$(a$, val, 1)
                 Loop
                 If InStr(sP1, b$) = 0 Then
                     If val = 1 Then
-                        Do While val < L And InStr(sP2, b$) = 0
+                        Do While val < l And InStr(sP2, b$) = 0
                             val = val + 1
-                            b$ = Mid$(A$, val, 1)
+                            b$ = Mid$(a$, val, 1)
                         Loop
                         If InStr(sP2, b$) > 0 Then val = val - 1
                     Else
-                        If val < L Then val = val - 1
+                        If val < l Then val = val - 1
                     End If
                 Else
                     val = val - 1
@@ -1838,7 +1847,7 @@ End If
 End Sub
 
 Private Sub glistN_SubSelStart(val As Long, shift As Integer)
-Dim W As Long, A$, L As Long, b$
+Dim W As Long, a$, l As Long, b$
 Const sP1 = ",+-*/=<>^!.&[]{}()^;""" + "'!"
 Dim sp As String: sp = " " + ChrW(9) + ChrW(160)
 Dim sP2 As String: sP2 = sP1 + sp
@@ -1849,36 +1858,36 @@ vartext = listAtColumn(ListIndex, Column)
 Else
 vartext = list(ListIndex)
 End If
-A$ = Mid$(vartext, glistN.SelStart - 1, 1)
-If Len(A$) > 0 Then
-W = AscW(A$)
+a$ = Mid$(vartext, glistN.SelStart - 1, 1)
+If Len(a$) > 0 Then
+W = AscW(a$)
         If (shift And 2) = 2 Then
-            A$ = Mid$(vartext, 1, glistN.SelStart - 1)
-            L = Len(A$)
-            val = L
+            a$ = Mid$(vartext, 1, glistN.SelStart - 1)
+            l = Len(a$)
+            val = l
             If val = 1 Then Exit Sub
-            b$ = Mid$(A$, L, 1)
+            b$ = Mid$(a$, l, 1)
             If InStr(sP1, b$) = 0 Then
-                Do While L > 1 And InStr(sp, b$) > 0
-                    L = L - 1
-                    b$ = Mid$(A$, L, 1)
+                Do While l > 1 And InStr(sp, b$) > 0
+                    l = l - 1
+                    b$ = Mid$(a$, l, 1)
                 Loop
                 If InStr(sP1, b$) = 0 Then
-                    If L = val Then
-                        Do While L > 1 And InStr(sP2, b$) = 0
-                            L = L - 1
-                            b$ = Mid$(A$, L, 1)
+                    If l = val Then
+                        Do While l > 1 And InStr(sP2, b$) = 0
+                            l = l - 1
+                            b$ = Mid$(a$, l, 1)
                         Loop
-                        If L = 1 And Not InStr(sP2, b$) > 0 Then L = L - 1
+                        If l = 1 And Not InStr(sP2, b$) > 0 Then l = l - 1
                         
                     Else
-                     If InStr(sP2, b$) > 0 Then L = L - 1
+                     If InStr(sP2, b$) > 0 Then l = l - 1
                     End If
                 End If
             Else
-                L = L - 1
+                l = l - 1
             End If
-            val = val - L
+            val = val - l
         ElseIf W > -9217 And W < -8192 Then
             val = 2
         End If
