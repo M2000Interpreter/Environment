@@ -277,7 +277,7 @@ Public Function WindowProc(ByVal hWnd As Long, _
                            ByVal uMsg As Long, _
                            ByVal wParam As Long, _
                            ByVal lParam As Long) As Long
-
+'' NOT USED
    Select Case uMsg
         Case WM_ACTIVATEAPP
         AppNoFocus = wParam = 0
@@ -337,7 +337,7 @@ If ExistFileT Then FindClose fhandle: timestamp = uintnew(wfd.ftLastAccessTime.d
 Exit Function
 there2:
 End Function
-Public Sub ChangeScreenRes(x As Long, y As Long)
+Public Sub ChangeScreenRes(X As Long, Y As Long)
 ' this is a modified version that i found in internet
 Static once As Boolean
 
@@ -354,8 +354,8 @@ nDc = CreateDC("DISPLAY", vbNullString, vbNullString, ByVal 0&)
 BITS = GetDeviceCaps(nDc, BITSPIXEL)
 erg = EnumDisplaySettings(0&, 0&, DevM)
 DevM.dmFields = DM_PELSWIDTH Or DM_PELSHEIGHT Or DM_BITSPERPEL
-DevM.dmPelsWidth = x
-DevM.dmPelsHeight = y
+DevM.dmPelsWidth = X
+DevM.dmPelsHeight = Y
 DevM.dmBitsPerPel = BITS
 erg = ChangeDisplaySettings(DevM, CDS_TEST)
 DeleteDC nDc
