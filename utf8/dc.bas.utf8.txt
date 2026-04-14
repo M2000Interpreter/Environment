@@ -3,6 +3,7 @@ Option Explicit
 Public Declare Function midiOutClose Lib "winmm.dll" (ByVal hMidiOut As Long) As Long
 Public Declare Function midiOutOpen Lib "winmm.dll" (lphMidiOut As Long, ByVal uDeviceID As Long, ByVal dwCallback As Long, ByVal dwInstance As Long, ByVal dwFlags As Long) As Long
 Public Declare Function midiOutShortMsg Lib "winmm.dll" (ByVal hMidiOut As Long, ByVal dwMsg As Long) As Long
+Public Declare Function midiOutSetVolume Lib "winmm.dll" (ByVal hMidiOut As Long, ByVal dwVolume As Long) As Long
 
 Const RC_PALETTE As Long = &H100
 Const SIZEPALETTE As Long = 104
@@ -100,7 +101,7 @@ Private Declare Function GetVolumeInformation Lib "kernel32" Alias "GetVolumeInf
 'Private Const MAX_PATH As Long = 1024
 Private Const MAX_PATH_UNICODE As Long = 260 * 2 - 1
 Public MusicBoxNote(1 To 16) As Long, MusicBoxState(1 To 16) As Boolean
-Public MusicBoxVolume(1 To 16) As Long, MusicBoxValue(1 To 16) As Long
+Public MusicBoxVolume(1 To 16) As Long, MusicBoxValue(1 To 16) As Long, MusicBoxDots(1 To 16) As Long, MusicBoxGate(1 To 16) As Long, MusicBoxScale(1 To 16) As Double
 
 Private Declare Function GetLongPathName Lib "kernel32" _
    Alias "GetLongPathNameW" _

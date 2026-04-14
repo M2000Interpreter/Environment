@@ -26,8 +26,7 @@ If MenuItems>0 then
 			end if
 			if ucase$(check$)<>ucase$(tmp$) then
 				Save.Doc tmp$, Dest$+menu$(i)+".utf8.txt", NoBomUtf8crlf
-				dos "copy /y "+quote$(Dir$+menu$(i))+" "+Dest$;
-				wait 1000
+				dos "copy /y"+quote$(Dir$+menu$(i))+" "+Dest$;
 				Print Over $(0, 8),@(0), Int(i/MenuItems*100), "% -  Change file: ";menu$(i)
 			else
 				Print Over $(0, 8),@(0), Int(i/MenuItems*100), "%"

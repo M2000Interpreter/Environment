@@ -9354,7 +9354,7 @@ MODULE KB {Function CallMe {
       -- George Karras --
       
       }
-      Global kb$=" ", dur=300, org=5, f=0, vol$="V90", voi(18), use(17) ' 0 ..17,
+      Global kb$=" ", dur=300, org=1, f=0, vol$="V90", voi(18), use(17) ' 0 ..17,
       n=1
       For i=1 to 16 { use(i)=True }
       use(10)= false \\ For drum machine
@@ -9417,7 +9417,7 @@ MODULE KB {Function CallMe {
             End Sub
       }
       \\ 10 for drum machine
-      Thread { Score 10,400,"CV90CC  ab Cd eCC" : Play 10,1 } as L Interval 60
+      Thread { Score 10,400,"CV90CC  ab Cd eCC" : Play 10,1, 10 } as L Interval 60
       Thread {
             ClKey "A#2", KeyPress(asc("A")), 1
             ClKey "B2", KeyPress(asc("Z")), 2
@@ -9446,7 +9446,7 @@ MODULE KB {Function CallMe {
             Refresh 10: wait 1
             If KeyPress(asc("1")) Then Exit
             If KeyPress(asc("3")) Then org<=14 : dur<=100 
-            If KeyPress(asc("4")) Then org<=5 : dur<=300
+            If KeyPress(asc("4")) Then org<=1 : dur<=300
             If KeyPress(asc("5")) Then org<=65 : dur<=5000
             If KeyPress(asc("8")) Then n=1-n : refr<=true
             If KeyPress(asc("9")) Then Thread L Restart
@@ -50372,5 +50372,69 @@ NORMAL
 PRINT
 PRINT
 ESCAPE ON
+}
+MODULE JOY {CONST  Acoustic_Bass = 33
+TEMPO=960*1.2
+VOLUME 80
+PLAY 1, 0
+
+' Notes: 12, 7 physical and 5 semitones
+' You can use C# or D♭ (is the same). The ♭ character from CTRL + 3
+
+' Octave 4 (5th)
+' we can change octave once for next notes too, until a new change happen.
+'Octaves 0 to 9
+
+' VALUE PART
+' @1 TEMPO  - IF YOU OMIT THEN IT IS @1
+' @2 TEMPO/2
+' @3 TEMPO/4
+' @4 TEMPO/8
+' @5 TEMPO/16
+' @6 TEMPO/32
+' dotted note @2+  (@2 plus @3)
+' double dotted @2++ (@2 plus @3 plus @4)
+' we can add Velocity (Volume), V0 to V127, but this change until next V excuted
+
+' You can make TIES adding values (max 20), so @4@2 is a TEMPO/8+TEMPO/2 duration for one note.
+' A ! means legato, but a !95 is a staccato 95% - You can assign it per note if you like (or at SCORE, 4th parameter for global in score)
+
+' You can make Tuplets: [CD]3@3 two notes played for 3 x quarters. We compute scale=(3/4)/(2)=3/8, so C played for 1x3/8 and D played for 1x3/8
+' Tuplets can't have tuplets inside (for this version).  Tuplets may have staccato/velocity for all individul notes
+' Value for tuplet may have Multiplier before or not. A tuplet without defined value and or multiplier has value 1 Tempo by default.
+' At the end of tuplet Staccato, Volume, Octave restored.
+
+
+' USE SPACE FOR SILENCE - ALSO SILENCE HAVE VALUES
+' SO A SPACE IS A SILENCE FOR A TEMPO TIME.
+' A SPACE@4 IS A SILENCE FOR TEMPO/8
+
+' Volume/Velocity V0 TO V127   - you can place it before note or after value (value may missing, is 1/1 by default) for the note to take account the change.
+' Inside Tuplets not use this at start - only after value (value may missing, is 1/1 by default)
+' For defining Volume for Tuplets you can do that aftet the value of Tuplet and before Staccato. so [C@3 @3E@3]2V60!75 place V60 for Tuplet and staccato 75%. See there is only multiplier, so this Tuplet has duration 2xTEMPO. Space inside is the silence of a value 1/4*scale. Scale = 2/(3/4)=8/3, so the 1/4*8/3=8/12=2/3. C@3 has finally Tempo*2/3*0.75 duration time
+partitura="V80"
+partitura+="E4@3E@3F@3G@3"
+partitura+="G@3F@3E@3D@3"
+partitura+="C@3C@3D@3E@3"
+partitura+="E@4D@4D@2"
+
+partitura+="E@3E@3F@3G@3"
+partitura+="G@3F@3E@3D@3"
+partitura+="C@3C@3D@3E@3"
+partitura+="D@4C@4C@2"
+
+partitura+="D@3D@3E@3C@3"
+partitura+="D@3E@4F@4E@3C@3"
+partitura+="D@3E@4F@4E@3D@3"
+partitura+="C@3D@3G3@2"
+
+partitura+="E4@3E@3F@3G@3"
+partitura+="G@3F@3E@3D@3"
+partitura+="C@3C@3D@3E@3"
+partitura+="D@4C@4C@2!"  ' LAST NOTE LEGATO - 100%
+
+SCORE 1, TEMPO, partitura, 75  ' 75% STACCATO  -  100% IS LEGATO (OMIT THE PARAMETER)- NO SILENCE BETWEEN NOTES.
+PLAY 1, Acoustic_Bass
+PRINT "ODE TO JOY"
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

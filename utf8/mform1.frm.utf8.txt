@@ -108,6 +108,9 @@ End Sub
 
 
 Private Sub Form_GotFocus()
+If Me.Left <> VirtualScreenWidth() + 2000 Or Me.Top <> VirtualScreenHeight() + 2000 Then
+    Me.Move VirtualScreenWidth() + 2000, VirtualScreenHeight() + 2000
+End If
 ShowM2000
 End Sub
 
