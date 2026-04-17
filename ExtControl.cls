@@ -47,13 +47,13 @@ End Sub
 Property Get FixEvent() As Boolean
 FixEvent = mycontrol Is Nothing
 End Property
-Property Get Value() As Object
-Attribute Value.VB_UserMemId = 0
+Property Get value() As Object
+Attribute value.VB_UserMemId = 0
 On Error Resume Next
 If Not another Is Nothing Then
-Set Value = another
+Set value = another
 Else
-Set Value = mycontrol
+Set value = mycontrol
 End If
 End Property
 Public Sub deconstruct()
@@ -64,6 +64,22 @@ End Sub
 
 Private Sub mycontrol_ObjectEvent(Info As EventInfo)
 Dim Values(), m As Long, uk1 As Object
+Debug.Print Info.name, mycontrol.name
+If LCase(Info.name) = "lostfocus" Or LCase(Info.name) = "lostfocus1" Then
+If mycontrol.enabled And mycontrol.Visible Then
+    Callback.LastActive = mycontrol.name  'myname$
+    Else
+    If Callback.LastActive = vbNullString Then
+Callback.LastActive = "gList2"
+End If
+If Callback.Controls(Callback.LastActive).Visible Then
+Callback.Controls(Callback.LastActive).SetFocus
+End If
+End If
+End If
+
+
+
 If Info.EventParameters.Count > 0 Then
 ReDim Values(0 To Info.EventParameters.Count)
 Dim evinf As EventParameter
@@ -72,11 +88,11 @@ Dim aa
 For Each evinf In Info.EventParameters
 Err.Clear
 On Error Resume Next
-    aa = CVar(evinf.Value)
+    aa = CVar(evinf.value)
     If MyIsObject(aa) Then
-        Set Values(m) = evinf.Value
+        Set Values(m) = evinf.value
     Else
-        Values(m) = evinf.Value
+        Values(m) = evinf.value
     End If
     If Err Then
         Err.Clear
@@ -86,23 +102,29 @@ On Error Resume Next
     m = m + 1
 Next evinf
 If mIndex <> -1 Then
-    Callback.CallbackNow myname$ + "." + Info.Name + "(" & mIndex & ")", Values()
+    Callback.CallbackNow myname$ + "." + Info.name + "(" & mIndex & ")", Values()
 Else
-    Callback.CallbackNow myname$ + "." + Info.Name + "()", Values()
+    Callback.CallbackNow myname$ + "." + Info.name + "()", Values()
 End If
 With Info.EventParameters
 For m = m - 1 To 0
     If IsObject(Values(m)) Then
-        Set .item(m).Value = Values(m)
+        Set .item(m).value = Values(m)
         Err.Clear
     Else
-        .item(m).Value = Values(m)
+        .item(m).value = Values(m)
     End If
 Next m
 End With
 ElseIf mIndex <> -1 Then
-    Callback.Callback myname$ + "." + Info.Name + "(" & mIndex & ")"
+    Callback.Callback myname$ + "." + Info.name + "(" & mIndex & ")"
 Else
-    Callback.Callback myname$ + "." + Info.Name + "()"
+    Callback.Callback myname$ + "." + Info.name + "()"
 End If
 End Sub
+Public Property Let Default(RHS)
+On Error Resume Next
+If Not Callback Is Nothing Then
+If CBool(RHS) Then Callback.Default = mycontrol.name
+End If
+End Property
