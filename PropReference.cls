@@ -21,6 +21,7 @@ Dim IamMethod  As Boolean
 Dim hardlink As Object, useobj As Boolean
 Private mLastObj As Object
 Public arr As Boolean
+Public UseExtControl As Boolean
 Dim oEnum As IUnknown
 Private IndexList As mIndexes
 Private IndexNew As Boolean
@@ -30,13 +31,22 @@ End Function
 Property Get ObjectType() As String
 On Error Resume Next
 If Not hardlink Is Nothing Then
-    ObjectType = "*" + Typename(ObjectRef)
+    If TypeOf hardlink Is ExtControl Then
+    ObjectType = "*" + Typename(hardlink.mycontrol)
+    Else
+    ObjectType = "*" + Typename(hardlink)
+    End If
 Else
+    If TypeOf var(ObjectRef) Is ExtControl Then
+    ObjectType = "[" + Typename(var(ObjectRef).mycontrol) + "]"
+    Else
     ObjectType = "[" + Typename(var(ObjectRef)) + "]"
+    End If
 End If
 End Property
-Sub Construct(ref As Long, vtrefnumber As Long, Optional indirect As Boolean = False)
+Sub Construct(ref As Long, vtrefnumber As Long, Optional indirect As Boolean = False, Optional UseExtCtrl As Boolean = False)
 If useobj Then Exit Sub
+UseExtControl = UseExtCtrl
 Init = True
 
 ObjectRef = ref
@@ -46,8 +56,9 @@ Else
 vtref = vtrefnumber
 End If
 End Sub
-Sub ConstructObj(obj As Object, vtrefnumber As Long)
+Sub ConstructObj(obj As Object, vtrefnumber As Long, Optional UseExtCtrl As Boolean = False)
 Init = True
+UseExtControl = UseExtCtrl
 Set hardlink = obj
 useobj = True
 'ObjectRef = ref
@@ -63,7 +74,7 @@ End Property
 Public Sub clearlastobject()
 Set mLastObj = Nothing
 End Sub
-Public Property Get Value() As Variant
+Public Property Get value() As Variant
 Dim v
 Dim RETVAR As Variant, retvar2, obj As Object
 Dim check As Boolean
@@ -71,20 +82,20 @@ Set mLastObj = Nothing
 If Init Then
 If UseIndex Then
 If Not IndexNew Then
- Value = 0
+ value = 0
 Set mLastObj = Me
 Exit Property
 ElseIf useobj Then
     IndexNew = False
-    Value = ReadPropIndexObj(hardlink, vtref, mIndex)
+    value = ReadPropIndexObj(hardlink, vtref, mIndex, UseExtControl)
 Else
     IndexNew = False
-    Value = ReadPropIndex(ObjectRef, vtref, mIndex, check, RETVAR)
+    value = ReadPropIndex(ObjectRef, vtref, mIndex, UseExtControl, check, RETVAR)
     If check And IsObject(RETVAR) Then
     On Error Resume Next
     Set obj = RETVAR
     If ReadOneParameter(obj, (0), vbNullString, retvar2) Then
-        Value = retvar2
+        value = retvar2
        Else
           Set mLastObj = RETVAR
     End If
@@ -96,29 +107,29 @@ Else
 
 
 If useobj Then
-If ReadPropObj(hardlink, vtref, RETVAR) Then
+If ReadPropObj(hardlink, vtref, RETVAR, UseExtControl) Then
 If IsObject(RETVAR) Then
- Value = 0
+ value = 0
           Set mLastObj = RETVAR
 
 Else
-Value = RETVAR
+value = RETVAR
 End If
 End If
 Else
- If ReadProp(ObjectRef, vtref, RETVAR) Then
+ If ReadProp(ObjectRef, vtref, RETVAR, UseExtControl) Then
  If IsObject(RETVAR) Then
-         Value = 0
+         value = 0
           Set mLastObj = RETVAR
 
 Else
 On Error Resume Next
 If TypeOf RETVAR Is IUnknown Then
-Value = 0
+value = 0
 Set mLastObj = RETVAR: Exit Property
 End If
 Err.Clear
-Value = RETVAR
+value = RETVAR
 End If
  End If
  End If
@@ -129,23 +140,23 @@ Else
 End If
 'If Not IsObject(Value) Then Debug.Print Value
 End Property
-Public Property Let Value(vNewValue As Variant)
+Public Property Let value(vNewValue As Variant)
 If Init Then
 If Not UseIndex Then
 If useobj Then
-WritePropObj hardlink, vtref, vNewValue
+WritePropObj hardlink, vtref, vNewValue, UseExtControl
 Else
-WriteProp ObjectRef, vtref, vNewValue
+WriteProp ObjectRef, vtref, vNewValue, UseExtControl
 End If
 ElseIf Not IndexNew Then
     MyEr "Missing index", "Έχασα τον δείκτη"
     Exit Property
 ElseIf useobj Then
 IndexNew = False
-WritePropIndexObj hardlink, vtref, vNewValue, mIndex
+WritePropIndexObj hardlink, vtref, vNewValue, mIndex, UseExtControl
 Else
 IndexNew = False
-WritePropIndex ObjectRef, vtref, vNewValue, mIndex
+WritePropIndex ObjectRef, vtref, vNewValue, mIndex, UseExtControl
 End If
 End If
 
@@ -157,9 +168,9 @@ SwapString2Variant s, vNewValue
 If Init Then
 If Not UseIndex Then
 If useobj Then
-    WritePropObj hardlink, vtref, vNewValue
+    WritePropObj hardlink, vtref, vNewValue, UseExtControl
 Else
-    WriteProp ObjectRef, vtref, vNewValue
+    WriteProp ObjectRef, vtref, vNewValue, UseExtControl
 End If
 ElseIf Not IndexNew Then
 ' do nothing
@@ -167,10 +178,10 @@ ElseIf Not IndexNew Then
     Exit Property
 ElseIf useobj Then
     IndexNew = False
-    WritePropIndexObj hardlink, vtref, vNewValue, mIndex
+    WritePropIndexObj hardlink, vtref, vNewValue, mIndex, UseExtControl
 Else
     IndexNew = False
-    WritePropIndex ObjectRef, vtref, vNewValue, mIndex
+    WritePropIndex ObjectRef, vtref, vNewValue, mIndex, UseExtControl
 End If
 End If
 

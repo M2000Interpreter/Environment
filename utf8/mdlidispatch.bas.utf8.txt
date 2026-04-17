@@ -80,7 +80,8 @@ Public Function CallByNameFixParamArray _
     (pobjTarget As Object, _
     ByVal pstrProcName As Variant, _
     ByVal CallType As cbnCallTypes, _
-     pArgs(), pargs2() As String, items As Long, Optional robj As Object, Optional fixnamearg As Long = 0, Optional center2mouse As Boolean = False, Optional pUnk) As Variant
+     pArgs(), pargs2() As String, items As Long, Optional robj As Object, Optional fixnamearg As Long = 0, _
+     Optional center2mouse As Boolean = False, Optional pUnk, Optional UseExtControl As Boolean = False) As Variant
 
 
     ' pobjTarget    :   Class or form object that contains the procedure/property
@@ -110,8 +111,11 @@ Dim myptr() As Long
 Dim mm As GuiM2000
 Dim mmm As mArray
     ' Get IDispatch from object
+    If pobjTarget Is Nothing Then Exit Function
+    If Not UseExtControl Then
     If TypeOf pobjTarget Is ExtControl Then
     Set pobjTarget = pobjTarget.Value
+    End If
     End If
     Set IDsp = pobjTarget
     If fixnamearg = 0 Then
@@ -227,16 +231,16 @@ End If
 If LastErNum = 0 Then
         lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
 End If
-If LastErNum <> 0 Then GoTo exitHere
+If LastErNum <> 0 Then GoTo ExitHere
 If lngRet <> 0 Then
     If lngRet = DISP_E_EXCEPTION Then
         ' CallByName pobjTarget, pstrProcName, VbMethod
         MyEr GetBStrFromPtr(Excep.StrPtrDescription, False), GetBStrFromPtr(Excep.StrPtrDescription, False)
-        GoTo exitHere
+        GoTo ExitHere
         Err.Raise Excep.wCode
     ElseIf Typename$(pobjTarget) = "GuiM2000" Then
 JUMPHERE:
-            On Error GoTo exitHere
+            On Error GoTo ExitHere
             lngRet = 0
             If UCase(pstrProcName) = "HIDE" Then
                 
@@ -559,7 +563,7 @@ there:
 Err.Clear
 CallByNameFixParamArray = VarRet
 Exit Function
-exitHere:
+ExitHere:
     If Err.Number <> 0 Then CallByNameFixParamArray = VarRet
 Err.Clear
     If items > 0 Then

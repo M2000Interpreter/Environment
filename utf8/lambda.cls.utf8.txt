@@ -16,6 +16,7 @@ Option Explicit
 ' in running state copy nonlocal variables to current list
 Public Name$
 Public Code$
+Public Pad As Document
 Private Type Vars
     Value As Variant
     there As Long
@@ -44,16 +45,16 @@ If used > 0 Then
                     Set v(myVar(where).there) = myVar(where).Value
                 ElseIf Typename(myVar(where).Value) = "Group" Then
                     
-                    Dim aa As Object, g As Group
-                    Set g = myVar(where).Value
-                    If g.IamApointer Then
-                    Set v(myVar(where).there) = g
+                    Dim aa As Object, G As Group
+                    Set G = myVar(where).Value
+                    If G.IamApointer Then
+                    Set v(myVar(where).there) = G
                     Else
-                    Set aa = g
+                    Set aa = G
                     UnFloatGroup bstack, nm$, myVar(where).there, aa
                     Set aa = Nothing
                     End If
-                    Set g = Nothing
+                    Set G = Nothing
                 Else
                     Set v(myVar(where).there) = myVar(where).Value
                 End If
