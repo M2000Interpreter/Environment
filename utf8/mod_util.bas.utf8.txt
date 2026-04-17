@@ -293,7 +293,7 @@ Public WWX&, ins&
 Public INK$, MINK$
 Public MKEY$
 Public Type target
-    Comm As String
+    comm As String
     Tag As String ' specified by id
     id As Long ' function id
     ' THIS IS POINTS AT CHARACTER RESOLUTION
@@ -708,7 +708,9 @@ contarr1:
              r$ = "RefArray"
            
             End If
-        
+        ElseIf Typename(vv) = "ExtControl" Then
+            r$ = Typename(vv.Value)
+    
         End If
         Set bstackstr.lastobj = Nothing
         Set bstackstr.lastpointer = Nothing
@@ -769,8 +771,10 @@ Public Function KeyPressed(ByVal VirtKeyCode As Long) As Boolean
 On Error GoTo KEXIT
 If Not Screen.ActiveForm Is Nothing Then
 If GetForegroundWindow = Screen.ActiveForm.hWnd Then
+If VirtKeyCode > 32 Then
 If MapVirtualKey(VirtKeyCode, 2) = 0 Then
     VirtKeyCode = VkKeyScan(CByte(VirtKeyCode Mod 256))
+End If
 End If
 KeyPressed = CBool((GetAsyncKeyState(VirtKeyCode) And &H8000&) = &H8000&)
 End If
@@ -3889,6 +3893,7 @@ If .mysplit = 0 Then
 Else
     D.Line (0, spl)-(D.ScaleWidth - dv15, D.ScaleHeight - dv15), .Paper, BF
     End If
+    .curPos = 0
     .currow = .mysplit
 ElseIf D.Name = "Form1" Or mb.used Then
 D.Line (0, spl)-(D.ScaleWidth - dv15, D.ScaleHeight - dv15), .Paper, BF
@@ -12236,7 +12241,7 @@ yl& = yl& + Y& - 1
 half = 1 - (yl& - Y + 1) Mod 2
 With BoxTarget
 .SZ = prive.SZ
-.Comm = COM$
+.comm = COM$
 .id = id&
 .Tag = Tag$
 .Lx = X&
@@ -22726,17 +22731,17 @@ ElseIf IsLabelSymbolNew(rest$, "ΤΥΠΟΣ", "TYPE", Lang) Then
                         End If
                         If Err Then GoTo wrong
                         On Error Resume Next
-                        Dim s3 As String
-                        s3 = s$
+                        Dim S3 As String
+                        S3 = s$
                         For i = 0 To ar - 1
                             CreateFormObject aVar, 9
                             Set pppp.item(i) = aVar
                             Set ec1 = aVar
                             With ec1
-                                .Attach alfa.Controls.Add(s$, what$ & i), what$, s3, alfa, i
+                                .Attach alfa.Controls.Add(s$, what$ & i), what$, S3, alfa, i
                                 If Err.Number Then
                                     Err.Clear
-                                    .Attach alfa.Controls.Add(App.EXENAME + "." + s$, what$ & i), what$, s3, alfa, i
+                                    .Attach alfa.Controls.Add(App.EXENAME + "." + s$, what$ & i), what$, S3, alfa, i
                                     If Err.Number Then
                                         Err.Clear
                                         GoTo wrong
@@ -24643,7 +24648,7 @@ End If
 ''stac1 = VbNullString
 
 If InStr(ss$, "?") > 0 Or InStr(ss$, "*") > 0 Then
-aDir.pattern = ss$
+aDir.Pattern = ss$
 frm$ = mylcasefILE$(aDir.Dir2$(mcd, "", False))
 
 Else
@@ -24723,7 +24728,7 @@ End If
 End If
 If i <> 0 Then addpath = False
 If InStr(ss$, "?") > 0 Or InStr(ss$, "*") > 0 Then
-    aDir.pattern = ss$
+    aDir.Pattern = ss$
     frm$ = mylcasefILE$(aDir.Dir2$(mcd, "", False))
 Else
     frm$ = mylcasefILE$(aDir.Dir2$(mcd, ss$, False))
@@ -24754,7 +24759,7 @@ ss$ = vbNullString
 Do While frm$ <> ""
 MyDoEvents
 If NOEXECUTION Then Exit Do
-If Right$(" " + aDir.pattern, 1) <> "*" And InStr(" " + aDir.pattern, "|") = 0 Then
+If Right$(" " + aDir.Pattern, 1) <> "*" And InStr(" " + aDir.Pattern, "|") = 0 Then
     If addext Then
         If addpath Then
             s$ = Included(mcd + frm$, stac1)
@@ -24780,7 +24785,7 @@ Else
 End If
 If s$ <> "" Then
 If i Then
-If Right$(" " + aDir.pattern, 1) <> "*" Then
+If Right$(" " + aDir.Pattern, 1) <> "*" Then
 Form1.List1.additem s$
 Else
 Form1.List1.additem s$
@@ -32208,7 +32213,7 @@ If IsExp(bstack, rest$, p) Then
                     End If
                 ElseIf IsLabelSymbolNewExp(rest$, "ΟΔΗΓΙΑ", "COMMAND", Lang, ss$) Then
                     If IsStrExp(bstack, rest$, W$) Then
-                        q(p).Comm = W$
+                        q(p).comm = W$
                     Else
                         GoTo skipcommand
                     End If

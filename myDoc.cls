@@ -54,7 +54,7 @@ Private words$, Unique As Long
 Private p3 As Long
 Dim mlcid As Long
 Dim sortmlcid As Long
-Private pos() As Long, slen() As Long, hit() As Long
+Private Pos() As Long, slen() As Long, hit() As Long
 Dim Buffer() As Byte, bufOffset As Long, bufsize As Long, SeekBuf As Long
 Public Busy As Boolean
 Private mSortstyle As VbCompareMethod
@@ -713,7 +713,7 @@ End Sub
 Public Function textFormat(ByVal linebreak2use$) As String
 '
 Dim mlines As Long, NeoData As String
- Dim mycur As Long, thiscur, L As Long
+ Dim mycur As Long, thiscur, l As Long
 mycur = DocParaNext(0)
 textFormat = space$(500)
 Do While mycur <> 0
@@ -721,10 +721,10 @@ Do While mycur <> 0
     For mlines = 1 To para(mycur).lines
         NeoData = NeoData + para(mycur).content(mlines)
     Next mlines
-L = Len(NeoData)
-If Len(textFormat) < thiscur + L Then textFormat = textFormat + space$((thiscur + L) + 100)
-Mid$(textFormat, thiscur, L) = NeoData
-thiscur = thiscur + L
+l = Len(NeoData)
+If Len(textFormat) < thiscur + l Then textFormat = textFormat + space$((thiscur + l) + 100)
+Mid$(textFormat, thiscur, l) = NeoData
+thiscur = thiscur + l
 mycur = DocParaNext(mycur)
 Loop
 textFormat = Left$(textFormat, thiscur - 1)
@@ -732,7 +732,7 @@ End Function
 Private Function textArray(ByVal linebreak2use$, mycur As Long, minimumbytes2exit As Long) As Byte()
 '
 Dim mlines As Long, NeoData As String
- Dim thiscur, L As Long, textbuf As String
+ Dim thiscur, l As Long, textbuf As String
 If minimumbytes2exit < 500 Then minimumbytes2exit = 500
 textbuf = space$(500)
 Do While mycur <> 0 And Not Len(textbuf) > minimumbytes2exit
@@ -741,10 +741,10 @@ Do While mycur <> 0 And Not Len(textbuf) > minimumbytes2exit
         NeoData = NeoData + para(mycur).content(mlines)
     Next mlines
      
-L = Len(NeoData)
-If Len(textbuf) < thiscur + L Then textbuf = textbuf + space$((thiscur + L) + 100)
-Mid$(textbuf, thiscur, L) = NeoData
-thiscur = thiscur + L
+l = Len(NeoData)
+If Len(textbuf) < thiscur + l Then textbuf = textbuf + space$((thiscur + l) + 100)
+Mid$(textbuf, thiscur, l) = NeoData
+thiscur = thiscur + l
 mycur = DocParaNext(mycur)
 Loop
 If mycur <> 0 Then
@@ -757,7 +757,7 @@ End Function
 Private Function textString(ByVal linebreak2use$, mycur As Long, minimumbytes2exit As Long) As String
 '
 Dim mlines As Long, NeoData As String
- Dim thiscur, L As Long, textbuf As String
+ Dim thiscur, l As Long, textbuf As String
 If minimumbytes2exit < 500 Then minimumbytes2exit = 500
 textbuf = space$(500)
 Do While mycur <> 0 And Not Len(textbuf) > minimumbytes2exit
@@ -765,10 +765,10 @@ Do While mycur <> 0 And Not Len(textbuf) > minimumbytes2exit
     For mlines = 1 To para(mycur).lines
         NeoData = NeoData + para(mycur).content(mlines)
     Next mlines
-L = Len(NeoData)
-If Len(textbuf) < thiscur + L Then textbuf = textbuf + space$((thiscur + L) + 100)
-Mid$(textbuf, thiscur, L) = NeoData
-thiscur = thiscur + L
+l = Len(NeoData)
+If Len(textbuf) < thiscur + l Then textbuf = textbuf + space$((thiscur + l) + 100)
+Mid$(textbuf, thiscur, l) = NeoData
+thiscur = thiscur + l
 mycur = DocParaNext(mycur)
 Loop
 If mycur <> 0 Then
@@ -780,7 +780,7 @@ End Function
 Property Get textDoc() As String
 Attribute textDoc.VB_UserMemId = 0
 Dim mlines As Long, NeoData As String
- Dim mycur As Long, thiscur, L As Long
+ Dim mycur As Long, thiscur, l As Long
 mycur = DocParaNext(0)
 textDoc = space$(500)
 Do While mycur <> 0
@@ -788,10 +788,10 @@ Do While mycur <> 0
     For mlines = 1 To para(mycur).lines
         NeoData = NeoData + para(mycur).content(mlines)
     Next mlines
-L = Len(NeoData)
-If Len(textDoc) < thiscur + L Then textDoc = textDoc + space$((thiscur + L) + 100)
-Mid$(textDoc, thiscur, L) = NeoData
-thiscur = thiscur + L
+l = Len(NeoData)
+If Len(textDoc) < thiscur + l Then textDoc = textDoc + space$((thiscur + l) + 100)
+Mid$(textDoc, thiscur, l) = NeoData
+thiscur = thiscur + l
 mycur = DocParaNext(mycur)
 Loop
 If myVarType(thiscur, vbEmpty) Then
@@ -836,7 +836,7 @@ ReDim a(0 To 2)
  a(2) = CByte(&HBF)
  bom$ = a()
 End If
- Dim mycur As Long, thiscur, L As Long
+ Dim mycur As Long, thiscur, l As Long
 mycur = DocParaNext(0)
 Dim flag As Boolean
 flag = False
@@ -864,10 +864,10 @@ Do While mycur <> 0
         Next i
         NeoData = a()
       End If
-L = LenB(NeoData)
-If LenB(textDoc) < thiscur + L Then textDoc = textDoc + space$((thiscur + L) + 100)
-If L > 0 Then MidB$(textDoc, thiscur, L) = NeoData
-thiscur = thiscur + L
+l = LenB(NeoData)
+If LenB(textDoc) < thiscur + l Then textDoc = textDoc + space$((thiscur + l) + 100)
+If l > 0 Then MidB$(textDoc, thiscur, l) = NeoData
+thiscur = thiscur + l
 mycur = DocParaNext(mycur)
 Loop
 If myVarType(thiscur, vbEmpty) Then
@@ -878,7 +878,7 @@ End If
 End Function
 Function textHtmlDoc(colortable() As String) As String
 Dim mlines As Long, NeoData As String, a77$
- Dim mycur As Long, thiscur, L As Long, a$, mColor() As Long, qu$
+ Dim mycur As Long, thiscur, l As Long, a$, mColor() As Long, qu$
  qu$ = """"
  a77$ = space$(EditTabWidth)
  a77$ = Replace(a77$, " ", "&nbsp;")
@@ -900,43 +900,43 @@ a$ = Replace$(a$, ChrW$(7) + " ", ChrW$(7) + ChrW$(7))
 If UBound(para(mycur).colordata()) > 0 Then
 mColor() = para(mycur).colordata()
 NeoData = vbNullString
-L = 1
-If mColor(L) > 1 Then mColor(L) = 1
+l = 1
+If mColor(l) > 1 Then mColor(l) = 1
 Do
-If L > 3 Then
-If mColor(L - 3) <> 15 And mColor(L - 3) <> 7 Then
-If mColor(L) - mColor(L - 2) < 1 Then
-If L > 1 Then NeoData = NeoData + Replace(Mid$(a$, mColor(L - 2)), ChrW$(7), " ") + "</span>"
+If l > 3 Then
+If mColor(l - 3) <> 15 And mColor(l - 3) <> 7 Then
+If mColor(l) - mColor(l - 2) < 1 Then
+If l > 1 Then NeoData = NeoData + Replace(Mid$(a$, mColor(l - 2)), ChrW$(7), " ") + "</span>"
 Else
-If L > 1 Then NeoData = NeoData + Replace(Mid$(a$, mColor(L - 2), mColor(L) - mColor(L - 2)), ChrW$(7), " ") + "</span>"
+If l > 1 Then NeoData = NeoData + Replace(Mid$(a$, mColor(l - 2), mColor(l) - mColor(l - 2)), ChrW$(7), " ") + "</span>"
 End If
 Else
-If L > 1 Then
-    If mColor(L) - mColor(L - 2) < 1 Then
-    NeoData = NeoData + Mid$(a$, mColor(L - 2)) + "</span>"
+If l > 1 Then
+    If mColor(l) - mColor(l - 2) < 1 Then
+    NeoData = NeoData + Mid$(a$, mColor(l - 2)) + "</span>"
     Else
-NeoData = NeoData + Mid$(a$, mColor(L - 2), mColor(L) - mColor(L - 2)) + "</span>"
+NeoData = NeoData + Mid$(a$, mColor(l - 2), mColor(l) - mColor(l - 2)) + "</span>"
 End If
 End If
 End If
 Else
-If L > 1 Then
-    If mColor(L) - mColor(L - 2) < 1 Then
-    NeoData = NeoData + Mid$(a$, mColor(L - 2)) + "</span>"
+If l > 1 Then
+    If mColor(l) - mColor(l - 2) < 1 Then
+    NeoData = NeoData + Mid$(a$, mColor(l - 2)) + "</span>"
     Else
-    NeoData = NeoData + Mid$(a$, mColor(L - 2), mColor(L) - mColor(L - 2)) + "</span>"
+    NeoData = NeoData + Mid$(a$, mColor(l - 2), mColor(l) - mColor(l - 2)) + "</span>"
     End If
 End If
 End If
-NeoData = NeoData + "<span style=" + qu$ + "color: #" + colortable(mColor(L - 1)) + ";" + qu$ + ">"
+NeoData = NeoData + "<span style=" + qu$ + "color: #" + colortable(mColor(l - 1)) + ";" + qu$ + ">"
 
-  L = L + 2
-Loop Until L > UBound(mColor())
-If mColor(L - 2) > 0 Then
-If mColor(L - 3) <> 15 And mColor(L - 3) <> 7 Then
-a$ = NeoData + Replace(Mid$(a$, mColor(L - 2)), ChrW$(7), " ") + "</span>"
+  l = l + 2
+Loop Until l > UBound(mColor())
+If mColor(l - 2) > 0 Then
+If mColor(l - 3) <> 15 And mColor(l - 3) <> 7 Then
+a$ = NeoData + Replace(Mid$(a$, mColor(l - 2)), ChrW$(7), " ") + "</span>"
 Else
-a$ = NeoData + Mid$(a$, mColor(L - 2)) + "</span>"
+a$ = NeoData + Mid$(a$, mColor(l - 2)) + "</span>"
 End If
 Else
 a$ = NeoData + "</span>"
@@ -952,10 +952,10 @@ End If
 If Nonbsp Then
 NeoData = Replace$(NeoData, vbTab, a77$)
 End If
-L = Len(NeoData)
-If Len(textHtmlDoc) < thiscur + L Then textHtmlDoc = textHtmlDoc + space$((thiscur + L) + 100)
-Mid$(textHtmlDoc, thiscur, L) = NeoData
-thiscur = thiscur + L
+l = Len(NeoData)
+If Len(textHtmlDoc) < thiscur + l Then textHtmlDoc = textHtmlDoc + space$((thiscur + l) + 100)
+Mid$(textHtmlDoc, thiscur, l) = NeoData
+thiscur = thiscur + l
 mycur = DocParaNext(mycur)
 Loop
 If myVarType(thiscur, vbEmpty) Then
@@ -971,17 +971,17 @@ End If
 End Function
 Property Get textDoc1LINE() As String  ' MORE SPEED IF WE KNOW THAT WE DON'T USE LINE BREAK
 Dim mlines As Long, NeoData As String
- Dim mycur As Long, thiscur, L As Long
+ Dim mycur As Long, thiscur, l As Long
 mycur = DocParaNext(0)
 textDoc1LINE = space$(1000)
 Do While mycur <> 0
     If thiscur <> 0 Then NeoData = vbCrLf Else thiscur = 1
         NeoData = NeoData + para(mycur).content(1)
    
-L = Len(NeoData)
-If Len(textDoc1LINE) < thiscur + L Then textDoc1LINE = textDoc1LINE + space$((thiscur + L) + 100)
-Mid$(textDoc1LINE, thiscur, L) = NeoData
-thiscur = thiscur + L
+l = Len(NeoData)
+If Len(textDoc1LINE) < thiscur + l Then textDoc1LINE = textDoc1LINE + space$((thiscur + l) + 100)
+Mid$(textDoc1LINE, thiscur, l) = NeoData
+thiscur = thiscur + l
 mycur = DocParaNext(mycur)
 Loop
 textDoc1LINE = Left$(textDoc1LINE, thiscur - 1)
@@ -1015,7 +1015,7 @@ Public Sub InsertDoc(ByVal ParaNum As Long, fromPos As Long, norawtext As String
      End If
      a() = Split(norawtext + vbLf, vbLf)
      
-Dim i As Long, k As Long, j As Long, ii As Long
+Dim i As Long, K As Long, j As Long, ii As Long
     i = LBound(a())
     Do
     If i > UBound(a()) Then Exit Do
@@ -1031,13 +1031,13 @@ Dim i As Long, k As Long, j As Long, ii As Long
     End If
     If TabWidth > 0 Then
     t() = Split(a(i), Chr(9))
-    k = LBound(t())
+    K = LBound(t())
     j = UBound(t())
-        If k = j Then
-        t_text = t(k)
+        If K = j Then
+        t_text = t(K)
         Else
         t_text = vbNullString
-        For ii = k To j
+        For ii = K To j
         If Len(t(ii)) = 0 Then
         t_text = t_text + space(TabWidth)
         ElseIf Len(t_text) Mod TabWidth = 0 Then
@@ -1403,8 +1403,8 @@ End Property
 Property Get startfrom(ParaNum As Long) As Long
 startfrom = para(ParaNum).startfrom
 End Property
-Property Let Paracolordata(ParaNum As Long, col() As Long)
-If ParaNum <> 0 Then para(ParaNum).colordata() = col()
+Property Let Paracolordata(ParaNum As Long, Col() As Long)
+If ParaNum <> 0 Then para(ParaNum).colordata() = Col()
 End Property
 Property Get Paracolordata(ParaNum As Long) As Long()
 ' it is valid
@@ -1426,18 +1426,18 @@ Property Get LastParagraph() As Long
 LastParagraph = DocParaBack(0)
 End Property
 Property Get SizeCRLF() As Long
-Dim mycur As Long, suma As Long, k As Long
+Dim mycur As Long, suma As Long, K As Long
 If IsEmpty Then
 Else
  mycur = DocParaNext(0)
-  k = -1
+  K = -1
     Do While mycur > 0
-    k = k + 1
+    K = K + 1
         suma = suma + TextParagraphLen(mycur)
         mycur = DocParaNext(mycur)
     Loop
     End If
-    SizeCRLF = suma + k * 2
+    SizeCRLF = suma + K * 2
 End Property
 Property Get TextParagraphOrder(ByVal Order As Long) As String
     ' 1 is the first
@@ -1491,41 +1491,25 @@ If FirstPosPara <= 0 Then
     mC = -1
     a = DocParaBack(a)
     If a = 0 Then Exit Function
-ElseIf FirstPosPara = Me.TextParagraphLen(a) Then
-    mC = FirstPosPara
-Else
-    If mC > Len(s$) Then
-        If Me.TextParagraphLen(a) > mC Then
-            
-            mC = mC - Len(s$)
-        Else
-            mC = mC - Len(s$) - 1
-        End If
-    Else
-    mC = mC - Len(s$)
-    End If
+'ElseIf FirstPosPara = Me.TextParagraphLen(a) Then
+'    mC = FirstPosPara
 End If
 If mC >= Len(s$) Then
 b = InstrRevTextCompareAnyLocale(Me.TextParagraph(a), s$, mC, mlcid) 'using default locale????
 ElseIf FirstPosPara > Len(s$) Then
-'Stop
-'b = InstrRevTextCompareAnyLocale(Me.TextParagraph(a), s$, FirstPosPara, mlcid)  'using default locale????
 End If
-'there:
 If b = 0 Then
-a = DocParaBack(a)
-Do While b = 0 And a > 0
-b = InstrRevTextCompareAnyLocale(Me.TextParagraph(a), s$, , mlcid)   'using default locale????
-If b Then
-Exit Do
-End If
-a = DocParaBack(a)
-Loop
+    a = DocParaBack(a)
+    Do While b = 0 And a > 0
+        b = InstrRevTextCompareAnyLocale(Me.TextParagraph(a), s$, , mlcid)   'using default locale????
+        If b Then Exit Do
+        a = DocParaBack(a)
+    Loop
 End If
 If b > 0 Then
-FirstPara = a
-FirstPosPara = b
-FindStrUp = True
+    FirstPara = a
+    FirstPosPara = b
+    FindStrUp = True
 End If
 End Function
 Public Function FindStrDown(s$, FirstPara As Long, FirstPosPara As Long) As Boolean
@@ -2230,7 +2214,7 @@ End Function
 Public Function SaveUnicodeOrAnsi(ByVal FileName As String, Optional mode2save As Long = 0, Optional Append As Boolean = False) As Boolean
 ' using doc as extension you can read it from word...with automatic conversion to unicode
 ' OVERWRITE ALWAYS
-Dim w As Long, a() As Byte, f$, i As Long, bb As Byte, yesswap As Boolean, LF$
+Dim W As Long, a() As Byte, f$, i As Long, bb As Byte, yesswap As Boolean, LF$
 Const Utf8CodePage As Long = 65001
 On Error GoTo t12345
 '' 0 vbcrlf, 1 vblf, 2 vbcr
@@ -2245,11 +2229,11 @@ If Not Append Then
 End If
 f$ = GetDosPath(FileName)
 If Err.Number > 0 Or f$ = vbNullString Then Exit Function
-w = FreeFile
-Open f$ For Binary As w
+W = FreeFile
+Open f$ For Binary As W
 ' mode2save
 ' 0 is utf-le
-If Append Then Seek #w, LOF(w) + 1
+If Append Then Seek #W, LOF(W) + 1
 mode2save = mode2save Mod 10
 Dim maxmw As Long, iPos As Long
  Dim bbBuf() As Byte, iLen As Long
@@ -2258,17 +2242,17 @@ Dim maxmw As Long, iPos As Long
 
 If Abs(mode2save) = 7 Or mode2save = 0 Then
  a() = ChrW(&HFEFF)
-If Not Append And mode2save >= 0 Then Put #w, , a()
+If Not Append And mode2save >= 0 Then Put #W, , a()
 
 ElseIf Abs(mode2save) = 1 Then
 a() = ChrW(&HFFFE) ' big endian...need swap
-If Not Append And mode2save > 0 Then Put #w, , a()
+If Not Append And mode2save > 0 Then Put #W, , a()
 yesswap = True
 ElseIf Abs(mode2save) = 2 Then  'utf8
 If mode2save > 0 And Not Append Then
-        Put #w, , CByte(&HEF)
-        Put #w, , CByte(&HBB)
-        Put #w, , CByte(&HBF)
+        Put #W, , CByte(&HEF)
+        Put #W, , CByte(&HBB)
+        Put #W, , CByte(&HBF)
         End If
      ''   Put #W, , Utf16toUtf8(buf)
             iPos = DocParaNext(0)
@@ -2282,12 +2266,12 @@ If mode2save > 0 And Not Append Then
             If iLen > 0 Then
             ReDim bbBuf(0 To iLen - 1)
             iLen = WideCharToMultiByte(Utf8CodePage, 0, VarPtr(a(0)), CLng(UBound(a) - LBound(a) + 1) \ 2, VarPtr(bbBuf(0)), iLen, 0, 0)
-            Put #w, , bbBuf()
+            Put #W, , bbBuf()
             End If
         Wend
      End If
      
-        Close w
+        Close W
     SaveUnicodeOrAnsi = True
         Exit Function
 ElseIf Abs(mode2save) = 3 Then ' ascii
@@ -2296,9 +2280,9 @@ ElseIf Abs(mode2save) = 3 Then ' ascii
 If mlcid < 4 Then mlcid = Module1.Clid
             While iPos <> 0
             
-                Put #w, , Convert2Ansi(textString(LF$, iPos, maxmw), mlcid)
+                Put #W, , Convert2Ansi(textString(LF$, iPos, maxmw), mlcid)
             Wend
-            Close w
+            Close W
             SaveUnicodeOrAnsi = True
             Exit Function
 End If
@@ -2312,17 +2296,17 @@ a() = textArray(LF$, iPos, maxmw)
 For i = 0 To UBound(a()) - 1 Step 2
 bb = a(i): a(i) = a(i + 1): a(i + 1) = bb
 Next i
-Put #w, , a()
+Put #W, , a()
 Wend
 Else
 
 
 While iPos <> 0
 a() = textArray(LF$, iPos, maxmw)
-Put #w, , a()
+Put #W, , a()
 Wend
 End If
-Close w
+Close W
 SaveUnicodeOrAnsi = True
 t12345:
 End Function
@@ -2610,12 +2594,12 @@ mycur = DocParaNext(mycur)
 Loop
 End Property
 Private Function mWordCount(ByVal s$) As Long
-Dim i&, L As Long
+Dim i&, l As Long
 Static p2 As Long, p1 As Integer, p4 As Long
-  L = Len(s): If L = 0 Then Exit Function
-  p2 = StrPtr(s): L = L - 1
+  l = Len(s): If l = 0 Then Exit Function
+  p2 = StrPtr(s): l = l - 1
   p4 = p2 - 2
-  For i = p2 To p2 + L * 2 Step 2
+  For i = p2 To p2 + l * 2 Step 2
   GetMem2 i, p1
   Select Case p1
     Case 65 To 90, 97 To 122, Is > 127
@@ -2628,41 +2612,41 @@ Static p2 As Long, p1 As Integer, p4 As Long
   Next i
 End Function
 Private Function mWordMap(s$) As String
-Dim i&, L As Long
+Dim i&, l As Long
 Static p2 As Long, p1 As Integer, p3 As Long, p4 As Long
-Dim ss$, pos As Long
-pos = -2
-  L = Len(s): If L = 0 Then mWordMap = " ": Exit Function
+Dim ss$, Pos As Long
+Pos = -2
+  l = Len(s): If l = 0 Then mWordMap = " ": Exit Function
 
-  p2 = StrPtr(s$): L = L - 1
+  p2 = StrPtr(s$): l = l - 1
   p3 = p2
   p4 = p2 - 2
-  For i = p2 To p2 + L * 2 Step 2
+  For i = p2 To p2 + l * 2 Step 2
   GetMem2 i, p1
   Select Case p1
     Case 65 To 90, 97 To 122, Is > 127
-    If i - p4 = 2 Then p2 = i: pos = pos + 2
+    If i - p4 = 2 Then p2 = i: Pos = Pos + 2
     Case 39
     If i - p4 = 2 Then p4 = i
     Case Else
     If i - p4 > 2 Then
-            CopyMemory ByVal p3 + pos, ByVal p2, i - p2
-            pos = pos + i - p2
-            PutMem2 p3 + pos, 32   ' place a space...
+            CopyMemory ByVal p3 + Pos, ByVal p2, i - p2
+            Pos = Pos + i - p2
+            PutMem2 p3 + Pos, 32   ' place a space...
             
     End If
     p4 = i
   End Select
   Next i
   If i - p4 > 2 Then
-        CopyMemory ByVal p3 + pos, ByVal p2, i - p2
-        pos = pos + i - p2
+        CopyMemory ByVal p3 + Pos, ByVal p2, i - p2
+        Pos = Pos + i - p2
   End If
-  pos = pos / 2
-  If pos <= 0 Then
+  Pos = Pos / 2
+  If Pos <= 0 Then
   mWordMap = " "
   Else
-  mWordMap = Left$(s$, pos)
+  mWordMap = Left$(s$, Pos)
   End If
 
 End Function
@@ -2704,31 +2688,31 @@ Unique = CountWords2(words$, uLCID)
 UniqueWords = Unique
 End Function
 Private Function CountWords2(a$, uLCID As Long) As Long
-Dim L As Long, NORM_IGNORECASE As Long
+Dim l As Long, NORM_IGNORECASE As Long
 If Not NoIgnoreCase Then NORM_IGNORECASE = &H1001 Else NORM_IGNORECASE = &H1000
 Dim Top As Long
-L = Len(a$)
-If L = 1 Then
+l = Len(a$)
+If l = 1 Then
 CountWords2 = -(Trim(a$) <> "")
 Top = CountWords2
 If Top > 0 Then
-ReDim pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
-pos(1) = StrPtr(a$)
+ReDim Pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
+Pos(1) = StrPtr(a$)
 slen(1) = 1
 End If
 Else
 Dim p5 As Long
 p5 = 512 '' L \ 32 + 1
-ReDim pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
-Dim i As Long, k As Long
+ReDim Pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
+Dim i As Long, K As Long
 Dim p2 As Long, p4 As Long, p6 As Long, bb As Integer
 p2 = StrPtr(a$)
 p3 = p2
 Dim Md As Long, mda As Long, mtop As Long
-L = p2 + 2 * L
+l = p2 + 2 * l
 p4 = p2
 Do
-         If p4 >= L Then
+         If p4 >= l Then
          If p4 <> p2 Then GoTo there1
         CountWords2 = Top: Exit Function
         End If
@@ -2740,13 +2724,13 @@ Do
             Case Else
             If p4 <> p2 Then
 there1:
-                k = (p4 - p2) \ 2
+                K = (p4 - p2) \ 2
                 mtop = Top
                 mda = 0
                 Md = (mtop - mda + 1) \ 2
                 p6 = mda + Md
                 Do While Md > 0
-                    Select Case CompareString(uLCID, NORM_IGNORECASE, p2, k, pos(p6), slen(p6))
+                    Select Case CompareString(uLCID, NORM_IGNORECASE, p2, K, Pos(p6), slen(p6))
                         Case 1
                             mtop = mtop - Md
                             Md = (mtop - mda + 1) \ 2
@@ -2762,19 +2746,19 @@ there1:
                 If Md = 0 Then
                 If Top = p5 Then
                 p5 = p5 * 2
-                ReDim Preserve pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
+                ReDim Preserve Pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
                 End If
                     Top = Top + 1
                     
                     If mda = Top - 1 Then
-                        pos(Top) = p2
-                        slen(Top) = k
+                        Pos(Top) = p2
+                        slen(Top) = K
                     Else
-                        CopyMemory ByVal VarPtr(pos(1)) + mda * 4 + 4, ByVal VarPtr(pos(1)) + mda * 4, (Top - mda - 1) * 4
+                        CopyMemory ByVal VarPtr(Pos(1)) + mda * 4 + 4, ByVal VarPtr(Pos(1)) + mda * 4, (Top - mda - 1) * 4
                         CopyMemory ByVal VarPtr(slen(1)) + mda * 4 + 4, ByVal VarPtr(slen(1)) + mda * 4, (Top - mda - 1) * 4
                         CopyMemory ByVal VarPtr(hit(1)) + mda * 4 + 4, ByVal VarPtr(hit(1)) + mda * 4, (Top - mda - 1) * 4
-                        pos(mda + 1) = p2
-                        slen(mda + 1) = k
+                        Pos(mda + 1) = p2
+                        slen(mda + 1) = K
                         hit(mda + 1) = 0
                     End If
                 End If
@@ -2799,7 +2783,7 @@ Else
 ReDim a(1 To Unique)
 Dim i As Long
 For i = 1 To Unique
-a(i) = MakeString(pos(i), slen(i)) & " (" & (hit(i) + 1) & ")"
+a(i) = MakeString(Pos(i), slen(i)) & " (" & (hit(i) + 1) & ")"
 Next i
 ExportWords = a()
 End If
@@ -2817,11 +2801,11 @@ Exit Sub
 Else
 If usenumbers Then
 For i = 1 To Unique
-THISOBJECT.additem MakeString(pos(i), slen(i)) & " (" & (hit(i) + 1) & ")"
+THISOBJECT.additem MakeString(Pos(i), slen(i)) & " (" & (hit(i) + 1) & ")"
 Next i
 Else
 For i = 1 To Unique
-THISOBJECT.additem MakeString(pos(i), slen(i))
+THISOBJECT.additem MakeString(Pos(i), slen(i))
 Next i
 
 End If
@@ -2831,7 +2815,7 @@ End Sub
 Public Sub ResetWords()
 words$ = vbNullString
 p3 = 0
-ReDim pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
+ReDim Pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
 Unique = 0
 End Sub
 Public Sub QuickSortString(arr() As String, ByVal lb As Long, ByVal ub As Long)
@@ -3079,6 +3063,17 @@ Exit Function
 End If
 Next cu
 End Function
+Function CompareOnly(Position As Long, from$, this$, Optional uLCID As Long = 1033) As Boolean
+Dim NORM_IGNORECASE As Long
+If Not NoIgnoreCase Then NORM_IGNORECASE = &H1
+Dim p1 As Long, p2 As Long, l1 As Long, l2 As Long, cu As Long
+l1 = (Len(from$) - Len(this$)) * 2 - (Position - 1) * 2
+If l1 < 0 Then Exit Function
+p1 = StrPtr(from$) + (Position - 1) * 2
+p2 = StrPtr(this$)
+l2 = Len(this$)
+CompareOnly = CompareString(uLCID, NORM_IGNORECASE, p1, l2, p2, l2) = 2
+End Function
 Function InstrRevTextCompareAnyLocale(from$, this$, Optional Position As Long = -1, Optional uLCID As Long = 1033) As Long
 Dim NORM_IGNORECASE As Long
 If Not NoIgnoreCase Then NORM_IGNORECASE = &H1
@@ -3121,19 +3116,21 @@ PutMem2 VarPtr(acc), mValue
 RangeUnsignInteger = acc >= Abs(mFrom) And acc <= Abs(mTo)
 End Function
 Function FindWord(Find$, direction As Boolean, there As Long, cur As Long) As Boolean
-Dim oncemore As Boolean, result As Boolean, res$, code As Integer
+Dim oncemore As Boolean, result As Boolean, res$, Code As Integer
+Dim oCur As Long
 again:
 If direction Then
  result = FindStrDown(Find$, there, cur)
  Else
+ oCur = cur
  result = FindStrUp(Find$, there, cur)
  End If
 If result Then
 res$ = TextParagraph(there)
 If cur > 1 Then
-    code = AscW(Mid$(res$, cur - 1, 1))
-    If Not RangeUnsignInteger(code, &H2000&, &H206F&) Then
-        Select Case code
+    Code = AscW(Mid$(res$, cur - 1, 1))
+    If Not RangeUnsignInteger(Code, &H2000&, &H206F&) Then
+        Select Case Code
         Case 39, 65 To 90, 97 To 122, Is > 127
         If direction Then cur = cur + 1 Else cur = cur - 1
         GoTo again
@@ -3142,9 +3139,9 @@ If cur > 1 Then
     End If
 End If
 If (Len(res$) - cur + 1) > Len(Find$) Then
-    code = AscW(Mid$(res$, cur + Len(Find$), 1))
-    If Not RangeUnsignInteger(code, &H2000&, &H206F&) Then
-    Select Case code
+    Code = AscW(Mid$(res$, cur + Len(Find$), 1))
+    If Not RangeUnsignInteger(Code, &H2000&, &H206F&) Then
+    Select Case Code
     Case 39, 65 To 90, 97 To 122, Is > 127
     
     If direction Then
@@ -3159,7 +3156,11 @@ If (Len(res$) - cur + 1) > Len(Find$) Then
                 Exit Function
             End If
         Else
+        If oCur = cur + Len(Find$) Then
+        cur = cur - 1
+        Else
         cur = cur + Len(Find$)
+        End If
         End If
     End If
     GoTo again
@@ -3185,18 +3186,46 @@ End Function
 
 Function FindIdentifier(Find$, direction As Boolean, there As Long, cur As Long) As Boolean
 ' there is paragraph number not paragraph order
-Dim oncemore As Boolean, result As Boolean, res$
-If Len(Find$) > 1 And Left$(Find$, 1) = "&" Then Find$ = Mid$(Find$, 2): cur = cur + 1
+Dim oncemore As Boolean, result As Boolean, res$, lenFind As Long
+lenFind = Len(Find$)
+If lenFind > 1 And Left$(Find$, 1) = "&" Then Find$ = Mid$(Find$, 2): cur = cur + 1
 If InStr(Find$, Chr$(13)) > 0 Then Exit Function
 If InStr(Find$, Chr$(10)) > 0 Then Exit Function
+
+Dim oCur As Long
+If direction Then
+Else
+If cur - lenFind >= 0 Then
+If TextParagraphLen(there) + 1 < cur - 1 Then
+Else
+If CompareOnly(cur - lenFind, TextParagraph(there), Find$, LCID) Then
+    cur = cur - lenFind - 1
+End If
+End If
+End If
+
+
+While TextParagraphLen(there) < cur Or TextParagraphLen(there) < lenFind
+    cur = TextParagraphLen(there)
+    If cur < lenFind Then
+        there = DocParaBack(there)
+        If there = 0 Then Exit Function
+        cur = TextParagraphLen(there)
+    Else
+        GoTo again
+    End If
+Wend
+End If
 again:
 If direction Then
  result = FindStrDown(Find$, there, cur)
  Else
+ oCur = cur
  result = FindStrUp(Find$, there, cur)
  End If
 If result Then
 res$ = TextParagraph(there)
+Debug.Print there, res$
 If cur > 1 Then
 If AscW(Mid$(res$, cur, 1)) = 35 Then
 Else
@@ -3206,7 +3235,12 @@ Else
     If direction Then
     cur = cur + 1
     Else
-    cur = cur + Len(Find$) - 1
+    If oCur = cur + lenFind - 1 Then
+    cur = cur - 1
+
+    Else
+    cur = cur + lenFind - 1
+    End If
     End If
     '
     GoTo again
@@ -3218,13 +3252,13 @@ If Find$ = "" Then Exit Function
 Select Case AscW(Right$(Find$, 1))
 Case 36, 37, 40
 Case Else
-If (Len(res$) - cur + 1) > Len(Find$) Then
-    Select Case AscW(Mid$(res$, cur + Len(Find$), 1))
+If (Len(res$) - cur + 1) > lenFind Then
+    Select Case AscW(Mid$(res$, cur + lenFind, 1))
     Case 40, 48 To 57, 65 To 90, 95, 97 To 122, Is > 127
     If direction Then
     cur = cur + 1
     Else
-        If cur <= Len(Find$) Then
+        If cur <= lenFind Then
             there = DocParaBack(there)
                 If there > 0 Then
                     cur = TextParagraphLen(there)
@@ -3233,11 +3267,12 @@ If (Len(res$) - cur + 1) > Len(Find$) Then
                 Exit Function
             End If
         Else
-        cur = cur + Len(Find$)
+        cur = cur + lenFind - 1
         End If
     End If
     GoTo again
     Case Else
+    
     End Select
 End If
 End Select
@@ -3283,10 +3318,10 @@ CompareStr2 = -2 + CompareString(0, 0, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
 
 End Function
 
-Private Function countbrakcet(a$, k As Long, counter As Long) As Long
+Private Function countbrakcet(a$, K As Long, counter As Long) As Long
 Dim i As Long, j As Integer, blind As Boolean
 countbrakcet = counter
-For i = Abs(k) To Len(a$)
+For i = Abs(K) To Len(a$)
 j = AscW(Mid$(a$, i, 1))
 Select Case j
 Case 34
@@ -3294,7 +3329,7 @@ blind = Not blind
 Case 123
 If Not blind Then countbrakcet = countbrakcet + 1
 Case 125
-If Not blind Then countbrakcet = countbrakcet - 1: If countbrakcet = 0 Then k = i: Exit For
+If Not blind Then countbrakcet = countbrakcet - 1: If countbrakcet = 0 Then K = i: Exit For
 End Select
 Next i
 

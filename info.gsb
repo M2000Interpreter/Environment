@@ -18360,7 +18360,7 @@ Function Pad.PopUp {
 }
 function cs_choose{
        With Pad, "ColorCollection1", lcase$("|abstract|as|base|bool|break|byte|case|catch|char|checked|class|const|continue|decimal|default|delegate|do|double|else|enum|event|explicit|extern|false|finally|fixed|float|for|foreach|goto|if|implicit|in|int|interface|internal|is|lock|long|namespace|new|null|object|operator|out|override|params|private|protected|public|readonly|ref|return|sbyte|sealed|short|sizeof|stackalloc|static|string|struct|switch|this|throw|True|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|using|static|virtual|void|volatile|while|add|alias|ascending|async|await|by|descending|dynamic|equals|from|get|global|group|into|join|let|nameof|on|orderby|partial|remove|select|set|value|var|when|where|yield|"),"NoColor", False, "UseCase", True,"ExtraFront", "_", "LineComment2", "", "CommentSymbols","[/][/]", "ComSymbolsWidth", 2, "CommentLineLight", false, "MultiLineComment1", "/*","MultiLineComment2", "*/"
-      With Pad, "WordCharLeft",". ,+-=/*^()[];<>:?", "WordCharRight"," .,+-=/*^()[];<>?:","OtherSymbols","@","UseColon",";"
+      With Pad, "WordCharLeft",". ,+-=/*^()[];<>:?", "WordCharRight"," .,+-=/*^()[];<>?:","OtherSymbols","@","UseColon",";", "LineComment1","/","LineComment2","/"
       With Pad,"StartSymbols", "+-&|*=></,.1234567890()'"+chr$(34), "StringSep2","'", "EnablePairs", True, "linespace", 30
       With Pad, "SearchWords", True, "nowrap", True, "AllowInsertBrackets",  True, "SpaceIndent", 2, "HighlightParagraph", True, "Default", True
       Method Pad, "ReColor"
@@ -23382,9 +23382,9 @@ MODULE SIMPLETXT {Παλιό.Τοπικό=Τοπικό
 Μέθοδος Κειμ3, "Move", θεσηΧ,2400,5000,400
 νγ$={
 }
-Με Κειμ1, "ShowAlways", Αληθές, "NumberOnly", Αληθές, "Value" ως Τιμ1, "WordCharLeft","(", "WordCharRight",")"
+Με Κειμ1, "ShowAlways", Αληθές, "NumberOnly", Αληθές, "Value" ως Τιμ1, "WordCharLeft","(", "WordCharRight",")", "Default", Αληθές
 Με Κειμ2, "ShowAlways", Αληθές, "NumberIntOnly",Αληθές, "Value" ως Τιμ2
-Με Κειμ3, "ShowAlways", Αληθές, "UsedAsTextBox", Αληθές,"Text" ως Τιμ3$
+Με Κειμ3, "ShowAlways", Αληθές, "UsedAsTextBox", Αληθές,"Text" ως Τιμ3$, "SelLength" ως  Μήκος_Επιλογής, "SelStart" ως Αρχή_Επιλογής
 Τιμ1=93.112
 Τιμ2=1456
 Τιμ3$="Μια γραμμή μόνο"
@@ -23395,7 +23395,13 @@ MODULE SIMPLETXT {Παλιό.Τοπικό=Τοπικό
       Κάλεσε Τοπικά Φόρμα1.About()
 }
 Συνάρτηση Κειμ3.About {
-      Κάλεσε Τοπικά Φόρμα1.About()
+      Επίπεδο Φόρμα1 {
+            Οθόνη  #606060
+            Αρχή_Επιλογής=0
+            Μήκος_Επιλογής=Μήκος(Τιμ3$)
+            Τύπωσε $(Τρόπος),"με ctrl+1 κεφαλαία|ctrl+2 πεζά|ctrl+Z undo|ctrl+Y redo"
+            Τυπωσε Μέρος  $(Τρόπος),"με ctrl + A επιλογή όλων"
+      }
 }
 Συνάρτηση Φόρμα1.About {
       Επίπεδο Φόρμα1 {
@@ -23410,7 +23416,7 @@ MODULE SIMPLETXT {Παλιό.Τοπικό=Τοπικό
       Επίπεδο Φόρμα1 {
             Τιμ1=Τιμ1+1  \\ δεν δουλεύει το Τιμ1++ γιατί είναι αντικείμενο και όχι μεταβλητή
             Οθόνη  #606060
-            Τύπωσε  Μορφή$(" {0:3} | {1} | Ctrl+F1", Τιμ1, Τιμ2)
+            Τύπωσε Μορφή$(" {0:3} | {1} | Ctrl+F1", Τιμ1, Τιμ2)
             Τύπωσε Πάνω $(9), Τιμ3$
             Ανανέωση
             Μέθοδος Κειμ1, "Show"
@@ -23450,9 +23456,9 @@ Method text3, "Move", PositionX,2400,5000,400
 nl$={
 }
 
-With text1, "ShowAlways", True, "NumberOnly", True, "Value" As Value1
+With text1, "ShowAlways", True, "NumberOnly", True, "Value" As Value1, "default", true
 With text2, "ShowAlways", True, "NumberIntOnly", True, "Value" As Value2, "Text" As Value2$
-With text3, "ShowAlways", True, "UsedAsTextBox", True,"Text" As Value3$
+With text3, "ShowAlways", True, "UsedAsTextBox", True,"Text" As Value3$, "SelLength" as  SelLength, "SelStart" as SelStart
 Value1=93.112
 Value2=1456
 Value3$="One line only"
@@ -23463,7 +23469,13 @@ Function text2.About {
       Call Local Form1.About()
 }
 Function text3.About {
-      Call Local Form1.About()
+      Layer Form1 {
+            Cls  #606060
+            SelStart=0
+            SelLength=Len(Value3$)
+            Print $(Way),"use ctrl+1 ucase|ctrl+2 lcase|ctrl+Z undo|ctrl+Y redo"
+            Print Part $(Way),"use ctrl+A select all"
+      }
 }
 Function Form1.About {
       Layer Form1 {
@@ -40861,13 +40873,16 @@ End Function
 
 }
 MODULE BASICO {// this is a simple program on a more advanced input/output to M2000 console through threads.
-
-form 60, 32
+ofont=fontname$
+font "consolas"
+if lcase$(fontname$, 7)<>"consolas" then font "Verdana"
+form 60,25
 // guess.bas
 // Guess a number game
 // Trasnlation from BASICO version 0.9
 // addition of a thread system to emulate reading/writing to CONSOLE
-global backColor=5, mypen=14
+global backColor=#003300, mypen=15
+pen 10
 cls backColor,0
 string keybuffer, outbuffer, lastchar, c, z, s
 // echo = false
@@ -40946,6 +40961,11 @@ main()
 FlushOutBuffer()
 print
 threads erase
+font ofont
+pen 14
+cls 5
+form 60, 32
+
 End
 
 sub main()
@@ -41046,14 +41066,14 @@ end function
 sub mycursor(s, p)
 		if s<>"" then if uint(chrcode(s))<32 then s="" 
 		if p>0 then
-			print part @(p), $(0,4), ~(mypen+1, backColor, backColor), s
+			print part @(p), $(0,4), ~(mypen, backColor, backColor), s
 		 else
 			 print over $(0), s
 		end if
 end sub
 sub mycursorOnly(p)
 		if p>0 then
-			print part @(p), $(0,4), ~(mypen+1, backColor, backColor), if$(blink and query->"_","")
+			print part @(p), $(0,4), ~(mypen, backColor, backColor), if$(blink and query->"_","")
 		 else
 			 print over $(0), if$(blink and query->"_","")
 		end if

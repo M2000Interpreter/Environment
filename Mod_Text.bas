@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 18
+Global Const Revision = 19
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -4139,7 +4139,7 @@ End Function
 
 Public Function SpeedGroup(bstack As basetask, pppp As iBoxArray, Prefix$, ByVal W$, b$, v As Long) As Long
 Dim Vars As Long, Vname As Long, y1 As Long, subs As Long, snames As Long, i As Long, ec$, ohere$, p As Long
-Dim depth As Long, loopthis As Boolean, v100 As Boolean, RetStackSize As Long, s3 As Long, rest1$
+Dim depth As Long, loopthis As Boolean, v100 As Boolean, RetStackSize As Long, S3 As Long, rest1$
 Dim safegroup As Group
 Dim oldjump As Long, oldifctrl As Long, olduseofif As Long
 Dim kolpo As Boolean, bb$, once As Boolean, subsfc As FastCollection
@@ -4955,12 +4955,12 @@ thh:
                 GoTo normalexit
             Case 1
                 bstack.addlen = nd&
-                s3 = bstack.OriginalCode
+                S3 = bstack.OriginalCode
               
-                If s3 < 0 Then
-                    TestShowSub = var(-s3).Code
+                If S3 < 0 Then
+                    TestShowSub = var(-S3).Code
                 Else
-                    TestShowSub = sbf(s3).sb
+                    TestShowSub = sbf(S3).sb
                 End If
                 TestShowBypass = False
                 If LastErNum <> 0 Then b$ = vbNullString
@@ -5000,25 +5000,25 @@ thh:
                                     bstack.addlen = nd&
                                     GoTo fastexit
                                 End If
-                                    p = bstack.isPop3Long(s3, sbi)
+                                    p = bstack.isPop3Long(S3, sbi)
                                     If p > 0 Then
-                                        If s3 > 0 Then
-                                            bb$ = Mid$(sbf(s3).sb, Len(sbf(s3).sb) - p - sbi + 1, p)
-                                        ElseIf s3 = 0 Then
+                                        If S3 > 0 Then
+                                            bb$ = Mid$(sbf(S3).sb, Len(sbf(S3).sb) - p - sbi + 1, p)
+                                        ElseIf S3 = 0 Then
                                             bb$ = Mid$(ec$, Len(ec$) - p + 1)
                                         Else
-                                            bb$ = Mid$(var(-s3).Code$, Len(var(-s3).Code$) - p - sbi + 1, p)
+                                            bb$ = Mid$(var(-S3).Code$, Len(var(-S3).Code$) - p - sbi + 1, p)
                                         End If
                                         If trace Then
                                             TestShowBypass = True
                                             If TestShowBypass Then
-                                                If s3 < 0 Then
-                                                    TestShowSub = var(-s3).Code
-                                                ElseIf s3 = 0 Then
+                                                If S3 < 0 Then
+                                                    TestShowSub = var(-S3).Code
+                                                ElseIf S3 = 0 Then
                                                     TestShowSub = ec$ + b$
                                                     sbi = Len(b$)
                                                 Else
-                                                    TestShowSub = sbf(s3).sb
+                                                    TestShowSub = sbf(S3).sb
                                                 End If
                                             End If
                                             bstack.addlen = sbi
@@ -5033,35 +5033,35 @@ fulty:
                                     End If
                                 Else
                                     If InStr(small$, " ") > 0 Then
-                                        bstack.PushSecondThird s3, sbi
-                                        If searchsub(bstack.OriginalCode, small$, i, s3, bb$) Then
+                                        bstack.PushSecondThird S3, sbi
+                                        If searchsub(0&, bstack.OriginalCode, small$, i, S3, bb$) Then
                                             If Len(small$) <> 0 Then If Not MyRead(7, bstack, small$, 1) Then GoTo thh
                                             GoTo contSub
                                         ElseIf bstack.IamChild Then
-                                            If searchsub(FindPrevOriginal(bstack), small$, i, s3, bb$) Then
+                                            If searchsub(bstack.OriginalCode, FindPrevOriginal(bstack), small$, i, S3, bb$) Then
                                                 If Len(small$) <> 0 Then If Not MyRead(7, bstack, small$, 1) Then GoTo thh
 contSub:
                                                 If Len(bb$) = 0 Then
-                                                    If s3 < 0 Then
-                                                        bb$ = Mid$(var(-s3).Code, i)
+                                                    If S3 < 0 Then
+                                                        bb$ = Mid$(var(-S3).Code, i)
                                                     Else
-                                                        bb$ = Mid$(sbf(s3).sb, i)
+                                                        bb$ = Mid$(sbf(S3).sb, i)
                                                     End If
                                                     sbi = 0
                                                 Else
-                                                    If s3 < 0 Then
-                                                        sbi = Len(var(-s3).Code) - i - Len(bb$)
+                                                    If S3 < 0 Then
+                                                        sbi = Len(var(-S3).Code) - i - Len(bb$)
                                                     Else
-                                                        sbi = Len(sbf(s3).sb) - i - Len(bb$)
+                                                        sbi = Len(sbf(S3).sb) - i - Len(bb$)
                                                     End If
                                                 End If
                                                 If trace Then
                                                     TestShowBypass = True
                                                     If TestShowBypass Then
-                                                        If s3 < 0 Then
-                                                            TestShowSub = var(-s3).Code
+                                                        If S3 < 0 Then
+                                                            TestShowSub = var(-S3).Code
                                                         Else
-                                                            TestShowSub = sbf(s3).sb
+                                                            TestShowSub = sbf(S3).sb
                                                         End If
                                                     End If
                                                     bstack.addlen = Len(TestShowSub) - i + 1 - Len(bb$)
@@ -5071,13 +5071,13 @@ contSub:
 jumpbad:
                                                 badSubNotFound
                                                 If bstack.IsDecimal Then
-                                                    p = bstack.Pop3Long(s3, sbi)
-                                                    If s3 > 0 Then
-                                                       bb$ = Mid$(sbf(s3).sb, Len(sbf(s3).sb) - p - sbi + 1, p)
-                                                    ElseIf s3 = 0 Then
+                                                    p = bstack.Pop3Long(S3, sbi)
+                                                    If S3 > 0 Then
+                                                       bb$ = Mid$(sbf(S3).sb, Len(sbf(S3).sb) - p - sbi + 1, p)
+                                                    ElseIf S3 = 0 Then
                                                       bb$ = Mid$(ec$, Len(ec$) - p + 1)
                                                     Else
-                                                       bb$ = Mid$(var(-s3).Code$, Len(var(-s3).Code$) - p - sbi + 1, p)
+                                                       bb$ = Mid$(var(-S3).Code$, Len(var(-S3).Code$) - p - sbi + 1, p)
                                                     End If
                                                 End If
                                                 bstack.RetStackDrop 3 ' 5
@@ -5106,9 +5106,9 @@ jumpbad:
                                         bb$ = Mid$(ec$, i)
                                     End If
                                 Else
-                                    s3 = subsfc.sValue
-                                    If s3 < 0 Then
-                                        If i = 0 Or i > Len(var(-s3).Code$) Then
+                                    S3 = subsfc.sValue
+                                    If S3 < 0 Then
+                                        If i = 0 Or i > Len(var(-S3).Code$) Then
                                             SwapStrings b$, bb$
                                             SpeedGroup = 2
                                             bstack.addlen = nd&
@@ -5117,7 +5117,7 @@ jumpbad:
                                             GoTo AGAINGOTOLAMBDA
                                         End If
                                     Else
-                                        If i = 0 Or i > Len(sbf(s3).sb) Then
+                                        If i = 0 Or i > Len(sbf(S3).sb) Then
                                             SwapStrings b$, bb$
                                             SpeedGroup = 2
                                             bstack.addlen = nd&
@@ -5129,7 +5129,7 @@ jumpbad:
                                
                                 GoTo subsentry10
                             Else
-                                If s3 = 0 Then
+                                If S3 = 0 Then
                                     i = PosLabel(bb$, ec$)
                                     If i = 0 Or i > Len(ec$) Then
                                         GoTo checkother
@@ -5140,47 +5140,47 @@ jumpbad:
                                     End If
                                 End If
 checkother:
-                                If s3 < 0 Then
-                                    i = PosLabel(bb$, var(-s3).Code$)
-                                    If i = 0 Or i > Len(var(-s3).Code$) Then
+                                If S3 < 0 Then
+                                    i = PosLabel(bb$, var(-S3).Code$)
+                                    If i = 0 Or i > Len(var(-S3).Code$) Then
                                         SwapStrings b$, bb$
                                         SpeedGroup = 2
                                         bstack.addlen = nd&
                                         Exit Do
                                     End If
-                                    subsfc.ItemCreator2 bb$, i, s3
+                                    subsfc.ItemCreator2 bb$, i, S3
 AGAINGOTOLAMBDA:
                                     If bstack.SubLevel > 0 Then
-                                                If Len(var(-s3).Code$) - i > sbi Then
-                                                    bb$ = Mid$(var(-s3).Code$, i, Len(var(-s3).Code$) - i - sbi)
+                                                If Len(var(-S3).Code$) - i > sbi Then
+                                                    bb$ = Mid$(var(-S3).Code$, i, Len(var(-S3).Code$) - i - sbi)
                                                 Else
-                                                    bb$ = Mid$(var(-s3).Code$, i)
+                                                    bb$ = Mid$(var(-S3).Code$, i)
                                                     sbi = 0
                                                 End If
                                             Else
-                                                bb$ = Mid$(var(-s3).Code$, i)
+                                                bb$ = Mid$(var(-S3).Code$, i)
                                                 sbi = 0
                                             End If
                     
                                 Else
-                                    i = PosLabel(bb$, sbf(s3).sb)
-                                    If i = 0 Or i > Len(sbf(s3).sb) Then
+                                    i = PosLabel(bb$, sbf(S3).sb)
+                                    If i = 0 Or i > Len(sbf(S3).sb) Then
                                         SwapStrings b$, bb$
                                         SpeedGroup = 2
                                         bstack.addlen = nd&
                                         Exit Do
                                     End If
-                                    subsfc.ItemCreator2 bb$, i, s3
+                                    subsfc.ItemCreator2 bb$, i, S3
 AGAINGOTO:
                                     If bstack.SubLevel > 0 Then
-                                                If Len(sbf(s3).sb) - i > sbi Then
-                                                    bb$ = Mid$(sbf(s3).sb, i, Len(sbf(s3).sb) - i - sbi)
+                                                If Len(sbf(S3).sb) - i > sbi Then
+                                                    bb$ = Mid$(sbf(S3).sb, i, Len(sbf(S3).sb) - i - sbi)
                                                 Else
-                                                    bb$ = Mid$(sbf(s3).sb, i)
+                                                    bb$ = Mid$(sbf(S3).sb, i)
                                                     sbi = 0
                                                 End If
                                             Else
-                                                bb$ = Mid$(sbf(s3).sb, i)
+                                                bb$ = Mid$(sbf(S3).sb, i)
                                                 sbi = 0
                                             End If
                                 End If
@@ -14092,6 +14092,7 @@ isasub:
     If FastSymbol(a$, ")") Then
         
         V1& = bstack.OriginalCode
+        w2 = V1&
         v$ = bstack.originalname$
         bstack.originalname$ = s1$
         If gr Then
@@ -14099,7 +14100,7 @@ isasub:
         Else
             s1$ = "FUNCTION " + s1$
         End If
-        If searchsub(V1&, s1$, w1, V1&, n$, True) Then
+        If searchsub(0&, V1&, s1$, w1, V1&, n$, True) Then
 againsub:
             If Len(s1$) > 0 Then
                 If Not MyRead(7, bstack, s1$, 1) Then
@@ -14201,7 +14202,7 @@ againsub:
             End If
         ElseIf bstack.IamChild Then
             w3 = FindPrevOriginal(bstack)
-            If searchsub(w3, s1$, w1, V1&, n$, True) Then
+            If searchsub(w2, w3, s1$, w1, V1&, n$, True) Then
                 If w3 <> V1& And V1& < 0 Then
                     V1& = w3
                 End If
@@ -18296,6 +18297,7 @@ isasub:
     If FastSymbol(a$, ")") Then
         
         w2 = bstackstr.OriginalCode
+        w3 = w2
         q1$ = bstackstr.originalname$
         bstackstr.originalname$ = q2$ + ")"
         If gr Then
@@ -18303,7 +18305,7 @@ isasub:
         Else
             q2$ = "FUNCTION " + q2$
         End If
-        If searchsub(w2, q2$, w1, w2, n$, True) Then
+        If searchsub(0&, w2, q2$, w1, w2, n$, True) Then
 againsub:
             If Len(q2$) > 0 Then
                 If Not MyRead(7, bstackstr, q2$, 1) Then
@@ -18373,7 +18375,7 @@ againsub:
             End If
         ElseIf bstackstr.IamChild Then
             dn = FindPrevOriginal(bstackstr)
-            If searchsub(dn, q2$, w1, w2, n$, True) Then
+            If searchsub(w3, dn, q2$, w1, w2, n$, True) Then
                     If dn <> w2 And w2 < 0 Then
                         w2 = dn
                     End If
@@ -23611,7 +23613,7 @@ Dim subsfc As FastCollection
 Dim c As Constant, myl As lambda
 Dim basestack As basetask
 Dim ok As Boolean, nokillvars As Boolean
-Dim i As Long, p As Long, s3 As Long, bb$, Code$, ec$, small$, sbi As Long
+Dim i As Long, p As Long, S3 As Long, bb$, Code$, ec$, small$, sbi As Long
 Set basestack = mystack.Parent
 If basestack Is Nothing Then Set basestack = mystack
 ohere$ = here$
@@ -23819,24 +23821,24 @@ thh:
                                     GoTo fastexit
                                 End If
                                 If Not mystack.IsInRetStackString(small$) Then
-                                    p = mystack.isPop3Long(s3, sbi)
+                                    p = mystack.isPop3Long(S3, sbi)
                                     If p > 0 Then
-                                        If s3 > 0 Then
-                                            bb$ = Mid$(sbf(s3).sb, Len(sbf(s3).sb) - p - sbi + 1, p)
-                                        ElseIf s3 = 0 Then
+                                        If S3 > 0 Then
+                                            bb$ = Mid$(sbf(S3).sb, Len(sbf(S3).sb) - p - sbi + 1, p)
+                                        ElseIf S3 = 0 Then
                                             bb$ = Mid$(ec$, Len(ec$) - p + 1)
                                         Else
-                                            bb$ = Mid$(var(-s3).Code$, Len(var(-s3).Code$) - p - sbi + 1, p)
+                                            bb$ = Mid$(var(-S3).Code$, Len(var(-S3).Code$) - p - sbi + 1, p)
                                         End If
                                         If trace Then
                                             TestShowBypass = True
                                             If TestShowBypass Then
-                                                If s3 < 0 Then
-                                                    TestShowSub = var(-s3).Code
-                                                ElseIf s3 = 0 Then
+                                                If S3 < 0 Then
+                                                    TestShowSub = var(-S3).Code
+                                                ElseIf S3 = 0 Then
                                                     TestShowSub = ec$
                                                 Else
-                                                    TestShowSub = sbf(s3).sb
+                                                    TestShowSub = sbf(S3).sb
                                                 End If
                                             End If
                                             mystack.addlen = sbi
@@ -23851,35 +23853,35 @@ fulty:
                                     End If
                                 Else
                                     If InStr(small$, " ") > 0 Then
-                                        mystack.PushSecondThird s3, sbi
-                                        If searchsub(mystack.OriginalCode, small$, i, s3, bb$) Then
+                                        mystack.PushSecondThird S3, sbi
+                                        If searchsub(0, mystack.OriginalCode, small$, i, S3, bb$) Then
                                             If Len(small$) <> 0 Then If Not MyRead(7, mystack, small$, 1) Then GoTo thh
                                             GoTo contSub
                                         ElseIf mystack.IamChild Then
-                                            If searchsub(FindPrevOriginal(mystack), small$, i, s3, bb$) Then
+                                            If searchsub(mystack.OriginalCode, FindPrevOriginal(mystack), small$, i, S3, bb$) Then
                                                 If Len(small$) <> 0 Then If Not MyRead(7, mystack, small$, 1) Then GoTo thh
 contSub:
                                                 If Len(bb$) = 0 Then
-                                                    If s3 < 0 Then
-                                                        bb$ = Mid$(var(-s3).Code, i)
+                                                    If S3 < 0 Then
+                                                        bb$ = Mid$(var(-S3).Code, i)
                                                     Else
-                                                        bb$ = Mid$(sbf(s3).sb, i)
+                                                        bb$ = Mid$(sbf(S3).sb, i)
                                                     End If
                                                     sbi = 0
                                                 Else
-                                                    If s3 < 0 Then
-                                                        sbi = Len(var(-s3).Code) - i - Len(bb$)
+                                                    If S3 < 0 Then
+                                                        sbi = Len(var(-S3).Code) - i - Len(bb$)
                                                     Else
-                                                        sbi = Len(sbf(s3).sb) - i - Len(bb$)
+                                                        sbi = Len(sbf(S3).sb) - i - Len(bb$)
                                                     End If
                                                 End If
                                                 If trace Then
                                                     TestShowBypass = True
                                                     If TestShowBypass Then
-                                                        If s3 < 0 Then
-                                                            TestShowSub = var(-s3).Code
+                                                        If S3 < 0 Then
+                                                            TestShowSub = var(-S3).Code
                                                         Else
-                                                            TestShowSub = sbf(s3).sb
+                                                            TestShowSub = sbf(S3).sb
                                                         End If
                                                     End If
                                                     mystack.addlen = Len(TestShowSub) - i + 1 - Len(bb$)
@@ -23889,13 +23891,13 @@ contSub:
 therebad:
                                                 badSubNotFound
                                                 If mystack.IsDecimal Then
-                                                    p = mystack.Pop3Long(s3, sbi)
-                                                    If s3 > 0 Then
-                                                        bb$ = Mid$(sbf(s3).sb, Len(sbf(s3).sb) - p - sbi + 1, p)
-                                                    ElseIf s3 = 0 Then
+                                                    p = mystack.Pop3Long(S3, sbi)
+                                                    If S3 > 0 Then
+                                                        bb$ = Mid$(sbf(S3).sb, Len(sbf(S3).sb) - p - sbi + 1, p)
+                                                    ElseIf S3 = 0 Then
                                                         bb$ = Mid$(ec$, Len(ec$) - p + 1)
                                                     Else
-                                                        bb$ = Mid$(var(-s3).Code$, Len(var(-s3).Code$) - p - sbi + 1, p)
+                                                        bb$ = Mid$(var(-S3).Code$, Len(var(-S3).Code$) - p - sbi + 1, p)
                                                     End If
                                                 End If
                                                 mystack.RetStackDrop 3 '5
@@ -23923,49 +23925,49 @@ therebad:
                                             sbi = 0 ' ???? CHECK THIS
                                         End If
                                     Else
-                                        s3 = subsfc.sValue
-                                        If s3 < 0 Then
-                                            If i = 0 Or i > Len(var(-s3).Code$) Then
+                                        S3 = subsfc.sValue
+                                        If S3 < 0 Then
+                                            If i = 0 Or i > Len(var(-S3).Code$) Then
                                                 SwapStrings rest$, bb$
                                                 '  bstack.addlen = nd&
                                                 GoTo thh
                                             Else
 AGAINGOTOLAMBDA:
                                                 If mystack.SubLevel > 0 Then
-                                                    If Len(var(-s3).Code$) - i > sbi Then
-                                                        bb$ = Mid$(var(-s3).Code$, i, Len(var(-s3).Code$) - i - sbi)
+                                                    If Len(var(-S3).Code$) - i > sbi Then
+                                                        bb$ = Mid$(var(-S3).Code$, i, Len(var(-S3).Code$) - i - sbi)
                                                     Else
-                                                        bb$ = Mid$(var(-s3).Code$, i)
+                                                        bb$ = Mid$(var(-S3).Code$, i)
                                                         sbi = 0
                                                     End If
                                                 Else
-                                                    bb$ = Mid$(var(-s3).Code$, i)
+                                                    bb$ = Mid$(var(-S3).Code$, i)
                                                     sbi = 0
                                                 End If
                                             End If
                                         Else
-                                            If i = 0 Or i > Len(sbf(s3).sb) Then
+                                            If i = 0 Or i > Len(sbf(S3).sb) Then
                                                 SwapStrings rest$, bb$
                                                 '  bstack.addlen = nd&
                                                 GoTo thh
                                             End If
 AGAINGOTO:
                                             If mystack.SubLevel > 0 Then
-                                                If Len(sbf(s3).sb) - i > sbi Then
-                                                    bb$ = Mid$(sbf(s3).sb, i, Len(sbf(s3).sb) - i - sbi)
+                                                If Len(sbf(S3).sb) - i > sbi Then
+                                                    bb$ = Mid$(sbf(S3).sb, i, Len(sbf(S3).sb) - i - sbi)
                                                 Else
-                                                    bb$ = Mid$(sbf(s3).sb, i)
+                                                    bb$ = Mid$(sbf(S3).sb, i)
                                                     sbi = 0
                                                 End If
                                             Else
-                                                bb$ = Mid$(sbf(s3).sb, i)
+                                                bb$ = Mid$(sbf(S3).sb, i)
                                                 sbi = 0
                                             End If
                                         End If
                                     End If
                                     GoTo subsentry10
                                 Else
-                                    If s3 = 0 Then
+                                    If S3 = 0 Then
                                         i = PosLabel(bb$, ec$)
                                         If i = 0 Or i > Len(ec$) Then
                                             GoTo checkother
@@ -23977,23 +23979,23 @@ AGAINGOTO:
                                         End If
                                     End If
 checkother:
-                                If s3 < 0 Then
-                                    i = PosLabel(bb$, var(-s3).Code$)
-                                    If i = 0 Or i > Len(var(-s3).Code$) Then
+                                If S3 < 0 Then
+                                    i = PosLabel(bb$, var(-S3).Code$)
+                                    If i = 0 Or i > Len(var(-S3).Code$) Then
                                         SwapStrings rest$, bb$
                                         '  bstack.addlen = nd&
                                         GoTo thh
                                     End If
-                                    subsfc.ItemCreator2 bb$, i, s3
+                                    subsfc.ItemCreator2 bb$, i, S3
                                     GoTo AGAINGOTOLAMBDA
                                 Else
-                                    i = PosLabel(bb$, sbf(s3).sb)
-                                    If i = 0 Or i > Len(sbf(s3).sb) Then
+                                    i = PosLabel(bb$, sbf(S3).sb)
+                                    If i = 0 Or i > Len(sbf(S3).sb) Then
                                         SwapStrings rest$, bb$
                                          '  bstack.addlen = nd&
                                         GoTo thh
                                     End If
-                                    subsfc.ItemCreator2 bb$, i, s3
+                                    subsfc.ItemCreator2 bb$, i, S3
                                     GoTo AGAINGOTO
                                     
                                 End If
@@ -27283,7 +27285,7 @@ End Function
 
 
 Function logical(basestack As basetask, s$, D As Variant, Optional par As Long = 0, Optional flatobject As Boolean = False, Optional ByPass As Boolean = False, Optional sg As Integer = 1, Optional ByVal nostring As Boolean) As Boolean
-Dim b$, S2$, s3$, usehandler As mHandler
+Dim b$, S2$, S3$, usehandler As mHandler
 Dim ah As String
 again11:
 If ByPass Then
@@ -27672,7 +27674,7 @@ End If
 End Function
 
 Function logicalSelect(basestack As basetask, s$, D As Variant, Optional par As Long = 0, Optional flatobject As Boolean = False, Optional ByPass As Boolean = False, Optional sg As Integer = 1, Optional ByVal nostring As Boolean) As Boolean
-Dim b$, S2$, s3$, usehandler As mHandler, getcom As Boolean
+Dim b$, S2$, S3$, usehandler As mHandler, getcom As Boolean
 Dim ah As String, i As Long
 
 For i = 1 To Len(s$)
@@ -33629,7 +33631,7 @@ On Error GoTo there22
 If LastErNum = -1 Then GoTo there22
 Dim bs As basetask, loopthis As Boolean
 Dim subs As Long, snames As Long, Vname As Long
-Dim i As Long, p As Long, s3 As Long, bb$, pa$, small$, sbi As Long
+Dim i As Long, p As Long, S3 As Long, bb$, pa$, small$, sbi As Long
 Dim EXITNOW As Boolean
 Dim restart As Boolean
 Dim backup$, TSHB As Boolean
@@ -33722,9 +33724,9 @@ i = 1
 '    ProcModuleEntry = False: GoTo modfun
 'End If
 restart = True
-s3 = x1
+S3 = x1
 Do
-    bb$ = Mid$(sbf(s3).sb, i)
+    bb$ = Mid$(sbf(S3).sb, i)
 againmod:
     If LastErNum = -1 Then
         If bs.SubLevel > 0 Then GoTo unwindstack
@@ -33858,20 +33860,20 @@ thh1:
                 If trace Then TestShowBypass = False
 unwindstack:
                 If Not bs.IsInRetStackString(small$) Then
-                    p = bs.isPop3Long(s3, sbi)
+                    p = bs.isPop3Long(S3, sbi)
                     If p > 0 Then
-                        If s3 > 0 Then
-                            bb$ = Mid$(sbf(s3).sb, Len(sbf(s3).sb) - p - sbi + 1, p)
+                        If S3 > 0 Then
+                            bb$ = Mid$(sbf(S3).sb, Len(sbf(S3).sb) - p - sbi + 1, p)
                         Else
-                            bb$ = Mid$(var(-s3).Code$, Len(var(-s3).Code$) - p - sbi + 1, p)
+                            bb$ = Mid$(var(-S3).Code$, Len(var(-S3).Code$) - p - sbi + 1, p)
                         End If
                         If trace Then
                             TestShowBypass = True
                             If TestShowBypass Then
-                                If s3 < 0 Then
-                                    TestShowSub = var(-s3).Code
+                                If S3 < 0 Then
+                                    TestShowSub = var(-S3).Code
                                 Else
-                                    TestShowSub = sbf(s3).sb
+                                    TestShowSub = sbf(S3).sb
                                 End If
                             End If
                             bs.addlen = sbi
@@ -33886,8 +33888,8 @@ fulty:
                     End If
                 Else
                     If InStr(small$, " ") > 0 Then
-                        bs.PushSecondThird s3, sbi
-                        If searchsub(x1, small$, i, s3, bb$) Then
+                        bs.PushSecondThird S3, sbi
+                        If searchsub(0&, x1, small$, i, S3, bb$) Then
                             If Len(small$) <> 0 Then
                                 If Not MyRead(7, bs, small$, 1) Then
                                     bb$ = "  "
@@ -33898,7 +33900,7 @@ fulty:
                             ' x1 here is wrong...Check this
                         'ElseIf x1 <> basestack.OriginalCode And basestack.OriginalCode <> 0 Then
                             ElseIf basestack.IamChild Then  ' maybe I use this line not above
-                            If searchsub(FindPrevOriginal(bs), small$, i, s3, bb$) Then
+                            If searchsub(x1, FindPrevOriginal(bs), small$, i, S3, bb$) Then
                                 If Len(small$) <> 0 Then
                                 If Not MyRead(7, bs, small$, 1) Then
                                 
@@ -33908,17 +33910,17 @@ fulty:
                                 End If
 contSub:
                                 If Len(bb$) = 0 Then
-                                    If s3 < 0 Then
-                                        bb$ = Mid$(var(-s3).Code, i)
+                                    If S3 < 0 Then
+                                        bb$ = Mid$(var(-S3).Code, i)
                                     Else
-                                        bb$ = Mid$(sbf(s3).sb, i)
+                                        bb$ = Mid$(sbf(S3).sb, i)
                                     End If
                                     sbi = 0
                                 Else
-                                    If s3 < 0 Then
-                                        sbi = Len(var(-s3).Code) - i - Len(bb$)
+                                    If S3 < 0 Then
+                                        sbi = Len(var(-S3).Code) - i - Len(bb$)
                                     Else
-                                        sbi = Len(sbf(s3).sb) - i - Len(bb$)
+                                        sbi = Len(sbf(S3).sb) - i - Len(bb$)
                                     End If
                                 End If
                                 If LastErNum = -1 Then
@@ -33927,10 +33929,10 @@ contSub:
                                 If trace Then
                                     TestShowBypass = True
                                     If TestShowBypass Then
-                                        If s3 < 0 Then
-                                            TestShowSub = var(-s3).Code
+                                        If S3 < 0 Then
+                                            TestShowSub = var(-S3).Code
                                         Else
-                                            TestShowSub = sbf(s3).sb
+                                            TestShowSub = sbf(S3).sb
                                         End If
                                     End If
                                     bs.addlen = Len(TestShowSub) - i + 1 - Len(bb$)
@@ -33940,13 +33942,13 @@ contSub:
 therebad:
                             badSubNotFound
                             If bs.IsDecimal Then
-                            p = bs.Pop3Long(s3, sbi)
-                            If s3 > 0 Then
-                                bb$ = Mid$(sbf(s3).sb, Len(sbf(s3).sb) - p - sbi + 1, p)
-                             ElseIf s3 = 0 Then
+                            p = bs.Pop3Long(S3, sbi)
+                            If S3 > 0 Then
+                                bb$ = Mid$(sbf(S3).sb, Len(sbf(S3).sb) - p - sbi + 1, p)
+                             ElseIf S3 = 0 Then
                        
                             Else
-                                bb$ = Mid$(var(-s3).Code$, Len(var(-s3).Code$) - p - sbi + 1, p)
+                                bb$ = Mid$(var(-S3).Code$, Len(var(-S3).Code$) - p - sbi + 1, p)
                             End If
                             End If
                             bs.RetStackDrop 3 '5
@@ -33961,37 +33963,37 @@ therebad:
             ElseIf bb$ = "BREAK" Then
                     GoTo thh1
             Else
-                If sbf(s3).subs Is Nothing Then
-                    Set sbf(s3).subs = New FastCollection
+                If sbf(S3).subs Is Nothing Then
+                    Set sbf(S3).subs = New FastCollection
                 End If
-                If sbf(s3).subs.ExistKey(bb$) Then
-                    If IsNumeric(sbf(s3).subs.Value) Then
-                        i = sbf(s3).subs.Value
-                        x1 = s3
+                If sbf(S3).subs.ExistKey(bb$) Then
+                    If IsNumeric(sbf(S3).subs.Value) Then
+                        i = sbf(S3).subs.Value
+                        x1 = S3
                     Else
-                        i = val(Split(sbf(s3).subs.Value)(0))
-                        x1 = val(Split(sbf(s3).subs.Value)(1))
+                        i = val(Split(sbf(S3).subs.Value)(0))
+                        x1 = val(Split(sbf(S3).subs.Value)(1))
                     End If
                    
                 Else
                     If InStr(bb$, vbCr) > 0 Then
-                        i = rinstr(sbf(s3).sb, bb$)
-                        If i = 0 Then i = Len(sbf(s3).sb) + 1
+                        i = rinstr(sbf(S3).sb, bb$)
+                        If i = 0 Then i = Len(sbf(S3).sb) + 1
                     Else
-                        i = PosLabel(bb$, sbf(s3).sb)
+                        i = PosLabel(bb$, sbf(S3).sb)
                     End If
-                    sbf(s3).subs.AddKey bb$, i
-                    x1 = s3
+                    sbf(S3).subs.AddKey bb$, i
+                    x1 = S3
                 End If
                 If trace Then
                     bs.addlen = 0
                     TestShowBypass = True
-                    TestShowSub = sbf(s3).sb
+                    TestShowSub = sbf(S3).sb
                 End If
                 If bs.SubLevel > 0 Then
-                    If x1 = s3 Then
-                        If Len(sbf(s3).sb) - i > sbi Then
-                            bb$ = Mid$(sbf(s3).sb, i, Len(sbf(s3).sb) - i - sbi)
+                    If x1 = S3 Then
+                        If Len(sbf(S3).sb) - i > sbi Then
+                            bb$ = Mid$(sbf(S3).sb, i, Len(sbf(S3).sb) - i - sbi)
                             GoTo againmod
                         Else
                             sbi = 0
@@ -34424,7 +34426,7 @@ Dim p As Variant, s$
              Set ps = Nothing
 End Sub
 
-Function searchsub(ByVal where As Long, W$, Final As Long, site As Long, Code$, Optional needfunc As Boolean = False) As Boolean
+Function searchsub(ByVal Originalwhere As Long, ByVal where As Long, W$, Final As Long, site As Long, Code$, Optional needfunc As Boolean = False) As Boolean
 Dim aCopy As Document
 Dim EndPoint As Long
 Dim ww$(), vv()
@@ -34644,9 +34646,19 @@ sitehere:
         If needfunc Then
             If Not sbf(site).subs.Find("@" + UCase(ww$(1))) Then
                 sbf(site).subs.AddKey "@" + UCase(ww$(1)), Array(Final, where, W$, Code$)
+                If Originalwhere > 0 Then
+                    sbf(Originalwhere).subs.AddKey "@" + UCase(ww$(1)), Array(Final, where, W$, Code$)
+                ElseIf Originalwhere < 0 Then
+                    var(-Originalwhere).subs.AddKey "@" + UCase(ww$(1)), Array(Final, where, W$, Code$)
+                End If
             End If
         ElseIf Not sbf(site).subs.Find(UCase(ww$(1))) Then
             sbf(site).subs.AddKey UCase(ww$(1)), Array(Final, where, W$, Code$)
+            If Originalwhere > 0 Then
+                sbf(Originalwhere).subs.AddKey UCase(ww$(1)), Array(Final, where, W$, Code$)
+            ElseIf Originalwhere < 0 Then
+                var(-Originalwhere).subs.AddKey UCase(ww$(1)), Array(Final, where, W$, Code$)
+            End If
         End If
 ElseIf where < 0 Then
 site = where
@@ -34678,7 +34690,7 @@ Dim x2 As Long, y2 As Long, monce As Long, w3 As Long
 Dim myLevel As Long, oldexec As Long, loopthis As Boolean, RetStackSize As Long
 
 Dim oldjump As Long, oldifctrl As Long, olduseofif As Long
-Dim s3 As Long, bb$, small$, ex2 As Long, sbi As Long
+Dim S3 As Long, bb$, small$, ex2 As Long, sbi As Long
 ' save state in execution stack
 oldjump = bstack.jump: oldifctrl = bstack.IFCTRL: olduseofif = bstack.UseofIf
 RetStackSize = bstack.RetStackTotal
@@ -34810,7 +34822,7 @@ ALFA12:
                     i = 1
 from123:
                     If Not bstack.IsInRetStackString(small$) Then
-                        p = bstack.Pop3Long(s3, sbi)
+                        p = bstack.Pop3Long(S3, sbi)
                         If p < 0 Then
                             Exec = 0
                             If RetStackSize <> bstack.RetStackTotal Then
@@ -34826,7 +34838,7 @@ from123:
                             Exit Function
                         End If
 jumphere1:
-                        If s3 = 0 And sbi > 0 Then
+                        If S3 = 0 And sbi > 0 Then
                         
                         End If
                         Exec = 1
@@ -34849,9 +34861,9 @@ jumphere1:
                     Else
 findelsesub0:
                         If InStr(small$, " ") > 0 Then
-                            bstack.PushSecondThird s3, sbi
-                            s3 = bstack.OriginalCode
-                            If searchsub(s3, small$, i, s3, bb$) Then
+                            bstack.PushSecondThird S3, sbi
+                            S3 = bstack.OriginalCode
+                            If searchsub(0&, S3, small$, i, S3, bb$) Then
                                 If Len(small$) <> 0 Then
                                     If Not MyRead(7, bstack, small$, 1) Then
                                         Exec = 0
@@ -34860,7 +34872,7 @@ findelsesub0:
                                 End If
                                 GoTo contSub
                             ElseIf bstack.IamChild Then
-                                If searchsub(FindPrevOriginal(bstack), small$, i, s3, bb$) Then
+                                If searchsub(bstack.OriginalCode, FindPrevOriginal(bstack), small$, i, S3, bb$) Then
                                 If Len(small$) <> 0 Then
                                     If Not MyRead(7, bstack, small$, 1) Then
                                         Exec = 0
@@ -34869,17 +34881,17 @@ findelsesub0:
                                 End If
 contSub:
                                 If Len(bb$) = 0 Then
-                                    If s3 < 0 Then
-                                        bb$ = Mid$(var(-s3).Code, i)
+                                    If S3 < 0 Then
+                                        bb$ = Mid$(var(-S3).Code, i)
                                     Else
-                                        bb$ = Mid$(sbf(s3).sb, i)
+                                        bb$ = Mid$(sbf(S3).sb, i)
                                     End If
                                     sbi = 0
                                 Else
-                                    If s3 < 0 Then
-                                        sbi = Len(var(-s3).Code) - i - Len(bb$)
+                                    If S3 < 0 Then
+                                        sbi = Len(var(-S3).Code) - i - Len(bb$)
                                     Else
-                                        sbi = Len(sbf(s3).sb) - i - Len(bb$)
+                                        sbi = Len(sbf(S3).sb) - i - Len(bb$)
                                     End If
                                 End If
                                 kolpo = False
@@ -34887,10 +34899,10 @@ contSub:
                                 If trace Then
                                     TestShowBypass = True
                                     If TestShowBypass Then
-                                    If s3 < 0 Then
-                                        TestShowSub = var(-s3).Code
+                                    If S3 < 0 Then
+                                        TestShowSub = var(-S3).Code
                                     Else
-                                        TestShowSub = sbf(s3).sb
+                                        TestShowSub = sbf(S3).sb
                                     End If
                                     End If
                                     bstack.addlen = Len(TestShowSub) - i + 1 - Len(bb$)
@@ -34906,23 +34918,23 @@ subsub02:
                                         If bstack.IsInRetStackString(small$) Then GoTo findelsesub0
                                         y2 = y2 - 1
                                         If y2 = 0 Then GoTo from123  'normal level
-                                            p = bstack.isPop3Long(s3, sbi)
+                                            p = bstack.isPop3Long(S3, sbi)
                                             If p > 0 Then
-                                                If s3 > 0 Then
+                                                If S3 > 0 Then
                                                 
-                                                    bb$ = Mid$(sbf(s3).sb, Len(sbf(s3).sb) - p - sbi + 1, p)
-                                                ElseIf s3 = 0 Then
+                                                    bb$ = Mid$(sbf(S3).sb, Len(sbf(S3).sb) - p - sbi + 1, p)
+                                                ElseIf S3 = 0 Then
                                                     GoTo jumphere1
                                                 Else
-                                                    bb$ = Mid$(var(-s3).Code$, Len(var(-s3).Code$) - p - sbi + 1, p)
+                                                    bb$ = Mid$(var(-S3).Code$, Len(var(-S3).Code$) - p - sbi + 1, p)
                                                 End If
                                                 If trace Then
                                                     TestShowBypass = True
                                                     If TestShowBypass Then
-                                                        If s3 < 0 Then
-                                                            TestShowSub = var(-s3).Code
+                                                        If S3 < 0 Then
+                                                            TestShowSub = var(-S3).Code
                                                         Else
-                                                            TestShowSub = sbf(s3).sb
+                                                            TestShowSub = sbf(S3).sb
                                                         End If
                                                     End If
                                                     bstack.addlen = sbi
@@ -34949,16 +34961,16 @@ subsub02:
                                                         bb$ = Mid$(b$, i, ex2 - i + 1)
                                                     End If
                                                 Else
-                                                    s3 = subs.sValue
-                                                    If s3 < 0 Then
-                                                        If i = 0 Or i > Len(var(-s3).Code$) Then
+                                                    S3 = subs.sValue
+                                                    If S3 < 0 Then
+                                                        If i = 0 Or i > Len(var(-S3).Code$) Then
                                                             b$ = bb$
                                                             Exec = 2
                                                             Exit Do
                                                         End If
                                                         GoTo AGAINGOTOLAMBDA
                                                     Else
-                                                        If i = 0 Or i > Len(sbf(s3).sb) Then
+                                                        If i = 0 Or i > Len(sbf(S3).sb) Then
                                                             b$ = bb$
                                                             Exec = 2
                                                             Exit Do
@@ -34969,7 +34981,7 @@ subsub02:
                                                 End If
                                                 GoTo subsub02
                                             Else
-                                                If s3 = 0 Then
+                                                If S3 = 0 Then
                                                 ' priority in the code
                                                     i = PosLabel(bb$, b$, ex2)
                                                     If i = 0 Or i > ex2 Then
@@ -34983,34 +34995,34 @@ subsub02:
                                                 End If
                                                 
 checkother:
-                                                If s3 < 0 Then
-                                                    i = PosLabel(bb$, var(-s3).Code$)
-                                                    If i = 0 Or i > Len(var(-s3).Code$) Then
+                                                If S3 < 0 Then
+                                                    i = PosLabel(bb$, var(-S3).Code$)
+                                                    If i = 0 Or i > Len(var(-S3).Code$) Then
                                                         b$ = bb$
                                                         Exec = 2
                                                         Exit Do
                                                     End If
 AGAINGOTOLAMBDA:
-                                                    subs.ItemCreator2 bb$, i, s3
-                                                    If Len(var(-s3).Code$) - i > sbi Then
-                                                    bb$ = Mid$(var(-s3).Code$, i, Len(var(-s3).Code$) - i - sbi)
+                                                    subs.ItemCreator2 bb$, i, S3
+                                                    If Len(var(-S3).Code$) - i > sbi Then
+                                                    bb$ = Mid$(var(-S3).Code$, i, Len(var(-S3).Code$) - i - sbi)
                                                     Else
-                                                    bb$ = Mid$(var(-s3).Code$, i)
+                                                    bb$ = Mid$(var(-S3).Code$, i)
                                                     sbi = 0
                                                     End If
-                                                ElseIf s3 > 0 Then
-                                                    i = PosLabel(bb$, sbf(s3).sb)
-                                                    If i = 0 Or i > Len(sbf(s3).sb) Then
+                                                ElseIf S3 > 0 Then
+                                                    i = PosLabel(bb$, sbf(S3).sb)
+                                                    If i = 0 Or i > Len(sbf(S3).sb) Then
                                                         b$ = bb$
                                                         Exec = 2
                                                         Exit Do
                                                     End If
-                                                    subs.ItemCreator2 bb$, i, s3
+                                                    subs.ItemCreator2 bb$, i, S3
 AGAINGOTO:
-                                                    If Len(sbf(s3).sb) - i > sbi Then
-                                                    bb$ = Mid$(sbf(s3).sb, i, Len(sbf(s3).sb) - i - sbi)
+                                                    If Len(sbf(S3).sb) - i > sbi Then
+                                                    bb$ = Mid$(sbf(S3).sb, i, Len(sbf(S3).sb) - i - sbi)
                                                     Else
-                                                    bb$ = Mid$(sbf(s3).sb, i)
+                                                    bb$ = Mid$(sbf(S3).sb, i)
                                                     sbi = 0
                                                     End If
                                                 Else ' cascade to upper level
@@ -35036,10 +35048,10 @@ AGAINGOTO:
                                     ElseIf x2 = 0 Then
                                         If bstack.ErrorOriginal <> 0 Then
                                         b$ = bb$
-                                        ElseIf s3 <> 0 Then
+                                        ElseIf S3 <> 0 Then
                                         
                                            ' If bstack.OriginalCode <> S3 Then
-                                            bstack.ErrorOriginal = s3
+                                            bstack.ErrorOriginal = S3
                                                 'If S3 < 0 Then
                                                 '    b$ = Mid$(var(-S3).code, Len(var(-S3).code) - sbi - Len(bb$))
                                                 'Else
@@ -35059,13 +35071,13 @@ AGAINGOTO:
                                     badSubNotFound
                                     Exec = 0
                                     If bstack.IsDecimal Then
-                                         p = bstack.Pop3Long(s3, sbi)
-                                         If s3 > 0 Then
-                                             bb$ = Mid$(sbf(s3).sb, Len(sbf(s3).sb) - p - sbi + 1, p)
-                                          ElseIf s3 = 0 Then
+                                         p = bstack.Pop3Long(S3, sbi)
+                                         If S3 > 0 Then
+                                             bb$ = Mid$(sbf(S3).sb, Len(sbf(S3).sb) - p - sbi + 1, p)
+                                          ElseIf S3 = 0 Then
                                             bb$ = Mid$(b$, p + 1, ex2 - p)
                                          Else
-                                             bb$ = Mid$(var(-s3).Code$, Len(var(-s3).Code$) - p - sbi + 1, p)
+                                             bb$ = Mid$(var(-S3).Code$, Len(var(-S3).Code$) - p - sbi + 1, p)
                                          End If
                                     End If
                                     bstack.RetStackDrop 3 '5

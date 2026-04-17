@@ -78,9 +78,10 @@ Public SelectionColor As Long
 Public SelectionTextColor As Long
 Private showparagraphonce As Boolean
 Private mNoWrap As Boolean
-Private BlockStartPara As Long, BlockStartPos As Long, BlockStartLine As Long, BlockTopline As Long
+Public BlockStartPos As Long, BlockEndPos As Long
+Private BlockStartPara As Long, BlockStartLine As Long, BlockTopline As Long
 Private BlockStartCursor As Long, BlockEndCursor As Long
-Private BlockEndPara As Long, BlockEndPos As Long, BlockEndline As Long, BlockBottomline As Long
+Private BlockEndPara As Long, BlockEndline As Long, BlockBottomline As Long
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
 Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
@@ -830,7 +831,7 @@ Dim a() As String, K As Long, a77$
 a77$ = space$(EditTabWidth)
 If Not glistN.UseTab Then
 
-a() = split(ThatData, ChrW(9))
+a() = Split(ThatData, ChrW(9))
 PasteDoc Join(a(), a77$)
 Else
 PasteDoc ThatData
@@ -4215,15 +4216,15 @@ If HaveMarkedText Then
 If BlockStartLine = BlockEndline Then
 SelLength = Abs(BlockStartCursor - BlockEndCursor)
 Else
-Dim a$(), oldmydoc As Document, i As Long, sum As Long
+Dim a$(), oldmydoc As Document, i As Long, SUM As Long
 ' maybe we didn't need to preserve old UndoDoc...I need to clarify this..
 Set oldmydoc = UndoDoc
 Set UndoDoc = New Document
 FillBlock
-sum = UndoDoc.SizeCRLF + 2
-If UndoDoc.LfLead Then sum = sum - 1
-If UndoDoc.CrTail Then sum = sum + 1
-SelLength = sum - 2 ' no the last vbcrlf
+SUM = UndoDoc.SizeCRLF + 2
+If UndoDoc.LfLead Then SUM = SUM - 1
+If UndoDoc.CrTail Then SUM = SUM + 1
+SelLength = SUM - 2 ' no the last vbcrlf
 End If
 Set UndoDoc = oldmydoc
 End If

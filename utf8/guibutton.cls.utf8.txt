@@ -30,7 +30,7 @@ Private Sub OneClick()
 On Error Resume Next
 If SkipFirstClick Then glistN.PrepareClick
 End Sub
-Friend Sub Construct(there As GuiM2000, name$)
+Friend Sub Construct(there As GuiM2000, Name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
@@ -39,9 +39,9 @@ Friend Sub Construct(there As GuiM2000, name$)
  there.AddGuiControl Me
  glistN.Dynamic
  there.Controls(ctrlName).TabStop = True
- mesCtrlName = name$
+ mesCtrlName = Name$
 End Sub
-Friend Sub ConstructArray(there As GuiM2000, name$, i As Long)
+Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
  Set Callback = there
  On Error Resume Next
  ctrlName = GetTag$
@@ -50,15 +50,15 @@ Friend Sub ConstructArray(there As GuiM2000, name$, i As Long)
  there.AddGuiControl Me
  glistN.Dynamic
  there.Controls(ctrlName).TabStop = True
- mesCtrlName = name$
+ mesCtrlName = Name$
 End Sub
-Public Sub move(X, Y, Optional w, Optional H)
-If IsMissing(w) Then
+Public Sub move(X, Y, Optional W, Optional H)
+If IsMissing(W) Then
 glistN.MoveTwips CLng(X), CLng(Y), 0, 0
 ElseIf IsMissing(H) Then
-glistN.MoveTwips CLng(X), CLng(Y), CLng(w), 0
+glistN.MoveTwips CLng(X), CLng(Y), CLng(W), 0
 Else
-glistN.MoveTwips CLng(X), CLng(Y), CLng(w), CLng(H)
+glistN.MoveTwips CLng(X), CLng(Y), CLng(W), CLng(H)
 End If
 End Sub
 Public Sub deconstruct()
@@ -73,7 +73,7 @@ dimm1 = rgb(100, 200, 160)
 dimm2 = rgb(200, 120, 60)
 Dim ff As New StdFont
 With Callback
-ff.name = .CtrlFontName
+ff.Name = .CtrlFontName
 ff.charset = Form1.DIS.Font.charset
 ff.Size = .CtrlFontSize
 ff.bold = .CtrlFontBold
@@ -144,7 +144,13 @@ If Callback.LastActive = vbNullString Then
 Callback.LastActive = "gList2"
 End If
 If Callback.Controls(Callback.LastActive).Visible Then
-Callback.Controls(Callback.LastActive).SetFocus
+        Dim a As Object
+        Set a = Callback.Controls(Callback.LastActive)
+        If a Is Nothing Then
+            Callback.LastActive = ""
+        ElseIf a.enabled Then
+            a.SetFocus
+        End If
 End If
 Exit Sub
 End If
@@ -304,7 +310,7 @@ Public Sub FontAttr(ThisFontName, Optional ThisMode = -1, Optional ThisBold = Tr
 Dim aa As New StdFont
 If ThisFontName <> "" Then
 
-aa.name = ThisFontName
+aa.Name = ThisFontName
 
 If ThisMode > 7 Then aa.Size = ThisMode Else aa = 7
 aa.bold = ThisBold
@@ -442,8 +448,8 @@ If a = 0 Then Exit Sub
 a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
 Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
-Private Sub gListN_AccKey(m As Long)
-Callback.AccProces m
+Private Sub gListN_AccKey(M As Long)
+Callback.AccProces M
 End Sub
 Property Let Visible(ByVal RHS As Boolean)
     If Not glistN Is Nothing Then
