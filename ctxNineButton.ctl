@@ -47,11 +47,11 @@ Attribute DblClick.VB_UserMemId = -601
 Event ContextMenu()
 Event OwnerDraw(ByVal hGraphics As Long, ByVal hFont As Long, ByVal ButtonState As UcsNineButtonStateEnum, ClientLeft As Long, ClientTop As Long, ClientWidth As Long, ClientHeight As Long, Caption As String, ByVal hPicture As Long)
 Event RegisterCancelMode(oCtl As Object, Handled As Boolean)
-Event KeyDown(KeyCode As Integer, shift As Integer)
+Event KeyDown(keycode As Integer, shift As Integer)
 Attribute KeyDown.VB_UserMemId = -602
 Event KeyPress(KeyAscii As Integer)
 Attribute KeyPress.VB_UserMemId = -604
-Event KeyUp(KeyCode As Integer, shift As Integer)
+Event KeyUp(keycode As Integer, shift As Integer)
 Event AccessKeyPress(KeyAscii As Integer)
 Event MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 Attribute MouseDown.VB_UserMemId = -605
@@ -66,6 +66,7 @@ Event OLEGiveFeedback(Effect As Long, DefaultCursors As Boolean)
 Event OLESetData(Data As Object, DataFormat As Integer)
 Event OLEStartDrag(Data As Object, AllowedEffects As Long)
 Event GetHwnd(ByRef ValidHwnd As Long)
+Event LostFocus1()
 
 '=========================================================================
 ' Public enums
@@ -715,13 +716,13 @@ End Property
 
 '== run-time =============================================================
 
-Property Get Value() As Boolean
-Attribute Value.VB_UserMemId = 0
-Attribute Value.VB_MemberFlags = "400"
+Property Get value() As Boolean
+Attribute value.VB_UserMemId = 0
+Attribute value.VB_MemberFlags = "400"
     '--- do nothing
 End Property
 
-Property Let Value(ByVal bValue As Boolean)
+Property Let value(ByVal bValue As Boolean)
     If bValue Then
         pvHandleClick
     End If
@@ -1343,7 +1344,7 @@ Private Function pvPrepareFont(oFont As StdFont, hFont As Long) As Boolean
     If oFont Is Nothing Then
         GoTo QH
     End If
-    If GdipCreateFontFamilyFromName(StrPtr(oFont.Name), 0, hFamily) <> 0 Then
+    If GdipCreateFontFamilyFromName(StrPtr(oFont.name), 0, hFamily) <> 0 Then
         If GdipGetGenericFontFamilySansSerif(hFamily) <> 0 Then
             GoTo QH
         End If
@@ -2245,8 +2246,8 @@ Private Function FromBase64Array(sText As String) As Byte()
     End If
 End Function
 
-Private Function HM2Pix(ByVal Value As Single) As Long
-   HM2Pix = Int(Value * 1440 / 2540 / Screen.TwipsPerPixelX + 0.5!)
+Private Function HM2Pix(ByVal value As Single) As Long
+   HM2Pix = Int(value * 1440 / 2540 / Screen.TwipsPerPixelX + 0.5!)
 End Function
 
 Private Function ToScaleMode(sScaleUnits As String) As ScaleModeConstants
@@ -2373,8 +2374,8 @@ Private Sub UserControl_HitTest(X As Single, Y As Single, HitResult As Integer)
     End If
 End Sub
 
-Private Sub UserControl_KeyDown(KeyCode As Integer, shift As Integer)
-    RaiseEvent KeyDown(KeyCode, shift)
+Private Sub UserControl_KeyDown(keycode As Integer, shift As Integer)
+    RaiseEvent KeyDown(keycode, shift)
 End Sub
 
 Private Sub UserControl_KeyPress(KeyAscii As Integer)
@@ -2393,8 +2394,12 @@ Private Sub UserControl_AccessKeyPress(KeyAscii As Integer)
     End If
 End Sub
 
-Private Sub UserControl_KeyUp(KeyCode As Integer, shift As Integer)
-    RaiseEvent KeyUp(KeyCode, shift)
+Private Sub UserControl_KeyUp(keycode As Integer, shift As Integer)
+    RaiseEvent KeyUp(keycode, shift)
+End Sub
+
+Private Sub UserControl_LostFocus()
+    RaiseEvent LostFocus1
 End Sub
 
 Private Sub UserControl_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
@@ -2584,7 +2589,7 @@ Private Sub UserControl_InitProperties()
     MaskColor = DEF_MASKCOLOR
     AutoRedraw = DEF_AUTOREDRAW
     On Error GoTo QH
-    m_sInstanceName = Typename(Extender.Parent) & "." & Extender.Name
+    m_sInstanceName = Typename(Extender.Parent) & "." & Extender.name
     #If DebugMode Then
         DebugInstanceName m_sInstanceName, m_sDebugID
     #End If
@@ -2613,7 +2618,7 @@ Private Sub UserControl_ReadProperties(PropBag As PropertyBag)
         AutoRedraw = .ReadProperty("AutoRedraw", DEF_AUTOREDRAW)
     End With
     On Error GoTo QH
-    m_sInstanceName = Typename(Extender.Parent) & "." & Extender.Name
+    m_sInstanceName = Typename(Extender.Parent) & "." & Extender.name
     #If DebugMode Then
         DebugInstanceName m_sInstanceName, m_sDebugID
     #End If

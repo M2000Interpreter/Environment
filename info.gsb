@@ -5108,6 +5108,7 @@ For This {
 	Method Edit1, mi$,"Show Hidden Characters", true, true, acc:="F10"
 	Method Edit1, mi$,"Free Style Edit", true, true, acc:="F9", shift:=True
 	Method Edit1, mi$,"Wrap Text", true, true, acc:="F1"
+	Method Edit1, mi$,"Comment/Uncomment", true, true,acc:="/",ctrl:=true
 
 	
 	With Edit1, "MenuGroup","This"
@@ -5436,7 +5437,9 @@ Function Edit1.DblClick {
 	Case 11
 		Call Local ChangeStyle()
 	Case 12
-		Call Local ChangeWrap()		
+		Call Local ChangeWrap()
+	Case 13
+		Method Pad,"PressKey", asc("4"), 2
 	End Select
 }
 
@@ -9417,7 +9420,11 @@ MODULE KB {Function CallMe {
             End Sub
       }
       \\ 10 for drum machine
-      Thread { Score 10,400,"CV90CC  ab Cd eCC" : Play 10,1, 10 } as L Interval 60
+      play 10, 0
+       check()
+      Thread {
+          check()
+      } as L Interval 600
       Thread {
             ClKey "A#2", KeyPress(asc("A")), 1
             ClKey "B2", KeyPress(asc("Z")), 2
@@ -9449,8 +9456,8 @@ MODULE KB {Function CallMe {
             If KeyPress(asc("4")) Then org<=1 : dur<=300
             If KeyPress(asc("5")) Then org<=65 : dur<=5000
             If KeyPress(asc("8")) Then n=1-n : refr<=true
-            If KeyPress(asc("9")) Then Thread L Restart
-            If KeyPress(asc("0")) Then Thread L Hold
+            If KeyPress(asc("9")) Then check() :Thread L Restart
+            If KeyPress(asc("0")) Then Thread L Hold: Play 10, 0
             If KeyPress(32) Then { vol$ <= "V127"  } else vol$ <=if$(dur=300->"V100", "V110")
             Print "--------"
       }
@@ -9523,6 +9530,9 @@ MODULE KB {Function CallMe {
 }
 Inline code LibFade
 FadeScreen Lazy$(&CallMe()), 1.7
+sub check()
+	if playnow(10) else Score 10,400,"CV90CC  ab Cd eCC" : Play 10,1	
+end sub
 }
 MODULE AU {Declare form1 Form
 Declare combo1 combobox Form form1
@@ -37275,7 +37285,7 @@ Enum UcsNineButtonStyleEnum {
 	ucsBtyCardFocus
 }
 declare FORM1 FORM
-declare Button(30) TYPE "M2000.CTXNINEBUTTON" FORM FORM1
+declare Button(30) type "ctxninebutton" form form1    // then name is "M2000.ctxninebutton", if .ctxninebutton exist in registry then we get that;
 Method FORM1,"move", 1000, 1000, 14000, 12000
 z=Button(0)
 With z,"ButtonTextFlags" as ButtonTextFlags()
@@ -37291,6 +37301,7 @@ for i=0 to 14
 	With Button(i), "tooltip", "hello from "+i
 	With Button(i+15), "tooltip", "hello from "+(i	+15)
 Next i
+With Button(0), "*Default", true    // see *before the name. The Dafault property is on ExtControl object who hanfle events.
 Layer Form1 {Gradient 11, #7777aa}
 function Button.GetHwnd(new Index, &A) {
 	layer Form1 {A=Hwnd}
@@ -37305,9 +37316,9 @@ function Button.click(index) {
 	Print "Click "; index
 	refresh
 }
-method FORM1 "SHOW", 1
+method form1 "Show", 1
 
-declare FORM1 nothing
+declare form1 nothing
 }
 MODULE SHAPEEX {ENUM SESHAPECONSTANTS {
 	SESHAPERECTANGLE = 0
@@ -49748,8 +49759,9 @@ declare image1 image form form1
 declare InpAngleX TEXTBOX form form1
 declare InpAngleY TEXTBOX form form1
 declare InpAngleZ TEXTBOX form form1
-' see ninebuttons
-declare button1 TYPE "M2000.CTXNINEBUTTON" form form1
+' see ninebuttons   "M2000.CTXNINEBUTTON" from revision 18 we can write witout M2000.
+' You need it exist the same in Windows Registry.
+declare button1 type "ctxninebutton" form form1
 Enum UcsNineButtonStyleEnum {
 	ucsBtyNone =1
 	ucsBtyButtonDefault
@@ -49783,6 +49795,7 @@ Enum UcsNineButtonStyleEnum {
 	ucsBtyCardFocus
 }
 With Button1, "Style", ucsBtyOutlineWarning, "ManualFocus",true, "AnimationDuration", 1.2~, "AutoRedraw",True, "TabStop", true
+With Button1, "*Default", true     // we use *Default to access the ExtControl object (which handle the events from Button1)
 method form1, "NoTaskBar"  ' no minimized button
 method InpAngleX, "Colors", 1,14, 1, 15
 method InpAngley, "Colors", 1,14, 1,15
@@ -49815,7 +49828,7 @@ method InpAngleX, "AccKey",  "X", opcode:=1
 method InpAngleY, "AccKey",  "Y", opcode:=1
 method InpAngleZ, "AccKey",  "Z", opcode:=1
 method Form1, "AccKey",  chr$(13), opcode:=1
-With image1, "TabStop", false, "Default", true, "ToolTip" as ToolTip$
+With image1, "TabStop", false,  "ToolTip" as ToolTip$
 ToolTip$="Click to Stop"
 With form1, "visible" as visible, "blink", 300, "blinktimes", 12, "NoFocus" as ReadNoFocus
 Boolean Free
@@ -50436,5 +50449,241 @@ partitura+="D@4C@4C@2!"  ' LAST NOTE LEGATO - 100%
 SCORE 1, TEMPO, partitura, 75  ' 75% STACCATO  -  100% IS LEGATO (OMIT THE PARAMETER)- NO SILENCE BETWEEN NOTES.
 PLAY 1, Acoustic_Bass
 PRINT "ODE TO JOY"
+}
+MODULE REGEXNEW {form 80
+declare c "m2000.regex"
+print type$(c)
+rem ExportProperties(c)
+Enum Logic {
+	NoMatch
+	NoMatch_DropExpect
+	HaveMatch
+	HaveMatch_DropExpect
+	HaveMatch_dotAll
+}
+Enum Display {
+	NoDisplay
+	DisplayList
+}
+flush
+open "out.txt" for wide output as #F
+partTitle={' -----------------------------------------------------------------------
+	' Test functions (each returns Boolean). For brevity they follow same
+	' logic used in earlier conversion: initialize, run Exec/Replace, assert.
+	' -----------------------------------------------------------------------
+	
+	' Category 1
+	}
+	Print #F, partTitle
+	T_1_01_basic_literal_exact(HaveMatch, "abc", "abc", "match for 'abc'", DisplayList)
+	T_1_02_basic_literal_mismatch(NoMatch, "abc", "abx", "no match for 'abx'")
+	T_1_03_dot_matches_any(HaveMatch,".", "a", "'.' to match 'a'")
+	T_1_04_dot_requires_at_least_one(NoMatch, ".","", "'.' not to match empty")
+	T_1_05_dot_in_sequence(HaveMatch, "a.c","abc","'a.c' to match 'abc'", DisplayList)
+	T_1_06_dot_dotall_true_newline(HaveMatch_dotAll,"a.c", "a\nc", "dotAll True expected match across newline", DisplayList)
+	// we forget to raise multiline flag
+	vblf=chr$(10)
+	T_1_07_dot_dotall_false_newline(NoMatch,"a.c", "a"+vblf+"c", "dotAll False expected no match across newline")
+	T_1_08_anchor_dot_single(HaveMatch, "^.$", "x", "^.$ to match 'x'", DisplayList)
+	T_1_09_anchor_dot_multi_fail(NoMatch, "^.$", "xy", "^.$ to fail on 'xy'")
+partTitle={
+	' Category 2 (Escapes)
+	}
+	Print #F, partTitle
+	T_2_01_escape_digit_true(HaveMatch, "\d", "5", "\d to match '5'", DisplayList)
+	T_2_02_escape_digit_false(NoMatch,"\d","a", "\d not to match 'a'")
+	T_2_03_escape_word_true(HaveMatch, "\w+", "hello_123", "\w+ to match 'hello_123'", DisplayList)
+	T_2_04_escape_word_false(NoMatch, "\w+", "!@#", "\w+ not to match '!@#'")
+	vbTab=chr$(9)
+	T_2_05_escape_space_true(HaveMatch, "\s+", " " + vbTab + vbLf, "\s+ to match whitespace", DisplayList)
+	T_2_06_escape_space_false(NoMatch, "\s+", "abc", "\s+ not to match 'abc'")
+	T_2_07_escape_lf(HaveMatch,"\n", vblf,"\n to match vbLf", DisplayList)
+	vbCr=chr$(13)
+	T_2_08_escape_cr(HaveMatch, "\r", vbCr, "\r to match vbCr", DisplayList)
+	T_2_09_escape_tab(HaveMatch, "\t", vbTab, "\t to match vbTab", DisplayList)
+	T_2_10_escape_escaped_metachar(HaveMatch,"\.",".", "\. to match '.'", DisplayList)
+	T_2_11_escape_d2_exec(HaveMatch, "\d{2}", "12","\d{2} to match '12'",  , "12")
+	T_2_12_escape_d2_partial_fail(NoMatch, "\d{2}", "1a", "\d{2} to fail on '1a'")
+close #f
+win "out.txt"
+end
+// Category 1
+sub Function T_1_01_basic_literal_exact()
+	print #F, "T_1_01_basic_literal_exact"
+	gosub CommonPart
+end sub
+sub Function T_1_02_basic_literal_mismatch()
+	print #F, "T_1_02_basic_literal_mismatch"
+	gosub CommonPart
+end sub
+sub T_1_03_dot_matches_any()
+	print #F, "T_1_03_dot_matches_any"
+	gosub CommonPart
+end sub
+sub T_1_04_dot_requires_at_least_one()
+	print #F, "T_1_04_dot_requires_at_least_one"
+	gosub CommonPart
+end sub
+sub T_1_05_dot_in_sequence()
+	print #F, "T_1_05_dot_in_sequence"
+	gosub CommonPart
+end sub
+sub T_1_06_dot_dotall_true_newline()
+	print #F, "T_1_06_dot_dotall_true_newline"
+	gosub CommonPart
+end sub
+sub T_1_07_dot_dotall_false_newline()
+	print #F, "T_1_07_dot_dotall_false_newline"
+	gosub CommonPart
+end sub
+sub T_1_08_anchor_dot_single()
+	print #F, "T_1_08_anchor_dot_single"
+	gosub CommonPart
+end sub
+sub T_1_09_anchor_dot_multi_fail()
+	print #F, "T_1_09_anchor_dot_multi_fail"
+	gosub CommonPart
+end sub
+// Category 2
+sub T_2_01_escape_digit_true()
+	print #F,"T_2_01_escape_digit_true"
+	gosub CommonPart
+end sub
+sub T_2_02_escape_digit_false()
+	print #F,"T_2_02_escape_digit_false"
+	gosub CommonPart
+end sub
+sub T_2_03_escape_word_true()
+	print #F,"T_2_03_escape_word_true"
+	gosub CommonPart
+end sub
+sub T_2_04_escape_word_false()
+	print #F,"T_2_04_escape_word_false"
+	gosub CommonPart
+end sub
+sub T_2_05_escape_space_true()
+	print #F,"T_2_05_escape_space_true"
+	gosub CommonPart
+end sub
+sub T_2_06_escape_space_false()
+	print #F,"T_2_06_escape_space_false"
+	gosub CommonPart
+end sub
+sub T_2_07_escape_lf()
+	print #F,"T_2_07_escape_lf"
+	gosub CommonPart
+end sub
+sub T_2_08_escape_cr()
+	print #F,"T_2_08_escape_cr"
+	gosub CommonPart
+end sub
+sub T_2_09_escape_tab()
+	print #F,"T_2_09_escape_tab"
+	gosub CommonPart
+end sub
+sub T_2_10_escape_escaped_metachar()
+	print #F,"T_2_10_escape_escaped_metachar"
+	gosub CommonPart
+end sub
+sub T_2_11_escape_d2_exec()
+	print #F,"T_2_11_escape_d2_exec"
+	gosub CommonPart
+end sub
+sub T_2_12_escape_d2_partial_fail()
+	print #F,"T_2_12_escape_d2_partial_fail"
+	gosub CommonPart
+end sub
+
+
+
+function InitRegexAndHandle(r as *Regex, pattern As String,ignoreCase As Boolean = False, MaxSteps As Long = -1, multiline As Boolean = False,  dotAll As Boolean = False)
+	= false
+	try ok {
+		 with r, "MaxMatchSteps" as  new r.MaxMatchSteps
+		if MaxSteps<=0 then
+			method r,"Init", pattern, ignoreCase, r.MaxMatchSteps, multiline, dotAll
+		Else
+			method r,"Init", pattern, ignoreCase, MaxSteps, multiline, dotAll
+		end if
+	}
+	if not ok or error then exit function
+	=true
+end function
+Function ExecColl(r as *Regex, subj As String)
+	=list
+	try ok {
+		Method r, "Exec", subj as new ExecColl
+	}
+	if not ok or error then exit function
+	' do something else here
+	if Type$(ExecColl)="Long" then exit function
+	Method ExecColl , "_NewEnum" as new Item
+	flush
+	While Item {
+		data eval$(item)
+	 }
+	 =[]
+End Function
+// ExportProperties(r) this works for any COM object
+Sub ExportProperties(r)
+	local m=param(r), i as long, doc$
+	Document doc$  ' upgrade to document from string
+	if len(m)>1 then {
+		For i=0 to len(m)-1
+		\\  use index, not key so i! is index
+			Doc$=m$(i!)+{
+			}  ' we use this block for new line
+		Next 
+	}
+	Report Doc$
+	Clipboard Doc$ 
+End sub
+// This is a common part for the tests.
+// we place the reading of parameters here
+// this is the M2000 way...
+CommonPart:
+	if empty then return
+	@Read New YourWish as logic, exp as string, searchstr as string, msg as string, DisplayIt as Display=NoDisplay, match1$=""
+	local dotAll as boolean
+	if YourWish=HaveMatch_dotAll then dotAll=true : ? #F, "Use of dotAll: True"
+	if YourWish<HaveMatch_dotAll then local msg0="expected " else local msg0=""
+	if  @InitRegexAndHandle(c, exp,,,,dotAll) then
+		local z=@ExecColl(c,searchstr)
+		if YourWish>=HaveMatch then
+			if len(z)=0 then
+				if  YourWish= HaveMatch_DropExpect then
+					? #F, msg: return
+				else
+					? #F, msg0+msg: return
+				end if
+			end if
+			Pen 15 {? #F, "ok: "+msg}
+			if  match1$<>"" then
+				If stackitem$(z)=match1$ then ?#F, stackitem$(z)+" match "+match1$
+			end if
+			if DisplayIt=DisplayList then
+				Pen 11 {
+					print #F,"Len = ";Len(z)
+					print #F, z
+				}
+			end if
+		else
+			if not len(z)=0 then
+				if  YourWish= NoMatch_DropExpect then
+					? #F, msg: return
+				else
+					? #F, msg0+msg: return
+				end if
+			end if
+			If YourWish=NoMatch_DropExpect then
+				Pen 15 {? #F, "ok: "+msg}				
+			else
+				Pen 15 {? #F, "ok: "+msg0+msg}
+			end if
+		end if
+	end if
+	print #f
+	Rem local a$=key$
+return
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

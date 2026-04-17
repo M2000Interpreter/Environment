@@ -12,29 +12,28 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
 Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-' a stack only for strings for group objects
 Private mstack As New Collection
 Public Property Get Total() As Long
-Total = mstack.count
+Total = mstack.Count
 End Property
-Public Property Get count() As Long
-count = mstack.count
+Public Property Get Count() As Long
+Count = mstack.Count
 End Property
 Function Copy() As mStiva2
-Dim I As Long
+Dim i As Long
 Set Copy = New mStiva2
-For I = Total To 1 Step -1
-Copy.PushVariant mstack.item(I)
-Next I
+For i = Total To 1 Step -1
+Copy.PushVariant mstack.item(i)
+Next i
 End Function
 Public Property Get IsDecimal() As Boolean
 Dim what, t As Byte
-If mstack.count > 0 Then
+If mstack.Count > 0 Then
 what = mstack.item(1)
 GetMem1 VarPtr(what), t
 IsDecimal = t = 14
@@ -42,91 +41,91 @@ End If
 End Property
 Public Property Get IsCurrency() As Boolean
 Dim what, t As Byte
-If mstack.count > 0 Then
+If mstack.Count > 0 Then
 what = mstack.item(1)
 GetMem1 VarPtr(what), t
 IsCurrency = t = 14
 End If
 End Property
 Public Property Get LookTopVal() As Variant
-If mstack.count > 0 Then
+If mstack.Count > 0 Then
 LookTopVal = mstack.item(1)
 End If
 End Property
 Public Function LookTopValIsLong(p As Long) As Boolean
-Dim A, t As Byte
-If mstack.count > 0 Then
-A = mstack.item(1)
-GetMem1 VarPtr(A), t
+Dim a, t As Byte
+If mstack.Count > 0 Then
+a = mstack.item(1)
+GetMem1 VarPtr(a), t
 If t = 3 Then
 LookTopValIsLong = True
 mstack.Remove 1
-p = CLng(A)
+p = CLng(a)
 End If
 End If
 
 End Function
 Public Property Get LookSecondVal() As Variant
-If mstack.count > 1 Then
+If mstack.Count > 1 Then
 LookSecondVal = mstack.item(2)
 End If
 End Property
 Public Property Get PopVal() As Variant
-If mstack.count > 0 Then
+If mstack.Count > 0 Then
 PopVal = mstack.item(1)
    mstack.Remove 1
 End If
 End Property
-Public Sub PushVal(A As Variant)
-If mstack.count = 0 Then
-mstack.Add A
+Public Sub PushVal(a As Variant)
+If mstack.Count = 0 Then
+mstack.Add a
 Else
-mstack.Add A, , 1
+mstack.Add a, , 1
 End If
 End Sub
-Public Sub PushVariant(A As Variant)
-If mstack.count = 0 Then
-mstack.Add A
+Public Sub PushVariant(a As Variant)
+If mstack.Count = 0 Then
+mstack.Add a
 Else
-mstack.Add A, , 1
+mstack.Add a, , 1
 End If
 End Sub
-Public Sub PushLong(A As Long)
-If mstack.count = 0 Then
-mstack.Add CVar(A)
+Public Sub PushLong(a As Long)
+If mstack.Count = 0 Then
+mstack.Add CVar(a)
 Else
-mstack.Add CVar(A), , 1
+mstack.Add CVar(a), , 1
 End If
 End Sub
 Public Sub MakeTopItem(where As Long)
 'we pick an item and to the top
-Dim A As Variant
+Dim a As Variant
 On Error Resume Next
 If where > 1 Then
-A = mstack.item(where)
+a = mstack.item(where)
 mstack.Remove where
-If mstack.count = 0 Then
-mstack.Add A
+If mstack.Count = 0 Then
+mstack.Add a
 Else
-mstack.Add A, , 1
+mstack.Add a, , 1
 End If
 End If
 End Sub
 Public Sub Flush()
 Dim num As Long
-For num = 1 To mstack.count
+For num = 1 To mstack.Count
    mstack.Remove 1
 Next num
 End Sub
-Public Sub PushStr(ByRef A As String)
-If mstack.count = 0 Then
-mstack.Add CVar(A)
+Public Sub PushStr(ByRef a As String)
+If mstack.Count = 0 Then
+mstack.Add CVar(a)
 Else
-mstack.Add CVar(A), , 1
+mstack.Add CVar(a), , 1
 End If
 End Sub
 Public Property Get StackItem2(where As Long, maxvalue As Long) As Variant
-If where > mstack.count Then
+If where > mstack.Count Then
 StackItem2 = maxvalue + 1
 Else
 StackItem2 = mstack.item(where)
@@ -146,13 +145,13 @@ Dim aa
 Set aa = RHS
 mstack.Add aa
 End Sub
-Public Sub DataVal(A As Variant)
-mstack.Add A
+Public Sub DataVal(a As Variant)
+mstack.Add a
 End Sub
-Public Sub DataStr(ByRef A As String)
+Public Sub DataStr(ByRef a As String)
 Dim v As Variant
 v = vbNullString
-SwapString2Variant A, v
+SwapString2Variant a, v
 mstack.Add v
 End Sub
 Sub GetStackPick(where, ByRef v As Variant)
@@ -164,44 +163,44 @@ Public Property Get StackPick(where As Long) As Variant
 StackPick = mstack.item(where)
 mstack.Remove where
 End Property
-Public Sub MergeBottom(A As mStiva2)
-If Me Is A Then Exit Sub
-Dim I As Long, aa As Variant
-If A.Total > 0 Then
+Public Sub MergeBottom(a As mStiva2)
+If Me Is a Then Exit Sub
+Dim i As Long, aa As Variant
+If a.Total > 0 Then
 Do
-aa = A.StackPick(1)
+aa = a.StackPick(1)
 mstack.Add aa
-Loop Until A.Total < 1
+Loop Until a.Total < 1
 End If
 End Sub
-Public Sub DataStrUn(A As String)
-Dim aa As Variant, I As Long, b As String
-b = Split(A)(0)
-aa = A
-If mstack.count = 0 Then
+Public Sub DataStrUn(a As String)
+Dim aa As Variant, i As Long, b As String
+b = Split(a)(0)
+aa = a
+If mstack.Count = 0 Then
 mstack.Add aa
 Else
-For I = 1 To Total
-If Split(mstack.item(I))(0) = b Then
+For i = 1 To Total
+If Split(mstack.item(i))(0) = b Then
 
-mstack.Remove I
-If mstack.count = 0 Then
+mstack.Remove i
+If mstack.Count = 0 Then
 mstack.Add aa
-ElseIf I = 1 Then
+ElseIf i = 1 Then
 mstack.Add aa, , 1
 Else
-mstack.Add aa, , , I - 1
+mstack.Add aa, , , i - 1
 End If
 Exit Sub
 End If
-Next I
+Next i
 mstack.Add aa
 End If
 End Sub
 Public Sub drop(ByVal items As Long)
 Dim num As Long
 On Error Resume Next
-If mstack.count < items Then: Set mstack = New Collection: Exit Sub
+If mstack.Count < items Then: Set mstack = New Collection: Exit Sub
 For num = 1 To items
     mstack.Remove 1
 Next num
@@ -215,7 +214,7 @@ Dim Pack2Long As Variant
     mstack.Remove 1
     PutMem4 VarPtr(Pack2Long) + 4, Long1
     PutMem4 VarPtr(Pack2Long) + 8, Long2
-    If mstack.count = 0 Then
+    If mstack.Count = 0 Then
         mstack.Add Pack2Long
     Else
         mstack.Add Pack2Long, , 1
@@ -231,7 +230,7 @@ Dim Pack2Long As Variant
     PutMem4 VarPtr(Pack2Long) + 4, Long1
     PutMem4 VarPtr(Pack2Long) + 8, Long2
     PutMem4 VarPtr(Pack2Long) + 12, Long3
-    If mstack.count = 0 Then
+    If mstack.Count = 0 Then
         mstack.Add Pack2Long
     Else
         mstack.Add Pack2Long, , 1
@@ -242,7 +241,7 @@ Public Sub Push2long(ByVal Long1 As Long, ByVal Long2 As Long)
     Pack2Long = 0@
     PutMem4 VarPtr(Pack2Long) + 4, Long1
     PutMem4 VarPtr(Pack2Long) + 8, Long2
-    If mstack.count = 0 Then
+    If mstack.Count = 0 Then
         mstack.Add Pack2Long
     Else
         mstack.Add Pack2Long, , 1
@@ -254,7 +253,7 @@ Public Sub Push3long(ByVal Long1 As Long, ByVal Long2 As Long, ByVal Long3 As Lo
     PutMem4 VarPtr(Pack3Long) + 4, Long1
     PutMem4 VarPtr(Pack3Long) + 8, Long2
     PutMem4 VarPtr(Pack3Long) + 12, Long3
-    If mstack.count = 0 Then
+    If mstack.Count = 0 Then
         mstack.Add Pack3Long
     Else
         mstack.Add Pack3Long, , 1
@@ -262,7 +261,7 @@ Public Sub Push3long(ByVal Long1 As Long, ByVal Long2 As Long, ByVal Long3 As Lo
 End Sub
 
 Public Function Pop2Long(ByRef Long2 As Long) As Long
-If mstack.count > 0 Then
+If mstack.Count > 0 Then
     Dim PackLoad As Variant
     PackLoad = mstack.item(1)
     mstack.Remove 1
@@ -271,7 +270,7 @@ If mstack.count > 0 Then
 End If
 End Function
 Public Function Pop3Long(Long2 As Long, Long3 As Long) As Long
-If mstack.count > 0 Then
+If mstack.Count > 0 Then
     Dim PackLoad As Variant
     PackLoad = mstack.item(1)
     mstack.Remove 1
@@ -281,7 +280,7 @@ If mstack.count > 0 Then
 End If
 End Function
 Public Function isPop3Long(Long2 As Long, Long3 As Long) As Long
-If mstack.count > 0 Then
+If mstack.Count > 0 Then
     Dim PackLoad As Variant, t As Byte
     PackLoad = mstack.item(1)
     GetMem1 VarPtr(PackLoad), t
@@ -296,7 +295,7 @@ If mstack.count > 0 Then
 End If
 End Function
 Public Function IsPop2Long(ByRef Long2 As Long) As Long
-If mstack.count > 0 Then
+If mstack.Count > 0 Then
     Dim PackLoad As Variant, t As Byte
     PackLoad = mstack.item(1)
     GetMem1 VarPtr(PackLoad), t
@@ -310,14 +309,14 @@ If mstack.count > 0 Then
 End If
 End Function
 Public Sub PushObj(RHS As Variant)
-If mstack.count = 0 Then
+If mstack.Count = 0 Then
 mstack.Add RHS
 Else
 mstack.Add RHS, , 1
 End If
 End Sub
 Public Function IsEmpty() As Boolean
-IsEmpty = mstack.count = 0
+IsEmpty = mstack.Count = 0
 End Function
 Public Property Get PopStr() As String
     On Error Resume Next

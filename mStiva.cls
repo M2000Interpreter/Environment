@@ -15,11 +15,7 @@ Option Explicit
 Private mstack As New Collection
 Private mMany As Long
 Dim BeginFrom As Long
-' interface for iteration
 Public Index As Long
-' new idea to not include a VarItem
-' we place three items, the slot, the type (or subtype), the data.
-' so each item is a multiple of three
 
 Public Function IsEmpty() As Boolean
 IsEmpty = mstack.Count = 0
@@ -623,7 +619,7 @@ End Sub
 Public Sub Begin(from As Long)
 BeginFrom = from
 End Sub
-Public Sub AddItem(ByRef a As String)
+Public Sub additem(ByRef a As String)
 Dim aa As VarItem
 Set aa = NewVarItem()
     aa.Typename = "S"
@@ -854,14 +850,14 @@ For i = Total To 1 Step -1
 Copy.PushStr Me.StackItem(i)
 Next i
 End Function
-Property Get Value() As Variant
+Property Get value() As Variant
 Dim aa As VarItem
 If Index >= 0 And Index < mMany Then
     Set aa = mstack.item(Index + 1)
     If aa.slot = 1 Then
-        Set Value = aa.mItem
+        Set value = aa.mItem
     Else
-        Value = aa.mItem
+        value = aa.mItem
     End If
 End If
 End Property
