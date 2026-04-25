@@ -81,9 +81,10 @@ Private Declare Function SetWindowLong Lib "user32" _
 Public Const GWL_STYLE = (-16)
 Public Const WS_SYSMENU = &H80000
 Public Const WS_MINIMIZEBOX = &H20000
-    
+Private Const GWL_HWNDPARENT = (-8)
 Private Const GWL_EXSTYLE = (-20)
 Private Const WS_EX_LAYERED = &H80000
+Private Const WS_EX_TOOLWINDOW = &H80&
     Private Const LWA_Defaut         As Long = &H2
 Private Const LWA_COLORKEY = &H1
 Private Const LWA_ALPHA = &H2
@@ -374,7 +375,7 @@ Public Function PathMakeDirs(ByVal Pathd As String) As Boolean
 Function PurifyPath(sPath$) As String
 Dim a$(), i
 If sPath$ = vbNullString Then Exit Function
-a$() = split(sPath, "\")
+a$() = Split(sPath, "\")
 If isdir(a$(LBound(a$()))) Then i = i + 1
 For i = LBound(a$()) + i To UBound(a$())
 a$(i) = PurifyName(a$(i))
@@ -579,7 +580,15 @@ Public Sub SetTrans(oForm As Form, Optional bytAlpha As Byte = 255, Optional lCo
     SetLayeredWindowAttributes oForm.hWnd, lColor, bytAlpha, IIf(TRMODE, LWA_COLORKEY Or LWA_Defaut, LWA_Defaut)
     UpdateWindow oForm.hWnd
 End Sub
-
+Public Sub FormParent(oForm As Form, ParentHwnd As Long)
+    Dim lStyle As Long
+    lStyle = GetWindowLong(oForm.hWnd, GWL_EXSTYLE)
+    If Not (lStyle And WS_EX_TOOLWINDOW) = WS_EX_TOOLWINDOW Then
+    SetWindowLong oForm.hWnd, GWL_EXSTYLE, lStyle Or WS_EX_TOOLWINDOW
+    End If
+    SetWindowLong oForm.hWnd, GWL_HWNDPARENT, ParentHwnd
+    UpdateWindow oForm.hWnd
+End Sub
 
 Private Function IsArrayEmpty(va As Variant) As Boolean
     Dim v As Variant
@@ -627,7 +636,7 @@ Dim st&, pa&, po&
 st& = 1
 Dim word$(), it As Long, Max As Long, Line$, ok As Boolean, Min As Long
 simple$ = simple$ + "|"
-word$() = split(simple$, "|")
+word$() = Split(simple$, "|")
 
 
 Max = UBound(word$()) - 1

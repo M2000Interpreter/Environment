@@ -123,7 +123,7 @@ Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not
 Private Const DWL_ANYTHREAD& = 0&
 Const LOCALE_ILANGUAGE = 1&
 Private OldPar As Long, dragCharpos As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private Type DRAWTEXTPARAMS
      cbSize As Long
      iTabLength As Long
@@ -132,7 +132,7 @@ Private Type DRAWTEXTPARAMS
      uiLengthDrawn As Long
 End Type
 Dim tParam As DRAWTEXTPARAMS
-Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
+Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
 Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT) As Long
 Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
@@ -765,7 +765,6 @@ Dim what$, ThatPara As Long, pastchars As Long, oldpanpos As Long
 pastchars = mDoc.TextParagraphLine2(glistN.ListIndex + 1, what$, ThatPara, False)
 Charpos = pastchars + glistN.SelStart
 
-'mDoc.MarkParagraphID = ThatPara
 
 If Not glistN.enabled Then Exit Sub
 oldpanpos = glistN.PanPos
@@ -776,47 +775,18 @@ Else
 RaiseEvent inform(glistN.ListIndex + 1, glistN.SelStart)
 End If
 On Error Resume Next
-
-'If NoCenterLineEdit Then Exit Sub
-
-'If LastListIndex <> glistN.ListIndex Then
-
-'LastListIndex = glistN.ListIndex: glistN.ShowMe
-
-'End If
-
 If LastListIndex <> glistN.ListIndex Then
-
-LastListIndex = glistN.ListIndex
-
+    LastListIndex = glistN.ListIndex
     If NoCenterLineEdit Then
        If Not tmpshow Then glistN.ShowMe2
     Else
-    tmpshow = False
-    If oldpanpos <> glistN.PanPos Then Show Else glistN.ShowMe
+        tmpshow = False
+        If oldpanpos <> glistN.PanPos Then Show Else glistN.ShowMe
     End If
-Else
-If NoCenterLineEdit Then
- 'glistN.ShowPan
-Else
-Show
-End If
-    
+ElseIf Not NoCenterLineEdit Then
+   Show
 End If
 tmpshow = False
-Exit Sub
-If NoCenterLineEdit Then
-    If LastListIndex <> glistN.ListIndex Then
-        LastListIndex = glistN.ListIndex:  glistN.ShowMe: If Not tmpshow Then glistN.ShowMe2
-    Else
-        If Not tmpshow Then glistN.ShowMe2
-    End If
-
-Else
-    glistN.ShowMe
-    If Not tmpshow Then glistN.ShowMe2
-End If
-
 End Sub
 
 Private Sub glistN_DragData(ThatData As String)
@@ -1818,6 +1788,23 @@ End If
 End If
 100
 End Function
+Function HaveMarkedMultiline() As Boolean
+On Error GoTo 100
+If BlockEndPos < 1 Then BlockEndPos = 1
+If glistN.MarkNext = 0 Then
+Else
+If BlockStartPara <> BlockEndPara Then
+HaveMarkedMultiline = True
+End If
+End If
+100
+End Function
+Function MarkedTextMultilineAny() As Boolean
+If BlockStartPara <> BlockEndPara Then
+MarkedTextMultilineAny = True
+End If
+End Function
+
 Function MarkedTextAny() As Boolean
 If BlockStartPara <> BlockEndPara Then
 MarkedTextAny = True

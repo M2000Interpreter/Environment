@@ -41,36 +41,7 @@ Private myTimerIsRunning As Boolean
 ' PUBLIC PROPERTIES
 Public Property Get PlayMusic() As Boolean
 ' check if music is there
-
 PlayMusic = MusicTaskNum > 0
-Exit Sub
-
-Dim i As Long
-rest
-       If myMasterList.Count > 0 Then
-       For i = 1 To myMasterList.Count
-       If myMasterList(i).id < 100 Then
- PlayMusic = True
-GoTo thh11
-       End If
-       
-       Next i
-        
-        End If
-       If myRunningList.Count > 0 Then
-       For i = 1 To myRunningList.Count
-       If myRunningList(i).id < 100 Then
-        PlayMusic = True
- GoTo thh11
-     '  End
-       End If
-       
-       Next i
-        
-        End If
-thh11:
-        RestEnd
- 
 End Property
 Public Property Get QueueCount() As Long
   QueueCount = myRunningList.Count + myMasterList.Count
@@ -344,8 +315,37 @@ b.originalname = bstack.originalname
 
 Set GetNewBaseTask = b
 End Function
-
-
+Public Function CanChangePlan() As Boolean
+    On Error Resume Next
+    Dim t As TaskInterface
+    For Each t In myMasterList
+       If TypeOf t Is myProcess Then CanChangePlan = False: Exit Function
+    Next
+    For Each t In myRunningList
+       If TypeOf t Is myProcess Then CanChangePlan = False: Exit Function
+    Next
+   CanChangePlan = True
+End Function
+Public Function CanStopMain() As Boolean
+    On Error Resume Next
+    Dim t As TaskInterface, acc As Long
+    For Each t In myMasterList
+       If TypeOf t Is myProcess Then
+            If Not t.Done Then acc = acc + 1
+       ElseIf TypeOf t Is counter Then
+            If Not t.Done Then acc = acc + 1
+       End If
+    
+    Next
+    For Each t In myRunningList
+       If TypeOf t Is myProcess Then
+            If Not t.Done Then acc = acc + 1
+       ElseIf TypeOf t Is counter Then
+            If Not t.Done Then acc = acc + 1
+       End If
+    Next
+    CanStopMain = acc <= 1
+End Function
 
 Public Sub Dispose()
   On Error Resume Next

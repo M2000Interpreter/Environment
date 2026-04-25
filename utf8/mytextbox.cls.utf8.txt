@@ -75,7 +75,7 @@ Private Declare Function CloseClipboard Lib "user32" _
     Private Pad$, mStayOpen As Boolean
 Public Property Get Text() As String
 If glistN.listcount = 0 Then
-glistN.AddItem mprompt
+glistN.additem mprompt
 Else
 Text = glistN.list(0)
 End If
@@ -83,7 +83,7 @@ End Property
 Public Property Get vartext() As String
 Attribute vartext.VB_UserMemId = 0
 If glistN.listcount = 0 Then
-glistN.AddItem ""
+glistN.additem ""
 Else
 vartext = Mid$(glistN.list(0), 1 + Len(mprompt))
 End If
@@ -94,7 +94,7 @@ glistN.HeadLine = vbNullString ' no info
 glistN.HeadlineHeight = 0
 
 If glistN.listcount = 0 Then
-glistN.AddItem mprompt + RHS
+glistN.additem mprompt + RHS
 Else
 glistN.list(0) = mprompt + RHS
 End If
@@ -108,7 +108,7 @@ glistN.restrictLines = 1
 glistN.HeadLine = vbNullString ' no info
 glistN.HeadlineHeight = 0
 If glistN.listcount = 0 Then
-glistN.AddItem RHS
+glistN.additem RHS
 Else
 glistN.list(0) = RHS
 End If
@@ -193,6 +193,7 @@ this = Mid$(content, 1 + Len(mprompt))
 RaiseEvent ValidString(this, thispos)
 thispos = thispos + Len(mprompt)
 content = mprompt + this
+If Len(content) < thispos Then thispos = Len(content) + 1
 If thispos <> glistN.SelStart And this <> "" Then glistN.SelStart = thispos: glistN.ShowMe
 End Sub
 Public Sub ResetPan()
@@ -510,7 +511,7 @@ End Property
 Private Sub glistN_AddSelStart(val As Long, shift As Integer)
 Dim W As Long, a$
 If glistN.SelStart > 0 Then
-a$ = Mid$(vartext, glistN.SelStart, 1)
+a$ = Mid$(Text, glistN.SelStart, 1)
 If LenB(a$) > 1 Then
 W = AscW(a$)
 If W > -10241 And W < -9216 Then
@@ -523,7 +524,7 @@ End Sub
 Private Sub glistN_SubSelStart(val As Long, shift As Integer)
 Dim W As Long, a$
 If glistN.SelStart < 2 Then Exit Sub
-a$ = Mid$(vartext, glistN.SelStart - 1, 1)
+a$ = Mid$(Text, glistN.SelStart - 1, 1)
 If LenB(a$) > 1 Then
 W = AscW(a$)
 If W > -9217 And W < -8192 Then

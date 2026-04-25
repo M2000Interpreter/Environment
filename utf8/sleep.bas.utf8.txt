@@ -115,15 +115,15 @@ Private Declare Function GetForegroundWindow Lib "user32" () As Long
     
 
 Public Function Is64bit() As Boolean
-    Static m As Boolean, used As Boolean
+    Static M As Boolean, used As Boolean
 If used Then
 Else
    If GetProcAddress(GetModuleHandle("kernel32"), "IsWow64Process") > 0 Then
-      IsWow64Process GetCurrentProcess(), m
+      IsWow64Process GetCurrentProcess(), M
       used = True
    End If
 End If
-   Is64bit = m
+   Is64bit = M
 End Function
 
 Public Function Blockmalloc(ByVal nBytes As Long, way As Long, Optional NoRun As Boolean = True) As Long
@@ -160,55 +160,46 @@ Public Function BlockSize(ByVal Ptr As Long) As Long
     BlockSize = HeapSize(hHeap, 0, Ptr)
 End Function
 Public Sub BlockFree(ByVal Ptr As Long)
-
-  '  Debug.Print HeapFree(GetProcessHeap(), 0, Ptr)
-        HeapFree GetProcessHeap(), 0, Ptr
+    HeapFree GetProcessHeap(), 0, Ptr
 End Sub
 Public Sub SetUpForExecution(ByVal Ptr As Long, ByVal nBytes As Long)
-        Dim oldV As Long
-        FlushInstructionCache GetCurrentProcess, Ptr, nBytes
-        VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READ, oldV ' PAGE_READWRITE
-        VirtualLock Ptr, nBytes
+    Dim oldV As Long
+    FlushInstructionCache GetCurrentProcess, Ptr, nBytes
+    VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READ, oldV ' PAGE_READWRITE
+    VirtualLock Ptr, nBytes
 End Sub
 Public Sub ReleaseExecution(ByVal Ptr As Long, ByVal nBytes As Long)
-        Dim oldV As Long
-       FlushInstructionCache GetCurrentProcess, Ptr, nBytes
-        
-        VirtualUnlock Ptr, nBytes
-         VirtualProtect Ptr, nBytes, PAGE_READWRITE, oldV '  PAGE_EXECUTE_READ
+    Dim oldV As Long
+    FlushInstructionCache GetCurrentProcess, Ptr, nBytes
+    
+    VirtualUnlock Ptr, nBytes
+    VirtualProtect Ptr, nBytes, PAGE_READWRITE, oldV '  PAGE_EXECUTE_READ
 End Sub
 Public Sub BlockFreeVirtual(ByVal Ptr As Long, ByVal nBytes As Long)
-      ' VirtualUnlock Ptr, nBytes
-     
-      If VirtualFree(Ptr, 0&, &H8000&) = 0 Then
+    If VirtualFree(Ptr, 0&, &H8000&) = 0 Then
       Debug.Print GetLastError()
-      End If
+    End If
 End Sub
 Public Sub MyRefresh(bstack As basetask)
-On Error Resume Next
-Dim some As Object
-With Prefresh(GetCode(bstack.Owner))
-            Call GetSystemTimeAsFileTime(basictimer)
-            If basictimer > .k1 Then .RRCOUNTER = 0
-            
-                If .RRCOUNTER = 0 Then
-                    .k1 = basictimer + REFRESHRATE: .RRCOUNTER = 1
-                    If Not bstack.toprinter Then
-                    Set some = bstack.Owner
-                    
-                     If some.Visible Then
+    On Error Resume Next
+    Dim some As Object
+    With Prefresh(GetCode(bstack.Owner))
+        Call GetSystemTimeAsFileTime(basictimer)
+        If basictimer > .k1 Then .RRCOUNTER = 0
+            If .RRCOUNTER = 0 Then
+                .k1 = basictimer + REFRESHRATE: .RRCOUNTER = 1
+                If Not bstack.toprinter Then
+                Set some = bstack.Owner
+                If some.Visible Then
                     If TypeOf some Is GuiM2000 Then
-                        
                         If some.RefreshList > 0 Then some.RefreshALL Else some.Refresh
-                        
                     Else
-                    some.Refresh
+                        some.Refresh
                     End If
-                    End If
-                    End If
-                 End If
-                 
-                 End With
+                End If
+            End If
+        End If
+    End With
 End Sub
 Public Sub SkipRefresh(bstack As basetask)
     With Prefresh(GetCode(bstack.Owner))
@@ -491,29 +482,29 @@ Loop Until lNumberOf10ThmiliSeconds < 0
 
 End Sub
 
-Public Sub SleepWaitNO(ByVal A As Long)
+Public Sub SleepWaitNO(ByVal a As Long)
 Exit Sub
  Dim b As New clsProfiler
-Dim l As Boolean, k
+Dim l As Boolean, K
 l = NOEDIT
   b.MARKONE
-While A > b.MARKTWO And l = NOEDIT
+While a > b.MARKTWO And l = NOEDIT
 MyDoEvents2 Form1
 If Not TaskMaster Is Nothing Then If TaskMaster.Processing Then TaskMaster.TimerTick Else Sleep 0
 
- A = A \ 3
+ a = a \ 3
 Wend
 End Sub
-Private Sub SleepWaitNew(A As Long)
+Private Sub SleepWaitNew(a As Long)
  Dim b As New clsProfiler
   b.MARKONE
 Do
  MyDoEvents
-Loop Until A > b.MARKTWO
+Loop Until a > b.MARKTWO
 End Sub
 Public Sub SleepWaitEdit(bstack As basetask, lNumberOf10ThmiliSeconds As Long)
 On Error Resume Next
-If Forms.count < 3 Then
+If Forms.Count < 3 Then
 Sleep 1
  DoEvents
 Exit Sub
@@ -596,7 +587,7 @@ End Sub
         
 Public Sub SleepWaitEdit2(lNumberOf10ThmiliSeconds As Long)
 On Error Resume Next
-If Forms.count < 3 Then
+If Forms.Count < 3 Then
 Sleep 1
 DoEvents
 Exit Sub
@@ -681,10 +672,10 @@ CloseHandle hTimer
 If Not TaskMaster Is Nothing Then TaskMaster.RestEnd
 End Sub
 Sub SetVisibleByHDC(whatHDC As Long, setit As Long)
-Dim k As Form
+Dim K As Form
 On Error Resume Next
-For Each k In Forms
-    If k.hDC = whatHDC Then k.Visible = setit
-Next k
+For Each K In Forms
+    If K.hDC = whatHDC Then K.Visible = setit
+Next K
 
 End Sub

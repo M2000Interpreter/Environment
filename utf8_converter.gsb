@@ -8,7 +8,7 @@ Dest$ = Dir$
 Dir Appdir$
 Files "BAS|CLS|FRM"
 Menu
-Files + "BAS|CLS|FRM"
+Files + "BAS|CLS|FRM|CTL"
 If MenuItems>0 then
 	For i=1 to MenuItems
 		Clear tmp$
@@ -28,7 +28,7 @@ If MenuItems>0 then
 				Save.Doc tmp$, Dest$+menu$(i)+".utf8.txt", NoBomUtf8crlf
 					dos "copy /y "+quote$(Dir$+menu$(i))+" "+Dest$;
 				If lcase$(Right$(menu$(i),4))=".frm" then
-					dos "copy /y "+quote$(Dir$+right$(menu$(i), len(menu$(i))-1)+"x")+" "+Dest$;
+					dos "copy /y "+quote$(Dir$+left$(menu$(i), len(menu$(i))-1)+"x")+" "+Dest$;
 				end if
 				wait 1000
 				Print Over $(0, 8),@(0), Int(i/MenuItems*100), "% -  Change file: ";menu$(i)

@@ -112,15 +112,17 @@ Private Sub TaskInterface_Parameters(ParamArray Values() As Variant)
 On Error GoTo poulos
   ' Verifing parameter count
   If UBound(Values) = 5 Then
-    
     On Error Resume Next
     myid = CLng(Values(0))  ' this is the hanlde
-   mYspace = CCur(Values(1)) '
-   mycode = CStr(Values(2))
-   myholdtime = CCur(Values(3)) ' για το after μονο
-    m_duration = uintnew(CCur(timeGetTime)) + myholdtime
-   myHere$ = CStr(Values(4))  ' change from 5 to 4
-   mNostretch = CBool(Values(5))
+    mYspace = CCur(Values(1)) '
+    mycode = CStr(Values(2))
+    myholdtime = CCur(Values(3)) ' για το after μονο
+    m_duration = CLng(uintnew(CCur(timeGetTime)) + myholdtime)
+    If Err Then
+    myDone = True
+    End If
+    myHere$ = CStr(Values(4))  ' change from 5 to 4
+    mNostretch = CBool(Values(5))
     If Err.Number > 0 Then
       On Error GoTo 0
     
@@ -129,6 +131,7 @@ On Error GoTo poulos
     ' do something
   Else
 poulos:
+    myDone = True
     ' not defined yet
   End If
   
