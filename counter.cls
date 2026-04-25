@@ -27,7 +27,7 @@ Dim jobnameID As Long
 Dim m_duration As Long
 Dim m_now As Long
 Dim mYspace As Long
-    Dim myholdtime As Currency
+Dim myholdtime As Currency
 Dim mycode As String
 Dim MyMode As Long
 Dim mybusy As Boolean
@@ -38,7 +38,7 @@ Private myBUFvar As String, res As Long
 Private myBase As TaskInterface
 Private Declare Function timeGetTime Lib "kernel32.dll" Alias "GetTickCount" () As Long
 Private myProcess As basetask
-
+Private ua, UB
 Private Property Get TaskInterface_Process() As basetask
 Set TaskInterface_Process = myProcess
 End Property
@@ -88,52 +88,52 @@ On Error GoTo poulos
   If UBound(Values) = 4 Then
     
     On Error Resume Next
-   jobnameID = CLng(Values(0)) ' this is the hanlde
-   mYspace = Signed(Values(1)) '
- 
-  pipename = "\\.\pipe\" & Values(2) + ChrW$(0)
-'pipename = validpipename(CStr(Values(2)))
-   myholdtime = Signed(Values(3))
-
-   m_now = timeGetTime
+    jobnameID = CLng(Values(0)) ' this is the hanlde
+    mYspace = Signed(Values(1)) '
+    
+    pipename = "\\.\pipe\" & Values(2) + ChrW$(0)
+    myholdtime = Signed(Values(3))
+    
+    m_now = timeGetTime
     m_duration = myholdtime
-   mytarget$ = Values(4)
-   ' AND A VARIABLE....TO PLACE DATA
-   Dim openMode, pipeMode As Long
-    Dim SA As SECURITY_ATTRIBUTES
-'Create the named pipe
-   Const GMEM_FIXED = &H0
+    mytarget$ = Values(4)
+    ' AND A VARIABLE....TO PLACE DATA
+    Dim openMode, pipeMode As Long
+    Dim sA As SECURITY_ATTRIBUTES
+    'Create the named pipe
+    Const GMEM_FIXED = &H0
     Const GMEM_ZEROINIT = &H40
     Const GPTR = (GMEM_FIXED Or GMEM_ZEROINIT)
     Dim pSD As Long
-  pSD = GlobalAlloc(GPTR, SECURITY_DESCRIPTOR_MIN_LENGTH)
-      res = InitializeSecurityDescriptor(pSD, SECURITY_DESCRIPTOR_REVISION)
-      res = SetSecurityDescriptorDacl(pSD, -1, 0, 0)
-      SA.nLength = LenB(SA)
-      SA.lpSecurityDescriptor = pSD
-      SA.bInheritHandle = True
-openMode = PIPE_ACCESS_INBOUND 'PIPE_ACCESS_DUPLEX ' Or WRITE_DAC ' PIPE_ACCESS_DUPLEX | WRITE_DAC
-pipeMode = PIPE_NOWAIT Or PIPE_TYPE_BYTE Or PIPE_READMODE_BYTE
-hPipe = CreateNamedPipe(StrPtr(pipename), openMode, pipeMode, 10, 10000, 2000, 400, SA)
+    pSD = GlobalAlloc(GPTR, SECURITY_DESCRIPTOR_MIN_LENGTH)
+    res = InitializeSecurityDescriptor(pSD, SECURITY_DESCRIPTOR_REVISION)
+    res = SetSecurityDescriptorDacl(pSD, -1, 0, 0)
+    sA.nLength = LenB(sA)
+    sA.lpSecurityDescriptor = pSD
+    sA.bInheritHandle = True
+    openMode = PIPE_ACCESS_INBOUND 'PIPE_ACCESS_DUPLEX ' Or WRITE_DAC ' PIPE_ACCESS_DUPLEX | WRITE_DAC
+    pipeMode = PIPE_NOWAIT Or PIPE_TYPE_BYTE Or PIPE_READMODE_BYTE
+    hPipe = CreateNamedPipe(StrPtr(pipename), openMode, pipeMode, 10, 10000, 2000, 400, sA)
 
-If INVALID_HANDLE_VALUE = hPipe Then
-myBase.Done = True: Exit Sub
-End If
+    If INVALID_HANDLE_VALUE = hPipe Then
+        myBase.Done = True: Exit Sub
+    End If
     If Err.Number > 0 Then
-      On Error GoTo 0
-
+        On Error GoTo 0
     End If
     On Error GoTo 0
-    ' do something
-  Else
-poulos:
-
   End If
-  
+poulos:
 End Sub
 Private Function BytesToStr(ab() As Byte) As String
     BytesToStr = ab() 'StrConv(ab, vbUnicode)
     
+End Function
+Private Function UnsignedSub(a As Long, b As Long)
+    MemLong(VarPtr(ua) + 8) = a
+    MemLong(VarPtr(UB) + 8) = b
+    ua = ua - UB
+    UnsignedSub = MemLong(VarPtr(ua) + 8)
 End Function
 Private Function TaskInterface_Tick() As Boolean
  Dim X As Integer, mycnt As Long
@@ -142,7 +142,7 @@ On Error GoTo there
 If UnsignedSub(timeGetTime, m_now) > m_duration Then
     TaskInterface_Tick = True
     m_now = timeGetTime
-   m_duration = mYspace
+    m_duration = mYspace
    If hPipe <> 0 Then
   ' mybuf$ = String$(2001, Chr(0))
    If ConnectNamedPipe(hPipe, ByVal 0) = 0 Then
@@ -240,8 +240,9 @@ End Sub
 ' PRIVATE ROUTINES
 
 Private Sub Class_Initialize()
-  Set myBase = New TaskBase
-'
+    Set myBase = New TaskBase
+    MemInt(VarPtr(ua)) = 20
+    MemInt(VarPtr(UB)) = 20
 End Sub
 
 

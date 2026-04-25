@@ -167,7 +167,7 @@ Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, capchroma As Lon
 Dim Quit
 Private OldPar As Long, dragCharpos As Long
 ' new
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private Type DRAWTEXTPARAMS
      cbSize As Long
      iTabLength As Long
@@ -176,7 +176,7 @@ Private Type DRAWTEXTPARAMS
      uiLengthDrawn As Long
 End Type
 Dim tParam As DRAWTEXTPARAMS
-Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
+Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
 Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT) As Long
 Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
@@ -2338,6 +2338,22 @@ If BlockStartPara <> BlockEndPara Then
 MarkedTextAny = True
 ElseIf BlockStartPos <> BlockEndPos Then
 MarkedTextAny = True
+End If
+End Function
+Function HaveMarkedMultiline() As Boolean
+On Error GoTo 100
+If BlockEndPos < 1 Then BlockEndPos = 1
+If glistN.MarkNext = 0 Then
+Else
+If BlockStartPara <> BlockEndPara Then
+HaveMarkedMultiline = True
+End If
+End If
+100
+End Function
+Function MarkedTextMultilineAny() As Boolean
+If BlockStartPara <> BlockEndPara Then
+MarkedTextMultilineAny = True
 End If
 End Function
 
@@ -8614,7 +8630,7 @@ If SelLength > 0 Then
 Else
     SelStart = ii
 End If
-If SelText <> "" And BlockStartPos <> BlockEndPos Then
+If SelText <> "" And MarkedTextMultilineAny() Then
     a$ = vbCrLf + SelText + "*"
     If UseTab Then
         If Myleft$(CurrentParagraph, 2) <> comm Then

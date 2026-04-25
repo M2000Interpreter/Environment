@@ -692,7 +692,7 @@ Public Property Let list(ByVal Index As Long, ByVal vNewValue As Variant)
     If glistN.Visible Then glistN.PrepareToShow
 End Property
 Sub Add(content$)
-glistN.AddItem content$
+glistN.additem content$
 End Sub
 Sub AddFast(Index As Long, content$)
 glistN.additemFast content$

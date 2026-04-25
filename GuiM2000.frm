@@ -92,7 +92,7 @@ Private Declare Function SetWindowTextW Lib "user32" (ByVal hWnd As Long, ByVal 
     Private Const GWL_WNDPROC = -4
     Private m_Caption As String
 Dim setupxy As Single
-Dim Lx As Single, lY As Single, dr As Boolean
+Dim lX As Single, lY As Single, dr As Boolean
 Dim scrTwips As Long
 Dim bordertop As Long, borderleft As Long
 Dim allwidth As Long, itemWidth As Long
@@ -1998,7 +1998,11 @@ Else
 that.move ScrInfo(hmonitor).Width + ScrInfo(hmonitor).Left - that.Width, Y '+ ScrInfo(hmonitor).top
 End If
 ElseIf Y + that.Height > ScrInfo(hmonitor).Height + ScrInfo(hmonitor).Top Then
+If Y - that.Height - y1 < ScrInfo(hmonitor).Top Then
+that.move X, ScrInfo(hmonitor).Top
+Else
 that.move X, Y - that.Height - y1
+End If
 Else
 that.move X, Y
 End If
@@ -2089,7 +2093,7 @@ Private Sub ResizeMark_MouseDown(Button As Integer, shift As Integer, X As Singl
         Y = Y + ResizeMark.Top
         dr = Button = 1
         ResizeMark.MousePointer = vbSizeNWSE
-        Lx = X
+        lX = X
         lY = Y
         If dr Then Relax = False
     Else
@@ -2103,7 +2107,7 @@ If Sizable And Not dr Then
     Y = Y + ResizeMark.Top
     dr = Button = 1
     ResizeMark.MousePointer = vbSizeNWSE
-    Lx = X
+    lX = X
     lY = Y
 End If
 End Sub
@@ -2117,11 +2121,11 @@ If Not Relax Then
     Relax = True
     If dr Then
          If Y < (Height - 150) Or Y >= Height Then addy = (Y - lY) Else addy = 0 ' dv15 * 5
-         If X < (Width - 150) Or X >= Width Then addX = (X - Lx) Else addX = 0 'dv15 * 5
+         If X < (Width - 150) Or X >= Width Then addX = (X - lX) Else addX = 0 'dv15 * 5
          If addy = 0 And addX = 0 Then Relax = False: Exit Sub
          If Width + addX >= 1800 And Width + addX < VirtualScreenWidth() Then
              If Height + addy >= 1800 And Height + addy < VirtualScreenHeight() Then
-                Lx = X
+                lX = X
                 lY = Y
                 move Left, Top, Width + addX, Height + addy
                 IhaveLastPos = False
@@ -2146,7 +2150,7 @@ If Not Relax Then
             If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
                     dr = Button = 1
                     ResizeMark.MousePointer = vbSizeNWSE
-                    Lx = X
+                    lX = X
                     lY = Y
                     If dr Then Relax = False: Exit Sub
             Else

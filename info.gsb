@@ -6029,7 +6029,10 @@ MODULE FORM44 {Module TryIt {
 	Rem : Set slow
 	Set fast
 	// new for Concurrent, a value non zero cause maintask to not execute step by step
-	Thread.Plan  Concurrent 1  ' Sequential
+	Play 0
+	try {
+		Thread.Plan  Concurrent 1  ' Sequential
+	}
 	Refresh 40
 	SMOOTH on
 	Cls,0
@@ -8579,8 +8582,10 @@ For i=1 to 2000 {
 }
 print timecount
 Set Fast
+Print "Run FB2 - This use BigIntegers"
 }
-MODULE BN {Print "Arbitrary-precision multiplication"
+MODULE BN {// Thi  demo not use BigIntegers 
+Print "Arbitrary-precision multiplication"
 Dim Mu(0 to 9,0 to 9) as integer
 integer j, i
 for j=0 to 9 : For i=0 to 9:Mu(i,j)=i*j : Next i :Next j
@@ -8611,6 +8616,7 @@ print a$
 print "x"
 print n1$
 print "Normal multiplication:";val(n1$)*val(a$)
+print "BigInteger multiplication:";eval(n1$+"U")*eval(a$+"U")
 refresh
 k=0
 l=len(a$)
@@ -8624,8 +8630,7 @@ while n1>0
     n1--
     rev2=string$("0", k)
     rev1=""
-    k++
-    
+    k++    
     if n>0 then
         if not exist(num, n) then
             digit=0%
@@ -8795,12 +8800,12 @@ MODULE HU {Module Huffman {
  
       Sub Traverse(a, a$)
             local b=array(a,1)      
-            if type$(b)="mArray"  Else {
+            if type$(b)="String" then
                   Print  @(10); quote$(array$(a, 1));" "; a$,@(20),array(a)
                   Append decode, a$ :=array$(a, 1)
                   Append encode, array$(a, 1):=a$
                   Exit Sub   
-            }
+            End if
             traverse(array(b), a$+"0")
             traverse(array(b,1), a$+"1")
       End Sub
@@ -9530,6 +9535,7 @@ MODULE KB {Function CallMe {
 }
 Inline code LibFade
 FadeScreen Lazy$(&CallMe()), 1.7
+PLAY 0
 sub check()
 	if playnow(10) else Score 10,400,"CV90CC  ab Cd eCC" : Play 10,1	
 end sub
@@ -9631,6 +9637,7 @@ MODULE ICONS {function dummy {
 	mouse.icon hide
 	n=0
 	p=false
+	string lastimage
 	if useM200sprites then
 		spr$=""
 		image ico (5) to spr$    ' use 5 (magenta) as transparent color
@@ -9749,6 +9756,7 @@ rem				hold
 				Menu fill #F377FF, 7, 0
 			 	files + "screen*.bmp"
 		 		Menu @ "globalmenu" !
+		 		if lastimage<>"" then Menu Show lastimage
 			 	loadnow<=0
 			 	press<=-2
 			 	release
@@ -9778,7 +9786,9 @@ rem				hold
 			 	refresh 1000
 				move 0,0
 				image Menu$(loadnow), scale.x
-				Print @(0,0), "Image:";Menu$(loadnow)
+				lastimage=Menu$(loadnow)
+				Print @(0,0), "Image:";lastimage
+				
 				hold
 				Report mess$
 				refresh 20
@@ -9794,7 +9804,8 @@ rem				hold
 					move 0,0
 					try {
 						image Menu$(loadnow), scale.x
-						Print @(0,0), "Image:";Menu$(loadnow)
+						lastimage=Menu$(loadnow)
+						Print @(0,0), "Image:";lastimage
 						hold						
 						Report mess$
 						preview<=loadnow
@@ -9832,12 +9843,7 @@ function dummy1 {
 }
 FadeScreen &Dummy(), 1.7
 }
-MODULE COMPILER {// THIS TINY LANGUAGE NEED A DIV TYPE LIKE VB6, NOT LIKE PYTHON.
-// THE "-div" SWITCH SET THE VB6 TYPE DIV
-// THE "+div" SWITCH SET THE PYTHON TYPE DIV
-// SO THIS MODULE USE "OWN" DIV, TO BE  INDEPENDENT FROM CURRENT SWITCH, AND NOT CHANGE IT USING: SET SWITCH "-DIV"  (WHICH CHANGE IT UNTIL THE M2000 INTERPRETER GET A BREAK FROM BUTTON BREAK OR A NEW SET SWITCH CHANGE IT)
-// USING SWITCH STATEMENT FROM CONSOLE WRITE THE CHANGE TO REGISTRY
-Module CompilerExample {
+MODULE COMPILER {Module CompilerExample {
 	Set Fast !
 	Module lexical_analyzer (a$){
 		lim=Len(a$)
@@ -9854,13 +9860,13 @@ Module CompilerExample {
 			Try {
 				// second parameter is the offset in buffer units
 				// third parameter is length in bytes
-				=Eval$(Scanner, offset,2*len(a$))=a$
+				=Scanner[offset,2*len(a$)]=a$
 			}
 		}
 		Ahead2=lambda Scanner (a$, offset)->{
 			=false
 			Try {
-				=Eval$(Scanner, offset,2) ~ a$
+				=Scanner[offset,2] ~ a$
 			}
 		}
 		const nl$=chr$(13)+chr$(10), quo$="""", er$="@", Ansi=3
@@ -9894,7 +9900,7 @@ Module CompilerExample {
 					End if
 					checkerror()
 				End While
-				Output$="String "+quote$(Eval$(Scanner, strin, (offset-strin)*2))+nl$
+				Output$="String "+quote$(Scanner[strin, (offset-strin)*2])+nl$
 				offset++ : ColumnNo++
 			} Else.if Ahead("'", offset) Then {
 				Output$=format$("{0::-10}{1::-10} ", LineNo, ColumnNo)
@@ -9908,7 +9914,7 @@ Module CompilerExample {
 					End if
 					checkerror()
 				End While
-				lit$=format$(Eval$(Scanner, strin, (offset-strin)*2))
+				lit$=format$(Scanner[strin, (offset-strin)*2])
 				select case len(lit$)
 				case 1
 					Output$="Integer "+str$(asc(lit$),0)+nl$
@@ -9925,7 +9931,7 @@ Module CompilerExample {
 				While Ahead2("[a-zA-Z0-9_]", offset)
 					offset++ : ColumnNo++
 				End While
-				Keywords(Eval$(Scanner, strin, (offset-strin)*2))
+				Keywords(Scanner[strin, (offset-strin)*2])
 			} Else.if Ahead2("[0-9]", offset) Then {
 				strin=offset
 				Output$=format$("{0::-10}{1::-10} Integer ", LineNo, ColumnNo)
@@ -9936,10 +9942,10 @@ Module CompilerExample {
 				if Ahead2("[a-zA-Z_]", offset) then  
 					{Error " Invalid number. Starts like a number, but ends in non-numeric characters."+er$}
 				else
-					Output$=Eval$(Scanner, strin, (offset-strin)*2)+nl$
+					Output$=Scanner[strin, (offset-strin)*2]+nl$
 				end if
 			} Else {
-				Symbols(Eval$(Scanner, Offset, 2))	      
+				Symbols(Scanner[Offset, 2])	      
 				offset++ : ColumnNo++
 			}
 			Until offset>=lim
@@ -10475,32 +10481,30 @@ Module CompilerExample {
 				jmp_, jz_
 	    	}
 	     	exit_now=false
-		Inventory  func=halt_:=lambda->{exit_now=true}
-		Append  func, push_:=lambda->{sp--:return stack_, sp:=eval(code_, pc as long):pc+=4}
-		Append  func, jz_:=lambda->{
-			sp++: if eval(stack_, sp-1)=0 then pc=eval(code_, pc as long) else pc+=4
-		}
-		Append  func, jmp_:=lambda->{pc=eval(code_, pc as long)}
-		Append  func, fetch_:=lambda->{sp--:Return stack_, sp:=eval(stack_, eval(code_, pc as long)):pc+=4}
-		Append  func, store_:=lambda->{Return stack_, eval(code_, pc as long):=eval(stack_, sp):sp++:pc+=4}
-		Append  func, add_:=lambda->{Return stack_, sp+1:=uint(sint(eval(stack_, sp+1))+sint(eval(stack_, sp))):sp++}
-		Append  func, sub_:=lambda->{Return stack_, sp+1:=uint(sint(eval(stack_, sp+1))-sint(eval(stack_, sp))):sp++}
-		Append  func, mul_:=lambda->{Return stack_, sp+1:=uint(sint(eval(stack_, sp+1))*sint(eval(stack_, sp))):sp++}
-		Append  func, div_:=lambda->{Return stack_, sp+1:=uint(div(sint(eval(stack_, sp+1)),sint(eval(stack_, sp)))):sp++}
-		Append  func, mod_:=lambda->{Return stack_, sp+1:=uint(mod(sint(eval(stack_, sp+1)),sint(eval(stack_, sp)))) :sp++}
-		Append  func, not_:=lambda->{Return stack_, sp:=if(eval(stack_, sp)=0->uint(-1),0)}
-		Append  func, neg_:=lambda->{Return stack_, sp:=uint(-sint(eval(stack_, sp)))}
-		Append  func, and_:=lambda->{Return stack_, sp+1:=binary.and(eval(stack_, sp+1),eval(stack_, sp)):sp++	}
-		Append  func, or_:=lambda->{Return stack_, sp+1:=binary.or(eval(stack_, sp+1),eval(stack_, sp)):sp++	}
-		Append  func, lt_:=lambda->{Return stack_, sp+1:=uint(if(sint(eval(stack_, sp+1))<sint(eval(stack_, sp))->-1, 0)):sp++}
-		Append  func, gt_:=lambda->{Return stack_, sp+1:=uint(if(sint(eval(stack_, sp+1))>sint(eval(stack_, sp))->-1, 0)):sp++}
-		Append  func, le_:=lambda->{Return stack_, sp+1:=uint(if(sint(eval(stack_, sp+1))<=sint(eval(stack_, sp))->-1, 0)):sp++}
-		Append  func, ge_:=lambda->{Return stack_, sp+1:=uint(if(sint(eval(stack_, sp+1))>=sint(eval(stack_, sp))->-1, 0)):sp++}
-		Append  func, ne_:=lambda->{Return stack_, sp+1:=uint(if(eval(stack_, sp+1)<>eval(stack_, sp)->-1, 0)):sp++}
-		Append  func, eq_:=lambda->{Return stack_, sp+1:=uint(if(eval(stack_, sp+1)=eval(stack_, sp)->-1, 0)):sp++}
-		Append  func, prts_:=lambda->{Print #-2, strings$(eval(stack_,sp));: Refresh:sp++}
-		Append  func, prti_:=lambda->{Print #-2, str$(sint(eval(stack_,sp)),0);: Refresh:sp++}
-		Append  func, prtc_:=lambda->{Print #-2, chrcode$(eval(stack_,sp));: Refresh:sp++}
+		Inventory  func=halt_:={exit_now=true}
+		Append  func, push_:={sp--:stack_[sp]=eval(code_, pc as long):pc+=4}
+		Append  func, jz_:={	sp++: if eval(stack_, sp-1)=0 then pc=eval(code_, pc as long) else pc+=4}
+		Append  func, jmp_:={pc=eval(code_, pc as long)}
+		Append  func, fetch_:={sp--:stack_[sp]=stack_[eval(code_, pc as long)]:pc+=4}
+		Append  func, store_:={stack_[eval(code_, pc as long)]=stack_[sp]:sp++:pc+=4}
+		Append  func, add_:={stack_[sp+1]=uint(sint(stack_[sp+1])+sint(stack_[sp])):sp++}
+		Append  func, sub_:={stack_[sp+1]=uint(sint(stack_[sp+1])-sint(stack_[sp])):sp++}
+		Append  func, mul_:={stack_[sp+1]=uint(sint(stack_[sp+1])*sint(stack_[sp])):sp++}
+		Append  func, div_:={stack_[sp+1]=uint(sint(stack_[sp+1]) div sint(stack_[sp])):sp++}
+		Append  func, mod_:={stack_[sp+1]=uint(sint(stack_[sp+1]) mod sint(stack_[sp])) :sp++}
+		Append  func, not_:={stack_[sp]=if(stack_[sp]=0->uint(-1),0)}
+		Append  func, neg_:={stack_[sp]=uint(-sint(stack_[sp]))}
+		Append  func, and_:={stack_[sp+1]=binary.and(stack_[sp+1],stack_[sp]):sp++	}
+		Append  func, or_:={stack_[sp+1]=binary.or(stack_[sp+1],stack_[sp]):sp++}
+		Append  func, lt_:={stack_[sp+1]=uint(if(sint(stack_[sp+1])<sint(stack_[sp])->-1, 0)):sp++}
+		Append  func, gt_:={stack_[sp+1]=uint(if(sint(stack_[sp+1])>sint(stack_[sp])->-1, 0)):sp++}
+		Append  func, le_:={stack_[sp+1]=uint(if(sint(stack_[sp+1])<=sint(stack_[sp])->-1, 0)):sp++}
+		Append  func, ge_:={stack_[sp+1]=uint(if(sint(stack_[sp+1])>=sint(stack_[sp])->-1, 0)):sp++}
+		Append  func, ne_:={stack_[sp+1]=uint(if(stack_[sp+1]<>stack_[sp]->-1, 0)):sp++}
+		Append  func, eq_:={stack_[sp+1]=uint(if(stack_[sp+1]=stack_[sp]->-1, 0)):sp++}
+		Append  func, prts_:={Print #-2, strings$(stack_[sp]);: Refresh:sp++}
+		Append  func, prti_:={Print #-2, str$(sint(stack_[sp]),0);: Refresh:sp++}
+		Append  func, prtc_:={Print #-2, chrcode$(stack_[sp]);: Refresh:sp++}
 		Rem : Form 120, 60 ' change console width X height to run Ascii Mandlebrot example
 		// change Report with Print #-2,   (report stop when scrolling 3/4 of height of console, waiting key or mouse key to continue)
 		Print #-2,  "Virtual Assembly Code:"+{
@@ -10530,6 +10534,8 @@ Module CompilerExample {
 			Next i
 		End if
 		buffer clear code_ as byte*1000
+		byte opc
+		buffer  acc as long
 		do
 			m=0
 			offset=val(a$,"int", m)
@@ -10540,29 +10546,29 @@ Module CompilerExample {
 			op$=if$(instr(line$," ")>0->leftpart$(line$," "), line$)
 			if not valid(eval(op$+"_")) then exit
 			opc=eval(op$+"_")
-			Return code_, offset:=opc
+			code_[offset]=opc
 			if opc>=store_ then
 				line$=rightpart$(line$," ")
 				select case opc
 				case store_, fetch_
-					Return code_, offset+1:=val(rightpart$(leftpart$(line$,"]"),"[")) as long : offset+=4
+					acc[0]=val(rightpart$(leftpart$(line$,"]"),"["))
+					code_[offset+1]=acc: offset+=4
 				case push_
-					Return code_, offset+1:=uint(val(line$)) as long : offset+=4
+					acc[0]=uint(val(line$))
+					code_[offset+1]=acc: offset+=4
 				case jz_, jmp_
-					Return code_, offset+1:=val(rightpart$(line$,")")) as long : offset+=4
+					acc[0]=val(rightpart$(line$,")"))
+					code_[offset+1]=acc:offset+=4
 				end select 
 			end if
 		Always
 		Print "Press any key" : Push key$ : Drop
 		// Prepare VM
-		def mod(a,b)=a- sint(uint(a / b))*b
-		def div(a,b)=sint(uint(a / b))
 		profiler
 		let pc=0, sp=len(stack_) div 4
 		do
-			b=func(eval(code_, pc))
-			pc++
-			call local b()
+			push func$(eval(code_, pc))
+			pc++:inline letter$
 		until exit_now
 		Print
 		Print "", round(Timecount/1000,2),"s"
@@ -10572,8 +10578,7 @@ Module CompilerExample {
 		}+code$
 		Print "Prepare M2000 Code"
 		Flush
-		prototype {Global z
-			Module Halt {Error "stop"}
+		prototype {Module Halt {Error "stop"}
 			Module neg {push -number}
 			Module not {push number=0}
 			Module and {push sint(binary.and(uint(number), uint(number)))}
@@ -10585,13 +10590,14 @@ Module CompilerExample {
 			Module ne {push number<>number}
 			Module eq {push number=number}
 			Module mul {push number*number}
-			Module div {shift 2: push sint(uint(number/number))}
-			Module mod (b, a) {push a- sint(uint(a / b))*b}
+			Module div (b as long, a as long)  { push a div b}
+			Module mod (b as long, a as long) {push a mod b}
 			Module sub {shift 2: push number - number}
 			Module add {push number + number}
 			Module prtc {Print #-2, chrcode$(number);:Refresh}
 			Module prts {Print #-2, format$(var$(number));:Refresh}
 			Module prti {Print #-2, str$(number, 0);:Refresh}
+			Global z
 			} as prolog$
 		Variable$=lambda$ (many, Name$, glob as Boolean=false)->{
 			if many else exit
@@ -10652,8 +10658,59 @@ Module CompilerExample {
 		}+"Try {" + {
 		} + code$+"}"+{
 		}+Subs$+"}"
-		 // clipboard M2000code$
-		// exit
+		open "exec10.gsb" for wide output as #f
+		coded$= M2000code$+{
+		module runme {
+			
+			Escape Off
+			title "Test Compiler"
+			cls 10,0
+			desktop 200, 10
+			try{
+				back{
+					myleft=motion.x
+					mytop=motion.y
+					show ###
+				}
+			}
+			show
+			try {
+			window 6, ??
+			@@@
+			form
+			cls 5
+			double: Report 2,{!@#}
+			normal
+			cls 10,2
+			pen 15
+
+			//motion.w myleft, 0
+					back {
+						myleft=motion.x
+						mytop=motion.y
+					}
+			
+			}
+			? myleft, mytop
+			run
+			a$=key$
+			
+		}
+		runme:end
+		}
+		// 
+		coded$=replace$("!@#",menu$(menu), coded$)
+		if menu=1 then coded$=replace$("@@@","Form 104, 60", coded$) else coded$=replace$("@@@","Form 60, 32", coded$)
+		back {coded$=replace$("###",str$(hwnd), coded$)
+		coded$=replace$("??",str$(Window), coded$)
+		}		
+		Print #F, hide$(coded$!);
+		close #f
+		if ask("Run on external interpreter", "info","*yes", "no")=1  then
+		use exec10
+		Print "You can close it running Killthem the module which stop all m2000.exe except this one"
+		exit 
+		end if
 		Inline M2000Code$
 		Print "Press any key" : Push key$ : Drop
 		profiler
@@ -11757,19 +11814,19 @@ MODULE EM {Module Checkit {
             Class:
             Module Empl(.name$, .id$, .salary) {}
       }
-      Data "Tyler Bennett",		"E10297", 32000, D101
-      Data "John Rappl",		"E21437", 47000, D050
+      Data "Tyler Bennett","E10297", 32000, D101
+      Data "John Rappl","E21437", 47000, D050
       Data "George Woltman",	"E00127", 53500, D101
-      Data "Adam Smith",		"E63535", 18000, D202
-      Data "Claire Buckman",		"E39876", 27800, D202
-      Data "David McClellan",		"E04242", 41500, D101
-      Data "Rich Holcomb",		"E01234", 49500, D202
-      Data "Nathan Adams",		"E41298", 21900, D050
-      Data "Richard Potter",		"E43128", 15900, D101
+      Data "Adam Smith",	"E63535", 18000, D202
+      Data "Claire Buckman","E39876", 27800, D202
+      Data "David McClellan","E04242", 41500, D101
+      Data "Rich Holcomb","E01234", 49500, D202
+      Data "Nathan Adams","E41298", 21900, D050
+      Data "Richard Potter","E43128", 15900, D101
       Data "David Motsinger",	"E27002", 19250, D202
-      Data "Tim Sampair",		"E03033", 27000, D101
-      Data "Kim Arlich",			"E10001", 57000, D190
-      Data "Timothy Grove",		"E16398", 29900, D190
+      Data "Tim Sampair","E03033", 27000, D101
+      Data "Kim Arlich","E10001", 57000, D190
+      Data "Timothy Grove","E16398", 29900, D190
       Data ""
       Read name$
       While name$<>""  {
@@ -12165,10 +12222,10 @@ OOP
 }
 MODULE PERM1 {Report "A program that performs a permutation test to judge whether the treatment had a significantly stronger effect than the placebo. "
 Print "Treatment group "
-Print 85, 88, 75, 66, 25, 29, 83, 39, 97
+Print (85, 88, 75, 66, 25, 29, 83, 39, 97)#STR$(" ")
 Print "Control group"
-Print 68, 41, 10, 49, 16, 65, 32, 92, 28, 98
-Print "Please wait about 1.5 to 4.5 minutes  - Use ctrl-C to exit any time"
+Print (68, 41, 10, 49, 16, 65, 32, 92, 28, 98)#STR$(" ")
+Print "Please wait about 1 to 3 minutes  - Use ctrl-C to exit any time"
 Refresh
 Module Checkit {
       Global data(), treat=0
@@ -12787,7 +12844,7 @@ MODULE HTTP {Module CheckIt  {
             \\ break AA$ to lines
             Document BB$=AA$
             \\ using line breaks as CRLF
-            Print "Press space or mouse to change page, or Esc to break report"
+            PEN 15{Print "Press space or mouse to change page, or Esc to break report"}
             Report BB$
       }
       Declare xml Nothing
@@ -12795,8 +12852,17 @@ MODULE HTTP {Module CheckIt  {
 Report 2, "Using the Microsoft.XMLHTTP with threads - see Down4 where we use an internal object for download with events. Use space bar or mouse click to advance the scroll"
 CheckIt
 }
-MODULE CAL {PRINTER.QUALITY  0  ' 0 TO 3
+MODULE CAL {//GLOBAL CONST PRINT_IT AS BOOLEAN=TRUE
+GLOBAL PRINT_IT AS BOOLEAN=TRUE
 TITLE "WAIT..", 0
+IF PRINT_IT THEN
+	IF ASK("WE USE THE PDF PRINTER IF ANY. MAY I START ?","M2000","*YES", "JUST VIEW PAGES HERE")<>1 THEN
+		PRINT_IT<=FALSE
+//			TITLE "M2000"
+//			EXIT
+	END IF
+END IF
+PRINTER.QUALITY  0  ' 0 TO 3
 FUNCTION PDFPRINTER$ {
 	MENU
 	PRINTER +
@@ -12808,17 +12874,15 @@ FUNCTION PDFPRINTER$ {
 	IF PR=0 THEN PR=1
 	=MENU$(PR)
 }
-GLOBAL PR$=PDFPRINTER$()
+IF PRINT_IT THEN GLOBAL PR$=PDFPRINTER$()
 \\ Calendar - FOR "REAL" programmers
 \\ All statements in UPPERCASE
 \\ Output TO 132 characters console - as a line PRINTER
 \\ USE COURIER NEW  (FONT "COURIER NEW")
 
-\\ CHANGE THE 
-GLOBAL CONST PRINT_IT AS BOOLEAN=TRUE
 MODULE GLOBAL SNOOPY {
 IF NOT PRINT_IT THEN CURSOR 0,ROW 
-'IF  PRINT_IT THEN FONT "COURIER NEW" : FORM 132, 68
+\\	IF  PRINT_IT THEN FONT "COURIER NEW" : FORM 132, 68
 PRINT $(,8)
 PRINT #-2, {
 					   XXXX
@@ -12939,30 +13003,42 @@ ELSE
 	CLS 15, 0
 	IF MODULE(fixmode) THEN
 		fixmode 132,68
+		FORM
 		SHOW
 	ELSE
 		FORM 132,68
 	END IF
+	REFRESH
+	DESKTOP 200
 END IF
 
 PEN 0
-CALENDAR 1966, 1032 ' GREEK
-GOSUB WAITKEY_OR_MOUSE
-{
-	I=VAL(DATE$(TODAY,LOCALE, "yyyy"))
-	FOR I=I TO I+5
-	CALENDAR I, 1033
-	GOSUB WAITKEY_OR_MOUSE
-	NEXT I
-}
+P=1
 
-IF PRINT_IT THEN PRINTING OFF ELSE REFRESH 50
+CALENDAR 1966, 1032 ' GREEK
+IF  PRINT_IT THEN SPEECH "PAGE "+P+" NOW DEVELOPED."
+IF NOT PRINT_IT  THEN  SPEECH "PRESS MOUSE BUTTON OR ANY KEY TO CONTINUE."
+GOSUB WAITKEY_OR_MOUSE
+I=VAL(DATE$(TODAY,LOCALE, "yyyy"))
+P++
+FOR I=I TO I+5
+	CALENDAR I, 1033
+	IF  PRINT_IT THEN SPEECH "PAGE "+P+" NOW DEVELOPED."	
+	GOSUB WAITKEY_OR_MOUSE
+	P++
+NEXT I
+IF PRINT_IT THEN
+	SPEECH "YOU HAVE TO OPEN THE PDF FILE MANUALY."
+	PRINTING OFF
+ELSE
+	DESKTOP 255:CLS 0:FORM;REFRESH 50
+END IF
 CLEAR  ' CLEAR VARIABLES FROM THIS MODULE
 TITLE "INFO"
-'KEYBOARD "INFO"+CHR$(13)
+IF MODULE(INFO) THEN KEYBOARD "INFO"+CHR$(13)
 END
 WAITKEY_OR_MOUSE:
-IF PRINT_IT THEN RETURN
+IF PRINT_IT  THEN  RETURN
 WHILE INKEY$="" AND MOUSE=0
 END WHILE
 RETURN
@@ -13688,6 +13764,9 @@ MODULE UTF8 {Module checkit {
             	Please use a proper font if you didn't see some letters (use Font "fontname",  check font with ? fontname$)
             	Also check the Choose.Font statement
             }
+      Refresh
+      SPEECH "Read a file character by character of type UTF8. Pess any key"
+      Push key$: drop
       document a$
       a$={First Line
             Second line 𐐷
@@ -14307,7 +14386,7 @@ MODULE ENV {Module CheckIt {
 	}
 	Pen 12 {Print "Path: "; Env$("PATH")}
 	Cursor 0, row
-	Print "MOMEPATH: ";  Env$("HOMEPATH")
+	Print "HOMEPATH: ";  Env$("HOMEPATH")
 	Declare objShell Nothing
 \\ using internal Information object
 	Declare OsInfo INFORMATION
@@ -16929,7 +17008,7 @@ execute "mdbfile", {
 	INSERT INTO `customers` VALUES (2,'Ines','Brushfield','1986-04-13','804-427-9456','14187 Commercial Trail','Hampton','VA',947);
 	INSERT INTO `customers` VALUES (3,'Freddi','Boagey','1985-02-07','719-724-7869','251 Springs Junction','Colorado Springs','CO',2967);
 	INSERT INTO `customers` VALUES (4,'Ambur','Roseburgh','1974-04-14','407-231-8017','30 Arapahoe Terrace','Orlando','FL',457);
-	INSERT INTO `customers` VALUES (5,'Clemmie','Betchley','1973-11-07',NULL,'5 Spohn Circle','Arlington','TX',3675);
+	INSERT INTO `customers` VALUES (5,'Clemmie','Betchley','1973-11-07',NULL,'5 Spohn Circle','Arlington','TX',675);
 	INSERT INTO `customers` VALUES (6,'Elka','Twiddell','1991-09-04','312-480-8498','7 Manley Drive','Chicago','IL',3073);
 	INSERT INTO `customers` VALUES (7,'Ilene','Dowson','1964-08-30','615-641-4759','50 Lillian Crossing','Nashville','TN',1672);
 	INSERT INTO `customers` VALUES (8,'Thacher','Naseby','1993-07-17','941-527-3977','538 Mosinee Center','Sarasota','FL',205);
@@ -16998,7 +17077,8 @@ sub GetIDwithNullPhone(RS)
 if type$(RS)="Recordset" then
 	with RS, "EOF" as new rs.eof, "fields" as new fields(), "fields" as new fields$(), "fields" as new rs.fields
 	with rs.fields, "count" as new rs.fields.count
-	print  "Test number of fields:", rs.fields.count	
+	print  "Test number of fields:", rs.fields.count
+	print "id", "phone"
 	while not rs.eof
 		print $(4), fields(0), $(7), CheckNull$(fields(1), fields$(1)), $(0)
 		method rs, "movenext"
@@ -17601,23 +17681,30 @@ Sub Press()
 End Sub
 }
 MODULE CLOCK {Αν Έγκυρο(ok) Αλλιως Πληκτρολόγιο "Clock1"+χαρ$(13) : Έξοδος
+Όρισε  ShowWindow απο "User32.ShowWindow" {Μακρυς a, Μακρυς cmd}
 Όρισε Μ Μοναδικό      ' Declare m Mutex  : Methos m, "Create", "onename" return error if can't created with ownership
 \\ we can create more than one mutexs in the m, using create
 \\ so now this run only one time for the user. The second time the mutex exist so exit the program early.
 Κάνε Συνέχισε Ως Λογικός
 Δες  {
-      Μέθοδος Μ, "CREATE", "Global\CLOCK10101001"
+      Μέθοδος Μ, "CREATE", "Global\CLOCK10101101"
       Συνέχισε=Αληθής     
 }
 Αν Συνέχισε Αλλιώς Έξοδος
+
 Ανανέωση 5000
+
+Τίτλος "Μ2000 Ρολόϊ"
 Φόρμα
 ομαλά ναί
-Παράθυρο 16, Συσκευή
+Παράθυρο 12, 8000, 8000
+σβησε
 Οθόνη 5,0
 Πενα 14
-Περιθώριο {Πένα 14}
-Επιφάνεια Κρυψε
+Περιθώριο {
+Πένα 14
+Οθόνη 5,0
+
 Επιφάνεια 220, 5
 \\ ανοίγει με ctrl+f1
 Περί ! "Μ2000 Ρολόι 12 ωρών - M2000 Clock 12 hours", κλιμαξ.χ*5/7, κλιμαξ.υ*2/3,{
@@ -17643,8 +17730,8 @@ MODULE CLOCK {Αν Έγκυρο(ok) Αλλιως Πληκτρολόγιο "Clock
             Enter key change clock hour to return analog to minutes time or at hour intervals.
             Space key exit the clock
       }
-κχ=χ.σημεία-4000
-κυ=4000
+κχ=κλιμαξ.χ/2
+κυ=κλιμαξ.υ/2
 απ1=3000
 απ2=600
 απ3=απ1-απ2
@@ -17662,9 +17749,10 @@ MODULE CLOCK {Αν Έγκυρο(ok) Αλλιως Πληκτρολόγιο "Clock
 λεπτό=υπωρα(0,0,1,0)
 Θέση κχ, κυ
 \\ η χρώμα { } ; φτιάχνει περιοχή μόνο για εμφάνιση
-Χρώμα { Κύκλος Γέμισμα 2, απ2+απ1 } ;
+Χρώμα {Κύκλος Γέμισμα 2, απ2+απ1} ;
 Θέση κχ-απ2-απ1, κυ-απ2-απ1
 Βάψε 2*(απ2+απ1),2*(απ2+απ1), 7,1,1
+Χρώμα {};
 Θέση κχ, κυ-απ1*3/4
 Τίτλος "Μ2000 Ρολόι"
 Επιγραφή "Μ2000 Ρολόι","Arial Black",18,0,2
@@ -17686,7 +17774,18 @@ MODULE CLOCK {Αν Έγκυρο(ok) Αλλιως Πληκτρολόγιο "Clock
 Κράτησε
 Μετακίνηση=Ψευδές
 Ανανέωση 1000
-Μετά 200 {Άναψε : Τίτλος "Μ2000 Ρολόϊ"}
+
+
+
+//	Μετά 200 {Άναψε : Τίτλος "Μ2000 Ρολόϊ"}
+Μετά 200 {
+Αν  Εγκυρο(ThatHwnd) Τότε
+	Άναψε ThatHwnd
+	Κίνηση.Π;
+Αλλιως
+	Άναψε
+Τέλος Αν
+}  '  για το περιθώριο
 Κάθε 100  {
 Αναβοσβήνει~   \\ αντιστροφή λογικής  (Αναβοσβήνει = Δεν Αναβοσβήνει)
 Άφησε
@@ -17785,11 +17884,14 @@ MODULE CLOCK {Αν Έγκυρο(ok) Αλλιως Πληκτρολόγιο "Clock
 
 Αν Πατημένο(13) τότε ΟλόκληρεςΏρες~  \\ αντιστροφή αληθές<>ψευδές
 }
+Οθόνη
+}
 Τιτλος ".....",0
-Οθόνη \\ επαναφορά από το περιορισμό περιοχής της Χρώμα
+ΠΕΝΑ 14
+//	Οθόνη \\ επαναφορά από το περιορισμό περιοχής της Χρώμα
 Επιφάνεια 255
 Επιφάνεια Κρυψε
-Μέθοδος Μ, "DESTROY", "Global\CLOCK10101001"   ' Declare m, "Destroy"
+Μέθοδος Μ, "DESTROY", "Global\CLOCK10101101"   ' Declare m, "Destroy"
 Όρισε Μ Τίποτα   ' Declare m Nothing
 }
 MODULE BOOK {Class Book {
@@ -18093,19 +18195,25 @@ for SecondbookDB {
 MODULE POPUP {title "",0
 Declare Form1 Form
 Declare aPopUpForm Form
-With Form1, "Title", "Hello There"
+With Form1, "Title", "Hello There",, "left" as leftform, "top" as topform
 With aPopUpForm, "Title", "This is a PopUp Form", "Visible" as PopUpVisible
 Declare Text1 TextBox Form aPopUpForm
 Method Text1,"Move", 2000,2000,6000,600
-With Text1,"Text" as txt$
+With Text1,"Text" as txt$, "Default", true
 txt$="U+10437 (𐐷) in UNICODE"
+
+
 Function Text1.Enter {
       \\ If we press enter in textbox in popup form
       \\ we change title in form1
       With Form1, "Title", txt$
-      With form1, "GetFocus"
+       PopUpVisible=false
+//	      With form1, "GetFocus"
 }
 X=1000
+Function Form1.enter {
+Method Form1, "PopUp", aPopUpForm, mouse.x-leftform, mouse.y-topform
+}
 Function Form1.MouseDown {
 \* Use STACK to see stack in console...
 \* ...before you decide what to do with the values
@@ -18133,7 +18241,7 @@ Print X
 Title "Info"
 end
 }
-MODULE SURROGATE {\\ pressing alt press INS or + on keypad and 10437 on keypad or number keys and release alt to get 𐐷
+MODULE SURROGATE {Report " hold down alt key and then  press INS or + on keypad and 10437 on keypad or number keys and release alt to get 𐐷"
 
 Print #-2, {"𐐷"}
 Print hex$(chrcode("𐐷"),2.5)="10437"
@@ -21678,14 +21786,19 @@ MODULE INFO {keyboard "UseThis : InfoBasic: Showkeys", 13
 }
 MODULE CLOCK1 {''keyboard " clock %ok=1 : clear :  info "+chr$(13)
 Report{
+	This is  a new version: The form of the new program get parent this form
+	So now the clock is always on top of the caller
 	Wait for loading another m2000.exe which load info.gsb as modules
 	Click on clock and press space to close it
 	Hold mouse down at the center to move the clock
 	Code written in GREEK Language
-	Use ctrl+F1 for help (Greek and English lanugage)
+	Use ctrl+F1 for help (Greek and English language)
 	To see the code give here: edit clock
 }
-win appdir$+"m2000.exe", {load modules info.gsb: ok=1: clock: end}
+Back { ' we need the M2000 main form hwnd
+	win appdir$+"m2000.exe", { ThatHwnd=}+hwnd+{&:load modules info.gsb: ok=1: clock: end}
+}
+//		win appdir$+"m2000.exe", {load modules info.gsb: ok=1: clock: end}
 
 }
 MODULE USETHIS {try {
@@ -23117,13 +23230,13 @@ MODULE BASIC1 {
 \\ the gosub 210 disable these features
 
 
-000 GOSUB 200
+000 BASIC
 010 
 020 REM 
 030 FORM ! 80,48
 040 CONST MAX=64%   ' % for Integer
 050 DEF INTEGER A1, I  :  DEF Z$
-060 DIM P(MAX)
+060 DIM P(MAX): LIST
 070 PRINT $(0,20)   ' SET WIDTH TO 20
 080 INPUT "Give a value for variable A (try 64)=", A1
 090 GOSUB ALFA(&A1)
@@ -23134,14 +23247,8 @@ MODULE BASIC1 {
 140 A1-- 
 150 END WHILE
 160 PRINT
-170 GOSUB 220
 180 END
 
-
-200 SET SWITCHES "+FOR +DIM"
-210 RETURN
-220 SET SWITCHES "-FOR -DIM"
-230 RETURN
 
 
 300 SUB ALFA(&A AS Integer)
@@ -23339,7 +23446,8 @@ Bold OldBold
   k$=key$
   
 }
-MODULE BREAKPOINT {Test "start", test("ok"), A
+MODULE BREAKPOINT {print "Just close the control form"
+Test "start", test("ok"), A
 For A=1 to 100 {
       Wait 1
       Print A
@@ -24718,7 +24826,7 @@ MODULE WORKER {Καθαρό
       }
       Τμήμα Στοιχεία {
             Διάβασε Α$
-            Σωρός Α$
+            Σωρός Α$            
             Διάβασε .ΑφμΕργοδ$, .ΙδιότηταΕργαζομένου$, .ΗμΠρόσλ, .Τελική
       }
 Κλάση:
@@ -25524,8 +25632,8 @@ Function form1.Target {
 	m~
 }
 Layer form1 {
-	window 12, 12000, 8000
-	form 36, 23
+	window 12, 16000, 8000
+	form 40, 23
 	motion.w;  ' center window
 	cls #333333, 0
 	cursor 4, 4
@@ -27655,45 +27763,70 @@ MODULE ARDUINO {module SerialRead {
 	\\ str$(string) convert to ansi based on Locale (Locale 1033 or 1032 etc)
 	\\ chr$(string) do the opposite, ansi to utf16le
 	\\ when we send to arduino we have to place a lf (char 10) (1 byte)
-
-	Arduino$={
-		  int incomingByte = 0;
-                void setup() {
-                  Serial.begin(9600);
-                }
-                
-                void loop() {
-                  if (Serial.available() > 0) {
-                    incomingByte = Serial.read();
-                    Serial.print("I received: ");
-                    Serial.println(incomingByte, DEC);
-                  }
-                }
+	Font "Arial New"
+	form 80, 32
+	linespace 0
+	form 80
+	Cls 3
+	Double
+	Report 2, "Arduino Connect through COM port"
+	Normal
+	Cls 1,2
+	Report ! 2
+	Arduino$={int incomingByte = 0;
+	void setup() {
+		Serial.begin(9600);
 	}
-	Pen 15 {
-			Report {You have to place this sketch -code- to Arduino Nano from Arduino IDE:
-				
-			}
+	void loop() {
+		if (Serial.available() > 0) {
+			incomingByte = Serial.read();
+			Serial.print("I received: ");
+			Serial.println(incomingByte, DEC);
 		}
-	Report Arduino$
+	}
+	}
 	clipboard Arduino$
-	Print "code copied to clipboard"
+	Y=row
+	cursor 0,2
+	Report 1, "code copied to clipboard"
+	cursor 0, Y
+	Pen 6 {	Report {You have to place this sketch -code- to Arduino Nano from Arduino IDE:}
+		}
+	Pen 7 {Report Arduino$}
+	Report {We send hello and code 10 (line feed), and this is what we have to get:}
+	pen 10{
+		Report 2, {I received: 72 
+		I received: 104
+		I received: 108 
+		I received: 108
+		I received: 111
+		I received: 10
+		}
+	}
 	const  newline$=str$(chr$(13)+chr$(10)) , send$=str$(chr$(10))
 	escape off
 	declare withevents com3 serialport
-	Print "Try to set port to 3:";
+	Print $(4),"Try to set port to 3:";
+	x=pos
 	Menu
 	for i=1 to 7
 		Menu + "COM"+str$(i,"")
 	next
 	Menu Show "3"
-	if menu=0 then port=3 else port=val(mid$(menu$(menu),4)) : Print menu$(menu)
-	Print "If we get error then check cable, or change port number"
+	if menu=0 then port=3 else port=val(mid$(menu$(menu),4))
+	Print $(4),@(x),"COM"+port,$(0)
+	Print
+	Report"If we get error then check cable, or change port number"
 	Try ok {
 		method com3, "OpenPort", port
 	}
-	If ok then
-	PRINT "ok press A or Esc"
+	If ok Else 1000
+	Report  "ok press A (send hello and we get response each byte - DEC format) or Esc"
+	Y=height - row
+	font "Consolas"
+	bold 0
+	Cls 0, -Y
+	refresh
 	\\ we use olddata$ to stack the line characters
 	olddata$=""
 	function com3_DataArrival (new many) {
@@ -27711,16 +27844,24 @@ MODULE ARDUINO {module SerialRead {
 			olddata$+=Left$(a$, (where-1) as byte)
 			\\ so now the line is ready
 		
-			Print #-2, string$(olddata$ as utf8dec)
+			Pen random(11, 13){Print #-2, string$(olddata$ as utf8dec)}
+			refresh
 			\\ so olddata$ get a new value
 			\\ after the newline$
 			olddata$=mid$(a$, where+2 as byte)
 		end if
 		refresh
 	}
+	once=false
 	try ok {
 		every 30 {
-			if keypress(65) then method com3, "writestring", string$("hello" as utf8enc)+send$
+			// Send when we press one time - no auto repeat
+			if keypress(65) and not once then once=true:method com3, "writestring", string$("hello" as utf8enc)+send$
+			if once and not keypress(65) then  once=false
+
+//				//	Send when you release button
+//				if keypress(65) and not once then once=true
+//				if once and not keypress(65) then method com3, "writestring", string$("hello" as utf8enc)+send$: once=false
 			method com3, "processloop", 30
 			if keypress(27) then exit
 			if error then print error$ : exit
@@ -27729,13 +27870,24 @@ MODULE ARDUINO {module SerialRead {
 	\\ last data here
 	if olddata$<>"" then Print #-2, string$(olddata$ as utf8dec);
 	refresh
+	
+	Font "Verdana"
+	bold
+	form 80
+
 	\\ if we remove the cable we get error
 	\\ but we handle it and just print the error string
-	end if
-	if error or not ok then print : print "ERROR:"+error$
-	\\ also this close the port
 	
+1000	\\ also this close the port
 	declare com3 nothing
+	if error or not ok then print
+		cls 5, 0
+		pen 14
+		print "ERROR:"+error$
+		Scroll Split 0
+	Else
+		if module(infobasic) then keyboard "infobasic", 13
+	end if
 	\\ set locale
 }
 SerialRead
@@ -40610,27 +40762,31 @@ print zArray.Ubound=0, z5.Ubound=9, z5(5).toString$="(3-75i)"
 }
 MODULE SPEEDTST {CLS,0
 PRINT "SPEED TEST"
-PRINT "You can use Ctrl+C or Esc (not in Fast !)", $("0"),,
+PRINT "You can use Ctrl+C or Esc (not in Fast !)"
 MODULE TESTA {
 	PROFILER:Z=100000
 	FOR I=1 TO 100000:Z++:NEXT
-	PRINT TIMECOUNT
+	PRINT PART $(0),TIMECOUNT
+	PRINT
 }
 
 MODULE TESTB {
 	PROFILER:I=100000
 	WHILE I>0:I--:END WHILE
-	PRINT TIMECOUNT
+	PRINT PART $(0),TIMECOUNT
+	PRINT
 }
 MODULE TESTC {
 	PROFILER:I=100000
 	DO:I--:UNTIL I<1
-	PRINT TIMECOUNT
+	PRINT PART $(0),TIMECOUNT
+	PRINT
 }
 MODULE TESTD {
 	PROFILER:I=100000
 	{LOOP:I--:IF I<1 THEN EXIT
-	}:PRINT TIMECOUNT
+	}:PRINT PART $(0),TIMECOUNT
+	PRINT
 }
 SET SLOW
 	PRINT "SET SLOW"
@@ -44275,7 +44431,7 @@ cursor 0, 38
 }
 MODULE STATS1 {module Statistics_Normal_distribution {    
 	form 80, 50
-	n=1000000
+	n=100000
 	Print "Samples: "+n
 	locale 1033
 	Print "wait..."
@@ -44295,7 +44451,7 @@ MODULE STATS1 {module Statistics_Normal_distribution {
 		}
 		=v, s, sq, max, min
 	}
-	profiler
+	profiler !
 	(a, sum, sumSq, max, min)=generate(n)
 	print timecount
 	Print "Array generated.",,"Wait...": refresh
@@ -44311,7 +44467,7 @@ MODULE STATS1 {module Statistics_Normal_distribution {
 	mm=max-min
 	mb=mm/bins
 	print "feed bins"
-	profiler
+	profiler !
 	for i = 0 to len(a)-1
 		long k=(a[i]-min)/mb
 		bins(k)++
@@ -44333,7 +44489,9 @@ MODULE STATS1 {module Statistics_Normal_distribution {
 	end while
 	close #f
 }
+Profiler
 Statistics_Normal_distribution
+print timecount
 }
 MODULE STATS2 {form 80, 32
 module statistics1 {
@@ -45936,10 +46094,13 @@ MODULE MANDELBROT {Module Mandelbrot(x=0&,y=0&,z=1&) {
 	}
 }
 Cls 1,0
+PRINT "PRESS CTR+C/ESC TO EXIT PROGRAM EARLY"
 sz=(1,2,4,8,16)
 i=each(sz)
 While i {
       Mandelbrot 250*twipsx,100*twipsy, array(i)
+      Cursor 0,1
+      Print Over $(1), "Phase:"+(i^+1)+"/"+(len(sz))
 }
 }
 MODULE PREP {//https://rosettacode.org/wiki/Compiler/Simple_file_inclusion_pre_processor
@@ -46327,6 +46488,7 @@ Report {
 	We use BigInteger to get the first 2000 Fibonacci numbers.
 
 }
+Cls, row
 K=List:=0:=0u, 1:=1u
 fib=Lambda K (x as long)-> {
       If Exist(K, x) Then =Eval(K) :Exit
@@ -48182,12 +48344,12 @@ MODULE INTER1 {GLOBAL ENUM HRESULT {
 	E_ACCESSDENIED				= &H80070005&
 	E_HANDLE					= &H80070006&
 	E_OUTOFMEMORY				= &H8007000E&
-	E_INVALIDARG				= &H80070057&
+	E_INVALIDARG					= &H80070057&
 	E_UNEXPECTED				= &H8000FFFF&
 	
 	DISP_E_MEMBERNOTFOUND		= &H80020003&
 	DISP_E_UNKNOWNNAME		= &H80020006&
-	DISP_E_NONAMEDARGS		= &H80020007&
+	DISP_E_NONAMEDARGS			= &H80020007&
 	DISP_E_EXCEPTION				= &H80020009&
 	DISP_E_BADINDEX				= &H8002000B&
 }
@@ -49387,7 +49549,6 @@ buf[0]|r = 1: buf[1]|r = 1: buf[2]|r = 1: buf[3] = (1, 0i)
 showArr(buf, "Input")
 FFT(out, buf, 0, 1, 8)
 ShowArr(out, "Output")
-' print $("") ' #2
 close #F
 print #-2, eval$(buffer(dir$+"output.txt"))
 Sub ShowArr(m, mes as string)
@@ -50124,7 +50285,7 @@ END IF
 }
 MODULE KILLTHEM {Declare GetCurrentProcessId Lib "kernel32.GetCurrentProcessId" As Long
 // this is our ProcessId
-ourPID=GetCurrentProcessId()
+string ourPID=GetCurrentProcessId()  // convert to string`
 // get current directrory
 m$=dir$
 // set TEMP folder as current folder
@@ -50406,7 +50567,13 @@ PRINT
 PRINT
 ESCAPE ON
 }
-MODULE JOY {CONST  Acoustic_Bass = 33
+MODULE JOY {' Module JOY
+' use JOY
+' or to skip message:
+' JOY true
+' SKIP is optional here
+READ ? SKIP AS BOOLEAN=FALSE
+CONST  Acoustic_Bass = 33
 TEMPO=960*1.2
 VOLUME 80
 PLAY 1, 0
@@ -50468,6 +50635,7 @@ partitura+="D@4C@4C@2!"  ' LAST NOTE LEGATO - 100%
 
 SCORE 1, TEMPO, partitura, 75  ' 75% STACCATO  -  100% IS LEGATO (OMIT THE PARAMETER)- NO SILENCE BETWEEN NOTES.
 PLAY 1, Acoustic_Bass
+IF SKIP THEN EXIT
 PRINT "ODE TO JOY"
 }
 MODULE REGEXNEW {form 80
@@ -50485,6 +50653,7 @@ Enum Display {
 	NoDisplay
 	DisplayList
 }
+string ContOnPrev=""
 flush
 open "out.txt" for wide output as #F
 partTitle={' -----------------------------------------------------------------------
@@ -50524,9 +50693,55 @@ partTitle={
 	T_2_10_escape_escaped_metachar(HaveMatch,"\.",".", "\. to match '.'", DisplayList)
 	T_2_11_escape_d2_exec(HaveMatch, "\d{2}", "12","\d{2} to match '12'",  , "12")
 	T_2_12_escape_d2_partial_fail(NoMatch, "\d{2}", "1a", "\d{2} to fail on '1a'")
+partTitle={
+	' Category 3 - classes/ranges
+	}
+	Print #F, partTitle
+	T_3_01_class_basic_true(HaveMatch, "[a-c]", "b","class [a-c] should match 'b'")
+	T_3_02_class_basic_false(NoMatch, "[a-c]", "d", "class [a-c] shouldn't match 'd'")
+	T_3_03_class_range_cases(HaveMatch,"[a-zA-Z]","G", "range [a-zA-Z] should match 'G'")
+	T_3_04_class_negated_true(HaveMatch,  "[^0-9]", "x", "negated class should match 'x'")
+	T_3_05_class_negated_false(NoMatch, "[^0-9]", "5", "negated class shouldn't match '5'")
+	T_3_06_class_escape_in_class_true(HaveMatch,"[\d\s]", "3", "[\d\s] should match '3'")
+	T_3_07_class_escape_in_class_false(NoMatch, "[\d\s]","a","[\d\s] shouldn't match 'a'")
+	T_3_08_class_quantifier_on_class(HaveMatch ,"[a-c]+","abccba", "[a-c]+ should match 'abccba'")
+	T_3_09_class_quantifier_partial_exec(HaveMatch, "[a-c]+", "abcd", "expected match on 'abcd'", ,"abc")
+	T_3_10_negated_single(HaveMatch, "[^a]","b", "[^a] should match 'b'")
+	T_3_11_empty_class_false(NoMatch, "[]", "a","empty class [] should not match anything")
+	T_3_12_negated_empty_true(HaveMatch, "[^]", "a", "[^] should match any char")
+partTitle={
+	' Category 4 (quantifiers) - many tests below, similar pattern
+	}
+	Print #F, partTitle	
+	T_4_01_quant_a_star_empty(HaveMatch,"a*", "","a* should match empty")
+	T_4_02_quant_a_star_exec(HaveMatch, "a*", "aaa", "a* expected match 'aaa'",,"aaa")
+	T_4_03_quant_a_star_lazy_exec(HaveMatch, "a*?", "aaa", "a*? should return something",,"")
+	T_4_04_quant_a_star_possessive_exec(HaveMatch, "a*+", "aaa", "a*+ should match 'aaa' possessive",, "aaa")
+	T_4_05_quant_a_plus_true_false(HaveMatch,  "a+", "aaa", "a+ should match 'aaa'")
+	T_4_05_quant_a_plus_true_false(NoMatch, ContOnPrev, " ", "a+ should not match space")
+	T_4_06_quant_a_plus_lazy(HaveMatch, "a+?", "aaa", "a+? should match 'aaa' lazily",,"a")
+	T_4_07_quant_a_plus_possessive(HaveMatch, "a++", "aaa", "a++ should match 'aaa'",,"aaa")
+	T_4_08_quant_a_question(HaveMatch, "a?", "","a? should match empty" )
+	T_4_08_quant_a_question(HaveMatch, ContOnPrev, "","a? should match empty" )
+//		T_4_09_quant_a_question_lazy(HaveMatch)
+//		T_4_10_quant_a_question_possessive(HaveMatch)
+//		T_4_11_quant_exact_a3(HaveMatch)
+//		T_4_12_quant_exact_a3_longer(HaveMatch)
+//		T_4_13_quant_range_true(HaveMatch)
+//		T_4_14_quant_range_below_min(HaveMatch)
+//		T_4_15_quant_range_lazy(HaveMatch)
+//		T_4_16_quant_range_possessive(HaveMatch)
+//		T_4_17_quant_min_unlimited(HaveMatch)
+//		T_4_18_quant_min_unlimited_lazy(HaveMatch)
+//		T_4_19_quant_min_unlimited_possessive(HaveMatch)
+//		T_4_20_wildcard_greedy(HaveMatch)
+//		T_4_21_wildcard_lazy(HaveMatch)
+//		T_4_22_wildcard_possessive(HaveMatch)
+
 close #f
 win "out.txt"
 end
+
 // Category 1
 sub Function T_1_01_basic_literal_exact()
 	print #F, "T_1_01_basic_literal_exact"
@@ -50613,7 +50828,144 @@ sub T_2_12_escape_d2_partial_fail()
 	print #F,"T_2_12_escape_d2_partial_fail"
 	gosub CommonPart
 end sub
-
+// Category 3
+sub T_3_01_class_basic_true()
+	print #F,"T_3_01_class_basic_true"
+	gosub CommonPart
+end sub
+sub T_3_02_class_basic_false()
+	print #F,"T_3_02_class_basic_false"
+	gosub CommonPart
+end sub
+sub T_3_03_class_range_cases()
+	print #F,"T_3_03_class_range_cases"
+	gosub CommonPart
+end sub
+sub T_3_04_class_negated_true()
+	print #F,"T_3_04_class_negated_true"
+	gosub CommonPart
+end sub
+sub T_3_05_class_negated_false()
+	print #F,"T_3_05_class_negated_false"
+	gosub CommonPart
+end sub
+sub T_3_06_class_escape_in_class_true()
+	print #F,"T_3_06_class_escape_in_class_true"
+	gosub CommonPart
+end sub
+sub T_3_07_class_escape_in_class_false()
+	print #F,"T_3_07_class_escape_in_class_false"
+	gosub CommonPart
+end sub
+sub T_3_08_class_quantifier_on_class()
+	print #F,"T_3_08_class_quantifier_on_class"
+	gosub CommonPart
+end sub
+sub T_3_09_class_quantifier_partial_exec()
+	print #F,"T_3_09_class_quantifier_partial_exec"
+	gosub CommonPart
+end sub
+sub T_3_10_negated_single()
+	print #F,"T_3_10_negated_single"
+	gosub CommonPart
+end sub
+sub T_3_11_empty_class_false()
+	print #F,"T_3_11_empty_class_false"
+	gosub CommonPart
+end sub
+sub T_3_12_negated_empty_true()
+	print #F,"T_3_12_negated_empty_true"
+	gosub CommonPart
+end sub
+// Category 4
+sub T_4_01_quant_a_star_empty()
+	print #F,"T_4_01_quant_a_star_empty"
+	gosub CommonPart
+end sub
+sub T_4_02_quant_a_star_exec()
+	print #F,"T_4_02_quant_a_star_exec"
+	gosub CommonPart
+end sub
+sub T_4_03_quant_a_star_lazy_exec()
+	print #F,"T_4_03_quant_a_star_lazy_exec"
+	gosub CommonPart
+end sub
+sub T_4_04_quant_a_star_possessive_exec()
+	print #F,"T_4_04_quant_a_star_possessive_exec"
+	gosub CommonPart
+end sub
+sub T_4_05_quant_a_plus_true_false()
+	print #F,"T_4_05_quant_a_plus_true_false"
+	gosub CommonPart
+end sub
+sub T_4_06_quant_a_plus_lazy()
+	print #F,"T_4_06_quant_a_plus_lazy"
+	gosub CommonPart
+end sub
+sub T_4_07_quant_a_plus_possessive()
+	print #F,"T_4_07_quant_a_plus_possessive"
+	gosub CommonPart
+end sub
+sub T_4_08_quant_a_question()
+	print #F,"T_4_08_quant_a_question"
+	gosub CommonPart
+end sub
+sub T_4_09_quant_a_question_lazy()
+	print #F,"T_4_09_quant_a_question_lazy"
+	gosub CommonPart
+end sub
+sub T_4_10_quant_a_question_possessive()
+	print #F,"T_4_10_quant_a_question_possessive"
+	gosub CommonPart
+end sub
+sub T_4_11_quant_exact_a3()
+	print #F,"T_4_11_quant_exact_a3"
+	gosub CommonPart
+end sub
+sub T_4_12_quant_exact_a3_longer()
+	print #F,"T_4_12_quant_exact_a3_longer"
+	gosub CommonPart
+end sub
+sub T_4_13_quant_range_true()
+	print #F,"T_4_13_quant_range_true"
+	gosub CommonPart
+end sub
+sub T_4_14_quant_range_below_min()
+	print #F,"T_4_14_quant_range_below_min"
+	gosub CommonPart
+end sub
+sub T_4_15_quant_range_lazy()
+	print #F,"T_4_15_quant_range_lazy"
+	gosub CommonPart
+end sub
+sub T_4_16_quant_range_possessive()
+	print #F,"T_4_16_quant_range_possessive"
+	gosub CommonPart
+end sub
+sub T_4_17_quant_min_unlimited()
+	print #F,"T_4_17_quant_min_unlimited"
+	gosub CommonPart
+end sub
+sub T_4_18_quant_min_unlimited_lazy()
+	print #F,"T_4_18_quant_min_unlimited_lazy"
+	gosub CommonPart
+end sub
+sub T_4_19_quant_min_unlimited_possessive()
+	print #F,"T_4_19_quant_min_unlimited_possessive"
+	gosub CommonPart
+end sub
+sub T_4_20_wildcard_greedy()
+	print #F,"T_4_20_wildcard_greedy"
+	gosub CommonPart
+end sub
+sub T_4_21_wildcard_lazy()
+	print #F,"T_4_21_wildcard_lazy"
+	gosub CommonPart
+end sub
+sub T_4_22_wildcard_possessive()
+	print #F,"T_4_22_wildcard_possessive"
+	gosub CommonPart
+end sub
 
 
 function InitRegexAndHandle(r as *Regex, pattern As String,ignoreCase As Boolean = False, MaxSteps As Long = -1, multiline As Boolean = False,  dotAll As Boolean = False)
@@ -50667,7 +51019,7 @@ CommonPart:
 	local dotAll as boolean
 	if YourWish=HaveMatch_dotAll then dotAll=true : ? #F, "Use of dotAll: True"
 	if YourWish<HaveMatch_dotAll then local msg0="expected " else local msg0=""
-	if  @InitRegexAndHandle(c, exp,,,,dotAll) then
+	if  if(exp=""-> true, @InitRegexAndHandle(c, exp,,,,dotAll)) then
 		local z=@ExecColl(c,searchstr)
 		if YourWish>=HaveMatch then
 			if len(z)=0 then
@@ -50705,5 +51057,867 @@ CommonPart:
 	print #f
 	Rem local a$=key$
 return
+}
+MODULE KEYANY {const on=1, off=0
+cls 0,0
+pen 15{
+	Print Part "M2000 Interpreter ";version;".";revision
+	italic on
+	Print Under "      for version 14, vevision > 20"
+	Print Under
+}
+italic off
+cls, 2
+Escape OFF
+//	you have always otion Ctrl+C to stop
+do
+	pen random(10,11){?"boom (press Esc to exit, pres any shift, press A, press /, press ;)"}
+	refresh
+	wait 10
+	pen 15 {
+		if keypress(0x10) then print "shift (any one, left or right)"
+		if keypress(0xA0) then print "shift (left)"
+		if keypress(0xA1) then print "shift (right)"
+		if keypress(65) then print "A"
+		if keypress(195!) then print "Γ"
+//			59 is ascii code of ;
+//			Changing keyboard language change Virtual Code
+//			Using // we found the current virtual code
+		if keypress(59!) then print ";"
+//			The same for Slash, may have different code.
+		if keypress(47!) then print "/"
+	}
+Until keypress(27)
+wait 100
+boolean bad
+while  Keypress(27)
+	wait 10
+	Print "ok.. leave Esc now"
+	bad=true
+end while
+if bad Then
+if module(joy) then joy true
+Print "Thank you": Refresh: wait 2000
+end if
+Escape ON
+If module(infobasic) then keyboard "infobasic", 13
+}
+MODULE BEST {Report {
+	Run Clock as another m2000.exe but the window is child for the console window - the Back
+	So tthe three windows form Form44 module are together with the other m2000.exe window
+	We can bring any of four of them on top.
+	Do not press space
+}
+Clock1
+Form44
+}
+MODULE DOUBLELIST {Declare Simple Form
+With Simple, "Title" as myTitle$
+Layer Simple {
+      Linespace 60
+      Font "Arial Black"
+      Window 16, 16000,6000
+      Cls 1,0
+}
+
+Declare ListBox1 Listbox Form Simple
+Declare ListBox2 Listbox Form Simple
+Method ListBox1, "move", 1000,1000,6000,2000
+Method ListBox2, "move", 8000,1000,6000,2000
+With Listbox1, "ScrollTo" as Scr1, "ScrollFrom" as Scr1Read, "ShowAlways", True, "List" as list$()
+With Listbox2, "ScrollTo" as Scr2, "ScrollFrom" as Scr2Read, "Edit",true ,  "ShowAlways", True
+
+With ListBox1,"Text", {Name
+                                    Address1
+                                    Address2
+                                    Address3
+                                    Info1
+                                    Info2
+                                    Info3
+                                    Info4
+                                    }
+With ListBox2,"Text", {.
+                                    .
+                                    .
+                                    .
+                                    .
+                                    .
+                                    .
+                                    .
+                                    }
+
+
+Method Simple, "Show"
+Function Simple.Unload {
+      Keyboard "!"
+}
+Function Listbox2.Scroll {
+      scr1=scr2read
+}
+Function Listbox2.Click {
+      scr1=scr2read
+}
+Function Listbox1.Scroll {
+      Read New Where
+      myTitle$=List$(Where-1)
+      scr2=scr1read
+}
+Function Listbox1.Click {
+      Read New Where
+      myTitle$=List$(Where-1)
+      scr2=scr1read
+}
+Function Listbox2.Scroll {
+      scr1=scr2read
+}
+Function Listbox1.Scroll {
+      scr2=scr1read
+}
+Function Listbox2.Move {
+      read top1
+      scr1=top1
+}
+Function Listbox1.Move {
+      read top1
+      scr2=top1
+}
+a$=Key$ \\ no loop just wait a key, in console only
+Declare Simple Nothing
+}
+MODULE TURTLEENGINE {M=MODE
+WINDOW 6, WINDOW
+OLDSCALE.Y=SCALE.Y
+WINDOW M, SCALE.X, SCALE.X*9/16;
+Z=SCALE.Y/OLDSCALE.Y
+FORM;
+MODULE TURTLE_GRAPHICS {
+	FLUSH
+	IF NOT VALID(USE_STEPS) THEN USE_STEPS=FALSE
+	IF NOT VALID(CLEAN) THEN CLEAN=TRUE
+	IF NOT VALID(DELAY) THEN DELAY=100
+	IF NOT VALID(NORTH) THEN NORTH=90
+	IF NOT VALID(ZOOM) THEN ZOOM=1
+	IF NOT VALID(XPOS) THEN XPOS=0
+	IF NOT VALID(YPOS) THEN YPOS=0
+	IF VALID(MASTER_ZOOM) THEN
+		ZOOM*=MASTER_ZOOM
+	ELSE
+		LOCAL MASTER_ZOOM AS SINGLE=1
+	END IF
+	CONST PI AS SINGLE=3.1415926
+	BOOLEAN pen_draw=TRUE
+	SINGLE pen_angle=(NORTH-90)*PI/180
+	INTEGER line_width=1
+	ENUM PEN.COLOR {
+		BLACK=#000000
+		RED=#FF0000
+		GREEN=#00FF00
+		BLUE=#0000FF
+	}
+	FUNCTION PIC(CO){
+		DRAWING 3000, 3000 {
+			MOVE 0,0
+			WIDTH 4{
+				DRAW TO 3000, 1500, CO
+				DRAW TO 0, 3000, CO
+				DRAW TO 1000, 1500, CO
+				DRAW TO 0,0, CO
+			}
+		} AS ARROW
+		=ARROW
+	}	
+	SMOOTH ON
+	ARROW=PIC(0)
+	IF CLEAN THEN CLS,0
+	HOLD
+	IF MODULE(DRAWTHIS) THEN CALL LOCAL DRAWTHIS
+	RELEASE
+	REFRESH 25
+	PEN 0
+	END
+	
+	SUB DRAW.LETTER(G$, WHERE, CO=0&, SIZE=100, rotation=0)
+		SET_BACK()
+		WHERE-=NORTH+rotation
+		STEP ANGLE -WHERE/180*PI, 300*SIZE/100*ZOOM
+		PEN CO {LEGEND G$,FONTNAME$,MODE*SIZE/100*ZOOM, (NORTH-90+rotation)*PI/180, 2}
+		STEP ANGLE -WHERE/180*PI, -300*SIZE/100*ZOOM
+		PUT_ARROW()
+	END SUB
+	SUB PEN.BLACK()
+		PEN #000000
+		ARROW=PIC(PEN)
+	END SUB	
+	SUB PEN.RED()
+		PEN #FF0000
+		ARROW=PIC(PEN)
+	END SUB	
+	SUB PEN.GREEN()
+		PEN #00FF00
+		ARROW=PIC(PEN)
+	END SUB
+	SUB PEN.BLUE()
+		PEN #0000FF
+		ARROW=PIC(PEN)		
+	END SUB
+	SUB CENTER.SCREEN()
+		SET_BACK()
+		MOVE (SCALE.X DIV 2)+XPOS, (SCALE.Y DIV 2)+YPOS
+		PUT_ARROW()
+	END SUB
+	SUB MOVE.ARROW(Χ, Υ)
+		SET_BACK()
+		X*=MASTER_ZOOM:Y*=MASTER_ZOOM
+		MOVE Χ+XPOS, Υ+YPOS
+		PUT_ARROW()		
+	END SUB
+	SUB LINE.WIDTH(that AS INTEGER)
+		that*=MASTER_ZOOM
+		IF that<1 THEN that=1
+		IF that>15 ΤΌΤΕ that=15
+		line_width=that
+	END SUB
+	SUB PEN.UP()
+		pen_draw=FALSE
+	END SUB
+	SUB PEN.DOWN()
+		pen_draw=TRUE
+	END SUB
+	SUB DRAW.CIRCLE(radius)
+		SET_BACK()
+		IF pen_draw THEN
+			WIDTH line_width {
+				CIRCLE radius
+			}
+		END IF
+		PUT_ARROW()
+	END SUB
+	SUB DRAW.ARC(radius, st=0, en=360, rotation=0)
+		SET_BACK()`
+		IF pen_draw THEN
+			WIDTH line_width {
+				CIRCLE radius,1,PEN,(NORTH-st+rotation)/180*PI, (NORTH-en+rotation)/180*PI;
+			}
+		END IF
+		PUT_ARROW()
+	END SUB
+	SUB GO.FORWARD(distance)
+		distance*=ZOOM
+		SET_BACK()
+		IF pen_draw THEN
+			WIDTH line_width {
+				IF USE_STEPS THEN
+					LOCAL STP=ABS(distance) DIV (300*MASTER_ZOOM)
+					IF STP>0 THEN
+						LOCAL STP1=300*SGN(distance)*MASTER_ZOOM
+						STEP ANGLE pen_angle, distance
+						LOCAL i AS INTEGER, XP=POS.X, YP=POS.Y
+						STEP ANGLE pen_angle, -distance
+						FOR i=1 TO STP
+							DRAW ANGLE pen_angle, STP1
+							PUT_ARROW()
+							SET_BACK()															 
+						NEXT i
+						DRAW TO XP, YP
+					ELSE
+						DRAW ANGLE pen_angle, distance
+					END IF					 
+				ELSE
+					DRAW ANGLE pen_angle, distance
+				END IF
+			}
+		ELSE
+			IF USE_STEPS THEN
+				LOCAL STP=ABS(distance) DIV (300*MASTER_ZOOM)
+				IF STP>0 THEN
+					LOCAL STP1=300*SGN(distance)*MASTER_ZOOM
+					STEP ANGLE pen_angle, distance
+					LOCAL i AS INTEGER, XP=POS.X, YP=POS.Y
+					STEP ANGLE pen_angle, -distance
+					FOR i=1 TO STP
+						STEP ANGLE pen_angle, STP1
+						PUT_ARROW()
+						SET_BACK()															 
+					NEXT i
+					MOVE XP, YP
+				ELSE
+					STEP ANGLE pen_angle, distance
+				END IF					 						 
+			ELSE
+				STEP ANGLE pen_angle, distance
+			END IF
+		END IF
+		PUT_ARROW()
+	END SUB
+	
+	SUB DRAW.REAR(distance)
+		GO.FORWARD(-distance)
+	END SUB
+	
+	SUB TURN.RIGHT(angle_in_degrees)
+		SET_BACK()
+		pen_angle-=angle_in_degrees/180*PI
+		PUT_ARROW()
+	END SUB
+	
+	SUB TURN.TO(angle_in_degrees)
+		SET_BACK()
+		pen_angle=(angle_in_degrees+NORTH-90)/180*PI
+		PUT_ARROW()
+	END SUB	
+	
+	SUB SET_BACK()
+		RELEASE
+	END SUB
+	
+	SUB PUT_ARROW()
+		HOLD
+		IMAGE ARROW, 600*MASTER_ZOOM,,pen_angle*180/PI
+		REFRESH 1000
+		WAIT DELAY
+	END SUB
+}
+MODULE PRG1 {
+	CENTER.SCREEN()
+	LINE.WIDTH(4)
+	PEN.RED()
+	ZZ=13
+	TURN.RIGHT(ZZ)
+	DRAW.LETTER("Α", 225,,,-ZZ)
+	GO.FORWARD(4000)
+	DRAW.LETTER("90°     ", -20, BLUE,200, -ZZ)
+	PEN.BLACK()
+	DRAW.ARC(300, -5, 275, -ZZ)
+	PEN.RED()
+	DRAW.LETTER("Β", 135,,,-ZZ)
+	TURN.RIGHT(270)
+	GO.FORWARD(3000)
+	DRAW.LETTER("Γ",45,,,-ZZ)
+	TURN.RIGHT(270-ATN(3000/4000))
+	GO.FORWARD(5000)
+	TURN.TO(180)
+	PEN.UP()
+	GO.FORWARD(6000)
+	PEN.DOWN()
+	PEN.GREEN()
+	HOUSE(5000)	
+	SUB HOUSE(n)
+			LOCAL i
+			FOR i=1 TO 3	
+				TURN.RIGHT(120)
+				GO.FORWARD(n)
+			NEXT
+			TURN.RIGHT(90)
+			PARALLELOGRAM(n, n)
+			TURN.RIGHT(90)
+	END SUB
+	SUB PARALLELOGRAM(w, h)
+		LOCAL i
+		FOR i=1 TO 2
+			TURN.RIGHT(90)	
+			GO.FORWARD(h)
+			TURN.RIGHT(90)
+			GO.FORWARD(w)
+		NEXT
+	END SUB
+}
+BACKGROUND {CLS 0, 0}
+CLS 15,0
+PEN 0
+REFRESH
+SPEECH "PREES ANY KEY TO START"
+A$=KEY$
+GLOBAL MASTER_ZOOM=SCALE.X/TWIPSX/1792
+TURTLE_GRAPHICS %USE_STEPS=TRUE, %DELAY=30, %XPOS=-SCALE.X / 2.8, %NORTH=190, %ZOOM=0.9;  DRAWTHIS AS PRG1
+TURTLE_GRAPHICS %USE_STEPS=TRUE, %DELAY=30, %CLEAN=FALSE,  %XPOS=SCALE.X / 2.8, %NORTH=10, %ZOOM=0.9;  DRAWTHIS AS PRG1
+TURTLE_GRAPHICS %USE_STEPS=TRUE, %DELAY=30, %CLEAN=FALSE,  %YPOS=-SCALE.Y / 3.8, %NORTH=100, %ZOOM=0.7;  DRAWTHIS AS PRG1
+TURTLE_GRAPHICS %USE_STEPS=TRUE, %DELAY=30, %CLEAN=FALSE,  %YPOS=SCALE.Y / 3.8, %NORTH=280, %ZOOM=0.7;  DRAWTHIS AS PRG1
+CURSOR 0,0
+PRINT "TURTLE GRAPHICS 1.0"
+REFRESH
+SPEECH "TURTLE GRAPHICS 1.0"
+SPEECH "PREES ANY KEY TO RETURN"
+A$=KEY$
+IF MODULE(INFO) THEN KEYBOARD "INFO", 13
+}
+MODULE WQWETO {// THIS CODE USING A CLASS  CBARCODE ()AT GIT:  HTTPS://GITHUB.COM/WQWETO/CLIPBAR FROM VLADIMIR VISSOULTCHEV, FROM BULGARIA)
+FLUSH
+WINDOW 14, 18200, 14200;
+MODE 14
+CLS 5,0
+GRADIENT 5, 1
+MOVE 500,500
+DRAWING {
+	FILL 3600,3600+TWIPSX, 15
+	MOVE 0,0
+	IMAGE IMAGE("HTTPS://GITHUB.COM/WQWETO", ,1), 3600
+} AS QRCODE
+IMAGE QRCODE, 1800
+BIGTITLE("BARCODE by WQWETO", 1, 60, #ffEE99, #ffaa00, 1)
+DECLARE BAR "M2000.CBARCODE"
+REM PRINT TYPE$(BAR)
+ENUM UCSBARCODETYPEENUM {
+	UCSBCTAUTO = 0
+	UCSBCTEAN13
+	UCSBCTEAN8
+	UCSBCTEAN128
+	UCSBCTUPCA
+	UCSBCTUPCE
+}
+LONG INK_BLEED_IN_PERCENTS=10
+BOOLEAN TRUE=1=1, FALSE=1=0
+METHOD BAR, "INIT", INK_BLEED_IN_PERCENTS,  BHANGSEPARATORS:= TRUE, BSHOWDIGITS:=TRUE AS OK
+METHOD BAR, "GETBARCODE", "123456789012:12345",  UCSBCTEAN13 AS PIC
+WITH PIC, "WIDTH" AS PIC.WIDTH, "HEIGHT" AS PIC.HEIGHT
+MOVE  6000, 5600
+// PIC IS A PICTURE OBJECT
+MEM$=""
+// NOW IMAGE CAN RENDER PIC TO STRING
+IMAGE PIC, 7500  TO MEM$
+REM ? IMAGE.X(MEM$)=7500
+REM	? LEN(MEM$)
+// SO NOW WE PLACE A BITMAP
+IMAGE MEM$			 ', 7500
+// WE CAN RENDER PICTURE AS EMF DIRECTLY
+STEP 0, -3000
+IMAGE PIC, 7500*1.2
+// WE CAN MAKE A FILE IN MEMORY USING DRAWING.
+// WE CAN MAKE ANOTHER EMF WHERE WE DRAW THE PICTURE
+DRAWING {
+	IMAGE PIC, 3000
+} AS MEM
+REM ? LEN(MEM)
+STEP -3000, 6000
+// WE CAN ROTATE THE IMAGE NOW
+IMAGE MEM, 10000, ,-90
+METHOD BAR, "GETBARCODE", "ABCDEFABCDEFG23432432432432432",  UCSBCTEAN128 AS PIC
+MOVE 6000, 9000
+IMAGE PIC, 11000
+
+METHOD BAR, "GETBARCODE", "123456789012ABCDEFABCDEFG23432432432432432",  UCSBCTEAN128 AS PIC
+MOVE 6000, 12000
+IMAGE PIC, 11000
+PUSH KEY$
+DROP
+IF MODULE(INFO) THEN KEYBOARD "INFO", 13
+SUB  BIGTITLE(THIS$, THERE, PERCENT, PENA=15, CL1=2, CL2=2, F$="TIMES NEW ROMAN")
+	LOCAL M=SCALE.X
+	LOCAL DY=SIZE.Y(THIS$,F$,128)
+	LOCAL DW=SIZE.X(THIS$,F$,128)*1.2
+	LOCAL RPC=M/DW*PERCENT/100
+	LOCAL W,W1,FINAL, LW=8
+	DRAWING {
+		DRAWING  {
+			PATH  {
+				LEGEND THIS$,F$,128
+			};
+			FILL DW,DY, CL1, CL2
+			PATH  {};		
+		} AS W
+		DRAWING {
+			PEN PENA
+			WIDTH LW*RPC {COLOR  {LEGEND THIS$,F$,128}}
+		} AS W1	
+		IMAGE W
+		STEP -LW*TWIPSX*RPC, -LW*TWIPSX*RPC
+		IMAGE W1
+	} AS FINAL
+	CURSOR 0, THERE
+	MOVE !
+	STEP SCALE.X*(1-PERCENT/100)/2
+	IMAGE FINAL, SCALE.X*PERCENT/100
+END SUB
+
+
+
+}
+MODULE ARROWS {M=MODE
+WINDOW 6, WINDOW
+OLDSCALE.Y=SCALE.Y
+WINDOW M, SCALE.X, SCALE.X*9/16;
+Z=SCALE.Y/OLDSCALE.Y
+FORM;
+SINGLE PI=@PI, A, I
+SMOOTH ON
+CLS 15
+PEN 0
+DOUBLE
+REPORT 2, "ARROWS"
+NORMAL
+MOVE 6600*Z,8000*Z
+FOR A=0 TO 2*PI STEP PI/7
+	STEP ANGLE A, 300
+	ARROW(4000*Z, 300*Z, A)
+	ARROW(4000*Z, 300*Z, 3*PI/2+A, 2)
+	ARROW(4000*Z, 300*Z, PI+A, 3)
+	ARROW(4000*Z, 300*Z, -3*PI/2+A, 4)
+NEXT
+FOR I=-6000 TO 5000 STEP 1000
+	MOVE 20000*Z, 8000*Z
+	ARROW2(-6000*Z, I*Z, 300*Z, #FF00FF)
+	MOVE 20000*Z, 8000*Z
+	ARROW2(6000*Z, -I*Z, 300*Z, #FFFF00)
+	MOVE 20000*Z, 8000*Z
+	ARROW2(I*Z+1000*Z, -6000*Z,  300*Z, #00FFFF)
+	MOVE 20000*Z, 8000*Z
+	ARROW2(I*Z, 6000*Z, 300*Z, #FF7777)
+NEXT
+PUSH KEY$
+DROP
+IF MODULE(INFO) THEN KEYBOARD "INFO", 13
+
+SUB ARROW(LE AS SINGLE, AR AS SINGLE, ANG AS SINGLE, COL=1)
+	LOCAL AR1=AR*1.11803398~, P2=0.463647609~
+	WIDTH 3 {DRAW ANGLE ANG, LE, COL}
+	LOCAL X=POS.X, Y=POS.Y
+	STEP ANGLE ANG, -AR
+	PEN COL {POLYGON COL, ANGLE ANG+PI/2, AR/2, ANG+PI-P2, -AR1, ANG+PI+P2, AR1, 0,0}
+	DRAW ANGLE ANG+PI/2, AR, 15	
+	MOVE X, Y
+END SUB
+
+
+SUB ARROW2(POSX AS SINGLE,  POSY AS SINGLE, AR AS SINGLE, COL=1)
+		LOCAL AR1=AR*1.11803398~, P2=0.463647609~
+		IF POSY=0 THEN
+			IF POSX>0 THEN 
+				LOCAL ANG=2*PI
+			ELSE
+				LOCAL ANG=PI
+			END IF
+		ELSE
+			ANG=ATN(POSX/POSY)/180*PI-SGN(POSY)*PI/2		
+		END IF
+		WIDTH 3 {DRAW POSX, POSY, COL}
+		LOCAL X=POS.X, Y=POS.Y
+		STEP ANGLE ANG, -AR
+		PEN COL {POLYGON COL, ANGLE ANG+PI/2, AR/2, ANG+PI-P2, -AR1, ANG+PI+P2, AR1, 0,0}
+		DRAW ANGLE ANG+PI/2, AR, 15 
+		MOVE X, Y			
+END SUB
+}
+MODULE INDUCTORS {C=MODE
+WINDOW 6, WINDOW
+OLDSCALE.Y=SCALE.Y
+WINDOW C, SCALE.X, SCALE.X*9/16;
+Z=SCALE.Y/OLDSCALE.Y
+FORM;
+SMOOTH ON
+CLS 15, 0
+PEN 0
+DOUBLE
+REPORT 2,  "DRAWING INDUCTORS"
+NORMAL
+A=-PI/16
+AA=0
+FLUSH
+DATA 1000, 6000, 12000, 0
+FOR M=1000 TO 8000 STEP 2000
+MOVE 2000*Z+AA*Z, 6000*Z+M*Z
+INDUCTOR(4, M, 0+A, Z)
+INDUCTOR(8, M, -PI/2+A, Z)
+INDUCTOR(6, M, -PI+A, Z)
+INDUCTOR(3, M, PI/2+A, Z)
+A+=PI/3
+AA+=NUMBER
+NEXT
+PUSH KEY$
+DROP
+IF MODULE(INFO) THEN KEYBOARD "INFO", 13
+SUB INDUCTOR(PARTS, LE, A, Z)
+	LE*=Z
+	LOCAL SINGLE M=LE/6000*240
+	LOCAL SINGLE B=LE/(PARTS+4)*.4
+	LOCAL SINGLE C=B-20*PARTS*LE/6000
+	WHILE LE>(4*B+2*PARTS*(B-C))
+		C-=15
+		IF C<M THEN B*=1.2: c=B/1.3
+	END WHILE
+	WIDTH FLOOR(Z*3) {DRAW ANGLE A, B}
+	STEP ANGLE A, B
+	FOR I=1 TO PARTS
+		ARC(TRUE, B, A, Z)
+		STEP ANGLE A, B
+		STEP ANGLE A, -C
+		ARC(FALSE, C, A, Z)
+		STEP ANGLE A, B-C	
+	NEXT
+	ARC(TRUE, B, A, Z)
+	STEP ANGLE A, B
+	WIDTH FLOOR(Z*3) {DRAW ANGLE A, B}
+END SUB
+SUB ARC(UP AS BOOLEAN, AR AS SINGLE, ARG AS SINGLE, Z AS SINGLE)
+	LOCAL KK=-ARG, K=KK
+	WIDTH FLOOR(Z*3) {
+		IF UP ELSE K+=PI
+		CIRCLE AR, 1, PEN, 0-K, PI-K;
+	}
+END SUB
+}
+MODULE MULTICOLUMN {//	Thei is work but I would like to have a hrizontal scrolling  bar
+//	So now you can only srink some columns
+//	Use shift to chnage size between two columns when you pick the column's left line
+Declare Simple Form
+With Simple, "Title" As myTitle$, "Width" as Simple.Width, "Height" as Simple.Height
+Layer Simple {
+	Linespace 60
+	Font "Arial Black"
+	Window 16, 12000,6000
+	gradient 11, 1, 0
+//		Cursor 0, height div 2
+//		Report 2,"Hello World"
+}
+\\ now put a ListBox
+Declare Listbox1 Listbox Form Simple
+Method Listbox1, "move", 1000,1000,7900,4500
+ method ListBox1, "Colors", 0,15,,0,7
+With ListBox1, "Column" as Listbox1.column, "Edit" as editcolumn, "Transparent", true,
+With ListBox1, "Columns", 4, "ColumnWidth" as a(), "NarrowSelect", true, "TextColumn" as textColumn$()
+With ListBox1,  "TitleHeight", 1.8, "Title", {My Title} , "AdjustColumns", true , "BorderStyle", 1 , "TopRows", 2, "maychange", true,"DisplayLines", 7
+method ListBox1, "SetGrid", true, 5
+
+editcolumn=false
+a(1)=3300
+a(2)=3300
+a(3)=3300
+a(4)=3300
+// set the listcount by using "text" property
+With Listbox1,"text", {Header 1
+		Paris
+		Athens
+		Rome
+		Tirana
+		Nicosia
+		Brussels
+		Copenhagen
+		Berlin
+		Dublin
+		Luxembourg
+		One More
+		}
+textColumn$(2)={Header 2
+		4Paris2
+		2Athens2
+		1Rome2
+		Tirana2
+		Nicosia2
+		2Brussels2
+		Copenhagen2
+		1Berlin2
+		Dublin2
+		8Luxembourg2
+		one more2
+		}
+textColumn$(3)={Header 3
+}
+textColumn$(4)={Header 4
+		200
+		300
+		400
+		500
+		600
+		700
+		800
+		900
+		1000
+		1100
+		1200
+		}
+With Listbox1, "ListIndex" As ListIndex, "ListCount" As  ListCount , "ShowAlways", TRUE
+With Listbox1, "Find" As Find(),  "List" As List$(), "Edit" as Edit_ok, "Center" as Center_ok
+//Edit_ok=true
+Center_ok=true
+listindex=0
+method listbox1, "addheight", 1
+method listbox1, "insertcolumn", 2, 2
+listindex=4
+method listbox1, "insert", "**New**"
+method listbox1, "Delete", listcount-1
+method listbox1, "Delete", listcount-1
+	method listbox1, "appendcolumn", 1, 600
+With Simple,"Sizable", True,"SizerWidth",90
+Function Listbox1.SoftClick {
+	call local Listbox1.CLick()
+}
+Function Listbox1.CLick {
+	read new who
+	if who=1  then
+		if editcolumn then editcolumn=false
+	else.if Listbox1.column=1  then
+		editcolumn=false
+	else
+		editcolumn=true
+	end if
+}
+Function Simple.click{
+	method listbox1, "sort",,,4, 2
+}
+Function Simple.Unload(new &Cancel) {
+	beep
+}
+Function Simple.Resize {
+	Layer Simple {
+	Mode 16
+	gradient 11, 1, 0
+//		Cursor 0, height div 2
+//		Report 2,"Hello World"
+	if Simple.Width>6000 and Simple.Height>6000 then
+		Method Listbox1,"move",1000,1000,Simple.Width-2000, Simple.Height-2000
+	end if
+	Method Listbox1,"Refresh"
+}
+\\ we put a refresh to console because
+\\ when this handler run, can't run thread k.
+Layer { Refresh}
+Method Simple, "refreshALL"
+}
+Method Simple, "Show", 1
+Declare Simple Nothing
+}
+MODULE TSTJOY2 {GOTO 1000
+MODULE SPEEDTST {
+	PRINT "SPEED TEST 2nd USING WIAT 0 IN EVERY LOOP"
+	PRINT "You can use Ctrl+C or Esc (not in Fast !)"
+	MODULE TESTA {
+		PROFILER:Z=100
+		FOR I=1 TO 100:Z++:WAIT 0::NEXT
+		PRINT PART $("0"),TIMECOUNT
+		PRINT
+	}
+	
+	MODULE TESTB {
+		PROFILER:I=100
+		WHILE I>0:I--:WAIT 0:END WHILE
+		PRINT PART $("0"),TIMECOUNT
+		PRINT
+	}
+	MODULE TESTC {
+		PROFILER:I=100
+		DO:I--::WAIT 0:UNTIL I<1
+		PRINT PART $("0"),TIMECOUNT
+		PRINT
+	}
+	MODULE TESTD {
+		PROFILER:I=100
+		{LOOP:I--:IF I<1 THEN EXIT
+		WAIT 0}:PRINT PART $("0"),TIMECOUNT
+		PRINT
+	}
+	PRINT "SET FAST"
+	SET FAST
+	TESTA
+		PRINT "FOR 100":REFRESH
+	TESTB
+		PRINT "WHILE 100":REFRESH
+	TESTC
+		PRINT "DO 100":REFRESH
+	TESTD
+		PRINT "LOOP 100":REFRESh
+
+	SET FAST
+}
+MODULE SPEEDTST2  {
+	PRINT "SPEED TEST 3nd JUST USE SLOW"
+	PRINT "You can use Ctrl+C or Esc (not in Fast !)"
+	MODULE TESTA {
+		PROFILER:Z=100000
+		FOR I=1 TO 100000:Z++:NEXT
+		PRINT PART $("0"),TIMECOUNT
+		PRINT
+	}
+	
+	MODULE TESTB {
+		PROFILER:I=100000
+		WHILE I>0:I--:END WHILE
+		PRINT PART $("0"),TIMECOUNT
+		PRINT
+	}
+	MODULE TESTC {
+		PROFILER:I=100000
+		DO:I--:UNTIL I<1
+		PRINT PART $("0"),TIMECOUNT
+		PRINT
+	}
+	MODULE TESTD {
+		PROFILER:I=100000
+		{LOOP:I--:IF I<1 THEN EXIT
+		}:PRINT PART $("0"),TIMECOUNT
+		PRINT
+	}
+	PRINT "SET SLOW"
+	SET SLOW
+	TESTA
+		PRINT "FOR 100000":REFRESH
+	TESTB
+		PRINT "WHILE 100000":REFRESH
+	TESTC
+		PRINT "DO 100000":REFRESH
+	TESTD
+		PRINT "LOOP 100000":REFRESh
+
+	SET FAST
+}
+NOTES=("C", "C#", "D","D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" )
+PRINT "THIS IS A TEST"
+SET SLOW
+IF MODULE(JOY) THEN JOY
+PRINT "WE SET SLOW"
+WAIT 2000
+
+IF MODULE(TURING) THEN TURING
+IF MODULE(FFT) THEN FFT
+PLAY 0
+PRINT "STOP AND RESTART JOY"
+PRINT "PRESS ANY KEY"
+PUSH KEY$
+DROP
+IF MODULE(JOY) THEN JOY
+IF MODULE(SPEED) THEN SPEED
+SET FAST
+WHILE  PLAYSCORE
+	N=PLAYNOTE(1): if n>-1 THEN N$= NOTES#VAL$(N MOD 12)+(N DIV 12) ELSE N$="Silence"
+	PRINT OVER $(,10), "USING SELECTION  FAST WE HAVE TO USE WAIT TO PASS TIME FOR MUSIC", N$
+	WAIT 1
+END WHILE
+PRINT
+PRINT "RESTART JOY - FINAL PART"
+PRINT "PRESS ANY KEY"
+PUSH KEY$
+DROP
+IF MODULE(JOY) THEN JOY
+SPEEDTST
+SPEEDTST2
+1000 SET FAST
+JOY
+GLOBAL KL=0
+MODULE ALFA {KL++}
+FOR I=1 TO 10000
+ALFA
+NEXT
+PRINT KL
+
+}
+MODULE TSTJOY3 {//	New editor control keys from revision 20, version 14:
+//	Use ctrl 1 to change to upper case the selected form - or for non selected this chenge keyboard to upper case
+//	Use ctrl 2 to change to lower  case the selected form - or for non selected this chenge keyboard to lower case
+//	ctrl  4  tongle comment/uncoment (line or lines) same as ctrl /
+PRINT "Play for 7 seconds only"
+JOY
+K=0
+Z1=0
+THREAD {
+	IF NOT PLAYSCORE THEN Z1=TICK:THREAD THIS ERASE
+} AS M  INTERVAL 100
+PROFILER
+Z=TICK
+AFTER 7000 {PLAY 0:  Z1=TICK}
+// Main task is a thread also, and exit if no other threads run
+MAIN.TASK 50 {
+	K+=50
+}
+PRINT TIMECOUNT, " From hi-res timer"
+PRINT K, " Computed from Main.Task thread"
+PRINT Z1-Z, " Ticks of task manager"
+PRINT TICK ' SHOULD BE ZERO - IF NO THREADS RUN
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

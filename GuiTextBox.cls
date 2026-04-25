@@ -64,7 +64,7 @@ Dim mIndex As Long, mStayOpen As Boolean
 Dim Callback As GuiM2000
 Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long
 Dim tParam As DRAWTEXTPARAMS
-Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
+Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
 Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Integer) As Long
 Public NumberOnly As Boolean
 Public NumberIntOnly As Boolean
@@ -95,7 +95,7 @@ Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
 End Sub
 Public Property Get Text() As String
 If glistN.listcount = 0 Then
-glistN.AddItem mprompt
+glistN.additem mprompt
 Else
 Text = glistN.list(0)
 End If
@@ -103,7 +103,7 @@ End Property
 Public Property Get vartext() As String
 Attribute vartext.VB_UserMemId = 0
 If glistN.listcount = 0 Then
-glistN.AddItem ""
+glistN.additem ""
 Else
 vartext = Mid$(glistN.list(0), 1 + Len(mprompt))
 End If
@@ -114,7 +114,7 @@ glistN.HeadLine = vbNullString ' no info
 glistN.HeadlineHeight = 0
 
 If glistN.listcount = 0 Then
-glistN.AddItem mprompt + RHS
+glistN.additem mprompt + RHS
 Else
 glistN.list(0) = mprompt + RHS
 End If
@@ -130,7 +130,7 @@ glistN.restrictLines = 1
 glistN.HeadLine = vbNullString ' no info
 glistN.HeadlineHeight = 0
 If glistN.listcount = 0 Then
-glistN.AddItem RHS
+glistN.additem RHS
 Else
 glistN.list(0) = RHS
 End If
@@ -280,7 +280,6 @@ End Sub
 
 
 Private Sub glistN_ChangeListItem(item As Long, content As String)
-'If Not enabled Then Exit Sub
 Dim this As String, thispos As Long, VR(2)
 thispos = glistN.SelStart - Len(mprompt)
 this = Mid$(content, 1 + Len(mprompt))
@@ -293,7 +292,6 @@ If NumberOnly Then
 End If
 
 If Len(this) < thispos Then thispos = Len(this) + 1
-'' RaiseEvent ValidString(this, thispos)
 VR(0) = this
 VR(1) = thispos
    If mIndex >= 0 Then
@@ -319,11 +317,9 @@ End Sub
 
 Private Sub glistN_ChangeSelStart(thisselstart As Long)
 If thisselstart <= Len(mprompt) Then thisselstart = Len(mprompt) + 1
-'glistN.ShowPan
 With glistN
-'.ShowPan
-.ShowMe2
-'.ExternalCursor thisselstart, .list(.ListIndex), .forecolor
+    Debug.Print thisselstart
+    .ShowMe2
 End With
 End Sub
 
@@ -1427,8 +1423,7 @@ End Property
 Private Sub glistN_AddSelStart(val As Long, shift As Integer)
 Dim W As Long, a$, l As Long, b$
 If glistN.SelStart > 0 Then
-a$ = Mid$(vartext, glistN.SelStart)
-
+a$ = Mid$(Text, glistN.SelStart)
     If Len(a$) > 0 Then
         W = AscW(a$)
         If (shift And 2) = 2 Then
@@ -1465,11 +1460,11 @@ End Sub
 Private Sub glistN_SubSelStart(val As Long, shift As Integer)
 Dim W As Long, a$, l As Long, b$
 If glistN.SelStart < 2 Then Exit Sub
-a$ = Mid$(vartext, glistN.SelStart - 1, 1)
+a$ = Mid$(Text, glistN.SelStart - 1, 1)
 If Len(a$) > 0 Then
 W = AscW(a$)
         If (shift And 2) = 2 Then
-            a$ = Mid$(vartext, 1, glistN.SelStart - 1)
+            a$ = Mid$(Text, 1, glistN.SelStart - 1)
             l = Len(a$)
             val = l
             If val = 1 Then Exit Sub

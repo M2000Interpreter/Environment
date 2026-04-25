@@ -149,7 +149,7 @@ Private Declare Function Ellipse Lib "gdi32" (ByVal hDC As Long, ByVal x1 As Lon
 Private Declare Function CreatePen Lib "gdi32" (ByVal nPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 
 Private Const PS_NULL = 5
 Private Const PS_SOLID = 0
@@ -1130,11 +1130,21 @@ Else
                                     RaiseEvent PureListOff
                                 Else
                                     RaiseEvent SetExpandSS(mSelstart + 1)
-                                    SelStartEventAlways = SelStart + 1
+                                    SelStartEventAlways = SelStart + 1  ' we think here we have one word (one character)
                                     RaiseEvent DelExpandSS
                                     RaiseEvent PureListOn
                                     pair$ = list(SELECTEDITEM - 1)
+                                    
                                     list(SELECTEDITEM - 1) = Left$(pair$, SelStart - 2) + kk$ + Mid$(pair$, SelStart - 1)
+                                    If Len(kk$) > 1 Then
+                                    ' but we have more sometimes.............
+                                    ' this eliminate the problem when we press Alt + 10473
+                                    ' now we move the cursor one more character (here we have
+                                    If AscW(kk$) > -10241 And AscW(kk$) < -9216 Then
+                                    
+                                    SelStartEventAlways = SelStart + Len(kk$) - 1
+                                    End If
+                                    End If
                                     RaiseEvent PureListOff
                                 End If
                                 RaiseEvent SetExpandSS(mSelstart)
@@ -1442,7 +1452,7 @@ If ListIndex < topitem Then topitem = ListIndex
     End If
 End Sub
 Public Sub PressKey(KeyCode As Integer, shift As Integer, Optional NoEvents As Boolean = False)
-Dim lcnt As Long, osel As Long, lsep As Long
+Dim lcnt As Long, osel As Long, lsep As Long, linetxt As String
 If shift <> 0 And KeyCode = 16 Then Exit Sub
 Timer1.enabled = False
 If BlinkON Then BlinkTimer.enabled = True
@@ -1996,8 +2006,10 @@ If mTabs = 1 Then
         If (SelStart - val) < osel Then SelStart = SelStart - val Else SelStart = osel
         
         'SelStart = SelStart - val  ' make it a delete because we want selstart to take place before list() take value     RaiseEvent PureListOn
-        RaiseEvent addone(Mid$(list(SELECTEDITEM - 1), SelStart, val))
+        'Mid$(list(SELECTEDITEM - 1), SelStart, val)        RaiseEvent addone(Mid$(list(SELECTEDITEM - 1), SelStart, val))
+        
         list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) + Mid$(list(SELECTEDITEM - 1), SelStart + val)
+        
         RaiseEvent SetExpandSS(mSelstart)
         RaiseEvent PureListOff
         ShowMe2  'refresh now
@@ -2734,8 +2746,6 @@ If (Button And 3) > 0 And myEnabled Then
              End If
                 If MultiSelect Or ListMenu(SELECTEDITEM - 1) Then
                         If ListRadio(SELECTEDITEM - 1) And ListSelected(SELECTEDITEM - 1) Then
-                        ' do nothing
-                        Stop
                         ElseIf ListRadio(SELECTEDITEM - 1) Then
                             ListSelected(SELECTEDITEM - 1) = Not ListSelected(SELECTEDITEM - 1)
                             If MultiSelect Then
@@ -2797,8 +2807,6 @@ If (Button And 3) > 0 And myEnabled Then
                 If MultiSelect Or ListMenu(SELECTEDITEM - 1) Then
                     If (X / scrTwips > 0) And (X / scrTwips < LeftMarginPixels) Then
                         If ListRadio(SELECTEDITEM - 1) And ListSelected(SELECTEDITEM - 1) Then
-                        ' do nothing
-                        Stop
                         Else
                             ListSelected(SELECTEDITEM - 1) = Not ListSelected(SELECTEDITEM - 1)
                             If MultiSelect Then
@@ -3155,11 +3163,10 @@ waitforparent = True
 End Sub
 Public Sub Dynamic()
 overrideTextHeight = 0
-   If restrictLines > 0 Then
-myt = (UserControl.ScaleHeight - mHeadlineHeightTwips) / restrictLines
+If restrictLines > 0 Then
+    myt = (UserControl.ScaleHeight - mHeadlineHeightTwips) / restrictLines
 Else
-
-myt = UserControlTextHeight() + addpixels * scrTwips
+    myt = UserControlTextHeight() + addpixels * scrTwips
 End If
 HeadlineHeight = UserControlTextHeight() / scrTwips
 mytPixels = myt / scrTwips
@@ -7588,36 +7595,36 @@ If Col >= 1 And Col <= mTabs Then
     ColumnWidth = CVar(mParts(Col) * scrTwips)
 End If
 End Property
-Public Sub QuickSortExtended(ByVal Col As Long, ByVal lb As Long, ByVal ub As Long)
+Public Sub QuickSortExtended(ByVal Col As Long, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
 On Error GoTo abc1
 Dim Piv As String, tmp As String
-     If ub - lb = 1 Then
-     M1 = lb
-      If StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Mid$(listAtColumn(ub, Col), SkipChars), mSortstyle) = 1 Then SwapListItems M1, ub
+     If UB - LB = 1 Then
+     M1 = LB
+      If StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Mid$(listAtColumn(UB, Col), SkipChars), mSortstyle) = 1 Then SwapListItems M1, UB
       Exit Sub
      Else
-       M1 = (lb + ub) \ 2 '+ 1
-             If StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Mid$(listAtColumn(lb, Col), SkipChars), mSortstyle) = 0 Then
-                M2 = ub - 1
-                M1 = lb
-                Piv = Mid$(listAtColumn(lb, Col), SkipChars)
+       M1 = (LB + UB) \ 2 '+ 1
+             If StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Mid$(listAtColumn(LB, Col), SkipChars), mSortstyle) = 0 Then
+                M2 = UB - 1
+                M1 = LB
+                Piv = Mid$(listAtColumn(LB, Col), SkipChars)
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If StrComp(Mid$(listAtColumn(ub, Col), SkipChars), Piv, mSortstyle) = -1 Then SwapListItems lb, ub
+                        If StrComp(Mid$(listAtColumn(UB, Col), SkipChars), Piv, mSortstyle) = -1 Then SwapListItems LB, UB
                         Exit Sub
                     End If
                 Loop Until StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Piv, mSortstyle) <> 0
                 Piv = Mid$(listAtColumn(M1, Col), SkipChars)
-                If M1 > lb Then If StrComp(Mid$(listAtColumn(lb, Col), SkipChars), Piv, mSortstyle) = 1 Then SwapListItems M1, lb: Piv = Mid$(listAtColumn(M1, Col), SkipChars)
+                If M1 > LB Then If StrComp(Mid$(listAtColumn(LB, Col), SkipChars), Piv, mSortstyle) = 1 Then SwapListItems M1, LB: Piv = Mid$(listAtColumn(M1, Col), SkipChars)
             Else
                 Piv = Mid$(listAtColumn(M1, Col), SkipChars)
-                M1 = lb
+                M1 = LB
                 Do While StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Piv, mSortstyle) = -1: M1 = M1 + 1: Loop
             End If
     End If
-    M2 = ub
+    M2 = UB
     Do
       Do While StrComp(Mid$(listAtColumn(M2, Col), SkipChars), Piv, mSortstyle) = 1: M2 = M2 - 1: Loop
       If M1 <= M2 Then
@@ -7628,8 +7635,8 @@ Dim Piv As String, tmp As String
       If M1 > M2 Then Exit Do
       Do While StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Piv, mSortstyle) = -1: M1 = M1 + 1: Loop
     Loop
-    If lb < M2 Then QuickSortExtended Col, lb, M2
-    If M1 < ub Then QuickSortExtended Col, M1, ub
+    If LB < M2 Then QuickSortExtended Col, LB, M2
+    If M1 < UB Then QuickSortExtended Col, M1, UB
     Exit Sub
 abc1:
     
