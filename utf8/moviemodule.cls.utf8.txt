@@ -31,7 +31,7 @@ Private Declare Function midiOutSetVolume Lib "winmm" (ByVal uDeviceID As Long, 
 Private Declare Function waveOutSetVolume Lib "winmm.dll" (ByVal uDeviceID As Long, ByVal dwVolume As Long) As Long
 Private Declare Function waveOutGetVolume Lib "winmm.dll" (ByVal uDeviceID As Long, dwVolume As Long) As Long
 
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 
 
 Private myid As Long
@@ -345,11 +345,12 @@ Public Function openMovie()
     pt$ = UCase(ExtractType(FileName))
     'Specify the mpegvideo driver to play the movies
     'type mpegvideo alias
-     If pt$ = "MID" Then
+    If pt$ = "MID" Then
     Error = mciSendString("open " + LASTF + " type sequencer alias m" + LTrim$(str$(myid)) + " ", 0, 0, 0)
     ElseIf pt$ = "WAV" Then
     Error = mciSendString("open " + LASTF + " type waveaudio alias m" + LTrim$(str$(myid)) + " ", 0, 0, 0)
-      ElseIf Left$(pt$, 2) = "MP" Then
+    
+    ElseIf Left$(pt$, 2) = "MP" Then
     Error = mciSendString("open " + LASTF + " type mpegvideo alias m" + LTrim$(str$(myid)) + " ", 0, 0, 0)
     Else
     Error = mciSendString("open " + LASTF + " alias m" + LTrim$(str$(myid)) + " ", 0, 0, 0)
@@ -488,11 +489,11 @@ Public Function getAudioStatus() As String
     Error = mciSendString("status m" + LTrim$(str$(myid)) + " audio", Data, 128, 0)
     getAudioStatus = StrPart(Data)
 End Function
-Public Function sizeLocateMovie(Left As Long, top As Long, Width As Long, Height As Long)
+Public Function sizeLocateMovie(Left As Long, Top As Long, Width As Long, Height As Long)
     'Change the size of the m"+str(myID)+" and the location of
     'the m"+str(myID)+" in Pixels
 ' 120 120 200 200 frame 0 0 200 200 source 0 0 200 200
-    Error = mciSendString("put m" + LTrim$(str$(myid)) + " window at " & Left & " " & top & " " & Width & " " & Height, 0, 0, 0)
+    Error = mciSendString("put m" + LTrim$(str$(myid)) + " window at " & Left & " " & Top & " " & Width & " " & Height, 0, 0, 0)
 
 'Error = mciSendString("put m"+str(myID)+" video 120 120 200 200 frame 0 0 200 200 source 0 0 200 200 ", 0, 0, 0)
 

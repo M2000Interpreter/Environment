@@ -921,7 +921,7 @@ If FastSymbol(r$, ",") Then
     Set pppp = tables.ValueObj
     
     Set fieldlist = pppp.item(1)
-    For i = 0 To fieldlist.count - 1
+    For i = 0 To fieldlist.Count - 1
         fieldlist.Index = i
         fieldlist.Done = True
         If fieldlist.sValue = -1 Then
@@ -937,9 +937,9 @@ If FastSymbol(r$, ",") Then
     Next i
     Set indexField = pppp.item(3)
     
-    If indexField.count > 0 Then
-    stac1.DataVal indexField.count
-    For j = 0 To pppp.item(3).count - 1
+    If indexField.Count > 0 Then
+    stac1.DataVal indexField.Count
+    For j = 0 To pppp.item(3).Count - 1
     indexField.Index = j
     indexField.Done = True
     
@@ -950,21 +950,21 @@ If FastSymbol(r$, ",") Then
     indexField.Done = False
     Next j
     End If
-stac1.PushVal indexField.count
+stac1.PushVal indexField.Count
 stac1.PushVal Fields
 Else
-For i = 0 To tables.count - 1
+For i = 0 To tables.Count - 1
 tables.Index = i
 tables.Done = True
 If tables.sValue = 0 Then
 Set pppp = tables.ValueObj
     stac1.DataStr pppp.item(20)
     
-    stac1.DataVal pppp.item(3).count
+    stac1.DataVal pppp.item(3).Count
 End If
 tables.Done = False
 Next i
-stac1.PushVal stac1.count \ 2
+stac1.PushVal stac1.Count \ 2
 End If
 
 End If
@@ -1074,11 +1074,11 @@ End If
         Set TBL = CreateObject("ADOX.TABLE")
            Set cat = CreateObject("ADOX.Catalog")
            Set cat.ActiveConnection = myBase
-           If cat.ActiveConnection.errors.count > 0 Then
+           If cat.ActiveConnection.errors.Count > 0 Then
            MyEr "Can't connect to Base", "Δεν μπορώ να συνδεθώ με τη βάση"
            Exit Function
            End If
-        If cat.tables.count > 0 Then
+        If cat.tables.Count > 0 Then
         For Each TBL In cat.tables
         
         If TBL.Type = "TABLE" Then
@@ -1088,8 +1088,8 @@ End If
         
         cnt = cnt + 1
                             stac1.DataStr TBL.Name
-                       If TBL.indexes.count > 0 Then
-                                         For j = 0 To TBL.indexes.count - 1
+                       If TBL.indexes.Count > 0 Then
+                                         For j = 0 To TBL.indexes.Count - 1
                                                    With TBL.indexes(j)
                                                    If (.Unique = False) And (.indexnulls = 0) Then
                                                         KB = True
@@ -1114,9 +1114,9 @@ End If
          cnt = 1
                      rs.open "Select * From [" + TBL.Name + "] ;", myBase, 3, 4 'adOpenStatic, adLockBatchOptimistic
                                          stac1.Flush
-                                        stac1.DataVal CDbl(rs.Fields.count)
-                                        If TBL.indexes.count > 0 Then
-                                         For j = 0 To TBL.indexes.count - 1
+                                        stac1.DataVal CDbl(rs.Fields.Count)
+                                        If TBL.indexes.Count > 0 Then
+                                         For j = 0 To TBL.indexes.Count - 1
                                                    With TBL.indexes(j)
                                                    If (.Unique = False) And (.indexnulls = 0) Then
                                                    vindx = True
@@ -1133,7 +1133,7 @@ End If
                                             Else
                                             stac1.DataVal CDbl(0)
                                         End If
-                     For i = 0 To rs.Fields.count - 1
+                     For i = 0 To rs.Fields.Count - 1
                      With rs.Fields(i)
                              stac1.DataStr .Name
                              If .Type = 203 And .DEFINEDSIZE >= 536870910# Then
@@ -1177,12 +1177,12 @@ End If
                      Next i
                      rs.Close
                      If vindx Then
-                    If TBL.indexes.count > 0 Then
-                             For j = 0 To TBL.indexes.count - 1
+                    If TBL.indexes.Count > 0 Then
+                             For j = 0 To TBL.indexes.Count - 1
                           With TBL.indexes(j)
                           If (.Unique = False) And (.indexnulls = 0) Then
-                          stac1.DataVal CDbl(.Columns.count)
-                          For K = 0 To .Columns.count - 1
+                          stac1.DataVal CDbl(.Columns.Count)
+                          For K = 0 To .Columns.Count - 1
                             stac1.DataStr .Columns(K).Name
                              stac1.DataStr inames(.Columns(K).sortorder, Lang)
                           Next K
@@ -1220,7 +1220,7 @@ End Function
 Public Function append_table(bstackstr As basetask, Base As String, r$, ed As Boolean, Optional Lang As Long = -1) As Boolean
 Dim table$, i&, par$, ok As Boolean, TT, t As Double, j&, vv, p_acc As tuple, acc As tuple
 Dim gindex As Long
-Dim mb As Mk2Base, tables As FastCollection, pppp As tuple, Temp As tuple, fieldlist As FastCollection
+Dim mb As Mk2Base, tables As FastCollection, pppp As tuple, temp As tuple, fieldlist As FastCollection
 Dim indexField As FastCollection, allkey$, prevkey$
 
  ok = False
@@ -1253,8 +1253,8 @@ If gindex > 0 Then
 Set tables = pppp.item(2)
 Set indexField = pppp.item(3)
 Set fieldlist = pppp.item(4)
-If indexField.count > 0 Then
-    If gindex > fieldlist.count + 1 Then gindex = fieldlist.count + 1
+If indexField.Count > 0 Then
+    If gindex > fieldlist.Count + 1 Then gindex = fieldlist.Count + 1
     fieldlist.Index = gindex - 1
     fieldlist.Done = True
     tables.Index = fieldlist.Value
@@ -1265,7 +1265,7 @@ If indexField.count > 0 Then
     p_acc.CopyArray acc
     tables.Done = False
 Else
-    If gindex > tables.count + 1 Then gindex = tables.count + 1
+    If gindex > tables.Count + 1 Then gindex = tables.Count + 1
     tables.Index = gindex - 1
     tables.Done = True
     Set p_acc = tables.ValueObj
@@ -1283,32 +1283,32 @@ Do
 TT = 0
 fieldlist.Index = p_acc.item(i&)
 fieldlist.Done = True
-Set Temp = fieldlist.ValueObj
+Set temp = fieldlist.ValueObj
 
 If FastSymbol(r$, ",") Then
-If i& = 0 And Temp.item(4) Then
+If i& = 0 And temp.item(4) Then
     If Not ed Then
-        acc.item(p_acc.item(i&)) = Temp.item(5)
-        Temp.item(5) = Temp.item(5) + 1
+        acc.item(p_acc.item(i&)) = temp.item(5)
+        temp.item(5) = temp.item(5) + 1
     End If
 End If
 ElseIf IsStrExp(bstackstr, r$, par$, False) Then
-    If i& = 0 And Temp.item(4) Then
+    If i& = 0 And temp.item(4) Then
         If Not ed Then
-            acc.item(p_acc.item(i&)) = Temp.item(4)
-            Temp.item(4) = Temp.item(4) + 1
+            acc.item(p_acc.item(i&)) = temp.item(4)
+            temp.item(4) = temp.item(4) + 1
         End If
-    ElseIf Temp.item(2) > 0 Then
-        acc.item(p_acc.item(i&)) = RealLeft(par$, Temp.item(2))
+    ElseIf temp.item(2) > 0 Then
+        acc.item(p_acc.item(i&)) = RealLeft(par$, temp.item(2))
     Else
         acc.item(p_acc.item(i&)) = par$
     End If
     If Not FastSymbol(r$, ",") Then Exit Do
 ElseIf IsExp(bstackstr, r$, TT, False) Then
-    If i& = 0 And Temp.item(4) Then
+    If i& = 0 And temp.item(4) Then
         If Not ed Then
-            acc.item(p_acc.item(i&)) = Temp.item(4)
-            Temp.item(4) = Temp.item(4) + 1
+            acc.item(p_acc.item(i&)) = temp.item(4)
+            temp.item(4) = temp.item(4) + 1
         End If
     Else
         acc.item(p_acc.item(i&)) = TT
@@ -1316,13 +1316,13 @@ ElseIf IsExp(bstackstr, r$, TT, False) Then
     If Not FastSymbol(r$, ",") Then Exit Do
 End If
 i& = i& + 1
-Loop Until i& = p_acc.count
+Loop Until i& = p_acc.Count
 ' now we append to table, without checking the keys (its a fault)
 Set tables = pppp.item(2)
 Set indexField = pppp.item(3)
 Set fieldlist = pppp.item(4)
-If indexField.count > 0 Then
-For j& = 0 To indexField.count - 1
+If indexField.Count > 0 Then
+For j& = 0 To indexField.Count - 1
     indexField.Index = j&
     indexField.Done = True
     If Len(allkey$) = 0 Then
@@ -1368,7 +1368,7 @@ Else
         MyEr "index key not unique", "Το κλειδί δεν είναι μοναδικό"
         Exit Function
     End If
-    fieldlist.AddKey allkey$, tables.count
+    fieldlist.AddKey allkey$, tables.Count
     If pppp.item(5) = 2 Then
         fieldlist.SortDes
     Else
@@ -1381,7 +1381,7 @@ If gindex > 0 Then
     tables.Done = True
     Set tables.ValueObj = acc
 Else
-    tables.AddKey tables.count + 1, acc
+    tables.AddKey tables.Count + 1, acc
     pppp.item(21) = pppp.item(21) + 1
 End If
 tables.Done = False
@@ -1530,7 +1530,7 @@ End Function
 Public Sub getrow(bstackstr As basetask, r$, Optional ERL As Boolean = True, Optional Search$ = " = ", Optional Lang As Long = 0, Optional IamHelpFile As Boolean = False)
 Dim stat As Long
 Dim Base As String, table$, from As Long, first$, Second$, ok As Boolean, fr As Double, stac1$, p, i&
-Dim mb As Mk2Base, tables As FastCollection, pppp As tuple, Temp As tuple, fieldlist As FastCollection, ii As Long, pppp1 As tuple
+Dim mb As Mk2Base, tables As FastCollection, pppp As tuple, temp As tuple, fieldlist As FastCollection, ii As Long, pppp1 As tuple
 Dim vv, IndexList As FastCollection, many As Long, topi As Long, temp2 As tuple, ret As Boolean
 Dim LastRead As Long
 ok = False
@@ -1594,23 +1594,23 @@ If IsStrExp(bstackstr, r$, Base, False) Then
                         If fieldlist.sValue <> -1 Then GoTo aError
                         i& = fieldlist.Index
                         ii = 0
-                        topi = tables.count
+                        topi = tables.Count
                         many = 0
-                        If IndexList.count > 0 Then
-                        topi = IndexList.count
+                        If IndexList.Count > 0 Then
+                        topi = IndexList.Count
                         While ii < topi
                             IndexList.Index = ii
                             IndexList.Done = True
                             tables.Index = IndexList.Value
                             tables.Done = True
                             If tables.sValue = 0 Then
-                                Set Temp = tables.ValueObj
-                                If Temp.count > i& Then
-                                If Temp.CompareItem(i&, p, Search$, ret) Then
+                                Set temp = tables.ValueObj
+                                If temp.Count > i& Then
+                                If temp.CompareItem(i&, p, Search$, ret) Then
                                     If ret Then
                                         from = from - 1
-                                        If temp2 Is Nothing Then Set temp2 = Temp: LastRead = ii
-                                        If from = 0 Then Set pppp1 = Temp: LastRead = ii
+                                        If temp2 Is Nothing Then Set temp2 = temp: LastRead = ii
+                                        If from = 0 Then Set pppp1 = temp: LastRead = ii
                                         
                                         many = many + 1
                                     End If
@@ -1627,14 +1627,14 @@ If IsStrExp(bstackstr, r$, Base, False) Then
                             tables.Index = ii
                             tables.Done = True
                             If tables.sValue = 0 Then
-                                Set Temp = tables.ValueObj
-                                If Temp.count > i& Then
-                                If Temp.CompareItem(i&, p, Search$, ret) Then
+                                Set temp = tables.ValueObj
+                                If temp.Count > i& Then
+                                If temp.CompareItem(i&, p, Search$, ret) Then
                                 
                                     If ret Then
                                         from = from - 1
-                                        If temp2 Is Nothing Then Set temp2 = Temp
-                                        If from = 0 Then Set pppp1 = Temp
+                                        If temp2 Is Nothing Then Set temp2 = temp
+                                        If from = 0 Then Set pppp1 = temp
                                         
                                         many = many + 1
                                     End If
@@ -1647,7 +1647,7 @@ If IsStrExp(bstackstr, r$, Base, False) Then
                             ii = ii + 1
                         Wend
                         End If
-                        If Not pppp1 Is Nothing Then Set Temp = pppp1 Else Set Temp = temp2
+                        If Not pppp1 Is Nothing Then Set temp = pppp1 Else Set temp = temp2
                         If many = 0 Then
                         bstackstr.soros.PushVal 0
                         Exit Sub
@@ -1664,8 +1664,8 @@ aError:
             End If
 
             ii = 0
-            If IndexList.count > 0 Then
-                topi = IndexList.count
+            If IndexList.Count > 0 Then
+                topi = IndexList.Count
                 
                 While from > 0 And ii < topi
                     IndexList.Index = ii
@@ -1674,7 +1674,7 @@ aError:
                     tables.Done = True
                     If tables.sValue = 0 Then
                         from = from - 1
-                        If from = 0 Then Set Temp = tables.ValueObj: LastRead = ii
+                        If from = 0 Then Set temp = tables.ValueObj: LastRead = ii
                     End If
                     ii = ii + 1
                 Wend
@@ -1682,7 +1682,7 @@ aError:
             
             
             Else
-            topi = tables.count
+            topi = tables.Count
             
             While from > 0 And ii < topi
             
@@ -1690,22 +1690,22 @@ aError:
                 tables.Done = True
                 If tables.sValue = 0 Then
                     from = from - 1
-                    If from = 0 Then Set Temp = tables.ValueObj: LastRead = ii
+                    If from = 0 Then Set temp = tables.ValueObj: LastRead = ii
                 End If
                 ii = ii + 1
             Wend
             End If
 cont001:
             pppp.item(22) = -1
-            If Not Temp Is Nothing Then
+            If Not temp Is Nothing Then
                 pppp.item(22) = LastRead
                 Set pppp1 = pppp.item(17)  ' field indexes
-                For ii = pppp1.count - 1 To 0 Step -1
+                For ii = pppp1.Count - 1 To 0 Step -1
                     from = pppp1.item(ii)
-                    If Temp.IsStringItem(from) Then
-                        bstackstr.soros.PushStrVariant Temp.item(from)
+                    If temp.IsStringItem(from) Then
+                        bstackstr.soros.PushStrVariant temp.item(from)
                     Else
-                        bstackstr.soros.PushVal Temp.item(from)
+                        bstackstr.soros.PushVal temp.item(from)
                     End If
                 Next ii
                 bstackstr.soros.PushVal many
@@ -1883,7 +1883,7 @@ id$ = "SELECT * FROM [" + table$ + "] WHERE [" + first$ + "] " + Second$
 Dim LL$
    Set rec = CreateObject("ADODB.Recordset")
  Err.Clear
- If myBase.Mode = 0 Then myBase.open
+ If myBase.mode = 0 Then myBase.open
  Err.Clear
   rec.open id$, myBase, 3, 4
 If Err.Number <> 0 Then
@@ -1923,7 +1923,7 @@ If from >= 0 Then
   End If
 End If
 
-    For i& = rec.Fields.count - 1 To 0 Step -1
+    For i& = rec.Fields.Count - 1 To 0 Step -1
     On Error Resume Next
     Err.Clear
     stat = rec.Fields(i&).status
@@ -2238,20 +2238,20 @@ For i = LBound(commands()) To UBound(commands())
         ProcTask2 bstackstr  'to allow threads to run at background.
         Set rs = myBase.Execute(commands(i))
         If Typename(rs) = "Recordset" Then
-            If rs.Fields.count > 0 Then
+            If rs.Fields.Count > 0 Then
                 Set aa = rs
                 mm.DataObj aa
                 Set aa = Nothing
                 Set rs = Nothing
             End If
         End If
-        If myBase.errors.count <> 0 Then Exit For
+        If myBase.errors.Count <> 0 Then Exit For
     End If
 Next i
 
 If mm.Total > 0 Then bstackstr.soros.MergeTop mm
-If myBase.errors.count <> 0 Then
-    For i = 0 To myBase.errors.count - 1
+If myBase.errors.Count <> 0 Then
+    For i = 0 To myBase.errors.Count - 1
         erdesc$ = erdesc$ + myBase.errors(i)
     Next i
         MyEr "Can't execute command:" + erdesc$, "Δεν μπορώ να εκτελέσω την εντολή:" + erdesc$
@@ -2404,7 +2404,7 @@ mcat.tables(Tablename).indexes("ndx").Remove
 Err.Clear
 mcat.tables(Tablename).indexes.Refresh
 
-   If mcat.tables.count > 0 Then
+   If mcat.tables.Count > 0 Then
    okntable = True
         For Each mtable In mcat.tables
         If mtable.Type = "TABLE" Then
@@ -2427,7 +2427,7 @@ Else
  mtable.indexes("ndx").Remove  ' remove the old index/
  End If
  Err.Clear
- If mcat.ActiveConnection.errors.count > 0 Then
+ If mcat.ActiveConnection.errors.Count > 0 Then
  mcat.ActiveConnection.errors.Clear
  End If
  Err.Clear
@@ -2451,8 +2451,8 @@ Else
                  
         End If
         Wend
-        If pIndex.Columns.count > 0 Then
-        If mtable.indexes.count = 1 Then
+        If pIndex.Columns.Count > 0 Then
+        If mtable.indexes.Count = 1 Then
         mtable.indexes.Delete pIndex.Name
         End If
         mtable.indexes.Append pIndex
@@ -2615,7 +2615,7 @@ End If
          Set mtable.parentcatalog = cat
 ' check if table exist
 
-           If cat.tables.count > 0 Then
+           If cat.tables.Count > 0 Then
         For Each mtable In cat.tables
           If mtable.Type = "TABLE" Then
         If mtable.Name = Tablename Then
@@ -2710,11 +2710,11 @@ Sub BaseCompact(bstackstr As basetask, r$)
 
 Dim Base As String, conn, BASE2 As String, realtype$
 If Not IsStrExp(bstackstr, r$, Base, False) Then
-MissParam r$
+missParam r$
 Else
 If FastSymbol(r$, ",") Then
 If Not IsStrExp(bstackstr, r$, BASE2, False) Then
-MissParam r$
+missParam r$
 Exit Sub
 End If
 End If
@@ -2777,7 +2777,7 @@ End If
 End Sub
 
 Public Function DELfields(bstackstr As basetask, r$) As Boolean
-Dim Base$, table$, first$, Second$, ok As Boolean, p As Double, vv, usehandler As mHandler
+Dim Base$, table$, first$, Second$, ok As Boolean, p, vv, usehandler As mHandler
 ok = False
 If IsExp(bstackstr, r$, p) Then
 If bstackstr.lastobj Is Nothing Then
@@ -2788,7 +2788,7 @@ If Not TypeOf bstackstr.lastobj Is mHandler Then
 GoTo ee1
 Else
 Set usehandler = bstackstr.lastobj
-If Not usehandler.T1 = 1 Then
+If Not usehandler.t1 = 1 Then
 ee1:
 MyEr "Expected Inventory", "Περίμενα Κατάσταση"
 Exit Function
@@ -2804,7 +2804,7 @@ Set bstackstr.lastobj = Nothing
 Set usehandler = Nothing
 Do While FastSymbol(r$, ",")
 ok = False
-If IsExp(bstackstr, r$, p) Then
+If IsExp(bstackstr, r$, p, , True) Then
 aa.Remove p
 If Not aa.Done Then MyEr "Key not exist", "Δεν υπάρχει τέτοιο κλειδί": Exit Do
 ok = True
@@ -2853,22 +2853,22 @@ ok = True
         Second$ = LTrim$(str(p))
     End If
 Else
-MissParam r$
+missParam r$
 End If
 Else
-MissParam r$
+missParam r$
 
 End If
 Else
-MissParam r$
+missParam r$
 
 End If
 Else
-MissParam r$
+missParam r$
 
 End If
 Else
-MissParam r$
+missParam r$
 End If
 Else
 On Error Resume Next
@@ -2884,7 +2884,7 @@ End If
 
 End If
 Else
-MissParam r$
+missParam r$
 End If
 If Not ok Then DELfields = False: Exit Function
 On Error Resume Next
@@ -2943,7 +2943,7 @@ Dim rec
    Else
    myBase.errors.Clear
    myBase.Execute "DELETE * FROM [" + table$ + "] WHERE " + first$ + " = " + Second$
-   If myBase.errors.count > 0 Then
+   If myBase.errors.Count > 0 Then
    MyEr "Can't delete " + table$, "Δεν μπορώ να διαγράψω"
    Else
     DELfields = True
@@ -2984,10 +2984,10 @@ Sub CloseAllConnections()
 Dim v As Variant, bb As Boolean
 On Error Resume Next
 If Not Init Then Exit Sub
-If conCollection.count > 0 Then
+If conCollection.Count > 0 Then
 Dim i As Long
 Err.Clear
-For i = conCollection.count - 1 To 0 Step -1
+For i = conCollection.Count - 1 To 0 Step -1
 On Error Resume Next
 conCollection.Index = i
 If conCollection.IsObj Then
@@ -3000,7 +3000,7 @@ Else
 With conCollection.ValueObj
 bb = .ConnectionString <> ""
 If Err.Number = 0 Then
-If .Mode > 0 Then
+If .mode > 0 Then
 If .state = 1 Then
    .Close
 ElseIf .state = 2 Then
@@ -3044,7 +3044,7 @@ conthere:
         mb.Close_
     ElseIf vv.ConnectionString <> "" Then
     
-    If Err.Number = 0 And vv.Mode <> 0 Then vv.Close
+    If Err.Number = 0 And vv.mode <> 0 Then vv.Close
     Err.Clear
     End If
     conCollection.Remove conname

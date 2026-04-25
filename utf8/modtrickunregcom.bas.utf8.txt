@@ -8,7 +8,7 @@ Private Declare Function CopyBytes Lib "msvbvm60.dll" Alias "__vbaCopyBytes" (By
 
 Private Declare Function ObjSetAddRef Lib "msvbvm60.dll" Alias "__vbaObjSetAddref" (ByRef objDest As Object, ByVal pObject As Long) As Long
 Private Declare Function ObjSetNoRef Lib "msvbvm60.dll" Alias "__vbaObjSet" (dstObject As Any, ByVal srcObjPtr As Long) As Long
-Public Type guid
+Public Type GUID
     Data1       As Long
     Data2       As Integer
     Data3       As Integer
@@ -37,10 +37,10 @@ Private Type ITypeInfo
     ReleaseVarDesc              As Long    '54
 End Type
 Private Declare Function ProgIDFromCLSID Lib "ole32.dll" ( _
-                         ByRef Clsid As guid, _
+                         ByRef Clsid As GUID, _
                          lpszProgID As Long) As Long
 Private Declare Function StringFromCLSID Lib "ole32.dll" ( _
-                         ByRef Clsid As guid, _
+                         ByRef Clsid As GUID, _
                          lpszProgID As Long) As Long
 Public Declare Function CoTaskMemAlloc Lib "ole32.dll" _
                             (ByVal hMem As Long) As Long
@@ -49,7 +49,7 @@ Public Declare Sub CoTaskMemFree Lib "ole32.dll" _
                             (ByVal hMem As Long)
 Private Declare Function CLSIDFromString Lib "ole32.dll" ( _
                          ByVal lpszCLSID As Long, _
-                         ByRef Clsid As guid) As Long
+                         ByRef Clsid As GUID) As Long
 Private Declare Function GetMem4 Lib "msvbvm60" ( _
                          ByRef Src As Any, _
                          ByRef Dst As Any) As Long
@@ -101,8 +101,8 @@ Private Const TKIND_RECORD        As Long = 1
 Private Const TKIND_ENUM          As Long = 0
 '
 
-Dim iidClsFctr      As guid
-Dim iidUnk          As guid
+Dim iidClsFctr      As GUID
+Dim iidUnk          As GUID
 Dim isinit          As Boolean
 '' ADDED BY GEORGE
 ' parameter description by [rm] 2005
@@ -139,7 +139,7 @@ End Type
 
 
 Public Type TYPEATTR
-    guid(15)                As Byte
+    GUID(15)                As Byte
     tLCID                   As Long
     dwReserved              As Long
     memidConstructor        As Long
@@ -289,7 +289,7 @@ End Enum
 
 
 
-Public Function GetGUIDstr(G As guid) As String
+Public Function GetGUIDstr(G As GUID) As String
 Dim ret As Long, here As Long
 
 ret = StringFromCLSID(G, here)
@@ -297,7 +297,7 @@ If ret Then Exit Function
 GetGUIDstr = GetBStrFromPtr(here)
 CoTaskMemFree here
 End Function
-Public Function strProgID(G As guid) As String
+Public Function strProgID(G As GUID) As String
 Dim ret As Long, here As Long
 
 ret = ProgIDFromCLSID(G, here)
@@ -307,7 +307,7 @@ CoTaskMemFree here
 End Function
 
 Public Function strProgIDfromSrting(IID_IClassFactory As String) As String
-Dim ret As Long, here As Long, iidClsFctr As guid
+Dim ret As Long, here As Long, iidClsFctr As GUID
 CLSIDFromString StrPtr(IID_IClassFactory), iidClsFctr
 ret = ProgIDFromCLSID(iidClsFctr, here)
 If ret Then Exit Function
@@ -320,14 +320,14 @@ End Function
 ' // Get all co-classes described in type library.
 Public Function GetAllCoclasses( _
                 ByRef path As String, _
-                ByRef listOfClsid() As guid, _
+                ByRef listOfClsid() As GUID, _
                 ByRef listOfNames() As String, _
                 ByRef countCoClass As Long) As Boolean
                 
     Dim typeLib As IUnknown
     Dim typeInf As IUnknown
     Dim ret     As Long
-    Dim count   As Long
+    Dim Count   As Long
     Dim Index   As Long
     Dim pAttr   As Long
     Dim tKind   As Long
@@ -339,15 +339,15 @@ Public Function GetAllCoclasses( _
         Exit Function
     End If
     
-    count = ITypeLib_GetTypeInfoCount(typeLib)
+    Count = ITypeLib_GetTypeInfoCount(typeLib)
     countCoClass = 0
     
-    If count > 0 Then
+    If Count > 0 Then
     
-        ReDim listOfClsid(count - 1)
-        ReDim listOfNames(count - 1)
+        ReDim listOfClsid(Count - 1)
+        ReDim listOfNames(Count - 1)
         
-        For Index = 0 To count - 1
+        For Index = 0 To Count - 1
         
             ret = ITypeLib_GetTypeInfo(typeLib, Index, typeInf)
                         
@@ -405,7 +405,7 @@ Public Function ResolveObjPtrNoRef(ByVal Ptr As Long) As IUnknown
 ObjSetNoRef ResolveObjPtrNoRef, Ptr
 End Function
 
-Public Function GetAllMembers(mList As FastCollection, Obj As Object _
+Public Function GetAllMembers(mList As FastCollection, obj As Object _
                ) As Boolean
     Dim IDsp        As IDispatch.IDispatchM2000
     Dim IDsp1        As IDispatch.IDispatchM2000
@@ -421,7 +421,7 @@ Public Function GetAllMembers(mList As FastCollection, Obj As Object _
     Dim ret As Long, pctinfo As Long, ppTInfo As Long, typeInf As IUnknown
     Dim pAttr   As Long
     Dim tKind   As Long
-    Set IDsp = Obj
+    Set IDsp = obj
     Dim cFncs As Long, cVars As Long, ttt$
     Dim i As Long
     Dim j As Long
@@ -465,7 +465,7 @@ Public Function GetAllMembers(mList As FastCollection, Obj As Object _
     If (TKIND_DISPATCH And mAttr.typekind) > 0 Then
     
         cFuncs = mAttr.cFuncs '' mAttr.cVars
-        Debug.Print mAttr.cImplTypes
+     '   Debug.Print mAttr.cImplTypes
         For j = 0 To mAttr.cFuncs - 1
             ITypeInfo_GetFuncDesc typeInf, j, ppFuncDesc
             CpyMem fncdsc, ByVal ppFuncDesc, Len(fncdsc)
@@ -553,7 +553,7 @@ End Function
 ' // Create IDispach implementation described in type library.
 ' // not used
 Public Function CreateIDispatch( _
-                ByRef Obj As IUnknown, _
+                ByRef obj As IUnknown, _
                 ByRef typeLibPath As String, _
                 ByRef interfaceName As String) As Object
                 
@@ -583,14 +583,14 @@ Public Function CreateIDispatch( _
     ITypeInfo_ReleaseTypeAttr typeInf, pAttr
     
     If tKind = TKIND_DISPATCH Then
-        Set CreateIDispatch = Obj
+        Set CreateIDispatch = obj
         Exit Function
     ElseIf tKind <> TKIND_INTERFACE Then
         Err.Raise &H80004002, , "Interface not found"
         Exit Function
     End If
   
-    ret = CreateStdDispatch(Nothing, Obj, typeInf, retObj)
+    ret = CreateStdDispatch(Nothing, obj, typeInf, retObj)
     If ret Then
         Err.Raise ret
         Exit Function
@@ -611,7 +611,7 @@ Public Function CreateObjectEx2( _
     Dim ret     As Long
     Dim pAttr   As Long
     Dim tKind   As Long
-    Dim Clsid   As guid
+    Dim Clsid   As GUID
     
     ret = LoadTypeLibEx(StrPtr(pathToTLB), REGKIND_NONE, typeLib)
     
@@ -647,7 +647,7 @@ End Function
 ' // Create object by CLSID and path.
 Public Function CreateObjectEx( _
                 ByRef path As String, _
-                ByRef Clsid As guid) As IUnknown
+                ByRef Clsid As GUID) As IUnknown
                 
     Dim hLib    As Long
     Dim lpAddr  As Long
@@ -737,8 +737,8 @@ End Function
 ' // Call "DllGetClassObject" function using a pointer.
 Public Function DllGetClassObject( _
                  ByVal funcAddr As Long, _
-                 ByRef Clsid As guid, _
-                 ByRef IID As guid, _
+                 ByRef Clsid As GUID, _
+                 ByRef IID As GUID, _
                  ByRef out As IUnknown) As Long
                  
     Dim params(2)   As Variant
@@ -781,9 +781,9 @@ End Function
 
 ' // Call "IClassFactory:CreateInstance" method.
 Public Function IClassFactory_CreateInstance( _
-                 ByVal Obj As IUnknown, _
+                 ByVal obj As IUnknown, _
                  ByVal punkOuter As Long, _
-                 ByRef riid As guid, _
+                 ByRef riid As GUID, _
                  ByRef out As IUnknown) As Long
     
     Dim params(2)   As Variant
@@ -801,7 +801,7 @@ Public Function IClassFactory_CreateInstance( _
         list(pIndex) = VarPtr(params(pIndex)):   types(pIndex) = VarType(params(pIndex))
     Next
     
-    resultCall = DispCallFunc(Obj, &HC, CC_STDCALL, vbLong, 3, types(0), list(0), pReturn)
+    resultCall = DispCallFunc(obj, &HC, CC_STDCALL, vbLong, 3, types(0), list(0), pReturn)
           
     If resultCall Then Err.Raise resultCall: Exit Function
      
@@ -811,12 +811,12 @@ End Function
 
 ' // Call "ITypeLib:GetTypeInfoCount" method.
 Public Function ITypeLib_GetTypeInfoCount( _
-                 ByVal Obj As IUnknown) As Long
+                 ByVal obj As IUnknown) As Long
     
     Dim resultCall  As Long
     Dim pReturn     As Variant
 
-    resultCall = DispCallFunc(Obj, &HC, CC_STDCALL, vbLong, 0, ByVal 0&, ByVal 0&, pReturn)
+    resultCall = DispCallFunc(obj, &HC, CC_STDCALL, vbLong, 0, ByVal 0&, ByVal 0&, pReturn)
           
     If resultCall Then Err.Raise resultCall: Exit Function
      
@@ -826,7 +826,7 @@ End Function
 
 ' // Call "ITypeLib:GetTypeInfo" method.
 Public Function ITypeLib_GetTypeInfo( _
-                 ByVal Obj As IUnknown, _
+                 ByVal obj As IUnknown, _
                  ByVal Index As Long, _
                  ByRef ppTInfo As IUnknown) As Long
     
@@ -844,7 +844,7 @@ Public Function ITypeLib_GetTypeInfo( _
         list(pIndex) = VarPtr(params(pIndex)):   types(pIndex) = VarType(params(pIndex))
     Next
     
-    resultCall = DispCallFunc(Obj, &H10, CC_STDCALL, vbLong, 2, types(0), list(0), pReturn)
+    resultCall = DispCallFunc(obj, &H10, CC_STDCALL, vbLong, 2, types(0), list(0), pReturn)
           
     If resultCall Then Err.Raise resultCall: Exit Function
      
@@ -854,7 +854,7 @@ End Function
 
 ' // Call "ITypeLib:FindName" method.
 Public Function ITypeLib_FindName( _
-                 ByVal Obj As IUnknown, _
+                 ByVal obj As IUnknown, _
                  ByRef szNameBuf As String, _
                  ByVal lHashVal As Long, _
                  ByRef ppTInfo As IUnknown, _
@@ -878,7 +878,7 @@ Public Function ITypeLib_FindName( _
         list(pIndex) = VarPtr(params(pIndex)):   types(pIndex) = VarType(params(pIndex))
     Next
     
-    resultCall = DispCallFunc(Obj, &H2C, CC_STDCALL, vbLong, 5, types(0), list(0), pReturn)
+    resultCall = DispCallFunc(obj, &H2C, CC_STDCALL, vbLong, 5, types(0), list(0), pReturn)
           
     If resultCall Then Err.Raise resultCall: Exit Function
      
@@ -887,7 +887,7 @@ Public Function ITypeLib_FindName( _
 End Function
 
 Public Sub ITypeInfo_GetVarDesc( _
-            ByVal Obj As IUnknown, _
+            ByVal obj As IUnknown, _
             ByVal Index As Long, _
             ByRef ppVarAttr As Long)
     
@@ -903,37 +903,37 @@ Public Sub ITypeInfo_GetVarDesc( _
        For pIndex = 0 To UBound(params)
         list(pIndex) = VarPtr(params(pIndex)):   types(pIndex) = VarType(params(pIndex))
     Next
-    resultCall = DispCallFunc(Obj, &H18, CC_STDCALL, vbLong, 2, types(0), list(0), pReturn)
+    resultCall = DispCallFunc(obj, &H18, CC_STDCALL, vbLong, 2, types(0), list(0), pReturn)
           
     If resultCall Then Err.Raise resultCall
 End Sub
 Public Sub ITypeInfo_ReleaseVarDesc( _
-            ByVal Obj As IUnknown, _
+            ByVal obj As IUnknown, _
             ByVal ppVarAttr As Long)
     
     Dim resultCall  As Long
     
-    resultCall = DispCallFunc(Obj, &H54, CC_STDCALL, vbEmpty, 1, vbLong, VarPtr(CVar(ppVarAttr)), 0)
+    resultCall = DispCallFunc(obj, &H54, CC_STDCALL, vbEmpty, 1, vbLong, VarPtr(CVar(ppVarAttr)), 0)
           
     If resultCall Then Err.Raise resultCall
 
 End Sub
 ' // Call "ITypeInfo:GetTypeAttr" method.
 Public Sub ITypeInfo_GetTypeAttr( _
-            ByVal Obj As IUnknown, _
+            ByVal obj As IUnknown, _
             ByRef ppTypeAttr As Long)
     
     Dim resultCall  As Long
     Dim pReturn     As Variant
     ppTypeAttr = 0
     pReturn = VarPtr(ppTypeAttr)
-    resultCall = DispCallFunc(Obj, &HC, CC_STDCALL, vbEmpty, 1, vbLong, VarPtr(pReturn), 0)
+    resultCall = DispCallFunc(obj, &HC, CC_STDCALL, vbEmpty, 1, vbLong, VarPtr(pReturn), 0)
     If ppTypeAttr = 0 Then Exit Sub
     If resultCall Then Err.Raise resultCall
 
 End Sub
 Public Sub ITypeInfo_GetRefTypeOfImplType( _
-            ByVal Obj As IUnknown, _
+            ByVal obj As IUnknown, _
             ByVal Index As Long, _
             ByRef pRefType As Long)
     Dim resultCall  As Long
@@ -948,14 +948,14 @@ Public Sub ITypeInfo_GetRefTypeOfImplType( _
        For pIndex = 0 To UBound(params)
         list(pIndex) = VarPtr(params(pIndex)):   types(pIndex) = VarType(params(pIndex))
     Next
-    resultCall = DispCallFunc(Obj, &H20, CC_STDCALL, vbLong, 2, types(0), list(0), pReturn)
+    resultCall = DispCallFunc(obj, &H20, CC_STDCALL, vbLong, 2, types(0), list(0), pReturn)
     If resultCall Then Err.Raise resultCall
 
         
 End Sub
 
 Public Sub ITypeInfo_GetFuncDesc( _
-            ByVal Obj As IUnknown, _
+            ByVal obj As IUnknown, _
             ByVal Index As Long, _
             ByRef ppFuncAttr As Long)
     
@@ -971,7 +971,7 @@ Public Sub ITypeInfo_GetFuncDesc( _
        For pIndex = 0 To UBound(params)
         list(pIndex) = VarPtr(params(pIndex)):   types(pIndex) = VarType(params(pIndex))
     Next
-    resultCall = DispCallFunc(Obj, &H14, CC_STDCALL, vbLong, 2, types(0), list(0), pReturn)
+    resultCall = DispCallFunc(obj, &H14, CC_STDCALL, vbLong, 2, types(0), list(0), pReturn)
           
     If resultCall Then Err.Raise resultCall
 
@@ -979,7 +979,7 @@ End Sub
 
 ' // Call "ITypeInfo:GetDocumentation" method.
 Public Function ITypeInfo_GetDocumentation( _
-                 ByVal Obj As IUnknown, _
+                 ByVal obj As IUnknown, _
                  ByVal memid As Long, _
                  ByRef pBstrName As String, _
                  ByRef pBstrDocString As String, _
@@ -1003,7 +1003,7 @@ Public Function ITypeInfo_GetDocumentation( _
         list(pIndex) = VarPtr(params(pIndex)):   types(pIndex) = VarType(params(pIndex))
     Next
     
-    resultCall = DispCallFunc(Obj, &H30, CC_STDCALL, vbLong, 5, types(0), list(0), pReturn)
+    resultCall = DispCallFunc(obj, &H30, CC_STDCALL, vbLong, 5, types(0), list(0), pReturn)
           
     If resultCall Then Err.Raise resultCall: Exit Function
      
@@ -1011,7 +1011,7 @@ Public Function ITypeInfo_GetDocumentation( _
     
 End Function
 Public Function ITypeInfo_GetNames( _
-                 ByVal Obj As IUnknown, _
+                 ByVal obj As IUnknown, _
                  ByVal memid As Long, _
                  pBstrName() As String, _
                  ByVal cMaxNames As Long, _
@@ -1033,7 +1033,7 @@ Public Function ITypeInfo_GetNames( _
         list(pIndex) = VarPtr(params(pIndex)):   types(pIndex) = VarType(params(pIndex))
     Next
 
-    resultCall = DispCallFunc(Obj, &H1C, CC_STDCALL, vbLong, 4, types(0), list(0), pReturn)
+    resultCall = DispCallFunc(obj, &H1C, CC_STDCALL, vbLong, 4, types(0), list(0), pReturn)
           
     If resultCall Then Err.Raise resultCall: Exit Function
      
@@ -1041,7 +1041,7 @@ Public Function ITypeInfo_GetNames( _
     
 End Function
 Public Sub ITypeInfo_GetRefTypeInfo( _
-            ByVal Obj As IUnknown, _
+            ByVal obj As IUnknown, _
             ByVal hreftype As Long, _
             ByRef ppTInfo As Long)
   
@@ -1058,29 +1058,29 @@ Public Sub ITypeInfo_GetRefTypeInfo( _
        For pIndex = 0 To UBound(params)
         list(pIndex) = VarPtr(params(pIndex)):   types(pIndex) = VarType(params(pIndex))
     Next
-    resultCall = DispCallFunc(Obj, &H38, CC_STDCALL, vbLong, 2, types(0), list(0), pReturn)
+    resultCall = DispCallFunc(obj, &H38, CC_STDCALL, vbLong, 2, types(0), list(0), pReturn)
     If resultCall Then Err.Raise resultCall
  
   
             End Sub
 ' // Call "ITypeInfo:ReleaseTypeAttr" method.
 Public Sub ITypeInfo_ReleaseTypeAttr( _
-            ByVal Obj As IUnknown, _
+            ByVal obj As IUnknown, _
             ByVal ppTypeAttr As Long)
     
     Dim resultCall  As Long
     
-    resultCall = DispCallFunc(Obj, &H4C, CC_STDCALL, vbEmpty, 1, vbLong, VarPtr(CVar(ppTypeAttr)), 0)
+    resultCall = DispCallFunc(obj, &H4C, CC_STDCALL, vbEmpty, 1, vbLong, VarPtr(CVar(ppTypeAttr)), 0)
     If resultCall Then Err.Raise resultCall
 
 End Sub
 Public Sub ITypeInfo_ReleaseFuncDesc( _
-            ByVal Obj As IUnknown, _
+            ByVal obj As IUnknown, _
             ByVal ppFuncAttr As Long)
     
     Dim resultCall  As Long
     
-    resultCall = DispCallFunc(Obj, &H50, CC_STDCALL, vbEmpty, 1, vbLong, VarPtr(CVar(ppFuncAttr)), 0)
+    resultCall = DispCallFunc(obj, &H50, CC_STDCALL, vbEmpty, 1, vbLong, VarPtr(CVar(ppFuncAttr)), 0)
     If resultCall Then Err.Raise resultCall
 
 End Sub

@@ -24,8 +24,6 @@ Private Declare Function GetForegroundWindow Lib "user32" () As Long
 Private mEnabled As Boolean
 Dim Iam As Boolean
 Public UseOnlyTheList As Boolean
-'' autocomplete isn't check yet for GuiDropDown...
-'' next...time...
 Public AutoComplete As Boolean
 Public NoCaseSensitive As Boolean
 Public SkipFirstClick As Boolean
@@ -446,7 +444,7 @@ End Sub
 Private Sub textbox_KeyDown(KeyCode As Integer, shift As Integer)
 'If Not glistN.enabled Then KeyCode = 0: shift = 0: Exit Sub
 Dim b$
-Dim gl As Long, X As Long, x1 As gList, XX As Boolean
+Dim gl As Long, X As Long, x1 As gList, XX As Boolean, W As Long
 Iam = True
 If KeyCode = vbKeyRight And Len(MenuGroup) <> 0 Then
 Set x1 = Textbox.glistN
@@ -520,34 +518,51 @@ If Pad.Visible Then If glistN.Visible Then glistN.enabled = True: Textbox.SkipPr
       Callback.Callback mesCtrlName + ".OpenMenu(" + str(-1) + ")"
       End If
     gl = glistN.listcount
-     If gl = 0 Then
-     '  If Callback.Visible Then Callback.SetFocus
-        Exit Sub
-     End If
+     If gl = 0 Then Exit Sub
      If mMenuStyle Then
-     If mMenuWidth > 1000 Then
-     Pad.Width = mMenuWidth
+        If mMenuWidth > 1000 Then
+            Pad.Width = mMenuWidth
+        Else
+            Pad.Width = Callback.Controls(ctrlName).Width
+        End If
      Else
-     Pad.Width = Callback.Controls(ctrlName).Width
-     End If
-     Else
-Pad.Width = CLng(Callback.Controls(ctrlName).Width / 1.618 * dv15) \ dv15
-End If
-If Callback.Controls(ctrlName).Height * gl < VirtualScreenHeight() * 3 / 5 Then
+        Pad.Width = CLng(Callback.Controls(ctrlName).Width / 1.618 * dv15) \ dv15
+    End If
+Dim hmonitor As Long
+hmonitor = FindMonitorFromPixel(Callback.Controls(ctrlName).Left, Callback.Controls(ctrlName).Top)
 
+If (1 - (Callback.Controls(ctrlName).Top + Callback.Top - Callback.Controls(ctrlName).Height) / ScrInfo(hmonitor).Height) > 3 / 5 Then
+    If gl > (ScrInfo(hmonitor).Height - Callback.Controls(ctrlName).Top + ScrInfo(hmonitor).Top - Callback.Top - Callback.Controls(ctrlName).Height - 2 * dv15 * glistN.BorderStyle) \ Callback.Controls(ctrlName).Height - 1 Then
+        gl = (ScrInfo(hmonitor).Height - Callback.Controls(ctrlName).Top + ScrInfo(hmonitor).Top - Callback.Top - Callback.Controls(ctrlName).Height - 2 * dv15 * glistN.BorderStyle) \ Callback.Controls(ctrlName).Height - 1
+    End If
+ElseIf ((Callback.Controls(ctrlName).Top + Callback.Top - Callback.Controls(ctrlName).Height) \ ScrInfo(hmonitor).Height) < 3 / 5 Then
+    If gl > ((Callback.Controls(ctrlName).Top + Callback.Top) - 2 * dv15 * glistN.BorderStyle) \ Callback.Controls(ctrlName).Height Then
+        gl = ((Callback.Controls(ctrlName).Top + Callback.Top) - 2 * dv15 * glistN.BorderStyle) \ Callback.Controls(ctrlName).Height
+    End If
+ElseIf gl > ((Callback.Controls(ctrlName).Top + Callback.Top) - 2 * dv15 * glistN.BorderStyle) \ Callback.Controls(ctrlName).Height Then
+    gl = ((Callback.Controls(ctrlName).Top + Callback.Top) - 2 * dv15 * glistN.BorderStyle) \ Callback.Controls(ctrlName).Height
+End If
+If gl > (ScrInfo(hmonitor).Height * 3 / 5) \ Callback.Controls(ctrlName).Height Then
+    gl = (ScrInfo(hmonitor).Height * 3 / 5) \ Callback.Controls(ctrlName).Height
+End If
+If gl < 1 Then gl = 1
 Pad.Controls(1).Height = Callback.Controls(ctrlName).Height * gl + 2 * dv15 * glistN.BorderStyle
 glistN.restrictLines = gl
-Pad.Height = Pad.Controls(1).Height ' Callback.Controls(ctrlName).Height * glistN.restrictLines + 2 * dv15
-Else
-Pad.Controls(1).Height = Callback.Controls(ctrlName).Height * Int(VirtualScreenHeight() * 3 / 5 / Callback.Controls(ctrlName).Height) + 2 * dv15 * glistN.BorderStyle
-glistN.restrictLines = (VirtualScreenHeight() * 3 / 5) \ Callback.Controls(ctrlName).Height
 Pad.Height = Pad.Controls(1).Height
-
-End If
+If AutoComplete Then
+glistN.AutoHide = True
+glistN.CalcAndShowBar
+glistN.StickBar = False
+glistN.ShowBar = True
+Else
 
 glistN.AutoHide = False
 glistN.StickBar = False
 glistN.ShowBar = False
+If mMenuStyle Then
+glistN.ScrollTo 0
+End If
+End If
 glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
 
     Textbox.SkipProcAtExitFocus = True
@@ -589,15 +604,30 @@ ElseIf KeyCode = vbKeyTab Then
 If Not mMenuStyle Then Callback.LastActive = vbNullString
 Textbox.SkipProcAtExitFocus = False
 Pad.Visible = False
+
 'glistN.Visible = False
 ElseIf AutoComplete And KeyCode = vbKeyRight And Textbox.SelStart >= Len(Textbox.Text) Then
 b$ = Myleft$(Textbox.glistN.LastLinePart, 1)
-If b$ <> "" Then Textbox.glistN.LastLinePart = Mid$(Textbox.glistN.LastLinePart, 2)
+If Len(b$) > 0 Then
+W = AscW(b$)
+'If W > -9217 And W < -8192 Then
+If W > -10241 And W < -9216 Then
+b$ = Myleft$(Textbox.glistN.LastLinePart, 2)
+Textbox.glistN.LastLinePart = Mid$(Textbox.glistN.LastLinePart, 3)
+Textbox.SelStart = Textbox.SelStart + 1
+Else
+Textbox.glistN.LastLinePart = Mid$(Textbox.glistN.LastLinePart, 2)
+End If
+End If
+
 Textbox.Text = Textbox.Text + b$
 ElseIf KeyCode = vbKeyReturn Then
 If Edit Then
 If Not mMenuStyle Then If Textbox.glistN.TabStopSoft Then Callback.LastActive = ctrlName
-
+If AutoComplete Then
+    Textbox.glistN.LastLinePart = ""
+    Textbox.glistN.ShowMe2
+End If
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".DblClick(" + str(mIndex) + "," + str(-1) + ")"
    Else
@@ -622,8 +652,14 @@ Textbox.glistN.NoCaretShow = True
 
 If Textbox.glistN.BackStyle = 1 Then Textbox.glistN.CenterText = True
 
-If Not mMenuStyle Then If Callback.LastActive <> ctrlName Then Textbox.glistN.ShowMe: Callback.LastActive = ctrlName
-
+If Not mMenuStyle Then
+If Callback.LastActive <> ctrlName Then
+If AutoComplete Then
+Textbox.glistN.LastLinePart = ""
+End If
+Textbox.glistN.ShowMe: Callback.LastActive = ctrlName
+End If
+End If
 glistN.BypassLeaveonChoose = False
 If Iam Then
 If Not mMenuStyle Then Pad.Visible = False
@@ -737,34 +773,47 @@ If (Button And 1) = 1 And Not Pad.Visible Then
       End If
 gl = glistN.listcount
 If gl = 0 Then Exit Sub
-
+Pad.Width = CLng(Callback.Controls(ctrlName).Width / 1.618 * dv15) \ dv15
 Textbox.glistN.DropKey = True
 If glistN.Visible Then glistN.enabled = True: Textbox.SkipProcAtExitFocus = True: glistN.SetFocus: Textbox.glistN.DropKey = False: Exit Sub
 ' never come here with mMenuStule
-'If mMenuStyle Then
-'     If mMenuWidth > 1000 Then
-'     Pad.Width = mMenuWidth
-'     Else
-'     Pad.Width = Callback.Controls(ctrlName).Width
-'     End If
-'     Else
-'Pad.Width = CLNG(Callback.Controls(ctrlName).Width / 1.618 * dv15) \ dv15
-'End If
+Dim hmonitor As Long
+hmonitor = FindMonitorFromPixel(Callback.Controls(ctrlName).Left, Callback.Controls(ctrlName).Top)
 
-If Callback.Controls(ctrlName).Height * gl < ScrY() * 3 / 5 Then
+If (1 - (Callback.Controls(ctrlName).Top + Callback.Top - Callback.Controls(ctrlName).Height) / ScrInfo(hmonitor).Height) > 3 / 5 Then
+    If gl > (ScrInfo(hmonitor).Height - Callback.Controls(ctrlName).Top + ScrInfo(hmonitor).Top - Callback.Top - Callback.Controls(ctrlName).Height - 2 * dv15 * glistN.BorderStyle) \ Callback.Controls(ctrlName).Height - 1 Then
+        gl = (ScrInfo(hmonitor).Height - Callback.Controls(ctrlName).Top + ScrInfo(hmonitor).Top - Callback.Top - Callback.Controls(ctrlName).Height - 2 * dv15 * glistN.BorderStyle) \ Callback.Controls(ctrlName).Height - 1
+    End If
+ElseIf ((Callback.Controls(ctrlName).Top + Callback.Top - Callback.Controls(ctrlName).Height) \ ScrInfo(hmonitor).Height) < 3 / 5 Then
+    If gl > ((Callback.Controls(ctrlName).Top + Callback.Top) - 2 * dv15 * glistN.BorderStyle) \ Callback.Controls(ctrlName).Height Then
+        gl = ((Callback.Controls(ctrlName).Top + Callback.Top) - 2 * dv15 * glistN.BorderStyle) \ Callback.Controls(ctrlName).Height
+    End If
+ElseIf gl > ((Callback.Controls(ctrlName).Top + Callback.Top) - 2 * dv15 * glistN.BorderStyle) \ Callback.Controls(ctrlName).Height Then
+    gl = ((Callback.Controls(ctrlName).Top + Callback.Top) - 2 * dv15 * glistN.BorderStyle) \ Callback.Controls(ctrlName).Height
+End If
+If gl > (ScrInfo(hmonitor).Height * 3 / 5) \ Callback.Controls(ctrlName).Height Then
+    gl = (ScrInfo(hmonitor).Height * 3 / 5) \ Callback.Controls(ctrlName).Height
+End If
+If gl < 1 Then gl = 1
 Pad.Controls(1).Height = Callback.Controls(ctrlName).Height * gl + 2 * dv15 * glistN.BorderStyle
 glistN.restrictLines = gl
-Pad.Height = Pad.Controls(1).Height    'Pad.Height = Callback.Controls(ctrlName).Height * glistN.restrictLines
-Else
-Pad.Controls(1).Height = Callback.Controls(ctrlName).Height * Int(VirtualScreenHeight() * 3 / 5 / Callback.Controls(ctrlName).Height) + 2 * dv15 * glistN.BorderStyle
-glistN.restrictLines = (ScrY() * 3 / 5) \ Callback.Controls(ctrlName).Height
 Pad.Height = Pad.Controls(1).Height
-End If
+
 
 glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
+If AutoComplete Then
+glistN.AutoHide = True
+glistN.CalcAndShowBar
+glistN.StickBar = False
+glistN.ShowBar = True
+Else
 glistN.AutoHide = False
 glistN.StickBar = False
 glistN.ShowBar = False
+If mMenuStyle Then
+glistN.ScrollTo 0
+End If
+End If
     Textbox.SkipProcAtExitFocus = True
     glistN.LeaveonChoose = True
   If AutoComplete Then
@@ -889,7 +938,7 @@ End If
 End If
 Textbox.locked = RHS
 End Property
-Public Sub AddItem(a$)
+Public Sub additem(a$)
 glistN.additemFast a$
 Text = a$
 End Sub
