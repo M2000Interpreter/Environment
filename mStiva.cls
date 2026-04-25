@@ -564,7 +564,12 @@ aa.Typename = "S"
 aa.ItemDouble = a
 Else
 aa.Typename = "N"
+If VarType(a) = vbObject Then
+aa.Typename = "*"
+Set aa.ObjectRef = a
+Else
 aa.ItemVariant = a
+End If
 End If
 mstack.Add aa
 Inc
@@ -850,14 +855,14 @@ For i = Total To 1 Step -1
 Copy.PushStr Me.StackItem(i)
 Next i
 End Function
-Property Get value() As Variant
+Property Get Value() As Variant
 Dim aa As VarItem
 If Index >= 0 And Index < mMany Then
     Set aa = mstack.item(Index + 1)
     If aa.slot = 1 Then
-        Set value = aa.mItem
+        Set Value = aa.mItem
     Else
-        value = aa.mItem
+        Value = aa.mItem
     End If
 End If
 End Property

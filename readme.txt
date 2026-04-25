@@ -1,8 +1,12 @@
 M2000 Interpreter and Environment
-Version 14 revision 19 active-X
+Version 14 revision 20 active-X
 
-Fix some bugs from the previous revision. 
-
+1. Fix some bugs from the previous revisions 18 & 19
+2. I found a way to call a M2000 program from another M2000 program as a child window which is always infront of the caller but for the caller own windows are like siblings, they share the same group of windows. In Info there is now the clock, which open infront of console. We can run Form44 module which make 3 windows (or more if we change a number). These windows may selected an stand infront of clock.We can put the clock between these windows, but never goes behind the "parent", the console (which is the caller). Clock has transparency and irreqular shape as window.
+3. More than 20 changes/additions..
+4. Its faster about 15-17% (less time to run tests).
+I check it against Info modules. I continue check for breaking code.
+5. More modules on INFO file.
 
 
 George Karras, Kallithea Attikis, Greece.

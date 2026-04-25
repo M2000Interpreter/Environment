@@ -1,10 +1,10 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Any)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Any)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
 Public Const KEYEVENTF_KEYUP = &H2
 Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
@@ -55,7 +55,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -544,47 +544,85 @@ For jn = 0 To 15
 MYJOYSTAT(jn).enabled = False
 Next jn
 End Sub
+Public Sub PollJoypadOne(r)
+    Dim jn As Long, wh As Long
+    ' Get the Joypadk information
+    jn = CLng(r)
+    If MYJOYSTAT(jn).enabled Then
+        If Not MYJOYSTAT(jn).Wait2Read Then
+            MYJOYEX.dwSize = 64
+            MYJOYEX.dwFlags = 255
+            Call joyGetPosEx(jn, MYJOYEX)
+            wh = MYJOYEX.dwButtons
+            With MYJOYSTAT(jn)
+                .Wait2Read = False
+                If wh <> 0 Then .lngButton = (Log(wh) / Log(2)) + 1 Else .lngButton = 0
+                .AnalogX = MYJOYEX.dwXpos
+                .AnalogY = MYJOYEX.dwYpos
+                If (MYJOYEX.dwXpos = 0 And MYJOYEX.dwYpos = 0) Then
+                    .joyPaD = DirectionLeftUp
+                ElseIf (MYJOYEX.dwXpos = 0 And MYJOYEX.dwYpos = 65535) Then
+                    .joyPaD = DirectionLeftDown
+                ElseIf (MYJOYEX.dwXpos = 65535 And MYJOYEX.dwYpos = 0) Then
+                    .joyPaD = DirectionRightUp
+                ElseIf (MYJOYEX.dwXpos = 65535 And MYJOYEX.dwYpos = 65535) Then
+                    .joyPaD = DirectionRightDown
+                ElseIf (MYJOYEX.dwXpos = 0) Then
+                    .joyPaD = DirectionLeft
+                ElseIf (MYJOYEX.dwXpos = 65535) Then
+                    .joyPaD = DirectionRight
+                ElseIf (MYJOYEX.dwYpos = 0) Then
+                    .joyPaD = DirectionUp
+                ElseIf (MYJOYEX.dwYpos = 65535) Then
+                    .joyPaD = DirectionDown
+                Else
+                    .joyPaD = DirectionNone
+                End If
+                .Wait2Read = True
+            End With
+        End If
+    End If
+    
+End Sub
 
 Public Sub PollJoypadk()
-
     Dim jn As Long, wh As Long
     ' Get the Joypadk information
     For jn = 0 To 15
-    If MYJOYSTAT(jn).enabled Then
-    If Not MYJOYSTAT(jn).Wait2Read Then
-      MYJOYEX.dwSize = 64
-    MYJOYEX.dwFlags = 255
-    Call joyGetPosEx(jn, MYJOYEX)
-    wh = MYJOYEX.dwButtons
-    
-     With MYJOYSTAT(jn)
-     .Wait2Read = False
-        If wh <> 0 Then .lngButton = (Log(wh) / Log(2)) + 1 Else .lngButton = 0
-            .AnalogX = MYJOYEX.dwXpos
-            .AnalogY = MYJOYEX.dwYpos
-            If (MYJOYEX.dwXpos = 0 And MYJOYEX.dwYpos = 0) Then
-            .joyPaD = DirectionLeftUp
-        ElseIf (MYJOYEX.dwXpos = 0 And MYJOYEX.dwYpos = 65535) Then
-            .joyPaD = DirectionLeftDown
-        ElseIf (MYJOYEX.dwXpos = 65535 And MYJOYEX.dwYpos = 0) Then
-            .joyPaD = DirectionRightUp
-        ElseIf (MYJOYEX.dwXpos = 65535 And MYJOYEX.dwYpos = 65535) Then
-            .joyPaD = DirectionRightDown
-        ElseIf (MYJOYEX.dwXpos = 0) Then
-            .joyPaD = DirectionLeft
-        ElseIf (MYJOYEX.dwXpos = 65535) Then
-            .joyPaD = DirectionRight
-        ElseIf (MYJOYEX.dwYpos = 0) Then
-            .joyPaD = DirectionUp
-        ElseIf (MYJOYEX.dwYpos = 65535) Then
-            .joyPaD = DirectionDown
-        Else
-            .joyPaD = DirectionNone
+        If MYJOYSTAT(jn).enabled Then
+            If Not MYJOYSTAT(jn).Wait2Read Then
+                MYJOYEX.dwSize = 64
+                MYJOYEX.dwFlags = 255
+                Call joyGetPosEx(jn, MYJOYEX)
+                wh = MYJOYEX.dwButtons
+                With MYJOYSTAT(jn)
+                    .Wait2Read = False
+                    If wh <> 0 Then .lngButton = (Log(wh) / Log(2)) + 1 Else .lngButton = 0
+                    .AnalogX = MYJOYEX.dwXpos
+                    .AnalogY = MYJOYEX.dwYpos
+                    If (MYJOYEX.dwXpos = 0 And MYJOYEX.dwYpos = 0) Then
+                        .joyPaD = DirectionLeftUp
+                    ElseIf (MYJOYEX.dwXpos = 0 And MYJOYEX.dwYpos = 65535) Then
+                        .joyPaD = DirectionLeftDown
+                    ElseIf (MYJOYEX.dwXpos = 65535 And MYJOYEX.dwYpos = 0) Then
+                        .joyPaD = DirectionRightUp
+                    ElseIf (MYJOYEX.dwXpos = 65535 And MYJOYEX.dwYpos = 65535) Then
+                        .joyPaD = DirectionRightDown
+                    ElseIf (MYJOYEX.dwXpos = 0) Then
+                        .joyPaD = DirectionLeft
+                    ElseIf (MYJOYEX.dwXpos = 65535) Then
+                        .joyPaD = DirectionRight
+                    ElseIf (MYJOYEX.dwYpos = 0) Then
+                        .joyPaD = DirectionUp
+                    ElseIf (MYJOYEX.dwYpos = 65535) Then
+                        .joyPaD = DirectionDown
+                    Else
+                        .joyPaD = DirectionNone
+                    End If
+                    .Wait2Read = True
+                End With
+            End If
         End If
-          .Wait2Read = True
-        End With
-    End If
-    End If
     Next jn
 End Sub
 
@@ -1322,7 +1360,7 @@ If zoomfactor < 1! Then
                 Set cDIBbuffer1 = New cDIBSection
                 If Not cDib(amask$, cDIBbuffer1) Then
                     Set cDIBbuffer1 = Nothing
-                    GoTo exitHere
+                    GoTo ExitHere
                 End If
                 Set cDIBbuffer2 = New cDIBSection
                 cDIBbuffer2.CreateFromPicture cDIBbuffer1.Picture2(zoomfactor)
@@ -1338,7 +1376,7 @@ ElseIf amask$ <> "" Then
         Set cDIBbuffer2 = New cDIBSection
         If Not cDib(amask$, cDIBbuffer2) Then
             Set cDIBbuffer2 = Nothing
-            GoTo exitHere
+            GoTo ExitHere
         End If
         End If
 End If
@@ -1517,7 +1555,7 @@ Dim tSA2 As SAFEARRAY2D
         image_y = image_y + y_step2
     Next screen_y
     End If
-exitHere:
+ExitHere:
     
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
     CopyMemory ByVal VarPtrArray(bDib1), 0&, 4
@@ -1679,7 +1717,7 @@ Dim tSA2 As SAFEARRAY2D
         image_x = image_x + x_step2
         image_y = image_y + y_step2
     Next screen_y
-exitHere:
+ExitHere:
     
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
     CopyMemory ByVal VarPtrArray(bDib1), 0&, 4
@@ -1899,14 +1937,14 @@ End Function
 Function CollideArea(Priority As Long, Percent As Long, basestack As basetask, rest$) As Boolean
 ' nx2 isn't width but absolute line at nx2
 ' means not inside
-Dim nx1 As Long, ny1 As Long, nx2 As Long, ny2 As Long, p As Double
-If IsExp(basestack, rest$, p) Then
+Dim nx1 As Long, ny1 As Long, nx2 As Long, ny2 As Long, p
+If IsExp(basestack, rest$, p, , True, , True) Then
 nx1 = CLng(p): If Not FastSymbol(rest$, ",") Then Exit Function
-If IsExp(basestack, rest$, p) Then
+If IsExp(basestack, rest$, p, , True, , True) Then
 ny1 = CLng(p): If Not FastSymbol(rest$, ",") Then Exit Function
-If IsExp(basestack, rest$, p) Then
+If IsExp(basestack, rest$, p, , True, , True) Then
 nx2 = CLng(p): If Not FastSymbol(rest$, ",") Then Exit Function
-If IsExp(basestack, rest$, p) Then
+If IsExp(basestack, rest$, p, , True, , True) Then
 ny2 = CLng(p)
 End If
 End If
@@ -2359,12 +2397,12 @@ For i = 1 To Len(ss1$) - 1
         note = InStr(Face$, UCase(v$))
     End If
     If note = 25 Then
-        Debug.Print "silence", beeperBEAT / 2
+   '     Debug.Print "silence", beeperBEAT / 2
        If silence Then
             Sleep beeperBEAT
         Else
             silence = True
-            Debug.Print "Sleep " & beeperBEAT + beeperBEAT / 2
+   '         Debug.Print "Sleep " & beeperBEAT + beeperBEAT / 2
         End If
     Else
         If note = 0 Then note = InStr(Face$, UCase(Left$(v$, 1)) + "_") Else i = i + 1
@@ -4445,13 +4483,13 @@ End Function
 Function IsLabelAnew(where$, a$, r$, Lang As Long) As Long
 ' for left side...no &
 
-Dim rr&, one As Boolean, c$, gr As Boolean, split As Boolean
+Dim rr&, one As Boolean, c$, gr As Boolean, Split As Boolean
 r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
 Dim i&, l As Long, p3 As Integer
 Dim p2 As Long, p1 As Integer, p4 As Long
 l = Len(a$): If l = 0 Then IsLabelAnew = 0: Lang = 1: Exit Function
-split = Lang > -1
+Split = Lang > -1
 p2 = StrPtr(a$): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
@@ -4642,7 +4680,7 @@ i1233:
 
 
     Next i
-    If split Then
+    If Split Then
         If i > p4 Then a$ = vbNullString Else If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
         r$ = myUcase(r$, gr)
         Lang = 1 + CLng(gr)
@@ -5203,31 +5241,31 @@ crNew basestack, players(prive)
 ProcWriter = True
 End Function
 
-Sub SendAKey(ByVal keycode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
+Sub SendAKey(ByVal KeyCode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
 Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long, old As Long
 Const key_release As Byte = 2
-If keycode > 500 Then extended = 1: keycode = keycode - 500
+If KeyCode > 500 Then extended = 1: KeyCode = KeyCode - 500
 If extended = 0 Then
-If keycode > 64 And keycode < 91 Then
+If KeyCode > 64 And KeyCode < 91 Then
     If Not CapsLockOn() Then shift = Not shift
 End If
 End If
 
-Map = MapVirtualKey(keycode, 0)
+Map = MapVirtualKey(KeyCode, 0)
 smap = MapVirtualKey(&H10, 0)
 cmap = MapVirtualKey(&H11, 0)
 amap = MapVirtualKey(&H12, 0)
 
 
-keycode = keycode Mod 255
+KeyCode = KeyCode Mod 255
 ' press key
 If shift Then keybd_event &H10, smap, 0, 0
 If ctrl Then keybd_event &H11, cmap, 0, 0
 If alt Then keybd_event &H12, amap, 0, 0
-keybd_event keycode, Map, extended, 0
+keybd_event KeyCode, Map, extended, 0
 
 ' release key
-keybd_event keycode, Map, KEYEVENTF_KEYUP + extended, 0
+keybd_event KeyCode, Map, KEYEVENTF_KEYUP + extended, 0
 If shift Then keybd_event &H10, smap, KEYEVENTF_KEYUP, 0
 If ctrl Then keybd_event &H11, cmap, KEYEVENTF_KEYUP, 0
 If alt Then keybd_event &H12, amap, KEYEVENTF_KEYUP, 0

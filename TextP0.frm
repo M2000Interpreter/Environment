@@ -172,7 +172,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   "http:///"
+      Location        =   ""
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -2411,7 +2411,7 @@ If TEXT1.SelLength > 0 Then
 Else
     TEXT1.SelStart = ii
 End If
-If TEXT1.SelText <> "" And TEXT1.BlockStartPos <> TEXT1.BlockEndPos Then
+If TEXT1.SelText <> "" And TEXT1.MarkedTextMultilineAny Then
     a$ = vbCrLf + TEXT1.SelText & "*"
     If gList1.UseTab Then
         If Left$(TEXT1.CurrentParagraph, 2) <> "//" Then
@@ -3528,52 +3528,56 @@ TEXT1.mDoc.ColorEvent = Not TEXT1.NoColor
 
 End Sub
 Private Sub mywait11(bstack As basetask, ByVal pp)
-Dim p As Boolean, e As Boolean
-On Error Resume Next
-If bstack.Process Is Nothing Then
-''If extreme Then MyDoEvents
-If pp = 0 Then Exit Sub
-Else
-
-Err.Clear
-p = bstack.Process.Done
-If Err.Number = 0 Then
-e = True
-If p <> 0 Then
-Exit Sub
-End If
-End If
-End If
-Dim tn As Long, dt As Long
-tn = timeGetTime
-If pp < 1 Then dt = 1 Else dt = Signed(pp)
-Do
-If TaskMaster.Processing And Not bstack.TaskMain Then
-        If Not bstack.toprinter Then bstack.Owner.Refresh
-        'If TaskMaster.tickdrop > 0 Then TaskMaster.tickdrop
-        TaskMaster.TimerTick  'Now
-       ' SleepWait 1
-       MyDoEvents
-       
-Else
-        ' SleepWait 1
-        MyDoEvents
+    Dim p As Boolean, e As Boolean
+    On Error Resume Next
+    If bstack.Process Is Nothing Then
+        If pp = 0 Then Exit Sub
+    Else
+        Err.Clear
+        p = bstack.Process.Done
+        If Err.Number = 0 Then
+            e = True
+            If p <> 0 Then
+                Exit Sub
+            End If
         End If
-If e Then
-p = bstack.Process.Done
-If Err.Number = 0 Then
-If p <> 0 Then
-Exit Do
-End If
-End If
-End If
-Loop Until UnsignedSub(timeGetTime, tn) > dt Or NOEXECUTION
-
-                       If exWnd <> 0 Then
-                MyTitle$ bstack
+    End If
+    Dim tn As Long, dt As Long
+    tn = timeGetTime
+    If pp < 1 Then dt = 1 Else dt = Signed(pp)
+    Do
+        If TaskMaster.Processing And Not bstack.TaskMain Then
+            If Not bstack.toprinter Then bstack.Owner.Refresh
+            TaskMaster.TimerTick
+            MyDoEvents
+        Else
+            MyDoEvents
+        End If
+        If e Then
+            p = bstack.Process.Done
+            If Err.Number = 0 Then
+                If p <> 0 Then
+                    Exit Do
                 End If
-End Sub
+            End If
+        End If
+    Loop Until UnsignedSub(timeGetTime, tn) > dt Or NOEXECUTION
 
+    If exWnd <> 0 Then
+        MyTitle$ bstack
+    End If
+End Sub
+Private Function UnsignedSub(a As Long, b As Long)
+    Static ua, UB
+    If ua = Empty Then
+        MemInt(VarPtr(ua)) = 20
+        MemInt(VarPtr(UB)) = 20
+    End If
+    MemLong(VarPtr(ua) + 8) = a
+    MemLong(VarPtr(UB) + 8) = b
+    ua = ua - UB
+    UnsignedSub = MemLong(VarPtr(ua) + 8)
+End Function
 Public Function NeoASK(bstack As basetask) As Double
 If ASKINUSE Then Exit Function
 On Error GoTo recover

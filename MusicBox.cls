@@ -38,7 +38,7 @@ midiOutSetVolume hmidi, ParkVolume
 End Sub
 Private Sub Class_Terminate()
 Dim midimsg As String
-TaskMaster.MusicTaskNum = TaskMaster.MusicTaskNum - 1
+
 If mNote >= 0 Then
  midimsg = &H80 + (mNote * &H100) + Channel
  midiOutShortMsg hmidi, midimsg
@@ -49,6 +49,8 @@ MusicBoxState(Channel1plus) = False
 MusicBoxVolume(Channel1plus) = 127
 TieLen = 0
 TieLevel = 0
+If TaskMaster Is Nothing Then Exit Sub
+TaskMaster.MusicTaskNum = TaskMaster.MusicTaskNum - 1
 End Sub
 
 Private Property Get TaskInterface_Process() As basetask
