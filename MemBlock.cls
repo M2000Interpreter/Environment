@@ -70,7 +70,7 @@ Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As
 
 Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
- Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
 Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
@@ -824,7 +824,7 @@ Public Sub SentToClipBoard(Optional pWidth As Long = -1, Optional ByVal pHeight 
         MyEr "Not a proper picture to send it to clipboard", "Δεν είναι μια σωστή εικόνα για να τη στείλω στο πρόχειρο"
         Exit Sub
     End If
-    If mm.handle <> 0 Then
+    If mm.Handle <> 0 Then
         If (OpenClipboard(Form1.hWnd) <> 0) Then
            If EmptyClipboard Then
                 If mm.Type = 2 Then
@@ -833,9 +833,9 @@ Public Sub SentToClipBoard(Optional pWidth As Long = -1, Optional ByVal pHeight 
                         DeleteEnhMetaFile hEmf
                     End If
                 ElseIf mm.Type = 4 Then
-                    SetClipboardData 14, mm.handle
+                    SetClipboardData 14, mm.Handle
                 Else
-                    SetClipboardData 2, mm.handle
+                    SetClipboardData 2, mm.Handle
                 End If
             End If
             CloseClipboard
@@ -930,10 +930,10 @@ Private Function getEmf(Wmf As StdPicture) As Long
  
  Dim bytes As Long
 Dim Buffer() As Byte
-   bytes = GetMetaFileBitsEx(Wmf.handle, bytes, ByVal 0&)
+   bytes = GetMetaFileBitsEx(Wmf.Handle, bytes, ByVal 0&)
  If bytes Then
 ReDim Buffer(1 To bytes) As Byte
-Call GetMetaFileBitsEx(Wmf.handle, bytes, Buffer(1))
+Call GetMetaFileBitsEx(Wmf.Handle, bytes, Buffer(1))
 Else
 
 Exit Function
