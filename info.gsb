@@ -51774,7 +51774,7 @@ Method Simple, "refreshALL"
 Method Simple, "Show", 1
 Declare Simple Nothing
 }
-MODULE TSTJOY2 {GOTO 1000
+MODULE TSTJOY2 {//	GOTO 1000
 MODULE SPEEDTST {
 	PRINT "SPEED TEST 2nd USING WIAT 0 IN EVERY LOOP"
 	PRINT "You can use Ctrl+C or Esc (not in Fast !)"

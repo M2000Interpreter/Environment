@@ -68,8 +68,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-
-
 ' use of Extender
 Option Explicit
 Dim waitforparent As Boolean
@@ -149,7 +147,7 @@ Private Declare Function Ellipse Lib "gdi32" (ByVal hDC As Long, ByVal x1 As Lon
 Private Declare Function CreatePen Lib "gdi32" (ByVal nPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 
 Private Const PS_NULL = 5
 Private Const PS_SOLID = 0
@@ -630,7 +628,6 @@ CalcAndShowBar
 ShowMe
 End Property
 Public Property Get Text() As String
-Attribute Text.VB_UserMemId = 0
 Dim i As Long, Pad$
 Text = space$(500)
 RaiseEvent PureListOn
@@ -1128,23 +1125,20 @@ Else
                                     pair$ = list(SELECTEDITEM - 1)
                                     list(SELECTEDITEM - 1) = Left$(pair$, SelStart - 3) + kk$ + Mid$(pair$, SelStart - 2)
                                     RaiseEvent PureListOff
+                                ElseIf AscW(kk$) > -10241 And AscW(kk$) < -9216 Then
+                                    RaiseEvent SetExpandSS(mSelstart + 2)
+                                    SelStartEventAlways = SelStart + 2
+                                    RaiseEvent PureListOn
+                                    pair$ = list(SELECTEDITEM - 1)
+                                    list(SELECTEDITEM - 1) = Left$(pair$, SelStart - 3) + kk$ + Mid$(pair$, SelStart - 2)
+                                    RaiseEvent PureListOff
                                 Else
                                     RaiseEvent SetExpandSS(mSelstart + 1)
-                                    SelStartEventAlways = SelStart + 1  ' we think here we have one word (one character)
+                                    SelStartEventAlways = SelStart + 1
                                     RaiseEvent DelExpandSS
                                     RaiseEvent PureListOn
                                     pair$ = list(SELECTEDITEM - 1)
-                                    
                                     list(SELECTEDITEM - 1) = Left$(pair$, SelStart - 2) + kk$ + Mid$(pair$, SelStart - 1)
-                                    If Len(kk$) > 1 Then
-                                    ' but we have more sometimes.............
-                                    ' this eliminate the problem when we press Alt + 10473
-                                    ' now we move the cursor one more character (here we have
-                                    If AscW(kk$) > -10241 And AscW(kk$) < -9216 Then
-                                    
-                                    SelStartEventAlways = SelStart + Len(kk$) - 1
-                                    End If
-                                    End If
                                     RaiseEvent PureListOff
                                 End If
                                 RaiseEvent SetExpandSS(mSelstart)
@@ -1215,6 +1209,14 @@ Else
                                     pair$ = listAtColumn(SELECTEDITEM - 1, mCurTab)
                                     listAtColumn(SELECTEDITEM - 1, mCurTab) = Left$(pair$, SelStart - 3) + kk$ + Mid$(pair$, SelStart - 2)
                                     RaiseEvent PureListOff
+                                ElseIf AscW(kk$) > -10241 And AscW(kk$) < -9216 Then
+                                    RaiseEvent SetExpandSS(mSelstart + 2)
+                                    SelStartEventAlways = SelStart + 2
+                                    RaiseEvent PureListOn
+                                    pair$ = list(SELECTEDITEM - 1)
+                                    list(SELECTEDITEM - 1) = Left$(pair$, SelStart - 3) + kk$ + Mid$(pair$, SelStart - 2)
+                                    RaiseEvent PureListOff
+                                    
                                 Else
                                     RaiseEvent SetExpandSS(mSelstart + 1)
                                     SelStartEventAlways = SelStart + 1
@@ -1223,6 +1225,7 @@ Else
                                     pair$ = listAtColumn(SELECTEDITEM - 1, mCurTab)
                                     listAtColumn(SELECTEDITEM - 1, mCurTab) = Left$(pair$, SelStart - 2) + kk$ + Mid$(pair$, SelStart - 1)
                                     RaiseEvent PureListOff
+                                                                        
                                 End If
                                 RaiseEvent SetExpandSS(mSelstart)
                             Else
@@ -1452,7 +1455,7 @@ If ListIndex < topitem Then topitem = ListIndex
     End If
 End Sub
 Public Sub PressKey(KeyCode As Integer, shift As Integer, Optional NoEvents As Boolean = False)
-Dim lcnt As Long, osel As Long, lsep As Long, linetxt As String
+Dim lcnt As Long, osel As Long, lsep As Long
 If shift <> 0 And KeyCode = 16 Then Exit Sub
 Timer1.enabled = False
 If BlinkON Then BlinkTimer.enabled = True
@@ -2006,10 +2009,8 @@ If mTabs = 1 Then
         If (SelStart - val) < osel Then SelStart = SelStart - val Else SelStart = osel
         
         'SelStart = SelStart - val  ' make it a delete because we want selstart to take place before list() take value     RaiseEvent PureListOn
-        'Mid$(list(SELECTEDITEM - 1), SelStart, val)        RaiseEvent addone(Mid$(list(SELECTEDITEM - 1), SelStart, val))
-        
+        RaiseEvent addone(Mid$(list(SELECTEDITEM - 1), SelStart, val))
         list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) + Mid$(list(SELECTEDITEM - 1), SelStart + val)
-        
         RaiseEvent SetExpandSS(mSelstart)
         RaiseEvent PureListOff
         ShowMe2  'refresh now
@@ -2746,6 +2747,8 @@ If (Button And 3) > 0 And myEnabled Then
              End If
                 If MultiSelect Or ListMenu(SELECTEDITEM - 1) Then
                         If ListRadio(SELECTEDITEM - 1) And ListSelected(SELECTEDITEM - 1) Then
+                        ' do nothing
+                        Stop
                         ElseIf ListRadio(SELECTEDITEM - 1) Then
                             ListSelected(SELECTEDITEM - 1) = Not ListSelected(SELECTEDITEM - 1)
                             If MultiSelect Then
@@ -2807,6 +2810,8 @@ If (Button And 3) > 0 And myEnabled Then
                 If MultiSelect Or ListMenu(SELECTEDITEM - 1) Then
                     If (X / scrTwips > 0) And (X / scrTwips < LeftMarginPixels) Then
                         If ListRadio(SELECTEDITEM - 1) And ListSelected(SELECTEDITEM - 1) Then
+                        ' do nothing
+                        Stop
                         Else
                             ListSelected(SELECTEDITEM - 1) = Not ListSelected(SELECTEDITEM - 1)
                             If MultiSelect Then
@@ -3163,10 +3168,11 @@ waitforparent = True
 End Sub
 Public Sub Dynamic()
 overrideTextHeight = 0
-If restrictLines > 0 Then
-    myt = (UserControl.ScaleHeight - mHeadlineHeightTwips) / restrictLines
+   If restrictLines > 0 Then
+myt = (UserControl.ScaleHeight - mHeadlineHeightTwips) / restrictLines
 Else
-    myt = UserControlTextHeight() + addpixels * scrTwips
+
+myt = UserControlTextHeight() + addpixels * scrTwips
 End If
 HeadlineHeight = UserControlTextHeight() / scrTwips
 mytPixels = myt / scrTwips
