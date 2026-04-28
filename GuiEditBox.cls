@@ -1568,7 +1568,7 @@ ReplaceTitle = vbNullString
 End If
 End If
 End Sub
-Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub glistN_KeyDown(keycode As Integer, shift As Integer)
 If glistN.HeadLine <> "" Then
 If NoTitle Then
 glistN.HeadLine = vbNullString
@@ -1579,7 +1579,7 @@ ReplaceTitle = vbNullString
 End If
 End If
 Dim VR(2)
-VR(0) = KeyCode
+VR(0) = keycode
 VR(1) = shift
 If mIndex > -1 Then
     Callback.CallbackNow mesCtrlName + ".KeyDown(" + CStr(Index) + ")", VR()
@@ -1587,15 +1587,15 @@ Else
     Callback.CallbackNow mesCtrlName + ".KeyDown()", VR()
 End If
 shift = VR(1)
-KeyCode = VR(0)
+keycode = VR(0)
 
 Dim selstart2 As Long, b As Boolean, Pad$, cc As Long
 Dim l1 As Long, c1 As Long
-If KeyCode = 18 Then
+If keycode = 18 Then
 Exit Sub
 End If
-If KeyCode = vbKeyF10 And (shift And 7) = 1 Then
-KeyCode = 0
+If keycode = vbKeyF10 And (shift And 7) = 1 Then
+keycode = 0
 If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".PopUp(" + str(mIndex) + "," + str(MOUSEX(Callback.Left)) + "," + str(MOUSEY(Callback.Top)) + "," + str(2) + "," + str(glistN.ListIndex + 1) + ")"
    Else
@@ -1603,8 +1603,8 @@ If mIndex >= 0 Then
       End If
 Exit Sub
 End If
-If KeyCode = 16 And shift <> 0 Then
-KeyCode = 0
+If keycode = 16 And shift <> 0 Then
+keycode = 0
 If glistN.SelStart = 0 Then
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Inform(" + str(mIndex) + "," + str(glistN.ListIndex + 1) + ", 1)"
@@ -1620,19 +1620,19 @@ Else
 End If
 Exit Sub
 End If
-If NoMark And Not (KeyCode <> vbKeyDown Or KeyCode <> vbKeyUp Or KeyCode <> vbKeyPageUp Or KeyCode <> vbKeyPageDown) Then KeyCode = 0: Exit Sub
+If NoMark And Not (keycode <> vbKeyDown Or keycode <> vbKeyUp Or keycode <> vbKeyPageUp Or keycode <> vbKeyPageDown) Then keycode = 0: Exit Sub
 
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
 '
-If NoMark And KeyCode = vbKeyUp Then KeyCode = vbKeyPageUp
-If NoMark And KeyCode = vbKeyDown Then KeyCode = vbKeyPageDown
-ElseIf KeyCode = vbKeyX And (shift And 3) = 2 Then
+If NoMark And keycode = vbKeyUp Then keycode = vbKeyPageUp
+If NoMark And keycode = vbKeyDown Then keycode = vbKeyPageDown
+ElseIf keycode = vbKeyX And (shift And 3) = 2 Then
 MarkCut
 Show
-KeyCode = 0
-ElseIf KeyCode = vbKey1 And (shift And 3) = 2 And Not (NumberOnly Or NumberIntOnly) Then
+keycode = 0
+ElseIf keycode = vbKey1 And (shift And 3) = 2 And Not (NumberOnly Or NumberIntOnly) Then
 ' CONVERT TO UPPER CASE
-KeyCode = 0
+keycode = 0
 If HaveMarkedText Then
 Pad$ = myUcase(SelText, True)
 GoTo happyflat
@@ -1641,9 +1641,9 @@ If Not CapsLockOn Then
 SendAKey &H14, 0, 0, 0
 End If
 End If
-ElseIf KeyCode = vbKey2 And (shift And 3) = 2 And Not (NumberOnly Or NumberIntOnly) Then
+ElseIf keycode = vbKey2 And (shift And 3) = 2 And Not (NumberOnly Or NumberIntOnly) Then
 ' CONVERT TO LOWER CASE
-KeyCode = 0
+keycode = 0
 If HaveMarkedText Then
 Pad$ = myLcase(SelText)
 GoTo happyflat
@@ -1652,19 +1652,19 @@ If CapsLockOn Then
 SendAKey &H14, 0, 0, 0
 End If
 End If
-ElseIf KeyCode = vbKey3 And (shift And 3) = 2 And Not (NumberOnly Or NumberIntOnly) Then
+ElseIf keycode = vbKey3 And (shift And 3) = 2 And Not (NumberOnly Or NumberIntOnly) Then
 Pad$ = ChrW$(&H266D)
 GoTo happyflat
-ElseIf KeyCode = vbKeyC And (shift And 3) = 2 Then
+ElseIf keycode = vbKeyC And (shift And 3) = 2 Then
 MarkCopy
-KeyCode = 0
-ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
+keycode = 0
+ElseIf keycode = vbKeyV And (shift And 3) = 2 Then
     Sleep 10
     On Error Resume Next
     Pad$ = GetTextData(13)
     If Err Or Pad$ = "" Then
     Pad$ = Clipboard.GetText(1)
-    If Err Or Pad$ = "" Then Err.Clear: KeyCode = 0: Exit Sub
+    If Err Or Pad$ = "" Then Err.Clear: keycode = 0: Exit Sub
     End If
     If NumberOnly Or NumberIntOnly Then
         If Not ValidNum(Pad$, False, NumberIntOnly) Then GoTo conthere
@@ -1705,13 +1705,13 @@ happyflat:
     SelText = Pad$
     RemoveUndo SelText
     End If
-    KeyCode = 0
+    keycode = 0
     ReColorBlock
-ElseIf KeyCode = vbKeyA And (shift And 3) = 2 Then
+ElseIf keycode = vbKeyA And (shift And 3) = 2 Then
 glistN.MarkNext = 0
 glistN.MarkALL
-KeyCode = 0
-ElseIf KeyCode = vbKeyY And (shift And 3) = 2 Then
+keycode = 0
+ElseIf keycode = vbKeyY And (shift And 3) = 2 Then
 ' Redo
 profundo.MARKONE
 againY:
@@ -1787,8 +1787,8 @@ Redomode = 0
 End If
 If undoprev Then GoTo againY
 End If
-KeyCode = 0
-ElseIf KeyCode = vbKeyZ And (shift And 3) = 2 Then
+keycode = 0
+ElseIf keycode = vbKeyZ And (shift And 3) = 2 Then
 ' 2nd version of undo system
 ' undopos now is selstart
 profundo.MARKONE
@@ -1856,41 +1856,41 @@ undotext = vbNullString
 undomode = 0
 End If
 If undoprev Then GoTo againZ
-KeyCode = 0
-ElseIf KeyCode = vbKeyA And (shift And 3) = 3 Then
+keycode = 0
+ElseIf keycode = vbKeyA And (shift And 3) = 3 Then
 glistN.MarkNext = 0
 BlockEndPara = mDoc.MarkParagraphID
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 glistN.ShowPan
-KeyCode = 0
+keycode = 0
 
-ElseIf KeyCode = vbKeyDelete Then
+ElseIf keycode = vbKeyDelete Then
 If HaveMarkedText Then
 ClearRedo
 PushUndo
 glistN_MarkDelete False
 
-KeyCode = 0
+keycode = 0
 End If
-ElseIf KeyCode = vbKeyBack Then
+ElseIf keycode = vbKeyBack Then
 If HaveMarkedText Then
 ClearRedo
 PushUndo
 glistN_MarkDelete False
 
-KeyCode = 0
+keycode = 0
 End If
 End If
 conthere:
 If NoMark And EditDoc = False Then glistN.ShowMe2: Exit Sub
-If KeyCode = 0 And shift = 0 Then Exit Sub
-If KeyCode <> 0 Or shift <> 0 Then PressKey_A KeyCode, shift
+If keycode = 0 And shift = 0 Then Exit Sub
+If keycode <> 0 Or shift <> 0 Then PressKey_A keycode, shift
 
 
 End Sub
 
-Private Sub glistN_KeyDownAfter(KeyCode As Integer, shift As Integer)
+Private Sub glistN_KeyDownAfter(keycode As Integer, shift As Integer)
 If NoMark Then Exit Sub
 If HaveMarkedText Then
 If shift = 0 Then
@@ -1906,17 +1906,17 @@ glistN.RefreshNow
 
 ElseIf (shift And 1) = 1 Then
 
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
 glistN_MarkOut
 End If
 End If
 ElseIf (shift And 1) = 1 And glistN.MarkNext = 0 Then
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
 glistN.MarkNext = 1
 glistN_MarkIn
 End If
 ElseIf (shift And 1) = 1 And glistN.MarkNext > 0 Then
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
 glistN.MarkNext = 2
 glistN_MarkOut
 End If
@@ -2506,12 +2506,12 @@ Dim M As Long, z As Long
                 FillBlock
                 Exit Sub
                 Else
-                z = InStr(2, SelText, ".")
+                z = InStr(1, SelText, ".")
                 End If
             Else
-                z = InStr(2, SelText, ".")
+                z = InStr(1, SelText, ".")
             End If
-            If z > 1 Then
+            If z > 0 Then
                 SelStartSilent = SelStart + z
                 SelLengthSilent = SelLength - z
                 FillBlock
@@ -4617,7 +4617,7 @@ Public Property Let SetM2000(RHS)
     AutoNumber = True
     AllowInsertBrackets = True
     glistN.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", "@", Chr$(9), "#", "%", "&")
-    glistN.WordCharRight = ConCat(".", ":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", Chr$(9), "#")
+    glistN.WordCharRight = ConCat("|", ".", ":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", Chr$(9), "#")
     glistN.WordCharRightButIncluded = "(" ' so aaa(sdd) give aaa( as word
     glistN.WordCharLeftButIncluded = "#"
     
@@ -8391,44 +8391,44 @@ Public Property Get LineHeight() As Variant
 ''
 LineHeight = glistN.HeightTwips / glistN.lines
 End Property
-Public Sub PressKey(KeyCode As Integer, shift As Integer)
+Public Sub PressKey(keycode As Integer, shift As Integer)
 Dim b As Boolean
   b = enabled
-    PressKey_A KeyCode, shift
+    PressKey_A keycode, shift
 enabled = b
   
 End Sub
-Private Sub PressKey_A(KeyCode As Integer, shift As Integer)
+Private Sub PressKey_A(keycode As Integer, shift As Integer)
 Static ctrl As Boolean, alt As Boolean, noentrance As Boolean, where As Long, noinp As Double
 Dim aa$, a$, JJ As Long, ii As Long, comm As String
 If alt = True Then shift = shift Or 4: alt = False
 If noentrance Then
-KeyCode = 0
+keycode = 0
 Exit Sub
 End If
 noentrance = True
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 If shift = 2 Then
-If glistN.VirtualKey(KeyCode) = 47 Then KeyCode = vbKey4
+If glistN.VirtualKey(keycode) = 47 Then keycode = vbKey4
 End If
 End If
 
-Select Case KeyCode
+Select Case keycode
 Case vbKeyReturn
 nochange = True
 If UsedAsTextBox Or NumberOnly Or NumberIntOnly Then
-KeyCode = 0
+keycode = 0
 If Not Callback Is Nothing Then
 With Callback.Control(1)
 .PressKey 13, 0
 End With
 End If
 ElseIf (shift And 2) = 2 And AllowInsertBrackets Then
-KeyCode = 0
+keycode = 0
 shift = 0
 insertbrackets
 ElseIf AutoIntNewLine Then
-KeyCode = 0
+keycode = 0
 Else
 
 End If
@@ -8438,9 +8438,9 @@ nochange = False
 Case vbKeyControl
 ctrl = True
 alt = (shift And 4) = 4
-KeyCode = 0
+keycode = 0
 Case vbKeyF1
-If shift > 0 Then If (shift And 2) <> 2 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+If shift > 0 Then If (shift And 2) <> 2 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 
 If (shift And 2) = 2 Then
 shift = 0
@@ -8460,9 +8460,9 @@ Render
 ManualInform
 End If
 
-KeyCode = 0
+keycode = 0
 Case vbKeyF2
-If (shift And 4) = 4 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 4) = 4 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 
 If shift <> 0 Then
 LastSearchType = 2 - Abs(shift Mod 2 = 1)
@@ -8476,7 +8476,7 @@ s$ = InputBoxN("Search to the top " & IIf(LastSearchType = 1, " characters" & vb
 End If
 If Not noinp = 1 Then
 noentrance = False
-KeyCode = 0
+keycode = 0
 Exit Sub
 End If
 End If
@@ -8491,9 +8491,9 @@ If LastSearchType > 0 Then
         supsub
     End If
 End If
-KeyCode = 0
+keycode = 0
 Case vbKeyF3
-If (shift And 4) = 4 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 4) = 4 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
     If shift <> 0 Then
     shift = 0
         If s$ = vbNullString And SelText <> "" Then s$ = SelText
@@ -8504,7 +8504,7 @@ If (shift And 4) = 4 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
         End If
         If Not noinp = 1 Then
             noentrance = False
-            KeyCode = 0
+            keycode = 0
             Exit Sub
         End If
     End If
@@ -8520,29 +8520,29 @@ If (shift And 4) = 4 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
         End If
     End If
 Case vbKeyF4
-If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 If SelText <> "" Then mscatsub Else dothis
 shift = 0
-KeyCode = 0
+keycode = 0
 Case vbKeyF5
-If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 If SelText <> "" Then rthissub shift
-KeyCode = 0
+keycode = 0
 shift = 0
 Case vbKeyF6  ' Set/Show/Reset Para1
-If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton para1, PosPara1
-KeyCode = 0
+keycode = 0
 shift = 0
 Case vbKeyF7  'Set/Show/Reset Para2
-If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para2, PosPara2
-KeyCode = 0
+keycode = 0
 shift = 0
 Case vbKeyF8  'Set/Show/Reset Para2
-If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para3, PosPara3
-KeyCode = 0
+keycode = 0
 shift = 0
 Case vbKeyF9  ' Count Words
 'If (shift And 7) > 1 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
@@ -8574,9 +8574,9 @@ End If
 End If
 End If
 End If
-KeyCode = 0
+keycode = 0
 Case vbKeyF10
-If (shift And 7) > 1 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 1 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 showparagraph = Not showparagraph
@@ -8584,15 +8584,15 @@ mDoc.WrapAgain
 Render
 End If
 ManualInform
-KeyCode = 0
+keycode = 0
 Case vbKeyF11
-If (shift And 7) = 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) = 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
 fState = fState + 1
 SetME
 WrapAll
 ManualInform
 glistN.ShowMe
-KeyCode = 0
+keycode = 0
 Case vbKeyPageUp
 Case vbKeyPageDown
 Case vbKey4
@@ -8738,7 +8738,7 @@ glistN.Noflashingcaret = False
 Render
 
 nochange = False
-KeyCode = 0
+keycode = 0
 shift = 0
 End If
 Case vbKeyTab
@@ -8764,12 +8764,12 @@ If UseTab And Not BlockStartPos <> BlockEndPos And (TabControl = 0 Or MyTrimLNoT
           SelStart = JJ + 1
         End If
        
-         KeyCode = 0
+         keycode = 0
     ElseIf NLtrim(Mid$(CurrentParagraph, Charpos, 1)) = vbNullString Then
         SelStart = SelStart + 1
-        KeyCode = 8
+        keycode = 8
     ElseIf NLtrim(Myleft$(CurrentParagraph, Charpos - 1)) = vbNullString Then
-        KeyCode = 8
+        keycode = 8
     End If
     'End If
    
@@ -8847,7 +8847,7 @@ conttab:
     Render
     nochange = False
     End If
-    KeyCode = 0  ' new
+    keycode = 0  ' new
     shift = 0 ' new
 ElseIf BlockStartPos <> BlockEndPos And HaveMarkedText Then
 conttab1:
@@ -8920,7 +8920,7 @@ glistN.enabled = True
 Render
 nochange = False
 End If
-KeyCode = 0
+keycode = 0
 shift = 0
 
 End If
@@ -9715,13 +9715,13 @@ tParam.iTabLength = Abs(vNewValue)
 End Property
 Private Function MyTrimL(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL = 1: Exit Function
   p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 9
     Case Else
      MyTrimL = (i - p2) \ 2 + 1
@@ -9732,13 +9732,13 @@ Dim p2 As Long, p1 As Integer, p4 As Long
 End Function
 Private Function MyTrimLNoTab(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimLNoTab = 1: Exit Function
   p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      MyTrimLNoTab = (i - p2) \ 2 + 1
@@ -9749,13 +9749,13 @@ Dim p2 As Long, p1 As Integer, p4 As Long
 End Function
 Private Function MyTrimL2(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL2 = 0: Exit Function
   p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      MyTrimL2 = (i - p2) \ 2 '+ 1
@@ -9766,13 +9766,13 @@ Dim p2 As Long, p1 As Integer, p4 As Long
 End Function
 Private Function NLTrim2(s$) As String
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then NLTrim2 = 1: Exit Function
   p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      NLTrim2 = Mid$(s$, (i - p2) \ 2 + 1)
@@ -10008,13 +10008,13 @@ End If
 End Property
 Private Function MyTrimRNoCr(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimRNoCr = 1: Exit Function
   p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 9
     Case Else
      MyTrimRNoCr = (i - p2) \ 2 + 1
@@ -10025,13 +10025,13 @@ Dim p2 As Long, p1 As Integer, p4 As Long
 End Function
 Private Function MyTrimL2NoTab(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
   p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160
     Case Else
      MyTrimL2NoTab = (i - p2) \ 2 + 1

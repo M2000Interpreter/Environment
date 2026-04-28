@@ -36114,10 +36114,11 @@ Module CheckIt {
 			// Eval(buf, 0) read the first byte as unsigned number (0 to 255)
 			// buf and buf$ can coexist, they are different variables
 			buffer buf as byte*len(buf$)*2
-			return buf, 0:=buf$
+//				return buf, 0:=buf$   ' old way or for multiple values of for casting 
+			buf[0]=buf$
 			crc =0xFFFFFFFF-crc
 			For i = 0 To Len(buf) -1
-				crc = binary.xor(binary.shift(crc, -8), crct(binary.xor(binary.and(crc, 0xff), Eval(buf, i))))
+				crc = binary.xor(binary.shift(crc, -8), crct(binary.xor(binary.and(crc, 0xff), buf[i])))
 			Next
 			=0xFFFFFFFF-crc
 		}
@@ -40495,13 +40496,14 @@ every t {
 refresh 40
 
 }
-MODULE FINDWORD {read W as string="*"
-if left$(w,1)="*" then
-	report {FindWord "Remove {"}
+MODULE FINDWORD {read W as string="*", WW as string ="|"
+if left$(W,1)="*" then
+	report {FindWord "Remove {"
+	}
 	keyboard {FindWord "Remove {"}, 13
 else
-	print "search: ";w
-	modules  ? "", w
+	print "search: ";W
+	modules  ? "", W, WW
 end if
 }
 MODULE COMP_NUM {Class Complex {
@@ -40836,10 +40838,12 @@ rem {
       return hash;
     }
 }
+// We use currency for unsigned long
+// binary.add() works using currency
 FUNCTION jenkins_one_at_a_time_hash(key as buffer, length as currency) {
 	currency hash, i
 	while i<>length
-		hash=binary.add(hash, eval(key, i)) : i++          // hash+=key[i++]
+		hash=binary.add(hash, key[i]) : i++          // hash+=key[i++]
 		hash=binary.add(hash, binary.shift(hash, 10))  // hash+=hash << 10
 		hash=binary.xor(hash, binary.shift(hash, -6))  // hash^=hash >> 6
 	end while
@@ -40850,9 +40854,9 @@ FUNCTION jenkins_one_at_a_time_hash(key as buffer, length as currency) {
 }
 buffer clear mem as byte*8192
 return mem, 0:=str$("a")
-hex jenkins_one_at_a_time_hash(mem, 1)
+hex jenkins_one_at_a_time_hash(mem, 1), 0xca2e9442
 return mem, 0:=str$("The quick brown fox jumps over the lazy dog")
-hex jenkins_one_at_a_time_hash(mem, 43)
+hex jenkins_one_at_a_time_hash(mem, 43), 0x519e91f5
 }
 MODULE RAREBITS {//Linespace twipsX*4
 // Form 64
@@ -41362,7 +41366,7 @@ module beta {
 dim values(0 to 99) as long
 long idx 
 module beta2 {
-	values(idx)=eval(BinaryData,0)
+	values(idx)=BinaryData[0]
 	print values(idx),
 	idx++
 }
@@ -43098,7 +43102,8 @@ module  String_length {
 	Buffer Clear Mem as Byte*100
 	Buffer  Mem2 as Integer*50
 	Mem[0]=A$
-	Print Eval$(Mem, 0, 18)  ' 18 bytes from Mem[0] as a string
+//		Print Eval$(Mem, 0, 18)  ' 18 bytes from Mem[0] as a string
+	Print Mem[0,18]    'this is the same as Eval$(Mem, 0, 18) but use one identifer less
 	Mem2[0]=Mem
 	For i=0 to 8
 	      Hex Mem2[i], ChrCode$(Mem2[i])
@@ -45199,13 +45204,13 @@ Private:
 		long m, n
 		do If Stackitem()>=Stackitem(2) Then Drop 2:if  empty then exit else continue
 			over 2,2
-			Read p, r : i = p-1 : x=eval(.a, r)
-			For j=p to r-1:If x>eval(.a, j) Then i++:Swap(i,j) 
+			Read p, r : i = p-1 : x=.a[r]
+			For j=p to r-1:If x>.a[j] Then i++:Swap(i,j) 
 			Next j : Swap(i+1,r) :  Push  i+2, i:shift 3
 		always
 		sub Swap()
-			read m, n: local v=eval(.a, m), w=eval(.a, n)
-			return .a, m:=w, n:=v
+			read m, n: local v=.a[m]
+			return .a, m:=.a[n], n:=v
 		end sub
 	}
 Public:
@@ -48418,7 +48423,7 @@ public:
 		ReleaseFuncDesc
 		ReleaseVarDesc
 	}
-	FUNCTION new.Attr {
+	FUNCTION new.Attr() {
 		VAR ret as .TYPEATTR
 		=ret
 	}
@@ -50573,7 +50578,7 @@ MODULE JOY {' Module JOY
 ' JOY true
 ' SKIP is optional here
 READ ? SKIP AS BOOLEAN=FALSE
-CONST  Acoustic_Bass = 33
+CONST  Organ = 23
 TEMPO=960*1.2
 VOLUME 80
 PLAY 1, 0
@@ -50616,12 +50621,12 @@ partitura="V80"
 partitura+="E4@3E@3F@3G@3"
 partitura+="G@3F@3E@3D@3"
 partitura+="C@3C@3D@3E@3"
-partitura+="E@4D@4D@2"
+partitura+="E@4+D@4D@2"   ' one or two + for dotted notes
 
 partitura+="E@3E@3F@3G@3"
 partitura+="G@3F@3E@3D@3"
 partitura+="C@3C@3D@3E@3"
-partitura+="D@4C@4C@2"
+partitura+="D@4+C@4C@2"
 
 partitura+="D@3D@3E@3C@3"
 partitura+="D@3E@4F@4E@3C@3"
@@ -50631,10 +50636,10 @@ partitura+="C@3D@3G3@2"
 partitura+="E4@3E@3F@3G@3"
 partitura+="G@3F@3E@3D@3"
 partitura+="C@3C@3D@3E@3"
-partitura+="D@4C@4C@2!"  ' LAST NOTE LEGATO - 100%
+partitura+="D@4+C@4C@2!"  ' LAST NOTE LEGATO - 100%
 
-SCORE 1, TEMPO, partitura, 75  ' 75% STACCATO  -  100% IS LEGATO (OMIT THE PARAMETER)- NO SILENCE BETWEEN NOTES.
-PLAY 1, Acoustic_Bass
+SCORE 1, TEMPO, partitura, 85  ' 85% STACCATO  -  100% IS LEGATO (OMIT THE PARAMETER)- NO SILENCE BETWEEN NOTES.
+PLAY 1, Organ
 IF SKIP THEN EXIT
 PRINT "ODE TO JOY"
 }

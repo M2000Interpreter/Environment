@@ -147,7 +147,7 @@ Private Declare Function Ellipse Lib "gdi32" (ByVal hDC As Long, ByVal x1 As Lon
 Private Declare Function CreatePen Lib "gdi32" (ByVal nPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 
 Private Const PS_NULL = 5
 Private Const PS_SOLID = 0
@@ -260,8 +260,8 @@ Event MenuChecked(item As Long)
 Event PromptLine(ThatLine As Long)
 Event PanLeftRight(direction As Boolean)
 Event GetBackPicture(pic As Object)
-Event KeyDown(KeyCode As Integer, shift As Integer)
-Event KeyDownAfter(KeyCode As Integer, shift As Integer)
+Event KeyDown(keycode As Integer, shift As Integer)
+Event KeyDownAfter(keycode As Integer, shift As Integer)
 Event SyncKeyboard(item As Integer)
 Event SyncKeyboardUnicode(a$)
 Event PreviewKeyboardUnicode(ByRef a$)
@@ -983,11 +983,11 @@ Timer1.Interval = 40
 Timer1.enabled = True
 End Sub
 
-Public Sub LargeBar1KeyDown(KeyCode As Integer, shift As Integer)
+Public Sub LargeBar1KeyDown(keycode As Integer, shift As Integer)
 Timer1.enabled = False
 If ListIndex < 0 Then
 Else
-PressKey KeyCode, shift
+PressKey keycode, shift
 End If
 End Sub
 
@@ -1454,31 +1454,31 @@ If ListIndex < topitem Then topitem = ListIndex
       PrepareToShow 5
     End If
 End Sub
-Public Sub PressKey(KeyCode As Integer, shift As Integer, Optional NoEvents As Boolean = False)
+Public Sub PressKey(keycode As Integer, shift As Integer, Optional NoEvents As Boolean = False)
 Dim lcnt As Long, osel As Long, lsep As Long
-If shift <> 0 And KeyCode = 16 Then Exit Sub
+If shift <> 0 And keycode = 16 Then Exit Sub
 Timer1.enabled = False
 If BlinkON Then BlinkTimer.enabled = True
 'Timer1.Interval = 1000
 Dim LastListIndex As Long, bb As Boolean, val As Long
 LastListIndex = ListIndex
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
     If Not Spinner Then If Hidebar Then Hidebar = False: Redraw Hidebar Or m_showbar
-    If (KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown) And (shift And 2) = 2 Then
+    If (keycode = vbKeyPageUp Or keycode = vbKeyPageDown) And (shift And 2) = 2 Then
         If MarkNext = 0 Then
-            RaiseEvent KeyDown(KeyCode, shift)
-            If KeyCode <> 0 Then GetKeY2 KeyCode, shift
+            RaiseEvent KeyDown(keycode, shift)
+            If keycode <> 0 Then GetKeY2 keycode, shift
         End If
-        If KeyCode = 0 Then Exit Sub
+        If keycode = 0 Then Exit Sub
     End If
-    If MarkNext = 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+    If MarkNext = 0 Then RaiseEvent KeyDownAfter(keycode, shift)
 End If
 
-If KeyCode = 93 Then
+If keycode = 93 Then
 ' you have to clear myButton, here keycode
-RaiseEvent OutPopUp(nowX, nowY, KeyCode)
+RaiseEvent OutPopUp(nowX, nowY, keycode)
 End If
-Select Case KeyCode
+Select Case keycode
 Case vbKeyHome
 If EditFlagSpecial And (shift And 2) = 0 Then
     RaiseEvent DelExpandSS
@@ -1555,8 +1555,8 @@ Case vbKeyPageUp
             SELECTEDITEM = SELECTEDITEM - 1
         Else
             PrepareToShow 5
-            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
-            shift = 0: KeyCode = 0: Exit Sub
+            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+            shift = 0: keycode = 0: Exit Sub
         End If
     Else
         If topitem < SELECTEDITEM - (lines + 1) \ 2 Then
@@ -1599,8 +1599,8 @@ Case vbKeyPageUp
     End If
     RaiseEvent ChangeSelStart(SelStart)
     If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
-    shift = 0: KeyCode = 0: Exit Sub
+    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+    shift = 0: keycode = 0: Exit Sub
 Case vbKeyUp
     If Spinner Then Exit Sub
     
@@ -1626,7 +1626,7 @@ Case vbKeyUp
     If shift <> 0 Then
         If ListIndex < topitem Then topitem = ListIndex
         PrepareToShow 5
-        If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+        If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
     Else
         RaiseEvent MarkDestroyAny
         MarkNext = 0
@@ -1636,13 +1636,13 @@ Case vbKeyUp
             If topitem < 0 Then topitem = 0
             ShowMe2
         Else
-            KeyCode = 0
+            keycode = 0
             If ListIndex < topitem Then topitem = ListIndex
             PrepareToShow 5
         End If
         Exit Sub
     End If
-    shift = 0: KeyCode = 0: Exit Sub
+    shift = 0: keycode = 0: Exit Sub
 Case vbKeyDown
     If Spinner Then Exit Sub
     lcnt = listcount
@@ -1668,7 +1668,7 @@ Case vbKeyDown
     If shift <> 0 Then
         If ListIndex - topitem > lines Then topitem = ListIndex - lines
         PrepareToShow 5
-        If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+        If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
     Else
         RaiseEvent MarkDestroyAny
         MarkNext = 0
@@ -1680,13 +1680,13 @@ Case vbKeyDown
             End If
             ShowMe2
         Else
-            KeyCode = 0
+            keycode = 0
             If ListIndex - topitem > lines Then topitem = ListIndex - lines
             PrepareToShow 5
         End If
         Exit Sub
     End If
-     KeyCode = 0: Exit Sub
+     keycode = 0: Exit Sub
 Case vbKeyPageDown
     lcnt = listcount
     If shift = 0 Then RaiseEvent MarkDestroyAny
@@ -1701,8 +1701,8 @@ Case vbKeyPageDown
             SELECTEDITEM = SELECTEDITEM + 1
         Else
             PrepareToShow 5
-            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
-            shift = 0: KeyCode = 0: Exit Sub
+            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+            shift = 0: keycode = 0: Exit Sub
         End If
     ElseIf (SELECTEDITEM - topitem) <= (lines + 1) \ 2 Then
         If topitem + (lines + 1) + 1 <= lcnt Then
@@ -1732,8 +1732,8 @@ Case vbKeyPageDown
     End If
     RaiseEvent ChangeSelStart(SelStart)
     If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
-    shift = 0: KeyCode = 0: Exit Sub
+    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+    shift = 0: keycode = 0: Exit Sub
 Case vbKeySpace
     If SELECTEDITEM > 0 Then
         If EditFlagSpecial Then
@@ -1761,7 +1761,7 @@ Case vbKeySpace
                     RaiseEvent PureListOff
                     SelStartEventAlways = SelStart + 1
                     RaiseEvent SetExpandSS(mSelstart)
-                    KeyCode = 0
+                    keycode = 0
                     If listcount > 0 Or MultiLineEditBox Then
                         If OverrideShow And Not HandleOverride Then
                             ShowMe
@@ -1796,7 +1796,7 @@ Case vbKeySpace
                     RaiseEvent PureListOff
                     SelStartEventAlways = SelStart + 1
                     RaiseEvent SetExpandSS(mSelstart)
-                    KeyCode = 0
+                    keycode = 0
                     'PrepareToShow 2
                     If listcount > 0 Or MultiLineEditBox Then
                         If OverrideShow And Not HandleOverride Then
@@ -2106,47 +2106,47 @@ Else
     RaiseEvent EnterOnly
 End If
 End Select
-If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
-If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
+If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
 End If
 
 If MultiLineEditBox Then
     SelStartEventAlways = SelStart
-    If shift Or Not (KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown) Then Me.PrepareToShow 5
+    If shift Or Not (keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown) Then Me.PrepareToShow 5
 Else
-    KeyCode = 0
+    keycode = 0
     SelStartEventAlways = SelStart
     Me.PrepareToShow 5
 End If
-KeyCode = 0
+keycode = 0
 End Sub
 
-Private Sub UserControl_KeyUp(KeyCode As Integer, shift As Integer)
+Private Sub UserControl_KeyUp(keycode As Integer, shift As Integer)
     On Error GoTo fin
     If PrevLocale <> GetLocale Then RaiseEvent Maybelanguage
-    If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
+    If BypassKey Then keycode = 0: shift = 0: Exit Sub
     Dim i As Long, K As Integer
 
     lastshift = shift
 
-    If KeyCode = 18 Then
+    If keycode = 18 Then
     
-    ElseIf KeyCode = 112 And (shift And 2) = 2 Then
-        KeyCode = 0
+    ElseIf keycode = 112 And (shift And 2) = 2 Then
+        keycode = 0
         shift = 0
         RaiseEvent CtrlPlusF1
     Exit Sub
-ElseIf KeyCode >= vbKeyF1 And KeyCode <= vbKeyF12 Then
-    K = ((KeyCode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
+ElseIf keycode >= vbKeyF1 And keycode <= vbKeyF12 Then
+    K = ((keycode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
     RaiseEvent Fkey(K)
-    If K = 0 Then KeyCode = 0: shift = 0
-ElseIf KeyCode = 16 And shift <> 0 Then
+    If K = 0 Then keycode = 0: shift = 0
+ElseIf keycode = 16 And shift <> 0 Then
   '  RaiseEvent Maybelanguage
-ElseIf KeyCode = vbKeyV Then
+ElseIf keycode = vbKeyV Then
     Exit Sub
 Else
-    If KeyCode = 27 And NoEscapeKey Then
-        KeyCode = 0
+    If keycode = 27 And NoEscapeKey Then
+        keycode = 0
     Else
         RaiseEvent RefreshOnly
     End If
@@ -3934,7 +3934,7 @@ CalcAndShowBar
 
 'End If
 End Sub
-Public Sub additem(a$)
+Public Sub AddItem(a$)
 Dim i As Long
 
 If itemcount = Buffer Then
@@ -6031,88 +6031,88 @@ Friend Sub GoON()
         ChooseNextRight Me, Me.Parent, True
     End If
 End Sub
-Friend Sub TakeKey(KeyCode As Integer, shift As Integer)
-    UserControl_KeyDown KeyCode, shift
-If KeyCode <> 0 Then
-    UserControl_KeyUp KeyCode, shift
+Friend Sub TakeKey(keycode As Integer, shift As Integer)
+    UserControl_KeyDown keycode, shift
+If keycode <> 0 Then
+    UserControl_KeyUp keycode, shift
 End If
 
 End Sub
 
-Private Sub UserControl_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub UserControl_KeyDown(keycode As Integer, shift As Integer)
 On Error GoTo fin
 If shift = 0 Then
-    If KeyCode = vbKeyDown Or KeyCode = vbKeyUp Then
+    If keycode = vbKeyDown Or keycode = vbKeyUp Then
         If WinKey() Then
-            RaiseEvent WindowKey(KeyCode)
-            KeyCode = 0
+            RaiseEvent WindowKey(keycode)
+            keycode = 0
             Exit Sub
         End If
     End If
 End If
 PrevLocale = GetLocale()
-If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
+If BypassKey Then keycode = 0: shift = 0: Exit Sub
 lastshift = shift
 
-If KeyCode = 27 And NoEscapeKey Then
-KeyCode = 0
+If keycode = 27 And NoEscapeKey Then
+keycode = 0
 Exit Sub
 End If
 If Arrows2Tab And Not EditFlagSpecial Then
-    If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Then
+    If keycode = vbKeyLeft Or keycode = vbKeyUp Then
         If Typename(Me.Parent) = "GuiM2000" Then
         ChooseNextLeft Me, Me.Parent
         End If
-        KeyCode = 0
+        keycode = 0
         Exit Sub
-    ElseIf KeyCode = vbKeyRight Or KeyCode = vbKeyDown Then
+    ElseIf keycode = vbKeyRight Or keycode = vbKeyDown Then
         If Typename(Me.Parent) = "GuiM2000" Then
         ChooseNextRight Me, Me.Parent
         End If
-        KeyCode = 0
+        keycode = 0
         Exit Sub
     End If
 End If
-If KeyCode = vbKeyTab And Not EditFlagSpecial Then
+If keycode = vbKeyTab And Not EditFlagSpecial Then
     If shift = 1 Then
         choosenext
-        KeyCode = 0
+        keycode = 0
         Exit Sub
     End If
-ElseIf KeyCode = vbKeyF4 Then
+ElseIf keycode = vbKeyF4 Then
 If shift = 4 Then
 On Error Resume Next
 If Parent.Name = "GuiM2000" Or Parent.Name = "Form2" Or Parent.Name = "Form4" Then
 With UserControl.Parent
 .ByeBye
 End With
-KeyCode = 0
+keycode = 0
 Exit Sub
 End If
 End If
 End If
-If DropKey Then shift = 0: KeyCode = 0: Exit Sub
+If DropKey Then shift = 0: keycode = 0: Exit Sub
 Dim i&
 If shift = 4 Then
-If KeyCode = 18 Then
+If keycode = 18 Then
 If mynum$ = vbNullString Then mynum$ = "0"
-KeyCode = 0
+keycode = 0
 Exit Sub
 Else
-If KeyCode <> 0 Then GetKeY2 KeyCode, shift
+If keycode <> 0 Then GetKeY2 keycode, shift
 End If
-Select Case KeyCode
+Select Case keycode
 Case vbKeyAdd, vbKeyInsert
 mynum$ = "&h"
 Case vbKey0 To vbKey9
-mynum$ = mynum$ + Chr$(KeyCode - vbKey0 + 48)
+mynum$ = mynum$ + Chr$(keycode - vbKey0 + 48)
 LastNumX = True
 Case vbKeyNumpad0 To vbKeyNumpad9
 LastNumX = False
-mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 48)
+mynum$ = mynum$ + Chr$(keycode - vbKeyNumpad0 + 48)
 Case vbKeyA To vbKeyF
 If Left$(mynum$, 1) = "&" Then
-mynum$ = mynum$ + Chr$(KeyCode)
+mynum$ = mynum$ + Chr$(keycode)
 LastNumX = True
 Else
 mynum$ = vbNullString
@@ -6124,18 +6124,18 @@ Exit Sub
 End If
 
 mynum$ = vbNullString
-If shift <> 0 And KeyCode = 0 Then Exit Sub
+If shift <> 0 And keycode = 0 Then Exit Sub
 
-RaiseEvent KeyDown(KeyCode, shift)
-If KeyCode <> 0 Then GetKeY2 KeyCode, shift
-If (KeyCode = 0) Or Not (enabled Or state) Then Exit Sub
+RaiseEvent KeyDown(keycode, shift)
+If keycode <> 0 Then GetKeY2 keycode, shift
+If (keycode = 0) Or Not (enabled Or state) Then Exit Sub
 If SELECTEDITEM < 0 Then
 SELECTEDITEM = topitem + 1: ShowMe2
-If Not EditFlagSpecial Then: KeyCode = 0
+If Not EditFlagSpecial Then: keycode = 0
 End If
-LargeBar1KeyDown KeyCode, shift
+LargeBar1KeyDown keycode, shift
 If EnabledBar Then
-Select Case KeyCode
+Select Case keycode
 Case vbKeyLeft, vbKeyUp
 If WinKey Then
 
@@ -7105,11 +7105,12 @@ If Pos <> 0 Then
 Dim mypos As Long, ogt As String, this$
 If Pos <= 0 Then Pos = 1
 ePos = Pos
+If Len(mline$) < Pos Then Pos = Len(mline$)
 Do While Pos > 0
 If InStr(1, WordCharLeft, Mid$(mline$, Pos, 1)) Then Exit Do
 Pos = Pos - 1
 Loop
-If Pos > 0 Then If InStr(1, WordCharLeftButIncluded, Mid$(mline$, Pos, 1)) Then Pos = Pos - 1
+ If Pos > 0 Then If Len(Mid$(mline$, Pos, 1)) > 0 Then If InStr(1, WordCharLeftButIncluded, Mid$(mline$, Pos, 1)) Then Pos = Pos - 1
 Do While ePos <= Len(mline$)
 one$ = Mid$(mline$, ePos, 1)
 If InStr(1, WordCharRightButIncluded, one$) Then ePos = ePos + 1: Exit Do
@@ -7122,7 +7123,6 @@ If (ePos - Pos - 1) > 0 Then
     If Pos > Len(mline$) Then Pos = 0 Else Pos = Pos - 1
     End If
     this$ = Mid$(mline$, Pos + 1, ePos - Pos - 1)
-    
     RaiseEvent WordMarked(this$)
     If this = vbNullString Or Not EditFlag Then Exit Sub
     oldselstart = SelStart
@@ -7412,13 +7412,13 @@ Sub DestCaret()
 End Sub
 Private Function MyTrimL(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL = 1: Exit Function
   p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 9
     Case Else
      MyTrimL = (i - p2) \ 2 + 1
@@ -7601,36 +7601,36 @@ If Col >= 1 And Col <= mTabs Then
     ColumnWidth = CVar(mParts(Col) * scrTwips)
 End If
 End Property
-Public Sub QuickSortExtended(ByVal Col As Long, ByVal LB As Long, ByVal UB As Long)
+Public Sub QuickSortExtended(ByVal Col As Long, ByVal lb As Long, ByVal ub As Long)
 Dim M1 As Long, M2 As Long
 On Error GoTo abc1
 Dim Piv As String, tmp As String
-     If UB - LB = 1 Then
-     M1 = LB
-      If StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Mid$(listAtColumn(UB, Col), SkipChars), mSortstyle) = 1 Then SwapListItems M1, UB
+     If ub - lb = 1 Then
+     M1 = lb
+      If StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Mid$(listAtColumn(ub, Col), SkipChars), mSortstyle) = 1 Then SwapListItems M1, ub
       Exit Sub
      Else
-       M1 = (LB + UB) \ 2 '+ 1
-             If StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Mid$(listAtColumn(LB, Col), SkipChars), mSortstyle) = 0 Then
-                M2 = UB - 1
-                M1 = LB
-                Piv = Mid$(listAtColumn(LB, Col), SkipChars)
+       M1 = (lb + ub) \ 2 '+ 1
+             If StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Mid$(listAtColumn(lb, Col), SkipChars), mSortstyle) = 0 Then
+                M2 = ub - 1
+                M1 = lb
+                Piv = Mid$(listAtColumn(lb, Col), SkipChars)
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If StrComp(Mid$(listAtColumn(UB, Col), SkipChars), Piv, mSortstyle) = -1 Then SwapListItems LB, UB
+                        If StrComp(Mid$(listAtColumn(ub, Col), SkipChars), Piv, mSortstyle) = -1 Then SwapListItems lb, ub
                         Exit Sub
                     End If
                 Loop Until StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Piv, mSortstyle) <> 0
                 Piv = Mid$(listAtColumn(M1, Col), SkipChars)
-                If M1 > LB Then If StrComp(Mid$(listAtColumn(LB, Col), SkipChars), Piv, mSortstyle) = 1 Then SwapListItems M1, LB: Piv = Mid$(listAtColumn(M1, Col), SkipChars)
+                If M1 > lb Then If StrComp(Mid$(listAtColumn(lb, Col), SkipChars), Piv, mSortstyle) = 1 Then SwapListItems M1, lb: Piv = Mid$(listAtColumn(M1, Col), SkipChars)
             Else
                 Piv = Mid$(listAtColumn(M1, Col), SkipChars)
-                M1 = LB
+                M1 = lb
                 Do While StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Piv, mSortstyle) = -1: M1 = M1 + 1: Loop
             End If
     End If
-    M2 = UB
+    M2 = ub
     Do
       Do While StrComp(Mid$(listAtColumn(M2, Col), SkipChars), Piv, mSortstyle) = 1: M2 = M2 - 1: Loop
       If M1 <= M2 Then
@@ -7641,8 +7641,8 @@ Dim Piv As String, tmp As String
       If M1 > M2 Then Exit Do
       Do While StrComp(Mid$(listAtColumn(M1, Col), SkipChars), Piv, mSortstyle) = -1: M1 = M1 + 1: Loop
     Loop
-    If LB < M2 Then QuickSortExtended Col, LB, M2
-    If M1 < UB Then QuickSortExtended Col, M1, UB
+    If lb < M2 Then QuickSortExtended Col, lb, M2
+    If M1 < ub Then QuickSortExtended Col, M1, ub
     Exit Sub
 abc1:
     
