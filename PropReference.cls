@@ -17,11 +17,11 @@ Dim vtref As Long
 Dim mIndex As Variant
 Public UseIndex As Boolean
 Dim Init As Boolean
-Dim IamMethod  As Boolean
+'Dim IamMethod  As Boolean  ' not used
 Dim hardlink As Object, useobj As Boolean
 Private mLastObj As Object
-Public arr As Boolean
-Public UseExtControl As Boolean
+Public Arr As Boolean
+Private UseExtControl As Boolean
 Dim oEnum As IUnknown
 Private IndexList As mIndexes
 Private IndexNew As Boolean
@@ -30,17 +30,28 @@ Function IsObj()
 End Function
 Property Get ObjectType() As String
 On Error Resume Next
+Dim v As Variant, that As FastCollection
 If Not hardlink Is Nothing Then
     If TypeOf hardlink Is ExtControl Then
     ObjectType = "*" + Typename(hardlink.mycontrol)
     Else
-    ObjectType = "*" + Typename(hardlink)
+    
+    If TypeOf hardlink Is FastCollection Then
+    Set that = hardlink
+    If that.structLen > 0 Then
+        ObjectType = "[?*" + Typename(that.StructObj) + "]"
+    Else
+        ObjectType = "[?*Inventory]"
+    End If
+    Else
+    ObjectType = "[?*" + Typename(hardlink) + "]"
+    End If
     End If
 Else
     If TypeOf var(ObjectRef) Is ExtControl Then
-    ObjectType = "[" + Typename(var(ObjectRef).mycontrol) + "]"
+    ObjectType = "[?*" + Typename(var(ObjectRef).mycontrol) + "]"
     Else
-    ObjectType = "[" + Typename(var(ObjectRef)) + "]"
+    ObjectType = "[?*" + Typename(var(ObjectRef)) + "]"
     End If
 End If
 End Property
@@ -74,7 +85,7 @@ End Property
 Public Sub clearlastobject()
 Set mLastObj = Nothing
 End Sub
-Public Property Get value() As Variant
+Public Property Get Value() As Variant
 Dim v
 Dim RETVAR As Variant, retvar2, obj As Object
 Dim check As Boolean
@@ -82,20 +93,20 @@ Set mLastObj = Nothing
 If Init Then
 If UseIndex Then
 If Not IndexNew Then
- value = 0
+ Value = 0
 Set mLastObj = Me
 Exit Property
 ElseIf useobj Then
     IndexNew = False
-    value = ReadPropIndexObj(hardlink, vtref, mIndex, UseExtControl)
+    Value = ReadPropIndexObj(hardlink, vtref, mIndex, UseExtControl)
 Else
     IndexNew = False
-    value = ReadPropIndex(ObjectRef, vtref, mIndex, UseExtControl, check, RETVAR)
+    Value = ReadPropIndex(ObjectRef, vtref, mIndex, UseExtControl, check, RETVAR)
     If check And IsObject(RETVAR) Then
     On Error Resume Next
     Set obj = RETVAR
     If ReadOneParameter(obj, (0), vbNullString, retvar2) Then
-        value = retvar2
+        Value = retvar2
        Else
           Set mLastObj = RETVAR
     End If
@@ -109,27 +120,27 @@ Else
 If useobj Then
 If ReadPropObj(hardlink, vtref, RETVAR, UseExtControl) Then
 If IsObject(RETVAR) Then
- value = 0
+ Value = 0
           Set mLastObj = RETVAR
 
 Else
-value = RETVAR
+Value = RETVAR
 End If
 End If
 Else
  If ReadProp(ObjectRef, vtref, RETVAR, UseExtControl) Then
  If IsObject(RETVAR) Then
-         value = 0
+         Value = 0
           Set mLastObj = RETVAR
 
 Else
 On Error Resume Next
 If TypeOf RETVAR Is IUnknown Then
-value = 0
+Value = 0
 Set mLastObj = RETVAR: Exit Property
 End If
 Err.Clear
-value = RETVAR
+Value = RETVAR
 End If
  End If
  End If
@@ -140,7 +151,7 @@ Else
 End If
 'If Not IsObject(Value) Then Debug.Print Value
 End Property
-Public Property Let value(vNewValue As Variant)
+Public Property Let Value(vNewValue As Variant)
 If Init Then
 If Not UseIndex Then
 If useobj Then
@@ -187,13 +198,14 @@ End If
 
 
 End Property
-Public Property Get isMethod() As Boolean
-isMethod = IamMethod
-End Property
+'Public Property Get isMethod() As Boolean
+'isMethod = IamMethod
+'End Property
 
-Public Property Let isMethod(ByVal vNewValue As Boolean)
-IamMethod = vNewValue
-End Property
+'Public Property Let isMethod(ByVal vNewValue As Boolean)
+'IamMethod = vNewValue
+'End Property
+
 
 Private Sub Class_Terminate()
 Set hardlink = Nothing

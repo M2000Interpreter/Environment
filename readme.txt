@@ -1,8 +1,13 @@
 M2000 Interpreter and Environment
-Version 14 revision 21 active-X
+Version 14 revision 22 active-X
 
-1. Fix the borken ctrl+z/ctrl+y from revision 20 (was a mistake)
-2. Fix the Fill @ ... version of Fill statement (Now KB module show the Notes as letters - the fault was by the new IsExp() function which return string, but only if we pass a variant, and this old function ProcFill use the X as Double, so internal was variant, get the string but convert to number so X returned the 0,which then converted to string and we see the 0 for string value.)
+I do a big test with the examples form all the releases.
+I do many fixes.
+Also Modules ? now has third parameter:
+Module ? "", "Alfa|Beta", "|"
+perform a check for ALFA and BETA in every module/function loaded to M2000 environment.
+Module ? "*HELP", "Alfa|Beta", "|"
+The same but only for those modules which have a part named HELP.
 
 
 
