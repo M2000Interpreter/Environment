@@ -260,8 +260,8 @@ Event MenuChecked(item As Long)
 Event PromptLine(ThatLine As Long)
 Event PanLeftRight(direction As Boolean)
 Event GetBackPicture(pic As Object)
-Event KeyDown(keycode As Integer, shift As Integer)
-Event KeyDownAfter(keycode As Integer, shift As Integer)
+Event KeyDown(KeyCode As Integer, shift As Integer)
+Event KeyDownAfter(KeyCode As Integer, shift As Integer)
 Event SyncKeyboard(item As Integer)
 Event SyncKeyboardUnicode(a$)
 Event PreviewKeyboardUnicode(ByRef a$)
@@ -628,6 +628,7 @@ CalcAndShowBar
 ShowMe
 End Property
 Public Property Get Text() As String
+Attribute Text.VB_UserMemId = 0
 Dim i As Long, Pad$
 Text = space$(500)
 RaiseEvent PureListOn
@@ -983,11 +984,11 @@ Timer1.Interval = 40
 Timer1.enabled = True
 End Sub
 
-Public Sub LargeBar1KeyDown(keycode As Integer, shift As Integer)
+Public Sub LargeBar1KeyDown(KeyCode As Integer, shift As Integer)
 Timer1.enabled = False
 If ListIndex < 0 Then
 Else
-PressKey keycode, shift
+PressKey KeyCode, shift
 End If
 End Sub
 
@@ -1454,31 +1455,31 @@ If ListIndex < topitem Then topitem = ListIndex
       PrepareToShow 5
     End If
 End Sub
-Public Sub PressKey(keycode As Integer, shift As Integer, Optional NoEvents As Boolean = False)
+Public Sub PressKey(KeyCode As Integer, shift As Integer, Optional NoEvents As Boolean = False)
 Dim lcnt As Long, osel As Long, lsep As Long
-If shift <> 0 And keycode = 16 Then Exit Sub
+If shift <> 0 And KeyCode = 16 Then Exit Sub
 Timer1.enabled = False
 If BlinkON Then BlinkTimer.enabled = True
 'Timer1.Interval = 1000
 Dim LastListIndex As Long, bb As Boolean, val As Long
 LastListIndex = ListIndex
-If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
     If Not Spinner Then If Hidebar Then Hidebar = False: Redraw Hidebar Or m_showbar
-    If (keycode = vbKeyPageUp Or keycode = vbKeyPageDown) And (shift And 2) = 2 Then
+    If (KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown) And (shift And 2) = 2 Then
         If MarkNext = 0 Then
-            RaiseEvent KeyDown(keycode, shift)
-            If keycode <> 0 Then GetKeY2 keycode, shift
+            RaiseEvent KeyDown(KeyCode, shift)
+            If KeyCode <> 0 Then GetKeY2 KeyCode, shift
         End If
-        If keycode = 0 Then Exit Sub
+        If KeyCode = 0 Then Exit Sub
     End If
-    If MarkNext = 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+    If MarkNext = 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
 End If
 
-If keycode = 93 Then
+If KeyCode = 93 Then
 ' you have to clear myButton, here keycode
-RaiseEvent OutPopUp(nowX, nowY, keycode)
+RaiseEvent OutPopUp(nowX, nowY, KeyCode)
 End If
-Select Case keycode
+Select Case KeyCode
 Case vbKeyHome
 If EditFlagSpecial And (shift And 2) = 0 Then
     RaiseEvent DelExpandSS
@@ -1555,8 +1556,8 @@ Case vbKeyPageUp
             SELECTEDITEM = SELECTEDITEM - 1
         Else
             PrepareToShow 5
-            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
-            shift = 0: keycode = 0: Exit Sub
+            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+            shift = 0: KeyCode = 0: Exit Sub
         End If
     Else
         If topitem < SELECTEDITEM - (lines + 1) \ 2 Then
@@ -1599,8 +1600,8 @@ Case vbKeyPageUp
     End If
     RaiseEvent ChangeSelStart(SelStart)
     If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
-    shift = 0: keycode = 0: Exit Sub
+    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+    shift = 0: KeyCode = 0: Exit Sub
 Case vbKeyUp
     If Spinner Then Exit Sub
     
@@ -1626,7 +1627,7 @@ Case vbKeyUp
     If shift <> 0 Then
         If ListIndex < topitem Then topitem = ListIndex
         PrepareToShow 5
-        If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+        If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
     Else
         RaiseEvent MarkDestroyAny
         MarkNext = 0
@@ -1636,13 +1637,13 @@ Case vbKeyUp
             If topitem < 0 Then topitem = 0
             ShowMe2
         Else
-            keycode = 0
+            KeyCode = 0
             If ListIndex < topitem Then topitem = ListIndex
             PrepareToShow 5
         End If
         Exit Sub
     End If
-    shift = 0: keycode = 0: Exit Sub
+    shift = 0: KeyCode = 0: Exit Sub
 Case vbKeyDown
     If Spinner Then Exit Sub
     lcnt = listcount
@@ -1668,7 +1669,7 @@ Case vbKeyDown
     If shift <> 0 Then
         If ListIndex - topitem > lines Then topitem = ListIndex - lines
         PrepareToShow 5
-        If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+        If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
     Else
         RaiseEvent MarkDestroyAny
         MarkNext = 0
@@ -1680,13 +1681,13 @@ Case vbKeyDown
             End If
             ShowMe2
         Else
-            keycode = 0
+            KeyCode = 0
             If ListIndex - topitem > lines Then topitem = ListIndex - lines
             PrepareToShow 5
         End If
         Exit Sub
     End If
-     keycode = 0: Exit Sub
+     KeyCode = 0: Exit Sub
 Case vbKeyPageDown
     lcnt = listcount
     If shift = 0 Then RaiseEvent MarkDestroyAny
@@ -1701,8 +1702,8 @@ Case vbKeyPageDown
             SELECTEDITEM = SELECTEDITEM + 1
         Else
             PrepareToShow 5
-            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
-            shift = 0: keycode = 0: Exit Sub
+            If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+            shift = 0: KeyCode = 0: Exit Sub
         End If
     ElseIf (SELECTEDITEM - topitem) <= (lines + 1) \ 2 Then
         If topitem + (lines + 1) + 1 <= lcnt Then
@@ -1732,8 +1733,8 @@ Case vbKeyPageDown
     End If
     RaiseEvent ChangeSelStart(SelStart)
     If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
-    shift = 0: keycode = 0: Exit Sub
+    If shift <> 0 Then If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
+    shift = 0: KeyCode = 0: Exit Sub
 Case vbKeySpace
     If SELECTEDITEM > 0 Then
         If EditFlagSpecial Then
@@ -1761,7 +1762,7 @@ Case vbKeySpace
                     RaiseEvent PureListOff
                     SelStartEventAlways = SelStart + 1
                     RaiseEvent SetExpandSS(mSelstart)
-                    keycode = 0
+                    KeyCode = 0
                     If listcount > 0 Or MultiLineEditBox Then
                         If OverrideShow And Not HandleOverride Then
                             ShowMe
@@ -1796,7 +1797,7 @@ Case vbKeySpace
                     RaiseEvent PureListOff
                     SelStartEventAlways = SelStart + 1
                     RaiseEvent SetExpandSS(mSelstart)
-                    keycode = 0
+                    KeyCode = 0
                     'PrepareToShow 2
                     If listcount > 0 Or MultiLineEditBox Then
                         If OverrideShow And Not HandleOverride Then
@@ -2106,47 +2107,47 @@ Else
     RaiseEvent EnterOnly
 End If
 End Select
-If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
-If MarkNext > 0 Then RaiseEvent KeyDownAfter(keycode, shift)
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
+If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, shift)
 End If
 
 If MultiLineEditBox Then
     SelStartEventAlways = SelStart
-    If shift Or Not (keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown) Then Me.PrepareToShow 5
+    If shift Or Not (KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown) Then Me.PrepareToShow 5
 Else
-    keycode = 0
+    KeyCode = 0
     SelStartEventAlways = SelStart
     Me.PrepareToShow 5
 End If
-keycode = 0
+KeyCode = 0
 End Sub
 
-Private Sub UserControl_KeyUp(keycode As Integer, shift As Integer)
+Private Sub UserControl_KeyUp(KeyCode As Integer, shift As Integer)
     On Error GoTo fin
     If PrevLocale <> GetLocale Then RaiseEvent Maybelanguage
-    If BypassKey Then keycode = 0: shift = 0: Exit Sub
+    If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
     Dim i As Long, K As Integer
 
     lastshift = shift
 
-    If keycode = 18 Then
+    If KeyCode = 18 Then
     
-    ElseIf keycode = 112 And (shift And 2) = 2 Then
-        keycode = 0
+    ElseIf KeyCode = 112 And (shift And 2) = 2 Then
+        KeyCode = 0
         shift = 0
         RaiseEvent CtrlPlusF1
     Exit Sub
-ElseIf keycode >= vbKeyF1 And keycode <= vbKeyF12 Then
-    K = ((keycode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
+ElseIf KeyCode >= vbKeyF1 And KeyCode <= vbKeyF12 Then
+    K = ((KeyCode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
     RaiseEvent Fkey(K)
-    If K = 0 Then keycode = 0: shift = 0
-ElseIf keycode = 16 And shift <> 0 Then
+    If K = 0 Then KeyCode = 0: shift = 0
+ElseIf KeyCode = 16 And shift <> 0 Then
   '  RaiseEvent Maybelanguage
-ElseIf keycode = vbKeyV Then
+ElseIf KeyCode = vbKeyV Then
     Exit Sub
 Else
-    If keycode = 27 And NoEscapeKey Then
-        keycode = 0
+    If KeyCode = 27 And NoEscapeKey Then
+        KeyCode = 0
     Else
         RaiseEvent RefreshOnly
     End If
@@ -5397,7 +5398,7 @@ On Error GoTo th1
 
 If Extender.Parent Is Nothing Then Exit Sub
 
-If Extender.Parent.Picture.Handle <> 0 And BackStyle = 1 Then
+If Extender.Parent.Picture.handle <> 0 And BackStyle = 1 Then
 
 If Me.BorderStyle = 1 Then
 currentY = 0
@@ -5415,7 +5416,7 @@ ElseIf BackStyle = 1 Then
 Dim mmo As PictureBox
 RaiseEvent GetBackPicture(mmo)
 If Not mmo Is Nothing Then
-If mmo.Picture.Handle <> 0 Then
+If mmo.Picture.handle <> 0 Then
     UserControl.PaintPicture mmo.Picture, 0, 0, , , Extender.Left, Extender.Top
     If Me.BorderStyle = 1 Then
     currentY = 0
@@ -5457,7 +5458,7 @@ If BackStyle = 1 Then
             Set pp = UserControl.Parent
         End If
         On Error GoTo th1
-        If pp.Picture.Handle <> 0 Then
+        If pp.Picture.handle <> 0 Then
             If Me.BorderStyle = 1 Then
                 UserControl.PaintPicture pp.Picture, scrTwips, scrTwips, Width - 2 * scrTwips, Height - 2 * scrTwips, Extender.Left, Extender.Top, Width - 2 * scrTwips, Height - 2 * scrTwips
                 hnr.Left = 0
@@ -5489,7 +5490,7 @@ If BackStyle = 1 Then
         Dim mmo As Object  ' MUST BE A FORM OR A PICTURE BOX
         RaiseEvent GetBackPicture(mmo)
         If Not mmo Is Nothing Then
-            If mmo.Image.Handle <> 0 Then
+            If mmo.Image.handle <> 0 Then
                 UserControl.PaintPicture mmo.Image, 0, 0, , , Extender.Left - mmo.Left, Extender.Top - mmo.Top
                 If Me.BorderStyle = 1 Then
                         UserControl.PaintPicture UserControl.Parent.Picture, scrTwips, scrTwips, Width - 2 * scrTwips, Height - 2 * scrTwips, Extender.Left, Extender.Top, Width - 2 * scrTwips, Height - 2 * scrTwips
@@ -5758,7 +5759,7 @@ End Function
 Public Sub RepaintFromOut(parentpic As StdPicture, Myleft As Long, mytop As Long)
 On Error GoTo th1
 
-If parentpic.Handle <> 0 Then
+If parentpic.handle <> 0 Then
 UserControl.PaintPicture parentpic, 0, 0, , , Myleft, mytop
 Else
 th1:
@@ -6031,88 +6032,88 @@ Friend Sub GoON()
         ChooseNextRight Me, Me.Parent, True
     End If
 End Sub
-Friend Sub TakeKey(keycode As Integer, shift As Integer)
-    UserControl_KeyDown keycode, shift
-If keycode <> 0 Then
-    UserControl_KeyUp keycode, shift
+Friend Sub TakeKey(KeyCode As Integer, shift As Integer)
+    UserControl_KeyDown KeyCode, shift
+If KeyCode <> 0 Then
+    UserControl_KeyUp KeyCode, shift
 End If
 
 End Sub
 
-Private Sub UserControl_KeyDown(keycode As Integer, shift As Integer)
+Private Sub UserControl_KeyDown(KeyCode As Integer, shift As Integer)
 On Error GoTo fin
 If shift = 0 Then
-    If keycode = vbKeyDown Or keycode = vbKeyUp Then
+    If KeyCode = vbKeyDown Or KeyCode = vbKeyUp Then
         If WinKey() Then
-            RaiseEvent WindowKey(keycode)
-            keycode = 0
+            RaiseEvent WindowKey(KeyCode)
+            KeyCode = 0
             Exit Sub
         End If
     End If
 End If
 PrevLocale = GetLocale()
-If BypassKey Then keycode = 0: shift = 0: Exit Sub
+If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
 lastshift = shift
 
-If keycode = 27 And NoEscapeKey Then
-keycode = 0
+If KeyCode = 27 And NoEscapeKey Then
+KeyCode = 0
 Exit Sub
 End If
 If Arrows2Tab And Not EditFlagSpecial Then
-    If keycode = vbKeyLeft Or keycode = vbKeyUp Then
+    If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Then
         If Typename(Me.Parent) = "GuiM2000" Then
         ChooseNextLeft Me, Me.Parent
         End If
-        keycode = 0
+        KeyCode = 0
         Exit Sub
-    ElseIf keycode = vbKeyRight Or keycode = vbKeyDown Then
+    ElseIf KeyCode = vbKeyRight Or KeyCode = vbKeyDown Then
         If Typename(Me.Parent) = "GuiM2000" Then
         ChooseNextRight Me, Me.Parent
         End If
-        keycode = 0
+        KeyCode = 0
         Exit Sub
     End If
 End If
-If keycode = vbKeyTab And Not EditFlagSpecial Then
+If KeyCode = vbKeyTab And Not EditFlagSpecial Then
     If shift = 1 Then
         choosenext
-        keycode = 0
+        KeyCode = 0
         Exit Sub
     End If
-ElseIf keycode = vbKeyF4 Then
+ElseIf KeyCode = vbKeyF4 Then
 If shift = 4 Then
 On Error Resume Next
 If Parent.Name = "GuiM2000" Or Parent.Name = "Form2" Or Parent.Name = "Form4" Then
 With UserControl.Parent
 .ByeBye
 End With
-keycode = 0
+KeyCode = 0
 Exit Sub
 End If
 End If
 End If
-If DropKey Then shift = 0: keycode = 0: Exit Sub
+If DropKey Then shift = 0: KeyCode = 0: Exit Sub
 Dim i&
 If shift = 4 Then
-If keycode = 18 Then
+If KeyCode = 18 Then
 If mynum$ = vbNullString Then mynum$ = "0"
-keycode = 0
+KeyCode = 0
 Exit Sub
 Else
-If keycode <> 0 Then GetKeY2 keycode, shift
+If KeyCode <> 0 Then GetKeY2 KeyCode, shift
 End If
-Select Case keycode
+Select Case KeyCode
 Case vbKeyAdd, vbKeyInsert
 mynum$ = "&h"
 Case vbKey0 To vbKey9
-mynum$ = mynum$ + Chr$(keycode - vbKey0 + 48)
+mynum$ = mynum$ + Chr$(KeyCode - vbKey0 + 48)
 LastNumX = True
 Case vbKeyNumpad0 To vbKeyNumpad9
 LastNumX = False
-mynum$ = mynum$ + Chr$(keycode - vbKeyNumpad0 + 48)
+mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 48)
 Case vbKeyA To vbKeyF
 If Left$(mynum$, 1) = "&" Then
-mynum$ = mynum$ + Chr$(keycode)
+mynum$ = mynum$ + Chr$(KeyCode)
 LastNumX = True
 Else
 mynum$ = vbNullString
@@ -6124,18 +6125,18 @@ Exit Sub
 End If
 
 mynum$ = vbNullString
-If shift <> 0 And keycode = 0 Then Exit Sub
+If shift <> 0 And KeyCode = 0 Then Exit Sub
 
-RaiseEvent KeyDown(keycode, shift)
-If keycode <> 0 Then GetKeY2 keycode, shift
-If (keycode = 0) Or Not (enabled Or state) Then Exit Sub
+RaiseEvent KeyDown(KeyCode, shift)
+If KeyCode <> 0 Then GetKeY2 KeyCode, shift
+If (KeyCode = 0) Or Not (enabled Or state) Then Exit Sub
 If SELECTEDITEM < 0 Then
 SELECTEDITEM = topitem + 1: ShowMe2
-If Not EditFlagSpecial Then: keycode = 0
+If Not EditFlagSpecial Then: KeyCode = 0
 End If
-LargeBar1KeyDown keycode, shift
+LargeBar1KeyDown KeyCode, shift
 If EnabledBar Then
-Select Case keycode
+Select Case KeyCode
 Case vbKeyLeft, vbKeyUp
 If WinKey Then
 
@@ -7412,16 +7413,16 @@ Sub DestCaret()
 End Sub
 Private Function MyTrimL(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL = 1: Exit Function
-  p2 = StrPtr(s): l = l - 1
-  p4 = p2 + l * 2
-  For i = p2 To p4 Step 2
+  P2 = StrPtr(s): l = l - 1
+  p4 = P2 + l * 2
+  For i = P2 To p4 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160, 9
     Case Else
-     MyTrimL = (i - p2) \ 2 + 1
+     MyTrimL = (i - P2) \ 2 + 1
    Exit Function
   End Select
   Next i
