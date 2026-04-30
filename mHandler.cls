@@ -49,11 +49,11 @@ End Sub
 Friend Sub CopyTo(a As mHandler)
 If IamEnum Then Set a = Me: Exit Sub
 Set a = New mHandler
-a.T1 = T1
-If T1 = 1 Then
+a.t1 = t1
+If t1 = 1 Then
     a.ReadOnly = ReadOnly
     Set a.objref = mObjRef
-ElseIf T1 = 3 Then
+ElseIf t1 = 3 Then
     If ReadOnly Then
     Dim mAr As mArray, mtu As tuple
            If TypeOf objref Is mArray Then
@@ -95,15 +95,26 @@ If IsObject(index_cursor) Then Set mObjRef = index_cursor: index_cursor = vbEmpt
 End If
 End Sub
 Friend Function CreateFromPicture(b As Long, w1 As Long, w2 As Long, w3 As Long) As Object
-If T1 = 2 Then
+If t1 = 2 Then
 Dim mm As MemBlock
 Set mm = mObjRef
 Set CreateFromPicture = mm.CreateFromPicture(b, w1, w2, w3)
 End If
 End Function
+Friend Function CopyMemBlock(a, p, mm As Object) As Boolean
+Dim M As MemBlock, M1 As MemBlock, usest As Boolean
+Set M = Me.objref
+Err.Clear
+Set mm = M.Copy(CLng(a), CLng(p))
+CopyMemBlock = Err.Number = 0
+If Not CopyMemBlock Then
+    MyEr Err.Description, Err.Description
+    Err.Clear
+End If
+End Function
 ' GetPNGBuffer
 Friend Property Get CreatePng() As Object
-If T1 = 2 Then
+If t1 = 2 Then
     Dim mm As MemBlock, res As mHandler
     Set mm = mObjRef
     If mm.GetPNGBuffer(res) Then
@@ -111,10 +122,10 @@ If T1 = 2 Then
     End If
 End If
 End Property
-Property Get T1() As Variant
-T1 = mt1
+Property Get t1() As Variant
+t1 = mt1
 End Property
-Friend Property Let T1(ByVal RHS As Variant)
+Friend Property Let t1(ByVal RHS As Variant)
 mt1 = RHS
 End Property
 

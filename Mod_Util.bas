@@ -6721,6 +6721,9 @@ End Sub
 
 Public Sub MyDoEvents()
 On Error GoTo there
+If MusicMaster.PlayMusic Then
+    MusicMaster.TimerTickNow
+End If
 If TaskMaster Is Nothing Then
     DoEvents
     Exit Sub
@@ -6728,15 +6731,12 @@ ElseIf Not TaskMaster.Processing And TaskMaster.QueueCount = 0 Then
     DoEvents
     Exit Sub
 Else
-    If TaskMaster.PlayMusic Then
-        TaskMaster.OnlyMusic = True
-        TaskMaster.TimerTick
-        TaskMaster.OnlyMusic = False
-    End If
+    MusicMaster.StopProcess
     TaskMaster.StopProcess
     TaskMaster.TimerTick
     DoEvents
     TaskMaster.StartProcess
+    MusicMaster.StartProcess
 End If
 Exit Sub
 there:
@@ -9394,6 +9394,9 @@ resp = myEvent(ObjFromPtr(basestackLP), rest$, Lang)
 End Sub
 Sub NeoProto(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = ProcProto(ObjFromPtr(basestackLP), rest$, Lang)
+End Sub
+Sub NeoItalic(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
+resp = ProcItalic(ObjFromPtr(basestackLP), rest$)
 End Sub
 Sub NeoEnum(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = ProcEnum(ObjFromPtr(basestackLP), rest$)
@@ -13036,7 +13039,7 @@ With players(prive)
                 If IsExp(bstack, rest$, Y, , True) Then
                     If Scr.DrawWidth > 1 Then
                         If flag Or flag2 Then
-                            If flag Then
+                            If Not flag Then
                                 halfX = (X Mod Scr.DrawWidth * dv15)
                                 halfy = (Y Mod Scr.DrawWidth * dv15)
                             Else
@@ -19124,16 +19127,15 @@ Function MyPlayScore(bstack As basetask, rest$) As Boolean
 Dim task As TaskInterface, sx As Double, p As Variant, i As Long
 Dim ch As Long
 MyPlayScore = True
+MusicMaster.Interval = 10
+MusicMaster.OnlyMusic = True
 If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
     If p = 0 Then
-        'TaskMaster.MusicTaskNum = 0
-        TaskMaster.OnlyMusic = True
         mute = True
-        Do
-            TaskMaster.TimerTickNow
-        Loop Until TaskMaster.PlayMusic = False
-        TaskMaster.OnlyMusic = False   '' forget it in revision 130
-       
+        'Do
+        '    MusicMaster.TimerTickNow
+        'Loop Until MusicMaster.PlayMusic = False
+        MusicMaster.Dispose
         For i = 1 To 16
             MusicBoxState(i) = False
             MusicBoxNote(i) = -2
@@ -19147,14 +19149,14 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
                 ch = (CLng(p) - 1) Mod 16 + 1
                 If sx < 1 Then
                     sx = 0
-                    Do While TaskMaster.ThrowOne((ch))
+                    Do While MusicMaster.ThrowOne((ch))
                         sx = sx - 1
                         If sx < -100 Then Exit Do
                     Loop
                 Else
                     
                     If MusicBoxState(ch) = True Then
-                        Set task = TaskMaster.GetTask((ch))
+                        Set task = MusicMaster.GetTask((ch))
                         If task Is Nothing Then GoTo abc
                         task.Parameters (ch), CLng(sx)
                     Else
@@ -19162,8 +19164,8 @@ abc:
                         Set task = New MusicBox
                         Set task.Owner = Form1.DIS
                         task.Parameters (ch), CLng(sx)
-                        TaskMaster.MusicTaskNum = TaskMaster.MusicTaskNum + 1
-                        TaskMaster.AddTask task
+                        MusicTaskNum = MusicTaskNum + 1
+                        MusicMaster.AddTask task
                     End If
                 End If
                 Do While FastSymbol(rest$, ",")
@@ -19174,14 +19176,14 @@ abc:
                             If IsExp(bstack, rest$, sx) Then
                                 If sx < 1 Then
                                     sx = 0
-                                    Do While TaskMaster.ThrowOne((ch))
+                                    Do While MusicMaster.ThrowOne((ch))
                                         sx = sx - 1
                                         If sx < -100 Then Exit Do
                                     Loop
                                 Else
                                     If MusicBoxState(ch) = True Then
                                         sx = 0
-                                        Do While TaskMaster.ThrowOne((ch))
+                                        Do While MusicMaster.ThrowOne((ch))
                                             sx = sx - 1
                                             If sx < -100 Then Exit Do
                                         Loop
@@ -19189,8 +19191,8 @@ abc:
                                     Set task = New MusicBox
                                     Set task.Owner = Form1.DIS
                                     task.Parameters ch, CLng(sx)
-                                    TaskMaster.MusicTaskNum = TaskMaster.MusicTaskNum + 1
-                                    TaskMaster.AddTask task
+                                    MusicTaskNum = MusicTaskNum + 1
+                                    MusicMaster.AddTask task
                                 End If
                                 MyPlayScore = True
                              End If
@@ -20742,7 +20744,7 @@ If x1 <> 0 Then
             RenameFile2 pa$, ExtractPath(pa$) + ExtractNameOnly(pa$, True) + ".bck1"
             askme = True
         End If
-     ProcTask2 Basestack1
+        ProcTask2 Basestack1
      
         If askme Then
                 
@@ -27827,7 +27829,7 @@ End With
 Do
 x1 = IsLabelFileName(basestack, rest$, W$)
 If x1 = 1 Then
-    SwapStrings s$, W$
+    s$ = W$  ' never swap here we need the backup later.
 Else
     x1 = IsStrExp(basestack, rest$, s$, False)
 End If

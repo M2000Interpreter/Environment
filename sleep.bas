@@ -214,11 +214,26 @@ Public Sub PrintRefresh(bstack As basetask, Scr As Object)
             .k1 = basictimer + REFRESHRATE: .RRCOUNTER = 1
             If Scr.Visible Then Scr.Refresh
             If Not TaskMaster Is Nothing Then
-                TaskMaster.StopProcess
-                DoEvents
-                TaskMaster.StartProcess
+                If MusicMaster.PlayMusic Then
+                    MusicMaster.StopProcess
+                    TaskMaster.StopProcess
+                    DoEvents
+                    TaskMaster.StartProcess
+                    MusicMaster.StartProcess
+                Else
+                    TaskMaster.StopProcess
+                    
+                    DoEvents
+                    TaskMaster.StartProcess
+                End If
             Else
-                DoEvents
+                If MusicMaster.PlayMusic Then
+                    MusicMaster.StopProcess
+                    DoEvents
+                    MusicMaster.StartProcess
+                Else
+                    DoEvents
+                End If
             End If
         End If
     End With
@@ -234,11 +249,26 @@ With Prefresh(GetCode(some))
             If byPassCallback Then Exit Sub
             If some.Visible Then some.Refresh
             If Not TaskMaster Is Nothing Then
-                TaskMaster.StopProcess
-                DoEvents
-                TaskMaster.StartProcess
+                If MusicMaster.PlayMusic Then
+                    MusicMaster.StopProcess
+                    TaskMaster.StopProcess
+                    DoEvents
+                    TaskMaster.StartProcess
+                    MusicMaster.StartProcess
+                Else
+                    TaskMaster.StopProcess
+                    
+                    DoEvents
+                    TaskMaster.StartProcess
+                End If
             Else
-                DoEvents
+                If MusicMaster.PlayMusic Then
+                    MusicMaster.StopProcess
+                    DoEvents
+                    MusicMaster.StartProcess
+                Else
+                    DoEvents
+                End If
             End If
    End If
 End With
@@ -265,12 +295,27 @@ Public Sub MyDoEvents0(some As Object)
             End If
         End If
         If Not TaskMaster Is Nothing Then
-            TaskMaster.StopProcess
-            DoEvents
-            TaskMaster.StartProcess
-        Else
-            DoEvents
-        End If
+                If MusicMaster.PlayMusic Then
+                    MusicMaster.StopProcess
+                    TaskMaster.StopProcess
+                    DoEvents
+                    TaskMaster.StartProcess
+                    MusicMaster.StartProcess
+                Else
+                    TaskMaster.StopProcess
+                    
+                    DoEvents
+                    TaskMaster.StartProcess
+                End If
+            Else
+                If MusicMaster.PlayMusic Then
+                    MusicMaster.StopProcess
+                    DoEvents
+                    MusicMaster.StartProcess
+                Else
+                    DoEvents
+                End If
+            End If
     End With
     Exit Sub
 procbliah3:
@@ -297,14 +342,25 @@ Static once As Boolean
                     If DOeVONLY Then
                         If Not once Then
                             once = True
-                            TaskMaster.TimerTickNow
-                            TaskMaster.StopProcess
-                            DoEvents
-                            TaskMaster.StartProcess
+                            If MusicMaster.PlayMusic Then
+                                TaskMaster.TimerTickNow
+                                MusicMaster.StopProcess
+                                TaskMaster.StopProcess
+                                DoEvents
+                                TaskMaster.StartProcess
+                                MusicMaster.StartProcess
+                            Else
+                                TaskMaster.TimerTickNow
+                                TaskMaster.StopProcess
+                                DoEvents
+                                TaskMaster.StartProcess
+                            End If
                             once = False
                         Else
+                            
                             TaskMaster.TimerTickNow
                             TaskMaster.StopProcess
+                            MusicMaster.StopProcess
                             DoEvents
                         End If
                     Else
@@ -316,19 +372,30 @@ Static once As Boolean
                             TaskMaster.Dispose
                             If Not once Then
                                 once = True
-                                TaskMaster.TimerTickNow
-                                TaskMaster.StopProcess
-                                DoEvents
-                                TaskMaster.StartProcess
+                                If MusicMaster.PlayMusic Then
+                                    TaskMaster.TimerTickNow
+                                    MusicMaster.StopProcess
+                                    TaskMaster.StopProcess
+                                    DoEvents
+                                    TaskMaster.StartProcess
+                                    MusicMaster.StartProcess
+                                Else
+                                    TaskMaster.TimerTickNow
+                                    TaskMaster.StopProcess
+                                    DoEvents
+                                    TaskMaster.StartProcess
+                                End If
                                 once = False
                             Else
                                 TaskMaster.TimerTickNow
                                 TaskMaster.StopProcess
+                                MusicMaster.StopProcess
                                 DoEvents
                             End If
                         End If
                     End If
                     TaskMaster.RestEnd
+                    MusicMaster.RestEnd
                 End If
             Exit Sub
         End If
@@ -360,14 +427,24 @@ Static once As Boolean
             If DOeVONLY Then
                 If Not once Then
                     once = True
-                    TaskMaster.TimerTickNow
-                    TaskMaster.StopProcess
-                    DoEvents
-                    TaskMaster.StartProcess
+                    If MusicMaster.PlayMusic Then
+                        TaskMaster.TimerTickNow
+                        MusicMaster.StopProcess
+                        TaskMaster.StopProcess
+                        DoEvents
+                        TaskMaster.StartProcess
+                        MusicMaster.StartProcess
+                    Else
+                        TaskMaster.TimerTickNow
+                        TaskMaster.StopProcess
+                        DoEvents
+                        TaskMaster.StartProcess
+                    End If
                     once = False
                 Else
                     TaskMaster.TimerTickNow
                     TaskMaster.StopProcess
+                    MusicMaster.StopProcess
                     DoEvents
                 End If
             Else
@@ -387,30 +464,40 @@ Static once As Boolean
                     End If
                     If Not once Then
                         once = True
-                        TaskMaster.TimerTickNow
-                        TaskMaster.StopProcess
-                        DoEvents
-                        TaskMaster.StartProcess
+                        If MusicMaster.PlayMusic Then
+                            TaskMaster.TimerTickNow
+                            MusicMaster.StopProcess
+                            TaskMaster.StopProcess
+                            DoEvents
+                            TaskMaster.StartProcess
+                            MusicMaster.StartProcess
+                        Else
+                            TaskMaster.TimerTickNow
+                            TaskMaster.StopProcess
+                            DoEvents
+                            TaskMaster.StartProcess
+                        End If
                         once = False
                     Else
                         TaskMaster.TimerTickNow
                         TaskMaster.StopProcess
+                        MusicMaster.StopProcess
                         DoEvents
                     End If
                 End If
             End If
             TaskMaster.RestEnd
+            MusicMaster.RestEnd
         End If
     End With
 End Sub
 
 Public Sub MyDoEvents2(Optional obj As Object)
 On Error GoTo endevents
-If TaskMaster.PlayMusic Then
+If MusicMaster.PlayMusic Then
+' why check again.
     If k1 = 0 Then Call GetSystemTimeAsFileTime(basictimer): k1 = basictimer: RRCOUNTER = 1
-    TaskMaster.OnlyMusic = True
-    TaskMaster.TimerTick
-    TaskMaster.OnlyMusic = False
+    MusicMaster.TimerTick
 End If
 If TaskMaster.Processing Then
     If Not extreme Then
@@ -425,9 +512,11 @@ If TaskMaster.Processing Then
                             Kform = False
                             .k1 = 0
                             TaskMaster.rest
+                            MusicMaster.rest
                             UpdateWindow obj.hWnd
                             DoEvents
                             TaskMaster.RestEnd
+                            MusicMaster.RestEnd
                         Else
                             MyDoEvents1 obj
                         End If
@@ -456,8 +545,10 @@ Else
             If Kform Then
                 Kform = False
                 TaskMaster.rest
+                MusicMaster.rest
                 DoEvents
                 TaskMaster.RestEnd
+                MusicMaster.RestEnd
             Else
                 DoEvents
             End If

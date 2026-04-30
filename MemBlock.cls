@@ -759,28 +759,31 @@ If mitems > 0 Then
     If r <> 0 Then
         If r >= 0 And r < mitems Then
             If p >= 1 Then
-                aCopy.Construct itemlen, CLng(p), , r = 0 And Not mExecBloc
-                If mitems > p Then
+                aCopy.Construct itemlen, CLng(p), , r = 0 And Not mExecBloc, BasicItem
+                If mitems < p Then
                     p = mitems
                 End If
                 CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), itemlen * p
             Else
            
-                aCopy.Construct itemlen, 1&, , Not mExecBloc
+                aCopy.Construct itemlen, 1&, , Not mExecBloc, BasicItem
                 
                 CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), itemlen
             End If
         Else
-            aCopy.Construct itemlen, 1&, , Not mExecBloc
+            aCopy.Construct itemlen, 1&, , Not mExecBloc, BasicItem
             CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), itemlen
         End If
     Else
-    aCopy.Construct itemlen, mitems, , Not mExecBloc
-    hMem = GlobalLock(aCopy.GetPtr(0))
-    
-    CopyMemory ByVal hMem, ByVal mPtr, BLen
-    GlobalUnlock hMem
+        aCopy.Construct itemlen, mitems, , Not mExecBloc, BasicItem
+        CopyMemory ByVal aCopy.GetPtr(0), ByVal mPtr, BLen
+        
+        
     End If
+    aCopy.UseStruct = Me.UseStruct
+    Set aCopy.structref = Me.structref
+    aCopy.SubType = SubType
+    aCopy.type1 = type1
     Set Copy = aCopy
 End If
 End Function

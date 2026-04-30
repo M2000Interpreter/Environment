@@ -50,7 +50,7 @@ MusicBoxVolume(Channel1plus) = 127
 TieLen = 0
 TieLevel = 0
 If TaskMaster Is Nothing Then Exit Sub
-TaskMaster.MusicTaskNum = TaskMaster.MusicTaskNum - 1
+MusicTaskNum = MusicTaskNum - 1
 End Sub
 
 Private Property Get TaskInterface_Process() As basetask

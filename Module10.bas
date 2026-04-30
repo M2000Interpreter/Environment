@@ -6,6 +6,7 @@ Option Explicit
 ' removed all InStrB. strings expexted to be as UTF16LE (as strings in VB6)
 ' if we have an ascii string then we have to convert it before use it
 ' also if we have a UTF8 string we have to convert it before use it here
+Global MusicTaskNum As Long
 Private Type PeekArrayType
     Ptr         As Long
     Reserved    As Currency
@@ -331,16 +332,16 @@ Dim ss$, skip As Boolean, checktype As Boolean
             If FastSymbol(b$, "=") Then
                 p = nMath2.cxZero
                 If FastSymbol(b$, "(") Then
-                Dim p1
-                If Not IsNumberD2(b$, p1) Then
+                Dim P1
+                If Not IsNumberD2(b$, P1) Then
                     GoTo ER0001
                 End If
-                p.r = CDbl(p1)
+                p.r = CDbl(P1)
                 If Not FastSymbol(b$, ",") Then GoTo ER0001
-                If Not IsNumberD2(b$, p1) Then
+                If Not IsNumberD2(b$, P1) Then
                     GoTo ER0001
                 End If
-                p.i = CDbl(p1)
+                p.i = CDbl(P1)
                 b$ = NLtrim(b$)
                 If Not UCase$(Left$(b$, 2)) = "I)" Then GoTo ER0001
                 Mid$(b$, 1, 2) = "  "
@@ -6239,18 +6240,18 @@ End Sub
 
 Private Function MyTrimLi(s$, l As Long) As Long
 Dim i&
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
  If l > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
  If l <= 0 Then MyTrimLi = 1: Exit Function
   l = l - 1
   i = Len(s)
-  p2 = StrPtr(s) + l * 2:  p4 = p2 + i * 2
-  For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  P2 = StrPtr(s) + l * 2:  p4 = P2 + i * 2
+  For i = P2 To p4 Step 2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 9
     Case Else
-     MyTrimLi = (i - p2) \ 2 + 1 + l
+     MyTrimLi = (i - P2) \ 2 + 1 + l
    Exit Function
   End Select
   Next i

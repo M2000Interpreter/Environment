@@ -12,7 +12,7 @@ Attribute VB_Name = "Module1"
 Option Explicit
 
 
-Private timestamp As Long
+Private timestamp As Long, musicstamp As Long
 Global skiperror As Boolean
 Global maxlonglong, limitlonglong, plan As Long, lastpanel As Long
 Global OsInfo As New clsOSInfo, Zero64, One64, stoponerror As Boolean
@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 22
+Global Const Revision = 23
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -209,44 +209,22 @@ Public AviSizeY As Long
 Public mycoder As New coder
 ' play music
 Public voices$(0 To 15), BEATS(0 To 15) As Double, GatePerCent(0 To 15) As Double
-
-
-
 Const GFSR_SYSTEMRESOURCES = 0
 Const GFSR_GDIRESOURCES = 1
 Const GFSR_USERRESOURCES = 2
-
-
 Declare Function SetLocaleInfo Lib "kernel32" Alias "SetLocaleInfoA" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As String) As Long
 Declare Function GetLocaleInfo Lib "kernel32" Alias "GetLocaleInfoA" (ByVal Locale As Long, ByVal LCType As Long, lpLCData As String, ByVal cchData As Long) As Long
 Public Declare Function GetWindowsDirectory Lib "kernel32" Alias "GetWindowsDirectoryA" (ByVal lpBuffer As String, ByVal nSize As Long) As Long
-
-
 Private Const LOCALE_USER_DEFAULT = 0&
-
-
 Public trace As Boolean, tracecounter As Long, bypasstrace As Boolean
-
-
-
-
 Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
-
 Public Declare Function SetTimer Lib "user32" _
        (ByVal hWnd As Long, ByVal nIDEvent As Long, _
         ByVal uElapse As Long, ByVal lpTimerFunc As Long) As Long
-
 Public Declare Sub KillTimer Lib "user32" _
        (ByVal hWnd As Long, ByVal nIDEvent As Long)
-'Public Type tagInitCommonControlsEx
- ' lngSize As Long
-  ' lngICC As Long
-'End Type
-'Public Declare Function InitCommonControlsEx Lib "comctl32.dll" (iccex As tagInitCommonControlsEx) As Boolean
-'Public Const ICC_USEREX_CLASSES = &H200
-' APPLICATION TASK MASTER
 Public MasterTimer As Currency, tickTimer As Double
-Public TaskMaster As TaskMaster
+Public TaskMaster As TaskMaster, MusicMaster As New TaskMaster
 Public hmidi As Long
 Public mute As Boolean
 Public beat As Long
@@ -6924,7 +6902,7 @@ num17: ' "CHARSET", "ваяайтгяес"   ' charset of the object to display
     
     IsNumberNew = True
     Exit Function
-num18: ' "ITALIC", "пкациа"  ' charset of the object to display
+num18: ' "ITALIC", "ITALICS",  "пкациа"  ' charset of the object to display
     r = players(GetCode(bstack.Owner)).italics
     
     IsNumberNew = True
@@ -7262,7 +7240,7 @@ num63: ' "MOVIE.COUNTER", "MEDIA.COUNTER", "MUSIC.COUNTER", "таимиа.летягтгс", "
 num64: ' "PLAYSCORE", "паифеижымг"
     IsNumberNew = True
     
-       r = TaskMaster.PlayMusic
+       r = MusicMaster.PlayMusic
     
     Exit Function
 num65: ' "MOVIE", "MEDIA", "MUSIC", "таимиа", "лоусийг"
@@ -9045,7 +9023,10 @@ contbuf1:
             If TypeOf bstack.lastobj Is mHandler Then
                 Set usehandler = bstack.lastobj
                 Set bstack.lastobj = Nothing
+                r = 0
+                
                 If usehandler.t1 = 2 Then
+                    p = 0
                     If FastSymbol(a$, ",") Then
                         IsExp bstack, a$, r
                         If FastSymbol(a$, ",") Then
@@ -9055,9 +9036,11 @@ contbuf1:
                             End If
                         End If
                     End If
-                
-                     Set usehandler.objref = usehandler.objref.Copy(r, p)
-                    Set bstack.lastobj = usehandler
+                    Set anything = Nothing
+                    If usehandler.CopyMemBlock(r, p, anything) Then
+                        Set usehandler.objref = anything
+                        Set bstack.lastobj = usehandler
+                    End If
                     IsNumberNew = FastSymbol(a$, ")", True)
                     Exit Function
                 End If
@@ -10689,22 +10672,30 @@ ValidNumberOnlyMatrix = i > Len(a$)
 End If
 End Function
 Private Sub MyDoEventsNoThread()
+
 On Error GoTo there
+
 If TaskMaster Is Nothing Then
     DoEvents
     Exit Sub
-ElseIf Not TaskMaster.Processing And TaskMaster.QueueCount = 0 Then
-    DoEvents
-    Exit Sub
+
 Else
-    If TaskMaster.PlayMusic Then
-        TaskMaster.OnlyMusic = True
-        TaskMaster.TimerTick
-        TaskMaster.OnlyMusic = False
+    If Not TaskMaster.Processing And TaskMaster.QueueCount = 0 Then
+        MusicMaster.StopProcess
+        MusicMaster.TimerTickNow
+        DoEvents
+        MusicMaster.StartProcess
+        Exit Sub
+    Else
+        If MusicMaster.PlayMusic Then
+            MusicMaster.TimerTickNow
+        End If
+        MusicMaster.StopProcess
+        TaskMaster.StopProcess
+        DoEvents
+        TaskMaster.StartProcess
+        MusicMaster.StartProcess
     End If
-    TaskMaster.StopProcess
-    DoEvents
-    TaskMaster.StartProcess
 End If
 Exit Sub
 there:
@@ -15587,7 +15578,7 @@ Function ConstNewParam(bstack As basetask, b$, W$) As Boolean
                 Exit Function
             Else
                 p = CVar(ss$)
-                GoTo CONT11
+                GoTo cont11
             End If
         End If
 here:
@@ -15673,7 +15664,7 @@ makelambda:
     Case 3
 
             If Not IsStrExp(bstack, b$, ss$, False) Then MissStringExpr: Exit Function
-CONT11:
+cont11:
             If Not bstack.lastobj Is Nothing Then GoTo makelambda
             Set bstack.lastobj = Nothing
             Set cv = New Constant
@@ -17985,20 +17976,10 @@ contTask:
                     i = 0
                     Do
                         If TaskMaster Is Nothing Then Execute = 0: Exit Function
-                        If TaskMaster.PlayMusic Then
-                            TaskMaster.OnlyMusic = True
-                            TaskMaster.TimerTick
-                            TaskMaster.OnlyMusic = False
-                        End If
-                        If TaskMaster Is Nothing Then Execute = 0: Exit Function
-                        
-                            
                             If TaskMaster.Processing Then
                                 TaskMaster.TimerTick
                                 i = 0
                             Else
-                            'MyDoEvents0 di
-                            'MyDoEventsNoRefresh
                             If i = 1 Then
                                 DoEvents
                                 i = 10
@@ -21052,13 +21033,6 @@ Function IdentifierGroup(basestack As basetask, what$, rest$, Lang As Long, aloc
 End Function
 Function Identifier(basestack As basetask, what$, rest$, Optional nocom As Boolean = False, Optional Lang As Long = 1) As Boolean
 Dim x1 As Long, y1 As Long, it As Long, ohere$, s$, par As Boolean, p As Variant
-'If Not TaskMaster Is Nothing Then
-'If TaskMaster.PlayMusic Then
-'    TaskMaster.OnlyMusic = True
-'    TaskMaster.TimerTick
-'    TaskMaster.OnlyMusic = False
-'End If
-'End If
 If what$ = vbNullString Then
     Identifier = IsLabel(basestack, rest$, what$)
      
@@ -21591,6 +21565,12 @@ Case "SCORE", "жымг"
 Case "TARGETS", "стовои"
     Identifier = ProcTargets(basestack, rest$, Lang)
     Exit Function
+Case "WITH", "ле", "ле.амтийеилемо"
+    Identifier = MyWith(basestack, rest$, Lang)
+    Exit Function
+Case "METHOD", "леходос"
+    Identifier = MyMethod(basestack, rest$, Lang, False, False)
+    Exit Function
 Case "LATIN", "катимийа", "ENGLISH", "аццкийа"
     LATIN basestack '****************************************************************
     Exit Function
@@ -21684,7 +21664,7 @@ Case "SCROLL", "йукисг"
 Case "EDIT.DOC", "диояхысе"
     Identifier = ProcEditDoc(basestack, rest$, Lang)
     Exit Function
-Case "ITALIC", "пкациа"   '.......................
+Case "ITALIC", "ITALICS", "пкациа"  '.......................
     Identifier = ProcItalic(basestack, rest$)
     Exit Function
 Case "йкеиди", "FKEY"
@@ -21695,12 +21675,6 @@ Case "OPEN", "амоине"
     Exit Function
 Case "NAME", "омола"
     Identifier = ProcName(basestack, rest$, Lang)
-    Exit Function
-Case "WITH", "ле", "ле.амтийеилемо"
-    Identifier = MyWith(basestack, rest$, Lang)
-    Exit Function
-Case "METHOD", "леходос"
-    Identifier = MyMethod(basestack, rest$, Lang, False, False)
     Exit Function
 Case "TUNE", "лекыдиа"
     Identifier = ProcTune(basestack, rest$)
@@ -25098,7 +25072,14 @@ CheckThis:
         End If
 End If
 End Function
+Public Sub MusicMasterTick()
+' This is the TimerFunction that will be
+' called when SetTimer times out.
+    musicstamp = MemLong(VarPtr(basictimer))
+    MusicMaster.TimerTick
 
+
+End Sub
 
 
 Public Sub TaskMasterTick()
@@ -25109,7 +25090,14 @@ If once Then Exit Sub
   If Not TaskMaster Is Nothing Then
      Call GetSystemTimeAsFileTime(basictimer)
     If Abs(MasterTimer - basictimer > 0.025@) Then
-        If Not extreme Then once = True: DoEvents: once = False
+        If Not extreme Then
+            MusicMaster.tickdrop = 1
+            once = True
+                Debug.Print "TaskMasterTick"
+                DoEvents
+            once = False
+            MusicMaster.tickdrop = 0
+        End If
         Call GetSystemTimeAsFileTime(basictimer)
         MasterTimer = basictimer
     End If
@@ -25482,41 +25470,40 @@ End Sub
 Sub ProcTask2(bstack As basetask)
 On Error GoTo procbliah2
 If bstack.IamThread And trace Then
+    If MusicMaster.PlayMusic Then MusicMaster.TimerTick
     If SLOW Or IsWine Then Sleep 1
-TaskMaster.rest
-If IsWine Then
-DoEvents
-Else
-SleepWaitEdit2 1
-End If
-TaskMaster.RestEnd
-Exit Sub
-
+        TaskMaster.rest
+    If IsWine Then
+        DoEvents
+    Else
+        SleepWaitEdit2 1
+    End If
+    TaskMaster.RestEnd
+    Exit Sub
 ElseIf TaskMaster Is Nothing Then
-If SLOW Or IsWine Then
-Sleep 1
-End If
-DoEvents
-Else
-If TaskMaster.Processing Then
-          TaskMaster.RestEnd1
- TaskMaster.TimerTickNow
-
-ElseIf SLOW Or IsWine Then
-Sleep 1
-End If
-TaskMaster.rest
-If IsWine Then
-DoEvents
-Else
-SleepWaitEdit2 1
-End If
-TaskMaster.RestEnd
-End If
+    If SLOW Or IsWine Then
+        Sleep 1
+    End If
+        DoEvents
+    Else
+        If TaskMaster.Processing Then
+            TaskMaster.RestEnd1
+            TaskMaster.TimerTickNow
+        ElseIf SLOW Or IsWine Then
+            Sleep 1
+        End If
+        TaskMaster.rest
+        If IsWine Then
+            DoEvents
+        Else
+            SleepWaitEdit2 1
+        End If
+        TaskMaster.RestEnd
+    End If
 Exit Sub
 procbliah2:
-DoEvents
-Sleep 1
+    DoEvents
+    Sleep 1
 End Sub
 
 Sub ResetBreak()
@@ -25527,21 +25514,32 @@ End Sub
 Private Sub MyDoEvents()
 On Error GoTo there
 If TaskMaster Is Nothing Then
-    DoEvents
-    Exit Sub
+    GoTo cont1
 ElseIf Not TaskMaster.Processing And TaskMaster.QueueCount = 0 Then
-    DoEvents
+cont1:
+    If MusicMaster.PlayMusic Then
+        MusicMaster.StopProcess
+        MusicMaster.TimerTick
+        DoEvents
+        MusicMaster.StartProcess
+    Else
+        DoEvents
+    End If
     Exit Sub
 Else
-    If TaskMaster.PlayMusic Then
-        TaskMaster.OnlyMusic = True
+    If MusicMaster.PlayMusic Then
+        MusicMaster.StopProcess
+        TaskMaster.StopProcess
         TaskMaster.TimerTick
-        TaskMaster.OnlyMusic = False
+        DoEvents
+        TaskMaster.StartProcess
+        MusicMaster.StartProcess
+    Else
+        TaskMaster.StopProcess
+        TaskMaster.TimerTick
+        DoEvents
+        TaskMaster.StartProcess
     End If
-    TaskMaster.StopProcess
-    TaskMaster.TimerTick
-    DoEvents
-    TaskMaster.StartProcess
 End If
 Exit Sub
 there:
@@ -25579,8 +25577,10 @@ If escok Then
 End If
 End If
 If bstack Is Nothing Then myexit = True: Exit Function
+If MusicMaster.PlayMusic Then
+    MusicMaster.TimerTickNow
+End If
 If TaskMaster Is Nothing Then Exit Function
-If TaskMaster.OnlyMusic Then TaskMaster.TimerTick
 If bstack.IamThread Then myexit = bstack.Process.Done Else myexit = False
 End Function
 Function myexit2(bstack As basetask) As Boolean
@@ -29238,9 +29238,9 @@ Set basestack.Owner = mDC
 SetText mDC
 
 If Not TaskMaster Is Nothing Then
-If TaskMaster.Processing Or TaskMaster.QueueCount <> 0 Then
- TaskMaster.StopProcess
-End If
+    If TaskMaster.Processing Or TaskMaster.QueueCount <> 0 Then
+     TaskMaster.StopProcess
+    End If
 End If
 
     Call Module10.executeblock(it, basestack, rest$, False, once, , True)
@@ -30786,6 +30786,7 @@ Dim myLevel As Long, oldexec As Long, loopthis As Boolean, RetStackSize As Long
 Dim oldjump As Long, oldifctrl As Long, olduseofif As Long
 Dim S3 As Long, bb$, small$, ex2 As Long, sbi As Long
 ' save state in execution stack
+
 oldjump = bstack.jump: oldifctrl = bstack.IFCTRL: olduseofif = bstack.UseofIf
 RetStackSize = bstack.RetStackTotal
 If Exec = 0 Then Exec = 1
@@ -32531,11 +32532,6 @@ End Function
 
 Function CallByPtr(nSubAddress As Long, basestack As basetask, rest$, Lang As Long) As Boolean
 Dim resp As Boolean
-'If TaskMaster.PlayMusic Then
-'    TaskMaster.OnlyMusic = True
-'    TaskMaster.TimerTick
-'    TaskMaster.OnlyMusic = False
-'End If
 CallWindowProc nSubAddress, VarPtr(basestack), VarPtr(rest$), VarPtr(Lang), VarPtr(resp)
 CallByPtr = resp
 End Function
@@ -32681,13 +32677,13 @@ End If
         If FastSymbol(rest$, ".") Then
             i = FastPureLabel(rest$, ss$)
             If GetVar(basestack, "THIS." + myUcase(ss$, True), i) Then 'ChrW(&HFFBF) +
-                GoTo CONT11
+                GoTo cont11
             End If
                 resp = False
             Exit Sub
         ElseIf IsExp(basestack, rest$, p) Then
             i = CLng(p)
-CONT11:
+cont11:
             If i >= 0 Or i <= p Then
                 If Not MyIsObject(var(i)) Then
                 InternalError
@@ -41653,17 +41649,18 @@ If compareStr4 = 0 Then compareStr4 = k1
 End Function
 Private Function checkbreak(bstack As basetask, b$, once As Boolean) As Boolean
 Static Busy As Boolean
+Dim btimer As Long
 checkbreak = NOEXECUTION
 If lckfrm > 0 Then Exit Function
-Dim btimer As Long
 Call GetSystemTimeAsFileTime(basictimer)
 btimer = MemLong(VarPtr(basictimer))
-If (btimer And &H28000) = (timestamp And &H28000) Then Exit Function
+If (btimer And &H380000) = (timestamp And &H380000) Then Exit Function
 timestamp = btimer
 If Forms.Count > 5 Then Exit Function
 If Busy Then Exit Function
 If Not bstack.IamAnEvent Then
 If bstack.TaskMain Then Exit Function
+
 If KeyPressed2(&H11, &H43) Then
 Busy = True
 Form1.EXECSTOP
@@ -41678,7 +41675,7 @@ Busy = True
 ResetBreak
 If Form1.mybreak1() Then
     Modalid = 0
-    If Not TaskMaster Is Nothing Then TaskMaster.Dispose
+    If Not TaskMaster Is Nothing Then TaskMaster.Dispose: MusicMaster.Dispose
     NOEXECUTION = True
     MOUT = True
     MKEY$ = "@Start" + Chr$(13)
@@ -41697,27 +41694,50 @@ Busy = False
 End Function
 Private Function checkbreakEsc(bstack As basetask) As Boolean
 Static Busy As Boolean, tmstp As Long
+Dim btimer As Long
+
 If bstack Is Nothing Then checkbreakEsc = True: Exit Function
 If lckfrm > 0 Then
-If TaskMaster Is Nothing Then Exit Function
-If TaskMaster.OnlyMusic Then TaskMaster.TimerTick
+
+Call GetSystemTimeAsFileTime(basictimer)
+tmstp = MemLong(VarPtr(basictimer))
+If MusicTaskNum > 0 Then
+    If Not SLOW Then
+        If Not (tmstp And &HE0000) = (musicstamp And &HE0000) Then
+            musicstamp = tmstp
+            If MusicMaster.PlayMusic Then
+                MusicMaster.TimerTick
+            End If
+            tmstp = MemLong(VarPtr(basictimer))
+        End If
+        
+    End If
+End If
+
 checkbreakEsc = NOEXECUTION 'Or checkbreakEsc
 Exit Function
 End If
 Call GetSystemTimeAsFileTime(basictimer)
 tmstp = MemLong(VarPtr(basictimer))
-If Not TaskMaster Is Nothing Then
-    If (tmstp And &H380) = (timestamp And &H380) Then
-        If TaskMaster.OnlyMusic Then
-            TaskMaster.TimerTick
+If MusicTaskNum > 0 Then
+    If Not SLOW Then
+        If Not (tmstp And &HE0000) = (musicstamp And &HE0000) Then
+            musicstamp = tmstp
+            If MusicMaster.PlayMusic Then
+                MusicMaster.TimerTick
+            End If
+            tmstp = MemLong(VarPtr(basictimer))
         End If
+        
     End If
+  
 End If
 If Not extreme Then
     If (tmstp And &H3800) = (timestamp And &H3800) Then Exit Function
     If escok Then If myexit2(bstack) Then checkbreakEsc = True: Exit Function
 Else
-    If (tmstp And &H3000) = (timestamp And &H3000) Then Exit Function
+    If (tmstp And &H3800000) = (timestamp And &H3800000) Then Exit Function
+    
 End If
 timestamp = tmstp
 If Forms.Count > 5 Then Exit Function
@@ -44510,7 +44530,7 @@ w1 = Abs(IsLabel(bstack, a$, s$))
 
 If w1 = 1 Or w1 = 3 Then
     w2 = w1
-CONT11:
+cont11:
     If Not GetVar(bstack, s$, w1, , , , , , Glob) Then GoTo jmp1478
     If Not VarTypeName(var(w1)) = mGroup Then GoTo jmp1478
     If var(w1).IamApointer Then
@@ -48883,27 +48903,38 @@ Loop Until Not FastSymbol(a$, ",")
 aProp.PushIndexes idx
 End Function
 Public Sub MyDoEventsNoRefresh()
-On Error GoTo there
 If TaskMaster Is Nothing Then
-    DoEvents
-    Exit Sub
+    GoTo cont1
 ElseIf Not TaskMaster.Processing And TaskMaster.QueueCount = 0 Then
-    DoEvents
+cont1:
+    If MusicMaster.PlayMusic Then
+        MusicMaster.StopProcess
+        MusicMaster.TimerTick
+        DoEvents
+        MusicMaster.StartProcess
+    Else
+        DoEvents
+    End If
     Exit Sub
 Else
-    If TaskMaster.PlayMusic Then
-        TaskMaster.OnlyMusic = True
+    If MusicMaster.PlayMusic Then
+        MusicMaster.StopProcess
+        TaskMaster.StopProcess
         TaskMaster.TimerTick
-        TaskMaster.OnlyMusic = False
+        DoEvents
+        TaskMaster.StartProcess
+        MusicMaster.StartProcess
+    Else
+        TaskMaster.StopProcess
+        TaskMaster.TimerTick
+        DoEvents
+        TaskMaster.StartProcess
     End If
-    TaskMaster.StopProcess
-    TaskMaster.TimerTick
-    DoEvents
-    TaskMaster.StartProcess
 End If
 Exit Sub
 there:
 If Not TaskMaster Is Nothing Then TaskMaster.RestEnd1
+MusicMaster.RestEnd1
 End Sub
 Private Function lookB123(s As String, Optional ByVal Pos As Long = 1) As Boolean
 Dim i&, l As Long

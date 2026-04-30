@@ -2138,7 +2138,7 @@ Private Function SetTextData( _
         Else
         placeSize = lSize
         End If
-        hMem = GlobalAlloc(0, placeSize + 2)
+        hMem = GlobalAlloc(GMEM_MOVEABLE, placeSize + 2)
         If (hMem > 0) Then
         lPtr = GlobalLock(hMem)
         CopyMemory ByVal lPtr, ByVal StrPtr(String$(placeSize \ 2 + 1, Chr$(0))), placeSize + 2
@@ -9715,16 +9715,16 @@ tParam.iTabLength = Abs(vNewValue)
 End Property
 Private Function MyTrimL(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL = 1: Exit Function
-  p2 = StrPtr(s): l = l - 1
-  p4 = p2 + l * 2
-  For i = p2 To p4 Step 2
+  P2 = StrPtr(s): l = l - 1
+  p4 = P2 + l * 2
+  For i = P2 To p4 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160, 9
     Case Else
-     MyTrimL = (i - p2) \ 2 + 1
+     MyTrimL = (i - P2) \ 2 + 1
    Exit Function
   End Select
   Next i
@@ -9732,16 +9732,16 @@ Dim p2 As Long, P1 As Integer, p4 As Long
 End Function
 Private Function MyTrimLNoTab(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimLNoTab = 1: Exit Function
-  p2 = StrPtr(s): l = l - 1
-  p4 = p2 + l * 2
-  For i = p2 To p4 Step 2
+  P2 = StrPtr(s): l = l - 1
+  p4 = P2 + l * 2
+  For i = P2 To p4 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160
     Case Else
-     MyTrimLNoTab = (i - p2) \ 2 + 1
+     MyTrimLNoTab = (i - P2) \ 2 + 1
    Exit Function
   End Select
   Next i
@@ -9749,16 +9749,16 @@ Dim p2 As Long, P1 As Integer, p4 As Long
 End Function
 Private Function MyTrimL2(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL2 = 0: Exit Function
-  p2 = StrPtr(s): l = l - 1
-  p4 = p2 + l * 2
-  For i = p2 To p4 Step 2
+  P2 = StrPtr(s): l = l - 1
+  p4 = P2 + l * 2
+  For i = P2 To p4 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160
     Case Else
-     MyTrimL2 = (i - p2) \ 2 '+ 1
+     MyTrimL2 = (i - P2) \ 2 '+ 1
    Exit Function
   End Select
   Next i
@@ -9766,16 +9766,16 @@ Dim p2 As Long, P1 As Integer, p4 As Long
 End Function
 Private Function NLTrim2(s$) As String
 Dim i&, l As Long
-Dim p2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then NLTrim2 = 1: Exit Function
-  p2 = StrPtr(s): l = l - 1
-  p4 = p2 + l * 2
-  For i = p2 To p4 Step 2
+  P2 = StrPtr(s): l = l - 1
+  p4 = P2 + l * 2
+  For i = P2 To p4 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160
     Case Else
-     NLTrim2 = Mid$(s$, (i - p2) \ 2 + 1)
+     NLTrim2 = Mid$(s$, (i - P2) \ 2 + 1)
    Exit Function
   End Select
   Next i
@@ -10008,16 +10008,16 @@ End If
 End Property
 Private Function MyTrimRNoCr(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimRNoCr = 1: Exit Function
-  p2 = StrPtr(s): l = l - 1
-  p4 = p2 + l * 2
-  For i = p4 To p2 Step -2
+  P2 = StrPtr(s): l = l - 1
+  p4 = P2 + l * 2
+  For i = p4 To P2 Step -2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160, 9
     Case Else
-     MyTrimRNoCr = (i - p2) \ 2 + 1
+     MyTrimRNoCr = (i - P2) \ 2 + 1
    Exit Function
   End Select
   Next i
@@ -10025,16 +10025,16 @@ Dim p2 As Long, P1 As Integer, p4 As Long
 End Function
 Private Function MyTrimL2NoTab(s$) As Long
 Dim i&, l As Long
-Dim p2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
-  p2 = StrPtr(s): l = l - 1
-  p4 = p2 + l * 2
-  For i = p2 To p4 Step 2
+  P2 = StrPtr(s): l = l - 1
+  p4 = P2 + l * 2
+  For i = P2 To p4 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160
     Case Else
-     MyTrimL2NoTab = (i - p2) \ 2 + 1
+     MyTrimL2NoTab = (i - P2) \ 2 + 1
    Exit Function
   End Select
   Next i

@@ -28,7 +28,7 @@ Public Enum PriorityLevel
 End Enum
 
 
-Public MusicTaskNum As Long
+
 Public OnlyMusic As Boolean
 Private myRunningList As Collection
 Private myMasterList As Collection
@@ -40,8 +40,9 @@ Private myTimerIsRunning As Boolean
 
 ' PUBLIC PROPERTIES
 Public Property Get PlayMusic() As Boolean
-' check if music is there
+If OnlyMusic Then
 PlayMusic = MusicTaskNum > 0
+End If
 End Property
 Public Property Get QueueCount() As Long
   QueueCount = myRunningList.Count + myMasterList.Count
@@ -59,7 +60,7 @@ End Property
 
 
 Public Property Get Processing() As Boolean
-  Processing = myTimerIsRunning
+  Processing = myTimerIsRunning Or MusicTaskNum > 0
 End Property
 Public Function GetTask(thisid As Long) As TaskInterface
 Dim i As Long
@@ -363,7 +364,11 @@ Public Sub Dispose()
 End Sub
 
 Public Sub TimerTick()
-    tickTimer = tickTimer + 1
+If Not Me Is MusicMaster Then
+If MusicMaster.PlayMusic Then MusicMaster.TimerTick Else tickTimer = tickTimer + 1
+Else
+tickTimer = tickTimer + 1
+End If
     If tickdrop > 0 Then Exit Sub
     Dim this As TaskInterface, many As Long, dosomething As Boolean
     If myMasterList.Count = 0 Then Exit Sub
@@ -374,15 +379,6 @@ again:
     Do
         Set this = myMasterList(1)
         myMasterList.Remove 1
-        If OnlyMusic Then
-            If this.id > 100 Then
-                AddTask this
-                Exit Sub
-            End If
-        ElseIf holdtasks Then
-            AddTask this, this.Priority
-            Exit Sub
-        End If
         myRunningList.Add this
         many = many - 1
     Loop While this.id < 0 And myMasterList.Count <> 0
@@ -433,18 +429,6 @@ Dim this As TaskInterface
   Set this = myMasterList(1)
   myMasterList.Remove 1
 
-  
- If OnlyMusic Then
- If this.id > 100 Then
- AddTask this
- tickdrop = 0
- Exit Sub
- End If
- ElseIf holdtasks Then
- AddTask this, this.Priority
- tickdrop = 0
- Exit Sub
- End If
   myRunningList.Add this
   Loop While this.id < 0 And myMasterList.Count <> 0
   If this.id < 0 Then tickdrop = 0: Exit Sub
@@ -486,55 +470,44 @@ End If
   If LastErNum <> 0 Then Dispose
 End Sub
 Public Sub TimerTickNow()
+
+If Not Me Is MusicMaster Then
+If MusicMaster.PlayMusic Then MusicMaster.TimerTick Else tickTimer = tickTimer + 1
+Else
+Exit Sub
 tickTimer = tickTimer + 1
+End If
 Dim this As TaskInterface
 Dim manybusy As Long
 If myTimerHandle = 0 Then Exit Sub
   If myMasterList.Count = 0 Then Exit Sub
-  
   Do
-  
-  Set this = myMasterList(1)
-  myMasterList.Remove 1
- If OnlyMusic Then
- If this.id > 100 Then
- AddTask this
- Exit Sub
- End If
- ElseIf holdtasks Then
- AddTask this, this.Priority
- Exit Sub
- End If
-  myRunningList.Add this
+    Set this = myMasterList(1)
+    myMasterList.Remove 1
+    myRunningList.Add this
   Loop While this.id < 0 And myMasterList.Count <> 0
   If this.id < 0 Then Exit Sub
-  
   If Not this.Busy And Not this.Done Then
-
-  this.Tick
+    this.Tick
   Else
-  manybusy = manybusy + 1
+    manybusy = manybusy + 1
   End If
   If Remove(this.id) Then
-  If this.Done Then
-
-    this.Dispose tmThisTask
-  Else
-If Not NOEXECUTION Then
-AddTask this, this.Priority
-Else
-this.Dispose tmThisTask
-End If
-    
-  End If
+    If this.Done Then
+        this.Dispose tmThisTask
+    Else
+        If Not NOEXECUTION Then
+            AddTask this, this.Priority
+        Else
+            this.Dispose tmThisTask
+        End If
+    End If
   Else
     If this.Done Then
-    this.Dispose tmThisTask
-  Else
-
-    AddTask this, this.Priority
-    
-  End If
+        this.Dispose tmThisTask
+    Else
+        AddTask this, this.Priority
+    End If
     this.Dispose tmThisTask
   End If
 
@@ -571,9 +544,7 @@ Private Sub Class_Initialize()
 tickTimer = 0
   Set myMasterList = New Collection
   Set myRunningList = New Collection
-
   myInterval = 5
-
 End Sub
 
 
@@ -589,23 +560,25 @@ End Sub
 
 Private Sub StartTimer()
   If myTimerHandle = 0 Then
-  If QueueCount > 0 Then
- ''MasterTimer = 0
-  
-    myTimerHandle = SetTimer(0&, 0&, myInterval, AddressOf TaskMasterTick)
-    myTimerIsRunning = (myTimerHandle <> 0)
-  End If
+    If QueueCount > 0 Then
+      If OnlyMusic Then
+          myTimerIsRunning = True
+      Else
+          myTimerHandle = SetTimer(0&, 0&, myInterval, AddressOf TaskMasterTick)
+          myTimerIsRunning = (myTimerHandle <> 0)
+      End If
+    End If
   End If
 End Sub
 
 
 Private Sub StopTimer()
   If myTimerHandle <> 0 Then
-  '' MasterTimer = 0
     KillTimer 0&, myTimerHandle
     myTimerHandle = 0
-    myTimerIsRunning = False
+  
   End If
+    myTimerIsRunning = False
 End Sub
 
 Public Sub rest()
@@ -615,7 +588,7 @@ tickdrop = tickdrop + 1
 End Sub
 Public Sub RestEnd()
 tickdrop = tickdrop - 1
-If tickdrop <= 0 Then tickdrop = 0: holdtasks = False
+If tickdrop <= 0 Then tickdrop = 0 ': holdtasks = False
 ''If tickdrop > 0 Then If QueueCount = 0 Then tickdrop = 0:: holdtasks = False
 End Sub
 Public Sub rest1()
