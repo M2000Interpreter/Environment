@@ -12024,7 +12024,7 @@ again2:
                 Set usehandler = bstack.lastobj
                 If usehandler.t1 = 4 Then
                     If myVarType(usehandler.index_cursor, vbString) Then
-                        If nostring Then
+                        If nostring and noand Then
                             MissNumExpr
                             IsExpA = False
                             Exit Function
