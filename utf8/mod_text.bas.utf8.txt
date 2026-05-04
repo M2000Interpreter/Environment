@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 25
+Global Const Revision = 26
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -43202,10 +43202,11 @@ reentry1:
     ElseIf IsExp(bstack, ss$, p) Then
     If Len(ss$) > 0 Then Mid$(a$, w1 + 1 - Len(ss$), Len(ss$)) = ss$
     Mid$(a$, 1, w1 + 1 - Len(ss$)) = space$(w1 - Len(ss$))
+    If bstack.lastobj Is Nothing Then
     If VarType(p) = vbString Then
-   
     SwapString2Variant s$, p
     GoTo JUMPHERE
+    End If
     End If
 handlehandlers:
         w1 = 0
