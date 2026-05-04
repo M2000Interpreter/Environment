@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 24
+Global Const Revision = 25
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -16040,6 +16040,7 @@ a123321:                                    NotArray
                 If Not bypasstrace Then
 tragain:
                     If Not TraceThis(bstack, di, b$, ss$, SBB$) Then Execute = 0: Exit Function
+                    If NOEXECUTION Then b$ = ""
                     If Len(tracecode) > 0 Then
                     ss$ = tracecode
                     tracecode = vbNullString
@@ -41664,7 +41665,7 @@ If bstack.TaskMain Then Exit Function
 If KeyPressed2(&H11, &H43) Then
 Busy = True
 Form1.EXECSTOP
-timestamp = basictimer
+timestamp = MemLong(VarPtr(basictimer))
 Busy = False
 checkbreak = NOEXECUTION
 Exit Function

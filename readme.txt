@@ -1,47 +1,12 @@
 M2000 Interpreter and Environment
-Version 14 revision 24 active-X
-Fix an issue from Revision 20 to 23
-The third test now show result, no error
-This was not hard to fix but hard to find out as an issue:
-because the issue was after the Or (or similar operator) and when the first value was an enumarator type which return a string value.
-As you see the second example has "."=z so this works for Revision 20 to 23
-The fix was the addition of AND noand  (where noand is a flag, and used from evaluator to stop before AND/OR/XOR, so a noand=false means we have these and we continue. So after AND/OR/XOR a string value can be placed (and this was known from evaluator, see the two tests, first and second), but for the Enumarator type has not fixed as the first operand after AND/OR/XOR (only for these revisions). Previous revisions work different so they don't have this issue. 
-
-module testme (a as boolean, changeit as boolean=false) {
-	if a then
-		enum aa {
-			a_dot="."
-			a_nothing=""
-			a_underscore="_"
-		}
-		z=a_dot
-	else
-		z="."
-	end if
-	boolean dot
-	if changeit then
-		? z="" or "."=z
-		? (z="." and not dot) or ""=z
-	else
-		? z="" or z="."
-		? (z="." and not dot) or z=""
-	end if
-}
-Try {
-	testme false
-}
-Try {
-	testme true, true
-}
-Try {
-	testme true
-}
-
-
+Version 14 revision 25 active-X
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
+1. Fix a mistake at the break function, which produce an overflow.
+2. At the textbox for watching variables in the test form, the enumerator type with string value not displayed using the string format for the purpose of the form. Although was not wrong the value shown as is, not bad but not what we want. This fault produced by the change of the evaluator, which now return string from the part which previous works only for numbers/objects
 
-The first time Windows make some work behind the scene so the M200 console slow down. So type END and open it again.
+
+The first time Windows did some work behind the scenes so the M2000 console slowed down. You can type END to close the program and then open it again.
 
 To get the INFO file, from M2000 console do these:
 dir appdir$
