@@ -19621,6 +19621,10 @@ stackshowonly = True
 If FastSymbol(dl$, ")") Then
 ok = True
 ElseIf IsExp(b, dl$, p) Then
+If MemInt(VarPtr(p)) = vbString Then
+SwapString2Variant s$, p
+GoTo thatstring
+End If
     If al$ = vbNullString Then
         If pagio$ = "GREEK" Then
         al$ = "? " + Left$(dl2$, Len(dl2$) - Len(dl$)) + "=" + MyCStr(p)
@@ -19633,6 +19637,7 @@ ElseIf IsExp(b, dl$, p) Then
     End If
     ok = True
     ElseIf IsStrExp(b, dl$, s$) Then
+thatstring:
     If Len(dl2$) - Len(dl$) >= 0 Then
     
     
