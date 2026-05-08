@@ -6029,7 +6029,7 @@ MODULE FORM44 {Module TryIt {
 	Rem : Set slow
 	Set fast
 	// new for Concurrent, a value non zero cause maintask to not execute step by step
-	Play 0
+	//		Play 0
 	try {
 		Thread.Plan  Concurrent 1  ' Sequential
 	}
@@ -9631,7 +9631,8 @@ MODULE ICONS {function dummy {
 	\\ call global
 	Fade 5, 0
 	useM200sprites=random(1,2)=1
-
+	ThatWidth=scale.x-2000
+	ThatHeight=scale.y-2000
 	hold
 	Wait 500
 	mouse.icon hide
@@ -9657,7 +9658,7 @@ MODULE ICONS {function dummy {
 			changing opacity
 			}, "Arial Black", 22,0,2,1,150			
 			For i=1 to sp {
-				move Random(14000)+1000, Random(10000)+1000
+				move Random(ThatWidth)+1000, Random(ThatHeight)+1000
 				let  a=random(90), b=random(50)+150, c=random(50)-50*(random(10)=1)
 				sprite spr$,5, a,b,c
 			}
@@ -9686,7 +9687,7 @@ MODULE ICONS {function dummy {
 			changing opacity
 			}, "Arial Black", 22,0,2,1,150
 			For i=1 to sp {
-				move Random(14000)+1000, Random(10000)+1000
+				move Random(ThatWidth)+1000, Random(ThatHeight)+1000
 				let  a=random(90), b=random(50)+150, c=random(50)-50*(random(10)=1)
 				sprite ico, , a,b,c
 			}
@@ -37273,6 +37274,8 @@ MODULE TURING {Module CheckIt {
 		.AddRule "C", "0", "1", "right", "D", 	"C", "1", "1", "left", "E"
 		.AddRule "D", "0", "1", "left", "A",	"D", "1", "1", "left", "D"
 		.AddRule "E", "0", "1", "stay", "H", 	"E", "1", "0", "left", "A"
+		Print "Starting (wait 3~ seconds)"
+		refresh
 		profiler
 		.Run 4700, false //000000, false
 		Print round(timecount/1000,2);"s"    // estimated 12.5 hours for 47000000 steps
@@ -50577,7 +50580,8 @@ MODULE JOY {' Module JOY
 ' or to skip message:
 ' JOY true
 ' SKIP is optional here
-READ ? SKIP AS BOOLEAN=FALSE
+READ ? SKIP AS BOOLEAN=FALSE, MANY AS LONG=1
+IF MANY<1 THEN MANY=1
 CONST  Organ = 23
 TEMPO=960*1.2
 VOLUME 80
@@ -50618,6 +50622,7 @@ PLAY 1, 0
 ' Inside Tuplets not use this at start - only after value (value may missing, is 1/1 by default)
 ' For defining Volume for Tuplets you can do that aftet the value of Tuplet and before Staccato. so [C@3 @3E@3]2V60!75 place V60 for Tuplet and staccato 75%. See there is only multiplier, so this Tuplet has duration 2xTEMPO. Space inside is the silence of a value 1/4*scale. Scale = 2/(3/4)=8/3, so the 1/4*8/3=8/12=2/3. C@3 has finally Tempo*2/3*0.75 duration time
 partitura="V80"
+FOR I=1 TO MANY
 partitura+="E4@3E@3F@3G@3"
 partitura+="G@3F@3E@3D@3"
 partitura+="C@3C@3D@3E@3"
@@ -50637,7 +50642,7 @@ partitura+="E4@3E@3F@3G@3"
 partitura+="G@3F@3E@3D@3"
 partitura+="C@3C@3D@3E@3"
 partitura+="D@4+C@4C@2!"  ' LAST NOTE LEGATO - 100%
-
+NEXT I
 SCORE 1, TEMPO, partitura, 85  ' 85% STACCATO  -  100% IS LEGATO (OMIT THE PARAMETER)- NO SILENCE BETWEEN NOTES.
 PLAY 1, Organ
 IF SKIP THEN EXIT
@@ -51536,12 +51541,14 @@ END SUB
 
 
 }
-MODULE ARROWS {M=MODE
+MODULE ARROWS {HIDE
+M=MODE
 WINDOW 6, WINDOW
 OLDSCALE.Y=SCALE.Y
 WINDOW M, SCALE.X, SCALE.X*9/16;
 Z=SCALE.Y/OLDSCALE.Y
 FORM;
+//	REFRESH
 SINGLE PI=@PI, A, I
 SMOOTH ON
 CLS 15
@@ -51549,6 +51556,7 @@ PEN 0
 DOUBLE
 REPORT 2, "ARROWS"
 NORMAL
+SHOW
 MOVE 6600*Z,8000*Z
 FOR A=0 TO 2*PI STEP PI/7
 	STEP ANGLE A, 300
@@ -51924,5 +51932,373 @@ PRINT TIMECOUNT, " From hi-res timer"
 PRINT K, " Computed from Main.Task thread"
 PRINT Z1-Z, " Ticks of task manager"
 PRINT TICK ' SHOULD BE ZERO - IF NO THREADS RUN
+}
+MODULE ADFGVX {Module CheckADFGVX_Cipher {
+	Class cipher {
+	Private:
+		buffer a as byte*36
+		b="ADFGVX"
+		key="ABCDEFGHIJK"
+		orderkey="ABCDEFGHIJK"
+		map=list
+		map2=list
+		module preparemaps {
+			for i=0 to 5
+				jj=0
+				for j=i*6 to j+5
+					.map(chr$(.a[j]))=mid$(.b, i+1,1)+mid$(.b,jj+1, 1)
+					.map2(mid$(.b, i+1,1)+mid$(.b,jj+1, 1))=chr$(.a[j])
+					jj++
+				next
+			next			
+		}
+	Public:
+		Module SetRandom (&returnvalue) {
+			return .a, 0:=str$("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+			for i=1 to 100
+				c=random(0, 35):d=c
+				while c=d {d=random(0, 35)}
+				 byte o=.a[c]
+				.a[c]<=.a[d]
+				.a[d]<=o
+			next
+			returnvalue=chr$(eval$(.a)) ' convert to UTF16LE
+			.preparemaps	
+		}
+		Module SetSpecific (that$){
+			return .a, 0:=str$(Ucase$(that$))
+			.preparemaps		
+		}
+		Module SetKey (.key as string) {
+			.key<=ucase$(.key)			
+			if len(.key)<7 or len(.key)>12 then Error "Key has not proper length"
+			if filter$(.key, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")<>"" then
+				Error "Key has bad letters"
+			end if
+			dim aa(1 to len(.key))
+			for i=1 to len(.key):aa(i)=mid$(.key,i,1):next
+			.orderkey<=aa()#sort()#str$("")				
+		}
+		Module Display {
+			Print "The 6 x 6 Polybius square:"		
+			Print "  | A D F G V X"
+			Print "---------------"
+			for i=0 to 5
+				Print mid$(.b,i+1,1)+" | ";
+				jj=0
+				for j=i*6 to j+5
+					print chr$(.a[j]);" ";
+					jj++
+				next
+				print
+			next
+			Print "Key:";.key
+		}
+		Function Encrypt(p as string) {
+			crypted=""
+			for i=1 to len(p)	
+				crypted+=.map$(mid$(p,i,1))
+			next
+			m=1
+			encrypted=""
+			For i = 1 To Len(.key)
+				ch = Mid$(.orderkey, i, 1)			
+				For j = Instr(.key, ch) - 1 To Len(crypted) - 1 Step Len(.key)
+					encrypted += Mid$(crypted, j + 1, 1)
+					if m mod 5=0 then encrypted += " "
+					m++
+				Next
+			Next
+			=encrypted
+		}
+		Function Decrypt(p as string) {
+			p=filter$(p, " ")
+			decrypted=""
+			m=1
+			dim b$(len(p))
+			For i = 1 To Len(.key)
+				ch = Mid$(.orderkey, i, 1)
+				For j = Instr(.key, ch) - 1 To Len(p) - 1 Step Len(.key)
+					b$(j)=mid$(p, m, 1)
+					m++
+				Next
+			Next
+			for i=0 to len(b$())-1 step 2
+				decrypted+=.map2(b$(i)+b$(i+1))	
+			next
+			=decrypted	
+		}
+	}
+	ADFGVX=cipher()
+	for ADFGVX {
+		.SetSpecific "A9GKMF1DQRSBVX8Z0WTEJLOPY5U4CN2H76I3"
+		.SetKey "volcanism"
+		.Display
+		encode=.Encrypt("ATTACKAT1200AM")
+		Print "Encoded: ";encode
+		Print "Decoded: ";.Decrypt(encode)
+		' using randomblock
+//				thisblock=""
+//				.SetRandom &thisblock
+//				Print "Random Block:";thisblock
+//				.Display
+//				encode=.Encrypt("ATTACKAT1200AM")
+//				Print encode
+//				Print .Decrypt(encode)	
+	}
+} 
+CheckADFGVX_Cipher
+}
+MODULE CMDTOOL {prototype {
+MODULE GLOBAL interpret {
+global filename$="base1.xml"
+module latest {
+	PrintConsoleLn("The latest entry is:")
+	if exist(filename$) else exit
+	declare xml xmlData
+	with xml, "xml" as doc$, "beautify" as beautify
+	doc$=string$(eval$(buffer(filename$)) as UTF8dec)
+	with  xml, "lastchild" set child
+	with child,"attr" as attr$()
+	PrintConsoleLn(attr$("name")+","+@tag$()+","+attr$("date"))
+	declare xml nothing
+}
+module latestForEachTag {
+	PrintConsoleLn("latest entry for each tag:")
+	if exist(filename$) else exit
+	declare xml xmlData
+	with xml, "xml" as doc$, "beautify" as beautify
+	doc$=string$(eval$(buffer("base1.xml")) as UTF8dec)
+	with xml, "firstchild" as firstchild
+	child=firstchild
+	with child,"attr" as attr$()
+	inventory alfa
+	do
+		if not exist(alfa, @tag$()) then
+			append alfa, @tag$():=child
+		else
+			return alfa, @tag$():=child
+		end if
+		Method xml, "EndOffChilds", &child as ok
+	when ok
+	sort alfa
+	k=each(alfa)
+	while k
+		child=eval(k)
+		PrintConsoleLn(attr$("name")+","+@tag$()+","+attr$("date"))
+	end while
+	declare xml nothing
+}
+module All {
+	PrintConsoleLn("All entries sorted by date:")
+	if exist(filename$) else exit
+	declare xml xmlData
+	with xml, "xml" as doc$, "beautify" as beautify
+	doc$=string$(eval$(buffer("base1.xml")) as UTF8dec)
+	with xml, "firstchild" as firstchild
+	child=firstchild
+	with child,"attr" as attr$()
+	inventory alfa
+	i=0
+	do
+		// prevent same keys using a unique patch key
+		append alfa, attr$("date")+str$(i,"000000"):=child
+		i++
+		Method xml, "EndOffChilds", &child as ok
+	when ok
+	sort alfa
+	k=each(alfa)
+	while k
+		child=eval(k)
+		PrintConsoleLn(attr$("name")+","+@tag$()+","+attr$("date"))
+	end while
+	declare xml nothing
+}
+module add (line$) {
+	line$=trim$(line$)
+	if line$="" then exit
+	declare xml xmlData
+	with xml, "xml" as doc$, "beautify" as beautify
+	bom$=str$(format$("\uef\ubb\ubf"))
+	//  len(bom$)=1.5 (1.5*2=3 bytes)
+	k=0
+	if exist(filename$) then try {k=filelen(filename$)}
+	if k<10 then
+		method xml, "PrepareNodeSimple", "xml" as ProcessInstructions
+		method xml, "PlaceAttributeToNode", ProcessInstructions, "version", "1.0"
+		method xml, "PlaceAttributeToNode", ProcessInstructions, "encoding", "utf-8-sig" 
+		method xml, "PlaceProcessingInstructions", ProcessInstructions
+		method xml, "PrepareNode", "MyFile" as Node
+		method xml, "InsertNode", Node
+	else
+		 doc$=string$(eval$(buffer(filename$)) as UTF8dec)
+	end if
+	a$=""""+line$
+	def name$, tag$,date$
+	do
+		a$=rightpart$(a$, """") : what$=lcase$(trim$(leftpart$(a$, """")))
+		if what$="" then exit
+		a$=rightpart$(a$, """") :par$=leftpart$(a$, """")
+		select case what$
+		case "name"
+			name$=par$
+		case "tag"
+			tag$=par$
+		case "date"
+			date$=par$
+		end select
+	always
+	if name$<>"" and date$<>"" then
+			method xml, "PrepareNode", "Row", "" as Node1
+			method xml, "PlaceAttributeToNode", Node1, "name", name$
+			if tag$<>"" then method xml, "PlaceAttributeToNode", Node1, "tag", tag$
+			method xml, "PlaceAttributeToNode", Node1,  "date", date$
+			method xml, "AppendChild", Node1
+			open filename$ for wide output as #f
+			print #f, bom$;string$(doc$ as UTF8enc);
+			close #f
+			beautify=-4
+			PrintConsoleLn(doc$)
+	end if
+	declare xml nothing
+}
+declare FreeConsole lib "Kernel32.FreeConsole"
+declare GetStdHandle lib "Kernel32.GetStdHandle" {long a}
+declare AttachConsole lib "Kernel32.AttachConsole" {long a}
+declare CloseHandle lib "Kernel32.CloseHandle" {long a}
+declare global WriteCons Lib "Kernel32.WriteConsoleW" {long cons, a$,  long n, Long  p, long u}
+long STD_OUTPUT_HANDLE=-11
+global retvalue
+buffer clear retvalue as long
+ret=AttachConsole(-1)
+global m=GetStdHandle(STD_OUTPUT_HANDLE)
+if ret=0 then
+beep
+push Ask("Run from cmd line","Problem",,"")
+drop
+exit
+end if
+if not islet then
+	try {
+		open "tool.bat" for output as #f
+		print #f, {@}+shortdir$(appdir$)+{m2000.exe data {%*}: dir %cd%:load tool
+			}
+		close #f
+		}
+	PrintConsoleLn("")
+	dos "tool.bat"
+	
+else
+	read cmd$
+	cmd$=trim$(cmd$)+" "
+	select case lcase$(leftpart$(cmd$, " "))
+	case "add"
+		add rightpart$(cmd$," ")
+	case "latest"
+		latest
+	case "latest-per-tag"
+		latestForEachTag
+	case "all-entries"
+		all
+	case else
+		help()
+	end select
+end if
+call void closehandle(m)
+call void freeconsole()
+
+Sub PrintConsole(a$)
+      Call Void WriteCons(m, a$, Len(a$), retvalue(0), 0)
+End Sub
+Sub PrintConsoleLn(a$)
+	a$+={
+	}
+	Call Void WriteCons(m, a$, Len(a$), retvalue(0), 0)
+End Sub
+function tag$()
+	try {
+		=attr$("tag")
+	}
+end function
+Sub Help()
+h$="M2000 Interpreter "+Version+"."+Revision+{
+}
+h$+={Simple Database (RosettaCode task)
+Commands:
+	tool
+	tool add name "anyname" tag "tagtext" date "YYYY.MM.DD.HH:MM"
+	tool latest
+	tool latest-per-tag
+	tool all-entries
+	- for this example write Exit to return to M2000 console
+	- a simple tool command show this data
+	- See the databse:
+	type base1.xml
+	-See how we pass the comand line
+	type tool.bat
+	- This is the tool.gsb  (UTF8 with BOM)
+	type tool.gsb
+	- Clear and make database again with data
+	ResetDataBase
+}
+PrintConsole(h$)
+End Sub
+}
+module interpret1 {
+	try {interpret}
+}
+interpret1: end
+} as code$
+// this string has only 3 bytes. (Len(bom$)=1.5)
+bom$=str$(format$("\uef\ubb\ubf"))
+// we set Wide so no conversion to ANSI happen (based on LOCALE))
+Open "tool.gsb" for wide output as #F
+	Print #F,bom$;
+	Print #F, String$(code$ as UTF8enc);
+Close #F
+o=locale
+locale 1032
+Open "ResetDataBase.bat" for output as #F
+Print #F,{@echo off
+chcp 1253
+Del base1.xml
+call tool add name "BOB" tag "EAT A LOT" date "2022.10.21.04:00"
+call tool add name "JOHN" tag "DRINK WATER" "date 2022.10.15.12:00"
+call tool add name "PAUL" tag "EAT A LOT" date "2022.10.13.22:00"
+call tool add name "SUZAN" tag "DRINK WATER" date "2022.10.13.12:00"
+call tool add name "PHILIP" tag "DRINK WATER" date "2022.10.13.10:00"
+call tool add name "MONDY" tag "EAT A LOT" date "2022.10.10.12:00"
+call tool add name "MARY" tag "PIZZA FRIENDLY" date "2022.10.10.12:00"
+call tool add name "DONALD" tag "PIZZA FRIENDLY" date "2022.10.10.02:00"
+call tool add name "ΓΙΩΡΓΟΣ" date "2022.11.29.16:55"
+call tool all-entries
+};
+Close #F
+locale o
+win shortdir$(appdir$)+"m2000,exe", "tool.gsb"
+
+while not exist("tool.bat")
+	?".";
+	wait 100
+end while
+? "ok"
+declare info information
+dos "cd "+shortdir$(dir$)+" &&  tool"
+Print "Waitiing to close the cmd.exe window..."; dos
+Escape off
+Pen 15 {Print "If you return focus to this M2000 console you can press Esc and kill the DOS wiindow"}
+Refresh
+do
+        Method info ,"IsRunning", dos as zz
+        if keypress(27) then
+        		if zz then
+        			pid=dos
+	        		dos "taskkill /F /PID "+pid;: exit
+	        	end if
+        end if
+        wait 100
+until not zz
+Escape on
+Print "done"
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
