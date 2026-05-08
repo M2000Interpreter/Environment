@@ -2681,7 +2681,7 @@ Else
     Exit Function
 End If
 Exit Function
-Case2:
+case2:
 Exit Function
 comeoper:
     Set bstack.Sorosref = New mStiva
@@ -4692,7 +4692,7 @@ End Function
 Public Function ExecuteVar1(Exec1 As Long, bstack As basetask, W$, b$, v As Long, Lang As Long, VarStat As Boolean, NewStat As Boolean, nchr As Integer, ss$, sss As Long, temphere$, noVarStat As Boolean) As Long
 Dim i As Long, p As Variant, myobject As Object, ok As Boolean, sw$, sp As Variant, useType As Boolean
 Dim lasttype As Integer, pppp1 As mArray, isglobal As Boolean, usehandler As mHandler, usehandler1 As mHandler
-Dim newid As Boolean, Ar As refArray, ww As Integer, BI As BigInteger
+Dim newid As Boolean, Ar As refArray, ww As Integer, BI As BigInteger, Enum1 As Enumeration
 Dim pppp2 As iBoxArray, mTuple As tuple
 
 Const b12345 = vbCr + "'\/:}"
@@ -5245,7 +5245,8 @@ jumpbackhere:
                     If bstack.lastobj Is Nothing Then
                         If usehandler.t1 = 4 Then
 checkfromstring:
-                            Set myobject = usehandler.objref.SearchValue(p, ok)
+                            Set Enum1 = usehandler.objref
+                            Set myobject = Enum1.SearchValue(p, ok)
                             If ok Then
                                 Set var(v) = myobject
                             Else
@@ -5946,9 +5947,11 @@ NotArray1:
                                 End If
                             ElseIf ss$ = "--" Then
                                 If usehandler.index_start > 0 Then
-                                    usehandler.index_start = usehandler.index_start - 1
-                                    usehandler.objref.Index = usehandler.index_start
-                                    usehandler.index_cursor = usehandler.objref.Value
+                                    If usehandler.index_start <= usehandler.objref.Count - 1 Then
+                                        usehandler.index_start = usehandler.index_start - 1
+                                        usehandler.objref.Index = usehandler.index_start
+                                        usehandler.index_cursor = usehandler.objref.Value
+                                    End If
                                 End If
                             ElseIf ss$ = "-!" Then
                                 usehandler.sign = -usehandler.sign
@@ -6015,7 +6018,9 @@ checkobject1:
                             If TypeOf sp Is mHandler Then
                                 Set usehandler = sp
                                 If usehandler.t1 = 4 Then
-                                    Set sp = usehandler.objref.SearchValue(p, ok)
+                                    Set Enum1 = usehandler.objref
+
+                                    Set sp = Enum1.SearchValue(p, ok)
                                     If Not ok Then GoTo aproblem1
                                     bstack.SetVarobJ W$, sp
                                 Else
@@ -6240,18 +6245,18 @@ End Sub
 
 Private Function MyTrimLi(s$, l As Long) As Long
 Dim i&
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
  If l > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
  If l <= 0 Then MyTrimLi = 1: Exit Function
   l = l - 1
   i = Len(s)
-  P2 = StrPtr(s) + l * 2:  p4 = P2 + i * 2
-  For i = P2 To p4 Step 2
+  p2 = StrPtr(s) + l * 2:  p4 = p2 + i * 2
+  For i = p2 To p4 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160, 9
     Case Else
-     MyTrimLi = (i - P2) \ 2 + 1 + l
+     MyTrimLi = (i - p2) \ 2 + 1 + l
    Exit Function
   End Select
   Next i
@@ -8760,6 +8765,7 @@ conthereEnum:
                                 If Not it Then
                                     Set usehandler = p
                                     p = X
+                                    
                                     Set usehandler = usehandler.objref.SearchValue(p, ok)
                                     Set myobject = usehandler
                                     If ok Then
@@ -11105,6 +11111,11 @@ fromfirst0:
     bstack.addlen = oldLL
 cont111:
     Select Case w3
+    Case 100
+    SwapStrings b$, bb$
+    once = loopthis  ' TRUE IF i HAVE CASE ELSE ' FALSE IF I HAVE STANDARD ELSE
+    Exec = w3
+    Exit Function
     Case 0
 Error1:
                 
@@ -11130,7 +11141,7 @@ Error1:
         End If
         Exec = 0
         Exit Function
-    Case 1
+    Case 1, 50, 51
 ALFA12:
         If LastErNum = -2 Then
             If NocharsInLine(bb$) Then
@@ -11147,15 +11158,34 @@ ALFA12:
             Exec = 0
             Exit Function
         End If
-        Exec = oldexec ''1
+        
+            
+            Exec = oldexec
+        
         If kolpo And monce And Exec = 1 Then
             SwapStrings b$, bb$
             once = True
             Exit Function
+        ElseIf w3 > 49 Then
+        
+       If w3 = 50 Then
+            Exec = w3
+            DropMarkSel bstack
+            SwapStrings b$, bb$
+            once = True
+            Exit Function
+        ElseIf w3 = 51 Then
+            Exec = 51
+            SwapStrings b$, bb$
+            once = kolpo
+            Exit Function
+        End If
         ElseIf kolpo And NocharsInLine(bb$) Then
             If RetStackSize < bstack.RetStackTotal Then PopStagePart bstack, bstack.RetStackTotal - RetStackSize
             Exec = w3
             Exit Do
+        
+        
         End If
         If stepbystep Then
             b$ = bb$
@@ -11169,6 +11199,7 @@ ALFA12:
             Exec = 2
             If noblock Then
                 b$ = vbNullString
+                
             Else
                 SwapStrings b$, bb$
             End If
@@ -11502,7 +11533,15 @@ AGAINGOTO:
                             b$ = bb$
                             Exec = 2
                             Exit Do
+                        ElseIf HaveMarkSel(bstack) Then
+                        If RetStackSize < bstack.RetStackTotal Then
+                            DropMarkSel bstack
+                        End If
+                            b$ = bb$
+                            Exec = 2
+                            Exit Do
                         Else
+                        
                             subs.ItemCreator2 bb$, i, 0
                             bb$ = Mid$(b$, i, ex2 - i + 1)
                             GoTo fromfirst0

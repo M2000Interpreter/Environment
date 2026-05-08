@@ -4,7 +4,7 @@ Const CSIDL_TEMPLATES = &H15&
 Global Const OpSq = "«"
 Global Const ClSq = "»"
 Const MAX_PATH = 260
-Public Errorlog As New Document
+Public Errorlog As New Document, useDesktopInf As Boolean
 Private Const mProp = "PropReference"
 Private Const mHdlr = "mHandler"
 Private Const mGroup = "Group"
@@ -3773,14 +3773,18 @@ End With
  
 ' check to see if
 Dim ss$, skipthat As Boolean
-If Not IsSupervisor Then
-    ss$ = ReadUnicodeOrANSI(userfiles + "desktop.inf")
-    LastErNum = 0
-    If ss$ <> "" Then
-     skipthat = interpret(bstack, ss$)
-     If mycolor(PenOne) <> D.ForeColor Then
-     PenOne = -D.ForeColor
-     End If
+If useDesktopInf Or Not IsSupervisor Then
+    ss$ = userfiles + "desktop.inf"
+    If GetDosPath(ss$) <> "" Then
+        ss$ = ReadUnicodeOrANSI(ss$)
+        If ss$ <> "" Then
+            skipthat = interpret(bstack, ss$)
+            If mycolor(PenOne) <> D.ForeColor Then
+                PenOne = -D.ForeColor
+            End If
+        End If
+    Else
+        ss$ = ""
     End If
 End If
 If SzOne < 36 And D.Height / SzOne > 250 Then SetDouble D: BAR = BAR + 1
@@ -4274,7 +4278,9 @@ End If
 '.glistN.AddPixels = 0
 .glistN.ZOrder 0
 .BackColor = D.BackColor
-.ForeColor = D.ForeColor
+
+
+.ForeColor = rgbconv(CLng(D.ForeColor))
 .Font.Name = D.Font.Name
 Form1.SetText1
 .glistN.overrideTextHeight = prive.overrideTextHeight '   fonttest.TextHeight("fj")
@@ -6733,7 +6739,9 @@ ElseIf Not TaskMaster.Processing And TaskMaster.QueueCount = 0 Then
 Else
     MusicMaster.StopProcess
     TaskMaster.StopProcess
+
     TaskMaster.TimerTick
+    'If MusicMaster.PlayMusic Then MusicMaster.TimerTick
     DoEvents
     TaskMaster.StartProcess
     MusicMaster.StartProcess
@@ -8153,7 +8161,7 @@ Public Sub NoReference()
    MyEr "No reference exist", "Δεν υπάρχει αναφορά"
 End Sub
 Public Sub NoCommandOrBlock()
-MyEr "Expected in Select Case a Block or a Command", "Περίμενα στην Επίλεξε Με μια εντολή ή ένα μπλοκ εντολών)"
+MyEr "Expected in Select Case a Block or a Command", "Περίμενα στην Επίλεξε Με μια εντολή ή ένα μπλοκ εντολών"
 End Sub
 
 Public Sub NoSecReF()
@@ -10746,6 +10754,8 @@ If Not Mid$(a$, a1, 1) Like "[0-9]" Then Exit Do
 Loop
 Label$ = Mid$(a$, A2, a1 - A2): a$ = Mid$(a$, a1)
 IsNumberLabel = True
+'Else
+'if a2>1 then a$ = Mid$(a$, a2)
 End If
 
 End If
@@ -12507,6 +12517,7 @@ End Sub
 Function ProcEnum(bstack As basetask, rest$, Optional Glob As Boolean = False, Optional alocal As Boolean = False) As Boolean
 Dim s$, w1$, v As Long, enumvalue As Variant, myenum As Enumeration, mh As mHandler, V1 As Long, i As Long
 Dim s1$, badd As Byte, lasttype, feed, w2$, usehandler As mHandler, myother As Enumeration
+Dim ErrorValue As Long
 Dim gr As Boolean, fromvar As Long, j As Long
 fromvar = varhash.Count
 enumvalue = 0#
@@ -12541,8 +12552,21 @@ If FastSymbol(rest$, "{") Then
         ElseIf MaybeIsSymbol(s$, "/\'") Then
             SetNextLine s$
         ElseIf FastPureLabel(s$, w1$, , , , , , gr) = 1 Then
+            
             w2$ = myUcase(w1$, gr)
-            If alocal Or Glob Then
+            '
+            If FastSymbol(s$, ":") Then
+                If ErrorValue > 0 Then
+                    MyEr "Wrong enum definition", "Λάθος ορισμός απαριθμητή"
+                    Exit Function
+                ElseIf w2$ = "ERROR" Then
+                    ErrorValue = 1
+                    GoTo conthere
+                ElseIf w2$ = "ΛΑΘΟΣ" Then
+                    ErrorValue = 1
+                    GoTo conthere
+                End If
+            ElseIf alocal Or Glob Then
                 If GetVar(bstack, bstack.GroupName + w2$, j, Glob, , alocal) Then
                 If j <= fromvar Then
                     If Typename(var(j)) = "mHandler" Then
@@ -12569,9 +12593,13 @@ check111:
 copyhere:
                                 For j = 0 To myother.Count - 1
                                     myother.Index = j
+                                    'If MemInt(VarPtr(enumvalue)) = vbString Then
+                                    enumvalue = myenum.Count
+                                    'End If
                                     If AssignTypeNumeric(enumvalue + badd, VarType(lasttype)) Then
                                         enumvalue = enumvalue + badd
                                     End If
+                                    
                                     feed = myother.Value
                                     If MyIsNumeric(feed) Then
                                         lasttype = feed
@@ -12603,60 +12631,63 @@ cont123344:
                     feed = enumvalue
                     If MyIsNumeric(feed) Then lasttype = feed
                 Else
-                    If IsStrExp(bstack, s$, s1$, False) Then
-                        If AssignTypeNumeric(enumvalue + badd, VarType(lasttype)) Then
-                            enumvalue = enumvalue + badd
-                        Else
-                            Exit Function
-                        End If
-                        feed = CVar(s1$)
+                    MissPar
+                    Exit Function
+                End If
+            Else
+                If MyIsNumeric(enumvalue) Then
+                    If AssignTypeNumeric(enumvalue + badd, VarType(lasttype)) Then
+                        enumvalue = enumvalue + badd
+                        feed = enumvalue
                     Else
                         Exit Function
                     End If
-                End If
-            Else
-                If AssignTypeNumeric(enumvalue + badd, VarType(lasttype)) Then
-                    enumvalue = enumvalue + badd
-                    feed = enumvalue
                 Else
-                    Exit Function
+                    feed = w1$
                 End If
             End If
+            If ErrorValue Then
+            Set usehandler = mh
+            End If
             myenum.addone w1$, feed
+
             w1$ = myUcase(w1$, gr)
             If numid.Find(w1$, i) Then If i > 0 Then numid.ItemCreator2 w1$, -1
             Set mh = New mHandler
             Set mh.objref = myenum
             mh.t1 = 4
             mh.ReadOnly = True
+
             mh.index_cursor = feed
             mh.index_start = myenum.Count - 1
             V1 = globalvar(bstack.GroupName + myUcase(w1$, gr), V1, , (here$ = "") Or Glob)
             Set var(V1) = mh
             ProcEnum = True
+            If ErrorValue Then
+            s$ = vbNullString
+            myenum.ErrorIndex = myenum.Count - 1
+            myenum.HasErrorIndex = True
+            Exit Do
+            End If
         Else
             Exit Do
         End If
 conthere:
         If FastSymbol(s$, ",") Then ProcEnum = False
     Loop
-        
-    If V1 > v Then
-        Set var(v) = var(V1)
+    If myenum.Count = 0 Then
+        MyEr "Empty Enumeration", "Άδεια Απαρίθμηση": Exit Function
     Else
-        If myenum.Count = 0 Then
-            MyEr "Empty Enumeration", "Άδεια Απαρίθμηση": Exit Function
-        Else
-            Set mh = New mHandler
-            Set mh.objref = myenum
-            myenum.Index = myenum.Count - 1
-            mh.index_cursor = myenum.Value
-            mh.index_start = myenum.Index
-            mh.t1 = 4
-            mh.ReadOnly = True
-            Set var(v) = mh
-        End If
+        Set mh = New mHandler
+        Set mh.objref = myenum
+        myenum.Index = myenum.Count - 1
+        mh.index_cursor = myenum.Value
+        mh.index_start = myenum.Index
+        mh.t1 = 4
+        mh.ReadOnly = True
+        Set var(v) = mh
     End If
+
     ProcEnum = FastSymbol(rest$, "}", True)
 Else
     MissingEnumBlock
@@ -16053,6 +16084,38 @@ Checkit:
             Set v = pppp
         End If
 End Function
+Function HaveMarkSel(bstack As basetask) As Boolean
+Dim s As mStiva2
+Set s = bstack.RetStack
+If s.Total > 1 Then
+HaveMarkSel = s.LookTopVal = -5
+End If
+End Function
+Function HaveMarkSelGr(bstack As basetask) As Boolean
+Dim s As mStiva2
+Set s = bstack.RetStack
+If s.Total > 1 Then
+    If s.LookTopVal = -5 Then
+        HaveMarkSelGr = s.LookSecondVal = 0
+    End If
+End If
+End Function
+Function HaveMarkSelEn(bstack As basetask) As Boolean
+Dim s As mStiva2
+Set s = bstack.RetStack
+If s.Total > 1 Then
+    If s.LookTopVal = -5 Then
+        HaveMarkSelEn = s.LookSecondVal = 1
+    End If
+End If
+End Function
+Sub DropMarkSel(bstack As basetask)
+Dim s As mStiva2
+Set s = bstack.RetStack
+If s.Total > 1 Then
+If s.LookTopVal = -5 Then s.drop 2
+End If
+End Sub
 
 
 Function HaveMark(bstack As basetask, a As Long, b As Boolean) As Boolean
@@ -19621,10 +19684,10 @@ stackshowonly = True
 If FastSymbol(dl$, ")") Then
 ok = True
 ElseIf IsExp(b, dl$, p) Then
-If MemInt(VarPtr(p)) = vbString Then
-SwapString2Variant s$, p
-GoTo thatstring
-End If
+    If MemInt(VarPtr(p)) = vbString Then
+        SwapString2Variant s$, p
+        GoTo ThatString
+    End If
     If al$ = vbNullString Then
         If pagio$ = "GREEK" Then
         al$ = "? " + Left$(dl2$, Len(dl2$) - Len(dl$)) + "=" + MyCStr(p)
@@ -19637,7 +19700,7 @@ End If
     End If
     ok = True
     ElseIf IsStrExp(b, dl$, s$) Then
-thatstring:
+ThatString:
     If Len(dl2$) - Len(dl$) >= 0 Then
     
     
@@ -25671,26 +25734,26 @@ On Error Resume Next
 ret = 0
 ' its a document
 End Function
-Function newStart(basestack As basetask, rest$) As Boolean
-Dim Scr As Object, s$, pa As Long, r, mycoder As New coder
+Function newStart(basestack As basetask, rest$, Lang As Long) As Boolean
+Dim Scr As Object, s$, pa As Long, mycoder As New coder
+Dim haveStr As Boolean, skip1 As Boolean
+    If IsLabelSymbolNew(rest$, "ΔΙΕΠΑΦΗ", "DESKTOP", Lang) Then
+        useDesktopInf = True
+        skip1 = True
+    End If
+    If IsFlatStringExpr(basestack, rest$, s$) Then
+    haveStr = True
+    End If
 If HaltLevel > 0 Then rest$ = vbNullString: Exit Function
-    If Not basestack.IamChild And Not basestack.IamAnEvent Then
-        If IsNumber(basestack, rest$, r, True) Then
-            If r = 0 Then
-                If UseMe Is Nothing Then Beep: newStart = True: Exit Function
-                If UseMe.IhaveExtForm Then
-                    rest$ = UseMe.Code + vbCrLf + "END"  ' mycoder.must()
-                End If
-                newStart = True
-                Exit Function
-            End If
-        End If
+If Not basestack.IamChild And Not basestack.IamAnEvent Then
+    If Not haveStr Then
         If Check2Save Then
-        newStart = True
+            newStart = True
             Exit Function
         End If
+        Check2SaveModules = False
+    End If
 End If
-Check2SaveModules = False
 MyEr "", ""
 NOEXECUTION = False
 MOUT = False
@@ -25714,49 +25777,46 @@ Scr.ForeColor = mycolor(11)
 basestack.myBold = False
 basestack.myitalic = False
 pa = 0
+Err.Clear
 
-            Err.Clear
-            On Error Resume Next
-If IsStrExp(basestack, rest$, s$) Then
-            If s$ <> "" And s$ <> "*" Then MyFont = s$ Else MyFont = Scr.Font.Name
-      
-                Scr.Font.charset = 0
-                Scr.Font.Name = MyFont
-               If Not myLcase(MyFont) = myLcase(Scr.Font.Name) Then
-               Scr.Font.charset = 1
-               Scr.Font.Name = MyFont
-               End If
-               Sleep 1
-
-                Scr.Font.charset = basestack.myCharSet
-                    Form1.TEXT1.Font.charset = basestack.myCharSet
-
+On Error Resume Next
+If haveStr Then
+If s$ <> "" And s$ <> "*" Then MyFont = s$ Else MyFont = Scr.Font.Name
+    Scr.Font.charset = 0
+    Scr.Font.Name = MyFont
+    If Not myLcase(MyFont) = myLcase(Scr.Font.Name) Then
+        Scr.Font.charset = 1
+        Scr.Font.Name = MyFont
+    End If
+    Sleep 1
+    Scr.Font.charset = basestack.myCharSet
+    Form1.TEXT1.Font.charset = basestack.myCharSet
     Form1.List1.Font.charset = basestack.myCharSet
-
-                Scr.FontBold = False
-                Scr.FontItalic = False
-            If Err.Number > 0 Then
-                Err.Clear
-                Scr.Font.Name = FFONT
-                Scr.Font.charset = basestack.myCharSet
-            End If
-        StoreFont Scr.Font.Name, Scr.FontSize, Scr.Font.charset
-        
-        SetText Scr, -2, True
-            s$ = vbNullString
-            If FastSymbol(rest$, ",") Then
-             
-            If IsStrExp(basestack, rest$, s$) Then
-            'rest$ = s$ & "}" & rest$
+    Scr.FontBold = False
+    Scr.FontItalic = False
+    If Err.Number > 0 Then
+        Err.Clear
+        Scr.Font.Name = FFONT
+        Scr.Font.charset = basestack.myCharSet
+    End If
+    StoreFont Scr.Font.Name, Scr.FontSize, Scr.Font.charset
+    
+    SetText Scr, -2, True
+    s$ = vbNullString
+    If FastSymbol(rest$, ",") Then
+        If IsFlatStringExpr(basestack, rest$, s$) Then
             If s$ <> "" Then s$ = ": " + s$ + "}"
-            ElseIf FastSymbol(rest$, "{") Then
+        ElseIf FastSymbol(rest$, "{") Then
             s$ = ": " + block(rest$)
             If Not FastSymbol(rest$, "}") Then Set Scr = Nothing: newStart = False: Exit Function
-                End If
-                End If
-            original Basestack1, s$  ' set...
-            
+        End If
+    End If
+    original Basestack1, s$  ' set...
+    
 Else
+    If Not skip1 Then
+    useDesktopInf = False ' COLD RESTART
+    End If
     MyEr "", ""
     closeAll ' we closed all files
     If AVIRUN Then MediaPlayer1.stopMovie
@@ -26153,14 +26213,14 @@ ElseIf IsExp(bstack, rest$, p) Then
 
     i = ((CLng(p) + 23) Mod 24) + 1
     If lookOne(rest$, "{") Then
-         If IsStrExp(bstack, rest$, s$) Then
+         If IsFlatStringExpr(bstack, rest$, s$) Then
             FK$(i) = s$
         Else
             MissPar
             Exit Function
         End If
     ElseIf FastSymbol(rest$, ",") Then
-        If IsStrExp(bstack, rest$, s$) Then
+        If IsFlatStringExpr(bstack, rest$, s$) Then
             FK$(i) = s$
         Else
             MissPar
@@ -27236,7 +27296,7 @@ ProcFind = True
                 End If
     End If
     If FastSymbol(rest$, ",") Then
-    If Not IsStrExp(basestack, rest$, frm$) Then
+    If Not IsFlatStringExpr(basestack, rest$, frm$) Then
         MissStringExpr
         Exit Function
     End If
@@ -27536,9 +27596,9 @@ End If
                     doslast = Shell("CMD", vbNormalFocus)
         End If
 
-           MyDoEvents
-        Sleep CLng(Abs(p))
-
+        '   MyDoEvents
+        'Sleep CLng(Abs(p))
+        mywait11 basestack, CDbl(Abs(p))
 Else
 BadCommand
 Exit Function
