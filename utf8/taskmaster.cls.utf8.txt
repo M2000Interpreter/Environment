@@ -29,7 +29,7 @@ End Enum
 
 
 
-Public OnlyMusic As Boolean
+Public OnlyMusic As Boolean, Busy As Boolean
 Private myRunningList As Collection
 Private myMasterList As Collection
 Private myInterval As Long
@@ -38,11 +38,12 @@ Private myTimerIsRunning As Boolean
 
 
 
+
 ' PUBLIC PROPERTIES
 Public Property Get PlayMusic() As Boolean
-If OnlyMusic Then
+'If OnlyMusic Then
 PlayMusic = MusicTaskNum > 0
-End If
+'End If
 End Property
 Public Property Get QueueCount() As Long
   QueueCount = myRunningList.Count + myMasterList.Count
@@ -364,14 +365,19 @@ Public Sub Dispose()
 End Sub
 
 Public Sub TimerTick()
-If Not Me Is MusicMaster Then
-If MusicMaster.PlayMusic Then MusicMaster.TimerTick Else tickTimer = tickTimer + 1
-Else
+
 tickTimer = tickTimer + 1
-End If
     If tickdrop > 0 Then Exit Sub
     Dim this As TaskInterface, many As Long, dosomething As Boolean
-    If myMasterList.Count = 0 Then Exit Sub
+    If Busy Then Exit Sub
+    Busy = True
+    If myMasterList.Count = 0 Then
+        
+        If PlayMusic Then If Not OnlyMusic Then MusicMaster.TimerTick
+        Busy = False
+        Exit Sub
+    End If
+
     many = myMasterList.Count
     Dim manybusy As Long
     
@@ -382,7 +388,12 @@ again:
         myRunningList.Add this
         many = many - 1
     Loop While this.id < 0 And myMasterList.Count <> 0
-    If this.id < 0 Then Exit Sub
+    If Not OnlyMusic Then If PlayMusic Then MusicMaster.TimerTick
+    
+    If this.id < 0 Then
+        Busy = False
+        Exit Sub
+    End If
     dosomething = False
     If Not this.Busy And Not this.Done Then
       dosomething = this.Tick
@@ -403,13 +414,18 @@ again:
   Else
     this.Dispose tmThisTask
   End If
-
-    If myTimerIsRunning = False Or QueueCount = 0 Then
-        StopTimer
-    ElseIf QueueCount = 1 And taskmainonly Then
-        Sleep 50
-    ElseIf Not dosomething Then
-        Sleep 5
+    If Not OnlyMusic Then
+        If myTimerIsRunning = False Or QueueCount = 0 Then
+            StopTimer
+        ElseIf QueueCount = 1 And taskmainonly Then
+            If Not PlayMusic Then
+            Sleep 50
+            End If
+        ElseIf Not dosomething Then
+            If Not PlayMusic Then
+            Sleep 5
+            End If
+        End If
     End If
     If LastErNum <> 0 Then Dispose
     If manybusy > 0 Then
@@ -417,6 +433,7 @@ again:
            If Not myTimerIsRunning Then Dispose
         End If
     End If
+    Busy = False
 End Sub
 Public Sub TimerTickOne()
 If tickdrop > 0 Then Exit Sub 'tickdrop = myMasterList.Count: Exit Sub
@@ -576,8 +593,8 @@ Private Sub StopTimer()
   If myTimerHandle <> 0 Then
     KillTimer 0&, myTimerHandle
     myTimerHandle = 0
-  
   End If
+    Busy = False
     myTimerIsRunning = False
 End Sub
 

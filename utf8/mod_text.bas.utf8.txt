@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 26
+Global Const Revision = 27
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3737,7 +3737,7 @@ Public Sub PopStage(basestack As basetask)
         Dim one As Long
         With basestack.RetStack
         If .LookTopVal = -1 Then
-        basestack.SubLevel = basestack.SubLevel - 1
+            basestack.SubLevel = basestack.SubLevel - 1
            .drop 1
             var2used = .Pop2Long(sb2used)
             basestack.ErrVars = var2used
@@ -3749,8 +3749,8 @@ Public Sub PopStage(basestack As basetask)
             strfunid.poptop
             strid.poptop
         ElseIf .LookTopVal = -2 Then
-        basestack.SubLevel = basestack.SubLevel - 1
-        .drop 3  ' not 5
+            basestack.SubLevel = basestack.SubLevel - 1
+            .drop 3  ' not 5
         End If
         End With
 End Sub
@@ -3795,6 +3795,8 @@ JUMPHERE:
             basestack.UseofIf = basestack.UseofIf - 1
         Case -4
             GoTo JUMPHERE
+        Case -5
+            .drop 1  ' for select/end select
         Case Else
          .drop 2  ' string in topval (gosub to label)
              nok = True
@@ -3839,6 +3841,8 @@ JUMPHERE:
             basestack.UseofIf = basestack.UseofIf - 1
         Case -4
             GoTo JUMPHERE
+        Case -5
+            .drop 1  ' for select/end select
         Case Else
             Exit Sub
         End Select
@@ -5999,18 +6003,18 @@ If LastErNum = -2 Then IsExpBig = False
 End Function
 Private Function MyTrimLi(s$, l As Long) As Long
 Dim i&
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
  If l > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
  If l <= 0 Then MyTrimLi = 1: Exit Function
   l = l - 1
   i = Len(s)
-  P2 = StrPtr(s) + l * 2:  p4 = P2 + i * 2
-  For i = P2 To p4 Step 2
+  p2 = StrPtr(s) + l * 2:  p4 = p2 + i * 2
+  For i = p2 To p4 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160, 9
     Case Else
-     MyTrimLi = (i - P2) \ 2 + 1 + l
+     MyTrimLi = (i - p2) \ 2 + 1 + l
    Exit Function
   End Select
   Next i
@@ -6018,18 +6022,18 @@ Dim P2 As Long, P1 As Integer, p4 As Long
 End Function
 Private Function MyTrimLi2(s$, l As Long) As Long
 Dim i&
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
  If l > Len(s) Then MyTrimLi2 = Len(s) + 1: Exit Function
  If l <= 0 Then MyTrimLi2 = 1: Exit Function
   l = l - 1
   i = Len(s)
-  P2 = StrPtr(s) + l * 2:  p4 = P2 + i * 2
-  For i = P2 To p4 Step 2
+  p2 = StrPtr(s) + l * 2:  p4 = p2 + i * 2
+  For i = p2 To p4 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160, 7, 9
     Case Else
-     MyTrimLi2 = (i - P2) \ 2 + 1 + l
+     MyTrimLi2 = (i - p2) \ 2 + 1 + l
    Exit Function
   End Select
   Next i
@@ -6069,6 +6073,28 @@ Exit Function
 Case """"
     r = blockString(a$, 34, sng& + 1)
     IsNumber = FastSymbol(a$, Chr$(34))
+    If r = "" Then
+        Dim rr$
+        Do While a$ <> ""
+            Oldway a$, rr$
+            r = r + rr$
+            If Len(a$) > 0 Then
+                If AscW(a$) = 34 Then
+                    a$ = Mid$(a$, 2)
+                    r = r + Chr$(34) + blockString(a$, 34)
+                    IsNumber = FastSymbol(a$, Chr$(34))
+                Else
+                    Exit Do
+                End If
+            Else
+                Exit Do
+            End If
+        Loop
+    
+    End If
+    
+    
+    
     Exit Function
 Case "{"
     r = blockString(a$, 125, sng& + 1)
@@ -7960,7 +7986,8 @@ cont8case:
                             r = 0
                         End If
                     Else
-                        If usehandler.t1 = 4 And FastSymbol(a$, "|") Then
+                        If usehandler.t1 = 4 Then
+                        If FastSymbol(a$, "|") Then
                             If FastPureLabel(a$, s1$, , , , , , gr) = 1 Then
                                 s1$ = myUcase(s1$, gr)
                                 r = usehandler.objref.SearchSimple(s1$, gr)
@@ -7971,7 +7998,13 @@ a11212121:
                                 IsNumberNew = False
                                 Exit Function
                             End If
-                            
+                        ElseIf FastSymbol(a$, "^") Then
+                            r = usehandler.index_start
+                            Set bstack.lastobj = Nothing
+                        Else
+                            CopyHandler var(VR), bstack
+                            r = 0
+                        End If
                         Else
                             CopyHandler var(VR), bstack
                         r = 0
@@ -15705,6 +15738,7 @@ Dim temphere$, one As Boolean, likebasic As Boolean: likebasic = bstack.BasicSwi
 Dim subs As FastCollection
 If loopthis Then Execute = 2 Else Execute = 1
 againexecute:
+
 sss = Len(b$): lbl = True
 Do While Len(b$) <> LLL
     If checkbreakEsc(bstack) Then
@@ -15808,7 +15842,9 @@ againExtra2:
                 lbl = False
                 GoTo againExtra
             End If
-            If Module10.executeblock(Execute, bstack, b$, once, kolpo) Then Exit Function
+            If Module10.executeblock(Execute, bstack, b$, once, kolpo) Then
+                Exit Function
+            End If
             '' WHY 4???
             ''If Execute = 4 Then b$ = "{" + b$: Exit Function
             If kolpo Then ec$ = block(b$)
@@ -16122,7 +16158,7 @@ myerr1:
                         GoTo parsecommand
                     End If
                 ElseIf v <> 0 Then
-                    On v GoTo contif, ContElse, contElseIf, contSelect, ContTry, ForCont, contNext, contRefr, contWhile, ContRepeat, ContGoto, contSub, autogosub, ContOn, contLoop, contBreak, ContContinue, ContRestart, ContReturn, ContEnd, ContExit, ContInline, contUpdate, contThread, contAfter, contPart, contStatic, contEvery, contTask, ContScan, contTarg, BypassGlobalComm, BypassComm, contNegLocal, contNegGlobal, makeconst, VarOnly, contCall, contBinary, contHALT, contSTOP, contDraw, contVar, contClass, ContBASIC, ContRestore
+                    On v GoTo contif, ContElse, contElseIf, contSelect, ContTry, ForCont, contNext, contRefr, contWhile, ContRepeat, ContGoto, contSub, autogosub, ContOn, contLoop, contBreak, ContContinue, ContRestart, ContReturn, ContEnd, ContExit, ContInline, contUpdate, contThread, contAfter, contPart, contStatic, contEvery, contTask, ContScan, contTarg, BypassGlobalComm, BypassComm, contNegLocal, contNegGlobal, makeconst, VarOnly, contCall, contBinary, contHALT, contSTOP, contDraw, contVar, contClass, ContBASIC, ContRestore, ContCaseGr, ContCaseEN
                     Execute = 0: Exit Function
 contClass:
         one = True
@@ -16457,6 +16493,27 @@ contRet1:
                         Exit Function
                     End If
                 End If
+            Case "ΜΕ"
+ContCaseGr:
+                If HaveMarkSelGr(bstack) Then
+                    loopthis = IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "", 0)  ' we return as case or case else
+                    Execute = 100
+                    Exit Function
+                ElseIf Not MyWith(bstack, b$, 0&) Then
+                    Execute = 0 ' ??
+                    Exit Function
+                End If
+            Case "CASE"
+ContCaseEN:
+                If HaveMarkSelEn(bstack) Then
+                    loopthis = IsLabelSymbolNew(b$, "", "ELSE", 1) ' we return as case or case else
+                    Execute = 100
+                    Exit Function
+                Else
+                    NoCommandOrBlock
+                    Execute = 1 ' ??
+                    Exit Function
+                End If
             Case "END", "ΤΕΛΟΣ"
 ContEnd:
                 WaitShow = 0
@@ -16482,9 +16539,16 @@ ContEnd:
                     Execute = 2
                     Exit Function
                 ElseIf IsLabelSymbolNewExp(b$, "ΕΠΙΛΟΓΗΣ", "SELECT", Lang, W$) Then
-                    NoCommandOrBlock
-                    Execute = 1
-                    Exit Function
+                    If HaveMarkSel(bstack) Then
+                        DropMarkSel bstack
+                        Execute = 51
+                        once = True
+                        Exit Function
+                    Else
+                        NoCommandOrBlock
+                        Execute = 1 ' ??
+                        Exit Function
+                    End If
                 ElseIf IsLabelSymbolNewExp(b$, "ΣΥΝΑΡΤΗΣΗΣ", "FUNCTION", Lang, W$) Then
                     once = False
                     b$ = Chr$(0)
@@ -16560,7 +16624,13 @@ exitfor:
 exitfromhere:
                     If Execute <> 2 Then Execute = 1 Else Execute = 3
                    restartmodule = False
-                    
+                    If HaveMarkSel(bstack) Then
+                    '    DropMarkSel bstack
+                    '    While HaveMarkSel(bstack)
+                    '    DropMarkSel bstack
+                    '    Wend
+                        Execute = 51
+                    End If
                     b$ = vbNullString
                     once = True
                     Exit Function
@@ -18003,7 +18073,23 @@ contTask:
         Case "ELSE", "ΑΛΛΙΩΣ"
 ContElse:
     
-            
+            If HaveMarkSel(bstack) Then
+                If Len(W$) = 4 Then
+                    If HaveMarkSelEn(bstack) Then
+                        IsLabelSymbolNew b$, "", "CASE", 1
+                        Execute = 100
+                        Exit Function
+                    End If
+                ElseIf HaveMarkSelGr(bstack) Then
+                    IsLabelSymbolNew b$, "ΜΕ", "", 0
+                    Execute = 100
+                    Exit Function
+                End If
+                
+                
+                
+            End If
+ContElse1:
             If IFCTRL = 0 Then
             If lookB123(b$) Then
                 If HaveMark(bstack, i, ok) Then
@@ -18450,7 +18536,7 @@ contThenElseIf:
                                                 Select Case W$
                                                 Case "ΑΛΛΙΩΣ"
                                                     b$ = Mid$(b$, i)
-                                                    GoTo ContElse
+                                                    GoTo ContElse1
                                                 Case "ΑΛΛΙΩΣ.ΑΝ"
                                                      b$ = Mid$(b$, i)
                                                     GoTo contElseIf
@@ -18459,7 +18545,7 @@ contThenElseIf:
                                                 Select Case W$
                                                 Case "ELSE"
                                                     b$ = Mid$(b$, i)
-                                                    GoTo ContElse
+                                                    GoTo ContElse1
                                                 Case "ELSE.IF"
                                                     b$ = Mid$(b$, i)
                                                     GoTo contElseIf
@@ -18716,7 +18802,7 @@ contelseifpass:
                                 End If
                                 End If
                                 If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", Lang) Then GoTo contElseIf
-                                If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse
+                                If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse1
                                 
                             
                             End If
@@ -18808,7 +18894,7 @@ contif22:
 
                                                 Case "ΑΛΛΙΩΣ"
                                                     b$ = Mid$(b$, i)
-                                                    GoTo ContElse
+                                                    GoTo ContElse1
                                                 Case "ΑΛΛΙΩΣ.ΑΝ"
                                                      b$ = Mid$(b$, i)
                                                     GoTo contElseIf
@@ -18817,7 +18903,7 @@ contif22:
                                                 Select Case W$
                                                 Case "ELSE"
                                                     b$ = Mid$(b$, i)
-                                                    GoTo ContElse
+                                                    GoTo ContElse1
                                                 Case "ELSE.IF"
                                                     b$ = Mid$(b$, i)
                                                     GoTo contElseIf
@@ -19035,7 +19121,7 @@ contif22:
                 While FastOperator(b$, vbCrLf, i, 2)
                 Wend
                 If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", Lang) Then GoTo contElseIf
-                If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse
+                If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse1
                 End If
                 GoTo again1
             End If
@@ -19064,8 +19150,16 @@ Case "SELECT", "ΕΠΕΛΕΞΕ", "ΕΠΙΛΕΞΕ"  '****************************
 contSelect:
         'Us$ = vbNullString
         If once = True Then Execute = 0: Exit Function
-        If exeSelect(Execute, once, bstack, b$, v, Lang) Then Exit Function
-        If Execute = 2 And Len(b$) = 0 Then Exit Function
+        If exeSelect(Execute, once, bstack, b$, v, Lang) Then
+        
+        Exit Function
+        End If
+        If Len(b$) = 0 Then
+            If Execute = 2 Then Exit Function
+            If Execute = 51 Then
+                Exit Function
+            End If
+        End If
         once = False
         lbl = False
         If Len(b$) > 0 Then
@@ -21221,7 +21315,7 @@ Case "DIR", "ΚΑΤΑΛΟΓΟΣ"
     Identifier = ProcDir(basestack, rest$, Lang)
 Exit Function
 Case "START", "ΑΡΧΗ"
-    Identifier = newStart(basestack, rest$)
+    Identifier = newStart(basestack, rest$, Lang)
     Exit Function
 Case "REMOVE", "ΔΙΑΓΡΑΦΗ"
     Identifier = ProcRemove(basestack, rest$, Lang)
@@ -24561,16 +24655,16 @@ End If
 End Function
 Public Function MyTrimRStr(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimRStr = 1: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
-  For i = p4 To P2 Step -2
+  p2 = StrPtr(s): l = l - 1
+  p4 = p2 + l * 2
+  For i = p4 To p2 Step -2
   GetMem2 i, P1
   Select Case P1
     Case 32
     Case Else
-     MyTrimRStr = (i - P2) \ 2 + 1
+     MyTrimRStr = (i - p2) \ 2 + 1
    Exit Function
   End Select
   Next i
@@ -24578,16 +24672,16 @@ Dim P2 As Long, P1 As Integer, p4 As Long
 End Function
 Public Function MyTrimRNoCr(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimRNoCr = 1: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
-  For i = p4 To P2 Step -2
+  p2 = StrPtr(s): l = l - 1
+  p4 = p2 + l * 2
+  For i = p4 To p2 Step -2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160, 9
     Case Else
-     MyTrimRNoCr = (i - P2) \ 2 + 1
+     MyTrimRNoCr = (i - p2) \ 2 + 1
    Exit Function
   End Select
   Next i
@@ -30078,6 +30172,13 @@ therebad:
                         i = PosLabel(bb$, sbf(S3).sb)
                     End If
                     sbf(S3).subs.AddKey bb$, i
+                 
+                        
+                    If bs.UseofIf > 0 Then
+                        If HaveMark2(bs) Then
+                            bs.UseofIf = bs.UseofIf - 1
+                        End If
+                    End If
                     x1 = S3
                 End If
                 If trace Then
@@ -38400,9 +38501,9 @@ bypass1:
             GoTo jump1
         End If
     End If
-    GoTo JUMP0
+    GoTo jump0
 ElseIf here$ = vbNullString And GetSub(what$, x1) And Not MakeNew Then
-JUMP0:
+jump0:
     If x1 >= lckfrm And lckfrm <> 0 Then
         MyEr what$ + " is locked", what$ + " είναι κλειδωμένο"
         rest$ = vbNullString
@@ -41560,7 +41661,7 @@ Else
 End If
 End Function
 Private Function compareStr4(a$, b$) As Long   ' here is not byval as in fastcollection
-Dim i As Long, j As Long, a1$, b1$, P1 As Variant, P2 As Variant, n$, K As Long, k1 As Long
+Dim i As Long, j As Long, a1$, b1$, P1 As Variant, p2 As Variant, n$, K As Long, k1 As Long
 If CompareString(Clid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$)) = 2 Then Exit Function
 n$ = "[-0-9.]"
 K = Sgn(Len(a$) - Len(b$))
@@ -41575,8 +41676,8 @@ For i = 1 To j
     b1$ = Mid$(b$, i)
         IsNumberD2 a1$, P1
        
-        If IsNumberD2(b1$, P2) Then
-            compareStr4 = Sgn(MyRound(P1, 8) - MyRound(P2, 8))
+        If IsNumberD2(b1$, p2) Then
+            compareStr4 = Sgn(MyRound(P1, 8) - MyRound(p2, 8))
             If compareStr4 = 0 Then
                 If Len(a1$) * Len(b1$) <> 0 Then
                     If Len(n$) > 6 Then n$ = "[-0-9]"
@@ -43680,6 +43781,7 @@ conthere:
         missParam a$
     End If
 End Function
+
 Private Function IsVal(bstack As basetask, a$, r As Variant, Eng As Boolean) As Boolean
     Dim s$, ex$, dd As Long, pp As Variant, Lang As Long
     If Eng Then Lang = 1
@@ -45225,15 +45327,15 @@ End Sub
 
 Function FastPureLabel(b$, a$, Optional Pos As Long = 1, Optional convert As Boolean, Optional retdot As Boolean, Optional countdot As Long, Optional trimit As Boolean = True, Optional gr As Boolean) As Long
 Dim i&, l As Long, one As Boolean, convat As Boolean, nospace As Boolean, pres As Long
-Dim P2 As Long, P1 As Integer, p4 As Long, counter As Long
+Dim p2 As Long, P1 As Integer, p4 As Long, counter As Long
     a$ = vbNullString
     countdot = 0
     gr = False
     l = Len(b$): If l = 0 Then Exit Function
     If Pos > l Then Exit Function
-    P2 = StrPtr(b$) + Pos * 2 - 2: l = l - 1
-    p4 = P2 + l * 2
-    For i = P2 To p4 Step 2
+    p2 = StrPtr(b$) + Pos * 2 - 2: l = l - 1
+    p4 = p2 + l * 2
+    For i = p2 To p4 Step 2
     GetMem2 i, P1
     Select Case P1
       Case 32, 160, 7, 9
@@ -45322,9 +45424,9 @@ aName:
     If retdot Then
         If pres = 0 Then countdot = counter - 1
     End If
-    P2 = i + 2
+    p2 = i + 2
     FastPureLabel = 1
-    For i = P2 To p4 Step 2
+    For i = p2 To p4 Step 2
         GetMem2 i, P1
         Select Case P1
             Case 36 ' 3 or 6
@@ -47201,9 +47303,9 @@ End Function
 
 Public Function exeSelect(ExecuteLong, once As Boolean, bstack As basetask, b$, v As Long, Lang As Long) As Boolean
 Dim ok As Boolean, x1 As Long, y1 As Long, sp As Variant, st As Variant, sw$, slct As Long, ss$
-Dim x2 As Long, y2 As Long, p As Variant, W$, dum As Boolean, i As Long, nd&, lbl$, usehandler As mHandler
-Dim checkenum As Boolean, enumindex As Long, EnumName As String, that As BigInteger
-Dim Pos As Long
+Dim x2 As Long, y2 As Long, p As Variant, W$, dum As Boolean, i As Long, nd&, usehandler As mHandler
+Dim checkenum As Boolean, enumindex As Long, EnumName As String, that As BigInteger, ifcount As Long
+Dim Pos As Long, sPos As Long, comments As Long
                 
 exeSelect = True
 x1 = 0 ' mode numbers using p, sp and st
@@ -47225,7 +47327,9 @@ If IsLabelSymbolNew(b$, "ΜΕ", "CASE", Lang) Then
     ElseIf IsStrExp(bstack, b$, sw$) Then
         x1 = 2
     End If
+
 secondentry:
+    MarkSel bstack, Lang
     If x1 > 0 Then ' SELECT CASE NUMBER or STRING
         SetNextLine b$
         While MaybeIsSymbol(b$, RemChar)
@@ -47239,12 +47343,31 @@ secondentry:
         End If
         Do
             If NocharsInLine(b$) Then Exit Do
-            IsNumberLabel b$, lbl$
+            If slct = 0 And ok Then
+                GoTo againcont2
+            End If
+            IsNumberLabel b$, vbNullString
             If IsLabelSymbolNew(b$, "ΜΕ", "CASE", Lang) Then  ' WE HAVE CASE
             Pos = 0
-jumphere1:
-            If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo case1else
+            If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then
+                GoTo jumphere02
+            Else
+                GoTo jumphere01
+            End If
             
+            
+findit:
+            Pos = 0
+            
+            If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then
+            
+                GoTo jumphere2
+jumphere1:
+                If ifcount = 0 Then
+                If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo case1else
+                End If
+            End If
+jumphere01:
                 If ok Then
                     ExpectedEndSelect
                     ExecuteLong = 0
@@ -47334,20 +47457,16 @@ cont00123:
                                 If MemInt(VarPtr(p)) = vbString Then
                                     W$ = p: x2 = 2
                                 Else
-                                            y1 = UINT(p)
-                                            If y1 >= &H10000 And y1 <= &H10FFFF Then
-                                                y1 = y1 - &H10000
-                                                W$ = ChrW(UINT(y1 \ &H400& + &HD800&)) + ChrW(UINT((y1 And &H3FF&) + &HDC00&))
-                                            Else
-                                                W$ = ChrW$(y1)
-                                            End If
-                                            y1 = 0
-                                
-                                
-                                
+                                    y1 = UINT(p)
+                                    If y1 >= &H10000 And y1 <= &H10FFFF Then
+                                        y1 = y1 - &H10000
+                                        W$ = ChrW(UINT(y1 \ &H400& + &HD800&)) + ChrW(UINT((y1 And &H3FF&) + &HDC00&))
+                                    Else
+                                        W$ = ChrW$(y1)
+                                    End If
+                                    y1 = 0
                                     x2 = 2
                                 End If
-                                
                             ElseIf IsStrExp(bstack, b$, W$, False) Then
                                 x2 = 2
                             End If
@@ -47355,7 +47474,7 @@ cont00123:
                         If x2 > 0 Then 'WE HAVE NUMBER OR STRING
                             If checkenum Then
                             ' do nothing
-                            GoTo CONT1234
+                                GoTo CONT1234
                             ElseIf IsLabelSymbolNew(b$, "ΕΩΣ", "TO", Lang) Then   ' range ?
                                 y1 = 0
                                 If x1 = 1 Then
@@ -47443,25 +47562,33 @@ CONT1234:
                         
 selslct0:
                             SetNextLine b$
-                            If Left$(b$, 4) = vbCrLf + vbCrLf Then
-                                ExpectedCaseorElseorEnd
-                                b$ = Mid$(b$, 3)
-                                ExecuteLong = 0: Exit Function
-                            End If
-                                    While DropCommentOrLine(b$, False)
-                                    IsNumberLabel b$, lbl$
-                                    Wend
+                            comments = 0
+                            Do While DropCommentOrLine(b$, False)
+                                IsNumberLabel b$, vbNullString
+                                comments = comments + 1
+                            Loop
+                                  ' GoTo againcont
+                            If comments = 0 Then
                                 While IsLabelSymbolNew(b$, "ΜΕ", "CASE", Lang)
-                                    While DropCommentOrLine(b$, False)
-                                    IsNumberLabel b$, lbl$
-                                    Wend
-                                    'SetNextLine b$
-                                  '  IsNumberLabel b$, lbl$
+                                    If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then
+                                        dum = False
+                                        Pos = 0
+                                        GoTo jumphere2
+                                    End If
+                                    SetNextLine b$
                                 Wend
-                            
-                            
+                                While DropCommentOrLine(b$, False)
+                                    IsNumberLabel b$, vbNullString
+                                Wend
+                            End If
+                            If FastSymbol(b$, "{") Then
+                                GoTo haveblock
+                            Else
+                               GoTo Process
+                            End If
 conthere:
                             If FastSymbol(b$, "{") Then  ' block
+haveblock:
                                 ss$ = block(b$)
                                 dum = False
                                 i = 1
@@ -47497,13 +47624,11 @@ conthere:
                             Else   ' or line
                                 dum = True
                                 i = 1
-                                IsNumberLabel b$, lbl$
+                                IsNumberLabel b$, vbNullString
                                 While IsLabelSymbolNew(b$, "ΜΕ", "CASE", Lang)
                                     While DropCommentOrLine(b$, False)
-                                    IsNumberLabel b$, lbl$
+                                    IsNumberLabel b$, vbNullString
                                     Wend
-                                    'SetNextLine b$
-                                  '  IsNumberLabel b$, lbl$
                                 Wend
                                 ' #4 call one command
 
@@ -47513,44 +47638,69 @@ checknext:
                                 End If
 
                                 i = 1
-                                once = True
                                 While DropCommentOrLine(b$, False)
-                                IsNumberLabel b$, lbl$
+                                IsNumberLabel b$, vbNullString
                                 Wend
-                                Pos = 1
-                                aheadstatusANY b$, Pos
-                                If Pos <= 1 Then
-                                    ss$ = GetNextLine(b$) + vbCrLf + "'"
-                                Else
-                                    ss$ = Mid$(b$, 1, Pos - 1) + vbCrLf + "'"
-                                    b$ = Mid$(b$, Pos)
-                                End If
-                                TraceStore bstack, nd&, b$, 3
-                                
-                                
-                                Call Module10.executeblock(i, bstack, ss$, once, dum, True, True)
-                                bstack.addlen = nd&
-                                If i = 0 Then
+Process:
+                                once = False 'Len(b$) = 0
+                                i = 50
+
+                               Call Module10.executeblock(i, bstack, b$, once, dum, , True)
+                               If i = 0 Then
                                     ExecuteLong = 0: Exit Function
-                                ElseIf i = 1 And ss$ = vbNullString And once Then 'this is an exit ΟΚ3
-                                    b$ = vbNullString
+                                ElseIf i = 50 Then ' we have TO EXIT
+                                        ExecuteLong = 1
+                                        exeSelect = True
+                                       ' once = False
+                                        Exit Function
+                                ElseIf i = 51 Then
+                                    DropMarkSel bstack
+                                    ExecuteLong = 1
+                                    'once = True
+                                    exeSelect = False
+                                    Exit Function
+                                ElseIf i = 100 Then ' we have a case
+                                        If NOEXECUTION Then
+                                            ExecuteLong = 1
+                                            exeSelect = True
+                                            Exit Function
+                                        Else
+                                            dum = False
+                                            slct = 0
+                                            Pos = 0
+                                            ' A CASE TO SKIP
+                                            If once Then
+                                                If ok Then
+                                                    ExpectedEndSelect
+                                                    ExecuteLong = 0
+                                                    Exit Function
+                                                Else
+                                                  ok = True
+                                                End If
+                                            End If
+                                        End If
+                                ElseIf i = 1 And b$ = vbNullString And once Then 'this is an exit ΟΚ3
+
+                                    exeSelect = False
                                     ExecuteLong = 1
                                     Exit Function
                                 ElseIf i = 2 Then
-                                    If dum = True And Len(ss$) > 0 Then
+                                    If dum = True And Len(b$) > 0 Then ' 1
                                         slct = -1
-                                    ElseIf Len(ss$) > 0 Then
-                                        b$ = ss$
+                                    ElseIf Len(b$) > 0 Then
+                                        DropMarkSel bstack
                                         ExecuteLong = 2
                                         once = False
                                         Exit Function
                                     Else
                                         ExecuteLong = i
-                                        b$ = ss$
+                                        DropMarkSel bstack
                                         exeSelect = dum
+                                        Exit Function
                                     End If
+                                    
                                 ElseIf i = 3 Then
-                                    If dum = True And ss$ <> "" Then
+                                    If dum = True And Len(b$) > 0 Then
                                         slct = 0
                                     Else
                                         i = 2
@@ -47574,160 +47724,49 @@ contLoop:
                                 
 againcont:
                 SetNextLine b$
+againcont2:
+                comments = 0
                 While DropCommentOrLine(b$, False)
-                IsNumberLabel b$, lbl$
+                IsNumberLabel b$, vbNullString
+                comments = comments + 1
                 Wend
-                'If Left$(b$, 2) = vbCrLf Then
-                'ExpectedCaseorElseorEnd
-                '    ExecuteLong = 0
-                '    Exit Function
-                'End If
-                ' drop case
-                IsNumberLabel b$, lbl$
-                If IsLabelSymbolNew(b$, "ΜΕ", "CASE", Lang) Then
-                    dum = False
-                    Pos = 0
-                    GoTo jumphere1
-                ElseIf IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then
-                    dum = False
-                    Pos = 0
-                    GoTo jumphere2
-                ElseIf IsLabelSymbolNew(b$, "ΤΕΛΟΣ", "END", Lang) Then
-                    dum = False
-                    GoTo jumphere3
-                Else
-                    
-                    
-                    If FastSymbol(b$, "{") Then
-                        If Pos = -100 Or (dum And Not slct = 0) Then
-er100:
-                            MyEr "to many blocks for Select Case", "πολλά μπλοκ στην Επίλεξε Με"
-                            exeSelect = False
-                            Exit Function
-                        End If
-                        If slct >= 0 Then
-                            ss$ = block(b$) + "}"
-                            b$ = NLtrim$(Mid$(b$, 2))
-                        Else
-                            ss$ = block(b$)
+            
+                IsNumberLabel b$, vbNullString
+                If comments = 0 Then
+                    If Not ok Then
+                    If IsLabelSymbolNew(b$, "ΜΕ", "CASE", Lang) Then
+                        dum = False
+                        Pos = 0
+                        GoTo jumphere1
+                    End If
+                    If ifcount = 0 Then
+                        If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then
                             dum = False
-                            i = 1
-                            ' #7 call block inside Case (Break) ok
-                            TraceStore bstack, nd&, b$, 0
-                            Call Module10.executeblock(i, bstack, ss$, False, dum, , True)
-                            TraceRestore bstack, nd&
-                            If i = 1 Then
-                                FastSymbol b$, "}"
-                                If Not MaybeIsSymbol(b$, RemChar) Then
-                                    If Not Left$(b$, 2) = vbCrLf Then
-                                        ExpectedCommentsOnly
-                                        ExecuteLong = 0: Exit Function
-                                    End If
-                                End If
-                            Else
-                                If i = 0 Then
-                                    b$ = ss$ + b$
-                                    ExecuteLong = 0: Exit Function
-                                ElseIf i = 2 Then
-                                    If Len(ss$) > 0 Then b$ = ss$
-                                    If dum = True And b$ <> "" Then
-                                        slct = -1
-                                    Else
-                                        GoTo ContGoto
-                                    End If
-                                ElseIf i = 3 Then
-                                    If Len(ss$) > 0 Then b$ = ss$
-                                    If dum And b$ <> "" Then
-                                    
-                                    slct = 0
-                                    Pos = 1
-                                    
-                                    GoTo againcont
-                                    End If
-                               
-                                    
-                                End If
-                            End If
+                            Pos = 0
+                            GoTo jumphere2
                         End If
-                        Pos = -100
-                        SetNextLine b$
-                    ElseIf slct < 0 Then
-                        dum = True
-                        i = 1
-                        ' #8 call one command inside Case (Break) ok
-                        once = True
-                        Pos = 1
-                        aheadstatusANY b$, Pos
-                        If Pos <= 1 Then
-                            ss$ = GetNextLine(b$) + vbCrLf + "'"
-                        Else
-                            ss$ = Mid$(b$, 1, Pos - 1) + vbCrLf + "'"
-                            b$ = Mid$(b$, Pos)
-                        End If
-                        TraceStore bstack, nd&, b$, 3
-                        Call Module10.executeblock(i, bstack, ss$, once, dum, True, True)
-                        bstack.addlen = nd&
-                        If i = 0 Then
-                            ExecuteLong = 0: Exit Function
-                        ElseIf i = 1 And ss$ = vbNullString And once Then  'this is an exit ΟΚ3
-                            b$ = vbNullString
-                            ExecuteLong = 1
-                            Exit Function
-                        ElseIf i = 2 Then
-                            If dum = True And Len(ss$) > 0 Then
-                                slct = -1
-                            ElseIf Len(ss$) > 0 Then
-                                b$ = ss$
-                                ExecuteLong = 2
-                                once = False
-                                Exit Function
-                            Else
-                                ExecuteLong = i
-                                b$ = ss$
-                                exeSelect = dum
-                            End If
-                        ElseIf i = 3 Then
-                            If dum = True And ss$ <> "" Then
-                                slct = 0
-                            Else
-                                i = 2
-                                b$ = vbNullString
-                                exeSelect = True
-                            End If
-                        ElseIf i = 5 Then
-                            ExecuteLong = 2
-                            exeSelect = False
-                        Else
-                        If i = 1 Then GoTo againcont
-                        End If
-                        SetNextLine b$
-                    Else
-                        If dum Then IsNumberLabel b$, lbl$: GoTo checknext
-                        
-                        SetNextLine b$
+                    End If
+                    End If
+                    If IsLabelSymbolNew(b$, "ΤΕΛΟΣ", "END", Lang) Then
+                        dum = False
+                        GoTo jumphere3
                     End If
                 End If
-            ElseIf IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then
-jumphere2:
-                IsLabelSymbolNew b$, "ΜΕ", "CASE", Lang
-case1else:
-                If ok Then
-                    ExpectedEndSelect
-                    ExecuteLong = 0
-                    Exit Function
-                Else
-                    ok = True
-                End If
-                SetNextLine b$
-                While DropCommentOrLine(b$, False)
-                IsNumberLabel b$, lbl$
-                Wend
                 If FastSymbol(b$, "{") Then
-                    ss$ = block(b$)
-                    If slct > 0 Then
+                    If Pos = -100 Or (dum And Not slct = 0) Then
+er100:
+                        MyEr "to many blocks for Select Case", "πολλά μπλοκ στην Επίλεξε Με"
+                        exeSelect = False
+                        Exit Function
+                    End If
+                    If slct >= 0 Then
+                        ss$ = block(b$) + "}"
+                        b$ = NLtrim$(Mid$(b$, 2))
+                    Else
+                        ss$ = block(b$)
                         dum = False
                         i = 1
-                        ' #9 call block inside Else
+                        ' #7 call block inside Case (Break) ok
                         TraceStore bstack, nd&, b$, 0
                         Call Module10.executeblock(i, bstack, ss$, False, dum, , True)
                         TraceRestore bstack, nd&
@@ -47747,125 +47786,358 @@ case1else:
                                 If Len(ss$) > 0 Then b$ = ss$
                                 If dum = True And b$ <> "" Then
                                     slct = -1
-                                ElseIf b$ <> "" Then
-                                    GoTo ContGoto
                                 Else
-                                    once = True
-                                    Exit Function
+                                    GoTo ContGoto
                                 End If
                             ElseIf i = 3 Then
                                 If Len(ss$) > 0 Then b$ = ss$
-                                If dum = True And b$ <> "" Then slct = 0: b$ = Mid$(b$, 2): GetNextLine (ss$)
+                                If dum And b$ <> "" Then
+                                
+                                slct = 0
+                                Pos = 1
+                                
+                                GoTo againcont
+                                End If
+                           
+                                
                             End If
+                        End If
+                    End If
+                    Pos = -100
+                    SetNextLine b$
+                ElseIf slct < 0 Then
+                    dum = True
+                    i = 1
+                    ' #8 call one command inside Case (Break) ok
+                    once = False
+                    
+                    Call Module10.executeblock(i, bstack, b$, once, dum, , True)  ', True, True)
+
+                   
+                   
+                    If i = 0 Then
+                        ExecuteLong = 0: Exit Function
+                    ElseIf i = 100 Then ' we have a case
+                        If NOEXECUTION Then
+                            ExecuteLong = 1
+                            exeSelect = True
+                            Exit Function
+                        Else
+                            dum = False
+                            Pos = 0
+                            If once Then
+                                If ok Then
+                                    ExpectedEndSelect
+                                    ExecuteLong = 0
+                                    Exit Function
+                                Else
+                                    slct = 0
+                                    ok = True
+                                End If
+                            Else
+                                GoTo jumphere1
+                            End If
+                            
+                        End If
+                    ElseIf i = 1 And b$ = vbNullString And once Then  'this is an exit ΟΚ3
+                        b$ = vbNullString
+                        ExecuteLong = 1
+                        Exit Function
+                    ElseIf i = 2 Then ' 2
+                        If dum = True And Len(b$) > 0 Then
+                            slct = -1
+                        ElseIf Len(b$) > 0 Then
+                            DropMarkSel bstack
+                            ExecuteLong = 2
+                            once = False
+                            Exit Function
+                        Else
+                            ExecuteLong = i
+                            DropMarkSel bstack
+                            exeSelect = dum
+                            Exit Function
+                        End If
+                    ElseIf i = 3 Then
+                        If dum = True And b$ <> "" Then
+                            slct = 0
+                        Else
+                            i = 2
+                            b$ = vbNullString
+                            exeSelect = True
+                        End If
+                    ElseIf i = 5 Then
+                        ExecuteLong = 2
+                        exeSelect = False
+                    Else
+                    If i = 1 Then GoTo againcont
+                    End If
+                    SetNextLine b$
+                Else
+                
+jump123:
+                    If dum Then
+                    IsNumberLabel b$, vbNullString: GoTo checknext   ''???
+                    Else
+                        IsNumberLabel b$, ""
+                        Pos = 1
+                        Pos = MyTrimLi(b$, Pos)
+                        If FastPureLabel(b$, ss$, Pos, True, , , False) = 1 Then
+                            Select Case ss$
+                            Case "CASE"
+                            If Lang = 1 Then b$ = Mid$(b$, Pos): GoTo findit
+                            GoTo faultlang
+                            Case "ΜΕ"
+                            If Lang <> 1 Then b$ = Mid$(b$, Pos): GoTo findit
+faultlang:
+                            MyEr "Wrong language for Select", "Κακή γλώσσα για την Επίλεξε"
+                            Exit Function
+                            Case "IF"
+                            sPos = Pos
+                            ss$ = vbNullString
+                            aheadstatusIFthen b$, sPos, 1, ss$
+                            
+                            If Len(ss$) <> 0 Then ifcount = ifcount + 1
+                            b$ = Mid$(b$, sPos)
+                            Pos = 1
+                            
+                            GoTo againcont
+                            Case "AN"
+                            sPos = Pos
+                            ss$ = vbNullString
+                            aheadstatusIFthen b$, sPos, 0, ss$
+                            
+                            If Len(ss$) <> 0 Then ifcount = ifcount + 1
+                            b$ = Mid$(b$, sPos)
+                            Pos = 1
+                            
+                            GoTo againcont
+                            Case "ΕΠΙΛΕΞΕ"
+                            sPos = Module1.DropSelect2(b$, 0, Pos - 7)
+                            If sPos = 0 Then
+                                exeSelect = False
+                                Exit Function
+                            Else
+                                b$ = Mid$(b$, sPos)
+                            End If
+                            Pos = 1
+                            Case "SELECT"
+                            sPos = Module1.DropSelect2(b$, 1, Pos - 6)
+                            If sPos = 0 Then
+                                exeSelect = False
+                                Exit Function
+                            Else
+                                b$ = Mid$(b$, sPos)
+                            End If
+                            Pos = 1
+                            Case Else
+                                Pos = Pos - 1
+                                Do
+                                Pos = Pos + 1
+                                    aheadstatusSkipParam b$, Pos
+                                Loop While Mid$(b$, Pos) = ":"
+                                If Pos > 1 Then b$ = Mid$(b$, Pos)
+                                Pos = 1
+                                SetNextLine b$
+                            End Select
+                        Else
+                            Pos = 0
+                            Do
+                            Pos = Pos + 1
+                                aheadstatusSkipParam b$, Pos
+                            Loop While Mid$(b$, Pos) = ":"
+                            If Pos > 1 Then b$ = Mid$(b$, Pos)
+                            SetNextLine b$
+                            Pos = 1
+                        End If
+                    End If
+                    
+                End If
+                
+            Else
+                If ifcount = 0 Then
+                    If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then
+                    
+jumphere2:
+                        IsLabelSymbolNew b$, "ΜΕ", "CASE", Lang
+case1else:
+                        If ok Then
+                            ExpectedEndSelect
+                            ExecuteLong = 0
+                            Exit Function
+                        Else
+                          ok = True
+                        End If
+jumphere02:
+case2:
+                        SetNextLine b$
+                        While DropCommentOrLine(b$, False)
+                            IsNumberLabel b$, vbNullString
+                        Wend
+                        If IsLabelSymbolNew(b$, "ΤΕΛΟΣ", "END", Lang) Then
+                            'slct = 0
+                            If IsLabelSymbolNew(b$, "ΕΠΙΛΟΓΗΣ", "SELECT", Lang) Then
+                            slct = 0
+                                DropMarkSel bstack
+                                Exit Do
+                            End If
+                           ' b$ = ""
+                           ' Exit Do
+                        End If
+                        If FastSymbol(b$, "{") Then
+                            ss$ = block(b$)
+                            If slct > 0 Then
+                                dum = False
+                                i = 1
+                                ' #9 call block inside Else
+                                TraceStore bstack, nd&, b$, 0
+                                Call Module10.executeblock(i, bstack, ss$, False, dum, , True)
+                                TraceRestore bstack, nd&
+                                If i = 1 Then
+                                    FastSymbol b$, "}"
+                                    If Not MaybeIsSymbol(b$, RemChar) Then
+                                        If Not Left$(b$, 2) = vbCrLf Then
+                                            ExpectedCommentsOnly
+                                            ExecuteLong = 0: Exit Function
+                                        End If
+                                    End If
+                                Else
+                                    If i = 0 Then
+                                        b$ = ss$ + b$
+                                        ExecuteLong = 0: Exit Function
+                                    ElseIf i = 2 Then
+                                        If Len(ss$) > 0 Then b$ = ss$
+                                        If dum = True And b$ <> "" Then
+                                            slct = -1
+                                        ElseIf b$ <> "" Then
+                                            GoTo ContGoto
+                                        Else
+                                            once = True
+                                            Exit Function
+                                        End If
+                                    ElseIf i = 3 Then
+                                        If Len(ss$) > 0 Then b$ = ss$
+                                        If dum = True And b$ <> "" Then slct = 0: b$ = Mid$(b$, 2): GetNextLine (ss$)
+                                    End If
+                                End If
+                            Else
+                                b$ = NLtrim$(Mid$(b$, 2))
+                            End If
+                        Else
+                            If slct > 0 Then
+                                dum = True
+again1123:
+                                If NocharsInLine(b$) Then Exit Do
+                                i = 1
+                                ' #10 call one command inside ELSE
+                               once = False
+                                Call Module10.executeblock(i, bstack, b$, once, dum, , True)
+                                'TraceRestore bstack, nd&
+                                If i = 0 Then
+                                    ExecuteLong = 0: Exit Function
+                                ElseIf i = 51 Then
+                                    DropMarkSel bstack
+                                    ExecuteLong = 1
+                                    exeSelect = False
+                                    Exit Function
+                                ElseIf i = 50 Then
+                                    ExecuteLong = 1
+                                    exeSelect = dum
+                                    Exit Function
+                                ElseIf i = 1 And b$ = vbNullString And once Then  'this is an exit
+                                    b$ = vbNullString
+                                    ExecuteLong = 1
+                                    Exit Function
+                                ElseIf i = 2 Then ' 3
+                                    If dum = True And Len(b$) > 0 Then
+                                        slct = -1
+                                    ElseIf Len(b$) > 0 Then
+                                        DropMarkSel bstack
+                                        ExecuteLong = 2
+                                        once = False
+                                        Exit Function
+                                    Else
+                                        ExecuteLong = i
+                                        DropMarkSel bstack
+                                        exeSelect = dum
+                                        Exit Function
+                                    End If
+                                ElseIf i = 3 Then
+                                    If dum = True And b$ <> "" Then
+                                        slct = 0
+                                    Else
+                                        i = 2
+                                        b$ = vbNullString
+                                        exeSelect = True
+                                    End If
+                                ElseIf i = 5 Then
+                                    ExecuteLong = 2
+                                    exeSelect = False
+                                Else
+                                If NOEXECUTION Then
+                                    ExecuteLong = 1
+                                    exeSelect = False
+                                    Exit Function
+
+                                End If
+                                    SetNextLine b$
+                                    If IsLabelSymbolNew(b$, "ΤΕΛΟΣ", "END", Lang) Then
+                                    slct = 0
+                                    GoTo jumphere3
+                                    Else
+                                    GoTo again1123
+                                    End If
+                                End If
+                            End If
+                        End If
+                        SetNextLine b$
+                        While DropCommentOrLine(b$, False)
+                            IsNumberLabel b$, vbNullString
+                        Wend
+                        slct = 0
+                        GoTo CONT0001
+                    End If
+                End If
+                If IsLabelSymbolNew(b$, "ΤΕΛΟΣ", "END", Lang) Then
+                    If ifcount > 0 Then
+                        If IsLabelSymbolNew(b$, "ΑΝ", "IF", Lang) Then
+                        ifcount = ifcount - 1
+                        GoTo againcont
+                        End If
+                    End If
+jumphere3:
+                    If IsLabelSymbolNew(b$, "ΕΠΙΛΟΓΗΣ", "SELECT", Lang) Then
+                        DropMarkSel bstack
+                        exeSelect = False  ' need false to continue to other commands in execute
+                        
+                        Exit Function
+                     '   slct = 0
+                      '  Exit Do
+                   ' ElseIf slct <> 1 Then
+                   '     b$ = ""
+                   '     slct = 0
+                   '     Exit Do
+                    End If
+                Else
+                
+                    While DropCommentOrLine(b$, False)
+                        IsNumberLabel b$, vbNullString
+                    Wend
+                    
+                    
+                    If lookOne(b$, "{") Then
+                        If Pos = -100 Then
+                            GoTo er100
+                        Else
+                            Pos = -100
                         End If
                     Else
-                        b$ = NLtrim$(Mid$(b$, 2))
+                        GoTo jump123
                     End If
-                Else
-                    If slct > 0 Then
-                        dum = True
-again1123:
-                        i = 1
-                        ' #10 call one command inside ELSE
-                        once = True
-                        'TraceStore bstack, nd&, b$, 0
-                        Pos = 1
-                        aheadstatusANY b$, Pos
-                        If Pos <= 1 Then
-                            ss$ = GetNextLine(b$) + vbCrLf + "'"
-                        Else
-                            ss$ = Mid$(b$, 1, Pos - 1) + vbCrLf + "'"
-                            b$ = Mid$(b$, Pos)
-                        End If
-                        TraceStore bstack, nd&, b$, 3
-                        Call Module10.executeblock(i, bstack, ss$, once, dum, True, True)
-                        TraceRestore bstack, nd&
-                        If i = 0 Then
-                            ExecuteLong = 0: Exit Function
-                        ElseIf i = 1 And ss$ = vbNullString And once Then  'this is an exit
-                            b$ = vbNullString
-                            ExecuteLong = 1
-                            Exit Function
-                        ElseIf i = 2 Then
-                            If dum = True And Len(ss$) > 0 Then
-                                slct = -1
-                            ElseIf Len(ss$) > 0 Then
-                                b$ = ss$
-                                ExecuteLong = 2
-                                once = False
-                                Exit Function
-                            Else
-                                ExecuteLong = i
-                                b$ = ss$
-                                exeSelect = dum
-                                Exit Function
-                            End If
-                        ElseIf i = 3 Then
-                            If dum = True And ss$ <> "" Then
-                                slct = 0
-                            Else
-                                i = 2
-                                b$ = vbNullString
-                                exeSelect = True
-                            End If
-                        ElseIf i = 5 Then
-                            ExecuteLong = 2
-                            exeSelect = False
-                        Else
-                            SetNextLine b$
-                            If IsLabelSymbolNew(b$, "ΤΕΛΟΣ", "END", Lang) Then
-                            slct = 0
-                            GoTo jumphere3
-                            Else
-                            GoTo again1123
-                            End If
-                        End If
-                    End If
-                End If
-                SetNextLine b$
-                slct = 0
-            ElseIf IsLabelSymbolNew(b$, "ΤΕΛΟΣ", "END", Lang) Then
-jumphere3:
-                If IsLabelSymbolNew(b$, "ΕΠΙΛΟΓΗΣ", "SELECT", Lang) Then
-                    slct = 0
-                    Exit Do
-                Else
-                    ExpectedEndSelect
-                    ExecuteLong = 0
-                    Exit Function
-                End If
-            Else
-                'If ok Then
                     
-                
-                '    ExpectedEndSelect2
-                '     ExecuteLong = 0
-                '     Exit Function
-                'Else
-                While DropCommentOrLine(b$, False)
-                    IsNumberLabel b$, lbl$
-                Wend
-                If lookOne(b$, "{") Then
-                
-                If Pos = -100 Then
-                    GoTo er100
-                Else
-                    Pos = -100
                 End If
-                Else
-                Pos = 1
-                aheadstatusANY b$, Pos
-                Mid$(b$, 1, 1) = "'"
-                While DropCommentOrLine(b$, False)
-                    IsNumberLabel b$, lbl$
-                Wend
-                End If
-                
-                '    ExpectedCaseorElseorEnd2
-                'End If
-               ' ExecuteLong = 0
-               ' Exit Function
             End If
+
+CONT0001:
         Loop
         If slct > 0 Then
             ExecuteLong = 0: Exit Function
@@ -48434,17 +48706,23 @@ s.PushVal b
 s.PushVal a
 s.PushVal -3  ' mark for IF
 End Sub
-
+Sub MarkSel(bstack As basetask, Lang As Long)
+Dim s As mStiva2
+Set s = bstack.RetStack
+s.PushLong Lang
+s.PushVal -5  ' mark for select
+End Sub
 Function lookOne(s, c$) As Boolean
 Dim i&, l As Long, cc As Integer
-Dim P2 As Long, P1 As Integer
+Dim p2 As Long, P1 As Integer
   l = Len(s): If l = 0 Then Exit Function
-  P2 = StrPtr(s): l = l - 1: GetMem2 StrPtr(c$), cc
+  p2 = StrPtr(s): l = l - 1: GetMem2 StrPtr(c$), cc
 
-  For i = P2 To P2 + l * 2 Step 2
+  For i = p2 To p2 + l * 2 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160, 7, 9
+
     Case cc
     lookOne = True
     Case Else
@@ -48454,11 +48732,11 @@ Dim P2 As Long, P1 As Integer
 End Function
 Function lookTwoSame(s, c$) As Boolean
 Dim i&, l As Long, cc As Integer, cc2 As Integer
-Dim P2 As Long, P1 As Integer, n As Integer
+Dim p2 As Long, P1 As Integer, n As Integer
     If Len(c$) <> 1 Then Exit Function
   l = Len(s): If l = 0 Then Exit Function
-  P2 = StrPtr(s): l = l - 1: GetMem2 StrPtr(c$), cc
-  For i = P2 To P2 + l * 2 Step 2
+  p2 = StrPtr(s): l = l - 1: GetMem2 StrPtr(c$), cc
+  For i = p2 To p2 + l * 2 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160, 7, 9
@@ -48648,16 +48926,18 @@ End Function
 
 Private Function MyTrimL(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL = 1: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
-  For i = P2 To p4 Step 2
+  p2 = StrPtr(s): l = l - 1
+  p4 = p2 + l * 2
+  
+  
+  For i = p2 To p4 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160, 7, 9
     Case Else
-     MyTrimL = (i - P2) \ 2 + 1
+     MyTrimL = (i - p2) \ 2 + 1
    Exit Function
   End Select
   Next i
@@ -48940,11 +49220,11 @@ MusicMaster.RestEnd1
 End Sub
 Private Function lookB123(s As String, Optional ByVal Pos As Long = 1) As Boolean
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then Exit Function
   If Pos > l Then Exit Function
-  P2 = StrPtr(s) + (Pos - 1) * 2: l = l - 1
-  For i = P2 To P2 + l * 2 Step 2
+  p2 = StrPtr(s) + (Pos - 1) * 2: l = l - 1
+  For i = p2 To p2 + l * 2 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 32, 160, 7, 9
@@ -52519,11 +52799,11 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
     rrr$ = vbNullString
     r$ = vbNullString
     Dim i&, l As Long, p3 As Integer
-    Dim P2 As Long, p4 As Long  '', excludesp As Long
+    Dim p2 As Long, p4 As Long  '', excludesp As Long
     l = Len(a$): If l = 0 Then IsLabelDotSub = 0: Lang = 1: Exit Function
-    P2 = StrPtr(a$): l = l - 1
-    p4 = P2 + l * 2
-    For i = P2 To p4 Step 2
+    p2 = StrPtr(a$): l = l - 1
+    p4 = p2 + l * 2
+    For i = p2 To p4 Step 2
         GetMem2 i, P1
         Select Case P1
         Case 13
@@ -52545,13 +52825,13 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
                                 i = i + 4
                             End If
                         Loop
-                        a$ = Mid$(a$, (i + 2 - P2) \ 2)
+                        a$ = Mid$(a$, (i + 2 - p2) \ 2)
                     End If
                 Else
-                    If i > P2 Then a$ = Mid$(a$, (i - 2 - P2) \ 2)
+                    If i > p2 Then a$ = Mid$(a$, (i - 2 - p2) \ 2)
                 End If
             Else
-                If i > P2 Then a$ = Mid$(a$, (i - 2 - P2) \ 2)
+                If i > p2 Then a$ = Mid$(a$, (i - 2 - p2) \ 2)
             End If
             Lang = 1
             Exit Function
@@ -52585,7 +52865,7 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
                             r$ = vbNullString
                             rrr$ = vbNullString
                         Else
-                            IsLabelDotSub = 0: a$ = firstdot$ + Mid$(a$, (i - P2) \ 2): Exit Function
+                            IsLabelDotSub = 0: a$ = firstdot$ + Mid$(a$, (i - p2) \ 2): Exit Function
                         End If
                     Else
                         If LenB(r$) = 0 And i < p4 Then
@@ -52599,7 +52879,7 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
                         rrr$ = "?"
                         r$ = rrr$
                         i = i + 4
-                        a$ = Mid$(a$, (i - P2) \ 2)
+                        a$ = Mid$(a$, (i - p2) \ 2)
                         IsLabelDotSub = 1
                         Lang = -1
                         Exit Function
@@ -52611,11 +52891,11 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
                         Else
                             rrr$ = myUcase(r$)
                         End If
-                        a$ = Mid$(a$, (i + 2 - P2) \ 2)
+                        a$ = Mid$(a$, (i + 2 - p2) \ 2)
                         Exit Function
                     Else
                         IsLabelDotSub = 0
-                        a$ = Mid$(a$, (i + 2 - P2) \ 2)
+                        a$ = Mid$(a$, (i + 2 - p2) \ 2)
                         Exit Function
                     End If
             Case 46 '"."
@@ -52751,7 +53031,7 @@ i123:
     If i > p4 Then
         a$ = vbNullString: P1 = 0
     Else
-        If (i + 2 - P2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - P2) \ 2)
+        If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
     End If
     rrr$ = firstdot$ + myUcase(r$, gr)
     Lang = 1 + CLng(gr)
@@ -53763,4 +54043,246 @@ Function JoyPadRead(r, a$) As Boolean
         End If
     End If
     JoyPadRead = True
+End Function
+Function DropSelect2(b$, Lang As Long, Optional ByVal Pos As Long = 1) As Long
+Dim ss$, last As Boolean
+Dim OLDPOS As Long
+Dim sPos As Long
+Const RemChar = "'\/"
+Static RemWhitSpace As String
+If Len(RemWhitSpace) = 0 Then RemWhitSpace = " 0123456789" + vbCr + vbLf + ":" + vbTab + Chr$(160)
+sPos = Pos
+Do While Len(b$) > Pos
+ss$ = Mid$(b$, Pos, 1)
+If InStr(RemWhitSpace, ss$) > 0 Then
+    Pos = Pos + 1
+ElseIf InStr(RemChar, ss$) > 0 Then
+    Pos = Pos + 1
+    Do While Len(b$) > Pos
+        If Mid$(b$, Pos, 1) = vbCr Then Exit Do
+        Pos = Pos + 1
+    Loop
+Else
+   
+    Exit Do
+End If
+Loop
+aheadstatusSkipParam b$, Pos
+If Pos > sPos Then
+    If Mid$(b$, Pos, 2) = vbCrLf Then
+        Pos = Pos + 2
+    Else
+        Pos = Pos + 1
+    End If
+End If
+While Pos < Len(b$)
+jump0:
+        Pos = MyTrimLi(b$, Pos)
+jump1:
+        Do While Len(b$) > Pos
+            ss$ = Mid$(b$, Pos, 1)
+            If InStr(RemWhitSpace, ss$) > 0 Then
+                Pos = Pos + 1
+            ElseIf InStr(RemChar, ss$) > 0 Then
+                Pos = Pos + 1
+                Do While Len(b$) > Pos
+                    If Mid$(b$, Pos, 1) = vbCr Then Exit Do
+                    Pos = Pos + 1
+                Loop
+            ElseIf ss$ = "{" Then
+                If Pos > 1 Then b$ = Mid$(b$, Pos + 1)
+                ss$ = block(b$)
+                If Not FastSymbol(b$, "}", True) Then
+                    Exit Function
+                End If
+                Pos = 1
+            Else
+               Exit Do
+            End If
+        Loop
+    OLDPOS = Pos
+        If FastPureLabel(b$, ss$, Pos, True, , , False) = 1 Then
+            Select Case ss$
+            Case "ΜΕ"
+                If Lang = 0 Then
+                    If FastPureLabel(b$, ss$, Pos, True, , , False) = 1 Then
+                        If ss$ = "ΑΛΛΙΩΣ" Then
+                            If last Then
+                                MyEr "Bad use of case else", "Κακή χρήση του Με Αλλιώς"
+                            Else
+                                last = True
+                                GoTo jump2
+                            End If
+                        Else
+                            Pos = Pos - Len(ss$)
+                            GoTo jump2
+                        End If
+                    End If
+                Else
+                    MyEr "Bad use of Με (greel statement)", "Κακή χρήση του Με"
+                    Exit Function
+                End If
+            Case "CASE"
+                If Lang = 1 Then  ' CASE ELSE
+                    If FastPureLabel(b$, ss$, Pos, True, , , False) = 1 Then
+                        If ss$ = "ELSE" Then
+                            If last Then
+                                MyEr "Bad use of CASE ELSE", "Κακή χρήση του CASE ELSE"
+                            Else
+                                last = True
+                                GoTo jump2
+                            End If
+                        Else
+                            Pos = Pos - Len(ss$)
+                            GoTo jump2
+                        End If
+                    End If
+                Else
+                    MyEr "Bad use of CASE", "Κακή χρήση του CASE"
+                    Exit Function
+                End If
+            Case "ELSE"  ' else case
+                If FastPureLabel(b$, ss$, Pos, True, , , False) = 1 Then
+                    If ss$ = "CASE" Then
+                        If last Then
+                            MyEr "Bad use of ELSE CASE", "Κακή χρήση του ELSE CASE"
+                        Else
+                            Pos = Pos - 4
+                            last = True
+                            GoTo jump0
+                        End If
+                    Else
+                        Pos = Pos - Len(ss$)
+                        GoTo jump2
+                    End If
+                End If
+            Case "ΑΛΛΙΩΣ"  ' else case
+                If FastPureLabel(b$, ss$, Pos, True, , , False) = 1 Then
+                    If ss$ = "ΜΕ" Then
+                        If last Then
+                            MyEr "Bad use of Αλλιώς Με", "Κακή χρήση του Αλλιώς Με"
+                        Else
+                            Pos = Pos - 2
+                            last = True
+                            GoTo jump0
+                        End If
+                    Else
+                        Pos = Pos - Len(ss$)
+                        GoTo jump2
+                    End If
+                End If
+
+            Case "ΤΕΛΟΣ"
+                If Lang = 0 Then
+                    'Pos = Pos + 5
+                    Pos = MyTrimLi(b$, Pos)
+                    If FastPureLabel(b$, ss$, Pos, True, , , False) = 1 Then
+                        If ss$ = "ΕΠΙΛΟΓΗΣ" Then
+                            Pos = Pos - 1
+                            Do
+                            Pos = Pos + 1
+                            aheadstatusSkipParam b$, Pos
+                            Loop While Mid$(b$, Pos) = ":"
+                            GoTo finale
+                        End If
+                    End If
+                End If
+            Case "END"
+                If Lang = 1 Then
+                    'Pos = OLDPOS + 3
+                    Pos = MyTrimLi(b$, Pos)
+                    If FastPureLabel(b$, ss$, Pos, True, , , False) = 1 Then
+                        If ss$ = "SELECT" Then
+                            Pos = Pos - 1
+                            Do
+                                Pos = Pos + 1
+                                aheadstatusSkipParam b$, Pos
+                            Loop While Mid$(b$, Pos) = ":"
+                           ' If Pos > 1 Then b$ = Mid$(b$, Pos)
+                            GoTo finale
+                            
+                        End If
+                    End If
+                End If
+            Case "ΕΠΙΛΕΞΕ", "ΕΠΕΛΕΞΕ"
+                Pos = Module1.DropSelect2(b$, 0, Pos - 7)
+                If Pos = 0 Then Exit Function
+                GoTo jump0
+            Case "SELECT"
+                Pos = Module1.DropSelect2(b$, 1, Pos)
+                If Pos = 0 Then Exit Function
+                GoTo jump0
+
+            Case Else
+jump2:
+                Pos = OLDPOS - 1
+                Do
+                Pos = Pos + 1
+                    aheadstatusSkipParam b$, Pos
+                Loop While Mid$(b$, Pos) = ":"
+                GoTo jump1
+            End Select
+            
+            GoTo jump2
+        Else
+        If Pos > Len(b$) Then
+            MyEr "problem in select", "πρόβλημα στην ΕΠΙΛΕΞΕ"
+            Exit Function
+        End If
+            GoTo jump2
+        End If
+    OLDPOS = Pos
+Wend
+'SetNextLine b$   - this delete b$ if can't find vbCrLf
+sPos = InStr(b$, vbCrLf)
+If sPos > 0 Then sPos = sPos + 2
+If Not last Then
+Pos = MyTrimLi(b$, Pos)
+If FastPureLabel(b$, ss$, Pos, True, , , False) = 1 Then
+    Select Case Lang
+    Case 1
+    If ss$ = "END" Then
+    ExpectedEndSelect
+    Exit Function
+    End If
+    Case Else
+    If ss$ = "ΤΕΛΟΣ" Then
+    ExpectedEndSelect
+    Exit Function
+    End If
+    End Select
+End If
+Pos = MyTrimLi(b$, Pos)
+If FastPureLabel(b$, ss$, Pos, True, , , False) = 1 Then
+    Select Case Lang
+    Case 1
+    If Not ss$ = "SELECT" Then
+    ExpectedEndSelect
+    Exit Function
+    End If
+    Case Else
+    If ss$ = "ΕΠΙΛΟΓΗΣ" Then
+    ExpectedEndSelect
+    Exit Function
+    End If
+    End Select
+End If
+finale:
+Do While Len(b$) > Pos
+ss$ = Mid$(b$, Pos, 1)
+If InStr(RemWhitSpace, ss$) > 0 Then
+    Pos = Pos + 1
+ElseIf InStr(RemChar, ss$) > 0 Then
+    Pos = Pos + 1
+    Do While Len(b$) > Pos
+        If Mid$(b$, Pos, 1) = vbCr Then Exit Do
+        Pos = Pos + 1
+    Loop
+Else
+    
+    Exit Do
+End If
+Loop
+End If
+DropSelect2 = Pos
 End Function
