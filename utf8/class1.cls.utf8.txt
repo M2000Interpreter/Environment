@@ -26,24 +26,56 @@ f.Move VirtualScreenWidth() + 2000, VirtualScreenHeight() + 2000
 
 On Error Resume Next
 If Dir(App.path + "\M2000.vbp") <> "" Then
-Set m = CreateObject("M2000.callback")
-If Not Err Then GoTo 1000
+    Set m = CreateObject("M2000.callback")
+    If Not m Is Nothing Then GoTo 1000
+    Err.Clear
 End If
+
         Set m = NewObjectFromActivexDll(App.path + "\m2000.dll", "callback")
-        If Err Then
+        If Dir(App.path + "\m2000.DLL") <> "" And m Is Nothing Then
+            Err.Clear
+            GoTo 1235
+        End If
+        If Err Or m Is Nothing Then
             Err.Clear
             Set m = NewObjectFromActivexDll(App.path + "\lib.bin", "callback")
+            If Dir(App.path + "\lib.bin") <> "" And m Is Nothing Then
+                Err.Clear
+                GoTo 1234
+            End If
             If Err Then
                 Err.Clear
                 Set m = CreateObject("M2000.callback")
             End If
         End If
 If Err Then
-    MsgBox "Install M2000.dll first", vbCritical
+    Dim thepath$, s$, doslast As Double
+    If MsgBox("Install library first. May I try?", vbYesNo) = vbYes Then
+    
+        If Dir(App.path + "\lib.bin") <> "" Then
+1234
+        thepath$ = App.path + "\lib.bin"
+        ElseIf Dir(App.path + "\M2000.dll") <> "" Then
+1235
+        thepath$ = App.path + "\M2000.dll"
+        Else
+            Beep
+        End If
+        If thepath$ <> "" Then
+            s$ = "powershell -WindowStyle Hidden -NoProfile -Command " + Chr$(34) + "Start-Process CMD -WindowStyle Hidden -ArgumentList '/k regsvr32 " + thepath$ + "' -Verb RunAs" + Chr$(34)
+            doslast = Shell("CMD /C " + s$, vbMinimizedNoFocus)
+            Sleep 5000
+            MsgBox "Wait... to finish", vbCritical
+            
+        End If
+    End If
     Unload f
 Exit Sub
 End If
 1000
+If m Is Nothing Then
+
+Else
 ' check for old m2000.dll
 test = m.WindowState
 If Err Then
@@ -60,13 +92,17 @@ If Err Then
     ExitNow = True
     Exit Sub
 Else
-    m.getform f
     Debug.Assert (InIDECheck = True)
-    m.run "start"
-    m.StackMax -12345
     a$ = commandW
-    If Trim$(a$) = "-h" Or Trim$(a$) = "/?" Then frmAbout.Show 1: ExitNow = True: Exit Sub
+    If Trim$(LCase(a$)) = "-h" Or Trim$(a$) = "/?" Then frmAbout.Show 1: ExitNow = True: Exit Sub
     If a$ = "" And link$ <> "" Then a$ = link$
+    m.getform f
+    If a$ <> "" Then
+        m.run "start"
+    Else
+        m.run "start desktop"
+    End If
+    m.StackMax -12345
     If m.Status = 0 Then
         Set f.mm = Me
         Set f.m = m
@@ -77,6 +113,7 @@ Else
         Set m = Nothing
         ShutDownAll
     End If
+End If
 End If
 End Sub
 

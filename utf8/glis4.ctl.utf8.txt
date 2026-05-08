@@ -630,7 +630,7 @@ End Property
 Public Property Get Text() As String
 Attribute Text.VB_UserMemId = 0
 Dim i As Long, Pad$
-Text = Space$(500)
+Text = space$(500)
 RaiseEvent PureListOn
 
 Dim thiscur, l As Long
@@ -639,7 +639,7 @@ thiscur = 1
 For i = 0 To listcount - 1
 Pad$ = list(i) + vbCrLf
 l = Len(Pad)
-If Len(Text) < thiscur + l Then Text = Text + Space$((thiscur + l) + 100)
+If Len(Text) < thiscur + l Then Text = Text + space$((thiscur + l) + 100)
 Mid$(Text, thiscur, l) = Pad$
 thiscur = thiscur + l
 Next i
@@ -651,14 +651,14 @@ Public Property Get TextAtColumn(ByVal RHS As Long) As String
 Dim i As Long, Pad$
 If RHS < 1 Then RHS = 1
 If RHS > mTabs Then RHS = mTabs
-TextAtColumn = Space$(500)
+TextAtColumn = space$(500)
 RaiseEvent PureListOn
 Dim thiscur, l As Long
 thiscur = 1
 For i = 0 To listcount - 1
 Pad$ = listAtColumn(i, RHS) + vbCrLf
 l = Len(Pad)
-If Len(TextAtColumn) < thiscur + l Then TextAtColumn = TextAtColumn + Space$((thiscur + l) + 100)
+If Len(TextAtColumn) < thiscur + l Then TextAtColumn = TextAtColumn + space$((thiscur + l) + 100)
 Mid$(TextAtColumn, thiscur, l) = Pad$
 thiscur = thiscur + l
 Next i
@@ -3295,7 +3295,7 @@ If MoveParent Then
         vx = Extender.Container.Left + (X - preX)
         vy = Extender.Container.Top + (Y - preY)
         RaiseEvent ValidMove(vx, vy)
-        Extender.Container.Move vx, vy
+        Extender.Container.move vx, vy
         Timer1.enabled = False
         Timer1.Interval = 2
         Timer1.enabled = True
@@ -3315,7 +3315,7 @@ If ((Extender.Left + X - preX) > FloatLimitLeft) And FloatLimitLeft > 0 Then pre
     vy = Extender.Top + (Y - preY)
     RaiseEvent ValidMove(vx, vy)
     
-    Extender.Move vx, vy
+    Extender.move vx, vy
 End If
 End If
 If Me.BackStyle = 1 Then ShowMe2
@@ -4093,7 +4093,7 @@ Dim i As Long, j As Long, G$, nr As RECT, fg As Long, hnr As RECT, skipme As Boo
 If MultiSelect And LeftMarginPixels < mytPixels Then LeftMarginPixels = mytPixels
 If Not headeronly Then Repaint
 mEditFlag1 = mEditFlag
-CurrentY = 0
+currentY = 0
 nr.Top = 0
 nr.Left = 0
 nr.Bottom = mytPixels + 1
@@ -4219,7 +4219,7 @@ If j >= listcount Then j = listcount - 1
 If topitem < TopRows Then topitem = TopRows: j = j + TopRows
 
 If listcount > 0 Then
-    CurrentX = scrollme
+    currentX = scrollme
     DrawStyle = vbSolid
     fg = Me.ForeColor
     If havefocus Or dragfocus Then
@@ -4635,8 +4635,8 @@ there1:
             HideCaret (hWnd)
         End If
     End If
-    CurrentY = 0
-    CurrentX = 0
+    currentY = 0
+    currentX = 0
     DrawMode = vbCopyPen
 End If
 DrawStyle = vbSolid
@@ -4765,8 +4765,8 @@ Else
     Dim K As Integer, onr As Long, SUM As Long, hRgn As Long, ont As Long
     For ii = 0 To TopRows - 1
         i = ii
-        CurrentX = scrollme
-        CurrentY = 0
+        currentX = scrollme
+        currentY = 0
         onr = nr.Right
         ont = nr.Top
         RaiseEvent ExposeRect(i, VarPtr(nr), UserControl.hDC, skipme)
@@ -4903,7 +4903,7 @@ Else
                     If mTabs > 1 Then
                         SUM = LeftMarginPixels
                         nr.Left = SUM
-                        CurrentX = scrollme
+                        currentX = scrollme
                         For K = 1 To mTabs
                             If mParts(K) > 0 Then
                             mEditFlag1 = CBool(PropAtColumnNum(i, mCurTab, "EDIT"))
@@ -4958,8 +4958,8 @@ Else
     Next ii
     For ii = topitem To j + onemore
         i = ii
-        CurrentX = scrollme
-        CurrentY = 0
+        currentX = scrollme
+        currentY = 0
         onr = nr.Right
         ont = nr.Top
         RaiseEvent ExposeRect(i, VarPtr(nr), UserControl.hDC, skipme)
@@ -5105,7 +5105,7 @@ Else
                     If mTabs > 1 Then
                         SUM = LeftMarginPixels
                         nr.Left = SUM
-                        CurrentX = scrollme
+                        currentX = scrollme
                         For K = 1 To mTabs
                             If mParts(K) > 0 Then
                             mcenter = CBool(PropAtColumnNum(i, K, "CenterText"))
@@ -5321,8 +5321,8 @@ there1:
     Next
     End If
     End If
-    CurrentY = 0
-    CurrentX = 0
+    currentY = 0
+    currentX = 0
 End If
             If BorderStyle = 1 And BackStyle = 1 Then
                 hnr.Left = 0
@@ -5401,12 +5401,12 @@ If Extender.Parent Is Nothing Then Exit Sub
 If Extender.Parent.Picture.Handle <> 0 And BackStyle = 1 Then
 
 If Me.BorderStyle = 1 Then
-CurrentY = 0
-    CurrentX = 0
+currentY = 0
+    currentX = 0
 Line (0, 0)-(ScaleWidth - scrTwips, ScaleHeight - scrTwips), Me.BackColor, B
 UserControl.PaintPicture UserControl.Parent.Picture, scrTwips, scrTwips, Width - 2 * scrTwips, Height - 2 * scrTwips, Extender.Left, Extender.Top, Width - 2 * scrTwips, Height - 2 * scrTwips
-    CurrentY = 0
-    CurrentX = 0
+    currentY = 0
+    currentX = 0
 Else
 UserControl.PaintPicture UserControl.Parent.Picture, 0, 0, , , Extender.Left, Extender.Top
 
@@ -5419,11 +5419,11 @@ If Not mmo Is Nothing Then
 If mmo.Picture.Handle <> 0 Then
     UserControl.PaintPicture mmo.Picture, 0, 0, , , Extender.Left, Extender.Top
     If Me.BorderStyle = 1 Then
-    CurrentY = 0
-        CurrentX = 0
+    currentY = 0
+        currentX = 0
     Line (0, 0)-(ScaleWidth - scrTwips, ScaleHeight - scrTwips), Me.BackColor, B
-        CurrentY = 0
-        CurrentX = 0
+        currentY = 0
+        currentX = 0
     End If
 End If
 End If
@@ -5535,11 +5535,11 @@ Function design() As Boolean
 On Error GoTo there
 If GetTopUserControl(Me).Ambient.UserMode = False Then
 Cls
-CurrentX = scrTwips
-CurrentY = scrTwips
+currentX = scrTwips
+currentY = scrTwips
 Print UserControl.Ambient.DisplayName
-CurrentX = 0
-CurrentY = 0
+currentX = 0
+currentY = 0
 design = True
 Else
 'Cls
@@ -5905,7 +5905,7 @@ Extender.Visible = RHS
 End Property
 Public Property Let TopTwips(ByVal RHS As Long)
 On Error Resume Next
-Extender.Move Extender.Left, CSng(RHS)
+Extender.move Extender.Left, CSng(RHS)
 End Property
 Public Property Get HeightTwips() As Long
 On Error Resume Next
@@ -5918,18 +5918,18 @@ Ttwips = CLng(Extender.Top)
 End Sub
 Public Property Let HeightTwips(ByVal RHS As Long)
 On Error Resume Next
-Extender.Move Extender.Left, Extender.Top, Extender.Width, RHS
+Extender.move Extender.Left, Extender.Top, Extender.Width, RHS
 End Property
 Public Sub MoveTwips(ByVal mleft As Long, ByVal mtop As Long, mWidth As Long, mHeight As Long)
 On Error Resume Next
 If UseHeaderOnly Then
-Extender.Move mleft, mtop, mWidth, mHeight
+Extender.move mleft, mtop, mWidth, mHeight
 ElseIf mWidth < 100 Then
-Extender.Move mleft, mtop, Extender.Width, Extender.Height
+Extender.move mleft, mtop, Extender.Width, Extender.Height
 ElseIf mHeight < 100 Then
-Extender.Move mleft, mtop, mWidth, Extender.Height
+Extender.move mleft, mtop, mWidth, Extender.Height
 Else
-Extender.Move mleft, mtop, mWidth, mHeight
+Extender.move mleft, mtop, mWidth, mHeight
 End If
 End Sub
 Public Sub ZOrder(Optional ByVal RHS As Long = 0)
@@ -6023,12 +6023,12 @@ mpercent = RHS
 PropertyChanged "Percent"
 End Property
 Friend Sub Goback()
-    If TypeName(Me.Parent) = "GuiM2000" Then
+    If Typename(Me.Parent) = "GuiM2000" Then
         ChooseNextLeft Me, Me.Parent, True
     End If
 End Sub
 Friend Sub GoON()
-    If TypeName(Me.Parent) = "GuiM2000" Then
+    If Typename(Me.Parent) = "GuiM2000" Then
         ChooseNextRight Me, Me.Parent, True
     End If
 End Sub
@@ -6061,13 +6061,13 @@ Exit Sub
 End If
 If Arrows2Tab And Not EditFlagSpecial Then
     If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Then
-        If TypeName(Me.Parent) = "GuiM2000" Then
+        If Typename(Me.Parent) = "GuiM2000" Then
         ChooseNextLeft Me, Me.Parent
         End If
         KeyCode = 0
         Exit Sub
     ElseIf KeyCode = vbKeyRight Or KeyCode = vbKeyDown Then
-        If TypeName(Me.Parent) = "GuiM2000" Then
+        If Typename(Me.Parent) = "GuiM2000" Then
         ChooseNextRight Me, Me.Parent
         End If
         KeyCode = 0
@@ -7333,7 +7333,7 @@ If item = itemline Then
         FloatList = False
         If Button = 1 Then
             doubleclick = doubleclick + 1 + preservedoubleclick
-            If doubleclick = 1 Then Debug.Print "FIRST"
+            ''If doubleclick = 1 Then Debug.Print "FIRST"
             preservedoubleclick = 0
             If doubleclick = 1 Then
                 timestamp1 = ProfErr.MARKTWO
@@ -7343,7 +7343,6 @@ If item = itemline Then
                     doubleclick = 1
                     timestamp1 = ProfErr.MARKTWO
                 Else
-                    Debug.Print "OK"
                     timestamp1 = Timer + 100
                     DoubleClickCheck = True: Exit Function
                 End If

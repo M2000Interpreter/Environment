@@ -2,18 +2,18 @@ Attribute VB_Name = "mHLSRGB"
 Option Explicit
 
 Public Sub RGBToHLS( _
-      ByVal R As Long, ByVal G As Long, ByVal b As Long, _
+      ByVal r As Long, ByVal G As Long, ByVal b As Long, _
       H As Single, s As Single, l As Single _
    )
 Dim Max As Single
 Dim Min As Single
 Dim delta As Single
 Dim rr As Single, rG As Single, rB As Single
-If R < 0 Then R = 0 Else If R > 255 Then R = 255
+If r < 0 Then r = 0 Else If r > 255 Then r = 255
 If G < 0 Then G = 0 Else If G > 255 Then G = 255
 If b < 0 Then b = 0 Else If b > 255 Then b = 255
 
-   rr = R / 255: rG = G / 255: rB = b / 255
+   rr = r / 255: rG = G / 255: rB = b / 255
 
         Max = Maximum(rr, rG, rB)
         Min = Minimum(rr, rG, rB)
@@ -46,26 +46,24 @@ If b < 0 Then b = 0 Else If b > 255 Then b = 255
 'end {RGB_to_HLS}
 End Sub
 
-Public Function rgbconv(H As Long) As String
+Public Function rgbconv(H As Long) As Long
 Dim mr As Long, mg As Long, mb As Long
 Dim mg1 As Long, mb1 As Long
 Dim hh As Single, ss As Single, LL As Single
-rgbconv = "000000"
-For mr = 0 To 255
-For mg = 0 To 255
-For mb = 0 To 255
+mr = MemByte(VarPtr(H) + 2)
+mg = MemByte(VarPtr(H) + 1)
+mb = MemByte(VarPtr(H))
+
 RGBToHLS mr, mg, mb, hh, ss, LL
-If H = CLng(Int(hh * 60) Mod 360) Then
-rgbconv = Hex$(mb + mg * 256 + mr * 256 * 256)
-mb = 255
-mg = 255
-mr = 255
+If LL < 0.7 Then
+LL = 0.55
+Else
+LL = LL * 0.8
 End If
-Next mb
-Next mg
-Next mr
-
-
+HLSToRGB hh, ss, LL, mr, mg, mb
+MemByte(VarPtr(rgbconv)) = mb
+MemByte(VarPtr(rgbconv) + 1) = mg
+MemByte(VarPtr(rgbconv) + 2) = mr
 End Function
 Public Function hueconvSpecial(hr As Variant) As Long
 Dim mr As Long, mg As Long, mb As Long
@@ -125,14 +123,18 @@ satconv = CLng(LL * 255)
 
 End Function
 Public Function HSL(ByVal H, ByVal s, ByVal l) As Double
-Dim R As Long, G As Long, b As Long
-HLSToRGB CSng((H * 100&) Mod 36000) / 6000!, s / 100, l / 100, R, G, b
-HSL = R + (G + b * 256#) * 256#
+Dim r As Long, G As Long, b As Long
+HLSToRGB CSng((H * 100&) Mod 36000) / 6000!, s / 100, l / 100, r, G, b
+HSL = r + (G + b * 256#) * 256#
 End Function
+Public Function MoveColor(that As Double) As Double
+
+End Function
+
 
 Public Sub HLSToRGB( _
       ByVal H As Single, ByVal s As Single, ByVal l As Single, _
-      R As Long, G As Long, b As Long _
+      r As Long, G As Long, b As Long _
    )
 Dim rr As Single, rG As Single, rB As Single
 Dim Min As Single, Max As Single
@@ -188,11 +190,11 @@ Dim Minl As Long, Maxl As Long, MidL As Long, dif As Single
       End If
             
    End If
-   R = rr * 255: G = rG * 255: b = rB * 255
-   If R < 0 Or G < 0 Or b < 0 Or R > 255 Or G > 255 Or b > 255 Then
-   Maxl = Maximuml(R, G, b)
-   Minl = Minimuml(R, G, b)
-   MidL = R + G + b - Maxl - Minl
+   r = rr * 255: G = rG * 255: b = rB * 255
+   If r < 0 Or G < 0 Or b < 0 Or r > 255 Or G > 255 Or b > 255 Then
+   Maxl = Maximuml(r, G, b)
+   Minl = Minimuml(r, G, b)
+   MidL = r + G + b - Maxl - Minl
    If Maxl > Minl Then
    If Minl < 0 Then Maxl = Maxl - Minl: MidL = MidL - Minl: Minl = 0
    If Maxl > 255 Then
@@ -200,31 +202,31 @@ Dim Minl As Long, Maxl As Long, MidL As Long, dif As Single
    Maxl = (Maxl - Minl) * dif + Minl
    MidL = (MidL - Minl) * dif + Minl
    End If
-   If Maximuml(R, G, b) = R Then
-   R = Maxl
-            If Minimuml(R, G, b) = G Then
+   If Maximuml(r, G, b) = r Then
+   r = Maxl
+            If Minimuml(r, G, b) = G Then
             G = Minl: b = MidL
             Else
             G = Minl: b = MidL
             End If
-   ElseIf Maximuml(R, G, b) = G Then
+   ElseIf Maximuml(r, G, b) = G Then
             G = Maxl
-            If Minimuml(R, G, b) = R Then
-            R = Minl: b = MidL
+            If Minimuml(r, G, b) = r Then
+            r = Minl: b = MidL
             Else
-            b = Minl: R = MidL
+            b = Minl: r = MidL
             End If
    Else
    b = Maxl
-   If Minimuml(R, G, b) = R Then
-            R = Minl: G = MidL
+   If Minimuml(r, G, b) = r Then
+            r = Minl: G = MidL
             Else
-            G = Minl: R = MidL
+            G = Minl: r = MidL
             End If
 
    End If
    Else
-   R = 0: b = 0: G = 0
+   r = 0: b = 0: G = 0
    End If
    End If
    

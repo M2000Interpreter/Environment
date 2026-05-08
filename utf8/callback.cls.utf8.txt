@@ -223,6 +223,7 @@ End If
 'If form5iamloaded Then Unload Form5
 Finished = True
 End Sub
+
 Public Sub AsyncCli(LoadFileAndSwitches$, Optional Prompt$ = ">")
 Dim pid As Long
 If strTemp = vbNullString Then SetTmpPath
@@ -290,7 +291,7 @@ If Left$(cLine, 1) Like "[+-]" Then
 Dim ss$
 para$ = ""
 While Left$(cLine, 1) Like "[+-]"
-ss$ = split(cLine, " ")(0)
+ss$ = Split(cLine, " ")(0)
 cLine = LTrim$(Mid$(cLine, Len(ss$) + 1))
 para$ = para$ + ss$ + " "
 Wend
@@ -306,7 +307,7 @@ If ss$ = "" And para$ = "" Then
 s$ = LTrim(s$)
 If Left$(s$, 1) Like "[+-]" Then
 While Left$(s$, 1) Like "[+-]"
-ss$ = split(s$, " ")(0)
+ss$ = Split(s$, " ")(0)
 s$ = LTrim$(Mid$(s$, Len(ss$) + 1))
 para$ = para$ + ss$ + " "
 Wend

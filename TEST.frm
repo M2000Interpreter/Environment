@@ -216,7 +216,6 @@ Public Sub generalFkey(a As Integer)
 Dim monitor As Long, titl$, once As Boolean
 If once Then Exit Sub
 once = True
-Debug.Print "OK", a
 If a = 2 Then
 gList0.SetFocus
 ElseIf a = 3 Then

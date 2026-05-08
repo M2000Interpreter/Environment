@@ -191,7 +191,6 @@ Public Property Get GetCode() As String
     Dim packet() As Byte, i As Long, part As String, final As String, k As Long
     i = 1
     k = FreeFile
-    'Open App.path + "\data.txt" For Binary As #k
     Do
     ReDim packet(0)
     If Not GetResource(i + 100, packet) Then Exit Do

@@ -4932,7 +4932,7 @@ Case "DECLARE", "ояисе"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDeclare)
 Case "METHOD", "леходос"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoMethod)
-Case "WITH", "ле", "ле.амтийеилемо"
+Case "WITH", "ле.амтийеилемо"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoWith)
 Case "DATA", "сеияа"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoData)
@@ -5139,6 +5139,10 @@ Case "BASIC"
     aHash.ItemCreator2 CStr(mycommands(i)), 0, 45  ' 44 FOR CLASSES
 Case "RESTORE", "епамажояа"
     aHash.ItemCreator2 CStr(mycommands(i)), 0, 46
+Case "ле"
+    aHash.ItemCreator2 CStr(mycommands(i)), 0, 47
+Case "CASE"
+    aHash.ItemCreator2 CStr(mycommands(i)), 0, 48
 Case Else  ' MAYBE I MADE ONE FOR STRUCTURES
     aHash.ItemCreator CStr(mycommands(i)), 0
 End Select
@@ -5243,31 +5247,31 @@ crNew basestack, players(prive)
 ProcWriter = True
 End Function
 
-Sub SendAKey(ByVal keycode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
+Sub SendAKey(ByVal KeyCode As Integer, ByVal shift As Boolean, ByVal ctrl As Boolean, ByVal alt As Boolean)
 Dim extended As Byte, Map As Integer, smap As Integer, cmap As Integer, amap As Integer, cap As Long, old As Long
 Const key_release As Byte = 2
-If keycode > 500 Then extended = 1: keycode = keycode - 500
+If KeyCode > 500 Then extended = 1: KeyCode = KeyCode - 500
 If extended = 0 Then
-If keycode > 64 And keycode < 91 Then
+If KeyCode > 64 And KeyCode < 91 Then
     If Not CapsLockOn() Then shift = Not shift
 End If
 End If
 
-Map = MapVirtualKey(keycode, 0)
+Map = MapVirtualKey(KeyCode, 0)
 smap = MapVirtualKey(&H10, 0)
 cmap = MapVirtualKey(&H11, 0)
 amap = MapVirtualKey(&H12, 0)
 
 
-keycode = keycode Mod 255
+KeyCode = KeyCode Mod 255
 ' press key
 If shift Then keybd_event &H10, smap, 0, 0
 If ctrl Then keybd_event &H11, cmap, 0, 0
 If alt Then keybd_event &H12, amap, 0, 0
-keybd_event keycode, Map, extended, 0
+keybd_event KeyCode, Map, extended, 0
 
 ' release key
-keybd_event keycode, Map, KEYEVENTF_KEYUP + extended, 0
+keybd_event KeyCode, Map, KEYEVENTF_KEYUP + extended, 0
 If shift Then keybd_event &H10, smap, KEYEVENTF_KEYUP, 0
 If ctrl Then keybd_event &H11, cmap, KEYEVENTF_KEYUP, 0
 If alt Then keybd_event &H12, amap, KEYEVENTF_KEYUP, 0
@@ -5343,10 +5347,10 @@ Dim emfP As StdPicture
 Set emfP = QRCodegenBarcode(ab$, QRcolor, , sq, ErrLevel)
 If emfP Is Nothing Then Exit Sub
 Set aPic = New MemBlock
-bytes = GetEnhMetaFileBits(emfP.Handle, bytes, ByVal 0)
+bytes = GetEnhMetaFileBits(emfP.handle, bytes, ByVal 0)
 If bytes Then
     aPic.Construct 1, bytes
-    Call GetEnhMetaFileBits(emfP.Handle, bytes, ByVal aPic.GetBytePtr(0))
+    Call GetEnhMetaFileBits(emfP.handle, bytes, ByVal aPic.GetBytePtr(0))
     aPic.SubType = 2 ' emf
     Set usehandler = New mHandler
     usehandler.t1 = 2

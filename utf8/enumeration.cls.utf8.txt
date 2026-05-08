@@ -24,8 +24,8 @@ Private Type item
     iValue As Variant
     Pad As String
 End Type
-Public Done As Boolean
-Public Index As Long
+Public Done As Boolean, HasErrorIndex As Boolean
+Public Index As Long, ErrorIndex As Long
 Private PriveSpace() As item, mInterface As Boolean
 Dim MaxSpace As Long
 Dim toplim As Long
@@ -76,7 +76,11 @@ Private Function Malloc() As Long
     Malloc = toplim
 End Function
 Property Get Count()
-    Count = toplim + 1
+    If HasErrorIndex Then
+        Count = toplim
+    Else
+        Count = toplim + 1
+    End If
 End Property
 Property Get ZeroValue()
 If toplim >= 0 Then ZeroValue = PriveSpace(0).iValue
@@ -111,62 +115,81 @@ For i = 0 To toplim
 If RHS = PriveSpace(i).iValue Then ExistFromOther = True: Exit Function
 Next i
 End Function
-Function ExistFromOther2(useHandler As mHandler) As Boolean
+Function ExistFromOther2(usehandler As mHandler) As Boolean
 Dim other As Enumeration
-Set other = useHandler.objref
-other.Index = useHandler.index_start
+Set other = usehandler.objref
+other.Index = usehandler.index_start
 Dim s$, i As Long
 s$ = other.KeyToString
 For i = 0 To toplim
-If s$ = PriveSpace(i).Key Then ExistFromOther2 = True: useHandler.index_start = i: Exit For
+If s$ = PriveSpace(i).Key Then ExistFromOther2 = True: usehandler.index_start = i: Exit For
 Next i
 
 End Function
 Function SearchSimple(what As String, ByRef ok As Boolean) As Variant
-Dim i As Long
-For i = 0 To toplim
+Dim i As Long, ii As Long
+If HasErrorIndex Then ii = -1
+For i = 0 To toplim + ii
 If what = PriveSpace(i).KeyUCase Then ok = True: SearchSimple = PriveSpace(i).iValue: Index = i: Exit Function
 Next i
+If HasErrorIndex Then
+    Index = ErrorIndex
+    ok = True
+    SearchSimple = PriveSpace(Index).iValue
+End If
 End Function
 Function SearchValue(v As Variant, ByRef ok As Boolean) As Variant
 Dim i As Long, mm As mHandler
 ok = False
+Dim ii As Long
+If HasErrorIndex Then ii = -1
 again:
-For i = 0 To toplim
-If v = PriveSpace(i).iValue Then
-ok = True
-Set mm = New mHandler
-mm.t1 = 4
-Set mm.objref = Me
-mm.index_cursor = v
-mm.index_start = i
-mm.sign = 1
-Set SearchValue = mm
-Exit Function
-End If
+For i = 0 To toplim + ii
+    If v = PriveSpace(i).iValue Then
+    ok = True
+    Set mm = New mHandler
+    mm.t1 = 4
+    Set mm.objref = Me
+    mm.index_cursor = v
+    mm.index_start = i
+    mm.sign = 1
+    Set SearchValue = mm
+    Exit Function
+    End If
 Next i
 If Not ok Then
-If MemInt(VarPtr(v)) = vbString Then
-v = val(v)
-GoTo again
+    If MemInt(VarPtr(v)) = vbString Then
+        v = val(v)
+        GoTo again
 Else
+    v = -v
+    For i = 0 To toplim + ii
+    If v = PriveSpace(i).iValue Then
+    ok = True
+    Set mm = New mHandler
+    mm.t1 = 4
+    Set mm.objref = Me
+    mm.index_cursor = v
+    mm.index_start = i
+    mm.sign = -1
+    Set SearchValue = mm
+    Exit Function
+    End If
+    Next i
+End If
+End If
+If HasErrorIndex Then
+    Set mm = New mHandler
+    mm.t1 = 4
+    Set mm.objref = Me
+    mm.index_cursor = PriveSpace(ErrorIndex).iValue
+    mm.index_start = ErrorIndex
+    mm.sign = 1
+    Set SearchValue = mm
+    ok = True
+    Exit Function
+End If
 
-v = -v
-For i = 0 To toplim
-If v = PriveSpace(i).iValue Then
-ok = True
-Set mm = New mHandler
-mm.t1 = 4
-Set mm.objref = Me
-mm.index_cursor = v
-mm.index_start = i
-mm.sign = -1
-Set SearchValue = mm
-Exit Function
-End If
-Next i
-End If
-End If
 Set SearchValue = New mHandler
 End Function
 Public Property Get KeyToString() As Variant
