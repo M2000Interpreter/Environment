@@ -70,6 +70,9 @@ ElseIf t1 = 3 Then
     Else
         Set a.objref = mObjRef
     End If
+ElseIf t1 = 5 Then
+    a.ReadOnly = ReadOnly
+    Set a.objref = mObjRef
 Else
     Set a.objref = mObjRef
 End If

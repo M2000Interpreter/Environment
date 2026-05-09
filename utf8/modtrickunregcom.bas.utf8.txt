@@ -72,8 +72,8 @@ Private Declare Function DispCallFunc Lib "oleaut32" ( _
                          ByVal cc As Integer, _
                          ByVal vtReturn As Integer, _
                          ByVal cActuals As Long, _
-                         ByRef prgvt As Any, _
-                         ByRef prgpvarg As Any, _
+                         ByRef prgVt As Any, _
+                         ByRef prgpVarg As Any, _
                          ByRef pvargResult As Variant) As Long
 Private Declare Function LoadTypeLibEx Lib "oleaut32" ( _
                          ByVal szFile As Long, _
@@ -465,7 +465,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
     If (TKIND_DISPATCH And mAttr.typekind) > 0 Then
     
         cFuncs = mAttr.cFuncs '' mAttr.cVars
-     '   Debug.Print mAttr.cImplTypes
+
         For j = 0 To mAttr.cFuncs - 1
             ITypeInfo_GetFuncDesc typeInf, j, ppFuncDesc
             CpyMem fncdsc, ByVal ppFuncDesc, Len(fncdsc)
@@ -1145,7 +1145,7 @@ stringifyCustomType = bstrType
 
 End Function
 Private Function stringifyTypeDesc(TYPEDESC As TTYPEDESC, pTypeInfo As IUnknown) As String
-Dim out$, td As TTYPEDESC
+Dim out$, Td As TTYPEDESC
 If IsBadCodePtr(TYPEDESC.pTypeDesc) Then
     If TYPEDESC.vt = VT_PTR Then
         stringifyTypeDesc = "LONG"
@@ -1158,14 +1158,14 @@ End If
 Exit Function
 End If
 If TYPEDESC.vt = VT_PTR Then
-    memcpy td, ByVal TYPEDESC.pTypeDesc, Len(td)
-    stringifyTypeDesc = "*" + stringifyTypeDesc(td, pTypeInfo)
+    memcpy Td, ByVal TYPEDESC.pTypeDesc, Len(Td)
+    stringifyTypeDesc = "*" + stringifyTypeDesc(Td, pTypeInfo)
     Exit Function
 End If
 If TYPEDESC.vt = VT_SAFEARRAY Then
 out$ = "SAFEARRAY("
-    memcpy td, ByVal TYPEDESC.pTypeDesc, Len(td)
-    stringifyTypeDesc = out$ + stringifyTypeDesc(td, pTypeInfo) + ")"
+    memcpy Td, ByVal TYPEDESC.pTypeDesc, Len(Td)
+    stringifyTypeDesc = out$ + stringifyTypeDesc(Td, pTypeInfo) + ")"
     Exit Function
 End If
 If TYPEDESC.vt = VT_CARRAY Then
