@@ -8582,7 +8582,7 @@ For i=1 to 2000 {
 }
 print timecount
 Set Fast
-Print "Run FB2 - This use BigIntegers"
+Print "Run FB2 - That use BigIntegers, internal type of M2000"
 }
 MODULE BN {// Thi  demo not use BigIntegers 
 Print "Arbitrary-precision multiplication"
@@ -35288,7 +35288,7 @@ Function Form1Button1.Click {
      Read index
      If index=0 Then
            Rem :
-           Print ask("ok","This is an example for M2000 Gui")
+           REFRESH 25: Print ask("ok","This is an example for M2000 Gui")
            // hide previous line / unhide the next line
            Rem : After 300 {Print ask("ok","This is an example for M2000 Gui")}
            
@@ -35340,7 +35340,7 @@ Function Callback {
                   \\ using copy we can push back the mesage again
                   \\ New messages are coming
                   If msg$<>""  Then loop \\ just mark block for looping once
-                  Refresh
+                  \\Refresh - WE HAVE ONE MORE IN TASK.MAIN THAT IS OK.
             }
       }
 }
@@ -35383,8 +35383,8 @@ Main.Task 50 {
       If Again Then If form2.visible Then form2.caption$="Hello There 2 ["+now+"]"
   
       If form1.visible Or form2.visible Else Exit
-      Print "WAIT........"
-      Refresh
+      Print "WAIT........", tick
+      Refresh 100
 }
 Threads Erase
 Try {
@@ -47672,63 +47672,6 @@ MODULE JENSEN {Module Jensen`s_Device {
       Print i=101 ' true
 }
 Jensen`s_Device
-}
-MODULE BARCODE {CLS,0
-report 2,  "BARCODE"
-declare bar "m2000.cBarcode"
-rem print type$(bar)
-Enum UcsBarCodeTypeEnum {
-	ucsBctAuto = 0
-	ucsBctEan13
-	ucsBctEan8
-	ucsBctEan128
-	ucsBctUpcA
-	ucsBctUpcE
-}
-Long ink_bleed_in_percents=10
-boolean true=1=1, false=1=0
-method bar, "init", ink_bleed_in_percents,  bHangSeparators:= TRUE, bShowDigits:=TRUE as ok
-method bar, "GetBarCode", "123456789012:12345",  ucsBctEan13 as Pic
-With Pic, "Width" as pic.width, "Height" as pic.height
-move  5000, 6000
-// Pic is a Picture object
-mem$=""
-// Now Image can render Pic to string
-Image Pic, 7500  to mem$
-rem ? image.x(mem$)=7500
-rem	? len(mem$)
-// so now we place a bitmap
-image mem$			 ', 7500
-// We can render Picture as emf directly
-Step 0, -4000
-Image Pic, 7500*1.2
-// We can make a file in memory using Drawing.
-// We can make another emf where we draw the picture
-drawing {
-	image Pic, 3000
-} as Mem
-rem ? len(Mem)
-step -3000, 7000
-// we can rotate the image now
-image Mem, 10000, ,-90
-sub BigTitle(this$, there, percent)
-	local w, n
-	mm=width
-	w=scale.x
-	drawing  {
-		Linespace 0
-		mode 8
-		pen #FFEEFf
-		bold 0
-		legend chr$(160)+this$+chr$(160),"Lucida Handwriting",  8,0,3,1,-20
-
-	} as w
-	cursor 0, there
-	move !
-	n=scale.x/image.x(w)*percent/100
-	step (scale.x-image.x(w)*n)/2
-	image w, image.x(w)*n
-end sub
 }
 MODULE UNICODE {cls,0
 Δ=1

@@ -17,7 +17,7 @@ Private mitems As Long
 Private itemlen As Long
 Private mBytes As Long
 Private ErrorMes As Long
-Public structref As FastCollection
+Public structref As StructCollection
 Public UseStruct As Boolean
 Private mExecBloc As Boolean
 Private Strings As LongHash
