@@ -267,7 +267,7 @@ Private Sub pvSetParamArray(ByVal Ptr As Long, aParams() As Variant)
 
         ' get the variant's type
         CpyMem iVarType, ByVal lVarPtr + (lIdx * 16&), 2&
-'Debug.Print iVarType, "pvSetParam", lIdx
+
         If (iVarType And VT_BYREF) = VT_BYREF Then
         
             ' ByRef Parameter
@@ -484,7 +484,6 @@ If exclude.ExistKey(dispid) Then Exit Sub
     vParams = pvGetParamArray(params, NumVar)
 
    On Error Resume Next
-   ' Debug.Print "FireEvent", strEvent, what$
 
  If Not CallEventFromCOM(Me, strEvent, what$, NumVar, vParams(), delme, ItemIndex) Then
     MyEr "Problem With Event: " + strEvent, "Πρόβλημα με το γεγονός: " + strEvent
@@ -515,7 +514,7 @@ Public Sub fireevent(ByVal dispid As Long, ByVal params As Long)
     Dim refc() As Long
     vParams = pvGetParamArray2(params, NumVar, refc)
     On Error Resume Next
-    'Debug.Print ">>"; strEvent
+
     If Not CallEventFromCOM1(Me, strEvent, what$, NumVar, vParams, refc, delme, ItemIndex) Then
        MyEr "Problem With Event: " + strEvent, "Πρόβλημα με το γεγονός: " + strEvent
     End If
@@ -618,9 +617,9 @@ End Sub
 Public Function Attached() As Boolean
     Attached = blnAttached
 End Function
-Sub Process(VarProc As Long, A As Long, Ptr1 As Long, usestring As Boolean, stval$)
-    Dim t(0 To 8) As Integer, zero, Ptr As Long, ItsVariantRef As Boolean
-    CpyMem ByVal VarPtr(t(0)), ByVal A, 16
+Sub Process(VarProc As Long, a As Long, Ptr1 As Long, usestring As Boolean, stval$)
+    Dim t(0 To 8) As Integer, Zero, Ptr As Long, ItsVariantRef As Boolean
+    CpyMem ByVal VarPtr(t(0)), ByVal a, 16
 again:
     CpyMem Ptr, ByVal VarPtr(t(4)), 4
 
@@ -668,11 +667,11 @@ again:
                 End If
                 Exit Sub
             Else
-            CpyMem ByVal A, VarPtr(zero), 16
+            CpyMem ByVal a, VarPtr(Zero), 16
             End If
         Else
             Ptr1 = -Ptr1
-            CpyMem ByVal A, VarPtr(zero), 16
+            CpyMem ByVal a, VarPtr(Zero), 16
         End If
     End If
     CpyMem ByVal VarProc, ByVal VarPtr(t(0)), 16
@@ -686,7 +685,7 @@ Private Sub pvSetParamArray2(ByVal Ptr As Long, aParams() As Variant, ref() As L
     Dim lPtr        As Long
     Dim lVarPtr     As Long
     Dim iP          As Long
-    Dim zero
+    Dim Zero
     CpyMem tDPAR, ByVal Ptr, Len(tDPAR)
     lVarPtr = tDPAR.rgPointerToVariantArray
 
@@ -723,7 +722,7 @@ Private Sub pvSetParamArray2(ByVal Ptr As Long, aParams() As Variant, ref() As L
                    
             CpyMem ByVal lVarPtr + (lIdx * 16&), VarPtr(iVarType), 2
             End If
-            CpyMem aParams(iP), zero, 16
+            CpyMem aParams(iP), Zero, 16
 
             End If
     Next

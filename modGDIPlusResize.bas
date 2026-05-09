@@ -101,8 +101,8 @@ Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, By
 Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As Long
 
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
 ' GDI Functions
 Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
 Private Declare Sub OleCreatePictureIndirect2 Lib "OleAut32.dll" Alias "OleCreatePictureIndirect" _
@@ -899,14 +899,10 @@ Private Sub gdipResizeRotate(Scr As Object, Img As Long, Angle!, x1 As Long, y1 
     GdipSetInterpolationMode graphics, InterpolationModeHighQualityBicubic
     GdipSetPixelOffsetMode graphics, 0  '-4 * (bitmap = True)
     If Bitmap Then
-    '  GetImageDimension img, orWidth, orHeight
+
     GdipDrawImageRectRectI graphics, Img, -Width \ 2, -Height \ 2, Width, Height, mleft, mtop, orWidth, orHeight, UnitPixel, m_Attr
     Else
     
- 'GdipDrawImageRectRectI graphics, Img, -bWidth1 \ 2 - 50 * Size, -bHeight1 \ 2 - 50 * Size, bWidth1 + 100 * Size, bHeight1 + 100 * Size, bleft - 50, btop - 50, bWidth + 100, bHeight + 100, UnitPixel, m_Attr
-'Debug.Print 100, -bWidth1 \ 2 - 50 * Size, -bHeight1 \ 2 - 50 * Size, bWidth1 + 100 * Size, bHeight1 + 100 * Size, bleft - 50, btop - 50, bWidth + 100, bHeight + 100
-'Debug.Print 0, Int(-bWidth1 / 2 - ax1), Int(-bHeight1 / 2 - ay1), bWidth1 + ax1 * 2, bHeight1 + ay1 * 2, bleft - ax, btop - ay, bWidth + ax * 2, bHeight + ay * 2
-
          GdipDrawImageRectRectI graphics, Img, -bWidth1 / 2 - ax1, -bHeight1 / 2 - ay1, bWidth1 + ax1 * 2, bHeight1 + ay1 * 2, bleft - ax, btop - ay, bWidth + ax * 2, bHeight + ay * 2, UnitPixel, m_Attr
       
      End If

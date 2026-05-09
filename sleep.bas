@@ -162,18 +162,16 @@ End Function
 Public Sub BlockFree(ByVal Ptr As Long)
     HeapFree GetProcessHeap(), 0, Ptr
 End Sub
-Public Sub SetUpForExecution(ByVal Ptr As Long, ByVal nBytes As Long)
-    Dim oldV As Long
+Public Sub SetUpForExecution(ByVal Ptr As Long, ByVal nBytes As Long, ByRef OldV As Long)
     FlushInstructionCache GetCurrentProcess, Ptr, nBytes
-    VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READ, oldV ' PAGE_READWRITE
+    VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READ, OldV ' PAGE_READWRITE
     VirtualLock Ptr, nBytes
 End Sub
-Public Sub ReleaseExecution(ByVal Ptr As Long, ByVal nBytes As Long)
-    Dim oldV As Long
+Public Sub ReleaseExecution(ByVal Ptr As Long, ByVal nBytes As Long, ByVal OldV As Long)
     FlushInstructionCache GetCurrentProcess, Ptr, nBytes
     
     VirtualUnlock Ptr, nBytes
-    VirtualProtect Ptr, nBytes, PAGE_READWRITE, oldV '  PAGE_EXECUTE_READ
+    VirtualProtect Ptr, nBytes, OldV, OldV '  PAGE_EXECUTE_READ
 End Sub
 Public Sub BlockFreeVirtual(ByVal Ptr As Long, ByVal nBytes As Long)
     If VirtualFree(Ptr, 0&, &H8000&) = 0 Then

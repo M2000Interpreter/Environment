@@ -30,21 +30,20 @@ Function IsObj()
 End Function
 Property Get ObjectType() As String
 On Error Resume Next
-Dim v As Variant, that As FastCollection
+Dim v As Variant, that As FastCollection, other As StructCollection
 If Not hardlink Is Nothing Then
     If TypeOf hardlink Is ExtControl Then
     ObjectType = "*" + Typename(hardlink.mycontrol)
     Else
     
     If TypeOf hardlink Is FastCollection Then
-    Set that = hardlink
-    If that.structLen > 0 Then
-        ObjectType = "[?*" + Typename(that.StructObj) + "]"
-    Else
+        Set that = hardlink
         ObjectType = "[?*Inventory]"
-    End If
+    ElseIf TypeOf hardlink Is StructCollection Then
+        Set other = hardlink
+        ObjectType = "[?*" + Typename(other.StructObj) + "]"
     Else
-    ObjectType = "[?*" + Typename(hardlink) + "]"
+        ObjectType = "[?*" + Typename(hardlink) + "]"
     End If
     End If
 Else

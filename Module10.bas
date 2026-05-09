@@ -13,7 +13,7 @@ Private Type PeekArrayType
 End Type
 Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
 
-Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (Arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
+Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
 Private Declare Function SafeArrayGetDim Lib "OleAut32.dll" (ByVal Ptr As Long) As Long
 Private Declare Function vbaVarLateMemSt Lib "msvbvm60" _
                          Alias "__vbaVarLateMemSt" ( _
@@ -332,16 +332,16 @@ Dim ss$, skip As Boolean, checktype As Boolean
             If FastSymbol(b$, "=") Then
                 p = nMath2.cxZero
                 If FastSymbol(b$, "(") Then
-                Dim P1
-                If Not IsNumberD2(b$, P1) Then
+                Dim p1
+                If Not IsNumberD2(b$, p1) Then
                     GoTo ER0001
                 End If
-                p.r = CDbl(P1)
+                p.r = CDbl(p1)
                 If Not FastSymbol(b$, ",") Then GoTo ER0001
-                If Not IsNumberD2(b$, P1) Then
+                If Not IsNumberD2(b$, p1) Then
                     GoTo ER0001
                 End If
-                p.i = CDbl(P1)
+                p.i = CDbl(p1)
                 b$ = NLtrim(b$)
                 If Not UCase$(Left$(b$, 2)) = "I)" Then GoTo ER0001
                 Mid$(b$, 1, 2) = "  "
@@ -989,7 +989,7 @@ End If
 End Function
 ' internal use  You have to close file first
 Public Sub CloseHandler(RHS)
-Dim H&, Ar() As Variant
+Dim H&, ar() As Variant
 On Error Resume Next
 If InUseHandlers.ExistKey(RHS) Then
     H& = CLng(InUseHandlers.sValue)
@@ -1858,7 +1858,7 @@ End Function
 Public Function ExecuteVar5(Exec1 As Long, bstack As basetask, W$, b$, v As Long, Lang As Long, VarStat As Boolean, NewStat As Boolean, nchr As Integer, ss$, sss As Long, temphere$, noVarStat As Boolean) As Long
 Dim i As Long, p As Variant, myobject As Object, ok As Boolean, sw$, sp As Variant, useType As Boolean
 Dim lasttype As Integer, pppp1 As mArray, isglobal As Boolean, usehandler As mHandler, usehandler1 As mHandler, idx As mIndexes, myProp As PropReference
-Dim newid As Boolean, Ar As refArray, ww As Integer, BI As BigInteger, mylist As FastCollection
+Dim newid As Boolean, ar As refArray, ww As Integer, BI As BigInteger, mylist As FastCollection
 Dim ppppAny As iBoxArray, pppp2 As iBoxArray, mTuple As tuple
 Const b12345 = vbCr + "'\/:}"
 If AscW(W$) = 46 Then
@@ -1912,7 +1912,7 @@ againarray:
     If ppppAny Is Nothing Then
         GoTo err000
     End If
-    If Not ppppAny.Arr Then
+    If Not ppppAny.arr Then
         If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , True, idx) Then GoTo errorarr
     ElseIf FastSymbol(b$, ")") Then
         'need to found an expression
@@ -1947,7 +1947,7 @@ NotArray1:
                 Else
                     Set pppp1 = New mArray: pppp1.PushDim (1): pppp1.PushEnd
                     pppp1.SerialItem 0, 2, 9
-                    pppp1.Arr = True
+                    pppp1.arr = True
                     If bstack.lastobj Is Nothing Then
                         pppp1.item(0) = p
                     Else
@@ -1976,7 +1976,7 @@ errorarr:
     If MaybeIsSymbol(b$, ":+-*/~|") Or v = -2 Then
         With ppppAny
             If ppppAny.Final Then CantAssignValue: GoTo err000
-            If Not .Arr Then
+            If Not .arr Then
                 If v = -2 Then GoTo con123
                 If IsGroup(.item(v)) Then GoTo a1297654
                 If .IsObj Then
@@ -2108,7 +2108,7 @@ a1297654:
                             GoTo err000
                         End If
                     Else
-                        If Not .Arr And Not (.myarrbase = 9 Or .MyTypeToBe = 13) Then
+                        If Not .arr And Not (.myarrbase = 9 Or .MyTypeToBe = 13) Then
                             NullObject
                             Exit Function
                         End If
@@ -2121,7 +2121,7 @@ a1297654:
         'With ppppAny
 contEmptyObject:
             If FastSymbol(b$, ":=", , 2) Then
-                If Not .Arr Then GoTo NotArray1
+                If Not .arr Then GoTo NotArray1
     ' new on rev 20
 contassignhere:
                 If GetData(bstack, b$, myobject) Then
@@ -2531,7 +2531,7 @@ If Not bstack.lastobj Is Nothing Then
 EguFirst:
 
     If IsObjGroup(bstack.lastobj) Then
-        If bstack.lastobj.IamApointer Or Not ppppAny.Arr Then
+        If bstack.lastobj.IamApointer Or Not ppppAny.arr Then
             If IsObjProp(ppppAny.GroupRef) Then
                 Set myProp = ppppAny.GroupRef
                 myProp.PushIndexes idx
@@ -2565,7 +2565,7 @@ EguFirst:
             Else
                 If Not bstack.lastobj Is Nothing Then
                     If TypeOf bstack.lastobj Is iBoxArray Then
-                        If bstack.lastobj.Arr Then
+                        If bstack.lastobj.arr Then
                             Set ppppAny.item(v) = CopyArray(bstack.lastobj)
                         Else
                             Set ppppAny.item(v) = bstack.lastobj
@@ -2597,7 +2597,7 @@ EguFirst:
         End If
         Set bstack.lastobj = Nothing
      Else
-        If ppppAny.Arr Then
+        If ppppAny.arr Then
             If IsArrayGroup(ppppAny, v) Then
 here12500:
                 If ppppAny.item(v).IamApointer Then
@@ -2635,7 +2635,7 @@ here65654:
             myProp.PushIndexes idx
             myProp.Value = p
             Set myProp = Nothing
-        ElseIf Not ppppAny.Arr Then
+        ElseIf Not ppppAny.arr Then
             If IsmHandler(ppppAny.GroupRef) Then
                 Set usehandler = ppppAny.GroupRef
                 If usehandler.t1 = 1 Then
@@ -2649,6 +2649,9 @@ here65654:
                     Else
                        mylist.Value = p
                     End If
+                ElseIf usehandler.t1 = 5 Then
+                    ReadOnly
+                    GoTo err000
                 End If
             Else
                 NoAssignThere
@@ -2724,7 +2727,7 @@ End Function
 Public Function ExecuteVar(Exec1 As Long, ByVal jumpto As Long, bstack As basetask, W$, b$, v As Long, Lang As Long, VarStat As Boolean, NewStat As Boolean, nchr As Integer, ss$, sss As Long, temphere$, noVarStat As Boolean) As Long
 Dim i As Long, p As Variant, pp As Variant, myobject As Object, ok As Boolean, sw$, sp As Variant, useType As Boolean
 Dim lasttype As Integer, pppp1 As mArray, isglobal As Boolean, usehandler As mHandler, usehandler1 As mHandler, idx As mIndexes, myProp As PropReference
-Dim newid As Boolean, Ar As refArray, ww As Integer, BI As BigInteger, mylist As FastCollection
+Dim newid As Boolean, ar As refArray, ww As Integer, BI As BigInteger, mylist As FastCollection
 Dim ppppAny As iBoxArray, pppp2 As iBoxArray, mTuple As tuple, userGroup As Group
 Const b12345 = vbCr + "'\/:}"
 If jumpto = 9 Then GoTo Case8new
@@ -2759,14 +2762,14 @@ If Left$(b$, 1) = "[" Then
                         WrongType
                       GoTo err000
                 End If
-                Set Ar = var(v)
+                Set ar = var(v)
 st12123434:
-                If Not Ar.MarkTwoDimension Then
+                If Not ar.MarkTwoDimension Then
 st9994:
-                    If Typename$(Ar.Value(0, i)) = "RefArray" Then
-                        Set Ar = Ar.Value(0, i)
+                    If Typename$(ar.Value(0, i)) = "RefArray" Then
+                        Set ar = ar.Value(0, i)
 st3535435:
-                        If Ar.MarkTwoDimension Then
+                        If ar.MarkTwoDimension Then
                             'FastSymbol1 b$, "["
                             Mid$(b$, 1, 1) = " "
                             i = p
@@ -2778,16 +2781,16 @@ st38383:
                                     GoTo entry100101
                                 End If
                             End If
-                        ElseIf Typename$(Ar(0, p)) = "RefArray" Then
+                        ElseIf Typename$(ar(0, p)) = "RefArray" Then
                             
-                            Set Ar = Ar(0, p)
+                            Set ar = ar(0, p)
 st29939:
                             Mid$(b$, 1, 1) = " "
                             If IsExp(bstack, b$, p, , flatobject:=True, nostring:=True) Then
                                 If Not FastSymbol(b$, "]") Then
                                     GoTo syntax
                                 Else
-                                   If Ar.MarkTwoDimension Then
+                                   If ar.MarkTwoDimension Then
                                     GoTo st3535435
                                    Else
                                    If Left$(b$, 1) = "[" Then
@@ -2893,20 +2896,20 @@ forwidearrow:
                 GoTo cont00100203
             End If
             If Typename(var(v)) = "RefArray" Then
-                Set Ar = var(v)
+                Set ar = var(v)
 entry00022:
-                If Ar.MarkTwoDimension And Not ok Then
+                If ar.MarkTwoDimension And Not ok Then
                     GoTo entry00123
                 End If
                 p = Abs(Int(p))
                 sp = i
-                If Ar.vtType(0) = vbObject And ok Then
-                    If Ar.Count > 1 Then
+                If ar.vtType(0) = vbObject And ok Then
+                    If ar.Count > 1 Then
                     
-                    ElseIf Ar(0, sp) Is Nothing Then
+                    ElseIf ar(0, sp) Is Nothing Then
                         GoTo nRefArray
-                    ElseIf TypeOf Ar(0, sp) Is refArray Then
-                        Set Ar = Ar(0, sp)
+                    ElseIf TypeOf ar(0, sp) Is refArray Then
+                        Set ar = ar(0, sp)
                         sp = 0
                         ok = False
                         GoTo entry00022
@@ -2914,20 +2917,20 @@ entry00022:
                         WrongObject
                         GoTo nRefArray
                     End If
-                ElseIf Ar.Count < i Then
+                ElseIf ar.Count < i Then
                         OutOfLimit
                         GoTo nRefArray
-                ElseIf Ar.Count(sp) = 0 Then
+                ElseIf ar.Count(sp) = 0 Then
                         OutOfLimit
                         GoTo nRefArray
-                ElseIf Ar.Count(sp) <= p Then
+                ElseIf ar.Count(sp) <= p Then
                         OutOfLimit
                         GoTo nRefArray
                 End If
                 
-                If myVarType(Ar(sp, p), vbObject) Then
+                If myVarType(ar(sp, p), vbObject) Then
                 
-                Set pp = Ar(sp, p)
+                Set pp = ar(sp, p)
                 If pp Is Nothing Then
                     NoOperatorForThatObject "=>"
                 ElseIf TypeOf pp Is Group Then
@@ -2947,14 +2950,14 @@ entry00022:
                                     End If
                                     Dim pp1 As ppppLight
                                     Set pp1 = New ppppLight
-                                    pp1.Arr = False
+                                    pp1.arr = False
                                     Set pp1.GroupRef = myobject
                                   
                                     
                                     
 '                        NoOperatorForThatObject "."
                         If SpeedGroup(bstack, pp1, "", "RefArray", b$, -2&) = 1 Then
-                         Ar(sp, p) = CVar(pp1.GroupRef)
+                         ar(sp, p) = CVar(pp1.GroupRef)
                         GoTo NewCheck
                         Else
                         GoTo err000
@@ -2993,20 +2996,20 @@ entry00022:
             If IsExp(bstack, b$, sp, nostring:=False) Then
             
 entry00101:
-                If Not Ar Is Nothing Then GoTo entry00122
+                If Not ar Is Nothing Then GoTo entry00122
                 If varhash.Find2(here$ + "." + myUcase(W$), v, useType) Then
 entry00121:
                     If Typename(var(v)) = "RefArray" Then
-                        Set Ar = var(v)
+                        Set ar = var(v)
 entry00122:
-                        If Ar.MarkTwoDimension And Not ok Then
-                        If Ar.emtype = vbVariant Then ' vtType(0)
+                        If ar.MarkTwoDimension And Not ok Then
+                        If ar.emtype = vbVariant Then ' vtType(0)
                         If Not bstack.lastobj Is Nothing Then
                         If TypeOf bstack.lastobj Is refArray Then
-                        If Not bstack.lastobj Is Ar Then
+                        If Not bstack.lastobj Is ar Then
                             If ww = 8 Then
                             
-                             Ar(p) = CVar(bstack.lastobj)
+                             ar(p) = CVar(bstack.lastobj)
                                 Set bstack.lastobj = Nothing
                                         While FastSymbol(b$, ",")
                                         If Not IsExp(bstack, b$, sp) Then
@@ -3014,7 +3017,7 @@ entry00122:
                                             GoTo err000
                                         End If
                                         p = p + 1
-                                        Ar(p) = CVar(bstack.lastobj)
+                                        ar(p) = CVar(bstack.lastobj)
                                         Set bstack.lastobj = Nothing
                                         Wend
                             GoTo NewCheck
@@ -3030,15 +3033,15 @@ entry00123:
                         
                             p = Abs(Int(p))
                             
-                            If Ar.IsInnerRefArray(i, Ar) Then
+                            If ar.IsInnerRefArray(i, ar) Then
                                 i = 0
                                 ok = False
                                 GoTo entry00122
                             End If
-                            If (Ar.emtype = vbObject) And ok Then
-                                If Ar.Count > 1 Then
+                            If (ar.emtype = vbObject) And ok Then
+                                If ar.Count > 1 Then
                                                                 
-                                If Ar.Count(CVar(i)) = 0 Then
+                                If ar.Count(CVar(i)) = 0 Then
                                     Set sp = bstack.lastobj
                                     Set bstack.lastobj = Nothing
                                     GoTo count0
@@ -3046,10 +3049,10 @@ entry00123:
                                 
                                 GoTo takeitnow
                                 
-                                ElseIf Ar(0, CVar(i)) Is Nothing Then
+                                ElseIf ar(0, CVar(i)) Is Nothing Then
                                 ' error for [ ]
                                 If Not bstack.lastobj Is Nothing Then
-                                If Ar.Count(CVar(i)) = 0 Then
+                                If ar.Count(CVar(i)) = 0 Then
                                     Set sp = bstack.lastobj
                                     Set bstack.lastobj = Nothing
                                     GoTo count0
@@ -3060,8 +3063,8 @@ nRefArray:
                                     ExpRefArray i
                                     GoTo cont00100203
                                 End If
-                                ElseIf TypeOf Ar(0, CVar(i)) Is refArray Then
-                                    Set Ar = Ar(0, CVar(i))
+                                ElseIf TypeOf ar(0, CVar(i)) Is refArray Then
+                                    Set ar = ar(0, CVar(i))
                                     i = 0
                                     ok = False
                                     GoTo entry00122
@@ -3069,23 +3072,23 @@ nRefArray:
                                     WrongObject
                                     GoTo nRefArray
                                 End If
-                            ElseIf Ar.Count(CVar(i)) = 0 Then
+                            ElseIf ar.Count(CVar(i)) = 0 Then
 count0:
                                 
-                                Ar.DefArrayAt i, Ar.vtType(0), CLng(p)
+                                ar.DefArrayAt i, ar.vtType(0), CLng(p)
                                 ' if ar.vtType(0)=vbstring  ......... check for string
                                 Select Case ww
                                 Case 0
-                                Ar(CVar(i), p) = True
+                                ar(CVar(i), p) = True
                                 Case 8, 4, 18, 14
-                                Ar(CVar(i), p) = sp
+                                ar(CVar(i), p) = sp
                                 GoTo st9993993
                                 
                                 Case 5
                                     If myVarType(sp, vbString) Then
-                                        Ar(CVar(i), p) = sp
+                                        ar(CVar(i), p) = sp
                                     Else
-                                        Ar(CVar(i), p) = -sp
+                                        ar(CVar(i), p) = -sp
                                     End If
                                 End Select
                             Else
@@ -3095,7 +3098,7 @@ takeitnow:
                                     If ww <> 8 Then
                                         If ww = -100 Then
                                         If bstack.IsObjectRef(myobject) Then
-                                            Ar(CVar(i), p) = CVar(myobject)
+                                            ar(CVar(i), p) = CVar(myobject)
                                             GoTo NewCheck2
                                         End If
                                         Else
@@ -3125,12 +3128,12 @@ takeitnow:
                                                ' Set sp = Nothing
                                                ' End If
                                         ElseIf TypeOf bstack.lastobj Is BigInteger Then
-                                            If Ar.emtype = 201 Then
+                                            If ar.emtype = 201 Then
                                                 GoTo is201
                                             End If
                                             Set sp = bstack.lastobj
                                             Set bstack.lastobj = Nothing
-                                            Ar(CVar(i), p) = CopyBigInteger(sp)
+                                            ar(CVar(i), p) = CopyBigInteger(sp)
                                             Set sp = Nothing
                                             While FastSymbol(b$, ",")
                                             If Not IsExp(bstack, b$, sp) Then
@@ -3148,14 +3151,14 @@ takeitnow:
                                                 WrongType
                                                 GoTo err000
                                             End If
-                                            Ar(CVar(i), p) = CopyBigInteger(sp)
+                                            ar(CVar(i), p) = CopyBigInteger(sp)
                                             Set sp = Nothing
                                             Wend
                                             
                                             GoTo cont11100329
                                         End If
                                     ' check this
-                                        Ar(CVar(i), p) = CVar(bstack.lastobj)
+                                        ar(CVar(i), p) = CVar(bstack.lastobj)
                                         Set bstack.lastobj = Nothing
                                         While FastSymbol(b$, ",")
                                         If Not IsExp(bstack, b$, sp) Then
@@ -3163,26 +3166,26 @@ takeitnow:
                                             GoTo err000
                                         End If
                                         p = p + 1
-                                        Ar(CVar(i), p) = CVar(bstack.lastobj)
+                                        ar(CVar(i), p) = CVar(bstack.lastobj)
                                         Set bstack.lastobj = Nothing
                                         Wend
                                         
                                     End If
 cont11100329:
                                 Else
-                                    If Ar.emtype = 201 Then
+                                    If ar.emtype = 201 Then
 is201:
                                         Do
                                         
-                                        If p >= Ar.Count(CVar(i)) Then
+                                        If p >= ar.Count(CVar(i)) Then
                                         Set BI = CopyBigInteger(ZeroBig)
                                         Else
-                                        Set BI = CopyBigInteger(Ar.Value(CVar(i), p))
+                                        Set BI = CopyBigInteger(ar.Value(CVar(i), p))
                                         End If
                                         If Not bigintOperationsRef(bstack, b$, sp, BI, ww) Then
                                             GoTo err000
                                         End If
-                                        Ar.Value(CVar(i), p) = BI
+                                        ar.Value(CVar(i), p) = BI
                                         If ww <> 8 Then Exit Do
                                         If Not FastSymbol(b$, ",") Then Exit Do
                                         If Not IsExp(bstack, b$, sp, , flatobject:=True) Then
@@ -3195,19 +3198,19 @@ is201:
                                     Select Case ww
                                     Case -100
                                     
-                                    If Ar.vtType(CVar(i), p) = 36 Then
+                                    If ar.vtType(CVar(i), p) = 36 Then
                                     If bstack.IsAny(sp) Then
                                     If FastSymbol(b$, "|") Then
                                     
                                         ww = IsLabel(bstack, b$, ss$)
                                         If ww = 1 Then
-                                        Ar.PlaceValue2UDT i, p, ss$, sp
+                                        ar.PlaceValue2UDT i, p, ss$, sp
                                         GoTo thatsall
                                         ElseIf ww = 5 Then
                                         ww = p
                                         If IsExp(bstack, b$, p, , flatobject:=True) Then
                                         If FastSymbol(b$, ")") Then
-                                            Ar.PlaceValue2UDT i, ww, ss$, sp, p
+                                            ar.PlaceValue2UDT i, ww, ss$, sp, p
                                             GoTo thatsall
                                             End If
                                         End If
@@ -3219,25 +3222,25 @@ is201:
 
                                     End If
                                     If bstack.IsNumber(sp) Then
-                                    Ar(CVar(i), p) = sp
+                                    ar(CVar(i), p) = sp
                                     ElseIf bstack.IsString(sw$) Then
-                                    Ar(CVar(i), p) = CVar(sw$)
+                                    ar(CVar(i), p) = CVar(sw$)
                                     ElseIf bstack.IsObjectRef(myobject) Then
-                                    Ar(CVar(i), p) = CVar(myobject)
+                                    ar(CVar(i), p) = CVar(myobject)
                                     End If
 
                                     Case 0:
-                                    Ar(CVar(i), p) = Ar(CVar(i), p) = 0
-                                    Case 1: Ar(CVar(i), p) = Ar(CVar(i), p) + 1
-                                    Case 2: Ar(CVar(i), p) = Ar(CVar(i), p) - 1
-                                    Case 3: Ar(CVar(i), p) = -Ar(CVar(i), p)
-                                    Case 4: Ar(CVar(i), p) = Ar(CVar(i), p) + sp
-                                    Case 5: Ar(CVar(i), p) = Ar(CVar(i), p) - sp
-                                    Case 6: Ar(CVar(i), p) = Ar(CVar(i), p) * sp
-                                    Case 7: Ar(CVar(i), p) = Ar(CVar(i), p) / sp
+                                    ar(CVar(i), p) = ar(CVar(i), p) = 0
+                                    Case 1: ar(CVar(i), p) = ar(CVar(i), p) + 1
+                                    Case 2: ar(CVar(i), p) = ar(CVar(i), p) - 1
+                                    Case 3: ar(CVar(i), p) = -ar(CVar(i), p)
+                                    Case 4: ar(CVar(i), p) = ar(CVar(i), p) + sp
+                                    Case 5: ar(CVar(i), p) = ar(CVar(i), p) - sp
+                                    Case 6: ar(CVar(i), p) = ar(CVar(i), p) * sp
+                                    Case 7: ar(CVar(i), p) = ar(CVar(i), p) / sp
                                     Case 8
                                     
-                                    Ar(CVar(i), p) = sp
+                                    ar(CVar(i), p) = sp
 st9993993:
                                     
                                     While FastSymbol(b$, ",")
@@ -3251,7 +3254,7 @@ st9993993:
                                         End If
                                     End If
                                     p = p + 1
-                                    Ar(CVar(i), p) = sp
+                                    ar(CVar(i), p) = sp
                                     Wend
                                     Case 9:
                                         ww = IsLabel(bstack, b$, ss$)
@@ -3268,16 +3271,16 @@ st9993993:
                                       
                                         End If
                                         End If
-                                        Ar.PlaceValue2UDT i, p, ss$, sp
+                                        ar.PlaceValue2UDT i, p, ss$, sp
                                         Else
                                         
-                                        v = Ar(CVar(i), p)
+                                        v = ar(CVar(i), p)
                                         If IsExp(bstack, b$, sp) Then
                                             If Not readvarv(v, ss$, sp) Then
                                                 ExecuteVar = 0
                                                 Exit Function
                                             End If
-                                            Ar(CVar(i), p) = v
+                                            ar(CVar(i), p) = v
                                         End If
                                    
                                         '
@@ -3298,14 +3301,14 @@ st9993993:
                                                       
                                                         End If
                                                     End If
-                                                Ar.PlaceValue2UDT i, p, ss$, sp, CVar(ww)
+                                                ar.PlaceValue2UDT i, p, ss$, sp, CVar(ww)
                                                 End If
                                             End If
                                         End If
                                     End If
-                                    Case 14: Ar(CVar(i), p) = Ar(CVar(i), p) + sp
+                                    Case 14: ar(CVar(i), p) = ar(CVar(i), p) + sp
                                     Case 18
-                                    Ar(CVar(i), p) = sp
+                                    ar(CVar(i), p) = sp
                                     While FastSymbol(b$, ",")
                                     If Not IsExp(bstack, b$, sp, , flatobject:=True) Then
                                         If IsStrExp(bstack, b$, sw$, False) Then
@@ -3316,16 +3319,16 @@ st9993993:
                                         End If
                                     End If
                                     p = p + 1
-                                    Ar(CVar(i), p) = sp
+                                    ar(CVar(i), p) = sp
                                     Wend
                                     End Select
                                 End If
                                 End If
                             End If
-                            Select Case Ar.AssignError
+                            Select Case ar.AssignError
                             Case 6
                                
-                                OverflowValue VarType(Ar(i, p))
+                                OverflowValue VarType(ar(i, p))
                                 GoTo err000
                             Case 0
                             Case Else
@@ -3402,7 +3405,7 @@ End Function
 Public Function ExecuteVar7(Exec1 As Long, bstack As basetask, W$, b$, v As Long, Lang As Long, VarStat As Boolean, NewStat As Boolean, nchr As Integer, ss$, sss As Long, temphere$, noVarStat As Boolean) As Long
 Dim i As Long, p As Variant, myobject As Object, ok As Boolean, sw$, sp As Variant, useType As Boolean
 Dim lasttype As Integer, pppp1 As mArray, isglobal As Boolean, usehandler As mHandler, usehandler1 As mHandler, idx As mIndexes, myProp As PropReference
-Dim newid As Boolean, Ar As refArray, ww As Integer, BI As BigInteger, mylist As FastCollection
+Dim newid As Boolean, ar As refArray, ww As Integer, BI As BigInteger, mylist As FastCollection
 Dim ppppAny As iBoxArray, pppp2 As iBoxArray, mTuple As tuple
 Const b12345 = vbCr + "'\/:}"
 If AscW(W$) = 46 Then
@@ -3432,7 +3435,7 @@ If neoGetArray(bstack, W$, ppppAny) Then
 againintarr:
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
-If IsArrayArray(ppppAny, v) And ppppAny.Arr Then
+If IsArrayArray(ppppAny, v) And ppppAny.arr Then
 If FastSymbol(b$, "(") Then
 Set ppppAny = ppppAny.item(v)
 GoTo againintarr
@@ -3522,7 +3525,7 @@ End If
     If Not IsExp(bstack, b$, p) Then MissNumExpr: GoTo err000
     If Not bstack.lastobj Is Nothing Then
         If IsobjArray(bstack.lastobj) Then
-            If bstack.lastobj.Arr Then
+            If bstack.lastobj.arr Then
                 Set ppppAny.item(v) = CopyArray(bstack.lastobj)
             Else
                 Set ppppAny.item(v) = bstack.lastobj
@@ -3621,7 +3624,7 @@ MakeArray bstack, W$, 6, b$, ppppAny, NewStat, VarStat
         sss = Len(b$): ExecuteVar6 = 4: Exit Function
 End If
 If neoGetArray(bstack, W$, ppppAny, , , , True) Then
-    If Not ppppAny.Arr Then
+    If Not ppppAny.arr Then
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , , idx) Then GoTo err000
 
 GoTo there12567
@@ -3703,7 +3706,7 @@ NotArray1:
                 Else
             Set pppp1 = New mArray: pppp1.PushDim (1): pppp1.PushEnd
             pppp1.SerialItem 0, 2, 9
-            pppp1.Arr = True
+            pppp1.arr = True
             If bstack.lastobj Is Nothing Then
                 pppp1.item(0) = vbNullString
             Else
@@ -3726,7 +3729,7 @@ againstrarr:
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
 there12567:
-    If ppppAny.Arr Then
+    If ppppAny.arr Then
         If IsArrayArray(ppppAny, v) Then
             If FastSymbol(b$, "(") Then
                 Set ppppAny = ppppAny.item(v)
@@ -3769,7 +3772,7 @@ checkpar:
         If Not TypeOf ppppAny Is mArray Then
             GoTo WrongObj
         End If
-        If ppppAny.Arr Then
+        If ppppAny.arr Then
             If FastSymbol(b$, ":=", , 2) Then
                 If GetData(bstack, b$, myobject) Then
                     FeedArray ppppAny, v, myobject
@@ -3886,14 +3889,14 @@ jmp1112:
     ElseIf Not MyIsObject(ppppAny.item(v)) Then
     
     If TypeOf ppppAny Is mArray Then
-        If ppppAny.Arr Then
+        If ppppAny.arr Then
             If ppppAny.Count = 0 Then
                 ppppAny.GroupRef.Value = ss$
             ElseIf bstack.lastobj Is Nothing Then
                 ppppAny.ItemStr(v) = ss$
             Else
                 If IsobjArray(bstack.lastobj) Then
-                    If bstack.lastobj.Arr Then
+                    If bstack.lastobj.arr Then
                         Set ppppAny.item(v) = CopyArray(bstack.lastobj)
                     Else
                         Set ppppAny.item(v) = bstack.lastobj.GroupRef
@@ -4692,7 +4695,7 @@ End Function
 Public Function ExecuteVar1(Exec1 As Long, bstack As basetask, W$, b$, v As Long, Lang As Long, VarStat As Boolean, NewStat As Boolean, nchr As Integer, ss$, sss As Long, temphere$, noVarStat As Boolean) As Long
 Dim i As Long, p As Variant, myobject As Object, ok As Boolean, sw$, sp As Variant, useType As Boolean
 Dim lasttype As Integer, pppp1 As mArray, isglobal As Boolean, usehandler As mHandler, usehandler1 As mHandler
-Dim newid As Boolean, Ar As refArray, ww As Integer, BI As BigInteger, Enum1 As Enumeration
+Dim newid As Boolean, ar As refArray, ww As Integer, BI As BigInteger, Enum1 As Enumeration
 Dim pppp2 As iBoxArray, mTuple As tuple
 
 Const b12345 = vbCr + "'\/:}"
@@ -4762,6 +4765,7 @@ checkplease2:
                     GoTo noisnotAclass
                 End If
 cont12987:
+                
                 If Not AddGroupFromClass(bstack, b$, W$, False, NewStat, temphere$) Then
                     Exec1 = 0: ExecuteVar1 = 11
                     Exit Function
@@ -5368,14 +5372,14 @@ misnum:                         MissNumExpr
                             End If
                             Set myobject = Nothing
                         ElseIf TypeOf var(v) Is refArray Then
-                            Set Ar = var(v)
+                            Set ar = var(v)
                             Set myobject = p
                             If Not CheckAnyArray(myobject) Then
                                 GoTo WrongObj
                             End If
                             Set p = myobject
                             Set myobject = Nothing
-                            If Not fixAr(Ar, p, v) Then GoTo WrongObj
+                            If Not fixAr(ar, p, v) Then GoTo WrongObj
                         Else
                             GoTo WrongObj
                         End If
@@ -6006,6 +6010,13 @@ checkobject1:
                                 Set myobject = usehandler
                                 Set usehandler = Nothing
                                 bstack.SetVarobJ W$, myobject
+                            ElseIf usehandler.t1 = 5 Then
+                                Set usehandler = New mHandler
+                                usehandler.t1 = 5
+                                Set usehandler.objref = myobject
+                                Set myobject = usehandler
+                                Set usehandler = Nothing
+                                bstack.SetVarobJ W$, myobject
                             ElseIf usehandler.t1 = 3 Then
                                 bstack.SetVarobJ W$, myobject
                             ElseIf usehandler.t1 = 4 Then
@@ -6245,15 +6256,15 @@ End Sub
 
 Private Function MyTrimLi(s$, l As Long) As Long
 Dim i&
-Dim p2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, p1 As Integer, p4 As Long
  If l > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
  If l <= 0 Then MyTrimLi = 1: Exit Function
   l = l - 1
   i = Len(s)
   p2 = StrPtr(s) + l * 2:  p4 = p2 + i * 2
   For i = p2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 9
     Case Else
      MyTrimLi = (i - p2) \ 2 + 1 + l
@@ -6469,7 +6480,7 @@ Function MyRead(jump As Long, bstack As basetask, rest$, Lang As Long, Optional 
 Dim pp, ps As mStiva, bs As basetask, f As Boolean, ohere$, par As Boolean, flag As Boolean, flag2 As Boolean, ok As Boolean
 Dim s$, ss$, pa$, x1 As Long, y1 As Long, i As Long, myobject As Object, it As Long, useoptionals As Boolean, optlocal As Boolean
 Dim M As mStiva, checktype As Boolean, allowglobals As Boolean, isAglobal As Boolean, look As Boolean, ByPass As Boolean
-Dim usehandler As mHandler, ff As Long, usehandler1 As mHandler, Ar As refArray, jumpAs As Boolean, udt As Boolean, Mark As Long, cv As Constant
+Dim usehandler As mHandler, ff As Long, usehandler1 As mHandler, ar As refArray, jumpAs As Boolean, udt As Boolean, Mark As Long, cv As Constant
 Const mHdlr = "mHandler"
 Const mGroup = "Group"
 Const myArray = "mArray"
@@ -6638,9 +6649,9 @@ Case 1
             ElseIf x1 = 1 And CheckAnyArray(myobject) Then
                 ' ar
                 If IsRefArray(var(i)) Then
-                    Set Ar = var(i)
+                    Set ar = var(i)
                     Set p = myobject
-                    If Not fixAr(Ar, p, i) Then GoTo er103
+                    If Not fixAr(ar, p, i) Then GoTo er103
                     Set p = Nothing
                     Set myobject = Nothing
                 Else
@@ -6898,7 +6909,7 @@ Case 5, 7
                     Set ppppl.item(it) = myobject
                     Set myobject = Nothing
                 ElseIf TypeOf myobject Is iBoxArray Then
-                    If myobject.Arr Then
+                    If myobject.arr Then
                         Set ppppl.item(it) = CopyArray(myobject)
                     Else
                         Set ppppl.item(it) = myobject
@@ -6969,7 +6980,7 @@ Case 6
                     Set ppppl.item(it) = myobject
                     Set myobject = Nothing
                 ElseIf TypeOf myobject Is iBoxArray Then
-                    If myobject.Arr Then
+                    If myobject.arr Then
                         Set ppppl.item(it) = CopyArray(myobject)
                     Else
                         Set ppppl.item(it) = myobject
@@ -7356,14 +7367,14 @@ checkconstant:
                                     ss$ = "long"
                                 End If
                             End If
-                            Set Ar = var(i)
-                            If LCase(VarTypeName(Ar(0, 0))) <> LCase(ss$) Then
-                                If Ar.vtType(0) = vbVariant And LCase(ss$) = "variant" Then
+                            Set ar = var(i)
+                            If LCase(VarTypeName(ar(0, 0))) <> LCase(ss$) Then
+                                If ar.vtType(0) = vbVariant And LCase(ss$) = "variant" Then
                                 Else
                                     GoTo er103
                                 End If
                             End If
-                            Set Ar = Nothing
+                            Set ar = Nothing
                             GoTo jumpref01
                         End If
                     ElseIf TypeOf var(i) Is BigInteger Then
@@ -7898,7 +7909,7 @@ existAs04:
                                 If TypeOf myobject Is mHandler Then
                                     Set usehandler = myobject
                                     s$ = myUcase(s$)
-                                    If usehandler.t1 = 1 Then
+                                    If usehandler.t1 = 1 Then  ' OK t1=5  ...
                                         ff = 0
                                         If Not Fast2Varl(s$, "йатастасг", 9, "INVENTORY", 9, 9, ff) Then
                                             If usehandler.objref.IsQueue Then
@@ -7917,13 +7928,19 @@ existAs04:
                                             GoTo er103
                                         End If
                                     ElseIf usehandler.t1 = 2 Then
-                                    If Not Fast2Varl(s$, "диаяхяысг", 9, "BUFFER", 6, 9, ff) Then
-                                        If Not usehandler.objref.UseStruct Then
-                                        WrongObject
-                                        ElseIf Not usehandler.objref.structref.Tag = s$ Then
-                                        WrongObject
+                                        If Not Fast2Varl(s$, "диаяхяысг", 9, "BUFFER", 6, 9, ff) Then
+                                            If Not usehandler.objref.UseStruct Then
+                                            WrongObject
+                                            ElseIf Not usehandler.objref.structref.Tag = s$ Then
+                                            WrongObject
+                                            End If
                                         End If
-                                    End If
+                                    ElseIf usehandler.t1 = 5 Then
+                                        If Not Fast2Varl(s$, "долг", 4, "STRUCTURE", 9, 9, ff) Then
+                                            If Not usehandler.objref.structref.Tag = s$ Then
+                                                WrongObject
+                                            End If
+                                        End If
                                     ElseIf usehandler.t1 = 4 Then
                                         WrongObject
                                     Else
@@ -8006,7 +8023,7 @@ cont10101:
                         ff = 1
                         If Fast2Varl(rest$, "ыс", 2, "AS", 2, 2, ff) Then
 existAs08:
-                            If usehandler.t1 = 1 Then
+                            If usehandler.t1 = 1 Then   ' ok for .t1 = 5
                                 If Not Fast2Varl(rest$, "йатастасг", 9, "INVENTORY", 9, 9, ff) Then
                                     If Not Fast2Varl(rest$, "киста", 5, "LIST", 4, 5, ff) Then
                                         If Not Fast2Varl(rest$, "оуяа", 4, "QUEUE", 5, 5, ff) Then
@@ -8045,7 +8062,16 @@ existAs08:
                                     Set usehandler = Nothing
                                     GoTo conthereEnum
                                 End If
+                            ElseIf usehandler.t1 = 5 Then
+                                If Not Fast2Varl(s$, "долг", 4, "STRUCTURE", 9, 9, ff) Then
+                                    If Not FastType(rest$, usehandler.objref.structref.Tag) Then
+                                        WrongObject
+                                        MyRead = False
+                                        Exit Function
+                                    End If
+                                End If
                             End If
+                            
                         End If
                         Set usehandler = Nothing
                         bstack.SetVarobJ what$, myobject
@@ -8299,7 +8325,6 @@ existAs15:
                                         MyRead = False
                                         Exit Function
                                     Else
-                                    
                                         GoTo jump0001233
                                     End If
                                 End If
@@ -8361,10 +8386,17 @@ existAs15:
                                     MyRead = False
                                     Exit Function
                                 End If
+                            ElseIf usehandler1.t1 = 5 Then
+                                If Fast2Varl(rest$, "атупос", 6, "VARIANT", 7, 7, ff) Then
+                                    GoTo jump0001233
+                                ElseIf Not Fast2Varl(rest$, "долг", 4, "STRUCTURE", 9, 9, ff) Then
+                                    WrongObject
+                                    MyRead = False
+                                    Exit Function
+                                End If
                             ElseIf usehandler1.t1 = 4 Then
                                 If FastPureLabel(rest$, s$, , True, , , False) = 1 Then
                                     If Not s$ = myUcase(usehandler1.objref.EnumName, True) Then
-                                        
                                         If GetSub(s$ + "()", i) Then
                                             If sbf(i).IamAClass Then
                                                 GoTo er113
@@ -8379,30 +8411,28 @@ existAs15:
                                             bs.soros.PushObj usehandler1.index_cursor
                                         ElseIf myVarType(usehandler1.index_cursor, vbString) Then
                                             bs.soros.PushStrVariant usehandler1.index_cursor
-                                            
                                         Else
                                             bs.soros.PushVal usehandler1.index_cursor * usehandler1.sign
                                         End If
                                         Set usehandler1 = Nothing
                                         jumpAs = True
                                         GoTo fromEnumDeref
-                                        
                                     Else
                                         FastPureLabel rest$, s$
                                     End If
                                 Else
                                     GoTo er112
                                 End If
-                            If FastSymbol(rest$, "=") Then
-                                ' drop type
-                                If FastPureLabel(rest$, s$, , , True) <> 1 Then
-                                    MyRead = False
-                                    SyntaxError
-                                    Exit Function
+                                If FastSymbol(rest$, "=") Then
+                                    ' drop type
+                                    If FastPureLabel(rest$, s$, , , True) <> 1 Then
+                                        MyRead = False
+                                        SyntaxError
+                                        Exit Function
+                                    End If
                                 End If
                             End If
-                        End If
-                    ElseIf usehandler1.t1 = 4 Then
+                        ElseIf usehandler1.t1 = 4 Then
                         If FastSymbol(rest$, "=") Then
                             If IsEnumLabelOnly(bstack, rest$) Then
                                 Set usehandler = bstack.lastobj
@@ -8519,31 +8549,31 @@ existAs17:
                                     End Select
                                 End If
                                 If Typename(myobject) = "RefArray" Then
-                                    Set Ar = myobject
+                                    Set ar = myobject
                                     x1 = 0
-                                    If Not Ar.vtType(0) = vbVariant Then
+                                    If Not ar.vtType(0) = vbVariant Then
                                     Do
-                                        namesVT Ar.emtype, Ar(0, 0), s$
-                                        If s$ = "RefArray" Then Set Ar = Ar(0, 0): x1 = x1 + 1
+                                        namesVT ar.emtype, ar(0, 0), s$
+                                        If s$ = "RefArray" Then Set ar = ar(0, 0): x1 = x1 + 1
                                     Loop Until s$ <> "RefArray"
                                     End If
                                     '
-                                    s$ = LCase(VarTypeName(Ar(0, 0)))
+                                    s$ = LCase(VarTypeName(ar(0, 0)))
 checkTypeagain:
                                     If s$ <> LCase(ss$) Then
-                                        If Ar.vtType(0) = vbVariant And LCase(ss$) = "variant" Then
+                                        If ar.vtType(0) = vbVariant And LCase(ss$) = "variant" Then
                                         
                                         Else
-                                            If LCase(ss$) = "object" And Ar.vtType(0, 0) = vbObject Then
+                                            If LCase(ss$) = "object" And ar.vtType(0, 0) = vbObject Then
                                                 s$ = "object"
                                                 GoTo checkTypeagain
-                                            ElseIf LCase(ss$) = "tuple" And IsobjArray(Ar(0, 0)) Then
+                                            ElseIf LCase(ss$) = "tuple" And IsobjArray(ar(0, 0)) Then
                                                 s$ = "tuple"
                                                 GoTo checkTypeagain
                                             Else
                                             
                                             If s$ = "mhandler" Then
-                                                Set usehandler = Ar(0, 0)
+                                                Set usehandler = ar(0, 0)
                                                 s$ = LCase(VarTypeName(usehandler.objref))
                                                 While s$ = "mhandler"
                                                     Set usehandler = usehandler.objref
@@ -8561,7 +8591,7 @@ checkTypeagain:
                                     ElseIf y1 = 8 Then
                                         x1 = x1 + 1
                                         If x1 = 0 Then
-                                            If Ar.MarkTwoDimension Then
+                                            If ar.MarkTwoDimension Then
                                                 If Not IsOperator(rest$, "]") Then
                                                     GoTo er103
                                                 End If
@@ -8586,7 +8616,7 @@ checkTypeagain:
                                                 End If
                                                 End If
                                             Wend
-                                            If Ar.MarkTwoDimension Then
+                                            If ar.MarkTwoDimension Then
                                                 If Not IsOperator(rest$, "[]", 2) Then
                                                     GoTo er103
                                                 End If
@@ -8596,7 +8626,7 @@ checkTypeagain:
                                             End If
                                         End If
                                     End If
-                                    Set Ar = Nothing
+                                    Set ar = Nothing
                                     GoTo contsethere
                                 End If
                             Else
@@ -9806,7 +9836,7 @@ a39439494:
                         MyRead = True
                         GoTo loopcont123
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.Arr Then
+                        If myobject.arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -9903,7 +9933,7 @@ a39439494:
                         Set ppppl.item(it) = myobject
                         Set myobject = Nothing
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.Arr Then
+                        If myobject.arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -10349,52 +10379,52 @@ Set myobject2 = mygroup2
 End Sub
 
 
-Private Function fixAr(Ar As refArray, p, v) As Boolean
+Private Function fixAr(ar As refArray, p, v) As Boolean
     Dim pppp As mArray, tttt As tuple
     If TypeOf p Is mArray Then
             Set pppp = p
             If pppp.Count = 0 Then
-                Ar.ResetToType Ar.emtype, 0
-                Ar.UnFlat
+                ar.ResetToType ar.emtype, 0
+                ar.UnFlat
             Else
             p = CVar(pppp.ExportArrayCopy)
             
             If myVarType(p, vbEmpty) Then
-            Set Ar = pppp.ExportArrayCopy
+            Set ar = pppp.ExportArrayCopy
             
             Else
             
-            Ar.writevalue = p
-            Ar.flat = True
-            Ar.RedimForFlat pppp.Count - 1
+            ar.writevalue = p
+            ar.flat = True
+            ar.RedimForFlat pppp.Count - 1
         
             
             End If
-            Ar.UnFlat
-            Set var(v) = Ar
+            ar.UnFlat
+            Set var(v) = ar
             End If
              fixAr = True
     ElseIf TypeOf p Is tuple Then
             Set tttt = p
             If tttt.Count = 0 Then
                 'Ar.ResetToType Ar.vtType(0), 0
-                Ar.ResetToType Ar.emtype, 0
-                Ar.UnFlat
+                ar.ResetToType ar.emtype, 0
+                ar.UnFlat
             Else
             p = CVar(tttt.ExportArrayCopy)
             
             If myVarType(p, vbEmpty) Then
-            Set Ar = tttt.ExportArrayCopy
+            Set ar = tttt.ExportArrayCopy
             
             Else
             
-            Ar.writevalue = p
-            Ar.flat = True
-            Ar.RedimForFlat tttt.Count - 1
+            ar.writevalue = p
+            ar.flat = True
+            ar.RedimForFlat tttt.Count - 1
         
             End If
-            Ar.UnFlat
-            Set var(v) = Ar
+            ar.UnFlat
+            Set var(v) = ar
             End If
         fixAr = True
     End If
