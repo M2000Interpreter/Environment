@@ -95,7 +95,7 @@ Friend Sub ConstructArray(there As GuiM2000, Name$, i As Long)
 End Sub
 Public Property Get Text() As String
 If glistN.listcount = 0 Then
-glistN.additem mprompt
+glistN.AddItem mprompt
 Else
 Text = glistN.list(0)
 End If
@@ -103,7 +103,7 @@ End Property
 Public Property Get vartext() As String
 Attribute vartext.VB_UserMemId = 0
 If glistN.listcount = 0 Then
-glistN.additem ""
+glistN.AddItem ""
 Else
 vartext = Mid$(glistN.list(0), 1 + Len(mprompt))
 End If
@@ -114,7 +114,7 @@ glistN.HeadLine = vbNullString ' no info
 glistN.HeadlineHeight = 0
 
 If glistN.listcount = 0 Then
-glistN.additem mprompt + RHS
+glistN.AddItem mprompt + RHS
 Else
 glistN.list(0) = mprompt + RHS
 End If
@@ -130,7 +130,7 @@ glistN.restrictLines = 1
 glistN.HeadLine = vbNullString ' no info
 glistN.HeadlineHeight = 0
 If glistN.listcount = 0 Then
-glistN.additem RHS
+glistN.AddItem RHS
 Else
 glistN.list(0) = RHS
 End If
@@ -318,7 +318,6 @@ End Sub
 Private Sub glistN_ChangeSelStart(thisselstart As Long)
 If thisselstart <= Len(mprompt) Then thisselstart = Len(mprompt) + 1
 With glistN
-    Debug.Print thisselstart
     .ShowMe2
 End With
 End Sub

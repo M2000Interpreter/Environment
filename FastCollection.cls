@@ -52,13 +52,6 @@ Private AllowSameKey As Boolean
 Private mSortstyle As VbCompareMethod
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-
-' We get this from tlb (see reference)
-Public Type Container
-    struct As Object
-    Offset As Long  ' old ivalue
-    items As Long
-End Type
 Private Type item  ' if you add change swapb (check with lenb() function)
     Key As String
     KeyType As Integer
@@ -181,68 +174,7 @@ Public Sub AddKey(RHS, Optional aValue As Variant)
     End If
 
 End Sub
-Public Property Get StructOffset() As Long
-Dim zz
-'If structLen = 0 Then Stop
-If Index > -1 Then
-    zz = PriveSpace(Index).iValue
-    If VarType(zz) = vbUserDefinedType Then
-        StructOffset = zz.Offset
-    End If
-End If
-End Property
-Public Property Get StructMany() As Long
-Dim zz
-If Index > -1 Then
-    zz = PriveSpace(Index).iValue
-    If VarType(zz) = vbUserDefinedType Then
-        StructMany = zz.items
-    End If
-End If
-End Property
-Public Property Get StructObj() As Object
-Dim zz
-If Index > -1 Then
-    zz = PriveSpace(Index).iValue
-    If VarType(zz) = vbUserDefinedType Then
-        Set StructObj = zz.struct
-    End If
-End If
-End Property
-Friend Sub AddKeyStruct(RHS, Offset As Long, manyitems As Long, obj As Object)
-    Dim mycon As Container, aValue
-    mycon.Offset = Offset
-    mycon.items = manyitems
-    Set mycon.struct = obj
-    Index = -1
-    aValue = CVar(mycon)
-    lastkey = Normalize(RHS)
- 
-    If Len(lastkey) = 0 Then RHS = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = RHS
-    Done = False
-    lasttype = VarType(RHS)
-    If Not IsMissing(aValue) Then
-    
-   
-        If IsObject(aValue) Then
-        Value = -1
-        Set ValueObj = aValue
-        Else
-        Value = aValue
-        End If
-    Else
-        Value = aValue
-        If Index >= 0 Then
-        PriveSpace(Index).KeyType = lasttype
-        Else
-       ' PriveSpace(Index).KeyType = 0 ' invalid
-        End If
-    End If
 
-    
-    
-    
-End Sub
 Public Sub Sort()
 If toplim = -1 Then Exit Sub
 IamBusy = True
@@ -1881,55 +1813,4 @@ If Done Then
     End If
 End If
 End Sub
-Friend Sub AddFive(a As Long, Key As String, KeyType As Integer, iValue As Variant, sValue As Long, firsthash)
-    With PriveSpace(a)
-    .Key = Key
-    If IsObject(iValue) Then
-    Set .iValue = iValue
-    Else
-    .iValue = iValue
-    End If
-    .sValue = sValue
-    .firsthash = firsthash
-    End With
-    toplim = toplim + 1
-End Sub
-Friend Sub CopyCollection(this As FastCollection)
-    Set this = New FastCollection
-    Dim c As Long, D As Long
-    D = 0
-    c = Count
-    this.MakeSpace MaxSpace, mSortstyle
-    While c > D
-        With PriveSpace(D)
-            this.AddFive D, .Key, .KeyType, .iValue, .sValue, .firsthash
-        End With
-        D = D + 1
-    Wend
-    this.ExpandHash
-    ' do not forget to fix Tag outside
-    this.structLen = structLen
-End Sub
-Friend Sub MergeCollection(this As FastCollection, Offset As Long, lasthead$)
-'   we place our data to This collection
-    Dim D As Long, c As Long, b As Long
-    
-    D = this.Count
-    c = Count
-    this.AddMoreSpace c, mSortstyle
-    
-    While b < c
-        With PriveSpace(b)
-            If Not IsNumeric(.iValue) Then
-                Dim a As Container
-                a = .iValue
-                a.Offset = Offset + a.Offset
-                this.AddFive D + b, lasthead$ + .Key, .KeyType, a, .sValue, .firsthash
-            Else
-                this.AddFive D + b, .Key, lasthead$ + .KeyType, Offset + .iValue, .sValue, .firsthash
-            End If
-        End With
-        b = b + 1
-    Wend
-    this.ExpandHash
-End Sub
+

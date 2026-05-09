@@ -2416,7 +2416,7 @@ End If
 End Sub
 
 
-Public Sub additem(a$)
+Public Sub AddItem(a$)
 If Not NoEventInfo Then Exit Sub
 glistN.additemFast a$
 End Sub
@@ -3011,11 +3011,8 @@ If Not acclist Is Nothing Then
             End If
             M = 0
             Exit Sub
-        Else
-        'Debug.Print "NOT ENABLED"
         End If
         Else
-        'Debug.Print "NOT EXIST"
     End If
 End If
 End Sub
