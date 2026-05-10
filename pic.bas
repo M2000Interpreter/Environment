@@ -1,10 +1,10 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Any)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Any)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
 Public Const KEYEVENTF_KEYUP = &H2
 Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
@@ -55,7 +55,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -390,7 +390,7 @@ End Function
 
 Public Function cInt64(p)
     Static maxlonglong, limitlonglong, OneLongLong, OneBigLongLong
-    Dim a, i As Integer
+    Dim a, I As Integer
     If MemInt(VarPtr(maxlonglong)) = 0 Then
         maxlonglong = CDec("18446744073709551616")
         limitlonglong = CDec("9223372036854775808")
@@ -399,8 +399,8 @@ Public Function cInt64(p)
         MemInt(VarPtr(OneBigLongLong)) = 20
         MemByte(VarPtr(OneBigLongLong) + 12) = 1
     End If
-    i = MemInt(VarPtr(p))
-    Select Case i
+    I = MemInt(VarPtr(p))
+    Select Case I
     Case vbDecimal
         a = Fix(p)
         a = a - Int(a / maxlonglong) * maxlonglong
@@ -425,7 +425,7 @@ Public Function cInt64(p)
         While a >= limitlonglong: a = a - maxlonglong: Wend
         End If
         cInt64 = -OneLongLong And a
-        If i = vbString Then
+        If I = vbString Then
             If Left$(p, 1) = "&" And a < 0 Then
             Select Case Len(p)
             Case 10
@@ -872,7 +872,7 @@ If cDibbuffer0.hDIb = 0 Then Exit Function
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim a As Single, b As Single, K As Single, r As Single
+Dim a As Single, b As Single, k As Single, r As Single
 Dim br As Byte, bG As Byte, bbb As Byte ', ba$
 Dim BR1 As Byte, BG1 As Byte, bbb1 As Byte, ppBa As Long
 BR1 = 255 * ((100 - Alpha) / 100#)
@@ -892,14 +892,14 @@ Dim pw As Long, ph As Long
     piw = cDibbuffer0.Width
     pih = cDibbuffer0.Height
     r = Atn(CSng(piw) / CSng(pih)) + Pi / 2#
-     K = Fix(Abs((piw / Cos(r) / 2) * zoomfactor) + 0.5)
+     k = Fix(Abs((piw / Cos(r) / 2) * zoomfactor) + 0.5)
 
 Dim cDIBbuffer1 As Object
  Dim olddpix As Long, olddpiy As Long
  olddpix = cDibbuffer0.dpix
  olddpiy = cDibbuffer0.dpiy
- myw = 2 * K
-myh = 2 * K
+ myw = 2 * k
+myh = 2 * k
 
     pw = cDibbuffer0.Width
     ph = cDibbuffer0.Height
@@ -946,7 +946,7 @@ On Error Resume Next
     pws = pw
     phs = ph
     r = Atn(CSng(myw) / CSng(myh))
-    K = -myw / (2# * Sin(r))
+    k = -myw / (2# * Sin(r))
     
 
        x_step2 = CLng(Fix(Cos(Angle! + Pi / 2) * pw))
@@ -954,8 +954,8 @@ On Error Resume Next
 
     x_step = CLng(Fix(Cos(Angle!) * pw))
     y_step = CLng(Fix(Sin(Angle!) * ph))
-  image_x = CLng(Fix(pw / 2 - Fix(K * Sin(Angle! - r)))) * pw
-   image_y = CLng(Fix(ph / 2 + Fix(K * Cos(Angle! - r)))) * ph
+  image_x = CLng(Fix(pw / 2 - Fix(k * Sin(Angle! - r)))) * pw
+   image_y = CLng(Fix(ph / 2 + Fix(k * Cos(Angle! - r)))) * ph
 Dim pw1out As Long, ph1out As Long, pwOut As Long, phOut As Long, much As Single
 ''Dim cw1 As Long, ch1 As Long, outf As Single, fadex As Long, fadey As Long, outf1 As Single, outf2 As Single
 pw1 = pw1 - 1
@@ -1101,7 +1101,7 @@ Dim tSA2 As SAFEARRAY2D
 
 Public Sub CanvasSize(cDibbuffer0 As cDIBSection, ByVal wcm As Double, ByVal hcm As Double, Optional ByVal rep As Boolean = False, Optional Max As Integer = 0, Optional yshift As Long = 0, Optional bColor As Long = &HFFFFFF, Optional usepixel As Boolean = False, Optional ByVal Percent As Single = 85, Optional ByVal linewidth As Long = 4)
 ' top left align only
-Dim piw As Long, pih As Long, stx As Long, sty As Long, stOffx As Long, stOffy As Long, stBorderX As Long, stBorderY As Long, strx As Long, stry As Long, i As Long, j As Long
+Dim piw As Long, pih As Long, stx As Long, sty As Long, stOffx As Long, stOffy As Long, stBorderX As Long, stBorderY As Long, strx As Long, stry As Long, I As Long, j As Long
 
 Dim cDIBbuffer1 As New cDIBSection
 If Not usepixel Then
@@ -1128,14 +1128,14 @@ If cDIBbuffer1.create(piw, pih) Then
        sty = stBorderY
                 For j = 1 To stry
                 stx = stBorderX
-                             For i = 1 To strx
+                             For I = 1 To strx
                            
                             If Max = 0 Then Exit For
                             cDibbuffer0.PaintPicture cDIBbuffer1.HDC1, stx, sty + yshift
                             Max = Max - 1
                                stx = stx + cDibbuffer0.Width + stBorderX
                            
-                            Next i
+                            Next I
                  If Max = 0 Then Exit For
                    sty = sty + cDibbuffer0.Height + stBorderY
                 Next j
@@ -1159,7 +1159,7 @@ Public Sub RotateDibNew(cDibbuffer0 As cDIBSection, Optional ByVal Angle! = 0, _
         Optional ByVal zoomfactor As Single = 1, Optional bckColor As Long = &HFFFFFF)
 Const Pi = 3.14159!
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim K As Single, r As Single
+Dim k As Single, r As Single
 Dim br As Byte, bG As Byte, bbb As Byte, ppBa As Long
 Dim bDib() As Byte, bDib1() As Byte
 Dim tSA As SAFEARRAY2D
@@ -1189,7 +1189,7 @@ GetMem1 ppBa + 2, br
 piw = cDibbuffer0.Width
 pih = cDibbuffer0.Height
 r = Atn(piw / pih) + Pi / 2!
-K = Abs((piw / Cos(r) / 2!) * zoomfactor)
+k = Abs((piw / Cos(r) / 2!) * zoomfactor)
 Dim cDIBbuffer1 As Object
 Set cDIBbuffer1 = New cDIBSection
 If piw <= 1 Then piw = 2
@@ -1199,8 +1199,8 @@ cDIBbuffer1.GetDpiDIB cDibbuffer0
 cDibbuffer0.needHDC
 cDIBbuffer1.LoadPictureStretchBlt cDibbuffer0.HDC1, , , , , pix, piy, piw, pih
 cDibbuffer0.FreeHDC
-myw = Fix(2 * K)
-myh = Fix(2 * K)
+myw = Fix(2 * k)
+myh = Fix(2 * k)
 cDibbuffer0.ClearUp
 If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
     On Error Resume Next
@@ -1232,7 +1232,7 @@ If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
     ph = cDIBbuffer1.Height
 
     r = Atn(CSng(myw) / CSng(myh))
-    K = -CSng(myw) / (2! * Sin(r))
+    k = -CSng(myw) / (2! * Sin(r))
   
     Const pidicv2 = 1.570795!
     pw1 = pw + 1
@@ -1240,8 +1240,8 @@ If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
    
     pws = pw1 * zoomfactor
     phs = ph1 * zoomfactor
-    image_x = ((pws - zoomfactor - b) / 2 - (K * Sin(Angle! - r))) * pw
-    image_y = ((phs - zoomfactor - b) / 2 + (K * Cos(Angle! - r))) * ph
+    image_x = ((pws - zoomfactor - b) / 2 - (k * Sin(Angle! - r))) * pw
+    image_y = ((phs - zoomfactor - b) / 2 + (k * Cos(Angle! - r))) * ph
     image_x = image_x - MyMod(image_x, CSng(dv15))
     image_y = image_y - MyMod(image_y, CSng(dv15))
    
@@ -1390,7 +1390,7 @@ End If
 
 
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim K As Single, r As Single, ppBa As Long
+Dim k As Single, r As Single, ppBa As Long
 Dim br As Byte, bG As Byte, bbb As Byte, ba$
 Dim BR1 As Byte, BG1 As Byte, bbb1 As Byte
 ppBa = VarPtr(bckColor)
@@ -1463,15 +1463,15 @@ Dim tSA2 As SAFEARRAY2D
     phs = ph * zoomfactor
     
     r = Atn(CSng(myw) / CSng(myh))
-    K = -CSng(myw) / (2! * Sin(r))
+    k = -CSng(myw) / (2! * Sin(r))
     
     x_step = Cos(Angle!) * pw
     y_step = Sin(Angle!) * ph
 
     x_step2 = Cos(Angle! + pidicv2) * pw
     y_step2 = Sin(Angle! + pidicv2) * ph
-  image_x = ((pws - b) / 2 - (K * Sin(Angle! - r))) * pw
-   image_y = ((phs - b) / 2 + (K * Cos(Angle! - r))) * ph
+  image_x = ((pws - b) / 2 - (k * Sin(Angle! - r))) * pw
+   image_y = ((phs - b) / 2 + (k * Cos(Angle! - r))) * ph
       image_x = image_x - MyMod(image_x, CSng(dv15))
    image_y = image_y - MyMod(image_y, CSng(dv15))
   pws = pws + 1
@@ -1585,7 +1585,7 @@ Angle! = -MyMod(Angle!, 360!) * 1.745329E-02!
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100!
 Dim myw As Single, myh As Single, piw As Long, pih As Long, pix As Long, piy As Long
-Dim K As Single, r As Single, scNow As Integer
+Dim k As Single, r As Single, scNow As Integer
 Const pidicv2 = 1.570795!
 'If zoomfactor = 1 And angle! = 0 Then Exit Function
     piw = cDibbuffer0.Width
@@ -1657,7 +1657,7 @@ Dim tSA2 As SAFEARRAY2D
      pw = piw
     ph = pih
     r = Atn(CSng(myw) / CSng(myh))
-    K = -myw / (2! * Sin(r))
+    k = -myw / (2! * Sin(r))
   
     Dim pw1 As Long, ph1 As Long
     
@@ -1668,8 +1668,8 @@ Dim tSA2 As SAFEARRAY2D
    
          pws = pw1 * zoomfactor
     phs = ph1 * zoomfactor
-  image_x = ((pws - zoomfactor - b) / 2 - (K * Sin(Angle! - r))) * pw
-   image_y = ((phs - zoomfactor - b) / 2 + (K * Cos(Angle! - r))) * ph
+  image_x = ((pws - zoomfactor - b) / 2 - (k * Sin(Angle! - r))) * pw
+   image_y = ((phs - zoomfactor - b) / 2 + (k * Cos(Angle! - r))) * ph
    image_x = image_x - MyMod(image_x, CSng(dv15))
    image_y = image_y - MyMod(image_y, CSng(dv15))
    x_step2 = Cos(Angle! + pidicv2) * pw
@@ -1747,13 +1747,13 @@ Public Function CmpHeight(s As Single) As Single
 CmpHeight = s * 20#
 End Function
 Public Function FindSpriteByTag(sp As Long) As Long
-Dim i As Long
-For i = 0 To PobjNum
-If val("0" & Form1.dSprite(i).Tag) = sp Then
-FindSpriteByTag = i
+Dim I As Long
+For I = 0 To PobjNum
+If val("0" & Form1.dSprite(I).Tag) = sp Then
+FindSpriteByTag = I
 Exit For
 End If
-Next i
+Next I
 End Function
 Sub RsetRegion(ob As Control)
 With ob
@@ -1762,12 +1762,12 @@ Call SetWindowRgn(.hWnd, (0), False)
 End With
 End Sub
 Public Function RotateRegion(hRgn As Long, Angle As Single, ByVal piw As Long, ByVal pih As Long, ByVal Size As Single) As Long
-Dim K As Single, r As Single, aa As Single
+Dim k As Single, r As Single, aa As Single
 aa = (CLng(Angle! * 100) Mod 36000) / 100
 
 Angle! = -Angle * 1.74532925199433E-02
    r = Atn(piw / CSng(pih)) + Pi / 2!
-    K = piw / Cos(r)
+    k = piw / Cos(r)
     Dim myw As Long, myh As Long
  myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * Size, 0)
 myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * Size, 0)
@@ -1780,10 +1780,10 @@ hRgn = ScaleRegion(hRgn, Size)
     uXF.eM12 = Sin(Angle!)
     uXF.eM21 = -Sin(Angle!)
     uXF.eM22 = Cos(Angle!)
-K = Abs(K)
+k = Abs(k)
 
-uXF.eDx = Round(K * Cos(Angle! - r) / 2! + K / 2!, 0)
-uXF.eDy = Round(K * Sin(Angle! - r) / 2! + K / 2!, 0)
+uXF.eDx = Round(k * Cos(Angle! - r) / 2! + k / 2!, 0)
+uXF.eDy = Round(k * Sin(Angle! - r) / 2! + k / 2!, 0)
 
 
     rSize = GetRegionData(hRgn, rSize, ByVal 0&)
@@ -1894,45 +1894,45 @@ SetText Form1.dSprite(PobjNum)
 End If
 
 End If
-Dim i As Long, K As Integer
+Dim I As Long, k As Integer
 
-For i = Priority To 32
-K = FindSpriteByTag(i)
-If K <> 0 Then Form1.dSprite(K).ZOrder 0
-Next i
+For I = Priority To 32
+k = FindSpriteByTag(I)
+If k <> 0 Then Form1.dSprite(k).ZOrder 0
+Next I
 
 
 End Function
 Function CollidePlayers(Priority As Long, Percent As Long) As Long
-Dim i As Long, K As Integer, suma As Long
+Dim I As Long, k As Integer, suma As Long
 Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, it As Long
-K = FindSpriteByTag(Priority)
-If K = 0 Then Exit Function
-With Form1.dSprite(K)
+k = FindSpriteByTag(Priority)
+If k = 0 Then Exit Function
+With Form1.dSprite(k)
 it = val("0" & .Tag)
 x1 = .Left + .Width * (100 - Percent) / 200 - players(it).HotSpotX
 y1 = .Top + .Height * (100 - Percent) / 200 - players(it).HotSpotY
 x2 = .Left + .Width * (1 - (100 - Percent) / 200) - players(it).HotSpotX
 y2 = .Top + .Height * (1 - (100 - Percent) / 200) - players(it).HotSpotY
 End With
-For i = Priority - 1 To 1 Step -1
-K = FindSpriteByTag(i)
-If K <> 0 Then
-    With Form1.dSprite(K)
+For I = Priority - 1 To 1 Step -1
+k = FindSpriteByTag(I)
+If k <> 0 Then
+    With Form1.dSprite(k)
         If (x2 < .Left + .Width / 4) Or (x1 >= .Left + .Width * 3 / 4) Or (y2 <= .Top + .Height / 4) Or (y1 > .Top + .Height * 3 / 4) Then
         Else
-        suma = suma + 2 ^ (i - 1)
+        suma = suma + 2 ^ (I - 1)
         End If
     End With
 End If
-Next i
+Next I
 CollidePlayers = suma
 End Function
 Function SpriteVisible(Priority As Long) As Boolean
-Dim K As Long
-    K = FindSpriteByTag(Priority)
-    If K = 0 Then Exit Function
-    SpriteVisible = Form1.dSprite(K).Visible
+Dim k As Long
+    k = FindSpriteByTag(Priority)
+    If k = 0 Then Exit Function
+    SpriteVisible = Form1.dSprite(k).Visible
 End Function
 Function CollideArea(Priority As Long, Percent As Long, basestack As basetask, rest$) As Boolean
 ' nx2 isn't width but absolute line at nx2
@@ -1952,13 +1952,13 @@ End If
 End If
 
 
-Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, K As Long
-K = FindSpriteByTag(Priority)
-If K = 0 Then Exit Function
-x1 = Form1.dSprite(K).Left + Form1.dSprite(K).Width * (100 - Percent) / 200
-y1 = Form1.dSprite(K).Top + Form1.dSprite(K).Height * (100 - Percent) / 200
-x2 = x1 + Form1.dSprite(K).Width * (1 - 2 * (100 - Percent) / 200)
-y2 = y1 + Form1.dSprite(K).Height * (1 - 2 * (100 - Percent) / 200)
+Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, k As Long
+k = FindSpriteByTag(Priority)
+If k = 0 Then Exit Function
+x1 = Form1.dSprite(k).Left + Form1.dSprite(k).Width * (100 - Percent) / 200
+y1 = Form1.dSprite(k).Top + Form1.dSprite(k).Height * (100 - Percent) / 200
+x2 = x1 + Form1.dSprite(k).Width * (1 - 2 * (100 - Percent) / 200)
+y2 = y1 + Form1.dSprite(k).Height * (1 - 2 * (100 - Percent) / 200)
 If x2 < nx1 Or x1 >= nx2 Or y2 <= ny1 Or y1 > ny2 Then
 CollideArea = False
 Else
@@ -1984,128 +1984,128 @@ On Error Resume Next
 .ZOrder 0
 End With
 GetNewLayerObj = PobjNum
-Dim i As Long, K As Integer
-For i = Priority To 32
-K = FindSpriteByTag(i)
-If K <> 0 Then Form1.dSprite(K).ZOrder 0
-Next i
+Dim I As Long, k As Integer
+For I = Priority To 32
+k = FindSpriteByTag(I)
+If k <> 0 Then Form1.dSprite(k).ZOrder 0
+Next I
 End If
 End Function
 
 Function PosSpriteX(aPrior As Long) As Long ' before take from priority the original sprite
 '
-Dim K As Long
-K = FindSpriteByTag(aPrior)
-If K < 1 Or K > PobjNum Then Exit Function
-PosSpriteX = Form1.dSprite(K).Left
+Dim k As Long
+k = FindSpriteByTag(aPrior)
+If k < 1 Or k > PobjNum Then Exit Function
+PosSpriteX = Form1.dSprite(k).Left
 End Function
 Function PosSpriteY(aPrior As Long) As Long ' before take from priority the original sprite
-Dim K As Long
-K = FindSpriteByTag(aPrior)
-If K < 1 Or K > PobjNum Then Exit Function
- PosSpriteY = Form1.dSprite(K).Top
+Dim k As Long
+k = FindSpriteByTag(aPrior)
+If k < 1 Or k > PobjNum Then Exit Function
+ PosSpriteY = Form1.dSprite(k).Top
 End Function
 
 Sub PosSprite(aPrior As Long, ByVal X As Long, ByVal Y As Long) ' ' before take from priority the original sprite
-Dim K As Long
-K = FindSpriteByTag(aPrior)
-If K < 1 Or K > PobjNum Then Exit Sub
+Dim k As Long
+k = FindSpriteByTag(aPrior)
+If k < 1 Or k > PobjNum Then Exit Sub
  
 
-Form1.dSprite(K).move X, Y
+Form1.dSprite(k).move X, Y
 
 End Sub
 Sub SrpiteHideShow(ByVal aPrior As Long, ByVal wh As Boolean) ' this is a priority
 On Error Resume Next
-Dim K As Long
-K = FindSpriteByTag(aPrior)
-If K < 1 Or K > PobjNum Then Exit Sub
-Form1.dSprite(K).Visible = wh
+Dim k As Long
+k = FindSpriteByTag(aPrior)
+If k < 1 Or k > PobjNum Then Exit Sub
+Form1.dSprite(k).Visible = wh
 If wh Then
 If Form1.Visible Then
-MyDoEvents1 Form1.dSprite(K)
+MyDoEvents1 Form1.dSprite(k)
 End If
 End If
 End Sub
 Sub SpriteControl(ByVal aPrior As Long, ByVal bPrior As Long) ' these are priorities
-Dim K As Long, M As Long, i As Long
-K = FindSpriteByTag(aPrior)
+Dim k As Long, M As Long, I As Long
+k = FindSpriteByTag(aPrior)
 
-If K = 0 Then Exit Sub  ' there is no such a player
+If k = 0 Then Exit Sub  ' there is no such a player
 
     M = FindSpriteByTag(bPrior)
         If M = 0 Then Exit Sub
-        Form1.dSprite(K).Tag = bPrior
+        Form1.dSprite(k).Tag = bPrior
         Form1.dSprite(M).Tag = aPrior
         
     If aPrior < bPrior Then
-    For i = aPrior To 32
-        K = FindSpriteByTag(i)
-        If K <> 0 Then Form1.dSprite(K).ZOrder 0
-    Next i
+    For I = aPrior To 32
+        k = FindSpriteByTag(I)
+        If k <> 0 Then Form1.dSprite(k).ZOrder 0
+    Next I
     Else
-    For i = bPrior To 32
-        M = FindSpriteByTag(i)
+    For I = bPrior To 32
+        M = FindSpriteByTag(I)
         If M <> 0 Then Form1.dSprite(M).ZOrder 0
-    Next i
+    Next I
 End If
 End Sub
 Sub SpriteControlOver(ByVal aPrior As Long, ByVal bPrior As Long) ' these are priorities
-Dim K As Long, M As Long, i As Long, LL As Long
-K = FindSpriteByTag(aPrior)
+Dim k As Long, M As Long, I As Long, LL As Long
+k = FindSpriteByTag(aPrior)
 
-If K = 0 Then Exit Sub  ' there is no such a player
+If k = 0 Then Exit Sub  ' there is no such a player
 
     LL = FindSpriteByTag(bPrior)
         If LL = 0 Then Exit Sub
         LL = bPrior + 1
-     For i = aPrior + 1 To bPrior
-        M = FindSpriteByTag(i)
+     For I = aPrior + 1 To bPrior
+        M = FindSpriteByTag(I)
         If M <> 0 Then
             Form1.dSprite(M).ZOrder 0
             bPrior = Form1.dSprite(M).Tag
             Form1.dSprite(M).Tag = aPrior
             aPrior = bPrior
         End If
-    Next i
-    Form1.dSprite(K).ZOrder 0
-    bPrior = Form1.dSprite(K).Tag
-    Form1.dSprite(K).Tag = aPrior
-    For i = LL To 32
-        M = FindSpriteByTag(i)
+    Next I
+    Form1.dSprite(k).ZOrder 0
+    bPrior = Form1.dSprite(k).Tag
+    Form1.dSprite(k).Tag = aPrior
+    For I = LL To 32
+        M = FindSpriteByTag(I)
         If M <> 0 Then
             Form1.dSprite(M).ZOrder 0
         End If
-    Next i
+    Next I
 
 End Sub
 Sub SpriteControlUnder(ByVal aPrior As Long, ByVal bPrior As Long) ' these are priorities
-Dim K As Long, M As Long, i As Long, LL As Long
-K = FindSpriteByTag(aPrior)
+Dim k As Long, M As Long, I As Long, LL As Long
+k = FindSpriteByTag(aPrior)
 
-If K = 0 Then Exit Sub  ' there is no such a player
+If k = 0 Then Exit Sub  ' there is no such a player
 
     LL = FindSpriteByTag(bPrior)
         If LL = 0 Then Exit Sub
     LL = bPrior - 1
-     For i = K - 1 To LL Step -1
-        M = FindSpriteByTag(i)
+     For I = k - 1 To LL Step -1
+        M = FindSpriteByTag(I)
         If M <> 0 Then
             Form1.dSprite(M).ZOrder 1
             bPrior = Form1.dSprite(M).Tag
             Form1.dSprite(M).Tag = aPrior
             aPrior = bPrior
         End If
-    Next i
-    Form1.dSprite(K).ZOrder 1
-    bPrior = Form1.dSprite(K).Tag
-    Form1.dSprite(K).Tag = aPrior
-    For i = LL To 1 Step -1
-        M = FindSpriteByTag(i)
+    Next I
+    Form1.dSprite(k).ZOrder 1
+    bPrior = Form1.dSprite(k).Tag
+    Form1.dSprite(k).Tag = aPrior
+    For I = LL To 1 Step -1
+        M = FindSpriteByTag(I)
         If M <> 0 Then
             Form1.dSprite(M).ZOrder 1
         End If
-    Next i
+    Next I
     
 
 End Sub
@@ -2182,14 +2182,14 @@ PobjNum = PobjNum + 1
 End Sub
 Sub ClrSprites()
 On Error Resume Next
-Dim i As Long, Zero As basket, zerocounter As Counters
+Dim I As Long, Zero As basket, zerocounter As Counters
 If PobjNum > 0 Then
-For i = PobjNum To 1 Step -1
-        players(i) = Zero
-        Prefresh(i) = zerocounter
-        PobjNum = i
-If Form1.dSprite.Count > PobjNum Then Unload Form1.dSprite(PobjNum)
-Next i
+For I = PobjNum To 1 Step -1
+        players(I) = Zero
+        Prefresh(I) = zerocounter
+        PobjNum = I
+If Form1.dSprite.count > PobjNum Then Unload Form1.dSprite(PobjNum)
+Next I
 PobjNum = 0
 
 End If
@@ -2383,13 +2383,13 @@ Public Function GetNote(Oct As Integer, no As Integer) As Long
 GetNote = Oct * 12 + no
 End Function
 Public Sub PlayTune(ss$)
-Dim octave As Integer, i As Long, v$
+Dim octave As Integer, I As Long, v$
 Dim note As Integer, ss1$
 Dim silence As Boolean
 octave = 4
 ss1$ = ss$ & "_"
-For i = 1 To Len(ss1$) - 1
-    v$ = Mid$(ss1$, i, 2)
+For I = 1 To Len(ss1$) - 1
+    v$ = Mid$(ss1$, I, 2)
     If Left$(v$, 1) = " " Then
         v$ = " "
         note = 25
@@ -2405,39 +2405,39 @@ For i = 1 To Len(ss1$) - 1
    '         Debug.Print "Sleep " & beeperBEAT + beeperBEAT / 2
         End If
     Else
-        If note = 0 Then note = InStr(Face$, UCase(Left$(v$, 1)) + "_") Else i = i + 1
+        If note = 0 Then note = InStr(Face$, UCase(Left$(v$, 1)) + "_") Else I = I + 1
         If note <> 0 Then
-            If Mid$(ss1$, i + 1, 1) <> "" Then If InStr("1234567", Mid$(ss1$, i + 1, 1)) > 0 Then octave = val(Mid$(ss1$, i + 1, 1)): i = i + 1
+            If Mid$(ss1$, I + 1, 1) <> "" Then If InStr("1234567", Mid$(ss1$, I + 1, 1)) > 0 Then octave = val(Mid$(ss1$, I + 1, 1)): I = I + 1
             silence = False
             Beeper GetFrequency(octave, (note + 1) / 2), beeperBEAT '* 9 / 10
         End If
     End If
-Next i
+Next I
 End Sub
 Public Function PlayTuneMIDI(ch As Long, octave2play As Integer, note2play As Integer, subbeat As Long, doted As Long, volume2play As Long, skipgate As Long, zoom As Double, zoostat As Long, rightvol As Integer, leftvol As Integer) As Boolean
 
-Dim i As Long, v$, probe2play As Long, j As Long, park$, multiplier As Long, tupletBeat As Long, tupletDot As Long, divider As Double, BE As Double
+Dim I As Long, v$, probe2play As Long, j As Long, park$, multiplier As Long, tupletBeat As Long, tupletDot As Long, divider As Double, BE As Double
 Dim p
 If Len(voices(ch)) = 0 Then Exit Function
 note2play = 0
-i = 1
+I = 1
 again0:
-Select Case Mid$(voices(ch), i, 1)
+Select Case Mid$(voices(ch), I, 1)
 Case "V", "v"
 
         v$ = vbNullString
-        Do While InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i, 1) <> "")
-            v$ = v$ & Mid$(voices(ch), i + 1, 1)
-            i = i + 1
+        Do While InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I, 1) <> "")
+            v$ = v$ & Mid$(voices(ch), I + 1, 1)
+            I = I + 1
         Loop
         MusicBoxVolume(ch + 1) = val("0" & v$)
-        i = i + 1
+        I = I + 1
         GoTo again0
 Case "R", "r"
         v$ = vbNullString
-        Do While InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i + 1, 1) <> "")
-            v$ = v$ & Mid$(voices(ch), i + 1, 1)
-            i = i + 1
+        Do While InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I + 1, 1) <> "")
+            v$ = v$ & Mid$(voices(ch), I + 1, 1)
+            I = I + 1
         Loop
         p = val("0" + v$)
         If p > 0 Then
@@ -2446,13 +2446,13 @@ Case "R", "r"
         Else
             rightvol = 0
         End If
-        i = i + 1
+        I = I + 1
         GoTo again0
 Case "L", "l"
         v$ = vbNullString
-        Do While InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i + 1, 1) <> "")
-            v$ = v$ & Mid$(voices(ch), i + 1, 1)
-            i = i + 1
+        Do While InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I + 1, 1) <> "")
+            v$ = v$ & Mid$(voices(ch), I + 1, 1)
+            I = I + 1
         Loop
         p = val("0" + v$)
         If p > 0 Then
@@ -2461,11 +2461,11 @@ Case "L", "l"
         Else
             leftvol = 0
         End If
-        i = i + 1
+        I = I + 1
         GoTo again0
 Case "["
     If zoostat = 1 Then
-        i = i + 1
+        I = I + 1
         zoostat = 3  ' in the tuplet
         GoTo again0
     Else
@@ -2474,30 +2474,30 @@ Case "["
         park$ = Mid$(voices(ch), 2, j - 2)
         If park$ = "" Then voices(ch) = "": Exit Function
         zoostat = 1 ' entry
-        i = j
+        I = j
         v$ = vbNullString
-        Do While InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i + 1, 1) <> "")
-            v$ = v$ & Mid$(voices(ch), i + 1, 1)
-            i = i + 1
+        Do While InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I + 1, 1) <> "")
+            v$ = v$ & Mid$(voices(ch), I + 1, 1)
+            I = I + 1
         Loop
         multiplier = val("0" & v$)
         If multiplier = 0 Then multiplier = 1
         tupletBeat = 1
         tupletDot = 0
         zoom = 0
-        While Mid$(voices(ch), i + 1, 1) = "@"
-            i = i + 1
+        While Mid$(voices(ch), I + 1, 1) = "@"
+            I = I + 1
             tupletBeat = 1
-            If InStr("123456", Mid$(voices(ch), i + 1, 1)) > 0 Then
-                tupletBeat = val(Mid$(voices(ch), i + 1, 1))
-                i = i + 1
+            If InStr("123456", Mid$(voices(ch), I + 1, 1)) > 0 Then
+                tupletBeat = val(Mid$(voices(ch), I + 1, 1))
+                I = I + 1
             End If
-            If Mid$(voices(ch), i + 1, 1) = "+" Then
+            If Mid$(voices(ch), I + 1, 1) = "+" Then
                 doted = 1
-                i = i + 1
-                If Mid$(voices(ch), i + 1, 1) = "+" Then
+                I = I + 1
+                If Mid$(voices(ch), I + 1, 1) = "+" Then
                     tupletDot = 2
-                    i = i + 1
+                    I = I + 1
                 End If
             End If
             BE = 2# ^ (tupletBeat - 1)
@@ -2513,29 +2513,29 @@ Case "["
         If zoom = 0 Then zoom = 1
         zoom = zoom * multiplier
         
-        If UCase$(Mid$(voices(ch), i + 1, 1)) = "V" Then
-            i = i + 1
+        If UCase$(Mid$(voices(ch), I + 1, 1)) = "V" Then
+            I = I + 1
             v$ = vbNullString
-            Do While InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i, 1) <> "")
-                v$ = v$ & Mid$(voices(ch), i + 1, 1)
-                i = i + 1
+            Do While InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I, 1) <> "")
+                v$ = v$ & Mid$(voices(ch), I + 1, 1)
+                I = I + 1
             Loop
             MusicBoxVolume(ch + 1) = val("0" & v$)
         End If
         volume2play = MusicBoxVolume(ch + 1)
-        If UCase$(Mid$(voices(ch), i + 1, 1)) = "!" Then
-            i = i + 1
+        If UCase$(Mid$(voices(ch), I + 1, 1)) = "!" Then
+            I = I + 1
             v$ = vbNullString
-            If InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i + 1, 1) <> "") Then
-                v$ = v$ & Mid$(voices(ch), i + 1, 1)
-                i = i + 1
-                If InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i + 1, 1) <> "") Then
-                    v$ = v$ & Mid$(voices(ch), i + 1, 1)
-                    i = i + 1
+            If InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I + 1, 1) <> "") Then
+                v$ = v$ & Mid$(voices(ch), I + 1, 1)
+                I = I + 1
+                If InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I + 1, 1) <> "") Then
+                    v$ = v$ & Mid$(voices(ch), I + 1, 1)
+                    I = I + 1
                     If v$ = "10" Then
-                        If "0" = Mid$(voices(ch), i + 1, 1) Then
+                        If "0" = Mid$(voices(ch), I + 1, 1) Then
                             v$ = "100"
-                            i = i + 1
+                            I = I + 1
                         End If
                     End If
                 End If
@@ -2545,7 +2545,7 @@ Case "["
             End If
         End If
         ' now after ] we have the next notes...
-        voices(ch) = "[" + park$ + "]" + Mid$(voices(ch), i + 1)
+        voices(ch) = "[" + park$ + "]" + Mid$(voices(ch), I + 1)
         ' we have to fix the scale as scale=scale/divider
         ' divider is the sum of all factors on tuplet members
         
@@ -2559,7 +2559,7 @@ Case "]"
     zoostat = 2
     ' restore Gate array to normal gate
     ' restore Global Volume to one in zoomstat2
-    voices(ch) = Mid$(voices(ch), i + 1)
+    voices(ch) = Mid$(voices(ch), I + 1)
     PlayTuneMIDI = True
     Exit Function
         
@@ -2567,7 +2567,7 @@ Case " "
     v$ = " "
     probe2play = 25
 Case Else
-    v$ = Mid$(voices(ch), i, 2)
+    v$ = Mid$(voices(ch), I, 2)
     If Len(v$) = 1 Then v$ = v$ + "_"
     If Right$(v$, 1) = ChrW(FlatNote) Then
         probe2play = InStr(Face$, UCase(Left$(v$, 1)) + "_")
@@ -2587,33 +2587,33 @@ doted = 0
 If probe2play = 25 Then
     note2play = 24
     subbeat = 1
-    If Mid$(voices(ch), i + 1, 1) = "@" Then
-        i = i + 1
-        If InStr("123456", Mid$(voices(ch), i + 1, 1)) > 0 Then
-            subbeat = val(Mid$(voices(ch), i + 1, 1))
-            i = i + 1
+    If Mid$(voices(ch), I + 1, 1) = "@" Then
+        I = I + 1
+        If InStr("123456", Mid$(voices(ch), I + 1, 1)) > 0 Then
+            subbeat = val(Mid$(voices(ch), I + 1, 1))
+            I = I + 1
         End If
-        If Mid$(voices(ch), i + 1, 1) = "+" Then
+        If Mid$(voices(ch), I + 1, 1) = "+" Then
             doted = 1
-            i = i + 1
-            If Mid$(voices(ch), i + 1, 1) = "+" Then
+            I = I + 1
+            If Mid$(voices(ch), I + 1, 1) = "+" Then
                 doted = 2
-                i = i + 1
+                I = I + 1
             End If
         End If
     End If
-    If Mid$(voices(ch), i + 1, 1) = "@" Then  ' we have tie
-        voices(ch) = Mid$(voices(ch), i + 2)
+    If Mid$(voices(ch), I + 1, 1) = "@" Then  ' we have tie
+        voices(ch) = Mid$(voices(ch), I + 2)
         volume2play = -1
         PlayTuneMIDI = True
         Exit Function
     End If
-    If UCase$(Mid$(voices(ch), i + 1, 1)) = "V" Then
-        i = i + 1
+    If UCase$(Mid$(voices(ch), I + 1, 1)) = "V" Then
+        I = I + 1
         v$ = vbNullString
-        Do While InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i + 1, 1) <> "")
-            v$ = v$ & Mid$(voices(ch), i + 1, 1)
-            i = i + 1
+        Do While InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I + 1, 1) <> "")
+            v$ = v$ & Mid$(voices(ch), I + 1, 1)
+            I = I + 1
         Loop
         volume2play = val("0" & v$)
     End If
@@ -2622,60 +2622,60 @@ Else
     If probe2play = 0 Then
         probe2play = InStr(Face$, UCase(Left$(v$, 1)) & "_")
     Else
-        i = i + 1
+        I = I + 1
     End If
     doted = 0
     If probe2play <> 0 Then
         ' look for number
-        If Mid$(voices(ch), i + 1, 1) <> "" Then
-            If InStr("0123456789", Mid$(voices(ch), i + 1, 1)) > 0 Then
-                octave2play = val(Mid$(voices(ch), i + 1, 1))
-                i = i + 1
+        If Mid$(voices(ch), I + 1, 1) <> "" Then
+            If InStr("0123456789", Mid$(voices(ch), I + 1, 1)) > 0 Then
+                octave2play = val(Mid$(voices(ch), I + 1, 1))
+                I = I + 1
             End If
             subbeat = 1
-            If Mid$(voices(ch), i + 1, 1) = "@" Then
-                i = i + 1
-                If InStr("123456", Mid$(voices(ch), i + 1, 1)) > 0 Then
-                    subbeat = val(Mid$(voices(ch), i + 1, 1))
-                    i = i + 1
+            If Mid$(voices(ch), I + 1, 1) = "@" Then
+                I = I + 1
+                If InStr("123456", Mid$(voices(ch), I + 1, 1)) > 0 Then
+                    subbeat = val(Mid$(voices(ch), I + 1, 1))
+                    I = I + 1
                 End If
-                If Mid$(voices(ch), i + 1, 1) = "+" Then
+                If Mid$(voices(ch), I + 1, 1) = "+" Then
                     doted = 1
-                    i = i + 1
-                    If Mid$(voices(ch), i + 1, 1) = "+" Then
+                    I = I + 1
+                    If Mid$(voices(ch), I + 1, 1) = "+" Then
                         doted = 2
-                        i = i + 1
+                        I = I + 1
                     End If
                 End If
             End If
-            If Mid$(voices(ch), i + 1, 1) = "@" Then  ' we have tie
-                voices(ch) = Mid$(voices(ch), i + 2)
+            If Mid$(voices(ch), I + 1, 1) = "@" Then  ' we have tie
+                voices(ch) = Mid$(voices(ch), I + 2)
                 volume2play = -1
                 PlayTuneMIDI = True
                 Exit Function
             End If
-            If UCase$(Mid$(voices(ch), i + 1, 1)) = "V" Then
-                i = i + 1
+            If UCase$(Mid$(voices(ch), I + 1, 1)) = "V" Then
+                I = I + 1
                 v$ = vbNullString
-                Do While InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i, 1) <> "")
-                    v$ = v$ & Mid$(voices(ch), i + 1, 1)
-                    i = i + 1
+                Do While InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I, 1) <> "")
+                    v$ = v$ & Mid$(voices(ch), I + 1, 1)
+                    I = I + 1
                 Loop
                 volume2play = val("0" & v$)
             End If
-            If UCase$(Mid$(voices(ch), i + 1, 1)) = "!" Then
-                i = i + 1
+            If UCase$(Mid$(voices(ch), I + 1, 1)) = "!" Then
+                I = I + 1
                 v$ = vbNullString
-                If InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i + 1, 1) <> "") Then
-                    v$ = v$ & Mid$(voices(ch), i + 1, 1)
-                    i = i + 1
-                    If InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i + 1, 1) <> "") Then
-                        v$ = v$ & Mid$(voices(ch), i + 1, 1)
-                        i = i + 1
+                If InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I + 1, 1) <> "") Then
+                    v$ = v$ & Mid$(voices(ch), I + 1, 1)
+                    I = I + 1
+                    If InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I + 1, 1) <> "") Then
+                        v$ = v$ & Mid$(voices(ch), I + 1, 1)
+                        I = I + 1
                         If v$ = "10" Then
-                            If "0" = Mid$(voices(ch), i + 1, 1) Then
+                            If "0" = Mid$(voices(ch), I + 1, 1) Then
                                 v$ = "100"
-                                i = i + 1
+                                I = I + 1
                             End If
                         End If
                     End If
@@ -2694,22 +2694,22 @@ Else
     End If
 th:
     If note2play = 0 Then voices(ch) = "": Exit Function
-    voices(ch) = Mid$(voices(ch), i + 1)
+    voices(ch) = Mid$(voices(ch), I + 1)
 
 End Function
 Public Function SumTuneMIDI(ss$) As Double
 Dim subbeat As Long, doted As Long, volume2play As Long, skipgate As Long, GOOD As Boolean
-Dim i As Long, v$, probe2play As Long, j As Long, park$, multiplier As Long, tupletBeat As Long, tupletDot As Long, divider As Double, BE As Double
-i = 1
+Dim I As Long, v$, probe2play As Long, j As Long, park$, multiplier As Long, tupletBeat As Long, tupletDot As Long, divider As Double, BE As Double
+I = 1
 While Len(ss$) > 0
     
     probe2play = 0
-    Select Case Mid$(ss$, i, 1)
+    Select Case Mid$(ss$, I, 1)
     Case " "
         v$ = " "
         probe2play = 25
     Case Else
-        v$ = Mid$(ss$, i, 2)
+        v$ = Mid$(ss$, I, 2)
         If Len(v$) = 1 Then v$ = v$ + "_"
         If Right$(v$, 1) = ChrW(FlatNote) Then
             probe2play = InStr(Face$, UCase(Left$(v$, 1)) + "_")
@@ -2727,20 +2727,20 @@ While Len(ss$) > 0
     If probe2play = 25 Then
         
         subbeat = 1
-        If Mid$(ss$, i + 1, 1) = "@" Then
+        If Mid$(ss$, I + 1, 1) = "@" Then
 again1:
             subbeat = 1
-            i = i + 1
-            If InStr("123456", Mid$(ss$, i + 1, 1)) > 0 Then
-                subbeat = val(Mid$(ss$, i + 1, 1))
-                i = i + 1
+            I = I + 1
+            If InStr("123456", Mid$(ss$, I + 1, 1)) > 0 Then
+                subbeat = val(Mid$(ss$, I + 1, 1))
+                I = I + 1
             End If
-            If Mid$(ss$, i + 1, 1) = "+" Then
+            If Mid$(ss$, I + 1, 1) = "+" Then
                 doted = 1
-                i = i + 1
-                If Mid$(ss$, i + 1, 1) = "+" Then
+                I = I + 1
+                If Mid$(ss$, I + 1, 1) = "+" Then
                     doted = 2
-                    i = i + 1
+                    I = I + 1
                 End If
             End If
         End If
@@ -2753,13 +2753,13 @@ again1:
         Case Else
             SumTuneMIDI = SumTuneMIDI + 1 / BE
         End Select
-        If Mid$(ss$, i + 1, 1) = "@" Then GoTo again1
-        If UCase$(Mid$(ss$, i + 1, 1)) = "V" Then
-            i = i + 1
+        If Mid$(ss$, I + 1, 1) = "@" Then GoTo again1
+        If UCase$(Mid$(ss$, I + 1, 1)) = "V" Then
+            I = I + 1
             v$ = vbNullString
-            Do While InStr("1234567890", Mid$(ss$, i + 1, 1)) > 0 And (Mid$(ss$, i + 1, 1) <> "")
-                v$ = v$ & Mid$(ss$, i + 1, 1)
-                i = i + 1
+            Do While InStr("1234567890", Mid$(ss$, I + 1, 1)) > 0 And (Mid$(ss$, I + 1, 1) <> "")
+                v$ = v$ & Mid$(ss$, I + 1, 1)
+                I = I + 1
             Loop
         End If
         GOOD = True
@@ -2768,30 +2768,30 @@ again1:
         If probe2play = 0 Then
             probe2play = InStr(Face$, UCase(Left$(v$, 1)) & "_")
         Else
-            i = i + 1
+            I = I + 1
         End If
         doted = 0
         If probe2play <> 0 Then
             ' look for number
-            If Mid$(ss$, i + 1, 1) <> "" Then
-                If InStr("0123456789", Mid$(ss$, i + 1, 1)) > 0 Then
-                    i = i + 1
+            If Mid$(ss$, I + 1, 1) <> "" Then
+                If InStr("0123456789", Mid$(ss$, I + 1, 1)) > 0 Then
+                    I = I + 1
                 End If
                 subbeat = 1
-                If Mid$(ss$, i + 1, 1) = "@" Then
+                If Mid$(ss$, I + 1, 1) = "@" Then
 again2:
                     subbeat = 1
-                    i = i + 1
-                    If InStr("123456", Mid$(ss$, i + 1, 1)) > 0 Then
-                        subbeat = val(Mid$(ss$, i + 1, 1))
-                        i = i + 1
+                    I = I + 1
+                    If InStr("123456", Mid$(ss$, I + 1, 1)) > 0 Then
+                        subbeat = val(Mid$(ss$, I + 1, 1))
+                        I = I + 1
                     End If
-                    If Mid$(ss$, i + 1, 1) = "+" Then
+                    If Mid$(ss$, I + 1, 1) = "+" Then
                         doted = 1
-                        i = i + 1
-                        If Mid$(ss$, i + 1, 1) = "+" Then
+                        I = I + 1
+                        If Mid$(ss$, I + 1, 1) = "+" Then
                             doted = 2
-                            i = i + 1
+                            I = I + 1
                         End If
                     End If
                 End If
@@ -2806,30 +2806,30 @@ again2:
                 End Select
             
             
-                If Mid$(ss$, i + 1, 1) = "@" Then GoTo again2
+                If Mid$(ss$, I + 1, 1) = "@" Then GoTo again2
     
     
-                If UCase$(Mid$(ss$, i + 1, 1)) = "V" Then
-                    i = i + 1
+                If UCase$(Mid$(ss$, I + 1, 1)) = "V" Then
+                    I = I + 1
                     v$ = vbNullString
-                    Do While InStr("1234567890", Mid$(ss$, i + 1, 1)) > 0 And (Mid$(ss$, i, 1) <> "")
-                        v$ = v$ & Mid$(ss$, i + 1, 1)
-                        i = i + 1
+                    Do While InStr("1234567890", Mid$(ss$, I + 1, 1)) > 0 And (Mid$(ss$, I, 1) <> "")
+                        v$ = v$ & Mid$(ss$, I + 1, 1)
+                        I = I + 1
                     Loop
                 End If
-                If UCase$(Mid$(ss$, i + 1, 1)) = "!" Then
-                    i = i + 1
+                If UCase$(Mid$(ss$, I + 1, 1)) = "!" Then
+                    I = I + 1
                     v$ = vbNullString
-                    If InStr("1234567890", Mid$(ss$, i + 1, 1)) > 0 And (Mid$(ss$, i + 1, 1) <> "") Then
-                        v$ = v$ & Mid$(ss$, i + 1, 1)
-                        i = i + 1
-                        If InStr("1234567890", Mid$(ss$, i + 1, 1)) > 0 And (Mid$(ss$, i + 1, 1) <> "") Then
-                            v$ = v$ & Mid$(ss$, i + 1, 1)
-                            i = i + 1
+                    If InStr("1234567890", Mid$(ss$, I + 1, 1)) > 0 And (Mid$(ss$, I + 1, 1) <> "") Then
+                        v$ = v$ & Mid$(ss$, I + 1, 1)
+                        I = I + 1
+                        If InStr("1234567890", Mid$(ss$, I + 1, 1)) > 0 And (Mid$(ss$, I + 1, 1) <> "") Then
+                            v$ = v$ & Mid$(ss$, I + 1, 1)
+                            I = I + 1
                             If v$ = "10" Then
-                                If "0" = Mid$(ss$, i + 1, 1) Then
+                                If "0" = Mid$(ss$, I + 1, 1) Then
                                     v$ = "100"
-                                    i = i + 1
+                                    I = I + 1
                                 End If
                             End If
                         End If
@@ -2841,65 +2841,65 @@ again2:
             GOOD = True
             End If
         End If
-        If i >= Len(ss$) Or Not GOOD Then ss$ = ""
+        If I >= Len(ss$) Or Not GOOD Then ss$ = ""
         GOOD = False
-        i = i + 1
+        I = I + 1
     Wend
     If SumTuneMIDI = 0 Then SumTuneMIDI = 1
 End Function
 
 Public Function PlayTuneMIDItie(ch As Long, subbeat As Long, doted As Long, volume2play As Long, skipgate As Long) As Boolean
 
-Dim i As Long, v$
-i = 0
+Dim I As Long, v$
+I = 0
 subbeat = 1
-If InStr("123456", Mid$(voices(ch), i + 1, 1)) > 0 Then
-    subbeat = val(Mid$(voices(ch), i + 1, 1))
-    i = i + 1
+If InStr("123456", Mid$(voices(ch), I + 1, 1)) > 0 Then
+    subbeat = val(Mid$(voices(ch), I + 1, 1))
+    I = I + 1
     PlayTuneMIDItie = True
 Else
     Exit Function
 End If
-If Mid$(voices(ch), i + 1, 1) = "+" Then
+If Mid$(voices(ch), I + 1, 1) = "+" Then
     doted = 1
-    i = i + 1
-    If Mid$(voices(ch), i + 1, 1) = "+" Then
+    I = I + 1
+    If Mid$(voices(ch), I + 1, 1) = "+" Then
         doted = 1
-        i = i + 1
+        I = I + 1
     End If
 End If
 
-If Mid$(voices(ch), i + 1, 1) = "@" Then  ' we have tie
-    voices(ch) = Mid$(voices(ch), i + 2)
+If Mid$(voices(ch), I + 1, 1) = "@" Then  ' we have tie
+    voices(ch) = Mid$(voices(ch), I + 2)
     volume2play = -1
     
     PlayTuneMIDItie = True
     Exit Function
 End If
 
-If UCase$(Mid$(voices(ch), i + 1, 1)) = "V" Then
-    i = i + 1
+If UCase$(Mid$(voices(ch), I + 1, 1)) = "V" Then
+    I = I + 1
     v$ = vbNullString
-    Do While InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i + 1, 1) <> "")
-        v$ = v$ & Mid$(voices(ch), i + 1, 1)
-        i = i + 1
+    Do While InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I + 1, 1) <> "")
+        v$ = v$ & Mid$(voices(ch), I + 1, 1)
+        I = I + 1
     Loop
     If Len(v$) = 0 Then PlayTuneMIDItie = False: Exit Function
     volume2play = val("0" & v$)
 End If
-If UCase$(Mid$(voices(ch), i + 1, 1)) = "!" Then
-    i = i + 1
+If UCase$(Mid$(voices(ch), I + 1, 1)) = "!" Then
+    I = I + 1
     v$ = vbNullString
-    If InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i + 1, 1) <> "") Then
-        v$ = v$ & Mid$(voices(ch), i + 1, 1)
-        i = i + 1
-        If InStr("1234567890", Mid$(voices(ch), i + 1, 1)) > 0 And (Mid$(voices(ch), i + 1, 1) <> "") Then
-            v$ = v$ & Mid$(voices(ch), i + 1, 1)
-            i = i + 1
+    If InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I + 1, 1) <> "") Then
+        v$ = v$ & Mid$(voices(ch), I + 1, 1)
+        I = I + 1
+        If InStr("1234567890", Mid$(voices(ch), I + 1, 1)) > 0 And (Mid$(voices(ch), I + 1, 1) <> "") Then
+            v$ = v$ & Mid$(voices(ch), I + 1, 1)
+            I = I + 1
             If v$ = "10" Then
-                If "0" = Mid$(voices(ch), i + 1, 1) Then
+                If "0" = Mid$(voices(ch), I + 1, 1) Then
                     v$ = "100"
-                    i = i + 1
+                    I = I + 1
                 End If
             End If
         End If
@@ -2909,7 +2909,7 @@ If UCase$(Mid$(voices(ch), i + 1, 1)) = "!" Then
     End If
 End If
 
-voices(ch) = Mid$(voices(ch), i + 1)
+voices(ch) = Mid$(voices(ch), I + 1)
 PlayTuneMIDItie = True
 End Function
 
@@ -3407,47 +3407,47 @@ End Function
 Public Function SpellUnicode(a$)
 ' use spellunicode to get numbers
 ' and make a ListenUnicode...with numbers for input text
-Dim b$, i As Long
-For i = 1 To Len(a$) - 1
-b$ = b$ & CStr(AscW(Mid$(a$, i, 1))) & ","
-Next i
+Dim b$, I As Long
+For I = 1 To Len(a$) - 1
+b$ = b$ & CStr(AscW(Mid$(a$, I, 1))) & ","
+Next I
 SpellUnicode = b$ & CStr(AscW(Right$(a$, 1)))
 SpellUnicode = b$ & CStr(AscW(Right$(a$, 1)))
 End Function
 Public Function ListenUnicode(ParamArray aa() As Variant) As String
-Dim all$, i As Long
-For i = 0 To UBound(aa)
-    all$ = all$ & ChrW(aa(i))
-Next i
+Dim all$, I As Long
+For I = 0 To UBound(aa)
+    all$ = all$ & ChrW(aa(I))
+Next I
 ListenUnicode = all$
 End Function
 Function Convert2(a$, localeid As Long) As String  ' to feed textboxes
-Dim b$, i&
+Dim b$, I&
 If a$ <> "" Then
-For i& = 1 To Len(a$)
-b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(a$, i, 1) + Chr$(0), 128, localeid), 1))), 64, 1033), 1)
+For I& = 1 To Len(a$)
+b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(a$, I, 1) + Chr$(0), 128, localeid), 1))), 64, 1033), 1)
 
-Next i&
+Next I&
 Convert2 = b$
 End If
 End Function
 Function Convert3(a$, localeid As Long) As String  ' to feed textboxes
-Dim b$, i&
+Dim b$, I&
 If a$ <> "" Then
 If localeid = 0 Then localeid = Clid
-For i& = 1 To Len(a$)
-b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(a$, i, 1) + Chr$(0), 128, 1033), 1))), 64, localeid), 1)
+For I& = 1 To Len(a$)
+b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(a$, I, 1) + Chr$(0), 128, 1033), 1))), 64, localeid), 1)
 
-Next i&
+Next I&
 Convert3 = b$
 End If
 End Function
 Function Convert2Ansi(a$, localeid As Long) As String
-Dim b$, i&
+Dim b$, I&
 If a$ <> "" Then
-For i& = 1 To Len(a$)
-    b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(a$, i, 1) + Chr$(0), 128, localeid), 1))), 64, LCID_DEF), 1)
-Next i&
+For I& = 1 To Len(a$)
+    b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(a$, I, 1) + Chr$(0), 128, localeid), 1))), 64, LCID_DEF), 1)
+Next I&
 Convert2Ansi = b$
 End If
 End Function
@@ -3588,24 +3588,24 @@ Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
    CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
    CopyMemory ByVal VarPtr(b), t(0), 16
 End Sub
-Sub SwapVariant2(ByRef a As Variant, ByRef b As iBoxArray, i As Long)
+Sub SwapVariant2(ByRef a As Variant, ByRef b As iBoxArray, I As Long)
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory t(0), ByVal VarPtr(a), 16
-   CopyMemory ByVal VarPtr(a), ByVal b.itemPtr(i), 16
-   CopyMemory ByVal b.itemPtr(i), t(0), 16
+   CopyMemory ByVal VarPtr(a), ByVal b.itemPtr(I), 16
+   CopyMemory ByVal b.itemPtr(I), t(0), 16
 End Sub
-Sub SwapVariant3(ByRef a As mArray, K As Long, ByRef b As iBoxArray, i As Long)
+Sub SwapVariant3(ByRef a As mArray, k As Long, ByRef b As iBoxArray, I As Long)
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory t(0), ByVal a.itemPtr(K), 16
-   CopyMemory ByVal a.itemPtr(K), ByVal b.itemPtr(i), 16
-   CopyMemory ByVal b.itemPtr(i), t(0), 16
+   CopyMemory t(0), ByVal a.itemPtr(k), 16
+   CopyMemory ByVal a.itemPtr(k), ByVal b.itemPtr(I), 16
+   CopyMemory ByVal b.itemPtr(I), t(0), 16
 End Sub
-Sub EmptyVariantArrayItem(ByRef b As iBoxArray, i As Long)
+Sub EmptyVariantArrayItem(ByRef b As iBoxArray, I As Long)
    Dim a As Variant
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory t(0), ByVal VarPtr(a), 16
-   CopyMemory ByVal VarPtr(a), ByVal b.itemPtr(i), 16
-   CopyMemory ByVal b.itemPtr(i), t(0), 16
+   CopyMemory ByVal VarPtr(a), ByVal b.itemPtr(I), 16
+   CopyMemory ByVal b.itemPtr(I), t(0), 16
 End Sub
 Private Function c_CreatePartialRegion(rgnRects() As RECT, ByVal lIndex As Long, ByVal uIndex As Long, ByVal leftOffset As Long, ByVal cx As Long, Optional ByVal xFrmPtr As Long) As Long
 '' from Lavolpe, a very fast ROUTINE
@@ -4213,79 +4213,79 @@ ScrY = GetSystemMetrics(SM_CYSCREEN) * dv15
 End Function
 
 Public Function MyTrimL3Len(s$) As Long
-Dim i&, l As Long
+Dim I&, l As Long
 Dim P2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL3Len = 0: Exit Function
   P2 = StrPtr(s): l = l - 1
   p4 = P2 + l * 2
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
+  For I = P2 To p4 Step 2
+  GetMem2 I, P1
   Select Case P1
     Case 32, 160, 7
     Case Else
      
    Exit For
   End Select
-  Next i
- MyTrimL3Len = (i - P2) \ 2
+  Next I
+ MyTrimL3Len = (I - P2) \ 2
 End Function
 Public Function MyTrimL2(s$) As Long
-Dim i&, l As Long
+Dim I&, l As Long
 Dim P2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL2 = 1: Exit Function
   P2 = StrPtr(s): l = l - 1
   p4 = P2 + l * 2
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
+  For I = P2 To p4 Step 2
+  GetMem2 I, P1
   Select Case P1
     Case 32, 160, 7
     Case Else
-     MyTrimL2 = (i - P2) \ 2 + 1
+     MyTrimL2 = (I - P2) \ 2 + 1
    Exit Function
   End Select
-  Next i
+  Next I
  MyTrimL2 = l + 2
 End Function
 
 Public Function MyTrimR(s$) As Long
-Dim i&, l As Long
+Dim I&, l As Long
 Dim P2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimR = 1: Exit Function
   P2 = StrPtr(s): l = l - 1
   p4 = P2 + l * 2
-  For i = p4 To P2 Step -2
-  GetMem2 i, P1
+  For I = p4 To P2 Step -2
+  GetMem2 I, P1
   Select Case P1
     Case 32, 160
     Case Else
-     MyTrimR = (i - P2) \ 2 + 1
+     MyTrimR = (I - P2) \ 2 + 1
    Exit Function
   End Select
-  Next i
+  Next I
  MyTrimR = l + 2
 End Function
 
 
 Public Function MyTrimL2NoTab(s$) As Long
-Dim i&, l As Long
+Dim I&, l As Long
 Dim P2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
   P2 = StrPtr(s): l = l - 1
   p4 = P2 + l * 2
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
+  For I = P2 To p4 Step 2
+  GetMem2 I, P1
   Select Case P1
     Case 32, 160
     Case Else
-     MyTrimL2NoTab = (i - P2) \ 2 + 1
+     MyTrimL2NoTab = (I - P2) \ 2 + 1
    Exit Function
   End Select
-  Next i
+  Next I
  MyTrimL2NoTab = 0
 End Function
 
 Public Function MyTrimRfrom(s$, st As Long, ByVal en As Long) As Long
-Dim i&
+Dim I&
 Dim P2 As Long, P1 As Integer, p4 As Long
   If st > Len(s$) Then MyTrimRfrom = en: Exit Function
   If en > Len(s$) Then MyTrimRfrom = en: Exit Function
@@ -4293,190 +4293,190 @@ Dim P2 As Long, P1 As Integer, p4 As Long
   If st < 1 Then MyTrimRfrom = en: Exit Function
   P2 = StrPtr(s) + (st - 1) * 2: en = en - 1
   p4 = P2 + (en - st) * 2
-  For i = p4 To P2 Step -2
-  GetMem2 i, P1
+  For I = p4 To P2 Step -2
+  GetMem2 I, P1
   Select Case P1
     Case 32, 160, 9
     Case Else
      ' MyTrimRfrom = en + 1
-     MyTrimRfrom = (i - P2) \ 2 + st + 1
+     MyTrimRfrom = (I - P2) \ 2 + st + 1
    Exit Function
   End Select
-  Next i
+  Next I
  MyTrimRfrom = st
 End Function
 Public Function MyTrimCR(s$) As String
-Dim i&, l As Long
+Dim I&, l As Long
 Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = Len(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l * 2
-  For i = p4 To P2 Step -2
-  GetMem2 i, P1
+  For I = p4 To P2 Step -2
+  GetMem2 I, P1
   Select Case P1
     Case 32, 160, 10, 13
     Case Else
      Exit For
   End Select
-  Next i
-  p4 = i
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
+  Next I
+  p4 = I
+  For I = P2 To p4 Step 2
+  GetMem2 I, P1
   Select Case P1
     Case 32, 160, 10, 13
     Case Else
      
    Exit For
   End Select
-  Next i
-  P2 = i
+  Next I
+  P2 = I
   If P2 > p4 Then MyTrimCR = vbNullString Else MyTrimCR = Mid$(s$, (P2 - p22) \ 2 + 1, (p4 - P2) \ 2 + 1)
  
 End Function
 
 Public Function MyTrim(s$) As String
-Dim i&, l As Long
+Dim I&, l As Long
 Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = Len(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l * 2
-  For i = p4 To P2 Step -2
-  GetMem2 i, P1
+  For I = p4 To P2 Step -2
+  GetMem2 I, P1
   Select Case P1
     Case 32, 160
     Case Else
      Exit For
   End Select
-  Next i
-  p4 = i
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
+  Next I
+  p4 = I
+  For I = P2 To p4 Step 2
+  GetMem2 I, P1
   Select Case P1
     Case 32, 160
     Case Else
      
    Exit For
   End Select
-  Next i
-  P2 = i
+  Next I
+  P2 = I
   If P2 > p4 Then MyTrim = vbNullString Else MyTrim = Mid$(s$, (P2 - p22) \ 2 + 1, (p4 - P2) \ 2 + 1)
  
 End Function
 Public Function MyTrimLW(s$) As String
-Dim i&, l As Long
+Dim I&, l As Long
 Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = Len(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l * 2
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
+  For I = P2 To p4 Step 2
+  GetMem2 I, P1
   Select Case P1
     Case 32, 160
     Case Else
      
    Exit For
   End Select
-  Next i
-  P2 = i
+  Next I
+  P2 = I
   If P2 > p4 Then MyTrimLW = vbNullString Else MyTrimLW = Mid$(s$, (P2 - p22) \ 2 + 1, (p4 - P2) \ 2 + 1)
  
 End Function
 Public Function MyTrimRW(s$) As String
-Dim i&, l As Long
+Dim I&, l As Long
 Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = Len(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l * 2
-  For i = p4 To P2 Step -2
-  GetMem2 i, P1
+  For I = p4 To P2 Step -2
+  GetMem2 I, P1
   Select Case P1
     Case 32, 160
     Case Else
      Exit For
   End Select
-  Next i
-  p4 = i
+  Next I
+  p4 = I
    If P2 > p4 Then MyTrimRW = vbNullString Else MyTrimRW = Mid$(s$, (P2 - p22) \ 2 + 1, (p4 - P2) \ 2 + 1)
  
 End Function
 
 Public Function MyTrimRB(s$) As String
-Dim i&, l As Long
+Dim I&, l As Long
 Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = LenB(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l
-  For i = p4 To P2 Step -1
-  GetMem1 i, P1
+  For I = p4 To P2 Step -1
+  GetMem1 I, P1
   Select Case P1
     Case 32
     Case Else
    Exit For
   End Select
-  Next i
-  p4 = i
+  Next I
+  p4 = I
   If P2 > p4 Then MyTrimRB = vbNullString Else MyTrimRB = MidB$(s$, (P2 - p22) + 1, (p4 - P2) + 1)
  
 End Function
 Public Function MyTrimLB(s$) As String
-Dim i&, l As Long
+Dim I&, l As Long
 Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = LenB(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l
-  For i = P2 To p4 Step 1
-  GetMem1 i, P1
+  For I = P2 To p4 Step 1
+  GetMem1 I, P1
   Select Case P1
     Case 32
     Case Else
   
    Exit For
   End Select
-    Next i
-    P2 = i
+    Next I
+    P2 = I
   If P2 > p4 Then MyTrimLB = vbNullString Else MyTrimLB = MidB$(s$, (P2 - p22) + 1, (p4 - P2) + 1)
  
 End Function
 Public Function MyTrimB(s$) As String
-Dim i&, l As Long
+Dim I&, l As Long
 Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
 l = LenB(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l
-  For i = p4 To P2 Step -1
-  GetMem1 i, P1
+  For I = p4 To P2 Step -1
+  GetMem1 I, P1
   Select Case P1
     Case 32
     Case Else
   
    Exit For
   End Select
-  Next i
-  p4 = i
-  For i = P2 To p4 Step 1
-  GetMem1 i, P1
+  Next I
+  p4 = I
+  For I = P2 To p4 Step 1
+  GetMem1 I, P1
   Select Case P1
     Case 32
     Case Else
 
    Exit For
   End Select
-  Next i
-  P2 = i
+  Next I
+  P2 = I
   If P2 > p4 Then MyTrimB = vbNullString Else MyTrimB = MidB$(s$, (P2 - p22) + 1, (p4 - P2) + 1)
  
 End Function
@@ -4486,43 +4486,43 @@ Function IsLabelAnew(where$, a$, r$, Lang As Long) As Long
 Dim rr&, one As Boolean, c$, gr As Boolean, Split As Boolean
 r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
-Dim i&, l As Long, p3 As Integer
+Dim I&, l As Long, p3 As Integer
 Dim P2 As Long, P1 As Integer, p4 As Long
 l = Len(a$): If l = 0 Then IsLabelAnew = 0: Lang = 1: Exit Function
 Split = Lang > -1
 P2 = StrPtr(a$): l = l - 1
   p4 = P2 + l * 2
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
+  For I = P2 To p4 Step 2
+  GetMem2 I, P1
   Select Case P1
     Case 13
     
-    If i < p4 Then
-    GetMem2 i + 2, p3
+    If I < p4 Then
+    GetMem2 I + 2, p3
     If p3 = 10 Then
     IsLabelAnew = 1234
-    If i + 6 > p4 Then
+    If I + 6 > p4 Then
     a$ = vbNullString
     Else
-    i = i + 4
-    Do While i < p4
+    I = I + 4
+    Do While I < p4
 
-    GetMem2 i, P1
+    GetMem2 I, P1
     If P1 = 32 Or P1 = 160 Then
-    i = i + 2
+    I = I + 2
     Else
-    GetMem2 i + 2, p3
+    GetMem2 I + 2, p3
     If P1 <> 13 And p3 <> 10 Then Exit Do
-    i = i + 4
+    I = I + 4
     End If
     Loop
-    a$ = Mid$(a$, (i + 2 - P2) \ 2)
+    a$ = Mid$(a$, (I + 2 - P2) \ 2)
     End If
     Else
-    If i > P2 Then a$ = Mid$(a$, (i - 2 - P2) \ 2)
+    If I > P2 Then a$ = Mid$(a$, (I - 2 - P2) \ 2)
     End If
     Else
-    If i > P2 Then a$ = Mid$(a$, (i - 2 - P2) \ 2)
+    If I > P2 Then a$ = Mid$(a$, (I - 2 - P2) \ 2)
     End If
     
     Lang = 1
@@ -4532,28 +4532,28 @@ P2 = StrPtr(a$): l = l - 1
 
    Exit For
   End Select
-  Next i
-    If i > p4 Then a$ = vbNullString: IsLabelAnew = 0: Exit Function
-  For i = i To p4 Step 2
-  GetMem2 i, P1
+  Next I
+    If I > p4 Then a$ = vbNullString: IsLabelAnew = 0: Exit Function
+  For I = I To p4 Step 2
+  GetMem2 I, P1
   If P1 < 256 Then
   Select Case P1
         Case 64  '"@"
-            If i < p4 And r$ <> "" Then
-                GetMem2 i + 2, P1
+            If I < p4 And r$ <> "" Then
+                GetMem2 I + 2, P1
                 where$ = r$
                 r$ = vbNullString
             Else
-              IsLabelAnew = 0: a$ = Mid$(a$, (i - P2) \ 2): Exit Function
+              IsLabelAnew = 0: a$ = Mid$(a$, (I - P2) \ 2): Exit Function
             End If
         Case 63 '"?"
         If r$ = vbNullString Then
             r$ = "?"
-            i = i + 4
+            I = I + 4
         Else
-            i = i + 2
+            I = I + 2
         End If
-        a$ = Mid$(a$, (i - P2) \ 2)
+        a$ = Mid$(a$, (I - P2) \ 2)
         IsLabelAnew = 1
         Lang = -1
               
@@ -4562,18 +4562,18 @@ P2 = StrPtr(a$): l = l - 1
         Case 46 '"."
             If one Then
                 Exit For
-            ElseIf r$ <> "" And i < p4 Then
-                GetMem2 i + 2, P1
+            ElseIf r$ <> "" And I < p4 Then
+                GetMem2 I + 2, P1
                 If ChrW(P1) = "." Or ChrW(P1) = " " Then
-                If ChrW(P1) = "." And i + 2 < p4 Then
-                    GetMem2 i + 4, P1
-                    If ChrW(P1) = " " Then i = i + 4: Exit For
+                If ChrW(P1) = "." And I + 2 < p4 Then
+                    GetMem2 I + 4, P1
+                    If ChrW(P1) = " " Then I = I + 4: Exit For
                 Else
-                    i = i + 2
+                    I = I + 2
                    Exit For
                 End If
             End If
-                GetMem2 i, P1
+                GetMem2 I, P1
                 r$ = r$ & ChrW(P1)
                 rr& = 1
             End If
@@ -4632,12 +4632,12 @@ P2 = StrPtr(a$): l = l - 1
             
         Case 40 ' "("
             If r$ <> "" Then
-            If i + 4 <= p4 Then
-                GetMem2 i + 2, P1
-                GetMem2 i + 2, p3
+            If I + 4 <= p4 Then
+                GetMem2 I + 2, P1
+                GetMem2 I + 2, p3
                 If ChrW(P1) + ChrW(p3) = ")@" Then
                     r$ = r$ & "()."
-                    i = i + 4
+                    I = I + 4
                 Else
                     GoTo i1233
                 End If
@@ -4653,9 +4653,9 @@ i1233:
                                        Case Else
                                        Exit For
                                        End Select
-                     GetMem2 i, P1
+                     GetMem2 I, P1
                                         r$ = r$ & ChrW(P1)
-                                        i = i + 2
+                                        I = I + 2
                                       ' A$ = Mid$(A$, 2)
                                    Exit For
                             
@@ -4679,14 +4679,14 @@ i1233:
     End If
 
 
-    Next i
+    Next I
     If Split Then
-        If i > p4 Then a$ = vbNullString Else If (i + 2 - P2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - P2) \ 2)
+        If I > p4 Then a$ = vbNullString Else If (I + 2 - P2) \ 2 > 1 Then a$ = Mid$(a$, (I + 2 - P2) \ 2)
         r$ = myUcase(r$, gr)
         Lang = 1 + CLng(gr)
     Else
         Lang = 0
-        If i > p4 Then Lang = Len(a$) + 1 Else If (i + 2 - P2) \ 2 > 1 Then Lang = (i + 2 - P2) \ 2
+        If I > p4 Then Lang = Len(a$) + 1 Else If (I + 2 - P2) \ 2 > 1 Then Lang = (I + 2 - P2) \ 2
         r$ = myUcase(r$, gr)
     End If
     IsLabelAnew = rr&
@@ -4700,7 +4700,7 @@ Public Function NLTrim2$(a$)
 If Len(a$) > 0 Then NLTrim2$ = Mid$(a$, MyTrimL2(a$))
 End Function
 Public Function StringId(aHash As idHash, bHash As idHash, Optional ahashbackup As idHash, Optional bhashbackup As idHash) As Boolean
-Dim myid(), i As Long
+Dim myid(), I As Long
 Dim myfun()
 myid() = Array("ABOUT$", 1, "пеяи$", 1, "CONTROL$", 2, "THREADS$", 3, "мглата$", 33, "LAN$", 4, "дийтуо$", 4, "GRABFRAME$", 5, "паяейаяе$", 5 _
 , "емаомола$", 6, "TEMPNAME$", 6, "TEMPORARY$", 7, "пяосыяимо$", 7, "USER.NAME$", 8, "омола.вягстг$", 8 _
@@ -4712,13 +4712,13 @@ myid() = Array("ABOUT$", 1, "пеяи$", 1, "CONTROL$", 2, "THREADS$", 3, "мглата$",
 , "APPDIR$", 26, "ежаялоцг.йат$", 26, "DIR$", 27, "йат$", 27, "KEY$", 28, "йол$", 28, "INKEY$", 29, "емйол$", 29, "LETTER$", 30, "цяалла$", 30, "LAMBDA$", 31, "калда$", 35, "жояла$", 32 _
 , "омола.тлглатос$", 36, "MODULE.NAME$", 36, "INTERNET$", 37, "диадийтуо$", 37)
 If Not ahashbackup Is Nothing Then
-    For i = 0 To UBound(myid()) Step 2
-        ahashbackup.ItemCreator CStr(myid(i)), CLng(myid(i + 1))
-    Next i
+    For I = 0 To UBound(myid()) Step 2
+        ahashbackup.ItemCreator CStr(myid(I)), CLng(myid(I + 1))
+    Next I
 End If
-For i = 0 To UBound(myid()) Step 2
-    aHash.ItemCreator CStr(myid(i)), CLng(myid(i + 1))
-Next i
+For I = 0 To UBound(myid()) Step 2
+    aHash.ItemCreator CStr(myid(I)), CLng(myid(I + 1))
+Next I
 myfun() = Array("FORMAT$(", 1, "лояжг$(", 1, "EVAL$(", 2, "ейжя$(", 2, "ейжяасг$(", 2, "STACKTYPE$(", 3, "сыяоутупос$(", 3 _
 , "STACKITEM$(", 4, "тилгсыяоу$(", 4, "исвмг$(", 5, "WEAK$(", 5, "коцос$(", 6, "SPEECH$(", 6, "ASK$(", 7, "яыта$(", 7 _
 , "LOCALE$(", 8, "топийо$(", 8, "SHORTDIR$(", 9, "лийяос.йатакоцос$(", 9, "FILTER$(", 10, "жиктяо$(", 10, "коцос$(", 11, "SPEECH$(", 11 _
@@ -4739,18 +4739,18 @@ myfun() = Array("FORMAT$(", 1, "лояжг$(", 1, "EVAL$(", 2, "ейжя$(", 2, "ейжяасг$
 
 
 If Not bhashbackup Is Nothing Then
-For i = 0 To UBound(myfun()) Step 2
-    bhashbackup.ItemCreator CStr(myfun(i)), CLng(myfun(i + 1))
-Next i
+For I = 0 To UBound(myfun()) Step 2
+    bhashbackup.ItemCreator CStr(myfun(I)), CLng(myfun(I + 1))
+Next I
 End If
-For i = 0 To UBound(myfun()) Step 2
-    bHash.ItemCreator CStr(myfun(i)), CLng(myfun(i + 1))
-Next i
+For I = 0 To UBound(myfun()) Step 2
+    bHash.ItemCreator CStr(myfun(I)), CLng(myfun(I + 1))
+Next I
 StringId = True
 
 End Function
 Public Function NumberId(aHash As idHash, bHash As idHash, Optional ahashbackup As idHash, Optional bhashbackup As idHash) As Boolean
-Dim myid(), i As Long
+Dim myid(), I As Long
 Dim myfun()
 myid() = Array("THIS", 1, "ауто", 1, "RND", 2, "туваиос", 2, "PEN", 3, "пема", 3, "HWND", 4, "паяахуяо", 4, "LOCALE", 5, "топийо", 5, "CODEPAGE", 6, "йыдийосекида", 6 _
 , "SPEECH", 7, "коцос", 7, "ERROR", 8, "кахос", 8, "SCREEN.Y", 9, "амакусг.у", 9, "амакусг.ь", 9, "SCREEN.X", 10, "амакусг.в", 10, "TWIPSY", 11, "уьос.сглеиоу", 11 _
@@ -4773,13 +4773,13 @@ myid() = Array("THIS", 1, "ауто", 1, "RND", 2, "туваиос", 2, "PEN", 3, "пема", 3
 , "INTERNET", 99, "диадийтуо", 99, "CLIPBOARD.IMAGE", 100, "пяовеияо.еийома", 100, "CLIPBOARD.DRAWING", 101, "пяовеияо.сведио", 101, "MONITORS", 102, "охомес", 102, "DOS", 103, "йомсока", 103, "SOUNDREC.LEVEL", 104, "гвоцяажгсгс.епипедо", 104, "ADDRESSOF", 105, "диеухумсгапо", 105, "пкатос.таимиас", 106, "MOVIE.WIDTH", 106, "уьос.таимиас", 107, "MOVIE.HEIGHT", 107, "PAGE.WIDTH", 108, "пкатос.секидас", 108, "PAGE.HEIGHT", 109, "уьос.секидас", 109, "PRINTING", 110, "ейтупысг", 110 _
 , "SOUNDREC", 111, "гвоцяажгсг", 111, "PRINTER.QUALITY", 112, "поиотгта.ейтупысгс", 112)
 If Not ahashbackup Is Nothing Then
-For i = 0 To UBound(myid()) Step 2
-    ahashbackup.ItemCreator CStr(myid(i)), CLng(myid(i + 1))
-Next i
+For I = 0 To UBound(myid()) Step 2
+    ahashbackup.ItemCreator CStr(myid(I)), CLng(myid(I + 1))
+Next I
 End If
-For i = 0 To UBound(myid()) Step 2
-    aHash.ItemCreator CStr(myid(i)), CLng(myid(i + 1))
-Next i
+For I = 0 To UBound(myid()) Step 2
+    aHash.ItemCreator CStr(myid(I)), CLng(myid(I + 1))
+Next I
 myfun() = Array("PARAM(", 1, "паяал(", 1, "STACKITEM(", 2, "тилгсыяоу(", 2, "SGN(", 3, "сгл(", 3, "FRAC(", 4, "дей(", 4, "MATCH(", 5, "таутисг(", 5 _
 , "LOCALE(", 6, "топийо(", 6, "FILELEN(", 7, "аявеиоу.лгйос(", 7, "TAB(", 8, "стгкг(", 8, "KEYPRESS(", 9, "патглемо(", 9, "INKEY(", 10, "емйол(", 10 _
 , "тлгла(", 11, "MODULE(", 11, "басг(", 12, "MDB(", 12, "ASK(", 13, "яыта(", 13, "суцйяоусг(", 14, "COLLIDE(", 14, "лецехос.у(", 15, "лецехос.ь(", 15, "SIZE.Y(", 15, "лецехос.в(", 16, "SIZE.X(", 16 _
@@ -4805,18 +4805,18 @@ myfun() = Array("PARAM(", 1, "паяал(", 1, "STACKITEM(", 2, "тилгсыяоу(", 2, "SGN
 
 
 If Not bhashbackup Is Nothing Then
-For i = 0 To UBound(myfun()) Step 2
-    bhashbackup.ItemCreator CStr(myfun(i)), CLng(myfun(i + 1))
-Next i
+For I = 0 To UBound(myfun()) Step 2
+    bhashbackup.ItemCreator CStr(myfun(I)), CLng(myfun(I + 1))
+Next I
 End If
-For i = 0 To UBound(myfun()) Step 2
-    bHash.ItemCreator CStr(myfun(i)), CLng(myfun(i + 1))
-Next i
+For I = 0 To UBound(myfun()) Step 2
+    bHash.ItemCreator CStr(myfun(I)), CLng(myfun(I + 1))
+Next I
 NumberId = True
 End Function
 
-Public Function allcommands(aHash As sbHash) As Boolean
-Dim mycommands(), i As Long
+Public Function allcommands(aHash As coHash) As Boolean
+Dim mycommands(), I As Long
 mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "ASSERT", "BACK", "BACKGROUND", "BASE", "BASIC", "BEEP", "BIGINTEGER", "BINARY", "BITMAPS", "BOOLEAN", "BOLD", "BREAK", "BROWSER", "BUFFER", "BYTE", "CALL", "CASE", "CAT", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLOSE", "CLS", "CODEPAGE", "COLOR", "COMPLEX", "COMMIT", "COMPRESS", "CONST", "CONTINUE", "COPY", "CURRENCY", "CURSOR", "CURVE", "DATA", "DATE", "DB.PROVIDER", "DB.USER", "DECIMAL" _
 , "DECLARE", "DEF", "DELETE", "DESKTOP", "DIM", "DIR", "DIV", "DO", "DOCUMENT", "DOS", "DOUBLE", "DRAW", "DRAWING", "DRAWINGS", "DROP", "DURATION", "EDIT", "EDIT.DOC", "ELSE", "ELSE.IF", "EMPTY", "END", "ENGLISH", "ENUM", "ENUMERATION", "ERASE", "ERROR", "ESCAPE", "EVENT", "EVERY", "EXECUTE", "EXIT", "EXPORT", "FAST", "FIELD", "FILES", "FILL", "FIND", "FKEY", "FLOODFILL", "FLUSH", "FONT", "FOR", "FORM", "FORMLABEL", "FRAME", "FUNCTION", "GET", "GLOBAL" _
 , "GOSUB", "GOTO", "GRADIENT", "GREEK", "GROUP", "HALT", "HEIGHT", "HELP", "HEX", "HIDE", "HOLD", "HTML", "ICON", "IF", "IMAGE", "INLINE", "INPUT", "INSERT", "INTEGER", "INVENTORY", "ITALIC", "ITALICS", "INTERFACE", "JOYPAD", "KEYBOARD", "LATIN", "LAYER", "LEGEND", "LET", "LINE", "LINESPACE", "LINK", "LIST", "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LONG", "LOOP", "MAIN.TASK", "MARK", "MEDIA", "MENU", "MERGE.DOC", "METHOD", "MODE", "MODULE" _
@@ -4833,320 +4833,320 @@ mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "ASSERT", "BACK",
 , "пеяихыяио", "пета", "пимайас", "пимайес", "пкациа", "пкаисио", "пкгйтяокоцио", "поиотгта.ейтупысгс", "покуцымо", "пяос", "пяосхесе.еццяажо", "пяосхгйг", "пяытотупо", "пяовеияо", "яоутима", "яухлисеис", "с", "саяысе", "сбгсе", "сеияа", "секида", "семаяио", "сгл", "сглади", "стахеяг", "стахеяес", "статийг", "статийес", "стг", "стгм", "сто", "стой", "стовои", "стовос", "суццяажеас", "суццяажг", "суцвымеусе.еццяажо", "сулпиесг" _
 , "сумаятгсг", "сумевисе", "сус", "сустгла", "сведио", "сведиа", "сведио.мглатым", "сыяос", "сысе", "сысе.еццяажо", "таимиа", "таимиес", "танг", "танимолгсг", "текос", "титкос", "тлгла", "тлглата", "томос", "топийа", "топийес", "топийг", "топийо", "тоте", "тупос", "тупысе", "упеяйкасг", "упойатакоцос", "жаядиа", "жеяе", "жеяеписы", "жомто", "жояла", "жоятысе" _
 , "жоятысе.еццяажо", "жымг", "ваяайтгяес", "ваяане", "вягсг", "вягстг", "вягстгс", "вяыла", "вяылатисе", "ьгжио", "?")
-For i = 0 To UBound(mycommands())
+For I = 0 To UBound(mycommands())
 
-Select Case mycommands(i)
+Select Case mycommands(I)
 Case "SORT", "танимолгсг"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoSort)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoSort)
 Case "DEF", "йаме"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDef)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoDef)
 Case "NORMAL", "йамомийа"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoNormal)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoNormal)
 Case "DOUBLE", "дипка", "дипкос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDouble)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoDouble)
 Case "INTEGER", "айеяаиос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoInteger)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoInteger)
 Case "COMPLEX", "лицадийос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoComplex)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoComplex)
 Case "LONG", "лайяус"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoLong)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoLong)
 Case "SINGLE", "апкос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoSingle)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoSingle)
 Case "BOOLEAN", "коцийос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoBoolean)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoBoolean)
 Case "VARIANT", "атупос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoVariant)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoVariant)
 Case "BIGINTEGER", "лецакосайеяаиос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoBigInteger)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoBigInteger)
 Case "DECIMAL", "аяихлос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDecimal)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoDecimal)
 Case "CURRENCY", "коцистийос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoCurrency)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoCurrency)
 Case "BYTE", "ьгжио"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoByte)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoByte)
 Case "DATE", "глеяолгмиа"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDate)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoDate)
 Case "STRING", "цяалла"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoString)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoString)
 Case "OBJECT", "амтийеилемо"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoObject)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoObject)
 Case "CURSOR", "дяолеас"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoTextCursor)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoTextCursor)
 Case "MOUSE.ICON", "деийтг.лояжг"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoMouseIcon)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoMouseIcon)
 Case "FLOODFILL", "целисе"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoFloodFill)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoFloodFill)
 Case "FILL", "баье"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoFill)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoFill)
 Case "IMAGE", "еийома"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoImage)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoImage)
 Case "RELEASE", "ажгсе"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoRelease)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoRelease)
 Case "HOLD", "йяатгсе"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoHold)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoHold)
 Case "SUPERCLASS", "упеяйкасг"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoSuperClass)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoSuperClass)
 Case "CLASS", "йкасг"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoClass)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoClass)
 Case "DIM", "пимайас", "пимайес"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDIM)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoDIM)
 Case "PATH", "COLOR", "вяыла", "ивмос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPathDraw)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoPathDraw)
 Case "TITLE", "титкос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoTitle)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoTitle)
 Case "NEW", "мео"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoNew)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoNew)
 Case "MODULE", "тлгла"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoModule)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoModule)
 Case "GROUP", "олада"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoGroup)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoGroup)
 Case "DRAWINGS", "сведиа"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDrawings)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoDrawings)
 Case "BITMAPS", "еийомес"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoBitmaps)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoBitmaps)
 Case "MOVIES", "таимиес"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoMovies)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoMovies)
 Case "SOUNDS", "гвои"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoSounds)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoSounds)
 Case "FUNCTION", "сумаятгсг"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoFunction)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoFunction)
 Case "STEP", "бгла"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoStep)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoStep)
 Case "COPY", "амтецяаье", "амтицяаье"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoCopy)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoCopy)
 Case "охомг", "CLS"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoCls)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoCls)
 Case "пема", "PEN"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPen)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoPen)
 Case "WAIT", "амаломг"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoWait)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoWait)
 Case "EVENT", "цецомос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoEvent)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoEvent)
 Case "SET", "хесе"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoSet)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoSet)
 Case "INPUT", "еисацыцг"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoInput)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoInput)
 Case "CLEAR", "йахаяо"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoClear)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoClear)
 Case "DECLARE", "ояисе"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDeclare)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoDeclare)
 Case "METHOD", "леходос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoMethod)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoMethod)
 Case "WITH", "ле.амтийеилемо"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoWith)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoWith)
 Case "DATA", "сеияа"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoData)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoData)
 Case "PUSH", "баке"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPush)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoPush)
 Case "SWAP", "аккане"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoSwap)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoSwap)
 Case "COMMIT", "амехесе"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoComm)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoComm)
 Case "REFER", "апедысе"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoRef)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoRef)
 Case "READ", "диабасе"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoRead)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoRead)
 Case "LET", "стг", "стгм", "сто"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoLet)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoLet)
 Case "PRINT", "тупысе", "?"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPrint)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoPrint)
 Case "CALL", "йакесе"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 38
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 38
 Case "CHOOSE.OBJECT", "епекене.амтийеилемо", "епикене.амтийеилемо"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoChooseObj)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoChooseObj)
 Case "CHOOSE.FONT", "епекене.цяаллатосеияа", "епикене.цяаллатосеияа"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoChooseFont)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoChooseFont)
 Case "REM", "сгл"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoRem)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoRem)
 Case "LINESPACE", "диастиво"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoLinespace)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoLinespace)
 Case "BOLD", "жаядиа"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoBold)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoBold)
 Case "MODE", "тупос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoMode)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoMode)
 Case "GRADIENT", "жомто"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoGradient)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoGradient)
 Case "FILES", "аявеиа"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoFiles)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoFiles)
 Case "CAT", "йатакоцои", "йат"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoCat)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoCat)
 Case "MOVE", "хесг"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoMove)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoMove)
 Case "ваяане", "DRAW"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDraw)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoDraw)
 Case "WIDTH", "павос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoWidth)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoWidth)
 Case "покуцымо", "POLYGON"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPoly)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoPoly)
 Case "CIRCLE", "йуйкос"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoCircle)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoCircle)
 Case "йалпукг", "CURVE"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoCurve)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoCurve)
 Case "TEXT", "йеилемо"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoText)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoText)
 Case "HTML"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoHtml)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoHtml)
 Case "STRUCTURE", "долг"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoStructure)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoStructure)
 Case "басг", "BASE"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoBase)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoBase)
 Case "аявеио", "TABLE"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoTable)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoTable)
 Case "ейтекесг", "EXECUTE"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoExecute)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoExecute)
 Case "амайтгсг", "RETRIEVE"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoRetr)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoRetr)
 Case "амафгтгсг", "SEARCH"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoSearch)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoSearch)
 Case "пяосхгйг", "APPEND"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoAppend)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoAppend)
 Case "ажаияесг", "DELETE"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDelete)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoDelete)
 Case "танг", "ORDER"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoOrder)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoOrder)
 Case "сулпиесг", "COMPRESS"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoCompact)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoCompact)
 Case "LAYER", "епипедо"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoLayer)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoLayer)
 Case "PRINTER", "ейтупытгс"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPrinter)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoPrinter)
 Case "PAGE", "секида"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPage)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoPage)
 Case "PLAYER", "паийтгс"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPlayer)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoPlayer)
 Case "SPRITE", "диажамо", "диажамеиа"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoSprite)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoSprite)
 Case "MODULES", "тлглата"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoModules)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoModules)
 Case "CLIPBOARD", "пяовеияо"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoClipBoard)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoClipBoard)
 Case "паине", "PLAY"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPlayScore)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoPlayScore)
 Case "SCORE", "жымг"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoScore)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoScore)
 Case "REPORT", "амажояа"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoReport)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoReport)
 Case "BACK", "BACKGROUND", "пеяихыяио"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoBack)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoBack)
 Case "OVER", "памы"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoOver)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoOver)
 Case "ITALIC", "ITALICS", "пкациа"
-    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoItalic)
+    aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoItalic)
 Case "PROTOTYPE", "пяытотупо"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoProto)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoProto)
 Case "SHIFTBACK", "жеяеписы"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoShiftBack)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoShiftBack)
 Case "SHIFT", "жеяе"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoShift)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoShift)
 Case "LOAD", "жоятысе"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoLoad)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoLoad)
 Case "DROP", "пета"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDrop)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoDrop)
 Case "апаяихлгсг", "апая", "ENUMERATION", "ENUM"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoEnum)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoEnum)
 Case "диепажг", "INTERFACE"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoInterface)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoInterface)
 
 Case "DESKTOP", "епижамеиа"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDesktop)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoDesktop)
 Case "вяылатисе", "PSET"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPset)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoPset)
 Case "ASSERT", "аниысг"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoAssert)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoAssert)
 Case "ояиа.ейтупытг", "ояиа.ейтупысгс", "PRINTER.MARGINS"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoMargin)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoMargin)
 Case "поиотгта.ейтупысгс", "PRINTER.QUALITY"
-aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPrinterQuality)
+aHash.ItemCreator CStr(mycommands(I)), ProcPtr(AddressOf NeoPrinterQuality)
 Case "IF", "ам"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 1
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 1
 Case "ELSE", "аккиыс"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 2
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 2
 Case "ELSE.IF", "аккиыс.ам"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 3
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 3
 Case "SELECT", "епекене", "епикене"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 4
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 4
 Case "TRY", "дес"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 5
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 5
 Case "FOR", "циа"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 6
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 6
 Case "NEXT", "еполемо"
-     aHash.ItemCreator2 CStr(mycommands(i)), 0, 7
+     aHash.ItemCreator2 CStr(mycommands(I)), 0, 7
 Case "REFRESH", "амамеысг"
-     aHash.ItemCreator2 CStr(mycommands(i)), 0, 8
+     aHash.ItemCreator2 CStr(mycommands(I)), 0, 8
 Case "емы", "WHILE"
-     aHash.ItemCreator2 CStr(mycommands(i)), 0, 9
+     aHash.ItemCreator2 CStr(mycommands(I)), 0, 9
 Case "DO", "REPEAT", "епамакабе", "епамекабе"
-     aHash.ItemCreator2 CStr(mycommands(i)), 0, 10
+     aHash.ItemCreator2 CStr(mycommands(I)), 0, 10
 Case "GOTO", "пяос"
-     aHash.ItemCreator2 CStr(mycommands(i)), 0, 11
+     aHash.ItemCreator2 CStr(mycommands(I)), 0, 11
 Case "SUB", "яоутима"
-     aHash.ItemCreator2 CStr(mycommands(i)), 0, 12
+     aHash.ItemCreator2 CStr(mycommands(I)), 0, 12
 Case "GOSUB", "диалесоу"
-     aHash.ItemCreator2 CStr(mycommands(i)), 0, 13
+     aHash.ItemCreator2 CStr(mycommands(I)), 0, 13
 Case "апо", "ON"
-     aHash.ItemCreator2 CStr(mycommands(i)), 0, 14
+     aHash.ItemCreator2 CStr(mycommands(I)), 0, 14
 Case "LOOP", "йуйкийа"
-     aHash.ItemCreator2 CStr(mycommands(i)), 0, 15
+     aHash.ItemCreator2 CStr(mycommands(I)), 0, 15
 Case "BREAK", "диейоье"
-     aHash.ItemCreator2 CStr(mycommands(i)), 0, 16
+     aHash.ItemCreator2 CStr(mycommands(I)), 0, 16
 Case "CONTINUE", "сумевисе"
-     aHash.ItemCreator2 CStr(mycommands(i)), 0, 17
+     aHash.ItemCreator2 CStr(mycommands(I)), 0, 17
 Case "RESTART", "нейима"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 18
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 18
 Case "RETURN", "епистяожг"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 19
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 19
 Case "END", "текос"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 20
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 20
 Case "енодос", "EXIT"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 21
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 21
 Case "INLINE", "емхесг"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 22
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 22
 Case "UPDATE", "епийаияо"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 23
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 23
 Case "мгла", "THREAD"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 24
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 24
 Case "AFTER", "лета"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 25
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 25
 Case "леяос", "PART"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 26
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 26
 Case "статийг", "статийес", "STATIC"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 27
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 27
 Case "йахе", "EVERY"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 28
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 28
 Case "йуяио.еяцо", "MAIN.TASK", "TASK.MAIN"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 29
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 29
 Case "SCAN", "саяысе"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 30
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 30
 Case "TARGET", "стовос"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 31
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 31
 Case "LOCAL", "топийа", "топийг", "топийес"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 34  ' Local A, B, C=10, K
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 34  ' Local A, B, C=10, K
 Case "GLOBAL", "цемийо", "цемийг", "цемийес"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 35   'Global A, B=6, X
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 35   'Global A, B=6, X
 Case "CONST", "стахеяг", "стахеяес"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 36
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 36
 Case "BINARY", "дуадийо"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 39
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 39
 Case "HALT", "акт"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 40
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 40
 Case "STOP", "диайопг"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 41
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 41
 Case "DRAWING", "сведио"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 42
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 42
 Case "VAR", "VARIABLE", "VARIABLES", "летабкгтг", "летабкгтес"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 43  ' 44 FOR CLASSES
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 43  ' 44 FOR CLASSES
 Case "BASIC"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 45  ' 44 FOR CLASSES
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 45  ' 44 FOR CLASSES
 Case "RESTORE", "епамажояа"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 46
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 46
 Case "ле"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 47
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 47
 Case "CASE"
-    aHash.ItemCreator2 CStr(mycommands(i)), 0, 48
+    aHash.ItemCreator2 CStr(mycommands(I)), 0, 48
 Case Else  ' MAYBE I MADE ONE FOR STRUCTURES
-    aHash.ItemCreator CStr(mycommands(i)), 0
+    aHash.ItemCreator CStr(mycommands(I)), 0
 End Select
-Next i
+Next I
 allcommands = True
 End Function
 Private Function ProcPtr(ByVal nAddress As Long) As Long
