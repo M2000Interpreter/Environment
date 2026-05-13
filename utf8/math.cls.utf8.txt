@@ -945,63 +945,63 @@ Public Sub QuatMultQuatMul(n As Long, a As Long, b As Long, Optional c As Long =
     Next M
     End If
 End Sub
-Public Sub QuatMultByReal(a As Long, R As Double, Optional c As Long = 0)
+Public Sub QuatMultByReal(a As Long, r As Double, Optional c As Long = 0)
     Dim q As QuatType
     q = GetQuatType(a)
-    q.W = q.W * R
-    q.X = q.X * R
-    q.Y = q.Y * R
-    q.z = q.z * R
+    q.W = q.W * r
+    q.X = q.X * r
+    q.Y = q.Y * r
+    q.z = q.z * r
     If c = 0 Then CopyMemory a, VarPtr(q), 32: Exit Sub
     CopyMemory c, VarPtr(q), 32
 End Sub
 Public Sub QuatMultReal(a As Long, b As Long, Optional c As Long = 0)
-    Dim q As QuatType, R As Double
+    Dim q As QuatType, r As Double
     q = GetQuatType(a)
-    R = GetRealType(b)
-    q.W = q.W * R
-    q.X = q.X * R
-    q.Y = q.Y * R
-    q.z = q.z * R
+    r = GetRealType(b)
+    q.W = q.W * r
+    q.X = q.X * r
+    q.Y = q.Y * r
+    q.z = q.z * r
     If c = 0 Then CopyMemory a, VarPtr(q), 32: Exit Sub
     CopyMemory c, VarPtr(q), 32
 End Sub
 Public Sub QuatMultRealMul(n As Long, a As Long, b As Long, Optional c As Long = 0)
-    Dim q As QuatType, R As Double, M As Long
+    Dim q As QuatType, r As Double, M As Long
     For M = 1 To n
     q = GetQuatType(a)
-    R = GetRealType(b)
-    q.W = q.W * R
-    q.X = q.X * R
-    q.Y = q.Y * R
-    q.z = q.z * R
+    r = GetRealType(b)
+    q.W = q.W * r
+    q.X = q.X * r
+    q.Y = q.Y * r
+    q.z = q.z * r
     If c = 0 Then CopyMemory a, VarPtr(q), 32 Else CopyMemory c, VarPtr(q), 32: c = c + 32
     a = a + 32
     b = b + 8
     Next M
 End Sub
 Public Sub QuatMultRealMulOne(n As Long, a As Long, b As Long, Optional c As Long = 0)
-    Dim q As QuatType, R As Double, M As Long
-    R = GetRealType(b)
+    Dim q As QuatType, r As Double, M As Long
+    r = GetRealType(b)
     For M = 1 To n
     q = GetQuatType(a)
-    q.W = q.W * R
-    q.X = q.X * R
-    q.Y = q.Y * R
-    q.z = q.z * R
+    q.W = q.W * r
+    q.X = q.X * r
+    q.Y = q.Y * r
+    q.z = q.z * r
     If c = 0 Then CopyMemory a, VarPtr(q), 32 Else CopyMemory c, VarPtr(q), 32: c = c + 32
     a = a + 32
     Next M
 End Sub
-Public Sub QuatAddByReal(a As Long, R As Double, Optional c As Long = 0)
+Public Sub QuatAddByReal(a As Long, r As Double, Optional c As Long = 0)
     Dim q As QuatType
     If c = 0 Then
         q = GetQuatType(a)
-        q.W = q.W + R
+        q.W = q.W + r
         CopyMemory a, VarPtr(q), 8
     Else
         q = GetQuatType(a)
-        q.W = q.W + R
+        q.W = q.W + r
         CopyMemory c, VarPtr(q), 32
     End If
 End Sub
@@ -1399,49 +1399,49 @@ End Function
 ' hyperbolic sine
 
 Public Function Sinh(Value As Double) As Double
-    Dim temp As Double
-    temp = EXP(Value)
-    Sinh = (temp - 1 / temp) / 2
+    Dim Temp As Double
+    Temp = EXP(Value)
+    Sinh = (Temp - 1 / Temp) / 2
 End Function
 
 ' hyperbolic cosine
 
 Public Function Cosh(Value As Double) As Double
-    Dim temp As Double
-    temp = EXP(Value)
-    Cosh = (temp + 1 / temp) / 2
+    Dim Temp As Double
+    Temp = EXP(Value)
+    Cosh = (Temp + 1 / Temp) / 2
 End Function
 
 ' hyperbolic tangent
 
 Public Function Tanh(Value As Double) As Double
-    Dim temp As Double
-    temp = EXP(Value)
-    Tanh = (temp - 1 / temp) / (temp + 1 / temp)
+    Dim Temp As Double
+    Temp = EXP(Value)
+    Tanh = (Temp - 1 / Temp) / (Temp + 1 / Temp)
 End Function
 
 ' hyperbolic cotangent
 
 Public Function CotH(Value As Double) As Double
-    Dim temp As Double
-    temp = EXP(Value)
-    CotH = (temp + 1 / temp) / (temp - 1 / temp)
+    Dim Temp As Double
+    Temp = EXP(Value)
+    CotH = (Temp + 1 / Temp) / (Temp - 1 / Temp)
 End Function
 
 ' hyperbolic secant
 
 Public Function Sech(Value As Double) As Double
-    Dim temp As Double
-    temp = EXP(Value)
-    Sech = 2 / (temp + 1 / temp)
+    Dim Temp As Double
+    Temp = EXP(Value)
+    Sech = 2 / (Temp + 1 / Temp)
 End Function
 
 ' hyperbolic cosecant
 
 Public Function Csch(Value As Double) As Double
-    Dim temp As Double
-    temp = EXP(Value)
-    Csch = 2 / (temp - 1 / temp)
+    Dim Temp As Double
+    Temp = EXP(Value)
+    Csch = 2 / (Temp - 1 / Temp)
 End Function
 
 

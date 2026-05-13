@@ -20,10 +20,10 @@ Dim mIndex As Long
 Friend Property Get GetCallBack() As GuiM2000
 Set GetCallBack = Callback
 End Property
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
-Friend Property Let Index(ByVal RHS As Long)
+Friend Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Friend Property Get ControlName() As String
@@ -64,7 +64,7 @@ End Sub
 
 Private Sub mycontrol_ObjectEvent(Info As EventInfo)
 Dim Values(), M As Long, uk1 As Object
-Debug.Print Info.Name, mycontrol.Name
+'Debug.Print Info.Name, mycontrol.Name
 If LCase(Info.Name) = "lostfocus" Or LCase(Info.Name) = "lostfocus1" Then
 If mycontrol.enabled And mycontrol.Visible Then
     Callback.LastActive = mycontrol.Name  'myname$

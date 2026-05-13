@@ -12,13 +12,13 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 ' do something
-Public mylist As New LongHash
+Public mylist As New LongHash2
 
 Private Sub Class_Terminate()
 Dim i As Long, j As Long, start As Long
-j = Forms.count
+j = Forms.Count
 While j > 0
-For i = start To Forms.count - 1
+For i = start To Forms.Count - 1
 If mylist.ExistKey(Forms(i).hWnd) Then
 If mylist.Value = "" Then
 Forms(i).icon = LoadPicture("")

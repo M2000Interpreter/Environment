@@ -223,7 +223,7 @@ Public modulename$  ' module name plus name of object
 Public modulenameonly$
 Public VarIndex As Long, ItemIndex As Long
 ' by Edanmo
-Private exclude As New LongHash, inUse As New LongHash
+Private exclude As New LongHash2, inUse As New LongHash
 Public StaticCollection As FastCollection
 Private Declare Function lstrlenW Lib "kernel32" (ByVal lpString As Long) As Long
 Private Declare Sub RtlMoveMemory Lib "kernel32" (Dst As Any, Src As Any, ByVal BLen As Long)

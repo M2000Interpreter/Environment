@@ -648,22 +648,22 @@ Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR
 
     ' Get IDispatch from object
     Set IDsp = pobjTarget
-    Dim aa As Long, i As Integer, K As Integer
+    Dim aa As Long, i As Integer, k As Integer
     aa = DISPID_VALUE
     ' WE HAVE DISPIP
     If VarType(ThisIndex) = 8204 Then
                 ReDim varArr(0 To UBound(ThisIndex))
-                K = 0
+                k = 0
                 For i = UBound(ThisIndex) - 1 To 0 Step -1
                     If MemInt(VarPtr(ThisIndex(i))) = 9 Then
-                        Set varArr(K) = ThisIndex(i)
+                        Set varArr(k) = ThisIndex(i)
                     Else
-                        varArr(K) = ThisIndex(i)
+                        varArr(k) = ThisIndex(i)
                     End If
-                    K = K + 1
+                    k = k + 1
                 Next
                 With params
-                    .cArgs = K
+                    .cArgs = k
                     .rgPointerToVariantArray = VarPtr(varArr(0))
                     
                     .cNamedArgs = 0
@@ -812,22 +812,22 @@ Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, val1, E
     Set IDsp = pobjTarget
 
     ' WE HAVE DISPIP
-    Dim aa As Long, i As Integer, K As Integer
+    Dim aa As Long, i As Integer, k As Integer
     aa = DISPID_PROPERTYPUT
         If VarType(ThisIndex) = 8204 Then
                  ReDim varArr(0 To UBound(ThisIndex) + 1)
-                 K = 1
+                 k = 1
                  For i = UBound(ThisIndex) - 1 To 0 Step -1
                     If MemInt(VarPtr(ThisIndex(i))) = 9 Then
-                        Set varArr(K) = ThisIndex(i)
+                        Set varArr(k) = ThisIndex(i)
                     Else
-                        varArr(K) = ThisIndex(i)
+                        varArr(k) = ThisIndex(i)
                     End If
-                    K = K + 1
+                    k = k + 1
                  Next
                  varArr(0) = val1
                 With params
-                    .cArgs = K
+                    .cArgs = k
                     .rgPointerToVariantArray = VarPtr(varArr(0))
                     .cNamedArgs = 1
                      .rgPointerToDISPIDNamedArgs = VarPtr(aa)

@@ -772,14 +772,15 @@ Private Sub CheckToolTip()
         Extender.ToolTipText = ""
     End If
 End Sub
-Public Property Let ToolTip(ByVal RHS As String)
+Public Property Let TOOLTIP(ByVal RHS As String)
     mtooltip = RHS
+    Debug.Print RHS
     DestroyToolTip
     Extender.ToolTipText = Left$(mtooltip, 80)
     mHwnd = 0
 End Property
-Public Property Get ToolTip() As String
-    ToolTip = mtooltip
+Public Property Get TOOLTIP() As String
+    TOOLTIP = mtooltip
 End Property
 
 Public Property Get Quality() As SEQualityConstants

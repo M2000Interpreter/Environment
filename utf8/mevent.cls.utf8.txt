@@ -24,7 +24,7 @@ Private mParamBlock As String, mParams As Long
 Private Hash() As Long
 Public excludeme As Object
 Public NoHere$
-Public exclude As LongHash, StaticCollection As FastCollection
+Public exclude As LongHash2, StaticCollection As FastCollection
 Public Function Extern(ParamArray a()) As Long
 Attribute Extern.VB_UserMemId = 0
 ' default function
@@ -35,7 +35,7 @@ Else
 Exit Function
 End If
 ohere$ = here$
-Dim i As Long, ar As mArray, j As Long
+Dim i As Long, Ar As mArray, j As Long
 Dim manydim As Long, maxitems As Long, probe As Long, v() As Variant, probelow As Long
 Dim ms As mStiva
 Set ms = objref.soros
@@ -44,8 +44,8 @@ Select Case VarType(a(i))
 Case Is >= vbArray
 ' only with error control
 
-If varTypename(a(i)) = "Variant()" Then
-Set ar = New mArray
+If VarTypeName(a(i)) = "Variant()" Then
+Set Ar = New mArray
 v() = a(i)
 On Error Resume Next
 For j = 1 To 60
@@ -60,13 +60,13 @@ For j = 1 To manydim
     probe = UBound(v, j)
     If Err Then Exit For
     probelow = LBound(v, j)
-    ar.PushDim probe - probelow + 1
+    Ar.PushDim probe - probelow + 1
 Next j
-ar.PushEnd
+Ar.PushEnd
 'ar.RevOrder = True
-ar.CopySerialize v()
-ms.DataObj ar
-Set ar = Nothing
+Ar.CopySerialize v()
+ms.DataObj Ar
+Set Ar = Nothing
 Erase v()
 Else
 ms.DataValLong 0
@@ -130,11 +130,11 @@ End Sub
 
 Friend Sub ReadVar(where, Name$, func As String)
     Name$ = PriveSpace(where).Key
-    func = PriveSpace(where).ndx
+    func = PriveSpace(where).nDx
 End Sub
 Friend Sub ReadVarEx(where, Name$, func As String, Extra As Long)
     Name$ = PriveSpace(where).Key
-    func = PriveSpace(where).ndx
+    func = PriveSpace(where).nDx
     Extra = PriveSpace(where).firsthash
 End Sub
 
@@ -163,7 +163,7 @@ Friend Sub ReduceHash(newTop As Long)
             .Key = vbNullString
         End If
 
-        .ndx = vbNullString
+        .nDx = vbNullString
             
         End With
 
@@ -230,7 +230,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    func = PriveSpace(k).ndx: Find = True: Exit Function
+    func = PriveSpace(k).nDx: Find = True: Exit Function
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0
@@ -245,7 +245,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    PriveSpace(k).ndx = func
+    PriveSpace(k).nDx = func
     PriveSpace(k).Key = NewKey
     PriveSpace(k).firsthash = HD(NewKey)
                 ReDim Hash(MaxSpace * 2 + 3)
@@ -283,7 +283,7 @@ Dim a As Long
 a = Malloc()
 With PriveSpace(a)
     .Key = Key
-    .ndx = func
+    .nDx = func
     .firsthash = HD(Key)
 End With
 place HashFunc(Key), a
@@ -313,13 +313,13 @@ End Function
 Public Sub Upgrade(usethis$)
 Dim i As Long, a$
 For i = 0 To toplim
-a$ = PriveSpace(i).ndx
+a$ = PriveSpace(i).nDx
 Dim b$
 If a$ <> "" Then
 b$ = Left$(a$, rinstr(a$, "}", 0))
 a$ = Mid$(a$, Len(b$) + 1)
 If b$ <> "" And NoHere = a$ Then
-PriveSpace(i).ndx = b$ + usethis$
+PriveSpace(i).nDx = b$ + usethis$
 End If
 End If
 Next i

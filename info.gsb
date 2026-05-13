@@ -2970,16 +2970,16 @@ a=Dog
 AlfaByRef(&a)
 
 Print a=Cat  ' true
-Print "a value by name:";@Name$(a)
+Print "a value by name:";Name$(a)
 integer k
 list
 For k=Dog to Cat
-      Print "k value by name:";@Name$(k), type$(k)
+      Print "k value by name:";Name$(k), type$(k)
 Next
 
 kk=Each(Pets)
 While kk
-      Print @Name2$(kk), @Name$(kk)
+      Print Name2$(kk), Name$(kk)
 End While
 
 Sub Alfa(b as Pets)
@@ -3497,8 +3497,8 @@ report {
 }
 \\ rules for names are like subs, but not like simple routines with Gosub to a label (which we have to use same case label)
 Pen 14
-Print @(tab(2)), @FACTORIAL(24) 
-Print @(tab(2)), @factorial(10)
+Print @(tab(2)), factorial(24) 
+Print @(tab(2)), factorial(10)
 Pen 15
 Report {
 	Conclusion:
@@ -3516,7 +3516,7 @@ Clear \\ clear all static variables
 End
 Function factorial(x)
 	if x<2 then =1@ : Exit Function
-	=@factorial(x-1)*x
+	=factorial(x-1)*x
 End Function
 
 }
@@ -12236,7 +12236,7 @@ Module Checkit {
       For i=19 to 11 {total*=i}
       For i=9 to 1 {total/=i}
       Profiler
-      gt=@pick(19,9,0)
+      gt=pick(19,9,0)
       Print "Minutes:";Timecount/1000/60
       le=total-gt
       Print Format$("<= : {0:1}% {1}", 100*le/total, le)
@@ -12244,7 +12244,7 @@ Module Checkit {
       End
       Function pick(at, remain, accu)
             If remain Else =If(accu>treat->1,0):Exit Function
-            =@pick(at-1,remain-1,accu+data(at-1))+If(at>remain->@pick(at-1, remain, accu),0)
+            =pick(at-1,remain-1,accu+data(at-1))+If(at>remain->pick(at-1, remain, accu),0)
       End Function
 }
 Checkit
@@ -12955,8 +12955,8 @@ MODULE CALENDAR (YEAR, LOCALEID) {
                   MONTH=I+J*6
                   IF I>1 THEN PRINT " ";
                   FOR K=42 TO 48 :PRINT " ";UCASE$(LEFT$(LOCALE$(K),2));:NEXT K 
-                  SKIP[I]=@SKIPMO(YEAR, MONTH)
-                  COUNT[I]=@GETMAX(YEAR, MONTH)
+                  SKIP[I]=SKIPMO(YEAR, MONTH)
+                  COUNT[I]=GETMAX(YEAR, MONTH)
             NEXT I
             PRINT
             IF PRINT_IT ELSE REFRESH 1000
@@ -16963,8 +16963,12 @@ FourBitAdder
 MODULE BASEG {Print "Wait..."
 db.provider ""
 db.provider "Microsoft.Jet.OLEDB.4.0", "Jet OLEDB", "newpassword"
-'db.provider "Microsoft.ACE.OLEDB.12.0","Jet OLEDB", "newpassword"
+\\db.provider "Microsoft.ACE.OLEDB.12.0","Jet OLEDB", "newpassword"
 \\ remove base if exist in current directory
+IF EXIST("mdbfile.mdb") THEN
+	DOS "DEL "+SHORTDIR$(DIR$)+"mdbfile.mdb";
+	WAIT 300
+END IF
 base "mdbfile"
 \\ Make a new table and insert values (M2000 use ADOdb with a special connection string)
 \\ data taken from example's of MOSH HAMEDANI for SQL, see this video
@@ -22259,7 +22263,7 @@ back {
 				Print Part $(4,5), right$(string$(chrcode$(8199), 3)+str$(Fullmove_number,""),3)+".", $(7,12),condition$,
 			}
 			if blackComputer then
-				if not White then 	mymove$=@GetMove$(PastGames$(freeSlot)): keyboard left$(mymove$,4)+chr$(13)
+				if not White then 	mymove$=GetMove$(PastGames$(freeSlot)): keyboard left$(mymove$,4)+chr$(13)
 			end if		
 			White~
 			if empty then
@@ -27979,7 +27983,7 @@ If exist(d$+"adll3.dll") then
 	ExportBatch(batch$,,NoElevation)
 	\\ alt "+" "2" "7" "1" "3" we get ✓
 	\\ M2000 has unicode internal custom editor
-	If Not @WaitNoFileOrEsc(d$+"adll3.dll") Then break
+	If Not WaitNoFileOrEsc(d$+"adll3.dll") Then break
 	keys(14, 0,"", "✓","Old files Deleted")
 End If
 open dd$+"adll3.c" for output as F
@@ -27993,14 +27997,14 @@ exit
 }
 ExportBatch(batch$,,NoElevation)
 
-If @WaitFileOrEsc(d$+"adll3.o") then {
+If WaitFileOrEsc(d$+"adll3.o") then {
       keys(14, 0,"" ,"✓","Object file complete adll3.o")
       batch$="cd "+d$+" && "+gcc$+" -shared -o "+d$+"adll3.dll  "+d$+"adll3.o -Wl,--out-implib,libadll3.a"+{
       exit
       }
 	ExportBatch(batch$,,NoElevation)      
 } else Print"Error" :exit
-If not @WaitFileOrEsc(d$+"adll3.dll") then Error "No dll error"
+If not WaitFileOrEsc(d$+"adll3.dll") then Error "No dll error"
 keys(14, 0,"" ,"✓","Linked with gcc adll3.dll")
 Push row
 Cursor 0,there
@@ -32968,7 +32972,7 @@ Semaphore=False
 Thread {
 		Part {
 			cursor 0,0
-			Print Over $(5,10), Names$(Col(TopPlayer)), @WhoisThere2(), Px(TopPlayer), Py(TopPlayer), $("0.00"), R(TopPlayer), S(TopPlayer)
+			Print Over $(5,10), Names$(Col(TopPlayer)), WhoisThere2(), Px(TopPlayer), Py(TopPlayer), $("0.00"), R(TopPlayer), S(TopPlayer)
 			Print  Under
 	} as Semaphore
 } as Informe interval 1000/25
@@ -32992,7 +32996,7 @@ every 1000/25{
 	else.if mouse= 1 then
 		Part {
 		HideAllIcon()
-		Which=@WhoisThere2() 
+		Which=WhoisThere2() 
 		if Which>0 and Which<3  then
 			TopPlayer=PlayersOrder(which)
 			Player Which over 3
@@ -34042,7 +34046,7 @@ k$=""
 escape off
 profiler
 
-While not @Lookmp3()
+While not Lookmp3()
 	If Ask("no mp3 found", "Jukebox","*choose folder", "exit")=2  then goto 0 ' terminate module
 	dir ? "", "Folder for Mp3"
 End While
@@ -34211,7 +34215,7 @@ end sub
 sub info()
 cursor 0, zz
 if current>=1 and current<=items then
-	print over "listen now: [";str$(current,"");"]- ";a$(current);".mp3, at position:"; @Rep$(music.counter);" sec,  total duration:"; @Rep$(duration);" sec"
+	print over "listen now: [";str$(current,"");"]- ";a$(current);".mp3, at position:"; Rep$(music.counter);" sec,  total duration:"; Rep$(duration);" sec"
 else
 	print over "Problem"
 end if
@@ -34233,7 +34237,7 @@ sub GetFolder()
 		if not music then GetRandom()
 	}
 	if music and dir1$=dir$ then exit sub
-	if @Lookmp3()  then
+	if Lookmp3()  then
 		ChangeFolder()
 		line$=""
 		loop$=""
@@ -34247,7 +34251,7 @@ end sub
 sub showsort()
 	if fault then exit sub
 	local c$=a$(current)
-	if @Lookmp3()  then
+	if Lookmp3()  then
 		local i, k=queue
 		for i=1 to items
 			append k, a$(i):=v(i)
@@ -35001,12 +35005,12 @@ Print "record saved"
 soundrec end
 }
 MODULE REV34VER10 {module testA {
-	Print @FunctionReturnGroup()=>GroupMember
-	Print @FunctionReturnGroup()=>Name()=>v$()="Ok"
-	Print @FunctionReturnGroup()=>Name()=>val()=1234
-	Print @FunctionReturnGroup()=>Name()=>prop=500
-	Print @FunctionReturnGroup()=>Name()=>strProp$="yes"
-	Print @FunctionReturnGroup()=>Name()=>strProp.key=1000
+	Print FunctionReturnGroup()=>GroupMember
+	Print FunctionReturnGroup()=>Name()=>v$()="Ok"
+	Print FunctionReturnGroup()=>Name()=>val()=1234
+	Print FunctionReturnGroup()=>Name()=>prop=500
+	Print FunctionReturnGroup()=>Name()=>strProp$="yes"
+	Print FunctionReturnGroup()=>Name()=>strProp.key=1000
 	function FunctionReturnGroup()
 		local Z=random(1, 500)
 		local group a {
@@ -35093,8 +35097,8 @@ module testC {
 	}
 }
 module testD {
-	Print @FunctionReturnGroup()=>GroupMember
-	KK=@FunctionReturnGroup()
+	Print FunctionReturnGroup()=>GroupMember
+	KK=FunctionReturnGroup()
 	for kk {
 		 Print .Name()=>v$()="Ok"
 		 Print .Name()=>val()=1234
@@ -35102,7 +35106,7 @@ module testD {
 		 Print .Name()=>strProp$="yes"
 		 Print .Name()=>strProp.key=1000
 	}
-	LL=@FunctionReturnGroup()=>Name()
+	LL=FunctionReturnGroup()=>Name()
 	for LL {
 		 Print .v$()="Ok"
 		 Print .val()=1234
@@ -35429,7 +35433,7 @@ Escape on
 x=10
 REM n=5
 b$="beta"
-While not @checkit() 
+While not checkit() 
 	List !
 	Stop
 End While
@@ -35806,7 +35810,7 @@ end if
 //	lt	<
 //	gt	>
 rem 1:
-fieldsno.tag$("Name")=@conv$("Émily")
+fieldsno.tag$("Name")=conv$("Émily")
 beautify=-4
 Report 3, doc$
 declare databank Nothing
@@ -36679,7 +36683,7 @@ Module PriorityQueueForGroups (emptysecndqueue as Boolean) {
 	            n1=each(zz,-1,1)
 	            Header()
 	            while n1
-	                  Print @Peek$(stackitem(n1))
+	                  Print Peek$(stackitem(n1))
 	            end while             
       }
       MergePq(pq, zz, emptysecndqueue)
@@ -36689,17 +36693,17 @@ Module PriorityQueueForGroups (emptysecndqueue as Boolean) {
       n1=each(pq,-1, 1)
       Header()
       while n1
-            Print @Peek$(stackitem(n1))
+            Print Peek$(stackitem(n1))
       end while
       ObjectCount()
       Header()
-      while not @isEmpty(pq)
-            Print @Pop(pq)=>tostring$
+      while not isEmpty(pq)
+            Print Pop(pq)=>tostring$
       end while
       ObjectCount()
       Header()
-      while not @isEmpty(zz)
-            Print @Pop(zz)=>tostring$
+      while not isEmpty(zz)
+            Print Pop(zz)=>tostring$
       end while
       ObjectCount()
       // here are the subs/simple functions
@@ -36728,7 +36732,7 @@ Module PriorityQueueForGroups (emptysecndqueue as Boolean) {
       sub InsertPQ(a, n as *obj)
             Print "Insert:";n=>tostring$(1)
             if len(a)=0 then stack a {data n} : exit sub
-            if @comp(n, stackitem(a)) then stack a {push n} : exit sub
+            if Comp(n, stackitem(a)) then stack a {push n} : exit sub
             stack a {
                   push n
                   local t=2, pq=len(a), t1=0
@@ -36737,14 +36741,14 @@ Module PriorityQueueForGroups (emptysecndqueue as Boolean) {
                         t1=m
                         m=(pq+t) div 2
                         if m=0 then  m=t1 : exit 
-                        If @Comp(stackitem(m),n) then t=m+1:  continue
+                        If Comp(stackitem(m),n) then t=m+1:  continue
                         pq=m-1
                         m=pq
                   end while
                   if m>1 then shiftback m                  
             }
       end sub
-      function comp(a as *obj, pq as *obj)
+      function Comp(a as *obj, pq as *obj)
             =a>pq
       end function
       function Peek$(a as *obj)
@@ -37591,7 +37595,8 @@ FOR I=0 TO 27
 	WITH BUTTON(I), "STYLE", I+1, "CLICKABLE",TRUE, "SHAPE", I, "QUALITY",SEQUALITYHIGH
 	WITH BUTTON(I),  "STYLE3DEFFECT", SESTYLE3EFFECTDIFFUSE,"STYLE3D",SESTYLE3DBOTH
 	WITH BUTTON(I),"BORDERCOLOR", 15,  "BORDERWIDTH", 4, "FILLSTYLE", SEFSSOLID, "FILLCOLOR", RC()
-	WITH BUTTON(I),"SHIFT", RANDOM(0,1)*30, "CURVINGFACTOR", 5, "VERTICES", 7, "BORDERSTYLE", BSDOT, "TOOLTIP", "TITLE"+NL+"CHECK THIS "+I
+//	TOOLTIP$="TITLE"+NL+"CHECK THIS "+I
+	WITH BUTTON(I),"SHIFT", RANDOM(0,1)*30, "CURVINGFACTOR", 5, "VERTICES", 7, "BORDERSTYLE", BSDOT, "TOOLTIP", "TITLE"+NL+"CHECK THIS "+I ' TOOLTIP$
 	NEXT I
 LAYER FORM1 {GRADIENT 11, #7777AA
 THREAD {
@@ -40980,7 +40985,7 @@ Function Count(x as long long)
 End Function}
 }
 Cursor 0
-Pen retColor {Report @Count$(One, "bit")+" for X And X-1"}
+Pen retColor {Report Count$(One, "bit")+" for X And X-1"}
 
 Pen labelColor {
 	Report "Making Bits Rare"
@@ -41004,12 +41009,12 @@ Print K16$(GR, ":G")
 // Intersection AS-IS
 WG=Binary.And(WR,GR)
 Print Part $(0), K16$(WG,":");$(9);"W AND G (Intersection using AND binary)": Print
-Pen retColor {Report @Count$(WG,"bit")+" for W AND G"}
+Pen retColor {Report Count$(WG,"bit")+" for W AND G"}
 AdvancedWG=Binary.And(WR,Binary.Not(GR))
 Print Part $(0), K16$(AdvancedWG, ":");$(8);"W AND NOT G (Intersection making 1 bits rare)" : Print
 
 Pen retColor {
-	Report @Count$(AdvancedWG,"bit")+" for W AND NOT G"
+	Report Count$(AdvancedWG,"bit")+" for W AND NOT G"
 	Report 2, "press any key"
 }
 Push key$
@@ -41020,9 +41025,9 @@ else
 	cls oldback,0
 	pen oldpen
 end if
-// user simple static function (called using @Count())
+// user simple static function (called using Count())
 Function Count$(v, tp$)
-	ret=@Count(v)
+	ret=Count(v)
 	=Str$(ret,0)+if$(ret=1->" "+tp$, " "+tp$+"s")
 End Function
 Function Count(x as long long)
@@ -41130,39 +41135,38 @@ cls 5
 form 60, 32
 
 End
-
 sub main()
-local long myNumber, yourNumber, guesses
-local string ch
-
-  printf("Guess a number game\n")
-  printf("Numbers are between 1 and 50\n") 
-//  srand(time(0))  // get time in seconds since 1970, init Random Generator
-  while 1
-    myNumber = random(1, 100)     // get a random number  
-    myNumber = myNumber mod 50 + 1
-    guesses = 0
-    while 1
-      printf("Your guess: ")
-      yourNumber = @getDecimal()
-      guesses = guesses + 1
-      if yourNumber = myNumber then
-        printf(format$("You guessed it in {0} guesses!\n", guesses))
-        exit
-      else
-        if yourNumber > myNumber then
-          printf("Your guess is to high\n")
-        else
-          printf("Your guess is to low\n")
-        end if
-      end if
-    end while
-    printf("Another game (y or n): ")
-    ch = @getchar(true)
-    if ch="n" or ch="N" then exit 
-    dummy=@getchar(true) 
-  end while
-  printf("Goodbye.\n")
+	local long myNumber, yourNumber, guesses
+	local string ch
+	
+	printf("Guess a number game\n")
+	printf("Numbers are between 1 and 50\n") 
+	//  srand(time(0))  // get time in seconds since 1970, init Random Generator
+	while 1
+		myNumber = random(1, 100)     // get a random number  
+		myNumber = myNumber mod 50 + 1
+		guesses = 0
+		while 1
+			printf("Your guess: ")
+			yourNumber = getDecimal()
+			guesses = guesses + 1
+			if yourNumber = myNumber then
+				printf(format$("You guessed it in {0} guesses!\n", guesses))
+				exit
+			else
+				if yourNumber > myNumber then
+					printf("Your guess is to high\n")
+				else
+					printf("Your guess is to low\n")
+				end if
+			end if
+		end while
+		printf("Another game (y or n): ")
+		ch = getchar(true)
+		if ch="n" or ch="N" then exit 
+		dummy=getchar(true) 
+	end while
+	printf("Goodbye.\n")
 End Sub
 sub printf(a$)
 	query=false
@@ -41216,7 +41220,7 @@ end function
 function getDecimal()
 	local string charnum, cg
 	while 1 
-		ch = @getchar(,8)
+		ch = getchar(,8)
 		if ch=chr$(8) then
 			if len(charnum)>1 then charnum=left$(charnum, len(charnum)-1) else charnum=""
 		else.if (ch>="0") and (ch<="9") then
@@ -41227,19 +41231,19 @@ function getDecimal()
 	end while
 end function
 sub mycursor(s, p)
-		if s<>"" then if uint(chrcode(s))<32 then s="" 
-		if p>0 then
-			print part @(p), $(0,4), ~(mypen, backColor, backColor), s
-		 else
-			 print over $(0), s
-		end if
+	if s<>"" then if uint(chrcode(s))<32 then s="" 
+	if p>0 then
+		print part @(p), $(0,4), ~(mypen, backColor, backColor), s
+	 else
+		 print over $(0), s
+	end if
 end sub
 sub mycursorOnly(p)
-		if p>0 then
-			print part @(p), $(0,4), ~(mypen, backColor, backColor), if$(blink and query->"_","")
-		 else
-			 print over $(0), if$(blink and query->"_","")
-		end if
+	if p>0 then
+		print part @(p), $(0,4), ~(mypen, backColor, backColor), if$(blink and query->"_","")
+	 else
+		 print over $(0), if$(blink and query->"_","")
+	end if
 end sub
 Sub CleanQuery(holdbuffer as Boolean=false)
 	thread blinkit hold
@@ -41403,19 +41407,19 @@ ORG 0x}+Hex$(alfa(0))+{
 }+Hex$(alfa(0))+{: 31 c0                   xor    eax,eax
 }+Hex$(alfa(2))+{: b9 64 00 00 00          mov    ecx,0x64		; 100 to eax
 }+Hex$(alfa(7))+{: 01 c8                   add    eax,ecx
-}+Hex$(alfa(9))+{: a3 }+@hexdump(BinaryData(0))+{          mov    ds:0x}+@hexlow(BinaryData(0))+{,eax	; memory address of BinaryData(0)
+}+Hex$(alfa(9))+{: a3 }+hexdump(BinaryData(0))+{          mov    ds:0x}+hexlow(BinaryData(0))+{,eax	; memory address of BinaryData(0)
 }+Hex$(alfa(0xe))+{: 51                      push   ecx
 }+Hex$(alfa(0xf))+{: 50                      push   eax
-}+Hex$(alfa(0x10))+{: 68 }+@hexdump(AddressOf beta2)+{          push   0x}+Hex$(AddressOf beta2)+{		; AddressOf beta2
-}+Hex$(alfa(0x15))+{: e8 }+@hexdump(binary.add(module(), binary.not(alfa(0x15)+4)))+{          call   0x}+@hexlow(module())+{
+}+Hex$(alfa(0x10))+{: 68 }+hexdump(AddressOf beta2)+{          push   0x}+Hex$(AddressOf beta2)+{		; AddressOf beta2
+}+Hex$(alfa(0x15))+{: e8 }+hexdump(binary.add(module(), binary.not(alfa(0x15)+4)))+{          call   0x}+hexlow(module())+{
 }+Hex$(alfa(0x1a))+{: 58                      pop    eax
 }+Hex$(alfa(0x1b))+{: 59                      pop    ecx
 }+Hex$(alfa(0x1b))+{: 49                      dec    ecx
 }+Hex$(alfa(0x1d))+{: 0f 85 e4 ff ff ff       jne    0x7
 }+Hex$(alfa(0x23))+{: 51                      push   ecx
 }+Hex$(alfa(0x24))+{: 50                      push   eax
-}+Hex$(alfa(0x25))+{: 68 }+@hexdump(AddressOf beta)+{          push   0x}+Hex$(AddressOf beta)+{		; AddressOf beta
-}+Hex$(alfa(0x2a))+{: e8 }+@hexdump(binary.add(module(), binary.not(alfa(0x2a)+4)))+{          call   0x}+@hexlow(module())+{
+}+Hex$(alfa(0x25))+{: 68 }+hexdump(AddressOf beta)+{          push   0x}+Hex$(AddressOf beta)+{		; AddressOf beta
+}+Hex$(alfa(0x2a))+{: e8 }+hexdump(binary.add(module(), binary.not(alfa(0x2a)+4)))+{          call   0x}+hexlow(module())+{
 }+Hex$(alfa(0x2f))+{: 58                      pop    eax
 }+Hex$(alfa(0x30))+{: 59                      pop    ecx
 }+Hex$(alfa(0x31))+{: 31 c0                   xor    eax,eax
@@ -41655,7 +41659,7 @@ Module Life {
 	Do
 		k$=Key$
 		If k$=chr$(13) Then exit
-		A()=@GetNext()
+		A()=GetNext()
 		refresh 500
 		Display()
 	Until A()#Sum()=0
@@ -42235,8 +42239,8 @@ if random(1,2)=1 then N1-!
 D1=56789&&
 if random(1,2)=1 then D1-!
 Print N1+" div "+D1
-(Q, R)=@divide(N1, D1)
-? Q, R, "from @divide()"
+(Q, R)=divide(N1, D1)
+? Q, R, "from divide()"
 ? Q*D1+R
 Q1= N1 div# D1
 R1= N1 mod#  D1
@@ -42244,16 +42248,16 @@ R1= N1 mod#  D1
 ? Q1*D1+R1
 function divide(N as long long, D as long long)
 	if D = 0&& then error "Division By Zero"
-	if D < 0&& then (Q, R)=@divide(N, -D): =-Q, R:exit function
+	if D < 0&& then (Q, R)=divide(N, -D): =-Q, R:exit function
 	if N < 0 then
-		(Q,R)=@divide(-N, D)
+		(Q,R)=divide(-N, D)
 		if R = 0 then
 			=-Q, 0&&
 		else
 			=-Q - 1, D - R
 		end if
 	else	
-		=@divide_unsigned(N, D)
+		=divide_unsigned(N, D)
 	end if
 end  function
 function divide_unsigned(N, D)
@@ -42680,6 +42684,7 @@ checkevaluator "-2/3^(3*4)"
 CheckEvaluator "-(2/2)^(3*-4)"
 CheckEvaluator "-2/(3)^(3*-4)"
 CheckEvaluator "-2/(2)^-12"
+CheckEvaluator "-10*-(-2/-3*-5)"
 }
 MODULE FUSC {// https://rosettacode.org/wiki/Fusc_sequence
 // use keyboard for 0x2022 unicode character, •(bulltet Point):hold alt down and press + symbbol, then 2, then 0, then 2 then 2 release alt.
@@ -42938,7 +42943,7 @@ MODULE ULAM {Module Ulam_Spiral {
 		Local dir = "R", i, l=Len(n*n+"")
 		
 		For i = 1 To n*n
-			If @IsPrime(i) Then
+			If IsPrime(i) Then
 				matrix(x,y) = Right$("000"+i,l)
 			Else
 				matrix(x,y) = String$("-", l)  // this is different from VbScript
@@ -43649,7 +43654,7 @@ Module StarTrek {
 	4400 IF E-X<0THEN 4360
 	4410 E=E-X:IF D(7)<0THEN X=X*RND(1)
 	4450 H1=INT(X/K3):FOR I=1TO 3:IF K(I,3)<=0THEN 4670
-	4480 H=INT((H1/@FND(0))*(RND(1)+2)):IF H>0.15*K(I,3)THEN 4530
+	4480 H=INT((H1/FND(0))*(RND(1)+2)):IF H>0.15*K(I,3)THEN 4530
 	4500 PRINT"SENSORS SHOW NO DAMAGE TO ENEMY AT ";K(I,1);",";K(I,2):GOTO 4670
 	4530 K(I,3)=K(I,3)-H:PRINT H;" UNIT HIT ON KLINGON AT SECTOR ";K(I,1);",";
 	4550 PRINT K(I,2):IF K(I,3)<=0 THEN PRINT"*** KLINGON DESTROYED ***":GOTO 4580
@@ -43720,7 +43725,7 @@ Module StarTrek {
 	6000 IF K3<=0THEN RETURN
 	6010 IF D0<>0THEN PRINT"STARBASE SHIELDS PROTECT THE ENTERPRISE":RETURN
 	6040 FOR I=1TO 3:IF K(I,3)<=0THEN 6200
-	6060 H=INT((K(I,3)/@FND(1))*(2+RND(1))):S=S-H:K(I,3)=K(I,3)/(3+RND(0))
+	6060 H=INT((K(I,3)/FND(1))*(2+RND(1))):S=S-H:K(I,3)=K(I,3)/(3+RND(0))
 	6080 PRINT H;" UNIT HIT ON ENTERPRISE FROM SECTOR:";K(I,1);",";K(I,2)
 	6090 IF S<=0 THEN EXIT FOR 6240
 	6100 PRINT"      <SHIELDS DOWN TO ";S;" UNITS>"
@@ -44133,14 +44138,14 @@ For i = 0 To 3
     print tempSeq()#str$()
     
     Print "Forward binomial transform:"
-    forwardResult()=@binomialFwd(&tempSeq())
+    forwardResult()=binomialFwd(&tempSeq())
     print forwardResult()#str$()
     
     Print "Inverse binomial transform:"
-    print @binomialInv(&tempSeq())#str$()
+    print binomialInv(&tempSeq())#str$()
     
     Print "Round trip:"
-    print @binomialInv(&forwardResult())#str$()
+    print binomialInv(&forwardResult())#str$()
     
     Print "Self-inverting:"
     selfResult()=@binomialSelfInv(&tempSeq())
@@ -44174,7 +44179,7 @@ Function binomialFwd(&seq())
     Local result(lim)
     For n = 0 To lim - 1
         For k = 0 To n
-            result(n) += @binomial(n, k) * seq(k)
+            result(n) += binomial(n, k) * seq(k)
         Next
     Next
     =result()
@@ -44187,7 +44192,7 @@ Function binomialInv(&seq())
     For n = 0 To lim - 1
         For k = 0 To n
             sign = if((n - k) Mod 2 = 0 -> 1, -1)
-            result(n) += sign * @binomial(n, k) * seq(k)
+            result(n) += sign * binomial(n, k) * seq(k)
         Next
     Next
     =result()
@@ -44200,7 +44205,7 @@ Function binomialSelfInv(&seq())
     For n = 0 To lim - 1
         For k = 0 To n
             sign = if(k Mod 2 = 0-> 1, -1)
-            result(n) += sign * @binomial(n, k) * seq(k)
+            result(n) += sign * binomial(n, k) * seq(k)
         Next
     Next
     =result()
@@ -44225,7 +44230,7 @@ Module TestThis {
 }
 TestThis
 }
-MODULE SUMDIGITISOFANINTEGER {Form 60
+MODULE SUMDIGITSOFANINTEGER {Form 60
 const z="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 sumdigits=lambda z (m as string) ->{
 	integer ret, i
@@ -44614,7 +44619,7 @@ MODULE BERNOULLI {module Bernoulli_Numbers (filename as string) {
 	close #f
 	if filename<>""then Win "NotePad", dir$+filename : Print "Export to file ";dir$+filename 
 	sub nextBern()
-		local m=@bernoulli(b)
+		local m=bernoulli(b)
 		Print #F, format$("B({0::-2})={1}",b, m.tostring$)
 	end sub
 	function bernoulli(n as decimal)
@@ -44711,7 +44716,7 @@ MODULE MERSENNE {Module Factors_of_a_Mersenne_number{
 	For k = 0 To len(q())-1
 		REM
 		if k=9 then continue 
-		If @isPrime(q(k)) Then
+		If isPrime(q(k)) Then
 			long p, r, d, r=q(k), dd
 			long long i
 			dd =2*q(k)
@@ -45133,7 +45138,7 @@ module TrueTable {
 			S$+=B$+{
 			}+L$+{
 			} 			
-		when @PlayNext()
+		when PlayNext()
 		clipboard S$
 	}
 	if error or not ok then print "Error"+Error$ : restart
@@ -45399,10 +45404,10 @@ Module Topological_sort {
 	}
 	Doc$={Extracts a compile order for targes:
 	}
-	Doc$=@ExtractDeps("top1")
-	Doc$=@ExtractDeps("top2")
-	Doc$=@ExtractDeps("top1", "top2")
-	Doc$=@ExtractDeps("ip1")
+	Doc$=ExtractDeps("top1")
+	Doc$=ExtractDeps("top2")
+	Doc$=ExtractDeps("top1", "top2")
+	Doc$=ExtractDeps("ip1")
 	Report Doc$
 	Clipboard Doc$
 	Function ExtractDeps()
@@ -46378,9 +46383,9 @@ MODULE THREEPOINT {Module ThreePoints {
 		minX=Min(minX,p3.x)
 		maxX=Max(p1.x,p2.x)
 		maxX=Max(maxX,p3.x)
-		move minX*sc+h,v+@CalcY(a,b,c,minX)*sc1
+		move minX*sc+h,v+CalcY(a,b,c,minX)*sc1
 		FOR xi=minX TO maxX
-	        width 2 {draw To xi*sc+h, v+@CalcY(a,b,c,xi)*sc1}
+	        width 2 {draw To xi*sc+h, v+CalcY(a,b,c,xi)*sc1}
 		next
 		DrawPoint(1, p1)
 		DrawPoint(2, p2)
@@ -46620,7 +46625,7 @@ MODULE TAXICAB {module TaxiCab (f as long){
 	profiler
 	var Cubes=list, 	Sums=list, 	Ret=list
 	var st=0, en=1200
-	st=@Proc(0, en)
+	st=Proc(0, en)
 	sort ret as number
 	Display(1, 25)
 	Display(2000, 2006)
@@ -46663,15 +46668,12 @@ win dir$+"TaxiCabNumbers.txt"
 }
 MODULE ROOTS1 {Module Roots_of_Quadratic_Function {
 	declare global m math2
-	function global complex(a as double, b as double=0) {
-		method m, "cxNew", a, b as ret: =ret
-	}
 	function quadroots(a as double, b as double, c as double) {
 		var d = b*b - 4*a*c,  a2 = a + a	
 		if d<0 then
 			var r=-b/a2
 			var i=sqrt(-d)/a2
-			="complex", complex(r, i), complex(r, -i), 5
+			="complex", (r, i i), (r, -i i), 5
 		else.if d==0 then
 			="single root", -b/2/a, -b/2/a, 8
 		else
@@ -46708,19 +46710,7 @@ MODULE ROOTS1 {Module Roots_of_Quadratic_Function {
 		Print #f
 	end sub
 	sub disp1(a)
-		local aa="", bb=if$(a|i<0->"-","+")
-		if a|i<>0 then			
-			if abs(a|i)<>1 then bb+=""+(abs(round(a|i, n)))
-			bb+="i"
-		else
-			bb=""
-		end if
-		if a|r=0 then
-			if a|i=0 then aa="0"
-		else
-			aa=""+(round(a|r, n))
-		end if
-		Print #f, " (";aa;bb;")";
+		Print #f, round(a, 4);		
 	end sub
 	sub disp2(b)
 		local Boolean k=b<>0 and (abs(b)<1e-6 or abs(b)>1e6)
@@ -46764,7 +46754,7 @@ Const Center=2
 pen 0
 cls 15, 0
 rem ? 15;" twips per dot *";600;" dot per inch ="; 15*600;" twips per inch"
-pr$=@PdfPrinter()
+pr$=PdfPrinter()
 //set the printer output
 printer 12, pr$
 
@@ -47337,12 +47327,12 @@ MODULE TRANS {Module Matrix_Transposition {
 	a(2,0)=9,10,11,12
 	open "out.txt" for output as #f
 	showarray("a()", &a())
-	b()=@transpose(a())
+	b()=transpose(a())
 	showarray("transpose to", &b())
 	dim a(3,1)
 	a(0,0)=1,2,3
 	showarray("a()", &a())
-	b()=@transpose(a())
+	b()=transpose(a())
 	showarray("transpose to", &b())
 	
 	// Using arrays with square brackets:
@@ -47353,14 +47343,14 @@ MODULE TRANS {Module Matrix_Transposition {
 	a[2][0]=9,10,11,12
 	showarray2("a[][]", a)
 	// transpose has to know the type to define the new one
-	b=@transposeLong(a)
+	b=transposeLong(a)
 	showarray2("transpose to", b)
 	long c[2][0]
 	c[0][0]=1
 	c[1][0]=2
 	c[2][0]=3
 	showarray2("c[]", c)
-	b=@transposeLong(c)
+	b=transposeLong(c)
 	showarray2("transpose to", b)
 	' we can use Variant type as return type
 	d=@transposeAny(b)
@@ -47820,13 +47810,13 @@ else
 end if
 
 BUFFER preparemem AS INTEGER*10000  ' for 10000 characters
-compiled_statement=@process(db, preparemem, create$)
+compiled_statement=process(db, preparemem, create$)
 IF compiled_statement<>0 THEN
 	ret=sqlite3_step(compiled_statement)
 	IF ret=SQLITE_DONE THEN PRINT "TABLE CREATED"
 	ret=sqlite3_finalize(compiled_statement)
 END IF
-compiled_statement=@process(db, preparemem,insertRow$)
+compiled_statement=process(db, preparemem,insertRow$)
 IF compiled_statement<>0 THEN
 	FLUSH
 	Data 1,"Paul", 32, "California", 20000.45
@@ -47836,7 +47826,7 @@ IF compiled_statement<>0 THEN
 	Data 5, "David", 27, "Texas", 85000.00
 	Data 6, "Kim", 22, "South-Hall", 45000.00
 	rowTypes=(int64, txt, int, txt, dbl)
-	WHILE @bind_stack(compiled_statement, rowTypes)
+	WHILE bind_stack(compiled_statement, rowTypes)
 		ret=sqlite3_step(compiled_statement)
 		IF ret=SQLITE_DONE ELSE CANCEL=TRUE: EXIT
 		IF EMPTY THEN EXIT
@@ -47847,7 +47837,7 @@ END IF
 IF VALID(CANCEL) THEN GOTO 100
 PRINT "DATA INSERTED TO DATABASE AT TABLE COMPANY"
 VARIANT var0, var1, var2, var3, var4
-compiled_statement=@process(db, preparemem, ReadFieldNamesAndTypes$)
+compiled_statement=process(db, preparemem, ReadFieldNamesAndTypes$)
 IF compiled_statement<>0 THEN
 	ret=SQLITE_ROW
 	rows_counter=0
@@ -47856,11 +47846,11 @@ IF compiled_statement<>0 THEN
 		ret=sqlite3_step(compiled_statement)
 		IF ret=SQLITE_ROW THEN
 			rows_counter++
-			var0=@sqlite_column_string(compiled_statement, 0&)
-			var1=@sqlite_column_string(compiled_statement, 1&)
-			var2=@sqlite_column_string(compiled_statement, 2&)
+			var0=sqlite_column_string(compiled_statement, 0&)
+			var1=sqlite_column_string(compiled_statement, 1&)
+			var2=sqlite_column_string(compiled_statement, 2&)
 			' 1 not null 0 can be null
-			var3=@sqlite_column_string(compiled_statement, 3&)
+			var3=sqlite_column_string(compiled_statement, 3&)
 			? var0, var1, var2, var3
 		END IF
 	END WHILE
@@ -47868,7 +47858,7 @@ IF compiled_statement<>0 THEN
 	ret=sqlite3_finalize(compiled_statement)
 END IF
 
-compiled_statement=@process(db, preparemem, ReadRows$)
+compiled_statement=process(db, preparemem, ReadRows$)
 IF compiled_statement<>0 THEN
 	ret=SQLITE_ROW
 	rows_counter=0
@@ -47894,9 +47884,9 @@ IF compiled_statement<>0 THEN
 		IF ret=SQLITE_ROW THEN
 			// THIS IS ZERO BASED INDEX FOR COLUMNS
 			var0=sqlite3_column_int64(compiled_statement, 0&)
-			var1=@sqlite_column_string(compiled_statement, 1&)
+			var1=sqlite_column_string(compiled_statement, 1&)
 			var2=sqlite3_column_int(compiled_statement, 2&)
-			var3=@sqlite_column_string(compiled_statement, 3&)
+			var3=sqlite_column_string(compiled_statement, 3&)
 			var4=sqlite3_column_double(compiled_statement, 4&)
 			PRINT FORMAT$(rowformat, var0, var1, var2,  var3,  var4)
 		END IF
@@ -48254,8 +48244,8 @@ if ret11=0 then
 	print "CVars = "; tAttr|CVars
 	print "cImplTypes = "; tAttr|cImplTypes  ' how many interfaces exits
 	print "Version = "; tAttr|wMajorVerNum; "."; tAttr|wMinorVerNum
-	print "riid = ";@getClassId(tAttr)
-	m$=@getClassId(tAttr)
+	print "riid = ";getClassId(tAttr)
+	m$=getClassId(tAttr)
 	call void  iTypeInfo.ReleaseTypeAttr(oTypeInfo, ppTypeAttr)
 	print "released ok"
 
@@ -50696,11 +50686,11 @@ win "out.txt"
 end
 
 // Category 1
-sub Function T_1_01_basic_literal_exact()
+sub T_1_01_basic_literal_exact()
 	print #F, "T_1_01_basic_literal_exact"
 	gosub CommonPart
 end sub
-sub Function T_1_02_basic_literal_mismatch()
+sub T_1_02_basic_literal_mismatch()
 	print #F, "T_1_02_basic_literal_mismatch"
 	gosub CommonPart
 end sub
@@ -51993,7 +51983,7 @@ MODULE ADFGVX {Module CheckADFGVX_Cipher {
 CheckADFGVX_Cipher
 }
 MODULE CMDTOOL {prototype {
-MODULE GLOBAL interpret {
+module global interpret {
 global filename$="base1.xml"
 module latest {
 	PrintConsoleLn("The latest entry is:")
@@ -52003,7 +51993,7 @@ module latest {
 	doc$=string$(eval$(buffer(filename$)) as UTF8dec)
 	with  xml, "lastchild" set child
 	with child,"attr" as attr$()
-	PrintConsoleLn(attr$("name")+","+@tag$()+","+attr$("date"))
+	PrintConsoleLn(attr$("name")+","+tag$()+","+attr$("date"))
 	declare xml nothing
 }
 module latestForEachTag {
@@ -52017,10 +52007,10 @@ module latestForEachTag {
 	with child,"attr" as attr$()
 	inventory alfa
 	do
-		if not exist(alfa, @tag$()) then
-			append alfa, @tag$():=child
+		if not exist(alfa, tag$()) then
+			append alfa, tag$():=child
 		else
-			return alfa, @tag$():=child
+			return alfa, tag$():=child
 		end if
 		Method xml, "EndOffChilds", &child as ok
 	when ok
@@ -52028,7 +52018,7 @@ module latestForEachTag {
 	k=each(alfa)
 	while k
 		child=eval(k)
-		PrintConsoleLn(attr$("name")+","+@tag$()+","+attr$("date"))
+		PrintConsoleLn(attr$("name")+","+tag$()+","+attr$("date"))
 	end while
 	declare xml nothing
 }
@@ -52053,7 +52043,7 @@ module All {
 	k=each(alfa)
 	while k
 		child=eval(k)
-		PrintConsoleLn(attr$("name")+","+@tag$()+","+attr$("date"))
+		PrintConsoleLn(attr$("name")+","+tag$()+","+attr$("date"))
 	end while
 	declare xml nothing
 }
@@ -52218,8 +52208,16 @@ call tool all-entries
 };
 Close #F
 locale o
-win shortdir$(appdir$)+"m2000,exe", "tool.gsb"
-
+if file.app$("gsb")="" then	
+	try {
+		open "tool.bat" for output as #f
+		print #f, {@}+shortdir$(appdir$)+{m2000.exe data {%*}: dir %cd%:load tool
+			}
+		close #f
+		}
+else
+	win shortdir$(appdir$)+"m2000,exe", shortdir$(dir$)+"tool.gsb"
+end if
 while not exist("tool.bat")
 	?".";
 	wait 100
