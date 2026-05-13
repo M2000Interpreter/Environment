@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 30
+Global Const Revision = 31
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -26900,7 +26900,7 @@ Sub RealMeth(bstack As basetask, rest$, var2() As Variant, var3() As String, NoN
 '  testmeth "122,&beta,121,alfa:=a+4, beta:=122"
 Dim s$
 Dim mm As mArray, usehandler As mHandler
-Dim trap As Long, ss$, p As Variant, items As Long, ref As Boolean, i As Long, z As Variant, c As Long
+Dim trap As Long, ss$, p As Variant, items As Long, ref As Boolean, i As Long, Z As Variant, c As Long
 ok = True
 Do
 again:
@@ -33499,9 +33499,9 @@ End If
 End Sub
 
 Function myStructure(basestack As basetask, rest$, Lang As Long) As Boolean
-Dim Base As String
-If IsStrExp(basestack, rest$, Base) Then
-    myStructure = TABLENAMES(Base, basestack, rest$, Lang)
+Dim base As String
+If IsStrExp(basestack, rest$, base) Then
+    myStructure = TABLENAMES(base, basestack, rest$, Lang)
      
 Else
     myStructure = makestruct(basestack, rest$, Lang, here$ = "", False)
@@ -37526,12 +37526,12 @@ End If
     Case "?"
     s$ = s$ + "(?) "
     Case "N", "L", "D"
-    Dim z
-    z = .StackItem(i)
-    If VarType(z) = vbUserDefinedType Then
-    s$ = s$ + strComplex(z) + " "
+    Dim Z
+    Z = .StackItem(i)
+    If VarType(Z) = vbUserDefinedType Then
+    s$ = s$ + strComplex(Z) + " "
     Else
-    s$ = s$ + Trim$(str(z)) + " "
+    s$ = s$ + Trim$(str(Z)) + " "
     End If
     Case "S"
     ss$ = .StackItem(i)
@@ -42382,23 +42382,23 @@ Private Function IsInt(bstack As basetask, a$, r As Variant) As Boolean
  
 End Function
 Private Function IsUint(bstack As basetask, a$, r As Variant) As Boolean
-Dim z As Integer, i As Long
+Dim Z As Integer, i As Long
 If IsExp(bstack, a$, r, , True) Then
-z = VarType(r)
- If z = vbInteger Then
+Z = VarType(r)
+ If Z = vbInteger Then
      On Error Resume Next
     
         r = UINT(r)
      
         On Error GoTo 0
-ElseIf z = 20 Then
+ElseIf Z = 20 Then
 If r < 0 Then
 r = CDec(r) + maxlonglong
 Else
 r = CDec(r)
 
 End If
-ElseIf z = vbLong Then
+ElseIf Z = vbLong Then
 i = r
 r = Zero64
 PutMem4 VarPtr(r) + 8, i
@@ -45358,33 +45358,33 @@ Sub CopyPointerRef(basestack As basetask, thisobj As Object)
                                     here$ = ohere$
 End Sub
 Sub CallClear(bstack As basetask, what$, z1 As Variant, Optional minusone As Long = 0)
-Dim myobject As Object, ok As Boolean, z As Group
+Dim myobject As Object, ok As Boolean, Z As Group
 
-Set z = z1
+Set Z = z1
 
-   If z.IamApointer Then
+   If Z.IamApointer Then
    ' compiled has minus one reference ??
    'MsgBox z.refcount1 - MinusOne
-   If z.refcount1 - minusone > 1 Then Exit Sub
-   If z.link Is Nothing Then
+   If Z.refcount1 - minusone > 1 Then Exit Sub
+   If Z.link Is Nothing Then
    
-                    ElseIf z.link.IamFloatGroup Then
+                    ElseIf Z.link.IamFloatGroup Then
                     If minusone < 0 Then
-                    If z.LinkGroup.refcount1 - 1 = 0 Then Exit Sub
+                    If Z.LinkGroup.refcount1 - 1 = 0 Then Exit Sub
                     Else
-                    If z.LinkGroup.refcount1 = 0 Then Exit Sub
+                    If Z.LinkGroup.refcount1 = 0 Then Exit Sub
                     End If
-                        If z.LinkGroup.HasRemove Then
-                            Set bstack.lastobj = z.link
-                             z.link.ToDelete = True
+                        If Z.LinkGroup.HasRemove Then
+                            Set bstack.lastobj = Z.link
+                             Z.link.ToDelete = True
                              ProcessOper bstack, myobject, "_%", (0), 1, True
                         End If
                         GoTo conthere
                     End If
                 
-                ElseIf z.IamFloatGroup Then
-                Set bstack.lastobj = z
-                z.ToDelete = True
+                ElseIf Z.IamFloatGroup Then
+                Set bstack.lastobj = Z
+                Z.ToDelete = True
                 ProcessOper bstack, myobject, "_%", (0), 1
                 
                  Set bstack.lastobj = Nothing
@@ -47261,7 +47261,6 @@ conthere1012:
                                                     usehandler0.CopyTo usehandler0
                                                     If usehandler.objref.ExistFromOther2(usehandler0) Then
                                                         Set usehandler0.objref = usehandler.objref
-                                                        usehandler0.index_start = usehandler.objref.index
                                                         initval = True
                                                         Set usehandler = usehandler0
                                                         usehandler.sign = 1
@@ -47309,7 +47308,6 @@ conthere1002:
                                                 usehandler0.CopyTo usehandler0
                                                 If usehandler.objref.ExistFromOther2(usehandler0) Then
                                                     Set usehandler0.objref = usehandler.objref
-                                                    usehandler0.index_start = usehandler.objref.index
                                                     initval = True
                                                     Set usehandler = usehandler0
                                                     usehandler.sign = 1
@@ -49517,8 +49515,8 @@ Function CheckFreeExecute(a$) As Boolean
         Case Else
         End Select
 End Function
-Public Function myVarType(z, j As Integer) As Boolean
-myVarType = MemInt(VarPtr(z)) = j
+Public Function myVarType(Z, j As Integer) As Boolean
+myVarType = MemInt(VarPtr(Z)) = j
 End Function
 Public Function IntExp(n, X, ByVal r)
 On Error GoTo 100

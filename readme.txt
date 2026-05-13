@@ -1,59 +1,51 @@
 M2000 Interpreter and Environment
-Version 14 Revision 30
+Version 14 Revision 31
 
-The Best.
-1) Now simple functions (made using function/end function) not need the @ before the name.
-2) Fix a problem which came with the new evaluator. The problem was inside parenthesis and the unary minus.
-b=-1 : ?(-b+abs(b))  ' 2  - the fault return 0
-3) Fix some problems not realy known.
-4) Now we can write BSTR type of string in structures/Buffers.
-The real string is written in a special hash table, and at the field we place the address of the first character or 0 (for empty)
+Extend the error recovery without error raising but using the error value for an enum.
+This now work for parameters for Modules/Functions/Subs
+Also work with the Let statement and normal assign.
 
-Structure Alfa {
-	a as double
-	b as double
-	Caption as string ' this is a BSTR string
+CONST RECOVER_ERROR=RANDOM(-1,0)
+GLOBAL BAD_NUMBER=-999
+IF RECOVER_ERROR THEN
+	PRINT "RECOVER_ERROR = TRUE"
+	GLOBAL ENUM FLAGS_B {
+	    Hold, Right, Left
+	ERROR:
+		    ERB=BAD_NUMBER
+	}
+ELSE
+	PRINT "RECOVER_ERROR = FALSE"
+	GLOBAL ENUM FLAGS_B {Hold, Right, Left}
+END IF
+GLOBAL ENUM FLAGS_A {
+    In=-2, Out, FLAGS_B, Up, Down, Back, Front
+ERROR:
+    ERA=BAD_NUMBER
 }
-Structure Beta {
-	First as Alfa
-	Second As Alfa*10
+MODULE ALFA (M AS FLAGS_B) {
+    IF M=BAD_NUMBER THEN PRINT "NOT GOOD VALUE":EXIT
+    PRINT "OK - I DO THE JOB"
+    PRINT "INDEX:";M^
+    PRINT "VALUE:";M
+    PRINT "NAME:";EVAL$(M)
+    PRINT "TYPE:";TYPE$(M)
 }
-Beta Fields[20]
-Fields[0]|First|Caption="This is a string - which take only 4 bytes in structure"
-Fields[0]|First|a=1.23456e5
-Fields[0]|First|b=0.45455
-Print Fields[0]|First|Caption
-PrintData(Fields[0]|First[]) ' pass a copy 
-Fields[10]|Second[4]=Fields[0]|First[]
-PrintData(Fields[10]|Second[4])  ' pass a copy 
-Fields[10]|Second[4]=ChangeCaption(Fields[10]|Second[4], "New value for caption")
-PrintData(Fields[10]|Second[4])  ' pass a copy 
-Fields[10]|Second[4]|Caption="ok"
-PrintData(Fields[10]|Second[4])  ' pass a copy 
-Alfa JustAlfa
-JustAlfa=Fields[10]|Second[4]
-PrintData(JustAlfa)  ' pass a copy of a pointer
-Print JustAlfa|Caption="ok..."  ' changed
-PrintData(JustAlfa)  ' caption changed
-JustAlfa|Caption="Final"
-PrintData(JustAlfa[0]) ' pass a copy of buffer
-Print JustAlfa|Caption="Final"  ' not changed
-Print JustAlfa(0) ' absolute address of memory buffer
+VAR Z AS FLAGS_A=Front
+TRY OK {
+	ALFA Z
+}
+IF ERROR OR NOT OK THEN PRINT "ERROR"+ERROR$
+Z=Left
+PRINT "INDEX:";Z^
+PRINT "VALUE:";Z
+PRINT "NAME:";EVAL$(Z)
+PRINT "TYPE:";TYPE$(Z)
+ALFA Z ' this pass ok
 
-End
-Sub PrintData(d as Alfa) ' pass by pointer
-	Print "a:", d|a
-	Print "b:", d|b
-	Print "caption:",d|Caption
-	d|Caption="ok..."	
-End Sub
-Sub ChangeCaptionByreference(&d as alfa)
 
-End Sub
-Function ChangeCaption(d as Alfa, newValue as string)
-	d|Caption=newValue
-	=d
-End Function
+
+
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
 

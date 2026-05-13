@@ -5297,15 +5297,21 @@ checkfromstring:
                                         Set usehandler1.objref = usehandler.objref
                                         usehandler1.index_start = usehandler.objref.index
                                     Else
-                                        GoTo contwrong1
+                                        GoTo chkcontwrong1
                                     End If
                                 ElseIf usehandler.objref.ExistFromOther2(usehandler1) Then
                                     Set usehandler1.objref = usehandler.objref
                                 Else
+chkcontwrong1:
+                                    If usehandler.objref.HasErrorIndex Then
+                                         EnumJob usehandler1, usehandler
+                                    Else
+                                
 contwrong1:
                                     WrongType
                                     Set bstack.lastobj = Nothing
                                     GoTo err000
+                                    End If
                                 End If
                             End If
                         End If
@@ -6320,7 +6326,7 @@ Dim x1 As Long, what$, i As Long, flag As Boolean, checktype As Boolean, isAglob
 Dim ppppl As iBoxArray, bs As basetask, skipvar As Boolean, it As Long
 Dim p ' this is the value..
 ' get value
-Dim s$, z$, D$, go As Boolean
+Dim s$, Z$, D$, go As Boolean
 bstack.SwapData s$
 Do
     MyReadBasic = False
@@ -6412,24 +6418,24 @@ exit2:
         End If
     ElseIf x1 = 3 Then
 cont12:
-        z$ = CopyUntilEndOfLine(s$)
-        If Len(z$) = 0 Then z$ = s$
+        Z$ = CopyUntilEndOfLine(s$)
+        If Len(Z$) = 0 Then Z$ = s$
         
         If ISSTRINGA(s$, D$) Then
                 p = D$
         Else
-            i = InStr(z$, ",")
+            i = InStr(Z$, ",")
             If i = 0 Then
-                i = InStr(z$, ":")
+                i = InStr(Z$, ":")
                 If i = 0 Then
-                    p = MyTrim$(z$)
+                    p = MyTrim$(Z$)
                     SetNextLine s$
                 ElseIf i = 1 Then
                     p = ""
                     Mid$(s$, 1, i) = " "
     
-                ElseIf ISSTRINGA(s$, z$) Then
-                    p = z$
+                ElseIf ISSTRINGA(s$, Z$) Then
+                    p = Z$
                 Else
                     p = MyTrim$(Mid$(s$, 1, i - 1))
                     s$ = Mid$(s$, i + 1)
@@ -6438,9 +6444,9 @@ cont12:
             ElseIf i = 1 Then
                 p = ""
             Else
-                x1 = InStr(z$, ":")
+                x1 = InStr(Z$, ":")
                 If x1 < i And x1 > 1 Then i = x1
-                p = MyTrim$(Mid$(z$, 1, i - 1))
+                p = MyTrim$(Mid$(Z$, 1, i - 1))
                 Mid$(s$, 1, i - 1) = space$(i)
             End If
         End If
@@ -6639,12 +6645,18 @@ Case 1
                                     usehandler.index_start = usehandler1.objref.index
                                     Set var(i) = usehandler
                                 Else
-                                    GoTo er103
+                                    GoTo cher103 'er103
                                 End If
                             ElseIf usehandler1.objref.ExistFromOther2(usehandler) Then
                                 Set usehandler.objref = usehandler1.objref
                             Else
-                                GoTo er103
+cher103:
+                                If usehandler1.objref.HasErrorIndex Then
+                                    EnumJob1 usehandler1 ' set the error index
+                                    Set myobject = usehandler1
+                                Else
+                                    GoTo er103
+                                End If
                             End If
                         Else
                             Set var(i) = myobject
@@ -7909,12 +7921,17 @@ existAs03:
                                             usehandler.index_start = usehandler1.objref.index
                                             Set var(i) = usehandler
                                         Else
-                                            GoTo er103
+                                            GoTo cher103_1
                                         End If
                                     ElseIf usehandler1.objref.ExistFromOther2(usehandler) Then
                                         Set usehandler.objref = usehandler1.objref
                                     Else
-                                        GoTo er103
+cher103_1:
+                                        If usehandler1.objref.HasErrorIndex Then
+                                             EnumJob usehandler, usehandler1
+                                        Else
+                                            GoTo er103
+                                        End If
                                     End If
                                 Else
                                     If usehandler.t1 = 3 And usehandler.ReadOnly Then
@@ -8449,32 +8466,46 @@ existAs15:
                             ElseIf usehandler1.t1 = 4 Then
                                 If FastPureLabel(rest$, s$, , True, , , False) = 1 Then
                                     If Not s$ = myUcase(usehandler1.objref.EnumName, True) Then
-                                        If GetSub(s$ + "()", i) Then
-                                            If sbf(i).IamAClass Then
+                                        
+                                        If GetSub(s$ + "()", y1) Then
+                                            If sbf(y1).IamAClass Then
                                                 GoTo er113
                                             End If
-                                        ElseIf GetSub(bstack.GroupName + s$ + "()", i) Then
-                                            If sbf(i).IamAClass Then
+                                        ElseIf GetSub(bstack.GroupName + s$ + "()", y1) Then
+                                            If sbf(y1).IamAClass Then
                                                 GoTo er113
+                                            End If
+                                        ElseIf GetVar(bstack, s$, y1) Then
+                                            If Typename(var(y1)) = mHdlr Then
+                                            Set usehandler = var(y1)
+                                            If usehandler.t1 = 4 Then
+                                                If usehandler.objref.ExistFromOther2(usehandler1) Then
+                                                    Set usehandler1.objref = usehandler.objref
+                                                    GoTo cont1122331122
+                                                Else
+                                                If usehandler.objref.HasErrorIndex Then
+                                                EnumJob usehandler1, usehandler
+                                                GoTo cont1122331122
+                                                End If
+                                                    Set usehandler = Nothing
+                                                    GoTo er112
+                                                End If
+                                            End If
                                             End If
                                         End If
                                         ' no error yet
-                                        If MyIsObject(usehandler1.index_cursor) Then
-                                            bs.soros.PushObj usehandler1.index_cursor
-                                        ElseIf myVarType(usehandler1.index_cursor, vbString) Then
-                                            bs.soros.PushStrVariant usehandler1.index_cursor
-                                        Else
-                                            bs.soros.PushVal usehandler1.index_cursor * usehandler1.sign
-                                        End If
-                                        Set usehandler1 = Nothing
+                                        EnumJob2 bs, usehandler1
                                         jumpAs = True
                                         GoTo fromEnumDeref
                                     Else
+cont1122331122:
+                                        Set usehandler = Nothing
                                         FastPureLabel rest$, s$
                                     End If
                                 Else
                                     GoTo er112
                                 End If
+
                                 If FastSymbol(rest$, "=") Then
                                     ' drop type
                                     If FastPureLabel(rest$, s$, , , True) <> 1 Then
@@ -10328,8 +10359,8 @@ Public Function IntSqrdEC(sA) As Variant
         OverflowValue vbDecimal
         Exit Function
     End If
-    Dim q, r, t, z
-    z = CDec(sA)
+    Dim q, r, t, Z
+    Z = CDec(sA)
     r = CDec("0")
     q = CDec("1")
     Do
@@ -10338,10 +10369,10 @@ Public Function IntSqrdEC(sA) As Variant
     Do
         If q <= 1 Then Exit Do
         q = Int(q / 4&)
-        t = z - r - q
+        t = Z - r - q
         r = Int(r / 2)
         If t >= -1 Then
-            z = t
+            Z = t
             r = r + q
         End If
     Loop
@@ -16377,3 +16408,32 @@ Function IsFlatStringOptionalExpr(bstackstr As basetask, a$, q$) As Boolean
         IsFlatStringOptionalExpr = True
     End If
 End Function
+Sub EnumJob2(bs As basetask, usehandler1 As mHandler)
+    If MyIsObject(usehandler1.index_cursor) Then
+        bs.soros.PushObj usehandler1.index_cursor
+    ElseIf myVarType(usehandler1.index_cursor, vbString) Then
+        bs.soros.PushStrVariant usehandler1.index_cursor
+    Else
+        bs.soros.PushVal usehandler1.index_cursor * usehandler1.sign
+    End If
+    Set usehandler1 = Nothing
+End Sub
+Sub EnumJob(usehandler As mHandler, usehandler1 As mHandler)
+        Set usehandler.objref = usehandler1.objref
+        usehandler.index_start = usehandler1.objref.ErrorIndex
+        usehandler1.objref.index = usehandler1.objref.ErrorIndex
+        usehandler1.objref.Done = True
+        usehandler.index_cursor = usehandler1.objref.Value
+        usehandler1.objref.index = usehandler1.objref.ErrorIndex - 1
+        usehandler.sign = 1
+End Sub
+Sub EnumJob1(usehandler As mHandler)
+        Dim base As Enumeration
+        Set base = usehandler.objref
+        usehandler.index_start = base.ErrorIndex
+        base.index = base.ErrorIndex
+        base.Done = True
+        usehandler.index_cursor = base.Value
+        usehandler.objref.index = usehandler.objref.ErrorIndex - 1
+        usehandler.sign = 1
+End Sub
