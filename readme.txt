@@ -1,48 +1,9 @@
 M2000 Interpreter and Environment
-Version 14 Revision 31
+Version 14 Revision 32
 
-Extend the error recovery without error raising but using the error value for an enum.
-This now work for parameters for Modules/Functions/Subs
-Also work with the Let statement and normal assign.
+1) Fix for Greek functions of type Function/end function for names with accents (normal functions registered in uppercase so any name first convert to uppercase with no accents for Greek names, but simple functions use the name as is with accents, we can call with uppercase name but we have to use the accents as those used on the definition of the function)
 
-CONST RECOVER_ERROR=RANDOM(-1,0)
-GLOBAL BAD_NUMBER=-999
-IF RECOVER_ERROR THEN
-	PRINT "RECOVER_ERROR = TRUE"
-	GLOBAL ENUM FLAGS_B {
-	    Hold, Right, Left
-	ERROR:
-		    ERB=BAD_NUMBER
-	}
-ELSE
-	PRINT "RECOVER_ERROR = FALSE"
-	GLOBAL ENUM FLAGS_B {Hold, Right, Left}
-END IF
-GLOBAL ENUM FLAGS_A {
-    In=-2, Out, FLAGS_B, Up, Down, Back, Front
-ERROR:
-    ERA=BAD_NUMBER
-}
-MODULE ALFA (M AS FLAGS_B) {
-    IF M=BAD_NUMBER THEN PRINT "NOT GOOD VALUE":EXIT
-    PRINT "OK - I DO THE JOB"
-    PRINT "INDEX:";M^
-    PRINT "VALUE:";M
-    PRINT "NAME:";EVAL$(M)
-    PRINT "TYPE:";TYPE$(M)
-}
-VAR Z AS FLAGS_A=Front
-TRY OK {
-	ALFA Z
-}
-IF ERROR OR NOT OK THEN PRINT "ERROR"+ERROR$
-Z=Left
-PRINT "INDEX:";Z^
-PRINT "VALUE:";Z
-PRINT "NAME:";EVAL$(Z)
-PRINT "TYPE:";TYPE$(Z)
-ALFA Z ' this pass ok
-
+2) I give more speed with removing a upper case conversion which not need any more. 
 
 
 

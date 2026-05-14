@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 31
+Global Const Revision = 32
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -4171,7 +4171,8 @@ jmp1995:
                 makegroup bstack, W$, i
             End If
             bstack.tmpstr = W$ + Left$(b$, 1)
-            BackPort b$
+            'BackPort b$
+            If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
             If IsNumberNew(bstack, b$, rv, False) Then
                 bstack.LastValue = rv
                 SpeedGroup = 1
@@ -4189,7 +4190,8 @@ jmp1995:
         If Len(safegroup.lasthere) > 0 And Len(safegroup.GroupName) > 0 Then
             W$ = safegroup.lasthere + "." + safegroup.GroupName
             bstack.tmpstr = W$ + Left$(b$, 1)
-            BackPort b$
+            'BackPort b$
+            If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
             If Not IsNumberNew(bstack, b$, rv, False) Then SpeedGroup = 0: GoTo fastexit1
             bstack.LastValue = rv
             SpeedGroup = 1
@@ -4244,7 +4246,8 @@ conthere0001:
     Else
         bstack.tmpstr = W$ + Left$(b$, 1)
     End If
-    BackPort b$
+    'BackPort b$
+    If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
     If IsNumberNew(bstack, b$, rv, False) Then
         SpeedGroup = 1
         If pppp.Arr Then
@@ -4306,7 +4309,8 @@ jmp2000:
            Else
             bstack.tmpstr = W$ + Left$(b$, 1)
            End If
-            BackPort b$
+            'BackPort b$
+            If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
             If IsStr1(bstack, b$, bb$) Then
                 bstack.LastValue = bb$
                 SpeedGroup = 1
@@ -4323,7 +4327,8 @@ jmp2000:
         If Len(safegroup.lasthere) > 0 And Len(safegroup.GroupName) > 0 Then
             W$ = safegroup.lasthere + "." + safegroup.GroupName
             bstack.tmpstr = W$ + Left$(b$, 1)
-            BackPort b$
+            'BackPort b$
+            If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
             If Not IsStr1(bstack, b$, bb$) Then SpeedGroup = 0: GoTo fastexit1
             bstack.LastValue = bb$
             SpeedGroup = 1
@@ -4377,7 +4382,8 @@ cont5050:
 conthere000:
     If Left$(b$, 1) = "." Then
         bstack.tmpstr = W$ + Left$(b$, 1)
-        BackPort b$
+        'BackPort b$
+        If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
         Set bstack.lastpointer = Nothing
         If IsStr1(bstack, b$, bb$) Then GoTo conthere
     ElseIf var(y1).HasValue Then
@@ -4388,12 +4394,14 @@ conthere000:
                 Else
                     bstack.tmpstr = W$ + "$(" + Left$(b$, 1)
                 End If
-                BackPort b$
+                'BackPort b$
+                If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
                 Set bstack.lastpointer = Nothing
                 If IsStr1(bstack, b$, bb$) Then GoTo conthere
             ElseIf FastSymbol(b$, ")(", , 2) Then
                 bstack.tmpstr = W$ + "(" + Left$(b$, 1)
-                BackPort b$
+                'BackPort b$
+                If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
                  Set bstack.lastpointer = Nothing
                 If IsStr1(bstack, b$, bb$) Then GoTo conthere
             Else
@@ -4795,7 +4803,8 @@ cont1010:
         End If
     ElseIf i = 8 Then
         bstack.tmpstr = W$ + "[" + Left$(b$, 1)
-        BackPort b$
+        'BackPort b$
+        If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
         If IsNumberNew(bstack, b$, v, False) Then
             If bstack.lastobj Is Nothing Then
 er66876:
@@ -4900,8 +4909,8 @@ conthere3:
             End If
         ElseIf i = 6 Then
             bstack.tmpstr = W$ + Left$(b$, 1)
-            BackPort b$
-            ' ??????
+            'BackPort b$
+            If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
             If IsStr1(bstack, b$, W$) Then
             End If
         Else
@@ -5360,7 +5369,8 @@ cont2020:
         ElseIf Prefix = "@READ" Then
             If i Then
                 bstack.tmpstr = W$ + "." + Left$(b$, 1)
-                BackPort b$
+                'BackPort b$
+                If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
                 SpeedGroup = Abs(MyRead(1, bstack, b$, 1))
                 GoTo CONTlastEtnum
             Else
@@ -5375,38 +5385,34 @@ cont2020:
         Else
             If i Then
                 bstack.tmpstr = vbCrLf + Prefix + " " + W$ + "." + Left$(b$, 1)
-                BackPort b$
             Else
                 If var(y1).HasStrValue Then
                     bstack.tmpstr = vbCrLf + Prefix + " " + W$ + "$ " + Left$(b$, 1)
-                    BackPort b$
                 Else
                     bstack.tmpstr = vbCrLf + Prefix + " " + W$ + " " + Left$(b$, 1)
-                    BackPort b$
                 End If
             End If
+            'BackPort b$
+            If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
         End If
     Else
         If Left$(b$, 2) = Chr$(3) + "(" Then
-           If var(y1).HasStrValue Then
-               bstack.tmpstr = W$ + "$( "
-               Mid$(b$, 1, 2) = "  "
-               BackPort b$
-           Else
-               bstack.tmpstr = W$ + "( " ''+ Left$(b$, 1)
-               Mid$(b$, 1, 2) = "  "
-               BackPort b$
-           End If
+            If var(y1).HasStrValue Then
+                bstack.tmpstr = W$ + "$( "
+                Mid$(b$, 1, 2) = "  "
+            Else
+                bstack.tmpstr = W$ + "( " ''+ Left$(b$, 1)
+                Mid$(b$, 1, 2) = "  "
+            End If
         Else
             If Left$(b$, 1) = Chr$(3) Then Mid$(b$, 1, 1) = " "
             If MaybeIsSymbol(b$, "/*-+=~^&|<>") Then
                 bstack.tmpstr = W$ + Left$(b$, 1)
-                BackPort b$
             Else
                 bstack.tmpstr = W$ + "." + Left$(b$, 1)
-                BackPort b$
             End If
         End If
+        If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
     End If
     SpeedGroup = Execute(bstack, b$, True, , , , , True)
         
@@ -6663,7 +6669,7 @@ contthis1:
         GoTo LOOKFORVARNUM
     Else
         bstack.tmpstr = v$ + Left$(a$, 1)
-        BackPort a$
+        If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
        '' a$ = v$ + a$  ' ????
         Exit Function
     End If
@@ -8289,7 +8295,7 @@ Case 6
     If usebackup Then
         If strfunid.Find(v$, w1, bstack.strnum) Then
             bstack.tmpstr = "@" + v$ + Left$(a$, 1)
-            BackPort a$
+            If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
             v$ = vbNullString
             If IsStr1(bstack, a$, v$) Then
                 r = vbNullString
@@ -8302,8 +8308,8 @@ Case 6
         End If
     End If
     IsNumberNew = False
-    bstack.tmpstr = v$ + Left$(a$, 1)
-    BackPort a$
+    bstack.tmpstr = s1$ + Left$(a$, 1)
+    If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
     Exit Function
 Case 5
 'On Error Resume Next
@@ -9420,58 +9426,55 @@ Exit Function
 LOOKFORSUBNUM:
 ''On Error Resume Next
 If Len(s1$) = 1 Then
-If s1$ = Chr(0) Then
-If bstack.lastpointer Is Nothing Then GoTo skiperror
-Set ppppl = bstack.lastpointer
-Set bstack.lastpointer = Nothing
-w2 = 0
-GoTo contAr22
-Else
-SyntaxError
-Exit Function
-End If
-Else
-s1$ = v$ + ")" ' ANY CHAR HERE
-End If
-MakeThisSubNum bstack, s1$
-If IsSymbol(a$, "*") Then
-'is a function allways...
-If GetlocalSub(s1$, V1&) Then
-    GoTo contAr1
-ElseIf GetSub(s1$, V1&) Then
-GoTo contAr1
-ElseIf GetSub2(bstack, s1$, V1&) Then
-GoTo contAr1
-
-Else
-GoTo skiphere
-End If
-
-Else
-If neoGetArray(bstack, v$, ppppl, , , True) Then
-
-    GoTo contAr2L
-ElseIf LastErNum <> 0 Then
-Exit Function
-ElseIf GetlocalSub(s1$, V1&) Then
-    GoTo contAr1
-ElseIf neoGetArray(bstack, v$, ppppl, , True) Then
-GoTo contAr2
-ElseIf GetSub2(bstack, s1$, V1&) Then
-GoTo contAr1
-
-ElseIf GetSub(s1$, V1&) Then
-GoTo contAr1
-Else
-skiphere:
-If Len(bstack.UseGroupname) > 0 Then
-    If InStr(s1$, bstack.UseGroupname) = 1 Then
-        s1$ = bstack.UseGroupname + ChrW(&HFFBF) + Mid$(s1$, Len(bstack.UseGroupname) + 1)
-        If GetSub(s1$, V1&) Then GoTo contAr1
+    If s1$ = Chr(0) Then
+        If bstack.lastpointer Is Nothing Then GoTo skiperror
+        Set ppppl = bstack.lastpointer
+        Set bstack.lastpointer = Nothing
+        w2 = 0
+        GoTo contAr22
+    Else
+        SyntaxError
+        Exit Function
     End If
 End If
-If Right$(s1$, 1) = ")" Then
-    If here$ Like "*." + s1$ Then
+s$ = s1$
+s1$ = v$ + ")" ' ANY CHAR HERE
+
+MakeThisSubNum bstack, s1$
+If IsSymbol(a$, "*") Then
+    'is a function allways...
+    If GetlocalSub(s1$, V1&) Then
+        GoTo contAr1
+    ElseIf GetSub(s1$, V1&) Then
+        GoTo contAr1
+    ElseIf GetSub2(bstack, s1$, V1&) Then
+        GoTo contAr1
+    Else
+        GoTo skiphere
+    End If
+Else
+    If neoGetArray(bstack, v$, ppppl, , , True) Then
+        GoTo contAr2L
+    ElseIf LastErNum <> 0 Then
+        Exit Function
+    ElseIf GetlocalSub(s1$, V1&) Then
+        GoTo contAr1
+    ElseIf neoGetArray(bstack, v$, ppppl, , True) Then
+        GoTo contAr2
+    ElseIf GetSub2(bstack, s1$, V1&) Then
+        GoTo contAr1
+    ElseIf GetSub(s1$, V1&) Then
+        GoTo contAr1
+    Else
+skiphere:
+    If Len(bstack.UseGroupname) > 0 Then
+        If InStr(s1$, bstack.UseGroupname) = 1 Then
+            s1$ = bstack.UseGroupname + ChrW(&HFFBF) + Mid$(s1$, Len(bstack.UseGroupname) + 1)
+            If GetSub(s1$, V1&) Then GoTo contAr1
+        End If
+    End If
+    If Right$(s1$, 1) = ")" Then
+        If here$ Like "*." + s1$ Then
         subHash.ItemCreatorNoSwap s1$, bstack.OriginalCode, True
         GoTo contAr1
     ElseIf s1$ = "LAMBDA()" Then
@@ -9479,18 +9482,16 @@ contlambda01:
         If bstack.IamLambda Then
             s1$ = bstack.FuncRec
         Else
-           s1$ = Mid$(here$, rinstr(here$, "».") + 2)
-           If Right$(here$, 2) = "()" And bstack.UseGroupname = vbNullString Then
-
-            s1$ = sbf(bstack.OriginalCode).goodname
-            V1& = bstack.OriginalCode
-           ElseIf Not GetSub(s1$, V1&) Then
-               If here$ Like "*." + s1$ Then
-
-                  s1$ = sbf(bstack.OriginalCode).goodname
-                   V1& = bstack.OriginalCode
-               Else
-                   GoTo skiperror
+            s1$ = Mid$(here$, rinstr(here$, "».") + 2)
+            If Right$(here$, 2) = "()" And bstack.UseGroupname = vbNullString Then
+                s1$ = sbf(bstack.OriginalCode).goodname
+                V1& = bstack.OriginalCode
+            ElseIf Not GetSub(s1$, V1&) Then
+                If here$ Like "*." + s1$ Then
+                    s1$ = sbf(bstack.OriginalCode).goodname
+                    V1& = bstack.OriginalCode
+                Else
+                    GoTo skiperror
                End If
            End If
         End If
@@ -9544,7 +9545,7 @@ contAr1:
     End If
                 
 ElseIf V1& = -1 Then
-s1$ = v$
+s1$ = s$
 GoTo isasub
 Else
     
@@ -9861,7 +9862,8 @@ contlambdahere2:
                             End If
 againlambda:
                             bstack.tmpstr = "A_" & (Abs(w2)) & "(" & Left$(a$, 1)
-                            BackPort a$
+                            'BackPort a$
+                            If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
                             IsNumberNew = IsNumberNew(bstack, a$, p, False)
                             If Not bstack.lastobj Is Nothing Then
                                 If TypeOf bstack.lastobj Is lambda Then
@@ -10537,9 +10539,7 @@ finishnum:
             Else
 skiperror:
             IsNumberNew = False
-  
             If FindNameForGroup(bstack, v$) Then
-                
                 UnknownMethod1 a$, v$
             Else
                 If Len(v$) > 5 Then
@@ -10552,15 +10552,12 @@ skiperror:
                 End If
                 
                 If Len(here$) > 0 Then
-                    s$ = here$ + "." + v$ + ")"
-                    subHash.ItemCreatorNoSwap s$, -1, True
-                    
-                s1$ = v$
-                s$ = v$
-                GoTo isasub
+                    subHash.ItemCreator here$ + "." + v$ + ")", -1, True
+                    s1$ = s$
+                    s$ = v$
+                    GoTo isasub
                 End If
-               ' UnknownFunction1 a$, v$
-        
+                UnknownFunction1 a$, v$
             End If
             Exit Function
         End If
@@ -10699,10 +10696,12 @@ againsub:
                 GoTo againsub
             Else
                   If subHash.Count > 0 Then
+                    If Len(s$) > 0 Then
                     subHash.ReadVar subHash.Count - 1, v$, dn
                     If here$ + "." + s$ + ")" = v$ Then
                     UnknownFunction1 a$, s$ + ")"
                     Exit Function
+                    End If
                     End If
                 End If
                 s1$ = myUcase(s1$, True)
@@ -10722,7 +10721,8 @@ nofun1:
 Case 3
     IsNumberNew = False
     bstack.tmpstr = v$ + Left$(a$, 1)
-    BackPort a$
+    'BackPort a$
+    If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
     Exit Function
 
 End Select
@@ -11896,7 +11896,8 @@ a$ = NLtrim$(a$)
                     Case 3
                     rr& = 1 '5 ' float array or function
                     bstack.tmpstr = r$ + Left$(a$, 1)
-                    BackPort a$
+                    'BackPort a$
+                    If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
                     If Not IsStrExp(bstack, a$, r$, False) Then
                         MissString
                         rr& = 0
@@ -11906,7 +11907,8 @@ a$ = NLtrim$(a$)
 alfa:
                     rr& = 1
                     bstack.tmpstr = r$ + Left$(a$, 1)
-                    BackPort a$
+                    'BackPort a$
+                    If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
                     If IsExp(bstack, a$, p, flatobject:=True, nostring:=False) Then
                     If myVarType(p, vbString) Then
                         SwapString2Variant r$, p
@@ -11955,7 +11957,8 @@ alfa:
             ElseIf GetVar(bstack, myUcase(r$, True), rr&) Then
 1212:
                     bstack.tmpstr = r$ + Left$(a$, 1)
-                    BackPort a$
+                    'BackPort a$
+                    If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
                     If IsExp(bstack, a$, p, flatobject:=True, nostring:=False) Then
                     If myVarType(p, vbString) Then
                         rr& = 1
@@ -11970,19 +11973,16 @@ alfa:
         End If
     ElseIf rr& = 3 Then
         bstack.tmpstr = r$ + Left$(a$, 1)
-        BackPort a$
+        'BackPort a$
+        If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
         If IsStrExp(bstack, a$, r$, False) Then
             rr& = 1
-            
-          Else
-                        MissString
-                        rr& = 0
+        Else
+            MissString
+            rr& = 0
         End If
     End If
-   IsLabelFileName = rr&
- 
- 
-
+    IsLabelFileName = rr&
 End Function
 Function IsLabel(bstack As basetask, a$, rrr$, Optional skipdot As Boolean) As Long
 Dim buf$, fixme As Boolean, q1$
@@ -14517,7 +14517,8 @@ againlambda:
                 
                 'a$ = "A_" & (Abs(w2)) & "$(" + a$
                 bstackstr.tmpstr = "A_" & (Abs(w2)) & "$(" + Left$(a$, 1)
-                BackPort a$
+                'BackPort a$
+                If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
                 IsStr1 = IsStr1(bstackstr, a$, r$)
                 If Typename(bstackstr.lastobj) = "lambda" Then
                 If Left$(a$, 1) = "(" Then
@@ -16754,7 +16755,8 @@ ForCont:
                 End If
                 If x1 = 8 Then
                 bstack.tmpstr = W$ + "[" + Left$(b$, 1)
-                BackPort b$
+                'BackPort b$
+                If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
                 If IsExp(bstack, b$, p) Then
                     If bstack.lastobj Is Nothing Then
                     SyntaxError
@@ -19387,11 +19389,13 @@ autogosub:
 againsub:
             If Len(b$) = 0 Then
                 bstack.tmpstr = W$ + " "
-                BackPort b$
+                b$ = Chr(8)
             Else
                 bstack.tmpstr = W$ + Left$(b$, 1)
-                BackPort b$
+                Mid$(b$, 1, 1) = Chr(8)
             End If
+            
+                
             If Not IsStrExp(bstack, b$, W$, False) Then
                 InternalError
                 Execute = 0
@@ -19511,7 +19515,7 @@ constrsub:
         End If
     Else
         bstack.tmpstr = W$ + Left$(b$, 1)
-        BackPort b$
+        If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
         Exit Do
     End If
     
@@ -22717,8 +22721,9 @@ End Sub
 Function neoGetArray(bstack As basetask, ByVal nm$, ga As iBoxArray, Optional searchonly As Boolean = False, Optional ByVal useglobalname As Boolean = False, Optional useLocalOnly As Boolean = False, Optional rightexpression As Boolean, Optional feedback As Boolean, Optional fromthere As Long = 0) As Boolean
 Dim k As Long, myobject As Object
 Dim n$, hidden As Boolean
-nm$ = myUcase(nm$)
 If Len(nm$) = 0 Then SyntaxError: Exit Function
+'nm$ = myUcase(nm$)  from revision 32 version 14 this removed
+
 If useglobalname Or here$ = vbNullString Then
 n$ = bstack.GroupName + nm$
 ElseIf Left$(nm$, 5) = "ΑΥΤΟ." Or Left$(nm$, 5) = "THIS." Then
@@ -25087,7 +25092,8 @@ contlabel1:
                     If Len(rst$) > 0 Then
                         bstack.tmpstr = v$ + Left$(rst$, 1)
                         ppp$ = Left$(rst$, 1)
-                        BackPort rst$
+                        'BackPort rst$
+                        If Len(rst$) = 0 Then rst$ = Chr(8) Else Mid$(rst$, 1, 1) = Chr(8)
                         If IsNumberNew(bstack, rst$, p, False) Then
                             If Not bstack.lastpointer Is Nothing Then
                                 If bstack.lastpointer.IamApointer Then
@@ -33227,7 +33233,8 @@ myerror1:
                 rest$ = what$
             Else
                 basestack.tmpstr = "@" + what$ + Left$(rest$, 1)
-                BackPort rest$
+                'BackPort rest$
+                If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
             End If
             'rest$ =  rest$
         End If
@@ -33499,9 +33506,9 @@ End If
 End Sub
 
 Function myStructure(basestack As basetask, rest$, Lang As Long) As Boolean
-Dim base As String
-If IsStrExp(basestack, rest$, base) Then
-    myStructure = TABLENAMES(base, basestack, rest$, Lang)
+Dim Base As String
+If IsStrExp(basestack, rest$, Base) Then
+    myStructure = TABLENAMES(Base, basestack, rest$, Lang)
      
 Else
     myStructure = makestruct(basestack, rest$, Lang, here$ = "", False)
@@ -34611,7 +34618,8 @@ there123:
             If IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
                 wwPlain bstack, players(prive), s$, CLng(X), y1, , , CLng(p), x1, , , True
                 bstack.tmpstr = "@READ" + Left$(rest$, 1)
-                BackPort rest$
+                'BackPort rest$
+                If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
                 If Not Module10.executeblock(i, bstack, rest$, True, False, , True) Then
                 ' error ??
                 End If
@@ -34623,7 +34631,8 @@ there123:
             If IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then
                 wwPlain bstack, players(prive), s$, CLng(X), y1, , , CLng(p), , it, , True
                 bstack.tmpstr = "@READ" + Left$(rest$, 1)
-                BackPort rest$
+                'BackPort rest$
+                If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
                 If Not Module10.executeblock(i, bstack, rest$, True, False, , True) Then
                 ' error ?
                 End If
@@ -38832,7 +38841,8 @@ Select Case IsLabel(basestack, rest$, what$)
         flag = True
     Else
     basestack.tmpstr = what$ + "(" + Left$(rest$, 1)
-    BackPort rest$
+    'BackPort rest$
+    If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
     If IsExp(basestack, rest$, p) Then
 
     If MemInt(VarPtr(p)) = vbString Then
@@ -44705,7 +44715,7 @@ jmp1478:
 End Function
 Public Function GetPointer(bstack As basetask, a$) As Boolean
 Dim w1 As Long, s$, ppppl As iBoxArray, w2 As Long, p, nbstack As basetask, myobj As Object, i As Long
-Dim Glob As Boolean, rempar As Long, waspointer As Boolean, usehandler As mHandler
+Dim Glob As Boolean, rempar As Long, waspointer As Boolean, usehandler As mHandler, ppp$
 If MaybeIsSymbol(a$, ")") Then
 p = 0
 GoTo checkagain
@@ -44795,7 +44805,8 @@ cont11:
                 GoTo again
             Else
                 bstack.tmpstr = s$ + Left$(a$, 1)
-                BackPort a$
+                ppp$ = Left$(a$, 1)
+                If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
                 If IsNumberNew(bstack, a$, p, False) Then
                     If Not bstack.lastobj Is Nothing Then
                         If TypeOf bstack.lastobj Is Group Then
@@ -44812,6 +44823,8 @@ cont11:
                         End If
                     End If
                     Exit Function
+                Else
+                If Len(a$) > 0 Then Mid$(a$, 1, 1) = ppp$
                 End If
             End If
         End If
@@ -44866,20 +44879,22 @@ conthere:
         End If
     ElseIf w1 = 8 Then
         bstack.tmpstr = s$ + "[" + Left$(a$, 1)
-        BackPort a$
+        ppp$ = Left$(a$, 1)
+        If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
         If IsNumberNew(bstack, a$, p, False) Then
-        If bstack.lastobj Is Nothing Then
+            If bstack.lastobj Is Nothing Then
 er66876:
                 MyErMacro a$, "Not group found at array " + s$, "δεν βρήκα ομάδα στο πίνακα " + s$
                 Exit Function
-        ElseIf Not TypeOf bstack.lastobj Is Group Then
-            Set bstack.lastobj = Nothing
-            GoTo er66876
+            ElseIf Not TypeOf bstack.lastobj Is Group Then
+                Set bstack.lastobj = Nothing
+                GoTo er66876
+            End If
+            Set bstack.lastpointer = bstack.lastobj
+            GetPointer = True
+            GoTo ExitHere
         End If
-                Set bstack.lastpointer = bstack.lastobj
-                GetPointer = True
-                GoTo ExitHere
-        End If
+        If Len(a$) > 0 Then Mid$(a$, 1, 1) = ppp$
         GoTo er66876
     
         
@@ -50937,7 +50952,8 @@ cont111:
                 strFunctions = FastSymbol(a$, ")")
             Else
                 bstackstr.tmpstr = s$ + Left$(a$, 1)
-                BackPort a$
+                'BackPort a$
+                If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
                 GoTo ch1245
             End If
         ElseIf dd > 0 Then
@@ -50945,7 +50961,8 @@ cont111:
                 If dd = 8 Then
                     If Typename(var(w3)) = "RefArray" Then
                         bstackstr.tmpstr = s$ + "[" + Left$(a$, 1)
-                        BackPort a$
+                        'BackPort a$
+                        If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
                         If IsNumberNew(bstackstr, a$, p, False) Then
                             If bstackstr.lastobj Is Nothing Then
                                 If var(w3).Count > 0 And var(w3).vtType() = 8204 Then
@@ -53384,7 +53401,8 @@ If i = 1 Then
     ret = IsExp(bstack, part$, r)
     Else
     bstack.tmpstr = part$ + Left$(rest$, 1)
-    BackPort rest$
+    'BackPort rest$
+    If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
     ret = IsExp(bstack, rest$, r)
     End If
 ElseIf i = 3 Then
@@ -53395,21 +53413,25 @@ ElseIf i = 3 Then
     End If
     Else
     bstack.tmpstr = part$ + Left$(rest$, 1)
-    BackPort rest$
+    'BackPort rest$
+    If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
     ret = IsStrExp(bstack, rest$, ss$)
     If ret = False Then
     bstack.tmpstr = className$ + "()" + Left$(rest$, 1)
-    BackPort rest$
+    'BackPort rest$
+    If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
     ret = IsExp(bstack, rest$, r)
     End If
     End If
 ElseIf i = 5 Then
     bstack.tmpstr = part$ + Left$(rest$, 1)
-    BackPort rest$
+    'BackPort rest$
+    If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
     ret = IsExp(bstack, rest$, r)
 ElseIf i = 6 Then
     bstack.tmpstr = part$ + Left$(rest$, 1)
-    BackPort rest$
+    'BackPort rest$
+    If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
     ret = IsStrExp(bstack, rest$, ss$)
 Else
 WrongType

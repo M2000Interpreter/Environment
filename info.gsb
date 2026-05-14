@@ -42005,7 +42005,7 @@ Print retval=3 ' vt_long
 Call GetMem4(varptr(Z)+8, varptr(retval))
 Print retval=1234
 
-// do not change the value of variables who hold objects. Objects have counter and befaure changing the value (the pointer to object) interpreterhandle the counter. If the cunterget zero value then the object deleted. So if we change the pointer to a random value,when the variable get out of scope, has to call the method to subtract one from the counter and perhasp to erase the memory from the object, to destroy it, and for that using the pointer (but if the pointer show something else  we get a memory excpetion which halt the program)
+// do not change the value of variables who hold objects. Objects have counter and befaure changing the value (the pointer to object) interpreter handle the counter. If the cunterget zero value then the object deleted. So if we change the pointer to a random value,when the variable get out of scope, has to call the method to subtract one from the counter and perhasp to erase the memory from the object, to destroy it, and for that using the pointer (but if the pointer show something else  we get a memory excpetion which halt the program)
 
 Report "Varptr for items of arrays"
 
@@ -47693,7 +47693,8 @@ DIR USER
 IF NOT EXIST("sqlite3.dll") THEN
 	PRINT "FILE sqlite3.dll NOT FOUND - START DOWNLOAD FROM INTERNET"
 	CONST BINDF_GETNEWESTVERSION = 0x10&
-	STRING ZIPFILE="https://www.sqlite.org/2025/sqlite-dll-win-x86-3490200.zip"
+//		STRING ZIPFILE="https://www.sqlite.org/2025/sqlite-dll-win-x86-3490200.zip"
+	STRING ZIPFILE="https://sqlite.org/2026/sqlite-dll-win-x86-3530100.zip"
 	DECLARE URLDownloadToFile LIB "urlmon.URLDownloadToFileW" {
 		LONG p, szUrl$, sxFname$, LONG dwRrvd, LONG cback
 	}
@@ -47774,8 +47775,8 @@ DECLARE sqlite3_bind_int  LIB c DIR$+"sqlite3.sqlite3_bind_int" {
 	LONG handlerStatement, LONG Nth,  LONG int
 	} AS RET_STATUS
 
-ret= sqlite3_libversion_number()
-PRINT "SQLITE VERSION = ";(ret div 1000000)+"."+((ret mod 1000000) div 1000)+"."+(ret mod 1000)
+RET = sqlite3_libversion_number()
+PRINT "SQLITE VERSION = ";(RET div 1000000)+"."+((RET mod 1000000) div 1000)+"."+(RET mod 1000)
 rem {// press enter key just after rem to use these lines
 	BUFFER readthis AS BYTE*80
 	copyfromthere=sqlite3_libversion()
@@ -47801,20 +47802,22 @@ ReadFieldNamesAndTypes$={
 ReadRows$={
 	SELECT * FROM COMPANY ORDER BY NAME
 }
-Input "Use Disk (D) or Memory (M):";DM$
-if Left$(Ucase$(DM$))="D" then
-	if exist("check.db") then dos "del "+quote$(DIR$+"check.db");
-	ret=sqlite3_open16(DIR$+"check.db", &db)
-else
-	ret=sqlite3_open16(":memory:", &db)
-end if
+INPUT "Use Disk (D) or Memory (M):";DM$
+IF LEFT$(UCASE$(DM$),1)="D" THEN
+	IF EXIST("check.db") THEN DOS "DEL "+QUOTE$(DIR$+"check.db");
+	RET=SQLITE3_OPEN16(DIR$+"check.db", &DB)
+	PRINT "FILE: OK"
+ELSE
+	RET=SQLITE3_OPEN16(":memory:", &DB)
+	PRINT "MEMORY: OK"
+END IF
 
 BUFFER preparemem AS INTEGER*10000  ' for 10000 characters
 compiled_statement=process(db, preparemem, create$)
 IF compiled_statement<>0 THEN
-	ret=sqlite3_step(compiled_statement)
-	IF ret=SQLITE_DONE THEN PRINT "TABLE CREATED"
-	ret=sqlite3_finalize(compiled_statement)
+	RET=sqlite3_step(compiled_statement)
+	IF RET=SQLITE_DONE THEN PRINT "TABLE CREATED"
+	RET=sqlite3_finalize(compiled_statement)
 END IF
 compiled_statement=process(db, preparemem,insertRow$)
 IF compiled_statement<>0 THEN
@@ -47827,48 +47830,46 @@ IF compiled_statement<>0 THEN
 	Data 6, "Kim", 22, "South-Hall", 45000.00
 	rowTypes=(int64, txt, int, txt, dbl)
 	WHILE bind_stack(compiled_statement, rowTypes)
-		ret=sqlite3_step(compiled_statement)
-		IF ret=SQLITE_DONE ELSE CANCEL=TRUE: EXIT
+		RET=sqlite3_step(compiled_statement)
+		IF RET=SQLITE_DONE ELSE CANCEL=TRUE: EXIT
 		IF EMPTY THEN EXIT
-		ret=sqlite3_reset(compiled_statement)
+		RET=sqlite3_reset(compiled_statement)
 	END WHILE
-	ret=sqlite3_finalize(compiled_statement)
+	RET=sqlite3_finalize(compiled_statement)
 END IF
 IF VALID(CANCEL) THEN GOTO 100
 PRINT "DATA INSERTED TO DATABASE AT TABLE COMPANY"
 VARIANT var0, var1, var2, var3, var4
 compiled_statement=process(db, preparemem, ReadFieldNamesAndTypes$)
 IF compiled_statement<>0 THEN
-	ret=SQLITE_ROW
 	rows_counter=0
 	FLUSH
-	WHILE ret=SQLITE_ROW
-		ret=sqlite3_step(compiled_statement)
-		IF ret=SQLITE_ROW THEN
-			rows_counter++
-			var0=sqlite_column_string(compiled_statement, 0&)
-			var1=sqlite_column_string(compiled_statement, 1&)
-			var2=sqlite_column_string(compiled_statement, 2&)
-			' 1 not null 0 can be null
-			var3=sqlite_column_string(compiled_statement, 3&)
-			? var0, var1, var2, var3
-		END IF
-	END WHILE
+	DO
+		RET=sqlite3_step(compiled_statement)
+		IF RET=SQLITE_ROW ELSE EXIT
+		rows_counter++
+		var0=sqlite_column_string(compiled_statement, 0&)
+		var1=sqlite_column_string(compiled_statement, 1&)
+		var2=sqlite_column_string(compiled_statement, 2&)
+		' 1 not null 0 can be null
+		var3=sqlite_column_string(compiled_statement, 3&)
+		? var0, var1, var2, var3
+	ALWAYS
 	PRINT "FOUND NUMBER OF FIELDS = ";rows_counter
-	ret=sqlite3_finalize(compiled_statement)
+	RET=sqlite3_finalize(compiled_statement)
 END IF
 
 compiled_statement=process(db, preparemem, ReadRows$)
 IF compiled_statement<>0 THEN
-	ret=SQLITE_ROW
-	rows_counter=0
-	WHILE ret=SQLITE_ROW
-		ret=sqlite3_step(compiled_statement)
-		IF ret=SQLITE_ROW THEN rows_counter++
-	END WHILE
+	//RET=SQLITE_ROW
+	rows_counter=-1
+	//WHILE RET=SQLITE_ROW
+	DO	
+		rows_counter++
+		RET=sqlite3_step(compiled_statement)
+	WHEN RET=SQLITE_ROW
 	PRINT "FOUND NUMBER OF ROWS = ";rows_counter
-	ret=sqlite3_reset(compiled_statement)
-	ret=SQLITE_ROW
+	RET=sqlite3_reset(compiled_statement)
 	// WORKS WITH VARIANTS OR WITH SPECIFIC TYPES
 	// THESE ARE THE VARIABLES FILLING FROM DATABASE
 	STRING headers="{0:8}|{1:10}|{2:3}|{3:20}|{4:10}"
@@ -47879,24 +47880,23 @@ IF compiled_statement<>0 THEN
 	S=STRING$("-",WIDTH)
 	PRINT PART $(0), FORMAT$(bar, S, S, S, S, S )
 	PRINT
-	WHILE ret=SQLITE_ROW
-		ret=sqlite3_step(compiled_statement)
-		IF ret=SQLITE_ROW THEN
-			// THIS IS ZERO BASED INDEX FOR COLUMNS
-			var0=sqlite3_column_int64(compiled_statement, 0&)
-			var1=sqlite_column_string(compiled_statement, 1&)
-			var2=sqlite3_column_int(compiled_statement, 2&)
-			var3=sqlite_column_string(compiled_statement, 3&)
-			var4=sqlite3_column_double(compiled_statement, 4&)
-			PRINT FORMAT$(rowformat, var0, var1, var2,  var3,  var4)
-		END IF
-	END WHILE
+	DO
+		RET=sqlite3_step(compiled_statement)
+		IF RET=SQLITE_ROW ELSE EXIT
+		// THIS IS ZERO BASED INDEX FOR COLUMNS
+		var0=sqlite3_column_int64(compiled_statement, 0&)
+		var1=sqlite_column_string(compiled_statement, 1&)
+		var2=sqlite3_column_int(compiled_statement, 2&)
+		var3=sqlite_column_string(compiled_statement, 3&)
+		var4=sqlite3_column_double(compiled_statement, 4&)
+		PRINT FORMAT$(rowformat, var0, var1, var2,  var3,  var4)
+	ALWAYS
 	PRINT PART $(0), FORMAT$(bar, S, S, S, S, S )
-	ret=sqlite3_finalize(compiled_statement)
+	RET=sqlite3_finalize(compiled_statement)
 END IF
-100 ret=sqlite3_close_v2(db)
+100 RET=sqlite3_close_v2(db)
 REMOVE "sqlite3"  ' unload library
-PRINT ret=SQLITE_OK
+PRINT RET=SQLITE_OK
 FUNCTION sqlite_column_string(stmt AS LONG, icol AS LONG)
 	LOCAL buffer_size=sqlite3_column_bytes16(stmt, icol)
 	LOCAL buf : BUFFER buf AS BYTE*buffer_size
@@ -47905,36 +47905,36 @@ FUNCTION sqlite_column_string(stmt AS LONG, icol AS LONG)
 END FUNCTION
 FUNCTION process(this_db, prep, a$)
 	prep[0]=a$
-	LOCAL LONG z=LEN(a$)*2, ret, compiled_statement
+	LOCAL LONG z=LEN(a$)*2, RET, compiled_statement
 	LOCAL LONG where=prep(0), where0, last=z+where
 	DO	where0=where
 		z=last-where
-		ret=sqlite3_prepare16_v2(this_db, where0, z, &compiled_statement, &where)
-	UNTIL ret=0 or z=last-where
-	IF ret=0 THEN =compiled_statement
+		RET=sqlite3_prepare16_v2(this_db, where0, z, &compiled_statement, &where)
+	UNTIL RET=0 or z=last-where
+	IF RET=0 THEN =compiled_statement
 END FUNCTION
 FUNCTION bind_stack(that_stmt, Rtypes)
 	IF STACK.SIZE<LEN(Rtypes) THEN FLUSH : =FALSE: EXIT FUNCTION
 	LOCAL int64val AS  LONG LONG, dbl1 AS DOUBLE, int1 AS LONG
-	LOCAL m=EACH(Rtypes), ret AS LONG
+	LOCAL m=EACH(Rtypes), RET AS LONG
 	// BINDING USE BASE ONE FOR INDEX
 	WHILE m
 		SELECT CASE array(m)
 		CASE txt
 			READ a$
-			ret+=sqlite3_bind_text16(that_stmt, m^+1, a$, LEN(a$)*2, SQLITE_TRANSIENT)
+			RET+=sqlite3_bind_text16(that_stmt, m^+1, a$, LEN(a$)*2, SQLITE_TRANSIENT)
 		CASE dbl
 			READ dbl1
-			ret+=sqlite3_bind_double(that_stmt, m^+1, dbl1)
+			RET+=sqlite3_bind_double(that_stmt, m^+1, dbl1)
 		CASE int64
 			READ int64val
-			ret+=sqlite3_bind_int64(that_stmt, m^+1, int64val)
+			RET+=sqlite3_bind_int64(that_stmt, m^+1, int64val)
 		CASE int
 			READ int1
-			ret+=sqlite3_bind_int(that_stmt, m^+1, int1)
+			RET+=sqlite3_bind_int(that_stmt, m^+1, int1)
 		END SELECT
 	END WHILE
-	=ret=SQLITE_OK
+	=RET=SQLITE_OK
 END FUNCTION
 
 }
