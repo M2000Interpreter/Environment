@@ -922,7 +922,7 @@ If FastSymbol(r$, ",") Then
     
     Set fieldlist = pppp.item(1)
     For i = 0 To fieldlist.Count - 1
-        fieldlist.Index = i
+        fieldlist.index = i
         fieldlist.Done = True
         If fieldlist.sValue = -1 Then
             Fields = Fields + 1
@@ -940,7 +940,7 @@ If FastSymbol(r$, ",") Then
     If indexField.Count > 0 Then
     stac1.DataVal indexField.Count
     For j = 0 To pppp.item(3).Count - 1
-    indexField.Index = j
+    indexField.index = j
     indexField.Done = True
     
    
@@ -954,7 +954,7 @@ stac1.PushVal indexField.Count
 stac1.PushVal Fields
 Else
 For i = 0 To tables.Count - 1
-tables.Index = i
+tables.index = i
 tables.Done = True
 If tables.sValue = 0 Then
 Set pppp = tables.ValueObj
@@ -1068,7 +1068,7 @@ End If
         PushOne Base, myBase
     End If
   Dim cat, TBL, rs
-     Dim i As Long, j As Long, K As Long, KB As Boolean
+     Dim i As Long, j As Long, k As Long, KB As Boolean
   
            Set rs = CreateObject("ADODB.Recordset")
         Set TBL = CreateObject("ADOX.TABLE")
@@ -1182,10 +1182,10 @@ End If
                           With TBL.indexes(j)
                           If (.Unique = False) And (.indexnulls = 0) Then
                           stac1.DataVal CDbl(.Columns.Count)
-                          For K = 0 To .Columns.Count - 1
-                            stac1.DataStr .Columns(K).Name
-                             stac1.DataStr inames(.Columns(K).sortorder, Lang)
-                          Next K
+                          For k = 0 To .Columns.Count - 1
+                            stac1.DataStr .Columns(k).Name
+                             stac1.DataStr inames(.Columns(k).sortorder, Lang)
+                          Next k
                              Exit For
                              
                              End If
@@ -1220,7 +1220,7 @@ End Function
 Public Function append_table(bstackstr As basetask, Base As String, r$, ed As Boolean, Optional Lang As Long = -1) As Boolean
 Dim table$, i&, par$, ok As Boolean, TT, t As Double, j&, vv, p_acc As tuple, acc As tuple
 Dim gindex As Long
-Dim mb As Mk2Base, tables As FastCollection, pppp As tuple, temp As tuple, fieldlist As FastCollection
+Dim mb As Mk2Base, tables As FastCollection, pppp As tuple, Temp As tuple, fieldlist As FastCollection
 Dim indexField As FastCollection, allkey$, prevkey$
 
  ok = False
@@ -1255,9 +1255,9 @@ Set indexField = pppp.item(3)
 Set fieldlist = pppp.item(4)
 If indexField.Count > 0 Then
     If gindex > fieldlist.Count + 1 Then gindex = fieldlist.Count + 1
-    fieldlist.Index = gindex - 1
+    fieldlist.index = gindex - 1
     fieldlist.Done = True
-    tables.Index = fieldlist.Value
+    tables.index = fieldlist.Value
     tables.Done = True
     fieldlist.Done = False
     Set p_acc = tables.ValueObj
@@ -1266,7 +1266,7 @@ If indexField.Count > 0 Then
     tables.Done = False
 Else
     If gindex > tables.Count + 1 Then gindex = tables.Count + 1
-    tables.Index = gindex - 1
+    tables.index = gindex - 1
     tables.Done = True
     Set p_acc = tables.ValueObj
     p_acc.CopyArray acc
@@ -1281,34 +1281,34 @@ i& = 0
 Set fieldlist = pppp.item(1)
 Do
 TT = 0
-fieldlist.Index = p_acc.item(i&)
+fieldlist.index = p_acc.item(i&)
 fieldlist.Done = True
-Set temp = fieldlist.ValueObj
+Set Temp = fieldlist.ValueObj
 
 If FastSymbol(r$, ",") Then
-If i& = 0 And temp.item(4) Then
+If i& = 0 And Temp.item(4) Then
     If Not ed Then
-        acc.item(p_acc.item(i&)) = temp.item(5)
-        temp.item(5) = temp.item(5) + 1
+        acc.item(p_acc.item(i&)) = Temp.item(5)
+        Temp.item(5) = Temp.item(5) + 1
     End If
 End If
 ElseIf IsStrExp(bstackstr, r$, par$, False) Then
-    If i& = 0 And temp.item(4) Then
+    If i& = 0 And Temp.item(4) Then
         If Not ed Then
-            acc.item(p_acc.item(i&)) = temp.item(4)
-            temp.item(4) = temp.item(4) + 1
+            acc.item(p_acc.item(i&)) = Temp.item(4)
+            Temp.item(4) = Temp.item(4) + 1
         End If
-    ElseIf temp.item(2) > 0 Then
-        acc.item(p_acc.item(i&)) = RealLeft(par$, temp.item(2))
+    ElseIf Temp.item(2) > 0 Then
+        acc.item(p_acc.item(i&)) = RealLeft(par$, Temp.item(2))
     Else
         acc.item(p_acc.item(i&)) = par$
     End If
     If Not FastSymbol(r$, ",") Then Exit Do
 ElseIf IsExp(bstackstr, r$, TT, False) Then
-    If i& = 0 And temp.item(4) Then
+    If i& = 0 And Temp.item(4) Then
         If Not ed Then
-            acc.item(p_acc.item(i&)) = temp.item(4)
-            temp.item(4) = temp.item(4) + 1
+            acc.item(p_acc.item(i&)) = Temp.item(4)
+            Temp.item(4) = Temp.item(4) + 1
         End If
     Else
         acc.item(p_acc.item(i&)) = TT
@@ -1323,7 +1323,7 @@ Set indexField = pppp.item(3)
 Set fieldlist = pppp.item(4)
 If indexField.Count > 0 Then
 For j& = 0 To indexField.Count - 1
-    indexField.Index = j&
+    indexField.index = j&
     indexField.Done = True
     If Len(allkey$) = 0 Then
     allkey$ = indexField.Normalize(acc.item(indexField.sValue))
@@ -1337,14 +1337,14 @@ If Len(prevkey$) > 0 Then
             MyEr "index key not unique", "Το κλειδί δεν είναι μοναδικό"
             Exit Function
         End If
-        fieldlist.Index = gindex - 1
+        fieldlist.index = gindex - 1
         fieldlist.Done = True
-        tables.Index = fieldlist.Value
+        tables.index = fieldlist.Value
         ' I have to add logic here for calculating the final bytes for file
         ' so if the previous is less than the current, we can save to same plase
         ' else we have to delete this and make a new entry
         Set tables.ValueObj = acc
-        fieldlist.AddKey allkey$, tables.Index
+        fieldlist.AddKey allkey$, tables.index
         fieldlist.Remove prevkey$
         If pppp.item(5) = 2 Then
             fieldlist.SortDes
@@ -1353,9 +1353,9 @@ If Len(prevkey$) > 0 Then
         End If
     
     Else
-        fieldlist.Index = gindex - 1
+        fieldlist.index = gindex - 1
         fieldlist.Done = True
-        tables.Index = fieldlist.Value
+        tables.index = fieldlist.Value
         tables.Done = True
         fieldlist.Done = False
         Set tables.ValueObj = acc
@@ -1377,7 +1377,7 @@ Else
 End If
 End If
 If gindex > 0 Then
-    tables.Index = gindex - 1
+    tables.index = gindex - 1
     tables.Done = True
     Set tables.ValueObj = acc
 Else
@@ -1530,7 +1530,7 @@ End Function
 Public Sub getrow(bstackstr As basetask, r$, Optional ERL As Boolean = True, Optional Search$ = " = ", Optional Lang As Long = 0, Optional IamHelpFile As Boolean = False)
 Dim stat As Long
 Dim Base As String, table$, from As Long, first$, Second$, ok As Boolean, fr As Double, stac1$, p, i&
-Dim mb As Mk2Base, tables As FastCollection, pppp As tuple, temp As tuple, fieldlist As FastCollection, ii As Long, pppp1 As tuple
+Dim mb As Mk2Base, tables As FastCollection, pppp As tuple, Temp As tuple, fieldlist As FastCollection, ii As Long, pppp1 As tuple
 Dim vv, IndexList As FastCollection, many As Long, topi As Long, temp2 As tuple, ret As Boolean
 Dim LastRead As Long
 ok = False
@@ -1592,25 +1592,25 @@ If IsStrExp(bstackstr, r$, Base, False) Then
                     Set fieldlist = pppp.item(1)
                     If fieldlist.ExistKey(myUcase(first$, True)) Then
                         If fieldlist.sValue <> -1 Then GoTo aError
-                        i& = fieldlist.Index
+                        i& = fieldlist.index
                         ii = 0
                         topi = tables.Count
                         many = 0
                         If IndexList.Count > 0 Then
                         topi = IndexList.Count
                         While ii < topi
-                            IndexList.Index = ii
+                            IndexList.index = ii
                             IndexList.Done = True
-                            tables.Index = IndexList.Value
+                            tables.index = IndexList.Value
                             tables.Done = True
                             If tables.sValue = 0 Then
-                                Set temp = tables.ValueObj
-                                If temp.Count > i& Then
-                                If temp.CompareItem(i&, p, Search$, ret) Then
+                                Set Temp = tables.ValueObj
+                                If Temp.Count > i& Then
+                                If Temp.CompareItem(i&, p, Search$, ret) Then
                                     If ret Then
                                         from = from - 1
-                                        If temp2 Is Nothing Then Set temp2 = temp: LastRead = ii
-                                        If from = 0 Then Set pppp1 = temp: LastRead = ii
+                                        If temp2 Is Nothing Then Set temp2 = Temp: LastRead = ii
+                                        If from = 0 Then Set pppp1 = Temp: LastRead = ii
                                         
                                         many = many + 1
                                     End If
@@ -1624,17 +1624,17 @@ If IsStrExp(bstackstr, r$, Base, False) Then
                         Wend
                         Else
                         While ii < topi
-                            tables.Index = ii
+                            tables.index = ii
                             tables.Done = True
                             If tables.sValue = 0 Then
-                                Set temp = tables.ValueObj
-                                If temp.Count > i& Then
-                                If temp.CompareItem(i&, p, Search$, ret) Then
+                                Set Temp = tables.ValueObj
+                                If Temp.Count > i& Then
+                                If Temp.CompareItem(i&, p, Search$, ret) Then
                                 
                                     If ret Then
                                         from = from - 1
-                                        If temp2 Is Nothing Then Set temp2 = temp
-                                        If from = 0 Then Set pppp1 = temp
+                                        If temp2 Is Nothing Then Set temp2 = Temp
+                                        If from = 0 Then Set pppp1 = Temp
                                         
                                         many = many + 1
                                     End If
@@ -1647,7 +1647,7 @@ If IsStrExp(bstackstr, r$, Base, False) Then
                             ii = ii + 1
                         Wend
                         End If
-                        If Not pppp1 Is Nothing Then Set temp = pppp1 Else Set temp = temp2
+                        If Not pppp1 Is Nothing Then Set Temp = pppp1 Else Set Temp = temp2
                         If many = 0 Then
                         bstackstr.soros.PushVal 0
                         Exit Sub
@@ -1668,13 +1668,13 @@ aError:
                 topi = IndexList.Count
                 
                 While from > 0 And ii < topi
-                    IndexList.Index = ii
+                    IndexList.index = ii
                     IndexList.Done = True
-                    tables.Index = IndexList.Value
+                    tables.index = IndexList.Value
                     tables.Done = True
                     If tables.sValue = 0 Then
                         from = from - 1
-                        If from = 0 Then Set temp = tables.ValueObj: LastRead = ii
+                        If from = 0 Then Set Temp = tables.ValueObj: LastRead = ii
                     End If
                     ii = ii + 1
                 Wend
@@ -1686,26 +1686,26 @@ aError:
             
             While from > 0 And ii < topi
             
-                tables.Index = ii
+                tables.index = ii
                 tables.Done = True
                 If tables.sValue = 0 Then
                     from = from - 1
-                    If from = 0 Then Set temp = tables.ValueObj: LastRead = ii
+                    If from = 0 Then Set Temp = tables.ValueObj: LastRead = ii
                 End If
                 ii = ii + 1
             Wend
             End If
 cont001:
             pppp.item(22) = -1
-            If Not temp Is Nothing Then
+            If Not Temp Is Nothing Then
                 pppp.item(22) = LastRead
                 Set pppp1 = pppp.item(17)  ' field indexes
                 For ii = pppp1.Count - 1 To 0 Step -1
                     from = pppp1.item(ii)
-                    If temp.IsStringItem(from) Then
-                        bstackstr.soros.PushStrVariant temp.item(from)
+                    If Temp.IsStringItem(from) Then
+                        bstackstr.soros.PushStrVariant Temp.item(from)
                     Else
-                        bstackstr.soros.PushVal temp.item(from)
+                        bstackstr.soros.PushVal Temp.item(from)
                     End If
                 Next ii
                 bstackstr.soros.PushVal many
@@ -2231,7 +2231,7 @@ com2execute = Replace(com2execute, vbCrLf, "")
 com2execute = Replace(com2execute, ";", vbCrLf)
 Dim commands() As String, i As Long, mm As mStiva, aa As Object
 commands() = Split(com2execute + vbCrLf, vbCrLf)
-Set mm = New mStiva
+Set mm = NewmStiva
 For i = LBound(commands()) To UBound(commands())
 
     If Len(MyTrim(commands(i))) > 0 Then
@@ -2472,7 +2472,7 @@ MyOrder = True
 End Function
 Public Function NewTable(bstackstr As basetask, r$, Lang As Long) As Boolean
 'BASE As String, tablename As String, ParamArray flds()
-Dim Base As String, Tablename As String, fs As String, i&, n As Double, l As Double, ok As Boolean
+Dim Base As String, Tablename As String, fs As String, i&, N As Double, l As Double, ok As Boolean
 Dim vv, mb As Mk2Base, param As mStiva2, oldl As Double
 ok = False
 
@@ -2512,7 +2512,7 @@ Else
     If Not FastSymbol(r$, ",", True) Then
     Exit Function
     End If
-    If Not IsExp(bstackstr, r$, n) Then
+    If Not IsExp(bstackstr, r$, N) Then
     MissNumExpr
     Exit Function
     End If
@@ -2524,7 +2524,7 @@ Else
     Exit Function
     End If
     param.DataStr fs
-    param.DataVal n
+    param.DataVal N
     param.DataVal l
     Loop Until Not FastSymbol(r$, ",")
     param.PushVal Tablename
@@ -2638,32 +2638,32 @@ End If
                         If IsStrExp(bstackstr, r$, fs, False) Then
                         one_ok = True
                                 If FastSymbol(r$, ",") Then
-                                        If IsExp(bstackstr, r$, n) Then
+                                        If IsExp(bstackstr, r$, N) Then
                                 
                                             If FastSymbol(r$, ",") Then
                                                 If IsExp(bstackstr, r$, l) Then
-                                                If n = 1 Then n = 11: l = 0
-                                                If n = 2 Then n = 16: l = 0
-                                                If n = 3 Then n = 2: l = 0
-                                                If n = 4 Then
+                                                If N = 1 Then N = 11: l = 0
+                                                If N = 2 Then N = 16: l = 0
+                                                If N = 3 Then N = 2: l = 0
+                                                If N = 4 Then
                                                 oldl = l
-                                                n = 3: l = 0
+                                                N = 3: l = 0
                                                 End If
-                                                If n = 5 Then n = 6: l = 0
-                                                If n = 6 Then n = 4: l = 0
-                                                If n = 7 Then n = 5: l = 0
-                                                If n = 8 Then n = 7: l = 0
-                                                If n = 9 Then n = 128
-                                                If n = 10 Then n = 202
-                                                If n = 12 Then n = 203: l = 0
-                                                If n = 16 Then n = 14: l = 0
+                                                If N = 5 Then N = 6: l = 0
+                                                If N = 6 Then N = 4: l = 0
+                                                If N = 7 Then N = 5: l = 0
+                                                If N = 8 Then N = 7: l = 0
+                                                If N = 9 Then N = 128
+                                                If N = 10 Then N = 202
+                                                If N = 12 Then N = 203: l = 0
+                                                If N = 16 Then N = 14: l = 0
                                                     If l <> 0 Then
                                                 
-                                                     .Append fs, n, l
+                                                     .Append fs, N, l
                                            
                                                     Else
-                                                     .Append fs, n
-                                                     If n = 3 And oldl = -1 Then
+                                                     .Append fs, N
+                                                     If N = 3 And oldl = -1 Then
                                                      mtable.Columns.item(0).properties("AutoIncrement") = True
                                                    
                                                      End If
@@ -2989,7 +2989,7 @@ Dim i As Long
 Err.Clear
 For i = conCollection.Count - 1 To 0 Step -1
 On Error Resume Next
-conCollection.Index = i
+conCollection.index = i
 If conCollection.IsObj Then
 If TypeOf conCollection.ValueObj Is Mk2Base Then
 ' do nothing just throw
@@ -3294,7 +3294,7 @@ End If
 End If
 End Function
 Public Sub SQL()
-Dim a$, r$, K As Long, r1$, waittablename As Boolean
+Dim a$, r$, k As Long, r1$, waittablename As Boolean
 Dim closepar As Long, getonename As Boolean
 a$ = "SELECT * FROM [COMMANDS alfa] WHERE ENGLISH LIKE '" + "MODULE%" + "' AND GROUPNUM = 3"
 a$ = "SELECT [ENGLISH] FROM COMMANDS WHERE GROUPNUM =" + str$(100) + " ORDER BY [ENGLISH]"
@@ -3307,7 +3307,7 @@ Debug.Print a$
 If FastSymbol(a$, "*") Then Debug.Print "ALL"
 
 Do
-K = Len(a$)
+k = Len(a$)
 While FastSymbol(a$, "[")
 r$ = Left$(a$, InStr(a$, "]") - 1)
 Debug.Print "Field:"; r$
@@ -3430,7 +3430,7 @@ If FastSymbol(a$, "(") Then Debug.Print "Open Parenthesis": closepar = closepar 
 If closepar > 0 Then If FastSymbol(a$, ")") Then Debug.Print "Close Parenthesis": closepar = closepar - 1
 If FastSymbol(a$, ",") Then Debug.Print "Another Item (,)": getonename = False
 If FastSymbol(a$, ";") Then Exit Do
-Loop Until K = Len(a$)
+Loop Until k = Len(a$)
 End If
 End Sub
 Function ProcDBprovider(bstack As basetask, rest$, Lang As Long) As Boolean

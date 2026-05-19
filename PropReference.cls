@@ -90,65 +90,55 @@ Dim RETVAR As Variant, retvar2, obj As Object
 Dim check As Boolean
 Set mLastObj = Nothing
 If Init Then
-If UseIndex Then
-If Not IndexNew Then
- Value = 0
-Set mLastObj = Me
-Exit Property
-ElseIf useobj Then
-    IndexNew = False
-    Value = ReadPropIndexObj(hardlink, vtref, mIndex, UseExtControl)
-Else
-    IndexNew = False
-    Value = ReadPropIndex(ObjectRef, vtref, mIndex, UseExtControl, check, RETVAR)
-    If check And IsObject(RETVAR) Then
-    On Error Resume Next
-    Set obj = RETVAR
-    If ReadOneParameter(obj, (0), vbNullString, retvar2) Then
-        Value = retvar2
-       Else
-          Set mLastObj = RETVAR
+    If UseIndex Then
+        If Not IndexNew Then
+            Value = 0
+            Set mLastObj = Me
+            Exit Property
+        ElseIf useobj Then
+            IndexNew = False
+            Value = ReadPropIndexObj(hardlink, vtref, mIndex, UseExtControl)
+        Else
+            IndexNew = False
+            Value = ReadPropIndex(ObjectRef, vtref, mIndex, UseExtControl, check, RETVAR)
+            If check And IsObject(RETVAR) Then
+                On Error Resume Next
+                Set obj = RETVAR
+                If ReadOneParameter(obj, (0), vbNullString, retvar2) Then
+                    Value = retvar2
+                Else
+                    Set mLastObj = RETVAR
+                End If
+            End If
+        End If
+    Else
+        If useobj Then
+            If ReadPropObj(hardlink, vtref, RETVAR, UseExtControl) Then
+                If IsObject(RETVAR) Then
+                    Value = 0
+                    Set mLastObj = RETVAR
+                Else
+                    Value = RETVAR
+                End If
+            End If
+        Else
+            If ReadProp(ObjectRef, vtref, RETVAR, UseExtControl) Then
+                If IsObject(RETVAR) Then
+                    Value = 0
+                    Set mLastObj = RETVAR
+                Else
+                    On Error Resume Next
+                    If TypeOf RETVAR Is IUnknown Then
+                        Value = 0
+                        Set mLastObj = RETVAR: Exit Property
+                    End If
+                    Err.Clear
+                    Value = RETVAR
+                End If
+            End If
+        End If
     End If
-
- End If
 End If
-
-Else
-
-
-If useobj Then
-If ReadPropObj(hardlink, vtref, RETVAR, UseExtControl) Then
-If IsObject(RETVAR) Then
- Value = 0
-          Set mLastObj = RETVAR
-
-Else
-Value = RETVAR
-End If
-End If
-Else
- If ReadProp(ObjectRef, vtref, RETVAR, UseExtControl) Then
- If IsObject(RETVAR) Then
-         Value = 0
-          Set mLastObj = RETVAR
-
-Else
-On Error Resume Next
-If TypeOf RETVAR Is IUnknown Then
-Value = 0
-Set mLastObj = RETVAR: Exit Property
-End If
-Err.Clear
-Value = RETVAR
-End If
- End If
- End If
- End If
-Else
-' ??????????
-
-End If
-'If Not IsObject(Value) Then Debug.Print Value
 End Property
 Public Property Let Value(vNewValue As Variant)
 If Init Then
@@ -214,15 +204,15 @@ IndexNew = True
 mIndex = 0
 OptVariant mIndex
 End Sub
-Public Property Get Index() As Variant
-Index = mIndex
+Public Property Get index() As Variant
+index = mIndex
 End Property
 Public Sub ArrayIndex(ParamArray RHS())
 'IndexNew = True
     mIndex = RHS
 End Sub
 
-Public Property Let Index(ByVal RHS As Variant)
+Public Property Let index(ByVal RHS As Variant)
 IndexNew = True
 mIndex = RHS
 End Property

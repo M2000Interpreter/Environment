@@ -328,7 +328,7 @@ last$ = INK$ + kk$
         INK$ = last$
 again:
         If mIndex > -1 Then
-            Callback.Callback mesCtrlName + ".KeyPress(" + CStr(Index) + ")"
+            Callback.Callback mesCtrlName + ".KeyPress(" + CStr(index) + ")"
         Else
             Callback.Callback mesCtrlName + ".KeyPress()"
         End If
@@ -342,7 +342,7 @@ Private Sub pbox_KeyUp(KeyCode As Integer, shift As Integer)
 On Error GoTo fin
 'If PrevLocale <> GetLocale Then RaiseEvent Maybelanguage
 If BypassKey Then KeyCode = 0: shift = 0: Exit Sub
-Dim i As Long, K As Integer
+Dim i As Long, k As Integer
 
 lastshift = shift
 If KeyCode = 18 Then
@@ -353,9 +353,9 @@ shift = 0
 CtrlPlusF1
 Exit Sub
 ElseIf KeyCode >= vbKeyF1 And KeyCode <= vbKeyF12 Then
-    K = ((KeyCode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
-    Fkey K
-    If K = 0 Then KeyCode = 0: shift = 0
+    k = ((KeyCode - vbKeyF1 + 1) + 12 * (shift And 1)) + 24 * (1 + ((shift And 2) = 0)) - 1000 * ((shift And 4) = 4)
+    Fkey k
+    If k = 0 Then KeyCode = 0: shift = 0
 ElseIf KeyCode = 16 And shift <> 0 Then
   '  RaiseEvent Maybelanguage
 ElseIf KeyCode = vbKeyV Then
@@ -449,14 +449,14 @@ If Button > 0 And Targets Then
                 here$ = Callback.modulename()
                 Set bstack = New basetask
                 Set bstack.Owner = pbox
-                Set bstack.Sorosref = New mStiva
-                If Execute(bstack, (q(sel&).Comm), False) = 0 Then Beep
+                Set bstack.Sorosref = NewmStiva
+                If Execute(bstack, (q(sel&).comm), False) = 0 Then Beep
                 SwapStrings here$, oldHere$
                 
             Case Else
             
             If mIndex > -1 Then
-                Callback.Callback mesCtrlName + ".Target" + "(" + CStr(Index) + "," + str(sel& + prive * 10000) + ")"
+                Callback.Callback mesCtrlName + ".Target" + "(" + CStr(index) + "," + str(sel& + prive * 10000) + ")"
             Else
                 Callback.Callback mesCtrlName + ".Target" + "(" + str(sel& + prive * 10000) + ")"
             End If
@@ -474,7 +474,7 @@ End If
 
 
 If mIndex > -1 Then
-    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
+    Callback.Callback mesCtrlName + ".MouseDown(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 Else
     Callback.Callback mesCtrlName + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 End If
@@ -486,7 +486,7 @@ If Not enabled Then Exit Sub
 If Not Relax Then
 Relax = True
 If mIndex > -1 Then
-Callback.Callback mesCtrlName + ".MouseUp(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
+Callback.Callback mesCtrlName + ".MouseUp(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 Else
 Callback.Callback mesCtrlName + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 End If
@@ -499,7 +499,7 @@ If Not Relax Then
 CheckToolTip
 Relax = True
 If mIndex > -1 Then
-Callback.Callback mesCtrlName + ".MouseMove(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
+Callback.Callback mesCtrlName + ".MouseMove(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 Else
 Callback.Callback mesCtrlName + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 End If
@@ -580,7 +580,7 @@ If p >= 0 And p < UBound(q()) Then
             End If
         ElseIf IsLabelSymbolNew(rest$, "ÏÄÇÃÉÁ", "COMMAND", Lang, Y) Then
             If IsStrExp(bstack, rest$, W$) Then
-                q(p).Comm = W$
+                q(p).comm = W$
             Else
                 GoTo skipcommand
             End If
@@ -682,11 +682,11 @@ Public Sub ClearTargets()
     ReDim q(0) As target
 End Sub
 
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Friend Property Let Index(ByVal RHS As Long)
+Friend Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 
@@ -771,7 +771,7 @@ Property Let ShowCaret(ByVal RHS As Boolean)
         With players(prive)
         .ShowCaret = RHS
         DestroyCaret
-        LCTCnew pbox, players(prive), .currow, .curpos
+        LCTCnew pbox, players(prive), .currow, .curPos
         If RHS Then Module2.ShowCaret pbox.hWnd
         End With
         End If

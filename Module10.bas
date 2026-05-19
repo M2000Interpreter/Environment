@@ -2026,7 +2026,7 @@ con123:
                         If myobject.HasSet Then
                             W$ = Left$(W$, Len(W$) - 1)
                             Set myobject = bstack.soros
-                            Set bstack.Sorosref = New mStiva
+                            Set bstack.Sorosref = NewmStiva
                             PushParamGeneral bstack, b$
                             If Not FastSymbol(b$, ")", True) Then
                                 Set bstack.Sorosref = myobject
@@ -2344,7 +2344,7 @@ zzz123:
         ElseIf IsArrayGroup(ppppAny, v) Then
 again12568:
             Set myobject = bstack.soros
-            Set bstack.Sorosref = New mStiva
+            Set bstack.Sorosref = NewmStiva
             PushParamStraight bstack, b$
             If Not FastSymbol(b$, ")", True) Then
                 Set bstack.Sorosref = myobject
@@ -2411,7 +2411,7 @@ again12568:
 hasstr1:
                                     If var(v).HasSet Then
                                         Set myobject = bstack.soros
-                                        Set bstack.Sorosref = New mStiva
+                                        Set bstack.Sorosref = NewmStiva
                                         If bstack.lastobj Is Nothing Then
                                             bstack.soros.PushVal p
                                         ElseIf TypeOf bstack.lastobj Is mHandler Then
@@ -2700,7 +2700,7 @@ Exit Function
 case2:
 Exit Function
 comeoper:
-    Set bstack.Sorosref = New mStiva
+    Set bstack.Sorosref = NewmStiva
     If IsExp(bstack, b$, p) Then
         If bstack.lastobj Is Nothing Then
             bstack.soros.PushVal p
@@ -3754,7 +3754,7 @@ there12567:
 checkpar:
         W$ = Left$(W$, Len(W$) - 1)
         Set myobject = bstack.soros
-        Set bstack.Sorosref = New mStiva
+        Set bstack.Sorosref = NewmStiva
         PushParamGeneral bstack, b$
         If Not FastSymbol(b$, ")", True) Then
             Set bstack.Sorosref = myobject
@@ -3817,7 +3817,7 @@ checkpar:
         Else ' only group here
    
             Set myobject = bstack.soros
-            Set bstack.Sorosref = New mStiva
+            Set bstack.Sorosref = NewmStiva
             PushParamStraight bstack, b$
             If Not FastSymbol(b$, ")", True) Then
                     Set bstack.Sorosref = myobject
@@ -4446,7 +4446,7 @@ str99399:
                             ElseIf IsGroup(var(v)) Then
                                 If var(v).HasSet Then
                                     Set myobject = bstack.soros
-                                    Set bstack.Sorosref = New mStiva
+                                    Set bstack.Sorosref = NewmStiva
                                     If bstack.lastobj Is Nothing Then
                                         bstack.soros.PushStr ss$
                                     Else
@@ -4626,7 +4626,7 @@ strcont111:
                             If Not var(v).HasSet Then GroupCantSetValue: GoTo err000
                         End If
                         Set myobject = bstack.soros
-                        Set bstack.Sorosref = New mStiva
+                        Set bstack.Sorosref = NewmStiva
                         If bstack.lastobj Is Nothing Then
                             bstack.soros.PushStr ss$
                         Else
@@ -4658,7 +4658,7 @@ here1234:
                 Else
                     If IsGroup(var(v)) Then
                         Set myobject = bstack.soros
-                        Set bstack.Sorosref = New mStiva
+                        Set bstack.Sorosref = NewmStiva
                         GoTo a325674
                     ElseIf MemInt(VarPtr(var(v))) = vbString Then
                         MissStringExpr
@@ -5007,7 +5007,7 @@ str99399_1:
                         ElseIf IsGroup(var(v)) Then
                             If var(v).HasSet Then
                                 Set myobject = bstack.soros
-                                Set bstack.Sorosref = New mStiva
+                                Set bstack.Sorosref = NewmStiva
                                 If bstack.lastobj Is Nothing Then
                                     bstack.soros.PushStr ss$
                                 Else
@@ -5120,7 +5120,7 @@ assigngroup:
 hasstr1:
                             If var(v).HasSet Then
                                 Set myobject = bstack.soros
-                                Set bstack.Sorosref = New mStiva
+                                Set bstack.Sorosref = NewmStiva
                                 If bstack.lastobj Is Nothing Then
                                     bstack.soros.PushVal p
                                 ElseIf TypeOf bstack.lastobj Is mHandler Then
@@ -5751,7 +5751,7 @@ strcont111:
                                 If Not var(v).HasSet Then GroupCantSetValue: GoTo err000
                             End If
                             Set myobject = bstack.soros
-                            Set bstack.Sorosref = New mStiva
+                            Set bstack.Sorosref = NewmStiva
                             If bstack.lastobj Is Nothing Then
                                 bstack.soros.PushStr ss$
                             Else
@@ -5779,7 +5779,7 @@ a325674:
                     Else
                         If IsGroup(var(v)) Then
                             Set myobject = bstack.soros
-                            Set bstack.Sorosref = New mStiva
+                            Set bstack.Sorosref = NewmStiva
                             GoTo a325674
                         ElseIf MemInt(VarPtr(var(v))) = vbString Then
                             MissStringExpr
@@ -5871,7 +5871,7 @@ Z1123698:
                 End If
                 Set myobject = bstack.soros
 comeoper:
-                Set bstack.Sorosref = New mStiva
+                Set bstack.Sorosref = NewmStiva
                 If IsExp(bstack, b$, p) Then
                     If bstack.lastobj Is Nothing Then
                         bstack.soros.PushVal p
@@ -6753,7 +6753,7 @@ itisinumber:
                 If TypeOf var(i) Is Group Then
                     If var(i).HasSet Then
                         Set M = bstack.soros
-                        Set bstack.Sorosref = New mStiva
+                        Set bstack.Sorosref = NewmStiva
                         bstack.soros.PushVal p
                         NeoCall2 bstack, what$ + "." + ChrW(&H1FFF) + ":=()", ok
                         Set bstack.Sorosref = M
@@ -6829,7 +6829,7 @@ jump001:
                         Exit Function
                     ElseIf TypeOf var(i) Is Group Then
                         Set M = bstack.soros
-                        Set bstack.Sorosref = New mStiva
+                        Set bstack.Sorosref = NewmStiva
                         bstack.soros.PushStr s$
                         NeoCall2 bstack, Left$(what$, Len(what$) - 1) + "." + ChrW(&H1FFF) + ":=()", ok
                         Set bstack.Sorosref = M
@@ -7116,7 +7116,7 @@ If par Then
         If getvar2(bstack, ss$, i, , , flag) Then
             If MyIsObject(var(i)) Then
                 If Typename(var(i)) <> mGroup Then MyRead = True: Exit Function
-                    Set ps = New mStiva
+                    Set ps = NewmStiva
                     If ohere$ <> "" And Not var(i).IamGlobal Then
                         Set myobject = var(i).PrepareSoros(var(), ohere$ + ".")
                     Else
@@ -7165,7 +7165,7 @@ If par Then
             Col = 1 ' this is a switch... look down
      
         ElseIf IsStrExp(bstack, rest$, ss$) Then
-            Set ps = New mStiva
+            Set ps = NewmStiva
             Do While ss$ <> ""
                 If ISSTRINGA(ss$, pa$) Then
                     ps.DataStr pa$
@@ -9001,7 +9001,7 @@ contenumok:
 checkenum:
                         If var(i).HasSet Then
                             Set M = bstack.soros
-                            Set bstack.Sorosref = New mStiva
+                            Set bstack.Sorosref = NewmStiva
                             bstack.soros.PushVal p
                             NeoCall2 bstack, what$ + "." + ChrW(&H1FFF) + ":=()", ok
                             Set bstack.Sorosref = M
@@ -9602,7 +9602,7 @@ contstrhere:
                                 Exit Function
                             ElseIf TypeOf var(i) Is Group Then
                                 Set M = bstack.soros
-                                Set bstack.Sorosref = New mStiva
+                                Set bstack.Sorosref = NewmStiva
                                 bstack.soros.PushStr s$
                                 NeoCall2 bstack, Left$(what$, Len(what$) - 1) + "." + ChrW(&H1FFF) + ":=()", ok
                                 Set bstack.Sorosref = M
@@ -10594,7 +10594,7 @@ End If
 End Sub
 Sub CallByObject1(bstack As basetask, ret As Boolean, that As stdCallFunction)
 Dim Up As Long, getparam As Boolean, pp As Long
-Dim k As Long, p As Variant, Final(0 To 63) As Variant
+Dim K As Long, p As Variant, Final(0 To 63) As Variant
 Dim x1 As Long, what$, curtype As Long, s$, link$, rtype As Variant
 Dim thisref(0 To 63) As Long
 Dim usehandler As mHandler
@@ -10619,30 +10619,30 @@ If that.ReadType(that.Count - 1) = -100 Then
 Else
     Up = that.Count
 End If
-For k = 1 To Up
-        If that.IsByRef(k - 1) Then
+For K = 1 To Up
+        If that.IsByRef(K - 1) Then
             ' look for label..and check it
            If bstack.IsInStackString(what$) Then
-                If that.ReadType(k - 1) <= 4 Then
+                If that.ReadType(K - 1) <= 4 Then
                     If GetGlobalVar(bstack.GroupName + what$, x1) Then
-                        thisref(k - 1) = x1 ' so that is used to restore value
-                        If that.ReadType(k - 1) = 2 Then
-                            Final(k - 1) = CLng(VarPtr(var(x1)) + 8)
+                        thisref(K - 1) = x1 ' so that is used to restore value
+                        If that.ReadType(K - 1) = 2 Then
+                            Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
                         ElseIf MyIsObject(var(x1)) Then
-                            Final(k - 1) = CLng(VarPtr(var(x1)) + 8)
+                            Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
                         ElseIf MyIsUnknown(var(x1)) Then
-                            Final(k - 1) = CLng(VarPtr(var(x1)) + 8)
+                            Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
                         Else
-                            Final(k - 1) = var(x1)
+                            Final(K - 1) = var(x1)
                         End If
 
                     Else
                             ' no such variable
                     End If
-                    ElseIf that.ReadType(k - 1) = 64 Then
+                    ElseIf that.ReadType(K - 1) = 64 Then
                         If GetGlobalVar(bstack.GroupName + what$, x1) Then
                             If MemInt(VarPtr(var(x1))) = vbDouble Then
-                                Final(k - 1) = CLng(VarPtr(var(x1)) + 8)
+                                Final(K - 1) = CLng(VarPtr(var(x1)) + 8)
                             Else
                                 WrongType
                                 Exit Sub
@@ -10655,7 +10655,7 @@ For k = 1 To Up
             End If
         Else
         Dim ii As Long
-            Select Case that.ReadType(k - 1)
+            Select Case that.ReadType(K - 1)
             Case 2
                 If Not bstack.IsInStackNumber(p) Then
                     If Not bstack.IsInStackLong(ii) Then
@@ -10676,7 +10676,7 @@ For k = 1 To Up
                                 If p < 0 Then
                                     MyEr "Only zero or positive number", "Μόνο μηδέν ή θετικό αριθμό"
                                 Else
-                                    Final(k - 1) = CLng(signlong(p))
+                                    Final(K - 1) = CLng(signlong(p))
                                 End If
                             Else
                                 Exit For
@@ -10687,73 +10687,73 @@ For k = 1 To Up
                     Else
                         Exit For
                     End If
-                    Final(k - 1) = ii
+                    Final(K - 1) = ii
                     Else
                     If VarType(p) = 20 Then
-                    Final(k - 1) = p
+                    Final(K - 1) = p
                     Else
-                    Final(k - 1) = CLng(p)
+                    Final(K - 1) = CLng(p)
                     End If
                    End If
                 Case 20
                     If Not bstack.IsInStackNumber(p) Then
                         If Not bstack.IsInStackLong(ii) Then Exit For
-                        Final(k - 1) = cInt64(CVar(ii))
+                        Final(K - 1) = cInt64(CVar(ii))
                     Else
-                        Final(k - 1) = cInt64(p)
+                        Final(K - 1) = cInt64(p)
                     End If
                 Case 1, 5
                         If Not bstack.IsInStackNumber(p) Then
                     If Not bstack.soros.IsObj Then
                     If Not bstack.IsInStackLong(ii) Then Exit For
-                    Final(k - 1) = ii
+                    Final(K - 1) = ii
                     Else
-                    Set Final(k - 1) = bstack.soros.PopObj
+                    Set Final(K - 1) = bstack.soros.PopObj
                     End If
                     Else
-                    Final(k - 1) = p
+                    Final(K - 1) = p
                     End If
                 Case 4, 7
                     If Not bstack.IsInStackNumber(p) Then
                    
                     If Not bstack.IsInStackLong(ii) Then Exit For
-                    Final(k - 1) = ii
+                    Final(K - 1) = ii
                     Else
-                    Final(k - 1) = MyRound(p)
+                    Final(K - 1) = MyRound(p)
                     End If
                 Case 64
                     If Not bstack.IsInStackNumber(p) Then
                         If Not bstack.IsInStackLong(ii) Then Exit For
-                        Final(k - 1) = CDbl(ii)
+                        Final(K - 1) = CDbl(ii)
                     Else
-                        Final(k - 1) = CDbl(p)
+                        Final(K - 1) = CDbl(p)
                     End If
                 Case Else
                     If Not bstack.IsInStackString(s$) Then Exit For
-                    Final(k - 1) = s$
+                    Final(K - 1) = s$
                 End Select
         End If
 cont111:
-Next k
+Next K
 If getparam Then
 Do
 If bstack.IsInStackLong(pp) Then
-Final(k - 1) = pp
-k = k + 1
+Final(K - 1) = pp
+K = K + 1
 ElseIf bstack.IsInStackNumber(p) Then
-Final(k - 1) = p
-k = k + 1
+Final(K - 1) = p
+K = K + 1
 ElseIf bstack.IsInStackString(s$) Then
- Final(k - 1) = s$
-k = k + 1
+ Final(K - 1) = s$
+K = K + 1
 Else
 Exit Do
 End If
-Loop Until bstack.soros.IsEmpty Or k = 63
-Up = k - 1
+Loop Until bstack.soros.IsEmpty Or K = 63
+Up = K - 1
 End If
 
-If k > Up Then
+If K > Up Then
 'all is ok
 ' make your call
 If that.RetType = 0 Then
@@ -10827,21 +10827,21 @@ Exit Sub
 End If
 cont_here:
 
-For k = 1 To that.Count
-If that.IsByRef(k - 1) Then
+For K = 1 To that.Count
+If that.IsByRef(K - 1) Then
 ' RESTORE VALUES...
-    If that.ReadType(k - 1) < 5 Then
-    If that.ReadType(k - 1) <> 2 Then
-    x1 = MemInt(VarPtr(var(thisref(k - 1))))
+    If that.ReadType(K - 1) < 5 Then
+    If that.ReadType(K - 1) <> 2 Then
+    x1 = MemInt(VarPtr(var(thisref(K - 1))))
     If x1 = 9 Or x1 = 13 Then
     Else
-        var(thisref(k - 1)) = Final(k - 1)
+        var(thisref(K - 1)) = Final(K - 1)
     End If
     End If
     
     End If
 End If
-Next k
+Next K
 Exit Sub
 there:
 MyEr Err.Description, Err.Description
@@ -16077,7 +16077,6 @@ If Left$(ah, 1) <> "N" Then
 IsStrExp basestack, s$, b$, False
 If skipComp Then
 D = vbNullString
-'Debug.Print b$
 SwapString2Variant b$, D
 oldlogical = True
 Exit Function
@@ -16428,12 +16427,12 @@ Sub EnumJob(usehandler As mHandler, usehandler1 As mHandler)
         usehandler.sign = 1
 End Sub
 Sub EnumJob1(usehandler As mHandler)
-        Dim base As Enumeration
-        Set base = usehandler.objref
-        usehandler.index_start = base.ErrorIndex
-        base.index = base.ErrorIndex
-        base.Done = True
-        usehandler.index_cursor = base.Value
+        Dim Base As Enumeration
+        Set Base = usehandler.objref
+        usehandler.index_start = Base.ErrorIndex
+        Base.index = Base.ErrorIndex
+        Base.Done = True
+        usehandler.index_cursor = Base.Value
         usehandler.objref.index = usehandler.objref.ErrorIndex - 1
         usehandler.sign = 1
 End Sub

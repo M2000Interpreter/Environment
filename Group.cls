@@ -142,7 +142,7 @@ If eventlist Is Nothing Then Exit Sub
 Dim i As Long
 With eventlist
 For i = 0 To .Count - 1
-    .Index = i
+    .index = i
     .Done = True
     .Value = vbNullString
     .sValue = 0
@@ -157,7 +157,7 @@ Dim eventlist2 As New FastCollection
 Dim i As Long
 With eventlist
 For i = 0 To .Count - 1
-    .Index = i
+    .index = i
     .Done = True
     eventlist2.AddKey .KeyToString, ""
 Next i
@@ -184,55 +184,45 @@ End Function
 Public Function PrepareSoros(ByRef v(), ByVal topname$) As mStiva2
 Dim i As Long, AllSoros As New mStiva2, s As String, vv As mStiva2
 For i = 1 To FieldsCount
-s = Fields(i)
-'Debug.Print fields(i), topname$, GroupName
-
-If Left$(s, 1) = "*" Then
-AllSoros.DataStr "*" + topname$ + GroupName + Mid$(s, 2)
- If Not IsObject(v(val(Split(s)(1)))) Then Set v(val(Split(s)(1))) = New Group
-' If here$ <> "" And Not IamGlobal Then
- Set vv = v(val(Split(s)(1))).PrepareSoros(v(), Patch + ".")
-' Else
- Set vv = v(val(Split(s)(1))).PrepareSoros(v(), topname$ + GroupName)
- 'End If
- 
-AllSoros.MergeBottom vv
-Else
-If val(Split(s)(1)) = 0 Then
-AllSoros.DataStr s
-Else
-AllSoros.DataStr topname$ + GroupName + s
-End If
-End If
+    s = Fields(i)
+    If Left$(s, 1) = "*" Then
+        AllSoros.DataStr "*" + topname$ + GroupName + Mid$(s, 2)
+        If Not IsObject(v(val(Split(s)(1)))) Then Set v(val(Split(s)(1))) = New Group
+        Set vv = v(val(Split(s)(1))).PrepareSoros(v(), Patch + ".")
+        Set vv = v(val(Split(s)(1))).PrepareSoros(v(), topname$ + GroupName)
+        AllSoros.MergeBottom vv
+    Else
+        If val(Split(s)(1)) = 0 Then
+            AllSoros.DataStr s
+        Else
+            AllSoros.DataStr topname$ + GroupName + s
+        End If
+    End If
 Next
 Set PrepareSoros = AllSoros
-
 End Function
 Public Function PrepareSoros1(ByRef v(), ByVal topname$) As mStiva2
 Dim i As Long, AllSoros As New mStiva2, vv As mStiva2, s As String
 For i = 1 To FieldsCount
-s = Fields(i)
-If Left$(s, 1) = "*" Then
-AllSoros.DataStr "*" + topname$ + "." + Split(Mid$(s, 2))(0)
-
- Set vv = v(val(Split(s)(1))).PrepareSoros1(v(), GroupName)
- 
-AllSoros.MergeBottom vv
-Else
-AllSoros.DataStr GroupName + Split(s)(0)
-End If
+    s = Fields(i)
+    If Left$(s, 1) = "*" Then
+        AllSoros.DataStr "*" + topname$ + "." + Split(Mid$(s, 2))(0)
+        Set vv = v(val(Split(s)(1))).PrepareSoros1(v(), GroupName)
+        AllSoros.MergeBottom vv
+    Else
+        AllSoros.DataStr GroupName + Split(s)(0)
+    End If
 Next
 Dim a() As String
 If FuncRef$ <> "" Then
-a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
-If UBound(a()) > 0 Then
-For i = 1 To UBound(a())
-AllSoros.DataStr topname$ + "." + Split(a(i))(0)
-Next i
-End If
+    a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
+    If UBound(a()) > 0 Then
+        For i = 1 To UBound(a())
+            AllSoros.DataStr topname$ + "." + Split(a(i))(0)
+        Next i
+    End If
 End If
 Set PrepareSoros1 = AllSoros
-
 End Function
 Public Function PrepareSorosToCompare(ByRef v()) As mStiva2
 Dim i As Long, AllSoros As New mStiva2, vv As mStiva2, s As String
@@ -249,30 +239,28 @@ For i = 1 To FieldsCount
 Next
 Dim a() As String
 If FuncRef$ <> "" Then
-a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
-If UBound(a()) > 0 Then
-For i = 1 To UBound(a())
-AllSoros.DataStr (Split(a(i))(0))
-Next i
-End If
+    a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
+    If UBound(a()) > 0 Then
+        For i = 1 To UBound(a())
+            AllSoros.DataStr (Split(a(i))(0))
+        Next i
+    End If
 End If
 Set PrepareSorosToCompare = AllSoros
 End Function
 Public Function types() As String
-Dim i As Long, s$
-i = FieldsCount
-On Error Resume Next
-While i > 0
-If InStr(Fields(i), "( ") > 0 Then
-s$ = "A" + s$
-Else
-s$ = "V" + s$
-End If
-
-i = i - 1
-
-Wend
-types = s$
+    Dim i As Long, s$
+    i = FieldsCount
+    On Error Resume Next
+    While i > 0
+        If InStr(Fields(i), "( ") > 0 Then
+            s$ = "A" + s$
+        Else
+            s$ = "V" + s$
+        End If
+        i = i - 1
+    Wend
+    types = s$
 End Function
 Public Sub PeekItem(cursor As Long, item)
 '' used in the float mode
@@ -312,7 +300,6 @@ End If
 End Sub
 Public Sub PokeItem(cursor As Long, item)
 ' used in the float mode
-'Debug.Print Typename$(item)
 If IsObject(item) Then
 
 Set bank(cursor) = item

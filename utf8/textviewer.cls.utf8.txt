@@ -647,7 +647,6 @@ undopara = BlockEndPara
 undotext = that
 undomode = 1
 undopos = SelStart
-Debug.Print "PushMark2Undo"
 End Sub
 
 Private Sub glistN_PushUndoIfMarked()
@@ -1914,7 +1913,7 @@ Dim what$, ThatPara As Long
 
 If glistN.DragEnabled Then Exit Sub
 If ClickInsideMarkedText Then
-    Dim M As Long, z As Long
+    Dim M As Long, Z As Long
     If BlockStartLine = BlockEndline Then
         If BlockStartPos < BlockEndPos Then
             If Mid$(mDoc.TextParagraph(ThatPara), BlockEndPos, 1) = "(" Then
@@ -1923,14 +1922,14 @@ If ClickInsideMarkedText Then
                     FillBlock
                     Exit Sub
             Else
-                z = InStr(1, SelText, ".")
+                Z = InStr(1, SelText, ".")
             End If
         Else
-            z = InStr(1, SelText, ".")
+            Z = InStr(1, SelText, ".")
         End If
-        If z > 0 Then
-            SelStartSilent = SelStart + z
-            SelLengthSilent = SelLength - z
+        If Z > 0 Then
+            SelStartSilent = SelStart + Z
+            SelLengthSilent = SelLength - Z
             FillBlock
         ElseIf Right$(SelText, 1) = "(" Then
             SelStartSilent = SelStart
@@ -1952,8 +1951,8 @@ If ClickInsideMarkedText Then
                Else
                M = BlockStartPos
                End If
-               z = mDoc.TextParagraphLen(ThatPara)
-                While InStr(glistN.WordCharLeft, Mid$(mDoc.TextParagraph(ThatPara), M, 1)) < 2 And M < z
+               Z = mDoc.TextParagraphLen(ThatPara)
+                While InStr(glistN.WordCharLeft, Mid$(mDoc.TextParagraph(ThatPara), M, 1)) < 2 And M < Z
                     M = M + 1
                 Wend
                 If BlockStartPos < BlockEndPos Then
@@ -4204,15 +4203,15 @@ If HaveMarkedText Then
 If BlockStartLine = BlockEndline Then
 SelLength = Abs(BlockStartCursor - BlockEndCursor)
 Else
-Dim a$(), oldmydoc As Document, i As Long, SUM As Long
+Dim a$(), oldmydoc As Document, i As Long, sum As Long
 ' maybe we didn't need to preserve old UndoDoc...I need to clarify this..
 Set oldmydoc = UndoDoc
 Set UndoDoc = New Document
 FillBlock
-SUM = UndoDoc.SizeCRLF + 2
-If UndoDoc.LfLead Then SUM = SUM - 1
-If UndoDoc.CrTail Then SUM = SUM + 1
-SelLength = SUM - 2 ' no the last vbcrlf
+sum = UndoDoc.SizeCRLF + 2
+If UndoDoc.LfLead Then sum = sum - 1
+If UndoDoc.CrTail Then sum = sum + 1
+SelLength = sum - 2 ' no the last vbcrlf
 End If
 Set UndoDoc = oldmydoc
 End If

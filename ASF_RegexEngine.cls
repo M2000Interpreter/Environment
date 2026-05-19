@@ -52,7 +52,7 @@ Option Base 0
 ' ---------------- Public config -----------------------------------------
 Private Const DEFAULT_MAX_STEPS As Long = 200000
 ' --- debugging toggle: set True to print detailed trace during matching
-Private Const DEBUG_TRACE As Boolean = False
+'Private Const DEBUG_TRACE As Boolean = False
 
 ' ---------------- Public state ------------------------------------------
 Private pPattern As String
@@ -112,15 +112,15 @@ Private Function NodeExists(ByVal node As Collection, ByVal Key As String) As Bo
 End Function
 
 ' ---------------- Public API -------------------------------------------
-Public Sub Init(ByVal pattern As String, Optional ByVal ignoreCase As Boolean = False, Optional ByVal MaxSteps As Long = DEFAULT_MAX_STEPS, Optional ByVal multiline As Boolean = False, Optional ByVal dotAll As Boolean = False)
-    pPattern = pattern
+Public Sub Init(ByVal Pattern As String, Optional ByVal ignoreCase As Boolean = False, Optional ByVal MaxSteps As Long = DEFAULT_MAX_STEPS, Optional ByVal multiline As Boolean = False, Optional ByVal dotAll As Boolean = False)
+    pPattern = Pattern
     pIgnoreCase = ignoreCase
     pMultiline = multiline
     pDotAll = dotAll
     If MaxSteps <= 0 Then pMaxMatchSteps = DEFAULT_MAX_STEPS Else pMaxMatchSteps = MaxSteps
 
     ' Build AST
-    Set pAST = CompilePattern(pattern)
+    Set pAST = CompilePattern(Pattern)
     If Not pAST Is Nothing Then
         If Not NodeExists(pAST, "groupNodes") Then BuildGroupNodesFromAST pAST
     End If
@@ -131,8 +131,8 @@ Public Sub Init(ByVal pattern As String, Optional ByVal ignoreCase As Boolean = 
     ' compute group count after validation
     pGroupCount = GetGroupCount(pAST)
 End Sub
-Public Property Get pattern() As String: pattern = pPattern: End Property
-Public Property Let pattern(ByVal v As String): Init v, pIgnoreCase, pMaxMatchSteps, pMultiline, pDotAll: End Property
+Public Property Get Pattern() As String: Pattern = pPattern: End Property
+Public Property Let Pattern(ByVal v As String): Init v, pIgnoreCase, pMaxMatchSteps, pMultiline, pDotAll: End Property
 Public Property Get ignoreCase() As Boolean: ignoreCase = pIgnoreCase: End Property
 Public Property Let ignoreCase(ByVal v As Boolean): pIgnoreCase = v: End Property
 Public Property Get MaxMatchSteps() As Long: MaxMatchSteps = pMaxMatchSteps: End Property
@@ -165,14 +165,14 @@ Private Function CompilePattern(ByVal pat As String) As Collection
 
     Dim Pos As Long: Pos = 1
     Dim groupCounter As Long: groupCounter = 0
-    Dim body As Collection: Set body = ParseAlternation(pat, Pos, Len(pat), groupCounter)
-    NodeAdd ast, "body", body
+    Dim Body As Collection: Set Body = ParseAlternation(pat, Pos, Len(pat), groupCounter)
+    NodeAdd ast, "body", Body
     
     ' enforce lookbehind fixed-width constraint (raise at Init/Compile time)
     EnforceFixedWidthLookbehinds ast
 
     ' Precompute minLen
-    Dim mlen As Long: mlen = ComputeMinLen(body)
+    Dim mlen As Long: mlen = ComputeMinLen(Body)
     NodeAdd ast, "minLen", mlen
     
     ' Validate/lookbehind annotate
@@ -319,7 +319,7 @@ Private Function ParseSequence(pat As String, ByRef p As Long, pEnd As Long, _
                                             NodeAdd gnodeNamed, "child", innerNamed
                                             NodeAdd gnodeNamed, "name", nameBuf
                                             Set node = gnodeNamed
-                                            If DEBUG_TRACE Then Debug.Print "TRACE PARSE named-group -> name=" & nameBuf & " idx=" & thisIdx
+                                            ' If DEBUG_TRACE Then Debug.Print "TRACE PARSE named-group -> name=" & nameBuf & " idx=" & thisIdx
                                         Else
                                             Set node = newNode("lit"): NodeAdd node, "ch", "("
                                         End If
@@ -844,13 +844,13 @@ exit_:
     Exit Sub
 err_:
     ' Be defensive in production: clear error and continue (or rethrow in debug).
-    If DEBUG_TRACE Then Debug.Print "TraverseForGroups error: "; Err.Number; Err.Description
+    ' If DEBUG_TRACE Then Debug.Print "TraverseForGroups error: "; Err.Number; Err.Description
     Err.Clear
     Resume exit_
 End Sub
 
 Private Function MatchNode(ByVal node As Collection, ByVal subj As String, ByVal Pos As Long, Optional ByRef outEnd As Variant) As Boolean
-    If DEBUG_TRACE Then Debug.Print "TRACE MatchNode ENTER type=" & CStr(NodeGet(node, "type")) & " pos=" & Pos & " caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
+    ' If DEBUG_TRACE Then Debug.Print "TRACE MatchNode ENTER type=" & CStr(NodeGet(node, "type")) & " pos=" & Pos & " caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
     MatchSteps = MatchSteps + 1
     If MatchSteps > pMaxMatchSteps Then Err.Raise vbObjectError + 2, "RegexEngine", "Match aborted: too many steps"
 
@@ -991,14 +991,14 @@ Private Function MatchNode(ByVal node As Collection, ByVal subj As String, ByVal
         Case "quant"
             ' This path is rarely used now since we handle quantifiers inline in MatchSequence.
             Dim mn As Long: mn = NodeGet(node, "min")
-            Dim mx As Long: mx = NodeGet(node, "max")
-            If mx = -1 Then mx = Len(subj) - Pos + 1
+            Dim mX As Long: mX = NodeGet(node, "max")
+            If mX = -1 Then mX = Len(subj) - Pos + 1
             ' Attempt greedy expansion and accept largest
             Dim occPos() As Long: ReDim occPos(0 To 0)
             Dim occCount As Long: occCount = 0
             Dim curPos As Long: curPos = Pos
             Dim nodeEnd As Variant
-            Do While occCount < mx
+            Do While occCount < mX
                 Dim tempSnap() As Long: tempSnap = CopyCaps()
                 If MatchNode(NodeGet(node, "child"), subj, curPos, nodeEnd) Then
                     occCount = occCount + 1
@@ -1270,13 +1270,13 @@ Private Function MatchNode(ByVal node As Collection, ByVal subj As String, ByVal
         End If
     End If
 
-    If DEBUG_TRACE Then Debug.Print "TRACE MatchNode EXIT type=" & t & " pos=" & Pos & " res=" & CStr(res) & " localEnd=" & CStr(localEnd) & " caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
+    ' If DEBUG_TRACE Then Debug.Print "TRACE MatchNode EXIT type=" & t & " pos=" & Pos & " res=" & CStr(res) & " localEnd=" & CStr(localEnd) & " caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
     MatchNode = res
 End Function
 
 
 Private Function MatchSequence(ByVal children As Collection, ByVal subj As String, ByVal Pos As Long, Optional ByRef outEnd As Variant) As Boolean
-    If DEBUG_TRACE Then Debug.Print "TRACE MatchSequence start pos=" & Pos & " children=" & children.Count
+    ' If DEBUG_TRACE Then Debug.Print "TRACE MatchSequence start pos=" & Pos & " children=" & children.Count
     Dim seqSnap() As Long
     Dim rootSnap() As Long: rootSnap = CopyCaps()
     Dim grpSnap() As Long
@@ -1289,17 +1289,17 @@ Private Function MatchSequence(ByVal children As Collection, ByVal subj As Strin
         Dim nodeEnd As Variant
         Dim nodeType As String: nodeType = NodeGet(node, "type")
 
-        If DEBUG_TRACE Then Debug.Print "TRACE  seq child#" & i & " type=" & nodeType & " curPos=" & curPos
+        ' If DEBUG_TRACE Then Debug.Print "TRACE  seq child#" & i & " type=" & nodeType & " curPos=" & curPos
 
         If nodeType = "quant" Then
             ' --- handle quantifier with full backtracking (inline remainder matching) ---
             Dim childNode As Collection: Set childNode = NodeGet(node, "child")
             Dim mn As Long: mn = NodeGet(node, "min")
-            Dim mx As Long: mx = NodeGet(node, "max")
+            Dim mX As Long: mX = NodeGet(node, "max")
             Dim lazy As Boolean: lazy = NodeGet(node, "lazy")
             Dim possFlag As Boolean
             If NodeExists(node, "possessive") Then possFlag = NodeGet(node, "possessive") Else possFlag = False
-            If mx = -1 Then mx = Len(subj) - curPos + 1
+            If mX = -1 Then mX = Len(subj) - curPos + 1
         
             ' save sequence baseline snapshot
             seqSnap = CopyCaps()
@@ -1309,7 +1309,7 @@ Private Function MatchSequence(ByVal children As Collection, ByVal subj As Strin
             Dim occSnaps() As Variant   ' store snapshots (each an array of Long) after each successful occurrence
             Dim occCount As Long: occCount = 0
             Dim scanPos As Long: scanPos = curPos
-            Do While occCount < mx
+            Do While occCount < mX
                 Dim preSnap() As Long: preSnap = CopyCaps()
                 Dim ndEnd As Variant
                 If MatchNode(childNode, subj, scanPos, ndEnd) Then
@@ -1320,12 +1320,12 @@ Private Function MatchSequence(ByVal children As Collection, ByVal subj As Strin
                     Dim afterSnap() As Long: afterSnap = CopyCaps()
                     ReDim Preserve occSnaps(1 To occCount)
                     occSnaps(occCount) = afterSnap
-                    If DEBUG_TRACE Then Debug.Print "TRACE  quant matched occ " & occCount & " nodeEnd=" & ndEnd
+                    ' If DEBUG_TRACE Then Debug.Print "TRACE  quant matched occ " & occCount & " nodeEnd=" & ndEnd
                     scanPos = CLng(ndEnd) + 1
                 Else
                     ' restore captures from failed attempt and stop expanding
                     RestoreCaps preSnap
-                    If DEBUG_TRACE Then Debug.Print "TRACE  quant stop at occCount=" & occCount
+                    ' If DEBUG_TRACE Then Debug.Print "TRACE  quant stop at occCount=" & occCount
                     Exit Do
                 End If
             Loop
@@ -1334,13 +1334,13 @@ Private Function MatchSequence(ByVal children As Collection, ByVal subj As Strin
             If possFlag Then
                 If occCount < mn Then
                     ' not enough occurrences even at max -> fail immediately
-                    If DEBUG_TRACE Then Debug.Print "TRACE  quant possessive failed: occCount < min"
+                    ' If DEBUG_TRACE Then Debug.Print "TRACE  quant possessive failed: occCount < min"
                     RestoreCaps seqSnap
                     MatchSequence = False: Exit Function
                 End If
         
                 ' attempt remainder only with k = occCount
-                If DEBUG_TRACE Then Debug.Print "TRACE  quant possessive trying k=" & occCount & " (mn=" & mn & " occCount=" & occCount & ")"
+                ' If DEBUG_TRACE Then Debug.Print "TRACE  quant possessive trying k=" & occCount & " (mn=" & mn & " occCount=" & occCount & ")"
                 RestoreCaps seqSnap
                 ' restore capture state corresponding to occCount (if >0)
                 tmpSnaps = occSnaps(occCount)
@@ -1351,10 +1351,10 @@ Private Function MatchSequence(ByVal children As Collection, ByVal subj As Strin
                 Dim nxtEndP As Variant
                 For jP = i + 1 To children.Count
                     Dim nxtNodeP As Collection: Set nxtNodeP = children(jP)
-                    If DEBUG_TRACE Then Debug.Print "TRACE   quant possessive trying remainder child j=" & jP & " at posTry=" & posTryP & " type=" & NodeGet(nxtNodeP, "type")
+                    ' If DEBUG_TRACE Then Debug.Print "TRACE   quant possessive trying remainder child j=" & jP & " at posTry=" & posTryP & " type=" & NodeGet(nxtNodeP, "type")
                     If Not MatchNode(nxtNodeP, subj, posTryP, nxtEndP) Then
                         remSuccessP = False
-                        If DEBUG_TRACE Then Debug.Print "TRACE   possessive remainder child j=" & jP & " failed at pos=" & posTryP
+                        ' If DEBUG_TRACE Then Debug.Print "TRACE   possessive remainder child j=" & jP & " failed at pos=" & posTryP
                         Exit For
                     Else
                         posTryP = CLng(nxtEndP) + 1
@@ -1364,11 +1364,11 @@ Private Function MatchSequence(ByVal children As Collection, ByVal subj As Strin
                 If remSuccessP Then
                     outEnd = posTryP - 1
                     capsEnd(0) = CLng(outEnd)
-                    If DEBUG_TRACE Then Debug.Print "TRACE  quant possessive accepted k=" & occCount & " outEnd=" & outEnd
+                    ' If DEBUG_TRACE Then Debug.Print "TRACE  quant possessive accepted k=" & occCount & " outEnd=" & outEnd
                     MatchSequence = True: Exit Function
                 Else
                     ' possessive prevents trying smaller k -> fail the quantifier
-                    If DEBUG_TRACE Then Debug.Print "TRACE  quant possessive remainder failed -> overall fail"
+                    ' If DEBUG_TRACE Then Debug.Print "TRACE  quant possessive remainder failed -> overall fail"
                     RestoreCaps seqSnap
                     MatchSequence = False: Exit Function
                 End If
@@ -1382,20 +1382,20 @@ Private Function MatchSequence(ByVal children As Collection, ByVal subj As Strin
                 kStart = occCount: kEnd = mn: kStep = -1
             End If
         
-            Dim K As Long
+            Dim k As Long
             Dim remChildren As Collection
-            For K = kStart To kEnd Step kStep
-                If DEBUG_TRACE Then Debug.Print "TRACE  quant trying k=" & K & " (mn=" & mn & " occCount=" & occCount & ")"
+            For k = kStart To kEnd Step kStep
+                ' If DEBUG_TRACE Then Debug.Print "TRACE  quant trying k=" & k & " (mn=" & mn & " occCount=" & occCount & ")"
                 ' restore sequence baseline before attempting this k
                 RestoreCaps seqSnap
         
                 ' If k>0 restore the saved snapshot for exactly k occurrences (deterministic)
                 Dim posTry As Long
-                If K >= 1 Then
+                If k >= 1 Then
                     ' restore the capture state after k occurrences
-                    tmpSnaps = occSnaps(K)
+                    tmpSnaps = occSnaps(k)
                     RestoreCaps tmpSnaps
-                    posTry = occEnds(K) + 1
+                    posTry = occEnds(k) + 1
                 Else
                     posTry = curPos
                 End If
@@ -1426,16 +1426,16 @@ Private Function MatchSequence(ByVal children As Collection, ByVal subj As Strin
                 If remSuccess Then
                     outEnd = posTry - 1
                     capsEnd(0) = CLng(outEnd)
-                    If DEBUG_TRACE Then Debug.Print "TRACE  quant accepted k=" & K & " outEnd=" & outEnd
+                    ' If DEBUG_TRACE Then Debug.Print "TRACE  quant accepted k=" & k & " outEnd=" & outEnd
                     MatchSequence = True: Exit Function
                 Else
-                    If DEBUG_TRACE Then Debug.Print "TRACE  quant k=" & K & " remainder failed; will try next k"
+                    ' If DEBUG_TRACE Then Debug.Print "TRACE  quant k=" & k & " remainder failed; will try next k"
                     ' continue to next k (seqSnap will be restored at loop top)
                 End If
-            Next K
+            Next k
         
             ' none of the k choices worked; restore seq baseline and fail
-            If DEBUG_TRACE Then Debug.Print "TRACE  quant exhausted all k options -> fail"
+            ' If DEBUG_TRACE Then Debug.Print "TRACE  quant exhausted all k options -> fail"
             RestoreCaps seqSnap
             MatchSequence = False: Exit Function
             
@@ -1452,27 +1452,27 @@ Private Function MatchSequence(ByVal children As Collection, ByVal subj As Strin
             ' save sequence baseline snapshot
             grpSnap = CopyCaps()
             
-            If DEBUG_TRACE Then Debug.Print "TRACE   seq child#" & i & " group idx=" & gidx & " set start=" & curPos
+            ' If DEBUG_TRACE Then Debug.Print "TRACE   seq child#" & i & " group idx=" & gidx & " set start=" & curPos
 
             If gidx >= 1 Then capsStart(gidx) = curPos
 
             If Not MatchNode(NodeGet(node, "child"), subj, curPos, childEnd) Then
-                If DEBUG_TRACE Then Debug.Print "TRACE   seq child#" & i & " group FAILED, restoring seqSnap"
+                ' If DEBUG_TRACE Then Debug.Print "TRACE   seq child#" & i & " group FAILED, restoring seqSnap"
                 ' restore everything (seqSnap contains the capture arrays)
                 RestoreCaps grpSnap
                 MatchSequence = False: Exit Function
             Else
-                If DEBUG_TRACE Then Debug.Print "TRACE   seq child#" & i & " group OK nodeEnd=" & childEnd
+                ' If DEBUG_TRACE Then Debug.Print "TRACE   seq child#" & i & " group OK nodeEnd=" & childEnd
                 If gidx >= 1 Then capsEnd(gidx) = childEnd
                 curPos = CLng(childEnd) + 1
             End If
         Else
             If Not MatchNode(node, subj, curPos, nodeEnd) Then
-                If DEBUG_TRACE Then Debug.Print "TRACE   seq child#" & i & " node FAILED, restoring seqSnap"
+                ' If DEBUG_TRACE Then Debug.Print "TRACE   seq child#" & i & " node FAILED, restoring seqSnap"
                 RestoreCaps rootSnap
                 MatchSequence = False: Exit Function
             Else
-                If DEBUG_TRACE Then Debug.Print "TRACE   seq child#" & i & " node OK nodeEnd=" & nodeEnd
+                ' If DEBUG_TRACE Then Debug.Print "TRACE   seq child#" & i & " node OK nodeEnd=" & nodeEnd
                 curPos = CLng(nodeEnd) + 1
             End If
         End If
@@ -1480,7 +1480,7 @@ Private Function MatchSequence(ByVal children As Collection, ByVal subj As Strin
 
     outEnd = curPos - 1
     capsEnd(0) = CLng(outEnd)
-    If DEBUG_TRACE Then Debug.Print "TRACE MatchSequence success outEnd=" & outEnd & " caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
+    ' If DEBUG_TRACE Then Debug.Print "TRACE MatchSequence success outEnd=" & outEnd & " caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
     MatchSequence = True
 End Function
 
@@ -1524,15 +1524,15 @@ Private Function MatchQuantifier(ByVal child As Collection, ByVal minc As Long, 
     End If
 
     ' Non-possessive behavior proceeds as before:
-    Dim K As Long
+    Dim k As Long
     If lazy Then
         ' Lazy: try k = min..occCount
-        For K = minc To occCount
+        For k = minc To occCount
             RestoreCaps saveSnapshot
             Dim posTry As Long: posTry = posStart
             Dim t As Long
             Dim okAll As Boolean: okAll = True
-            For t = 1 To K
+            For t = 1 To k
                 Dim tmp() As Long: tmp = CopyCaps()
                 If MatchNode(child, subj, posTry, nodeEnd) Then
                     posTry = nodeEnd + 1
@@ -1543,16 +1543,16 @@ Private Function MatchQuantifier(ByVal child As Collection, ByVal minc As Long, 
                 End If
             Next t
             If okAll Then outEnd = posTry - 1: MatchQuantifier = True: Exit Function
-        Next K
+        Next k
         MatchQuantifier = False
     Else
         ' Greedy: try k = occCount down to minc
-        For K = occCount To minc Step -1
+        For k = occCount To minc Step -1
             RestoreCaps saveSnapshot
             Dim posTry2 As Long: posTry2 = posStart
             Dim u As Long
             Dim okAll2 As Boolean: okAll2 = True
-            For u = 1 To K
+            For u = 1 To k
                 Dim tmp2() As Long: tmp2 = CopyCaps()
                 If MatchNode(child, subj, posTry2, nodeEnd) Then
                     posTry2 = nodeEnd + 1
@@ -1563,7 +1563,7 @@ Private Function MatchQuantifier(ByVal child As Collection, ByVal minc As Long, 
                 End If
             Next u
             If okAll2 Then outEnd = posTry2 - 1: MatchQuantifier = True: Exit Function
-        Next K
+        Next k
         MatchQuantifier = False
     End If
 End Function
@@ -1594,12 +1594,12 @@ Private Sub RestoreCaps(ByRef snapshot() As Long)
     On Error GoTo bad_snapshot
     If (Not (IsArray(snapshot))) Then Exit Sub
 
-    Dim ub As Long: ub = UBound(snapshot)
-    If ub < 0 Then Exit Sub
+    Dim UB As Long: UB = UBound(snapshot)
+    If UB < 0 Then Exit Sub
 
     ' compute snapshot tot: (UB - 1) \ 2
     Dim snapTot As Long
-    snapTot = (ub - 1) \ 2
+    snapTot = (UB - 1) \ 2
     Dim snapOff As Long: snapOff = snapTot + 1
 
     Dim curTot As Long: curTot = pGroupCount
@@ -1704,7 +1704,7 @@ Private Function ExpandReplacement(ByVal caps As Collection, ByVal repl As Strin
     Dim nm As String
     Dim c2 As String
     Dim numStr As String
-    Dim K As Long
+    Dim k As Long
     Dim cc As String
     Dim useIdx As Long
     Dim try2 As Long
@@ -1777,12 +1777,12 @@ Private Function ExpandReplacement(ByVal caps As Collection, ByVal repl As Strin
                 Case "0" To "9"
                     ' numeric capture: greedy 2-digit then fallback
                     numStr = vbNullString
-                    K = i + 1
-                    Do While K <= l And Len(numStr) < 2
-                        cc = SafeMid(repl, K, 1)
+                    k = i + 1
+                    Do While k <= l And Len(numStr) < 2
+                        cc = SafeMid(repl, k, 1)
                         If cc >= "0" And cc <= "9" Then
                             numStr = numStr & cc
-                            K = K + 1
+                            k = k + 1
                         Else
                             Exit Do
                         End If
@@ -1849,12 +1849,12 @@ Private Function ComputeMinLen(ByVal node As Collection) As Long
     Select Case t
         Case "lit", "dot", "class": ComputeMinLen = 1
         Case "seq"
-            Dim SUM As Long: SUM = 0
+            Dim sum As Long: sum = 0
             Dim ch As Variant
             For Each ch In NodeGet(node, "child")
-                SUM = SUM + ComputeMinLen(ch)
+                sum = sum + ComputeMinLen(ch)
             Next
-            ComputeMinLen = SUM
+            ComputeMinLen = sum
         Case "group"
             ComputeMinLen = ComputeMinLen(NodeGet(node, "child"))
         Case "quant"
@@ -1938,7 +1938,7 @@ Public Function ExecAll(ByVal subj As String) As Collection
     CurSubject = subj
     MatchSteps = 0
 
-    If DEBUG_TRACE Then Debug.Print "TRACE ExecAll start subjLen=" & Len(subj) & " anchoredStart=" & CStr(NodeGet(pAST, "anchoredStart")) & " minLen=" & CStr(NodeGet(pAST, "minLen"))
+    ' If DEBUG_TRACE Then Debug.Print "TRACE ExecAll start subjLen=" & Len(subj) & " anchoredStart=" & CStr(NodeGet(pAST, "anchoredStart")) & " minLen=" & CStr(NodeGet(pAST, "minLen"))
 
     Dim anchoredStart As Boolean: anchoredStart = NodeGet(pAST, "anchoredStart")
     Dim l As Long: l = Len(subj)
@@ -1953,13 +1953,13 @@ Public Function ExecAll(ByVal subj As String) As Collection
             Dim tryPos As Long
             For tryPos = 1 To l
                 If tryPos = 1 Or SafeMid(subj, tryPos - 1, 1) = vbLf Or SafeMid(subj, tryPos - 1, 1) = vbCr Then
-                    If DEBUG_TRACE Then Debug.Print "TRACE ExecAll trying anchored pos=" & tryPos
+                    ' If DEBUG_TRACE Then Debug.Print "TRACE ExecAll trying anchored pos=" & tryPos
                     If Not (ExecAt(subj, tryPos) Is Nothing) Then
                         ' execAt returns captures in engine globals; BuildCaptureCollection wraps them
                         Dim matchColl As Collection
                         Set matchColl = BuildCaptureCollection()
                         results.Add matchColl
-                        If DEBUG_TRACE Then Debug.Print "TRACE ExecAll anchored matched at " & tryPos & " matchLen=" & (CLng(capsEnd(0)) - CLng(capsStart(0)) + 1)
+                        ' If DEBUG_TRACE Then Debug.Print "TRACE ExecAll anchored matched at " & tryPos & " matchLen=" & (CLng(capsEnd(0)) - CLng(capsStart(0)) + 1)
                         ' For anchored-start we continue scanning other anchored positions (do not skip to match end)
                     End If
                 End If
@@ -1976,7 +1976,7 @@ Public Function ExecAll(ByVal subj As String) As Collection
 
         Else
             ' anchored at beginning only
-            If DEBUG_TRACE Then Debug.Print "TRACE ExecAll trying anchored pos=1"
+            ' If DEBUG_TRACE Then Debug.Print "TRACE ExecAll trying anchored pos=1"
             If ExecAt(subj, 1) Is Nothing Then
                 Set ExecAll = Nothing
             Else
@@ -1997,7 +1997,7 @@ Public Function ExecAll(ByVal subj As String) As Collection
 
     Dim Pos As Long: Pos = 1
     Do While Pos <= startLimit
-        If DEBUG_TRACE Then Debug.Print "TRACE ExecAll trying pos=" & Pos & " (startLimit=" & startLimit & ")"
+        ' If DEBUG_TRACE Then Debug.Print "TRACE ExecAll trying pos=" & Pos & " (startLimit=" & startLimit & ")"
         If Not (ExecAt(subj, Pos) Is Nothing) Then
             ' match found at pos; Build collection of captures and add
             Dim Col As Collection
@@ -2009,7 +2009,7 @@ Public Function ExecAll(ByVal subj As String) As Collection
             Dim mend As Long: mend = CLng(capsEnd(0))
             Dim matchLen As Long: matchLen = mend - mstart + 1
 
-            If DEBUG_TRACE Then Debug.Print "TRACE ExecAll matched at pos=" & Pos & " mstart=" & mstart & " mend=" & mend & " len=" & matchLen
+            ' If DEBUG_TRACE Then Debug.Print "TRACE ExecAll matched at pos=" & Pos & " mstart=" & mstart & " mend=" & mend & " len=" & matchLen
 
             ' guard mstart not before pos
             If mstart < Pos Then mstart = Pos
@@ -2043,7 +2043,7 @@ End Function
 
 ' ExecAt: try to match body at absolute position startPos. Returns Collection (captures filled) or Nothing
 Public Function ExecAt(ByVal subj As String, ByVal startPos As Long) As Collection
-    If DEBUG_TRACE Then Debug.Print "TRACE ExecAt startPos=" & startPos & " subjLen=" & Len(subj) & " multiline=" & CStr(pMultiline) & " dotAll=" & CStr(pDotAll)
+    ' If DEBUG_TRACE Then Debug.Print "TRACE ExecAt startPos=" & startPos & " subjLen=" & Len(subj) & " multiline=" & CStr(pMultiline) & " dotAll=" & CStr(pDotAll)
     CurSubject = subj
     MatchSteps = MatchSteps + 1
 
@@ -2058,27 +2058,27 @@ Public Function ExecAt(ByVal subj As String, ByVal startPos As Long) As Collecti
         atomicLocks(i) = False
     Next i
     capsStart(0) = startPos
-    If DEBUG_TRACE Then Debug.Print "TRACE ExecAt caps initialized caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
+    ' If DEBUG_TRACE Then Debug.Print "TRACE ExecAt caps initialized caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
 
     Dim outEnd As Variant
     Dim ok As Boolean
     ok = MatchNode(NodeGet(pAST, "body"), subj, startPos, outEnd)
 
-    If DEBUG_TRACE Then Debug.Print "TRACE ExecAt after MatchNode ok=" & CStr(ok) & " outEnd=" & CStr(outEnd) & " caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
+    ' If DEBUG_TRACE Then Debug.Print "TRACE ExecAt after MatchNode ok=" & CStr(ok) & " outEnd=" & CStr(outEnd) & " caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
 
     If ok Then
         ' if outEnd available, ensure capsEnd(0) is synchronized
         If Not IsEmpty(outEnd) Then capsEnd(0) = CLng(outEnd)
-        If DEBUG_TRACE Then Debug.Print "TRACE ExecAt sync caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
+        ' If DEBUG_TRACE Then Debug.Print "TRACE ExecAt sync caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
 
         ' anchored-end check
         If NodeGet(pAST, "anchoredEnd") Then
             Dim matchEndPos As Long: matchEndPos = capsEnd(0)
             Dim subjLen As Long: subjLen = Len(subj)
-            If DEBUG_TRACE Then Debug.Print "TRACE anchoredEnd: matchEndPos=" & matchEndPos & " subjLen=" & subjLen
+            ' If DEBUG_TRACE Then Debug.Print "TRACE anchoredEnd: matchEndPos=" & matchEndPos & " subjLen=" & subjLen
             Dim okEnd As Boolean: okEnd = False
             If matchEndPos < 0 Then
-                If DEBUG_TRACE Then Debug.Print "TRACE anchoredEnd: bad matchEndPos, reject"
+                ' If DEBUG_TRACE Then Debug.Print "TRACE anchoredEnd: bad matchEndPos, reject"
                 Set ExecAt = Nothing: Exit Function
             End If
             If matchEndPos = subjLen Then
@@ -2093,18 +2093,18 @@ Public Function ExecAt(ByVal subj As String, ByVal startPos As Long) As Collecti
                 End If
             End If
             If Not okEnd Then
-                If DEBUG_TRACE Then Debug.Print "TRACE anchoredEnd check FAILED -> returning Nothing"
+                ' If DEBUG_TRACE Then Debug.Print "TRACE anchoredEnd check FAILED -> returning Nothing"
                 Set ExecAt = Nothing: Exit Function
             Else
-                If DEBUG_TRACE Then Debug.Print "TRACE anchoredEnd check OK"
+                ' If DEBUG_TRACE Then Debug.Print "TRACE anchoredEnd check OK"
             End If
         End If
 
-        If DEBUG_TRACE Then Debug.Print "TRACE ExecAt returning captures caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
+        ' If DEBUG_TRACE Then Debug.Print "TRACE ExecAt returning captures caps0=[" & capsStart(0) & "," & capsEnd(0) & "]"
         Set ExecAt = BuildCaptureCollection()
         Call UpdateNamedCapturesFromAST    ' <- keep named captures in sync
     Else
-        If DEBUG_TRACE Then Debug.Print "TRACE ExecAt MatchNode returned False -> no match"
+        ' If DEBUG_TRACE Then Debug.Print "TRACE ExecAt MatchNode returned False -> no match"
         Set ExecAt = Nothing
     End If
 End Function
@@ -2114,7 +2114,7 @@ Public Function Replace(ByVal subj As String, ByVal Replacement As String) As St
     Dim Pos As Long: Pos = 1
     Dim l As Long: l = Len(subj)
     Dim foundAt As Long
-    Dim cs As Collection
+    Dim Cs As Collection
     Dim startTry As Long
     Dim mstart As Long
     Dim mend As Long
@@ -2131,8 +2131,8 @@ Public Function Replace(ByVal subj As String, ByVal Replacement As String) As St
 
         ' Scan forward to locate the next match by trying ExecAt at increasing start positions
         For startTry = Pos To l
-            Set cs = ExecAt(subj, startTry)
-            If Not (cs Is Nothing) Then
+            Set Cs = ExecAt(subj, startTry)
+            If Not (Cs Is Nothing) Then
                 foundAt = startTry
                 Exit For
             End If
@@ -2155,7 +2155,7 @@ Public Function Replace(ByVal subj As String, ByVal Replacement As String) As St
             End If
 
             ' expand replacement using your helper (ExpandReplacement)
-            out = out & ExpandReplacement(cs, Replacement, pNamedCaptures)
+            out = out & ExpandReplacement(Cs, Replacement, pNamedCaptures)
 
             ' advance position after the matched substring
             matchLen = mend - mstart + 1
@@ -2187,7 +2187,7 @@ Public Function Split(ByVal subj As String) As Collection
     Dim Pos As Long: Pos = 1
     Dim l As Long: l = Len(subj)
     Dim foundAt As Long
-    Dim cs As Collection
+    Dim Cs As Collection
     Dim startTry As Long
     Dim mstart As Long
     Dim mend As Long
@@ -2198,8 +2198,8 @@ Public Function Split(ByVal subj As String) As Collection
 
         ' Scan forward to locate next match (try ExecAt at increasing start positions)
         For startTry = Pos To l
-            Set cs = ExecAt(subj, startTry)
-            If Not (cs Is Nothing) Then
+            Set Cs = ExecAt(subj, startTry)
+            If Not (Cs Is Nothing) Then
                 foundAt = startTry
                 Exit For
             End If
@@ -2250,29 +2250,29 @@ Private Function ComputeMaxLen(ByVal node As Collection) As Long
     Select Case t
         Case "lit", "dot", "class": ComputeMaxLen = 1
         Case "seq"
-            Dim SUM As Long: SUM = 0
+            Dim sum As Long: sum = 0
             Dim ch As Variant
             For Each ch In NodeGet(node, "child")
                 Dim M As Long: M = ComputeMaxLen(ch)
                 If M = -1 Then
                     ComputeMaxLen = -1: Exit Function
                 End If
-                SUM = SUM + M
+                sum = sum + M
             Next
-            ComputeMaxLen = SUM
+            ComputeMaxLen = sum
         Case "group"
             ComputeMaxLen = ComputeMaxLen(NodeGet(node, "child"))
         Case "alt"
-            Dim mx As Long: mx = 0
+            Dim mX As Long: mX = 0
             Dim itm As Variant
             For Each itm In NodeGet(node, "child")
                 Dim vm As Long: vm = ComputeMaxLen(itm)
                 If vm = -1 Then
-                    mx = -1: Exit For
-                ElseIf vm > mx Then mx = vm
+                    mX = -1: Exit For
+                ElseIf vm > mX Then mX = vm
                 End If
             Next
-            ComputeMaxLen = mx
+            ComputeMaxLen = mX
         Case "quant"
             Dim mxChild As Long: mxChild = ComputeMaxLen(NodeGet(node, "child"))
             If mxChild = -1 Then
@@ -2321,8 +2321,8 @@ Private Sub AnnotateLookbehinds(ByVal node As Collection)
             End If
             If t = "lookbehind_pos" Or t = "lookbehind_neg" Then
                 Dim mn As Long: mn = ComputeMinLen(NodeGet(node, "child"))
-                Dim mx As Long: mx = ComputeMaxLen(NodeGet(node, "child"))
-                If mn = -1 Or mx = -1 Or mn <> mx Then
+                Dim mX As Long: mX = ComputeMaxLen(NodeGet(node, "child"))
+                If mn = -1 Or mX = -1 Or mn <> mX Then
                     Err.Raise vbObjectError + 10, "RegexEngine", "Unsupported variable-length lookbehind (must be fixed-width)."
                 Else
                     NodeAdd node, "width", mn
@@ -2345,16 +2345,16 @@ Private Function ComputeFixedWidth(ByVal node As Collection) As Long
             ComputeFixedWidth = 1
             Exit Function
         Case "seq"
-            Dim SUM As Long: SUM = 0
+            Dim sum As Long: sum = 0
             Dim ch As Variant
             For Each ch In NodeGet(node, "child")
                 Dim W As Long: W = ComputeFixedWidth(ch)
                 If W = -1 Then
                     ComputeFixedWidth = -1: Exit Function
                 End If
-                SUM = SUM + W
+                sum = sum + W
             Next
-            ComputeFixedWidth = SUM
+            ComputeFixedWidth = sum
             Exit Function
         Case "group"
             ComputeFixedWidth = ComputeFixedWidth(NodeGet(node, "child"))
@@ -2366,12 +2366,12 @@ Private Function ComputeFixedWidth(ByVal node As Collection) As Long
                 ComputeFixedWidth = -1: Exit Function
             End If
             Dim mn As Long: mn = NodeGet(node, "min")
-            Dim mx As Long: mx = NodeGet(node, "max")
+            Dim mX As Long: mX = NodeGet(node, "max")
             ' if max is -1 (unbounded) or range not fixed -> variable
-            If mx = -1 Then
+            If mX = -1 Then
                 ComputeFixedWidth = -1: Exit Function
             End If
-            If mn <> mx Then
+            If mn <> mX Then
                 ComputeFixedWidth = -1: Exit Function
             End If
             ' fixed repeat count
@@ -2516,13 +2516,13 @@ Private Function FindGroupIndexByName(ByVal ast As Collection, ByVal Name As Str
     On Error GoTo ExitHere
     If Not NodeExists(ast, "groupNodes") Then Exit Function
     Dim gnodes As Collection: Set gnodes = NodeGet(ast, "groupNodes")
-    Dim lb As Long
+    Dim LB As Long
     
     Dim it As Variant
     For Each it In gnodes
-        lb = LBound(it)
-        If it(lb) = Name Then
-            FindGroupIndexByName = CLng(it(lb + 1))
+        LB = LBound(it)
+        If it(LB) = Name Then
+            FindGroupIndexByName = CLng(it(LB + 1))
             Exit Function
         End If
     Next it
@@ -2535,14 +2535,14 @@ Private Function FindGroupIndexByOrdinal(ByVal ast As Collection, ByVal ordinal 
     On Error GoTo ExitHere
     If Not NodeExists(ast, "groupNodes") Then Exit Function
     Dim gnodes As Collection: Set gnodes = NodeGet(ast, "groupNodes")
-    Dim lb As Long
+    Dim LB As Long
     Dim cIdx As Long
     
     Dim it As Variant
     For Each it In gnodes
-        lb = LBound(it)
+        LB = LBound(it)
         cIdx = cIdx + 1
-        If it(lb + 1) = ordinal Then
+        If it(LB + 1) = ordinal Then
             FindGroupIndexByOrdinal = cIdx
             Exit Function
         End If

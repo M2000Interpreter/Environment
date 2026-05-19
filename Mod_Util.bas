@@ -14,6 +14,9 @@ Dim FontList As FastCollection
 Public PLM, PTM, PRM, PBM
 Public Trush() As VarItem
 Public TrushCount As Long, TrushWait As Boolean
+Public Trush2() As mStiva
+Public TrushCount2 As Long, TrushWait2 As Boolean
+
 Public Nonbsp As Boolean
 Public k1 As Currency, Kform As Boolean
 Private Const doc = "Document"
@@ -647,7 +650,7 @@ contarr1:
                         ppppl.Arr = False
                         Set ppppl.GroupRef = vv
                         Set vv = bstackstr.soros
-                        Set bstackstr.Sorosref = New mStiva
+                        Set bstackstr.Sorosref = NewmStiva
                         
                         SpeedGroup bstackstr, ppppl, "FOR", "", "{Push type$(" + String$(bstackstr.ForLevel + 1, ".") + s$ + ")}", -2
                         If bstackstr.soros.IsEmpty Then
@@ -7531,7 +7534,6 @@ Else
   i& = LL - 1
   LL = -(many - 1) * 2 + 2
   For n = 0 To i&
- ' Debug.Print a1(n), A2(n)
   If a1(n) = 2048 And A2(n) = 1 Then
   If LL = 2 Then Exit For
         skip = True
@@ -7573,7 +7575,6 @@ Public Sub choosenext()
 Dim catchit As Boolean
 On Error Resume Next
 If Not Screen.ActiveForm Is Nothing Then
-'Debug.Print "choose next"
     Dim X As Form
      For Each X In Forms
      If X.Name = "Form1" Or X.Name = "GuiM2000" Or X.Name = "Form2" Or X.Name = "Form4" Then
@@ -8637,20 +8638,30 @@ MergeOperators = b$
 End If
 End Function
 Public Sub GarbageFlush()
+ReDim Trush2(100) As mStiva
 ReDim Trush(500) As VarItem
 Dim i As Long
 For i = 1 To 500
    Set Trush(i) = New VarItem
 Next i
+For i = 1 To 100
+   Set Trush2(i) = New mStiva
+Next i
 TrushCount = 500
+TrushCount2 = 100
 End Sub
 Public Sub GarbageFlush2()
+ReDim Trush2(100) As mStiva
 ReDim Trush(500) As VarItem
 Dim i As Long
 For i = 1 To 500
    Set Trush(i) = New VarItem
 Next i
+For i = 1 To 100
+   Set Trush2(i) = New mStiva
+Next i
 TrushCount = 500
+TrushCount2 = 100
 End Sub
 Function PointPos(f$) As Long
 Dim er As Long, er2 As Long
@@ -8850,7 +8861,7 @@ End If
 
 End Function
 Public Function ExtractName(f$, Optional simple As Boolean = False) As String
-Dim i As Long, j As Long, k$
+Dim i As Long, j As Long, K$
 If f$ = vbNullString Then Exit Function
 If simple Then
 j = SimplePointPos(f$)
@@ -8859,7 +8870,7 @@ j = PointPos(f$)
 If j > Len(f$) Then j = Len(f$)
 End If
 If Mid$(f$, j, 1) = "." Then
-k$ = ExtractType(f$, j, simple)
+K$ = ExtractType(f$, j, simple)
 Else
 j = Len(f$)
 End If
@@ -8869,7 +8880,7 @@ Case Is < " ", "\", "/", ":"
 Exit For
 End Select
 Next i
-If k$ = vbNullString Then
+If K$ = vbNullString Then
 If Mid$(f$, i + j - i, 1) = "." Then
 ExtractName = mylcasefILE(Mid$(f$, i + 1, j - i - 1))
 Else
@@ -8877,7 +8888,7 @@ ExtractName = mylcasefILE(Mid$(f$, i + 1, j - i))
 
 End If
 Else
-ExtractName = mylcasefILE(Mid$(f$, i + 1, j - i)) + k$
+ExtractName = mylcasefILE(Mid$(f$, i + 1, j - i)) + K$
 End If
 
 'ExtractName = mylcasefILE(Trim$(Mid$(f$, I + 1, j - I)))
@@ -9318,10 +9329,10 @@ resp = MyAnyType(bstack, rest$, Lang, Len(here$) > 0, vbBoolean, True)
 Set bstack = Nothing
 End Sub
 Sub NeoDate(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
-Dim bstack As basetask, k As Long
+Dim bstack As basetask, K As Long
 
 Set bstack = ObjFromPtr(basestackLP)
-k = MyTrimL(rest$): If k > 1 Then rest$ = Mid$(rest$, k)
+K = MyTrimL(rest$): If K > 1 Then rest$ = Mid$(rest$, K)
 If CheckFreeExecute(rest$) Then
     SetDouble bstack.Owner
     resp = True
@@ -9332,10 +9343,10 @@ Set bstack = Nothing
 
 End Sub
 Sub NeoDouble(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
-Dim bstack As basetask, k As Long
+Dim bstack As basetask, K As Long
 
 Set bstack = ObjFromPtr(basestackLP)
-k = MyTrimL(rest$): If k > 1 Then rest$ = Mid$(rest$, k)
+K = MyTrimL(rest$): If K > 1 Then rest$ = Mid$(rest$, K)
 If CheckFreeExecute(rest$) Then
     SetDouble bstack.Owner
     resp = True
@@ -9882,15 +9893,15 @@ If j - i >= fl - 1 Then
 End If
 End Function
 
-Function Fast2Symbol(a$, c$, k As Long, D$, l As Long) As Boolean
+Function Fast2Symbol(a$, c$, K As Long, D$, l As Long) As Boolean
 Dim i As Long, j As Long
 j = Len(a$)
 If j = 0 Then Exit Function
 i = MyTrimL(a$)
 If i > j Then Exit Function
-If j - i >= k - 1 Then
-    If InStr(c$, Mid$(a$, i, k)) > 0 Then
-    a$ = Mid$(a$, MyTrimLi(a$, i + k))
+If j - i >= K - 1 Then
+    If InStr(c$, Mid$(a$, i, K)) > 0 Then
+    a$ = Mid$(a$, MyTrimLi(a$, i + K))
     Fast2Symbol = True
     Exit Function
     End If
@@ -13158,393 +13169,364 @@ Dim multi As Boolean, original As Long, bhas As Integer, BI As BigInteger
 again111:
 Set anything = Arr
 If TypeOf anything Is iBoxArray Then
-Set usehandler = New mHandler
-usehandler.t1 = 3
-Set usehandler.objref = Arr
-Set anything = usehandler
+    Set usehandler = New mHandler
+    usehandler.t1 = 3
+    Set usehandler.objref = Arr
+    Set anything = usehandler
 Else
-If Not CheckLastHandlerOrIterator(anything, w3) Then Exit Function
+    If Not CheckLastHandlerOrIterator(anything, w3) Then Exit Function
 End If
 Pad$ = myUcase(Left$(a$, 20))  ' 20??
 cut = InStr(Pad$, "(")
-
 If cut <= 1 Then Exit Function
 Mid$(a$, 1, cut) = space$(cut)
 Set usehandler = anything
 If TypeOf usehandler.objref Is iBoxArray Then
-Set pppp = usehandler.objref
-
-If Left$(Pad$, 1) = Chr$(1) Then LSet Pad$ = Mid$(Pad$, 2): cut = cut - 1
-Do
-multi = False
-Select Case Left$(Pad$, cut - 1)
-Case "SUM", "¡»—"
-res = 0
-For w3 = 0 To pppp.Count - 1
-If pppp.MyIsNumeric(pppp.item(w3)) Then
-p = pppp.item(w3)
-If IsObject(res) Then
-If TypeOf p Is Complex Then
-    Set BI = res
-    res = nMath2.cxAddComVar(nMath2.cxNew(CDbl(BI.ToString), 0), p)
-Else
-    Set res = res.Add(CreateBigInteger(CStr(Int(p))))
-End If
-
-ElseIf TypeOf p Is Complex Then
-    If TypeOf res Is Complex Then
-        res = nMath2.cxAddVar(res, p)
-    Else
-        res = nMath2.cxAddComVar(nMath2.cxNew(res, 0#), p)
-    End If
-ElseIf TypeOf res Is Complex Then
-res = nMath2.cxAddRealVar(res, p)
-Else
-res = res + p
-End If
-ElseIf pppp.IsEnum2(w3, p) Then
-    If MyIsNumeric(p) Then
-        res = res + p
-    End If
-ElseIf pppp.ItemIsObject(w3) Then
-    Set p = pppp.itemObject(w3)
-    If TypeOf p Is BigInteger Then
-    
-        If TypeOf res Is Complex Then
-        Set BI = p
-        res = nMath2.cxAddRealVar(res, CDbl(BI.ToString))
-
-        ElseIf IsObject(res) Then
-            Set BI = p
-            Set res = res.Add(BI)
-        ElseIf w3 > 0 Then
-            Set BI = p
-            Set res = CreateBigInteger(CStr(Int(res))) '.Add((p))
-            Set res = res.Add(BI)
-        Else
-            Set res = Module10.CopyBigInteger(p)
-        End If
-    End If
-End If
-Next w3
-If IsObject(res) Then
-    Set bstack.lastobj = res
-    res = 0
-    fMatrix = True
-    Exit Function
-End If
-Case "MIN", "Ã… "
-res = 0
-w4 = -1
-If pppp.Count > 0 Then
-For w3 = 0 To pppp.Count - 1
-If pppp.MyIsNumeric(w3) Then
-res = pppp.itemnumeric(w3): w4 = w3: Exit For
-ElseIf pppp.IsEnum2(w3, p) Then
-If MyIsNumeric(p) Then
-    res = p: w4 = w3: Exit For
-End If
-End If
-Next w3
-
-For w3 = w3 To pppp.Count - 1
-If pppp.MyIsNumeric(pppp.item(w3)) Then
-If pppp.item(w3) < res Then res = pppp.item(w3): w4 = w3
-ElseIf pppp.IsEnum2(w3, p) Then
-If MyIsNumeric(p) Then
-    If p < res Then res = p: w4 = w3
-End If
-End If
-Next w3
-End If
-If Not FastSymbol(a$, ")") Then
-    bstack.soros.PushVal w4
-    If Not getone(bstack, a$) Then Exit Function
-    Else
-    fMatrix = True
-    Exit Function
-End If
-Case "MIN$", "Ã… $"
-res = vbNullString
-w4 = -1
-If pppp.Count > 0 Then
-For w3 = 0 To pppp.Count - 1
-    If pppp.IsStringItem(w3) Then
-        If pppp.IsEnum2(w3, p) Then
-            If VarType(p) = vbString Then
-                res = p: w4 = w3: Exit For
+    Set pppp = usehandler.objref
+    If Left$(Pad$, 1) = Chr$(1) Then LSet Pad$ = Mid$(Pad$, 2): cut = cut - 1
+    Do
+        multi = False
+        Select Case Left$(Pad$, cut - 1)
+        Case "SUM", "¡»—"
+            res = 0
+            For w3 = 0 To pppp.Count - 1
+                If pppp.MyIsNumeric(pppp.item(w3)) Then
+                    p = pppp.item(w3)
+                    If IsObject(res) Then
+                        If TypeOf p Is Complex Then
+                            Set BI = res
+                            res = nMath2.cxAddComVar(nMath2.cxNew(CDbl(BI.ToString), 0), p)
+                        Else
+                            Set res = res.Add(CreateBigInteger(CStr(Int(p))))
+                        End If
+                    ElseIf TypeOf p Is Complex Then
+                        If TypeOf res Is Complex Then
+                            res = nMath2.cxAddVar(res, p)
+                        Else
+                            res = nMath2.cxAddComVar(nMath2.cxNew(res, 0#), p)
+                        End If
+                    ElseIf TypeOf res Is Complex Then
+                        res = nMath2.cxAddRealVar(res, p)
+                    Else
+                        res = res + p
+                    End If
+                ElseIf pppp.IsEnum2(w3, p) Then
+                    If MyIsNumeric(p) Then
+                        res = res + p
+                    End If
+                ElseIf pppp.ItemIsObject(w3) Then
+                    Set p = pppp.itemObject(w3)
+                    If TypeOf p Is BigInteger Then
+                        If TypeOf res Is Complex Then
+                            Set BI = p
+                            res = nMath2.cxAddRealVar(res, CDbl(BI.ToString))
+                        ElseIf IsObject(res) Then
+                            Set BI = p
+                            Set res = res.Add(BI)
+                        ElseIf w3 > 0 Then
+                            Set BI = p
+                            Set res = CreateBigInteger(CStr(Int(res))) '.Add((p))
+                            Set res = res.Add(BI)
+                        Else
+                            Set res = Module10.CopyBigInteger(p)
+                        End If
+                    End If
+                End If
+            Next w3
+            If IsObject(res) Then
+                Set bstack.lastobj = res
+                res = 0
+                fMatrix = True
+                Exit Function
             End If
-        Else
-            res = pppp.item(w3): w4 = w3: Exit For
-        End If
-    End If
-Next w3
-
-For w3 = w3 To pppp.Count - 1
-    If pppp.IsStringItem(w3) Then
-        If pppp.IsEnum2(w3, p) Then
-            If VarType(p) = vbString Then
-                If p < res Then res = p: w4 = w3
+        Case "MIN", "Ã… "
+            res = 0
+            w4 = -1
+            If pppp.Count > 0 Then
+                For w3 = 0 To pppp.Count - 1
+                    If pppp.MyIsNumeric(w3) Then
+                        res = pppp.itemnumeric(w3): w4 = w3: Exit For
+                    ElseIf pppp.IsEnum2(w3, p) Then
+                        If MyIsNumeric(p) Then
+                            res = p: w4 = w3: Exit For
+                        End If
+                    End If
+                Next w3
+                For w3 = w3 To pppp.Count - 1
+                    If pppp.MyIsNumeric(pppp.item(w3)) Then
+                        If pppp.item(w3) < res Then res = pppp.item(w3): w4 = w3
+                    ElseIf pppp.IsEnum2(w3, p) Then
+                        If MyIsNumeric(p) Then
+                            If p < res Then res = p: w4 = w3
+                        End If
+                    End If
+                Next w3
             End If
-        Else
-            If pppp.item(w3) < res Then res = pppp.item(w3): w4 = w3
-        End If
-    End If
-Next w3
-End If
-If Not FastSymbol(a$, ")") Then
-    bstack.soros.PushVal w4
-    If Not getone(bstack, a$) Then Exit Function
-Else
-    fMatrix = True
-    Exit Function
-End If
-
-Case "MAX$", "Ã≈√$"
-res = vbNullString
-w4 = -1
-If pppp.Count > 0 Then
-For w3 = 0 To pppp.Count - 1
-    If pppp.IsStringItem(w3) Then
-        If pppp.IsEnum2(w3, p) Then
-            If VarType(p) = vbString Then
-                res = p: w4 = w3: Exit For
+            If Not FastSymbol(a$, ")") Then
+                bstack.soros.PushVal w4
+                If Not getone(bstack, a$) Then Exit Function
+            Else
+                fMatrix = True
+                Exit Function
             End If
-        Else
-            res = pppp.item(w3): w4 = w3: Exit For
-        End If
-    End If
-Next w3
-
-For w3 = w3 To pppp.Count - 1
-    If pppp.IsStringItem(w3) Then
-        If pppp.IsEnum2(w3, p) Then
-            If VarType(p) = vbString Then
-                If p > res Then res = p: w4 = w3
-            End If
-        Else
-            If pppp.item(w3) > res Then res = pppp.item(w3): w4 = w3
-        End If
-    End If
-Next w3
-End If
-If Not FastSymbol(a$, ")") Then
-    bstack.soros.PushVal w4
-    If Not getone(bstack, a$) Then Exit Function
-Else
-    fMatrix = True
-    Exit Function
-End If
-Case "MAX", "Ã≈√"
-res = 0
-w4 = -1
-If pppp.Count > 0 Then
-For w3 = 0 To pppp.Count - 1
-If pppp.MyIsNumeric(pppp.item(w3)) Then
-res = pppp.itemnumeric(w3): w4 = w3: Exit For
-ElseIf pppp.IsEnum2(w3, p) Then
-If MyIsNumeric(p) Then
-    res = p: w4 = w3: Exit For
-End If
-End If
-Next w3
-
-For w3 = w3 To pppp.Count - 1
-If pppp.MyIsNumeric(pppp.item(w3)) Then
-    If pppp.item(w3) > res Then res = pppp.item(w3): w4 = w3
-ElseIf pppp.IsEnum2(w3, p) Then
-If MyIsNumeric(p) Then
-    If p > res Then res = p: w4 = w3
-End If
-End If
-Next w3
-End If
-If Not FastSymbol(a$, ")") Then
-    bstack.soros.PushVal w4
-    If Not getone(bstack, a$) Then Exit Function
-Else
-    fMatrix = True
-    Exit Function
-End If
-Case "EVAL$", "≈ ÷—$"
-res = vbNullString
-GoTo contEVAL
-Case "EVAL", "≈ ÷—"
-contEVAL:
-If lookOne(a$, ")") Then
-    w2 = 0
-ElseIf IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
-    w2 = CLng(p)
-Else
-    GoTo missexp
-End If
-If w2 < 0 Or w2 >= pppp.Count Then
-MyEr "offset out of limits", "ƒÂﬂÍÙÁÚ ÂÍÙ¸Ú ÔÒﬂ˘Ì"
-fMatrix = False
-Exit Function
-Else
-If pppp.MyIsObject(pppp.item(w2)) Then
-Set bstack.lastobj = pppp.item(w2)
-res = 0
-lookagain:
-    If Not bstack.lastobj Is Nothing Then
-
-        If TypeOf bstack.lastobj Is mHandler Then
-            Set usehandler = bstack.lastobj
-            With usehandler
-                If .t1 = 3 Then
-                    If TypeOf .objref Is iBoxArray Then
-                        If FastSymbol(a$, ",") Then
-                            If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
-                                w4 = CLng(p)
-                                If w4 < 0 Or w4 >= .objref.Count Then
-                                    'indexout A$
-                                    errOutOfLimit
-                                    fMatrix = False
-                                    Exit Function
-                                End If
-                                Set pppp = .objref
-                                pppp.index = w4
-                                If pppp.IsObj Then
-                                Set res = pppp.Value
-                                If lookOne(a$, ",") Then w2 = w4: Set bstack.lastobj = res: GoTo lookagain
-                                Set anything = res
-                                If Not anything Is Nothing Then
-                                    If TypeOf anything Is mHandler Then
-                                        Set usehandler = anything
-                                        If usehandler.t1 = 3 Then
-                                            Set bstack.lastobj = usehandler
-                                            Set pppp = usehandler.objref
-                                            res = 0
-                                            original = 0
-                                            multi = True
-                                            GoTo conthere11
-                                        End If
-                                    End If
-                                End If
-                                Else
-                                If Mid$(Pad$, cut - 1, 1) = "$" Then
-                                res = CStr(MyVal(pppp.Value))
-
-                                Else
-                                res = MyVal(pppp.Value)
-                                If VarType(res) = vbString Then
-                                        If Not ValidNumberOnlyMatrix(CStr(res), res, False) Then res = 0
-                                End If
-                                End If
-                                End If
-                            Set bstack.lastobj = Nothing
-                            fMatrix = FastSymbol(a$, ")")
-                            Exit Function
+        Case "MIN$", "Ã… $"
+            res = vbNullString
+            w4 = -1
+            If pppp.Count > 0 Then
+                For w3 = 0 To pppp.Count - 1
+                    If pppp.IsStringItem(w3) Then
+                        If pppp.IsEnum2(w3, p) Then
+                            If VarType(p) = vbString Then
+                                res = p: w4 = w3: Exit For
                             End If
                         Else
-                            Set pppp = .objref
-                            original = 0
-                            multi = True
+                            res = pppp.item(w3): w4 = w3: Exit For
                         End If
-                        
-                    ElseIf TypeOf .objref Is mStiva Then
-  
-                    If FastSymbol(a$, ",") Then
-                            If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
-                                w4 = CLng(p)
-                                If w4 < 0 Or w4 >= .objref.Count Then
-                                    errOutOfLimit
-                                    fMatrix = False
-                                    Exit Function
-                                End If
-                             
-                                .objref.index = w4
-                                If .objref.IsObj Then
-                                Set res = .objref.Value
-                                If lookOne(a$, ",") Then w2 = w4: Set bstack.lastobj = res: GoTo lookagain
-                                Set anything = res
-                                If Not anything Is Nothing Then
-                                    If TypeOf anything Is mHandler Then
-                                        Set usehandler = anything
-                                        If usehandler.t1 = 3 Then
-                                            Set bstack.lastobj = usehandler
-                                            Set pppp = usehandler.objref
-                                            res = 0
-                                            original = 0
-                                            multi = True
-                                            GoTo conthere11
-                                        End If
-                                    End If
-                                End If
-                                
-                                
-                                
-                                
-                                
-                                Else
-                                If Mid$(Pad$, cut - 1, 1) = "$" Then
-                                res = CStr(MyVal(.objref.Value))
-                                Else
-                                res = MyVal(.objref.Value)
-                                If VarType(res) = vbString Then
-                                        If Not ValidNumberOnlyMatrix(CStr(res), res, False) Then res = 0
-                                End If
-                                End If
-                                End If
-                                
-                            Set bstack.lastobj = Nothing
-                            fMatrix = FastSymbol(a$, ")")
-                            Exit Function
-                            End If
-                       End If
                     End If
-                ElseIf usehandler.t1 = 1 And FastSymbol(a$, ",") Then
-                    If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
-                            w4 = CLng(p)
-                            If w4 < 0 Or w4 >= .objref.Count Then
-                                    errOutOfLimit
-                                    fMatrix = False
-                            Exit Function
+                Next w3
+                For w3 = w3 To pppp.Count - 1
+                    If pppp.IsStringItem(w3) Then
+                        If pppp.IsEnum2(w3, p) Then
+                            If VarType(p) = vbString Then
+                                If p < res Then res = p: w4 = w3
                             End If
+                        Else
+                            If pppp.item(w3) < res Then res = pppp.item(w3): w4 = w3
                         End If
-                    
-
-                        .objref.index = w4
-                        .objref.Done = True
-
-                    If .objref.IsObj Then
-                        res = usehandler.objref.ValueObj
-                                If lookOne(a$, ",") Then w2 = w4: Set bstack.lastobj = res: GoTo lookagain
-                                Set anything = res
-                                If Not anything Is Nothing Then
-                                    If TypeOf anything Is mHandler Then
-                                        Set usehandler = anything
-                                        If usehandler.t1 = 3 Then
-                                            Set bstack.lastobj = usehandler
-                                            Set pppp = usehandler.objref
-                                            res = 0
-                                            original = 0
-                                            multi = True
-                                            GoTo conthere11
-                                        End If
-                                    End If
-                                End If
-                        
-                        
-                        
-                    Else
-                                If Mid$(Pad$, cut - 1, 1) = "$" Then
-                                res = CStr(MyVal(.objref.Value))
-                                Else
-                                res = MyVal(.objref.Value)
-                                If VarType(res) = vbString Then
-                                        If Not ValidNumberOnlyMatrix(CStr(res), res, False) Then res = 0
-                                End If
-                                End If
-                        Set bstack.lastobj = Nothing
                     End If
-                    .objref.Done = False
+                Next w3
             End If
-            End With
-        ElseIf TypeOf bstack.lastobj Is lambda Then
+            If Not FastSymbol(a$, ")") Then
+                bstack.soros.PushVal w4
+                If Not getone(bstack, a$) Then Exit Function
+            Else
+                fMatrix = True
+                Exit Function
+            End If
+        Case "MAX$", "Ã≈√$"
+            res = vbNullString
+            w4 = -1
+            If pppp.Count > 0 Then
+                For w3 = 0 To pppp.Count - 1
+                    If pppp.IsStringItem(w3) Then
+                        If pppp.IsEnum2(w3, p) Then
+                            If VarType(p) = vbString Then
+                                res = p: w4 = w3: Exit For
+                            End If
+                        Else
+                            res = pppp.item(w3): w4 = w3: Exit For
+                        End If
+                    End If
+                Next w3
+                For w3 = w3 To pppp.Count - 1
+                    If pppp.IsStringItem(w3) Then
+                        If pppp.IsEnum2(w3, p) Then
+                            If VarType(p) = vbString Then
+                                If p > res Then res = p: w4 = w3
+                            End If
+                        Else
+                            If pppp.item(w3) > res Then res = pppp.item(w3): w4 = w3
+                        End If
+                    End If
+                Next w3
+            End If
+            If Not FastSymbol(a$, ")") Then
+                bstack.soros.PushVal w4
+                If Not getone(bstack, a$) Then Exit Function
+            Else
+                fMatrix = True
+                Exit Function
+            End If
+        Case "MAX", "Ã≈√"
+            res = 0
+            w4 = -1
+            If pppp.Count > 0 Then
+                For w3 = 0 To pppp.Count - 1
+                    If pppp.MyIsNumeric(pppp.item(w3)) Then
+                        res = pppp.itemnumeric(w3): w4 = w3: Exit For
+                    ElseIf pppp.IsEnum2(w3, p) Then
+                        If MyIsNumeric(p) Then
+                            res = p: w4 = w3: Exit For
+                        End If
+                    End If
+                Next w3
+                For w3 = w3 To pppp.Count - 1
+                    If pppp.MyIsNumeric(pppp.item(w3)) Then
+                        If pppp.item(w3) > res Then res = pppp.item(w3): w4 = w3
+                    ElseIf pppp.IsEnum2(w3, p) Then
+                        If MyIsNumeric(p) Then
+                            If p > res Then res = p: w4 = w3
+                        End If
+                    End If
+                Next w3
+            End If
+            If Not FastSymbol(a$, ")") Then
+                bstack.soros.PushVal w4
+                If Not getone(bstack, a$) Then Exit Function
+            Else
+                fMatrix = True
+                Exit Function
+            End If
+        Case "EVAL$", "≈ ÷—$"
+            res = vbNullString
+            GoTo contEVAL
+        Case "EVAL", "≈ ÷—"
+contEVAL:
+            If lookOne(a$, ")") Then
+                w2 = 0
+            ElseIf IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+                w2 = CLng(p)
+            Else
+                GoTo missexp
+            End If
+            If w2 < 0 Or w2 >= pppp.Count Then
+                MyEr "offset out of limits", "ƒÂﬂÍÙÁÚ ÂÍÙ¸Ú ÔÒﬂ˘Ì"
+                fMatrix = False
+                Exit Function
+            Else
+                If pppp.MyIsObject(pppp.item(w2)) Then
+                    Set bstack.lastobj = pppp.item(w2)
+                    res = 0
+lookagain:
+                    If Not bstack.lastobj Is Nothing Then
+                        If TypeOf bstack.lastobj Is mHandler Then
+                            Set usehandler = bstack.lastobj
+                            With usehandler
+                                If .t1 = 3 Then
+                                    If TypeOf .objref Is iBoxArray Then
+                                        If FastSymbol(a$, ",") Then
+                                            If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+                                                w4 = CLng(p)
+                                                If w4 < 0 Or w4 >= .objref.Count Then
+                                                    errOutOfLimit
+                                                    fMatrix = False
+                                                    Exit Function
+                                                End If
+                                                Set pppp = .objref
+                                                pppp.index = w4
+                                                If pppp.IsObj Then
+                                                    Set res = pppp.Value
+                                                    If lookOne(a$, ",") Then w2 = w4: Set bstack.lastobj = res: GoTo lookagain
+                                                    Set anything = res
+                                                    If Not anything Is Nothing Then
+                                                        If TypeOf anything Is mHandler Then
+                                                            Set usehandler = anything
+                                                            If usehandler.t1 = 3 Then
+                                                                Set bstack.lastobj = usehandler
+                                                                Set pppp = usehandler.objref
+                                                                res = 0
+                                                                original = 0
+                                                                multi = True
+                                                                GoTo conthere11
+                                                            End If
+                                                        End If
+                                                    End If
+                                                Else
+                                                    If Mid$(Pad$, cut - 1, 1) = "$" Then
+                                                        res = CStr(MyVal(pppp.Value))
+                                                    Else
+                                                        res = MyVal(pppp.Value)
+                                                        If VarType(res) = vbString Then
+                                                            If Not ValidNumberOnlyMatrix(CStr(res), res, False) Then res = 0
+                                                        End If
+                                                    End If
+                                                End If
+                                                Set bstack.lastobj = Nothing
+                                                fMatrix = FastSymbol(a$, ")")
+                                                Exit Function
+                                            End If
+                                        Else
+                                            Set pppp = .objref
+                                            original = 0
+                                            multi = True
+                                        End If
+                                    ElseIf TypeOf .objref Is mStiva Then
+                                        If FastSymbol(a$, ",") Then
+                                            If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+                                                w4 = CLng(p)
+                                                If w4 < 0 Or w4 >= .objref.Count Then
+                                                    errOutOfLimit
+                                                    fMatrix = False
+                                                    Exit Function
+                                                End If
+                                                .objref.index = w4
+                                                If .objref.IsObj Then
+                                                    Set res = .objref.Value
+                                                    If lookOne(a$, ",") Then w2 = w4: Set bstack.lastobj = res: GoTo lookagain
+                                                    Set anything = res
+                                                    If Not anything Is Nothing Then
+                                                        If TypeOf anything Is mHandler Then
+                                                            Set usehandler = anything
+                                                            If usehandler.t1 = 3 Then
+                                                                Set bstack.lastobj = usehandler
+                                                                Set pppp = usehandler.objref
+                                                                res = 0
+                                                                original = 0
+                                                                multi = True
+                                                                GoTo conthere11
+                                                            End If
+                                                        End If
+                                                    End If
+                                                Else
+                                                    If Mid$(Pad$, cut - 1, 1) = "$" Then
+                                                        res = CStr(MyVal(.objref.Value))
+                                                    Else
+                                                        res = MyVal(.objref.Value)
+                                                        If VarType(res) = vbString Then
+                                                            If Not ValidNumberOnlyMatrix(CStr(res), res, False) Then res = 0
+                                                        End If
+                                                    End If
+                                                End If
+                                                Set bstack.lastobj = Nothing
+                                                fMatrix = FastSymbol(a$, ")")
+                                                Exit Function
+                                            End If
+                                       End If
+                                    End If
+                                ElseIf usehandler.t1 = 1 And FastSymbol(a$, ",") Then
+                                    If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+                                        w4 = CLng(p)
+                                        If w4 < 0 Or w4 >= .objref.Count Then
+                                            errOutOfLimit
+                                            fMatrix = False
+                                            Exit Function
+                                        End If
+                                    End If
+                                    .objref.index = w4
+                                    .objref.Done = True
+                                    If .objref.IsObj Then
+                                        res = usehandler.objref.ValueObj
+                                        If lookOne(a$, ",") Then w2 = w4: Set bstack.lastobj = res: GoTo lookagain
+                                        Set anything = res
+                                        If Not anything Is Nothing Then
+                                            If TypeOf anything Is mHandler Then
+                                                Set usehandler = anything
+                                                If usehandler.t1 = 3 Then
+                                                    Set bstack.lastobj = usehandler
+                                                    Set pppp = usehandler.objref
+                                                    res = 0
+                                                    original = 0
+                                                    multi = True
+                                                    GoTo conthere11
+                                                End If
+                                            End If
+                                        End If
+                                    Else
+                                        If Mid$(Pad$, cut - 1, 1) = "$" Then
+                                            res = CStr(MyVal(.objref.Value))
+                                        Else
+                                            res = MyVal(.objref.Value)
+                                            If VarType(res) = vbString Then
+                                                If Not ValidNumberOnlyMatrix(CStr(res), res, False) Then res = 0
+                                            End If
+                                        End If
+                                        Set bstack.lastobj = Nothing
+                                    End If
+                                    .objref.Done = False
+                                End If
+                            End With
+                        ElseIf TypeOf bstack.lastobj Is lambda Then
                             PushStage bstack, False
-
                             If Mid$(Pad$, cut - 1, 1) = "$" Then
                                 w3 = globalvarGroup("A_" & (Abs(w2)) & "$", 0#)
                                 Set var(w3) = bstack.lastobj
@@ -13573,1073 +13555,1034 @@ lookagain:
                             End If
                             PopStage bstack
                             If Not bstack.lastobj Is Nothing Then
+                                If TypeOf bstack.lastobj Is mHandler Then
+                                    Set usehandler = bstack.lastobj
+                                    If usehandler.t1 = 3 Then
+                                        If TypeOf usehandler.objref Is iBoxArray Then
+                                            Set pppp = usehandler.objref
+                                            original = 0
+                                            multi = True
+                                            GoTo conthere11
+                                        End If
+                                    End If
+                                End If
+                            End If
+                            Exit Function
+conthere11:
+                        ElseIf TypeOf bstack.lastobj Is Group Then
+                            Dim ppppl As iBoxArray
+                            Set ppppl = BoxGroupVar(bstack.lastobj)
+                            Set bstack.lastpointer = Nothing
+                            Set bstack.lastobj = Nothing
+                            w2 = 0
+                            a$ = NLtrim(a$)
+                            If Left$(a$, 1) = "," Then
+                                If Mid$(Pad$, cut - 1, 1) = "$" Then
+                                    Mid$(a$, 1, 1) = " "
+                                    fMatrix = SpeedGroup(bstack, ppppl, "VAL$", pppp.CodeName + "$(", a$, w2) = 1
+                                Else
+                                    Mid$(a$, 1, 1) = "("
+                                    fMatrix = SpeedGroup(bstack, ppppl, "VAL", pppp.CodeName, a$, w2) = 1
+                                    res = bstack.LastValue
+                                End If
+                            Else
+                                If Mid$(Pad$, cut - 1, 1) = "$" Then
+                                    fMatrix = SpeedGroup(bstack, ppppl, "VAL$", pppp.CodeName + "$(", a$, w2) = 1
+                                Else
+                                    fMatrix = SpeedGroup(bstack, ppppl, "VAL", pppp.CodeName, a$, w2) = 1
+                                    res = bstack.LastValue
+                                End If
+                                FastSymbol a$, ")", True
+                            End If
+                            res = bstack.LastValue
+                            Exit Function
+                        Else
+                            Set bstack.lastobj = Nothing
+                            res = rValue(bstack, pppp.item(w2))
+                            If Not bstack.lastobj Is Nothing Then
+                                If TypeOf bstack.lastobj Is mHandler Then
+                                    Set usehandler = bstack.lastobj
+                                    If usehandler.t1 = 3 Then
+                                        If TypeOf usehandler.objref Is iBoxArray Then
+                                            res = 0
+                                            Set pppp = CopyArray(usehandler.objref)
+                                            original = 1
+                                            multi = True
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
+                    End If
+                Else
+                    If Mid$(Pad$, cut - 1, 1) = "$" Then
+                        If Not pppp.IsStringItem(w2) Then
+                            On Error Resume Next
+                            res = CStr(pppp.item(w2))
+                            If Err Then res = vbNullString
+                        Else
+                            res = pppp.item(w2)
+                        End If
+                    Else
+                        res = pppp.item(w2)
+                        If VarType(res) = vbString Then
+                                If Not ValidNumberOnlyMatrix(CStr(res), res, False) Then res = 0
+                        End If
+                    End If
+                End If
+            End If
+        Case "STUFF", "’À… œ"
+            If lookOne(a$, ")") Then
+                w2 = 0
+            ElseIf IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+                w2 = CLng(p)
+            Else
+                GoTo missexp
+            End If
+            If w2 < 0 Or w2 >= pppp.Count Then
+                GoTo outlim
+            End If
+            If pppp.MyIsObject(pppp.item(w2)) Then
+                Set bstack.lastobj = pppp.item(w2)
+                If Not bstack.lastobj Is Nothing Then
+                    If TypeOf bstack.lastobj Is iBoxArray Then
+                        original = 0
+                        Set pppp = bstack.lastobj
+                        Set pppp1 = Nothing
+                        multi = True
+                    ElseIf TypeOf bstack.lastobj Is mHandler Then
+                        Set usehandler = bstack.lastobj
+                        If usehandler.t1 = 3 Then
+                        original = 0
+                        Set pppp = usehandler.objref
+                        Set usehandler = Nothing
+                        Set pppp1 = Nothing
+                        multi = True
+                        End If
+                    Else
+                        multi = False
+                    End If
+                End If
+                res = 0
+            Else
+                res = pppp.item(w2)
+            End If
+            GoTo cont22234
+        Case "VAL", "‘…Ã«", "VAL$", "‘…Ã«$"
+            If lookOne(a$, ")") Then
+                w2 = 0
+            ElseIf IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+                w2 = CLng(p)
+            Else
+missexp:
+                MissNumExpr
+                fMatrix = False
+                Exit Function
+            End If
+            If w2 < 0 Or w2 >= pppp.Count Then
+outlim:
+                MyEr "offset out of limits", "ƒÂﬂÍÙÁÚ ÂÍÙ¸Ú ÔÒﬂ˘Ì"
+                fMatrix = False
+                Exit Function
+            Else
+                If pppp.MyIsObject(pppp.item(w2)) Then
+                    Set bstack.lastobj = pppp.item(w2)
+                    res = 0
+                    If Not bstack.lastobj Is Nothing Then
+                        If TypeOf bstack.lastobj Is mHandler Then
+                            Set usehandler = bstack.lastobj
+                            With usehandler
+                                If .t1 = 3 Then
+                                    If TypeOf usehandler.objref Is iBoxArray Then
+                                        Set pppp = usehandler.objref
+                                        original = 0
+                                        multi = True
+                                    End If
+                                ElseIf .t1 = 1 And FastSymbol(a$, ",") Then
+                                    If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+                                        w4 = CLng(p)
+                                        If w4 < 0 Or w4 >= .objref.Count Then
+                                            errOutOfLimit
+                                            fMatrix = False
+                                            Exit Function
+                                        End If
+                                    End If
+                                    .objref.index = w4
+                                    .objref.Done = True
+                                    If .objref.IsObj Then
+                                        res = rValue(bstack, usehandler.objref.ValueObj)
+                                    Else
+                                        If Mid$(Pad$, cut - 1, 1) = "$" Then
+                                            res = CStr(MyVal(.objref.Value))
+                                        Else
+                                            res = MyVal(.objref.Value)
+                                            If VarType(res) = vbString Then
+                                                If Not ValidNumberOnlyMatrix(CStr(res), res, False) Then res = 0
+                                            End If
+                                        End If
+                                        Set bstack.lastobj = Nothing
+                                    End If
+                                    .objref.Done = False
+                                End If
+                            End With
+                        ElseIf TypeOf bstack.lastobj Is Group Then
+                            If bstack.lastpointer Is Nothing Then
+                                If bstack.lastobj.IamApointer Then
+                                Set bstack.lastpointer = bstack.lastobj
+                            End If
+                        End If
+                    ElseIf TypeOf bstack.lastobj Is iBoxArray Then
+                        Set pppp = bstack.lastobj
+                        original = 0
+                        multi = True
+                    End If
+                End If
+            Else
+                If Mid$(Pad$, cut - 1, 1) = "$" Then
+                    If Not pppp.IsStringItem(w2) Then
+                        On Error Resume Next
+                        res = fixthis(pppp.item(w2))
+                            If Err Then res = vbNullString
+                        Else
+                            res = pppp.item(w2)
+                        End If
+                    Else
+                        res = pppp.item(w2)
+                        If VarType(res) = vbString Then
+                            If Not ValidNumberOnlyMatrix(CStr(res), res, False) Then res = 0
+                        End If
+                    End If
+                End If
+            End If
+        Case "SLICE", "Ã≈—œ”"
+            If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+                If p < 0 Then
+                    MyEr "start offset out of limits", "ƒÂﬂÍÙÁÚ ·Ò˜ﬁÚ ÂÍÙ¸Ú ÔÒﬂ˘Ì"
+                    fMatrix = False
+                    Exit Function
+                End If
+            Else
+                p = 0
+            End If
+            If FastSymbol(a$, ",") Then
+                If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+                    If r < 0 Then
+                        Set pppp = pppp.EmptyArraySameType()
+                        GoTo JMPeMPTY
+                    ElseIf r >= pppp.Count Or r < p Then
+                        MyEr "end offset out of limits", "ƒÂﬂÍÙÁÚ Ù›ÎÔıÚ ÂÍÙ¸Ú ÔÒﬂ˘Ì"
+                        fMatrix = False
+                        Exit Function
+                    End If
+                Else
+                    r = pppp.Count - 1
+                End If
+            Else
+                r = pppp.Count - 1
+            End If
+            If CLng(p) >= pppp.Count Then
+                Set pppp = pppp.EmptyArraySameType()
+                GoTo JMPeMPTY
+            End If
+            If original > 0 Then
+                pppp.CopyArraySliceFast pppp1, CLng(p), CLng(r)
+            Else
+                pppp.CopyArraySlice pppp1, CLng(p), CLng(r)
+            End If
+            Set pppp = pppp1
+            Set pppp1 = Nothing
+JMPeMPTY:
+            original = original + 1
+            multi = True
+            fMatrix = True
+            Set usehandler = New mHandler
+            usehandler.t1 = 3
+            Set usehandler.objref = pppp
+            Set bstack.lastobj = usehandler
+        Case "END", "‘≈À", "‘≈Àœ”"
+            retresonly = True
+            GoTo cont1111
+        Case "START", "¡—◊«"
+            retresonly = False
+cont1111:
+            If IsExp(bstack, a$, p) Then
+                Set anything = bstack.lastobj
+                Set bstack.lastobj = Nothing
+                If Not CheckLastHandlerOrIterator(anything, w3) Then MissingArray: Exit Function
+                Set usehandler = anything
+                If Not TypeOf usehandler.objref Is iBoxArray Then
+                    If usehandler.t1 = 4 Then Set usehandler = Nothing: Set anything = Nothing: GoTo again1
+                    Exit Function
+                End If
+                If original = 0 Then
+                    If TypeOf pppp Is tuple Then
+                    ElseIf TypeOf pppp Is mArray Then
+                        Set mymArray = pppp
+                        Set pppp = New tuple
+                        mymArray.CopyArray2tuple pppp
+                        Set mymArray = Nothing
+                    End If
+                ElseIf TypeOf pppp Is mArray Then
+                    Set mymArray = pppp
+                    Set pppp = New tuple
+                    mymArray.CopyArray2tuple pppp
+                    Set mymArray = Nothing
+                End If
+                If pppp.Count > 0 Then
+                    If retresonly Then
+                        If original > 0 Then
+                            Set anything = pppp
+                            Set pppp = usehandler.objref
+                            Set pppp1 = anything
+                        Else
+                            Set pppp1 = New tuple
+                            pppp.CopyArray pppp1
+                            Set pppp = usehandler.objref
+                        End If
+                        pppp.AppendArray pppp1
+                    Else
+                        Set anything = pppp
+                        Set pppp1 = usehandler.objref
+                        Set pppp = New tuple
+                        pppp1.CopyArray pppp
+                        Set pppp1 = anything
+                        pppp1.AppendArray pppp
+                        Set pppp1 = pppp
+                    End If
+                Else
+                    Set pppp1 = usehandler.objref
+                End If
+                original = original + 1
+                retresonly = False
+                Set anything = Nothing
+                Set usehandler = Nothing
+                GoTo cont12321
+            Else
+                MissingArray
+            End If
+            Exit Function
+        Case "SORT", "‘¡Œ…ÕœÃ«”«"
+            w2 = 0
+            w3 = -1
+            w4 = -1
+            If lookOne(a$, ")") Then
+                w2 = 0
+            ElseIf IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+                w2 = CLng(p)
+            Else
+                GoTo missexp
+            End If
+            If FastSymbol(a$, ",") Then
+                If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+                    w3 = CLng(p)
+                Else
+                   GoTo missexp
+                End If
+            End If
+            If FastSymbol(a$, ",") Then
+                If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+                    w4 = CLng(p)
+                Else
+                    GoTo missexp
+                End If
+            End If
+            If original > 0 Then
+                Set pppp1 = pppp
+            Else
+                Set pppp1 = New tuple
+                pppp.CopyArray pppp1
+            End If
+            original = original + 1
+            If w2 Then
+                pppp1.SortDesTuple w3, w4
+            Else
+                pppp1.SortTuple w3, w4
+            End If
+cont12321:
+            Set pppp = pppp1
+            Set pppp1 = Nothing
+            multi = True
+            fMatrix = True
+            Set usehandler = New mHandler
+            usehandler.t1 = 3
+            Set usehandler.objref = pppp
+            Set bstack.lastobj = usehandler
+        Case "STR$", "√—¡÷«$"
+            If IsExp(bstack, a$, p, , True) Then
+                If MemInt(VarPtr(p)) = vbString Then SwapString2Variant Pad$, p: p = Empty: GoTo contStr1
+                MissStringExpr
+                Exit Function
+            End If
+            If Not IsStrExp(bstack, a$, Pad$) Then Pad$ = " "
+contStr1:
+            If FastSymbol(a$, ",") Then
+                If IsExp(bstack, a$, p, , True) Then
+                    If MemInt(VarPtr(p)) = vbString Then SwapString2Variant s$, p: p = Empty: GoTo contStr2
+                End If
+                If Not IsStrExp(bstack, a$, s$) Then
+                    s$ = "": If Pad$ = " " Then Pad$ = ","
+                End If
+            End If
+contStr2:
+            res = ""
+            If pppp.Count > 0 Then
+                For w3 = 0 To pppp.Count - 2
+                    If pppp.IsStringItem(w3) Then
+                        If pppp.ItemType(w3) = "mHandler" Then
+                            Set usehandler = pppp.item(w3)
+                            If Len(s$) > 0 Then
+                                res = res + """" + usehandler.index_cursor + """" + Pad$
+                            Else
+                                res = res + usehandler.index_cursor + Pad$
+                            End If
+                        Else
+                            If Len(s$) > 0 Then
+                                res = res + """" + StringToEscapeStr(pppp.item(w3)) + """" + Pad$
+                            Else
+                                res = res + pppp.item(w3) + Pad$
+                            End If
+                        End If
+                    Else
+                        If Len(s$) > 0 Then
+                            res = res + Num2Str(pppp.itemnumeric(w3), s$) + Pad$
+                        Else
+                            If pppp.IsObjAt(w3, r) Then
+                                If TypeOf r Is BigInteger Then
+                                    ut$ = r.ToString
+                                    r = 0
+                                Else
+                                    ut$ = fixthis(pppp.itemnumeric(w3))
+                                End If
+                            Else
+                                r = pppp.itemnumeric(w3)
+                                If TypeOf r Is Complex Then
+                                    ut$ = fixthis(r)
+                                Else
+                                    ut$ = fixthis(r)
+                                End If
+                            End If
+                            res = res + ut$ + Pad$
+                        End If
+                    End If
+                Next
+                If pppp.IsStringItem(w3) Then
+                    If pppp.ItemType(w3) = "mHandler" Then
+                        Set usehandler = pppp.item(w3)
+                        If Len(s$) > 0 Then
+                            res = res + """" + usehandler.index_cursor + """"
+                        Else
+                            res = res + usehandler.index_cursor
+                        End If
+                    ElseIf Len(s$) > 0 Then
+                        res = res + """" + StringToEscapeStr(pppp.item(w3)) + """"
+                    Else
+                        res = res + pppp.item(w3)
+                    End If
+                Else
+                    If Len(s$) > 0 Then
+                        res = res + Num2Str(pppp.itemnumeric(w3), s$)
+                    Else
+                        If pppp.IsObjAt(w3, r) Then
+                            If TypeOf r Is BigInteger Then
+                                ut$ = r.ToString
+                                r = 0
+                            Else
+                                ut$ = fixthis(pppp.itemnumeric(w3))
+                            End If
+                        Else
+                            r = pppp.itemnumeric(w3)
+                            If TypeOf r Is Complex Then
+                                ut$ = fixthis(r)
+                            Else
+                                ut$ = fixthis(r)
+                            End If
+                        End If
+                        res = res + ut$
+                    End If
+                End If
+            End If
+        Case "FOLD$", "–¡ $"
+            res = vbNullString
+            GoTo contFOLD
+        Case "FOLD", "–¡ "
+contFOLD:
+            If IsExp(bstack, a$, p) Then
+                If Not bstack.lastobj Is Nothing Then
+                    Set anything = bstack.lastobj
+                    If FastSymbol(a$, ",") Then
+                        If IsExp(bstack, a$, p) Then
+                            If MemInt(VarPtr(p)) = vbString Then
+                                Set bstack.lastobj = Nothing
+                                res = vbNullString
+                                SwapVariant res, p
+                            ElseIf Not bstack.lastobj Is Nothing Then
+                                Set res = bstack.lastobj
+                            Else
+                                res = 0
+                                SwapVariant res, p
+                            End If
+                        ElseIf IsStrExp(bstack, a$, Pad$, False) Then
+                            res = Pad$
+                        Else
+                            missParam a$
+                            fMatrix = False
+                            Exit Function
+                        End If
+                    End If
+                    Set bstack.lastobj = Nothing
+                    Set r = Nothing
+                    CallLambdaArrayFold bstack, pppp, anything, res, r
+                    If LastErNum1 Then
+                        fMatrix = False
+                        Exit Function
+                    ElseIf Not r Is Nothing Then
+                        If TypeOf r Is mHandler Then
+                            Set usehandler = r
+                            If usehandler.t1 = 3 Then
+                                If TypeOf usehandler.objref Is iBoxArray Then
+                                    Set pppp = usehandler.objref
+                                    Set pppp1 = Nothing
+                                    multi = True
+                                    fMatrix = True
+                                    original = original + 1
+                                    Set bstack.lastobj = r
+                                    GoTo ABCDEF
+                                End If
+                            End If
+                        End If
+                        Set bstack.lastobj = r
+                    End If
+                Else
+missinglambda:
+                    MyEr "missing a lambda function", "ÎÂﬂÂÈ ÏÈ· Î‹Ï‰· ÛıÌ‹ÒÙÁÛÁ"
+                    fMatrix = False
+                    Exit Function
+                End If
+ABCDEF:
+            Else
+                GoTo missinglambda
+            End If
+        Case "REV", "¡Õ¡–"
+            Set pppp1 = New tuple
+            If pppp1.MyTypeToBe <> vbVariant Then
+                pppp.CopyArrayRevFast pppp1
+            Else
+                If original > 0 Then
+                    pppp.CopyArrayRevFast pppp1
+                Else
+                    pppp.CopyArrayRev pppp1
+                End If
+            End If
+            original = original + 1
+            Set pppp = pppp1
+            Set pppp1 = Nothing
+            res = 0
+            multi = True
+            fMatrix = True
+            Set usehandler = New mHandler
+            usehandler.t1 = 3
+            Set usehandler.objref = pppp
+            Set bstack.lastobj = usehandler
+        Case "EXPANSE", "¡Õœ…√Ã¡"
+            If IsExp(bstack, a$, p) Then
+                If original = 0 Then
+                    If TypeOf pppp Is tuple Then
+                        Set pppp1 = New tuple
+                        pppp.CopyArray pppp1
+                        Set pppp = pppp1
+                        Set pppp1 = Nothing
+                    ElseIf TypeOf pppp Is mArray Then
+                        Set mymArray = pppp
+                        Set pppp = New tuple
+                        mymArray.CopyArray2tuple pppp
+                        Set mymArray = Nothing
+                    End If
+                ElseIf TypeOf pppp Is mArray Then
+                    Set mymArray = pppp
+                    Set pppp = New tuple
+                    mymArray.CopyArray2tuple pppp
+                    Set mymArray = Nothing
+                End If
+                p = CLng(p)
+                If p < 0 Then p = 0
+                pppp.StartResize: pppp.PushDim CLng(p): pppp.PushEnd
+                original = original + 1
+            End If
+            res = 0
+            multi = True
+            fMatrix = True
+            Set usehandler = New mHandler
+            usehandler.t1 = 3
+            Set usehandler.objref = pppp
+            Set bstack.lastobj = usehandler
+        Case "MAT", "Ã¡∆…"
+            If Not IsFlatStringExpr(bstack, a$, ut$) Then
+                MissStringExpr
+                Exit Function
+            ElseIf LastErNum1 Then
+                Exit Function
+            End If
+            If FastSymbol(a$, ",") Then
+                If Not IsExp(bstack, a$, p) Then
+                    missParam a$
+                    Exit Function
+                ElseIf LastErNum1 Then
+                    Exit Function
+                End If
+            Else
+                p = 0
+                EmptyVariant VarPtr(p)
+            End If
+            If original = 0 Then
+                If TypeOf pppp Is tuple Then
+                    Set pppp1 = New tuple
+                    pppp.CopyArray pppp1
+                    Set pppp = pppp1
+                    Set pppp1 = Nothing
+                ElseIf TypeOf pppp Is mArray Then
+                    Set mymArray = pppp
+                    Set pppp = New tuple
+                    mymArray.CopyArray2tuple pppp
+                    Set mymArray = Nothing
+                End If
+            ElseIf TypeOf pppp Is mArray Then
+                Set mymArray = pppp
+                Set pppp = New tuple
+                mymArray.CopyArray2tuple pppp
+                Set mymArray = Nothing
+            End If
+            Set myTuple = pppp
+            If VarType(p) = vbEmpty Then
+                myTuple.Compute3 ut$
+            Else
+                If Not bstack.lastobj Is Nothing Then
+                    Set p = bstack.lastobj
+                    Set bstack.lastobj = Nothing
+                End If
+                myTuple.Compute2 p, ut$
+            End If
+            original = original + 1
+            res = 0
+            multi = True
+            fMatrix = True
+            Set usehandler = New mHandler
+            usehandler.t1 = 3
+            Set usehandler.objref = pppp
+            Set bstack.lastobj = usehandler
+        Case "MAP", "¡Õ‘"
+againmap:
+            If IsExp(bstack, a$, p) Then
+                If Not bstack.lastobj Is Nothing Then
+                    CallLambdaArrayMap bstack, pppp, bstack.lastobj
+                    If FastSymbol(a$, ",") Then GoTo againmap
+                Else
+                    GoTo missinglambda
+                End If
+            Else
+                pppp.CopyArray pppp1
+                Set pppp = pppp1
+                original = original + 1
+            End If
+            res = 0
+            If FastSymbol(a$, ",") Then
+                If pppp.Count = 0 Then
+                    If IsExp(bstack, a$, p, , True) Then
+                         res = p: retresonly = True
+                    ElseIf IsStrExp(bstack, a$, Pad$, False) Then
+                        res = Pad$: retresonly = True
+                    Else
+                        MyEr "No value", "◊˘ÒﬂÚ ÙÈÏﬁ"
+                        fMatrix = False
+                        Exit Function
+                    End If
+                Else
+                    w2 = 1
+                    aheadstatus a$, , w2
+                    If w2 > 1 Then Mid$(a$, 1, w2 - 1) = space$(w2)
+                End If
+            End If
+            fMatrix = True
+            If Not retresonly Then
+                Set usehandler = New mHandler
+                usehandler.t1 = 3
+                Set usehandler.objref = pppp
+                Set bstack.lastobj = usehandler
+            End If
+            multi = True
+        Case "REDUCE", "Ã¡∆≈ÿ≈"
+            If IsExp(bstack, a$, p) Then
+                If Not bstack.lastobj Is Nothing Then
+                    
+                    CallLambdaArrayReduce bstack, pppp, bstack.lastobj, r
+                    SwapVariant res, r
+                Else
+                    GoTo missinglambda
+                End If
+            Else
+                GoTo missinglambda
+            End If
+        Case "FILTER", "÷…À‘—œ"
+again:
+            If IsExp(bstack, a$, p) Then
+                If Not bstack.lastobj Is Nothing Then
+                    CallLambdaArray bstack, pppp, bstack.lastobj
+                Else
+                    GoTo missinglambda
+                    Exit Function
+                End If
+            Else
+                Set pppp1 = New tuple
+                pppp.CopyArray pppp1
+                Set pppp = pppp1
+                original = original + 1
+            End If
+            res = 0
+            If FastSymbol(a$, ",") Then
+                If pppp.Count = 0 Then
+                    If IsExp(bstack, a$, p) Then
+                        If Not bstack.lastobj Is Nothing Then
                             If TypeOf bstack.lastobj Is mHandler Then
                                 Set usehandler = bstack.lastobj
                                 If usehandler.t1 = 3 Then
                                     If TypeOf usehandler.objref Is iBoxArray Then
                                         Set pppp = usehandler.objref
-                                        original = 0
-                                        multi = True
-                                        GoTo conthere11
+                                        GoTo again
                                     End If
                                 End If
                             End If
-                                                      
-                            End If
-                            Exit Function
-conthere11:
-        ElseIf TypeOf bstack.lastobj Is Group Then
-            Dim ppppl As iBoxArray
-            Set ppppl = BoxGroupVar(bstack.lastobj)
-            Set bstack.lastpointer = Nothing
-            Set bstack.lastobj = Nothing
-            w2 = 0
-            a$ = NLtrim(a$)
-            If Left$(a$, 1) = "," Then
-                If Mid$(Pad$, cut - 1, 1) = "$" Then
-                    Mid$(a$, 1, 1) = " "
-                    fMatrix = SpeedGroup(bstack, ppppl, "VAL$", pppp.CodeName + "$(", a$, w2) = 1
-                Else
-                    Mid$(a$, 1, 1) = "("
-                    fMatrix = SpeedGroup(bstack, ppppl, "VAL", pppp.CodeName, a$, w2) = 1
-                    res = bstack.LastValue
-                End If
-            Else
-                If Mid$(Pad$, cut - 1, 1) = "$" Then
-                    fMatrix = SpeedGroup(bstack, ppppl, "VAL$", pppp.CodeName + "$(", a$, w2) = 1
-                Else
-                    fMatrix = SpeedGroup(bstack, ppppl, "VAL", pppp.CodeName, a$, w2) = 1
-                    res = bstack.LastValue
-                End If
-                FastSymbol a$, ")", True
-            End If
-            res = bstack.LastValue
-            Exit Function
-        Else
-            Set bstack.lastobj = Nothing
-            res = rValue(bstack, pppp.item(w2))
-            If Not bstack.lastobj Is Nothing Then
-                If TypeOf bstack.lastobj Is mHandler Then
-                    Set usehandler = bstack.lastobj
-                    If usehandler.t1 = 3 Then
-                        If TypeOf usehandler.objref Is iBoxArray Then
-                        res = 0
-                        Set pppp = CopyArray(usehandler.objref)
-                        original = 1
-                        multi = True
                         End If
-                    End If
-                End If
-            End If
-        End If
-    End If
-Else
-    If Mid$(Pad$, cut - 1, 1) = "$" Then
-        If Not pppp.IsStringItem(w2) Then
-            On Error Resume Next
-            res = CStr(pppp.item(w2))
-                If Err Then res = vbNullString
-            Else
-                res = pppp.item(w2)
-               
-            End If
-        Else
-            res = pppp.item(w2)
-            If VarType(res) = vbString Then
-                    If Not ValidNumberOnlyMatrix(CStr(res), res, False) Then res = 0
-            End If
-        End If
-    End If
-
-End If
-Case "STUFF", "’À… œ"
-If lookOne(a$, ")") Then
-    w2 = 0
-ElseIf IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
-    w2 = CLng(p)
-Else
-    GoTo missexp
-End If
-If w2 < 0 Or w2 >= pppp.Count Then
-    GoTo outlim
-End If
-If pppp.MyIsObject(pppp.item(w2)) Then
-    Set bstack.lastobj = pppp.item(w2)
-    If Not bstack.lastobj Is Nothing Then
-        If TypeOf bstack.lastobj Is iBoxArray Then
-            original = 0
-            Set pppp = bstack.lastobj
-            Set pppp1 = Nothing
-            multi = True
-        ElseIf TypeOf bstack.lastobj Is mHandler Then
-            Set usehandler = bstack.lastobj
-            If usehandler.t1 = 3 Then
-            original = 0
-            Set pppp = usehandler.objref
-            Set usehandler = Nothing
-            Set pppp1 = Nothing
-            multi = True
-            End If
-        Else
-            multi = False
-        End If
-    End If
-    res = 0
-Else
-    res = pppp.item(w2)
-End If
-GoTo cont22234
-Case "VAL", "‘…Ã«", "VAL$", "‘…Ã«$"
-If lookOne(a$, ")") Then
-    w2 = 0
-ElseIf IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
-    w2 = CLng(p)
-Else
-missexp:
-    MissNumExpr
-    fMatrix = False
-    Exit Function
-End If
-If w2 < 0 Or w2 >= pppp.Count Then
-outlim:
-    MyEr "offset out of limits", "ƒÂﬂÍÙÁÚ ÂÍÙ¸Ú ÔÒﬂ˘Ì"
-    fMatrix = False
-    Exit Function
-Else
-    If pppp.MyIsObject(pppp.item(w2)) Then
-        Set bstack.lastobj = pppp.item(w2)
-        res = 0
-        If Not bstack.lastobj Is Nothing Then
-            If TypeOf bstack.lastobj Is mHandler Then
-                Set usehandler = bstack.lastobj
-                With usehandler
-                    If .t1 = 3 Then
-                        If TypeOf usehandler.objref Is iBoxArray Then
-                            Set pppp = usehandler.objref
-                            original = 0
-                            multi = True
-                        End If
-                    ElseIf .t1 = 1 And FastSymbol(a$, ",") Then
-                        If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
-                            w4 = CLng(p)
-                            If w4 < 0 Or w4 >= .objref.Count Then
-                                errOutOfLimit
-                                fMatrix = False
-                                Exit Function
-                            End If
-                        End If
-                        .objref.index = w4
-                        .objref.Done = True
-                        If .objref.IsObj Then
-                            res = rValue(bstack, usehandler.objref.ValueObj)
-                        Else
-                            If Mid$(Pad$, cut - 1, 1) = "$" Then
-                                res = CStr(MyVal(.objref.Value))
-                            Else
-                                res = MyVal(.objref.Value)
-                                If VarType(res) = vbString Then
-                                    If Not ValidNumberOnlyMatrix(CStr(res), res, False) Then res = 0
-                                End If
-                            End If
-                            Set bstack.lastobj = Nothing
-                        End If
-                        .objref.Done = False
-                    End If
-                End With
-            ElseIf TypeOf bstack.lastobj Is Group Then
-                If bstack.lastpointer Is Nothing Then
-                    If bstack.lastobj.IamApointer Then
-                    Set bstack.lastpointer = bstack.lastobj
-                End If
-            End If
-        ElseIf TypeOf bstack.lastobj Is iBoxArray Then
-            Set pppp = bstack.lastobj
-            original = 0
-            multi = True
-        End If
-    End If
-Else
-    If Mid$(Pad$, cut - 1, 1) = "$" Then
-        If Not pppp.IsStringItem(w2) Then
-            On Error Resume Next
-            res = fixthis(pppp.item(w2))
-                If Err Then res = vbNullString
-            Else
-                res = pppp.item(w2)
-            End If
-        Else
-            res = pppp.item(w2)
-            If VarType(res) = vbString Then
-                If Not ValidNumberOnlyMatrix(CStr(res), res, False) Then res = 0
-            End If
-        End If
-    End If
-End If
-Case "SLICE", "Ã≈—œ”"
-If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
-If p < 0 Then
-    MyEr "start offset out of limits", "ƒÂﬂÍÙÁÚ ·Ò˜ﬁÚ ÂÍÙ¸Ú ÔÒﬂ˘Ì"
-    fMatrix = False
-    Exit Function
-End If
-Else
-p = 0
-End If
-If FastSymbol(a$, ",") Then
-If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
-    If r < 0 Then
-    Set pppp = pppp.EmptyArraySameType()
-        GoTo JMPeMPTY
-    ElseIf r >= pppp.Count Or r < p Then
-    MyEr "end offset out of limits", "ƒÂﬂÍÙÁÚ Ù›ÎÔıÚ ÂÍÙ¸Ú ÔÒﬂ˘Ì"
-    fMatrix = False
-    Exit Function
-    End If
-Else
-r = pppp.Count - 1
-End If
-Else
-r = pppp.Count - 1
-End If
-If CLng(p) >= pppp.Count Then
-    Set pppp = pppp.EmptyArraySameType()
-        GoTo JMPeMPTY
-End If
-If original > 0 Then
-pppp.CopyArraySliceFast pppp1, CLng(p), CLng(r)
-Else
-pppp.CopyArraySlice pppp1, CLng(p), CLng(r)
-End If
-Set pppp = pppp1
-Set pppp1 = Nothing
-JMPeMPTY:
-original = original + 1
-multi = True
-fMatrix = True
-Set usehandler = New mHandler
-usehandler.t1 = 3
-Set usehandler.objref = pppp
-Set bstack.lastobj = usehandler
-Case "END", "‘≈À", "‘≈Àœ”"
-retresonly = True
-GoTo cont1111
-Case "START", "¡—◊«"
-retresonly = False
-cont1111:
-If IsExp(bstack, a$, p) Then
-    Set anything = bstack.lastobj
-    Set bstack.lastobj = Nothing
-    If Not CheckLastHandlerOrIterator(anything, w3) Then MissingArray: Exit Function
-    Set usehandler = anything
-    If Not TypeOf usehandler.objref Is iBoxArray Then
-        If usehandler.t1 = 4 Then Set usehandler = Nothing: Set anything = Nothing: GoTo again1
-        Exit Function
-    End If
-    If original = 0 Then
-    If TypeOf pppp Is tuple Then
-
-    ElseIf TypeOf pppp Is mArray Then
-        Set mymArray = pppp
-        Set pppp = New tuple
-        mymArray.CopyArray2tuple pppp
-        Set mymArray = Nothing
-    End If
-    ElseIf TypeOf pppp Is mArray Then
-        Set mymArray = pppp
-        Set pppp = New tuple
-        mymArray.CopyArray2tuple pppp
-        Set mymArray = Nothing
-    End If
-    
-    
-    If pppp.Count > 0 Then
-        If retresonly Then
-            If original > 0 Then
-                Set anything = pppp
-                Set pppp = usehandler.objref
-                Set pppp1 = anything
-            Else
-                Set pppp1 = New tuple
-                pppp.CopyArray pppp1
-                Set pppp = usehandler.objref
-            End If
-            pppp.AppendArray pppp1
-        Else
-            Set anything = pppp
-            Set pppp1 = usehandler.objref
-            Set pppp = New tuple
-            pppp1.CopyArray pppp
-            Set pppp1 = anything
-            pppp1.AppendArray pppp
-            Set pppp1 = pppp
-        End If
-        
-    Else
-        Set pppp1 = usehandler.objref
-    End If
-    original = original + 1
-    retresonly = False
-    Set anything = Nothing
-    Set usehandler = Nothing
-    GoTo cont12321
-Else
-    MissingArray
-End If
-Exit Function
-Case "SORT", "‘¡Œ…ÕœÃ«”«"
-w2 = 0
-w3 = -1
-w4 = -1
-If lookOne(a$, ")") Then
-    w2 = 0
-ElseIf IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
-    w2 = CLng(p)
-Else
-    GoTo missexp
-End If
-If FastSymbol(a$, ",") Then
-    If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
-        w3 = CLng(p)
-    Else
-       GoTo missexp
-    End If
-End If
-If FastSymbol(a$, ",") Then
-    If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
-        w4 = CLng(p)
-    Else
-        GoTo missexp
-    End If
-End If
-If original > 0 Then
-    Set pppp1 = pppp
-Else
-    Set pppp1 = New tuple
-    pppp.CopyArray pppp1
-End If
-original = original + 1
-
-If w2 Then
-pppp1.SortDesTuple w3, w4
-Else
-pppp1.SortTuple w3, w4
-End If
-cont12321:
-Set pppp = pppp1
-Set pppp1 = Nothing
-multi = True
-fMatrix = True
-Set usehandler = New mHandler
-usehandler.t1 = 3
-Set usehandler.objref = pppp
-Set bstack.lastobj = usehandler
-Case "STR$", "√—¡÷«$"
-If IsExp(bstack, a$, p, , True) Then
-    If MemInt(VarPtr(p)) = vbString Then SwapString2Variant Pad$, p: p = Empty: GoTo contStr1
-    MissStringExpr
-    Exit Function
-End If
-If Not IsStrExp(bstack, a$, Pad$) Then Pad$ = " "
-contStr1:
-If FastSymbol(a$, ",") Then
-    If IsExp(bstack, a$, p, , True) Then
-        If MemInt(VarPtr(p)) = vbString Then SwapString2Variant s$, p: p = Empty: GoTo contStr2
-    End If
-    If Not IsStrExp(bstack, a$, s$) Then
-        s$ = "": If Pad$ = " " Then Pad$ = ","
-    End If
-End If
-contStr2:
-
-res = ""
-If pppp.Count > 0 Then
-For w3 = 0 To pppp.Count - 2
-If pppp.IsStringItem(w3) Then
-    If pppp.ItemType(w3) = "mHandler" Then
-    Set usehandler = pppp.item(w3)
-    If Len(s$) > 0 Then
-    res = res + """" + usehandler.index_cursor + """" + Pad$
-    Else
-    res = res + usehandler.index_cursor + Pad$
-    End If
-    Else
-    If Len(s$) > 0 Then
-        res = res + """" + StringToEscapeStr(pppp.item(w3)) + """" + Pad$
-    Else
-    res = res + pppp.item(w3) + Pad$
-    End If
-    End If
-Else
-    If Len(s$) > 0 Then
-    res = res + Num2Str(pppp.itemnumeric(w3), s$) + Pad$
-    Else
-        If pppp.IsObjAt(w3, r) Then
-            If TypeOf r Is BigInteger Then
-                ut$ = r.ToString
-                r = 0
-            Else
-                ut$ = fixthis(pppp.itemnumeric(w3))
-            End If
-        Else
-            r = pppp.itemnumeric(w3)
-            If TypeOf r Is Complex Then
-                
-                ut$ = fixthis(r)
-            Else
-                ut$ = fixthis(r)
-            End If
-        End If
-        res = res + ut$ + Pad$
-
-    End If
-End If
-Next
-If pppp.IsStringItem(w3) Then
- If pppp.ItemType(w3) = "mHandler" Then
-    Set usehandler = pppp.item(w3)
-    If Len(s$) > 0 Then
-    res = res + """" + usehandler.index_cursor + """"
-    Else
-    res = res + usehandler.index_cursor
-    End If
-    ElseIf Len(s$) > 0 Then
-        res = res + """" + StringToEscapeStr(pppp.item(w3)) + """"
-    Else
-        res = res + pppp.item(w3)
-    End If
-Else
-If Len(s$) > 0 Then
-    res = res + Num2Str(pppp.itemnumeric(w3), s$)
-    Else
-        If pppp.IsObjAt(w3, r) Then
-            If TypeOf r Is BigInteger Then
-                ut$ = r.ToString
-                r = 0
-            Else
-                ut$ = fixthis(pppp.itemnumeric(w3))
-            End If
-        Else
-            r = pppp.itemnumeric(w3)
-            If TypeOf r Is Complex Then
-                ut$ = fixthis(r)
-            Else
-                ut$ = fixthis(r)
-            End If
-        End If
-        res = res + ut$
-    End If
-End If
-End If
-Case "FOLD$", "–¡ $"
-res = vbNullString
-GoTo contFOLD
-Case "FOLD", "–¡ "
-contFOLD:
-If IsExp(bstack, a$, p) Then
-    
-    If Not bstack.lastobj Is Nothing Then
-        Set anything = bstack.lastobj
-        If FastSymbol(a$, ",") Then
-            If IsExp(bstack, a$, p) Then
-                If MemInt(VarPtr(p)) = vbString Then
-                    Set bstack.lastobj = Nothing
-                    res = vbNullString
-                    SwapVariant res, p
-                ElseIf Not bstack.lastobj Is Nothing Then
-                    Set res = bstack.lastobj
-                Else
-                    res = 0
-                    SwapVariant res, p
-                End If
-            ElseIf IsStrExp(bstack, a$, Pad$, False) Then
-                res = Pad$
-            Else
-               missParam a$
-                fMatrix = False
-                Exit Function
-            End If
-            
-        End If
-        Set bstack.lastobj = Nothing
-        Set r = Nothing
-        CallLambdaArrayFold bstack, pppp, anything, res, r
-        If LastErNum1 Then
-        fMatrix = False
-        Exit Function
-        ElseIf Not r Is Nothing Then
-        
-            If TypeOf r Is mHandler Then
-                Set usehandler = r
-                If usehandler.t1 = 3 Then
-                 If TypeOf usehandler.objref Is iBoxArray Then
-                    Set pppp = usehandler.objref
-                    Set pppp1 = Nothing
-                    multi = True
-                    fMatrix = True
-                    original = original + 1
-                    Set bstack.lastobj = r
-                    GoTo ABCDEF
-                End If
-                End If
-            End If
-            Set bstack.lastobj = r
-
-        End If
-    Else
-missinglambda:
-        MyEr "missing a lambda function", "ÎÂﬂÂÈ ÏÈ· Î‹Ï‰· ÛıÌ‹ÒÙÁÛÁ"
-        fMatrix = False
-        Exit Function
-    End If
-ABCDEF:
-Else
-GoTo missinglambda
-End If
-
-Case "REV", "¡Õ¡–"
-Set pppp1 = New tuple
-If pppp1.MyTypeToBe <> vbVariant Then
-    pppp.CopyArrayRevFast pppp1
-Else
-If original > 0 Then
-    pppp.CopyArrayRevFast pppp1
-Else
-    pppp.CopyArrayRev pppp1
-End If
-End If
-original = original + 1
-
-Set pppp = pppp1
-Set pppp1 = Nothing
-res = 0
-multi = True
-fMatrix = True
-Set usehandler = New mHandler
-usehandler.t1 = 3
-Set usehandler.objref = pppp
-Set bstack.lastobj = usehandler
-Case "EXPANSE", "¡Õœ…√Ã¡"
-If IsExp(bstack, a$, p) Then
-    If original = 0 Then
-    If TypeOf pppp Is tuple Then
-        Set pppp1 = New tuple
-        pppp.CopyArray pppp1
-        Set pppp = pppp1
-        Set pppp1 = Nothing
-    ElseIf TypeOf pppp Is mArray Then
-        Set mymArray = pppp
-        Set pppp = New tuple
-        mymArray.CopyArray2tuple pppp
-        Set mymArray = Nothing
-    End If
-    ElseIf TypeOf pppp Is mArray Then
-        Set mymArray = pppp
-        Set pppp = New tuple
-        mymArray.CopyArray2tuple pppp
-        Set mymArray = Nothing
-    End If
-    p = CLng(p)
-    If p < 0 Then p = 0
-    pppp.StartResize: pppp.PushDim CLng(p): pppp.PushEnd
-    original = original + 1
-End If
-res = 0
-multi = True
-fMatrix = True
-Set usehandler = New mHandler
-usehandler.t1 = 3
-Set usehandler.objref = pppp
-Set bstack.lastobj = usehandler
-Case "MAT", "Ã¡∆…"
-    If Not IsFlatStringExpr(bstack, a$, ut$) Then
-        MissStringExpr
-        Exit Function
-    ElseIf LastErNum1 Then
-        Exit Function
-    End If
-    If FastSymbol(a$, ",") Then
-        If Not IsExp(bstack, a$, p) Then
-            missParam a$
-            Exit Function
-        ElseIf LastErNum1 Then
-            Exit Function
-        End If
-    Else
-        p = 0
-        EmptyVariant VarPtr(p)
-    End If
-    If original = 0 Then
-        If TypeOf pppp Is tuple Then
-            Set pppp1 = New tuple
-            pppp.CopyArray pppp1
-            Set pppp = pppp1
-            Set pppp1 = Nothing
-        ElseIf TypeOf pppp Is mArray Then
-            Set mymArray = pppp
-            Set pppp = New tuple
-            mymArray.CopyArray2tuple pppp
-            Set mymArray = Nothing
-        End If
-    ElseIf TypeOf pppp Is mArray Then
-        Set mymArray = pppp
-        Set pppp = New tuple
-        mymArray.CopyArray2tuple pppp
-        Set mymArray = Nothing
-    End If
-    Set myTuple = pppp
-    If VarType(p) = vbEmpty Then
-        myTuple.Compute3 ut$
-    Else
-        If Not bstack.lastobj Is Nothing Then
-            Set p = bstack.lastobj
-            Set bstack.lastobj = Nothing
-        End If
-        myTuple.Compute2 p, ut$
-    End If
-    
-    original = original + 1
-
-res = 0
-multi = True
-fMatrix = True
-Set usehandler = New mHandler
-usehandler.t1 = 3
-Set usehandler.objref = pppp
-Set bstack.lastobj = usehandler
-
-Case "MAP", "¡Õ‘"
-againmap:
-If IsExp(bstack, a$, p) Then
-    If Not bstack.lastobj Is Nothing Then
-    CallLambdaArrayMap bstack, pppp, bstack.lastobj
-    If FastSymbol(a$, ",") Then GoTo againmap
-    Else
-        GoTo missinglambda
-    End If
-Else
-'If TypeOf pppp Is mArray Then
-'    Set pppp1 = New mArray
-'Else
-    Set pppp1 = New tuple
-'End If
-
-pppp.CopyArray pppp1
-Set pppp = pppp1
-original = original + 1
-End If
-res = 0
-If FastSymbol(a$, ",") Then
-    If pppp.Count = 0 Then
-        If IsExp(bstack, a$, p, , True) Then
-             res = p: retresonly = True
-        ElseIf IsStrExp(bstack, a$, Pad$, False) Then
-            res = Pad$: retresonly = True
-        Else
-           MyEr "No value", "◊˘ÒﬂÚ ÙÈÏﬁ"
-            fMatrix = False
-            Exit Function
-        End If
-    Else
-        w2 = 1
-        aheadstatus a$, , w2
-        If w2 > 1 Then Mid$(a$, 1, w2 - 1) = space$(w2)
-    End If
-End If
-fMatrix = True
-If Not retresonly Then
-Set usehandler = New mHandler
-usehandler.t1 = 3
-Set usehandler.objref = pppp
-Set bstack.lastobj = usehandler
-End If
-multi = True
-Case "REDUCE", "Ã¡∆≈ÿ≈"
-    If IsExp(bstack, a$, p) Then
-        If Not bstack.lastobj Is Nothing Then
-            
-            CallLambdaArrayReduce bstack, pppp, bstack.lastobj, r
-            SwapVariant res, r
-        Else
-            GoTo missinglambda
-        End If
-    Else
-        GoTo missinglambda
-    End If
-Case "FILTER", "÷…À‘—œ"
-again:
-    If IsExp(bstack, a$, p) Then
-        If Not bstack.lastobj Is Nothing Then
-            CallLambdaArray bstack, pppp, bstack.lastobj
-        Else
-            GoTo missinglambda
-        Exit Function
-    End If
-Else
-
-Set pppp1 = New tuple
-
-pppp.CopyArray pppp1
-Set pppp = pppp1
-original = original + 1
-End If
-res = 0
-If FastSymbol(a$, ",") Then
-    If pppp.Count = 0 Then
-        If IsExp(bstack, a$, p) Then
-            If Not bstack.lastobj Is Nothing Then
-            If TypeOf bstack.lastobj Is mHandler Then
-                Set usehandler = bstack.lastobj
-                If usehandler.t1 = 3 Then
-                    If TypeOf usehandler.objref Is iBoxArray Then
-                        Set pppp = usehandler.objref
-                        GoTo again
-                    End If
-                End If
-            End If
-            End If
-             res = p: retresonly = True
-        ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
-            res = Pad$: retresonly = True
-        Else
-           MyEr "No value", "◊˘ÒﬂÚ ÙÈÏﬁ"
-            fMatrix = False
-            Exit Function
-        End If
-    Else
-        w2 = 1
-        aheadstatus a$, , w2
-        If w2 > 1 Then Mid$(a$, 1, w2 - 1) = space$(w2)
-    End If
-End If
-fMatrix = True
-If Not retresonly Then
-Set usehandler = New mHandler
-usehandler.t1 = 3
-Set usehandler.objref = pppp
-Set bstack.lastobj = usehandler
-End If
-multi = True
-Case "NOTHAVE", "ƒ≈Õ≈◊≈…"
-bhas = 2
-GoTo jpos
-Case "HAVE", "≈◊≈…"
-bhas = 1
-GoTo jpos
-Case "POS", "»≈”«"
-jpos:
-    res = -1
-    cur = 0
-    Dim st() As String, Sn() As Variant
-    If IsExp(bstack, a$, r, flatobject:=True) Then
-        If MemInt(VarPtr(r)) = vbString Then
-            SwapString2Variant Pad$, r
-            GoTo there
-        End If
-        p = Int(r)
-        If p < 0 Then p = 0
-again1:
-        If FastSymbol(a$, "->", , 2) Then
-            If IsExp(bstack, a$, r) Then
-                If bstack.lastobj Is Nothing Then
-                    ReDim Sn(0 To 4) As Variant
-                    Sn(0) = r
-                Else
-dothis:
-                    Set anything = bstack.lastobj
-                    Set bstack.lastobj = Nothing
-                    If Not CheckLastHandlerOrIterator(anything, w3) Then Exit Function
-                    Set usehandler = anything
-                    If Not TypeOf usehandler.objref Is iBoxArray Then
-                        If usehandler.t1 = 4 Then Set usehandler = Nothing: Set anything = Nothing: GoTo again1
+                         res = p: retresonly = True
+                    ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
+                        res = Pad$: retresonly = True
+                    Else
+                        MyEr "No value", "◊˘ÒﬂÚ ÙÈÏﬁ"
+                        fMatrix = False
                         Exit Function
                     End If
-                    Set pppp1 = usehandler.objref
-            
-                    Sn() = pppp1.GetCopy()
-                    If pppp1.Count > 0 Then
-                        ReDim Preserve Sn(0 To pppp1.Count - 1)
-                    End If
-                    cur = pppp1.Count - 1
-                    w3 = p
+                Else
+                    w2 = 1
+                    aheadstatus a$, , w2
+                    If w2 > 1 Then Mid$(a$, 1, w2 - 1) = space$(w2)
                 End If
-            ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
-                GoTo there
-            Else
-                missParam a$: Exit Function
             End If
-        Else
-            If bstack.lastobj Is Nothing Then
-'                r = p
-                p = 0
-                ReDim Sn(0 To 4) As Variant
-                Sn(0) = r
-            Else
-                GoTo dothis
+            fMatrix = True
+            If Not retresonly Then
+                Set usehandler = New mHandler
+                usehandler.t1 = 3
+                Set usehandler.objref = pppp
+                Set bstack.lastobj = usehandler
             End If
-        End If
-        
-        If pppp.Count > 0 Then
+            multi = True
+        Case "NOTHAVE", "ƒ≈Õ≈◊≈…"
+            bhas = 2
+            GoTo jpos
+        Case "HAVE", "≈◊≈…"
+            bhas = 1
+            GoTo jpos
+        Case "POS", "»≈”«"
+jpos:
             res = -1
-            If Not pppp1 Is Nothing Then
-                While res = -1 And cur >= 0 And w3 < pppp.Count - cur - 1
-                    For w3 = w3 To pppp.Count - cur - 1
-                        If pppp.MyIsObject(pppp.item(w3)) Then
-                             If pppp.MyIsObject(Sn(0)) Then GoTo inside
+            cur = 0
+            Dim st() As String, Sn() As Variant
+            If IsExp(bstack, a$, r, flatobject:=True) Then
+                If MemInt(VarPtr(r)) = vbString Then
+                    SwapString2Variant Pad$, r
+                    GoTo there
+                End If
+                p = Int(r)
+                If p < 0 Then p = 0
+again1:
+                If FastSymbol(a$, "->", , 2) Then
+                    If IsExp(bstack, a$, r) Then
+                        If bstack.lastobj Is Nothing Then
+                            ReDim Sn(0 To 4) As Variant
+                            Sn(0) = r
                         Else
-                            If pppp.MyIsObject(Sn(0)) Then GoTo inside
-                            If pppp.item(w3) = Sn(0) Then
-inside:
-                                res = w3
-                                w4 = w3 + 1
-                                For w2 = 1 To cur
-                                    If w4 < pppp.Count Then
-                                        If pppp.MyIsObject(pppp.item(w4)) Then
-                                            If Not pppp.MyIsObject(Sn(w2)) Then
-                                                res = -1
-                                                Exit For
-                                            End If
-                                        Else
-                                            If pppp.MyIsObject(Sn(w2)) Then
-                                                res = -1
-                                                Exit For
-                                            Else
-                                                If pppp.item(w4) <> Sn(w2) Then res = -1: Exit For
-                                            End If
-                                        End If
-                                    End If
-                                    w4 = w4 + 1
-                                Next w2
-                                If w2 > cur Then Exit For
+dothis:
+                            Set anything = bstack.lastobj
+                            Set bstack.lastobj = Nothing
+                            If Not CheckLastHandlerOrIterator(anything, w3) Then Exit Function
+                            Set usehandler = anything
+                            If Not TypeOf usehandler.objref Is iBoxArray Then
+                                If usehandler.t1 = 4 Then Set usehandler = Nothing: Set anything = Nothing: GoTo again1
+                                Exit Function
                             End If
+                            Set pppp1 = usehandler.objref
+                            Sn() = pppp1.GetCopy()
+                            If pppp1.Count > 0 Then
+                                ReDim Preserve Sn(0 To pppp1.Count - 1)
+                            End If
+                            cur = pppp1.Count - 1
+                            w3 = p
                         End If
-                    Next w3
-                Wend
-            Else
-                For w3 = p To pppp.Count - 1
-                    If pppp.MyIsNumeric(pppp.item(w3)) Then
-                        If pppp.item(w3) = r Then
-                        res = w3: Exit For
-                        End If
+                    ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
+                        GoTo there
                     Else
-                        If pppp.ItemType(w3) = "mHandler" Then
-                            Set usehandler = pppp.item(w3)
-                            If usehandler.t1 = 4 Then
-                            If myVarType(usehandler.index_cursor, vbString) Then
-                                If myVarType(r, vbString) Then
-                                    If usehandler.index_cursor = r Then res = w3: Exit For
+                        missParam a$: Exit Function
+                    End If
+                Else
+                    If bstack.lastobj Is Nothing Then
+                        p = 0
+                        ReDim Sn(0 To 4) As Variant
+                        Sn(0) = r
+                    Else
+                        GoTo dothis
+                    End If
+                End If
+                If pppp.Count > 0 Then
+                    res = -1
+                    If Not pppp1 Is Nothing Then
+                        While res = -1 And cur >= 0 And w3 < pppp.Count - cur - 1
+                            For w3 = w3 To pppp.Count - cur - 1
+                                If pppp.MyIsObject(pppp.item(w3)) Then
+                                     If pppp.MyIsObject(Sn(0)) Then GoTo inside
+                                Else
+                                    If pppp.MyIsObject(Sn(0)) Then GoTo inside
+                                    If pppp.item(w3) = Sn(0) Then
+inside:
+                                        res = w3
+                                        w4 = w3 + 1
+                                        For w2 = 1 To cur
+                                            If w4 < pppp.Count Then
+                                                If pppp.MyIsObject(pppp.item(w4)) Then
+                                                    If Not pppp.MyIsObject(Sn(w2)) Then
+                                                        res = -1
+                                                        Exit For
+                                                    End If
+                                                Else
+                                                    If pppp.MyIsObject(Sn(w2)) Then
+                                                        res = -1
+                                                        Exit For
+                                                    Else
+                                                        If pppp.item(w4) <> Sn(w2) Then res = -1: Exit For
+                                                    End If
+                                                End If
+                                            End If
+                                            w4 = w4 + 1
+                                        Next w2
+                                        If w2 > cur Then Exit For
+                                    End If
+                                End If
+                            Next w3
+                        Wend
+                    Else
+                        For w3 = p To pppp.Count - 1
+                            If pppp.MyIsNumeric(pppp.item(w3)) Then
+                                If pppp.item(w3) = r Then
+                                    res = w3: Exit For
                                 End If
                             Else
-                                If usehandler.index_cursor * usehandler.sign = r Then res = w3: Exit For
-                            End If
-                            End If
-                        End If
-                    End If
-                Next w3
-                w2 = 1
-                Do While FastSymbol(a$, ",")
-                    If cur = UBound(Sn()) Then ReDim Preserve Sn(0 To cur * 2 - 1) As Variant
-                    cur = cur + 1
-                    If IsExp(bstack, a$, Sn(cur), , True) Then
-                        If res > -1 Then
-                            w3 = w3 + 1
-                            If w3 < pppp.Count Then
-                                If pppp.MyIsNumeric(pppp.item(w3)) Then
-                                    If pppp.item(w3) <> Sn(cur) Then w2 = -1
-                                ElseIf pppp.ItemType(w3) = "mHandler" Then
+                                If pppp.ItemType(w3) = "mHandler" Then
                                     Set usehandler = pppp.item(w3)
                                     If usehandler.t1 = 4 Then
                                         If myVarType(usehandler.index_cursor, vbString) Then
-                                             If myVarType(Sn(cur), vbString) Then
-                                                If usehandler.index_cursor <> Sn(cur) Then w2 = -1
-                                             End If
+                                            If myVarType(r, vbString) Then
+                                                If usehandler.index_cursor = r Then res = w3: Exit For
+                                            End If
                                         Else
-                                            If usehandler.index_cursor * usehandler.sign <> Sn(cur) Then w2 = -1
+                                            If usehandler.index_cursor * usehandler.sign = r Then res = w3: Exit For
                                         End If
+                                    End If
+                                End If
+                            End If
+                        Next w3
+                        w2 = 1
+                        Do While FastSymbol(a$, ",")
+                            If cur = UBound(Sn()) Then ReDim Preserve Sn(0 To cur * 2 - 1) As Variant
+                            cur = cur + 1
+                            If IsExp(bstack, a$, Sn(cur), , True) Then
+                                If res > -1 Then
+                                    w3 = w3 + 1
+                                    If w3 < pppp.Count Then
+                                        If pppp.MyIsNumeric(pppp.item(w3)) Then
+                                            If pppp.item(w3) <> Sn(cur) Then w2 = -1
+                                        ElseIf pppp.ItemType(w3) = "mHandler" Then
+                                            Set usehandler = pppp.item(w3)
+                                            If usehandler.t1 = 4 Then
+                                                If myVarType(usehandler.index_cursor, vbString) Then
+                                                     If myVarType(Sn(cur), vbString) Then
+                                                        If usehandler.index_cursor <> Sn(cur) Then w2 = -1
+                                                     End If
+                                                Else
+                                                    If usehandler.index_cursor * usehandler.sign <> Sn(cur) Then w2 = -1
+                                                End If
+                                            Else
+                                                w2 = -1
+                                            End If
+                                        Else
+                                            w2 = -1
+                                        End If
+                                    Else
+                                        w2 = -1
+                                    End If
+                                End If
+                            End If
+                        Loop
+                        If w2 = -1 Then
+                            w3 = res + 1
+                            res = -1
+                            While res = -1 And cur > 0 And w3 < pppp.Count - cur - 1
+                                For w3 = w3 To pppp.Count - cur - 1
+                                    If pppp.MyIsNumeric(pppp.item(w3)) Then
+                                        If pppp.item(w3) = Sn(0) Then
+                                            res = w3
+                                            w4 = w3 + 1
+                                            For w2 = 1 To cur
+                                                If w4 < pppp.Count Then
+                                                    If pppp.MyIsNumeric(pppp.itemnumeric(w4)) Then
+                                                        If pppp.item(w4) <> Sn(w2) Then res = -1: Exit For
+                                                    ElseIf pppp.ItemType(w4) = "mHandler" Then
+                                                        Set usehandler = pppp.item(w4)
+                                                        If usehandler.t1 = 4 Then
+                                                            If myVarType(usehandler.index_cursor, vbString) Then
+                                                                If myVarType(Sn(w2), vbString) Then
+                                                                    If usehandler.index_cursor <> Sn(w2) Then res = -1
+                                                                End If
+                                                            Else
+                                                                If usehandler.index_cursor * usehandler.sign <> Sn(w2) Then res = -1
+                                                            End If
+                                                        Else
+                                                            res = -1
+                                                        End If
+                                                    Else
+                                                        res = -1
+                                                    End If
+                                                End If
+                                                w4 = w4 + 1
+                                            Next w2
+                                            If w2 > cur Then Exit For
+                                        End If
+                                    End If
+                                Next w3
+                            Wend
+                        End If
+                    End If
+                End If
+            ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
+                
+there:
+                ReDim st(0 To 4) As String
+                st(0) = Pad$
+                If pppp.Count > 0 Then
+                    res = -1
+                    For w3 = p To pppp.Count - 1
+                        If pppp.IsStringItem(w3) Then
+                            If pppp.item(w3) = st(0) Then res = w3: Exit For
+                        End If
+                    Next w3
+                    w2 = 1
+                    Do While FastSymbol(a$, ",")
+                        If cur = UBound(st()) Then ReDim Preserve st(0 To cur * 2 - 1) As String
+                        cur = cur + 1
+                        If IsStrExp(bstack, a$, st(cur)) Then
+                            If res > -1 Then
+                                w3 = w3 + 1
+                                If w3 < pppp.Count Then
+                                    If pppp.IsStringItem(w3) Then
+                                        If pppp.item(w3) <> st(cur) Then w2 = -1
                                     Else
                                         w2 = -1
                                     End If
                                 Else
                                     w2 = -1
                                 End If
-                            Else
-                                w2 = -1
-                            End If
-                        End If
-                    End If
-                Loop
-                If w2 = -1 Then
-                    w3 = res + 1
-                    res = -1
-                    While res = -1 And cur > 0 And w3 < pppp.Count - cur - 1
-                        For w3 = w3 To pppp.Count - cur - 1
-                            If pppp.MyIsNumeric(pppp.item(w3)) Then
-                                If pppp.item(w3) = Sn(0) Then
-                                    res = w3
-                                    w4 = w3 + 1
-                                    For w2 = 1 To cur
-                                        If w4 < pppp.Count Then
-                                            If pppp.MyIsNumeric(pppp.itemnumeric(w4)) Then
-                                                If pppp.item(w4) <> Sn(w2) Then res = -1: Exit For
-                                            ElseIf pppp.ItemType(w4) = "mHandler" Then
-                                                Set usehandler = pppp.item(w4)
-                                                If usehandler.t1 = 4 Then
-                                                    If myVarType(usehandler.index_cursor, vbString) Then
-                                                        If myVarType(Sn(w2), vbString) Then
-                                                            If usehandler.index_cursor <> Sn(w2) Then res = -1
-                                                        End If
-                                                    Else
-                                                        If usehandler.index_cursor * usehandler.sign <> Sn(w2) Then res = -1
-                                                    End If
-                                                Else
-                                                    res = -1
-                                                End If
-                                            Else
-                                                res = -1
-                                            End If
-                                        End If
-                                        w4 = w4 + 1
-                                    Next w2
-                                    If w2 > cur Then Exit For
-                                End If
-                            End If
-                        Next w3
-                    Wend
-                End If
-            End If
-        End If
-    ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
-        
-there:
-        ReDim st(0 To 4) As String
-        st(0) = Pad$
-        If pppp.Count > 0 Then
-            res = -1
-            For w3 = p To pppp.Count - 1
-                If pppp.IsStringItem(w3) Then
-                    If pppp.item(w3) = st(0) Then res = w3: Exit For
-                End If
-            Next w3
-            w2 = 1
-            Do While FastSymbol(a$, ",")
-                If cur = UBound(st()) Then ReDim Preserve st(0 To cur * 2 - 1) As String
-                cur = cur + 1
-                If IsStrExp(bstack, a$, st(cur)) Then
-                    If res > -1 Then
-                        w3 = w3 + 1
-                        If w3 < pppp.Count Then
-                            If pppp.IsStringItem(w3) Then
-                                If pppp.item(w3) <> st(cur) Then w2 = -1
-                            Else
-                                w2 = -1
                             End If
                         Else
                             w2 = -1
                         End If
-                    End If
-                Else
-                    w2 = -1
-                End If
-            Loop
-            If w2 = -1 Then
-                w3 = res + 1
-                res = -1
-                While res = -1 And cur > 0 And w3 < pppp.Count - cur - 1
-                    For w3 = w3 To pppp.Count - cur - 1
-                        If pppp.IsStringItem(w3) Then
-                            If pppp.item(w3) = st(0) Then
-                                res = w3
-                                w4 = w3 + 1
-                                For w2 = 1 To cur
-                                    If w4 < pppp.Count Then
-                                        If pppp.IsStringItem(w4) Then
-                                            If pppp.item(w4) <> st(w2) Then res = -1: Exit For
-                                        Else
-                                            res = -1
-                                        End If
+                    Loop
+                    If w2 = -1 Then
+                        w3 = res + 1
+                        res = -1
+                        While res = -1 And cur > 0 And w3 < pppp.Count - cur - 1
+                            For w3 = w3 To pppp.Count - cur - 1
+                                If pppp.IsStringItem(w3) Then
+                                    If pppp.item(w3) = st(0) Then
+                                        res = w3
+                                        w4 = w3 + 1
+                                        For w2 = 1 To cur
+                                            If w4 < pppp.Count Then
+                                                If pppp.IsStringItem(w4) Then
+                                                    If pppp.item(w4) <> st(w2) Then res = -1: Exit For
+                                                Else
+                                                    res = -1
+                                                End If
+                                            End If
+                                            w4 = w4 + 1
+                                        Next w2
+                                        If w2 > cur Then Exit For
                                     End If
-                                    w4 = w4 + 1
-                                Next w2
-                                If w2 > cur Then Exit For
-                            End If
-                        End If
-                    Next w3
-                Wend
+                                End If
+                            Next w3
+                        Wend
+                    End If
+                End If
+            Else
+                missParam a$
+                Exit Function
             End If
-        End If
-    Else
-        missParam a$
-        Exit Function
-    End If
-    If bhas > 0 Then
-        If bhas = 1 Then
-            res = res <> -1
-        Else
-            res = res = -1
-        End If
-    End If
-Case Else
-MyErMacro a$, "Unknown function #" + Left$(Pad$, cut) + ")", "¢„Ì˘ÛÙÁ ÛıÌ‹ÒÙÁÛÁ #" + Left$(Pad$, cut) + ")"
-End Select
+            If bhas > 0 Then
+                If bhas = 1 Then
+                    res = res <> -1
+                Else
+                    res = res = -1
+                End If
+            End If
+        Case Else
+            MyErMacro a$, "Unknown function #" + Left$(Pad$, cut) + ")", "¢„Ì˘ÛÙÁ ÛıÌ‹ÒÙÁÛÁ #" + Left$(Pad$, cut) + ")"
+        End Select
 cont22234:
-fMatrix = FastSymbol(a$, ")")
-If Not multi Then Exit Do
-If fMatrix = False Then Exit Do
-If Not IsOperator(a$, "#") Then Exit Do
-If pppp.Count = 0 Then
-        Do
-        w2 = 1
-        aheadstatus a$, , w2
-        If w2 > 1 Then Mid$(a$, 1, w2 - 1) = space$(w2)
-        If Not FastSymbol(a$, ")") Then fMatrix = False: Exit Function
-        Loop Until Not IsOperator(a$, "#")
-Exit Function
-End If
-Pad$ = myUcase(Left$(a$, 20))
-cut = InStr(Pad$, "(")
-If cut <= 1 Then Exit Do
-Mid$(a$, 1, cut) = space$(cut)
-Set bstack.lastobj = Nothing
-
-Loop
+        fMatrix = FastSymbol(a$, ")")
+        If Not multi Then Exit Do
+        If fMatrix = False Then Exit Do
+        If Not IsOperator(a$, "#") Then Exit Do
+        If pppp.Count = 0 Then
+            Do
+                w2 = 1
+                aheadstatus a$, , w2
+                If w2 > 1 Then Mid$(a$, 1, w2 - 1) = space$(w2)
+                If Not FastSymbol(a$, ")") Then fMatrix = False: Exit Function
+            Loop Until Not IsOperator(a$, "#")
+            Exit Function
+        End If
+        Pad$ = myUcase(Left$(a$, 20))
+        cut = InStr(Pad$, "(")
+        If cut <= 1 Then Exit Do
+        Mid$(a$, 1, cut) = space$(cut)
+        Set bstack.lastobj = Nothing
+    Loop
 Else
-WrongObject
+    WrongObject
 End If
 End Function
 
 Function getone(bstack As basetask, rest$) As Boolean
-Dim what$, ss$, x1 As Long
-getone = True
-FastSymbol rest$, "&"
-   x1 = Abs(IsLabelBig(bstack, rest$, what$))
-    
+    Dim what$, ss$, x1 As Long
+    getone = True
+    FastSymbol rest$, "&"
+    x1 = Abs(IsLabelBig(bstack, rest$, what$))
+        
     If x1 <> 0 Then
-            If x1 > 4 Then
+        If x1 > 4 Then
+            ss$ = BlockParam(rest$)
+            what$ = what$ + ss$ + ")"
+            Mid$(rest$, 1, Len(ss$) + 1) = space(Len(ss$) + 1)
+            Do While IsSymbol(rest$, ".")
+                x1 = IsLabel(bstack, rest$, ss$)
+                If x1 > 0 Then what$ = what$ + "." + ss$ Else Exit Do
+                If x1 > 4 Then
                     ss$ = BlockParam(rest$)
                     what$ = what$ + ss$ + ")"
                     'rest$ = Mid$(rest$, Len(ss$) + 2)
                     Mid$(rest$, 1, Len(ss$) + 1) = space(Len(ss$) + 1)
-                    Do While IsSymbol(rest$, ".")
-                    x1 = IsLabel(bstack, rest$, ss$)
-                    If x1 > 0 Then what$ = what$ + "." + ss$ Else Exit Do
-                            If x1 > 4 Then
-                            ss$ = BlockParam(rest$)
-                            what$ = what$ + ss$ + ")"
-                            'rest$ = Mid$(rest$, Len(ss$) + 2)
-                            Mid$(rest$, 1, Len(ss$) + 1) = space(Len(ss$) + 1)
-                            End If
-                    Loop
-            End If
-              
-              getone = MyRead(6, bstack, (what$), 1, what$, x1, True)
-
-             Else
-             MissParamref rest$
-             Exit Function
-             End If
-  
-
-
-
+                End If
+            Loop
+        End If
+        getone = MyRead(6, bstack, (what$), 1, what$, x1, True)
+    Else
+       MissParamref rest$
+       Exit Function
+    End If
 End Function
 Sub CallLambdaArray(bstack As basetask, ByRef pppp As iBoxArray, mylambda As lambda)
 Dim w2 As Long, w1 As Long, nbstack As basetask
@@ -14659,7 +14602,8 @@ w1 = globalvarGroup("A_" & (w2), 0#)
     Set nbstack.Owner = bstack.Owner
     nbstack.OriginalCode = 0
     nbstack.UseGroupname = vbNullString
-Dim aa As Object, oldsoros As mStiva, tempsoros As New mStiva, finalpppp As New tuple
+Dim aa As Object, oldsoros As mStiva, tempsoros As mStiva, finalpppp As New tuple
+Set tempsoros = NewmStiva
 finalpppp.StartResize: finalpppp.PushDim pppp.Count: finalpppp.PushEnd
 Set oldsoros = bstack.soros
 Set bstack.Sorosref = tempsoros
@@ -14695,6 +14639,7 @@ For w1 = 0 To pppp.Count - 1
   tempsoros.Flush
 Next w1
 Set bstack.Sorosref = oldsoros
+If Not tempsoros Is Nothing Then tempsoros.Recycle
 PopStage bstack
 finalpppp.StartResize: finalpppp.PushDim where: finalpppp.PushEnd
 Set pppp = finalpppp
@@ -14719,7 +14664,8 @@ w1 = globalvarGroup("A_" & (w2), 0#)
     Set nbstack.Owner = bstack.Owner
     nbstack.OriginalCode = 0
     nbstack.UseGroupname = vbNullString
-Dim aa As Object, oldsoros As mStiva, tempsoros As New mStiva, finalpppp As New tuple
+Dim aa As Object, oldsoros As mStiva, tempsoros As mStiva, finalpppp As New tuple
+Set tempsoros = NewmStiva
 finalpppp.StartResize: finalpppp.PushDim pppp.Count: finalpppp.PushEnd
 Set oldsoros = bstack.soros
 Set bstack.Sorosref = tempsoros
@@ -14769,6 +14715,7 @@ Do While w1 < pppp.Count
   
 Loop
 Set bstack.Sorosref = oldsoros
+If Not tempsoros Is Nothing Then tempsoros.Recycle
 PopStage bstack
 Set pppp = finalpppp
 
@@ -14792,7 +14739,8 @@ w1 = globalvarGroup("A_" & (w2), 0#)
     Set nbstack.Owner = bstack.Owner
     nbstack.OriginalCode = 0
     nbstack.UseGroupname = vbNullString
-Dim aa As Object, oldsoros As mStiva, tempsoros As New mStiva
+Dim aa As Object, oldsoros As mStiva, tempsoros As mStiva
+Set tempsoros = NewmStiva
 Set oldsoros = bstack.soros
 Set bstack.Sorosref = tempsoros
 Dim what As Long, where As Long, finalpppp As New tuple, drop
@@ -14836,6 +14784,7 @@ Next
 SwapVariant r, rr
 Error1:
 Set bstack.Sorosref = oldsoros
+If Not tempsoros Is Nothing Then tempsoros.Recycle
 PopStage bstack
 End Sub
 
@@ -14857,7 +14806,8 @@ Sub CallLambdaArrayFold(bstack As basetask, pppp As iBoxArray, mylambda As lambd
     Set nbstack.Owner = bstack.Owner
     nbstack.OriginalCode = 0
     nbstack.UseGroupname = vbNullString
-    Dim aa As Object, oldsoros As mStiva, tempsoros As New mStiva
+    Dim aa As Object, oldsoros As mStiva, tempsoros As mStiva
+    Set tempsoros = NewmStiva
     Set oldsoros = bstack.soros
     Set bstack.Sorosref = tempsoros
     Dim r, what As Long, where As Long
@@ -14892,6 +14842,7 @@ Sub CallLambdaArrayFold(bstack As basetask, pppp As iBoxArray, mylambda As lambd
         End If
     End If
     Set bstack.Sorosref = oldsoros
+    If Not tempsoros Is Nothing Then tempsoros.Recycle
     PopStage bstack
 End Sub
 
@@ -15275,34 +15226,43 @@ Function NewVarItem() As VarItem
     Set Trush(TrushCount) = Nothing
     TrushCount = TrushCount - 1
 End Function
+Function NewmStiva() As mStiva
+    If TrushCount2 = 0 Then
+        Set NewmStiva = New mStiva
+      Exit Function
+    End If
+    Set NewmStiva = Trush2(TrushCount2)
+    Set Trush2(TrushCount2) = Nothing
+    TrushCount2 = TrushCount2 - 1
+End Function
 Function ExpMatrix(bstack As basetask, a$, r) As Boolean
 Dim usehandler As mHandler
- If Not bstack.lastobj Is Nothing Then
-                                If Typename(bstack.lastobj) = "mHandler" Then
-                                    Set usehandler = bstack.lastobj
-                                    Set bstack.lastobj = Nothing
-                                    ExpMatrix = fMatrix(bstack, a$, usehandler, r)
-                                    If MyIsObject(r) Then
-                                    If TypeOf r Is BigInteger Then
-                                        Set bstack.lastobj = r
-                                    End If
-                                    r = CDbl(0)
-                                    
-                                    End If
-                                    Exit Function
-                                ElseIf IsobjArray(bstack.lastobj) Then
-                                Set usehandler = New mHandler
-                                usehandler.t1 = 3
-                                Set usehandler.objref = bstack.lastobj
-                                Set bstack.lastobj = Nothing
-                                    ExpMatrix = fMatrix(bstack, a$, usehandler, r)
-                                    If MyIsObject(r) Then r = CDbl(0)
-                                    Exit Function
-                                End If
-                            End If
-                                SyntaxError
-                                ExpMatrix = False
-                                Exit Function
+If Not bstack.lastobj Is Nothing Then
+    If Typename(bstack.lastobj) = "mHandler" Then
+        Set usehandler = bstack.lastobj
+        Set bstack.lastobj = Nothing
+        ExpMatrix = fMatrix(bstack, a$, usehandler, r)
+        If MyIsObject(r) Then
+        If TypeOf r Is BigInteger Then
+            Set bstack.lastobj = r
+        End If
+        r = CDbl(0)
+        
+        End If
+        Exit Function
+    ElseIf IsobjArray(bstack.lastobj) Then
+    Set usehandler = New mHandler
+    usehandler.t1 = 3
+    Set usehandler.objref = bstack.lastobj
+    Set bstack.lastobj = Nothing
+        ExpMatrix = fMatrix(bstack, a$, usehandler, r)
+        If MyIsObject(r) Then r = CDbl(0)
+        Exit Function
+    End If
+End If
+SyntaxError
+ExpMatrix = False
+Exit Function
 End Function
 Sub targetsMyExec(MyExec As Long, b$, bb$, v As Long, di As Object, W$, bstack As basetask, VarStat As Boolean, temphere$)
 Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, SBB$, nd&, p As Variant
@@ -17131,7 +17091,7 @@ contnoproper:
                                 If NOEXECUTION Then
                                     NOEXECUTION = False
                                     MyEr "", ""
-                                    Set Basestack1.Sorosref = New mStiva
+                                    Set Basestack1.Sorosref = NewmStiva
                                     b$ = vbNullString
                                      ClearState
                                 End If
@@ -17960,7 +17920,7 @@ Case Else
 wehavearray:
                                         Set bstack.lastobj = Nothing
                                         Set myobject = bstack.soros
-                                        Set bstack.Sorosref = New mStiva
+                                        Set bstack.Sorosref = NewmStiva
                                         bstack.soros.MergeBottomCopyArray ppppl
                                         If Not MyRead(1, bstack, ss$, 1) Then
                                             Set bstack.lastobj = Nothing
@@ -19276,7 +19236,7 @@ End Function
 
 Function IdPara(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim x1 As Long, y1 As Long, i As Long, it As Long, vvl As Variant
-Dim X As Double, Y As Double, s$, what$, w3 As Long, w4 As Long, z As Double
+Dim X As Double, Y As Double, s$, what$, w3 As Long, w4 As Long, Z As Double
 Dim xa As Long, ya As Long
 Dim pppp As iBoxArray
 
@@ -19299,15 +19259,15 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
                 End If
             End If
             If FastSymbol(rest$, ",") Then
-                If IsExp(basestack, rest$, z, flatobject:=True, nostring:=True) Then
-                    z = Int(z)
-                    If z < 1 Then
+                If IsExp(basestack, rest$, Z, flatobject:=True, nostring:=True) Then
+                    Z = Int(Z)
+                    If Z < 1 Then
                         MyErMacro rest$, "the lenght base must be >=1", "ÙÔ ÏﬁÍÔÚ Ò›ÂÈ Ì· ÂﬂÌ·È >=1"
                         Exit Function
                     End If
                 End If
             Else
-                z = 0
+                Z = 0
             End If
         Else
             X = 0
@@ -19335,16 +19295,16 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
                         ElseIf Y < 1 Then
                             w3 = var(i).ParagraphFromOrder(1)
                             w4 = X
-                            If z > 0 Then
-                                var(i).BackSpaceNchars w3, w4 + CLng(z), CLng(z)
+                            If Z > 0 Then
+                                var(i).BackSpaceNchars w3, w4 + CLng(Z), CLng(Z)
                             End If
                             If w3 < 1 Then w3 = 1
                             If Len(s$) > 0 Then var(i).InsertDoc w3, w4, s$
                         Else
                             w3 = var(i).ParagraphFromOrder(Y + 1)
                             w4 = X
-                            If z > 0 Then
-                                var(i).BackSpaceNchars w3, w4 + CLng(z), CLng(z)
+                            If Z > 0 Then
+                                var(i).BackSpaceNchars w3, w4 + CLng(Z), CLng(Z)
                             End If
                             If w3 < 1 Then w3 = 1
                             If Len(s$) > 0 Then var(i).InsertDoc w3, w4, s$
@@ -19377,16 +19337,16 @@ If IsLabelSymbolNew(rest$, "”‘œ", "TO", Lang) Then
                             ElseIf Y < 1 Then
                                 w3 = pppp.item(it).ParagraphFromOrder(1)
                                 w4 = X
-                                If z > 0 Then
-                                    pppp.item(it).BackSpaceNchars w3, w4 + CLng(z), CLng(z)
+                                If Z > 0 Then
+                                    pppp.item(it).BackSpaceNchars w3, w4 + CLng(Z), CLng(Z)
                                 End If
                                 If w3 < 1 Then w3 = 1
                                 If Len(s$) > 0 Then pppp.item(it).InsertDoc w3, w4, s$
                             Else
                                 w3 = pppp.item(it).ParagraphFromOrder(Y + 1)
                                 w4 = X
-                                If z > 0 Then
-                                    pppp.item(it).BackSpaceNchars w3, w4 + CLng(z), CLng(z)
+                                If Z > 0 Then
+                                    pppp.item(it).BackSpaceNchars w3, w4 + CLng(Z), CLng(Z)
                                 End If
                                 If w3 < 1 Then w3 = 1
                                 If Len(s$) > 0 Then pppp.item(it).InsertDoc w3, w4, s$
@@ -20665,7 +20625,7 @@ End With
 End Sub
 Function ProcSave(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim pa$, W$, s$, Col As Long, prg$, x1 As Long, par As Boolean, i As Long, noUse As Long, lcl As Boolean
-Dim askme As Boolean, k As Long, M As Long
+Dim askme As Boolean, K As Long, M As Long
 If lckfrm <> 0 Then MyEr "Save is locked", "« ·ÔËﬁÍÂıÛÁ ÂﬂÌ·È ÍÎÂÈ‰˘Ï›ÌÁ": rest$ = vbNullString: Exit Function
 lcl = IsLabelSymbolNew(rest$, "‘œ–… ¡", "LOCAL", Lang) Or basestack.IamChild Or basestack.IamAnEvent
 
@@ -20706,10 +20666,10 @@ If x1 <> 0 Then
                                 If Not blockCheck(sbf(Col).sb, DialogLang, noUse, "Function " + s$ + "()" + vbCrLf) Then Exit Function
                                 If sbf(Col).IamAClass Then
 
-                                k = InStr(sbf(Col).sb, vbCrLf)
+                                K = InStr(sbf(Col).sb, vbCrLf)
                                 M = rinstr(sbf(Col).sb, vbCrLf + vbCrLf)
-                                k = InStr(k + 1, sbf(Col).sb, "{")
-                                prg$ = "CLASS " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, k + 3, M - k - 3) + vbCrLf + prg$
+                                K = InStr(K + 1, sbf(Col).sb, "{")
+                                prg$ = "CLASS " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, K + 3, M - K - 3) + vbCrLf + prg$
                                
                                
                                 Else
@@ -20723,10 +20683,10 @@ If x1 <> 0 Then
                         Else
                                 If Not blockCheck(sbf(Col).sb, DialogLang, noUse, "”ıÌ‹ÒÙÁÛÁ " + s$ + "()" + vbCrLf) Then Exit Function
                                 If sbf(Col).IamAClass Then
-                                k = InStr(sbf(Col).sb, vbCrLf)
+                                K = InStr(sbf(Col).sb, vbCrLf)
                                 M = rinstr(sbf(Col).sb, vbCrLf + vbCrLf)
-                                k = InStr(k + 1, sbf(Col).sb, "{")
-                                prg$ = " À¡”« " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, k + 3, M - k - 3) + vbCrLf + prg$
+                                K = InStr(K + 1, sbf(Col).sb, "{")
+                                prg$ = " À¡”« " + Left$(sbf(Col).goodname, Len(sbf(Col).goodname) - 2) + " {" + Mid$(sbf(Col).sb, K + 3, M - K - 3) + vbCrLf + prg$
                                 Else
                                 prg$ = s$ + " {" + sbf(Col).sb + "}" + vbCrLf + prg$
                                 If lcl Then
@@ -24100,7 +24060,7 @@ End Function
 
 Function GetData(bstack As basetask, rest$, obj As Object) As Boolean
 Dim s$, p As Variant, usehandler As mHandler ', vvl As Variant, photo As Object
-Set obj = New mStiva
+Set obj = NewmStiva
 Dim soros As mStiva
 Set soros = obj
 GetData = True
@@ -28153,7 +28113,7 @@ End If
     Else
       
        Set ObjectCatalog = New FastCollection
-       Dim cr As New cRegistry, first$, k As Long
+       Dim cr As New cRegistry, first$, K As Long
        Dim bFoundExeSect As Boolean, ss$, mmdir As New recDir
        '' some code here are copies from VbScriptEditor
        '' http://www.codeproject.com/Articles/19986/VbScript-Editor-With-Intellisense
@@ -30744,9 +30704,9 @@ Exit Function
 End Function
 
 Private Property Get xmlMonoNew() As XmlMono
-    Dim M As New XmlMonoInternal, z As New XmlMono
-    z.createTree M
-    Set xmlMonoNew = z
+    Dim M As New XmlMonoInternal, Z As New XmlMono
+    Z.createTree M
+    Set xmlMonoNew = Z
 End Property
 Function IsCollide(bstack As basetask, a$, r As Variant) As Boolean
 Dim R2 As Variant
@@ -30875,14 +30835,14 @@ UserName = OsInfo.UserName
 End Function
 Function IsDimension(bstack As basetask, a$, r As Variant) As Boolean
 Dim s$, pppp As mArray, ppppAny As iBoxArray, w1 As Long, p As Variant, anything As Object, pp As Variant, usehandler As mHandler
-Dim k As Long
-k = Abs(IsLabel(bstack, a$, s$))
+Dim K As Long
+K = Abs(IsLabel(bstack, a$, s$))
 Set bstack.lastobj = Nothing
-If k > 4 And k < 8 Then
+If K > 4 And K < 8 Then
 If neoGetArray(bstack, s$, ppppAny) Then
 If ppppAny.Arr Then
 If FastSymbol(a$, ")") Then
-    If k = 6 Then
+    If K = 6 Then
         IsStrExp bstack, s$ + ")", s$
     Else
         IsNumber bstack, s$ + ")", p
@@ -30890,7 +30850,7 @@ If FastSymbol(a$, ")") Then
 Else
 bstack.tmpstr = s$ + Left$(a$, 1)
   BackPort a$
-    If k = 6 Then
+    If K = 6 Then
         IsStrExp bstack, a$, s$
     Else
         IsNumber bstack, a$, p
@@ -31572,18 +31532,18 @@ Else
 End If
 End Function
 Function createAnobject(bstack As basetask, b$) As Boolean
-Dim s$, s1$, k As Integer, ob
+Dim s$, s1$, K As Integer, ob
 Set ob = Nothing
 If IsStrExp(bstack, b$, s$) Then
-k = 1
+K = 1
 End If
 If FastSymbol(b$, ",") Then
     If IsStrExp(bstack, b$, s1$) Then
-    k = k + 10
+    K = K + 10
     End If
 End If
 If FastSymbol(b$, ")") Then
-    Select Case k
+    Select Case K
     Case 1
         GetitObject ob, s$
     Case 10
@@ -31707,6 +31667,57 @@ End Function
 Function StaticNew(bstack As basetask, b$, W$, Lang As Long) As Boolean
 Dim p As Variant, ii As Long, ss$, usehandler As mHandler, H As Variant, ok As Boolean
 
+If IsLabelSymbolNew(b$, "”’Õ¡—‘«”«", "FUNCTION", Lang) Then
+Do
+    While FastSymbol(b$, "&") Or FastSymbol(b$, "."): Wend
+    Select Case IsLabel(bstack, b$, W$)
+    Case 1, 3, 4
+        If GetlocalVar(W$ + "(", ii) Then
+            GoTo baDName
+        ElseIf funid.Find(W$ + "(", ii) Then
+                GoTo BAD1
+        Else
+            W$ = here$ + "." + W$ + "()"
+            GoTo gogood
+        End If
+    Case 5, 6, 7
+        If FastSymbol(b$, ")") Then
+            If GetlocalVar(W$, ii) Then
+baDName:
+                MyEr "name used for array", "ÙÔ ¸ÌÔÏ· ˜ÒÁÛÈÏÔÔÈÂﬂÙ·È ·¸ ﬂÌ·Í·"
+                Exit Function
+            ElseIf funid.Find(W$, ii) Then
+                GoTo BAD1
+            Else
+                W$ = here$ + "." + W$ + ")"
+gogood:
+                If subHash.Find(W$, ii) Then
+                    If ii = -1 Then
+                        ' just skip
+                    Else
+BAD1:
+                        StaticNew = False
+                        MyEr "Bad name for static function", " ·Í¸ ¸ÌÔÏ· „È· ÛÙ·ÙÈÍﬁ ÛıÌ‹ÒÙÁÛÁ"
+                        Exit Function
+                    End If
+                Else
+                    subHash.ItemCreator W$, -1, True
+                End If
+            End If
+        Else
+            StaticNew = False
+            SyntaxError
+            Exit Function
+        End If
+    Case Else
+        StaticNew = False
+        SyntaxError
+        Exit Function
+    End Select
+Loop Until Not FastSymbol(b$, ",")
+StaticNew = True
+Exit Function
+Else
 If bstack.StaticCollection Is Nothing Then
 
 Set bstack.StaticCollection = New FastCollection
@@ -32030,6 +32041,7 @@ conthere:
     End Select
 aaa1:
  Loop Until Not FastSymbol(b$, ",")
+End If
 End Function
 Function MyDocument(basestack As basetask, rest$, Lang As Long, Optional alocal As Boolean) As Boolean
 Dim ss$, s$, what$, x1 As Long, i As Long, it As Long, pppp As iBoxArray
@@ -32169,52 +32181,52 @@ Dim i As Long
 i = evCom.VarIndex
 F1$ = evCom.modulename
 Set oldbstack = bstack.soros
-Dim j As Long, k As Long, s1$, S2$
+Dim j As Long, K As Long, s1$, S2$
 Dim ohere$
 ohere$ = here$
 here$ = vbNullString
 
 If evCom.Attached Then
-Set bb = New mStiva
-Set bstack.Sorosref = bb
-            PushStage bstack, False
-            If ItemIndex > -1 Then
-                bb.DataVal CVar(ItemIndex)
-            End If
-            For k = 1 To NumVar
-            If VariantIsRef(VarPtr(vrs(k))) Then
-            Select Case VarType(vrs(k))
+    Set bb = NewmStiva
+    Set bstack.Sorosref = bb
+    PushStage bstack, False
+    If ItemIndex > -1 Then
+        bb.DataVal CVar(ItemIndex)
+    End If
+    For K = 1 To NumVar
+        If VariantIsRef(VarPtr(vrs(K))) Then
+            Select Case VarType(vrs(K))
             Case vbString
-            globalvarGroup "EV" & (i + k) & "$", vrs(k)
-            bb.DataStr "EV" & (i + k) & "$"
+            globalvarGroup "EV" & (i + K) & "$", vrs(K)
+            bb.DataStr "EV" & (i + K) & "$"
             Case Is >= vbArray
             ' make it normal
-            globalvarGroup "EV" & (i + k) & "(", RetM2000array(vrs(k))
-            bb.DataStr "EV" & (i + k)
+            globalvarGroup "EV" & (i + K) & "(", RetM2000array(vrs(K))
+            bb.DataStr "EV" & (i + K)
             Case Else
-            globalvarGroup "EV" & (i + k), vrs(k)
-            bb.DataStr "EV" & (i + k)
+            globalvarGroup "EV" & (i + K), vrs(K)
+            bb.DataStr "EV" & (i + K)
             End Select
             Else
-            Select Case VarType(vrs(k))
+            Select Case VarType(vrs(K))
             Case vbString
-            bb.DataStr CStr(vrs(k))
+            bb.DataStr CStr(vrs(K))
             Case Is >= vbArray
             ' make it normal
-                Set ohelp = RetM2000array(vrs(k))
+                Set ohelp = RetM2000array(vrs(K))
                 bb.DataObj ohelp
                 Set ohelp = Nothing
             Case Else
-                If MyIsObject(vrs(k)) Then
-                    Set ohelp = vrs(k)
+                If MyIsObject(vrs(K)) Then
+                    Set ohelp = vrs(K)
                     bb.DataObj ohelp
                     Set ohelp = Nothing
                 Else
-                    bb.DataVal vrs(k)
+                    bb.DataVal vrs(K)
                 End If
             End Select
             End If
-            Next k
+            Next K
             '''bb.DataObj evCom
             '' last is the second name, the class name??
             bb.DataStr what$
@@ -32237,21 +32249,21 @@ Set bstack.Sorosref = bb
             End If
                   here$ = vbNullString
                   If NumVar > 0 Then
-       For k = LBound(vrs()) To UBound(vrs()) - 1
-       Select Case VarType(vrs(k))
+       For K = LBound(vrs()) To UBound(vrs()) - 1
+       Select Case VarType(vrs(K))
        Case vbString
-            GetlocalVar "EV" & (i + k) & "$", j
-            vrs(k) = var(j)
+            GetlocalVar "EV" & (i + K) & "$", j
+            vrs(K) = var(j)
        Case Is >= vbArray
-            GetlocalVar "EV" & (i + k) & "(", j
-            RetComArray var(j), vrs(k)
+            GetlocalVar "EV" & (i + K) & "(", j
+            RetComArray var(j), vrs(K)
        
         Case Else
-            GetlocalVar "EV" & (i + k), j
-             vrs(k) = var(j)
+            GetlocalVar "EV" & (i + K), j
+             vrs(K) = var(j)
             End Select
            
-            Next k
+            Next K
             End If
             PopStage bstack
 
@@ -32263,6 +32275,7 @@ conthere:
 Set bstack.Sorosref = oldbstack
 here$ = ohere$
 Set oldbstack = Nothing
+bb.Recycle
 Set bb = Nothing
 extreme = extr
 trace = tr
@@ -35218,7 +35231,7 @@ Function ExecuteGroupStruct(bstack As basetask, ohere$, vvv As Long, rest$, ByVa
 Dim W$, w1$, p As Variant, H, v As Long, s$, ss$, b$, i As Long, lcl As Boolean, j As Long, nm$, x1 As Long, y1 As Long, frm$, skip As Boolean
 Dim uni As Boolean, prv As Boolean, stripstack1 As New basetask, hlp As String, vl As String, NoRec As Boolean, Final As Boolean
 Dim highpriority As Boolean, ThisGroup As Group, RightAssociative As Boolean, removebypass As Boolean, c As Constant
-Dim usehandler As mHandler, usehandler2 As mHandler, it As Long, classfun As Boolean, zeroitem As Object, k As Long
+Dim usehandler As mHandler, usehandler2 As mHandler, it As Long, classfun As Boolean, zeroitem As Object, K As Long
 Dim Code As Long
 Const TT$ = "=-+*/<!,{" + vbCr
 If Trim$(rest$) = vbNullString Then
@@ -36441,8 +36454,8 @@ grerror:
         End If
 cont111:
         f$ = "=" + bstack.GroupName + W$ + "()"
-        k = -1
-        j = IsLabelAnew(here$, rest$, W$, k)
+        K = -1
+        j = IsLabelAnew(here$, rest$, W$, K)
         If j = 8 Then
         If IsExp(bstack, Mid$(f$, 2), p) Then
                 Set p = bstack.lastobj
@@ -36456,7 +36469,7 @@ cont111:
             End If
             GoTo continuehere
         Else
-            rest$ = Mid$(rest$, k)
+            rest$ = Mid$(rest$, K)
             If (j And 3) = 0 Then Exit Do
             
             If j And 7 = 3 Then W$ = Replace(W$, "$", "")
@@ -36481,10 +36494,10 @@ cont111:
         End If
         f$ = "=" + W$ + "()"
 foundit:
-        k = -1
-        j = IsLabelAnew(here$, rest$, W$, k)
+        K = -1
+        j = IsLabelAnew(here$, rest$, W$, K)
         If j <> 8 Then
-        rest$ = Mid$(rest$, k)
+        rest$ = Mid$(rest$, K)
         Else
             If IsExp(bstack, Mid$(f$, 2), p) Then
                 Set p = bstack.lastobj

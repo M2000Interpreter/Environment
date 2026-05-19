@@ -15,7 +15,7 @@ Option Explicit
 Private mstack As New Collection
 Private mMany As Long
 Dim BeginFrom As Long
-Public Index As Long
+Public index As Long
 
 Public Function IsEmpty() As Boolean
 IsEmpty = mstack.Count = 0
@@ -95,11 +95,11 @@ End If
 Inc
 End Sub
 Public Function CopyMe() As mStiva
-Set CopyMe = New mStiva
+Set CopyMe = NewmStiva
 CopyMe.Copy2TopNItems2FromStiva Me.Total, Me
 End Function
 Public Function CopyMe2(ByVal many As Long) As mStiva
-Set CopyMe2 = New mStiva
+Set CopyMe2 = NewmStiva
 If many < 0 Then
 many = -many
 CopyMe2.Copy2BottomNItems2FromStiva many, Me
@@ -329,12 +329,10 @@ End Sub
 Public Sub Flush()
 Dim num As Long, aa As VarItem
 For num = 1 To mstack.Count
-dec
-  Set aa = mstack(1)
-   mstack.Remove 1
-  aa.Recycle
-  
- 
+    dec
+    Set aa = mstack(1)
+    mstack.Remove 1
+    aa.Recycle
 Next num
 mMany = 0
 End Sub
@@ -624,7 +622,7 @@ End Sub
 Public Sub Begin(from As Long)
 BeginFrom = from
 End Sub
-Public Sub additem(ByRef a As String)
+Public Sub AddItem(ByRef a As String)
 Dim aa As VarItem
 Set aa = NewVarItem()
     aa.Typename = "S"
@@ -763,7 +761,7 @@ With ExportArray
     .myarrbase = 0
     .PushDim (items)
     .PushEnd
-    .arr = True
+    .Arr = True
 
 
 For i = 1 To items
@@ -794,7 +792,6 @@ Inc
 Loop Until a.Total < 1
 End If
 End Sub
-
 
 
 Private Sub Class_Terminate()
@@ -850,15 +847,15 @@ Set myobject2 = mygroup2
 End Sub
 Function Copy() As mStiva
 Dim i As Long
-Set Copy = New mStiva
+Set Copy = NewmStiva
 For i = Total To 1 Step -1
 Copy.PushStr Me.StackItem(i)
 Next i
 End Function
 Property Get Value() As Variant
 Dim aa As VarItem
-If Index >= 0 And Index < mMany Then
-    Set aa = mstack.item(Index + 1)
+If index >= 0 And index < mMany Then
+    Set aa = mstack.item(index + 1)
     If aa.slot = 1 Then
         Set Value = aa.mItem
     Else
@@ -868,8 +865,8 @@ End If
 End Property
 Function IsObj() As Boolean
 Dim aa As VarItem
-If Index >= 0 And Index < mMany Then
-    Set aa = mstack.item(Index + 1)
+If index >= 0 And index < mMany Then
+    Set aa = mstack.item(index + 1)
     If aa.slot = 1 Then
         IsObj = True
     End If
@@ -877,8 +874,8 @@ End If
 End Function
 Function IsObjAt(curitem As Long, peekvalue) As Boolean
 Dim aa As VarItem
-If Index >= 0 And Index < mMany Then
-    Set aa = mstack.item(Index + 1)
+If index >= 0 And index < mMany Then
+    Set aa = mstack.item(index + 1)
     If aa.slot = 1 Then
         Set peekvalue = aa.ObjectRef
         IsObjAt = True
@@ -888,8 +885,8 @@ End If
 End Function
 Function IsEnum(p As Variant) As Boolean
 Dim aa As VarItem, usehandler As mHandler
-If Index >= 0 And Index < mMany Then
-    Set aa = mstack.item(Index + 1)
+If index >= 0 And index < mMany Then
+    Set aa = mstack.item(index + 1)
     If aa.slot = 1 Then
         If Typename(aa.mItem) = "mHandler" Then
             Set usehandler = aa.mItem
@@ -928,4 +925,18 @@ For i = item To thisstiva.Count
 Next i
 End Sub
 
-
+Public Sub Recycle()
+    Dim obj As IUnknown, GetRefCount As Long
+    Set obj = Me
+    CopyMemory GetRefCount, ByVal (ObjPtr(obj)) + 4, 4
+    If GetRefCount > 4 Then Exit Sub
+    On Error Resume Next
+    Me.Flush
+    index = 0
+    BeginFrom = 0
+    TrushCount2 = TrushCount2 + 1
+    If TrushCount2 > UBound(Trush2) Then
+        ReDim Preserve Trush2(UBound(Trush2) * 2)
+    End If
+    Set Trush2(TrushCount2) = Me
+End Sub

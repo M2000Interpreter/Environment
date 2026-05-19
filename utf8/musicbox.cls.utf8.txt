@@ -174,19 +174,17 @@ again:
     volume = 0
     BypassGate = -1
     If PlayTuneMIDI(Channel, octava, lNote, BE, BE2, volume, BypassGate, m_scale, feedback, rvol1, lvol1) And Not mute Then
-
-      '      Debug.Print Channel, octava, lNote, BE, BE2, volume, BypassGate, m_scale, feedback
         If feedback = 1 Then
             gl_volume = volume ' we have to restore that
             gl_octava = octava
             MusicBoxScale(Channel1plus) = m_scale
             MusicBoxVolume(Channel1plus) = volume
             o_gate = GatePerCent(Channel)
-             If BypassGate <> -1 Then
+            If BypassGate <> -1 Then
                 If BypassGate < 100 Then
                     GatePerCent(Channel) = BypassGate / 100
                 End If
-             End If
+            End If
             GoTo again
         ElseIf feedback = 2 Then
             MusicBoxScale(Channel1plus) = 1

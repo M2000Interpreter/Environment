@@ -1,10 +1,10 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Any)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Any)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
 Public Const KEYEVENTF_KEYUP = &H2
 Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
@@ -55,7 +55,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -341,10 +341,10 @@ Public Function LowLong(ByVal p) As Long
     LowLong = MemLong(VarPtr(p) + 8)
 End Function
 Function Hex64$(a, Optional bytes = 8)
-    Dim p, P1, z
-    z = cInt64(a)
-    p = MemLong(VarPtr(z) + 8)
-    P1 = MemLong(VarPtr(z) + 12)
+    Dim p, P1, Z
+    Z = cInt64(a)
+    p = MemLong(VarPtr(Z) + 8)
+    P1 = MemLong(VarPtr(Z) + 12)
     Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
 End Function
 Public Function OneLongLong() As Variant
@@ -872,7 +872,7 @@ If cDibbuffer0.hDIb = 0 Then Exit Function
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim a As Single, b As Single, k As Single, r As Single
+Dim a As Single, b As Single, K As Single, r As Single
 Dim br As Byte, bG As Byte, bbb As Byte ', ba$
 Dim BR1 As Byte, BG1 As Byte, bbb1 As Byte, ppBa As Long
 BR1 = 255 * ((100 - Alpha) / 100#)
@@ -892,14 +892,14 @@ Dim pw As Long, ph As Long
     piw = cDibbuffer0.Width
     pih = cDibbuffer0.Height
     r = Atn(CSng(piw) / CSng(pih)) + Pi / 2#
-     k = Fix(Abs((piw / Cos(r) / 2) * zoomfactor) + 0.5)
+     K = Fix(Abs((piw / Cos(r) / 2) * zoomfactor) + 0.5)
 
 Dim cDIBbuffer1 As Object
  Dim olddpix As Long, olddpiy As Long
  olddpix = cDibbuffer0.dpix
  olddpiy = cDibbuffer0.dpiy
- myw = 2 * k
-myh = 2 * k
+ myw = 2 * K
+myh = 2 * K
 
     pw = cDibbuffer0.Width
     ph = cDibbuffer0.Height
@@ -946,7 +946,7 @@ On Error Resume Next
     pws = pw
     phs = ph
     r = Atn(CSng(myw) / CSng(myh))
-    k = -myw / (2# * Sin(r))
+    K = -myw / (2# * Sin(r))
     
 
        x_step2 = CLng(Fix(Cos(Angle! + Pi / 2) * pw))
@@ -954,8 +954,8 @@ On Error Resume Next
 
     x_step = CLng(Fix(Cos(Angle!) * pw))
     y_step = CLng(Fix(Sin(Angle!) * ph))
-  image_x = CLng(Fix(pw / 2 - Fix(k * Sin(Angle! - r)))) * pw
-   image_y = CLng(Fix(ph / 2 + Fix(k * Cos(Angle! - r)))) * ph
+  image_x = CLng(Fix(pw / 2 - Fix(K * Sin(Angle! - r)))) * pw
+   image_y = CLng(Fix(ph / 2 + Fix(K * Cos(Angle! - r)))) * ph
 Dim pw1out As Long, ph1out As Long, pwOut As Long, phOut As Long, much As Single
 ''Dim cw1 As Long, ch1 As Long, outf As Single, fadex As Long, fadey As Long, outf1 As Single, outf2 As Single
 pw1 = pw1 - 1
@@ -1159,7 +1159,7 @@ Public Sub RotateDibNew(cDibbuffer0 As cDIBSection, Optional ByVal Angle! = 0, _
         Optional ByVal zoomfactor As Single = 1, Optional bckColor As Long = &HFFFFFF)
 Const Pi = 3.14159!
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim k As Single, r As Single
+Dim K As Single, r As Single
 Dim br As Byte, bG As Byte, bbb As Byte, ppBa As Long
 Dim bDib() As Byte, bDib1() As Byte
 Dim tSA As SAFEARRAY2D
@@ -1189,7 +1189,7 @@ GetMem1 ppBa + 2, br
 piw = cDibbuffer0.Width
 pih = cDibbuffer0.Height
 r = Atn(piw / pih) + Pi / 2!
-k = Abs((piw / Cos(r) / 2!) * zoomfactor)
+K = Abs((piw / Cos(r) / 2!) * zoomfactor)
 Dim cDIBbuffer1 As Object
 Set cDIBbuffer1 = New cDIBSection
 If piw <= 1 Then piw = 2
@@ -1199,8 +1199,8 @@ cDIBbuffer1.GetDpiDIB cDibbuffer0
 cDibbuffer0.needHDC
 cDIBbuffer1.LoadPictureStretchBlt cDibbuffer0.HDC1, , , , , pix, piy, piw, pih
 cDibbuffer0.FreeHDC
-myw = Fix(2 * k)
-myh = Fix(2 * k)
+myw = Fix(2 * K)
+myh = Fix(2 * K)
 cDibbuffer0.ClearUp
 If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
     On Error Resume Next
@@ -1232,7 +1232,7 @@ If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
     ph = cDIBbuffer1.Height
 
     r = Atn(CSng(myw) / CSng(myh))
-    k = -CSng(myw) / (2! * Sin(r))
+    K = -CSng(myw) / (2! * Sin(r))
   
     Const pidicv2 = 1.570795!
     pw1 = pw + 1
@@ -1240,8 +1240,8 @@ If cDibbuffer0.create(CLng(myw), CLng(myh)) Then
    
     pws = pw1 * zoomfactor
     phs = ph1 * zoomfactor
-    image_x = ((pws - zoomfactor - b) / 2 - (k * Sin(Angle! - r))) * pw
-    image_y = ((phs - zoomfactor - b) / 2 + (k * Cos(Angle! - r))) * ph
+    image_x = ((pws - zoomfactor - b) / 2 - (K * Sin(Angle! - r))) * pw
+    image_y = ((phs - zoomfactor - b) / 2 + (K * Cos(Angle! - r))) * ph
     image_x = image_x - MyMod(image_x, CSng(dv15))
     image_y = image_y - MyMod(image_y, CSng(dv15))
    
@@ -1390,7 +1390,7 @@ End If
 
 
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim k As Single, r As Single, ppBa As Long
+Dim K As Single, r As Single, ppBa As Long
 Dim br As Byte, bG As Byte, bbb As Byte, ba$
 Dim BR1 As Byte, BG1 As Byte, bbb1 As Byte
 ppBa = VarPtr(bckColor)
@@ -1463,15 +1463,15 @@ Dim tSA2 As SAFEARRAY2D
     phs = ph * zoomfactor
     
     r = Atn(CSng(myw) / CSng(myh))
-    k = -CSng(myw) / (2! * Sin(r))
+    K = -CSng(myw) / (2! * Sin(r))
     
     x_step = Cos(Angle!) * pw
     y_step = Sin(Angle!) * ph
 
     x_step2 = Cos(Angle! + pidicv2) * pw
     y_step2 = Sin(Angle! + pidicv2) * ph
-  image_x = ((pws - b) / 2 - (k * Sin(Angle! - r))) * pw
-   image_y = ((phs - b) / 2 + (k * Cos(Angle! - r))) * ph
+  image_x = ((pws - b) / 2 - (K * Sin(Angle! - r))) * pw
+   image_y = ((phs - b) / 2 + (K * Cos(Angle! - r))) * ph
       image_x = image_x - MyMod(image_x, CSng(dv15))
    image_y = image_y - MyMod(image_y, CSng(dv15))
   pws = pws + 1
@@ -1585,7 +1585,7 @@ Angle! = -MyMod(Angle!, 360!) * 1.745329E-02!
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100!
 Dim myw As Single, myh As Single, piw As Long, pih As Long, pix As Long, piy As Long
-Dim k As Single, r As Single, scNow As Integer
+Dim K As Single, r As Single, scNow As Integer
 Const pidicv2 = 1.570795!
 'If zoomfactor = 1 And angle! = 0 Then Exit Function
     piw = cDibbuffer0.Width
@@ -1657,7 +1657,7 @@ Dim tSA2 As SAFEARRAY2D
      pw = piw
     ph = pih
     r = Atn(CSng(myw) / CSng(myh))
-    k = -myw / (2! * Sin(r))
+    K = -myw / (2! * Sin(r))
   
     Dim pw1 As Long, ph1 As Long
     
@@ -1668,8 +1668,8 @@ Dim tSA2 As SAFEARRAY2D
    
          pws = pw1 * zoomfactor
     phs = ph1 * zoomfactor
-  image_x = ((pws - zoomfactor - b) / 2 - (k * Sin(Angle! - r))) * pw
-   image_y = ((phs - zoomfactor - b) / 2 + (k * Cos(Angle! - r))) * ph
+  image_x = ((pws - zoomfactor - b) / 2 - (K * Sin(Angle! - r))) * pw
+   image_y = ((phs - zoomfactor - b) / 2 + (K * Cos(Angle! - r))) * ph
    image_x = image_x - MyMod(image_x, CSng(dv15))
    image_y = image_y - MyMod(image_y, CSng(dv15))
    x_step2 = Cos(Angle! + pidicv2) * pw
@@ -1762,12 +1762,12 @@ Call SetWindowRgn(.hWnd, (0), False)
 End With
 End Sub
 Public Function RotateRegion(hRgn As Long, Angle As Single, ByVal piw As Long, ByVal pih As Long, ByVal Size As Single) As Long
-Dim k As Single, r As Single, aa As Single
+Dim K As Single, r As Single, aa As Single
 aa = (CLng(Angle! * 100) Mod 36000) / 100
 
 Angle! = -Angle * 1.74532925199433E-02
    r = Atn(piw / CSng(pih)) + Pi / 2!
-    k = piw / Cos(r)
+    K = piw / Cos(r)
     Dim myw As Long, myh As Long
  myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * Size, 0)
 myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * Size, 0)
@@ -1780,10 +1780,10 @@ hRgn = ScaleRegion(hRgn, Size)
     uXF.eM12 = Sin(Angle!)
     uXF.eM21 = -Sin(Angle!)
     uXF.eM22 = Cos(Angle!)
-k = Abs(k)
+K = Abs(K)
 
-uXF.eDx = Round(k * Cos(Angle! - r) / 2! + k / 2!, 0)
-uXF.eDy = Round(k * Sin(Angle! - r) / 2! + k / 2!, 0)
+uXF.eDx = Round(K * Cos(Angle! - r) / 2! + K / 2!, 0)
+uXF.eDy = Round(K * Sin(Angle! - r) / 2! + K / 2!, 0)
 
 
     rSize = GetRegionData(hRgn, rSize, ByVal 0&)
@@ -1894,21 +1894,21 @@ SetText Form1.dSprite(PobjNum)
 End If
 
 End If
-Dim i As Long, k As Integer
+Dim i As Long, K As Integer
 
 For i = Priority To 32
-k = FindSpriteByTag(i)
-If k <> 0 Then Form1.dSprite(k).ZOrder 0
+K = FindSpriteByTag(i)
+If K <> 0 Then Form1.dSprite(K).ZOrder 0
 Next i
 
 
 End Function
 Function CollidePlayers(Priority As Long, Percent As Long) As Long
-Dim i As Long, k As Integer, suma As Long
+Dim i As Long, K As Integer, suma As Long
 Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, it As Long
-k = FindSpriteByTag(Priority)
-If k = 0 Then Exit Function
-With Form1.dSprite(k)
+K = FindSpriteByTag(Priority)
+If K = 0 Then Exit Function
+With Form1.dSprite(K)
 it = val("0" & .Tag)
 x1 = .Left + .Width * (100 - Percent) / 200 - players(it).HotSpotX
 y1 = .Top + .Height * (100 - Percent) / 200 - players(it).HotSpotY
@@ -1916,9 +1916,9 @@ x2 = .Left + .Width * (1 - (100 - Percent) / 200) - players(it).HotSpotX
 y2 = .Top + .Height * (1 - (100 - Percent) / 200) - players(it).HotSpotY
 End With
 For i = Priority - 1 To 1 Step -1
-k = FindSpriteByTag(i)
-If k <> 0 Then
-    With Form1.dSprite(k)
+K = FindSpriteByTag(i)
+If K <> 0 Then
+    With Form1.dSprite(K)
         If (x2 < .Left + .Width / 4) Or (x1 >= .Left + .Width * 3 / 4) Or (y2 <= .Top + .Height / 4) Or (y1 > .Top + .Height * 3 / 4) Then
         Else
         suma = suma + 2 ^ (i - 1)
@@ -1929,10 +1929,10 @@ Next i
 CollidePlayers = suma
 End Function
 Function SpriteVisible(Priority As Long) As Boolean
-Dim k As Long
-    k = FindSpriteByTag(Priority)
-    If k = 0 Then Exit Function
-    SpriteVisible = Form1.dSprite(k).Visible
+Dim K As Long
+    K = FindSpriteByTag(Priority)
+    If K = 0 Then Exit Function
+    SpriteVisible = Form1.dSprite(K).Visible
 End Function
 Function CollideArea(Priority As Long, Percent As Long, basestack As basetask, rest$) As Boolean
 ' nx2 isn't width but absolute line at nx2
@@ -1952,13 +1952,13 @@ End If
 End If
 
 
-Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, k As Long
-k = FindSpriteByTag(Priority)
-If k = 0 Then Exit Function
-x1 = Form1.dSprite(k).Left + Form1.dSprite(k).Width * (100 - Percent) / 200
-y1 = Form1.dSprite(k).Top + Form1.dSprite(k).Height * (100 - Percent) / 200
-x2 = x1 + Form1.dSprite(k).Width * (1 - 2 * (100 - Percent) / 200)
-y2 = y1 + Form1.dSprite(k).Height * (1 - 2 * (100 - Percent) / 200)
+Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, K As Long
+K = FindSpriteByTag(Priority)
+If K = 0 Then Exit Function
+x1 = Form1.dSprite(K).Left + Form1.dSprite(K).Width * (100 - Percent) / 200
+y1 = Form1.dSprite(K).Top + Form1.dSprite(K).Height * (100 - Percent) / 200
+x2 = x1 + Form1.dSprite(K).Width * (1 - 2 * (100 - Percent) / 200)
+y2 = y1 + Form1.dSprite(K).Height * (1 - 2 * (100 - Percent) / 200)
 If x2 < nx1 Or x1 >= nx2 Or y2 <= ny1 Or y1 > ny2 Then
 CollideArea = False
 Else
@@ -1984,64 +1984,64 @@ On Error Resume Next
 .ZOrder 0
 End With
 GetNewLayerObj = PobjNum
-Dim i As Long, k As Integer
+Dim i As Long, K As Integer
 For i = Priority To 32
-k = FindSpriteByTag(i)
-If k <> 0 Then Form1.dSprite(k).ZOrder 0
+K = FindSpriteByTag(i)
+If K <> 0 Then Form1.dSprite(K).ZOrder 0
 Next i
 End If
 End Function
 
 Function PosSpriteX(aPrior As Long) As Long ' before take from priority the original sprite
 '
-Dim k As Long
-k = FindSpriteByTag(aPrior)
-If k < 1 Or k > PobjNum Then Exit Function
-PosSpriteX = Form1.dSprite(k).Left
+Dim K As Long
+K = FindSpriteByTag(aPrior)
+If K < 1 Or K > PobjNum Then Exit Function
+PosSpriteX = Form1.dSprite(K).Left
 End Function
 Function PosSpriteY(aPrior As Long) As Long ' before take from priority the original sprite
-Dim k As Long
-k = FindSpriteByTag(aPrior)
-If k < 1 Or k > PobjNum Then Exit Function
- PosSpriteY = Form1.dSprite(k).Top
+Dim K As Long
+K = FindSpriteByTag(aPrior)
+If K < 1 Or K > PobjNum Then Exit Function
+ PosSpriteY = Form1.dSprite(K).Top
 End Function
 
 Sub PosSprite(aPrior As Long, ByVal X As Long, ByVal Y As Long) ' ' before take from priority the original sprite
-Dim k As Long
-k = FindSpriteByTag(aPrior)
-If k < 1 Or k > PobjNum Then Exit Sub
+Dim K As Long
+K = FindSpriteByTag(aPrior)
+If K < 1 Or K > PobjNum Then Exit Sub
  
 
-Form1.dSprite(k).move X, Y
+Form1.dSprite(K).move X, Y
 
 End Sub
 Sub SrpiteHideShow(ByVal aPrior As Long, ByVal wh As Boolean) ' this is a priority
 On Error Resume Next
-Dim k As Long
-k = FindSpriteByTag(aPrior)
-If k < 1 Or k > PobjNum Then Exit Sub
-Form1.dSprite(k).Visible = wh
+Dim K As Long
+K = FindSpriteByTag(aPrior)
+If K < 1 Or K > PobjNum Then Exit Sub
+Form1.dSprite(K).Visible = wh
 If wh Then
 If Form1.Visible Then
-MyDoEvents1 Form1.dSprite(k)
+MyDoEvents1 Form1.dSprite(K)
 End If
 End If
 End Sub
 Sub SpriteControl(ByVal aPrior As Long, ByVal bPrior As Long) ' these are priorities
-Dim k As Long, M As Long, i As Long
-k = FindSpriteByTag(aPrior)
+Dim K As Long, M As Long, i As Long
+K = FindSpriteByTag(aPrior)
 
-If k = 0 Then Exit Sub  ' there is no such a player
+If K = 0 Then Exit Sub  ' there is no such a player
 
     M = FindSpriteByTag(bPrior)
         If M = 0 Then Exit Sub
-        Form1.dSprite(k).Tag = bPrior
+        Form1.dSprite(K).Tag = bPrior
         Form1.dSprite(M).Tag = aPrior
         
     If aPrior < bPrior Then
     For i = aPrior To 32
-        k = FindSpriteByTag(i)
-        If k <> 0 Then Form1.dSprite(k).ZOrder 0
+        K = FindSpriteByTag(i)
+        If K <> 0 Then Form1.dSprite(K).ZOrder 0
     Next i
     Else
     For i = bPrior To 32
@@ -2051,10 +2051,10 @@ If k = 0 Then Exit Sub  ' there is no such a player
 End If
 End Sub
 Sub SpriteControlOver(ByVal aPrior As Long, ByVal bPrior As Long) ' these are priorities
-Dim k As Long, M As Long, i As Long, LL As Long
-k = FindSpriteByTag(aPrior)
+Dim K As Long, M As Long, i As Long, LL As Long
+K = FindSpriteByTag(aPrior)
 
-If k = 0 Then Exit Sub  ' there is no such a player
+If K = 0 Then Exit Sub  ' there is no such a player
 
     LL = FindSpriteByTag(bPrior)
         If LL = 0 Then Exit Sub
@@ -2068,9 +2068,9 @@ If k = 0 Then Exit Sub  ' there is no such a player
             aPrior = bPrior
         End If
     Next i
-    Form1.dSprite(k).ZOrder 0
-    bPrior = Form1.dSprite(k).Tag
-    Form1.dSprite(k).Tag = aPrior
+    Form1.dSprite(K).ZOrder 0
+    bPrior = Form1.dSprite(K).Tag
+    Form1.dSprite(K).Tag = aPrior
     For i = LL To 32
         M = FindSpriteByTag(i)
         If M <> 0 Then
@@ -2080,15 +2080,15 @@ If k = 0 Then Exit Sub  ' there is no such a player
 
 End Sub
 Sub SpriteControlUnder(ByVal aPrior As Long, ByVal bPrior As Long) ' these are priorities
-Dim k As Long, M As Long, i As Long, LL As Long
-k = FindSpriteByTag(aPrior)
+Dim K As Long, M As Long, i As Long, LL As Long
+K = FindSpriteByTag(aPrior)
 
-If k = 0 Then Exit Sub  ' there is no such a player
+If K = 0 Then Exit Sub  ' there is no such a player
 
     LL = FindSpriteByTag(bPrior)
         If LL = 0 Then Exit Sub
     LL = bPrior - 1
-     For i = k - 1 To LL Step -1
+     For i = K - 1 To LL Step -1
         M = FindSpriteByTag(i)
         If M <> 0 Then
             Form1.dSprite(M).ZOrder 1
@@ -2097,9 +2097,9 @@ If k = 0 Then Exit Sub  ' there is no such a player
             aPrior = bPrior
         End If
     Next i
-    Form1.dSprite(k).ZOrder 1
-    bPrior = Form1.dSprite(k).Tag
-    Form1.dSprite(k).Tag = aPrior
+    Form1.dSprite(K).ZOrder 1
+    bPrior = Form1.dSprite(K).Tag
+    Form1.dSprite(K).Tag = aPrior
     For i = LL To 1 Step -1
         M = FindSpriteByTag(i)
         If M <> 0 Then
@@ -2397,12 +2397,10 @@ For i = 1 To Len(ss1$) - 1
         note = InStr(Face$, UCase(v$))
     End If
     If note = 25 Then
-   '     Debug.Print "silence", beeperBEAT / 2
        If silence Then
             Sleep beeperBEAT
         Else
             silence = True
-   '         Debug.Print "Sleep " & beeperBEAT + beeperBEAT / 2
         End If
     Else
         If note = 0 Then note = InStr(Face$, UCase(Left$(v$, 1)) + "_") Else i = i + 1
@@ -2582,7 +2580,6 @@ Case Else
         probe2play = InStr(Face$, UCase(v$))
     End If
 End Select
-''Debug.Print v$ + ".", probe2play, Len(voices(Ch)), "?" + voices(Ch) + "?"
 doted = 0
 If probe2play = 25 Then
     note2play = 24
@@ -3563,13 +3560,13 @@ Dim t(0 To 3) As Long
    CopyMemory ByVal a, t(0), 2
 End Sub
 Sub VarByRefClean(ByVal a As Long)
-Static z As Variant
-CopyMemory ByVal a, z, 16
+Static Z As Variant
+CopyMemory ByVal a, Z, 16
 End Sub
 Function VariantIsRef(ByVal a As Long) As Boolean
-Static z As Integer
-   CopyMemory z, ByVal a, 2
-   VariantIsRef = (z And &H4000) = &H4000
+Static Z As Integer
+   CopyMemory Z, ByVal a, 2
+   VariantIsRef = (Z And &H4000) = &H4000
 End Function
 Sub SwapVariantRef(ByVal a As Long, ByVal b As Long)
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
@@ -3594,10 +3591,10 @@ Sub SwapVariant2(ByRef a As Variant, ByRef b As iBoxArray, i As Long)
    CopyMemory ByVal VarPtr(a), ByVal b.itemPtr(i), 16
    CopyMemory ByVal b.itemPtr(i), t(0), 16
 End Sub
-Sub SwapVariant3(ByRef a As mArray, k As Long, ByRef b As iBoxArray, i As Long)
+Sub SwapVariant3(ByRef a As mArray, K As Long, ByRef b As iBoxArray, i As Long)
    Static t(0 To 3) As Long ' 4 Longs * 4 bytes each = 16 bytes
-   CopyMemory t(0), ByVal a.itemPtr(k), 16
-   CopyMemory ByVal a.itemPtr(k), ByVal b.itemPtr(i), 16
+   CopyMemory t(0), ByVal a.itemPtr(K), 16
+   CopyMemory ByVal a.itemPtr(K), ByVal b.itemPtr(i), 16
    CopyMemory ByVal b.itemPtr(i), t(0), 16
 End Sub
 Sub EmptyVariantArrayItem(ByRef b As iBoxArray, i As Long)
@@ -5358,7 +5355,4 @@ If bytes Then
     Set basestack.lastobj = usehandler
 End If
 End Sub
-Sub testA()
-Dim a As New tuple
-Debug.Print Typename(a)
-End Sub
+

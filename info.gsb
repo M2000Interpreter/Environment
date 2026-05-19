@@ -2455,15 +2455,23 @@ MODULE RAT {Report {
 }
 Module RationalNumbers {
 	Class Rational {
-		numerator as decimal, denominator as decimal
+		numerator as decimal, denominator as decimal=1
 		gcd=lambda->0
 		lcm=lambda->0
+		module normalization  {
+			gdcval=.gcd(abs(.numerator), .denominator)
+			if gdcval<.denominator and gdcval<>0 then
+				.denominator/=gdcval
+				.numerator/=gdcval
+			end if
+		} 
 		operator "+" {
 			Read l
 			denom=.lcm(l.denominator, .denominator)
 			.numerator<=denom/l.denominator*l.numerator+denom/.denominator*.numerator
 			if .numerator==0 then denom=1
 			.denominator<=denom
+			.normalization 
 		}
 		Operator Unary {
 			.numerator-!
@@ -2479,6 +2487,7 @@ Module RationalNumbers {
 			Push l.numerator/g1*.numerator/g2
 			Push l.denominator/g2*.denominator/g1
 			Read .denominator, .numerator
+			.normalization 
 		}
 		Function Inverse {
 			if .numerator==0 then Error "Division by zero"
@@ -2570,7 +2579,15 @@ Module RationalNumbers {
 		}
 	class:
 		Module Rational (.numerator, .denominator) {
+			boolean invert
+			def frac(x)=@frac(round(x))
 			if .denominator=0 then .denominator<=1
+			if .denominator=1 and .numerator<>0 then
+				if frac(1@/.numerator)==0 then
+					.numerator <= round(1@/.numerator, 0)
+					invert=true
+				end if
+			end if
 			while frac(.numerator)<>0 {
 				.numerator*=10@
 				.denominator*=10@
@@ -2581,9 +2598,7 @@ Module RationalNumbers {
 			gcd1=lambda (a as decimal, b as decimal) -> {
 				if a<b then swap a,b
 				g=a mod b
-				while g {
-					a=b:b=g: g=a mod b
-				}
+				while g {a=b:b=g: g=a mod b}
 				=abs(b)
 			}
 			gdcval=gcd1(abs(.numerator), .denominator)
@@ -2595,6 +2610,7 @@ Module RationalNumbers {
 			.lcm<=lambda gcd=gcd1 (a as decimal, b as decimal) -> {
 			=a/gcd(a,b)*b
 			}
+			if invert then swap .numerator, .denominator
 		}
 	}
 	Print rational(-3,3)<>rational(-3,3)  ' false
@@ -6180,7 +6196,6 @@ MODULE FORM44 {Module TryIt {
 	                           \\  (an after {}  thread creation in a thread execution is an example for a second level thread)
 	                           Rem 100 :
 	                          If random(100)<4 then  PrintAndRefresh("draw lines")
-	                          refresh
 	                  } Else Thread This Erase
 	                  } as mine
 	            } As OneMore   Interval 30
@@ -6200,12 +6215,10 @@ MODULE FORM44 {Module TryIt {
 	thread {
 		threads: refresh
 	} as showthreads interval 200
-	Main.Task 100 {
-	'Every 100 {
-	      \\ using property  \\ 
+	Main.Task 30 {
 	            Rem 1 :       Print Type$(Visible), Type$(Form1_1)
 	            If Not visible Then break
-	            if closeme  then Call Local CloseAfter()
+	            if closeme  then Call Local CloseAfter() else wait 10
 	}
 	
 	\\  Cleaning;
@@ -52227,7 +52240,7 @@ declare info information
 dos "cd "+shortdir$(dir$)+" &&  tool"
 Print "Waitiing to close the cmd.exe window..."; dos
 Escape off
-Pen 15 {Print "If you return focus to this M2000 console you can press Esc and kill the DOS wiindow"}
+Pen 15 {Print "If you return focus to this M2000 console you can press Esc and kill the DOS window"}
 Refresh
 do
         Method info ,"IsRunning", dos as zz

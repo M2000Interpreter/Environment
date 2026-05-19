@@ -75,9 +75,7 @@ mr = val("&h" & Mid$(ba$, 1, 2))
 mg = val("&h" & Mid$(ba$, 3, 2))
 mb = val("&h" & Mid$(ba$, 5, 2))
 RGBToHLS mr, mg, mb, hh, ss, LL
-'Debug.Print hh, sS, ll
 hueconvSpecial = CLng(Int(hh * 60) Mod 360)
-
 End Function
 Public Function hueconv(hr As Variant) As Long
 Dim mr As Long, mg As Long, mb As Long
@@ -89,10 +87,7 @@ mb = val("&h" & Mid$(ba$, 1, 2))
 mg = val("&h" & Mid$(ba$, 3, 2))
 mr = val("&h" & Mid$(ba$, 5, 2))
 RGBToHLS mr, mg, mb, hh, ss, LL
-'Debug.Print hh, sS, ll
-
 hueconv = Int((360 + hh * 60) Mod 360)
-
 End Function
 Public Function lightconv(hr As Variant) As Long
 Dim mr As Long, mg As Long, mb As Long
@@ -104,9 +99,7 @@ mb = val("&h" & Mid$(ba$, 1, 2))
 mg = val("&h" & Mid$(ba$, 3, 2))
 mr = val("&h" & Mid$(ba$, 5, 2))
 RGBToHLS mr, mg, mb, hh, ss, LL
-'Debug.Print hh, sS, ll
 lightconv = CLng(LL * 255)
-
 End Function
 Public Function satconv(hr As Variant) As Long
 Dim mr As Long, mg As Long, mb As Long
@@ -118,9 +111,7 @@ mb = val("&h" & Mid$(ba$, 1, 2))
 mg = val("&h" & Mid$(ba$, 3, 2))
 mr = val("&h" & Mid$(ba$, 5, 2))
 RGBToHLS mr, mg, mb, hh, ss, LL
-'Debug.Print hh, sS, ll
 satconv = CLng(LL * 255)
-
 End Function
 Public Function HSL(ByVal H, ByVal s, ByVal l) As Double
 Dim r As Long, G As Long, b As Long

@@ -255,8 +255,6 @@ If No_of_Entries > 0 Then Exit Sub
             ExifTemp(Offset_to_APP1 + 16) * 256& + _
             ExifTemp(Offset_to_APP1 + 17)
     End If
-    
-    'Debug.Print "Offset_to_IFD0: " & Offset_to_IFD0
     IsLoaded = True
     GetDirectoryEntries Offset_to_TIFF + Offset_to_IFD0
     
@@ -342,10 +340,10 @@ Private Function IsIntel() As Boolean
     
 End Function
 
-Private Function sPad(sSrc As String, nsize As Integer, sPadChar As String) As String
+Private Function sPad(sSrc As String, nSize As Integer, sPadChar As String) As String
 
-    If Len(sSrc) < nsize Then
-        sPad = String(nsize - Len(sSrc), sPadChar) & sSrc
+    If Len(sSrc) < nSize Then
+        sPad = String(nSize - Len(sSrc), sPadChar) & sSrc
     Else
         sPad = sSrc
     End If
@@ -358,7 +356,7 @@ Else
 mytemp = 0
 End If
 End Function
-Private Sub GetDirectoryEntries(offset As Long)
+Private Sub GetDirectoryEntries(Offset As Long)
     
   
     Dim Upper_IFDDirectory As Long
@@ -367,19 +365,19 @@ Private Sub GetDirectoryEntries(offset As Long)
     Dim BytesPerComponent As Long
     Dim Offset_to_MakerNote As Long
     Dim i As Long, j As Long
-    Dim k As Integer
+    Dim K As Integer
     On Error GoTo finito
    ' Do
-    k = k + 1
+    K = K + 1
   '  On Error Resume Next
         If IsIntel Then
             No_of_Entries = _
-                ExifTemp(offset + 1) * 256& + _
-                ExifTemp(offset + 0)
+                ExifTemp(Offset + 1) * 256& + _
+                ExifTemp(Offset + 0)
         Else
             No_of_Entries = _
-                ExifTemp(offset + 0) * 256& + _
-                ExifTemp(offset + 1)
+                ExifTemp(Offset + 0) * 256& + _
+                ExifTemp(Offset + 1)
                 
         End If
         If No_of_Entries > 5 Then No_of_Entries = 5
@@ -394,26 +392,24 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
         NewDimensions = Upper_IFDDirectory + No_of_Entries
         
         ReDim Preserve IFDDirectory(1 To NewDimensions) As IFD_Data
-        ' Debug.Print ">>>"; No_of_Entries
         For i = 1 To No_of_Entries
-        ' Debug.Print i
             With IFDDirectory(Upper_IFDDirectory + i)
             
                 If IsIntel Then
 
                     .Tag_No = _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 1) * 256& + _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 0)
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 1) * 256& + _
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 0)
                     If .Tag_No = 0 Then No_of_Entries = i - 1: Exit For
                     .Data_Format = _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 3) * 256& + _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 2)
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 3) * 256& + _
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 2)
                           If .Data_Format = 0 Then No_of_Entries = i - 1: Exit For
                     .Components = _
-                         256# * mytemp((offset + 2) + ((i - 1) * 12) + 7) * 256& * 256& + _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 6) * 256& * 256& + _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 5) * 256& + _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 4)
+                         256# * mytemp((Offset + 2) + ((i - 1) * 12) + 7) * 256& * 256& + _
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 6) * 256& * 256& + _
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 5) * 256& + _
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 4)
                       If .Components = 0 Then No_of_Entries = i - 1: Exit For
                     Select Case .Data_Format
                     
@@ -421,16 +417,16 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                             BytesPerComponent = 1
                             If .Components * BytesPerComponent <= 4 Then
                                 .Value = _
-                                    sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 11)), 2, "0") & _
-                                    sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 10)), 2, "0") & _
-                                    sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 9)), 2, "0") & _
-                                    sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 8)), 2, "0")
+                                    sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)), 2, "0") & _
+                                    sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 10)), 2, "0") & _
+                                    sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 9)), 2, "0") & _
+                                    sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)), 2, "0")
                             Else
                                 .Offset_To_Value = _
-                                    256# * ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                    256# * ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                                 For j = 0 To .Components - 1
                                     .Value = .Value & ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
                                 Next
@@ -440,16 +436,16 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                             BytesPerComponent = 1
                             If .Components * BytesPerComponent <= 4 Then
                                 .Value = _
-                                    Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 11)) & _
-                                    Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 10)) & _
-                                    Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 9)) & _
-                                    Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 8))
+                                    Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)) & _
+                                    Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 10)) & _
+                                    Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 9)) & _
+                                    Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 8))
                             Else
                                 .Offset_To_Value = _
-                                    256# * ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                    256# * ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                                 For j = 0 To .Components - 2
                                     .Value = .Value & Chr(ExifTemp(Offset_to_TIFF + .Offset_To_Value + j))
                                 Next
@@ -459,10 +455,10 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                             BytesPerComponent = 2
                             If .Components * BytesPerComponent <= 4 Then
                                 .Value = _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 10) + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                                 '.Value = _
                                     ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
                                     ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
@@ -470,10 +466,10 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                                     ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                             Else
                                 .Offset_To_Value = _
-                                    256# * ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                    256# * ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                                 For j = 0 To .Components - 1
                                     .Value = .Value & ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
                                 Next
@@ -483,16 +479,16 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                             BytesPerComponent = 4
                             If .Components * BytesPerComponent <= 4 Then
                                 .Value = _
-                                    256# * ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                    256# * ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                             Else
                                 .Offset_To_Value = _
-                                    256# * ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                    256# * ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                                 For j = 0 To .Components - 1
                                     .Value = .Value & ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
                                 Next
@@ -501,10 +497,10 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                         Case m_RATIONAL, m_SRATIONAL
                             BytesPerComponent = 8
                             .Offset_To_Value = _
-                                256# * ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                256# * ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                             .Value = _
                                  256# + ExifTemp(Offset_to_TIFF + .Offset_To_Value + 3) * 256& * 256& + _
                                 ExifTemp(Offset_to_TIFF + .Offset_To_Value + 2) * 256& * 256& + _
@@ -521,18 +517,18 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                 Else
                 
                    .Tag_No = _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 0) * 256& + _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 1)
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 0) * 256& + _
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 1)
                            If .Tag_No = 0 Then No_of_Entries = i - 1: Exit For
                     .Data_Format = _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 2) * 256& + _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 3)
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 2) * 256& + _
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 3)
                         If .Data_Format = 0 Then No_of_Entries = i - 1: Exit For
                     .Components = _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 4) * 256& * 256& * 256& + _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 5) * 256& * 256& + _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 6) * 256& + _
-                        mytemp((offset + 2) + ((i - 1) * 12) + 7)
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 4) * 256& * 256& * 256& + _
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 5) * 256& * 256& + _
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 6) * 256& + _
+                        mytemp((Offset + 2) + ((i - 1) * 12) + 7)
                         If .Components = 0 Then No_of_Entries = i - 1: Exit For
                     Select Case .Data_Format
                     
@@ -540,16 +536,16 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                             BytesPerComponent = 1
                             If .Components * BytesPerComponent <= 4 Then
                                 .Value = _
-                                    sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 8)), 2, "0") & _
-                                    sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 9)), 2, "0") & _
-                                    sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 10)), 2, "0") & _
-                                    sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 11)), 2, "0")
+                                    sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)), 2, "0") & _
+                                    sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 9)), 2, "0") & _
+                                    sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 10)), 2, "0") & _
+                                    sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)), 2, "0")
                             Else
                                 .Offset_To_Value = _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                                 For j = 0 To .Components - 1
                                     .Value = .Value & ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
                                 Next
@@ -559,16 +555,16 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                             BytesPerComponent = 1
                             If .Components * BytesPerComponent <= 4 Then
                                 .Value = _
-                                    Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 8)) & _
-                                    Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 9)) & _
-                                    Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 10)) & _
-                                    Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 11))
+                                    Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)) & _
+                                    Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 9)) & _
+                                    Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 10)) & _
+                                    Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 11))
                             Else
                                 .Offset_To_Value = _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                                 For j = 0 To .Components - 1
                                     .Value = .Value & Chr(ExifTemp(Offset_to_TIFF + .Offset_To_Value + j))
                                 Next
@@ -578,16 +574,16 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                             BytesPerComponent = 2
                             If .Components * BytesPerComponent <= 4 Then
                                 .Value = _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 9) + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                             Else
                                 .Offset_To_Value = _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                                 For j = .Components - 1 To 0 Step -1
                                     .Value = .Value & ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
                                 Next
@@ -597,16 +593,16 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                             BytesPerComponent = 4
                             If .Components * BytesPerComponent <= 4 Then
                                 .Value = _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                             Else
                                 .Offset_To_Value = _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                    ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                                 For j = 0 To .Components - 1
                                     .Value = .Value & ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
                                 Next
@@ -615,10 +611,10 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                         Case m_RATIONAL, m_SRATIONAL
                             BytesPerComponent = 8
                             .Offset_To_Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                             .Value = _
                                 ExifTemp(Offset_to_TIFF + .Offset_To_Value + 0) * 256& * 256& * 256& + _
                                 ExifTemp(Offset_to_TIFF + .Offset_To_Value + 1) * 256& * 256& + _
@@ -643,10 +639,10 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
         If IsIntel Then
             If Not Processed_ExifSubIFD Then
                 Offset_to_Next_IFD = _
-                    mytemp(offset + 2 + (No_of_Entries * 12) + 3) * 256& * 256& * 256& + _
-                    mytemp(offset + 2 + (No_of_Entries * 12) + 2) * 256& * 256& + _
-                    mytemp(offset + 2 + (No_of_Entries * 12) + 1) * 256& + _
-                    mytemp(offset + 2 + (No_of_Entries * 12) + 0)
+                    mytemp(Offset + 2 + (No_of_Entries * 12) + 3) * 256& * 256& * 256& + _
+                    mytemp(Offset + 2 + (No_of_Entries * 12) + 2) * 256& * 256& + _
+                    mytemp(Offset + 2 + (No_of_Entries * 12) + 1) * 256& + _
+                    mytemp(Offset + 2 + (No_of_Entries * 12) + 0)
 
             Else
                 Offset_to_Next_IFD = 0
@@ -654,10 +650,10 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
         Else
             If Not Processed_ExifSubIFD Then
                 Offset_to_Next_IFD = _
-                    mytemp(offset + 2 + (No_of_Entries * 12) + 0) * 256& * 256& * 256& + _
-                    mytemp(offset + 2 + (No_of_Entries * 12) + 1) * 256& * 256& + _
-                    mytemp(offset + 2 + (No_of_Entries * 12) + 2) * 256& + _
-                    mytemp(offset + 2 + (No_of_Entries * 12) + 3)
+                    mytemp(Offset + 2 + (No_of_Entries * 12) + 0) * 256& * 256& * 256& + _
+                    mytemp(Offset + 2 + (No_of_Entries * 12) + 1) * 256& * 256& + _
+                    mytemp(Offset + 2 + (No_of_Entries * 12) + 2) * 256& + _
+                    mytemp(Offset + 2 + (No_of_Entries * 12) + 3)
 
             Else
                 Offset_to_Next_IFD = 0
@@ -669,13 +665,13 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
             Processed_ExifSubIFD = True
         End If
         
-        offset = Offset_to_TIFF + Offset_to_Next_IFD
+        Offset = Offset_to_TIFF + Offset_to_Next_IFD
 
     Exit Sub
 finito:
 End Sub
 
-Private Sub ProcessMakerNote(ByVal offset As Long)
+Private Sub ProcessMakerNote(ByVal Offset As Long)
     Dim No_of_Entries As Long
     Dim Upper_IFDDirectory As Long
     Dim NewDimensions As Long
@@ -684,12 +680,12 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
     
     If IsIntel Then
         No_of_Entries = _
-            ExifTemp(offset + 1) * 256& + _
-            ExifTemp(offset + 0)
+            ExifTemp(Offset + 1) * 256& + _
+            ExifTemp(Offset + 0)
     Else
         No_of_Entries = _
-            ExifTemp(offset + 0) * 256& + _
-            ExifTemp(offset + 1)
+            ExifTemp(Offset + 0) * 256& + _
+            ExifTemp(Offset + 1)
     End If
 
     On Error Resume Next
@@ -707,20 +703,20 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
             If IsIntel Then
 
                 .Tag_No = _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 1) * 256& + _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 0)
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 1) * 256& + _
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 0)
                     
                 .MakerNote = True
                 
                 .Data_Format = _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 3) * 256& + _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 2)
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 3) * 256& + _
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 2)
                     
                 .Components = _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 7) * 256& * 256& * 256& + _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 6) * 256& * 256& + _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 5) * 256& + _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 4)
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 7) * 256& * 256& * 256& + _
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 6) * 256& * 256& + _
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 5) * 256& + _
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 4)
                 
                 Select Case .Data_Format
                 
@@ -728,16 +724,16 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
                         BytesPerComponent = 1
                         If .Components * BytesPerComponent <= 4 Then
                             .Value = _
-                                sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 11)), 2, "0") & _
-                                sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 10)), 2, "0") & _
-                                sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 9)), 2, "0") & _
-                                sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 8)), 2, "0")
+                                sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)), 2, "0") & _
+                                sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 10)), 2, "0") & _
+                                sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 9)), 2, "0") & _
+                                sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)), 2, "0")
                         Else
                             .Offset_To_Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                             For j = 0 To .Components - 1
                                 .Value = .Value & ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
                             Next
@@ -747,16 +743,16 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
                         BytesPerComponent = 1
                         If .Components * BytesPerComponent <= 4 Then
                             .Value = _
-                                Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 11)) & _
-                                Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 10)) & _
-                                Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 9)) & _
-                                Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 8))
+                                Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)) & _
+                                Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 10)) & _
+                                Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 9)) & _
+                                Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 8))
                         Else
                             .Offset_To_Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                             For j = 0 To .Components - 2
                                 .Value = .Value & Chr(ExifTemp(Offset_to_TIFF + .Offset_To_Value + j))
                             Next
@@ -766,10 +762,10 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
                         BytesPerComponent = 2
                         If .Components * BytesPerComponent <= 4 Then
                             .Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                             '.Value = _
                                 ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
                                 ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
@@ -777,10 +773,10 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
                                 ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                         Else
                             .Offset_To_Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                             For j = 0 To .Components - 1
                                 .Value = .Value & ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
                             Next
@@ -790,16 +786,16 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
                         BytesPerComponent = 4
                         If .Components * BytesPerComponent <= 4 Then
                             .Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                         Else
                             .Offset_To_Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                             For j = 0 To .Components - 1
                                 .Value = .Value & ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
                             Next
@@ -808,10 +804,10 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
                     Case m_RATIONAL, m_SRATIONAL
                         BytesPerComponent = 8
                         .Offset_To_Value = _
-                            ExifTemp((offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
-                            ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
-                            ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& + _
-                            ExifTemp((offset + 2) + ((i - 1) * 12) + 8)
+                            ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& * 256& + _
+                            ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
+                            ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
+                            ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
                         .Value = _
                             ExifTemp(Offset_to_TIFF + .Offset_To_Value + 3) * 256& * 256& * 256& + _
                             ExifTemp(Offset_to_TIFF + .Offset_To_Value + 2) * 256& * 256& + _
@@ -828,18 +824,18 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
             Else
             
                .Tag_No = _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 0) * 256& + _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 1)
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 0) * 256& + _
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 1)
                     
                 .Data_Format = _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 2) * 256& + _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 3)
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 2) * 256& + _
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 3)
                     
                 .Components = _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 4) * 256& * 256& * 256& + _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 5) * 256& * 256& + _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 6) * 256& + _
-                    ExifTemp((offset + 2) + ((i - 1) * 12) + 7)
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 4) * 256& * 256& * 256& + _
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 5) * 256& * 256& + _
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 6) * 256& + _
+                    ExifTemp((Offset + 2) + ((i - 1) * 12) + 7)
                     
                 Select Case .Data_Format
                 
@@ -847,16 +843,16 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
                         BytesPerComponent = 1
                         If .Components * BytesPerComponent <= 4 Then
                             .Value = _
-                                sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 8)), 2, "0") & _
-                                sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 9)), 2, "0") & _
-                                sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 10)), 2, "0") & _
-                                sPad(Hex(ExifTemp((offset + 2) + ((i - 1) * 12) + 11)), 2, "0")
+                                sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)), 2, "0") & _
+                                sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 9)), 2, "0") & _
+                                sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 10)), 2, "0") & _
+                                sPad(Hex(ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)), 2, "0")
                         Else
                             .Offset_To_Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                             For j = 0 To .Components - 1
                                 .Value = .Value & ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
                             Next
@@ -866,16 +862,16 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
                         BytesPerComponent = 1
                         If .Components * BytesPerComponent <= 4 Then
                             .Value = _
-                                Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 8)) & _
-                                Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 9)) & _
-                                Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 10)) & _
-                                Chr(ExifTemp((offset + 2) + ((i - 1) * 12) + 11))
+                                Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)) & _
+                                Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 9)) & _
+                                Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 10)) & _
+                                Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 11))
                         Else
                             .Offset_To_Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                             For j = 0 To .Components - 1
                                 .Value = .Value & Chr(ExifTemp(Offset_to_TIFF + .Offset_To_Value + j))
                             Next
@@ -885,16 +881,16 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
                         BytesPerComponent = 2
                         If .Components * BytesPerComponent <= 4 Then
                             .Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                         Else
                             .Offset_To_Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                             For j = .Components - 1 To 0 Step -1
                                 .Value = .Value & ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
                             Next
@@ -904,16 +900,16 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
                         BytesPerComponent = 4
                         If .Components * BytesPerComponent <= 4 Then
                             .Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                         Else
                             .Offset_To_Value = _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                                ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                                ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                             For j = 0 To .Components - 1
                                 .Value = .Value & ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
                             Next
@@ -922,10 +918,10 @@ Private Sub ProcessMakerNote(ByVal offset As Long)
                     Case m_RATIONAL, m_SRATIONAL
                         BytesPerComponent = 8
                         .Offset_To_Value = _
-                            ExifTemp((offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
-                            ExifTemp((offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
-                            ExifTemp((offset + 2) + ((i - 1) * 12) + 10) * 256& + _
-                            ExifTemp((offset + 2) + ((i - 1) * 12) + 11)
+                            ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
+                            ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& * 256& + _
+                            ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
+                            ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                         .Value = _
                             ExifTemp(Offset_to_TIFF + .Offset_To_Value + 0) * 256& * 256& * 256& + _
                             ExifTemp(Offset_to_TIFF + .Offset_To_Value + 1) * 256& * 256& + _
