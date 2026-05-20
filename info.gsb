@@ -44356,7 +44356,7 @@ Print A==Vector(3,-4,5)  ' False
 A1=A.Mul(100)
 Print A1==Vector(300,400,500) ' true
 }
-MODULE COMPASS {Form 100,40    ' set console to 80 characters by 50 lines
+MODULE COMPASS {Form 100,40    ' set console to 80 characters by 40 lines
 Locale 1033   'change decimal point char to dot.
 \\goto 2000
 \\ Function heading() get a positive double as degrees and return the  compass index (1 for North)

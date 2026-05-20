@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 33
+Global Const Revision = 34
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7898,8 +7898,10 @@ conthere123:
         ElseIf TypeOf var(VR) Is mHandler Then
             ' this is ok for both buffer and inventory
             Set usehandler = var(VR)
+            
+            
             If usehandler.t1 = 2 Then
-                
+comehere11:
                 If V1& = 8 Then
                 If IsExp(bstack, a$, pp, , flatobject:=True, nostring:=True) Then
                 
@@ -9077,6 +9079,8 @@ contbuf1:
                     End If
                     Set anything = Nothing
                     If usehandler.CopyMemBlock(r, p, anything) Then
+                        Set usehandler = New mHandler
+                        usehandler.t1 = 2
                         Set usehandler.objref = anything
                         Set bstack.lastobj = usehandler
                     End If
@@ -9632,6 +9636,15 @@ group00012:
          Set bstack.lastobj = Nothing
          Mid$(a$, 1, 1) = " "
          GoTo jump8
+         ElseIf IsObjmHandler(nbstack.lastobj) Then
+         Set usehandler = nbstack.lastobj
+         
+         Set nbstack.lastobj = Nothing
+                 If usehandler.t1 = 2 Then
+                 If FastSymbol(a$, "[") Then
+                 GoTo comehere11
+                 End If
+                 End If
          End If
          End If
          SyntaxError
@@ -53932,7 +53945,6 @@ Else
 End If
 Else
 If Not IsMissing(NewVal) Then
-'If NewVal = 0 Then
 If Not IsMissing(where) Then
         p = (-OneLongLong And useBuffer.GetPtr(where))
 Else
@@ -53941,7 +53953,6 @@ End If
 w2 = MemLong(VarPtr(p) + 8)
 GoTo looklastobj
 End If
-'End If
 End If
 
 End Function

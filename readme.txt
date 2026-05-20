@@ -1,53 +1,119 @@
 M2000 Interpreter and Environment
-Version 14 Revision 33
+Version 14 Revision 34
 
-1. Fix a problem as shown:
-
-m=alfa() ' create a dummy alfa() in functions inner catalogue with a -1 index (which not exist, indexes are positive numbers)
-// we can't make a reference for a static function
-Push &alfa()  ' now raise error before hang the program
-
-function alfa()
-	=100
-end function
-
-2. Declare static function (only the name) to exclude a global function to bypass the static function. A static (or simple as we use to say) function for M2000 is a function like a sub, a part of code where we can use local variables and we see anything from the caller (a normal function can see only own identifiers - which are local by default- and global identifiers). Now we can call a static function using @ before the name (this is the fastet way), or without @. In any case we can't use a name for static function the same as a system identifier. So the function Abs() can't used for name for a simple function. The @Abs() is the original Abs(). We can make a normal function ABS() to bypass the original Abs() but we can use @Abs() to use the original always. So in a module lets use a new name for a simple or static function Hello(). 
-So now we can make a global Hello() which can use the static function (but not the variables of module alfa). Using statement Static Function Hello or Static Function Hello() we insert a dummy local function which hide any global with same name, before any use of the static function. So using UseStaticFunction=true we get 0 from the Write variable, and using UseStaticFunction=false we get 4 from the Write variable.
-As you see we can ude the static function because the search function always performed for the first call (then the function regostered in a local subs/function list). Modules and normal Functions (defined same as modules) are on a list of modules/fumctions and are more heavy definitions from subroutines and simple functions. Actually a module and a normall function have a basetask object which run on that task. Subs and static functions use the caller basetask (and each basetask has an owner the output object plus a stack of values for dynamic use of memory and passing (and returning for modules) values - like a stack for machine code, but we place values like strings or other types, like objects and arrays).
-
-Also the statement Static Function check if there is an array with same name and raise error. We can use A() as function and A() as array, we have to use A(* ) as function call (the * say i am function). Always arrays have priority over functions with same name. Calling with @ interpreter know that is a call to a function (internal or a static one).
-
-Global UseStaticFunction=true
-Global Write as long
-FUNCTION Global Hello(X) {
-		=@Hello(X)
-//			BEEP
-//			WAIT 200
-		Write++
+Advanced handling of buffer arrays. Now we can use object arrays to hold buffer arrays and address individual fields of buffer.
+1) Example Simple
+structure simple {
+	x as double
+	y as double
+	{ StrPtr as long} ' we make a union (4 bytes as long and string)
+	name1 as string
 }
-if UseStaticFunction then Static Function Hello
-Module alfa {		
-	if UseStaticFunction then Static Function Hello()	
-	Print Hello(10)	
-	InternalUse()
-	Gosub InternalUse()
-	' this is a simple function
-	Function Hello(x)
-		=String$("Hello", x)
-	End Function
-	' this is a subroutine
-	Sub InternalUse()
-		Print Hello(5)
-	End Sub		
+simple one[5], zero
+zero|name1="This is a BSTR string"
+Print len(Simple)=20 ' 20 bytes, 2x8 bytes double, 4 bytes pointer to string
+one[3]=zero ' copy to one at index 3 (4th item)
+Print len(zero)=20, len(one)=20*5  ' 20 bytes and 100bytes
+print Len(one[3]|name1)=21 ' characters = 21 words = 21*2 bytes
+print one[3]|StrPtr  ' this is the address of the string
+print one[0]|StrPtr=0  ' this is null string
+print Len(one[0]|name1)=0
+' now start the real example
+Object alfa[3], beta[3][2]  ' max two index holder - but as you see we can put anything inside
+alfa[1]=one
+print alfa[1][3]|name1="This is a BSTR string"
+print alfa[1] is one, " : True"  ' we have the same object
+alfa[2]=buffer(one)  ' we get a copy of all items
+alfa[3]=one[3] ' using one[3] we get a copy of item 3
+print alfa[2] is one, " : False"  ' we have different objects
+print alfa[2][3]|name1
+print alfa[1][3]|StrPtr=one[3]|StrPtr, " : True"
+print alfa[2][3]|StrPtr=one[3]|StrPtr, " : False"
+print len(alfa[3])=20  ' one only item
+print alfa[3]|name1="This is a BSTR string"
+print alfa[3]|StrPtr=one[3]|StrPtr, " : False"
+beta[3][0]=one
+print beta[3][0] is alfa[1], " : True"
+beta[3][0][3]|name1="New string"
+print alfa[1][3]|name1="New string", " : True"
+print one[3]|name1="New string", " : True"
+' we can put an object in an array of objects too
+beta[3][2]=alfa
+print beta[3][2][1][3]|name1="New string", " : True"
+zero=beta[3][2][1][3]  'we get the index 3 of object at beta[3][2][1]
+' zero is a copy 
+print zero|name1="New string", " : True"
+print zero|StrPtr<>beta[3][2][1][3]|StrPtr, " : True"
+zero=beta[3][2][1]
+zero[3]|name1="last string"
+' zero now point to beta[3][2][1]
+print zero is one, " : True"
+print zero is alfa[1], " : True"
+print zero is beta[3][2][1], " : True"
+print zero is beta[3][0], " : True"
+print beta[3][0][3]|name1="last string", " : True"
+
+
+
+2) Example Hard
+structure simple {
+	x as double
+	y as double
+	{StrPtr as long} ' we make a union
+	name1 as string
 }
-Call alfa
-' resolved automatic to Function Hello(x)/End Function
-' it is in the same original code
-Print Hello(3)
-Print Write
+structure bigone {
+	{simple};   ' import simple (using ; we bypass the union mechanism)
+	z as double * 100
+}
+structure bigtwo {
+	s as simple * 4
+	z as double * 10
+}
+bigtwo two[10]
+bigone one[5]
+simple zero
+zero|name1="This is a BSTR string"
+print len(Simple)=20 ' 20 bytes, 2x8 bytes double, 4 bytes pointer to string
+one[3]=zero 
+print len(zero)=20, len(one)=(20+100*8)*5  ' 20 bytes and 100bytes
+print one[3]|name1=zero|name1, one[3]|StrPtr<>zero|StrPtr 
+print Len(two)=(4*20+10*8)*10
+two[2]|s[1]=zero
+print two[2]|s[1]|name1=zero|name1, two[2]|s[1]|StrPtr<>zero|StrPtr 
+two[2]|s[1]|name1="new string"
+print two[2]|s[1]|name1=zero|name1, " : False"
+zero=two[2]|s[1]  ' get a copy
+print two[2]|s[1]|name1=zero|name1, two[2]|s[1]|StrPtr<>zero|StrPtr 
+' now the real example
+Object alfa[4], beta[3][2]
+alfa[2]=two
+print alfa[2][2]|s[1]|name1=zero|name1
+beta[3][1]=one
+print beta[3][1][3]|name1="This is a BSTR string"
+beta[3][1][3]=zero  ' copy because ...[3] is index to buffer at beta[3][1]
+print type$(beta[3][1])="Buffer"
+print beta[3][1][3]|name1=zero|name1
+print_name1(beta[3][1][3])
+print_name2(zero) ' zero is object pass pointer
+print zero|name1, zero|StrPtr ' we get new values.
+print alfa[2][2]|s[1]|name1, alfa[2][2]|s[1]|StrPtr,  " values before call"
+print_name2(alfa[2][2]|s[1])  ' pass copy
+print alfa[2][2]|s[1]|name1, alfa[2][2]|s[1]|StrPtr,  " same values as before call"
+print_name3(alfa[2],2,1) ' alfa[2] is object - pass pointer
+print alfa[2][2]|s[1]|name1, "change name"
+sub print_name1(a as bigone)
+	print a|name1, a|StrPtr, a|z[30], " inside print_name1()"
+end sub
+sub print_name2(a as simple)
+	print a|name1, a|StrPtr, " inside print_name2()"
+	a|name1=a|name1+"...ok...."
+end sub
+sub print_name3(a as bigtwo, index, n)
+	print a[index]|s[n]|name1, a[index]|s[n]|StrPtr, " inside print_name3()"
+	a[index]|s[n]|name1=a[index]|s[n]|name1+"...ok"
+end sub
 
-
-3. I put a pool for objects mStiva (the stack of values), so we reuse the objects as we go.
 
 
 
