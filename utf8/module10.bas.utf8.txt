@@ -6394,6 +6394,7 @@ Do
         GoTo exit1
     End If
     x1 = Abs(IsLabel(bstack, rest$, what$))
+    p = Empty
     If x1 = 1 Then
         If Not IsNumberD2fix(s$, p, False) Then
             GoTo cont12

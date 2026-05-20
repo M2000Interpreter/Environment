@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 34
+Global Const Revision = 35
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -19269,8 +19269,7 @@ contSelect:
         'Us$ = vbNullString
         If once = True Then Execute = 0: Exit Function
         If exeSelect(Execute, once, bstack, b$, v, Lang) Then
-        
-        Exit Function
+            Exit Function
         End If
         If Len(b$) = 0 Then
             If Execute = 2 Then Exit Function
@@ -19287,101 +19286,123 @@ contSelect:
 Case "ΑΠΟ", "ON"                 '************************************* ON NUMBER GOTO LABELS
 ContOn:
         If IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then
-        y1 = IsLabelSymbolNew(b$, "ΠΡΟΣ", "GOTO", Lang)
-        y2 = False
-        If Not y1 Then
-        y1 = IsLabelSymbolNew(b$, "ΔΙΑΜΕΣΟΥ", "GOSUB", Lang)
-        If Not y1 Then
-            MisGosub
-        End If
-        y2 = True
-        End If
+            y1 = IsLabelSymbolNew(b$, "ΠΡΟΣ", "GOTO", Lang)
+            y2 = False
+            If Not y1 Then
+                y1 = IsLabelSymbolNew(b$, "ΔΙΑΜΕΣΟΥ", "GOSUB", Lang)
+                If Not y1 Then
+                    If likebasic Then
+                        y1 = IsLabelSymbolNew(b$, "ΕΠΑΝΑΦΟΡΑ", "RESTORE", Lang)
+                        If Not y1 Then MisGosub1
+                        y2 = 2
+                    Else
+                        If Not y1 Then MisGosub
+                    End If
+                Else
+                    y2 = 1
+                End If
+                
+            End If
             If y1 Then
-            On Error Resume Next
+                On Error Resume Next
                 p = CLng(p)
                 If Err.Number = 6 Then
                     OverflowValue vbLong
                     Execute = 0
                     Exit Function
                 End If
-                                On Error GoTo 0
+                On Error GoTo 0
                 If p <= 0 Then ' no exit
-                SetNextLine b$
-               ' If loopthis Then loopthis = False: Execute = 1
-                If Execute <> 2 Then Execute = 1 Else Execute = 3
-            b$ = vbNullString
-           once = True
-           Exit Function
-                Else
-                W$ = vbNullString
-                i = 0
-                Do
-                i = 1
-                 x1 = FastPureLabel(b$, W$)
-                    If x1 = 0 Then
-                    If Not IsNumberLabel(b$, W$) Then p = 1000: Exit Do
-                    
-                    ElseIf x1 > 1 Then
-                        p = 1000
-                        Exit Do
+                    SetNextLine b$
+                    If Execute <> 2 Then Execute = 1 Else Execute = 3
+                        b$ = vbNullString
+                        once = True
+                        Exit Function
+                    Else
+                        W$ = vbNullString
+                        i = 0
+                        Do
+                        i = 1
+                        x1 = FastPureLabel(b$, W$)
+                        If x1 = 0 Then
+                            If Not IsNumberLabel(b$, W$) Then p = 1000: Exit Do
+                        ElseIf x1 > 1 Then
+                            p = 1000
+                            Exit Do
+                        End If
+                        i = 0
+                        p = p - 1
+                        If Not FastSymbol(b$, ",") Then Exit Do
+                        
+                    Loop Until p = 0#
+                    If p <> 0 Then
+                        If i = 0 Then
+                            If y2 = 2 Then
+                            W$ = ""
+                            GoTo RESTcontinue
+                            End If
+                            Execute = 1: W$ = GetNextLine$(b$): sss = Len(b$):
+                        End If
+                        W$ = vbNullString
+                    Else
+                        If i > 0 Then
+                            MissingLabel
+                            sss = LLL
+                            Execute = 0
+                        Exit Function
+                    Else
+                        If y2 Then
+                            If y2 = 2 Then
+RESTcontinue:
+                                sw$ = W$
+                                i = 1
+                                Select Case bstack.OriginalCode
+                                Case Is > 0
+                                    W$ = sbf(Abs(bstack.OriginalCode)).sb
+                               
+                                Case Is < 0
+                                    W$ = var(-bstack.OriginalCode).Code$
+                                End Select
+                                If Len(sw$) = 0 Then
+                                    i = 1
+                                Else
+                                    i = PosLabel(sw$, W$)
+                                    i = i - 2
+                                End If
+                                aheadstatusDATA W$, i, ok
+                                If ok Then bstack.datasearch = Mid$(W$, i)
+                        If ok Then bstack.datasearch = Mid$(W$, i)
+                                SetNextLine b$
+                                GoTo loopcontinue
+                            ElseIf bstack.SubLevel > deep And deep <> 0 Then
+                                If bstack.RetStackTotal >= 9 * deep Then
+                                    NoMoreDeep deep
+                                    Execute = 0
+                                Exit Function
+                            Else
+                                bstack.RetStackDrop bstack.RetStackTotal
+                            End If
+                            InternalError
+                            NOEXECUTION = True
+                            Execute = 0
+                            Exit Function
+                        End If
+                        If p = 1000 Then Exit Function
+                        SetNextLine b$
+                        If x1 = 1 Then
+                            i = 1
+                            GoTo contHereFromOn
+                        Else
+                            GoTo contHere2FromOn
+                        End If
                     End If
-                    i = 0
-                    p = p - 1
-                    If Not FastSymbol(b$, ",") Then Exit Do
-                    
-                Loop Until p = 0#
-                If p <> 0 Then
-                
-                If i = 0 Then
-                Execute = 1: W$ = GetNextLine$(b$): sss = Len(b$):
+                    b$ = W$
+                    Execute = 2
+                    Exit Function
                 End If
-                W$ = vbNullString
-                'Exit Do
-                Else
-                If i > 0 Then
-                MissingLabel
-                sss = LLL
-                  Execute = 0
-                Exit Function
-                Else
-                If y2 Then
-                If bstack.SubLevel > deep And deep <> 0 Then
-' GO BACK TO FIRST CALL
-If bstack.RetStackTotal >= 9 * deep Then
-             NoMoreDeep deep
-
-             Execute = 0
-             Exit Function
-
-            
-Else
-bstack.RetStackDrop bstack.RetStackTotal
- End If
-  InternalError
- NOEXECUTION = True
- Execute = 0
-Exit Function
- 
-End If
-               
-               If p = 1000 Then Exit Function
-                SetNextLine b$
-               If x1 = 1 Then
-               i = 1
-               GoTo contHereFromOn
-               Else
-               GoTo contHere2FromOn
-               End If
-               
-                
-                End If
-                b$ = W$
-                Execute = 2
-                Exit Function
-                End If
-                End If
-                End If
-            Else
+            End If
+        End If
+    Else
               sss = LLL
             End If
         Else
