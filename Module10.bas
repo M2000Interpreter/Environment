@@ -4955,6 +4955,7 @@ assignvalue3:
                                     GoTo err000
                                 End If
                             Else
+                                If Not useType Then var(v) = Empty
                                 var(v) = p
                             End If
                         Else
@@ -5149,7 +5150,7 @@ itsAconstant_1:
                 Else
                     If Left$(b$, 2) <> " >" Then
                         If useType = False Then
-                            var(v) = Empty
+                            'var(v) = Empty  ' wrong: z=eval(z) for variant z not work, because z get empty value;
                             GoTo assignvalue2
                         End If
                     Else

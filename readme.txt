@@ -1,11 +1,41 @@
 M2000 Interpreter and Environment
-Version 14 Revision 35
+Version 14 Revision 36
 
-1) fix a type problem in read for basic like programs (when we use BASIC statement)
-2) NEW: ON X RESTORE 100, 200, ALFA, 500, BETA
-When we use BASIC the RESTORE move the hidden pointer to choose the next DATA statement (DATA inside blocks { } skipped)
-So now there are 3 variations for ON (ON x GOTO....|ON x GOSUB....|ON x RESTORE....)
-- also help file updated.
+Fix Eval(), now Works for Standard types like numeric types. So in this example Eval() return number in any case. So found the pointer to group execute the Value part of Class alfa.
+
+class alfa {
+	{Read z as double=10}
+	x=z
+	id=int(rnd*100)
+	value {
+		=.X*100
+	}
+	remove {
+		? "deleted "+.id
+	}
+	' if we comment these lines
+	' then we get a uinque pointer
+	' so array(b) return a copy of actual object
+	{ ' return a pointer (object may have multiple pointers)
+		' standard group has a unique pointer.
+		->group(alfa)
+		break
+	}
+}
+// numeric, pointer to group, numeric, pointer to group, numeric
+a=(1,alfa(5),3,alfa(15),5)
+link a to a()
+b=each(a)
+variant z
+while b	
+	' fixed eval to work with nornal numeric values too
+	' we need eval() to run value part of class alfa
+		print eval(array(b)), b^   ' return a copy - but we have copy on pointer
+		print eval(a(b^)), b^  ' a() always return the item
+end while
+clear a
+print len(a)=0
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

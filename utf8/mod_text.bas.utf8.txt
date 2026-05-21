@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 35
+Global Const Revision = 36
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -9138,7 +9138,7 @@ fun36: ' "EVAL(", "ΕΚΦΡ(", "ΕΚΦΡΑΣΗ("
     SyntaxError
     Exit Function
     End If
-    
+       
     End If
     If FastSymbol1(a$, "#") Then GoTo comehere
     Exit Function
@@ -20159,7 +20159,7 @@ End If
 
 'If Len(b$) > 0 Then If AscW(b$) = 34 Then SyntaxError: Execute = 0
 'If Len(b$) > 0 Then If sss = LLL Then SyntaxError: Execute = 0
-
+If m_bInIDE Then
 If Len(b$) > 0 Then
 Debug.Print "Execute:", sss, LLL, bstack.OriginalCode, bstack.originalname
 If bstack.OriginalCode >= 0 Then
@@ -20170,6 +20170,7 @@ Else
 Debug.Print Left$(var(-bstack.OriginalCode).Code$, 200)
 End If
 'If sss = LLL Then SyntaxError: Execute = 0
+End If
 End If
 Exit Function
 errstat0:
@@ -34347,9 +34348,13 @@ Do
                         var(i) = 0&
                     ElseIf Typename$(usehandler.objref) = myArray Then
                         Set usehandler.objref = New mArray
+                    ElseIf Typename$(usehandler.objref) = "tuple" Then
+                        usehandler.objref.flushTuple
                     ElseIf Typename$(usehandler.objref) = "mStiva" Then
                          Set usehandler.objref = NewmStiva
                     End If
+                ElseIf Typename(var(i)) = "tuple" Then
+                    var(i).flushTuple
                 Else
                      var(i) = Empty
                 End If
@@ -41997,6 +42002,7 @@ ElseIf IsExp(bstack, a$, r, , True) Then
 End Function
 Private Function IsArrayFun(bstack As basetask, a$, r As Variant) As Boolean
 Dim s$, w1 As Long, pppp As iBoxArray, anything As Object, p As Variant, ms As mStiva, usehandler As mHandler, RF As refArray
+Dim myGroup As Group
 If IsStrExp(bstack, a$, s$) Then
         If bstack.lastobj Is Nothing Then
             If Right$("!!" + s$, 2) = "()" Then
@@ -43368,7 +43374,12 @@ reentry1:
     If VarType(p) = vbString Then
     SwapString2Variant s$, p
     GoTo JUMPHERE
+    Else
+    SwapVariant p, r
+    IsEval = FastSymbol(a$, ")", True)
+    Exit Function
     End If
+    
     End If
 handlehandlers:
         w1 = 0
@@ -43773,6 +43784,7 @@ getgroup2:
                 Set bstack.lastpointer = ThisGroup
                 GoTo getgroup
         ElseIf ThisGroup.HasValue Then
+        
         Set bstack.lastobj = Nothing
         Set pppp = New ppppLight
             pppp.PushDim 1
@@ -43782,12 +43794,12 @@ getgroup2:
         If ThisGroup.HasParameters Then
         
             FastSymbol a$, ","
-            
             IsEval = SpeedGroup(bstack, pppp, "VAL", "", a$, 0) = 1
             r = bstack.LastValue
              Exit Function
         Else
         FastSymbol a$, ","
+            
             IsEval = SpeedGroup(bstack, pppp, "VAL", "", a$, 0) = 1
             r = bstack.LastValue
             GoTo conthere
@@ -48273,8 +48285,10 @@ Else
 End If
 End Function
 
-Function GetArrayReference(bstack As basetask, a$, v$, pp, result As iBoxArray, index As Long) As Boolean
+Function GetArrayReference(bstack As basetask, a$, v$, curpp, result As iBoxArray, index As Long) As Boolean
 Dim dn As Long, dd As Long, p, w3, w2 As Long, ppppl As iBoxArray, pppp As mArray, usehandler As mHandler
+Dim pp As Variant
+Set pp = curpp
 If pp Is Nothing Then Exit Function
 If Not TypeOf pp Is iBoxArray Then
 If TypeOf pp Is mHandler Then
@@ -48370,6 +48384,7 @@ toohigh:
                         Set result = ppppl
                         index = w2
     End If
+
 End Function
 
 Function ProcessArray(bstack As basetask, a$, v$, pp, result) As Boolean
