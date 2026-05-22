@@ -52399,4 +52399,188 @@ sub print_name3(a as bigtwo, index, n)
 	a[index]|s[n]|name1=a[index]|s[n]|name1+"...ok"
 end sub
 }
+MODULE CHECKDOC {if width div tab<5  or tab<>10 then
+	mode 6
+	form 60
+	? $(,10) 'set tab to 10
+End if
+Cls
+Document TestDoc$={Rosetta Code is a programming chrestomathy site. The idea is to present solutions to the same task in as many different languages as possible, to demonstrate how languages are similar and different, and to aid a person with a grounding in one approach to a problem in learning another.
+Rosetta Code currently has 1,350 tasks, 405 draft tasks, and is aware of 996 languages, though we do not (and cannot) have solutions to every task in every language.}
+Document TestDocGr$=TestDoc$+" ΕΛΛΗΝΙΚΑ"
+Document NewDoc$
+with NewDoc$, "ListLoadedType" as docType
+with TestDoc$, "ListLoadedType" as type2save
+with TestDocGr$, "ListLoadedType" as type2saveGr
+
+Report 2, "NO BOM - CRLF"
+Print
+Save.Doc TestDoc$, "TestDocUTF8.txt", -2  ' UTF-8 no bom
+Save.Doc TestDoc$, "TestDocUTF16LE.txt", -7 ' UTF16LE no bom
+Save.Doc TestDoc$, "TestDocUTF16BE.txt", -1 ' UTF16BE no bom
+Save.Doc TestDoc$, "TestDocANSIdef.txt", 3 ' use current locale
+Save.Doc TestDoc$, "TestDocANSI1033.txt", 1033 ' use current locale
+Save.Doc TestDocGr$, "TestDocUTF8_GreekLetters.txt", -2  ' UTF-8 no bom
+
+TestAllFiles()
+WaitKeyPress()
+
+Report 2, "NO BOM - LF"
+Print
+Save.Doc TestDoc$, "TestDocUTF8.txt", -12  ' UTF-8 no bom
+Save.Doc TestDoc$, "TestDocUTF16LE.txt", -17 ' UTF16LE no bom
+Save.Doc TestDoc$, "TestDocUTF16BE.txt", -11 ' UTF16BE no bom
+Save.Doc TestDoc$, "TestDocANSIdef.txt", 13 ' use current locale
+type2save=13  ' need this because we put 1033
+Save.Doc TestDoc$, "TestDocANSI1033.txt", 1033 ' use current locale
+Save.Doc TestDocGr$, "TestDocUTF8_GreekLetters.txt", -12  ' UTF-8 no bom
+
+TestAllFiles()
+WaitKeyPress()
+
+Report 2, "NO BOM - CR"
+Print	
+Save.Doc TestDoc$, "TestDocUTF8.txt", -22  ' UTF-8 no bom
+Save.Doc TestDoc$, "TestDocUTF16LE.txt", -27 ' UTF16LE no bom
+Save.Doc TestDoc$, "TestDocUTF16BE.txt", -21 ' UTF16BE no bom
+Save.Doc TestDoc$, "TestDocANSIdef.txt", 23 ' use current locale
+with TestDoc$, "ListLoadedType" as type2save
+type2save=23  ' need this because we put 1033
+Save.Doc TestDoc$, "TestDocANSI1033.txt", 1033 ' use current locale
+Save.Doc TestDocGr$, "TestDocUTF8_GreekLetters.txt", -22  ' UTF-8 no bom
+TestAllFiles()
+WaitKeyPress()
+
+for i=0 to 20 step 10
+	type2save=i
+	type2saveGr=i
+	Select Case i
+	Case 0
+		Report 2, "Using BOM - CRLF"
+	Case 10
+		Report 2, "Using BOM - LF"
+	Case 20
+		Report 2, "Using BOM - CR"
+	End Select
+	Print
+	Save.Doc TestDoc$, "TestDocUTF8.txt", 2  ' UTF-8 no bom
+	Save.Doc TestDoc$, "TestDocUTF16LE.txt", 0 ' UTF16LE no bom
+	Save.Doc TestDoc$, "TestDocUTF16BE.txt", 1 ' UTF16BE no bom
+	Save.Doc TestDocGr$, "TestDocUTF8_GreekLetters.txt", 2  ' UTF-8 no bom
+	TestAllFiles(True)
+	WaitKeyPress()
+Next
+
+Sub TestAllFiles(SkipAnsi=false)
+	Load.Doc NewDoc$, "TestDocUTF8.txt"
+	Print TestDoc$=NewDoc$, ": TestDocUTF8.txt  ok" 
+	PrintLoadType(docType) ' ansi (because there is no special encondig for UTF8)
+	Clear NewDoc$
+	
+	Load.Doc NewDoc$, "TestDocUTF16LE.txt"
+	Print TestDoc$=NewDoc$, ": TestDocUTF16LE.txt ok"
+	PrintLoadType(docType)
+	Clear NewDoc$
+	
+	Load.Doc NewDoc$, "TestDocUTF16BE.txt"
+	Print TestDoc$=NewDoc$, ": TestDocUTF16BE.txt ok"
+	PrintLoadType(docType)
+	Clear NewDoc$
+	
+	if SkipAnsi Else
+		Load.Doc NewDoc$, "TestDocANSIdef.txt"
+		Print TestDoc$=NewDoc$, ": TestDocANSIdef.txt ok"
+		PrintLoadType(docType)
+		Clear NewDoc$
+		
+		Load.Doc NewDoc$, "TestDocANSI1033.txt", 1033 
+		Print TestDoc$=NewDoc$, ": TestDocANSI1033.txt ok"
+		PrintLoadType(docType)
+		Clear NewDoc$
+	End if
+	Load.Doc NewDoc$, "TestDocUTF8_GreekLetters.txt"
+	Print TestDocGr$=NewDoc$, ": TestDocUTF8_GreekLetters.txt  ok" 
+	PrintLoadType(docType)
+	Clear NewDoc$
+End Sub
+Sub WaitKeyPress()
+	Print
+	Report 2, "Press any key to continue": push key$: drop
+	Cls 
+End Sub
+Sub PrintLoadType(a as long)
+	Pen 11 {
+		Print "Parse "+a,
+		Print "| Encoding ";
+		Select Case abs(a) mod 10
+		Case 7, 0
+			Print "UTF-16LE";
+		Case 1
+			Print "UTF-16BE";
+		Case 2
+			Print "UTF-8";
+		Case else
+			Print "ANSI";
+		End Select
+		Print @(tab*3);"| newline:"+if$(abs(a div 10) +1->"crlf", "lf", "cr");
+		Print " | BOM: "+if$(a<0->"No", if$((a mod 10=3) and a<500->"No", "Yes"))	
+	}
+End sub
+}
+MODULE ZECKENDORF {Print "Wait about one minute for calculation"
+biginteger L[0]=0 : L[1]=1 :L[2]=2
+Zeckendorf=lambda  L, top=2  (n as biginteger)->{
+	if n<0 then n=0
+	long i=top, oi=i
+	 if top+1=Len(L) then L[top*2]=0u
+	while L[i]<=n
+		i++
+		L[i]=l[i-1]+l[i-2]
+	end while
+	top=i
+	if oi=i then
+		long low=0, high=top, mid
+		while low<=high
+			mid=low+(high-low) div 2
+			if L[mid]>n then high=mid-1 else low=mid+1
+		end while
+		 i=high
+	end if
+	biginteger r
+	if i>0 then	
+		for j=i  to 1
+			c=n>=L[j]:r+=r-c:n+=c*L[j]
+		next
+	end if
+	with r, "outputbase", 2	
+	=r
+}
+for i=0 to 20
+	print format$("{0::-10}: {1:-40}",i, Zeckendorf(i))
+next
+boolean found
+profiler
+for i=0 to 10000
+	if instr(str$(Zeckendorf(i)),"11")>0 then found =true: exit
+next
+print timecount
+if not found then
+	print "Checking numbers up to "+(i-1)+".."
+	print "No Zeckendorf numbers contain consecutive 1's"
+else
+	print "Found:";i
+end if
+}
+MODULE BINWORKS {// Big Integer can get various  base numbers (from 2 to 36) using "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+// Also we can set the output base (used when converted to string)
+a=biginteger("10101",2)
+biginteger  b
+with a, "outputbase", 2
+with b, "outputbase", 2
+b=100
+? a
+? b,"+"
+a+=b
+? a
+}
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

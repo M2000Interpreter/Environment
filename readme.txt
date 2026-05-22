@@ -1,40 +1,35 @@
 M2000 Interpreter and Environment
-Version 14 Revision 36
+Version 14 Revision 37
 
-Fix Eval(), now Works for Standard types like numeric types. So in this example Eval() return number in any case. So found the pointer to group execute the Value part of Class alfa.
+1) A fault index send value a(2)+a(1) to a(1) not a(3). Now fixed
+a=list:= 0:=0, 1:=1, 2:=2
+a(3)=a(2)+a(1)
+? a(3)=3
 
-class alfa {
-	{Read z as double=10}
-	x=z
-	id=int(rnd*100)
-	value {
-		=.X*100
-	}
-	remove {
-		? "deleted "+.id
-	}
-	' if we comment these lines
-	' then we get a uinque pointer
-	' so array(b) return a copy of actual object
-	{ ' return a pointer (object may have multiple pointers)
-		' standard group has a unique pointer.
-		->group(alfa)
-		break
-	}
+2) fix the algorithm for finding the type of text file. A problem was about unicode without BOM UTF16 (LE or BE) vs ANSI.
+The problem was for ANSI file which the system open using Edit or Load.Doc and some time read it as UTF16LE.
+There is a new module in INFO.gsb called  CheckDoc which make all possible combinations for UTF8/UTF16LE/UTF16BE/ANSI with line enconding CRLF, LF, CR with BOM/No BOM (ANSI always without BOM). Also this show the algorithm works. And also show how we can program to save various combinations (reading is automatic, unless we suggest the type, although that isn't always a command because for some types algorithm are sure about it).
+You can open any text file with the inner editor of M2000 console (press Esc to save it or Shift F12 to not save it):
+Edit "TestDocUTF8.txt"
+You can open this file using the defaul application for txt files:
+Win "TestDocUTF8.txt"
+or
+Win TestDocUTF8.txt
+Some statements may get filenames/paths without quotes, but not Edit because without "" make/edit modules  
+
+3) fix a problem with a comment using ' after calling a sub...in another sub only;
+Module TestModule {
+	alfa(10)' no problem here
+	End	
+	sub alfa(m)
+		beta(m*2)'here was the problem
+		Print m
+	End Sub
+	Sub beta(x)
+		Print x, "inner"
+	End Sub
 }
-// numeric, pointer to group, numeric, pointer to group, numeric
-a=(1,alfa(5),3,alfa(15),5)
-link a to a()
-b=each(a)
-variant z
-while b	
-	' fixed eval to work with nornal numeric values too
-	' we need eval() to run value part of class alfa
-		print eval(array(b)), b^   ' return a copy - but we have copy on pointer
-		print eval(a(b^)), b^  ' a() always return the item
-end while
-clear a
-print len(a)=0
+TestModule
 
 
 George Karras, Kallithea Attikis, Greece.

@@ -1015,7 +1015,7 @@ Public Sub InsertDoc(ByVal ParaNum As Long, fromPos As Long, norawtext As String
      End If
      a() = Split(norawtext + vbLf, vbLf)
      
-Dim i As Long, K As Long, j As Long, ii As Long
+Dim i As Long, k As Long, j As Long, ii As Long
     i = LBound(a())
     Do
     If i > UBound(a()) Then Exit Do
@@ -1031,13 +1031,13 @@ Dim i As Long, K As Long, j As Long, ii As Long
     End If
     If TabWidth > 0 Then
     t() = Split(a(i), Chr(9))
-    K = LBound(t())
+    k = LBound(t())
     j = UBound(t())
-        If K = j Then
-        t_text = t(K)
+        If k = j Then
+        t_text = t(k)
         Else
         t_text = vbNullString
-        For ii = K To j
+        For ii = k To j
         If Len(t(ii)) = 0 Then
         t_text = t_text + space(TabWidth)
         ElseIf Len(t_text) Mod TabWidth = 0 Then
@@ -1426,18 +1426,18 @@ Property Get LastParagraph() As Long
 LastParagraph = DocParaBack(0)
 End Property
 Property Get SizeCRLF() As Long
-Dim mycur As Long, suma As Long, K As Long
+Dim mycur As Long, suma As Long, k As Long
 If IsEmpty Then
 Else
  mycur = DocParaNext(0)
-  K = -1
+  k = -1
     Do While mycur > 0
-    K = K + 1
+    k = k + 1
         suma = suma + TextParagraphLen(mycur)
         mycur = DocParaNext(mycur)
     Loop
     End If
-    SizeCRLF = suma + K * 2
+    SizeCRLF = suma + k * 2
 End Property
 Property Get TextParagraphOrder(ByVal Order As Long) As String
     ' 1 is the first
@@ -2322,7 +2322,7 @@ Public Function ContainsUTF8(ByRef Source() As Byte) As Boolean
       CurByte = Source(i)
         If (CurByte And &HE0) = &HC0 Then
         If (Source(i + 1) And &HC0) = &H80 Then
-            ContainsUTF8 = ContainsUTF8 Or True
+            ContainsUTF8 = True
              i = i + 1
              Else
                 ContainsUTF8 = False
@@ -2336,7 +2336,7 @@ Public Function ContainsUTF8(ByRef Source() As Byte) As Boolean
             i = i + 1
             If i < lUBound2 Then
             If (Source(i + 1) And &HC0) = &H80 Then
-                ContainsUTF8 = ContainsUTF8 Or True
+                ContainsUTF8 = True
                 i = i + 1
             Else
                 ContainsUTF8 = False
@@ -2356,11 +2356,11 @@ Public Function ContainsUTF8(ByRef Source() As Byte) As Boolean
             i = i + 1
             If i < lUBound2 Then
                If (Source(i + 1) And &HC0) = &H80 Then
-                    ContainsUTF8 = ContainsUTF8 Or True
+                    ContainsUTF8 = True
                     i = i + 1
                     If i < lUBound3 Then
                        If (Source(i + 1) And &HC0) = &H80 Then
-                            ContainsUTF8 = ContainsUTF8 Or True
+                            ContainsUTF8 = True
                             i = i + 1
                         Else
                             ContainsUTF8 = False
@@ -2398,32 +2398,54 @@ Public Function ContainsUTF16(ByRef Source() As Byte) As Long
   Dim CurByte As Byte, CurByte1 As Byte
   Dim CurBytes As Long, CurBytes1 As Long
     lUBound = UBound(Source)
+    Dim found1 As Boolean, found2 As Boolean
     If lUBound > 4 Then
     CurByte = Source(0)
     CurByte1 = Source(1)
     For i = 2 To lUBound - 1 Step 2
-        If CurByte1 = 0 And CurByte < 31 Then CurBytes1 = CurBytes1 + 1
-        If CurByte = 0 And CurByte1 < 31 Then CurBytes = CurBytes + 1
-        If Source(i) = CurByte Then
+        If CurByte1 = 0 And CurByte < 31 Then
+            CurBytes1 = CurBytes1 + 1
+            found1 = True
+        End If
+        If CurByte = 0 And CurByte1 < 31 Then
             CurBytes = CurBytes + 1
+            found2 = True
+        End If
+        
+        If Source(i) = CurByte Then
+            If Source(i - 1) = Source(i + 1) Then
+                If Source(i) <> Source(i + 1) Then
+                    CurBytes = CurBytes + 1
+                End If
+            End If
         Else
             CurByte = Source(i)
         End If
         If Source(i + 1) = CurByte1 Then
-            CurBytes1 = CurBytes1 + 1
+            If Source(i - 1) = Source(i + 1) Then
+                If Source(i) <> Source(i + 1) Then
+                    CurBytes1 = CurBytes1 + 1
+                End If
+            End If
         Else
             CurByte1 = Source(i + 1)
         End If
-        
+    
     Next i
     End If
-    If CurBytes1 = CurBytes And CurBytes1 * 3 >= lUBound Then
+    If (CurBytes1 = CurBytes And CurBytes1 * 3 >= lUBound) Or Not (found1 Or found2) Then
     ContainsUTF16 = 0
     Else
     If CurBytes1 * 3 >= lUBound Then
-    ContainsUTF16 = 1
+        ContainsUTF16 = 1
     ElseIf CurBytes * 3 >= lUBound Then
-    ContainsUTF16 = 2
+        ContainsUTF16 = 2
+    ElseIf found1 Then
+        ContainsUTF16 = 1
+    
+    ElseIf found2 Then
+        ContainsUTF16 = 2
+    
     Else
     ContainsUTF16 = 0
     End If
@@ -2558,6 +2580,7 @@ utf8cont:
             NewSeek FNr, 1
             GoTo utf16
         End Select
+cont111:
         Dim cc$
         cc$ = space$(30)
         LSet cc$ = buf()
@@ -2595,11 +2618,11 @@ Loop
 End Property
 Private Function mWordCount(ByVal s$) As Long
 Dim i&, l As Long
-Static P2 As Long, P1 As Integer, p4 As Long
+Static p2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 - 2
-  For i = P2 To P2 + l * 2 Step 2
+  p2 = StrPtr(s): l = l - 1
+  p4 = p2 - 2
+  For i = p2 To p2 + l * 2 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 65 To 90, 97 To 122, Is > 127
@@ -2613,25 +2636,25 @@ Static P2 As Long, P1 As Integer, p4 As Long
 End Function
 Private Function mWordMap(s$) As String
 Dim i&, l As Long
-Static P2 As Long, P1 As Integer, p3 As Long, p4 As Long
+Static p2 As Long, P1 As Integer, p3 As Long, p4 As Long
 Dim ss$, Pos As Long
 Pos = -2
   l = Len(s): If l = 0 Then mWordMap = " ": Exit Function
 
-  P2 = StrPtr(s$): l = l - 1
-  p3 = P2
-  p4 = P2 - 2
-  For i = P2 To P2 + l * 2 Step 2
+  p2 = StrPtr(s$): l = l - 1
+  p3 = p2
+  p4 = p2 - 2
+  For i = p2 To p2 + l * 2 Step 2
   GetMem2 i, P1
   Select Case P1
     Case 65 To 90, 97 To 122, Is > 127
-    If i - p4 = 2 Then P2 = i: Pos = Pos + 2
+    If i - p4 = 2 Then p2 = i: Pos = Pos + 2
     Case 39
     If i - p4 = 2 Then p4 = i
     Case Else
     If i - p4 > 2 Then
-            CopyMemory ByVal p3 + Pos, ByVal P2, i - P2
-            Pos = Pos + i - P2
+            CopyMemory ByVal p3 + Pos, ByVal p2, i - p2
+            Pos = Pos + i - p2
             PutMem2 p3 + Pos, 32   ' place a space...
             
     End If
@@ -2639,8 +2662,8 @@ Pos = -2
   End Select
   Next i
   If i - p4 > 2 Then
-        CopyMemory ByVal p3 + Pos, ByVal P2, i - P2
-        Pos = Pos + i - P2
+        CopyMemory ByVal p3 + Pos, ByVal p2, i - p2
+        Pos = Pos + i - p2
   End If
   Pos = Pos / 2
   If Pos <= 0 Then
@@ -2704,33 +2727,33 @@ Else
 Dim p5 As Long
 p5 = 512 '' L \ 32 + 1
 ReDim Pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
-Dim i As Long, K As Long
-Dim P2 As Long, p4 As Long, p6 As Long, bb As Integer
-P2 = StrPtr(a$)
-p3 = P2
+Dim i As Long, k As Long
+Dim p2 As Long, p4 As Long, p6 As Long, bb As Integer
+p2 = StrPtr(a$)
+p3 = p2
 Dim Md As Long, mda As Long, mtop As Long
-l = P2 + 2 * l
-p4 = P2
+l = p2 + 2 * l
+p4 = p2
 Do
          If p4 >= l Then
-         If p4 <> P2 Then GoTo there1
+         If p4 <> p2 Then GoTo there1
         CountWords2 = Top: Exit Function
         End If
             GetMem2 p4, bb
             Select Case bb
             Case 65 To 90, 97 To 122, Is > 127
             Case 39
-            If p4 = P2 Then P2 = p4 + 2
+            If p4 = p2 Then p2 = p4 + 2
             Case Else
-            If p4 <> P2 Then
+            If p4 <> p2 Then
 there1:
-                K = (p4 - P2) \ 2
+                k = (p4 - p2) \ 2
                 mtop = Top
                 mda = 0
                 Md = (mtop - mda + 1) \ 2
                 p6 = mda + Md
                 Do While Md > 0
-                    Select Case CompareString(uLCID, NORM_IGNORECASE, P2, K, Pos(p6), slen(p6))
+                    Select Case CompareString(uLCID, NORM_IGNORECASE, p2, k, Pos(p6), slen(p6))
                         Case 1
                             mtop = mtop - Md
                             Md = (mtop - mda + 1) \ 2
@@ -2751,19 +2774,19 @@ there1:
                     Top = Top + 1
                     
                     If mda = Top - 1 Then
-                        Pos(Top) = P2
-                        slen(Top) = K
+                        Pos(Top) = p2
+                        slen(Top) = k
                     Else
                         CopyMemory ByVal VarPtr(Pos(1)) + mda * 4 + 4, ByVal VarPtr(Pos(1)) + mda * 4, (Top - mda - 1) * 4
                         CopyMemory ByVal VarPtr(slen(1)) + mda * 4 + 4, ByVal VarPtr(slen(1)) + mda * 4, (Top - mda - 1) * 4
                         CopyMemory ByVal VarPtr(hit(1)) + mda * 4 + 4, ByVal VarPtr(hit(1)) + mda * 4, (Top - mda - 1) * 4
-                        Pos(mda + 1) = P2
-                        slen(mda + 1) = K
+                        Pos(mda + 1) = p2
+                        slen(mda + 1) = k
                         hit(mda + 1) = 0
                     End If
                 End If
             End If
-            P2 = p4 + 2
+            p2 = p4 + 2
             End Select
             p4 = p4 + 2
   Loop
@@ -2886,7 +2909,7 @@ Do While Not (thislof < SeekBuf)
             GetByte f, SeekBuf, check
             If check <> 10 And check <> 13 Or lbreak = check Then
                 NewSeek f, ss  ' restore it
-            If check = 10 Then linebreaktype = 10 Else linebreaktype = 20
+                If lbreak = 10 Then linebreaktype = 10 Else linebreaktype = 20
             End If
             
         End If
@@ -2930,7 +2953,7 @@ Do While Not (thislof < SeekBuf)
                 End If
             If s1 <> vbCr And s1 <> vbLf Or lbreak = s1 Then
                   NewSeek f, ss
-            If s1 = vbLf Then linebreaktype = 10 Else linebreaktype = 20
+            If lbreak = vbLf Then linebreaktype = 10 Else linebreaktype = 20
             End If
         End If
         Exit Do
@@ -2974,7 +2997,7 @@ tryagain:
 notryother:
 
                 NewSeek f, ss  ' restore it
-                If check = 10 Then linebreaktype = 10 Else linebreaktype = 20
+                If lbreak = 10 Then linebreaktype = 10 Else linebreaktype = 20
      
             End If
             
@@ -3050,14 +3073,14 @@ End Sub
 Function InstrTextCompareAnyLocale(Position As Long, from$, this$, Optional uLCID As Long = 1033) As Long
 Dim NORM_IGNORECASE As Long
 If Not NoIgnoreCase Then NORM_IGNORECASE = &H1
-Dim P1 As Long, P2 As Long, l1 As Long, l2 As Long, cu As Long
+Dim P1 As Long, p2 As Long, l1 As Long, l2 As Long, cu As Long
 l1 = (Len(from$) - Len(this$)) * 2 - (Position - 1) * 2
 If l1 < 0 Then Exit Function
 P1 = StrPtr(from$) + (Position - 1) * 2
-P2 = StrPtr(this$)
+p2 = StrPtr(this$)
 l2 = Len(this$)
 For cu = P1 To P1 + l1 Step 2
-If CompareString(uLCID, NORM_IGNORECASE, cu, l2, P2, l2) = 2 Then
+If CompareString(uLCID, NORM_IGNORECASE, cu, l2, p2, l2) = 2 Then
 InstrTextCompareAnyLocale = (cu - StrPtr(from$)) \ 2 + 1
 Exit Function
 End If
@@ -3066,18 +3089,18 @@ End Function
 Function CompareOnly(Position As Long, from$, this$, Optional uLCID As Long = 1033) As Boolean
 Dim NORM_IGNORECASE As Long
 If Not NoIgnoreCase Then NORM_IGNORECASE = &H1
-Dim P1 As Long, P2 As Long, l1 As Long, l2 As Long, cu As Long
+Dim P1 As Long, p2 As Long, l1 As Long, l2 As Long, cu As Long
 l1 = (Len(from$) - Len(this$)) * 2 - (Position - 1) * 2
 If l1 < 0 Then Exit Function
 P1 = StrPtr(from$) + (Position - 1) * 2
-P2 = StrPtr(this$)
+p2 = StrPtr(this$)
 l2 = Len(this$)
-CompareOnly = CompareString(uLCID, NORM_IGNORECASE, P1, l2, P2, l2) = 2
+CompareOnly = CompareString(uLCID, NORM_IGNORECASE, P1, l2, p2, l2) = 2
 End Function
 Function InstrRevTextCompareAnyLocale(from$, this$, Optional Position As Long = -1, Optional uLCID As Long = 1033) As Long
 Dim NORM_IGNORECASE As Long
 If Not NoIgnoreCase Then NORM_IGNORECASE = &H1
-Dim P1 As Long, P2 As Long, l1 As Long, l2 As Long, cu As Long
+Dim P1 As Long, p2 As Long, l1 As Long, l2 As Long, cu As Long
 If Len(from$) < Position Then Position = -1
 If Position > 0 Then
 l1 = (Len(from$) - Len(this$)) * 2 - (Len(from$) - Position) * 2
@@ -3086,10 +3109,10 @@ l1 = (Len(from$) - Len(this$)) * 2
 End If
 If l1 < 0 Then Exit Function
 P1 = StrPtr(from$)
-P2 = StrPtr(this$)
+p2 = StrPtr(this$)
 l2 = Len(this$)
 For cu = P1 + l1 To P1 Step -2
-If CompareString(uLCID, NORM_IGNORECASE, cu, l2, P2, l2) = 2 Then
+If CompareString(uLCID, NORM_IGNORECASE, cu, l2, p2, l2) = 2 Then
 InstrRevTextCompareAnyLocale = (cu - P1) \ 2 + 1
 Exit Function
 End If
@@ -3314,10 +3337,10 @@ CompareStr2 = -2 + CompareString(0, 0, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
 
 End Function
 
-Private Function countbrakcet(a$, K As Long, counter As Long) As Long
+Private Function countbrakcet(a$, k As Long, counter As Long) As Long
 Dim i As Long, j As Integer, blind As Boolean
 countbrakcet = counter
-For i = Abs(K) To Len(a$)
+For i = Abs(k) To Len(a$)
 j = AscW(Mid$(a$, i, 1))
 Select Case j
 Case 34
@@ -3325,7 +3348,7 @@ blind = Not blind
 Case 123
 If Not blind Then countbrakcet = countbrakcet + 1
 Case 125
-If Not blind Then countbrakcet = countbrakcet - 1: If countbrakcet = 0 Then K = i: Exit For
+If Not blind Then countbrakcet = countbrakcet - 1: If countbrakcet = 0 Then k = i: Exit For
 End Select
 Next i
 

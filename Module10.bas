@@ -2657,6 +2657,9 @@ here65654:
                         GoTo err000
                     End If
                     Set mylist = usehandler.objref
+                    If v <= -100 Then
+                        mylist.index = Abs(v) - 100
+                    End If
                     If MemInt(VarPtr(p)) = vbObject Then
                        Set mylist.Value = p
                     Else
@@ -11484,9 +11487,9 @@ contSub:
                                     sbi = 0
                                 Else
                                     If S3 < 0 Then
-                                        sbi = Len(var(-S3).Code) - i - Len(bb$)
+                                        sbi = Len(var(-S3).Code) - i - Len(bb$) + 1
                                     Else
-                                        sbi = Len(sbf(S3).sb) - i - Len(bb$)
+                                        sbi = Len(sbf(S3).sb) - i - Len(bb$) + 1
                                     End If
                                 End If
                                 kolpo = False
@@ -11516,7 +11519,7 @@ subsub02:
                                             p = bstack.isPop3Long(S3, sbi)
                                             If p > 0 Then
                                                 If S3 > 0 Then
-                                                
+                                    
                                                     bb$ = Mid$(sbf(S3).sb, Len(sbf(S3).sb) - p - sbi + 1, p)
                                                 ElseIf S3 = 0 Then
                                                     GoTo jumphere1

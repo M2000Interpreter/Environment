@@ -6755,35 +6755,44 @@ If Not TaskMaster Is Nothing Then TaskMaster.RestEnd1
 End Sub
 
 Public Function ContainsUTF16(ByRef Source() As Byte, Optional maxsearch As Long = -1) As Long
-  Dim i As Long, lUBound As Long, lUBound2 As Long, lUBound3 As Long
+Dim i As Long, lUBound As Long, lUBound2 As Long, lUBound3 As Long
   Dim CurByte As Byte, CurByte1 As Byte
   Dim CurBytes As Long, CurBytes1 As Long
     lUBound = UBound(Source)
+    Dim found1 As Boolean
     If lUBound > 4 Then
     CurByte = Source(0)
     CurByte1 = Source(1)
-    If maxsearch = -1 Then
-    maxsearch = lUBound - 1
-    ElseIf maxsearch < 8 Or maxsearch > lUBound - 1 Then
-    maxsearch = lUBound - 1
-    End If
-    
-    
-    
-    For i = 2 To maxsearch Step 2
-        If CurByte1 = 0 And CurByte < 31 Then CurBytes1 = CurBytes1 + 1
-        If CurByte = 0 And CurByte1 < 31 Then CurBytes = CurBytes + 1
-        If Source(i) = CurByte Then
+    For i = 2 To lUBound - 1 Step 2
+        If CurByte1 = 0 And CurByte < 31 Then
+            CurBytes1 = CurBytes1 + 1
+            found1 = True
+        End If
+        If CurByte = 0 And CurByte1 < 31 Then
             CurBytes = CurBytes + 1
+            found1 = True
+        End If
+        
+        If Source(i) = CurByte Then
+            If Source(i - 1) = Source(i + 1) Then
+                If Source(i) <> Source(i + 1) Then
+                    CurBytes = CurBytes + 1
+                End If
+            End If
         Else
             CurByte = Source(i)
         End If
         If Source(i + 1) = CurByte1 Then
-            CurBytes1 = CurBytes1 + 1
+            If Source(i - 1) = Source(i + 1) Then
+                If Source(i) <> Source(i + 1) Then
+                    CurBytes1 = CurBytes1 + 1
+                
+                End If
+            End If
         Else
             CurByte1 = Source(i + 1)
         End If
-        
+    
     Next i
     End If
     If CurBytes1 = CurBytes And CurBytes1 * 3 >= lUBound Then

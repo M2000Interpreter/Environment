@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 36
+Global Const Revision = 37
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5053,9 +5053,9 @@ contSub:
                                                     sbi = 0
                                                 Else
                                                     If S3 < 0 Then
-                                                        sbi = Len(var(-S3).Code) - i - Len(bb$)
+                                                        sbi = Len(var(-S3).Code) - i - Len(bb$) + 1
                                                     Else
-                                                        sbi = Len(sbf(S3).sb) - i - Len(bb$)
+                                                        sbi = Len(sbf(S3).sb) - i - Len(bb$) + 1
                                                     End If
                                                 End If
                                                 If trace Then
@@ -20549,9 +20549,9 @@ contSub:
                                                     sbi = 0
                                                 Else
                                                     If S3 < 0 Then
-                                                        sbi = Len(var(-S3).Code) - i - Len(bb$)
+                                                        sbi = Len(var(-S3).Code) - i - Len(bb$) + 1
                                                     Else
-                                                        sbi = Len(sbf(S3).sb) - i - Len(bb$)
+                                                        sbi = Len(sbf(S3).sb) - i - Len(bb$) + 1
                                                     End If
                                                 End If
                                                 If trace Then
@@ -30227,9 +30227,9 @@ contSub:
                                     sbi = 0
                                 Else
                                     If S3 < 0 Then
-                                        sbi = Len(var(-S3).Code) - i - Len(bb$)
+                                        sbi = Len(var(-S3).Code) - i - Len(bb$) + 1
                                     Else
-                                        sbi = Len(sbf(S3).sb) - i - Len(bb$)
+                                        sbi = Len(sbf(S3).sb) - i - Len(bb$) + 1
                                     End If
                                 End If
                                 If LastErNum = -1 Then
@@ -31212,9 +31212,9 @@ contSub:
                                     sbi = 0
                                 Else
                                     If S3 < 0 Then
-                                        sbi = Len(var(-S3).Code) - i - Len(bb$)
+                                        sbi = Len(var(-S3).Code) - i - Len(bb$) + 1
                                     Else
-                                        sbi = Len(sbf(S3).sb) - i - Len(bb$)
+                                        sbi = Len(sbf(S3).sb) - i - Len(bb$) + 1
                                     End If
                                 End If
                                 kolpo = False
