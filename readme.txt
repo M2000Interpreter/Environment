@@ -1,35 +1,59 @@
 M2000 Interpreter and Environment
-Version 14 Revision 37
+Version 14 Revision 38
 
-1) A fault index send value a(2)+a(1) to a(1) not a(3). Now fixed
-a=list:= 0:=0, 1:=1, 2:=2
-a(3)=a(2)+a(1)
-? a(3)=3
 
-2) fix the algorithm for finding the type of text file. A problem was about unicode without BOM UTF16 (LE or BE) vs ANSI.
-The problem was for ANSI file which the system open using Edit or Load.Doc and some time read it as UTF16LE.
-There is a new module in INFO.gsb called  CheckDoc which make all possible combinations for UTF8/UTF16LE/UTF16BE/ANSI with line enconding CRLF, LF, CR with BOM/No BOM (ANSI always without BOM). Also this show the algorithm works. And also show how we can program to save various combinations (reading is automatic, unless we suggest the type, although that isn't always a command because for some types algorithm are sure about it).
-You can open any text file with the inner editor of M2000 console (press Esc to save it or Shift F12 to not save it):
-Edit "TestDocUTF8.txt"
-You can open this file using the defaul application for txt files:
-Win "TestDocUTF8.txt"
-or
-Win TestDocUTF8.txt
-Some statements may get filenames/paths without quotes, but not Edit because without "" make/edit modules  
+1) fix an error which occurs from revision 36 (for 36 to 37).
+variant z
+long k[10]
+z=(1,2,3)
+z=k  ' this raise error (revision 36 and 37)
 
-3) fix a problem with a comment using ' after calling a sub...in another sub only;
-Module TestModule {
-	alfa(10)' no problem here
-	End	
-	sub alfa(m)
-		beta(m*2)'here was the problem
-		Print m
-	End Sub
-	Sub beta(x)
-		Print x, "inner"
-	End Sub
+
+2) Variables for Complex numbers do not have ++, --, += ... operators. For tuple the operator repeated all items but skipped complex items. For arrays with parenthesis now return error message "wrong operator". Before was an exception on the code and returned "type mismatch".
+a=((1,-1i), (2,3i))
+a++  ' no message - for complex ++ not work
+link a to a()
+a(0)++  ' wrong operator ' before was type mismatch a VB6 error.
+
+3) Fix Variant z=<Expr ret object>, old workout was to split to two statements: variant z: z=<Expr ret object>. Example shows variant z to get a group. Because z is variant when we pass a copy of a pointer to group if we use =, so first time variant z=alfa() gets a copy of a pointer. This example shows when each object is destroyed and count the number of objects destroyed.
+ 
+global counter=1
+module tst {
+	class alfa {
+		x=10
+		remove {
+			print "deleted ", counter
+			counter++
+		}
+	}
+	dim a(10)<<alfa() '' 10 objects
+	variant z=alfa() ' now work - before need variant z: z=alfa()
+	' 11 objects
+	print z=>x=10  ' z is a pointer to alfa
+	z->a(4)  'get a pointer of a(4) ' z=a(4) get a pointer of a copy
+	z=>x+=100
+	? z=>x=110
+	? a(4).x=110
+	' z is variant - can't hold a named group
+	' 12 objects
+	z=a(5)  ' get a copy as a pointer to group
+	z=>x+=100
+	? z=>x=110
+	? a(5).x=10
+	b=alfa()  ' b is a named group
+	' 13 objects = z has a new object
+	z=b ' get a pointer to a copy of b
+	b.x+=1000
+	? b.x=1010
+	? z=>x=10
+	' z get a pointer to b (as a weak reference not a real pointer)
+	z->b
+	b.x+=1000   ' b.x = 2010
+	? z=>x=2010
+	clear b  ' to execute remove part
 }
-TestModule
+tst
+
 
 
 George Karras, Kallithea Attikis, Greece.
@@ -44,7 +68,7 @@ then press F1 to save info.gsb to M2000 user directory
 
 You can also execute statement SETTINGS to change font/language/colors and size of console letters.
 
-Read wiki at Github for compiling M2000 from source.
+Read wiki at GitHub to compile M2000 from source.
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate (optional)
