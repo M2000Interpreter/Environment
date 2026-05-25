@@ -25023,9 +25023,9 @@ If IsFlatStringExpr(bstack, rest$, Filter$) Then
             End If
         ElseIf LastErNum Then
             Exit Function
+        Else
+            missParam rest$
         End If
-    Else
-        missParam rest$
     End If
 ElseIf LastErNum Then
     Exit Function
