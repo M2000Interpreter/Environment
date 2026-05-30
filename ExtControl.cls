@@ -91,16 +91,22 @@ If Info.EventParameters.Count > 0 Then
 ReDim Values(0 To Info.EventParameters.Count)
 Dim evinf As EventParameter
 M = 0
-Dim aa
+'Dim check As Variant
 For Each evinf In Info.EventParameters
-Err.Clear
-On Error Resume Next
-    aa = CVar(evinf.Value)
-    If MyIsObject(aa) Then
-        Set Values(M) = evinf.Value
+On Error GoTo 100
+    Set check = evinf
+    If MemLong(MemLong(VarPtr(check) + 8) + 24) = 0 Then
+        Err.Clear
+        Values(M) = "Error"
     Else
-        Values(M) = evinf.Value
+        If MyIsObject(evinf.Value) Then
+            Set Values(M) = evinf.Value
+        Else
+            Values(M) = evinf.Value
+        End If
+        
     End If
+100
     If Err Then
         Err.Clear
         Values(M) = "Error"
@@ -113,10 +119,15 @@ If mIndex <> -1 Then
 Else
     Callback.CallbackNow myname$ + "." + Info.Name + "()", Values()
 End If
+On Error Resume Next
 With Info.EventParameters
 For M = M - 1 To 0
     If IsObject(Values(M)) Then
-        Set .item(M).Value = Values(M)
+        If Not .item(M).Value Is Values(M) Then
+            Set check = .item(M)
+            
+            Set check.Value = Values(M)
+        End If
         Err.Clear
     Else
         .item(M).Value = Values(M)

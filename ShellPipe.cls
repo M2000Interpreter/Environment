@@ -99,7 +99,7 @@ Private Declare Function GetExitCodeProcess Lib "kernel32" _
 
 Private Declare Function PeekNamedPipe Lib "kernel32" _
     (ByVal hNamedPipe As Long, _
-     ByVal lpBuf As String, _
+     ByVal lpBuf As Long, _
      ByVal nBufSize As Long, _
      ByRef lpBytesRead As Long, _
      ByRef lpTotalBytesAvail As Long, _
@@ -107,7 +107,7 @@ Private Declare Function PeekNamedPipe Lib "kernel32" _
 
 Private Declare Function ReadFile Lib "kernel32" _
     (ByVal hFile As Long, _
-     ByVal lpBuf As String, _
+     ByVal lpBuf As Long, _
      ByVal nNumberOfBytesToRead As Long, _
      ByRef lpNumberOfBytesRead As Long, _
      ByVal lpOverlapped As Any) As Long
@@ -166,7 +166,7 @@ Public Enum SP_RESULTS
     SP_CREATEPIPEFAILED = &H80042B00
     SP_CREATEPROCFAILED = &H80042B01
 End Enum
-
+Private mCp, mLCid As Long
 Public Event DataArrival(ByVal CharsTotal As Long)
 Public Event ErrDataArrival(ByVal CharsTotal As Long)
 Public Event EOF(ByVal EOFType As SPEOF_TYPES)
@@ -175,7 +175,29 @@ Public Event Error(ByVal Number As Long, _
                    ByVal Source As String, _
                    CancelDisplay As Boolean)
 Public Event ChildFinished()
+Private Declare Function GetLocaleInfo Lib "kernel32" Alias "GetLocaleInfoA" ( _
+    ByVal Locale As Long, _
+    ByVal LCType As Long, _
+    ByVal lpLCData As String, _
+    ByVal cchData As Long _
+) As Long
 
+Private Const LOCALE_IDEFAULTANSICODEPAGE As Long = &H1004
+
+Public Function CodePageFromLCID(ByVal lcid As Long) As Long
+    Dim sBuffer As String
+    Dim n As Long
+
+    sBuffer = String$(16, vbNullChar)
+
+    n = GetLocaleInfo(lcid, LOCALE_IDEFAULTANSICODEPAGE, sBuffer, Len(sBuffer))
+
+    If n > 0 Then
+        CodePageFromLCID = CLng(Left$(sBuffer, n - 1))
+    Else
+        CodePageFromLCID = 0
+    End If
+End Function
 Public Property Get Active() As Boolean
     If blnProcessActive Then 'Last we knew, it was active.
         If WaitForSingleObject(piProc.hProcess, 0&) <> WAIT_OBJECT_0 Then
@@ -353,6 +375,9 @@ Public Function Run( _
 End Function
 
 Public Sub SendData(ByVal Data As String)
+
+
+
     BufferIn.Append Data
     WriteData
 End Sub
@@ -407,10 +432,14 @@ Private Sub ReadData()
     If PipeOpenOut Then
         If PeekNamedPipe(hChildOutPipeRd, WIN32NULL, 0&, WIN32NULL, AvailChars, WIN32NULL) <> WIN32FALSE Then
             If AvailChars > 0 Then
-                Buffer = String$(AvailChars, 0)
-                If ReadFile(hChildOutPipeRd, ByVal Buffer, AvailChars, CharsRead, WIN32NULL) <> WIN32FALSE Then
+                Buffer = String$(AvailChars + 100, 0)
+                
+                'If ReadFile(hChildOutPipeRd, StrPtr(Buffer), AvailChars, CharsRead, WIN32NULL) <> WIN32FALSE Then
+                CharsRead = AvailChars
+                If FileReadString2(hChildOutPipeRd, Buffer, CharsRead) Then
                     If CharsRead > 0 Then
-                        BufferOut.Append Left$(Buffer, CharsRead)
+                        BufferOut.Append Buffer
+                        'BufferOut.Append Left$(Buffer, CharsRead)
                         RaiseEvent DataArrival(BufferOut.Length)
                     Else
                         RaiseEvent EOF(SPEOF_NORMAL)
@@ -452,13 +481,20 @@ Private Sub ReadData()
         If PeekNamedPipe(hChildErrPipeRd, WIN32NULL, 0&, WIN32NULL, AvailChars, WIN32NULL) <> WIN32FALSE Then
             If AvailChars > 0 Then
                 Buffer = String$(AvailChars, 0)
-                If ReadFile(hChildErrPipeRd, ByVal Buffer, AvailChars, CharsRead, WIN32NULL) <> WIN32FALSE Then
+                'If ReadFile(hChildErrPipeRd, ByVal Buffer, AvailChars, CharsRead, WIN32NULL) <> WIN32FALSE Then
+                
+                CharsRead = AvailChars
+                
+                If FileReadString2(hChildErrPipeRd, Buffer, CharsRead) Then
+                    
                     If CharsRead > 0 Then
                         If mErrAsOut Then
-                            BufferOut.Append Left$(Buffer, CharsRead)
+                            BufferOut.Append Buffer
+                '            BufferOut.Append Left$(Buffer, CharsRead)
                             RaiseEvent DataArrival(BufferOut.Length)
                         Else
-                            BufferErr.Append Left$(Buffer, CharsRead)
+                            BufferErr.Append Buffer
+                            'BufferErr.Append Left$(Buffer, CharsRead)
                             RaiseEvent ErrDataArrival(BufferErr.Length)
                         End If
                     Else
@@ -507,7 +543,9 @@ Private Sub WriteData()
     If PipeOpenIn Then
         If BufferIn.Length > 0 Then
             BufferIn.PeekBuffer Buffer
-            If WriteFile(hChildInPipeWr, ByVal Buffer, Len(Buffer), CharsWritten, 0&) <> WIN32FALSE Then
+            If WriteChars2File(hChildInPipeWr, Buffer, Len(Buffer), CharsWritten, 0&) <> WIN32FALSE Then
+             
+            'If WriteFile(hChildInPipeWr, ByVal Buffer, Len(Buffer), CharsWritten, 0&) <> WIN32FALSE Then
                 BufferIn.DeleteData CharsWritten
             Else
                 ErrNum = Err.LastDllError
@@ -521,9 +559,111 @@ Private Sub WriteData()
         BufferIn.Clear
     End If
 End Sub
+Private Function WriteChars2File(ByVal hFile As Long, _
+     lpBuf As String, _
+     ByVal cToWrite As Long, _
+     ByRef cWritten As Long, _
+     ByVal lpOverlapped As Long) As Long
+     Dim Buf1() As Byte, bytes As Long, stb As Long
+     
+     If LenB(lpBuf) = 0 Or cToWrite = 0 Then WriteChars2File = -1: Exit Function
+
+     Select Case mCp
+     Case -1
+        Buf1 = StrConv(lpBuf, vbFromUnicode, 1033)
+        bytes = UBound(Buf1) + 1
+        stb = bytes
+        WriteChars2File = API_Try_WriteFile(hFile, bytes, Buf1())
+        cWritten = cToWrite
+     Case 0
+        Buf1 = Conv2CodePage(lpBuf, DefCodePage)
+        bytes = UBound(Buf1) + 1
+        WriteChars2File = API_Try_WriteFile(hFile, bytes, Buf1())
+        cWritten = bytes
+     Case 1
+        Buf1 = Conv2CodePage(lpBuf, CLng(mLCid))
+        bytes = UBound(Buf1) + 1
+        stb = bytes
+        WriteChars2File = API_Try_WriteFile(hFile, bytes, Buf1())
+        If bytes = 0 Then
+           cWritten = 0
+        ElseIf stb > bytes Then
+           cWritten = CharUtf16(Buf1(), bytes, CLng(mLCid))
+        Else
+           cWritten = cToWrite
+        End If
+     Case 65001
+     
+        
+        Buf1 = Conv2CodePage(lpBuf, 65001) ' Utf16toUtf8(lpBuf)
+        bytes = UBound(Buf1) + 1
+        
+        stb = bytes
+        WriteChars2File = API_Try_WriteFile(hFile, bytes, Buf1())
+        If bytes = 0 Then
+           cWritten = 0
+        ElseIf stb > bytes Then
+           cWritten = CharUtf16(Buf1(), bytes, 65001)
+        Else
+           cWritten = cToWrite
+        End If
+     
+     Case Else
+        Buf1 = Conv2CodePage(lpBuf, CLng(mCp))
+        bytes = UBound(Buf1) + 1
+        stb = bytes
+        WriteChars2File = API_Try_WriteFile(hFile, bytes, Buf1())
+        If bytes = 0 Then
+           cWritten = 0
+        ElseIf stb > bytes Then
+           cWritten = CharUtf16(Buf1(), bytes, CLng(mCp))
+        Else
+           cWritten = cToWrite
+        End If
+     
+     End Select
+     
+End Function
+Private Function FileReadString2(FileH As Long, r$, bytes As Long) As Boolean
+    Dim Buf1() As Byte, dummy As Long, d$
+    If bytes <= 0 Then r$ = vbNullString: Exit Function
+    If FileH = 0 Then Exit Function
+    ReDim Buf1(0 To bytes - 1)
+    'r$ = Buf1()
+    dummy = API_Try_ReadFile(FileH, bytes, Buf1())
+    If bytes > 0 Then
+    FileReadString2 = True
+    ReDim Preserve Buf1(0 To bytes - 1)
+    r$ = Buf1()
+    CopyMemory ByVal StrPtr(r$), Buf1(0), bytes
+    Select Case mCp
+        Case -1
+        Case 0
+            r$ = StrConv(r$, vbUnicode)
+        Case 1
+            r$ = OEMdecode(r$, mLCid)
+        Case 65001
+            r$ = utf8decode(r$)
+        Case Else
+        On Error Resume Next
+            d$ = StrConv(r$, vbUnicode, mLCid)
+            If Err Then
+                MyEr "can't use the selected cp", "δεν μπορώ χρησιμοποιήσω την επιλεγμένη κωδικοποίηση"
+                r$ = StrConv(r$, vbUnicode)
+            Else
+                SwapStrings d$, r$
+            End If
+        End Select
+    
+    Else
+        r$ = vbNullString
+    End If
+End Function
 
 Private Sub Class_Initialize()
     blnFinishedChild = True
+    mCp = DefCodePage
+    mLCid = LCID_DEF
     Set BufferOut = New SPBuffer
     Set BufferErr = New SPBuffer
     Set BufferIn = New SPBuffer
@@ -536,3 +676,38 @@ End Sub
 Private Sub Class_Terminate()
 FinishChild
 End Sub
+
+Public Property Get ChCp() As Variant
+ChCp = mCp
+End Property
+
+Public Property Let ChCp(ByVal vNewValue As Variant)
+If vNewValue = -1 Then
+mCp = -1
+mLCid = LCIDFromCodePage(CLng(mCp))
+    
+Else
+mCp = vNewValue
+If mCp < 10000 And mCp <> 0 Then
+    mLCid = LCIDFromCodePage(CLng(mCp))
+    If mLCid = 0 Then
+    mLCid = mCp
+    mCp = 1
+    End If
+End If
+End If
+End Property
+Public Property Let ChCpFromLCID(ByVal vNewValue As Variant)
+Dim oCp As Long
+oCp = mCp
+On Error Resume Next
+If vNewValue = 0 Then
+vNewValue = lcid
+End If
+mCp = CodePageFromLCID(CLng(vNewValue))
+If Err Then
+    Err.Clear
+    mLCid = CLng(vNewValue)
+    mCp = oCp
+End If
+End Property

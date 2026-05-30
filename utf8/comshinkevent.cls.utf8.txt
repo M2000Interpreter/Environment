@@ -123,7 +123,7 @@ End Type
 
 Private Type SAFEARRAYBOUND
     cElements                   As Long
-    lLbound                     As Long
+    lLBound                     As Long
 End Type
 
 Private Type SAFEARRAY_1D
@@ -200,7 +200,7 @@ Private oECP        As IEnumConnectionPoints
 Private pECP        As Long
 Private pVTblECP    As Long
 
-Private oCP         As IConnectionPoint
+Private oCp         As IConnectionPoint
 Private pCP         As Long
 Private pVTblCP     As Long
 
@@ -371,7 +371,7 @@ Private Function pvGetParamArray(ByVal Ptr As Long, numArg As Long) As Variant()
     ' array pointing to the param array
     With SafeArray
         .Bounds(0).cElements = tDPAR.cArgs
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .cDims = 1
         .cbElements = 16
         .pvData = tDPAR.rgPointerToVariantArray
@@ -509,8 +509,8 @@ Public Sub fireevent(ByVal dispid As Long, ByVal params As Long)
     Else
         strEvent = GetMemberName(oTarget, dispid, iid_event, what$)
         inUse.AddKey dispid, strEvent, what$
+        
     End If
- 
     Dim refc() As Long
     vParams = pvGetParamArray2(params, NumVar, refc)
     On Error Resume Next
@@ -529,8 +529,8 @@ Public Sub Detach()
     If Not blnAttached Then Exit Sub
 
     ' clean up
-    hRet = CallPointer(oCP.Unadvise, pCP, dwCookie)
-    hRet = CallPointer(oCP.iunk.Release, pCP)
+    hRet = CallPointer(oCp.Unadvise, pCP, dwCookie)
+    hRet = CallPointer(oCp.iunk.Release, pCP)
     hRet = CallPointer(oECP.iunk.Release, pECP)
     hRet = CallPointer(oCPC.iunk.Release, pCPC)
     Set oTarget = Nothing
@@ -583,10 +583,10 @@ again:
 
     ' IConnectionPoint VTable
     CpyMem pVTblCP, ByVal pCP, 4
-    CpyMem oCP, ByVal pVTblCP, Len(oCP)
+    CpyMem oCp, ByVal pVTblCP, Len(oCp)
 
     ' IID of the event interface
-    hRet = CallPointer(oCP.GetConnectionInterface, pCP, VarPtr(iid_event))
+    hRet = CallPointer(oCp.GetConnectionInterface, pCP, VarPtr(iid_event))
     If hRet Then Exit Function
     check$ = GetGUIDstr(iid_event)
     ' IPropertyNotifySink  not this
@@ -598,7 +598,7 @@ again:
     Set oSink = CreateEventSink(iid_event, Me)
 
     ' advise the event sink
-    hRet = CallPointer(oCP.Advise, pCP, ObjPtr(oSink), VarPtr(dwCookie))
+    hRet = CallPointer(oCp.Advise, pCP, ObjPtr(oSink), VarPtr(dwCookie))
     If hRet Then Exit Function
 
     ' wohoo, done!
@@ -684,37 +684,37 @@ Private Sub pvSetParamArray2(ByVal Ptr As Long, aParams() As Variant, ref() As L
     Dim lIdx        As Long
     Dim lPtr        As Long
     Dim lVarPtr     As Long
-    Dim iP          As Long
+    Dim IP          As Long
     Dim Zero
     CpyMem tDPAR, ByVal Ptr, Len(tDPAR)
     lVarPtr = tDPAR.rgPointerToVariantArray
 
     For lIdx = 0 To tDPAR.cArgs - 1
-            iP = tDPAR.cArgs - lIdx
-            CpyMem iVarType, ByVal VarPtr(aParams(iP)), 2&
+            IP = tDPAR.cArgs - lIdx
+            CpyMem iVarType, ByVal VarPtr(aParams(IP)), 2&
             CpyMem lPtr, ByVal lVarPtr + (lIdx * 16&) + 8&, 4&
             iVarType = iVarType And &HBFFF&
-            If ref(iP) Then
-            lPtr = ref(iP)
+            If ref(IP) Then
+            lPtr = ref(IP)
             If iVarType = 12 Or lPtr < 0 Then
                 If lPtr < 0 Then
-                    CpyMem ByVal -lPtr, ByVal VarPtr(aParams(iP)), 16
+                    CpyMem ByVal -lPtr, ByVal VarPtr(aParams(IP)), 16
                 Else
-                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(iP)), 16
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)), 16
                 End If
             ElseIf iVarType = 14 Then
-                CpyMem ByVal lPtr + 2, ByVal VarPtr(aParams(iP)) + 2, 14
+                CpyMem ByVal lPtr + 2, ByVal VarPtr(aParams(IP)) + 2, 14
             Else
                 Select Case iVarType
                 Case vbDouble, vbCurrency, vbDate
-                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(iP)) + 8, 8
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)) + 8, 8
                 Case vbBoolean, vbInteger
-                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(iP)) + 8, 2
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)) + 8, 2
                 Case vbByte
-                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(iP)) + 8, 1
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)) + 8, 1
                 Case vbEmpty, vbNull
                 Case Else
-                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(iP)) + 8, 4
+                    CpyMem ByVal lPtr, ByVal VarPtr(aParams(IP)) + 8, 4
                 End Select
             End If
             If lPtr >= 0 Then
@@ -722,7 +722,7 @@ Private Sub pvSetParamArray2(ByVal Ptr As Long, aParams() As Variant, ref() As L
                    
             CpyMem ByVal lVarPtr + (lIdx * 16&), VarPtr(iVarType), 2
             End If
-            CpyMem aParams(iP), Zero, 16
+            CpyMem aParams(IP), Zero, 16
 
             End If
     Next

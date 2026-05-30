@@ -31,35 +31,34 @@ End Enum
 'To update oleaut32
 Public Declare Function SetParent Lib "user32" (ByVal hWndChild As Long, ByVal hWndNewParent As Long) As Long
 Private Declare Sub VariantCopy Lib "OleAut32.dll" (ByRef pvargDest As Variant, ByRef pvargSrc As Variant)
-Private KnownProp As FastCollection
-Private Init As Boolean
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
 Private Declare Function GetForegroundWindow Lib "user32" () As Long
 Public Function FindDISPID(pobjTarget As Object, ByVal pstrProcName As Variant) As Long
-
     Dim IDsp        As IDispatch.IDispatchM2000
     Dim riid        As IDispatch.IID
-    Dim dispid      As Long
-
-    Dim lngRet      As Long
+    Dim pp      As Long
     FindDISPID = -1
     If pobjTarget Is Nothing Then Exit Function
-
-    Dim a$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
-    ReDim myptr(0 To 0)
-    myptr(0) = StrPtr(pstrProcName)
-    
- Set IDsp = pobjTarget
- If Not getone(Typename(pobjTarget) & "." & pstrProcName, dispid) Then
-      lngRet = IDsp.GetIDsOfNames(riid, myptr(0), 1&, Clid, arrdispid(0))
-     
-      If lngRet = 0 Then dispid = arrdispid(0): PushOne Typename(pobjTarget) & "." & pstrProcName, dispid
-      
-      Else
-      lngRet = 0
-End If
-If lngRet = 0 Then FindDISPID = dispid
+    Set IDsp = pobjTarget
+    If IDsp.GetIDsOfNames(riid, StrPtr(pstrProcName), 1&, Clid, pp) = 0 Then FindDISPID = pp
 End Function
+Public Function FindDISPIDExt(pobjTarget As Object, ByVal pstrProcName As Variant) As Long
+    Dim IDsp        As IDispatch.IDispatchM2000
+    Dim riid        As IDispatch.IID
+    Dim pp      As Long
+    Dim E1 As ExtControl
+    FindDISPIDExt = -1
+    If pobjTarget Is Nothing Then Exit Function
+    If TypeOf pobjTarget Is ExtControl Then
+        Set E1 = pobjTarget
+        Set IDsp = E1.Value
+        Set pobjTarget = IDsp ' RETURN
+    Else
+        Set IDsp = pobjTarget
+    End If
+    If IDsp.GetIDsOfNames(riid, StrPtr(pstrProcName), 1&, Clid, pp) = 0 Then FindDISPIDExt = pp
+End Function
+
 Public Sub ShutEnabledGuiM2000(Optional all As Boolean = False)
 Dim X As Form, bb As Boolean
 
@@ -89,8 +88,8 @@ Public Function CallByNameFixParamArray _
     ' CallType      :   vbLet/vbGet/vbSet/vbMethod
     ' pArgs()       :   Param Array of parameters required for methode/property
     ' New by George
-     ' pargs2() the names of arguments
-     ' fixnamearg = the number of named arguments
+    ' pargs2() the names of arguments
+    ' fixnamearg = the number of named arguments
     Dim usehandler As mHandler
     Dim myform As Form
     Dim IDsp        As IDispatch.IDispatchM2000
@@ -120,19 +119,10 @@ Dim mmm As mArray
     Set IDsp = pobjTarget
     If fixnamearg = 0 Then
         ReDim varDISPID(0 To 0)
-If Not getone(Typename$(pobjTarget) & "." & pstrProcName, dispid) Then
-            ReDim myptr(0 To 0)
-            myptr(0) = StrPtr(pstrProcName)
-            
-            lngRet = IDsp.GetIDsOfNames(riid, myptr(0), 1&, Clid, varDISPID(0))
-            'if varDISPID(0)=-2147414014
-            If lngRet = 0 Then dispid = varDISPID(0): PushOne Typename$(pobjTarget) & "." & pstrProcName, dispid
-            Else
-            
-            lngRet = 0
-            
-End If
-Else
+        lngRet = IDsp.GetIDsOfNames(riid, StrPtr(pstrProcName), 1&, Clid, dispid)
+        If lngRet <> 0 Then dispid = -1
+    
+    Else
             ReDim myptr(0 To fixnamearg)
             myptr(0) = StrPtr(pstrProcName)
             For lngLoop = fixnamearg To 1 Step -1
@@ -198,15 +188,13 @@ passhere:
                     .rgPointerToVariantArray = VarPtr(varArr(0))
                  If CallType = VbLet Or CallType = VbSet Or fixnamearg > 0 Then
                 
-        If fixnamearg = 0 Then
-                ReDim varDISPID(0 To 0)
-                 varDISPID(0) = DISPID_PROPERTYPUT
+                If fixnamearg = 0 Then
+                    ReDim varDISPID(0 To 0)
+                    varDISPID(0) = DISPID_PROPERTYPUT
                    .cNamedArgs = 1
-                  .rgPointerToDISPIDNamedArgs = VarPtr(varDISPID(0))
+                    .rgPointerToDISPIDNamedArgs = VarPtr(varDISPID(0))
                  Else
-                  .cNamedArgs = fixnamearg
-
-      
+                    .cNamedArgs = fixnamearg
                   .rgPointerToDISPIDNamedArgs = VarPtr(varDISPID(1))
                 End If
                 
@@ -602,6 +590,7 @@ Public Function ReadOneParameter(pobjTarget As Object, dispid As Long, ERrR$, Va
        ' Invoke method/property
     Err.Clear
     On Error Resume Next
+    VarRet = Empty
     lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
     If Err > 0 Then
         If MyIsObject(VarRet) Then
@@ -691,10 +680,17 @@ Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR
         Err.Clear
         On Error Resume Next
         lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
+        If lngRet = &H8002000E Then
+        If CallType = VbGet Then
+            CallType = VbMethod
+            lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
+        End If
+        End If
 If Err > 0 Then
 If MyIsObject(VarRet) Then
     If VarRet Is Err Then Exit Function
 End If
+Set VarRet = Nothing
 ERrR$ = Err.Description
 Exit Function
 Else
@@ -704,6 +700,7 @@ Else
             Else
               ERrR$ = str$(lngRet)
             End If
+            
             Exit Function
         End If
   End If
@@ -716,6 +713,8 @@ Else
             ReadOneIndexParameter = 0
             ByPass = False
         Else
+            ByPass = True
+            
             Set ReadOneIndexParameter = VarRet
 
         End If
@@ -875,27 +874,6 @@ Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, val1, E
     
 End Sub
 
-Private Sub PushOne(KnownPropName As String, ByVal v As Long)
-On Error Resume Next
-If Not KnownProp.Find(LCase(KnownPropName)) Then KnownProp.AddKey LCase$(KnownPropName)
-KnownProp.Value = v
-
-End Sub
-Private Function getone(KnownPropName As String, this As Long) As Boolean
-On Error Resume Next
-Dim v As Long
-InitMe
-If KnownProp.Find(LCase$(KnownPropName)) Then
-getone = True: this = KnownProp.Value
-End If
-End Function
-
-Private Sub InitMe()
-If Init Then Exit Sub
-Set KnownProp = New FastCollection
-' from this collection we never delete items.
-Init = True
-End Sub
 Public Function MakeObjectFromString(obj As Variant, objstr As String) As Object
 Dim o As Object, strvar, varg(), obj1 As Object, varg2() As String
 strvar = objstr

@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 ' Basetask is a module task of M2000
 ' This is a utility soros for passing parammeters to functions
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Public LoadOnly As Boolean, NoRun As Boolean
 Public CheckUnReferenceGui As Long
 Public callx1 As Long, tpointer As Long
@@ -284,7 +284,7 @@ If Not StaticCollection.Find(Name$) Then Exit Function
         If usehandler.t1 = 3 Then
             Dim mm As iBoxArray, mm1 As tuple, mm2 As mArray
             Set mm = usehandler.objref
-            If mm.Arr Then
+            If mm.arr Then
             If TypeOf mm Is mArray Then
                 Set mm2 = mm
                 mm2.Compute0 p, ss$
@@ -409,12 +409,12 @@ End If
 End Function
 Static Function MyRound(a As Variant, Optional ByVal i As Integer = 0)
 Dim c As Variant, j As VbVarType
-Dim N(1 To 28) As Single, D(1 To 28) As Double, cur(1 To 28) As Currency, dec(1 To 28) As Variant
+Dim n(1 To 28) As Single, D(1 To 28) As Double, cur(1 To 28) As Currency, dec(1 To 28) As Variant
 Dim sg(-1 To 1) As Single, sg4(-1 To 1) As Double, sg8(-1 To 1) As Currency
 j = VarType(a)
 If j < vbSingle Then MyRound = a: Exit Function
 On Error GoTo there
-If N(1) = 0 Then
+If n(1) = 0 Then
     sg(-1) = CSng(-0.5)
     sg(1) = CSng(0.5)
     sg4(-1) = -0.5
@@ -422,13 +422,13 @@ If N(1) = 0 Then
     sg8(-1) = CCur(-0.5)
     sg8(1) = CCur(0.5)
     For c = 1& To 6&
-        N(c) = CSng(10 ^ c)
+        n(c) = CSng(10 ^ c)
     Next c
     For c = 7& To 27&
-        N(c) = CSng(-1)
+        n(c) = CSng(-1)
     Next c
-        N(c) = CSng(10 ^ 5)
-        N(10) = CSng(10 ^ 5)
+        n(c) = CSng(10 ^ 5)
+        n(10) = CSng(10 ^ 5)
     For c = 1& To 13&
         D(c) = CDbl(10 ^ c)
     Next c
@@ -454,9 +454,9 @@ End If
         c = Fix(a)
         Select Case j
         Case vbSingle
-            If N(i) > 0 Then
+            If n(i) > 0 Then
                 c = sg(Sgn(a))
-                MyRound = Fix(a * N(i) + c) / N(i)
+                MyRound = Fix(a * n(i) + c) / n(i)
             Else
                 MyRound = a
             End If
@@ -549,12 +549,12 @@ Public Sub ReadStaticCol2(Name$, var As Variant)
         End If
     End With
 End Sub
-Public Sub DropNdot(N As Long)
-If N = 0 Then Exit Sub
-If curdotcol - N < 0 Then
+Public Sub DropNdot(n As Long)
+If n = 0 Then Exit Sub
+If curdotcol - n < 0 Then
     curdotcol = 0
 Else
-    curdotcol = curdotcol - N
+    curdotcol = curdotcol - n
 End If
 End Sub
 

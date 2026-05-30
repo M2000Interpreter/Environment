@@ -55,6 +55,30 @@ Public Type QuatType                      ' To get axis and theta back out (JPL 
     Y As Double         ' v.y * sin(theta/2)        v.y = q.y / sin(theta/2)
     Z As Double         ' v.z * sin(theta/2)        v.z = q.z / sin(theta/2)
 End Type
+' There are another version as  MakeVector
+Public Function NewVector(X As Double, Y As Double, Z As Double) As VecType
+NewVector.X = X
+NewVector.Y = Y
+NewVector.Z = Z
+End Function
+Public Function NewLineType(p1 As VecType, p2 As VecType) As LineType
+NewLineType.point1 = p1
+NewLineType.point2 = p2
+End Function
+Public Function NewSegType(O As VecType, AF As VecType, AL As VecType, AU As VecType) As SegType
+NewSegType.Origin = O
+NewSegType.AxisF = AF
+NewSegType.AxisL = AL
+NewSegType.AxisU = AU
+End Function
+' There is another version MakeQuatType
+Public Function NewQuatType(W As Double, X As Double, Y As Double, Z As Double) As QuatType
+NewQuatType.W = W
+NewQuatType.X = X
+NewQuatType.Y = Y
+NewQuatType.Z = Z
+End Function
+
 Public Sub Vector(a As Long, X As Double, Y As Double, Z As Double)
 Dim V1 As VecType
 V1.X = X
@@ -89,6 +113,8 @@ Public Function DotProduct(a As Long, b As Long) As Double
     CopyMemory VarPtr(V2), b, 24
     DotProduct = V1.X * V2.X + V1.Y * V2.Y + V1.Z * V2.Z
 End Function
+
+
 Public Sub XProduct(a As Long, b As Long, c As Long)
     Dim V1 As VecType, V2 As VecType, V3 As VecType
     CopyMemory VarPtr(V1), a, 24
@@ -98,19 +124,22 @@ Public Sub XProduct(a As Long, b As Long, c As Long)
     V3.Z = V1.X * V2.Y - V1.Y * V2.X
     PutVector V3, c
 End Sub
-Public Sub RotVect(a As Long, b As Long, c As Long, Angle As Double, Optional bDegrees As Boolean = True)  '(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
+Public Function VecRotVect(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
+    VecRotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
+End Function
+Public Sub RotVect(a As Long, b As Long, c As Long, angle As Double, Optional bDegrees As Boolean = True)  '(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
     Dim vec As VecType, axis As VecType, RotVect As VecType
     CopyMemory VarPtr(vec), a, 24
     CopyMemory VarPtr(axis), b, 24
-    RotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, Angle, bDegrees))
+    RotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
     CopyMemory c, VarPtr(RotVect), 24
 End Sub
-Public Sub RotVectMult(n As Long, a As Long, b As Long, c As Long, Angle As Double, Optional bDegrees As Boolean = True)  '(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
+Public Sub RotVectMult(n As Long, a As Long, b As Long, c As Long, angle As Double, Optional bDegrees As Boolean = True)  '(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
     Dim vec As VecType, axis As VecType, RotVect As VecType, M As Long
     CopyMemory VarPtr(axis), b, 24
     For M = 1 To n
     CopyMemory VarPtr(vec), a, 24
-    RotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, Angle, bDegrees))
+    RotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
     CopyMemory c, VarPtr(RotVect), 24
     a = a + 24
     c = c + 24
@@ -438,16 +467,16 @@ Public Function Quat2Up(q As QuatType) As VecType
     Quat2Up = RotVecByQuat(MakeVec(0, 0, 1), q)
 End Function
 
-Public Function AxisAngle2Quat(axis As VecType, ByVal Angle As Double, Optional bDegrees As Boolean = True) As QuatType
+Public Function AxisAngle2Quat(axis As VecType, ByVal angle As Double, Optional bDegrees As Boolean = True) As QuatType
     ' You should be sure the vector is a UNIT vector before calling this, else the quaternion will not be a unit quaternion.
     ' Note that the Axis(vector) is the rotation vector, and has nothing to do with basis vectors.
     '
     Dim SinThetaDivTwo As Double
     '
-    If bDegrees Then Angle = Deg2Rad(Angle)
-    SinThetaDivTwo = Sin(Angle / 2)
+    If bDegrees Then angle = Deg2Rad(angle)
+    SinThetaDivTwo = Sin(angle / 2)
     '
-    AxisAngle2Quat.W = Cos(Angle / 2)
+    AxisAngle2Quat.W = Cos(angle / 2)
     AxisAngle2Quat.X = axis.X * SinThetaDivTwo
     AxisAngle2Quat.Y = axis.Y * SinThetaDivTwo
     AxisAngle2Quat.Z = axis.Z * SinThetaDivTwo
@@ -483,10 +512,10 @@ End Function
 '****************************************************************************************************
 '****************************************************************************************************
 
-Public Function RotSeg(seg As SegType, axis As VecType, Angle As Double, Optional bDegrees As Boolean = True) As SegType
+Public Function RotSeg(seg As SegType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As SegType
     ' This is exactly like a rotation: (Seg2 = Rot(Seg1, Axis, Angle)).
     '
-    RotSeg = RotSegByQuat(seg, AxisAngle2Quat(axis, Angle, bDegrees))
+    RotSeg = RotSegByQuat(seg, AxisAngle2Quat(axis, angle, bDegrees))
 End Function
 
 Public Function RotSegByQuat(seg As SegType, quat As QuatType) As SegType
@@ -518,8 +547,8 @@ Public Function UnRotQuat(q1 As QuatType, q2 As QuatType) As QuatType
     UnRotQuat = RotQuat(q1, NegQuat(q2))
 End Function
 
-Public Function RotVec(vec As VecType, axis As VecType, Angle As Double, Optional bDegrees As Boolean = True) As VecType
-    RotVec = RotVecByQuat(vec, AxisAngle2Quat(axis, Angle, bDegrees))
+Public Function RotVec(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
+    RotVec = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
 End Function
 
 Public Function RotVecByQuat(vec As VecType, quat As QuatType) As VecType
@@ -669,6 +698,11 @@ Public Sub VecDiffMult(n As Long, a As Long, b As Long, c As Long)
     c = c + 24
     Next M
 End Sub
+Public Function VecDifNum(V1 As VecType, D As Double) As VecType
+    VecDifNum.X = V1.X - D
+    VecDifNum.Y = V1.Y - D
+    VecDifNum.Z = V1.Z - D
+End Function
 
 
 Sub VecDiffNum(a As Long, D As Double, b As Long)
@@ -1399,49 +1433,49 @@ End Function
 ' hyperbolic sine
 
 Public Function Sinh(Value As Double) As Double
-    Dim Temp As Double
-    Temp = EXP(Value)
-    Sinh = (Temp - 1 / Temp) / 2
+    Dim temp As Double
+    temp = EXP(Value)
+    Sinh = (temp - 1 / temp) / 2
 End Function
 
 ' hyperbolic cosine
 
 Public Function Cosh(Value As Double) As Double
-    Dim Temp As Double
-    Temp = EXP(Value)
-    Cosh = (Temp + 1 / Temp) / 2
+    Dim temp As Double
+    temp = EXP(Value)
+    Cosh = (temp + 1 / temp) / 2
 End Function
 
 ' hyperbolic tangent
 
 Public Function Tanh(Value As Double) As Double
-    Dim Temp As Double
-    Temp = EXP(Value)
-    Tanh = (Temp - 1 / Temp) / (Temp + 1 / Temp)
+    Dim temp As Double
+    temp = EXP(Value)
+    Tanh = (temp - 1 / temp) / (temp + 1 / temp)
 End Function
 
 ' hyperbolic cotangent
 
 Public Function CotH(Value As Double) As Double
-    Dim Temp As Double
-    Temp = EXP(Value)
-    CotH = (Temp + 1 / Temp) / (Temp - 1 / Temp)
+    Dim temp As Double
+    temp = EXP(Value)
+    CotH = (temp + 1 / temp) / (temp - 1 / temp)
 End Function
 
 ' hyperbolic secant
 
 Public Function Sech(Value As Double) As Double
-    Dim Temp As Double
-    Temp = EXP(Value)
-    Sech = 2 / (Temp + 1 / Temp)
+    Dim temp As Double
+    temp = EXP(Value)
+    Sech = 2 / (temp + 1 / temp)
 End Function
 
 ' hyperbolic cosecant
 
 Public Function Csch(Value As Double) As Double
-    Dim Temp As Double
-    Temp = EXP(Value)
-    Csch = 2 / (Temp - 1 / Temp)
+    Dim temp As Double
+    temp = EXP(Value)
+    Csch = 2 / (temp - 1 / temp)
 End Function
 
 

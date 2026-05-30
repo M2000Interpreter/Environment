@@ -6429,8 +6429,8 @@ MODULE TEXTOUT {Module UsingEvents {
       Const  SVESentenceBoundary = 128
       Const SVSFlagsAsync = 1&
  
-      With sp, "EventInterests", SVEWordBoundary+SVEEndInputStream+SVESentenceBoundary
-      Method sp, "Speak", That$, SVSFlagsAsync
+      sp=>EventInterests =  SVEWordBoundary+SVEEndInputStream+SVESentenceBoundary
+      sp=>Speak That$, SVSFlagsAsync
       While Not EndStream {Wait 10}
       Wait 100
 }
@@ -27693,11 +27693,14 @@ With objExecObject, "StdOut" set StdOut
 With objExecObject, "Stdin" set StdIn
 With objExecObject, "Status" as Status
 With StdOut, "AtEndOfStream" as AtEndOfStream
+' no chcp 6500
+' this  (utf8) not work
+Method StdIn, "WriteLine" , "chcp 1253"
 Method StdIn, "WriteLine" , "cd c:\"
 Method StdIn, "WriteLine" , "dir"
 Method StdIn, "WriteLine" ," "
 wait 1000
-\\ we have to minimize the window
+' we have to minimize the window
 t=GetForegroundWindow()
 t1=ShowWindow(t, SW_MINIMIZE)
 a$=""
@@ -27717,7 +27720,9 @@ Every 10 {
                   		Method StdIn, "WriteLine" ," "
 	else
 		if right$(p$, len(a$)+1)=">"+a$ else
-			if p$=""   else  print #-2, p$ : refresh
+			if p$=""   else
+			print #-2, p$ : refresh
+			end if
 		end if
 	end if
 	if keypress(27) then exit
@@ -27727,7 +27732,12 @@ print "End"
 Declare objExecObject nothing
 Declare objShell nothing
 }
-MODULE HANDLER2 {Escape Off
+MODULE HANDLER2 {Declare SetConsoleOutputCP Lib "kernel32.SetConsoleOutputCP" {Long code}
+Declare GetConsoleOutputCP Lib "kernel32.GetConsoleOutputCP" {}
+Declare SetConsoleCP Lib "kernel32.SetConsoleCP" {Long code}
+Declare GetConsoleCP Lib "kernel32GetConsoleCP"
+
+Escape Off
 Form 80, 50
 Pen 15 {
 	Print "Demo: Using a console program from M2000, using ShellPipe internal object"
@@ -27737,22 +27747,55 @@ cls, 2
 Declare withevents SP SHELLPIPE
 Rem Print TYPE$(SP)
 with SP, "Active" as IsActive, "Hasline" as Sp.HasLine
-Method SP, "Run","cmd.exe /k" as ok
+//Method SP, "Run","cmd.exe  /d  /u /k" as ok
+Method SP, "Run","cmd.exe  /d  /k" as ok
+
 Wait 200
 Show
 Rem Print ok
 If ok=0 then
+' With SP, "chcp", -1  ' for /u 
+'  utf-8 work input - not work output (only for english letters)    	
+	Method SP, "SendLine", "chcp 65001"
+	With SP, "chcp", 65001 
+//	
+' set utf16le base on code page 1253  - work Input/Output
+//	 Method SP, "SendLine", "chcp 1253"
+//	  With SP, "chcp", 1253
+
+' set OEM 737  - work Input/Output
+//	Method SP, "SendLine", "chcp 737"
+//	With SP, "chcp", 737
+
+//	Method SP, "SendLine", "chcp 869"
+//	With SP, "chcp", 869
+
+
+' set codepage from locale 1032  - work Input/Outpu
+//	    With Sp, "ChCpFromLCID", 1032, "ChCp" as Cp    
+//	    Method SP, "SendLine", "chcp "+ cp
+    
+    Method SP, "SendLine", "Cd c:\"
     Method SP, "SendLine", "Dir"
     idle=timecount
     lastcomm$=""
     comm$=""
     profiler
+    crlf={
+    }
     Function SP_DataArrival {
     	While  Sp.HasLine
     		idle=timecount
     		method Sp, "GetLine" as aLine$
-    		if right$(aline$, len(lastcomm$)+1)<>">"+lastcomm$ then
-    			Print #-2, aLine$
+             	if right$(aline$, len(lastcomm$)+1)<>">"+lastcomm$ then
+             		dim a$()
+             		a$()=piece$(aLine$,crlf)
+    			z=each(a$())
+    			t=len(a$())
+    			while z
+    				print a$(z^);
+    				if z^<t then print
+    			end while
     	           	Refresh
     	           end if
               End While
@@ -27764,7 +27807,7 @@ If ok=0 then
     	if (timecount-idle)>100 then
     		Print "(child)>";
     		Pen 15 {Line Input comm$}
-    		Print
+    		Print    		
     		Method SP, "SendLine", comm$
     		refresh
     		lastcomm$=comm$
@@ -28359,8 +28402,8 @@ Declare DeleteMenu Lib "User32.DeleteMenu"  {Long hMenu, Long  uPosition, Long  
 
 Call void GetConsole()
 
-'Call void SetConsoleOutputCP(65001)
-'Call void SetConsoleCP(65001)
+//	Call void SetConsoleOutputCP(65001)
+//	Call void SetConsoleCP(65001)
 Long  m=-11, m1=-10
 Call void ConsoleCaption("George's Console")
 m=GetHandle(m)
@@ -28377,6 +28420,14 @@ Global retvalue, back$=module$
 buffer clear retvalue as long
 buffer clear getchar as integer*500
 Rem Title "", 0   ' minimize M2000 console/ hide title
+' this run cmd.exe inside our console, set the code page to UTF8 and exit
+' but the setting is there for next time - write *Dir /w  at M2000> prompt
+' we don't need this for using unicode
+ dos "chcp 65001 >nul && exit"
+// you don't need this because you can set UTF8 using this
+// check it using *chcp from M2000> prompt. 
+//	Call void SetConsoleOutputCP(65001)
+//	Call void SetConsoleCP(65001)
 
 For i=1 to 100
     PrintConsole("Καλημέρα - "+"ברוכים הבאים - الجامعات والكليات "+str$(i)+newline$)
@@ -37471,22 +37522,22 @@ Enum UcsNineButtonStyleEnum {
 }
 declare FORM1 FORM
 declare Button(30) type "ctxninebutton" form form1    // then name is "M2000.ctxninebutton", if .ctxninebutton exist in registry then we get that;
-Method FORM1,"move", 1000, 1000, 14000, 12000
-z=Button(0)
-With z,"ButtonTextFlags" as ButtonTextFlags()
+//Method FORM1,"move", 1000, 1000, 14000, 12000
+Form1=>move 1000, 1000, 14000, 12000
 for i=0 to 14
 	
-	Method Button(i), "move", 1000,1000+630*i, 4000, 600
+	Button(i)=>move 1000,1000+630*i, 4000, 600
 	With Button(i), "Style", i+1, "ManualFocus",true, "AnimationDuration", 1.2~, "AutoRedraw",True
-		With Button(i+15),  "ButtonTextFlags", ucsBstNormal @ ucsBflHorRight
-	z=Button(i)
-	ButtonTextFlags(ucsBstPressed)=2^random(1, 6)
-	Method Button(i+15), "move", 6000,1000+630*i, 4000, 600
+	With Button(i+15),  "ButtonTextFlags", ucsBstNormal @ ucsBflHorRight
+	Button(i)=>ButtonTextFlags(ucsBstPressed)=2^random(1, 6)
+	Button(i+15)=>move 6000,1000+630*i, 4000, 600
 	With Button(i+15), "Style", i+16, "ButtonTextFlags", ucsBstNormal @ ucsBflHorRight
-	With Button(i), "tooltip", "hello from "+i
-	With Button(i+15), "tooltip", "hello from "+(i	+15)
+		//	With Button(i), "tooltip", "hello from "+i
+	Button(i)=>tooltip="hello from "+i
+	Button(i+15)=>tooltip=	"hello from "+(i+15)
+		//With Button(i+15), "tooltip", "hello from "+(i+15)
 Next i
-With Button(0), "*Default", true    // see *before the name. The Dafault property is on ExtControl object who hanfle events.
+With Button(2), "*Default", true    // see *before the name. The Dafault property is on ExtControl object who handle events.
 Layer Form1 {Gradient 11, #7777aa}
 function Button.GetHwnd(new Index, &A) {
 	layer Form1 {A=Hwnd}
@@ -37502,7 +37553,6 @@ function Button.click(index) {
 	refresh
 }
 method form1 "Show", 1
-
 declare form1 nothing
 }
 MODULE SHAPEEX {ENUM SESHAPECONSTANTS {
@@ -41322,39 +41372,9 @@ function alfa_ondblclick {
 	Print "Double Click, wow"
 	refresh
 }
-function alfa_onkeydown {
-	read new a, b
-	local object pa, ev1
-	local keycode, OK AS BOOLEAN
-	// if you press backspace the pa is invalid so we catch the error here
-	try {
-'		with wb, "document" get withevents alfa
-			? "enter...0"
-		? type$(alfa)
-		ok=false
-		try {
-			with alfa, "parentWindow" SET  pa
-			ok=true
-		}
-		try {
-			if not ok then with alfa, "parent" SET  pa
-		}
-			? "enter...0...1"
-		OK=FALSE
-		TRY  {
-			? "enter..."
-			? TYPE$(pa),"OK"
-			? "enter...2"
-			with pa, "event" GET ev1
-			? "ok..."
-			OK=TRUE
-		}
-		IF NOT OK THEN PRINT TYPE$(EV1): EXIT else print
-		PRINT TYPE$(EV1)
-		IF TYPE$(EV1)="Nothing" then exit
-		with ev1, "keycode" get keycode
-		print "this is the key:", keycode
-	}
+function alfa_onkeydown (new a, b){
+	if not readystate then exit
+	print "this is the key:", b=>parentWindow=>event=>keycode
 	refresh
 }
 function wb.BeforeNavigate2 {
@@ -47546,7 +47566,7 @@ MODULE POLYSPIRAL {ΤΜΗΜΑ ΠΟΛΥΣΠΕΙΡΑ {
 		ΜΗΚΟΣ = ΠΛΑΤΟΣ.ΣΗΜΕΙΟΥ*20
 		ΓΩΝΙΑ = ΑΥΞΗΣΗ		
 		ΓΙΑ ν=1 ΕΩΣ 150
-			ΠΕΝΑ #FF0055
+			ΑΝ ν υπολοιπο 2=1 τοτε ΠΕΝΑ #FF0055 αλλιως ΠΕΝΑ #00FF55
 			ΠΑΧΟΣ 2 {ΧΑΡΑΞΕ ΓΩΝΙΑ ΓΩΝΙΑ, ΜΗΚΟΣ}
 			ΜΗΚΟΣ+=ΠΛΑΤΟΣ.ΣΗΜΕΙΟΥ*5
 			ΓΩΝΙΑ+=ΑΥΞΗΣΗ
@@ -48042,39 +48062,49 @@ MODULE EXCEL1 {try {
 	END IF
 }
 IF EXIST("MyTest.xlsx") THEN
-	PRINT "CLOSE EXCEL FILE..."
+	print "CLOSE EXCEL FILE..."
 	BREAK
 END IF
 DECLARE ExcelSheet "Excel.Sheet"
-WITH ExcelSheet, "Application" set ExcelSheet.Application
-WITH ExcelSheet.Application, "cells" as cells()
-WITH ExcelSheet.Application, "ActiveSheet" as ActiveSheet
-WITH ActiveSheet, "name", "MySheet1"
-WITH ActiveSheet, "Columns" set Columns ("A:C")
+ExcelSheet.Application=ExcelSheet=>Application
+cells=ExcelSheet.Application=>cells
+ActiveSheet=ExcelSheet.Application=>ActiveSheet
+ActiveSheet=>name= "MySheet1"
+//WITH ActiveSheet, "Columns" set Columns ("A:C")
 
+//Coiumns=ActiveSheet=>Columns("A:C")
+'? Columns=>address
 ' row, line
 cells(1,1)="Hello there"
 s1=cells(1,1)
 print s1, TYPE$(s1)="String"
 cells(1,2)=TODAY  ' date type
 cells(1,3)=NOW  ' date type
-PRINT cells(1,2), TYPE$((cells(1,2)))="Date" ' need enclosed parenthesis, without these return the object under cells
+print cells(1,2), TYPE$((cells(1,2)))="Date" ' need enclosed parenthesis, without these return the object under cells
 cells(2,1)=100.3
 cells(3, 1)=200.5
-cells(4, 1)="=Sum(A2:A3)"  ' type
+range1=cells(4, 1)^
+range1=>formula="=Sum(A2:A3)"  ' type
 cells(2,2)=1234&   ' we place a long type 32 bit, but converted to Double
-PRINT cells(4,1)=300.8 ' executed immediate
-PRINT TYPE$((cells(4,1)))="Double"
-PRINT TYPE$((cells(2,2)))="Double"  ' this is the proof of conversion to Double
-REM PRINT TYPE$(ExcelSheet.Application)
-' GIVE AN AUTOFIT FOR THESE COLUMNS:
-WITH ActiveSheet, "Columns" set Columns ("A:C")
-METHOD Columns, "AutoFit"
-' or specify width - 20 chars of mean width
-REM WITH Columns, "ColumnWidth", 20
+print cells(4,1)=300.8 ' executed immediate
+print range1=>address
+print TYPE$(range1=>value)="Double"
+try {
+	print type$((cells(4,1)=>value))="Double"
 	
+}
+print TYPE$(cells(2,2)=>value)="Double", "ok"  ' this is the proof of conversion to Double
 
-METHOD ExcelSheet, "SaveAs", dir$+"MyTest.xlsx", 51 ' 51 with no macro
+//	print TYPE$(ExcelSheet.Application)
+' GIVE AN AUTOFIT FOR THESE COLUMNS:
+//	WITH ActiveSheet, "Columns" set Columns ("A:C")
+//	METHOD Columns, "AutoFit"
+ActiveSheet=>Columns("A:C")=>Autofit
+' or specify width - 20 chars of mean width
+//	WITH Columns, "ColumnWidth", 20
+//	METHOD ExcelSheet, "SaveAs", dir$+"MyTest.xlsx", 51 ' 51 with no macro
+
+ExcelSheet=>SaveAs  dir$+"MyTest.xlsx", 51
 DECLARE ExcelSheet NOTHING
 TRY {
 	IF FILE.APP$("xlsx")="" THEN
@@ -48095,29 +48125,41 @@ TRY {
 	CLOSE#F
 }
 IF NOT CANOPEN THEN PRINT "CLOSE FILE MyTest.xlsx": EXIT
-
-DECLARE ExcelSheet.Application "Excel.Application"
+// Declare can arranged with WithEvents
+//DECLARE ExcelSheet.Application "Excel.Application"
+ExcelSheet.Application=GetObject("", "Excel.Application")
 With ExcelSheet.Application, "Workbooks" as WorkBooks
 With ExcelSheet.Application, "ActiveWorkbook" as ActiveWorkbook
 //? type$(WorkBooks)
-METHOD WorkBooks, "Open", dir$+"MyTest.xlsx"
-WITH ExcelSheet.Application, "cells" as cells()
+//	METHOD WorkBooks, "Open", dir$+"MyTest.xlsx"
+WorkBooks=>Open dir$+"MyTest.xlsx"
+//	WITH ExcelSheet.Application, "cells" as cells()
+cells=ExcelSheet.Application=>cells
 WITH ExcelSheet.Application, "ActiveSheet" as ActiveSheet
 WITH ActiveSheet, "name" as Sheet.Name$
 WITH ActiveSheet, "Columns" set Columns ("A:E")
-WITH ActiveSheet, "Range"  set  Range ("D1:D4")
-WITH Range, "Value" as Range.Value, "Value" as Range.Value$
+//WITH ActiveSheet, "Range"  set  Range ("D1:D4")
+Range=ActiveSheet=>Range("D1:D4")^  ' return the object Range
+//	WITH Range, "Value" as Range.Value, "Value" as Range.Value$
 PRINT  Sheet.Name$
-Range.Value$="Approved"
-WITH ActiveSheet, "Range"  set  Range ("E1:E4")
-Range.Value=TODAY
+//	Range.Value$="Approved"
+Range=>Value="Approved"
+//	WITH ActiveSheet, "Range"  set  Range ("E1:E4")
+//	Range.Value=TODAY
+ActiveSheet=>Range("E1:E4")=>value=TODAY
 cells(4,3)=NOW
-METHOD Columns, "AutoFit"
+//METHOD Columns, "AutoFit"
+Columns=>AutoFit
+
 ' TO NOT OPEN THE "OVERWRITE ALERT"
 ' FIRST WE SAVE USING NEW NEAME ...001
-METHOD ActiveSheet, "SaveAs", dir$+"MyTest001.xlsx", 51, CreateBackup:=TRUE ' 51 with no macro
-METHOD ActiveWorkbook, "Close", SaveChanges:=FALSE
-METHOD ExcelSheet.Application, "Quit"
+//	METHOD ActiveSheet, "SaveAs", dir$+"MyTest001.xlsx", 51, CreateBackup:=TRUE ' 51 with no macro
+//	METHOD ActiveWorkbook, "Close", SaveChanges:=FALSE
+//	METHOD ExcelSheet.Application, "Quit"
+ActiveSheet=>SaveAs dir$+"MyTest001.xlsx", 51, CreateBackup:=TRUE ' 51 with no macro
+ActiveWorkbook=>Close  SaveChanges:=FALSE
+ExcelSheet.Application=>Quit
+
 DECLARE ExcelSheet.Application NOTHING
 WAIT 300
 ' THEN AFTER CLOSSING THE WORKBOOK USING SAVECHANGES=FALESE
@@ -50114,6 +50156,7 @@ module scenedrive {
 		if scene_run>0 then thread scene_run hold: OnlyTitleMove=true: call local EnableRotation
 	end if
 }
+boolean p1
 thread {
 	Layer form1 {
 		if clearplease then Gradient gColor:clearplease~ else release
@@ -50123,7 +50166,7 @@ thread {
 		print part @(width-27), $(0,9),format$("{0:1:-8}°{1:1:-8}°{2:1:-8}°",angleX/10~,angleY/10~, angleZ/10~)
 		print part time$(if(locale=1032->now, time("UTC")), locale, "hh:mm:ss tt ");if$(locale=1032->time$(),"UTC"); " press Esc to quit"
 		rem print part time$(time("UTC"), locale, "hh:mm:ss tt");" UTC"
-		refresh 2000
+		part {refresh 2000} as p1
 	}
 } as clock interval 60
 module resetSceneState {
@@ -50172,7 +50215,8 @@ thread  {
 		if OnlyTitleMove then call local titlemove
 		call local sceneone
 	end if
-'	Layer form1 {refresh 25}
+	part {refresh 2000} as p1
+//		Layer form1 {refresh 25}
 
 }  as scene interval 30
 Boolean bpass
@@ -50180,9 +50224,9 @@ thread  {
 	if free then bpass=false else bpass=ReadNoFocus
 	if bpass else
 		call local titlemove
-		spX$	=dec1$(angleX+12~)
-		spY$	=dec1$(angleY+18~)
-		spZ$	=dec1$(angleZ)
+		spX$=dec1$(angleX+12~)
+		spY$=dec1$(angleY+18~)
+		spZ$=dec1$(angleZ)
 		call local sceneone
 	end if
 }  as scene_run hold
@@ -52582,5 +52626,70 @@ b=100
 ? b,"+"
 a+=b
 ? a
+}
+MODULE TRYTXT {mode 16
+A$={Anglo-Saxon (ang)
+	العربية (ar)
+	سنڌي (sd)
+	Azərbaycan (az)
+	Български (bg)
+	বাংলা (bn)
+	Català (ca)
+	Česky (cs)
+	Deutsch (de)
+	Ελληνικά (el)
+	English (en)
+	Esperanto (eo)
+	Español (es)
+	فارسی (fa)
+	Suomi (fi)
+	Français (fr)
+	ગુજરાતી (gu)
+	עברית (he)
+	हिन्दी (hi)
+	Bahasa Indonesia (id)
+	मराठी (mr)
+	Italiano (it)
+	日本語 (ja)
+	한국어 (ko)
+	Latviešu (lv)
+	Lietuvių (lt)
+	Bahasa Melayu (ms)
+	Македонски (mk)
+	مازِرونی (mzn)
+	नेपाल भाषा (new)
+	ਪੰਜਾਬੀ (pa)
+	Polski (pl)
+	پښتو (ps)
+	Português (pt)
+	Română (ro)
+	Русский (ru)
+	Svenska (sv)
+	தமிழ் (ta)
+	ไทย (th)
+	Türkçe (tr)
+	Українська (uk)
+	Tiếng Việt (vi)
+	Yorùbá (yo)
+	中文 (zh)
+	}
+Report a$
+crlf={
+}
+m=piece$(a$, crlf)
+z=each(m, 1, -2)
+L=len(m)-2
+long k1=height*3/4
+k=k1
+while z
+	print array$(z)
+	k--
+	If k>1 then continue
+	k=k1
+	if z^=L then exit
+	while inkey$="" and mouse=0 
+		wait 10
+	end while
+end while
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

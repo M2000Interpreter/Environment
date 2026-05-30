@@ -83,7 +83,7 @@ CodeName = ChrW(&H1FFF) + ss$
 
 End Sub
 
-Private Sub iBoxArray_AppendArray(K As iBoxArray)
+Private Sub iBoxArray_AppendArray(k As iBoxArray)
 '
 End Sub
 
@@ -120,23 +120,23 @@ Private Property Get iBoxArray_CodeName() As String
 iBoxArray_CodeName = CodeName
 End Property
 
-Private Sub iBoxArray_CopyArray(K As iBoxArray)
+Private Sub iBoxArray_CopyArray(k As iBoxArray)
 '
 End Sub
 
-Private Sub iBoxArray_CopyArrayRev(K As iBoxArray)
+Private Sub iBoxArray_CopyArrayRev(k As iBoxArray)
 '
 End Sub
 
-Private Sub iBoxArray_CopyArrayRevFast(K As iBoxArray)
+Private Sub iBoxArray_CopyArrayRevFast(k As iBoxArray)
 '
 End Sub
 
-Private Sub iBoxArray_CopyArraySlice(K As iBoxArray, fromS As Long, toS As Long)
+Private Sub iBoxArray_CopyArraySlice(k As iBoxArray, fromS As Long, toS As Long)
 '
 End Sub
 
-Private Sub iBoxArray_CopyArraySliceFast(K As iBoxArray, fromS As Long, toS As Long)
+Private Sub iBoxArray_CopyArraySliceFast(k As iBoxArray, fromS As Long, toS As Long)
 '
 End Sub
 
@@ -267,7 +267,7 @@ If Not GroupRef Is Nothing Then
         Dim usehandler As mHandler
         Set usehandler = GroupRef
         If usehandler.t1 = 1 Then
-            usehandler.objref.Index = Abs(curitem + 100)
+            usehandler.objref.index = Abs(curitem + 100)
             usehandler.objref.Done = True
             Set usehandler.objref.ValueObj = item
             Exit Property
@@ -472,11 +472,11 @@ End If
 
 End Function
 
-Private Function iBoxArray_PlaceValue2UDTArray(p As Long, Name As String, v As Variant, Index As Long) As Boolean
+Private Function iBoxArray_PlaceValue2UDTArray(p As Long, Name As String, v As Variant, index As Long) As Boolean
 '
 End Function
 
-Private Sub iBoxArray_processAppend(m As Object)
+Private Sub iBoxArray_processAppend(M As Object)
 '
 End Sub
 

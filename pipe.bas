@@ -214,7 +214,7 @@ Private Declare Function GetDateFormat Lib "kernel32" Alias "GetDateFormatW" ( _
 ) As Long
 Private Declare Function VarDateFromStr Lib "OleAut32.dll" ( _
     ByVal psDateIn As Long, _
-    ByVal LCID As Long, _
+    ByVal lcid As Long, _
     ByVal uwFlags As Long, _
     ByRef dtOut As Date) As Long
 Private Const S_OK = 0
@@ -236,8 +236,89 @@ Private EncbTrans(63) As Byte, EnclPowers8(255) As Long, EnclPowers16(255) As Lo
 Dim lPowers18(63) As Long, bTrans(255) As Byte, lPowers6(63) As Long, lPowers12(63) As Long
 
 
+Private Declare Function EnumSystemLocales Lib "kernel32" Alias "EnumSystemLocalesA" ( _
+    ByVal lpLocaleEnumProc As Long, _
+    ByVal dwFlags As Long _
+) As Long
 
-Public Function DateFromString(ByVal sDateIn As String, ByVal LCID As Long) As Date
+Private Declare Function GetLocaleInfo Lib "kernel32" Alias "GetLocaleInfoA" ( _
+    ByVal Locale As Long, _
+    ByVal LCType As Long, _
+    ByVal lpLCData As String, _
+    ByVal cchData As Long _
+) As Long
+
+Private Const LCID_INSTALLED As Long = &H1
+Private Const LOCALE_IDEFAULTANSICODEPAGE As Long = &H1004
+
+Private m_TargetCodePage As Long
+Private m_FoundLCID As Long
+Private Declare Function lstrlenA Lib "kernel32" ( _
+    ByVal lpString As Long _
+) As Long
+
+
+Private Function PointerToStringA(ByVal lpString As Long) As String
+    Dim nLen As Long
+    Dim sText As String
+
+    If lpString = 0 Then Exit Function
+
+    nLen = lstrlenA(lpString)
+
+    If nLen > 0 Then
+        sText = String$(nLen, vbNullChar)
+        CopyMemory ByVal sText, ByVal lpString, nLen
+        PointerToStringA = sText
+    End If
+End Function
+Public Function LCIDFromCodePage(ByVal CodePage As Long) As Long
+    m_TargetCodePage = CodePage
+    m_FoundLCID = 0
+
+    EnumSystemLocales AddressOf EnumLocalesProc, LCID_INSTALLED
+
+    LCIDFromCodePage = m_FoundLCID
+End Function
+
+Private Function EnumLocalesProc(ByVal lpLocaleString As Long) As Long
+    Dim sLocaleHex As String
+    Dim lcid As Long
+    Dim cp As Long
+
+    sLocaleHex = PointerToStringA(lpLocaleString)
+
+    If Len(sLocaleHex) > 0 Then
+        lcid = CLng("&H" & sLocaleHex)
+        cp = CodePageFromLCID(lcid)
+
+        If cp = m_TargetCodePage Then
+            m_FoundLCID = lcid
+            EnumLocalesProc = 0   ' Stop enumeration
+            Exit Function
+        End If
+    End If
+
+    EnumLocalesProc = 1           ' Continue enumeration
+End Function
+
+Private Function CodePageFromLCID(ByVal lcid As Long) As Long
+    Dim sBuffer As String
+    Dim n As Long
+
+    sBuffer = String$(16, vbNullChar)
+
+    n = GetLocaleInfo(lcid, LOCALE_IDEFAULTANSICODEPAGE, sBuffer, Len(sBuffer))
+
+    If n > 0 Then
+        CodePageFromLCID = CLng(Left$(sBuffer, n - 1))
+    Else
+        CodePageFromLCID = 0
+    End If
+End Function
+
+
+Public Function DateFromString(ByVal sDateIn As String, ByVal lcid As Long) As Date
 
     Dim hResult As Long
     Dim dtOut As Date
@@ -248,7 +329,7 @@ Public Function DateFromString(ByVal sDateIn As String, ByVal LCID As Long) As D
     Const LOCALE_NOUSEROVERRIDE = &H80000000
 
     ' Do the conversion
-    hResult = VarDateFromStr(StrPtr(sDateIn), LCID, LOCALE_NOUSEROVERRIDE, dtOut)
+    hResult = VarDateFromStr(StrPtr(sDateIn), lcid, LOCALE_NOUSEROVERRIDE, dtOut)
 
     Select Case hResult
 
@@ -294,37 +375,37 @@ Public Function FormatDateWithLocale(ByRef the_sFormat As String, the_datDate As
 End Function
 Public Function GetTimeZoneInfo() As String
 Dim RetVal As Long ' return value
-Dim my As New MemBlock
+Dim mY As New MemBlock
 Const DaylightName = 80&
 Const StandardName = 4&
-my.Construct 172  ' 172 bytes
-    RetVal = GetTimeZoneInformation(ByVal my.GetBytePtr(0))  ' read information on the computer's selected time zone
+mY.Construct 172  ' 172 bytes
+    RetVal = GetTimeZoneInformation(ByVal mY.GetBytePtr(0))  ' read information on the computer's selected time zone
 '     If zones.ExistKey(Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")) Then
      ' do nothing. now zone$ has set the index field to standard name.
 '     End If
     GetTimeZoneInfo = space$(64)
         
     If RetVal = 2 Then
-    MemCopy StrPtr(GetTimeZoneInfo), my.GetBytePtr(DaylightName), 64
+    MemCopy StrPtr(GetTimeZoneInfo), mY.GetBytePtr(DaylightName), 64
   
     Else
-    MemCopy StrPtr(GetTimeZoneInfo), my.GetBytePtr(StandardName), 64
+    MemCopy StrPtr(GetTimeZoneInfo), mY.GetBytePtr(StandardName), 64
     End If
     GetTimeZoneInfo = Replace(GetTimeZoneInfo, ChrW(0), "")
 End Function
 Public Function GetUTCDate() As Date
-    Dim my As New MemBlock
+    Dim mY As New MemBlock
     Const Bias = 0&
     Const StandardBias = 84&
     Const DaylightBias = 168&
-    my.Construct 172  ' 172 bytes
+    mY.Construct 172  ' 172 bytes
     Dim lngUTCTime As Long
      
-    lngUTCTime = GetTimeZoneInformation(ByVal my.GetBytePtr(0))
+    lngUTCTime = GetTimeZoneInformation(ByVal mY.GetBytePtr(0))
     If lngUTCTime = 2 Then
-        GetUTCDate = DateAdd("n", MemLong(my.GetBytePtr(Bias)) + MemLong(my.GetBytePtr(DaylightBias)), Now)
+        GetUTCDate = DateAdd("n", MemLong(mY.GetBytePtr(Bias)) + MemLong(mY.GetBytePtr(DaylightBias)), Now)
     Else
-        GetUTCDate = DateAdd("n", MemLong(my.GetBytePtr(Bias)) + MemLong(my.GetBytePtr(StandardBias)), Now)
+        GetUTCDate = DateAdd("n", MemLong(mY.GetBytePtr(Bias)) + MemLong(mY.GetBytePtr(StandardBias)), Now)
     End If
 End Function
 
@@ -655,7 +736,7 @@ Else
     Sleep 1
     Set a = New Document
     a.MaxParaLength = 1000
-    a.LCID = Clid
+    a.lcid = Clid
     a.ReadUnicodeOrANSI afile$, , what
     
     If InStr(simple$, vbCr) > 0 Then

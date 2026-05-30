@@ -25,7 +25,7 @@ Public Type Complex
     r   As Double
     i   As Double
 End Type
-
+' use mxcreate
 Public Type Matrix
     Col As Long                 ' Number of columns
     Row As Long                 ' Number of rows
@@ -338,9 +338,9 @@ End Function
 ' // The square root of a complex number
 Public Function cxSqr(Op As Complex) As Complex
 On Error Resume Next
-    Dim M As Double, A As Double
-    M = Sqr(cxMod(Op)): A = cxArg(Op) / 2
-    cxSqr.r = M * Cos(A): cxSqr.i = M * Sin(A)
+    Dim M As Double, a As Double
+    M = Sqr(cxMod(Op)): a = cxArg(Op) / 2
+    cxSqr.r = M * Cos(a): cxSqr.i = M * Sin(a)
 End Function
 
 ' // Module of a complex number
@@ -564,17 +564,17 @@ End Function
 ' // Return true if complex number is equal
 Public Function cxEq(Op1 As Complex, Op2 As Complex, _
                 Optional NumDigitsAfterDecimal As Long = -1) As Boolean
-        Dim z As Double
+        Dim Z As Double
     If NumDigitsAfterDecimal = -1 Then
-        z = Op1.r + Op2.r
-        If z > 10000000000# Then
+        Z = Op1.r + Op2.r
+        If Z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEq = True
         Else
         If Abs(Op1.r - Op2.r) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEq = True
         End If
     Else
-        z = Op1.r + Op2.r
-        If z > 10000000000# Then
+        Z = Op1.r + Op2.r
+        If Z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEq = True
         Else
         If Round(Op1.r, NumDigitsAfterDecimal) = Round(Op2.r, NumDigitsAfterDecimal) And _
@@ -583,19 +583,19 @@ Public Function cxEq(Op1 As Complex, Op2 As Complex, _
     End If
 End Function
 Public Function cxEqVar(Op1, Op2) As Boolean
-        Dim z As Double
-        z = Op1.r + Op2.r
-        If z > 10000000000# Then
+        Dim Z As Double
+        Z = Op1.r + Op2.r
+        If Z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEqVar = True
         Else
             If Abs(Op1.r - Op2.r) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEqVar = True
         End If
 End Function
 Public Function cxEqVar3(Op1, Op2, ByVal NumDigitsAfterDecimal As Long) As Boolean
-        Dim z As Double
-        z = Op1.r + Op2.r
-        z = Op1.r + Op2.r
-        If z > 10000000000# Then
+        Dim Z As Double
+        Z = Op1.r + Op2.r
+        Z = Op1.r + Op2.r
+        If Z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEqVar3 = True
         Else
         If Round(Op1.r, NumDigitsAfterDecimal) = Round(Op2.r, NumDigitsAfterDecimal) And _
@@ -603,10 +603,10 @@ Public Function cxEqVar3(Op1, Op2, ByVal NumDigitsAfterDecimal As Long) As Boole
         End If
 End Function
 Public Function cxEqComVar3(Op1 As Complex, Op2, ByVal NumDigitsAfterDecimal As Long) As Boolean
-        Dim z As Double
-        z = Op1.r + Op2.r
-        z = Op1.r + Op2.r
-        If z > 10000000000# Then
+        Dim Z As Double
+        Z = Op1.r + Op2.r
+        Z = Op1.r + Op2.r
+        If Z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEqComVar3 = True
         Else
         If Round(Op1.r, NumDigitsAfterDecimal) = Round(Op2.r, NumDigitsAfterDecimal) And _
@@ -614,10 +614,10 @@ Public Function cxEqComVar3(Op1 As Complex, Op2, ByVal NumDigitsAfterDecimal As 
         End If
 End Function
 Public Function cxEqComVar(Op1 As Complex, Op2) As Boolean
-        Dim z As Double
+        Dim Z As Double
         On Error GoTo 1000
-        z = Op1.r + Op2.r
-        If z > 10000000000# Then
+        Z = Op1.r + Op2.r
+        If Z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEqComVar = True
         Else
             If Abs(Op1.r - Op2.r) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEqComVar = True
@@ -649,20 +649,20 @@ End Function
 
 ' // The natural logarithm of a complex number
 Public Function cxlog(Op As Complex) As Complex
-    Dim M As Double, A As Double
-    M = cxMod(Op): A = cxArg(Op)
-    cxlog.r = Log(M): cxlog.i = A
+    Dim M As Double, a As Double
+    M = cxMod(Op): a = cxArg(Op)
+    cxlog.r = Log(M): cxlog.i = a
 End Function
 Public Function cxlogVar(Op) As Complex
-    Dim M As Double, A As Double
-    M = cxModVar(Op): A = cxArgVar(Op)
-    cxlogVar.r = Log(M): cxlogVar.i = A
+    Dim M As Double, a As Double
+    M = cxModVar(Op): a = cxArgVar(Op)
+    cxlogVar.r = Log(M): cxlogVar.i = a
 End Function
 ' // The logarithm of a complex number by base X
 Public Function cxLogX(Op As Complex, ByVal Base As Double) As Complex
-    Dim M As Double, A As Double, Nc As Complex
-    M = cxMod(Op): A = cxArg(Op): Nc.r = Log(Base)
-    cxLogX.r = Log(M): cxLogX.i = A
+    Dim M As Double, a As Double, Nc As Complex
+    M = cxMod(Op): a = cxArg(Op): Nc.r = Log(Base)
+    cxLogX.r = Log(M): cxLogX.i = a
     cxLogX = cxDiv(cxLogX, Nc)
 End Function
 
@@ -789,16 +789,16 @@ End Function
 
 ' // Hyperbolic arcsecant of a complex number
 Public Function cxAsech(Op As Complex) As Complex
-    Dim z As Complex
-    z = cxRealDiv(1, Op)
-    cxAsech = cxlog(cxAdd(z, cxSqr(cxAddReal(cxMul(z, z), 1))))
+    Dim Z As Complex
+    Z = cxRealDiv(1, Op)
+    cxAsech = cxlog(cxAdd(Z, cxSqr(cxAddReal(cxMul(Z, Z), 1))))
 End Function
 
 ' // Hyperbolic arccosecant of a complex number
 Public Function cxAcsch(Op As Complex) As Complex
-    Dim z As Complex
-    z = cxRealDiv(1, Op)
-    cxAcsch = cxlog(cxAdd(z, cxMul(cxSqr(cxAddReal(z, 1)), cxSqr(cxSubReal(z, 1)))))
+    Dim Z As Complex
+    Z = cxRealDiv(1, Op)
+    cxAcsch = cxlog(cxAdd(Z, cxMul(cxSqr(cxAddReal(Z, 1)), cxSqr(cxSubReal(Z, 1)))))
 End Function
 ' // Print matrix to immediate window
 Public Function PrintMtrx(Op As Matrix)
@@ -831,11 +831,11 @@ Public Function mxNull(ByVal Row As Long, ByVal Col As Long) As Matrix
 End Function
 
 ' // Creating the identity matrix
-Public Function mxIdt(ByVal size As Long) As Matrix
+Public Function mxIdt(ByVal Size As Long) As Matrix
     Dim ij As Long
-    If size <= 0 Then Exit Function
-    ReDim mxIdt.D(size * size - 1): mxIdt.Col = size: mxIdt.Row = size
-    For ij = 0 To size - 1: mxIdt.D(ij + (ij * size)) = 1: Next
+    If Size <= 0 Then Exit Function
+    ReDim mxIdt.D(Size * Size - 1): mxIdt.Col = Size: mxIdt.Row = Size
+    For ij = 0 To Size - 1: mxIdt.D(ij + (ij * Size)) = 1: Next
 End Function
 
 ' // Transpose matrix
@@ -904,34 +904,34 @@ Public Function mxDtm(Op As Matrix) As Double
     mxDtm = Determinant(Op)
 End Function
 ' Function to compute determinant using Gaussian Elimination
-Private Function Determinant(z As Matrix) As Double
-    Dim N As Integer, i As Integer, j As Integer, k As Integer
+Private Function Determinant(Z As Matrix) As Double
+    Dim n As Integer, i As Integer, j As Integer, k As Integer
     Dim pivot As Integer, maxRow As Integer
     Dim factor As Double, det As Double, temp As Double
-    Dim size As Integer
-    size = z.Row
+    Dim Size As Integer
+    Size = Z.Row
     det = 1
     
     ' Create a working copy to avoid modifying the original
     Dim mat() As Double, q As Integer
     
-    ReDim mat(0 To size - 1, 0 To size - 1)
-    For i = 0 To size - 1
-        For j = 0 To size - 1
-            mat(i, j) = z.D(q): q = q + 1
+    ReDim mat(0 To Size - 1, 0 To Size - 1)
+    For i = 0 To Size - 1
+        For j = 0 To Size - 1
+            mat(i, j) = Z.D(q): q = q + 1
         Next j
     Next i
 
-    For i = 0 To size - 1
+    For i = 0 To Size - 1
         ' Pivot selection
         maxRow = i
-        For j = i + 1 To size - 1
+        For j = i + 1 To Size - 1
             If Abs(mat(j, i)) > Abs(mat(maxRow, i)) Then maxRow = j
         Next j
         
         ' Swap rows
         If maxRow <> i Then
-            For k = 0 To size - 1
+            For k = 0 To Size - 1
                 temp = mat(i, k)
                 mat(i, k) = mat(maxRow, k)
                 mat(maxRow, k) = temp
@@ -947,9 +947,9 @@ Private Function Determinant(z As Matrix) As Double
         det = det * mat(i, i)
         
         ' Elimination
-        For j = i + 1 To size - 1
+        For j = i + 1 To Size - 1
             factor = mat(j, i) / mat(i, i)
-            For k = i + 1 To size - 1
+            For k = i + 1 To Size - 1
                 mat(j, k) = mat(j, k) - factor * mat(i, k)
             Next k
         Next j
@@ -957,41 +957,41 @@ Private Function Determinant(z As Matrix) As Double
     
     Determinant = det
 End Function
-Public Function mxInv(z As Matrix) As Matrix
-    Dim i As Long, j As Long, k As Long, N As Long, q As Integer
+Public Function mxInv(Z As Matrix) As Matrix
+    Dim i As Long, j As Long, k As Long, n As Long, q As Integer
     Dim temp As Double
     Dim pivot As Double
     Dim Aug() As Double
-    N = z.Row
+    n = Z.Row
     ' Augmented matrix: [A | I]
-    ReDim Aug(1 To N, 1 To 2 * N)
-    ReDim Inv(1 To N, 1 To N)
+    ReDim Aug(1 To n, 1 To 2 * n)
+    ReDim Inv(1 To n, 1 To n)
     
     ' Build augmented matrix
-    For i = 1 To N
-        For j = 1 To N
-            Aug(i, j) = z.D(q): q = q + 1
+    For i = 1 To n
+        For j = 1 To n
+            Aug(i, j) = Z.D(q): q = q + 1
         Next j
-        For j = 1 To N
+        For j = 1 To n
             If i = j Then
-                Aug(i, N + j) = 1#
+                Aug(i, n + j) = 1#
             Else
-                Aug(i, N + j) = 0#
+                Aug(i, n + j) = 0#
             End If
         Next j
     Next i
     
     ' Gauss-Jordan elimination
-    For i = 1 To N
+    For i = 1 To n
         
         ' Find pivot
         pivot = Aug(i, i)
         
         ' If pivot is zero, try to swap with a lower row
         If Abs(pivot) < 0.0000000001 Then
-            For k = i + 1 To N
+            For k = i + 1 To n
                 If Abs(Aug(k, i)) > 0.0000000001 Then
-                    For j = 1 To 2 * N
+                    For j = 1 To 2 * n
                         temp = Aug(i, j)
                         Aug(i, j) = Aug(k, j)
                         Aug(k, j) = temp
@@ -1009,26 +1009,26 @@ Public Function mxInv(z As Matrix) As Matrix
         End If
         
         ' Normalize pivot row
-        For j = 1 To 2 * N
+        For j = 1 To 2 * n
             Aug(i, j) = Aug(i, j) / pivot
         Next j
         
         ' Eliminate other rows
-        For k = 1 To N
+        For k = 1 To n
             If k <> i Then
                 temp = Aug(k, i)
-                For j = 1 To 2 * N
+                For j = 1 To 2 * n
                     Aug(k, j) = Aug(k, j) - temp * Aug(i, j)
                 Next j
             End If
         Next k
     Next i
-    mxInv = mxNull(N, N)
+    mxInv = mxNull(n, n)
     ' Extract inverse matrix
     q = 0
-    For i = 1 To N
-        For j = 1 To N
-            mxInv.D(q) = Aug(i, N + j): q = q + 1
+    For i = 1 To n
+        For j = 1 To n
+            mxInv.D(q) = Aug(i, n + j): q = q + 1
         Next j
     Next i
 End Function
