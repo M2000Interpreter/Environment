@@ -34,7 +34,7 @@ Public Type VecType
     ' This is used for both 3D spatial vectors, and Euler angles as well.
     X As Double
     Y As Double
-    Z As Double
+    z As Double
 End Type
 
 Public Type SegType
@@ -53,37 +53,37 @@ Public Type QuatType                      ' To get axis and theta back out (JPL 
     W As Double         ' cos(theta/2)              theta = ACos(q.w) * 2
     X As Double         ' v.x * sin(theta/2)        v.x = q.x / sin(theta/2)    solve for theta first, and then plug in here.
     Y As Double         ' v.y * sin(theta/2)        v.y = q.y / sin(theta/2)
-    Z As Double         ' v.z * sin(theta/2)        v.z = q.z / sin(theta/2)
+    z As Double         ' v.z * sin(theta/2)        v.z = q.z / sin(theta/2)
 End Type
 ' There are another version as  MakeVector
-Public Function NewVector(X As Double, Y As Double, Z As Double) As VecType
+Public Function NewVector(X As Double, Y As Double, z As Double) As VecType
 NewVector.X = X
 NewVector.Y = Y
-NewVector.Z = Z
+NewVector.z = z
 End Function
 Public Function NewLineType(p1 As VecType, p2 As VecType) As LineType
 NewLineType.point1 = p1
 NewLineType.point2 = p2
 End Function
-Public Function NewSegType(O As VecType, AF As VecType, AL As VecType, AU As VecType) As SegType
-NewSegType.Origin = O
-NewSegType.AxisF = AF
+Public Function NewSegType(o As VecType, af As VecType, AL As VecType, AU As VecType) As SegType
+NewSegType.Origin = o
+NewSegType.AxisF = af
 NewSegType.AxisL = AL
 NewSegType.AxisU = AU
 End Function
 ' There is another version MakeQuatType
-Public Function NewQuatType(W As Double, X As Double, Y As Double, Z As Double) As QuatType
+Public Function NewQuatType(W As Double, X As Double, Y As Double, z As Double) As QuatType
 NewQuatType.W = W
 NewQuatType.X = X
 NewQuatType.Y = Y
-NewQuatType.Z = Z
+NewQuatType.z = z
 End Function
 
-Public Sub Vector(a As Long, X As Double, Y As Double, Z As Double)
+Public Sub Vector(a As Long, X As Double, Y As Double, z As Double)
 Dim V1 As VecType
 V1.X = X
 V1.Y = Y
-V1.Z = Z
+V1.z = z
 CopyMemory a, VarPtr(V1.X), 24
 End Sub
 Private Function GetVector(a As Long) As VecType
@@ -111,7 +111,7 @@ Public Function DotProduct(a As Long, b As Long) As Double
     Dim V1 As VecType, V2 As VecType
     CopyMemory VarPtr(V1), a, 24
     CopyMemory VarPtr(V2), b, 24
-    DotProduct = V1.X * V2.X + V1.Y * V2.Y + V1.Z * V2.Z
+    DotProduct = V1.X * V2.X + V1.Y * V2.Y + V1.z * V2.z
 End Function
 
 
@@ -119,27 +119,27 @@ Public Sub XProduct(a As Long, b As Long, c As Long)
     Dim V1 As VecType, V2 As VecType, V3 As VecType
     CopyMemory VarPtr(V1), a, 24
     CopyMemory VarPtr(V2), b, 24
-    V3.X = V1.Y * V2.Z - V1.Z * V2.Y
-    V3.Y = V1.Z * V2.X - V1.X * V2.Z
-    V3.Z = V1.X * V2.Y - V1.Y * V2.X
+    V3.X = V1.Y * V2.z - V1.z * V2.Y
+    V3.Y = V1.z * V2.X - V1.X * V2.z
+    V3.z = V1.X * V2.Y - V1.Y * V2.X
     PutVector V3, c
 End Sub
-Public Function VecRotVect(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
-    VecRotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
+Public Function VecRotVect(vec As VecType, axis As VecType, Angle As Double, Optional bDegrees As Boolean = True) As VecType
+    VecRotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, Angle, bDegrees))
 End Function
-Public Sub RotVect(a As Long, b As Long, c As Long, angle As Double, Optional bDegrees As Boolean = True)  '(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
+Public Sub RotVect(a As Long, b As Long, c As Long, Angle As Double, Optional bDegrees As Boolean = True)  '(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
     Dim vec As VecType, axis As VecType, RotVect As VecType
     CopyMemory VarPtr(vec), a, 24
     CopyMemory VarPtr(axis), b, 24
-    RotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
+    RotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, Angle, bDegrees))
     CopyMemory c, VarPtr(RotVect), 24
 End Sub
-Public Sub RotVectMult(n As Long, a As Long, b As Long, c As Long, angle As Double, Optional bDegrees As Boolean = True)  '(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
+Public Sub RotVectMult(n As Long, a As Long, b As Long, c As Long, Angle As Double, Optional bDegrees As Boolean = True)  '(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
     Dim vec As VecType, axis As VecType, RotVect As VecType, M As Long
     CopyMemory VarPtr(axis), b, 24
     For M = 1 To n
     CopyMemory VarPtr(vec), a, 24
-    RotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
+    RotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, Angle, bDegrees))
     CopyMemory c, VarPtr(RotVect), 24
     a = a + 24
     c = c + 24
@@ -320,40 +320,40 @@ Public Function Euler2Quat(euler As VecType, Optional Order As Double = xyz, Opt
     If bDegrees Then EulerTemp = VecDeg2Rad(EulerTemp)
     '
     ' Speed-up variables, so that Sin and Cos aren't repeatedly called.
-    sx = Sin(EulerTemp.X / 2#): sy = Sin(EulerTemp.Y / 2#): SZ = Sin(EulerTemp.Z / 2#)
-    cx = Cos(EulerTemp.X / 2#): cy = Cos(EulerTemp.Y / 2#): cZ = Cos(EulerTemp.Z / 2#)
+    sx = Sin(EulerTemp.X / 2#): sy = Sin(EulerTemp.Y / 2#): SZ = Sin(EulerTemp.z / 2#)
+    cx = Cos(EulerTemp.X / 2#): cy = Cos(EulerTemp.Y / 2#): cZ = Cos(EulerTemp.z / 2#)
     '
     Select Case Order
     Case xyz
         Euler2Quat.W = cx * cy * cZ - sx * sy * SZ
         Euler2Quat.X = sx * cy * cZ + cx * sy * SZ
         Euler2Quat.Y = cx * sy * cZ - sx * cy * SZ
-        Euler2Quat.Z = cx * cy * SZ + sx * sy * cZ
+        Euler2Quat.z = cx * cy * SZ + sx * sy * cZ
     Case xzy
         Euler2Quat.W = cx * cy * cZ + sx * sy * SZ
         Euler2Quat.X = sx * cy * cZ - cx * sy * SZ
         Euler2Quat.Y = cx * cy * SZ - sx * sy * cZ
-        Euler2Quat.Z = cx * sy * cZ + sx * cy * SZ
+        Euler2Quat.z = cx * sy * cZ + sx * cy * SZ
     Case yzx
         Euler2Quat.W = cx * cy * cZ - sx * sy * SZ
         Euler2Quat.X = cx * cy * SZ + sx * sy * cZ
         Euler2Quat.Y = sx * cy * cZ + cx * sy * SZ
-        Euler2Quat.Z = cx * sy * cZ - sx * cy * SZ
+        Euler2Quat.z = cx * sy * cZ - sx * cy * SZ
     Case yxz
         Euler2Quat.W = cx * cy * cZ + sx * sy * SZ
         Euler2Quat.X = cx * sy * cZ + sx * cy * SZ
         Euler2Quat.Y = sx * cy * cZ - cx * sy * SZ
-        Euler2Quat.Z = cx * cy * SZ - sx * sy * cZ
+        Euler2Quat.z = cx * cy * SZ - sx * sy * cZ
     Case zxy
         Euler2Quat.W = cx * cy * cZ - sx * sy * SZ
         Euler2Quat.X = cx * sy * cZ - sx * cy * SZ
         Euler2Quat.Y = cx * cy * SZ + sx * sy * cZ
-        Euler2Quat.Z = sx * cy * cZ + cx * sy * SZ
+        Euler2Quat.z = sx * cy * cZ + cx * sy * SZ
     Case zyx
         Euler2Quat.W = cx * cy * cZ + sx * sy * SZ
         Euler2Quat.X = cx * cy * SZ - sx * sy * cZ
         Euler2Quat.Y = cx * sy * cZ + sx * cy * SZ
-        Euler2Quat.Z = sx * cy * cZ - cx * sy * SZ
+        Euler2Quat.z = sx * cy * cZ - cx * sy * SZ
     End Select
 End Function
 
@@ -363,12 +363,12 @@ Public Function Quat2Euler(q As QuatType, Optional Order As Double = xyz, Option
     ' Also, this is the way BodyBuilder does it, and these procedures are meant to reproduce that functionality.
     '
     Select Case Order
-    Case xyz: Quat2Euler = Quat2EulerHelper(-2# * (q.Y * q.Z - q.W * q.X), q.W * q.W - q.X * q.X - q.Y * q.Y + q.Z * q.Z, 2# * (q.X * q.Z + q.W * q.Y), -2# * (q.X * q.Y - q.W * q.Z), q.W * q.W + q.X * q.X - q.Y * q.Y - q.Z * q.Z)
-    Case xzy: Quat2Euler = Quat2EulerHelper(2# * (q.Y * q.Z + q.W * q.X), q.W * q.W - q.X * q.X + q.Y * q.Y - q.Z * q.Z, -2# * (q.X * q.Y - q.W * q.Z), 2# * (q.X * q.Z + q.W * q.Y), q.W * q.W + q.X * q.X - q.Y * q.Y - q.Z * q.Z)
-    Case yzx: Quat2Euler = Quat2EulerHelper(-2# * (q.X * q.Z - q.W * q.Y), q.W * q.W + q.X * q.X - q.Y * q.Y - q.Z * q.Z, 2# * (q.X * q.Y + q.W * q.Z), -2# * (q.Y * q.Z - q.W * q.X), q.W * q.W - q.X * q.X + q.Y * q.Y - q.Z * q.Z)
-    Case yxz: Quat2Euler = Quat2EulerHelper(2# * (q.X * q.Z + q.W * q.Y), q.W * q.W - q.X * q.X - q.Y * q.Y + q.Z * q.Z, -2# * (q.Y * q.Z - q.W * q.X), 2# * (q.X * q.Y + q.W * q.Z), q.W * q.W - q.X * q.X + q.Y * q.Y - q.Z * q.Z)
-    Case zxy: Quat2Euler = Quat2EulerHelper(-2# * (q.X * q.Y - q.W * q.Z), q.W * q.W - q.X * q.X + q.Y * q.Y - q.Z * q.Z, 2# * (q.Y * q.Z + q.W * q.X), -2# * (q.X * q.Z - q.W * q.Y), q.W * q.W - q.X * q.X - q.Y * q.Y + q.Z * q.Z)
-    Case zyx: Quat2Euler = Quat2EulerHelper(2# * (q.X * q.Y + q.W * q.Z), q.W * q.W + q.X * q.X - q.Y * q.Y - q.Z * q.Z, -2# * (q.X * q.Z - q.W * q.Y), 2# * (q.Y * q.Z + q.W * q.X), q.W * q.W - q.X * q.X - q.Y * q.Y + q.Z * q.Z)
+    Case xyz: Quat2Euler = Quat2EulerHelper(-2# * (q.Y * q.z - q.W * q.X), q.W * q.W - q.X * q.X - q.Y * q.Y + q.z * q.z, 2# * (q.X * q.z + q.W * q.Y), -2# * (q.X * q.Y - q.W * q.z), q.W * q.W + q.X * q.X - q.Y * q.Y - q.z * q.z)
+    Case xzy: Quat2Euler = Quat2EulerHelper(2# * (q.Y * q.z + q.W * q.X), q.W * q.W - q.X * q.X + q.Y * q.Y - q.z * q.z, -2# * (q.X * q.Y - q.W * q.z), 2# * (q.X * q.z + q.W * q.Y), q.W * q.W + q.X * q.X - q.Y * q.Y - q.z * q.z)
+    Case yzx: Quat2Euler = Quat2EulerHelper(-2# * (q.X * q.z - q.W * q.Y), q.W * q.W + q.X * q.X - q.Y * q.Y - q.z * q.z, 2# * (q.X * q.Y + q.W * q.z), -2# * (q.Y * q.z - q.W * q.X), q.W * q.W - q.X * q.X + q.Y * q.Y - q.z * q.z)
+    Case yxz: Quat2Euler = Quat2EulerHelper(2# * (q.X * q.z + q.W * q.Y), q.W * q.W - q.X * q.X - q.Y * q.Y + q.z * q.z, -2# * (q.Y * q.z - q.W * q.X), 2# * (q.X * q.Y + q.W * q.z), q.W * q.W - q.X * q.X + q.Y * q.Y - q.z * q.z)
+    Case zxy: Quat2Euler = Quat2EulerHelper(-2# * (q.X * q.Y - q.W * q.z), q.W * q.W - q.X * q.X + q.Y * q.Y - q.z * q.z, 2# * (q.Y * q.z + q.W * q.X), -2# * (q.X * q.z - q.W * q.Y), q.W * q.W - q.X * q.X - q.Y * q.Y + q.z * q.z)
+    Case zyx: Quat2Euler = Quat2EulerHelper(2# * (q.X * q.Y + q.W * q.z), q.W * q.W + q.X * q.X - q.Y * q.Y - q.z * q.z, -2# * (q.X * q.z - q.W * q.Y), 2# * (q.Y * q.z + q.W * q.X), q.W * q.W - q.X * q.X - q.Y * q.Y + q.z * q.z)
     End Select
     '
     If bDegrees Then Quat2Euler = VecRad2Deg(Quat2Euler)
@@ -377,7 +377,7 @@ End Function
 Private Function Quat2EulerHelper(r11 As Double, r12 As Double, r21 As Double, r31 As Double, r32 As Double) As VecType
     Quat2EulerHelper.X = Atan2(r11, r12)
     Quat2EulerHelper.Y = Asin(r21)
-    Quat2EulerHelper.Z = Atan2(r31, r32)
+    Quat2EulerHelper.z = Atan2(r31, r32)
 End Function
 
 Public Function Seg2Quat(seg As SegType) As QuatType
@@ -411,43 +411,43 @@ Public Function Axes2Quat(AxisF As VecType, AxisL As VecType, AxisU As VecType) 
     Dim s As Double
     Dim tr As Double
     Dim Max As Double
-    Dim X As Double, Y As Double, Z As Double
+    Dim X As Double, Y As Double, z As Double
     '
-    tr = (AxisF.X + AxisL.Y + AxisU.Z + 1#)
+    tr = (AxisF.X + AxisL.Y + AxisU.z + 1#)
     '
     If (tr >= 1#) Then
         s = (0.5 / Sqr(tr))
         Axes2Quat.W = 0.25 / s
-        Axes2Quat.X = (AxisL.Z - AxisU.Y) * s
-        Axes2Quat.Y = (AxisU.X - AxisF.Z) * s
-        Axes2Quat.Z = (AxisF.Y - AxisL.X) * s
+        Axes2Quat.X = (AxisL.z - AxisU.Y) * s
+        Axes2Quat.Y = (AxisU.X - AxisF.z) * s
+        Axes2Quat.z = (AxisF.Y - AxisL.X) * s
     Else
-        If (AxisL.Y > AxisU.Z) Then Max = AxisL.Y Else Max = AxisU.Z
+        If (AxisL.Y > AxisU.z) Then Max = AxisL.Y Else Max = AxisU.z
         '
         If (Max < AxisF.X) Then
-            s = (Sqr(AxisF.X - (AxisL.Y + AxisU.Z) + 1#))
+            s = (Sqr(AxisF.X - (AxisL.Y + AxisU.z) + 1#))
             X = (s * 0.5)
             s = (0.5 / s)
-            Axes2Quat.W = (AxisL.Z - AxisU.Y) * s
+            Axes2Quat.W = (AxisL.z - AxisU.Y) * s
             Axes2Quat.X = X
             Axes2Quat.Y = (AxisF.Y + AxisL.X) * s
-            Axes2Quat.Z = (AxisU.X + AxisF.Z) * s
+            Axes2Quat.z = (AxisU.X + AxisF.z) * s
         ElseIf (Max = AxisL.Y) Then
-            s = (Sqr(AxisL.Y - (AxisU.Z + AxisF.X) + 1#))
+            s = (Sqr(AxisL.Y - (AxisU.z + AxisF.X) + 1#))
             Y = (s * 0.5)
             s = (0.5 / s)
-            Axes2Quat.W = (AxisU.X - AxisF.Z) * s
+            Axes2Quat.W = (AxisU.X - AxisF.z) * s
             Axes2Quat.X = (AxisF.Y + AxisL.X) * s
             Axes2Quat.Y = Y
-            Axes2Quat.Z = (AxisL.Z + AxisU.Y) * s
+            Axes2Quat.z = (AxisL.z + AxisU.Y) * s
         Else
-            s = (Sqr(AxisU.Z - (AxisF.X + AxisL.Y) + 1#))
-            Z = (s * 0.5)
+            s = (Sqr(AxisU.z - (AxisF.X + AxisL.Y) + 1#))
+            z = (s * 0.5)
             s = (0.5 / s)
             Axes2Quat.W = (AxisF.Y - AxisL.X) * s
-            Axes2Quat.X = (AxisU.X + AxisF.Z) * s
-            Axes2Quat.Y = (AxisL.Z + AxisU.Y) * s
-            Axes2Quat.Z = Z
+            Axes2Quat.X = (AxisU.X + AxisF.z) * s
+            Axes2Quat.Y = (AxisL.z + AxisU.Y) * s
+            Axes2Quat.z = z
         End If
     End If
 End Function
@@ -467,19 +467,19 @@ Public Function Quat2Up(q As QuatType) As VecType
     Quat2Up = RotVecByQuat(MakeVec(0, 0, 1), q)
 End Function
 
-Public Function AxisAngle2Quat(axis As VecType, ByVal angle As Double, Optional bDegrees As Boolean = True) As QuatType
+Public Function AxisAngle2Quat(axis As VecType, ByVal Angle As Double, Optional bDegrees As Boolean = True) As QuatType
     ' You should be sure the vector is a UNIT vector before calling this, else the quaternion will not be a unit quaternion.
     ' Note that the Axis(vector) is the rotation vector, and has nothing to do with basis vectors.
     '
     Dim SinThetaDivTwo As Double
     '
-    If bDegrees Then angle = Deg2Rad(angle)
-    SinThetaDivTwo = Sin(angle / 2)
+    If bDegrees Then Angle = Deg2Rad(Angle)
+    SinThetaDivTwo = Sin(Angle / 2)
     '
-    AxisAngle2Quat.W = Cos(angle / 2)
+    AxisAngle2Quat.W = Cos(Angle / 2)
     AxisAngle2Quat.X = axis.X * SinThetaDivTwo
     AxisAngle2Quat.Y = axis.Y * SinThetaDivTwo
-    AxisAngle2Quat.Z = axis.Z * SinThetaDivTwo
+    AxisAngle2Quat.z = axis.z * SinThetaDivTwo
 End Function
 
 Public Function QuatAxis(quat As QuatType) As VecType
@@ -492,7 +492,7 @@ Public Function QuatAxis(quat As QuatType) As VecType
     On Error Resume Next
         QuatAxis.X = quat.X / SinThetaByTwo
         QuatAxis.Y = quat.Y / SinThetaByTwo
-        QuatAxis.Z = quat.Z / SinThetaByTwo
+        QuatAxis.z = quat.z / SinThetaByTwo
     On Error GoTo 0
 End Function
 
@@ -512,10 +512,10 @@ End Function
 '****************************************************************************************************
 '****************************************************************************************************
 
-Public Function RotSeg(seg As SegType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As SegType
+Public Function RotSeg(seg As SegType, axis As VecType, Angle As Double, Optional bDegrees As Boolean = True) As SegType
     ' This is exactly like a rotation: (Seg2 = Rot(Seg1, Axis, Angle)).
     '
-    RotSeg = RotSegByQuat(seg, AxisAngle2Quat(axis, angle, bDegrees))
+    RotSeg = RotSegByQuat(seg, AxisAngle2Quat(axis, Angle, bDegrees))
 End Function
 
 Public Function RotSegByQuat(seg As SegType, quat As QuatType) As SegType
@@ -528,18 +528,18 @@ End Function
 Public Function RotQuat(q1 As QuatType, q2 As QuatType) As QuatType
     ' q1 is being rotated by q2 amount.
     '
-    RotQuat.W = q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z
-    RotQuat.X = q1.W * q2.X + q1.X * q2.W - q1.Y * q2.Z + q1.Z * q2.Y
-    RotQuat.Y = q1.W * q2.Y + q1.X * q2.Z + q1.Y * q2.W - q1.Z * q2.X
-    RotQuat.Z = q1.W * q2.Z - q1.X * q2.Y + q1.Y * q2.X + q1.Z * q2.W
+    RotQuat.W = q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.z * q2.z
+    RotQuat.X = q1.W * q2.X + q1.X * q2.W - q1.Y * q2.z + q1.z * q2.Y
+    RotQuat.Y = q1.W * q2.Y + q1.X * q2.z + q1.Y * q2.W - q1.z * q2.X
+    RotQuat.z = q1.W * q2.z - q1.X * q2.Y + q1.Y * q2.X + q1.z * q2.W
 End Function
 Public Function MulQuat(q1 As QuatType, q2 As QuatType) As QuatType
     ' q1 is being rotated by q2 amount.
     '
-    MulQuat.W = q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z
-    MulQuat.X = q1.W * q2.X + q1.X * q2.W + q1.Y * q2.Z - q1.Z * q2.Y
-    MulQuat.Y = q1.W * q2.Y - q1.X * q2.Z + q1.Y * q2.W + q1.Z * q2.X
-    MulQuat.Z = q1.W * q2.Z + q1.X * q2.Y - q1.Y * q2.X + q1.Z * q2.W
+    MulQuat.W = q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.z * q2.z
+    MulQuat.X = q1.W * q2.X + q1.X * q2.W + q1.Y * q2.z - q1.z * q2.Y
+    MulQuat.Y = q1.W * q2.Y - q1.X * q2.z + q1.Y * q2.W + q1.z * q2.X
+    MulQuat.z = q1.W * q2.z + q1.X * q2.Y - q1.Y * q2.X + q1.z * q2.W
 End Function
 Public Function UnRotQuat(q1 As QuatType, q2 As QuatType) As QuatType
     ' q1 is being UNrotated by q2 amount.
@@ -547,8 +547,8 @@ Public Function UnRotQuat(q1 As QuatType, q2 As QuatType) As QuatType
     UnRotQuat = RotQuat(q1, NegQuat(q2))
 End Function
 
-Public Function RotVec(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
-    RotVec = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
+Public Function RotVec(vec As VecType, axis As VecType, Angle As Double, Optional bDegrees As Boolean = True) As VecType
+    RotVec = RotVecByQuat(vec, AxisAngle2Quat(axis, Angle, bDegrees))
 End Function
 
 Public Function RotVecByQuat(vec As VecType, quat As QuatType) As VecType
@@ -560,8 +560,8 @@ Public Function RotVecByQuat(vec As VecType, quat As QuatType) As VecType
     Dim num7 As Double, num8 As Double, num9 As Double
     Dim numa As Double, numb As Double, numc As Double
     '
-    num1 = quat.X * 2#:       num2 = quat.Y * 2#:       num3 = quat.Z * 2#
-    num4 = quat.X * num1:     num5 = quat.Y * num2:     num6 = quat.Z * num3
+    num1 = quat.X * 2#:       num2 = quat.Y * 2#:       num3 = quat.z * 2#
+    num4 = quat.X * num1:     num5 = quat.Y * num2:     num6 = quat.z * num3
     num7 = quat.X * num2:     num8 = quat.X * num3:     num9 = quat.Y * num3
     numa = quat.W * num1:     numb = quat.W * num2:     numc = quat.W * num3
     '
@@ -569,9 +569,9 @@ Public Function RotVecByQuat(vec As VecType, quat As QuatType) As VecType
     ' RotVecByQuat.y =       (num7 + numc)  * vec.x + (1# - (num4 + num6)) * vec.y +       (num9 - numa)  * vec.z
     ' RotVecByQuat.z =       (num8 - numb)  * vec.x +       (num9 + numa)  * vec.y + (1# - (num4 + num5)) * vec.z
     '
-    RotVecByQuat.X = (1# - (num5 + num6)) * vec.X + (num7 - numc) * vec.Y + (num8 + numb) * vec.Z
-    RotVecByQuat.Y = (num7 + numc) * vec.X + (1# - (num4 + num6)) * vec.Y + (num9 - numa) * vec.Z
-    RotVecByQuat.Z = (num8 - numb) * vec.X + (num9 + numa) * vec.Y + (1# - (num4 + num5)) * vec.Z
+    RotVecByQuat.X = (1# - (num5 + num6)) * vec.X + (num7 - numc) * vec.Y + (num8 + numb) * vec.z
+    RotVecByQuat.Y = (num7 + numc) * vec.X + (1# - (num4 + num6)) * vec.Y + (num9 - numa) * vec.z
+    RotVecByQuat.z = (num8 - numb) * vec.X + (num9 + numa) * vec.Y + (1# - (num4 + num5)) * vec.z
 End Function
 
 '****************************************************************************************************
@@ -640,14 +640,14 @@ Private Function VecSumm1(a As Long, b As Long) As VecType
     CopyMemory VarPtr(V2), b, 24
     VecSumm1.X = V1.X + V2.X
     VecSumm1.Y = V1.Y + V2.Y
-    VecSumm1.Z = V1.Z + V2.Z
+    VecSumm1.z = V1.z + V2.z
     
 End Function
 
 Public Function VecSum(V1 As VecType, V2 As VecType) As VecType
     VecSum.X = V1.X + V2.X
     VecSum.Y = V1.Y + V2.Y
-    VecSum.Z = V1.Z + V2.Z
+    VecSum.z = V1.z + V2.z
 End Function
 Public Sub VecSumm(a As Long, b As Long, c As Long)
     Dim V1 As VecType, V2 As VecType, V3 As VecType
@@ -655,7 +655,7 @@ Public Sub VecSumm(a As Long, b As Long, c As Long)
     CopyMemory VarPtr(V2), b, 24
     V3.X = V1.X + V2.X
     V3.Y = V1.Y + V2.Y
-    V3.Z = V1.Z + V2.Z
+    V3.z = V1.z + V2.z
     CopyMemory c, VarPtr(V3), 24
 End Sub
 Public Sub VecSummMult(n As Long, a As Long, b As Long, c As Long)
@@ -665,7 +665,7 @@ Public Sub VecSummMult(n As Long, a As Long, b As Long, c As Long)
     CopyMemory VarPtr(V1), a, 24
     V3.X = V1.X + V2.X
     V3.Y = V1.Y + V2.Y
-    V3.Z = V1.Z + V2.Z
+    V3.z = V1.z + V2.z
     CopyMemory c, VarPtr(V3), 24
     a = a + 24
     c = c + 24
@@ -674,7 +674,7 @@ End Sub
 Public Function VecDif(V1 As VecType, V2 As VecType) As VecType
     VecDif.X = V1.X - V2.X
     VecDif.Y = V1.Y - V2.Y
-    VecDif.Z = V1.Z - V2.Z
+    VecDif.z = V1.z - V2.z
 End Function
 Public Sub VecDiff(a As Long, b As Long, c As Long)
     Dim V1 As VecType, V2 As VecType, V3 As VecType
@@ -682,7 +682,7 @@ Public Sub VecDiff(a As Long, b As Long, c As Long)
     CopyMemory VarPtr(V2), b, 24
     V3.X = V1.X - V2.X
     V3.Y = V1.Y - V2.Y
-    V3.Z = V1.Z - V2.Z
+    V3.z = V1.z - V2.z
     CopyMemory c, VarPtr(V3), 24
 End Sub
 Public Sub VecDiffMult(n As Long, a As Long, b As Long, c As Long)
@@ -692,7 +692,7 @@ Public Sub VecDiffMult(n As Long, a As Long, b As Long, c As Long)
     CopyMemory VarPtr(V1), a, 24
     V3.X = V1.X - V2.X
     V3.Y = V1.Y - V2.Y
-    V3.Z = V1.Z - V2.Z
+    V3.z = V1.z - V2.z
     CopyMemory c, VarPtr(V3), 24
     a = a + 24
     c = c + 24
@@ -701,7 +701,7 @@ End Sub
 Public Function VecDifNum(V1 As VecType, D As Double) As VecType
     VecDifNum.X = V1.X - D
     VecDifNum.Y = V1.Y - D
-    VecDifNum.Z = V1.Z - D
+    VecDifNum.z = V1.z - D
 End Function
 
 
@@ -710,7 +710,7 @@ Sub VecDiffNum(a As Long, D As Double, b As Long)
     CopyMemory VarPtr(V1), a, 24
     v.X = V1.X - D
     v.Y = V1.Y - D
-    v.Z = V1.Z - D
+    v.z = V1.z - D
     CopyMemory b, VarPtr(v), 24
 End Sub
 Sub VecDiffNumMult(n As Long, a As Long, D As Double, b As Long)
@@ -719,7 +719,7 @@ Sub VecDiffNumMult(n As Long, a As Long, D As Double, b As Long)
     CopyMemory VarPtr(V1), a, 24
     v.X = V1.X - D
     v.Y = V1.Y - D
-    v.Z = V1.Z - D
+    v.z = V1.z - D
     CopyMemory b, VarPtr(v), 24
     a = a + 24
     b = b + 24
@@ -729,14 +729,14 @@ End Sub
 Public Function VecAddNum(v As VecType, D As Double) As VecType
     VecAddNum.X = v.X + D
     VecAddNum.Y = v.Y + D
-    VecAddNum.Z = v.Z + D
+    VecAddNum.z = v.z + D
 End Function
 Sub VecAddiNum(a As Long, D As Double, b As Long)
     Dim v As VecType, V1 As VecType
     CopyMemory VarPtr(V1), a, 24
     v.X = V1.X + D
     v.Y = V1.Y + D
-    v.Z = V1.Z + D
+    v.z = V1.z + D
     CopyMemory b, VarPtr(v), 24
 End Sub
 Sub VecAddiNumMult(n As Long, a As Long, D As Double, b As Long)
@@ -745,7 +745,7 @@ Sub VecAddiNumMult(n As Long, a As Long, D As Double, b As Long)
     CopyMemory VarPtr(V1), a, 24
     v.X = V1.X + D
     v.Y = V1.Y + D
-    v.Z = V1.Z + D
+    v.z = V1.z + D
     CopyMemory b, VarPtr(v), 24
     a = a + 24
     b = b + 24
@@ -757,7 +757,7 @@ Sub VecDiviNum(a As Long, D As Double, b As Long)
     CopyMemory VarPtr(V1), a, 24
     v.X = V1.X / D
     v.Y = V1.Y / D
-    v.Z = V1.Z / D
+    v.z = V1.z / D
     CopyMemory b, VarPtr(v), 24
 End Sub
 Sub VecDiviNumMult(n As Long, a As Long, D As Double, b As Long)
@@ -766,7 +766,7 @@ Sub VecDiviNumMult(n As Long, a As Long, D As Double, b As Long)
     CopyMemory VarPtr(V1), a, 24
     v.X = V1.X / D
     v.Y = V1.Y / D
-    v.Z = V1.Z / D
+    v.z = V1.z / D
     CopyMemory b, VarPtr(v), 24
     a = a + 24
     b = b + 24
@@ -775,14 +775,14 @@ End Sub
 Public Function VecDivNum(V1 As VecType, D As Double) As VecType
     VecDivNum.X = V1.X / D
     VecDivNum.Y = V1.Y / D
-    VecDivNum.Z = V1.Z / D
+    VecDivNum.z = V1.z / D
 End Function
 Sub VecMulNum(a As Long, D As Double, b As Long)
     Dim v As VecType, V1 As VecType
     CopyMemory VarPtr(V1), a, 24
     v.X = V1.X * D
     v.Y = V1.Y * D
-    v.Z = V1.Z * D
+    v.z = V1.z * D
     CopyMemory b, VarPtr(v), 24
 End Sub
 Sub VecMulNumMult(n As Long, a As Long, D As Double, b As Long)
@@ -791,7 +791,7 @@ Sub VecMulNumMult(n As Long, a As Long, D As Double, b As Long)
     CopyMemory VarPtr(V1), a, 24
     v.X = V1.X * D
     v.Y = V1.Y * D
-    v.Z = V1.Z * D
+    v.z = V1.z * D
     CopyMemory b, VarPtr(v), 24
     a = a + 24
     b = b + 24
@@ -800,22 +800,22 @@ End Sub
 Public Function VecMultNum(V1 As VecType, D As Double) As VecType
     VecMultNum.X = V1.X * D
     VecMultNum.Y = V1.Y * D
-    VecMultNum.Z = V1.Z * D
+    VecMultNum.z = V1.z * D
 End Function
 
 Public Function VecMagnitude(a As Long) As Double
     Dim v As VecType
     CopyMemory VarPtr(v), a, 24
-    VecMagnitude = Sqr(v.X * v.X + v.Y * v.Y + v.Z * v.Z)
+    VecMagnitude = Sqr(v.X * v.X + v.Y * v.Y + v.z * v.z)
 End Function
 Public Function VecMag(v As VecType) As Double
-    VecMag = Sqr(v.X * v.X + v.Y * v.Y + v.Z * v.Z)
+    VecMag = Sqr(v.X * v.X + v.Y * v.Y + v.z * v.z)
 End Function
 
 Public Function NegVec(v As VecType) As VecType
     NegVec.X = -v.X
     NegVec.Y = -v.Y
-    NegVec.Z = -v.Z
+    NegVec.z = -v.z
 End Function
 Public Sub UnitVect(a As Long)
     ' Returns ZERO vector if vector has no magnitude.
@@ -827,7 +827,7 @@ Public Sub UnitVect(a As Long)
     If D > 0 Then
         d1.X = v.X / D
         d1.Y = v.Y / D
-        d1.Z = v.Z / D
+        d1.z = v.z / D
     End If
     CopyMemory a, VarPtr(d1), 24
 End Sub
@@ -842,7 +842,7 @@ Public Sub UnitVectMult(n As Long, a As Long)
     If D > 0 Then
         d1.X = v.X / D
         d1.Y = v.Y / D
-        d1.Z = v.Z / D
+        d1.z = v.z / D
     Else
         d1 = Zero
     End If
@@ -858,18 +858,18 @@ Public Function UnitVec(v As VecType) As VecType
     If D > 0 Then
         UnitVec.X = v.X / D
         UnitVec.Y = v.Y / D
-        UnitVec.Z = v.Z / D
+        UnitVec.z = v.z / D
     End If
 End Function
 ' XProduct
 Public Function XProd(V1 As VecType, V2 As VecType) As VecType
-    XProd.X = V1.Y * V2.Z - V1.Z * V2.Y
-    XProd.Y = V1.Z * V2.X - V1.X * V2.Z
-    XProd.Z = V1.X * V2.Y - V1.Y * V2.X
+    XProd.X = V1.Y * V2.z - V1.z * V2.Y
+    XProd.Y = V1.z * V2.X - V1.X * V2.z
+    XProd.z = V1.X * V2.Y - V1.Y * V2.X
 End Function
 ' XDotProduct
 Public Function DotProd(V1 As VecType, V2 As VecType) As Double
-    DotProd = V1.X * V2.X + V1.Y * V2.Y + V1.Z * V2.Z
+    DotProd = V1.X * V2.X + V1.Y * V2.Y + V1.z * V2.z
 End Function
 Sub NegateQuat(a As Long, b As Long)
     Dim quat As QuatType
@@ -877,7 +877,7 @@ Sub NegateQuat(a As Long, b As Long)
 '    quat.w = quat.w
     quat.X = -quat.X
     quat.Y = -quat.Y
-    quat.Z = -quat.Z
+    quat.z = -quat.z
     CopyMemory b, VarPtr(quat), 48
 End Sub
 Sub NegateQuatMult(n As Long, a As Long, b As Long)
@@ -887,7 +887,7 @@ Sub NegateQuatMult(n As Long, a As Long, b As Long)
 '    quat.w = quat.w
     quat.X = -quat.X
     quat.Y = -quat.Y
-    quat.Z = -quat.Z
+    quat.z = -quat.z
     CopyMemory b, VarPtr(quat), 48
     a = a + 48
     b = b + 48
@@ -899,13 +899,13 @@ Public Function NegQuat(quat As QuatType) As QuatType
     NegQuat.W = quat.W
     NegQuat.X = -quat.X
     NegQuat.Y = -quat.Y
-    NegQuat.Z = -quat.Z
+    NegQuat.z = -quat.z
 End Function
 Public Function NegQuatAll(quat As QuatType) As QuatType
     NegQuatAll.W = -quat.W
     NegQuatAll.X = -quat.X
     NegQuatAll.Y = -quat.Y
-    NegQuatAll.Z = -quat.Z
+    NegQuatAll.z = -quat.z
 End Function
 Public Sub MakeLineFrom2Vec(a As Long, b As Long, c As Long) ' Pointers VecType, VecType, LineType
     CopyMemory c, a, 24
@@ -916,22 +916,22 @@ Public Function MakeLine(point1 As VecType, point2 As VecType) As LineType
     MakeLine.point2 = point2
 End Function
 
-Public Function MakeVec(X As Double, Y As Double, Z As Double) As VecType
+Public Function MakeVec(X As Double, Y As Double, z As Double) As VecType
     MakeVec.X = X
     MakeVec.Y = Y
-    MakeVec.Z = Z
+    MakeVec.z = z
 End Function
-Public Sub Quaternion(a As Long, W As Double, X As Double, Y As Double, Z As Double)
+Public Sub Quaternion(a As Long, W As Double, X As Double, Y As Double, z As Double)
     CopyMemory a, VarPtr(W), 8
     CopyMemory a + 8, VarPtr(X), 8
     CopyMemory a + 16, VarPtr(Y), 8
-    CopyMemory a + 24, VarPtr(Z), 8
+    CopyMemory a + 24, VarPtr(z), 8
 End Sub
-Public Function MakeQuat(W As Double, X As Double, Y As Double, Z As Double) As QuatType
+Public Function MakeQuat(W As Double, X As Double, Y As Double, z As Double) As QuatType
     MakeQuat.W = W
     MakeQuat.X = X
     MakeQuat.Y = Y
-    MakeQuat.Z = Z
+    MakeQuat.z = z
 End Function
 ' quad functions
 Public Sub QuatNeg(a As Long, Optional b As Long = 0)
@@ -985,7 +985,7 @@ Public Sub QuatMultByReal(a As Long, r As Double, Optional c As Long = 0)
     q.W = q.W * r
     q.X = q.X * r
     q.Y = q.Y * r
-    q.Z = q.Z * r
+    q.z = q.z * r
     If c = 0 Then CopyMemory a, VarPtr(q), 32: Exit Sub
     CopyMemory c, VarPtr(q), 32
 End Sub
@@ -996,7 +996,7 @@ Public Sub QuatMultReal(a As Long, b As Long, Optional c As Long = 0)
     q.W = q.W * r
     q.X = q.X * r
     q.Y = q.Y * r
-    q.Z = q.Z * r
+    q.z = q.z * r
     If c = 0 Then CopyMemory a, VarPtr(q), 32: Exit Sub
     CopyMemory c, VarPtr(q), 32
 End Sub
@@ -1008,7 +1008,7 @@ Public Sub QuatMultRealMul(n As Long, a As Long, b As Long, Optional c As Long =
     q.W = q.W * r
     q.X = q.X * r
     q.Y = q.Y * r
-    q.Z = q.Z * r
+    q.z = q.z * r
     If c = 0 Then CopyMemory a, VarPtr(q), 32 Else CopyMemory c, VarPtr(q), 32: c = c + 32
     a = a + 32
     b = b + 8
@@ -1022,7 +1022,7 @@ Public Sub QuatMultRealMulOne(n As Long, a As Long, b As Long, Optional c As Lon
     q.W = q.W * r
     q.X = q.X * r
     q.Y = q.Y * r
-    q.Z = q.Z * r
+    q.z = q.z * r
     If c = 0 Then CopyMemory a, VarPtr(q), 32 Else CopyMemory c, VarPtr(q), 32: c = c + 32
     a = a + 32
     Next M
@@ -1096,7 +1096,7 @@ Public Sub QuatAddQuat(a As Long, b As Long, Optional c As Long = 0)
         .W = .W + q2.W
         .X = .X + q2.X
         .Y = .Y + q2.Y
-        .Z = .Z + q2.Z
+        .z = .z + q2.z
     End With
     If c = 0 Then CopyMemory a, VarPtr(q), 32: Exit Sub
     CopyMemory c, VarPtr(q), 32
@@ -1111,7 +1111,7 @@ Public Sub QuatAddQuatMul(n As Long, a As Long, b As Long, Optional c As Long = 
             .W = .W + q2.W
             .X = .X + q2.X
             .Y = .Y + q2.Y
-            .Z = .Z + q2.Z
+            .z = .z + q2.z
         End With
         CopyMemory a, VarPtr(q), 32
         a = a + 32
@@ -1125,7 +1125,7 @@ Public Sub QuatAddQuatMul(n As Long, a As Long, b As Long, Optional c As Long = 
             .W = .W + q2.W
             .X = .X + q2.X
             .Y = .Y + q2.Y
-            .Z = .Z + q2.Z
+            .z = .z + q2.z
         End With
         CopyMemory c, VarPtr(q), 32
         a = a + 32
@@ -1152,37 +1152,37 @@ Public Function QuatNormRetDouble(a As Long) As Double
     QuatNormRetDouble = NormQuat(GetQuatType(a))
 End Function
 Public Sub QuatNorm(a As Long, b As Long)
-    Dim Z As Double
-    Z = NormQuat(GetQuatType(a))
-    CopyMemory b, VarPtr(Z), 8
+    Dim z As Double
+    z = NormQuat(GetQuatType(a))
+    CopyMemory b, VarPtr(z), 8
 End Sub
 Public Sub QuatNormMul(n As Long, a As Long, b As Long)
-    Dim Z As Double, M As Long
+    Dim z As Double, M As Long
     For M = 1 To n
-    Z = NormQuat(GetQuatType(a))
-    CopyMemory b, VarPtr(Z), 8
+    z = NormQuat(GetQuatType(a))
+    CopyMemory b, VarPtr(z), 8
     a = a + 32
     b = b + 8
     Next M
 End Sub
 Public Function NormQuat(v As QuatType) As Double
-    NormQuat = Sqr(v.W * v.W + v.X * v.X + v.Y * v.Y + v.Z * v.Z)
+    NormQuat = Sqr(v.W * v.W + v.X * v.X + v.Y * v.Y + v.z * v.z)
 End Function
 Public Function QuatStringQuat(q As QuatType, Optional frm$ = "#0.00000") As String
-    QuatStringQuat = MyFrm(q.W, frm$) & ", " & MyFrm(q.X, frm$) & ", " & MyFrm(q.Y, frm$) & ", " & MyFrm(q.Z, frm$)
+    QuatStringQuat = MyFrm(q.W, frm$) & " " & MyFrm(q.X, frm$) & " " & MyFrm(q.Y, frm$) & " " & MyFrm(q.z, frm$)
 End Function
 Public Function QuatString(a As Long, Optional frm$ = "#0.00000") As String
     Dim q As QuatType
     q = GetQuatType(a)
-    QuatString = MyFrm(q.W, frm$) & ", " & MyFrm(q.X, frm$) & ", " & MyFrm(q.Y, frm$) & ", " & MyFrm(q.Z, frm$)
+    QuatString = MyFrm(q.W, frm$) & " " & MyFrm(q.X, frm$) & " " & MyFrm(q.Y, frm$) & " " & MyFrm(q.z, frm$)
 End Function
 Public Function VecStringVec(v As VecType, Optional frm$ = "#0.00000") As String
-    VecStringVec = MyFrm(v.X, frm$) & ", " & MyFrm(v.Y, frm$) & ", " & MyFrm(v.Z, frm$)
+    VecStringVec = MyFrm(v.X, frm$) & " " & MyFrm(v.Y, frm$) & " " & MyFrm(v.z, frm$)
 End Function
 Public Function VecString(a As Long, Optional frm$ = "#0.00000") As String
     Dim v As VecType
     v = GetVector(a)
-    VecString = MyFrm(v.X, frm$) & ", " & MyFrm(v.Y, frm$) & ", " & MyFrm(v.Z, frm$)
+    VecString = MyFrm(v.X, frm$) & " " & MyFrm(v.Y, frm$) & " " & MyFrm(v.z, frm$)
 End Function
 Public Function SegString(seg As SegType) As String
     SegString = "Origin: " & VecStringVec(seg.Origin) & vbCrLf & _
@@ -1196,7 +1196,7 @@ Public Sub VectorRad2Deg(a As Long, Optional b As Long = 0)
     v = GetVector(a)
     v.X = Rad2Deg(v.X)
     v.Y = Rad2Deg(v.Y)
-    v.Z = Rad2Deg(v.Z)
+    v.z = Rad2Deg(v.z)
     If b = 0 Then CopyMemory a, VarPtr(v), 24: Exit Sub
     CopyMemory b, VarPtr(v), 24
 End Sub
@@ -1206,7 +1206,7 @@ Public Sub VectorRad2DegMult(n As Long, a As Long, b As Long)
     v = GetVector(a)
     v.X = Rad2Deg(v.X)
     v.Y = Rad2Deg(v.Y)
-    v.Z = Rad2Deg(v.Z)
+    v.z = Rad2Deg(v.z)
     CopyMemory b, VarPtr(v), 24
     a = a + 24
     b = b + 24
@@ -1218,7 +1218,7 @@ Public Sub VectorDeg2Rad(a As Long, Optional b As Long = 0)
     CopyMemory VarPtr(v), a, 24
     v.X = Deg2Rad(v.X)
     v.Y = Deg2Rad(v.Y)
-    v.Z = Deg2Rad(v.Z)
+    v.z = Deg2Rad(v.z)
     If b = 0 Then CopyMemory a, VarPtr(v), 24: Exit Sub
     CopyMemory b, VarPtr(v), 24
 End Sub
@@ -1228,7 +1228,7 @@ Public Sub VectorDeg2RadMult(n As Long, a As Long, b As Long)
     CopyMemory VarPtr(v), a, 24
     v.X = Deg2Rad(v.X)
     v.Y = Deg2Rad(v.Y)
-    v.Z = Deg2Rad(v.Z)
+    v.z = Deg2Rad(v.z)
     CopyMemory b, VarPtr(v), 24
     a = a + 24
     b = b + 24
@@ -1238,13 +1238,13 @@ End Sub
 Public Function VecRad2Deg(v As VecType) As VecType
     VecRad2Deg.X = Rad2Deg(v.X)
     VecRad2Deg.Y = Rad2Deg(v.Y)
-    VecRad2Deg.Z = Rad2Deg(v.Z)
+    VecRad2Deg.z = Rad2Deg(v.z)
 End Function
 
 Public Function VecDeg2Rad(v As VecType) As VecType
     VecDeg2Rad.X = Deg2Rad(v.X)
     VecDeg2Rad.Y = Deg2Rad(v.Y)
-    VecDeg2Rad.Z = Deg2Rad(v.Z)
+    VecDeg2Rad.z = Deg2Rad(v.z)
 End Function
 
 Public Function Rad2Deg(RadAngle As Double) As Double

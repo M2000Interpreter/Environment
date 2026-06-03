@@ -336,19 +336,19 @@ End If
         End If
 End Sub
 
-Private Sub dSprite_GotFocus(Index As Integer)
+Private Sub dSprite_GotFocus(index As Integer)
 If lockme Then TEXT1.SetFocus: Exit Sub
 
 End Sub
 
-Private Sub dSprite_LostFocus(Index As Integer)
+Private Sub dSprite_LostFocus(index As Integer)
 If iamactive Then
 iamactive = False
 DestroyCaret
 End If
 End Sub
 
-Private Sub dSprite_OLEDragOver(Index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
+Private Sub dSprite_OLEDragOver(index As Integer, Data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -571,7 +571,7 @@ i = .SelLength
 End With
 UNhookMe
 MyPopUp.feedlabels TEXT1, EditTextWord
-MyPopUp.Up X + gList1.Left, Y + gList1.Top
+MyPopUp.Up X + gList1.Left, Y + gList1.top
 myButton = 0
 End Sub
 
@@ -740,9 +740,9 @@ TEXT1.SelStartSilent = TEXT1.SelStart  'MOVE CHARPOS TO SELSTART
 
 el = TEXT1.Charpos  ' charpos maybe is in the start or the end of block
 s$ = TEXT1.SelText
-OldLcid = TEXT1.mDoc.LCID
+OldLcid = TEXT1.mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 
 l = el + 1
 If EditTextWord Then
@@ -776,7 +776,7 @@ End If
 Loop Until (W = eW And l = el) Or safety = 2
 
 End If
-TEXT1.mDoc.LCID = OldLcid
+TEXT1.mDoc.lcid = OldLcid
 TEXT1.mDoc.WrapAgain
 
 TEXT1.Render
@@ -802,9 +802,9 @@ Else
 neo$ = InputBoxN("Replace " & IIf(anystr, "part of ", "") & "Word", "Text Editor", s$, noinp)
 End If
 If noinp <> 1 Then Exit Sub
-OldLcid = TEXT1.mDoc.LCID
+OldLcid = TEXT1.mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 Set mDoc10 = New Document
 mDoc10 = neo$
 If mDoc10.DocLines > 1 Then
@@ -935,7 +935,7 @@ If prof1.MARKTWO > 1000 Then ProcTask2 Basestack1: prof1.MARKONE
 Loop Until safety = 2 Or KeyPressed(16)
 TEXT1.glistN.DropKey = False
 End If
-TEXT1.mDoc.LCID = OldLcid
+TEXT1.mDoc.lcid = OldLcid
 If w2 > 0 Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
 TEXT1.glistN.SuspDraw = False
 TEXT1.Render
@@ -963,9 +963,9 @@ Else
 l = TEXT1.Charpos
 End If
 
-OldLcid = TEXT1.mDoc.LCID
+OldLcid = TEXT1.mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
   If Not TEXT1.mDoc.FindStrDown(s$, W, l) Then GoTo sdnOut
@@ -982,7 +982,7 @@ TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdnOut:
-TEXT1.mDoc.LCID = OldLcid
+TEXT1.mDoc.lcid = OldLcid
 End Sub
 
 Public Sub supsub()
@@ -1007,9 +1007,9 @@ l = TEXT1.Charpos + Len(s$)
 End If
 
 'l = TEXT1.Charpos + Len(s$)
-OldLcid = TEXT1.mDoc.LCID
+OldLcid = TEXT1.mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
    If TEXT1.SelText = s$ Then l = l - 1
@@ -1018,6 +1018,7 @@ If EditTextWord Or anystr Then
        If Not TEXT1.mDoc.FindWord(s$, False, W, l) Then GoTo sdupOut
     End If
 Else
+    If TEXT1.SelText = s$ Then l = l - 1
     If Not TEXT1.mDoc.FindIdentifier(s$, False, W, l) Then GoTo sdupOut
 End If
 TEXT1.SelLengthSilent = 0
@@ -1027,7 +1028,7 @@ TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdupOut:
-TEXT1.mDoc.LCID = OldLcid
+TEXT1.mDoc.lcid = OldLcid
 End Sub
 Public Function InIDECheck() As Boolean
     m_bInIDE = True
@@ -1099,24 +1100,24 @@ End Sub
 
 
 
-Private Sub dSprite_MouseDown(Index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub dSprite_MouseDown(index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim p As Long, u2 As Long
 If lockme Then Exit Sub
 If Not NoAction Then
 NoAction = True
 Dim sel&
-p = val("0" & dSprite(Index).Tag)
+p = val("0" & dSprite(index).Tag)
 With players(p)
     u2 = .uMineLineSpace * 2
 
         If Button > 0 And Targets Then
 
-        sel& = ScanTarget(q(), CLng(X), CLng(Y), Index)
+        sel& = ScanTarget(q(), CLng(X), CLng(Y), index)
             If sel& >= 0 Then
                 If Button = 1 Then
                 Select Case q(sel&).id Mod 100
                 Case Is < 10
-                If Not interpret(DisStack, "LAYER " & dSprite(Index).Tag + " {" + vbCrLf + q(sel&).comm + vbCrLf & "}") Then Beep
+                If Not interpret(DisStack, "LAYER " & dSprite(index).Tag + " {" + vbCrLf + q(sel&).comm + vbCrLf & "}") Then Beep
                 Case Else
                 INK$ = q(sel&).comm
                 End Select
@@ -1903,7 +1904,7 @@ breakit:
                     MOUT = True
                 End If
         
-                QUERY Basestack1, Prompt$, qq$, (mybasket.mx * 4), True
+                QUERY Basestack1, Prompt$, qq$, (mybasket.mX * 4), True
             
                 
                 If NOEXECUTION And MOUT Then
@@ -2680,7 +2681,7 @@ End If
 End Sub
 
 
-Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, Url As Variant, Flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
+Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, Url As Variant, flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
 If look1 Then
 look1 = False:  lookfirst = False
 
@@ -2766,7 +2767,7 @@ Sleep 1
 If Form1.Visible Then Form1.Refresh
 End Sub
 Private Sub Prepare(basestack As basetask, ByVal Nb As String)
-Dim G As Long, iC As Long
+Dim g As Long, iC As Long
 Dim VP As String, vv As String, CM$, b As String
 If needset Then
 Nb = StrConv(Nb, vbUnicode)
@@ -2777,8 +2778,8 @@ Else
 b = Nb
 b = Replace(b, Chr(0), "")
 End If
-G = InStr(b, "?")
-If G > 0 Then b = Mid$(b, G + 1) Else Exit Sub
+g = InStr(b, "?")
+If g > 0 Then b = Mid$(b, g + 1) Else Exit Sub
 If b <> "" Then
 Do While Parameters(b, VP, vv)
 CM$ = VP & "$=" & """" + vv + """"
@@ -2831,7 +2832,7 @@ If IsWine Then
 With view1
 On Error Resume Next
     .Visible = True
-    .Top = IEY
+    .top = IEY
     .Left = IEX
     .Width = IESizeX
     .Height = IESizeY
@@ -3353,7 +3354,7 @@ End Sub
 Function GetKeY(ascii As Integer) As String
     Dim Buffer As String, ret As Long
     Buffer = String$(514, 0)
-    Dim r&, K&
+    Dim r&, k&
       r = GetKeyboardLayout(DWL_ANYTHREAD) And &HFFFF&
       r = CLng(val("&H" & Right(Hex(r), 4)))
     ret = GetLocaleInfo(r, LOCALE_ILANGUAGE, StrPtr(Buffer), Len(Buffer))
@@ -3573,14 +3574,14 @@ Private Sub mywait11(bstack As basetask, ByVal pp)
     End If
 End Sub
 Private Function UnsignedSub(a As Long, b As Long)
-    Static ua, ub
+    Static ua, UB
     If ua = Empty Then
         MemInt(VarPtr(ua)) = 20
-        MemInt(VarPtr(ub)) = 20
+        MemInt(VarPtr(UB)) = 20
     End If
     MemLong(VarPtr(ua) + 8) = a
-    MemLong(VarPtr(ub) + 8) = b
-    ua = ua - ub
+    MemLong(VarPtr(UB) + 8) = b
+    ua = ua - UB
     UnsignedSub = MemLong(VarPtr(ua) + 8)
 End Function
 Public Function NeoASK(bstack As basetask) As Double

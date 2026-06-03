@@ -90,7 +90,7 @@ Public Function CallByNameFixParamArray _
     ' New by George
     ' pargs2() the names of arguments
     ' fixnamearg = the number of named arguments
-    Dim usehandler As mHandler
+    Dim UseHandler As mHandler
     Dim myform As Form
     Dim IDsp        As IDispatch.IDispatchM2000
     Dim riid        As IDispatch.IID
@@ -531,9 +531,9 @@ On Error GoTo there
 If TypeOf VarRet Is IUnknown Then
 If UCase(pstrProcName) = "_NEWENUM" Then
     
-    Set usehandler = New mHandler
-    usehandler.ConstructEnumerator VarRet
-    Set robj = usehandler
+    Set UseHandler = New mHandler
+    UseHandler.ConstructEnumerator VarRet
+    Set robj = UseHandler
 Else
 On Error Resume Next
 If Err Then
@@ -592,7 +592,13 @@ Public Function ReadOneParameter(pobjTarget As Object, dispid As Long, ERrR$, Va
     On Error Resume Next
     VarRet = Empty
     lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
+    If lngRet = &H80020003 Or lngRet = &H8002000E Then
+    CallType = VbMethod
+    lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
+    
+    End If
     If Err > 0 Then
+        
         If MyIsObject(VarRet) Then
             If VarRet Is Err Then Exit Function
         End If
@@ -680,7 +686,7 @@ Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR
         Err.Clear
         On Error Resume Next
         lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
-        If lngRet = &H8002000E Then
+        If lngRet = &H8002000E Or lngRet = &H80020003 Then
         If CallType = VbGet Then
             CallType = VbMethod
             lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)

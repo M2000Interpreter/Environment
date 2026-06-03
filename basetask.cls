@@ -20,6 +20,7 @@ Public CheckUnReferenceGui As Long
 Public callx1 As Long, tpointer As Long
 Public RRCOUNTER As Long
 Public callohere As String
+Public LastIdpos As Long ' reverse pos
 Public addlen As Long, NoFuncError As Boolean, CallW As String, fHere$, strg As Boolean
 Public nokillvars As Boolean
 Public finalFlag As Boolean

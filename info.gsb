@@ -4787,7 +4787,7 @@ pen 15 {
 }
 }
 MODULE P {// this is not a game is an example for how we make a game using threads and sprites. Images are simple for this example.
-
+Player 0
 SET FAST !
 PEN #fff9aa
 // BLOCK ESCAPE KEY
@@ -5710,7 +5710,7 @@ If Module(Info) Then
 	Title "Info"
 end if
 }
-MODULE INFOBASIC {Italic 0
+MODULE INFOBASIC { Italic 0
 Bold 1
 if val(piece$(os$+" 1"," ")(1))>9 then
 	Font "Segoe UI"
@@ -5911,7 +5911,8 @@ Report {
 	just press tab before any letter, to delete indentation mark the text shift +End and then press shift tab
 	You can start a indentation with spaces (Default is tab - characrer 9), using shift tab in a clear line, or a line without leading tabs.
 	}, width-12
-title("Indent multiple lines")Report {
+title("Indent multiple lines")
+Report {
 	Mark a block and then press tab or shif tab to move text right or left
 	}, width-12
 title("Functions Keys for Editor")
@@ -10497,7 +10498,7 @@ MODULE COMPILER {Module CompilerExample {
 	     	exit_now=false
 		Inventory  func=halt_:={exit_now=true}
 		Append  func, push_:={sp--:stack_[sp]=eval(code_, pc as long):pc+=4}
-		Append  func, jz_:={	sp++: if eval(stack_, sp-1)=0 then pc=eval(code_, pc as long) else pc+=4}
+⇥⇥Append··func,·jz_:={sp++:·if·eval(stack_,·sp-1)=0·then·pc=eval(code_,·pc·as·long)·else·pc+=4}
 		Append  func, jmp_:={pc=eval(code_, pc as long)}
 		Append  func, fetch_:={sp--:stack_[sp]=stack_[eval(code_, pc as long)]:pc+=4}
 		Append  func, store_:={stack_[eval(code_, pc as long)]=stack_[sp]:sp++:pc+=4}
@@ -10508,7 +10509,7 @@ MODULE COMPILER {Module CompilerExample {
 		Append  func, mod_:={stack_[sp+1]=uint(sint(stack_[sp+1]) mod sint(stack_[sp])) :sp++}
 		Append  func, not_:={stack_[sp]=if(stack_[sp]=0->uint(-1),0)}
 		Append  func, neg_:={stack_[sp]=uint(-sint(stack_[sp]))}
-		Append  func, and_:={stack_[sp+1]=binary.and(stack_[sp+1],stack_[sp]):sp++	}
+		Append  func, and_:={stack_[sp+1]=binary.and(stack_[sp+1],stack_[sp]):sp++}
 		Append  func, or_:={stack_[sp+1]=binary.or(stack_[sp+1],stack_[sp]):sp++}
 		Append  func, lt_:={stack_[sp+1]=uint(if(sint(stack_[sp+1])<sint(stack_[sp])->-1, 0)):sp++}
 		Append  func, gt_:={stack_[sp+1]=uint(if(sint(stack_[sp+1])>sint(stack_[sp])->-1, 0)):sp++}
@@ -16078,6 +16079,7 @@ MODULE PRI {Module  Prime_decomposition    {
 		Print Part $(4,12), ~(15,bb),Number,$(6,5),~(oPen),Decompose(Number) : Refresh
 		Pen 15 {Print Under}
 	End While
+	report 2, "press any key"	
 	Bold oBold
 	Scroll Split 0  ' reset without clear
 	Linespace olinespace
@@ -33124,6 +33126,10 @@ Player 2 hide
 Player 3 hide
 //Player 0
 Mouse.icon 1
+Player 0
+Pen 14
+Back {Pen 14}
+
 
 Sub ShowAllicon()
 If not IsHide then exit sub
@@ -33494,6 +33500,7 @@ MODULE LIBTIMER {if Valid(UseTimer) Then
 	If UseTimer<1 then UseTimer=1
 	timer_spr$=""
 	timer_counter=1
+	boolean timer_work
 	Drawing 1000,1000 {
 		move 500,500
 		circle Fill 2, 450,,2
@@ -33507,18 +33514,19 @@ MODULE LIBTIMER {if Valid(UseTimer) Then
 		PLAYER 32 SHOW
 		Layer 32 {Refresh}
 		Thread {
-		{	timer_counter++
-			if timer_counter=100 then Player 32 hide : Exit
-			if  timer_counter>=100 Then Exit
-			Drawing 1000,1000 {
-			move 500,500
-			circle Fill 2, 450,,2
-			Pen 15
-			legend str$(timer_counter,"00"), "Impact", 24,0,2
-		} as timer_image
-		image  timer_image  to timer_spr$ (5), 100
-		Player 32,  SCALE.X-1000, 1000 use timer_spr$, 5, 10,0   size 1}
-	} as  timer_id interval if(UseTimer-> 60000, 30000, 1000)
+			Part {timer_counter++
+				if timer_counter=100 then Player 32 hide : Exit
+				if  timer_counter>=100 Then Exit
+				Drawing 1000,1000 {
+					move 500,500
+					circle Fill 2, 450,,2
+					Pen 15
+					legend str$(timer_counter,"00"), "Impact", 24,0,2
+				} as timer_image
+				image  timer_image  to timer_spr$ (5), 100
+				Player 32,  SCALE.X-1000, 1000 use timer_spr$, 5, 10,0   size 1
+			} as timer_work
+		} as  timer_id interval if(UseTimer-> 60000, 30000, 1000)
 	}
 Else
 	Report  {LibTimer Version 2, George Karras
@@ -33540,8 +33548,8 @@ Else
 			to restart we have to execute Thread timer_id Restart
 	Hide the timer:
 		Player 32 hide
-	Hide the timer:
-		Player 32 hide
+	Erase all Players:
+		Player 0
 	}
 End If
 }
@@ -34788,7 +34796,8 @@ beautify=-4
 Report 3, doc$
 Print status$
 }
-MODULE JSON1 {function KeyList (json) {
+MODULE JSON1 {flush
+function KeyList (json) {
 	flush
 	with json, "index" as json.index, "count" as json.count ,"KeyToStringPos" as keyName$()
 	if json.count=0 then =(,): exit
@@ -34885,7 +34894,9 @@ Sub OpByteLong()
       pc+=6
 End Sub
 }
-MODULE DOWNANY {FileFromDrive$="http://drive.google.com/uc?export=download&id="
+MODULE DOWNANY {// https://github.com/M2000Interpreter/Environment/releases/download/ver13rev44/M2000paper.pdf
+// https://drive.google.com/file/d/1rlfHZEEJstavnNpmXz_Si2NGFmW5t-Jp/view?usp=drive_link
+FileFromDrive$="http://drive.google.com/uc?export=download&id="
 //Const ERROR_SUCCESS = 0x0&
 Const BINDF_GETNEWESTVERSION = 0x10&
 //Const INTERNET_FLAG_RELOAD = 0x80000000&
@@ -34895,7 +34906,7 @@ if internet then
 	If exist("M2000paper.pdf") then Try {dos "del "+quote$(dir$+"M2000paper.pdf");} : Wait 200
 	Declare URLDownloadToFile lib "urlmon.URLDownloadToFileW" {long pCaller, szUrl$, sxFilename$, long dwReserved, long callback}
 	dir user
-	if URLDownloadToFile(0,FileFromDrive$+"1_6Vu_QNf4FBp5AyLVHM3HWrounV2lh4X", dir$+"M2000paper.pdf",BINDF_GETNEWESTVERSION,0)==0 then
+	if URLDownloadToFile(0,FileFromDrive$+"1rlfHZEEJstavnNpmXz_Si2NGFmW5t-Jp", dir$+"M2000paper.pdf",BINDF_GETNEWESTVERSION,0)==0 then
 		Print "Ok"
 	Else
 		Print "Try Again"
@@ -34903,7 +34914,7 @@ if internet then
 else
 	Print "Not Internet, Try Again"
 end if
-
+win M2000paper.pdf 
 
 
 }
@@ -36216,7 +36227,8 @@ MODULE VBCOLLECTION {Module GetC {
       Clipboard Doc$
       \\ so now we have to use it, using Methid to call Add
       Method c, "Add", 100, "Hello"
-      Method c, "Add", 2000, "There"
+      \\ Method c, "Add", 2000, "There"
+      c=>Add 2000, "there"
       \\ add a decimal number
  
       Method c, "Add", aDecimal, "Zero"
@@ -36234,11 +36246,12 @@ MODULE VBCOLLECTION {Module GetC {
       c.item=lambda c (akey$) ->{
             try ok {
                   method c, "item", akey$ as ret
-            }
+             }
             If type$(Ret)="Empty" Then Error  if$(locale=1032->"Το κλειδί δεν χρησιμοποιείται","Key not used")
             =ret
       }
       Print c.item("Hello")
+      Print c.item("Zero")
       Try {
             val=c.item("Hello12")
       }
@@ -36257,6 +36270,40 @@ Read a
 Print type$(a)="Collection"
 }
 MODULE XML4 {Module CheckIt {
+	Flush
+	Data "April", {Bubbly: I'm > Tam and <= Émily}
+	Data "Tam O'Shanter", {Burns: "When chapman billies leave the street ..."}
+	Data "Émily", {Short & shrift}
+	
+	declare xml xmlData
+	Node=xml=>PrepareNode("CharacterRemarks")^  ' look ^ for getting object		
+	xml=>InsertNode Node
+	while not empty
+		read name$, text$
+		Node1=xml=>PrepareNode("Character", text$)^    ' look ^ for getting object
+		xml=>PlaceAttributeToNode Node1, "name", name$
+		xml=>AppendChild Node1
+	end while
+	xml=>beautify=-4	
+	Report 3, xml=>xml  ' beautify return to 0
+	xml=>beautify=-4	
+	clipboard xml=>xml
+	Result=xml=>GetListByTag("Character", -1)^ ' look ^ for getting object
+	c=1
+	If len(Result)>0 then
+		Stack Result { // temporary attach Result as current stack
+			Read fieldsNo
+			print format$("{0:-4}|{1:20}|{2}", c, fieldsno=>Attr("Name"), title$(fieldsno=>text))
+			c++
+			' Loop raise a flag for this block,
+			' which interpreter read at the end of block,
+			' and then clear it
+			if empty else loop
+			}
+	end if
+}
+CheckIt
+Module CheckIt {
 	Flush
 	Data "April", {Bubbly: I'm > Tam and <= Émily}
 	Data "Tam O'Shanter", {Burns: "When chapman billies leave the street ..."}
@@ -36290,13 +36337,19 @@ MODULE XML4 {Module CheckIt {
 	If len(Result)>0 then
 		Stack Result {
 			Read fieldsNo : if c=1 then With fieldsNo, "Attr" as fieldsno.tag$(), "text" as child1.text$
-			Print format$("{0:-4}|{1:20}|{2}", c, fieldsno.tag$("Name"), child1.text$)
+			Print format$("{0:-4}|{1:20}|{2}", c, fieldsno.tag$("Name"), title$(child1.text$))
 			c++
 			if empty else LOOP  // Loop raise a flag for this block, which interpreter read at the end of block, and then cleat it
 		}
 	end if
 }
-CheckIt
+Pen 15 {
+	Print
+	Print Title$("Old Code ----------------------- Is better for reading the code")
+}
+pen 11 {
+	CheckIt
+}
 }
 MODULE BSEARCH {\\ binary search
 const N=10
@@ -37554,6 +37607,8 @@ function Button.click(index) {
 }
 method form1 "Show", 1
 declare form1 nothing
+clear
+wait 100
 }
 MODULE SHAPEEX {ENUM SESHAPECONSTANTS {
 	SESHAPERECTANGLE = 0
@@ -37827,7 +37882,7 @@ method hash,"rehash"
 Pen 11 {
 Print "change key and then rehash the list"
 for i=0 to hash.count-1
-	print format$("{0::-60} - {1}",hash(i), KeyNum(i))
+	print format$("{0:-60} - {1}",hash(i), KeyNum(i))
 next i
 }
 double
@@ -40589,7 +40644,12 @@ every t {
 refresh 40
 
 }
-MODULE FINDWORD {read W as string="*", WW as string ="|"
+MODULE FINDWORD {if not envelope$()="SS" then
+	read W as string="*"
+	WW="|"
+else
+	read W as string="*", WW as string ="|"
+end if
 if left$(W,1)="*" then
 	report {FindWord "Remove {"
 	}
@@ -40597,6 +40657,11 @@ if left$(W,1)="*" then
 else
 	print "search: ";W
 	modules  ? "", W, WW
+end if
+if not empty then
+	Print "Stack isn't Empty"
+	Stack
+	Print "Use FLUSH to erase all items"
 end if
 }
 MODULE COMP_NUM {Class Complex {
@@ -46583,13 +46648,19 @@ MODULE ROOTS {
 Global Group Cx {
 	declare m math2
 	function neg(a as Complex) {
-		method .m, "cxNeg", a as ret: =ret
+//			method .m, "cxNeg", a as ret: =ret
+		=.m=>cxNeg(a)
+		' =-a
 	}
 	function sqr(a as Complex) {
-		method .m, "cxSqr", a as ret: =ret
+//			method .m, "cxSqr", a as ret: =ret
+		=.m=>cxSqr(a)
+		' = Sqrt(a)   ' sqrt works with complex numbers.
 	}
 	function sub(a as Complex, b as Complex) {
-		method .m, "cxSub", a, b as ret: =ret
+//			method .m, "cxSub", a, b as ret: =ret
+		=.m=>cxSub(a, b)
+		' =a-b
 	}
 	function add(a as Complex, b as Complex) {
 		method .m, "cxAdd", a, b as ret:	=ret
@@ -52691,5 +52762,167 @@ while z
 		wait 10
 	end while
 end while
+}
+MODULE TSTSUB {global const many=30000
+form 80
+print $(,10) ' 10 characters column
+print "iterations per test:";many
+module TestThis (UseStatic=True){
+	if UseStatic then static sub TestMe,TestMe2
+	aa=100
+	print "TestMe - New Call without Parentheses"
+	profiler
+	for i=1 to many
+		TestMe
+	next
+	print timecount
+	print "TestMe() - Standard"
+	profiler
+	for i=1 to many
+		TestMe()
+	next
+	print timecount
+	print "TestMe() - Standard using GOSUB"
+	profiler
+	for i=1 to many
+		gosub TestMe()
+	next
+	print timecount	
+	print {TestMe2 "ok", 1000  - New Call without Parentheses}
+	profiler
+	for i=1 to many
+		TestMe2 "ok", 1000
+	next
+	print timecount
+	print {TestMe2("ok", 1000) - Standard}
+	profiler
+	for i=1 to many
+		TestMe2("ok", 1000)	
+	next
+	print timecount
+	print {TestMe2("ok", 1000) - Standard using GOSUB}
+	profiler
+	for i=1 to many
+		gosub TestMe2("ok", 1000)	
+	next
+	print timecount
+}
+pen 11 {print "Using Static Sub Definition"}
+TestThis
+pen 11 {print "Skip Static Sub Definition"}
+TestThis False
+Report {
+Using Static Sub Definition is faster. Also we shadowing any global module with same name.
+Names like print can be used for subs (e.g. SUB print()) but to call it we have to use:
+1 - print()
+2- gosub print()
+if we use Static Sub Print we can use Call
+3 - Call Print
+and (1)  and (2)
+
+To use our Print we have to use Module Print { } as local module
+This make Print as a call to local module
+We can use @Print  to call the original Print in the same module where we define local module print
+Inside module print statement print is the original one. 
+}
+
+sub TestMe()
+	aa++
+end sub
+sub TestMe2(Alfa, k)
+	aa+=k
+end sub
+}
+MODULE VBCOL2 {rem {
+Sub QueryInterface(in riid *GUID, out ppvObj **void)
+Function AddRef as ULONG
+Function Release as ULONG
+Sub GetTypeInfoCount(out pctinfo *UINT)
+Sub GetTypeInfo(in itinfo UINT, in lcid ULONG, out pptinfo **void)
+Sub GetIDsOfNames(in riid *GUID, in rgszNames **char, in cNames UINT, in lcid ULONG, out rgdispid *Long)
+Sub Invoke(in dispidMember Long, in riid *GUID, in lcid ULONG, in wFlags USHORT, in pdispparams *DISPPARAMS, out pvarResult *VARIANT, out pexcepinfo *EXCEPINFO, out puArgErr *UINT)
+Function Item(in Index *VARIANT) as VARIANT
+Sub Add(in Item *VARIANT, [in Key *VARIANT], [in Before *VARIANT], [in After *VARIANT])
+Function Count as Long
+Sub Remove(in Index *VARIANT)
+Function _NewEnum as IUnknown*
+
+}
+declare c collection
+Print type$(c)
+c=>add "this is a string item", "zero"
+? c=>count
+? c("zero")
+' to change an item you have to remove it.
+c=>Remove "zero"
+c=>add "ok", "zero"
+? c("zero")
+c=>add 122,"aa"
+c=>add  1000
+c=>add 34324324,"mm"
+? c=>count
+Method c, "_NewEnum" as Item
+while item
+	print eval(item)
+end while
+}
+MODULE LEGATO {tempo = 1000
+a$="e@3e@3e@2e@3e@3e@2e@3g@3c@3d@3e"
+a$+="f@3f@3f@3f@3f@3e@3e@3e@4e@4e@3d@3d@3e@3d@2g@2"
+a$+="e@3e@3e@2e@3e@3e@2e@3g@3c@3d@3e"
+a$+="f@3f@3f@3f@3f@3e@3e@3e@4e@4g@3g@3f@3d@3c"
+for staccato =50 to 100 step 25
+  if staccato<100 then 
+  	Print "Staccato "+staccato+"%"
+  else
+  	Print "Legato"
+  end if
+  score 1, tempo, a$, staccato
+  play 1,1
+  while playscore
+      wait 100
+  end while
+next
+}
+MODULE QUAT {oldlocale=locale
+Module English_Quaternion {
+	locale 1033
+	Static Function DispQuat
+	Declare Math Math
+	q=Math=>NewQuatType(10, 30, -50, 30)
+	print type$(q)="QuatType"
+	Print q|w=10, q|x=30, q|y=-50, q|z=30
+	Print Math=>QuatStringQuat(q)
+	Print Math=>QuatStringQuat(q, "0.000")
+	Print "q=";DispQuat(q)  ' (10+30i-50j+30k)
+	Print "Norm of Quaternion |q|:=";Math=>NormQuat(q)
+	Print "Conjugate Quaternion:=";DispQuat(Math=>NegQuat(q))  ' (10-30i+50j-30k)
+	Function DispQuat(q as QuatType)
+		' break for displayed better - M2000 handle any line length
+		local ret="("+(q|w)+if$(q|x<0->"","+")+(q|x)+if$(q|y<0->"i","i+")
+		=ret+(q|y)+if$(q|z<0->"j","j+")+(q|z)+"k)"
+	End Function
+}
+Pen 10 {English_Quaternion}
+print
+Τμήμα Ελληνικά_Τετραδόνιο1 {
+	Τοπικό 1032
+	Στατική Συνάρτηση Δείξε_Τερταδόνιο
+	Όρισε Μ Μαθηματικά
+	τ=Μ=>NewQuatType(10, 30, -50, 30)
+	Τύπωσε Τύπος$(τ)="QuatType"
+	Τύπωσε τ|w=10, τ|x=30, τ|y=-50, τ|z=30
+	Τύπωσε Μ=>QuatStringQuat(τ)
+	Τύπωσε Μ=>QuatStringQuat(τ, "0.000")
+	Τύπωσε "τ=";Δείξε_Τερταδόνιο(τ)  ' (10+30i-50j+30k)
+	Τύπωσε "Νόρμα (μέτρο) τετραδόνιου |τ|:=";Μ=>NormQuat(τ)
+	Τύπωσε "Συζυγές τετραδόνιο :=";Δείξε_Τερταδόνιο(Μ=>NegQuat(τ))  ' (10-30i+50j-30k)
+	Συνάρτηση Δείξε_Τερταδόνιο(α ως QuatType)
+		Τοπική επ="("+(α|w)+αν$(α|x<0->"", "+")+(α|x)+αν$(α|y<0->"i","i+")
+		=επ+(α|y)+αν$(α|z<0->"j","j+")+(α|z)+"k)"
+	Τέλος Συνάρτησης
+}
+Πένα 11 {Ελληνικά_Τετραδόνιο1}
+locale oldlocale
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

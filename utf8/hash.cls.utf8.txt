@@ -17,7 +17,7 @@ Option Explicit
     Key As String
     nDx As Long
     KeyType As Integer  ' 0 as is , 1, reference/don't delete
-    originaltype As Byte
+    originalType As Byte
     globalvar As Byte
     firsthash As Long
     lastpos As Long
@@ -28,8 +28,8 @@ Private PriveSpace() As item
 Public MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
-Public Index As Long
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Public index As Long
 Private Hash() As Long
 Private entrance As Long
 Public Sub BigSize(n As Long)
@@ -50,29 +50,29 @@ Friend Sub ReadVar(where, Name$, num As Long)
     num = PriveSpace(where).nDx
 End Sub
 Public Property Get lastNDX() As Long
-If Index < 0 Then
+If index < 0 Then
 lastNDX = 0
 Else
-lastNDX = PriveSpace(Index).nDx
+lastNDX = PriveSpace(index).nDx
 End If
 End Property
 Public Property Get lastkey() As String
-If Index < 0 Then
+If index < 0 Then
 lastkey = vbCrLf
 Else
-lastkey = PriveSpace(Index).Key
+lastkey = PriveSpace(index).Key
 End If
 End Property
 
 Private Sub ExpandHash()
 
-    Dim I As Long
+    Dim i As Long
     hashlen = hashlen * 2 + 3
     
     ReDim Hash(hashlen) As Long
-    For I = 0 To toplim
-        place HashFunc2(I), I
-    Next I
+    For i = 0 To toplim
+        place HashFunc2(i), i
+    Next i
     
 End Sub
 
@@ -80,12 +80,12 @@ End Sub
 Friend Sub ReduceHash(newTop As Long, v())
 Dim aa As Variant, ditem As item, ditemcl As item
     ditemcl.nDx = -1
-    Dim I As Long
+    Dim i As Long
      If toplim < newTop Then Exit Sub
      entrance = entrance + 1
-     For I = toplim To newTop Step -1
-        ditem = PriveSpace(I)
-        PriveSpace(I) = ditemcl
+     For i = toplim To newTop Step -1
+        ditem = PriveSpace(i)
+        PriveSpace(i) = ditemcl
        With ditem
         If .Pleft > 0 Then
             Hash(.lastpos) = .Pleft
@@ -106,12 +106,12 @@ Dim aa As Variant, ditem As item, ditemcl As item
             End If
         .KeyType = 0
         .globalvar = CByte(0)
-        .originaltype = CByte(0)
+        .originalType = CByte(0)
         .nDx = -1
             
         End With
 
-    Next I
+    Next i
 If entrance = 1 Then
     If MaxSpace >= 6004 Then
         If MaxSpace - newTop + 1 > 2 * newTop + 2 Then
@@ -126,9 +126,9 @@ If entrance = 1 Then
             hashlen = MaxSpace * 2 + 3
             '  reHash...
             toplim = newTop - 1
-            For I = 0 To toplim
-                place HashFunc2(I), I
-            Next I
+            For i = 0 To toplim
+                place HashFunc2(i), i
+            Next i
         Else
             toplim = newTop - 1
         End If
@@ -155,95 +155,106 @@ Friend Sub Expand(NewMaxSpace As Long)
            ReDim Preserve PriveSpace(MaxSpace) As item
            If MaxSpace > hashlen Then ExpandHash
 End Sub
-Property Get count()
-count = toplim + 1
+Property Get Count()
+Count = toplim + 1
 End Property
 Friend Function Find2(Key As String, num As Long, Optional checktype As Boolean, Optional isglobal As Boolean) As Boolean
-Dim K As Long
+Dim k As Long
 num = 0
 
 If Len(Key) = 0 Then Exit Function
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then
-    num = PriveSpace(K).nDx: Find2 = True: Index = K:  checktype = PriveSpace(K).originaltype: isglobal = PriveSpace(K).globalvar: Exit Function
+    If PriveSpace(k).Key = Key Then
+    num = PriveSpace(k).nDx: Find2 = True: index = k:  checktype = PriveSpace(k).originalType: isglobal = PriveSpace(k).globalvar: Exit Function
     End If
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0
 End If
 End Function
 Friend Function Find3(Key As String, num As Long, isglobal As Boolean) As Boolean
-Dim K As Long
+Dim k As Long
 num = 0
 
 If Len(Key) = 0 Then Exit Function
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then
-    num = PriveSpace(K).nDx: Find3 = True: Index = K: isglobal = PriveSpace(K).globalvar: Exit Function
+    If PriveSpace(k).Key = Key Then
+    num = PriveSpace(k).nDx: Find3 = True: index = k: isglobal = PriveSpace(k).globalvar: Exit Function
     End If
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0
 End If
 End Function
 Friend Function FindOlder(Key As String, num As Long, olderfromthat As Long) As Boolean
-Dim K As Long
+Dim k As Long
 num = 0
 
 If Len(Key) = 0 Then Exit Function
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key And K <= olderfromthat Then
-    num = PriveSpace(K).nDx: FindOlder = True: Index = K: Exit Function
+    If PriveSpace(k).Key = Key And k <= olderfromthat Then
+    num = PriveSpace(k).nDx: FindOlder = True: index = k: Exit Function
     End If
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0
 End If
 End Function
 Friend Function Find(Key As String, num As Long) As Boolean
-Dim K As Long
+Dim k As Long
 num = 0
 
 If Len(Key) = 0 Then Exit Function
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then
-    num = PriveSpace(K).nDx: Find = True: Index = K: Exit Function
+    If PriveSpace(k).Key = Key Then
+    num = PriveSpace(k).nDx: Find = True: index = k: Exit Function
     End If
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0
 End If
 End Function
 Friend Function ExistKey(Key As String) As Boolean
-Dim K As Long
+Dim k As Long
 
 If Len(Key) = 0 Then Exit Function
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then ExistKey = True: Exit Function
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0
+    If PriveSpace(k).Key = Key Then ExistKey = True: Exit Function
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0
 End If
 End Function
+'Friend Function ReBound(newnum As Long) As Boolean
+' dengerous... because one can be rebound a newer one, and that is wrong.
+'If index > 0 Then
+'With PriveSpace(index)
+'If .KeyType = 1 Then
+'    .nDx = newnum
+'    ReBound = True
+'End If
+'End With
+'End If
+'End Function
 
 Friend Function findRebound(Key As String, newnum As Long, v()) As Boolean
-Dim K As Long
+Dim k As Long
 If Len(Key) = 0 Then Exit Function
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 
-If K >= 0 Then
+If k >= 0 Then
 Do
-With PriveSpace(K)
+With PriveSpace(k)
     If .Key = Key Then
     If .KeyType = 0 Then
         If IsObject(v(.nDx)) Then Set v(.nDx) = Nothing
@@ -254,73 +265,73 @@ With PriveSpace(K)
      findRebound = True: Exit Function
     End If
     End With
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0
 End If
 End Function
 Friend Sub ItemCreator(Key As String, num As Long, Optional isRef As Boolean = False, Optional isglobal As Boolean = False, Optional deftype As Boolean = False)
-Dim A As Long
-A = Malloc()
+Dim a As Long
+a = Malloc()
 On Error GoTo exxx
-place HashFunc(Key), A
-With PriveSpace(A)
+place HashFunc(Key), a
+With PriveSpace(a)
     .nDx = num
     .KeyType = CByte(Abs(isRef))
-    .originaltype = CByte(deftype)
+    .originalType = CByte(deftype)
     .globalvar = CByte(isglobal)
     .firsthash = HD(Key)
      SwapStrings .Key, Key
 End With
-Index = A
+index = a
 exxx:
 End Sub
 Friend Sub ItemCreator2(id As idHash, Key As String, num As Long, Optional isRef As Boolean = False, Optional isglobal As Boolean = False, Optional deftype As Boolean = False)
-Dim A As Long
-A = Malloc()
+Dim a As Long
+a = Malloc()
 On Error GoTo exxx
-place id.lastHashFunc0 Mod hashlen, A
-With PriveSpace(A)
+place id.lastHashFunc0 Mod hashlen, a
+With PriveSpace(a)
     .nDx = num
     .KeyType = CByte(Abs(isRef))
-    .originaltype = CByte(deftype)
+    .originalType = CByte(deftype)
     .globalvar = CByte(isglobal)
     .firsthash = HD(Key)
      .Key = Key
 End With
-Index = A
+index = a
 exxx:
 End Sub
 Property Get Percent()
-Percent = count / hashlen
+Percent = Count / hashlen
 End Property
-Private Sub place(ByVal b, ByVal A)
-    Dim K As Long
-    K = Hash(b)
-    If Not Hash(b) = A + 1 Then
-         Hash(b) = A + 1
-         PriveSpace(A).Pleft = K
+Private Sub place(ByVal b, ByVal a)
+    Dim k As Long
+    k = Hash(b)
+    If Not Hash(b) = a + 1 Then
+         Hash(b) = a + 1
+         PriveSpace(a).Pleft = k
     End If
-    PriveSpace(A).lastpos = b
+    PriveSpace(a).lastpos = b
 End Sub
 
 Private Function HashFunc2(where As Long)
 HashFunc2 = PriveSpace(where).firsthash Mod hashlen
 End Function
 
-Private Function HashFunc(A$)
-HashFunc = HD(A$) Mod hashlen
+Private Function HashFunc(a$)
+HashFunc = HD(a$) Mod hashlen
 End Function
 Sub flat()
-Index = -1
+index = -1
 End Sub
 
 Friend Property Get vType(where As Long) As Boolean
-    vType = CBool(PriveSpace(where).originaltype)
+    vType = CBool(PriveSpace(where).originalType)
 End Property
 Friend Property Let vType(where As Long, RHS As Boolean)
     If RHS Then
-        PriveSpace(where).originaltype = 255
+        PriveSpace(where).originalType = 255
     Else
-        PriveSpace(where).originaltype = 0
+        PriveSpace(where).originalType = 0
     End If
 End Property

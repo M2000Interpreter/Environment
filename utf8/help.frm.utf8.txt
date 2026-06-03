@@ -67,7 +67,7 @@ Private jump As Boolean
  Dim scrTwips As Long
 
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
-Dim lX As Long, lY As Long, dr As Boolean, drmove As Boolean
+Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long
 Dim UAddPixelsTop As Long, flagmarkout As Boolean
@@ -82,8 +82,8 @@ End Sub
 
 
 
-Private Sub Form_KeyDown(keycode As Integer, shift As Integer)
-If keycode = vbKeyF12 And ((Not mHelp) Or trace) Then
+Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
+If KeyCode = vbKeyF12 And ((Not mHelp) Or trace) Then
 showmodules
 End If
 End Sub
@@ -173,7 +173,7 @@ If Button = 1 Then
     If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
     dr = True
     MousePointer = vbSizeNWSE
-    lX = X
+    Lx = X
     lY = Y
     End If
     
@@ -181,7 +181,7 @@ If Button = 1 Then
     If (X > Width - borderleft And X < Width) Or (Y > Height - bordertop) Then  ' (y > Height - bordertop And y < Height) And
     dr = True
     MousePointer = vbSizeNWSE
-    lX = X
+    Lx = X
     lY = Y
     End If
     End If
@@ -205,11 +205,11 @@ If dr Then
 If bordertop < 150 Then
 
         If Y < (Height - 150) Or Y > Height Then addy = (Y - lY)
-     If X < (Width - 150) Or X > Width Then addX = (X - lX)
+     If X < (Width - 150) Or X > Width Then addX = (X - Lx)
      
 Else
     If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
-        If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
+        If X < (Width - borderleft) Or X > Width Then addX = (X - Lx)
     End If
     
 
@@ -238,10 +238,10 @@ Else
         
         If Helplastfactor <> factor Then ScaleDialog Helplastfactor, Width
 
-        lX = X
+        Lx = X
         
         Else
-        lX = X * Helplastfactor / factor
+        Lx = X * Helplastfactor / factor
              ScaleDialog Helplastfactor, (Width + addX) * Helplastfactor / factor
          
    
@@ -255,7 +255,7 @@ Else
         lY = lY * Helplastfactor / factor
         End If
         Else
-        lX = X
+        Lx = X
         lY = Y
    
 End If
@@ -329,19 +329,19 @@ gList1.EditFlag = False
 End If
 End Sub
 
-Private Sub gList1_KeyDown(keycode As Integer, shift As Integer)
+Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
 If shift <> 0 Then
 If label1.SelectionColor = rgb(255, 64, 128) Then label1.SelectionColor = 0
 label1.NoMark = False
 label1.EditDoc = True
 End If
-Select Case keycode
+Select Case KeyCode
 Case vbKeyDelete, vbKeyBack, vbKeyReturn, vbKeySpace
 
 gList1.EditFlag = False
 If mHelp Or abt Then
-MKEY$ = MKEY$ & ChrW$(keycode)
-keycode = 0
+MKEY$ = MKEY$ & ChrW$(KeyCode)
+KeyCode = 0
 End If
 End Select
 If mHelp Or abt Then shift = 0
@@ -417,14 +417,14 @@ b = setupxy / 3
 CopyFromLParamToRect a, thatRect
 a.Right = a.Right - b
 a.Left = a.Right - setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = b + setupxy / 5
 FillThere thathDC, VarPtr(a), thatbgcolor
-a.Top = b + setupxy / 5 + setupxy / 10
+a.top = b + setupxy / 5 + setupxy / 10
 a.Bottom = b + setupxy \ 2
 FillThere thathDC, VarPtr(a), thatbgcolor
-a.Top = b + 2 * (setupxy / 5 + setupxy / 10)
-a.Bottom = a.Top + setupxy / 5
+a.top = b + 2 * (setupxy / 5 + setupxy / 10)
+a.Bottom = a.top + setupxy / 5
 FillThere thathDC, VarPtr(a), thatbgcolor
 
 End Sub
@@ -434,13 +434,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = a.Right - b
 a.Right = a.Right - setupxy + b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), gList1.dcolor
 b = 5
 a.Left = a.Left - 3
 a.Right = a.Right + 3
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), gList1.CapColor
 
@@ -487,12 +487,12 @@ allwidth = NewWidth  ''vH_x * factor
 allheight = vH_y * factor
 itemWidth = allwidth - 2 * borderleft
 Dim kk As Long
-If Left < MinMonitorLeft Or Top < MinMonitorTop Then
+If Left < MinMonitorLeft Or top < MinMonitorTop Then
 kk = 0
 Else
 kk = 1
 End If
-myform Me, Left * kk, Top * kk, allwidth, allheight, True, factor
+myform Me, Left * kk, top * kk, allwidth, allheight, True, factor
 
   
 gList1.addpixels = 4 * factor
@@ -515,4 +515,8 @@ Unload Me
 End Sub
 Private Sub gList1_RefreshDesktop()
 If Form1.Visible Then Form1.Refresh: If Form1.DIS.Visible Then Form1.DIS.Refresh
+End Sub
+
+Private Sub label1_inform(tLine As Long, tPos As Long)
+label1.ReplaceTitle = "" 'vH_title$
 End Sub

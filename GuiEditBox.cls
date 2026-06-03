@@ -21,7 +21,7 @@ Public textinform As String
 Private Col() As Long, lastdata As String, thispara As Long
 Private mark1 As Long, mark2 As Long
 Private TextPixelOffset As Long, LastSearchType As Long
-Private Brackets As Boolean
+Private Brackets As Boolean, lastAddPixelsTitle As Long
 Private nochange As Boolean, sp As String, sP1 As String, sP2 As String
 Private TabControl As Long
 Private mNoCenterLineEdit As Boolean, LineCommandSep As String
@@ -167,7 +167,7 @@ Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, capchroma As Lon
 Dim Quit
 Private OldPar As Long, dragCharpos As Long
 ' new
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Private Type DRAWTEXTPARAMS
      cbSize As Long
      iTabLength As Long
@@ -176,7 +176,7 @@ Private Type DRAWTEXTPARAMS
      uiLengthDrawn As Long
 End Type
 Dim tParam As DRAWTEXTPARAMS
-Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
+Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
 Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT) As Long
 Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
@@ -400,6 +400,7 @@ mDoc1.textDoc = Title
 End If
 glistN.HeadLine = vbNullString ' reset
 glistN.HeadLine = " " ' give a fake headline
+lastAddPixelsTitle = addpixelstoo
 onelineheight = glistN.HeadlineHeight + addpixelstoo
 glistN.addpixels = 4 * factor ' 'line spacing
 End If
@@ -498,8 +499,8 @@ mDoc.NoIgnoreCase = Not mUseCase
 mDoc.ColorEvent = True
 Set mDoc1 = New Document
 ResetSelColors
-mDoc.LCID = Clid
-mDoc1.LCID = Clid
+mDoc.lcid = Clid
+mDoc1.lcid = Clid
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 undopara = -1
@@ -888,9 +889,9 @@ End Sub
 Private Sub glistN_OutPopUp(X As Single, Y As Single, myButton As Integer)
 '
 If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".PopUp(" + str(mIndex) + "," + str(X + Callback.Controls(ctrlName).Left) + "," + str(Y + Callback.Controls(ctrlName).Top) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
+   Callback.Callback mesCtrlName + ".PopUp(" + str(mIndex) + "," + str(X + Callback.Controls(ctrlName).Left) + "," + str(Y + Callback.Controls(ctrlName).top) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
    Else
-      Callback.Callback mesCtrlName + ".PopUp(" + str(X + Callback.Controls(ctrlName).Left) + "," + str(Y + Callback.Controls(ctrlName).Top) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
+      Callback.Callback mesCtrlName + ".PopUp(" + str(X + Callback.Controls(ctrlName).Left) + "," + str(Y + Callback.Controls(ctrlName).top) + "," + str(myButton) + "," + str(glistN.ListIndex + 1) + ")"
       End If
 End Sub
 
@@ -1099,7 +1100,7 @@ ThatData = UndoDoc.textDoc
 End Sub
 
 Private Sub glistN_DragPasteData(ThatData As String)
-Dim a() As String, K As Long, a77$
+Dim a() As String, k As Long, a77$
 a77$ = space$(EditTabWidth)
 If Not glistN.UseTab Then
 
@@ -1169,14 +1170,14 @@ If item < 0 Then  ' this is a headline
     glistN.HeadlineHeight = mDoc1.DocLines * onelineheight
     For i = 1 To mDoc1.DocLines
         PrintItem2 thisHDC, mDoc1.TextLine2(i, False, True), a
-        a.Top = a.Top + onelineheight
+        a.top = a.top + onelineheight
     Next i
     'RaiseEvent ExposeRect(item, thisrect, thisHDC, skip)
     skip = True
     Exit Sub
 Else
     showparagraphWork = showparagraph
-    a.Top = a.Top + glistN.addpixels \ 2
+    a.top = a.top + glistN.addpixels \ 2
     mDoc.TextParagraphLine2 item + 1, what$, ThatPara, showparagraph
     If MarkedTextAny Then
         showparagraphWork = True
@@ -1276,7 +1277,7 @@ Else
     ElseIf HighLightParagraph Then
        If ThatPara = mDoc.MarkParagraphID Then
         bb = cc
-        bb.Top = b.Top
+        bb.top = b.top
         bb.Bottom = b.Bottom
         FillBack thisHDC, bb, HighLightColor
         End If
@@ -1341,14 +1342,14 @@ If item < 0 Then  ' this is a headline
     glistN.HeadlineHeight = mDoc1.DocLines * onelineheight
     For i = 1 To mDoc1.DocLines
         PrintItem2 thisHDC, mDoc1.TextLine2(i, False, True), a
-        a.Top = a.Top + onelineheight
+        a.top = a.top + onelineheight
     Next i
     ' RaiseEvent ExposeRect(item, thisrect, thisHDC, skip)
     skip = True
     Exit Sub
 Else
     showparagraphWork = showparagraph
-    a.Top = a.Top + glistN.addpixels \ 2
+    a.top = a.top + glistN.addpixels \ 2
     mDoc.TextParagraphLine2 item + 1, what$, ThatPara, showparagraph
     If MarkedTextAny Then
         showparagraphWork = True
@@ -1448,7 +1449,7 @@ Else
 ElseIf HighLightParagraph Then
    If ThatPara = mDoc.MarkParagraphID Then
     bb = cc
-    bb.Top = b.Top
+    bb.top = b.top
     bb.Bottom = b.Bottom
     FillBack thisHDC, bb, HighLightColor
     End If
@@ -1568,7 +1569,7 @@ ReplaceTitle = vbNullString
 End If
 End If
 End Sub
-Private Sub glistN_KeyDown(keycode As Integer, shift As Integer)
+Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
 If glistN.HeadLine <> "" Then
 If NoTitle Then
 glistN.HeadLine = vbNullString
@@ -1579,32 +1580,32 @@ ReplaceTitle = vbNullString
 End If
 End If
 Dim VR(2)
-VR(0) = keycode
+VR(0) = KeyCode
 VR(1) = shift
 If mIndex > -1 Then
-    Callback.CallbackNow mesCtrlName + ".KeyDown(" + CStr(Index) + ")", VR()
+    Callback.CallbackNow mesCtrlName + ".KeyDown(" + CStr(index) + ")", VR()
 Else
     Callback.CallbackNow mesCtrlName + ".KeyDown()", VR()
 End If
 shift = VR(1)
-keycode = VR(0)
+KeyCode = VR(0)
 
 Dim selstart2 As Long, b As Boolean, Pad$, cc As Long
 Dim l1 As Long, c1 As Long
-If keycode = 18 Then
+If KeyCode = 18 Then
 Exit Sub
 End If
-If keycode = vbKeyF10 And (shift And 7) = 1 Then
-keycode = 0
+If KeyCode = vbKeyF10 And (shift And 7) = 1 Then
+KeyCode = 0
 If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".PopUp(" + str(mIndex) + "," + str(MOUSEX(Callback.Left)) + "," + str(MOUSEY(Callback.Top)) + "," + str(2) + "," + str(glistN.ListIndex + 1) + ")"
+   Callback.Callback mesCtrlName + ".PopUp(" + str(mIndex) + "," + str(MOUSEX(Callback.Left)) + "," + str(MOUSEY(Callback.top)) + "," + str(2) + "," + str(glistN.ListIndex + 1) + ")"
    Else
-      Callback.Callback mesCtrlName + ".PopUp(" + str(MOUSEX(Callback.Left)) + "," + str(MOUSEY(Callback.Top)) + "," + str(2) + "," + str(glistN.ListIndex + 1) + ")"
+      Callback.Callback mesCtrlName + ".PopUp(" + str(MOUSEX(Callback.Left)) + "," + str(MOUSEY(Callback.top)) + "," + str(2) + "," + str(glistN.ListIndex + 1) + ")"
       End If
 Exit Sub
 End If
-If keycode = 16 And shift <> 0 Then
-keycode = 0
+If KeyCode = 16 And shift <> 0 Then
+KeyCode = 0
 If glistN.SelStart = 0 Then
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Inform(" + str(mIndex) + "," + str(glistN.ListIndex + 1) + ", 1)"
@@ -1620,19 +1621,19 @@ Else
 End If
 Exit Sub
 End If
-If NoMark And Not (keycode <> vbKeyDown Or keycode <> vbKeyUp Or keycode <> vbKeyPageUp Or keycode <> vbKeyPageDown) Then keycode = 0: Exit Sub
+If NoMark And Not (KeyCode <> vbKeyDown Or KeyCode <> vbKeyUp Or KeyCode <> vbKeyPageUp Or KeyCode <> vbKeyPageDown) Then KeyCode = 0: Exit Sub
 
-If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
 '
-If NoMark And keycode = vbKeyUp Then keycode = vbKeyPageUp
-If NoMark And keycode = vbKeyDown Then keycode = vbKeyPageDown
-ElseIf keycode = vbKeyX And (shift And 3) = 2 Then
+If NoMark And KeyCode = vbKeyUp Then KeyCode = vbKeyPageUp
+If NoMark And KeyCode = vbKeyDown Then KeyCode = vbKeyPageDown
+ElseIf KeyCode = vbKeyX And (shift And 3) = 2 Then
 MarkCut
 Show
-keycode = 0
-ElseIf keycode = vbKey1 And (shift And 3) = 2 And Not (NumberOnly Or NumberIntOnly) Then
+KeyCode = 0
+ElseIf KeyCode = vbKey1 And (shift And 3) = 2 And Not (NumberOnly Or NumberIntOnly) Then
 ' CONVERT TO UPPER CASE
-keycode = 0
+KeyCode = 0
 If HaveMarkedText Then
 Pad$ = myUcase(SelText, True)
 GoTo happyflat
@@ -1641,9 +1642,9 @@ If Not CapsLockOn Then
 SendAKey &H14, 0, 0, 0
 End If
 End If
-ElseIf keycode = vbKey2 And (shift And 3) = 2 And Not (NumberOnly Or NumberIntOnly) Then
+ElseIf KeyCode = vbKey2 And (shift And 3) = 2 And Not (NumberOnly Or NumberIntOnly) Then
 ' CONVERT TO LOWER CASE
-keycode = 0
+KeyCode = 0
 If HaveMarkedText Then
 Pad$ = myLcase(SelText)
 GoTo happyflat
@@ -1652,19 +1653,19 @@ If CapsLockOn Then
 SendAKey &H14, 0, 0, 0
 End If
 End If
-ElseIf keycode = vbKey3 And (shift And 3) = 2 And Not (NumberOnly Or NumberIntOnly) Then
+ElseIf KeyCode = vbKey3 And (shift And 3) = 2 And Not (NumberOnly Or NumberIntOnly) Then
 Pad$ = ChrW$(&H266D)
 GoTo happyflat
-ElseIf keycode = vbKeyC And (shift And 3) = 2 Then
+ElseIf KeyCode = vbKeyC And (shift And 3) = 2 Then
 MarkCopy
-keycode = 0
-ElseIf keycode = vbKeyV And (shift And 3) = 2 Then
+KeyCode = 0
+ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
     Sleep 10
     On Error Resume Next
     Pad$ = GetTextData(13)
     If Err Or Pad$ = "" Then
     Pad$ = Clipboard.GetText(1)
-    If Err Or Pad$ = "" Then Err.Clear: keycode = 0: Exit Sub
+    If Err Or Pad$ = "" Then Err.Clear: KeyCode = 0: Exit Sub
     End If
     If NumberOnly Or NumberIntOnly Then
         If Not ValidNum(Pad$, False, NumberIntOnly) Then GoTo conthere
@@ -1705,13 +1706,13 @@ happyflat:
     SelText = Pad$
     RemoveUndo SelText
     End If
-    keycode = 0
+    KeyCode = 0
     ReColorBlock
-ElseIf keycode = vbKeyA And (shift And 3) = 2 Then
+ElseIf KeyCode = vbKeyA And (shift And 3) = 2 Then
 glistN.MarkNext = 0
 glistN.MarkALL
-keycode = 0
-ElseIf keycode = vbKeyY And (shift And 3) = 2 Then
+KeyCode = 0
+ElseIf KeyCode = vbKeyY And (shift And 3) = 2 Then
 ' Redo
 profundo.MARKONE
 againY:
@@ -1787,8 +1788,8 @@ Redomode = 0
 End If
 If undoprev Then GoTo againY
 End If
-keycode = 0
-ElseIf keycode = vbKeyZ And (shift And 3) = 2 Then
+KeyCode = 0
+ElseIf KeyCode = vbKeyZ And (shift And 3) = 2 Then
 ' 2nd version of undo system
 ' undopos now is selstart
 profundo.MARKONE
@@ -1856,41 +1857,41 @@ undotext = vbNullString
 undomode = 0
 End If
 If undoprev Then GoTo againZ
-keycode = 0
-ElseIf keycode = vbKeyA And (shift And 3) = 3 Then
+KeyCode = 0
+ElseIf KeyCode = vbKeyA And (shift And 3) = 3 Then
 glistN.MarkNext = 0
 BlockEndPara = mDoc.MarkParagraphID
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 glistN.ShowPan
-keycode = 0
+KeyCode = 0
 
-ElseIf keycode = vbKeyDelete Then
+ElseIf KeyCode = vbKeyDelete Then
 If HaveMarkedText Then
 ClearRedo
 PushUndo
 glistN_MarkDelete False
 
-keycode = 0
+KeyCode = 0
 End If
-ElseIf keycode = vbKeyBack Then
+ElseIf KeyCode = vbKeyBack Then
 If HaveMarkedText Then
 ClearRedo
 PushUndo
 glistN_MarkDelete False
 
-keycode = 0
+KeyCode = 0
 End If
 End If
 conthere:
 If NoMark And EditDoc = False Then glistN.ShowMe2: Exit Sub
-If keycode = 0 And shift = 0 Then Exit Sub
-If keycode <> 0 Or shift <> 0 Then PressKey_A keycode, shift
+If KeyCode = 0 And shift = 0 Then Exit Sub
+If KeyCode <> 0 Or shift <> 0 Then PressKey_A KeyCode, shift
 
 
 End Sub
 
-Private Sub glistN_KeyDownAfter(keycode As Integer, shift As Integer)
+Private Sub glistN_KeyDownAfter(KeyCode As Integer, shift As Integer)
 If NoMark Then Exit Sub
 If HaveMarkedText Then
 If shift = 0 Then
@@ -1906,17 +1907,17 @@ glistN.RefreshNow
 
 ElseIf (shift And 1) = 1 Then
 
-If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
 glistN_MarkOut
 End If
 End If
 ElseIf (shift And 1) = 1 And glistN.MarkNext = 0 Then
-If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
 glistN.MarkNext = 1
 glistN_MarkIn
 End If
 ElseIf (shift And 1) = 1 And glistN.MarkNext > 0 Then
-If keycode = vbKeyLeft Or keycode = vbKeyUp Or keycode = vbKeyDown Or keycode = vbKeyRight Or keycode = vbKeyEnd Or keycode = vbKeyHome Or keycode = vbKeyPageUp Or keycode = vbKeyPageDown Then
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
 glistN.MarkNext = 2
 glistN_MarkOut
 End If
@@ -2121,6 +2122,16 @@ If Not mNoColor Then
 Else
     SetTextData 13, pp1
 End If
+If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
+    If glistN.lines > 1 Then
+        If UserCodePage = 1253 Then
+            ReplaceTitle = " Έγινε αντιγραφή στο πρόχειρο"
+        Else
+            ReplaceTitle = " Copy to Clipboard done"
+        End If
+    End If
+End If
+
 End If
 End Sub
 Private Function SetTextData( _
@@ -2694,22 +2705,22 @@ Col(1) = 1
 
 End Sub
 Private Sub addone(ByVal thispos As Long, ByVal thiscolor As Long)
-Dim K As Long
+Dim k As Long
 
-K = UBound(Col())
+k = UBound(Col())
 If Col(1) = 0 Then
 makebase 14
 If thispos <> 1 Then
-K = UBound(Col())
+k = UBound(Col())
 Else
 Col(0) = thiscolor
 Exit Sub
 End If
 End If
 ' LOOK THIS SECOND TIME
-If K >= 1 Then
-If K > 1 Then If Col(K - 1) = thiscolor Then Exit Sub
-If Col(K) >= thispos Then
+If k >= 1 Then
+If k > 1 Then If Col(k - 1) = thiscolor Then Exit Sub
+If Col(k) >= thispos Then
 
 'If col(k) >= thispos Then
 'thispos = thispos + 1
@@ -2718,43 +2729,43 @@ If Col(K) >= thispos Then
 Exit Sub
 End If
 End If
-ReDim Preserve Col(K + 2) As Long
-Col(K + 1) = thiscolor
-Col(K + 2) = thispos
+ReDim Preserve Col(k + 2) As Long
+Col(k + 1) = thiscolor
+Col(k + 2) = thispos
 
 
 End Sub
 
 Private Sub addone2000(ByVal thispos As Long, ByVal thiscolor As Long)
-Dim K As Long
+Dim k As Long
 If thiscolor = 0 Then thiscolor = 14
-K = UBound(Col())
+k = UBound(Col())
 If Col(1) = 0 Then
 makebase 14
 If thispos <> 1 Then
-K = UBound(Col())
+k = UBound(Col())
 Else
 Col(0) = thiscolor
 Exit Sub
 End If
 End If
 ' LOOK THIS SECOND TIME
-If K >= 1 Then
-If K > 1 Then If Col(K - 1) = thiscolor Then Exit Sub
-If Col(K) = thispos Then
-Col(K - 1) = thiscolor: Exit Sub
+If k >= 1 Then
+If k > 1 Then If Col(k - 1) = thiscolor Then Exit Sub
+If Col(k) = thispos Then
+Col(k - 1) = thiscolor: Exit Sub
 End If
 End If
 
 ''''If col(k - 1) = thiscolor And k > 1 Then Exit Sub
 
-ReDim Preserve Col(K + 2)
-Col(K + 1) = thiscolor
-Col(K + 2) = thispos
+ReDim Preserve Col(k + 2)
+Col(k + 1) = thiscolor
+Col(k + 2) = thispos
 
 
 End Sub
-Private Sub ColorizeExpressions2000(ByVal a$, K As Long, pos2 As Long, feedthis As Long)
+Private Sub ColorizeExpressions2000(ByVal a$, k As Long, pos2 As Long, feedthis As Long)
 Dim drop$, pos1 As Long, kind As Long, localfeedthis As Long, thispara1 As Long, lastpar As Long
 Dim lastcol As Long, bracket As Long
 Dim n$
@@ -2775,13 +2786,13 @@ If kind = 0 Then
         Else
             addone2000 1, 14
         End If
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
     
     End If
 getlabelonly:
     n$ = a$
     kind = IsLabelOnly2000(n$, drop$)
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     If kind = 0 And n$ <> a$ Then
     feedthis = 100
     a$ = n$: Exit Sub
@@ -2793,7 +2804,7 @@ getlabelonly:
         Else
             addone2000 1, 14
         End If
-         pos2 = K - Len(a$) + 1
+         pos2 = k - Len(a$) + 1
          
     kind = 0
     GoTo again
@@ -2804,31 +2815,31 @@ If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
 If kind = 0 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
 If kind = 0 Then
   If FastSymbol(a$, "->", , 2) Then
-    pos2 = K - Len(a$) - 1
+    pos2 = k - Len(a$) - 1
     addone2000 pos2, 11
         a$ = NLtrim$(a$)
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         If MaybeIsSymbolNoSpace(a$, "{") Then
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         addone2000 pos2, 14
         a$ = Mid$(a$, 2)
          localfeedthis = 0
-           pos2 = K - Len(a$) + 1
-           If pos2 <= K Then
+           pos2 = k - Len(a$) + 1
+           If pos2 <= k Then
                 drop$ = block(a$)
                 If Len(drop$) > 0 Then
-                    ColorizeInnerStatements drop$, K - Len(a$), pos2, localfeedthis
+                    ColorizeInnerStatements drop$, k - Len(a$), pos2, localfeedthis
            
-                    If Len(a$) > 0 Then ColorizeInnerStatements a$, K, pos2, localfeedthis
+                    If Len(a$) > 0 Then ColorizeInnerStatements a$, k, pos2, localfeedthis
                     drop$ = vbNullString
                 Else
-                ColorizeInnerStatements a$, K, pos2, localfeedthis
+                ColorizeInnerStatements a$, k, pos2, localfeedthis
                End If
 
            End If
             kind = 0
             drop$ = vbNullString
-            If pos2 > K Then Exit Sub
+            If pos2 > k Then Exit Sub
         Else
            GoTo checklambda
             
@@ -2844,7 +2855,7 @@ If kind > 0 Then
     If pos2 > 0 Then
        addone2000 pos2, 11
     Else
-       addone2000 K - Len(a$) - Len(drop$) + 1, 11
+       addone2000 k - Len(a$) - Len(drop$) + 1, 11
        End If
         '' for the end
    Else
@@ -2853,7 +2864,7 @@ If kind > 0 Then
     If pos2 > 0 Then
        addone2000 pos2, 13
     Else
-       addone2000 K - Len(a$) - Len(drop$) + 1, 13
+       addone2000 k - Len(a$) - Len(drop$) + 1, 13
        End If
         lastcol = 13
    kind = 0
@@ -2879,21 +2890,21 @@ If kind > 0 Then
         End If
     Else
         If kind = 8 Then
-        addone2000 K - Len(a$) - Len(drop$), 10
-        addone2000 K - Len(a$) - Len(drop$) + 1, 11
+        addone2000 k - Len(a$) - Len(drop$), 10
+        addone2000 k - Len(a$) - Len(drop$) + 1, 11
         Else
-       addone2000 K - Len(a$) - Len(drop$) + 1, lastcol
+       addone2000 k - Len(a$) - Len(drop$) + 1, lastcol
        End If
     End If
   End If
-  pos2 = K - Len(a$) + 1
+  pos2 = k - Len(a$) + 1
  If kind > 3 Then
 checklambda:
   Do
   pos1 = 1
   drop$ = aheadstatus2000(a$, False, pos1)
   If pos1 > 1 Then
-  ColorizeExpressions2000 Mid$(a$, 1, pos1 - 1), K - Len(a$) + pos1 - 1, pos2, feedthis
+  ColorizeExpressions2000 Mid$(a$, 1, pos1 - 1), k - Len(a$) + pos1 - 1, pos2, feedthis
   If feedthis = 14 Or feedthis = 11 Then
   If lastcol <> 11 And lastcol <> 10 And lastcol <> 13 Then lastcol = feedthis
   feedthis = 0
@@ -2904,7 +2915,7 @@ checklambda:
    End If
    If FastSymbol(a$, ",") Then
      addone2000 pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
    Else
    Exit Do
    End If
@@ -2913,13 +2924,13 @@ checklambda:
 addone2000 pos2, 14
 lastpar = 14
 FastSymbol a$, "("
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
   pos1 = 1
   drop$ = aheadstatus2000(a$, False, pos1)
     thispara1 = thispara
   If pos1 > 1 Then
 
-  ColorizeExpressions2000 Mid$(a$, 1, pos1 - 1), K - Len(a$) + pos1 - 1, pos2, feedthis
+  ColorizeExpressions2000 Mid$(a$, 1, pos1 - 1), k - Len(a$) + pos1 - 1, pos2, feedthis
     a$ = Mid$(a$, pos1)
     End If
     If thispara1 <> thispara Then
@@ -2933,24 +2944,24 @@ pos2 = K - Len(a$) + 1
       addone2000 pos2, 14
       FastSymbol a$, ")"
     End If
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
 ElseIf IsSymbol(a$, ",") Then
 addone2000 pos2, 14
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
     GoTo again
 ElseIf MaybeIsSymbol(a$, "]") Then
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     addone2000 pos2, lastcol
     If FastSymbol(a$, "][", , 2) Then
     GoTo checklambda
     Else
-        pos2 = K - Len(a$) + 2
+        pos2 = k - Len(a$) + 2
         addone2000 pos2, 14
         FastSymbol a$, "]"
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
     End If
 ElseIf MaybeIsSymbol(a$, ")") Then
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     If kind >= 10 Then
     addone2000 pos2, 14
     
@@ -2959,18 +2970,18 @@ ElseIf MaybeIsSymbol(a$, ")") Then
   Else
   addone2000 pos2, 14
   End If
-  pos2 = K - Len(a$) + 2
+  pos2 = k - Len(a$) + 2
   addone2000 pos2, 14
   FastSymbol a$, ")"
    
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   End If
   End If
 
 GoTo again
 ElseIf MaybeIsSymbol(a$, "(", , True) Then
     addone2000 pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
    GoTo again
 ElseIf MaybeIsSymbol(a$, "{") Then
 addone2000 pos2, 15
@@ -2980,7 +2991,7 @@ blockStringAhead2 a$, pos1, bracket
 If bracket = 0 Then feedthis = 0 Else feedthis = 15
 a$ = Mid$(a$, pos1 + 1)
 drop$ = vbNullString
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
 If feedthis = 15 Then Exit Sub
     GoTo again
 
@@ -2993,7 +3004,7 @@ Else
 addone2000 pos2, 15
 End If
 drop$ = vbNullString
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
     GoTo again
 ElseIf MaybeIsSymbol(a$, Chr(34)) Then
 
@@ -3004,7 +3015,7 @@ Else
 addone2000 pos2, 15
 End If
 drop$ = vbNullString
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
     GoTo again
 Else
 If Col((UBound(Col()) \ 2) * 2) <> 14 Then addone2000 pos2, 14
@@ -3016,7 +3027,7 @@ If pos2 > 0 Then addone2000 pos2, 14
 
 
 End Sub
-Private Sub ColorizeExpressions(a$, K As Long, pos2 As Long, feedthis As Long)
+Private Sub ColorizeExpressions(a$, k As Long, pos2 As Long, feedthis As Long)
 Dim drop$, pos1 As Long, kind As Long
 Dim lastcol As Long
 again:
@@ -3029,7 +3040,7 @@ a$ = LTrim$(a$)
      If a$ = vbNullString Then Exit Sub
     If Myleft$(a$, Len(MultiLineComment1)) = MultiLineComment1 Then
     feedthis = -15
-    pos2 = K - Len(a$)
+    pos2 = k - Len(a$)
     Exit Sub
     ElseIf Myleft$(a$, 1) = "=" Then
    
@@ -3040,7 +3051,7 @@ addone pos2, lastcol
 pos2 = pos2 + 1
     GoTo herestr
     ElseIf Myleft$(a$, 2) = "/>" Then
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     
     
     a$ = Mid$(a$, 3)
@@ -3049,7 +3060,7 @@ pos2 = pos2 + 1
     pos2 = pos2 + 2
     GoTo there001
     ElseIf Myleft$(a$, 1) = ">" Then
-     pos2 = K - Len(a$) + 1
+     pos2 = k - Len(a$) + 1
     a$ = Mid$(a$, 2)
 
    If feedthis = 1 Then feedthis = 0
@@ -3089,27 +3100,27 @@ there001:
    Else
  '  pos2 = k - Len(a$)
     feedthis = -15
-    pos2 = K - Len(a$)
+    pos2 = k - Len(a$)
     Exit Sub
    End If
        feedthis = -2
 cont123:
     ElseIf Myleft$(a$, Len(CloseTag)) = CloseTag Then
-     pos2 = K - Len(a$) + 1
+     pos2 = k - Len(a$) + 1
         If pos2 > 0 Then
                 addone pos2, 14
             Else
                 addone 1, 14
             End If
       a$ = Mid$(a$, Len(CloseTag) + 1)
-             pos2 = K - Len(a$)
+             pos2 = k - Len(a$)
     If a$ = vbNullString Then Exit Sub
     kind = IsLabelOnly(a$, drop$)
    
         feedthis = 1
         
     ElseIf Myleft$(a$, Len(OpenTag)) = OpenTag Then
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     a$ = Mid$(a$, Len(OpenTag) + 1)
     
         If pos2 > 0 Then
@@ -3135,11 +3146,11 @@ feedthis = 1
     If kind > 0 Then
         If drop$ = "" Then drop$ = Chr$(0)
         If feedthis <> -2 Then feedthis = 0 Else Mid$(drop$, 1, 1) = "-"
-        pos2 = K - Len(a$) + 1 - Len(drop$)
+        pos2 = k - Len(a$) + 1 - Len(drop$)
         If pos2 = 0 Then pos2 = 1
     Else
     If Len(a$) > 0 Then kind = 1: drop$ = "-": a$ = Mid$(a$, 2)
-     pos2 = K - Len(a$)
+     pos2 = k - Len(a$)
     If pos2 = 0 Then pos2 = 1
     End If
     
@@ -3157,7 +3168,7 @@ If kind = 100 Then
         Else
             addone 1, 14
         End If
-         pos2 = K - Len(a$) + 1
+         pos2 = k - Len(a$) + 1
          
     kind = 0
     GoTo again
@@ -3170,7 +3181,7 @@ If kind > 0 Then
     If pos2 > 0 Then
        addone pos2, 11
     Else
-       addone K - Len(a$) - Len(drop$) + 1, 11
+       addone k - Len(a$) - Len(drop$) + 1, 11
        End If
     ElseIf IsmineHere(drop$) Then  ' FALL TO MAIN VOC
     
@@ -3182,13 +3193,13 @@ If kind > 0 Then
              If pos2 > 0 Then
         addone pos2, lastcol
     Else
-       addone K - Len(a$) - Len(drop$) + 1, lastcol
+       addone k - Len(a$) - Len(drop$) + 1, lastcol
        End If
        If Len(OpenTag) > 0 Then
    If MaybeIsSymbol(a$, "[=>/]") Then
 'drop$ = drop$ + " "
 
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
 lastcol = 14
 drop$ = ""
 GoTo cont0010
@@ -3207,38 +3218,38 @@ End If
 cont0010:
             If FastSymbol(a$, "=") Then
 
-                pos2 = K - Len(a$) '+ 1
+                pos2 = k - Len(a$) '+ 1
 
                 addone pos2, lastcol
 herestr:
                 If FastSymbol(a$, StringSep) Then
-                    pos2 = K - Len(a$)
+                    pos2 = k - Len(a$)
                     drop$ = blockString2(a$)
                     addone pos2, 15
-                    pos2 = K - Len(a$) + 1
+                    pos2 = k - Len(a$) + 1
                     lastcol = 14
                     drop$ = ""
                     GoTo again
                 ElseIf FastSymbol(a$, stringsep2, , Len(stringsep2)) Then
-                    pos2 = K - Len(a$)
+                    pos2 = k - Len(a$)
                     drop$ = blockString3(a$, stringsep2)
                     addone pos2, 15
-                    pos2 = K - Len(a$) + 1
+                    pos2 = k - Len(a$) + 1
                     lastcol = 14
                     drop$ = ""
                     GoTo again
                 Else
-                    pos2 = K - Len(a$) + 1
+                    pos2 = k - Len(a$) + 1
                     kind = IsLabelOnly(a$, drop$)
                     If Len(drop$) = 0 Then
                         addone pos2, 10
-                        pos2 = K - Len(a$) + 1
+                        pos2 = k - Len(a$) + 1
                         lastcol = 14
                     ElseIf kind > 0 Then
                         lastcol = 14
-                        pos2 = K - Len(a$) - Len(drop$) + 1
+                        pos2 = k - Len(a$) - Len(drop$) + 1
                         addone pos2, 10
-                        pos2 = K - Len(a$) + 1
+                        pos2 = k - Len(a$) + 1
                         drop$ = ""
                     End If
                     GoTo again
@@ -3255,24 +3266,24 @@ herestr:
     End If
    Else
    If kind = 10 Then lastcol = 14 Else lastcol = 10
-   pos2 = K - Len(a$) '+ 1
+   pos2 = k - Len(a$) '+ 1
    End If
    
    If pos2 > 0 And Len(drop$) = 0 Then
        addone pos2, lastcol
    Else
-       addone K - Len(a$) - Len(drop$) + 1, lastcol
+       addone k - Len(a$) - Len(drop$) + 1, lastcol
       
        End If
   End If
   
-  pos2 = K - Len(a$) + 1
+  pos2 = k - Len(a$) + 1
   If kind > 3 Then
   Do
   pos1 = 1
   drop$ = aheadstatus(a$, False, pos1)
   If pos1 > 1 Then
-  ColorizeExpressions Mid$(a$, 1, pos1 - 1), K - Len(a$) + pos1 - 1, pos2, feedthis
+  ColorizeExpressions Mid$(a$, 1, pos1 - 1), k - Len(a$) + pos1 - 1, pos2, feedthis
   ' ColorizeExpressions Mid$(a$, 1, pos1 - 1), k, pos2, feedthis
   If feedthis = 1 Then Exit Sub
   ' check next paragraph for symbols as starting position, if not feedthis
@@ -3282,22 +3293,22 @@ herestr:
    End If
    If FastSymbol(a$, mSplitExpr) Then
      addone pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
    ElseIf MaybeIsSymbol(a$, OtherSymbols, , True) Then
      addone pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
    Else
    Exit Do
    End If
    Loop
     If FastSymbol(a$, ")") Then
   addone pos2, lastcol
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   End If
   If Brackets Then
     If FastSymbol(a$, "]") Then
   addone pos2, lastcol
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   End If
   End If
   End If
@@ -3305,11 +3316,11 @@ herestr:
 GoTo again
 ElseIf IsSymbol(a$, mSplitExpr) Then
 addone pos2, 14
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
     GoTo again
 ElseIf MaybeIsSymbol(a$, OtherSymbols, , True) Then
 addone pos2, 14
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
     GoTo again
  ElseIf MaybeIsSymbol(a$, LineComment2) Then
 drop$ = "  "
@@ -3322,7 +3333,7 @@ End If
 feedthis = 1
  Exit Sub
 ElseIf FastSymbolNoRemove(a$, MultiLineComment1, , Len(MultiLineComment1)) Then
-pos2 = K - Len(a$)
+pos2 = k - Len(a$)
 cont0030:
 If MultiLineComment1 <> "{" Then
 feedthis = -15
@@ -3358,7 +3369,7 @@ Else
         feedthis = 15
     End If
     drop$ = vbNullString
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     If feedthis = 15 Then Exit Sub
     GoTo again
 End If
@@ -3371,13 +3382,13 @@ Else
 addone pos2, 15
 End If
 drop$ = vbNullString
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
     GoTo again
 
 Else
 addone pos2, 14
 a$ = Mid$(a$, 2)
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     GoTo again
 
  End If
@@ -4690,7 +4701,7 @@ mDoc.Paracolordata(thispara) = Col()
 thispara1 = thispara
 End If
 End Sub
-Private Sub ColorizeInnerStatements(a$, K As Long, pos2 As Long, feedback As Long, Optional jump As Boolean = False)
+Private Sub ColorizeInnerStatements(a$, k As Long, pos2 As Long, feedback As Long, Optional jump As Boolean = False)
 Dim drop$, pos1 As Long, onetime As Boolean, kind As Long, lastkind As Long, feedthis As Long, counter As Long
 Dim lastcol As Long
 a$ = Replace(a$, vbTab, " ")
@@ -4700,7 +4711,7 @@ If kind = 0 Then
 addone2000 pos2, 14
 lastcol = 14
 If FastSymbol(a$, "(") Then
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
 End If
 GoTo again2
 End If
@@ -4709,7 +4720,7 @@ GoTo fromjump
 End If
 onetime = True
 
-If K < 1 Then
+If k < 1 Then
 makebase 14
 mDoc.Paracolordata(thispara) = Col()
 If mDoc.startfrom(thispara) = thispara Then
@@ -4740,7 +4751,7 @@ again:
 If RTrim$(a$) = vbNullString Then
 If pos2 > 0 Then
 If Col((UBound(Col()) \ 2) * 2) <> lastcol Then
-If pos2 < K Then
+If pos2 < k Then
 addone2000 pos2 + 1, lastcol
 End If
 ElseIf UBound(Col()) < 2 Then
@@ -4753,22 +4764,22 @@ mDoc.Paracolordata(thispara) = Col()
 Exit Sub
 ' FOR TESTS
   pos1 = 0
-  For K = 1 To UBound(Col()) Step 2
-    If VarType(Col(K)) = 0 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
-    If Col(K) > pos1 Then pos1 = Col(K)
-    If Col(K) < pos1 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
-  Next K
-    For K = 0 To UBound(Col()) Step 2
-   If Col(K) > 15 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
-  Next K
+  For k = 1 To UBound(Col()) Step 2
+    If VarType(Col(k)) = 0 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
+    If Col(k) > pos1 Then pos1 = Col(k)
+    If Col(k) < pos1 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
+  Next k
+    For k = 0 To UBound(Col()) Step 2
+   If Col(k) > 15 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
+  Next k
   
 End If
 If FastSymbol(a$, "&") Then
-            addone2000 K - Len(a$), 13
-            pos2 = K - Len(a$) + 1
+            addone2000 k - Len(a$), 13
+            pos2 = k - Len(a$) + 1
 ElseIf FastSymbol(a$, "...", , 3) Then
-            addone2000 K - Len(a$) - 2, 11
-            pos2 = K - Len(a$) + 1
+            addone2000 k - Len(a$) - 2, 11
+            pos2 = k - Len(a$) + 1
 End If
 If MaybeIsSymbol(a$, ":", "\") Then
 a$ = Mid$(a$, 2)
@@ -4781,7 +4792,7 @@ If pos2 > 1 Then
     Else
         addone2000 1, 14
     End If
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
 GoTo novar
 End If
 End If
@@ -4806,7 +4817,7 @@ addone2000 pos2, 14
 Else
 addone2000 1, 14
 End If
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
 Wend
 End If
 If onetime And MaybeIsSymbol(a$, "(") Then
@@ -4820,7 +4831,7 @@ If IsSymbol(a$, "@") Then
         Else
         addone2000 1, 14
         End If
-     pos2 = K - Len(a$) + 1
+     pos2 = k - Len(a$) + 1
 End If
 End If
 again500:
@@ -4837,20 +4848,20 @@ If kind > 0 Then
                 If pos2 > 0 Then
                    addone2000 pos2, 11
                 Else
-                   addone2000 K - Len(a$) - Len(drop$) + 1, 11
+                   addone2000 k - Len(a$) - Len(drop$) + 1, 11
                    End If
         '' for the end
                 If ismine2(drop$) Then
               
                 kind = -2
                 If Trim$(a$) <> "" Then
-                                        pos2 = K - Len(a$) + 1
+                                        pos2 = k - Len(a$) + 1
                                         If ismine22(drop$) Then
                                         
                                         ElseIf MaybeIsSymbol(a$, "{") Then
                                         
                                             addone2000 pos2, 14
-                                            pos2 = K - Len(a$) + 1
+                                            pos2 = k - Len(a$) + 1
                                             onetime = True
                                             GoTo again
                                         ElseIf ismine5(drop$) Then
@@ -4866,12 +4877,12 @@ If kind > 0 Then
                   
                 kind = -1
                                 If Trim$(a$) <> "" Then
-                                                  pos2 = K - Len(a$) + 1
+                                                  pos2 = k - Len(a$) + 1
                                         If FastSymbol(a$, "{") Then
                                     
                                                   addone2000 pos2, 14
                                               
-                                                  pos2 = K - Len(a$) + 1
+                                                  pos2 = k - Len(a$) + 1
                                                   
                                                   onetime = True
                                                   GoTo again
@@ -4882,7 +4893,7 @@ If kind > 0 Then
                                 End If
                 ElseIf ismine33(drop$) Then
                 ' fix for case >100, =50...
-                pos2 = K - Len(a$) + 1
+                pos2 = k - Len(a$) + 1
                 Do
                     lastcol = 14
                     addone2000 pos2, 14
@@ -4900,10 +4911,10 @@ If kind > 0 Then
                     drop$ = aheadstatus2000(a$, False, pos1)
                     If pos1 > 0 Then
                         drop$ = Mid$(a$, 1, pos1 - 1)
-                        ColorizeExpressions2000 drop$, K - Len(a$) + Len(drop$), pos2, feedthis
+                        ColorizeExpressions2000 drop$, k - Len(a$) + Len(drop$), pos2, feedthis
                     If feedthis <> 15 Then
                     a$ = Mid$(a$, pos1)
-                    pos2 = K - Len(a$) + 1
+                    pos2 = k - Len(a$) + 1
                     addone2000 pos2, 14
                 Else
                     counter = 1
@@ -4920,7 +4931,7 @@ nextline1:
                     mDoc.Paracolordata(thispara) = Col()
                     a$ = drop$
                     
-                    K = Len(a$)
+                    k = Len(a$)
                     
                     If mDoc.startfrom(thispara) = 0 Then
                         mDoc.startfrom(thispara) = thispara
@@ -4934,7 +4945,7 @@ nextline1:
                         Col(0) = 15
                         Col(1) = 1
                         Col(2) = 15
-                        Col(3) = K + 1
+                        Col(3) = k + 1
                     Else
                         ReDim Col(1)
                         Col(0) = 15
@@ -4953,17 +4964,17 @@ nextline1:
                         End If
                         If Myleft(a$, 1) <> "}" Then
                             a$ = Mid$(a$, pos1 + 1)
-                            pos2 = K - Len(a$) + 1
+                            pos2 = k - Len(a$) + 1
                         Else
                             a$ = Mid$(a$, 2)
-                            pos2 = K - Len(a$) + 2
+                            pos2 = k - Len(a$) + 2
                             addone2000 pos2, 14
                         End If
                         feedback = 0 'lastcol
                         feedthis = 0
                         If MaybeIsSymbol(a$, "<>=~") Then
                             onetime = False
-                            pos2 = K - Len(a$) + 1
+                            pos2 = k - Len(a$) + 1
                             addone2000 pos2, 14
                             If FastSymbol(a$, "<") Then
                                 If FastSymbol(a$, ">") Then
@@ -5000,22 +5011,22 @@ nextline1:
             End If
             If pos2 > 0 Then
                 If kind = 8 Then
-                   addone2000 K - Len(a$) - Len(drop$) + 1, 10
-                   addone2000 K - Len(a$), 13
+                   addone2000 k - Len(a$) - Len(drop$) + 1, 10
+                   addone2000 k - Len(a$), 13
                 Else
                     addone2000 pos2, 10
                 End If
             Else
                 lastkind = 0
                 If kind = 8 Then
-                    addone2000 K - Len(a$) - Len(drop$) + 1, 10
-                    addone2000 K - Len(a$), 13
+                    addone2000 k - Len(a$) - Len(drop$) + 1, 10
+                    addone2000 k - Len(a$), 13
                 Else
-                    addone2000 K - Len(a$) - Len(drop$) + 1, 10
+                    addone2000 k - Len(a$) - Len(drop$) + 1, 10
                 End If
             End If
         End If
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         If kind > 3 Then
             If kind = 8 Then
                 lastcol = 13 '10
@@ -5030,7 +5041,7 @@ marvel:
             If pos1 > 1 Then
 marvel2:
                 drop$ = Mid$(a$, 1, pos1 - 1)
-                ColorizeExpressions2000 drop$, K - Len(a$) + Len(drop$), pos2, feedthis
+                ColorizeExpressions2000 drop$, k - Len(a$) + Len(drop$), pos2, feedthis
                 If feedthis = 11 Or feedthis = 14 Or feedthis = 10 Then
                     feedthis = 0
                 End If
@@ -5055,20 +5066,20 @@ checkthistoo:
                     Exit Sub
                 End If
                 If kind = 8 And Myleft$(a$, 1) = "]" Then '****************************fix this
-                    pos2 = K - Len(a$) + 1
+                    pos2 = k - Len(a$) + 1
                     addone2000 pos2, 13
                     a$ = Mid$(a$, 2)
                     pos2 = pos2 + 1 'k - Len(a$) + 1
                     If Myleft$(a$, 1) = "[" Then
                         a$ = Mid$(a$, 2)
-                        pos2 = K - Len(a$) + 1
+                        pos2 = k - Len(a$) + 1
                         GoTo CheckThis
                     End If
                     onetime = False
                 ElseIf kind > 4 And onetime Then
                     If FastSymbol(a$, ",") Then
   addone2000 pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   pos1 = 1
   GoTo CheckThis
   End If
@@ -5076,27 +5087,27 @@ End If
 
 If FastSymbol(a$, "//", , 2) Then
 addone pos2, 7
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
  mDoc.Paracolordata(thispara) = Col()
  Exit Sub
 ElseIf FastSymbol(a$, "->", , 2) Then
 addone2000 pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
 If FastSymbol(a$, "{") Then
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     onetime = True
     GoTo again
 End If
   ElseIf FastSymbol(a$, ",") Then
   addone2000 pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   pos1 = 1
 
   End If
 ElseIf kind > 4 And onetime Then
 If FastSymbol(a$, ",") Then
   addone2000 pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   pos1 = 1
   GoTo CheckThis
   End If
@@ -5104,13 +5115,13 @@ If FastSymbol(a$, ",") Then
   End If
 
     If FastSymbol(a$, ")") Then
-    pos2 = K - Len(a$)
+    pos2 = k - Len(a$)
     If lastcol = 0 Then
     addone2000 pos2, 14
     Else
   addone2000 pos2, lastcol
   End If
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   End If
   End If
 
@@ -5121,20 +5132,20 @@ If MaybeIsSymbol(a$, ".") Then
 If FastSymbol(a$, ".(", , 2) Then
 addone2000 pos2, 14
 a$ = vbNullString
-    pos2 = K + 1
+    pos2 = k + 1
     
 ElseIf FastSymbol(a$, "..", , 2) Then
     If Myleft$(a$, 1) = "." Then
         a$ = Mid$(a$, 2)
         lastcol = 11
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         lastkind = 1
         addone2000 pos2 - 3, lastcol
     Else
         lastcol = 10
         lastkind = 1
         addone2000 pos2, lastcol
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
     End If
     GoTo here3
 Else
@@ -5146,38 +5157,38 @@ End If
 End If
 If FastSymbol(a$, "<=", , 2) Then
   addone2000 pos2, 15
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     Else
   
 again4:
   If MaybeIsSymbolNoSpace(a$, "~", True) Then
     addone2000 pos2, 15
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   ElseIf FastSymbol(a$, "=>", , 2) Then
     addone2000 pos2, 14
   
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   ElseIf FastSymbol(a$, "=") Then
   If onetime And lastcol = 11 Then
     
   Else
     addone2000 pos2, 15
   End If
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
 ElseIf FastSymbol(a$, "//", , 2) Then
 addone pos2, 7
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
  mDoc.Paracolordata(thispara) = Col()
  Exit Sub
   ElseIf MaybeIsSymbol(a$, "+-*/", "=", True) Then
   addone2000 pos2, 15
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   ElseIf FastSymbol(a$, "/*-+=~^|<>") Then
   addone2000 pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   If FastSymbol(a$, "/*-+=~^&|<>") Then
   addone2000 pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   End If
 End If
   End If
@@ -5198,7 +5209,7 @@ again3:
   If drop$ = vbNullString Then drop$ = " "
   End If
 feedback = 0
- ColorizeExpressions2000 drop$, K - Len(a$) + Len(drop$), pos2, feedback
+ ColorizeExpressions2000 drop$, k - Len(a$) + Len(drop$), pos2, feedback
 If feedback <> 15 Then
 If feedback = 0 And lastcol = 0 Then feedback = 14
 If drop$ = "(" Then
@@ -5217,7 +5228,7 @@ feedback = 0
 
 a$ = Mid$(a$, pos1)
 
-ColorizeInnerStatements a$, K, pos2, feedback, True
+ColorizeInnerStatements a$, k, pos2, feedback, True
 
 If MaybeIsSymbol(a$, ")") Then
 addone2000 pos2, lastcol
@@ -5249,7 +5260,7 @@ nextline:
  mDoc.Paracolordata(thispara) = Col()
   a$ = drop$
 
- K = Len(a$)
+ k = Len(a$)
 
  If mDoc.startfrom(thispara) = 0 Then
  mDoc.startfrom(thispara) = thispara
@@ -5265,7 +5276,7 @@ nextline:
              Col(0) = 15
             Col(1) = 1
              Col(2) = 15
-             Col(3) = K + 1
+             Col(3) = k + 1
              Else
     ReDim Col(1)
              Col(0) = 15
@@ -5286,13 +5297,13 @@ If UBound(Col()) > 1 Then
 If Myleft(a$, 1) = "}" Then
 Else
 a$ = Mid$(a$, pos1 + 1)
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
 End If
 feedback = 0 'lastcol
 feedthis = 0
 If MaybeIsSymbol(a$, "<>=~") Then
     onetime = False
-            pos2 = K - Len(a$) + 1
+            pos2 = k - Len(a$) + 1
             addone2000 pos2, 14
 
     If FastSymbol(a$, "<") Then
@@ -5343,13 +5354,13 @@ End If
 again112:
     If MaybeIsSymbol(a$, ",;", , True) Then
      addone2000 pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     lastkind = 0
     onetime = False
     ElseIf FastSymbol(a$, "}") Then
     lastkind = 0
          addone2000 pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     onetime = True
    If MaybeIsSymbol(a$, ".;+(<>=~") Then
     onetime = False
@@ -5372,7 +5383,7 @@ End If
     GoTo again112
     ElseIf MaybeIsSymbol(a$, "'") Then
         lastkind = 0
-         pos2 = K - Len(a$) + 1
+         pos2 = k - Len(a$) + 1
         FastSymbol a$, "'"
         
         If pos2 > 0 Then
@@ -5382,7 +5393,7 @@ End If
         addone2000 1, 7
         End If
         a$ = vbNullString
-        pos2 = K
+        pos2 = k
         If pos2 > 0 Then
          addone2000 pos2 + 1, 14
         End If
@@ -5406,13 +5417,13 @@ GoTo here1
 ElseIf MaybeIsSymbol(a$, "\", , True) Then
 
 If lastkind = 1 Then
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
  If AscW(a$ + ".") <> 32 Then
  If MaybeIsSymbol(a$, ".", ".", True) Then
  
  End If
  If MaybeIsSymbolNoSpace(a$, "\") Then GoTo again
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     
     lastkind = 0
   If MaybeIsSymbol(a$, "\", , True) Then GoTo here1
@@ -5428,7 +5439,7 @@ here1:
     Else
     addone2000 1, 7
     End If
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
  mDoc.Paracolordata(thispara) = Col()
  Exit Sub
  End If
@@ -5441,7 +5452,7 @@ ElseIf MaybeIsSymbol(a$, "'") Then
     
     addone2000 1, 7
     End If
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
  mDoc.Paracolordata(thispara) = Col()
  Exit Sub
 
@@ -5453,24 +5464,24 @@ ElseIf FastSymbol(a$, ":") Then
 onetime = True
 ElseIf FastSymbol(a$, ")") Then
 addone2000 pos2, lastcol
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
     GoTo again4
 ElseIf FastSymbol(a$, ";") Then
 addone2000 pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     GoTo again2
 ElseIf FastSymbol(a$, "}") Then
 addone2000 pos2, 14
-addone2000 K - Len(a$), 11
-pos2 = K - Len(a$) + 1
+addone2000 k - Len(a$), 11
+pos2 = k - Len(a$) + 1
     GoTo again3
 
 ElseIf FastSymbol(a$, "{") Then
 onetime = True
 ElseIf FastSymbol(a$, "?") Then
 addone2000 pos2, 14
-addone2000 K - Len(a$), 11
-pos2 = K - Len(a$) + 1
+addone2000 k - Len(a$), 11
+pos2 = k - Len(a$) + 1
 GoTo again2
 Else
 addone2000 pos2, lastcol
@@ -5478,12 +5489,12 @@ mDoc.Paracolordata(thispara) = Col()
 Exit Sub
 End If
 addone2000 pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     GoTo again
 ElseIf IsSymbol(a$, "?") Then
 
 addone2000 1, 11
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         GoTo again2
 ElseIf IsSymbol(a$, "=") Then
 
@@ -5492,21 +5503,21 @@ addone2000 pos2, 11
 Else
 addone2000 1, 11
 End If
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         onetime = False
         GoTo again2
 ElseIf FastSymbol(a$, "{") Then
 onetime = True
 If pos2 > 0 Then
 If Col((UBound(Col()) \ 2) * 2) <> 14 Then addone2000 pos2, 14
-       pos2 = K - Len(a$) + 1
+       pos2 = k - Len(a$) + 1
         If FastSymbol(a$, "&") Then
-            addone2000 K - Len(a$), 13
-            pos2 = K - Len(a$) + 1
+            addone2000 k - Len(a$), 13
+            pos2 = k - Len(a$) + 1
         End If
 Else
 addone2000 1, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
 End If
     
         GoTo again
@@ -5524,17 +5535,17 @@ a$ = Mid$(a$, 2)
  GoTo CheckThis
 End If
 End If
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         GoTo again
 
 Else
 If IsNumberLabel(a$, drop$) Then
     If pos2 > 0 Then
-        addone K - Len(a$) - Len(drop$) + 1, 14
+        addone k - Len(a$) - Len(drop$) + 1, 14
     Else
-        addone K - Len(a$) - Len(drop$) + 1, 15
+        addone k - Len(a$) - Len(drop$) + 1, 15
         End If
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         GoTo again
  End If
  End If
@@ -5568,19 +5579,19 @@ End If
 Exit Sub
 End If
 ReDim Col(1)
-Dim a$, K As Long, pos1 As Long, pos2 As Long, onetime As Boolean, kind As Long
+Dim a$, k As Long, pos1 As Long, pos2 As Long, onetime As Boolean, kind As Long
 Dim lastcol As Long
 a$ = Data
 onetime = True
- K = Len(a$)
-If K < 1 Then
+ k = Len(a$)
+If k < 1 Then
 makebase 14
 mDoc.Paracolordata(thispara) = Col()
 Exit Sub
 End If
 If feedback > 0 Then
 lastcol = 15
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
 
 GoTo herecol
 ElseIf MultiLineComment1 <> "{" Then
@@ -5592,7 +5603,7 @@ entry2:
 
 If FastSymbol(a$, MultiLineComment1, , Len(MultiLineComment1)) Then
 
-pos2 = K - Len(a$) + 1 - Len(MultiLineComment1)
+pos2 = k - Len(a$) + 1 - Len(MultiLineComment1)
 feedback = 15
 addone pos2, 15
 GoTo entry2_6
@@ -5600,7 +5611,7 @@ entry2_5:
 drop$ = ""
 
 If pos2 > 0 Then
-pos2 = K - Len(a$) - 1
+pos2 = k - Len(a$) - 1
   addone pos2, 15
   
   Else
@@ -5613,7 +5624,7 @@ entry2_6:
 If InStr(a$, mMultiLineComment2) > 0 Then
 a$ = Mid$(a$, InStr(a$, mMultiLineComment2) + Len(mMultiLineComment2))
 entry3:
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
 If mDoc.startfrom(thispara) <> 0 Then
 If mDoc.startfrom(thispara) = thispara Then mDoc.startfrom(thispara) = 0
 End If
@@ -5631,16 +5642,16 @@ Else
 entry100:
     Do While thispara <> 0
   If oldpara <> thispara Then mDoc.startfrom(thispara) = mDoc.startfrom(oldpara)
-  K = InStr(drop$, mMultiLineComment2)
+  k = InStr(drop$, mMultiLineComment2)
   
 
     kind = 0
    oldpara = thispara
-  If K > 0 Then
-  a$ = Mid$(drop$, K + Len(mMultiLineComment2))
-     K = Len(drop$)
+  If k > 0 Then
+  a$ = Mid$(drop$, k + Len(mMultiLineComment2))
+     k = Len(drop$)
     feedback = 0
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     drop$ = vbNullString
     Exit Do
   
@@ -5659,7 +5670,7 @@ entry100:
   If a$ = vbNullString Then Exit Sub
   pos1 = 1
   drop$ = ""
-If K = 0 Then
+If k = 0 Then
 GoTo thisexit
 Else
 GoTo marvel
@@ -5674,7 +5685,7 @@ again:
 If RTrim$(a$) = vbNullString Then
 thisexit:
 If pos2 > 0 Then
-  If pos2 <= K Then addone pos2, lastcol
+  If pos2 <= k Then addone pos2, lastcol
   Else
   makebase 14
   End If
@@ -5682,14 +5693,14 @@ mDoc.Paracolordata(thispara) = Col()
 Exit Sub
 ' FOR TESTS
   pos1 = 0
-  For K = 1 To UBound(Col()) Step 2
-    If VarType(Col(K)) = 0 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
-    If Col(K) > pos1 Then pos1 = Col(K)
-    If Col(K) < pos1 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
-  Next K
-    For K = 0 To UBound(Col()) Step 2
-   If Col(K) > 15 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
-  Next K
+  For k = 1 To UBound(Col()) Step 2
+    If VarType(Col(k)) = 0 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
+    If Col(k) > pos1 Then pos1 = Col(k)
+    If Col(k) < pos1 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
+  Next k
+    For k = 0 To UBound(Col()) Step 2
+   If Col(k) > 15 Then mDoc.Paracolordata(thispara) = Col(): Exit Sub
+  Next k
   
 End If
 'pos2 = k - Len(a$) + 1
@@ -5707,7 +5718,7 @@ addone pos2, 14
 Else
 addone 1, 14
 End If
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
  
 Wend
 End If
@@ -5740,15 +5751,15 @@ If kind > 0 Then
                 If pos2 > 0 Then
                    addone pos2, lastcol
                 Else
-                   addone K - Len(a$) - Len(drop$) + 1, lastcol
+                   addone k - Len(a$) - Len(drop$) + 1, lastcol
                    End If
-                   pos2 = K - Len(a$) + 1
+                   pos2 = k - Len(a$) + 1
 
 If MaybeIsSymbol2(a$, 1, "[=>/]") Then
     lastcol = 14
 
     If FastSymbol(a$, "=") Then
-    pos2 = K - Len(a$)
+    pos2 = k - Len(a$)
         addone pos2, lastcol
         
         If FastSymbol(a$, Chr$(34)) Then
@@ -5768,7 +5779,7 @@ If MaybeIsSymbol2(a$, 1, "[=>/]") Then
        
         Else
         
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         GoTo again2
         End If
     End If
@@ -5782,7 +5793,7 @@ If pos1 > 1 Or pos2 = 0 Then
 a$ = Mid$(a$, pos1)
 If pos2 = 0 Then pos2 = 1
 addone pos2, 10
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
 End If
    GoTo herecol
 
@@ -5794,7 +5805,7 @@ End If
                 If pos2 > 0 Then
                    addone pos2, lastcol
                 Else
-                   addone K - Len(a$) - Len(drop$) + 1, lastcol
+                   addone k - Len(a$) - Len(drop$) + 1, lastcol
                    End If
                 End If
 
@@ -5803,10 +5814,10 @@ End If
               
                 kind = -2
                 If Trim$(a$) <> "" Then
-                                        pos2 = K - Len(a$) + 1
+                                        pos2 = k - Len(a$) + 1
                                         If FastSymbol(a$, "{") Then
                                             addone pos2, 14
-                                            pos2 = K - Len(a$) + 1
+                                            pos2 = k - Len(a$) + 1
                                             onetime = True
                                             GoTo again
                                         ElseIf IsmineHere2(drop$) Then
@@ -5819,12 +5830,12 @@ End If
                   
                 kind = -1
                                 If Trim$(a$) <> "" Then
-                                                  pos2 = K - Len(a$) + 1
+                                                  pos2 = k - Len(a$) + 1
                                         If FastSymbol(a$, "{") Then
                                     
                                                   addone pos2, 14
                                               
-                                                  pos2 = K - Len(a$) + 1
+                                                  pos2 = k - Len(a$) + 1
                                                   
                                                   onetime = True
                                                   GoTo again
@@ -5844,23 +5855,23 @@ cont0020:
    If IsLabelOnly2000((drop$), drop$) > 1 Then
    If pos2 = 0 Then pos2 = 1
         addone pos2, 10
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         GoTo herecol
    End If
    ElseIf Len(drop$) > 0 Then
    If pos2 = 0 Then pos2 = 1
         addone pos2, 10
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         GoTo herecol
 
    End If
        pos1 = InStr(a$, OpenTag)
 If pos1 = 0 Then
 If FastSymbolNoRemove(a$, "=") Then
-pos2 = K - Len(a$)
+pos2 = k - Len(a$)
 If pos2 = 0 Then pos2 = 1
 addone pos2, 14
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
 GoTo herecol
 Else
 makebase 10
@@ -5868,17 +5879,17 @@ mDoc.Paracolordata(thispara) = Col()
 Exit Sub
 End If
 ElseIf FastSymbolNoRemove(a$, "=") Then
-pos2 = K - Len(a$)
+pos2 = k - Len(a$)
 If pos2 = 0 Then pos2 = 1
 addone pos2, 14
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
 GoTo herecol
 
 End If
 a$ = Mid$(a$, pos1)
 If pos2 = 0 Then pos2 = 1
 addone pos2, 10
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
    GoTo herecol
    
    Else
@@ -5886,7 +5897,7 @@ pos2 = K - Len(a$) + 1
                  If pos2 > 0 Then
                  addone pos2, lastcol
                 Else
-                 addone K - Len(a$) - Len(drop$) + 1, lastcol
+                 addone k - Len(a$) - Len(drop$) + 1, lastcol
                 
                  End If
                 End If
@@ -5894,7 +5905,7 @@ pos2 = K - Len(a$) + 1
 
                  
   End If
-  pos2 = K - Len(a$) + 1
+  pos2 = k - Len(a$) + 1
   If kind > 3 Then
 herecol:
 If FastSymbolNoRemove(a$, MultiLineComment1, , Len(MultiLineComment1)) Then
@@ -5926,7 +5937,7 @@ marvel:
   If pos1 > 1 Then
 marvel2:
 
- ColorizeExpressions Mid$(a$, 1, pos1 - 1), K - Len(a$) + pos1 - 1, pos2, feedthis
+ ColorizeExpressions Mid$(a$, 1, pos1 - 1), k - Len(a$) + pos1 - 1, pos2, feedthis
 'ColorizeExpressions Mid$(a$, 1, pos1 - 1), k, pos2, feedthis
 
  If feedthis = 1 Then
@@ -5937,7 +5948,7 @@ marvel2:
  feedback = feedthis
   
 If feedthis = -15 Then
-   a$ = Right$(a$, K - pos2)
+   a$ = Right$(a$, k - pos2)
    onetime = False
    lastcol = 15
    feedthis = 15
@@ -5957,7 +5968,7 @@ If feedthis = -15 Then
   mDoc.Paracolordata(oldpara) = Col()
     
     a$ = drop$
-    K = Len(a$)
+    k = Len(a$)
     pos2 = 1
     ReDim Col(1)
     kind = 0
@@ -5974,20 +5985,20 @@ If feedthis = -15 Then
   Else
        addone pos2, 14
        End If
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   pos1 = 1
   drop$ = aheadstatus(a$, False, pos1)
 GoTo marvel2
 ElseIf MaybeIsSymbol(a$, mSplitExpr, , True) Then
 addone pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   pos1 = 1
   drop$ = aheadstatus(a$, False, pos1)
 GoTo marvel2
 ElseIf MaybeIsSymbol(a$, OtherSymbols, , True) Then
 
 addone pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   pos1 = 1
   drop$ = aheadstatus(a$, False, pos1)
 GoTo marvel2
@@ -6008,7 +6019,7 @@ End If
   mDoc.startfrom(thispara) = mDoc.startfrom(oldpara)
   kind = 0
     a$ = drop$
-    K = Len(a$)
+    k = Len(a$)
     pos2 = 1
     ReDim Col(1)
     oldpara = thispara
@@ -6027,7 +6038,7 @@ End If
    addone pos2, lastcol
    End If
    'lastcol ' '
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   End If
   If Brackets Then
     If FastSymbol(a$, "]") Then
@@ -6036,7 +6047,7 @@ End If
    Else
    addone pos2, lastcol
    End If
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   End If
   End If
   
@@ -6045,7 +6056,7 @@ End If
   End If
 If FastSymbol(a$, mSplitExpr) Then
   addone pos2, 14 ' WAS LASTCOL
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
 End If
 
   
@@ -6053,16 +6064,16 @@ again4:
 '
   If FastSymbol(a$, AssignSym, , Len(AssignSym)) Then
   addone pos2, 15
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     
     onetime = False
     
   ElseIf MaybeIsSymbol(a$, "+-*/", "=", True) Then
   addone pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   ElseIf MaybeIsSymbolNoSpace(a$, "~", True) Then
   addone pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
 End If
 again2:
 Do
@@ -6070,7 +6081,7 @@ again3:
   pos1 = 1
  '' kind = -2 maybe
 a$ = NLtrim$(a$)
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
   drop$ = aheadstatus(a$, False, pos1)
   
   If pos1 > 1 Or drop$ = "S" Then
@@ -6100,17 +6111,17 @@ pos2 = K - Len(a$) + 1
   If drop$ = vbNullString Then drop$ = " "
   End If
 feedback = 0
- ColorizeExpressions drop$, K - Len(a$) + pos1 - 1, pos2, feedback
+ ColorizeExpressions drop$, k - Len(a$) + pos1 - 1, pos2, feedback
  If kind = 40 Then
     kind = 1
     a$ = NLtrim$(Mid$(a$, pos1))
     
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     
     If a$ = vbNullString Then
     ElseIf feedback = -15 Then
             a$ = Mid$(a$, pos1)
-        pos2 = K - Len(a$) ' + 1 - Len(MultiLineComment1)
+        pos2 = k - Len(a$) ' + 1 - Len(MultiLineComment1)
            onetime = False
    lastcol = 15
    feedthis = 15
@@ -6119,7 +6130,7 @@ feedback = 0
 
     ElseIf Myleft(a$, 1) = LineCommandSep Then
     a$ = Mid$(a$, 2)
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     If Not a$ = vbNullString Then
     
     GoTo herecol
@@ -6137,13 +6148,13 @@ feedback = 0
     ElseIf MaybeIsSymbol(a$, ")]", , True) Then
     kind = 0
         addone pos2, 14
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         GoTo again4
     End If
  ElseIf feedback = -15 Then
 
             a$ = Mid$(a$, pos1 - Len(drop$) + Len(MultiLineComment1))
-        pos2 = K - Len(a$)
+        pos2 = k - Len(a$)
         
           ' onetime = False
    lastcol = 15
@@ -6153,7 +6164,7 @@ feedback = 0
 
 Else
 a$ = Mid$(a$, pos1)
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
 If drop$ = "(" Then
     If feedback = 100 Then
         lastcol = 14
@@ -6184,7 +6195,7 @@ End If
   mDoc.Paracolordata(oldpara) = Col()
     kind = 0
     a$ = drop$
-    K = Len(a$)
+    k = Len(a$)
     pos2 = 1
     ReDim Col(1)
     oldpara = thispara
@@ -6198,7 +6209,7 @@ End If
 If InStr(drop$, " ") = 0 Or kind >= 0 Then
 If MaybeIsSymbol(a$, mSplitExpr, , True) Then
      addone pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     onetime = False
     End If
     While FastSymbol(a$, LineCommandSep)
@@ -6208,7 +6219,7 @@ addone pos2, 14
 Else
 addone 1, 14
 End If
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
  
 Wend
     
@@ -6217,11 +6228,11 @@ End If
   End If
     If MaybeIsSymbol(a$, OtherSymbols, , True) Then
      addone pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     onetime = False
     ElseIf FastSymbol(a$, "}") Then
          addone pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     onetime = True
     GoTo again
    Else
@@ -6240,14 +6251,14 @@ addone 1, 7
 End If
     If FastSymbol(a$, MultiLineComment1, , Len(MultiLineComment1)) Then
 
-        pos2 = K - Len(a$) + 1 - Len(MultiLineComment1)
+        pos2 = k - Len(a$) + 1 - Len(MultiLineComment1)
            onetime = False
    lastcol = 15
    feedthis = 15
    drop$ = ""
         GoTo entry2_5
         End If
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
  mDoc.Paracolordata(thispara) = Col()
  Exit Sub
 ElseIf MaybeIsSymbol2(a$, ComSymbolsWidth, CommentSymbols) Then
@@ -6257,43 +6268,43 @@ If pos2 > 0 Then
 Else
 addone 1, CLng(IIf(CommentLineLight, 12, 7))
 End If
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
  mDoc.Paracolordata(thispara) = Col()
  Exit Sub
 ElseIf Not onetime Then
 If FastSymbol(a$, mSplitExpr) Then
 If Len(OpenTag) > 0 Then
 addone pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     End If
 ElseIf FastSymbol(a$, LineCommandSep) Then
 onetime = True
 ElseIf FastSymbol(a$, ")") Then
 addone pos2, lastcol
-pos2 = K - Len(a$) + 1
+pos2 = k - Len(a$) + 1
     GoTo again4
 ElseIf MaybeIsSymbol(a$, OtherSymbols, , True) Then
 addone pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     GoTo again2
 ElseIf FastSymbol(a$, "}") Then
 addone pos2, 14
-addone K - Len(a$), 11
-pos2 = K - Len(a$) + 1
+addone k - Len(a$), 11
+pos2 = k - Len(a$) + 1
     GoTo again3
 
 ElseIf FastSymbol(a$, "{") Then
 onetime = True
 ElseIf FastSymbol(a$, "?") Then
 addone pos2, 14
-addone K - Len(a$), 11
-pos2 = K - Len(a$) + 1
+addone k - Len(a$), 11
+pos2 = k - Len(a$) + 1
 GoTo again2
 Else
 If Brackets Then
     If FastSymbol(a$, "]") Then
   addone pos2, lastcol
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
   End If
   End If
 addone pos2, lastcol
@@ -6301,7 +6312,7 @@ mDoc.Paracolordata(thispara) = Col()
 Exit Sub
 End If
 addone pos2, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
     GoTo again
 ElseIf IsSymbol(a$, "?") Then
 
@@ -6310,7 +6321,7 @@ addone pos2, 14
 Else
 addone 1, 14
 End If
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         GoTo again2
 ElseIf IsSymbol(a$, "=") Then
 If Len(OpenTag) > 0 Then
@@ -6326,20 +6337,20 @@ Else
 addone 1, 11
 End If
 End If
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         GoTo again2
 ElseIf FastSymbol(a$, "{") Then
 onetime = True
 If pos2 > 0 Then
 addone pos2, 14
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
     If FastSymbol(a$, "&") Then
           addone pos2, 10
-      pos2 = K - Len(a$) + 1
+      pos2 = k - Len(a$) + 1
 End If
 Else
 addone 1, 14
-    pos2 = K - Len(a$) + 1
+    pos2 = k - Len(a$) + 1
 End If
     
         GoTo again
@@ -6350,7 +6361,7 @@ addone pos2, 14
 Else
 addone 1, 14
 End If
-        pos2 = K - Len(a$) + 1
+        pos2 = k - Len(a$) + 1
         GoTo again
 
 ElseIf pos2 = 0 Then
@@ -6358,15 +6369,15 @@ If Myleft$(a$, 1) <> "" Then
 If InStr(StartSymbols + Chr$(0), Myleft$(a$, 1)) > 0 Then
 pos1 = 1
  drop$ = aheadstatus(a$, False, pos1)
- pos2 = K - Len(a$) + 1
+ pos2 = k - Len(a$) + 1
 If drop$ <> "" Then GoTo marvel
 
 End If
 End If
 If AutoNumber Then
 If IsNumberLabel(a$, drop$) Then
-        addone K - Len(a$) - Len(drop$) + 1, 15
-        pos2 = K - Len(a$) + 1
+        addone k - Len(a$) - Len(drop$) + 1, 15
+        pos2 = k - Len(a$) + 1
         GoTo again
  End If
  
@@ -6411,7 +6422,7 @@ DeleteObject my_brush
 End Sub
  Private Sub PrintItem1(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS Or DT_TABSTOP)
  Dim cc As String
-r.Top = r.Top + TextPixelOffset
+r.top = r.top + TextPixelOffset
  If showparagraphonce Then
          cc = c & "Ά"
   DrawTextEx mHdc, StrPtr(cc), -1, r, way, VarPtr(tParam)
@@ -6419,12 +6430,12 @@ r.Top = r.Top + TextPixelOffset
   DrawTextEx mHdc, StrPtr(c), -1, r, way, VarPtr(tParam)
    
     End If
-    r.Top = r.Top - TextPixelOffset
+    r.top = r.top - TextPixelOffset
     End Sub
  Private Sub PrintItem(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS Or DT_TABSTOP)
-  r.Top = r.Top + TextPixelOffset
+  r.top = r.top + TextPixelOffset
   DrawTextEx mHdc, StrPtr(c), -1, r, way, VarPtr(tParam)
-r.Top = r.Top - TextPixelOffset
+r.top = r.top - TextPixelOffset
     End Sub
      Private Sub PrintItem2(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_EXPANDTABS Or DT_TABSTOP)
  Dim that As Long
@@ -6626,15 +6637,15 @@ If HaveMarkedText Then
 If BlockStartLine = BlockEndline Then
 SelLength = Abs(BlockStartCursor - BlockEndCursor)
 Else
-Dim a$(), oldmydoc As Document, i As Long, SUM As Long
+Dim a$(), oldmydoc As Document, i As Long, sum As Long
 ' maybe we didn't need to preserve old UndoDoc...I need to clarify this..
 Set oldmydoc = UndoDoc
 Set UndoDoc = New Document
 FillBlock
-SUM = UndoDoc.SizeCRLF + 2
-If UndoDoc.LfLead Then SUM = SUM - 1
-If UndoDoc.CrTail Then SUM = SUM + 1
-SelLength = SUM - 2 ' no the last vbcrlf
+sum = UndoDoc.SizeCRLF + 2
+If UndoDoc.LfLead Then sum = sum - 1
+If UndoDoc.CrTail Then sum = sum + 1
+SelLength = sum - 2 ' no the last vbcrlf
 End If
 Set UndoDoc = oldmydoc
 End If
@@ -6758,12 +6769,12 @@ Public Property Let ForeColor(ByVal RHS As OLE_COLOR)
 
 End Property
 
-Public Property Get Top() As Long
-Top = Callback.Controls(ctrlName).Top
+Public Property Get top() As Long
+top = Callback.Controls(ctrlName).top
 End Property
 
-Public Property Let Top(ByVal RHS As Long)
-Callback.Controls(ctrlName).Top = RHS
+Public Property Let top(ByVal RHS As Long)
+Callback.Controls(ctrlName).top = RHS
 End Property
 Public Property Get Left() As Variant
 Left = Callback.Controls(ctrlName).Left
@@ -6831,7 +6842,7 @@ BlockStartLine = glistN.ListIndex
 BlockEndline = BlockStartLine
 BlockEndPara = BlockStartPara
 BlockEndPos = BlockStartPos
-Dim K As Long, l As Long
+Dim k As Long, l As Long
 If Right$(RHS, 1) = vbCr Then RHS = RHS + vbLf
 If RHS <> "" Then
 If prev Then undoprev = prev
@@ -6855,9 +6866,9 @@ Else
 End If
 
 
-K = kk
+k = kk
 glistN.MarkNext = 2
-SelStart = K
+SelStart = k
 
 End Property
 Public Property Let InsertTextNoRender(ByVal RHS As String)
@@ -6871,7 +6882,7 @@ RemoveUndo (RHS)
 undomode = 4 ' like 0
 b = enabled
 If b Then enabled = False
-Dim K As Long, l As Long
+Dim k As Long, l As Long
 If Right$(RHS, 1) = vbCr Then RHS = RHS + vbLf
 If RHS <> "" Then
 
@@ -6892,7 +6903,7 @@ End Property
 Public Property Let InsertText(ByVal RHS As String)
 glistN_MarkDelete False
 glistN.MarkNext = 0
-Dim K As Long, l As Long
+Dim k As Long, l As Long
 If Right$(RHS, 1) = vbCr Then RHS = RHS + vbLf
 If RHS <> "" Then
 mDoc.ResetColor mDoc.MarkParagraphID
@@ -7255,7 +7266,7 @@ mDoc1.textDoc = RTrim$(Title$ + " " + a$)
 End If
 glistN.HeadLine = vbNullString ' reset
 glistN.HeadLine = " " ' give a fake headline
-onelineheight = glistN.HeadlineHeight
+onelineheight = glistN.HeadlineHeight + lastAddPixelsTitle
 glistN.HeadlineHeight = mDoc1.DocLines * onelineheight
 glistN.ShowMe
 
@@ -7271,8 +7282,8 @@ Dim b As RECT, Origin As Long, tabw As Long, dummy As RECT
 tabw = tParam.iTabLength * glistN.AveCharWith
 Origin = r.Left
 dummy = r
-dummy.Top = r.Bottom + 10
-dummy.Bottom = dummy.Top + r.Bottom - r.Top
+dummy.top = r.Bottom + 10
+dummy.Bottom = dummy.top + r.Bottom - r.top
 Dim ww$(), items&, i, rleft
 If UBound(Col()) < 1 Then
     b = area
@@ -7324,13 +7335,13 @@ ww$() = SplitStringUsingArrayNoTab(c, Col(), items&)
     For i = 0 To items&
     c = ww$(i)
     r.Left = Offset
-    r.Top = r.Top + TextPixelOffset
+    r.top = r.top + TextPixelOffset
         b = r
 
         If b.Right <= area.Left Or b.Left >= area.Right Then
         hRgn = CreateRectRgnIndirect(dummy)
         SelectClipRgn mHdc, hRgn
-        Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, Origin))
+        Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, Origin))
 
         SelectClipRgn mHdc, &H0
         DeleteObject hRgn
@@ -7338,13 +7349,13 @@ ww$() = SplitStringUsingArrayNoTab(c, Col(), items&)
         Else
         hRgn = CreateRectRgnIndirect(area)
         SelectClipRgn mHdc, hRgn
-         Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, Origin))
+         Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, Origin))
 
         SelectClipRgn mHdc, &H0
         DeleteObject hRgn
         End If
         If r.Left > area.Right Then Exit For
-        r.Top = r.Top - TextPixelOffset
+        r.top = r.top - TextPixelOffset
     Next i
 alfa1:
 r.Left = rleft
@@ -7381,9 +7392,9 @@ For i = 0 To items&
     c = ww$(i)
        r.Left = Offset '+ rleft + addthis
        If r.Left > r.Right Then Exit For
-    r.Top = r.Top + TextPixelOffset
-    Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, Origin))
-    r.Top = r.Top - TextPixelOffset
+    r.top = r.top + TextPixelOffset
+    Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, Origin))
+    r.top = r.top - TextPixelOffset
     
 Next i
 r.Left = rleft
@@ -7419,11 +7430,11 @@ For i = 0 To items&
     c = ww$(i)
        r.Left = Offset
        If r.Left > r.Right Then Exit For
-    r.Top = r.Top + TextPixelOffset
+    r.top = r.top + TextPixelOffset
     
     If Not NoColor Then SetTextColor mHdc, M2000(Col(i * 2))
-    Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, Origin))
-    r.Top = r.Top - TextPixelOffset
+    Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, Origin))
+    r.top = r.top - TextPixelOffset
     
 Next i
  If r.Left < r.Right Then
@@ -7469,7 +7480,7 @@ On Error Resume Next
     For i = items& To 0 Step -1
         CM = ww$(i)
         r.Left = Offset + rleft + addthis
-        r.Top = r.Top + TextPixelOffset
+        r.top = r.top + TextPixelOffset
         b = r
         If i > 0 Then
         
@@ -7485,7 +7496,7 @@ On Error Resume Next
         DrawTextEx mHdc, StrPtr(CM), -1, r, mway, VarPtr(tParam)
           SelectClipRgn mHdc, &H0
    DeleteObject hRgn
-           r.Top = r.Top - TextPixelOffset
+           r.top = r.top - TextPixelOffset
    
     Next i
 Else
@@ -7503,12 +7514,12 @@ Else
         ' for Kenring
         addthis = glistN.UserControlTextWidthPixels(CM + c) - Offset - glistN.UserControlTextWidthPixels(c)
         r.Left = Offset + rleft + addthis
-        r.Top = r.Top + TextPixelOffset
+        r.top = r.top + TextPixelOffset
         
         If Not mNoColor1 Then SetTextColor mHdc, M2000(Col(i * 2))
     
         DrawTextEx mHdc, StrPtr(c), -1, r, mway, VarPtr(tParam)
-        r.Top = r.Top - TextPixelOffset
+        r.top = r.top - TextPixelOffset
         If r.Left < 0 Then Exit For
     Next i
 
@@ -8367,11 +8378,11 @@ End Property
 Public Property Let locked(ByVal RHS As Boolean)
 glistN.enabled = Not RHS
 End Property
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Friend Property Let Index(ByVal RHS As Long)
+Friend Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 
@@ -8391,44 +8402,44 @@ Public Property Get LineHeight() As Variant
 ''
 LineHeight = glistN.HeightTwips / glistN.lines
 End Property
-Public Sub PressKey(keycode As Integer, shift As Integer)
+Public Sub PressKey(KeyCode As Integer, shift As Integer)
 Dim b As Boolean
   b = enabled
-    PressKey_A keycode, shift
+    PressKey_A KeyCode, shift
 enabled = b
   
 End Sub
-Private Sub PressKey_A(keycode As Integer, shift As Integer)
+Private Sub PressKey_A(KeyCode As Integer, shift As Integer)
 Static ctrl As Boolean, alt As Boolean, noentrance As Boolean, where As Long, noinp As Double
 Dim aa$, a$, JJ As Long, ii As Long, comm As String
 If alt = True Then shift = shift Or 4: alt = False
 If noentrance Then
-keycode = 0
+KeyCode = 0
 Exit Sub
 End If
 noentrance = True
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 If shift = 2 Then
-If glistN.VirtualKey(keycode) = 47 Then keycode = vbKey4
+If glistN.VirtualKey(KeyCode) = 47 Then KeyCode = vbKey4
 End If
 End If
 
-Select Case keycode
+Select Case KeyCode
 Case vbKeyReturn
 nochange = True
 If UsedAsTextBox Or NumberOnly Or NumberIntOnly Then
-keycode = 0
+KeyCode = 0
 If Not Callback Is Nothing Then
 With Callback.Control(1)
 .PressKey 13, 0
 End With
 End If
 ElseIf (shift And 2) = 2 And AllowInsertBrackets Then
-keycode = 0
+KeyCode = 0
 shift = 0
 insertbrackets
 ElseIf AutoIntNewLine Then
-keycode = 0
+KeyCode = 0
 Else
 
 End If
@@ -8438,9 +8449,9 @@ nochange = False
 Case vbKeyControl
 ctrl = True
 alt = (shift And 4) = 4
-keycode = 0
+KeyCode = 0
 Case vbKeyF1
-If shift > 0 Then If (shift And 2) <> 2 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
+If shift > 0 Then If (shift And 2) <> 2 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 
 If (shift And 2) = 2 Then
 shift = 0
@@ -8460,9 +8471,9 @@ Render
 ManualInform
 End If
 
-keycode = 0
+KeyCode = 0
 Case vbKeyF2
-If (shift And 4) = 4 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 4) = 4 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 
 If shift <> 0 Then
 LastSearchType = 2 - Abs(shift Mod 2 = 1)
@@ -8476,7 +8487,7 @@ s$ = InputBoxN("Search to the top " & IIf(LastSearchType = 1, " characters" & vb
 End If
 If Not noinp = 1 Then
 noentrance = False
-keycode = 0
+KeyCode = 0
 Exit Sub
 End If
 End If
@@ -8491,9 +8502,9 @@ If LastSearchType > 0 Then
         supsub
     End If
 End If
-keycode = 0
+KeyCode = 0
 Case vbKeyF3
-If (shift And 4) = 4 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 4) = 4 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
     If shift <> 0 Then
     shift = 0
         If s$ = vbNullString And SelText <> "" Then s$ = SelText
@@ -8504,7 +8515,7 @@ If (shift And 4) = 4 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
         End If
         If Not noinp = 1 Then
             noentrance = False
-            keycode = 0
+            KeyCode = 0
             Exit Sub
         End If
     End If
@@ -8520,29 +8531,29 @@ If (shift And 4) = 4 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
         End If
     End If
 Case vbKeyF4
-If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If SelText <> "" Then mscatsub Else dothis
 shift = 0
-keycode = 0
+KeyCode = 0
 Case vbKeyF5
-If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If SelText <> "" Then rthissub shift
-keycode = 0
+KeyCode = 0
 shift = 0
 Case vbKeyF6  ' Set/Show/Reset Para1
-If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton para1, PosPara1
-keycode = 0
+KeyCode = 0
 shift = 0
 Case vbKeyF7  'Set/Show/Reset Para2
-If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para2, PosPara2
-keycode = 0
+KeyCode = 0
 shift = 0
 Case vbKeyF8  'Set/Show/Reset Para2
-If (shift And 7) > 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para3, PosPara3
-keycode = 0
+KeyCode = 0
 shift = 0
 Case vbKeyF9  ' Count Words
 'If (shift And 7) > 1 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
@@ -8564,19 +8575,19 @@ End If
 End If
 
 Else
-If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
-If glistN.lines > 1 Then
-If UserCodePage = 1253 Then
-ReplaceTitle = "Λέξεις στο κείμενο:" + str(mDoc.WordCount)
-Else
-ReplaceTitle = "Words in text:" + str(mDoc.WordCount)
+    If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
+        If glistN.lines > 1 Then
+            If UserCodePage = 1253 Then
+                ReplaceTitle = "Λέξεις στο κείμενο:" + str(mDoc.WordCount)
+            Else
+                ReplaceTitle = "Words in text:" + str(mDoc.WordCount)
+            End If
+        End If
+    End If
 End If
-End If
-End If
-End If
-keycode = 0
+KeyCode = 0
 Case vbKeyF10
-If (shift And 7) > 1 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) > 1 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 showparagraph = Not showparagraph
@@ -8584,15 +8595,15 @@ mDoc.WrapAgain
 Render
 End If
 ManualInform
-keycode = 0
+KeyCode = 0
 Case vbKeyF11
-If (shift And 7) = 0 Then keycode = 0: shift = 0: noentrance = False: Exit Sub
+If (shift And 7) = 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
 fState = fState + 1
 SetME
 WrapAll
 ManualInform
 glistN.ShowMe
-keycode = 0
+KeyCode = 0
 Case vbKeyPageUp
 Case vbKeyPageDown
 Case vbKey4
@@ -8738,7 +8749,7 @@ glistN.Noflashingcaret = False
 Render
 
 nochange = False
-keycode = 0
+KeyCode = 0
 shift = 0
 End If
 Case vbKeyTab
@@ -8764,12 +8775,12 @@ If UseTab And Not BlockStartPos <> BlockEndPos And (TabControl = 0 Or MyTrimLNoT
           SelStart = JJ + 1
         End If
        
-         keycode = 0
+         KeyCode = 0
     ElseIf NLtrim(Mid$(CurrentParagraph, Charpos, 1)) = vbNullString Then
         SelStart = SelStart + 1
-        keycode = 8
+        KeyCode = 8
     ElseIf NLtrim(Myleft$(CurrentParagraph, Charpos - 1)) = vbNullString Then
-        keycode = 8
+        KeyCode = 8
     End If
     'End If
    
@@ -8847,7 +8858,7 @@ conttab:
     Render
     nochange = False
     End If
-    keycode = 0  ' new
+    KeyCode = 0  ' new
     shift = 0 ' new
 ElseIf BlockStartPos <> BlockEndPos And HaveMarkedText Then
 conttab1:
@@ -8920,7 +8931,7 @@ glistN.enabled = True
 Render
 nochange = False
 End If
-keycode = 0
+KeyCode = 0
 shift = 0
 
 End If
@@ -8948,9 +8959,9 @@ End If
 
 
 
-OldLcid = mDoc.LCID
+OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
   If Not mDoc.FindStrDown(s$, W, l) Then GoTo sdnOut
@@ -8971,7 +8982,7 @@ ParaSelStart = l
 glistN.enabled = True
 SelLength = Len(s$)
 sdnOut:
-mDoc.LCID = OldLcid
+mDoc.lcid = OldLcid
 End Sub
 Sub Searchup(s$, Optional anystr As Boolean = False)
 Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
@@ -8989,9 +9000,9 @@ Else
 l = Charpos + Len(s$)
 End If
 
-OldLcid = mDoc.LCID
+OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
    If SelText = s$ Then l = l - 1
@@ -9000,7 +9011,9 @@ If EditTextWord Or anystr Then
        If Not mDoc.FindWord(s$, False, W, l) Then GoTo sdupOut
     End If
 Else
+
     If WordOnly Then
+        If SelText = s$ Then l = l - Len(s$)
         If Not mDoc.FindWord(s$, False, W, l) Then GoTo sdupOut
     Else
         If Not mDoc.FindIdentifier(s$, False, W, l) Then GoTo sdupOut
@@ -9013,7 +9026,7 @@ ParaSelStart = l
 glistN.enabled = True
 SelLength = Len(s$)
 sdupOut:
-mDoc.LCID = OldLcid
+mDoc.lcid = OldLcid
 End Sub
 Public Sub helpmeSub()
       If mIndex >= 0 Then
@@ -9047,9 +9060,9 @@ SelStartSilent = SelStart  'MOVE CHARPOS TO SELSTART
 
 el = Charpos  ' charpos maybe is in the start or the end of block
 s$ = SelText
-OldLcid = mDoc.LCID
+OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.lcid = TempLcid
 
 l = el + 1
 If EditTextWord Then
@@ -9084,7 +9097,7 @@ End If
 Loop Until (W = eW And l = el) Or safety = 2
 
 End If
-mDoc.LCID = OldLcid
+mDoc.lcid = OldLcid
 Render
 If glistN.Visible Then glistN.SetFocus
 End Sub
@@ -9129,9 +9142,9 @@ End If
 End If
 
 If noinp <> 1 Then Exit Sub
-OldLcid = mDoc.LCID
+OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.lcid = TempLcid
 Set mDoc10 = New Document
 mDoc10 = neo$
 If mDoc10.DocLines > 1 Then
@@ -9256,7 +9269,7 @@ If prof1.MARKTWO > 1000 Then ProcTask2 Basestack1: prof1.MARKTWO
 Loop Until safety = 2 Or KeyPressed(16)
 glistN.DropKey = False
 End If
-mDoc.LCID = OldLcid
+mDoc.lcid = OldLcid
 If w2 > 0 Then mDoc.WrapAgainBlock w2, w2:   mDoc.ColorThis w2
 glistN.SuspDraw = False
 Render
@@ -9715,16 +9728,16 @@ tParam.iTabLength = Abs(vNewValue)
 End Property
 Private Function MyTrimL(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL = 1: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  p2 = StrPtr(s): l = l - 1
+  p4 = p2 + l * 2
+  For i = p2 To p4 Step 2
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 9
     Case Else
-     MyTrimL = (i - P2) \ 2 + 1
+     MyTrimL = (i - p2) \ 2 + 1
    Exit Function
   End Select
   Next i
@@ -9732,16 +9745,16 @@ Dim P2 As Long, P1 As Integer, p4 As Long
 End Function
 Private Function MyTrimLNoTab(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimLNoTab = 1: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  p2 = StrPtr(s): l = l - 1
+  p4 = p2 + l * 2
+  For i = p2 To p4 Step 2
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160
     Case Else
-     MyTrimLNoTab = (i - P2) \ 2 + 1
+     MyTrimLNoTab = (i - p2) \ 2 + 1
    Exit Function
   End Select
   Next i
@@ -9749,16 +9762,16 @@ Dim P2 As Long, P1 As Integer, p4 As Long
 End Function
 Private Function MyTrimL2(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL2 = 0: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  p2 = StrPtr(s): l = l - 1
+  p4 = p2 + l * 2
+  For i = p2 To p4 Step 2
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160
     Case Else
-     MyTrimL2 = (i - P2) \ 2 '+ 1
+     MyTrimL2 = (i - p2) \ 2 '+ 1
    Exit Function
   End Select
   Next i
@@ -9766,16 +9779,16 @@ Dim P2 As Long, P1 As Integer, p4 As Long
 End Function
 Private Function NLTrim2(s$) As String
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then NLTrim2 = 1: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  p2 = StrPtr(s): l = l - 1
+  p4 = p2 + l * 2
+  For i = p2 To p4 Step 2
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160
     Case Else
-     NLTrim2 = Mid$(s$, (i - P2) \ 2 + 1)
+     NLTrim2 = Mid$(s$, (i - p2) \ 2 + 1)
    Exit Function
   End Select
   Next i
@@ -9784,9 +9797,9 @@ End Function
 Private Function NLtrim$(a$)
 If Len(a$) > 0 Then NLtrim$ = Mid$(a$, MyTrimL(a$))
 End Function
-Private Sub countbrakcet(a$, K As Long, counter As Long)
+Private Sub countbrakcet(a$, k As Long, counter As Long)
 Dim i As Long, j As Integer, blind As Boolean
-For i = Abs(K) To Len(a$)
+For i = Abs(k) To Len(a$)
 j = AscW(Mid$(a$, i, 1))
 Select Case j
 Case 34
@@ -9794,7 +9807,7 @@ blind = Not blind
 Case 123
 If Not blind Then counter = counter + 1
 Case 125
-If Not blind Then counter = counter - 1: If counter = 0 Then K = i: Exit For
+If Not blind Then counter = counter - 1: If counter = 0 Then k = i: Exit For
 End Select
 Next i
 
@@ -10008,16 +10021,16 @@ End If
 End Property
 Private Function MyTrimRNoCr(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimRNoCr = 1: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
-  For i = p4 To P2 Step -2
-  GetMem2 i, P1
-  Select Case P1
+  p2 = StrPtr(s): l = l - 1
+  p4 = p2 + l * 2
+  For i = p4 To p2 Step -2
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 9
     Case Else
-     MyTrimRNoCr = (i - P2) \ 2 + 1
+     MyTrimRNoCr = (i - p2) \ 2 + 1
    Exit Function
   End Select
   Next i
@@ -10025,16 +10038,16 @@ Dim P2 As Long, P1 As Integer, p4 As Long
 End Function
 Private Function MyTrimL2NoTab(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
-  P2 = StrPtr(s): l = l - 1
-  p4 = P2 + l * 2
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  p2 = StrPtr(s): l = l - 1
+  p4 = p2 + l * 2
+  For i = p2 To p4 Step 2
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160
     Case Else
-     MyTrimL2NoTab = (i - P2) \ 2 + 1
+     MyTrimL2NoTab = (i - p2) \ 2 + 1
    Exit Function
   End Select
   Next i
@@ -10146,8 +10159,8 @@ Dim dummy As RECT, r As RECT, tabw As Long, Offset As Long, hRgn As Long, estX A
 tabw = tParam.iTabLength * glistN.AveCharWith
 glistN.UserControlTextMetricsPixels that$, r.Right, r.Bottom
 dummy = r
-dummy.Top = r.Bottom + 1
-dummy.Bottom = dummy.Top + r.Bottom
+dummy.top = r.Bottom + 1
+dummy.Bottom = dummy.top + r.Bottom
 Offset = 0
 estX = 0
 hRgn = CreateRectRgnIndirect(dummy)
@@ -10187,7 +10200,7 @@ End If
 For i = 0 To items&
     c = ww$(i)
     r.Left = Offset
-    rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
+    rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
     If Len(c) >= ExtSelStart - estX Or (found > 0 And rleftacc > found) Then
             If Not Len(c) >= ExtSelStart - estX Then
             ExtSelStart = Len(c) + estX
@@ -10208,7 +10221,7 @@ For i = 0 To items&
             If found > 0 Then
                 rx1 = Offset
                 If mark1 > 1 Then
-                    Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), mark1 - 1, 1, tabw, 0))
+                    Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), mark1 - 1, 1, tabw, 0))
                 End If
                 c = Mid$(ww(i), mark1, mark2 - mark1 + 1)
                 If nrtl Then
@@ -10216,7 +10229,7 @@ For i = 0 To items&
                     M2 = M2 - mark1 + 1
                     If M2 - M1 > 0 Then Mid$(c, M1, M2 - M1 + 1) = StrReverse(Mid$(c, M1, M2 - M1 + 1))
                 End If
-                If found > Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c$), 1, tabw, 0)) Then
+                If found > Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c$), 1, tabw, 0)) Then
                         nValue = mark1 + estX
                         Exit For
                     Else
@@ -10232,7 +10245,7 @@ For i = 0 To items&
             If nValue <= 0 Then nValue = 1
             If mark1 > 1 Then
             
-            rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), mark2, 1, tabw, 0))
+            rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), mark2, 1, tabw, 0))
             If found > 0 Then
             If rx1 <= found Then
             nValue = mark1 + estX
@@ -10241,7 +10254,7 @@ For i = 0 To items&
             End If
 
             End If
-            RealX1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), mark1 - 1, 1, tabw, 0))
+            RealX1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), mark1 - 1, 1, tabw, 0))
             
             End If
             Exit For
@@ -10251,7 +10264,7 @@ For i = 0 To items&
         End If
         ElseIf mark1 <> 0 And mark2 <> 0 And nValue = mark2 + 1 Then
         If found > 0 Then
-         rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), mark2, 1, tabw, 0))
+         rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), mark2, 1, tabw, 0))
         If found > rx1 Then
          nValue = mark1 + estX
             RealX1 = rx1
@@ -10267,14 +10280,14 @@ For i = 0 To items&
 here1:
             If mark1 > 1 Then
                 
-                Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), mark1 - 1, 1, tabw, 0))
+                Offset = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), mark1 - 1, 1, tabw, 0))
             End If
             If mark1 = nValue And found > 0 Then
 
             If Offset > found Then
             j = mark1 - 2
             If j >= 1 Then
-            Do While found < r.Left + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), j, 1, tabw, 0))
+            Do While found < r.Left + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), j, 1, tabw, 0))
             j = j - 1
             If j = 0 Then j = 1: Exit Do
             Loop
@@ -10303,10 +10316,10 @@ here1:
             If nValue = mark2 + 1 Then
             If found > 0 Then
             For j = mark2 - mark1 + 1 To 1 Step -1
-            If found > Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), j, 1, tabw, 0)) Then
+            If found > Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), j, 1, tabw, 0)) Then
             
             If j > 1 Then
-            If LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), j, 1, tabw, 0)) > LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), j - 1, 1, tabw, 0)) < 0 Then
+            If LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), j, 1, tabw, 0)) > LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), j - 1, 1, tabw, 0)) < 0 Then
             
                         nValue = mark2 - (j) + estX
 
@@ -10348,9 +10361,9 @@ here1:
             
             Else
 conthere:
-            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
+            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
              If nValue > mark1 Then
-                rx1 = rleftacc - 1 - LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), nValue - mark1, 1, tabw, 0))
+                rx1 = rleftacc - 1 - LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), nValue - mark1, 1, tabw, 0))
             Else
                 rx1 = rleftacc - 1
             End If
@@ -10361,7 +10374,7 @@ conthere:
                 original = nValue
                 For j = nValue To mark2
 
-                rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), j - mark1 + 1, 1, tabw, 0))
+                rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), j - mark1 + 1, 1, tabw, 0))
 
                     
                     original = original + 1
@@ -10404,7 +10417,7 @@ conthere:
                   original = nValue
                   For j = nValue - 1 To mark1 + 1 Step -1
                 
-                      rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), j - mark1, 1, tabw, 0))
+                      rx1 = rleftacc - LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), j - mark1, 1, tabw, 0))
                       If found <= rx1 Then Exit For
                       original = j
                       
@@ -10466,7 +10479,7 @@ rx1 = 0
         Else ' NO RTL
 nortl:
             c = Myleft$(c, ExtSelStart - estX - 1)
-            rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
+            rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
             If found > 0 Then
                 If found < rx1 Then
                     nValue = ExtSelStart - 1
@@ -10485,7 +10498,7 @@ nortl:
                         Else
                        ' nValue = Len(c) + estX
                         End If
-                        rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
+                        rx1 = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
                     End If
                     RealX1 = rx1
                     Exit For
@@ -10515,17 +10528,17 @@ nortl:
                 If Len(c) = 0 Then
                     rleftacc = Offset
                 ElseIf nrtl And M2 = mark2 Then
-                rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
+                rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
                   c = ww(i)
 
                If M2 - M1 > 0 Then c = Mid$(c, M1, M2 - M1 + 1)
-                   rleftacc = rleftacc + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
+                   rleftacc = rleftacc + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
                 nValue = M1 - 1
             Else
-                 rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), Len(c), 1, tabw, 0))
+                 rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), Len(c), 1, tabw, 0))
                 End If
             ElseIf found > 0 Then
-            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.Top, StrPtr(c), nValue, 1, tabw, 0))
+            rleftacc = Offset + LowWord(TabbedTextOut(mHdc, r.Left, r.top, StrPtr(c), nValue, 1, tabw, 0))
         If rleftacc < found Then
         nValue = original
 
