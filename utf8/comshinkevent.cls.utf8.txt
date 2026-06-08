@@ -123,7 +123,7 @@ End Type
 
 Private Type SAFEARRAYBOUND
     cElements                   As Long
-    lLBound                     As Long
+    lLbound                     As Long
 End Type
 
 Private Type SAFEARRAY_1D
@@ -371,7 +371,7 @@ Private Function pvGetParamArray(ByVal Ptr As Long, numArg As Long) As Variant()
     ' array pointing to the param array
     With SafeArray
         .Bounds(0).cElements = tDPAR.cArgs
-        .Bounds(0).lLBound = 0
+        .Bounds(0).lLbound = 0
         .cDims = 1
         .cbElements = 16
         .pvData = tDPAR.rgPointerToVariantArray
@@ -460,39 +460,6 @@ finalize:
 
         End If
 End Function
-
-Public Sub fireeventOLD(ByVal dispid As Long, ByVal params As Long)
-' change to fire events, when also othet events are fired.
-'Static once As Boolean
-'If once Then Exit Sub
-' if en event not used then do nothing and exit sub
-If exclude.ExistKey(dispid) Then Exit Sub
-'once = True
-    Dim strEvent    As String
-    Dim vParams()   As Variant
-    Dim NumVar As Long, what$, delme As Boolean
-    ' get the name of the event
-    If inUse.ExistKey(dispid) Then
-    strEvent = inUse.Value
-    what$ = inUse.Info
-    Else
-    strEvent = GetMemberName(oTarget, dispid, iid_event, what$)
-    inUse.AddKey dispid, strEvent, what$
-    End If
- 
-   
-    vParams = pvGetParamArray(params, NumVar)
-
-   On Error Resume Next
-
- If Not CallEventFromCOM(Me, strEvent, what$, NumVar, vParams(), delme, ItemIndex) Then
-    MyEr "Problem With Event: " + strEvent, "Πρόβλημα με το γεγονός: " + strEvent
- End If
-   If delme Then exclude.AddKey dispid, ""
-
-    pvSetParamArray params, vParams
-    'once = False
-End Sub
 Public Sub fireevent(ByVal dispid As Long, ByVal params As Long)
 ' change to fire events, when also othet events are fired.
     Static once As Boolean

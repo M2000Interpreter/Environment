@@ -574,7 +574,7 @@ End Sub
 Public Sub SleepWaitNO(ByVal a As Long)
 Exit Sub
  Dim b As New clsProfiler
-Dim l As Boolean, K
+Dim l As Boolean, k
 l = NOEDIT
   b.MARKONE
 While a > b.MARKTWO And l = NOEDIT
@@ -761,10 +761,10 @@ CloseHandle hTimer
 If Not TaskMaster Is Nothing Then TaskMaster.RestEnd
 End Sub
 Sub SetVisibleByHDC(whatHDC As Long, setit As Long)
-Dim K As Form
+Dim k As Form
 On Error Resume Next
-For Each K In Forms
-    If K.hDC = whatHDC Then K.Visible = setit
-Next K
+For Each k In Forms
+    If k.hDC = whatHDC Then k.Visible = setit
+Next k
 
 End Sub

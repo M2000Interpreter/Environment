@@ -18,6 +18,10 @@ Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination
 
 Event Cancel(NoCancel As Boolean)
 Event Progress(ByVal FileIdx As Long, ByVal Current As Long, ByVal Total As Long, mCancel As Boolean)
+Event TotalSize(ByVal TS As Double)
+Event Error(ByVal FileIdx As Long, Source As String, Description As String, Cancel As Boolean)
+
+Event ExtractComplete(ByVal FileIdx As Long, File As Variant)
 Dim mTotal As Double, mSum As Double, LastTotal As Double, oIndex As Long
 Dim mLastCancel As Boolean
 Dim mLastCurent
@@ -160,8 +164,19 @@ Private Sub Zip_BeforeExtract(ByVal FileIdx As Long, File As Variant, SkipFile A
     RaiseEvent Cancel(mCancel)
 End Sub
 
+Private Sub Zip_Error(ByVal FileIdx As Long, Source As String, Description As String, Cancel As Boolean)
+    RaiseEvent Error(FileIdx, Source, Description, Cancel)
+End Sub
+
+Private Sub Zip_ExtractComplete(ByVal FileIdx As Long, File As Variant)
+    RaiseEvent ExtractComplete(FileIdx, File)
+End Sub
+
 Private Sub Zip_Progress(ByVal FileIdx As Long, ByVal Current As Long, ByVal Total As Long, mCancel As Boolean)
     RaiseEvent Progress(FileIdx, Current, Total, mCancel)
     
 End Sub
 
+Private Sub Zip_TotalSize(aSize As Double)
+    RaiseEvent TotalSize(aSize)
+End Sub

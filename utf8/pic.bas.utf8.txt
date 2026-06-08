@@ -1911,15 +1911,15 @@ If k = 0 Then Exit Function
 With Form1.dSprite(k)
 it = val("0" & .Tag)
 x1 = .Left + .Width * (100 - Percent) / 200 - players(it).HotSpotX
-y1 = .Top + .Height * (100 - Percent) / 200 - players(it).HotSpotY
+y1 = .top + .Height * (100 - Percent) / 200 - players(it).HotSpotY
 x2 = .Left + .Width * (1 - (100 - Percent) / 200) - players(it).HotSpotX
-y2 = .Top + .Height * (1 - (100 - Percent) / 200) - players(it).HotSpotY
+y2 = .top + .Height * (1 - (100 - Percent) / 200) - players(it).HotSpotY
 End With
 For i = Priority - 1 To 1 Step -1
 k = FindSpriteByTag(i)
 If k <> 0 Then
     With Form1.dSprite(k)
-        If (x2 < .Left + .Width / 4) Or (x1 >= .Left + .Width * 3 / 4) Or (y2 <= .Top + .Height / 4) Or (y1 > .Top + .Height * 3 / 4) Then
+        If (x2 < .Left + .Width / 4) Or (x1 >= .Left + .Width * 3 / 4) Or (y2 <= .top + .Height / 4) Or (y1 > .top + .Height * 3 / 4) Then
         Else
         suma = suma + 2 ^ (i - 1)
         End If
@@ -1956,7 +1956,7 @@ Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, k As Long
 k = FindSpriteByTag(Priority)
 If k = 0 Then Exit Function
 x1 = Form1.dSprite(k).Left + Form1.dSprite(k).Width * (100 - Percent) / 200
-y1 = Form1.dSprite(k).Top + Form1.dSprite(k).Height * (100 - Percent) / 200
+y1 = Form1.dSprite(k).top + Form1.dSprite(k).Height * (100 - Percent) / 200
 x2 = x1 + Form1.dSprite(k).Width * (1 - 2 * (100 - Percent) / 200)
 y2 = y1 + Form1.dSprite(k).Height * (1 - 2 * (100 - Percent) / 200)
 If x2 < nx1 Or x1 >= nx2 Or y2 <= ny1 Or y1 > ny2 Then
@@ -2003,7 +2003,7 @@ Function PosSpriteY(aPrior As Long) As Long ' before take from priority the orig
 Dim k As Long
 k = FindSpriteByTag(aPrior)
 If k < 1 Or k > PobjNum Then Exit Function
- PosSpriteY = Form1.dSprite(k).Top
+ PosSpriteY = Form1.dSprite(k).top
 End Function
 
 Sub PosSprite(aPrior As Long, ByVal X As Long, ByVal Y As Long) ' ' before take from priority the original sprite
@@ -2160,7 +2160,7 @@ With Form1.dSprite(s)
 .Picture = photo.Picture(SZ)
 .Left = .Left + players(s).X - .Width / 2
 players(s).X = .Width / 2
-.Top = .Top + players(s).Y - .Height / 2
+.top = .top + players(s).Y - .Height / 2
 players(s).Y = .Height / 2
 Call SetWindowRgn(.hWnd, myRgn, True)
 ''''''''''''''''''''''''UpdateWindow .hwnd
@@ -3619,14 +3619,14 @@ Private Function c_CreatePartialRegion(rgnRects() As RECT, ByVal lIndex As Long,
     ' cheat a little & use rectangles to store the header
     With rgnRects(lIndex - 2&) ' bytes 0-15
         .Left = 32                      ' length of region header in bytes
-        .Top = 1                        ' required cannot be anything else
+        .top = 1                        ' required cannot be anything else
         .Right = uIndex - lIndex + 1&   ' number of rectangles for the region
         .Bottom = .Right * 16&          ' byte size used by the rectangles;
     End With                            ' ^^ can be zero & Windows will calculate
     
     With rgnRects(lIndex - 1&) ' bytes 16-31 bounding rectangle identification
         .Left = leftOffset                  ' left
-        .Top = rgnRects(lIndex).Top         ' top
+        .top = rgnRects(lIndex).top         ' top
         .Right = leftOffset + cx            ' right
         .Bottom = rgnRects(uIndex).Bottom   ' bottom
     End With
@@ -4830,8 +4830,9 @@ mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "ASSERT", "BACK",
 , "ΠΕΡΙΘΩΡΙΟ", "ΠΕΤΑ", "ΠΙΝΑΚΑΣ", "ΠΙΝΑΚΕΣ", "ΠΛΑΓΙΑ", "ΠΛΑΙΣΙΟ", "ΠΛΗΚΤΡΟΛΟΓΙΟ", "ΠΟΙΟΤΗΤΑ.ΕΚΤΥΠΩΣΗΣ", "ΠΟΛΥΓΩΝΟ", "ΠΡΟΣ", "ΠΡΟΣΘΕΣΕ.ΕΓΓΡΑΦΟ", "ΠΡΟΣΘΗΚΗ", "ΠΡΩΤΟΤΥΠΟ", "ΠΡΟΧΕΙΡΟ", "ΡΟΥΤΙΝΑ", "ΡΥΘΜΙΣΕΙΣ", "Σ", "ΣΑΡΩΣΕ", "ΣΒΗΣΕ", "ΣΕΙΡΑ", "ΣΕΛΙΔΑ", "ΣΕΝΑΡΙΟ", "ΣΗΜ", "ΣΗΜΑΔΙ", "ΣΤΑΘΕΡΗ", "ΣΤΑΘΕΡΕΣ", "ΣΤΑΤΙΚΗ", "ΣΤΑΤΙΚΕΣ", "ΣΤΗ", "ΣΤΗΝ", "ΣΤΟ", "ΣΤΟΚ", "ΣΤΟΧΟΙ", "ΣΤΟΧΟΣ", "ΣΥΓΓΡΑΦΕΑΣ", "ΣΥΓΓΡΑΦΗ", "ΣΥΓΧΩΝΕΥΣΕ.ΕΓΓΡΑΦΟ", "ΣΥΜΠΙΕΣΗ" _
 , "ΣΥΝΑΡΤΗΣΗ", "ΣΥΝΕΧΙΣΕ", "ΣΥΣ", "ΣΥΣΤΗΜΑ", "ΣΧΕΔΙΟ", "ΣΧΕΔΙΑ", "ΣΧΕΔΙΟ.ΝΗΜΑΤΩΝ", "ΣΩΡΟΣ", "ΣΩΣΕ", "ΣΩΣΕ.ΕΓΓΡΑΦΟ", "ΤΑΙΝΙΑ", "ΤΑΙΝΙΕΣ", "ΤΑΞΗ", "ΤΑΞΙΝΟΜΗΣΗ", "ΤΕΛΟΣ", "ΤΙΤΛΟΣ", "ΤΜΗΜΑ", "ΤΜΗΜΑΤΑ", "ΤΟΝΟΣ", "ΤΟΠΙΚΑ", "ΤΟΠΙΚΕΣ", "ΤΟΠΙΚΗ", "ΤΟΠΙΚΟ", "ΤΟΤΕ", "ΤΥΠΟΣ", "ΤΥΠΩΣΕ", "ΥΠΕΡΚΛΑΣΗ", "ΥΠΟΚΑΤΑΛΟΓΟΣ", "ΦΑΡΔΙΑ", "ΦΕΡΕ", "ΦΕΡΕΠΙΣΩ", "ΦΟΝΤΟ", "ΦΟΡΜΑ", "ΦΟΡΤΩΣΕ" _
 , "ΦΟΡΤΩΣΕ.ΕΓΓΡΑΦΟ", "ΦΩΝΗ", "ΧΑΡΑΚΤΗΡΕΣ", "ΧΑΡΑΞΕ", "ΧΡΗΣΗ", "ΧΡΗΣΤΗ", "ΧΡΗΣΤΗΣ", "ΧΡΩΜΑ", "ΧΡΩΜΑΤΙΣΕ", "ΨΗΦΙΟ", "?")
-For i = 0 To UBound(mycommands())
 
+    
+For i = 0 To UBound(mycommands())
 Select Case mycommands(i)
 Case "SORT", "ΤΑΞΙΝΟΜΗΣΗ"
 aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoSort)
@@ -5144,6 +5145,8 @@ Case Else  ' MAYBE I MADE ONE FOR STRUCTURES
     aHash.ItemCreator CStr(mycommands(i)), 0
 End Select
 Next i
+aHash.ItemCreator "®", ProcPtr(AddressOf NeoRead2)
+
 allcommands = True
 End Function
 Private Function ProcPtr(ByVal nAddress As Long) As Long
@@ -5344,10 +5347,10 @@ Dim emfP As StdPicture
 Set emfP = QRCodegenBarcode(ab$, QRcolor, , sq, ErrLevel)
 If emfP Is Nothing Then Exit Sub
 Set aPic = New MemBlock
-bytes = GetEnhMetaFileBits(emfP.handle, bytes, ByVal 0)
+bytes = GetEnhMetaFileBits(emfP.Handle, bytes, ByVal 0)
 If bytes Then
     aPic.Construct 1, bytes
-    Call GetEnhMetaFileBits(emfP.handle, bytes, ByVal aPic.GetBytePtr(0))
+    Call GetEnhMetaFileBits(emfP.Handle, bytes, ByVal aPic.GetBytePtr(0))
     aPic.SubType = 2 ' emf
     Set usehandler = New mHandler
     usehandler.t1 = 2

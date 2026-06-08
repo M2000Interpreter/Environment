@@ -38,14 +38,14 @@ Friend Sub NoPublic(bstack As basetask, where$)
 End Sub
 Friend Sub GetIcon(a As StdPicture)
 On Error Resume Next
-Dim K As StdPicture
+Dim k As StdPicture
 If IhaveExtForm Then
 ExtForm.GetIcon PackData(a)
 End If
 End Sub
 Friend Function GetAppIcon() As StdPicture
 On Error Resume Next
-Dim K As StdPicture
+Dim k As StdPicture
 If IhaveExtForm Then
 Set GetAppIcon = UnPackData(ExtForm.GetAppIcon)
 End If
@@ -357,7 +357,7 @@ If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
-If Form1.Top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).Top
+If Form1.top >= VirtualScreenHeight Then Form1.move ScrInfo(Console).Left, ScrInfo(Console).top
 Else
 If Form1.WindowState = 0 Then
 If Not (Forms.Count > 5) Then Form1.Visible = False
@@ -520,7 +520,7 @@ If ExtForm Is Nothing Then Exit Sub
 'ExtForm.Visible = True
 'End If
 ExtForm.CaptionW = lasttitle
-
+If Err Then Set ExtForm = Nothing
 End Sub
 
 Public Sub Hide()

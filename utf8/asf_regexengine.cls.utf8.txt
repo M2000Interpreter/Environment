@@ -543,7 +543,7 @@ Private Function ParseSequence(pat As String, ByRef p As Long, pEnd As Long, _
     Set ParseSequence = seq
 End Function
 
-Private Sub PropagateFlags(ByVal node As Variant, ByRef Flags As String)
+Private Sub PropagateFlags(ByVal node As Variant, ByRef flags As String)
     If node Is Nothing Then Exit Sub
     On Error GoTo err_
     
@@ -557,12 +557,12 @@ Private Sub PropagateFlags(ByVal node As Variant, ByRef Flags As String)
                     Case "lit", "dot"
                         Dim tmpNode As Collection
                         Set tmpNode = elm
-                        NodeAdd tmpNode, "flags_on", Flags
+                        NodeAdd tmpNode, "flags_on", flags
                 End Select
                 If NodeExists(elm, "child") Then
-                    PropagateFlags NodeGet(elm, "child"), Flags
+                    PropagateFlags NodeGet(elm, "child"), flags
                 Else
-                    PropagateFlags elm, Flags
+                    PropagateFlags elm, flags
                 End If
             End If
         Next elm

@@ -277,7 +277,11 @@ place HashFunc(Key), a
 With PriveSpace(a)
     .nDx = num
     .KeyType = CByte(Abs(isRef))
+    'If isRef Then
+    '.originalType = PriveSpace(CByte(deftype)
+    'Else
     .originalType = CByte(deftype)
+    'End If
     .globalvar = CByte(isglobal)
     .firsthash = HD(Key)
      SwapStrings .Key, Key

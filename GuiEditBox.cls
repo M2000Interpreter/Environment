@@ -8956,9 +8956,6 @@ If SelLength > 0 Then
 Else
     l = Charpos
 End If
-
-
-
 OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
 If TempLcid <> 0 Then mDoc.lcid = TempLcid
@@ -8984,6 +8981,7 @@ SelLength = Len(s$)
 sdnOut:
 mDoc.lcid = OldLcid
 End Sub
+
 Sub Searchup(s$, Optional anystr As Boolean = False)
 Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
 W = mDoc.MarkParagraphID
@@ -9027,6 +9025,7 @@ glistN.enabled = True
 SelLength = Len(s$)
 sdupOut:
 mDoc.lcid = OldLcid
+ManualInform
 End Sub
 Public Sub helpmeSub()
       If mIndex >= 0 Then

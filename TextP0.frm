@@ -983,6 +983,7 @@ TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdnOut:
 TEXT1.mDoc.lcid = OldLcid
+TEXT1_Inform TEXT1.glistN.ListIndex + 1, TEXT1.glistN.SelStart
 End Sub
 
 Public Sub supsub()
@@ -1029,6 +1030,7 @@ TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdupOut:
 TEXT1.mDoc.lcid = OldLcid
+TEXT1_Inform TEXT1.glistN.ListIndex + 1, TEXT1.glistN.SelStart
 End Sub
 Public Function InIDECheck() As Boolean
     m_bInIDE = True
@@ -2767,7 +2769,7 @@ Sleep 1
 If Form1.Visible Then Form1.Refresh
 End Sub
 Private Sub Prepare(basestack As basetask, ByVal Nb As String)
-Dim g As Long, iC As Long
+Dim G As Long, iC As Long
 Dim VP As String, vv As String, CM$, b As String
 If needset Then
 Nb = StrConv(Nb, vbUnicode)
@@ -2778,8 +2780,8 @@ Else
 b = Nb
 b = Replace(b, Chr(0), "")
 End If
-g = InStr(b, "?")
-If g > 0 Then b = Mid$(b, g + 1) Else Exit Sub
+G = InStr(b, "?")
+If G > 0 Then b = Mid$(b, G + 1) Else Exit Sub
 If b <> "" Then
 Do While Parameters(b, VP, vv)
 CM$ = VP & "$=" & """" + vv + """"

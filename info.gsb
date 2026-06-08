@@ -5767,7 +5767,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 62 for M2000 Interpreter version 14, revision 15 and above"
+	Report " A collection of modules for tests version 63 for M2000 Interpreter version 14, revision 42 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -14878,55 +14878,58 @@ Puzzle15
 MODULE CRYPTO {// https://en.wikipedia.org/wiki/RIPEMD
 // The original RIPEMD function was designed in the framework of the EU project RIPE (RACE Integrity Primitives Evaluation) in 1992
 // RIPEMD-160 is 160bit cryptographic hash function.
+if version<14 then exit
+if version=14 and revision<42 then exit
 
 Module Checkit {
 	Function Prepare_RiPeMd_160 {
-		Dim Base 0,  K(5) AS CURRENCY, K1(5) AS CURRENCY
-		K(0)=0x00000000, 0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xA953FD4E
-		K1(0)=0x50A28BE6,0x5C4DD124, 0x6D703EF3, 0x7A6D76E9, 0x00000000
-		Dim Base 0,r(80) AS INTEGER, r1(80) AS INTEGER, s(80) AS INTEGER, s1(80) AS INTEGER
-		r(0)=0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
-		r(16)=7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8
-		r(32)= 3, 10, 14, 4, 9, 15, 8, 1, 2, 7, 0, 6, 13, 11, 5, 12
-		r(48)=1, 9, 11, 10, 0, 8, 12, 4, 13, 3, 7, 15, 14, 5, 6, 2
-		r(64)=4, 0, 5, 9, 7, 12, 2, 10, 14, 1, 3, 8, 11, 6, 15, 13
-		k=r() : k*=4   ' k is a pointer to array. We have to multiply to make them offsets
+		Currency K[4], K1[4]
+		K[0]=0x00000000, 0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xA953FD4E
+		K1[0]=0x50A28BE6,0x5C4DD124, 0x6D703EF3, 0x7A6D76E9, 0x00000000
+		Byte r[80], r1[80], s[80], s1[80]
+		r[0]=0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+		r[16]=7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8
+		r[32]= 3, 10, 14, 4, 9, 15, 8, 1, 2, 7, 0, 6, 13, 11, 5, 12
+		r[48]=1, 9, 11, 10, 0, 8, 12, 4, 13, 3, 7, 15, 14, 5, 6, 2
+		r[64]=4, 0, 5, 9, 7, 12, 2, 10, 14, 1, 3, 8, 11, 6, 15, 13
 		
-		r1(0)=5, 14, 7, 0, 9, 2, 11, 4, 13, 6, 15, 8, 1, 10, 3, 12
-		r1(16)=6, 11, 3, 7, 0, 13, 5, 10, 14, 15, 8, 12, 4, 9, 1, 2
-		r1(32)=15, 5, 1, 3, 7, 14, 6, 9, 11, 8, 12, 2, 10, 0, 4, 13
-		r1(48)=8, 6, 4, 1, 3, 11, 15, 0, 5, 12, 2, 13, 9, 7, 10, 14
-		r1(64)=12, 15, 10, 4, 1, 5, 8, 7, 6, 2, 13, 14, 0, 3, 9, 11
+		r1[0]=5, 14, 7, 0, 9, 2, 11, 4, 13, 6, 15, 8, 1, 10, 3, 12
+		r1[16]=6, 11, 3, 7, 0, 13, 5, 10, 14, 15, 8, 12, 4, 9, 1, 2
+		r1[32]=15, 5, 1, 3, 7, 14, 6, 9, 11, 8, 12, 2, 10, 0, 4, 13
+		r1[48]=8, 6, 4, 1, 3, 11, 15, 0, 5, 12, 2, 13, 9, 7, 10, 14
+		r1[64]=12, 15, 10, 4, 1, 5, 8, 7, 6, 2, 13, 14, 0, 3, 9, 11
 		
-		k=r1() : k*=4
+		s[0]=11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8
+		s[16]=7, 6, 8, 13, 11, 9, 7, 15, 7, 12, 15, 9, 11, 7, 13, 12
+		s[32]=11, 13, 6, 7, 14, 9, 13, 15, 14, 8, 13, 6, 5, 12, 7, 5
+		s[48]=11, 12, 14, 15, 14, 15, 9, 8, 9, 14, 5, 6, 8, 6, 5, 12
+		s[64]=9, 15, 5, 11, 6, 8, 13, 12, 5, 12, 13, 14, 11, 8, 5, 6
 		
-		s(0)=11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8
-		s(16)=7, 6, 8, 13, 11, 9, 7, 15, 7, 12, 15, 9, 11, 7, 13, 12
-		s(32)=11, 13, 6, 7, 14, 9, 13, 15, 14, 8, 13, 6, 5, 12, 7, 5
-		s(48)=11, 12, 14, 15, 14, 15, 9, 8, 9, 14, 5, 6, 8, 6, 5, 12
-		s(64)=9, 15, 5, 11, 6, 8, 13, 12, 5, 12, 13, 14, 11, 8, 5, 6
-		
-		s1(0)=8, 9, 9, 11, 13, 15, 15, 5, 7, 7, 8, 11, 14, 14, 12, 6
-		s1(16)=9, 13, 15, 7, 12, 8, 9, 11, 7, 7, 12, 7, 6, 15, 13, 11
-		s1(32)=9, 7, 15, 11, 8, 6, 6, 14, 12, 13, 5, 14, 13, 13, 7, 5
-		s1(48)=15, 5, 8, 11, 14, 14, 6, 14, 6, 9, 12, 9, 12, 5, 15, 8
-		s1(64)=8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11
+		s1[0]=8, 9, 9, 11, 13, 15, 15, 5, 7, 7, 8, 11, 14, 14, 12, 6
+		s1[16]=9, 13, 15, 7, 12, 8, 9, 11, 7, 7, 12, 7, 6, 15, 13, 11
+		s1[32]=9, 7, 15, 11, 8, 6, 6, 14, 12, 13, 5, 14, 13, 13, 7, 5
+		s1[48]=15, 5, 8, 11, 14, 14, 6, 14, 6, 9, 12, 9, 12, 5, 15, 8
+		s1[64]=8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11
 		
 		// return of this function is a lambda function
 		// all arrays are closures to this lambda
-		=lambda K(),K1(),TT, T,r(),r1(), s(), s1() (&message$, ansi as Boolean=true, ansiid=1033)-> {
+		=lambda K,K1,TT, T, r, r1, s, s1 (&message$)-> {
 			set fast!
+			declare GetMem4 lib "msvbvm60.GetMem4" {Long addr, Long retValue}
+			string f="FillDataFromMem"
 			CURRENCY  h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE
 			CURRENCY  h3 = 0x10325476, h4 = 0xC3D2E1F0
-			LONG L, L1, blocks, acc, padding
+			LONG L, L1, blocks, acc, padding, sPtr
 			INTEGER  i, j
 			Boolean  f64=true
 			INTEGER oldid
-			if ansi then oldid=locale : locale ansiid
-			// we use a buffer of 64 bytes
-			buffer clear message as byte*64
-			L=len(message$)*if(ansi->1&, 2&)
-			if binary.and(L,63&)>55& then  padding=64&
+			// we use a Buffer of 64 bytes
+			Buffer clear message as Long*16
+			Buffer clear final as byte*64
+
+			L=len(message$)*2
+			sPtr=StrPtr(varptr(message$))
+			if binary.and(L,63&)>55& then padding=64&
 			padding+= 64& - (L Mod 64&)
 			L1=padding+L+1&
 	
@@ -14935,7 +14938,7 @@ Module Checkit {
 			blocks=L1 div 64&
 rem
 			Print "blocks:";blocks
-			// now prepare the buffer
+			// now prepare the Buffer
 			PrepareBuffer()
 			CURRENCY  A, B, C, D, E, AA, BB, CC, DD, EE, T, TT, tmp1
 			do
@@ -14943,34 +14946,34 @@ rem
 			AA = h0 : BB = h1 : CC = h2 : DD = h3 : EE = h4
 			JJ=0
 			for J=0 to 15 {
-				push Binary.add(Binary.Rotate(binary.add(A,binary.xor(binary.xor(B,C),D),eval(message ,r(j) as long),k(jj)), s(j)), e)
+				push Binary.add(Binary.Rotate(binary.add(A,binary.xor(binary.xor(B,C),D),message[r[j]] ,k[jj]), s[j]), e)
 				A = E : E = D : D = Binary.Rotate(C, 10) : C = B :B=Number 
-				push binary.add(Binary.Rotate(binary.add(AA,binary.xor(BB, binary.or(CC, binary.not(DD))),eval(message, r1(j) as long),k1(jj)),s1(j)),EE)
+				push binary.add(Binary.Rotate(binary.add(AA,binary.xor(BB, binary.or(CC, binary.not(DD))),message[r1[j]],k1[jj]),s1[j]),EE)
 				AA = EE : EE = DD : DD = Binary.Rotate(CC, 10) : CC = BB : BB=number
 			} : JJ++
 			for J=16 to 31 {
-				push binary.add(Binary.Rotate(binary.add(A,binary.or(binary.and(B,C), binary.and(binary.not(B), D)),eval(message ,r(j) as long),k(jj)), s(j)), e)
+				push binary.add(Binary.Rotate(binary.add(A,binary.or(binary.and(B,C), binary.and(binary.not(B), D)),message[r[j]],k[jj]), s[j]), e)
 				A = E : E = D : D = Binary.Rotate(C, 10) : C = B :B=Number 
-				push binary.add(Binary.Rotate(binary.add(AA,binary.or(binary.and(BB,DD), binary.and(CC,binary.not(DD))),eval(message, r1(j) as long),k1(jj)),s1(j)),EE)
+				push binary.add(Binary.Rotate(binary.add(AA,binary.or(binary.and(BB,DD), binary.and(CC,binary.not(DD))),message[r1[j]],k1[jj]),s1[j]),EE)
 				AA = EE : EE = DD : DD = Binary.Rotate(CC, 10) : CC = BB :BB=Number
 			} :JJ++
 			for J=32 to 47 {
-				push binary.add(Binary.Rotate(binary.add(A,binary.xor(binary.or(B, binary.not(C)), D),eval(message ,r(j) as long),k(jj)), s(j)), e)
+				push binary.add(Binary.Rotate(binary.add(A,binary.xor(binary.or(B, binary.not(C)), D),message[r[j]],k[jj]), s[j]), e)
 				A = E : E = D : D = Binary.Rotate(C, 10) : C = B :B=Number 
-				push binary.add(Binary.Rotate(binary.add(AA,binary.xor(binary.or(BB, binary.not(CC)), DD),eval(message, r1(j) as long),k1(jj)),s1(j)),EE)
+				push binary.add(Binary.Rotate(binary.add(AA,binary.xor(binary.or(BB, binary.not(CC)), DD),message[r1[j]],k1[jj]),s1[j]),EE)
 				AA = EE : EE = DD : DD = Binary.Rotate(CC, 10) : CC = BB :BB=Number
 			}: JJ++
 			for J=48 to 63 {
 				JJ=J DIV 16
-				push binary.add(Binary.Rotate(binary.add(A,binary.or(binary.and(B,D), binary.and(C,binary.not(D))),eval(message ,r(j) as long),k(jj)), s(j)), e)
+				push binary.add(Binary.Rotate(binary.add(A,binary.or(binary.and(B,D), binary.and(C,binary.not(D))),message[r[j]],k[jj]), s[j]), e)
 				A = E : E = D : D = Binary.Rotate(C, 10) : C = B :B=Number 
-				push binary.add(Binary.Rotate(binary.add(AA,binary.or(binary.and(BB,CC), binary.and(binary.not(BB),DD)),eval(message, r1(j) as long),k1(jj)),s1(j)),EE)
+				push binary.add(Binary.Rotate(binary.add(AA,binary.or(binary.and(BB,CC), binary.and(binary.not(BB),DD)),message[r1[j]],k1[jj]),s1[j]),EE)
 				AA = EE : EE = DD : DD = Binary.Rotate(CC, 10) : CC = BB :BB=Number
 			}: JJ++
 			for J=64 to 79 {
-				push binary.add(Binary.Rotate(binary.add(A,binary.xor(B, binary.or(C, binary.not(D))),eval(message ,r(j) as long),k(jj)), s(j)), e)
+				push binary.add(Binary.Rotate(binary.add(A,binary.xor(B, binary.or(C, binary.not(D))),message[r[j]],k[jj]), s[j]), e)
 				A = E : E = D : D = Binary.Rotate(C, 10) : C = B :B=Number 
-				push binary.add(Binary.Rotate(binary.add(AA,binary.xor(binary.xor(BB,CC),DD),eval(message, r1(j) as long),k1(jj)),s1(j)),EE)
+				push binary.add(Binary.Rotate(binary.add(AA,binary.xor(binary.xor(BB,CC),DD),message[r1[j]],k1[jj]),s1[j]),EE)
 				AA = EE : EE = DD : DD = Binary.Rotate(CC, 10) : CC = BB :BB=Number
 			}
 			push binary.add(h1, C, DD):h1 = binary.add(h2, D, EE)
@@ -14978,81 +14981,95 @@ rem
 			h4 = binary.add(h0, B, CC):Read h0
 			blocks--
 rem
-			IF blocks mod 10=0 then print over $(0,8), blocks : Refresh
+			IF blocks mod 10=0 then Print over $(0,8), blocks : Refresh
 			if blocks=0 then exit
 			PrepareBuffer()
 			always
 rem
-			print
-			buffer ans as byte*20
+			Print
+			Buffer ans as byte*20
 			// we put ulong (long ar ulong in buffers)
 			Return ans, 0:=h0 as long, 4:=h1 as long,8:=h2 as long, 12:=h3 as long, 16:=h4 as long
 			=ans
-			if ansi then locale oldid
 			set fast
-			
-			Sub PrepareBuffer()
-				
+			function StrPtr(varptr as long)
+				local thatptr as long
+				call GetMem4(varptr, varptr(thatptr))
+				=thatptr
+			end function			
+			Sub PrepareBuffer()				
 				if L-acc>=64 then
-					LoadPart(64)
+					Method message, f, sPtr+acc:acc+=64
 				else.if blocks=1 then
-					return message, 0:=string$(chr$(0),32)
+					message[0]=string$(chr$(0),32)
 					if L-acc=0 and f64 then
-						Return message, 56:=L*8 as long, 60 :=binary.shift(L,-29) as long
+						message[14]=L*8
+						message[15]=binary.shift(L,-29)
 					else
-						Return message, L-acc:=0x80, 56:=L*8 as long, 60 :=binary.shift(L,-29) as long
-						if L>acc then LoadPart(L-acc)
+						message[14]=L*8
+						message[15]=binary.shift(L,-29)
+						LoadPart(L-acc)
 					end if
 				else
-					Return message, L-acc:=0x80
 					LoadPart(L-acc)
 				end if
 			End Sub
 			sub LoadPart(many)
-				// str$() convert to ansi, one byte per character
-				// using 1033 as Ansi language
-				if ansi then
-					Return message, 0:=str$(mid$(message$,1+acc, many))
-				else
-					Return message, 0:=mid$(message$, 1+acc, many)
-				end if
+				Method message, f, sPtr+acc, many
+				Return message, many!:=0x80 as byte
 				acc+=many
 			end sub
 		}
 	}
 	Module TestHash (RIPEMD){
 		Flush
+			oldlocale=locale
+			locale 1033		
 		// push data to stack of values, as fifo (each entry append to end of stack)
-		Data "b3be159860842cebaa7174c8fff0aa9e50a5199f","Rosetta Code"
-		Data "9c1185a5c5e9fc54612808977ee8f548b2258d31",""
-		Data "0bdc9d2d256b3ee9daae347be6f4dc835a467ffe","a"
-		Data "8eb208f7e05d987a9b044a8e98c6b087f15a0bfc","abc"
-		Data "5d0689ef49d2fae572b881b123a85ffa21595f36", "message digest"
-		Data "f71c27109c692c1b56bbdceb5b9d2865b3708dbc","abcdefghijklmnopqrstuvwxyz"
+
+		Data "b3be159860842cebaa7174c8fff0aa9e50a5199f",Str$("Rosetta Code"), 1
+		Data "9c1185a5c5e9fc54612808977ee8f548b2258d31","",1
+		Data "0bdc9d2d256b3ee9daae347be6f4dc835a467ffe",Str$("a"),1
+		Data "8eb208f7e05d987a9b044a8e98c6b087f15a0bfc",Str$("abc"),1
+		Data "5d0689ef49d2fae572b881b123a85ffa21595f36", Str$("message digest"),1
+		Data "f71c27109c692c1b56bbdceb5b9d2865b3708dbc",Str$("abcdefghijklmnopqrstuvwxyz"),1
 		Data "b0e20b6e3116640286ed3a87a5713079b21f5189"
-		Data "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-		Data "9b752e45573d4b39f4dbd3323cab82bf63326bfb", String$("1234567890",8)
-		Data "52783243c1697bdbe16d37f97f68f08325dc1528", String$("a",1000000)
-		
+		Data Str$("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"), 1
+		Data "9b752e45573d4b39f4dbd3323cab82bf63326bfb", String$(Str$("1234567890"),8),1
+		Data "035d252bc6f3bbfd3622a05c02408a6bac7a1c4e", "George the Best - Ελληνικά Unicode", 0
+		Data "eb33e86b2400cc0a11707be717a35a9acf074a58", String$(Str$("a"),10000),1
+		Data "9f8a87a921acaae6f31c2e30464f6acb348ee1cc", String$(Str$("a"),100000),1
+		Data "52783243c1697bdbe16d37f97f68f08325dc1528", String$(Str$("a"),1000000),1
 		While not empty
-			Read check$, text$
-			Print "RIPEMD160 for ";quote$(Left$(if$(len(text$)>30->left$(text$,27)+"...",  text$),30))
+			Read check$, text$, ansi as boolean
+			Print "RIPEMD160 for ";
+			If ansi then
+				Print quote$(Left$(if$(len(text$)>30->chr$(left$(text$,27 as byte))+"...",  chr$(text$)),30)),			
+			else
+				Print quote$(Left$(if$(len(text$)>30->left$(text$,27)+"...",  text$),30)),
+			end if
+			Print " Byte Length = ";len(text$)*2
 			// pass text$ by reference
+			
+			Profiler
 			Display(RIPEMD(&text$))
+			locale oldlocale		
 		End While
 		
 		sub Display(ans)
+			Print TimeCount/1000;"sec"
 			local answer$
 			for i=0 to len(ans)-1
 				answer$+=hex$(eval(ans,i),1)
 			next i
+//				clipboard lcase$(answer$)
 			Print lcase$(answer$)
 			Print lcase$(answer$)=check$: Refresh
 		end sub
 	}
 	TestHash Prepare_RiPeMd_160()
 }
-Print "Press Esc to exit before the end of the last big string 1 million characters"
+Print "Press Esc to exit before the end of the last big string 1 million bytes"
 Checkit
 }
 MODULE DIJKSTRA {Module Dijkstra`s_algorithm {
@@ -20375,23 +20392,26 @@ If Menu>0 Then {
                   Report HelpText$
                   Menu
                   Print @(40);"Choose ";
-                  Menu "Edit Description","Change Group","Pick another","Delete","End"
+                  Menu "Edit Description","Change Group","Pick another","DELETE","End"
                   Cls #edca85,3
                   Pen #3c1414
-                  If Menu=5 Then Exit
-                  if Menu=4 Then
-                          if ask("Delete this word "+EnglishName$)=1 then
-                               try ok  {Delete "HELP2000", "COMMANDS", "ENGLISH", EnglishName$}
-                               try ok {if not ok then Delete "HELP2000", "COMMANDS", "GREEK", EnglishName$
+                  select case Menu
+                  case 5
+                      Exit
+                  case 4
+                          if ask("DELETE this word "+EnglishName$)=1 then
+                               try ok  {DELETE "HELP2000", "COMMANDS", "ENGLISH", EnglishName$}
+                               try ok {if not ok then DELETE "HELP2000", "COMMANDS", "GREEK", EnglishName$
                                if not ok then beep "problem??"
                                }
                            end if
-                  end if
-                  If Menu=3 Then Here = True : Exit
-                  If Menu=2 Then {
+                  case 3
+                      Here = True
+                      Exit
+                  case 2
                         ChangeGroup(EnglishName$)
                         Here = True
-                  } Else {
+                  case else
                         Escape Off
                         Scroll Split Row
                         Cls #0077AA
@@ -20400,13 +20420,18 @@ If Menu>0 Then {
                         Return "HELP2000", "SELECT * FROM [COMMANDS] WHERE ENGLISH LIKE '"+EnglishName$ +"'", ,HelpText$
                         Escape On
                         Here=True  
-                  }
+                  End select
             } Else.If Sel2=1 Then {
                   Print "New"
                   Escape off
                   Input "Greek:", GreekID$
-                  Input "English:", EnglishID$                      
-                  ''Input ! HelpText$, Width-1, Height-Row-2
+                  If GreekID$="" then exit
+                  GreekID$=filter$(GreekID$," )")
+                  If GreekID$="" then exit
+                  Input "English:", EnglishID$
+                  If EnglishID$="" then exit
+                  EnglishID$=filter$(EnglishID$," )")
+                  If EnglishID$="" then exit
                   Scroll Split Row
                   Clear HelpText$    ' we need a fresh one
                   Cls #0077AA
@@ -20422,8 +20447,7 @@ If Menu>0 Then {
             Here =True
             }     
       } Else {
-      ' If is empty delete group
-            Delete "HELP2000","GROUP","GROUPNUM", No(Selection)
+            DELETE "HELP2000","GROUP","GROUPNUM", No(Selection)
       }
 }
 If Here Then Loop
@@ -20550,7 +20574,6 @@ Document GreekInfo$, EnglishInfo$, GroupInfo$, AllGreek$, AllEnglish$
 Dir AppDir$
 stp$=","+chrcode$(160)
 Execute "HELP2000", "DELETE FROM COMMANDS WHERE GROUPNUM =22;"
-\\ Retrieve "HELP2000","GROUP", 1,"",""
       For i=1 To myGroups {
            EnglishInfo$= RightPart$(name$(i),stp$)
            GreekInfo$= LeftPart$(name$(i),stp$)
@@ -34413,7 +34436,10 @@ Sub GetRandom()
 End sub
 }
 MODULE ZIPWORK {Cls, 0
-Declare zip compressor
+Declare withevents  zip compressor
+function zip_TotalSize (new a) {	
+	Print "Size:=";a
+}	
 Print type$(zip)
 a$={
 	hello there
@@ -42068,7 +42094,7 @@ module MapRange {
 }
 MapRange
 }
-MODULE VARPTR {// msvbvm60.dll exist in all versions of Windows. It is the runtime companion for every Visual Basic 6 program
+MODULE VARPTR1 {// msvbvm60.dll exist in all versions of Windows. It is the runtime companion for every Visual Basic 6 program
 // M2000 Environament is a VB6 program (so run with this companion)
 // this library is not a virtual machine. This program compile for maximum speed (is a 32 bit application)
 // Although is 32bit, can handle files above 2GBytes, but the limit of memory is at the 2GBytes.
@@ -48341,7 +48367,7 @@ INTERFACE ITypeInfo, "{00020401-0000-0000-C000-000000000046}" {
 	GetImplTypeFlags
 	GetIDsOfNames
 	Invoke
-	GetDocumentation
+	GetDocumentation : {LONG memid,  Long pBstrName, LONG BstrDocString, LONG pdwHelpContext, LONG  pBstrHelpFile}
 	GetDllEntry
 	GetRefTypeInfo
 	AddressOfMember
@@ -48370,6 +48396,10 @@ LONG ppTypeAttr
 hex Idispatch.GetTypeInfo(newList, 0&, 0&, &oTypeInfo)
 ret11= iTypeInfo.GetTypeAttr(oTypeInfo, VarPtr(ppTypeAttr))
 hex ret11
+ret$=""
+Print ITypeInfo.GetDocumentation(oTypeInfo, -1&, varptr(ret$), 0&,0&,0&)
+Pen 11 {Print "Type from ITypeInfo.GetDocumentation:";ret$}
+
 const TKIND_DISPATCH=4&
 if ret11=0 then
 	print "ok", ppTypeAttr
@@ -48423,9 +48453,9 @@ sub IDLfromString(riid as buffer, st$)
 end sub
 }
 MODULE INTER1 {GLOBAL ENUM HRESULT {
-	S_OK						= 0&  ' long type
+	S_OK						= 0&  ' LONG type
 	S_FALSE						= 1&
-	E_NOTIMPL					= &H80004001& ' long type hexadecimal signed
+	E_NOTIMPL					= &H80004001& ' LONG type hexadecimal signed
 	E_NOINTERFACE				= &H80004002&
 	E_POINTER					= &H80004003&
 	E_ABORT						= &H80004004&
@@ -48496,7 +48526,7 @@ public:
 		GetImplTypeFlags
 		GetIDsOfNames
 		Invoke
-		GetDocumentation
+		GetDocumentation : {LONG memid,  Long pBstrName, LONG BstrDocString, LONG pdwHelpContext, LONG  pBstrHelpFile}
 		GetDllEntry
 		GetRefTypeInfo
 		AddressOfMember
@@ -48555,15 +48585,18 @@ IF Z=>IUnknown.QueryInterface(k, riid(0), varptr(ptr))=S_OK then
 	PRINT "ptr is k  = "; ptr is k
 	DIM ret(10) as object
 	PRINT z=>Idispatch.GetTypeInfo(ptr, 0&, LCID_DEF, varptr(ret(0)))
-	PRINT type$(ret(0))
+	PEN 10 {PRINT "Type from type$():";type$(ret(0))}
+	ret$=""
+	PRINT z=>ITypeInfo.GetDocumentation(ret(0), -1&, varptr(ret$), 0&,0&,0&)
+	PEN 11 {PRINT "Type from ITypeInfo.GetDocumentation:";ret$}
 	LONG ppTypeAttr
 	// we don't pass varptr(ppTypeAttr)
 	// we change the signature to pass by reference
-	// but the actual signature of this function is a pointer to long.
+	// but the actual signature of this function is a pointer to LONG.
 	// so passing by refernece, M2000 pass the Varptr of  ppTypeAttr
 	// we can't pass now Varptr(ppTypeAttr) because expect the by reference data
 	// &ppTypeAttr is actually a string, which have the full name of the variable.
-	ret11= z=>iTypeInfo.GetTypeAttr(ret(0), &ppTypeAttr)
+	ret11= z=>ITypeInfo.GetTypeAttr(ret(0), &ppTypeAttr)
 	HEX ret11
 	IF ret11=S_OK THEN
 		PRINT "ok", ppTypeAttr
@@ -48579,7 +48612,7 @@ IF Z=>IUnknown.QueryInterface(k, riid(0), varptr(ptr))=S_OK then
 			' so now make a buffer placing the bytes.
 			' this is a type of casting (sending bytes in a string)
 			PRINT .getClassId(copyAttr|riid)
-			call void  .iTypeInfo.ReleaseTypeAttr(ret(0), ppTypeAttr)
+			call void  .ITypeInfo.ReleaseTypeAttr(ret(0), ppTypeAttr)
 		}
 		PRINT "released ok"
 	ELSE
@@ -50084,7 +50117,7 @@ method InpAngleX, "FontAttr", f$, 26
 method InpAngley, "FontAttr",  f$, 26
 method InpAngleZ, "FontAttr",  f$, 26
 method form1, "AccKey",  "Q",alt:=true, opcode:=100615*2  ' altQ send alt+F4
-method form1, "AccKey",  chr$(27), opcode:=100615*2  ' space send alt+F4
+method form1, "AccKey",  chr$(27), opcode:=100615*2  ' Escape send alt+F4
 method InpAngleX, "Transparent"
 method InpAngley, "Transparent"
 method InpAngleZ, "Transparent"
@@ -50095,8 +50128,12 @@ With InpAngleX, "prompt", "X: ", "Value" as angleX, "VarText" as spX$, "ThisKind
 With InpAngleY, "prompt", "Y: ", "Value" as angleY, "VarText" as spY$, "ThisKind2","°"
 With InpAngleZ, "prompt", "Z: ", "Value" as angleZ, "VarText" as spZ$,"ThisKind2","°"
 method InpAngleX, "AccKey",  "X", opcode:=1
+method InpAngleX, "AccKey",  chr$(27), opcode:=100615*2  ' Escape send alt+F4
 method InpAngleY, "AccKey",  "Y", opcode:=1
+method InpAngleY, "AccKey",  chr$(27), opcode:=100615*2  ' Escape send alt+F4
 method InpAngleZ, "AccKey",  "Z", opcode:=1
+method InpAngleZ, "AccKey",  chr$(27), opcode:=100615*2  ' Escape send alt+F4
+
 method Form1, "AccKey",  chr$(13), opcode:=1
 With image1, "TabStop", false,  "ToolTip" as ToolTip$
 ToolTip$="Click to Stop"
@@ -52924,5 +52961,87 @@ print
 }
 Πένα 11 {Ελληνικά_Τετραδόνιο1}
 locale oldlocale
+}
+MODULE SUPERSCRIPT {Module SupSub_Script_Example (locale1=1033) {
+  OldLocale=Locale
+  Locale Locale1 ' works for 1032 too
+  Print Part "A";SupScript(-12345.06789e-100)
+  Print
+  N=12
+  Print Part "C";SubScript(N);"H";SubScript(2*N+2)
+  Print
+  Print Part "Rational = ";SupScript(123);"/";SubScript(456)
+  Print
+  Print Part "Just Subscript = A";SubScript(-12345.06789e-100)
+  Print
+  Locale OldLocale
+  Function SubScript(x)
+    local string r
+    local s=""+x, i
+    for i=1 to len(s)
+      n=val(mid$(s,i,1))
+      select case mid$(s,i,1)
+      case "E"
+        r+=chrcode$(0x1D07 ) '  chrcode$(0x1D49)
+      case ","
+        r+=","
+      case "."
+        r+="."  
+      case "-"
+        r+=chrcode$(0x208B)
+      case "+"
+        r+=chrcode$(0x208a)
+      case else
+        r+=chrcode$(0x2080+n)
+      end select
+    next
+    =r
+  End Function
+  Function SupScript(x)
+    local string r
+    local s=""+x, i
+    for i=1 to len(s)
+      n=val(mid$(s,i,1))
+      select case mid$(s,i,1)
+      case "1"
+        r+=chrcode$(0x00B9)
+      case "2","3"
+        r+=chrcode$(0x00B0+n)
+      case "E"
+        r+=chrcode$(0x1D31 ) '  chrcode$(0x1D49)
+      case ","
+        r+=chrcode$(0x02D2)
+      case "."
+        r+=chrcode$(0x22C5)    
+      case "-"
+        r+=chrcode$(0x207b)
+      case "+"
+        r+=chrcode$(0x207a)
+      case else
+        r+=chrcode$(0x2070+n)
+      end select
+    next
+    =r
+  End Function
+}
+If Mode<>14 then font "Arial New": Mode 14
+Report 2, "Using comma for decimal separator - Locale 1032"
+SupSub_Script_Example 1032
+Print
+Report 2, "Using  dot for decimal separator - Locale 1033"
+SupSub_Script_Example 1033
+Print
+Italics
+Print Part ~(11);"Double Height:"
+Print
+Italics
+Double
+Report 2, "Using comma for decimal separator - Locale 1032"
+SupSub_Script_Example 1032
+Print
+Report 2, "Using  dot for decimal separator - Locale 1033"
+SupSub_Script_Example 1033
+Normal
+If module(Infobasic) then Pen 15 {Report 2, "Press F3"}
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

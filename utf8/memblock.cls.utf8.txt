@@ -31,7 +31,7 @@ Private Type METAFILEPICT
 End Type
 Private Type PWMFRect16
     Left   As Integer
-    Top    As Integer
+    top    As Integer
     Right  As Integer
     Bottom As Integer
 End Type
@@ -68,8 +68,9 @@ Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nSize As Long, lpD
 Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
+Private Declare Sub FillMemory Lib "kernel32" Alias "RtlFillMemory" (Destination As Any, ByVal Length As Long, ByVal Fill As Byte)
 Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
@@ -298,9 +299,9 @@ Public Property Get NoRun() As Boolean
 NoRun = mExecBloc
 End Property
 
-Public Function PutStringAtOffset(addr As Variant, AnyString As String) As Variant
+Public Function PutStringAtOffset(Addr As Variant, AnyString As String) As Variant
 Dim Offset
-Offset = uintnew(addr) - uintnew(mPtr)
+Offset = uintnew(Addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + 3 >= mitems * itemlen Then
         ErrorMes = 4
@@ -322,9 +323,9 @@ Else
     PutStringAtOffset = 0  ' null
 End If
 End Function
-Public Function GetStringFromOffset(addr As Variant, AnyString As String) As Variant
+Public Function GetStringFromOffset(Addr As Variant, AnyString As String) As Variant
 Dim Offset
-Offset = uintnew(addr) - uintnew(mPtr)
+Offset = uintnew(Addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + 3 >= mitems * itemlen Then
         ErrorMes = 4
@@ -339,12 +340,12 @@ If ErrorMes = 0 And mitems > 0 Then
            AnyString = .Value
            GetStringFromOffset = .StrPointer
         Else
-            If MemLong(addr) = 0 Then
+            If MemLong(Addr) = 0 Then
             AnyString = vbNullString
             Else
             AnyString = "Crash"
             End If
-            GetStringFromOffset = addr
+            GetStringFromOffset = Addr
         End If
         .Done = False
         End With
@@ -356,9 +357,9 @@ Else
 End If
 
 End Function
-Public Function GetData1(f As Long, addr, lengthInBytes As Long) As Boolean
+Public Function GetData1(f As Long, Addr, lengthInBytes As Long) As Boolean
 Dim Offset, place
-Offset = uintnew(addr) - uintnew(mPtr)
+Offset = uintnew(Addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + lengthInBytes - 1 >= mitems * itemlen Then
         ErrorMes = 4
@@ -371,7 +372,7 @@ If ErrorMes = 0 And mitems > 0 Then
         .cDims = 1
         .onebound(0).lLbound = 0
         .onebound(0).cElements = lengthInBytes
-        .pvData = addr
+        .pvData = Addr
     End With
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
 
@@ -390,15 +391,15 @@ there:
 End If
         
 End Function
-Public Function GetData(f As Long, ByVal addr, lengthInBytes As Long) As Boolean
+Public Function GetData(f As Long, ByVal Addr, lengthInBytes As Long) As Boolean
 Dim Offset, range
-range = uintnew(addr) - uintnew1(GetPtr(0))
+range = uintnew(Addr) - uintnew1(GetPtr(0))
 If range < 0 Or range >= mitems * itemlen Then
         ErrorMes = 4
         GetData = False
         Exit Function
 End If
-Offset = uintnew(addr) - uintnew(mPtr)
+Offset = uintnew(Addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + lengthInBytes - 1 >= (mitems * itemlen - range) Then
         ErrorMes = 4
@@ -408,7 +409,7 @@ If ErrorMes = 0 And mitems > 0 Then
         Dim FH As Long
         FH = Module10.ReadFileHandler(CLng(f))
         If FH = 0 Then Exit Function
-        Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(addr)
+        Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(Addr)
         GetData = True
         Exit Function
   End If
@@ -449,15 +450,15 @@ there:
         
 
 End Function
-Public Function putData(f As Long, addr, lengthInBytes As Long) As Boolean
+Public Function putData(f As Long, Addr, lengthInBytes As Long) As Boolean
 Dim Offset, place, range
-range = uintnew(addr) - uintnew1(GetPtr(0))
+range = uintnew(Addr) - uintnew1(GetPtr(0))
 If range < 0 Or range >= mitems * itemlen Then
         ErrorMes = 4
         putData = False
         Exit Function
 End If
-Offset = uintnew(addr) - uintnew(mPtr)
+Offset = uintnew(Addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + lengthInBytes - 1 >= mitems * itemlen Then
         ErrorMes = 4
@@ -470,7 +471,7 @@ If ErrorMes = 0 And mitems > 0 Then
         .cDims = 1
         .onebound(0).lLbound = 0
         .onebound(0).cElements = lengthInBytes
-        .pvData = addr
+        .pvData = Addr
     End With
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
         place = 1
@@ -843,7 +844,7 @@ Public Sub SentToClipBoard(Optional pWidth As Long = -1, Optional ByVal pHeight 
         MyEr "Not a proper picture to send it to clipboard", "Δεν είναι μια σωστή εικόνα για να τη στείλω στο πρόχειρο"
         Exit Sub
     End If
-    If mm.handle <> 0 Then
+    If mm.Handle <> 0 Then
         If (OpenClipboard(Form1.hWnd) <> 0) Then
            If EmptyClipboard Then
                 If mm.Type = 2 Then
@@ -852,9 +853,9 @@ Public Sub SentToClipBoard(Optional pWidth As Long = -1, Optional ByVal pHeight 
                         DeleteEnhMetaFile hEmf
                     End If
                 ElseIf mm.Type = 4 Then
-                    SetClipboardData 14, mm.handle
+                    SetClipboardData 14, mm.Handle
                 Else
-                    SetClipboardData 2, mm.handle
+                    SetClipboardData 2, mm.Handle
                 End If
             End If
             CloseClipboard
@@ -949,10 +950,10 @@ Private Function getEmf(Wmf As StdPicture) As Long
  
  Dim bytes As Long
 Dim Buffer() As Byte
-   bytes = GetMetaFileBitsEx(Wmf.handle, bytes, ByVal 0&)
+   bytes = GetMetaFileBitsEx(Wmf.Handle, bytes, ByVal 0&)
  If bytes Then
 ReDim Buffer(1 To bytes) As Byte
-Call GetMetaFileBitsEx(Wmf.handle, bytes, Buffer(1))
+Call GetMetaFileBitsEx(Wmf.Handle, bytes, Buffer(1))
 Else
 
 Exit Function
@@ -1015,17 +1016,17 @@ If w2 <> -1 Then w2 = w2 / dv15
     Set CreateFromPicture = Handler
     
 End Function
-Function CopyItem(ByVal that As Long, Done As Boolean) As MemBlock
+Function CopyItem(ByVal That As Long, Done As Boolean) As MemBlock
     If mSubtype > 0 Then
         ErrorMes = 4
         Done = False
         Exit Function
     End If
-    that = GetPtr(that)
+    That = GetPtr(That)
     If ErrorMes = 0 Then
         Set CopyItem = New MemBlock
         CopyItem.Construct (itemlen), 1, , , (BasicItem)
-        CopyMemory ByVal CopyItem.GetPtr(0), ByVal that, itemlen
+        CopyMemory ByVal CopyItem.GetPtr(0), ByVal That, itemlen
         CopyItem.UseStruct = Me.UseStruct
         If UseStruct Then
             Set CopyItem.structref = Me.structref
@@ -1034,7 +1035,7 @@ Function CopyItem(ByVal that As Long, Done As Boolean) As MemBlock
         If Not Strings Is Nothing Then
         Dim i As Long
         Dim Soff As Long, dif As Long
-        Soff = that - GetPtr(0)
+        Soff = That - GetPtr(0)
         For i = 0 To Strings.Count - 1
             Strings.index = i
             Strings.Done = True
@@ -1084,24 +1085,33 @@ Friend Sub ClearStringPartial(ByVal start_addr As Long, ByVal that_length As Lon
         Next i
     End If
 End Sub
-Sub FillDataFromMem(ByVal that As Long)
+Sub FillDataFromMem(ByVal That As Long, Optional ByVal bytestocopy As Long = -1)
     If BasicItem = vbString Or mSubtype > 0 Or Not mExecBloc Then
         MyEr "Not for this type if buffer", "όχι για αυτή τη διάρθρωση"
         Exit Sub
     End If
     If ErrorMes = 0 Then
-        CopyMemory ByVal GetPtr(0), ByVal that, mBytes
+        If bytestocopy = -1 Then
+            CopyMemory ByVal GetPtr(0), ByVal That, mBytes
+        ElseIf bytestocopy > 0 And bytestocopy <= mBytes Then
+            CopyMemory ByVal GetPtr(0), ByVal That, bytestocopy
+        End If
     End If
 End Sub
-
-Function CopyItemString(ByVal that As Long, ByVal bytes As Long, Done As Boolean) As String
+Sub Clear()
+    FillMemory ByVal GetPtr(0), mBytes, CByte(0)
+End Sub
+Sub FillByte(Optional ByVal That As Byte = 0)
+    FillMemory ByVal GetPtr(0), mBytes, That
+End Sub
+Function CopyItemString(ByVal That As Long, ByVal bytes As Long, Done As Boolean) As String
     If BasicItem = vbString Or mSubtype > 0 Then
         Done = False
         Exit Function
     End If
     If bytes <= 0 Then bytes = itemlen
-    If ValidArea2(that, bytes) Then
-    that = GetPtr(that)
+    If ValidArea2(That, bytes) Then
+    That = GetPtr(That)
     If ErrorMes = 0 Then
         Dim place As Long
         If bytes Mod 2 = 1 Then
@@ -1110,7 +1120,7 @@ Function CopyItemString(ByVal that As Long, ByVal bytes As Long, Done As Boolean
             CopyItemString = String$((bytes + 1) \ 2, Chr(0))
         End If
         
-        CopyMemory ByVal StrPtr(CopyItemString), ByVal that, bytes
+        CopyMemory ByVal StrPtr(CopyItemString), ByVal That, bytes
         Done = True
     End If
     End If
