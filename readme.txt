@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 Version 14 Revision 44
 
-I fix an error from revision 40. I forgot to fix Interpreter for constant objects and a lambda function. The Interpreter find the constant (is an object of type constant) and then use this object to pass arguments x, y to the default property. That is fault. So I change it, so now Interpret skip this object and then find the function L() and we get the result as expected. Previous revisions are ok because the did nothing for any object, except the Inventory object.
+I fixed an error from revision 40. I forgot to fix Interpreter for constant objects and a lambda function. The Interpreter finds the constant (is an object of type constant) and then uses this object to pass arguments x, y to the default property. That is fault. So, I changed it, so now Interpret skips this object and then find the function L() and we get the result as expected. Previous revisions are ok because they did nothing for any object, except the Inventory object.
 
 This is the code:
 Const L=Lambda (x, y)->x^y
