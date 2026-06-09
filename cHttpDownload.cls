@@ -280,7 +280,7 @@ Private Function pvRecvHeaders(baBuffer() As Byte) As Boolean
     sHeaders = m_oSocket.FromTextArray(m_baFileBuffer, ucsScpAcp) & m_oSocket.FromTextArray(baBuffer, ucsScpAcp)
     lPos = InStr(sHeaders, STR_DELIM)
     If lPos > 0 Then
-        vSplit = split(Left$(sHeaders, lPos), vbCrLf)
+        vSplit = Split(Left$(sHeaders, lPos), vbCrLf)
         Select Case CLng(val(Mid$(vSplit(0), 10, 3)))
         Case 200 To 299
 TryDownload:
@@ -448,7 +448,7 @@ Private Function pvSendComplete(baBuffer() As Byte) As Boolean
     sHeaders = m_oSocket.FromTextArray(baBuffer, ucsScpAcp)
     lPos = InStr(sHeaders, STR_DELIM)
     If lPos > 0 Then
-        vSplit = split(Left$(sHeaders, lPos), vbCrLf)
+        vSplit = Split(Left$(sHeaders, lPos), vbCrLf)
         Select Case CLng(val(Mid$(vSplit(0), 10, 3)))
         Case 200 To 299, 300 To 399
             m_sBody = Mid$(sHeaders, lPos + Len(STR_DELIM))

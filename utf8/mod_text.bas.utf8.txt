@@ -97,7 +97,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 44
+Global Const Revision = 45
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -44449,8 +44449,32 @@ reentry1:
              '   If Not bstack.lastobj Is Nothing Then GoTo conthere
                 Exit Function
             Else
-            a$ = Mid$(a$, w1 + 1 - Len(s$))
-            GoTo getgroup
+                If Not bstack.lastobj Is Nothing Then
+                    a$ = Mid$(a$, w1 + 1 - Len(s$))
+                    
+                    GoTo getgroup
+                Else
+                    w2 = w1
+                    If MaybeIsSymbol3(a$, ")", w1) Then
+                        
+                        If IsNumberNew(bstack, a$, r, False) Then
+                        FastSymbol a$, ")"
+                        IsEval = True
+                        End If
+                        Exit Function
+                    ElseIf Mid$(a$, w1, 1) = "," Then
+                        If w1 > w3 Then Mid$(a$, w1, 1) = " "
+                        Mid$(a$, w2, 1) = "("
+                        If IsNumberNew(bstack, a$, r, False) Then
+                        IsEval = True
+                        End If
+                        Exit Function
+                        
+                    Else
+                        IsEval = False
+                        Exit Function
+                    End If
+                End If
             End If
     ElseIf IsExp(bstack, ss$, p) Then
     If Len(ss$) > 0 Then Mid$(a$, w1 + 1 - Len(ss$), Len(ss$)) = ss$
@@ -44863,6 +44887,7 @@ getgroup2:
             End If
           End If
         ElseIf Typename(bstack.lastobj) = mGroup Then
+checkme:
         Set ThisGroup = bstack.lastobj
         If ThisGroup.IamApointer Then
                 Set bstack.lastobj = ThisGroup
@@ -46123,7 +46148,14 @@ contGe:
                 Set bstack.lastobj = var(w1)
                 Set bstack.lastpointer = var(w1)
                 Else
+                If var(w1).IamFloatGroup Then
+                
                 Set IsGroupOnly = var(w1)
+                Else
+                    Set bstack.lastobj = Nothing
+            
+                
+                End If
         End If
         CheckGroupOrPointer = True
         Exit Function

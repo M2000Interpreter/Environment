@@ -1,11 +1,19 @@
 M2000 Interpreter and Environment
-Version 14 Revision 44
+Version 14 Revision 45
 
-I fixed an error from revision 40. I forgot to fix Interpreter for constant objects and a lambda function. The Interpreter finds the constant (is an object of type constant) and then uses this object to pass arguments x, y to the default property. That is fault. So, I changed it, so now Interpret skips this object and then find the function L() and we get the result as expected. Previous revisions are ok because they did nothing for any object, except the Inventory object.
+A tiny fix, Eval(GroupObject) when GroupObject is a static group.
 
-This is the code:
-Const L=Lambda (x, y)->x^y
-Print L(2,3)=8  ' her was the error
+Class Alfa {
+Private:
+	{read z as double}
+	k=z
+Public:
+	value (n) {=n*.k}
+}
+M=Alfa(100)
+Print M(3)=300
+Print Eval(M, 3)=300 ' <<< this fixed
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
