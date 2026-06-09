@@ -97,7 +97,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 43
+Global Const Revision = 44
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -23332,6 +23332,10 @@ checkgroup:
                         Exit Function
                     ElseIf TypeOf var(k) Is lambda Then
                     ElseIf MyIsObject(var(k)) And Not noobj Then
+                        If TypeOf var(k) Is Constant Then
+                            neoGetArray = False
+                            Exit Function
+                        End If
                     
 getnewprop:
                         Dim neoProp As PropReference

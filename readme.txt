@@ -1,71 +1,11 @@
 M2000 Interpreter and Environment
-Version 14 Revision 43
+Version 14 Revision 44
 
-Fix English Case and Greek Με when use semi boolean function, like Case <50
-Interpreter see < after Case and believe is not a command at Flow Execution level (as in Select Case, for cases)
-So now I fix it by intercept the error and reroute it. Also I found another bug in Select Case and now is ok.  
-This is the test code:
+I fix an error from revision 40. I forgot to fix Interpreter for constant objects and a lambda function. The Interpreter find the constant (is an object of type constant) and then use this object to pass arguments x, y to the default property. That is fault. So I change it, so now Interpret skip this object and then find the function L() and we get the result as expected. Previous revisions are ok because the did nothing for any object, except the Inventory object.
 
-tuple=(100, 200, 77, 500, 1005, -20, 75, 90)
-Case=100  ' this is a variable
-for i=1 to 100
-    x=tuple#Val(Random(0,7))
-    LIST
-    Print "x=";x
-    Select Case x
-    Case 100, 200
-        Print "One line1"
-        Print "One line2"
-    Case 1000, 500
-    		x+=10
-    Case <50
-    {
-        x++
-    }
-    Case 70 έως 80
-  			Select Case x
-  			Case 73
-  	      	x/=10
-  	    Case Else
-  	    		x|Υπόλ 10
-  	    End Select
-    Case Else
-        x-=50
-    End Select
-    Print "Export x=";x, Case=100, i
-next 
-
-// This is the Greek Version:
-
-Π=(100, 200, 77, 500, 1005, -20, 75, 90)
-Για ι=1 εως 100
-  	Με=100
-  	Χ=Π#Τιμή(Τυχαίος(0,7))
-  	Λίστα	
-  	Τύπωσε "Χ=";Χ
-  	Επίλεξε Με Χ
-  	Με 100, 200
-        Τύπωσε "Σε μια γραμμή1"
-        Τύπωσε "Σε μια γραμμή2"
-  	Με 1000, 500
-  			Χ+=10
-  	Με <50
-    {
-        Χ++
-    }
-  	Με 70 έως 80
-  			Επίλεξε Με Χ
-  			Με 73
-  	        Χ/=10
-  	    Με Αλλιώς
-  	        Χ|Υπόλ 10
-  	    Τέλος Επιλογής
-  	Με Αλλιώς
-  	    Χ-=50
-  	Τέλος Επιλογής
-  	Τύπωσε "Εξαγωγή Χ=";Χ, Με=100, ι
-Επόμενο
-
+This is the code:
+Const L=Lambda (x, y)->x^y
+Print L(2,3)=8  ' her was the error
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
