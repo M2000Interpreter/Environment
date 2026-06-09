@@ -18100,9 +18100,25 @@ If IsExp(bstack, a$, p) Then
         With usehandler
             If TypeOf .objref Is FastCollection Then
                 If FastSymbol(a$, ",") Then
-                    If IsExp(bstack, a$, p, , True) Then
+                    If IsExp(bstack, a$, p) Then
+                        If Not bstack.lastobj Is Nothing Then
+                            If TypeOf bstack.lastobj Is mHandler Then
+                                If bstack.lastobj.t1 = 4 Then
+                                    Set bstack.lastobj = Nothing
+                                    GoTo noenum
+                                End If
+                            ElseIf TypeOf bstack.lastobj Is BigInteger Then
+                                p = bstack.lastobj.AnyBaseOuput(10)
+                                Set bstack.lastobj = Nothing
+                                GoTo noenum
+                            End If
+                            MyEr "No Object Allowed for Key", "Δεν επιτρέπεται αντικείμενο για κλειδί"
+                            Set bstack.lastobj = Nothing
+                            Exit Function
+                        End If
+noenum:
                         If myVarType(p, vbString) Then
-                            s$ = p
+                            SwapString2Variant s$, p
                             GoTo j5884
                         End If
                         If FastSymbol(a$, ",") Then

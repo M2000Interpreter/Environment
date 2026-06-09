@@ -1,12 +1,71 @@
 M2000 Interpreter and Environment
-Version 14 Revision 42
+Version 14 Revision 43
 
-1) Fix DELETE statement for Databases and for Lists (for using BigInteger as keys).
-2) Fix Append & Return for Lists for BigIntegers as keys
-3) Call FunctionFromLib can be called without parenthesis
-4) More speed when we call modules, normal functions and lambda functions.
-5) Crypto example in Info Updated using new funtionallity for Buffers.
- 
+Fix English Case and Greek Με when use semi boolean function, like Case <50
+Interpreter see < after Case and believe is not a command at Flow Execution level (as in Select Case, for cases)
+So now I fix it by intercept the error and reroute it. Also I found another bug in Select Case and now is ok.  
+This is the test code:
+
+tuple=(100, 200, 77, 500, 1005, -20, 75, 90)
+Case=100  ' this is a variable
+for i=1 to 100
+    x=tuple#Val(Random(0,7))
+    LIST
+    Print "x=";x
+    Select Case x
+    Case 100, 200
+        Print "One line1"
+        Print "One line2"
+    Case 1000, 500
+    		x+=10
+    Case <50
+    {
+        x++
+    }
+    Case 70 έως 80
+  			Select Case x
+  			Case 73
+  	      	x/=10
+  	    Case Else
+  	    		x|Υπόλ 10
+  	    End Select
+    Case Else
+        x-=50
+    End Select
+    Print "Export x=";x, Case=100, i
+next 
+
+// This is the Greek Version:
+
+Π=(100, 200, 77, 500, 1005, -20, 75, 90)
+Για ι=1 εως 100
+  	Με=100
+  	Χ=Π#Τιμή(Τυχαίος(0,7))
+  	Λίστα	
+  	Τύπωσε "Χ=";Χ
+  	Επίλεξε Με Χ
+  	Με 100, 200
+        Τύπωσε "Σε μια γραμμή1"
+        Τύπωσε "Σε μια γραμμή2"
+  	Με 1000, 500
+  			Χ+=10
+  	Με <50
+    {
+        Χ++
+    }
+  	Με 70 έως 80
+  			Επίλεξε Με Χ
+  			Με 73
+  	        Χ/=10
+  	    Με Αλλιώς
+  	        Χ|Υπόλ 10
+  	    Τέλος Επιλογής
+  	Με Αλλιώς
+  	    Χ-=50
+  	Τέλος Επιλογής
+  	Τύπωσε "Εξαγωγή Χ=";Χ, Με=100, ι
+Επόμενο
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

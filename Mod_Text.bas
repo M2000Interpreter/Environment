@@ -97,7 +97,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 42
+Global Const Revision = 43
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -16904,7 +16904,6 @@ ContEnd:
                     Exit Function
                 ElseIf IsLabelSymbolNewExp(b$, "епикоцгс", "SELECT", Lang, W$) Then
                     If HaveMarkSel(bstack) Then
-                        DropMarkSel bstack
                         Execute = 51
                         once = True
                         Exit Function
@@ -16987,12 +16986,8 @@ exitfor:
                 Else
 exitfromhere:
                     If Execute <> 2 Then Execute = 1 Else Execute = 3
-                   restartmodule = False
+                    restartmodule = False
                     If HaveMarkSel(bstack) Then
-                    '    DropMarkSel bstack
-                    '    While HaveMarkSel(bstack)
-                    '    DropMarkSel bstack
-                    '    Wend
                         Execute = 51
                     End If
                     b$ = vbNullString
@@ -20261,7 +20256,20 @@ parsecommand:
     ' ss$
     
     If Not Identifier(bstack, W$, b$, iscom, Lang, ss$) Then
-    
+        If W$ = "ле" Then  ' ле <100
+            If HaveMarkSelGr(bstack) Then
+                loopthis = IsLabelSymbolNew(b$, "аккиыс", "", 0)  ' we return as case or case else
+                Execute = 100
+                Exit Function
+            End If
+        ElseIf W$ = "CASE" Then
+                If HaveMarkSelEn(bstack) Then
+                    loopthis = IsLabelSymbolNew(b$, "", "ELSE", 1) ' we return as case or case else
+                    Execute = 100
+                    Exit Function
+                End If
+        End If
+        
         If NERR Then NOEXECUTION = True
         If LastErNum1 = 0 Then
             If Len(ss$) > 0 Then
@@ -22142,8 +22150,18 @@ Case "SCORE", "жымг"
 Case "TARGETS", "стовои"
     Identifier = ProcTargets(basestack, rest$, Lang)
     Exit Function
+Case "CASE"
+    'If HaveMarkSelEn(basestack) Then
+        Identifier = False
+    
+    'End If
+    Exit Function
 Case "WITH", "ле", "ле.амтийеилемо"
-    Identifier = MyWith(basestack, rest$, Lang)
+    If HaveMarkSelGr(basestack) Then
+        Identifier = False
+    Else
+        Identifier = MyWith(basestack, rest$, Lang)
+    End If
     Exit Function
 Case "METHOD", "леходос"
     Identifier = MyMethod(basestack, rest$, Lang, False, False)

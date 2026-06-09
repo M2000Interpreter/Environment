@@ -97,7 +97,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 42
+Global Const Revision = 43
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -20261,7 +20261,14 @@ parsecommand:
     ' ss$
     
     If Not Identifier(bstack, W$, b$, iscom, Lang, ss$) Then
-    
+        If W$ = "ΜΕ" Then  ' ΜΕ <100
+            If HaveMarkSelGr(bstack) Then
+                loopthis = IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "", 0)  ' we return as case or case else
+                Execute = 100
+                Exit Function
+            End If
+        End If
+        
         If NERR Then NOEXECUTION = True
         If LastErNum1 = 0 Then
             If Len(ss$) > 0 Then
@@ -22143,7 +22150,11 @@ Case "TARGETS", "ΣΤΟΧΟΙ"
     Identifier = ProcTargets(basestack, rest$, Lang)
     Exit Function
 Case "WITH", "ΜΕ", "ΜΕ.ΑΝΤΙΚΕΙΜΕΝΟ"
-    Identifier = MyWith(basestack, rest$, Lang)
+                If HaveMarkSelGr(basestack) Then
+                    Identifier = False
+                Else
+                    Identifier = MyWith(basestack, rest$, Lang)
+                End If
     Exit Function
 Case "METHOD", "ΜΕΘΟΔΟΣ"
     Identifier = MyMethod(basestack, rest$, Lang, False, False)
