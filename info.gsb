@@ -48225,27 +48225,17 @@ IF NOT CANOPEN THEN PRINT "CLOSE FILE MyTest.xlsx": EXIT
 // Declare can arranged with WithEvents
 //DECLARE ExcelSheet.Application "Excel.Application"
 ExcelSheet.Application=GetObject("", "Excel.Application")
-With ExcelSheet.Application, "Workbooks" as WorkBooks
-With ExcelSheet.Application, "ActiveWorkbook" as ActiveWorkbook
-//? type$(WorkBooks)
-//	METHOD WorkBooks, "Open", dir$+"MyTest.xlsx"
+WorkBooks=ExcelSheet.Application=>Workbooks
+ActiveWorkbook=ExcelSheet.Application=>ActiveWorkbook
 WorkBooks=>Open dir$+"MyTest.xlsx"
-//	WITH ExcelSheet.Application, "cells" as cells()
 cells=ExcelSheet.Application=>cells
-WITH ExcelSheet.Application, "ActiveSheet" as ActiveSheet
-WITH ActiveSheet, "name" as Sheet.Name$
-WITH ActiveSheet, "Columns" set Columns ("A:E")
-//WITH ActiveSheet, "Range"  set  Range ("D1:D4")
+ActiveSheet=ExcelSheet.Application=>ActiveSheet
+Columns=ActiveSheet=>Columns("A:E")^  ' return the object Range
 Range=ActiveSheet=>Range("D1:D4")^  ' return the object Range
-//	WITH Range, "Value" as Range.Value, "Value" as Range.Value$
-PRINT  Sheet.Name$
-//	Range.Value$="Approved"
-Range=>Value="Approved"
-//	WITH ActiveSheet, "Range"  set  Range ("E1:E4")
-//	Range.Value=TODAY
-ActiveSheet=>Range("E1:E4")=>value=TODAY
+PRINT  ActiveSheet=>name
+Range=>value="Approved"
+ActiveSheet=>Range("E1:E4")=TODAY
 cells(4,3)=NOW
-//METHOD Columns, "AutoFit"
 Columns=>AutoFit
 
 ' TO NOT OPEN THE "OVERWRITE ALERT"
@@ -53043,5 +53033,15 @@ Report 2, "Using  dot for decimal separator - Locale 1033"
 SupSub_Script_Example 1033
 Normal
 If module(Infobasic) then Pen 15 {Report 2, "Press F3"}
+}
+MODULE BABY {? "Sleep Baby..."
+volume 40
+tempo=900
+// C4 PLAY OCTAVE C 4 at tempo duration, or if we use @2 play 1/2^(2-1)=1/2  
+Score 1, tempo, "C4@2C@2G@2G@2A@2A@2G@1F@2F@2E@2E@2D@2D@2C@1G@2G@2F@2F@2E@2E@2D@1G@2G@2F@2F@2E@2E@2D@1C@2C@2G@2G@2A@2A@2G@1F@2F@2E@2E@2D@2D@2C@1", 80
+Score 2, tempo, "C5@1G@1F@1C@1F@1C@1G@1C@1C@1F@1C@1G@1C@1F@1C@1G@1C@1G@1F@1C@1F@1C@1G@1C@1"
+// ORGAN 1 IS ACOUSTIC PIANO
+//PLAY SCORE, ORGAN (1 TO 127), SCORE, ORGAN (MAX 16 VOICES)
+Play 1, 1, 2, 1
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

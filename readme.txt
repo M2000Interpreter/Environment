@@ -1,18 +1,76 @@
 M2000 Interpreter and Environment
-Version 14 Revision 45
+Version 14 Revision 46
 
-A tiny fix, Eval(GroupObject) when GroupObject is a static group.
+A big fault when using after AND/OR/XOR/NOT two or more strings and then comparison operator. Now is ok.
+Test Example:
 
-Class Alfa {
-Private:
-	{read z as double}
-	k=z
-Public:
-	value (n) {=n*.k}
-}
-M=Alfa(100)
-Print M(3)=300
-Print Eval(M, 3)=300 ' <<< this fixed
+a$="aa" ' same without suffix $
+b$="bb" ' same without suffix $
+
+' these was ok:
+if a$+b$="aabb" then print "ok 1"
+if "aabb"=a$+b$ and a$<>b$ then print "ok 2"
+if a$+b$="aabb" and a$<>b$ then print "ok 3"
+if a$<>b$ and "aabb"=a$+b$ then print "ok 4"
+
+' this was wrong:
+if a$<>b$ and a$+b$="aabb" then print "ok 5"
+
+' these was ok:
+
+if (a$+b$="aabb") then print "ok 1-1"
+if ("aabb"=a$+b$) and a$<>b$ then print "ok 2-1"
+if (a$+b$="aabb") and a$<>b$ then print "ok 3-1"
+if a$<>b$ and ("aabb"=a$+b$) then print "ok 4-1"
+
+' this was wrong:
+if a$<>b$ and (a$+b$="aabb") then print "ok 5-1"
+
+' this was wrong:
+if not a$+b$="aabb" then print "ok 1-2"
+
+' these was ok:
+if "aabb"=a$+b$ and not a$=b$ then print "ok 2-2"
+if a$+b$="aabb" and not a$=b$ then print "ok 3-2"
+if a$<>b$ and not "aabb"<>a$+b$ then print "ok 4-2"
+
+' this was wrong:
+if a$<>b$ and not a$+b$<>"aabb" then print "ok 5-2"
+
+? "Without suffix $ - these are different variables"
+a="aa"
+b="bb"
+
+' these was ok:
+if a+b="aabb" then print "ok 1"
+if "aabb"=a+b and a<>b then print "ok 2"
+if a+b="aabb" and a<>b then print "ok 3"
+if a<>b and "aabb"=a+b then print "ok 4"
+
+' this was wrong:
+if a<>b and a+b="aabb" then print "ok 5"
+
+' these was ok:
+
+if (a+b="aabb") then print "ok 1-1"
+if ("aabb"=a+b) and a<>b then print "ok 2-1"
+if (a+b="aabb") and a<>b then print "ok 3-1"
+if a<>b and ("aabb"=a+b) then print "ok 4-1"
+
+' this was wrong:
+if a<>b and (a+b="aabb") then print "ok 5-1"
+
+' this was wrong:
+if not a+b="aabb" then print "ok 1-2"
+
+' these was ok:
+if "aabb"=a+b and not a=b then print "ok 2-2"
+if a+b="aabb" and not a=b then print "ok 3-2"
+if a<>b and not "aabb"<>a+b then print "ok 4-2"
+
+' this was wrong:
+if a<>b and not a+b<>"aabb" then print "ok 5-2"
+
 
 
 George Karras, Kallithea Attikis, Greece.

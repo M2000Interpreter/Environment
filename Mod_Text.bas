@@ -14,7 +14,6 @@ Option Explicit
 
 Private timestamp As Long, musicstamp As Long
 Global Const neoReadEng = "╝ "
-'Global Const neoReadGr = "╝ "
 Global skiperror As Boolean
 Global maxlonglong, limitlonglong, plan As Long, lastpanel As Long
 Global OsInfo As New clsOSInfo, Zero64, One64, stoponerror As Boolean
@@ -97,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 45
+Global Const Revision = 46
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7211,7 +7210,7 @@ num53: ' "PI", "пи"
     Exit Function
 num54: ' "NOT", "ови", "дем"
     If FastSymbol(a$, "(") Then
-        If IsExpBig(bstack, a$, r, , True, , True) Then
+        If IsExpBig(bstack, a$, r, , True) Then
             processNegateNonZero r
             r = Not r
             IsNumberNew = FastSymbol(a$, ")")
@@ -7219,7 +7218,7 @@ num54: ' "NOT", "ови", "дем"
         Else
             NotAfter a$
         End If
-    ElseIf IsExpBig(bstack, a$, r, False, True, , True) Then
+    ElseIf IsExpBig(bstack, a$, r, False, True) Then
         processNegateNonZero r
         r = Not r
     Else
@@ -25466,8 +25465,8 @@ End If
 End Function
 Function blockString(s$, endstr As Long, Optional i As Long = 1) As String
 ' endstr 34 or 125
-Dim j As Long, c As Long, start As Long
-start = i
+Dim j As Long, c As Long, Start As Long
+Start = i
 Dim a1 As Boolean
 c = Len(s$)
 If i > c Then Exit Function
@@ -25497,7 +25496,7 @@ End Select
 i = i + 1
 Loop Until i > c
 If j = 1 Then
-blockString = Mid$(s$, start, i - start)
+blockString = Mid$(s$, Start, i - Start)
 s$ = Mid$(s$, i)
 Else
 s$ = Mid$(s$, i)
