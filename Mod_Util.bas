@@ -2266,6 +2266,7 @@ cont0:
         Loop
         If realR < .mX - px - 1 Then GoTo cont1
         .curPos = px + realR
+        
         If Not ONELINE Then px = 0
         If nocr Then GoTo jumpexit Else py = py + 1
         If py >= .mY And Not ONELINE Then
@@ -2473,6 +2474,7 @@ cont1:
             If semicolon Then
             ElseIf lenw& > realR& Then
                 realR& = ((realR& + .Column + 1) \ (.Column + 1)) * (.Column + 1)
+                If realR& >= .mX Then realR& = 0: py = py + 1
             End If
         ElseIf ff < UBound(LL) Then
         If ff < UBound(LL) Then
@@ -2481,6 +2483,7 @@ cont1:
             GoTo again
         End If
         End If
+        
         .curPos = px + realR
         .currow = py
         GoTo jumpexit
@@ -19114,12 +19117,12 @@ End If
 End Function
 
 Sub ClearLoadedForms()
-Dim i As Long, j As Long, start As Long
+Dim i As Long, j As Long, Start As Long
 j = Forms.Count
 Debug.Print ""
 While j > 0
-For i = start To Forms.Count - 1
-If TypeOf Forms(i) Is GuiM2000 Then Unload Forms(i): start = i: Exit For
+For i = Start To Forms.Count - 1
+If TypeOf Forms(i) Is GuiM2000 Then Unload Forms(i): Start = i: Exit For
 Next i
 j = j - 1
 Wend
@@ -26364,7 +26367,7 @@ Mid$(rest$, 1, i) = space(i)
 i = i + 1
 If MaybeIsSymbol3lot(rest$, "(", i) Then
 s$ = s1$ + s$
-
+FastSymbol rest$, "("
 
 FastSymbol rest$, ")"
     fHelp basestack, s$, Abs(pagio$ = "GREEK") + 1

@@ -1,75 +1,46 @@
 M2000 Interpreter and Environment
-Version 14 Revision 46
+Version 14 Revision 47
 
-A big fault when using after AND/OR/XOR/NOT two or more strings and then comparison operator. Now is ok.
-Test Example:
+Two faults fixed - was difficult to found because altering fontname may not produced becasue of different font metrics:
 
-a$="aa" ' same without suffix $
-b$="bb" ' same without suffix $
+1. Print type 4, for printing on output layer, use proportional text. If text need more space than the column have we get more columns. The problem was when column advance to same position as the width of screen (text coordinates). An exit from a sub without altering a by reference value do the fault, leaving 0 - so we get same line second time and overwrite it. This is the test program:
 
-' these was ok:
-if a$+b$="aabb" then print "ok 1"
-if "aabb"=a$+b$ and a$<>b$ then print "ok 2"
-if a$+b$="aabb" and a$<>b$ then print "ok 3"
-if a$<>b$ and "aabb"=a$+b$ then print "ok 4"
+Font "Courier New"
+Form 120, 32
+? $(4),  ' use proportional text
+a=Random(!12345)
+c$=string$("0", 124)
+for i=1 to 100
+	print i+string$("*", Random(80, 130)),
+	aa=key$ ' press any key to continue
+next
+print c$,
+print c$,
+Print
 
-' this was wrong:
-if a$<>b$ and a$+b$="aabb" then print "ok 5"
+2. Print type 0 (the default), for printing on output layer using non proportional text. If text need more space than the column have we  get more columns and we get columns from other lines too (in no free line exist we get a free line scrolling up the "scrolling part" of screen). Here the problem was for an internal ruller which stayed at position width, at newer prints, so no print happen until the program execute a new line and reset the position to 0 (or any other statement which move the cursor). Older revisions stopped after 26.
 
-' these was ok:
+Flush
+Font "Courier New"
+Form 120, 32
+Print $(0),  ' this is the default one
+a=Random(!12345)
+c$=string$("0", 124)
+Z=FALSE
+for i=1 to 100 ' fault after 26 for older revisions
+	IF POS>119 THEN Z=TRUE
+	IF Z THEN PUSH I, POS
+	print i+string$("*", Random(10, 300)+118*1.5)+"-",
+	aaa$=key$	' press a key to print next
+	if not empty then exit for
+next
+print c$,
+Print c$,
+Print
+Stack ' show stack values
+Flush ' delete stack values
 
-if (a$+b$="aabb") then print "ok 1-1"
-if ("aabb"=a$+b$) and a$<>b$ then print "ok 2-1"
-if (a$+b$="aabb") and a$<>b$ then print "ok 3-1"
-if a$<>b$ and ("aabb"=a$+b$) then print "ok 4-1"
 
-' this was wrong:
-if a$<>b$ and (a$+b$="aabb") then print "ok 5-1"
-
-' this was wrong:
-if not a$+b$="aabb" then print "ok 1-2"
-
-' these was ok:
-if "aabb"=a$+b$ and not a$=b$ then print "ok 2-2"
-if a$+b$="aabb" and not a$=b$ then print "ok 3-2"
-if a$<>b$ and not "aabb"<>a$+b$ then print "ok 4-2"
-
-' this was wrong:
-if a$<>b$ and not a$+b$<>"aabb" then print "ok 5-2"
-
-? "Without suffix $ - these are different variables"
-a="aa"
-b="bb"
-
-' these was ok:
-if a+b="aabb" then print "ok 1"
-if "aabb"=a+b and a<>b then print "ok 2"
-if a+b="aabb" and a<>b then print "ok 3"
-if a<>b and "aabb"=a+b then print "ok 4"
-
-' this was wrong:
-if a<>b and a+b="aabb" then print "ok 5"
-
-' these was ok:
-
-if (a+b="aabb") then print "ok 1-1"
-if ("aabb"=a+b) and a<>b then print "ok 2-1"
-if (a+b="aabb") and a<>b then print "ok 3-1"
-if a<>b and ("aabb"=a+b) then print "ok 4-1"
-
-' this was wrong:
-if a<>b and (a+b="aabb") then print "ok 5-1"
-
-' this was wrong:
-if not a+b="aabb" then print "ok 1-2"
-
-' these was ok:
-if "aabb"=a+b and not a=b then print "ok 2-2"
-if a+b="aabb" and not a=b then print "ok 3-2"
-if a<>b and not "aabb"<>a+b then print "ok 4-2"
-
-' this was wrong:
-if a<>b and not a+b<>"aabb" then print "ok 5-2"
 
 
 

@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 46
+Global Const Revision = 47
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -47910,6 +47910,7 @@ resumehere:
                             End If
                         End If
                     End If
+                    
                     Select Case .FTEXT
                     Case 1
                         dlen = RealLen(s$)
@@ -47927,7 +47928,8 @@ resumehere:
                         LCTbasketCur Scr, prive
                         Scr.currentX = Scr.currentX + (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2
                         w3 = 0
-                        wwPlain basestack, prive, s$, Scr.Width, 0, , True, 0, , w3, True
+                        wwPlain basestack, prive, s$, &H7FFFF, 0, , True, 0, , w3, True
+
                         w3 = w3 \ .Xt + 1
                         .curPos = (.Column + 1) * ((w3 + .Column + 1) \ (.Column + 1))
                         If .curPos >= .mX And Not w4 Then
@@ -48177,8 +48179,22 @@ cont12344:
             If par Then
                 If .Column > .mX And .FTEXT < 4 Then
                 Else
+                    
                     If Not w4 Then
-                        If Not skiplast Then crNew basestack, prive
+                        If Not skiplast Then
+                            If .FTEXT = 4 Then
+                                If .currow <= Scr.currentY \ .Yt Then
+                                    crNew basestack, prive
+                                End If
+                            ElseIf .FTEXT = 0 Then
+                                If .currow <= Scr.currentY \ .Yt Then
+                                    crNew basestack, prive
+                                End If
+                            Else
+                            
+                                crNew basestack, prive
+                            End If
+                        End If
                     End If
                 End If
             Else

@@ -92,7 +92,7 @@ Private Type POINTL
 End Type
 Private Type RECT
     Left As Long
-    Top As Long
+    top As Long
     Right As Long
     Bottom As Long
 End Type
@@ -155,14 +155,14 @@ Sub Pprop()
 For Each X In Printers
 If X.DeviceName = pname And X.Port = Port Then Exit For
 Next X
-Dim gp As Long, td As PRINTER_DEFAULTS
-Call OpenPrinter(X.DeviceName, gp, td)
+Dim gp As Long, Td As PRINTER_DEFAULTS
+Call OpenPrinter(X.DeviceName, gp, Td)
 If form5iamloaded Then
 Call PrinterProperties(Form5.hWnd, gp)
 Else
 Call PrinterProperties(Form1.hWnd, gp)
 End If
-Call ResetPrinter(gp, td)
+Call ResetPrinter(gp, Td)
 Call ClosePrinter(gp)
 End Sub
 Function CreateBitmapPicture(ByVal hBmp As Long, ByVal hPal As Long) As Picture
@@ -384,14 +384,14 @@ If what = vbNullString Then
 ReDim para(1)
 para(1) = vbNullString
 Else
-para() = split(what, vbCrLf)
+para() = Split(what, vbCrLf)
 End If
 Dim bchar As Byte
 i = AverCharSpace(DDD, bchar)
 With mybasket
 ' from old code here
     tParam.iTabLength = .ReportTab
-    px = .curpos
+    px = .curPos
     py = .currow
     If Not nosettext Then
         If px >= .mX Then
@@ -635,7 +635,7 @@ If what = vbNullString Then
 ReDim para(1)
 para(1) = vbNullString
 Else
-para() = split(what, vbCrLf)
+para() = Split(what, vbCrLf)
 End If
 Dim bchar As Byte
 With mybasket
@@ -643,7 +643,7 @@ With mybasket
     tParam.iTabLength = .ReportTab
     tabw = .ReportTab * AverCharSpace(DDD, bchar)
 '    If bchar = 2 Then bchar = 0
-    px = .curpos
+    px = .curPos
     py = .currow
     If Not nosettext Then
         If px >= .mX Then
@@ -959,7 +959,9 @@ last:
         mDoc.AppendParagraphOneLine Trim$(buf$)
         End If
              End If
-                If isAcolumn Then Exit Sub
+                If isAcolumn Then
+                    Exit Sub
+                End If
                 'If UBound(para) = i Then Exit For
         If skip < 0 Or scrollme Then
 JUMPHERE:
@@ -1110,12 +1112,12 @@ Public Function C_Str(v As Variant) As String
     C_Str = CStr(v)
     On Error GoTo 0
 End Function
-Public Function At(Data As Variant, ByVal Index As Long, Optional Default As String) As String
+Public Function At(Data As Variant, ByVal index As Long, Optional Default As String) As String
     On Error GoTo EH
     At = Default
     If IsArray(Data) Then
-        If LBound(Data) <= Index And Index <= UBound(Data) Then
-            At = C_Str(Data(Index))
+        If LBound(Data) <= index And index <= UBound(Data) Then
+            At = C_Str(Data(index))
         End If
     End If
     Exit Function
