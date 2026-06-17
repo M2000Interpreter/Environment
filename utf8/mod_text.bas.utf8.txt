@@ -14,7 +14,6 @@ Option Explicit
 
 Private timestamp As Long, musicstamp As Long
 Global Const neoReadEng = "® "
-'Global Const neoReadGr = "® "
 Global skiperror As Boolean
 Global maxlonglong, limitlonglong, plan As Long, lastpanel As Long
 Global OsInfo As New clsOSInfo, Zero64, One64, stoponerror As Boolean
@@ -97,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 45
+Global Const Revision = 48
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3197,9 +3196,13 @@ ElseIf FastSymbol1(aa$, "=") Then
         If IsExpA(bstack, aa$, r, 0, False) Then
             If Not bstack.lastobj Is Nothing Then
                 GoTo CONT1234
+            ElseIf Not thatone Is Nothing Then
+                    po = thatone.compare(Module13.CreateBi(r)) = 0
             Else
                 If MemInt(VarPtr(r)) = vbBoolean Then
-                    po = r
+                    po = po = (r <> 0)
+                ElseIf MemInt(VarPtr(po)) = vbBoolean Then
+                    po = po = (r <> 0) ' no zero
                 Else
                     If r = 0 Then
                         If po = 0 Then
@@ -3225,28 +3228,21 @@ CONT1234:
                     If Not thatone Is Nothing Then
                         po = that.compare(thatone) = 0
                     Else
-                        If MemInt(VarPtr(po)) = vbString Then
-                            po = that.compare(Module13.CreateBigInteger(CStr(po))) = 0
-                        Else
-                            po = that.compare(Module13.CreateBigInteger(format$(Int(po), "0"))) = 0
-                        End If
+                        po = that.compare(Module13.CreateBi(po)) = 0
                     End If
                 ElseIf Not thatone Is Nothing Then
-                    If MemInt(VarPtr(r)) = vbString Then
-                        po = thatone.compare(Module13.CreateBigInteger(CStr(r))) = 0
-                    Else
-                        po = thatone.compare(Module13.CreateBigInteger(format$(Int(r), "0"))) = 0
-                    End If
-                
+                    po = thatone.compare(Module13.CreateBi(r)) = 0
                 Else
                     GoTo conterr
                 End If
+            ElseIf Not thatone Is Nothing Then
+                po = thatone.compare(Module13.CreateBi(r)) = 0
+            ElseIf MemInt(VarPtr(r)) = vbBoolean Then
+                po = po = (r <> 0)
+            ElseIf MemInt(VarPtr(po)) = vbBoolean Then
+                po = po = (r <> 0) ' no zero
             Else
-                If MemInt(VarPtr(r)) = vbBoolean Then
-                    po = r
-                Else
-                    po = CBool(po = r)
-                End If
+                po = CBool(po = r)
             End If
     Else
         MissNumExpr
@@ -3265,27 +3261,17 @@ ElseIf FastSymbol1(aa$, "<") Then
                     If Not thatone Is Nothing Then
                         po = that.compare(thatone) > -1
                     Else
-                        If MemInt(VarPtr(po)) = vbString Then
-                            po = that.compare(Module13.CreateBigInteger(CStr(po))) > -1
-                        Else
-                            po = that.compare(Module13.CreateBigInteger(format$(Int(po), "0"))) > -1
-                        End If
+                        po = that.compare(Module13.CreateBi(po)) > -1
                     End If
                 Else
                     GoTo conterr
                 End If
             ElseIf Not thatone Is Nothing Then
-                If MemInt(VarPtr(r)) = vbString Then
-                    po = thatone.compare(Module13.CreateBigInteger(CStr(r))) < 1
-                Else
-                    po = thatone.compare(Module13.CreateBigInteger(format$(Int(r), "0"))) < 1
-                End If
+                po = thatone.compare(Module13.CreateBi(r)) < 1
+            ElseIf MemInt(VarPtr(r)) = vbBoolean Then
+                po = Int(po) <= CInt(r)
             Else
-                If MemInt(VarPtr(r)) = vbBoolean Then
-                    po = r
-                Else
-                    po = po <= r
-                End If
+                po = po <= r
             End If
         Else
             MissNumExpr
@@ -3300,30 +3286,19 @@ ElseIf FastSymbol1(aa$, "<") Then
                     Set that = bstack.lastobj
                     Set bstack.lastobj = Nothing
                     If Not thatone Is Nothing Then
-                    po = that.compare(thatone) <> 0
+                        po = that.compare(thatone) <> 0
                     Else
-                        If MemInt(VarPtr(po)) = vbString Then
-                            po = that.compare(Module13.CreateBigInteger(CStr(po))) <> 0
-                        Else
-                            po = that.compare(Module13.CreateBigInteger(format$(Int(po), "0"))) <> 0
-                        End If
+                        po = that.compare(Module13.CreateBi(po)) <> 0
                     End If
                 Else
                     GoTo conterr
                 End If
             ElseIf Not thatone Is Nothing Then
-                If MemInt(VarPtr(r)) = vbString Then
-                    po = thatone.compare(Module13.CreateBigInteger(CStr(r))) <> 0
-                Else
-                    po = thatone.compare(Module13.CreateBigInteger(format$(Int(r), "0"))) <> 0
-                End If
-
+                po = thatone.compare(Module13.CreateBi(r)) <> 0
+            ElseIf MemInt(VarPtr(r)) = vbBoolean Then
+                po = Int(po <> 0) <> Int(r)
             Else
-                If MemInt(VarPtr(r)) = vbBoolean Then
-                    po = r
-                Else
-                    po = po <> r
-                End If
+                po = po <> r
             End If
         Else
             MissNumExpr
@@ -3338,25 +3313,20 @@ ElseIf FastSymbol1(aa$, "<") Then
                 If Not thatone Is Nothing Then
                     po = that.compare(thatone) = 1
                 Else
-                    If MemInt(VarPtr(po)) = vbString Then
-                        po = that.compare(Module13.CreateBigInteger(CStr(po))) = 1
-                    Else
-                        po = that.compare(Module13.CreateBigInteger(format$(Int(po), "0"))) = 1
-                    End If
+                    po = that.compare(Module13.CreateBi(po)) = 1
                 End If
             ElseIf Not thatone Is Nothing Then
-                If MemInt(VarPtr(r)) = vbString Then
-                    po = thatone.compare(Module13.CreateBigInteger(CStr(r))) = -1
-                Else
-                    po = thatone.compare(Module13.CreateBigInteger(format$(Int(r), "0"))) = -1
-                End If
-
+               
+                po = thatone.compare(Module13.CreateBi(r)) = -1
+               
             Else
                 GoTo conterr
             End If
+        ElseIf Not thatone Is Nothing Then
+                po = thatone.compare(Module13.CreateBi(r)) = -1
         Else
             If MemInt(VarPtr(r)) = vbBoolean Then
-                po = r
+                po = Int(po) < CInt(r)
             Else
                 po = po < r
             End If
@@ -3379,27 +3349,17 @@ ElseIf FastSymbol1(aa$, ">") Then
                     If Not thatone Is Nothing Then
                         po = that.compare(thatone) < 1
                     Else
-                        If MemInt(VarPtr(po)) = vbString Then
-                            po = that.compare(Module13.CreateBigInteger(CStr(po))) < 1
-                        Else
-                            po = that.compare(Module13.CreateBigInteger(format$(Int(po), "0"))) < 1
-                        End If
+                        po = that.compare(Module13.CreateBi(po)) < 1
                     End If
                 Else
                     GoTo conterr
                 End If
             ElseIf Not thatone Is Nothing Then
-                If MemInt(VarPtr(r)) = vbString Then
-                    po = thatone.compare(Module13.CreateBigInteger(CStr(r))) > -1
-                Else
-                    po = thatone.compare(Module13.CreateBigInteger(format$(Int(r), "0"))) > -1
-                End If
+                po = thatone.compare(Module13.CreateBi(r)) > -1
+            ElseIf MemInt(VarPtr(r)) = vbBoolean Then
+                po = Int(po) >= CInt(r)
             Else
-                If MemInt(VarPtr(r)) = vbBoolean Then
-                    po = r
-                Else
-                    po = po >= r
-                End If
+                po = po >= r
             End If
         Else
             MissNumExpr
@@ -3414,28 +3374,19 @@ ElseIf FastSymbol1(aa$, ">") Then
                 If Not thatone Is Nothing Then
                     po = that.compare(thatone) = -1
                 Else
-                    If MemInt(VarPtr(po)) = vbString Then
-                        po = that.compare(Module13.CreateBigInteger(CStr(po))) = -1
-                    Else
-                        po = that.compare(Module13.CreateBigInteger(format$(Int(po), "0"))) = -1
-                    End If
+                    po = that.compare(Module13.CreateBi(po)) = -1
                 End If
             ElseIf Not thatone Is Nothing Then
-                If MemInt(VarPtr(r)) = vbString Then
-                    po = thatone.compare(Module13.CreateBigInteger(CStr(r))) = 1
-                Else
-                    po = thatone.compare(Module13.CreateBigInteger(format$(Int(r), "0"))) = 1
-                End If
-
+                po = thatone.compare(Module13.CreateBi(r)) = 1
             Else
                 GoTo conterr
             End If
+        ElseIf Not thatone Is Nothing Then
+            po = thatone.compare(Module13.CreateBi(r)) = 1
+        ElseIf MemInt(VarPtr(r)) = vbBoolean Then
+            po = Int(po) > CInt(r)
         Else
-            If MemInt(VarPtr(r)) = vbBoolean Then
-                po = r
-            Else
-                po = po > r
-            End If
+            po = po > r
         End If
     Else
 conterr:
@@ -7211,7 +7162,7 @@ num53: ' "PI", "ΠΙ"
     Exit Function
 num54: ' "NOT", "ΟΧΙ", "ΔΕΝ"
     If FastSymbol(a$, "(") Then
-        If IsExpBig(bstack, a$, r, , True, , True) Then
+        If IsExpBig(bstack, a$, r, , True) Then
             processNegateNonZero r
             r = Not r
             IsNumberNew = FastSymbol(a$, ")")
@@ -7219,7 +7170,7 @@ num54: ' "NOT", "ΟΧΙ", "ΔΕΝ"
         Else
             NotAfter a$
         End If
-    ElseIf IsExpBig(bstack, a$, r, False, True, , True) Then
+    ElseIf IsExpBig(bstack, a$, r, False, True) Then
         processNegateNonZero r
         r = Not r
     Else
@@ -8474,20 +8425,16 @@ fun115:
                     If Not bstack.lastobj Is Nothing Then
                         Set p = bstack.lastobj
                         If Not TypeOf p Is BigInteger Then WrongType: Exit Function
-                    ElseIf MemInt(VarPtr(p)) = vbString Then
-                        Set p = Module13.CreateBigInteger(CStr(p))
                     Else
-                        Set p = Module13.CreateBigInteger(format$(Int(p), "0"))
+                        Set p = Module13.CreateBi(p)
                     End If
                     If FastSymbol(a$, ",") Then
                         If IsExpBig(bstack, a$, pp) Then
                         If Not bstack.lastobj Is Nothing Then
                             Set pp = bstack.lastobj
                             If Not TypeOf pp Is BigInteger Then WrongType: Exit Function
-                        ElseIf MemInt(VarPtr(p)) = vbString Then
-                            Set pp = Module13.CreateBigInteger(CStr(p))
                         Else
-                            Set pp = Module13.CreateBigInteger(format$(Int(p), "0"))
+                            Set pp = Module13.CreateBi(p)
                         End If
                         Set bstack.lastobj = big.modpow1(p, pp)
                         r = 0
@@ -9521,6 +9468,15 @@ FUN114A:
     Else
         p = 10
     End If
+    pp = 0
+    If FastSymbol(a$, ",") Then
+        If Not IsExp(bstack, a$, pp, , True, , True) Then
+            MissNumExpr
+            Exit Function
+        End If
+    Else
+        pp = 10
+    End If
     If FastSymbol(a$, ")") Then
         IsNumberNew = True
         r = 0
@@ -9528,6 +9484,10 @@ FUN114A:
             Set bstack.lastobj = CreateBigInteger(s$, p)
         Else
             Set bstack.lastobj = CreateBigInteger(s$)
+        End If
+        pp = CLng(pp)
+        If pp > 1 And pp < 37 Then
+            bstack.lastobj.OutputBase = pp
         End If
     End If
     ElseIf FastSymbol(a$, ")") Then
@@ -15875,7 +15835,7 @@ makelambda:
                     cv.DefineOnce p, vType
                 Else
                    If what = -1 Then
-                    Set p = Module13.CreateBigInteger(CStr(p))
+                    Set p = Module13.CreateBi(p)
                     If Len(b$) > 0 Then
                     If UCase$(Left$(b$, 1)) = "U" Then
                         Mid$(b$, 1, 1) = " "
@@ -17105,8 +17065,20 @@ cont10456:
                                         p = CByte(p)
                                     Case vbDate
                                         p = CDate(p)
-                                    Case vbObject
+                                    Case 36
+                                        If Typename(var(x2)) = "Complex" Then
+                                            BadForType "Complex", "Μιγαδικός"
+                                        Else
+                                            BadForType Typename(var(x2)), Typename(var(x2))
+                                        End If
+                                        Execute = 0
+                                        Exit Function
+                                    Case vbObject, 36
+                                        If Typename(var(x2)) = "BigInteger" Then
+                                        BadForType "BigInteger", "ΜεγάλοςΑκέραιος"
+                                        Else
                                         MissingnumVar
+                                        End If
                                         Execute = 0
                                         Exit Function
                                     Case Else
@@ -21690,7 +21662,7 @@ Exit Function
 Case "REPORT", "ΑΝΑΦΟΡΑ"
 Identifier = MyReport(basestack, rest$, Lang)
 Exit Function
-Case "LET", "ΣΤΗ", "ΣΤΗΝ", "ΣΤΟ"  'ok
+Case "LET", "ΣΤΗ", "ΣΤΗΝ", "ΣΤΟ", "ΣΤΙΣ", "ΣΤΑ"
 Identifier = MyLet(basestack, rest$, Lang)
 Exit Function
 Case "COMMIT", "ΑΝΕΘΕΣΕ"
@@ -25466,8 +25438,8 @@ End If
 End Function
 Function blockString(s$, endstr As Long, Optional i As Long = 1) As String
 ' endstr 34 or 125
-Dim j As Long, c As Long, start As Long
-start = i
+Dim j As Long, c As Long, Start As Long
+Start = i
 Dim a1 As Boolean
 c = Len(s$)
 If i > c Then Exit Function
@@ -25497,7 +25469,7 @@ End Select
 i = i + 1
 Loop Until i > c
 If j = 1 Then
-blockString = Mid$(s$, start, i - start)
+blockString = Mid$(s$, Start, i - Start)
 s$ = Mid$(s$, i)
 Else
 s$ = Mid$(s$, i)
@@ -35047,7 +35019,10 @@ j0:
             
         End If
     End If
-Loop Until Not FastSymbol(rest$, ",")
+    If Not FastSymbol(rest$, ",") Then Exit Do
+    DropCommentOrLine rest$
+ Loop
+E1:
 End Function
 Function MyThread(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim frm$, ss$, what$, i As Long, p As Variant, X As Double, par As Boolean, bs As basetask
@@ -40801,19 +40776,15 @@ ER0001:
 cont1023:
     Else
     If Typename(p) = "BigInteger" Then
-    If ISSTRINGA(rest$, ps$) Then
-        Set p = Module13.CreateBigInteger(ps$)
-    ElseIf Not IsNumberD2(rest$, p, notdef And Not notypes, True) Then
-    ProcDef = False
-    SyntaxError
-    Exit Function
-    Else
-        If VarType(p) = vbString Then
-        Set p = Module13.CreateBigInteger(CStr(p))
+        If ISSTRINGA(rest$, ps$) Then
+            Set p = Module13.CreateBigInteger(ps$)
+        ElseIf Not IsNumberD2(rest$, p, notdef And Not notypes, True) Then
+            ProcDef = False
+            SyntaxError
+            Exit Function
         Else
-        Set p = Module13.CreateBigInteger(format$(Int(p), "0"))
+            Set p = Module13.CreateBi(p)
         End If
-    End If
     Else
         If Not ISSTRINGA(rest$, ps$) Then
             If VarType(first) = vbString Then
@@ -47527,7 +47498,15 @@ ElseIf IsExp(basestack, rest$, p) Then
         ElseIf TypeOf basestack.lastobj Is BigInteger Then
             Set anyBigInteger = basestack.lastobj
             p = ""
-            SwapString2Variant anyBigInteger.ToString, p
+            If xa Then
+                i = anyBigInteger.OutputBase
+                anyBigInteger.OutputBase = 16
+                SwapString2Variant anyBigInteger.ToString, p
+                anyBigInteger.OutputBase = i
+                i = 0
+            Else
+                SwapString2Variant anyBigInteger.ToString, p
+            End If
         End If
         Set basestack.lastobj = Nothing
     ElseIf VarType(p) = vbBoolean Then
@@ -47911,6 +47890,7 @@ resumehere:
                             End If
                         End If
                     End If
+                    
                     Select Case .FTEXT
                     Case 1
                         dlen = RealLen(s$)
@@ -47928,7 +47908,8 @@ resumehere:
                         LCTbasketCur Scr, prive
                         Scr.currentX = Scr.currentX + (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2
                         w3 = 0
-                        wwPlain basestack, prive, s$, Scr.Width, 0, , True, 0, , w3, True
+                        wwPlain basestack, prive, s$, &H7FFFF, 0, , True, 0, , w3, True
+
                         w3 = w3 \ .Xt + 1
                         .curPos = (.Column + 1) * ((w3 + .Column + 1) \ (.Column + 1))
                         If .curPos >= .mX And Not w4 Then
@@ -48178,8 +48159,22 @@ cont12344:
             If par Then
                 If .Column > .mX And .FTEXT < 4 Then
                 Else
+                    
                     If Not w4 Then
-                        If Not skiplast Then crNew basestack, prive
+                        If Not skiplast Then
+                            If .FTEXT = 4 Then
+                                If .currow <= Scr.currentY \ .Yt Then
+                                    crNew basestack, prive
+                                End If
+                            ElseIf .FTEXT = 0 Then
+                                If .currow <= Scr.currentY \ .Yt Then
+                                    crNew basestack, prive
+                                End If
+                            Else
+                            
+                                crNew basestack, prive
+                            End If
+                        End If
                     End If
                 End If
             Else
@@ -48576,7 +48571,7 @@ jumphere01:
                                 If Not that Is Nothing Then
 
                                 If bstack.lastobj Is Nothing Then
-                                    Set bstack.lastobj = Module13.CreateBigInteger(format$(Int(p), "0"))
+                                    Set bstack.lastobj = Module13.CreateBi(p)
                                 ElseIf Not TypeOf bstack.lastobj Is BigInteger Then
                                     Set bstack.lastobj = Nothing
                                     GoTo err001101
@@ -48587,7 +48582,7 @@ jumphere01:
                                         If IsExpBig(bstack, b$, p, , Not checkenum) Then
 
                                         If bstack.lastobj Is Nothing Then
-                                            Set bstack.lastobj = Module13.CreateBigInteger(format$(Int(p), "0"))
+                                            Set bstack.lastobj = Module13.CreateBi(p)
                                         ElseIf Not TypeOf bstack.lastobj Is BigInteger Then
                                             Set bstack.lastobj = Nothing
                                             GoTo err001101
@@ -48631,7 +48626,7 @@ jumphere01:
                                     End If
                                     Set that = bstack.lastobj
                                     
-                                    If that.compare(Module13.CreateBigInteger(format$(Int(sp), "0"))) = 0 Or slct = -1 Then
+                                    If that.compare(Module13.CreateBi(sp)) = 0 Or slct = -1 Then
                                         Set bstack.lastobj = Nothing
                                         Set that = Nothing
                                         If slct = 1 Then slct = 0: GoTo selslct0

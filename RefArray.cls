@@ -33,12 +33,12 @@ Private ihavearray As Boolean, isok As Boolean
 Private Declare Function SafeArrayRedim Lib "oleaut32" (ByVal saPtr As Long, ByVal saBound As Long) As Long
 Private OneDimension As Boolean
 Public flat As Boolean
-Public Function GetUDTValue(ByVal there, ByVal p As Long, Name$, Optional ndx)
+Public Function GetUDTValue(ByVal there, ByVal p As Long, Name$, Optional nDx)
 On Error Resume Next
-If IsMissing(ndx) Then
+If IsMissing(nDx) Then
     SwapVariant GetUDTValue, Value(there, p, Name$)
 Else
-    SwapVariant GetUDTValue, Value(there, p, Name$, CLng(ndx))
+    SwapVariant GetUDTValue, Value(there, p, Name$, CLng(nDx))
 End If
 End Function
 Friend Property Get emtype() As Integer
@@ -261,7 +261,7 @@ entry1:
             ElseIf mt = 8201 Then ' vbObject + vbArray
                 If Me.emtype = 201 Then
                     
-                    Set p(where) = Module13.CreateBigInteger(format(Int(that), "0"))
+                    Set p(where) = Module13.CreateBi(that)
                 
                 Else
                     mError = 91
@@ -341,7 +341,7 @@ entry1:
                 mError = 5050
                 End If
                 Else
-                Set p(where)(what) = Module13.CreateBigInteger(format(Int(that), "0"))
+                Set p(where)(what) = Module13.CreateBi(that)
                 End If
             ElseIf wt = vbObject Then
                 Set p(where)(what) = that
@@ -702,7 +702,7 @@ isok = True
 If where > 0 Then OneDimension = False
 End Sub
 Property Get ItemType(item) As Long
-On Error GoTo alfa
+On Error GoTo ALFA
     If ihavearray And isok Then
         If Not IsMissing(item) Then
         
@@ -712,7 +712,7 @@ On Error GoTo alfa
         End If
     End If
     Exit Property
-alfa:
+ALFA:
     ItemType = -1
 End Property
 Public Function IsInnerRefArray(item, r As refArray) As Boolean
@@ -1046,20 +1046,20 @@ End Sub
 Friend Sub CopyVariantArray(ByRef a As Variant, ByRef b As Variant)
     CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
 End Sub
-Public Function putData(f As Long, ndx As Long, lengthInBytes As Long) As Boolean
-    Dim addr, mitems, itemlen
+Public Function putData(f As Long, nDx As Long, lengthInBytes As Long) As Boolean
+    Dim Addr, mitems, itemlen
     
     itemlen = MemInt(UnsignedAdd(MemLong(UnsignedAdd(VarPtr(p(0)), 8)), 4))
     mitems = Me.Elements(p(0))
-    If Not (ndx >= 0 And ndx < mitems) Then
+    If Not (nDx >= 0 And nDx < mitems) Then
         OutOfLimit
         GoTo there
     End If
     lengthInBytes = Abs(lengthInBytes)
-    If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - ndx) Then
-        lengthInBytes = itemlen * (mitems - ndx)
+    If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - nDx) Then
+        lengthInBytes = itemlen * (mitems - nDx)
     End If
-    addr = UnsignedAdd(Me.ArrPtr(0), itemlen * ndx)
+    Addr = UnsignedAdd(Me.ArrPtr(0), itemlen * nDx)
     
     On Error GoTo there
     Dim a1 As SAFEARRAY1D, a() As Byte
@@ -1068,7 +1068,7 @@ Public Function putData(f As Long, ndx As Long, lengthInBytes As Long) As Boolea
         .cDims = 1
         .onebound(0).lLbound = 0
         .onebound(0).cElements = lengthInBytes
-        .pvData = addr
+        .pvData = Addr
     End With
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
         On Error GoTo there1
@@ -1083,25 +1083,25 @@ there1:
         CopyMemory ByVal VarPtrArray(a), 0&, 4
 there:
 End Function
-Friend Function GetData(f As Long, ndx As Long, lengthInBytes As Long) As Boolean
-    Dim addr, mitems, itemlen
+Friend Function GetData(f As Long, nDx As Long, lengthInBytes As Long) As Boolean
+    Dim Addr, mitems, itemlen
     
     itemlen = MemInt(UnsignedAdd(MemLong(UnsignedAdd(VarPtr(p(0)), 8)), 4))
     mitems = Me.Elements(p(0))
-    If Not (ndx >= 0 And ndx < mitems) Then
+    If Not (nDx >= 0 And nDx < mitems) Then
         OutOfLimit
         GoTo there
     End If
     lengthInBytes = Abs(lengthInBytes)
-    If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - ndx) Then
-        lengthInBytes = itemlen * (mitems - ndx)
+    If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - nDx) Then
+        lengthInBytes = itemlen * (mitems - nDx)
     End If
-    addr = UnsignedAdd(Me.ArrPtr(0), itemlen * ndx)
+    Addr = UnsignedAdd(Me.ArrPtr(0), itemlen * nDx)
     On Error GoTo there
     Dim FH As Long
     FH = Module10.ReadFileHandler(CLng(f))
     If FH = 0 Then Exit Function
-    Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(addr)
+    Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(Addr)
     GetData = True
     Exit Function
 there:

@@ -132,7 +132,6 @@ Function divide(v As BigInteger) As BigInteger
 End Function
 Function divideE(v As BigInteger) As BigInteger
     Dim s$, p$, M$, k As Integer
- ' ? Module13.CreateBigInteger("-25").ModulusE(Module13.CreateBigInteger("-7")).ToString
     p$ = v.Value
     If LeftB$(p$, 1) = ChrB$(45) Then MidB$(p$, 1, 1) = ChrB$(48)
     If bSgn() < 0 Then
@@ -161,7 +160,6 @@ Function Modulus(v As BigInteger) As BigInteger
 End Function
 Function ModulusE(v As BigInteger) As BigInteger
     Dim s$, p$, k As Integer
- ' ? Module13.CreateBigInteger("-25").ModulusE(Module13.CreateBigInteger("-7")).ToString
     p$ = v.Value
     If LeftB$(p$, 1) = ChrB$(45) Then MidB$(p$, 1, 1) = ChrB$(48)
     If bSgn() < 0 Then

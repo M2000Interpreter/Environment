@@ -1,46 +1,28 @@
 M2000 Interpreter and Environment
-Version 14 Revision 47
-
-Two faults fixed - was difficult to found because altering fontname may not produced becasue of different font metrics:
-
-1. Print type 4, for printing on output layer, use proportional text. If text need more space than the column have we get more columns. The problem was when column advance to same position as the width of screen (text coordinates). An exit from a sub without altering a by reference value do the fault, leaving 0 - so we get same line second time and overwrite it. This is the test program:
-
-Font "Courier New"
-Form 120, 32
-? $(4),  ' use proportional text
-a=Random(!12345)
-c$=string$("0", 124)
-for i=1 to 100
-	print i+string$("*", Random(80, 130)),
-	aa=key$ ' press any key to continue
-next
-print c$,
-print c$,
-Print
-
-2. Print type 0 (the default), for printing on output layer using non proportional text. If text need more space than the column have we  get more columns and we get columns from other lines too (in no free line exist we get a free line scrolling up the "scrolling part" of screen). Here the problem was for an internal ruller which stayed at position width, at newer prints, so no print happen until the program execute a new line and reset the position to 0 (or any other statement which move the cursor). Older revisions stopped after 26.
-
-Flush
-Font "Courier New"
-Form 120, 32
-Print $(0),  ' this is the default one
-a=Random(!12345)
-c$=string$("0", 124)
-Z=FALSE
-for i=1 to 100 ' fault after 26 for older revisions
-	IF POS>119 THEN Z=TRUE
-	IF Z THEN PUSH I, POS
-	print i+string$("*", Random(10, 300)+118*1.5)+"-",
-	aaa$=key$	' press a key to print next
-	if not empty then exit for
-next
-print c$,
-Print c$,
-Print
-Stack ' show stack values
-Flush ' delete stack values
+Version 14 Revision 48
 
 
+1) Add outputbase value (optional) in BigInteger() function
+2) we can add string and biginteger to get get string 
+
+a=biginteger("1AC3FF4FAFE", 16, 2) ' two optional inputbase and outputbase
+biginteger b="127398127398172837128937812738127381273812738"
+biginteger c=127398127398172837128937812738127381273812737u
+b=>outputbase=16
+print a ' binary
+print b ' hex
+c++
+print b=c
+hex a
+print a+"value" ' add string return string
+print "0b"+a  ' add string return string 
+print "(0b"+a+")" ' add string return string
+
+
+3) Fix Sprite moving (using hardware sprites through Player) when the player move I found thisL I hade to hide, then to move, then to show (this was too fast to see the hide state, but the moving is instant, otherwise we get a non sync rendering). I found it looking the sprite rotation which not have problem so I think maybe the problem can be fixed with hide/show effect and I it is that.
+Execute Sprites module on Info file (see below how to load it).
+
+4) Some minor additions like error messages for For loop when we use BigInteger for control value (not allowed), or complex type (also not allowed).
 
 
 

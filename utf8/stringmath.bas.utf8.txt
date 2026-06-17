@@ -480,7 +480,7 @@ Public Function BigIntFromString(Sin As String, iBaseIn As Integer) As String
             
     Dim bRN As Boolean
     Dim sBS As String
-    Dim iP As Long, iV As Long
+    Dim IP As Long, iV As Long
     
     'test for empty parameters
     If LenB(Sin) = 0 Or iBaseIn = 0 Then
@@ -498,14 +498,14 @@ Public Function BigIntFromString(Sin As String, iBaseIn As Integer) As String
     sBS = StrConv(CStr(iBaseIn), vbFromUnicode)
     
     BigIntFromString = ChrB$(48)
-    For iP = 1 To LenB(Sin)
+    For IP = 1 To LenB(Sin)
         'use constant list position and base for conversion
-        iV = InStrB(Alphabet, MidB$(Sin, iP, 1))
+        iV = InStrB(Alphabet, MidB$(Sin, IP, 1))
         If iV > 0 Then 'accumulate
             BigIntFromString = multiply(BigIntFromString, sBS)
             BigIntFromString = Add(BigIntFromString, StrConv(CStr(iV - 1), vbFromUnicode))
         End If
-    Next iP
+    Next IP
     
     'decide on any negative signs
     If bRN Then
@@ -606,7 +606,7 @@ Function IntStrByExp(sA As String, sExp As String) As String
     End If
 
 End Function
-Function IsProbablyPrime(sA As String, K As Integer) As Boolean
+Function IsProbablyPrime(sA As String, k As Integer) As Boolean
     If LenB(sA) < 1 Then Exit Function
     If LeftB$(sA, 1) = ChrB$(45) Then
         MyEr "Negative Prime not exist", "Αρνητικός πρώτος δεν υπάρχει"
@@ -627,7 +627,7 @@ Function IsProbablyPrime(sA As String, K As Integer) As Boolean
     Dim a As String, X As String, i As Long, j As Long
     
     IsProbablyPrime = True
-    For i = 1 To K
+    For i = 1 To k
         
         Do
             a = SpaceB(LenB(sA))
@@ -728,6 +728,17 @@ Public Function IsPrime(sA As String) As Boolean
     Loop
 End Function
 ' GET UNICODE AND CHANGE IT TO ANSI
+Public Function CreateBi(v As Variant) As BigInteger
+    If MyIsNumeric(v) Then
+        Set CreateBi = CreateBigInteger(format(Int(v), "0"))
+    
+    ElseIf MemInt(VarPtr(v)) = vbString Then
+        Dim s$
+        SwapString2Variant s$, v
+        Set CreateBi = CreateBigInteger(s$)
+    End If
+
+End Function
 Public Function CreateBigInteger(s$, Optional basenum) As BigInteger
     Set CreateBigInteger = New BigInteger
     s$ = TrimZeroU(s$)

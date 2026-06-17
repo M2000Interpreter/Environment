@@ -13134,7 +13134,8 @@ Set Scr = bstack.Owner
 prive = GetCode(Scr)
 Dim flag As Boolean, flag2 As Boolean
 flag = FastSymbol(rest$, "!")
-If flag Then flag2 = FastSymbol(rest$, "!")
+If flag Then flag2 = FastSymbol(rest$, "!"): If flag2 Then flag = False
+Dim oldwidth As Integer
 With players(prive)
     Col = players(prive).mypen
     If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then Col = mycolor(p)
@@ -13143,30 +13144,37 @@ With players(prive)
             If FastSymbol(rest$, ",") Then
                 If IsExp(bstack, rest$, Y, , True) Then
                     If Scr.DrawWidth > 1 Then
+                        oldwidth = Scr.DrawWidth
+                        Scr.DrawWidth = 1
+                        
                         If flag Or flag2 Then
                             If Not flag Then
-                                halfX = (X Mod Scr.DrawWidth * dv15)
-                                halfy = (Y Mod Scr.DrawWidth * dv15)
+                                halfX = X Mod (oldwidth * dv15)
+                                halfy = Y Mod (oldwidth * dv15)
                             Else
-                                halfX = Scr.DrawWidth * dv15 \ 2
-                                halfy = Scr.DrawWidth * dv15 \ 2
+                                halfX = oldwidth * dv15 \ 2
+                                halfy = oldwidth * dv15 \ 2
                             End If
-                            halfX1 = Scr.DrawWidth * dv15 - halfX
-                            halfy1 = Scr.DrawWidth * dv15 - halfy
+                            halfX1 = oldwidth * dv15 - halfX
+                            halfy1 = oldwidth * dv15 - halfy
                             If TypeOf Scr Is MetaDc Then
                            
                                 Set mm = Scr
-                                mm.Line2 X - halfX, Y - halfy, X + halfX1, Y + halfy1, Col, True, True
+                                mm.Line2 X - halfX, Y - halfy + dv15, X + halfX1, Y + halfy1, Col, True, True
                             Else
                                 Form1.DIS.Line (X - halfX, Y - halfy)-(X + halfX1, Y + halfy1), Col, BF
                             End If
+                            Scr.DrawWidth = oldwidth
                         Else
                             If TypeOf Scr Is MetaDc Then
-                                Scr.Line2 X, Y, X, Y, Col, False, False
+                                Scr.Line2 X, Y + dv15, X, Y + dv15, Col, False, False
+                                Scr.DrawWidth = oldwidth
                             Else
+                                Scr.DrawWidth = oldwidth
                                 Scr.PSet (X, Y), Col
                             End If
                         End If
+                        
                     Else
                         If TypeOf Scr Is MetaDc Then
                             Scr.Line2 X, Y, X, Y, Col, False, False
@@ -13185,27 +13193,32 @@ With players(prive)
     Else
         If Scr.DrawWidth > 1 Then
             If flag Or flag2 Then
-                If flag Then
-                    halfX = .XGRAPH Mod (Scr.DrawWidth * dv15)
-                    halfy = .YGRAPH Mod (Scr.DrawWidth * dv15)
+                oldwidth = Scr.DrawWidth
+                Scr.DrawWidth = 1
+                
+                If Not flag Then
+                    halfX = (.XGRAPH Mod (oldwidth * dv15))
+                    halfy = (.YGRAPH Mod (oldwidth * dv15))
                 Else
-                    halfX = Scr.DrawWidth * dv15 \ 2
-                    halfy = Scr.DrawWidth * dv15 \ 2
+                    halfX = oldwidth * dv15 \ 2
+                    halfy = oldwidth * dv15 \ 2
                 End If
-                halfX1 = Scr.DrawWidth * dv15 - halfX
-                halfy1 = Scr.DrawWidth * dv15 - halfy
+                halfX1 = oldwidth * dv15 - halfX
+                halfy1 = oldwidth * dv15 - halfy
             
                 If TypeOf Scr Is MetaDc Then
                     
                     Set mm = Scr
-                    mm.Line2 .XGRAPH - halfX, .YGRAPH - halfy, .XGRAPH + halfX1, .YGRAPH + halfy1, Col, True, True
+                    mm.Line2 .XGRAPH - halfX, .YGRAPH - halfy + dv15, .XGRAPH + halfX1, .YGRAPH + halfy1, Col, True, True
                     
                 Else
                     Form1.DIS.Line (.XGRAPH - halfX, .YGRAPH - halfy)-(.XGRAPH + halfX1, .YGRAPH + halfy1), Col, BF
                 End If
+                Scr.DrawWidth = oldwidth
             Else
                 If TypeOf Scr Is MetaDc Then
-                    Scr.Line2 .XGRAPH, .YGRAPH, .XGRAPH, .YGRAPH, Col, False, False
+                    Scr.Line2 .XGRAPH, .YGRAPH + dv15, .XGRAPH, .YGRAPH + dv15, Col, False, False
+                    
                 Else
                     Scr.PSet (.XGRAPH, .YGRAPH), Col
                 End If
@@ -15240,7 +15253,7 @@ ArrArg = a(1)
 LocalVar = a(2)
 If Len(ArrArg) > 0 Then
 x1 = rinstr(actualvar, ArrArg) + Len(ArrArg) - 1
-JUMPHERE:
+jumphere:
     If neoGetArray(bstack, Left$(actualvar, x1), pppp) Then
         If Not pppp.arr Then GoTo cont123
         If Not NeoGetArrayItem(pppp, bstack, Left$(actualvar, x1), w2, Mid$(actualvar, x1 + 1)) Then GoTo cont123
@@ -15270,7 +15283,7 @@ Else
     ii = 1
     If FastPureLabel(actualvar, what$, ii, , , , False) > 4 Then
     x1 = ii - 1 'rinstr(actualvar, what$) + Len(what$) - 1
-    GoTo JUMPHERE
+    GoTo jumphere
     
     End If
     
@@ -16539,7 +16552,7 @@ noexpression:
                 If IsExpBig(bstack, b$, p) Then
                
                 If bstack.lastobj Is Nothing Then
-                    var(v) = Module13.CreateBigInteger(format$(Int(p), "0"))
+                    var(v) = Module13.CreateBi(p)
                 ElseIf TypeOf bstack.lastobj Is BigInteger Then
                     Set var(v) = CopyBigInteger(bstack.lastobj)
                     Set bstack.lastobj = Nothing
@@ -27960,13 +27973,13 @@ If x1 <> 0 Then
             ss$ = loadcatalog.Value
             If loadcatalog.ExistKey(W$ + Chr(1)) Then Switches loadcatalog.Value
             par1 = False
-            GoTo JUMPHERE
+            GoTo jumphere
         ElseIf loadcatalog.ExistKey(mcd + ExtractNameOnly(W$, True) + ".gsb") Then
             W$ = mcd + ExtractNameOnly(W$, True) + ".gsb"
             ss$ = loadcatalog.Value
             If loadcatalog.ExistKey(W$ + Chr(1)) Then Switches loadcatalog.Value
             par1 = False
-            GoTo JUMPHERE
+            GoTo jumphere
         End If
     Else
         'If loadcatalog.ExistKey(mcd + ExtractNameOnly(s$, True) + ".gsb") Then
@@ -28050,7 +28063,7 @@ If x1 <> 0 Then
         End If
     End If
     End If
-JUMPHERE:
+jumphere:
     If ss$ <> "" Then
     If Err.Number = 0 And Not (basestack.IamChild Or basestack.IamAnEvent) Then
        If Not NoRun Then LASTPROG$ = s$
@@ -29085,7 +29098,7 @@ makeitnow1:
                         GoTo contGetStr
                         ElseIf rA.emtype = 201 Then
                         If basestack.lastobj Is Nothing Then
-                            Set p = Module13.CreateBigInteger(format$(Int(p), "0"))
+                            Set p = Module13.CreateBi(p)
                         ElseIf TypeOf basestack.lastobj Is BigInteger Then
                             Set p = basestack.lastobj
                             Set basestack.lastobj = Nothing
@@ -29157,7 +29170,7 @@ contGetStr:
                         If Not IsMissing(zeroitem) Then
                         If basestack.lastobj Is Nothing Then
                         If TypeOf zeroitem Is BigInteger Then
-                            Set basestack.lastobj = Module13.CreateBigInteger(format$(Int(p), "0"))
+                            Set basestack.lastobj = Module13.CreateBi(p)
                         Else
                             SyntaxError
                             Exit Function
@@ -32022,7 +32035,7 @@ aaaa1:
                                 Exit Function
                             
                         End If
-                         Set p = Module13.CreateBigInteger(CStr(p))
+                         Set p = Module13.CreateBi(p)
                     End If
                     bstack.SetVarobJ W$, p
                     GoTo aaa1
@@ -33026,7 +33039,7 @@ Public Function Validator(bstack As basetask, a$, v$, r) As Boolean
                     a$ = Mid$(a$, w1)
                     r = (FastSymbol(a$, ")") And NLtrim$(n$) = vbNullString)
                 ElseIf LastErNum <> 0 Then
-                    GoTo JUMPHERE
+                    GoTo jumphere
                 Else  ' for MyErMacro
                     r = 1
                     If Len(a$) + w1 > Len(n$) Then r = 0
@@ -33046,7 +33059,7 @@ Public Function Validator(bstack As basetask, a$, v$, r) As Boolean
                 If Len(a$) + w1 > Len(n$) Then r = 0
                 r = r * FastSymbol(a$, ")", True)
             Else
-JUMPHERE:
+jumphere:
             LastErNum = 0
             LastErNum1 = 0
             LastErNameGR = vbNullString
@@ -36911,7 +36924,7 @@ cont1290:
             End If
             If Not zeroitem Is Nothing Then
                 If TypeOf zeroitem Is BigInteger Then
-                    Set p = Module13.CreateBigInteger(format$(Int(p), "0"))
+                    Set p = Module13.CreateBi(p)
                     Set zeroitem = Nothing
                 End If
             End If
@@ -37424,7 +37437,7 @@ End If
     If neoGetArray(stripstack1, W$, pppp, , Glob) Then
         If Not NeoGetArrayItem(pppp, stripstack1, W$, v, rest$) Then ExecuteGroupStruct = 0:  Exit Function
         On Error Resume Next
-JUMPHERE:
+jumphere:
         If Not FastSymbol(rest$, "=", True) Then
         SyntaxError
            ExecuteGroupStruct = 0: Exit Function
@@ -37455,7 +37468,7 @@ End If
 If neoGetArray(stripstack1, W$, pppp, , Glob) Then
 If Not NeoGetArrayItem(pppp, stripstack1, W$, v, rest$) Then ExecuteGroupStruct = 0:   Exit Function
     On Error Resume Next
-    GoTo JUMPHERE
+    GoTo jumphere
 Else
 ExecuteGroupStruct = 0:   Exit Function
 End If

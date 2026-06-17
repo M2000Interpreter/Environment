@@ -332,16 +332,16 @@ Dim ss$, skip As Boolean, checktype As Boolean
             If FastSymbol(b$, "=") Then
                 p = nMath2.cxZero
                 If FastSymbol(b$, "(") Then
-                Dim p1
-                If Not IsNumberD2(b$, p1) Then
+                Dim P1
+                If Not IsNumberD2(b$, P1) Then
                     GoTo ER0001
                 End If
-                p.r = CDbl(p1)
+                p.r = CDbl(P1)
                 If Not FastSymbol(b$, ",") Then GoTo ER0001
-                If Not IsNumberD2(b$, p1) Then
+                If Not IsNumberD2(b$, P1) Then
                     GoTo ER0001
                 End If
-                p.i = CDbl(p1)
+                p.i = CDbl(P1)
                 b$ = NLtrim(b$)
                 If Not UCase$(Left$(b$, 2)) = "I)" Then GoTo ER0001
                 Mid$(b$, 1, 2) = "  "
@@ -360,17 +360,12 @@ Dim ss$, skip As Boolean, checktype As Boolean
                 missNumber
                 Exit Function
             Else
-                If MemInt(VarPtr(p)) = vbString Then
-                    Set p = Module13.CreateBigInteger(CStr(p))
-                Else
-                    Set p = Module13.CreateBigInteger(format(Int(p), "0"))
-                End If
+                p = Module13.CreateBi(p)
             End If
         End If
     ElseIf Not IsEnumAs(bstack, b$, p) Then
-    
-            ExpectedEnumType
-            Exit Function
+        ExpectedEnumType
+        Exit Function
     End If
 
     If noVarStat Then
@@ -507,7 +502,7 @@ ElseIf ss$ = "*=" Then
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.multiply(Module13.CreateBigInteger(format$(Int(p), "0")))
+            Set BI = BI.multiply(Module13.CreateBi(p))
         End If
      End If
 ElseIf ss$ = "/=" Then
@@ -522,7 +517,7 @@ contdiv:
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.divide(Module13.CreateBigInteger(format$(Int(p), "0")))
+            Set BI = BI.divide(Module13.CreateBi(p))
         End If
     End If
 
@@ -537,7 +532,7 @@ ElseIf ss$ = "+=" Then
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.Add(Module13.CreateBigInteger(format$(Int(p), "0")))
+            Set BI = BI.Add(Module13.CreateBi(p))
         End If
     End If
 ElseIf ss$ = "-=" Then
@@ -550,7 +545,7 @@ ElseIf ss$ = "-=" Then
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.subtract(Module13.CreateBigInteger(format$(Int(p), "0")))
+            Set BI = BI.subtract(Module13.CreateBi(p))
         End If
     End If
 Else
@@ -565,7 +560,7 @@ Else
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.Modulus(Module13.CreateBigInteger(format$(Int(p), "0")))
+            Set BI = BI.Modulus(Module13.CreateBi(p))
         End If
     End If
     Case "DIV", "ΔΙΑ"
@@ -600,7 +595,7 @@ Case 4
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.Add(Module13.CreateBigInteger(format$(Int(p), "0")))
+            Set BI = BI.Add(Module13.CreateBi(p))
         End If
 Case 5
         If Not bstack.lastobj Is Nothing Then
@@ -611,7 +606,7 @@ Case 5
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.subtract(Module13.CreateBigInteger(format$(Int(p), "0")))
+            Set BI = BI.subtract(Module13.CreateBi(p))
         End If
 Case 6
        If Not bstack.lastobj Is Nothing Then
@@ -623,7 +618,7 @@ Case 6
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.multiply(Module13.CreateBigInteger(format$(Int(p), "0")))
+            Set BI = BI.multiply(Module13.CreateBi(p))
         End If
 Case 7
         If Not bstack.lastobj Is Nothing Then
@@ -635,7 +630,7 @@ Case 7
                 GoTo WrongObj
             End If
         Else
-            Set BI = BI.divide(Module13.CreateBigInteger(format$(Int(p), "0")))
+            Set BI = BI.divide(Module13.CreateBi(p))
         End If
 Case 8
         If Not bstack.lastobj Is Nothing Then
@@ -646,7 +641,7 @@ Case 8
                 GoTo WrongObj
             End If
         Else
-            Set BI = Module13.CreateBigInteger(format$(Int(p), "0"))
+            Set BI = Module13.CreateBi(p)
         End If
 Case Else
     WrongOperator
@@ -1708,6 +1703,9 @@ MyEr "No proper name for enumeration", "μη κανονικό όνομα για 
 End Sub
 Public Sub BadFumName()
 MyEr "No proper name for simple function", "μη κανονικό όνομα για απλή συνάρτηση"
+End Sub
+Public Sub BadForType(t$, g$)
+MyEr t$ + " can't be used in FOR loop", g$ + " δεν μπορεί να χρησιμοποιηθεί σε επανάληψη Για"
 End Sub
 Public Sub BadFunStrName()
 MyEr "No proper name for simple string function", "μη κανονικό όνομα για απλή αλφαριθμητική συνάρτηση"
@@ -3325,7 +3323,7 @@ takeitnow:
                                             p = p + 1
                                             
                                             If bstack.lastobj Is Nothing Then
-                                            Set sp = Module13.CreateBigInteger(format$(Int(sp), "0"))
+                                            Set sp = Module13.CreateBi(sp)
                                             ElseIf TypeOf bstack.lastobj Is BigInteger Then
                                             Set sp = bstack.lastobj
                                             Set bstack.lastobj = Nothing
@@ -5700,13 +5698,9 @@ contprop4:
                         End If
                     Else
                         If TypeOf var(v) Is BigInteger Then
-                            On Error GoTo C12313
-                            If MyIsNumeric(p) Then
-                                Set var(v) = Module13.CreateBigInteger(format$(Int(p), "0"))
+                                On Error GoTo C12313
+                                Set var(v) = Module13.CreateBi(p)
                             Else
-                                Set var(v) = Module13.CreateBigInteger(CStr(p))
-                            End If
-                        Else
 C12313:
                             GoTo WrongObj
                         End If
@@ -6582,18 +6576,18 @@ End Sub
 
 Private Function MyTrimLi(s$, l As Long) As Long
 Dim i&
-Dim p2 As Long, p1 As Integer, p4 As Long
+Dim P2 As Long, P1 As Integer, p4 As Long
  If l > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
  If l <= 0 Then MyTrimLi = 1: Exit Function
   l = l - 1
   i = Len(s)
-  p2 = StrPtr(s) + l * 2:  p4 = p2 + i * 2
-  For i = p2 To p4 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  P2 = StrPtr(s) + l * 2:  p4 = P2 + i * 2
+  For i = P2 To p4 Step 2
+  GetMem2 i, P1
+  Select Case P1
     Case 32, 160, 9
     Case Else
-     MyTrimLi = (i - p2) \ 2 + 1 + l
+     MyTrimLi = (i - P2) \ 2 + 1 + l
    Exit Function
   End Select
   Next i
@@ -6668,7 +6662,7 @@ Do
                     GoTo cont22
                 End If
             If Not IsObject(p) Then
-                Set p = Module13.CreateBigInteger(CStr(p))
+                Set p = Module13.CreateBi(p)
             End If
             ElseIf i = 12 Then
                 If Not IsNumberD2fix(s$, p, False) Then
@@ -8489,7 +8483,7 @@ messnotype:
                                             End If
                                         End If
                                     Else
-                                        Set p = Module13.CreateBigInteger(format$(Int(p), "0"))
+                                        Set p = Module13.CreateBi(p)
                                     End If
                                 Case vbByte
                                     p = CByte(p)
@@ -8889,16 +8883,12 @@ islist:
                                     useoptionals = False
                                 ElseIf check2(ss$, "ΜΕΓΑΛΟΣΑΚΕΡΑΙΟΣ", "BIGINTEGER") Then
                                     useoptionals = False
-                                If FastSymbol(rest$, "=") Then
-                                    Set p = New BigInteger
-                                    If ISSTRINGA(rest$, ss$) Then
-                                        Set p = Module13.CreateBigInteger(ss$)
-                                    ElseIf IsNumberD2(rest$, p, True, True) Then
-                                        If MemInt(VarPtr(p)) = vbString Then
-                                        Set p = Module13.CreateBigInteger(CStr(p))
-                                        Else
-                                        Set p = Module13.CreateBigInteger(format$(Int(p), "0"))
-                                            End If
+                                    If FastSymbol(rest$, "=") Then
+                                        Set p = New BigInteger
+                                        If ISSTRINGA(rest$, ss$) Then
+                                            Set p = Module13.CreateBigInteger(ss$)
+                                        ElseIf IsNumberD2(rest$, p, True, True) Then
+                                            Set p = Module13.CreateBi(p)
                                         Else
                                             missNumber
                                             Exit Function
@@ -11252,7 +11242,7 @@ messnotype:
                                     End If
                                 End If
                             Else
-                                Set p = Module13.CreateBigInteger(format$(Int(p), "0"))
+                                Set p = Module13.CreateBi(p)
                             End If
                         Case vbByte
                             p = CByte(p)
@@ -11654,11 +11644,7 @@ islist:
                                             If ISSTRINGA(rest$, ss$) Then
                                                 Set p = Module13.CreateBigInteger(ss$)
                                             ElseIf IsNumberD2(rest$, p, True, True) Then
-                                                If MemInt(VarPtr(p)) = vbString Then
-                                                Set p = Module13.CreateBigInteger(CStr(p))
-                                                Else
-                                                Set p = Module13.CreateBigInteger(format$(Int(p), "0"))
-                                                End If
+                                                Set p = Module13.CreateBi(p)
                                             Else
                                                 missNumber
                                                 Exit Function
@@ -14968,7 +14954,7 @@ messnotype:
                                     End If
                                 End If
                             Else
-                                Set p = Module13.CreateBigInteger(format$(Int(p), "0"))
+                                Set p = Module13.CreateBi(p)
                             End If
                         Case vbByte
                             p = CByte(p)
@@ -15375,11 +15361,7 @@ islist:
                                             If ISSTRINGA(rest$, ss$) Then
                                                 Set p = Module13.CreateBigInteger(ss$)
                                             ElseIf IsNumberD2(rest$, p, True, True) Then
-                                                If MemInt(VarPtr(p)) = vbString Then
-                                                Set p = Module13.CreateBigInteger(CStr(p))
-                                                Else
-                                                Set p = Module13.CreateBigInteger(format$(Int(p), "0"))
-                                                End If
+                                                Set p = Module13.CreateBi(p)
                                             Else
                                                 missNumber
                                                 Exit Function
@@ -19259,7 +19241,7 @@ contpow2:
                     If Not park Is Nothing Then
                         If TypeOf park Is BigInteger Then
                             Set BI = park
-                            Set BI = BI.Add(Module13.CreateBigInteger(format$(Int(po), "0")))
+                            Set BI = BI.Add(Module13.CreateBi(po))
                             Set park = Nothing
                         End If
                     End If
@@ -19643,7 +19625,7 @@ jumpmult:
 
 jumpmult1:
                     If bstack.lastobj Is Nothing Then
-                        Set bstack.lastobj = Module13.CreateBigInteger(format(Int(r), "0"))
+                        Set bstack.lastobj = Module13.CreateBi(r)
                         r = 0
                     End If
                     If Not bstack.lastobj Is Nothing Then
@@ -19693,9 +19675,10 @@ jumpmult2:
                                 ElseIf Not park Is Nothing Then
                                     Set back = park
                                 ElseIf ac <> 0 Then
-                                    Set back = Module13.CreateBigInteger(format(Int(ac), "0"))
+                                    Set back = Module13.CreateBi(ac)
                                 End If
-                                Set park = Module13.CreateBigInteger(format(Int(po), "0"))
+                            
+                                Set park = Module13.CreateBi(po)
                                 GoTo jumpmult2
                             End If
                         End If
@@ -19768,7 +19751,7 @@ jumpdiv:
 
 jumpdiv1:
                 If bstack.lastobj Is Nothing Then
-                    Set bstack.lastobj = Module13.CreateBigInteger(format(Int(r), "0"))
+                    Set bstack.lastobj = Module13.CreateBi(r)
                     r = 0
                 End If
                 If Not bstack.lastobj Is Nothing Then
@@ -19818,9 +19801,9 @@ jumpdiv2:
                 ElseIf Not park Is Nothing Then
                 Set back = park
                 ElseIf ac <> 0 Then
-                Set back = Module13.CreateBigInteger(format(Int(ac), "0"))
+                    Set back = Module13.CreateBi(ac)
                 End If
-                Set park = Module13.CreateBigInteger(format(Int(po), "0"))
+                    Set park = Module13.CreateBi(po)
                     GoTo jumpdiv2
                 End If
                 End If
@@ -19890,7 +19873,7 @@ a99449:
                                 GoTo m23ds2
                             ElseIf Not BI Is Nothing Then
                                 MUL = 1110
-                                Set park = Module13.CreateBigInteger(format(Int(r), "0"))
+                                Set park = Module13.CreateBi(r)
                                 GoTo aaaa1221
                             End If
     
@@ -19910,7 +19893,7 @@ a99449:
                                 GoTo m23ds2
                             ElseIf Not BI Is Nothing Then
                                 MUL = 1110
-                                Set park = Module13.CreateBigInteger(format(Int(r), "0"))
+                                Set park = Module13.CreateBi(r)
                                 GoTo aaaa1221
                             End If
                             po = r
@@ -19945,7 +19928,7 @@ m23ds2:
                             If TypeOf bstack.lastobj Is BigInteger Then
                                 If BI Is Nothing Then
                                     Set park = bstack.lastobj
-                                    Set BI = Module13.CreateBigInteger(format(Int(po), "0"))
+                                    Set BI = Module13.CreateBi(po)
                                 End If
                                 Set park = bstack.lastobj
                                 GoTo aaaa1221
@@ -19954,7 +19937,7 @@ m23ds2:
                             End If
                         ElseIf Not BI Is Nothing Then
                             MUL = 1010  ' DIV
-                            Set park = Module13.CreateBigInteger(format(Int(r), "0"))
+                            Set park = Module13.CreateBi(r)
                             GoTo aaaa1221
                         End If
                         r1 = po
@@ -19974,7 +19957,7 @@ abdhdh5353:
                             If TypeOf bstack.lastobj Is BigInteger Then
                                 If BI Is Nothing Then
                                     Set park = bstack.lastobj
-                                    Set BI = Module13.CreateBigInteger(format(Int(po), "0"))
+                                    Set BI = Module13.CreateBi(po)
                                 End If
                                 Set park = bstack.lastobj
                                 GoTo aaaa1221
@@ -19983,7 +19966,7 @@ abdhdh5353:
                             End If
                         ElseIf Not BI Is Nothing Then
                             MUL = 1010
-                            Set park = Module13.CreateBigInteger(format(Int(r), "0"))
+                            Set park = Module13.CreateBi(r)
                             GoTo aaaa1221
                         End If
                         po = r
@@ -20015,7 +19998,7 @@ abdhdh5353:
                             GoTo m23ds2
                         ElseIf Not BI Is Nothing Then
                             MUL = 1120
-                            Set park = Module13.CreateBigInteger(format(Int(r), "0"))
+                            Set park = Module13.CreateBi(r)
                             GoTo aaaa1221
                         End If
                         po = r
@@ -20035,7 +20018,7 @@ abdhdh5353:
                         GoTo m23ds2
                     ElseIf Not BI Is Nothing Then
                         MUL = 1120
-                        Set park = Module13.CreateBigInteger(format(Int(r), "0"))
+                        Set park = Module13.CreateBi(r)
                         GoTo aaaa1221
                     End If
                     MUL = 55
@@ -20077,7 +20060,7 @@ n3843:
                         GoTo m23ds2
                     ElseIf Not BI Is Nothing Then
                         MUL = 1020
-                        Set park = Module13.CreateBigInteger(format(Int(r), "0"))
+                        Set park = Module13.CreateBi(r)
                         GoTo aaaa1221
                     End If
                     MUL = 50
@@ -20096,7 +20079,7 @@ n3843:
                         GoTo abdhdh5353
                     ElseIf Not BI Is Nothing Then
                         MUL = 1020
-                        Set park = Module13.CreateBigInteger(format(Int(r), "0"))
+                        Set park = Module13.CreateBi(r)
                         GoTo aaaa1221
                     End If
                     po = r
@@ -20117,7 +20100,7 @@ n3843:
             '  good
             MUL = 3
             If priorityOr Then
-               If IsExpBig(bstack, aa$, r, , True, , True) Then
+               If IsExpBig(bstack, aa$, r, , True) Then
                     processAcAndPoSimple ac, po
                     nostring = True
                     processNegateNonZero po
@@ -20129,7 +20112,7 @@ n3843:
                     Exit Function
                 End If
             Else
-                If IsExpBig(bstack, aa$, r, False, True, , True) Then
+                If IsExpBig(bstack, aa$, r, False, True) Then
                         processAcAndPoSimple ac, po
                         nostring = True
                         processNegateNonZero po
@@ -20146,7 +20129,7 @@ n3843:
         '  good
             MUL = 3
             If priorityOr Then
-                If IsExpBig(bstack, aa$, r, , True, , True) Then
+                If IsExpBig(bstack, aa$, r, , True) Then
                     processAcAndPoSimple ac, po
                     nostring = True
                     processNegateNonZero po
@@ -20158,7 +20141,7 @@ n3843:
                     Exit Function
                 End If
             Else
-                If IsExpBig(bstack, aa$, r, False, True, , True) Then
+                If IsExpBig(bstack, aa$, r, False, True) Then
                     processAcAndPoSimple ac, po
                     nostring = True
                     processNegateNonZero po
@@ -20174,7 +20157,7 @@ n3843:
             Set bstack.lastobj = Nothing
     '  good
             MUL = 3
-            If IsExpBig(bstack, aa$, r, False, True, , True) Then
+            If IsExpBig(bstack, aa$, r, False, True) Then
                 processAcAndPoSimple ac, po
                 nostring = True
                 processNegateNonZero po
@@ -20268,7 +20251,7 @@ ElseIf FastSymbol1(aa$, "-") Then
         If r = 0 Then
             If Not BI Is Nothing Then
                 If bstack.lastobj Is Nothing Then
-                    Set bstack.lastobj = Module13.CreateBigInteger(format(Int(r), "0"))
+                    Set bstack.lastobj = Module13.CreateBi(r)
                 End If
                 GoTo cont33333434
             ElseIf Not bstack.lastobj Is Nothing Then
@@ -20283,7 +20266,7 @@ cont33333434:
                     Else
     
     
-                    Set park = Module13.CreateBigInteger(format(Int(ac + po), "0"))
+                    Set park = Module13.CreateBi(ac + po)
                     Set BI = CopyBigInteger(bstack.lastobj)
                     Set bstack.lastobj = Nothing
                     If IntVal < 0 Then
@@ -20323,7 +20306,7 @@ cont11233:
                     IsExpA = False
                     Exit Function
                 Else
-                    Set bstack.lastobj = Module13.CreateBigInteger(format(Int(r), "0"))
+                    Set bstack.lastobj = Module13.CreateBi(r)
                 End If
             End If
             GoTo cont9494949
@@ -20336,9 +20319,9 @@ cont9494949:
                 If Not park Is Nothing Then
                     Set back = park
                 End If
-                Set park = Module13.CreateBigInteger(format(Int(ac), "0"))
+                Set park = Module13.CreateBi(ac)
                 ac = 0
-            Set BI = CopyBigInteger(bstack.lastobj)
+                Set BI = CopyBigInteger(bstack.lastobj)
                 If r1 < 0 Then
                     r1 = 1
                     BI.negate
@@ -20398,7 +20381,20 @@ fastsum:
                 WrongType
                 Exit Function
             Else
-                Set bstack.lastobj = Module13.CreateBigInteger(format(Int(r), "0"))
+                If MemInt(VarPtr(r)) = vbString Then
+                    If Not park Is Nothing Then
+                        WrongType
+                        Exit Function
+                    Else
+                        
+                        po = BI.ToString + r
+                        Set BI = Nothing
+                        nostring = False
+                        GoTo cont484848
+                    End If
+                Else
+                    Set bstack.lastobj = Module13.CreateBi(r)
+                End If
             End If
             r = 0
         End If
@@ -20432,6 +20428,13 @@ wrong:
             End If
         ElseIf myVarType(po, vbString) Then
             ' convert to string
+            If Not bstack.lastobj Is Nothing Then
+            If TypeOf bstack.lastobj Is BigInteger Then
+                r = bstack.lastobj.ToString
+            End If
+            Set bstack.lastobj = Nothing
+
+            End If
             If myVarType(r, vbString) Then
                 po = po + r
             Else
@@ -20474,7 +20477,12 @@ wrong:
                      Set BI = Nothing
                      GoTo cont7789
                 ElseIf park Is Nothing Then
-                    Set park = Module13.CreateBigInteger(format(Int(po), "0"))
+                    If Not MyIsNumeric(po) Then
+                            WrongType
+                            Exit Function
+                    Else
+                        Set park = Module13.CreateBi(po)
+                    End If
                 End If
                 Set BI = CopyBigInteger(bstack.lastobj)
                 If IntVal < 0 Then
@@ -20499,7 +20507,7 @@ ElseIf lookOne(aa$, "(") Then
     If logical(bstack, aa$, r, -1, True, getcom, , True) Then
     If Not BI Is Nothing Then
         If bstack.lastobj Is Nothing Then
-            Set bstack.lastobj = Module13.CreateBigInteger(format(Int(r), "0"))
+            Set bstack.lastobj = Module13.CreateBi(r)
         End If
         
         If Not FastSymbol1(aa$, ")") Then
@@ -20747,7 +20755,7 @@ jumpequ1:
             End If
             IsExpA = True
             If bstack.lastobj Is Nothing Then
-                po = BI.compare(Module13.CreateBigInteger(format(Int(r), "0"))) = 0
+                po = BI.compare(Module13.CreateBi(r)) = 0
             ElseIf TypeOf bstack.lastobj Is BigInteger Then
                 po = BI.compare(CopyBigInteger(bstack.lastobj)) = 0
                 Set bstack.lastobj = Nothing
@@ -20761,9 +20769,9 @@ jumpequ2:
             If TypeOf bstack.lastobj Is BigInteger Then
                 Set BI = bstack.lastobj
                 If ac = 0 Then
-                    po = BI.compare(Module13.CreateBigInteger(format$(Int(po), "0"))) = 0
+                    po = BI.compare(Module13.CreateBi(po)) = 0
                 Else ' now r is the bi
-                    po = BI.compare(Module13.CreateBigInteger(format$(Int(ac + po), "0"))) = 0
+                    po = BI.compare(Module13.CreateBi(ac + po)) = 0
                     ac = 0
                 End If
             Else
@@ -20854,7 +20862,7 @@ rocket:
                      End If
                      IsExpA = True
                      If bstack.lastobj Is Nothing Then
-                         po = BI.compare(Module13.CreateBigInteger(format(Int(ac + r), "0")))
+                         po = BI.compare(Module13.CreateBi(ac + r))
                      ElseIf TypeOf bstack.lastobj Is BigInteger Then
                          po = BI.compare(CopyBigInteger(bstack.lastobj))
                      Else
@@ -20868,9 +20876,9 @@ rocket:
                      If TypeOf bstack.lastobj Is BigInteger Then
                          Set BI = bstack.lastobj
                        If ac = 0 Then
-                             po = -BI.compare(Module13.CreateBigInteger(format$(Int(po), "0")))
+                             po = -BI.compare(Module13.CreateBi(po))
                          Else ' now r is the bi
-                             po = -BI.compare(Module13.CreateBigInteger(format$(Int(ac + po), "0")))
+                             po = -BI.compare(Module13.CreateBi(ac + po))
                              ac = 0
                          End If
                      Else
@@ -20954,7 +20962,7 @@ strlessequal:
                     End If
                     IsExpA = True
                     If bstack.lastobj Is Nothing Then
-                        po = BI.compare(Module13.CreateBigInteger(format(Int(r), "0"))) < 1
+                        po = BI.compare(Module13.CreateBi(r)) < 1
                     ElseIf TypeOf bstack.lastobj Is BigInteger Then
                         po = BI.compare(CopyBigInteger(bstack.lastobj)) < 1
                         Set bstack.lastobj = Nothing
@@ -20967,9 +20975,9 @@ strlessequal:
                     If TypeOf bstack.lastobj Is BigInteger Then
                         Set BI = bstack.lastobj
                         If ac = 0 Then
-                            po = BI.compare(Module13.CreateBigInteger(format$(Int(po), "0"))) > -1
+                            po = BI.compare(Module13.CreateBi(po)) > -1
                         Else ' now r is the bi
-                            po = BI.compare(Module13.CreateBigInteger(format$(Int(ac + po), "0"))) > -1
+                            po = BI.compare(Module13.CreateBi(ac + po)) > -1
                             ac = 0
                         End If
                     Else
@@ -21036,7 +21044,7 @@ strnotequal:
                 End If
                 IsExpA = True
                 If bstack.lastobj Is Nothing Then
-                    po = BI.compare(Module13.CreateBigInteger(format(Int(r), "0"))) <> 0
+                    po = BI.compare(Module13.CreateBi(r)) <> 0
                 ElseIf TypeOf bstack.lastobj Is BigInteger Then
                     po = BI.compare(CopyBigInteger(bstack.lastobj)) <> 0
                     Set bstack.lastobj = Nothing
@@ -21049,9 +21057,9 @@ strnotequal:
                 If TypeOf bstack.lastobj Is BigInteger Then
                     Set BI = bstack.lastobj
                     If ac = 0 Then
-                        po = BI.compare(Module13.CreateBigInteger(format$(Int(po), "0"))) <> 0
+                        po = BI.compare(Module13.CreateBi(po)) <> 0
                     Else ' now r is the bi
-                        po = BI.compare(Module13.CreateBigInteger(format$(Int(ac + po), "0"))) <> 0
+                        po = BI.compare(Module13.CreateBi(ac + po)) <> 0
                         ac = 0
                     End If
                 Else
@@ -21115,7 +21123,7 @@ strless:
             End If
             IsExpA = True
             If bstack.lastobj Is Nothing Then
-                po = BI.compare(Module13.CreateBigInteger(format(Int(r), "0"))) = -1
+                po = BI.compare(Module13.CreateBi(r)) = -1
             ElseIf TypeOf bstack.lastobj Is BigInteger Then
                 po = BI.compare(CopyBigInteger(bstack.lastobj)) = -1
                 Set bstack.lastobj = Nothing
@@ -21128,9 +21136,9 @@ strless:
             If TypeOf bstack.lastobj Is BigInteger Then
                 Set BI = bstack.lastobj
                 If ac = 0 Then
-                    po = BI.compare(Module13.CreateBigInteger(format$(Int(po), "0"))) = 1
+                    po = BI.compare(Module13.CreateBi(po)) = 1
                 Else ' now r is the bi
-                    po = BI.compare(Module13.CreateBigInteger(format$(Int(ac + po), "0"))) = 1
+                    po = BI.compare(Module13.CreateBi(ac + po)) = 1
                     ac = 0
                 End If
             Else
@@ -21202,7 +21210,7 @@ strGreEqual:
                 End If
                 IsExpA = True
                 If bstack.lastobj Is Nothing Then
-                    po = BI.compare(Module13.CreateBigInteger(format(Int(r), "0"))) > -1
+                    po = BI.compare(Module13.CreateBi(r)) > -1
                 ElseIf TypeOf bstack.lastobj Is BigInteger Then
                     po = BI.compare(CopyBigInteger(bstack.lastobj)) > -1
                     Set bstack.lastobj = Nothing
@@ -21215,9 +21223,9 @@ strGreEqual:
                 If TypeOf bstack.lastobj Is BigInteger Then
                     Set BI = bstack.lastobj
                     If ac = 0 Then
-                        po = BI.compare(Module13.CreateBigInteger(format$(Int(po), "0"))) < 1
+                        po = BI.compare(Module13.CreateBi(po)) < 1
                     Else ' now r is the bi
-                        po = BI.compare(Module13.CreateBigInteger(format$(Int(ac + po), "0"))) < 1
+                        po = BI.compare(Module13.CreateBi(ac + po)) < 1
                         ac = 0
                     End If
                 Else
@@ -21283,7 +21291,7 @@ strGreat:
                 End If
                 IsExpA = True
                 If bstack.lastobj Is Nothing Then
-                    po = BI.compare(Module13.CreateBigInteger(format(Int(r), "0"))) = 1
+                    po = BI.compare(Module13.CreateBi(r)) = 1
                 ElseIf TypeOf bstack.lastobj Is BigInteger Then
                     po = BI.compare(CopyBigInteger(bstack.lastobj)) = 1
                     Set bstack.lastobj = Nothing
@@ -21296,9 +21304,9 @@ strGreat:
                 If TypeOf bstack.lastobj Is BigInteger Then
                     Set BI = bstack.lastobj
                     If ac = 0 Then
-                        po = BI.compare(Module13.CreateBigInteger(format$(Int(po), "0"))) = -1
+                        po = BI.compare(Module13.CreateBi(po)) = -1
                     Else ' now r is the bi
-                        po = BI.compare(Module13.CreateBigInteger(format$(Int(ac + po), "0"))) = -1
+                        po = BI.compare(Module13.CreateBi(ac + po)) = -1
                         ac = 0
                     End If
                 Else
@@ -21762,7 +21770,7 @@ CONTaaabbcc:
                 If Not BI Is Nothing Then
 jumpmult1:
                     If bstack.lastobj Is Nothing Then
-                        Set bstack.lastobj = Module13.CreateBigInteger(format(Int(r), "0"))
+                        Set bstack.lastobj = Module13.CreateBi(r)
                         r = 0
                     End If
                     If Not bstack.lastobj Is Nothing Then
@@ -21790,9 +21798,9 @@ jumpmult2:
                 If Not park Is Nothing Then
                 Set back = park
                 ElseIf ac <> 0 Then
-                Set back = Module13.CreateBigInteger(format(Int(ac), "0"))
+                Set back = Module13.CreateBi(ac)
                 End If
-                Set park = Module13.CreateBigInteger(format(Int(po), "0"))
+                Set park = Module13.CreateBi(po)
                     GoTo jumpmult2
                 End If
                 End If
@@ -21848,7 +21856,7 @@ jumpmult2:
 
 jumpdiv1:
                 If bstack.lastobj Is Nothing Then
-                    Set bstack.lastobj = Module13.CreateBigInteger(format(Int(r), "0"))
+                    Set bstack.lastobj = Module13.CreateBi(r)
                     r = 0
                 End If
                 If Not bstack.lastobj Is Nothing Then
@@ -21861,44 +21869,41 @@ jumpdiv1:
                     Set back = park
                     Set park = BI
 jumpdiv2:
-                    If IntVal < 0 Then
-                    Set BI = CopyBigInteger(bstack.lastobj)
-                    BI.negate
-                    IntVal = 1
-                    Else
-                    Set BI = CopyBigInteger(bstack.lastobj)
-                    End If
-                    Set rr = BI
-                    Set BI = park
-                    Set park = rr
-                    Set rr = Nothing
-                    If Not MUL = 1020 Then MUL = 1010
-                    
+                        If IntVal < 0 Then
+                            Set BI = CopyBigInteger(bstack.lastobj)
+                            BI.negate
+                            IntVal = 1
+                        Else
+                            Set BI = CopyBigInteger(bstack.lastobj)
+                        End If
+                            Set rr = BI
+                            Set BI = park
+                            Set park = rr
+                            Set rr = Nothing
+                            If Not MUL = 1020 Then MUL = 1010
+                        Else
+                            Set bstack.lastobj = Nothing
+                        End If
                     Else
                         Set bstack.lastobj = Nothing
                     End If
                 Else
-                    Set bstack.lastobj = Nothing
-                End If
-                Else
-                If r = 0 Then
-                If Not bstack.lastobj Is Nothing Then
-                If Not park Is Nothing Then
-                Set back = park
-                ElseIf ac <> 0 Then
-                Set back = Module13.CreateBigInteger(format(Int(ac), "0"))
-                End If
-                Set park = Module13.CreateBigInteger(format(Int(po), "0"))
-                    GoTo jumpdiv2
-                End If
-                End If
-                MUL = 2
+                    If r = 0 Then
+                        If Not bstack.lastobj Is Nothing Then
+                            If Not park Is Nothing Then
+                                Set back = park
+                            ElseIf ac <> 0 Then
+                                Set back = Module13.CreateBi(ac)
+                            End If
+                            Set park = Module13.CreateBi(po)
+                            GoTo jumpdiv2
+                        End If
+                    End If
+                    MUL = 2
                 End If
                 r1 = po
                 po = r
-
-                   ' IntVal = 0
-                ElseIf FastSymbol1(aa$, "(") Then
+            ElseIf FastSymbol1(aa$, "(") Then
                 If IntVal < 0 Then po = -po: IntVal = 0
                     If IsExp(bstack, aa$, r, , True) Then
                         MUL = 2

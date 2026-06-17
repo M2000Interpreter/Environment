@@ -1,10 +1,10 @@
 Attribute VB_Name = "gpp1"
 Option Explicit
 Public pw As Long, ph As Long, psw As Long, psh As Long, pwox As Long, phoy As Long, mydpi As Long, prFactor As Single, szFactor As Single
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
-Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
-Private Declare Sub GetMem81 Lib "msvbvm60" Alias "GetMem8" (ByVal addr As Long, RetVal As Currency)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
+Private Declare Sub GetMem81 Lib "msvbvm60" Alias "GetMem8" (ByVal Addr As Long, RetVal As Currency)
 
       Private Type DOCINFO
           cbSize As Long
@@ -12,15 +12,15 @@ Private Declare Sub GetMem81 Lib "msvbvm60" Alias "GetMem8" (ByVal addr As Long,
           lpszOutput As String
       End Type
             Private Declare Function StartDoc Lib "gdi32" Alias "StartDocA" _
-          (ByVal Hdc As Long, lpdi As DOCINFO) As Long
+          (ByVal hDC As Long, lpdi As DOCINFO) As Long
 
-      Private Declare Function StartPage Lib "gdi32" (ByVal Hdc As Long) _
+      Private Declare Function StartPage Lib "gdi32" (ByVal hDC As Long) _
           As Long
 
-      Private Declare Function EndDoc Lib "gdi32" (ByVal Hdc As Long) _
+      Private Declare Function EndDoc Lib "gdi32" (ByVal hDC As Long) _
           As Long
 
-      Private Declare Function EndPage Lib "gdi32" (ByVal Hdc As Long) _
+      Private Declare Function EndPage Lib "gdi32" (ByVal hDC As Long) _
           As Long
 Private mp_hdc As Long
 Public MyDM() As Byte
@@ -33,10 +33,10 @@ Private Const PHYSICALWIDTH As Long = 110
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
 
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal Hdc As Long, ByVal iCapabilitiy As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal iCapabilitiy As Long) As Long
 
       Private Declare Function ResetDC Lib "gdi32" Alias "ResetDCA" _
-          (ByVal Hdc As Long, lpInitData As Any) As Long
+          (ByVal hDC As Long, lpInitData As Any) As Long
 Private Declare Function CreateIC Lib "gdi32" Alias "CreateICA" _
           (ByVal lpDriverName As String, ByVal lpDeviceName As String, _
           ByVal lpOutput As String, lpInitData As Any) As Long
@@ -47,7 +47,7 @@ Private Declare Function CreateIC Lib "gdi32" Alias "CreateICA" _
       Private Declare Function CreateDC Lib "gdi32" Alias "CreateDCA" _
           (ByVal lpDriverName As String, ByVal lpDeviceName As String, _
           ByVal lpOutput As Long, lpInitData As Any) As Long
-      Private Declare Function DeleteDC Lib "gdi32" (ByVal Hdc As Long) _
+      Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) _
           As Long
       Private Const NULLPTR = 0&
       ' Constants for DEVMODE
@@ -219,10 +219,10 @@ End Sub
       End If
       End Function
 Sub SwapPrinterDim(pw As Long, ph As Long, psw As Long, psh As Long, LPX As Long, lpy As Long)
-Dim A As Long
-A = pw: pw = ph: ph = A
-A = psw: psw = psh: psh = A
-A = LPX: LPX = lpy: lpy = A
+Dim a As Long
+a = pw: pw = ph: ph = a
+a = psw: psw = psh: psh = a
+a = LPX: LPX = lpy: lpy = a
 End Sub
 Sub PrinterDim(pw As Long, ph As Long, psw As Long, psh As Long, LPX As Long, lpy As Long)
           Dim ret As Long
@@ -390,36 +390,36 @@ b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" 
 b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\OpenWithList\"
 
 End Sub
-Function signlong(ByVal A As Currency) As Currency
-If A < 0 Then A = 0
-If A > 4294967295@ Then A = 4294967295@
-If A > 2147483647@ Then
-signlong = ((-2147483648@ + A) - 2147483648@) ' And &HFFFFFFFF
+Function signlong(ByVal a As Currency) As Currency
+If a < 0 Then a = 0
+If a > 4294967295@ Then a = 4294967295@
+If a > 2147483647@ Then
+signlong = ((-2147483648@ + a) - 2147483648@) ' And &HFFFFFFFF
 Else
-signlong = A
+signlong = a
 End If
 End Function
-Function signlong2(ByVal A As Double) As Long
-If A < 0 Then A = 0
-If A > 4294967295# Then A = 4294967295#
-If A > 2147483647# Then
-signlong2 = CLng((-2147483648# + A) - 2147483648#)
+Function signlong2(ByVal a As Double) As Long
+If a < 0 Then a = 0
+If a > 4294967295# Then a = 4294967295#
+If a > 2147483647# Then
+signlong2 = CLng((-2147483648# + a) - 2147483648#)
 Else
-signlong2 = CLng(A)
+signlong2 = CLng(a)
 End If
 End Function
-Function uintnew3(A As Long) As Double
-If A < 0 Then
-uintnew3 = 4294967296# + CDbl(A)
+Function uintnew3(a As Long) As Double
+If a < 0 Then
+uintnew3 = 4294967296# + CDbl(a)
 Else
-uintnew3 = CDbl(A)
+uintnew3 = CDbl(a)
 End If
 End Function
-Function uintnew1(A As Long) As Currency   ' uintnew1(cUlng(add32(2147483647@, 2147483647@)))=4294967294
-If A < 0 Then
-uintnew1 = 4294967296@ + CCur(A)
+Function uintnew1(a As Long) As Currency   ' uintnew1(cUlng(add32(2147483647@, 2147483647@)))=4294967294
+If a < 0 Then
+uintnew1 = 4294967296@ + CCur(a)
 Else
-uintnew1 = CCur(A)
+uintnew1 = CCur(a)
 End If
 End Function
 Function SignInt64(v)
@@ -429,43 +429,43 @@ If v >= limitlonglong Then v = v - maxlonglong
 End Function
 
 
-Function uintnew0(ByVal A As Currency) As Double
-A = Fix(A)
-If A > 2147483647@ Then A = 2147483647@
-If A < -2147483648@ Then A = -2147483648@
-If A < 0 Then
-uintnew0 = CDbl(4294967296@ + A)
+Function uintnew0(ByVal a As Currency) As Double
+a = Fix(a)
+If a > 2147483647@ Then a = 2147483647@
+If a < -2147483648@ Then a = -2147483648@
+If a < 0 Then
+uintnew0 = CDbl(4294967296@ + a)
 Else
-uintnew0 = CDbl(A)
+uintnew0 = CDbl(a)
 End If
 End Function
-Function uintnew(ByVal A As Currency) As Currency
-A = Fix(A)
-If A > 2147483647@ Then A = 2147483647@
-If A < -2147483648@ Then A = -2147483648@
-If A < 0 Then
-uintnew = 4294967296@ + A
+Function uintnew(ByVal a As Currency) As Currency
+a = Fix(a)
+If a > 2147483647@ Then a = 2147483647@
+If a < -2147483648@ Then a = -2147483648@
+If a < 0 Then
+uintnew = 4294967296@ + a
 Else
-uintnew = A
+uintnew = a
 End If
 End Function
-Function add32(ByVal A As Currency, ByVal b As Currency) As Currency
-add32 = uintnew1(LowLong(cInt64(CDec(A) + CDec(b))))
+Function add32(ByVal a As Currency, ByVal b As Currency) As Currency
+add32 = uintnew1(LowLong(cInt64(CDec(a) + CDec(b))))
 
 End Function
 
 Function HexToUnsigned(s$) As Currency
-Dim A As Double
-A = CLng("&h" + s$)
-If A < 0 Then
-HexToUnsigned = 4294967296@ + A
+Dim a As Double
+a = CLng("&h" + s$)
+If a < 0 Then
+HexToUnsigned = 4294967296@ + a
 Else
-HexToUnsigned = CCur(A)
+HexToUnsigned = CCur(a)
 End If
 End Function
-Function uintnew2(A As Double) As Double
+Function uintnew2(a As Double) As Double
 Dim ucn As Currency
-ucn = Fix(A)
+ucn = Fix(a)
 If ucn > 2147483647# Then ucn = 2147483647#
 If ucn < -2147483648# Then ucn = -2147483648#
 If ucn < 0 Then
@@ -474,9 +474,9 @@ Else
 uintnew2 = CDbl(ucn)
 End If
 End Function
-Function UINT(ByVal A As Long) As Long 'δίνει έναν integer σαν Unsigned integer σε long
+Function UINT(ByVal a As Long) As Long 'δίνει έναν integer σαν Unsigned integer σε long
  Dim b As Long
- b = A And &HFFFF&
+ b = a And &HFFFF&
  If b < 0 Then
  UINT = CLng(&H10000 + b)
  Else
@@ -484,53 +484,53 @@ Function UINT(ByVal A As Long) As Long 'δίνει έναν integer σαν Unsigned integer 
  End If
  
  End Function
-Function cUbyte(ByVal A As Long) As Long
-If (A And &H80&) <> 0 Then
-    cUbyte = A Or &HFFFFFF80
+Function cUbyte(ByVal a As Long) As Long
+If (a And &H80&) <> 0 Then
+    cUbyte = a Or &HFFFFFF80
 Else
-    cUbyte = A And &H7F&
+    cUbyte = a And &H7F&
 End If
 End Function
-Function cUint(ByVal A As Long) As Long ' πέρνει έναν Unsigned integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
-If (A And &H8000&) <> 0 Then
-    cUint = A Or &HFFFF8000
+Function cUint(ByVal a As Long) As Long ' πέρνει έναν Unsigned integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
+If (a And &H8000&) <> 0 Then
+    cUint = a Or &HFFFF8000
 Else
-    cUint = A And &H7FFF&
+    cUint = a And &H7FFF&
 End If
 End Function
-Function LowWord(A As Long) As Long
-LowWord = A
+Function LowWord(a As Long) As Long
+LowWord = a
 PutMem2 VarPtr(LowWord) + 2, 0
 End Function
 Function HighLow(H As Long, l As Long) As Long
-Dim A As Integer
+Dim a As Integer
 HighLow = l
-GetMem2 VarPtr(H), A
-PutMem2 VarPtr(HighLow) + 2, A
+GetMem2 VarPtr(H), a
+PutMem2 VarPtr(HighLow) + 2, a
 End Function
-Function HighWord(A As Long) As Long
+Function HighWord(a As Long) As Long
 Dim H As Integer
-GetMem2 VarPtr(A) + 2, H
+GetMem2 VarPtr(a) + 2, H
 PutMem2 VarPtr(HighWord), H
 End Function
-Function cUlng2(A As Double) As Long ' for packlng, get a double as unsigned 32bit and return sign 32bit
-A = Fix(A)
-If A > 4294967296# Then A = 4294967296#
-If A < 0 Then A = 0
-If A > 2147483647# Then
-cUlng2 = A - 4294967296#
+Function cUlng2(a As Double) As Long ' for packlng, get a double as unsigned 32bit and return sign 32bit
+a = Fix(a)
+If a > 4294967296# Then a = 4294967296#
+If a < 0 Then a = 0
+If a > 2147483647# Then
+cUlng2 = a - 4294967296#
 Else
-cUlng2 = CLng(A)
+cUlng2 = CLng(a)
 End If
 Exit Function
 End Function
 ' πέρνει έναν unsigned long και τον κάνει νορμάλ χωρίς αλλαγή των bits
-Function cUlng(ByVal A As Currency) As Long
+Function cUlng(ByVal a As Currency) As Long
     On Error GoTo cu1
     Dim ret As Long
-    A = Abs(A)
-    A = A / 10000@
-    GetMem4 VarPtr(A), ret
+    a = Abs(a)
+    a = a / 10000@
+    GetMem4 VarPtr(a), ret
     cUlng = ret
     Exit Function
 cu1:
@@ -540,17 +540,17 @@ Function Sput(ByVal sL As String) As String
 ' change to signed
 Sput = Chr(2) + Right$("00000000" & Hex$(Len(sL)), 8) + sL
 End Function
-Function PACKLNGUnsign$(A As Variant)
-If A < 0 Then
-PACKLNGUnsign$ = Right$("00000000" & Hex$(cUlng2(CDbl(-A))), 8)
+Function PACKLNGUnsign$(a As Variant)
+If a < 0 Then
+PACKLNGUnsign$ = Right$("00000000" & Hex$(cUlng2(CDbl(-a))), 8)
 Else
-PACKLNGUnsign$ = Right$("00000000" & Hex$(cUlng2(CDbl(A))), 8)
+PACKLNGUnsign$ = Right$("00000000" & Hex$(cUlng2(CDbl(a))), 8)
 End If
 End Function
-Function PACKLNG$(ByVal A As Double) ' change to get negative values
-If A > 2147483647# Then A = 2147483647#
-If A < -2147483648# Then A = -2147483648#
-PACKLNG$ = Right$("00000000" & Hex$(CLng(A)), 8)
+Function PACKLNG$(ByVal a As Double) ' change to get negative values
+If a > 2147483647# Then a = 2147483647#
+If a < -2147483648# Then a = -2147483648#
+PACKLNG$ = Right$("00000000" & Hex$(CLng(a)), 8)
 End Function
 Function PACKLNG2$(ByVal z)  ' with error return..for revision print, change for Write to file, to cutoff excess
 ' this if only for print
@@ -558,7 +558,7 @@ On Error GoTo er10
 If myVarType(z, vbObject) Then
 z = uintnew(ObjPtr(z))
 End If
-Dim internal As Long, A As Currency, high$, v64 As Boolean
+Dim internal As Long, a As Currency, high$, v64 As Boolean
 v64 = myVarType(z, 20)
 j1112243:
 If myVarType(z, 20) Then
@@ -577,18 +577,20 @@ ElseIf myVarType(z, vbLong) Then
 ElseIf myVarType(z, vbInteger) Then
     PACKLNG2$ = "0x" + Right$("000" & Hex$(z), 4)
     Exit Function
+ElseIf myVarType(z, vbString) Then
+SwapString2Variant PACKLNG2$, z
 Else
-    A = Int(CCur(z))
-    If A > 4294967296# Then
+    a = Int(CCur(z))
+    If a > 4294967296# Then
         PACKLNG2$ = "???+"
-    ElseIf A < 0 Then
+    ElseIf a < 0 Then
         ' error
         PACKLNG2$ = "???-"
     Else
-        If A > 2147483647# Then
-            internal = CLng(A - 4294967296#)
+        If a > 2147483647# Then
+            internal = CLng(a - 4294967296#)
         Else
-            internal = CLng(A)
+            internal = CLng(a)
         End If
 jump1:
         If (internal And &HFFFF0000) = 0 Then
@@ -608,8 +610,8 @@ Function UNPACKLNG(ByVal s$) As Long
 UNPACKLNG = CLng("&H" & s$)
 End Function
 
-Function ORGAN(A As Long) As String
-Select Case A
+Function ORGAN(a As Long) As String
+Select Case a
 Case 1
 ORGAN = "Acoustic Grand Piano"
 Case 2
@@ -868,10 +870,10 @@ Case 128
 ORGAN = "Gunshot"
 End Select
 End Function
-Function Copy64Cur(ByVal x) As Currency
+Function Copy64Cur(ByVal X) As Currency
 Dim l As Long
-If VarType(x) = 20 Then
-GetMem81 VarPtr(x) + 8, Copy64Cur
+If VarType(X) = 20 Then
+GetMem81 VarPtr(X) + 8, Copy64Cur
 End If
 End Function
 Function CopyCur64(ByVal c As Currency)

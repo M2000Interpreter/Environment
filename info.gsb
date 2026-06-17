@@ -5767,7 +5767,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 63 for M2000 Interpreter version 14, revision 42 and above"
+	Report " A collection of modules for tests version 63 for M2000 Interpreter version 14, revision 48 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -33099,10 +33099,12 @@ every 1000/25{
 				refresh 
 			next
 		else.if which=3 then	
-			HideAllIcon()
+			//HideAllIcon()
 			Px(TopPlayer)+=xx-xx1
 			Py(TopPlayer)+=yy-yy1
-			player 3 ,Px(TopPlayer), Py(TopPlayer) : wait 3
+			player 3 hide
+	  		player 3 ,Px(TopPlayer), Py(TopPlayer)
+	  		player 3 show':wait 3
 		end if
 		} as Semaphore
 	else.if keypress(32) then
@@ -33130,7 +33132,9 @@ For i=1 to 50
 	next
 	for k=1 to 3
 		j=PlayersOrder(k)
+		player k hide
 		Player k, px(j), py(j)
+		player k show
 		next
 	refresh
 	mv*=1.3
@@ -46218,48 +46222,48 @@ Print Polar(abs(a), arg(a))=(8, -3i)
 ? str$((8,-3i) ,"0.00")
 }
 MODULE MANDELBROT {Module Mandelbrot(x=0&,y=0&,z=1&) {
-    If z<1  then z=1
-    If z>16 then z=16
-    Const iXmax=32*z
-    Const iYmax=26*z
-    Def single Cx, Cy, CxMin=-2.05, CxMax=0.85, CyMin=-1.2,  CyMax=1.2
-    Const PixelWidth=(CxMax-CxMin)/iXmax, iXm=(iXmax-1)*PixelWidth
-    Const PixelHeight=(CyMax-CyMin)/iYmax,Ph2=PixelHeight/2
-    Const Iteration=25
-    Const EscRadious=2.5, ER2=EscRadious**2
-    Def single preview
-    preview=iXmax*twipsX*(z/16)
-    Def long yp, xp, dx, dy, dx1, dy1
-    Let dx=twipsx*(16/z), dx1=dx-1
-    Let dy=twipsy*(16/z), dy1=dy-1
-     d=dx/twipsX
-    yp=y
-    iXm1 = iXm-PixelHeight*(z-1)/16
-    iYmax1=iYmax-PixelHeight*(z-1)/32
-    
-    WIDTH  8/Z {
-	For iY=0 to (iYmax1-1)*PixelHeight step PixelHeight {
-    		Cy=CyMin+iY
-    		xp=x
-    		if abs(Cy)<Ph2 Then Cy=0
-    		For iX=0 to iXm1 step PixelWidth {
-    			Let  Cx=CxMin+iX,Zx=0,Zy=0,Zx2=Zx**2,Zy2=Zy**2
-    			For It=Iteration to 1 {Let Zy=2*Zx*Zy+Cy,Zx=Zx2-Zy2+Cx,Zx2=Zx**2,Zy2=Zy**2 :if Zx2+Zy2>ER2 Then exit
-    		}
-    		if it>13 then {it-=13} else.if it=0 then pset ! 0,xp,yp: xp+=dx : continue
-    		it*=10:PSET ! color(it, it,255), xp,yp :xp+=dx
-    		} : yp+=dy
-            	}
+	If z<1  then z=1
+	If z>16 then z=16
+	Const iXmax=32*z/2
+	Const iYmax=26*z/2
+	Def single Cx, Cy, CxMin=-2.05, CxMax=0.85, CyMin=-1.2,  CyMax=1.2
+	Const  PixelWidth=(CxMax-CxMin)/iXmax, iXm=(iXmax-1*z)*PixelWidth
+	Const  PixelHeight=(CyMax-CyMin)/iYmax,Ph2=PixelHeight/2
+	Const Iteration=25
+	Const EscRadious=2.5, ER2=EscRadious**2
+	//	    Def single preview
+	//	    preview=iXmax*twipsX*(z/16)
+	long yp, xp, dx, dy, dx1, dy1
+	Let dx=twipsx*48/z, dx1=dx-1
+	Let dy=twipsy*48/z, dy1=dy-1
+	d=dx/twipsX
+	yp=y+dy/twipsy/2 '4/z*twipsY
+	iXm1 = iXm'+PixelWidth*z/2
+	iYmax1=iYmax+PixelHeight*z
+	' x-= dx/twipsX*2   '     8/z*twipsX 
+	Width  dx/twipsX-1 {
+		For iY=0 to (iYmax1+z/4)*PixelHeight step PixelHeight {
+			Cy=CyMin+iY
+			xp=x
+			if abs(Cy)<Ph2 Then Cy=0
+			For iX=0 to iXm1 step PixelWidth {
+				Let  Cx=CxMin+iX,Zx=0,Zy=0,Zx2=Zx**2,Zy2=Zy**2
+				For It=Iteration to 1 {Let Zy=2*Zx*Zy+Cy,Zx=Zx2-Zy2+Cx,Zx2=Zx**2,Zy2=Zy**2 :if Zx2+Zy2>ER2 Then exit
+			}
+			if it>13 then {it-=13} else.if it=0 then pset ! 0,xp,yp: xp+=dx : continue
+			it*=10:PSET ! color(it, it,255), xp,yp :xp+=dx
+		} : yp+=dy
+		}
 	}
 }
 Cls 1,0
 PRINT "PRESS CTR+C/ESC TO EXIT PROGRAM EARLY"
-sz=(1,2,4,8,16)
+sz=(1, 2, 3, 4, 5, 6, 8, 12, 16)
 i=each(sz)
 While i {
-      Mandelbrot 250*twipsx,100*twipsy, array(i)
-      Cursor 0,1
-      Print Over $(1), "Phase:"+(i^+1)+"/"+(len(sz))
+  Mandelbrot 350*twipsx,100*twipsy, array(i)
+  Cursor 0,1
+  Print Over $(1), "Phase:"+(i^+1)+"/"+(len(sz))
 }
 }
 MODULE PREP {//https://rosettacode.org/wiki/Compiler/Simple_file_inclusion_pre_processor
