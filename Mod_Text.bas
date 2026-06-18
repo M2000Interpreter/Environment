@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 48
+Global Const Revision = 49
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -19938,75 +19938,71 @@ contNegLocal:
  '               If noVarStat Then SyntaxError: Execute = 0: Exit Function
         
                 If Not NewStat Then
-                 If IsLabelSymbolNew(b$, "дипкос", "DOUBLE", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbDouble) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbInteger) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbLong) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbSingle) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbBoolean) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbDecimal) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "коцистийос", "CURRENCY", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbCurrency) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "цяалла", "STRING", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbString) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "атупос", "VARIANT", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbVariant) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "олада", "GROUP", Lang) Then
-                    If Not ProcGroup(-1, bstack, b$, Lang) Then
-                    Execute = 0
-                    Exit Function
+                    If IsLabelSymbolNew(b$, "дипкос", "DOUBLE", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbDouble) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbInteger) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbLong) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbSingle) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbBoolean) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbDecimal) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "коцистийос", "CURRENCY", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbCurrency) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "цяалла", "STRING", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbString) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "атупос", "VARIANT", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbVariant) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "олада", "GROUP", Lang) Then
+                        If Not ProcGroup(-1, bstack, b$, Lang) Then
+                        Execute = 0
+                        Exit Function
+                        End If
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "ьгжио", "BYTE", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbByte) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "глеяолгмиа", "DATE", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbDate) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "амтийеилемо", "OBJECT", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbObject) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "лецакосайеяаиос", "BIGINTEGER", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, vbObject, , New BigInteger) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "лицадийос", "COMPLEX", Lang) Then
+                        If Not MyAnyType(bstack, b$, Lang, True, 200) Then Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "апая", "ENUM", Lang, , True) Then
+                        If Not ProcEnum(bstack, b$, , True) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "апаяихлгсг", "ENUMERATION", Lang, , True) Then
+                        If Not ProcEnum(bstack, b$, , True) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "диепажг", "INTERFACE", Lang) Then
+                        If Not ProcInter(bstack, b$, Lang, , True) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
+                    ElseIf IsLabelSymbolNew(b$, "долг", "STRUCTURE", Lang) Then
+                        If Not makestruct(bstack, b$, Lang, False, True) Then Execute = 0: Exit Function
+                        GoTo loopcontinue
                     End If
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "ьгжио", "BYTE", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbByte) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "глеяолгмиа", "DATE", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbDate) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "амтийеилемо", "OBJECT", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbObject) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "лецакосайеяаиос", "BIGINTEGER", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, vbObject, , New BigInteger) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "лицадийос", "COMPLEX", Lang) Then
-                    If Not MyAnyType(bstack, b$, Lang, True, 200) Then Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "апая", "ENUM", Lang, , True) Then
-                If Not ProcEnum(bstack, b$, , True) Then Execute = 0: Exit Function
-                GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "апаяихлгсг", "ENUMERATION", Lang, , True) Then
-
-                If Not ProcEnum(bstack, b$, , True) Then Execute = 0: Exit Function
-
-                GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "диепажг", "INTERFACE", Lang) Then
-                    If Not ProcInter(bstack, b$, Lang, , True) Then Execute = 0: Exit Function
-                    GoTo loopcontinue
-                ElseIf IsLabelSymbolNew(b$, "долг", "STRUCTURE", Lang) Then
-
-                If Not makestruct(bstack, b$, Lang, False, True) Then Execute = 0: Exit Function
-
-                GoTo loopcontinue
-                End If
                     NewStat = True
-                    End If
-                    sss = Len(b$)
-                    LLL = sss
+                End If
+                sss = Len(b$)
+                LLL = sss
                 iscom = True
                     Select Case IsLabelDotSub(temphere$, b$, W$, ss$, (Lang), nchr)
                     Case 1234, 0
@@ -32195,7 +32191,7 @@ findelsesub0:
                                 If searchsub(bstack.OriginalCode, FindPrevOriginal(bstack), small$, i, S3, bb$) Then
                                 bstack.callx1 = 0
                                 If Len(small$) <> 0 Then
-                                    If Not MyRead(7, bstack, small$, 1) Then
+                                    If Not MyRead7(bstack, small$, 1) Then
                                         Exec = 0
                                         Exit Function
                                     End If

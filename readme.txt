@@ -1,28 +1,26 @@
 M2000 Interpreter and Environment
-Version 14 Revision 48
+Version 14 Revision 49
 
+A bug removed (Was there for at least tow revisions I suspect)
+The bug was in While End while. Repeat Until, Repeat When, Repeat Always
+When we call a sub which is not in the same module but in the parent module, and only on the first call the read function not executed  so the i variable not exist;
+This fault not happen if the sub is in the module inner
+Also this fault not happen if we use For loop or a standard block { }
+(It is one statement error, which I forgot to change when I change the read function for better results from a monolithic old function)
+So now this test display true the i exist.
 
-1) Add outputbase value (optional) in BigInteger() function
-2) we can add string and biginteger to get get string 
+module inner {
+	m=true
+	while m {
+		sub1 100
+		m=false
+	}
+}
+inner
 
-a=biginteger("1AC3FF4FAFE", 16, 2) ' two optional inputbase and outputbase
-biginteger b="127398127398172837128937812738127381273812738"
-biginteger c=127398127398172837128937812738127381273812737u
-b=>outputbase=16
-print a ' binary
-print b ' hex
-c++
-print b=c
-hex a
-print a+"value" ' add string return string
-print "0b"+a  ' add string return string 
-print "(0b"+a+")" ' add string return string
-
-
-3) Fix Sprite moving (using hardware sprites through Player) when the player move I found thisL I hade to hide, then to move, then to show (this was too fast to see the hide state, but the moving is instant, otherwise we get a non sync rendering). I found it looking the sprite rotation which not have problem so I think maybe the problem can be fixed with hide/show effect and I it is that.
-Execute Sprites module on Info file (see below how to load it).
-
-4) Some minor additions like error messages for For loop when we use BigInteger for control value (not allowed), or complex type (also not allowed).
+sub sub1(i)
+	? valid(i)
+end sub
 
 
 
