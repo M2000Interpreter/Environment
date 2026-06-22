@@ -20,7 +20,7 @@ Dim Init As Boolean
 'Dim IamMethod  As Boolean  ' not used
 Dim hardlink As Object, useobj As Boolean, isobjret As Boolean
 Private mLastObj As Object
-Public arr As Boolean
+Public Arr As Boolean
 Private UseExtControl As Boolean
 'Dim oEnum As IUnknown
 Private IndexList As mIndexes
@@ -84,6 +84,7 @@ Set hardlink = obj
 useobj = True
 Set mLastObj = Nothing
 vtref = vtrefnumber
+'Debug.Print Typename(obj), vtref
 End Sub
 Public Property Get lastobj() As Object
 Set lastobj = mLastObj
@@ -95,6 +96,76 @@ End Property
 Public Sub clearlastobject()
 Set mLastObj = Nothing
 End Sub
+Public Property Get ValueObjNoError() As Object
+Dim v, oerr As Boolean
+oerr = skiperror
+skiperror = True
+Dim RETVAR As Variant, retvar2, obj As Object
+Dim check As Boolean
+Set mLastObj = Nothing
+isobjret = False
+If Init Then
+    If UseIndex Then
+        If Not IndexNew Then
+            'ValueObj = 0
+            Set mLastObj = Me
+            'Set ValueObj = Me
+            isobjret = True
+            skiperror = oerr
+            Exit Property
+        ElseIf useobj Then
+            IndexNew = False
+            Set ValueObjNoError = ReadPropIndexObjObj(hardlink, vtref, mIndex, UseExtControl)
+            
+        Else
+            IndexNew = False
+            Set obj = var(ObjectRef)
+            Set ValueObjNoError = ReadPropIndexObjObj(obj, vtref, mIndex, UseExtControl)
+          
+        End If
+    Else
+        If useobj Then
+            If ReadPropObj(hardlink, vtref, RETVAR, UseExtControl) Then
+                If IsObject(RETVAR) Then
+                    isobjret = True
+                    'ValueObj = 0
+                    Set mLastObj = RETVAR
+                Else
+                    If TypeOf RETVAR Is IUnknown Then
+                        isobjret = True
+                     '   ValueObj = 0
+                        Set mLastObj = RETVAR
+                        skiperror = oerr
+                        Exit Property
+                    End If
+                    'ValueObj = RETVAR
+                End If
+            End If
+        Else
+            If ReadProp(ObjectRef, vtref, RETVAR, UseExtControl) Then
+                If IsObject(RETVAR) Then
+                    isobjret = True
+                    'ValueObj = 0
+                    Set mLastObj = RETVAR
+                Else
+                    On Error Resume Next
+                    If TypeOf RETVAR Is IUnknown Then
+                        isobjret = True
+                     '   ValueObj = 0
+                        Set mLastObj = RETVAR
+                        skiperror = oerr
+                        Exit Property
+                    End If
+                    Err.Clear
+                   ' ValueObj = RETVAR
+                End If
+            End If
+        End If
+    End If
+End If
+skiperror = oerr
+End Property
+
 Public Property Get ValueObj() As Object
 Dim v
 Dim RETVAR As Variant, retvar2, obj As Object
@@ -112,7 +183,6 @@ If Init Then
         ElseIf useobj Then
             IndexNew = False
             Set ValueObj = ReadPropIndexObjObj(hardlink, vtref, mIndex, UseExtControl)
-            
         Else
             IndexNew = False
             Set obj = var(ObjectRef)
@@ -156,6 +226,84 @@ If Init Then
     End If
 End If
 End Property
+Public Property Get ValueNoError() As Variant
+Dim v, oerr As Boolean
+oerr = skiperror
+skiperror = True
+Dim RETVAR As Variant, retvar2, obj As Object
+Dim check As Boolean
+Set mLastObj = Nothing
+isobjret = False
+If Init Then
+    If UseIndex Then
+        If Not IndexNew Then
+            ValueNoError = 0
+            Set mLastObj = Me
+            isobjret = True
+            skiperror = oerr
+
+            Exit Property
+        ElseIf useobj Then
+            IndexNew = False
+
+            ValueNoError = ReadPropIndexObj(hardlink, vtref, mIndex, UseExtControl)
+        Else
+            IndexNew = False
+            ValueNoError = ReadPropIndex(ObjectRef, vtref, mIndex, UseExtControl, check, RETVAR)
+            If check And IsObject(RETVAR) Then
+                On Error Resume Next
+                Set obj = RETVAR
+                If ReadOneParameter(obj, (0), vbNullString, retvar2) Then
+                    ValueNoError = retvar2
+                Else
+                    isobjret = True
+                    Set mLastObj = RETVAR
+                End If
+            End If
+        End If
+    Else
+        If useobj Then
+            If ReadPropObj(hardlink, vtref, RETVAR, UseExtControl) Then
+                If IsObject(RETVAR) Then
+                    isobjret = True
+                    ValueNoError = 0
+                    Set mLastObj = RETVAR
+                Else
+                    If TypeOf RETVAR Is IUnknown Then
+                        isobjret = True
+                        ValueNoError = 0
+                        Set mLastObj = RETVAR
+                        skiperror = oerr
+                        Exit Property
+                    End If
+                    ValueNoError = RETVAR
+                End If
+            End If
+        Else
+            If ReadProp(ObjectRef, vtref, RETVAR, UseExtControl) Then
+                If IsObject(RETVAR) Then
+                    isobjret = True
+                    ValueNoError = 0
+                    Set mLastObj = RETVAR
+                Else
+                    On Error Resume Next
+                    If TypeOf RETVAR Is IUnknown Then
+                        isobjret = True
+                        ValueNoError = 0
+                        Set mLastObj = RETVAR
+                        skiperror = oerr
+                        Exit Property
+                    End If
+                    Err.Clear
+                    ValueNoError = RETVAR
+                End If
+            End If
+        End If
+    End If
+End If
+skiperror = oerr
+End Property
+
 Public Property Get Value() As Variant
 Dim v
 Dim RETVAR As Variant, retvar2, obj As Object
@@ -171,7 +319,6 @@ If Init Then
             Exit Property
         ElseIf useobj Then
             IndexNew = False
-
             Value = ReadPropIndexObj(hardlink, vtref, mIndex, UseExtControl)
         Else
             IndexNew = False

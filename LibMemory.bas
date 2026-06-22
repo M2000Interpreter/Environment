@@ -571,12 +571,12 @@ End Function
 'Returns the memory address of a variable of array type
 'Returns error 5 for a non-array or an array wrapped in a Variant
 '*******************************************************************************
-Public Function VarPtrArr(ByRef Arr As Variant) As LongPtr
+Public Function VarPtrArr(ByRef arr As Variant) As LongPtr
     Const vtArrByRef As Long = vbArray + VT_BYREF
-    Dim vt As VbVarType: vt = MemInt(VarPtr(Arr)) 'VarType(arr) ignores VT_BYREF
+    Dim vt As VbVarType: vt = MemInt(VarPtr(arr)) 'VarType(arr) ignores VT_BYREF
     If (vt And vtArrByRef) = vtArrByRef Then
         Const pArrayOffset As Long = 8
-        VarPtrArr = MemLongPtr(VarPtr(Arr) + pArrayOffset)
+        VarPtrArr = MemLongPtr(VarPtr(arr) + pArrayOffset)
     Else
         Err.Raise 5, "VarPtrArr", "Array required"
     End If
@@ -586,17 +586,24 @@ End Function
 'Returns the pointer to the underlying SAFEARRAY structure of a VB array
 'Returns error 5 for a non-array
 '*******************************************************************************
-Public Function ArrPtr(ByRef Arr As Variant) As LongPtr
-    Dim vt As VbVarType: vt = MemInt(VarPtr(Arr)) 'VarType(arr) ignores VT_BYREF
+Public Function ArrPtr(ByRef arr As Variant) As LongPtr
+    Dim vt As VbVarType: vt = MemInt(VarPtr(arr)) 'VarType(arr) ignores VT_BYREF
     If vt And vbArray Then
         Const pArrayOffset As Long = 8
-        ArrPtr = MemLongPtr(VarPtr(Arr) + pArrayOffset)
+        ArrPtr = MemLongPtr(VarPtr(arr) + pArrayOffset)
         If vt And VT_BYREF Then ArrPtr = MemLongPtr(ArrPtr)
     Else
         Err.Raise 5, "ArrPtr", "Array required"
     End If
 End Function
-
+Public Function ArrPtrNoError(ByRef arr As Variant) As LongPtr
+    Dim vt As VbVarType: vt = MemInt(VarPtr(arr)) 'VarType(arr) ignores VT_BYREF
+    If vt And vbArray Then
+        Const pArrayOffset As Long = 8
+        ArrPtrNoError = MemLongPtr(VarPtr(arr) + pArrayOffset)
+        If vt And VT_BYREF Then ArrPtrNoError = MemLongPtr(ArrPtrNoError)
+    End If
+End Function
 '*******************************************************************************
 'Alternative for CopyMemory - not affected by API speed issues on Windows
 '--------------------------
@@ -805,37 +812,37 @@ End Sub
 'Utility for 'CloneParamArray' - avoid deallocation on elements passed ByVal
 'e.g. if original ParamArray has a pointer to a BSTR then safely clear the copy
 '*******************************************************************************
-Private Sub FixByValElements(ByRef Arr() As Variant _
+Private Sub FixByValElements(ByRef arr() As Variant _
                            , ByRef rmArr As REMOTE_MEMORY _
                            , ByRef vtArr As Variant)
-    Dim I As Long
+    Dim i As Long
     Dim v As Variant
     Dim vtIndex As Long: vtIndex = 0
     Dim vt As VbVarType
     '
     vtArr = vbArray + vbInteger
-    For I = 0 To UBound(Arr)
+    For i = 0 To UBound(arr)
         vt = rmArr.memValue(vtIndex)
         If (vt And VT_BYREF) = 0 Then
             If (vt And vbArray) = vbArray Or vt = vbObject Or vt = vbString _
             Or vt = vbDataObject Or vt = vbUserDefinedType Then
-                If vt = vbObject Then Set v = Arr(I) Else v = Arr(I)
+                If vt = vbObject Then Set v = arr(i) Else v = arr(i)
                 rmArr.memValue(vtIndex) = vbEmpty 'Avoid deallocation
-                If vt = vbObject Then Set Arr(I) = v Else Arr(I) = v
+                If vt = vbObject Then Set arr(i) = v Else arr(i) = v
             End If
         End If
         vtIndex = vtIndex + VT_SPACING
-    Next I
+    Next i
     vtArr = vbEmpty
 End Sub
 
 '*******************************************************************************
 'Returns the input array wrapped in a ByRef Variant without copying the array
 '*******************************************************************************
-Public Function GetArrayByRef(ByRef Arr As Variant) As Variant
-    If IsArray(Arr) Then
-        GetArrayByRef = VarPtrArr(Arr)
-        MemInt(VarPtr(GetArrayByRef)) = VarType(Arr) Or VT_BYREF
+Public Function GetArrayByRef(ByRef arr As Variant) As Variant
+    If IsArray(arr) Then
+        GetArrayByRef = VarPtrArr(arr)
+        MemInt(VarPtr(GetArrayByRef)) = VarType(arr) Or VT_BYREF
     Else
         Err.Raise 5, "GetArrayByRef", "Array required"
     End If
@@ -904,7 +911,7 @@ Public Function EmptyArray(ByVal numberOfDimensions As Long _
     #End If
     Const FADF_HAVEVARTYPE As Long = &H80
     Const fFeaturesHi As Long = FADF_HAVEVARTYPE * &H10000
-    Dim I As Long
+    Dim i As Long
     '
     If Not rm.isInitialized Then
         InitRemoteMemory rm
@@ -913,21 +920,21 @@ Public Function EmptyArray(ByVal numberOfDimensions As Long _
         rm.memValue = VarPtr(fakeSafeArray(0)) 'The fake ArrPtr
         '
         'Set 'cElements' to 1 for each SAFEARRAYBOUND
-        For I = safeArraySize To UBound(fakeSafeArray, 1) Step 2
-            fakeSafeArray(I) = 1
-        Next I
+        For i = safeArraySize To UBound(fakeSafeArray, 1) Step 2
+            fakeSafeArray(i) = 1
+        Next i
     End If
     fakeSafeArray(0) = fFeaturesHi + numberOfDimensions 'cDims and fFeatures
-    I = safeArraySize + (numberOfDimensions - 1) * 2 'Highest dimension position
+    i = safeArraySize + (numberOfDimensions - 1) * 2 'Highest dimension position
     '
-    fakeSafeArray(I) = 0 'Highest dimension must have 0 'cElements'
+    fakeSafeArray(i) = 0 'Highest dimension must have 0 'cElements'
     If originalType = 200 Then
         rm.memValue = nMath2.cxZero
     ElseIf originalType = 201 Then
         Set rm.memValue = Module13.CreateBigInteger("0")
     End If
     RemoteAssign rm, VarPtr(fakeSafeArray(0)), rm.remoteVT, vbArray + vType, EmptyArray, rm.memValue
-    fakeSafeArray(I) = 1
+    fakeSafeArray(i) = 1
 End Function
 
 

@@ -90,7 +90,7 @@ Public Function CallByNameFixParamArray _
     ' New by George
     ' pargs2() the names of arguments
     ' fixnamearg = the number of named arguments
-    Dim UseHandler As mHandler
+    Dim usehandler As mHandler
     Dim myform As Form
     Dim IDsp        As IDispatch.IDispatchM2000
     Dim riid        As IDispatch.IID
@@ -218,6 +218,10 @@ End If
         ' Invoke method/property
 If LastErNum = 0 Then
         lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
+        If lngRet = -2147352562 Then
+        lngRet = IDsp.Invoke(dispid, riid, 0, 2, params, VarRet, Excep, lngArgErr)
+        
+        End If
 End If
 If LastErNum <> 0 Then GoTo ExitHere
 If lngRet <> 0 Then
@@ -531,9 +535,9 @@ On Error GoTo there
 If TypeOf VarRet Is IUnknown Then
 If UCase(pstrProcName) = "_NEWENUM" Then
     
-    Set UseHandler = New mHandler
-    UseHandler.ConstructEnumerator VarRet
-    Set robj = UseHandler
+    Set usehandler = New mHandler
+    usehandler.ConstructEnumerator VarRet
+    Set robj = usehandler
 Else
 On Error Resume Next
 If Err Then
@@ -618,11 +622,11 @@ Public Function ReadOneParameter(pobjTarget As Object, dispid As Long, ERrR$, Va
     ReadOneParameter = Err = 0
     Err.Clear
 End Function
-Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR$, ThisIndex As Variant, Optional useset As Boolean = False, Optional ByPass As Boolean) As Variant
+Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR$, ThisIndex As Variant, Optional useSet As Boolean = False, Optional ByPass As Boolean) As Variant
     
     Dim CallType As cbnCallTypes
     
-    If useset Then
+    If useSet Then
     CallType = VbSet
     Else
     CallType = VbGet
@@ -686,6 +690,7 @@ Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR
         Err.Clear
         On Error Resume Next
         lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
+        
         If lngRet = &H8002000E Or lngRet = &H80020003 Then
         If CallType = VbGet Then
             CallType = VbMethod
@@ -760,6 +765,7 @@ Public Sub ChangeOneParameter(pobjTarget As Object, dispid As Long, val1, ERrR$)
       
                 ReDim varArr(0 To 0)
                 If MemInt(VarPtr(val1)) = 9 Then
+                CallType = VbSet + VbLet
                 Set varArr(0) = val1
                 Else
                 varArr(0) = val1
@@ -776,7 +782,10 @@ Public Sub ChangeOneParameter(pobjTarget As Object, dispid As Long, val1, ERrR$)
         End If
 
         ' Invoke method/property
-        
+        If dispid = -1 Then
+            InternalError
+            Exit Sub
+        End If
         lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
 
         If lngRet <> 0 Then
@@ -819,7 +828,7 @@ Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, val1, E
     ' WE HAVE DISPIP
     Dim aa As Long, i As Integer, k As Integer
     aa = DISPID_PROPERTYPUT
-        If VarType(ThisIndex) = 8204 Then
+        If VarType(ThisIndex) = 8204 And ArrPtrNoError(ThisIndex) <> 0 Then
                  ReDim varArr(0 To UBound(ThisIndex) + 1)
                  k = 1
                  For i = UBound(ThisIndex) - 1 To 0 Step -1
@@ -830,7 +839,12 @@ Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, val1, E
                     End If
                     k = k + 1
                  Next
-                 varArr(0) = val1
+                 If MyIsObject(val1) Then
+                    Set varArr(0) = val1
+                    CallType = VbSet + VbLet
+                 Else
+                    varArr(0) = val1
+                 End If
                 With params
                     .cArgs = k
                     .rgPointerToVariantArray = VarPtr(varArr(0))
@@ -847,6 +861,7 @@ Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, val1, E
                     varArr(1) = ThisIndex
                 End If
                 If MemInt(VarPtr(val1)) = 9 Then
+                    CallType = VbSet + VbLet
                     Set varArr(0) = val1
                 Else
                     varArr(0) = val1

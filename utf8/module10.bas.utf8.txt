@@ -13,7 +13,7 @@ Private Type PeekArrayType
 End Type
 Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
 
-Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
+Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (Arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
 Private Declare Function SafeArrayGetDim Lib "OleAut32.dll" (ByVal Ptr As Long) As Long
 Private Declare Function vbaVarLateMemSt Lib "msvbvm60" _
                          Alias "__vbaVarLateMemSt" ( _
@@ -27,8 +27,8 @@ Private Declare Function vbaVarLateMemCallLdRf CDecl Lib "msvbvm60" _
                          ByVal sName As Long, _
                          ByVal cArgs As Long, _
                          ByVal vArgs As Long) As Long
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
 Private Const E_POINTER As Long = &H80004003
 Private Const S_OK As Long = 0
 Private Const INTERNET_MAX_URL_LENGTH As Long = 2083
@@ -332,16 +332,16 @@ Dim ss$, skip As Boolean, checktype As Boolean
             If FastSymbol(b$, "=") Then
                 p = nMath2.cxZero
                 If FastSymbol(b$, "(") Then
-                Dim P1
-                If Not IsNumberD2(b$, P1) Then
+                Dim p1
+                If Not IsNumberD2(b$, p1) Then
                     GoTo ER0001
                 End If
-                p.r = CDbl(P1)
+                p.r = CDbl(p1)
                 If Not FastSymbol(b$, ",") Then GoTo ER0001
-                If Not IsNumberD2(b$, P1) Then
+                If Not IsNumberD2(b$, p1) Then
                     GoTo ER0001
                 End If
-                p.i = CDbl(P1)
+                p.i = CDbl(p1)
                 b$ = NLtrim(b$)
                 If Not UCase$(Left$(b$, 2)) = "I)" Then GoTo ER0001
                 Mid$(b$, 1, 2) = "  "
@@ -1096,13 +1096,13 @@ ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
 ret = ReadFile(FileNumber, Data(0), BlockSize, SizeRead, 0&)
 BlockSize = SizeRead
 End Sub
-Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal Addr As Long)
+Public Sub API_ReadBLOCK(ByVal FileNumber As Long, ByVal BlockSize As Long, ByVal addr As Long)
 Dim PosL As Long
 Dim PosH As Long
 Dim SizeRead As Long
 Dim ret As Long
 ret = SetFilePointer(FileNumber, PosL, PosH, FILE_CURRENT)
-ret = ReadFile(FileNumber, ByVal Addr, BlockSize, SizeRead, 0&)
+ret = ReadFile(FileNumber, ByVal addr, BlockSize, SizeRead, 0&)
 End Sub
 
 Public Sub API_CloseFile(ByVal FileNumber As Long)
@@ -1704,8 +1704,8 @@ End Sub
 Public Sub BadFumName()
 MyEr "No proper name for simple function", "μη κανονικό όνομα για απλή συνάρτηση"
 End Sub
-Public Sub BadForType(t$, g$)
-MyEr t$ + " can't be used in FOR loop", g$ + " δεν μπορεί να χρησιμοποιηθεί σε επανάληψη Για"
+Public Sub BadForType(t$, G$)
+MyEr t$ + " can't be used in FOR loop", G$ + " δεν μπορεί να χρησιμοποιηθεί σε επανάληψη Για"
 End Sub
 Public Sub BadFunStrName()
 MyEr "No proper name for simple string function", "μη κανονικό όνομα για απλή αλφαριθμητική συνάρτηση"
@@ -1946,7 +1946,7 @@ againarray:
     If ppppAny Is Nothing Then
         GoTo err000
     End If
-    If Not ppppAny.arr Then
+    If Not ppppAny.Arr Then
         If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , True, idx) Then GoTo errorarr
     ElseIf FastSymbol(b$, ")") Then
         'need to found an expression
@@ -1981,7 +1981,7 @@ NotArray1:
                 Else
                     Set pppp1 = New mArray: pppp1.PushDim (1): pppp1.PushEnd
                     pppp1.SerialItem 0, 2, 9
-                    pppp1.arr = True
+                    pppp1.Arr = True
                     If bstack.lastobj Is Nothing Then
                         pppp1.item(0) = p
                     Else
@@ -2010,7 +2010,7 @@ errorarr:
     If MaybeIsSymbol(b$, ":+-*/~|") Or v = -2 Then
         With ppppAny
             If ppppAny.Final Then CantAssignValue: GoTo err000
-            If Not .arr Then
+            If Not .Arr Then
                 If v = -2 Then GoTo con123
                 If IsGroup(.item(v)) Then GoTo a1297654
                 If .IsObj Then
@@ -2142,7 +2142,7 @@ a1297654:
                             GoTo err000
                         End If
                     Else
-                        If Not .arr And Not (.myarrbase = 9 Or .MyTypeToBe = 13) Then
+                        If Not .Arr And Not (.myarrbase = 9 Or .MyTypeToBe = 13) Then
                             NullObject
                             Exit Function
                         End If
@@ -2155,7 +2155,7 @@ a1297654:
         'With ppppAny
 contEmptyObject:
             If FastSymbol(b$, ":=", , 2) Then
-                If Not .arr Then GoTo NotArray1
+                If Not .Arr Then GoTo NotArray1
     ' new on rev 20
 contassignhere:
                 If GetData(bstack, b$, myobject) Then
@@ -2598,17 +2598,18 @@ contprop3:
                                 UseProp.ConstructObj myobject, v, True
                                 Set bstack.lastobj = UseProp
                                 UseProp.UseIndex = False
-                                p = UseProp.Value
+                                If Left$(b$, 1) = ">" Then
+                                    
+                                p = UseProp.ValueNoError
                                 If UseProp.LastHasObject Then
-                                    If Left$(b$, 1) = ">" Then
                                         Set myobject = UseProp.lastobj
                                         UseProp.clearlastobject
                                         p = 0
                                         GoTo com123cont
-                                    Else
-                                       Set myobject = UseProp.lastobj
-                                       UseProp.clearlastobject
-                                       p = 0
+                                    'Else
+                                    '   Set myobject = UseProp.lastobj
+                                    '   UseProp.clearlastobject
+                                    '   p = 0
                                     End If
                                 End If
                                 GoTo Propgetvalue
@@ -2636,7 +2637,12 @@ Propgetvalue:
                         End If
                         UseProp.UseIndex = True
                     End If
-                    UseProp.Value = p
+                    If Not bstack.lastobj Is Nothing Then
+                        UseProp.Value = CVar(bstack.lastobj)
+                        Set bstack.lastobj = Nothing
+                    Else
+                        UseProp.Value = p
+                    End If
                 Else
                     GoTo noexpression
                 End If
@@ -2670,7 +2676,7 @@ If Not bstack.lastobj Is Nothing Then
 EguFirst:
 
     If IsObjGroup(bstack.lastobj) Then
-        If bstack.lastobj.IamApointer Or Not ppppAny.arr Then
+        If bstack.lastobj.IamApointer Or Not ppppAny.Arr Then
             If IsObjProp(ppppAny.GroupRef) Then
                 Set myProp = ppppAny.GroupRef
                 myProp.PushIndexes idx
@@ -2693,6 +2699,10 @@ EguFirst:
             myobject.ToDelete = True
             Set myobject = Nothing
             Set bstack.lastobj = Nothing
+        ElseIf IsArrayProp(ppppAny, v) Then
+            Set UseProp = myobject
+            UseProp.PushIndexes idx
+            UseProp.Value = CVar(bstack.lastobj)
         Else
             If IsObjmHandler(bstack.lastobj) Then
                 AssignVal2Array bstack, ppppAny, v
@@ -2704,7 +2714,7 @@ EguFirst:
             Else
                 If Not bstack.lastobj Is Nothing Then
                     If TypeOf bstack.lastobj Is iBoxArray Then
-                        If bstack.lastobj.arr Then
+                        If bstack.lastobj.Arr Then
                             Set ppppAny.item(v) = CopyArray(bstack.lastobj)
                         Else
                             Set ppppAny.item(v) = bstack.lastobj
@@ -2736,7 +2746,7 @@ EguFirst:
         End If
         Set bstack.lastobj = Nothing
      Else
-        If ppppAny.arr Then
+        If ppppAny.Arr Then
             If IsArrayGroup(ppppAny, v) Then
 here12500:
                 If ppppAny.item(v).IamApointer Then
@@ -2774,7 +2784,7 @@ here65654:
             myProp.PushIndexes idx
             myProp.Value = p
             Set myProp = Nothing
-        ElseIf Not ppppAny.arr Then
+        ElseIf Not ppppAny.Arr Then
             If IsmHandler(ppppAny.GroupRef) Then
                 Set usehandler = ppppAny.GroupRef
                 If usehandler.t1 = 1 Then
@@ -3117,7 +3127,7 @@ entry00022:
                                     End If
                                     Dim pp1 As ppppLight
                                     Set pp1 = New ppppLight
-                                    pp1.arr = False
+                                    pp1.Arr = False
                                     Set pp1.GroupRef = myobject
                                   
                                     
@@ -3637,7 +3647,7 @@ If neoGetArray(bstack, W$, ppppAny) Then
 againintarr:
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
-If IsArrayArray(ppppAny, v) And ppppAny.arr Then
+If IsArrayArray(ppppAny, v) And ppppAny.Arr Then
 If FastSymbol(b$, "(") Then
 Set ppppAny = ppppAny.item(v)
 GoTo againintarr
@@ -3727,7 +3737,7 @@ End If
     If Not IsExp(bstack, b$, p) Then MissNumExpr: GoTo err000
     If Not bstack.lastobj Is Nothing Then
         If IsobjArray(bstack.lastobj) Then
-            If bstack.lastobj.arr Then
+            If bstack.lastobj.Arr Then
                 Set ppppAny.item(v) = CopyArray(bstack.lastobj)
             Else
                 Set ppppAny.item(v) = bstack.lastobj
@@ -3826,7 +3836,7 @@ MakeArray bstack, W$, 6, b$, ppppAny, NewStat, VarStat
         sss = Len(b$): ExecuteVar6 = 4: Exit Function
 End If
 If neoGetArray(bstack, W$, ppppAny, , , , True) Then
-    If Not ppppAny.arr Then
+    If Not ppppAny.Arr Then
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , , idx) Then GoTo err000
 
 GoTo there12567
@@ -3908,7 +3918,7 @@ NotArray1:
                 Else
             Set pppp1 = New mArray: pppp1.PushDim (1): pppp1.PushEnd
             pppp1.SerialItem 0, 2, 9
-            pppp1.arr = True
+            pppp1.Arr = True
             If bstack.lastobj Is Nothing Then
                 pppp1.item(0) = vbNullString
             Else
@@ -3931,7 +3941,7 @@ againstrarr:
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
 there12567:
-    If ppppAny.arr Then
+    If ppppAny.Arr Then
         If IsArrayArray(ppppAny, v) Then
             If FastSymbol(b$, "(") Then
                 Set ppppAny = ppppAny.item(v)
@@ -3974,7 +3984,7 @@ checkpar:
         If Not TypeOf ppppAny Is mArray Then
             GoTo WrongObj
         End If
-        If ppppAny.arr Then
+        If ppppAny.Arr Then
             If FastSymbol(b$, ":=", , 2) Then
                 If GetData(bstack, b$, myobject) Then
                     FeedArray ppppAny, v, myobject
@@ -4093,14 +4103,14 @@ jmp1112:
     
     If TypeOf ppppAny Is mArray Then
 contfromtuple:
-        If ppppAny.arr Then
+        If ppppAny.Arr Then
             If ppppAny.Count = 0 Then
                 ppppAny.GroupRef.Value = ss$
             ElseIf bstack.lastobj Is Nothing Then
                 ppppAny.ItemStr(v) = ss$
             Else
                 If IsobjArray(bstack.lastobj) Then
-                    If bstack.lastobj.arr Then
+                    If bstack.lastobj.Arr Then
                         Set ppppAny.item(v) = CopyArray(bstack.lastobj)
                     Else
                         Set ppppAny.item(v) = bstack.lastobj.GroupRef
@@ -5419,7 +5429,7 @@ noexpression1:
             
                 Set UseProp = var(v)
                 If Left$(b$, 2) = " >" Then
-                    p = UseProp.Value
+                    p = UseProp.ValueNoError
                     If UseProp.LastHasObject Then
                         Set myobject = UseProp.lastobj
                         UseProp.clearlastobject
@@ -5443,7 +5453,12 @@ Propgetvalue:
                         End If
                         UseProp.UseIndex = True
                     End If
+                    If bstack.lastobj Is Nothing Then
                     UseProp.Value = p
+                    Else
+                
+                    UseProp.Value = CVar(bstack.lastobj)
+                    End If
                 Else
                     GoTo noexpression
                 End If
@@ -5528,9 +5543,15 @@ contwrong1:
                             End If
                         End If
                         Set var(v) = usehandler1
+                        
                     ElseIf TypeOf bstack.lastobj Is iBoxArray Then
                         Set usehandler1 = New mHandler
                         usehandler1.t1 = 3
+                        Set usehandler1.objref = bstack.lastobj
+                        Set var(v) = usehandler1
+                    ElseIf TypeOf bstack.lastobj Is FastCollection Then
+                        Set usehandler1 = New mHandler
+                        usehandler1.t1 = 1
                         Set usehandler1.objref = bstack.lastobj
                         Set var(v) = usehandler1
                     Else
@@ -5592,6 +5613,14 @@ misnum:
                 If Left$(b$, 2) = " >" Then
                 
                 Set myobject = var(v)
+                If TypeOf myobject Is PropReference Then
+                Set UseProp = myobject
+                Set myobject = UseProp.ValueObj
+                If UseProp.LastHasObject Then
+                        Set myobject = UseProp.lastobj
+                        UseProp.clearlastobject
+                End If
+                End If
 com123cont:
                 
                 If Not myobject Is Nothing Then
@@ -5616,6 +5645,14 @@ contprop4:
                                     If Left$(b$, 3) = ")=>" Then
                                         Mid$(b$, 1, 3) = "   "
                                         Set myobject = UseProp.ValueObj
+                                        If myobject Is Nothing Then
+                                        If UseProp.LastHasObject Then
+                                                Set myobject = UseProp.lastobj
+                                                UseProp.clearlastobject
+                                        End If
+                                        End If
+                                        
+                                        
                                         GoTo contCom112233
                                     ElseIf Left$(b$, 1) = ")" Then
                                         Mid$(b$, 1, 1) = " "
@@ -5629,7 +5666,9 @@ contprop4:
                                 End If
                                 SyntaxError
                                 GoTo err000
+                                
                             ElseIf Not FastSymbol(b$, "=") Then
+                                FastSymbol b$, "^"
                                 On Error Resume Next
                                 ProcMethodAsap bstack, myobject, sw$, b$, ok, False, False
                                 On Error GoTo 0
@@ -5638,11 +5677,13 @@ contprop4:
                             Else
                                 Set UseProp = New PropReference
                                 UseProp.ConstructObj myobject, v, True
-                                Set bstack.lastobj = UseProp
+                                'Set bstack.lastobj = UseProp
                                 UseProp.UseIndex = False
-                                p = UseProp.Value
-                                If UseProp.LastHasObject Then
-                                    If Left$(b$, 1) = ">" Then
+                               ' p = UseProp.ValueNoError
+                                'If UseProp.LastHasObject Then
+                                If Left$(b$, 1) = ">" Then
+                                    p = UseProp.ValueNoError
+                                    If UseProp.LastHasObject Then
                                         Set myobject = UseProp.lastobj
                                         UseProp.clearlastobject
                                         p = 0
@@ -5650,10 +5691,10 @@ contprop4:
                                             Mid$(b$, 1, 1) = " "
                                             GoTo contCom112233
                                         End If
-                                    Else
-                                       Set myobject = UseProp.lastobj
-                                       UseProp.clearlastobject
-                                       p = 0
+                                    'Else
+                                    '   Set myobject = UseProp.lastobj
+                                     '  UseProp.clearlastobject
+                                      ' p = 0
                                     End If
                                 End If
                                 GoTo Propgetvalue
@@ -6576,18 +6617,18 @@ End Sub
 
 Private Function MyTrimLi(s$, l As Long) As Long
 Dim i&
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim p2 As Long, p1 As Integer, p4 As Long
  If l > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
  If l <= 0 Then MyTrimLi = 1: Exit Function
   l = l - 1
   i = Len(s)
-  P2 = StrPtr(s) + l * 2:  p4 = P2 + i * 2
-  For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  p2 = StrPtr(s) + l * 2:  p4 = p2 + i * 2
+  For i = p2 To p4 Step 2
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 9
     Case Else
-     MyTrimLi = (i - P2) \ 2 + 1 + l
+     MyTrimLi = (i - p2) \ 2 + 1 + l
    Exit Function
   End Select
   Next i
@@ -9374,7 +9415,7 @@ a39439494:
                         MyRead7 = True
                         GoTo loopcont123
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.arr Then
+                        If myobject.Arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -9471,7 +9512,7 @@ a39439494:
                         Set ppppl.item(it) = myobject
                         Set myobject = Nothing
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.arr Then
+                        If myobject.Arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -12236,7 +12277,7 @@ a39439494:
                         MyRead8 = True
                         GoTo loopcont123
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.arr Then
+                        If myobject.Arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -12333,7 +12374,7 @@ a39439494:
                         Set ppppl.item(it) = myobject
                         Set myobject = Nothing
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.arr Then
+                        If myobject.Arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -12968,7 +13009,7 @@ Case 5, 7
                     Set ppppl.item(it) = myobject
                     Set myobject = Nothing
                 ElseIf TypeOf myobject Is iBoxArray Then
-                    If myobject.arr Then
+                    If myobject.Arr Then
                         Set ppppl.item(it) = CopyArray(myobject)
                     Else
                         Set ppppl.item(it) = myobject
@@ -13039,7 +13080,7 @@ Case 6
                     Set ppppl.item(it) = myobject
                     Set myobject = Nothing
                 ElseIf TypeOf myobject Is iBoxArray Then
-                    If myobject.arr Then
+                    If myobject.Arr Then
                         Set ppppl.item(it) = CopyArray(myobject)
                     Else
                         Set ppppl.item(it) = myobject
@@ -15959,7 +16000,7 @@ a39439494:
                         MyRead = True
                         GoTo loopcont123
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.arr Then
+                        If myobject.Arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -16056,7 +16097,7 @@ a39439494:
                         Set ppppl.item(it) = myobject
                         Set myobject = Nothing
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.arr Then
+                        If myobject.Arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject

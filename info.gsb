@@ -33102,9 +33102,7 @@ every 1000/25{
 			//HideAllIcon()
 			Px(TopPlayer)+=xx-xx1
 			Py(TopPlayer)+=yy-yy1
-			player 3 hide
 	  		player 3 ,Px(TopPlayer), Py(TopPlayer)
-	  		player 3 show':wait 3
 		end if
 		} as Semaphore
 	else.if keypress(32) then
@@ -33132,10 +33130,8 @@ For i=1 to 50
 	next
 	for k=1 to 3
 		j=PlayersOrder(k)
-		player k hide
 		Player k, px(j), py(j)
-		player k show
-		next
+	next
 	refresh
 	mv*=1.3
 	wait 10
@@ -53047,5 +53043,44 @@ Score 2, tempo, "C5@1G@1F@1C@1F@1C@1G@1C@1C@1F@1C@1G@1C@1F@1C@1G@1C@1G@1F@1C@1F@
 // ORGAN 1 IS ACOUSTIC PIANO
 //PLAY SCORE, ORGAN (1 TO 127), SCORE, ORGAN (MAX 16 VOICES)
 Play 1, 1, 2, 1
+}
+MODULE ROMBERG {'This use a triangle array which start with one item.
+' Each step add another array of single values
+' Each array start with one item and append as we work more.
+' https://rosettacode.org/wiki/Numerical_integration/Romberg_integration#M2000_Interpreter
+' https://en.wikipedia.org/wiki/Romberg%27s_method
+Module Romberg_integration {
+	function Romberg(func as lambda,lower,upper,steps,acc=1e-8) {
+	  h0= upper-lower
+	  s0= func(lower)+func(upper)
+	  single r[0][0]
+	  r[0][0]=s0*h0/2
+	  rr= 0
+	  n= 1
+	  for i=1 to steps
+	  	 ro= rr
+	     n= 2*n
+	     h= h0/n
+	     s=s0/2
+	     for j= 1 to n-1 
+	        s+=func(lower+j*h)
+	     next
+	     f=1
+	     r[i][0] = s*h
+	     for k= 1 to i 
+	        r1= r[i][k-1]
+	        r2= r[i-1][k-1]
+	        f*=4
+	        rr=(f*r1-r2)/(f-1)
+	        r[i][k]=rr
+	     next
+	     if Abs(rr-ro) < acc then exit for
+	  next
+	  =rr
+	}
+	print round(Romberg((lambda->rsin(number)),0,1,5),8)=0.45969769	' true
+	print round(Romberg((lambda->exp(number)),-3,3,5),6)=20.035749  ' true
+}
+Romberg_integration
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

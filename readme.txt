@@ -1,28 +1,19 @@
 M2000 Interpreter and Environment
-Version 14 Revision 49
+Version 14 Revision 50
 
-A bug removed (Was there for at least tow revisions I suspect)
-The bug was in While End while. Repeat Until, Repeat When, Repeat Always
-When we call a sub which is not in the same module but in the parent module, and only on the first call the read function not executed  so the i variable not exist;
-This fault not happen if the sub is in the module inner
-Also this fault not happen if we use For loop or a standard block { }
-(It is one statement error, which I forgot to change when I change the read function for better results from a monolithic old function)
-So now this test display true the i exist.
 
-module inner {
-	m=true
-	while m {
-		sub1 100
-		m=false
-	}
+1) TEST new variation using ?
+Test "Start", Test("ok"), a
+For a=1 to 100 {
+      Refresh 1
+      print a
+      If a=30 Then Test "something else"
+      If a=41 Then Test "ok" ? Test("ok2"), a
+      If a=81 Then Test "ok2" ? a
 }
-inner
+Test !
 
-sub sub1(i)
-	? valid(i)
-end sub
-
-
+2) Advanced use of com objects.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

@@ -45,6 +45,10 @@ Public Sub IndexOpt(n As Long)
         OptVariant ar(n)
     End If
 End Sub
-Property Get count()
-    count = UBound(ar)
+Property Get Count()
+If ArrPtrNoError(ar) = 0 Then
+    Count = 0
+Else
+    Count = UBound(ar)
+End If
 End Property

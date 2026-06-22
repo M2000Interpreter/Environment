@@ -228,8 +228,3 @@ val = ChrB$(48)
 cReminder = ChrB$(48)
 outbase = 10
 End Sub
-
-Public Property Let ALFA(vNewValue)
-Beep
-End Property
-
