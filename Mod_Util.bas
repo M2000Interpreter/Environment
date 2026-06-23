@@ -13,9 +13,9 @@ Public doslast As Double
 Dim FontList As FastCollection
 Public PLM, PTM, PRM, PBM
 Public Trush() As VarItem
-Public TrushCount As Long, TrushWait As Boolean
+Public TrushCount As Long, TrushLim As Long, SkipTrush As Boolean
 Public Trush2() As mStiva
-Public TrushCount2 As Long, TrushWait2 As Boolean
+Public TrushCount2 As Long
 
 Public Nonbsp As Boolean
 Public k1 As Currency, Kform As Boolean
@@ -8683,6 +8683,7 @@ MergeOperators = b$
 End If
 End Function
 Public Sub GarbageFlush()
+
 ReDim Trush2(100) As mStiva
 ReDim Trush(500) As VarItem
 Dim i As Long
@@ -8696,6 +8697,7 @@ TrushCount = 500
 TrushCount2 = 100
 End Sub
 Public Sub GarbageFlush2()
+
 ReDim Trush2(100) As mStiva
 ReDim Trush(500) As VarItem
 Dim i As Long
@@ -15253,7 +15255,7 @@ ArrArg = a(1)
 LocalVar = a(2)
 If Len(ArrArg) > 0 Then
 x1 = rinstr(actualvar, ArrArg) + Len(ArrArg) - 1
-jumphere:
+JUMPHERE:
     If neoGetArray(bstack, Left$(actualvar, x1), pppp) Then
         If Not pppp.arr Then GoTo cont123
         If Not NeoGetArrayItem(pppp, bstack, Left$(actualvar, x1), w2, Mid$(actualvar, x1 + 1)) Then GoTo cont123
@@ -15283,7 +15285,7 @@ Else
     ii = 1
     If FastPureLabel(actualvar, what$, ii, , , , False) > 4 Then
     x1 = ii - 1 'rinstr(actualvar, what$) + Len(what$) - 1
-    GoTo jumphere
+    GoTo JUMPHERE
     
     End If
     
@@ -15307,9 +15309,10 @@ Dim ss$
     
 End Function
 Function NewVarItem() As VarItem
+    SkipTrush = False
     If TrushCount = 0 Then
-    Set NewVarItem = New VarItem
-      Exit Function
+        Set NewVarItem = New VarItem
+        Exit Function
     End If
     Set NewVarItem = Trush(TrushCount)
     Set Trush(TrushCount) = Nothing
@@ -16410,7 +16413,7 @@ checkobject:
                             
                             ElseIf TypeOf myobject Is VarItem Then
                                 
-                                var(v) = myobject.ItemVariant
+                               var(v) = myobject.ItemVariant
                             Else
                                 Set myobject = Nothing
                                 Set bstack.lastobj = Nothing
@@ -22434,7 +22437,7 @@ Function DeclareGUI(bstack As basetask, what$, rest$, ifier As Boolean, Lang As 
 DeclareGUI = True
 On Error GoTo wrong
 Dim W$, x1 As Long, y1 As Long, s$, USEOLD As Boolean, bp As Long
-Dim ALFA As GuiM2000, mm As CallBack2, alfa0 As GuiImage
+Dim alfa As GuiM2000, mm As CallBack2, alfa0 As GuiImage
 Dim aVar As Variant, p As Variant
 Dim pppp As mArray, mmmm As mEvent
 ' for these events no use of noHere property because no copyevent/upgrade happens
@@ -22463,14 +22466,14 @@ Dim pppp As mArray, mmmm As mEvent
         If ar = 0 Then
             If Not USEOLD Then ProcEvent bstack, "{Read msg$, &obj}", 1, y1
             CreateFormObject var(i), 1
-            Set ALFA = var(i)
-            Set ALFA.safe = getSafeFormList()
-            Set ALFA.EventObj = var(y1)
-            ALFA.index = -1
-            ALFA.myname = what$
-            ALFA.modulename = here$
-            ALFA.TempTitle = what$
-            Set ALFA = Nothing
+            Set alfa = var(i)
+            Set alfa.safe = getSafeFormList()
+            Set alfa.EventObj = var(y1)
+            alfa.index = -1
+            alfa.myname = what$
+            alfa.modulename = here$
+            alfa.TempTitle = what$
+            Set alfa = Nothing
         Else
             ProcEvent bstack, "{Read index, msg$, &obj}", 1, y1
             Set mmmm = var(y1)
@@ -22480,10 +22483,10 @@ Dim pppp As mArray, mmmm As mEvent
             bp = True
             If ar = 0 Then
                 CreateFormObject var(i), 1
-                Set ALFA = var(i)
+                Set alfa = var(i)
                 Set mmmm = New mEvent
-                Set ALFA.safe = getSafeFormList()
-                Set ALFA.EventObj = mmmm
+                Set alfa.safe = getSafeFormList()
+                Set alfa.EventObj = mmmm
                 With mmmm
                     .BypassInit 10
                     .VarIndex = i * 1000 + varhash.Count
@@ -22491,13 +22494,13 @@ Dim pppp As mArray, mmmm As mEvent
                     .ParamBlock "@Read msg$, &obj", 2
                     .GenItemCreator LTrim$(str(i * 456)), "{ Module " + here$ + vbCrLf + "try { Call local " + here$ + "." + bstack.GroupName + what$ + "() } }" + here$ + "." + bstack.GroupName
                 End With
-                ALFA.myname = what$
-                ALFA.index = -1
-                ALFA.modulename = here$
-                ALFA.ByPass = bp
-                ALFA.TempTitle = what$
+                alfa.myname = what$
+                alfa.index = -1
+                alfa.modulename = here$
+                alfa.ByPass = bp
+                alfa.TempTitle = what$
                 Set mmmm = Nothing
-                Set ALFA = Nothing
+                Set alfa = Nothing
             Else
                 Set mmmm = New mEvent
 contEvArray:
@@ -22548,27 +22551,27 @@ contEvArray:
             Dim aa2 As GuiButton
             If ar = 0 Then
                 CreateFormObject var(i), 2
-                Set ALFA = bstack.lastobjIndirect(var())
+                Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
                 Set bstack.lastobj = Nothing
                 If Err Then GoTo wrong
                 Set aa2 = var(i)
                 With aa2
-                    .Construct ALFA, what$
+                    .Construct alfa, what$
                     If Not alfa0 Is Nothing Then
                         .move 0, 0, 6000, 600
-                        Set ALFA.Controls(.ctrlName).Container = alfa0.pbox
+                        Set alfa.Controls(.ctrlName).Container = alfa0.pbox
                     Else
                         .move 0, 2000, 6000, 600
                     End If
                     .Caption = what$
                     .SetUp
                 End With
-                Set ALFA = Nothing
+                Set alfa = Nothing
             Else
                 If neoGetArray(bstack, oName$ + "(", pppp, , CBool(Glob)) Then
                     what$ = Left$(what$, Len(oName$))
-                    Set ALFA = bstack.lastobjIndirect(var())
+                    Set alfa = bstack.lastobjIndirect(var())
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
@@ -22577,10 +22580,10 @@ contEvArray:
                         Set pppp.item(i) = aVar
                         Set aa2 = aVar
                         With aa2
-                            .ConstructArray ALFA, what$, i
+                            .ConstructArray alfa, what$, i
                             If Not alfa0 Is Nothing Then
                                 .move 0, 0, 6000, 600
-                                Set ALFA.Controls(.ctrlName).Container = alfa0.pbox
+                                Set alfa.Controls(.ctrlName).Container = alfa0.pbox
                             Else
                                 .move 0, 2000, 6000, 600
                             End If
@@ -22589,7 +22592,7 @@ contEvArray:
                         End With
                     Next i
                     pppp.IHaveGui = True
-                    Set ALFA = Nothing
+                    Set alfa = Nothing
                 End If
             End If
         End If
@@ -22607,27 +22610,27 @@ ElseIf IsLabelSymbolNew(rest$, "еисацыцг", "TEXTBOX", Lang) Then
             Dim aa3 As GuiTextBox
             If ar = 0 Then
                 CreateFormObject var(i), 3
-                Set ALFA = bstack.lastobjIndirect(var())
+                Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
                 Set bstack.lastobj = Nothing
                 If Err Then GoTo wrong
                 Set aa3 = var(i)
                 With aa3
-                    .Construct ALFA, what$
+                    .Construct alfa, what$
                     If Not alfa0 Is Nothing Then
                         .move 0, 0, 6000, 600
-                        Set ALFA.Controls(.ctrlName).Container = alfa0.pbox
+                        Set alfa.Controls(.ctrlName).Container = alfa0.pbox
                     Else
                         .move 0, 2000, 6000, 600
                     End If
                     .SetUp
                     .Text = what$
                 End With
-                Set ALFA = Nothing
+                Set alfa = Nothing
             Else
                 If neoGetArray(bstack, oName$ + "(", pppp, , CBool(Glob)) Then
                     what$ = Left$(what$, Len(oName$))
-                    Set ALFA = bstack.lastobjIndirect(var())
+                    Set alfa = bstack.lastobjIndirect(var())
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
@@ -22636,10 +22639,10 @@ ElseIf IsLabelSymbolNew(rest$, "еисацыцг", "TEXTBOX", Lang) Then
                         Set pppp.item(i) = aVar
                         Set aa3 = aVar
                         With aa3
-                            .ConstructArray ALFA, what$, i
+                            .ConstructArray alfa, what$, i
                             If Not alfa0 Is Nothing Then
                                 .move 0, 0, 6000, 600
-                                Set ALFA.Controls(.ctrlName).Container = alfa0.pbox
+                                Set alfa.Controls(.ctrlName).Container = alfa0.pbox
                             Else
                                 .move 0, 2000, 6000, 600
                             End If
@@ -22648,7 +22651,7 @@ ElseIf IsLabelSymbolNew(rest$, "еисацыцг", "TEXTBOX", Lang) Then
                         End With
                     Next i
                     pppp.IHaveGui = True
-                    Set ALFA = Nothing
+                    Set alfa = Nothing
                 End If
             End If
         End If
@@ -22666,27 +22669,27 @@ ElseIf IsLabelSymbolNew(rest$, "епикоцг", "CHECKBOX", Lang) Then
             Dim aa4 As GuiCheckBox
             If ar = 0 Then
                 CreateFormObject var(i), 4
-                Set ALFA = bstack.lastobjIndirect(var())
+                Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
                 Set bstack.lastobj = Nothing
                 If Err Then GoTo wrong
                 Set aa4 = var(i)
                 With aa4
-                    .Construct ALFA, what$
+                    .Construct alfa, what$
                     If Not alfa0 Is Nothing Then
                         .move 0, 0, 6000, 600
-                        Set ALFA.Controls(.ctrlName).Container = alfa0.pbox
+                        Set alfa.Controls(.ctrlName).Container = alfa0.pbox
                     Else
                         .move 0, 2000, 6000, 600
                     End If
                     .Caption = what$
                     .SetUp
                 End With
-                Set ALFA = Nothing
+                Set alfa = Nothing
             Else
                 If neoGetArray(bstack, oName$ + "(", pppp, , CBool(Glob)) Then
                     what$ = Left$(what$, Len(oName$))
-                    Set ALFA = bstack.lastobjIndirect(var())
+                    Set alfa = bstack.lastobjIndirect(var())
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
@@ -22695,10 +22698,10 @@ ElseIf IsLabelSymbolNew(rest$, "епикоцг", "CHECKBOX", Lang) Then
                         Set pppp.item(i) = aVar
                         Set aa4 = aVar
                         With aa4
-                            .ConstructArray ALFA, what$, i
+                            .ConstructArray alfa, what$, i
                             If Not alfa0 Is Nothing Then
                                 .move 0, 0, 6000, 600
-                                Set ALFA.Controls(.ctrlName).Container = alfa0.pbox
+                                Set alfa.Controls(.ctrlName).Container = alfa0.pbox
                             Else
                                 .move 0, 2000, 6000, 600
                             End If
@@ -22707,7 +22710,7 @@ ElseIf IsLabelSymbolNew(rest$, "епикоцг", "CHECKBOX", Lang) Then
                         End With
                     Next i
                     pppp.IHaveGui = True
-                    Set ALFA = Nothing
+                    Set alfa = Nothing
                 End If
             End If
         End If
@@ -22725,32 +22728,32 @@ ElseIf IsLabelSymbolNew(rest$, "йеилемо", "EDITBOX", Lang) Then
             Dim aa5 As GuiEditBox
             If ar = 0 Then
                 CreateFormObject var(i), 5
-                Set ALFA = bstack.lastobjIndirect(var())
+                Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
                 Set bstack.lastobj = Nothing
                 If Err Then GoTo wrong
                 Set aa5 = var(i)
                 With aa5
-                    .Construct ALFA, what$
+                    .Construct alfa, what$
                     If Not alfa0 Is Nothing Then
                         .move 0, 0, 6000, 1200
-                        Set ALFA.Controls(.ctrlName).Container = alfa0.pbox
+                        Set alfa.Controls(.ctrlName).Container = alfa0.pbox
                     Else
                         .move 0, 2000, 6000, 1200
                     End If
-                    If ALFA.prive <> 0 Then
-                        .LineSpace = players(ALFA.prive).uMineLineSpace
+                    If alfa.prive <> 0 Then
+                        .LineSpace = players(alfa.prive).uMineLineSpace
                     Else
                         .LineSpace = players(0).uMineLineSpace
                     End If
                     .SetUp
                     .Text = what$
                 End With
-                Set ALFA = Nothing
+                Set alfa = Nothing
             Else
                 If neoGetArray(bstack, oName$ + "(", pppp, , CBool(Glob)) Then
                     what$ = Left$(what$, Len(oName$))
-                    Set ALFA = bstack.lastobjIndirect(var())
+                    Set alfa = bstack.lastobjIndirect(var())
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
@@ -22759,15 +22762,15 @@ ElseIf IsLabelSymbolNew(rest$, "йеилемо", "EDITBOX", Lang) Then
                         Set pppp.item(i) = aVar
                         Set aa5 = aVar
                         With aa5
-                            .ConstructArray ALFA, what$, i
+                            .ConstructArray alfa, what$, i
                             If Not alfa0 Is Nothing Then
                                 .move 0, 0, 6000, 1200
-                                Set ALFA.Controls(.ctrlName).Container = alfa0.pbox
+                                Set alfa.Controls(.ctrlName).Container = alfa0.pbox
                             Else
                                 .move 0, 2000, 6000, 1200
                             End If
-                            If ALFA.prive <> 0 Then
-                                .LineSpace = players(ALFA.prive).uMineLineSpace
+                            If alfa.prive <> 0 Then
+                                .LineSpace = players(alfa.prive).uMineLineSpace
                             Else
                                 .LineSpace = players(0).uMineLineSpace
                             End If
@@ -22776,7 +22779,7 @@ ElseIf IsLabelSymbolNew(rest$, "йеилемо", "EDITBOX", Lang) Then
                         End With
                     Next i
                     pppp.IHaveGui = True
-                    Set ALFA = Nothing
+                    Set alfa = Nothing
                 End If
             End If
         End If
@@ -22794,28 +22797,28 @@ ElseIf IsLabelSymbolNew(rest$, "киста", "LISTBOX", Lang) Then
             Dim aa6 As GuiListBox
             If ar = 0 Then
                 CreateFormObject var(i), 6
-                Set ALFA = bstack.lastobjIndirect(var())
+                Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
                 Set bstack.lastobj = Nothing
                 If Err Then GoTo wrong
                 Set aa6 = var(i)
                 With aa6
-                    .Construct ALFA, what$
+                    .Construct alfa, what$
                     '.move 0, 2000, 6000, 600
                     If Not alfa0 Is Nothing Then
                         .move 0, 0, 6000, 600
-                        Set ALFA.Controls(.ctrlName).Container = alfa0.pbox
+                        Set alfa.Controls(.ctrlName).Container = alfa0.pbox
                     Else
                         .move 0, 2000, 6000, 600
                     End If
                     .ListText = what$
                     .SetUp
                 End With
-                Set ALFA = Nothing
+                Set alfa = Nothing
             Else
                 If neoGetArray(bstack, oName$ + "(", pppp, , CBool(Glob)) Then
                     what$ = Left$(what$, Len(oName$))
-                    Set ALFA = bstack.lastobjIndirect(var())
+                    Set alfa = bstack.lastobjIndirect(var())
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
@@ -22824,15 +22827,15 @@ ElseIf IsLabelSymbolNew(rest$, "киста", "LISTBOX", Lang) Then
                         Set pppp.item(i) = aVar
                         Set aa6 = aVar
                         With aa6
-                            .ConstructArray ALFA, what$, i
+                            .ConstructArray alfa, what$, i
                             If Not alfa0 Is Nothing Then
                                 .move 0, 0, 6000, 600
-                                Set ALFA.Controls(.ctrlName).Container = alfa0.pbox
+                                Set alfa.Controls(.ctrlName).Container = alfa0.pbox
                             Else
                                 .move 0, 2000, 6000, 600
                             End If
-                            If ALFA.prive <> 0 Then
-                                .LineSpace = players(ALFA.prive).uMineLineSpace
+                            If alfa.prive <> 0 Then
+                                .LineSpace = players(alfa.prive).uMineLineSpace
                             Else
                                 .LineSpace = players(0).uMineLineSpace
                             End If
@@ -22841,7 +22844,7 @@ ElseIf IsLabelSymbolNew(rest$, "киста", "LISTBOX", Lang) Then
                         End With
                     Next i
                     pppp.IHaveGui = True
-                    Set ALFA = Nothing
+                    Set alfa = Nothing
                 End If
             End If
         End If
@@ -22859,25 +22862,25 @@ ElseIf IsLabelSymbolNew(rest$, "еийома", "IMAGE", Lang) Then
             Dim aa8 As GuiImage
             If ar = 0 Then
                 CreateFormObject var(i), 8
-                Set ALFA = bstack.lastobjIndirect(var())
+                Set alfa = bstack.lastobjIndirect(var())
                 Set alfa0 = GetContainer(bstack, rest$, Lang)
                 Set bstack.lastobj = Nothing
                 Set aa8 = var(i)
                 With aa8
-                    .Construct ALFA, what$
+                    .Construct alfa, what$
                     If Not alfa0 Is Nothing Then
-                        Set ALFA.Controls(.ctrlName).Container = alfa0.pbox
+                        Set alfa.Controls(.ctrlName).Container = alfa0.pbox
                     Else
                         .move 0, 2000, 6000, 600
                     End If
                     .SetUp
                     .Text = what$
                 End With
-                Set ALFA = Nothing
+                Set alfa = Nothing
             Else
                 If neoGetArray(bstack, oName$ + "(", pppp, , CBool(Glob)) Then
                     what$ = Left$(what$, Len(oName$))
-                    Set ALFA = bstack.lastobjIndirect(var())
+                    Set alfa = bstack.lastobjIndirect(var())
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     For i = 0 To ar - 1
@@ -22885,10 +22888,10 @@ ElseIf IsLabelSymbolNew(rest$, "еийома", "IMAGE", Lang) Then
                         Set pppp.item(i) = aVar
                         Set aa8 = aVar
                         With aa8
-                            .ConstructArray ALFA, what$, i
+                            .ConstructArray alfa, what$, i
                             If Not alfa0 Is Nothing Then
                                 .move 0, 0, 6000, 600
-                                Set ALFA.Controls(.ctrlName).Container = alfa0.pbox
+                                Set alfa.Controls(.ctrlName).Container = alfa0.pbox
                             Else
                                 .move 0, 2000, 6000, 600
                             End If
@@ -22897,7 +22900,7 @@ ElseIf IsLabelSymbolNew(rest$, "еийома", "IMAGE", Lang) Then
                         End With
                     Next i
                     pppp.IHaveGui = True
-                    Set ALFA = Nothing
+                    Set alfa = Nothing
                 End If
             End If
         End If
@@ -22916,32 +22919,32 @@ ElseIf IsLabelSymbolNew(rest$, "киста.еисацыцгс", "COMBOBOX", Lang) Then
             Dim aa7 As GuiDropDown
             If ar = 0 Then
                 CreateFormObject var(i), 7
-                Set ALFA = bstack.lastobjIndirect(var())
+                Set alfa = bstack.lastobjIndirect(var())
                 Set bstack.lastobj = Nothing
                 Set aa7 = var(i)
                 With aa7
-                    .Construct ALFA, what$
+                    .Construct alfa, what$
                     .move 0, 2000, 6000, 600
                     .SetUp
                 End With
-                Set ALFA = Nothing
+                Set alfa = Nothing
             Else
                 If neoGetArray(bstack, oName$ + "(", pppp, , CBool(Glob)) Then
                     what$ = Left$(what$, Len(oName$))
-                    Set ALFA = bstack.lastobjIndirect(var())
+                    Set alfa = bstack.lastobjIndirect(var())
                     Set bstack.lastobj = Nothing
                     For i = 0 To ar - 1
                         CreateFormObject aVar, 7
                         Set pppp.item(i) = aVar
                         Set aa7 = aVar
                         With aa7
-                            .ConstructArray ALFA, what$, i
+                            .ConstructArray alfa, what$, i
                             .move 0, 2000, 6000, 600
                             .SetUp
                         End With
                     Next i
                     pppp.IHaveGui = True
-                    Set ALFA = Nothing
+                    Set alfa = Nothing
                 End If
             End If
         End If
@@ -22970,7 +22973,7 @@ ElseIf IsLabelSymbolNew(rest$, "тупос", "TYPE", Lang) Then
                     If Err Then Err.Clear: GoTo wrong
                     
                     CreateFormObject var(i), 9
-                    Set ALFA = bstack.lastobjIndirect(var())
+                    Set alfa = bstack.lastobjIndirect(var())
                     Set alfa0 = GetContainer(bstack, rest$, Lang)
                     Set bstack.lastobj = Nothing
                     If Err Then GoTo wrong
@@ -22978,10 +22981,10 @@ ElseIf IsLabelSymbolNew(rest$, "тупос", "TYPE", Lang) Then
                     Set ec1 = var(i)
                     With ec1
                         
-                         .Attach ALFA.Controls.Add(s$, what$), what$, s$, ALFA
+                         .Attach alfa.Controls.Add(s$, what$), what$, s$, alfa
                          If Err.Number Then
                          Err.Clear
-                         .Attach ALFA.Controls.Add(App.EXENAME + "." + s$, what$), what$, s$, ALFA
+                         .Attach alfa.Controls.Add(App.EXENAME + "." + s$, what$), what$, s$, alfa
                          If Err.Number Then
                          Err.Clear
                          
@@ -22989,21 +22992,21 @@ ElseIf IsLabelSymbolNew(rest$, "тупос", "TYPE", Lang) Then
                          
                          End If
                          End If
-                         ALFA.AddGuiControl ec1
+                         alfa.AddGuiControl ec1
                         If Not alfa0 Is Nothing Then
-                            ALFA.Controls(what$).move 0, 2000, 6000, 600
-                            Set ALFA.Controls(what$).Container = alfa0.pbox
+                            alfa.Controls(what$).move 0, 2000, 6000, 600
+                            Set alfa.Controls(what$).Container = alfa0.pbox
                         Else
                             
-                            ALFA.Controls(what$).move 0, 2000, 6000, 600
+                            alfa.Controls(what$).move 0, 2000, 6000, 600
                         End If
                         If .FixEvent Then y3 = True
                     End With
-                    Set ALFA = Nothing
+                    Set alfa = Nothing
                 Else
                     If neoGetArray(bstack, oName$ + "(", pppp, , CBool(Glob)) Then
                         what$ = Left$(what$, Len(oName$))
-                        Set ALFA = bstack.lastobjIndirect(var())
+                        Set alfa = bstack.lastobjIndirect(var())
                         Set alfa0 = GetContainer(bstack, rest$, Lang)
                         Set bstack.lastobj = Nothing
                         If Err Then GoTo wrong
@@ -23019,10 +23022,10 @@ ElseIf IsLabelSymbolNew(rest$, "тупос", "TYPE", Lang) Then
                             Set pppp.item(i) = aVar
                             Set ec1 = aVar
                             With ec1
-                                .Attach ALFA.Controls.Add(s$, what$ & i), what$, S3, ALFA, i
+                                .Attach alfa.Controls.Add(s$, what$ & i), what$, S3, alfa, i
                                 If Err.Number Then
                                     Err.Clear
-                                    .Attach ALFA.Controls.Add(App.EXENAME + "." + s$, what$ & i), what$, S3, ALFA, i
+                                    .Attach alfa.Controls.Add(App.EXENAME + "." + s$, what$ & i), what$, S3, alfa, i
                                     If Err.Number Then
                                         Err.Clear
                                         GoTo wrong
@@ -23030,20 +23033,20 @@ ElseIf IsLabelSymbolNew(rest$, "тупос", "TYPE", Lang) Then
                                     s$ = App.EXENAME + "." + s$
                                     End If
                                 End If
-                                ALFA.AddGuiControl ec1
+                                alfa.AddGuiControl ec1
                                 If Err.Number Then Err.Clear: GoTo wrong
                                 If Not alfa0 Is Nothing Then
-                                    ALFA.Controls(what$ & i).move 0, 2000, 6000, 600
-                                    Set ALFA.Controls(what$ & i).Container = alfa0.pbox
+                                    alfa.Controls(what$ & i).move 0, 2000, 6000, 600
+                                    Set alfa.Controls(what$ & i).Container = alfa0.pbox
                                 Else
                                     
-                                    ALFA.Controls(what$ & i).move 0, 2000, 6000, 600
+                                    alfa.Controls(what$ & i).move 0, 2000, 6000, 600
                                 End If
                                 If .FixEvent Then y3 = True
                             End With
                         Next i
                         pppp.IHaveGui = True
-                        Set ALFA = Nothing
+                        Set alfa = Nothing
                     End If
                 End If
             End If
@@ -27973,13 +27976,13 @@ If x1 <> 0 Then
             ss$ = loadcatalog.Value
             If loadcatalog.ExistKey(W$ + Chr(1)) Then Switches loadcatalog.Value
             par1 = False
-            GoTo jumphere
+            GoTo JUMPHERE
         ElseIf loadcatalog.ExistKey(mcd + ExtractNameOnly(W$, True) + ".gsb") Then
             W$ = mcd + ExtractNameOnly(W$, True) + ".gsb"
             ss$ = loadcatalog.Value
             If loadcatalog.ExistKey(W$ + Chr(1)) Then Switches loadcatalog.Value
             par1 = False
-            GoTo jumphere
+            GoTo JUMPHERE
         End If
     Else
         'If loadcatalog.ExistKey(mcd + ExtractNameOnly(s$, True) + ".gsb") Then
@@ -28063,7 +28066,7 @@ If x1 <> 0 Then
         End If
     End If
     End If
-jumphere:
+JUMPHERE:
     If ss$ <> "" Then
     If Err.Number = 0 And Not (basestack.IamChild Or basestack.IamAnEvent) Then
        If Not NoRun Then LASTPROG$ = s$
@@ -33039,7 +33042,7 @@ Public Function Validator(bstack As basetask, a$, v$, r) As Boolean
                     a$ = Mid$(a$, w1)
                     r = (FastSymbol(a$, ")") And NLtrim$(n$) = vbNullString)
                 ElseIf LastErNum <> 0 Then
-                    GoTo jumphere
+                    GoTo JUMPHERE
                 Else  ' for MyErMacro
                     r = 1
                     If Len(a$) + w1 > Len(n$) Then r = 0
@@ -33059,7 +33062,7 @@ Public Function Validator(bstack As basetask, a$, v$, r) As Boolean
                 If Len(a$) + w1 > Len(n$) Then r = 0
                 r = r * FastSymbol(a$, ")", True)
             Else
-jumphere:
+JUMPHERE:
             LastErNum = 0
             LastErNum1 = 0
             LastErNameGR = vbNullString
@@ -33194,7 +33197,7 @@ End Function
 Function ProcPage(basestack As basetask, rest$, Lang As Long) As Boolean
 
 Dim Scr As Object, X As Double, skip As Boolean, mDrawing As MemBlock, usehandler As mHandler
-Dim ALFA As StdPicture, sz1, sz2
+Dim alfa As StdPicture, sz1, sz2
 Set Scr = basestack.Owner
 If IsLabelSymbolNew(rest$, "сведио", "DRAWING", Lang) Then
     If basestack.toprinter Then
@@ -33221,13 +33224,13 @@ If IsLabelSymbolNew(rest$, "сведио", "DRAWING", Lang) Then
             
             If Not mDrawing.IsEmf Then
                 
-                Set ALFA = mDrawing.GetStdPicture()
-                oprinter.RenderStdPicture basestack, ALFA, 0, mDrawing.type1, sz1, sz2
+                Set alfa = mDrawing.GetStdPicture()
+                oprinter.RenderStdPicture basestack, alfa, 0, mDrawing.type1, sz1, sz2
                 
             
             ElseIf Not mDrawing.IsWmf Then
-                Set ALFA = mDrawing.GetStdPicture()
-                oprinter.RenderStdPicture basestack, ALFA, 0, mDrawing.type1, sz1, sz2
+                Set alfa = mDrawing.GetStdPicture()
+                oprinter.RenderStdPicture basestack, alfa, 0, mDrawing.type1, sz1, sz2
             Else
             GoTo missdr
             End If
@@ -37437,7 +37440,7 @@ End If
     If neoGetArray(stripstack1, W$, pppp, , Glob) Then
         If Not NeoGetArrayItem(pppp, stripstack1, W$, v, rest$) Then ExecuteGroupStruct = 0:  Exit Function
         On Error Resume Next
-jumphere:
+JUMPHERE:
         If Not FastSymbol(rest$, "=", True) Then
         SyntaxError
            ExecuteGroupStruct = 0: Exit Function
@@ -37468,7 +37471,7 @@ End If
 If neoGetArray(stripstack1, W$, pppp, , Glob) Then
 If Not NeoGetArrayItem(pppp, stripstack1, W$, v, rest$) Then ExecuteGroupStruct = 0:   Exit Function
     On Error Resume Next
-    GoTo jumphere
+    GoTo JUMPHERE
 Else
 ExecuteGroupStruct = 0:   Exit Function
 End If

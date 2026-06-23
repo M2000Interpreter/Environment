@@ -544,6 +544,7 @@ Private Sub Class_Initialize()
 Dim anyname As Long
 startaddress = VarPtr(anyname)
 stacksize = 900000
+TrushLim = 200000
 timeBeginPeriod 1
  If Not l_complete Then NeoSubMain
         Set objref = New basetask

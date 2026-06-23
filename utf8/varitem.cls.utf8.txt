@@ -10,7 +10,7 @@ Attribute VB_Name = "VarItem"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Option Explicit
 Public mItem As Variant
 Public slot As Byte
@@ -42,24 +42,24 @@ Property Let ItemStr(ByRef RHS As String)
     slot = 4
     MoveStringToVariant RHS, mItem
 End Property
-Public Sub PopString(S$)
+Public Sub PopString(s$)
     If slot = 4 Then
         If Not myVarType(mItem, vbString) Then
             mItem = 0
-            S$ = vbNullString
+            s$ = vbNullString
         Else
-            SwapString2Variant S$, mItem
+            SwapString2Variant s$, mItem
         End If
     ElseIf slot = 5 Then
-        S$ = mItem
+        s$ = mItem
     ElseIf slot = 2 Then
         If VarType(mItem) = vbString Then
-            S$ = mItem
+            s$ = mItem
         Else
-            S$ = vbNullString
+            s$ = vbNullString
         End If
     Else
-        S$ = vbNullString
+        s$ = vbNullString
     End If
 End Sub
 Property Get ItemStr() As String
@@ -103,17 +103,20 @@ Public Property Get ObjectRef() As Variant
     If slot = 1 Then Set ObjectRef = mItem Else Set ObjectRef = Nothing
 End Property
 Public Sub Recycle()
+    If SkipTrush Then Exit Sub
     Dim obj As IUnknown, GetRefCount As Long
     Set obj = Me
     CopyMemory GetRefCount, ByVal (ObjPtr(obj)) + 4, 4
     If GetRefCount > 4 Then Exit Sub
     On Error Resume Next
+
+    TrushCount = TrushCount + 1
+    While TrushCount > UBound(Trush)
+        If TrushCount > TrushLim Then SkipTrush = True: Exit Sub
+        ReDim Preserve Trush(UBound(Trush) * 2)
+    Wend
     mItem = vbEmpty
     slot = 0
     mTypeName = 0
-    TrushCount = TrushCount + 1
-    If TrushCount > UBound(Trush) Then
-        ReDim Preserve Trush(UBound(Trush) * 2)
-    End If
     Set Trush(TrushCount) = Me
 End Sub

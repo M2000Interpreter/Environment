@@ -1,19 +1,37 @@
 M2000 Interpreter and Environment
-Version 14 Revision 50
+Version 14 Revision 51
+
+1) Remove a bug (two letters supposed to be Greek but was English) for IF (the Greek equivalent). This isn't something for English statements.
+
+2) New limit for pool of object's for stack items. 
+Flush Garbage ' this exist from previous revisions - reset the two pools, of varitem (stack item object) and mstiva (stack object).
+Flush Garbage 100000 reset pools and set limit to 100 thousand varitems. So if we use more, that more will destroyed and not recycled to pool
+Flush Garbage 100000; set only the limit.
+So if we get a lot of stack items, we can return to the lower limit. Default limit is the 200 thousands objects.
 
 
-1) TEST new variation using ?
-Test "Start", Test("ok"), a
-For a=1 to 100 {
-      Refresh 1
-      print a
-      If a=30 Then Test "something else"
-      If a=41 Then Test "ok" ? Test("ok2"), a
-      If a=81 Then Test "ok2" ? a
+3) New read only variable SYMBOL which return the Varitem, the object under each item on a stack object. So Push 123 wrap 123 in a Varitem and place it to an item in mstiva object (the stack of values). A statement A=Symbol pop the VarItem, not the value which carry. A statement Push A, A, A places only three pointers of the same object, not in three varitems, but in place we use for varitems.
+In M2000 stack objects using Symbol we can say "all is an object".
+
+def Symbol()=Symbol
+def sVal(a)=a
+object A=Symbol("hello"), B=Symbol(123456780000000000000000000000000001u)
+object C=Symbol((1,2,3,4,5))
+? sVal(A), sVal(B), sVal(C)
+Push A, A, A  
+Stack
+Stack New {
+	Push A, A, A
+	Print Array([])#Str$()="Hello Hello Hello"
 }
-Test !
+A=>mItem="Other"
+Stack  ' print stack items: Other Other Other
+Print Array([])#Str$()="Other Other Other"
+let m=a  ' push a : read m ' read unbox value from a
+var k=a  ' set k = a
+Print type$(m)="String", k is a
 
-2) Advanced use of com objects.
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

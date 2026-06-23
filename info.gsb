@@ -10498,7 +10498,7 @@ MODULE COMPILER {Module CompilerExample {
 	     	exit_now=false
 		Inventory  func=halt_:={exit_now=true}
 		Append  func, push_:={sp--:stack_[sp]=eval(code_, pc as long):pc+=4}
-⇥⇥Append··func,·jz_:={sp++:·if·eval(stack_,·sp-1)=0·then·pc=eval(code_,·pc·as·long)·else·pc+=4}
+		Append func, jz_:={sp++: if eval(stack_, sp-1)=0 then pc=eval(code_, pc as long) else pc+=4}
 		Append  func, jmp_:={pc=eval(code_, pc as long)}
 		Append  func, fetch_:={sp--:stack_[sp]=stack_[eval(code_, pc as long)]:pc+=4}
 		Append  func, store_:={stack_[eval(code_, pc as long)]=stack_[sp]:sp++:pc+=4}
@@ -37418,7 +37418,7 @@ MODULE TURING {Module CheckIt {
 		.Reset "A", "H", "0"
 		.AddRule "A", "0", "1", "right", "B", 	"A", "1", "1", "left", "C"
 		.AddRule "B", "0", "1", "right", "C", 	"B", "1", "1", "right", "B"
-		.AddRule "C", "0", "1", "right", "D", 	"C", "1", "1", "left", "E"
+		.AddRule "C", "0", "1", "right", "D", 	"C", "1", "0", "left", "E"
 		.AddRule "D", "0", "1", "left", "A",	"D", "1", "1", "left", "D"
 		.AddRule "E", "0", "1", "stay", "H", 	"E", "1", "0", "left", "A"
 		Print "Starting (wait 3~ seconds)"
@@ -50403,7 +50403,7 @@ END IF
 }
 MODULE KILLTHEM {Declare GetCurrentProcessId Lib "kernel32.GetCurrentProcessId" As Long
 // this is our ProcessId
-string ourPID=GetCurrentProcessId()  // convert to string`
+string ourPID=GetCurrentProcessId()  // convert to string
 // get current directrory
 m$=dir$
 // set TEMP folder as current folder
@@ -51413,7 +51413,7 @@ MODULE TURTLE_GRAPHICS {
 		PUT_ARROW()
 	END SUB
 	SUB DRAW.ARC(radius, st=0, en=360, rotation=0)
-		SET_BACK()`
+		SET_BACK()
 		IF pen_draw THEN
 			WIDTH line_width {
 				CIRCLE radius,1,PEN,(NORTH-st+rotation)/180*PI, (NORTH-en+rotation)/180*PI;
@@ -52883,15 +52883,75 @@ c=>add "this is a string item", "zero"
 ' to change an item you have to remove it.
 c=>Remove "zero"
 c=>add "ok", "zero"
-? c("zero")
+? c("zero")="ok", c("Zero")="ok", c(1)="ok"
 c=>add 122,"aa"
+? c(2)=122
 c=>add  1000
 c=>add 34324324,"mm"
+? c(4)=34324324
 ? c=>count
+m=(1,2i)
+c=>add m, "alfa"
+? c("alfa")|r=1, c("alfa")|i=1, c("alfa") 
 Method c, "_NewEnum" as Item
 while item
-	print eval(item)
+	print eval(item),
 end while
+biginteger b=123123123121213123123123u
+c=>add  b, "big1"
+? c("big1")=>tostring(),
+? c("big1")^  ' object
+k=c("big1")^
+? k
+Method c, "_NewEnum" as Item
+while item
+	print eval(item),
+end while
+dim a(10)=1
+mm=list:=1,2,"hello", 3,4, 100:=(1,2,3,4)
+c=>add  mm, "list"
+dd=(1,2,3,4,5,6)
+c=>add dd, "array"
+print
+? c("array")^
+mm0=c("array")^
+? type$(mm0), mm0#sum()
+mm1=list
+? type$(mm1)
+mm1=c("list")^
+m0=each(mm1)
+while m0
+	? eval(m0)
+end while
+
+?type$(getAnyValue("Not Exist Key"))
+?type$(getAnyValue("array"))="tuple"
+?type$(getAnyValue("list"))="Inventory"
+?type$(getAnyValue(1))="String"
+?type$(getAnyValue("Big1"))="BigInteger"
+big1=getAnyValue("Big1")
+c=>remove "Big1"
+c=>add big1+10, "Big1"
+?type$(getAnyValue("Big1"))="BigInteger"
+? getAnyValue("Big1")-10=big1 
+? type$(getAnyValue("ALFA"))="Complex" 
+function getAnyValue(key)
+	local variant z
+	Try {
+		let z=c(key)
+	}
+	if Type$(z)="Empty" then
+	Try {
+		z=c(key)^
+		if type$(z)="FastCollection" then
+			local z1=list
+			z1=c(key)^
+			z=z1
+		end if
+	}	
+	end if
+	= z
+end function
 }
 MODULE LEGATO {tempo = 1000
 a$="e@3e@3e@2e@3e@3e@2e@3g@3c@3d@3e"

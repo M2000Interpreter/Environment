@@ -3770,7 +3770,7 @@ Case "SEEK", "SEEK(", "SELECT", "SEQUENTIAL", "SET", "SETTINGS", "SGN(", "SHIFT"
 Case "SHOW", "SHOW$(", "SIN(", "SINGLE", "SINGLE[", "SINT(", "SIZE", "SIZE.X(", "SIZE.Y(", "SLICE(", "SLOW", "SMOOTH"
 Case "SND$(", "SORT", "SORT(", "SOUND", "SOUNDREC", "SOUNDREC.LEVEL", "SOUNDS", "SPEECH", "SPEECH$(", "SPLIT", "SPRITE"
 Case "SPRITE$", "SQRT(", "STACK", "STACK(", "STACK$(", "STACK.SIZE", "STACKITEM$(", "STACKITEM(", "STACKTYPE$(", "START", "START(", "STATIC"
-Case "STEP", "STEREO", "STOCK", "STOP", "STR$(", "STREAM", "STRING", "STRING[", "STRING$(", "STRREV$(", "STRUCTURE", "STUFF(", "SUB", "SUBDIR", "SUM(", "SUPERCLASS"
+Case "STEP", "STEREO", "STOCK", "STOP", "STR$(", "STREAM", "STRING", "STRING[", "STRING$(", "STRREV$(", "STRUCTURE", "STUFF(", "SUB", "SUBDIR", "SUM(", "SUPERCLASS", "SYMBOL"
 Case "SWAP", "SWEEP", "SWITCHES", "TAB", "TAB(", "TABLE", "TAN(", "TARGET"
 Case "TARGETS", "TASK.MAIN", "TEMPNAME$", "TEMPORARY$", "TEST", "TEST(", "TEXT", "THEN", "THIS"
 Case "THREAD", "THREAD.PLAN", "THREADS", "THREADS$", "TICK", "TIME$(", "TIME(", "TIMECOUNT", "TITLE", "TITLE$("
@@ -3827,7 +3827,7 @@ Case "пкациа", "пкаисио", "пкатос", "пкатос.секидас", "пкатос.сглеиоу", "пкатос.
 Case "пяос", "пяосаялоцгс", "пяосхесе.еццяажо", "пяосхгйг", "пяытотупо", "пяыто(", "пяосыяимо$", "пяовеияо", "пяовеияо$", "пяовеияо.еийома", "пяовеияо.еийома$", "пяовеияо.сведио", "яеула", "яифа("
 Case "яоутима", "яоутимас", "яухлисеис", "яыта$(", "яыта(", "саяысе", "сбгсе", "се"
 Case "сеияа", "сеияиайос.дисйоу(", "секида", "семаяио", "сгл", "сгл(", "сглади", "сглеио", "сглеио(", "сглеяа", "сйоупидиа", "ста", "стахеяг", "стахеяес", "статийг", "статийес"
-Case "стг", "стгкг", "стгкг(", "стгм", "стис", "сто", "стой", "стовои", "стовос", "стяоцц(", "суццяажеас"
+Case "стг", "стгкг", "стгкг(", "стгм", "стис", "сто", "стой", "стовои", "стовос", "стяоцц(", "сулбоко", "суццяажеас"
 Case "суццяажг", "суцйяиме(", "суцйяоусг(", "суцвымеусе.еццяажо", "суфуцгс(", "сулпиесг", "сулпкгяысг", "сум(", "сумаятгсг", "сумаятгсгс", "сумаятгсг$("
 Case "сумаятгсг(", "сумевисе", "сумхгла", "сус", "сусйеуг", "сусйеуг.пяобокгс$", "сустгла", "сувмотгта(", "свд$(", "сведио", "сведиа"
 Case "сведио.мглатым", "сыяос", "сыяос(", "сыяос$(", "сыяоутупос$(", "сысе", "сысе.еццяажо", "таимиа", "таимиа.летягтгс", "таимиес"
@@ -4772,7 +4772,7 @@ myid() = Array("THIS", 1, "ауто", 1, "RND", 2, "туваиос", 2, "PEN", 3, "пема", 3
 , "MENU", 78, "епикоцг", 78, "NUMBER", 79, "аяихлос", 79, "тилг", 79, "LAMBDA", 80, "калда", 81, "GROUP", 83, "олада", 83, "ARRAY", 84, "пимайас", 84, "[]", 85 _
 , "сыяос", 86, "STACK", 86, "ISWINE", 87, "SHOW", 88, "охомг", 88, "OSBIT", 89, "WINDOW", 90, "сусйеуг", 90, "MONITOR.STACK", 91, "екецвос.сыяоу", 91, "MONITOR.STACK.SIZE", 92, "екецвос.лецехос.сыяоу", 92, "?", 93, "диаяхяысг", 94, "BUFFER", 94, "йатастасг", 95, "INVENTORY", 95, "LIST", 96, "киста", 96, "QUEUE", 97, "оуяа", 97, "INFINITY", 82, "апеияо", 82, "еккгмийа", 98, "GREEK", 98 _
 , "INTERNET", 99, "диадийтуо", 99, "CLIPBOARD.IMAGE", 100, "пяовеияо.еийома", 100, "CLIPBOARD.DRAWING", 101, "пяовеияо.сведио", 101, "MONITORS", 102, "охомес", 102, "DOS", 103, "йомсока", 103, "SOUNDREC.LEVEL", 104, "гвоцяажгсгс.епипедо", 104, "ADDRESSOF", 105, "диеухумсгапо", 105, "пкатос.таимиас", 106, "MOVIE.WIDTH", 106, "уьос.таимиас", 107, "MOVIE.HEIGHT", 107, "PAGE.WIDTH", 108, "пкатос.секидас", 108, "PAGE.HEIGHT", 109, "уьос.секидас", 109, "PRINTING", 110, "ейтупысг", 110 _
-, "SOUNDREC", 111, "гвоцяажгсг", 111, "PRINTER.QUALITY", 112, "поиотгта.ейтупысгс", 112)
+, "SOUNDREC", 111, "гвоцяажгсг", 111, "PRINTER.QUALITY", 112, "поиотгта.ейтупысгс", 112, "SYMBOL", 113, "сулбоко", 113)
 If Not ahashbackup Is Nothing Then
 For i = 0 To UBound(myid()) Step 2
     ahashbackup.ItemCreator CStr(myid(i)), CLng(myid(i + 1))
