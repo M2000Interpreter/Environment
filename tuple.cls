@@ -26,6 +26,7 @@ Private Const mgrp = "Group"
 Private Const mlmbd = "lambda"
 Private Const mArr = "mArray"
 Private Const mTuple = "tuple"
+Private Const refArr = "RefArray"
 Private actualData
 Dim maxitems As Long
 Dim maxitems1 As Long
@@ -952,6 +953,7 @@ End Sub
 Public Sub CopyTuple2Array(k As mArray)
 'copy this to k
 If k Is Nothing Then Set k = New mArray
+Dim spareArr As mArray
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 k.MyTypeToBe = MyTypeToBe
 ' no use, we do the redim in PushEnd
@@ -983,8 +985,12 @@ Else
                 End With
                 Set k.item(i) = spare
                 Set spare = Nothing
-            Case "RefArray"
+            Case refArr
                 Set k.item(i) = Me.item(i).Copy()
+            Case mArr
+                Me.item(i).CopyArray spareArr
+                Set k.item(i) = spareArr
+                Set spareArr = Nothing
             Case Else
                 Set k.item(i) = Me.item(i)
             End Select
@@ -1006,6 +1012,7 @@ Public Sub CopyArray(k As tuple)
 
 If k Is Me Then Exit Sub
 If k Is Nothing Then Set k = New tuple
+Dim spareArr As mArray
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 k.MyTypeToBe = MyTypeToBe
 ' no use, we do the redim in PushEnd
@@ -1038,8 +1045,12 @@ Else
                 End With
                 Set k.item(i) = spare
                 Set spare = Nothing
-            Case "RefArray"
+            Case refArr
                 Set k.item(i) = Me.item(i).Copy()
+            Case mArr
+                Me.item(i).CopyArray spareArr
+                Set k.item(i) = spareArr
+                Set spareArr = Nothing
             Case Else
                 Set k.item(i) = Me.item(i)
             End Select
@@ -1057,11 +1068,11 @@ End Sub
 Public Sub CopyArrayRev(k As tuple)
 'copy this to k
 If k Is Me Then Exit Sub
+Dim spareArr As mArray
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 Dim mm As Long, M1 As Long
 If k Is Nothing Then Set k = New tuple
 k.MyTypeToBe = MyTypeToBe
-'k.SerialItem v, Me.UpperMonoLimit, 8
 k.myarrbase = myarrbase
 k.RevOrder = False
 k.StartResize
@@ -1092,8 +1103,12 @@ For i = 0 To Me.UpperMonoLimit
             End With
             Set k.item(i) = spare
             Set spare = Nothing
-        Case "RefArray"
+        Case refArr
             Set k.item(i) = Me.item(i).Copy()
+        Case mArr
+            Me.item(i).CopyArray spareArr
+            Set k.item(i) = spareArr
+            Set spareArr = Nothing
         Case Else
             Set k.item(i) = Me.item(M1)
         End Select
@@ -1111,10 +1126,9 @@ End Sub
 Public Sub CopyArrayRevFast(k As tuple)
 'copy this to k
 If k Is Me Then Exit Sub
-Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
+Dim v As Variant, i As Long
 Dim mm As Long, M1 As Long
 k.MyTypeToBe = MyTypeToBe
-'k.SerialItem v, Me.UpperMonoLimit, 8
 k.myarrbase = myarrbase
 k.RevOrder = False
 k.StartResize
@@ -1165,6 +1179,7 @@ Public Sub CopyArraySlice(k As tuple, fromS As Long, toS As Long)
 ' make one dimemsion only
 If k Is Me Then Exit Sub
 If k Is Nothing Then Set k = New tuple
+Dim spareArr As mArray
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 k.MyTypeToBe = MyTypeToBe
 'k.SerialItem v, toS - fromS + 1, 8
@@ -1192,8 +1207,12 @@ For i = fromS To toS
             End With
             Set k.item(i - fromS) = spare
             Set spare = Nothing
-        Case "RefArray"
+        Case refArr
             Set k.item(i - fromS) = Me.item(i).Copy()
+        Case mArr
+            Me.item(i).CopyArray spareArr
+            Set k.item(i - fromS) = spareArr
+            Set spareArr = Nothing
         Case Else
             Set k.item(i - fromS) = Me.item(i)
         End Select
@@ -1212,7 +1231,7 @@ Public Sub CopyArraySliceFast(k As tuple, fromS As Long, toS As Long)
 ' make one dimemsion only
 If k Is Me Then Exit Sub
 If k Is Nothing Then Set k = New tuple
-Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
+Dim v As Variant, i As Long
 k.MyTypeToBe = MyTypeToBe
 'k.SerialItem v, toS - fromS + 1, 8
 k.myarrbase = myarrbase

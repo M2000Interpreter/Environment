@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 51
+Global Const Revision = 52
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -26413,7 +26413,10 @@ Sub mywait(bstack As basetask, pp As Variant, Optional SLEEPSHORT As Boolean = F
     oldRR = RRCOUNTER
     Do
         If TaskMaster.Processing And Not bstack.TaskMain Then
-            If Not bstack.toprinter Then bstack.Owner.Refresh
+            If Not bstack.toprinter Then
+            MyRefresh bstack
+            'bstack.Owner.Refresh
+            End If
             TaskMaster.TimerTick
             MyDoEvents1 Form1
             If SLEEPSHORT Then Sleep 1
@@ -32617,7 +32620,7 @@ Function StockValues(bstack As basetask, b$, Lang As Long) As Boolean
 
 ' Stock A[$|%| ]()  keep  N,  B[$|%| ]()
 ' Stock A[$|%| ]()  sweep  N [,  value ]   fill a copy of value to n items or empty slots
-Dim W$, pppp As mArray, ppppAny As iBoxArray, v As Long, VN As Long, i As Long, what$, pppp1 As mArray, V1 As Long
+Dim W$, pppp As iBoxArray, ppppAny As iBoxArray, v As Long, VN As Long, i As Long, what$, pppp1 As iBoxArray, V1 As Long
 Dim bs As New basetask, p As Variant, P1 As Variant, soros As mStiva, ww$, ss$, usehandler As mHandler
 Dim useType As Boolean, vt As Integer
 i = Abs(IsLabel(bstack, b$, what$))
@@ -43137,10 +43140,23 @@ If IsStrExp(bstack, a$, s$) Then
             If neoGetArray(bstack, s$, pppp) Then
 check123678:
                 If Not pppp.arr Then NotArray: Exit Function
-                 If FastSymbol(a$, ",") Then
+                If FastSymbol(a$, ",") Then
                     IsArrayFun = NeoGetArrayItem(pppp, bstack, s$, w1, a$)
                 Else
+                
                     IsArrayFun = FastSymbol(a$, ")", True)
+                    If Not usehandler Is Nothing Then
+                    If Not usehandler.UseIterator Then
+                        Dim usehandler1 As mHandler
+                        usehandler.CopyTo usehandler1
+                        Dim pppp1 As iBoxArray
+                        pppp.CopyArray pppp1
+                        Set usehandler1.objref = pppp1
+                        Set bstack.lastobj = usehandler1
+                        r = Empty
+                        Exit Function
+                    End If
+                    End If
                     w1 = 0
                     
                    ' w1 = pppp.index
@@ -43214,6 +43230,7 @@ checkIterator:
                     If Not IsArrayFun Then Exit Function
                     GoTo checkIterator
                     Else
+                    
                     GoTo check123678
                     End If
                 ElseIf TypeOf usehandler.objref Is mStiva Then
@@ -44489,8 +44506,17 @@ reentry1:
                     If MaybeIsSymbol3(a$, ")", w1) Then
                         
                         If IsNumberNew(bstack, a$, r, False) Then
-                        FastSymbol a$, ")"
-                        IsEval = True
+                            FastSymbol a$, ")"
+                            IsEval = True
+                        ElseIf Left$(a$, 1) = vbBack Then
+                            If IsStr1(bstack, a$, s$) Then
+                            r = ""
+                            SwapString2Variant s$, r
+                            FastSymbol a$, ")"
+                            IsEval = True
+                            Exit Function
+                        End If
+                        
                         End If
                         Exit Function
                     ElseIf Mid$(a$, w1, 1) = "," Then

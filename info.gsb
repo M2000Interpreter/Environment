@@ -2646,7 +2646,7 @@ Module RationalNumbers {
 	
 	Z=Z.Power(2)
 	Print Z.real
-	Print z.tostring$;" = ";eval(z.tostring$)   
+	Print z.tostring$;" = ";eval(z.tostring$)
 	Print Z=Z
 	Print Z=N, "            SHOULD BE FALSE"  ' false
 	Print Z=-Z , "            SHOULD BE FALSE"  ' false
@@ -23332,16 +23332,19 @@ Module Check {
 \\ set tab width
 Report ! 4
 KK=80
+LINES=32
+form KK, LINES
+MM=MODE/2
+MODE MM
 Repeat {
 Refresh 5000
-form KK, 32
 g=20 : d=2
 \\ Blocks {} handle Goto jumps
 Repeat {
 	Cls 5, 0
 	Pen 14
 	Double
-	Pen 15 {Report 2, "Example of Report statement"}
+	Pen 15 {Report 2, "Example of Report statement "+str$(MM,1033)}
 	Normal
 	OldItalic=Italic
 	Italic 1
@@ -23377,8 +23380,18 @@ Repeat {
 	If g>18 Then d=-d
 } Always
 ContHere:
-KK=KK-5
-} Until KK<50
+OLDMM=MM
+MM1=0
+refresh 5000
+form KK, LINES
+DO
+MM+=MM1
+MM+=0.25
+MODE MM
+MM1++
+UNTIL MM>OLDMM
+refresh 25
+} Until HEIGHT<32
 ExitLoop:
 }
 MODULE TEXTONLY {Declare Form1 Form
@@ -34945,137 +34958,152 @@ win M2000paper.pdf
 
 }
 MODULE FUNNY {Clear \\ clear static too
-FKey 1, "Cls, 0 : Edit "+module$
-FKey 5, module$
-Font "Verdana"
-Form 70,35
-Cls 3
-Pen 14
-Double
-Report 2, "Funny Loops.."
-Normal
-Cls 5,2
-old_italic=Italic
-Italic 1
-Pen 15 {Report 1, {Look how we can mix proportional font with same font  as monospace font} }
-Italic old_italic ' restore italic to old value
-\\ iterator
-ForEach=lambda (x, x1) -> {
-      st=1 \\ this is optional
-      read ? st
-      =lambda x ,x1, st (&n) -> {
-            =true
-            if x<=x1 then {
-                  n=x : x+=st
-            }  else =false
-      }
-}
-\\ execution of a lambda function by iterator
-\\ get more parameters, from stack (using call statement)
-Lcode=lambda i (&m) -> {
-\\ choose to use  a lambda by value
-\\ or any function by reference, using islet (is letter)
-\\ check head of stack if is string (function references in M2000 are strings)
-      If islet then { read &cd() } else read cd
-      =false
-      if m(&i) then {
-            Try ok {
-                  call cd(i)
-            }
-            if not ok then exit
-            =true
-       }
-}
-Z=Foreach(60,80,2)
-CodeW=lambda (i) -> {
-      Let limit=1 \\ this is optional
-      Read ? limit
-      Print i, limit
-      if i>limit then =i ' error
-}
-\\ print prints with transparent background for fonts
-\\ Print Over erase a line before, and set all line one field (temporary)
-Print Over "Try iterate code using an iterator and  a secondary limit, if limit break then recalibrate iteration using other data, here other limit"
-\ \ but Print Over leave one line, so we can fill this line with Print Unter (also change line)
-Print Under
-\\ Print Over, Print Part and Print Under can be used for making columns with diffrent width
-\\ Here is the first loop (empty block)
-While Lcode(&z, CodeW,75) {}
-n=error
-If n>75 then {
-      Print "out of scope...recalibrate"
-      while Lcode(&z, CodeW,100 ) {}
-}
-Print Under
-Print Over "Example of step by step execution"
-Print Under
-Z=Foreach(10,15)
-n=0
-\\ Pen { } change temporary pen to black
-\\ using loop we mark block for loop at the end of block execution
-\\ Calling a function with Call return error if function return non zero value.
-\\ so here we get Error and if is not zero then we do next loop
-Pen 0 {
-     Print Over ~(0,7,14),$(0,8), "Step"+str$( n+1),@(tab),
-     \\ also here we have an empty block
-      while Lcode(&z, CodeW,n) {}
-      n=error
-      if n<>0 then loop
-}
-\\ here is the lambda with static variable
-\\ static variables are per execution object (attached to parent object), no per function (as code)
-\\ so if this lambda ...moved to another execution object, passing as parameter
-\\ then static i get 1 and start new count.
-CodeW=lambda -> {
-      Static i=1
-      Print Over ~(14,8),$(4,8),"just run, no need iteration number ", i
-      i++
-}
-Z=Foreach(1,5)
-Print Over "Simple iteration , using static counter inside code"
-\\ Here we have a repeat {} until block
-Repeat {Print Under} Until Not Lcode(&Z,Codew)
-Print Over "Iteration using group's function, passing by reference, altering group member counter"
-Print Under \\ print underline and change line too
-Group Alfa {
-      counter
-     Function M {
-            .counter++
-      }
-}
-Z=Foreach(200,499)
-y=row
-\\ we use a$ for image holder
-a$=""
-Mouse.icon Hide
-Print $("0.00%"),
-\\ and here is the "game"
-While Lcode(&Z, &Alfa.M()) {
-    FeedBack(y, Alfa.counter/300, "  press space to exit early")
-    Move 0, 0
-    copy scale.x,scale.y to a$
-    Move mouse.x, mouse.y
-    Sprite A$,, Alfa.counter,40,80 \\ leaving 2nd parameter, to automatic  match the paper color for 100% transparent
-    If keypress(32) then exit
-    Refresh 5000 \\ rfefresh now and reset counter for next refresh  5 sec later (never happen)
-    Sprite Sprite$ \\ when Sprite write, altered background saved to Sprite$, so now sprite erased
-    \\ Hold take all screen, and Release restore screen to that we take with Hold. But here we use Sprite Sprite (we have only one)
-    Wait 5+Random(1,11-Alfa.counter/30)*2
-}
-Print
-Print $(""),
-Print "Counter:";Alfa.counter
-
-
-Mouse.Icon Show
-Sub FeedBack(y, val, msg$)
-     local N
-     Pen 15 {
-          Cursor 0, y
-          N=round(val*100,0)
-          Print Over $(0,8), val, @(tab),$(4), ~(7);string$("[]",50);msg$;@(tab), ~(11),string$("[]", N div 2)+string$("[", N mod 2);
+Read useHold as Boolean=False
+escape off
+try {
+    FKey 1, "Cls, 0 : Edit "+module$
+    FKey 5, module$
+    Font "Verdana"
+    Form 70,35
+    Cls 3
+    Pen 14
+    Double
+    Report 2, "Funny Loops.."
+    Normal
+    Cls 5,2
+    old_italic=Italic
+    Italic 1
+    Pen 15 {Report 1, {Look how we can mix proportional font with same font  as monospace font} }
+    Italic old_italic ' restore italic to old value
+    \\ iterator
+    ForEach=lambda (x, x1) -> {
+          st=1 \\ this is optional
+          read ? st
+          =lambda x ,x1, st (&n) -> {
+                =true
+                if x<=x1 then {
+                      n=x : x+=st
+                }  else =false
+          }
     }
-End Sub
+    \\ execution of a lambda function by iterator
+    \\ get more parameters, from stack (using call statement)
+    Lcode=lambda i (&m) -> {
+    \\ choose to use  a lambda by value
+    \\ or any function by reference, using islet (is letter)
+    \\ check head of stack if is string (function references in M2000 are strings)
+          If islet then { read &cd() } else read cd
+          =false
+          if m(&i) then {
+                Try ok {
+                      call cd(i)
+                }
+                if not ok then exit
+                =true
+           }
+    }
+    Z=Foreach(60,80,2)
+    CodeW=lambda (i) -> {
+          Let limit=1 \\ this is optional
+          Read ? limit
+          Print i, limit
+          if i>limit then =i ' error
+    }
+    \\ print prints with transparent background for fonts
+    \\ Print Over erase a line before, and set all line one field (temporary)
+    Print Over "Try iterate code using an iterator and  a secondary limit, if limit break then recalibrate iteration using other data, here other limit"
+    \ \ but Print Over leave one line, so we can fill this line with Print Unter (also change line)
+    Print Under
+    \\ Print Over, Print Part and Print Under can be used for making columns with diffrent width
+    \\ Here is the first loop (empty block)
+    While Lcode(&z, CodeW,75) {}
+    n=error
+    If n>75 then {
+          Print "out of scope...recalibrate"
+          while Lcode(&z, CodeW,100 ) {}
+    }
+    Print Under
+    Print Over "Example of step by step execution"
+    Print Under
+    Z=Foreach(10,15)
+    n=0
+    \\ Pen { } change temporary pen to black
+    \\ using loop we mark block for loop at the end of block execution
+    \\ Calling a function with Call return error if function return non zero value.
+    \\ so here we get Error and if is not zero then we do next loop
+    Pen 0 {
+         Print Over ~(0,7,14),$(0,8), "Step"+str$( n+1),@(tab),
+         \\ also here we have an empty block
+          while Lcode(&z, CodeW,n) {}
+          n=error
+          if n<>0 then loop
+    }
+    \\ here is the lambda with static variable
+    \\ static variables are per execution object (attached to parent object), no per function (as code)
+    \\ so if this lambda ...moved to another execution object, passing as parameter
+    \\ then static i get 1 and start new count.
+    CodeW=lambda -> {
+          Static i=1
+          Print Over ~(14,8),$(4,8),"just run, no need iteration number ", i
+          i++
+    }
+    Z=Foreach(1,5)
+    Print Over "Simple iteration , using static counter inside code"
+    \\ Here we have a repeat {} until block
+    Repeat {Print Under} Until Not Lcode(&Z,Codew)
+    Print Over "Iteration using group's function, passing by reference, altering group member counter"
+    Print Under \\ print underline and change line too
+    Group Alfa {
+          counter
+         Function M {
+                .counter++
+          }
+    }
+    Z=Foreach(200,499)
+    y=row
+    \\ we use a$ for image holder
+    a$=""
+    Mouse.icon Hide
+    Print $("0.00%"),
+    \\ and here is the "game"
+    Every 1000/15 {
+        if Lcode(&Z, &Alfa.M()) then
+            FeedBack(y, Alfa.counter/300, "  press space to exit early")
+            if useHold then
+                Hold
+                Move 0, 0:copy scale.x,scale.y to a$
+                Move mouse.x, mouse.y
+                Sprite A$,, Alfa.counter,40,80, 1 \\ leaving 2nd parameter, to automatic  match the paper color for 100% transparent
+                Refresh 5000 \\ refresh now and reset counter for next refresh  5 sec later (never happen)
+                Release
+            else
+                Move 0, 0:copy scale.x,scale.y to a$
+                Move mouse.x, mouse.y
+                Sprite A$,, Alfa.counter,40,80 \\ leaving 2nd parameter, to automatic  match the paper color for 100% transparent
+                Refresh 5000 \\ refresh now and reset counter for next refresh  5 sec later (never happen)
+                Sprite Sprite$ \\ when Sprite write, altered background saved to Sprite$, so now sprite erased
+            end if
+        end if
+        If keypress(32) or Alfa.counter=300 then exit
+    }
+    Print
+    Print $(""),
+    Print "Counter:";Alfa.counter
+    
+    
+    Mouse.Icon Show
+    Sub FeedBack(y, val, msg$)
+         local N
+         Pen 15 {
+              Cursor 0, y
+              N=round(val*100,0)
+              Print Over $(0,8), val, @(tab),$(4), ~(7);string$("[]",50);msg$;@(tab), ~(11),string$("[]", N div 2)+string$("[", N mod 2);
+        }
+    End Sub
+    
+}
+? $("")
+Escape on
 }
 MODULE RECSOUND {Volume 100
 soundrec new dir$+"alfa.wav"
@@ -41216,8 +41244,11 @@ Function Count(x as long long)
 End Function
 
 }
-MODULE BASICO {// this is a simple program on a more advanced input/output to M2000 console through threads.
+MODULE BASICO {Cls 0,0
+Window 6, window
+// this is a simple program on a more advanced input/output to M2000 console through threads.
 ofont=fontname$
+thread.plan Sequential
 font "consolas"
 if lcase$(fontname$, 7)<>"consolas" then font "Verdana"
 form 60,25
@@ -41308,7 +41339,7 @@ threads erase
 font ofont
 pen 14
 cls 5
-form 60, 32
+window mode,window
 
 End
 sub main()
@@ -53142,5 +53173,194 @@ Module Romberg_integration {
 	print round(Romberg((lambda->exp(number)),-3,3,5),6)=20.035749  ' true
 }
 Romberg_integration
+}
+MODULE AMB {Report {NON-DETERMINISTIC FINITE AUTOMATON
+	The Amb operator (or function) takes a variable number of expressions or values  and yields a correct one which will satisfy a constraint in some future computation, thereby avoiding failure.
+}
+// https://rosettacode.org/wiki/Amb
+// VERSION 14 - REVISION 52: restored the fault of STOCK statement when using tuple (the problem start after version 12, when arrays have one of two objects, mArray and tuple)
+// An array made from DIM first time is mArray. An array made from (,) (a tuple) is tuple type.
+// A pointer to array may hold pointer to mArray or tuple. Is an mHandler type (a type container for List/Stack/Arrays pointers)
+// Iterators (created using Each()) are same type mHandler for mArrays. tuple, mStiva (the stack object), FastCollection (the Inventory object, which can be a list or queue) 
+Module AmbFunction {
+    Function Amb (failure) {
+        // get an array of s items, return an array of 1 item
+        // we do this so we forget the type of element
+        getitem=lambda (n, c) -> {
+            dim z(1) :link c to c()
+            stock c(n) keep 1, z(0)  // copy from c(n) to z(0) one item
+            =z()
+        }
+        read a
+        c1=lambda a, getitem (i, &any,  &ret) ->{
+            any=getitem(i, a)
+            ret=any
+            =true
+        }
+        m=stack.size
+        if m=0 then Error "At least two arrays needed"
+        c=c1
+        while m>1 {
+              read b
+              c1=lambda c2=c, j=0, m=len(a), b, failure, getitem (i, &any,  &ret) ->{
+                    any=getitem(i, b)
+                    ret=(,) :  ok=false :  anyother=(,)
+                    do
+                          if c2(j, &anyother,  &ret) then
+                                if not failure(any, anyother) then
+                                      ok=true
+                                      ret=cons(ret, any)
+                                end if
+                          end if
+                          j++
+                    until ok or j=m
+                    if j=m then j=0
+                    =ok
+              }
+              c=c1 :  a=b :  m--    
+        }
+        read b
+        amb1=lambda c2=c, j=0, m=len(a), b, failure, getitem (&ret) ->{
+              ret=(,) :  ok=false: anyother=(,)
+              k=each(b)
+              while k
+                    any=getitem(k^, b)
+                    do
+                          if c2(j, &anyother,  &ret) then
+                                if not failure(any, anyother) then
+                                      ok=true
+                                      ret=cons(ret, any)
+                                end if
+                          end if
+                          j++
+                    until ok or j=m
+                    if j=m then j=0
+                    if ok then exit
+              end while
+              =ok
+        }
+        ret=(,)
+        if amb1(&ret) then =ret else =(,)  ' default return value
+    }     
+    a=(1, 2, 3)
+    b=(7, 6, 4, 5)
+    failure=lambda  (a,b)->{
+        =a#val(0)*b#val(0)<>8
+    }
+    Print amb(failure, a, b)#str$()
+    a=("the", "that", "a")
+    b=("frog", "elephant", "thing")
+    c=("walked", "treaded", "grows")
+    d=("slowly", "quickly")
+    failure=lambda  (a,b)->{
+        =left$(a#val$(0),1)<>right$(b#val$(0),1)
+    }
+    Print amb(failure, a, b, c, d)#str$()
+}
+AmbFunction
+Pen 11 {Print "Redefine AmbFunction - Versatile (found all solutions) - wait some seconds"}
+Module AmbFunction {
+    Enum Solution {First, Any=-1}
+    Function Amb(way as Solution, failure) {
+        // get an array of s items, return an array of 1 item
+        // we do this so we forget the type of element
+        getitem=lambda (n, c) -> {
+            dim z(1) :link c to c()
+            stock c(n) keep 1, z(0)  // copy from c(n) to z(0) one item
+            =z()
+        }
+        read a
+        c1=lambda i=0, a, getitem (&any,  &ret) ->{
+            any=getitem(i, a)
+            ret=any
+            i++
+            ok=i=len(a)
+            if ok then i=0
+            =ok
+        }
+        m=stack.size
+        if m=0 then Error "At least two arrays needed"
+        c=c1
+        while m>0 {
+            read a
+            c1=lambda c2=c, i=0, a,  getitem (&any,  &ret) ->{
+                any=getitem(i, a)
+                ret=(,) :  ok=false :  anyother=(,)
+                ok=c2(&anyother,  &ret)  
+                ret=cons(ret, any)
+                if ok then i++
+                ok=i=len(a)
+                if ok  then i=0 
+                =ok
+            }
+            c=c1 :  m--
+        }
+        ok=false
+        any=(,)
+        flush
+        while not ok
+            ret=(,)
+            ok=c(&any, &ret)
+            s=stack(ret)
+            if not failure(! s)  then data ret : if way>0 then ok=true
+        End While
+        if empty then
+            ret=(("",),)
+        else
+            ret=array([])
+        end if
+        =ret
+    }
+    a=(1, 2, 3)
+    b=(7, 6, 4, 5)
+    failure=lambda  (a,b)->{
+        =a*b<>8
+    }
+    Print Amb(First, failure, a, b)#val(0)#str$()
+    a=("the", "that", "a")
+    b=("frog", "elephant", "thing")
+    c=("walked", "treaded", "grows")
+    d=("slowly", "quickly")
+    failure=lambda  (a$, b$, c$, d$)->{
+        def amb(x$, y$)=right$(x$,1)<>left$(y$,1)
+        =amb(a$,b$) or amb(b$,c$) or amb(c$, d$)
+    }
+    Print amb(First, failure, a, b, c, d)#Val(0)#str$()
+    Range=lambda (a, f) ->{
+      for i=a to f-1: data i: next
+      =array([])
+    }
+    Print "Small Pythagorean triples problem for range(1 to 11):"
+    a=range(1,11)
+    failure=lambda  (a, b, z)->{
+        =not (a^2+b^2=z^2 and b>a)
+    }
+    all=amb(Any,failure, a, a, a)
+    k=each(all)
+    while k
+        z=array(k)
+        Print z#str$()
+    end while
+    Print "Solutions for a+a+c+c+c=9 when a (1 to 6) and c (0 to 6) (wait some seconds):"
+    Refresh       
+    a=range(1,6)
+    c=range(0,6)
+    N=9
+    failure=lambda  N (a, b, c, d, e)->{
+        =not (a+b+c+d+e=N and a>=b and b>=c and c>=d and d>=e)
+    }
+    all=amb(Any,failure, a, a, c, c, c)
+    k=each(all)
+    document ret$
+    while k
+        z=array(k)
+        ret$=replace$("+0", "  ", z#str$("+"))+" ="+str$(N)+{
+    }
+    end while
+    Sort descending ret$
+    Print #-2, ret$  ' print like in a file using non proportional text  rendering
+// clipboard ret$
+}
+AmbFunction
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

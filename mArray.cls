@@ -25,6 +25,8 @@ Private Const mgrp = "Group"
 Private Const mlmbd = "lambda"
 Private Const mArr = "mArray"
 Private Const mTuple = "tuple"
+Private Const refArr = "RefArray"
+
 Private actualData
 Dim maxitems As Long
 Dim maxitems1 As Long
@@ -1094,6 +1096,7 @@ Public Sub CopyArray(k As mArray)
 
 If k Is Me Then Exit Sub
 If k Is Nothing Then Set k = New mArray
+Dim spareArr As mArray
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda, gr As Group, linkthis As Boolean
 k.MyTypeToBe = MyTypeToBe
 k.myarrbase = myarrbase
@@ -1133,8 +1136,12 @@ Else
                 End With
                 Set k.item(i) = spare
                 Set spare = Nothing
-            Case "RefArray"
+            Case refArr
                 Set k.item(i) = Me.item(i).Copy()
+            Case mArr
+                Me.item(i).CopyArray spareArr
+                Set k.item(i) = spareArr
+                Set spareArr = Nothing
             Case Else
                 Set k.item(i) = Me.item(i)
             End Select
@@ -1153,6 +1160,7 @@ End Sub
 Public Sub CopyArray2tuple(k As tuple)
 'copy this to k
 If k Is Nothing Then Set k = New tuple
+Dim spareArr As mArray
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 k.MyTypeToBe = MyTypeToBe
 ' no use, we do the redim in PushEnd
@@ -1186,8 +1194,12 @@ Else
                 End With
                 Set k.item(i) = spare
                 Set spare = Nothing
-            Case "RefArray"
+            Case refArr
                 Set k.item(i) = Me.item(i).Copy()
+            Case mArr
+                Me.item(i).CopyArray spareArr
+                Set k.item(i) = spareArr
+                Set spareArr = Nothing
             Case Else
                 Set k.item(i) = Me.item(i)
             End Select
@@ -1206,6 +1218,7 @@ End Sub
 Public Sub CopyArrayRev(k As mArray)
 'copy this to k
 If k Is Me Then Exit Sub
+Dim spareArr As mArray
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda, gr As Group, linkthis As Boolean
 Dim mm As Long, M1 As Long
 If k Is Nothing Then Set k = New mArray
@@ -1250,8 +1263,12 @@ For i = 0 To Me.UpperMonoLimit
             End With
             Set k.item(i) = spare
             Set spare = Nothing
-        Case "RefArray"
+        Case refArr
             Set k.item(i) = Me.item(i).Copy()
+        Case mArr
+            Me.item(i).CopyArray spareArr
+            Set k.item(i) = spareArr
+            Set spareArr = Nothing
         Case Else
             Set k.item(i) = Me.item(M1)
         End Select
@@ -1269,7 +1286,7 @@ End Sub
 Public Sub CopyArrayRevFast(k As mArray)
 'copy this to k
 If k Is Me Then Exit Sub
-Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
+Dim v As Variant, i As Long
 Dim mm As Long, M1 As Long
 k.MyTypeToBe = MyTypeToBe
 'k.SerialItem v, Me.UpperMonoLimit, 8
@@ -1325,6 +1342,7 @@ Public Sub CopyArraySlice(k As mArray, fromS As Long, toS As Long)
 ' make one dimemsion only
 If k Is Me Then Exit Sub
 If k Is Nothing Then Set k = New mArray
+Dim spareArr As mArray
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda, gr As Group, linkthis As Boolean
 k.MyTypeToBe = MyTypeToBe
 k.myarrbase = myarrbase
@@ -1358,8 +1376,12 @@ For i = fromS To toS
             End With
             Set k.item(i - fromS) = spare
             Set spare = Nothing
-        Case "RefArray"
+        Case refArr
             Set k.item(i - fromS) = Me.item(i).Copy()
+        Case mArr
+            Me.item(i).CopyArray spareArr
+            Set k.item(i - fromS) = spareArr
+            Set spareArr = Nothing
         Case Else
             Set k.item(i - fromS) = Me.item(i)
         End Select
@@ -1378,7 +1400,7 @@ Public Sub CopyArraySliceFast(k As mArray, fromS As Long, toS As Long)
 ' make one dimemsion only
 If k Is Me Then Exit Sub
 If k Is Nothing Then Set k = New mArray
-Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
+Dim v As Variant, i As Long
 k.MyTypeToBe = MyTypeToBe
 k.myarrbase = myarrbase
 k.RevOrder = False
