@@ -1,103 +1,32 @@
 M2000 Interpreter and Environment
-Version 14 Revision 52
+Version 14 Revision 53
 
-1) Remove a bug in Eval() - Rat module now run in info.gsb
-2) Stock statement found not workig with tuple array (tuple object), only with mArray. Fixed now for tuple also.
-PRINT "Part One Using an mArray object"
-DIM A(7)  ' this is an mArray object
-PRINT Type$(A())="mArray"
-A(0)=1,2,3,4,5,6,7
-A=A()
-SamePart()
-clear
-PRINT "Part Two Using an mArray object"
-A=(1,2,3,4,5,6,7)
-PRINT Type$(A)="tuple"
-LINK A TO A()
-Try ok {
-	SamePart()
-}
-IF ERROR THEN
-	PRINT Error$=" Type mismatch" ' this is message from VB6
-	PRINT "Version>12 and (Version<14 or ( Version=14 and Revision<52)):";
-	PRINT Version>12 and (Version<14 or ( Version=14 and Revision<52))
-END IF
-SUB SamePart()
-	PRINT A(0), " Type of A():";Type$(A())
-	LOCAL A1, B1, C1
-	' Stock transfer values to variables
-	STOCK A(0) OUT A1, B1, C1
-	PRINT A1, B1, C1
-	A1++
-	B1+=10
-	C1*=100
-	' Stock transfer values from variables
-	STOCK A(0) IN A1, B1, C1
-	PRINT A
-	' Stock copy items to same or other array.
-	STOCK A(0)KEEP 2, A(2)
-	PRINT A
-END SUB
+1) Latest revisions use a() of an object as a call to default property of object "a" using no parameters (or a number of parameters)
+(for the time being we can't use named parametes here). We get a named conflict if we try to use DIM a() if a is an object (local to current module). This is not bad, but what if the "a" object is a BigNumber (treated as numeric value, but is an object). So this revision do not raise error if "a" is biginteger (there is no default property for biginteger).
+1.1 Test Code:
+	biginteger a=1000u
+	//	a=(1,2,3,4) ' is OK
+	dim a(10) as long ' now this pass
+	list
 
-3) Fix the mArray inside tuple or mArray always copied if we get a copy of mArray or tuple.
-A=(1,2,3)
-PRINT A#START((4,5,6)) ' 4,5,6,1,2,3
-PRINT A#END((4,5,6)) ' 1,2,3,4,5,6
-PRINT A#END((4,5,6))#START((0,)) ' 0,1,2,3,4,5,6
-CLEAR
-DIM A(3)
-A(0)=1,2,3
-POINTERA=A()
-T=(1,2,A())
-T=T#END(T) ' WORKS ALSO THIS T=T#START(T)
-A(2)+=100
-PRINT T#VAL(2)#VAL(2)=3 ' WAS 103
-PRINT T#VAL(2+3)#VAL(2)=103
-T=T#END(T) ' WORKS ALSO THIS T=T#START(T)
+1.2 Test Code which raise error (we have local object):
+	a=getobject("","m2000.VarItem") 
+	//	a=list ' the same if a is a list (because a() and a$() exist for list)
+	//	buffer clear a as Integer*100 ' memory buffer a(0) is the address at offset 0. 
+	buffer clear a as Integer*100 ' memory buffer a(0) is the address at offset 0. 
+	dim a(10) as long ' we get error becaue "a" is an object.
+	list
 
-A(2)+=100
-PRINT T#VAL(2)#VAL(2)=3 ' WAS 203
-PRINT T#VAL(2+3)#VAL(2)=103 ' WAS 203
-PRINT T#VAL(2+6)#VAL(2)=3 ' WAS 203
-PRINT T#VAL(2+9)#VAL(2)=203 ' ONLY THE LAST IS THE SAME AS A()
-CLEAR ' CLEAR ALL VARIABLES
-DIM A(3)
-A(0)=1,2,3
-POINTERA=A() ' POINTER IS AN MHANDLER OBJECT WHICH HAVE THE ACTUAL POINTER TO A()
-T=(1,2,POINTERA) ' USING POINTER NOW
-T=T#START(T) ' WORKS ALSO THIS T=T#END(T)
-A(2)+=100
-PRINT T#VAL(2)#VAL(2)=103
-PRINT T#VAL(2+3)#VAL(2)=103
-T=T#START(T) ' WORKS ALSO THIS T=T#END(T)
-A(2)+=100
-PRINT T#VAL(2)#VAL(2)=203
-PRINT T#VAL(2+3)#VAL(2)=203
-PRINT T#VAL(2+6)#VAL(2)=203
-PRINT T#VAL(2+9)#VAL(2)=203
+1.3 Test Code which not raise error because local shadow global:
+	global a=getobject("","m2000.VarItem")
+	dim a(10) as long ' now this pass 
+	list
 
-4) Function Array() now works for tuple without second parameter, we get a copy
-	4.1 Copy a tuple:
-		A=(1,2,3,4)
-		B=ARRAY(A)
-		PRINT B IS A  ' false
-		PRINT A ' 1,2,3,4
-		PRINT B ' 1,2,3,4
-  4.2 Access items directly (is as before, no change)
-		A=("alfa", 1200, (12,3i), 1234567890123456789012345678901234567890u)
-		PRINT ARRAY(A,0)="alfa" ' string
-		PRINT ARRAY(A,1)=1200 ' double
-		PRINT ARRAY(A,2)=(12,3i) ' complex
-		PRINT ARRAY(A,3)=1234567890123456789012345678901234567890u ' BigInteger  
-	4.3 Access Iterator object (is an mHandler with a property UseIterator to True)
-    A=("alfa", 1200, (12,3i), 1234567890123456789012345678901234567890u)
-    M=EACH(a, -1, 1) 'reverse from last to first
-    PRINT "INDEX", "VALUE"
-    WHILE M ' ITERATE FROM 3 TO 0
-     	PRINT "(";M^;") ";ARRAY(M)
-    END WHILE
-    
-  So the 4.1 works because UseIterator property is false and has no second parameter.
+2) Swap Array items in any combination if array item is type of Biginteger
+Was not problem when array was variant. Now fixed for all other combinations.
+
+
+
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

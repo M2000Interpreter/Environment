@@ -7887,8 +7887,37 @@ End Sub
 Public Sub badsupport()
 MyEr "object not supported", "Το αντικείμενο δεν υποστηρίζεται"
 End Sub
-Public Sub conflictname()
-MyEr "Name conflict with Inventory object", "Υπάρχει τέτοιο όνομα σε χρήση σε Κατάσταση"
+Public Sub conflictname(obj1)
+Dim obj As Object, uHandler As mHandler, mCol As FastCollection
+Dim uProp As PropReference
+Set obj = obj1
+If Not obj Is Nothing Then
+    If TypeOf obj Is mHandler Then
+    Set uHandler = obj
+        If uHandler.indirect Then
+            Set obj = var(uHandler.indirect)
+        Else
+            Set obj = uHandler.objref
+        End If
+    ElseIf TypeOf obj Is PropReference Then
+        Set uProp = obj
+        Set obj = uProp.CurObject
+    End If
+    If TypeOf obj Is FastCollection Then
+        Set mCol = obj
+        If mCol.IsQueue Then
+            MyEr "Name conflict with queue object", "Υπάρχει τέτοιο όνομα σε χρήση σε αντικείμενο ουρά"
+        Else
+            MyEr "Name conflict with list object", "Υπάρχει τέτοιο όνομα σε χρήση σε αντικείμενο λίστα"
+        End If
+        
+    Else
+        MyEr "Name conflict with " + Typename$(obj) + " object", "Υπάρχει τέτοιο όνομα σε χρήση σε " + Typename$(obj)
+    End If
+Else
+MyEr "Name conflict", "Υπάρχει τέτοιο όνομα σε χρήση"
+
+End If
 End Sub
 Public Sub MissArrayName()
 MyEr "Missing array name", "Λείπει όνομα πίνακα"
@@ -18222,7 +18251,7 @@ End If
 End Function
 Function MySwap(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim s$, s0$, s1$, ss$, f As Long, of As Long, Col As Long, x1 As Long, i As Long, pppp As iBoxArray, pppp1 As iBoxArray, p
-Dim swaparrays As Boolean, ar1 As Long, ar2 As Long
+Dim swaparrays As Boolean, ar1 As Long, ar2 As Long, varIsObj As Boolean
     f = Abs(IsLabel(bstack, rest$, s$))
     MySwap = True
     If f = 1 Or f = 4 Then Col = 1: of = f
@@ -18233,50 +18262,74 @@ Dim swaparrays As Boolean, ar1 As Long, ar2 As Long
    ' If (f = 3 Or f = 6) And Col > 0 Then SyntaxError: MySwap = False:    Exit Function
     If Col = 1 Then
         If GetVar(bstack, s$, f) Then
-                If Not FastSymbol(rest$, ",") Then MissingnumVar:  Exit Function
+            If Not FastSymbol(rest$, ",") Then MissingnumVar:  Exit Function
                 i = Abs(IsLabel(bstack, rest$, ss$))
-              If i = 1 Or i = 4 Then
-                If GetVar(bstack, ss$, x1) Then
-            If MyIsObject(var(f)) Then
-            If var(f) Is Nothing Then
-            ElseIf TypeOf var(f) Is Constant Then
-            CantAssignValue
-            MySwap = False: Exit Function
-            End If
-        End If
-        If MyIsObject(var(x1)) Then
-            If TypeOf var(x1) Is Constant Then
-            CantAssignValue
-            MySwap = False: Exit Function
-            End If
-        End If
-                    If f <> x1 Then SwapVariant var(f), var(x1)
-                    
-                    
-                Exit Function
-                Else
-s11111:
-                    Nosuchvariable ss$
-                    MySwap = False
-                    Exit Function
-                End If
-            ElseIf i = 5 Or i = 6 Or i = 7 Then
-                If neoGetArray(bstack, ss$, pppp) Then
-                If Not pppp.arr Then NotArray: Exit Function
-                    If Not NeoGetArrayItem(pppp, bstack, ss$, x1, rest$, True) Then Exit Function
+                If i = 1 Or i = 4 Then
+                    If GetVar(bstack, ss$, x1) Then
                         If MyIsObject(var(f)) Then
-                            If TypeOf var(f) Is Constant Then
-                            CantAssignValue
-                            MySwap = False: Exit Function
+                            If var(f) Is Nothing Then
+                                NoSwap ""
+                                MySwap = False: Exit Function
+                            ElseIf TypeOf var(f) Is Constant Then
+                                CantAssignValue
+                                MySwap = False: Exit Function
+                            End If
+                        End If
+                        If MyIsObject(var(x1)) Then
+                            If var(x1) Is Nothing Then
+                                NoSwap ""
+                                MySwap = False: Exit Function
+                            ElseIf TypeOf var(x1) Is Constant Then
+                                CantAssignValue
+                                MySwap = False: Exit Function
+                            End If
+                        End If
+                        If f <> x1 Then SwapVariant var(f), var(x1)
+                        Exit Function
+                    Else
+s11111:
+                        Nosuchvariable ss$
+                        MySwap = False
+                        Exit Function
+                    End If
+                ElseIf i = 5 Or i = 6 Or i = 7 Then
+                    If neoGetArray(bstack, ss$, pppp) Then
+                        If Not pppp.arr Then NotArray: Exit Function
+                        If Not NeoGetArrayItem(pppp, bstack, ss$, x1, rest$, True) Then Exit Function
+                        varIsObj = MyIsObject(var(f))
+                        If varIsObj Then
+                            If var(f) Is Nothing Then
+                                NoSwap ""
+                                MySwap = False: Exit Function
+                            ElseIf TypeOf var(f) Is Constant Then
+                                CantAssignValue
+                                MySwap = False: Exit Function
                             End If
                         End If
                         If pppp.MyTypeToBe <> vbVariant Then
-                            If pppp.MyTypeToBe <> vbObject Then
+                            If pppp.MyTypeToBe = 201 Then
+                            If varIsObj Then
+                            If TypeOf var(f) Is BigInteger Then
+                                Set p = pppp.item(x1)
+                                SwapVariant var(f), p
+                                Set pppp.item(x1) = p
+                            Exit Function
+                            End If
+                            End If
+                            NoSwap ""
+                            Exit Function
+                            ElseIf pppp.MyTypeToBe <> vbObject Then
+                            
                                 p = pppp.item(x1)
                                 SwapVariant var(f), p
                                 pppp.item(x1) = p
+                                
                             Else
                                 Set p = pppp.item(x1)
+                                If TypeOf var(f) Is BigInteger Then
+                                    If p Is Nothing Then NoSwap "": Exit Function
+                                    If Not TypeOf p Is BigInteger Then NoSwap "": Exit Function
+                                End If
                                 SwapVariant var(f), p
                                 If myVarType(p, vbObject) Then
                                     Set pppp.item(x1) = p
@@ -18343,19 +18396,39 @@ nextone:
                     If pppp.IhaveClass Then
                             NoSwap ""
                     Else
-                             If MyIsObject(var(x1)) Then
-                                If TypeOf var(x1) Is Constant Then
-                                CantAssignValue
-                                MySwap = False: Exit Function
+                            varIsObj = MyIsObject(var(x1))
+                             If varIsObj Then
+                                If var(x1) Is Nothing Then
+                                    NoSwap ""
+                                    MySwap = False: Exit Function
+                                ElseIf TypeOf var(x1) Is Constant Then
+                                    CantAssignValue
+                                    MySwap = False: Exit Function
                                 End If
                             End If
                             If pppp.MyTypeToBe <> vbVariant Then
-                                If pppp.MyTypeToBe <> vbObject Then
+                                If pppp.MyTypeToBe = 201 Then
+                                    If varIsObj Then
+                                        If TypeOf var(x1) Is BigInteger Then
+                                            Set p = pppp.item(f)
+                                            SwapVariant var(x1), p
+                                            Set pppp.item(f) = p
+                                            Exit Function
+                                        End If
+                                    End If
+                                    NoSwap ""
+                                    Exit Function
+                                ElseIf pppp.MyTypeToBe <> vbObject Then
+                                
                                     p = pppp.item(f)
                                     SwapVariant var(x1), p
                                     pppp.item(f) = p
                                 Else
                                     Set p = pppp.item(f)
+                                    If TypeOf var(x1) Is BigInteger Then
+                                        If p Is Nothing Then NoSwap "": Exit Function
+                                        If Not TypeOf p Is BigInteger Then NoSwap "": Exit Function
+                                    End If
                                     SwapVariant var(x1), p
                                     If myVarType(p, vbObject) Then
                                         Set pppp.item(f) = p
@@ -18391,7 +18464,15 @@ nextone:
                         If pppp.MyTypeToBe <> vbVariant Or pppp1.MyTypeToBe <> vbVariant Then
                             If pppp.MyTypeToBe <> vbObject And pppp1.MyTypeToBe <> vbObject Then
                                 If pppp.ItemIsObject(f) Then
-                                    NoSwap ""
+                                    If pppp.MyTypeToBe = 201 Or pppp1.MyTypeToBe = 201 Then
+                                        Set p = pppp.item(f)
+                                        Set pppp.item(f) = pppp1.item(x1)
+                                        Set pppp1.item(x1) = p
+
+                                    Else
+                                        NoSwap ""
+                                    
+                                    End If
                                     Exit Function
                                 ElseIf pppp1.ItemIsObject(x1) Then
                                     NoSwap ""
@@ -18411,13 +18492,47 @@ nextone:
                                         Set pppp.item(f) = Nothing
                                     End If
                                 ElseIf pppp.MyTypeToBe = vbVariant Or pppp1.MyTypeToBe = vbObject Then
+                                    If pppp.MyTypeToBe = 201 Then
+                                       Set p = pppp1.item(x1)
+                                       If p Is Nothing Then
+                                       NoSwap ""
+                                       ElseIf TypeOf p Is BigInteger Then
+                                        Set pppp1.item(x1) = pppp.item(f)
+                                        Set pppp.item(f) = p
+                                       Else
+                                       NoSwap ""
+                                       End If
+                                       Exit Function
+                                    ElseIf pppp.IsObjAt(f, p) Then
+                                        ' maybe is not ok for propReference objects.
+                                        
+                                        Set pppp.item(f) = pppp1.item(x1)
+                                        Set pppp1.item(x1) = p
+                                    Else
                                     Set p = pppp1.item(x1)
+                                    
                                     SwapVariant2 p, pppp, f
                                     If myVarType(p, vbObject) Then
                                         Set pppp1.item(x1) = p
                                     Else
                                         Set pppp1.item(x1) = Nothing
                                     End If
+                                    End If
+                                ElseIf pppp.MyTypeToBe = vbObject And pppp1.MyTypeToBe = 201 Then
+                                    Set p = pppp.item(f)
+                                    If Not p Is Nothing Then
+                                        If TypeOf p Is BigInteger Then
+                                            Set pppp.item(f) = pppp1.item(x1)
+                                            Set pppp1.item(x1) = p
+                                        Else
+                                            NoSwap ""
+                                        End If
+                                    Else
+                                        NoSwap ""
+                                    End If
+                                    Exit Function
+                                    
+                                    
                                 Else
                                     NoSwap ""
                                     Exit Function
@@ -37762,31 +37877,5 @@ End Function
 Private Function IsObjmHandler(v As Object) As Boolean
     If Not v Is Nothing Then
         IsObjmHandler = TypeOf v Is mHandler
-    End If
-End Function
-Private Function GetPPPP(tstArray As iBoxArray, pppp As mArray) As Boolean
-        Dim usehandler As mHandler, myTuple As tuple
-        If Not tstArray Is Nothing Then
-        If Not tstArray.arr Then Exit Function
-        If TypeOf tstArray Is mArray Then
-            Set pppp = tstArray
-        Else
-            If varhash.lastNDX > 0 Then
-                If IsmHandler(var(varhash.lastNDX)) Then
-                    Set usehandler = var(varhash.lastNDX)
-                    If usehandler.t1 = 3 Then
-                        Set myTuple = tstArray
-                        Set pppp = New mArray
-                        myTuple.CopyTuple2Array pppp
-                        Set usehandler.objref = pppp
-                        GoTo contArrayOnly1
-                    End If
-                End If
-            End If
-            conflictname
-            Exit Function
-        End If
-contArrayOnly1:
-    GetPPPP = True
     End If
 End Function

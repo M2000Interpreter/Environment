@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 14
 Global Const VerMinor = 0
-Global Const Revision = 52
+Global Const Revision = 53
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -9876,11 +9876,11 @@ cont111222:
                  pppp.GetDnum dn, w3, V1&
                 If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
                     If dn < dd Then
-                        If Not FastSymbol(a$, ",") Then: MyErMacro a$, "need index for " + v$ + ")", "χρειάζομαι δείκτη για το πίνακα " + v$ + ")": IsNumberNew = False: Exit Function
+                        If Not FastSymbol(a$, ",") Then: MyErMacro a$, "need index for " + GetName(v$) + ")", "χρειάζομαι δείκτη για το πίνακα " + GetName(v$) + ")": IsNumberNew = False: Exit Function
                     Else
                         If FastSymbol(a$, ",") Then
                         IsNumberNew = False
-                        MyErMacro a$, "too many indexes for array " + v$ + ")", "πολλοί δείκτες για το πίνακα " + v$ + ")"
+                        MyErMacro a$, "too many indexes for array " + GetName(v$) + ")", "πολλοί δείκτες για το πίνακα " + GetName(v$) + ")"
                         Exit Function
                     End If
                     If Not FastSymbol(a$, ")") Then: MissSymbol ")": IsNumberNew = False: Exit Function
@@ -9889,12 +9889,12 @@ cont111222:
                 If p < -V1& Then
                     IsNumberNew = False
 toolow:
-                        MyErMacro a$, "index too low for array " + v$ + ")", "χαμηλός δείκτης στο πίνακα " + v$ + ")"
+                        MyErMacro a$, "index too low for array " + GetName(v$) + ")", "χαμηλός δείκτης στο πίνακα " + GetName(v$) + ")"
                         Exit Function
                     End If
                     If Not pppp.PushOffset(w2, dn, CLng(Fix(p))) Then
 toohigh:
-                        MyErMacro a$, "index too high for array " + v$ + ")", "δείκτης υψηλός για το πίνακα " + v$ + ")"
+                        MyErMacro a$, "index too high for array " + GetName(v$) + ")", "δείκτης υψηλός για το πίνακα " + GetName(v$) + ")"
                         IsNumberNew = False
                         Exit Function
                     End If
@@ -9902,7 +9902,7 @@ toohigh:
                 Else
                     IsNumberNew = False
                     If Not LastErNum = -2 Then
-                            MyErMacro a$, "missing index for array " + v$ + ")", "χάθηκε δείκτης για το πίνακα " + v$ + ")"
+                            MyErMacro a$, "missing index for array " + GetName(v$) + ")", "χάθηκε δείκτης για το πίνακα " + GetName(v$) + ")"
                     End If
                     Exit Function
                 End If
@@ -17866,7 +17866,7 @@ CONDwhen:
                                 End If
                             End If
                             If Execute = 3 Then ok = False
-                            If ok Or MOUT Then
+                            If ok Or MOUT Or LastErNum <> 0 Then
                                 If ok Then
                                     ss$ = GetNextLine(b$)  'FORGET ANY CODE TO THE RIGHT
                                 Else
@@ -17944,7 +17944,7 @@ CONDwhen:
                                             End If
                                         End If
                                         If Execute = 3 Then ok = False
-                                        If ok Or MOUT Then Exit Do
+                                        If ok Or MOUT Or LastErNum <> 0 Then Exit Do
                                         IsExp bstack, W$, p
                                     
                                     If Not bstack.lastobj Is Nothing Then
@@ -18019,7 +18019,7 @@ CONDwhen:
                                 ElseIf Execute = 3 Then
                                 ok = False
                                 End If
-                                If ok Or MOUT Then Exit Do
+                                If ok Or MOUT Or LastErNum <> 0 Then Exit Do
                             Loop
                         Else
                             Execute = 0
@@ -18220,7 +18220,7 @@ contWhile1:
                                     End If
                                 End If
                                 If Execute = 3 Then ok = False
-                                If ok Or MOUT Then Exit Do
+                                If ok Or MOUT Or LastErNum <> 0 Then Exit Do
 another1:
                                 IsExp bstack, W$, p
                                                            If Not bstack.lastobj Is Nothing Then
@@ -18348,7 +18348,7 @@ contEvery:
                                     Exit Function
                                 End If
                             End If
-                            If ok Or MOUT Then Exit Do
+                            If ok Or MOUT Or LastErNum <> 0 Then Exit Do
                             If UnsignedSub(timeGetTime, x2) > y2 Then
                                     x2 = UnsignedSub(x2, Not y2) ' // add
                             End If
@@ -23325,6 +23325,10 @@ checkgroup:
                         If TypeOf var(k) Is Constant Then
                             neoGetArray = False
                             Exit Function
+                        ElseIf TypeOf var(k) Is BigInteger Then
+                            neoGetArray = False
+                            Exit Function
+                            
                         End If
                     
 getnewprop:
@@ -25998,26 +26002,26 @@ conthere:
                 pppp.GetDnum dn, w3, lim
                 If IsExp(bstack, rst$, p, flatobject:=True, nostring:=True) Then
                     If dn < dd Then
-                        If Not FastSymbol(rst$, ",") Then MyEr "need index for " + v$ + sp$, "χρειάζομαι δείκτη για το πίνακα " + v$ + sp$: Exit Function
+                        If Not FastSymbol(rst$, ",") Then MyEr "need index for " + GetName(v$) + sp$, "χρειάζομαι δείκτη για το πίνακα " + GetName(v$) + sp$: Exit Function
                     Else
-                        If FastSymbol(rst$, ",") Then MyEr "too many indexes for array " + v$ + sp$, "πολλοί δείκτες για το πίνακα " + v$ + sp$: Exit Function
+                        If FastSymbol(rst$, ",") Then MyEr "too many indexes for array " + GetName(v$) + sp$, "πολλοί δείκτες για το πίνακα " + GetName(v$) + sp$: Exit Function
 
                         If Not FastSymbol(rst$, ")") Then MyEr "missing )", "λείπει )": Exit Function
                     End If
                     On Error Resume Next
                     If p < -lim Then
 toolow:
-                        MyEr "index too low for array " + v$ + sp$, "χαμηλός δείκτης στο πίνακα " + v$ + sp$: Exit Function
+                        MyEr "index too low for array " + GetName(v$) + sp$, "χαμηλός δείκτης για το πίνακα " + GetName(v$) + sp$: Exit Function
                     End If
                     If pppp.PushOffset(Offset, dn, CLng(p)) Then
                         NeoGetArrayItem = True
                     Else
 toohigh:
-                        MyEr "index too high for array " + v$ + sp$, "δείκτης υψηλός για το πίνακα " + v$ + sp$: Exit Function
+                        MyEr "index too high for array " + GetName(v$) + sp$, "δείκτης υψηλός για το πίνακα " + GetName(v$) + sp$: Exit Function
                     End If
                 Else
                     If Not LastErNum = -2 Then
-                        MyEr "missing index for array " + v$ + sp$, "χάθηκε δείκτης για το πίνακα " + v$ + sp$
+                        MyEr "missing index for array " + GetName(v$) + sp$, "χάθηκε δείκτης για το πίνακα " + GetName(v$) + sp$
                     End If
                     Exit Function
                 End If
@@ -41201,7 +41205,7 @@ ArrBase = usethisbase
    ElseIf neoGetArray(basestack, W$, tstArray, True, , Not Len(here$) = 0, , , fromthere) And Not par Then       '
 cont11134:
     If Not GetPPPP(tstArray, pppp) Then
-        conflictname
+        
         Set tstArray = Nothing
         GoTo ex1
     End If
@@ -41266,7 +41270,7 @@ cont33341:
 enter1234:
         If neoGetArray(basestack, W$, tstArray) Then
         If Not GetPPPP(tstArray, pppp) Then
-            conflictname
+            
             Set tstArray = Nothing
             GoTo ex1
         End If
@@ -41354,7 +41358,7 @@ w1112:
                 rest$ = Mid$(rest$, f)
                 If neoGetArray(basestack, W$, tstArray) Then
                     If Not GetPPPP(tstArray, pppp) Then
-                        conflictname
+                        
                         Set tstArray = Nothing
                         GoTo ex1
                     End If
@@ -41412,7 +41416,7 @@ Case 7
          If IsExp(basestack, rest$, X) Then
              If neoGetArray(basestack, W$, tstArray) Then ''basestack.GroupName &
                  If Not GetPPPP(tstArray, pppp) Then
-                     conflictname
+                     
                      Set tstArray = Nothing
                      GoTo ex1
                  End If
@@ -41436,7 +41440,7 @@ Case 7
                     rest$ = Mid$(rest$, f)
                     If neoGetArray(basestack, W$, tstArray) Then
                     If Not GetPPPP(tstArray, pppp) Then
-                        conflictname
+                        
                         Set tstArray = Nothing
                         GoTo ex1
                     End If
@@ -41476,7 +41480,7 @@ Case 6
         If IsStrExp(basestack, rest$, s$) Then
             If neoGetArray(basestack, W$, tstArray) Then '' basestack.GroupName &
                 If Not GetPPPP(tstArray, pppp) Then
-                    conflictname
+                    
                     Set tstArray = Nothing
                     GoTo ex1
                 End If
@@ -41511,7 +41515,7 @@ Case 6
             rest$ = Mid$(rest$, f)
             If neoGetArray(basestack, W$, tstArray) Then
                 If Not GetPPPP(tstArray, pppp) Then
-                    conflictname
+                    
                     Set tstArray = Nothing
                     GoTo ex1
                 End If
@@ -49524,12 +49528,12 @@ p = 0
                     
                         If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
                         If dn < dd Then
-                            If Not FastSymbol(a$, ",") Then: MyErMacro a$, "need index for " + v$ + ")", "χρειάζομαι δείκτη για το πίνακα " + v$ + ")": GetArrayReference = False: Exit Function
+                            If Not FastSymbol(a$, ",") Then: MyErMacro a$, "need index for " + GetName(v$) + ")", "χρειάζομαι δείκτη για το πίνακα " + GetName(v$) + ")": GetArrayReference = False: Exit Function
                            
                             Else
                          If FastSymbol(a$, ",") Then
                         GetArrayReference = False
-                        MyErMacro a$, "too many indexes for array " + v$ + ")", "πολλοί δείκτες για το πίνακα " + v$ + ")"
+                        MyErMacro a$, "too many indexes for array " + GetName(v$) + ")", "πολλοί δείκτες για το πίνακα " + GetName(v$) + ")"
                         Exit Function
                          
                          End If
@@ -49541,13 +49545,13 @@ p = 0
                             If p < -pppp.myarrbase Then
 toolow:
                             GetArrayReference = False
-                              MyErMacro a$, "index too low for array " + v$ + ")", "χαμηλός δείκτης στο πίνακα " + v$ + ")"
+                              MyErMacro a$, "index too low for array " + GetName(v$) + ")", "χαμηλός δείκτης στο πίνακα " + GetName(v$) + ")"
                             Exit Function
                             End If
                             
                         If Not pppp.PushOffset(w2, dn, CLng(Fix(p))) Then
 toohigh:
-                                MyErMacro a$, "index too high for array " + v$ + ")", "δείκτης υψηλός για το πίνακα " + v$ + ")"
+                                MyErMacro a$, "index too high for array " + GetName(v$) + ")", "δείκτης υψηλός για το πίνακα " + GetName(v$) + ")"
                                 GetArrayReference = False
                             Exit Function
                             End If
@@ -49558,7 +49562,7 @@ toohigh:
                         If LastErNum = -2 Then
                         Else
                         
-                        MyErMacro a$, "missing index for array " + v$ + ")", "χάθηκε δείκτης για το πίνακα " + v$ + ")"
+                        MyErMacro a$, "missing index for array " + GetName(v$) + ")", "χάθηκε δείκτης για το πίνακα " + GetName(v$) + ")"
                         End If
                         Exit Function
                         End If
@@ -49613,12 +49617,12 @@ p = 0
                     
                         If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
                         If dn < dd Then
-                            If Not FastSymbol(a$, ",") Then: MyErMacro a$, "need index for " + v$ + ")", "χρειάζομαι δείκτη για το πίνακα " + v$ + ")": ProcessArray = False: Exit Function
+                            If Not FastSymbol(a$, ",") Then: MyErMacro a$, "need index for " + GetName(v$) + ")", "χρειάζομαι δείκτη για το πίνακα " + GetName(v$) + ")": ProcessArray = False: Exit Function
                            
                             Else
                          If FastSymbol(a$, ",") Then
                         ProcessArray = False
-                        MyErMacro a$, "too many indexes for array " + v$ + ")", "πολλοί δείκτες για το πίνακα " + v$ + ")"
+                        MyErMacro a$, "too many indexes for array " + GetName(v$) + ")", "πολλοί δείκτες για το πίνακα " + GetName(v$) + ")"
                         Exit Function
                          
                          End If
@@ -49629,13 +49633,13 @@ p = 0
                             On Error Resume Next
                             If p < -pppp.myarrbase Then
                             ProcessArray = False
-                              MyErMacro a$, "index too low for array " + v$ + ")", "χαμηλός δείκτης στο πίνακα " + v$ + ")"
+                              MyErMacro a$, "index too low for array " + GetName(v$) + ")", "χαμηλός δείκτης στο πίνακα " + GetName(v$) + ")"
                             Exit Function
                             End If
                             
                         If Not pppp.PushOffset(w2, dn, CLng(Fix(p))) Then
                                 ProcessArray = False
-                                MyErMacro a$, "index too high for array " + v$ + ")", "δείκτης υψηλός για το πίνακα " + v$ + ")"
+                                MyErMacro a$, "index too high for array " + GetName(v$) + ")", "δείκτης υψηλός για το πίνακα " + GetName(v$) + ")"
                                 ProcessArray = False
                             Exit Function
                             End If
@@ -49646,7 +49650,7 @@ p = 0
                         If LastErNum = -2 Then
                         Else
                         
-                        MyErMacro a$, "missing index for array " + v$ + ")", "χάθηκε δείκτης για το πίνακα " + v$ + ")"
+                        MyErMacro a$, "missing index for array " + GetName(v$) + ")", "χάθηκε δείκτης για το πίνακα " + GetName(v$) + ")"
                         End If
                         Exit Function
                         End If
@@ -55350,7 +55354,10 @@ End Function
 Private Function GetPPPP(tstArray As iBoxArray, pppp As mArray) As Boolean
         Dim usehandler As mHandler, myTuple As tuple
         If Not tstArray Is Nothing Then
-        If Not tstArray.arr Then Exit Function
+        If Not tstArray.arr Then
+            conflictname tstArray.GroupRef
+            Exit Function
+        End If
         If TypeOf tstArray Is mArray Then
             Set pppp = tstArray
         Else
@@ -55365,14 +55372,18 @@ Private Function GetPPPP(tstArray As iBoxArray, pppp As mArray) As Boolean
                         GoTo contArrayOnly1
                     End If
                 End If
+                If MyIsObject(var(varhash.lastNDX)) Then
+                    conflictname var(varhash.lastNDX)
+                End If
             End If
-            conflictname
+            InternalError
             Exit Function
         End If
 contArrayOnly1:
     GetPPPP = True
     End If
 End Function
+
 
 Function strComplex(ByRef p As Variant, Optional q$ = ".", Optional UseSep As Boolean = False) As String
     Dim q2$
