@@ -94,9 +94,9 @@ Public UKEY$
 Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, WaitShow As Long
 Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
-Global Const VerMajor = 14
+Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 54
+Global Const Revision = 0
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7892,6 +7892,7 @@ conthere123:
             
             
             If usehandler.t1 = 2 Then
+
 comehere11:
                 If V1& = 8 Then
                 If IsExp(bstack, a$, pp, , flatobject:=True, nostring:=True) Then
@@ -7942,6 +7943,9 @@ comehere11:
                 End If
                 SyntaxError
                 Exit Function
+                ElseIf Left$(a$, 2) = "=>" Then
+                GoTo GetObjFromHandler
+                
                 End If
                 pp = 0&
                 
@@ -8403,9 +8407,46 @@ End If
 'Select Case v$
 
 findthird:
-On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96, fun97, fun98, fun99, fun100, fun101, fun102, fun103, fun104, fun105, fun106, fun107, fun108, fun109, fun110, fun111, fun112, fun113, fun114, fun115, fun116, fun117, fun118, fun119, fun120, fun121, fun122, fun123, fun124, fun125, fun126, fun127, fun128, fun129, fun130, fun131, fun132
+On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, _
+fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, _
+fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, _
+fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, _
+fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, _
+fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, _
+fun91, fun92, fun93, fun94, fun95, fun96, fun97, fun98, fun99, fun100, fun101, fun102, fun103, fun104, _
+fun105, fun106, fun107, fun108, fun109, fun110, fun111, fun112, fun113, fun114, fun115, fun116, fun117, _
+fun118, fun119, fun120, fun121, fun122, fun123, fun124, fun125, fun126, fun127, fun128, fun129, fun130, _
+fun131, fun132, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, _
+fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133
 IsNumberNew = False
 Exit Function
+fun133: 'Mid() as Mid$ AND OTHER
+Select Case w1
+Case 134, 135: w1 = 45 + w1 - 133
+Case 136, 137: w1 = 28 + w1 - 136
+Case 138: w1 = 60
+Case 139: w1 = 62
+Case 140: w1 = 1
+Case 141: w1 = 51
+Case 142, 143: w1 = 69 + w1 - 142
+Case 144: w1 = 37
+Case 145: w1 = 40
+Case 146: w1 = 10
+Case 147, 148: w1 = 42 + w1 - 147
+Case 149: w1 = 31
+Case 150: w1 = 65
+Case Else
+w1 = 45
+End Select
+If strFunctions(w1, v$, bstack, a$, s1$) Then
+    IsNumberNew = True
+    r = vbNullString
+    SwapString2Variant s1$, r
+End If
+Exit Function
+' аяис
+
+' ден
 fun116:
     If IsExpBig(bstack, a$, p) Then
         If Not bstack.lastobj Is Nothing Then

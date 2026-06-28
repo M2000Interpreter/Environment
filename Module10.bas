@@ -5568,7 +5568,11 @@ contwrong1:
                     Set usehandler1 = Nothing
                     Set myobject = Nothing
                 Else
-                    If usehandler.t1 = 4 Then
+                    If Left$(b$, 1) = ">" Then
+                        Set myobject = usehandler.objref
+                        Mid$(b$, 1, 1) = " "
+                        GoTo contCom112233
+                    ElseIf usehandler.t1 = 4 Then
                         If IsStrExp(bstack, b$, ss$) Then
                             p = vbNullString
                             SwapString2Variant ss$, p
