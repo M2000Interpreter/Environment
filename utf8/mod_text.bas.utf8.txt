@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 0
+Global Const Revision = 1
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -14534,9 +14534,10 @@ groupstrvalue:
             End If
             If w1 < 0 Then Exit Function
         End If
-        On w1 GoTo F1, f2, f3, f4, f5, f6, f7
-    Exit Function
-F1: ' "STACKITEM(", "ΤΙΜΗΣΩΡΟΥ("
+        On w1 GoTo f1, f2, f3, f4, f5, f6, f7, f8, f8, f8, f9, f9, f10, f11, f12, f13, f14, f14, f15, f16, f17, f18, f18, f19, f20
+        
+        Exit Function
+f1: ' "STACKITEM(", "ΤΙΜΗΣΩΡΟΥ("
             IsStr1 = StackItem(bstackstr, a$, p)
             GoTo Final
 f2: ' "ARRAY(", "ΠΙΝΑΚΑΣ("
@@ -14554,9 +14555,38 @@ f5: ' "CDR(", "ΕΠΟΜΕΝΑ("
 f6: ' "VAL(", "ΤΙΜΗ(", "ΑΞΙΑ("
             IsStr1 = IsVal(bstackstr, a$, p, Left$(q$, 1) = "V")
             GoTo Final
+            
 f7: ' "EVAL(", "ΕΚΦΡ(", "ΕΚΦΡΑΣΗ("
             IsStr1 = IsEval(q$, bstackstr, a$, p)
-
+            GoTo Final
+f8: '
+            w2 = 45 + w1 - 8
+            GoTo findthird
+f9: '
+            w2 = 28 + w1 - 11
+            GoTo findthird
+f10:
+            w2 = 60: GoTo findthird
+f11:
+            w2 = 62: GoTo findthird
+f12:
+            w2 = 15: GoTo findthird
+f13:
+            w2 = 53: GoTo findthird
+f14:
+            w2 = 69 + w1 - 17: GoTo findthird
+f15:
+            w2 = 37: GoTo findthird
+f16:
+            w2 = 40: GoTo findthird
+f17:
+            w2 = 10: GoTo findthird
+f18:
+            w2 = 42 + w1 - 22: GoTo findthird
+f19:
+            w2 = 31: GoTo findthird
+f20:
+            w2 = 25: GoTo findthird
 Final:
            If FastSymbol(a$, "#") Then
                 p = vbNullString
@@ -30158,6 +30188,7 @@ Else
 End If
 Set Form2.Process = bstack
 stackshow bstack
+trace = True
 If FastSymbol(rest$, "?") Then
 
 GoTo com1020
@@ -30179,6 +30210,7 @@ Else
 
 End If
 ElseIf what$ <> "" Then
+trace = True
 com1020:
 STbyST = True
 STq = False
@@ -30213,15 +30245,16 @@ Form2.gList4.ListIndex = 1
 End If
 
 Else
-If FastPureLabel(rest$, what$, , , , , False) = 1 Then
-TestShowCode = True
-rest$ = ": " + rest$
 trace = True
- Set Form2.Process = bstack
-stackshow bstack
-'MyDoEvents
-Form1.Show , Form5
+If FastPureLabel(rest$, what$, , , , , False) = 1 Then
+    TestShowCode = True
+    rest$ = ": " + rest$
+    Set Form2.Process = bstack
+    stackshow bstack
+    'MyDoEvents
+    Form1.Show , Form5
 Else
+
 GoTo com1020
 End If
 
@@ -33649,7 +33682,7 @@ End Function
 Public Function CallEventFromGuiOne(gui As GuiM2000, a As mEvent, aString$) As Boolean
     If a Is Nothing Then CallEventFromGuiOne = True: Exit Function
     If Not a.enabled Then CallEventFromGuiOne = True: Exit Function
-    Dim n$, f$, F1$, uIndex As Long
+    Dim n$, f$, f1$, uIndex As Long
     Dim s1$, klm As Long
     Dim i As Long, ui As Long
     
@@ -33673,8 +33706,8 @@ Public Function CallEventFromGuiOne(gui As GuiM2000, a As mEvent, aString$) As B
         End If
         
     End If
-    F1$ = gui.modulename
-    If F1$ <> "" Then f$ = myUcase(F1$ + "." + f$ + ")", True) Else f$ = myUcase(f$ + ")", True)
+    f1$ = gui.modulename
+    If f1$ <> "" Then f$ = myUcase(f1$ + "." + f$ + ")", True) Else f$ = myUcase(f$ + ")", True)
 
     If Not GetSub(f$, klm) Then
         CallEventFromGuiOne = False
@@ -33706,7 +33739,7 @@ Public Function CallEventFromGuiOne(gui As GuiM2000, a As mEvent, aString$) As B
             Set bstack.StaticCollection = a.StaticCollection.ValueObj
         End If
     End If
-    If F1$ <> "" Then s1$ = n$ + "Module " + F1$ + vbCrLf + sbf(klm).sb Else s1$ = n$ + sbf(klm).sb
+    If f1$ <> "" Then s1$ = n$ + "Module " + f1$ + vbCrLf + sbf(klm).sb Else s1$ = n$ + sbf(klm).sb
     Dim ww As Boolean
     ww = Execute(bstack, s1$, False, False) = 0
     If Not bstack.StaticCollection Is Nothing Then
@@ -33716,10 +33749,10 @@ Public Function CallEventFromGuiOne(gui As GuiM2000, a As mEvent, aString$) As B
         End If
     End If
     If ww Then
-        If F1$ = vbNullString Then
+        If f1$ = vbNullString Then
             MyEr "Problem in Event " + aString$, "Πρόβλημα στο γεγονός " + aString$
         Else
-            MyEr "Problem in Event " + aString$ + " in module " + F1$, "Πρόβλημα στο γεγονός " + aString$ + " στο τμήμα " + F1$
+            MyEr "Problem in Event " + aString$ + " in module " + f1$, "Πρόβλημα στο γεγονός " + aString$ + " στο τμήμα " + f1$
         End If
     Else
         CallEventFromGuiOne = True
@@ -33741,14 +33774,14 @@ Public Function CallEventFromGuiNow(gui As GuiM2000, a As mEvent, aString$, vrs(
     extreme = True
     tr = trace
     If tr Then If Rnd * 100 > 3 Then trace = False
-    Dim n$, f$, F1$, bb As mStiva, oldbstack As mStiva, nowtotal As Long
+    Dim n$, f$, f1$, bb As mStiva, oldbstack As mStiva, nowtotal As Long
     Dim bstack As basetask
     Set bstack = New basetask
     Set bstack.Owner = Form1.DIS
     bstack.IamAnEvent = True
     Dim i As Long
     i = a.VarIndex
-    F1$ = gui.modulename
+    f1$ = gui.modulename
     
     Set oldbstack = bstack.soros
     Dim j As Long, k As Long, s1$, klm As Long, S2$
@@ -33776,7 +33809,7 @@ Public Function CallEventFromGuiNow(gui As GuiM2000, a As mEvent, aString$, vrs(
             n$ = Left$(n$, Len(n$) - 1)
             If n$ <> "" Then n$ = "Push " + n$ + vbCrLf
         End If
-        If F1$ <> "" Then f$ = myUcase(F1$ + "." + f$ + ")", True) Else f$ = myUcase(f$ + ")", True)
+        If f1$ <> "" Then f$ = myUcase(f1$ + "." + f$ + ")", True) Else f$ = myUcase(f$ + ")", True)
         If Not GetSub(f$, klm) Then
             CallEventFromGuiNow = False
             GoTo conthere
@@ -33785,7 +33818,7 @@ Public Function CallEventFromGuiNow(gui As GuiM2000, a As mEvent, aString$, vrs(
         If Left$(s1$, 10) = "'11001EDIT" Then
             SetNextLine s1$
         End If
-        If F1$ <> "" Then s1$ = n$ + "Module " + F1$ + vbCrLf + sbf(klm).sb Else s1$ = n$ + sbf(klm).sb
+        If f1$ <> "" Then s1$ = n$ + "Module " + f1$ + vbCrLf + sbf(klm).sb Else s1$ = n$ + sbf(klm).sb
         Dim nn As Long, ww As Boolean
         If Not a.StaticCollection Is Nothing Then
             If a.StaticCollection.ExistKey(f$) Then
@@ -41786,10 +41819,10 @@ Set GetAnewEvent = bb
 End Function
 Public Function CallEventFromCOM1(evCom As ComShinkEvent, aString$, what$, NumVar As Long, vrs(), ref() As Long, exclude As Boolean, ItemIndex As Long) As Boolean
     Dim tr As Boolean, extr As Boolean, olescok As Boolean
-    Dim f$, F1$, klm As Long, ohelp As Object
+    Dim f$, f1$, klm As Long, ohelp As Object
     CallEventFromCOM1 = True
-    F1$ = evCom.modulename$
-    f$ = UCase(F1$ + "_" + aString$ + "()") ' No greek
+    f1$ = evCom.modulename$
+    f$ = UCase(f1$ + "_" + aString$ + "()") ' No greek
     If Not subHash.Find(f$, klm) Then exclude = True: Exit Function
     extr = extreme
     extreme = True
