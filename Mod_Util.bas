@@ -58,6 +58,8 @@ Private Declare Function GetTempFileNameW Lib "kernel32" _
      As Long
 Private Const UNIQUE_NAME = &H0&
 Public Pow2(33) As Currency, Pow2minusOne(33) As Currency
+Public Pow2D(65), Pow2minusOneD(65)
+
 Public nMath As New Math
 Public nMath2 As New MATH2
 Public nOpenGl As New cOpenGL
@@ -4467,222 +4469,233 @@ Dim paren As New mStiva2
 countlines = 1
 Column = 0
 Lang = Not Lang
-Dim a1 As Boolean
+Dim a1 As Boolean, arrow As Boolean, tmp As String, tmplines As Long
 Dim jump As Boolean
 If Trim$(s$) = vbNullString Then Exit Function
 c = Len(s$)
 a1 = True
 i = 1
 Do
-Column = Column + 1
-Select Case AscW(Mid$(s$, i, 1))
-Case 10
-Column = 0
-Case 13
-lastlabel$ = ""
-If openpar <> 0 Then
-GoTo pareprob
-End If
-oldjump = False
-jump = False
-If Len(s$) > i + 1 Then countlines = countlines + 1
-Column = 0
-Case 58
-lastlabel$ = ""
-oldjump = False
-jump = False
-Case 32, 160, 9
-If Len(lastlabel$) > 0 Then
-lastlabel$ = myUcase(lastlabel$)
-If Not ismine1(lastlabel$) Then
-If Not ismine2(lastlabel$) Then
-If Not ismine22(lastlabel$) Then
-    jump = Not oldjump
-Else
-    oldjump = True
-    jump = False
-End If
-Else
-oldjump = True
-jump = False
-End If
-Else
-oldjump = False
-jump = False
-End If
-lastlabel$ = ""
-End If
-Case 34
-lastlabel$ = ""
-oldi = i
-Do While i < c
-i = i + 1
-Select Case AscW(Mid$(s$, i, 1))
-Case 34
-Exit Do
-Case 13
-
-Checkit:
-    If Not Lang Then
-        b$ = sbname$ + "Problem in string in paragraph " & (countlines)
-    Else
-        b$ = sbname$ + "Πρόβλημα με το αλφαριθμητικό στη παράγραφο " & (countlines)
-    End If
-    resp& = ask(b$, True)
-If resp& <> 4 Then
-blockCheck = True
-End If
-Exit Function
-End Select
-
-Loop
-If oldi <> i Then
-Else
-i = oldi + 1
-GoTo Checkit
-End If
-
-Case 40
-lastlabel$ = ""
-jump = True
-openpar = openpar + 1
-paren.PushVal countlines
-Case 41
-lastlabel$ = ""
-openpar = openpar - 1
-If openpar = 0 Then jump = False
-If openpar < 0 Then Exit Do
-paren.drop 1
-Case 47
-If Mid$(s$, i + 1, 1) = "/" Then i = i + 1: GoTo a1111
-Case 39, 92
-a1111:
-lastlabel$ = ""
-Do While i < c
-i = i + 1
-If Mid$(s$, i, 2) = vbCrLf Then Exit Do
-Loop
-countlines = countlines + 1
-If openpar > 0 Then Exit Do
-Case 61, 43, 44
-lastlabel$ = ""
-jump = True
-Case 123
-If Len(lastlabel$) > 0 Then
-lastlabel$ = myUcase(lastlabel$)
-If Not ismine1(lastlabel$) Then
-If Not ismine2(lastlabel$) Then
-If Not ismine22(lastlabel$) Then
-    jump = Not oldjump
-Else
-    oldjump = True
-    jump = False
-End If
-Else
-oldjump = True
-jump = False
-End If
-Else
-oldjump = False
-jump = False
-End If
-lastlabel$ = ""
-End If
-
-If jump Then
-jump = False
-' we have a multiline text
-Dim target As Long, t4 As Long, st1 As Long, stc1 As Long
-target = j
-st = countlines
-stc = Column
-    Do
+    Column = Column + 1
     Select Case AscW(Mid$(s$, i, 1))
-            Case 34
-            t4 = i
-            st1 = countlines
-            stc1 = Column
-            Do While i < c
+    Case 45
+        If Mid$(s$, i, 2) = "->" Then
+            arrow = openpar <> 0
+        End If
+        jump = False
+        lastlabel$ = ""
+    Case 10
+        Column = 0
+    Case 13
+        lastlabel$ = ""
+        If openpar <> 0 Then
+            GoTo pareprob
+        End If
+        oldjump = False
+        jump = False
+        If Len(s$) > i + 1 Then countlines = countlines + 1
+        Column = 0
+    Case 58
+        lastlabel$ = ""
+        oldjump = False
+        jump = False
+    Case 32, 160, 9
+        If Len(lastlabel$) > 0 Then
+            lastlabel$ = myUcase(lastlabel$)
+            If Not ismine1(lastlabel$) Then
+                If Not ismine2(lastlabel$) Then
+                    If Not ismine22(lastlabel$) Then
+                        jump = Not oldjump
+                    Else
+                        oldjump = True
+                        jump = False
+                    End If
+                Else
+                    oldjump = True
+                    jump = False
+                End If
+            Else
+                oldjump = False
+                jump = False
+            End If
+            lastlabel$ = ""
+        End If
+    Case 34
+        lastlabel$ = ""
+        oldi = i
+        Do While i < c
             i = i + 1
-            Column = Column + 1
-            If AscW(Mid$(s$, i, 1)) = 34 Then
-            
-            Exit Do
-            End If
-            If AscW(Mid$(s$, i, 1)) = 13 Then
-                 countlines = st1
-                i = t4: Exit Do
-            End If
-            Loop
-        Case 13
+            Select Case AscW(Mid$(s$, i, 1))
+            Case 34
+                Exit Do
+            Case 13
+Checkit:
+                If Not Lang Then
+                    b$ = sbname$ + "Problem in string in paragraph " & (countlines)
+                Else
+                    b$ = sbname$ + "Πρόβλημα με το αλφαριθμητικό στη παράγραφο " & (countlines)
+                End If
+                resp& = ask(b$, True)
+                If resp& <> 4 Then
+                    blockCheck = True
+                End If
+                Exit Function
+            End Select
+        Loop
+        If oldi <> i Then
+        Else
+            i = oldi + 1
+            GoTo Checkit
+        End If
+    Case 40
+        lastlabel$ = ""
+        jump = True
+        openpar = openpar + 1
+        paren.PushVal countlines
+    Case 41
+        lastlabel$ = ""
+        openpar = openpar - 1
+        If openpar = 0 Then jump = False
+        If openpar < 0 Then Exit Do
+        arrow = False
+        paren.drop 1
+    Case 47
+        If Mid$(s$, i + 1, 1) = "/" Then i = i + 1: GoTo a1111
+    Case 39, 92
+a1111:
+        lastlabel$ = ""
+        Do While i < c
+            i = i + 1
+            If Mid$(s$, i, 2) = vbCrLf Then Exit Do
+        Loop
         countlines = countlines + 1
-        Column = 1
-        Case 123
-        Column = Column + 1
-        j = j - 1
-        Case 125
-        j = j + 1: If j = target Then Exit Do
-        Column = Column + 1
-        Case Else
-        Column = Column + 1
+        If openpar > 0 Then Exit Do
+    Case 61, 43, 44
+        lastlabel$ = ""
+        jump = True
+    Case 123
+        If Len(lastlabel$) > 0 Then
+            lastlabel$ = myUcase(lastlabel$)
+            If Not ismine1(lastlabel$) Then
+                If Not ismine2(lastlabel$) Then
+                    If Not ismine22(lastlabel$) Then
+                        jump = Not oldjump
+                    Else
+                        oldjump = True
+                        jump = False
+                    End If
+                Else
+                    oldjump = True
+                    jump = False
+                End If
+            Else
+                oldjump = False
+                jump = False
+            End If
+            lastlabel$ = ""
+        End If
+        If jump Then
+            jump = False
+            ' we have a multiline text
+            Dim target As Long, t4 As Long, st1 As Long, stc1 As Long
+            target = j
+            st = countlines
+            stc = Column
+            Do
+                Select Case AscW(Mid$(s$, i, 1))
+                Case 34
+                    t4 = i
+                    st1 = countlines
+                    stc1 = Column
+                    Do While i < c
+                        i = i + 1
+                        Column = Column + 1
+                        If AscW(Mid$(s$, i, 1)) = 34 Then
+                            Exit Do
+                        End If
+                        If AscW(Mid$(s$, i, 1)) = 13 Then
+                            countlines = st1
+                            i = t4: Exit Do
+                        End If
+                    Loop
+                Case 13
+                    countlines = countlines + 1
+                    Column = 1
+                Case 123
+                    Column = Column + 1
+                    j = j - 1
+                Case 125
+                    j = j + 1: If j = target Then Exit Do
+                    Column = Column + 1
+                Case Else
+                    Column = Column + 1
+                End Select
+                i = i + 1
+            Loop Until i > c
+            If MaybeIsSymbol3(s$, "{", i + 1) Then
+                i = c + 1
+                Column = Column + 1
+                If Not Lang Then
+                    b$ = sbname$ + "Problem starting a second block {"
+                Else
+                    b$ = sbname$ + "Πρόβλημα δευτερο μπλοκ {"
+                End If
+                resp& = ask(b$, True)
+            End If
+            If j <> target Then
+                countlines = st
+                Column = stc
+                Exit Do
+            End If
+        Else
+            If arrow Then
+            
+            arrow = False
+            tmp = block(Mid$(s$, i + 1))
+            If Len(tmp) > 0 Then
+            tmplines = 0
+            If Not blockCheck(tmp, Lang, tmplines, , Column) Then
+            countlines = countlines + tmplines - 1
+            Exit Function
+            End If
+            i = i + Len(tmp)
+            End If
+            End If
+            j = j - 1
+            oldjump = False
+        End If
+    Case 13
+    
+    Case 125
+        If openpar <> 0 And j > 0 Then
+pareprob:
+            If paren.Count > 0 Then countlines = paren.PopVal
+            If Not Lang Then
+                b$ = sbname$ + "Problem in parenthesis in paragraph" + str$(countlines)
+            Else
+                b$ = sbname$ + "Πρόβλημα με τις παρενθέσεις στη παράγραφο" + str$(countlines)
+            End If
+            resp& = ask(b$, True)
+            If resp& <> 4 Then
+                blockCheck = True
+            End If
+            Exit Function
+        End If
+        j = j + 1: If j = 1 Then Exit Do
+    Case 65 To 93, 97 To 122, Is > 127
+        jump = False
+        lastlabel$ = lastlabel$ + Mid$(s$, i, 1)
+    Case 46
+        jump = False
+        lastlabel$ = lastlabel$ + Mid$(s$, i, 1)
+    Case 48 To 57, 95
+        jump = False
+        If Len(lastlabel$) > 0 Then lastlabel$ = lastlabel$ + Mid$(s$, i, 1)
+    Case Else
+        jump = False
+        lastlabel$ = ""
     End Select
     i = i + 1
-    Loop Until i > c
-     If MaybeIsSymbol3(s$, "{", i + 1) Then
-    i = c + 1
-    Column = Column + 1
-        If Not Lang Then
-            b$ = sbname$ + "Problem starting a second block {"
-        Else
-        b$ = sbname$ + "Πρόβλημα δευτερο μπλοκ {"
-        End If
-        resp& = ask(b$, True)
-    
-    End If
-    If j <> target Then
-
-    countlines = st
-    Column = stc
-    Exit Do
-    End If
-    Else
-j = j - 1
-oldjump = False
-End If
-Case 13
-
-Case 125
-If openpar <> 0 And j > 0 Then
-pareprob:
-If paren.Count > 0 Then countlines = paren.PopVal
-If Not Lang Then
-        b$ = sbname$ + "Problem in parenthesis in paragraph" + str$(countlines)
-    Else
-        b$ = sbname$ + "Πρόβλημα με τις παρενθέσεις στη παράγραφο" + str$(countlines)
-    End If
-    resp& = ask(b$, True)
-If resp& <> 4 Then
-blockCheck = True
-End If
-    Exit Function
-
-End If
-j = j + 1: If j = 1 Then Exit Do
-Case 65 To 93, 97 To 122, Is > 127
-jump = False
-lastlabel$ = lastlabel$ + Mid$(s$, i, 1)
-Case 46
-jump = False
-lastlabel$ = lastlabel$ + Mid$(s$, i, 1)
-
-Case 48 To 57, 95
-jump = False
-If Len(lastlabel$) > 0 Then lastlabel$ = lastlabel$ + Mid$(s$, i, 1)
-Case Else
-jump = False
-lastlabel$ = ""
-End Select
-i = i + 1
 Loop Until i > c
 If openpar <> 0 Then
 GoTo pareprob
@@ -4942,6 +4955,7 @@ Private Function UnsignedSub(a As Long, b As Long)
     If ua = Empty Then
         MemInt(VarPtr(ua)) = 20
         MemInt(VarPtr(UB)) = 20
+
     End If
     MemLong(VarPtr(ua) + 8) = a
     MemLong(VarPtr(UB) + 8) = b
@@ -10361,6 +10375,40 @@ Err1:
         
         End If
 End Function
+' IsHILOWLONG
+Function IsHILOWLONG(bstack As basetask, a$, r As Variant) As Boolean
+    Dim p As Variant
+    Static maxlonglong
+    If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+    End If
+    If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+        If FastSymbol(a$, ",") Then
+              If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+                    p = cInt64(p)
+                    
+                    r = cInt64(r)
+                    MemLong(VarPtr(r) + 12) = MemLong(VarPtr(r) + 8)
+                    MemLong(VarPtr(r) + 8) = MemLong(VarPtr(p) + 8)
+                    r = CDec(r)
+                    If r < 0 Then
+                        r = r + maxlonglong
+                    End If
+                    IsHILOWLONG = FastSymbol(a$, ")", True)
+                  Else
+                     
+                    missParam a$
+                End If
+        Else
+             
+             missParam a$
+        End If
+     Else
+             
+             missParam a$
+      End If
+     
+End Function
 
 Function IsHILOWWORD(bstack As basetask, a$, r As Variant) As Boolean
     Dim p As Variant
@@ -10403,25 +10451,61 @@ Function IsBinaryNot(bstack As basetask, a$, r As Variant) As Boolean
     
     End If
 End Function
-Function IsBinaryNeg(bstack As basetask, a$, r As Variant) As Boolean
-  If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
-            On Error Resume Next
-       
-             r = CDbl(Pow2minusOne(32) - uintnew(r))
-        If Err.Number > 0 Then
-        
-            WrongArgument a$
-        
-            Exit Function
-            End If
-    On Error GoTo 0
-    
-        IsBinaryNeg = FastSymbol(a$, ")", True)
+Function IsBinaryNot64(bstack As basetask, a$, r As Variant) As Boolean
+    Static maxlonglong
+    If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+    End If
+    If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+        r = cInt64(r)
+        MemLong(VarPtr(r) + 8) = Not MemLong(VarPtr(r) + 8)
+        MemLong(VarPtr(r) + 12) = Not MemLong(VarPtr(r) + 12)
+        r = CDec(r)
+        If r < 0 Then
+            r = r + maxlonglong
+        End If
+        IsBinaryNot64 = FastSymbol(a$, ")", True)
     Else
-           missParam a$
-    
+        missParam a$
     End If
 End Function
+Function IsBinaryNeg(bstack As basetask, a$, r As Variant) As Boolean
+    If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+        On Error Resume Next
+        r = CCur(Pow2minusOne(32) - uintnew(r))
+        If Err.Number > 0 Then
+            WrongArgument a$
+            Exit Function
+        End If
+        On Error GoTo 0
+        IsBinaryNeg = FastSymbol(a$, ")", True)
+    Else
+        missParam a$
+    End If
+End Function
+Function IsBinaryNeg64(bstack As basetask, a$, r As Variant) As Boolean
+    Static maxlonglong
+    If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+    End If
+    If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+        r = CDec(cInt64(r))
+        
+        If r < 0 Then
+            r = r + maxlonglong
+        End If
+        If r > maxlonglong / 2 Then
+            r = Pow2D(63)
+        Else
+        r = Pow2minusOneD(64) - r
+        End If
+        IsBinaryNeg64 = FastSymbol(a$, ")", True)
+    Else
+        missParam a$
+    End If
+End Function
+
+
 Function IsBinaryOr(bstack As basetask, a$, r As Variant) As Boolean
 Dim p As Variant
 If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
@@ -10435,9 +10519,34 @@ If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
 End If
 missParam a$
 End Function
+Function IsBinaryOr64(bstack As basetask, a$, r As Variant) As Boolean
+Static maxlonglong
+Dim p As Variant
+If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+End If
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+    If FastSymbol(a$, ",") Then
+        If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = cInt64(p)
+            r = cInt64(r)
+            MemLong(VarPtr(r) + 8) = MemLong(VarPtr(r) + 8) Or MemLong(VarPtr(p) + 8)
+            MemLong(VarPtr(r) + 12) = MemLong(VarPtr(r) + 12) Or MemLong(VarPtr(p) + 12)
+            ' DECIMAL
+            r = CDec(r)
+            If r < 0 Then
+                r = r + maxlonglong
+            End If
+            IsBinaryOr64 = FastSymbol(a$, ")", True)
+            Exit Function
+        End If
+    End If
+End If
+missParam a$
+End Function
 Function IsBinaryAdd(bstack As basetask, a$, r As Variant) As Boolean
 Dim p As Variant
-On Error Resume Next
+On Error GoTo 1000
 If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
     If FastSymbol(a$, ",") Then
         If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
@@ -10446,14 +10555,130 @@ If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
                 If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
                 r = add32(r, p)
             Wend
-            r = uintnew1(LowLong(cInt64(CDec(r))))
             IsBinaryAdd = FastSymbol(a$, ")", True)
             Exit Function
         End If
     End If
 End If
 missParam a$
+Exit Function
+1000
+Overflow
 End Function
+Function signlong3(ByVal a As Currency) As Long
+If a < 0 Then a = 0
+If a > 4294967295# Then a = 4294967295#
+If a > 2147483647# Then
+signlong3 = CLng((-2147483648# + a) - 2147483648#)
+Else
+signlong3 = CLng(a)
+End If
+End Function
+Function IsBinarySub(bstack As basetask, a$, r As Variant) As Boolean
+Dim p As Variant
+On Error GoTo 1000
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+    If FastSymbol(a$, ",") Then
+        If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            r = CCur(r) - CCur(p)
+            If r < 0 Then r = 4294967296# + r
+            While FastSymbol(a$, ",")
+                If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
+                r = CCur(r) - CCur(p)
+                If r < 0 Then r = 4294967296# + r
+            Wend
+            IsBinarySub = FastSymbol(a$, ")", True)
+            Exit Function
+        End If
+    End If
+End If
+missParam a$
+Exit Function
+1000
+Overflow
+End Function
+
+Function IsBinaryAdd64(bstack As basetask, a$, r As Variant) As Boolean
+Static maxlonglong
+Dim p As Variant
+If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+End If
+On Error Resume Next
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+    If FastSymbol(a$, ",") Then
+        If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = CDec(cInt64(p))
+            If p < 0 Then
+                p = p + maxlonglong
+            End If
+            r = CDec(cInt64(r))
+            If r < 0 Then
+                r = r + maxlonglong
+            End If
+            r = p + r
+            If r > maxlonglong Then
+                r = r - maxlonglong
+            End If
+            While FastSymbol(a$, ",")
+                If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
+                p = CDec(cInt64(p))
+                If p < 0 Then
+                    p = p + maxlonglong
+                End If
+                r = p + r
+                If r > maxlonglong Then
+                    r = r - maxlonglong
+                End If
+            Wend
+            IsBinaryAdd64 = FastSymbol(a$, ")", True)
+            Exit Function
+        End If
+    End If
+End If
+missParam a$
+End Function
+Function IsBinarySub64(bstack As basetask, a$, r As Variant) As Boolean
+Static maxlonglong
+Dim p As Variant
+If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+End If
+On Error Resume Next
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+    If FastSymbol(a$, ",") Then
+        If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = CDec(cInt64(p))
+            If p < 0 Then
+                p = p + maxlonglong
+            End If
+            r = CDec(cInt64(r))
+            If r < 0 Then
+                r = r + maxlonglong
+            End If
+            r = r - p
+            If r < 0 Then
+                r = r + maxlonglong
+            End If
+            While FastSymbol(a$, ",")
+                If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
+                p = CDec(cInt64(p))
+                If p < 0 Then
+                    p = p + maxlonglong
+                End If
+                r = r - p
+                If r < 0 Then
+                    r = r + maxlonglong
+                End If
+            Wend
+            IsBinarySub64 = FastSymbol(a$, ")", True)
+            Exit Function
+        End If
+    End If
+End If
+missParam a$
+End Function
+
 Function IsBinaryAnd(bstack As basetask, a$, r As Variant) As Boolean
 Dim p As Variant
 If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
@@ -10465,6 +10690,57 @@ If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
             End If
         End If
     End If
+missParam a$
+End Function
+Function IsBinaryAnd64(bstack As basetask, a$, r As Variant) As Boolean
+Static maxlonglong
+Dim p As Variant
+If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+End If
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+    If FastSymbol(a$, ",") Then
+        If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = cInt64(p)
+            r = cInt64(r)
+            MemLong(VarPtr(r) + 8) = MemLong(VarPtr(r) + 8) And MemLong(VarPtr(p) + 8)
+            MemLong(VarPtr(r) + 12) = MemLong(VarPtr(r) + 12) And MemLong(VarPtr(p) + 12)
+            ' DECIMAL
+            r = CDec(r)
+            If r < 0 Then
+                r = r + maxlonglong
+            End If
+            IsBinaryAnd64 = FastSymbol(a$, ")", True)
+            Exit Function
+        End If
+    End If
+End If
+missParam a$
+End Function
+
+Function IsBinaryXor64(bstack As basetask, a$, r As Variant) As Boolean
+Static maxlonglong
+Dim p As Variant, LowLong As Long, hiword As Long
+If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+End If
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+    If FastSymbol(a$, ",") Then
+        If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = cInt64(p)
+            r = cInt64(r)
+            MemLong(VarPtr(r) + 8) = MemLong(VarPtr(r) + 8) Xor MemLong(VarPtr(p) + 8)
+            MemLong(VarPtr(r) + 12) = MemLong(VarPtr(r) + 12) Xor MemLong(VarPtr(p) + 12)
+            ' DECIMAL
+            r = CDec(r)
+            If r < 0 Then
+                r = r + maxlonglong
+            End If
+            IsBinaryXor64 = FastSymbol(a$, ")", True)
+            Exit Function
+        End If
+    End If
+End If
 missParam a$
 End Function
 Function IsBinaryXor(bstack As basetask, a$, r As Variant) As Boolean
@@ -10480,6 +10756,208 @@ If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
 End If
 missParam a$
 End Function
+Function IsBinaryTest(bstack As basetask, a$, r As Variant) As Boolean
+Dim p As Variant
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+     If FastSymbol(a$, ",") Then
+         If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = Int(p)
+            If p > 31 Or p < 0 Then
+                MyErMacro a$, "Bit from 0 to 31", "Ψηφίο από 0 ως 31"
+                IsBinaryTest = False: Exit Function
+            Else
+                
+                r = (signlong(r) And signlong(Pow2(CLng(p)))) <> 0
+                IsBinaryTest = FastSymbol(a$, ")", True)
+                Exit Function
+            End If
+        End If
+    End If
+End If
+missParam a$
+End Function
+Function IsBinarySet(bstack As basetask, a$, r As Variant) As Boolean
+Dim p As Variant
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+     If FastSymbol(a$, ",") Then
+         If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = Int(p)
+            If p > 31 Or p < 0 Then
+                MyErMacro a$, "Bit from 0 to 31", "Ψηφίο από 0 ως 31"
+                IsBinarySet = False: Exit Function
+            Else
+                r = uintnew1(signlong2(r) Or signlong(Pow2(CLng(p))))
+                While FastSymbol(a$, ",")
+                    If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
+                    p = Int(p)
+                    If p > 31 Or p < 0 Then
+                        MyErMacro a$, "Bit from 0 to 31", "Ψηφίο από 0 ως 31"
+                        IsBinarySet = False: Exit Function
+                    End If
+                    r = uintnew1(signlong2(r) Or signlong(Pow2(CLng(p))))
+                Wend
+                IsBinarySet = FastSymbol(a$, ")", True)
+                Exit Function
+            End If
+        End If
+    End If
+End If
+missParam a$
+End Function
+Function IsBinaryReset(bstack As basetask, a$, r As Variant) As Boolean
+Dim p As Variant
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+     If FastSymbol(a$, ",") Then
+         If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = Int(p)
+            If p > 31 Or p < 0 Then
+                MyErMacro a$, "Bit from 0 to 31", "Ψηφίο από 0 ως 31"
+                IsBinaryReset = False: Exit Function
+            Else
+                r = uintnew1(signlong2(r) And Not signlong(Pow2(CLng(p))))
+                While FastSymbol(a$, ",")
+                    If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
+                    p = Int(p)
+                    If p > 31 Or p < 0 Then
+                        MyErMacro a$, "Bit from 0 to 31", "Ψηφίο από 0 ως 31"
+                        IsBinaryReset = False: Exit Function
+                    End If
+                    r = uintnew1(signlong2(r) And Not signlong(Pow2(CLng(p))))
+                Wend
+                IsBinaryReset = FastSymbol(a$, ")", True)
+                Exit Function
+            End If
+        End If
+    End If
+End If
+missParam a$
+End Function
+Function IsBinaryTest64(bstack As basetask, a$, r As Variant) As Boolean
+Static maxlonglong
+Dim p As Variant, P1 As Variant, res As Boolean
+If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+End If
+P1 = cInt64(0)
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+     If FastSymbol(a$, ",") Then
+         If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = Int(p)
+            If p > 63 Or p < 0 Then
+                MyErMacro a$, "Bit from 0 to 63", "Ψηφίο από 0 ως 63"
+                IsBinaryTest64 = False: Exit Function
+            Else
+                p = cInt64(Pow2D(p))
+                r = cInt64(r)
+                MemLong(VarPtr(P1) + 8) = MemLong(VarPtr(r) + 8) And MemLong(VarPtr(p) + 8)
+                MemLong(VarPtr(P1) + 12) = MemLong(VarPtr(r) + 12) And MemLong(VarPtr(p) + 12)
+                res = P1 <> 0
+                While FastSymbol(a$, ",")
+                    If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
+                    p = Int(p)
+                    If p > 63 Or p < 0 Then
+                        MyErMacro a$, "Bit from 0 to 63", "Ψηφίο από 0 ως 63"
+                        IsBinaryTest64 = False: Exit Function
+                    End If
+                    p = cInt64(Pow2D(p))
+                    MemLong(VarPtr(P1) + 8) = MemLong(VarPtr(r) + 8) And MemLong(VarPtr(p) + 8)
+                    MemLong(VarPtr(P1) + 12) = MemLong(VarPtr(r) + 12) And MemLong(VarPtr(p) + 12)
+                    res = res And (P1 <> 0)
+                Wend
+                r = res
+                IsBinaryTest64 = FastSymbol(a$, ")", True)
+                Exit Function
+            End If
+        End If
+    End If
+End If
+missParam a$
+End Function
+Function IsBinarySet64(bstack As basetask, a$, r As Variant) As Boolean
+Static maxlonglong
+Dim p As Variant
+If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+End If
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+     If FastSymbol(a$, ",") Then
+         If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = Int(p)
+            If p > 63 Or p < 0 Then
+                MyErMacro a$, "Bit from 0 to 63", "Ψηφίο από 0 ως 63"
+                IsBinarySet64 = False: Exit Function
+            Else
+                p = cInt64(Pow2D(p))
+                r = cInt64(r)
+                MemLong(VarPtr(r) + 8) = MemLong(VarPtr(r) + 8) Or MemLong(VarPtr(p) + 8)
+                MemLong(VarPtr(r) + 12) = MemLong(VarPtr(r) + 12) Or MemLong(VarPtr(p) + 12)
+                While FastSymbol(a$, ",")
+                    If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
+                    p = Int(p)
+                    If p > 63 Or p < 0 Then
+                        MyErMacro a$, "Bit from 0 to 63", "Ψηφίο από 0 ως 63"
+                        IsBinarySet64 = False: Exit Function
+                    End If
+                    p = cInt64(Pow2D(p))
+                    MemLong(VarPtr(r) + 8) = MemLong(VarPtr(r) + 8) Or MemLong(VarPtr(p) + 8)
+                    MemLong(VarPtr(r) + 12) = MemLong(VarPtr(r) + 12) Or MemLong(VarPtr(p) + 12)
+                Wend
+                r = CDec(r)
+                If r < 0 Then
+                    r = r + maxlonglong
+                End If
+                
+                IsBinarySet64 = FastSymbol(a$, ")", True)
+                Exit Function
+            End If
+        End If
+    End If
+End If
+missParam a$
+End Function
+Function IsBinaryReset64(bstack As basetask, a$, r As Variant) As Boolean
+Static maxlonglong
+Dim p As Variant
+If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+End If
+
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+     If FastSymbol(a$, ",") Then
+         If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = Int(p)
+            If p > 63 Or p < 0 Then
+                MyErMacro a$, "Bit from 0 to 63", "Ψηφίο από 0 ως 63"
+                IsBinaryReset64 = False: Exit Function
+            Else
+                p = cInt64(Pow2D(p))
+                r = cInt64(r)
+                MemLong(VarPtr(r) + 8) = MemLong(VarPtr(r) + 8) And Not MemLong(VarPtr(p) + 8)
+                MemLong(VarPtr(r) + 12) = MemLong(VarPtr(r) + 12) And Not MemLong(VarPtr(p) + 12)
+                While FastSymbol(a$, ",")
+                    If Not IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then MissNumExpr: Exit Function
+                    p = Int(p)
+                    If p > 63 Or p < 0 Then
+                        MyErMacro a$, "Bit from 0 to 63", "Ψηφίο από 0 ως 63"
+                        IsBinaryReset64 = False: Exit Function
+                    End If
+                    p = cInt64(Pow2D(p))
+                    MemLong(VarPtr(r) + 8) = MemLong(VarPtr(r) + 8) And Not MemLong(VarPtr(p) + 8)
+                    MemLong(VarPtr(r) + 12) = MemLong(VarPtr(r) + 12) And Not MemLong(VarPtr(p) + 12)
+                Wend
+                r = CDec(r)
+                If r < 0 Then
+                    r = r + maxlonglong
+                End If
+                IsBinaryReset64 = FastSymbol(a$, ")", True)
+                Exit Function
+            End If
+        End If
+    End If
+End If
+missParam a$
+End Function
+
 Function IsBinaryShift(bstack As basetask, a$, r As Variant) As Boolean
 Dim p As Variant
 If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
@@ -10504,8 +10982,61 @@ If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
 End If
 missParam a$
 End Function
+Function IsBinaryShift64(bstack As basetask, a$, r As Variant) As Boolean
+Static maxlonglong
+Dim p As Variant, P1 As Variant
+If MemInt(VarPtr(maxlonglong)) = 0 Then
+    maxlonglong = CDec("18446744073709551616")
+End If
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+     If FastSymbol(a$, ",") Then
+         If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = CInt(p)
+            If p > 63 Or p < -63 Then
+                MyErMacro a$, "Shift from -63 to 63", "Ολίσθηση από -63 ως 63"
+                IsBinaryShift64 = False: Exit Function
+            Else
+            
+            
+            
+                
+                If p > 0 Then
+                    r = cInt64(r)
+                    P1 = cInt64(Pow2minusOneD(64 - p))
+                    MemLong(VarPtr(r) + 8) = MemLong(VarPtr(r) + 8) And MemLong(VarPtr(P1) + 8)
+                    MemLong(VarPtr(r) + 12) = MemLong(VarPtr(r) + 12) And MemLong(VarPtr(P1) + 12)
+                    r = CDec(r)
+                    If r < 0 Then
+                        r = r + maxlonglong
+                    End If
+                
+                    r = r * Pow2D(p)
+                   ' r = CCur((signlong(r) And signlong(Pow2minusOne(32 - p))) * Pow2(p))
+                ElseIf p = 0 Then
+                    r = CDec(cInt64(r))
+                    If r < 0 Then
+                        r = r + maxlonglong
+                    End If
+                       ' as is
+                Else
+                    r = CDec(cInt64(r))
+                    If r < 0 Then
+                        r = Int((r + maxlonglong) / Pow2D(-p))
+                    Else
+                        r = Int(r / Pow2D(-p))
+                    End If
+                End If
+                IsBinaryShift64 = FastSymbol(a$, ")", True)
+                Exit Function
+            End If
+        End If
+    End If
+End If
+missParam a$
+End Function
 Function IsBinaryRotate(bstack As basetask, a$, r As Variant) As Boolean
 Dim p As Variant
+On Error GoTo 1000
 If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
     If FastSymbol(a$, ",") Then
         If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
@@ -10527,7 +11058,74 @@ If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
     End If
 End If
 missParam a$
+Exit Function
+1000
+    If Err.Number = 6 Then
+    Overflow
+    Else
+    MyEr Err.Description, Err.Description
+    End If
 End Function
+Function IsBinaryRotate64(bstack As basetask, a$, r As Variant) As Boolean
+Static maxlonglong
+Dim p As Variant, P1 As Variant, r1 As Variant
+If MemInt(VarPtr(maxlonglong)) = 0 Then
+    maxlonglong = CDec("18446744073709551616")
+End If
+If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
+     If FastSymbol(a$, ",") Then
+         If IsExp(bstack, a$, p, flatobject:=True, nostring:=True) Then
+            p = CInt(p)
+            If p > 63 Or p < -63 Then
+                MyErMacro a$, "Rotation from -63 to 63", "Περιστοφή από -63 ως 63"
+                IsBinaryRotate64 = False: Exit Function
+            Else
+                If p > 0 Then
+                    r = cInt64(r)
+                    r1 = CDec(r)
+                    
+                    P1 = cInt64(Pow2minusOneD(64 - p))
+                    MemLong(VarPtr(r) + 8) = MemLong(VarPtr(r) + 8) And MemLong(VarPtr(P1) + 8)
+                    MemLong(VarPtr(r) + 12) = MemLong(VarPtr(r) + 12) And MemLong(VarPtr(P1) + 12)
+                    r = CDec(r)
+                    If r < 0 Then
+                        r = r + maxlonglong
+                    End If
+                    If r1 < 0 Then
+                        r1 = r1 + maxlonglong
+                    End If
+                    r = r * Pow2D(p) + Int(r1 / Pow2D(64 - p))
+             
+                ElseIf p = 0 Then
+                    r = CDec(cInt64(r))
+                    If r < 0 Then
+                        r = r + maxlonglong
+                    End If
+                       ' as is
+                Else
+                    r = cInt64(r)
+                    r1 = CDec(r)
+                    P1 = cInt64(Pow2minusOneD(-p))
+                    MemLong(VarPtr(r) + 8) = MemLong(VarPtr(r) + 8) And MemLong(VarPtr(P1) + 8)
+                    MemLong(VarPtr(r) + 12) = MemLong(VarPtr(r) + 12) And MemLong(VarPtr(P1) + 12)
+                    r = CDec(r)
+                    If r < 0 Then
+                        r = r + maxlonglong
+                    End If
+                    If r1 < 0 Then
+                        r1 = r1 + maxlonglong
+                    End If
+                    r = r * Pow2D(64 + p) + Int(r1 / Pow2D(-p))
+                End If
+                IsBinaryRotate64 = FastSymbol(a$, ")", True)
+                Exit Function
+            End If
+        End If
+    End If
+End If
+missParam a$
+End Function
+
 Function IsSinRad(bstack As basetask, a$, r As Variant) As Boolean
 If IsExp(bstack, a$, r, flatobject:=True, nostring:=True) Then
     If TypeOf r Is Complex Then
@@ -34608,6 +35206,11 @@ st1:
     If myVarType(p, 20) Then
         P2 = 2
         r$ = Hex64$(p)
+        If Len(r$) = 16 And Not lookOne(a$, ",") Then
+        If Left$(r$, 8) = "00000000" Then
+        r$ = Mid$(r$, 9)
+        End If
+        End If
     ElseIf p > CDec(4294967295#) Then
         If p > maxlonglong Then
         Else

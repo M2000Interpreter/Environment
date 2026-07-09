@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 1
+Global Const Revision = 2
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5532,6 +5532,17 @@ For i = 0 To 32
     Pow2(i) = CCur(2 ^ i)
     Pow2minusOne(i) = Pow2(i) - 1
 Next i
+Dim dd, dd2
+Pow2D(0) = CDec(1)
+Pow2minusOneD(0) = CDec(0)
+dd = CDec(1)
+dd2 = CDec(2)
+
+For i = 1 To 64
+    Pow2D(i) = Pow2D(i - 1) * dd2
+    Pow2minusOneD(i) = Pow2D(i) - dd
+Next i
+
 Alphabet = StrConv("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", vbFromUnicode)
 '' From 9.6 by default we have no round to 13d for double
 One64 = CopyCur64(0.0001@)
@@ -5979,15 +5990,15 @@ If LastErNum = -2 Then IsExpBig = False
 End Function
 Private Function MyTrimLi(s$, l As Long) As Long
 Dim i&
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long
  If l > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
  If l <= 0 Then MyTrimLi = 1: Exit Function
   l = l - 1
   i = Len(s)
   P2 = StrPtr(s) + l * 2:  p4 = P2 + i * 2
   For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 9
     Case Else
      MyTrimLi = (i - P2) \ 2 + 1 + l
@@ -5998,15 +6009,15 @@ Dim P2 As Long, P1 As Integer, p4 As Long
 End Function
 Private Function MyTrimLi2(s$, l As Long) As Long
 Dim i&
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long
  If l > Len(s) Then MyTrimLi2 = Len(s) + 1: Exit Function
  If l <= 0 Then MyTrimLi2 = 1: Exit Function
   l = l - 1
   i = Len(s)
   P2 = StrPtr(s) + l * 2:  p4 = P2 + i * 2
   For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 7, 9
     Case Else
      MyTrimLi2 = (i - P2) \ 2 + 1 + l
@@ -8417,7 +8428,9 @@ fun91, fun92, fun93, fun94, fun95, fun96, fun97, fun98, fun99, fun100, fun101, f
 fun105, fun106, fun107, fun108, fun109, fun110, fun111, fun112, fun113, fun114, fun115, fun116, fun117, _
 fun118, fun119, fun120, fun121, fun122, fun123, fun124, fun125, fun126, fun127, fun128, fun129, fun130, _
 fun131, fun132, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, _
-fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133
+fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun151, fun152, fun153, fun154, fun155, fun156, _
+fun157, fun158, fun159, fun160, fun161, fun162, fun163, fun164, fun165, fun166, fun167, fun168, fun169, _
+fun170
 IsNumberNew = False
 Exit Function
 fun133: 'Mid() as Mid$ AND OTHER
@@ -9404,35 +9417,92 @@ fun123:  ' "RSIN(", "ΑΗΜ("
 fun70:  ' "ABS(", "ΑΠΟΛ("
 IsNumberNew = IsAbs(bstack, a$, r)
 Exit Function
+
+fun162: ' "BINARY.TEST("
+    IsNumberNew = IsBinaryTest(bstack, a$, r)
+    Exit Function
+fun163: ' "BINARY.SET("
+    IsNumberNew = IsBinarySet(bstack, a$, r)
+    Exit Function
+fun164: ' "BINARY.RESET("
+    IsNumberNew = IsBinaryReset(bstack, a$, r)
+    Exit Function
+fun165: ' "BIT64.TEST("
+    IsNumberNew = IsBinaryTest64(bstack, a$, r)
+    Exit Function
+fun166: ' "BIT64.SET("
+    IsNumberNew = IsBinarySet64(bstack, a$, r)
+    Exit Function
+fun167: ' "BIT64.RESET("
+    IsNumberNew = IsBinaryReset64(bstack, a$, r)
+    Exit Function
+fun168: ' "BINARY.SUB("
+    IsNumberNew = IsBinarySub(bstack, a$, r)
+    Exit Function
+fun169: ' "BIT64.SUB("
+    IsNumberNew = IsBinarySub64(bstack, a$, r)
+    Exit Function
 fun71: ' "LOWORD(", "LOWWORD(", "ΚΑΤΩΜΙΣΟ("
     IsNumberNew = IsLOWORD(bstack, a$, r)
     Exit Function
+fun161: ' "LOWLONG(", "LOLONG("
+    IsNumberNew = IsLOLONG(bstack, a$, r)
+    Exit Function
 fun74: ' "HIWORD(", "HIGHWORD(", "ΠΑΝΩΜΙΣΟ("
-   IsNumberNew = IsHIWORD(bstack, a$, r)
+    IsNumberNew = IsHIWORD(bstack, a$, r)
+    Exit Function
+fun160: '"HILONG(", "HIGHLONG("
+    IsNumberNew = IsHILONG(bstack, a$, r)
     Exit Function
 fun75: ' "BINARY.NEG(", "ΔΥΑΔΙΚΟ.ΑΝΤΙ(", "ΔΥΑΔΙΚΟ.ΑΝΤΙΣΤΡΟΦΟ("
     IsNumberNew = IsBinaryNeg(bstack, a$, r)
     Exit Function
+fun158: ' "BIT64.NEG("
+    IsNumberNew = IsBinaryNeg64(bstack, a$, r)
+    Exit Function
 fun76: ' "BINARY.OR(", "ΔΥΑΔΙΚΟ.Η("
     IsNumberNew = IsBinaryOr(bstack, a$, r)
+    Exit Function
+fun153: ' "BIT64.OR("
+    IsNumberNew = IsBinaryOr64(bstack, a$, r)
     Exit Function
 fun105: ' "BINARY.NOT(", "ΔΥΑΔΙΚΟ.ΟΧΙ("
     IsNumberNew = IsBinaryNot(bstack, a$, r)
     Exit Function
+fun157: ' "BIT64.NOT("
+    IsNumberNew = IsBinaryNot64(bstack, a$, r)
+    Exit Function
+
 fun77: ' "BINARY.AND(", "ΔΥΑΔΙΚΟ.ΚΑΙ("
     IsNumberNew = IsBinaryAnd(bstack, a$, r)
+    Exit Function
+fun152: ' "BIT64.AND("
+    IsNumberNew = IsBinaryAnd64(bstack, a$, r)
     Exit Function
 fun78: ' "BINARY.XOR(", "ΔΥΑΔΙΚΟ.ΑΠΟ("
     IsNumberNew = IsBinaryXor(bstack, a$, r)
     Exit Function
+fun151: ' "BIT64.XOR("
+    IsNumberNew = IsBinaryXor64(bstack, a$, r)
+    Exit Function
 fun79: ' "HILOWWORD(", "ΔΥΟΜΙΣΑ("
     IsNumberNew = IsHILOWWORD(bstack, a$, r)
     Exit Function
+fun159: '"HILOWLONG(",
+    IsNumberNew = IsHILOWLONG(bstack, a$, r)
+    Exit Function
+
 fun80: ' "BINARY.SHIFT(", "ΔΥΑΔΙΚΟ.ΟΛΙΣΘΗΣΗ("
     IsNumberNew = IsBinaryShift(bstack, a$, r)
     Exit Function
+fun155: ' "BIT64.SHIFT("
+    IsNumberNew = IsBinaryShift64(bstack, a$, r)
+    Exit Function
 fun81: ' "BINARY.ROTATE(", "ΔΥΑΔΙΚΗ.ΠΕΡΙΣΤΡΟΦΗ("
     IsNumberNew = IsBinaryRotate(bstack, a$, r)
+    Exit Function
+fun156: ' "BIT64.ROTATE("
+    IsNumberNew = IsBinaryRotate64(bstack, a$, r)
     Exit Function
 fun82: ' "SINT(", "ΑΚΕΡΑΙΟ.ΔΥΑΔΙΚΟ("
 ' GET AN Unsigned AND GIVES A SIGN...AS READING BITS
@@ -9444,6 +9514,9 @@ fun83: ' "USGN(", "ΔΥΑΔΙΚΟ("
 fun84: ' "UINT(", "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ("
 ' READING BITS OF A SIGN AND GIVE AN Unsigned OF SAME BITS
     IsNumberNew = IsUint(bstack, a$, r)
+    Exit Function
+fun170: ' "UINT(", "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ("
+    IsNumberNew = IsUint64(bstack, a$, r)
     Exit Function
 fun102: ' "CEIL(","ΟΡΟΦ("
     IsNumberNew = IsCeil(bstack, a$, r)
@@ -9496,6 +9569,10 @@ fun93: ' "TEST(", "ΔΟΚΙΜΗ("
 fun109: ' "BINARY.ADD(", "ΔΥΑΔΙΚΟ.ΠΡΟΣΘΕΣΗ(","ΔΥΑΔΙΚΟ.ΠΡΟ("
     IsNumberNew = IsBinaryAdd(bstack, a$, r)
     Exit Function
+fun154: ' "BIT64.ADD("
+    IsNumberNew = IsBinaryAdd64(bstack, a$, r)
+    Exit Function
+
 fun114:  ' ok
     If IsExp(bstack, a$, p) Then
         If MemInt(VarPtr(p)) = vbString Then
@@ -11340,7 +11417,7 @@ Function IsLabelBig(bstack As basetask, a$, rrr$, Optional nocommand As Boolean,
     Dim rr&, one As Boolean, br As Integer, c$, dot&, skipcase As Boolean, cc As Long, isstrparam As Boolean, ascwc As Integer
     Dim i As Long
     Dim p, s$
-    Dim P1, s1$
+    Dim p1, s1$
     Dim pppp As iBoxArray, a1$, w2 As Long
     r$ = vbNullString
     gr = False
@@ -11567,7 +11644,7 @@ checkc1:
                                                 r$ = pppp.item(w2).LastOpen
                                                 GoTo again2134
                                             Else
-                                                rr& = globalvarGroup(c$, P1)
+                                                rr& = globalvarGroup(c$, p1)
                                                 Set var(rr&) = pppp.item(w2)
                                             End If
                                         Else
@@ -11576,7 +11653,7 @@ checkc1:
                                             GoTo skiploop
                                         End If
                                     Else
-                                        rr& = globalvarGroup(c$, P1)
+                                        rr& = globalvarGroup(c$, p1)
                                         Set var(rr&) = pppp.item(w2)
                                     End If
                                 Else
@@ -14534,10 +14611,10 @@ groupstrvalue:
             End If
             If w1 < 0 Then Exit Function
         End If
-        On w1 GoTo f1, f2, f3, f4, f5, f6, f7, f8, f8, f8, f9, f9, f10, f11, f12, f13, f14, f14, f15, f16, f17, f18, f18, f19, f20
+        On w1 GoTo F1, f2, f3, f4, f5, f6, f7, f8, f8, f8, f9, f9, f10, f11, f12, f13, f14, f14, f15, f16, f17, f18, f18, f19, f20
         
         Exit Function
-f1: ' "STACKITEM(", "ΤΙΜΗΣΩΡΟΥ("
+F1: ' "STACKITEM(", "ΤΙΜΗΣΩΡΟΥ("
             IsStr1 = StackItem(bstackstr, a$, p)
             GoTo Final
 f2: ' "ARRAY(", "ΠΙΝΑΚΑΣ("
@@ -25582,13 +25659,13 @@ End If
 End Function
 Public Function MyTrimRStr(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimRStr = 1: Exit Function
   P2 = StrPtr(s): l = l - 1
   p4 = P2 + l * 2
   For i = p4 To P2 Step -2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32
     Case Else
      MyTrimRStr = (i - P2) \ 2 + 1
@@ -25599,13 +25676,13 @@ Dim P2 As Long, P1 As Integer, p4 As Long
 End Function
 Public Function MyTrimRNoCr(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimRNoCr = 1: Exit Function
   P2 = StrPtr(s): l = l - 1
   p4 = P2 + l * 2
   For i = p4 To P2 Step -2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 9
     Case Else
      MyTrimRNoCr = (i - P2) \ 2 + 1
@@ -32699,7 +32776,7 @@ Function StockValues(bstack As basetask, b$, Lang As Long) As Boolean
 ' Stock A[$|%| ]()  keep  N,  B[$|%| ]()
 ' Stock A[$|%| ]()  sweep  N [,  value ]   fill a copy of value to n items or empty slots
 Dim W$, pppp As iBoxArray, ppppAny As iBoxArray, v As Long, VN As Long, i As Long, what$, pppp1 As iBoxArray, V1 As Long
-Dim bs As New basetask, p As Variant, P1 As Variant, soros As mStiva, ww$, ss$, usehandler As mHandler
+Dim bs As New basetask, p As Variant, p1 As Variant, soros As mStiva, ww$, ss$, usehandler As mHandler
 Dim useType As Boolean, vt As Integer
 i = Abs(IsLabel(bstack, b$, what$))
 If i > 4 And i < 8 Then
@@ -33051,10 +33128,10 @@ againhere:
                         Set bstack.lastobj = Nothing
                         If what$ <> "" Then
                             If Left$(what$, 1) = "N" Then
-                                If IsNumber(bstack, b$, P1) Then
+                                If IsNumber(bstack, b$, p1) Then
                                     If bstack.lastobj Is Nothing Then
                                         For i = 0 To p - 1
-                                            pppp.item(i + v) = P1
+                                            pppp.item(i + v) = p1
                                         Next i
                                     Else
                                         bs.soros.PushObj bstack.lastobj
@@ -33682,7 +33759,7 @@ End Function
 Public Function CallEventFromGuiOne(gui As GuiM2000, a As mEvent, aString$) As Boolean
     If a Is Nothing Then CallEventFromGuiOne = True: Exit Function
     If Not a.enabled Then CallEventFromGuiOne = True: Exit Function
-    Dim n$, f$, f1$, uIndex As Long
+    Dim n$, f$, F1$, uIndex As Long
     Dim s1$, klm As Long
     Dim i As Long, ui As Long
     
@@ -33706,8 +33783,8 @@ Public Function CallEventFromGuiOne(gui As GuiM2000, a As mEvent, aString$) As B
         End If
         
     End If
-    f1$ = gui.modulename
-    If f1$ <> "" Then f$ = myUcase(f1$ + "." + f$ + ")", True) Else f$ = myUcase(f$ + ")", True)
+    F1$ = gui.modulename
+    If F1$ <> "" Then f$ = myUcase(F1$ + "." + f$ + ")", True) Else f$ = myUcase(f$ + ")", True)
 
     If Not GetSub(f$, klm) Then
         CallEventFromGuiOne = False
@@ -33739,7 +33816,7 @@ Public Function CallEventFromGuiOne(gui As GuiM2000, a As mEvent, aString$) As B
             Set bstack.StaticCollection = a.StaticCollection.ValueObj
         End If
     End If
-    If f1$ <> "" Then s1$ = n$ + "Module " + f1$ + vbCrLf + sbf(klm).sb Else s1$ = n$ + sbf(klm).sb
+    If F1$ <> "" Then s1$ = n$ + "Module " + F1$ + vbCrLf + sbf(klm).sb Else s1$ = n$ + sbf(klm).sb
     Dim ww As Boolean
     ww = Execute(bstack, s1$, False, False) = 0
     If Not bstack.StaticCollection Is Nothing Then
@@ -33749,10 +33826,10 @@ Public Function CallEventFromGuiOne(gui As GuiM2000, a As mEvent, aString$) As B
         End If
     End If
     If ww Then
-        If f1$ = vbNullString Then
+        If F1$ = vbNullString Then
             MyEr "Problem in Event " + aString$, "Πρόβλημα στο γεγονός " + aString$
         Else
-            MyEr "Problem in Event " + aString$ + " in module " + f1$, "Πρόβλημα στο γεγονός " + aString$ + " στο τμήμα " + f1$
+            MyEr "Problem in Event " + aString$ + " in module " + F1$, "Πρόβλημα στο γεγονός " + aString$ + " στο τμήμα " + F1$
         End If
     Else
         CallEventFromGuiOne = True
@@ -33774,14 +33851,14 @@ Public Function CallEventFromGuiNow(gui As GuiM2000, a As mEvent, aString$, vrs(
     extreme = True
     tr = trace
     If tr Then If Rnd * 100 > 3 Then trace = False
-    Dim n$, f$, f1$, bb As mStiva, oldbstack As mStiva, nowtotal As Long
+    Dim n$, f$, F1$, bb As mStiva, oldbstack As mStiva, nowtotal As Long
     Dim bstack As basetask
     Set bstack = New basetask
     Set bstack.Owner = Form1.DIS
     bstack.IamAnEvent = True
     Dim i As Long
     i = a.VarIndex
-    f1$ = gui.modulename
+    F1$ = gui.modulename
     
     Set oldbstack = bstack.soros
     Dim j As Long, k As Long, s1$, klm As Long, S2$
@@ -33809,7 +33886,7 @@ Public Function CallEventFromGuiNow(gui As GuiM2000, a As mEvent, aString$, vrs(
             n$ = Left$(n$, Len(n$) - 1)
             If n$ <> "" Then n$ = "Push " + n$ + vbCrLf
         End If
-        If f1$ <> "" Then f$ = myUcase(f1$ + "." + f$ + ")", True) Else f$ = myUcase(f$ + ")", True)
+        If F1$ <> "" Then f$ = myUcase(F1$ + "." + f$ + ")", True) Else f$ = myUcase(f$ + ")", True)
         If Not GetSub(f$, klm) Then
             CallEventFromGuiNow = False
             GoTo conthere
@@ -33818,7 +33895,7 @@ Public Function CallEventFromGuiNow(gui As GuiM2000, a As mEvent, aString$, vrs(
         If Left$(s1$, 10) = "'11001EDIT" Then
             SetNextLine s1$
         End If
-        If f1$ <> "" Then s1$ = n$ + "Module " + f1$ + vbCrLf + sbf(klm).sb Else s1$ = n$ + sbf(klm).sb
+        If F1$ <> "" Then s1$ = n$ + "Module " + F1$ + vbCrLf + sbf(klm).sb Else s1$ = n$ + sbf(klm).sb
         Dim nn As Long, ww As Boolean
         If Not a.StaticCollection Is Nothing Then
             If a.StaticCollection.ExistKey(f$) Then
@@ -40666,7 +40743,7 @@ End If
 End Function
 Function ProcDef(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim i As Long, what$, y1 As Long, ss$, s$, p, ps$, first
-Dim notypes As Boolean, notypes0 As Boolean, P1
+Dim notypes As Boolean, notypes0 As Boolean, p1
 ProcDef = True
 again11:
 y1 = IsLabel(basestack, rest$, what$)
@@ -40868,15 +40945,15 @@ ER0001:
                 End If
             ElseIf TypeOf p Is Complex Then
                 If FastSymbol(rest$, "(") Then
-                If Not IsNumberD2(rest$, P1, notdef And Not notypes, True) Then
+                If Not IsNumberD2(rest$, p1, notdef And Not notypes, True) Then
                     GoTo ER0001
                 End If
-                p.r = CDbl(P1)
+                p.r = CDbl(p1)
                 If Not FastSymbol(rest$, ",") Then GoTo ER0001
-                If Not IsNumberD2(rest$, P1, notdef And Not notypes, True) Then
+                If Not IsNumberD2(rest$, p1, notdef And Not notypes, True) Then
                     GoTo ER0001
                 End If
-                p.i = CDbl(P1)
+                p.i = CDbl(p1)
                 rest$ = NLtrim(rest$)
                 If Not UCase$(Left$(rest$, 2)) = "I)" Then GoTo ER0001
                 Mid$(rest$, 1, 2) = "  "
@@ -41819,10 +41896,10 @@ Set GetAnewEvent = bb
 End Function
 Public Function CallEventFromCOM1(evCom As ComShinkEvent, aString$, what$, NumVar As Long, vrs(), ref() As Long, exclude As Boolean, ItemIndex As Long) As Boolean
     Dim tr As Boolean, extr As Boolean, olescok As Boolean
-    Dim f$, f1$, klm As Long, ohelp As Object
+    Dim f$, F1$, klm As Long, ohelp As Object
     CallEventFromCOM1 = True
-    f1$ = evCom.modulename$
-    f$ = UCase(f1$ + "_" + aString$ + "()") ' No greek
+    F1$ = evCom.modulename$
+    f$ = UCase(F1$ + "_" + aString$ + "()") ' No greek
     If Not subHash.Find(f$, klm) Then exclude = True: Exit Function
     extr = extreme
     extreme = True
@@ -42924,7 +43001,7 @@ Else
 End If
 End Function
 Private Function compareStr4(a$, b$) As Long   ' here is not byval as in fastcollection
-Dim i As Long, j As Long, a1$, b1$, P1 As Variant, P2 As Variant, n$, k As Long, k1 As Long
+Dim i As Long, j As Long, a1$, b1$, p1 As Variant, P2 As Variant, n$, k As Long, k1 As Long
 If CompareString(Clid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$)) = 2 Then Exit Function
 n$ = "[-0-9.]"
 k = Sgn(Len(a$) - Len(b$))
@@ -42937,10 +43014,10 @@ For i = 1 To j
     If Mid$(a$, i, 1) Like n$ Then
     a1$ = Mid$(a$, i)
     b1$ = Mid$(b$, i)
-        IsNumberD2 a1$, P1
+        IsNumberD2 a1$, p1
        
         If IsNumberD2(b1$, P2) Then
-            compareStr4 = Sgn(MyRound(P1, 8) - MyRound(P2, 8))
+            compareStr4 = Sgn(MyRound(p1, 8) - MyRound(P2, 8))
             If compareStr4 = 0 Then
                 If Len(a1$) * Len(b1$) <> 0 Then
                     If Len(n$) > 6 Then n$ = "[-0-9]"
@@ -42962,7 +43039,7 @@ For i = 1 To j
         Else
         a$ = Mid$(a$, i)
     b$ = Mid$(b$, i)
-    IsNumberD2 a$, P1
+    IsNumberD2 a$, p1
        
           If Len(a$) > 0 Then
        
@@ -42984,7 +43061,7 @@ For i = 1 To j
     ElseIf Mid$(b$, i, 1) Like n$ Then
     a$ = Mid$(a$, i)
     b$ = Mid$(b$, i)
-    IsNumberD2 b$, P1
+    IsNumberD2 b$, p1
     If Len(b$) > 0 Then
        
             Select Case CompareString(Clid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
@@ -43579,6 +43656,26 @@ Private Function IsInt(bstack As basetask, a$, r As Variant) As Boolean
     End If
  
 End Function
+Private Function IsUint64(bstack As basetask, a$, r As Variant) As Boolean
+Static maxlonglong
+Dim p As Variant
+If MemInt(VarPtr(maxlonglong)) = 0 Then
+        maxlonglong = CDec("18446744073709551616")
+End If
+On Error GoTo 1000
+If IsExp(bstack, a$, r, , True) Then
+    r = CDec(cInt64(r))
+    If r < 0 Then
+        r = r + maxlonglong
+    End If
+    IsUint64 = FastSymbol(a$, ")", True)
+    Exit Function
+End If
+missParam a$
+Exit Function
+1000
+Overflow
+End Function
 Private Function IsUint(bstack As basetask, a$, r As Variant) As Boolean
 Dim z As Integer, i As Long
 If IsExp(bstack, a$, r, , True) Then
@@ -43628,6 +43725,7 @@ End If
                 missParam a$
     End If
 End Function
+
 Private Function IsSint(bstack As basetask, a$, r As Variant) As Boolean
 Dim p As Variant, rB As Byte, ri As Integer, dn As Long, rd As Double, usehandler As mHandler
 p = 4
@@ -43771,11 +43869,61 @@ If IsExp(bstack, a$, r, , True) Then
                 missParam a$
  End If
 End Function
+Private Function IsLOLONG(bstack As basetask, a$, r As Variant) As Boolean
+  Dim z As Long
+  
+  If IsExp(bstack, a$, r, , True) Then
+    On Error Resume Next
+    r = cInt64(r)
+    MemLong(VarPtr(z)) = MemLong(VarPtr(r) + 8)
+    r = uintnew(CCur(z))
+    If Err.Number > 0 Then
+    
+    WrongArgument a$
+  
+    IsLOLONG = False
+    Exit Function
+    End If
+    On Error GoTo 0
+    
+        IsLOLONG = FastSymbol(a$, ")", True)
+      Else
+        
+        missParam a$
+
+    End If
+End Function
+
+Private Function IsHILONG(bstack As basetask, a$, r As Variant) As Boolean
+  Dim z As Long
+  
+  If IsExp(bstack, a$, r, , True) Then
+    On Error Resume Next
+    r = cInt64(r)
+    MemLong(VarPtr(z)) = MemLong(VarPtr(r) + 12)
+    r = uintnew(CCur(z))
+    If Err.Number > 0 Then
+    
+    WrongArgument a$
+  
+    IsHILONG = False
+    Exit Function
+    End If
+    On Error GoTo 0
+    
+        IsHILONG = FastSymbol(a$, ")", True)
+      Else
+        
+        missParam a$
+
+    End If
+End Function
+
 Private Function IsHIWORD(bstack As basetask, a$, r As Variant) As Boolean
   If IsExp(bstack, a$, r, , True) Then
     On Error Resume Next
     
-    r = Int(Int(r / 256) / 256)
+    r = CCur(Int(Int(r / 256) / 256))
     If Err.Number > 0 Then
     
     WrongArgument a$
@@ -43785,10 +43933,9 @@ Private Function IsHIWORD(bstack As basetask, a$, r As Variant) As Boolean
     End If
     On Error GoTo 0
     
-IsHIWORD = FastSymbol(a$, ")", True)
+    IsHIWORD = FastSymbol(a$, ")", True)
       Else
-                
-                missParam a$
+missParam a$
     
     End If
 End Function
@@ -46661,7 +46808,7 @@ End Sub
 
 Function FastPureLabel(b$, a$, Optional Pos As Long = 1, Optional convert As Boolean, Optional retdot As Boolean, Optional countdot As Long, Optional trimit As Boolean = True, Optional gr As Boolean) As Long
 Dim i&, l As Long, one As Boolean, convat As Boolean, nospace As Boolean, pres As Long
-Dim P2 As Long, P1 As Integer, p4 As Long, counter As Long
+Dim P2 As Long, p1 As Integer, p4 As Long, counter As Long
     a$ = vbNullString
     countdot = 0
     gr = False
@@ -46670,8 +46817,8 @@ Dim P2 As Long, P1 As Integer, p4 As Long, counter As Long
     P2 = StrPtr(b$) + Pos * 2 - 2: l = l - 1
     p4 = P2 + l * 2
     For i = P2 To p4 Step 2
-    GetMem2 i, P1
-    Select Case P1
+    GetMem2 i, p1
+    Select Case p1
       Case 32, 160, 7, 9
         If nospace Then pres = 0: GoTo ExitHere
         If counter = 0 Then
@@ -46680,25 +46827,25 @@ Dim P2 As Long, P1 As Integer, p4 As Long, counter As Long
             Exit Function
         End If
       Case Else
-      Select Case P1
+      Select Case p1
         Case 38
             Pos = Pos + 1
             If i < p4 Then
                 i = i + 2
-                GetMem2 i, P1
-                If P1 = 72 Or P1 = 104 Then
+                GetMem2 i, p1
+                If p1 = 72 Or p1 = 104 Then
                     i = i + 2
                     If i <= p4 Then
-                        GetMem2 i, P1
-                        If (P1 >= 48 And P1 <= 57) Then
+                        GetMem2 i, p1
+                        If (p1 >= 48 And p1 <= 57) Then
                             i = i - 4
                             Pos = Pos - 1
                             GoTo ExitHere
-                        ElseIf (P1 >= 97 And P1 <= 102) Then
+                        ElseIf (p1 >= 97 And p1 <= 102) Then
                             i = i - 4
                             Pos = Pos - 1
                             GoTo ExitHere
-                        ElseIf (P1 >= 48 And P1 <= 70) Then
+                        ElseIf (p1 >= 48 And p1 <= 70) Then
                             i = i - 4
                             Pos = Pos - 1
                             GoTo ExitHere
@@ -46731,7 +46878,7 @@ Dim P2 As Long, P1 As Integer, p4 As Long, counter As Long
         Case 65 To 91, 93 To 122, Is > 191
             counter = counter + 1
             If convert Then
-                If P1 > 901 And P1 < 975 Then gr = True
+                If p1 > 901 And p1 < 975 Then gr = True
             End If
             GoTo aName
         Case 123
@@ -46761,8 +46908,8 @@ aName:
     P2 = i + 2
     FastPureLabel = 1
     For i = P2 To p4 Step 2
-        GetMem2 i, P1
-        Select Case P1
+        GetMem2 i, p1
+        Select Case p1
             Case 36 ' 3 or 6
                 If one Then Exit For
                 FastPureLabel = 3
@@ -46775,10 +46922,10 @@ aName:
                 one = True
             Case 40 ' add 3
                 If i + 4 <= p4 Then
-                    GetMem2 i + 2, P1
-                    If P1 = 41 Then
-                        GetMem2 i + 4, P1
-                        If P1 = 64 Then
+                    GetMem2 i + 2, p1
+                    If p1 = 41 Then
+                        GetMem2 i + 4, p1
+                        If p1 = 64 Then
                             convat = True
                             If FastPureLabel = 1 Then
                                 counter = counter + 4
@@ -46788,8 +46935,8 @@ aName:
                                 counter = counter + 3
                                 l = i + 6
                                 For l = l To p4 Step 2
-                                    GetMem2 l, P1
-                                    If P1 = 64 Then counter = counter + 1 Else Exit For
+                                    GetMem2 l, p1
+                                    If p1 = 64 Then counter = counter + 1 Else Exit For
                                 Next l
                                 Exit For
                             End If
@@ -46812,7 +46959,7 @@ conthere:
                 convat = True
                 If FastPureLabel = 3 Then
                     counter = counter + 1
-                    GetMem2 i + 2, P1
+                    GetMem2 i + 2, p1
                     Exit For
                 End If
                 If one Then Exit For
@@ -50073,13 +50220,13 @@ s.PushVal -5  ' mark for select
 End Sub
 Function lookOne(s, c$) As Boolean
 Dim i&, l As Long, cc As Integer
-Dim P2 As Long, P1 As Integer
+Dim P2 As Long, p1 As Integer
   l = Len(s): If l = 0 Then Exit Function
   P2 = StrPtr(s): l = l - 1: GetMem2 StrPtr(c$), cc
 
   For i = P2 To P2 + l * 2 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 7, 9
 
     Case cc
@@ -50091,13 +50238,13 @@ Dim P2 As Long, P1 As Integer
 End Function
 Function lookTwoSame(s, c$) As Boolean
 Dim i&, l As Long, cc As Integer, cc2 As Integer
-Dim P2 As Long, P1 As Integer, n As Integer
+Dim P2 As Long, p1 As Integer, n As Integer
     If Len(c$) <> 1 Then Exit Function
   l = Len(s): If l = 0 Then Exit Function
   P2 = StrPtr(s): l = l - 1: GetMem2 StrPtr(c$), cc
   For i = P2 To P2 + l * 2 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 7, 9
         If n <> 0 Then Exit Function
     Case cc
@@ -50285,15 +50432,15 @@ End Function
 
 Private Function MyTrimL(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL = 1: Exit Function
   P2 = StrPtr(s): l = l - 1
   p4 = P2 + l * 2
   
   
   For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 7, 9
     Case Else
      MyTrimL = (i - P2) \ 2 + 1
@@ -50580,13 +50727,13 @@ MusicMaster.RestEnd1
 End Sub
 Private Function lookB123(s As String, Optional ByVal Pos As Long = 1) As Boolean
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then Exit Function
   If Pos > l Then Exit Function
   P2 = StrPtr(s) + (Pos - 1) * 2: l = l - 1
   For i = P2 To P2 + l * 2 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 7, 9
     Case 13, 47, 39, 92
      lookB123 = True
@@ -51112,7 +51259,7 @@ End Function
 Function enthesi(bstack As basetask, rest$) As String
 'first is the string "label {0} other {1}
 Dim counter As Long, pat$, Final$, pat1$, pl1 As Long, pl2 As Long, pl3 As Long
-Dim q$, p As Variant, P1 As Integer, pd$, insertdot As Boolean, threeparam As Boolean
+Dim q$, p As Variant, p1 As Integer, pd$, insertdot As Boolean, threeparam As Boolean
 Dim hasnumeric As Boolean
 If IsExp(bstack, rest$, p, , True) Then
     If MemInt(VarPtr(p)) = vbString Then SwapString2Variant Final$, p: p = Empty: GoTo cont1
@@ -51170,41 +51317,41 @@ again11:
                 If pl2 > 0 Then
                     pl1 = InStr(pl2, Final$, "}")
                     If Mid$(Final$, pl2 + Len(pat1$), 1) = ":" Then
-                        P1 = 0
+                        p1 = 0
                         pl3 = val(Mid$(Final$, pl2 + Len(pat1$) + 1) + "}")
                     Else
                         If Mid$(Final$, pl2 + Len(pat1$), 1) = "-" Then
-                            P1 = val("-0" + Mid$(Final$, pl2 + Len(pat1$) + 1))
+                            p1 = val("-0" + Mid$(Final$, pl2 + Len(pat1$) + 1))
                         Else
-                            P1 = val("0" + Mid$(Final$, pl2 + Len(pat1$)))
+                            p1 = val("0" + Mid$(Final$, pl2 + Len(pat1$)))
                         End If
-                        pl3 = pl2 + Len(pat1$) + Len(LTrim(str$(P1)))
+                        pl3 = pl2 + Len(pat1$) + Len(LTrim(str$(p1)))
                         If Mid$(Final$, pl3, 1) = ":" Then
-                            pl3 = val(Mid$(Final$, pl2 + Len(pat1$) + 1 + Len(LTrim(str$(P1)))) + "}")
+                            pl3 = val(Mid$(Final$, pl2 + Len(pat1$) + 1 + Len(LTrim(str$(p1)))) + "}")
                             threeparam = True
                         Else
                             pl3 = 0
                         End If
-                        If P1 < 0 Then
-                            If pl3 = 0 Then pl3 = P1
-                            P1 = 0
+                        If p1 < 0 Then
+                            If pl3 = 0 Then pl3 = p1
+                            p1 = 0
                         ElseIf pl3 = 0 And Not insertdot Then
                             If pl3 = 0 Then
-                                If Not hasnumeric Then pl3 = P1 Else p = Round(p, P1)
+                                If Not hasnumeric Then pl3 = p1 Else p = Round(p, p1)
                             End If
-                            P1 = 0
+                            p1 = 0
                         End If
                     End If
                     If q$ = "" Then
                         Select Case MemInt(VarPtr(p))
                         Case vbLong, vbInteger, vbByte, 20
-                            If P1 > 0 Then pd$ = format$(p, String$(P1, "0")) Else pd$ = CStr(p)
+                            If p1 > 0 Then pd$ = format$(p, String$(p1, "0")) Else pd$ = CStr(p)
                         Case vbString
                             pd$ = LTrim$(p)
                         Case 36
                             If TypeOf p Is Complex Then
                             If threeparam Then
-                                pd$ = fixthis(nMath2.cxNew(MyRound(p.r, P1), MyRound(p.i, P1)))
+                                pd$ = fixthis(nMath2.cxNew(MyRound(p.r, p1), MyRound(p.i, p1)))
                                 Else
                                 pd$ = fixthis(p)
                                 
@@ -51219,7 +51366,7 @@ again11:
                             ElseIf InStr(pd$, "e") > 0 Then '' we can change e to greek ε
 cont2234:
                                 If threeparam Then
-                                    pd$ = format$(p, "0." + String$(P1, "0") + "E+####")
+                                    pd$ = format$(p, "0." + String$(p1, "0") + "E+####")
                                 Else
                                     pd$ = format$(p, "0." + String$(Abs(pl3) \ 4, "0") + "E+####")
                                 End If
@@ -51236,13 +51383,13 @@ cont2234:
                         Case Else
 cont5534:
                             If threeparam Then
-                                If P1 < 0 Then P1 = -P1
-                                If P1 > 28 Then P1 = 28
-                                p = MyRound(p, P1)
-                                If P1 = 0 Then
+                                If p1 < 0 Then p1 = -p1
+                                If p1 > 28 Then p1 = 28
+                                p = MyRound(p, p1)
+                                If p1 = 0 Then
                                     pd$ = format$(p, "0")
                                 Else
-                                    pd$ = format$(p, "0." + String$(P1, "0"))
+                                    pd$ = format$(p, "0." + String$(p1, "0"))
                                 End If
                                 If Not NoUseDec Then
                                    If Not OverideDec Then
@@ -51262,11 +51409,11 @@ cont5534:
                         End Select
                     Else
                         pd$ = ""
-                        If P1 > 0 And insertdot Then
-                            If Len(q$) < P1 + 1 Then
-                                q$ = "0" + String$(P1 - Len(q$), "0") + q$
+                        If p1 > 0 And insertdot Then
+                            If Len(q$) < p1 + 1 Then
+                                q$ = "0" + String$(p1 - Len(q$), "0") + q$
                             End If
-                            pd$ = Left$(q$, Len(q$) - P1) + NowDec + Right$(q$, P1)
+                            pd$ = Left$(q$, Len(q$) - p1) + NowDec + Right$(q$, p1)
                         Else
                             SwapStrings q$, pd$
                         End If
@@ -54200,7 +54347,7 @@ g19383:
 End If
 mEval = FastSymbol(a$, ")", True)
 End Function
-Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As Integer = 0) As Long
+Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional p1 As Integer = 0) As Long
     ' for left side...no &
     Dim rr&, one As Boolean, br As Integer, c$, firstdot$, gr As Boolean
     rrr$ = vbNullString
@@ -54211,8 +54358,8 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
     P2 = StrPtr(a$): l = l - 1
     p4 = P2 + l * 2
     For i = P2 To p4 Step 2
-        GetMem2 i, P1
-        Select Case P1
+        GetMem2 i, p1
+        Select Case p1
         Case 13
             If i < p4 Then
                 GetMem2 i + 2, p3
@@ -54223,12 +54370,12 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
                     Else
                         i = i + 4
                         Do While i < p4
-                            GetMem2 i, P1
-                            If P1 = 32 Or P1 = 160 Or P1 = 9 Then
+                            GetMem2 i, p1
+                            If p1 = 32 Or p1 = 160 Or p1 = 9 Then
                                 i = i + 2
                             Else
                                 GetMem2 i + 2, p3
-                                If P1 <> 13 And p3 <> 10 Then Exit For
+                                If p1 <> 13 And p3 <> 10 Then Exit For
                                 i = i + 4
                             End If
                         Loop
@@ -54251,23 +54398,23 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
     Next i
     If i > p4 Then a$ = vbNullString: IsLabelDotSub = 0: Exit Function
     For i = i To p4 Step 2
-        GetMem2 i, P1
-        If P1 < 256 Then
-            Select Case P1
+        GetMem2 i, p1
+        If p1 < 256 Then
+            Select Case p1
             Case 0 To 6
                 ' no chars
             Case 7
                 If i + 2 <= p4 Then
-                    GetMem2 i + 2, P1
-                    Select Case P1
+                    GetMem2 i + 2, p1
+                    Select Case p1
                     Case 61, 40
                         If Len(r$) > 1 Then r$ = Left$(r$, Len(r$) - 1)
                     End Select
                 End If
             Case 64  '"@"
                     If i < p4 And r$ <> "" Then
-                        GetMem2 i + 2, P1
-                        If ChrW(P1) <> "(" Then
+                        GetMem2 i + 2, p1
+                        If ChrW(p1) <> "(" Then
                             where$ = myUcase(r$, gr)
                             r$ = vbNullString
                             rrr$ = vbNullString
@@ -54309,18 +54456,18 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
                 If one Then
                     Exit For
                 ElseIf r$ <> "" And i < p4 Then
-                    GetMem2 i + 2, P1
-                    If ChrW(P1) = "." Or ChrW(P1) = " " Then
-                        If ChrW(P1) = "." And i + 2 < p4 Then
-                            GetMem2 i + 4, P1
-                            If ChrW(P1) = " " Then i = i + 4: Exit For
+                    GetMem2 i + 2, p1
+                    If ChrW(p1) = "." Or ChrW(p1) = " " Then
+                        If ChrW(p1) = "." And i + 2 < p4 Then
+                            GetMem2 i + 4, p1
+                            If ChrW(p1) = " " Then i = i + 4: Exit For
                         Else
                             i = i + 2
                             Exit For
                         End If
                     End If
-                    GetMem2 i, P1
-                    r$ = r$ & ChrW(P1)
+                    GetMem2 i, p1
+                    r$ = r$ & ChrW(p1)
                     rr& = 1
                 Else
                     firstdot$ = firstdot$ + "."
@@ -54331,7 +54478,7 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
                 If one Then
                     Exit For
                 ElseIf r$ <> "" Then
-                    r$ = r$ + ChrW(P1)
+                    r$ = r$ + ChrW(p1)
                     rr& = 1 'is an identifier or floating point variable
                 Else
                     Exit For
@@ -54370,7 +54517,7 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
                 If one Then
                     Exit For
                 Else
-                    r$ = r$ + ChrW(P1)
+                    r$ = r$ + ChrW(p1)
                     rr& = 1 'is an identifier or floating point variable
                 End If
             Case 36 ' "$"
@@ -54378,7 +54525,7 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
                 If r$ <> "" Then
                 one = True
                 rr& = 3 ' is string variable
-                r$ = r$ & ChrW(P1)
+                r$ = r$ & ChrW(p1)
                 Else
                 Exit For
                 End If
@@ -54387,16 +54534,16 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional P1 As
                 If r$ <> "" Then
                 one = True
                 rr& = 4 ' is long variable
-                r$ = r$ & ChrW(P1)
+                r$ = r$ & ChrW(p1)
                 Else
                 Exit For
                 End If
             Case 40 '"("
                 If r$ <> "" Then
                     If i + 4 <= p4 Then
-                        GetMem2 i + 2, P1
+                        GetMem2 i + 2, p1
                         GetMem2 i + 2, p3
-                        If ChrW(P1) + ChrW(p3) = ")@" Then
+                        If ChrW(p1) + ChrW(p3) = ")@" Then
                             r$ = r$ & "()."
                             i = i + 4
                         Else
@@ -54414,8 +54561,8 @@ i123:
                         Case Else
                             Exit For
                         End Select
-                        GetMem2 i, P1
-                        r$ = r$ & ChrW(P1)
+                        GetMem2 i, p1
+                        r$ = r$ & ChrW(p1)
                         i = i + 2
                         Exit For
                      End If
@@ -54430,13 +54577,13 @@ i123:
                 Exit For
             Else
                 gr = True
-                r$ = r$ + ChrW(P1)
+                r$ = r$ + ChrW(p1)
                 rr& = 1 'is an identifier or floating point variable
             End If
         End If
     Next i
     If i > p4 Then
-        a$ = vbNullString: P1 = 0
+        a$ = vbNullString: p1 = 0
     Else
         If (i + 2 - P2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - P2) \ 2)
     End If

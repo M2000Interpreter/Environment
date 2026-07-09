@@ -336,16 +336,16 @@ Public Function HighLong(ByVal p) As Long
     If MemInt(VarPtr(p)) <> 20 Then p = cInt64(p)
     HighLong = MemLong(VarPtr(p) + 12)
 End Function
-Public Function LowLong(ByVal p) As Long
+Public Function lowlong(ByVal p) As Long
     If Not myVarType(p, 20) Then p = cInt64(p)
-    LowLong = MemLong(VarPtr(p) + 8)
+    lowlong = MemLong(VarPtr(p) + 8)
 End Function
 Function Hex64$(a, Optional bytes = 8)
-    Dim p, P1, z
+    Dim p, p1, z
     z = cInt64(a)
     p = MemLong(VarPtr(z) + 8)
-    P1 = MemLong(VarPtr(z) + 12)
-    Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
+    p1 = MemLong(VarPtr(z) + 12)
+    Hex64$ = Right$(Right$("0000000" + Hex$(p1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
 End Function
 Public Function OneLongLong() As Variant
     Static p
@@ -3721,8 +3721,8 @@ Select Case a$
 Case "@(", "$(", "~(", "?", "->", "[]"
 Case "ABOUT", "ABOUT$", "ABS(", "ADDRESSOF", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
 Case "ARG(", "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
-Case "BACK", "BACKGROUND", "BACKWARD(", "BANK(", "BASE", "BASIC", "BEEP", "BIGINTEGER", "BIGINTEGER(", "BIGINTEGER[", "BINARY", "BINARY.ADD(", "BINARY.AND(", "BINARY.NEG(", "BINARY.NOT("
-Case "BINARY.OR(", "BINARY.ROTATE(", "BINARY.SHIFT(", "BINARY.XOR(", "BITMAPS", "BMP$(", "BOLD"
+Case "BACK", "BACKGROUND", "BACKWARD(", "BANK(", "BASE", "BASIC", "BEEP", "BIGINTEGER", "BIGINTEGER(", "BIGINTEGER[", "BINARY", "BINARY.ADD(", "BIT64.ADD(", "BINARY.AND(", "BIT64.AND(", "BIT64.NEG(", "BINARY.NEG(", "BIT64.NOT(", "BINARY.NOT("
+Case "BINARY.OR(", "BIT64.OR(", "BIT64.RESET(", "BINARY.RESET(", "BIT64.ROTATE(", "BINARY.ROTATE(", "BIT64.SHIFT(", "BINARY.SHIFT(", "BIT64.SET(", "BINARY.SET(", "BIT64.SUB(", "BINARY.SUB(", "BIT64.TEST(", "BINARY.TEST(", "BIT64.XOR(", "BINARY.XOR(", "BITMAPS", "BMP$(", "BOLD"
 Case "BOOLEAN", "BORDER", "BREAK", "BROWSER", "BROWSER$", "BUFFER", "BUFFER(", "BYTE", "BYTE[", "CALL", "CASE", "CASCADE", "CAT", "CAR("
 Case "CDATE(", "CDR(", "CEIL(", "CENTER", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN"
 Case "CHR$(", "CHR(", "CHRCODE$(", "CHRCODE(", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLIPBOARD$", "CLIPBOARD.DRAWING", "CLIPBOARD.IMAGE", "CLIPBOARD.IMAGE$"
@@ -3741,14 +3741,14 @@ Case "FILL", "FILTER(", "FILTER$(", "FINAL", "FIND", "FKEY", "FLOODFILL", "FLOOR
 Case "FORM", "FORMAT$(", "FORMAT(", "FORMLABEL", "FORWARD(", "FRAC(", "FRAME", "FREQUENCY(", "FROM", "FUNCTION", "FUNCTION$(", "FUNCTION("
 Case "GARBAGE", "GET", "GETOBJECT(", "GLOBAL", "GOSUB", "GOTO", "GRABFRAME$", "GRADIENT", "GREEK", "GROUP", "GROUP(", "GROUP$("
 Case "GROUP.COUNT(", "HALT", "HAVE(", "HEIGHT", "HELP", "HEX", "HEX$(", "HEX(", "HIDE", "HIDE$(", "HIGH", "HIFI", "HIGHWORD("
-Case "HILOWWORD(", "HIWORD(", "HOLD", "HSL(", "HTML", "HWND", "ICON", "IF", "IF(", "IF$(", "IMAGE", "IMAGE(", "IMAGE.X("
+Case "HILOWWORD(", "HILOWLONG(", "HIWORD(", "HILONG(", "HIGHLONG(", "HOLD", "HSL(", "HTML", "HWND", "ICON", "IF", "IF(", "IF$(", "IMAGE", "IMAGE(", "IMAGE.X("
 Case "IMAGE.X.PIXELS(", "IMAGE.Y(", "IMAGE.Y.PIXELS(", "IN", "INFINITY", "INKEY$", "INKEY(", "INLINE", "INPUT", "INPUT$("
 Case "INSERT", "INSTR(", "INT(", "INTEGER", "INTEGER[", "INTERFACE", "INTERVAL", "INTERNET", "INTERNET$", "INVENTORY", "IS", "ISLET", "ISNUM", "ISWINE", "ITALIC", "ITALICS"
 Case "JOYPAD", "JOYPAD(", "JOYPAD.ANALOG.X(", "JOYPAD.ANALOG.Y(", "JOYPAD.DIRECTION(", "JPG$(", "KEEP", "KEY$", "KEYBOARD"
 Case "KEYPRESS(", "LAMBDA", "LAMBDA(", "LAMBDA$", "LAMBDA$(", "LAN$", "LANDSCAPE", "LATIN", "LAYER", "LAZY$(", "LCASE$(", "LCASE(", "LEFT$(", "LEFT(", "LEFTPART$(", "LEFTPART(", "LEGEND", "LEN"
 Case "LEN(", "LEN.DISP(", "LET", "LETTER$", "LIB", "LICENSE", "LINE", "LINESPACE", "LINK", "LIST", "LN("
 Case "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LOCALE$(", "LOCALE(", "LOG(", "LONG", "LONG[", "LOOP"
-Case "LOWORD(", "LOWWORD(", "LTRIM$(", "LTRIM(", "MAIN.TASK", "MAGNITUDE(", "MAP(", "MARK", "MASTER", "MAT(", "MATCH(", "MAX(", "MAX.DATA$("
+Case "LOWORD(", "LOWWORD(", "LOWLONG(", "LOLONG(", "LTRIM$(", "LTRIM(", "MAIN.TASK", "MAGNITUDE(", "MAP(", "MARK", "MASTER", "MAT(", "MATCH(", "MAX(", "MAX.DATA$("
 Case "MAX.DATA(", "MDB(", "MEDIA", "MEDIA.COUNTER", "MEMBER$(", "MEMBER.TYPE$(", "MEMO", "MEMORY", "MENU"
 Case "MENU$(", "MENU.VISIBLE", "MENUITEMS", "MERGE.DOC", "METHOD", "MID$(", "MID(", "MIN(", "MIN.DATA$(", "MIN.DATA("
 Case "MOD", "MOD(", "MODE", "MODPOW(", "MODULE", "MODULE$", "MODULE(", "MODULES", "MODULE.NAME$", "MONITOR", "MONITORS", "MONITOR.STACK", "MONITOR.STACK.SIZE", "MOTION", "MOTION.W", "MOTION.WX"
@@ -3775,7 +3775,7 @@ Case "SWAP", "SWEEP", "SWITCHES", "TAB", "TAB(", "TABLE", "TAN(", "TARGET"
 Case "TARGETS", "TASK.MAIN", "TEMPNAME$", "TEMPORARY$", "TEST", "TEST(", "TEXT", "THEN", "THIS"
 Case "THREAD", "THREAD.PLAN", "THREADS", "THREADS$", "TICK", "TIME$(", "TIME(", "TIMECOUNT", "TITLE", "TITLE$(", "TITLE("
 Case "TO", "TODAY", "TONE", "TOP", "TRIM$(", "TRIM(", "TRUE", "TRY", "TUNE", "TUPLE", "TWIPSX"
-Case "TWIPSY", "TYPE", "TYPE$(", "TYPE(", "UCASE$(", "UCASE(", "UINT(", "UNARY", "UNDER", "UNICODE", "UNION.DATA$(", "UNIQUE", "UNTIL"
+Case "TWIPSY", "TYPE", "TYPE$(", "TYPE(", "UCASE$(", "UCASE(", "UINT(", "UINT64(", "UNARY", "UNDER", "UNICODE", "UNION.DATA$(", "UNIQUE", "UNTIL"
 Case "UP", "UPDATABLE", "UPDATE", "USE", "USER", "USERS", "USER.NAME$", "USGN("
 Case "VAL(", "VAL$(", "VALID(", "VALUE", "VALUE(", "VAR", "VALUE$", "VARIABLE", "VARIABLES", "VARIANT", "VARIANT[", "VARPTR(", "VERSION", "VIEW", "VOID", "VOLUME"
 Case "WAIT", "WCHAR", "WEAK", "WEAK$(", "WHILE", "WHEN", "WIDE", "WIDTH", "WIN", "WINDOW"
@@ -3793,8 +3793,8 @@ Case "ΓΡΑΦΗ$(", "ΓΡΑΦΗ(", "ΓΡΑΨΕ", "ΓΡΗΓΟΡΑ", "ΓΩΝΙΑ"
 Case "ΔΕΙΚΤΗΣΑ.Ψ", "ΔΕΙΚΤΗΣΑ.Υ", "ΔΕΙΚΤΗΣΑ.Χ", "ΔΕΙΞΕ", "ΔΕΚ(", "ΔΕΚΑΕΞ", "ΔΕΚΑΕΞ$(", "ΔΕΚΑΕΞ(", "ΔΕΝ", "ΔΕΝΕΧΕΙ(", "ΔΕΞΙΟΣ", "ΔΕΞΙ$(", "ΔΕΞΙ(", "ΔΕΞΙΜΕΡΟΣ$(", "ΔΕΞΙΜΕΡΟΣ(", "ΔΕΣ", "ΔΗΜΟΣΙΟ"
 Case "ΔΙΑ", "ΔΙΑΒΑΣΕ", "ΔΙΑΓΡΑΦΗ", "ΔΙΑΔΙΚΤΥΟ", "ΔΙΑΔΙΚΤΥΟ$", "ΔΙΑΔΟΧΙΚΟ", "ΔΙΑΚΟΠΗ", "ΔΙΑΚΟΠΤΕΣ", "ΔΙΑΜΕΣΟΥ", "ΔΙΑΡΘΡΩΣΗ", "ΔΙΑΡΘΡΩΣΗ(", "ΔΙΑΡΚΕΙΑ", "ΔΙΑΣΤΑΣΗ("
 Case "ΔΙΑΣΤΙΧΟ", "ΔΙΑΦΑΝΕΙΑ", "ΔΙΑΦΑΝΕΙΑ$", "ΔΙΑΦΑΝΟ", "ΔΙΑΦΥΓΗ", "ΔΙΑΚΟΠΗ", "ΔΙΕΚΟΨΕ", "ΔΙΕΠΑΦΗ", "ΔΙΕΥΘΜ(", "ΔΙΕΥΘΥΝΣΗΑΠΟ", "ΔΙΚΤΥΟ$", "ΔΙΟΡΘΩΣΕ"
-Case "ΔΙΠΛΑ", "ΔΙΠΛΟ", "ΔΙΠΛΟΣ", "ΔΙΠΛΟΣ[", "ΔΟΚΙΜΗ", "ΔΟΚΙΜΗ(", "ΔΟΜΗ", "ΔΡΟΜΕΑΣ", "ΔΥΑΔΙΚΗ.ΠΕΡΙΣΤΡΟΦΗ(", "ΔΥΑΔΙΚΟ", "ΔΥΑΔΙΚΟ(", "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ("
-Case "ΔΥΑΔΙΚΟ.ΑΝΤΙ(", "ΔΥΑΔΙΚΟ.ΑΝΤΙΣΤΡΟΦΟ(", "ΔΥΑΔΙΚΟ.ΑΠΟ(", "ΔΥΑΔΙΚΟ.Η(", "ΔΥΑΔΙΚΟ.ΚΑΙ(", "ΔΥΑΔΙΚΟ.ΟΛΙΣΘΗΣΗ(", "ΔΥΑΔΙΚΟ.ΟΧΙ(", "ΔΥΑΔΙΚΟ.ΠΡΟΣΘΕΣΗ(", "ΔΥΑΔΙΚΟ.ΠΡΟ(", "ΔΥΟΜΙΣΑ(", "ΔΩΣΕ"
+Case "ΔΙΠΛΑ", "ΔΙΠΛΟ", "ΔΙΠΛΟΣ", "ΔΙΠΛΟΣ[", "ΔΟΚΙΜΗ", "ΔΟΚΙΜΗ(", "ΔΟΜΗ", "ΔΡΟΜΕΑΣ", "ΔΥΑΔΙΚΗ.ΠΕΡΙΣΤΡΟΦΗ(", "ΔΥΑΔ64.ΠΕΡΙΣΤΡΟΦΗ(", "ΔΥΑΔΙΚΟ", "ΔΥΑΔ(", "ΔΥΑΔ64(", "ΔΥΑΔΙΚΟ(", "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ(", "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ64(", "ΔΥΑΔΙΚΟ.ΑΦ(", "ΔΥΑΔΙΚΟ.ΑΦΑΙΡΕΣΗ(", "ΔΥΑΔΙΚΟ.ΒΑΛΕ(", "ΔΥΑΔΙΚΟ.ΒΓΑΛΕ(", "ΔΥΑΔΙΚΟ.ΕΧΕΙ("
+Case "ΔΥΑΔΙΚΟ.ΑΝΤΙ(", "ΔΥΑΔΙΚΟ.ΑΝΤΙΣΤΡΟΦΟ(", "ΔΥΑΔ64.ΑΝΤΙ(", "ΔΥΑΔ64.ΑΝΤΙΣΤΡΟΦΟ(", "ΔΥΑΔΙΚΟ.ΑΠΟ(", "ΔΥΑΔΙΚΟ.Η(", "ΔΥΑΔΙΚΟ.ΚΑΙ(", "ΔΥΑΔΙΚΟ.ΟΛΙΣΘΗΣΗ(", "ΔΥΑΔΙΚΟ.ΟΧΙ(", "ΔΥΑΔΙΚΟ.ΠΡΟΣΘΕΣΗ(", "ΔΥΑΔΙΚΟ.ΠΡΟ(", "ΔΥΑΔ64.ΑΦ(", "ΔΥΑΔ64.ΑΦΑΙΡΕΣΗ(", "ΔΥΑΔ64.ΒΑΛΕ(", "ΔΥΑΔ64.ΒΓΑΛΕ(", "ΔΥΑΔ64.ΕΧΕΙ(", "ΔΥΑΔ64.ΑΠΟ(", "ΔΥΑΔ64.Η(", "ΔΥΑΔ64.ΚΑΙ(", "ΔΥΑΔ64.ΟΛΙΣΘΗΣΗ(", "ΔΥΑΔ64.ΟΧΙ(", "ΔΥΑΔ64.ΠΡΟΣΘΕΣΗ(", "ΔΥΑΔ64.ΠΡΟ(", "ΔΥΟΜΙΣΑ(", "ΔΥΟΜΙΣΑ64(", "ΔΩΣΕ"
 Case "ΕΓΓΡΑΦΕΣ(", "ΕΓΓΡΑΦΟ", "ΕΓΓΡΑΦΟΥ.ΛΕΞΕΙΣ(", "ΕΓΓΡΑΦΟΥ.ΜΗΚΟΣ(", "ΕΓΓΡΑΦΟΥ.ΜΟΝΑΔΙΚΕΣ.ΛΕΞΕΙΣ(", "ΕΓΓΡΑΦΟΥ.ΠΑΡ(", "ΕΓΓΡΑΨΙΜΟ(", "ΕΓΚΥΡΟ(", "ΕΙΚ$("
 Case "ΕΙΚΟΝΑ", "ΕΙΚΟΝΑ(", "ΕΙΚΟΝΑ.Ψ(", "ΕΙΚΟΝΑ.Ψ.ΣΗΜΕΙΑ(", "ΕΙΚΟΝΑ.Υ(", "ΕΙΚΟΝΑ.Υ.ΣΗΜΕΙΑ(", "ΕΙΚΟΝΑ.Χ(", "ΕΙΚΟΝΑ.Χ.ΣΗΜΕΙΑ(", "ΕΙΚΟΝΕΣ", "ΕΙΚΟΝΙΔΙΟ", "ΕΙΝΑΡ", "ΕΙΝΑΙ", "ΕΙΝΓΡ"
 Case "ΕΙΣΑΓΩΓΗ", "ΕΙΣΑΓΩΓΗ$(", "ΕΙΣΑΓΩΓΗΣ", "ΕΚΘ(", "ΕΚΔΟΣΗ", "ΕΚΤΕΛΕΣΗ", "ΕΚΤΥΠΩΣΗ", "ΕΚΤΥΠΩΣΗΣ", "ΕΚΤΥΠΩΤΗΣ", "ΕΚΤΥΠΩΤΗΣ$", "ΕΚΦΡ(", "ΕΚΦΡ$("
@@ -3807,7 +3807,7 @@ Case "ΕΧΕΙ(", "ΕΩΣ", "Η", "ΗΜ(", "ΗΜΕΡΑ$(", "ΗΜΕΡΑ(", "ΗΜ�
 Case "ΗΧΟΙ", "ΗΧΟΣ", "ΘΕΣΕ", "ΘΕΣΕ(", "ΘΕΣΗ", "ΘΕΣΗ(", "ΘΕΣΗ.Ψ", "ΘΕΣΗ.Υ", "ΘΕΣΗ.Χ", "ΘΕΣΗΔΕΞΙΑ(", "ΙΔΙΟΤΗΤΑ", "ΙΔΙΟΤΗΤΑ(", "ΙΔΙΟΤΗΤΑ$("
 Case "ΙΔΙΟΤΗΤΕΣ", "ΙΔΙΟΤΗΤΕΣ$", "ΙΔΙΩΤΙΚΟ", "ΙΣΧΝΗ", "ΙΣΧΝΗ$(", "ΙΧΝΟΣ", "ΚΑΘΑΡΗ", "ΚΑΘΑΡΟ", "ΚΑΘΑΡΙΣΕ", "ΚΑΘΕ", "ΚΑΘΕΤΗ", "ΚΑΘΕ(", "ΚΑΙ", "ΚΑΛΕΣΕ", "ΚΑΜΠΥΛΗ"
 Case "ΚΑΝΕ", "ΚΑΝΟΝΙΚΑ", "ΚΑΤ", "ΚΑΤ$", "ΚΑΤΑΛΟΓΟΙ", "ΚΑΤΑΛΟΓΟΣ", "ΚΑΤΑΣΤΑΣΗ", "ΚΑΤΑΣΤΑΣΗ.ΤΑΙΝΙΑΣ$", "ΚΑΤΑΧΩΡΗΣΗ", "ΚΑΤΩ"
-Case "ΚΑΤΩΜΙΣΟ(", "ΚΕΙΜΕΝΟ", "ΚΕΝΗ", "ΚΕΝΟ", "ΚΕΝΤΡΟ", "ΚΕΦ$(", "ΚΕΦ(", "ΚΙΝΗΣΗ", "ΚΙΝΗΣΗ.Π", "ΚΙΝΗΣΗ.ΠΥ"
+Case "ΚΑΤΩΜΙΣΟ(", "ΚΑΤΩΜΙΣΟ64(", "ΚΕΙΜΕΝΟ", "ΚΕΝΗ", "ΚΕΝΟ", "ΚΕΝΤΡΟ", "ΚΕΦ$(", "ΚΕΦ(", "ΚΙΝΗΣΗ", "ΚΙΝΗΣΗ.Π", "ΚΙΝΗΣΗ.ΠΥ"
 Case "ΚΙΝΗΣΗ.ΠΧ", "ΚΙΝΗΣΗ.Υ", "ΚΙΝΗΣΗ.ΥΠ", "ΚΙΝΗΣΗ.Ψ", "ΚΙΝΗΣΗ.ΨΠ", "ΚΙΝΗΣΗ.Χ", "ΚΙΝΗΣΗ.ΧΠ", "ΚΛΑΣΗ", "ΚΛΕΙΔΙ", "ΚΛΕΙΣΕ", "ΚΛΙΜΑΞ.Υ", "ΚΛΙΜΑΞ.Ψ"
 Case "ΚΛΙΜΑΞ.Χ", "ΚΟΜ$", "ΚΟΙΝΟΣ", "ΚΟΙΝΟΙ", "ΚΟΝΣΟΛΑ", "ΚΡΑΤΑ", "ΚΡΑΤΗΣΕ", "ΚΡΥΦΟ$(", "ΚΡΥΨΕ", "ΚΥΚΛΙΚΑ", "ΚΥΚΛΟΣ"
 Case "ΚΥΛΙΣΗ", "ΚΥΡΙΟ", "ΚΥΡΙΟ.ΕΡΓΟ", "ΚΩΔ(", "ΚΩΔΙΚΑ", "ΚΩΔΙΚΟΣΕΛΙΔΑ", "ΛΑΒΗ", "ΛΑΒΗ(", "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Υ(", "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Ψ("
@@ -3820,7 +3820,7 @@ Case "ΜΠΡΟΣΤΑ(", "ΝΑΙ", "ΝΕΑ", "ΝΕΟ", "ΝΕΟΙ", "ΝΕΟΣ", "�
 Case "ΞΕΚΙΝΑ", "ΟΔΗΓΙΑ", "ΟΔΗΓΟΣ$(", "ΟΘΟΝΗ", "ΟΘΟΝΕΣ", "ΟΜΑΛΑ", "ΟΚΝ$(", "ΟΜΑΔΑ", "ΟΜΑΔΑ(", "ΟΜΑΔΑ$(", "ΟΜΑΔΑ.ΣΥΝΟΛΟ(", "ΟΝΟΜΑ", "ΟΝΟΜΑ.ΑΡΧΕΙΟΥ$("
 Case "ΟΝΟΜΑ.ΑΡΧΕΙΟΥ.ΜΟΝΟ$(", "ΟΝΟΜΑ.ΤΜΗΜΑΤΟΣ$", "ΟΝΟΜΑ.ΧΡΗΣΤΗ$", "ΟΡΙΖΟΝΤΙΑ", "ΟΡΙΑ.ΕΚΤΥΠΩΤΗ", "ΟΡΙΑ.ΕΚΤΥΠΩΣΗΣ", "ΟΡΙΟ.ΑΝΑΔΡΟΜΗΣ", "ΟΡΙΣΕ", "ΟΡΙΣΜΑ(", "ΟΡΟΦ(", "ΟΣΟ", "ΟΥΡΑ", "ΟΧΙ", "ΠΑΙΖΕΙΦΩΝΗ", "ΠΑΙΚΤΗΣ", "ΠΑΙΚΤΗΣ("
 Case "ΠΑΙΖΕΙΑΞΙΑ(", "ΠΑΙΖΕΙΕΝΤΑΣΗ(", "ΠΑΙΖΕΙΝΟΤΑ(", "ΠΑΙΖΕΙΠΟΡΤΑ(", "ΠΑΙΖΕΙΣΧΗΜΑ(", "ΠΑΙΖΕΙΤΕΛΕΙΕΣ(", "ΠΑΙΖΕΙΤΩΡΑ(", "ΠΑΙΞΕ", "ΠΑΚ(", "ΠΑΚ$(", "ΠΑΝΤΑ"
-Case "ΠΑΝΩ", "ΠΑΝΩΜΙΣΟ(", "ΠΑΡΑΓΡΑΦΟΣ$(", "ΠΑΡΑΓΡΑΦΟΣ(", "ΠΑΡΑΜ(", "ΠΑΡΑΜ$(", "ΠΑΡΑΘΕΣΗ$(", "ΠΑΡΑΘΥΡΟ", "ΠΑΡΑΜΕΤΡΟΙ$", "ΠΑΡΕ", "ΠΑΡΕΚΑΡΕ$"
+Case "ΠΑΝΩ", "ΠΑΝΩΜΙΣΟ(", "ΠΑΝΩΜΙΣΟ64(", "ΠΑΡΑΓΡΑΦΟΣ$(", "ΠΑΡΑΓΡΑΦΟΣ(", "ΠΑΡΑΜ(", "ΠΑΡΑΜ$(", "ΠΑΡΑΘΕΣΗ$(", "ΠΑΡΑΘΥΡΟ", "ΠΑΡΑΜΕΤΡΟΙ$", "ΠΑΡΕ", "ΠΑΡΕΚΑΡΕ$"
 Case "ΠΑΡΕΜΒΟΛΗ", "ΠΑΤΗΜΕΝΟ(", "ΠΑΧΟΣ", "ΠΕΔΙΑ", "ΠΕΔΙΟ", "ΠΕΔΙΟ$(", "ΠΕΖ$(", "ΠΕΖ(", "ΠΕΝΑ", "ΠΕΡΙ"
 Case "ΠΕΡΙ$", "ΠΕΡΙΘΩΡΙΟ", "ΠΕΤΑ", "ΠΙ", "ΠΙΝΑΚΑΣ", "ΠΙΝΑΚΑΣ$(", "ΠΙΝΑΚΑΣ(", "ΠΙΝΑΚΕΣ", "ΠΙΣΩ("
 Case "ΠΛΑΓΙΑ", "ΠΛΑΙΣΙΟ", "ΠΛΑΤΟΣ", "ΠΛΑΤΟΣ.ΣΕΛΙΔΑΣ", "ΠΛΑΤΟΣ.ΣΗΜΕΙΟΥ", "ΠΛΑΤΟΣ.ΤΑΙΝΙΑΣ", "ΠΛΑΤΦΟΡΜΑ$", "ΠΛΕΙΑΔΑ", "ΠΛΗΚΤΡΟΛΟΓΙΟ", "ΠΟΙΟΤΗΤΑ.ΕΚΤΥΠΩΣΗΣ", "ΠΟΛΙΚΟΣ(", "ΠΟΛΥΓΩΝΟ"
@@ -4215,13 +4215,13 @@ End Function
 
 Public Function MyTrimL3Len(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL3Len = 0: Exit Function
   P2 = StrPtr(s): l = l - 1
   p4 = P2 + l * 2
   For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 7
     Case Else
      
@@ -4232,13 +4232,13 @@ Dim P2 As Long, P1 As Integer, p4 As Long
 End Function
 Public Function MyTrimL2(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL2 = 1: Exit Function
   P2 = StrPtr(s): l = l - 1
   p4 = P2 + l * 2
   For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 7
     Case Else
      MyTrimL2 = (i - P2) \ 2 + 1
@@ -4250,13 +4250,13 @@ End Function
 
 Public Function MyTrimR(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimR = 1: Exit Function
   P2 = StrPtr(s): l = l - 1
   p4 = P2 + l * 2
   For i = p4 To P2 Step -2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160
     Case Else
      MyTrimR = (i - P2) \ 2 + 1
@@ -4269,13 +4269,13 @@ End Function
 
 Public Function MyTrimL2NoTab(s$) As Long
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL2NoTab = 0: Exit Function
   P2 = StrPtr(s): l = l - 1
   p4 = P2 + l * 2
   For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160
     Case Else
      MyTrimL2NoTab = (i - P2) \ 2 + 1
@@ -4287,7 +4287,7 @@ End Function
 
 Public Function MyTrimRfrom(s$, st As Long, ByVal en As Long) As Long
 Dim i&
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long
   If st > Len(s$) Then MyTrimRfrom = en: Exit Function
   If en > Len(s$) Then MyTrimRfrom = en: Exit Function
   If en <= st Then MyTrimRfrom = en: Exit Function
@@ -4295,8 +4295,8 @@ Dim P2 As Long, P1 As Integer, p4 As Long
   P2 = StrPtr(s) + (st - 1) * 2: en = en - 1
   p4 = P2 + (en - st) * 2
   For i = p4 To P2 Step -2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 9
     Case Else
      ' MyTrimRfrom = en + 1
@@ -4308,15 +4308,15 @@ Dim P2 As Long, P1 As Integer, p4 As Long
 End Function
 Public Function MyTrimCR(s$) As String
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long, p22 As Long
 l = Len(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l * 2
   For i = p4 To P2 Step -2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 10, 13
     Case Else
      Exit For
@@ -4324,8 +4324,8 @@ l = Len(s): If l = 0 Then Exit Function
   Next i
   p4 = i
   For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160, 10, 13
     Case Else
      
@@ -4339,15 +4339,15 @@ End Function
 
 Public Function MyTrim(s$) As String
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long, p22 As Long
 l = Len(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l * 2
   For i = p4 To P2 Step -2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160
     Case Else
      Exit For
@@ -4355,8 +4355,8 @@ l = Len(s): If l = 0 Then Exit Function
   Next i
   p4 = i
   For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160
     Case Else
      
@@ -4369,15 +4369,15 @@ l = Len(s): If l = 0 Then Exit Function
 End Function
 Public Function MyTrimLW(s$) As String
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long, p22 As Long
 l = Len(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l * 2
   For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160
     Case Else
      
@@ -4390,15 +4390,15 @@ l = Len(s): If l = 0 Then Exit Function
 End Function
 Public Function MyTrimRW(s$) As String
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long, p22 As Long
 l = Len(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l * 2
   For i = p4 To P2 Step -2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 32, 160
     Case Else
      Exit For
@@ -4411,15 +4411,15 @@ End Function
 
 Public Function MyTrimRB(s$) As String
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long, p22 As Long
 l = LenB(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l
   For i = p4 To P2 Step -1
-  GetMem1 i, P1
-  Select Case P1
+  GetMem1 i, p1
+  Select Case p1
     Case 32
     Case Else
    Exit For
@@ -4431,15 +4431,15 @@ l = LenB(s): If l = 0 Then Exit Function
 End Function
 Public Function MyTrimLB(s$) As String
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long, p22 As Long
 l = LenB(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l
   For i = P2 To p4 Step 1
-  GetMem1 i, P1
-  Select Case P1
+  GetMem1 i, p1
+  Select Case p1
     Case 32
     Case Else
   
@@ -4452,15 +4452,15 @@ l = LenB(s): If l = 0 Then Exit Function
 End Function
 Public Function MyTrimB(s$) As String
 Dim i&, l As Long
-Dim P2 As Long, P1 As Integer, p4 As Long, p22 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long, p22 As Long
 l = LenB(s): If l = 0 Then Exit Function
 
   P2 = StrPtr(s): l = l - 1
   p22 = P2
   p4 = P2 + l
   For i = p4 To P2 Step -1
-  GetMem1 i, P1
-  Select Case P1
+  GetMem1 i, p1
+  Select Case p1
     Case 32
     Case Else
   
@@ -4469,8 +4469,8 @@ l = LenB(s): If l = 0 Then Exit Function
   Next i
   p4 = i
   For i = P2 To p4 Step 1
-  GetMem1 i, P1
-  Select Case P1
+  GetMem1 i, p1
+  Select Case p1
     Case 32
     Case Else
 
@@ -4488,14 +4488,14 @@ Dim rr&, one As Boolean, c$, gr As Boolean, Split As Boolean
 r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
 Dim i&, l As Long, p3 As Integer
-Dim P2 As Long, P1 As Integer, p4 As Long
+Dim P2 As Long, p1 As Integer, p4 As Long
 l = Len(a$): If l = 0 Then IsLabelAnew = 0: Lang = 1: Exit Function
 Split = Lang > -1
 P2 = StrPtr(a$): l = l - 1
   p4 = P2 + l * 2
   For i = P2 To p4 Step 2
-  GetMem2 i, P1
-  Select Case P1
+  GetMem2 i, p1
+  Select Case p1
     Case 13
     
     If i < p4 Then
@@ -4508,12 +4508,12 @@ P2 = StrPtr(a$): l = l - 1
     i = i + 4
     Do While i < p4
 
-    GetMem2 i, P1
-    If P1 = 32 Or P1 = 160 Then
+    GetMem2 i, p1
+    If p1 = 32 Or p1 = 160 Then
     i = i + 2
     Else
     GetMem2 i + 2, p3
-    If P1 <> 13 And p3 <> 10 Then Exit Do
+    If p1 <> 13 And p3 <> 10 Then Exit Do
     i = i + 4
     End If
     Loop
@@ -4536,12 +4536,12 @@ P2 = StrPtr(a$): l = l - 1
   Next i
     If i > p4 Then a$ = vbNullString: IsLabelAnew = 0: Exit Function
   For i = i To p4 Step 2
-  GetMem2 i, P1
-  If P1 < 256 Then
-  Select Case P1
+  GetMem2 i, p1
+  If p1 < 256 Then
+  Select Case p1
         Case 64  '"@"
             If i < p4 And r$ <> "" Then
-                GetMem2 i + 2, P1
+                GetMem2 i + 2, p1
                 where$ = r$
                 r$ = vbNullString
             Else
@@ -4564,18 +4564,18 @@ P2 = StrPtr(a$): l = l - 1
             If one Then
                 Exit For
             ElseIf r$ <> "" And i < p4 Then
-                GetMem2 i + 2, P1
-                If ChrW(P1) = "." Or ChrW(P1) = " " Then
-                If ChrW(P1) = "." And i + 2 < p4 Then
-                    GetMem2 i + 4, P1
-                    If ChrW(P1) = " " Then i = i + 4: Exit For
+                GetMem2 i + 2, p1
+                If ChrW(p1) = "." Or ChrW(p1) = " " Then
+                If ChrW(p1) = "." And i + 2 < p4 Then
+                    GetMem2 i + 4, p1
+                    If ChrW(p1) = " " Then i = i + 4: Exit For
                 Else
                     i = i + 2
                    Exit For
                 End If
             End If
-                GetMem2 i, P1
-                r$ = r$ & ChrW(P1)
+                GetMem2 i, p1
+                r$ = r$ & ChrW(p1)
                 rr& = 1
             End If
       Case 38 ' "&"
@@ -4586,7 +4586,7 @@ P2 = StrPtr(a$): l = l - 1
             Exit For
     Case 91
         If r$ = vbNullString Then
-                r$ = ChrW(P1)
+                r$ = ChrW(p1)
                 rr& = 1
         Else
                 If Left$(r$, 1) <> "[" Then rr& = 8: Exit For
@@ -4599,7 +4599,7 @@ P2 = StrPtr(a$): l = l - 1
 
             Exit For
             ElseIf r$ <> "" Then
-            r$ = r$ & ChrW(P1)
+            r$ = r$ & ChrW(p1)
             '' A$ = Mid$(A$, 2)
             rr& = 1 'is an identifier or floating point variable
             Else
@@ -4609,7 +4609,7 @@ P2 = StrPtr(a$): l = l - 1
             If one Then
             Exit For
             Else
-            r$ = r$ & ChrW(P1)
+            r$ = r$ & ChrW(p1)
             rr& = 1 'is an identifier or floating point variable
             End If
         Case 36 ' "$"
@@ -4617,7 +4617,7 @@ P2 = StrPtr(a$): l = l - 1
             If r$ <> "" Then
             one = True
             rr& = 3 ' is string variable
-            r$ = r$ & ChrW(P1)
+            r$ = r$ & ChrW(p1)
             Else
             Exit For
             End If
@@ -4626,7 +4626,7 @@ P2 = StrPtr(a$): l = l - 1
             If r$ <> "" Then
             one = True
             rr& = 4 ' is long variable
-            r$ = r$ & ChrW(P1)
+            r$ = r$ & ChrW(p1)
             Else
             Exit For
             End If
@@ -4634,9 +4634,9 @@ P2 = StrPtr(a$): l = l - 1
         Case 40 ' "("
             If r$ <> "" Then
             If i + 4 <= p4 Then
-                GetMem2 i + 2, P1
+                GetMem2 i + 2, p1
                 GetMem2 i + 2, p3
-                If ChrW(P1) + ChrW(p3) = ")@" Then
+                If ChrW(p1) + ChrW(p3) = ")@" Then
                     r$ = r$ & "()."
                     i = i + 4
                 Else
@@ -4654,8 +4654,8 @@ i1233:
                                        Case Else
                                        Exit For
                                        End Select
-                     GetMem2 i, P1
-                                        r$ = r$ & ChrW(P1)
+                     GetMem2 i, p1
+                                        r$ = r$ & ChrW(p1)
                                         i = i + 2
                                       ' A$ = Mid$(A$, 2)
                                    Exit For
@@ -4674,7 +4674,7 @@ i1233:
               Exit For
               Else
               gr = True
-              r$ = r$ & ChrW(P1)
+              r$ = r$ & ChrW(p1)
               rr& = 1 'is an identifier or floating point variable
               End If
     End If
@@ -4787,27 +4787,22 @@ myfun() = Array("PARAM(", 1, "ΠΑΡΑΜ(", 1, "STACKITEM(", 2, "ΤΙΜΗΣΩΡ�
 , "LOCALE(", 6, "ΤΟΠΙΚΟ(", 6, "FILELEN(", 7, "ΑΡΧΕΙΟΥ.ΜΗΚΟΣ(", 7, "TAB(", 8, "ΣΤΗΛΗ(", 8, "KEYPRESS(", 9, "ΠΑΤΗΜΕΝΟ(", 9, "INKEY(", 10, "ΕΝΚΟΜ(", 10 _
 , "ΤΜΗΜΑ(", 11, "MODULE(", 11, "ΒΑΣΗ(", 12, "MDB(", 12, "ASK(", 13, "ΡΩΤΑ(", 13, "ΣΥΓΚΡΟΥΣΗ(", 14, "COLLIDE(", 14, "ΜΕΓΕΘΟΣ.Υ(", 15, "ΜΕΓΕΘΟΣ.Ψ(", 15, "SIZE.Y(", 15, "ΜΕΓΕΘΟΣ.Χ(", 16, "SIZE.X(", 16 _
 , "WRITABLE(", 17, "ΕΓΓΡΑΨΙΜΟ(", 17, "COLOR(", 18, "COLOUR(", 18, "ΧΡΩΜΑ(", 18, "DIMENSION(", 19, "ΔΙΑΣΤΑΣΗ(", 19, "ARRAY(", 20, "ΠΙΝΑΚΑΣ(", 20 _
-, "FUNCTION(", 21, "ΣΥΝΑΡΤΗΣΗ(", 21, "DRIVE.SERIAL(", 22, "ΣΕΙΡΙΑΚΟΣ.ΔΙΣΚΟΥ(", 22, "FILE.STAMP(", 23, "ΑΡΧΕΙΟΥ.ΣΤΑΜΠΑ(", 23, "EXIST.DIR(", 25, "ΥΠΑΡΧΕΙ.ΚΑΤΑΛΟΓΟΣ(", 25 _
-, "EXIST(", 26, "ΥΠΑΡΧΕΙ(", 26, "JOYPAD(", 27, "ΛΑΒΗ(", 27, "JOYPAD.DIRECTION(", 28, "ΛΑΒΗ.ΚΑΤΕΥΘΥΝΣΗ(", 28, "JOYPAD.ANALOG.X(", 29, "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Χ(", 29 _
-, "JOYPAD.ANALOG.Y(", 30, "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Υ(", 30, "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Ψ(", 30, "IMAGE.X(", 31, "ΕΙΚΟΝΑ.Χ(", 31, "IMAGE.Y(", 32, "ΕΙΚΟΝΑ.Υ(", 32, "ΕΙΚΟΝΑ.Ψ(", 32, "IMAGE.X.PIXELS(", 33, "ΕΙΚΟΝΑ.Χ.ΣΗΜΕΙΑ(", 33 _
-, "IMAGE.Y.PIXELS(", 34, "ΕΙΚΟΝΑ.Υ.ΣΗΜΕΙΑ(", 34, "ΕΙΚΟΝΑ.Ψ.ΣΗΜΕΙΑ(", 34, "VALID(", 35, "ΕΓΚΥΡΟ(", 35, "EVAL(", 36, "ΕΚΦΡ(", 36, "ΕΚΦΡΑΣΗ(", 36, "POINT(", 37, "ΣΗΜΕΙΟ(", 37 _
-, "CTIME(", 38, "ΥΠΩΡΑ(", 38, "CDATE(", 39, "ΥΠΜΕΡ(", 39, "TIME(", 40, "ΧΡΟΝΟΣ(", 40, "DATE(", 41, "ΗΜΕΡΑ(", 41, "VAL(", 42, "ΤΙΜΗ(", 42, "ΑΞΙΑ(", 42, "RINSTR(", 107, "ΘΕΣΗΔΕΞΙΑ(", 43 _
-, "INSTR(", 106, "ΘΕΣΗ(", 44, "RECORDS(", 45, "ΕΓΓΡΑΦΕΣ(", 45, "GROUP.COUNT(", 46, "ΟΜΑΔΑ.ΣΥΝΟΛΟ(", 46, "PARAGRAPH(", 47, "ΠΑΡΑΓΡΑΦΟΣ(", 47, "PARAGRAPH.INDEX(", 48, "ΑΡΙΘΜΟΣ.ΠΑΡΑΓΡΑΦΟΥ(", 48 _
-, "BACKWARD(", 49, "ΠΙΣΩ(", 49, "FORWARD(", 50, "ΜΠΡΟΣΤΑ(", 50, "DOC.PAR(", 51, "ΕΓΓΡΑΦΟΥ.ΠΑΡ(", 51, "MAX.DATA(", 52, "ΜΕΓΑΛΟ.ΣΕΙΡΑΣ(", 52, "MIN.DATA(", 53, "ΜΙΚΡΟ.ΣΕΙΡΑΣ(", 53 _
-, "MAX(", 54, "ΜΕΓΑΛΟ(", 54, "MIN(", 55, "ΜΙΚΡΟ(", 55, "COMPARE(", 56, "ΣΥΓΚΡΙΝΕ(", 56, "DOC.UNIQUE.WORDS(", 57, "ΕΓΓΡΑΦΟΥ.ΜΟΝΑΔΙΚΕΣ.ΛΕΞΕΙΣ(", 57, "DOC.WORDS(", 58, "ΕΓΓΡΑΦΟΥ.ΛΕΞΕΙΣ(", 58 _
-, "DOC.LEN(", 59, "ΕΓΓΡΑΦΟΥ.ΜΗΚΟΣ(", 59, "LEN.DISP(", 60, "ΜΗΚΟΣ.ΕΜΦ(", 60, "LEN(", 61, "ΜΗΚΟΣ(", 61, "SQRT(", 62, "ΡΙΖΑ(", 62, "FREQUENCY(", 63, "ΣΥΧΝΟΤΗΤΑ(", 63 _
+, "FUNCTION(", 21, "ΣΥΝΑΡΤΗΣΗ(", 21, "DRIVE.SERIAL(", 22, "ΣΕΙΡΙΑΚΟΣ.ΔΙΣΚΟΥ(", 22, "FILE.STAMP(", 23, "ΑΡΧΕΙΟΥ.ΣΤΑΜΠΑ(", 23, "EXIST.DIR(", 25, "ΥΠΑΡΧΕΙ.ΚΑΤΑΛΟΓΟΣ(", 25, "EXIST(", 26, "ΥΠΑΡΧΕΙ(", 26, "JOYPAD(", 27, "ΛΑΒΗ(", 27, "JOYPAD.DIRECTION(", 28, "ΛΑΒΗ.ΚΑΤΕΥΘΥΝΣΗ(", 28, "JOYPAD.ANALOG.X(", 29, "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Χ(", 29 _
+, "JOYPAD.ANALOG.Y(", 30, "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Υ(", 30, "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Ψ(", 30, "IMAGE.X(", 31, "ΕΙΚΟΝΑ.Χ(", 31, "IMAGE.Y(", 32, "ΕΙΚΟΝΑ.Υ(", 32, "ΕΙΚΟΝΑ.Ψ(", 32, "IMAGE.X.PIXELS(", 33, "ΕΙΚΟΝΑ.Χ.ΣΗΜΕΙΑ(", 33, "IMAGE.Y.PIXELS(", 34, "ΕΙΚΟΝΑ.Υ.ΣΗΜΕΙΑ(", 34, "ΕΙΚΟΝΑ.Ψ.ΣΗΜΕΙΑ(", 34, "VALID(", 35, "ΕΓΚΥΡΟ(", 35, "EVAL(", 36, "ΕΚΦΡ(", 36, "ΕΚΦΡΑΣΗ(", 36, "POINT(", 37, "ΣΗΜΕΙΟ(", 37 _
+, "CTIME(", 38, "ΥΠΩΡΑ(", 38, "CDATE(", 39, "ΥΠΜΕΡ(", 39, "TIME(", 40, "ΧΡΟΝΟΣ(", 40, "DATE(", 41, "ΗΜΕΡΑ(", 41, "VAL(", 42, "ΤΙΜΗ(", 42, "ΑΞΙΑ(", 42, "RINSTR(", 107, "ΘΕΣΗΔΕΞΙΑ(", 43, "INSTR(", 106, "ΘΕΣΗ(", 44, "RECORDS(", 45, "ΕΓΓΡΑΦΕΣ(", 45, "GROUP.COUNT(", 46, "ΟΜΑΔΑ.ΣΥΝΟΛΟ(", 46, "PARAGRAPH(", 47, "ΠΑΡΑΓΡΑΦΟΣ(", 47, "PARAGRAPH.INDEX(", 48, "ΑΡΙΘΜΟΣ.ΠΑΡΑΓΡΑΦΟΥ(", 48 _
+, "BACKWARD(", 49, "ΠΙΣΩ(", 49, "FORWARD(", 50, "ΜΠΡΟΣΤΑ(", 50, "DOC.PAR(", 51, "ΕΓΓΡΑΦΟΥ.ΠΑΡ(", 51, "MAX.DATA(", 52, "ΜΕΓΑΛΟ.ΣΕΙΡΑΣ(", 52, "MIN.DATA(", 53, "ΜΙΚΡΟ.ΣΕΙΡΑΣ(", 53, "MAX(", 54, "ΜΕΓΑΛΟ(", 54, "MIN(", 55, "ΜΙΚΡΟ(", 55, "COMPARE(", 56, "ΣΥΓΚΡΙΝΕ(", 56, "DOC.UNIQUE.WORDS(", 57, "ΕΓΓΡΑΦΟΥ.ΜΟΝΑΔΙΚΕΣ.ΛΕΞΕΙΣ(", 57, "DOC.WORDS(", 58, "ΕΓΓΡΑΦΟΥ.ΛΕΞΕΙΣ(", 58, "DOC.LEN(", 59, "ΕΓΓΡΑΦΟΥ.ΜΗΚΟΣ(", 59, "LEN.DISP(", 60, "ΜΗΚΟΣ.ΕΜΦ(", 60, "LEN(", 61, "ΜΗΚΟΣ(", 61, "SQRT(", 62, "ΡΙΖΑ(", 62, "FREQUENCY(", 63, "ΣΥΧΝΟΤΗΤΑ(", 63 _
 , "LOG(", 64, "ΛΟΓ(", 64, "LN(", 65, "ΛΦ(", 65, "ATN(", 66, "ΤΟΞ.ΕΦ(", 66, "TAN(", 67, "ΕΦΑΠ(", 67, "COS(", 68, "ΣΥΝ(", 68, "SIN(", 69, "ΗΜ(", 69, "ABS(", 70, "ΑΠΟΛ(", 70, "ΜΕΤΡΟ(", 70, "MAGNITUDE", 70, "LOWORD(", 71, "LOWWORD(", 71, "ΚΑΤΩΜΙΣΟ(", 71, "ΚΑΘΕ(", 72, "EACH(", 73 _
-, "HIWORD(", 74, "HIGHWORD(", 74, "ΠΑΝΩΜΙΣΟ(", 74, "BINARY.NEG(", 75, "ΔΥΑΔΙΚΟ.ΑΝΤΙ(", 75, "ΔΥΑΔΙΚΟ.ΑΝΤΙΣΤΡΟΦΟ(", 75, "BINARY.OR(", 76, "ΔΥΑΔΙΚΟ.Η(", 76 _
-, "BINARY.AND(", 77, "ΔΥΑΔΙΚΟ.ΚΑΙ(", 77, "BINARY.XOR(", 78, "ΔΥΑΔΙΚΟ.ΑΠΟ(", 78, "HILOWWORD(", 79, "ΔΥΟΜΙΣΑ(", 79, "BINARY.SHIFT(", 80, "ΔΥΑΔΙΚΟ.ΟΛΙΣΘΗΣΗ(", 80 _
-, "BINARY.ROTATE(", 81, "ΔΥΑΔΙΚΗ.ΠΕΡΙΣΤΡΟΦΗ(", 81, "SINT(", 82, "ΑΚΕΡΑΙΟ.ΔΥΑΔΙΚΟ(", 82, "USGN(", 83, "ΔΥΑΔΙΚΟ(", 83, "UINT(", 84, "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ(", 84, "ROUND(", 85, "ΣΤΡΟΓΓ(", 85 _
-, "INT(", 86, "ΑΚ(", 86, "SEEK(", 87, "ΜΕΤΑΘΕΣΗ(", 87, "EOF(", 88, "ΤΕΛΟΣ(", 88, "RANDOM(", 89, "ΤΥΧΑΙΟΣ(", 89, "CHRCODE(", 90, "ΧΑΡΚΩΔ(", 90, "ASC(", 91, "ΚΩΔ(", 91 _
+, "HIWORD(", 74, "HIGHWORD(", 74, "ΠΑΝΩΜΙΣΟ(", 74, "BINARY.NEG(", 75, "ΔΥΑΔΙΚΟ.ΑΝΤΙ(", 75, "ΔΥΑΔΙΚΟ.ΑΝΤΙΣΤΡΟΦΟ(", 75, "BINARY.OR(", 76, "ΔΥΑΔΙΚΟ.Η(", 76, "BINARY.AND(", 77, "ΔΥΑΔΙΚΟ.ΚΑΙ(", 77, "BINARY.XOR(", 78, "ΔΥΑΔΙΚΟ.ΑΠΟ(", 78, "HILOWWORD(", 79, "ΔΥΟΜΙΣΑ(", 79, "BINARY.SHIFT(", 80, "ΔΥΑΔΙΚΟ.ΟΛΙΣΘΗΣΗ(", 80 _
+, "BINARY.ROTATE(", 81, "ΔΥΑΔΙΚΗ.ΠΕΡΙΣΤΡΟΦΗ(", 81, "SINT(", 82, "ΑΚΕΡΑΙΟ.ΔΥΑΔΙΚΟ(", 82, "USGN(", 83, "ΔΥΑΔΙΚΟ(", 83, "UINT(", 84, "ΔΥΑΔ(", 84, "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ(", 84, "ROUND(", 85, "ΣΤΡΟΓΓ(", 85, "INT(", 86, "ΑΚ(", 86, "SEEK(", 87, "ΜΕΤΑΘΕΣΗ(", 87, "EOF(", 88, "ΤΕΛΟΣ(", 88, "RANDOM(", 89, "ΤΥΧΑΙΟΣ(", 89, "CHRCODE(", 90, "ΧΑΡΚΩΔ(", 90, "ASC(", 91, "ΚΩΔ(", 91 _
 , "GROUP(", 92, "ΟΜΑΔΑ(", 92, "TEST(", 93, "ΔΟΚΙΜΗ(", 93, "CONS(", 94, "ΕΝΩΣΗ(", 94, "CAR(", 95, "ΠΡΩΤΟ(", 95, "CDR(", 96, "ΕΠΟΜΕΝΑ(", 96, "ΣΩΡΟΣ(", 24, "STACK(", 24, "READY(", 97, "ΕΤΟΙΜΟ(", 97, "PROPERTY(", 98, "ΙΔΙΟΤΗΤΑ(", 98, "IF(", 99, "ΑΝ(", 99, "ORDER(", 100, "ΤΑΞΗ(", 100, "BANK(", 101, "ΤΡΑΠ(", 101, "CEIL(", 102, "ΟΡΟΦ(", 102, "FLOOR(", 86, "ΔΑΠΕΔ(", 86, "ΕΙΚΟΝΑ(", 103 _
 , "IMAGE(", 103, "BUFFER(", 104, "ΔΙΑΡΘΡΩΣΗ(", 104, "BINARY.NOT(", 105, "ΔΥΑΔΙΚΟ.ΟΧΙ(", 105, "POINTER(", 108, "ΔΕΙΚΤΗΣ(", 108, "BINARY.ADD(", 109, "ΔΥΑΔΙΚΟ.ΠΡΟΣΘΕΣΗ(", 109, "ΔΥΑΔΙΚΟ.ΠΡΟ(", 109, "HSL(", 110, "ΧΚΦ(", 110, "PLAYER(", 111, "ΠΑΙΚΤΗΣ(", 111, "GETOBJECT(", 112, "ΑΝΤΙΚΕΙΜΕΝΟ(", 112, "VARPTR(", 113, "ΔΙΕΥΘΜ(", 113, "BIGINTEGER(", 114, "ΜΕΓΑΛΟΣΑΚΕΡΑΙΟΣ(", 114 _
 , "MODPOW(", 115, "ΥΠΟΔΥΝ(", 115, "MOD(", 116, "ΥΠΟΛ(", 116, "CONJUGATE(", 117, "ΣΥΖΥΓΗΣ(", 117, "ARG(", 118, "ΟΡΙΣΜΑ(", 118, "ΦΑΣΗ(", 119, "PHASE(", 119, "POLAR(", 120, "ΠΟΛΙΚΟΣ(", 120, "EXP(", 121, "ΕΚΘ(", 121, "RCOS(", 122, "ΑΣΥΝ(", 122, "RSIN(", 123, "ΑΗΜ(", 123, "RTAN(", 124, "ΑΕΦΑΠ(", 124 _
 , "RATN(", 125, "ΑΤΟΞ.ΕΦ(", 125, "PLAYVALUE(", 126, "ΠΑΙΖΕΙΑΞΙΑ(", 126, "PLAYVOLUME(", 127, "ΠΑΙΖΕΙΕΝΤΑΣΗ(", 127, "PLAYNOTE(", 128, "ΠΑΙΖΕΙΝΟΤΑ(", 128, "PLAYNOW(", 129, "ΠΑΙΖΕΙΤΩΡΑ(", 129, "PLAYDOTS(", 130, "ΠΑΙΖΕΙΤΕΛΕΙΕΣ(", 130, "PLAYGATE(", 131, "ΠΑΙΖΕΙΠΟΡΤΑ(", 131, "PLAYTUPLET(", 132, "ΠΑΙΖΕΙΣΧΗΜΑ(", 132 _
-, "MID(", 133, "ΜΕΣ(", 133, "RIGHT(", 135, "ΔΕΞΙ(", 135, "LEFT(", 134, "ΑΡΙΣ(", 134, "RIGHTPART(", 137, "ΑΡΙΣΤΕΡΟΜΕΡΟΣ(", 137, "LEFTPART(", 136, "ΔΕΞΙΜΕΡΟΣ(", 136 _
-, "STR(", 138, "ΓΡΑΦΗ(", 138, "CHR(", 139, "ΧΑΡ(", 139, "FORMAT(", 140, "ΜΟΡΦΗ(", 140, "TRIM(", 141, "ΑΠΟΚ(", 141, "RTRIM(", 142, "ΑΠΟΚ.ΔΕ(", 142, "LTRIM(", 143, "ΑΠΟΚ.ΑΡ(", 143 _
-, "HEX(", 144, "ΔΕΚΑΕΞ(", 144, "REPLACE(", 145, "ΑΛΛΑΓΗ(", 145, "FILTER(", 146, "ΦΙΛΤΡΟ(", 146, "UCASE(", 147, "ΚΕΦ(", 147, "LCASE(", 148, "ΠΕΖ(", 148, "TYPE(", 149, "ΤΥΠΟΣ(", 149, "TITLE(", 150, "ΤΙΤΛΟΣ(", 150)
+, "MID(", 133, "ΜΕΣ(", 133, "RIGHT(", 135, "ΔΕΞΙ(", 135, "LEFT(", 134, "ΑΡΙΣ(", 134, "RIGHTPART(", 137, "ΑΡΙΣΤΕΡΟΜΕΡΟΣ(", 137, "LEFTPART(", 136, "ΔΕΞΙΜΕΡΟΣ(", 136, "STR(", 138, "ΓΡΑΦΗ(", 138, "CHR(", 139, "ΧΑΡ(", 139, "FORMAT(", 140, "ΜΟΡΦΗ(", 140, "TRIM(", 141, "ΑΠΟΚ(", 141, "RTRIM(", 142, "ΑΠΟΚ.ΔΕ(", 142, "LTRIM(", 143, "ΑΠΟΚ.ΑΡ(", 143 _
+, "HEX(", 144, "ΔΕΚΑΕΞ(", 144, "REPLACE(", 145, "ΑΛΛΑΓΗ(", 145, "FILTER(", 146, "ΦΙΛΤΡΟ(", 146, "UCASE(", 147, "ΚΕΦ(", 147, "LCASE(", 148, "ΠΕΖ(", 148, "TYPE(", 149, "ΤΥΠΟΣ(", 149, "TITLE(", 150, "ΤΙΤΛΟΣ(", 150, "BIT64.XOR(", 151, "ΔΥΑΔ64.ΑΠΟ(", 151, "BIT64.AND(", 152, "ΔΥΑΔ64.ΚΑΙ(", 152, "BIT64.OR(", 153, "ΔΥΑΔ64.Η(", 153 _
+, "BIT64.ADD(", 154, "ΔΥΑΔ64.ΠΡΟ(", 154, "ΔΥΑΔ64.ΠΡΟΣΘΕΣΗ(", 154, "BIT64.SHIFT(", 155, "ΔΥΑΔ64.ΟΛΙΣΘΗΣΗ(", 155, "BIT64.ROTATE(", 156, "ΔΥΑΔ64.ΠΕΡΙΣΤΡΟΦΗ(", 156, "BIT64.NOT(", 157, "ΔΥΑΔ64.ΟΧΙ(", 157, "BIT64.NEG(", 158, "ΔΥΑΔ64.ΑΝΤΙ(", 158, "ΔΥΑΔ64.ΑΝΤΙΣΤΡΟΦΟ(", 158 _
+, "HILOWLONG(", 159, "ΔΥΟΜΙΣΑ64(", 159, "HILONG(", 160, "ΠΑΝΩΜΙΣΟ64(", 160, "HIGHLONG(", 160, "LOLONG(", 161, "LOWLONG(", 161, "ΚΑΤΩΜΙΣΟ64(", 161, "BINARY.TEST(", 162, "ΔΥΑΔΙΚΟ.ΕΧΕΙ(", 162, "BINARY.SET(", 163, "ΔΥΑΔΙΚΟ.ΒΑΛΕ(", 163, "BINARY.RESET(", 164, "ΔΥΑΔΙΚΟ.ΒΓΑΛΕ(", 164, "BIT64.TEST(", 165, "ΔΥΑΔ64.ΕΧΕΙ(", 165, "BIT64.SET(", 166, "ΔΥΑΔ64.ΒΑΛΕ(", 166, "BIT64.RESET(", 167, "ΔΥΑΔ64.ΒΓΑΛΕ(", 167 _
+, "BINARY.SUB(", 168, "ΔΥΑΔΙΚΟ.ΑΦΑΙΡΕΣΗ(", 168, "ΔΥΑΔΙΚΟ.ΑΦ(", 168, "ΔΥΑΔ64.ΑΦ(", 169, "ΔΥΑΔ64.ΑΦΑΙΡΕΣΗ(", 169, "BIT64.SUB(", 169, "ΔΥΑΔ64(", 170, "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ64(", 170, "UINT64(", 170)
 
 
 

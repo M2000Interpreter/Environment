@@ -450,8 +450,7 @@ uintnew = a
 End If
 End Function
 Function add32(ByVal a As Currency, ByVal b As Currency) As Currency
-add32 = uintnew1(LowLong(cInt64(CDec(a) + CDec(b))))
-
+add32 = uintnew1(lowlong(cInt64(CDec(a) + CDec(b))))
 End Function
 
 Function HexToUnsigned(s$) As Currency
