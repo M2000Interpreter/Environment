@@ -91,6 +91,7 @@ mstack.Add a, , 1
 End If
 End Sub
 Public Sub PushLong(a As Long)
+'Debug.Print "PUSH " & a
 If mstack.Count = 0 Then
 mstack.Add CVar(a)
 Else

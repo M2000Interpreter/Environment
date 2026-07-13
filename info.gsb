@@ -53363,4 +53363,217 @@ Module AmbFunction {
 }
 AmbFunction
 }
+MODULE CALLEXTERNAL {Module CheckCCall {
+      mybuf$=string$(chr$(0), 1000)
+      a$="Hello There 12345"+Chr$(0)
+      Print Len(a$)
+      Buffer Clear Mem as Byte*Len(a$)
+      \\ copy to Mem the converted a$ (from Utf-16Le to ANSI)
+      \\ Return Mem, 0:=str$(a$)
+     Mem[0]=str$(a$)
+      Declare  MyStrDup Lib C "msvcrt._strdup" { Long Ptr} 
+      Declare  MyFree Lib C "msvcrt.free" { Long Ptr}
+      \\ see & means by reference
+      \\ ... means any number of arguments 
+      Declare  MyPrintStr Lib C "msvcrt.swprintf" { &sBuf$,  sFmt$, long Z } 
+ 
+      \\ Now we use address Mem(0) as pointer (passing by value)
+      Long Z=MyStrDup(Mem(0))
+      a=MyPrintStr(&myBuf$, "%s", Z)
+      Print MyFree(Z), a
+      Print LeftPart$(chr$(mybuf$), chr$(0))
+}
+CheckCCall
+}
+MODULE VBSCRIPT {Module Checkit {
+	Global a()
+	mm=10
+	Module CallFromVb {
+	\\ Number get first parameter is numeric Else error
+		Print "CallFromVb",
+		While Not Empty
+			If Islet Then
+				Print letter$,
+			Else
+				Print Number,
+			End If
+		End While
+		Print
+	}
+	Module Global CallFromVbGlobal {
+		Read X()
+		X(0)++
+		a()=X()
+		Print "ok"
+	}
+	Declare Global vs  "MSScriptControl.ScriptControl"
+	Declare Alfa Module
+	Print Type$(Alfa)  \\ name is CallBack2
+	With vs, "Language","Vbscript", "AllowUI", true, "SitehWnd",  hwnd
+	Method vs, "Reset"
+	Method vs, "AddObject", "__global__",  Alfa, true
+	prototype {
+		' This is VBScript code
+		dim M(9), k   ' 0 to 9, so 10 items
+		Sub main()
+		CallModule "CallFromVb", 1000
+		M(0)=1000
+		for k=1 to 9:M(k)=10:next
+		ExecuteStatement "Print {George}"
+		
+		CallGlobal "CallFromVbGlobal", M
+		ExecuteStatement "Print a(0)"
+		k=me.Eval("a(0)")
+		CallModule "CallFromVb", "a(0)", k
+		' use Let to assign a number to variable
+		ExecuteStatement "let mm=12345"
+		k=me.Eval("mm")
+		CallModule "CallFromVb", k
+		CallModule "CallFromVb", M(0)
+		End Sub
+	} as VBcode
+	Method vs, "AddCode", VBcode 
+	Method vs, "run", "main"
+	Declare vs nothing
+	If error Then print error$
+	Print Len(a())
+	Print a()
+}
+CheckIt
+}
+MODULE PYTHON {Module CheckPython{
+      // here without use WithEvents
+      Def hidetext as long
+      Declare SP SHELLPIPE
+      with SP, "Active" as IsActive, "Hasline" as Sp.HasLine
+      text code.py {#!/usr/bin/env python3
+      import ctypes
+      MessageBox = ctypes.windll.user32.MessageBoxW
+      MessageBox(None, 'Hello', 'Window title', 0)
+      print("Done from python")
+      }
+      Method SP, "Run","python3 "+quote$(temporary$+"code.py") as ok
+      profiler
+      if ok==0 else 500
+      while isActive
+      Method Sp, "ProcessLoop"
+      if sp.Hasline then
+            method Sp, "GetLine" as aLine$
+            print
+            print #-2, aLine$
+            hidetext=true
+            refresh
+      end if
+      wait 0
+      if hidetext else Print Over "wait..."; timecount
+      end while
+      print
+      print "done"
+      print exist( temporary$+"code.py")=true
+500      text code.py ' delete temporary$+"code.py"
+      print exist( temporary$+"code.py")=false
+}
+CheckPython
+}
+MODULE PYTHON1 {module variation2 {
+      Declare SP SHELLPIPE
+      with SP, "Active" as IsActive, "Hasline" as Sp.HasLine
+      text code.py {#!/usr/bin/env python3
+                                    import random
+                                     
+                                    def rand9999():
+                                        return random.randint(1000, 9999)
+                                     
+                                    def tag(attr='', **kwargs):
+                                        for tag, txt in kwargs.items():
+                                            return '<{tag}{attr}>{txt}</{tag}>'.format(**locals())
+                                     
+                                    if __name__ == '__main__':
+                                        header = tag(tr=''.join(tag(th=txt) for txt in ',X,Y,Z'.split(','))) + '\n'
+                                        rows = '\n'.join(tag(tr=tag(' style="font-weight: bold;"', td=i)
+                                                                        + ''.join(tag(td=rand9999())
+                                                                                  for j in range(3)))
+                                                         for i in range(1, 6))
+                                        table = tag(table='\n' + header + rows + '\n')
+                                        print(table)
+                                    }
+            Method SP, "Run","python "+quote$(temporary$+"code.py") as ok
+            if ok==0 else 500
+            while isActive
+            Method Sp, "ProcessLoop"
+            while sp.Hasline
+                  method Sp, "GetLine" as aLine$
+                  print #-2, aLine$
+                  refresh
+            end while
+            wait 0
+            end while
+            print
+            print "done"
+500     text code.py ' delete temporary$+"code.py"
+}
+variation2
+}
+MODULE PYTHON2 {module variation3 {
+	Declare SP SHELLPIPE
+	Print $(4), ' switch to proportional length text rendering
+	with SP, "Active" as IsActive, "Hasline" as Sp.HasLine
+	text UTF-8 code.py {#!/usr/bin/env python3
+      import logging
+      import threading
+      from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+      class HelloHTTPRequestHandler(BaseHTTPRequestHandler):
+        message = 'Hello World! 今日は'
+        def do_GET(self):
+          self.send_response(200)
+          self.send_header('Content-type', 'text/html; charset=UTF-8')
+          self.end_headers()
+          self.wfile.write(self.message.encode('utf-8'))
+          self.close_connection = True
+          logging.info("New do_GET()")
+      def serve(addr, port):
+        logging.info("Thread %s: starting", "Hello")
+        with ThreadingHTTPServer((addr, port), HelloHTTPRequestHandler) as server:
+          server.serve_forever(poll_interval=None)            
+      if __name__ == '__main__':
+        format = "%(asctime)s: %(message)s"
+        logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
+        addr, port = ('localhost', 80)
+       
+        threading.Thread(target=serve, args=(addr, port), daemon=True).start()
+       
+        try:
+          while True:
+            # handle Ctrl+C
+            input()
+       
+        except KeyboardInterrupt:
+          pass
+      }
+        Method SP, "Run","python "+quote$(temporary$+"code.py") as ok
+        after 400 {
+            win file.app$("html"), "http:\\127.0.0.1"
+        }
+	if ok==0 else 500
+	escape off
+	while isActive
+		Method SP, "ProcessLoop"
+		if keypress(27) then ? "Esc": Refresh:  exit
+		if keypress(67) and keypress(0x11) then Print "^space": exit
+		while sp.Hasline
+			method SP, "GetLine" as aLine$
+			print aLine$
+			refresh
+		end while
+		wait 0
+	end while
+	print
+	print "done"
+	Declare SP nothing
+500 	text code.py ' delete temporary$+"code.py"
+	Print $(0), ' normal text rendering (monospaced)
+	escape on
+}
+variation3
+}
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

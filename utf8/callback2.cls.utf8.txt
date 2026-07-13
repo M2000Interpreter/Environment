@@ -50,23 +50,26 @@ Public Sub MethodType(ByVal mName$, mType$)
 mName$ = myUcase(mName$)
 reghash.AddKey mName$, mType$
 End Sub
-Public Sub CallGlobal(modulename$, ParamArray a())
+Public Sub CallGlobal(modulename$, ParamArray a1())
 If status <> 0 Then Exit Sub
 Dim ohere$
 ohere$ = here$
-Dim I As Long, ms As New mStiva, Ar As mArray, j As Long
+Dim i As Long, ms As New mStiva, ar As mArray, j As Long
 Dim manydim As Long, maxitems As Long, probe As Long, v() As Variant, probelow As Long
+Dim a()
+CloneParamArray a1(0), UBound(a1) - LBound(a1) + 1, a()
 Dim oldsoros As mStiva
 Set oldsoros = objref.soros
 Set objref.Sorosref = ms
-For I = 0 To UBound(a())
-Select Case VarType(a(I))
+For i = 0 To UBound(a())
+Select Case VarType(a(i))
 Case Is >= vbArray
 ' only with error control
-If Typename(a(I)) = "Variant()" Then
-Set Ar = New mArray
-v() = a(I)
+If Typename(a(i)) = "Variant()" Then
+Set ar = New mArray
+v() = a(i)
 On Error Resume Next
+Debug.Print v(0)
 For j = 1 To 60
     probe = UBound(v, j)
     If Err Then Exit For
@@ -75,17 +78,16 @@ manydim = j - 1
 On Error Resume Next
 Dim items As Long
 For j = 1 To manydim
-    
     probe = UBound(v, j)
     If Err Then Exit For
     probelow = LBound(v, j)
-    Ar.PushDim probe - probelow + 1
+    ar.PushDim probe - probelow + 1
 Next j
-Ar.PushEnd
+ar.PushEnd
 'ar.RevOrder = True
-Ar.CopySerialize v()
-ms.DataObj Ar
-Set Ar = Nothing
+ar.JustACopy v()
+ms.DataObj ar
+Set ar = Nothing
 Erase v()
 Else
 ms.DataValLong 0
@@ -93,11 +95,11 @@ End If
 Case vbEmpty
 ms.DataValLong 0
 Case vbVariant, vbString
-ms.DataStr CStr(a(I))
+ms.DataStr CStr(a(i))
 Case Else
-ms.DataVal CDbl(a(I))
+ms.DataVal CDbl(a(i))
 End Select
-Next I
+Next i
 PushStage objref, 0
 Set ms = Nothing
 here$ = vbNullString
@@ -133,6 +135,7 @@ Set objref.Sorosref = oldsoros
 Set oldsoros = Nothing
 here$ = ohere$
 End Sub
+
 Private Function GetSubFullName2(nm$, fullname$, retnum As Long) As Boolean
 Dim dummy As Long
 If Len(here$) > 0 Then
@@ -189,7 +192,7 @@ ohere$ = here$
 here$ = full$
 
 
-Dim I As Long, ms As New mStiva, Ar As mArray, j As Long
+Dim i As Long, ms As New mStiva, ar As mArray, j As Long
 Dim manydim As Long, maxitems As Long, probe As Long, v() As Variant, probelow As Long
 Dim IhaveSignature As Boolean, sign$, sign2$, dummy$, look As Long
 If reghash.Find(myUcase(modulename$, True)) Then
@@ -203,14 +206,14 @@ Set oldsoros = objref.soros
 Set objref.Sorosref = ms
 
 
-For I = 0 To UBound(a())
+For i = 0 To UBound(a())
 
-Select Case VarType(a(I))
+Select Case VarType(a(i))
 Case Is >= vbArray
 ' only with error control
-If Typename(a(I)) = "Variant()" Then
-Set Ar = New mArray
-v() = a(I)
+If Typename(a(i)) = "Variant()" Then
+Set ar = New mArray
+v() = a(i)
 On Error Resume Next
 For j = 1 To 60
     probe = UBound(v, j)
@@ -223,12 +226,12 @@ For j = manydim To 1 Step -1
     probe = UBound(v, j)
     If Err Then Exit For
     probelow = LBound(v, j)
-    Ar.PushDim probe - probelow + 1
+    ar.PushDim probe - probelow + 1
 Next j
-Ar.PushEnd
-Ar.RevOrder = True
+ar.PushEnd
+ar.RevOrder = True
 
-Ar.CopySerialize v()
+ar.JustACopy v()
 ''
 If IhaveSignature Then
 look = IsLabelOnly(sign$, dummy$)
@@ -237,15 +240,15 @@ look = IsLabelOnly(sign$, dummy$)
 look = globalvarGroup("b" & (var2used) & "." & dummy$, True) ' perhaps this is a fault, why is true??
 ElseIf look > 4 Then
 FastSymbol sign, ")", True
-ms.DataObj Ar
+ms.DataObj ar
 Else
 SyntaxError
 GoTo there
 End If
 Else
-ms.DataObj Ar
+ms.DataObj ar
 End If
-Set Ar = Nothing
+Set ar = Nothing
 Erase v()
 Else
 ms.DataValLong 0
@@ -255,13 +258,13 @@ End If
 Case vbEmpty
 ms.DataValLong 0
 Case vbVariant, vbString
-ms.DataStr CStr(a(I))
+ms.DataStr CStr(a(i))
 Case Else
 
-ms.DataVal CDbl(a(I))
+ms.DataVal CDbl(a(i))
 
 End Select
-Next I
+Next i
 PushStage objref, 0
 objref.soros.MergeTop ms
 
@@ -472,18 +475,18 @@ End Sub
 Public Function SpellUnicode(a$)
 ' use spellunicode to get numbers
 ' and make a ListenUnicode...with numbers for input text
-Dim b$, I As Long
-For I = 1 To Len(a$) - 1
-b$ = b$ & CStr(AscW(Mid$(a$, I, 1))) & ","
-Next I
+Dim b$, i As Long
+For i = 1 To Len(a$) - 1
+b$ = b$ & CStr(AscW(Mid$(a$, i, 1))) & ","
+Next i
 SpellUnicode = b$ & CStr(AscW(Right$(a$, 1)))
 SpellUnicode = b$ & CStr(AscW(Right$(a$, 1)))
 End Function
 Public Function ListenUnicode(ParamArray aa() As Variant) As String
-Dim all$, I As Long
-For I = 0 To UBound(aa)
-    all$ = all$ & ChrW(aa(I))
-Next I
+Dim all$, i As Long
+For i = 0 To UBound(aa)
+    all$ = all$ & ChrW(aa(i))
+Next i
 ListenUnicode = all$
 End Function
 Private Sub Class_Terminate()

@@ -4465,7 +4465,7 @@ Function blockCheck(ByVal s$, ByVal Lang As Long, countlines As Long, Optional B
 If s$ = vbNullString Then blockCheck = True: Exit Function
 Dim i As Long, j As Long, c As Long, b$, resp&
 Dim openpar As Long, oldi As Long, lastlabel$, oldjump As Boolean, st As Long, stc As Long
-Dim paren As New mStiva2
+Dim paren As New mStiva2, skip13 As Boolean
 countlines = 1
 Column = 0
 Lang = Not Lang
@@ -4480,16 +4480,28 @@ Do
     Select Case AscW(Mid$(s$, i, 1))
     Case 45
         If Mid$(s$, i, 2) = "->" Then
+            If Not arrow And openpar Then
+            Else
+            If skip13 Then
+            skip13 = False
+              End If
+ 
             arrow = openpar <> 0
-        End If
+            End If
+                   End If
         jump = False
         lastlabel$ = ""
     Case 10
         Column = 0
     Case 13
+        If PicHandler.IsLambda(lastlabel$) Then
+            skip13 = True
+        End If
         lastlabel$ = ""
+        If Not skip13 Then
         If openpar <> 0 Then
             GoTo pareprob
+        End If
         End If
         oldjump = False
         jump = False
@@ -4501,6 +4513,9 @@ Do
         jump = False
     Case 32, 160, 9
         If Len(lastlabel$) > 0 Then
+            If PicHandler.IsLambda(lastlabel$) Then
+                skip13 = True
+            End If
             lastlabel$ = myUcase(lastlabel$)
             If Not ismine1(lastlabel$) Then
                 If Not ismine2(lastlabel$) Then
@@ -4697,9 +4712,11 @@ pareprob:
     End Select
     i = i + 1
 Loop Until i > c
+'If Not skip13 Then
 If openpar <> 0 Then
 GoTo pareprob
 End If
+'End If
 If j = 0 Then
 
 ElseIf j < 0 Then
@@ -9215,7 +9232,13 @@ resp = MyRead(2, ObjFromPtr(basestackLP), rest$, Lang)
 End Sub
 
 Sub NeoReadBasic(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
-resp = MyReadBasic(ObjFromPtr(basestackLP), rest$)
+Dim bst As basetask
+Set bst = ObjFromPtr(basestackLP)
+If bst.BasicSwitch Then
+    resp = MyReadBasic(bst, rest$)
+Else
+    resp = MyRead(1, bst, rest$, Lang)
+End If
 End Sub
 Sub NeoReport(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = MyReport(ObjFromPtr(basestackLP), rest$, Lang)
@@ -9623,7 +9646,13 @@ Sub NeoData(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = MyData(ObjFromPtr(basestackLP), rest$)
 End Sub
 Sub NeoDataBASIC(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
-resp = MyBasicData(ObjFromPtr(basestackLP), rest$)
+Dim bst As basetask
+Set bst = ObjFromPtr(basestackLP)
+If bst.BasicSwitch Then
+    resp = MyBasicData(bst, rest$)
+Else
+    resp = MyData(bst, rest$)
+End If
 End Sub
 Sub NeoClear(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = MyClear(ObjFromPtr(basestackLP), rest$)

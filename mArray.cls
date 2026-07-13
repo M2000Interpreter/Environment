@@ -899,9 +899,15 @@ End If
 End If
 '
 End Sub
+Friend Sub JustACopy(mmm As Variant)
+    actualData = mmm
+End Sub
+
 Friend Sub CopySerialize(mmm As Variant)
 ' may we get an exception here
+    
 If VarType(actualData) = vbArray + vbVariant Then
+If VarType(mmm) = vbArray + vbVariant Then
 Dim m_base As Long, first12 As Long
 Dim m_base_0 As Long, first12_0 As Long, r1 As Long, R2 As Long
 GetMem4 UnsignedAdd(VarPtr(actualData), 8), m_base_0
@@ -917,10 +923,12 @@ R2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 'GetMem4 m_base_0 + 12, first1_0
 PutMem4 m_base + 12, first12_0
 PutMem4 m_base_0 + 12, first12
+Debug.Print "bingo"
 R2 = SafeArrayUnaccessData(ByVal m_base_0)
 r1 = SafeArrayUnaccessData(ByVal m_base)
 R2 = SafeArrayUnlock(m_base_0)
 r1 = SafeArrayUnlock(m_base)
+End If
 End If
 End If
 End Sub

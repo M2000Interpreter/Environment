@@ -352,16 +352,21 @@ Dim ss$, skip As Boolean, checktype As Boolean
                 p = nMath2.cxZero
             End If
     ElseIf IsLabelSymbolNew(b$, "ΜΕΓΑΛΟΣΑΚΕΡΑΙΟΣ", "BIGINTEGER", Lang) Then
-        Set p = New BigInteger
+        
         If FastSymbol(b$, "=") Then
             If ISSTRINGA(b$, ss$) Then
                 Set p = Module13.CreateBigInteger(ss$)
-            ElseIf Not IsNumberD2(b$, p, True, True) Then
-                missNumber
-                Exit Function
             Else
-                p = Module13.CreateBi(p)
+                Set p = New BigInteger
+                If Not IsNumberD2(b$, p, True, True) Then
+                    missNumber
+                    Exit Function
+                Else
+                    Set p = Module13.CreateBi(p)
+                End If
             End If
+        Else
+            Set p = New BigInteger
         End If
     ElseIf Not IsEnumAs(bstack, b$, p) Then
         ExpectedEnumType
