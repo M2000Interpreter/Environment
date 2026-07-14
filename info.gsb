@@ -52930,7 +52930,7 @@ while item
 end while
 biginteger b=123123123121213123123123u
 c=>add  b, "big1"
-? c("big1")=>tostring(),
+? c("big1")=>tostring
 ? c("big1")^  ' object
 k=c("big1")^
 ? k
