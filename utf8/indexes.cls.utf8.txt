@@ -26,9 +26,22 @@ End Sub
 Property Get Value(n As Long) As Variant
 Attribute Value.VB_UserMemId = 0
     If n >= 0 And n < UBound(ar) Then
-        Value = ar(n)
+        If MyIsObject(ar(n)) Then
+            Set Value = ar(n)
+        Else
+            Value = ar(n)
+        End If
     End If
 End Property
+Property Set Value(n As Long, RHS As Variant)
+    If n >= 0 And n < UBound(ar) Then
+        Set ar(n) = RHS
+    ElseIf n >= UBound(ar) Then
+        ReDim Preserve ar(n + 1)
+        Set ar(n) = RHS
+    End If
+End Property
+
 Property Let Value(n As Long, RHS As Variant)
     If n >= 0 And n < UBound(ar) Then
         ar(n) = RHS

@@ -1,34 +1,37 @@
 M2000 Interpreter and Environment
-Version 15 Revision 3
+Version 15 Revision 4
 
-1) Remove a fault from a literal value for biginteger (broken from last 2-3 revisions):
-	local a as biginteger=10
-2) Fix BASIC switch to work nice when we call a module from a module which is BASIC enabled. So the READ inside inner is the norma read as designed to be.
-module alfa {
-	BASIC
-	module inner {
-		read x
-		if x>0 then print x, else print
-	}
-	do
-		read a
-		inner a
-	until a=0	
-	data 1,2,3,4,5,0
+1) Objects for arguments when we use object1=>function(object2)
+ 
+BIGINTEGER A=100U
+' A is object of type BigInteger
+' Function ADD() return BigInteger
+' But need BigInteger as parameter
+' I fix the simple format =>functionOrProperty()
+' to get Objects as parameters (I forgot to do that)
+PRINT A=>ADD(1u)^=A+1
+' This is the old way which always works nice
+' and can be used to pass named parameters and by reference too.
+Method A,"Add", 12u as B
+Print B=112u
+
+2) Fix a bug which is rare to occur. 
+First the Inner module need to get the pointer and produce a copy as a named Group, when the Group is type ONE.(We use: a as *One to get the pointer to a, but we have to use a=>X to read the value).
+
+The problem was at the second call to Inner when the first one use a pointer of type weak reference (not a real pointer, means the object life not depend from the weak reference), and the second one use the real pointer - from a copy - (like in this example). M2000 not offer the real pointer from a group which are "Static" like alfa (so always the static objects are deleted at the exit of the code, module's or function's where they defined) 
+
+GROUP alfa {
+	Type: One	
+	Χ=10
 }
-alfa
-
-3) Upgrade the colorized code procedure:
-3.1 Now we get the right color for this: 
-	Print IF(1>0->{alfa_String},{beta_string})
-	Explain: (the {alfa_String} get colour for string, before upgrade the -> works for lambda so the colorize code procedure interpreted this as code which is not)
-
-3.2 Handle of parenthesis for more than one paragraph. Before upgrade there was a check for balanced parenthesis which works only for line boundaries. Now the check extended if the reason for extension is a lambda function as a parameter spliting in more than one line, or the string literal which use curly brackets (which used for strings with paragraphs - spliting with CRLF) or both as a combination. Also the handling retain the color of the parenthesis. There are three different colors, one for known functions like LEN(), one for user functions and the bare parenthesis. So now the colors for the close parenthesis adjust to the color of the open parenthesis, for more than one paragraph.
-This uprgrade done for the TextViewer (the class which is the editor of M2000 code) and the EditBox (which have two editors inside, one for M2000 code and a universal one - see CS and HtmlEditor module in info for editing c# code and html code).
-
-4) Fix an error which prevent the reading of an array passed by VBScript back to M2000 in an example VbScript (now included at INFO file see below). Also I put three modules to show how we can use python from M2000.
-
-
+Module Inner (a as One){		
+	List
+	Print a.Χ
+}
+' Pointer(alfa) is a weak reference to alfa 
+Inner Pointer(alfa)
+' Pointer((alfa)) is a real pointer to a copy of alfa
+Inner Pointer((alfa))
 
 
   

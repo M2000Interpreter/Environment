@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 3
+Global Const Revision = 4
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -21961,7 +21961,7 @@ Case "OVERWRITE", "ΚΑΤΑΧΩΡΗΣΗ"
 Identifier = RepPara(basestack, rest$)
 Exit Function
 Case "INSERT", "ΠΑΡΕΜΒΟΛΗ"
-Identifier = IdPara(basestack, rest$, Lang)
+Identifier = idPara(basestack, rest$, Lang)
 Exit Function
 Case "DOCUMENT", "ΕΓΓΡΑΦΟ"
 Identifier = MyDocument(basestack, rest$, Lang)
@@ -50670,10 +50670,20 @@ Dim s$, p, idx As New mIndexes, dn As Long, aProp As PropReference
 Set aProp = obj1
 Do
         If IsExp(bstack, a$, p) Then
-                idx(dn) = p
+                If bstack.lastobj Is Nothing Then
+                    idx(dn) = p
+                Else
+                    Set idx(dn) = bstack.lastobj
+                    Set bstack.lastobj = Nothing
+                End If
                 aProp.index = p
             ElseIf IsStrExp(bstack, a$, s$) Then
+                If bstack.lastobj Is Nothing Then
                 idx(dn) = s$
+                Else
+                    Set idx(dn) = bstack.lastobj
+                    Set bstack.lastobj = Nothing
+                End If
                 aProp.index = s$
             ElseIf FastSymbol(a$, "?") Then
                 idx.IndexOpt dn

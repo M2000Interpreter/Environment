@@ -7501,10 +7501,10 @@ existAs03:
                                     Else
                                         If Len(myobject.lasthere) = 0 Then
                                             If GetVar(bstack, myobject.GroupName, it, True) Then
-                                                If Not var(i).TypeGroup(s$) Then GoTo errgr
+                                                If Not var(it).TypeGroup(s$) Then GoTo errgr
                                             End If
                                         ElseIf GetVar(bstack, myobject.lasthere + "." + myobject.GroupName, it, True) Then
-                                            If Not var(i).TypeGroup(s$) Then GoTo errgr
+                                            If Not var(it).TypeGroup(s$) Then GoTo errgr
                                         End If
                                     End If
                                 End If
@@ -7822,16 +7822,16 @@ errgr:
                                         If Not myobject.link.TypeGroup(s$) Then GoTo errgr
                                         GoTo oop0
                                     ElseIf Len(myobject.lasthere) = 0 Then
-                                        If GetVar(bstack, myobject.GroupName, i, True) Then
-                                            If Not var(i).TypeGroup(s$) Then GoTo errgr
-                                                CopyGroup2 var(i), bstack
+                                        If GetVar(bstack, myobject.GroupName, y1, True) Then
+                                            If Not var(y1).TypeGroup(s$) Then GoTo errgr
+                                                CopyGroup2 var(y1), bstack
                                                 GoTo oop1
                                             Else
                                                 GoTo errgr
                                             End If
-                                        ElseIf GetVar(bstack, myobject.lasthere + "." + myobject.GroupName, i, True) Then
-                                            If Not var(i).TypeGroup(s$) Then GoTo errgr
-                                            CopyGroup2 var(i), bstack
+                                        ElseIf GetVar(bstack, myobject.lasthere + "." + myobject.GroupName, y1, True) Then
+                                            If Not var(y1).TypeGroup(s$) Then GoTo errgr
+                                            CopyGroup2 var(y1), bstack
                                             GoTo oop1
                                         Else
                                             GoTo errgr
@@ -10246,10 +10246,10 @@ existAs03:
                                         Else
                                             If Len(myobject.lasthere) = 0 Then
                                                 If GetVar(bstack, myobject.GroupName, it, True) Then
-                                                    If Not var(i).TypeGroup(s$) Then GoTo errgr
+                                                    If Not var(it).TypeGroup(s$) Then GoTo errgr
                                                 End If
                                             ElseIf GetVar(bstack, myobject.lasthere + "." + myobject.GroupName, it, True) Then
-                                                If Not var(i).TypeGroup(s$) Then GoTo errgr
+                                                If Not var(it).TypeGroup(s$) Then GoTo errgr
                                             End If
                                         End If
                                     End If
@@ -10562,16 +10562,16 @@ errgr:
                                     If Not myobject.link.TypeGroup(s$) Then GoTo errgr
                                     GoTo oop0
                                 ElseIf Len(myobject.lasthere) = 0 Then
-                                    If GetVar(bstack, myobject.GroupName, i, True) Then
-                                        If Not var(i).TypeGroup(s$) Then GoTo errgr
-                                            CopyGroup2 var(i), bstack
+                                    If GetVar(bstack, myobject.GroupName, y1, True) Then
+                                        If Not var(y1).TypeGroup(s$) Then GoTo errgr
+                                            CopyGroup2 var(y1), bstack
                                             GoTo oop1
                                         Else
                                             GoTo errgr
                                         End If
-                                    ElseIf GetVar(bstack, myobject.lasthere + "." + myobject.GroupName, i, True) Then
-                                        If Not var(i).TypeGroup(s$) Then GoTo errgr
-                                        CopyGroup2 var(i), bstack
+                                    ElseIf GetVar(bstack, myobject.lasthere + "." + myobject.GroupName, y1, True) Then
+                                        If Not var(y1).TypeGroup(s$) Then GoTo errgr
+                                        CopyGroup2 var(y1), bstack
                                         GoTo oop1
                                     Else
                                         GoTo errgr
@@ -13966,10 +13966,10 @@ existAs03:
                                         Else
                                             If Len(myobject.lasthere) = 0 Then
                                                 If GetVar(bstack, myobject.GroupName, it, True) Then
-                                                    If Not var(i).TypeGroup(s$) Then GoTo errgr
+                                                    If Not var(it).TypeGroup(s$) Then GoTo errgr
                                                 End If
                                             ElseIf GetVar(bstack, myobject.lasthere + "." + myobject.GroupName, it, True) Then
-                                                If Not var(i).TypeGroup(s$) Then GoTo errgr
+                                                If Not var(it).TypeGroup(s$) Then GoTo errgr
                                             End If
                                         End If
                                     End If
@@ -14283,16 +14283,16 @@ errgr:
                                     If Not myobject.link.TypeGroup(s$) Then GoTo errgr
                                     GoTo oop0
                                 ElseIf Len(myobject.lasthere) = 0 Then
-                                    If GetVar(bstack, myobject.GroupName, i, True) Then
-                                        If Not var(i).TypeGroup(s$) Then GoTo errgr
-                                            CopyGroup2 var(i), bstack
+                                    If GetVar(bstack, myobject.GroupName, y1, True) Then
+                                        If Not var(y1).TypeGroup(s$) Then GoTo errgr
+                                            CopyGroup2 var(y1), bstack
                                             GoTo oop1
                                         Else
                                             GoTo errgr
                                         End If
-                                    ElseIf GetVar(bstack, myobject.lasthere + "." + myobject.GroupName, i, True) Then
-                                        If Not var(i).TypeGroup(s$) Then GoTo errgr
-                                        CopyGroup2 var(i), bstack
+                                    ElseIf GetVar(bstack, myobject.lasthere + "." + myobject.GroupName, y1, True) Then
+                                        If Not var(y1).TypeGroup(s$) Then GoTo errgr
+                                        CopyGroup2 var(y1), bstack
                                         GoTo oop1
                                     Else
                                         GoTo errgr
