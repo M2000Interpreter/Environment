@@ -14584,9 +14584,11 @@ cont1122331122:
                                 Else
                                     GoTo er112
                                 End If
-                                If DropValue(rest$, 0) = 0 Then
-                                    MyRead = False
-                                    Exit Function
+                                If DropValue(rest$, 4) = 0 Then
+                                    If DropValue(rest$, 0) = 0 Then
+                                        MyRead = False
+                                        Exit Function
+                                    End If
                                 End If
                             End If
                         ElseIf usehandler1.t1 = 4 Then
