@@ -167,6 +167,11 @@ Public Sub SetUpForExecution(ByVal Ptr As Long, ByVal nBytes As Long, ByRef OldV
     VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READ, OldV ' PAGE_READWRITE
     VirtualLock Ptr, nBytes
 End Sub
+Public Sub SetUpForExecution2(ByVal Ptr As Long, ByVal nBytes As Long, ByRef OldV As Long)
+    FlushInstructionCache GetCurrentProcess, Ptr, nBytes
+    VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READWRITE, OldV ' PAGE_READWRITE
+    VirtualLock Ptr, nBytes
+End Sub
 Public Sub ReleaseExecution(ByVal Ptr As Long, ByVal nBytes As Long, ByVal OldV As Long)
     FlushInstructionCache GetCurrentProcess, Ptr, nBytes
     

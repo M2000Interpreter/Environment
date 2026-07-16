@@ -948,19 +948,19 @@ Private Function getEmf(Wmf As StdPicture) As Long
  zz.xExt = bb.BoundingBox.Right - bb.BoundingBox.Left
  zz.yExt = bb.BoundingBox.Bottom - bb.BoundingBox.Bottom
  
- Dim bytes As Long
+ Dim Bytes As Long
 Dim Buffer() As Byte
-   bytes = GetMetaFileBitsEx(Wmf.Handle, bytes, ByVal 0&)
- If bytes Then
-ReDim Buffer(1 To bytes) As Byte
-Call GetMetaFileBitsEx(Wmf.Handle, bytes, Buffer(1))
+   Bytes = GetMetaFileBitsEx(Wmf.Handle, Bytes, ByVal 0&)
+ If Bytes Then
+ReDim Buffer(1 To Bytes) As Byte
+Call GetMetaFileBitsEx(Wmf.Handle, Bytes, Buffer(1))
 Else
 
 Exit Function
 End If
     On Error Resume Next
     zz.mm = 1
-    getEmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.hDC, zz)
+    getEmf = SetWinMetaFileBits(Bytes, Buffer(1), Form1.hDC, zz)
 End Function
 
 Public Sub SentWmfToClipBoard()
@@ -1016,17 +1016,17 @@ If w2 <> -1 Then w2 = w2 / dv15
     Set CreateFromPicture = Handler
     
 End Function
-Function CopyItem(ByVal That As Long, Done As Boolean) As MemBlock
+Function CopyItem(ByVal that As Long, Done As Boolean) As MemBlock
     If mSubtype > 0 Then
         ErrorMes = 4
         Done = False
         Exit Function
     End If
-    That = GetPtr(That)
+    that = GetPtr(that)
     If ErrorMes = 0 Then
         Set CopyItem = New MemBlock
         CopyItem.Construct (itemlen), 1, , , (BasicItem)
-        CopyMemory ByVal CopyItem.GetPtr(0), ByVal That, itemlen
+        CopyMemory ByVal CopyItem.GetPtr(0), ByVal that, itemlen
         CopyItem.UseStruct = Me.UseStruct
         If UseStruct Then
             Set CopyItem.structref = Me.structref
@@ -1035,7 +1035,7 @@ Function CopyItem(ByVal That As Long, Done As Boolean) As MemBlock
         If Not Strings Is Nothing Then
         Dim i As Long
         Dim Soff As Long, dif As Long
-        Soff = That - GetPtr(0)
+        Soff = that - GetPtr(0)
         For i = 0 To Strings.Count - 1
             Strings.index = i
             Strings.Done = True
@@ -1085,42 +1085,42 @@ Friend Sub ClearStringPartial(ByVal start_addr As Long, ByVal that_length As Lon
         Next i
     End If
 End Sub
-Sub FillDataFromMem(ByVal That As Long, Optional ByVal bytestocopy As Long = -1)
-    If BasicItem = vbString Or mSubtype > 0 Or Not mExecBloc Then
+Sub FillDataFromMem(ByVal that As Long, Optional ByVal bytestocopy As Long = -1)
+    If BasicItem = vbString Or mSubtype > 0 Then
         MyEr "Not for this type if buffer", "όχι για αυτή τη διάρθρωση"
         Exit Sub
     End If
     If ErrorMes = 0 Then
         If bytestocopy = -1 Then
-            CopyMemory ByVal GetPtr(0), ByVal That, mBytes
+            CopyMemory ByVal GetPtr(0), ByVal that, mBytes
         ElseIf bytestocopy > 0 And bytestocopy <= mBytes Then
-            CopyMemory ByVal GetPtr(0), ByVal That, bytestocopy
+            CopyMemory ByVal GetPtr(0), ByVal that, bytestocopy
         End If
     End If
 End Sub
 Sub Clear()
     FillMemory ByVal GetPtr(0), mBytes, CByte(0)
 End Sub
-Sub FillByte(Optional ByVal That As Byte = 0)
-    FillMemory ByVal GetPtr(0), mBytes, That
+Sub FillByte(Optional ByVal that As Byte = 0)
+    FillMemory ByVal GetPtr(0), mBytes, that
 End Sub
-Function CopyItemString(ByVal That As Long, ByVal bytes As Long, Done As Boolean) As String
+Function CopyItemString(ByVal that As Long, ByVal Bytes As Long, Done As Boolean) As String
     If BasicItem = vbString Or mSubtype > 0 Then
         Done = False
         Exit Function
     End If
-    If bytes <= 0 Then bytes = itemlen
-    If ValidArea2(That, bytes) Then
-    That = GetPtr(That)
+    If Bytes <= 0 Then Bytes = itemlen
+    If ValidArea2(that, Bytes) Then
+    that = GetPtr(that)
     If ErrorMes = 0 Then
         Dim place As Long
-        If bytes Mod 2 = 1 Then
-            CopyItemString = StrConv(String(bytes, Chr(0)), vbFromUnicode)
+        If Bytes Mod 2 = 1 Then
+            CopyItemString = StrConv(String(Bytes, Chr(0)), vbFromUnicode)
         Else
-            CopyItemString = String$((bytes + 1) \ 2, Chr(0))
+            CopyItemString = String$((Bytes + 1) \ 2, Chr(0))
         End If
         
-        CopyMemory ByVal StrPtr(CopyItemString), ByVal That, bytes
+        CopyMemory ByVal StrPtr(CopyItemString), ByVal that, Bytes
         Done = True
     End If
     End If

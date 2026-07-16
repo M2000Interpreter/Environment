@@ -243,7 +243,7 @@ With Callback
 white = .Controls(1).ForeColor
 ff.Name = .CtrlFontName
 ff.charset = Form1.DIS.Font.charset
-ff.Size = .CtrlFontSize
+ff.size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 End With
 mStayOpen = True
@@ -982,33 +982,33 @@ End Property
 Public Property Let MaxCharLength(ByVal RHS As Long)
 glistN.maxchar = RHS
 End Property
-Private Sub glistN_ChangeListItem(item As Long, content As String)
+Private Sub glistN_ChangeListItem(item As Long, Content As String)
 Dim selstart2 As Long, checklistindex As Long, old$
 '' only for M2000, use NumberOnly
 If NumberOnly Or NumberIntOnly Then
-content = MyTrim(content)
+Content = MyTrim(Content)
 NumberOnly = True
-If Len(content) > glistN.maxchar Then
+If Len(Content) > glistN.maxchar Then
 Charpos = glistN.maxchar
 glistN.SelStartEventAlways = glistN.SelStart - 1
 Exit Sub
 End If
-If content = vbNullString Then
-ElseIf Not ValidNum(content, False, NumberIntOnly) Then
+If Content = vbNullString Then
+ElseIf Not ValidNum(Content, False, NumberIntOnly) Then
 undotext = vbNullString
-content = mDoc.TextLine(item + 1)
+Content = mDoc.TextLine(item + 1)
 Exit Sub
 End If
 End If
 If UsedAsTextBox Then
-If Len(content) > glistN.maxchar Then
+If Len(Content) > glistN.maxchar Then
 IsRTLrun
 Charpos = glistN.maxchar
 glistN.SelStartEventAlways = glistN.SelStart - 1
 Exit Sub
 End If
 End If
-mDoc.TextLine(item + 1) = content
+mDoc.TextLine(item + 1) = Content
 'IsRTLrun
 WrapMarkedPara
 If all <> mDoc.DocLines Then
@@ -2452,12 +2452,12 @@ If mIndex >= 0 Then
 End If
 End Sub
 
-Private Sub glistN_ReadListItem(item As Long, content As String)
+Private Sub glistN_ReadListItem(item As Long, Content As String)
 If item >= 0 Then
 
-content = mDoc.TextLine2(item + 1, showparagraphWork And showparagraph)
+Content = mDoc.TextLine2(item + 1, showparagraphWork And showparagraph)
 If showparagraph And showparagraphWork Then
-content = Replace(content, vbTab, ChrW(&H21E5))
+Content = Replace(Content, vbTab, ChrW(&H21E5))
 End If
 End If
 End Sub
@@ -5142,16 +5142,20 @@ nextline1:
             End If
             If pos2 > 0 Then
                 If kind = 8 Then
-                   addone2000 k - Len(a$) - Len(drop$) + 1, 10
-                   addone2000 k - Len(a$), 13
+                    If onetime Then
+                    addone2000 k - Len(a$) - Len(drop$) + 1, 10
+                    addone2000 k - Len(a$), 13
+                    End If
                 Else
                     addone2000 pos2, 10
                 End If
             Else
                 lastkind = 0
                 If kind = 8 Then
-                    addone2000 k - Len(a$) - Len(drop$) + 1, 10
-                    addone2000 k - Len(a$), 13
+                    If onetime Then
+                        addone2000 k - Len(a$) - Len(drop$) + 1, 10
+                        addone2000 k - Len(a$), 13
+                    End If
                 Else
                     addone2000 k - Len(a$) - Len(drop$) + 1, 10
                 End If
@@ -8452,7 +8456,7 @@ If ThisFontName <> "" Then
 
 aa.Name = ThisFontName
 
-If ThisMode > 7 Then aa.Size = ThisMode Else aa = 7
+If ThisMode > 7 Then aa.size = ThisMode Else aa = 7
 aa.bold = ThisBold
 Set glistN.Font = aa
 TextPixelOffset = Int(glistN.TextHeightOffset)
@@ -9742,16 +9746,16 @@ End Property
 
 Public Property Let Value(ByVal vNewValue As Variant)
 NumberOnly = True
-Dim content As String
+Dim Content As String
 
 If MyIsNumeric(vNewValue) Then
-content = NLtrim$(str(vNewValue))
-If Not ValidNum(content, True, NumberIntOnly) Then
+Content = NLtrim$(str(vNewValue))
+If Not ValidNum(Content, True, NumberIntOnly) Then
     Text = vbNullString
 ElseIf vNewValue = 0 Then
     Text = vbNullString
 Else
-    Text = content
+    Text = Content
     End If
     Else
     Text = vbNullString
@@ -10869,7 +10873,7 @@ If UsedAsTextBox Or NumberOnly Or NumberIntOnly Then Callback.SendFKEY a
 End If
 End Sub
 
-Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional OpCode As Long = 0)
 
 If MyIsNumeric(a) Then
 a = CLng(a)
@@ -10885,10 +10889,10 @@ a = AscW(a)
 If a > 126 Then a = 0
 End Select
 End If
-If Opcode < 0 Then Opcode = 0
+If OpCode < 0 Then OpCode = 0
 If a = 0 Then Exit Sub
 a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
-Callback.RegisterAcc a, ctrlName, Opcode
+Callback.RegisterAcc a, ctrlName, OpCode
 End Sub
 Private Sub gListN_AccKey(M As Long)
 Callback.AccProces M

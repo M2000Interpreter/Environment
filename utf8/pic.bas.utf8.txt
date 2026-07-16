@@ -340,12 +340,12 @@ Public Function LowLong(ByVal p) As Long
     If Not myVarType(p, 20) Then p = cInt64(p)
     LowLong = MemLong(VarPtr(p) + 8)
 End Function
-Function Hex64$(a, Optional bytes = 8)
+Function Hex64$(a, Optional Bytes = 8)
     Dim p, P1, z
     z = cInt64(a)
     p = MemLong(VarPtr(z) + 8)
     P1 = MemLong(VarPtr(z) + 12)
-    Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
+    Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(p), 8), Bytes * 2)
 End Function
 Public Function OneLongLong() As Variant
     Static p
@@ -1761,7 +1761,7 @@ With ob
 Call SetWindowRgn(.hWnd, (0), False)
 End With
 End Sub
-Public Function RotateRegion(hRgn As Long, Angle As Single, ByVal piw As Long, ByVal pih As Long, ByVal Size As Single) As Long
+Public Function RotateRegion(hRgn As Long, Angle As Single, ByVal piw As Long, ByVal pih As Long, ByVal size As Single) As Long
 Dim k As Single, r As Single, aa As Single
 aa = (CLng(Angle! * 100) Mod 36000) / 100
 
@@ -1769,9 +1769,9 @@ Angle! = -Angle * 1.74532925199433E-02
    r = Atn(piw / CSng(pih)) + Pi / 2!
     k = piw / Cos(r)
     Dim myw As Long, myh As Long
- myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * Size, 0)
-myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * Size, 0)
-hRgn = ScaleRegion(hRgn, Size)
+ myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * size, 0)
+myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * size, 0)
+hRgn = ScaleRegion(hRgn, size)
 
 
     Dim uXF As XFORM
@@ -1798,14 +1798,14 @@ DeleteObject hRgn
 End Function
 
 
-Public Function ScaleRegion(hRgn As Long, Size As Single) As Long
+Public Function ScaleRegion(hRgn As Long, size As Single) As Long
   Dim uXF As XFORM
     Dim D2R As Single, rData() As Byte, rSize As Long
 
-    uXF.eM11 = Size
+    uXF.eM11 = size
     uXF.eM12 = 0
     uXF.eM21 = 0
-    uXF.eM22 = Size
+    uXF.eM22 = size
 
     uXF.eDx = 0
     uXF.eDy = 0
@@ -1872,14 +1872,14 @@ On Error Resume Next
 .ZOrder 0
 .Font.Name = Form1.DIS.Font.Name
 .Font.charset = Form1.DIS.Font.charset
-.Font.Size = SZ
+.Font.size = SZ
 .Font.Strikethrough = False
 .Font.Underline = False
 .Font.Italic = Form1.DIS.Font.Italic
 .Font.bold = Form1.DIS.Font.bold
 .Font.Name = Form1.DIS.Font.Name
 .Font.charset = Form1.DIS.Font.charset
-.Font.Size = SZ
+.Font.size = SZ
 
 End With
 '''DeleteObject myRgn  ' from windows...
@@ -3183,7 +3183,7 @@ End If
 CloseClipboard
 End Function
 Public Function GetImageEmf() As mHandler
-Dim hMem As Long, hEmf As Long, bytes As Long
+Dim hMem As Long, hEmf As Long, Bytes As Long
 Dim hCOPY As Long
 Dim mypic As New cDIBSection
 Dim aPic As MemBlock
@@ -3197,12 +3197,12 @@ If IsClipboardFormatAvailable(CF_ENHMETAFILE) Then
          If hEmf <> 0 Then
              ' hCOPY = CopyEnhMetaFile(hemf, ByVal 0)
               
-               bytes = GetEnhMetaFileBits(hEmf, bytes, ByVal 0)
-                If bytes Then
+               Bytes = GetEnhMetaFileBits(hEmf, Bytes, ByVal 0)
+                If Bytes Then
                     Set aPic = New MemBlock
-                    aPic.Construct 1, bytes
+                    aPic.Construct 1, Bytes
                     
-                    Call GetEnhMetaFileBits(hEmf, bytes, ByVal aPic.GetBytePtr(0))
+                    Call GetEnhMetaFileBits(hEmf, Bytes, ByVal aPic.GetBytePtr(0))
                     aPic.SubType = 2 ' emf
                 End If
                ' DeleteEnhMetaFile hCOPY
@@ -3740,7 +3740,7 @@ Case "CONTINUE", "CONTROL$", "COPY", "COS(", "CTIME(", "CURRENCY", "CURRENCY[", 
 Case "DATA", "DATE", "DATE[", "DATE$(", "DATE(", "DATEFIELD", "DB.PROVIDER", "DB.USER", "DECIMAL", "DECIMAL[", "DECLARE", "DEF", "DELETE"
 Case "DESCENDING", "DESKTOP", "DIM", "DIMENSION(", "DIR", "DIR$", "DIV", "DO"
 Case "DOC.LEN(", "DOC.PAR(", "DOC.UNIQUE.WORDS(", "DOC.WORDS(", "DOCUMENT", "DOS", "DOUBLE", "DOUBLE[", "DOWN", "DRAW", "DRAWING"
-Case "DRAWINGS", "DRIVE$(", "DRIVE.SERIAL(", "DROP", "DRW$(", "DURATION", "EACH("
+Case "DRAWINGS", "DRIVE$(", "DRIVE.SERIAL(", "DROP", "DRW$(", "DURATION", "EACH(", "EAX"
 Case "EDIT", "EDIT.DOC", "ELSE", "ELSE.IF", "EMPTY", "END", "END(", "ENGLISH", "ENUM", "ENUMERATION", "ENVELOPE$(", "EOF("
 Case "ERASE", "ERROR", "ERROR$", "ERRORS", "ESCAPE", "EVAL(", "EVAL$(", "EVENT", "EVENTS", "EVERY", "EXCLUSIVE", "EXECUTE", "EXIST(", "EXIST.DIR("
 Case "EXIT", "EXP(", "EXPANSE(", "EXPORT", "EXTERN", "FALSE", "FAST", "FIELD", "FIELD$(", "FILE$("
@@ -3803,7 +3803,7 @@ Case "ΔΙΑ", "ΔΙΑΒΑΣΕ", "ΔΙΑΓΡΑΦΗ", "ΔΙΑΔΙΚΤΥΟ", "ΔΙ
 Case "ΔΙΑΣΤΙΧΟ", "ΔΙΑΦΑΝΕΙΑ", "ΔΙΑΦΑΝΕΙΑ$", "ΔΙΑΦΑΝΟ", "ΔΙΑΦΥΓΗ", "ΔΙΑΚΟΠΗ", "ΔΙΕΚΟΨΕ", "ΔΙΕΠΑΦΗ", "ΔΙΕΥΘΜ(", "ΔΙΕΥΘΥΝΣΗΑΠΟ", "ΔΙΚΤΥΟ$", "ΔΙΟΡΘΩΣΕ"
 Case "ΔΙΠΛΑ", "ΔΙΠΛΟ", "ΔΙΠΛΟΣ", "ΔΙΠΛΟΣ[", "ΔΟΚΙΜΗ", "ΔΟΚΙΜΗ(", "ΔΟΜΗ", "ΔΡΟΜΕΑΣ", "ΔΥΑΔΙΚΗ.ΠΕΡΙΣΤΡΟΦΗ(", "ΔΥΑΔ64.ΠΕΡΙΣΤΡΟΦΗ(", "ΔΥΑΔΙΚΟ", "ΔΥΑΔ(", "ΔΥΑΔ64(", "ΔΥΑΔΙΚΟ(", "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ(", "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ64(", "ΔΥΑΔΙΚΟ.ΑΦ(", "ΔΥΑΔΙΚΟ.ΑΦΑΙΡΕΣΗ(", "ΔΥΑΔΙΚΟ.ΒΑΛΕ(", "ΔΥΑΔΙΚΟ.ΒΓΑΛΕ(", "ΔΥΑΔΙΚΟ.ΕΧΕΙ("
 Case "ΔΥΑΔΙΚΟ.ΑΝΤΙ(", "ΔΥΑΔΙΚΟ.ΑΝΤΙΣΤΡΟΦΟ(", "ΔΥΑΔ64.ΑΝΤΙ(", "ΔΥΑΔ64.ΑΝΤΙΣΤΡΟΦΟ(", "ΔΥΑΔΙΚΟ.ΑΠΟ(", "ΔΥΑΔΙΚΟ.Η(", "ΔΥΑΔΙΚΟ.ΚΑΙ(", "ΔΥΑΔΙΚΟ.ΟΛΙΣΘΗΣΗ(", "ΔΥΑΔΙΚΟ.ΟΧΙ(", "ΔΥΑΔΙΚΟ.ΠΡΟΣΘΕΣΗ(", "ΔΥΑΔΙΚΟ.ΠΡΟ(", "ΔΥΑΔ64.ΑΦ(", "ΔΥΑΔ64.ΑΦΑΙΡΕΣΗ(", "ΔΥΑΔ64.ΒΑΛΕ(", "ΔΥΑΔ64.ΒΓΑΛΕ(", "ΔΥΑΔ64.ΕΧΕΙ(", "ΔΥΑΔ64.ΑΠΟ(", "ΔΥΑΔ64.Η(", "ΔΥΑΔ64.ΚΑΙ(", "ΔΥΑΔ64.ΟΛΙΣΘΗΣΗ(", "ΔΥΑΔ64.ΟΧΙ(", "ΔΥΑΔ64.ΠΡΟΣΘΕΣΗ(", "ΔΥΑΔ64.ΠΡΟ(", "ΔΥΟΜΙΣΑ(", "ΔΥΟΜΙΣΑ64(", "ΔΩΣΕ"
-Case "ΕΓΓΡΑΦΕΣ(", "ΕΓΓΡΑΦΟ", "ΕΓΓΡΑΦΟΥ.ΛΕΞΕΙΣ(", "ΕΓΓΡΑΦΟΥ.ΜΗΚΟΣ(", "ΕΓΓΡΑΦΟΥ.ΜΟΝΑΔΙΚΕΣ.ΛΕΞΕΙΣ(", "ΕΓΓΡΑΦΟΥ.ΠΑΡ(", "ΕΓΓΡΑΨΙΜΟ(", "ΕΓΚΥΡΟ(", "ΕΙΚ$("
+Case "ΕΑΧ", "ΕΓΓΡΑΦΕΣ(", "ΕΓΓΡΑΦΟ", "ΕΓΓΡΑΦΟΥ.ΛΕΞΕΙΣ(", "ΕΓΓΡΑΦΟΥ.ΜΗΚΟΣ(", "ΕΓΓΡΑΦΟΥ.ΜΟΝΑΔΙΚΕΣ.ΛΕΞΕΙΣ(", "ΕΓΓΡΑΦΟΥ.ΠΑΡ(", "ΕΓΓΡΑΨΙΜΟ(", "ΕΓΚΥΡΟ(", "ΕΙΚ$("
 Case "ΕΙΚΟΝΑ", "ΕΙΚΟΝΑ(", "ΕΙΚΟΝΑ.Ψ(", "ΕΙΚΟΝΑ.Ψ.ΣΗΜΕΙΑ(", "ΕΙΚΟΝΑ.Υ(", "ΕΙΚΟΝΑ.Υ.ΣΗΜΕΙΑ(", "ΕΙΚΟΝΑ.Χ(", "ΕΙΚΟΝΑ.Χ.ΣΗΜΕΙΑ(", "ΕΙΚΟΝΕΣ", "ΕΙΚΟΝΙΔΙΟ", "ΕΙΝΑΡ", "ΕΙΝΑΙ", "ΕΙΝΓΡ"
 Case "ΕΙΣΑΓΩΓΗ", "ΕΙΣΑΓΩΓΗ$(", "ΕΙΣΑΓΩΓΗΣ", "ΕΚΘ(", "ΕΚΔΟΣΗ", "ΕΚΤΕΛΕΣΗ", "ΕΚΤΥΠΩΣΗ", "ΕΚΤΥΠΩΣΗΣ", "ΕΚΤΥΠΩΤΗΣ", "ΕΚΤΥΠΩΤΗΣ$", "ΕΚΦΡ(", "ΕΚΦΡ$("
 Case "ΕΚΦΡΑΣΗ(", "ΕΚΦΡΑΣΗ$(", "ΕΛΕΓΧΟΣ", "ΕΛΕΓΧΟΣ.ΣΩΡΟΥ", "ΕΛΕΓΧΟΣ.ΜΕΓΕΘΟΣ.ΣΩΡΟΥ", "ΕΛΛΗΝΙΚΑ", "ΕΝΑΟΝΟΜΑ$", "ΕΝΘΕΣΗ", "ΕΝΚΟΜ$", "ΕΝΚΟΜ(", "ΕΝΤΑΣΗ", "ΕΝΤΟΛΗ$"
@@ -4782,7 +4782,7 @@ myid() = Array("THIS", 1, "ΑΥΤΟ", 1, "RND", 2, "ΤΥΧΑΙΟΣ", 2, "PEN", 3
 , "MENU", 78, "ΕΠΙΛΟΓΗ", 78, "NUMBER", 79, "ΑΡΙΘΜΟΣ", 79, "ΤΙΜΗ", 79, "LAMBDA", 80, "ΛΑΜΔΑ", 81, "GROUP", 83, "ΟΜΑΔΑ", 83, "ARRAY", 84, "ΠΙΝΑΚΑΣ", 84, "[]", 85 _
 , "ΣΩΡΟΣ", 86, "STACK", 86, "ISWINE", 87, "SHOW", 88, "ΟΘΟΝΗ", 88, "OSBIT", 89, "WINDOW", 90, "ΣΥΣΚΕΥΗ", 90, "MONITOR.STACK", 91, "ΕΛΕΓΧΟΣ.ΣΩΡΟΥ", 91, "MONITOR.STACK.SIZE", 92, "ΕΛΕΓΧΟΣ.ΜΕΓΕΘΟΣ.ΣΩΡΟΥ", 92, "?", 93, "ΔΙΑΡΘΡΩΣΗ", 94, "BUFFER", 94, "ΚΑΤΑΣΤΑΣΗ", 95, "INVENTORY", 95, "LIST", 96, "ΛΙΣΤΑ", 96, "QUEUE", 97, "ΟΥΡΑ", 97, "INFINITY", 82, "ΑΠΕΙΡΟ", 82, "ΕΛΛΗΝΙΚΑ", 98, "GREEK", 98 _
 , "INTERNET", 99, "ΔΙΑΔΙΚΤΥΟ", 99, "CLIPBOARD.IMAGE", 100, "ΠΡΟΧΕΙΡΟ.ΕΙΚΟΝΑ", 100, "CLIPBOARD.DRAWING", 101, "ΠΡΟΧΕΙΡΟ.ΣΧΕΔΙΟ", 101, "MONITORS", 102, "ΟΘΟΝΕΣ", 102, "DOS", 103, "ΚΟΝΣΟΛΑ", 103, "SOUNDREC.LEVEL", 104, "ΗΧΟΓΡΑΦΗΣΗΣ.ΕΠΙΠΕΔΟ", 104, "ADDRESSOF", 105, "ΔΙΕΥΘΥΝΣΗΑΠΟ", 105, "ΠΛΑΤΟΣ.ΤΑΙΝΙΑΣ", 106, "MOVIE.WIDTH", 106, "ΥΨΟΣ.ΤΑΙΝΙΑΣ", 107, "MOVIE.HEIGHT", 107, "PAGE.WIDTH", 108, "ΠΛΑΤΟΣ.ΣΕΛΙΔΑΣ", 108, "PAGE.HEIGHT", 109, "ΥΨΟΣ.ΣΕΛΙΔΑΣ", 109, "PRINTING", 110, "ΕΚΤΥΠΩΣΗ", 110 _
-, "SOUNDREC", 111, "ΗΧΟΓΡΑΦΗΣΗ", 111, "PRINTER.QUALITY", 112, "ΠΟΙΟΤΗΤΑ.ΕΚΤΥΠΩΣΗΣ", 112, "SYMBOL", 113, "ΣΥΜΒΟΛΟ", 113)
+, "SOUNDREC", 111, "ΗΧΟΓΡΑΦΗΣΗ", 111, "PRINTER.QUALITY", 112, "ΠΟΙΟΤΗΤΑ.ΕΚΤΥΠΩΣΗΣ", 112, "SYMBOL", 113, "ΣΥΜΒΟΛΟ", 113, "EAX", 114, "ΕΑΧ", 114)
 If Not ahashbackup Is Nothing Then
 For i = 0 To UBound(myid()) Step 2
     ahashbackup.ItemCreator CStr(myid(i)), CLng(myid(i + 1))
@@ -5169,8 +5169,8 @@ Public Sub StoreFont(aName$, aSize As Single, ByVal aCharset As Long)
 Err.Clear
 On Error Resume Next
 If aSize < 1 Then aSize = 1
-fonttest.Font.Size = aSize
-If Err.Number > 0 Then aSize = 12: fonttest.Font.Size = aSize
+fonttest.Font.size = aSize
+If Err.Number > 0 Then aSize = 12: fonttest.Font.size = aSize
     fonttest.FontName = aName$
     fonttest.Font.bold = True
     fonttest.Font.Italic = True
@@ -5179,8 +5179,8 @@ If Err.Number > 0 Then aSize = 12: fonttest.Font.Size = aSize
     fonttest.Font.bold = True
     fonttest.Font.Italic = True
     fonttest.Font.charset = aCharset
-    fonttest.Font.Size = aSize
-    aSize = fonttest.Font.Size '' return
+    fonttest.Font.size = aSize
+    aSize = fonttest.Font.size '' return
 End Sub
 Public Function InternalLeadingSpace() As Long
 On Error Resume Next
@@ -5355,15 +5355,15 @@ End If
 step2:
 Set basestack.lastobj = Nothing
 Dim aPic As MemBlock, usehandler As mHandler
-Dim bytes As Long
+Dim Bytes As Long
 Dim emfP As StdPicture
 Set emfP = QRCodegenBarcode(ab$, QRcolor, , sq, ErrLevel)
 If emfP Is Nothing Then Exit Sub
 Set aPic = New MemBlock
-bytes = GetEnhMetaFileBits(emfP.Handle, bytes, ByVal 0)
-If bytes Then
-    aPic.Construct 1, bytes
-    Call GetEnhMetaFileBits(emfP.Handle, bytes, ByVal aPic.GetBytePtr(0))
+Bytes = GetEnhMetaFileBits(emfP.Handle, Bytes, ByVal 0)
+If Bytes Then
+    aPic.Construct 1, Bytes
+    Call GetEnhMetaFileBits(emfP.Handle, Bytes, ByVal aPic.GetBytePtr(0))
     aPic.SubType = 2 ' emf
     Set usehandler = New mHandler
     usehandler.t1 = 2

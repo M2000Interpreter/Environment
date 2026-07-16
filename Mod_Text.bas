@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 5
+Global Const Revision = 6
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -6665,10 +6665,13 @@ Else
     If w1 < 0 Then GoTo LOOKFORVARNUM
 End If
 findsecond:
-On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89, num90, num91, num92, num93, num94, num95, num96, num97, num98, num99, num100, num101, num102, num103, num104, num105, num106, num107, num108, num109, num110, num111, num112, num113
+On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89, num90, num91, num92, num93, num94, num95, num96, num97, num98, num99, num100, num101, num102, num103, num104, num105, num106, num107, num108, num109, num110, num111, num112, num113, num114
 IsNumberNew = 0
 InternalError
 Exit Function
+num114:
+        r = MyEax
+        IsNumberNew = True: Exit Function
 num113:
     If bstack.soros.Total = 0 Then
         EmptyStack a$
@@ -8386,7 +8389,7 @@ Else
  End If
 Case 6
     If usebackup Then
-        If strfunid.Find(v$, w1, bstack.strnum) Then
+        If strfunid.Find(v$, w1, bstack.strNum) Then
             bstack.tmpstr = "@" + v$ + Left$(a$, 1)
             If Len(a$) = 0 Then a$ = Chr(8) Else Mid$(a$, 1, 1) = Chr(8)
             v$ = vbNullString
@@ -14201,7 +14204,7 @@ Select Case w1
         If usebackup Then
             If Not stridbackup.Find(q$, w1) Then GoTo itisavar
         Else
-            If Not strid.Find(q$, w1, bstackstr.strnum) Then GoTo itisavar
+            If Not strid.Find(q$, w1, bstackstr.strNum) Then GoTo itisavar
             If w1 < 0 Then GoTo itisavar
         End If
 
@@ -14574,7 +14577,7 @@ groupstrvalue:
                 If usebackup Then
                     If Not strfunidbackup.Find(q$, w1) Then GoTo isasub ' Exit Function
                 Else
-                    If Not strfunid.Find(q$, w1, bstackstr.strnum) Then
+                    If Not strfunid.Find(q$, w1, bstackstr.strNum) Then
                         q1$ = q$ + ")"
                     If GetSub(q1$, w1) Then
                         Set nbstack = New basetask
@@ -20856,7 +20859,7 @@ If here$ <> ohere$ Or mystack.IamChild Or basestack.IamAnEvent Then
             .commnum = comhash.Count
             .strfunnum = strfunid.Count
             .numfunnum = funid.Count
-            .strnum = strid.Count
+            .strNum = strid.Count
             .numnum = numid.Count
         End With
     End If
@@ -21293,7 +21296,7 @@ there1234:
                     If .numfunnum <> funid.Count Then funid.ReduceHash .numfunnum
                     If .strfunnum <> strfunid.Count Then strfunid.ReduceHash .strfunnum
                     If .numnum <> numid.Count Then numid.ReduceHash .numnum
-                    If .strnum <> strid.Count Then strid.ReduceHash .strnum
+                    If .strNum <> strid.Count Then strid.ReduceHash .strNum
                 End With
                 If nokillvars Then
                     If sbf(x1).sbc Then
@@ -21358,7 +21361,7 @@ emptyfunc:
                     If .numfunnum <> funid.Count Then funid.ReduceHash .numfunnum
                     If .strfunnum <> strfunid.Count Then strfunid.ReduceHash .strfunnum
                     If .numnum <> numid.Count Then numid.ReduceHash .numnum
-                    If .strnum <> strid.Count Then strid.ReduceHash .strnum
+                    If .strNum <> strid.Count Then strid.ReduceHash .strNum
                 End With
             End If
             If Not nokillvars Then
@@ -31144,7 +31147,7 @@ With bs
     .commnum = comhash.Count
     .strfunnum = strfunid.Count
     .numfunnum = funid.Count
-    .strnum = strid.Count
+    .strNum = strid.Count
     .numnum = numid.Count
     If sbf(x1).sbc Then
         numid.pushtopGlobal
@@ -31321,7 +31324,7 @@ thh1:
             If .commnum <> comhash.Count Then comhash.ReduceHash2 .commnum
             If .numfunnum <> funid.Count Then funid.ReduceHash .numfunnum
             If .strfunnum <> strfunid.Count Then strfunid.ReduceHash .strfunnum
-            If .strnum <> strid.Count Then strid.ReduceHash .strnum
+            If .strNum <> strid.Count Then strid.ReduceHash .strNum
             If sbf(x1).sbc Then
                 numid.poptopGlobal
                 funid.poptopGlobal
@@ -32061,7 +32064,7 @@ If len1 = 1 Then
                     Final = Final + 1 ' because mid$ starts from 1
                     W$ = vbNullString
                     searchsub = True
-                    GoTo register
+                    GoTo Register
                     End If
                 End If
             Loop
@@ -32084,7 +32087,7 @@ If len1 = 1 Then
             End If
             W$ = vbNullString
             searchsub = True
-            GoTo register
+            GoTo Register
         End If
     End If
     Exit Function
@@ -32154,7 +32157,7 @@ paliedo:
         End If
     Loop
 End With
-register:
+Register:
 If searchsub Then
 If where > 0 Then
 site = where
@@ -33224,7 +33227,7 @@ End Sub
 Sub PlaceBasket(DDD As Object, thisbasket As basket)
 On Error Resume Next
 With thisbasket
-If Not (DDD.FontName = .FontName And DDD.Font.charset = .charset And DDD.Font.Size = .SZ) Then
+If Not (DDD.FontName = .FontName And DDD.Font.charset = .charset And DDD.Font.size = .SZ) Then
 StoreFont .FontName, .SZ, .charset
 DDD.Font.charset = 0
 DDD.FontSize = 9
@@ -33603,7 +33606,7 @@ alfa.BypassInit CLng(a.CurMaxSpace)
 Dim aaa() As GenItem, bbb() As Long, mytop As Long
 aa.CopySpaceUp aaa(), bbb(), mytop
 alfa.CopySpaceDown aaa(), bbb(), mytop
-alfa.ParamBlock aa.ParamsRead, aa.params
+alfa.ParamBlock aa.ParamsRead, aa.Params
 alfa.NoHere = aa.NoHere
 alfa.enabled = aa.enabled
 Set bstack.lastobj = alfa
@@ -33655,7 +33658,7 @@ a.ReadVar j, n$, f$
 If f$ <> "" Then
 Set bb = NewmStiva
 Set bstack.Sorosref = bb
-bb.Copy2TopNItems2FromStiva a.params, oldbstack
+bb.Copy2TopNItems2FromStiva a.Params, oldbstack
 PushStage bstack, False
 s1$ = Mid$(f$, 2, rinstr(f$, "}") - 2)
 klm = ModuleSubAsap("A_()", s1$, Trim$(Mid$(f$, Len(s1$) + 3)))
@@ -33678,7 +33681,7 @@ Set bstack.Sorosref = oldbstack
 Set bstack.StaticCollection = oldstatic
 Set oldstatic = Nothing
 Set oldbstack = Nothing
-bstack.soros.drop a.params
+bstack.soros.drop a.Params
 Set bb = Nothing
 
 here$ = ohere$
@@ -33726,7 +33729,7 @@ Public Function CallEventFromGui(gui As GuiM2000, a As mEvent, aString$) As Bool
                     End If
                 End If
                 Set bstack.Sorosref = bb
-                bb.Copy2TopNItems2FromStiva a.params, oldbstack
+                bb.Copy2TopNItems2FromStiva a.Params, oldbstack
                 PushStage bstack, False
                 s1$ = Mid$(f$, 2, rinstr(f$, "}") - 2)
                 klm = ModuleSubAsap("A_()", s1$, Trim$(Mid$(f$, Len(s1$) + 3)))
@@ -33749,7 +33752,7 @@ conthere:
     bb.Recycle
     Set bb = Nothing
     If Not a Is Nothing Then
-        bstack.soros.drop a.params
+        bstack.soros.drop a.Params
     End If
     here$ = ohere$
     extreme = extr
@@ -33783,7 +33786,7 @@ Public Function CallEventFromGuiOne(gui As GuiM2000, a As mEvent, aString$) As B
         End If
         
     End If
-    F1$ = gui.modulename
+    F1$ = gui.ModuleName
     If F1$ <> "" Then f$ = myUcase(F1$ + "." + f$ + ")", True) Else f$ = myUcase(f$ + ")", True)
 
     If Not GetSub(f$, klm) Then
@@ -33858,7 +33861,7 @@ Public Function CallEventFromGuiNow(gui As GuiM2000, a As mEvent, aString$, vrs(
     bstack.IamAnEvent = True
     Dim i As Long
     i = a.VarIndex
-    F1$ = gui.modulename
+    F1$ = gui.ModuleName
     
     Set oldbstack = bstack.soros
     Dim j As Long, k As Long, s1$, klm As Long, S2$
@@ -34465,7 +34468,7 @@ reenter2:
                     Set bs.StaticCollection = basestack.StaticCollection
                     bs.CallLocalLast = True
                     bs.strfunnum = basestack.strfunnum
-                    bs.strnum = basestack.strnum
+                    bs.strNum = basestack.strNum
                     bs.numnum = basestack.numnum
                     bs.numfunnum = basestack.numfunnum
                     bs.commnum = basestack.commnum
@@ -34632,7 +34635,7 @@ again111:
                 bs.GroupName = basestack.GroupName
                 bs.CallLocalLast = True
                 bs.strfunnum = basestack.strfunnum
-                bs.strnum = basestack.strnum
+                bs.strNum = basestack.strNum
                 bs.numnum = basestack.numnum
                 bs.numfunnum = basestack.numfunnum
                 bs.commnum = basestack.commnum
@@ -34703,6 +34706,9 @@ again111:
 End If
 ExitHere:
 basestack.nokillvars = False
+Set basestack.lastobj = Nothing
+Set basestack.lastpointer = Nothing
+
 Set basestack = Nothing
 
 End Sub
@@ -34798,9 +34804,9 @@ End If
 End Sub
 
 Function myStructure(basestack As basetask, rest$, Lang As Long) As Boolean
-Dim Base As String
-If IsStrExp(basestack, rest$, Base) Then
-    myStructure = TABLENAMES(Base, basestack, rest$, Lang)
+Dim base As String
+If IsStrExp(basestack, rest$, base) Then
+    myStructure = TABLENAMES(base, basestack, rest$, Lang)
      
 Else
     myStructure = makestruct(basestack, rest$, Lang, here$ = "", False)
@@ -41898,7 +41904,7 @@ Public Function CallEventFromCOM1(evCom As ComShinkEvent, aString$, what$, NumVa
     Dim tr As Boolean, extr As Boolean, olescok As Boolean
     Dim f$, F1$, klm As Long, ohelp As Object
     CallEventFromCOM1 = True
-    F1$ = evCom.modulename$
+    F1$ = evCom.ModuleName$
     f$ = UCase(F1$ + "_" + aString$ + "()") ' No greek
     If Not subHash.Find(f$, klm) Then exclude = True: Exit Function
     extr = extreme

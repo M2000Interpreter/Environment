@@ -716,25 +716,25 @@ ok = Not HaveMarkedText
 End Sub
 
 
-Private Sub glistN_ChangeListItem(item As Long, content As String)
+Private Sub glistN_ChangeListItem(item As Long, Content As String)
 Dim selstart2 As Long, checklistindex As Long
 '' only for M2000, use NumberOnly
 If NumberOnly Then
-If Not ValidNum(content, False, NumberIntOnly) Then
+If Not ValidNum(Content, False, NumberIntOnly) Then
 undotext = vbNullString
-content = mDoc.TextLine(item + 1)
+Content = mDoc.TextLine(item + 1)
 Exit Sub
 End If
 End If
 If UsedAsTextBox Then
-If Len(content) > glistN.maxchar Then
+If Len(Content) > glistN.maxchar Then
 'IsRTLrun
 Charpos = glistN.maxchar
 glistN.SelStartEventAlways = glistN.SelStart - 1
 Exit Sub
 End If
 End If
-mDoc.TextLine(item + 1) = content
+mDoc.TextLine(item + 1) = Content
 'IsRTLrun
 WrapMarkedPara
 If all <> mDoc.DocLines Then
@@ -1892,10 +1892,10 @@ End If
 
 End Sub
 
-Private Sub glistN_ReadListItem(item As Long, content As String)
+Private Sub glistN_ReadListItem(item As Long, Content As String)
 If item >= 0 Then
 
-content = mDoc.TextLine2(item + 1, showparagraphWork And showparagraph)
+Content = mDoc.TextLine2(item + 1, showparagraphWork And showparagraph)
 
 End If
 End Sub
@@ -2223,6 +2223,8 @@ If k >= 1 Then
 If k > 1 Then If Col(k - 1) = thiscolor Then Exit Sub
 If Col(k) = thispos Then
 Col(k - 1) = thiscolor: Exit Sub
+ElseIf Col(k) > thispos Then
+Exit Sub
 End If
 End If
 
@@ -2551,16 +2553,20 @@ nextline1:
             End If
             If pos2 > 0 Then
                 If kind = 8 Then
-                   addone k - Len(a$) - Len(drop$) + 1, 10
-                   addone k - Len(a$), 13
+                    If onetime Then
+                       addone k - Len(a$) - Len(drop$) + 1, 10
+                       addone k - Len(a$), 13
+                    End If
                 Else
                     addone pos2, 10
                 End If
             Else
                 lastkind = 0
                 If kind = 8 Then
-                    addone k - Len(a$) - Len(drop$) + 1, 10
-                    addone k - Len(a$), 13
+                    If onetime Then
+                        addone k - Len(a$) - Len(drop$) + 1, 10
+                        addone k - Len(a$), 13
+                    End If
                 Else
                     addone k - Len(a$) - Len(drop$) + 1, 10
                 End If
