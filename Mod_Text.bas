@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 6
+Global Const Revision = 7
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -166,7 +166,7 @@ Public subHash As New sbHash
 Public varhash As New Hash
 Public comhash As New coHash, numid As New idHash, numidbackup As New idHash, funid As New idHash, funidbackup As New idHash
 Public zones As New FastCollection
-Public strid  As New idHash, stridbackup As New idHash, strfunid As New idHash, strfunidbackup As New idHash
+Public strID  As New idHash, stridbackup As New idHash, strfunid As New idHash, strfunidbackup As New idHash
 Public Clid As Long 'current id for app id
 Public lastAboutHTitle As String, LastAboutText As String
 ''
@@ -3687,7 +3687,7 @@ Public Sub PopStage(basestack As basetask)
             numid.poptop
             funid.poptop
             strfunid.poptop
-            strid.poptop
+            strID.poptop
         ElseIf .LookTopVal = -2 Then
             basestack.SubLevel = basestack.SubLevel - 1
             .drop 3  ' not 5
@@ -5429,7 +5429,7 @@ subHash.ReduceHash snames, sbf()
 numid.poptop
 funid.poptop
 strfunid.poptop
-strid.poptop
+strID.poptop
 
 End Function
 
@@ -5608,7 +5608,7 @@ Set varhash = New Hash
 Set comhash = New coHash
 Set numid = New idHash
 Set funid = New idHash
-Set strid = New idHash
+Set strID = New idHash
 Set strfunid = New idHash
 GoTo there
 End If
@@ -5682,7 +5682,7 @@ there:
 Randomize
 allcommands comhash
 NumberId numid, funid, numidbackup, funidbackup
-StringId strid, strfunid, stridbackup, strfunidbackup
+StringId strID, strfunid, stridbackup, strfunidbackup
 Set zones = New FastCollection
 TimeZones zones
 Set TaskMaster = New TaskMaster
@@ -5740,7 +5740,7 @@ Set subHash = Nothing
 Set comhash = Nothing
 Set numid = Nothing
 Set funid = Nothing
-Set strid = Nothing
+Set strID = Nothing
 Set strfunid = Nothing
 Set Prof = Nothing
 Set MediaPlayer1 = Nothing
@@ -14204,7 +14204,7 @@ Select Case w1
         If usebackup Then
             If Not stridbackup.Find(q$, w1) Then GoTo itisavar
         Else
-            If Not strid.Find(q$, w1, bstackstr.strNum) Then GoTo itisavar
+            If Not strID.Find(q$, w1, bstackstr.strNum) Then GoTo itisavar
             If w1 < 0 Then GoTo itisavar
         End If
 
@@ -16212,7 +16212,9 @@ Function Execute(bstack As basetask, b$, once As Boolean, Optional linebyline As
 Dim di As Object, nchr As Integer
 Set di = bstack.Owner
 Dim myobject As Object, usehandler As mHandler, usehandler1 As mHandler
-If checkbreak(bstack, b$, once) Then GoTo enterbreak
+If checkbreak(bstack, b$, once) Then
+    If Not bstack.machinecode Then GoTo enterbreak
+End If
 Dim pppp As mArray, ppppl As iBoxArray, bb$, ec$, i As Long, jump As Boolean, slct As Long, sp As Variant, sw$, ok As Boolean, IFCTRL As Long
 'If linebyline Then
 If loopthis Or linebyline And Not noblock Then IFCTRL = bstack.IFCTRL: jump = bstack.jump
@@ -16228,9 +16230,11 @@ sss = Len(b$): lbl = True
 Do While Len(b$) <> LLL
     If checkbreakEsc(bstack) Then
 enterbreak:
-    NOEXECUTION = False
-    MyClear bstack, ""
-    NOEXECUTION = True
+        If bstack.machinecode Then GoTo continueMC
+    
+        NOEXECUTION = False
+        MyClear bstack, ""
+        NOEXECUTION = True
         MyEr "", ""
         k1 = 0
         REFRESHRATE = 40
@@ -16262,6 +16266,7 @@ enterbreak:
             Exit Function
         End If
     End If
+continueMC:
     If (trace And Not stoponerror) Or SLOW Then
        If WaitShow > 0 Then WaitShow = WaitShow - 1
         refreshGui
@@ -20859,7 +20864,7 @@ If here$ <> ohere$ Or mystack.IamChild Or basestack.IamAnEvent Then
             .commnum = comhash.Count
             .strfunnum = strfunid.Count
             .numfunnum = funid.Count
-            .strNum = strid.Count
+            .strNum = strID.Count
             .numnum = numid.Count
         End With
     End If
@@ -20871,7 +20876,7 @@ If here$ <> ohere$ Or mystack.IamChild Or basestack.IamAnEvent Then
             numid.pushtopGlobal
             funid.pushtopGlobal
             strfunid.pushtopGlobal
-            strid.pushtopGlobal
+            strID.pushtopGlobal
         End If
     Else
         mystack.ErrVars = var2used
@@ -21296,14 +21301,14 @@ there1234:
                     If .numfunnum <> funid.Count Then funid.ReduceHash .numfunnum
                     If .strfunnum <> strfunid.Count Then strfunid.ReduceHash .strfunnum
                     If .numnum <> numid.Count Then numid.ReduceHash .numnum
-                    If .strNum <> strid.Count Then strid.ReduceHash .strNum
+                    If .strNum <> strID.Count Then strID.ReduceHash .strNum
                 End With
                 If nokillvars Then
                     If sbf(x1).sbc Then
                         numid.poptopGlobal
                         funid.poptopGlobal
                         strfunid.poptopGlobal
-                        strid.poptopGlobal
+                        strID.poptopGlobal
                     End If
                 End If
             End If
@@ -21361,7 +21366,7 @@ emptyfunc:
                     If .numfunnum <> funid.Count Then funid.ReduceHash .numfunnum
                     If .strfunnum <> strfunid.Count Then strfunid.ReduceHash .strfunnum
                     If .numnum <> numid.Count Then numid.ReduceHash .numnum
-                    If .strNum <> strid.Count Then strid.ReduceHash .strNum
+                    If .strNum <> strID.Count Then strID.ReduceHash .strNum
                 End With
             End If
             If Not nokillvars Then
@@ -21380,7 +21385,7 @@ emptyfunc:
                     numid.poptopGlobal
                     funid.poptopGlobal
                     strfunid.poptopGlobal
-                    strid.poptopGlobal
+                    strID.poptopGlobal
                 End If
             End If
             Exit Do
@@ -22725,19 +22730,19 @@ Else
     End If
 End If
 If Right$(Name$, 1) = "$" Then
-    If strid.Find(Name$, M) Then
+    If strID.Find(Name$, M) Then
         If Len(here$) = 0 Or makeitglobal Then
-            strid.ItemCreator2 Name$, -2
-            varhash.ItemCreator2 strid, Name$, j, link, makeitglobal, useType
+            strID.ItemCreator2 Name$, -2
+            varhash.ItemCreator2 strID, Name$, j, link, makeitglobal, useType
         Else
-            strid.ItemCreator2 Name$, -1
+            strID.ItemCreator2 Name$, -1
             varhash.ItemCreator here$ + "." + Name$, j, link, , useType
         End If
         globalvar = j
         Exit Function
     End If
     If Len(here$) = 0 Or makeitglobal Then
-        varhash.ItemCreator2 strid, Name$, j, link, makeitglobal, useType
+        varhash.ItemCreator2 strID, Name$, j, link, makeitglobal, useType
     Else
         varhash.ItemCreator here$ + "." + Name$, j, link, , useType
     End If
@@ -22852,11 +22857,11 @@ Else
         j = CLng(q)
     End If
 End If
-If strid.Find(Name$, M) Then
-If M > -1 Then strid.ItemCreator2 Name$, -1
+If strID.Find(Name$, M) Then
+If M > -1 Then strID.ItemCreator2 Name$, -1
 End If
 If here$ = vbNullString Or makeitglobal Then
-    varhash.ItemCreator2 strid, Name$, j, link, makeitglobal, True
+    varhash.ItemCreator2 strID, Name$, j, link, makeitglobal, True
 Else
     varhash.ItemCreator here$ + "." + Name$, j, link, , True
 End If
@@ -22871,14 +22876,14 @@ j = AllocVar() ' var2used
  
 If here$ = vbNullString Or gl Then
 If Right$(Name$, 1) = "$" Then
-    If strid.Find(Name$, M) Then strid.ItemCreator2 Name$, -2
+    If strID.Find(Name$, M) Then strID.ItemCreator2 Name$, -2
 Else
     If numid.Find(Name$, M) Then numid.ItemCreator2 Name$, -2
 End If
 varhash.ItemCreator myUcase(Name$), j, , gl, True
 Else
 If Right$(Name$, 1) = "$" Then
-    If strid.Find(Name$, M) Then strid.ItemCreator2 Name$, -1
+    If strID.Find(Name$, M) Then strID.ItemCreator2 Name$, -1
 Else
 If numid.Find(Name$, M) Then numid.ItemCreator Name$, -1
 End If
@@ -31147,18 +31152,18 @@ With bs
     .commnum = comhash.Count
     .strfunnum = strfunid.Count
     .numfunnum = funid.Count
-    .strNum = strid.Count
+    .strNum = strID.Count
     .numnum = numid.Count
     If sbf(x1).sbc Then
         numid.pushtopGlobal
         funid.pushtopGlobal
         strfunid.pushtopGlobal
-        strid.pushtopGlobal
+        strID.pushtopGlobal
     Else
         numid.pushtop
         funid.pushtop
         strfunid.pushtop
-        strid.pushtop
+        strID.pushtop
     End If
     subs = sb2used: snames = subHash.Count
     .UseGroupname = sbf(x1).sbgroup
@@ -31324,17 +31329,17 @@ thh1:
             If .commnum <> comhash.Count Then comhash.ReduceHash2 .commnum
             If .numfunnum <> funid.Count Then funid.ReduceHash .numfunnum
             If .strfunnum <> strfunid.Count Then strfunid.ReduceHash .strfunnum
-            If .strNum <> strid.Count Then strid.ReduceHash .strNum
+            If .strNum <> strID.Count Then strID.ReduceHash .strNum
             If sbf(x1).sbc Then
                 numid.poptopGlobal
                 funid.poptopGlobal
                 strfunid.poptopGlobal
-                strid.poptopGlobal
+                strID.poptopGlobal
             Else
                 numid.poptop
                 funid.poptop
                 strfunid.poptop
-                strid.poptop
+                strID.poptop
             End If
         End With
         Set bs = Nothing
@@ -33227,7 +33232,7 @@ End Sub
 Sub PlaceBasket(DDD As Object, thisbasket As basket)
 On Error Resume Next
 With thisbasket
-If Not (DDD.FontName = .FontName And DDD.Font.charset = .charset And DDD.Font.size = .SZ) Then
+If Not (DDD.FontName = .FontName And DDD.Font.charset = .charset And DDD.Font.Size = .SZ) Then
 StoreFont .FontName, .SZ, .charset
 DDD.Font.charset = 0
 DDD.FontSize = 9
@@ -33606,7 +33611,7 @@ alfa.BypassInit CLng(a.CurMaxSpace)
 Dim aaa() As GenItem, bbb() As Long, mytop As Long
 aa.CopySpaceUp aaa(), bbb(), mytop
 alfa.CopySpaceDown aaa(), bbb(), mytop
-alfa.ParamBlock aa.ParamsRead, aa.Params
+alfa.ParamBlock aa.ParamsRead, aa.params
 alfa.NoHere = aa.NoHere
 alfa.enabled = aa.enabled
 Set bstack.lastobj = alfa
@@ -33658,7 +33663,7 @@ a.ReadVar j, n$, f$
 If f$ <> "" Then
 Set bb = NewmStiva
 Set bstack.Sorosref = bb
-bb.Copy2TopNItems2FromStiva a.Params, oldbstack
+bb.Copy2TopNItems2FromStiva a.params, oldbstack
 PushStage bstack, False
 s1$ = Mid$(f$, 2, rinstr(f$, "}") - 2)
 klm = ModuleSubAsap("A_()", s1$, Trim$(Mid$(f$, Len(s1$) + 3)))
@@ -33681,7 +33686,7 @@ Set bstack.Sorosref = oldbstack
 Set bstack.StaticCollection = oldstatic
 Set oldstatic = Nothing
 Set oldbstack = Nothing
-bstack.soros.drop a.Params
+bstack.soros.drop a.params
 Set bb = Nothing
 
 here$ = ohere$
@@ -33729,7 +33734,7 @@ Public Function CallEventFromGui(gui As GuiM2000, a As mEvent, aString$) As Bool
                     End If
                 End If
                 Set bstack.Sorosref = bb
-                bb.Copy2TopNItems2FromStiva a.Params, oldbstack
+                bb.Copy2TopNItems2FromStiva a.params, oldbstack
                 PushStage bstack, False
                 s1$ = Mid$(f$, 2, rinstr(f$, "}") - 2)
                 klm = ModuleSubAsap("A_()", s1$, Trim$(Mid$(f$, Len(s1$) + 3)))
@@ -33752,7 +33757,7 @@ conthere:
     bb.Recycle
     Set bb = Nothing
     If Not a Is Nothing Then
-        bstack.soros.drop a.Params
+        bstack.soros.drop a.params
     End If
     here$ = ohere$
     extreme = extr
@@ -40899,8 +40904,8 @@ jumpnow:
     i = AllocVar()
     If y1 = 3 Then
     that = vbNullString
-    If strid.Find(what$, (i), (i)) Then
-        strid.ItemCreator what$, -2
+    If strID.Find(what$, (i), (i)) Then
+        strID.ItemCreator what$, -2
     End If
     ElseIf y1 = 1 Then
     If numid.Find(what$, (i), (i)) Then

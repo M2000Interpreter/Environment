@@ -53693,4 +53693,269 @@ print
 
 
 }
+MODULE ASM2 {Static Function MachineCode
+SplitHor(4/5)
+Enum PESubsystem {
+    Subsystem_GUI = 2
+    Subsystem_CUI = 3
+}
+Assembler =getobject("","m2000.x86")
+Assembler=>Subsystem=Subsystem_GUI
+Assembler=>PEHeader=true
+Buffer2export=MachineCode({
+extern "kernel32", GetModuleHandleA
+extern "user32",   LoadCursorA
+extern "user32",   RegisterClassA
+extern "user32",   UnregisterClassA
+extern "user32",   CreateWindowExA
+extern "user32",   DestroyWindow
+extern "user32",   ShowWindow
+extern "user32",   GetMessageA
+extern "user32",   TranslateMessage
+extern "user32",   DispatchMessageA
+extern "user32",   DefWindowProcA
+extern "user32",   PostQuitMessage
+
+AppName:           db "ASM Window", 0
+WindowTitle:       db "My first ASM window", 0
+hInstance:         dd 0
+hCursor:           dd 0
+hWnd:              dd 0
+wMsg:              dd 0
+
+COLOR_APPWORKSPACE equ 12
+SIZEOF_WNDCLASS    equ 40
+SIZEOF_MSG         equ 28
+WM_DESTROY         equ &H2
+IDC_ARROW          equ &H7F00
+
+main:
+   push ebp
+   mov  ebp, esp
+
+   push dword 0
+   call GetModuleHandleA
+   mov [hInstance], eax
+
+   push dword IDC_ARROW
+   push dword 0
+   call LoadCursorA
+   mov [hCursor], eax
+
+
+   ;;;;;; WND CLASS ;;;;;;;;
+
+   sub esp, SIZEOF_WNDCLASS                ; WNDCLASS 40 Bytes
+   
+   mov dword [esp+0], 3                    ; style = CS_HREDRAW or CS_VREDRAW
+   mov dword [esp+4], WndProc              ; lpfnWndProc = WndProc
+   mov dword [esp+8], 0                    ; cbClsExtra = 0
+   mov dword [esp+12], 0                   ; cbWndExtra = 0
+
+   mov eax, [hInstance]
+   mov dword [esp+16], eax                 ; hInstance
+
+   mov dword [esp+20], 0                   ; hIcon = 0
+
+   mov eax, [hCursor]
+   mov dword [esp+24], eax                 ; hCursor
+
+   mov dword [esp+28], COLOR_APPWORKSPACE  ; background color
+   mov dword [esp+32], 0                   ; lpzszMenuName = 0
+   mov dword [esp+36], AppName             ; lpszClassName = AppName
+
+   push dword esp                          ; register the window class
+   call RegisterClassA
+
+
+   ;;;;;; CREATEWINDOW ;;;;;;;;
+
+   push dword 0                            ; lParam
+   push dword [hInstance]                  ; hInstance
+   push dword 0                            ; hMenu
+   push dword 0                            ; hWndParent
+   push dword 250                          ; Height
+   push dword 300                          ; Width
+   push dword 0                            ; y
+   push dword 0                            ; x
+   push dword &HCF0000                     ; WS_OVERLAPPEDWND or WS_BORDER or WS_CAPTION
+   push dword WindowTitle                  ; lpWindowName
+   push dword AppName                      ; ClassName
+   push dword &H40000                      ; dwExStyle
+   call CreateWindowExA
+
+   mov [hWnd], eax
+
+   push dword 1                            ; show the window
+   push dword [hWnd]
+   call ShowWindow
+
+
+   ;;;;;; MESSAGELOOP ;;;;;;;;
+
+   sub  esp, SIZEOF_MSG                    ; space for MSG Struct
+   mov  [wMsg], esp
+
+   MessageLoop:
+       push dword 0                        ; get a message from the queue
+       push dword 0
+       push dword 0
+       push dword [wMsg]
+       call GetMessageA
+
+       test eax, eax
+       jz   ExitMessageLoop
+
+       push dword [wMsg]                   ; process the message
+       call TranslateMessage
+       push dword [wMsg]
+       call DispatchMessageA
+
+       jmp  MessageLoop
+
+   ExitMessageLoop:
+   add  esp, SIZEOF_MSG                    ; cleanup MSG struct
+
+   push dword [hWnd]                       ; destroy the window
+   call DestroyWindow
+
+   push dword [hInstance]                  ; unregister the window class
+   push dword AppName
+   call UnregisterClassA
+
+   add  esp, SIZEOF_WNDCLASS               ; cleanup WNDCLASS Struct
+   pop  ebp
+ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+WndProc:
+   mov  eax, [esp+8]                       ; Message
+   cmp  eax, WM_DESTROY                    ; WM_DESTROY?
+   jne  WndProcNext
+   push dword 0
+   call PostQuitMessage
+
+   WndProcNext:
+       push dword [esp+16]                 ; copy arguments
+       push dword [esp+16]
+       push dword [esp+16]
+       push dword [esp+16]
+       call DefWindowProcA
+
+ret 16
+})
+killit()
+open "test.exe" for output as #f
+	put #f, Buffer2export
+close #f
+//	Declare ShellExecute Lib "shell32.ShellExecuteW" {Long hWnd, Long lpszOp, lpszFile$, long lpszParams, long LpszDir, Long FsShowCmd }
+//	Print ShellExecute(0, 0, dir$+"test.exe", 0, 0, 1&)
+//	
+win dir$+"test.exe"
+
+Sub killit(name$="test.exe")
+	local out$=quote$(dir$+"out.txt")
+	Dos "del "+out$, 500;
+	name$=lcase(name$)
+	Dos format({tasklist /fi "IMAGENAME eq {0}" >}+out$, name$), 500;
+	local a$
+	document a$
+	load.doc a$,"out.txt"
+	local m=Paragraph(a$, 0) 
+	If Forward(a$,m) then
+		While m
+			p=Paragraph$(a$,(m))
+			if lcase(left(p, len(name$)))=name$ then
+				Pid=val(trim(rightpart(p, " ")))
+				Dos "taskkill /F /PID "+pid;
+				Print "Pid=";Pid;" ...killed in action"
+			End if
+		End While
+	End If
+End Sub
+Function MachineCode(assembly as string)
+	if Assembler=>assemble(assembly, true) then
+		local OutPutSize=Assembler=>OutputSize
+		local mc
+		buffer code mc as byte*OutputSize
+		' feed the base address to Assembler
+		Assembler=>BaseAddress=&H400000
+		if Assembler=>assemble(assembly) then
+			' get a copy of final machine code
+			mc=>FillDataFromMem Assembler=>GetOutPtr
+			=mc
+			exit function
+		End if
+	End if
+	error Assembler=>LastErrorMessage 
+End Function
+Sub SplitHor(ratio as single)
+	if ratio<0.15 or ratio>0.85 then ratio=0.5
+	local old=mode
+	window 6, window
+	back {
+		local x1=scale.x,y1=scale.y
+		x=scale.x*ratio:window 6, x, y1
+	}
+	mode old, x, y1
+	back {motion x1-scale.x, (y1-scale.y)/2}
+end sub
+}
+MODULE ASM3 {// these modules called local - see all variables/modules of this module
+module beta {
+	? alfa,
+}
+module Cr {
+	?
+}
+assembler=getobject("","m2000.x86")
+long alfa
+ptrAlfa=varptr(alfa)
+
+CallModule=Module()
+AddrBeta=Addressof Beta
+AddrCr=AddressOf Cr
+
+' Execute Code pass values to four places in stack
+' [ebp+12] first
+' [ebp+16] second
+' [ebp+20] third
+' [ebp+24] forth
+ASM_TEST_RAWDATA = {
+	mov eax, [ebp+12]
+	mov [ptrAlfa], eax	
+oneLabel:
+	mov eax, [ptrAlfa]
+	dec eax
+	js exit
+	mov [ptrAlfa], eax
+	push dword AddrBeta | call CallModule
+	jmp oneLabel
+exit:
+	push dword AddrCr | call CallModule
+	ret 16  ; drop 4 long (4x4 bytes) and then return.
+}
+if assembler=>assemble(ASM_TEST_RAWDATA, true) then
+	' get the output size
+	OutPutSize=assembler=>OutputSize
+	buffer code example1 as byte*OutputSize
+	' feed the base address to assembler
+	assembler=>BaseAddress=example1(0)
+	if assembler=>assemble(ASM_TEST_RAWDATA) then
+		' get a copy of final machine code
+		example1=>FillDataFromMem assembler=>GetOutPtr
+		' Execute Code! Example1, 0;  ' Execute_ReadWrite
+		cls
+		profiler
+		Execute Code Example1, 0, 501; ' Execute_Read
+		print timecount
+		Push Key$:Drop:CLS
+		profiler:for alfa=500 to 0:Call Local Beta:next:call local Cr:? timecount
+		Push Key$:Drop:CLS
+		profiler:for alfa=500 to 0:?alfa,:next:?:? timecount	
+	end if
+end if
+}
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

@@ -20,6 +20,7 @@ Public CheckUnReferenceGui As Long
 Public callx1 As Long, tpointer As Long
 Public RRCOUNTER As Long
 Public callohere As String
+Public machinecode As Boolean
 Public LastIdpos As Long ' reverse pos
 Public addlen As Long, NoFuncError As Boolean, CallW As String, fHere$, strg As Boolean
 Public nokillvars As Boolean
@@ -30,7 +31,7 @@ Public Vars As Long, Vname As Long, ByName As Long
 Public ErrVars As Long, ErrVname As Long
 Public usestack As Boolean
 Public commnum As Long
-Public strnum As Long
+Public strNum As Long
 Public numnum As Long
 Public strfunnum As Long
 Public numfunnum As Long

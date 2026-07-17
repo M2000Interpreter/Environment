@@ -1669,7 +1669,7 @@ abt = False
 Set comhash = New coHash
 Set numid = New idHash
 Set funid = New idHash
-Set strid = New idHash
+Set strID = New idHash
 Set strfunid = New idHash
 NERR = False
 If Not TaskMaster Is Nothing Then TaskMaster.Dispose
@@ -5466,9 +5466,19 @@ Propgetvalue:
                     End If
                     If bstack.lastobj Is Nothing Then
                     UseProp.Value = p
+                    ElseIf TypeOf bstack.lastobj Is mHandler Then
+                        Set usehandler = bstack.lastobj
+                        If usehandler.t1 = 4 Then
+                            If MyIsNumeric(usehandler.index_cursor) Then
+                                UseProp.Value = usehandler.index_cursor * usehandler.sign
+                            Else
+                                UseProp.Value = usehandler.index_cursor
+                            End If
+                        Else
+                        UseProp.Value = CVar(bstack.lastobj)
+                        End If
                     Else
-                
-                    UseProp.Value = CVar(bstack.lastobj)
+                        UseProp.Value = CVar(bstack.lastobj)
                     End If
                 Else
                     GoTo noexpression
@@ -22132,12 +22142,12 @@ Sub EnumJob(usehandler As mHandler, usehandler1 As mHandler)
         usehandler.sign = 1
 End Sub
 Sub EnumJob1(usehandler As mHandler)
-        Dim Base As Enumeration
-        Set Base = usehandler.objref
-        usehandler.index_start = Base.ErrorIndex
-        Base.index = Base.ErrorIndex
-        Base.Done = True
-        usehandler.index_cursor = Base.Value
+        Dim base As Enumeration
+        Set base = usehandler.objref
+        usehandler.index_start = base.ErrorIndex
+        base.index = base.ErrorIndex
+        base.Done = True
+        usehandler.index_cursor = base.Value
         usehandler.objref.index = usehandler.objref.ErrorIndex - 1
         usehandler.sign = 1
 End Sub

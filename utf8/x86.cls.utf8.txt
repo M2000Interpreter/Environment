@@ -448,9 +448,13 @@ Public Function Assemble( _
     Optional ByVal OnlySize As Boolean = False _
 ) As Boolean
     ' remove tabs
+    '  ChrW(160)
+    strASM = Replace(strASM, ChrW(160), " ")
     strASM = Replace(strASM, Chr$(9), " ")
     strASM = Replace(strASM, ";" + vbCr, "; " + vbCr)
-    
+    If InStr(1, strASM, "EQU", vbTextCompare) > 0 Then
+        strASM = PreProcessAsm(strASM)
+    End If
     Set labels = New FastCollection
     labels.UcaseKeys = True
     ScannerInit strASM
@@ -2708,8 +2712,16 @@ Private Sub ScannerGetNextToken()
                             clsToken.TType = TokenMMRegister
                         ElseIf StrComp(clsToken.Content, "extern", vbTextCompare) = 0 Then
                             clsToken.TType = TokenExtern
+                            
                         Else
-                            clsToken.TType = TokenSymbol
+                            Dim i As Long
+                            If GetlocalVar(clsToken.Content, i) Then
+                                clsToken.Content = Trim(str$(CLng(var(i))))
+                                clsToken.TType = TokenValue
+                            Else
+                                clsToken.TType = TokenSymbol
+                            End If
+                         
                         End If
                         
                         .Position = .Position - 1
