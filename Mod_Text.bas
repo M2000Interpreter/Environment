@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 7
+Global Const Revision = 8
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -33232,7 +33232,7 @@ End Sub
 Sub PlaceBasket(DDD As Object, thisbasket As basket)
 On Error Resume Next
 With thisbasket
-If Not (DDD.FontName = .FontName And DDD.Font.charset = .charset And DDD.Font.Size = .SZ) Then
+If Not (DDD.FontName = .FontName And DDD.Font.charset = .charset And DDD.Font.size = .SZ) Then
 StoreFont .FontName, .SZ, .charset
 DDD.Font.charset = 0
 DDD.FontSize = 9

@@ -217,7 +217,7 @@ End Enum
 
 Public Type fncinf
     Name                    As String
-    addr                    As Long
+    Addr                    As Long
     params                  As Integer
 End Type
 
@@ -328,7 +328,7 @@ Public Function GetAllCoclasses( _
     Dim typeInf As IUnknown
     Dim ret     As Long
     Dim Count   As Long
-    Dim Index   As Long
+    Dim index   As Long
     Dim pAttr   As Long
     Dim tKind   As Long
     
@@ -347,9 +347,9 @@ Public Function GetAllCoclasses( _
         ReDim listOfClsid(Count - 1)
         ReDim listOfNames(Count - 1)
         
-        For Index = 0 To Count - 1
+        For index = 0 To Count - 1
         
-            ret = ITypeLib_GetTypeInfo(typeLib, Index, typeInf)
+            ret = ITypeLib_GetTypeInfo(typeLib, index, typeInf)
                         
             If ret Then
                 Err.Raise ret
@@ -463,7 +463,7 @@ Public Function GetAllMembers(mList As FastCollection, obj As Object _
     End If
 
     If (TKIND_DISPATCH And mAttr.typekind) > 0 Then
-    
+
         cFuncs = mAttr.cFuncs '' mAttr.cVars
 
         For j = 0 To mAttr.cFuncs - 1
@@ -827,7 +827,7 @@ End Function
 ' // Call "ITypeLib:GetTypeInfo" method.
 Public Function ITypeLib_GetTypeInfo( _
                  ByVal obj As IUnknown, _
-                 ByVal Index As Long, _
+                 ByVal index As Long, _
                  ByRef ppTInfo As IUnknown) As Long
     
     Dim params(1)   As Variant
@@ -837,7 +837,7 @@ Public Function ITypeLib_GetTypeInfo( _
     Dim pIndex      As Long
     Dim pReturn     As Variant
     
-    params(0) = Index
+    params(0) = index
     params(1) = VarPtr(ppTInfo)
     
     For pIndex = 0 To UBound(params)
@@ -888,7 +888,7 @@ End Function
 
 Public Sub ITypeInfo_GetVarDesc( _
             ByVal obj As IUnknown, _
-            ByVal Index As Long, _
+            ByVal index As Long, _
             ByRef ppVarAttr As Long)
     
     Dim resultCall  As Long
@@ -897,7 +897,7 @@ Public Sub ITypeInfo_GetVarDesc( _
     Dim types(1)    As Integer
     Dim list(1)     As Long
     Dim pIndex      As Long
-    params(0) = Index
+    params(0) = index
     params(1) = VarPtr(ppVarAttr)
    
        For pIndex = 0 To UBound(params)
@@ -934,7 +934,7 @@ Public Sub ITypeInfo_GetTypeAttr( _
 End Sub
 Public Sub ITypeInfo_GetRefTypeOfImplType( _
             ByVal obj As IUnknown, _
-            ByVal Index As Long, _
+            ByVal index As Long, _
             ByRef pRefType As Long)
     Dim resultCall  As Long
     Dim pReturn     As Variant
@@ -942,7 +942,7 @@ Public Sub ITypeInfo_GetRefTypeOfImplType( _
     Dim types(1)    As Integer
     Dim list(1)     As Long
         Dim pIndex      As Long
-     params(0) = Index
+     params(0) = index
     params(1) = VarPtr(pRefType)
    
        For pIndex = 0 To UBound(params)
@@ -956,7 +956,7 @@ End Sub
 
 Public Sub ITypeInfo_GetFuncDesc( _
             ByVal obj As IUnknown, _
-            ByVal Index As Long, _
+            ByVal index As Long, _
             ByRef ppFuncAttr As Long)
     
     Dim resultCall  As Long
@@ -965,7 +965,7 @@ Public Sub ITypeInfo_GetFuncDesc( _
     Dim types(1)    As Integer
     Dim list(1)     As Long
         Dim pIndex      As Long
-     params(0) = Index
+     params(0) = index
     params(1) = VarPtr(ppFuncAttr)
    
        For pIndex = 0 To UBound(params)

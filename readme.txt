@@ -1,22 +1,23 @@
 M2000 Interpreter and Environment
-Version 15 Revision 7
+Version 15 Revision 8
 
-
-1) Make the machine code to read variables from module. Also demonstrate the calling method to modules from machine code
-see Asm2 in Info file
-
-2) There is a new Asm3 module which make a test.exe from assembly. So now M2000 can make exe files (only from assembler for now). 
-
+July 18 2026,
+Added four properties for x86 class, for adjusting stack and heap limits.
+I am stopping adding new things, and set my focus to documentation.
+I finish the greek manual, the hard work, and I publish it here and in a few days I will make any corrections.
+I have to refresh the english manual (there is an old one)
   
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
 
 The first time Windows did some work behind the scenes so the M2000 console slowed down. You can type END to close the program and THEN open it again.
 
-To get the INFO file, from M2000 console do these:
+To get the INFO file, from M2000 console do this:
+
 dir appdir$
 load info
-THEN press F1 to save info.gsb to M2000 user directory
+
+then press F1 to save info.gsb to M2000 user directory
 
 You can also execute statement SETTINGS to change font/language/colors and size of console letters.
 
@@ -29,7 +30,7 @@ install ca.crt as root certificate (optional).
 
 http://georgekarras.blogspot.gr/
 
-https://rosettacode.org/wiki/Category:M2000_Interpreter (560 tasks)
+https://rosettacode.org/wiki/Category:M2000_Interpreter (578 tasks)
 
 Code/Exe files can be found here: 
 

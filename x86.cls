@@ -359,11 +359,20 @@ Private m_blnWritePE            As Boolean
 Private m_lngPECodeSize         As Long
 
 Private m_lngBaseAddress        As Long
+Private m_SizeOfStackReserve    As Long
+
+Private m_SizeOfStackCommit     As Long
+Private m_SizeOfHeapReserve     As Long
+Private m_SizeOfHeapCommit      As Long
 
 
 Private Sub Class_Initialize()
     InitInstructions
     m_udeSubsystem = Subsystem_CUI
+    m_SizeOfStackReserve = &H100000
+    m_SizeOfStackCommit = &H1000
+    m_SizeOfHeapReserve = &H100000
+    m_SizeOfHeapCommit = &H1000
 End Sub
 Public Property Get LabelOffset(Name As String) As Long
     If labels Is Nothing Then Exit Property
@@ -689,10 +698,10 @@ Private Function WritePEHeader() As Boolean
             .SizeOfImage = .BaseOfData + RoundToSectionSize(lngImp)
             .SizeOfHeaders = GetPEHeaderSize()
             .Subsystem = m_udeSubsystem
-            .SizeOfStackReserve = &H100000
-            .SizeOfStackCommit = &H1000
-            .SizeOfHeapReserve = &H100000
-            .SizeOfHeapCommit = &H1000
+            .SizeOfStackReserve = m_SizeOfStackReserve
+            .SizeOfStackCommit = m_SizeOfStackCommit
+            .SizeOfHeapReserve = m_SizeOfHeapReserve
+            .SizeOfHeapCommit = m_SizeOfHeapCommit
             .NumberOfRvaAndSizes = 16
             
             With .DataDirectory(ETableImport)
@@ -1216,7 +1225,7 @@ Private Sub InstructionOutOpCode(udtInstr As ASMInstruction)
     
     With Instructions(udtInstr.OpCodeIndex)
         For i = 0 To .OpCodeLen - 1
-            OutputByte .OpCode(i)
+            OutputByte .Opcode(i)
         Next
     End With
 End Sub
@@ -1254,13 +1263,13 @@ Private Sub InstructionOutPrefixes(udtInstr As ASMInstruction)
 End Sub
 
 
-Private Sub OutputMem(ByVal Ptr As Long, ByVal Bytes As Long)
-    If m_lngOutPos + Bytes > m_lngOutSize Then
+Private Sub OutputMem(ByVal Ptr As Long, ByVal bytes As Long)
+    If m_lngOutPos + bytes > m_lngOutSize Then
         Err.Raise 123456, , "not enough space in output array"
     End If
     
-    CopyMemory m_btOutput(m_lngOutPos), ByVal Ptr, Bytes
-    m_lngOutPos = m_lngOutPos + Bytes
+    CopyMemory m_btOutput(m_lngOutPos), ByVal Ptr, bytes
+    m_lngOutPos = m_lngOutPos + bytes
 End Sub
 
 
@@ -2415,7 +2424,16 @@ End Function
 Private Function EvenSize(ByVal SZ As Long) As Long
     EvenSize = SZ + (SZ Mod 2)
 End Function
-
+Public Property Get OutputStrBytes() As String
+    Dim size    As Long
+    size = m_lngOutSize
+    If size Mod 2 = 1 Then
+        OutputStrBytes = StrConv(space$(size), vbFromUnicode)
+    Else
+        OutputStrBytes = space$(size \ 2)
+    End If
+    CopyMemory StrPtr(OutputStrBytes), m_btOutput(0), size
+End Property
 
 ' hex string to byte array
 Private Function HexToByte(ByVal strHex As String) As Byte()
@@ -2808,3 +2826,38 @@ Private Function IsAlphaNumeric(ByVal bt As Byte) As Boolean
                      ((bt >= CHAR_ALPHA_LA) And (bt <= CHAR_ALPHA_LZ)) Or _
                      (bt = CHAR_UNDERSCORE)
 End Function
+
+Public Property Get SizeOfStackReserve() As Long
+SizeOfStackReserve = m_SizeOfStackReserve
+End Property
+
+Public Property Let SizeOfStackReserve(ByVal vNewValue As Long)
+If vNewValue < &H100000 Then vNewValue = &H100000
+m_SizeOfStackReserve = vNewValue
+End Property
+Public Property Get SizeOfStackCommit() As Long
+SizeOfStackCommit = m_SizeOfStackCommit
+End Property
+
+Public Property Let SizeOfStackCommit(ByVal vNewValue As Long)
+If vNewValue > m_SizeOfStackReserve Then vNewValue = m_SizeOfStackReserve
+If vNewValue < &H1000 Then vNewValue = &H1000
+m_SizeOfStackCommit = vNewValue
+End Property
+Public Property Get SizeOfHeapReserve() As Long
+SizeOfHeapReserve = m_SizeOfHeapReserve
+End Property
+
+Public Property Let SizeOfHeapReserve(ByVal vNewValue As Long)
+If vNewValue < &H100000 Then vNewValue = &H100000
+m_SizeOfHeapReserve = vNewValue
+End Property
+Public Property Get SizeOfHeapCommit() As Long
+SizeOfHeapCommit = m_SizeOfHeapCommit
+End Property
+
+Public Property Let SizeOfHeapCommit(ByVal vNewValue As Long)
+If vNewValue > m_SizeOfHeapReserve Then vNewValue = m_SizeOfHeapReserve
+If vNewValue < &H1000 Then vNewValue = &H1000
+m_SizeOfHeapCommit = vNewValue
+End Property

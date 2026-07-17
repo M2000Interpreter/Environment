@@ -340,12 +340,12 @@ Public Function LowLong(ByVal p) As Long
     If Not myVarType(p, 20) Then p = cInt64(p)
     LowLong = MemLong(VarPtr(p) + 8)
 End Function
-Function Hex64$(a, Optional Bytes = 8)
+Function Hex64$(a, Optional bytes = 8)
     Dim p, P1, z
     z = cInt64(a)
     p = MemLong(VarPtr(z) + 8)
     P1 = MemLong(VarPtr(z) + 12)
-    Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(p), 8), Bytes * 2)
+    Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
 End Function
 Public Function OneLongLong() As Variant
     Static p
@@ -3183,7 +3183,7 @@ End If
 CloseClipboard
 End Function
 Public Function GetImageEmf() As mHandler
-Dim hMem As Long, hEmf As Long, Bytes As Long
+Dim hMem As Long, hEmf As Long, bytes As Long
 Dim hCOPY As Long
 Dim mypic As New cDIBSection
 Dim aPic As MemBlock
@@ -3197,12 +3197,12 @@ If IsClipboardFormatAvailable(CF_ENHMETAFILE) Then
          If hEmf <> 0 Then
              ' hCOPY = CopyEnhMetaFile(hemf, ByVal 0)
               
-               Bytes = GetEnhMetaFileBits(hEmf, Bytes, ByVal 0)
-                If Bytes Then
+               bytes = GetEnhMetaFileBits(hEmf, bytes, ByVal 0)
+                If bytes Then
                     Set aPic = New MemBlock
-                    aPic.Construct 1, Bytes
+                    aPic.Construct 1, bytes
                     
-                    Call GetEnhMetaFileBits(hEmf, Bytes, ByVal aPic.GetBytePtr(0))
+                    Call GetEnhMetaFileBits(hEmf, bytes, ByVal aPic.GetBytePtr(0))
                     aPic.SubType = 2 ' emf
                 End If
                ' DeleteEnhMetaFile hCOPY
@@ -5159,7 +5159,7 @@ Case Else  ' MAYBE I MADE ONE FOR STRUCTURES
 End Select
 Next i
 aHash.ItemCreator "®", ProcPtr(AddressOf NeoRead2)
-
+ASMOpCodes.InitInstructions
 allcommands = True
 End Function
 Private Function ProcPtr(ByVal nAddress As Long) As Long
@@ -5355,15 +5355,15 @@ End If
 step2:
 Set basestack.lastobj = Nothing
 Dim aPic As MemBlock, usehandler As mHandler
-Dim Bytes As Long
+Dim bytes As Long
 Dim emfP As StdPicture
 Set emfP = QRCodegenBarcode(ab$, QRcolor, , sq, ErrLevel)
 If emfP Is Nothing Then Exit Sub
 Set aPic = New MemBlock
-Bytes = GetEnhMetaFileBits(emfP.Handle, Bytes, ByVal 0)
-If Bytes Then
-    aPic.Construct 1, Bytes
-    Call GetEnhMetaFileBits(emfP.Handle, Bytes, ByVal aPic.GetBytePtr(0))
+bytes = GetEnhMetaFileBits(emfP.Handle, bytes, ByVal 0)
+If bytes Then
+    aPic.Construct 1, bytes
+    Call GetEnhMetaFileBits(emfP.Handle, bytes, ByVal aPic.GetBytePtr(0))
     aPic.SubType = 2 ' emf
     Set usehandler = New mHandler
     usehandler.t1 = 2

@@ -15,8 +15,6 @@ Option Explicit
 ' TODO:
 '   * for example PINSRW, rem32 => ptr needs DWORD keyword to be assembled,
 '                                  but there aren't any other possibilities
-
-
 Private Const MAX_PARAMETERS                As Long = 3
 Private Const MAX_OPCODE_LEN                As Long = 4
 
@@ -216,8 +214,8 @@ Public Enum ASMXMMRegisters
     XMM7 = &H8000&
 End Enum
 
-Private Type OpCode
-    Bytes(MAX_OPCODE_LEN - 1)       As Byte
+Private Type Opcode
+    bytes(MAX_OPCODE_LEN - 1)       As Byte
     ByteCount                       As Long
     RegOpExt                        As Long
 End Type
@@ -237,7 +235,7 @@ End Type
 Public Type Instruction
     Mnemonic                        As String
     Prefixes                        As OpCodePrefixes
-    OpCode(MAX_OPCODE_LEN - 1)      As Byte
+    Opcode(MAX_OPCODE_LEN - 1)      As Byte
     OpCodeLen                       As Long
     RegOpExt                        As Long
     ModRM                           As Boolean
@@ -1288,29 +1286,28 @@ End Sub
 
 Private Sub Instruction( _
     Mnemonic As String, _
-    OpCode As String, _
+    Opcode As String, _
     ByVal SizeModifier As SizeMod, _
     ByVal Ext As ExtType, _
-    ParamArray Params() As Variant _
+    ParamArray params() As Variant _
 )
-
     Dim strArgs()   As String
     Dim i           As Long
     
-    If UBound(Params) > -1 Then
-        ReDim strArgs(UBound(Params)) As String
+    If UBound(params) > -1 Then
+        ReDim strArgs(UBound(params)) As String
         
-        For i = 0 To UBound(Params)
-            strArgs(i) = Trim$(Params(i))
+        For i = 0 To UBound(params)
+            strArgs(i) = Trim$(params(i))
         Next
     End If
     
     Select Case Ext
-        Case ExtNon: InstrDefault Trim$(Mnemonic), Trim$(OpCode), SizeModifier, strArgs, UBound(Params) + 1
-        Case ExtReg: InstrRegExt Trim$(Mnemonic), Trim$(OpCode), SizeModifier, strArgs, UBound(Params) + 1
-        Case ExtFlt: InstrFloatExt Trim$(Mnemonic), Trim$(OpCode), SizeModifier, strArgs, UBound(Params) + 1
-        Case ExtCon: InstrCondition Trim$(Mnemonic), Trim$(OpCode), SizeModifier, strArgs, UBound(Params) + 1
-        Case Ext3DN: Instr3DNow Trim$(Mnemonic), Trim$(OpCode), SizeModNone, strArgs, UBound(Params) + 1
+        Case ExtNon: InstrDefault Trim$(Mnemonic), Trim$(Opcode), SizeModifier, strArgs, UBound(params) + 1
+        Case ExtReg: InstrRegExt Trim$(Mnemonic), Trim$(Opcode), SizeModifier, strArgs, UBound(params) + 1
+        Case ExtFlt: InstrFloatExt Trim$(Mnemonic), Trim$(Opcode), SizeModifier, strArgs, UBound(params) + 1
+        Case ExtCon: InstrCondition Trim$(Mnemonic), Trim$(Opcode), SizeModifier, strArgs, UBound(params) + 1
+        Case Ext3DN: Instr3DNow Trim$(Mnemonic), Trim$(Opcode), SizeModNone, strArgs, UBound(params) + 1
     End Select
 End Sub
 
@@ -1320,7 +1317,7 @@ Private Sub InstrRegExt( _
     Mnemonic As String, _
     Op As String, _
     ByVal SizeModifier As SizeMod, _
-    Params() As String, _
+    params() As String, _
     ParamCnt As Long _
 )
 
@@ -1335,7 +1332,7 @@ Private Sub InstrRegExt( _
 
     With ParseOpCode(Op)
         For i = 0 To MAX_OPCODE_LEN - 1
-            udtInstr.OpCode(i) = .Bytes(i)
+            udtInstr.Opcode(i) = .bytes(i)
         Next
         
         udtInstr.OpCodeLen = .ByteCount
@@ -1345,16 +1342,16 @@ Private Sub InstrRegExt( _
     End With
     
     For i = 0 To ParamCnt - 1
-        If Left$(Params(i), 1) = "#" Then
+        If Left$(params(i), 1) = "#" Then
             lngRegPa = i
-            Select Case Mid$(Params(i), 2, 2)
+            Select Case Mid$(params(i), 2, 2)
                 Case "08":  udeSize = Bits8
                 Case "16":  udeSize = Bits16
                 Case "32":  udeSize = Bits32
                 Case Else:  Err.Raise 12345, , "Invalid size!"
             End Select
         Else
-            udtInstr.Parameters(i) = ParseParameter(Params(i))
+            udtInstr.Parameters(i) = ParseParameter(params(i))
             If Not udtInstr.Parameters(i).Forced Then
                 If udtInstr.Parameters(i).PType = ParamReg Or _
                    udtInstr.Parameters(i).PType = (ParamReg Or ParamMem) Then
@@ -1369,7 +1366,7 @@ Private Sub InstrRegExt( _
             .Parameters(lngRegPa) = ParseParameter(GetRegExtRegName(i, udeSize))
             AddInstr udtInstr
             
-            .OpCode(.OpCodeLen - 1) = .OpCode(.OpCodeLen - 1) + 1
+            .Opcode(.OpCodeLen - 1) = .Opcode(.OpCodeLen - 1) + 1
         End With
     Next
 End Sub
@@ -1380,7 +1377,7 @@ Private Sub InstrFloatExt( _
     Mnemonic As String, _
     Op As String, _
     ByVal SizeModifier As SizeMod, _
-    Params() As String, _
+    params() As String, _
     ByVal ParamCnt As Long _
 )
 
@@ -1395,7 +1392,7 @@ Private Sub InstrFloatExt( _
 
     With ParseOpCode(Op)
         For i = 0 To MAX_OPCODE_LEN - 1
-            udtInstr.OpCode(i) = .Bytes(i)
+            udtInstr.Opcode(i) = .bytes(i)
         Next
         
         udtInstr.OpCodeLen = .ByteCount
@@ -1403,13 +1400,13 @@ Private Sub InstrFloatExt( _
         udtInstr.Now3DByte = -1
         udtInstr.ModRM = .RegOpExt > -1
     End With
-    lastbyte = udtInstr.OpCode(udtInstr.OpCodeLen - 1)
+    lastbyte = udtInstr.Opcode(udtInstr.OpCodeLen - 1)
     
     For i = 0 To ParamCnt - 1
-        If UCase$(Params(i)) = "ST#" Then
+        If UCase$(params(i)) = "ST#" Then
             lngFlPa = i
         Else
-            udtInstr.Parameters(i) = ParseParameter(Params(i))
+            udtInstr.Parameters(i) = ParseParameter(params(i))
             If Not udtInstr.Parameters(i).Forced Then
                 If udtInstr.Parameters(i).PType = ParamReg Or _
                    udtInstr.Parameters(i).PType = (ParamReg Or ParamMem) Then
@@ -1420,7 +1417,7 @@ Private Sub InstrFloatExt( _
     Next
     
     For i = 0 To 7
-        udtInstr.OpCode(udtInstr.OpCodeLen - 1) = lastbyte + i
+        udtInstr.Opcode(udtInstr.OpCodeLen - 1) = lastbyte + i
         udtInstr.Parameters(lngFlPa) = ParseParameter("ST" & i)
         AddInstr udtInstr
     Next
@@ -1432,7 +1429,7 @@ Private Sub InstrCondition( _
     Mnemonic As String, _
     Op As String, _
     ByVal SizeModifier As SizeMod, _
-    Params() As String, _
+    params() As String, _
     ByVal ParamCnt As Long _
 )
 
@@ -1448,7 +1445,7 @@ Private Sub InstrCondition( _
     
     With ParseOpCode(Op)
         For i = 0 To MAX_OPCODE_LEN - 1
-            udtInstr.OpCode(i) = .Bytes(i)
+            udtInstr.Opcode(i) = .bytes(i)
         Next
         
         udtInstr.OpCodeLen = .ByteCount
@@ -1456,10 +1453,10 @@ Private Sub InstrCondition( _
         udtInstr.Now3DByte = -1
         udtInstr.ModRM = .RegOpExt > -1
     End With
-    lastbyte = udtInstr.OpCode(udtInstr.OpCodeLen - 1)
+    lastbyte = udtInstr.Opcode(udtInstr.OpCodeLen - 1)
     
     For i = 0 To ParamCnt - 1
-        udtInstr.Parameters(i) = ParseParameter(Params(i))
+        udtInstr.Parameters(i) = ParseParameter(params(i))
         If Not udtInstr.Parameters(i).Forced Then
             If udtInstr.Parameters(i).PType = ParamReg Or _
                udtInstr.Parameters(i).PType = (ParamReg Or ParamMem) Then
@@ -1470,7 +1467,7 @@ Private Sub InstrCondition( _
 
     For i = 0 To UBound(conds)
         udtInstr.Mnemonic = Mnemonic & conds(i)
-        udtInstr.OpCode(udtInstr.OpCodeLen - 1) = lastbyte + ConditionOffset(conds(i))
+        udtInstr.Opcode(udtInstr.OpCodeLen - 1) = lastbyte + ConditionOffset(conds(i))
         AddInstr udtInstr
     Next
 End Sub
@@ -1481,7 +1478,7 @@ Private Sub Instr3DNow( _
     Mnemonic As String, _
     Op As String, _
     ByVal SizeModifier As SizeMod, _
-    Params() As String, _
+    params() As String, _
     ByVal ParamCnt As Long _
 )
 
@@ -1494,7 +1491,7 @@ Private Sub Instr3DNow( _
 
     With ParseOpCode(Op)
         For i = 0 To MAX_OPCODE_LEN - 1
-            udtInstr.OpCode(i) = .Bytes(i)
+            udtInstr.Opcode(i) = .bytes(i)
         Next
         
         udtInstr.OpCodeLen = .ByteCount
@@ -1503,7 +1500,7 @@ Private Sub Instr3DNow( _
     End With
     
     For i = 0 To ParamCnt - 2
-        udtInstr.Parameters(i) = ParseParameter(Params(i))
+        udtInstr.Parameters(i) = ParseParameter(params(i))
         If Not udtInstr.Parameters(i).Forced Then
             If udtInstr.Parameters(i).PType = ParamReg Or _
                udtInstr.Parameters(i).PType = (ParamReg Or ParamMem) Or _
@@ -1513,7 +1510,7 @@ Private Sub Instr3DNow( _
         End If
     Next
     
-    udtInstr.Now3DByte = CLng(Params(i))
+    udtInstr.Now3DByte = CLng(params(i))
     
     AddInstr udtInstr
 End Sub
@@ -1523,7 +1520,7 @@ Private Sub InstrDefault( _
     Mnemonic As String, _
     Op As String, _
     ByVal SizeModifier As SizeMod, _
-    Params() As String, _
+    params() As String, _
     ByVal ParamCnt As Long _
 )
 
@@ -1536,7 +1533,7 @@ Private Sub InstrDefault( _
 
     With ParseOpCode(Op)
         For i = 0 To MAX_OPCODE_LEN - 1
-            udtInstr.OpCode(i) = .Bytes(i)
+            udtInstr.Opcode(i) = .bytes(i)
         Next
         
         udtInstr.OpCodeLen = .ByteCount
@@ -1546,7 +1543,7 @@ Private Sub InstrDefault( _
     End With
     
     For i = 0 To ParamCnt - 1
-        udtInstr.Parameters(i) = ParseParameter(Params(i))
+        udtInstr.Parameters(i) = ParseParameter(params(i))
         If Not udtInstr.Parameters(i).Forced Then
             If udtInstr.Parameters(i).PType = ParamReg Or _
                udtInstr.Parameters(i).PType = (ParamReg Or ParamMem) Or _
@@ -1617,7 +1614,7 @@ Private Function ParseParameter(param As String) As InstructionParam
 End Function
 
 
-Private Function ParseOpCode(Op As String) As OpCode
+Private Function ParseOpCode(Op As String) As Opcode
     Dim i       As Long
     Dim strH    As String
     
@@ -1634,7 +1631,7 @@ Private Function ParseOpCode(Op As String) As OpCode
             End Select
             
             If Len(strH) = 2 Then
-                .Bytes(.ByteCount) = CLng("&H" & strH)
+                .bytes(.ByteCount) = CLng("&H" & strH)
                 .ByteCount = .ByteCount + 1
                 strH = ""
             End If
