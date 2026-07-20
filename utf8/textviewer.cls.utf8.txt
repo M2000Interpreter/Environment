@@ -716,25 +716,25 @@ ok = Not HaveMarkedText
 End Sub
 
 
-Private Sub glistN_ChangeListItem(item As Long, Content As String)
+Private Sub glistN_ChangeListItem(item As Long, content As String)
 Dim selstart2 As Long, checklistindex As Long
 '' only for M2000, use NumberOnly
 If NumberOnly Then
-If Not ValidNum(Content, False, NumberIntOnly) Then
+If Not ValidNum(content, False, NumberIntOnly) Then
 undotext = vbNullString
-Content = mDoc.TextLine(item + 1)
+content = mDoc.TextLine(item + 1)
 Exit Sub
 End If
 End If
 If UsedAsTextBox Then
-If Len(Content) > glistN.maxchar Then
+If Len(content) > glistN.maxchar Then
 'IsRTLrun
 Charpos = glistN.maxchar
 glistN.SelStartEventAlways = glistN.SelStart - 1
 Exit Sub
 End If
 End If
-mDoc.TextLine(item + 1) = Content
+mDoc.TextLine(item + 1) = content
 'IsRTLrun
 WrapMarkedPara
 If all <> mDoc.DocLines Then
@@ -1892,10 +1892,10 @@ End If
 
 End Sub
 
-Private Sub glistN_ReadListItem(item As Long, Content As String)
+Private Sub glistN_ReadListItem(item As Long, content As String)
 If item >= 0 Then
 
-Content = mDoc.TextLine2(item + 1, showparagraphWork And showparagraph)
+content = mDoc.TextLine2(item + 1, showparagraphWork And showparagraph)
 
 End If
 End Sub
@@ -2377,7 +2377,7 @@ If onetime Then
         GoTo CheckThis
     End If
 End If
-drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
+drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 5
 If kind = 0 Then
     If IsSymbol(a$, "@") Then
         If pos2 > 0 Then
@@ -2391,8 +2391,8 @@ End If
 again500:
 kind = IsLabelDot("", a$, drop$)
 
-If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
-If kind = 0 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
+If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 6
+If kind = 0 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 5
 If kind = 0 Then drop$ = "->": kind = Abs(FastSymbol(a$, drop$, , 2))
 fromjump:
 If kind = 0 Then drop$ = vbNullString
@@ -2725,7 +2725,13 @@ here3:
     Else
 again4:
         If MaybeIsSymbolNoSpace(a$, "~", True) Then
-            addone pos2, 15
+            If MaybeIsSymbolNoSpace(a$, "(", True) Then
+                If ps Is Nothing Then Set ps = New mStiva2
+                ps.PushLong 11&
+                addone pos2, 11
+            Else
+                addone pos2, 15
+            End If
             pos2 = k - Len(a$) + 1
         ElseIf FastSymbol(a$, "=>", , 2) Then
             addone pos2, 14
@@ -3080,7 +3086,7 @@ End If
 End If
 Exit Sub
 End If
-drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
+drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 5
 If kind = 0 Then
     If IsSymbol(a$, "@") Then
         If pos2 > 0 Then
@@ -3139,8 +3145,8 @@ getlabelonly:
         
     End If
 End If
-If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
-If kind = 0 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
+If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 6
+If kind = 0 And pos2 < 2 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 5
 If kind = 0 Then
   If FastSymbol(a$, "->", , 2) Then
   If Not TokenLambda Then

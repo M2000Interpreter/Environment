@@ -1,11 +1,9 @@
 M2000 Interpreter and Environment
-Version 15 Revision 8
+Version 15 Revision 9
 
-July 18 2026,
-Added four properties for x86 class, for adjusting stack and heap limits.
-I am stopping adding new things, and set my focus to documentation.
-I finish the greek manual, the hard work, and I publish it here and in a few days I will make any corrections.
-I have to refresh the english manual (there is an old one)
+July 20, 2026,
+Adjustments for the Colorize code for @(), $() and ~(), the inner functions of PRINT statement.
+Works for M2000 Editor (textViewer.cls) and EditBox control for forms.    
   
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

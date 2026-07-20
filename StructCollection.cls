@@ -60,10 +60,10 @@ Friend Sub AddMoreSpace(ThatSpace As Long)
     ReDim Preserve PriveSpace(MaxSpace) As item
 End Sub
 Public Sub AddKey2(RHS, Optional aValue As Variant)
-Stop
+'Stop
 End Sub
 Public Sub AddKey(RHS, Optional aValue As Variant)
-Stop
+'Stop
 End Sub
 Public Property Get StructOffset() As Long
 If index > -1 Then

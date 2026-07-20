@@ -243,7 +243,7 @@ With Callback
 white = .Controls(1).ForeColor
 ff.Name = .CtrlFontName
 ff.charset = Form1.DIS.Font.charset
-ff.size = .CtrlFontSize
+ff.Size = .CtrlFontSize
 ff.bold = .CtrlFontBold
 End With
 mStayOpen = True
@@ -982,33 +982,33 @@ End Property
 Public Property Let MaxCharLength(ByVal RHS As Long)
 glistN.maxchar = RHS
 End Property
-Private Sub glistN_ChangeListItem(item As Long, Content As String)
+Private Sub glistN_ChangeListItem(item As Long, content As String)
 Dim selstart2 As Long, checklistindex As Long, old$
 '' only for M2000, use NumberOnly
 If NumberOnly Or NumberIntOnly Then
-Content = MyTrim(Content)
+content = MyTrim(content)
 NumberOnly = True
-If Len(Content) > glistN.maxchar Then
+If Len(content) > glistN.maxchar Then
 Charpos = glistN.maxchar
 glistN.SelStartEventAlways = glistN.SelStart - 1
 Exit Sub
 End If
-If Content = vbNullString Then
-ElseIf Not ValidNum(Content, False, NumberIntOnly) Then
+If content = vbNullString Then
+ElseIf Not ValidNum(content, False, NumberIntOnly) Then
 undotext = vbNullString
-Content = mDoc.TextLine(item + 1)
+content = mDoc.TextLine(item + 1)
 Exit Sub
 End If
 End If
 If UsedAsTextBox Then
-If Len(Content) > glistN.maxchar Then
+If Len(content) > glistN.maxchar Then
 IsRTLrun
 Charpos = glistN.maxchar
 glistN.SelStartEventAlways = glistN.SelStart - 1
 Exit Sub
 End If
 End If
-mDoc.TextLine(item + 1) = Content
+mDoc.TextLine(item + 1) = content
 'IsRTLrun
 WrapMarkedPara
 If all <> mDoc.DocLines Then
@@ -2452,12 +2452,12 @@ If mIndex >= 0 Then
 End If
 End Sub
 
-Private Sub glistN_ReadListItem(item As Long, Content As String)
+Private Sub glistN_ReadListItem(item As Long, content As String)
 If item >= 0 Then
 
-Content = mDoc.TextLine2(item + 1, showparagraphWork And showparagraph)
+content = mDoc.TextLine2(item + 1, showparagraphWork And showparagraph)
 If showparagraph And showparagraphWork Then
-Content = Replace(Content, vbTab, ChrW(&H21E5))
+content = Replace(content, vbTab, ChrW(&H21E5))
 End If
 End If
 End Sub
@@ -2810,7 +2810,7 @@ End If
 End If
 Exit Sub
 End If
-drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
+drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 5
 If kind = 0 Then
     If IsSymbol(a$, "@") Then
         If pos2 > 0 Then
@@ -2869,8 +2869,8 @@ getlabelonly:
         
     End If
 End If
-If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
-If kind = 0 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
+If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 6
+If kind = 0 And pos2 < 2 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 5
 If kind = 0 Then
   If FastSymbol(a$, "->", , 2) Then
   If Not TokenLambda Then
@@ -4966,7 +4966,7 @@ If onetime Then
         GoTo CheckThis
     End If
 End If
-drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
+drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 5
 If kind = 0 Then
     If IsSymbol(a$, "@") Then
         If pos2 > 0 Then
@@ -4980,8 +4980,8 @@ End If
 again500:
 kind = IsLabelDot2000("", a$, drop$)
 
-If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
-If kind = 0 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
+If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 6
+If kind = 0 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 5
 If kind = 0 Then drop$ = "->": kind = Abs(FastSymbol(a$, drop$, , 2))
 fromjump:
 If kind = 0 Then drop$ = vbNullString
@@ -5314,7 +5314,18 @@ here3:
     Else
 again4:
         If MaybeIsSymbolNoSpace(a$, "~", True) Then
-            addone2000 pos2, 15
+            If MaybeIsSymbolNoSpace(a$, "(", True) Then
+                If ps Is Nothing Then Set ps = New mStiva2
+                ps.PushLong 11&
+                addone2000 pos2, 11
+            Else
+                addone2000 pos2, 15
+            End If
+            pos2 = k - Len(a$) + 1
+        ElseIf FastSymbol(a$, "~(", , 2) Then
+            If ps Is Nothing Then Set ps = New mStiva2
+            ps.PushLong 11&
+            addone2000 pos2, 11
             pos2 = k - Len(a$) + 1
         ElseIf FastSymbol(a$, "=>", , 2) Then
             addone2000 pos2, 14
@@ -8456,7 +8467,7 @@ If ThisFontName <> "" Then
 
 aa.Name = ThisFontName
 
-If ThisMode > 7 Then aa.size = ThisMode Else aa = 7
+If ThisMode > 7 Then aa.Size = ThisMode Else aa = 7
 aa.bold = ThisBold
 Set glistN.Font = aa
 TextPixelOffset = Int(glistN.TextHeightOffset)
@@ -9746,16 +9757,16 @@ End Property
 
 Public Property Let Value(ByVal vNewValue As Variant)
 NumberOnly = True
-Dim Content As String
+Dim content As String
 
 If MyIsNumeric(vNewValue) Then
-Content = NLtrim$(str(vNewValue))
-If Not ValidNum(Content, True, NumberIntOnly) Then
+content = NLtrim$(str(vNewValue))
+If Not ValidNum(content, True, NumberIntOnly) Then
     Text = vbNullString
 ElseIf vNewValue = 0 Then
     Text = vbNullString
 Else
-    Text = Content
+    Text = content
     End If
     Else
     Text = vbNullString
@@ -10873,7 +10884,7 @@ If UsedAsTextBox Or NumberOnly Or NumberIntOnly Then Callback.SendFKEY a
 End If
 End Sub
 
-Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional OpCode As Long = 0)
+Public Sub AccKey(a, Optional shift As Boolean, Optional ctrl As Boolean, Optional alt As Boolean, Optional Opcode As Long = 0)
 
 If MyIsNumeric(a) Then
 a = CLng(a)
@@ -10889,10 +10900,10 @@ a = AscW(a)
 If a > 126 Then a = 0
 End Select
 End If
-If OpCode < 0 Then OpCode = 0
+If Opcode < 0 Then Opcode = 0
 If a = 0 Then Exit Sub
 a = a - 1000 * shift - 10000 * ctrl - 100000 * alt
-Callback.RegisterAcc a, ctrlName, OpCode
+Callback.RegisterAcc a, ctrlName, Opcode
 End Sub
 Private Sub gListN_AccKey(M As Long)
 Callback.AccProces M
