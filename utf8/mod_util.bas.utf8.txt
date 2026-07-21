@@ -13740,7 +13740,7 @@ Exit Function
 
 End Function
 Private Function textPUT(bstack As basetask, ByVal ThisFile As String, THISBODY As String, c$, mode2save As Long) As Boolean
-Dim chk As String, b$, j As Long, Prepare$, VR$, s$, v As Double, buf$, i As Long
+Dim chk As String, b$, j As Long, Prepare$, VR$, s$, v, buf$, i As Long
 ThisFile = strTemp + ThisFile
 chk = GetDosPath(ThisFile)
 If chk <> "" And c$ = "new" Then KillFile GetDosPath(chk)
@@ -13756,8 +13756,18 @@ If j = 0 Then Prepare$ = Prepare$ + THISBODY: Exit Do
 If j > 1 Then VR$ = Mid$(THISBODY, 1, InStr(THISBODY, "##") - 1)
 THISBODY = Mid$(THISBODY, j + 2)
 '
-If IsExp(bstack, VR$, v, , True) Then
-buf$ = Trim$(str$(v))
+If IsExp(bstack, VR$, v) Then
+If bstack.lastobj Is Nothing Then
+buf$ = fixthis(v)
+ElseIf TypeOf bstack.lastobj Is BigInteger Then
+Dim bb As BigInteger
+Set bb = bstack.lastobj
+    buf$ = bb.ToString
+Else
+Set bstack.lastobj = Nothing
+buf$ = fixthis(v)
+End If
+
 ElseIf IsStrExp(bstack, VR$, s$, Len(bstack.tmpstr) = 0) Then
 buf$ = s$
 Else
@@ -19873,12 +19883,12 @@ End If
 End Function
 
 Sub ClearLoadedForms()
-Dim i As Long, j As Long, Start As Long
+Dim i As Long, j As Long, start As Long
 j = Forms.Count
 Debug.Print ""
 While j > 0
-For i = Start To Forms.Count - 1
-If TypeOf Forms(i) Is GuiM2000 Then Unload Forms(i): Start = i: Exit For
+For i = start To Forms.Count - 1
+If TypeOf Forms(i) Is GuiM2000 Then Unload Forms(i): start = i: Exit For
 Next i
 j = j - 1
 Wend
@@ -33875,10 +33885,10 @@ JUMPHERE:
             LastErName = vbNullString
             a$ = Mid$(a$, w1)
             Validator = FastSymbol(a$, ")")
-            r = 0
+            r = False
         End If
-        If "" <> LastErName Then r = 0
-        If "" <> LastErNameGR Then r = 0
+        If "" <> LastErName Then r = False
+        If "" <> LastErNameGR Then r = False
         LastErNameGR = vbNullString
         LastErName = vbNullString
         LastErNum = 0
