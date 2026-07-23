@@ -1259,9 +1259,6 @@ dqq.currentY = .currow * .Yt + .uMineLineSpace
 End With
 End Sub
 Public Sub SetDouble(dq As Object)
-'With players(GetCode(dq))
-'    SetTextSZ dq, .SZ, 2
-'End With
 SetTextSZ dq, players(GetCode(dq)).SZ, 2
 End Sub
 
@@ -3204,59 +3201,58 @@ End Sub
 Public Sub SetTextSZ(dq As Object, mSz As Single, Optional factor As Single = 1, Optional AddTwipsTop As Long = -1)
 ' Used for making specific basket
 On Error Resume Next
+
 With players(GetCode(dq))
 If AddTwipsTop < 0 Then
     If .double And factor = 1 Then
-    .mysplit = .osplit
-    .Column = .OCOLUMN
-    .currow = (.currow + 1) * 2 - 2
-    .curPos = .curPos * 2
-    If .UseDouble > 0 Then
-        mSz = .UseDouble
-        .UseDouble = 0 ' .SZ
-    Else
-        mSz = .SZ / 2
-    End If
-    .uMineLineSpace = .MineLineSpace
-    .double = False
+        .mysplit = .osplit
+        .Column = .OCOLUMN
+        .currow = (.currow + 1) * 2 - 2
+        .curPos = .curPos * 2
+        If .UseDouble > 0 Then
+            mSz = .UseDouble
+            .UseDouble = 0 ' .SZ
+        Else
+            mSz = .SZ / 2
+        End If
+        .uMineLineSpace = .MineLineSpace
+        .double = False
     ElseIf factor = 2 And Not .double Then
-     .osplit = .mysplit
-     .OCOLUMN = .Column
-     .Column = .Column \ 2
-     .mysplit = .mysplit \ 2
-     .currow = (.currow + 1) \ 2
-     .curPos = .curPos / 2
-     If .UseDouble > 0 Then
-        mSz = .UseDouble
-        .UseDouble = 0
-     Else
-     If Not .IamEmf Then
-    Dim oldTH As Long
-    oldTH = dq.TextHeight("A")
-    .UseDouble = .SZ
-     mSz = .SZ * 2
-     dq.FontSize = mSz
-     Do While oldTH * 2 < dq.TextHeight("A")
-     mSz = mSz - 0.25
-     If mSz < 1 Then mSz = 1: Exit Do
-     dq.FontSize = mSz
-     Loop
-     Else
-     .UseDouble = .SZ
-     mSz = .SZ * 2
-     dq.FontSize = mSz
-     End If
-     
-     End If
-    .uMineLineSpace = .MineLineSpace * 2
-    .double = True
+        .osplit = .mysplit
+        .OCOLUMN = .Column
+        .Column = .Column \ 2
+        .mysplit = .mysplit \ 2
+        .currow = (.currow + 1) \ 2
+        .curPos = .curPos / 2
+        If .UseDouble > 0 Then
+           mSz = .UseDouble
+           .UseDouble = 0
+        Else
+            If Not .IamEmf Then
+                Dim oldTH As Long
+                oldTH = dq.TextHeight("A")
+                .UseDouble = .SZ
+                mSz = .SZ * 2
+                dq.FontSize = mSz
+                Do While oldTH * 2 < dq.TextHeight("A")
+                    mSz = mSz - 0.25
+                    If mSz < 1 Then mSz = 1: Exit Do
+                    dq.FontSize = mSz
+                Loop
+            Else
+                .UseDouble = .SZ
+                mSz = .SZ * 2
+                dq.FontSize = mSz
+            End If
+         End If
+        .uMineLineSpace = .MineLineSpace * 2
+        .double = True
     End If
 Else
-
-mSz = mSz * factor
-.MineLineSpace = AddTwipsTop
-.uMineLineSpace = AddTwipsTop * factor
-.double = factor <> 1
+    mSz = mSz * factor
+    .MineLineSpace = AddTwipsTop
+    .uMineLineSpace = AddTwipsTop * factor
+    .double = factor <> 1
 End If
 dq.FontSize = mSz
 .SZ = mSz
@@ -3273,9 +3269,6 @@ If .double Then
     End If
 End If
 SetText dq
-
-
-
 If .mY <= 0 Then .mY = 1
 If .mX <= 0 Then .mX = 1
 .SZ = dq.FontSize

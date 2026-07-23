@@ -625,7 +625,6 @@ End Sub
 
 Private Sub glistN_Maybelanguage()
 If Not glistN.enabled Then Exit Sub
-
 If glistN.SelStart = 0 Then
 RaiseEvent inform(glistN.ListIndex + 1, 1)
 Else
@@ -762,7 +761,6 @@ End Sub
 
 Private Sub glistN_ChangeSelStart(thisselstart As Long)
 If glistN.ListIndex < 0 Then Exit Sub
-
 Dim what$, ThatPara As Long, pastchars As Long, oldpanpos As Long
 pastchars = mDoc.TextParagraphLine2(glistN.ListIndex + 1, what$, ThatPara, False)
 Charpos = pastchars + glistN.SelStart
@@ -2008,7 +2006,7 @@ If glistN.ListIndex >= 0 Then
     b$ = mDoc.TextParagraph(mDoc.MarkParagraphID)
 If Charpos = 1 And b$ <> "" Then
     dummy = mDoc.InsertBeforeParagraph(mDoc.MarkParagraphID, "")
-        mDoc.ColorThis (dummy)
+     mDoc.ColorThis (dummy)
      all = mDoc.DocLines
     mDoc.MarkParagraphID = dummy
     SetRowColumn glistN.ListIndex + 2, 0
@@ -4336,6 +4334,8 @@ mDoc.MarkParagraphID = ThatPara
 End Property
 Public Property Let Text2(RHS As String)
 Dim oldenabled As Boolean
+Set ps = Nothing
+
 LastListIndex = 0
 If Me.HaveMarkedText Then
 BlockStartPara = BlockEndPara

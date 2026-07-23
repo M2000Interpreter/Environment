@@ -328,15 +328,14 @@ End Sub
 Private Sub ColorThis2(mNum As Long, Optional Count As Long = 0, Optional LookDown As Boolean = True)
     Dim mNum1 As Long, laststart As Long
     If mNum = 0 Then Exit Sub
-    If para(mNum).ParenthFrom > 0 And para(mNum).ParenthFrom <= mNum Then
+    If para(mNum).ParenthFrom > 0 Then  ' And para(mNum).ParenthFrom <= mNum
         mNum = para(mNum).ParenthFrom
         para(mNum).ParenthFrom = 0
         laststart = mNum
-        mNum1 = DocParaNext(mNum1)
+        mNum1 = DocParaNext(mNum)
         Do While mNum1 <> 0
             If para(mNum1).ParenthFrom = laststart Then
                 para(mNum1).ParenthFrom = 0
-                'ColorThis1 mNum1, (0), True
                 mNum1 = DocParaNext(mNum1)
             Else
                 Exit Do
@@ -2608,13 +2607,13 @@ Loop
 End Property
 Private Function mWordCount(ByVal s$) As Long
 Dim i&, l As Long
-Static p2 As Long, p1 As Integer, p4 As Long
+Static P2 As Long, P1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then Exit Function
-  p2 = StrPtr(s): l = l - 1
-  p4 = p2 - 2
-  For i = p2 To p2 + l * 2 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  P2 = StrPtr(s): l = l - 1
+  p4 = P2 - 2
+  For i = P2 To P2 + l * 2 Step 2
+  GetMem2 i, P1
+  Select Case P1
     Case 65 To 90, 97 To 122, Is > 127
     If i - p4 = 2 Then mWordCount = mWordCount + 1
     Case 39
@@ -2626,25 +2625,25 @@ Static p2 As Long, p1 As Integer, p4 As Long
 End Function
 Private Function mWordMap(s$) As String
 Dim i&, l As Long
-Static p2 As Long, p1 As Integer, p3 As Long, p4 As Long
+Static P2 As Long, P1 As Integer, p3 As Long, p4 As Long
 Dim ss$, Pos As Long
 Pos = -2
   l = Len(s): If l = 0 Then mWordMap = " ": Exit Function
 
-  p2 = StrPtr(s$): l = l - 1
-  p3 = p2
-  p4 = p2 - 2
-  For i = p2 To p2 + l * 2 Step 2
-  GetMem2 i, p1
-  Select Case p1
+  P2 = StrPtr(s$): l = l - 1
+  p3 = P2
+  p4 = P2 - 2
+  For i = P2 To P2 + l * 2 Step 2
+  GetMem2 i, P1
+  Select Case P1
     Case 65 To 90, 97 To 122, Is > 127
-    If i - p4 = 2 Then p2 = i: Pos = Pos + 2
+    If i - p4 = 2 Then P2 = i: Pos = Pos + 2
     Case 39
     If i - p4 = 2 Then p4 = i
     Case Else
     If i - p4 > 2 Then
-            CopyMemory ByVal p3 + Pos, ByVal p2, i - p2
-            Pos = Pos + i - p2
+            CopyMemory ByVal p3 + Pos, ByVal P2, i - P2
+            Pos = Pos + i - P2
             PutMem2 p3 + Pos, 32   ' place a space...
             
     End If
@@ -2652,8 +2651,8 @@ Pos = -2
   End Select
   Next i
   If i - p4 > 2 Then
-        CopyMemory ByVal p3 + Pos, ByVal p2, i - p2
-        Pos = Pos + i - p2
+        CopyMemory ByVal p3 + Pos, ByVal P2, i - P2
+        Pos = Pos + i - P2
   End If
   Pos = Pos / 2
   If Pos <= 0 Then
@@ -2718,32 +2717,32 @@ Dim p5 As Long
 p5 = 512 '' L \ 32 + 1
 ReDim Pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
 Dim i As Long, k As Long
-Dim p2 As Long, p4 As Long, p6 As Long, bb As Integer
-p2 = StrPtr(a$)
-p3 = p2
+Dim P2 As Long, p4 As Long, p6 As Long, bb As Integer
+P2 = StrPtr(a$)
+p3 = P2
 Dim Md As Long, mda As Long, mtop As Long
-l = p2 + 2 * l
-p4 = p2
+l = P2 + 2 * l
+p4 = P2
 Do
          If p4 >= l Then
-         If p4 <> p2 Then GoTo there1
+         If p4 <> P2 Then GoTo there1
         CountWords2 = top: Exit Function
         End If
             GetMem2 p4, bb
             Select Case bb
             Case 65 To 90, 97 To 122, Is > 127
             Case 39
-            If p4 = p2 Then p2 = p4 + 2
+            If p4 = P2 Then P2 = p4 + 2
             Case Else
-            If p4 <> p2 Then
+            If p4 <> P2 Then
 there1:
-                k = (p4 - p2) \ 2
+                k = (p4 - P2) \ 2
                 mtop = top
                 mda = 0
                 Md = (mtop - mda + 1) \ 2
                 p6 = mda + Md
                 Do While Md > 0
-                    Select Case CompareString(uLCID, NORM_IGNORECASE, p2, k, Pos(p6), slen(p6))
+                    Select Case CompareString(uLCID, NORM_IGNORECASE, P2, k, Pos(p6), slen(p6))
                         Case 1
                             mtop = mtop - Md
                             Md = (mtop - mda + 1) \ 2
@@ -2764,19 +2763,19 @@ there1:
                     top = top + 1
                     
                     If mda = top - 1 Then
-                        Pos(top) = p2
+                        Pos(top) = P2
                         slen(top) = k
                     Else
                         CopyMemory ByVal VarPtr(Pos(1)) + mda * 4 + 4, ByVal VarPtr(Pos(1)) + mda * 4, (top - mda - 1) * 4
                         CopyMemory ByVal VarPtr(slen(1)) + mda * 4 + 4, ByVal VarPtr(slen(1)) + mda * 4, (top - mda - 1) * 4
                         CopyMemory ByVal VarPtr(hit(1)) + mda * 4 + 4, ByVal VarPtr(hit(1)) + mda * 4, (top - mda - 1) * 4
-                        Pos(mda + 1) = p2
+                        Pos(mda + 1) = P2
                         slen(mda + 1) = k
                         hit(mda + 1) = 0
                     End If
                 End If
             End If
-            p2 = p4 + 2
+            P2 = p4 + 2
             End Select
             p4 = p4 + 2
   Loop
@@ -3063,14 +3062,14 @@ End Sub
 Function InstrTextCompareAnyLocale(Position As Long, from$, this$, Optional uLCID As Long = 1033) As Long
 Dim NORM_IGNORECASE As Long
 If Not NoIgnoreCase Then NORM_IGNORECASE = &H1
-Dim p1 As Long, p2 As Long, l1 As Long, l2 As Long, cu As Long
+Dim P1 As Long, P2 As Long, l1 As Long, l2 As Long, cu As Long
 l1 = (Len(from$) - Len(this$)) * 2 - (Position - 1) * 2
 If l1 < 0 Then Exit Function
-p1 = StrPtr(from$) + (Position - 1) * 2
-p2 = StrPtr(this$)
+P1 = StrPtr(from$) + (Position - 1) * 2
+P2 = StrPtr(this$)
 l2 = Len(this$)
-For cu = p1 To p1 + l1 Step 2
-If CompareString(uLCID, NORM_IGNORECASE, cu, l2, p2, l2) = 2 Then
+For cu = P1 To P1 + l1 Step 2
+If CompareString(uLCID, NORM_IGNORECASE, cu, l2, P2, l2) = 2 Then
 InstrTextCompareAnyLocale = (cu - StrPtr(from$)) \ 2 + 1
 Exit Function
 End If
@@ -3079,18 +3078,18 @@ End Function
 Function CompareOnly(Position As Long, from$, this$, Optional uLCID As Long = 1033) As Boolean
 Dim NORM_IGNORECASE As Long
 If Not NoIgnoreCase Then NORM_IGNORECASE = &H1
-Dim p1 As Long, p2 As Long, l1 As Long, l2 As Long, cu As Long
+Dim P1 As Long, P2 As Long, l1 As Long, l2 As Long, cu As Long
 l1 = (Len(from$) - Len(this$)) * 2 - (Position - 1) * 2
 If l1 < 0 Then Exit Function
-p1 = StrPtr(from$) + (Position - 1) * 2
-p2 = StrPtr(this$)
+P1 = StrPtr(from$) + (Position - 1) * 2
+P2 = StrPtr(this$)
 l2 = Len(this$)
-CompareOnly = CompareString(uLCID, NORM_IGNORECASE, p1, l2, p2, l2) = 2
+CompareOnly = CompareString(uLCID, NORM_IGNORECASE, P1, l2, P2, l2) = 2
 End Function
 Function InstrRevTextCompareAnyLocale(from$, this$, Optional Position As Long = -1, Optional uLCID As Long = 1033) As Long
 Dim NORM_IGNORECASE As Long
 If Not NoIgnoreCase Then NORM_IGNORECASE = &H1
-Dim p1 As Long, p2 As Long, l1 As Long, l2 As Long, cu As Long
+Dim P1 As Long, P2 As Long, l1 As Long, l2 As Long, cu As Long
 If Len(from$) < Position Then Position = -1
 If Position > 0 Then
 l1 = (Len(from$) - Len(this$)) * 2 - (Len(from$) - Position) * 2
@@ -3098,22 +3097,22 @@ Else
 l1 = (Len(from$) - Len(this$)) * 2
 End If
 If l1 < 0 Then Exit Function
-p1 = StrPtr(from$)
-p2 = StrPtr(this$)
+P1 = StrPtr(from$)
+P2 = StrPtr(this$)
 l2 = Len(this$)
-For cu = p1 + l1 To p1 Step -2
-If CompareString(uLCID, NORM_IGNORECASE, cu, l2, p2, l2) = 2 Then
-InstrRevTextCompareAnyLocale = (cu - p1) \ 2 + 1
+For cu = P1 + l1 To P1 Step -2
+If CompareString(uLCID, NORM_IGNORECASE, cu, l2, P2, l2) = 2 Then
+InstrRevTextCompareAnyLocale = (cu - P1) \ 2 + 1
 Exit Function
 End If
 Next cu
 End Function
 
-Public Property Get lcid() As Long
-lcid = mLCid
+Public Property Get LCID() As Long
+LCID = mLCid
 End Property
 
-Public Property Let lcid(ByVal RHS As Long)
+Public Property Let LCID(ByVal RHS As Long)
 If CLng(RHS) = 0 Then
     mLCid = OsInfo.LangNonUnicodeCode
 ElseIf GetCodePage(CLng(RHS)) <> 0 Then
@@ -3210,7 +3209,7 @@ Else
     If cur - lenFind >= 0 Then
         If TextParagraphLen(there) + 1 < cur - 1 Then
         Else
-            If CompareOnly(cur - lenFind, TextParagraph(there), Find$, lcid) Then
+            If CompareOnly(cur - lenFind, TextParagraph(there), Find$, LCID) Then
                 cur = cur - lenFind - 1
             End If
         End If

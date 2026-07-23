@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 10
+Global Const Revision = 11
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3997,74 +3997,73 @@ End Sub
 
 
 Function SizeY(bstack As basetask, a$, s$, s1$, r As Variant) As Boolean
-Dim R2 As Variant, R3 As Variant, R4 As Variant
+    Dim R2 As Variant, R3 As Variant, R4 As Variant
     R3 = 0
     R4 = 0
-    If IsStrExp(bstack, a$, s$, False) Then
-    If Not FastSymbol(a$, ",") Then: missParam a$: SizeY = False: Exit Function
-    If Not IsStrExp(bstack, a$, s1$, False) Then: missParam a$: SizeY = False: Exit Function
-    If Not FastSymbol(a$, ",") Then: missParam a$: SizeY = False: Exit Function
-    If Not IsExp(bstack, a$, R2, , True) Then: missParam a$: SizeY = False: Exit Function
-    If bstack.toprinter Then
-        If szFactor = 0 Then InternalError: Exit Function
-        R2 = R2 * szFactor
-    End If
-    If FastSymbol(a$, ",") Then
-        If Not IsExp(bstack, a$, R3, , True) Then
-             missParam a$: SizeY = False: Exit Function
+    If IsFlatStringExpr(bstack, a$, s$) Then
+        If Not FastSymbol(a$, ",") Then: missParam a$: SizeY = False: Exit Function
+        If Not IsFlatStringExpr(bstack, a$, s1$) Then: missParam a$: SizeY = False: Exit Function
+        If Not FastSymbol(a$, ",") Then: missParam a$: SizeY = False: Exit Function
+        If Not IsExp(bstack, a$, R2, , True, , True) Then: missParam a$: SizeY = False: Exit Function
+        If bstack.toprinter Then
+            If szFactor = 0 Then InternalError: Exit Function
+            R2 = R2 * szFactor
         End If
+        If FastSymbol(a$, ",") Then
+            If Not IsExp(bstack, a$, R3, , True, , True) Then
+                 missParam a$: SizeY = False: Exit Function
+            End If
             If FastSymbol(a$, ",") Then
-                If Not IsExp(bstack, a$, R4, , True) Then
+                If Not IsExp(bstack, a$, R4, , True, , True) Then
                     missParam a$: SizeY = False: Exit Function
                 End If
                 R4 = Abs(Int(R4))
             End If
         End If
-    On Error Resume Next
-    r = nTextY(bstack, s$, s1$, CSng(R2), R3, R4)
-    If bstack.toprinter Then
-        r = r * prFactor
-    End If
-    If Err.Number > 0 Then r = 0
-    On Error GoTo 0
-    SizeY = FastSymbol(a$, ")", True)
+        On Error Resume Next
+        r = nTextY(bstack, s$, s1$, CSng(R2), CDbl(R3), CLng(R4))
+        If bstack.toprinter Then
+            r = r * prFactor
+        End If
+        If Err.Number > 0 Then r = 0
+        On Error GoTo 0
+        SizeY = FastSymbol(a$, ")", True)
     End If
 End Function
 
 Function SizeX(bstack As basetask, a$, s$, s1$, r As Variant) As Boolean
-Dim R2 As Variant, R3 As Variant, R4 As Variant
+    Dim R2 As Variant, R3 As Variant, R4 As Variant
     R3 = 0
     R4 = 0
-    If IsStrExp(bstack, a$, s$, False) Then
-    If Not FastSymbol(a$, ",") Then SizeX = False: Exit Function
-    If Not IsStrExp(bstack, a$, s1$, False) Then SizeX = False: Exit Function
-    If Not FastSymbol(a$, ",") Then SizeX = False: Exit Function
-    If Not IsExp(bstack, a$, R2, , True) Then SizeX = False: Exit Function
-    If bstack.toprinter Then
-        If szFactor = 0 Then InternalError: Exit Function
-        R2 = R2 * szFactor
-    End If
-    If FastSymbol(a$, ",") Then
-        If Not IsExp(bstack, a$, R3, , True) Then
-           missParam a$: SizeX = False: Exit Function
+    If IsFlatStringExpr(bstack, a$, s$) Then
+        If Not FastSymbol(a$, ",") Then SizeX = False: Exit Function
+        If Not IsFlatStringExpr(bstack, a$, s1$) Then SizeX = False: Exit Function
+        If Not FastSymbol(a$, ",") Then SizeX = False: Exit Function
+        If Not IsExp(bstack, a$, R2, , True, , True) Then SizeX = False: Exit Function
+        If bstack.toprinter Then
+            If szFactor = 0 Then InternalError: Exit Function
+            R2 = R2 * szFactor
         End If
+        If FastSymbol(a$, ",") Then
+            If Not IsExp(bstack, a$, R3, , True, , True) Then
+               missParam a$: SizeX = False: Exit Function
+            End If
             If FastSymbol(a$, ",") Then
-                If Not IsExp(bstack, a$, R4, , True) Then
+                If Not IsExp(bstack, a$, R4, , True, , True) Then
                     missParam a$: SizeX = False: Exit Function
                 End If
                 R4 = Abs(Int(R4))
             End If
+        End If
+        On Error Resume Next
+        r = nText(bstack, s$, s1$, CSng(R2), CDbl(R3), CLng(R4))
+        If bstack.toprinter Then
+            r = r * prFactor
+        End If
+        If Err.Number > 0 Then r = 0
+        On Error GoTo 0
+        SizeX = FastSymbol(a$, ")", True)
     End If
-    On Error Resume Next
-    r = nText(bstack, s$, s1$, CSng(R2), R3, R4)
-    If bstack.toprinter Then
-        r = r * prFactor
-    End If
-    If Err.Number > 0 Then r = 0
-    On Error GoTo 0
-    SizeX = FastSymbol(a$, ")", True)
-    End If
-
 End Function
 
 Public Function SpeedGroup(bstack As basetask, pppp As iBoxArray, Prefix$, ByVal W$, b$, v As Long) As Long
@@ -5754,9 +5753,7 @@ End Sub
 Function GetArr(bstack As basetask, b$, p As Variant, s$, skip As Long, lookCompOrTuple As Boolean) As Boolean
     Dim pppp As tuple, x1 As Long, usehandler As mHandler, r, that As BigInteger
     Dim obj1 As Object, val1 As Variant
-    
     x1 = 1
-
     If skip <> 0 Then
         FastSymbol b$, ","
 jmp11:
@@ -5771,18 +5768,15 @@ jmp11:
                 Set pppp.item(0&) = bstack.lastobj
                 Set bstack.lastobj = Nothing
             End If
-'            Set bstack.lastobj = pppp
             p = 0
             GetArr = True
             GoTo cont111
-            Exit Function
         End If
 contSecond:
         Set obj1 = bstack.lastobj
         Set bstack.lastobj = Nothing
         SwapVariant p, val1
         p = 0
-
         If IsExp(bstack, b$, p) Then
             x1 = 3
             If Left$(b$, 1) = " " Then b$ = NLtrim(b$)
@@ -5796,15 +5790,13 @@ contSecond:
                     End If
                     Set bstack.lastobj = Nothing
                 End If
-                ' so p is the imaginary pert
                 If Not obj1 Is Nothing Then
-                        val1 = 0
+                    val1 = 0
                     If TypeOf obj1 Is BigInteger Then
                         Set that = obj1
                         val1 = CDbl(StrConv(that.Value, vbUnicode))
                     End If
                     Set obj1 = Nothing
-                    
                 End If
                 p = nMath2.cxNew(CDbl(val1), CDbl(p))
                 Mid$(b$, 1, 2) = "  "
@@ -5890,22 +5882,19 @@ CONTaabb:
     Do While MaybeIsSymbol(b$, ",)")
         IsSymbol b$, ","
         If pppp Is Nothing Then
-                    Set pppp = New tuple: pppp.myarrbase = 0:: pppp.arr = True 'pppp.PushDim (1): pppp.PushEnd: pppp.Arr = True
+            Set pppp = New tuple: pppp.myarrbase = 0:: pppp.arr = True 'pppp.PushDim (1): pppp.PushEnd: pppp.Arr = True
         End If
         If lookOne(b$, ")") Then
-       ' x1 = x1 + 1
-            
             If x1 = 1 Then
-            pppp.SerialItem 0, x1, 10
-            If bstack.lastobj Is Nothing Then
-                
-                pppp.item(0&) = p
+                pppp.SerialItem 0, x1, 10
+                If bstack.lastobj Is Nothing Then
+                    pppp.item(0&) = p
                 Else
-                Set pppp.item(0) = bstack.lastobj
-                Set bstack.lastobj = Nothing
+                    Set pppp.item(0) = bstack.lastobj
+                    Set bstack.lastobj = Nothing
                 End If
             Else
-            pppp.SerialItem 0, x1 - 1, 10
+                pppp.SerialItem 0, x1 - 1, 10
             End If
             Exit Do
         ElseIf IsExp(bstack, b$, p) Then
@@ -30459,144 +30448,137 @@ End If
 End Function
 
 Function ProcLabel(basestack As basetask, rest$) As Boolean
-Dim s$, frm$, p As Variant, X As Double, Y As Double, sx As Double, sy As Double
-Dim Scr As Object, prive As basket, Quality As Boolean
-Set Scr = basestack.Owner
-prive = players(GetCode(Scr))
-ProcLabel = True
-Quality = FastSymbol(rest$, "!")
-
-If Not IsStrExp(basestack, rest$, s$) Then Exit Function
-
-
-frm$ = Replace(s$, ChrW(&HFFFFF8FB), ChrW(&H2007))
-s$ = vbNullString
-X = 0
-If FastSymbol(rest$, ",") Then
-    If Not IsStrExp(basestack, rest$, s$) Then
-    If TypeOf Scr Is GuiM2000 Then
-        If Len(prive.FontName) > 0 Then
-            s$ = prive.FontName
+    Dim s$, frm$, p As Variant, X As Variant, Y As Variant, sy As Variant
+    Dim Scr As Object, prive As basket, Quality As Boolean
+    Set Scr = basestack.Owner
+    prive = players(GetCode(Scr))
+    ProcLabel = True
+    Quality = FastSymbol(rest$, "!")
+    
+    If Not IsFlatStringExpr(basestack, rest$, s$) Then Exit Function
+    frm$ = Replace(s$, ChrW(&HFFFFF8FB), ChrW(&H2007))
+    s$ = vbNullString
+    X = 0!
+    If FastSymbol(rest$, ",") Then
+        If Not IsFlatStringExpr(basestack, rest$, s$) Then
+            If TypeOf Scr Is GuiM2000 Then
+                If Len(prive.FontName) > 0 Then
+                    s$ = prive.FontName
+                Else
+                    s$ = Scr.Controls(1).FontName
+                End If
+            Else
+                s$ = prive.FontName
+            End If
+        End If
+        If FastSymbol(rest$, ",") Then
+            If Not IsExp(basestack, rest$, X, , True, , True) Then
+                If TypeOf Scr Is GuiM2000 Then
+                    If Len(prive.FontName) > 0 Then
+                        X = prive.SZ
+                    Else
+                        X = Scr.Controls(1).FontSize
+                    End If
+                Else
+                    X = prive.SZ
+                End If
+            Else
+                If Scr Is Form1.PrinterDocument1 Then
+                    X = X * szFactor
+                End If
+            End If
+            Y = 0
+            If FastSymbol(rest$, ",") Then
+                If Not IsExp(basestack, rest$, p, , True, , True) Then p = 0
+                If FastSymbol(rest$, ",") Then
+                    If IsExp(basestack, rest$, sy, , True, , True) Then
+                        nPlain basestack, frm$, s$, CSng(X), CDbl(Y), CLng(-p - 1), Quality, CLng(sy \ DXP)
+                    Else
+                        nPlain basestack, frm$, s$, CSng(X), CDbl(Y), CLng(-p - 1), Quality
+                    End If
+                Else
+                    nPlain basestack, frm$, s$, CSng(X), CDbl(Y), CLng(-p - 1), Quality
+                End If
+            Else
+                nPlain basestack, frm$, s$, CSng(X), CDbl(Y), -1&, Quality
+            End If
         Else
-            s$ = Scr.Controls(1).FontName
+            nPlain basestack, frm$, s$, CSng(X), 0#, -1&, Quality
         End If
     Else
-    s$ = prive.FontName
+        nPlain basestack, frm$, prive.FontName, prive.SZ, 0#, -1&, Quality
     End If
-    End If
-    If FastSymbol(rest$, ",") Then
-        If Not IsExp(basestack, rest$, X) Then
-         If TypeOf Scr Is GuiM2000 Then
-                 If Len(prive.FontName) > 0 Then
-                    X = prive.SZ
-                 Else
-                    X = Scr.Controls(1).FontSize
+    PlaceBasket Scr, prive
+End Function
+Function ProcLegend(basestack As basetask, rest$) As Boolean
+    Dim s$, frm$, p As Variant, X As Variant, Y As Variant, sx As Variant, sy As Variant
+    Dim Scr As Object, prive As basket
+    Set Scr = basestack.Owner
+    prive = players(GetCode(Scr))
+    ProcLegend = True
+    If FastSymbol(rest$, "!") Then
+        ProcLegend = False
+        If IsFlatStringExpr(basestack, rest$, s$) Then
+            If InStr(s$, ChrW(&HFFFFF8FB)) > 0 Then s$ = Replace(s$, ChrW(&HFFFFF8FB), ChrW(&H2007))
+            ProcLegend = True
+            If Not FastSymbol(rest$, ",") Then ProcLegend = False: Exit Function
+            If IsExp(basestack, rest$, p, , True, , True) Then
+                X = p
+                If Not FastSymbol(rest$, ",") Then
+                    Y = 1
+                ElseIf Not IsExp(basestack, rest$, Y, , True, , True) Then
+                    ProcLegend = False: Exit Function
                 End If
-         Else
-            X = prive.SZ
+            Else
+                X = prive.mX
+                If Not FastSymbol(rest$, ",") Then ProcLegend = False: Exit Function
+                If Not IsExp(basestack, rest$, Y, , True, , True) Then ProcLegend = False: Exit Function
+            End If
+            wPlain Scr, prive, s$, CLng(X), CLng(Y - 1)
         End If
-        Else
-            If Scr Is Form1.PrinterDocument1 Then
+    Else
+        If Not IsFlatStringExpr(basestack, rest$, s$) Then Exit Function
+        frm$ = Replace(s$, ChrW(&HFFFFF8FB), ChrW(&H2007))
+        s$ = vbNullString
+        X = 0
+        If FastSymbol(rest$, ",") Then
+            If Not IsFlatStringExpr(basestack, rest$, s$) Then Exit Function
+        End If
+        If FastSymbol(rest$, ",") Then
+            If Not IsExp(basestack, rest$, X) Then Exit Function
+            If basestack.toprinter Then
+                If szFactor = 0 Then InternalError: Exit Function
                 X = X * szFactor
             End If
         End If
-        
-            Y = 0
-            
-                If FastSymbol(rest$, ",") Then
-                    If Not IsExp(basestack, rest$, p) Then p = 0
-                  If FastSymbol(rest$, ",") Then
-                    If IsExp(basestack, rest$, sy) Then
-                        nPlain basestack, frm$, s$, X, Y, CLng(-p - 1), Quality, CLng(sy \ DXP)
-                    Else
-                        nPlain basestack, frm$, s$, X, Y, CLng(-p - 1), Quality
-                    End If
-                 Else
-                    nPlain basestack, frm$, s$, X, Y, CLng(-p - 1), Quality
-                 End If
-                Else
-                    nPlain basestack, frm$, s$, X, Y, -1, Quality
-                End If
-    Else
-        nPlain basestack, frm$, s$, X, 0, -1, Quality
-    End If
-Else
-nPlain basestack, frm$, prive.FontName, prive.SZ, X, -1, Quality
-End If
-PlaceBasket Scr, prive
-End Function
-Function ProcLegend(basestack As basetask, rest$) As Boolean
-Dim s$, frm$, p As Variant, X As Double, Y As Double, sx As Double, sy As Double
-Dim Scr As Object, prive As basket
-Set Scr = basestack.Owner
-prive = players(GetCode(Scr))
-ProcLegend = True
-If FastSymbol(rest$, "!") Then
-ProcLegend = False
-If IsStrExp(basestack, rest$, s$, False) Then
-      If InStr(s$, ChrW(&HFFFFF8FB)) > 0 Then s$ = Replace(s$, ChrW(&HFFFFF8FB), ChrW(&H2007))
-
-    ProcLegend = True
-    If Not FastSymbol(rest$, ",") Then ProcLegend = False: Exit Function
-    If IsExp(basestack, rest$, p) Then
-    X = p
-    If Not FastSymbol(rest$, ",") Then
-    Y = 1
-    ElseIf Not IsExp(basestack, rest$, Y) Then
-       ProcLegend = False: Exit Function
-    End If
-    Else
-    X = prive.mX
-    If Not FastSymbol(rest$, ",") Then ProcLegend = False: Exit Function
-    If Not IsExp(basestack, rest$, Y) Then ProcLegend = False: Exit Function
-    End If
-    wPlain Scr, prive, s$, (X), Y - 1
-End If
-Else
-If Not IsStrExp(basestack, rest$, s$, False) Then Exit Function
-
-
-frm$ = Replace(s$, ChrW(&HFFFFF8FB), ChrW(&H2007))
-s$ = vbNullString
-X = 0
-If FastSymbol(rest$, ",") Then
-If Not IsStrExp(basestack, rest$, s$, False) Then Exit Function
-End If
-If FastSymbol(rest$, ",") Then
-    If Not IsExp(basestack, rest$, X) Then Exit Function
-    If basestack.toprinter Then
-        If szFactor = 0 Then InternalError: Exit Function
-        X = X * szFactor
-    End If
-End If
-If FastSymbol(rest$, ",") Then
-If Not IsExp(basestack, rest$, Y) Then Exit Function
-If FastSymbol(rest$, ",") Then
-    If Not IsExp(basestack, rest$, p) Then Exit Function
-    If FastSymbol(rest$, ",") Then
-        If Not IsExp(basestack, rest$, sx) Then Exit Function
         If FastSymbol(rest$, ",") Then
-            If Not IsExp(basestack, rest$, sy) Then Exit Function
-                nPlain basestack, frm$, s$, X, Y, CLng(p), sx <> False, CLng(sy \ DXP)
-            Else
-                nPlain basestack, frm$, s$, X, Y, CLng(p), sx <> False
+            If Not IsExp(basestack, rest$, Y, , True, , True) Then Exit Function
+            If FastSymbol(rest$, ",") Then
+                If Not IsExp(basestack, rest$, p) Then Exit Function
+                    If FastSymbol(rest$, ",") Then
+                        If Not IsExp(basestack, rest$, sx, , True, , True) Then Exit Function
+                        If FastSymbol(rest$, ",") Then
+                            If Not IsExp(basestack, rest$, sy, , True, , True) Then Exit Function
+                                nPlain basestack, frm$, s$, CSng(X), CDbl(Y), CLng(p), sx <> False, CLng(sy \ DXP)
+                            Else
+                                nPlain basestack, frm$, s$, CSng(X), CDbl(Y), CLng(p), sx <> False
+                            End If
+                        Else
+                            nPlain basestack, frm$, s$, CSng(X), CDbl(Y), CLng(p)
+                        End If
+                    Else
+                        nPlain basestack, frm$, s$, CSng(X), CDbl(Y)
+                    End If
+                Else
+                    nPlain basestack, frm$, s$, CSng(X)
+                End If
             End If
-        Else
-            nPlain basestack, frm$, s$, X, Y, CLng(p)
-        End If
-    Else
-        nPlain basestack, frm$, s$, X, Y
-    End If
-Else
-    nPlain basestack, frm$, s$, X
-End If
-End If
-If FastSymbol(rest$, ";") Then
-''NO REFRESH
-Else
-If Not extreme Then If Not basestack.toprinter Then MyRefresh basestack ' MyDoEvents1 Scr
-End If
-PlaceBasket Scr, prive
+            If FastSymbol(rest$, ";") Then
+            ''NO REFRESH
+            Else
+                If Not extreme Then If Not basestack.toprinter Then MyRefresh basestack ' MyDoEvents1 Scr
+            End If
+            PlaceBasket Scr, prive
 End Function
 
 Function ExecuteEmfBlock(basestack As basetask, rest$, it As Long, ww, hh) As Object

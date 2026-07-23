@@ -1,34 +1,12 @@
 M2000 Interpreter and Environment
-Version 15 Revision 10
+Version 15 Revision 11
 
-July 21, 2026,
-I am working for the new M2000paper.pdf. When I found something not working I fix it.
+July 23, 2026,
 
-1. The Text statement example now working as expected. Also upgraded to support biginteger
+1. I found a difficult fault in Document class, for colouring code. So the fix is good for TextViewer Class and GuiEditBox class.
+2. Update FORMLABEL and GRADIENT statement for handle string expressions according version's 14 changes (forgot to update)
+3. Added two new modules in INFO file and update the Compiler module to Version 15 (although the previous code was good)
 
-Const programname$="MyProgram"
-biginteger alfa=1234567890123456789012345678901234567890u
-Text UTF-16 logging.txt {##STR$(TODAY+NOW,"YYYYMMDDHHNNSS")##
-	This is a BigInteger ##alfa##
-	} 
-For var1=1 to 10
-	Text UTF-16 logging.txt + {This is a line for LOG ##var1## for ##programname$##
-	}
-Next var1
-\\ win temporary$+"logging.txt"' we can open the file in notepad
-\\ or we can open using OPEN (not for UTF-8)
-Open temporary$+"logging.txt" for wide input as #k
-	Try {Seek #k, 3}  ' SKIP BOM
-	While not EOF(#k)
-		Line Input #k, aLine$
-		Print aLine$
-	End While
-Close #k
-\\ delete the log file
-Text logging.txt
-
-
-2. Valid() now return boolean type for false (was integer 0) 
   
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
