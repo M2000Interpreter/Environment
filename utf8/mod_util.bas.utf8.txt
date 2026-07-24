@@ -14549,7 +14549,12 @@ cont1111:
                     If usehandler.t1 = 4 Then Set usehandler = Nothing: Set anything = Nothing: GoTo again1
                     Exit Function
                 End If
-                If original = 0 Then
+                If TypeOf pppp Is FastCollection Then
+                    Set pppp1 = New tuple
+                    pppp.CopyArray pppp1
+                    Set pppp = pppp1
+                    Set pppp1 = Nothing
+                ElseIf original = 0 Then
                     If TypeOf pppp Is tuple Then
                     ElseIf TypeOf pppp Is mArray Then
                         Set mymArray = pppp
@@ -14648,13 +14653,13 @@ cont12321:
                 MissStringExpr
                 Exit Function
             End If
-            If Not IsStrExp(bstack, a$, Pad$) Then Pad$ = " "
+            If Not IsFlatStringExpr(bstack, a$, Pad$) Then Pad$ = " "
 contStr1:
             If FastSymbol(a$, ",") Then
                 If IsExp(bstack, a$, p, , True) Then
                     If MemInt(VarPtr(p)) = vbString Then SwapString2Variant s$, p: p = Empty: GoTo contStr2
                 End If
-                If Not IsStrExp(bstack, a$, s$) Then
+                If Not IsFlatStringExpr(bstack, a$, s$) Then
                     s$ = "": If Pad$ = " " Then Pad$ = ","
                 End If
             End If
@@ -14756,7 +14761,7 @@ contFOLD:
                                 res = 0
                                 SwapVariant res, p
                             End If
-                        ElseIf IsStrExp(bstack, a$, Pad$, False) Then
+                        ElseIf IsFlatStringExpr(bstack, a$, Pad$) Then
                             res = Pad$
                         Else
                             missParam a$
@@ -14820,7 +14825,12 @@ ABCDEF:
             Set bstack.lastobj = usehandler
         Case "EXPANSE", "ΑΝΟΙΓΜΑ"
             If IsExp(bstack, a$, p) Then
-                If original = 0 Then
+                If TypeOf pppp Is FastCollection Then
+                    Set pppp1 = New tuple
+                    pppp.CopyArray pppp1
+                    Set pppp = pppp1
+                    Set pppp1 = Nothing
+                ElseIf original = 0 Then
                     If TypeOf pppp Is tuple Then
                         Set pppp1 = New tuple
                         pppp.CopyArray pppp1
@@ -14840,7 +14850,38 @@ ABCDEF:
                 End If
                 p = CLng(p)
                 If p < 0 Then p = 0
+                w2 = pppp.Count
                 pppp.StartResize: pppp.PushDim CLng(p): pppp.PushEnd
+                If FastSymbol(a$, ",") Then
+                If IsExp(bstack, a$, p) Then
+                    If bstack.lastobj Is Nothing Then
+
+                    For cur = w2 To pppp.Count - 1
+                       pppp.item(cur) = p
+                    Next
+                    Else
+                    GoTo cont1112
+                    End If
+                ElseIf IsStrExp(bstack, a$, Pad$) Then
+                    If bstack.lastobj Is Nothing Then
+                        For cur = w2 To pppp.Count - 1
+                           pppp.item(cur) = Pad$
+                        Next
+                    Else '
+cont1112:
+                        If TypeOf pppp Is tuple Then
+                            Set myTuple = pppp
+                            myTuple.Fillobj2 bstack, w2
+                            
+                        Else
+                            For cur = w2 To pppp.Count - 1
+                               Set pppp.item(cur) = bstack.lastobj
+                            Next
+                        End If
+                        Set bstack.lastobj = Nothing
+                    End If
+                End If
+                End If
                 original = original + 1
             End If
             res = 0
@@ -14869,7 +14910,12 @@ ABCDEF:
                 EmptyVariant VarPtr(p)
             End If
             If original = 0 Then
-                If TypeOf pppp Is tuple Then
+                If TypeOf pppp Is FastCollection Then
+                    Set pppp1 = New tuple
+                    pppp.CopyArray pppp1
+                    Set pppp = pppp1
+                    Set pppp1 = Nothing
+                ElseIf TypeOf pppp Is tuple Then
                     Set pppp1 = New tuple
                     pppp.CopyArray pppp1
                     Set pppp = pppp1
@@ -14923,7 +14969,7 @@ againmap:
                 If pppp.Count = 0 Then
                     If IsExp(bstack, a$, p, , True) Then
                          res = p: retresonly = True
-                    ElseIf IsStrExp(bstack, a$, Pad$, False) Then
+                    ElseIf IsFlatStringExpr(bstack, a$, Pad$) Then
                         res = Pad$: retresonly = True
                     Else
                         MyEr "No value", "Χωρίς τιμή"
@@ -14987,7 +15033,7 @@ again:
                             End If
                         End If
                          res = p: retresonly = True
-                    ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
+                    ElseIf IsFlatStringExpr(bstack, a$, Pad$) Then
                         res = Pad$: retresonly = True
                     Else
                         MyEr "No value", "Χωρίς τιμή"
@@ -15029,6 +15075,10 @@ jpos:
 again1:
                 If FastSymbol(a$, "->", , 2) Then
                     If IsExp(bstack, a$, r) Then
+                        If MemInt(VarPtr(r)) = vbString Then
+                            SwapString2Variant Pad$, r
+                            GoTo there
+                        End If
                         If bstack.lastobj Is Nothing Then
                             ReDim Sn(0 To 4) As Variant
                             Sn(0) = r
@@ -15050,7 +15100,7 @@ dothis:
                             cur = pppp1.Count - 1
                             w3 = p
                         End If
-                    ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
+                    ElseIf IsFlatStringExpr(bstack, a$, Pad$) Then
                         GoTo there
                     Else
                         missParam a$: Exit Function
@@ -15193,7 +15243,7 @@ inside:
                         End If
                     End If
                 End If
-            ElseIf IsStrExp(bstack, a$, Pad$, Len(bstack.tmpstr) = 0) Then
+            ElseIf IsFlatStringExpr(bstack, a$, Pad$) Then
                 
 there:
                 ReDim st(0 To 4) As String
@@ -15209,7 +15259,7 @@ there:
                     Do While FastSymbol(a$, ",")
                         If cur = UBound(st()) Then ReDim Preserve st(0 To cur * 2 - 1) As String
                         cur = cur + 1
-                        If IsStrExp(bstack, a$, st(cur)) Then
+                        If IsFlatStringExpr(bstack, a$, st(cur)) Then
                             If res > -1 Then
                                 w3 = w3 + 1
                                 If w3 < pppp.Count Then
@@ -15567,6 +15617,8 @@ Sub CallLambdaArrayFold(bstack As basetask, pppp As iBoxArray, mylambda As lambd
             tempsoros.PushVal pppp.item(w1)
         End If
         If Not GoFunc(nbstack, "A_" & (Abs(w2)) & "()", vbNullString, r, w2, , , True) Then Exit For
+        If MemInt(VarPtr(r)) <> 0 Then tempsoros.Flush: Exit For
+
     Next w1
     If tempsoros.Count > 0 Then
         If tempsoros.StackItemTypeIsObject(1) Then
@@ -15574,6 +15626,14 @@ Sub CallLambdaArrayFold(bstack As basetask, pppp As iBoxArray, mylambda As lambd
             res = 0
         Else
             res = tempsoros.PopAnyNoObject
+        End If
+    Else
+        If Not bstack.lastobj Is Nothing Then
+            Set retObj = bstack.lastobj
+            Set bstack.lastobj = Nothing
+            res = 0
+        Else
+            res = r
         End If
     End If
     Set bstack.Sorosref = oldsoros
@@ -24645,7 +24705,7 @@ usehandler:
                     If FastSymbol(rest$, ",") Then
                         If IsExp(basestack, rest$, p) Then
                             If FastSymbol(rest$, ",") Then
-                                Set mm = New mArray
+                                Set mm = New tuple
                                 mm.PushDim 20, (0)
                                 mm.PushEnd
                                 If Not useclid Then

@@ -2112,11 +2112,54 @@ Set actualData(i) = obj
 Next i
 Set obj = Nothing
 End Sub
-Public Sub FillLambda(bstack As basetask)
+Public Sub Fillobj2(bstack As basetask, Optional from As Long = 0)
+Dim obj As Variant, ob1 As Object, ob2 As Object, i As Long
+Dim myHandler As mHandler
+Set obj = bstack.lastobj
+Set bstack.lastobj = Nothing
+If TypeOf obj Is lambda Then
+    For i = from To maxitems - 1
+        CopyLambda obj, bstack
+        Set actualData(i) = bstack.lastobj
+        Set bstack.lastobj = Nothing
+    Next i
+ElseIf TypeOf obj Is Group Then
+    Set ob1 = obj
+    For i = from To maxitems - 1
+        CopyGroupObj ob1, ob2
+        Set actualData(i) = ob2
+        Set ob2 = Nothing
+    Next i
+ElseIf TypeOf obj Is mHandler Then
+    Set myHandler = obj
+    Select Case myHandler.t1
+    Case 3 ' array-tuple
+    Dim pppp As iBoxArray, pppp1 As iBoxArray
+    Set pppp = myHandler.objref
+    For i = from To maxitems - 1
+        Set myHandler = New mHandler
+        Set pppp1 = New tuple
+        pppp.CopyArray pppp1
+        Set myHandler.objref = pppp1
+        myHandler.t1 = 3
+        Set actualData(i) = myHandler
+    Next i
+    Case Else
+        GoTo all
+    End Select
+Else
+all:
+    For i = from To maxitems - 1
+        Set actualData(i) = obj
+    Next i
+End If
+Set obj = Nothing
+End Sub
+Public Sub FillLambda(bstack As basetask, Optional from As Long = 0)
 Dim obj As Variant, i As Long
 Set obj = bstack.lastobj
     Set bstack.lastobj = Nothing
-For i = 0 To maxitems - 1
+For i = from To maxitems - 1
  CopyLambda obj, bstack
 Set actualData(i) = bstack.lastobj
 Set bstack.lastobj = Nothing
@@ -2655,12 +2698,12 @@ AppendArray z
 Set k = z
 End Sub
 
-Private Property Let iBoxArray_Arr(ByVal RHS As Boolean)
+Private Property Let iBoxArray_arr(ByVal RHS As Boolean)
     arr = RHS
 End Property
 
-Private Property Get iBoxArray_Arr() As Boolean
-    iBoxArray_Arr = arr
+Private Property Get iBoxArray_arr() As Boolean
+    iBoxArray_arr = arr
 End Property
 
 Private Property Let iBoxArray_arrname(ByVal RHS As String)
@@ -2730,8 +2773,8 @@ iBoxArray_CopyArraySliceFast z, fromS, toS
 Set k = z
 End Sub
 
-Private Property Get iBoxArray_count() As Long
-    iBoxArray_count = Count
+Private Property Get iBoxArray_Count() As Long
+    iBoxArray_Count = Count
 End Property
 
 Private Function iBoxArray_EmptyArraySameType() As Object
@@ -2778,12 +2821,12 @@ Private Property Get iBoxArray_IhaveClass() As Boolean
     iBoxArray_IhaveClass = IhaveClass
 End Property
 
-Private Property Let iBoxArray_Index(ByVal RHS As Long)
+Private Property Let iBoxArray_index(ByVal RHS As Long)
     index = RHS
 End Property
 
-Private Property Get iBoxArray_Index() As Long
-    iBoxArray_Index = index
+Private Property Get iBoxArray_index() As Long
+    iBoxArray_index = index
 End Property
 
 Private Property Get iBoxArray_IsEmpty() As Variant
@@ -2794,8 +2837,8 @@ Private Function iBoxArray_IsEnum2(curitem As Long, p As Variant) As Boolean
     iBoxArray_IsEnum2 = IsEnum2(curitem, p)
 End Function
 
-Private Function iBoxArray_isObj() As Boolean
-    iBoxArray_isObj = IsObj
+Private Function iBoxArray_IsObj() As Boolean
+    iBoxArray_IsObj = IsObj
 End Function
 
 Private Function iBoxArray_IsObjAt(curitem As Long, peekvalue As Variant) As Boolean
@@ -2806,16 +2849,16 @@ Private Function iBoxArray_IsStringItem(curitem As Long) As Variant
     iBoxArray_IsStringItem = IsStringItem(curitem)
 End Function
 
-Private Property Set iBoxArray_Item(curitem As Long, RHS As Variant)
+Private Property Set iBoxArray_item(curitem As Long, RHS As Variant)
     Set item(curitem) = RHS
 End Property
 
-Private Property Let iBoxArray_Item(curitem As Long, RHS As Variant)
+Private Property Let iBoxArray_item(curitem As Long, RHS As Variant)
     item(curitem) = RHS
 End Property
 
-Private Property Get iBoxArray_Item(curitem As Long) As Variant
-SwapVariant iBoxArray_Item, Me.item(curitem)
+Private Property Get iBoxArray_item(curitem As Long) As Variant
+SwapVariant iBoxArray_item, Me.item(curitem)
 End Property
 Private Function iBoxArray_PlaceValue2UDTArray(p As Long, Name As String, v As Variant, index As Long) As Boolean
 iBoxArray_PlaceValue2UDTArray = PlaceValue2UDTArray(p, Name, v, index)
@@ -2929,11 +2972,11 @@ Private Function iBoxArray_UpperMonoLimit() As Variant
 iBoxArray_UpperMonoLimit = UpperMonoLimit
 End Function
 
-Private Property Get iBoxArray_value() As Variant
+Private Property Get iBoxArray_Value() As Variant
     If IsObj Then
-        Set iBoxArray_value = Value
+        Set iBoxArray_Value = Value
     Else
-        iBoxArray_value = Value
+        iBoxArray_Value = Value
     End If
 End Property
 Private Function iBoxArray_IsEnum(p As Variant) As Boolean

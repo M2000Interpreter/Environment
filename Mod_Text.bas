@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 11
+Global Const Revision = 12
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7969,6 +7969,12 @@ cont8case:
                 If Not usehandler.UseIterator Then
                     Set nbstack = Nothing  ' ???
                     If FastSymbol1(a$, "#") Then
+                        If usehandler.t1 = 1 Then
+                            Set anything = usehandler.objref
+                         Set usehandler = New mHandler
+                         Set usehandler.objref = anything
+                         usehandler.t1 = 3
+                        End If
                         If Not usehandler.t1 = 3 Then WrongObject: Exit Function
                         If Not fMatrix(bstack, a$, usehandler, r) Then
                             Exit Function
@@ -43296,6 +43302,7 @@ check123678:
                     If Not usehandler Is Nothing Then
                     If Not usehandler.UseIterator Then
                         Dim usehandler1 As mHandler
+
                         usehandler.CopyTo usehandler1
                         Dim pppp1 As iBoxArray
                         pppp.CopyArray pppp1
@@ -43359,6 +43366,9 @@ checkIterator:
                     End If
                     GoTo check123678
                 ElseIf IsobjArray(usehandler.objref) Then
+                    If usehandler.t1 = 1 Then
+                        GoTo contFast
+                    End If
                     Set pppp = usehandler.objref
                     If usehandler.UseIterator Then
                     pppp.index = usehandler.index_cursor
@@ -43369,7 +43379,7 @@ checkIterator:
                         Set bstack.lastobj = Nothing
                         Set usehandler = Nothing
                         IsArrayFun = IsExp(bstack, a$, r, , True)
-                        IsArrayFun = FastSymbol(a$, ")", True)
+                        IsArrayFun = FastSymbol(a$, ")", True) And IsArrayFun
                         w1 = r
                     Else
                         IsArrayFun = FastSymbol(a$, ")", True)
@@ -43400,8 +43410,33 @@ checkIterator:
                     Set ms = Nothing
                     IsArrayFun = FastSymbol(a$, ")", True)
                     Exit Function
-                ElseIf TypeOf usehandler.objref Is FastCollection Then
-                    If FastSymbol(a$, "!") Then
+                ElseIf False Then ' TypeOf usehandler.objref Is FastCollection
+contFast:
+                    If FastSymbol(a$, ",") Then
+                    If IsExp(bstack, a$, p, False, True) Then
+                        Set pppp = usehandler.objref
+                        If CLng(p) < pppp.Count Then
+                            If CLng(p) >= 0 Then
+                                If pppp.IsObjAt(CLng(p), r) Then
+                                    Set bstack.lastobj = r
+                                    r = 0
+                                Else
+                                    Set bstack.lastobj = Nothing
+                                    r = pppp.item(CLng(p))
+                                End If
+                            Else
+                                MyEr "index too low", "χαμηλός δείκτης"
+                                Exit Function
+                            End If
+                        Else
+                            MyEr "index too high", "υψηλός δείκτης"
+                            Exit Function
+                        End If
+                    Else
+                        missParam a$
+                        Exit Function
+                    End If
+                    ElseIf FastSymbol(a$, "!") Then
                     Set bstack.lastobj = usehandler.objref.ExportKeys
                     Else
                     Set bstack.lastobj = usehandler.objref.ExportValues

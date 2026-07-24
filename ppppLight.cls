@@ -13,15 +13,15 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Implements iBoxArray
 Option Explicit
-Public refgroup As Object, GroupRef As Object, Arr As Boolean, IhaveClass As Boolean, CodeName As String
+Public refgroup As Object, GroupRef As Object, arr As Boolean, IhaveClass As Boolean, CodeName As String
 Public Final As Boolean, common As Boolean, myarrbase As Long
 Private ndnum As Long, dnum As Long
 Private actualData As Variant
 Public Property Set item(curitem As Long, item As Variant)
-    Set iBoxArray_Item(curitem) = item
+    Set iBoxArray_item(curitem) = item
 End Property
 Public Function itemnumeric(curitem As Long) As Variant
-If Not Arr Then
+If Not arr Then
     If curitem = -2 Then
     
     ElseIf curitem < 0 Then
@@ -51,7 +51,7 @@ dnum = ndnum
 End Sub
 Public Sub PushProp(a As Variant)
 Set GroupRef = a
-Arr = False
+arr = False
 End Sub
 Public Function IsObjAt(curitem As Long, peekvalue As Variant) As Boolean
     IsObjAt = iBoxArray_IsObjAt(curitem, peekvalue)
@@ -87,12 +87,12 @@ Private Sub iBoxArray_AppendArray(k As iBoxArray)
 '
 End Sub
 
-Private Property Let iBoxArray_Arr(ByVal RHS As Boolean)
-Arr = RHS
+Private Property Let iBoxArray_arr(ByVal RHS As Boolean)
+arr = RHS
 End Property
 
-Private Property Get iBoxArray_Arr() As Boolean
-iBoxArray_Arr = Arr
+Private Property Get iBoxArray_arr() As Boolean
+iBoxArray_arr = arr
 End Property
 
 Private Property Let iBoxArray_arrname(ByVal RHS As String)
@@ -140,8 +140,8 @@ Private Sub iBoxArray_CopyArraySliceFast(k As iBoxArray, fromS As Long, toS As L
 '
 End Sub
 
-Private Property Get iBoxArray_count() As Long
-iBoxArray_count = 1
+Private Property Get iBoxArray_Count() As Long
+iBoxArray_Count = 1
 End Property
 
 Private Function iBoxArray_EmptyArraySameType() As Object
@@ -167,7 +167,7 @@ Private Sub iBoxArray_GetPorp(aProp As PropReference, curitem As Long)
 
 End Sub
 
-Private Function iBoxArray_GetUDTValue(ByVal p As Long, Name As String, Optional ndx As Variant) As Variant
+Private Function iBoxArray_GetUDTValue(ByVal p As Long, Name As String, Optional nDx As Variant) As Variant
 
 End Function
 
@@ -187,11 +187,11 @@ Private Property Get iBoxArray_IhaveClass() As Boolean
 iBoxArray_IhaveClass = IhaveClass
 End Property
 
-Private Property Get iBoxArray_Index() As Long
+Private Property Get iBoxArray_index() As Long
 
 End Property
 
-Private Property Let iBoxArray_Index(ByVal RHS As Long)
+Private Property Let iBoxArray_index(ByVal RHS As Long)
 
 End Property
 
@@ -207,7 +207,7 @@ Private Function iBoxArray_IsEnum2(curitem As Long, p As Variant) As Boolean
 
 End Function
 
-Private Function iBoxArray_isObj() As Boolean
+Private Function iBoxArray_IsObj() As Boolean
 If Not TypeOf GroupRef Is mHandler Then GoTo e1245
 Dim usehandler As mHandler
 Set usehandler = GroupRef
@@ -216,7 +216,7 @@ e1245:
     Err.Raise 5010, , "Need an Inventory Object"
     Exit Function
 End If
-iBoxArray_isObj = usehandler.objref.IsObj
+iBoxArray_IsObj = usehandler.objref.IsObj
 End Function
 
 Private Function iBoxArray_IsObjAt(curitem As Long, peekvalue As Variant) As Boolean
@@ -242,7 +242,7 @@ End If
         Set peekvalue = usehandler
     End If
 Else
-    If Not Arr Then
+    If Not arr Then
     Set peekvalue = GroupRef
     Else
     Set peekvalue = actualData
@@ -258,7 +258,7 @@ Private Function iBoxArray_IsStringItem(curitem As Long) As Variant
 iBoxArray_IsStringItem = IsStringItem(curitem)
 End Function
 
-Private Property Set iBoxArray_Item(curitem As Long, item As Variant)
+Private Property Set iBoxArray_item(curitem As Long, item As Variant)
 '
 On Error Resume Next
 If curitem < 0 Then
@@ -288,7 +288,7 @@ End If
 
 End Property
 
-Private Property Let iBoxArray_Item(curitem As Long, item As Variant)
+Private Property Let iBoxArray_item(curitem As Long, item As Variant)
 Dim usehandler As mHandler
 If curitem < 0 Then
 If curitem <> -2 Then
@@ -306,9 +306,9 @@ End If
 End If
 End Property
 
-Private Property Get iBoxArray_Item(curitem As Long) As Variant
+Private Property Get iBoxArray_item(curitem As Long) As Variant
 If curitem = -2 Then
-    Set iBoxArray_Item = GroupRef
+    Set iBoxArray_item = GroupRef
 ElseIf curitem < 0 Then
     If Not TypeOf GroupRef Is mHandler Then GoTo e1245
 Dim usehandler As mHandler
@@ -319,21 +319,21 @@ e1245:
 End If
     If usehandler.objref.Done Then
         If usehandler.objref.IsObj Then
-            Set iBoxArray_Item = usehandler.objref.ValueObj
+            Set iBoxArray_item = usehandler.objref.ValueObj
         Else
-            iBoxArray_Item = usehandler.objref.Value
+            iBoxArray_item = usehandler.objref.Value
         End If
     Else
-        Set iBoxArray_Item = usehandler
+        Set iBoxArray_item = usehandler
     End If
 Else
-    If Not Arr Then
-    Set iBoxArray_Item = GroupRef
+    If Not arr Then
+    Set iBoxArray_item = GroupRef
     Else
     If IsObject(actualData) Then
-    Set iBoxArray_Item = actualData
+    Set iBoxArray_item = actualData
     Else
-    iBoxArray_Item = actualData
+    iBoxArray_item = actualData
     End If
     End If
 End If
@@ -348,7 +348,7 @@ SwapVariant iBoxArray_itemnumeric, itemnumeric(curitem)
 End Function
 
 Private Property Get iBoxArray_itemObject(curitem As Long) As Variant
-If Arr Then
+If arr Then
     
     If MyIsObject(actualData) Then
         Set iBoxArray_itemObject = actualData
@@ -370,7 +370,7 @@ End Property
 
 Private Property Get iBoxArray_ItemType(curitem As Variant) As String
 On Error GoTo there1
-If Arr Then
+If arr Then
    
         iBoxArray_ItemType = VarTypeName(actualData)
    
@@ -410,7 +410,7 @@ there1:
 End Property
 
 Private Property Get iBoxArray_ItemTypeNum(curitem As Variant) As Integer
-If Not Arr Then
+If Not arr Then
     If curitem = -2 Then
     
     ElseIf curitem < 0 Then
@@ -445,7 +445,7 @@ End Sub
 
 Private Function iBoxArray_PlaceValue2UDT(p As Long, Name As String, v As Variant) As Boolean
 On Error Resume Next
-If Not Arr Then
+If Not arr Then
     If p = -2 Then
     
     ElseIf p < 0 Then
@@ -539,7 +539,7 @@ Private Function iBoxArray_UpperMonoLimit() As Variant
 '
 End Function
 
-Private Property Get iBoxArray_value() As Variant
+Private Property Get iBoxArray_Value() As Variant
 
 End Property
 Friend Property Get Unique() As Boolean

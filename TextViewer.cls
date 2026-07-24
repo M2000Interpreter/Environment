@@ -4299,6 +4299,7 @@ Text = mDoc.textDoc
 End Property
 Public Property Let Text(RHS As String)
 On Error GoTo 100
+Set ps = Nothing
 Dim oldenabled As Boolean
 LastListIndex = 0
 If Me.HaveMarkedText Then
@@ -4335,7 +4336,6 @@ End Property
 Public Property Let Text2(RHS As String)
 Dim oldenabled As Boolean
 Set ps = Nothing
-
 LastListIndex = 0
 If Me.HaveMarkedText Then
 BlockStartPara = BlockEndPara

@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+Implements iBoxArray
 Option Explicit
 ' George's FastCollection
 ' Only Add, and Find.
@@ -66,14 +67,14 @@ Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Public Stable As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Private lastfind As String
 Private lasttype As Integer
 Private lastkey As String
 Private Hash() As Long
 Public Done As Boolean
-Public Index As Long
+Public index As Long
 Public structLen As Long
 Private ParentIndex As Long
 Public NumericSort As Boolean
@@ -125,7 +126,7 @@ End Sub
 
 Public Sub AddKey2(RHS, Optional aValue As Variant)
 IamBusy = True
-    Index = -1
+    index = -1
     
     lastkey = Normalize(RHS)
     If Len(lastkey) = 0 Then RHS = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = RHS
@@ -147,7 +148,7 @@ IamBusy = True
 IamBusy = False
 End Sub
 Public Sub AddKey(RHS, Optional aValue As Variant)
-    Index = -1
+    index = -1
     
      lastkey = Normalize(RHS)
  
@@ -167,8 +168,8 @@ Public Sub AddKey(RHS, Optional aValue As Variant)
         Value = aValue
         
     End If
-    If Index >= 0 Then
-        PriveSpace(Index).KeyType = lasttype
+    If index >= 0 Then
+        PriveSpace(index).KeyType = lasttype
     Else
 '        PriveSpace(Index).KeyType = 0 ' invalid
     End If
@@ -234,41 +235,41 @@ End Sub
 Public Sub RemoveWithNoFind()
 'If AllowSameKey Then Exit Sub
 Dim new_item As item
-Dim K As Long, k1 As Long, vvv As Variant, top1 As Long
+Dim k As Long, k1 As Long, vvv As Variant, top1 As Long
 If toplim < 0 Then Exit Sub
 top1 = toplim
 If Done Then
 Sorted = False
        If ParentIndex > -1 Then
-            PriveSpace(ParentIndex).Pleft = PriveSpace(Index).Pleft
+            PriveSpace(ParentIndex).Pleft = PriveSpace(index).Pleft
 
         Else
         
-        Hash(PriveSpace(Index).lastpos) = PriveSpace(Index).Pleft
+        Hash(PriveSpace(index).lastpos) = PriveSpace(index).Pleft
 
         End If
-        If top1 = Index Then
+        If top1 = index Then
             PriveSpace(top1) = new_item
         Else
             SwapVariant vvv, PriveSpace(top1).iValue
-            PriveSpace(Index).iValue = -1
-            PriveSpace(Index) = PriveSpace(top1)
+            PriveSpace(index).iValue = -1
+            PriveSpace(index) = PriveSpace(top1)
             PriveSpace(top1) = new_item
-            SwapVariant vvv, PriveSpace(Index).iValue
+            SwapVariant vvv, PriveSpace(index).iValue
         End If
-        K = Hash(PriveSpace(Index).lastpos) - 1
-        If K = top1 Then
+        k = Hash(PriveSpace(index).lastpos) - 1
+        If k = top1 Then
             ' we have to give the new position to Hash()
-            Hash(PriveSpace(Index).lastpos) = Index + 1
+            Hash(PriveSpace(index).lastpos) = index + 1
         Else
-            Do While K >= 0 And K <> top1 And K <> k1
-                   k1 = K
-                   K = PriveSpace(K).Pleft - 1
+            Do While k >= 0 And k <> top1 And k <> k1
+                   k1 = k
+                   k = PriveSpace(k).Pleft - 1
             Loop
-            If K = k1 Then
+            If k = k1 Then
                Rehash
-            ElseIf K = top1 Then
-               PriveSpace(k1).Pleft = Index + 1
+            ElseIf k = top1 Then
+               PriveSpace(k1).Pleft = index + 1
             End If
         End If
   
@@ -311,22 +312,22 @@ End If
 End Sub
 Public Sub Remove(RHS)
 If AllowSameKey Then Exit Sub
-Dim K As Long, k1 As Long, vvv As Variant, top1 As Long, ndx As Long, Parndx As Long
+Dim k As Long, k1 As Long, vvv As Variant, top1 As Long, nDx As Long, Parndx As Long
 If toplim < 0 Then Exit Sub
 top1 = toplim
-If Find2(RHS, Parndx, ndx) Then
+If Find2(RHS, Parndx, nDx) Then
         Sorted = False
         Done = True
-        Index = ndx
+        index = nDx
         ' here we make a clean to pointers to PriveSpace, so we exclude the removing item
         If Parndx > -1 Then
             ' if we have a parent then just push to parent the Pleft pointer
             ' Pleft is always +1 (so Pleft 0 give -1 null for this context)
-            PriveSpace(Parndx).Pleft = PriveSpace(ndx).Pleft
+            PriveSpace(Parndx).Pleft = PriveSpace(nDx).Pleft
 
         Else
         ' so we have no parent, just out Pleft to Hash
-        Hash(PriveSpace(ndx).lastpos) = PriveSpace(ndx).Pleft
+        Hash(PriveSpace(nDx).lastpos) = PriveSpace(nDx).Pleft
 
         End If
         ' we don't have to see Hash() any more for RHS
@@ -335,31 +336,31 @@ If Find2(RHS, Parndx, ndx) Then
         ' We have to get change top1 to ndx, maybe we remove top1
         ' we can check this but it is faster to not check this (more often top1 isn't ndx)
         ' Using SwapVariant we can swap any kind of Variant, including objects (swaping pointers only)
-        If top1 = ndx Then
+        If top1 = nDx Then
         PriveSpace(top1) = new_item
         Else
         SwapVariant vvv, PriveSpace(top1).iValue
-        PriveSpace(ndx).iValue = -1 ' is good to pass a number - so we break any pointer to object
-        PriveSpace(ndx) = PriveSpace(top1) ' now we perform a copy (no objects included)
+        PriveSpace(nDx).iValue = -1 ' is good to pass a number - so we break any pointer to object
+        PriveSpace(nDx) = PriveSpace(top1) ' now we perform a copy (no objects included)
         PriveSpace(top1) = new_item
         ' so now we put back iValue (maybe is an object)
-        SwapVariant vvv, PriveSpace(ndx).iValue
+        SwapVariant vvv, PriveSpace(nDx).iValue
         End If
         ' here Lastpos is from previous PriveSpace(top1) which is PriveSpace(ndx)
-        K = Hash(PriveSpace(ndx).lastpos) - 1
-        If K = top1 Then
+        k = Hash(PriveSpace(nDx).lastpos) - 1
+        If k = top1 Then
             ' we have to give the new position to Hash()
-            Hash(PriveSpace(ndx).lastpos) = ndx + 1
+            Hash(PriveSpace(nDx).lastpos) = nDx + 1
         Else
          
-         Do While K >= 0 And K <> top1 And K <> k1
-                k1 = K
-                K = PriveSpace(K).Pleft - 1
+         Do While k >= 0 And k <> top1 And k <> k1
+                k1 = k
+                k = PriveSpace(k).Pleft - 1
          Loop
-         If K = k1 Then
+         If k = k1 Then
             Rehash
-         ElseIf K = top1 Then
-            PriveSpace(k1).Pleft = ndx + 1
+         ElseIf k = top1 Then
+            PriveSpace(k1).Pleft = nDx + 1
          End If
         End If
   
@@ -373,67 +374,67 @@ End Sub
 
 Property Let Value(RHS As Variant)
 Done = False
-If Index = -1 Then
+If index = -1 Then
 ItemCreator lastkey, RHS
 
 Else
-    SwapVariant PriveSpace(Index).iValue, RHS
+    SwapVariant PriveSpace(index).iValue, RHS
 End If
 Done = True
 End Property
 Property Set ValueObj(RHS As Variant)
 Done = False
-If Index = -1 Then
+If index = -1 Then
     ItemCreator lastkey, RHS
 Else
-    Set PriveSpace(Index).iValue = RHS
+    Set PriveSpace(index).iValue = RHS
 End If
 Done = True
 End Property
 Property Get sValue() As Long
 Done = False
-If Index = -1 Then
+If index = -1 Then
 Else
     Done = True
-    sValue = PriveSpace(Index).sValue
+    sValue = PriveSpace(index).sValue
 End If
 End Property
 Property Let sValue(RHS As Long)
-If Index = -1 Then
+If index = -1 Then
 Else
     Done = True
-    PriveSpace(Index).sValue = RHS
+    PriveSpace(index).sValue = RHS
 End If
 End Property
 Property Get KeyTypeValue() As Integer
 Done = False
-If Index = -1 Then
+If index = -1 Then
 Else
     Done = True
-    KeyTypeValue = PriveSpace(Index).KeyType
+    KeyTypeValue = PriveSpace(index).KeyType
 End If
 End Property
 Property Let KeyTypeValue(RHS As Integer)
-If Index = -1 Then
+If index = -1 Then
 Else
     Done = True
-    PriveSpace(Index).KeyType = RHS
+    PriveSpace(index).KeyType = RHS
 End If
 End Property
 
 Property Get Value() As Variant
 Done = False
-If Index = -1 Then
-ElseIf Not IsObject(PriveSpace(Index).iValue) Then
+If index = -1 Then
+ElseIf Not IsObject(PriveSpace(index).iValue) Then
     Done = True
 
-    Value = PriveSpace(Index).iValue
+    Value = PriveSpace(index).iValue
     If structLen > 0 Then
         Value = Value.Offset
     End If
     If VarTypeName(Value) = "Error" Then
-    If PriveSpace(Index).KeyType = 8 Then
-    Value = PriveSpace(Index).Key
+    If PriveSpace(index).KeyType = 8 Then
+    Value = PriveSpace(index).Key
     Else
     Value = MyVal()
     End If
@@ -448,18 +449,18 @@ End Property
 Public Function IsString() As Boolean
 Dim n As Byte
 Done = False
-If Index = -1 Then
+If index = -1 Then
 Else
     Done = True
-     GetMem1 VarPtr(PriveSpace(Index).iValue), n
-     If n = 10 Then n = PriveSpace(Index).KeyType
+     GetMem1 VarPtr(PriveSpace(index).iValue), n
+     If n = 10 Then n = PriveSpace(index).KeyType
 End If
 IsString = n = 8
 End Function
 Private Function MyVal() As Variant
 On Error Resume Next
-MyVal = PriveSpace(Index).Key
-Select Case PriveSpace(Index).KeyType
+MyVal = PriveSpace(index).Key
+Select Case PriveSpace(index).KeyType
 Case vbString
 If MyVal Like "[-0-9.]*" Then
     MyVal = CDbl(Replace$(MyVal, ".", NowDec$))
@@ -484,12 +485,12 @@ End Function
 Function ValueType(ch As Long, p As Variant, s As String) As Boolean
 Done = False
 Dim val1 As Variant
-If Index = -1 Then
+If index = -1 Then
 ValueType = False
-ElseIf Not IsObject(PriveSpace(Index).iValue) Then
+ElseIf Not IsObject(PriveSpace(index).iValue) Then
 ValueType = True
     Done = True
-    val1 = PriveSpace(Index).iValue
+    val1 = PriveSpace(index).iValue
     If structLen > 0 Then
         val1 = val1.Offset
     End If
@@ -522,9 +523,9 @@ End If
 End Function
 Property Get ValueObj() As Variant
 Done = False
-If Index = -1 Then
-ElseIf IsObject(PriveSpace(Index).iValue) Then
-    Set ValueObj = PriveSpace(Index).iValue
+If index = -1 Then
+ElseIf IsObject(PriveSpace(index).iValue) Then
+    Set ValueObj = PriveSpace(index).iValue
     Done = True
 End If
 
@@ -600,7 +601,7 @@ End Function
 Function ChangeKey(key1, Key2)
 If AllowSameKey Then Exit Function
     Dim Key As String, NewKey As String
-    Dim K As Long
+    Dim k As Long
     If key1 = Key2 Then ChangeKey = True
     Key = Normalize(key1)
     If Len(Key) = 0 Then Exit Function
@@ -609,12 +610,12 @@ If AllowSameKey Then Exit Function
     NewKey = Normalize(Key2)
     If Len(NewKey) = 0 Then Exit Function
     
-    K = Hash(HashFunc(Key)) - 1
-    If K >= 0 Then
+    k = Hash(HashFunc(Key)) - 1
+    If k >= 0 Then
     Do
-            If PriveSpace(K).Key = Key Then
-                PriveSpace(K).Key = NewKey
-                PriveSpace(K).firsthash = HD(NewKey)
+            If PriveSpace(k).Key = Key Then
+                PriveSpace(k).Key = NewKey
+                PriveSpace(k).firsthash = HD(NewKey)
                 ReDim Hash(MaxSpace * 2 + 3)
                 hashlen = MaxSpace * 2 + 3
                 Rehash
@@ -622,47 +623,47 @@ If AllowSameKey Then Exit Function
                 Sorted = False
                 Exit Function
             End If
-            K = PriveSpace(K).Pleft - 1
-    Loop Until K < 0
+            k = PriveSpace(k).Pleft - 1
+    Loop Until k < 0
     End If
 End Function
 Sub swap(key1, Key2)
-Dim K As Long, c As item
+Dim k As Long, c As item
 If Find(key1) Then
-K = Index
+k = index
 If Find(Key2) Then
 
-    c = PriveSpace(K): PriveSpace(K) = PriveSpace(Index): PriveSpace(Index) = c
-    Index = K
+    c = PriveSpace(k): PriveSpace(k) = PriveSpace(index): PriveSpace(index) = c
+    index = k
     Rehash
     Sorted = False
 End If
 End If
 End Sub
 Sub SwapValues(key1, Key2)
-Dim K As Long
+Dim k As Long
 If Find(key1) Then
-K = Index
+k = index
 If Find(Key2) Then
-    SwapVariant PriveSpace(K).iValue, PriveSpace(Index).iValue
+    SwapVariant PriveSpace(k).iValue, PriveSpace(index).iValue
 End If
 End If
 End Sub
 Sub SwapNext(key1)
-Dim K As Long
+Dim k As Long
 On Error Resume Next
 If Done Then
-    K = Index
+    k = index
     If Find(key1) Then
-        SwapVariant PriveSpace(K).iValue, PriveSpace(Index).iValue
+        SwapVariant PriveSpace(k).iValue, PriveSpace(index).iValue
     End If
 End If
 End Sub
 Sub SwapByIndex(RHS As Long)
 On Error Resume Next
 If Done Then
-    SwapVariant PriveSpace(RHS).iValue, PriveSpace(Index).iValue
-    Index = RHS
+    SwapVariant PriveSpace(RHS).iValue, PriveSpace(index).iValue
+    index = RHS
 End If
 End Sub
 
@@ -692,26 +693,26 @@ Property Get LastKnown() As String
     LastKnown = lastfind
 End Property
 Function IsObj() As Boolean
-If Index = -1 Then
+If index = -1 Then
 Else
-IsObj = IsObject(PriveSpace(Index).iValue)
+IsObj = IsObject(PriveSpace(index).iValue)
 End If
 End Function
 Function IsObjAt(curitem As Long, peekvalue) As Boolean
-If Index = -1 Then
+If index = -1 Then
 Else
-If IsObject(PriveSpace(Index).iValue) Then
-    Set peekvalue = PriveSpace(Index).iValue
+If IsObject(PriveSpace(index).iValue) Then
+    Set peekvalue = PriveSpace(index).iValue
     IsObjAt = True
 End If
 End If
 End Function
 Function IsEnum(p As Variant) As Boolean
 Dim usehandler As mHandler
-If Index = -1 Then
-ElseIf IsObject(PriveSpace(Index).iValue) Then
-If VarTypeName(PriveSpace(Index).iValue) = "mHandler" Then
-    Set usehandler = PriveSpace(Index).iValue
+If index = -1 Then
+ElseIf IsObject(PriveSpace(index).iValue) Then
+If VarTypeName(PriveSpace(index).iValue) = "mHandler" Then
+    Set usehandler = PriveSpace(index).iValue
     IsEnum = usehandler.t1 = 4
     If IsEnum Then
         If myVarType(usehandler.index_cursor, vbString) Then
@@ -725,100 +726,100 @@ End If
 End Function
 
 Function Find(RHS) As Boolean
-Dim K As Long, Key As String, k1 As Long
+Dim k As Long, Key As String, k1 As Long
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 ParentIndex = -1
 Done = False
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then Find = True: lastfind = Key: Index = K: Done = True: Exit Function
-     ParentIndex = K
-     k1 = K
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0 Or k1 = K
-If k1 = K Then
+    If PriveSpace(k).Key = Key Then Find = True: lastfind = Key: index = k: Done = True: Exit Function
+     ParentIndex = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k1 = k
+If k1 = k Then
 Rehash
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
 ParentIndex = -1
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then Find = True: lastfind = Key: Index = K: Done = True: Exit Function
-     ParentIndex = K
-     k1 = K
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0 Or K = k1
+    If PriveSpace(k).Key = Key Then Find = True: lastfind = Key: index = k: Done = True: Exit Function
+     ParentIndex = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k = k1
 End If
 End If
 End If
 
 End Function
 Function FindOne(RHS, num) As Boolean
-Dim K As Long, Key As String, k1 As Long
+Dim k As Long, Key As String, k1 As Long
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 ParentIndex = -1
 Done = False
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then
+    If PriveSpace(k).Key = Key Then
         num = num + 1
-        If num = 0 Then FindOne = True: lastfind = Key: Index = K: Done = True: Exit Function
+        If num = 0 Then FindOne = True: lastfind = Key: index = k: Done = True: Exit Function
     End If
-     ParentIndex = K
-     k1 = K
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0 Or k1 = K
-If k1 = K Then
+     ParentIndex = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k1 = k
+If k1 = k Then
 Rehash
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
 ParentIndex = -1
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then
+    If PriveSpace(k).Key = Key Then
       num = num + 1
-        If num = 0 Then FindOne = True: lastfind = Key: Index = K: Done = True: Exit Function
+        If num = 0 Then FindOne = True: lastfind = Key: index = k: Done = True: Exit Function
     End If
-     ParentIndex = K
-     k1 = K
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0 Or K = k1
+     ParentIndex = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k = k1
 End If
 End If
 End If
 
 End Function
-Private Function Find2(RHS, Parndx As Long, ndx As Long) As Boolean
-Dim K As Long, Key As String, k1 As Long
+Private Function Find2(RHS, Parndx As Long, nDx As Long) As Boolean
+Dim k As Long, Key As String, k1 As Long
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 Parndx = -1
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then Find2 = True: ndx = K: Exit Function
-     Parndx = K
-     k1 = K
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0 Or k1 = K
-If k1 = K Then
+    If PriveSpace(k).Key = Key Then Find2 = True: nDx = k: Exit Function
+     Parndx = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k1 = k
+If k1 = k Then
 Parndx = -1
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
 Do
-    If PriveSpace(K).Key = Key Then Find2 = True: ndx = K: Exit Function
-     Parndx = K
-     k1 = K
-     K = PriveSpace(K).Pleft - 1
-Loop Until K < 0 Or k1 = K
+    If PriveSpace(k).Key = Key Then Find2 = True: nDx = k: Exit Function
+     Parndx = k
+     k1 = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0 Or k1 = k
 End If
 End If
 End If
@@ -826,104 +827,104 @@ End Function
 
 Function ExistKey0(RHS) As Boolean
 If AllowSameKey Then Exit Function
-Dim K As Long, Key As String, k1 As Long
+Dim k As Long, Key As String, k1 As Long
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
     Do
-        If PriveSpace(K).Key = Key Then ExistKey0 = True: Index = K: Exit Function
-        k1 = K
-        K = PriveSpace(K).Pleft - 1
-    Loop Until K < 0 Or k1 = K
-    If K = k1 Then
+        If PriveSpace(k).Key = Key Then ExistKey0 = True: index = k: Exit Function
+        k1 = k
+        k = PriveSpace(k).Pleft - 1
+    Loop Until k < 0 Or k1 = k
+    If k = k1 Then
         Rehash
-        K = Hash(HashFunc(Key)) - 1
+        k = Hash(HashFunc(Key)) - 1
         k1 = -2
-        If K >= 0 Then
+        If k >= 0 Then
         Do
-            If PriveSpace(K).Key = Key Then ExistKey0 = True: Index = K: Exit Function
-            k1 = K
-            K = PriveSpace(K).Pleft - 1
-        Loop Until K < 0 Or k1 = K
+            If PriveSpace(k).Key = Key Then ExistKey0 = True: index = k: Exit Function
+            k1 = k
+            k = PriveSpace(k).Pleft - 1
+        Loop Until k < 0 Or k1 = k
         End If
     End If
 End If
 End Function
 Function ExistKey(RHS) As Boolean
-Dim K As Long, k1 As Long, Key As String
+Dim k As Long, k1 As Long, Key As String
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
-K = Hash(HashFunc(Key)) - 1
+k = Hash(HashFunc(Key)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
     Do
-        If PriveSpace(K).Key = Key Then ExistKey = True: Index = K: Exit Function
-        k1 = K
-        K = PriveSpace(K).Pleft - 1
+        If PriveSpace(k).Key = Key Then ExistKey = True: index = k: Exit Function
+        k1 = k
+        k = PriveSpace(k).Pleft - 1
         
-    Loop Until K < 0 Or K = k1
-    If K = k1 Then
+    Loop Until k < 0 Or k = k1
+    If k = k1 Then
         Rehash
-        K = Hash(HashFunc(Key)) - 1
-        If K >= 0 Then
+        k = Hash(HashFunc(Key)) - 1
+        If k >= 0 Then
         Do
-            If PriveSpace(K).Key = Key Then ExistKey = True: Index = K: Exit Function
-            k1 = K
-            K = PriveSpace(K).Pleft - 1
-        Loop Until K < 0 Or K = k1
+            If PriveSpace(k).Key = Key Then ExistKey = True: index = k: Exit Function
+            k1 = k
+            k = PriveSpace(k).Pleft - 1
+        Loop Until k < 0 Or k = k1
         End If
     End If
 End If
 End Function
 Function ExistKey3(RHS) As Boolean
-Dim K As Long, k1 As Long, Key As String
+Dim k As Long, k1 As Long, Key As String
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 k1 = -2
-K = Hash(HashFunc(Key)) - 1
-If K >= 0 Then
+k = Hash(HashFunc(Key)) - 1
+If k >= 0 Then
     Do
-        If PriveSpace(K).Key = Key Then ExistKey3 = True: Exit Function
-        k1 = K
-        K = PriveSpace(K).Pleft - 1
-    Loop Until K < 0 Or K = k1
-    If K = k1 Then
+        If PriveSpace(k).Key = Key Then ExistKey3 = True: Exit Function
+        k1 = k
+        k = PriveSpace(k).Pleft - 1
+    Loop Until k < 0 Or k = k1
+    If k = k1 Then
         Rehash
-        K = Hash(HashFunc(Key)) - 1
-        If K >= 0 Then
+        k = Hash(HashFunc(Key)) - 1
+        If k >= 0 Then
             Do
-                If PriveSpace(K).Key = Key Then ExistKey3 = True: Exit Function
-                k1 = K
-                K = PriveSpace(K).Pleft - 1
-            Loop Until K < 0 Or K = k1
+                If PriveSpace(k).Key = Key Then ExistKey3 = True: Exit Function
+                k1 = k
+                k = PriveSpace(k).Pleft - 1
+            Loop Until k < 0 Or k = k1
         End If
     End If
 End If
 End Function
 
 Private Function ExistKey2(Key As String, nkey As Long) As Boolean
-Dim K As Long, k1 As Long
+Dim k As Long, k1 As Long
 If Len(Key) = 0 Then ExistKey2 = True: Exit Function
-K = Hash(HashFunc1(nkey)) - 1
+k = Hash(HashFunc1(nkey)) - 1
 k1 = -2
-If K >= 0 Then
+If k >= 0 Then
     Do
-        If PriveSpace(K).Key = Key Then ExistKey2 = True: Exit Function
-        k1 = K
-        K = PriveSpace(K).Pleft - 1
-    Loop Until K < 0 Or K = k1
-    If K = k1 Then
+        If PriveSpace(k).Key = Key Then ExistKey2 = True: Exit Function
+        k1 = k
+        k = PriveSpace(k).Pleft - 1
+    Loop Until k < 0 Or k = k1
+    If k = k1 Then
         Rehash
-        K = Hash(HashFunc(Key)) - 1
-        If K >= 0 Then
+        k = Hash(HashFunc(Key)) - 1
+        If k >= 0 Then
         Do
-            If PriveSpace(K).Key = Key Then ExistKey2 = True: Exit Function
-            k1 = K
-            K = PriveSpace(K).Pleft - 1
+            If PriveSpace(k).Key = Key Then ExistKey2 = True: Exit Function
+            k1 = k
+            k = PriveSpace(k).Pleft - 1
             
-        Loop Until K < 0 Or K = k1
+        Loop Until k < 0 Or k = k1
         End If
     End If
 
@@ -949,7 +950,7 @@ End With
 
 place HashFunc1(kk), a
 
-Index = a
+index = a
 Done = True
 End Sub
 Friend Sub ItemCreator2(Key As String, nValue As Long, dvalue As Long)
@@ -967,17 +968,17 @@ With PriveSpace(a)
     .firsthash = kk
 End With
 place HashFunc1(kk), a
-Index = -1
+index = -1
 End Sub
 Property Get Percent()
 Percent = 100 * Count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
-    Dim K As Long
-    K = Hash(b)
-    If Not K = a + 1 Then
+    Dim k As Long
+    k = Hash(b)
+    If Not k = a + 1 Then
          Hash(b) = a + 1
-         PriveSpace(a).Pleft = K
+         PriveSpace(a).Pleft = k
     End If
     PriveSpace(a).lastpos = b
 End Sub
@@ -1012,76 +1013,76 @@ Public Property Get ReferCount() As Long
 ReferCount = GetRefCount(Me)
 End Property
 Public Property Get KeyToString2() As Variant
-If Index > -1 Then
+If index > -1 Then
 
-    KeyToString2 = PriveSpace(Index).Key + str$(PriveSpace(Index).lastpos < toplim) + str$(PriveSpace(Index).Pleft) ' + Str$(Int(Percent * 1000) / 100) + Str$(hashlen) + Str$(count)
+    KeyToString2 = PriveSpace(index).Key + str$(PriveSpace(index).lastpos < toplim) + str$(PriveSpace(index).Pleft) ' + Str$(Int(Percent * 1000) / 100) + Str$(hashlen) + Str$(count)
 End If
 End Property
 Public Property Get KeyToString() As Variant
-If Index > -1 Then
+If index > -1 Then
 
-    KeyToString = PriveSpace(Index).Key
+    KeyToString = PriveSpace(index).Key
 End If
 End Property
 Public Property Get HassKeyNumberPart() As Variant
-If Index > -1 Then
-HassKeyNumberPart = Left$(PriveSpace(Index).Key, 1) Like "[-0-9.]*"
+If index > -1 Then
+HassKeyNumberPart = Left$(PriveSpace(index).Key, 1) Like "[-0-9.]*"
 End If
 End Property
 Public Property Get KeyToNumber() As Variant
-If Index > -1 Then
+If index > -1 Then
     KeyToNumber = MyVal()
     If VarType(KeyToNumber) = vbString Then KeyToNumber = CDbl(0)
 End If
 End Property
 Public Property Get ReferCountValue() As Long
-If Index = -1 Then
-ElseIf IsObject(PriveSpace(Index).iValue) Then
-    ReferCountValue = GetRefCount(PriveSpace(Index).iValue)
+If index = -1 Then
+ElseIf IsObject(PriveSpace(index).iValue) Then
+    ReferCountValue = GetRefCount(PriveSpace(index).iValue)
 End If
 End Property
 Public Sub ToStart()
-Index = 0
+index = 0
 Done = Count > 0
 End Sub
 Public Sub ToEnd()
-Index = Count - 1
+index = Count - 1
 Done = Count > 0
 End Sub
 
 Public Sub NextIndex()
 Done = False
-    If Index = -1 Then
+    If index = -1 Then
  
     Else
-        If Index < toplim Then Done = True: Index = Index + 1
+        If index < toplim Then Done = True: index = index + 1
     End If
 
 End Sub
 Public Function ToNextIndex()
 Done = False
-    If Index = -1 Then
+    If index = -1 Then
  
     Else
-        If Index < toplim Then Done = True: Index = Index + 1
+        If index < toplim Then Done = True: index = index + 1
     End If
     ToNextIndex = Done
 End Function
 Public Sub PrevIndex()
 Done = False
-    If Index = -1 Then
+    If index = -1 Then
     
     Else
-        If Index > 0 Then Done = True: Index = Index - 1
+        If index > 0 Then Done = True: index = index - 1
     End If
 
 End Sub
 Public Function ToPrevIndex()
 Done = False
-    If Index = -1 Then
+    If index = -1 Then
     
     Else
-        If Index > 0 Then Done = True: Index = Index - 1
+        If index > 0 Then Done = True: index = index - 1
     End If
     ToPrevIndex = Done
 End Function
@@ -1090,270 +1091,270 @@ Private Sub Class_Terminate()
     Erase PriveSpace()
 End Sub
 
-Private Sub QuickSortItems(Arr() As item, ByVal lb As Long, ByVal ub As Long)
+Private Sub QuickSortItems(arr() As item, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
-  If ub - lb = 1 Then
-     M1 = lb
+  If UB - LB = 1 Then
+     M1 = LB
 
-     If CompareStr2(Arr(M1).Key, Arr(ub).Key, mSortstyle) = 1 Then SwapItem VarPtr(Arr(M1)), VarPtr(Arr(ub))
+     If CompareStr2(arr(M1).Key, arr(UB).Key, mSortstyle) = 1 Then SwapItem VarPtr(arr(M1)), VarPtr(arr(UB))
      Exit Sub
-  ElseIf ub - lb < 7 Then
-  InsertionSort1 Arr(), lb, ub
+  ElseIf UB - LB < 7 Then
+  InsertionSort1 arr(), LB, UB
   Exit Sub
   Else
-    M1 = (lb + ub) \ 2
-   LoadItem VarPtr(Piv), VarPtr(Arr(M1))
-   M1 = lb
-   Do While CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) = -1: M1 = M1 + 1: Loop
+    M1 = (LB + UB) \ 2
+   LoadItem VarPtr(Piv), VarPtr(arr(M1))
+   M1 = LB
+   Do While CompareStr2(arr(M1).Key, Piv.Key, mSortstyle) = -1: M1 = M1 + 1: Loop
     
   End If
   
-  M2 = ub
+  M2 = UB
   Do
-    Do While CompareStr2(Arr(M2).Key, Piv.Key, mSortstyle) = 1: M2 = M2 - 1: Loop
+    Do While CompareStr2(arr(M2).Key, Piv.Key, mSortstyle) = 1: M2 = M2 - 1: Loop
     If M1 <= M2 Then
-      SwapItem VarPtr(Arr(M1)), VarPtr(Arr(M2))
+      SwapItem VarPtr(arr(M1)), VarPtr(arr(M2))
       M1 = M1 + 1
       M2 = M2 - 1
     End If
     If M1 > M2 Then Exit Do
-    Do While CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) = -1: M1 = M1 + 1: Loop
+    Do While CompareStr2(arr(M1).Key, Piv.Key, mSortstyle) = -1: M1 = M1 + 1: Loop
   Loop
   LoadItem VarPtr(Piv), VarPtr(zeroitem)
-  If lb < M2 Then QuickSortItems Arr, lb, M2
-  If M1 < ub Then QuickSortItems Arr, M1, ub
+  If LB < M2 Then QuickSortItems arr, LB, M2
+  If M1 < UB Then QuickSortItems arr, M1, UB
 End Sub
-Private Sub QuickSortItemsRevWithSameKey(Arr() As item, ByVal lb As Long, ByVal ub As Long)
+Private Sub QuickSortItemsRevWithSameKey(arr() As item, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
-  If ub - lb = 1 Then
-     M1 = lb
+  If UB - LB = 1 Then
+     M1 = LB
 
-     If CompareStr2(Arr(M1).Key, Arr(ub).Key, mSortstyle) = -1 Then SwapItem VarPtr(Arr(M1)), VarPtr(Arr(ub))
+     If CompareStr2(arr(M1).Key, arr(UB).Key, mSortstyle) = -1 Then SwapItem VarPtr(arr(M1)), VarPtr(arr(UB))
      Exit Sub
-  ElseIf ub - lb < 7 Then
-  InsertionSort1 Arr(), lb, ub
+  ElseIf UB - LB < 7 Then
+  InsertionSort1 arr(), LB, UB
   Exit Sub
   
   Else
-    M1 = (lb + ub) \ 2
-    LoadItem VarPtr(Piv), VarPtr(Arr(M1))
-    If CompareStr2(Arr(lb).Key, Piv.Key, mSortstyle) = 0 Then
-            M2 = ub - 1
-            M1 = lb
-            LoadItem VarPtr(Piv), VarPtr(Arr(lb))
+    M1 = (LB + UB) \ 2
+    LoadItem VarPtr(Piv), VarPtr(arr(M1))
+    If CompareStr2(arr(LB).Key, Piv.Key, mSortstyle) = 0 Then
+            M2 = UB - 1
+            M1 = LB
+            LoadItem VarPtr(Piv), VarPtr(arr(LB))
             Do
                 M1 = M1 + 1
                 If M1 > M2 Then
-                    If CompareStr2(Arr(ub).Key, Piv.Key, mSortstyle) = 1 Then SwapItem VarPtr(Arr(lb)), VarPtr(Arr(ub))
+                    If CompareStr2(arr(UB).Key, Piv.Key, mSortstyle) = 1 Then SwapItem VarPtr(arr(LB)), VarPtr(arr(UB))
                     Exit Sub
                 End If
-            Loop Until CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) <> 0
-            LoadItem VarPtr(Piv), VarPtr(Arr(M1))
-            If M1 > lb Then If CompareStr2(Arr(lb).Key, Piv.Key, mSortstyle) = -1 Then SwapItem VarPtr(Arr(lb)), VarPtr(Arr(M1)): LoadItem VarPtr(Piv), VarPtr(Arr(M1))
+            Loop Until CompareStr2(arr(M1).Key, Piv.Key, mSortstyle) <> 0
+            LoadItem VarPtr(Piv), VarPtr(arr(M1))
+            If M1 > LB Then If CompareStr2(arr(LB).Key, Piv.Key, mSortstyle) = -1 Then SwapItem VarPtr(arr(LB)), VarPtr(arr(M1)): LoadItem VarPtr(Piv), VarPtr(arr(M1))
     Else
-        M1 = lb
-        Do While CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) = 1: M1 = M1 + 1: Loop
+        M1 = LB
+        Do While CompareStr2(arr(M1).Key, Piv.Key, mSortstyle) = 1: M1 = M1 + 1: Loop
         End If
     End If
   
-  M2 = ub
+  M2 = UB
   Do
-    Do While CompareStr2(Arr(M2).Key, Piv.Key, mSortstyle) = -1: M2 = M2 - 1: Loop
+    Do While CompareStr2(arr(M2).Key, Piv.Key, mSortstyle) = -1: M2 = M2 - 1: Loop
     If M1 <= M2 Then
-      SwapItem VarPtr(Arr(M1)), VarPtr(Arr(M2))
+      SwapItem VarPtr(arr(M1)), VarPtr(arr(M2))
       M1 = M1 + 1
       M2 = M2 - 1
     End If
     If M1 > M2 Then Exit Do
-    Do While CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) = 1: M1 = M1 + 1: Loop
+    Do While CompareStr2(arr(M1).Key, Piv.Key, mSortstyle) = 1: M1 = M1 + 1: Loop
   Loop
   LoadItem VarPtr(Piv), VarPtr(zeroitem)
-  If lb < M2 Then QuickSortItemsRevWithSameKey Arr, lb, M2
-  If M1 < ub Then QuickSortItemsRevWithSameKey Arr, M1, ub
+  If LB < M2 Then QuickSortItemsRevWithSameKey arr, LB, M2
+  If M1 < UB Then QuickSortItemsRevWithSameKey arr, M1, UB
 End Sub
-Private Sub QuickSortItemsWithSameKey(Arr() As item, ByVal lb As Long, ByVal ub As Long)
+Private Sub QuickSortItemsWithSameKey(arr() As item, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
-  If ub - lb = 1 Then
-     M1 = lb
+  If UB - LB = 1 Then
+     M1 = LB
 
-     If CompareStr2(Arr(M1).Key, Arr(ub).Key, mSortstyle) = 1 Then SwapItem VarPtr(Arr(M1)), VarPtr(Arr(ub))
+     If CompareStr2(arr(M1).Key, arr(UB).Key, mSortstyle) = 1 Then SwapItem VarPtr(arr(M1)), VarPtr(arr(UB))
      Exit Sub
-  ElseIf ub - lb < 7 Then
-  InsertionSort1 Arr(), lb, ub
+  ElseIf UB - LB < 7 Then
+  InsertionSort1 arr(), LB, UB
   Exit Sub
   
   Else
-        M1 = (lb + ub) \ 2
-        LoadItem VarPtr(Piv), VarPtr(Arr(M1))
-        If CompareStr2(Arr(lb).Key, Piv.Key, mSortstyle) = 0 Then
-                M2 = ub - 1
-                M1 = lb
-                LoadItem VarPtr(Piv), VarPtr(Arr(lb))
+        M1 = (LB + UB) \ 2
+        LoadItem VarPtr(Piv), VarPtr(arr(M1))
+        If CompareStr2(arr(LB).Key, Piv.Key, mSortstyle) = 0 Then
+                M2 = UB - 1
+                M1 = LB
+                LoadItem VarPtr(Piv), VarPtr(arr(LB))
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If CompareStr2(Arr(ub).Key, Piv.Key, mSortstyle) = -1 Then SwapItem VarPtr(Arr(lb)), VarPtr(Arr(ub))
+                        If CompareStr2(arr(UB).Key, Piv.Key, mSortstyle) = -1 Then SwapItem VarPtr(arr(LB)), VarPtr(arr(UB))
                         Exit Sub
                     End If
-                Loop Until CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) <> 0
-                LoadItem VarPtr(Piv), VarPtr(Arr(M1))
-                If M1 > lb Then If CompareStr2(Arr(lb).Key, Piv.Key, mSortstyle) = 1 Then SwapItem VarPtr(Arr(lb)), VarPtr(Arr(M1)): LoadItem VarPtr(Piv), VarPtr(Arr(M1))
+                Loop Until CompareStr2(arr(M1).Key, Piv.Key, mSortstyle) <> 0
+                LoadItem VarPtr(Piv), VarPtr(arr(M1))
+                If M1 > LB Then If CompareStr2(arr(LB).Key, Piv.Key, mSortstyle) = 1 Then SwapItem VarPtr(arr(LB)), VarPtr(arr(M1)): LoadItem VarPtr(Piv), VarPtr(arr(M1))
         Else
-                M1 = lb
-                Do While CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) = -1: M1 = M1 + 1: Loop
+                M1 = LB
+                Do While CompareStr2(arr(M1).Key, Piv.Key, mSortstyle) = -1: M1 = M1 + 1: Loop
         End If
   End If
   
-  M2 = ub
+  M2 = UB
   Do
-    Do While CompareStr2(Arr(M2).Key, Piv.Key, mSortstyle) = 1: M2 = M2 - 1: Loop
+    Do While CompareStr2(arr(M2).Key, Piv.Key, mSortstyle) = 1: M2 = M2 - 1: Loop
     If M1 <= M2 Then
-      SwapItem VarPtr(Arr(M1)), VarPtr(Arr(M2))
+      SwapItem VarPtr(arr(M1)), VarPtr(arr(M2))
       M1 = M1 + 1
       M2 = M2 - 1
     End If
     If M1 > M2 Then Exit Do
-    Do While CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) = -1: M1 = M1 + 1: Loop
+    Do While CompareStr2(arr(M1).Key, Piv.Key, mSortstyle) = -1: M1 = M1 + 1: Loop
   Loop
   LoadItem VarPtr(Piv), VarPtr(zeroitem)
-  If lb < M2 Then QuickSortItemsWithSameKey Arr, lb, M2
-  If M1 < ub Then QuickSortItemsWithSameKey Arr, M1, ub
+  If LB < M2 Then QuickSortItemsWithSameKey arr, LB, M2
+  If M1 < UB Then QuickSortItemsWithSameKey arr, M1, UB
 End Sub
-Private Sub QuickSortItemsNumbers(Arr() As item, ByVal lb As Long, ByVal ub As Long)
+Private Sub QuickSortItemsNumbers(arr() As item, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
 On Error GoTo abc1
-     If ub - lb = 1 Then
-     M1 = lb
-       If compareStr4(Arr(M1).Key, Arr(ub).Key) = 1 Then SwapItem VarPtr(Arr(M1)), VarPtr(Arr(ub))
+     If UB - LB = 1 Then
+     M1 = LB
+       If compareStr4(arr(M1).Key, arr(UB).Key) = 1 Then SwapItem VarPtr(arr(M1)), VarPtr(arr(UB))
       Exit Sub
-    ElseIf ub - lb < 7 Then
-        InsertionSort Arr(), lb, ub
+    ElseIf UB - LB < 7 Then
+        InsertionSort arr(), LB, UB
         Exit Sub
      Else
-       M1 = (lb + ub) \ 2 '+ 1
-       LoadItem VarPtr(Piv), VarPtr(Arr(M1))
-             If compareStr4(Arr(lb).Key, Piv.Key) = 0 Then
-                M2 = ub - 1
-                M1 = lb
-                LoadItem VarPtr(Piv), VarPtr(Arr(lb))
+       M1 = (LB + UB) \ 2 '+ 1
+       LoadItem VarPtr(Piv), VarPtr(arr(M1))
+             If compareStr4(arr(LB).Key, Piv.Key) = 0 Then
+                M2 = UB - 1
+                M1 = LB
+                LoadItem VarPtr(Piv), VarPtr(arr(LB))
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If compareStr4(Arr(ub).Key, Piv.Key) = -1 Then SwapItem VarPtr(Arr(lb)), VarPtr(Arr(ub))
+                        If compareStr4(arr(UB).Key, Piv.Key) = -1 Then SwapItem VarPtr(arr(LB)), VarPtr(arr(UB))
                         Exit Sub
                     End If
-                Loop Until compareStr4(Arr(M1).Key, Piv.Key) <> 0
-                LoadItem VarPtr(Piv), VarPtr(Arr(M1))
-                If M1 > lb Then If compareStr4(Arr(lb).Key, Piv.Key) = 1 Then SwapItem VarPtr(Arr(lb)), VarPtr(Arr(M1)): LoadItem VarPtr(Piv), VarPtr(Arr(M1))
+                Loop Until compareStr4(arr(M1).Key, Piv.Key) <> 0
+                LoadItem VarPtr(Piv), VarPtr(arr(M1))
+                If M1 > LB Then If compareStr4(arr(LB).Key, Piv.Key) = 1 Then SwapItem VarPtr(arr(LB)), VarPtr(arr(M1)): LoadItem VarPtr(Piv), VarPtr(arr(M1))
             Else
-                M1 = lb
-                Do While compareStr4(Arr(M1).Key, Piv.Key) = -1: M1 = M1 + 1: Loop
+                M1 = LB
+                Do While compareStr4(arr(M1).Key, Piv.Key) = -1: M1 = M1 + 1: Loop
             End If
     End If
-    M2 = ub
+    M2 = UB
     Do
-      Do While compareStr4(Arr(M2).Key, Piv.Key) = 1: M2 = M2 - 1: Loop
+      Do While compareStr4(arr(M2).Key, Piv.Key) = 1: M2 = M2 - 1: Loop
       If M1 <= M2 Then
-        SwapItem VarPtr(Arr(M1)), VarPtr(Arr(M2))
+        SwapItem VarPtr(arr(M1)), VarPtr(arr(M2))
         M1 = M1 + 1
         M2 = M2 - 1
       End If
       If M1 > M2 Then Exit Do
-      Do While compareStr4(Arr(M1).Key, Piv.Key) = -1: M1 = M1 + 1: Loop
+      Do While compareStr4(arr(M1).Key, Piv.Key) = -1: M1 = M1 + 1: Loop
     Loop
     LoadItem VarPtr(Piv), VarPtr(zeroitem)
-    If lb < M2 Then QuickSortItemsNumbers Arr, lb, M2
-    If M1 < ub Then QuickSortItemsNumbers Arr, M1, ub
+    If LB < M2 Then QuickSortItemsNumbers arr, LB, M2
+    If M1 < UB Then QuickSortItemsNumbers arr, M1, UB
     Exit Sub
 abc1:
     
 
 End Sub
 
-Private Sub QuickSortItemsRevNumbers(Arr() As item, ByVal lb As Long, ByVal ub As Long)
+Private Sub QuickSortItemsRevNumbers(arr() As item, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
 On Error GoTo abc1
-     If ub - lb = 1 Then
-     M1 = lb
-       If compareStr4(Arr(M1).Key, Arr(ub).Key) = -1 Then SwapItem VarPtr(Arr(M1)), VarPtr(Arr(ub))
+     If UB - LB = 1 Then
+     M1 = LB
+       If compareStr4(arr(M1).Key, arr(UB).Key) = -1 Then SwapItem VarPtr(arr(M1)), VarPtr(arr(UB))
       Exit Sub
-    ElseIf ub - lb < 7 Then
-        InsertionSort Arr(), lb, ub, 1
+    ElseIf UB - LB < 7 Then
+        InsertionSort arr(), LB, UB, 1
         Exit Sub
      Else
-       M1 = (lb + ub) \ 2 '+ 1
-       LoadItem VarPtr(Piv), VarPtr(Arr(M1))
-             If compareStr4(Arr(lb).Key, Piv.Key) = 0 Then
-                M2 = ub - 1
-                M1 = lb
-                LoadItem VarPtr(Piv), VarPtr(Arr(lb))
+       M1 = (LB + UB) \ 2 '+ 1
+       LoadItem VarPtr(Piv), VarPtr(arr(M1))
+             If compareStr4(arr(LB).Key, Piv.Key) = 0 Then
+                M2 = UB - 1
+                M1 = LB
+                LoadItem VarPtr(Piv), VarPtr(arr(LB))
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If compareStr4(Arr(ub).Key, Piv.Key) = 1 Then SwapItem VarPtr(Arr(lb)), VarPtr(Arr(ub))
+                        If compareStr4(arr(UB).Key, Piv.Key) = 1 Then SwapItem VarPtr(arr(LB)), VarPtr(arr(UB))
                         Exit Sub
                     End If
-                Loop Until compareStr4(Arr(M1).Key, Piv.Key) <> 0
-                LoadItem VarPtr(Piv), VarPtr(Arr(M1))
-                If M1 > lb Then If compareStr4(Arr(lb).Key, Piv.Key) = -1 Then SwapItem VarPtr(Arr(lb)), VarPtr(Arr(M1)): LoadItem VarPtr(Piv), VarPtr(Arr(M1))
+                Loop Until compareStr4(arr(M1).Key, Piv.Key) <> 0
+                LoadItem VarPtr(Piv), VarPtr(arr(M1))
+                If M1 > LB Then If compareStr4(arr(LB).Key, Piv.Key) = -1 Then SwapItem VarPtr(arr(LB)), VarPtr(arr(M1)): LoadItem VarPtr(Piv), VarPtr(arr(M1))
             Else
-                M1 = lb
-                Do While compareStr4(Arr(M1).Key, Piv.Key) = 1: M1 = M1 + 1: Loop
+                M1 = LB
+                Do While compareStr4(arr(M1).Key, Piv.Key) = 1: M1 = M1 + 1: Loop
             End If
     End If
-    M2 = ub
+    M2 = UB
     Do
-      Do While compareStr4(Arr(M2).Key, Piv.Key) = -1: M2 = M2 - 1: Loop
+      Do While compareStr4(arr(M2).Key, Piv.Key) = -1: M2 = M2 - 1: Loop
       If M1 <= M2 Then
-        SwapItem VarPtr(Arr(M1)), VarPtr(Arr(M2))
+        SwapItem VarPtr(arr(M1)), VarPtr(arr(M2))
         M1 = M1 + 1
         M2 = M2 - 1
       End If
       If M1 > M2 Then Exit Do
-      Do While compareStr4(Arr(M1).Key, Piv.Key) = 1: M1 = M1 + 1: Loop
+      Do While compareStr4(arr(M1).Key, Piv.Key) = 1: M1 = M1 + 1: Loop
     Loop
     LoadItem VarPtr(Piv), VarPtr(zeroitem)
-    If lb < M2 Then QuickSortItemsRevNumbers Arr, lb, M2
-    If M1 < ub Then QuickSortItemsRevNumbers Arr, M1, ub
+    If LB < M2 Then QuickSortItemsRevNumbers arr, LB, M2
+    If M1 < UB Then QuickSortItemsRevNumbers arr, M1, UB
     Exit Sub
 abc1:
     
 
 End Sub
-Private Sub QuickSortItemsRev(Arr() As item, ByVal lb As Long, ByVal ub As Long)
+Private Sub QuickSortItemsRev(arr() As item, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
-  If ub - lb = 1 Then
-     M1 = lb
+  If UB - LB = 1 Then
+     M1 = LB
 
-     If CompareStr2(Arr(M1).Key, Arr(ub).Key, mSortstyle) = -1 Then SwapItem VarPtr(Arr(M1)), VarPtr(Arr(ub))
+     If CompareStr2(arr(M1).Key, arr(UB).Key, mSortstyle) = -1 Then SwapItem VarPtr(arr(M1)), VarPtr(arr(UB))
      Exit Sub
-  ElseIf ub - lb < 7 Then
-  InsertionSort1 Arr(), lb, ub, 1
+  ElseIf UB - LB < 7 Then
+  InsertionSort1 arr(), LB, UB, 1
   Exit Sub
   Else
   ' we have unique names
-    M1 = (lb + ub) \ 2
-    LoadItem VarPtr(Piv), VarPtr(Arr(M1))
-    M1 = lb
-   Do While CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) = 1: M1 = M1 + 1: Loop
+    M1 = (LB + UB) \ 2
+    LoadItem VarPtr(Piv), VarPtr(arr(M1))
+    M1 = LB
+   Do While CompareStr2(arr(M1).Key, Piv.Key, mSortstyle) = 1: M1 = M1 + 1: Loop
   End If
   
-  M2 = ub
+  M2 = UB
   Do
-    Do While CompareStr2(Arr(M2).Key, Piv.Key, mSortstyle) = -1: M2 = M2 - 1: Loop
+    Do While CompareStr2(arr(M2).Key, Piv.Key, mSortstyle) = -1: M2 = M2 - 1: Loop
 
     If M1 <= M2 Then
-      SwapItem VarPtr(Arr(M1)), VarPtr(Arr(M2))
+      SwapItem VarPtr(arr(M1)), VarPtr(arr(M2))
       M1 = M1 + 1
       M2 = M2 - 1
     End If
     If M1 > M2 Then Exit Do
-    Do While CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) = 1: M1 = M1 + 1: Loop
+    Do While CompareStr2(arr(M1).Key, Piv.Key, mSortstyle) = 1: M1 = M1 + 1: Loop
 
   Loop
   LoadItem VarPtr(Piv), VarPtr(zeroitem)
-  If lb < M2 Then QuickSortItemsRev Arr, lb, M2
-  If M1 < ub Then QuickSortItemsRev Arr, M1, ub
+  If LB < M2 Then QuickSortItemsRev arr, LB, M2
+  If M1 < UB Then QuickSortItemsRev arr, M1, UB
 
 End Sub
 Public Function AllowAnyKey()
@@ -1387,11 +1388,11 @@ If (uScol(part) And 1) = 1 Then compareStr444 = -ret Else compareStr444 = ret
 
 End Function
 Private Function compareStr44(a$, b$) As Long
-Dim i As Long, j As Long, a1$, b1$, p1 As Variant, p2 As Variant, n$, K As Long, k1 As Long
+Dim i As Long, j As Long, a1$, b1$, P1 As Variant, P2 As Variant, n$, k As Long, k1 As Long
 If CompareString(useclid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$)) = 2 Then Exit Function
 n$ = "[-0-9.]"
-K = Sgn(Len(a$) - Len(b$))
-k1 = K
+k = Sgn(Len(a$) - Len(b$))
+k1 = k
 again:
 j = IIf(Len(a$) >= Len(b$), Len(b$), Len(a$))
 
@@ -1400,13 +1401,13 @@ For i = 1 To j
     If Mid$(a$, i, 1) Like n$ Then
     a1$ = Mid$(a$, i)
     b1$ = Mid$(b$, i)
-        IsNumberD2 a1$, p1
-        If IsNumberD2(b1$, p2) Then
-            compareStr44 = Sgn(MyRound(p1, 8) - MyRound(p2, 8))
+        IsNumberD2 a1$, P1
+        If IsNumberD2(b1$, P2) Then
+            compareStr44 = Sgn(MyRound(P1, 8) - MyRound(P2, 8))
             If compareStr44 = 0 Then
                 If Len(a1$) * Len(b1$) <> 0 Then
                     If Len(n$) > 6 Then n$ = "[-0-9]"
-                    K = Sgn(Len(a1$) - Len(b1$))
+                    k = Sgn(Len(a1$) - Len(b1$))
                      
                     a$ = a1$
                     b$ = b1$
@@ -1414,7 +1415,7 @@ For i = 1 To j
                     GoTo again
                 End If
                 If Len(a1$) + Len(b1$) = 0 Then
-                    compareStr44 = K
+                    compareStr44 = k
                 Else
                     compareStr44 = Sgn(Len(a1$) - Len(b1$))
                 End If
@@ -1424,7 +1425,7 @@ For i = 1 To j
         Else
         a$ = Mid$(a$, i)
     b$ = Mid$(b$, i)
-    IsNumberD2 a$, p1
+    IsNumberD2 a$, P1
        
           If Len(a$) > 0 Then
        
@@ -1432,7 +1433,7 @@ For i = 1 To j
                 Case 1, 3
                 compareStr44 = -1
                 Case 2
-                If K > 0 Then
+                If k > 0 Then
                 compareStr44 = -1
                 Else
                 compareStr44 = 1
@@ -1446,14 +1447,14 @@ For i = 1 To j
     ElseIf Mid$(b$, i, 1) Like n$ Then
     a$ = Mid$(a$, i)
     b$ = Mid$(b$, i)
-    IsNumberD2 b$, p1
+    IsNumberD2 b$, P1
     If Len(b$) > 0 Then
        
             Select Case CompareString(useclid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
                 Case 3
                 compareStr44 = 1
                 Case 1, 2
-                If K < 0 Then
+                If k < 0 Then
                 compareStr44 = 1
                 Else
                 compareStr44 = -1
@@ -1496,7 +1497,7 @@ End Function
 Public Property Get IsQueue() As Variant
 IsQueue = AllowSameKey
 End Property
-Private Sub InsertionSort(Arr() As item, ByVal iMin As Long, ByVal iMax As Long, Optional what As Long = -1)
+Private Sub InsertionSort(arr() As item, ByVal iMin As Long, ByVal iMax As Long, Optional what As Long = -1)
     Dim i As Long
     Dim j As Long
     i = iMin + 1
@@ -1504,8 +1505,8 @@ Private Sub InsertionSort(Arr() As item, ByVal iMin As Long, ByVal iMax As Long,
     While i < iMax
         j = i
         Do While j > iMin
-        If compareStr4(Arr(j).Key, Arr(j - 1).Key) = what Then
-            SwapItem VarPtr(Arr(j)), VarPtr(Arr(j - 1))
+        If compareStr4(arr(j).Key, arr(j - 1).Key) = what Then
+            SwapItem VarPtr(arr(j)), VarPtr(arr(j - 1))
             j = j - 1
         Else
             Exit Do
@@ -1514,7 +1515,7 @@ Private Sub InsertionSort(Arr() As item, ByVal iMin As Long, ByVal iMax As Long,
         i = i + 1
     Wend
 End Sub
-Private Sub InsertionSort1(Arr() As item, ByVal iMin As Long, ByVal iMax As Long, Optional what As Long = -1)
+Private Sub InsertionSort1(arr() As item, ByVal iMin As Long, ByVal iMax As Long, Optional what As Long = -1)
     Dim i As Long
     Dim j As Long
     i = iMin + 1
@@ -1522,8 +1523,8 @@ Private Sub InsertionSort1(Arr() As item, ByVal iMin As Long, ByVal iMax As Long
     While i < iMax
         j = i
         Do While j > iMin
-        If CompareStr2(Arr(j).Key, Arr(j - 1).Key, mSortstyle) = what Then
-            SwapItem VarPtr(Arr(j)), VarPtr(Arr(j - 1))
+        If CompareStr2(arr(j).Key, arr(j - 1).Key, mSortstyle) = what Then
+            SwapItem VarPtr(arr(j)), VarPtr(arr(j - 1))
             j = j - 1
         Else
             Exit Do
@@ -1775,10 +1776,10 @@ Public Function ExportKeys() As Object
 Dim a As New tuple, i As Long
 a.PushDim Count
 a.PushEnd
-a.Arr = True
+a.arr = True
 Done = True
 For i = 0 To Count - 1
-Index = i
+index = i
 If KeyTypeValue <> vbString Then
 a.item(i) = KeyToNumber
 Else
@@ -1793,10 +1794,10 @@ Public Function ExportValues() As Object
 Dim a As New tuple, i As Long
 a.PushDim Count
 a.PushEnd
-a.Arr = True
+a.arr = True
 Done = True
 For i = 0 To Count - 1
-    Index = i
+    index = i
     If IsObj Then
         Set a.item(i) = ValueObj
     Else
@@ -1808,8 +1809,372 @@ Set ExportValues = a
 End Function
 Sub PlaceValue2UDT(Name$, v)
 If Done Then
-    If Index > -1 Then
-        Module10.PlaceValue2UDT PriveSpace(Index).iValue, Name$, v
+    If index > -1 Then
+        Module10.PlaceValue2UDT PriveSpace(index).iValue, Name$, v
     End If
 End If
 End Sub
+
+Private Sub iBoxArray_AppendArray(k As iBoxArray)
+'
+End Sub
+
+Private Property Let iBoxArray_arr(ByVal RHS As Boolean)
+'
+End Property
+
+Private Property Get iBoxArray_arr() As Boolean
+iBoxArray_arr = True
+End Property
+
+Private Property Let iBoxArray_arrname(ByVal RHS As String)
+'
+End Property
+
+Private Property Get iBoxArray_arrname() As String
+'
+End Property
+
+Private Property Get iBoxArray_ArrPtr() As Long
+'
+End Property
+
+Private Function iBoxArray_bareteamgroup() As Object
+'
+End Function
+
+Private Property Let iBoxArray_CodeName(RHS As String)
+'
+End Property
+
+Private Property Get iBoxArray_CodeName() As String
+'
+End Property
+
+Private Property Let iBoxArray_common(ByVal RHS As Boolean)
+'
+End Property
+
+Private Property Get iBoxArray_common() As Boolean
+'
+End Property
+
+Private Sub iBoxArray_CopyArray(k As iBoxArray)
+    Set k = ExportValues
+End Sub
+
+Private Sub iBoxArray_CopyArrayRev(k As iBoxArray)
+Dim a As New tuple, i As Long
+a.PushDim Count
+a.PushEnd
+a.arr = True
+Done = True
+For i = 0 To Count - 1
+    index = i
+    If IsObj Then
+        Set a.item(Count - i - 1) = ValueObj
+    Else
+        a.item(Count - i - 1) = Value
+    End If
+Next
+Done = False
+Set k = a
+End Sub
+
+Private Sub iBoxArray_CopyArrayRevFast(k As iBoxArray)
+'
+iBoxArray_CopyArrayRev k
+End Sub
+
+Private Sub iBoxArray_CopyArraySlice(k As iBoxArray, fromS As Long, toS As Long)
+Dim a As New tuple, i As Long
+If toS < 0 Then toS = 0
+If toS - fromS < 0 Then Set k = a: Exit Sub
+a.PushDim toS - fromS + 1
+a.PushEnd
+a.arr = True
+Done = True
+If fromS >= Count Then fromS = Count - 1
+
+For i = fromS To toS
+    index = i
+    If IsObj Then
+        Set a.item(i - fromS) = ValueObj
+    Else
+        a.item(i - fromS) = Value
+    End If
+Next
+Done = False
+Set k = a
+
+End Sub
+
+Private Sub iBoxArray_CopyArraySliceFast(k As iBoxArray, fromS As Long, toS As Long)
+    iBoxArray_CopyArraySlice k, fromS, toS
+End Sub
+
+Private Property Get iBoxArray_Count() As Long
+iBoxArray_Count = toplim + 1
+End Property
+
+Private Function iBoxArray_EmptyArraySameType() As Object
+'
+End Function
+
+Private Property Let iBoxArray_Final(ByVal RHS As Boolean)
+'
+End Property
+
+Private Property Get iBoxArray_Final() As Boolean
+'
+End Property
+
+Private Function iBoxArray_GetCopy() As Variant()
+'
+End Function
+
+Private Sub iBoxArray_GetPorp(aProp As PropReference, curitem As Long)
+'
+End Sub
+
+Private Function iBoxArray_GetUDTValue(ByVal p As Long, Name As String, Optional nDx As Variant) As Variant
+'
+End Function
+
+Private Property Set iBoxArray_GroupRef(RHS As Object)
+'
+End Property
+
+Private Property Get iBoxArray_GroupRef() As Object
+'
+End Property
+
+Private Property Let iBoxArray_IhaveClass(ByVal RHS As Boolean)
+'
+End Property
+
+Private Property Get iBoxArray_IhaveClass() As Boolean
+'
+End Property
+
+Private Property Let iBoxArray_index(ByVal RHS As Long)
+Done = True
+index = RHS
+End Property
+
+Private Property Get iBoxArray_index() As Long
+    iBoxArray_index = index
+End Property
+
+Private Property Get iBoxArray_IsEmpty() As Variant
+'
+End Property
+
+Private Function iBoxArray_IsEnum(p As Variant) As Boolean
+'
+End Function
+
+Private Function iBoxArray_IsEnum2(curitem As Long, p As Variant) As Boolean
+'
+End Function
+
+Private Function iBoxArray_IsObj() As Boolean
+'
+End Function
+
+Private Function iBoxArray_IsObjAt(curitem As Long, peekvalue As Variant) As Boolean
+peekvalue = 0
+If VarTypeName(PriveSpace(curitem).iValue) = "Error" Then
+    iBoxArray_IsObjAt = False
+ElseIf MyIsObject(PriveSpace(curitem).iValue) Then
+    Set peekvalue = PriveSpace(curitem).iValue
+    iBoxArray_IsObjAt = True
+End If
+End Function
+
+Private Function iBoxArray_IsStringItem(curitem As Long) As Variant
+If VarTypeName(PriveSpace(curitem).iValue) = "Error" Then
+    iBoxArray_IsStringItem = PriveSpace(curitem).KeyType = 8
+Else
+    iBoxArray_IsStringItem = MemInt(VarPtr(PriveSpace(curitem).iValue)) = vbString
+End If
+End Function
+
+Private Property Set iBoxArray_item(curitem As Long, RHS As Variant)
+    Set PriveSpace(curitem).iValue = RHS
+End Property
+
+Private Property Let iBoxArray_item(curitem As Long, RHS As Variant)
+    PriveSpace(curitem).iValue = RHS
+End Property
+
+Private Property Get iBoxArray_item(curitem As Long) As Variant
+   If VarTypeName(PriveSpace(curitem).iValue) = "Error" Then
+       If PriveSpace(curitem).KeyType = 8 Then
+    iBoxArray_item = PriveSpace(curitem).Key
+    Else
+        On Error Resume Next
+        iBoxArray_item = PriveSpace(curitem).Key
+        Select Case PriveSpace(curitem).KeyType
+        Case vbString
+        If iBoxArray_item Like "[-0-9.]*" Then
+            iBoxArray_item = CDbl(Replace$(iBoxArray_item, ".", NowDec$))
+        Else
+            iBoxArray_item = vbNullString
+        End If
+        Case vbDouble
+        iBoxArray_item = CDbl(Replace$(iBoxArray_item, ".", NowDec$))
+        Case vbCurrency
+        iBoxArray_item = CCur(Replace$(iBoxArray_item, ".", NowDec$))
+        Case vbDecimal
+        iBoxArray_item = CDec(Replace$(iBoxArray_item, ".", NowDec$))
+        Case 20
+        iBoxArray_item = cInt64(MyVal)
+        Case 5
+        
+        Case Else
+        iBoxArray_item = CDbl(Replace$(iBoxArray_item, ".", NowDec$))
+        End Select
+
+    End If
+   Else
+    iBoxArray_item = PriveSpace(curitem).iValue
+    End If
+End Property
+
+Private Function iBoxArray_ItemIsObject(curitem As Variant) As Boolean
+'
+End Function
+
+Private Function iBoxArray_itemnumeric(curitem As Long) As Variant
+'
+If VarTypeName(PriveSpace(curitem).iValue) = "Error" Then
+    If PriveSpace(curitem).KeyType = 8 Then
+        iBoxArray_itemnumeric = 0
+    Else
+        iBoxArray_itemnumeric = iBoxArray_item(curitem)
+    End If
+ElseIf MyIsNumeric(PriveSpace(curitem).iValue) Then
+
+    iBoxArray_itemnumeric = PriveSpace(curitem).iValue
+Else
+    iBoxArray_itemnumeric = 0
+End If
+End Function
+
+Private Property Get iBoxArray_itemObject(curitem As Long) As Variant
+'
+End Property
+
+Private Property Get iBoxArray_itemPtr(curitem As Long) As Long
+'
+End Property
+
+Private Property Let iBoxArray_ItemStr(curitem As Long, RHS As String)
+'
+End Property
+
+Private Property Get iBoxArray_ItemType(curitem As Variant) As String
+'
+If VarTypeName(PriveSpace(CLng(curitem)).iValue) = "Error" Then
+    iBoxArray_ItemType = Typename(iBoxArray_item(CLng(curitem)))
+Else
+    iBoxArray_ItemType = Typename(PriveSpace(CLng(curitem)).iValue)
+End If
+End Property
+
+Private Property Get iBoxArray_ItemTypeNum(curitem As Variant) As Integer
+
+End Property
+
+Private Property Let iBoxArray_myarrbase(ByVal RHS As Long)
+'
+End Property
+
+Private Property Get iBoxArray_myarrbase() As Long
+    iBoxArray_myarrbase = 0
+End Property
+
+Private Function iBoxArray_MyIsNumeric(v As Variant) As Boolean
+iBoxArray_MyIsNumeric = MyIsNumeric(v)
+End Function
+
+Private Function iBoxArray_MyIsObject(v As Variant) As Boolean
+ iBoxArray_MyIsObject = MyIsObject(v)
+End Function
+
+Private Property Get iBoxArray_MyTypeToBe() As Integer
+'
+End Property
+
+Private Sub iBoxArray_Neg(v As Long)
+'
+End Sub
+
+Private Function iBoxArray_PlaceValue2UDT(p As Long, Name As String, v As Variant) As Boolean
+'
+End Function
+
+Private Function iBoxArray_PlaceValue2UDTArray(p As Long, Name As String, v As Variant, index As Long) As Boolean
+'
+End Function
+
+Private Sub iBoxArray_processAppend(M As Object)
+'
+End Sub
+
+Private Sub iBoxArray_PushDim(nDim As Long, Optional limBase As Variant)
+'
+End Sub
+
+Private Sub iBoxArray_PushEnd(Optional thisarr As Variant)
+'
+End Sub
+
+Private Sub iBoxArray_PushProp(a As Variant)
+'
+End Sub
+
+Private Property Set iBoxArray_refgroup(ByVal RHS As Object)
+'
+End Property
+
+Private Property Get iBoxArray_refgroup() As Object
+'
+End Property
+
+Private Function iBoxArray_SerialItem(item As Variant, cursor As Long, Command As Long) As Boolean
+'
+End Function
+
+Private Sub iBoxArray_SortDesTuple(Optional Low As Long = -1&, Optional high As Long = -1&)
+'
+End Sub
+
+Private Sub iBoxArray_SortTuple(Optional Low As Long = -1&, Optional high As Long = -1&)
+'
+
+End Sub
+
+Private Sub iBoxArray_StartResize()
+'
+End Sub
+
+Private Sub iBoxArray_SwapItem(curitem As Long, thisvariant As Variant)
+'
+If curitem >= 0 And curitem < Count Then
+With PriveSpace(curitem)
+If VarTypeName(PriveSpace(curitem).iValue) = "Error" Then PriveSpace(curitem).iValue = Empty
+SwapVariant .iValue, thisvariant
+End With
+End If
+End Sub
+
+Private Function iBoxArray_UpperMonoLimit() As Variant
+'
+iBoxArray_UpperMonoLimit = Count - 1
+End Function
+
+Private Property Get iBoxArray_Value() As Variant
+'
+End Property
