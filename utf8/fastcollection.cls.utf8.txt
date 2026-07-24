@@ -2038,7 +2038,12 @@ Private Property Get iBoxArray_item(curitem As Long) As Variant
 
     End If
    Else
+    If MyIsObject(PriveSpace(curitem).iValue) Then
+    Set iBoxArray_item = PriveSpace(curitem).iValue
+    
+    Else
     iBoxArray_item = PriveSpace(curitem).iValue
+    End If
     End If
 End Property
 
@@ -2064,6 +2069,12 @@ End Function
 
 Private Property Get iBoxArray_itemObject(curitem As Long) As Variant
 '
+If MyIsObject(PriveSpace(curitem).iValue) Then
+    Set iBoxArray_itemObject = PriveSpace(curitem).iValue
+Else
+    Set iBoxArray_itemObject = Nothing
+End If
+
 End Property
 
 Private Property Get iBoxArray_itemPtr(curitem As Long) As Long
