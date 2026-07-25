@@ -81,7 +81,7 @@ Dim undostate As Boolean
 Dim Redostate As Boolean
 Dim NoHeadwrap As Boolean
 Public SkipProcAtExitFocus As Boolean
-Private ps As mStiva2, TokenLambda As Boolean
+Private ps As mStiva2, TokenLambda As Boolean, loadnew As Boolean
 Private Type UndoChain
     undopara As Long
     undopos As Long
@@ -105,6 +105,7 @@ Public NoTitle As Boolean, TitleStay As Boolean
 Private mNoColor As Boolean, mNoColor1 As Boolean
 Public Title As String
 Public UsedAsTextBox As Boolean  '' only in m2000. Enter exit - use maxchar - No wrap
+Private mEditDocStatus As Boolean
 Private mEditDoc As Boolean
 Public AutoNumber As Boolean
 Public Charpos As Long, expandCharPos As Long
@@ -163,7 +164,7 @@ Public ctrlName As String
 Private mesCtrlName As String
 Dim mIndex As Long, mStayOpen As Boolean
 Dim Callback As GuiM2000
-Dim oldEditDoc As Boolean
+Dim oldEditDocStatus As Boolean
 Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, capchroma As Long
 Dim Quit
 Private OldPar As Long, dragCharpos As Long
@@ -270,7 +271,8 @@ End With
 'glistN.addpixels = 0
 TextPixelOffset = Int(glistN.TextHeightOffset)
 capchroma = glistN.CapColor
-EditDoc = True
+EditDocStatus = True
+mEditDoc = True
 nowrap = False
 enabled = True
 SetME
@@ -284,9 +286,9 @@ If tmpshow Then tmpshow = False: Exit Sub
 glistN.PrepareToShow 5
 End Sub
 Public Sub PasteDoc(thisdoc As String)
-
- Const CF_UNICODETEXT = 13
- ClearRedo
+If Not mEditDoc Then Exit Sub
+Const CF_UNICODETEXT = 13
+ClearRedo
 If thisdoc = vbNullString Then
 thisdoc = GetTextData(CF_UNICODETEXT)
 Else
@@ -532,6 +534,7 @@ End Property
 
 Private Sub glistN_addone(that As String)  '
 ClearRedo
+If Not mEditDoc Then Exit Sub
 If that = vbCrLf Then
 PushUndo
 undopara = mDoc.MarkParagraphID
@@ -568,6 +571,7 @@ End Sub
 Public Sub AddUndo(that As String)
 If Not enabled Then Exit Sub
 ClearRedo
+If Not mEditDoc Then Exit Sub
 If that = vbCrLf Then
 PushUndo
 undopara = mDoc.MarkParagraphID
@@ -584,6 +588,7 @@ End If
 End Sub
 Public Sub RemoveUndo(that As String)
 ClearRedo
+If Not mEditDoc Then Exit Sub
 If that = vbCrLf Then
 PushUndo
 undopara = mDoc.MarkParagraphID
@@ -630,7 +635,6 @@ If undopara <> -1 Then
 undoprev = True
 End If
 End Sub
-
 
 Private Sub glistN_SubSelStart(val As Long, shift As Integer)
 expandCharPos = 0
@@ -845,10 +849,12 @@ Yes = HaveMarkedText
 End Sub
 
 Private Sub glistN_MarkCut(ThatData As String)
+If Not mEditDoc Then Exit Sub
 expandCharPos = 0
 ThatData = undotext
 End Sub
 Private Sub glistN_DragOverDone(a As Boolean)
+If Not mEditDoc Then Exit Sub
 If Not mDoc.InvalidPara(OldPar) Then
         a = True
         SelLengthSilent = 0
@@ -906,6 +912,7 @@ End Sub
 
 Private Sub glistN_PushMark2Undo(that As String)
 ClearRedo
+If Not mEditDoc Then Exit Sub
 undopara = BlockEndPara
 undotext = that
 undomode = 1
@@ -929,6 +936,7 @@ Private Sub glistN_RemoveOne(that As String)
 If Not enabled Then Exit Sub
 
 ClearRedo
+If Not mEditDoc Then Exit Sub
 If that = vbCrLf Then
 PushUndo
 undopara = mDoc.MarkParagraphID
@@ -983,6 +991,7 @@ Public Property Let MaxCharLength(ByVal RHS As Long)
 glistN.maxchar = RHS
 End Property
 Private Sub glistN_ChangeListItem(item As Long, content As String)
+If Not mEditDoc Then Exit Sub
 Dim selstart2 As Long, checklistindex As Long, old$
 '' only for M2000, use NumberOnly
 If NumberOnly Or NumberIntOnly Then
@@ -1284,7 +1293,7 @@ Else
         End If
     End If
     If ThatPara = mDoc.MarkParagraphID Then
-        If EditDoc Then
+        If EditDocStatus Then
             If glistN.ListIndex = item Then
             ' why???
                 If mNoWrap Or (Not skipcolor) Then glistN.ExternalCursor2 RealX1(thisHDC, glistN.SelStart, mDoc.TextLine2(item + 1, showparagraph, NoColor)), OldColor
@@ -1457,7 +1466,7 @@ ElseIf HighLightParagraph Then
 End If
     If ThatPara = mDoc.MarkParagraphID Then
 
-            If EditDoc Then
+            If EditDocStatus Then
                         ' old patch -- removed here
                       If mNoWrap And (glistN.ListIndex = item) Then
               '        glistN.ExternalCursor glistN.SelStart, what$, black
@@ -1749,7 +1758,7 @@ SelLength = Len(undotext) + 1
 Else
 SelLength = Len(undotext)
 End If
-    glistN_MarkDelete True
+ If mEditDoc Then glistN_MarkDelete True
     glistN.MarkNext = 0
 PushUndo
 InsertText = Redotext
@@ -1823,7 +1832,7 @@ If undomode = 0 Or undomode = 4 Then
     End If
     
     If undomode = 4 Then
-    glistN_MarkDelete True
+    If mEditDoc Then glistN_MarkDelete True
     glistN.MarkNext = 0
     PopUndo
     PushRedo
@@ -1871,7 +1880,7 @@ ElseIf KeyCode = vbKeyDelete Then
 If HaveMarkedText Then
 ClearRedo
 PushUndo
-glistN_MarkDelete False
+If mEditDoc Then glistN_MarkDelete False
 
 KeyCode = 0
 End If
@@ -1879,13 +1888,32 @@ ElseIf KeyCode = vbKeyBack Then
 If HaveMarkedText Then
 ClearRedo
 PushUndo
-glistN_MarkDelete False
+
+If mEditDoc Then glistN_MarkDelete False
 
 KeyCode = 0
 End If
+ElseIf KeyCode = vbKeyReturn Then
+    If AllowInsertBrackets Then
+    ElseIf HaveMarkedText Then
+        If glistN.WWWLink Then
+            If InStr(SelText, vbCr) = 0 Then
+                If InStr(SelText, "://") > 0 Then
+                    If mIndex >= 0 Then
+                        Callback.Callback mesCtrlName + ".WWWlink(" + str(mIndex) + """" + SelText + """" + ")"
+                    Else
+                        Callback.Callback mesCtrlName + ".WWWlink(" + """" + SelText + """" + ")"
+                    End If
+                    KeyCode = 0
+                    shift = 0
+                    Exit Sub
+                End If
+            End If
+        End If
+    End If
 End If
 conthere:
-If NoMark And EditDoc = False Then glistN.ShowMe2: Exit Sub
+If NoMark And EditDocStatus = False Then glistN.ShowMe2: Exit Sub
 If KeyCode = 0 And shift = 0 Then Exit Sub
 If KeyCode <> 0 Or shift <> 0 Then PressKey_A KeyCode, shift
 
@@ -1927,6 +1955,7 @@ End Sub
 
 Private Sub glistN_LineDown()
 Dim b$, nline As Long
+If Not mEditDoc Then Exit Sub
 mDoc.TextParagraphLine glistN.ListIndex + 1, b$, nline
 mDoc.MarkParagraphID = nline
 
@@ -1950,6 +1979,7 @@ If mDoc.IsLast(mDoc.MarkParagraphID) Then Exit Sub
 End Sub
 
 Private Sub glistN_LineUp()
+If Not mEditDoc Then Exit Sub
 Dim olID As Long, b$ ', c$
 olID = mDoc.MarkParagraphID
 If ParaSelStart < 2 Then
@@ -2166,6 +2196,7 @@ Private Function SetTextData( _
 End Function
 
 Private Sub glistN_MarkDelete(preservecursor As Boolean)
+If Not mEditDoc Then Exit Sub
 Dim order1 As Long, order2 As Long, a$, b$, i As Long
 Dim oldid As Long, OLDPOS As Long
 oldid = mDoc.MarkParagraphID
@@ -2475,7 +2506,7 @@ End Sub
 
 Private Sub glistN_Selected(item As Long)
 If undomode = 1 And undotext <> "" Then PushUndo
-If mEditDoc <> glistN.EditFlag Then EditDoc = EditDoc
+If mEditDocStatus <> glistN.EditFlag Then EditDocStatus = EditDocStatus
 Dim what$, ThatPara As Long
 mDoc.TextParagraphLine2 item, what$, ThatPara, showparagraphWork And showparagraph
 mDoc.MarkParagraphID = ThatPara
@@ -2484,6 +2515,13 @@ Dim M As Long, z As Long
 
 
     If ClickInsideMarkedText Then
+        If glistN.WWWLink Then
+            If BlockStartLine = BlockEndline Then
+                If InStr(SelText, "://") > 0 Then
+                    Exit Sub
+                End If
+            End If
+        End If
         If Not M2000code Then
         If BlockStartLine = BlockEndline Then
         M = SelLength
@@ -2574,18 +2612,29 @@ End Sub
 
 
 Private Sub glistN_Selected2(item As Long)
-If Not EditDoc Then
- 
-   If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".Click(" + str(mIndex) + ")"
-   Else
-      Callback.Callback mesCtrlName + ".Click()"
-      End If
+If Not EditDocStatus Then
+    If mIndex >= 0 Then
+        Callback.Callback mesCtrlName + ".Click(" + str(mIndex) + ")"
+    Else
+        Callback.Callback mesCtrlName + ".Click()"
+    End If
 Else
 
 If undomode = 1 And undotext <> "" Then PushUndo
 If ClickInsideMarkedText Then
 ' start drag
+        If glistN.WWWLink Then
+            If InStr(SelText, vbCr) = 0 Then
+                If InStr(SelText, "://") > 0 Then
+                    If mIndex >= 0 Then
+                        Callback.Callback mesCtrlName + ".WWWlink(" + str(mIndex) + """" + SelText + """" + ")"
+                    Else
+                        Callback.Callback mesCtrlName + ".WWWlink(" + """" + SelText + """" + ")"
+                    End If
+                    Exit Sub
+                End If
+            End If
+        End If
 glistN.MarkNext = 4
 
 glistN.DragNow
@@ -2601,6 +2650,22 @@ End Sub
 
 Private Sub glistN_SplitLine()
 '
+
+If SelLength > 0 Then
+If glistN.WWWLink Then
+            If InStr(SelText, vbCr) = 0 Then
+                If InStr(SelText, "://") > 0 Then
+                    If mIndex >= 0 Then
+                        Callback.Callback mesCtrlName + ".WWWlink(" + str(mIndex) + """" + SelText + """" + ")"
+                    Else
+                        Callback.Callback mesCtrlName + ".WWWlink(" + """" + SelText + """" + ")"
+                    End If
+                    Exit Sub
+                End If
+            End If
+        End If
+End If
+If Not mEditDoc Then Exit Sub
 Dim b$, dummy As Long, a As Long
 If NumberOnly Or NumberIntOnly Or UsedAsTextBox Then Exit Sub
 If glistN.ListIndex >= 0 Then
@@ -2680,12 +2745,13 @@ Private Sub glistN_WindowKey(VbKeyThis As Integer)
 End Sub
 
 Private Sub glistN_WordMarked(ThisWord As String)
+  loadnew = False
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Word(" + str(mIndex) + ",{" + ThisWord + "})"
    Else
       Callback.Callback mesCtrlName + ".Word({" + ThisWord + "})"
       End If
-      If mEditDoc = False Then ThisWord = vbNullString
+      If loadnew Then ThisWord = vbNullString
 End Sub
 
 Private Sub mDoc_BreakLine(Data As String, datanext As String)
@@ -4754,8 +4820,8 @@ Public Property Let SetM2000(RHS)
     EnablePairs = True
     AutoNumber = True
     AllowInsertBrackets = True
-    glistN.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", "@", Chr$(9), "#", "%", "&")
-    glistN.WordCharRight = ConCat("|", ".", ":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", Chr$(9), "#")
+    glistN.WordCharLeft = ConCat("~", ":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", "@", Chr$(9), "#", "%", "&")
+    glistN.WordCharRight = ConCat("~", "|", ".", ":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", Chr$(9), "#")
     glistN.WordCharRightButIncluded = "(" ' so aaa(sdd) give aaa( as word
     glistN.WordCharLeftButIncluded = "#"
     
@@ -6550,10 +6616,17 @@ If glistN.VerticalCenterText Then that = that Or DT_VCENTER Or DT_EXPANDTABS Or 
     End Sub
 Public Property Get EditDoc() As Boolean
 EditDoc = mEditDoc
+'EditDocStatus = mEditDoc
 End Property
-
+Private Property Get EditDocStatus() As Boolean
+EditDocStatus = mEditDocStatus
+End Property
 Public Property Let EditDoc(ByVal RHS As Boolean)
 mEditDoc = RHS
+End Property
+
+Private Property Let EditDocStatus(ByVal RHS As Boolean)
+mEditDocStatus = RHS
 If Not RHS Then glistN.MarkNext = 0
 glistN.EditFlag = RHS
 If glistN.enabled Then
@@ -6716,6 +6789,7 @@ glistN.enabled = oldenabled
 Dim what$, ThatPara As Long, pastchars
    pastchars = mDoc.TextParagraphLine(1, what$, ThatPara)
 mDoc.MarkParagraphID = ThatPara
+loadnew = True
 End Property
 Public Property Get TextParagraphs() As Long
 TextParagraphs = mDoc.DocParagraphs
@@ -6929,8 +7003,10 @@ End If
 
 End If
 End Property
+
 Public Property Let SelText(ByVal RHS As String)
 Dim kk As Long, Pad$, prev As Boolean
+If Not mEditDoc Then Exit Property
 kk = SelStart
 SelStart = kk
 prev = HaveMarkedText
@@ -7090,6 +7166,7 @@ End If
 FindNewUndo = NeoUndo
 End Function
 Private Sub PushUndo()
+If Not mEditDoc Then Exit Sub
 If undopara = -1 Then Exit Sub
 Dim b As Long
 b = FindNewUndo
@@ -7109,6 +7186,7 @@ End With
 End Sub
 Private Function PopUndo() As Boolean
 ' false ...no undo saved
+If Not mEditDoc Then Exit Function
 If NeoUndo < 1 Then Exit Function
 
 With MultiUndo(NeoUndo)
@@ -7146,7 +7224,7 @@ End If
 FindNewRedo = NeoRedo
 End Function
 Private Sub PushRedo()
-
+If Not mEditDoc Then Exit Sub
 If Redopara = -1 Then Exit Sub
 Dim b As Long
 b = FindNewRedo
@@ -7165,6 +7243,7 @@ End With
 End Sub
 Private Function PopRedo() As Boolean
 ' false ...no Redo saved
+If Not mEditDoc Then Exit Function
 If NeoRedo < 1 Then Exit Function
 With MultiRedo(NeoRedo)
 Redotext = .undotext
@@ -7294,6 +7373,18 @@ Public Sub insertbrackets()
 Dim i As Long, j As Long, ss$, idnt$, tc As Long
 Dim ww As Long
 If SelLength > 0 Then
+If EnableLink Then
+    If InStr(SelText, vbCr) = 0 Then
+        If InStr(SelText, "://") > 0 Then
+            If mIndex >= 0 Then
+                Callback.Callback mesCtrlName + ".WWWlink(" + str(mIndex) + """" + SelText + """" + ")"
+            Else
+                Callback.Callback mesCtrlName + ".WWWlink(" + """" + SelText + """" + ")"
+            End If
+            Exit Sub
+        End If
+    End If
+End If
 ClearRedo
 PushUndo
 glistN_MarkDelete False
@@ -8635,12 +8726,16 @@ If (shift And 4) = 4 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
     End If
 Case vbKeyF4
 If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
+If Not mEditDoc Then
 If SelText <> "" Then mscatsub Else dothis
+Else
+dothis
+End If
 shift = 0
 KeyCode = 0
 Case vbKeyF5
 If (shift And 7) > 0 Then KeyCode = 0: shift = 0: noentrance = False: Exit Sub
-If SelText <> "" Then rthissub shift
+If mEditDoc Then If SelText <> "" Then rthissub shift
 KeyCode = 0
 shift = 0
 Case vbKeyF6  ' Set/Show/Reset Para1
@@ -9064,7 +9159,7 @@ TempLcid = FoundLocaleId(s$)
 If TempLcid <> 0 Then mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
-  If Not mDoc.FindStrDown(s$, W, l) Then GoTo sdnOut
+    If Not mDoc.FindStrDown(s$, W, l) Then GoTo sdnOut
   Else
     If Not mDoc.FindWord(s$, True, W, l) Then GoTo sdnOut
     End If
@@ -9086,6 +9181,52 @@ mDoc.LCID = OldLcid
 End Sub
 
 Sub Searchup(s$, Optional anystr As Boolean = False)
+Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
+W = mDoc.MarkParagraphID
+'SelStartSilent = SelStart - (SelLength > 1)
+'l = Charpos + Len(s$)
+
+If SelLength > 0 Then
+If BlockEndPos > BlockStartPos Then
+l = BlockStartPos + Len(s$)
+Else
+l = BlockEndPos + Len(s$)
+End If
+Else
+l = Charpos + Len(s$)
+End If
+
+OldLcid = mDoc.LCID
+TempLcid = FoundLocaleId(s$)
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If EditTextWord Or anystr Then
+        If SelText = s$ Then l = l - 1
+        If anystr Then
+            If Not mDoc.FindStrUp(s$, W, l) Then GoTo sdupOut
+        Else
+            If Not mDoc.FindWord(s$, False, W, l) Then GoTo sdupOut
+        End If
+    Else
+        If SelText = s$ Then l = l - 1
+    If WordOnly Then
+        'If SelText = s$ Then l = l - Len(s$)
+        If Not mDoc.FindWord(s$, False, W, l) Then GoTo sdupOut
+    Else
+        
+        If Not mDoc.FindIdentifier(s$, False, W, l) Then GoTo sdupOut
+    End If
+End If
+SelLengthSilent = 0
+mDoc.MarkParagraphID = W
+glistN.enabled = False
+ParaSelStart = l
+glistN.enabled = True
+SelLength = Len(s$)
+sdupOut:
+mDoc.LCID = OldLcid
+ManualInform
+End Sub
+Sub SearchupOLD(s$, Optional anystr As Boolean = False)
 Dim l As Long, W As Long, TempLcid As Long, OldLcid As Long
 W = mDoc.MarkParagraphID
 'SelStartSilent = SelStart - (SelLength > 1)
@@ -9130,6 +9271,7 @@ sdupOut:
 mDoc.LCID = OldLcid
 ManualInform
 End Sub
+
 Public Sub helpmeSub()
       If mIndex >= 0 Then
        Callback.Callback mesCtrlName + ".Help(" + str(mIndex) + ",{" + Trim$(SelText) + "})"
@@ -9649,10 +9791,14 @@ End If
 End Sub
 Sub TextViewOnly()
 mStayOpen = False
-NoMark = True
+HighLightParagraph = False
+NoMark = False
 mNoColor = True
 mNoColor1 = True
+EditDocStatus = True
 EditDoc = False
+EnableLink = True
+NoCenterLineEdit = True
 glistN.PanPos = 0
 nowrap = False
 mDoc1.WrapAgain
@@ -9664,6 +9810,7 @@ mStayOpen = True
 glistN.ForeColor = black 'rgb(0, 0, 0)
 glistN.BackColor = white ' rgb(255, 255, 255)
 NoMark = Not OnOff
+mEditDocStatus = OnOff
 mEditDoc = OnOff
 If Not OnOff Then glistN.MarkNext = 0 Else glistN.MarkNext = 2
 glistN.EditFlag = OnOff
@@ -10908,6 +11055,13 @@ End Sub
 Private Sub gListN_AccKey(M As Long)
 Callback.AccProces M
 End Sub
+Public Function WWWLinkMes(link$) As String
+If pagio$ = "GREEK" Then
+WWWLinkMes = "Μπορώ να ανοίξω τον σύνδεσμο;" + vbCrLf + link$
+Else
+WWWLinkMes = "May open the link?" + vbCrLf + link$
+End If
+End Function
 Public Property Let IControlIndex_Index(ByVal RHS As Long)
 mIndex = RHS
 End Property
@@ -10925,3 +11079,13 @@ Set mDoc = Nothing
 Set mDoc1 = Nothing
 End Sub
 
+
+Public Property Get EnableLink() As Variant
+If glistN Is Nothing Then Exit Property
+EnableLink = glistN.WWWLink
+End Property
+
+Public Property Let EnableLink(ByVal RHS As Variant)
+If glistN Is Nothing Then Exit Property
+glistN.WWWLink = RHS
+End Property

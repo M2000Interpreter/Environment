@@ -293,7 +293,7 @@ Public SzOne As Single
 Public PenOne As Long
 Public NoAction As Boolean
 Public StartLine As Boolean
-Public www&
+Public WWW&
 Public WWX&, ins&
 Public INK$, MINK$
 Public MKEY$
@@ -3967,7 +3967,9 @@ With Form1.TEXT1
     
     If n <= 0 Then .Title = aTitle$ + " ": If wh& = -1& Then wh& = Abs(n - 1)
     If NumberOnly Then
-     .glistN.UseTab = False
+        .glistN.UseTab = False
+        .glistN.WWWLink = False
+
         .NumberOnly = True
         .NumberIntOnly = UseIntOnly
         OldV$ = v$
@@ -3976,7 +3978,9 @@ With Form1.TEXT1
         .NumberIntOnly = False
         .NumberOnly = False
     Else
-    .glistN.UseTab = True
+        .glistN.UseTab = True
+        .glistN.WWWLink = True
+
         OldV$ = v$
         ScreenEdit bb, v$, X&, Y&, wi& - 1, Hi&, wh&, , n, shiftlittle
         If result = 99 And Hi& = wi& Then v$ = OldV$
@@ -4022,6 +4026,8 @@ With Form1.TEXT1
 
 ProcTask2 bstack
 .glistN.UseTab = True
+.glistN.WWWLink = True
+
 Hook Form1.hWnd, Nothing '.glistN
 .AutoNumber = Not Form1.EditTextWord
 
@@ -4258,8 +4264,8 @@ If Form1.EditTextWord Then
 .glistN.WordCharLeftButIncluded = vbNullString
 
 Else
-.glistN.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", "@", Chr$(9), "#", "%", "&")
-.glistN.WordCharRight = ConCat("|", ".", ":", "{", "}", "[", "]", ",", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", Chr$(9), "#")
+.glistN.WordCharLeft = ConCat("~", ":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", "@", Chr$(9), "#", "%", "&")
+.glistN.WordCharRight = ConCat("~", "|", ".", ":", "{", "}", "[", "]", ",", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", Chr$(9), "#")
 .glistN.WordCharRightButIncluded = "(" ' so aaa(sdd) give aaa( as word
 .glistN.WordCharLeftButIncluded = "#"
 End If
@@ -22176,6 +22182,14 @@ End If
 End If
 End If
 End Function
+Function WWWLinkMes(link$) As String
+If pagio$ = "GREEK" Then
+WWWLinkMes = "Μπορώ να ανοίξω τον σύνδεσμο;" + vbCrLf + link$
+Else
+WWWLinkMes = "May open the link?" + vbCrLf + link$
+End If
+End Function
+
 Function BreakMes() As String
 If Check2SaveModules Then
 If pagio$ = "GREEK" Then

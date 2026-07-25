@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 13
+Global Const Revision = 14
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -31026,7 +31026,8 @@ jump11:
             If sbf(x1).sbc = 0 Then sbf(x1).sbc = -1
         MakeMyTitle s$, Lang
         Form1.TEXT1.glistN.UseTab = UseTabInForm1Text1
-        
+        Form1.TEXT1.glistN.WWWLink = True
+
         With players(GetCode(basestack.Owner))
             prev$ = sbf(x1).sb
             ScreenEdit basestack, prev$, 0, .mysplit, .mX - 1, .mY - 1, sbf(x1).sbc, , , , True
@@ -51362,6 +51363,7 @@ again11:
                             P1 = val("-0" + Mid$(Final$, pl2 + Len(pat1$) + 1))
                         Else
                             P1 = val("0" + Mid$(Final$, pl2 + Len(pat1$)))
+                      
                         End If
                         pl3 = pl2 + Len(pat1$) + Len(LTrim(str$(P1)))
                         If Mid$(Final$, pl3, 1) = ":" Then
@@ -51404,7 +51406,11 @@ again11:
                             ElseIf InStr(pd$, "e") > 0 Then '' we can change e to greek å
 cont2234:
                                 If threeparam Then
-                                    pd$ = format$(p, "0." + String$(P1, "0") + "E+####")
+                                    If Abs(p) < 9 / 10 ^ (P1 + 1) Then
+                                        pd$ = "0." + String$(P1, "0")
+                                    Else
+                                        pd$ = format$(p, "0." + String$(P1, "0") + "E+####")
+                                    End If
                                 Else
                                     pd$ = format$(p, "0." + String$(Abs(pl3) \ 4, "0") + "E+####")
                                 End If
@@ -51463,10 +51469,13 @@ cont5534:
                             pd$ = Right$(space$(Abs(pl3)) + pd$, Abs(pl3))
                         End If
                     End If
+                    If (pl1 - pl2 + 1) < 1 Then
+                    Else
                     Final$ = Replace$(Final$, Mid$(Final$, pl2, pl1 - pl2 + 1), pd$)
                     pl2 = InStr(pl2, Final$, pat1$)
                     If pl2 > 0 Then GoTo again11
                     If InStr(Final$, pat$) > 0 Then GoTo cont7747
+                    End If
                 Else
                     
 cont7747:
@@ -51519,8 +51528,10 @@ again0:
                             pd$ = Right$(space$(Abs(pl3)) + q$, Abs(pl3))
                         End If
                     End If
+                    If (pl1 - pl2 + 1) > 0 Then
                     Final$ = Replace$(Final$, Mid$(Final$, pl2, pl1 - pl2 + 1), pd$)
                     GoTo again0
+                    End If
                 End If
                 If Not FastSymbol(rest$, ",") Then Exit Do
             Else

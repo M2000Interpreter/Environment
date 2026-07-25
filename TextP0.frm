@@ -740,9 +740,9 @@ TEXT1.SelStartSilent = TEXT1.SelStart  'MOVE CHARPOS TO SELSTART
 
 el = TEXT1.Charpos  ' charpos maybe is in the start or the end of block
 s$ = TEXT1.SelText
-OldLcid = TEXT1.mDoc.lcid
+OldLcid = TEXT1.mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
 
 l = el + 1
 If EditTextWord Then
@@ -776,7 +776,7 @@ End If
 Loop Until (W = eW And l = el) Or safety = 2
 
 End If
-TEXT1.mDoc.lcid = OldLcid
+TEXT1.mDoc.LCID = OldLcid
 TEXT1.mDoc.WrapAgain
 
 TEXT1.Render
@@ -802,9 +802,9 @@ Else
 neo$ = InputBoxN("Replace " & IIf(anystr, "part of ", "") & "Word", "Text Editor", s$, noinp)
 End If
 If noinp <> 1 Then Exit Sub
-OldLcid = TEXT1.mDoc.lcid
+OldLcid = TEXT1.mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
 Set mDoc10 = New Document
 mDoc10 = neo$
 If mDoc10.DocLines > 1 Then
@@ -935,7 +935,7 @@ If prof1.MARKTWO > 1000 Then ProcTask2 Basestack1: prof1.MARKONE
 Loop Until safety = 2 Or KeyPressed(16)
 TEXT1.glistN.DropKey = False
 End If
-TEXT1.mDoc.lcid = OldLcid
+TEXT1.mDoc.LCID = OldLcid
 If w2 > 0 Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
 TEXT1.glistN.SuspDraw = False
 TEXT1.Render
@@ -963,9 +963,9 @@ Else
 l = TEXT1.Charpos
 End If
 
-OldLcid = TEXT1.mDoc.lcid
+OldLcid = TEXT1.mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
   If Not TEXT1.mDoc.FindStrDown(s$, W, l) Then GoTo sdnOut
@@ -982,7 +982,7 @@ TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdnOut:
-TEXT1.mDoc.lcid = OldLcid
+TEXT1.mDoc.LCID = OldLcid
 TEXT1_Inform TEXT1.glistN.ListIndex + 1, TEXT1.glistN.SelStart
 End Sub
 
@@ -1008,9 +1008,9 @@ l = TEXT1.Charpos + Len(s$)
 End If
 
 'l = TEXT1.Charpos + Len(s$)
-OldLcid = TEXT1.mDoc.lcid
+OldLcid = TEXT1.mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
    If TEXT1.SelText = s$ Then l = l - 1
@@ -1029,7 +1029,7 @@ TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdupOut:
-TEXT1.mDoc.lcid = OldLcid
+TEXT1.mDoc.LCID = OldLcid
 TEXT1_Inform TEXT1.glistN.ListIndex + 1, TEXT1.glistN.SelStart
 End Sub
 Public Function InIDECheck() As Boolean
@@ -2682,6 +2682,20 @@ End If
 End If
 End Sub
 
+
+Private Sub TEXT1_WWW(thispath As String)
+If EditTextWord Then
+    If KeyPressed(&H11) Then
+        MyShell myRegister("HTML"), vbNormalFocus, thispath
+    End If
+Else
+    
+    If ask(Basestack1, WWWLinkMes(thispath)) = 1 Then
+        MyShell myRegister("HTML"), vbNormalFocus, thispath
+    
+    End If
+End If
+End Sub
 
 Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, Url As Variant, flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
 If look1 Then

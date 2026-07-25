@@ -64,6 +64,7 @@ Dim all As Long, onelineheight As Long
 Event inform(tLine As Long, tPos As Long)
 Event ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Event CtrlPlusF1()
+Event WWW(thispath As String)
 Public LastSelStart As Long
 Public NoMark As Boolean
 Public NoTitle As Boolean
@@ -1925,6 +1926,13 @@ If glistN.DragEnabled Then Exit Sub
 If ClickInsideMarkedText Then
     Dim M As Long, z As Long
     If BlockStartLine = BlockEndline Then
+        If glistN.WWWLink Then
+        If InStr(SelText, "://") > 0 Then
+          '  what$ = myRegister("HTML")
+          '  MyShell what$, vbNormalFocus, SelText
+        Exit Sub
+        End If
+        End If
         If BlockStartPos < BlockEndPos Then
             If Mid$(mDoc.TextParagraph(ThatPara), BlockEndPos, 1) = "(" Then
                     SelStartSilent = SelStart
@@ -1988,10 +1996,22 @@ Private Sub glistN_Selected2(item As Long)
 If undomode = 1 And undotext <> "" Then PushUndo
 If ClickInsideMarkedText Then
 ' start drag
+
 If glistN.DragEnabled Then
 glistN.MarkNext = 4
 
 glistN.DragNow
+Else
+        If glistN.WWWLink Then
+        If InStr(SelText, vbCr) = 0 Then
+        If InStr(SelText, "://") > 0 Then
+            RaiseEvent WWW(SelText)
+        Exit Sub
+        End If
+        End If
+        End If
+
+
 End If
 End If
 End Sub
@@ -2387,7 +2407,7 @@ If kind = 0 Then
     End If
 End If
 again500:
-kind = IsLabelDot("", a$, drop$)
+kind = IsLabelDot("", a$, drop$, pos1 = 0)
 
 If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 6
 If kind = 0 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 5
@@ -2395,7 +2415,14 @@ If kind = 0 Then drop$ = "->": kind = Abs(FastSymbol(a$, drop$, , 2))
 fromjump:
 If kind = 0 Then drop$ = vbNullString
 If kind > 0 Then
-    If ismine(drop$) Then
+    If kind = 101 Then
+        If pos2 > 0 Then
+            addone pos2, 15
+        Else
+            addone k - Len(a$) - Len(drop$) + 1, 15
+        End If
+        Exit Sub
+    ElseIf ismine(drop$) Then
         lastcol = 11
         If pos2 > 0 Then
             addone pos2, 11
@@ -3480,7 +3507,7 @@ Else
 End If
 Set ps = Nothing
 End Sub
-Function IsLabelDot(where$, a$, r$) As Long 'ok
+Function IsLabelDot(where$, a$, r$, Optional WWW As Boolean = False) As Long 'ok
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, firstdot$, gr As Boolean
@@ -3523,7 +3550,9 @@ a$ = NLtrim$(a$)
             If Mid$(a$, 2, 2) = ". " Or Mid$(a$, 2, 1) = " " Then Exit Do
             r$ = r$ & Left$(a$, 1)
             a$ = Mid$(a$, 2)
+            If rr& <> 101 Then
             rr& = 1
+            End If
             Else
             firstdot$ = firstdot$ + "."
             a$ = Mid$(a$, 2)
@@ -3538,7 +3567,9 @@ a$ = NLtrim$(a$)
             ElseIf r$ <> "" Then
             r$ = r$ & Left$(a$, 1)
             a$ = Mid$(a$, 2)
+            If rr& <> 101 Then
             rr& = 1 'is an identifier or floating point variable
+            End If
             Else
             Exit Do
             End If
@@ -3574,7 +3605,9 @@ a$ = NLtrim$(a$)
                     r$ = r$ & Left$(a$, 1)
                     a$ = Mid$(a$, 2)
                 End If
+                If rr& <> 101 Then
                 rr& = 1 'is an identifier or floating point variable
+                End If
             End If
         Case 36 ' "$"
         
@@ -3638,6 +3671,28 @@ a$ = NLtrim$(a$)
                         Exit Do
             
             End If
+        Case 47
+        If Len(r$) = 0 Or Not WWW Then Exit Do
+        If InStr(r$, ":/") > 0 Then
+            r$ = r$ + "/"
+            a$ = Mid$(a$, 2)
+        Else
+            Exit Do
+        
+        End If
+        Case 58
+        If Len(r$) = 0 Or Not WWW Then Exit Do
+        If Mid$(a$, 1, 3) = "://" Then
+            r$ = r$ + "://"
+            a$ = Mid$(a$, 4)
+            rr& = 101
+        ElseIf Mid$(a$, 1, 2) = ":/" Then
+            r$ = r$ + ":/"
+            a$ = Mid$(a$, 3)
+            rr& = 101
+        Else
+            Exit Do
+        End If
         Case Else
         Exit Do
         End Select
@@ -3675,7 +3730,9 @@ a$ = NLtrim$(a$)
                     r$ = r$ & Left$(a$, 1)
                     a$ = Mid$(a$, 2)
                 End If
+                If rr& <> 101 Then
                 rr& = 1 'is an identifier or floating point variable
+                End If
             End If
         End If
 

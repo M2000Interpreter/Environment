@@ -5055,8 +5055,9 @@ With HelpPad, "visible" as helpshow, "ShowAlways", True, "Text" as HelpText$, "e
 With HelpPad, "NoCenterLineEdit", True, "SetM2000", True, "EditDoc" as HelpEdit ' predifined for word picking
 \\ we want HelpPad not shown from beginning, so we disable it
 HelpEnabled=false
-With Pad, "NoWrap" as NoWrap
+With Pad, "NoWrap" as NoWrap, "EnableLink" as WWWlink
 NoWrap=True
+WWWlink=True
 With Pad,  "SetM2000", True, "SelLength" as SelLength, "HighlightParagraph", True
 
 \\ Set labels for menu's headers. and thecolor for check mark/ disable items,  in menus which we have those
@@ -5125,7 +5126,7 @@ For This {
 	Method Edit1, mi$,"Free Style Edit", true, true, acc:="F9", shift:=True
 	Method Edit1, mi$,"Wrap Text", true, true, acc:="F1"
 	Method Edit1, mi$,"Comment/Uncomment", true, true,acc:="/",ctrl:=true
-
+	Method Edit1, mi$,"WWW Link", true, true,acc:="W",ctrl:=true
 	
 	With Edit1, "MenuGroup","This"
 
@@ -5154,7 +5155,7 @@ For This {
 \\ always Def make local variables. We can set a type before for all non typed names after
 \\ or we can use as type and give a first value (not an expression here).
 \\ by defailt false is the va;ue for Boolean type, so the =false not needed
-Def Boolean LoadState=false,  old_status=false, lastword$, old_wrap=true
+Def Boolean LoadState=false,  old_status=false, lastword$, old_wrap=true, old_wwwlink=true
 
  \\ We need some properties with inexes, so we make these as arrays 
  \\ They look as arrays but they are objects (PropReference)
@@ -5305,7 +5306,9 @@ Function Notepad.Resize {
 ms$={Find Topic
 Use ALL to get a list of all topics}
 Function HelpPad.click() {
-	Method  HelpPad, "EditTextView", false:
+	'Method  HelpPad, "EditTextView", false
+	HelpPad=>TextViewOnly
+	HelpPad=>ShowAlways=True
 	what$=lastword$
 	If ask(ms$,,,,, what$)=1 Then Read New what$ :Call Local FindWord(what$, true)
 }
@@ -5355,6 +5358,9 @@ Function Pad.Inform {
 	else.if old_wrap <> NoWrap then
 		With Inform1, "Caption",If$(NoWrap-> "No Wrap", "Wrap Text")
 		old_wrap=NoWrap
+	else.if old_wwwlink <> WWWlink then
+		With Inform1, "Caption",If$(Not WWWlink-> "Disable Links", "Enable Links")			
+		old_wwwlink=WWWlink	
 	Else
 		With Inform1, "Caption", format$("{0}-{1}", L,P)
 	End If
@@ -5391,7 +5397,12 @@ Function ChangeWrap {
 	Edit1.Selected(12)=not old_wrap
 	NoWrap=old_wrap
 	With Inform1, "Caption",If$(NoWrap-> "No Wrap", "Wrap Text")
-'	Method Pad,"Show"
+}
+Function ChangeWWWlink {
+	old_wwwlink~
+	Edit1.Selected(14)=not old_wwwlink
+	WWWlink=old_wwwlink
+	With Inform1, "Caption",If$(Not WWWlink-> "Disable Links", "Enable Links")
 }
 
 \\ Befor Edit1 opened
@@ -5403,6 +5414,7 @@ Function Edit1.OpenMenu {
 	Edit1.Selected(10)= par_Status
 	Edit1.Selected(11)= style_status
 	Edit1.Selected(12)=Not NoWrap
+	Edit1.Selected(14)=WWWlink
 	
 }
 \\ We can check in checkboxes and radiobutton withou closing the menu
@@ -5421,6 +5433,8 @@ Function Edit1.MenuChecked {
 		Call Local ChangeStyle()
 	Else.If RadioIndex=12 Then
 		Call Local ChangeWrap()
+	Else.If RadioIndex=14 Then
+		Call Local ChangeWWWlink()
 	Else
 		With Inform1, "Caption","??"
 		Method Pad,"Show"	
@@ -5456,6 +5470,8 @@ Function Edit1.DblClick {
 		Call Local ChangeWrap()
 	Case 13
 		Method Pad,"PressKey", asc("4"), 2
+	Case 14
+		Call Local ChangeWWWlink()
 	End Select
 }
 
@@ -5683,6 +5699,13 @@ Function Handle1.MouseUp {
 }
 Function HelpPad.Word() {
 	Call Local FindWord(letter$, false)
+}
+Function Pad.WWWlink(New link$) {
+	if keypress(0x11) then
+		win file.app$("html"), link$		
+	else.if ask(pad=>WWWLinkMes(link$), title$ )=1 then
+		win file.app$("html"), link$
+	end if
 }
 \\ this work with help
 Function Pad.Word() {
@@ -18783,7 +18806,8 @@ Greek  ' this make the popup menu of edit boc as
 Show
 Clear
 Flush
-first$={ΠΡΟΓΡΑΜΜΑ Κυκλική_Ουρά
+first$={!! https://alkisg.mysch.gr/steki/index.php?action=recent
+ΠΡΟΓΡΑΜΜΑ Κυκλική_Ουρά
 ΣΤΑΘΕΡΕΣ
   ΛάθοςΕξ = "Λάθος Εξαγωγής, Η ουρά είναι άδεια"
   Εξ = "Εξαγωγή "
@@ -18913,7 +18937,7 @@ Method Pad, "FontAttr", "COURIER NEW", 14, true
 identifiers$="<-|ΠΡΟΓΡΑΜΜΑ|ΜΕΤΑΒΛΗΤΕΣ|ΠΡΑΓΜΑΤΙΚΕΣ|ΑΚΕΡΑΙΕΣ|ΛΟΓΙΚΕΣ|ΧΑΡΑΚΤΗΡΕΣ|ΣΤΑΘΕΡΕΣ|ΑΡΧΗ|ΓΡΑΨΕ|ΔΙΑΒΑΣΕ|ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ|DIV|MOD|ΑΝ|ΤΟΤΕ|ΑΛΛΙΩΣ|ΑΛΛΙΩΣ_ΑΝ|ΤΕΛΟΣ_ΑΝ|ΓΙΑ|ΑΠΟ|ΜΕΧΡΙ|ΜΕ_ΒΗΜΑ|ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ|ΕΠΙΛΕΞΕ|ΠΕΡΙΠΤΩΣΗ|ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ|ΟΣΟ|ΕΠΑΝΑΛΑΒΕ|ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ|ΜΕΧΡΙΣ_ΟΤΟΥ|ΚΑΙ|Η|ΟΧΙ|ΑΛΗΘΗΣ|ΨΕΥΔΗΣ|ΚΑΛΕΣΕ|ΔΙΑΔΙΚΑΣΙΑ|ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ|Α_Μ(|Α_Τ(|Ε|ΕΦ(|ΗΜ(|ΛΟΓ(|ΣΥΝ(|Τ_Ρ(|ΣΥΝΑΡΤΗΣΗ|ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ|"
 With Pad, "NoWrap", True, "ColorCollection1", identifiers$, "LineComment1", "!", "OtherSymbols","@", "CommentSymbols", "[!][!]", "ComSymbolsWidth", 2, "WordCharRight", ": ,[]+()-*/)}≤≥≠"+chr$(9), "WordCharleft", " :,[]+*/)({≤≥≠"+chr$(9), "WordCharRightButIncluded", "(","ExtraFront",""
 With Pad, "LineComment2",CHR$(0), "StringSep2","'", "AssignSym","<-", "SearchWords",False, "UseColon","","SplitExpr",",", "CommentLineLight", True
-With Pad, "Sellength" as Pad.SelLength, "EnablePairs", True, "BracketsForArrays", True
+With Pad, "Sellength" as Pad.SelLength, "EnablePairs", True, "BracketsForArrays", True, "EnableLink", true
 With File1,"label","Αρχείο", "listtext" As list$, "list" As list$() '
 With Edit1,"label","Επεξεργασία",  "Mark", Color(255,100,0)
 With Help1,"label","Βοήθεια",  "Mark", Color(255,100,0)
@@ -18983,6 +19007,13 @@ else
 	Document BackUp$=first$
 End If
 Pad.text$=BackUp$
+Function Pad.WWWlink(New link$) {
+	if keypress(0x11) then
+		win file.app$("html"), link$		
+	else.if ask(Pad=>WWWLinkMes(link$), "TextOnly" )=1 then
+		win file.app$("html"), link$
+	end if
+}
 Function NotePad.Unload {
       Read New &Ok
       After 30 {Call local File1.DblClick(4) }
@@ -19289,7 +19320,7 @@ With Help1,"label","Help",  "Mark", Color(255,100,0)
 Method Pad, "FontAttr", "VERDANA", 13.5, true
 With NotePad, "Title" As Caption$, "Visible" As Visible, "TitleHeight" As tHeight, "Sizable", True
 With NotePad, "UseIcon", True, "UseReverse", True
-With Pad, "Text" As Pad.text$, "ShowAlways", True,"NoColor", True,"SelLength" as SelLength
+With Pad, "Text" As Pad.text$, "ShowAlways", True,"NoColor", True,"SelLength" as SelLength, "EnableLink", true
 With Pad, "SearchWords", False, "nowrap", False, "linespace", 30
 With Pad, "ReplaceTitle" as InnerInfo$,"Default", True
 Def TitleStr$(a$)=a$ '   Ucase$(Left$(a$,1))+Mid$(a$,2)
@@ -19399,6 +19430,13 @@ Function Edit1.DblClick {
             }
       End Select
 
+}
+Function Pad.WWWlink(New link$) {
+	if keypress(0x11) then
+		win file.app$("html"), link$		
+	else.if ask(Pad=>WWWLinkMes(link$), "TextOnly" )=1 then
+		win file.app$("html"), link$
+	end if
 }
 Function Pad.Inform {
       Read New L, P
@@ -23368,19 +23406,29 @@ Declare Text1 TextBox Form Form1
 Method Edit1, "move",1000,1000,w-2000,2000
 Method Text1, "move",1000,3600,w-2000,600
 With Edit1, "Text",{Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+
+https://georgekarras.blogspot.com/
 TextBox Handle:
 Use ctrl + left or right arrow, for moving fast skipping words and spaces. You can paste text with Ctrl+V, but without merging, the old text replaced with the new one. You can't get a copy.
 }, "ScrollKeyUpDown", True
 With Text1, "MaxCharLength", 100
+Edit1=>SearchWords=true
 Method Edit1,"TextViewOnly"
 Method Edit1, "Transparent"
 Method Edit1, "Colors", 15, 15
 Method Text1, "Transparent"
 Method Text1, "Colors", 15,15
 m=1 : s=1
+Function Edit1.WWWlink(New link$) {
+	if keypress(0x11) then
+		win file.app$("html"), link$		
+	else.if ask(Edit1=>WWWLinkMes(link$), "TextOnly" )=1 then
+		win file.app$("html"), link$
+	end if
+}
 Function Form1.Unload {
 	read new &ok
-	If mm<>0 then thread mm erase : mm=0:ok=true     
+	If mm<>0 then thread mm erase : mm=0:ok=True     
 }
 Layer Form1 {
 	gradient 7,0
@@ -23585,7 +23633,7 @@ nl$={
 
 With text1, "ShowAlways", True, "NumberOnly", True, "Value" As Value1, "default", true
 With text2, "ShowAlways", True, "NumberIntOnly", True, "Value" As Value2, "Text" As Value2$
-With text3, "ShowAlways", True, "UsedAsTextBox", True,"Text" As Value3$, "SelLength" as  SelLength, "SelStart" as SelStart
+With text3, "ShowAlways", True, "UsedAsTextBox", True,"Text" As Value3$, "SelLength" as  SelLength, "SelStart" as SelStart, "MaxCharLength", 1000
 Value1=93.112
 Value2=1456
 Value3$="One line only"
@@ -44584,7 +44632,7 @@ cursor 0, 38
 }
 MODULE STATS1 {module Statistics_Normal_distribution {    
 	form 80, 50
-	n=100000
+	n=10000
 	Print "Samples: "+n
 	locale 1033
 	Print "wait..."
@@ -44629,7 +44677,7 @@ MODULE STATS1 {module Statistics_Normal_distribution {
 	print "Bins are ok.",,"Wait for export file: out2.txt"
 	max=bins()#max()
 	for b = 0 to bins
-	print #f, format$("{0:2:-5}|{1:68}",b*mb+min,string$("*",bins(b)/max*60)+" "+str$(round(bins(b)/n*100,2), locale)+"%")
+	print #f, format$("{0:2:-5}|{1:68}",round(b*mb+min,2),string$("*",bins(b)/max*60)+" "+str$(round(bins(b)/n*100,2), locale)+"%")
 	next b
 	close #f
 	print "Done"
