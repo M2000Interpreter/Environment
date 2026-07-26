@@ -5635,6 +5635,8 @@ misnum:
                     GoTo err000
                 End If
             ElseIf MyIsObject(var(v)) Then
+            ' object1
+
                 If Left$(b$, 2) = " >" Then
                 
                 Set myobject = var(v)
@@ -6502,7 +6504,21 @@ jumphere1:
                     If Not var(v) Is Nothing Then
                         If TypeOf var(v) Is Group Then
                             GoTo noexpression1
+                        ElseIf MyIsObject(var(v)) Then
+                            Set myobject = var(v)
+                            If TypeOf myobject Is PropReference Then
+                            Set UseProp = myobject
+                            Set myobject = UseProp.ValueObj
+                            If UseProp.LastHasObject Then
+                                    Set myobject = UseProp.lastobj
+                                    UseProp.clearlastobject
+                            End If
+                            End If
+                            GoTo contCom112233
+                        
+                        
                         End If
+                    
                     End If
                 End If
                 OnlyForGroupPointers

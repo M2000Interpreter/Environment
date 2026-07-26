@@ -1,22 +1,11 @@
 M2000 Interpreter and Environment
-Version 15 Revision 14
+Version 15 Revision 15
 
 July 26, 2026,
 
-1. Links in M2000 Editor can selected and activated (double click)
-2. Links in EditBox can be selected to work or not using EnableLink (boolean) property
-3. The Method TextViewOnly of EditBox now show the caret, we can copy any part, we can activate a link, but we can't alter the text.4. 
-4. Modules TextOnly and mEditor in INFO file show the changes. In mEditor a new menu item added in Edit menu, to enable or disable the link selection/event_raise. Also the event is prepared for either using keyboard Ctrl+Enter (when the marked text is a URL, we can select it using F4 automatic), or just by clicking and choosing from a messagebox to open the link.\
-
-This is the event function for Pad (the EditBox). The link opened with the default application for html files. Statement Win (Windows) call the application passing the parameter (the link).
-Function Pad.WWWlink(New link$) {
-	if keypress(0x11) then ' this is the Control key (left or right)
-		win file.app$("html"), link$		
-	else.if ask(pad=>WWWLinkMes(link$), title$)=1 then
-		win file.app$("html"), link$
-	end if
-}
-
+1. Fix in select case for Enum variables in cases with semi compares (Eg. Case >=EnumVar1)
+2. Obj=>methodOrPoperty now work for global variable Obj
+3. Update RegEx object from the Publisher (https://github.com/ECP-Solutions/ASF/tree/main)
   
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
