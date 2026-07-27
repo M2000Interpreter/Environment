@@ -103,7 +103,7 @@ Private Const DIB_RGB_COLORS  As Long = 0
 'Variable types needed for DIBSections.
 Private Type SAFEARRAYBOUND
     cElements         As Long
-    lLBound           As Long
+    lLbound           As Long
 End Type
 Private Type SAFEARRAY2D
     cDims             As Integer
@@ -139,7 +139,7 @@ End Type
 
 'API needed for creating DIBSections for sampling and pixel access.
 Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
-Private Declare Function CreateDIBSection2 Lib "gdi32" Alias "CreateDIBSection" (ByVal hDC As Long, pBitmapInfo As BITMAPINFO, ByVal un As Long, lplpVoid As Long, ByVal handle As Long, ByVal dw As Long) As Long   'lplpVoid changed to ByRef
+Private Declare Function CreateDIBSection2 Lib "gdi32" Alias "CreateDIBSection" (ByVal hDC As Long, pBitmapInfo As BITMAPINFO, ByVal un As Long, lplpVoid As Long, ByVal Handle As Long, ByVal dw As Long) As Long   'lplpVoid changed to ByRef
 Private Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
@@ -473,7 +473,7 @@ Private Sub WriteBits(ByVal si As Long, code As Long)
     Wend
 End Sub
 
-Private Sub EncodeCoefficients(Data() As Integer, p As Long, Pred As Long, Td As Long, Ta As Long)
+Private Sub EncodeCoefficients(Data() As Integer, P As Long, Pred As Long, Td As Long, Ta As Long)
 'Use Huffman tables to compress a block of 64 quantized DCT coefficients to the local
 'm_Data() byte array.  The coefficients are input in the data() array starting at index p.
 'Pred is the predictor for the DC coefficient.  Td and Ta are indexes to the local DC and AC
@@ -482,13 +482,13 @@ Private Sub EncodeCoefficients(Data() As Integer, p As Long, Pred As Long, Td As
     Dim rs    As Long
     Dim si    As Long
     Dim code  As Long
-    Dim p2    As Long
+    Dim P2    As Long
 
-    p2 = p + 64
+    P2 = P + 64
 
-    code = Data(p) - Pred
-    Pred = Data(p)
-    p = p + 1
+    code = Data(P) - Pred
+    Pred = Data(P)
+    P = P + 1
 
     si = 1
     rs = 0
@@ -511,14 +511,14 @@ Private Sub EncodeCoefficients(Data() As Integer, p As Long, Pred As Long, Td As
     With HuffAC(Ta)
         r = 0
         Do
-            If Data(p) = 0 Then
+            If Data(P) = 0 Then
                  r = r + 1
             Else
                 While r > 15
                     WriteBits .EHUFSI(240), .EHUFCO(240) 'append RUN16 (a run of 16 zeros)
                     r = r - 16
                 Wend
-                code = Data(p)
+                code = Data(P)
                 rs = r * 16
                 si = 1
                 If code < 0 Then
@@ -538,8 +538,8 @@ Private Sub EncodeCoefficients(Data() As Integer, p As Long, Pred As Long, Td As
                 WriteBits si, code                 'append AC value
                 r = 0
             End If
-            p = p + 1
-        Loop While p < p2 'should be equal on exit
+            P = P + 1
+        Loop While P < P2 'should be equal on exit
         If r <> 0 Then WriteBits .EHUFSI(0), .EHUFCO(0) 'append EOB (end of block)
     End With
 
@@ -556,28 +556,28 @@ End Sub
 Private Sub CollectStatisticsAC(Data() As Integer, freqac() As Long)
     Dim code As Long
     Dim n    As Long 'Number of coefficients in data()
-    Dim p    As Long 'Index for current data() coefficient
-    Dim p2   As Long
+    Dim P    As Long 'Index for current data() coefficient
+    Dim P2   As Long
     Dim r    As Long 'Run length of zeros
     Dim rs   As Long 'Run-length/Size-category Symbol
 
 
     n = UBound(Data) + 1
-    p = 0
-    While p <> n
-        p = p + 1     'Skip DC coefficient
-        p2 = p + 63   '63 AC coefficients
+    P = 0
+    While P <> n
+        P = P + 1     'Skip DC coefficient
+        P2 = P + 63   '63 AC coefficients
 
         r = 0
-        While p <> p2
-            If Data(p) = 0 Then
+        While P <> P2
+            If Data(P) = 0 Then
                  r = r + 1
             Else
                 While r > 15
                     freqac(240) = freqac(240) + 1  'RUN16 Symbol
                     r = r - 16
                 Wend
-                code = Data(p)
+                code = Data(P)
                 If code < 0 Then 'rs = number of bits needed for code
                     rs = Int((Log(-code) * 1.442695040889)) + 1   '1/log(2)  (+ error correction)
                 ElseIf code > 0 Then
@@ -590,7 +590,7 @@ Private Sub CollectStatisticsAC(Data() As Integer, freqac() As Long)
                 freqac(rs) = freqac(rs) + 1        'Run-length/Size-category Symbol
                 r = 0
             End If
-            p = p + 1
+            P = P + 1
         Wend
         If r <> 0 Then freqac(0) = freqac(0) + 1   'EOB Symbol
     Wend
@@ -600,16 +600,16 @@ Private Sub CollectStatisticsDCNonInterleaved(Data() As Integer, freqdc() As Lon
     Dim Diff  As Long     'DC Difference
     Dim Pred  As Long     'DC Predictor
     Dim n     As Long     'Number of coefficients in data()
-    Dim p     As Long     'Index for current data() coefficient
+    Dim P     As Long     'Index for current data() coefficient
     Dim s     As Long     'Size category for Diff
 
 
     n = UBound(Data) + 1
-    p = 0
+    P = 0
     Pred = 0
-    While p <> n
-        Diff = Data(p) - Pred
-        Pred = Data(p)
+    While P <> n
+        Diff = Data(P) - Pred
+        Pred = Data(P)
 
         If Diff < 0 Then 's = number of bits needed for Diff
             s = Int((Log(-Diff) * 1.442695040889)) + 1   '1/log(2)  (+ error correction)
@@ -620,12 +620,12 @@ Private Sub CollectStatisticsDCNonInterleaved(Data() As Integer, freqdc() As Lon
         End If
 
         freqdc(s) = freqdc(s) + 1
-        p = p + 64
+        P = P + 64
     Wend
 
 End Sub
 Private Sub CollectStatisticsDCInterleaved(Data() As Integer, freqdc() As Long, Hi As Long, Vi As Long)
-    Dim p()       As Long     'Index to .data in component f for scanline g
+    Dim P()       As Long     'Index to .data in component f for scanline g
     Dim f         As Long      'Index counter  (component)
     Dim G         As Long      'Index counter  (sampling factor, vertical)
     Dim H         As Long      'Index counter  (sampling factor, horizontal)
@@ -642,7 +642,7 @@ Private Sub CollectStatisticsDCInterleaved(Data() As Integer, freqdc() As Long, 
 
 
     n = UBound(Data) + 1
-    ReDim p(Vi - 1)
+    ReDim P(Vi - 1)
 
 
     MCUx = (XX + 8 * HMax - 1) \ (8 * HMax)
@@ -651,7 +651,7 @@ Private Sub CollectStatisticsDCInterleaved(Data() As Integer, freqdc() As Long, 
     H = (-Int(-XX * Hi / HMax) + 7) \ 8  'Width of scanline in data (MCUs)
 
     For G = 0 To Vi - 1                  'Initialize .data pointers
-        p(G) = 64 * H * G
+        P(G) = 64 * H * G
     Next G
     pLF = 64 * H * (Vi - 1)              'Initialize .data pointer advancer
 
@@ -665,9 +665,9 @@ Private Sub CollectStatisticsDCInterleaved(Data() As Integer, freqdc() As Long, 
         For G = 1 To Vi
         For H = 1 To Hi
 
-        Diff = Data(p(G - 1)) - Pred
-        Pred = Data(p(G - 1))
-        p(G - 1) = p(G - 1) + 64
+        Diff = Data(P(G - 1)) - Pred
+        Pred = Data(P(G - 1))
+        P(G - 1) = P(G - 1) + 64
         If Diff < 0 Then 's = number of bits needed for Diff
             s = Int((Log(-Diff) * 1.442695040889)) + 1   '1/log(2)  (+ error correction)
         ElseIf Diff > 0 Then
@@ -687,9 +687,9 @@ Private Sub CollectStatisticsDCInterleaved(Data() As Integer, freqdc() As Long, 
         If H > MCUr Then  'Pad with dummy block
             s = 0
         Else
-            Diff = Data(p(G - 1)) - Pred
-            Pred = Data(p(G - 1))
-            p(G - 1) = p(G - 1) + 64
+            Diff = Data(P(G - 1)) - Pred
+            Pred = Data(P(G - 1))
+            P(G - 1) = P(G - 1) + 64
 
             If Diff < 0 Then
                 s = Int((Log(-Diff) * 1.442695040889)) + 1
@@ -705,7 +705,7 @@ Private Sub CollectStatisticsDCInterleaved(Data() As Integer, freqdc() As Long, 
 
        'Advance data pointers
         For G = 0 To Vi - 1
-            p(G) = p(G) + pLF
+            P(G) = P(G) + pLF
         Next G
     Next j
 
@@ -714,12 +714,12 @@ Private Sub CollectStatisticsDCInterleaved(Data() As Integer, freqdc() As Long, 
     For i = 1 To MCUx
     For G = 1 To Vi
     For H = 1 To Hi
-    If p(G - 1) >= n Or (i = MCUx And H > MCUr) Then 'Pad with dummy block
+    If P(G - 1) >= n Or (i = MCUx And H > MCUr) Then 'Pad with dummy block
         s = 0
     Else
-        Diff = Data(p(G - 1)) - Pred
-        Pred = Data(p(G - 1))
-        p(G - 1) = p(G - 1) + 64
+        Diff = Data(P(G - 1)) - Pred
+        Pred = Data(P(G - 1))
+        P(G - 1) = P(G - 1) + 64
 
         If Diff < 0 Then
             s = Int((Log(-Diff) * 1.442695040889)) + 1
@@ -765,7 +765,7 @@ Private Sub ExpandDQT(Tqi As Long)
     End With
 
 End Sub
-Private Sub Quantize(Data() As Integer, p As Long, FScale() As Single)
+Private Sub Quantize(Data() As Integer, P As Long, FScale() As Single)
     Dim i As Long  'Take 8X8 block of unscaled DCT coefficients [m_Block(0-7, 0-7)],
     Dim j As Long  'Scale, Quantize, and store the results in data() array of
     Dim t As Long  'COMPONENT in Zig Zag order at index p
@@ -774,10 +774,10 @@ Private Sub Quantize(Data() As Integer, p As Long, FScale() As Single)
     For j = 0 To 7
         For i = 0 To 7
             t = ZigZag(i, j)
-            Data(p + t) = m_Block(i, j) * FScale(t)
+            Data(P + t) = m_Block(i, j) * FScale(t)
         Next i
     Next j
-    p = p + 64
+    P = P + 64
 
 End Sub
 Public Property Let Quality(vData As Long)
@@ -949,7 +949,7 @@ Public Function SampleHDC(ByVal lHDC As Long, lWidth As Long, lHeight As Long, O
     Dim hDC        As Long    'Handle to the Device context holding the DIBSection
     Dim lPtr       As Long    'Address of memory pointing to the DIBSection's bits
     Dim BI         As BITMAPINFO 'Type containing the Bitmap information
-    Dim SA         As SAFEARRAY2D
+    Dim sA         As SAFEARRAY2D
     Dim Pixel()    As Byte   'Byte array containing pixel data
     Dim f          As Long   'Index counter for components
     Dim qp         As Long   'Index for quantized FDCT value (in component data)
@@ -967,7 +967,7 @@ Public Function SampleHDC(ByVal lHDC As Long, lWidth As Long, lHeight As Long, O
     Dim j0         As Long   'Top  index of an 8X8 block of pixels
     Dim i          As Long   'Pixel Index (Horizontal)
     Dim j          As Long   'Pixel Index (Vertical)
-    Dim p          As Long   'DCT Index (horizontal)
+    Dim P          As Long   'DCT Index (horizontal)
     Dim q          As Long   'DCT Index (vertical)
 
 
@@ -993,12 +993,12 @@ Public Function SampleHDC(ByVal lHDC As Long, lWidth As Long, lHeight As Long, O
         If hDIb = 0 Then
             SampleHDC = 1 'CreateDIBSection2() API Failure
         Else
-            With SA                        'This code copies the pointer of the 2-D bitmap
+            With sA                        'This code copies the pointer of the 2-D bitmap
                 .cbElements = 1            'pixel data to the pointer of the Pixel() array.
                 .cDims = 2                 'This allows you to read/modify the pixel data
-                .Bounds(0).lLBound = 0     'as if it were stored in the Pixel() array.
+                .Bounds(0).lLbound = 0     'as if it were stored in the Pixel() array.
                 .Bounds(0).cElements = BI.bmiHeader.biHeight
-                .Bounds(1).lLBound = 0
+                .Bounds(1).lLbound = 0
                 .Bounds(1).cElements = ((BI.bmiHeader.biWidth * 3 + 3) And &HFFFFFFFC)
                 .pvData = lPtr             'Note that this is extreamly efficient, since it copies
             End With                       'a pointer to the data, and not the data itself.
@@ -1053,7 +1053,7 @@ Public Function SampleHDC(ByVal lHDC As Long, lWidth As Long, lHeight As Long, O
 
            'Read 8X8 blocks of pixels, convert from RGB->YCbCr colorspace, FDCT and Quantize
            'the data, store the results in .data of this component
-            CopyMemory ByVal VarPtrArray(Pixel), VarPtr(SA), 4& 'Get Pixel array descriptor
+            CopyMemory ByVal VarPtrArray(Pixel), VarPtr(sA), 4& 'Get Pixel array descriptor
             j = yi8 - 1
             While j > 0               'Scan from top to bottom (j = -1 after loop)
                 i = 0
@@ -1061,16 +1061,16 @@ Public Function SampleHDC(ByVal lHDC As Long, lWidth As Long, lHeight As Long, O
                 While i < 3 * xi8     'Scan from left to right (i = 3*xi8 after loop)
                     j = j0
                     i0 = i
-                    For p = 0 To 7    'Get 8X8 block of level shifted YCbCr values
+                    For P = 0 To 7    'Get 8X8 block of level shifted YCbCr values
                         i = i0
                         For q = 0 To 7
-                            m_Block(q, p) = rm * Pixel(i + 2, j) + _
+                            m_Block(q, P) = rm * Pixel(i + 2, j) + _
                                             gm * Pixel(i + 1, j) + _
                                             bm * Pixel(i, j) + s
                             i = i + 3
                         Next q
                         j = j - 1
-                    Next p
+                    Next P
                     FDCT                               'Calculate the FDCT
                     Quantize .Data, qp, QTable(.Tqi).FScale   'Quantize, and store in DCT buffer
                 Wend
@@ -1255,7 +1255,7 @@ End Sub
 '================================================================================
 Private Sub InsertSOSNonInterleaved(CompIndex As Long, Td As Long, Ta As Long)
 'Insert an SOS marker and scan data for a non-interleaved Sequential scan.
-    Dim p         As Long     'Index to .data in component
+    Dim P         As Long     'Index to .data in component
     Dim n         As Long
     Dim Pred      As Long     'Predictor for DC coefficient
 
@@ -1278,13 +1278,13 @@ Private Sub InsertSOSNonInterleaved(CompIndex As Long, Td As Long, Ta As Long)
    'Insert non-interleaved sequential entropy coded data
     With Comp(CompIndex)
 
-        p = 0
+        P = 0
         n = UBound(.Data) + 1
         Pred = 0
 
         WriteBitsBegin
-        While p <> n
-            EncodeCoefficients .Data, p, Pred, Td, Ta
+        While P <> n
+            EncodeCoefficients .Data, P, Pred, Td, Ta
         Wend
         WriteBitsEnd
 
@@ -1305,7 +1305,7 @@ Private Sub InsertSOSInterleaved(CompIndex() As Long, Td() As Long, Ta() As Long
     Dim MCUx      As Long      'Number of MCUs per scanline
     Dim MCUy      As Long      'Number of MCU scanlines
 
-    Dim p()        As Long     'Index to .data in component f for scanline g
+    Dim P()        As Long     'Index to .data in component f for scanline g
     Dim pLF()      As Long     'Line Feed for p in .data for component f
     Dim Pred()     As Long     'Predictor for DC coefficient in component f
     Dim MCUr()     As Long     'Number of complete 8X8 blocks in rightmost MCU for component f
@@ -1334,7 +1334,7 @@ Private Sub InsertSOSInterleaved(CompIndex() As Long, Td() As Long, Ta() As Long
 
 
    'Insert interleaved sequential entropy coded data
-    ReDim p(FirstIndex To SecondIndex, VMax - 1)
+    ReDim P(FirstIndex To SecondIndex, VMax - 1)
     ReDim Pred(FirstIndex To SecondIndex)
     ReDim pLF(FirstIndex To SecondIndex)
     ReDim MCUr(FirstIndex To SecondIndex)
@@ -1347,7 +1347,7 @@ Private Sub InsertSOSInterleaved(CompIndex() As Long, Td() As Long, Ta() As Long
             H = (-Int(-XX * .Hi / HMax) + 7) \ 8  'Width of scanline in .data (MCUs)
 
             For G = 0 To .Vi - 1                  'Initialize .data pointers
-                p(f, G) = 64 * H * G
+                P(f, G) = 64 * H * G
             Next G
             pLF(f) = 64 * H * (.Vi - 1)           'Initialize .data pointer advancer
 
@@ -1365,7 +1365,7 @@ Private Sub InsertSOSInterleaved(CompIndex() As Long, Td() As Long, Ta() As Long
         With Comp(CompIndex(f))
         For G = 1 To .Vi
         For H = 1 To .Hi
-        EncodeCoefficients .Data, p(f, G - 1), Pred(f), Td(f), Ta(f)
+        EncodeCoefficients .Data, P(f, G - 1), Pred(f), Td(f), Ta(f)
         Next H
         Next G
         End With
@@ -1381,7 +1381,7 @@ Private Sub InsertSOSInterleaved(CompIndex() As Long, Td() As Long, Ta() As Long
             Pad64(0) = Pred(f)
             EncodeCoefficients Pad64, 0, Pred(f), Td(f), Ta(f)
         Else
-            EncodeCoefficients .Data, p(f, G - 1), Pred(f), Td(f), Ta(f)
+            EncodeCoefficients .Data, P(f, G - 1), Pred(f), Td(f), Ta(f)
         End If
         Next H
         Next G
@@ -1391,7 +1391,7 @@ Private Sub InsertSOSInterleaved(CompIndex() As Long, Td() As Long, Ta() As Long
        'Advance .data pointers
         For f = FirstIndex To SecondIndex
         For G = 0 To Comp(CompIndex(f)).Vi - 1
-        p(f, G) = p(f, G) + pLF(f)
+        P(f, G) = P(f, G) + pLF(f)
         Next G
         Next f
      Next j
@@ -1402,11 +1402,11 @@ Private Sub InsertSOSInterleaved(CompIndex() As Long, Td() As Long, Ta() As Long
     With Comp(CompIndex(f))
     For G = 1 To .Vi
     For H = 1 To .Hi
-    If p(f, G - 1) > UBound(.Data) Or (i = MCUx And H > MCUr(f)) Then 'Pad with dummy block
+    If P(f, G - 1) > UBound(.Data) Or (i = MCUx And H > MCUr(f)) Then 'Pad with dummy block
         Pad64(0) = Pred(f)
         EncodeCoefficients Pad64, 0, Pred(f), Td(f), Ta(f)
     Else
-        EncodeCoefficients .Data, p(f, G - 1), Pred(f), Td(f), Ta(f)
+        EncodeCoefficients .Data, P(f, G - 1), Pred(f), Td(f), Ta(f)
     End If
     Next H
     Next G
@@ -1585,7 +1585,69 @@ Private Function OptimizeHuffmanTables(CompIndex() As Long, Td() As Long, Ta() A
     OptimizeHuffmanTables = k
 
 End Function
+Public Function GetBuffer() As Object
+    Dim CompIndex()  As Long 'Indexes of Components to be included
+    Dim Td()         As Long 'DC Huffman Table Selectors
+    Dim Ta()         As Long 'AC Huffman Table Selectors
+    Dim FileNum      As Integer
+    Dim i            As Long
 
+
+    ReDim CompIndex(Nf - 1)
+    ReDim Td(Nf - 1)
+    ReDim Ta(Nf - 1)
+
+    For i = 0 To Nf - 1
+        CompIndex(i) = i
+        Td(i) = IIf(i = 0, 0, 1)
+        Ta(i) = IIf(i = 0, 0, 1)
+    Next i
+
+    i = OptimizeHuffmanTables(CompIndex, Td, Ta, 0, Nf - 1)
+
+   'Estimate maximum possible file size needed
+    i = 1.3 * i + 1000 + Len(m_Comment)
+    ReDim m_Data(i)
+    m_Ptr = 0
+
+    InsertMarker SOI                                   'SOI - Start of Image
+    InsertJFIF                                         'JFIF
+
+    If Len(m_Comment) > 0 Then
+        InsertCOM m_Comment     'COM - Comment
+    Else
+        InsertCOM "JPEG Encoder Class" & vbCrLf & "Written by John Korejwa <korejwa@tiac.net>" & vbCrLf & "Visual Basic sourcecode available at planetsourcecode.com"
+    End If
+    InsertDQT m_Ptr, 0                                 'DQT - Define Quantization Tables
+    If Nf > 1 Then InsertDQT m_Ptr, 1
+
+    InsertSOF SOF0                                     'SOF - Start of Frame
+
+    InsertDHT m_Ptr, 0, False                          'DHT - Define Huffman Tables
+    InsertDHT m_Ptr, 0, True
+    If Nf > 1 Then
+        InsertDHT m_Ptr, 1, False
+        InsertDHT m_Ptr, 1, True
+    End If
+
+    InsertSequentialScans CompIndex, Td, Ta, 0, Nf - 1 'SOS - Scan Data
+    InsertMarker EOI                                   'EOI - End of Image
+
+   'Size the final byte array and write to file
+    ReDim Preserve m_Data(m_Ptr - 1)
+    Set GetBuffer = New mHandler
+    Dim usehandler As mHandler, Buffer As MemBlock
+    Set usehandler = GetBuffer
+    Set Buffer = New MemBlock
+    Buffer.Construct m_Ptr
+    Buffer.FillDataFromMem VarPtr(m_Data(0)), m_Ptr
+    Set usehandler.objref = Buffer
+    usehandler.t1 = 2
+    Erase m_Data
+
+
+    
+End Function
 
 
 Public Function SaveFile(FileName As String) As Long
@@ -1625,9 +1687,11 @@ Public Function SaveFile(FileName As String) As Long
     InsertMarker SOI                                   'SOI - Start of Image
     InsertJFIF                                         'JFIF
 
-    If Len(m_Comment) > 0 Then InsertCOM m_Comment     'COM - Comment
-    InsertCOM "JPEG Encoder Class" & vbCrLf & "Written by John Korejwa <korejwa@tiac.net>" & vbCrLf & "Visual Basic sourcecode available at planetsourcecode.com"
-
+    If Len(m_Comment) > 0 Then
+        InsertCOM m_Comment     'COM - Comment
+    Else
+        InsertCOM "JPEG Encoder Class" & vbCrLf & "Written by John Korejwa <korejwa@tiac.net>" & vbCrLf & "Visual Basic sourcecode available at planetsourcecode.com"
+    End If
     InsertDQT m_Ptr, 0                                 'DQT - Define Quantization Tables
     If Nf > 1 Then InsertDQT m_Ptr, 1
 

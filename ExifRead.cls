@@ -10,11 +10,11 @@ Attribute VB_Name = "ExifRead"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
  Option Explicit
 'changed to wotk with M2000 Unicode support
   Private No_of_Entries As Long
-Private ExifTemp() As Byte
+Private ExifTemp() As Byte, quick As HashList
 Private Offset_to_IFD0 As Long
 Private Offset_to_APP1 As Long
 Private Offset_to_TIFF As Long
@@ -45,7 +45,7 @@ Private Type IFD_Data_Values
     BytVal As Byte
     StrVal As String
     IntVal As Integer
-    LngVal As Long
+    lngVal As Long
     SngVal As Single
     DblVal As Double
 End Type
@@ -183,18 +183,61 @@ Public Property Let picFile(picFile As String)
     m_file = picFile
 End Property
 
-Public Property Get MakerNoteTag(Optional ByVal MakerTag As Long) As Variant
+Private Property Get MakerNoteTag(Optional ByVal MakerTag As Long) As Variant
     If IsLoaded = False Then Exit Property
     
     Dim i As Long
     
     For i = 1 To UBound(IFDDirectory)
-        If IFDDirectory(i).Tag_No = MakerTag And IFDDirectory(i).MakerNote = True Then
+        If IFDDirectory(i).Tag_No = MakerTag Or IFDDirectory(i).MakerNote = True Then
             MakerNoteTag = IFDDirectory(i).Value
             Exit For
         End If
     Next
     
+End Property
+Public Property Get Comment() As String
+If No_of_Entries <> 0 Then
+Dim p As Long, pe As Long, pi As Long
+
+Dim i As Long
+Dim s As String
+Dim L As Long
+s = ""
+p = VarPtr(ExifTemp(0)) + 20
+pe = VarPtr(ExifTemp(UBound(ExifTemp)))
+
+If MemInt(p) = -257 Then
+again:
+L = CLng(MemByte(p + 2) * 256) + CLng(MemByte(p + 3))
+
+For i = p + 4 To p + L + 1
+    If MemByte(i) = 0 Then Exit For
+    s = s + Chr$(MemByte(i))
+Next i
+Comment = s
+p = i
+
+entry2:
+If pe >= p Then Exit Property
+If MemInt(p) = -257 Then
+s = s + vbCrLf
+GoTo again
+ElseIf MemByte(p) < 255 Then
+
+ElseIf MemByte(p) = 255 And MemByte(p + 1) = 219 Then
+    Exit Property
+Else
+    pi = CLng(MemByte(p + 2)) * 256 + CLng(MemByte(p + 3))
+    If pi > 0 Then
+        p = p + pi
+        GoTo entry2
+    End If
+End If
+Else
+GoTo entry2
+End If
+End If
 End Property
 
 Public Property Get Tag(Optional ByVal ExifTag As EXIF_TAG) As Variant
@@ -216,16 +259,19 @@ Public Property Get Tag(Optional ByVal ExifTag As EXIF_TAG) As Variant
     If IsLoaded = False Then Exit Property
     Dim i As Long
     On Error Resume Next
-    For i = 1 To No_of_Entries
-        If IFDDirectory(i).Tag_No = ExifTag Then
-            Tag = IFDDirectory(i).Value
-            Exit For
-        End If
-    Next
+    If quick.Find(ExifTag, i) Then
+       ' i = quick.Value(i)
+        Tag = IFDDirectory(i).Value
+    End If
+   ' For i = 1 To No_of_Entries
+    '    If IFDDirectory(i).Tag_No = ExifTag Then
+     '       Tag = IFDDirectory(i).Value
+      '      Exit For
+       ' End If
+    'Next
 
 End Property
-
-Public Sub Load(Optional ByVal picFile As String)
+Public Sub Load2(Optional ByVal picFile As String)
 If No_of_Entries > 0 Then Exit Sub
     If m_file = vbNullString Then
         m_file = picFile
@@ -236,9 +282,10 @@ If No_of_Entries > 0 Then Exit Sub
     
     
     
-    OpenJPGFile m_file
+    OpenJPGFile m_file, 4000&
     If InspectJPGFile = False Then
         IsLoaded = False
+        No_of_Entries = 1
         Exit Sub
     End If
     
@@ -256,30 +303,61 @@ If No_of_Entries > 0 Then Exit Sub
             ExifTemp(Offset_to_APP1 + 17)
     End If
     IsLoaded = True
-    GetDirectoryEntries Offset_to_TIFF + Offset_to_IFD0
+    GetDirectoryEntries Offset_to_TIFF + Offset_to_IFD0, True
     
 End Sub
 
-Private Function OpenJPGFile(ByVal inFile As String)
+Public Sub Load(ByVal picFile As String, Optional ByVal readbytes As Long = 10000)
+If No_of_Entries > 0 Then Exit Sub
+    If m_file = vbNullString Then
+        m_file = picFile
+        If m_file = vbNullString Then
+            Exit Sub
+        End If
+    End If
+    
+    
+    
+    OpenJPGFile m_file, readbytes
+    If InspectJPGFile = False Then
+        IsLoaded = False
+        No_of_Entries = 1
+        Exit Sub
+    End If
+    
+    If IsIntel Then
+        Offset_to_IFD0 = _
+            ExifTemp(Offset_to_APP1 + 17) * 256& * 256& * 256& + _
+            ExifTemp(Offset_to_APP1 + 16) * 256& * 256& + _
+            ExifTemp(Offset_to_APP1 + 15) * 256& + _
+            ExifTemp(Offset_to_APP1 + 14)
+    Else
+        Offset_to_IFD0 = _
+            ExifTemp(Offset_to_APP1 + 14) * 256& * 256& * 256& + _
+            ExifTemp(Offset_to_APP1 + 15) * 256& * 256& + _
+            ExifTemp(Offset_to_APP1 + 16) * 256& + _
+            ExifTemp(Offset_to_APP1 + 17)
+    End If
+    IsLoaded = True
+    GetDirectoryEntries Offset_to_TIFF + Offset_to_IFD0, False
+    
+End Sub
+
+Private Function OpenJPGFile(ByVal inFile As String, maxdata As Long)
     Dim fFile As Integer, qqq As Long
- 
-    '  If norest Then Exit Function
     On Error GoTo aqw
-     inFile = GetDosPath(inFile)
-  If inFile = vbNullString Then GoTo aqw
+    inFile = GetDosPath(inFile)
+    If inFile = vbNullString Then GoTo aqw
     fFile = FreeFile
- qqq = FileLen(inFile)
+    qqq = FileLen(inFile)
  
     Open inFile For Binary Access Read As #fFile
-    If qqq > 4000 Then qqq = 4000
-ReDim ExifTemp(qqq) As Byte
-
-   
-           ExifTemp = InputB(qqq, #fFile)
-       
+        If maxdata > 0 Then If qqq > maxdata Then qqq = maxdata
+        ReDim ExifTemp(qqq) As Byte
+        ExifTemp = InputB(qqq, #fFile)
     Close #fFile
 
-        Exit Function
+    Exit Function
 aqw:
     If fFile <> 0 Then Close #fFile
         ReDim ExifTemp(10) As Byte
@@ -356,19 +434,19 @@ Else
 mytemp = 0
 End If
 End Function
-Private Sub GetDirectoryEntries(Offset As Long)
+Private Sub GetDirectoryEntries(Offset As Long, fast As Boolean)
     
   
-    Dim Upper_IFDDirectory As Long
+   ' Dim Upper_IFDDirectory As Long
     Dim NewDimensions As Long
     Dim Processed_ExifSubIFD As Boolean
     Dim BytesPerComponent As Long
     Dim Offset_to_MakerNote As Long
     Dim i As Long, j As Long
-    Dim K As Integer
+    Dim k As Integer, c As Byte
     On Error GoTo finito
    ' Do
-    K = K + 1
+    k = k + 1
   '  On Error Resume Next
         If IsIntel Then
             No_of_Entries = _
@@ -380,8 +458,8 @@ Private Sub GetDirectoryEntries(Offset As Long)
                 ExifTemp(Offset + 1)
                 
         End If
-        If No_of_Entries > 5 Then No_of_Entries = 5
-If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
+     If fast Then If No_of_Entries > 5 Then No_of_Entries = 5
+     If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
         'On Error Resume Next
         'Upper_IFDDirectory = UBound(IFDDirectory)
         'If Err.Number > 0 Then
@@ -389,11 +467,11 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
         'Err.Number = 0
         'End If
         
-        NewDimensions = Upper_IFDDirectory + No_of_Entries
+        NewDimensions = No_of_Entries
         
         ReDim Preserve IFDDirectory(1 To NewDimensions) As IFD_Data
         For i = 1 To No_of_Entries
-            With IFDDirectory(Upper_IFDDirectory + i)
+            With IFDDirectory(i)
             
                 If IsIntel Then
 
@@ -401,6 +479,7 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                         mytemp((Offset + 2) + ((i - 1) * 12) + 1) * 256& + _
                         mytemp((Offset + 2) + ((i - 1) * 12) + 0)
                     If .Tag_No = 0 Then No_of_Entries = i - 1: Exit For
+                     quick.Add i, .Tag_No, vbLong
                     .Data_Format = _
                         mytemp((Offset + 2) + ((i - 1) * 12) + 3) * 256& + _
                         mytemp((Offset + 2) + ((i - 1) * 12) + 2)
@@ -440,17 +519,18 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                                     Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 10)) & _
                                     Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 9)) & _
                                     Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 8))
+                                    .Value = Replace(.Value, Chr(0), "")
                             Else
                                 .Offset_To_Value = _
                                     256# * ExifTemp((Offset + 2) + ((i - 1) * 12) + 11) * 256& * 256& + _
                                     ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& * 256& + _
                                     ExifTemp((Offset + 2) + ((i - 1) * 12) + 9) * 256& + _
                                     ExifTemp((Offset + 2) + ((i - 1) * 12) + 8)
-                                For j = 0 To .Components - 2
-                                    .Value = .Value & Chr(ExifTemp(Offset_to_TIFF + .Offset_To_Value + j))
+                                For j = 0 To .Components - 1
+                                c = ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
+                                If c <> 0 Then .Value = .Value & Chr(c)
                                 Next
                             End If
-                            
                         Case m_SHORT, m_SSHORT
                             BytesPerComponent = 2
                             If .Components * BytesPerComponent <= 4 Then
@@ -520,6 +600,7 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                         mytemp((Offset + 2) + ((i - 1) * 12) + 0) * 256& + _
                         mytemp((Offset + 2) + ((i - 1) * 12) + 1)
                            If .Tag_No = 0 Then No_of_Entries = i - 1: Exit For
+                    quick.Add i, .Tag_No, vbLong
                     .Data_Format = _
                         mytemp((Offset + 2) + ((i - 1) * 12) + 2) * 256& + _
                         mytemp((Offset + 2) + ((i - 1) * 12) + 3)
@@ -559,6 +640,8 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                                     Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 9)) & _
                                     Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 10)) & _
                                     Chr(ExifTemp((Offset + 2) + ((i - 1) * 12) + 11))
+                                    .Value = Replace(.Value, Chr(0), "")
+                                    
                             Else
                                 .Offset_To_Value = _
                                     ExifTemp((Offset + 2) + ((i - 1) * 12) + 8) * 256& * 256& * 256& + _
@@ -566,7 +649,8 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
                                     ExifTemp((Offset + 2) + ((i - 1) * 12) + 10) * 256& + _
                                     ExifTemp((Offset + 2) + ((i - 1) * 12) + 11)
                                 For j = 0 To .Components - 1
-                                    .Value = .Value & Chr(ExifTemp(Offset_to_TIFF + .Offset_To_Value + j))
+                                    c = ExifTemp(Offset_to_TIFF + .Offset_To_Value + j)
+                                    If c <> 0 Then .Value = .Value & Chr(c)
                                 Next
                             End If
                             
@@ -635,7 +719,7 @@ If Err.Number > 0 Then No_of_Entries = 0: Exit Sub
            
         Next
          
-         Exit Sub
+        If fast Then Exit Sub
         If IsIntel Then
             If Not Processed_ExifSubIFD Then
                 Offset_to_Next_IFD = _
@@ -941,4 +1025,9 @@ Private Sub ProcessMakerNote(ByVal Offset As Long)
         
     Next
         
+End Sub
+
+Private Sub Class_Initialize()
+Set quick = New HashList
+quick.Prepare 200
 End Sub

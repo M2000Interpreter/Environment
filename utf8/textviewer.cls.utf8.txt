@@ -64,7 +64,7 @@ Dim all As Long, onelineheight As Long
 Event inform(tLine As Long, tPos As Long)
 Event ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Event CtrlPlusF1()
-Event WWW(thispath As String)
+Event www(thispath As String)
 Public LastSelStart As Long
 Public NoMark As Boolean
 Public NoTitle As Boolean
@@ -125,7 +125,7 @@ Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not
 Private Const DWL_ANYTHREAD& = 0&
 Const LOCALE_ILANGUAGE = 1&
 Private OldPar As Long, dragCharpos As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 Private Type DRAWTEXTPARAMS
      cbSize As Long
      iTabLength As Long
@@ -1350,6 +1350,19 @@ glistN_MarkDelete False
 
 KeyCode = 0
 End If
+ElseIf KeyCode = vbKeyReturn Then
+    If HaveMarkedText Then
+        If glistN.WWWLink Then
+            If InStr(SelText, vbCr) = 0 Then
+                If InStr(SelText, "://") > 0 Then
+                    RaiseEvent www(SelText)
+                    KeyCode = 0
+                    shift = 0
+                    Exit Sub
+                End If
+            End If
+        End If
+    End If
 End If
 
 End Sub
@@ -1928,9 +1941,7 @@ If ClickInsideMarkedText Then
     If BlockStartLine = BlockEndline Then
         If glistN.WWWLink Then
         If InStr(SelText, "://") > 0 Then
-          '  what$ = myRegister("HTML")
-          '  MyShell what$, vbNormalFocus, SelText
-        Exit Sub
+            Exit Sub
         End If
         End If
         If BlockStartPos < BlockEndPos Then
@@ -1995,24 +2006,21 @@ End Sub
 Private Sub glistN_Selected2(item As Long)
 If undomode = 1 And undotext <> "" Then PushUndo
 If ClickInsideMarkedText Then
-' start drag
+    ' start drag
 
-If glistN.DragEnabled Then
-glistN.MarkNext = 4
-
-glistN.DragNow
-Else
+    If glistN.DragEnabled Then
+        glistN.MarkNext = 4
+        glistN.DragNow
+    Else
         If glistN.WWWLink Then
-        If InStr(SelText, vbCr) = 0 Then
-        If InStr(SelText, "://") > 0 Then
-            RaiseEvent WWW(SelText)
-        Exit Sub
+            If InStr(SelText, vbCr) = 0 Then
+                If InStr(SelText, "://") > 0 Then
+                    RaiseEvent www(SelText)
+                    Exit Sub
+                End If
+            End If
         End If
-        End If
-        End If
-
-
-End If
+    End If
 End If
 End Sub
 Private Sub glistN_ShowExternalCursor()
@@ -2259,7 +2267,7 @@ Dim idPara As Long, nPara As Long
 Set ps = Nothing
 idPara = mDoc.ParenthFrom(thispara)
 nPara = thispara
-Do While mDoc.Advance(nPara)
+Do While mDoc.advance(nPara)
     If idPara = mDoc.ParenthFrom(nPara) Then
         mDoc.ParenthFrom(nPara) = 0
         mDoc.ResetColor (nPara)
@@ -2302,7 +2310,7 @@ If k < 1 Then
     If mDoc.startfrom(thispara) = thispara Then
         feedback = thispara
         ReDim Col(1)
-        Do While mDoc.Advance(thispara)
+        Do While mDoc.advance(thispara)
             If mDoc.startfrom(thispara) = feedback Then
                 mDoc.startfrom(thispara) = 0
                 mDoc.Paracolordata(thispara) = Col()
@@ -3495,7 +3503,7 @@ Else
         If mDoc.ParenthFrom(thispara) = 0 Then
             mDoc.ParenthFrom(thispara) = thispara
         End If
-        If mDoc.Advance(thispara) Then
+        If mDoc.advance(thispara) Then
             If thispara <> 0 Then
             
             mDoc.ParenthFrom(thispara) = mDoc.ParenthFrom(thispara1)
@@ -3507,7 +3515,7 @@ Else
 End If
 Set ps = Nothing
 End Sub
-Function IsLabelDot(where$, a$, r$, Optional WWW As Boolean = False) As Long 'ok
+Function IsLabelDot(where$, a$, r$, Optional www As Boolean = False) As Long 'ok
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, firstdot$, gr As Boolean
@@ -3672,7 +3680,7 @@ a$ = NLtrim$(a$)
             
             End If
         Case 47
-        If Len(r$) = 0 Or Not WWW Then Exit Do
+        If Len(r$) = 0 Or Not www Then Exit Do
         If InStr(r$, ":/") > 0 Then
             r$ = r$ + "/"
             a$ = Mid$(a$, 2)
@@ -3681,7 +3689,7 @@ a$ = NLtrim$(a$)
         
         End If
         Case 58
-        If Len(r$) = 0 Or Not WWW Then Exit Do
+        If Len(r$) = 0 Or Not www Then Exit Do
         If Mid$(a$, 1, 3) = "://" Then
             r$ = r$ + "://"
             a$ = Mid$(a$, 4)

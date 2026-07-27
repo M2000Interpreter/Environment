@@ -34,12 +34,35 @@ Attribute Value.VB_UserMemId = 0
     End If
 End Property
 Property Set Value(n As Long, RHS As Variant)
-    If n >= 0 And n < UBound(ar) Then
-        Set ar(n) = RHS
-    ElseIf n >= UBound(ar) Then
-        ReDim Preserve ar(n + 1)
-        Set ar(n) = RHS
+Dim UseHandler As mHandler, obj As Object
+On Error Resume Next
+If n >= 0 And n < UBound(ar) Then
+    
+ElseIf n >= UBound(ar) Then
+    ReDim Preserve ar(n + 1)
+End If
+Set obj = RHS
+If Err.Number Then Exit Property
+If TypeOf RHS Is mHandler Then
+    Set UseHandler = RHS
+    If UseHandler.t1 = 4 Then
+
+    If myVarType(UseHandler.index_cursor, vbString) Then
+        ar(n) = UseHandler.index_cursor
+        Exit Property
+    Else
+                If UseHandler.sign = -1 Then
+                       ar(n) = -UseHandler.index_cursor
+                    Else
+                       ar(n) = UseHandler.index_cursor
+                    End If
+                    Exit Property
     End If
+    Else
+   ' Set obj = UseHandler.objref
+    End If
+End If
+Set ar(n) = obj
 End Property
 
 Property Let Value(n As Long, RHS As Variant)

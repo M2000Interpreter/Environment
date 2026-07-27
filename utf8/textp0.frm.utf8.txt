@@ -603,7 +603,7 @@ End Sub
 
 
 
-Private Sub List1_ListError(Code As Long)
+Private Sub List1_ListError(code As Long)
 Dim dummy As Long
 List1.ListIndex = -1
 List1.LeaveonChoose = False
@@ -616,7 +616,7 @@ dummy = interpret(Basestack1, List1.Tag)
 'Me.KeyPreview = True
 End If
 End If
-MyEr "Menu Error " & CStr(Code), "Λάθος στην ΕΠΙΛΟΓΗ αριθμός " & CStr(Code)
+MyEr "Menu Error " & CStr(code), "Λάθος στην ΕΠΙΛΟΓΗ αριθμός " & CStr(code)
 End Sub
 
 
@@ -1103,13 +1103,13 @@ End Sub
 
 
 Private Sub dSprite_MouseDown(index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
-Dim p As Long, u2 As Long
+Dim P As Long, u2 As Long
 If lockme Then Exit Sub
 If Not NoAction Then
 NoAction = True
 Dim sel&
-p = val("0" & dSprite(index).Tag)
-With players(p)
+P = val("0" & dSprite(index).Tag)
+With players(P)
     u2 = .uMineLineSpace * 2
 
         If Button > 0 And Targets Then
@@ -2237,6 +2237,20 @@ Exit Sub
 End If
 Select Case KeyCode
 Case vbKeyReturn
+
+        If TEXT1.glistN.WWWLink Then
+            If InStr(TEXT1.SelText, vbCr) = 0 Then
+                If InStr(TEXT1.SelText, "://") > 0 Then
+                    'RaiseEvent www(SelText)
+                    TEXT1_WWW TEXT1.SelText
+                    KeyCode = 0
+                    shift = 0
+                    Exit Sub
+                End If
+            End If
+        End If
+
+
 nochange = True
 
 
@@ -3550,16 +3564,16 @@ TEXT1.mDoc.ColorEvent = Not TEXT1.NoColor
 
 End Sub
 Private Sub mywait11(bstack As basetask, ByVal pp)
-    Dim p As Boolean, e As Boolean
+    Dim P As Boolean, e As Boolean
     On Error Resume Next
     If bstack.Process Is Nothing Then
         If pp = 0 Then Exit Sub
     Else
         Err.Clear
-        p = bstack.Process.Done
+        P = bstack.Process.Done
         If Err.Number = 0 Then
             e = True
-            If p <> 0 Then
+            If P <> 0 Then
                 Exit Sub
             End If
         End If
@@ -3576,9 +3590,9 @@ Private Sub mywait11(bstack As basetask, ByVal pp)
             MyDoEvents
         End If
         If e Then
-            p = bstack.Process.Done
+            P = bstack.Process.Done
             If Err.Number = 0 Then
-                If p <> 0 Then
+                If P <> 0 Then
                     Exit Do
                 End If
             End If
@@ -3828,7 +3842,7 @@ ask = NeoASK(bstack)
 End Function
 
 Sub mywait(bstack As basetask, pp As Double, Optional SLEEPSHORT As Boolean = False)
-Dim p As Boolean, e As Boolean
+Dim P As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents1 Form1
@@ -3836,10 +3850,10 @@ If pp = 0 Then Exit Sub
 Else
 
 Err.Clear
-p = bstack.Process.Done
+P = bstack.Process.Done
 If Err.Number = 0 Then
 e = True
-If p <> 0 Then
+If P <> 0 Then
 Exit Sub
 End If
 End If
@@ -3861,9 +3875,9 @@ Do
         End If
 If SLEEPSHORT Then Sleep 1
 If e Then
-p = bstack.Process.Done
+P = bstack.Process.Done
 If Err.Number = 0 Then
-If p <> 0 Then
+If P <> 0 Then
 Exit Do
 End If
 End If

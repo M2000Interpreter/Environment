@@ -147,7 +147,7 @@ Private Declare Function Ellipse Lib "gdi32" (ByVal hDC As Long, ByVal x1 As Lon
 Private Declare Function CreatePen Lib "gdi32" (ByVal nPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
 
 Private Const PS_NULL = 5
 Private Const PS_SOLID = 0
@@ -2044,6 +2044,8 @@ End If
 End If
 Case vbKeyReturn
 If MultiLineEditBox Then
+
+
     If EditFlag Then
         RaiseEvent SplitLine
         RaiseEvent SetExpandSS(mSelstart)

@@ -125,6 +125,33 @@ If t1 = 2 Then
     End If
 End If
 End Property
+Friend Property Get CreateJpg(percent, comment$) As Object
+If t1 = 2 Then
+    Dim mm As MemBlock, photo As cDIBSection
+    Set mm = mObjRef
+    If mm.IsBmp Then
+    ElseIf mm.IsPng Then
+    ElseIf mm.IsEmf Then
+    ElseIf mm.IsGif Then
+    ElseIf mm.IsIco Then
+    ElseIf mm.IsJpg Then
+    Else
+        Exit Property
+    End If
+    Dim mWidth As Long, mHeight As Long, pic As StdPicture
+    If mm.ReadImageSizeX(mWidth) And mm.ReadImageSizeY(mHeight) Then
+    
+    Set photo = New cDIBSection
+    Set pic = mm.GetStdPicture()
+    photo.CreateFromPicture pic
+    
+    If photo.bitsPerPixel <> 24 Then Conv24 photo
+    Set CreateJpg = SaveJPGtoBuffer(photo, percent, comment$)
+
+    End If
+    End If
+
+End Property
 Property Get t1() As Variant
 t1 = mt1
 End Property

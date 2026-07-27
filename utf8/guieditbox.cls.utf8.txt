@@ -2543,8 +2543,8 @@ Dim M As Long, z As Long
             SelLengthSilent = M - BlockEndPos
             End If
             FillBlock
-         Else
-            SelLengthSilent = SelLength - 1
+        Else
+            SelLengthSilent = M ' SelLength - 1 | SEE CARELIDE PAD.
         End If
         End If
     Else
@@ -2852,7 +2852,7 @@ Dim idPara As Long, nPara As Long
 Set ps = Nothing
 idPara = mDoc.ParenthFrom(thispara)
 nPara = thispara
-Do While mDoc.Advance(nPara)
+Do While mDoc.advance(nPara)
     If idPara = mDoc.ParenthFrom(nPara) Then
         mDoc.ParenthFrom(nPara) = 0
         mDoc.ResetColor (nPara)
@@ -4899,7 +4899,7 @@ thispara1 = thispara
         If mDoc.ParenthFrom(thispara) = 0 Then
             mDoc.ParenthFrom(thispara) = thispara
         End If
-        If mDoc.Advance(thispara) Then
+        If mDoc.advance(thispara) Then
             If thispara <> 0 Then
             
             mDoc.ParenthFrom(thispara) = mDoc.ParenthFrom(thispara1)
@@ -4938,7 +4938,7 @@ If k < 1 Then
     If mDoc.startfrom(thispara) = thispara Then
         feedback = thispara
         ReDim Col(1)
-        Do While mDoc.Advance(thispara)
+        Do While mDoc.advance(thispara)
             If mDoc.startfrom(thispara) = feedback Then
                 mDoc.startfrom(thispara) = 0
                 mDoc.Paracolordata(thispara) = Col()

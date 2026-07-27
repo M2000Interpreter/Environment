@@ -54177,4 +54177,76 @@ MODULE SNAKE2 {MODULE SNAKE_AND_LADDER {
 }
 SNAKE_AND_LADDER
 }
+MODULE REVLIST {' https://rosettacode.org/wiki/Singly-linked_list/Reversal#M2000_Interpreter
+module checkit (filename as string=""){
+	global integer f  ' so remove function now can read f
+	open filename for output as #f
+	static function createllist, Fill_llist
+	static sub showlist, reverselist
+	class llist {
+		pnext=pointer()
+	 	variant v
+	 	remove {
+	 		print #f, .v+" deleted"
+	 	}
+		{
+			read llist.v
+			->(llist)
+			break
+		} ' return pointer
+	}
+	llist=createllist("Big","fjords","vex","quick","waltz","nymph")
+	showlist llist
+	reverselist &llist
+	showlist llist
+	llist=Fill_llist(1, 10)
+	showlist llist
+	reverselist &llist
+	showlist llist
+	llist=pointer()
+	close #f	
+	end
+	function createllist()
+		local any as variant
+		read any
+		local first=llist(any)
+		h1=first
+		while not empty
+			read any
+			h1=>pnext=llist(any)
+			h1=h1=>pnext
+		end while
+		=first
+	end function
+	function Fill_llist(fromn as integer, ton as integer)
+		local integer st=sgn(ton-fromn)
+		local first=llist(fromn)
+		if st=0 then =first:exit function
+		local h1=first
+		do
+			fromn+=st
+			h1=>pnext=llist(fromn)
+			h1=h1=>pnext
+		when fromn<>ton
+		=first
+	end function
+	sub showlist(h1)
+		do	print #F, h1=>v+" ";
+			h1=h1=>pnext
+		when h1 is type llist:print #f,""
+	end sub
+	sub reverselist(&first)
+		local neoFirst=first, backList=pointer()
+		do
+			first=neoFirst
+			neoFirst=first=>pNext
+			first=>pNext=backList
+			backlist=first
+		until neofirst is type Null
+	end sub
+}
+flush
+checkit "output.txt"
+win "output.txt"
+}
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

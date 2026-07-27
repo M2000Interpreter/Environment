@@ -19,7 +19,7 @@ Private mBytes As Long
 Private ErrorMes As Long
 Public structref As StructCollection
 Public UseStruct As Boolean
-Private mExecBloc As Boolean
+Private mExecBloc As Boolean, mCallBack As Boolean, oldV As Long
 Private Strings As LongHash2
 Private BasicItem As Integer
 Private mType1 As Boolean
@@ -68,7 +68,7 @@ Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nSize As Long, lpD
 Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
 Private Declare Sub FillMemory Lib "kernel32" Alias "RtlFillMemory" (Destination As Any, ByVal Length As Long, ByVal Fill As Byte)
 Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
@@ -91,6 +91,7 @@ Const CF_ENHMETAFILE = 14
 
 
 Sub Construct(ByteLen As Long, Optional Times As Long = 1, Optional clearme As Long = 0, Optional executable As Boolean = False, Optional thatbasicitem As Integer)
+If mCallBack Then ErrorMes = 1: Exit Sub
 If mitems <> 0 Then
 If mitems <> Times Or mBytes <> ByteLen * Times Then
     ErrorMes = 1: Exit Sub
@@ -146,7 +147,7 @@ Public Property Get status()
     status = ErrorMes
 End Property
 Public Sub ResizeItems(NewSize As Long, Optional clearme As Long = 0)
-
+If mCallBack Then ErrorMes = 1: Exit Sub
 If mBytes = 0 Then Exit Sub
 Dim oPtr As Long
 
@@ -288,6 +289,7 @@ If mPtr <> 0 Then
             BlockFree mPtr
         End If
     Else
+            If callback Then callback = False
             BlockFreeVirtual mPtr, mBytes
             mBytes = 0
     End If
@@ -699,7 +701,6 @@ Public Function DrawImageToHdc(where As Object, Optional X As Long = 0&, Optiona
    CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
    DrawImageToHdc = DrawImageFromBuffer(a(), where.hDC, X, Y, (Width), (Height))
    CopyMemory ByVal VarPtrArray(a), 0&, 4
- 
 End Function
 Public Function ReadImageSizeX(SizeX As Variant) As Boolean
 If Width <> -1 Then SizeX = Width: ReadImageSizeX = True: Exit Function
@@ -762,7 +763,7 @@ Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
     
     CopyMemory ByVal VarPtrArray(a), 0&, 4
 End Sub
-Function Copy(Optional r As Long = 0, Optional p As Long = 0) As Object
+Function Copy(Optional r As Long = 0, Optional P As Long = 0) As Object
 Dim aCopy As New MemBlock, BLen As Long, hMem As Long
 If mitems > 0 Then
     If mExecBloc Then
@@ -773,12 +774,12 @@ If mitems > 0 Then
     mitems = BLen \ itemlen
     If r <> 0 Then
         If r >= 0 And r < mitems Then
-            If p >= 1 Then
-                aCopy.Construct itemlen, CLng(p), , r = 0 And Not mExecBloc, BasicItem
-                If mitems < p Then
-                    p = mitems
+            If P >= 1 Then
+                aCopy.Construct itemlen, CLng(P), , r = 0 And Not mExecBloc, BasicItem
+                If mitems < P Then
+                    P = mitems
                 End If
-                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), itemlen * p
+                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), itemlen * P
             Else
            
                 aCopy.Construct itemlen, 1&, , Not mExecBloc, BasicItem
@@ -891,7 +892,7 @@ End Function
 Public Function IsJpg() As Boolean
     Dim H As Long
        CopyMemory H, ByVal GetBytePtr(0), 4
-        If (H And &HFFFF&) = &HD8FF Then
+        If (H And &HFFFF&) = &HD8FF& Then
             mSubtype = 1
             IsJpg = True
         End If
@@ -948,19 +949,19 @@ Private Function getEmf(Wmf As StdPicture) As Long
  zz.xExt = bb.BoundingBox.Right - bb.BoundingBox.Left
  zz.yExt = bb.BoundingBox.Bottom - bb.BoundingBox.Bottom
  
- Dim Bytes As Long
+ Dim bytes As Long
 Dim Buffer() As Byte
-   Bytes = GetMetaFileBitsEx(Wmf.Handle, Bytes, ByVal 0&)
- If Bytes Then
-ReDim Buffer(1 To Bytes) As Byte
-Call GetMetaFileBitsEx(Wmf.Handle, Bytes, Buffer(1))
+   bytes = GetMetaFileBitsEx(Wmf.Handle, bytes, ByVal 0&)
+ If bytes Then
+ReDim Buffer(1 To bytes) As Byte
+Call GetMetaFileBitsEx(Wmf.Handle, bytes, Buffer(1))
 Else
 
 Exit Function
 End If
     On Error Resume Next
     zz.mm = 1
-    getEmf = SetWinMetaFileBits(Bytes, Buffer(1), Form1.hDC, zz)
+    getEmf = SetWinMetaFileBits(bytes, Buffer(1), Form1.hDC, zz)
 End Function
 
 Public Sub SentWmfToClipBoard()
@@ -1001,7 +1002,7 @@ If w2 <> -1 Then w2 = w2 / dv15
     
     aa.SaveDibToMeMBlock k
     Set kk = k
-    Dim p
+    Dim P
     
     If rot <> 0 Then
         aa.ClearUp
@@ -1104,23 +1105,23 @@ End Sub
 Sub FillByte(Optional ByVal that As Byte = 0)
     FillMemory ByVal GetPtr(0), mBytes, that
 End Sub
-Function CopyItemString(ByVal that As Long, ByVal Bytes As Long, Done As Boolean) As String
+Function CopyItemString(ByVal that As Long, ByVal bytes As Long, Done As Boolean) As String
     If BasicItem = vbString Or mSubtype > 0 Then
         Done = False
         Exit Function
     End If
-    If Bytes <= 0 Then Bytes = itemlen
-    If ValidArea2(that, Bytes) Then
+    If bytes <= 0 Then bytes = itemlen
+    If ValidArea2(that, bytes) Then
     that = GetPtr(that)
     If ErrorMes = 0 Then
         Dim place As Long
-        If Bytes Mod 2 = 1 Then
-            CopyItemString = StrConv(String(Bytes, Chr(0)), vbFromUnicode)
+        If bytes Mod 2 = 1 Then
+            CopyItemString = StrConv(String(bytes, Chr(0)), vbFromUnicode)
         Else
-            CopyItemString = String$((Bytes + 1) \ 2, Chr(0))
+            CopyItemString = String$((bytes + 1) \ 2, Chr(0))
         End If
         
-        CopyMemory ByVal StrPtr(CopyItemString), ByVal that, Bytes
+        CopyMemory ByVal StrPtr(CopyItemString), ByVal that, bytes
         Done = True
     End If
     End If
@@ -1132,4 +1133,67 @@ End Property
 
 Friend Property Let type1(ByVal vNewValue As Variant)
     mType1 = CBool(vNewValue)
+End Property
+
+Public Property Get callback() As Boolean
+    callback = mCallBack
+End Property
+Public Property Let callback2(ByVal RHS As Boolean)
+Dim obj As Object
+If Not mExecBloc Then
+    If mCallBack <> RHS Then
+        If RHS Then
+            Set obj = Me
+            Err.Clear
+            On Error Resume Next
+            MemBlockCallBack.Add CVar(Me), MemLong(VarPtr(obj))
+            If Not Err.Number Then
+            SetUpForExecution2 GetPtr(0), SizeByte, oldV
+            End If
+            Err.Clear
+        Else
+            Set obj = Me
+            Err.Clear
+            On Error Resume Next
+            MemBlockCallBack.Remove MemLong(VarPtr(obj))
+            If Not Err.Number Then
+                ReleaseExecution GetPtr(0), SizeByte, oldV
+            End If
+            Err.Clear
+        End If
+    End If
+    mCallBack = RHS
+Else
+    mCallBack = False
+End If
+End Property
+
+Public Property Let callback(ByVal RHS As Boolean)
+Dim obj As Object
+If Not mExecBloc Then
+    If mCallBack <> RHS Then
+        If RHS Then
+            Set obj = Me
+            Err.Clear
+            On Error Resume Next
+            MemBlockCallBack.Add CVar(Me), MemLong(VarPtr(obj))
+            If Not Err.Number Then
+            SetUpForExecution GetPtr(0), SizeByte, oldV
+            End If
+            Err.Clear
+        Else
+            Set obj = Me
+            Err.Clear
+            On Error Resume Next
+            MemBlockCallBack.Remove MemLong(VarPtr(obj))
+            If Not Err.Number Then
+                ReleaseExecution GetPtr(0), SizeByte, oldV
+            End If
+            Err.Clear
+        End If
+    End If
+    mCallBack = RHS
+Else
+    mCallBack = False
+End If
 End Property

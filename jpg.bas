@@ -25,15 +25,15 @@ Public Sub SaveBmp(sFile As String, ByVal Scr As Object)
             photo.SaveDib sFile
        
 End Sub
-Public Function DecodeHEXtoMemBloc(ByVal A$, ok As Boolean, Optional forcode As Boolean = False) As Object
+Public Function DecodeHEXtoMemBloc(ByVal a$, ok As Boolean, Optional forcode As Boolean = False) As Object
     Dim mem As New MemBlock, BLen As Long
-    A$ = DecodeHEX(A$, ok)
-    If ok And LenB(A$) > 0 Then
-        BLen = LenB(A$)
+    a$ = DecodeHEX(a$, ok)
+    If ok And LenB(a$) > 0 Then
+        BLen = LenB(a$)
         mem.Construct 1, BLen, , forcode
-        CopyBytes BLen, mem.GetPtr(0), StrPtr(A$)
+        CopyBytes BLen, mem.GetPtr(0), StrPtr(a$)
         Set DecodeHEXtoMemBloc = mem
-    ElseIf Len(A$) = 0 Then
+    ElseIf Len(a$) = 0 Then
         ok = False
         MyEr "Empty String to make buffer", "Αδειο αλφαριθμητικό για να φτιάξω διάρθρωση"
     Else
@@ -41,15 +41,15 @@ Public Function DecodeHEXtoMemBloc(ByVal A$, ok As Boolean, Optional forcode As 
     End If
     
 End Function
-Public Function Decode64toMemBloc(ByVal A$, ok As Boolean, Optional forcode As Boolean = False) As Object
+Public Function Decode64toMemBloc(ByVal a$, ok As Boolean, Optional forcode As Boolean = False) As Object
     Dim mem As New MemBlock, BLen As Long
-    A$ = Decode64(A$, ok)
-    If ok And LenB(A$) > 0 Then
-        BLen = LenB(A$)
+    a$ = Decode64(a$, ok)
+    If ok And LenB(a$) > 0 Then
+        BLen = LenB(a$)
         mem.Construct 1, BLen, , forcode
-        CopyBytes BLen, mem.GetPtr(0), StrPtr(A$)
+        CopyBytes BLen, mem.GetPtr(0), StrPtr(a$)
         Set Decode64toMemBloc = mem
-    ElseIf Len(A$) = 0 Then
+    ElseIf Len(a$) = 0 Then
         ok = False
         MyEr "Empty String to make buffer", "Αδειο αλφαριθμητικό για να φτιάξω διάρθρωση"
     Else
@@ -58,7 +58,7 @@ Public Function Decode64toMemBloc(ByVal A$, ok As Boolean, Optional forcode As B
     
 End Function
 Public Function File2newMemblock(FileName As String, r, p) As Object
-    Dim mem As New MemBlock, BLen As Long, I As Long
+    Dim mem As New MemBlock, BLen As Long, i As Long
     r = -1#
     FileName = CFname(FileName)
     If FileName <> "" Then
@@ -67,13 +67,13 @@ Public Function File2newMemblock(FileName As String, r, p) As Object
     BLen = FileLen(GetDosPath(FileName))
     If BLen Then
     mem.Construct 1, BLen, , CBool(p)
-    I = FreeFile
+    i = FreeFile
     On Error Resume Next
 
-    Open GetDosPath(FileName) For Binary Access Read As I
+    Open GetDosPath(FileName) For Binary Access Read As i
 
-    If Err.Number > 0 Then MyEr Err.Description, Err.Description: Close I: Exit Function
-    If mem.GetData1(I, mem.GetPtr(0), BLen) Then
+    If Err.Number > 0 Then MyEr Err.Description, Err.Description: Close i: Exit Function
+    If mem.GetData1(i, mem.GetPtr(0), BLen) Then
     r = 0#
     Set File2newMemblock = mem
     If Not mem.IsWmf Then
@@ -91,15 +91,15 @@ Public Function File2newMemblock(FileName As String, r, p) As Object
     End If
     End If
     End If
-    Close I
+    Close i
     End If
     End If
 End Function
 
-Public Function SaveStr2MemBlock(A, r) As Object
+Public Function SaveStr2MemBlock(a, r) As Object
 Dim aa As New cDIBSection
 r = -1#
-If cDib(A, aa) Then
+If cDib(a, aa) Then
     aa.GetDpi 96, 96
     If Not aa.SaveDibToMeMBlock(SaveStr2MemBlock) Then
     MyEr "Can't save to buffer", "Δεν μπορώ να σώσω στη διάρθρωση"
@@ -114,32 +114,51 @@ Public Function SaveJPG( _
       ByVal sFile As String, Optional ByVal lQuality As Long = 90, _
       Optional UserComment As String) As Boolean
    Dim j As New cJpeg
-j.Quality = lQuality
-If UserComment = vbNullString Then j.Comment = "M2000 User" Else j.Comment = Left$(UserComment, 64)
-If lQuality <= 50 Then
-j.SetSamplingFrequencies 2, 2, 1, 1, 1, 1  ' for screen
-Else
-j.SetSamplingFrequencies 1, 1, 1, 1, 1, 1  ' as camera
-End If
-With cDib
-.needHDC
-j.SampleHDC .HDC1, .Width, .Height
-.FreeHDC
-j.SaveFile sFile
-End With
+        j.Quality = lQuality
+        If UserComment = vbNullString Then j.comment = "M2000 User" Else j.comment = Left$(UserComment, 64)
+        If lQuality <= 50 Then
+        j.SetSamplingFrequencies 2, 2, 1, 1, 1, 1  ' for screen
+        Else
+        j.SetSamplingFrequencies 1, 1, 1, 1, 1, 1  ' as camera
+        End If
+        With cDib
+        .needHDC
+        j.SampleHDC .HDC1, .Width, .Height
+        .FreeHDC
+        j.SaveFile sFile
+        End With
+   End Function
+Public Function SaveJPGtoBuffer( _
+      ByRef cDib As cDIBSection, _
+      Optional ByVal lQuality As Long = 90, _
+      Optional UserComment As String) As Object
+   Dim j As New cJpeg
+        j.Quality = lQuality
+        If UserComment = vbNullString Then j.comment = "M2000 User" Else j.comment = Left$(UserComment, 64)
+        If lQuality <= 50 Then
+        j.SetSamplingFrequencies 2, 2, 1, 1, 1, 1  ' for screen
+        Else
+        j.SetSamplingFrequencies 1, 1, 1, 1, 1, 1  ' as camera
+        End If
+        With cDib
+        .needHDC
+        j.SampleHDC .HDC1, .Width, .Height
+        .FreeHDC
+        Set SaveJPGtoBuffer = j.GetBuffer
+        End With
    End Function
 
-Public Sub CheckOrientation(A As cDIBSection, f As String)
+Public Sub CheckOrientation(a As cDIBSection, f As String)
     If LCase(ExtractType(f, (0))) = "jpg" Then
         Dim qw As New ExifRead
-        qw.Load f
+        qw.Load2 f
         Select Case qw.Tag(Orientation)
         Case 3
-          RotateDib180 A
+          RotateDib180 a
         Case 8
-          RotateDib90 A
+          RotateDib90 a
         Case 6
-          RotateDib270 A
+          RotateDib270 a
         End Select
     End If
 End Sub
@@ -408,7 +427,7 @@ If Not thislayer Is Nothing Then
         .ScaleMode = vbPixels
         End With
         With nOpenGl
-        If .Start(thislayer, parent1) Then
+        If .start(thislayer, parent1) Then
             .SetBackgroundColor 0!, 0!, 0!
             Call .SetBackgroundPictureUnder(parent1, thislayer.Left, thislayer.top)
         
@@ -430,7 +449,7 @@ If Not thislayer Is Nothing Then
         '.ScaleMode = vbPixels
         End With
         With nOpenGl
-        If .Start(thislayer, thislayer) Then
+        If .start(thislayer, thislayer) Then
             .SetBackgroundColor 0!, 0!, 0!
             Call .SetBackgroundPictureUnder(parent2, thislayer.Left, thislayer.top)
             parent2.ScaleMode = vbTwips
