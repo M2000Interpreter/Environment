@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 17
+Global Const Revision = 18
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -10534,7 +10534,8 @@ syntax1:
 contlabel:
                         Set usehandler = ppppl.GroupRef
                         If usehandler.t1 = 1 Then
-                            If Typename(usehandler.objref) <> "FastCollection" Then
+                            
+                            If Not TypeOf usehandler.objref Is FastCollection Then
                                 If usehandler.indirect = -1 Then
                                     Set usehandler = usehandler.objref
                                     Set useFast = usehandler.objref
@@ -10643,10 +10644,17 @@ inv100:                     If usehandler.t1 = 1 Then
                                         r = rValue(bstack, .ValueObj)
                                         If FastSymbol1(a$, "#") Then
                                             If Not bstack.lastobj Is Nothing Then
-                                                If Typename(bstack.lastobj) = mHdlr Then
+                                                If TypeOf bstack.lastobj Is mHandler Then
                                                     Set usehandler = bstack.lastobj
                                                     Set bstack.lastobj = Nothing
                                                     IsNumberNew = fMatrix(bstack, a$, usehandler, r)
+                                                    If MyIsObject(r) Then r = 0#
+                                                    
+                                                    Exit Function
+                                                ElseIf TypeOf bstack.lastobj Is iBoxArray Then
+                                                    Set anything = bstack.lastobj
+                                                    Set bstack.lastobj = Nothing
+                                                    IsNumberNew = fMatrix(bstack, a$, CVar(anything), r)
                                                     If MyIsObject(r) Then r = 0#
                                                     
                                                     Exit Function
@@ -27939,7 +27947,8 @@ Sub ProcMethodAsap(bstack As basetask, vv As Object, FN$, rest$, ok As Boolean, 
 Dim var1() As Variant, s$, r As Double, l As Long, NewRef As Long, Glob As Boolean, newvar As Boolean
 Dim result As Variant, retobject As Object, usehandler As mHandler, oUnk As stdole.IUnknown
 Dim namarg As Long, x1 As Long, f As Long, language As Long, CallThis As cbnCallTypes
-Const b = vbCr + ",'\/:}"
+Const b = vbCr + "'\/:}"
+
 
 ok = True
 If vv Is Nothing Then Exit Sub
@@ -27979,6 +27988,7 @@ ElseIf InStr(b, Mid$(rest$, f, 1)) = 0 Then
     If Not ok1 Then Exit Sub
     result = CallByNameFixParamArray(vv, FN$, CallThis, var1(), var2(), items, retobject, namarg, bstack.IamAnEvent, oUnk)
 Else
+    
     result = CallByNameFixParamArray(vv, FN$, CallThis, var1(), var2(), 0, retobject, namarg, bstack.IamAnEvent, oUnk)
 End If
 End If
@@ -50741,7 +50751,10 @@ Function getindexes(bstack As basetask, obj1 As Object, a$) As Boolean
 Dim s$, P, idx As New mIndexes, dn As Long, aProp As PropReference
 Set aProp = obj1
 Do
-        If IsExp(bstack, a$, P) Then
+        If FastSymbol(a$, "?") Then
+                idx.IndexOpt dn
+                aProp.IndexOpt
+        ElseIf IsExp(bstack, a$, P) Then
                 If bstack.lastobj Is Nothing Then
                     idx(dn) = P
                 Else

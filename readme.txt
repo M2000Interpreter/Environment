@@ -1,18 +1,9 @@
 M2000 Interpreter and Environment
-Version 15 Revision 17
+Version 15 Revision 18
 
-July 27, 2026,
-Very fast new revision. The programmer of Regex (in M2000 the ASF_RegexEngine.cls, code from https://github.com/ECP-Solutions) fix the issue 27 (which I found): Now Replace("Myer, Ken") return the same value as VBscript.
+July 29, 2026,
 
-declare RegEx "M2000.Regex"
-RegEx=>Pattern = "(\S+), (\S+)"
-Print RegEx=>Replace("Myer, Ken", "$2 $1")="Ken Myer"
-Clear
-declare RegEx "VBscript.RegExp"
-RegEx=>Pattern = "(\S+), (\S+)"
-Print RegEx=>Replace("Myer, Ken", "$2 $1")="Ken Myer"
-
-
+Some minor fixes. Info file Updated.
 
 
 

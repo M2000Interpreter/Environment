@@ -5790,11 +5790,11 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 63 for M2000 Interpreter version 14, revision 48 and above"
+	Report " A collection of modules for tests version 64 for M2000 Interpreter version 15, revision 17 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
-		Report 1, "George Karras 1999-2025"
+		Report 1, "George Karras 1999-2027"
 	}
 }
 cls backcolor, row
@@ -54248,5 +54248,86 @@ module checkit (filename as string=""){
 flush
 checkit "output.txt"
 win "output.txt"
+}
+MODULE KNUTHPOWER {https://rosettacode.org/wiki/Knuth%27s_power_tree#M2000_Interpreter
+Module Knuth`s_power_tree {
+	Document final$
+	paths=PathsPowerTree(200)
+	Compute(1.1, 81)
+	print 1.1^81
+	Compute(3u, 191)
+	print modpow( 3u,191u, biginteger("1"+string$("0", 100)))
+	mm=(0,1,2,17)	
+	zz=each(mm)
+	while zz
+		n=array(zz)
+		Compute(2, n)
+		print 2^n
+	end while
+	Clipboard final$
+	
+	Sub Compute(X, Exp as long)
+		local zz=paths(Exp): if Exp>1 then local z=each(zz, 2)
+		local o=0, compile$, N=Exp
+		document compile$="Print "+{"X=";}+X+{
+		}
+		IF Exp=1 then
+			compile$={X1=X
+			}
+		else.if Exp=0 then
+			compile$={X0=1
+			}		
+		else
+			while z
+				N=array(z)
+				if N mod 2=0 then
+					compile$="X"+N+" = "+if$(N=2->"X","X"+(N/2))+" * "+if$(N=2->"X","X"+(N/2))+{
+					} 
+				else
+					compile$="X"+N+" = "+sq$(o)+" * "+sq$(N-o)+{
+					}
+				end if
+				o=N
+			end while
+		end if
+		compile$="Print X"+N+{
+		}
+		
+		Pen 11 {report compile$}
+		final$=compile$+{
+		}
+		inline compile$+{:final$=X+"^"+N+" = "+}+sq$(N)+{
+		}
+		final$={
+		
+		}
+	end sub
+	Function sq$(N)
+		if N=0 then ="1" else =if(N=1->"X","X"+N)
+	End Function
+	Function PathsPowerTree(many as long)
+		local a=list:=1
+		local paths=list:=0,1,2:=(1,2)
+		local i as long, p, z, m	
+		many=Abs(many)
+		Stack New {
+		push 2
+		while not empty
+			read i:if exist(a, i) then continue
+			many--:if many<1 then exit
+			p=paths(i):m=each(p):append a, i
+			while m
+				z=array(m)+i
+				if not exist(paths, z) then
+					append paths, z:=p#end((z,))
+					data z
+				end if
+			end while
+		end while
+		}
+		=paths
+	end function
+}
+Knuth`s_power_tree
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}
