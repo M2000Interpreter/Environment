@@ -1,10 +1,10 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Any)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Any)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
 Public Const KEYEVENTF_KEYUP = &H2
 Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
@@ -55,7 +55,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -332,49 +332,49 @@ Public Const KL_NAMELENGTH = 9
 Declare Function LoadKeyboardLayout Lib "user32" Alias "LoadKeyboardLayoutA" (ByVal pwszKLID As String, ByVal flags As Long) As Long
 Declare Function UnloadKeyboardLayout Lib "user32" (ByVal HKL As Long) As Long
 Declare Function ActivateKeyboardLayout Lib "user32" (ByVal HKL As Long, ByVal flags As Long) As Long
-Public Function HighLong(ByVal p) As Long
-    If MemInt(VarPtr(p)) <> 20 Then p = cInt64(p)
-    HighLong = MemLong(VarPtr(p) + 12)
+Public Function HighLong(ByVal P) As Long
+    If MemInt(VarPtr(P)) <> 20 Then P = cInt64(P)
+    HighLong = MemLong(VarPtr(P) + 12)
 End Function
-Public Function LowLong(ByVal p) As Long
-    If Not myVarType(p, 20) Then p = cInt64(p)
-    LowLong = MemLong(VarPtr(p) + 8)
+Public Function LowLong(ByVal P) As Long
+    If Not myVarType(P, 20) Then P = cInt64(P)
+    LowLong = MemLong(VarPtr(P) + 8)
 End Function
 Function Hex64$(a, Optional bytes = 8)
-    Dim p, P1, z
+    Dim P, P1, z
     z = cInt64(a)
-    p = MemLong(VarPtr(z) + 8)
+    P = MemLong(VarPtr(z) + 8)
     P1 = MemLong(VarPtr(z) + 12)
-    Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
+    Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(P), 8), bytes * 2)
 End Function
 Public Function OneLongLong() As Variant
-    Static p
-    If p = Empty Then
-        PutMem2 VarPtr(p), 20
-        PutMem1 VarPtr(p) + 8, 1
+    Static P
+    If P = Empty Then
+        PutMem2 VarPtr(P), 20
+        PutMem1 VarPtr(P) + 8, 1
     End If
-    OneLongLong = p
+    OneLongLong = P
 End Function
 Public Function OneBigLongLong() As Variant
-    Static p
-    If p = Empty Then
-        PutMem2 VarPtr(p), 20
-        PutMem1 VarPtr(p) + 12, 1
+    Static P
+    If P = Empty Then
+        PutMem2 VarPtr(P), 20
+        PutMem1 VarPtr(P) + 12, 1
     End If
-    OneBigLongLong = p
+    OneBigLongLong = P
 End Function
 Public Function MaskLowLongLong() As Variant
-    Static p
-    If p = Empty Then
-    MemInt(VarPtr(p)) = 20
-    MemLong(VarPtr(p) + 8) = -1&
+    Static P
+    If P = Empty Then
+    MemInt(VarPtr(P)) = 20
+    MemLong(VarPtr(P) + 8) = -1&
     End If
-    MaskLowLongLong = p
+    MaskLowLongLong = P
 End Function
 Public Function Signed(a) As Long
-    Dim p
-    p = Fix(CDec(a))
-    Signed = MemLong(VarPtr(p) + 8)
+    Dim P
+    P = Fix(CDec(a))
+    Signed = MemLong(VarPtr(P) + 8)
 End Function
 Public Function UnsignedSub(a As Long, b As Long)
     Static ua, UB
@@ -388,7 +388,7 @@ Public Function UnsignedSub(a As Long, b As Long)
     UnsignedSub = MemLong(VarPtr(ua) + 8)
 End Function
 
-Public Function cInt64(p)
+Public Function cInt64(P)
     Static maxlonglong, limitlonglong, OneLongLong, OneBigLongLong
     Dim a, i As Integer
     If MemInt(VarPtr(maxlonglong)) = 0 Then
@@ -399,10 +399,10 @@ Public Function cInt64(p)
         MemInt(VarPtr(OneBigLongLong)) = 20
         MemByte(VarPtr(OneBigLongLong) + 12) = 1
     End If
-    i = MemInt(VarPtr(p))
+    i = MemInt(VarPtr(P))
     Select Case i
     Case vbDecimal
-        a = Fix(p)
+        a = Fix(P)
         a = a - Int(a / maxlonglong) * maxlonglong
         If a < -limitlonglong - 1 Then
             While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
@@ -410,13 +410,13 @@ Public Function cInt64(p)
         While a >= limitlonglong: a = a - maxlonglong: Wend
         cInt64 = -OneLongLong And a
     Case 20
-        cInt64 = p
+        cInt64 = P
     Case vbLong, vbInteger
-        cInt64 = -OneLongLong And p
+        cInt64 = -OneLongLong And P
     Case Else
         On Error GoTo er1
         
-        a = Fix(CDec(p))
+        a = Fix(CDec(P))
         If a > limitlonglong Or a <= -limitlonglong Then
         a = a - Int(a / (maxlonglong)) * (maxlonglong)
         If a <= -limitlonglong - 1 Then
@@ -426,14 +426,14 @@ Public Function cInt64(p)
         End If
         cInt64 = -OneLongLong And a
         If i = vbString Then
-            If Left$(p, 1) = "&" And a < 0 Then
-            Select Case Len(p)
+            If Left$(P, 1) = "&" And a < 0 Then
+            Select Case Len(P)
             Case 10
-                If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) > 0 Then
+                If InStr("89ABCDEF", UCase(Mid$(P, 3, 1))) > 0 Then
                 cInt64 = OneBigLongLong + cInt64
                 End If
             Case 18
-                If Mid$(p, 3, 8) = "00000000" Then
+                If Mid$(P, 3, 8) = "00000000" Then
                     cInt64 = OneBigLongLong + cInt64
                 End If
             Case 11 To 17
@@ -1761,7 +1761,7 @@ With ob
 Call SetWindowRgn(.hWnd, (0), False)
 End With
 End Sub
-Public Function RotateRegion(hRgn As Long, Angle As Single, ByVal piw As Long, ByVal pih As Long, ByVal size As Single) As Long
+Public Function RotateRegion(hRgn As Long, Angle As Single, ByVal piw As Long, ByVal pih As Long, ByVal Size As Single) As Long
 Dim k As Single, r As Single, aa As Single
 aa = (CLng(Angle! * 100) Mod 36000) / 100
 
@@ -1769,9 +1769,9 @@ Angle! = -Angle * 1.74532925199433E-02
    r = Atn(piw / CSng(pih)) + Pi / 2!
     k = piw / Cos(r)
     Dim myw As Long, myh As Long
- myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * size, 0)
-myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * size, 0)
-hRgn = ScaleRegion(hRgn, size)
+ myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * Size, 0)
+myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * Size, 0)
+hRgn = ScaleRegion(hRgn, Size)
 
 
     Dim uXF As XFORM
@@ -1798,14 +1798,14 @@ DeleteObject hRgn
 End Function
 
 
-Public Function ScaleRegion(hRgn As Long, size As Single) As Long
+Public Function ScaleRegion(hRgn As Long, Size As Single) As Long
   Dim uXF As XFORM
     Dim D2R As Single, rData() As Byte, rSize As Long
 
-    uXF.eM11 = size
+    uXF.eM11 = Size
     uXF.eM12 = 0
     uXF.eM21 = 0
-    uXF.eM22 = size
+    uXF.eM22 = Size
 
     uXF.eDx = 0
     uXF.eDy = 0
@@ -1872,14 +1872,14 @@ On Error Resume Next
 .ZOrder 0
 .Font.Name = Form1.DIS.Font.Name
 .Font.charset = Form1.DIS.Font.charset
-.Font.size = SZ
+.Font.Size = SZ
 .Font.Strikethrough = False
 .Font.Underline = False
 .Font.Italic = Form1.DIS.Font.Italic
 .Font.bold = Form1.DIS.Font.bold
 .Font.Name = Form1.DIS.Font.Name
 .Font.charset = Form1.DIS.Font.charset
-.Font.size = SZ
+.Font.Size = SZ
 
 End With
 '''DeleteObject myRgn  ' from windows...
@@ -1937,15 +1937,15 @@ End Function
 Function CollideArea(Priority As Long, Percent As Long, basestack As basetask, rest$) As Boolean
 ' nx2 isn't width but absolute line at nx2
 ' means not inside
-Dim nx1 As Long, ny1 As Long, nx2 As Long, ny2 As Long, p
-If IsExp(basestack, rest$, p, , True, , True) Then
-nx1 = CLng(p): If Not FastSymbol(rest$, ",") Then Exit Function
-If IsExp(basestack, rest$, p, , True, , True) Then
-ny1 = CLng(p): If Not FastSymbol(rest$, ",") Then Exit Function
-If IsExp(basestack, rest$, p, , True, , True) Then
-nx2 = CLng(p): If Not FastSymbol(rest$, ",") Then Exit Function
-If IsExp(basestack, rest$, p, , True, , True) Then
-ny2 = CLng(p)
+Dim nx1 As Long, ny1 As Long, nx2 As Long, ny2 As Long, P
+If IsExp(basestack, rest$, P, , True, , True) Then
+nx1 = CLng(P): If Not FastSymbol(rest$, ",") Then Exit Function
+If IsExp(basestack, rest$, P, , True, , True) Then
+ny1 = CLng(P): If Not FastSymbol(rest$, ",") Then Exit Function
+If IsExp(basestack, rest$, P, , True, , True) Then
+nx2 = CLng(P): If Not FastSymbol(rest$, ",") Then Exit Function
+If IsExp(basestack, rest$, P, , True, , True) Then
+ny2 = CLng(P)
 End If
 End If
 End If
@@ -2419,7 +2419,7 @@ End Sub
 Public Function PlayTuneMIDI(ch As Long, octave2play As Integer, note2play As Integer, subbeat As Long, doted As Long, volume2play As Long, skipgate As Long, zoom As Double, zoostat As Long, rightvol As Integer, leftvol As Integer) As Boolean
 
 Dim i As Long, v$, probe2play As Long, j As Long, park$, multiplier As Long, tupletBeat As Long, tupletDot As Long, divider As Double, BE As Double
-Dim p
+Dim P
 If Len(voices(ch)) = 0 Then Exit Function
 note2play = 0
 i = 1
@@ -2441,10 +2441,10 @@ Case "R", "r"
             v$ = v$ & Mid$(voices(ch), i + 1, 1)
             i = i + 1
         Loop
-        p = val("0" + v$)
-        If p > 0 Then
-        If p > 1000 Then p = 1000
-            rightvol = cUint(&HFF00 * p / 1000 + 255)
+        P = val("0" + v$)
+        If P > 0 Then
+        If P > 1000 Then P = 1000
+            rightvol = cUint(&HFF00 * P / 1000 + 255)
         Else
             rightvol = 0
         End If
@@ -2456,10 +2456,10 @@ Case "L", "l"
             v$ = v$ & Mid$(voices(ch), i + 1, 1)
             i = i + 1
         Loop
-        p = val("0" + v$)
-        If p > 0 Then
-        If p > 1000 Then p = 1000
-            leftvol = cUint(&HFF00 * p / 1000 + 255)
+        P = val("0" + v$)
+        If P > 0 Then
+        If P > 1000 Then P = 1000
+            leftvol = cUint(&HFF00 * P / 1000 + 255)
         Else
             leftvol = 0
         End If
@@ -3518,9 +3518,9 @@ t(0) = 1 ' VT_NULL
    CopyMemory ByVal VarPtr(VarNull), t(0), 16
 End Sub
 Function myIsNull(VarNull As Variant) As Boolean
-Dim p As Integer
-GetMem2 VarPtr(VarNull), p
-myIsNull = p = 1
+Dim P As Integer
+GetMem2 VarPtr(VarNull), P
+myIsNull = P = 1
 End Function
 
 ' VarByRef VarPtr(var2(items)), var(i)
@@ -3975,7 +3975,7 @@ End Function
 
 
 
-Static Function ValidNum(a$, Final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
+Static Function ValidNum(a$, final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
 Dim r As Long
 Dim r1 As Long
 r1 = 1
@@ -3988,7 +3988,7 @@ r1 = 1
     End If
 
 Dim v As Double, b$
-If Final Then
+If final Then
 If checktype > 0 Then
 r1 = IsNumberOnly(a$, r1, v, r, cutdecimals)
 Else
@@ -5169,8 +5169,8 @@ Public Sub StoreFont(aName$, aSize As Single, ByVal aCharset As Long)
 Err.Clear
 On Error Resume Next
 If aSize < 1 Then aSize = 1
-fonttest.Font.size = aSize
-If Err.Number > 0 Then aSize = 12: fonttest.Font.size = aSize
+fonttest.Font.Size = aSize
+If Err.Number > 0 Then aSize = 12: fonttest.Font.Size = aSize
     fonttest.FontName = aName$
     fonttest.Font.bold = True
     fonttest.Font.Italic = True
@@ -5179,8 +5179,8 @@ If Err.Number > 0 Then aSize = 12: fonttest.Font.size = aSize
     fonttest.Font.bold = True
     fonttest.Font.Italic = True
     fonttest.Font.charset = aCharset
-    fonttest.Font.size = aSize
-    aSize = fonttest.Font.size '' return
+    fonttest.Font.Size = aSize
+    aSize = fonttest.Font.Size '' return
 End Sub
 Public Function InternalLeadingSpace() As Long
 On Error Resume Next

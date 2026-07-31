@@ -57,7 +57,7 @@ Public Function Decode64toMemBloc(ByVal a$, ok As Boolean, Optional forcode As B
     End If
     
 End Function
-Public Function File2newMemblock(FileName As String, r, p) As Object
+Public Function File2newMemblock(FileName As String, r, P) As Object
     Dim mem As New MemBlock, BLen As Long, i As Long
     r = -1#
     FileName = CFname(FileName)
@@ -66,7 +66,7 @@ Public Function File2newMemblock(FileName As String, r, p) As Object
      
     BLen = FileLen(GetDosPath(FileName))
     If BLen Then
-    mem.Construct 1, BLen, , CBool(p)
+    mem.Construct 1, BLen, , CBool(P)
     i = FreeFile
     On Error Resume Next
 
@@ -115,7 +115,7 @@ Public Function SaveJPG( _
       Optional UserComment As String) As Boolean
    Dim j As New cJpeg
         j.Quality = lQuality
-        If UserComment = vbNullString Then j.comment = "M2000 User" Else j.comment = Left$(UserComment, 64)
+        If UserComment = vbNullString Then j.Comment = "M2000 User" Else j.Comment = Left$(UserComment, 64)
         If lQuality <= 50 Then
         j.SetSamplingFrequencies 2, 2, 1, 1, 1, 1  ' for screen
         Else
@@ -134,7 +134,7 @@ Public Function SaveJPGtoBuffer( _
       Optional UserComment As String) As Object
    Dim j As New cJpeg
         j.Quality = lQuality
-        If UserComment = vbNullString Then j.comment = "M2000 User" Else j.comment = Left$(UserComment, 64)
+        If UserComment = vbNullString Then j.Comment = "M2000 User" Else j.Comment = Left$(UserComment, 64)
         If lQuality <= 50 Then
         j.SetSamplingFrequencies 2, 2, 1, 1, 1, 1  ' for screen
         Else

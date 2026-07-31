@@ -198,39 +198,39 @@ Private Property Get MakerNoteTag(Optional ByVal MakerTag As Long) As Variant
 End Property
 Public Property Get Comment() As String
 If No_of_Entries <> 0 Then
-Dim p As Long, pe As Long, pi As Long
+Dim P As Long, pe As Long, Pi As Long
 
 Dim i As Long
 Dim s As String
-Dim L As Long
+Dim l As Long
 s = ""
-p = VarPtr(ExifTemp(0)) + 20
+P = VarPtr(ExifTemp(0)) + 20
 pe = VarPtr(ExifTemp(UBound(ExifTemp)))
 
-If MemInt(p) = -257 Then
+If MemInt(P) = -257 Then
 again:
-L = CLng(MemByte(p + 2) * 256) + CLng(MemByte(p + 3))
+l = CLng(MemByte(P + 2) * 256) + CLng(MemByte(P + 3))
 
-For i = p + 4 To p + L + 1
+For i = P + 4 To P + l + 1
     If MemByte(i) = 0 Then Exit For
     s = s + Chr$(MemByte(i))
 Next i
 Comment = s
-p = i
+P = i
 
 entry2:
-If pe >= p Then Exit Property
-If MemInt(p) = -257 Then
+If pe >= P Then Exit Property
+If MemInt(P) = -257 Then
 s = s + vbCrLf
 GoTo again
-ElseIf MemByte(p) < 255 Then
+ElseIf MemByte(P) < 255 Then
 
-ElseIf MemByte(p) = 255 And MemByte(p + 1) = 219 Then
+ElseIf MemByte(P) = 255 And MemByte(P + 1) = 219 Then
     Exit Property
 Else
-    pi = CLng(MemByte(p + 2)) * 256 + CLng(MemByte(p + 3))
-    If pi > 0 Then
-        p = p + pi
+    Pi = CLng(MemByte(P + 2)) * 256 + CLng(MemByte(P + 3))
+    If Pi > 0 Then
+        P = P + Pi
         GoTo entry2
     End If
 End If
@@ -303,7 +303,7 @@ If No_of_Entries > 0 Then Exit Sub
             ExifTemp(Offset_to_APP1 + 17)
     End If
     IsLoaded = True
-    GetDirectoryEntries Offset_to_TIFF + Offset_to_IFD0, True
+    GetDirectoryEntries Offset_to_TIFF + Offset_to_IFD0, False
     
 End Sub
 

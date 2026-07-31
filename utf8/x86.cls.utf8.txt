@@ -68,6 +68,8 @@ Private Const CHAR_PARENTH_L    As Long = 40
 Private Const CHAR_PARENTH_R    As Long = 41
 
 Private Const CHAR_NUMBER_0     As Long = 48
+Private Const CHAR_NUMBER_7     As Long = 55
+
 Private Const CHAR_NUMBER_9     As Long = 57
 
 Private Const CHAR_ALPHA_UA     As Long = 65
@@ -189,14 +191,14 @@ Private Type PointerInfo
 End Type
 
 Private Type RawData
-    size                        As ParamSize
+    Size                        As ParamSize
     Values()                    As Long
     ValueCount                  As Long
 End Type
 
 Private Type ASMArgument
     TType                       As ParamType
-    size                        As ParamSize
+    Size                        As ParamSize
     Pointer                     As PointerInfo
     Register                    As ASMRegisters
     FPURegister                 As ASMFPURegisters
@@ -211,7 +213,7 @@ Private Type ASMInstruction
     Args(MAX_PARAMETERS - 1)    As ASMArgument
     OpCodeIndex                 As Long
     ArgCount                    As Long
-    size                        As Long
+    Size                        As Long
     Offset                      As Long
     flags                       As OpCodePrefixes
     Data                        As RawData
@@ -242,7 +244,7 @@ End Type
 
 Private Type IMAGE_DATA_DIRECTORY
     VirtualAddress              As Long
-    size                        As Long
+    Size                        As Long
 End Type
 
 Private Type IMAGE_SECTION_HEADER
@@ -381,9 +383,15 @@ Public Property Get LabelOffset(Name As String) As Long
         LabelOffset = .Offset - m_lngBaseAddress
     End With
     End If
-
 End Property
-
+Public Property Get LabelPtr(Name As String) As Long
+    If labels Is Nothing Then Exit Property
+    If labels.ExistKey(Name) Then
+    With m_udtLabels(labels.Value)
+        LabelPtr = .Offset
+    End With
+    End If
+End Property
 Public Property Get Subsystem() As PESubsystem
     Subsystem = m_udeSubsystem
 End Property
@@ -709,14 +717,14 @@ Private Function WritePEHeader() As Boolean
                                   RoundToSectionSize(ntHdr.OptionalHeader.SizeOfCode) + _
                                   GetNeededIATSize()
                                   
-                .size = Len(impTbl)
+                .Size = Len(impTbl)
             End With
             
             With .DataDirectory(ETableIAT)
                 .VirtualAddress = ntHdr.OptionalHeader.BaseOfCode + _
                                   RoundToSectionSize(ntHdr.OptionalHeader.SizeOfCode)
                                   
-                .size = GetNeededIATSize()
+                .Size = GetNeededIATSize()
             End With
         End With
     End With
@@ -786,7 +794,7 @@ Private Function AssembleInstructions() As Boolean
     For i = 0 To m_lngInstrCount - 1
         lngSz = m_lngOutPos
         
-        If m_udtInstrs(i).Data.size <> BitsUnknown Then
+        If m_udtInstrs(i).Data.Size <> BitsUnknown Then
             If Not RawDataOut(m_udtInstrs(i).Data) Then Exit Function
         Else
             InstructionOutPrefixes m_udtInstrs(i)
@@ -795,7 +803,7 @@ Private Function AssembleInstructions() As Boolean
         End If
         
         lngSz = m_lngOutPos - lngSz
-        If lngSz <> m_udtInstrs(i).size Then Err.Raise 123, , "invalid size after output"
+        If lngSz <> m_udtInstrs(i).Size Then Err.Raise 123, , "invalid size after output"
     Next
     
     AssembleInstructions = True
@@ -807,7 +815,7 @@ Private Function RawDataOut(Data As RawData) As Boolean
     Dim i   As Long
     
     For i = 0 To Data.ValueCount - 1
-        OutputBytes Data.Values(i), Data.size
+        OutputBytes Data.Values(i), Data.Size
     Next
     
     RawDataOut = True
@@ -865,15 +873,15 @@ Private Function InstructionOutArgs(udtInstr As ASMInstruction) As Boolean
                     If .PType = ParamRel Then
                         ' if a relative value is needed, make the immediate
                         ' relative to the end of the current instruction
-                        lngImmVal(lngImmValCnt) = lngImmVal(lngImmValCnt) - (udtInstr.Offset + udtInstr.size)
+                        lngImmVal(lngImmValCnt) = lngImmVal(lngImmValCnt) - (udtInstr.Offset + udtInstr.Size)
                     End If
                     
-                    If (SizesForInt(lngImmVal(lngImmValCnt)) And .size) = 0 Then
+                    If (SizesForInt(lngImmVal(lngImmValCnt)) And .Size) = 0 Then
                         SetError "Relative value too big for instruction", udtInstr.Line, udtInstr.Section
                         Exit Function
                     End If
                     
-                    udeImmSize(lngImmValCnt) = .size
+                    udeImmSize(lngImmValCnt) = .Size
                     lngImmValCnt = lngImmValCnt + 1
                     blnImmVal = True
                     
@@ -1287,8 +1295,8 @@ Private Property Get OutputPosition() As Long
 End Property
 
 
-Private Sub OutputBytes(ByVal Value As Long, ByVal size As ParamSize)
-    Select Case size
+Private Sub OutputBytes(ByVal Value As Long, ByVal Size As ParamSize)
+    Select Case Size
         Case Bits8:     OutputByte Value
         Case Bits16:    OutputInteger Value
         Case Bits32:    OutputLong Value
@@ -1368,14 +1376,14 @@ Private Function ParsePointer(Ptr As Pointer) As Boolean
             Select Case token.TType
                 Case TokenRegister:
                     blnReg = True
-                    lngReg = RegToIdx(RegStrToReg(token.Content))
+                    lngReg = RegToIdx(RegStrToReg(token.content))
                     Match TokenRegister
                 Case TokenValue:
                     lngTms = lngTms * token.Value
                     Match TokenValue
-                Case TokenSymbol:
-                    lngTms = lngTms * m_udtLabels(GetLabelIndex(token.Content)).Offset
-                    Match TokenSymbol
+                Case tokensymbol:
+                    lngTms = lngTms * m_udtLabels(GetLabelIndex(token.content)).Offset
+                    Match tokensymbol
             End Select
         Loop While Match(TokenOpMul)
         
@@ -1406,14 +1414,14 @@ Private Function GetInstructionSizes() As Boolean
     Dim i           As Long
     Dim j           As Long
     Dim k           As Long
-    Dim size        As Long
+    Dim Size        As Long
     Dim lngImpSz    As Long
     Dim blnFoundI   As Boolean
 
     For i = 0 To m_lngInstrCount - 1                ' all instructions in the source
-        If m_udtInstrs(i).Data.size <> BitsUnknown Then
+        If m_udtInstrs(i).Data.Size <> BitsUnknown Then
             With m_udtInstrs(i)
-                .size = .Data.ValueCount * .Data.size \ 8
+                .Size = .Data.ValueCount * .Data.Size \ 8
             End With
         Else
             blnFoundI = False
@@ -1424,7 +1432,7 @@ Private Function GetInstructionSizes() As Boolean
                     
                     If CompareInstrs(m_udtInstrs(i), Instructions(j)) Then
                         ' OpCode length + all used prefixes, ModR/M Byte
-                        size = Instructions(j).OpCodeLen + _
+                        Size = Instructions(j).OpCodeLen + _
                                BitCount(Instructions(j).Prefixes Or m_udtInstrs(i).flags) + _
                                Abs(m_udtInstrs(i).Segment <> SegUnknown) + _
                                Abs(Instructions(j).ModRM) + _
@@ -1439,19 +1447,19 @@ Private Function GetInstructionSizes() As Boolean
                                         Select Case .PType
                                         
                                             Case ParamImm, ParamRel:
-                                                size = size + .size \ 8 ' Imm
+                                                Size = Size + .Size \ 8 ' Imm
                                             
                                             Case ParamMem Or ParamReg, ParamMem:
                                                 If Not Instructions(j).ModRM And .PType = ParamMem Then
-                                                    size = size + 4     ' Imm
+                                                    Size = Size + 4     ' Imm
                                                 Else
                                                     If m_udtInstrs(i).Args(k).Pointer.HasDisplacement Then
-                                                        size = size + m_udtInstrs(i).Args(k).Pointer.DispSize \ 8
+                                                        Size = Size + m_udtInstrs(i).Args(k).Pointer.DispSize \ 8
                                                     End If
                                                     
                                                     If m_udtInstrs(i).Args(k).Pointer.RegisterCount = 2 Or _
                                                        m_udtInstrs(i).Args(k).Pointer.RegisterMultiples Then
-                                                        size = size + 1 ' SIB
+                                                        Size = Size + 1 ' SIB
                                                     End If
                                                 End If
                                                 
@@ -1463,7 +1471,7 @@ Private Function GetInstructionSizes() As Boolean
                         End If
                         
                         m_udtInstrs(i).OpCodeIndex = j
-                        m_udtInstrs(i).size = size
+                        m_udtInstrs(i).Size = Size
                         Exit For
                     End If
                 End If
@@ -1499,7 +1507,7 @@ Private Function GetInstructionSizes() As Boolean
         FillInIAT RoundToSectionSize(GetPEHeaderSize()) + _
                   RoundToSectionSize(m_lngPECodeSize)
     End If
-
+    If m_lngOutSize = 0 Then Exit Function
     ReDim m_btOutput(m_lngOutSize - 1) As Byte
 
     GetInstructionSizes = True
@@ -1518,7 +1526,7 @@ Private Sub FillInOffsets()
     
     For i = 0 To m_lngInstrCount - 1
         m_udtInstrs(i).Offset = m_lngOutSize + m_lngBaseAddress + lngPEOffset
-        m_lngOutSize = m_lngOutSize + m_udtInstrs(i).size
+        m_lngOutSize = m_lngOutSize + m_udtInstrs(i).Size
 
         If j < m_lngLabelCount Then
             If m_udtLabels(j).Instruction = i Then
@@ -1622,8 +1630,8 @@ Private Function CompareInstrs( _
                 End If
             End If
             
-            If (Comp.Parameters(i).size And Src.Args(i).size) = 0 Then
-                If Comp.Parameters(i).size <> BitsUnknown Then
+            If (Comp.Parameters(i).Size And Src.Args(i).Size) = 0 Then
+                If Comp.Parameters(i).Size <> BitsUnknown Then
                     Exit Function
                 End If
             End If
@@ -1640,13 +1648,13 @@ Private Function FindLabels() As Boolean
     Dim lngInstrCnt As Long
     
     For i = 1 To m_lngTokenCount - 2
-        If m_clsTokens(i).TType = TokenSymbol Then
+        If m_clsTokens(i).TType = tokensymbol Then
             If m_clsTokens(i + 1).TType = TokenOpColon Then
-                If GetLabelIndex(m_clsTokens(i).Content) > -1 Then
-                    SetError "ambigious names: " & m_clsTokens(i).Content, m_clsTokens(i).Line, m_clsTokens(i).Section
+                If GetLabelIndex(m_clsTokens(i).content) > -1 Then
+                    SetError "ambigious names: " & m_clsTokens(i).content, m_clsTokens(i).Line, m_clsTokens(i).Section
                     Exit Function
                 End If
-                AddLabel m_clsTokens(i).Content, lngInstrCnt
+                AddLabel m_clsTokens(i).content, lngInstrCnt
             End If
         ElseIf m_clsTokens(i).TType = TokenOperator Then
             lngInstrCnt = lngInstrCnt + 1
@@ -1676,8 +1684,8 @@ Private Function ParseInstructions() As Boolean
                         Exit Function
                     End If
             
-                Case TokenSymbol:
-                    Match TokenSymbol
+                Case tokensymbol:
+                    Match tokensymbol
                     If Not Match(TokenOpColon) Then
                         SetError """:"" expected after label ID", token.Line, token.Section
                         Exit Do
@@ -1691,7 +1699,7 @@ Private Function ParseInstructions() As Boolean
                     
                 Case Else:
                     If token.TType <> TokenEndOfInstruction Then
-                        SetError "Unexpected symbol: " & token.Content, token.Line, token.Section
+                        SetError "Unexpected symbol: " & token.content, token.Line, token.Section
                         Exit Do
                     End If
                     
@@ -1755,19 +1763,19 @@ Private Function ParseExtern() As Boolean
         SetError "Expected: string identifier for library name", token.Line, token.Section
         Exit Function
     Else
-        strLib = token.Content
+        strLib = token.content
         Match TokenString
         
         If Not Match(TokenSeparator) Then
             SetError "Libraryname and functionname have to be seperated through a "",""", token.Line, token.Section
             Exit Function
         Else
-            If token.TType <> TokenSymbol Then
+            If token.TType <> tokensymbol Then
                 SetError "Expected: Name of the exporte function", token.Line, token.Section
                 Exit Function
             Else
-                strFnc = token.Content
-                Match TokenSymbol
+                strFnc = token.content
+                Match tokensymbol
                 
                 If GetLabelIndex(strFnc) > -1 Then
                     SetError "Name not unique", token.Line, token.Section
@@ -1786,10 +1794,10 @@ Private Function ParseRawData() As Boolean
     Dim lngLen      As Long
     Dim lngTemp     As Long
     
-    Select Case UCase$(token.Content)
-        Case "DB":  udtInstr.Data.size = Bits8
-        Case "DW":  udtInstr.Data.size = Bits16
-        Case "DD":  udtInstr.Data.size = Bits32
+    Select Case UCase$(token.content)
+        Case "DB":  udtInstr.Data.Size = Bits8
+        Case "DW":  udtInstr.Data.Size = Bits16
+        Case "DD":  udtInstr.Data.Size = Bits32
     End Select
     Match TokenRawData
     
@@ -1805,16 +1813,16 @@ Private Function ParseRawData() As Boolean
                 Case TokenString:
                     lngTemp = .ValueCount
                     
-                    ReDim Preserve .Values(.ValueCount + Len(token.Content) - 1) As Long
-                    For i = 1 To Len(token.Content)
-                        .Values(lngTemp + i - 1) = Asc(Mid$(token.Content, i, 1))
+                    ReDim Preserve .Values(.ValueCount + Len(token.content) - 1) As Long
+                    For i = 1 To Len(token.content)
+                        .Values(lngTemp + i - 1) = Asc(Mid$(token.content, i, 1))
                     Next
                     
-                    .ValueCount = .ValueCount + Len(token.Content)
+                    .ValueCount = .ValueCount + Len(token.content)
                     Match TokenString
                     
                 Case Else:
-                    SetError "Unexpected: " & token.Content, udtInstr.Line, udtInstr.Section
+                    SetError "Unexpected: " & token.content, udtInstr.Line, udtInstr.Section
                     Exit Function
                     
             End Select
@@ -1832,14 +1840,14 @@ Private Function ParseInstruction() As Boolean
     
     ' instruction can have multiple keywords like "lock rep"
     Do While token.TType = TokenKeyword
-        Select Case UCase$(token.Content)
+        Select Case UCase$(token.content)
             Case "REP":     udtInstr.flags = udtInstr.flags Or PrefixFlgRep
             Case "REPE":    udtInstr.flags = udtInstr.flags Or PrefixFlgRepe
             Case "REPZ":    udtInstr.flags = udtInstr.flags Or PrefixFlgRepz
             Case "REPNE":   udtInstr.flags = udtInstr.flags Or PrefixFlgRepne
             Case "REPNZ":   udtInstr.flags = udtInstr.flags Or PrefixFlgRepnz
             Case "LOCK":    udtInstr.flags = udtInstr.flags Or PrefixFlgLock
-            Case Else:      SetError "Unknown keyword: " & token.Content, token.Line, token.Section
+            Case Else:      SetError "Unknown keyword: " & token.content, token.Line, token.Section
                             Exit Function
         End Select
         
@@ -1849,7 +1857,7 @@ Private Function ParseInstruction() As Boolean
     If token.TType <> TokenOperator Then
         SetError "Operator expected", token.Line, token.Section
     Else
-        udtInstr.Mnemonic = token.Content
+        udtInstr.Mnemonic = token.content
         udtInstr.Line = token.Line
         udtInstr.Section = token.Section
         
@@ -1891,7 +1899,7 @@ Private Function ParseArguments(udtInstr As ASMInstruction) As Boolean
                 If Not ParseArgumentFPUReg(udtInstr, udtInstr.Args(lngArgs)) Then Exit Function
             Case TokenMMRegister:
                 If Not ParseArgumentMMReg(udtInstr, udtInstr.Args(lngArgs)) Then Exit Function
-            Case TokenSymbol:
+            Case tokensymbol:
                 If Not ParseArgumentSymbol(udtInstr, udtInstr.Args(lngArgs)) Then Exit Function
             Case TokenValue:
                 If Not ParseArgumentValue(udtInstr, udtInstr.Args(lngArgs)) Then Exit Function
@@ -1904,7 +1912,7 @@ Private Function ParseArguments(udtInstr As ASMInstruction) As Boolean
             Case TokenEndOfInstruction:
                 Exit Do
             Case Else:
-                SetError "Unexpected: " & token.Content, udtInstr.Line, udtInstr.Section
+                SetError "Unexpected: " & token.content, udtInstr.Line, udtInstr.Section
                 Exit Function
         End Select
         
@@ -1912,11 +1920,11 @@ Private Function ParseArguments(udtInstr As ASMInstruction) As Boolean
     Loop While Match(TokenSeparator) Or blnCont
     
     If lngPtrIdx > -1 Then
-        If udtInstr.Args(lngPtrIdx).size = BitsUnknown Then
+        If udtInstr.Args(lngPtrIdx).Size = BitsUnknown Then
             If lngArgs = 2 Then
-                If IsDefinite(udtInstr.Args(1 - lngPtrIdx).size) Or _
+                If IsDefinite(udtInstr.Args(1 - lngPtrIdx).Size) Or _
                    (udtInstr.Args(1 - lngPtrIdx).TType And ParamMM) Then
-                    udtInstr.Args(lngPtrIdx).size = udtInstr.Args(1 - lngPtrIdx).size
+                    udtInstr.Args(lngPtrIdx).Size = udtInstr.Args(1 - lngPtrIdx).Size
                 Else
                     SetError "Invalid pointer size", udtInstr.Line, udtInstr.Section
                     Exit Function
@@ -1949,10 +1957,10 @@ Private Function ParseArgumentValue( _
     arg.TType = ParamImm
     arg.Value = token.Value
     
-    If arg.size = BitsUnknown Then
-        arg.size = SizesForInt(token.Value)
+    If arg.Size = BitsUnknown Then
+        arg.Size = SizesForInt(token.Value)
     Else
-        If (arg.size And SizesForInt(token.Value)) = 0 Then
+        If (arg.Size And SizesForInt(token.Value)) = 0 Then
             SetError "Incompatible integer sizes", udtInstr.Line, udtInstr.Section
             Exit Function
         End If
@@ -1971,11 +1979,11 @@ Private Function ParseArgumentSymbol( _
     Dim lngLblIdx   As Long
     Dim blnExtern   As Boolean
     
-    lngLblIdx = GetLabelIndex(token.Content)
+    lngLblIdx = GetLabelIndex(token.content)
     If lngLblIdx = -1 Then
-        lngLblIdx = GetExternIndex(token.Content)
+        lngLblIdx = GetExternIndex(token.content)
         If lngLblIdx = -1 Then
-            SetError "Unknown label: " & token.Content, udtInstr.Line, udtInstr.Section
+            SetError "Unknown label: " & token.content, udtInstr.Line, udtInstr.Section
             Exit Function
         Else
             blnExtern = True
@@ -1985,7 +1993,7 @@ Private Function ParseArgumentSymbol( _
     If blnExtern Then
         arg.TType = ParamMem Or ParamExt
         arg.SymbolIndex = lngLblIdx
-        arg.size = Bits32
+        arg.Size = Bits32
         
         arg.Pointer.HasDisplacement = True
         arg.Pointer.Ptr.DispSize = Bits32
@@ -1994,12 +2002,12 @@ Private Function ParseArgumentSymbol( _
         arg.TType = ParamRel
         arg.SymbolIndex = lngLblIdx
         
-        If arg.size = BitsUnknown Then
-            arg.size = Bits32 Or Bits16 Or Bits8
+        If arg.Size = BitsUnknown Then
+            arg.Size = Bits32 Or Bits16 Or Bits8
         End If
     End If
     
-    Match TokenSymbol
+    Match tokensymbol
     ParseArgumentSymbol = True
 End Function
 
@@ -2010,18 +2018,18 @@ Private Function ParseArgumentMMReg( _
 ) As Boolean
 
     arg.TType = ParamMM
-    arg.MMRegister = MMRegStrToNum(token.Content)
+    arg.MMRegister = MMRegStrToNum(token.content)
     
-    If arg.size <> BitsUnknown Then
-        If (arg.size And (Bits32 Or Bits64 Or Bits80 Or Bits128)) = 0 Then
+    If arg.Size <> BitsUnknown Then
+        If (arg.Size And (Bits32 Or Bits64 Or Bits80 Or Bits128)) = 0 Then
             SetError "Incompatible sizes", udtInstr.Line, udtInstr.Section
             Exit Function
         End If
     Else
         If (arg.MMRegister < XMM0) Then
-            arg.size = Bits64
+            arg.Size = Bits64
         Else
-            arg.size = Bits128
+            arg.Size = Bits128
         End If
     End If
     
@@ -2036,15 +2044,15 @@ Private Function ParseArgumentFPUReg( _
 ) As Boolean
 
     arg.TType = ParamSTX
-    arg.FPURegister = FPURegStrToNum(token.Content)
+    arg.FPURegister = FPURegStrToNum(token.content)
     
-    If arg.size <> BitsUnknown Then
-        If (arg.size And (Bits32 Or Bits64 Or Bits80)) = 0 Then
+    If arg.Size <> BitsUnknown Then
+        If (arg.Size And (Bits32 Or Bits64 Or Bits80)) = 0 Then
             SetError "Incompatible sizes", udtInstr.Line, udtInstr.Section
             Exit Function
         End If
     Else
-        arg.size = Bits32 Or Bits64 Or Bits80
+        arg.Size = Bits32 Or Bits64 Or Bits80
     End If
     
     Match TokenFPUReg
@@ -2058,15 +2066,15 @@ Private Function ParseArgumentRegister( _
 ) As Boolean
 
     arg.TType = ParamReg
-    arg.Register = RegStrToReg(token.Content)
+    arg.Register = RegStrToReg(token.content)
     
-    If arg.size <> BitsUnknown Then
-        If arg.size <> RegisterSize(arg.Register) Then
+    If arg.Size <> BitsUnknown Then
+        If arg.Size <> RegisterSize(arg.Register) Then
             SetError "Incompatible sizes", udtInstr.Line, udtInstr.Section
             Exit Function
         End If
     Else
-        arg.size = RegisterSize(arg.Register)
+        arg.Size = RegisterSize(arg.Register)
     End If
     
     Match TokenRegister
@@ -2080,14 +2088,14 @@ Private Function ParseKeywords( _
     argidx As Long _
 ) As Boolean
 
-    Select Case UCase$(token.Content)
-        Case "BYTE":                udtInstr.Args(argidx).size = Bits8
-        Case "WORD":                udtInstr.Args(argidx).size = Bits16
-        Case "DWORD", "FLOAT":      udtInstr.Args(argidx).size = Bits32
-        Case "QWORD", "DOUBLE":     udtInstr.Args(argidx).size = Bits64
-        Case "EXTENDED":            udtInstr.Args(argidx).size = Bits80
-        Case "DQWORD":              udtInstr.Args(argidx).size = Bits128
-        Case Else:                  SetError "At this position invalid: " & token.Content, udtInstr.Line, udtInstr.Section
+    Select Case UCase$(token.content)
+        Case "BYTE":                udtInstr.Args(argidx).Size = Bits8
+        Case "WORD":                udtInstr.Args(argidx).Size = Bits16
+        Case "DWORD", "FLOAT":      udtInstr.Args(argidx).Size = Bits32
+        Case "QWORD", "DOUBLE":     udtInstr.Args(argidx).Size = Bits64
+        Case "EXTENDED":            udtInstr.Args(argidx).Size = Bits80
+        Case "DQWORD":              udtInstr.Args(argidx).Size = Bits128
+        Case Else:                  SetError "At this position invalid: " & token.content, udtInstr.Line, udtInstr.Section
                                     Exit Function
     End Select
     
@@ -2158,12 +2166,12 @@ Private Function ValidateExpr( _
                         Exit Function
                     End If
                     
-                    If RegStrToReg(token.Content) < RegEAX Then
+                    If RegStrToReg(token.content) < RegEAX Then
                         SetError "Only 32 bit registers allowed in pointer", udtInstr.Line, udtInstr.Section
                         Exit Function
                     End If
                     
-                    lngReg = RegToIdx(RegStrToReg(token.Content))
+                    lngReg = RegToIdx(RegStrToReg(token.content))
                     blnHasRegister = True
                     Match TokenRegister
                 
@@ -2171,23 +2179,23 @@ Private Function ValidateExpr( _
                     lngTms = lngTms * token.Value
                     Match TokenValue
                 
-                Case TokenSymbol:
+                Case tokensymbol:
                     If blnHasRegister Then
                         SetError "Register*Label not possible", udtInstr.Line, udtInstr.Section
                         Exit Function
                     End If
                     
-                    If GetLabelIndex(token.Content) = -1 Then
-                        SetError "Unknown symbol: " & token.Content, udtInstr.Line, udtInstr.Section
+                    If GetLabelIndex(token.content) = -1 Then
+                        SetError "Unknown symbol: " & token.content, udtInstr.Line, udtInstr.Section
                         Exit Function
                     End If
                                         
                     blnHasSymbol = True
                     blnHasSymbols = True
-                    Match TokenSymbol
+                    Match tokensymbol
                 
                 Case Else:
-                    SetError "Invalid in pointer: " & token.Content, udtInstr.Line, udtInstr.Section
+                    SetError "Invalid in pointer: " & token.content, udtInstr.Line, udtInstr.Section
                     Exit Function
                     
             End Select
@@ -2280,7 +2288,7 @@ Private Function ParseSegmentReg(udtInstr As ASMInstruction) As Boolean
     If udtInstr.Segment <> SegUnknown Then
         SetError "Only one segment override per instruction", udtInstr.Line, udtInstr.Section
     Else
-        udtInstr.Segment = SegStrToSeg(token.Content)
+        udtInstr.Segment = SegStrToSeg(token.content)
         Match TokenSegmentReg
      
         If Match(TokenOpColon) Then
@@ -2425,14 +2433,14 @@ Private Function EvenSize(ByVal SZ As Long) As Long
     EvenSize = SZ + (SZ Mod 2)
 End Function
 Public Property Get OutputStrBytes() As String
-    Dim size    As Long
-    size = m_lngOutSize
-    If size Mod 2 = 1 Then
-        OutputStrBytes = StrConv(space$(size), vbFromUnicode)
+    Dim Size    As Long
+    Size = m_lngOutSize
+    If Size Mod 2 = 1 Then
+        OutputStrBytes = StrConv(space$(Size), vbFromUnicode)
     Else
-        OutputStrBytes = space$(size \ 2)
+        OutputStrBytes = space$(Size \ 2)
     End If
-    CopyMemory StrPtr(OutputStrBytes), m_btOutput(0), size
+    CopyMemory StrPtr(OutputStrBytes), m_btOutput(0), Size
 End Property
 
 ' hex string to byte array
@@ -2594,6 +2602,7 @@ End Sub
 
 Private Sub ScannerGetNextToken()
     Dim clsToken    As ASMToken
+    Dim i As Long
     
     Set clsToken = New ASMToken
     Set m_udtScanner.CurToken = m_udtScanner.NextToken
@@ -2643,59 +2652,112 @@ Private Sub ScannerGetNextToken()
                             
                     Case CHAR_SEPARATOR:
                         clsToken.TType = TokenSeparator
-                        clsToken.Content = ","
+                        clsToken.content = ","
                         
                     Case CHAR_COLON:
                         clsToken.TType = TokenOpColon
-                        clsToken.Content = ":"
+                        clsToken.content = ":"
                         
                     Case CHAR_PLUS:
                         clsToken.TType = TokenOpAdd
-                        clsToken.Content = "+"
+                        clsToken.content = "+"
                     
                     Case CHAR_MINUS:
                         clsToken.TType = TokenOpSub
-                        clsToken.Content = "-"
+                        clsToken.content = "-"
                     
                     Case CHAR_ASTERISK:
                         clsToken.TType = TokenOpMul
-                        clsToken.Content = "*"
+                        clsToken.content = "*"
                     
                     Case CHAR_BRACKET_L:
                         clsToken.TType = TokenBracketLeft
-                        clsToken.Content = "["
+                        clsToken.content = "["
                     
                     Case CHAR_BRACKET_R:
                         clsToken.TType = TokenBracketRight
-                        clsToken.Content = "]"
+                        clsToken.content = "]"
                     
                     Case CHAR_NUMBER_0 To CHAR_NUMBER_9:
-                        Do
-                            clsToken.Content = clsToken.Content & ChrW$(.Source(.Position))
-                            .Position = .Position + 1
-                        Loop While IsDigit(.Source(.Position))
-                        
+                        Select Case ChrW$(.Source(.Position + 1))
+                            Case "x", "X", "χ", "Χ"
+                                clsToken.content = "**"
+                                .Position = .Position + 2
+                        End Select
+                        If clsToken.content = "**" Then
+                            
+                            If Not IsHexChar(.Source(.Position)) Then
+                            clsToken.TType = tokensymbol
+                            GoTo cont1231
+                            End If
+                            clsToken.content = "&H"
+                            Do
+                                If .Source(.Position) <> 95 Then
+                                
+                                clsToken.content = clsToken.content & ChrW$(.Source(.Position))
+                                End If
+                                .Position = .Position + 1
+                            Loop While IsHexChar(.Source(.Position)) Or .Source(.Position) = 95
+                           
+                        Else
+                            Do
+                                If .Source(.Position) <> 95 Then
+                                    clsToken.content = clsToken.content & ChrW$(.Source(.Position))
+                                End If
+                                .Position = .Position + 1
+                            Loop While IsDigit(.Source(.Position)) Or .Source(.Position) = 95
+                        End If
+                        If .Source(.Position) <> CHAR_AMPERSAND Then
+                            .Position = .Position - 1
+                        End If
                         clsToken.TType = TokenValue
-                        .Position = .Position - 1
-                        
+cont1231:
                     Case CHAR_AMPERSAND:
                         Select Case ChrW$(.Source(.Position + 1))
                         
-                            Case "H", "O":
-                                clsToken.Content = "&"
-                                .Position = .Position + 1
-                                
-                                Do
-                                    clsToken.Content = clsToken.Content & ChrW$(.Source(.Position))
-                                    .Position = .Position + 1
-                                Loop While IsHexChar(.Source(.Position))
-                                
+                            Case "O", "o"
+                                clsToken.content = ""
+                                .Position = .Position + 2
+                                If IsOctChar(.Source(.Position)) Then
+                                    Do
+                                        If .Source(.Position) <> 95 Then
+                                        
+                                        clsToken.content = clsToken.content & ChrW$(.Source(.Position))
+                                        End If
+                                        .Position = .Position + 1
+                                    Loop While IsOctChar(.Source(.Position)) Or .Source(.Position) = 95
+                                    If .Source(.Position) <> CHAR_AMPERSAND Then
+                                        .Position = .Position - 1
+                                    End If
+                    
+                                    clsToken.content = "&H" + PACKLNG$(val("&O" + clsToken.content))
                                 clsToken.TType = TokenValue
-                                .Position = .Position - 1
+                                Else
+                                    clsToken.TType = TokenInvalid
+                                    clsToken.content = "&"
+                                End If
                                 
+                            Case "H", "h":
+                                clsToken.content = "&H"
+                                .Position = .Position + 2
+                                If IsHexChar(.Source(.Position)) Then
+                                    Do
+                                        If .Source(.Position) <> 95 Then
+                                            clsToken.content = clsToken.content & ChrW$(.Source(.Position))
+                                        End If
+                                        .Position = .Position + 1
+                                    Loop While IsHexChar(.Source(.Position)) Or .Source(.Position) = 95
+                                    If .Source(.Position) <> CHAR_AMPERSAND Then
+                                        .Position = .Position - 1
+                                    End If
+                                    clsToken.TType = TokenValue
+                                Else
+                                    clsToken.TType = TokenInvalid
+                                    clsToken.content = "&"
+                                End If
                             Case Else:
                                 clsToken.TType = TokenInvalid
-                                clsToken.Content = "&"
+                                clsToken.content = "&"
                                 
                         End Select
                         
@@ -2705,39 +2767,39 @@ Private Sub ScannerGetNextToken()
                                  .Source(.Position) <> CHAR_CARRIAGE And _
                                  .Source(.Position) <> CHAR_LINEFEED
                         
-                            clsToken.Content = clsToken.Content & ChrW$(.Source(.Position))
+                            clsToken.content = clsToken.content & ChrW$(.Source(.Position))
                             .Position = .Position + 1
                         Loop
                         clsToken.TType = TokenString
                         
                     Case CHAR_ALPHA_UA To CHAR_ALPHA_UZ, CHAR_ALPHA_LA To CHAR_ALPHA_LZ:
                         Do
-                            clsToken.Content = clsToken.Content & ChrW$(.Source(.Position))
+                            clsToken.content = clsToken.content & ChrW$(.Source(.Position))
                             .Position = .Position + 1
                         Loop While IsAlphaNumeric(.Source(.Position))
                         
-                        If IsRegister(clsToken.Content) Then
+                        If IsRegister(clsToken.content) Then
                             clsToken.TType = TokenRegister
-                        ElseIf IsSegmentReg(clsToken.Content) Then
+                        ElseIf IsSegmentReg(clsToken.content) Then
                             clsToken.TType = TokenSegmentReg
-                        ElseIf IsFPUReg(clsToken.Content) Then
+                        ElseIf IsFPUReg(clsToken.content) Then
                             clsToken.TType = TokenFPUReg
-                        ElseIf IsKeyword(clsToken.Content) Then
+                        ElseIf IsKeyword(clsToken.content) Then
                             clsToken.TType = TokenKeyword
-                        ElseIf IsRawDataOp(clsToken.Content) Then
+                        ElseIf IsRawDataOp(clsToken.content) Then
                             clsToken.TType = TokenRawData
-                        ElseIf IsMMReg(clsToken.Content) Then
+                        ElseIf IsMMReg(clsToken.content) Then
                             clsToken.TType = TokenMMRegister
-                        ElseIf StrComp(clsToken.Content, "extern", vbTextCompare) = 0 Then
+                        ElseIf StrComp(clsToken.content, "extern", vbTextCompare) = 0 Then
                             clsToken.TType = TokenExtern
                             
                         Else
-                            Dim i As Long
-                            If GetlocalVar(clsToken.Content, i) Then
-                                clsToken.Content = Trim(str$(CLng(var(i))))
+                            
+                            If GetlocalVar(clsToken.content, i) Then
+                                clsToken.content = Trim(str$(CLng(var(i))))
                                 clsToken.TType = TokenValue
                             Else
-                                clsToken.TType = TokenSymbol
+                                clsToken.TType = tokensymbol
                             End If
                          
                         End If
@@ -2746,7 +2808,7 @@ Private Sub ScannerGetNextToken()
                         
                     Case Else:
                         clsToken.TType = TokenInvalid
-                        clsToken.Content = ChrW$(.Source(.Position))
+                        clsToken.content = ChrW$(.Source(.Position))
                         
                 End Select
                 
@@ -2754,7 +2816,7 @@ Private Sub ScannerGetNextToken()
                     .LastWasEOI = True
                 Else
                     If clsToken.TType <> TokenKeyword And _
-                       clsToken.TType <> TokenSymbol And _
+                       clsToken.TType <> tokensymbol And _
                        .Source(.Position) <> CHAR_SPACE Then
                         .LastWasEOI = False
                     End If
@@ -2781,11 +2843,11 @@ Private Sub ScannerGetNextToken()
     With clsToken
         If .TType = TokenOpColon Then
             If m_udtScanner.CurToken.TType = TokenOperator Then
-                m_udtScanner.CurToken.TType = TokenSymbol
+                m_udtScanner.CurToken.TType = tokensymbol
                 m_udtScanner.NextIsEOI = True
                 m_udtScanner.LastWasEOI = False
             End If
-        ElseIf .TType = TokenSymbol Then
+        ElseIf .TType = tokensymbol Then
             If m_udtScanner.CurToken.TType = TokenEndOfInstruction Or _
                m_udtScanner.CurToken.TType = TokenBeginOfInput Or _
                m_udtScanner.LastWasEOI Then
@@ -2794,14 +2856,14 @@ Private Sub ScannerGetNextToken()
             End If
         ElseIf .TType = TokenValue Then
             On Error Resume Next
-            .Value = CLng(.Content)
+            .Value = CLng(.content)
             If Err Then .TType = TokenInvalid
             On Error GoTo 0
         End If
 
         .Line = m_udtScanner.Line
         .Section = m_udtScanner.Section
-        .Position = (m_udtScanner.Position - Len(.Content)) - m_udtScanner.LinePos + 1
+        .Position = (m_udtScanner.Position - Len(.content)) - m_udtScanner.LinePos + 1
     End With
 
     Set m_udtScanner.NextToken = clsToken
@@ -2811,7 +2873,9 @@ End Sub
 Private Function IsDigit(ByVal bt As Byte) As Boolean
     IsDigit = (bt >= CHAR_NUMBER_0) And (bt <= CHAR_NUMBER_9)
 End Function
-
+Private Function IsOctChar(ByVal bt As Byte) As Boolean
+    IsOctChar = (bt >= CHAR_NUMBER_0) And (bt <= CHAR_NUMBER_7)
+End Function
 
 Private Function IsHexChar(ByVal bt As Byte) As Boolean
     IsHexChar = ((bt >= CHAR_NUMBER_0) And (bt <= CHAR_NUMBER_9)) Or _

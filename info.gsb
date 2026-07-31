@@ -4984,6 +4984,7 @@ MODULE MEDITOR {\\ notepad for M2000 programs (gsb files)
 \\ Use F1 in editor to change to no wrap<->wrap
 Clear \\ Clear all variables/objects
 Global aLL$
+Boolean DesktopInf
 Document aLL$
 if exist(appdir$+"help2000utf8.dat") then
 	Global aa, bb, where, no_par
@@ -5104,6 +5105,7 @@ For This {
 	const mi$="MenuItem"  \\ is a temporary variable only for For This Block
 	const mr$="MenuRadio"
 	Method File1, mi$,"Open",true, acc:="O", ctrl:=true
+	Method File1, mi$,"Open Desktop.inf",true, acc:="D", ctrl:=true
 	Method File1, mi$,"Save",true, acc:="S", ctrl:=true
 	Method File1, mi$,""    \\  only  a line here
 	Method File1, mi$,"Close",true, acc:="C", alt:=true
@@ -5256,7 +5258,7 @@ Function InformNow {
 Function NotePad.Unload(New &Ok) {
 	If LoadState Then Quit=true : Call Local InformNow("Quit Loading..") : Exit
 	If Pad.Text$<>BackUp$ Then
-		After 50 {Call Local File1.DblClick(4)}
+		After 50 {Call Local File1.DblClick(5)}
 		Ok=True
 	End If
 }
@@ -5328,7 +5330,7 @@ Function Pad.KeyDown {
 	If kc=116 and shf=2 Then
 		kc=0 : shf=0
 		After 20{
-			Call Local Run1.DblClick(0)
+			if not DesktopInf then Call Local Run1.DblClick(0)
 		}
 	else.if kc=70 and shf=2 then
 		kc=112
@@ -5417,6 +5419,15 @@ Function Edit1.OpenMenu {
 	Edit1.Selected(14)=WWWlink
 	
 }
+Function Run1.OpenMenu {
+	Run1=>MenuEnabled(0)=not DesktopInf
+	Run1=>MenuEnabled(2)=not DesktopInf
+	if DesktopInf then 
+		Run1=>List(3)="Run M2000"
+	else
+		Run1=>List(3)="Test Normal"
+	end if
+}
 \\ We can check in checkboxes and radiobutton withou closing the menu
 \\ if we click on checks - (not on names)
 \\ here we use If Else.If Else End If
@@ -5486,7 +5497,7 @@ UseShow$={
 Function Run1.DblClick {
 	Read New Run1index
 	if Run1index=1 then
-		exit
+		exit   
 	else.if Run1index=5 then
 		Clear TestFile$
 		Prototype {
@@ -5511,6 +5522,19 @@ Function Run1.DblClick {
 	       dir ? "*","Documents Folder"
 	       docFolder$=dir$
 	       dir olddir$
+	else.if DesktopInf then
+		if Pad.Text$=BackUp$ then
+			beep
+			Win appdir$+"m2000.exe"
+		else
+			After 50 {
+			call local File1.DblClick(2)
+			if Pad.Text$=BackUp$ then
+				beep
+				Win appdir$+"m2000.exe"
+			end if
+			}
+		end if
 	else.If ask(if$(Run1index=0->"Module to run","Command(s) to execute"	+UseShow$),,,,,mod2run$)=1 Then
 		Read mod2run$
 		Clear TestFile$
@@ -5521,7 +5545,6 @@ Function Run1.DblClick {
 		TestFile$="Script TestThis :"+If$(Run1index=0->"Test ","")+mod2run$+": Push Key$: Drop: End"
 		Save.Doc TestFile$, "Test1234.gsb"
 		Win appdir$+"m2000.exe", dir$+"Test1234.gsb"
-
 	End If
 }
 
@@ -5555,9 +5578,57 @@ Function File1.DblClick {
 	\\ Because we want some jumps..we use  On Goto
 	\\ on Goto need here a block
 	{
-		On File1index Goto Open1, Save1, ExitNow, Save2, Unload
-Exitnow:
+		On File1index Goto Open1, OpenDesktop, Save1, ExitNow, Save2, Unload
+ExitNow:
 		Exit
+OpenDesktop:
+		If Pad.Text$<>BackUp$ Then {
+			If ask("Save Changes first?",Title$)=1 Then Goto Save1
+		}
+		DesktopInf=true
+		dir user
+		filename$=dir$+"Desktop.inf"
+		Clear BackUp$
+		if exist(filename$) then
+			Clear LoadFile$
+			layer NotePad {
+				Load.Doc LoadFile$, filename$
+			}			
+			Caption$=TitleStr$(File.Name$(Filename$)) +" - M2000 Pad"
+			BackUp$=LoadFile$
+			Clear LoadFile$
+			Pad.Text$=BackUp$
+		else
+			if greek then		
+				Prototype {Ελληνικά
+					Γραμματοσειρά "Courier new"
+					Φόρμα 136, 36 ' για 1920X1080 - 42 γραμμές χωρίς διάστημα στις γραμμές.
+					Περιθώριο {Οθόνη #002200,0}
+					Φορμα;   ' πλήρη οθόνη (αν δεν ήταν)
+					Φαρδιά 0
+					Οθόνη #003300, 0 '#226611,0
+					Πένα #ccffdd 
+					Διακόπτες "+NBS"
+					Συγγραφή !4  ' 4 κενά το TAB
+					Αναφορά 1, "Γεια χαρά!"
+					} as DektopCode$
+			else
+				Prototype {English
+					Font "Courier new"
+					Form 136, 36 ' for 1920X1080 .
+					Back {Cls #002200,0}
+					Form;   'full screen
+					Bold  0
+					Cls #003300, 0 ' paperr color
+					Pen  #ccffdd 
+					Switches "+NBS"
+					Edit !4  ' 4 em chars for TAB
+					Report 1, "Hello;"
+					} as DektopCode$
+			end if
+			Pad.Text$=DektopCode$
+			end if
+		exit
 Open1:
 		If Pad.Text$<>BackUp$ Then {
 			If ask("Save Changes first?",Title$)=1 Then Goto Save1
@@ -5587,6 +5658,7 @@ Open1:
 					dir file.path$(Filename$)
 					If not quit Then 
 						Caption$=TitleStr$(File.Name$(Filename$)) +" - M2000 Pad"
+						DesktopInf=false
 						Clear Backup$
 						BackUp$=LoadFile$
 						Clear LoadFile$
@@ -5608,16 +5680,23 @@ Open1:
 		End If
 		Exit
 Save1:
-		Layer NotePad {
-			try ok {
-				Save.As Filename$,"**","Save M2000 File","gsb"
+		if not DesktopInf then
+			Layer NotePad {
+				try ok {
+					Save.As Filename$,"**","Save M2000 File","gsb"
+				}
+				If not ok Then Push "" : Dir User
 			}
-			If not ok Then Push "" : Dir User
-		}
-		If not cont2 Then Method Pad,"GetFocus"
-		Read f$
-		If f$="" Then Exit 
-		If lcase$(file.type$(f$))<>"gsb" Then f$=f$+".gsb"
+			If not cont2 Then Method Pad,"GetFocus"
+			Read f$
+			If f$="" Then Exit 		
+			If lcase$(file.type$(f$))<>"gsb" Then f$=f$+".gsb"
+		else
+//				test   '  - do test for this test
+			dir user			
+			f$=dir$+File.Name$(Filename$)
+		end if
+		
 		If Exist(f$) Then  If Ask(nl$+"Overwrite"+nl$+f$,Title$)<>1 Then Exit
 		Try ok {
 			Clear BackUp$
@@ -5634,6 +5713,7 @@ Save2:
 		If Pad.Text$<>BackUp$ Then {
 			If ask("Save Changes?",Title$,"*SAVE", "CANCEL")=1 Then Goto Save1
 		}
+		DesktopInf=false
 		Clear BackUp$
 		Pad.Text$=""
 		If Cont2 Then
@@ -5726,6 +5806,7 @@ Call Local Notepad.Resize()
 With Pad,"Default",True
 \\ open as modal
 With NotePad,  "Blink", 50, "BlinkTimes", 20
+	
 Method NotePad,"Show", 1
 Declare Pad Nothing
 Declare NotePad Nothing 
@@ -17704,7 +17785,6 @@ Sub Press()
 End Sub
 }
 MODULE CLOCK {Αν Έγκυρο(ok) Αλλιως Πληκτρολόγιο "Clock1"+χαρ$(13) : Έξοδος
-Όρισε  ShowWindow απο "User32.ShowWindow" {Μακρυς a, Μακρυς cmd}
 Όρισε Μ Μοναδικό      ' Declare m Mutex  : Methos m, "Create", "onename" return error if can't created with ownership
 \\ we can create more than one mutexs in the m, using create
 \\ so now this run only one time for the user. The second time the mutex exist so exit the program early.

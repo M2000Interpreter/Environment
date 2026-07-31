@@ -90,7 +90,7 @@ Public Enum TokenType
     TokenOperator
     TokenKeyword
     TokenValue
-    TokenSymbol
+    tokensymbol
     TokenFPUReg
     TokenSegmentReg
     TokenRegister
@@ -224,7 +224,7 @@ End Type
 ' or a numerical value. In this case it mustn't be assembled!
 Public Type InstructionParam
     PType                           As ParamType
-    size                            As ParamSize
+    Size                            As ParamSize
     Register                        As ASMRegisters
     FPURegister                     As ASMFPURegisters
     MMRegister                      As ASMXMMRegisters
@@ -1561,17 +1561,17 @@ Private Function ParseParameter(param As String) As InstructionParam
     With ParseParameter
         If IsRegister(param) Then
             .Register = RegStrToReg(param)
-            .size = RegisterSize(.Register)
+            .Size = RegisterSize(.Register)
             .PType = ParamReg
             .Forced = True
         ElseIf IsNumeric(param) Then
             .Value = CLng(param)
-            .size = GetFirstSetBit(SizesForInt(.Value))
+            .Size = GetFirstSetBit(SizesForInt(.Value))
             .PType = ParamImm
             .Forced = True
         ElseIf IsFPUReg(param) Then
             .FPURegister = FPURegStrToNum(param)
-            .size = Bits32 Or Bits64 Or Bits80
+            .Size = Bits32 Or Bits64 Or Bits80
             .PType = ParamSTX
             .Forced = True
         Else
@@ -1583,9 +1583,9 @@ Private Function ParseParameter(param As String) As InstructionParam
                     .PType = .PType Or ParamMem
                 Else
                     If (.MMRegister And MM0) Then
-                        .size = Bits64
+                        .Size = Bits64
                     Else
-                        .size = Bits128
+                        .Size = Bits128
                     End If
                 End If
             Else
@@ -1599,15 +1599,15 @@ Private Function ParseParameter(param As String) As InstructionParam
             End If
             
             Select Case Right$(param, 2)
-                Case "08":  .size = Bits8
-                Case "16":  .size = Bits16
-                Case "32":  .size = Bits32
-                Case "64":  .size = Bits64
-                Case "80":  .size = Bits80
+                Case "08":  .Size = Bits8
+                Case "16":  .Size = Bits16
+                Case "32":  .Size = Bits32
+                Case "64":  .Size = Bits64
+                Case "80":  .Size = Bits80
             End Select
             
             Select Case Right$(param, 3)
-                Case "128": .size = Bits128
+                Case "128": .Size = Bits128
             End Select
         End If
     End With
@@ -1784,57 +1784,57 @@ Public Function ConditionOffset(cc As String) As Long
 End Function
 
 
-Public Function GetRegExtRegName(ByVal Offset As Long, ByVal size As ParamSize) As String
-    Select Case size
+Public Function GetRegExtRegName(ByVal Offset As Long, ByVal Size As ParamSize) As String
+    Select Case Size
         Case Bits8, Bits16, Bits32:
         Case Else:  Err.Raise 123456, , "GetRegExtRegName: invalid size"
     End Select
     
     Select Case Offset
         Case 0:
-            Select Case size
+            Select Case Size
                 Case Bits8:     GetRegExtRegName = "AL"
                 Case Bits16:    GetRegExtRegName = "AX"
                 Case Bits32:    GetRegExtRegName = "EAX"
             End Select
         Case 1:
-            Select Case size
+            Select Case Size
                 Case Bits8:     GetRegExtRegName = "CL"
                 Case Bits16:    GetRegExtRegName = "CX"
                 Case Bits32:    GetRegExtRegName = "ECX"
             End Select
         Case 2:
-            Select Case size
+            Select Case Size
                 Case Bits8:     GetRegExtRegName = "DL"
                 Case Bits16:    GetRegExtRegName = "DX"
                 Case Bits32:    GetRegExtRegName = "EDX"
             End Select
         Case 3:
-            Select Case size
+            Select Case Size
                 Case Bits8:     GetRegExtRegName = "BL"
                 Case Bits16:    GetRegExtRegName = "BX"
                 Case Bits32:    GetRegExtRegName = "EBX"
             End Select
         Case 4:
-            Select Case size
+            Select Case Size
                 Case Bits8:     GetRegExtRegName = "AH"
                 Case Bits16:    GetRegExtRegName = "SP"
                 Case Bits32:    GetRegExtRegName = "ESP"
             End Select
         Case 5:
-            Select Case size
+            Select Case Size
                 Case Bits8:     GetRegExtRegName = "CH"
                 Case Bits16:    GetRegExtRegName = "BP"
                 Case Bits32:    GetRegExtRegName = "EBP"
             End Select
         Case 6:
-            Select Case size
+            Select Case Size
                 Case Bits8:     GetRegExtRegName = "DH"
                 Case Bits16:    GetRegExtRegName = "SI"
                 Case Bits32:    GetRegExtRegName = "ESI"
             End Select
         Case 7:
-            Select Case size
+            Select Case Size
                 Case Bits8:     GetRegExtRegName = "BH"
                 Case Bits16:    GetRegExtRegName = "DI"
                 Case Bits32:    GetRegExtRegName = "EDI"
@@ -2066,7 +2066,7 @@ Public Function GetTokenName(ByVal tk As TokenType) As String
         Case TokenSegmentReg:       GetTokenName = "SegmentReg"
         Case TokenFPUReg:           GetTokenName = "FPUReg"
         Case TokenSeparator:        GetTokenName = "Separator"
-        Case TokenSymbol:           GetTokenName = "Symbol"
+        Case tokensymbol:           GetTokenName = "Symbol"
         Case TokenUnknown:          GetTokenName = "Unknown"
         Case TokenValue:            GetTokenName = "Value"
         Case TokenMMRegister:       GetTokenName = "MMReg"
@@ -2076,19 +2076,18 @@ End Function
 
 Public Function PreProcessAsm(ByVal strASM As String) As String
     Dim strLines()  As String
-    Dim strParts()  As String
     Dim strOutput   As String
     Dim strID       As String
-    Dim strSymb()   As String
-    Dim strCnt()    As String
-    Dim lngSymbCnt  As Long
+    Dim prep As New FastCollection
+    Dim final As New Document
     Dim i           As Long
-    Dim j           As Long
+    Dim j           As Long, j1 As Long
     Dim k           As Long
     Dim blnInQt     As Boolean
     Dim lngWordCnt  As Long
     Dim blnInWS     As Boolean
     Dim blnIsEQU    As Boolean
+    prep.UcaseKeys = True
     
     strLines = Split(strASM, vbCrLf)
     
@@ -2097,18 +2096,25 @@ Public Function PreProcessAsm(ByVal strASM As String) As String
         blnInWS = False
         blnIsEQU = False
         lngWordCnt = 0
-        
-        For j = 1 To Len(strLines(i)) - 3
+        For j1 = 1 To Len(strLines(i))
+                Select Case AscW(Mid$(strLines(i), j1, 1))
+                Case 9, 32, 160
+                strOutput = strOutput & Mid$(strLines(i), j1, 1)
+                Case Else
+                Exit For
+            End Select
+        Next
+        For j = j1 To Len(strLines(i)) - 2
             If Mid$(strLines(i), j, 1) = """" Then
                 blnInQt = Not blnInQt
             Else
                 If Not blnInQt Then
                     If UCase$(Mid$(strLines(i), j, 3)) = "EQU" Then
-                        ReDim Preserve strSymb(lngSymbCnt)
-                        ReDim Preserve strCnt(lngSymbCnt)
-                        strSymb(lngSymbCnt) = Trim$(Left$(strLines(i), j - 1))
-                        strCnt(lngSymbCnt) = Trim$(Mid$(strLines(i), j + 3))
-                        lngSymbCnt = lngSymbCnt + 1
+                        If prep.ExistKey(Trim$(Left$(strLines(i), j - 1))) Then
+                            prep.Value = Trim$(Mid$(strLines(i), j + 3))
+                        Else
+                            prep.AddKey Trim$(Left$(strLines(i), j - 1)), Trim$(Mid$(strLines(i), j + 3))
+                        End If
                         blnIsEQU = True
                         Exit For
                     ElseIf Mid$(strLines(i), j, 1) = " " Then
@@ -2122,29 +2128,24 @@ Public Function PreProcessAsm(ByVal strASM As String) As String
                 End If
             End If
             If lngWordCnt > 1 Then Exit For
-            DoEvents
         Next
         
         If Not blnIsEQU Then
-            For j = 1 To Len(strLines(i))
+            '  DROP SPACES FIRST
+
+            For j = j1 To Len(strLines(i))
                 Select Case Mid$(strLines(i), j, 1)
                     Case "A" To "Z", "a" To "z":
                         strID = ""
                         Do
                             strID = strID & Mid$(strLines(i), j, 1)
                             j = j + 1
-                            DoEvents
                         Loop While Mid$(strLines(i), j, 1) Like "[a-zA-Z0-9_]"
                         j = j - 1
                         
-                        For k = 0 To lngSymbCnt - 1
-                            If StrComp(strSymb(k), strID, vbTextCompare) = 0 Then
-                                strOutput = strOutput & strCnt(k)
-                                Exit For
-                            End If
-                        Next
-                        
-                        If k = lngSymbCnt Then
+                        If prep.ExistKey(strID) Then
+                            strOutput = strOutput & prep.Value
+                        Else
                             strOutput = strOutput & strID
                         End If
                         
@@ -2153,7 +2154,7 @@ Public Function PreProcessAsm(ByVal strASM As String) As String
                         Do
                             strID = strID & Mid$(strLines(i), j, 1)
                             j = j + 1
-                            DoEvents
+                           ' DoEvents
                         Loop While Mid$(strLines(i), j, 1) Like "[0-9]"
                         j = j - 1
                         
@@ -2164,7 +2165,7 @@ Public Function PreProcessAsm(ByVal strASM As String) As String
                         Do
                             j = j + 1
                             strID = strID & Mid$(strLines(i), j, 1)
-                            DoEvents
+                           ' DoEvents
                         Loop While Mid$(strLines(i), j, 1) <> """"
                         
                         strOutput = strOutput & strID
@@ -2181,12 +2182,11 @@ Public Function PreProcessAsm(ByVal strASM As String) As String
                         strOutput = strOutput & Mid$(strLines(i), j, 1)
                         
                 End Select
-                DoEvents
             Next
-            strOutput = strOutput & vbCrLf
+            final.AppendParagraph strOutput
+            strOutput = vbNullString
         End If
-        DoEvents
     Next
     
-    PreProcessAsm = strOutput
+    PreProcessAsm = final.textDoc
 End Function

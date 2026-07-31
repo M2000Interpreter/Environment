@@ -3717,8 +3717,9 @@ End If
         If X.Name = "GuiM2000" Then
             Set XX = X
             If XX.Enablecontrol Then
-                If XX.Modal = 0 Then XX.Modal = mycode
+                If XX.Modal = 0 Then XX.Modal = mycode Else XX.Tag = str(mycode)
                 XX.Enablecontrol = False
+            
             End If
         End If
         Set XX = Nothing
@@ -3782,7 +3783,12 @@ For Each X In Forms
     If X.Name = "GuiM2000" Then
         Set XX = X
         If Not XX.Enablecontrol Then
+        If XX.Tag = str(mycode) Then
+        XX.Tag = ""
+        XX.Enablecontrol = True
+        Else
         XX.TestModal mycode
+        End If
         End If
         If XX.Enablecontrol Then Set z = XX
         'End If

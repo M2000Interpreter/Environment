@@ -1,10 +1,10 @@
 Attribute VB_Name = "gpp1"
 Option Explicit
 Public pw As Long, ph As Long, psw As Long, psh As Long, pwox As Long, phoy As Long, mydpi As Long, prFactor As Single, szFactor As Single
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
-Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
-Private Declare Sub GetMem81 Lib "msvbvm60" Alias "GetMem8" (ByVal Addr As Long, RetVal As Currency)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
+Private Declare Sub GetMem81 Lib "msvbvm60" Alias "GetMem8" (ByVal addr As Long, retval As Currency)
 
       Private Type DOCINFO
           cbSize As Long
@@ -346,39 +346,39 @@ Dim pDevMode As DEVMODE
         
          'Call CopyMemory(dm(1), pDevMode, Len(pDevMode))
 End Function
-Public Sub associate(EXT As String, FileType As String, _
+Public Sub associate(Ext As String, FileType As String, _
   ByVal FileName As String)
 On Error Resume Next
 FileName = mylcasefILE(FileName)
 Dim b As Object
 Set b = CreateObject("wscript.shell")
-EXT = "." & Replace(UCase(EXT), ".", "")
+Ext = "." & Replace(UCase(Ext), ".", "")
 If FileName = vbNullString Then Exit Sub
 b.regwrite "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\" & ExtractNameOnly(FileName, True), FileName
-b.regwrite "HKCR\" & EXT & "\", FileType
-b.regwrite "HKCR\" & FileType & "\", EXT & " M2000 file"  'EXT & "_auto_file"
+b.regwrite "HKCR\" & Ext & "\", FileType
+b.regwrite "HKCR\" & FileType & "\", Ext & " M2000 file"  'EXT & "_auto_file"
 b.regwrite "HKCR\" & FileType & "\DefaultIcon\", FileName & ",0"
 b.regwrite "HKCR\" & FileType & "\shell\open\command\", FileName & " ""%1"" "
-b.regwrite "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\", EXT & " M2000 file"
+b.regwrite "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\", Ext & " M2000 file"
 b.regwrite "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\DefaultIcon\", FileName & ",0"
 b.regwrite "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\shell\open\command\", FileName & " ""%1"" "
 b.regwrite "HKCR\Applications\" & FileType & "\shell\open\command\", FileName & " ""&l"" "
-b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\Application"
-b.regwrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\Application", FileName
-b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\OpenWithList\"
-b.regwrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\OpenWithList\", FileName
+b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & Ext & "\Application"
+b.regwrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & Ext & "\Application", FileName
+b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & Ext & "\OpenWithList\"
+b.regwrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & Ext & "\OpenWithList\", FileName
 
 End Sub
-Public Sub deassociate(EXT As String, FileType As String, _
+Public Sub deassociate(Ext As String, FileType As String, _
   ByVal FileName As String)
 On Error Resume Next
 FileName = mylcasefILE(FileName)
 Dim b As Object
 Set b = CreateObject("wscript.shell")
-EXT = "." & Replace$(EXT, ".", "")
+Ext = "." & Replace$(Ext, ".", "")
 If FileName = vbNullString Then Exit Sub
 b.regdelete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\" & ExtractNameOnly(FileName, True)
-b.regdelete "HKCR\" & EXT & "\" ', FileType
+b.regdelete "HKCR\" & Ext & "\" ', FileType
 b.regdelete "HKCR\" & FileType & "\shell\open\command\" ', Filename & " ""&l"" "
 b.regdelete "HKCR\" & FileType & "\DefaultIcon\" ', Filename & ",0"
 b.regdelete "HKCR\" & FileType & "\" ', EXT * " file"
@@ -386,8 +386,8 @@ b.regdelete "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\shell\open\comm
 b.regdelete "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\DefaultIcon\" ', Filename & ",0"
 b.regdelete "HKLM\SOFTWARE\Classes\" & ExtractName(FileName) & "\" ', EXT * " file"
 b.regdelete "HKCR\Applications\" & FileType & "\shell\open\command\" ', Filename & " ""&l"" "
-b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\Application"
-b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\OpenWithList\"
+b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & Ext & "\Application"
+b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & Ext & "\OpenWithList\"
 
 End Sub
 Function signlong(ByVal a As Currency) As Currency
@@ -450,7 +450,7 @@ uintnew = a
 End If
 End Function
 Function add32(ByVal a As Currency, ByVal b As Currency) As Currency
-add32 = uintnew1(lowlong(cInt64(CDec(a) + CDec(b))))
+add32 = uintnew1(LowLong(cInt64(CDec(a) + CDec(b))))
 End Function
 
 Function HexToUnsigned(s$) As Currency
